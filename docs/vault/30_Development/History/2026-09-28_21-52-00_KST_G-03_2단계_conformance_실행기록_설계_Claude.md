@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-G03-STAGE2-CONFORMANCE-RECORD-001"
 title: "G-03 2단계 설계 — conformance 실행 기록의 저장과 노출: host 범위 사실에 tenant RLS를 씌우지 않고, credential 없는 생산자만 허용하며, RECORDED가 무엇을 측정한 것인지 말한다 (카드 95, docs-only)"
-version: "1.0.0"
+version: "1.1.0"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T21:52:00+09:00"
+updated: "2026-09-28T22:24:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "a0e807b5"
@@ -17,7 +17,7 @@ tags: ["s10-be", "g-03", "conformance", "persistence", "rls", "design", "claude"
 
 전문은 [[G-03_conformance_실행기록_저장과_노출_2단계_설계]]다. 이 기록은 무엇을 결정했고 **어디서 카드 지시와 다른 결론이 났는지**를 남긴다.
 
-## 1. 카드 지시와 다른 결론 하나 — RLS
+## 1. 카드 지시와 다른 결론 하나 — RLS  *(v1.0 기록. **Codex가 승인**했다 — §10)*
 
 카드는 "(1) … table·column·index·**RLS(project/tenant 범위)**"를 지시했다. 설계는 **tenant RLS를 두지 않는 쪽**을 권고한다. 이유는 1단계가 이미 정한 사실이다.
 
@@ -37,7 +37,7 @@ tags: ["s10-be", "g-03", "conformance", "persistence", "rls", "design", "claude"
 
 `REDACTION_PROBES`는 adapter의 `redact()`를 **시험하는 입력**이고 `detail`을 세탁하는 장치가 아니다 — 그것을 sanitiser로 쓰는 설계는 하지 않았다. `checks` JSONB는 `name`·`passed`·`skipped`만 담고, 이름은 `CHECKLIST`의 닫힌 집합이라 자유 문자열이 아니다.
 
-## 3. 생산자는 credential 없이 도는 것만
+## 3. 생산자는 credential 없이 도는 것만  *(v1.0 기록. 금지 경계와 `installed-cli` 열거는 §10 F3·F2에서 바뀌었다)*
 
 실제 CLI `install`·`authenticate` 금지 이유를 네 개로 나눠 적었다 — (i) credential이 필요하고 그것은 **G-25 BLOCKED_EXTERNAL**이다, (ii) `install`은 host를 바꾸므로 측정이 스스로를 무효화한다, (iii) 시간 상한이 없다, (iv) 한 tenant 구성원이 촉발한 실행이 **모든 tenant가 읽는 공유 사실을 덮어쓴다**.
 
@@ -70,9 +70,9 @@ union으로 가는 방식에 따라 **gate가 통과하면서 계약 파일이 �
 
 또 `status` 리터럴이 넓어지므로 1단계의 원칙("코드가 만들 수 없는 값을 스키마가 광고하지 않는다")을 지키려면 **branch와 생산자가 같은 PR에** 들어가야 한다.
 
-## 7. 시험 계획
+## 7. 시험 계획  *(v1.0 기록 — **T12는 틀렸고 §10 F3에서 고쳤다**)*
 
-12개를 표로 적었고 핵심 부정 시험은 **T11**(route가 `run_conformance`를 import·호출하면 실패)과 **T12**(fixture 경로에서 `install`·`authenticate`가 호출되면 실패)다. 나머지는 계약·권한·append-only·index다.
+v1.0은 12개를 적고 핵심 부정 시험을 **T11**(route가 `run_conformance`를 import·호출하면 실패)과 **T12**(fixture 경로에서 `install`·`authenticate`가 호출되면 실패)로 뒀다. **T12는 제품 경계를 잘못 잡은 것이었다** — 현재 판(15개)과 고친 T12는 §10을 보라.
 
 ## 8. 검증 방법과 한계
 
@@ -81,6 +81,22 @@ union으로 가는 방식에 따라 **gate가 통과하면서 계약 파일이 �
 - **실행하지 않았다**: 로컬 실 PG·Docker·전체 suite. docs-only이고 코드 변경 0, migration 0이다.
 - **migration 번호를 예약하지 않았다** — 구현 PR에서 조정자가 배정한다.
 
-## 9. 다음 첫 행동
+## 9. 다음 첫 행동  *(v1.1에서 갱신)*
 
-Codex 계약·보안 검토. 승인 뒤 구현 카드는 (1) migration 번호 배정 요청, (2) §1의 RLS 판단 확정, (3) branch·생산자·`NOT_OBSERVED_REASON`·`#208` fixture를 한 PR로 묶는 순서다.
+v1.1 재검토 요청을 올렸다. RLS 판단은 §10에서 닫혔으므로 승인 뒤 구현 카드는 (1) migration 번호 배정 요청, (2) branch·생산자·`NOT_OBSERVED_REASON`·`#208` fixture를 한 PR로 묶기, (3) `CHECKLIST` 버전별 비교 규칙 확정 순서다.
+
+## 10. Codex 검토 반영 (v1.1)
+
+RLS는 **§2-1(c) host-global record로 승인**됐다. 승인 조건으로 붙은 세 불변식(row에 tenant·project·user 값이나 자유 문자열 없음 / route는 매번 `require_project_access` / 직접 DB 표면은 host-global 안전 필드만)을 설계가 계약으로 받았다. 차단 결함 5건은 다음과 같이 닫았다.
+
+| | Codex 지적 | 반영 |
+|---|---|---|
+| **F1** | 목록 route와 union의 응답 shape가 모순 | **exact key set까지 확정.** 결정적이었던 것은 "**기록 없는 adapter를 배열에 넣지 않는다**"다 — `adapters[]`가 대상, `records[]`가 존재하는 측정이므로 **배열에서의 부재가 측정의 부재**이고, 그래서 "섞인 배열"과 per-adapter `NOT_OBSERVED` entry라는 개념이 사라진다. 기록 0개면 **1단계 7키 그대로**, 하나 이상이면 `records[]`를 든 별 branch. 단건은 자기 class 두 개. class 4개·계약 파일 4개·`response_model`까지 적었다. item의 결과 목록은 `outcomes`로 이름을 갈라 descriptor `checks`와 섞이지 않게 했다 |
+| **F2** | 생산자 없는 값을 계약·CHECK가 광고 | **좁혔다.** Literal·CHECK는 `fixture-adapter`·`in-server` **한 값씩**, `source_ref` column은 **넣지 않는다**(채울 생산자가 없다). 넓히는 PR이 producer·검증·계약·조합 allowlist를 같은 commit에서 넓힌다 |
+| **F3** | T12가 제품 경계를 잘못 고정 | **내 설계 오류였다.** `run_conformance()`의 checklist가 `adapter.install()`(`conformance.py:206`)·`adapter.authenticate()`(`:215`)를 **실제로 부른다** — 실측으로 확인했다. 그래서 금지 대상을 메서드 호출이 아니라 **실 adapter 선택(`CliAdapter`·`agents.BY_NAME`)·subprocess·실 credential·요청 중 실행**으로 다시 정했고, fixture stub은 **호출되어야 하며** host mutation·외부 credential 접근이 0임을 단언하도록 T12를 고쳤다 |
+| **F4** | report 내부 무결성이 counts 합 하나 | **§2-8 신설.** 생산자는 caller dict가 아니라 실제 `ConformanceReport`에서 만들고 counts를 **재계산**, `failed`는 유도, `checks`는 개수·정확한 키·`CHECKLIST`와 같은 이름·같은 순서·중복 없음, `passed && skipped` 거부. `jsonb_array_length(checks) = total`을 **DB CHECK로도** 둔다. 깨진 저장 row는 읽을 때 **정본 5xx로 fail-closed**(T13) |
+| **F5** | host 결속·단일 host 전제 없음 | **`host_id`를 row·조회·index에 결속**했다(§2-9). 비식별 opaque 값이고 설정에서 오며, 없으면 생산자는 시작하지 않고 읽기는 정본 5xx다(다른 host 기록으로 답하거나 `NOT_OBSERVED`로 위장하지 않는다). index·질의는 **`(host_id, adapter, recorded_at DESC, record_id DESC)`** 로 동률까지 결정적이다. 강제할 수 없는 배포 전제보다 행에 적힌 값을 골랐다 |
+
+시험은 12개에서 **15개**가 됐다. T12를 고치고 T13(깨진 row fail-closed)·T14(생산자 재계산)·T15(`host_id` 부재)를 넣었으며, T5를 "**기존 계약 파일과 exact key set 대조**"로, T3을 "생산 가능한 값만"으로, T10을 "host별·결정적 최신 선택"으로 조였다.
+
+**정직하게 적어 둘 것**: F3은 내가 설계에서 틀린 것이다 — 금지의 *이유* 네 개는 유효했지만 그것에서 **시험 가능한 경계를 도출한 방식**이 잘못됐고, 그대로 구현하면 정상 생산자가 실패했다. 실측(`:206`·`:215`)으로 확인한 뒤 경계를 다시 세웠다.
