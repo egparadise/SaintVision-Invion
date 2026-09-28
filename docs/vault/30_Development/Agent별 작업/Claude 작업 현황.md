@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.42"
+version: "1.2.43"
 status: "review"
 author: "Claude"
-updated: "2026-09-28T17:15:23+09:00"
+updated: "2026-09-28T21:52:00+09:00"
 
 updated: "2026-09-28T18:40:59+09:00"
 source_of_truth: "Git"
@@ -20,6 +20,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+G-03 2단계 설계 카드 95 (Claude, 2026-09-28, base #200 head `a0e807b5`, branch `agent/claude/g03-conformance-stage2-design`, docs-only): conformance 실행 기록의 table·column·index·RLS·생산자·RECORDED branch·시험 계획. **RLS는 카드 지시와 다르게 권고**했다 — host 범위 사실에 tenant 소유를 씌우면 복제 불일치나 영원히 안 보이는 행이 되므로 `tenant_id` 없이 두고 읽기 경계는 live membership(근거·대안 2개를 표로, 판단은 Codex·조정자). `detail`은 저장·노출 안 함(host CLI 출력이 모든 tenant에게 새는 경로). 실제 CLI `install`·`authenticate` 금지 이유 4개. `subject`가 fixture vs installed-cli를 말한다. `exported()`·`--check`의 고아 계약 파일 공백을 실측해 시험(T7)으로 메운다. 핵심 부정 시험은 T11(route가 suite를 돌리면 실패)·T12(실 CLI 호출이면 실패). 다음 첫 행동: Codex 계약·보안 검토. 전문 [[G-03_conformance_실행기록_저장과_노출_2단계_설계]].
 
 G-03 conformance API 1단계 구현 (Claude, 2026-09-28, base 설계 #182 `50c7a33c` + #167 `b7866d63` + #184 `c47811b2`(=#195) merge, branch `agent/claude/g03-conformance-api-impl`): 설계 v1.2 그대로. `conformance.py`에 `CheckSpec`·`CHECKLIST` 단일 정본 도입(`run_conformance()`가 소비, `tests/test_adapters.py` 27 passed 무변경이 동작 불변의 근거), 15-name 독립 set ratchet(순서+gate 3), `GET /v1/projects/{p}/adapters/conformance`는 `NOT_OBSERVED` 단일값·counts·boolean 없음·`recordedAt`은 null 전용 required·suite 미실행(예외 stub + AST 참조 확인), `RES-0004`는 2단계 deferred, live membership·부재/비회원/다른 tenant 동형 403, **#195 merge로 정본 403 denial 1행을 PG-free(stub 단언)와 실 PG(audit_events 실제 행)에서 확인**(무토큰 401 + anonymous 행 포함). 계약 1개 생성·새 code 0·migration 없음. PG-free 43 passed + 변이 5건 사망, 실 PG 7건 hosted, fixture guard 포함. 다음 첫 행동: Codex 검토. 2단계는 migration 번호 선요청부터. 전문 [[2026-09-28_G-03_conformance_API_1단계_구현_Claude]].
 
