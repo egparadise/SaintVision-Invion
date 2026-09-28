@@ -38,7 +38,6 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
   nodes = [],
   activePool: propActivePool,
   allPools: propAllPools,
-  projectId,
   initialPools,
   initialPoolsState,
   initialPoolsError,
