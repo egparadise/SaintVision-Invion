@@ -2,6 +2,7 @@
 
 from contextlib import contextmanager
 from datetime import datetime, timezone
+import ast
 import hashlib
 import importlib.util
 import json
@@ -12,7 +13,7 @@ import pytest
 
 from inv.errors import DomainError
 from inv.object_store import LocalObjectStore, ObjectDigest
-from inv.s3_client import HttpResponse, S3Client, S3Config
+from inv.s3_client import HttpResponse, S3Client, S3Config, _authorization
 from inv.s3_object_store import S3Objects, make_s3_locator
 
 
@@ -110,6 +111,17 @@ def test_put_access_denied_is_never_lowered_to_idempotent_success():
     assert [call[0] for call in client.calls] == ["PUT"]
 
 
+def test_conditional_put_conflict_preserves_existing_bytes_and_is_not_success():
+    client = FakeClient()
+    client.put_response = HttpResponse(412, {}, b"")
+    different = b"replacement must not overwrite committed bytes"
+    with pytest.raises(DomainError) as error:
+        store(client).put(LOCATOR, different, hashlib.sha256(different).hexdigest())
+    assert error.value.code == "STORE-0005" and error.value.status == 409
+    assert client.get_response.body == BODY
+    assert [call[0] for call in client.calls] == ["PUT", "GET"]
+
+
 @pytest.mark.parametrize("damage", ["body", "metadata", "size"])
 def test_get_fails_closed_on_every_integrity_drift(damage):
     client = FakeClient()
@@ -173,6 +185,11 @@ def test_local_objects_are_exposed_through_the_same_spi_without_scope_discard():
     assert provider.exists(locator) is True
     assert provider.get(locator, SHA, len(BODY)) == BODY
     assert provider.hash(locator) == ObjectDigest(SHA, len(BODY))
+    different = b"replacement"
+    with pytest.raises(DomainError) as error:
+        provider.put(locator, different, hashlib.sha256(different).hexdigest())
+    assert error.value.code == "STORE-0005" and error.value.status == 409
+    assert provider.get(locator, SHA, len(BODY)) == BODY
     provider.delete(locator)
     assert provider.exists(locator) is False
     assert provider.provider_id == "local-bounded-v1"
@@ -198,17 +215,65 @@ def test_public_request_contracts_never_accept_object_id_or_provider_locator():
         for name in schema["$defs"]
         if name.endswith(("Input", "Request", "Spec", "Command"))
     }
+    def property_names(value, definitions, seen=frozenset()):
+        if not isinstance(value, dict):
+            return set()
+        reference = value.get("$ref")
+        if isinstance(reference, str) and reference.startswith("#/$defs/"):
+            name = reference.rsplit("/", 1)[1]
+            if name in seen:
+                return set()
+            return property_names(definitions[name], definitions, seen | {name})
+        found = set(value.get("properties", {}))
+        for child in value.values():
+            if isinstance(child, dict):
+                found |= property_names(child, definitions, seen)
+            elif isinstance(child, list):
+                for item in child:
+                    found |= property_names(item, definitions, seen)
+        return found
+
+    forbidden = {"objectId", "locator"}
     violations = {
-        name: sorted({"objectId", "locator"} & set(schema["$defs"][name].get("properties", {})))
+        name: sorted(
+            forbidden
+            & property_names(schema["$defs"][name], schema["$defs"], {name})
+        )
         for name in request_names
-        if {"objectId", "locator"} & set(schema["$defs"][name].get("properties", {}))
+        if forbidden & property_names(schema["$defs"][name], schema["$defs"], {name})
     }
     standalone_requests = sorted((ROOT / "contracts").glob("*-request.schema.json"))
     for path in standalone_requests:
-        properties = json.loads(path.read_text(encoding="utf-8")).get("properties", {})
-        leaked = sorted({"objectId", "locator"} & set(properties))
+        standalone = json.loads(path.read_text(encoding="utf-8"))
+        leaked = sorted(
+            forbidden & property_names(standalone, standalone.get("$defs", {}))
+        )
         if leaked:
             violations[path.name] = leaked
+    app = ast.parse(
+        (ROOT / "services/control-plane/src/inv/app.py").read_text(encoding="utf-8-sig")
+    )
+    verbs = {"get", "post", "put", "patch", "delete", "websocket"}
+    for function in (
+        node for node in ast.walk(app) if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+    ):
+        routes = [
+            decorator
+            for decorator in function.decorator_list
+            if isinstance(decorator, ast.Call)
+            and isinstance(decorator.func, ast.Attribute)
+            and decorator.func.attr in verbs
+        ]
+        if not routes:
+            continue
+        parameters = {argument.arg.replace("_", "").lower() for argument in function.args.args}
+        if {"objectid", "locator"} & parameters:
+            violations[f"route:{function.name}:parameters"] = sorted(parameters)
+        for route in routes:
+            if route.args and isinstance(route.args[0], ast.Constant):
+                value = str(route.args[0].value).replace("_", "").lower()
+                if "{objectid" in value or "{locator" in value:
+                    violations[f"route:{function.name}:path"] = [str(route.args[0].value)]
     assert violations == {}
 
 
@@ -228,3 +293,48 @@ def test_sigv4_path_encoding_is_deterministic_and_secret_free_from_url():
     assert method == "GET" and url.endswith("/bucket-name/prefix/a%20space")
     assert "secret-value" not in url and "secret-value" not in json.dumps(headers)
     assert headers["authorization"].startswith("AWS4-HMAC-SHA256 Credential=ACCESS/")
+
+
+def test_put_condition_is_signed_so_an_intermediary_cannot_strip_it():
+    transport = FakeClient()
+    client = S3Client(
+        S3Config("https://storage.invalid", "bucket", "ACCESS", "secret", "us-east-1"),
+        transport,
+    )
+    client.put("object", BODY, SHA)
+    headers = transport.calls[0][2]
+    assert headers["if-none-match"] == "*"
+    assert "SignedHeaders=host;if-none-match;x-amz-content-sha256;" in headers[
+        "authorization"
+    ]
+
+
+def test_sigv4_matches_the_aws_s3_get_object_known_answer_vector():
+    """AWS S3 SigV4 guide, GET Object example dated 2013-05-24."""
+
+    empty_sha = hashlib.sha256(b"").hexdigest()
+    config = S3Config(
+        "https://examplebucket.s3.amazonaws.com",
+        "examplebucket",
+        "AKIAIOSFODNN7EXAMPLE",
+        "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+        "us-east-1",
+    )
+    authorization = _authorization(
+        config,
+        "GET",
+        "/test.txt",
+        {
+            "host": "examplebucket.s3.amazonaws.com",
+            "range": "bytes=0-9",
+            "x-amz-content-sha256": empty_sha,
+            "x-amz-date": "20130524T000000Z",
+        },
+        b"",
+    )
+    assert authorization == (
+        "AWS4-HMAC-SHA256 "
+        "Credential=AKIAIOSFODNN7EXAMPLE/20130524/us-east-1/s3/aws4_request, "
+        "SignedHeaders=host;range;x-amz-content-sha256;x-amz-date, "
+        "Signature=f0e8bdb87c964420e857bd35b5d6ed310bd44f0170aba48dd91039c6036bdb41"
+    )

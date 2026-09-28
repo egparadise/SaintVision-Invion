@@ -64,6 +64,38 @@ def _sign(key: bytes, value: str) -> bytes:
     return hmac.new(key, value.encode("utf-8"), hashlib.sha256).digest()
 
 
+def _authorization(config, method, canonical_uri, headers, body):
+    """Return SigV4 Authorization for an already-canonical S3 request."""
+
+    payload_hash = hashlib.sha256(body).hexdigest()
+    signed_names = ";".join(sorted(headers))
+    canonical_headers = "".join(
+        f"{name}:{headers[name].strip()}\n" for name in sorted(headers)
+    )
+    canonical_request = "\n".join(
+        [method, canonical_uri, "", canonical_headers, signed_names, payload_hash]
+    )
+    date = headers["x-amz-date"][:8]
+    scope = f"{date}/{config.region}/s3/aws4_request"
+    string_to_sign = "\n".join(
+        [
+            "AWS4-HMAC-SHA256",
+            headers["x-amz-date"],
+            scope,
+            hashlib.sha256(canonical_request.encode()).hexdigest(),
+        ]
+    )
+    date_key = _sign(("AWS4" + config.secret_key).encode(), date)
+    region_key = _sign(date_key, config.region)
+    service_key = _sign(region_key, "s3")
+    signing_key = _sign(service_key, "aws4_request")
+    signature = hmac.new(signing_key, string_to_sign.encode(), hashlib.sha256).hexdigest()
+    return (
+        f"AWS4-HMAC-SHA256 Credential={config.access_key}/{scope}, "
+        f"SignedHeaders={signed_names}, Signature={signature}"
+    )
+
+
 class S3Client:
     """One canonical AWS Signature Version 4 implementation for S3 calls."""
 
@@ -71,7 +103,9 @@ class S3Client:
         self.config = config
         self.transport = transport or UrlLibTransport()
 
-    def _request(self, method, key, body=b"", metadata_digest=None, now=None):
+    def _request(
+        self, method, key, body=b"", metadata_digest=None, if_none_match=None, now=None
+    ):
         now = now or datetime.now(timezone.utc)
         parsed = urlsplit(self.config.endpoint)
         host = parsed.netloc
@@ -90,38 +124,15 @@ class S3Client:
         }
         if metadata_digest is not None:
             headers["x-amz-meta-content-sha256"] = metadata_digest
-        signed_names = ";".join(sorted(headers))
-        canonical_headers = "".join(
-            f"{name}:{headers[name].strip()}\n" for name in sorted(headers)
-        )
-        canonical_request = "\n".join(
-            [method, canonical_uri, "", canonical_headers, signed_names, payload_hash]
-        )
-        date = now.strftime("%Y%m%d")
-        scope = f"{date}/{self.config.region}/s3/aws4_request"
-        string_to_sign = "\n".join(
-            [
-                "AWS4-HMAC-SHA256",
-                headers["x-amz-date"],
-                scope,
-                hashlib.sha256(canonical_request.encode()).hexdigest(),
-            ]
-        )
-        date_key = _sign(("AWS4" + self.config.secret_key).encode(), date)
-        region_key = _sign(date_key, self.config.region)
-        service_key = _sign(region_key, "s3")
-        signing_key = _sign(service_key, "aws4_request")
-        signature = hmac.new(
-            signing_key, string_to_sign.encode(), hashlib.sha256
-        ).hexdigest()
-        headers["authorization"] = (
-            f"AWS4-HMAC-SHA256 Credential={self.config.access_key}/{scope}, "
-            f"SignedHeaders={signed_names}, Signature={signature}"
+        if if_none_match is not None:
+            headers["if-none-match"] = if_none_match
+        headers["authorization"] = _authorization(
+            self.config, method, canonical_uri, headers, body
         )
         return self.transport.request(method, url, headers, body)
 
     def put(self, key, body, digest):
-        return self._request("PUT", key, body, digest)
+        return self._request("PUT", key, body, digest, if_none_match="*")
 
     def get(self, key):
         return self._request("GET", key)

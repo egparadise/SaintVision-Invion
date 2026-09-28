@@ -100,6 +100,17 @@ class LocalObjectStore:
 
     def put(self, locator, body, expected_sha256):
         with self.legacy.locked() as files:
+            if files.exists(locator):
+                observed = files.hash(locator)
+                if (
+                    observed.sha256 != expected_sha256
+                    or observed.size_bytes != len(body)
+                ):
+                    raise DomainError(
+                        "STORE-0005", "Immutable object already differs", 409
+                    )
+                files.read(locator, expected_sha256, len(body))
+                return
             files.put(locator, body, expected_sha256)
 
     def get(self, locator, expected_sha256, expected_size):
