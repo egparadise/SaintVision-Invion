@@ -251,3 +251,17 @@ def test_fault_transport_preserves_real_reads_and_injects_only_one_put(monkeypat
     assert result.status == 200 and transport.observed is True
     assert control.calls[0][0] == "safe-key" and control.calls[0][1] == b"partial"
     assert transport.request("GET", "safe", {}, b"").body == b"read"
+
+
+def test_budget_upsert_uses_the_actual_composite_primary_key():
+    class Connection:
+        call = None
+
+        def execute(self, statement, params):
+            self.call = (statement, params)
+
+    connection = Connection()
+    producer._set_budget(connection, "tenant", "project", 63)
+    statement, params = connection.call
+    assert "ON CONFLICT(tenant_id,project_id)" in statement
+    assert params == ("tenant", "project", 63)

@@ -373,6 +373,14 @@ def _count_storage_rows(env) -> int:
         ).fetchone()["n"]
 
 
+def _set_budget(connection, tenant: str, project: str, quota: int) -> None:
+    connection.execute(
+        "INSERT INTO inv.storage_budgets VALUES(%s,%s,%s) "
+        "ON CONFLICT(tenant_id,project_id) DO UPDATE SET quota_bytes=excluded.quota_bytes",
+        (tenant, project, quota),
+    )
+
+
 def _quota_case(identity: str, env) -> dict[str, Any]:
     from inv.snapshots import SnapshotStore
 
@@ -380,11 +388,7 @@ def _quota_case(identity: str, env) -> dict[str, Any]:
     digest = hashlib.sha256(body).hexdigest()
     attempts = 8 if identity.endswith("concurrent-8") else 1
     with psycopg.connect(env.owner) as owner:
-        owner.execute(
-            "INSERT INTO inv.storage_budgets VALUES(%s,%s,%s) "
-            "ON CONFLICT(project_id) DO UPDATE SET quota_bytes=excluded.quota_bytes",
-            (env.tenant, env.project, len(body) - 1),
-        )
+        _set_budget(owner, env.tenant, env.project, len(body) - 1)
     provider = S3Objects("s3-compatible-v1", "s11-quota/" + uuid4().hex, S3Client(_s3_config()))
     store = SnapshotStore(env.db, provider)
     before = _count_storage_rows(env)
@@ -428,11 +432,7 @@ def _provider_507_case(identity: str, env) -> dict[str, Any]:
     prefix = "s11-capacity/" + uuid4().hex
     control = S3Client(_s3_config())
     with psycopg.connect(env.owner) as owner:
-        owner.execute(
-            "INSERT INTO inv.storage_budgets VALUES(%s,%s,%s) "
-            "ON CONFLICT(project_id) DO UPDATE SET quota_bytes=excluded.quota_bytes",
-            (env.tenant, env.project, len(body) * 4),
-        )
+        _set_budget(owner, env.tenant, env.project, len(body) * 4)
     # SnapshotStore derives the part locator.  The fault transport rejects the
     # one product PUT and forwards the subsequent read to real MinIO.
     placeholder = S3Objects("s3-compatible-v1", prefix, control)
