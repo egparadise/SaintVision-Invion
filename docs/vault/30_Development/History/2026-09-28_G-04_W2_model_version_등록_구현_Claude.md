@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-G04-W2-MODEL-VERSION-REGISTER-001"
-title: "G-04 W2 model version 등록 route 구현 v1.1 — canApprove·부모 결속 404·정본 ProblemDetails·IDEM-6 advisory 직렬화, URI 서버 파생·잠금 뒤 시각 취득(Codex F2·F3), UNIQUE 충돌 409, PG-free 80 + 실 PG 13 시험"
-version: "1.1.0"
+title: "G-04 W2 model version 등록 route 구현 v1.1 — canApprove·부모 결속 404·정본 ProblemDetails·IDEM-6 advisory 직렬화, URI 서버 파생·잠금 뒤 시각 취득(Codex F2·F3), UNIQUE 충돌 409, F1 oracle 종결·F4 denial 1행 고정, PG-free 91 + 실 PG 16 시험"
+version: "1.2.0"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T16:28:56+09:00"
+updated: "2026-09-28T17:33:11+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S10-BE"]
@@ -151,3 +151,46 @@ Codex 결정: tenant-wide `uq_model_versions_tenant_id_content_sha256`은 siblin
 | 실 PG | 13건(목표 F1 시험 1건은 migration PR로 이동) |
 
 **변이 3건이 죽었다**: URI를 다른 model로 파생(6건 이상), 시각 취득을 lock 앞으로 되돌림(3건), sqlstate fallback 복원(1건).
+
+## 11. v1.2 — F1·F4 선행을 merge하고 시험을 뒤집었다
+
+조정자 지시대로 두 head를 차례로 merge했다(**둘 다 해소만**):
+
+| merge | 무엇이 풀렸나 |
+|---|---|
+| **#197** head `977faf90`(migration `0052`) | digest UNIQUE가 `(model_id, content_sha256)`이 되어 **F1 oracle이 사라졌다** |
+| **#184** head `c47811b2`(= `#195`) | 정본 403이 **denial 1행**을 남긴다 — 내가 v1.0 §7에서 공백으로 보고한 것 |
+
+`projects.py`는 네 route(release·lineage·run records·model versions)를 모두 등록하는 union으로 해소했다.
+
+### 11-1. 제품 한 곳을 반드시 고쳐야 했다
+
+`UNIQUE_CONFLICTS`가 **없어진 constraint 이름**(`uq_model_versions_tenant_id_content_sha256`)을 키로 들고 있었다. 그대로 두면 같은 model 안 digest 중복이 **알 수 없는 constraint로 전파돼 500**이 된다(비차단 지적대로 모르는 위반은 전파하므로). `uq_model_versions_model_id_content_sha256`으로 바꾸고, **detail도 고쳤다** — 충돌이 이제 호출자가 path에 적은 model 안이므로 *"This model already has a version with that content digest."* 라고 말할 수 있다. 옛 이름은 표에서 **뺐다**: 남겨 두면 migration이 되돌려질 때 모호한 문구가 조용히 되살아나는 죽은 코드다.
+
+### 11-2. F1 시험을 뒤집었다
+
+- 실 PG: 누출을 공백으로 기록하던 시험을 **`test_f1_a_digest_held_in_a_project_i_cannot_see_does_not_refuse_my_registration`** 으로 교체했다 — **201**이고 그 bytes를 든 행이 project마다 하나씩 **둘**이며 상대 project·model id는 응답에 없다. 짝으로 **같은 model 안 같은 digest는 여전히 409**(route를 통해, 500이 아니라)를 단언한다.
+- PG-free: `test_f1_the_digest_conflict_is_now_inside_the_model_the_caller_named`(detail이 무엇이 일어났는지 말하고 project는 말하지 않음) + `test_f1_the_tenant_wide_digest_constraint_is_no_longer_mapped`(옛 이름은 매핑되지 않으므로 500).
+
+### 11-3. F4를 #191 쪽 시험으로 고정했다
+
+`#195`의 recorder를 stub해(`world["audited_denials"]` — 기존 `world["denials"]`는 "raise할 오류"라 키를 따로 썼다) **1건**과 모든 컬럼을 단언한다. 그리고 지시받은 **register route action 회귀**:
+
+```
+POST /v1/projects/{project_id}/models/{model_id}/versions
+```
+
+57자이므로 `AUDIT_ACTION_LIMIT`(64) 안에 들어가 **template 그대로**이고 digest 형태가 아니다. 시험이 (i) 그 문자열과 정확히 같은지, (ii) `PROJECT`·`MODEL`·`USER`·`SHA`·키 어느 것도 들어 있지 않은지, (iii) 실제로 등록된 route의 path에서 파생된 값과 같은지(상수 drift 방지)를 본다. **404·422·409는 denial이 아니다**도 단언한다 — AC-02는 거부된 *접근*에 관한 것이고, 실패한 모든 요청을 denial로 적으면 trail이 쓸모를 잃는다. 두 span 사이 회수도 1행을 남기고 write는 0이다.
+
+실 PG에도 두 건을 넣었다: 403이 `audit_events`에 **정확히 1행**(모든 컬럼 + 그 action)을 남기고 row·원장은 0이며, 성공은 `allow` 1건(`model_version.register`)만 남고 denial 0이다.
+
+### 11-4. 검증(delta)
+
+| 명령 | 결과 |
+|---|---|
+| `pytest tests/core/test_model_version_register_route.py -q` | **91 passed**(v1.1의 80에서) |
+| `pytest … locator/0052 migration + test_migrations + canonical_denial_audit -q` | **73 passed** |
+| `export_schemas --check` · `check_contract_bindings` · `migration_graph` | PASS (head `0052` 단일) |
+| 실 PG | **16건**(F1 뒤집기 2 + F4 2 포함) |
+
+**변이 2건이 죽었다**: `UNIQUE_CONFLICTS`를 옛 tenant-wide 이름으로 되돌림 **4건**, `REGISTER_PATH` 변경(action 회귀) **5건+**.

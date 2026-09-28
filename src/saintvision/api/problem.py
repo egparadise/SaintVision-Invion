@@ -37,7 +37,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
@@ -155,12 +155,38 @@ def canonical_response(error: CanonicalProblem, *, trace_id: str) -> JSONRespons
     )
 
 
-def install_canonical_problem_handler(app: FastAPI) -> None:
-    """Register the handler once. Existing handlers are left alone."""
+#: Categories whose 401/403 refusals are audited (AC-02): the same two the
+#: legacy ``InvError`` handler records.
+DENIAL_CATEGORIES: frozenset[str] = frozenset({"AUTH", "SEC"})
+DENIAL_STATUSES: frozenset[int] = frozenset({401, 403})
+
+#: ``on_denial(request, code=..., trace_id=...)``: records one denial. Supplied
+#: by ``create_app`` so this module keeps no database dependency.
+DenialRecorder = Callable[..., None]
+
+
+def is_audited_denial(error: CanonicalProblem) -> bool:
+    """Whether a canonical problem is a denial the shared handler records."""
+    return error.category in DENIAL_CATEGORIES and error.status in DENIAL_STATUSES
+
+
+def install_canonical_problem_handler(
+    app: FastAPI, *, on_denial: DenialRecorder | None = None
+) -> None:
+    """Register the handler once. Existing handlers are left alone.
+
+    ``on_denial`` is called exactly once, before the response is built, for a
+    problem that :func:`is_audited_denial` -- and only there: no route records
+    a denial itself. If the recorder raises, the exception propagates and the
+    request ends as a generic 500 (fail-closed): an audit failure is not
+    disguised as a successful refusal.
+    """
 
     @app.exception_handler(CanonicalProblem)
     async def _canonical(request: Request, exc: CanonicalProblem) -> JSONResponse:
         trace_id = getattr(request.state, "trace_id", None) or new_trace_id()
+        if on_denial is not None and is_audited_denial(exc):
+            on_denial(request, code=exc.code, trace_id=trace_id)
         return canonical_response(exc, trace_id=trace_id)
 
 

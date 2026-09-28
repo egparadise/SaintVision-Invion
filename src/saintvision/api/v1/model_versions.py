@@ -128,18 +128,21 @@ IDEMPOTENCY_KEY_PATTERN = r"[A-Za-z0-9._:-]{1,128}"
 
 #: Unique constraints this route can reach, and what the caller may be told.
 #:
-#: ``uq_model_versions_model_id_version`` is entirely inside the path's project,
-#: because the model is bound before the service is called, so naming it
-#: discloses nothing the caller did not already name. The digest constraint is
-#: **tenant** scoped, so the same detail would tell a member of one project that
-#: a digest exists in another; its detail says only that the registration
-#: conflicts.
+#: Both are entirely inside the path's model, which the route binds to the path's
+#: project before calling the service, so a conflict on either is a conflict the
+#: caller already named: nothing is disclosed that they did not bring.
+#:
+#: The digest constraint used to be ``(tenant_id, content_sha256)`` and its detail
+#: had to be vague, because a member of one project could learn that a digest
+#: existed in another. Migration ``0052`` narrowed it to
+#: ``(model_id, content_sha256)`` (Codex #191 F1), which is why the detail can now
+#: say what actually happened.
 UNIQUE_CONFLICTS: Mapping[str, str] = {
     "uq_model_versions_model_id_version": (
         "This model already has a version with that name."
     ),
-    "uq_model_versions_tenant_id_content_sha256": (
-        "That content digest is already registered."
+    "uq_model_versions_model_id_content_sha256": (
+        "This model already has a version with that content digest."
     ),
 }
 # ``uq_model_versions_tenant_id_version_id`` is deliberately absent: a collision

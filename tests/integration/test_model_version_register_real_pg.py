@@ -115,18 +115,37 @@ def _seed(connection, *, tenant_id, now, label, role="approver"):
     return {"user_id": user_id, "project_id": project_id, "model_id": model_id}
 
 
-def _client(app_engine, *, tenant_id, user_id, now, authenticate=True):
+#: A bearer the real verifier knows, for the tests that need ``get_principal`` to
+#: actually run.
+TOKEN = "register-real-token"
+
+
+def _client(app_engine, *, tenant_id, user_id, now, authenticate=True, verified=False):
+    """A client for this app.
+
+    ``verified=True`` registers a real credential instead of overriding
+    ``get_principal``. That distinction is load-bearing for the denial audit: the
+    shared recorder reads the actor and the tenant from what ``get_principal``
+    pinned on ``request.state``, so a dependency override leaves them unset and the
+    row comes out anonymous with no tenant. The first hosted run of the F4 test
+    showed exactly that -- ``tenant_id`` was NULL -- and the product was right: it
+    records only what the request proved. Tests that assert those columns therefore
+    have to go through the real verifier.
+    """
+    principal = Principal(
+        user_id=user_id, tenant_id=tenant_id, external_subject="synthetic-register"
+    )
     app = create_app(
         engine=app_engine,
         settings=Settings(database_url="test-only", idempotency_ttl_seconds=600),
-        verifier=StaticPrincipalVerifier({}, allow_outside_dev=True),
+        verifier=StaticPrincipalVerifier(
+            {TOKEN: principal} if verified else {}, allow_outside_dev=True
+        ),
         clock=lambda: now,
         check_partitions_on_startup=False,
     )
-    if authenticate:
-        app.dependency_overrides[get_principal] = lambda: Principal(
-            user_id=user_id, tenant_id=tenant_id, external_subject="synthetic-register"
-        )
+    if authenticate and not verified:
+        app.dependency_overrides[get_principal] = lambda: principal
     return TestClient(app, raise_server_exceptions=False)
 
 
@@ -148,6 +167,11 @@ def _body(version="1.0.0", digest=None):
 
 def _headers(key):
     return {"Idempotency-Key": key, "Content-Type": "application/json"}
+
+
+def _bearer_headers(key):
+    """The same headers plus a credential the real verifier accepts."""
+    return {**_headers(key), "Authorization": f"Bearer {TOKEN}"}
 
 
 def _rows(owner_engine, tenant_id):
@@ -340,28 +364,25 @@ def test_the_same_digest_again_is_a_409_and_writes_nothing(
     )
 
     body = _canonical(response, code="GRAPH-0002", status=409)
-    assert body["detail"] == "That content digest is already registered."
+    # The invariant that survives the F1 narrowing: the same bytes under two names
+    # *within one model* is still refused. And because the constraint is now inside
+    # the model the caller named, the detail may say so.
+    assert body["detail"] == "This model already has a version with that content digest."
     assert len(_rows(owner_engine, tenant)) == 1
-    # This is the invariant that survives the F1 narrowing: the same bytes under
-    # two names *within one model* stays a conflict.
 
 
-def test_f1_today_that_same_digest_is_refused_and_says_nothing_about_where(
+def test_f1_a_digest_held_in_a_project_i_cannot_see_does_not_refuse_my_registration(
     owner_engine, app_engine, two_tenants, frozen_now
 ):
-    """The sibling-project existence oracle, recorded as a gap, not as correct.
+    """The oracle #191 F1 named, closed by migration 0052 on this branch.
 
-    ``uq_model_versions_tenant_id_content_sha256`` is tenant scoped, so a digest
-    held in a project the caller cannot see refuses this registration -- and a
-    409/201 difference carries that existence bit whatever the wording says.
-    Codex #191 F1 decided the invariant moves to ``(model_id, content_sha256)``.
+    A caller who may approve only in their own project submits bytes that already
+    exist in a project they have no membership of. Before the narrowing they got
+    409 and the tenant-wide constraint had answered a question they had no access
+    to ask -- the existence bit is the status code, so no wording could hide it.
+    Now they get 201, and their registration is their own.
 
-    The target test ("two projects of one tenant may each register the same
-    digest") is **not** here: it would have to be an expected failure until the
-    migration lands, and an xfail is a JUnit ``skipped`` entry that the Backend
-    lane's exact-skip gate would reject. It belongs to the migration PR, which is
-    where it turns green. This test asserts what happens today, and that the
-    refusal at least discloses no identifier while it still happens.
+    This test replaces the one that pinned the leak as current behaviour.
     """
     tenant, _ = two_tenants
     with owner_engine.begin() as connection:
@@ -387,9 +408,125 @@ def test_f1_today_that_same_digest_is_refused_and_says_nothing_about_where(
         _path(mine), json=_body("1.0.0", digest=digest), headers=_headers("k-hid2")
     )
 
-    _canonical(response, code="GRAPH-0002", status=409)
+    assert response.status_code == 201, response.text
+    # Two rows now hold those bytes, one per project, and nothing about the other
+    # project reached this caller.
+    rows = _rows(owner_engine, tenant)
+    assert len(rows) == 2
     assert hidden["project_id"] not in response.text
     assert hidden["model_id"] not in response.text
+
+
+def test_f1_the_same_digest_in_the_same_model_is_still_refused(
+    owner_engine, app_engine, two_tenants, frozen_now
+):
+    """The other half: narrowing the scope did not abandon the rule.
+
+    Asserted through the route rather than the table, because what matters here is
+    that the caller is told 409 rather than 500 -- the constraint is the second
+    defence the design counts on.
+    """
+    tenant, _ = two_tenants
+    with owner_engine.begin() as connection:
+        seeded = _seed(connection, tenant_id=tenant, now=frozen_now, label="w2-inmodel")
+
+    client = _client(app_engine, tenant_id=tenant, user_id=seeded["user_id"], now=frozen_now)
+    digest = _digest()
+    assert client.post(
+        _path(seeded), json=_body("1.0.0", digest=digest), headers=_headers("k-in1")
+    ).status_code == 201
+    response = client.post(
+        _path(seeded), json=_body("2.0.0", digest=digest), headers=_headers("k-in2")
+    )
+
+    body = _canonical(response, code="GRAPH-0002", status=409)
+    assert body["detail"] == "This model already has a version with that content digest."
+    assert len(_rows(owner_engine, tenant)) == 1
+
+
+def test_f4_a_refused_registration_leaves_exactly_one_denial_row(
+    owner_engine, app_engine, two_tenants, frozen_now
+):
+    """F4, against a real ``audit_events``.
+
+    This PR reported that a canonical 403 left no denial at all; #195 is the fix
+    and is merged into this branch, so the row is asserted rather than described.
+    The action is the bounded, identifier-free template (#189).
+    """
+    tenant, _ = two_tenants
+    with owner_engine.begin() as connection:
+        seeded = _seed(
+            connection, tenant_id=tenant, now=frozen_now, label="w2-deny", role="requester"
+        )
+
+    client = _client(
+        app_engine,
+        tenant_id=tenant,
+        user_id=seeded["user_id"],
+        now=frozen_now,
+        verified=True,
+    )
+    body = _canonical(
+        client.post(_path(seeded), json=_body(), headers=_bearer_headers("k-deny")),
+        code="AUTH-0030",
+        status=403,
+    )
+
+    with owner_engine.begin() as connection:
+        rows = connection.execute(
+            text(
+                "SELECT tenant_id, actor_type, actor_id, action, outcome, reason_code, "
+                "target_type, target_id, trace_id, detail FROM audit_events "
+                "WHERE outcome = 'deny' ORDER BY occurred_at"
+            )
+        ).mappings().all()
+
+    assert len(rows) == 1, rows
+    row = rows[0]
+    assert row["tenant_id"] == tenant
+    assert row["actor_type"] == "user"
+    assert row["actor_id"] == seeded["user_id"]
+    assert row["reason_code"] == "AUTH-0030"
+    assert (row["target_type"], row["target_id"]) == ("project", seeded["project_id"])
+    assert row["trace_id"] == body["traceId"]
+    assert row["detail"] == {}
+    # The register route's action, verbatim: 57 characters, so not the digest form.
+    assert row["action"] == "POST /v1/projects/{project_id}/models/{model_id}/versions"
+    assert seeded["project_id"] not in row["action"]
+    assert seeded["model_id"] not in row["action"]
+    # Nothing was written by the refused request.
+    assert _rows(owner_engine, tenant) == []
+    assert _ledger(owner_engine, tenant) == []
+
+
+def test_f4_a_registration_that_succeeds_records_an_allow_and_no_denial(
+    owner_engine, app_engine, two_tenants, frozen_now
+):
+    tenant, _ = two_tenants
+    with owner_engine.begin() as connection:
+        seeded = _seed(connection, tenant_id=tenant, now=frozen_now, label="w2-allow")
+
+    client = _client(
+        app_engine,
+        tenant_id=tenant,
+        user_id=seeded["user_id"],
+        now=frozen_now,
+        verified=True,
+    )
+    assert client.post(
+        _path(seeded), json=_body(), headers=_bearer_headers("k-allow")
+    ).status_code == 201
+
+    with owner_engine.begin() as connection:
+        outcomes = connection.execute(
+            text(
+                "SELECT outcome, action FROM audit_events WHERE tenant_id = :t "
+                "ORDER BY occurred_at"
+            ),
+            {"t": tenant},
+        ).mappings().all()
+    assert [row["outcome"] for row in outcomes] == ["allow"]
+    assert outcomes[0]["action"] == "model_version.register"
 
 
 # --------------------------------------------------------------------------
