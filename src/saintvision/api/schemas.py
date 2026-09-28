@@ -825,6 +825,40 @@ class ModelVersionResponse(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+class EvalRunStartRequest(Strict):
+    """What a caller may choose when starting an eval run (G-05 W5).
+
+    Three fields, and what is *absent* matters as much as what is here.
+
+    ``adapter`` is a **name**, not an endpoint or a credential. The server resolves
+    it through ``adapters.agents.adapter_for``, whose ``BY_NAME`` is the configured
+    allowlist, so a caller can pick one of the platform's four CLIs and nothing
+    else. A request that could name a URL would let the caller point this route --
+    which spends money -- at a host of their choosing.
+
+    ``componentVersions`` is part of the run's identity: "the agent scored 72%"
+    means nothing without which prompt, context and model produced it. It is
+    bounded, and the three keys the service fills in itself are **refused**:
+    ``run_suite`` merges them with ``setdefault``, so a caller who sent
+    ``{"adapter": "something-else"}`` would have their own value recorded as the
+    identity of the run. Refusing them is the only place that can be stopped
+    without changing the service's signature.
+
+    ``requireModelPinning`` defaults to **true**, which is the service's own
+    default: a score from an adapter that cannot say which model build produced it
+    is not reproducible. Passing false is allowed and is recorded on the run
+    (``modelPinned: "false"``) rather than merely decided at the call site.
+    """
+
+    adapter: str = Field(min_length=1, max_length=64, pattern="^[a-z0-9-]+$")
+    require_model_pinning: bool = Field(default=True, alias="requireModelPinning")
+    component_versions: dict[str, str] = Field(
+        default_factory=dict, alias="componentVersions", max_length=32
+    )
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
 class RetentionPinRequest(Strict):
     """What a caller asks of W4: keep this version at least until ``until``.
 
@@ -836,6 +870,33 @@ class RetentionPinRequest(Strict):
     """
 
     until: AwareDatetime
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class EvalRunResponse(Strict):
+    """The finished run, by identity and by count.
+
+    No case content and no model output: ``eval_results.observed`` is a redacted
+    summary and this response does not carry even that. What a caller needs from
+    starting a run is which run it was and whether it passed.
+
+    ``passedGate`` is its own field rather than something a reader derives from
+    the counts, because the row's own rule is stricter than "passed == total": a
+    run with any forbidden-behaviour violation is not a pass whatever the score
+    says.
+    """
+
+    eval_run_id: str = Field(alias="evalRunId")
+    suite_id: str = Field(alias="suiteId")
+    status: Literal["running", "completed", "aborted"]
+    total_cases: int = Field(ge=0, alias="totalCases")
+    passed_cases: int = Field(ge=0, alias="passedCases")
+    violations: int = Field(ge=0)
+    passed_gate: bool = Field(alias="passedGate")
+    component_versions: dict[str, str] = Field(alias="componentVersions")
+    started_at: dt.datetime = Field(alias="startedAt")
+    ended_at: dt.datetime | None = Field(default=None, alias="endedAt")
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
