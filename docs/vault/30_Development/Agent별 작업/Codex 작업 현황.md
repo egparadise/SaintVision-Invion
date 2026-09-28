@@ -1,20 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.206"
+version: "1.0.207"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T14:16:18+09:00"
+updated: "2026-09-28T15:17:15+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
 
-## 2026-09-28 S11-ST 손상·용량·backup 장애 시험 설계 — PR 요청
+## 2026-09-28 S11-ST 손상·용량·backup 장애 시험 설계 v1.1 — 재검토 요청 준비
 
-- 객체 손상·부분 쓰기·용량 소진은 AC-11 `long-soak`의 hosted 하위 matrix, WAL archive·retention 장애는 `actual-pitr-rpo-rto-retention` 축으로 분리했다. hosted archive·same-host dry-run은 운영 PITR 합격으로 승격하지 않는다.
-- target을 결과보다 먼저 Git에 고정했다: hosted 3600초·1000 operation·fault 6/6와 손실/유출/overshoot/residue 0, 운영 RPO 900초·RTO 3600초·35일·2주 smoke 및 archive/retention fault 뒤 복구 2건이다.
-- Local disk-full의 raw `OSError`와 retention apply 중단의 journal 부재는 현재 구현 공백이다. 공개 계약·migration·registry 상태는 불변이며 S11-ST `planned`, 측정은 `NOT_OBSERVED`, Claude 설계 검토 대기다. [[S11-ST_손상_용량_backup_장애시험_설계]], [[2026-09-28_14-16-18_KST_S11-ST_손상_용량_backup_장애시험_설계_Codex]].
+- Claude 검토 F1~F9를 반영해 별도 registry 소비 경로를 폐기했다. #177의 단일 정본 registry에 물리 5노드 24시간 long-soak target을 추가하고 약한 PITR target을 archive fault target으로 교체하며, 축별 targetId를 닫는 Codex 선행 카드를 확정했다.
+- hosted fault matrix는 AC-11 축 PASS가 아닌 reference-only다. raw producer→storage importer→AC-11 envelope 두 층, 22 case identity hash·exact 분류, `/bin/true`·empty/truncated backup `BAK-03`, 기존 #173·recovery drill·G-02·#150 재사용을 고정했다.
+- Local disk-full의 raw `OSError`와 retention apply journal 부재는 구현 공백이다. 공개 계약·migration·registry 상태는 아직 불변이며 S11-ST `planned`, 측정 `NOT_OBSERVED`; target pin·정적 게이트·push 뒤 Claude 재검토를 요청한다. [[S11-ST_손상_용량_backup_장애시험_설계]], [[S11_ST_storage_failure_target_v0]], [[2026-09-28_14-16-18_KST_S11-ST_손상_용량_backup_장애시험_설계_Codex]].
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 
