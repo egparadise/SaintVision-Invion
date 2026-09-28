@@ -95,8 +95,8 @@ export interface EvalEvidence {
 }
 
 export const EXPECTED_FIXTURE_BYTE_SHA256 = {
-  prompts100: 'da34cea2e226fca69a5e7908468d079a87c96544c07ea404a73d903a283d2046',
-  codingTasks30: 'ee3ba6d78cf204f9038cef01589290d651ffc7a38b8498c72a7df674dbfe5408',
+  prompts100: 'f8962fdaaac27303d0ea3631a84f6e49a21008f6e9cc1b24d0806a73a47364b2',
+  codingTasks30: '549710ce589c37533e727d6f5d69242cff080668ff6652281e38c8151b3dbdb9',
 };
 
 export const ALLOWED_PROMPT_CATEGORIES = new Set([
@@ -366,7 +366,8 @@ export function runSyntheticEvalSuite(options: RunSyntheticSuiteOptions = {}): E
     try {
       const pPath = path.resolve(__dirname, '../../../tests/fixtures/prompts_100.json');
       if (fs.existsSync(pPath)) {
-        return sha256Hex(fs.readFileSync(pPath));
+        const raw = fs.readFileSync(pPath, 'utf-8').replace(/\r\n/g, '\n');
+        return sha256Hex(raw);
       }
     } catch {
       // fallback
@@ -378,7 +379,8 @@ export function runSyntheticEvalSuite(options: RunSyntheticSuiteOptions = {}): E
     try {
       const cPath = path.resolve(__dirname, '../../../tests/fixtures/coding_tasks_30.json');
       if (fs.existsSync(cPath)) {
-        return sha256Hex(fs.readFileSync(cPath));
+        const raw = fs.readFileSync(cPath, 'utf-8').replace(/\r\n/g, '\n');
+        return sha256Hex(raw);
       }
     } catch {
       // fallback

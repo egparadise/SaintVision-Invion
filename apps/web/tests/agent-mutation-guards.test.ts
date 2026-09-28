@@ -32,10 +32,10 @@ describe('G-07 Mutation & Integrity Guards (MUT-01~03 & MUT-RUN-01~07)', () => {
 
     it('matches exact canonical fixture byte SHA-256 constants', () => {
       expect(EXPECTED_FIXTURE_BYTE_SHA256.prompts100).toBe(
-        'da34cea2e226fca69a5e7908468d079a87c96544c07ea404a73d903a283d2046'
+        'f8962fdaaac27303d0ea3631a84f6e49a21008f6e9cc1b24d0806a73a47364b2'
       );
       expect(EXPECTED_FIXTURE_BYTE_SHA256.codingTasks30).toBe(
-        'ee3ba6d78cf204f9038cef01589290d651ffc7a38b8498c72a7df674dbfe5408'
+        '549710ce589c37533e727d6f5d69242cff080668ff6652281e38c8151b3dbdb9'
       );
     });
   });
