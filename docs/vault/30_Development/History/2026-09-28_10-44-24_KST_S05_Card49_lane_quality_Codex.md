@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CODEX-S05-CARD49-LANE-QUALITY-001"
 title: "S05 Card49 hosted lane fail-closed 품질 보강"
-version: "1.0.0"
+version: "1.0.1"
 status: "implemented-review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T10:44:24+09:00"
+updated: "2026-09-28T10:59:32+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S05-DB"]
@@ -26,10 +26,11 @@ PR #151 Claude r1 검토의 후속 결함 3~5와 생존 변이 1~7을 다음 계
 4. 검증하지 않은 `semaphoreProductCodePresent` 상수는 `semaphoreProductCodeExpected`로 개명했다. report의 `projectSemaphore` 부재 검증은 유지한다.
 5. wave·aggregate 이전 산출물을 실행 전에 지워 stale JSON/JUnit 재사용을 막았다.
 6. topology를 `placement_benchmark.py`에서 환경으로 전달해 wave JSON/JUnit scope가 hosted 측정을 정직하게 기록하도록 했다.
+7. 요청·성공·실패의 정수성과 합계, all-request P95 사용을 고정하고 aggregate JUnit에도 measurement scope를 기록했다. workflow concurrency는 YAML 구조로 job-level임을 검증하며 dirty checkout은 DB 접근 전에 거부한다.
 
 ## 시험과 경계
 
-`tests/test_s05_legacy_staircase.py` focused PG-free 시험은 26 passed다. `main()`을 subprocess·DB monkeypatch로 직접 호출해 첫 degraded rung 뒤 중단과 `DEGRADE_AT_20`, SQL timeout 합계, 이전 산출물 삭제, CLI provenance를 검증했다. 별도 부정 시험은 잘못된 SHA/scope/fingerprint/lifecycle, 누락·불일치 SQLSTATE, fingerprint 재사용, unexpected exit를 거부한다.
+`tests/test_s05_legacy_staircase.py` focused PG-free 재실행은 **31 passed**다. 첫 실행은 새 요청 합계 검사가 기존 부정 fixture 두 건의 `20 success + 1 failure` 모순을 먼저 잡아 **29 passed / 2 failed**였고, fixture를 `19 success + 1 failure`로 교정한 뒤 exit 0을 확인했다. `main()`을 subprocess·DB monkeypatch로 직접 호출해 첫 degraded rung 뒤 중단과 `DEGRADE_AT_20`, SQL timeout·요청 합계, 이전 산출물 삭제, CLI provenance와 dirty checkout DB 선차단을 검증했다. 별도 부정 시험은 잘못된 SHA/scope/fingerprint/lifecycle, 누락·불일치 SQLSTATE, fingerprint 재사용, unexpected exit, success-only P95 대체를 거부한다.
 
 YAML parse와 Python compile은 exit 0이고 수정 Python 3파일 Black check도 exit 0이다. 로컬 PostgreSQL·Docker·브라우저·전체 suite와 legacy staircase 측정은 실행하지 않았다. 이 카드의 hosted Backend는 코드 품질 증거이며 Card46 정본 run `36362386530`이나 Card47 compatibility run `36363327477`을 재판정하지 않는다.
 

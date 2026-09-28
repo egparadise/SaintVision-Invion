@@ -136,6 +136,22 @@ def _wave_metrics(report: dict[str, Any]) -> dict[str, Any]:
     ):
         _require(field in round_report, f"INVALID_RUN: round field {field} is required")
     _require("errorsBySqlState" in round_report, "INVALID_RUN: errorsBySqlState is required")
+    request_count = report.get("requestCount")
+    success_count = round_report["successCount"]
+    failure_count = round_report["failureCount"]
+    for name, value in (
+        ("requestCount", request_count),
+        ("successCount", success_count),
+        ("failureCount", failure_count),
+    ):
+        _require(
+            isinstance(value, int) and not isinstance(value, bool) and value >= 0,
+            f"INVALID_RUN: {name} must be a non-negative integer",
+        )
+    _require(
+        success_count + failure_count == request_count,
+        "INVALID_RUN: successCount plus failureCount must equal requestCount",
+    )
     sqlstates = round_report["errorsBySqlState"]
     _require(isinstance(sqlstates, dict), "INVALID_RUN: errorsBySqlState must be an object")
     _require(
@@ -145,7 +161,6 @@ def _wave_metrics(report: dict[str, Any]) -> dict[str, Any]:
         ),
         "INVALID_RUN: errorsBySqlState values must be non-negative integers",
     )
-    failure_count = round_report["failureCount"]
     _require(
         sum(sqlstates.values()) == failure_count,
         "INVALID_RUN: errorsBySqlState sum must equal failureCount",
@@ -294,6 +309,7 @@ def write_junit(path: Path, summary: dict[str, Any]) -> None:
         "codeSha": summary["codeSha"],
         "runPurpose": summary["runPurpose"],
         "canonicalDecisionEvidenceRunId": summary["canonicalDecisionEvidenceRunId"],
+        "measurementScope": summary["measurementScope"],
         "decision": summary["evaluation"]["decision"],
         "firstDegradeConcurrency": summary["evaluation"]["firstDegradeConcurrency"],
         "semaphoreProductCodeExpected": False,

@@ -1280,5 +1280,5 @@ AOA-05 follow-up: the old 18 setup errors had two distinct causes: unset CX01_CO
 ## 2026-09-28 Card49 S05 hosted lane 품질 보강
 
 - #151 Claude r1 후속: SQLSTATE 완전성·미분류 실패 `INVALID_RUN`, job concurrency 취소 방지, dirty checkout, CLI provenance, hosted topology, stale 산출물 삭제를 구현했다.
-- 생존 변이 1~7을 직접 겨냥한 PG-free `main()`/부정 시험을 추가해 focused 26 passed. YAML parse·compile·Black·diff exit 0이며 legacy staircase·실 PG·Docker·브라우저는 실행하지 않았다.
+- 생존 변이 1~7과 요청 합계·all-request P95·job concurrency 구조·dirty checkout 선차단을 겨냥한 PG-free `main()`/부정 시험은 focused 31 passed. 첫 실행의 fixture 모순 2건(29 passed/2 failed)을 교정했고, legacy staircase·실 PG·Docker·브라우저는 실행하지 않았다.
 - 새 측정이나 gate 변경이 아니며 Card46 정본 run과 Card47 compatibility run을 소급 변경하지 않는다. [[2026-09-28_10-44-24_KST_S05_Card49_lane_quality_Codex]]

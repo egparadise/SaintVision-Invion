@@ -7,6 +7,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location(
@@ -162,16 +163,41 @@ def test_sqlstate_counts_are_not_merged_with_success_latency():
 
 
 @pytest.mark.parametrize(
+    ("success", "failure", "message"),
+    [
+        (True, 0, "successCount must be a non-negative integer"),
+        (19, -1, "failureCount must be a non-negative integer"),
+        (19, 0, "successCount plus failureCount must equal requestCount"),
+    ],
+)
+def test_wave_metrics_rejects_invalid_request_accounting(success, failure, message):
+    evidence = report()
+    evidence["rounds"][0].update(successCount=success, failureCount=failure)
+    with pytest.raises(ValueError, match=message):
+        module._wave_metrics(evidence)
+
+
+def test_wave_metrics_preserves_all_request_p95_instead_of_success_only_p95():
+    evidence = report()
+    evidence["rounds"][0].update(p95AllMs=2000.001, p95SuccessMs=100.0)
+    metrics = module._wave_metrics(evidence)
+    assert metrics["p95AllMs"] == 2000.001
+    assert metrics["p95SuccessMs"] == 100.0
+
+
+@pytest.mark.parametrize(
     ("mutation", "message"),
     [
         (lambda item: item.pop("errorsBySqlState"), "errorsBySqlState is required"),
         (lambda item: item.pop("p95AllMs"), "round field p95AllMs is required"),
         (
-            lambda item: item.update(failureCount=1, errorsBySqlState={}),
+            lambda item: item.update(successCount=19, failureCount=1, errorsBySqlState={}),
             "sum must equal failureCount",
         ),
         (
-            lambda item: item.update(failureCount=1, errorsBySqlState={"40P01": 1}),
+            lambda item: item.update(
+                successCount=19, failureCount=1, errorsBySqlState={"40P01": 1}
+            ),
             "failureCount exceeds classified SQL timeout failures",
         ),
     ],
@@ -240,13 +266,18 @@ def test_run_metadata_is_bounded_and_machine_readable(purpose, run_id, scope, me
 
 
 def test_workflow_is_opt_in_and_checks_out_the_pr_head():
-    workflow = (ROOT / ".github" / "workflows" / "s05-legacy-staircase.yml").read_text(
-        encoding="utf-8"
-    )
+    workflow_path = ROOT / ".github" / "workflows" / "s05-legacy-staircase.yml"
+    workflow = workflow_path.read_text(encoding="utf-8")
+    parsed = yaml.load(workflow, Loader=yaml.BaseLoader)
     assert "run-s05-legacy-staircase" in workflow
     assert "github.event.pull_request.head.sha || github.sha" in workflow
     assert "pull_request:\n    types:\n      - labeled" in workflow
     assert "cancel-in-progress: false" in workflow
+    assert "concurrency" not in parsed
+    assert parsed["jobs"]["s05-legacy-staircase"]["concurrency"] == {
+        "group": "${{ github.workflow }}-${{ github.ref }}",
+        "cancel-in-progress": "false",
+    }
     assert "--run-purpose clean-integration-base-execution-compatibility" in workflow
     assert "--measurement-scope hosted-single-runner-legacy-only-postgresql16" in workflow
 
@@ -278,6 +309,7 @@ def test_aggregate_junit_records_measurement_not_promotion(tmp_path):
         "codeSha": "a" * 40,
         "runPurpose": "clean-integration-base-execution-compatibility",
         "canonicalDecisionEvidenceRunId": "36362386530",
+        "measurementScope": HOSTED_SCOPE,
         "evaluation": {
             "decision": "NO_DEGRADE_THROUGH_50_CLOSE_SEMAPHORE_LINE",
             "firstDegradeConcurrency": None,
@@ -289,6 +321,7 @@ def test_aggregate_junit_records_measurement_not_promotion(tmp_path):
     assert 'failures="0"' in text
     assert 'name="promotionClaim" value="False"' in text
     assert 'name="canonicalDecisionEvidenceRunId" value="36362386530"' in text
+    assert f'name="measurementScope" value="{HOSTED_SCOPE}"' in text
     assert 'name="semaphoreProductCodeExpected" value="False"' in text
     assert "NO_DEGRADE_THROUGH_50_CLOSE_SEMAPHORE_LINE" in text
 
@@ -419,3 +452,29 @@ def test_main_rejects_unexpected_benchmark_exit(tmp_path, monkeypatch):
 
     with pytest.raises(SystemExit, match="unexpected exit 2"):
         module.main(main_args(output_dir))
+
+
+def test_main_rejects_dirty_checkout_before_database_access(tmp_path, monkeypatch):
+    code_sha = "a" * 40
+    database_touched = False
+
+    def fake_check_output(command, **_kwargs):
+        if command[1] == "rev-parse":
+            return f"{code_sha}\n"
+        if command[1] == "status":
+            return " M tools/run_s05_legacy_staircase.py\n"
+        raise AssertionError(command)
+
+    def forbidden_database_access(_dsn):
+        nonlocal database_touched
+        database_touched = True
+        raise AssertionError("database must not be touched for a dirty checkout")
+
+    monkeypatch.setattr(module.subprocess, "check_output", fake_check_output)
+    monkeypatch.setattr(module, "owned_disposable_count", forbidden_database_access)
+    monkeypatch.setenv("INV_TEST_ADMIN_DSN", "postgresql://redacted")
+    monkeypatch.setenv("INV_EVIDENCE_CODE_SHA", code_sha)
+
+    with pytest.raises(SystemExit, match="working tree must be clean"):
+        module.main(main_args(tmp_path / "dirty"))
+    assert database_touched is False

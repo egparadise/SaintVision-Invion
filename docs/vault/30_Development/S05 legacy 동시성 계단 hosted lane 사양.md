@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-S05-LEGACY-STAIRCASE-LANE-SPEC-001"
 title: "S05 legacy 동시성 계단 hosted lane 사양"
-version: "1.4.0"
+version: "1.4.1"
 status: "hosted-measured-review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T10:44:24+09:00"
+updated: "2026-09-28T10:59:32+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S05-DB"]
@@ -92,11 +92,11 @@ PR #151 clean-base run [36363327477](https://github.com/egparadise/SaintVision-I
 
 Card49는 측정 결과나 gate를 재정의하지 않고 다음 opt-in 실행 전에 runner의 fail-closed 경계를 닫는다. 계단 lane은 이 카드에서 실행하지 않는다.
 
-- `errorsBySqlState`는 필수 object이며 모든 값은 음이 아닌 정수다. 합계가 `failureCount`와 같아야 하고, `failureCount > 55P03+57014`면 미분류 실패가 있으므로 `INVALID_RUN`이다.
+- `requestCount`·`successCount`·`failureCount`는 bool이 아닌 음이 아닌 정수이며 성공+실패가 요청 수와 같아야 한다. `errorsBySqlState`는 필수 object이고 합계가 `failureCount`와 같아야 하며, `failureCount > 55P03+57014`면 미분류 실패가 있으므로 `INVALID_RUN`이다.
 - checkout은 `git status --porcelain`이 비어 있어야 한다. `codeSHA`, CLI 입력 `runPurpose`, `canonicalDecisionEvidenceRunId`, `measurementScope`를 검증하고 wave report scope와 교차 확인한다.
 - `semaphoreProductCodePresent=false`라는 검증하지 않은 상수는 미래 증거에서 `semaphoreProductCodeExpected=false`로 이름을 바꾼다. wave report의 `projectSemaphore` 부재 검사는 유지한다.
 - 각 wave 전에 이전 JSON·JUnit·log를, 실행 시작 전에 이전 aggregate JSON·JUnit을 삭제한다. 새 프로세스가 산출하지 못하면 stale 파일로 통과할 수 없다.
-- workflow concurrency는 실제 opt-in job 안에서 `cancel-in-progress: false`다. 다른 label 이벤트가 진행 중 측정 run을 취소하지 않는다.
-- PG-free 시험은 `main()`의 degrade 결정·첫 rung 뒤 중단, SQL timeout 합계, stale unlink, fingerprint 재사용, 비정상 exit, SHA·scope·lifecycle·fingerprint 부정 경로를 직접 실행한다.
+- workflow concurrency는 실제 opt-in job 안에서 `cancel-in-progress: false`다. 다른 label 이벤트가 진행 중 측정 run을 취소하지 않는다. 구조 시험은 workflow root에 concurrency가 없고 opt-in job에만 있는지 YAML로 확인한다.
+- aggregate JUnit도 `measurementScope`를 기록한다. PG-free 시험은 `main()`의 degrade 결정·첫 rung 뒤 중단, dirty checkout DB 선차단, all-request P95 보존, SQL timeout·요청 합계, stale unlink, fingerprint 재사용, 비정상 exit, SHA·scope·lifecycle·fingerprint 부정 경로를 직접 실행한다.
 
 Card49의 field rename과 stricter validation은 과거 Card46·Card47 JSON을 다시 해석하거나 수정하지 않는다. 다음 실행부터 새 규칙을 적용하며, 이 카드의 hosted Backend는 코드 품질 증거일 뿐 성능 측정 증거가 아니다.
