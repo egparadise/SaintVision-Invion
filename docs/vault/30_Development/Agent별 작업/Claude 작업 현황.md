@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.28"
+version: "1.2.29"
 status: "review"
 author: "Claude"
-updated: "2026-09-28T15:06:23+09:00"
+updated: "2026-09-28T17:49:34+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+G-01 후속 adapters 404 정본화 카드 76 (Claude, 2026-09-28, base #180 `9c4ea18b` + #184 `c47811b2` merge, branch `agent/claude/g01-adapters-canonical-404`): #180이 pin한 FastAPI 404 모양을 정본 `RES-0004`/404로 바꾸고 그 시험을 **의도적으로 갱신**, caller가 준 이름 echo 제거(XSS 모양 문자열로 부정 시험). strict 응답 모델은 **실측으로 갈랐다** — 정상 행 11키 / 오류 행 5키를 직접 확인해 **단건은 모델 도입**(13키, 생성물 + `--check` 적용), **목록은 보류**(두 모양이라 default 채우기가 깨진 tool의 wire 모양을 바꾼다 — FE 소유 변경). `loginDetail`이 CLI 출력이라는 사실은 열린 mapping으로 선언해 남겼다. 404가 denial로 기록되지 않음을 단언(#195는 401·403만), 무토큰은 두 route 각각 401 + anonymous 1행·template action. PG-free 20 passed, 실 PG 3건 hosted. 다음 첫 행동: Codex 검토. 목록 응답 모델·`loginDetail` 좁히기는 FE owner 결정 후속. 전문 [[2026-09-28_G-01_adapters_404_정본화_Claude]].
 
 G-01 adapters route HTTP 레벨 시험 (Claude, 2026-09-28, base `1e8baf04`, branch `agent/claude/adapters-route-http-tests`): PR #179의 통합 분류표 1순위 구현. **시험 파일 하나(15 test)이고 제품 코드는 한 줄도 바꾸지 않았다.** 공백의 실체: `GET /v1/adapters`·`/{name}`이 S03부터 서빙됐는데 `tests/`의 `v1/adapters` grep 0건 — route 층(인증·응답 shape·404·`readyCount`)이 한 번도 실행된 적이 없었다. 담은 것 15건: 키 집합·`measurementScope`/`remoteNodeReadiness`(G-12 정직성을 시험으로 고정)·순서 보존·`readyCount` near-miss 4 + 양성 대조 1·깨진 tool 1개가 요청을 실패시키지 않음·단건 조회의 probe 병합·도달 불가 200·두 route 401·`BusinessDispatch` 가시성·선언 타입 부재 기록. 판단 둘: ①`agents.readiness()`를 **stub**한다(대상은 route, 실 바이너리 탐지는 G-11 — 섞으면 route 회귀와 바이너리 부재가 같은 실패로 보인다). ②**정본 `ProblemDetails`가 아닌 404를 그대로 pin**한다(`code`·`type` 없음까지 단언) — 공개 오류 body 변경은 계약 변경이고 #167이 기존 표면을 건드리지 않은 결정과 같다. 관찰: 두 route가 `-> dict`라 `export_schemas`가 schema를 만들지 않아 **모양 변화를 gate가 못 잡는다**. 응답 타입 추가는 계약 변경이라 범위 밖이고 사실만 시험으로 남겼다(후속 후보). 검증: 신규 파일 **15 passed**, `pytest tests/core` **1047 passed / 4 skipped**, docs gate 2종 exit 0. 로컬 실 PG·Docker·전체 suite 미실행. 다음 첫 행동: Codex 검토. 그 뒤 2순위(G-02 live archiver hosted 실행)는 접근 경로 결정이 먼저라 짧은 설계 문서부터 올린다. 전문 [[2026-09-28_G-01_adapters_route_HTTP시험_Claude]].
 
