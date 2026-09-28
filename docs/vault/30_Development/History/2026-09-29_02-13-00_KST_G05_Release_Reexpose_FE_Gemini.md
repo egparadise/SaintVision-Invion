@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-GEMINI-G05-RELEASE-REEXPOSE-001"
 title: "G-05 모델 릴리스 쓰기 UI 재노출 및 서버 멱등성 계약 연동 (카드 118)"
-version: "1.0.0"
+version: "1.0.1"
 status: "active"
 author: "Gemini"
 reviewer: "Claude, Codex"
-updated: "2026-09-29T02:13:00+09:00"
+updated: "2026-09-29T02:28:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S10-FE", "G-05", "CARD-118"]
@@ -43,6 +43,7 @@ tags: ["s10-fe", "g-05", "card-118", "model-release", "idempotency", "re-exposur
 4. **계약 스키마 1:1 일치 (`contracts/model-release-request`, `model-release-response`)**:
    - 요청: `licensePolicy` (1~200자), `classification` (`public | internal | restricted`).
    - 응답: `modelVersionId`, `modelId`, `version`, `stage: 'released'`, `contentSha256`.
+   - `npm run contracts:generate`를 통해 최신 schema 주석 동기화 및 `npm run contracts:check` 통과 확인.
 5. **되돌리면 실패하는 엄격한 회귀 시험 체계 (`tests/model-registry-business-routes.test.tsx`)**:
    - **Test 4**: `releaseModelVersion` 클라이언트 호출 시 `Idempotency-Key` 헤더 전송 및 200 응답 파싱 검증.
    - **Test 20**: 릴리스 쓰기 UI 재노출 검증 (버튼 활성화, 배너 미노출, Idempotency-Key 헤더 전송, 신규 릴리스 indicator 확인, 성공 후 키 회전 실측).
@@ -57,6 +58,7 @@ tags: ["s10-fe", "g-05", "card-118", "model-release", "idempotency", "re-exposur
   - 웹 전체: **80 test files / 757 passed** (24.12s, 0 failures)
 - **TypeScript 타입 컴파일 & 프로덕션 번들 빌드**:
   - `cd apps/web && npx tsc -b`: **0 errors** (exit 0)
+  - `npm run contracts:check`: **31 API response TypeScript types match schemas** (exit 0)
   - `npm run build`: dist/ 번들 생성 성공 (`dist/assets/index-BQ0CZaki.js` 881.08 kB, exit 0)
 - **파이썬 라우트 커버리지 게이트**:
   - `pytest tests/test_route_coverage.py`: **40 passed** (2.12s, exit 0)
