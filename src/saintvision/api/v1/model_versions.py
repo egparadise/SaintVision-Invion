@@ -56,11 +56,11 @@ paces and waits on an advisory lock. A request that took a minute to arrive woul
 have stamped ``created_at``, the audit and the ledger's ``expires_at`` with a time
 from before it waited.
 
-**Known operational gap**: the advisory lock wait is unbounded. The product engine
-sets no ``lock_timeout`` or ``statement_timeout``, so a request whose key is held
-by a long transaction waits without a deadline. Bounding it is a timeout contract
-for the whole write lane rather than something this route should invent alone, so
-it is stated here and carried as a separate card instead of being left implicit.
+**Lock waits are bounded** (card 84, ``api/lock_wait.py``). The advisory lock and
+any row lock in the write transaction wait at most ``Settings.business_lock_timeout_ms``
+(``SET LOCAL lock_timeout``); a wait past that, or a deadlock, is
+``SYS-0001/503/retryable=true`` with no value from the database in the answer. The
+bound is the lane's, not this route's -- every write route uses the same helper.
 """
 
 from __future__ import annotations
@@ -96,6 +96,7 @@ from ..deps import (
     serialise_idempotent_write,
     store_idempotent_response,
 )
+from ..lock_wait import bounded_lock_wait
 from ..problem import (
     AUTH_PROJECT,
     GRAPH_PRECONDITION,
@@ -327,7 +328,9 @@ async def register_version(
     # (2) One atomic transaction: serialise, re-check, bind, register, record.
     with factory() as session:
         with session.begin():
-            with tenant_scope(session, principal.tenant_id):
+            with tenant_scope(session, principal.tenant_id), bounded_lock_wait(
+                session, timeout_ms=settings.business_lock_timeout_ms
+            ):
                 # IDEM-6: the serialisation point comes before any resource row,
                 # in every route, so the lock order in this lane is one order.
                 serialise_idempotent_write(

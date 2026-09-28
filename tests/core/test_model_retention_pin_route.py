@@ -342,8 +342,12 @@ def test_the_lock_timeout_comes_from_settings(monkeypatch):
 
 @pytest.mark.parametrize("value", [0, -1, True, "5000", None])
 def test_a_lock_timeout_that_is_not_a_positive_integer_is_refused_before_any_lock(value):
-    with pytest.raises(RuntimeError):
-        model_retention._bound_lock_wait(Session({"log": [], "lock_timeouts": []}), timeout_ms=value)
+    from saintvision.api.lock_wait import bound_lock_wait
+
+    session = Session({"log": [], "lock_timeouts": []})
+    with pytest.raises(ValueError):
+        bound_lock_wait(session, timeout_ms=value)
+    assert session.world["lock_timeouts"] == []
 
 
 def test_a_shorter_or_equal_until_is_a_200_no_op_that_is_still_recorded(monkeypatch):

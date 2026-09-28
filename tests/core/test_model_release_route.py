@@ -114,6 +114,11 @@ class Session:
     def __init__(self, world):
         self.world = world
 
+    def execute(self, statement, params=None):
+        # Card 84: the lane's lock-wait bound, SET LOCAL before the row lock.
+        self.world.setdefault("lock_timeouts", []).append(str(statement))
+        return None
+
     def get(self, _model, _key, **_kwargs):
         return self.world["parent"]
 

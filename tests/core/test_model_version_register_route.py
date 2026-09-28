@@ -95,6 +95,11 @@ class Session:
         self.world = world
 
     def execute(self, statement, params=None):
+        if "lock_timeout" in str(statement):
+            # Card 84: the lane's bound on every lock wait, set before the lock.
+            self.world["log"].append("set-lock-timeout")
+            self.world.setdefault("lock_timeouts", []).append(str(statement))
+            return None
         self.world["log"].append("lock")
         self.world["locks"].append({"sql": str(statement), "params": params})
         # A real lock can wait. Advancing the clock here is how a waiting
@@ -335,6 +340,7 @@ def test_the_whole_order_is_fixed(monkeypatch):
     assert world["log"] == [
         "permission",
         "body-read",
+        "set-lock-timeout",
         "lock",
         "permission",
         "ledger-read",
@@ -424,7 +430,7 @@ def test_the_permission_is_checked_again_after_the_lock(monkeypatch):
     }
     client = build(monkeypatch, world)
     canonical(post(client), code="AUTH-0030", status=403)
-    assert world["log"] == ["permission", "body-read", "lock", "permission"]
+    assert world["log"] == ["permission", "body-read", "set-lock-timeout", "lock", "permission"]
     assert world["registered"] == []
     assert world["stored"] == []
 

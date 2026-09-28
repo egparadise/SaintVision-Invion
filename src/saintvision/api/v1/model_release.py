@@ -61,6 +61,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from starlette.concurrency import run_in_threadpool
 
+from ...config import Settings
 from ...adapters.model_import import (
     MODEL_IMPORT_DECLARATION_MISMATCH,
     require_exact_declaration,
@@ -73,7 +74,8 @@ from ...services import projects as project_service
 from ...services.audit import record_event
 from ...services.lineage import release_model_version, trace_model
 from .. import schemas
-from ..deps import get_now, get_principal
+from ..deps import get_now, get_principal, get_settings
+from ..lock_wait import bounded_lock_wait
 from ..problem import (
     AUTH_PROJECT,
     GRAPH_PRECONDITION,
@@ -351,6 +353,7 @@ async def release_model(
     request: Request,
     principal: Principal = Depends(get_principal),
     now: dt.datetime = Depends(get_now),
+    settings: Settings = Depends(get_settings),
 ) -> Any:
     """Compare the importer's declaration with the manifest, then release.
 
@@ -388,10 +391,13 @@ async def release_model(
         request, project_id=project_id, model_id=model_id, version=version
     )
 
-    # (3) One atomic transaction: re-check, bind, compare, release, audit.
+    # (3) One atomic transaction: re-check, bind, compare, release, audit. The
+    # row lock below waits at most the lane's budget (card 84).
     with factory() as session:
         with session.begin():
-            with tenant_scope(session, principal.tenant_id):
+            with tenant_scope(session, principal.tenant_id), bounded_lock_wait(
+                session, timeout_ms=settings.business_lock_timeout_ms
+            ):
                 _require_approval(session, principal=principal, project_id=project_id)
                 row = _locked_version(
                     session,
