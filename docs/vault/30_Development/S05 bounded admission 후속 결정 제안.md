@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-S05-BOUNDED-ADMISSION-DECISION-001"
 title: "S05 bounded admission 후속 결정 제안"
-version: "1.2.0"
+version: "1.3.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T16:50:00+09:00"
+updated: "2026-09-28T17:15:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S05-DB"]
@@ -16,6 +16,8 @@ tags: ["s05", "placement", "admission", "semaphore", "decision"]
 
 > [!summary] 코디네이터 결정
 > **W=450ms를 포함한 모든 permit wait `W>0` arm은 실행하지 않는다. 세 판정 gate는 바꾸지 않고, 다음 측정은 legacy(flag off)만 20→35→50 동시로 높여 실제 degrade 지점을 찾는다.** 첫 degrade 지점이 확인될 때만 candidate(W=0) 비교 arm을 별도로 제안한다. 50동시까지 degrade가 없으면 semaphore 라인을 "현 hosted 부하에서 불필요"로 닫고 legacy를 확정한다. flag 기본 off, S05-DB `in_progress`, 승격 없음은 유지한다.
+>
+> **Card46 run 36362386530에서 20·35·50동시 모두 사전 degrade 기준을 통과했다. 따라서 이 문서의 조건대로 bounded semaphore 라인을 닫고 측정한 hosted 50동시 범위에서는 legacy를 확정한다.** 제품의 private semaphore flag는 off로 유지하며 삭제·승격·AC-05 주장은 하지 않는다.
 
 ## 1. 확정된 입력
 
@@ -143,3 +145,20 @@ hold P95/max와 legacy lock-wait P95/max는 반드시 기록하지만 degrade tr
 - [x] flag off·S05 `in_progress`·승격 없음
 
 근거: [[S05 project별 bounded semaphore 사양]], [[S05 hosted 20동시 wave opt-in lane 사양]], [[2026-09-23_12-20-00_KST_S05_Bprime_구현_교정실험_Codex]], [[2026-09-23_13-28-00_KST_S05_bounded_semaphore_사양_Codex]], [[2026-09-28_08-35-00_KST_S05_hosted_20동시_wave_Codex]], [[2026-09-28_09-00-00_KST_S05_bounded_admission_후속결정_Codex]].
+
+## 6. Card46 결과와 semaphore 라인 종료
+
+PR #148 측정 head `3a1790ff3431706e81a2ba258eb0b26ea456ed31`, hosted run [36362386530](https://github.com/egparadise/SaintVision-Invion/actions/runs/36362386530)은 9개 wave를 모두 순차 실행했다.
+
+| concurrency | 성공/실패 | 55P03+57014 최대 | request P95 all 중앙 | degrade |
+|---:|---:|---:|---:|---|
+| 20 | 60/0 | 0 | 411.382ms | false |
+| 35 | 105/0 | 0 | 705.026ms | false |
+| 50 | 150/0 | 0 | 990.625ms | false |
+
+9개 DB fingerprint는 모두 달랐고 종료 뒤 `inv_test_%` 잔존은 0이다. 기준 1·2 모두 false이며 실행 뒤 기준 변경은 없었다. 따라서 `NO_DEGRADE_THROUGH_50_CLOSE_SEMAPHORE_LINE`을 채택한다.
+
+- 현 hosted 4 CPU/PostgreSQL 16.15/합성 단일 Node 조건에서 bounded semaphore 후속 구현·측정 라인은 종료한다.
+- legacy 경로를 이 범위의 기본으로 확정하고 private semaphore flag는 계속 off로 둔다. 코드 삭제는 별도 cleanup 판단이며 이번 PR에서 하지 않는다.
+- S05-DB는 `in_progress`를 유지한다. 이 결과는 물리 5노드 AC-05나 운영 승격이 아니다.
+- hosted 수치는 개발 PC evidence와 직접 비교하지 않는다. 정본: [[S05 legacy 동시성 계단 hosted lane 사양]], [[2026-09-28_16-50-00_KST_S05_legacy_동시성_계단_Codex]].

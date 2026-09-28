@@ -1270,6 +1270,12 @@ AOA-05 follow-up: the old 18 setup errors had two distinct causes: unset CX01_CO
 - Exact commands, exit codes, runtime identity, scope and evidence: [[2026-09-21_integration-tip-verification_Codex]].
 - Reporting rule: attach full SHA, branch, checkout path, exact command/cwd, runtime, KST start/end, direct exit, counts/reasons, artifact, and executor/reviewer identity to every verification claim.
 
+## 2026-09-28 Card46 S05 legacy hosted 계단
+
+- PR #148 측정 head `3a1790ff3431706e81a2ba258eb0b26ea456ed31`, run `36362386530` success. legacy flag-off 20/35/50동시 각 3회는 60/60·105/105·150/150 성공, `55P03=0`, `57014=0`, P95 all 중앙 411.382/705.026/990.625ms다.
+- wave마다 새 disposable DB를 써 fingerprint 9개 유일·잔존 0을 확인했다. artifact `saintvision-s05-legacy-staircase-36362386530` ID `10945399201`, aggregate JUnit 1/0/0/0이다.
+- 사전 기준의 timeout max(any wave)·누적 P95 all 중앙값 혼용을 유지한 결과 `NO_DEGRADE_THROUGH_50_CLOSE_SEMAPHORE_LINE`. bounded semaphore 후속 라인을 닫고 hosted 50동시 범위에서 legacy를 확정한다. private flag off·S05 `in_progress`·승격/AC-05 없음. [[2026-09-28_16-50-00_KST_S05_legacy_동시성_계단_Codex]]
+
 ## 2026-09-21 current continuation: contract map, CI readiness, UI-FB-03
 
 - Response-contract map: eight functional shared adapters are inventoried. Workspace/readiness, discovery candidates, storage lists, approval review, and kernel approval challenge/decision are bound to canonical/generated shapes and shared fixtures. Remaining unbound groups are project-list legacy envelopes, run/result/artifact, run/approval queue, placement/pool/mutation, storage resolve/replica/model, shards, and node observations. Order by user-facing/control impact is in [[2026-09-21_web_response_contract_map_workspace_Codex]]. Targeted fixed-SHA kernel/approval tests: 9 passed; full Vitest: 39 files/359 passed; schema 28 and TS response types 7 passed; `tsc -b`/Vite build/docs/ontology passed at `0c248976430aac1d91fa14f7ea63f80c757997eb`.

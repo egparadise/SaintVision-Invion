@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-S05-LEGACY-STAIRCASE-LANE-SPEC-001"
 title: "S05 legacy 동시성 계단 hosted lane 사양"
-version: "1.0.0"
-status: "implementation-ready"
+version: "1.1.0"
+status: "hosted-measured-review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T16:50:00+09:00"
+updated: "2026-09-28T17:15:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S05-DB"]
@@ -57,3 +57,19 @@ hold P95/max와 legacy lock-wait P95/max는 진단으로만 기록한다. workfl
 aggregate JUnit green은 측정 완결만 뜻하며 성능 합격을 뜻하지 않는다. 판정은 JSON의 `DEGRADE_AT_<N>` 또는 `NO_DEGRADE_THROUGH_50_CLOSE_SEMAPHORE_LINE`으로 별도 기록한다.
 
 롤백은 신규 workflow·runner·focused 시험과 integration report의 redacted DB fingerprint 필드를 제거하는 것으로 끝난다. 제품 경로·계약·migration에는 롤백 대상이 없다.
+
+## 5. hosted 실행 결과
+
+PR #148 측정 head `3a1790ff3431706e81a2ba258eb0b26ea456ed31`의 run [36362386530](https://github.com/egparadise/SaintVision-Invion/actions/runs/36362386530)은 success다. artifact `saintvision-s05-legacy-staircase-36362386530`(ID `10945399201`)은 wave별 JSON/JUnit/log 27개와 aggregate JSON/JUnit을 보존한다. aggregate JUnit은 1 test, failure/error/skip 0이다.
+
+| rung | 성공/실패 | P95 all 3회 | 중앙 | hold P95 중앙 | lock-wait P95 중앙 | timeout 최대 |
+|---:|---:|---|---:|---:|---:|---:|
+| 20 | 60/0 | 416.581 / 411.382 / 385.452ms | 411.382ms | 11.353ms | 212.943ms | 0 |
+| 35 | 105/0 | 699.641 / 739.044 / 705.026ms | 705.026ms | 12.642ms | 438.854ms | 0 |
+| 50 | 150/0 | 993.279 / 990.625 / 985.117ms | 990.625ms | 12.260ms | 561.842ms | 0 |
+
+`55P03=0`, `57014=0`, request P95 all 중앙은 모두 2000ms 이하라 세 rung 모두 degrade=false다. 9개 wave fingerprint는 전부 유일하고 잔존 DB는 0이며 candidate 실행은 0이다. 사전 결정에 따라 `NO_DEGRADE_THROUGH_50_CLOSE_SEMAPHORE_LINE`으로 bounded semaphore 라인을 닫는다.
+
+환경은 Ubuntu 24 hosted runner(image `20260920.314.1`), 4 CPU, 약 15.6GiB, Python 3.12.14, PostgreSQL 16.15, max connections 100이다. 로컬 수치와 직접 비교하지 않는다. flag off, S05-DB `in_progress`, 승격 없음이다.
+
+첫 run `36362223316`은 fingerprint report의 Python import 누락으로 첫 wave JSON 전에 fail closed한 `INVALID_RUN`이며 어떤 수치도 쓰지 않는다.
