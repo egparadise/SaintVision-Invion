@@ -1,16 +1,21 @@
 import { AgentRunRequest, GoldenEvalMetric } from '@/contracts/types';
 
 export class AgentLoopManager {
-  private tenantBudgetKrw = 650000; // 650,000 KRW remaining
+  private tenantBudgetKrw: number;
   private requests: AgentRunRequest[] = [];
   private goldenMetric: GoldenEvalMetric;
 
-  constructor() {
+  constructor(initialBudgetKrw: number = 650000) {
+    this.tenantBudgetKrw = initialBudgetKrw;
     this.goldenMetric = this.evaluateGoldenSuite();
   }
 
   getTenantBudget(): number {
     return this.tenantBudgetKrw;
+  }
+
+  setTenantBudget(budgetKrw: number): void {
+    this.tenantBudgetKrw = budgetKrw;
   }
 
   getGoldenMetric(): GoldenEvalMetric {
@@ -60,13 +65,15 @@ export class AgentLoopManager {
   /**
    * Submit Natural Language Run Request with Budget and Leak Checks
    */
-  createRunRequest(objective: string, contextFiles: string[]): { success: boolean; request?: AgentRunRequest; error?: string } {
+  createRunRequest(objective: string, contextFiles: string[], overrideCostKrw?: number): { success: boolean; request?: AgentRunRequest; error?: string } {
     const leakCheck = this.scanPromptForLeaks(objective);
     if (!leakCheck.isSafe) {
       return { success: false, error: leakCheck.violation };
     }
 
-    const { tokens, costKrw } = this.estimateTokensAndCost(objective, contextFiles.length);
+    const { tokens, costKrw } = overrideCostKrw !== undefined
+      ? { tokens: Math.ceil(overrideCostKrw * 40), costKrw: overrideCostKrw }
+      : this.estimateTokensAndCost(objective, contextFiles.length);
 
     if (costKrw > this.tenantBudgetKrw) {
       return {

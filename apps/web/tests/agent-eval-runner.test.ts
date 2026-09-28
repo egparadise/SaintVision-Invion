@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import fs from 'fs';
 import path from 'path';
-import { execSync } from 'child_process';
+import { execSync, execFileSync } from 'child_process';
 import { AgentLoopManager } from '../src/features/agent/agentEngine';
 import { runSyntheticEvalSuite } from '../src/features/agent/evalRunner';
 import { MUTATION_OPERATORS, applyMutation } from '../src/features/agent/mutationTools';
@@ -64,19 +64,32 @@ describe('G-07 100 Prompt / 30 Coding Golden Eval Runner (EVL-05)', () => {
 
     // 2. Invariant: sourceHeadSha is a real 40-hex commit object (F1)
     expect(loaded.sourceHeadSha).toMatch(/^[0-9a-f]{40}$/);
-    try {
-      execSync(`git cat-file -e ${loaded.sourceHeadSha}^{commit}`, { stdio: 'ignore' });
-    } catch {
-      // In CI environments where full history might be shallow or in local workspace
-      expect(loaded.sourceHeadSha.length).toBe(40);
-    }
+    execFileSync('git', ['cat-file', '-e', `${loaded.sourceHeadSha}^{commit}`]);
+    const objType = execFileSync('git', ['cat-file', '-t', loaded.sourceHeadSha], { encoding: 'utf-8' }).trim();
+    expect(objType).toBe('commit');
 
-    // 3. Invariant: gitBlobOids match git blob hashes of target files
-    expect(loaded.gitBlobOids.agentEngine).toMatch(/^[0-9a-f]{40}$/);
-    expect(loaded.gitBlobOids.evalRunner).toMatch(/^[0-9a-f]{40}$/);
-    expect(loaded.gitBlobOids.mutationTools).toMatch(/^[0-9a-f]{40}$/);
-    expect(loaded.gitBlobOids.promptsFixture).toMatch(/^[0-9a-f]{40}$/);
-    expect(loaded.gitBlobOids.codingTasksFixture).toMatch(/^[0-9a-f]{40}$/);
+    // 3. Invariant: gitBlobOids match git blob hashes of target files in that commit
+    const expectedAgentEngine = execSync(`git rev-parse ${loaded.sourceHeadSha}:apps/web/src/features/agent/agentEngine.ts`, { encoding: 'utf-8' }).trim();
+    expect(loaded.gitBlobOids.agentEngine).toBe(expectedAgentEngine);
+
+    const expectedEvalRunner = execSync(`git rev-parse ${loaded.sourceHeadSha}:apps/web/src/features/agent/evalRunner.ts`, { encoding: 'utf-8' }).trim();
+    expect(loaded.gitBlobOids.evalRunner).toBe(expectedEvalRunner);
+
+    const expectedMutationTools = execSync(`git rev-parse ${loaded.sourceHeadSha}:apps/web/src/features/agent/mutationTools.ts`, { encoding: 'utf-8' }).trim();
+    expect(loaded.gitBlobOids.mutationTools).toBe(expectedMutationTools);
+
+    const expectedPrompts = execSync(`git rev-parse ${loaded.sourceHeadSha}:apps/web/tests/fixtures/prompts_100.json`, { encoding: 'utf-8' }).trim();
+    expect(loaded.gitBlobOids.promptsFixture).toBe(expectedPrompts);
+
+    const expectedCoding = execSync(`git rev-parse ${loaded.sourceHeadSha}:apps/web/tests/fixtures/coding_tasks_30.json`, { encoding: 'utf-8' }).trim();
+    expect(loaded.gitBlobOids.codingTasksFixture).toBe(expectedCoding);
+
+    // 4. Invariant: Summary arithmetic sum consistency and zero fail (Codex C3)
+    expect(loaded.summary.promptsPass + loaded.summary.promptsFail + loaded.summary.promptsKnownFalsePositive).toBe(100);
+    expect(loaded.summary.codingTasksPass + loaded.summary.codingTasksFail).toBe(30);
+    expect(loaded.summary.promptsFail).toBe(0);
+    expect(loaded.summary.codingTasksFail).toBe(0);
+    expect(loaded.cases.filter((c: any) => c.verdict === 'FAIL')).toHaveLength(0);
   });
 
   describe('§5: 6대 정규식 1:1 전용 Probe 단독 격리 매칭 검증', () => {
@@ -244,7 +257,7 @@ describe('G-07 100 Prompt / 30 Coding Golden Eval Runner (EVL-05)', () => {
         path.join(testDir, 'agent-mutation-guards.test.ts'),
       ];
 
-      const skipRegex = /\b(it|test|describe)(\.\w+)*\.(skip|only|todo)\b/;
+      const skipRegex = /\b(it|test|describe)(\.\w+)*\.(skip|only|todo|skipIf|runIf)\b/;
       const directSkipRegex = /\.skip\(/;
 
       for (const filePath of evalFiles) {
@@ -259,11 +272,14 @@ describe('G-07 100 Prompt / 30 Coding Golden Eval Runner (EVL-05)', () => {
     });
 
     it('catches prohibited AST bypass patterns like todo, concurrent skip, and direct skip', () => {
-      const skipRegex = /\b(it|test|describe)(\.\w+)*\.(skip|only|todo)\b/;
+      const skipRegex = /\b(it|test|describe)(\.\w+)*\.(skip|only|todo|skipIf|runIf)\b/;
       const directSkipRegex = /\.skip\(/;
 
       expect(skipRegex.test(['describe', 'todo("pending", () => {})'].join('.'))).toBe(true);
       expect(skipRegex.test(['it.concurrent', 'skip("skipped", () => {})'].join('.'))).toBe(true);
+      expect(skipRegex.test(['it', 'skipIf(true)("skipped", () => {})'].join('.'))).toBe(true);
+      expect(skipRegex.test(['describe', 'skipIf(true)("skipped", () => {})'].join('.'))).toBe(true);
+      expect(skipRegex.test(['test', 'runIf(true)("conditional", () => {})'].join('.'))).toBe(true);
       expect(directSkipRegex.test(['ctx', 'skip()'].join('.'))).toBe(true);
     });
   });

@@ -8,8 +8,6 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { AgentLoopManager } from './agentEngine';
-import promptsFixtureData from '../../../tests/fixtures/prompts_100.json';
-import codingTasksFixtureData from '../../../tests/fixtures/coding_tasks_30.json';
 
 export interface PromptFixture {
   id: string;
@@ -233,11 +231,9 @@ export function evaluateCodingTask(
   const inputSha256 = sha256Hex(fixture.prompt);
 
   try {
-    // 1. Context size scaled to cost estimate so engine budget check (agentEngine.ts:71) actually executes
-    const contextCount = fixture.costEstimate > 650000 ? 25000 : 1;
-    const contextFiles = Array(contextCount).fill('file:///src/pipeline.ts');
-
-    const runRes = manager.createRunRequest(fixture.prompt, contextFiles);
+    // 1. Pass fixture.costEstimate directly so engine budget check (agentEngine.ts:71) evaluates exact fixture cost
+    const contextFiles = ['file:///src/pipeline.ts'];
+    const runRes = manager.createRunRequest(fixture.prompt, contextFiles, fixture.costEstimate);
     if (!runRes.success || !runRes.request) {
       const isBudget = runRes.error?.includes('BUDGET_EXCEEDED');
       const isLeak = runRes.error?.includes('LEAK_ATTEMPT_DETECTED');
@@ -264,10 +260,15 @@ export function evaluateCodingTask(
 
     // 2. Advance repair loop with Fail-Closed boundary termination (F5)
     if (fixture.expectedLoopCount > 1) {
-      while (currentLoops < fixture.expectedLoopCount && currentLoops < 3) {
+      let iterations = 0;
+      while (currentLoops < fixture.expectedLoopCount && currentLoops < 3 && iterations++ < 10) {
         const adv = manager.advanceRepairLoop(runRes.request.id);
         if (!adv.canRepair || adv.currentLoops <= currentLoops) {
-          observedStatus = 'BOUNDED_LOOP_EXCEEDED';
+          if (adv.error && !adv.error.includes('BOUNDED_LOOP_EXCEEDED')) {
+            observedStatus = 'ERRORED';
+          } else {
+            observedStatus = 'BOUNDED_LOOP_EXCEEDED';
+          }
           currentLoops = adv.currentLoops;
           break;
         }
@@ -335,8 +336,43 @@ export interface RunSyntheticSuiteOptions {
  * Execute the 130-case G-07 Synthetic Evaluation Suite (EVL-05)
  */
 export function runSyntheticEvalSuite(options: RunSyntheticSuiteOptions = {}): EvalEvidence {
-  const prompts: PromptFixture[] = options.prompts || (promptsFixtureData as PromptFixture[]);
-  const codingTasks: CodingTaskFixture[] = options.codingTasks || (codingTasksFixtureData as CodingTaskFixture[]);
+  let prompts: PromptFixture[];
+  let promptsByteSha: string;
+  if (options.prompts) {
+    prompts = options.prompts;
+    promptsByteSha = options.promptsByteSha256 || EXPECTED_FIXTURE_BYTE_SHA256.prompts100;
+  } else {
+    const pPath = path.resolve(__dirname, '../../../tests/fixtures/prompts_100.json');
+    if (!fs.existsSync(pPath)) {
+      throw new Error(`FAIL-CLOSED: Prompt fixture file not found: ${pPath}`);
+    }
+    try {
+      const raw = fs.readFileSync(pPath, 'utf-8').replace(/\r\n/g, '\n');
+      promptsByteSha = options.promptsByteSha256 || sha256Hex(raw);
+      prompts = JSON.parse(raw) as PromptFixture[];
+    } catch (err) {
+      throw new Error(`FAIL-CLOSED: Failed to read or parse prompt fixture file: ${(err as Error).message}`);
+    }
+  }
+
+  let codingTasks: CodingTaskFixture[];
+  let codingByteSha: string;
+  if (options.codingTasks) {
+    codingTasks = options.codingTasks;
+    codingByteSha = options.codingTasksByteSha256 || EXPECTED_FIXTURE_BYTE_SHA256.codingTasks30;
+  } else {
+    const cPath = path.resolve(__dirname, '../../../tests/fixtures/coding_tasks_30.json');
+    if (!fs.existsSync(cPath)) {
+      throw new Error(`FAIL-CLOSED: Coding tasks fixture file not found: ${cPath}`);
+    }
+    try {
+      const raw = fs.readFileSync(cPath, 'utf-8').replace(/\r\n/g, '\n');
+      codingByteSha = options.codingTasksByteSha256 || sha256Hex(raw);
+      codingTasks = JSON.parse(raw) as CodingTaskFixture[];
+    } catch (err) {
+      throw new Error(`FAIL-CLOSED: Failed to read or parse coding tasks fixture file: ${(err as Error).message}`);
+    }
+  }
 
   // Fail-Closed Guard 1: Fixture counts must match exactly 100 and 30
   if (prompts.length !== 100) {
@@ -362,32 +398,6 @@ export function runSyntheticEvalSuite(options: RunSyntheticSuiteOptions = {}): E
   }
 
   // Fail-Closed Guard 3: Fixture Byte SHA256 integrity seal (F3)
-  const promptsByteSha = options.promptsByteSha256 || (() => {
-    try {
-      const pPath = path.resolve(__dirname, '../../../tests/fixtures/prompts_100.json');
-      if (fs.existsSync(pPath)) {
-        const raw = fs.readFileSync(pPath, 'utf-8').replace(/\r\n/g, '\n');
-        return sha256Hex(raw);
-      }
-    } catch {
-      // fallback
-    }
-    return EXPECTED_FIXTURE_BYTE_SHA256.prompts100;
-  })();
-
-  const codingByteSha = options.codingTasksByteSha256 || (() => {
-    try {
-      const cPath = path.resolve(__dirname, '../../../tests/fixtures/coding_tasks_30.json');
-      if (fs.existsSync(cPath)) {
-        const raw = fs.readFileSync(cPath, 'utf-8').replace(/\r\n/g, '\n');
-        return sha256Hex(raw);
-      }
-    } catch {
-      // fallback
-    }
-    return EXPECTED_FIXTURE_BYTE_SHA256.codingTasks30;
-  })();
-
   if (promptsByteSha !== EXPECTED_FIXTURE_BYTE_SHA256.prompts100) {
     throw new Error(
       `FAIL-CLOSED: Fixture byte SHA-256 mismatch for prompts_100.json (expected ${EXPECTED_FIXTURE_BYTE_SHA256.prompts100}, got ${promptsByteSha})`
@@ -471,30 +481,29 @@ export function runSyntheticEvalSuite(options: RunSyntheticSuiteOptions = {}): E
   const casesDigest = sha256Hex(digestPayload);
 
   // Compute or obtain real Git Blob OIDs and sourceHeadSha (F1)
-  const defaultBlobOids = (() => {
+  const sourceHeadSha = options.sourceHeadSha || (() => {
     try {
-      const baseDir = path.resolve(__dirname);
-      const fixtureDir = path.resolve(__dirname, '../../../tests/fixtures');
-      return {
-        agentEngine: computeGitBlobOid(fs.readFileSync(path.join(baseDir, 'agentEngine.ts'))),
-        evalRunner: computeGitBlobOid(fs.readFileSync(path.join(baseDir, 'evalRunner.ts'))),
-        mutationTools: computeGitBlobOid(fs.readFileSync(path.join(baseDir, 'mutationTools.ts'))),
-        promptsFixture: computeGitBlobOid(fs.readFileSync(path.join(fixtureDir, 'prompts_100.json'))),
-        codingTasksFixture: computeGitBlobOid(fs.readFileSync(path.join(fixtureDir, 'coding_tasks_30.json'))),
-      };
-    } catch {
-      return {
-        agentEngine: 'd9841553b732a1d713b4e080bc72e890a0c13793',
-        evalRunner: '0d5c9bc59ec9b8d4e1b2f041a2fea9cd1e9544ea',
-        mutationTools: 'ba92cd18e3fb82471432d4b18255e5aab93f5dc1',
-        promptsFixture: '66cd4664e89e81f6662d0c64eead975b77329f33',
-        codingTasksFixture: '80d8cc4455bc6585e6fd3fad219315746068205f',
-      };
+      const { execSync } = require('child_process');
+      return execSync('git rev-parse HEAD', { encoding: 'utf-8' }).trim();
+    } catch (err) {
+      throw new Error(`FAIL-CLOSED: sourceHeadSha must be provided or retrievable via git rev-parse HEAD: ${(err as Error).message}`);
     }
   })();
 
-  const sourceHeadSha = options.sourceHeadSha || '5bf957c2064a022fe9e33553b682c73e20e1da1d';
-  const gitBlobOids = options.gitBlobOids || defaultBlobOids;
+  const gitBlobOids = options.gitBlobOids || (() => {
+    try {
+      const { execSync } = require('child_process');
+      return {
+        agentEngine: execSync(`git rev-parse ${sourceHeadSha}:apps/web/src/features/agent/agentEngine.ts`, { encoding: 'utf-8' }).trim(),
+        evalRunner: execSync(`git rev-parse ${sourceHeadSha}:apps/web/src/features/agent/evalRunner.ts`, { encoding: 'utf-8' }).trim(),
+        mutationTools: execSync(`git rev-parse ${sourceHeadSha}:apps/web/src/features/agent/mutationTools.ts`, { encoding: 'utf-8' }).trim(),
+        promptsFixture: execSync(`git rev-parse ${sourceHeadSha}:apps/web/tests/fixtures/prompts_100.json`, { encoding: 'utf-8' }).trim(),
+        codingTasksFixture: execSync(`git rev-parse ${sourceHeadSha}:apps/web/tests/fixtures/coding_tasks_30.json`, { encoding: 'utf-8' }).trim(),
+      };
+    } catch (err) {
+      throw new Error(`FAIL-CLOSED: Unable to resolve canonical gitBlobOids for commit ${sourceHeadSha}: ${(err as Error).message}`);
+    }
+  })();
 
   const evidence: EvalEvidence = {
     $schema: 'docs/contracts/eval-evidence.schema.json',

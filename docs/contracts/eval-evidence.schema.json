@@ -59,7 +59,8 @@
           "type": "string",
           "pattern": "^[0-9a-f]{40}$"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "isSynthetic": {
       "type": "boolean",
@@ -88,7 +89,8 @@
           "type": "string",
           "pattern": "^[0-9a-f]{64}$"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "casesDigest": {
       "type": "string",
@@ -154,7 +156,8 @@
           "type": "integer",
           "const": 0
         }
-      }
+      },
+      "additionalProperties": false
     },
     "cases": {
       "type": "array",
@@ -209,7 +212,8 @@
           "loopCount": {
             "type": "integer"
           }
-        }
+        },
+        "additionalProperties": false
       }
     },
     "metrics": {
@@ -232,9 +236,11 @@
             "reason": {
               "type": "string"
             }
-          }
+          },
+          "additionalProperties": false
         }
-      }
+      },
+      "additionalProperties": false
     },
     "liveLanes": {
       "type": "object",
@@ -258,7 +264,8 @@
             "reason": {
               "type": "string"
             }
-          }
+          },
+          "additionalProperties": false
         },
         "EVL-04": {
           "type": "object",
@@ -274,7 +281,8 @@
             "reason": {
               "type": "string"
             }
-          }
+          },
+          "additionalProperties": false
         },
         "SSE-01": {
           "type": "object",
@@ -290,9 +298,11 @@
             "reason": {
               "type": "string"
             }
-          }
+          },
+          "additionalProperties": false
         }
-      }
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": false

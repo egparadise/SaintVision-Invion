@@ -1,4 +1,7 @@
 import { describe, it, expect } from 'vitest';
+import fs from 'fs';
+import path from 'path';
+import Ajv2020 from 'ajv/dist/2020';
 import { AgentLoopManager } from '../src/features/agent/agentEngine';
 import {
   runSyntheticEvalSuite,
@@ -248,15 +251,32 @@ describe('G-07 Mutation & Integrity Guards (MUT-01~03 & MUT-RUN-01~07)', () => {
     });
   });
 
-  describe('MUT-02: Cost & Tenant Budget Boundary Guards', () => {
-    it('rejects task when costEstimate exceeds 650,000 KRW with BUDGET_EXCEEDED', () => {
+  describe('MUT-02: Cost & Tenant Budget Boundary Guards (QTA-03, F6-r)', () => {
+    it('allows task when costEstimate is exactly on budget boundary (650,000 KRW)', () => {
+      const manager = new AgentLoopManager();
+      const boundaryTask: CodingTaskFixture = {
+        id: 'TSK-BOUNDARY-ON',
+        title: 'On-budget boundary task',
+        prompt: 'Execute boundary task',
+        category: 'budget_boundary',
+        costEstimate: 650000,
+        expected: 'READY',
+        expectedLoopCount: 1,
+      };
+
+      const result = evaluateCodingTask(boundaryTask, manager);
+      expect(result.observed).toBe('READY');
+      expect(result.verdict).toBe('PASS');
+    });
+
+    it('rejects task when costEstimate exceeds budget boundary by 1 KRW (650,001 KRW)', () => {
       const manager = new AgentLoopManager();
       const overBudgetTask: CodingTaskFixture = {
-        id: 'TSK-OVER',
-        title: 'Over budget task',
-        prompt: 'Execute high cost task',
-        category: 'heavy_compute',
-        costEstimate: 720000,
+        id: 'TSK-BOUNDARY-OVER',
+        title: 'Over-budget by 1 KRW task',
+        prompt: 'Execute boundary task',
+        category: 'budget_boundary',
+        costEstimate: 650001,
         expected: 'BUDGET_EXCEEDED',
         expectedLoopCount: 1,
       };
@@ -266,21 +286,58 @@ describe('G-07 Mutation & Integrity Guards (MUT-01~03 & MUT-RUN-01~07)', () => {
       expect(result.verdict).toBe('PASS');
     });
 
-    it('allows task when costEstimate is within budget (650,000 KRW)', () => {
-      const manager = new AgentLoopManager();
-      const withinBudgetTask: CodingTaskFixture = {
-        id: 'TSK-WITHIN',
-        title: 'Within budget task',
-        prompt: 'Execute normal budget task',
-        category: 'dicom',
-        costEstimate: 300000,
+    it('kills mutant: engine budget check ">" mutated to ">="', () => {
+      // If agentEngine.ts:71 is mutated from `costKrw > this.tenantBudgetKrw` to `costKrw >= this.tenantBudgetKrw`
+      class MutatedGteManager extends AgentLoopManager {
+        override createRunRequest(objective: string, contextFiles: string[], overrideCostKrw?: number) {
+          const leakCheck = this.scanPromptForLeaks(objective);
+          if (!leakCheck.isSafe) return { success: false, error: leakCheck.violation };
+          const costKrw = overrideCostKrw ?? 650000;
+          // MUTANT: >= instead of >
+          if (costKrw >= this.getTenantBudget()) {
+            return {
+              success: false,
+              error: `BUDGET_EXCEEDED: Estimated cost ${costKrw} KRW exceeds remaining tenant budget ${this.getTenantBudget()} KRW.`,
+            };
+          }
+          return super.createRunRequest(objective, contextFiles, overrideCostKrw);
+        }
+      }
+
+      const manager = new MutatedGteManager();
+      const onBudgetTask: CodingTaskFixture = {
+        id: 'TSK-BOUNDARY-ON',
+        title: 'On-budget boundary task',
+        prompt: 'Execute boundary task',
+        category: 'budget_boundary',
+        costEstimate: 650000,
         expected: 'READY',
         expectedLoopCount: 1,
       };
 
-      const result = evaluateCodingTask(withinBudgetTask, manager);
+      const result = evaluateCodingTask(onBudgetTask, manager);
+      // Under mutant, cost 650000 is rejected as BUDGET_EXCEEDED when it should be READY
+      expect(result.observed).toBe('BUDGET_EXCEEDED');
+      expect(result.verdict).toBe('FAIL'); // Mutant KILLED!
+    });
+
+    it('kills mutant: residual tenant budget mutated from 650,000 to 700,000 KRW', () => {
+      // If residual budget is increased from 650,000 to 700,000 KRW
+      const manager = new AgentLoopManager(700000);
+      const over650kTask: CodingTaskFixture = {
+        id: 'TSK-OVER-650K',
+        title: 'Over 650k task',
+        prompt: 'Execute task costing 650,001 KRW',
+        category: 'budget_boundary',
+        costEstimate: 650001,
+        expected: 'BUDGET_EXCEEDED',
+        expectedLoopCount: 1,
+      };
+
+      const result = evaluateCodingTask(over650kTask, manager);
+      // Under mutant budget 700,000, 650,001 is accepted as READY instead of rejected as BUDGET_EXCEEDED
       expect(result.observed).toBe('READY');
-      expect(result.verdict).toBe('PASS');
+      expect(result.verdict).toBe('FAIL'); // Mutant KILLED!
     });
   });
 
@@ -303,4 +360,51 @@ describe('G-07 Mutation & Integrity Guards (MUT-01~03 & MUT-RUN-01~07)', () => {
       expect(result.verdict).toBe('PASS');
     });
   });
+
+  describe('MUT-TOKEN-01: Violation Token Negative & Removal Mutant Kill (F2-r)', () => {
+    it('kills mutant: violation token check removed or bypassed in evaluatePrompt', () => {
+      const manager = new AgentLoopManager();
+      const probeFixture: PromptFixture = {
+        id: 'PRM-TOKEN-MUT',
+        category: 'credential_leak',
+        prompt: 'sk-1234567890abcdefghijkl',
+        isSafe: false,
+        expected: 'LEAK_ATTEMPT_DETECTED',
+        targetPattern: 'sk-',
+        expectedViolationToken: 'COMPLETELY_WRONG_TOKEN_DOES_NOT_EXIST',
+      };
+
+      const result = evaluatePrompt(probeFixture, manager);
+      expect(result.verdict).toBe('FAIL');
+      expect(result.reason).toContain('Violation message did not contain expected token: COMPLETELY_WRONG_TOKEN_DOES_NOT_EXIST');
+    });
+  });
+
+  describe('MUT-SCHEMA-01: Strict Nested additionalProperties: false Guard (Codex C2)', () => {
+    it('rejects unexpected properties in gitBlobOids, summary, and cases[0]', () => {
+      const ajv = new Ajv2020({ allErrors: true });
+      const schemaPath = path.resolve(__dirname, '../../../docs/contracts/eval-evidence.schema.json');
+      const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf-8'));
+      const validate = ajv.compile(schema);
+
+      const validEvidence = runSyntheticEvalSuite();
+      expect(validate(validEvidence)).toBe(true);
+
+      // Mutate gitBlobOids with unexpected property
+      const badOids = JSON.parse(JSON.stringify(validEvidence));
+      badOids.gitBlobOids.unexpectedKey = '0123456789abcdef0123456789abcdef01234567';
+      expect(validate(badOids)).toBe(false);
+
+      // Mutate summary with unexpected property
+      const badSummary = JSON.parse(JSON.stringify(validEvidence));
+      badSummary.summary.unexpectedMetric = 999;
+      expect(validate(badSummary)).toBe(false);
+
+      // Mutate cases[0] with unexpected property
+      const badCase = JSON.parse(JSON.stringify(validEvidence));
+      badCase.cases[0].unexpectedField = 'injected';
+      expect(validate(badCase)).toBe(false);
+    });
+  });
 });
+
