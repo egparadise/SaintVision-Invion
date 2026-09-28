@@ -188,9 +188,12 @@ def test_without_a_credential_the_route_is_401_and_the_anonymous_denial_is_audit
     owner_engine, app_engine, app_sessionmaker, two_tenants, clean_tables
 ):
     """The real path (configured app, app-role engine): 401 + WWW-Authenticate and
-    exactly one anonymous denial row. Before 0047 (audit isolation, #128) the
-    out-of-band audit write failed under the app role (hosted run 36382121571,
-    500); this branch carries 0047, so the outcome is observed, not assumed."""
+    exactly one anonymous denial row, whose action is the route template.
+
+    This route's raw path is 90 characters and ``audit_events.action`` is 64,
+    so until #189 the denial INSERT overflowed and the 401 surfaced as a 500
+    (hosted run 36384978039, Codex #184 F3). The action is now derived from
+    the matched route, so the outcome is observed on the real column."""
     tenant_a, _ = two_tenants
     with owner_engine.begin() as connection:
         mine = _seed_project(connection, tenant_id=tenant_a, code="mine")
@@ -211,10 +214,12 @@ def test_without_a_credential_the_route_is_401_and_the_anonymous_denial_is_audit
         assert "recordId" not in response.text
     with owner_engine.begin() as connection:
         rows = connection.execute(
-            text("SELECT actor_type, reason_code FROM audit_events WHERE outcome = 'deny' ORDER BY occurred_at DESC")
+            text("SELECT actor_type, reason_code, action FROM audit_events WHERE outcome = 'deny' ORDER BY occurred_at DESC")
         ).fetchall()
     assert len(rows) == before + 1
     assert rows[0][0] == "anonymous" and rows[0][1] == "AUTH-MISSING-CREDENTIAL"
+    assert rows[0][2] == "GET /v1/projects/{project_id}/runs/{run_id}/record"
+    assert mine["project_id"] not in rows[0][2] and run_id not in rows[0][2]
 
 
 def test_a_non_member_of_an_existing_project_is_403_not_404(owner_engine, app_engine, app_sessionmaker, two_tenants, clean_tables):
@@ -225,25 +230,3 @@ def test_a_non_member_of_an_existing_project_is_403_not_404(owner_engine, app_en
     run_id, _ = _sealed_run(app_sessionmaker, tenant_id=tenant_a, seed=mine)
     with _client(app_engine, tenant_id=tenant_a, user_id=outsider["user_id"]) as client:
         _canonical(client.get(_path(mine["project_id"], run_id)), code="AUTH-0030", status=403)
-
-
-def test_diagnostic_anonymous_denial_writer_on_the_app_role_engine(app_engine, two_tenants, clean_tables):
-    """TEMPORARY diagnostic (Codex #184 F3, coordinator order): surface the DBAPI
-    exception behind the 500 with the exact action string the handler builds for
-    this route, and for a #175 lineage route, directly on the app-role engine.
-    Removed once the cause is on record."""
-    from saintvision.services.audit import record_denial_out_of_band
-
-    project_id, run_id, model_id = new_id("project"), new_id("run"), new_id("model")
-    for action in (
-        f"GET {_path(project_id, run_id)}",
-        f"GET /v1/projects/{project_id}/models/{model_id}/versions/1/lineage",
-        "GET /v1/nodes",
-    ):
-        try:
-            record_denial_out_of_band(
-                app_engine, now=NOW, actor_type="anonymous", action=action, reason_code="AUTH-MISSING-CREDENTIAL"
-            )
-        except Exception as exc:  # noqa: BLE001 -- diagnostic: the class and first line are the finding
-            first = str(exc).splitlines()[0]
-            raise AssertionError(f"len(action)={len(action)}: {type(exc).__name__}: {first}") from None
