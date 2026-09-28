@@ -67,6 +67,30 @@ def test_optional_helper_serialises_before_replay_and_finishes_same_ledger(monke
     ]
 
 
+def test_optional_helper_yields_the_stored_replay_without_finishing(monkeypatch):
+    stored = {"projectId": "prj_replay", "status": "archived"}
+
+    @contextmanager
+    def bounded(_session, *, timeout_ms):
+        assert timeout_ms == 500
+        yield
+
+    monkeypatch.setattr("saintvision.api.lock_wait.bounded_lock_wait", bounded)
+    monkeypatch.setattr(deps, "serialise_idempotent_write", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(deps, "replay_or_reserve", lambda *_args, **_kwargs: stored)
+    monkeypatch.setattr(
+        deps,
+        "store_idempotent_response",
+        lambda *_args, **_kwargs: pytest.fail("a replay must not write another ledger result"),
+    )
+
+    with deps.optional_idempotent_write(
+        object(), principal=PRINCIPAL, endpoint="PUT /legacy", idempotency_key="idem-hit",
+        payload={"status": "archived"}, now=NOW, ttl_seconds=600, lock_timeout_ms=500,
+    ) as (replay, _finish):
+        assert replay is stored
+
+
 def test_optional_helper_without_key_bounds_but_does_not_take_advisory_lock(monkeypatch):
     calls = []
 
