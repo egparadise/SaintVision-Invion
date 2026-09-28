@@ -153,6 +153,8 @@ export const NaturalLanguageRunView: React.FC = () => {
       {/* Action Notification Banner */}
       {actionNotice && (
         <div
+          role={actionNotice.type === 'error' ? 'alert' : 'status'}
+          aria-live={actionNotice.type === 'error' ? 'assertive' : 'polite'}
           style={{
             padding: '12px 18px',
             borderRadius: '6px',

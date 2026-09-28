@@ -148,8 +148,8 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
   tenantId,
   checkoutId,
   currentReviewerId,
-  nodes,
-  runs,
+  nodes = [],
+  runs = [],
   approvals = [],
   workspaces = [],
   onRefreshNodes,
@@ -211,10 +211,16 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
   // Global Keyboard Shortcuts (Alt+Tab window cycling, Escape to close modals, Win/Meta to toggle Start menu)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Escape: Close Start Menu or Notifications
+      // Escape: Close Start Menu or Notifications first (overlays)
       if (e.key === 'Escape') {
-        if (isStartMenuOpen) setIsStartMenuOpen(false);
-        if (isNotifOpen) setIsNotifOpen(false);
+        if (isStartMenuOpen) {
+          setIsStartMenuOpen(false);
+          return;
+        }
+        if (isNotifOpen) {
+          setIsNotifOpen(false);
+          return;
+        }
       }
       // Alt + Tab: Cycle through open windows
       if (e.altKey && (e.key === 'Tab' || e.code === 'Tab')) {

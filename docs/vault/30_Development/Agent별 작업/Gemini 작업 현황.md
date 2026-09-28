@@ -113,6 +113,25 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-28T11:52:00+09:00 (최신 tip `1e8baf04`, 작업 브랜치 `agent/gemini/s05-s06-fe-fixes`).
 
 ## 2026-09-28 S05·S06-FE 제품 결함 후속 감사 및 수정 (`agent/gemini/s05-s06-fe-fixes`)
+- 확인 기준: 2026-09-28T13:30:00+09:00 (최신 작업 브랜치 `agent/gemini/s11-fe-fixes`).
+
+## 2026-09-28 S11-FE 제품 결함 DEF-S11-01~19 전수 치유 완료 (`agent/gemini/s11-fe-fixes`)
+
+- **19대 제품 결함 전수 치유 완결**:
+  - **DEF-S11-01 (키보드 포커스 링 복원)**: `Button.tsx`, `MonacoWorkspaceEditor.tsx`, `WebTerminal.tsx`에서 `outline: 'none'` 하드코딩 제거 및 `index.css` 전역 `:focus-visible` 고대비 링 정의.
+  - **DEF-S11-02 (WorkspaceList 키보드 접근성)**: 카드에 `role="button"`, `tabIndex={0}`, `aria-label`, Enter/Space `onKeyDown` 및 자식 Studio 버튼 이벤트 버블링 차단 가드 적용.
+  - **DEF-S11-03~06 (모달 A11y 표준화)**: `useModalA11y` 훅 신설로 Tab/Shift+Tab 포커스 트랩(컨테이너 래핑 포함), 종료 시 트리거 복귀, Esc 닫기(`e.stopPropagation()`) 구현. `WorkspaceCreateModal`, `GitCommitModal`, `ConflictResolutionModal`, `AdminSecurityConsole` (kill-switch), `ApprovalDetail` (reject), `RunDetail` (cancel, receipt), `DeveloperStudio` (cancel, receipt) 전면 배선 및 `role="dialog"`, `aria-modal="true"`, `aria-labelledby` 부여. `Header.tsx` 활성 탭 `aria-current="page"` 부여.
+  - **DEF-S11-07 (동적 알림 Live Region)**: `ReleaseCandidateView`, `NaturalLanguageRunView`, `DistributedRecoveryView`에 `role="alert"` / `role="status"` 및 `aria-live` 부여.
+  - **DEF-S11-08, DEF-S11-11~16 (RCV 허위 상태 격리)**: 백엔드 API 미노출 상태에서 5-Node 계측 허위 문구 정정(`[정적 예시] 원격 텔레메트리 미연동`), 'ACTIVE LIVE'/'STANDBY' 배지를 '모의 활성'/'모의 대기'로 격리, `releaseEngine.ts` 초기값 `rollbackVerified: false` 설정 및 롤백 플래그 연동 배지 격리, WCAG 자동화 감사 과장 문구 정정, 명도대비 수동 계산값 표기 정정, 무중단 롤백 보증 문구 정정, WCAG 배지 동적 바인딩(`audit.status`).
+  - **DEF-S11-09 & DEF-S11-10 (WCAG 명도 대비율 적합화)**: 버튼 배경 토큰(`--color-brand-primary-bg: #1d4ed8`, 6.70:1 $\ge$ 4.5:1 / `--color-status-offline-bg: #dc2626`, 4.83:1 $\ge$ 4.5:1)과 전경·링 토큰(`--color-brand-primary: #60a5fa`, dark surface 6.98:1 / `--color-status-offline: #f87171`, dark surface 6.41:1)을 완전 분리하여 텍스트 4.5:1, 링 3.0:1 이상 전수 충족. 폼 경계선 Dark `#9ca3af`(5.78:1 $\ge$ 3.0:1), Light `#64748b`(4.34:1 $\ge$ 3.0:1) 보정.
+  - **DEF-S11-17~19 (반응형 뷰포트 및 롤백 식별)**: auto-fit 유동 그리드, 테이블 `overflow-x: auto` 래퍼, Desktop/Tablet/Mobile 뷰포트 버튼 클릭 시 컨테이너 `maxWidth` 동적 전환, 롤백 버튼 버전 식별 aria-label 부여.
+- **검증 실측**:
+  - `apps/web/tests/s11-defect-fixes.test.tsx`: 전수 통과.
+  - `pytest tests/test_route_coverage.py`: **39 passed**.
+  - `tools/check_frontend_integrity.py`: **0 violations, exit 0**.
+  - `tools/check_contract_bindings.py`: **exit 0**.
+  - `tools/check_docs.py` & `tools/check_ontology.py`: **exit 0**.
+- **보고서**: [[2026-09-28_13-05-00_KST_S11_FE_Gemini_제품결함_수정]]
 
 - **작업 개요**: S05 매트릭스(v1.2.2), S06 매트릭스(v1.1.2) 및 PR #151 S05 공식 결정(legacy 배치 경로 정본)에 입각하여 현재 `apps/web` 제품 코드를 전수 감사하고, Claude UI 축 독립 검토(issuecomment-5862081355) 지적 F-1~F-9 및 r2 조건부 승인 C-1~C-4를 전수 치유.
 - **결함 수정 내역 (F-1 ~ F-9 및 r2 C-1 ~ C-4)**:
