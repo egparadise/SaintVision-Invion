@@ -1,3 +1,16 @@
+const SERVER_KIND_LABELS: Record<string, string> = {
+  eval_run: '정량 평가 실행 (eval_run)',
+  code_commit: 'Git 커밋 (code_commit)',
+  approval: '거버넌스 승인 원장 (approval)',
+  container_image: '컨테이너 이미지 (container_image)',
+  dataset_version: '데이터셋 버전 (dataset_version)',
+  deployment: '배포 내역 (deployment)',
+  evaluations: '정량 평가 실행 (eval_run)',
+  commits: 'Git 커밋 (code_commit)',
+  approvals: '거버넌스 승인 원장 (approval)',
+  images: '컨테이너 이미지 (container_image)',
+};
+
 import React, { useState, useRef, useEffect } from 'react';
 import { ModelLineage, ProblemDetails } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
@@ -73,12 +86,22 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   const [relLoading, setRelLoading] = useState(false);
   const [relResult, setRelResult] = useState<ModelReleaseResponse | null>(null);
 
+  // Idempotency keys preserved per submission intent
+  const [regIdempotencyKey, setRegIdempotencyKey] = useState<string>(() =>
+    modelRegistryObservation.generateIdempotencyKey('w2')
+  );
+  const [pinIdempotencyKey, setPinIdempotencyKey] = useState<string>(() =>
+    modelRegistryObservation.generateIdempotencyKey('pin')
+  );
+
   // ProblemDetails error and Live Region
   const [problemDetails, setProblemDetails] = useState<ProblemDetails | null>(null);
   const [generalError, setGeneralError] = useState<string | null>(null);
   const [liveAnnouncement, setLiveAnnouncement] = useState<string>('');
 
   const abortControllerRef = useRef<AbortController | null>(null);
+  const writeAbortControllerRef = useRef<AbortController | null>(null);
+  const writeGenerationRef = useRef(0);
 
   useEffect(() => {
     if (propProjectId) setProjectId(propProjectId);
@@ -87,10 +110,12 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   useEffect(() => {
     return () => {
       abortControllerRef.current?.abort();
+      writeAbortControllerRef.current?.abort();
     };
   }, []);
 
-  const canApprove = currentUser?.canApprove !== false;
+  // F1: Fail-closed strict canApprove check. Missing / undefined canApprove is strictly FALSE!
+  const canApprove = (currentUser as { canApprove?: boolean } | null | undefined)?.canApprove === true;
 
   const clearErrors = () => {
     setProblemDetails(null);
@@ -166,25 +191,53 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       return;
     }
 
+    // F4: byteSize non-negative integer strict validation (no silent truncation/conversion)
+    let byteSizeNum = 0;
+    if (regByteSize.trim() !== '') {
+      if (!/^\d+$/.test(regByteSize.trim())) {
+        setGeneralError('byteSize는 0 이상의 정수여야 합니다.');
+        return;
+      }
+      byteSizeNum = Number(regByteSize.trim());
+      if (!Number.isSafeInteger(byteSizeNum) || byteSizeNum < 0) {
+        setGeneralError('byteSize는 안전한 양의 정수 범위 내여야 합니다.');
+        return;
+      }
+    }
+
+    // G3: Write abort and generation guard
+    writeAbortControllerRef.current?.abort();
+    const ctrl = new AbortController();
+    writeAbortControllerRef.current = ctrl;
+    const currentGen = ++writeGenerationRef.current;
+
     setRegLoading(true);
     setLiveAnnouncement(`버전 [${regVersion}] 등록 요청 중...`);
     try {
-      const byteSizeNum = parseInt(regByteSize, 10);
+      // F2 & G2: Send preserved regIdempotencyKey across retries
       const res = await modelRegistryObservation.registerModelVersion(
         projectId.trim(),
         modelId.trim(),
         {
           version: regVersion.trim(),
           contentSha256: regSha256.trim(),
-          byteSize: Number.isInteger(byteSizeNum) && byteSizeNum >= 0 ? byteSizeNum : 0,
-        }
+          byteSize: byteSizeNum,
+        },
+        { signal: ctrl.signal, idempotencyKey: regIdempotencyKey }
       );
+      if (writeGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
       setRegResult(res);
+      // Success: rotate key for the next registration intent
+      setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
       setLiveAnnouncement(`버전 등록 성공: [${res.version}] (ID: ${res.modelVersionId})`);
     } catch (err: unknown) {
+      if (writeGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
+      // Failure: preserve regIdempotencyKey so retrying the same payload reuses the key!
       handleApiError(err, '모델 버전 등록 실패');
     } finally {
-      setRegLoading(false);
+      if (writeGenerationRef.current === currentGen && !ctrl.signal.aborted) {
+        setRegLoading(false);
+      }
     }
   };
 
@@ -204,23 +257,38 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       return;
     }
 
+    // G3: Write abort and generation guard
+    writeAbortControllerRef.current?.abort();
+    const ctrl = new AbortController();
+    writeAbortControllerRef.current = ctrl;
+    const currentGen = ++writeGenerationRef.current;
+
     setPinLoading(true);
     setLiveAnnouncement(`보존 고정 연장 요청 중 (Until: ${pinUntil})...`);
     try {
+      // F2 & G2: Send preserved pinIdempotencyKey across retries
       const res = await modelRegistryObservation.extendRetentionPin(
         projectId.trim(),
         modelId.trim(),
         version.trim(),
-        { until: pinUntil.trim() }
+        { until: pinUntil.trim() },
+        { signal: ctrl.signal, idempotencyKey: pinIdempotencyKey }
       );
+      if (writeGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
       setPinResult(res);
+      // Success: rotate key for next pin intent
+      setPinIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('pin'));
       setLiveAnnouncement(
         `보존 고정 완료: [${res.version}] ${res.extended ? '연장됨' : '기존 유지 (연장 없음)'} (Pinned Until: ${res.retentionPinnedUntil})`
       );
     } catch (err: unknown) {
+      if (writeGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
+      // Failure: preserve pinIdempotencyKey so retrying the same payload reuses the key!
       handleApiError(err, '보존 고정 연장 실패');
     } finally {
-      setPinLoading(false);
+      if (writeGenerationRef.current === currentGen && !ctrl.signal.aborted) {
+        setPinLoading(false);
+      }
     }
   };
 
@@ -240,9 +308,16 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       return;
     }
 
+    // G3: Write abort and generation guard
+    writeAbortControllerRef.current?.abort();
+    const ctrl = new AbortController();
+    writeAbortControllerRef.current = ctrl;
+    const currentGen = ++writeGenerationRef.current;
+
     setRelLoading(true);
     setLiveAnnouncement(`모델 릴리스 요청 중 (분류: ${relClassification})...`);
     try {
+      // Release route does NOT receive Idempotency-Key in backend contract (model_release.py)
       const res = await modelRegistryObservation.releaseModelVersion(
         projectId.trim(),
         modelId.trim(),
@@ -250,14 +325,19 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
         {
           licensePolicy: relLicensePolicy.trim(),
           classification: relClassification,
-        }
+        },
+        { signal: ctrl.signal }
       );
+      if (writeGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
       setRelResult(res);
       setLiveAnnouncement(`모델 릴리스 성공: [${res.version}] (Stage: ${res.stage})`);
     } catch (err: unknown) {
+      if (writeGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
       handleApiError(err, '모델 릴리스 실패');
     } finally {
-      setRelLoading(false);
+      if (writeGenerationRef.current === currentGen && !ctrl.signal.aborted) {
+        setRelLoading(false);
+      }
     }
   };
 
@@ -445,6 +525,22 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           </div>
         </div>
 
+        {!canApprove && (
+          <div
+            data-testid="banner-no-approve-permission"
+            style={{
+              fontSize: '12px',
+              color: '#f85149',
+              backgroundColor: '#3d1214',
+              padding: '8px 12px',
+              borderRadius: '6px',
+              border: '1px solid #f85149',
+            }}
+          >
+            ⚠️ 거버넌스 승인 권한(canApprove)이 없어 조회만 가능합니다. (상태 변경 작업 비활성화)
+          </div>
+        )}
+
         {/* Action Tabs Navigation */}
         <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid #30363d', paddingBottom: '10px' }}>
           <button
@@ -534,7 +630,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
 
         {/* Tab Content: 2. W2 Register */}
         {activeTab === 'register' && (
-          <form onSubmit={handleRegisterVersion} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <form noValidate onSubmit={handleRegisterVersion} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
               <div>
                 <label htmlFor="input-register-version" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
@@ -546,7 +642,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                   type="text"
                   placeholder="1.0.0-rc1"
                   value={regVersion}
-                  onChange={(e) => setRegVersion(e.target.value)}
+                  onChange={(e) => {
+                    setRegVersion(e.target.value);
+                    setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
+                  }}
                   style={{
                     width: '100%',
                     padding: '6px 10px',
@@ -570,7 +669,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                   type="text"
                   placeholder="0123456789abcdef..."
                   value={regSha256}
-                  onChange={(e) => setRegSha256(e.target.value)}
+                  onChange={(e) => {
+                    setRegSha256(e.target.value);
+                    setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
+                  }}
                   style={{
                     width: '100%',
                     padding: '6px 10px',
@@ -591,10 +693,13 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 <input
                   id="input-register-bytesize"
                   data-testid="input-register-bytesize"
-                  type="number"
-                  min="0"
+                  type="text"
+                  inputMode="numeric"
                   value={regByteSize}
-                  onChange={(e) => setRegByteSize(e.target.value)}
+                  onChange={(e) => {
+                    setRegByteSize(e.target.value);
+                    setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
+                  }}
                   style={{
                     width: '100%',
                     padding: '6px 10px',
@@ -631,7 +736,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
 
         {/* Tab Content: 3. W4 Pin */}
         {activeTab === 'pin' && (
-          <form onSubmit={handleExtendPin} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <form noValidate onSubmit={handleExtendPin} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div>
               <label htmlFor="input-pin-until" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
                 보존 만료 시각 (ISO 8601 with Offset) *
@@ -678,7 +783,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
 
         {/* Tab Content: 4. Release */}
         {activeTab === 'release' && (
-          <form onSubmit={handleReleaseModel} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <form noValidate onSubmit={handleReleaseModel} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' }}>
               <div>
                 <label htmlFor="input-release-license" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
@@ -728,6 +833,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                   <option value="restricted">restricted (제한됨)</option>
                 </select>
               </div>
+            </div>
+            <div style={{ fontSize: '11px', color: '#8b949e', backgroundColor: '#161b22', padding: '8px', borderRadius: '4px' }}>
+              ℹ️ Release는 서버 계약상 Idempotency-Key를 수신하지 않으므로 in-flight 이중 제출 방지 가드로 보호됩니다.
             </div>
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
               <Button
@@ -945,7 +1053,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             </div>
           </div>
 
-          {/* Unobserved Elements Explicit Honest Cards */}
+          {/* Dynamic Unresolved / CountOnly Kinds Honest Cards (Claude G1) */}
           <div
             style={{
               display: 'grid',
@@ -953,77 +1061,41 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               gap: '12px',
             }}
           >
-            <div
-              data-testid="trace-evaluations-unobserved"
-              style={{
-                backgroundColor: '#0d1117',
-                border: '1px solid #30363d',
-                borderRadius: '6px',
-                padding: '12px',
-              }}
-            >
-              <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>정량 평가 점수 (Accuracy / F1)</div>
-              <div style={{ fontSize: '14px', fontWeight: 700, color: '#d29922', marginTop: '4px' }}>
-                NOT_OBSERVED (미관측)
-              </div>
-              <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '2px' }}>
-                응답 스키마에 미포함되어 가짜 점수 합성을 차단합니다.
-              </div>
-            </div>
-
-            <div
-              data-testid="trace-commits-unobserved"
-              style={{
-                backgroundColor: '#0d1117',
-                border: '1px solid #30363d',
-                borderRadius: '6px',
-                padding: '12px',
-              }}
-            >
-              <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>Git 커밋 상세 (Commits)</div>
-              <div style={{ fontSize: '14px', fontWeight: 700, color: '#8b949e', marginTop: '4px' }}>
-                NOT_OBSERVED (범위 외)
-              </div>
-              <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '2px' }}>
-                프로젝트 멤버 조회 경계 밖으로 서버에서 미제공됩니다.
-              </div>
-            </div>
-
-            <div
-              data-testid="trace-approvals-unobserved"
-              style={{
-                backgroundColor: '#0d1117',
-                border: '1px solid #30363d',
-                borderRadius: '6px',
-                padding: '12px',
-              }}
-            >
-              <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>거버넌스 승인 원장 (Approvals)</div>
-              <div style={{ fontSize: '14px', fontWeight: 700, color: '#8b949e', marginTop: '4px' }}>
-                NOT_OBSERVED (범위 외)
-              </div>
-              <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '2px' }}>
-                배포 내역의 approvalId 외에 독립 원장은 미반환됩니다.
-              </div>
-            </div>
-
-            <div
-              data-testid="trace-images-unobserved"
-              style={{
-                backgroundColor: '#0d1117',
-                border: '1px solid #30363d',
-                borderRadius: '6px',
-                padding: '12px',
-              }}
-            >
-              <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>컨테이너 이미지 (Images)</div>
-              <div style={{ fontSize: '14px', fontWeight: 700, color: '#8b949e', marginTop: '4px' }}>
-                NOT_OBSERVED (범위 외)
-              </div>
-              <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '2px' }}>
-                빌드 이미지 상세 내역은 응답에 포함되지 않습니다.
-              </div>
-            </div>
+            {(realTrace.countOnlyKinds && realTrace.countOnlyKinds.length > 0
+              ? realTrace.countOnlyKinds
+              : ['eval_run', 'code_commit', 'approval', 'container_image']
+            ).map((kind) => {
+              const unresolvedItem = realTrace.unresolved.find((u) => u.kind === kind);
+              const label = SERVER_KIND_LABELS[kind] || `${kind} 항목`;
+              const isEval = kind === 'eval_run' || kind === 'evaluations';
+              return (
+                <div
+                  key={kind}
+                  data-testid={`trace-${kind}-unobserved`}
+                  style={{
+                    backgroundColor: '#0d1117',
+                    border: '1px solid #30363d',
+                    borderRadius: '6px',
+                    padding: '12px',
+                  }}
+                >
+                  <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>{label}</div>
+                  <div style={{ fontSize: '14px', fontWeight: 700, color: unresolvedItem ? '#58a6ff' : '#8b949e', marginTop: '4px' }}>
+                    {unresolvedItem ? `상세 범위 외 (${unresolvedItem.count}건 관측)` : '관측된 항목 없음 (0건)'}
+                  </div>
+                  {isEval && (
+                    <div style={{ fontSize: '12px', fontWeight: 600, color: '#d29922', marginTop: '4px' }}>
+                      정량 평가 점수: NOT_OBSERVED (미관측)
+                    </div>
+                  )}
+                  <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '2px' }}>
+                    {isEval
+                      ? '응답 스키마에 미포함되어 가짜 점수 합성을 차단합니다.'
+                      : '프로젝트 멤버 조회 경계 밖으로 서버에서 미제공됩니다.'}
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
           {/* Datasets Table */}

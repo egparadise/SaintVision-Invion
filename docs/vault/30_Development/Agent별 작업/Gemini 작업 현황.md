@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.130"
+version: "1.0.131"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-28T22:10:00+09:00"
+updated: "2026-09-28T22:38:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,7 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-28T22:10:00+09:00 (최신 tip `agent/gemini/g05-fe-model-registry`, 카드 94).
+- 확인 기준: 2026-09-28T22:38:00+09:00 (최신 tip `agent/gemini/g05-fe-model-registry`, 카드 94 r2).
 
 ## 2026-09-28 G-05 FE 모델 레지스트리 화면 실제 business route 연동 및 불변식 검증 (카드 94, `agent/gemini/g05-fe-model-registry`)
 
@@ -36,11 +36,19 @@ source_of_truth: "Git"
     - W3 솔기(seam)에 대한 명시적 안내: `"W3 검증: 미연결 (검증 앵커 #215 대기)"` 배지 표출.
     - RFC 9457 ProblemDetails (401, 403, 404, 409, 422) 및 502/504 HTML 에러 정제 처리.
     - `role="status" aria-live="polite"` 라이브 리전 상시 DOM 유지, WCAG AA 다크 테마 대비 4.5:1 이상 실측 확보.
-  - **Vitest 13건 비즈니스 라우트 전용 시험 (`apps/web/tests/model-registry-business-routes.test.tsx`)**:
-    - GET lineage(정상/NOT_OBSERVED/404), POST W2(정상/409/422/Idempotency-Key), POST W4(정상/403/404), POST Release(정상/403/404), 런타임 가드 위조 거부 13건 전수 PASS.
+  - **Vitest 17건 비즈니스 라우트 전용 시험 (`apps/web/tests/model-registry-business-routes.test.tsx`)**:
+    - GET lineage(서버 kind 동적 렌더링/NOT_OBSERVED 정직 분리), POST W2(Idempotency-Key 재시도 안정성 및 회전), POST W4, POST Release, 409 Conflict(서버 원문 detail), 403 Forbidden, 503 Retryable, fail-closed canApprove, missing/scope 표출, live-region, in-flight 중복 차단, query/write unmount abort, calendar round-trip, byteSize 정수 검증, ProblemDetails status 결속, additionalProperties:false 및 컬렉션 상한 17건 전수 PASS.
+  - **Codex F1~F5 & Claude G1~G6 1차 리뷰 전수 반영**:
+    - F1/G1: canApprove fail-closed 엄격화 (role fallback 배제, 3종 쓰기 aria-disabled, 전역 배너).
+    - F2/G2: Idempotency-Key 재시도 안정성 유지 및 폼 의도별 관리.
+    - F3/G4: 4종 최상위 및 3종 중첩 응답 strict key 화이트리스트 및 컬렉션 상한 강제.
+    - F4/G4: 달력 유효성(윤년/월별 일수) 및 byteSize 정수 문자열 엄격 검증.
+    - F5: ProblemDetails HTTP status 결속 검증.
+    - G1/G5: 서버 kind 어휘(`dataset_version`, `deployment`, `code_commit`, `container_image`, `eval_run`, `approval`), 실 ID 접두(`mdv_`, `mdl_`, `dsv_`, `dpl_`, `apv_`), 409 detail 형식 일치.
+    - G3: 쓰기 3종 writeAbortController 및 writeGeneration 세대 가드 추가.
 - **실측 검증**:
-  - `npm test -- model-registry-business-routes`: 13 passed (456ms).
-  - `npm test` (apps/web): 79 files, 688 passed (21.33s).
+  - `npm test -- model-registry-business-routes`: 17 passed (644ms).
+  - `npm test` (apps/web): 79 files, 691 passed (24.70s).
   - `npx tsc -b`: 0 errors.
   - `npm run build`: bundle 정상 빌드 (815.13 kB, 11.92s).
   - `npm run contracts:check`: 23개 스키마 타입 정합 (PASS).

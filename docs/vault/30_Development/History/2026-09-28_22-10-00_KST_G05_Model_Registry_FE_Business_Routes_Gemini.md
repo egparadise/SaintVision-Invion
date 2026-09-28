@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-GEMINI-G05-FE-MODEL-REGISTRY-001"
 title: "G-05 FE 모델 레지스트리 화면 실제 business route 연동 및 불변식 검증"
-version: "1.0.0"
+version: "1.1.0"
 status: "active"
 author: "Gemini"
 reviewer: "Claude, Codex"
-updated: "2026-09-28T22:10:00+09:00"
+updated: "2026-09-28T22:38:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S10-FE", "G-05"]
@@ -80,3 +80,27 @@ tags: ["s10-fe", "g-05", "model-registry", "lineage", "retention-pin", "model-re
   - `tests/test_route_coverage.py`: 40 passed (4.39s)
   - `tests/core/test_model_release_route.py`: 59 passed (20.54s)
   - `tests/core/test_model_retention_pin_route.py` & `test_model_version_register_route.py`: 133 passed (27.04s)
+
+## 4. Codex (F1~F5) 및 Claude (G1~G6) 1차 검토 반영 내역 (r2)
+
+- **Codex F1 (canApprove fail-closed 엄격 적용)**:
+  - `(currentUser as { canApprove?: boolean })?.canApprove === true`로 엄격화하여 `undefined`, `null`, `false` 및 전역 역할(`role: 'owner'`, `role: 'operator'`) fallback을 전면 배제.
+  - 권한 미충족 시 전역 경고 배너(`banner-no-approve-permission`) 표출 및 W2 등록, W4 보존 연장, 릴리스 3개 쓰기 버튼을 `disabled` 및 `aria-disabled="true"` 처리 (시험 8).
+- **Codex F2 & Claude G2 (Idempotency-Key 재시도 안정성 및 의도 단위 유지)**:
+  - `ModelLineageView` 상태에 `regIdempotencyKey` 및 `pinIdempotencyKey`를 보존하여, 503/timeout 등 일시적 실패 후 사용자가 재시도할 때 정확히 동일한 key를 재전송하도록 보장.
+  - 입력 필드 수정 시 또는 제출 성공 시에만 새 멱등키로 회전(rotate). Model Release 경로는 서버 계약(`model_release.py`)상 Idempotency-Key를 수신하지 않으므로 헤더 미전송 및 in-flight 가드로 이중 제출 방지 명시 (시험 13, 시험 4).
+- **Codex F3 & Claude G4 (additionalProperties: false 및 컬렉션 상한 강제)**:
+  - `isModelLineageTraceResponse`, `isModelVersionResponse`, `isRetentionPinResponse`, `isModelReleaseResponse` 4종 최상위 응답 및 3종 중첩 타입(`LineageDatasetVersion`, `LineageDeployment`, `LineageUnresolved`)에 허용 key whitelist Set을 적용하여 여분 속성 유입 시 fail-closed 거부.
+  - `datasets`(<=200), `deployments`(<=200), `missing`(<=16), `unresolved`(<=16), `detailedKinds`(<=16), `countOnlyKinds`(<=16) 컬렉션 상한 강제 (시험 16).
+- **Codex F4 & Claude G4 (Calendar round-trip 및 ByteSize 정수 검증)**:
+  - `isValidIsoDateTime`에 윤년 및 월별 일수 검증을 추가하여 `2026-02-30T12:00:00Z`, `2026-04-31T12:00:00Z` 등 달력상 불가능한 일시 거부.
+  - `regByteSize`는 정수 문자열(`/^\d+$/`)로 엄격 검증하여 소수점(`1.5`)이나 음수 입력 시 서버 요청 전 즉시 클라이언트 거부 및 안내 (시험 14).
+- **Codex F5 (ProblemDetails HTTP status 결속)**:
+  - `client.ts`의 `isProblemDetails(value, response.status)`를 통해 HTTP status와 body status 불일치 시 fail-closed로 거부 (시험 15).
+- **Claude G1 & G5 (서버 kind 어휘 및 ID 접두 일치)**:
+  - 픽스처 및 카드를 서버 실재 어휘(`dataset_version`, `deployment`, `code_commit`, `container_image`, `eval_run`, `approval`)와 접두(`mdv_`, `mdl_`, `dsv_`, `dpl_`, `apv_`)로 일치.
+  - `countOnlyKinds`/`unresolved`로부터 카드를 동적으로 렌더링하고, 개수 관측 항목("상세 범위 외 (N건 관측)")과 정량 평가 지표(`accuracy`, `f1` -> "NOT_OBSERVED (미관측)")를 명확히 분리. 409 detail을 서버 `model_release.py:326` 문자열 형식으로 일치 (시험 1, 시험 5).
+- **Claude G3 (쓰기 3종 abort 및 세대 가드)**:
+  - `handleRegisterVersion`, `handleExtendPin`, `handleReleaseModel`에 `writeAbortControllerRef` 및 `writeGenerationRef`를 적용하여 unmount 시 요청 abort 및 늦은 응답 상태 오염 차단 (시험 17).
+- **Claude G6 (문서 시각 정합성)**:
+  - History 및 작업 현황 문서의 `updated` 시각을 커밋 이전 시각(`2026-09-28T22:38:00+09:00`)으로 정정.
