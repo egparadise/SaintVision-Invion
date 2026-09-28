@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.40"
+version: "1.2.41"
 status: "review"
 author: "Claude"
-updated: "2026-09-28T13:27:20+09:00"
+updated: "2026-09-28T16:44:42+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+F1 model version digest UNIQUE 범위 migration 0052 (Claude, 2026-09-28, base #176 `1ddd85d0`, branch `agent/claude/g04-f1-digest-scope`): #191 F1의 선행. tenant 범위 digest UNIQUE가 project별 `canApprove`와 어긋나 **status code로 sibling-project 존재를 누출**하던 것을 `(model_id, content_sha256)`으로 좁혔다. 사전 데이터 검사(논증이 틀리면 문장으로 멈춤) → `CONCURRENTLY` 생성 → `USING INDEX` 승격 → 옛 제약 제거 순서, INVALID 인덱스 이름 선제 drop, offline render는 검사 생략(첫 판이 hosted offline 단계를 깼음), downgrade는 두 이유로 거부, head `0052` 단일. ORM·definer-policy·head marker 동반 이동. PG-free 11 passed + 변이 3건 사망, 실 PG 6건 hosted. 시험이 주석을 매칭하던 첫 판을 AST + source 위치 정렬로 고쳤다. 다음 첫 행동: Codex 검토 → 승인되면 #191이 이 head와 새 #184 head(#195 정본 403 denial audit)를 merge해 oracle 시험을 뒤집고 F4를 고정. 전문 [[2026-09-28_F1_model_version_digest_범위_migration_0052_Claude]].
 
 ### 2026-09-28 카드 bh · S10-BE MLflow 미러 2단계 (branch agent/claude/s10-be-mlflow-mirror-p2, base #172 41256e4f)
 
