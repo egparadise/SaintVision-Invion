@@ -115,6 +115,102 @@ def test_evidence_is_granted_insert_but_not_update_or_delete(rendered_sql):
             assert "INSERT" in grant.upper()
 
 
+def test_audit_tables_are_policed_and_unreadable_by_the_application(rendered_sql):
+    """F-S02-01: the baseline policed every table in TENANT_SCOPED and left
+    audit_events out of the loop while granting it to inv_app.
+
+    A grant that is never revoked is the whole finding, so the order of the two
+    statements is asserted, not just their presence.
+    """
+    import sys
+
+    sys.path.insert(0, str(ROOT / "src"))
+    from saintvision.db.models import AUDIT_TABLES
+
+    for table in AUDIT_TABLES:
+        assert re.search(rf"ALTER TABLE {table} ENABLE ROW LEVEL SECURITY", rendered_sql), table
+        assert re.search(rf"ALTER TABLE {table} FORCE ROW LEVEL SECURITY", rendered_sql), table
+        assert re.search(
+            rf"CREATE POLICY {table}_tenant_isolation ON {table} FOR ALL TO inv_app", rendered_sql
+        ), table
+        assert _position(rendered_sql, rf"GRANT SELECT, INSERT ON {table} TO inv_app") < _position(
+            rendered_sql, rf"REVOKE SELECT ON {table} FROM inv_app"
+        ), f"{table}: the revoke does not follow the grant it undoes"
+
+
+def test_the_tenant_less_denial_has_exactly_one_narrow_writer(rendered_sql):
+    """AC-02 keeps the NULL-tenant denial; only one path may write it.
+
+    The row cannot satisfy a tenant policy, so if the application role could
+    write it directly the tenant isolation above would be decorative.
+    """
+    assert re.search(
+        r"CREATE POLICY audit_events_denial_append ON audit_events FOR INSERT TO inv_audit_writer"
+        r"\s*WITH CHECK \(tenant_id IS NULL AND outcome = 'deny'\)",
+        rendered_sql,
+    )
+    assert re.search(
+        r"CREATE FUNCTION public\.record_auth_denial\(.*?SECURITY DEFINER"
+        r".*?SET search_path = pg_catalog",
+        rendered_sql,
+        re.DOTALL,
+    )
+    # tenant_id, outcome and occurred_at are constants in the body, never arguments.
+    assert re.search(
+        r"VALUES\s*\(p_event_id, clock_timestamp\(\), NULL, p_actor_type, p_actor_id, p_action,"
+        r"\s*'deny', p_reason_code",
+        rendered_sql,
+    )
+    for pattern in (
+        r"ALTER FUNCTION public\.record_auth_denial\([^)]*\)\s*OWNER TO inv_audit_writer",
+        r"REVOKE ALL ON FUNCTION public\.record_auth_denial\([^)]*\)\s*FROM PUBLIC",
+        r"GRANT EXECUTE ON FUNCTION public\.record_auth_denial\([^)]*\)\s*TO inv_app",
+        r"REVOKE CREATE ON SCHEMA public FROM inv_audit_writer",
+    ):
+        assert re.search(pattern, rendered_sql), pattern
+    assert "inv_audit_writer has members; refusing denial-primitive ownership" in rendered_sql
+    # Any member at all, not just inv_app/inv_kernel: naming the runtime roles
+    # would miss `GRANT inv_audit_reader TO bridge; GRANT bridge TO inv_app` and
+    # would let an unrelated pre-existing login read across tenants unreviewed.
+    assert "inv_audit_reader already has members (%); review membership before migration" in rendered_sql
+    assert not re.search(
+        r"rolname IN \('inv_app', 'inv_kernel'\)[^;]*inv_audit_reader", rendered_sql
+    ), "the reader guard must not be scoped to the two runtime roles"
+
+
+def test_the_downgrade_does_not_restore_the_insecure_audit_grant(rendered_sql):
+    """A rollback of a security fix must not be a way to reintroduce it.
+
+    Read from the source rather than the rendered upgrade, because ``--sql``
+    never renders ``downgrade()``.
+    """
+    source = (MIGRATIONS / "0047_audit_events_isolation.py").read_text(encoding="utf-8")
+    body = source.split("def downgrade()", 1)[1]
+    assert re.search(r"REVOKE SELECT ON audit_events FROM inv_app", body)
+    assert not re.search(r"GRANT SELECT ON audit_events TO inv_app", body), (
+        "downgrade re-grants the privilege this revision revoked"
+    )
+
+
+def test_the_audit_read_role_is_separate_and_not_a_login(rendered_sql):
+    role = re.search(r"CREATE ROLE inv_audit_reader([^;]+);", rendered_sql, re.IGNORECASE)
+    assert role, "the audit read role is not created"
+    flags = role.group(1).upper()
+    for flag in ("NOLOGIN", "NOSUPERUSER", "NOBYPASSRLS", "NOCREATEDB", "NOCREATEROLE", "NOINHERIT"):
+        assert flag in flags, f"audit reader lacks {flag}"
+    assert re.search(
+        r"CREATE POLICY audit_events_audit_read ON audit_events FOR SELECT TO inv_audit_reader",
+        rendered_sql,
+    )
+    assert re.search(r"GRANT SELECT ON audit_events TO inv_audit_reader", rendered_sql)
+    # Reading audit records is all it does.
+    assert not re.search(
+        r"GRANT (?:[^;]*,\s*)?(?:INSERT|UPDATE|DELETE)[^;]*ON audit_events TO inv_audit_reader",
+        rendered_sql,
+        re.IGNORECASE,
+    )
+
+
 def test_no_migration_reads_the_mutable_partition_constant():
     """The bug this file exists for.
 

@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.21"
+version: "1.2.23"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T09:55:00+09:00"
+updated: "2026-09-28T09:05:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+F-S02-01 audit_events 테넌트 격리 (Claude, 2026-09-28, base `1e8baf04`, branch `agent/claude/f-s02-01-audit-rls`): Codex 판정(PR #120 "F-S02-01 정책 판정", baseline 수용 기각) 4항을 계약으로 받아 `0047_audit_events_isolation` 착지 — RLS **ENABLE+FORCE**, 역할별 정책 3(`_tenant_isolation` FOR ALL TO inv_app · `_denial_append` FOR INSERT TO inv_audit_writer `WITH CHECK (tenant_id IS NULL AND outcome='deny')` · `_audit_read` FOR SELECT TO inv_audit_reader), `REVOKE SELECT … FROM inv_app`(INSERT 유지=append-only 불변), 새 역할 둘(NOLOGIN·NOINHERIT·NOBYPASSRLS, inv_app·inv_kernel member면 migration 중단), 좁은 `public.record_auth_denial(...)` SECURITY DEFINER(tenant NULL·outcome deny·`clock_timestamp()` 상수, 0045 패턴으로 소유권 이전). 앱은 `record_denial_out_of_band`를 두 갈래로(tenant 있음 → `tenant_scope`+기존 `record_event`, NULL → primitive); `record_event`·계약 파일 무변경. 실 PG 실측: 신규 `tests/test_audit_events_isolation.py` red **12 failed/3 passed** → **15 passed**, test_migrations **25**(정적 게이트 3건 추가), test_database **19**, test_api **29**(NULL-tenant 401 행 단언 추가), test_collect_rls_evidence **20**(head 0046 고정 gap 단언 3곳 닫힘으로 뒤집음), integration/test_definer_audit **22**, route_coverage 39·serving_anchors 9·definer_audit_cli 3·migration_prerequisite 6 — 전부 exit 0. **가역 downgrade 왕복 실측 ROUNDTRIP OK**(backend.yml "reversible tail"이 이제 실제로 실행되므로 가정하지 않았다). `definer-policy.json` revision→0047 + 신규 항목(`397bfe69…`), 기존 12건 digest 재확인 일치. 게이트 7종 exit 0. 정직한 경계: 위조 방지 아님·`inv_audit_reader`는 전 테넌트 읽기(baseline에 이유 명시, disposable DB는 audit 행 0이라 수집기 PASS가 그 범위를 측정한 것은 아님)·superuser WORM 아님·공유 dev DB는 0046 유지. self-close 없음, registry 무변경. **Codex 보안 검토 = 수정 요청 → 반영(09:05)**: F-R1 reader guard가 직접 member만 봐서 `GRANT reader TO bridge; GRANT bridge TO inv_app` 간접 멤버십과 기존 login member를 통과시켰다 → **member가 하나라도 있으면 거부**(이름 포함 메시지, writer guard와 같은 원칙; 사슬은 머리에 직접 member가 있으므로 추가 `pg_has_role` guard는 도달 불가라 넣지 않고 이유를 주석에 명시) + 실제 migration negative 시험 2건(direct·chain, disposable DB 0046 시드 → upgrade 중단·half-applied 아님·사슬이 실제 bypass임을 pg_has_role로 선단언) + 정적 게이트가 옛 좁은 형태를 거부. F-R2 downgrade가 `GRANT SELECT ON audit_events TO inv_app`으로 원래 노출을 복원했다 → downgrade에서도 **SELECT 회수 유지**(가역이지만 비대칭, 운영 순서·DB만 rollback 시 500 되는 것까지 docstring에 명시) + 왕복을 저장소 시험으로 승격(`app_select=False` 요구) + PG-free 소스 단언. 수정분 검증: PG-free test_migrations **26 passed**·definer_audit_cli 3·check_docs exit 0. **실 PG는 이 수정분에 대해 로컬 미실행**(가용 1.28→0.81GB, 1.5GB 규칙) → 새 시험 3건의 실행 근거는 hosted Backend. definer-policy sourceMigrationSHA256 → 82e1126d(definitionSHA256 불변). 다음: Codex 재검토. 전문 [[2026-09-28_07-05-00_KST_F-S02-01_audit_events_테넌트격리_구현_Claude]] · 설계 [[2026-09-28_06-10-00_KST_F-S02-01_audit_events_테넌트격리_설계_Claude]].
 
 hosted Core junit로 S04/05/07-DB 케이스 수치 보강 카드 12 (Claude, 2026-09-22, 읽기 전용): artifact `saintvision-core-evidence`(run 35706465645 `3d1892c0` + proof 35714470445 `f2aa2b14`)를 .work/ci-junit에 받아(바이너리 삭제 후 1.4MB) 파일별 수치(core 2948/58/0·shard-recovery 21·containment 28·workspace 22·business-handoff 17·lan-installer 15·docker-host 2, f2aa2b14는 core 2998/58/0 외 동일)와 카드 10의 hosted-only 항목 케이스 이름을 classname으로 추출 — 재전송 hash(output_ingestion 5·node_delivery 18·results 21), placement Explain(placement 12), shard replacement 21, containment 28, workspace 복구 12+11, 노드 스토리지 전송 27 — **전부 passed**. hosted에도 없는 것(AC-05 결정성/P95·AC-07 60초/95%·CX01)은 그대로 물리/5노드 대기로 명시. 패키지 §C-2 + 검증상태지도 §12 보강. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 
