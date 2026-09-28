@@ -329,7 +329,14 @@ def _candidate_identity(root: Path, name: str, kind: str) -> dict:
     expected_type = stat.S_ISREG if kind == "archive" else stat.S_ISDIR
     if not expected_type(info.st_mode):
         raise RetentionApplyRefused("retention candidate changed type")
-    return {"device": int(info.st_dev), "inode": int(info.st_ino)}
+    # Linux can immediately recycle an inode after an operator replaces a
+    # candidate at the same path.  Bind the metadata-change clock as well so
+    # dev+inode reuse cannot authorise deletion of the replacement.
+    return {
+        "device": int(info.st_dev),
+        "inode": int(info.st_ino),
+        "ctimeNs": int(info.st_ctime_ns),
+    }
 
 
 def _journal_path(backups_dir: Path, journal_path: Path | None) -> Path:
@@ -551,7 +558,7 @@ def _load_journal(path: Path) -> dict:
         or not isinstance(target["name"], str)
         or target["state"] not in {"pending", "removed", "already-absent"}
         or not isinstance(target["identity"], dict)
-        or set(target["identity"]) != {"device", "inode"}
+        or set(target["identity"]) != {"device", "inode", "ctimeNs"}
         or any(
             not isinstance(value, int) or isinstance(value, bool) or value < 0
             for value in target["identity"].values()
@@ -735,7 +742,11 @@ def _delete_candidate(target: dict, archive_dir: Path, backups_dir: Path) -> boo
         info = path.stat(follow_symlinks=False)
     except FileNotFoundError:
         return False
-    if {"device": int(info.st_dev), "inode": int(info.st_ino)} != target["identity"]:
+    if {
+        "device": int(info.st_dev),
+        "inode": int(info.st_ino),
+        "ctimeNs": int(info.st_ctime_ns),
+    } != target["identity"]:
         raise RetentionApplyRefused("retention candidate identity changed")
     if target["kind"] == "archive":
         if not stat.S_ISREG(info.st_mode):
@@ -770,11 +781,13 @@ def apply(
             journal["failureClass"] = None
     else:
         journal = _new_journal(plan_, archive_dir, backups_dir)
+    active_target: dict | None = None
     try:
         _write_journal(journal_file, journal)
         for target in journal["targets"]:
             if target["state"] != "pending":
                 continue
+            active_target = target
             observed = _observed_plan(plan_, archive_dir, backups_dir)
             current = _validate_current_plan(journal, observed, backups_dir)
             _validate_pending_target(
@@ -800,6 +813,28 @@ def apply(
         _write_journal(journal_file, journal)
         return invocation_removed
     except (OSError, RetentionApplyRefused) as error:
+        # A caught rmtree failure may already have removed backup_label.  Its
+        # directory ctime legitimately changed, so persist that new identity
+        # only when the original dev+inode still names the same partial
+        # directory.  A hard crash before this receipt update remains
+        # fail-closed on resume.
+        if (
+            isinstance(error, OSError)
+            and active_target is not None
+            and active_target["kind"] == "backups"
+        ):
+            partial = _candidate_path(backups_dir, active_target["name"], "backups")
+            if _path_exists_no_follow(partial) and not _path_exists_no_follow(
+                partial / "backup_label"
+            ):
+                observed_identity = _candidate_identity(
+                    backups_dir, active_target["name"], "backups"
+                )
+                if (
+                    observed_identity["device"] == active_target["identity"]["device"]
+                    and observed_identity["inode"] == active_target["identity"]["inode"]
+                ):
+                    active_target["identity"] = observed_identity
         journal["status"] = "partial"
         journal["failureClass"] = PARTIAL_FAILURE_CLASS
         _refresh_incomplete(journal)

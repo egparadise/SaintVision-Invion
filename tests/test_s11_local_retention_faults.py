@@ -542,6 +542,13 @@ def test_bak02_delete_flushes_parent_before_returning(tmp_path, monkeypatch):
     assert not (archive / target["name"]).exists()
 
 
+def test_bak02_candidate_identity_binds_ctime_against_inode_reuse(tmp_path):
+    archive, _backups, planned, _journal = _retention_world(tmp_path)
+    identity = retention._candidate_identity(archive, planned.delete_archive[0], "archive")
+    assert set(identity) == {"device", "inode", "ctimeNs"}
+    assert identity["ctimeNs"] >= 0
+
+
 def test_bak02_changed_retained_label_refuses_before_another_delete(tmp_path, monkeypatch):
     archive, backups, planned, journal = _retention_world(tmp_path)
 
