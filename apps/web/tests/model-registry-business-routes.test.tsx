@@ -1556,6 +1556,12 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
 
     // Second attempt succeeded
     expect(container.querySelector('[data-testid="registry-release-success"]')).not.toBeNull();
+
+    // M1 Invariant: replay response must NOT be displayed as fresh release
+    const replayIndicator = container.querySelector('[data-testid="release-replay-indicator"]');
+    expect(replayIndicator).not.toBeNull();
+    expect(replayIndicator?.textContent).not.toBe('신규 릴리스 완료 (Fresh)');
+    expect(replayIndicator?.textContent).toContain('재시도 응답 — 서버 원장 결과');
   });
 
   // 22. Release Idempotency-Key Rotation on Input Changes
@@ -1618,6 +1624,23 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     const changedKey = extractIdempotencyKey(fetchCalls[1][1]);
     expect(changedKey).not.toBeNull();
     expect(changedKey).not.toBe(initialKey);
+
+    // L1: Change classification select
+    const classificationSelect = container.querySelector('#select-release-classification') as HTMLSelectElement;
+    await act(async () => {
+      classificationSelect.value = 'public';
+      classificationSelect.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    await act(async () => {
+      releaseBtn.click();
+    });
+
+    expect(fetchCalls.length).toBe(3);
+    const classificationKey = extractIdempotencyKey(fetchCalls[2][1]);
+    expect(classificationKey).not.toBeNull();
+    expect(classificationKey).not.toBe(changedKey);
+    expect(classificationKey).not.toBe(initialKey);
   });
 
   // 23. Fail-Closed Release Authorization Guard
@@ -1656,6 +1679,94 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     // Zero calls to /release
     expect((globalThis.fetch as any).mock.calls.length).toBe(0);
     expect(container.querySelector('[role="alert"]')?.textContent).toContain('승인 권한(canApprove)이 없는 계정은 모델을 릴리스할 수 없습니다.');
+
+    // L2: Re-render with canApprove undefined (must also fail closed)
+    await act(async () => {
+      root.render(
+        <ModelLineageView
+          projectId="prj_alpha"
+          initialModelId="mdl_01JLLAMA30000000000000000"
+          initialVersion="1.0.0-rc1"
+          currentUser={{ canApprove: undefined }}
+        />
+      );
+    });
+
+    const releaseTabBtn2 = Array.from(container.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('모델 릴리스')
+    );
+    await act(async () => {
+      releaseTabBtn2?.click();
+    });
+
+    const releaseBtn2 = container.querySelector('[data-testid="btn-release-model"]') as HTMLButtonElement;
+    expect(releaseBtn2.disabled).toBe(true);
+    expect(container.textContent).toContain('승인 권한(canApprove)이 필요한 작업입니다.');
+  });
+
+  // 24. Release Loading State & In-Flight Abort on Input Change (L3 / N1 pattern)
+  it('aborts in-flight release request and unlocks button when input changes during submission', async () => {
+    let resolveFirstCall: (res: any) => void;
+    let signalAborted = false;
+
+    globalThis.fetch = vi.fn().mockImplementation((_url, init) => {
+      init.signal?.addEventListener('abort', () => {
+        signalAborted = true;
+      });
+      return new Promise((resolve) => {
+        resolveFirstCall = resolve;
+      });
+    });
+
+    await act(async () => {
+      root.render(
+        <ModelLineageView
+          projectId="prj_alpha"
+          initialModelId="mdl_01JLLAMA30000000000000000"
+          initialVersion="1.0.0-rc1"
+          currentUser={{ canApprove: true }}
+        />
+      );
+    });
+
+    const releaseTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('모델 릴리스')
+    );
+    await act(async () => {
+      releaseTabBtn?.click();
+    });
+
+    const releaseBtn = container.querySelector('[data-testid="btn-release-model"]') as HTMLButtonElement;
+    expect(releaseBtn.disabled).toBe(false);
+
+    // 1. Trigger release submission (in-flight)
+    await act(async () => {
+      releaseBtn.click();
+    });
+    expect(releaseBtn.disabled).toBe(true);
+    expect(releaseBtn.textContent).toContain('릴리스 중...');
+
+    // 2. Change licensePolicy input while request is in-flight
+    const licenseInput = container.querySelector('#input-release-license') as HTMLInputElement;
+    await act(async () => {
+      setInputValue(licenseInput, 'Apache-2.0-Modified');
+    });
+
+    // In-flight request MUST be aborted and loading flag cleared
+    expect(signalAborted).toBe(true);
+    expect(releaseBtn.disabled).toBe(false);
+    expect(releaseBtn.textContent).toContain('모델 릴리스 (POST /release)');
+
+    // 3. Late resolution of old request must be discarded without showing success card
+    await act(async () => {
+      resolveFirstCall!(
+        new Response(JSON.stringify(validReleaseResponse), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      );
+    });
+    expect(container.querySelector('[data-testid="registry-release-success"]')).toBeNull();
   });
 
 });

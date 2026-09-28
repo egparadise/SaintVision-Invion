@@ -566,6 +566,8 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
     const currentGen = ++relGenerationRef.current;
 
     const isReplaySubmission = submittedRelKeysRef.current.has(relIdempotencyKey);
+    // Key is recorded at transmission time (regardless of outcome) so that retries with the same key are identified as resubmissions
+    submittedRelKeysRef.current.add(relIdempotencyKey);
 
     setRelLoading(true);
     setLiveAnnouncement(`모델 릴리스 요청 중 (분류: ${relClassification})...`);
@@ -581,13 +583,12 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
         { signal: ctrl.signal, idempotencyKey: relIdempotencyKey }
       );
       if (relGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
-      submittedRelKeysRef.current.add(relIdempotencyKey);
       setRelResult(res);
       setRelIsReplay(isReplaySubmission);
       // Key rotates ONLY after success!
       setRelIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('rel'));
       if (isReplaySubmission) {
-        setLiveAnnouncement(`저장된 릴리스 응답 수신(Replay): [${res.version}] (Stage: ${res.stage})`);
+        setLiveAnnouncement(`재시도 응답 수신(서버 원장 결과): [${res.version}] (Stage: ${res.stage})`);
       } else {
         setLiveAnnouncement(`신규 모델 릴리스 완료: [${res.version}] (Stage: ${res.stage})`);
       }
@@ -1177,12 +1178,14 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
         >
           <div style={{ fontWeight: 600 }}>
             {relIsReplay
-              ? 'ℹ️ 모델 릴리스 확인 완료 (저장된 멱등 응답 Replay, 200 OK)'
+              ? 'ℹ️ 모델 릴리스 확인 완료 (재시도 응답 — 서버 원장 결과, 200 OK)'
               : '✔ 모델 릴리스 완료 (200 OK)'}
           </div>
           <div style={{ marginTop: '4px', fontSize: '11px', color: '#8b949e' }}>
             <span data-testid="release-replay-indicator">
-              {relIsReplay ? '저장된 릴리스 응답 (Replay)' : '신규 릴리스 완료 (Fresh)'}
+              {relIsReplay
+                ? '재시도 응답 — 서버 원장 결과 (저장된 응답일 수 있음)'
+                : '신규 릴리스 완료 (Fresh)'}
             </span>
           </div>
           <div style={{ marginTop: '6px', fontSize: '12px', color: '#c9d1d9', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px' }}>

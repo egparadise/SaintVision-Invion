@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-GEMINI-G05-RELEASE-REEXPOSE-001"
 title: "G-05 모델 릴리스 쓰기 UI 재노출 및 서버 멱등성 계약 연동 (카드 118)"
-version: "1.0.1"
+version: "1.0.2"
 status: "active"
 author: "Gemini"
 reviewer: "Claude, Codex"
-updated: "2026-09-29T02:28:00+09:00"
+updated: "2026-09-29T03:01:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S10-FE", "G-05", "CARD-118"]
@@ -51,11 +51,26 @@ tags: ["s10-fe", "g-05", "card-118", "model-release", "idempotency", "re-exposur
    - **Test 22**: `licensePolicy` 또는 `classification` 입력 변경 시 Idempotency-Key 즉시 회전 실측.
    - **Test 23**: `canApprove === false` 또는 `undefined` 시 fail-closed 방어 (버튼 disabled, 안내 문구, 폼 서밋 시 0 network calls, alert 표출).
 
+
+### 2-1. Claude UI r1 독립 검토 조치 (M1, L1~L3 반영)
+
+1. **M1: `release-replay-indicator` 재시도 응답 정직화**:
+   - `ModelLineageView.tsx`에서 `submittedRelKeysRef.current.add(relIdempotencyKey)`의 호출 위치를 `await modelRegistryObservation.releaseModelVersion` **호출 직전(요청 전송 시점)**으로 이동.
+   - 1차 시도가 네트워크 단절/오류로 실패한 후 동일한 `relIdempotencyKey`로 재제출하여 200 성공을 받을 때, 클라이언트가 이미 전송 이력이 있는 키임을 감지하여 `relIsReplay = true`로 정확히 전환.
+   - 인디케이터 문구를 허위의 '신규 릴리스 완료 (Fresh)' 대신 정직한 `재시도 응답 — 서버 원장 결과 (저장된 응답일 수 있음)`로 표출하도록 수정.
+   - **Test 21**: 503 오류 후 동일 키 재시도 시 성공 수신 후 indicator가 '신규 릴리스 완료 (Fresh)'가 아니며 '재시도 응답 — 서버 원장 결과'를 포함함을 단언 (되돌리면 실패).
+2. **L1: classification 변경 시 멱등키 회전 시험 추가**:
+   - **Test 22**: 배포 분류(`classification`) 셀렉트 값을 `public`으로 변경 시 새 `rel_...` 키로 즉시 회전함을 단언.
+3. **L2: `canApprove === undefined` fail-closed 가드 시험 추가**:
+   - **Test 23**: `canApprove: undefined`일 때 릴리스 버튼 비활성화 및 안내 문구 표출 검증.
+4. **L3: 릴리스 요청 중 입력 변경 시 abort 및 로딩 해제 시험 추가**:
+   - **Test 24**: 릴리스 요청 in-flight 상태에서 `licensePolicy` 입력값 변경 시 진행 중인 요청의 signal이 abort되고 버튼 로딩 상태가 즉시 해제되며 지연 응답이 안전하게 폐기됨을 검증.
+
 ## 3. 실측 검증 증거
 
 - **단위/통합 테스트 (Vitest)**:
-  - `tests/model-registry-business-routes.test.tsx`: **23 passed** (2312ms, 0 failures)
-  - 웹 전체: **80 test files / 757 passed** (24.12s, 0 failures)
+  - `tests/model-registry-business-routes.test.tsx`: **24 passed** (2312ms, 0 failures)
+  - 웹 전체: **80 test files / 758 passed** (24.12s, 0 failures)
 - **TypeScript 타입 컴파일 & 프로덕션 번들 빌드**:
   - `cd apps/web && npx tsc -b`: **0 errors** (exit 0)
   - `npm run contracts:check`: **31 API response TypeScript types match schemas** (exit 0)
