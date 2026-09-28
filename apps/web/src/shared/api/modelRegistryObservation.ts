@@ -596,8 +596,6 @@ export function isEvalRunResponse(data: unknown): data is EvalRunResponse {
   if (!r.componentVersions || typeof r.componentVersions !== 'object' || Array.isArray(r.componentVersions)) {
     return false;
   }
-  const cvKeys = Object.keys(r.componentVersions);
-  if (cvKeys.length > 32) return false;
   for (const v of Object.values(r.componentVersions as Record<string, unknown>)) {
     if (typeof v !== 'string') return false;
   }

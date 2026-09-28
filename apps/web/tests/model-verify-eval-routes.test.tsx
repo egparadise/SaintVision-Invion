@@ -7,7 +7,7 @@ import { ModelLineageView } from '../src/features/mlops/ModelLineageView';
 import {
   isModelVerifyResponse,
   isEvalRunResponse,
-  generateIdempotencyKey,
+  startEvalRun,
 } from '../src/shared/api/modelRegistryObservation';
 import type { ModelVerifyResponse } from '../src/contracts/model-verify-response';
 import type { EvalRunResponse } from '../src/contracts/eval-run-response';
@@ -48,7 +48,12 @@ describe('G-05 W3 Verify & W5 Eval Run Business Routes (Card 101)', () => {
     return rec[name] ?? rec[name.toLowerCase()];
   };
 
-  const setInputValue = (input: HTMLInputElement, val: string) => {
+  const setInputValue = (input: HTMLElement, val: string) => {
+    if (input instanceof HTMLSelectElement) {
+      input.value = val;
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      return;
+    }
     const setNative = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
     setNative?.call(input, val);
     input.dispatchEvent(new Event('input', { bubbles: true }));
@@ -91,7 +96,8 @@ describe('G-05 W3 Verify & W5 Eval Run Business Routes (Card 101)', () => {
     passedCases: 25,
     violations: 0,
     componentVersions: {
-      adapter: 'codex',
+      adapter: 'codex-cli',
+      contractVersion: '1.0.0',
       prompt: 'pmt_01J11111111111111111111111',
     },
     startedAt: '2026-09-28T12:00:00Z',
@@ -124,7 +130,25 @@ describe('G-05 W3 Verify & W5 Eval Run Business Routes (Card 101)', () => {
       const { endedAt, ...withoutEndedAt } = validEvalRunResponse;
       expect(isEvalRunResponse(withoutEndedAt)).toBe(true);
 
-      // Rejects extra keys (additionalProperties: false)
+      // Accepts payload with endedAt: null
+      expect(isEvalRunResponse({ ...validEvalRunResponse, endedAt: null })).toBe(true);
+
+      // M1: Accepts payload with 35 componentVersions keys (32 user keys + 3 server keys)
+      const bigComponentVersions: Record<string, string> = {
+        adapter: 'codex-cli',
+        contractVersion: '1.0.0',
+        modelPinned: 'false',
+      };
+      for (let i = 0; i < 32; i++) {
+        bigComponentVersions[`user_component_${i}`] = `ver_${i}`;
+      }
+      expect(Object.keys(bigComponentVersions).length).toBe(35);
+      expect(isEvalRunResponse({ ...validEvalRunResponse, componentVersions: bigComponentVersions })).toBe(true);
+
+      // Rejects non-string values in componentVersions
+      expect(isEvalRunResponse({ ...validEvalRunResponse, componentVersions: { adapter: 12345 as any } })).toBe(false);
+
+      // Rejects extra keys on root (additionalProperties: false)
       expect(isEvalRunResponse({ ...validEvalRunResponse, unauthorizedKey: 123 })).toBe(false);
 
       // Rejects missing required keys
@@ -208,17 +232,15 @@ describe('G-05 W3 Verify & W5 Eval Run Business Routes (Card 101)', () => {
       const liveRegion = container.querySelector('[aria-live="polite"]');
       expect(liveRegion?.textContent).toContain('W3 커널 측정 검증 완료: mdl_01JLLAMA30000000000000000:1.0.0 (새로 검증됨)');
 
-      const successBanner = container.querySelector('.bg-emerald-950\\/40');
+      const successBanner = container.querySelector('[data-testid="registry-verify-success"]');
       expect(successBanner).toBeTruthy();
       expect(successBanner?.textContent).toContain('새로 검증됨');
       expect(successBanner?.textContent).toContain('mvm_01JABCDEF1234567890ABCDEFG');
 
       // Check W3 badge in header
-      const w3Badge = Array.from(container.querySelectorAll('span')).find((el) =>
-        el.textContent?.includes('W3 검증: 검증 완료')
-      );
+      const w3Badge = container.querySelector('[data-testid="badge-w3-verify-seam"]');
       expect(w3Badge).toBeTruthy();
-      expect(w3Badge?.textContent).toContain('측정: mvm_01JABCDEF1234567890ABCDEFG');
+      expect(w3Badge?.textContent).toContain('W3 검증: 검증 완료 (측정: mvm_01JABCDEF1234567890ABCDEFG)');
     });
 
     it('rejects invalid measurementId format client-side before network call', async () => {
@@ -267,7 +289,7 @@ describe('G-05 W3 Verify & W5 Eval Run Business Routes (Card 101)', () => {
       expect(mockFetch).not.toHaveBeenCalledWith(expect.stringContaining('/verify'), expect.anything());
     });
 
-    it('handles 409 GRAPH-0002 snapshot drift / measurement mismatch error honestly', async () => {
+    it('handles 409 GRAPH-0002 snapshot drift error honestly using exact server detail string', async () => {
       const mockFetch = vi.fn().mockImplementation((url: string) => {
         if (url.includes('/lineage')) {
           return Promise.resolve(new Response(JSON.stringify(validTraceResponse), { status: 200 }));
@@ -281,7 +303,7 @@ describe('G-05 W3 Verify & W5 Eval Run Business Routes (Card 101)', () => {
                 status: 409,
                 code: 'GRAPH-0002',
                 category: 'GRAPH',
-                detail: 'Measurement digest does not match current model lineage snapshot.',
+                detail: 'The measurement does not match the current storage snapshot of the model version.',
                 retryable: false,
                 traceId: '0123456789abcdef0123456789abcdef',
                 causeRef: null,
@@ -330,10 +352,10 @@ describe('G-05 W3 Verify & W5 Eval Run Business Routes (Card 101)', () => {
 
       const alert = container.querySelector('[role="alert"]');
       expect(alert?.textContent).toContain('GRAPH-0002');
-      expect(alert?.textContent).toContain('Measurement digest does not match');
+      expect(alert?.textContent).toContain('The measurement does not match the current storage snapshot of the model version.');
     });
 
-    it('fails closed when canApprove is false', async () => {
+    it('fails closed when canApprove is false or undefined (both button and handler level)', async () => {
       const mockFetch = vi.fn().mockImplementation((url: string) => {
         if (url.includes('/lineage')) {
           return Promise.resolve(new Response(JSON.stringify(validTraceResponse), { status: 200 }));
@@ -342,6 +364,7 @@ describe('G-05 W3 Verify & W5 Eval Run Business Routes (Card 101)', () => {
       });
       globalThis.fetch = mockFetch;
 
+      // 1. canApprove = false
       await act(async () => {
         root.render(
           <ModelLineageView
@@ -365,10 +388,35 @@ describe('G-05 W3 Verify & W5 Eval Run Business Routes (Card 101)', () => {
       );
       expect(submitBtn?.hasAttribute('disabled')).toBe(true);
       expect(submitBtn?.getAttribute('aria-disabled')).toBe('true');
+
+      // Attempt form submit programmatically to test handler guard
+      const form = container.querySelector('form');
+      await act(async () => {
+        form?.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+      });
+      expect(mockFetch).not.toHaveBeenCalledWith(expect.stringContaining('/verify'), expect.anything());
+      const alert = container.querySelector('[role="alert"]');
+      expect(alert?.textContent).toContain('승인 권한(canApprove)이 없는 계정은 모델 버전을 검증할 수 없습니다.');
+
+      // 2. canApprove undefined (fail-closed)
+      await act(async () => {
+        root.render(
+          <ModelLineageView
+            projectId="prj_demo"
+            modelId="mdl_test"
+            version="1.0.0"
+          />
+        );
+      });
+      const submitBtn2 = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('W3 커널 측정 검증 제출')
+      );
+      expect(submitBtn2?.hasAttribute('disabled')).toBe(true);
     });
 
-    it('preserves Idempotency-Key on retry across failures', async () => {
+    it('W3 idempotency lifecycle: keeps key on retry, rotates on success, rotates on input change', async () => {
       let capturedKeys: string[] = [];
+      let returnSuccess = false;
       const mockFetch = vi.fn().mockImplementation((url: string, init?: RequestInit) => {
         if (url.includes('/lineage')) {
           return Promise.resolve(new Response(JSON.stringify(validTraceResponse), { status: 200 }));
@@ -376,23 +424,26 @@ describe('G-05 W3 Verify & W5 Eval Run Business Routes (Card 101)', () => {
         if (url.includes('/verify')) {
           const key = getHeader(init, 'Idempotency-Key');
           if (key) capturedKeys.push(key);
-          return Promise.resolve(
-            new Response(
-              JSON.stringify({
-                type: 'about:blank',
-                title: 'SYS-0001',
-                status: 503,
-                code: 'SYS-0001',
-                category: 'SYS',
-                detail: 'Kernel measurement worker temporarily overloaded',
-                retryable: true,
-                traceId: '0123456789abcdef0123456789abcdef',
-                causeRef: null,
-                evidenceId: null,
-              }),
-              { status: 503, headers: { 'Content-Type': 'application/problem+json' } }
-            )
-          );
+          if (!returnSuccess) {
+            return Promise.resolve(
+              new Response(
+                JSON.stringify({
+                  type: 'about:blank',
+                  title: 'SYS-0001',
+                  status: 503,
+                  code: 'SYS-0001',
+                  category: 'transient',
+                  detail: 'The model measurement observation could not be read.',
+                  retryable: true,
+                  traceId: '0123456789abcdef0123456789abcdef',
+                  causeRef: null,
+                  evidenceId: null,
+                }),
+                { status: 503, headers: { 'Content-Type': 'application/problem+json' } }
+              )
+            );
+          }
+          return Promise.resolve(new Response(JSON.stringify(validVerifyResponse), { status: 200 }));
         }
         return Promise.reject(new Error(`Unhandled URL: ${url}`));
       });
@@ -425,24 +476,272 @@ describe('G-05 W3 Verify & W5 Eval Run Business Routes (Card 101)', () => {
         b.textContent?.includes('W3 커널 측정 검증 제출')
       );
 
-      // Attempt 1
+      // (a) Attempt 1: fails 503
       await act(async () => {
         submitBtn?.click();
       });
 
-      // Attempt 2 (retry)
+      // (b) Attempt 2 (retry after failure): must use SAME key
       await act(async () => {
         submitBtn?.click();
       });
 
       expect(capturedKeys.length).toBe(2);
       expect(capturedKeys[0]).toBeTruthy();
-      expect(capturedKeys[0]).toBe(capturedKeys[1]); // Idempotency-Key preserved!
+      expect(capturedKeys[0]).toBe(capturedKeys[1]); // Idempotency-Key preserved on retry!
+
+      // (c) Attempt 3: successful response
+      returnSuccess = true;
+      await act(async () => {
+        submitBtn?.click();
+      });
+      expect(capturedKeys.length).toBe(3);
+      expect(capturedKeys[2]).toBe(capturedKeys[0]); // same key used for retry that succeeded
+
+      // (d) Attempt 4: next submission after success must rotate key (M2)
+      await act(async () => {
+        submitBtn?.click();
+      });
+      expect(capturedKeys.length).toBe(4);
+      expect(capturedKeys[3]).not.toBe(capturedKeys[2]); // Key rotated on success!
+
+      // (e) Change measurementId: must rotate key
+      await act(async () => {
+        setInputValue(measurementInput, 'mvm_01JABCDEF1234567890ABCDEFH');
+      });
+      await act(async () => {
+        submitBtn?.click();
+      });
+      expect(capturedKeys.length).toBe(5);
+      expect(capturedKeys[4]).not.toBe(capturedKeys[3]); // Key rotated on input change!
+    });
+
+    it('H2 Zero Fake Verification: resets verifyResult when model/version/inputs change or on failure', async () => {
+      let shouldFail = false;
+      const mockFetch = vi.fn().mockImplementation((url: string) => {
+        if (url.includes('/lineage')) {
+          return Promise.resolve(new Response(JSON.stringify(validTraceResponse), { status: 200 }));
+        }
+        if (url.includes('/verify')) {
+          if (shouldFail) {
+            return Promise.resolve(
+              new Response(
+                JSON.stringify({
+                  type: 'about:blank',
+                  title: 'GRAPH-0002',
+                  status: 409,
+                  code: 'GRAPH-0002',
+                  category: 'business_rule',
+                  detail: 'The measurement does not match the current storage snapshot of the model version.',
+                }),
+                { status: 409, headers: { 'Content-Type': 'application/problem+json' } }
+              )
+            );
+          }
+          return Promise.resolve(new Response(JSON.stringify(validVerifyResponse), { status: 200 }));
+        }
+        return Promise.reject(new Error(`Unhandled URL: ${url}`));
+      });
+      globalThis.fetch = mockFetch;
+
+      await act(async () => {
+        root.render(
+          <ModelLineageView
+            projectId="prj_demo"
+            modelId="mdl_01JLLAMA30000000000000000"
+            version="1.0.0"
+            canApprove={true}
+          />
+        );
+      });
+
+      // Switch to verify tab and submit
+      const verifyTab = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('W3 검증')
+      );
+      await act(async () => {
+        verifyTab?.click();
+      });
+
+      const measurementInput = container.querySelector('#mvm-measurement-id') as HTMLInputElement;
+      await act(async () => {
+        setInputValue(measurementInput, 'mvm_01JABCDEF1234567890ABCDEFG');
+      });
+
+      const submitBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('W3 커널 측정 검증 제출')
+      );
+      await act(async () => {
+        submitBtn?.click();
+      });
+
+      // Verification active
+      expect(container.querySelector('[data-testid="registry-verify-success"]')).toBeTruthy();
+      expect(container.querySelector('[data-testid="badge-w3-verify-seam"]')?.textContent).toContain('W3 검증: 검증 완료');
+
+      // Change version input to '2.0.0' -> must immediately reset verifyResult (H2)
+      const versionInput = container.querySelector('#reg-version') as HTMLInputElement;
+      await act(async () => {
+        setInputValue(versionInput, '2.0.0');
+      });
+
+      // Must be flushed: badge shows unverified, success card disappears
+      expect(container.querySelector('[data-testid="registry-verify-success"]')).toBeNull();
+      expect(container.querySelector('[data-testid="badge-w3-verify-seam"]')?.textContent).toContain('W3 검증: 미검증');
+
+      // Change back to '1.0.0' and re-verify
+      await act(async () => {
+        setInputValue(versionInput, '1.0.0');
+      });
+      await act(async () => {
+        submitBtn?.click();
+      });
+      expect(container.querySelector('[data-testid="registry-verify-success"]')).toBeTruthy();
+
+      // Subsequent failure flushes verifyResult
+      shouldFail = true;
+      await act(async () => {
+        submitBtn?.click();
+      });
+      expect(container.querySelector('[data-testid="registry-verify-success"]')).toBeNull();
+      expect(container.querySelector('[data-testid="badge-w3-verify-seam"]')?.textContent).toContain('W3 검증: 미검증');
+    });
+
+    it('discards late responses when request is superseded (generation/abort guard)', async () => {
+      let resolveFirst: ((val: Response) => void) | null = null;
+      const mockFetch = vi.fn().mockImplementation((url: string, init?: RequestInit) => {
+        if (url.includes('/lineage')) {
+          return Promise.resolve(new Response(JSON.stringify(validTraceResponse), { status: 200 }));
+        }
+        if (url.includes('/verify')) {
+          const body = JSON.parse(init?.body as string);
+          if (body.measurementId.includes('SLOW')) {
+            return new Promise((resolve) => {
+              resolveFirst = resolve;
+            });
+          }
+          return Promise.resolve(new Response(JSON.stringify(validVerifyResponse), { status: 200 }));
+        }
+        return Promise.reject(new Error(`Unhandled URL: ${url}`));
+      });
+      globalThis.fetch = mockFetch;
+
+      await act(async () => {
+        root.render(
+          <ModelLineageView
+            projectId="prj_demo"
+            modelId="mdl_01JLLAMA30000000000000000"
+            version="1.0.0"
+            canApprove={true}
+          />
+        );
+      });
+
+      const verifyTab = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('W3 검증')
+      );
+      await act(async () => {
+        verifyTab?.click();
+      });
+
+      const measurementInput = container.querySelector('#mvm-measurement-id') as HTMLInputElement;
+      const submitBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('W3 커널 측정 검증 제출')
+      );
+
+      // Submit slow request
+      await act(async () => {
+        setInputValue(measurementInput, 'mvm_01JABCDEF1234567890SLOW00');
+      });
+      await act(async () => {
+        submitBtn?.click();
+      });
+
+      // Submit new fast request before slow one resolves
+      await act(async () => {
+        setInputValue(measurementInput, 'mvm_01JABCDEF1234567890ABCDEFG');
+      });
+      await act(async () => {
+        submitBtn?.click();
+      });
+
+      // Fast request succeeded
+      expect(container.querySelector('[data-testid="verified-measurement-id"]')?.textContent).toBe('mvm_01JABCDEF1234567890ABCDEFG');
+
+      // Now slow request resolves late with obsolete data
+      const obsoleteResponse: ModelVerifyResponse = {
+        ...validVerifyResponse,
+        verifiedMeasurementId: 'mvm_01JABCDEF1234567890SLOW00',
+      };
+      await act(async () => {
+        resolveFirst?.(new Response(JSON.stringify(obsoleteResponse), { status: 200 }));
+      });
+
+      // Must NOT be overwritten by superseded request!
+      expect(container.querySelector('[data-testid="verified-measurement-id"]')?.textContent).toBe('mvm_01JABCDEF1234567890ABCDEFG');
+    });
+
+    it('displays contract error alert when server returns invalid verify response', async () => {
+      const mockFetch = vi.fn().mockImplementation((url: string) => {
+        if (url.includes('/lineage')) {
+          return Promise.resolve(new Response(JSON.stringify(validTraceResponse), { status: 200 }));
+        }
+        if (url.includes('/verify')) {
+          // Missing required field newlyVerified
+          return Promise.resolve(
+            new Response(
+              JSON.stringify({
+                modelVersionId: 'mdv_01JABCDEF1234567890ABCDEFG',
+                modelId: 'mdl_01JLLAMA30000000000000000',
+                version: '1.0.0',
+                stage: 'draft',
+              }),
+              { status: 200 }
+            )
+          );
+        }
+        return Promise.reject(new Error(`Unhandled URL: ${url}`));
+      });
+      globalThis.fetch = mockFetch;
+
+      await act(async () => {
+        root.render(
+          <ModelLineageView
+            projectId="prj_demo"
+            modelId="mdl_01JLLAMA30000000000000000"
+            version="1.0.0"
+            canApprove={true}
+          />
+        );
+      });
+
+      const verifyTab = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('W3 검증')
+      );
+      await act(async () => {
+        verifyTab?.click();
+      });
+
+      const measurementInput = container.querySelector('#mvm-measurement-id') as HTMLInputElement;
+      await act(async () => {
+        setInputValue(measurementInput, 'mvm_01JABCDEF1234567890ABCDEFG');
+      });
+
+      const submitBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('W3 커널 측정 검증 제출')
+      );
+      await act(async () => {
+        submitBtn?.click();
+      });
+
+      expect(container.querySelector('[data-testid="registry-verify-success"]')).toBeNull();
+      const alert = container.querySelector('[role="alert"]');
+      expect(alert?.textContent).toContain('응답 계약 불일치');
     });
   });
 
   describe('W5 Eval Run Business Route', () => {
-    it('successfully calls eval runs endpoint and renders gate results and scores', async () => {
+    it('successfully calls eval runs endpoint and renders gate results and scores (H1 adapter options & M5 details)', async () => {
       const mockFetch = vi.fn().mockImplementation((url: string, init?: RequestInit) => {
         if (url.includes('/lineage')) {
           return Promise.resolve(new Response(JSON.stringify(validTraceResponse), { status: 200 }));
@@ -454,7 +753,7 @@ describe('G-05 W3 Verify & W5 Eval Run Business Routes (Card 101)', () => {
 
           const body = JSON.parse(init?.body as string);
           expect(body).toEqual({
-            adapter: 'codex',
+            adapter: 'claude-code',
             requireModelPinning: true,
             componentVersions: {
               prompt: 'pmt_01J11111111111111111111111',
@@ -462,7 +761,19 @@ describe('G-05 W3 Verify & W5 Eval Run Business Routes (Card 101)', () => {
             },
           });
 
-          return Promise.resolve(new Response(JSON.stringify(validEvalRunResponse), { status: 201 }));
+          return Promise.resolve(
+            new Response(
+              JSON.stringify({
+                ...validEvalRunResponse,
+                componentVersions: {
+                  adapter: 'claude-code',
+                  contractVersion: '1.0.0',
+                  prompt: 'pmt_01J11111111111111111111111',
+                },
+              }),
+              { status: 201 }
+            )
+          );
         }
         return Promise.reject(new Error(`Unhandled URL: ${url}`));
       });
@@ -489,13 +800,15 @@ describe('G-05 W3 Verify & W5 Eval Run Business Routes (Card 101)', () => {
         evalTab?.click();
       });
 
-      // Fill in Suite ID and component versions
+      // Fill in Suite ID and component versions, and select claude-code adapter (H1)
       const suiteInput = container.querySelector('#eval-suite-id') as HTMLInputElement;
+      const adapterSelect = container.querySelector('#eval-adapter') as HTMLSelectElement;
       const promptInput = container.querySelector('#eval-prompt-ver') as HTMLInputElement;
       const ctxInput = container.querySelector('#eval-ctx-ver') as HTMLInputElement;
 
       await act(async () => {
         setInputValue(suiteInput, 'evs_01JABCDEF1234567890ABCDEFG');
+        setInputValue(adapterSelect, 'claude-code');
         setInputValue(promptInput, 'pmt_01J11111111111111111111111');
         setInputValue(ctxInput, 'ctx_01J22222222222222222222222');
       });
@@ -515,16 +828,20 @@ describe('G-05 W3 Verify & W5 Eval Run Business Routes (Card 101)', () => {
       expect(liveRegion?.textContent).toContain('W5 평가 실행 완료: evr_01JABCDEF1234567890ABCDEFG');
 
       // Success card displays GATE PASS badge and score
-      const passBadge = Array.from(container.querySelectorAll('span')).find((el) =>
-        el.textContent?.includes('GATE PASS')
-      );
+      const passBadge = container.querySelector('[data-testid="eval-gate-badge"]');
       expect(passBadge).toBeTruthy();
+      expect(passBadge?.textContent).toBe('GATE PASS');
 
       const scoreText = container.textContent;
       expect(scoreText).toContain('통과: 25 / 25 케이스 (위반 0건)');
+
+      // M5: componentVersions are rendered
+      const cvText = container.querySelector('[data-testid="eval-component-versions"]')?.textContent;
+      expect(cvText).toContain('adapter=claude-code');
+      expect(cvText).toContain('contractVersion=1.0.0');
     });
 
-    it('honestly renders GATE FAIL badge and violation count when gate fails', async () => {
+    it('honestly renders aborted status, GATE FAIL badge, and NOT_OBSERVED endedAt (M5)', async () => {
       const failedEvalResponse: EvalRunResponse = {
         evalRunId: 'evr_01JABCDEF1234567890ABCDEFG',
         suiteId: 'evs_01JABCDEF1234567890ABCDEFG',
@@ -534,10 +851,11 @@ describe('G-05 W3 Verify & W5 Eval Run Business Routes (Card 101)', () => {
         passedCases: 22,
         violations: 3,
         componentVersions: {
-          adapter: 'claude',
+          adapter: 'codex-cli',
+          contractVersion: '1.0.0',
         },
         startedAt: '2026-09-28T12:00:00Z',
-        endedAt: '2026-09-28T12:01:30Z',
+        endedAt: null, // NOT_OBSERVED
       };
 
       const mockFetch = vi.fn().mockImplementation((url: string) => {
@@ -581,18 +899,44 @@ describe('G-05 W3 Verify & W5 Eval Run Business Routes (Card 101)', () => {
         submitBtn?.click();
       });
 
-      // Honest rendering of GATE FAIL badge
-      const failBadge = Array.from(container.querySelectorAll('span')).find((el) =>
-        el.textContent?.includes('GATE FAIL')
-      );
+      // Honest rendering of status title and GATE FAIL badge
+      const failBadge = container.querySelector('[data-testid="eval-gate-badge"]');
       expect(failBadge).toBeTruthy();
+      expect(failBadge?.textContent).toBe('GATE FAIL');
+      expect(container.textContent).toContain('⚠️ 평가 스위트 중단됨 (Status: aborted)');
       expect(container.textContent).toContain('통과: 22 / 25 케이스 (위반 3건)');
+
+      // EndedAt null -> NOT_OBSERVED rendered
+      const endedAtElem = container.querySelector('[data-testid="eval-ended-at"]');
+      expect(endedAtElem?.textContent).toBe('NOT_OBSERVED');
     });
 
-    it('rejects invalid adapter format client-side before network call', async () => {
-      const mockFetch = vi.fn().mockImplementation((url: string) => {
+    it('W5 idempotency lifecycle: preserves key on retry, rotates on success, rotates on input change', async () => {
+      let capturedKeys: string[] = [];
+      let returnSuccess = false;
+      const mockFetch = vi.fn().mockImplementation((url: string, init?: RequestInit) => {
         if (url.includes('/lineage')) {
           return Promise.resolve(new Response(JSON.stringify(validTraceResponse), { status: 200 }));
+        }
+        if (url.includes('/eval/suites/')) {
+          const key = getHeader(init, 'Idempotency-Key');
+          if (key) capturedKeys.push(key);
+          if (!returnSuccess) {
+            return Promise.resolve(
+              new Response(
+                JSON.stringify({
+                  type: 'about:blank',
+                  title: 'SYS-0001',
+                  status: 503,
+                  code: 'SYS-0001',
+                  category: 'transient',
+                  detail: 'Eval worker unavailable',
+                }),
+                { status: 503, headers: { 'Content-Type': 'application/problem+json' } }
+              )
+            );
+          }
+          return Promise.resolve(new Response(JSON.stringify(validEvalRunResponse), { status: 201 }));
         }
         return Promise.reject(new Error(`Unhandled URL: ${url}`));
       });
@@ -617,22 +961,100 @@ describe('G-05 W3 Verify & W5 Eval Run Business Routes (Card 101)', () => {
       });
 
       const suiteInput = container.querySelector('#eval-suite-id') as HTMLInputElement;
-      const adapterInput = container.querySelector('#eval-adapter') as HTMLInputElement;
       await act(async () => {
         setInputValue(suiteInput, 'evs_01JABCDEF1234567890ABCDEFG');
-        setInputValue(adapterInput, 'invalid adapter! spaces & symbols');
       });
 
       const submitBtn = Array.from(container.querySelectorAll('button')).find((b) =>
         b.textContent?.includes('W5 평가 실행 시작')
       );
+
+      // (a) Attempt 1: fails 503
       await act(async () => {
         submitBtn?.click();
       });
 
-      const alert = container.querySelector('[role="alert"]');
-      expect(alert?.textContent).toContain('어댑터 식별자는 소문자, 숫자, 하이픈만 허용됩니다.');
+      // (b) Attempt 2 (retry): must use SAME key
+      await act(async () => {
+        submitBtn?.click();
+      });
+      expect(capturedKeys.length).toBe(2);
+      expect(capturedKeys[0]).toBeTruthy();
+      expect(capturedKeys[0]).toBe(capturedKeys[1]); // Idempotency-Key preserved on failure retry!
+
+      // (c) Attempt 3: successful response
+      returnSuccess = true;
+      await act(async () => {
+        submitBtn?.click();
+      });
+      expect(capturedKeys.length).toBe(3);
+      expect(capturedKeys[2]).toBe(capturedKeys[0]);
+
+      // (d) Attempt 4: next submission after success must rotate key (M2)
+      await act(async () => {
+        submitBtn?.click();
+      });
+      expect(capturedKeys.length).toBe(4);
+      expect(capturedKeys[3]).not.toBe(capturedKeys[2]); // Key rotated on success!
+
+      // (e) Change suiteId: must rotate key
+      await act(async () => {
+        setInputValue(suiteInput, 'evs_01JABCDEF1234567890ABCDEFH');
+      });
+      await act(async () => {
+        submitBtn?.click();
+      });
+      expect(capturedKeys.length).toBe(5);
+      expect(capturedKeys[4]).not.toBe(capturedKeys[3]); // Key rotated on input change!
+    });
+
+    it('fails closed when canApprove is false or undefined for W5 eval run', async () => {
+      const mockFetch = vi.fn().mockImplementation((url: string) => {
+        if (url.includes('/lineage')) {
+          return Promise.resolve(new Response(JSON.stringify(validTraceResponse), { status: 200 }));
+        }
+        return Promise.reject(new Error(`Unhandled URL: ${url}`));
+      });
+      globalThis.fetch = mockFetch;
+
+      await act(async () => {
+        root.render(
+          <ModelLineageView
+            projectId="prj_demo"
+            modelId="mdl_test"
+            version="1.0.0"
+            canApprove={false}
+          />
+        );
+      });
+
+      const evalTab = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('W5 평가 실행')
+      );
+      await act(async () => {
+        evalTab?.click();
+      });
+
+      const submitBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('W5 평가 실행 시작')
+      );
+      expect(submitBtn?.hasAttribute('disabled')).toBe(true);
+      expect(submitBtn?.getAttribute('aria-disabled')).toBe('true');
+
+      // Test handler guard via form submit
+      const form = container.querySelector('form');
+      await act(async () => {
+        form?.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+      });
       expect(mockFetch).not.toHaveBeenCalledWith(expect.stringContaining('/runs'), expect.anything());
+      const alert = container.querySelector('[role="alert"]');
+      expect(alert?.textContent).toContain('승인 권한(canApprove)이 없는 계정은 평가 스위트를 실행할 수 없습니다.');
+    });
+
+    it('rejects invalid adapter format client-side in startEvalRun before network call', async () => {
+      await expect(
+        startEvalRun('prj_1', 'evs_1', { adapter: 'invalid adapter with spaces!' })
+      ).rejects.toThrow('유효한 어댑터 이름');
     });
   });
 });

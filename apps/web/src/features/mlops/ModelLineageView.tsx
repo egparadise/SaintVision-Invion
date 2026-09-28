@@ -166,6 +166,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
 
   const handleSelectModel = (modelId: string) => {
     setSelectedModelId(modelId);
+    setVerifyResult(null);
     const m = lineages.find((item) => item.modelId === modelId);
     if (m) {
       setCommitmentModelId(m.modelId);
@@ -238,7 +239,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
 
   // W5 Eval Run form state
   const [evalSuiteId, setEvalSuiteId] = useState('');
-  const [evalAdapter, setEvalAdapter] = useState('codex');
+  const [evalAdapter, setEvalAdapter] = useState('codex-cli');
   const [evalPromptVer, setEvalPromptVer] = useState('');
   const [evalCtxVer, setEvalCtxVer] = useState('');
   const [evalRequirePinning, setEvalRequirePinning] = useState(true);
@@ -330,9 +331,11 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
     }
   };
 
-  // G2 & G3: Invalidate in-flight responses and rotate idempotency keys when form inputs change
+  // G2 & G3 & H2: Invalidate in-flight responses, reset results, and rotate idempotency keys when form inputs change
   const handleProjectIdChange = (val: string) => {
     setProjectId(val);
+    setVerifyResult(null);
+    setEvalResult(null);
     regGenerationRef.current++;
     pinGenerationRef.current++;
     relGenerationRef.current++;
@@ -346,6 +349,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
 
   const handleModelIdChange = (val: string) => {
     setModelId(val);
+    setVerifyResult(null);
     regGenerationRef.current++;
     pinGenerationRef.current++;
     relGenerationRef.current++;
@@ -359,6 +363,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
 
   const handleVersionChange = (val: string) => {
     setVersion(val);
+    setVerifyResult(null);
     regGenerationRef.current++;
     pinGenerationRef.current++;
     relGenerationRef.current++;
@@ -406,36 +411,42 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
 
   const handleVerifyMeasurementIdChange = (val: string) => {
     setVerifyMeasurementId(val);
+    setVerifyResult(null);
     verifyGenerationRef.current++;
     setVerifyIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w3'));
   };
 
   const handleEvalSuiteIdChange = (val: string) => {
     setEvalSuiteId(val);
+    setEvalResult(null);
     evalGenerationRef.current++;
     setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
   };
 
   const handleEvalAdapterChange = (val: string) => {
     setEvalAdapter(val);
+    setEvalResult(null);
     evalGenerationRef.current++;
     setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
   };
 
   const handleEvalPromptVerChange = (val: string) => {
     setEvalPromptVer(val);
+    setEvalResult(null);
     evalGenerationRef.current++;
     setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
   };
 
   const handleEvalCtxVerChange = (val: string) => {
     setEvalCtxVer(val);
+    setEvalResult(null);
     evalGenerationRef.current++;
     setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
   };
 
   const handleEvalRequirePinningChange = (checked: boolean) => {
     setEvalRequirePinning(checked);
+    setEvalResult(null);
     evalGenerationRef.current++;
     setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
   };
@@ -596,10 +607,12 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   const handleVerifyVersion = async (e: React.FormEvent) => {
     e.preventDefault();
     clearErrors();
+    setVerifyResult(null);
     if (!canApprove) {
       setGeneralError('승인 권한(canApprove)이 없는 계정은 모델 버전을 검증할 수 없습니다.');
       return;
     }
+    if (verifyLoading) return;
     if (!projectId.trim() || !modelId.trim() || !version.trim()) {
       setGeneralError('프로젝트 ID, 모델 ID, 버전을 확인하세요.');
       return;
@@ -631,24 +644,30 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       );
       if (verifyGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
       setVerifyResult(res);
+      setVerifyIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w3'));
       setLiveAnnouncement(
         `W3 커널 측정 검증 완료: ${modelId.trim()}:${version.trim()} (${res.newlyVerified ? '새로 검증됨' : '이미 검증됨'})`
       );
     } catch (err: unknown) {
       if (verifyGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
+      setVerifyResult(null);
       handleApiError(err, 'W3 커널 측정 검증 실패');
     } finally {
-      setVerifyLoading(false);
+      if (verifyGenerationRef.current === currentGen && !ctrl.signal.aborted) {
+        setVerifyLoading(false);
+      }
     }
   };
 
   const handleStartEvalRun = async (e: React.FormEvent) => {
     e.preventDefault();
     clearErrors();
+    setEvalResult(null);
     if (!canApprove) {
-      setGeneralError('Running an eval suite requires approval permission.');
+      setGeneralError('승인 권한(canApprove)이 없는 계정은 평가 스위트를 실행할 수 없습니다.');
       return;
     }
+    if (evalLoading) return;
     if (!projectId.trim() || !evalSuiteId.trim()) {
       setGeneralError('프로젝트 ID와 평가 스위트 ID를 확인하세요.');
       return;
@@ -688,12 +707,16 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       );
       if (evalGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
       setEvalResult(res);
+      setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
       setLiveAnnouncement(`W5 평가 실행 완료: ${res.evalRunId}`);
     } catch (err: unknown) {
       if (evalGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
+      setEvalResult(null);
       handleApiError(err, 'W5 평가 실행 실패');
     } finally {
-      setEvalLoading(false);
+      if (evalGenerationRef.current === currentGen && !ctrl.signal.aborted) {
+        setEvalLoading(false);
+      }
     }
   };
 
@@ -751,14 +774,14 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               borderRadius: '4px',
               fontSize: '11px',
               fontWeight: 600,
-              backgroundColor: verifyResult ? '#1f6feb' : '#21262d',
-              border: verifyResult ? '1px solid #388bfd' : '1px solid #30363d',
-              color: verifyResult ? '#ffffff' : '#8b949e',
+              backgroundColor: verifyResult && verifyResult.version === version.trim() ? '#1f6feb' : '#21262d',
+              border: verifyResult && verifyResult.version === version.trim() ? '1px solid #388bfd' : '1px solid #30363d',
+              color: verifyResult && verifyResult.version === version.trim() ? '#ffffff' : '#8b949e',
             }}
           >
-            {verifyResult
+            {verifyResult && verifyResult.version === version.trim()
               ? `W3 검증: 검증 완료 (측정: ${verifyResult.verifiedMeasurementId})`
-              : 'W3 검증: 미연결 (검증 앵커 #215 대기)'}
+              : 'W3 검증: 미검증 (커널 계측 검증 대기)'}
           </span>
         </div>
         {/* Global Resource Binding Inputs */}
@@ -1209,7 +1232,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 id="mvm-measurement-id"
                 data-testid="input-verify-measurement-id"
                 type="text"
-                placeholder="mvm_01JABCDEF1234567890ABCDEF"
+                placeholder="mvm_01JABCDEF1234567890ABCDEFG"
                 value={verifyMeasurementId}
                 onChange={(e) => handleVerifyMeasurementIdChange(e.target.value)}
                 style={{
@@ -1255,7 +1278,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                   id="eval-suite-id"
                   data-testid="input-eval-suite-id"
                   type="text"
-                  placeholder="evs_01JABCDEF1234567890ABCDEF"
+                  placeholder="evs_01JABCDEF1234567890ABCDEFG"
                   value={evalSuiteId}
                   onChange={(e) => handleEvalSuiteIdChange(e.target.value)}
                   style={{
@@ -1272,13 +1295,11 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               </div>
               <div>
                 <label htmlFor="eval-adapter" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
-                  어댑터 식별자 (adapter - codex | claude | gemini | orca) *
+                  어댑터 식별자 (adapter - codex-cli | claude-code | gemini-cli | antigravity) *
                 </label>
-                <input
+                <select
                   id="eval-adapter"
                   data-testid="input-eval-adapter"
-                  type="text"
-                  placeholder="codex"
                   value={evalAdapter}
                   onChange={(e) => handleEvalAdapterChange(e.target.value)}
                   style={{
@@ -1291,7 +1312,12 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                     fontSize: '12px',
                     boxSizing: 'border-box',
                   }}
-                />
+                >
+                  <option value="codex-cli">codex-cli</option>
+                  <option value="claude-code">claude-code</option>
+                  <option value="gemini-cli">gemini-cli</option>
+                  <option value="antigravity">antigravity</option>
+                </select>
               </div>
             </div>
 
@@ -1441,7 +1467,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
         </div>
       )}
       {/* Mutation Results Displays */}
-      {verifyResult && (
+      {verifyResult && verifyResult.version === version.trim() && (
         <div
           role="status"
           data-testid="registry-verify-success"
@@ -1483,7 +1509,13 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           }}
         >
           <div style={{ fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span>✔ 평가 스위트 실행 완료 (Status: {evalResult.status})</span>
+            <span>
+              {evalResult.status === 'completed'
+                ? `✔ 평가 스위트 실행 완료 (Status: ${evalResult.status})`
+                : evalResult.status === 'aborted'
+                ? `⚠️ 평가 스위트 중단됨 (Status: ${evalResult.status})`
+                : `⏳ 평가 스위트 실행 중 (Status: ${evalResult.status})`}
+            </span>
             <span
               data-testid="eval-gate-badge"
               style={{
@@ -1491,7 +1523,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 borderRadius: '4px',
                 fontSize: '11px',
                 fontWeight: 700,
-                backgroundColor: evalResult.passedGate ? '#2ea043' : '#f85149',
+                backgroundColor: evalResult.passedGate ? '#1a7f37' : '#cf222e',
                 color: '#ffffff',
               }}
             >
@@ -1504,8 +1536,18 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               <div>Run ID: <code>{evalResult.evalRunId}</code></div>
               <div>Suite ID: <code>{evalResult.suiteId}</code></div>
               <div>Started: {evalResult.startedAt}</div>
-              {evalResult.endedAt && <div>Ended: {evalResult.endedAt}</div>}
+              <div>Ended: <span data-testid="eval-ended-at">{evalResult.endedAt ? evalResult.endedAt : 'NOT_OBSERVED'}</span></div>
             </div>
+            {evalResult.componentVersions && Object.keys(evalResult.componentVersions).length > 0 && (
+              <div style={{ marginTop: '6px', fontSize: '11px', color: '#8b949e' }}>
+                <span style={{ fontWeight: 600 }}>구성요소 버전 (componentVersions): </span>
+                <span data-testid="eval-component-versions">
+                  {Object.entries(evalResult.componentVersions)
+                    .map(([k, v]) => `${k}=${v}`)
+                    .join(', ')}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       )}
