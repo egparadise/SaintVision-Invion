@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-2026-09-28-G02-LIVE-ARCHIVER-DESIGN"
 title: "G-02 live archiver hosted 실행 설계 v1.0 (docs-only) — 두 겹 skip 원인 실측(CX01 fixture 전제가 먼저, 내부 네트워크 도달성이 다음), 권고안 (a) docker exec 실행자 주입, exact skip-map 19→17, fail-closed·되돌림 시험 목록 (카드 54)"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T13:54:47+09:00"
+updated: "2026-09-28T14:30:23+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -23,3 +23,7 @@ tags: ["G-02", "recovery", "hosted", "design", "claude"]
 - migration 없음. 2단계 구현 PR은 이 설계 위 stack.
 
 로컬 검증: docs-only, check_docs·single_source 통과. owner Claude / reviewer Codex(worker) / 병합 금지.
+
+## v1.1 (2026-09-28T14:30:23+09:00) — Codex F1 반영
+
+#126(#159 head `5e206aa4`)의 Core는 disposable CX01을 직접 만들고 focused gate(`core.yml:211-243`)가 18 passed + internal-network 2 skipped를 요구하므로 **Core에서는 장벽 2가 이미 관측**된다. 설계를 lane별로 정정: Backend = CX01 map 19→17(+이미지 env), Core = focused gate 18/2 → 20/0(사유 상수 삭제), Core main-suite map 불변(v1.0의 19→17은 존재하지 않는 항목이라 오류). 구현 PR은 #126·#159 포함 base 위 stack. 되돌림 시험에 Core gate 항목 추가.
