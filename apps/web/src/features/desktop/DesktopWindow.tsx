@@ -20,21 +20,27 @@ export const DesktopWindowComponent: React.FC<DesktopWindowProps> = ({
   onToggleMaximize,
   children,
 }) => {
-  React.useEffect(() => {
-    if (!isActive || !window.isOpen || window.isMinimized) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.stopPropagation();
-        onClose();
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Escape') {
+      if (e.defaultPrevented) return;
+      const target = e.target as HTMLElement | null;
+      if (target) {
+        const tag = target.tagName?.toLowerCase();
+        if (
+          tag === 'input' ||
+          tag === 'textarea' ||
+          tag === 'select' ||
+          target.isContentEditable ||
+          target.closest('.xterm') ||
+          target.closest('[data-terminal]')
+        ) {
+          return;
+        }
       }
-    };
-
-    globalThis.addEventListener('keydown', handleKeyDown);
-    return () => {
-      globalThis.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isActive, window.isOpen, window.isMinimized, onClose]);
+      e.stopPropagation();
+      onClose();
+    }
+  };
 
   if (!window.isOpen || window.isMinimized) {
     return null;
@@ -92,6 +98,7 @@ export const DesktopWindowComponent: React.FC<DesktopWindowProps> = ({
       tabIndex={-1}
       style={style}
       onMouseDown={onFocus}
+      onKeyDown={isActive ? handleKeyDown : undefined}
     >
       {/* Window Title Bar */}
       <div
@@ -112,7 +119,7 @@ export const DesktopWindowComponent: React.FC<DesktopWindowProps> = ({
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <button
             type="button"
-            title="창 닫기 (Esc)"
+            title="창 닫기"
             aria-label={`창 닫기: ${title}`}
             onClick={(e) => {
               e.stopPropagation();

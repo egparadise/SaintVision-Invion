@@ -1810,13 +1810,13 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                     <span>유휴 우선 추천 노드:</span>
                     <span style={{ fontSize: '0.6875rem', color: '#94a3b8', fontWeight: 400 }}>[서버 유휴 우선 후보 순위 · 샤드 미할당]</span>
                   </div>
-                  {placementPreview.candidates.map((c: any, idx) => {
-                    const cpuMillicores = c.spare?.cpuMillicores ?? c.availableCpuMillicores ?? 0;
-                    const gpuDevices = c.spare?.gpuDevices ?? c.availableGpuDevices ?? 0;
+                  {placementPreview.candidates.map((c, idx) => {
+                    const cpuCores = c.availableCpuMillicores / 1000;
+                    const gpuDevices = c.availableGpuDevices;
                     const name = c.hostname || c.nodeId;
                     return (
                       <div key={c.nodeId} style={{ padding: '4px 6px', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: '4px', marginBottom: '4px' }}>
-                        {idx + 1}. <strong>{name}</strong> ({cpuMillicores > 0 ? `${cpuMillicores / 1000}C 가용` : '미측정'}, {gpuDevices > 0 ? `${gpuDevices} GPU` : 'GPU 없음'})
+                        {idx + 1}. <strong>{name}</strong> ({`${cpuCores}C 가용`}, {gpuDevices > 0 ? `${gpuDevices} GPU` : '0 GPU'})
                       </div>
                     );
                   })}

@@ -17,10 +17,7 @@ export type PoolItem = PoolListItemResponse;
 export type CandidateItem = DiscoveryCandidateResponse;
 
 export interface PlacementSimulatorProps {
-  nodes?: NodeItem[];
-  activePool?: any;
-  allPools?: any[];
-  projectId?: string;
+  nodes: NodeItem[];
   initialPools?: PoolItem[];
   initialPoolsState?: 'idle' | 'loading' | 'success' | 'error';
   initialPoolsError?: string | null;
@@ -35,9 +32,7 @@ export interface PlacementSimulatorProps {
 }
 
 export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
-  nodes = [],
-  activePool: propActivePool,
-  allPools: propAllPools,
+  nodes,
   initialPools,
   initialPoolsState,
   initialPoolsError,
@@ -50,9 +45,6 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
   initialCandidatesState,
   initialCandidatesError,
 }) => {
-  const effectiveInitialPools = initialPools || propAllPools || (propActivePool ? [propActivePool] : undefined);
-  const effectiveInitialPoolsState = initialPoolsState || (effectiveInitialPools && effectiveInitialPools.length > 0 ? 'success' : undefined);
-
   const [requiredCores, setRequiredCores] = useState<number>(4);
   const [requiredRamGb, setRequiredRamGb] = useState<number>(8);
   const [requiresGpu, setRequiresGpu] = useState<boolean>(false);
@@ -61,12 +53,12 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
   const [fencedNodeIds, setFencedNodeIds] = useState<Set<string>>(new Set());
 
   // Real backend pool list state
-  const [pools, setPools] = useState<PoolItem[]>(effectiveInitialPools || []);
-  const [poolsState, setPoolsState] = useState<'idle' | 'loading' | 'success' | 'error'>(effectiveInitialPoolsState || 'idle');
+  const [pools, setPools] = useState<PoolItem[]>(initialPools || []);
+  const [poolsState, setPoolsState] = useState<'idle' | 'loading' | 'success' | 'error'>(initialPoolsState || 'idle');
   const [poolsError, setPoolsError] = useState<string | null>(initialPoolsError || null);
 
   const [selectedPoolId, setSelectedPoolId] = useState<string>(
-    () => propActivePool?.poolId || propActivePool?.id || effectiveInitialPools?.[0]?.poolId || (effectiveInitialPools?.[0] as any)?.id || ''
+    () => initialPools?.[0]?.poolId || ''
   );
 
   // Pool capacity state fetched on demand (canonical separation: pool list does NOT bundle volatile capacity)
@@ -88,6 +80,24 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
     initialPreviewState || 'idle'
   );
   const [previewError, setPreviewError] = useState<string | null>(initialPreviewError || null);
+
+  useEffect(() => {
+    if (initialPoolCapacityState !== undefined) {
+      setPoolCapacityState(initialPoolCapacityState);
+    }
+  }, [initialPoolCapacityState]);
+
+  useEffect(() => {
+    if (initialPoolCapacityError !== undefined) {
+      setPoolCapacityError(initialPoolCapacityError);
+    }
+  }, [initialPoolCapacityError]);
+
+  useEffect(() => {
+    if (initialPoolCapacity !== undefined) {
+      setPoolCapacity(initialPoolCapacity);
+    }
+  }, [initialPoolCapacity]);
 
   const loadPools = () => {
     setPoolsState('loading');
@@ -145,7 +155,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
 
   // Fetch live resource pools & discovery candidates from backend
   useEffect(() => {
-    if (effectiveInitialPools === undefined && effectiveInitialPoolsState === undefined) {
+    if (initialPools === undefined && initialPoolsState === undefined) {
       loadPools();
     }
     if (initialCandidates === undefined && initialCandidatesState === undefined) {
@@ -372,7 +382,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
             </div>
           )}
 
-          {!poolCapacity && activePool && (
+          {!poolCapacity && activePool && poolCapacityState === 'idle' && (
             <div
               data-testid="pool-capacity-pending"
               style={{

@@ -98,8 +98,12 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({
                 role="button"
                 tabIndex={0}
                 aria-label={`작업공간 ${wsp.name} 선택`}
-                onClick={() => onSelectWorkspace(wsp.id)}
+                onClick={(e) => {
+                  if (e.target !== e.currentTarget && (e.target as HTMLElement).closest('button')) return;
+                  onSelectWorkspace(wsp.id);
+                }}
                 onKeyDown={(e) => {
+                  if (e.target !== e.currentTarget) return;
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     onSelectWorkspace(wsp.id);
@@ -176,6 +180,13 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({
                       onClick={(e) => {
                         e.stopPropagation();
                         onOpenStudio(wsp.id);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.stopPropagation();
+                          e.preventDefault();
+                          onOpenStudio(wsp.id);
+                        }
                       }}
                       style={{
                         padding: '4px 8px',
