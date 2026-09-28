@@ -38,7 +38,7 @@ ALLOWLIST_CANONICAL_SHA256 = "b73aba8ff97443bbd1e314d5ca0375fdcbce8205a1a746bc5a
 SCAN_ALLOWLIST_REPO_PATH = (
     "docs/vault/30_Development/Evidence/s11-security-dependency-sast-allowlist-v1.json"
 )
-SCAN_ALLOWLIST_BLOB = "7b9312310268cc52458e1668da89040bd644b665"
+SCAN_ALLOWLIST_BLOB = "74dde5cb52976a598bfc27466289d07877872f70"
 SCHEMA_VERSION = "1.0.0"
 RUN_PURPOSE = "ac11-release-gate"
 AXIS_PURPOSE = "ac11-axis-evidence"

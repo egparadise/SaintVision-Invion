@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-S11-AC11-SECURITY-SCAN-20260929"
 title: "AC-11 security critical/high hosted scan과 fail-closed 집계"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-29T00:11:42+09:00"
+updated: "2026-09-29T00:14:43+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_id: "S11-BE"
@@ -33,8 +33,9 @@ tags: ["S11", "AC-11", "security", "SAST", "dependency-audit", "hosted"]
 - `python -m pytest -q tests/test_ac11_security_scan.py` → **6 passed**, exit 0.
 - `python -m pytest -q tests/test_aggregate_ac11_evidence.py` → **63 passed**, exit 0.
 - `python -m py_compile tools/run_ac11_security_scan.py tools/aggregate_ac11_evidence.py` → exit 0.
-- workflow YAML safe-load와 `git diff --check` → exit 0. producer blob `de439f28…4c5b`, workflow blob `942316a4…3b2`, allowlist blob `7b931231…b665`를 서로 대조했다.
+- workflow YAML safe-load와 `git diff --check` → exit 0. producer blob `de439f28…4c5b`, 수정 workflow blob `aabc8270…288a`, allowlist blob `74dde5cb…2f70`을 서로 대조했다.
 - `check_docs`(935 versioned documents), `check_contract_bindings`(55 fixtures·20 response types·14 replay guards), `check_ontology`, `check_doc_single_source --ratchet` → 모두 exit 0.
+- 최초 push run `36441818573`은 job 0으로 workflow validation 실패했다. job-level `env`에서 step 실행 전에는 사용할 수 없는 `runner.temp` context를 쓴 것이 원인이므로 raw scanner 경로를 `/tmp`로 고정하고 workflow·allowlist blob pin을 함께 갱신했다. 보안 scan이 실행된 결과가 아니며 PASS 또는 finding 0 증거로 세지 않는다.
 - hosted opt-in run은 PR 생성 뒤 exact head에서 실행한다. 실행 전 상태를 PASS로 기록하지 않는다.
 
 ## 남은 일

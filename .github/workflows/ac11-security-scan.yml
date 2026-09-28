@@ -22,8 +22,8 @@ jobs:
       SOURCE_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
       REPORT: evidence/s11-ac11-security-scan.json
       JUNIT: evidence/s11-ac11-security-scan.xml
-      PIP_AUDIT_JSON: ${{ runner.temp }}/s11-pip-audit.json
-      BANDIT_JSON: ${{ runner.temp }}/s11-bandit.json
+      PIP_AUDIT_JSON: /tmp/s11-pip-audit.json
+      BANDIT_JSON: /tmp/s11-bandit.json
       PIP_AUDIT_VERSION: '2.10.1'
       BANDIT_VERSION: '1.9.4'
     steps:
