@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.41"
+version: "1.2.42"
 status: "review"
 author: "Claude"
-updated: "2026-09-28T16:44:42+09:00"
+updated: "2026-09-28T18:40:59+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+G-05 W5 eval suite 실행 route 구현 카드 82 (Claude, 2026-09-28, base #202 `9c2733de` + #191 `9e9f1a0b` merge 충돌 0, branch `agent/claude/g05-w5-eval-run`): 설계 #183 §8의 마지막 PR. `run_suite` 시그니처 변경 0. **돈을 쓰는 route**라 권한을 세 번 확인한다(body 앞 / 재생 앞 / **외부 호출 직전**), adapter는 구성 allowlist의 **이름**뿐(URL 불가, 6종 부정 시험), `componentVersions`는 서비스가 채우는 세 키를 거부해 **identity 위조를 막는다**(setdefault라 호출자 값이 이긴다), `0053`의 NULL project suite는 **404**(네 경우 동형), IDEM 재생이 **두 번째 청구를 막는다**. `VAL_SCHEMA` → `GRAPH-0002` 409(adapter 상태 전제), 번역 표를 세 함수 AST로 검증. 감사는 식별자·수만(case 내용 없음), 403은 #195 denial 1행·62자 template action. **중복 검사를 정직하게 적었다**: `project_id is None`은 `!=`와 중복이라 지워도 시험이 통과한다 — 코드가 결정을 말하게 두고 그 사실을 세 곳에 적었다. PG-free 64 passed + 변이 3건 사망, W2 91 무회귀, 실 PG 9건 hosted(provider 호출 0). 다음 첫 행동: Codex 검토. §8 여덟 중 일곱 완료, W3만 seam 대기. 전문 [[2026-09-28_G-05_W5_eval_suite_실행_구현_Claude]].
 
 G-04 W2 model version 등록 route 구현 카드 64 (Claude, 2026-09-28, base #175 `6ea12700` + #159 `5e206aa4` merge, branch `agent/claude/g04-w2-model-version-register`): 설계 #183 v1.2.1 §8의 PR 4. `register_model_version`에 처음으로 HTTP 경로가 생겼고 **서비스 시그니처 변경 0**이다. 순서: permission → body-read → lock → permission → ledger-read → model-get → service → audit → ledger-write. 권한·키가 body보다 먼저, **lock이 원장·row보다 먼저**(IDEM-6), **lock 뒤 권한 재확인**, span 2개로 **body 읽는 동안 tx 0**. IDEM-6 직렬화점은 `deps.serialise_idempotent_write`(키 파생 advisory xact lock, migration 0)이고 실 PG barrier 시험으로 동시 최초 2건 → row 1·원장 1·unique error 0을 확인한다. 부모 `models` 결속으로 **부재·다른 tenant·다른 project가 같은 404**, UNIQUE 충돌은 **409**(UNIQUE 아닌 IntegrityError는 500 유지). **발견**: digest UNIQUE가 tenant 범위라 409가 다른 project의 존재를 드러낸다 — 어디서인지는 말하지 않게 했고 판단은 owner에게 남겼다. **의도적 누락 2**: `produced_by_run_id`(#184 `run_in_project` 필요), `lineage`(subject 미검증) — 422 거부를 시험으로 고정. **관찰**: 정본 403이 denial audit을 남기지 않는다(공유 핸들러, 별 카드). PG-free 64 passed + revert-fail 5, 실 PG 13은 hosted, PG-free fixture guard 포함. 다음 첫 행동: Codex 검토. 이어서 G-03 1단계 구현 카드(#182 설계 위 stack). 전문 [[2026-09-28_G-04_W2_model_version_등록_구현_Claude]].
 
