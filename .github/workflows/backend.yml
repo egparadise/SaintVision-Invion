@@ -61,6 +61,9 @@ jobs:
       # Role-shape rejection tests mutate cluster-wide role flags. They own a
       # separate disposable cluster instead of altering the shared service.
       INV_TEST_ROLE_GUARD_IMAGE: postgres:16
+      # G-02: the owned archiver for the live RPO cases runs the same image as
+      # this job's PostgreSQL service; the test refuses to guess one.
+      INV_TEST_ARCHIVER_IMAGE: postgres:16
 
     steps:
       - uses: actions/checkout@v4
@@ -158,7 +161,9 @@ jobs:
               'Explicit pinned local candidate image required': 2,
               'Actual Windows PowerShell launcher': 10,
               'Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)': 1,
-              'CX01_CONTAINER is unset; container identity/ownership cannot be verified': 19,
+              # G-02: the two live archiver cases now run here (docker exec probe,
+              # image from INV_TEST_ARCHIVER_IMAGE); the other 17 still need CX01.
+              'CX01_CONTAINER is unset; container identity/ownership cannot be verified': 17,
               'Explicit candidate image and disposable container DB address required': 8,
               'claude is not installed on this machine': 1,
               'codex is not installed on this machine': 1,
@@ -170,6 +175,9 @@ jobs:
               # S05 lock-wait evidence is a separately approved two-wave diagnostic.
               # Normal Backend collection must expose, but never execute, that load.
               'run only through tools/placement_lock_wait_diagnostic.py': 1,
+              # S11 storage fault evidence owns MinIO/PostgreSQL/archive containers
+              # in its label-gated reference lane; default Backend only declares it.
+              'run only through S11 Storage Failure Hosted Reference opt-in lane': 1,
               # S10-BE stage 2: the live MLflow conformance file runs only in the run-mlflow
               # lane (INV_MLFLOW_LIVE_URI); in this job it skips, visibly, 3 cases.
               'Set INV_MLFLOW_LIVE_URI (the run-mlflow lane starts the server)': 3,

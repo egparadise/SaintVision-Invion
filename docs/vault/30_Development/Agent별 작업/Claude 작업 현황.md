@@ -19,6 +19,14 @@ source_of_truth: "Git"
 
 ## 최근 확인한 진척
 
+### 2026-09-28 카드 54 2단계 · G-02 구현 (branch agent/claude/g02-live-archiver-impl, base #181 5490de3c + #159 5e206aa4 merge)
+
+- 실행자 주입·docker exec 실행자·시험 경로 전환·워크플로 gate(Backend 17, Core 20/0). 상세: [[2026-09-28_14-44-26_KST_G-02_live_archiver_hosted_구현_Claude]]
+
+### 2026-09-28 카드 54 · G-02 live archiver hosted 설계 (branch agent/claude/g02-live-archiver-design, base 1e8baf04)
+
+- docs-only: [[G-02 live archiver hosted 실행 설계 v1.0]] — 두 겹 skip 원인 실측, (a) docker exec 실행자 주입 설계, 호출자 4곳, skip-map 19→17, fail-closed, 되돌림 시험 목록. 상세: [[2026-09-28_13-54-47_KST_G-02_live_archiver_hosted_설계_Claude]]
+
 F1 model version digest UNIQUE 범위 migration 0052 (Claude, 2026-09-28, base #176 `1ddd85d0`, branch `agent/claude/g04-f1-digest-scope`): #191 F1의 선행. tenant 범위 digest UNIQUE가 project별 `canApprove`와 어긋나 **status code로 sibling-project 존재를 누출**하던 것을 `(model_id, content_sha256)`으로 좁혔다. 사전 데이터 검사(논증이 틀리면 문장으로 멈춤) → `CONCURRENTLY` 생성 → `USING INDEX` 승격 → 옛 제약 제거 순서, INVALID 인덱스 이름 선제 drop, offline render는 검사 생략(첫 판이 hosted offline 단계를 깼음), downgrade는 두 이유로 거부, head `0052` 단일. ORM·definer-policy·head marker 동반 이동. PG-free 11 passed + 변이 3건 사망, 실 PG 6건 hosted. 시험이 주석을 매칭하던 첫 판을 AST + source 위치 정렬로 고쳤다. 다음 첫 행동: Codex 검토 → 승인되면 #191이 이 head와 새 #184 head(#195 정본 403 denial audit)를 merge해 oracle 시험을 뒤집고 F4를 고정. 전문 [[2026-09-28_F1_model_version_digest_범위_migration_0052_Claude]].
 
 ### 2026-09-28 카드 bh · S10-BE MLflow 미러 2단계 (branch agent/claude/s10-be-mlflow-mirror-p2, base #172 41256e4f)
