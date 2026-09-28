@@ -1,0 +1,252 @@
+{
+  "$defs": {
+    "LineageDatasetVersion": {
+      "additionalProperties": false,
+      "properties": {
+        "contentSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Contentsha256",
+          "type": "string"
+        },
+        "datasetVersionId": {
+          "title": "Datasetversionid",
+          "type": "string"
+        },
+        "uri": {
+          "minLength": 1,
+          "title": "Uri",
+          "type": "string"
+        },
+        "version": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "datasetVersionId",
+        "version",
+        "contentSha256",
+        "uri"
+      ],
+      "title": "LineageDatasetVersion",
+      "type": "object"
+    },
+    "LineageDeployment": {
+      "additionalProperties": false,
+      "description": "A deployment of the traced version.\n\n``deployedByUserId`` and ``notes`` are on the row and are deliberately not\nhere: reading lineage does not need a person's identifier or free text.",
+      "properties": {
+        "approvalId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Approvalid"
+        },
+        "deployedAt": {
+          "format": "date-time",
+          "title": "Deployedat",
+          "type": "string"
+        },
+        "deployedDigest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Deployeddigest",
+          "type": "string"
+        },
+        "deploymentId": {
+          "title": "Deploymentid",
+          "type": "string"
+        },
+        "environment": {
+          "pattern": "^(lab|staging|pilot)$",
+          "title": "Environment",
+          "type": "string"
+        },
+        "imageId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Imageid"
+        },
+        "status": {
+          "pattern": "^(pending|active|superseded|rolled_back|failed)$",
+          "title": "Status",
+          "type": "string"
+        },
+        "supersededAt": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supersededat"
+        }
+      },
+      "required": [
+        "deploymentId",
+        "environment",
+        "status",
+        "deployedDigest",
+        "deployedAt"
+      ],
+      "title": "LineageDeployment",
+      "type": "object"
+    },
+    "LineageUnresolved": {
+      "additionalProperties": false,
+      "description": "How many subjects of one kind this response does not describe.\n\nA count and a kind, and nothing else. An identifier would leak another\nproject's row, and a reason would tell the caller whether a hidden\nidentifier exists -- which is the same disclosure by a longer route.",
+      "properties": {
+        "count": {
+          "minimum": 1,
+          "title": "Count",
+          "type": "integer"
+        },
+        "kind": {
+          "maxLength": 32,
+          "minLength": 1,
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "count"
+      ],
+      "title": "LineageUnresolved",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "AC-10's traceback, reduced to what a project member may be shown.\n\n``commits``, ``images``, ``evaluations`` and ``approvals`` are absent rather\nthan empty. An empty array would read as \"nothing was recorded\", which is a\ndifferent and much more alarming statement than \"this route cannot prove who\nowns those rows\"; the second is what ``unresolved`` and ``countOnlyKinds``\nsay.\n\n``deployments: []`` *is* an empty array, because it means something\ncomplete: nothing has been deployed. That difference is the reason the two\nare shaped differently.",
+  "properties": {
+    "contentSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Contentsha256",
+      "type": "string"
+    },
+    "countOnlyKinds": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 16,
+      "title": "Countonlykinds",
+      "type": "array"
+    },
+    "datasets": {
+      "items": {
+        "$ref": "#/$defs/LineageDatasetVersion"
+      },
+      "maxItems": 200,
+      "title": "Datasets",
+      "type": "array"
+    },
+    "deployments": {
+      "items": {
+        "$ref": "#/$defs/LineageDeployment"
+      },
+      "maxItems": 200,
+      "title": "Deployments",
+      "type": "array"
+    },
+    "detailedKinds": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 16,
+      "title": "Detailedkinds",
+      "type": "array"
+    },
+    "fullyTraceable": {
+      "title": "Fullytraceable",
+      "type": "boolean"
+    },
+    "missing": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 16,
+      "title": "Missing",
+      "type": "array"
+    },
+    "modelVersionId": {
+      "title": "Modelversionid",
+      "type": "string"
+    },
+    "producedByRunId": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Producedbyrunid"
+    },
+    "stage": {
+      "pattern": "^(draft|candidate|released|retired)$",
+      "title": "Stage",
+      "type": "string"
+    },
+    "traceabilityLimitedByScope": {
+      "title": "Traceabilitylimitedbyscope",
+      "type": "boolean"
+    },
+    "truncated": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Truncated",
+      "type": "object"
+    },
+    "unresolved": {
+      "items": {
+        "$ref": "#/$defs/LineageUnresolved"
+      },
+      "maxItems": 16,
+      "title": "Unresolved",
+      "type": "array"
+    },
+    "version": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "modelVersionId",
+    "version",
+    "stage",
+    "contentSha256",
+    "datasets",
+    "deployments",
+    "missing",
+    "unresolved",
+    "fullyTraceable",
+    "traceabilityLimitedByScope",
+    "detailedKinds",
+    "countOnlyKinds"
+  ],
+  "title": "ModelLineageTraceResponse",
+  "type": "object"
+}
