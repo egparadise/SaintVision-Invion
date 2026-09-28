@@ -740,6 +740,12 @@ class ModelReleaseRequest(Strict):
     against that immutable declaration for exact equality. ``extra="forbid"``
     is load-bearing here rather than conventional: a proposal carrying a field
     the declaration does not have is itself a mismatch.
+
+    The request carries a required ``Idempotency-Key`` header (card 113). The
+    same key with this same body and path replays the stored
+    ``ModelReleaseResponse``; the same key with a different body or path is
+    ``GRAPH-0002``/409; a version that is already released is ``GRAPH-0002``/409
+    under any other key.
     """
 
     license_policy: str = Field(min_length=1, max_length=200, alias="licensePolicy")
