@@ -65,6 +65,47 @@ class WorkspaceRecovery:
         self.snapshots, self.generations = snapshots, generations
         self.db = snapshots.db
 
+    def _checkpoint_reader(
+        self, tenant, project, run_id, source_attempt, step_id, *, authorize=None
+    ):
+        """Resolve the persisted provider without holding a provider/filesystem lock."""
+
+        with self.db.transaction(tenant) as conn:
+            lock_run(conn, run_id, project)
+            if authorize is not None:
+                authorize(conn)
+            pin = conn.execute(
+                "SELECT object_id FROM inv.checkpoint_objects "
+                "WHERE project_id=%s AND run_id=%s AND attempt=%s AND step_id=%s",
+                (project, run_id, source_attempt, step_id),
+            ).fetchone()
+            if not pin:
+                raise DomainError("RES-0004", "Workspace checkpoint not found", 404)
+            return self.snapshots._reader(self.snapshots._row(conn, project, pin["object_id"]))
+
+    def _checkout_reader(self, tenant, project, run_id, restore_id, *, authorize=None):
+        """Resolve a checkout's immutable checkpoint provider before lock ordering."""
+
+        with self.db.transaction(tenant) as conn:
+            lock_run(conn, run_id, project)
+            if authorize is not None:
+                authorize(conn)
+            restored = conn.execute(
+                "SELECT * FROM inv.workspace_restores "
+                "WHERE restore_id=%s AND project_id=%s AND run_id=%s",
+                (restore_id, project, run_id),
+            ).fetchone()
+            if not restored or str(restored["recovery_epoch"]) != self.db.recovery_epoch:
+                raise DomainError("STORE-0022", "Current-epoch restore required")
+            pin = conn.execute(
+                "SELECT object_id FROM inv.checkpoint_objects "
+                "WHERE project_id=%s AND run_id=%s AND attempt=%s AND step_id=%s",
+                (project, run_id, restored["source_attempt"], restored["step_id"]),
+            ).fetchone()
+            if not pin:
+                raise DomainError("STORE-0022", "Restore source checkpoint is missing")
+            return self.snapshots._reader(self.snapshots._row(conn, project, pin["object_id"]))
+
     def checkpoint(
         self, tenant, project, run_id, workspace_id, step_id, source, *, proofs, object_id=None
     ):
@@ -132,9 +173,17 @@ class WorkspaceRecovery:
                 "root": [str(self.generations.root), *self.generations.identity],
             }
         )
+        provider = self._checkpoint_reader(
+            tenant,
+            project,
+            run_id,
+            source_attempt,
+            step_id,
+            authorize=authorize,
+        )
         with (
             self.generations.locked() as root_fd,
-            object_store_session(self.snapshots.provider) as files,
+            object_store_session(provider) as files,
             self.db.transaction(tenant) as conn,
         ):
             run = lock_run(conn, run_id, project)
@@ -260,10 +309,11 @@ class WorkspaceRecovery:
                 "root": [str(working.root), *working.identity],
             }
         )
+        provider = self._checkout_reader(tenant, project, run_id, restore_id, authorize=authorize)
         with (
             working.locked() as work_fd,
             self.generations.locked() as restored_fd,
-            object_store_session(self.snapshots.provider) as files,
+            object_store_session(provider) as files,
             self.db.transaction(tenant) as conn,
         ):
             run = lock_run(conn, run_id, project)
@@ -320,9 +370,12 @@ class WorkspaceRecovery:
                 )
                 return prior
             pin = conn.execute(
-                "SELECT object_id FROM inv.checkpoint_objects WHERE run_id=%s AND attempt=%s AND step_id=%s",
-                (run_id, restored["source_attempt"], restored["step_id"]),
+                "SELECT object_id FROM inv.checkpoint_objects "
+                "WHERE project_id=%s AND run_id=%s AND attempt=%s AND step_id=%s",
+                (project, run_id, restored["source_attempt"], restored["step_id"]),
             ).fetchone()
+            if not pin:
+                raise DomainError("STORE-0022", "Restore source checkpoint is missing")
             obj = self.snapshots._row(conn, project, pin["object_id"])
             require_object_provider(files, obj)
             if obj["state"] != "ready" or obj["content_hash"] != restored["content_hash"]:

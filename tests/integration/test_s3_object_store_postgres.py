@@ -23,7 +23,8 @@ from inv.ids import new_id
 from inv.leases import Allocation
 from inv.object_store import ObjectStoreRegistry
 from inv.snapshots import SnapshotStore
-from inv.workspace_files import canonical
+from inv.workspace_files import RestoreGenerations, canonical
+from inv.workspace_recovery import WorkspaceRecovery
 from inv.workspace_resume import commit_workspace_output
 
 pytestmark = pytest.mark.postgres
@@ -71,7 +72,7 @@ def _running(env):
             expected_version=run["version"],
             proofs=proofs,
         )
-    return run, proofs
+    return run, proofs, lease
 
 
 def _publish(store, env, object_id, body):
@@ -140,8 +141,16 @@ def test_snapshot_store_persists_s3_locator_and_rls_hides_it_from_other_tenant(e
     assert provider.exists(row["locator"]) is False
 
 
-def test_snapshot_checkpoint_replay_is_quiet_and_registry_restores_s3(env):
-    body = b"hosted s3 checkpoint replay"
+def test_workspace_recovery_uses_registry_for_s3_checkpoint_and_replay(env, tmp_path):
+    workspace_id = new_id("wsp")
+    body = canonical(
+        {
+            "format": "workspace-snapshot:1",
+            "workspaceId": workspace_id,
+            "directories": [],
+            "files": [],
+        }
+    )
     provider = _provider("checkpoint/" + uuid4().hex)
     store = SnapshotStore(env.db, provider)
     with psycopg.connect(env.owner) as owner:
@@ -149,20 +158,13 @@ def test_snapshot_checkpoint_replay_is_quiet_and_registry_restores_s3(env):
             "INSERT INTO inv.storage_budgets VALUES(%s,%s,%s)",
             (env.tenant, env.project, len(body) * 8),
         )
-    run, proofs = _running(env)
+    run, proofs, lease = _running(env)
     object_id = str(uuid4())
     _publish(store, env, object_id, body)
 
     first = store.checkpoint(env.tenant, run["runId"], "s3-step", object_id, proofs=proofs)
     assert store.checkpoint(env.tenant, run["runId"], "s3-step", object_id, proofs=proofs) == first
     assert _counts(env, run["runId"], "inv.run.checkpoint_published") == (1, 1, 1)
-
-    reader = SnapshotStore(
-        env.db,
-        _provider("unused/" + uuid4().hex, "unused-writer-v1"),
-        ObjectStoreRegistry([provider]),
-    )
-    assert reader.restore(env.tenant, env.project, run["runId"], 1, "s3-step") == body
 
     changed = _provider("changed/" + uuid4().hex, "s3-compatible-v2")
     changed_store = SnapshotStore(env.db, changed)
@@ -171,6 +173,49 @@ def test_snapshot_checkpoint_replay_is_quiet_and_registry_restores_s3(env):
     with pytest.raises(DomainError, match="GRAPH-0004"):
         changed_store.checkpoint(env.tenant, run["runId"], "s3-step", changed_id, proofs=proofs)
     assert _counts(env, run["runId"], "inv.run.checkpoint_published") == (1, 1, 1)
+
+    env.leases.release(
+        env.tenant,
+        lease["leaseId"],
+        lease["fencingToken"],
+        authenticated_node_id=env.node,
+        stop_receipt=str(uuid4()),
+    )
+    run = env.runs.transition(
+        env.tenant, run["runId"], "recovering", expected_version=run["version"]
+    )
+    reader = SnapshotStore(
+        env.db,
+        _provider("unused/" + uuid4().hex, "unused-writer-v1"),
+        ObjectStoreRegistry([provider]),
+    )
+    restore_root = tmp_path / "restores"
+    restore_root.mkdir(mode=0o700)
+    recovery = WorkspaceRecovery(reader, RestoreGenerations(restore_root))
+    restore_id = str(uuid4())
+    restored = recovery.restore(
+        env.tenant,
+        env.project,
+        run["runId"],
+        workspace_id,
+        1,
+        "s3-step",
+        restore_id,
+        expected_version=run["version"],
+    )
+    replayed = recovery.restore(
+        env.tenant,
+        env.project,
+        run["runId"],
+        workspace_id,
+        1,
+        "s3-step",
+        restore_id,
+        expected_version=run["version"],
+    )
+    assert restored["sha256"] == hashlib.sha256(body).hexdigest()
+    assert restored["replayed"] is False and replayed["replayed"] is True
+    assert (restore_root / restored["generation"] / "receipt.json").is_file()
 
 
 class _DeliveryResult:
@@ -205,7 +250,7 @@ def test_workspace_output_replay_binds_provider_and_writes_one_pin_event(env):
             "INSERT INTO inv.storage_budgets VALUES(%s,%s,%s)",
             (env.tenant, env.project, 1024 * 1024),
         )
-    run, _proofs = _running(env)
+    run, _proofs, _lease = _running(env)
     internal_run = {"run_id": run["runId"], "attempt": run["attempt"]}
     command = str(uuid4())
     workspace_id = new_id("wsp")

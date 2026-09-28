@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-CODEX-S3-OBJECT-STORE-SPI-001"
 title: "S3 호환 ObjectStore 구현 1단계 — SPI·단일 SigV4·provider conformance"
-version: "1.1.0"
+version: "1.1.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T18:10:00+09:00"
+updated: "2026-09-28T12:10:00+09:00"
 source_of_truth: "Git"
 ---
 

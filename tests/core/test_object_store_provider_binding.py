@@ -16,6 +16,7 @@ from inv.object_store import (
     require_object_provider,
 )
 from inv.snapshots import SnapshotStore
+from inv.workspace_recovery import WorkspaceRecovery
 
 OBJECT = UUID("22222222-2222-4222-8222-222222222222")
 ROW = {
@@ -60,6 +61,8 @@ class Connection:
 
     def execute(self, statement, params=()):
         self.statements.append((statement, params))
+        if "FROM inv.runs" in statement:
+            return Result(one={"project_id": "project"})
         if "FROM inv.checkpoint_objects" in statement:
             return Result(one={"object_id": OBJECT})
         if "FROM inv.storage_objects" in statement and "SELECT *" in statement:
@@ -110,6 +113,17 @@ def test_restore_resolves_the_persisted_provider_from_registry():
     assert store.restore("tenant", "project", "run", 1, "step") == b"payload"
     assert local.calls == []
     assert remote.calls == [("get", "opaque-locator", "a" * 64, 7)]
+
+
+def test_workspace_recovery_resolves_the_persisted_checkpoint_provider():
+    database = Database(dict(ROW))
+    local = Provider(LOCAL_PROVIDER_ID)
+    remote = Provider("s3-compatible-v1")
+    store = SnapshotStore(database, local, ObjectStoreRegistry([local, remote]))
+    recovery = WorkspaceRecovery(store, generations=None)
+
+    assert recovery._checkpoint_reader("tenant", "project", "run", 1, "step") is remote
+    assert local.calls == [] and remote.calls == []
 
 
 def test_configured_registry_always_includes_recovery_local_and_optional_s3():

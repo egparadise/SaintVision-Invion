@@ -1,22 +1,22 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.209"
+version: "1.0.210"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T11:29:09+09:00"
+updated: "2026-09-28T12:10:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
 
-## 2026-09-28 Card45 S3 ObjectStore 제품 결속 v2 — hosted 검증 대기
+## 2026-09-28 Card45 S3 ObjectStore 제품 결속 v2 — 제품 restore 보강·hosted 재검증
 
 - Claude r1 지적을 반영해 승인 v1 head `5a794ae9`를 merge commit `82df64a0`으로 일반 push했다. persisted provider 불일치는 read/delete/state mutation 전에 `STORE-0001`/503/retryable로 닫고, configured app은 Workspace recovery Local과 준비된 S3를 read registry에 함께 등록한다. S3 restore는 row provider로 선택하며 prefix 이탈도 retryable 503이다.
-- PG-free provider binding 5 passed, S3 23 passed, 기존 replay/artifact/workspace 37 passed다. hosted 전용 MinIO+disposable PG 파일에는 SnapshotStore와 workspace-output 두 producer의 quiet replay·provider drift `GRAPH-0004`·event/pin 1건 및 S3 restore를 추가했으며 아직 실행 전이다. `deploy/CONFIGURED-SERVER.md`에 exact objectStore·Local+S3 read registry·prefix/provider 전환 경계를 기록했다.
+- Claude r2에서 미사용 `SnapshotStore.restore`만 S3를 읽고 실제 `WorkspaceRecovery.restore`가 Local writer에 고정된 공백을 확인했다. 제품 restore와 checkout이 row provider를 registry에서 선택하도록 고치고 PG-free 선택 시험을 추가했으며, hosted 시험도 실제 `WorkspaceRecovery.restore`·receipt replay를 호출한다. `deploy/CONFIGURED-SERVER.md`에는 Local root 일치, legacy/new 동시 거부, worker mount, 전환 전 drain을 기록했다.
 - PR #149 위 stack에서 provider/locator migration, strict `configurationReadiness.objectStore`, worker/API 단일 설정 정본, 두 checkpoint 생산자 replay guard, provider-body Artifact download와 Local provider→DB lock order를 결속했다. 코드 head는 `51ffdc26`; 문서 head는 후속 커밋이다.
 - receipt body fallback은 제거했고 provider 부재는 `STORE-0001`/503으로 닫는다. S3 예약 local provider ID·endpoint path·unknown inner key·dual provider를 거부하며, 공개 route/schema의 objectId/locator 입력은 positional·keyword-only·Query alias까지 0건을 단언한다.
-- PG-free focused 87 passed/3 명시 skip, 추가 경계 58 passed/1 symlink skip, route coverage 40 passed, bindings/frontend/freshness/ontology/YAML/compile/diff exit 0이다. 로컬 실 PG·Docker는 실행하지 않았다. digest-pinned MinIO+PG와 실제 Artifact HTTP case, migration/definer audit는 PR hosted Core evidence 대기이므로 done이 아니다. [[2026-09-28_10-36-00_KST_S3_ObjectStore_제품결속_v2_Codex]].
+- PG-free focused 87 passed/3 명시 skip, 추가 경계 58 passed/1 symlink skip, r2 설정/provider 26 passed/1 Windows symlink skip, route coverage 40 passed, bindings/frontend/freshness/ontology/YAML/compile/diff exit 0이다. head `3cf7b33c` hosted는 S01 2+3·Backend·Docs·Frontend·Desktop green, Core pytest 3361/36/2/0이며 exact skip-map 1건에서만 red였다. `c556e99a`로 map을 맞췄고 제품 restore 보강 head의 최종 hosted 완주는 대기다. 로컬 실 PG·Docker는 실행하지 않았다. [[2026-09-28_10-36-00_KST_S3_ObjectStore_제품결속_v2_Codex]].
 
 ## 2026-09-28 Card45 S3 ObjectStore 구현 1단계 — reviewer 인계
 
