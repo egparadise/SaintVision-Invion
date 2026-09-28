@@ -14,7 +14,7 @@ from __future__ import annotations
 import datetime as dt
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr
+from pydantic import field_validator, BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr
 
 
 class Strict(BaseModel):
@@ -808,6 +808,34 @@ class LineageUnresolved(Strict):
     count: int = Field(ge=1)
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class RunRecordSealRequest(Strict):
+    """What a caller may say when sealing a run (G-04 W1, design §5-2).
+
+    Only the *role* of each server-derived artifact. The sealed set, the
+    digests, the bundle and the component versions are derived from the rows
+    the server locks; a request cannot add, omit or name any of them. An
+    artifact the mapping leaves out is sealed as ``other``; an id outside the
+    server's set is refused.
+    """
+
+    roles: dict[str, str] = Field(default_factory=dict)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    @field_validator("roles")
+    @classmethod
+    def _roles_are_known(cls, value: dict[str, str]) -> dict[str, str]:
+        allowed = {"diff", "test_report", "trace", "log", "model", "dataset", "other"}
+        for artifact_id, role in value.items():
+            if not (isinstance(artifact_id, str) and artifact_id.startswith("art_") and len(artifact_id) == 30):
+                raise ValueError("roles keys must be artifact ids")
+            if role not in allowed:
+                raise ValueError("unknown artifact role")
+        if len(value) > 1000:
+            raise ValueError("too many role mappings")
+        return value
 
 
 class RunRecordResponse(Strict):
