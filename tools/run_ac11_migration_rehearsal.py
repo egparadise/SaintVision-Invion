@@ -319,7 +319,7 @@ CATALOG_QUERIES = {
         LEFT JOIN pg_attrdef d ON d.adrelid=a.attrelid AND d.adnum=a.attnum
         WHERE n.nspname IN ('public','inv') AND c.relkind IN ('r','p','v','m')
           AND a.attnum>0 AND NOT a.attisdropped
-        ORDER BY 1,2,4
+        ORDER BY n.nspname,c.relname,a.attnum
     """,
     "constraints": """
         SELECT n.nspname,c.relname,co.conname,co.contype,co.convalidated,
@@ -374,11 +374,22 @@ CATALOG_QUERIES = {
 }
 
 
+def normalize_constraint_definition(definition: str) -> str:
+    return definition.replace(
+        "::character varying::text", "::character varying"
+    ).replace("]::text[]", "]")
+
+
 def catalog_fingerprint(admin_dsn: str, database: str) -> CatalogFingerprint:
     sections: dict[str, list[list[Any]]] = {}
     with psycopg.connect(_db_conninfo(admin_dsn, database)) as conn:
         for name, query in CATALOG_QUERIES.items():
             sections[name] = [list(row) for row in conn.execute(query).fetchall()]
+    # pg_dump/pg_restore can move the same text coercion from an ARRAY result
+    # onto each varchar element. PostgreSQL deparses both forms differently,
+    # although their stored CHECK semantics are equivalent.
+    for row in sections["constraints"]:
+        row[5] = normalize_constraint_definition(row[5])
     return CatalogFingerprint(
         sha256=canonical_sha256(sections),
         counts={name: len(rows) for name, rows in sections.items()},

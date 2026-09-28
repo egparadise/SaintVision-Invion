@@ -139,9 +139,23 @@ def test_catalog_queries_compare_logical_columns_and_stable_routine_identities()
     columns = runner.CATALOG_QUERIES["columns"]
     grants = runner.CATALOG_QUERIES["routineGrants"]
     assert "a.attname,a.attnum" not in columns
-    assert "ORDER BY 1,2,4" in columns
+    assert "ORDER BY n.nspname,c.relname,a.attnum" in columns
     assert "specific_name" not in grants
     assert "pg_get_function_identity_arguments" in grants
+
+
+def test_catalog_constraint_normalization_only_collapses_equivalent_array_text_casts():
+    direct = (
+        "CHECK (status::text = ANY (ARRAY['active'::character varying, "
+        "'deleted'::character varying]::text[]))"
+    )
+    restored = (
+        "CHECK (status::text = ANY (ARRAY['active'::character varying::text, "
+        "'deleted'::character varying::text]))"
+    )
+    normalize = runner.normalize_constraint_definition
+    assert normalize(direct) == normalize(restored)
+    assert normalize(direct) != normalize(direct.replace("deleted", "quarantined"))
 
 
 def test_junit_declares_zero_tail_as_skip_and_restore_as_pass():
