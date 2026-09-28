@@ -1,11 +1,11 @@
 ---
 doc_id: "CLAUDE-G04-G05-BUSINESS-ROUTES-DESIGN-001"
 title: "G-04·G-05 남은 business lane route 통합 설계 v1.0 — S09 넷(Context bundle 조회·RunRecord 봉인·pin 조회·eval 실행) + model-registry 셋(register·verify·pin_retention): 기존 서비스·index·route 재사용 표, 읽기 membership/쓰기 canApprove 등급, 정본 ProblemDetails·strict·path→row·404·IDEM, tx/lock 순서와 Codex 계약 지점, persistence 판정(eval suite project 결속 = migration 필요·번호 요청), 계약·FE 영향, route별 PR 분할 (카드 58, docs-only)"
-version: "1.2.0"
+version: "1.2.1"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T15:11:46+09:00"
+updated: "2026-09-28T15:16:34+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -38,7 +38,7 @@ tags: ["G-04", "G-05", "business-lane", "route", "design", "claude"]
 | R1 | `GET /projects/{p}/runs/{run_id}/record` | 읽기 | **membership** — `require_project_access`(`services/projects.py:204`; membership 없으면 `AUTH_PROJECT_SCOPE`), #158 §6-3 "읽기에 필요한 등급은 membership" | `get_record` |
 | R2 | `GET /projects/{p}/runs/{run_id}/record/artifacts[?role=]` + `GET …/record/artifacts/{artifact_id}/verify` | 읽기 | membership | `list_pinned_artifacts`, `verify_pin` |
 | R3 | `GET /projects/{p}/runs/{run_id}/context-bundle` | 읽기 | membership | `read_bundle` + `verify_bundle`(응답에 `hashVerified`) |
-| W1 | `POST /projects/{p}/runs/{run_id}/record` (봉인) | 쓰기 | **canApprove는 필요조건일 뿐**(Codex F1). integrity 값(`component_versions`·artifact 목록·`bundle_id`)은 request가 아니라 **서버가 잠근 정본(Run/Evidence/Context/Artifact)에서 파생**; request는 선택 의도 최소값만(§5-2) | `seal_run_record` |
+| W1 | `POST /projects/{p}/runs/{run_id}/record` (봉인) | 쓰기 | **canApprove는 필요조건일 뿐**(Codex F1). integrity 값(`component_versions`·**봉인 artifact 집합 전체**·`bundle_id`·checksum)은 request가 아니라 **서버가 잠근 정본(Run/Evidence/Context/Artifact)에서 완전하게 파생**; request는 서버 파생 artifact 각각의 **role 매핑만** 줄 수 있고 누락·추가할 수 없다(§5-2) | `seal_run_record` |
 | W2 | `POST /projects/{p}/models/{model_id}/versions` (등록) | 쓰기 | canApprove | `register_model_version` |
 | W3 | `POST /projects/{p}/models/{model_id}/versions/{version}/verify` | 쓰기 | **보류**(Codex F1 최종 승인 불가): `lineage.py:279`의 정본은 "trusted worker hashed the actual weights"인데 canApprove 사용자가 DB에 있는 digest를 그대로 제출해 `verified_at`을 세울 수 있음. **trusted-worker identity + 실제 object read/hash Evidence 결속 seam**을 먼저 정한 뒤에만 구현 | `verify_model_version` |
 | W4 | `POST /projects/{p}/models/{model_id}/versions/{version}/retention-pin` | 쓰기 | canApprove | `pin_retention` |
@@ -88,8 +88,8 @@ tags: ["G-04", "G-05", "business-lane", "route", "design", "claude"]
 2. `(tenant, project, endpoint, Idempotency-Key)` **직렬화점**(IDEM-6 advisory lock) 확보 → 원장 조회(있으면 exact replay 또는 `GRAPH-0002/409`).
 3. `runs` 대상 행 **`FOR UPDATE` + `populate_existing`**, path→`workload.project` 재결속, terminal 상태·최종 필드 재확인.
 4. live `canApprove` **재확인**(회수 TOCTOU).
-5. bundle/workload와 artifact를 **서버 정본에서 읽고**, 변경 가능한 행(`artifacts`)은 **`artifact_id` 오름차순으로 잠근 뒤** active/verified/run 결속 재확인. request가 주는 것은 선택 의도 최소값(예: 어떤 artifact를 어떤 role로 pin할지의 **선택**)뿐이며 `component_versions`·checksum·`bundle_id`·`workload_spec_sha256`은 서버가 파생.
-6. 기존 RunRecord 확인 → 없으면 record + pin + idempotency 응답을 **같은 tx**에 기록. 있으면 요청의 **canonical seal intent**(정렬된 pin (artifact_id, role) 집합 + 파생 값)와 저장된 record+pin 집합을 비교해 **동일할 때만 자연 멱등 성공**, 다르면 `GRAPH-0002/409`.
+5. bundle/workload와 artifact를 **서버 정본에서 읽고**, 변경 가능한 행(`artifacts`)은 **`artifact_id` 오름차순으로 잠근 뒤** active/verified/run 결속 재확인. **봉인 대상 artifact 집합은 서버가 run 정본에서 완전하게 파생한다**: 그 run의 `artifacts` 중 `status='active'`이고 `checksum_sha256`이 있는 행 **전부**(v1.2.1, Codex 조건). request는 그 집합의 각 artifact에 대한 **role 매핑만**(`roles: {artifact_id: role}`) 줄 수 있다 — 매핑이 없는 서버 파생 artifact는 `other`로 봉인되고, 서버 집합에 없는 artifact_id를 매핑하면 `GRAPH-0002/409`(누락도 추가도 불가). `component_versions`·checksum·`bundle_id`·`workload_spec_sha256`은 서버가 파생. 서비스 `seal_run_record(artifacts=…)`에는 route가 **서버 파생 집합 + role**로 만든 `ArtifactPin` 목록을 넘긴다(서비스 시그니처 변경 0). 일부 선택 봉인은 제품 의도가 아니며 지원하지 않는다.
+6. 기존 RunRecord 확인 → 없으면 record + pin + idempotency 응답을 **같은 tx**에 기록. 있으면 **canonical seal intent = 서버 파생 artifact 집합에 role을 입힌 정렬된 (artifact_id, role, checksum) 집합 + 파생 값**과 저장된 record+pin 집합을 비교해 **동일할 때만 자연 멱등 성공**, 다르면 `GRAPH-0002/409`.
 
 `uq_run_records_run_id`(`0003:174`)는 최후 방어이지 정상 직렬화 수단이 아니다. IntegrityError가 raw 500으로 새거나 pin 일부가 남으면 안 된다(한 tx). 오류 표: 동일 키·동일 body → exact replay; 동일 키·다른 body → `GRAPH-0002/409`; lock timeout/deadlock → 값 비노출 **`SYS-0001/503/retryable=true`**; 그 밖 전제 위반 → `GRAPH-0002/409`.
 
@@ -145,6 +145,6 @@ READ COMMITTED. 순서: **idempotency 직렬화점 → live canApprove → Model
 - bundle 본문(`content`) 노출 route: 비밀 스캔(`context.py:71 _refuse_recognised_secrets`)이 저장 시점에만 있어 읽기 노출은 별 결정.
 - 봉인 시 outbox/mirror 훅 여부(#172의 `enqueue_mirror`는 lineage·eval에만) — 봉인은 미러 대상 아님(설계 #168 §1 표에 없음).
 - **Codex 설계 판정(v1.2 반영)**: F1 등급 최종(W2·W4·W5 canApprove 승인, W1 필요조건+서버 파생, **W3 보류**), F2 W1 계약(§5-2), F3 W4 계약(§5-3), F4 IDEM 예약(IDEM-6). 실 PG 계약 시험은 각 구현 PR에서 독립 PG session+barrier로.
-- **코디네이터 결정(v1.1 반영)**: (1) W5 migration 번호 **0052** 예약(§5-1). (2) W1~W5 canApprove 통일 **잠정 승인**(#152 §3·#167 `_require_approval` 선례) — 권한 경계 결정이므로 **최종 확정은 Codex 설계 검토**에서: 특히 W5(외부 adapter 호출·비용)가 canApprove로 충분한지, W1 봉인·W4 pin 경합 계약(§5)과 함께 판단.
-- **진행 결정**: 계약 지점이 없는 **PR 1(R1 RunRecord 조회 + `_run_in_project` helper)**은 설계 승인 전이라도 #175 branch 위에 **draft**로 올려 검토 대기 시간을 줄인다(설계가 바뀌면 draft를 따라 고침). W1·W4는 Codex 계약 전 착수하지 않는다.
+- **코디네이터 결정(v1.1)**: W5 migration 번호 **0052** 예약(§5-1). canApprove 통일 잠정 승인은 v1.2 Codex 최종 판정으로 대체됨(위 항목).
+- **최종 상태(v1.2.1)**: W2·W4·W5 = canApprove 확정, **W4 구현 차단 해제**; W1 = canApprove + 서버 파생 완전 artifact 집합(§5-2 5항)으로 계약 확정, 구현 가능; **W3 = 보류**(trusted-worker 실제-byte 측정 Evidence seam 전). R1(#184)·R2(#188) draft는 이 판정과 정합.
 - owner Claude / reviewer Codex / 병합 금지. worktree 재사용, branch `agent/claude/g04-g05-business-routes-design`, base `1e8baf04`, force-push·`git add -A` 없음. 시각은 `date`.
