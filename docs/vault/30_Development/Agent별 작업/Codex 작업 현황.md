@@ -25,6 +25,12 @@ source_of_truth: "Git"
 - `08ece3bc`의 URI trailing/version slash 수정은 되살림 3건이 exit 1로 KILLED됐다. 정확한 경계는 trailing slash를 parser가, version slash를 `build_uri()`와 `test_builder_rejects_ambiguous_version_path`가 막는다. `0043` pin migration은 직접 PostgreSQL 단언을 정독해 승인했다(로컬 PG 실행은 제한에 따라 NOT_RUN). `c75201af` model shard resolution은 fail-closed/unavailable·tenant/location 경계를 직접 시험해 검토 공백을 닫았다.
 - `34791448` exact-match adapter는 casefold 완화 mutation이 2건 실패해 KILLED됐으며, request path 미결속 blocker는 유지한다. `3e267b05` archive retention은 WAL boundary mutation을 property 시험이 잡았지만 malformed `START TIME`을 directory mtime으로 fail-open 대체하는 F-VFCL04-01과 명명 timezone을 실패/UTC 오해석하는 F-VFCL04-02를 분리해 수정 요청했다.
 - #139·#143 병합 전이라 registry는 건드리지 않고 VF-CL-02/03 true, VF-CL-04 false+두 새 blocker의 의미 diff만 제안했다. 다음은 Claude가 retention timestamp fail-closed와 timezone parsing을 보정한 뒤 Codex 재검토와 registry owner 적용이다. [[2026-09-28_16-25-00_KST_VF-CL_독립검토공백_Codex]].
+## 2026-09-28 S11 AC-11 composite long-soak target 설계 — Claude 검토 요청
+
+- #157의 필수 `long-soak`과 #185의 storage reference 경계를 결합해 열·전원·NTP·스위치·WAN·실 WS/PTY·물리 storage를 한 24시간 물리 창에 묶었다. ADR-100의 등록 5/eligible Ubuntu 4/CP 겸임 제외 1, external monotonic observer, 14개 exact case와 20개 fault-class SHA를 고정했다.
+- hosted storage/drift는 같은 SHA의 필수 하위 관측이지만 성공만으로 축 PASS를 만들 수 없고, storage-only도 PASS가 아니다. 실제 registry 변경은 #192 방식의 별도 repin 카드로 남겼다.
+- 이 카드는 docs-only이며 실제 장비·fault·hosted 실행은 0건이다. 운영자 자원 전 `BLOCKED_EXTERNAL(G-19/G-24)`이고 reviewer Claude 승인 뒤 registry/importer repin이 첫 후속이다. [[S11_AC11_composite_long_soak_설계]], [[S11_AC11_composite_long_soak_target_v0]], [[2026-09-28_19-59-12_KST_S11_AC11_composite_long_soak_설계_Codex]].
+
 ## 2026-09-28 S11-BE·S11-DB AC-11 통합 인수 설계 v1.1.1 — Claude 재검토 요청
 
 - migration을 가역 `forward→downgrade→forward`와 비가역 `forward→verified restore→forward`로 분리했다. 현재 head `0046_model_manifest_readiness`는 비가역이고 reversible tail이 0개이므로 no-op downgrade를 PASS로 세지 않는다.
