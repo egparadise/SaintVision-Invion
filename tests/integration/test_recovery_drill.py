@@ -187,19 +187,15 @@ def _classify_archiver_connection_failure(name, run=subprocess.run):
         raise AssertionError(
             "Owned archiver PostgreSQL startup reported an error: " + diagnostic
         )
-    if ready and not any(port_bindings.values()):
-        pytest.skip(
-            "Docker inspect state confirms status=running, running=True, "
-            f"restarting=False, restartCount={restart_count}, exitCode={exit_code}; "
-            "PostgreSQL-ready log marker is present; "
-            "hostPortPublished=False. This test's Docker internal network has no "
-            "published host port, so host pytest cannot reach the container by "
-            "Docker-only name"
-        )
-    if ready and any(port_bindings.values()):
+    if ready:
+        # G-02: the probe runs *inside* the container (docker exec psql), so
+        # host reachability is no longer part of the design. A ready server
+        # that the probe still cannot query is a failure to classify, never a
+        # skip -- the old "no published host port" skip would hide a real
+        # defect in the exec path.
         raise AssertionError(
-            "Owned archiver is running and PostgreSQL reports ready with a published "
-            "host port, but host connection still failed"
+            "Owned archiver is running and PostgreSQL reports ready, but the "
+            f"in-container probe still failed (hostPortPublished={bool(any(port_bindings.values()))})"
         )
 
     raise AssertionError(
@@ -485,11 +481,51 @@ def test_cli_and_database_record_refuse_unverified_operational_target(args):
     assert args.source not in result.stdout + result.stderr
 
 
+def _exec_sql(name, sql, *, timeout=20):
+    """Transport only: run one statement inside the archiver over docker exec psql.
+
+    Returns the stdout lines (tab-separated fields). No judgement lives here;
+    the capability report is produced by ``drill._recovery_capability`` through
+    its own executor.
+    """
+    completed = subprocess.run(
+        ["docker", "exec", name, "psql", "-X", "-At", "-F", "\t", "-v", "ON_ERROR_STOP=1",
+         "-U", "postgres", "-d", "postgres", "-c", sql],
+        capture_output=True, timeout=timeout,
+    )
+    if completed.returncode != 0:
+        raise RuntimeError(f"docker exec psql exited {completed.returncode}")
+    return [line for line in completed.stdout.decode("utf-8", errors="replace").splitlines() if line.strip()]
+
+
+@pytest.fixture
+def archiver_image():
+    """The PostgreSQL image the owned archiver runs: explicit, or the CX01 container's.
+
+    hosted Backend sets ``INV_TEST_ARCHIVER_IMAGE``; hosted Core (and a local
+    CX01 setup) has ``CX01_CONTAINER``, whose image is reused. Neither present
+    is a visible skip with a fixed reason -- never a guessed image.
+    """
+    explicit = os.environ.get("INV_TEST_ARCHIVER_IMAGE", "").strip()
+    if explicit:
+        return explicit
+    container = os.environ.get("CX01_CONTAINER", "").strip()
+    if container:
+        base = json.loads(subprocess.check_output(["docker", "inspect", container]))[0]
+        return base["Image"]
+    pytest.skip("INV_TEST_ARCHIVER_IMAGE is unset and no CX01 container is named; no archiver image to run")
+
+
 @pytest.mark.parametrize("archive_command", ["/bin/true", "/bin/false"])
-def test_live_archiver_configuration_cannot_certify_operational_rpo(args, archive_command):
-    """A separate owned PG server, no published ports or production changes."""
+def test_live_archiver_configuration_cannot_certify_operational_rpo(archiver_image, archive_command):
+    """A separate owned PG server, no published ports or production changes.
+
+    The archiver sits on an owned ``--internal`` network with no published port
+    (that isolation is what makes ``archive_command`` failure meaningful), so
+    every query goes through ``docker exec psql`` inside the container and the
+    capability report is built by the tool through its docker-exec executor.
+    """
     name = "sv-rpo-" + uuid4().hex[:12]
-    base = json.loads(subprocess.check_output(["docker", "inspect", args.docker]))[0]
     network = "sv-rpo-net-" + uuid4().hex[:12]
     label = "ai.saintvision.rpo-test"
     network_label = "ai.saintvision.rpo-network"
@@ -518,7 +554,7 @@ def test_live_archiver_configuration_cannot_certify_operational_rpo(args, archiv
                 "/var/lib/postgresql/data:rw",
                 "-e",
                 "POSTGRES_HOST_AUTH_METHOD=trust",
-                base["Image"],
+                archiver_image,
                 "-c",
                 "archive_mode=on",
                 "-c",
@@ -530,18 +566,21 @@ def test_live_archiver_configuration_cannot_certify_operational_rpo(args, archiv
             timeout=30,
         )
         assert created.returncode == 0, "Owned archiver fixture could not start"
-        dsn = "postgresql://postgres@" + name + ":5432/postgres"
+        inspected = json.loads(subprocess.check_output(["docker", "inspect", name]))[0]
+        assert not any((inspected.get("HostConfig", {}).get("PortBindings") or {}).values()), (
+            "Owned archiver must not publish a host port"
+        )
         deadline = time.monotonic() + 30
         while True:
             try:
-                with psycopg.connect(dsn, connect_timeout=1) as conn:
-                    conn.execute("SELECT 1")
+                assert _exec_sql(name, "SELECT 1") == ["1"]
                 break
-            except psycopg.OperationalError:
+            except (RuntimeError, subprocess.TimeoutExpired, AssertionError):
                 if time.monotonic() > deadline:
                     _classify_archiver_connection_failure(name)
                 time.sleep(0.1)
-        capability = drill._recovery_capability(dsn)
+        execute = drill.docker_exec_settings_executor(name)
+        capability = drill._recovery_capability(execute=execute)
         assert capability["archivingConfigured"] is True
         assert capability["archiveSwitchTimeoutSeconds"] == 300
         assert capability["settings"]["archive_command"] == "configured"
@@ -550,23 +589,20 @@ def test_live_archiver_configuration_cannot_certify_operational_rpo(args, archiv
         assert capability["operationalRpoVerified"] is False
         assert not drill._meets_operational_rpo({"recoveryCapability": capability}, 900)
         # Even actual archiver exit-success is not proof of retained bytes.
-        with psycopg.connect(dsn, autocommit=True) as conn:
-            conn.execute("CREATE TABLE archive_probe(value text)")
-            conn.execute("INSERT INTO archive_probe VALUES('synthetic-marker')")
-            conn.execute("SELECT pg_switch_wal()")
-            deadline = time.monotonic() + 15
-            while True:
-                conn.execute("SELECT pg_stat_clear_snapshot()")
-                archived, failed = conn.execute(
-                    "SELECT archived_count,failed_count FROM pg_stat_archiver"
-                ).fetchone()
-                if (archived if archive_command == "/bin/true" else failed) > 0:
-                    break
-                if time.monotonic() > deadline:
-                    raise AssertionError("Expected archive outcome not observed")
-                time.sleep(0.1)
+        _exec_sql(name, "CREATE TABLE archive_probe(value text)")
+        _exec_sql(name, "INSERT INTO archive_probe VALUES('synthetic-marker')")
+        _exec_sql(name, "SELECT pg_switch_wal()")
+        deadline = time.monotonic() + 15
+        while True:
+            (row,) = _exec_sql(name, "SELECT archived_count,failed_count FROM pg_stat_archiver")
+            archived, failed = (int(value) for value in row.split("\t"))
+            if (archived if archive_command == "/bin/true" else failed) > 0:
+                break
+            if time.monotonic() > deadline:
+                raise AssertionError("Expected archive outcome not observed")
+            time.sleep(0.1)
         assert not drill._meets_operational_rpo(
-            {"recoveryCapability": drill._recovery_capability(dsn)}, 900
+            {"recoveryCapability": drill._recovery_capability(execute=execute)}, 900
         )
     finally:
         cleanup = {
