@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.23"
+version: "1.2.24"
 status: "review"
 author: "Claude"
-updated: "2026-09-28T23:44:00+09:00"
+updated: "2026-09-28T23:07:31+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,7 @@ source_of_truth: "Git"
 
 ## 최근 확인한 진척
 
-48 task 진행률 재채점 카드 99 (Claude, 2026-09-28, 분석 tree `95a59b24` = `origin/coord/train-ci-2150`, PR base `integration/all-agents-unified`, docs-only): 09-18과 **같은 rubric**(48×0/25/50/75/100, 분모 4,800)으로 48 task를 재채점했다. 09-18 기록에 **task별 점수표가 없어** 새로 배정했고 **2,800과는 합계로만 비교 가능**하다고 명시했다. **병합 전 `main`(`f9be6b61`, 09-10) 1,950 = 40.62% / 병합 후 train 3,325 = 69.27%** 로 두 열을 분리했다(병합만으로 done을 올리지 않는다는 원칙 유지 — train 열은 이미 검토·CI를 통과한 구현의 성숙도다). **결론은 69.27%가 아니라 33이다** — 48 중 33개가 75점이고 그 천장은 우리 코드가 아니라 **운영 인수·외부 자산**이 만든다. 100점은 S01-FE·S01-DB 둘뿐이고 범위가 설계·계약 문서로 닫혀 있다. 근거 CI는 분석 tree 자체의 5 workflow success(Backend `36424405419` 5153 passed, Core `36424410039` 5456 passed 등)이고 진행 중 run은 인용하지 않았다. 병합 격차 실측: migration 33→70, v1 route 4→19, 시험 파일 54→317, contracts 12→79이며 `api/problem.py`(정본 ProblemDetails)·lineage 조회·MLflow 미러·AC-11 집계기가 **통째로 미병합**이다. 결론에 **우리 코드로 남은 작업(owner별)** 과 **사용자·외부 조치(G-15~G-26)** 를 분리했고 `G-19`(물리 PC 5대)가 가장 많은 task를 막는다. **v1.1 정정 2건**: (1) "W3 verify route 미구현"은 틀렸다 — #215(`3bdc6e70`)·#213(`c59d6ebd`)이 분석 tree에 들어 있고 `api/v1/model_verify.py`·`0054`가 실재한다. §3 표는 verify를 정확히 적었는데 §5 결론이 어긋났다(표가 맞고 결론이 틀렸다). (2) "AC-11 long-soak registry repin 남음"도 틀렸다 — #217(카드 96)이 `coord/train-ci-2207`에 병합돼 `REQUIRED_TARGET_BY_AXIS`에 long-soak이 등록됐고, 분석 tree에만 없다. W3 관련 점수는 재확인해도 S10-BE·S10-ST 75 그대로이며(G-25 상한), S11-BE는 2207 기준 50→75여서 그 tree 합계는 3,350 = 69.79%다. 다음 첫 행동: Codex 검토. 전문 [[2026-09-28 48 task 진행률 재채점]].
+48 task 진행률 재채점 카드 99 (Claude, 2026-09-28, 분석 tree `95a59b24` = `origin/coord/train-ci-2150`, PR base `integration/all-agents-unified`, docs-only, **v1.2**): 09-18과 같은 rubric(48×0/25/50/75/100, 분모 4,800)으로 재채점했다. **결론: 09-18 baseline 2,800 → 병합 후보 tree 3,350 / 4,800 = 69.79%**(+550, +11.46%p), 올린 행 18·내린 행 0, **48 중 34개가 75점**이고 그 천장은 우리 코드가 아니라 운영 인수·외부 자산이 만든다. 100점은 S01-FE·S01-DB 둘뿐이다. **v1.0·v1.1의 사실 오류 네 건을 v1.2에서 정정했다** — (1) "task별 baseline 없음"은 거짓이었다(`Evidence/development-progress-storage-check-20260912.json`에 48행·2,775가 있고 markdown만 검색한 내 실수다), (2) 그 결과 `S04-ST`·`S06-ST`를 근거 없이 75→50으로 내렸다(baseline 근거가 train tree에 그대로 있어 복원), (3) `main` 점수 열(1,950=40.62%)이 나중의 closure를 09-10 시점에 소급 사용해 **열과 28.65%p 격차 주장을 삭제**했다(병합 격차는 재고 수치로만 남겼다), (4) 75 승격이 rubric의 "관련 시험" 조건을 만족하지 않아 **올린 모든 행에 task 고유 시험을 결속**하고 결속 못 한 `S08-BE`는 baseline 50을 유지했다. 네 건 모두 **영역 단위 추정을 행 단위 증거보다 먼저 믿은** 같은 습관에서 나왔다. `#217`이 든 tree에서는 `S11-BE`가 50→75여서 3,375 = 70.31%다. 다음 첫 행동: Codex 재검토. 전문 [[2026-09-28 48 task 진행률 재채점]].
 
 hosted Core junit로 S04/05/07-DB 케이스 수치 보강 카드 12 (Claude, 2026-09-22, 읽기 전용): artifact `saintvision-core-evidence`(run 35706465645 `3d1892c0` + proof 35714470445 `f2aa2b14`)를 .work/ci-junit에 받아(바이너리 삭제 후 1.4MB) 파일별 수치(core 2948/58/0·shard-recovery 21·containment 28·workspace 22·business-handoff 17·lan-installer 15·docker-host 2, f2aa2b14는 core 2998/58/0 외 동일)와 카드 10의 hosted-only 항목 케이스 이름을 classname으로 추출 — 재전송 hash(output_ingestion 5·node_delivery 18·results 21), placement Explain(placement 12), shard replacement 21, containment 28, workspace 복구 12+11, 노드 스토리지 전송 27 — **전부 passed**. hosted에도 없는 것(AC-05 결정성/P95·AC-07 60초/95%·CX01)은 그대로 물리/5노드 대기로 명시. 패키지 §C-2 + 검증상태지도 §12 보강. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 
