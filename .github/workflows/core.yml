@@ -210,6 +210,7 @@ jobs:
               'PowerShell and csc.exe shim require Windows': 1,
               'Actual Windows PowerShell launcher': 10,
               'Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)': 1,
+              'run only through tools/placement_lock_wait_diagnostic.py': 1,
               'CX01_CONTAINER is unset; container identity/ownership cannot be verified': 19,
               'claude is not installed on this machine': 1,
               'codex is not installed on this machine': 1,
