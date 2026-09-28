@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.126"
+version: "1.0.127"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-28T18:58:00+09:00"
+updated: "2026-09-29T01:44:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,41 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-28T18:58:00+09:00 (최신 tip `agent/gemini/s10-fe-conformance-status`).
+- 확인 기준: 2026-09-29T01:44:00+09:00 (최신 tip `agent/gemini/g03-fe-stage2`, 카드 115 G-03 2단계 conformance 관측 화면 및 단건 라우트 연동 완결).
+
+## 2026-09-29 G-03 FE 2단계 어댑터 Conformance 관측 화면 및 단건 라우트 연동 (카드 115, PR #221 대응)
+
+- **작업 브랜치**: `agent/gemini/g03-fe-stage2` (base: `agent/claude/g03-conformance-stage2-impl` head `2f853a94`).
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude, Codex.
+- **작업 내용 (카드 115 전수 완결)**:
+  1. **Discriminated Union 계약 수용 및 런타임 가드**:
+     - `ConformanceStatusUnion` (`NOT_OBSERVED` | `RECORDED`) 및 `AdapterConformanceUnion` 구현.
+     - `isConformanceStatusRecordedResponse`, `isAdapterConformanceNotObservedResponse`, `isAdapterConformanceRecordedResponse` strict 가드 구현.
+     - `subject: fixture-adapter`, `provenance: in-server`, `total === passed + failed + skipped`, `outcomes.length === total`, outcome `!(passed && skipped)` 계약 불변식 강제.
+  2. **목록 화면 RECORDED 분기 및 실행 기록 노출**:
+     - `NOT_OBSERVED` 시 신규 reason (`No conformance run is recorded for this host and these adapters.`) 표출.
+     - `RECORDED` 시 `latestRecordedAt` 및 어댑터별 `records` 테이블 표출 (`data-testid="conformance-records-table"`).
+     - 허위 PASS/100% 라벨 없이 `subject`/`provenance`/카운트 서버 정본 그대로 표출.
+  3. **단건 어댑터 Conformance 라우트 및 상세 조회 UI**:
+     - `fetchAdapterConformance(projectId, adapterName)` API 연동 (`GET /v1/projects/{projectId}/adapters/{name}/conformance`).
+     - 목록 테이블에서 어댑터별 상세 드릴다운 및 독립된 단건 어댑터 입력폼 제공.
+     - 단건 결과 표출 카드 (`data-testid="single-conformance-result-container"`).
+  4. **RFC 9457 Fail-Closed 오류 처리**:
+     - 404 `RES-0004`: "어댑터 없음" (입력값 미에코, 재시도 버튼 미노출).
+     - 500 `SYS-0002`: 서버 host identity 미설정 고정 안내 (재시도 버튼 미노출).
+     - 503 `SYS-0001`: 리소스 잠금 안내 및 "다시 시도" 버튼 (`data-testid="single-conformance-retry-btn"`) 표출.
+     - 계약 불일치: fail-closed 에러 배너.
+  5. **상태 격리 (State Isolation)**:
+     - 단건 어댑터 입력 변경 시 단건 결과 초기화, 프로젝트 입력 변경 시 목록 및 단건 결과 동시 초기화.
+  6. **단위 및 통합 테스트**:
+     - `tests/model-lineage.test.ts`에 32개 시험 완비 및 전수 통과.
+- **실측 검증 증거**:
+  - Vitest: `tests/model-lineage.test.ts` 32 passed, 전체 78 test files / 716 tests passed (0 failures).
+  - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist/ 825.35 kB 생성 성공.
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed.
+  - 무결성 도구: `check_frontend_integrity.py` 85 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --check` PASS (0 conflicts).
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-29_01-44-00_KST_G03_Stage2_FE_Gemini.md` (v1.0.0).
 
 ## 2026-09-28 S10-FE 어댑터 conformance 관측 화면 새 API(G-03 1단계) 연동 및 Claude UI·Codex 계약 리뷰 전수 반영 (agent/gemini/s10-fe-conformance-status)
 

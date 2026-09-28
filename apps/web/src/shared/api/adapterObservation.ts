@@ -5,6 +5,8 @@ import type {
   ConformanceRecordItem,
   ConformanceCheckOutcome,
 } from '@/contracts/conformance-status-recorded-response';
+import type { AdapterConformanceNotObservedResponse } from '@/contracts/adapter-conformance-not-observed-response';
+import type { AdapterConformanceRecordedResponse } from '@/contracts/adapter-conformance-recorded-response';
 
 /**
  * The list route's response is a discriminated union on `status` (G-03 stage two,
@@ -12,6 +14,15 @@ import type {
  * recorded, or the RECORDED branch with `records[]` and `latestRecordedAt`.
  */
 export type ConformanceStatusUnion = ConformanceStatusResponse | ConformanceStatusRecordedResponse;
+
+/**
+ * The single-adapter route's response is a discriminated union on `status` (G-03 stage two,
+ * design #218 v1.2 §4-3): NOT_OBSERVED with single adapter descriptor checks or
+ * RECORDED with full outcomes report and counts.
+ */
+export type AdapterConformanceUnion =
+  | AdapterConformanceNotObservedResponse
+  | AdapterConformanceRecordedResponse;
 
 const CONFORMANCE_STATUS_KEYS = new Set([
   'status',
@@ -34,6 +45,32 @@ const CONFORMANCE_RECORDED_KEYS = new Set([
 ]);
 
 const RECORD_ITEM_KEYS = new Set([
+  'adapter',
+  'subject',
+  'provenance',
+  'contractVersion',
+  'suiteContractVersion',
+  'total',
+  'passed',
+  'failed',
+  'skipped',
+  'outcomes',
+  'recordedAt',
+]);
+
+const ADAPTER_NOT_OBSERVED_KEYS = new Set([
+  'status',
+  'reason',
+  'scope',
+  'adapter',
+  'contractVersion',
+  'checks',
+  'recordedAt',
+]);
+
+const ADAPTER_RECORDED_KEYS = new Set([
+  'status',
+  'scope',
   'adapter',
   'subject',
   'provenance',
@@ -187,6 +224,72 @@ export function isConformanceStatusUnion(value: unknown): value is ConformanceSt
 }
 
 /**
+ * Strict runtime schema guard for single adapter NOT_OBSERVED response
+ * (contracts/adapter-conformance-not-observed-response.schema.json).
+ */
+export function isAdapterConformanceNotObservedResponse(
+  value: unknown
+): value is AdapterConformanceNotObservedResponse {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const o = value as Record<string, unknown>;
+  if (!hasExactKeys(o, ADAPTER_NOT_OBSERVED_KEYS)) return false;
+
+  if (o.status !== 'NOT_OBSERVED') return false;
+  if (typeof o.reason !== 'string' || o.reason.length < 1 || o.reason.length > 300) return false;
+  if (o.scope !== 'control-plane-host') return false;
+  if (typeof o.adapter !== 'string' || o.adapter.length < 1 || o.adapter.length > 64) return false;
+  if (!isVersionString(o.contractVersion)) return false;
+  if (!Array.isArray(o.checks) || !o.checks.every(isConformanceCheckDescriptor)) return false;
+  if (o.recordedAt !== null) return false;
+
+  return true;
+}
+
+/**
+ * Strict runtime schema guard for single adapter RECORDED response
+ * (contracts/adapter-conformance-recorded-response.schema.json).
+ */
+export function isAdapterConformanceRecordedResponse(
+  value: unknown
+): value is AdapterConformanceRecordedResponse {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const o = value as Record<string, unknown>;
+  if (!hasExactKeys(o, ADAPTER_RECORDED_KEYS)) return false;
+
+  if (o.status !== 'RECORDED') return false;
+  if (o.scope !== 'control-plane-host') return false;
+  if (typeof o.adapter !== 'string' || o.adapter.length < 1 || o.adapter.length > 64) return false;
+  if (o.subject !== 'fixture-adapter') return false;
+  if (o.provenance !== 'in-server') return false;
+  if (!isVersionString(o.contractVersion) || !isVersionString(o.suiteContractVersion)) return false;
+
+  const { total, passed, failed, skipped, outcomes, recordedAt } = o;
+  if (!isCount(total) || !isCount(passed) || !isCount(failed) || !isCount(skipped)) return false;
+  if (!Array.isArray(outcomes) || !outcomes.every(isConformanceCheckOutcome)) return false;
+  if (!isAwareDateTime(recordedAt)) return false;
+
+  const items = outcomes as ConformanceCheckOutcome[];
+  if (passed + failed + skipped !== total) return false;
+  if (items.length !== total) return false;
+  const recount = {
+    passed: items.filter((x) => x.passed && !x.skipped).length,
+    failed: items.filter((x) => !x.passed && !x.skipped).length,
+    skipped: items.filter((x) => x.skipped).length,
+  };
+  if (recount.passed !== passed || recount.failed !== failed || recount.skipped !== skipped) return false;
+
+  return true;
+}
+
+/** Either branch of the single adapter route, told apart by `status`. */
+export function isAdapterConformanceUnion(value: unknown): value is AdapterConformanceUnion {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const status = (value as Record<string, unknown>).status;
+  if (status === 'RECORDED') return isAdapterConformanceRecordedResponse(value);
+  return isAdapterConformanceNotObservedResponse(value);
+}
+
+/**
  * Fetch adapter conformance status from control-plane.
  * Endpoint: GET /v1/projects/{project_id}/adapters/conformance
  * Conforms to G-03 (stage one NOT_OBSERVED shape, stage two RECORDED branch) and the
@@ -210,6 +313,41 @@ export async function fetchConformanceStatus(
 
   if (!isConformanceStatusUnion(result)) {
     throw new Error('ConformanceStatusResponse 응답 계약 불일치');
+  }
+
+  return result;
+}
+
+/**
+ * Fetch single adapter conformance status from control-plane.
+ * Endpoint: GET /v1/projects/{project_id}/adapters/{name}/conformance
+ * Conforms to G-03 stage two single-adapter contract pair:
+ * contracts/adapter-conformance-not-observed-response.schema.json and
+ * contracts/adapter-conformance-recorded-response.schema.json.
+ */
+export async function fetchAdapterConformance(
+  projectId: string,
+  adapterName: string,
+  signal?: AbortSignal
+): Promise<AdapterConformanceUnion> {
+  const p = projectId?.trim();
+  if (!p) {
+    throw new Error('프로젝트 ID를 확인하세요.');
+  }
+  const a = adapterName?.trim();
+  if (!a) {
+    throw new Error('어댑터 이름을 확인하세요.');
+  }
+
+  const encodedProject = encodeURIComponent(p);
+  const encodedAdapter = encodeURIComponent(a);
+  const result = await apiClient<unknown>(
+    `/v1/projects/${encodedProject}/adapters/${encodedAdapter}/conformance`,
+    { method: 'GET', signal }
+  );
+
+  if (!isAdapterConformanceUnion(result)) {
+    throw new Error('AdapterConformanceResponse 응답 계약 불일치');
   }
 
   return result;

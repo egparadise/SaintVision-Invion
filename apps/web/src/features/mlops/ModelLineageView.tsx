@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ModelLineage, ModelCommitObservation } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { fetchModelCommitment } from '@/shared/api/modelCommitmentObservation';
-import { fetchConformanceStatus, type ConformanceStatusUnion } from '@/shared/api/adapterObservation';
+import { fetchConformanceStatus, fetchAdapterConformance, type ConformanceStatusUnion, type AdapterConformanceUnion } from '@/shared/api/adapterObservation';
 import { MlopsManager } from './mlopsEngine';
 
 /** Per-check tally across the recorded adapters, from the server's outcomes only. */
@@ -91,6 +91,67 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       }
     } finally {
       setConformanceLoading(false);
+    }
+  };
+
+  // Single adapter conformance observation state (G-03 stage two single route)
+  const [singleAdapterName, setSingleAdapterName] = useState('codex-cli');
+  const [singleConformanceData, setSingleConformanceData] = useState<AdapterConformanceUnion | null>(null);
+  const [singleConformanceLoading, setSingleConformanceLoading] = useState(false);
+  const [singleConformanceError, setSingleConformanceError] = useState<{
+    code?: string;
+    status?: number;
+    title?: string;
+    detail: string;
+    retryable?: boolean;
+  } | null>(null);
+
+  const handleFetchSingleConformance = async (e?: React.FormEvent, targetAdapter?: string) => {
+    if (e) e.preventDefault();
+    const adapterToFetch = (targetAdapter !== undefined ? targetAdapter : singleAdapterName).trim();
+    if (!conformanceProjectId.trim() || !adapterToFetch) {
+      return;
+    }
+    setSingleConformanceLoading(true);
+    setSingleConformanceError(null);
+    setSingleConformanceData(null);
+    try {
+      const data = await fetchAdapterConformance(conformanceProjectId.trim(), adapterToFetch);
+      setSingleConformanceData(data);
+    } catch (err: any) {
+      setSingleConformanceData(null);
+      const prob = err?.problem;
+      if (prob) {
+        let safeDetail = prob.detail || '요청이 거절되었습니다.';
+        if (prob.code === 'RES-0004') {
+          safeDetail = '어댑터 없음';
+        } else if (/<[a-z][\s\S]*>/i.test(safeDetail)) {
+          safeDetail = '서버 게이트웨이 또는 프록시 오류가 발생했습니다. (HTML 응답 수신)';
+        } else if (prob.status && prob.status >= 500 && prob.category === 'NET') {
+          safeDetail = '서버 내부 오류 또는 업스트림 통신 장애가 발생했습니다.';
+        }
+        setSingleConformanceError({
+          code: prob.code,
+          status: prob.status,
+          title: prob.title,
+          detail: safeDetail,
+          retryable: prob.retryable === true,
+        });
+      } else {
+        const isContractMismatch = err?.message && err.message.includes('계약 불일치');
+        let fallbackMessage = err?.message || '네트워크 오류가 발생했습니다.';
+        if (/<[a-z][\s\S]*>/i.test(fallbackMessage)) {
+          fallbackMessage = '서버 또는 프록시 오류가 발생했습니다.';
+        }
+        setSingleConformanceError({
+          detail: isContractMismatch
+            ? `클라이언트 응답 계약 검증 실패: ${err.message}`
+            : fallbackMessage,
+          retryable: false,
+        });
+      }
+    } finally {
+      setSingleConformanceLoading(false);
     }
   };
 
@@ -569,7 +630,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
           <div>
             <h4 style={{ margin: 0, fontSize: '15px', color: '#f0f6fc' }}>
-              Multi-LLM Provider Adapter Conformance (G-03 1단계 API 연동)
+              Multi-LLM Provider Adapter Conformance (G-03 2단계 API 연동)
             </h4>
             <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
               컨트롤 플레인 호스트의 실제 어댑터 적합성 상태를 조회합니다. 저장된 기록이 없으면 정직하게 <code style={{ color: '#e3b341' }}>NOT_OBSERVED</code>(미측정)와 정본 체크리스트 규격을, 기록이 있으면 <code style={{ color: '#e3b341' }}>RECORDED</code>와 어댑터별 기록을 반환합니다. 기록의 측정 대상은 설치된 CLI가 아니라 제품 fixture adapter입니다(<code>subject: fixture-adapter</code>).
@@ -587,7 +648,13 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             data-testid="conformance-project-input"
             placeholder="Project ID (prj_...)"
             value={conformanceProjectId}
-            onChange={(e) => setConformanceProjectId(e.target.value)}
+            onChange={(e) => {
+              setConformanceProjectId(e.target.value);
+              setConformanceData(null);
+              setConformanceError(null);
+              setSingleConformanceData(null);
+              setSingleConformanceError(null);
+            }}
             style={{
               padding: '6px 10px',
               backgroundColor: '#0d1117',
@@ -795,6 +862,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                       <th scope="col" style={{ padding: '8px' }}>Contract / Suite</th>
                       <th scope="col" style={{ padding: '8px' }}>결과 (전체 · 통과 · 실패 · 건너뜀)</th>
                       <th scope="col" style={{ padding: '8px' }}>Recorded At</th>
+                      <th scope="col" style={{ padding: '8px' }}>단건 조회</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -822,6 +890,19 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                         </td>
                         <td style={{ padding: '8px', color: '#8b949e' }}>
                           <span data-testid={`conformance-record-recorded-at-${idx}`}>{record.recordedAt}</span>
+                        </td>
+                        <td style={{ padding: '8px' }}>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            data-testid={`conformance-inspect-btn-${idx}`}
+                            onClick={() => {
+                              setSingleAdapterName(record.adapter);
+                              handleFetchSingleConformance(undefined, record.adapter);
+                            }}
+                          >
+                            단건 상세 조회
+                          </Button>
                         </td>
                       </tr>
                     ))}
@@ -900,6 +981,370 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             </div>
           </div>
         )}
+
+        {/* Single Adapter Conformance Observation Section (GET /v1/projects/:projectId/adapters/:name/conformance) */}
+        <div
+          data-testid="single-adapter-conformance-section"
+          style={{
+            marginTop: '24px',
+            paddingTop: '20px',
+            borderTop: '1px solid #30363d',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px',
+          }}
+        >
+          <div>
+            <h5 style={{ margin: 0, fontSize: '14px', color: '#f0f6fc' }}>
+              단건 어댑터 Conformance 조회 (Single Route)
+            </h5>
+            <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
+              엔드포인트 <code>GET /v1/projects/:projectId/adapters/:name/conformance</code>를 통해 개별 어댑터의 정본 체크리스트 규격 또는 상세 테스트 결과를 조회합니다.
+            </p>
+          </div>
+
+          <form
+            onSubmit={handleFetchSingleConformance}
+            style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}
+          >
+            <input
+              type="text"
+              data-testid="single-conformance-adapter-input"
+              placeholder="Adapter Name (e.g. codex-cli)"
+              value={singleAdapterName}
+              onChange={(e) => {
+                setSingleAdapterName(e.target.value);
+                setSingleConformanceData(null);
+                setSingleConformanceError(null);
+              }}
+              style={{
+                padding: '6px 10px',
+                backgroundColor: '#0d1117',
+                border: '1px solid #30363d',
+                borderRadius: '6px',
+                color: '#c9d1d9',
+                fontSize: '13px',
+                fontFamily: 'var(--font-mono, monospace)',
+                minWidth: '200px',
+              }}
+            />
+            <Button
+              size="sm"
+              variant="primary"
+              type="submit"
+              data-testid="single-conformance-fetch-btn"
+              disabled={singleConformanceLoading || !conformanceProjectId.trim() || !singleAdapterName.trim()}
+            >
+              {singleConformanceLoading ? '조회 중...' : '어댑터 Conformance 조회'}
+            </Button>
+          </form>
+
+          {/* Live Region for Single Conformance Status Announcements */}
+          <div
+            data-testid="single-conformance-live-status"
+            role="status"
+            aria-live="polite"
+            style={
+              singleConformanceLoading || singleConformanceError || singleConformanceData
+                ? {
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    fontWeight: 500,
+                    backgroundColor: singleConformanceLoading
+                      ? 'rgba(56, 139, 253, 0.15)'
+                      : singleConformanceError
+                      ? 'rgba(248, 81, 73, 0.15)'
+                      : 'rgba(240, 136, 62, 0.15)',
+                    border: `1px solid ${
+                      singleConformanceLoading
+                        ? '#58a6ff'
+                        : singleConformanceError
+                        ? '#ff7b72'
+                        : '#f0883e'
+                    }`,
+                    color: singleConformanceLoading
+                      ? '#58a6ff'
+                      : singleConformanceError
+                      ? '#ff7b72'
+                      : '#f0883e',
+                  }
+                : undefined
+            }
+          >
+            {singleConformanceLoading && `⏳ [${singleAdapterName}] 어댑터 Conformance 상태 조회 중...`}
+            {singleConformanceError && `❌ [${singleAdapterName}] 어댑터 Conformance 조회 실패`}
+            {!singleConformanceLoading &&
+              !singleConformanceError &&
+              singleConformanceData &&
+              (singleConformanceData.status === 'RECORDED'
+                ? `ℹ️ [${singleConformanceData.adapter}] 조회 완료: 기록됨(RECORDED) (총 ${singleConformanceData.total}개 테스트 완료)`
+                : `ℹ️ [${singleConformanceData.adapter}] 조회 완료: 미측정(NOT_OBSERVED) (${singleConformanceData.checks.length}개 정본 체크 항목)`)}
+          </div>
+
+          {/* Single Conformance Error Banner on ProblemDetails (401, 403, 404 RES-0004, 500 SYS-0002, 503 SYS-0001) */}
+          {singleConformanceError && (
+            <div
+              role="alert"
+              data-testid="single-conformance-error-banner"
+              style={{
+                padding: '10px 14px',
+                borderRadius: '6px',
+                fontSize: '13px',
+                backgroundColor: 'rgba(248, 81, 73, 0.15)',
+                border: '1px solid #ff7b72',
+                color: '#ff7b72',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '8px',
+              }}
+            >
+              <div>
+                ❌ {singleConformanceError.code && singleConformanceError.status
+                  ? `[${singleConformanceError.code}] (${singleConformanceError.status}) `
+                  : ''}
+                {singleConformanceError.detail}
+                {singleConformanceError.retryable === false && (
+                  <span style={{ marginLeft: '8px', fontSize: '11px', color: '#8b949e' }}>
+                    (재시도 불가)
+                  </span>
+                )}
+              </div>
+              {singleConformanceError.retryable && (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  data-testid="single-conformance-retry-btn"
+                  onClick={() => handleFetchSingleConformance()}
+                >
+                  다시 시도
+                </Button>
+              )}
+            </div>
+          )}
+
+          {/* Single Conformance Result Container */}
+          {singleConformanceData && (
+            <div
+              data-testid="single-conformance-result-container"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '14px',
+              }}
+            >
+              {/* Metadata Grid */}
+              <div
+                style={{
+                  backgroundColor: '#0d1117',
+                  border: '1px solid #30363d',
+                  borderRadius: '6px',
+                  padding: '14px',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                  gap: '10px',
+                  fontSize: '13px',
+                }}
+              >
+                <div>
+                  <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>CONFORMANCE STATUS</span>
+                  <span
+                    data-testid="single-conformance-status-badge"
+                    style={{
+                      display: 'inline-block',
+                      marginTop: '4px',
+                      padding: '2px 8px',
+                      borderRadius: '4px',
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      backgroundColor:
+                        singleConformanceData.status === 'RECORDED'
+                          ? 'rgba(56, 139, 253, 0.15)'
+                          : 'rgba(240, 136, 62, 0.15)',
+                      color: singleConformanceData.status === 'RECORDED' ? '#58a6ff' : '#f0883e',
+                    }}
+                  >
+                    {singleConformanceData.status === 'RECORDED' ? '기록됨 (RECORDED)' : `미측정 (${singleConformanceData.status})`}
+                  </span>
+                </div>
+                <div>
+                  <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>ADAPTER</span>
+                  <code data-testid="single-conformance-adapter" style={{ color: '#f0f6fc', fontWeight: 600 }}>
+                    {singleConformanceData.adapter}
+                  </code>
+                </div>
+                <div>
+                  <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>SCOPE</span>
+                  <code data-testid="single-conformance-scope" style={{ color: '#58a6ff' }}>
+                    {singleConformanceData.scope}
+                  </code>
+                </div>
+                <div>
+                  <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>CONTRACT VERSION</span>
+                  <span data-testid="single-conformance-contract-version" style={{ color: '#c9d1d9', fontFamily: 'var(--font-mono, monospace)' }}>
+                    {singleConformanceData.contractVersion}
+                  </span>
+                </div>
+
+                {singleConformanceData.status === 'NOT_OBSERVED' ? (
+                  <>
+                    <div>
+                      <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>RECORDED AT</span>
+                      <span data-testid="single-conformance-recorded-at" style={{ color: '#8b949e' }}>
+                        null (미측정)
+                      </span>
+                    </div>
+                    <div style={{ gridColumn: '1 / -1' }}>
+                      <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>REASON</span>
+                      <span data-testid="single-conformance-reason" style={{ color: '#c9d1d9' }}>
+                        {singleConformanceData.reason}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>SUBJECT / PROVENANCE</span>
+                      <span data-testid="single-conformance-subject" style={{ color: '#c9d1d9' }}>
+                        {singleConformanceData.subject} / {singleConformanceData.provenance}
+                      </span>
+                    </div>
+                    <div>
+                      <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>SUITE CONTRACT VERSION</span>
+                      <span data-testid="single-conformance-suite-contract-version" style={{ color: '#c9d1d9', fontFamily: 'var(--font-mono, monospace)' }}>
+                        {singleConformanceData.suiteContractVersion}
+                      </span>
+                    </div>
+                    <div>
+                      <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>RESULTS</span>
+                      <span data-testid="single-conformance-counts" style={{ color: '#f0f6fc', fontWeight: 600 }}>
+                        {`전체 ${singleConformanceData.total} · 통과 ${singleConformanceData.passed} · 실패 ${singleConformanceData.failed} · 건너뜀 ${singleConformanceData.skipped}`}
+                      </span>
+                    </div>
+                    <div>
+                      <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>RECORDED AT</span>
+                      <span data-testid="single-conformance-recorded-at" style={{ color: '#8b949e' }}>
+                        {singleConformanceData.recordedAt}
+                      </span>
+                    </div>
+                    <div style={{ gridColumn: '1 / -1' }}>
+                      <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>SUBJECT NOTE</span>
+                      <span data-testid="single-conformance-subject-note" style={{ color: '#c9d1d9' }}>
+                        fixture-adapter · in-server — 제품 fixture adapter에 대한 suite 실행 기록이며 설치된 CLI의 적합성이 아닙니다.
+                      </span>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* When NOT_OBSERVED: Render Checks Descriptors */}
+              {singleConformanceData.status === 'NOT_OBSERVED' && (
+                <div style={{ overflowX: 'auto' }}>
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#f0f6fc', marginBottom: '8px' }}>
+                    정본 Conformance Checklist ({singleConformanceData.checks.length}개 항목)
+                  </div>
+                  <table
+                    data-testid="single-conformance-checks-table"
+                    style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}
+                  >
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
+                        <th scope="col" style={{ padding: '8px' }}>#</th>
+                        <th scope="col" style={{ padding: '8px' }}>Check Name</th>
+                        <th scope="col" style={{ padding: '8px' }}>Capability Gated</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {singleConformanceData.checks.map((check, idx) => (
+                        <tr
+                          key={`${idx}-${check.name}`}
+                          data-testid={`single-conformance-check-row-${idx}`}
+                          style={{ borderBottom: '1px solid #21262d' }}
+                        >
+                          <td style={{ padding: '8px', color: '#8b949e' }}>{idx + 1}</td>
+                          <td style={{ padding: '8px', fontWeight: 600, color: '#f0f6fc', fontFamily: 'var(--font-mono, monospace)' }}>
+                            <span data-testid={`single-conformance-check-name-${idx}`}>{check.name}</span>
+                          </td>
+                          <td style={{ padding: '8px' }}>
+                            <span
+                              data-testid={`single-conformance-check-gated-${idx}`}
+                              style={{
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                fontSize: '11px',
+                                fontWeight: 600,
+                                backgroundColor: check.capabilityGated ? 'rgba(56, 139, 253, 0.15)' : 'rgba(160, 168, 178, 0.15)',
+                                color: check.capabilityGated ? '#58a6ff' : '#a0a8b2',
+                              }}
+                            >
+                              {check.capabilityGated ? 'Capability Gated' : 'Standard'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* When RECORDED: Render Detailed Outcomes */}
+              {singleConformanceData.status === 'RECORDED' && (
+                <div style={{ overflowX: 'auto' }}>
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#f0f6fc', marginBottom: '8px' }}>
+                    상세 체크 결과 ({singleConformanceData.outcomes.length}개 항목)
+                  </div>
+                  <table
+                    data-testid="single-conformance-outcomes-table"
+                    style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}
+                  >
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
+                        <th scope="col" style={{ padding: '8px' }}>#</th>
+                        <th scope="col" style={{ padding: '8px' }}>Check Name</th>
+                        <th scope="col" style={{ padding: '8px' }}>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {singleConformanceData.outcomes.map((outcome, idx) => (
+                        <tr
+                          key={`${idx}-${outcome.name}`}
+                          data-testid={`single-conformance-outcome-row-${idx}`}
+                          style={{ borderBottom: '1px solid #21262d' }}
+                        >
+                          <td style={{ padding: '8px', color: '#8b949e' }}>{idx + 1}</td>
+                          <td style={{ padding: '8px', fontWeight: 600, color: '#f0f6fc', fontFamily: 'var(--font-mono, monospace)' }}>
+                            <span data-testid={`single-conformance-outcome-name-${idx}`}>{outcome.name}</span>
+                          </td>
+                          <td style={{ padding: '8px' }}>
+                            <span
+                              data-testid={`single-conformance-outcome-status-${idx}`}
+                              style={{
+                                padding: '2px 8px',
+                                borderRadius: '4px',
+                                fontSize: '11px',
+                                fontWeight: 600,
+                                backgroundColor: outcome.skipped
+                                  ? 'rgba(139, 148, 158, 0.15)'
+                                  : outcome.passed
+                                  ? 'rgba(56, 139, 253, 0.15)'
+                                  : 'rgba(248, 81, 73, 0.15)',
+                                color: outcome.skipped ? '#8b949e' : outcome.passed ? '#58a6ff' : '#ff7b72',
+                              }}
+                            >
+                              {outcome.skipped ? '건너뜀 (Skipped)' : outcome.passed ? '통과 (Passed)' : '실패 (Failed)'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Real Model Commitment Observation Panel (Control-Plane GET /v1/.../commitment) */}
