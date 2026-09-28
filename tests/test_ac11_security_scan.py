@@ -150,6 +150,13 @@ def test_complete_zero_finding_report_is_measured_pass_and_redacted(source):
     assert "more_info" not in serialized
 
 
+def test_workflow_redaction_checks_fields_not_benign_path_substrings():
+    workflow = (ROOT / ".github/workflows/ac11-security-scan.yml").read_text(encoding="utf-8")
+    assert "forbidden_keys =" in workflow
+    assert "assert_redacted(report)" in workflow
+    assert "name in lowered" not in workflow
+
+
 def test_pip_audit_vulnerability_is_conservatively_high_and_cannot_be_ignored(source):
     source["pip"].write_text(
         json.dumps(

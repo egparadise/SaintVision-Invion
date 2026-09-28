@@ -7,7 +7,7 @@
   },
   "workflow": {
     "path": ".github/workflows/ac11-security-scan.yml",
-    "blob": "f0400d21c0d59803161323a5d036a4bea69c8366"
+    "blob": "84dea5d4bd61654d58eff06585284b7c75e5b996"
   },
   "importer": {
     "path": "tools/import_ac11_security_scan.py",
