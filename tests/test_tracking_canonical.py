@@ -126,6 +126,32 @@ def test_canonical_bytes_are_compact_sorted_utf8_json():
     assert canonical_bytes({"z": "é", "a": [1, "b"]}) == '{"a":[1,"b"],"z":"é"}'.encode("utf-8")
 
 
+def test_canonicalization_is_idempotent_including_non_integral_float_metrics():
+    """hosted 36375872884: the hook canonicalises, then hashes the canonical form again."""
+    payload = {
+        "params": {"x": 0.1, "n": 2.0},
+        "tags": {"k": "v"},
+        "metrics": [{"key": "category.a.mean_score", "value": 0.9, "step": 0, "timestamp_ms": 5},
+                    {"key": "rate", "value": 1.0, "step": 0, "timestamp_ms": 5}],
+    }
+    once = canonical.canonical_payload(payload)
+    assert once["metrics"][0]["value"] == "0.9" and once["metrics"][1]["value"] == 1
+    twice = canonical.canonical_payload(once)
+    assert twice == once
+    assert payload_sha256(once) == payload_sha256(payload) == payload_sha256(twice)
+    # Only a float's exact repr is accepted back; any other string is not numeric.
+    for bad in ("0.90", " 0.9", "abc", "1e3", "nan", "inf"):
+        with pytest.raises(CanonicalizationError):
+            canonical.canonical_payload({"metrics": [{"key": "m", "value": bad}]})
+
+
+def test_the_pair_predicate_is_null_safe():
+    """A failure status with a NULL code must fail the CHECK, not pass through NULL."""
+    predicate = codes.sql_pair_check()
+    assert "IS NOT DISTINCT FROM 'TRACK-0001'" in predicate
+    assert "error_code = 'TRACK" not in predicate
+
+
 def test_canonicalize_does_not_mutate_its_input():
     payload = {"b": {"y": None, "x": 1.0}, "a": [1]}
     before = repr(payload)

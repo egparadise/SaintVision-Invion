@@ -153,9 +153,12 @@ def check_pair(status: MirrorStatus | str, error_code: str | None) -> MirrorStat
 
 def sql_pair_check() -> str:
     """The SQL predicate that states the same pairs, for the migration and the model."""
+    # NULL-safe on purpose: ``error_code = 'TRACK-0001'`` is NULL (not false)
+    # when error_code is NULL, and a CHECK passes on NULL -- so a failure
+    # status with no code would slip through. IS NOT DISTINCT FROM is false.
     parts = []
     for status, code in STATUS_CODE_PAIRS.items():
-        clause = "error_code IS NULL" if code is None else f"error_code = '{code}'"
+        clause = "error_code IS NULL" if code is None else f"error_code IS NOT DISTINCT FROM '{code}'"
         parts.append(f"(status = '{status.value}' AND {clause})")
     return " OR ".join(parts)
 

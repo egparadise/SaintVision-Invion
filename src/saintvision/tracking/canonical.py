@@ -115,6 +115,17 @@ def canonical_metrics(metrics: list[dict[str, Any]]) -> list[dict[str, Any]]:
             if isinstance(number, bool) or not isinstance(number, int):
                 raise CanonicalizationError("unsupported-type", f"metric {name} must be an int")
         raw = metric["value"]
+        if isinstance(raw, str):
+            # Idempotence: a non-integral float became its ``repr`` on an
+            # earlier pass and comes back as exactly that string. Anything
+            # else that is a string is not a number.
+            try:
+                parsed = float(raw)
+            except ValueError:
+                parsed = None
+            if parsed is None or repr(parsed) != raw:
+                raise CanonicalizationError("unsupported-type", "metric value must be numeric")
+            raw = parsed
         if isinstance(raw, bool) or not isinstance(raw, (int, float)):
             raise CanonicalizationError("unsupported-type", "metric value must be numeric")
         value = canonicalize(raw)

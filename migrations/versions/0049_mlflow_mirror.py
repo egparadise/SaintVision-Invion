@@ -69,11 +69,14 @@ SUBJECT_KIND_MATCH = (
 )
 PROJECT_BOUND = "subject_kind = 'eval_run' OR project_id IS NOT NULL"
 #: Design §5, stated at this revision's moment (see module docstring).
+#: NULL-safe: ``=`` against a NULL error_code is NULL and a CHECK passes on
+#: NULL, so a failure status with no code would slip through; IS NOT DISTINCT
+#: FROM is false there (hosted run 36375872884 caught exactly that row).
 STATUS_CODE_PAIR = (
     "(status = 'mirrored' AND error_code IS NULL) OR "
-    "(status = 'unavailable' AND error_code = 'TRACK-0001') OR "
-    "(status = 'refused' AND error_code = 'TRACK-0002') OR "
-    "(status = 'mismatch' AND error_code = 'TRACK-0003')"
+    "(status = 'unavailable' AND error_code IS NOT DISTINCT FROM 'TRACK-0001') OR "
+    "(status = 'refused' AND error_code IS NOT DISTINCT FROM 'TRACK-0002') OR "
+    "(status = 'mismatch' AND error_code IS NOT DISTINCT FROM 'TRACK-0003')"
 )
 
 #: Every table in this revision is append-only for the application role.

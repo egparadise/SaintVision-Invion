@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-2026-09-28-S10-BE-MLFLOW-MIRROR-IMPL-1"
 title: "S10-BE MLflow 미러 구현 1단계 — TrackingSink 계약·run_tracking_conformance·ReferenceSink, TRACK-0001~0005 표, canonical payload/URI, migration 0049(intents·attempts·defects, append-only·RLS·CHECK), 정본 tx enqueue 훅, deliver_intent(FOR UPDATE·terminal 반환), PG-free 76 + 실 PG 42(hosted) (카드 bg)"
-version: "1.3.1"
+version: "1.3.2"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T12:59:25+09:00"
+updated: "2026-09-28T13:13:15+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -78,3 +78,9 @@ hosted Backend run **36373656210**(head 322488fb) = 3.12 **3138 passed / 47 skip
 ### 6.1 Codex r3 (v1.3.1, 2026-09-28T12:59:25+09:00) — 경쟁 시험 정정
 
 지적: 시험이 ModelVersion 2개를 config absent인 선행 tx에서 미리 commit하고 thread에서는 `enqueue_mirror`만 호출해 "canonical mutation과 mirror의 같은-tx 결속" 변이가 생존하며, `sleep(0.5)`는 B가 잠금에 도달했다는 신호가 아니다. 정정: 두 thread가 각각 **실제 `register_model_version`(훅 포함)을 자기 tx 안에서** 호출(version 1.0.0/`a`*64, 1.0.1/`b`*64). A는 등록 뒤 tx를 열어둔 채 대기. `_serialize_enqueue`를 감싼 wrapper가 thread B의 잠금 진입 직전에 event를 set → main이 그 신호를 기다린 뒤(0.3s 뒤 B 미완료·오류 없음 확인) A를 release. 기대 그대로: canonical row 2, subject intent 2, experiment 1, event 3 = intent 집합, 오류 0. 잠금 제거 변이(B가 experiment 중복 INSERT → 롤백)와 "canonical 먼저 commit 뒤 mirror 별도 tx" 변이가 각각 죽는다.
+
+### 6.2 hosted Backend run 36375872884(head 41256e4f) — 2 실패 수정 (v1.3.2, 2026-09-28T13:13:15+09:00)
+
+3.12 총계 **3224 passed / 47 skipped / 2 deselected / 2 failed**(3.14 동류). 둘 다 #172 자체 결함:
+- `test_finished_eval_run_…`: `enqueue_mirror`가 `canonical_payload(payload)` 뒤 `payload_sha256(canonical)`로 **canonical 형식을 다시 canonicalize**하는데, 비정수 float metric은 첫 pass에서 `repr` 문자열("0.9")이 되어 두 번째 pass의 "metric value must be numeric"에 걸렸다(멱등 아님). 수정: `canonical_metrics`가 **float의 정확한 repr 문자열만** 숫자로 되돌려 받음(그 밖 문자열·"0.90"·" 0.9"·"1e3"·"nan"은 거부). 시험: `canonical_payload(canonical_payload(p)) == canonical_payload(p)`, digest 3자 일치.
+- `test_attempt_check_constraints…[status=unavailable, error_code=NULL]` DID NOT RAISE: CHECK `error_code = 'TRACK-0001'`은 NULL에서 NULL이고 CHECK는 NULL을 통과시킨다. 수정: `sql_pair_check()`·0049 literal을 **`IS NOT DISTINCT FROM`**으로(NULL-safe). 시험: predicate에 `=` 비교 부재, literal == 생성값.
