@@ -5,9 +5,9 @@
       "targetId": "s11-st-hosted-storage-fault-soak-v0",
       "axis": "long-soak",
       "sourceDocument": {
-        "commit": "2ce66f2615c1f4a15d02f21b49bfceaff8e083bf",
+        "commit": "6e8b81ee7372952512f20d78f41f9d53b0152035",
         "path": "docs/vault/30_Development/S11-ST_손상_용량_backup_장애시험_설계.md",
-        "blob": "25a92da1abe429a55af4a569a370232828b7c970"
+        "blob": "cee9963d17fc11baf5d77fe69eda97224ea354b8"
       },
       "criteria": {
         "windowSeconds": {"operator": "gte", "value": 3600},
@@ -35,9 +35,9 @@
       "targetId": "s11-st-actual-pitr-archive-failure-v0",
       "axis": "actual-pitr-rpo-rto-retention",
       "sourceDocument": {
-        "commit": "2ce66f2615c1f4a15d02f21b49bfceaff8e083bf",
+        "commit": "6e8b81ee7372952512f20d78f41f9d53b0152035",
         "path": "docs/vault/30_Development/S11-ST_손상_용량_backup_장애시험_설계.md",
-        "blob": "25a92da1abe429a55af4a569a370232828b7c970"
+        "blob": "cee9963d17fc11baf5d77fe69eda97224ea354b8"
       },
       "criteria": {
         "consecutiveWeeklyRestoreSmokeWeeks": {"operator": "gte", "value": 2},
