@@ -1,11 +1,11 @@
 ---
 doc_id: "CLAUDE-S12-DB-AC12-EVIDENCE-COLLECTOR-DESIGN-001"
 title: "S12-DB AC-12 acceptance Evidence collector 설계 — operational_readiness(--acceptance-evidence)·pitr_readiness·pitr_opt_in_dry_run·desktop-browser proof의 출력을 고정 SHA에서 읽어 AC-12 항목별 PASS·FAIL·NOT_OBSERVED·BLOCKED_EXTERNAL로 나누는 collector (판정 논리 복제 없음, #127·#131과 같은 형식, 카드 aq)"
-version: "1.2.0"
+version: "1.3.0"
 status: "proposed-review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T10:23:47+09:00"
+updated: "2026-09-28T10:28:02+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -55,8 +55,8 @@ tags: ["S12-DB", "AC-12", "evidence", "collector", "operational-readiness", "pit
 
 | # | 우회 | 규칙 |
 |---|---|---|
-| F3' | 상호 `startswith([:12])` 비교가 1글자 `proof_sha`도 결속으로 인정 | `sha_binding`: proof sha와 번들 codeSha 모두 **소문자 hex 12~40자**(`^[0-9a-f]{12,40}$`, 대문자는 소문자로 정규화, full 40 권장)여야 하고 짧은 쪽이 긴 쪽의 접두여야 PASS. 1자·11자·비hex·41자·다른 40자 → NOT_OBSERVED(사유 명시) |
-| F4' | `--reachable-ref HEAD`가 raw 문자열로 `merge-base` 실행되어 항상 통과 | `resolve_remote_tracking_ref`: `refs/remotes/<remote>/<branch>` 또는 `<remote>/<branch>`(`git remote`에 있는 remote만)이고 `rev-parse --verify`로 commit에 풀려야 함. `HEAD`·local branch·tag·`refs/heads/*`·미설정 remote → `invalid-ref`(exit 2, opt-out으로도 통과 불가). stale 구분: `ls-remote --heads <remote> <branch>`의 live tip과 remote-tracking tip 비교 → `fresh`/`stale`/`unknown`(오프라인); **stale이면 도달 아님**, unknown은 기록. `provenance.remoteRefFreshness` |
+| F3' | 상호 `startswith([:12])` 비교가 1글자 `proof_sha`도 결속으로 인정 | `sha_binding`: proof sha와 번들 codeSha 모두 **원문 그대로 소문자 hex 12~40자**(`^[0-9a-f]{12,40}$`, **case folding 없음** — 대문자는 NOT_OBSERVED, full 40 권장)여야 하고 짧은 쪽이 긴 쪽의 접두여야 PASS. 1자·11자·비hex·대문자·41자·다른 40자 → NOT_OBSERVED(사유 명시) |
+| F4' | `--reachable-ref HEAD`가 raw 문자열로 `merge-base` 실행되어 항상 통과 | `resolve_remote_tracking_ref`: `refs/remotes/<remote>/<branch>` 또는 `<remote>/<branch>`(`git remote`에 있는 remote만)이고 `rev-parse --verify`로 commit에 풀려야 함. `HEAD`·local branch·tag·`refs/heads/*`·미설정 remote → `invalid-ref`(exit 2, opt-out으로도 통과 불가). live head 확인: `ls-remote --heads <remote> <branch>`의 live tip과 remote-tracking tip 비교 → `fresh`만 도달; `stale`(tip 상이)·`unverified`(ls-remote 무응답: 오프라인·인증·branch 없음) 모두 **도달 아님(fail-closed)**, 사유와 `provenance.remoteRefFreshness` 기록 |
 
 ## 2. 판정·산출·provenance
 

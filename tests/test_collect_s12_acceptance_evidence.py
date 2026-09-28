@@ -577,7 +577,7 @@ def test_f4_remote_reachability_reads_git_and_fails_closed_without_output(monkey
 @pytest.mark.parametrize("proof_sha, expected, why", [
     ("a", tool.NOT_OBSERVED, "not 12..40 lowercase hex"),                 # 1 char matched the old mutual-prefix check
     ("a" * 11, tool.NOT_OBSERVED, "not 12..40 lowercase hex"),            # 11 chars
-    ("A" * 12, tool.PASS, None),                                          # uppercase hex is normalised to lowercase
+    ("A" * 12, tool.NOT_OBSERVED, "not 12..40 lowercase hex"),            # uppercase is NOT folded: mutant that lowercases first must die
     ("g" * 12, tool.NOT_OBSERVED, "not 12..40 lowercase hex"),            # non-hex
     ("zz" + "a" * 38, tool.NOT_OBSERVED, "not 12..40 lowercase hex"),
     ("b" * 40, tool.NOT_OBSERVED, "different code SHA"),                  # a different full SHA
@@ -594,8 +594,12 @@ def test_f3_binding_requires_12_to_40_lowercase_hex_and_prefix_agreement(proof_s
         assert why in item["reason"]
 
 
-def test_f3_uppercase_hex_is_normalised_and_bundle_sha_is_validated_too():
-    assert tool.sha_binding("A" * 40, "a" * 40) == (True, None)
+def test_f3_uppercase_is_rejected_on_the_original_text_and_bundle_sha_is_validated_too():
+    """Kills the ``.lower()``-before-match mutant: an uppercase proof SHA is not a binding."""
+    ok, why = tool.sha_binding("A" * 40, "a" * 40)
+    assert not ok and "lowercase hex" in why
+    ok, why = tool.sha_binding("a" * 40, "A" * 40)
+    assert not ok and "bundle code sha" in why
     ok, why = tool.sha_binding("a" * 40, "not-a-sha")
     assert not ok and "bundle code sha" in why
     assert tool.sha_binding(None, "a" * 40)[0] is False
@@ -624,7 +628,7 @@ def test_f4_reachable_ref_accepts_only_verified_remote_tracking_refs(monkeypatch
     assert tool.remote_reachability("a" * 40, "refs/remotes/origin/integration/all-agents-unified")["reachable"] is True
 
 
-def test_f4_stale_remote_tracking_ref_does_not_count_and_unknown_freshness_is_recorded(monkeypatch):
+def test_f4_stale_or_unverifiable_remote_tracking_ref_does_not_count(monkeypatch):
     base = {
         ("remote",): ["origin"],
         ("rev-parse", "--verify", "--quiet", "refs/remotes/origin/x^{commit}"): ["c" * 40],
@@ -633,9 +637,10 @@ def test_f4_stale_remote_tracking_ref_does_not_count_and_unknown_freshness_is_re
     monkeypatch.setattr(tool, "_git_lines", _fake_git({**base, ("ls-remote", "--heads", "origin", "x"): ["d" * 40 + "\trefs/heads/x"]}))
     stale = tool.remote_reachability("a" * 40, "origin/x")
     assert stale["reachable"] is False and stale["freshness"] == "stale" and "stale" in stale["reason"]
-    monkeypatch.setattr(tool, "_git_lines", _fake_git(base))  # ls-remote gave nothing (offline)
-    unknown = tool.remote_reachability("a" * 40, "origin/x")
-    assert unknown["reachable"] is True and unknown["freshness"] == "unknown"
+    monkeypatch.setattr(tool, "_git_lines", _fake_git(base))  # ls-remote gave nothing (offline/auth/missing)
+    unverified = tool.remote_reachability("a" * 40, "origin/x")
+    assert unverified["reachable"] is False and unverified["freshness"] == "unverified"   # fail-closed, not reachable
+    assert "could not be verified" in unverified["reason"]
     monkeypatch.setattr(tool, "_git_ok", lambda *args: False)
     assert tool.remote_reachability("a" * 40, "origin/x")["reason"] == "not an ancestor"
 

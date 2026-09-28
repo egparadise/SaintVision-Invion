@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-2026-09-28-S12-DB-AC12-EVIDENCE-COLLECTOR"
 title: "S12-DB AC-12 acceptance Evidence collector — 설계 1쪽 + collector + PG-free 자기 시험 111 passed (기존 operational_readiness·pitr_readiness·pitr_opt_in_dry_run·browser proof 재사용, 판정 복제 없음, 카드 aq)"
-version: "1.2.0"
+version: "1.3.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T10:23:47+09:00"
+updated: "2026-09-28T10:28:02+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -31,6 +31,10 @@ F1 구조화 값 redaction + raw/escaped 검사(부정 시험 7 + walker 1), F2 
 ## 1c. Codex 재검토 잔여 2건 반영(head 663aad65 → 다음 head)
 
 F3' `sha_binding` 소문자 hex 12~40 + 접두 일치(부정 시험: 1자·11자·비hex·41자·다른 40자·대문자 정규화·번들 sha 검증), F4' `resolve_remote_tracking_ref`(HEAD·local·tag·refs/heads·미설정 remote 거부, `ls-remote` stale 구분, invalid-ref는 opt-out으로도 불가; 시험 3). PG-free **147 passed**.
+
+## 1d. Codex 3차 잔여 2건(head 1fed4274 → 다음 head)
+
+F3'' `sha_binding`이 `.lower()`를 먼저 해 대문자가 통과 → 원문에 `_HEX_SHA.fullmatch` 적용, 대문자 = NOT_OBSERVED, 시험을 뒤집어 lower-first 변이 사살. F4'' `ls-remote` 무응답을 `unknown`으로 두고 reachable=true → `unverified`로 명명하고 `fresh`만 도달(stale·unverified 모두 unreachable, 사유 기록), 시험 뒤집음. PG-free **147 passed**.
 
 ## 2. 검증·경계
 

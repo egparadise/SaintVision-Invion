@@ -224,12 +224,13 @@ _HEX_SHA = re.compile(r"^[0-9a-f]{12,40}$")
 
 
 def sha_binding(proof_sha: Any, code_sha: Any) -> tuple[bool, str | None]:
-    """Bind a proof to this bundle's code SHA: both must be lowercase hex of 12..40 chars (a full
-    40 is recommended) and the shorter must be a prefix of the longer.  Anything else -- a
-    1-character or 11-character token, non-hex text, or a different SHA -- is NOT a binding."""
+    """Bind a proof to this bundle's code SHA: both must be LOWERCASE hex of 12..40 chars exactly
+    as written (a full 40 is recommended; no case folding -- git and gh emit lowercase, so an
+    uppercase value is not a SHA this collector recognises) and the shorter must be a prefix of
+    the longer.  Anything else -- a 1-character or 11-character token, non-hex or uppercase
+    text, or a different SHA -- is NOT a binding."""
     if not isinstance(proof_sha, str) or not isinstance(code_sha, str):
         return False, "sha is not a string"
-    proof_sha, code_sha = proof_sha.strip().lower(), code_sha.strip().lower()
     if not _HEX_SHA.fullmatch(proof_sha):
         return False, f"proof sha is not 12..40 lowercase hex characters ({len(proof_sha)} chars)"
     if not _HEX_SHA.fullmatch(code_sha):
@@ -647,10 +648,12 @@ def resolve_remote_tracking_ref(ref: str) -> dict[str, Any]:
     resolved = _git_lines("rev-parse", "--verify", "--quiet", full + "^{commit}")
     if not resolved:
         return {"ok": False, "reason": f"{full} does not resolve to a commit"}
-    # Stale detection: compare the remote-tracking tip with what the remote reports now.
+    # Freshness: the remote-tracking tip must equal what the remote reports NOW.  If the live
+    # head cannot be read (offline, auth, missing branch) the ref is treated as unverified,
+    # and an unverified ref is not a reachable one (fail-closed).
     live = _git_lines("ls-remote", "--heads", remote, branch)
     if not live:
-        freshness = "unknown"
+        freshness = "unverified"
     else:
         live_sha = live[0].split()[0]
         freshness = "fresh" if live_sha == resolved[0] else "stale"
@@ -663,8 +666,8 @@ def remote_reachability(sha: str | None, ref: str | None = None) -> dict[str, An
     A clean but unpushed commit would otherwise produce evidence nobody can check out.  With
     ``ref`` the check is explicit ancestry (``merge-base --is-ancestor``) against a VERIFIED
     remote-tracking ref only; without it, any ``refs/remotes/*`` that contains the commit
-    counts.  A stale remote-tracking ref (its tip differs from the live remote) does not count.
-    Fail closed when git says nothing.
+    counts.  A stale remote-tracking ref (its tip differs from the live remote) does not count,
+    and neither does one whose live head could not be read.  Fail closed when git says nothing.
     """
     if not sha:
         return {"reachable": False, "refs": [], "mode": "no-sha", "freshness": None}
@@ -673,9 +676,17 @@ def remote_reachability(sha: str | None, ref: str | None = None) -> dict[str, An
         if not resolved["ok"]:
             return {"reachable": False, "refs": [], "mode": "invalid-ref", "reason": resolved["reason"], "freshness": None}
         ancestor = _git_ok("merge-base", "--is-ancestor", sha, resolved["sha"])
-        reachable = ancestor and resolved["freshness"] != "stale"
+        reachable = ancestor and resolved["freshness"] == "fresh"
+        if reachable:
+            reason = None
+        elif not ancestor:
+            reason = "not an ancestor"
+        elif resolved["freshness"] == "stale":
+            reason = "remote-tracking ref is stale (live remote head differs)"
+        else:
+            reason = "live remote head could not be verified (ls-remote returned nothing)"
         return {"reachable": reachable, "refs": [resolved["ref"]] if reachable else [], "mode": "explicit-ref",
-                "freshness": resolved["freshness"], "reason": None if reachable else ("remote-tracking ref is stale" if ancestor else "not an ancestor")}
+                "freshness": resolved["freshness"], "reason": reason}
     refs = [line for line in _git_lines("branch", "-r", "--contains", sha) if "->" not in line]
     return {"reachable": bool(refs), "refs": refs, "mode": "remote-containment", "freshness": None}
 
