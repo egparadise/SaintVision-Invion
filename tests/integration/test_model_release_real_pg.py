@@ -32,6 +32,11 @@ pytestmark = pytest.mark.postgres
 DECLARATION = {"licensePolicy": "internal-only-eula-2026", "classification": "restricted"}
 
 
+def _digest() -> str:
+    """64 lowercase hex, unique: the shape the checksum columns require."""
+    return uuid.uuid4().hex + uuid.uuid4().hex
+
+
 def _observation(project_id, model_id, version):
     return {
         "projectId": project_id,
@@ -51,100 +56,253 @@ def _observation(project_id, model_id, version):
     }
 
 
+def _insert(connection, table_name, **values):
+    """Insert through the model metadata, so a wrong column cannot reach hosted CI.
+
+    Raw SQL in a fixture is checked by PostgreSQL and nowhere else, which is how
+    this file first failed: an hour of hosted CI to learn a name. Building the
+    statement from ``Base.metadata`` validates the column names as it is written,
+    and the required-column check below covers the omissions PostgreSQL would
+    otherwise be the first to notice.
+    """
+    from saintvision.db.base import Base
+    from saintvision.db import models  # noqa: F401  (registers the tables)
+
+    table = Base.metadata.tables[table_name]
+    unknown = set(values) - set(table.columns.keys())
+    assert not unknown, f"{table_name} has no column(s) {sorted(unknown)}"
+    required = {
+        column.name
+        for column in table.columns
+        if not column.nullable and column.default is None and column.server_default is None
+    }
+    assert required <= set(values), f"{table_name} needs {sorted(required - set(values))}"
+    connection.execute(table.insert().values(**values))
+
+
+def _seed_subjects(connection, *, tenant_id, project_id, user_id, now, label):
+    """The four subject rows a fully traceable version needs, and their chain.
+
+    ``trace_model`` resolves each edge to a row and reports a kind as missing when
+    the row is absent, so seeding edges alone leaves the version untraceable --
+    which is what the first hosted run of this file showed, with every release
+    refused as ``GRAPH-0002`` before the declaration was ever compared. The
+    approval chain (workspace, workload, run) is here for the same reason: the
+    row has to exist to be found.
+    """
+    dataset_id = new_id("dataset")
+    dataset_version_id = new_id("dataset_version")
+    commit_id = new_id("commit")
+    suite_id = new_id("eval_suite")
+    eval_run_id = new_id("eval_run")
+    workspace_id = new_id("workspace")
+    workload_id = new_id("workload")
+    run_id = new_id("run")
+    approval_id = new_id("approval")
+
+    _insert(
+        connection,
+        "datasets",
+        dataset_id=dataset_id,
+        tenant_id=tenant_id,
+        project_id=project_id,
+        name=f"dataset-{label}",
+        created_at=now,
+    )
+    _insert(
+        connection,
+        "dataset_versions",
+        dataset_version_id=dataset_version_id,
+        tenant_id=tenant_id,
+        dataset_id=dataset_id,
+        version="2026-09-01",
+        content_sha256=_digest(),
+        byte_size=1,
+        record_count=1,
+        uri=f"inv://datasets/dataset-{label}@2026-09-01",
+        created_at=now,
+    )
+    _insert(
+        connection,
+        "code_commits",
+        commit_id=commit_id,
+        tenant_id=tenant_id,
+        repository="git@example.invalid:saintvision.git",
+        # 40 lowercase hex, which the column's CHECK requires.
+        commit_sha=uuid.uuid4().hex[:40].ljust(40, "0"),
+        recorded_at=now,
+    )
+    _insert(
+        connection,
+        "eval_suites",
+        suite_id=suite_id,
+        tenant_id=tenant_id,
+        name=f"suite-{label}",
+        version="1",
+        definition_sha256=_digest(),
+        created_at=now,
+    )
+    _insert(
+        connection,
+        "eval_runs",
+        eval_run_id=eval_run_id,
+        tenant_id=tenant_id,
+        suite_id=suite_id,
+        status="completed",
+        total_cases=1,
+        passed_cases=1,
+        violations=0,
+        passed_gate=True,
+        started_at=now,
+        ended_at=now,
+    )
+    _insert(
+        connection,
+        "workspaces",
+        workspace_id=workspace_id,
+        tenant_id=tenant_id,
+        project_id=project_id,
+        name=f"workspace-{label}",
+        created_by_user_id=user_id,
+        created_at=now,
+    )
+    _insert(
+        connection,
+        "workloads",
+        workload_id=workload_id,
+        tenant_id=tenant_id,
+        project_id=project_id,
+        objective=f"objective-{label}",
+        spec={},
+        spec_sha256=_digest(),
+        contract_version="v1alpha1",
+        created_by_user_id=user_id,
+        created_at=now,
+    )
+    _insert(
+        connection,
+        "runs",
+        run_id=run_id,
+        tenant_id=tenant_id,
+        workload_id=workload_id,
+        workspace_id=workspace_id,
+        requested_by_user_id=user_id,
+        created_at=now,
+    )
+    _insert(
+        connection,
+        "approvals",
+        approval_id=approval_id,
+        tenant_id=tenant_id,
+        run_id=run_id,
+        subject_sha256=_digest(),
+        decision="approved",
+        risk_level=1,
+        decided_by_user_id=user_id,
+        decided_at=now,
+        expires_at=now + dt.timedelta(days=365),
+    )
+    # Keyed by the model_lineage edge kind, which is a different vocabulary from
+    # the identifier kinds used above: the edge kind ``code_commit`` belongs to a
+    # row whose id kind is ``commit``.
+    return {
+        "dataset_version": dataset_version_id,
+        "code_commit": commit_id,
+        "eval_run": eval_run_id,
+        "approval": approval_id,
+    }
+
+
 def _seed(connection, *, tenant_id, now, project_code, role="approver"):
     """One project, one approving member, one releasable model version."""
     user_id = new_id("user")
     project_id = new_id("project")
     model_id = new_id("model")
     version_id = new_id("model_version")
-    connection.execute(
-        text(
-            "INSERT INTO users (user_id, tenant_id, external_subject, display_name, "
-            "status, created_at, updated_at, version) "
-            "VALUES (:user, :tenant, :subject, :subject, 'active', :now, :now, 1)"
-        ),
-        {"user": user_id, "tenant": tenant_id, "subject": f"release-{project_code}", "now": now},
+
+    _insert(
+        connection,
+        "users",
+        user_id=user_id,
+        tenant_id=tenant_id,
+        external_subject=f"release-{project_code}",
+        display_name=f"release-{project_code}",
+        status="active",
+        created_at=now,
+        updated_at=now,
+        version=1,
     )
-    connection.execute(
-        text(
-            "INSERT INTO projects (project_id, tenant_id, code, display_name, status, "
-            "created_at, version) VALUES (:project, :tenant, :code, :code, 'active', :now, 1)"
-        ),
-        {"project": project_id, "tenant": tenant_id, "code": project_code, "now": now},
+    _insert(
+        connection,
+        "projects",
+        project_id=project_id,
+        tenant_id=tenant_id,
+        code=project_code,
+        display_name=project_code,
+        status="active",
+        created_at=now,
+        version=1,
     )
-    connection.execute(
-        text(
-            "INSERT INTO project_members (tenant_id, project_id, user_id, role_code) "
-            "VALUES (:tenant, :project, :user, :role)"
-        ),
-        {"tenant": tenant_id, "project": project_id, "user": user_id, "role": role},
+    _insert(
+        connection,
+        "project_members",
+        tenant_id=tenant_id,
+        project_id=project_id,
+        user_id=user_id,
+        role_code=role,
     )
-    connection.execute(
-        text(
-            "INSERT INTO models (model_id, tenant_id, project_id, name, created_at) "
-            "VALUES (:model, :tenant, :project, :name, :now)"
-        ),
-        {
-            "model": model_id,
-            "tenant": tenant_id,
-            "project": project_id,
-            "name": f"model-{project_code}",
-            "now": now,
-        },
+    _insert(
+        connection,
+        "models",
+        model_id=model_id,
+        tenant_id=tenant_id,
+        project_id=project_id,
+        name=f"model-{project_code}",
+        created_at=now,
     )
-    # 64 lowercase hex, unique per tenant, because the response contract checks
-    # the shape and the table has a per-tenant unique constraint.
-    digest = uuid.uuid4().hex + uuid.uuid4().hex
-    connection.execute(
-        text(
-            "INSERT INTO model_versions (model_version_id, tenant_id, model_id, version, "
-            "stage, content_sha256, byte_size, uri, verified_at, retention_pinned_until, "
-            "created_at) VALUES (:version_id, :tenant, :model, '1.0.0', 'draft', :sha, 1, "
-            ":uri, :now, :until, :now)"
-        ),
-        {
-            "version_id": version_id,
-            "tenant": tenant_id,
-            "model": model_id,
-            "sha": digest,
-            "uri": f"inv://models/model-{project_code}@1.0.0",
-            "now": now,
-            "until": now + dt.timedelta(days=365),
-        },
+    _insert(
+        connection,
+        "model_versions",
+        model_version_id=version_id,
+        tenant_id=tenant_id,
+        model_id=model_id,
+        version="1.0.0",
+        stage="draft",
+        # 64 lowercase hex, unique per tenant: the response contract checks the
+        # shape and the table has a per-tenant unique constraint.
+        content_sha256=_digest(),
+        byte_size=1,
+        uri=f"inv://models/model-{project_code}@1.0.0",
+        verified_at=now,
+        retention_pinned_until=now + dt.timedelta(days=365),
+        created_at=now,
     )
-    # Every required lineage kind, so the release is refused for no other reason.
-    #
-    # The lineage kind and the identifier kind are not the same vocabulary: the
-    # edge kind is ``code_commit`` (the model_lineage CHECK) while the id kind is
-    # ``commit`` (ids.PREFIXES). Passing the edge kind to new_id raises, which is
-    # how this fixture failed on hosted PostgreSQL before every assertion below
-    # had a chance to run.
-    for kind, id_kind in (
-        ("dataset_version", "dataset_version"),
-        ("code_commit", "commit"),
-        ("eval_run", "eval_run"),
-        ("approval", "approval"),
-    ):
-        # Composite primary key, no surrogate id: the edge *is* the four values.
-        connection.execute(
-            text(
-                "INSERT INTO model_lineage (tenant_id, model_version_id, kind, subject_id, "
-                "relation, recorded_at) VALUES (:tenant, :version_id, :kind, :subject, "
-                "'derived_from', :now)"
-            ),
-            {
-                "tenant": tenant_id,
-                "version_id": version_id,
-                "kind": kind,
-                "subject": new_id(id_kind),
-                "now": now,
-            },
+
+    subjects = _seed_subjects(
+        connection,
+        tenant_id=tenant_id,
+        project_id=project_id,
+        user_id=user_id,
+        now=now,
+        label=project_code,
+    )
+    for kind, subject_id in subjects.items():
+        _insert(
+            connection,
+            "model_lineage",
+            tenant_id=tenant_id,
+            model_version_id=version_id,
+            kind=kind,
+            subject_id=subject_id,
+            relation="derived_from",
+            recorded_at=now,
         )
     return {
         "user_id": user_id,
         "project_id": project_id,
         "model_id": model_id,
         "version_id": version_id,
+        "subjects": subjects,
     }
 
 

@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-VFCL03-IMPORT-REQUEST-PATH-IMPL-001"
 title: "VF-CL-03 import adapter 요청 경로 구현 — 공유 정본 ProblemDetails 모듈·strict body helper·release route, Codex F-R1~F-R3 반영(운영 factory 결속·threadpool self-call·redirect 거부·streaming 상한·실 PG node 6건), PG-free 58 + 실 PG 6"
-version: "1.2.0"
+version: "1.3.0"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T11:58:12+09:00"
+updated: "2026-09-28T12:26:40+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["VF-CL-03"]
@@ -117,3 +117,15 @@ Codex 재검토: 두 Backend matrix(3.12·3.14)가 `tests/integration/test_model
 - 이 판단은 hosted가 아니라 fixture 층의 결함이었고, 내가 실 PG를 돌리지 않는 동안 **fixture를 PG-free로 한 번도 실행하지 않은 것**이 원인이다. 앞으로 실 PG 파일을 올릴 때는 stub 실행을 같이 넣는다.
 
 PG-free: `tests/core/test_model_release_route.py` **59 passed**(guard 1건 추가).
+
+## 10. v1.3 — edge만 심고 subject row를 심지 않았다 (`3338e5e1` 결과)
+
+두 번째 hosted round(run `36372016702`)에서 4/6은 통과했고 **29c(불일치)와 30c(양성)** 가 실패했다. 원인은 Codex가 정확히 지적한 그대로다 — `_seed`가 `model_lineage` edge 네 건만 넣고 그 `subject_id`가 가리키는 `dataset_versions`·`code_commits`·`eval_runs`·`approvals` **행을 만들지 않았다.** 정본 `trace_model()`은 edge 존재가 아니라 `_load_all()`로 **행을 다시 읽어** required kind를 판정하므로 네 edge가 전부 dangling이고 `missing`이 네 종류 전부였다. 그래서 29c는 `MODEL-0009` 대신 `GRAPH-0002`를, 30c는 200 대신 `GRAPH-0002` 409를 받았다.
+
+**제품 순서는 옳다** — 설계 §6의 4-4(기존 전제) → 4-5(선언 비교)가 그대로 동작한 것이고, 검증 안 된 버전에 선언 불일치를 먼저 말하지 않는다는 규칙이 지켜진 결과다. 고칠 것은 fixture다.
+
+- `_seed_subjects()`가 네 subject 행과 그 의존 행(`datasets`, `eval_suites`, `workspaces`·`workloads`·`runs`)까지 정본 필수 필드로 심는다. edge kind와 id kind의 대응(`code_commit` → `commit`)을 반환 dict의 키로 고정했다.
+- **raw SQL을 버리고 `Base.metadata`로 insert한다.** `_insert()`가 컬럼 이름을 metadata에 대조하고 **default 없는 NOT NULL 컬럼 누락까지** 단언한다. fixture의 SQL을 PostgreSQL만 검사하던 것이 hosted round-trip 두 번을 쓴 이유다.
+- **guard가 개수만 세던 것도 보강했다**(Codex 요청). 이제 기록된 statement에서 테이블 이름을 뽑아 네 subject table과 그 의존 table이 모두 쓰였는지, 그리고 `set(seeded["subjects"]) == set(REQUIRED_KINDS)`인지 단언한다. semantic dangling이 PG-free에서 잡힌다.
+
+PG-free: `tests/core/test_model_release_route.py` **59 passed**, `pytest tests/core` **1091 passed / 4 skipped**.

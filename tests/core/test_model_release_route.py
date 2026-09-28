@@ -1087,9 +1087,41 @@ def test_the_real_pg_seed_builds_every_row_without_a_database():
         now=dt.datetime(2026, 9, 9, tzinfo=dt.timezone.utc),
         project_code="fixture-guard",
     )
-    assert set(seeded) == {"user_id", "project_id", "model_id", "version_id"}
-    # users, projects, project_members, models, model_versions, four edges.
-    assert len(recorder.statements) == 9
+    assert set(seeded) == {
+        "user_id",
+        "project_id",
+        "model_id",
+        "version_id",
+        "subjects",
+    }
+    # The edge kinds, keyed to the subject rows that make the version traceable.
+    assert set(seeded["subjects"]) == {
+        "dataset_version",
+        "code_commit",
+        "eval_run",
+        "approval",
+    }
+    # Five own rows, nine subject-chain rows, four edges. Counted so a row that
+    # stops being seeded is noticed here rather than as a refusal on hosted CI.
+    assert len(recorder.statements) == 18
+
+    # Counting statements was not enough: the first version of this fixture wrote
+    # four edges whose subject rows did not exist, and trace_model resolves an
+    # edge to a row rather than trusting the edge, so every required kind came
+    # back missing and no release could be reached. The tables are therefore named.
+    written = {
+        statement.split("INSERT INTO ", 1)[1].split(" ", 1)[0]
+        for statement in recorder.statements
+    }
+    assert {"dataset_versions", "code_commits", "eval_runs", "approvals"} <= written, (
+        "every required lineage kind needs a real subject row, not just an edge"
+    )
+    assert {"datasets", "eval_suites", "workspaces", "workloads", "runs"} <= written, (
+        "and the rows those subjects depend on"
+    )
+    from saintvision.services.lineage import REQUIRED_KINDS
+
+    assert set(seeded["subjects"]) == set(REQUIRED_KINDS)
 
     # The trap itself, named: two lineage kinds are not entity kinds, so a fixture
     # that reuses an edge kind as an id kind raises.
