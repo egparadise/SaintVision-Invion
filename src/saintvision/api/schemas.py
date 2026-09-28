@@ -869,6 +869,20 @@ class LineageDatasetVersion(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+class ConformanceCheckDescriptor(Strict):
+    """One check the conformance contract defines, named and gated.
+
+    A descriptor, not a result: there is no ``passed`` here because nothing has
+    been observed. Read from ``adapters.conformance.CHECKLIST``, which is the
+    single source for the list.
+    """
+
+    name: str = Field(min_length=1, max_length=100)
+    capability_gated: bool = Field(alias="capabilityGated")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
 class LineageDeployment(Strict):
     """A deployment of the traced version.
 
@@ -996,6 +1010,60 @@ class RunRecordResponse(Strict):
     sealed_at: dt.datetime = Field(alias="sealedAt")
 
 
+class RunRecordArtifactPin(Strict):
+    """One artifact as the record pinned it: reference, digest and size, no content."""
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True, populate_by_name=True)
+
+    artifact_id: str = Field(alias="artifactId")
+    role: str = Field(pattern="^(diff|test_report|trace|log|model|dataset|other)$")
+    uri: str = Field(min_length=1)
+    checksum_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="checksumSha256")
+    object_version: str | None = Field(default=None, alias="objectVersion")
+    byte_size: int = Field(ge=0, alias="byteSize")
+
+
+class RunRecordArtifactPageResponse(Strict):
+    """One bounded page of the artifacts pinned into a sealed record.
+
+    A record pins the run's whole artifact set, which has no bound of its own,
+    so the list is paged: at most ``limit`` (default 50, maximum 200) items in
+    stable ``artifactId`` order. ``count`` is the number of items in *this
+    page*, never the record's total. ``nextCursor`` is the last item's
+    ``artifactId`` when more follow, and null on the last page. ``role`` echoes
+    the filter, which holds across pages.
+    """
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True, populate_by_name=True)
+
+    record_id: str = Field(alias="recordId")
+    run_id: str = Field(alias="runId")
+    role: str | None = Field(default=None, pattern="^(diff|test_report|trace|log|model|dataset|other)$")
+    items: list[RunRecordArtifactPin] = Field(max_length=200)
+    count: int = Field(ge=0, le=200)
+    next_cursor: str | None = Field(default=None, alias="nextCursor")
+
+
+class ArtifactPinVerificationResponse(Strict):
+    """Whether a pinned artifact still matches the digest sealed into the record.
+
+    ``verified: false`` is a reported fact, not an error: the record stays the
+    account of what was true at sealing, and a changed object is an integrity
+    finding for the caller.
+    """
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True, populate_by_name=True)
+
+    record_id: str = Field(alias="recordId")
+    run_id: str = Field(alias="runId")
+    artifact_id: str = Field(alias="artifactId")
+    verified: bool
+    #: Required: a pin exists whenever verification ran (the service is 404
+    #: otherwise) and its checksum is non-null in the database, so a missing or
+    #: null value here would be a fail-open integrity answer (Codex #188 F1).
+    pinned_checksum_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="pinnedChecksumSha256")
+
+
 class ModelLineageTraceResponse(Strict):
     """AC-10's traceback, reduced to what a project member may be shown.
 
@@ -1054,5 +1122,43 @@ class ModelVersionByDatasetDigestPageResponse(Strict):
     unresolved_model_versions: int = Field(ge=0, alias="unresolvedModelVersions")
     truncated: dict[str, int] = Field(default_factory=dict)
     complete: bool
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ConformanceStatusResponse(Strict):
+    """What this platform can honestly say about adapter conformance (G-03).
+
+    Phase one says **NOT_OBSERVED** and nothing more, because nothing is stored:
+    ``run_conformance`` has no product caller and no table. The consequences are
+    in the field list rather than in a comment --
+
+    * ``status`` is ``Literal["NOT_OBSERVED"]``, one value. A widened literal
+      would advertise ``RECORDED`` in the generated schema before any code can
+      produce it; phase two brings that branch in with the counts that make it
+      mean something.
+    * there is **no** ``conformant`` boolean. A boolean has no third value, so
+      "not measured" would have to be spelled ``false``, which reads as "it was
+      run and it failed".
+    * there are **no counts**. ``passed: 0`` is not the absence of a
+      measurement; it is a measurement of zero.
+    * ``recordedAt`` is typed ``None``: the only honest value is null, so the
+      contract says so rather than trusting the route.
+
+    ``scope`` is the same word ``GET /v1/adapters`` uses. The project in the path
+    is who may read this, not who owns it: conformance is a property of the
+    control-plane host, not of a tenant's data.
+    """
+
+    status: Literal["NOT_OBSERVED"]
+    reason: str = Field(min_length=1, max_length=300)
+    scope: Literal["control-plane-host"]
+    contract_version: str = Field(min_length=1, max_length=32, alias="contractVersion")
+    #: The adapters the suite would run against -- a target list, not a result.
+    adapters: list[str]
+    checks: list[ConformanceCheckDescriptor]
+    #: Required, and only ever null: a consumer can rely on the key being
+    #: there, and the one value it may hold is the absence of a measurement.
+    recorded_at: None = Field(alias="recordedAt")
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
