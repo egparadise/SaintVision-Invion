@@ -1,11 +1,11 @@
 ---
 doc_id: "S11-AC11-MIGRATION-RESTORE-TARGET-001"
 title: "S11 AC-11 migration restore-forward target v0"
-version: "1.1.0"
+version: "1.1.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T20:38:03+09:00"
+updated: "2026-09-28T21:59:06+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S11-BE", "S11-DB"]
@@ -42,7 +42,7 @@ target `s11-migration-reversible-roundtrip-v1`은 source migration graph에서 �
 
 - producer report 안의 JUnit hash는 `junitSha256`이며 GitHub artifact digest가 아니다.
 - artifact download 뒤 importer가 GitHub artifact digest·만료 시각을 축별 `ac11-axis-evidence` 봉투에 결속한다.
-- head `0053_eval_suite_project_scope`의 최신 불가역 barrier는 `0052_model_version_digest_scope`이며 reversible tail은 1이다. hosted runner는 fresh 0052 기준 DB와 `0052→0053→0052` candidate를 비교한다.
+- hosted runner는 source migration graph에서 최신 불가역 barrier와 현재 head를 매번 도출하고 fresh barrier DB와 `barrier→head→barrier` candidate를 비교한다. 특정 head나 tail 개수를 문서 상수로 간주하지 않으며, graph에서 도출한 tail이 0이면 위 구조적 `NOT_APPLICABLE` 규칙을 적용하고 1 이상이면 실제 왕복을 실행한다.
 - 이후 migration PR은 같은 PR에서 fixture manifest와 reversible-tail 기대를 갱신해야 한다. source graph와 manifest가 어긋나면 lane은 database 작업 전에 fail-closed 한다.
 - label 재실행은 새 head push만으로 자동 발생하지 않는다. 새 head 증거가 필요하면 label을 제거 후 다시 붙이거나 `workflow_dispatch`를 사용한다.
 - 같은 PostgreSQL service 안에서 만든 role은 새 cluster role 복원을 증명하지 않는다. 별도 cluster·운영 archive 증거는 AC-11의 다른 축으로 남는다.
