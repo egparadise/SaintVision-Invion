@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.207"
+version: "1.0.208"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T17:15:00+09:00"
+updated: "2026-09-28T10:36:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-28 Card45 S3 ObjectStore 제품 결속 v2 — hosted 검증 대기
+
+- PR #149 위 stack에서 provider/locator migration, strict `configurationReadiness.objectStore`, worker/API 단일 설정 정본, 두 checkpoint 생산자 replay guard, provider-body Artifact download와 Local provider→DB lock order를 결속했다. 코드 head는 `51ffdc26`; 문서 head는 후속 커밋이다.
+- receipt body fallback은 제거했고 provider 부재는 `STORE-0001`/503으로 닫는다. S3 예약 local provider ID·endpoint path·unknown inner key·dual provider를 거부하며, 공개 route/schema의 objectId/locator 입력은 positional·keyword-only·Query alias까지 0건을 단언한다.
+- PG-free focused 87 passed/3 명시 skip, 추가 경계 58 passed/1 symlink skip, route coverage 40 passed, bindings/frontend/freshness/ontology/YAML/compile/diff exit 0이다. 로컬 실 PG·Docker는 실행하지 않았다. digest-pinned MinIO+PG와 실제 Artifact HTTP case, migration/definer audit는 PR hosted Core evidence 대기이므로 done이 아니다. [[2026-09-28_10-36-00_KST_S3_ObjectStore_제품결속_v2_Codex]].
 
 ## 2026-09-28 Card45 S3 ObjectStore 구현 1단계 — reviewer 인계
 
