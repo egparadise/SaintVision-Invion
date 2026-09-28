@@ -75,6 +75,42 @@ const ARTIFACT_ROLE_RE = /^(diff|test_report|trace|log|model|dataset|other)$/;
 const BUNDLE_STRATEGY_RE = /^(lexical|metadata|hybrid|explicit)$/;
 const BUNDLE_ITEM_KIND_RE = /^(document|code|message|tool_output|summary)$/;
 
+/**
+ * Validate strict RFC 3339 date-time format including calendar validity (leap year, days in month).
+ */
+export function isValidIsoDateTime(val: string): boolean {
+  if (typeof val !== 'string') return false;
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?(Z|([+-])(\d{2}):(\d{2}))$/.exec(val);
+  if (!match) return false;
+
+  const year = parseInt(match[1], 10);
+  const month = parseInt(match[2], 10);
+  const day = parseInt(match[3], 10);
+  const hour = parseInt(match[4], 10);
+  const minute = parseInt(match[5], 10);
+  const second = parseInt(match[6], 10);
+
+  if (month < 1 || month > 12) return false;
+  if (day < 1 || day > 31) return false;
+  if (hour < 0 || hour > 23) return false;
+  if (minute < 0 || minute > 59) return false;
+  if (second < 0 || second > 60) return false;
+
+  const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+  const daysInMonth = [31, isLeapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  if (day > daysInMonth[month - 1]) return false;
+
+  const tzSign = match[8];
+  if (tzSign && match[9] && match[10]) {
+    const tzHour = parseInt(match[9], 10);
+    const tzMin = parseInt(match[10], 10);
+    if (tzHour < 0 || tzHour > 23 || tzMin < 0 || tzMin > 59) return false;
+  }
+
+  const d = new Date(val);
+  return !isNaN(d.getTime());
+}
+
 export function isRunRecordResponse(data: unknown): data is RunRecordResponse {
   if (!data || typeof data !== 'object' || Array.isArray(data)) return false;
   const obj = data as Record<string, unknown>;
@@ -93,7 +129,7 @@ export function isRunRecordResponse(data: unknown): data is RunRecordResponse {
     if (typeof v !== 'string') return false;
   }
   if (typeof obj.attemptCount !== 'number' || !Number.isInteger(obj.attemptCount) || obj.attemptCount < 0) return false;
-  if (typeof obj.sealedAt !== 'string' || !obj.sealedAt) return false;
+  if (!isValidIsoDateTime(obj.sealedAt as string)) return false;
 
   if (obj.bundleHash !== undefined && obj.bundleHash !== null) {
     if (typeof obj.bundleHash !== 'string' || !SHA256_HEX_RE.test(obj.bundleHash)) return false;
@@ -208,7 +244,7 @@ export function isContextBundleResponse(data: unknown): data is ContextBundleRes
   for (const v of Object.values(obj.componentVersions as Record<string, unknown>)) {
     if (typeof v !== 'string') return false;
   }
-  if (typeof obj.builtAt !== 'string' || !obj.builtAt) return false;
+  if (!isValidIsoDateTime(obj.builtAt as string)) return false;
   if (!Array.isArray(obj.items)) return false;
   for (const item of obj.items) {
     if (!isContextBundleItemSummary(item)) return false;

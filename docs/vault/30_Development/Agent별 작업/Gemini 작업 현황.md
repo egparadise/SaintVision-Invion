@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.127"
+version: "1.0.128"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-28T19:38:00+09:00"
+updated: "2026-09-28T20:50:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,27 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-23T10:30:00+09:00 (최신 tip `fdd4a895`, 작업 브랜치 `agent/gemini/s04-fe-matrix-measured`).
+- 확인 기준: 2026-09-28T20:50:00+09:00 (최신 tip `agent/gemini/g04-fe-seal-record`, PR #212).
+
+## 2026-09-28 G-04 RunDetail 봉인 기록 패널 Claude UI r2 및 Codex 계약 검토 조치 완결 (`agent/gemini/g04-fe-seal-record`, PR #212)
+
+- **PR**: #212 (https://github.com/egparadise/SaintVision-Invion/pull/212)
+- **Base**: `agent/claude/g04-w1-seal-record` (PR #201 head `9dfb2878` + PR #188 head `5c34aaca` 클린 머지 `e1d593ce`)
+- **조치 내역 (Claude F1~F9 및 Codex F-R1~F-R4 전수 완결)**:
+  1. **F1 [High] 백엔드 CI 통과 (#188 선행 머지)**: #188 head `5c34aaca` 병합(`e1d593ce`)으로 W1 POST 라우트와의 카운트 중복 해소 (`(path, method)` 단위 계측). `test_run_record_artifacts_route.py` 통과 (88 passed).
+  2. **F2 & F-R3 [High] R2 페이지 개수 및 `nextCursor` 페이지네이션**: `count`를 "이 페이지 N건"으로 정정하고 `nextCursor` 존재 시 추가 항목 안내 및 다음 페이지 버튼(`handleLoadNextPage`, cursor 쿼리 전달) 구현.
+  3. **F3 & F-R2 [High] R2/R3 에러 정직 보존**: `Promise.allSettled` rejected 사유를 버리지 않고 `artifactsError`, `bundleError`, `bundleSpecialStatus`로 보존. R3 409 `GRAPH-0002` 재현 불가 배지 표출 및 라이브 리전 거짓 "0건/없음" 배제.
+  4. **F4 [Medium] R1 404 "No such run." 분리**: exact detail `No sealed record for this run.`만 미봉인으로 판정, 그 외 404는 오류 배너 표출.
+  5. **F5 & F-R1 [High] 401 / 502 실제 fetch 경로 검증**: `client.ts`의 `isProblemDetails`에서 legacy 401 `AUTH-MISSING-CREDENTIAL` 원형 보존. HTML 502/504 정제 한국어 메시지 표출.
+  6. **F6 [Medium] AbortSignal 및 세대 관리**: Run 전환 시 비동기 응답 누출 차단(`signal.aborted` 가드 전수 배치).
+  7. **F7 [Low] 정직성 변이 전수 사살**: 불일치 배지 `#ff7b72` 및 `data-tone="mismatch"` 단언, 한글 정규식 버그 교정, Run 전환 시 번들 잔존 차단.
+  8. **F8 & F-R4 [Medium] 문구 정합 및 RFC 3339 달력 날짜 검증**: `isValidIsoDateTime`으로 `sealedAt`/`builtAt` 윤년·달력 검증, 불일치 문구 정합, `evidenceId`/`tokenEstimate`/`objectVersion`/`nextCursor` 실표출.
+  9. **F9 [Low] 픽스처 규격화**: `bnd_` / `art_` + 26자리 Crockford ULID 및 순수 `RunItem` 사용.
+- **실측 검증**:
+  - Vitest: `tests/run-detail-seal-record.test.tsx` 18 passed. 웹 전체 79 test files / 693 passed.
+  - `npx tsc -b`: 0 errors. `npm run build`: dist/ 번들 생성 성공 (9.02s).
+  - 파이썬 게이트: `pytest tests/test_route_coverage.py tests/core/test_run_record_artifacts_route.py` 88 passed, `check_frontend_integrity.py` 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-28_20-50-00_KST_G04_RunDetail_Seal_Record_Panel_Claude_r2_Codex_Gemini.md` (`HIST-G04-002`, v1.0.0).
 
 ## 2026-09-28 G-04 RunDetail 봉인 기록(R1·R2·R3) 읽기 전용 패널 및 무결성 검증 (카드 86, `agent/gemini/g04-fe-seal-record`)
 
