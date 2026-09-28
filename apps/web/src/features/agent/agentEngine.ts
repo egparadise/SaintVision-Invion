@@ -88,7 +88,7 @@ export class AgentLoopManager {
       estimatedTokens: tokens,
       estimatedCostKrw: costKrw,
       tenantRemainingBudgetKrw: this.tenantBudgetKrw,
-      boundedRepairLoops: 1,
+      boundedRepairLoops: 0,
       maxRepairLoops: 3,
       status: 'ready',
       proposedDiff,
