@@ -1140,3 +1140,13 @@ def test_the_real_pg_seed_builds_every_row_without_a_database():
     # The trap itself, named: two lineage kinds are not entity kinds, so a fixture
     # that reuses an edge kind as an id kind raises.
     assert set(LINEAGE_KINDS) - set(PREFIXES) == {"code_commit", "container_image"}
+
+
+def test_card84_both_spans_bound_their_lock_waits(monkeypatch):
+    """Permission preflight and the write transaction both SET LOCAL lock_timeout
+    (Codex #211 F1: the preflight's FOR SHARE on the user row can wait too)."""
+    world: dict = {}
+    client = build(monkeypatch, world)
+    response = post(client)
+    assert response.status_code == 200, response.text
+    assert world["lock_timeouts"] == ["SET LOCAL lock_timeout = '5000ms'"] * 2

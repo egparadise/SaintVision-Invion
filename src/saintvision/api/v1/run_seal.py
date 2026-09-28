@@ -268,10 +268,14 @@ async def seal_run_record(
     """Seal the run's record from the server's own rows, once per key."""
     factory = make_session_factory(request.app.state.engine)
 
+    # Bounded as well (card 84 F1): effective_permission reads the user row FOR
+    # SHARE, so a held FOR UPDATE on it would otherwise wait here forever.
     # (1) Permission first, in its own short transaction, before the body.
     with factory() as session:
         with session.begin():
-            with tenant_scope(session, principal.tenant_id):
+            with tenant_scope(session, principal.tenant_id), bounded_lock_wait(
+                session, timeout_ms=settings.business_lock_timeout_ms
+            ):
                 _require_approval(session, principal=principal, project_id=project_id)
 
     key = _require_idempotency_key(idempotency_key)

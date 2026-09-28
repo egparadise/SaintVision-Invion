@@ -96,8 +96,8 @@ class Session:
 
     def execute(self, statement, params=None):
         if "lock_timeout" in str(statement):
-            # Card 84: the lane's bound on every lock wait, set before the lock.
-            self.world["log"].append("set-lock-timeout")
+            # Card 84: the lane's bound on every lock wait; recorded apart from
+            # the order log, once per span (preflight and write).
             self.world.setdefault("lock_timeouts", []).append(str(statement))
             return None
         self.world["log"].append("lock")
@@ -340,7 +340,6 @@ def test_the_whole_order_is_fixed(monkeypatch):
     assert world["log"] == [
         "permission",
         "body-read",
-        "set-lock-timeout",
         "lock",
         "permission",
         "ledger-read",
@@ -430,7 +429,7 @@ def test_the_permission_is_checked_again_after_the_lock(monkeypatch):
     }
     client = build(monkeypatch, world)
     canonical(post(client), code="AUTH-0030", status=403)
-    assert world["log"] == ["permission", "body-read", "set-lock-timeout", "lock", "permission"]
+    assert world["log"] == ["permission", "body-read", "lock", "permission"]
     assert world["registered"] == []
     assert world["stored"] == []
 
@@ -1221,3 +1220,12 @@ def test_the_real_pg_fixture_builds_every_row_without_a_database():
         created_at=NOW,
     )
     assert recorder.statements[-1].startswith("INSERT INTO model_versions")
+
+
+def test_card84_both_spans_bound_their_lock_waits(monkeypatch):
+    """The permission preflight reads the user row FOR SHARE (effective_permission),
+    so it is bounded too, not only the write transaction (Codex #211 F1)."""
+    world: dict = {}
+    client = build(monkeypatch, world)
+    assert post(client).status_code == 201
+    assert world["lock_timeouts"] == ["SET LOCAL lock_timeout = '5000ms'"] * 2

@@ -94,7 +94,7 @@ class Session:
     def execute(self, statement, params=None):
         sql = str(statement)
         if "lock_timeout" in sql:
-            self.world["log"].append("set-lock-timeout")
+            # Card 84: recorded apart from the order log; both spans set it.
             self.world["lock_timeouts"].append(sql)
         elif "pg_advisory_xact_lock" in sql:
             self.world["log"].append("advisory-lock")
@@ -282,7 +282,7 @@ def canonical(response, *, code, status, retryable=False):
 
 FULL_ORDER = [
     "permission", "body-read",
-    "set-lock-timeout", "advisory-lock", "permission", "ledger-read",
+    "advisory-lock", "permission", "ledger-read",
     "parent-get", "version-lock", "permission", "service", "audit", "ledger-write",
 ]
 
@@ -329,15 +329,15 @@ def test_the_serialisation_point_precedes_every_row_and_uses_the_endpoint_consta
     assert post(client).status_code == 200
     log = world["log"]
     assert log.index("advisory-lock") < log.index("ledger-read") < log.index("parent-get")
-    assert log.index("set-lock-timeout") < log.index("advisory-lock")
-    assert world["lock_timeouts"] == ["SET LOCAL lock_timeout = '5000ms'"]
+    # both spans -- the permission preflight and the write -- are bounded (card 84 F1)
+    assert world["lock_timeouts"] == ["SET LOCAL lock_timeout = '5000ms'"] * 2
 
 
 def test_the_lock_timeout_comes_from_settings(monkeypatch):
     world: dict = {}
     client = build(monkeypatch, world, lock_timeout_ms=250)
     assert post(client).status_code == 200
-    assert world["lock_timeouts"] == ["SET LOCAL lock_timeout = '250ms'"]
+    assert world["lock_timeouts"] == ["SET LOCAL lock_timeout = '250ms'"] * 2
 
 
 @pytest.mark.parametrize("value", [0, -1, True, "5000", None])
@@ -410,6 +410,7 @@ def test_a_member_without_the_approval_grade_is_403_before_the_body_is_read(monk
     client = build(monkeypatch, world)
     canonical(post(client, content=b"{" + b"x" * 20000), code="AUTH-0030", status=403)
     assert world["log"] == ["permission"]
+    assert world["lock_timeouts"] == ["SET LOCAL lock_timeout = '5000ms'"]        # the preflight span is bounded too
 
 
 def test_a_non_member_is_403_before_the_body_is_read(monkeypatch):
@@ -423,7 +424,7 @@ def test_a_revocation_between_the_spans_is_403_and_locks_no_row(monkeypatch):
     world = {"permissions": [{"canApprove": True}, {"canApprove": False}]}
     client = build(monkeypatch, world)
     canonical(post(client), code="AUTH-0030", status=403)
-    assert world["log"] == ["permission", "body-read", "set-lock-timeout", "advisory-lock", "permission"]
+    assert world["log"] == ["permission", "body-read", "advisory-lock", "permission"]
     assert world["version_locks"] == [] and world["stored"] == []
 
 
@@ -488,7 +489,7 @@ def test_a_stored_answer_is_replayed_exactly_and_no_row_is_locked(monkeypatch):
     client = build(monkeypatch, world)
     response = post(client)
     assert response.status_code == 200 and response.json() == stored
-    assert world["log"] == ["permission", "body-read", "set-lock-timeout", "advisory-lock", "permission", "ledger-read"]
+    assert world["log"] == ["permission", "body-read", "advisory-lock", "permission", "ledger-read"]
 
 
 def test_the_same_key_with_a_different_request_is_409(monkeypatch):

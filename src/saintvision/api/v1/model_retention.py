@@ -150,11 +150,15 @@ async def pin_model_version_retention(
     """Extend the retention pin to ``until``, once per idempotency key."""
     factory = make_session_factory(request.app.state.engine)
 
+    # Bounded as well (card 84 F1): effective_permission reads the user row FOR
+    # SHARE, so a held FOR UPDATE on it would otherwise wait here forever.
     # (1) Permission first, in its own short transaction, with nothing held
     # open while the body arrives.
     with factory() as session:
         with session.begin():
-            with tenant_scope(session, principal.tenant_id):
+            with tenant_scope(session, principal.tenant_id), bounded_lock_wait(
+                session, timeout_ms=settings.business_lock_timeout_ms
+            ):
                 _require_approval(session, principal=principal, project_id=project_id)
 
     key = _require_idempotency_key(idempotency_key)

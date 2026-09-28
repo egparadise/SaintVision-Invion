@@ -1,5 +1,10 @@
 """Card 84 on a real PostgreSQL: every write route ends within the budget when its lock is held.
 
+Including the first, permission-only span (Codex #211 F1): ``effective_permission``
+reads the caller's ``users`` row ``FOR SHARE``, so a ``FOR UPDATE`` held on that
+row by another transaction would otherwise stall the request before the body,
+the kernel observation or any write.
+
 For each write route in the business lane an *independent* connection holds
 the lock the route needs -- the idempotency advisory lock (the same key the
 route derives) or the resource row ``FOR UPDATE`` -- and the route is called
@@ -11,8 +16,6 @@ waits on the held lock until the test's own deadline kills it.
 from __future__ import annotations
 
 import datetime as dt
-import time
-from concurrent.futures import ThreadPoolExecutor
 
 import pytest
 from fastapi.testclient import TestClient
@@ -27,6 +30,7 @@ from saintvision.config import Settings
 from saintvision.db.session import tenant_scope
 from saintvision.identity.principal import Principal, StaticPrincipalVerifier
 from saintvision.ids import new_id
+from lock_wait_harness import within_deadline
 from test_model_release_real_pg import DECLARATION, _observation
 from test_model_release_real_pg import _seed as _seed_releasable
 from test_model_version_register_real_pg import _body as _register_body
@@ -73,10 +77,9 @@ def _canonical_503(response):
 
 
 def _within_deadline(call):
-    started = time.monotonic()
-    with ThreadPoolExecutor(max_workers=1) as pool:
-        response = pool.submit(call).result(timeout=DEADLINE_SECONDS)
-    return response, time.monotonic() - started
+    """The harness of ``tests/lock_wait_harness.py``: on timeout it returns without
+    joining the blocked worker, so the caller's ``finally`` can release the lock."""
+    return within_deadline(call, seconds=DEADLINE_SECONDS)
 
 
 class _Held:
@@ -271,3 +274,104 @@ def test_the_bound_is_local_to_the_transaction_and_the_next_write_proceeds(owner
         json=_register_body(), headers={"Idempotency-Key": "k-local-2", "Content-Type": "application/json"},
     )
     assert ok.status_code == 201, ok.text
+
+
+# ---------------------------------------------------------------- the permission preflight (Codex #211 F1)
+
+
+def _counting_fetcher(observation):
+    calls = {"n": 0}
+
+    def fetch(**_kwargs):
+        calls["n"] += 1
+        return observation
+
+    return fetch, calls
+
+
+def test_f1_w2_register_ends_within_the_budget_when_the_callers_user_row_is_held(owner_engine, app_engine, two_tenants, clean_tables):
+    tenant, _ = two_tenants
+    with owner_engine.begin() as connection:
+        seeded = _approver(connection, tenant, "lw-f1-w2")
+    held = _Held(owner_engine).row("users", "user_id", seeded["user_id"])
+    try:
+        client = _client(app_engine, tenant_id=tenant, user_id=seeded["user_id"])
+        response, elapsed = _within_deadline(lambda: client.post(
+            f"/v1/projects/{seeded['project_id']}/models/{seeded['model_id']}/versions",
+            json=_register_body(), headers={"Idempotency-Key": "k-f1-w2", "Content-Type": "application/json"},
+        ))
+    finally:
+        held.close()
+    _canonical_503(response)
+    assert elapsed < DEADLINE_SECONDS
+    with owner_engine.begin() as connection:
+        assert connection.execute(text("SELECT count(*) FROM model_versions WHERE tenant_id = :t"), {"t": tenant}).scalar_one() == 0
+        assert connection.execute(text("SELECT count(*) FROM idempotency_records WHERE tenant_id = :t"), {"t": tenant}).scalar_one() == 0
+
+
+def test_f1_w4_pin_ends_within_the_budget_when_the_callers_user_row_is_held(owner_engine, app_engine, two_tenants, clean_tables):
+    tenant, _ = two_tenants
+    with owner_engine.begin() as connection:
+        seeded = _approver(connection, tenant, "lw-f1-w4")
+        version_id = _version_row(connection, tenant=tenant, model_id=seeded["model_id"])
+    held = _Held(owner_engine).row("users", "user_id", seeded["user_id"])
+    try:
+        client = _client(app_engine, tenant_id=tenant, user_id=seeded["user_id"])
+        response, elapsed = _within_deadline(lambda: client.post(
+            f"/v1/projects/{seeded['project_id']}/models/{seeded['model_id']}/versions/1.0.0/retention-pin",
+            json={"until": "2028-01-01T00:00:00+00:00"}, headers={"Idempotency-Key": "k-f1-w4", "Content-Type": "application/json"},
+        ))
+    finally:
+        held.close()
+    _canonical_503(response)
+    assert elapsed < DEADLINE_SECONDS
+    with owner_engine.begin() as connection:
+        until = connection.execute(text("SELECT retention_pinned_until FROM model_versions WHERE model_version_id = :v"), {"v": version_id}).scalar_one()
+        assert until == dt.datetime(2027, 1, 1, tzinfo=UTC)
+        assert connection.execute(text("SELECT count(*) FROM idempotency_records WHERE tenant_id = :t"), {"t": tenant}).scalar_one() == 0
+
+
+def test_f1_w1_seal_ends_within_the_budget_when_the_callers_user_row_is_held(owner_engine, app_engine, app_sessionmaker, two_tenants, clean_tables):
+    tenant, _ = two_tenants
+    with owner_engine.begin() as connection:
+        seed = _seed_project(connection, tenant_id=tenant, code="lw-f1-w1")
+        connection.execute(text("UPDATE project_members SET role_code = 'approver' WHERE user_id = :u"), {"u": seed["user_id"]})
+    run_id, _, _ = _prepare_run(app_sessionmaker, tenant_id=tenant, seed=seed)
+    held = _Held(owner_engine).row("users", "user_id", seed["user_id"])
+    try:
+        client = _client(app_engine, tenant_id=tenant, user_id=seed["user_id"])
+        response, elapsed = _within_deadline(lambda: client.post(
+            f"/v1/projects/{seed['project_id']}/runs/{run_id}/record",
+            json={}, headers={"Idempotency-Key": "k-f1-w1", "Content-Type": "application/json"},
+        ))
+    finally:
+        held.close()
+    _canonical_503(response)
+    assert elapsed < DEADLINE_SECONDS
+    with owner_engine.begin() as connection:
+        assert connection.execute(text("SELECT count(*) FROM run_records WHERE run_id = :r"), {"r": run_id}).scalar_one() == 0
+        assert connection.execute(text("SELECT count(*) FROM idempotency_records WHERE tenant_id = :t"), {"t": tenant}).scalar_one() == 0
+
+
+def test_f1_release_ends_within_the_budget_when_the_callers_user_row_is_held_and_never_fetches(owner_engine, app_engine, two_tenants, clean_tables):
+    """The preflight refuses before the kernel observation: the fetcher is not called."""
+    tenant, _ = two_tenants
+    with owner_engine.begin() as connection:
+        seeded = _seed_releasable(connection, tenant_id=tenant, now=NOW, project_code="lw-f1-rel", role="approver")
+    fetch, calls = _counting_fetcher(_observation(seeded["project_id"], seeded["model_id"], "1.0.0"))
+    held = _Held(owner_engine).row("users", "user_id", seeded["user_id"])
+    try:
+        client = _client(app_engine, tenant_id=tenant, user_id=seeded["user_id"])
+        client.app.state.model_commitment_fetcher = fetch
+        response, elapsed = _within_deadline(lambda: client.post(
+            f"/v1/projects/{seeded['project_id']}/models/{seeded['model_id']}/versions/1.0.0/release",
+            json=DECLARATION, headers={"Content-Type": "application/json"},
+        ))
+    finally:
+        held.close()
+    _canonical_503(response)
+    assert elapsed < DEADLINE_SECONDS
+    assert calls["n"] == 0
+    with owner_engine.begin() as connection:
+        stage = connection.execute(text("SELECT stage FROM model_versions WHERE model_version_id = :v"), {"v": seeded["version_id"]}).scalar_one()
+    assert stage == "draft"

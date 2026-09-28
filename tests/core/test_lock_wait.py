@@ -127,11 +127,38 @@ def test_the_context_manager_sets_the_bound_then_maps_a_wait_and_reraises_anythi
 
 
 @pytest.mark.parametrize("module", [run_seal, model_retention, model_versions, model_release])
-def test_every_business_write_route_uses_the_shared_bound_and_keeps_no_copy(module):
+def test_every_transaction_span_of_every_write_route_is_bounded_and_no_copy_exists(module):
+    """Structure, not a substring (Codex #211 F1): each route opens N sessions
+    (the permission preflight and the write) and every one of them enters
+    ``bounded_lock_wait`` beside its tenant scope; a bare tenant scope is a
+    span that could wait forever."""
+    import re
+
     source = inspect.getsource(module)
-    assert "bounded_lock_wait(" in source, module.__name__
+    spans = source.count("with factory() as session:")
+    assert spans >= 2, module.__name__
+    assert source.count("bounded_lock_wait(") == spans, module.__name__
+    assert not re.search(r"with tenant_scope\(session, principal\.tenant_id\):\n", source), module.__name__
     assert "SET LOCAL lock_timeout = '" not in source, module.__name__  # no private copy of the bound
     assert "55P03" not in source and "40P01" not in source, module.__name__
+
+
+def test_the_deadline_harness_returns_on_timeout_instead_of_waiting_for_the_blocked_call():
+    """Codex #211 F2: a reverted bound must fail the test by its deadline, not
+    hang CI on an executor shutdown that waits for the blocked worker."""
+    import threading
+    import time
+
+    from lock_wait_harness import DeadlineExceeded, within_deadline
+
+    release = threading.Event()
+    started = time.monotonic()
+    with pytest.raises(DeadlineExceeded):
+        within_deadline(release.wait, seconds=0.5)
+    assert time.monotonic() - started < 3.0                         # returned promptly, did not join the worker
+    release.set()                                                    # let the worker finish
+    result, elapsed = within_deadline(lambda: "ok", seconds=5)
+    assert result == "ok" and elapsed < 5
 
 
 def test_statement_timeout_is_a_stated_decision_not_an_omission():
