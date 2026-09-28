@@ -455,5 +455,152 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
         globalThis.fetch = originalFetch;
       }
     });
+
+    it('rejects ModelCommitObservation with extra property (violating additionalProperties: false)', async () => {
+      const originalFetch = globalThis.fetch;
+      const testProjectId = 'prj_0123456789ABCDEFGHJKMNPQRS';
+      const testModelId = 'mdl_0123456789ABCDEFGHJKMNPQRS';
+      const testVersion = '1.0.0';
+
+      const payloadWithExtraProp = {
+        projectId: testProjectId,
+        modelId: testModelId,
+        version: testVersion,
+        manifestHash: '7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069',
+        sourceRunId: 'run_0123456789ABCDEFGHJKMNPQRS',
+        committedAt: '2026-09-28T09:00:00Z',
+        commitRecoveryEpoch: '33333333-3333-4333-8333-333333333333',
+        format: 'safetensors',
+        totalBytes: 52428800,
+        shardCount: 4,
+        licensePolicy: 'Apache-2.0',
+        classification: 'internal',
+        committed: true,
+        currentAvailability: 'unknown',
+        requiresExecutionRevalidation: true,
+        unexpectedProperty: 'violates_additionalProperties_false', // extra property
+      };
+
+      try {
+        globalThis.fetch = vi.fn().mockResolvedValue({
+          ok: true,
+          status: 200,
+          headers: new Headers({ 'content-type': 'application/json' }),
+          json: async () => payloadWithExtraProp,
+        } as any);
+
+        await act(async () => {
+          root.render(React.createElement(ModelLineageView, { initialLineages: TEST_FIXTURE_LINEAGES }));
+        });
+
+        const projectInput = container.querySelector<HTMLInputElement>('[data-testid="commitment-project-input"]');
+        const modelInput = container.querySelector<HTMLInputElement>('[data-testid="commitment-model-input"]');
+        const versionInput = container.querySelector<HTMLInputElement>('[data-testid="commitment-version-input"]');
+        const fetchBtn = container.querySelector<HTMLButtonElement>('[data-testid="commitment-fetch-btn"]');
+
+        const setInputValue = (el: HTMLInputElement, val: string) => {
+          const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+          setter?.call(el, val);
+          el.dispatchEvent(new Event('input', { bubbles: true }));
+          el.dispatchEvent(new Event('change', { bubbles: true }));
+        };
+
+        await act(async () => {
+          setInputValue(projectInput!, testProjectId);
+          setInputValue(modelInput!, testModelId);
+          setInputValue(versionInput!, testVersion);
+        });
+
+        await act(async () => {
+          fetchBtn!.click();
+        });
+        await act(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 0));
+        });
+
+        const errorBanner = container.querySelector('[data-testid="commitment-error-banner"]');
+        expect(errorBanner).not.toBeNull();
+        expect(errorBanner?.getAttribute('role')).toBe('alert');
+        expect(errorBanner?.textContent).toContain('ModelCommitObservation 응답 계약 불일치');
+
+        const resultContainer = container.querySelector('[data-testid="commitment-result-container"]');
+        expect(resultContainer).toBeNull();
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    });
+
+    it('rejects ModelCommitObservation with invalid calendar date-time (e.g. 2026-02-30T25:61:00Z)', async () => {
+      const originalFetch = globalThis.fetch;
+      const testProjectId = 'prj_0123456789ABCDEFGHJKMNPQRS';
+      const testModelId = 'mdl_0123456789ABCDEFGHJKMNPQRS';
+      const testVersion = '1.0.0';
+
+      const payloadWithInvalidDate = {
+        projectId: testProjectId,
+        modelId: testModelId,
+        version: testVersion,
+        manifestHash: '7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069',
+        sourceRunId: 'run_0123456789ABCDEFGHJKMNPQRS',
+        committedAt: '2026-02-30T25:61:00Z', // impossible calendar date & time
+        commitRecoveryEpoch: '33333333-3333-4333-8333-333333333333',
+        format: 'safetensors',
+        totalBytes: 52428800,
+        shardCount: 4,
+        licensePolicy: 'Apache-2.0',
+        classification: 'internal',
+        committed: true,
+        currentAvailability: 'unknown',
+        requiresExecutionRevalidation: true,
+      };
+
+      try {
+        globalThis.fetch = vi.fn().mockResolvedValue({
+          ok: true,
+          status: 200,
+          headers: new Headers({ 'content-type': 'application/json' }),
+          json: async () => payloadWithInvalidDate,
+        } as any);
+
+        await act(async () => {
+          root.render(React.createElement(ModelLineageView, { initialLineages: TEST_FIXTURE_LINEAGES }));
+        });
+
+        const projectInput = container.querySelector<HTMLInputElement>('[data-testid="commitment-project-input"]');
+        const modelInput = container.querySelector<HTMLInputElement>('[data-testid="commitment-model-input"]');
+        const versionInput = container.querySelector<HTMLInputElement>('[data-testid="commitment-version-input"]');
+        const fetchBtn = container.querySelector<HTMLButtonElement>('[data-testid="commitment-fetch-btn"]');
+
+        const setInputValue = (el: HTMLInputElement, val: string) => {
+          const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+          setter?.call(el, val);
+          el.dispatchEvent(new Event('input', { bubbles: true }));
+          el.dispatchEvent(new Event('change', { bubbles: true }));
+        };
+
+        await act(async () => {
+          setInputValue(projectInput!, testProjectId);
+          setInputValue(modelInput!, testModelId);
+          setInputValue(versionInput!, testVersion);
+        });
+
+        await act(async () => {
+          fetchBtn!.click();
+        });
+        await act(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 0));
+        });
+
+        const errorBanner = container.querySelector('[data-testid="commitment-error-banner"]');
+        expect(errorBanner).not.toBeNull();
+        expect(errorBanner?.getAttribute('role')).toBe('alert');
+        expect(errorBanner?.textContent).toContain('ModelCommitObservation 응답 계약 불일치');
+
+        const resultContainer = container.querySelector('[data-testid="commitment-result-container"]');
+        expect(resultContainer).toBeNull();
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    });
   });
 });
