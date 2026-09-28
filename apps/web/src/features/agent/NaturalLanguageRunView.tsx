@@ -53,6 +53,10 @@ export const NaturalLanguageRunView: React.FC = () => {
     if (!activeRequest) return;
     const res = agentManager.advanceRepairLoop(activeRequest.id);
     if (!res.canRepair) {
+      setActiveRequest({
+        ...activeRequest,
+        status: 'rejected',
+      });
       setActionNotice({
         type: 'error',
         text: `🛑 ${res.error}`,
