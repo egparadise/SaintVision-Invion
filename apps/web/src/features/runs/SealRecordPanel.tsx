@@ -53,22 +53,22 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
     const rawDetail = String(problem?.detail || err?.detail || '');
     const rawMessage = String(err?.message || problem?.title || err?.title || (typeof err?.problem === 'string' ? err.problem : '') || err || '');
 
-    // HTML / Gateway 502/504 sanitization (check detail and message to avoid HTML leakage)
+    const status = Number(err?.status || problem?.status || 0);
     const isHtmlOrGateway =
       /<[a-z][\s\S]*>/i.test(rawDetail) ||
       /<[a-z][\s\S]*>/i.test(rawMessage) ||
       rawMessage.includes('SyntaxError') ||
-      rawDetail.includes('502') ||
-      rawMessage.includes('502') ||
-      rawDetail.includes('504') ||
-      rawMessage.includes('504') ||
+      status === 502 ||
+      status === 504 ||
       rawDetail.includes('Bad Gateway') ||
-      rawMessage.includes('Bad Gateway');
+      rawMessage.includes('Bad Gateway') ||
+      rawDetail.includes('Gateway Timeout') ||
+      rawMessage.includes('Gateway Timeout');
 
     if (isHtmlOrGateway) {
       return {
-        status: err?.status || problem?.status || 502,
-        code: problem?.code || err?.code || 'NET-0502',
+        status: status === 504 ? 504 : 502,
+        code: problem?.code || err?.code || (status === 504 ? 'NET-0504' : 'NET-0502'),
         message: '서버 또는 게이트웨이 오류가 발생했습니다. (잠시 후 다시 시도해 주세요)',
       };
     }
@@ -169,25 +169,29 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
 
       // If unsealed, check if latest unsealed Context Bundle exists
       if (recordMissing) {
+        let bundleStatusDesc = '';
         try {
           const bundle = await fetchContextBundle(projectId, runId, signal);
           if (!signal.aborted && bundle) {
             setContextBundle(bundle);
+            bundleStatusDesc = ', 최신 컨텍스트 번들 존재';
           }
         } catch (bErr: any) {
           if (signal.aborted) return;
           const bPErr = cleanErrorMessage(bErr);
           if (bPErr.status === 404 && (bPErr.detail?.includes('No context bundle') || bPErr.message?.includes('No context bundle'))) {
             setBundleSpecialStatus('not_found');
-          } else if (bPErr.status === 409 && (bPErr.code === 'GRAPH-0002' || bPErr.detail?.includes('Missing snapshot') || bPErr.message?.includes('Missing snapshot'))) {
+          } else if (bPErr.status === 409 && (bPErr.code === 'GRAPH-0002' || bPErr.detail?.includes('cannot be reproduced') || bPErr.message?.includes('cannot be reproduced'))) {
             setBundleSpecialStatus('reproduction_failed');
+            bundleStatusDesc = ', 번들 재현불가';
           } else {
             setBundleError(bPErr);
+            bundleStatusDesc = `, 번들 조회 실패 (${bPErr.code || bPErr.status || '오류'})`;
           }
         }
         if (signal.aborted) return;
         setIsLoading(false);
-        setLiveAnnouncement('봉인 기록 없음: 미봉인 실행');
+        setLiveAnnouncement(`봉인 기록 없음: 미봉인 실행${bundleStatusDesc}`);
         return;
       }
 
@@ -218,7 +222,7 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
         if (bErr.status === 404 && (bErr.detail?.includes('No context bundle') || bErr.message?.includes('No context bundle'))) {
           setBundleSpecialStatus('not_found');
           bundleMsg = '없음';
-        } else if (bErr.status === 409 && (bErr.code === 'GRAPH-0002' || bErr.detail?.includes('Missing snapshot') || bErr.message?.includes('Missing snapshot'))) {
+        } else if (bErr.status === 409 && (bErr.code === 'GRAPH-0002' || bErr.detail?.includes('cannot be reproduced') || bErr.message?.includes('cannot be reproduced'))) {
           setBundleSpecialStatus('reproduction_failed');
           bundleMsg = '재현불가';
         } else {
@@ -248,19 +252,25 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
 
   const handleLoadNextPage = async () => {
     if (!projectId || !runId || !artifactsPage?.nextCursor || isLoadingMoreArtifacts) return;
+    const currentGen = generationRef.current;
+    const reqRunId = runId;
     setIsLoadingMoreArtifacts(true);
     setLiveAnnouncement(`아티팩트 다음 페이지 조회 중 (cursor: ${artifactsPage.nextCursor.slice(0, 12)}...)...`);
 
     try {
-      const nextPage = await fetchRunRecordArtifacts(projectId, runId, { cursor: artifactsPage.nextCursor });
+      const nextPage = await fetchRunRecordArtifacts(projectId, reqRunId, { cursor: artifactsPage.nextCursor });
+      if (generationRef.current !== currentGen || runId !== reqRunId) return;
       setArtifactsPage(nextPage);
       setLiveAnnouncement(`아티팩트 다음 페이지 조회 완료: 이 페이지 ${nextPage.count}건${nextPage.nextCursor ? ' (추가 페이지 있음)' : ''}`);
     } catch (err: any) {
+      if (generationRef.current !== currentGen || runId !== reqRunId) return;
       const pErr = cleanErrorMessage(err);
       setArtifactsError(pErr);
       setLiveAnnouncement(`❌ 아티팩트 다음 페이지 조회 실패: ${pErr.message}`);
     } finally {
-      setIsLoadingMoreArtifacts(false);
+      if (generationRef.current === currentGen && runId === reqRunId) {
+        setIsLoadingMoreArtifacts(false);
+      }
     }
   };
 
@@ -806,7 +816,9 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
       )}
 
       {/* Context Bundle Metadata (R3) */}
-      {(!isUnsealed ? (contextBundle || bundleError || bundleSpecialStatus) : contextBundle) && (
+      {(!isUnsealed
+        ? (contextBundle || bundleError || bundleSpecialStatus)
+        : (contextBundle || bundleError || bundleSpecialStatus === 'reproduction_failed')) && (
         <div
           data-testid="seal-bundle-section"
           style={{
@@ -965,9 +977,12 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8125rem' }}>
                     <thead>
                       <tr style={{ borderBottom: '1px solid #30363d', color: '#8b949e', textAlign: 'left' }}>
+                        <th scope="col" style={{ padding: '8px' }}>순번</th>
                         <th scope="col" style={{ padding: '8px' }}>항목 ID</th>
                         <th scope="col" style={{ padding: '8px' }}>종류 (Kind)</th>
                         <th scope="col" style={{ padding: '8px' }}>버전</th>
+                        <th scope="col" style={{ padding: '8px' }}>비식별화</th>
+                        <th scope="col" style={{ padding: '8px' }}>신뢰도</th>
                         <th scope="col" style={{ padding: '8px' }}>콘텐츠 해시 (SHA-256)</th>
                         <th scope="col" style={{ padding: '8px' }}>바이트 크기</th>
                       </tr>
@@ -975,9 +990,22 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
                     <tbody>
                       {contextBundle.items.map((item, idx) => (
                         <tr key={`${item.itemId}-${idx}`} style={{ borderBottom: '1px solid #21262d' }}>
+                          <td style={{ padding: '8px', color: '#8b949e' }}>{item.ordinal ?? idx + 1}</td>
                           <td style={{ padding: '8px', fontFamily: 'monospace', color: '#c9d1d9' }}>{item.itemId}</td>
                           <td style={{ padding: '8px', color: '#58a6ff' }}>{item.kind}</td>
                           <td style={{ padding: '8px', color: '#8b949e' }}>v{item.itemVersion}</td>
+                          <td style={{ padding: '8px' }}>
+                            {item.redacted ? (
+                              <span style={{ fontSize: '0.6875rem', padding: '1px 6px', borderRadius: '4px', backgroundColor: 'rgba(210, 153, 34, 0.2)', color: '#d29922', fontWeight: 600 }}>
+                                [비식별화]
+                              </span>
+                            ) : (
+                              <span style={{ color: '#8b949e' }}>-</span>
+                            )}
+                          </td>
+                          <td style={{ padding: '8px', color: '#8b949e' }}>
+                            {item.confidence !== undefined && item.confidence !== null ? `${(item.confidence * 100).toFixed(0)}%` : '-'}
+                          </td>
                           <td style={{ padding: '8px', fontFamily: 'monospace', color: '#8b949e', fontSize: '0.75rem' }}>
                             {item.contentHash.slice(0, 16)}...
                           </td>

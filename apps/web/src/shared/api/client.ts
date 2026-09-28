@@ -64,12 +64,13 @@ function isProblemDetails(value: unknown): value is ProblemDetails {
     typeof problem.title === 'string' && problem.title.length > 0 && problem.title.length <= 200 &&
     Number.isInteger(problem.status) && Number(problem.status) >= 400 && Number(problem.status) <= 599 &&
     typeof problem.code === 'string' && (/^[A-Z]+-[0-9]{4}$/.test(problem.code) || isLegacyAuth) &&
-    (isLegacyAuth ? (problem.category === undefined || (typeof problem.category === 'string' && /^[A-Z]+$/.test(problem.category))) : (typeof problem.category === 'string' && /^[A-Z]+$/.test(problem.category))) &&
+    typeof problem.category === 'string' && /^[A-Z]+$/.test(problem.category) &&
     typeof problem.detail === 'string' && problem.detail.length <= 1000 &&
-    (isLegacyAuth ? (problem.retryable === undefined || typeof problem.retryable === 'boolean') : (typeof problem.retryable === 'boolean')) &&
-    (isLegacyAuth ? (problem.traceId === undefined || (typeof problem.traceId === 'string' && /^[0-9a-f]{32}$/.test(problem.traceId))) : (typeof problem.traceId === 'string' && /^[0-9a-f]{32}$/.test(problem.traceId))) &&
-    (problem.causeRef === null || problem.causeRef === undefined || (typeof problem.causeRef === 'string' && problem.causeRef.length > 0 && problem.causeRef.length <= 200)) &&
-    (problem.evidenceId === null || problem.evidenceId === undefined || (typeof problem.evidenceId === 'string' && /^evd_[0-9A-HJKMNP-TV-Z]{26}$/.test(problem.evidenceId)));
+    typeof problem.retryable === 'boolean' &&
+    typeof problem.traceId === 'string' && /^[0-9a-f]{32}$/.test(problem.traceId) &&
+    (problem.causeRef === null || (typeof problem.causeRef === 'string' && problem.causeRef.length > 0 && problem.causeRef.length <= 200)) &&
+    (problem.evidenceId === null || (typeof problem.evidenceId === 'string' && /^evd_[0-9A-HJKMNP-TV-Z]{26}$/.test(problem.evidenceId))) &&
+    (!('instance' in problem) || problem.instance === null || (typeof problem.instance === 'string' && problem.instance.length <= 500));
 }
 
 let inMemoryAuthToken: string | null = null;

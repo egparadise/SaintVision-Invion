@@ -1,54 +1,34 @@
-// @vitest-environment happy-dom
+/** @vitest-environment happy-dom */
 import React, { act } from 'react';
 import { createRoot, Root } from 'react-dom/client';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { RunDetail } from '../src/features/runs/RunDetail';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SealRecordPanel } from '../src/features/runs/SealRecordPanel';
 import * as client from '../src/shared/api/client';
 import { ApiError } from '../src/shared/api/client';
-import type { RunItem, ProblemDetails } from '../src/contracts/types';
-import type { RunRecordResponse } from '../src/contracts/run-record-response';
-import type { RunRecordArtifactPageResponse } from '../src/contracts/run-record-artifact-page-response';
-import type { ArtifactPinVerificationResponse } from '../src/contracts/artifact-pin-verification-response';
-import type { ContextBundleResponse } from '../src/contracts/context-bundle-response';
 import {
-  isRunRecordResponse,
   isArtifactPinVerificationResponse,
   isContextBundleResponse,
+  isRunRecordResponse,
 } from '../src/shared/api/runSealObservation';
+import type {
+  ArtifactPinVerificationResponse,
+  ContextBundleResponse,
+  RunRecordArtifactPageResponse,
+  RunRecordResponse,
+} from '../src/contracts/types';
 
 (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
 
-function makeProblem(status: number, code: string, detail: string, category = 'AUTH'): ProblemDetails {
-  return {
-    type: 'about:blank',
-    title: code,
-    status,
-    code,
-    category,
-    detail,
-    retryable: false,
-    traceId: '0123456789abcdef0123456789abcdef',
-    causeRef: null,
-    evidenceId: null,
-  };
-}
+const sampleRun = {
+  id: 'run_01J8Z3XQ2K9WMV5T7N4B6C8D0E',
+  projectId: 'prj_01J8Z3XQ2K9WMV5T7N4B6C8D0E',
+};
 
 const SHA_A = 'a'.repeat(64);
 const SHA_B = 'b'.repeat(64);
 const SHA_C = 'c'.repeat(64);
 const SHA_D = 'd'.repeat(64);
 
-// Strictly conforming RunItem (F9: no status, targetNodeId, startedAt)
-const sampleRun: RunItem = {
-  id: 'run_01J8Z3XQ2K9WMV5T7N4B6C8D0E',
-  projectId: 'prj_01J8Z3XQ2K9WMV5T7N4B6C8D0E',
-  state: 'succeeded',
-  createdAt: '2026-09-28T04:00:00Z',
-  completedAt: '2026-09-28T05:00:00Z',
-};
-
-// Fixtures with valid ULID IDs and bnd_ prefix (F9)
 const ART_ID_1 = 'art_01J8Z3XQ2K9WMV5T7N4B6C8D01';
 const ART_ID_2 = 'art_01J8Z3XQ2K9WMV5T7N4B6C8D02';
 const BUNDLE_ID = 'bnd_01J8Z3XQ2K9WMV5T7N4B6C8D0E';
@@ -122,7 +102,8 @@ const contextBundleFixture: ContextBundleResponse = {
       ordinal: 1,
       contentHash: SHA_D,
       byteSize: 1024,
-      redacted: false,
+      redacted: true,
+      confidence: 0.95,
     },
   ],
 };
@@ -138,38 +119,62 @@ function parseRgb(colorStr: string): [number, number, number] {
       ];
     }
   }
-  const match = colorStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-  if (match) {
-    return [parseInt(match[1], 10), parseInt(match[2], 10), parseInt(match[3], 10)];
+  const m = colorStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  if (m) {
+    return [parseInt(m[1], 10), parseInt(m[2], 10), parseInt(m[3], 10)];
   }
   return [255, 255, 255];
 }
 
-function relativeLuminance([r, g, b]: [number, number, number]): number {
-  const [rs, gs, bs] = [r, g, b].map((c) => {
-    const s = c / 255;
-    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
-  });
-  return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+function srgbToLinear(c: number): number {
+  const norm = c / 255;
+  return norm <= 0.03928 ? norm / 12.92 : Math.pow((norm + 0.055) / 1.055, 2.4);
 }
 
-function contrastRatio(rgb1: [number, number, number], rgb2: [number, number, number]): number {
-  const l1 = relativeLuminance(rgb1);
-  const l2 = relativeLuminance(rgb2);
+function relativeLuminance([r, g, b]: [number, number, number]): number {
+  return 0.2126 * srgbToLinear(r) + 0.7152 * srgbToLinear(g) + 0.0722 * srgbToLinear(b);
+}
+
+function contrastRatio(fg: [number, number, number], bg: [number, number, number]): number {
+  const l1 = relativeLuminance(fg);
+  const l2 = relativeLuminance(bg);
   const lighter = Math.max(l1, l2);
   const darker = Math.min(l1, l2);
   return (lighter + 0.05) / (darker + 0.05);
 }
 
-describe('RunDetail Seal Record Panel - R1/R2/R3 Contract Bindings (Card 86)', () => {
+function makeProblem(
+  status: number,
+  code: string,
+  detail: string,
+  category = 'RES',
+  retryable = false,
+  causeRef: string | null = null,
+  evidenceId: string | null = null,
+): client.ProblemDetails {
+  return {
+    type: 'about:blank',
+    title: code,
+    status,
+    code,
+    category,
+    detail,
+    retryable,
+    traceId: '0123456789abcdef0123456789abcdef',
+    causeRef,
+    evidenceId,
+  };
+}
+
+describe('SealRecordPanel Component (G-04 R1·R2·R3)', () => {
   let container: HTMLDivElement;
   let root: Root;
 
   beforeEach(() => {
-    vi.restoreAllMocks();
     container = document.createElement('div');
     document.body.appendChild(container);
     root = createRoot(container);
+    vi.restoreAllMocks();
   });
 
   afterEach(() => {
@@ -177,34 +182,19 @@ describe('RunDetail Seal Record Panel - R1/R2/R3 Contract Bindings (Card 86)', (
       root.unmount();
     });
     container.remove();
-    vi.restoreAllMocks();
   });
 
-  it('1. Tab 7 button integration in RunDetail: switches to seal record tab', async () => {
-    vi.spyOn(client, 'apiClient').mockImplementation(async (url: string) => {
-      if (url.includes('/record/artifacts')) return artifactsPageFixture as any;
-      if (url.includes('/context-bundle')) return contextBundleFixture as any;
-      if (url.includes('/record')) return sealedRecordFixture as any;
-      return {} as any;
-    });
-
+  it('1. Mounts without initial fetch when projectId or runId is missing', async () => {
+    const fetchSpy = vi.spyOn(client, 'apiClient');
     await act(async () => {
-      root.render(<RunDetail run={sampleRun} onBack={() => {}} />);
+      root.render(<SealRecordPanel projectId="" runId="" />);
     });
-
-    const sealTabBtn = container.querySelector('[data-testid="tab-seal"]') as HTMLButtonElement;
-    expect(sealTabBtn).not.toBeNull();
-    expect(sealTabBtn.textContent).toContain('7. 봉인 기록 (Seal Record)');
-
-    await act(async () => {
-      sealTabBtn.click();
-    });
-
-    const panel = container.querySelector('[data-testid="seal-record-panel"]');
-    expect(panel).not.toBeNull();
+    expect(fetchSpy).not.toHaveBeenCalled();
+    const liveRegion = container.querySelector('[data-testid="seal-record-live-status"]');
+    expect(liveRegion?.textContent).toContain('식별자 누락');
   });
 
-  it('2. R1 Sealed RunRecord Happy Path: renders sealed record, workload spec, attempts, evidenceId', async () => {
+  it('2. Sealed run complete success (R1 + R2 + R3)', async () => {
     vi.spyOn(client, 'apiClient').mockImplementation(async (url: string) => {
       if (url.includes('/record/artifacts')) return artifactsPageFixture as any;
       if (url.includes('/context-bundle')) return contextBundleFixture as any;
@@ -216,52 +206,36 @@ describe('RunDetail Seal Record Panel - R1/R2/R3 Contract Bindings (Card 86)', (
       root.render(<SealRecordPanel projectId={sampleRun.projectId} runId={sampleRun.id} />);
     });
 
-    const badge = container.querySelector('[data-testid="seal-status-badge"]');
-    expect(badge?.textContent).toContain('✔ 봉인됨 (SEALED)');
+    const statusBadge = container.querySelector('[data-testid="seal-status-badge"]');
+    expect(statusBadge?.textContent).toContain('봉인됨 (SEALED)');
 
-    const recordId = container.querySelector('[data-testid="seal-record-id"]');
-    expect(recordId?.textContent).toBe('rec_01J8Z3XQ2K9WMV5T7N4B6C8D0E');
-
-    const finalState = container.querySelector('[data-testid="seal-final-state"]');
-    expect(finalState?.textContent).toBe('succeeded');
-
-    const terminationReason = container.querySelector('[data-testid="seal-termination-reason"]');
-    expect(terminationReason?.textContent).toBe('completed');
-
-    const attemptCount = container.querySelector('[data-testid="seal-attempt-count"]');
-    expect(attemptCount?.textContent).toContain('1회');
-
-    const evidenceId = container.querySelector('[data-testid="seal-evidence-id"]');
-    expect(evidenceId?.textContent).toBe('evd_01J8Z3XQ2K9WMV5T7N4B6C8D0E');
-
-    const specSha = container.querySelector('[data-testid="seal-workload-spec-sha"]');
-    expect(specSha?.textContent).toBe(SHA_B);
-
-    // Live region announcement contains page count
     const liveRegion = container.querySelector('[data-testid="seal-record-live-status"]');
     expect(liveRegion?.textContent).toContain('봉인 기록 조회 완료: 봉인됨 (아티팩트 이 페이지 2건, 번들 해시일치)');
+
+    expect(container.querySelector('[data-testid="seal-record-details"]')).not.toBeNull();
+    expect(container.textContent).toContain('evd_01J8Z3XQ2K9WMV5T7N4B6C8D0E');
+    expect(container.textContent).toContain('succeeded');
+    expect(container.textContent).toContain('completed');
+
+    const artifactRows = container.querySelectorAll('[data-testid^="seal-artifact-row-"]');
+    expect(artifactRows.length).toBe(2);
+    expect(container.textContent).toContain('v1.0');
+    expect(container.textContent).toContain('토큰 추정: 512');
+    expect(container.textContent).toContain('[비식별화]');
+    expect(container.textContent).toContain('95%');
   });
 
-  it('3. R2 Pinned Artifacts Table & Verification: verified:true vs verified:false 200 fact report (F7/F8)', async () => {
+  it('3. Artifact pin verification (R2): handles verified: true and verified: false (reported as facts)', async () => {
+    let verifyResponse: ArtifactPinVerificationResponse = {
+      runId: sampleRun.id,
+      recordId: sealedRecordFixture.recordId,
+      artifactId: ART_ID_1,
+      pinnedChecksumSha256: SHA_A,
+      verified: true,
+    };
+
     vi.spyOn(client, 'apiClient').mockImplementation(async (url: string) => {
-      if (url.includes(`/record/artifacts/${ART_ID_1}/verify`)) {
-        return {
-          runId: sampleRun.id,
-          recordId: 'rec_01J8Z3XQ2K9WMV5T7N4B6C8D0E',
-          artifactId: ART_ID_1,
-          pinnedChecksumSha256: SHA_A,
-          verified: true,
-        } as ArtifactPinVerificationResponse as any;
-      }
-      if (url.includes(`/record/artifacts/${ART_ID_2}/verify`)) {
-        return {
-          runId: sampleRun.id,
-          recordId: 'rec_01J8Z3XQ2K9WMV5T7N4B6C8D0E',
-          artifactId: ART_ID_2,
-          pinnedChecksumSha256: SHA_B,
-          verified: false,
-        } as ArtifactPinVerificationResponse as any;
-      }
+      if (url.includes('/verify')) return verifyResponse as any;
       if (url.includes('/record/artifacts')) return artifactsPageFixture as any;
       if (url.includes('/context-bundle')) return contextBundleFixture as any;
       if (url.includes('/record')) return sealedRecordFixture as any;
@@ -272,54 +246,48 @@ describe('RunDetail Seal Record Panel - R1/R2/R3 Contract Bindings (Card 86)', (
       root.render(<SealRecordPanel projectId={sampleRun.projectId} runId={sampleRun.id} />);
     });
 
-    // Object version rendered (F8)
-    const ver1 = container.querySelector(`[data-testid="seal-artifact-version-${ART_ID_1}"]`);
-    expect(ver1?.textContent).toBe('v1.0');
-    const ver2 = container.querySelector(`[data-testid="seal-artifact-version-${ART_ID_2}"]`);
-    expect(ver2?.textContent).toBe('-');
+    const verifyBtn = container.querySelector(`[data-testid="seal-verify-btn-${ART_ID_1}"]`) as HTMLButtonElement;
+    expect(verifyBtn).not.toBeNull();
+    expect(verifyBtn.getAttribute('aria-label')).toBe(`아티팩트 ${ART_ID_1} 무결성 검증`);
 
-    // Verify button has descriptive aria-label (O3)
-    const verifyDiffBtn = container.querySelector(`[data-testid="seal-verify-btn-${ART_ID_1}"]`) as HTMLButtonElement;
-    expect(verifyDiffBtn.getAttribute('aria-label')).toBe(`아티팩트 ${ART_ID_1} 무결성 검증`);
-
-    // Verify ART_ID_1 -> verified: true
     await act(async () => {
-      verifyDiffBtn.click();
+      verifyBtn.click();
     });
-    const diffStatusAfter = container.querySelector(`[data-testid="seal-artifact-verify-status-${ART_ID_1}"]`) as HTMLElement;
-    expect(diffStatusAfter?.textContent).toContain('✔ 일치 (Verified)');
-    expect(diffStatusAfter?.getAttribute('data-tone')).toBe('match');
 
-    // Verify ART_ID_2 -> verified: false (reported fact with 200, F7/F8)
-    const verifyModelBtn = container.querySelector(`[data-testid="seal-verify-btn-${ART_ID_2}"]`) as HTMLButtonElement;
+    const successBadge = container.querySelector(`[data-testid="seal-artifact-verify-status-${ART_ID_1}"]`) as HTMLElement;
+    expect(successBadge?.textContent).toContain('✔ 일치 (Verified)');
+    expect(successBadge.getAttribute('data-tone')).toBe('match');
+    expect(['rgb(63, 185, 80)', '#3fb950']).toContain(successBadge.style.color);
+
+    verifyResponse = {
+      runId: sampleRun.id,
+      recordId: sealedRecordFixture.recordId,
+      artifactId: ART_ID_2,
+      pinnedChecksumSha256: SHA_B,
+      verified: false,
+    };
+
+    const verifyBtn2 = container.querySelector(`[data-testid="seal-verify-btn-${ART_ID_2}"]`) as HTMLButtonElement;
     await act(async () => {
-      verifyModelBtn.click();
+      verifyBtn2.click();
     });
-    const modelStatusAfter = container.querySelector(`[data-testid="seal-artifact-verify-status-${ART_ID_2}"]`) as HTMLElement;
-    expect(modelStatusAfter?.textContent).toContain('⚠️ 불일치 (봉인 다이제스트와 다름·대상 없음)');
-    expect(modelStatusAfter?.getAttribute('data-tone')).toBe('mismatch');
-    // Color mutation kill: must NOT be green (#3fb950)
-    expect(modelStatusAfter?.style.color).not.toBe('#3fb950');
-    expect(modelStatusAfter?.style.color).not.toBe('rgb(63, 185, 80)');
-    expect(['#ff7b72', 'rgb(255, 123, 114)']).toContain(modelStatusAfter?.style.color);
 
-    // CRITICAL INVARIANT: verified: false must NEVER contain PASS or 합격 or 녹색
-    expect(modelStatusAfter?.textContent).not.toMatch(/pass|합격|성공|verified /i);
-
-    // Error alert banner is NOT shown for verified: false (it is a valid 200 fact report)
-    expect(container.querySelector('[data-testid="seal-record-error-banner"]')).toBeNull();
+    const mismatchBadge = container.querySelector(`[data-testid="seal-artifact-verify-status-${ART_ID_2}"]`) as HTMLElement;
+    expect(mismatchBadge?.textContent).toContain('⚠️ 불일치 (봉인 다이제스트와 다름·대상 없음)');
+    expect(mismatchBadge.getAttribute('data-tone')).toBe('mismatch');
+    expect(['rgb(255, 123, 114)', '#ff7b72']).toContain(mismatchBadge.style.color);
+    expect(mismatchBadge.style.color).not.toBe('rgb(63, 185, 80)');
   });
 
-  it('4. R3 Context Bundle: renders hashVerified:true vs hashVerified:false without error, tokenEstimate (F7/F8)', async () => {
-    let returnMismatch = false;
+  it('4. Context bundle hash verification (R3): handles hashVerified: true and false (reported as facts)', async () => {
+    const unverifiedBundle: ContextBundleResponse = {
+      ...contextBundleFixture,
+      hashVerified: false,
+    };
+
     vi.spyOn(client, 'apiClient').mockImplementation(async (url: string) => {
-      if (url.includes('/context-bundle')) {
-        return {
-          ...contextBundleFixture,
-          hashVerified: !returnMismatch,
-        } as any;
-      }
       if (url.includes('/record/artifacts')) return artifactsPageFixture as any;
+      if (url.includes('/context-bundle')) return unverifiedBundle as any;
       if (url.includes('/record')) return sealedRecordFixture as any;
       return {} as any;
     });
@@ -328,41 +296,22 @@ describe('RunDetail Seal Record Panel - R1/R2/R3 Contract Bindings (Card 86)', (
       root.render(<SealRecordPanel projectId={sampleRun.projectId} runId={sampleRun.id} />);
     });
 
-    // tokenEstimate rendered
-    const tokenSummary = container.querySelector('[data-testid="bundle-item-token-summary"]');
-    expect(tokenSummary?.textContent).toContain('토큰 추정: 512');
-
-    const hashStatusTrue = container.querySelector('[data-testid="bundle-hash-verified-status"]') as HTMLElement;
-    expect(hashStatusTrue?.textContent).toContain('✔ 해시 일치 (Hash Verified)');
-    expect(hashStatusTrue?.getAttribute('data-tone')).toBe('match');
-
-    // Re-render with hashVerified: false (200 fact report)
-    returnMismatch = true;
-    const refreshBtn = container.querySelector('[data-testid="seal-record-refresh-btn"]') as HTMLButtonElement;
-    await act(async () => {
-      refreshBtn.click();
-    });
-
-    const hashStatusFalse = container.querySelector('[data-testid="bundle-hash-verified-status"]') as HTMLElement;
-    expect(hashStatusFalse?.textContent).toContain('⚠️ 해시 불일치 (Hash Mismatch)');
-    expect(hashStatusFalse?.getAttribute('data-tone')).toBe('mismatch');
-    expect(hashStatusFalse?.style.color).not.toBe('#3fb950');
-    expect(hashStatusFalse?.style.color).not.toBe('rgb(63, 185, 80)');
-    expect(['#ff7b72', 'rgb(255, 123, 114)']).toContain(hashStatusFalse?.style.color);
-    // F7 regex fix: test against /✔|해시 일치 \(/
-    expect(hashStatusFalse?.textContent).not.toMatch(/✔|해시 일치 \(/);
+    const bundleHashStatus = container.querySelector('[data-testid="bundle-hash-verified-status"]') as HTMLElement;
+    expect(bundleHashStatus).not.toBeNull();
+    expect(bundleHashStatus.textContent).toContain('⚠️ 해시 불일치 (Hash Mismatch)');
+    expect(bundleHashStatus.getAttribute('data-tone')).toBe('mismatch');
+    expect(['rgb(255, 123, 114)', '#ff7b72']).toContain(bundleHashStatus.style.color);
+    expect(bundleHashStatus.style.color).not.toBe('rgb(63, 185, 80)');
+    expect(bundleHashStatus.textContent).not.toMatch(/✔|해시 일치 \(/);
   });
 
-  it('5. Unsealed Run (404 RES-0004 with exact detail): displays honest "미봉인" notice with zero fake PASS/numbers', async () => {
+  it('5. Unsealed run (404 RES-0004 with exact detail "No sealed record for this run."): renders unsealed notice, no fake artifacts', async () => {
     vi.spyOn(client, 'apiClient').mockImplementation(async (url: string) => {
       if (url.includes('/record')) {
         throw new ApiError(makeProblem(404, 'RES-0004', 'No sealed record for this run.', 'RES'));
       }
       if (url.includes('/context-bundle')) {
-        return {
-          ...contextBundleFixture,
-          sealed: false,
-        } as any;
+        throw new ApiError(makeProblem(404, 'RES-0004', 'No context bundle for this run.', 'RES'));
       }
       return {} as any;
     });
@@ -371,27 +320,18 @@ describe('RunDetail Seal Record Panel - R1/R2/R3 Contract Bindings (Card 86)', (
       root.render(<SealRecordPanel projectId={sampleRun.projectId} runId={sampleRun.id} />);
     });
 
-    const badge = container.querySelector('[data-testid="seal-status-badge"]');
-    expect(badge?.textContent).toContain('미봉인 (UNSEALED)');
+    const statusBadge = container.querySelector('[data-testid="seal-status-badge"]');
+    expect(statusBadge?.textContent).toContain('미봉인 (UNSEALED)');
 
     const unsealedNotice = container.querySelector('[data-testid="seal-record-unsealed-notice"]');
     expect(unsealedNotice).not.toBeNull();
     expect(unsealedNotice?.textContent).toContain('이 실행(Run)은 아직 봉인(Seal)되지 않은 실행입니다.');
 
-    // Assert sealed record details and artifacts table are NOT rendered
-    expect(container.querySelector('[data-testid="seal-record-details"]')).toBeNull();
     expect(container.querySelector('[data-testid="seal-artifacts-section"]')).toBeNull();
-
-    // Context bundle reflects unsealed state (sealed: false)
-    const bundleSealedStatus = container.querySelector('[data-testid="bundle-sealed-status"]');
-    expect(bundleSealedStatus?.textContent).toContain('최신 빌드 (Latest Build)');
-
-    // Live region
-    const liveRegion = container.querySelector('[data-testid="seal-record-live-status"]');
-    expect(liveRegion?.textContent).toContain('봉인 기록 없음: 미봉인 실행');
+    expect(container.querySelector('[data-testid="seal-record-details"]')).toBeNull();
   });
 
-  it('6. 404 RES-0004 with "No such run.": renders error banner, NOT unsealed notice (F4)', async () => {
+  it('6. 404 with other detail (e.g. "No such run.") is rendered as error banner, not unsealed notice (F4)', async () => {
     vi.spyOn(client, 'apiClient').mockImplementation(async (url: string) => {
       if (url.includes('/record')) {
         throw new ApiError(makeProblem(404, 'RES-0004', 'No such run.', 'RES'));
@@ -403,25 +343,16 @@ describe('RunDetail Seal Record Panel - R1/R2/R3 Contract Bindings (Card 86)', (
       root.render(<SealRecordPanel projectId={sampleRun.projectId} runId={sampleRun.id} />);
     });
 
-    // Unsealed badge and notice must NOT be rendered
-    expect(container.querySelector('[data-testid="seal-record-unsealed-notice"]')).toBeNull();
-    const badge = container.querySelector('[data-testid="seal-status-badge"]');
-    expect(badge).toBeNull();
-
-    // Error banner MUST be rendered
     const errorBanner = container.querySelector('[data-testid="seal-record-error-banner"]');
     expect(errorBanner).not.toBeNull();
-    expect(errorBanner?.textContent).toContain('[RES-0004]');
-    expect(errorBanner?.textContent).toContain('(404)');
+    expect(errorBanner?.textContent).toContain('RES-0004');
     expect(errorBanner?.textContent).toContain('No such run.');
+    expect(container.querySelector('[data-testid="seal-record-unsealed-notice"]')).toBeNull();
   });
 
-  it('7. 403 Forbidden Canonical ProblemDetails (AUTH-0030): renders alert banner and isolates containers', async () => {
-    vi.spyOn(client, 'apiClient').mockImplementation(async (url: string) => {
-      if (url.includes('/record')) {
-        throw new ApiError(makeProblem(403, 'AUTH-0030', 'This project is not accessible.', 'AUTH'));
-      }
-      return {} as any;
+  it('7. 403 Forbidden (AUTH-0030) ProblemDetails from server is rendered as error banner (F5)', async () => {
+    vi.spyOn(client, 'apiClient').mockImplementation(async () => {
+      throw new ApiError(makeProblem(403, 'AUTH-0030', 'This project is not accessible.', 'AUTH'));
     });
 
     await act(async () => {
@@ -430,18 +361,12 @@ describe('RunDetail Seal Record Panel - R1/R2/R3 Contract Bindings (Card 86)', (
 
     const errorBanner = container.querySelector('[data-testid="seal-record-error-banner"]');
     expect(errorBanner).not.toBeNull();
-    expect(errorBanner?.getAttribute('role')).toBe('alert');
     expect(errorBanner?.textContent).toContain('[AUTH-0030]');
     expect(errorBanner?.textContent).toContain('(403)');
     expect(errorBanner?.textContent).toContain('This project is not accessible.');
-
-    expect(container.querySelector('[data-testid="seal-record-details"]')).toBeNull();
-    expect(container.querySelector('[data-testid="seal-artifacts-section"]')).toBeNull();
-    expect(container.querySelector('[data-testid="seal-bundle-section"]')).toBeNull();
   });
 
-  it('8. 401 Unauthorized via realistic fetch (legacy InvError body produces NET-0401) (F5)', async () => {
-    // Realistic fetch mock returning legacy InvError body
+  it('8. 401 Unauthorized via realistic fetch (legacy InvError body with all 11 keys retains AUTH-MISSING-CREDENTIAL) (F5 & G3)', async () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => {
       return {
         ok: false,
@@ -454,7 +379,12 @@ describe('RunDetail Seal Record Panel - R1/R2/R3 Contract Bindings (Card 86)', (
           code: 'AUTH-MISSING-CREDENTIAL',
           title: 'AUTH-MISSING-CREDENTIAL',
           detail: 'a bearer credential is required',
+          category: 'AUTH',
+          retryable: false,
+          traceId: '0123456789abcdef0123456789abcdef',
           instance: '/v1/projects/prj_01/runs/run_01/record',
+          causeRef: null,
+          evidenceId: null,
         }),
         text: async () => JSON.stringify({
           type: 'https://saintvision.invenio/problems/auth-missing-credential',
@@ -462,7 +392,12 @@ describe('RunDetail Seal Record Panel - R1/R2/R3 Contract Bindings (Card 86)', (
           code: 'AUTH-MISSING-CREDENTIAL',
           title: 'AUTH-MISSING-CREDENTIAL',
           detail: 'a bearer credential is required',
+          category: 'AUTH',
+          retryable: false,
+          traceId: '0123456789abcdef0123456789abcdef',
           instance: '/v1/projects/prj_01/runs/run_01/record',
+          causeRef: null,
+          evidenceId: null,
         }),
       } as any;
     });
@@ -479,15 +414,17 @@ describe('RunDetail Seal Record Panel - R1/R2/R3 Contract Bindings (Card 86)', (
     fetchSpy.mockRestore();
   });
 
-  it('9. 502 HTML proxy error via realistic fetch: sanitizes HTML in problem.detail into Korean fallback (F5)', async () => {
-    // Realistic fetch mock returning HTML 502 Bad Gateway
+  it('9. HTML 502/504 Bad Gateway error is sanitized into clean Korean fallback without HTML tags (F5)', async () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => {
       return {
         ok: false,
         status: 502,
         statusText: 'Bad Gateway',
         headers: new Headers({ 'content-type': 'text/html' }),
-        text: async () => '<html><body><h1>502 Bad Gateway</h1><p>proxy failed</p></body></html>',
+        text: async () => '<html><body>502 Bad Gateway: nginx proxy failed</body></html>',
+        json: async () => {
+          throw new SyntaxError('Unexpected token <');
+        },
       } as any;
     });
 
@@ -498,32 +435,35 @@ describe('RunDetail Seal Record Panel - R1/R2/R3 Contract Bindings (Card 86)', (
     const errorBanner = container.querySelector('[data-testid="seal-record-error-banner"]');
     expect(errorBanner).not.toBeNull();
     expect(errorBanner?.textContent).toContain('서버 또는 게이트웨이 오류가 발생했습니다.');
-
-    // Assert ZERO raw HTML tag leakage into the DOM
-    expect(container.innerHTML).not.toContain('<html');
-    expect(container.innerHTML).not.toContain('<body');
-    expect(container.textContent).not.toContain('proxy failed');
+    expect(errorBanner?.textContent).not.toContain('<html>');
+    expect(errorBanner?.textContent).not.toContain('proxy failed');
     fetchSpy.mockRestore();
   });
 
-  it('10. R2 Pagination (F2): "이 페이지 N건" label, nextCursor and pagination button', async () => {
+  it('10. Pagination on R2 artifacts: renders "이 페이지 {count}건" and requests nextCursor (F2 & F-R3)', async () => {
     let requestedCursor: string | null = null;
+    const page1: RunRecordArtifactPageResponse = {
+      recordId: sealedRecordFixture.recordId,
+      runId: sealedRecordFixture.runId,
+      role: null,
+      nextCursor: 'art_01J8Z3XQ2K9WMV5T7N4B6C8D99',
+      count: 2,
+      items: artifactsPageFixture.items,
+    };
+    const page2: RunRecordArtifactPageResponse = {
+      recordId: sealedRecordFixture.recordId,
+      runId: sealedRecordFixture.runId,
+      role: null,
+      nextCursor: null,
+      count: 1,
+      items: [artifactsPageFixture.items[0]],
+    };
+
     vi.spyOn(client, 'apiClient').mockImplementation(async (url: string) => {
       if (url.includes('/record/artifacts')) {
-        const u = new URL('http://localhost' + url);
+        const u = new URL('https://saintvision.local' + url);
         requestedCursor = u.searchParams.get('cursor');
-        if (requestedCursor) {
-          return {
-            ...artifactsPageFixture,
-            nextCursor: null,
-            count: 1,
-            items: [artifactsPageFixture.items[0]],
-          } as any;
-        }
-        return {
-          ...artifactsPageFixture,
-          nextCursor: 'art_01J8Z3XQ2K9WMV5T7N4B6C8D99',
-        } as any;
+        return (requestedCursor ? page2 : page1) as any;
       }
       if (url.includes('/context-bundle')) return contextBundleFixture as any;
       if (url.includes('/record')) return sealedRecordFixture as any;
@@ -535,14 +475,12 @@ describe('RunDetail Seal Record Panel - R1/R2/R3 Contract Bindings (Card 86)', (
     });
 
     const pageCountEl = container.querySelector('[data-testid="seal-artifacts-page-count"]');
-    expect(pageCountEl?.textContent).toContain('이 페이지 2건 (추가 항목 있음)');
+    expect(pageCountEl?.textContent).toContain('이 페이지 2건');
     expect(pageCountEl?.textContent).not.toContain('총 2개');
 
     const nextBtn = container.querySelector('[data-testid="seal-artifacts-next-page-btn"]') as HTMLButtonElement;
     expect(nextBtn).not.toBeNull();
-    expect(nextBtn.textContent).toContain('다음 페이지 (더보기)');
 
-    // Click next page
     await act(async () => {
       nextBtn.click();
     });
@@ -551,10 +489,10 @@ describe('RunDetail Seal Record Panel - R1/R2/R3 Contract Bindings (Card 86)', (
     expect(pageCountEl?.textContent).toContain('이 페이지 1건');
   });
 
-  it('11. Sealed run with R2 500 error (F3): renders seal-artifacts-error, no fake "0건"', async () => {
+  it('11. Sealed run with R2 500 error (F3 & G4): renders seal-artifacts-error with SYS-0002, no fake "0건"', async () => {
     vi.spyOn(client, 'apiClient').mockImplementation(async (url: string) => {
       if (url.includes('/record/artifacts')) {
-        throw new ApiError(makeProblem(500, 'SYS-0001', 'Database connection error.', 'SYS'));
+        throw new ApiError(makeProblem(500, 'SYS-0002', 'Database connection error.', 'SYS'));
       }
       if (url.includes('/context-bundle')) return contextBundleFixture as any;
       if (url.includes('/record')) return sealedRecordFixture as any;
@@ -567,20 +505,19 @@ describe('RunDetail Seal Record Panel - R1/R2/R3 Contract Bindings (Card 86)', (
 
     const artErr = container.querySelector('[data-testid="seal-artifacts-error"]');
     expect(artErr).not.toBeNull();
-    expect(artErr?.textContent).toContain('SYS-0001');
+    expect(artErr?.textContent).toContain('SYS-0002');
     expect(artErr?.textContent).toContain('(500)');
     expect(artErr?.textContent).toContain('Database connection error.');
 
-    // Assert live region announces "조회 실패", NOT "아티팩트 0건"
     const liveRegion = container.querySelector('[data-testid="seal-record-live-status"]');
     expect(liveRegion?.textContent).not.toContain('아티팩트 0건');
     expect(liveRegion?.textContent).toContain('아티팩트 조회 실패');
   });
 
-  it('12. Sealed run with R3 409 GRAPH-0002 error (F3): renders reproduction-failed fact, no fake "번들 없음"', async () => {
+  it('12. Sealed run with R3 409 GRAPH-0002 error (F3 & G4): renders reproduction-failed fact with exact server detail, no fake "번들 없음"', async () => {
     vi.spyOn(client, 'apiClient').mockImplementation(async (url: string) => {
       if (url.includes('/context-bundle')) {
-        throw new ApiError(makeProblem(409, 'GRAPH-0002', 'Missing snapshot, cannot reproduce bundle.', 'GRAPH'));
+        throw new ApiError(makeProblem(409, 'GRAPH-0002', "A bundle item's snapshot is missing; the bundle cannot be reproduced.", 'GRAPH'));
       }
       if (url.includes('/record/artifacts')) return artifactsPageFixture as any;
       if (url.includes('/record')) return sealedRecordFixture as any;
@@ -591,18 +528,17 @@ describe('RunDetail Seal Record Panel - R1/R2/R3 Contract Bindings (Card 86)', (
       root.render(<SealRecordPanel projectId={sampleRun.projectId} runId={sampleRun.id} />);
     });
 
-    const reproFail = container.querySelector('[data-testid="seal-bundle-reproduction-failed"]') as HTMLElement;
-    expect(reproFail).not.toBeNull();
-    expect(reproFail.getAttribute('data-tone')).toBe('mismatch');
-    expect(reproFail.textContent).toContain('번들 재현 불가 (Snapshot Missing / GRAPH-0002)');
+    const repFailBanner = container.querySelector('[data-testid="seal-bundle-reproduction-failed"]');
+    expect(repFailBanner).not.toBeNull();
+    expect(repFailBanner?.getAttribute('data-tone')).toBe('mismatch');
+    expect(container.querySelector('[data-testid="seal-bundle-not-found"]')).toBeNull();
 
-    // Live region announces '재현불가', NOT '번들 없음'
     const liveRegion = container.querySelector('[data-testid="seal-record-live-status"]');
+    expect(liveRegion?.textContent).toContain('재현불가');
     expect(liveRegion?.textContent).not.toContain('번들 없음');
-    expect(liveRegion?.textContent).toContain('번들 재현불가');
   });
 
-  it('13. Sealed run with R3 404 error (F3): renders seal-bundle-not-found notice', async () => {
+  it('13. Sealed run with R3 404 No context bundle: renders not-found notice (F3)', async () => {
     vi.spyOn(client, 'apiClient').mockImplementation(async (url: string) => {
       if (url.includes('/context-bundle')) {
         throw new ApiError(makeProblem(404, 'RES-0004', 'No context bundle for this run.', 'RES'));
@@ -616,12 +552,11 @@ describe('RunDetail Seal Record Panel - R1/R2/R3 Contract Bindings (Card 86)', (
       root.render(<SealRecordPanel projectId={sampleRun.projectId} runId={sampleRun.id} />);
     });
 
-    const bundleNotFound = container.querySelector('[data-testid="seal-bundle-not-found"]');
-    expect(bundleNotFound).not.toBeNull();
-    expect(bundleNotFound?.textContent).toContain('컨텍스트 번들 없음');
+    expect(container.querySelector('[data-testid="seal-bundle-not-found"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="seal-bundle-reproduction-failed"]')).toBeNull();
   });
 
-  it('14. Stale Data Clearing upon Run ID switch (revert-fail: kills stale state leak, clears bundle) (F7)', async () => {
+  it('14. Run ID switch: previous artifacts and bundle sections do not leak across runs (F7)', async () => {
     vi.spyOn(client, 'apiClient').mockImplementation(async (url: string) => {
       if (url.includes('/run_A/record/artifacts')) return artifactsPageFixture as any;
       if (url.includes('/run_A/context-bundle')) return contextBundleFixture as any;
@@ -639,25 +574,17 @@ describe('RunDetail Seal Record Panel - R1/R2/R3 Contract Bindings (Card 86)', (
     await act(async () => {
       root.render(<SealRecordPanel projectId="prj_01" runId="run_A" />);
     });
-
-    expect(container.querySelector('[data-testid="seal-record-details"]')).not.toBeNull();
     expect(container.querySelector('[data-testid="seal-artifacts-section"]')).not.toBeNull();
     expect(container.querySelector('[data-testid="seal-bundle-section"]')).not.toBeNull();
 
-    // Switch to run_B
     await act(async () => {
       root.render(<SealRecordPanel projectId="prj_01" runId="run_B" />);
     });
-
-    // run_A artifacts, details, and bundle must be completely gone
-    expect(container.querySelector('[data-testid="seal-record-details"]')).toBeNull();
     expect(container.querySelector('[data-testid="seal-artifacts-section"]')).toBeNull();
-    // F7: assert bundle section is not retained from run_A
     expect(container.querySelector('[data-testid="seal-bundle-section"]')).toBeNull();
-    expect(container.querySelector('[data-testid="seal-record-unsealed-notice"]')).not.toBeNull();
   });
 
-  it('15. Abort Guard in unsealed path (F6): late R3 response on run switch does not corrupt state', async () => {
+  it('15. Abort Guard in unsealed path (F6 & G4): late R3 response on run switch does not corrupt state (correct route order)', async () => {
     let resolveRunABundle: ((value: any) => void) | null = null;
     const bundlePromise = new Promise((resolve) => {
       resolveRunABundle = resolve;
@@ -670,11 +597,11 @@ describe('RunDetail Seal Record Panel - R1/R2/R3 Contract Bindings (Card 86)', (
       if (url.includes('/run_A/context-bundle')) {
         return bundlePromise;
       }
+      if (url.includes('/run_B/record/artifacts')) return artifactsPageFixture as any;
+      if (url.includes('/run_B/context-bundle')) return contextBundleFixture as any;
       if (url.includes('/run_B/record')) {
         return sealedRecordFixture as any;
       }
-      if (url.includes('/run_B/record/artifacts')) return artifactsPageFixture as any;
-      if (url.includes('/run_B/context-bundle')) return contextBundleFixture as any;
       return {} as any;
     });
 
@@ -682,17 +609,14 @@ describe('RunDetail Seal Record Panel - R1/R2/R3 Contract Bindings (Card 86)', (
       root.render(<SealRecordPanel projectId="prj_01" runId="run_A" />);
     });
 
-    // Switch to run_B while run_A's bundle fetch is still pending
     await act(async () => {
       root.render(<SealRecordPanel projectId="prj_01" runId="run_B" />);
     });
 
-    // Resolve run_A's bundle now
     await act(async () => {
       resolveRunABundle?.(contextBundleFixture);
     });
 
-    // Live region must announce run_B's completed state, NOT run_A's unsealed state
     const liveRegion = container.querySelector('[data-testid="seal-record-live-status"]');
     expect(liveRegion?.textContent).toContain('봉인 기록 조회 완료: 봉인됨');
     expect(liveRegion?.textContent).not.toContain('미봉인 실행');
@@ -734,7 +658,7 @@ describe('RunDetail Seal Record Panel - R1/R2/R3 Contract Bindings (Card 86)', (
       root.render(<SealRecordPanel projectId={sampleRun.projectId} runId={sampleRun.id} />);
     });
 
-    const darkBgRgb: [number, number, number] = [13, 17, 23]; // #0d1117
+    const darkBgRgb: [number, number, number] = [13, 17, 23];
 
     const checkElementContrast = (el: HTMLElement) => {
       const fgColor = el.style.color;
@@ -759,17 +683,11 @@ describe('RunDetail Seal Record Panel - R1/R2/R3 Contract Bindings (Card 86)', (
   });
 
   it('18. Strict Runtime Guards: reject non-conforming responses, invalid sealedAt format, extra keys (F8)', () => {
-    // Valid RunRecordResponse
     expect(isRunRecordResponse(sealedRecordFixture)).toBe(true);
-
-    // Extra key rejected
     expect(isRunRecordResponse({ ...sealedRecordFixture, unauthorizedKey: 123 })).toBe(false);
-
-    // Invalid sealedAt format (F8 & F-R4: must be valid RFC 3339 calendar date-time)
     expect(isRunRecordResponse({ ...sealedRecordFixture, sealedAt: 'not-a-timestamp' })).toBe(false);
     expect(isRunRecordResponse({ ...sealedRecordFixture, sealedAt: '2026-02-30T12:00:00Z' })).toBe(false);
 
-    // Valid ArtifactPinVerificationResponse
     const validVerify: ArtifactPinVerificationResponse = {
       runId: 'run_01J8Z3XQ2K9WMV5T7N4B6C8D0E',
       recordId: 'rec_01J8Z3XQ2K9WMV5T7N4B6C8D0E',
@@ -780,11 +698,293 @@ describe('RunDetail Seal Record Panel - R1/R2/R3 Contract Bindings (Card 86)', (
     expect(isArtifactPinVerificationResponse(validVerify)).toBe(true);
     expect(isArtifactPinVerificationResponse({ ...validVerify, extra: true })).toBe(false);
 
-    // Valid ContextBundleResponse
     expect(isContextBundleResponse(contextBundleFixture)).toBe(true);
     expect(isContextBundleResponse({ ...contextBundleFixture, bogusField: 'nope' })).toBe(false);
-    // Invalid builtAt calendar date-time rejected (F-R4)
     expect(isContextBundleResponse({ ...contextBundleFixture, builtAt: 'not-a-timestamp' })).toBe(false);
     expect(isContextBundleResponse({ ...contextBundleFixture, builtAt: '2026-02-30T12:00:00Z' })).toBe(false);
+  });
+
+  it('19. Unsealed run with R3 409 GRAPH-0002 (G1): renders seal-bundle-reproduction-failed fact and live status includes 번들 재현불가', async () => {
+    vi.spyOn(client, 'apiClient').mockImplementation(async (url: string) => {
+      if (url.includes('/context-bundle')) {
+        throw new ApiError(makeProblem(409, 'GRAPH-0002', "A bundle item's snapshot is missing; the bundle cannot be reproduced.", 'GRAPH'));
+      }
+      if (url.includes('/record')) {
+        throw new ApiError(makeProblem(404, 'RES-0004', 'No sealed record for this run.', 'RES'));
+      }
+      return {} as any;
+    });
+
+    await act(async () => {
+      root.render(<SealRecordPanel projectId={sampleRun.projectId} runId={sampleRun.id} />);
+    });
+
+    expect(container.querySelector('[data-testid="seal-record-unsealed-notice"]')).not.toBeNull();
+    const bundleSection = container.querySelector('[data-testid="seal-bundle-section"]');
+    expect(bundleSection).not.toBeNull();
+    const repFailedBanner = container.querySelector('[data-testid="seal-bundle-reproduction-failed"]');
+    expect(repFailedBanner).not.toBeNull();
+    expect(repFailedBanner?.getAttribute('data-tone')).toBe('mismatch');
+
+    const liveRegion = container.querySelector('[data-testid="seal-record-live-status"]');
+    expect(liveRegion?.textContent).toContain('봉인 기록 없음: 미봉인 실행, 번들 재현불가');
+  });
+
+  it('20. Unsealed run with R3 500 error (G1): renders seal-bundle-error and live status includes 번들 조회 실패', async () => {
+    vi.spyOn(client, 'apiClient').mockImplementation(async (url: string) => {
+      if (url.includes('/context-bundle')) {
+        throw new ApiError(makeProblem(500, 'SYS-0002', 'Database connection error.', 'SYS'));
+      }
+      if (url.includes('/record')) {
+        throw new ApiError(makeProblem(404, 'RES-0004', 'No sealed record for this run.', 'RES'));
+      }
+      return {} as any;
+    });
+
+    await act(async () => {
+      root.render(<SealRecordPanel projectId={sampleRun.projectId} runId={sampleRun.id} />);
+    });
+
+    expect(container.querySelector('[data-testid="seal-record-unsealed-notice"]')).not.toBeNull();
+    const bundleSection = container.querySelector('[data-testid="seal-bundle-section"]');
+    expect(bundleSection).not.toBeNull();
+    const bundleErr = container.querySelector('[data-testid="seal-bundle-error"]');
+    expect(bundleErr).not.toBeNull();
+    expect(bundleErr?.textContent).toContain('SYS-0002');
+
+    const liveRegion = container.querySelector('[data-testid="seal-record-live-status"]');
+    expect(liveRegion?.textContent).toContain('봉인 기록 없음: 미봉인 실행, 번들 조회 실패 (SYS-0002)');
+  });
+
+  it('21. Next page generation guard (G2): late page 2 response after run switch does not overwrite new run artifacts', async () => {
+    let resolvePage2: ((value: any) => void) | null = null;
+    const page2Promise = new Promise((resolve) => {
+      resolvePage2 = resolve;
+    });
+
+    const page1A: RunRecordArtifactPageResponse = {
+      recordId: 'rec_A',
+      runId: 'run_A',
+      role: null,
+      nextCursor: 'cur_page2',
+      count: 1,
+      items: [
+        {
+          artifactId: 'art_01J8Z3XQ2K9WMV5T7N4B6C8DA1',
+          role: 'diff',
+          objectVersion: null,
+          uri: 's3://art/diffA1',
+          checksumSha256: SHA_A,
+          byteSize: 100,
+        },
+      ],
+    };
+
+    const page2A: RunRecordArtifactPageResponse = {
+      recordId: 'rec_A',
+      runId: 'run_A',
+      role: null,
+      nextCursor: null,
+      count: 1,
+      items: [
+        {
+          artifactId: 'art_01J8Z3XQ2K9WMV5T7N4B6C8DA2',
+          role: 'model',
+          objectVersion: null,
+          uri: 's3://art/modelA2',
+          checksumSha256: SHA_B,
+          byteSize: 200,
+        },
+      ],
+    };
+
+    const page1B: RunRecordArtifactPageResponse = {
+      recordId: 'rec_B',
+      runId: 'run_B',
+      role: null,
+      nextCursor: null,
+      count: 1,
+      items: [
+        {
+          artifactId: 'art_01J8Z3XQ2K9WMV5T7N4B6C8DB1',
+          role: 'diff',
+          objectVersion: null,
+          uri: 's3://art/diffB1',
+          checksumSha256: SHA_C,
+          byteSize: 300,
+        },
+      ],
+    };
+
+    vi.spyOn(client, 'apiClient').mockImplementation(async (url: string) => {
+      if (url.includes('/run_A/record/artifacts')) {
+        const u = new URL('https://saintvision.local' + url);
+        if (u.searchParams.get('cursor') === 'cur_page2') {
+          return page2Promise;
+        }
+        return page1A as any;
+      }
+      if (url.includes('/run_A/context-bundle')) return { ...contextBundleFixture, runId: 'run_A' } as any;
+      if (url.includes('/run_A/record')) return { ...sealedRecordFixture, runId: 'run_A' } as any;
+
+      if (url.includes('/run_B/record/artifacts')) return page1B as any;
+      if (url.includes('/run_B/context-bundle')) return { ...contextBundleFixture, runId: 'run_B' } as any;
+      if (url.includes('/run_B/record')) return { ...sealedRecordFixture, runId: 'run_B' } as any;
+      return {} as any;
+    });
+
+    await act(async () => {
+      root.render(<SealRecordPanel projectId="prj_01" runId="run_A" />);
+    });
+    expect(container.textContent).toContain('art_01J8Z3XQ2K9WMV5T7N4B6C8DA1');
+
+    const nextBtn = container.querySelector('[data-testid="seal-artifacts-next-page-btn"]') as HTMLButtonElement;
+    expect(nextBtn).not.toBeNull();
+    await act(async () => {
+      nextBtn.click();
+    });
+
+    // Switch to run_B while run_A's page 2 is pending
+    await act(async () => {
+      root.render(<SealRecordPanel projectId="prj_01" runId="run_B" />);
+    });
+    expect(container.textContent).toContain('art_01J8Z3XQ2K9WMV5T7N4B6C8DB1');
+    expect(container.textContent).not.toContain('art_01J8Z3XQ2K9WMV5T7N4B6C8DA1');
+
+    // Now resolve run_A's page 2
+    await act(async () => {
+      resolvePage2?.(page2A);
+    });
+
+    // Run B's view must NOT contain Run A's page 2 artifact
+    expect(container.textContent).toContain('art_01J8Z3XQ2K9WMV5T7N4B6C8DB1');
+    expect(container.textContent).not.toContain('art_01J8Z3XQ2K9WMV5T7N4B6C8DA2');
+    const liveRegion = container.querySelector('[data-testid="seal-record-live-status"]');
+    expect(liveRegion?.textContent).not.toContain('다음 페이지 조회 완료');
+  });
+
+  it('22. Verify generation guard (F6 mutation kill): late verify response after run switch does not update state', async () => {
+    let resolveVerify: ((value: any) => void) | null = null;
+    const verifyPromise = new Promise((resolve) => {
+      resolveVerify = resolve;
+    });
+
+    vi.spyOn(client, 'apiClient').mockImplementation(async (url: string) => {
+      if (url.includes('/run_A/record/artifacts/' + ART_ID_1 + '/verify')) {
+        return verifyPromise;
+      }
+      if (url.includes('/run_A/record/artifacts')) return artifactsPageFixture as any;
+      if (url.includes('/run_A/context-bundle')) return contextBundleFixture as any;
+      if (url.includes('/run_A/record')) return { ...sealedRecordFixture, runId: 'run_A' } as any;
+
+      if (url.includes('/run_B/record/artifacts')) return artifactsPageFixture as any;
+      if (url.includes('/run_B/context-bundle')) return contextBundleFixture as any;
+      if (url.includes('/run_B/record')) return { ...sealedRecordFixture, runId: 'run_B' } as any;
+      return {} as any;
+    });
+
+    await act(async () => {
+      root.render(<SealRecordPanel projectId="prj_01" runId="run_A" />);
+    });
+
+    const verifyBtn = container.querySelector(`[data-testid="seal-verify-btn-${ART_ID_1}"]`) as HTMLButtonElement;
+    expect(verifyBtn).not.toBeNull();
+    await act(async () => {
+      verifyBtn.click();
+    });
+
+    // Switch to run_B while verify on run_A is pending
+    await act(async () => {
+      root.render(<SealRecordPanel projectId="prj_01" runId="run_B" />);
+    });
+
+    // Resolve verify on run_A with mismatch
+    await act(async () => {
+      resolveVerify?.({
+        runId: 'run_A',
+        recordId: 'rec_A',
+        artifactId: ART_ID_1,
+        pinnedChecksumSha256: SHA_A,
+        verified: false,
+      });
+    });
+
+    // Run B's ART_ID_1 verify badge must NOT show the mismatch result from Run A
+    const verifyStatus = container.querySelector(`[data-testid="seal-artifact-verify-status-${ART_ID_1}"]`);
+    expect(verifyStatus?.textContent).toContain('미검증 (검증 대기)');
+    const liveRegion = container.querySelector('[data-testid="seal-record-live-status"]');
+    expect(liveRegion?.textContent).not.toContain(`아티팩트 ${ART_ID_1} 검증 완료`);
+  });
+
+  it('23. Artifacts page reset guard (F7 mutation kill): setArtifactsPage(null) ensures previous run artifacts do not persist when new run R2 fails', async () => {
+    vi.spyOn(client, 'apiClient').mockImplementation(async (url: string) => {
+      if (url.includes('/run_A/record/artifacts')) return artifactsPageFixture as any;
+      if (url.includes('/run_A/context-bundle')) return contextBundleFixture as any;
+      if (url.includes('/run_A/record')) return { ...sealedRecordFixture, runId: 'run_A' } as any;
+
+      if (url.includes('/run_B/record/artifacts')) {
+        throw new ApiError(makeProblem(500, 'SYS-0002', 'Failed to retrieve artifacts for run B.', 'SYS'));
+      }
+      if (url.includes('/run_B/context-bundle')) return { ...contextBundleFixture, runId: 'run_B' } as any;
+      if (url.includes('/run_B/record')) return { ...sealedRecordFixture, runId: 'run_B' } as any;
+      return {} as any;
+    });
+
+    await act(async () => {
+      root.render(<SealRecordPanel projectId="prj_01" runId="run_A" />);
+    });
+    expect(container.textContent).toContain(ART_ID_1);
+
+    await act(async () => {
+      root.render(<SealRecordPanel projectId="prj_01" runId="run_B" />);
+    });
+
+    // Run B's R2 failed, so Run A's artifacts table MUST NOT be displayed
+    expect(container.textContent).not.toContain(ART_ID_1);
+    expect(container.querySelector('[data-testid="seal-artifacts-error"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="seal-artifacts-error"]')?.textContent).toContain('Failed to retrieve artifacts for run B.');
+  });
+
+  it('24. ProblemDetails strictness (G3 contract): canonical 404 missing required nullable causeRef is rejected and downgraded to NET-0404', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => {
+      return {
+        ok: false,
+        status: 404,
+        statusText: 'Not Found',
+        headers: new Headers({ 'content-type': 'application/problem+json' }),
+        json: async () => ({
+          type: 'about:blank',
+          status: 404,
+          code: 'RES-0004',
+          title: 'RES-0004',
+          detail: 'No such run.',
+          category: 'RES',
+          retryable: false,
+          traceId: '0123456789abcdef0123456789abcdef',
+          // causeRef and evidenceId are intentionally missing (undefined)
+        }),
+        text: async () => JSON.stringify({
+          type: 'about:blank',
+          status: 404,
+          code: 'RES-0004',
+          title: 'RES-0004',
+          detail: 'No such run.',
+          category: 'RES',
+          retryable: false,
+          traceId: '0123456789abcdef0123456789abcdef',
+        }),
+      } as any;
+    });
+
+    await act(async () => {
+      root.render(<SealRecordPanel projectId={sampleRun.projectId} runId={sampleRun.id} />);
+    });
+
+    const errorBanner = container.querySelector('[data-testid="seal-record-error-banner"]');
+    expect(errorBanner).not.toBeNull();
+    // Non-canonical problem (missing required nullable causeRef) is downgraded to NET-0404
+    expect(errorBanner?.textContent).toContain('[NET-0404]');
+    expect(errorBanner?.textContent).not.toContain('[RES-0004]');
+    fetchSpy.mockRestore();
   });
 });

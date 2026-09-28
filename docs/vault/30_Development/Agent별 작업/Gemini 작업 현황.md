@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.128"
+version: "1.0.129"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-28T20:50:00+09:00"
+updated: "2026-09-28T21:22:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,25 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-28T20:50:00+09:00 (최신 tip `agent/gemini/g04-fe-seal-record`, PR #212).
+- 확인 기준: 2026-09-28T21:22:00+09:00 (최신 tip `agent/gemini/g04-fe-seal-record`, PR #212 r3).
+
+## 2026-09-28 G-04 RunDetail 봉인 기록 패널 Claude UI r2 재검토(G1~G5, O3, O4) 완결 (`agent/gemini/g04-fe-seal-record`, PR #212)
+
+- **PR**: #212 (https://github.com/egparadise/SaintVision-Invion/pull/212)
+- **Base**: `agent/claude/g04-w1-seal-record` (PR #201 head `9dfb2878` + PR #188 head `5c34aaca` 클린 머지 `e1d593ce`)
+- **조치 내역 (G1~G5, O3, O4 전수 완결)**:
+  1. **G1 [중간] 미봉인 경로 R3 401/403/409/5xx 화면 표출**: 미봉인 실행에서도 409 `GRAPH-0002` 재현불가 배지 및 500 에러 배너를 정직하게 표출(`SealRecordPanel.tsx:819`), 라이브 리전에도 번들 상태 안내 부가.
+  2. **G2 [중간] `handleLoadNextPage` 세대 가드**: `generationRef` 및 `runId` 확인 가드를 응답/에러/finally 전 구간에 배치하여 실행 전환 시 이전 페이지 응답 누출 차단.
+  3. **G3 [중간] `isProblemDetails` 계약 엄격 복원**: `causeRef`·`evidenceId`의 `undefined` 허용을 제거하여 canonical required 계약을 엄격 준수하고, 11키 legacy 401 본문은 정밀 수용.
+  4. **G4 & G5 [낮음] 픽스처 및 문서 정합**: 409 서버 정본 detail 일치, SYS-0002(500) 교정, URL 분기 순서 교정, 페이지 교체 동작 명시.
+  5. **O3 & O4 [권고] 접근성 및 항목 복원**: R3 번들 항목 표에 순번, 비식별화([비식별화]), 신뢰도 열 복원. 게이트웨이 에러 판정 범위 정밀화.
+  6. **변이 사살 시험 6건 보강**: 시험 19(미봉인 409), 20(미봉인 500), 21(페이지네이션 전환), 22(검증 전환), 23(아티팩트 리셋), 24(causeRef 누락 거부) 총 24건 전수 통과.
+- **실측 검증**:
+  - Vitest: `tests/run-detail-seal-record.test.tsx` 24 passed (496ms). 웹 전체 79 test files / 699 passed (21.71s).
+  - `npx tsc -b`: 0 errors. `npm run build`: dist/ 번들 생성 성공 (7.14s).
+  - `npm run contracts:check`: PASS (20 API response TypeScript types match).
+  - 파이썬 게이트: `pytest tests/test_route_coverage.py tests/core/test_run_record_artifacts_route.py` 88 passed (18.30s), `check_frontend_integrity.py` 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-28_21-22-00_KST_G04_RunDetail_Seal_Record_Panel_Claude_r3_Gemini.md` (`HIST-G04-003`, v1.0.0).
 
 ## 2026-09-28 G-04 RunDetail 봉인 기록 패널 Claude UI r2 및 Codex 계약 검토 조치 완결 (`agent/gemini/g04-fe-seal-record`, PR #212)
 
