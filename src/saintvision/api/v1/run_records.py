@@ -39,6 +39,7 @@ from ..problem import (
     RES_NOT_FOUND,
     VAL_REQUEST,
     CanonicalProblem,
+    read_bounded_body,
     require_absent_body,
     translate,
 )
@@ -84,8 +85,11 @@ async def read_run_record(
     principal: Principal = Depends(get_principal),
     session: Session = Depends(get_session),
 ) -> schemas.RunRecordResponse:
-    require_absent_body(await request.body())
+    # Live membership first, so a non-member learns nothing from how the body is
+    # judged; then the shared bounded reader refuses a body (bounded, so an
+    # oversized one is 413/422 rather than an allocation), as ``model_release`` does.
     _membership(session, principal=principal, project_id=project_id)
+    require_absent_body(await read_bounded_body(request))
     run = run_in_project(
         session, tenant_id=principal.tenant_id, project_id=project_id, run_id=run_id
     )
@@ -98,9 +102,12 @@ async def read_run_record(
     return _response(record)
 
 
-def _record_in_project(session: Session, *, principal: Principal, project_id: str, run_id: str):
-    """membership -> run bound to the path's project -> the sealed record, or the canonical error."""
-    _membership(session, principal=principal, project_id=project_id)
+def _sealed_record(session: Session, *, principal: Principal, project_id: str, run_id: str):
+    """The run bound to the path's project, then its sealed record, or the canonical error.
+
+    Membership is checked by the caller *before* the request body is judged
+    (Codex #184 F2), so this helper starts at the binding.
+    """
     run = run_in_project(
         session, tenant_id=principal.tenant_id, project_id=project_id, run_id=run_id
     )
@@ -136,9 +143,10 @@ async def read_run_record_artifacts(
     refusal (``VAL-0003``), so the route does not keep its own copy of the
     allowed roles.
     """
-    require_absent_body(await request.body())
+    _membership(session, principal=principal, project_id=project_id)
+    require_absent_body(await read_bounded_body(request))
     query = _query(request, allowed=frozenset({"role"}))
-    record = _record_in_project(session, principal=principal, project_id=project_id, run_id=run_id)
+    record = _sealed_record(session, principal=principal, project_id=project_id, run_id=run_id)
     try:
         rows = record_service.list_pinned_artifacts(
             session, tenant_id=principal.tenant_id, record_id=record.record_id, role=query.get("role")
@@ -169,8 +177,9 @@ async def verify_run_record_artifact(
     not a request error. An artifact that is not pinned to this record is the
     same 404 as one that does not exist.
     """
-    require_absent_body(await request.body())
-    record = _record_in_project(session, principal=principal, project_id=project_id, run_id=run_id)
+    _membership(session, principal=principal, project_id=project_id)
+    require_absent_body(await read_bounded_body(request))
+    record = _sealed_record(session, principal=principal, project_id=project_id, run_id=run_id)
     if not is_id(artifact_id, "artifact"):
         raise CanonicalProblem(RES_NOT_FOUND, 404, "No such pinned artifact.")
     try:

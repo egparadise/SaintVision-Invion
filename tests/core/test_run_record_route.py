@@ -254,9 +254,30 @@ def test_an_unsealed_run_is_404_with_the_canonical_body(monkeypatch):
     assert world["record_calls"] == [(TENANT, RUN)]
 
 
-def test_a_body_on_this_get_is_refused(monkeypatch):
-    client = build(monkeypatch, {})
+def test_a_body_on_this_get_is_refused_after_membership_and_before_any_row(monkeypatch):
+    world: dict = {}
+    client = build(monkeypatch, world)
     canonical(client.request("GET", PATH, headers=AUTH, content=b"{}"), code="VAL-0003", status=422)
+    assert world["access_calls"] == [(TENANT, PROJECT, "usr_01J8Z3XQ2K9WMV5T7N4B6C8D0E")]   # membership first
+    assert world["session"].gets == [] and "record_calls" not in world                    # nothing read
+
+
+def test_a_non_member_with_a_body_is_403_and_the_body_is_never_judged(monkeypatch):
+    """Codex #184 F2: live membership precedes the body check, so a non-member learns
+    nothing from how the body is judged and no row or service is touched."""
+    world = {"denial": InvError(AUTH_PROJECT_SCOPE, "project is not accessible to this principal")}
+    client = build(monkeypatch, world)
+    canonical(client.request("GET", PATH, headers=AUTH, content=b"{" + b"x" * 20000), code="AUTH-0030", status=403)
+    assert world["session"].gets == [] and "record_calls" not in world
+
+
+def test_an_oversized_body_is_refused_by_the_shared_bounded_reader(monkeypatch):
+    """The body is read through ``read_bounded_body`` (8 KiB): the shared reader's
+    refusal is VAL-0003 with 413, before any row."""
+    world: dict = {}
+    client = build(monkeypatch, world)
+    canonical(client.request("GET", PATH, headers=AUTH, content=b"x" * 9000), code="VAL-0003", status=413)
+    assert world["session"].gets == [] and "record_calls" not in world
 
 
 # ---------------------------------------------------------------- the translation table is complete

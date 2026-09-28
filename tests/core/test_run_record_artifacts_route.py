@@ -289,9 +289,29 @@ def test_binding_and_sealing_failures_are_404_on_both_routes(monkeypatch, path, 
 
 
 @pytest.mark.parametrize("path", [ARTIFACTS_PATH, verify_path(ART_DIFF)])
-def test_a_body_on_these_gets_is_refused(monkeypatch, path):
-    client = build(monkeypatch, {})
+def test_a_body_on_these_gets_is_refused_after_membership_and_before_any_row(monkeypatch, path):
+    world: dict = {}
+    client = build(monkeypatch, world)
     canonical(client.request("GET", path, headers=AUTH, content=b"{}"), code="VAL-0003", status=422)
+    assert world["access_calls"] == [(TENANT, PROJECT, "usr_01J8Z3XQ2K9WMV5T7N4B6C8D0E")]
+    assert world["session"].gets == [] and "record_calls" not in world
+
+
+@pytest.mark.parametrize("path", [ARTIFACTS_PATH, verify_path(ART_DIFF)])
+def test_a_non_member_with_a_body_is_403_and_the_body_is_never_judged(monkeypatch, path):
+    """Codex #184 F2 applied to R2: live membership precedes the body check."""
+    world = {"denial": InvError(AUTH_PROJECT_SCOPE, "project is not accessible to this principal")}
+    client = build(monkeypatch, world)
+    canonical(client.request("GET", path, headers=AUTH, content=b"{" + b"x" * 20000), code="AUTH-0030", status=403)
+    assert world["session"].gets == [] and "record_calls" not in world and "list_calls" not in world
+
+
+@pytest.mark.parametrize("path", [ARTIFACTS_PATH, verify_path(ART_DIFF)])
+def test_an_oversized_body_is_refused_by_the_shared_bounded_reader(monkeypatch, path):
+    world: dict = {}
+    client = build(monkeypatch, world)
+    canonical(client.request("GET", path, headers=AUTH, content=b"x" * 9000), code="VAL-0003", status=413)
+    assert world["session"].gets == [] and "record_calls" not in world
 
 
 def test_every_reachable_business_code_is_in_the_translation_table():
