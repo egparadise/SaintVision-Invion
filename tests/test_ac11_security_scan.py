@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 import copy
 import json
 import sys
@@ -246,3 +247,24 @@ def test_version_and_dirty_checkout_are_fail_closed(source, monkeypatch):
     monkeypatch.setattr(tool, "_git", dirty_git)
     with pytest.raises(tool.SecurityScanError, match="checkout is dirty"):
         build(source)
+
+
+def test_git_sha1_wire_identity_is_explicitly_not_a_security_digest():
+    path = ROOT / "services" / "control-plane" / "src" / "inv" / "remote_git.py"
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    calls = [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and isinstance(node.func.value, ast.Name)
+        and node.func.value.id == "hashlib"
+        and node.func.attr == "sha1"
+    ]
+    assert len(calls) == 1
+    assert any(
+        keyword.arg == "usedforsecurity"
+        and isinstance(keyword.value, ast.Constant)
+        and keyword.value.value is False
+        for keyword in calls[0].keywords
+    )

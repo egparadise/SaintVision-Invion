@@ -208,7 +208,13 @@ class GitHubRepository:
             if blob.get("sha") != blob_id or blob.get("encoding") != "base64":
                 raise DomainError("VERIFY-0024", "Remote blob scope differs")
             data = base64.b64decode(blob["content"].replace("\n", ""), validate=True)
-            actual = hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
+            # Git object IDs are protocol identities, not security digests.  Keep
+            # SHA-1 wire compatibility while making that boundary explicit to
+            # Python/OpenSSL and static analysis.
+            actual = hashlib.sha1(
+                b"blob " + str(len(data)).encode() + b"\0" + data,
+                usedforsecurity=False,
+            ).hexdigest()
             if actual != blob_id or len(data) != entry["size"] or blob.get("size") != len(data):
                 raise DomainError("VERIFY-0024", "Remote blob checksum differs")
             content_bytes += len(data)
