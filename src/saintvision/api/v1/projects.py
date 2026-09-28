@@ -36,6 +36,7 @@ router = APIRouter(prefix="/v1", tags=["projects"])
 # and never reached, and a nested ``include_router`` would only leave a lazy
 # placeholder. ``register`` adds the real route.
 from . import (  # noqa: E402
+    conformance_status,
     context_bundles,
     eval_runs,
     lineage_query,
@@ -52,6 +53,7 @@ run_records.register(router)
 run_seal.register(router)
 context_bundles.register(router)
 model_versions.register(router)
+conformance_status.register(router)
 eval_runs.register(router)
 model_retention.register(router)
 
