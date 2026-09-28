@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1.0.0",
+  "targets": [
+    {
+      "targetId": "s05-physical-five-node-ac05-v0",
+      "axis": "physical-five-node-ac05-placement-load",
+      "sourceDocument": {
+        "commit": "d74e82ec5d0dda0b9f379e56fea2aad2a9b714f3",
+        "path": "docs/vault/30_Development/Sprints/S05 자원 배치.md",
+        "blob": "51556eb61d3dd72026b4c01c5081dfeb2bd64e9e"
+      },
+      "criteria": {
+        "concurrency": {"operator": "eq", "value": 50},
+        "determinismMismatchCount": {"operator": "eq", "value": 0},
+        "requestP95Ms": {"operator": "lte", "value": 2000},
+        "reservationOverflowCount": {"operator": "eq", "value": 0}
+      },
+      "requiredEnvironment": {
+        "topology": "physical-five-node",
+        "eligibleNodeCount": 4,
+        "excludedNodeCount": 1
+      }
+    },
+    {
+      "targetId": "s11-actual-pitr-v0",
+      "axis": "actual-pitr-rpo-rto-retention",
+      "sourceDocument": {
+        "commit": "d74e82ec5d0dda0b9f379e56fea2aad2a9b714f3",
+        "path": "docs/vault/30_Development/DB 최종 개발 계획.md",
+        "blob": "4cf99daa4156e852448b61040f3085977cc3e2d8"
+      },
+      "criteria": {
+        "consecutiveWeeklyRestoreSmokeWeeks": {"operator": "gte", "value": 2},
+        "maxRestoreSmokeGapDays": {"operator": "lte", "value": 7},
+        "retentionDays": {"operator": "gte", "value": 35},
+        "rpoSeconds": {"operator": "lte", "value": 900},
+        "rtoSeconds": {"operator": "lte", "value": 3600}
+      },
+      "requiredEnvironment": {
+        "topology": "physical",
+        "failureDomain": "separate",
+        "archiveKind": "operational",
+        "sameHost": false
+      }
+    },
+    {
+      "targetId": "s11-security-critical-high-zero-v0",
+      "axis": "security-critical-high-zero",
+      "sourceDocument": {
+        "commit": "c62cb671692479b0ee2bc2cc8a12d3c10587174b",
+        "path": "docs/vault/30_Development/Evidence/s11-security-allowlist-v0.json",
+        "blob": "ff2f9966956da677ebcdee92ec1de2292bd5ec52"
+      },
+      "criteria": {},
+      "requiredEnvironment": {
+        "topology": "hosted",
+        "evidenceClass": "security-tools-v0"
+      }
+    },
+    {
+      "targetId": "s11-irreversible-restore-forward-v0",
+      "axis": "irreversible-restore-forward",
+      "sourceDocument": {
+        "commit": "40b592e623da4107d3857fe678e1eb3d8387541d",
+        "path": "docs/vault/30_Development/S11_AC11_migration_restore_target_v0.md",
+        "blob": "d14e09dfabad930f996a3a9d38506627535b2723"
+      },
+      "criteria": {
+        "catalogMismatchCount": {"operator": "eq", "value": 0},
+        "negativeFixturePassCount": {"operator": "eq", "value": 3},
+        "restoreForwardPassCount": {"operator": "eq", "value": 1}
+      },
+      "requiredEnvironment": {
+        "topology": "hosted-single-postgres-service",
+        "synthetic": true
+      }
+    }
+  ]
+}
