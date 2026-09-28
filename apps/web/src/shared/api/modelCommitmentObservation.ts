@@ -21,7 +21,7 @@ export async function fetchModelCommitment(
 
   const path = [p, m, v].map(encodeURIComponent);
   const result = await apiClient<ModelCommitObservation>(
-    \/v1/projects/\/models/\/versions/\/commitment\,
+    `/v1/projects/${path[0]}/models/${path[1]}/versions/${path[2]}/commitment`,
     { method: 'GET', signal }
   );
 
