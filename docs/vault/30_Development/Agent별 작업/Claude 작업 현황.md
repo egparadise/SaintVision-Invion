@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.21"
+version: "1.2.22"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T09:55:00+09:00"
+updated: "2026-09-28T13:55:28+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+G-03 conformance 결과 API 노출 설계 카드 55 (Claude, 2026-09-28, base `1e8baf04`, branch `agent/claude/g03-conformance-api-design`, docs-only): PR #179 §3-3 구현 1단계의 설계. **실측이 설계를 정했다** — 생산자·증거 shape·비교 함수·계약 버전은 있는데 **제품 호출부 0, 저장 0(db·migrations grep 0건), CI 산출물 0**이다. 그래서 1단계는 `status: "NOT_OBSERVED"` + `reason` + `scope: "control-plane-host"` + 계약 버전 + check 이름 15 + 대상 adapter 4만 내고 **counts와 boolean을 두지 않는다**(`passed: 0`은 "돌렸고 0 통과"로 읽히고 `conformant: bool`에는 미측정 자리가 없다). **route가 `run_conformance()`를 부르지 않음**도 부정 시험으로 고정했다 — 그 함수는 `CliAdapter`에서 호스트 CLI 프로세스를 구동한다. 권한은 #158을 그대로 물려받되(live `require_project_access`, 읽기는 membership, 존재 비노출 동형 거부) **conformance가 tenant 데이터가 아니라는 사실**을 `scope` 필드로 밝혔고, path→row 결속이 1단계에 없다는 것도 적었다. #146 FE 대응표에서 **백엔드 근거 없는 필드·값 셋**을 찾아 API에서 배제했다 — `avgLatencyMs`·`tokensPerSec`(suite가 측정하지 않음) · `Local-vLLM`(대상 아님) · `v1.0.0-ADR-004`(정본은 `1.0.0`). FE 수정은 Gemini 책임이라 범위 밖. **1단계 persistence 필요 없음(확정)이라 migration 번호 미요청**, 2단계는 번호 선요청 필요(#174 반례 인용). 계약 2건·새 code 0·`export_schemas --check`가 잡음(`…Response` 이름 규칙, #167 사례). 선행 의존 `api/problem.py` → 병합 순서 #167 → 구현 PR. 부정 시험 17건(NOT_OBSERVED 7·권한/비노출 6·계약 4, 실 PG 1). 다음 첫 행동: Codex 검토, 승인 뒤 구현 PR을 이 설계 위에 stack. 전문 [[2026-09-28_G-03_conformance_API_설계_Claude]].
 
 hosted Core junit로 S04/05/07-DB 케이스 수치 보강 카드 12 (Claude, 2026-09-22, 읽기 전용): artifact `saintvision-core-evidence`(run 35706465645 `3d1892c0` + proof 35714470445 `f2aa2b14`)를 .work/ci-junit에 받아(바이너리 삭제 후 1.4MB) 파일별 수치(core 2948/58/0·shard-recovery 21·containment 28·workspace 22·business-handoff 17·lan-installer 15·docker-host 2, f2aa2b14는 core 2998/58/0 외 동일)와 카드 10의 hosted-only 항목 케이스 이름을 classname으로 추출 — 재전송 hash(output_ingestion 5·node_delivery 18·results 21), placement Explain(placement 12), shard replacement 21, containment 28, workspace 복구 12+11, 노드 스토리지 전송 27 — **전부 passed**. hosted에도 없는 것(AC-05 결정성/P95·AC-07 60초/95%·CX01)은 그대로 물리/5노드 대기로 명시. 패키지 §C-2 + 검증상태지도 §12 보강. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 
