@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.123"
+version: "1.0.124"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-28T10:33:44+09:00"
+updated: "2026-09-28T10:56:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,18 +19,32 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-28T10:33:44+09:00 (작업 브랜치 `agent/gemini/s12-fe-matrix`).
+- 확인 기준: 2026-09-28T10:56:00+09:00 (작업 브랜치 `agent/gemini/s12-fe-matrix`).
 
-## 2026-09-28 S12-FE 내부망 HTTPS 웹 배포·운영자 교육 시나리오 매트릭스 v1.0.1 정정 (`agent/gemini/s12-fe-matrix`)
+## 2026-09-28 S12-FE 내부망 HTTPS 웹 배포·운영자 교육 시나리오 매트릭스 v1.0.2 개정 (`agent/gemini/s12-fe-matrix`)
 
-- **작업 개요**: Codex 계약 축 독립 검토 지적 5건(F-R1~F-R5)을 전수 반영하여 정본 시나리오 매트릭스를 v1.0.1로 갱신.
+- **작업 개요**: Claude UI 축 검토 의견 11개 항목 및 Codex 계약 축 지적을 전수 반영하여 정본 시나리오 매트릭스를 v1.0.2로 확정.
 - **주요 규격 및 정직한 경계 정정 (Zero Fake / Honest Boundary)**:
-  1. **F-R1 (TLS 협상 규격 정정)**: `nginx.conf` 설정(`ssl_protocols TLSv1.2 TLSv1.3;`) 및 시험에 정합하게 "TLS 1.2/1.3 협상"으로 바로잡고, 엄격한 TLS 1.3 단독 강제는 미측정(UNMEASURED)으로 분리.
-  2. **F-R2 (Transport Fixture 한계 명시)**: `test_web_container.py`의 업스트림이 실 Control Plane이 아닌 `tests/fixtures/nginx_transport.py` 전송 계층 픽스처임을 명시하고, SMK-05/RCV-01을 `MEASURED (transport fixture)`로 정정. 실제 Control Plane 401은 `test_studio_browser.py`의 PG+HTTP 레인으로 분리.
-  3. **F-R3 (RCV-03 제품 결속 분리)**: `DistributedRecoveryView.tsx`가 SSE를 구독하지 않는 인메모리 시뮬레이션임을 확인하여 UI 재연결/복구 조회를 `UNMEASURED / 미연결`로 분리하고, Nginx 비버퍼링 설정만 `MEASURED`로 한정.
-  4. **F-R4 (MAN-02 서명 가드 한정)**: `signOffRelease`가 접두사/문자열 휴리스틱임을 명시하여 `MEASURED (엔진 단위시험 한정)`로 표기하고, 실제 서버 인가(Authorization)는 `UNMEASURED / 미연결`로 규정.
-  5. **F-R5 (ADR-100 토폴로지 정합)**: 실재하지 않는 임의의 IP/GPU/OS 분기 표기를 전면 삭제하고, 정본 토폴로지 ADR-100(CP 호스트 겸임 Node 1 + 독립 Ubuntu Worker 4) 참조 및 `BLOCKED_EXTERNAL / 미측정`으로 정직 격리.
-  6. **3분류 상태 체계 통일**: 모든 시나리오 상태를 `MEASURED (fixture/합성)`, `UNMEASURED / 미연결`, `BLOCKED_EXTERNAL`로 엄격 정렬.
+  1. **TLS 1.2 이상 협상 규격 통일 (Claude 1, Codex F-R1)**: `nginx.conf:42` 및 테스트에 일치하도록 SMK-01을 "TLS 1.2 이상 협상 (1.3 전용 아님)"으로 정정하고, 화면의 TLS 1.3 STRICT 표출을 결함(DEF-S12-09)으로 수록.
+  2. **관측 경로 분리 (Claude 2)**: HTTPS Nginx 컨테이너(transport fixture 업스트림)와 HTTP Vite 개발서버(실 CP + PG)를 명확히 분리하고, HTTPS 경유 IdP 로그인은 미관측(`UNMEASURED`)으로 지정. SMK-05 게이트웨이 검증에서 401 분리.
+  3. **배포 화면 진입 미관측 명시 (Claude 3)**: hosted 브라우저 4개 시험에서 '내부망 배포' 탭 진입 0건 확인, SMK-04를 '부분 측정 (Studio·Desktop 한정)'으로 하향하고 배포탭 진입은 미관측(`UNMEASURED`)으로 명시.
+  4. **RCV-02 세션 만료 경로 정정 (Claude 4)**: 전체 앱은 401 시 `resetAuthenticatedState`에 의해 `Login.tsx`의 `login-error-alert`로 전환되므로, `IntranetDeploymentView`의 `deployment-auth-required-notice`는 컴포넌트 단독 렌더(`wiring.test.tsx:71`)에서만 보임을 명시. 체류 중 만료는 `UNMEASURED`.
+  5. **18대 결함 백로그 확충 (Claude 5, 5-a ~ 5-j 반영)**:
+     - DEF-S12-09 (5-a): TLS 1.3 STRICT 왜곡 표출.
+     - DEF-S12-10 (5-b): TLS 인증서 정보 패널 픽스처의 실제 조회 가장.
+     - DEF-S12-11 (5-c): 화면의 배포용 nginx.conf 전문이 실제 `apps/web/nginx.conf`와 심각하게 괴리 (port 8443 vs 443, TLS 1.3 vs 1.2/1.3, pacs-backend vs control-plane, /etc/nginx/ssl vs /etc/ssl/certs).
+     - DEF-S12-12 (5-d): `:114` 100% (5/5 PASSED) 및 `:576` 5/5 Nodes PASSED (100%) 하드코딩 리터럴 결함.
+     - DEF-S12-13 (5-e): `:194` 라이브 프로브(HTTP 200) 검증 완료 과장 표기.
+     - DEF-S12-14 (5-f): `:388, :478` Date.now() 기반 동적 계산으로 항상 '방금 전 검증'으로 위장.
+     - DEF-S12-15 (5-g): GA/프로덕션 확정 라벨 하드코딩 표출.
+     - DEF-S12-16 (5-h): 클라이언트 서명 1회로 physicalHardwareAcceptance: 'accepted' 전이 및 시험 고정.
+     - DEF-S12-17 (5-i): 재실습 완료 버튼 클릭만으로 자기보고 승인되는 무검증 교육 이수.
+     - DEF-S12-18 (5-j): 운영자 ID 임의 편집 가능 및 정규식 취약성(`/^(usr_operator_|usr_admin_|admin|operator)/`)으로 인한 심각한 클라이언트 권한 우회 결함.
+  6. **결함 분석 및 수정 계획 오류 정정 (Claude 6)**: DEF-S12-03(:474 PASSED)과 DEF-S12-08(:668 COMPLETED)이 상태값 미바인딩 리터럴임을 명시하고, offline 노드 PASSED 숨김 및 기존 시험(`intranet-deployment.test.ts:56-73, :128-143`) 수정 계획 수립.
+  7. **RCV-03 시험 파일 부재 정정 (Claude 7)**: `recovery.test.ts` 부재, `distributed-recovery.test.ts` 및 `sse-stream.test.ts` 인용, 백오프 코드 실재하나 단언 시험 부재 및 UI 미연결 명시.
+  8. **시험 단언 정밀 분리 및 it 9개 정정 (Claude 8)**: `intranet-deployment.test.ts` 시험 수 9개(it 9개) 반영, hosted run `35795657531` 명시, 단언 있음과 코드 존재·단언 없음 분리.
+  9. **서버 도메인 모델 실재 명시 (Claude 9)**: `operations_pilot.py:221` `ReleaseManifest`, `:251` `AcceptanceRecord`, `pilot.py:358/396` 실재하나 REST 라우트 부재임을 명시하여 DEF-S12-06/07의 연결 대상으로 인용.
+  10. **문서 위생 및 EXT-02 전제값 정정 (Claude 10, 11)**: index.html no-cache/must-revalidate 정정, 33행 남는 전제·차단 표기, EXT-02 전제값 '미정' 격리.
 - **산출 문서**: `docs/vault/30_Development/2026-09-28_S12-FE_내부망HTTPS_웹배포_운영인수_시나리오_매트릭스_Gemini.md`
 - **독립 검토 요청**: Claude (UI 경로 축), Codex (계약 축).
 
