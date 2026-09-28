@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.25"
+version: "1.2.26"
 status: "review"
 author: "Claude"
-updated: "2026-09-28T23:28:47+09:00"
+updated: "2026-09-28T23:29:40+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,7 @@ source_of_truth: "Git"
 
 ## 최근 확인한 진척
 
-48 task 진행률 재채점 카드 99 (Claude, 2026-09-28, 분석 tree `95a59b24` = `origin/coord/train-ci-2150`, PR base `integration/all-agents-unified`, docs-only, **v1.2**): 09-18과 같은 rubric(48×0/25/50/75/100, 분모 4,800)으로 재채점했다. **결론: 09-18 baseline 2,800 → 병합 후보 tree 3,350 / 4,800 = 69.79%**(+550, +11.46%p), 올린 행 18·내린 행 0, **48 중 34개가 75점**이고 그 천장은 우리 코드가 아니라 운영 인수·외부 자산이 만든다. 100점은 S01-FE·S01-DB 둘뿐이다. **v1.0·v1.1의 사실 오류 네 건을 v1.2에서 정정했다** — (1) "task별 baseline 없음"은 거짓이었다(`Evidence/development-progress-storage-check-20260912.json`에 48행·2,775가 있고 markdown만 검색한 내 실수다), (2) 그 결과 `S04-ST`·`S06-ST`를 근거 없이 75→50으로 내렸다(baseline 근거가 train tree에 그대로 있어 복원), (3) `main` 점수 열(1,950=40.62%)이 나중의 closure를 09-10 시점에 소급 사용해 **열과 28.65%p 격차 주장을 삭제**했다(병합 격차는 재고 수치로만 남겼다), (4) 75 승격이 rubric의 "관련 시험" 조건을 만족하지 않아 **올린 모든 행에 task 고유 시험을 결속**하고 결속 못 한 `S08-BE`는 baseline 50을 유지했다. 네 건 모두 **영역 단위 추정을 행 단위 증거보다 먼저 믿은** 같은 습관에서 나왔다. `#217`이 든 tree에서는 `S11-BE`가 50→75여서 3,375 = 70.31%다. **v1.3**: v1.2가 선언한 행 단위 증거 규칙을 v1.2 자신이 세 곳에서 지키지 않은 것을 고쳤다 — (a) 는 50→75인데 결속이 비어 있어 ·+실측 History를 붙이고 U1/U5/U6를 100 잔여로 분리, (b) "한 시험을 두 행에 두 번 세지 않는다"면서 ·를 공유해 고유 근거로 교체(이제 표 전체에 공유 결속 0), (c) 100점 두 행이 registry 을 근거로 순환 참조해 closure commit ·와 그 History·고정 SHA CI를 결속. 추가로 **인용 경로 80개를 전수 대조**해 가 실제로는 인 것을 찾아 고쳤다. 점수는 3,350 = 69.79% 그대로다. 다음 첫 행동: Codex 재검토. 전문 [[2026-09-28 48 task 진행률 재채점]].
+48 task 진행률 재채점 카드 99 (Claude, 2026-09-28, 분석 tree `95a59b24` = `origin/coord/train-ci-2150`, PR base `integration/all-agents-unified`, docs-only, **v1.3**): 09-18과 같은 rubric(48×0/25/50/75/100, 분모 4,800)으로 재채점했다. **결론: 09-18 baseline 2,800 → 병합 후보 tree 3,350 / 4,800 = 69.79%**(+550, +11.46%p), 올린 행 18·내린 행 0, **48 중 34개가 75점**이고 그 천장은 우리 코드가 아니라 운영 인수·외부 자산이 만든다. 100점은 S01-FE·S01-DB 둘뿐이다. **v1.2에서 사실 오류 네 건을 정정했다** — (1) "task별 baseline 없음"은 거짓이었다(`Evidence/development-progress-storage-check-20260912.json`에 48행·2,775가 있고 markdown만 검색한 내 실수다), (2) 그 결과 `S04-ST`·`S06-ST`를 근거 없이 75→50으로 내렸다(baseline 근거가 train tree에 그대로 있어 복원), (3) `main` 점수 열(1,950=40.62%)이 나중의 closure를 09-10 시점에 소급 사용해 **열과 28.65%p 격차 주장을 삭제**했다, (4) 75 승격이 rubric의 "관련 시험" 조건을 만족하지 않아 **올린 모든 행에 task 고유 시험을 결속**했다. **v1.3에서는 그 규칙을 v1.2 자신이 지키지 않은 세 곳을 고쳤다** — (a) `S01-ST`는 50→75인데 결속이 비어 있어 `tests/test_s01_readiness_preflight.py`·`tests/core/test_storage_roundtrip_verifier.py`와 실측 History를 붙이고 U1·U5·U6를 100 잔여로 분리, (b) "한 시험을 두 행에 두 번 세지 않는다"면서 `test_recovery_capability.py`·`test_placement_lock_budget.py`를 공유해 고유 근거로 교체했다(이제 표 전체에 공유 결속 0), (c) 100점 두 행이 registry `done`을 근거로 **순환 참조**해 closure commit `b0313282`·`8b20d3e6`와 그 History(최종판정·peer review)·고정 SHA CI를 결속했다. 추가로 **인용 경로 80개를 전수 대조**해 `core/test_pool_placement_response.py`가 실제로는 `test_pool_placement_response_contract.py`인 것을 찾아 고쳤다. 점수는 3,350 = 69.79% 그대로다 — v1.3은 표가 **주장하는 것**이 아니라 **증명하는 것**을 바꿨다. 다음 첫 행동: Codex 재검토. 전문 [[2026-09-28 48 task 진행률 재채점]].
 
 hosted Core junit로 S04/05/07-DB 케이스 수치 보강 카드 12 (Claude, 2026-09-22, 읽기 전용): artifact `saintvision-core-evidence`(run 35706465645 `3d1892c0` + proof 35714470445 `f2aa2b14`)를 .work/ci-junit에 받아(바이너리 삭제 후 1.4MB) 파일별 수치(core 2948/58/0·shard-recovery 21·containment 28·workspace 22·business-handoff 17·lan-installer 15·docker-host 2, f2aa2b14는 core 2998/58/0 외 동일)와 카드 10의 hosted-only 항목 케이스 이름을 classname으로 추출 — 재전송 hash(output_ingestion 5·node_delivery 18·results 21), placement Explain(placement 12), shard replacement 21, containment 28, workspace 복구 12+11, 노드 스토리지 전송 27 — **전부 passed**. hosted에도 없는 것(AC-05 결정성/P95·AC-07 60초/95%·CX01)은 그대로 물리/5노드 대기로 명시. 패키지 §C-2 + 검증상태지도 §12 보강. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 
