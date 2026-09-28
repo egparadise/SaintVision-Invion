@@ -13,8 +13,12 @@ from tools import run_s11_storage_failure_hosted as runner
 
 pytestmark = pytest.mark.postgres
 
+_OPT_IN_REASON = "run only through S11 Storage Failure Hosted Reference opt-in lane"
+
 
 def test_hosted_storage_failure_reference_matrix(env):
+    if "INV_S11_STORAGE_REPORT" not in os.environ:
+        pytest.skip(_OPT_IN_REASON)
     report_path = Path(os.environ["INV_S11_STORAGE_REPORT"])
     junit_path = Path(os.environ["INV_S11_STORAGE_JUNIT"])
     source_run_id = os.environ["INV_S11_SOURCE_RUN_ID"]

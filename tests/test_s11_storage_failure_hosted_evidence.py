@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import importlib.util
 import json
 from pathlib import Path
 import sys
@@ -17,6 +18,21 @@ sys.path.insert(0, str(ROOT / "tools"))
 
 import import_s11_storage_failure_hosted_evidence as importer  # noqa: E402
 import run_s11_storage_failure_hosted as producer  # noqa: E402
+
+
+def test_default_collection_skips_the_label_gated_hosted_case(monkeypatch):
+    case_path = ROOT / "tests" / "integration" / "test_s11_storage_failure_hosted.py"
+    spec = importlib.util.spec_from_file_location("s11_hosted_case_opt_in_test", case_path)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    monkeypatch.delenv("INV_S11_STORAGE_REPORT", raising=False)
+
+    with pytest.raises(
+        pytest.skip.Exception,
+        match="run only through S11 Storage Failure Hosted Reference opt-in lane",
+    ):
+        module.test_hosted_storage_failure_reference_matrix(None)
 
 
 SOURCE = "a" * 40

@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CODEX-S11-ST-HOSTED-REFERENCE-001"
 title: "S11-ST hosted 10-case reference lane"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T18:00:00+09:00"
+updated: "2026-09-28T18:15:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_id: "S11-ST"
@@ -29,10 +29,12 @@ acceptance_id: "AC-11"
 - raw/reference 결과: 10/10 case exact surface 일치, finding 0, classification mismatch 0, false success 0, unexpected error 0, quota overshoot 0, committed object loss 0, partial/temp/cleanup residue 0. `MEASURED_PASS`다.
 - 환경: Python 3.12.14, PostgreSQL `16.15 (Debian 16.15-1.pgdg13+2)`, MinIO digest `sha256:72b4794d…c629`, archive image digest `sha256:1a6ab3f5…4b54`, loopback-only MinIO, internal archive network, published archive port 0, GitHub secret 0.
 - artifact `10960190326`, name `s11-storage-hosted-3fe6a7a12f27e61ecdebe1c018a94929b8558f63`, digest `sha256:6202aafd06908ff09be5df75655bfb0a05e6a54c67b620c767fe145ce9518e9e`, 만료 `2026-10-28T08:54:49Z`다.
+- docs-only head `b972a70e`에서 동일 lane run `36400962763` / job `108858451886`도 success했다. exact head·clean tree, 10/10 exact surface, finding·residue·secret 0을 재확인했고 artifact `10960581532`의 digest는 `sha256:dfaf7cf4a0631048caf3e49f7c69518257ebbd33c20a353f0a5bf89f3f0f6c37`다.
+- 같은 head의 기본 Backend 3.12 run `36400962757`은 전용 환경변수 없이 hosted integration case를 수집해 `INV_S11_STORAGE_REPORT`를 읽는 opt-in 경계 결함으로 failure였다. 전용 lane 밖에서는 `run only through S11 Storage Failure Hosted Reference opt-in lane`으로 skip하고, Backend/Core exact skip distribution에 각 1건을 등록했다. 누락 시 실패하는 PG-free 회귀 시험을 추가했다.
 
 ## 판정
 
 - 결과는 `referenceOnly=true`, `axis=null`, `targetRef=null`이다. AC-11 필수 축이나 long-soak을 통과시키지 않고 S11-ST는 `planned`를 유지한다.
 - 실제 5노드·별도 장애 영역·운영 archive·장시간 soak은 실행하지 않았으며 계속 `BLOCKED_EXTERNAL`/`NOT_REGISTERED`다.
-- 로컬 PostgreSQL·Docker·전체 suite는 실행하지 않았다. 로컬에서는 `tests/test_s11_storage_failure_hosted_evidence.py` 28 passed, py_compile, YAML parse, `git diff --check`만 수행했다.
-- 이 문서 commit은 측정 코드 뒤의 docs-only delta다. 최종 PR head의 동일 lane 재실행 run과 artifact 식별자는 PR #204 코멘트에 기록하고, 그 이후에는 코드를 바꾸지 않는다.
+- 로컬 PostgreSQL·Docker·전체 suite는 실행하지 않았다. 로컬에서는 `tests/test_s11_storage_failure_hosted_evidence.py` 29 passed, YAML parse, `git diff --check`를 확인했다. integration 파일 단독 실행은 이 PC Python 3.10에 `enum.StrEnum`이 없어 collection 전에 exit 4였고 제품 판정에 쓰지 않았다.
+- opt-in 경계 hotfix를 포함한 최종 PR head의 동일 lane·Backend 재실행 식별자는 PR #204 코멘트에 기록한다.
