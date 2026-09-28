@@ -27,7 +27,19 @@ jobs:
           cache-dependency-path: requirements-docs.txt
       - run: python -m pip install -r requirements-docs.txt
       - run: python tools/check_docs.py
-      - run: python tools/check_doc_path_citations.py --ratchet
+      - name: Repository path citations exist (ratchet; baseline may only shrink)
+        shell: bash
+        run: |
+          # The floor is the baseline at the base commit: a PR compares to its
+          # base branch, a push to the previous commit. Fail-closed if absent.
+          if [ -n "${GITHUB_BASE_REF:-}" ]; then
+            git fetch --no-tags --depth=1 origin "$GITHUB_BASE_REF"
+            base="origin/$GITHUB_BASE_REF"
+          else
+            git fetch --no-tags --deepen=1 origin
+            base="HEAD~1"
+          fi
+          python tools/check_doc_path_citations.py --ratchet --base-ref "$base"
       - run: python tools/check_contract_bindings.py
       - run: python tools/check_frontend_integrity.py
       - name: Report fixture producer reachability

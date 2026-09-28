@@ -128,7 +128,7 @@ def test_write_baseline_round_trips(tmp_path):
     root, vault = _repo(tmp_path)
     _doc(vault, "a.md", "`src/App.tsx` `src/pkg/mod.py:9`")
     baseline = tmp_path / "b.txt"
-    tool.write_baseline(tool.broken_citations(root, vault), baseline)
+    tool.write_baseline(tool.broken_citations(root, vault), baseline, seed=True)
     assert tool.read_baseline(baseline) == {"a.md || src/App.tsx", "a.md || src/pkg/mod.py:9"}
     assert tool.run_ratchet(root, vault, baseline) == 0
 
@@ -138,3 +138,111 @@ def test_write_baseline_round_trips(tmp_path):
 def test_real_vault_ratchet_is_green():
     """The committed baseline must match the committed tree; a new invented path in any doc fails here too."""
     assert tool.run_ratchet() == 0
+
+
+# ---------------------------------------------------------------- Codex review of #169: floor, containment, fences
+
+def test_indented_and_longer_fences_are_recognised():
+    """CommonMark allows up to three spaces before a fence and longer markers."""
+    text = (
+        "keep `src/pkg/mod.py`\n"
+        "   ```bash\n"
+        "cat `src/inside-indented-fence.py`\n"
+        "   ```\n"
+        "````\n"
+        "```\n"                       # a shorter run does not close a 4-backtick fence
+        "`src/inside-long-fence.py`\n"
+        "````\n"
+        "  ~~~~\n"
+        "`src/inside-tilde.py`\n"
+        "~~~\n"                       # too short: still inside
+        "`src/still-inside.py`\n"
+        "~~~~~\n"                     # long enough: closes
+        "after `tools/x.py`\n"
+    )
+    found = [raw for *_rest, raw in tool.citations_in(text)]
+    assert found == ["src/pkg/mod.py", "tools/x.py"]
+
+
+def test_dot_segments_cannot_escape_the_repository(tmp_path):
+    root, vault = _repo(tmp_path)
+    (tmp_path / "outside.txt").write_text("secret\n", encoding="utf-8")   # exists, but outside root
+    _doc(vault, "a.md", "`src/../../outside.txt` `src/./pkg/mod.py` `src/pkg/../pkg/mod.py`")
+    broken = tool.broken_citations(root, vault)
+    assert broken["a.md || src/../../outside.txt"].startswith("path escapes the repository")
+    assert broken["a.md || src/./pkg/mod.py"].startswith("path escapes the repository")
+    assert broken["a.md || src/pkg/../pkg/mod.py"].startswith("path escapes the repository")
+
+
+def test_a_symlink_on_the_cited_path_fails_even_when_it_points_inside(tmp_path):
+    root, vault = _repo(tmp_path)
+    outside = tmp_path / "outside.txt"
+    outside.write_text("secret\n", encoding="utf-8")
+    try:
+        (root / "src" / "leak.txt").symlink_to(outside)                 # file symlink -> outside
+        (root / "tools" / "alias").symlink_to(root / "src" / "pkg", target_is_directory=True)
+    except (OSError, NotImplementedError) as exc:
+        import pytest
+        pytest.skip(f"symlink creation not permitted here: {exc}")
+    _doc(vault, "a.md", "`src/leak.txt` `tools/alias/mod.py` `src/pkg/mod.py`")
+    broken = tool.broken_citations(root, vault)
+    assert broken == {
+        "a.md || src/leak.txt": "path goes through a symlink",
+        "a.md || tools/alias/mod.py": "path goes through a symlink",
+    }
+
+
+def test_ratchet_fails_when_a_new_broken_citation_and_its_baseline_line_arrive_together(tmp_path, capsys):
+    """Codex #169 finding 1: current == baseline must not pass when the floor was raised."""
+    root, vault = _repo(tmp_path)
+    _doc(vault, "a.md", "`src/App.tsx` `src/New.tsx`")
+    baseline = tmp_path / "baseline.txt"
+    baseline.write_text("a.md || src/App.tsx\na.md || src/New.tsx\n", encoding="utf-8")
+    base_baseline = {"a.md || src/App.tsx"}                                   # what the base commit accepted
+    assert tool.run_ratchet(root, vault, baseline, base_baseline=base_baseline) == 1
+    out = capsys.readouterr().out
+    assert "FAIL (floor raised)" in out and "+ a.md || src/New.tsx" in out
+    # The same tree passes against a base that already accepted both, and when
+    # the floor is lowered (base had more) it also passes.
+    assert tool.run_ratchet(root, vault, baseline, base_baseline=base_baseline | {"a.md || src/New.tsx"}) == 0
+    assert tool.run_ratchet(root, vault, baseline, base_baseline=base_baseline | {"a.md || src/New.tsx", "b.md || src/Old.tsx"}) == 0
+
+
+def test_write_baseline_is_shrink_only_and_seed_refuses_an_existing_file(tmp_path):
+    root, vault = _repo(tmp_path)
+    _doc(vault, "a.md", "`src/App.tsx` `src/New.tsx`")
+    baseline = tmp_path / "b.txt"
+    baseline.write_text("a.md || src/App.tsx\na.md || src/Gone.tsx\n", encoding="utf-8")
+    refused = tool.write_baseline(tool.broken_citations(root, vault), baseline)
+    assert refused == ["a.md || src/New.tsx"]                               # never added
+    assert tool.read_baseline(baseline) == {"a.md || src/App.tsx"}          # stale entry dropped
+    import pytest
+    with pytest.raises(FileExistsError):
+        tool.write_baseline(tool.broken_citations(root, vault), baseline, seed=True)
+
+
+def test_baseline_at_ref_reads_git_and_fails_closed_on_an_unknown_ref(tmp_path):
+    import subprocess
+    repo = tmp_path / "git"
+    repo.mkdir()
+    run = lambda *args: subprocess.run(["git", *args], cwd=repo, check=True, capture_output=True, text=True)
+    run("init", "-q")
+    run("config", "user.email", "t@example")
+    run("config", "user.name", "t")
+    run("commit", "-q", "--allow-empty", "-m", "empty")
+    assert tool.baseline_at_ref("HEAD", repo) is None                       # file absent: first introduction
+    (repo / "tools" / "baselines").mkdir(parents=True)
+    (repo / "tools" / "baselines" / "doc_path_citations.txt").write_text("# c\na.md || src/App.tsx\n", encoding="utf-8")
+    run("add", "-A")
+    run("commit", "-q", "-m", "baseline")
+    assert tool.baseline_at_ref("HEAD", repo) == {"a.md || src/App.tsx"}
+    import pytest
+    with pytest.raises(ValueError):
+        tool.baseline_at_ref("no-such-ref", repo)
+
+
+def test_cli_ratchet_requires_a_base_ref(capsys):
+    import pytest
+    with pytest.raises(SystemExit) as exc:
+        tool.main(["--ratchet"])
+    assert exc.value.code == 2
