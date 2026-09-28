@@ -24,6 +24,15 @@ Invariants (tested in ``tests/test_pitr_archive_retention.py``):
    is an operator event, not this tool's).
 5. With no retained backup (empty backups dir) NOTHING in the archive is a candidate --
    an archive without a base is unrecoverable already, and deleting WAL cannot help.
+6. Label time handling is fail-closed (F-VFCL04-01 / F-VFCL04-02, PR #147):
+   a ``START TIME`` that is present but not parseable raises ``ValueError`` -- the whole
+   plan is refused (CLI exit 3), the same policy this module already applied to a missing
+   ``START WAL LOCATION``; a label WITHOUT ``START TIME`` gives the backup an UNKNOWN age
+   (never the directory mtime): an unknown-age backup is always retained, never a
+   deletion candidate, never the "newest" pick, and its start segment still bounds the
+   WAL that is kept.  Accepted time forms are a numeric offset (``+0900``/``+09:00``) or an
+   explicit ``UTC``/``GMT``; a named non-UTC abbreviation (``KST``, ``EST``, ...) is
+   rejected instead of being stamped UTC, and a naive time is rejected as ambiguous.
 
 The default is a dry run that prints the plan as JSON. ``--apply`` deletes exactly the
 planned paths after printing that same plan, and reports what was removed. Nothing is
@@ -46,6 +55,9 @@ SEGMENT = re.compile(r"^[0-9A-F]{24}$")
 LABEL = re.compile(r"^([0-9A-F]{24})\.[0-9A-F]{8}\.backup$")
 START_WAL = re.compile(r"START WAL LOCATION:.*\(file ([0-9A-F]{24})\)")
 START_TIME = re.compile(r"START TIME:\s*(.+)$", re.M)
+_TIME_WITH_ZONE = re.compile(r"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})(?:\s*(\S+))?$")
+_NUMERIC_OFFSET = re.compile(r"^[+-]\d{2}:?\d{2}$")
+UTC_NAMES = ("UTC", "GMT", "Z")
 
 DEFAULT_DAYS = 7  # decision 2026-09-22 (coordinator, user delegation) -- pilot value
 
@@ -54,7 +66,13 @@ DEFAULT_DAYS = 7  # decision 2026-09-22 (coordinator, user delegation) -- pilot 
 class BaseBackup:
     name: str
     start_segment: str
-    taken_at: datetime
+    taken_at: datetime | None  # None = unknown age (label had no START TIME): always retained
+
+
+@dataclass
+class UnknownAge:
+    """Marker returned by ``parse_backup_label`` when the label carries no START TIME."""
+    reason: str = "backup_label has no START TIME; age unknown, backup retained"
 
 
 @dataclass
@@ -66,6 +84,7 @@ class Plan:
     delete_backups: list[str] = field(default_factory=list)
     delete_archive: list[str] = field(default_factory=list)
     kept_archive: int = 0
+    unknown_age_backups: list[str] = field(default_factory=list)
     reason: str = ""
 
     def as_dict(self) -> dict:
@@ -78,6 +97,7 @@ class Plan:
             "deleteBackups": self.delete_backups,
             "deleteArchive": self.delete_archive,
             "keptArchiveEntries": self.kept_archive,
+            "unknownAgeBackups": self.unknown_age_backups,
             "reason": self.reason,
         }
 
@@ -90,23 +110,47 @@ def _position(segment: str) -> str:
     return segment[8:]
 
 
-def parse_backup_label(text: str, fallback_time: datetime) -> tuple[str, datetime]:
+def parse_start_time(raw: str) -> datetime:
+    """Parse a PostgreSQL ``START TIME`` value into an aware UTC datetime, or raise.
+
+    PostgreSQL writes ``%Y-%m-%d %H:%M:%S %Z`` in the SERVER time zone, so the zone token
+    may be any abbreviation (``KST``, ``CET``, ...).  Only two forms carry an unambiguous
+    instant: a numeric offset and an explicit ``UTC``/``GMT``.  Anything else is refused --
+    a named non-UTC abbreviation must not be stamped UTC (up to hours of error, in the
+    unsafe direction half of the time), and a naive time is ambiguous.
+    """
+    raw = raw.strip()
+    m = _TIME_WITH_ZONE.match(raw)
+    if not m:
+        raise ValueError(f"START TIME not in '<date> <time> <zone>' form: {raw!r}")
+    clock, zone = m.group(1), m.group(2)
+    naive = datetime.strptime(clock, "%Y-%m-%d %H:%M:%S")
+    if zone is None:
+        raise ValueError(f"START TIME has no time zone; refusing to assume UTC: {raw!r}")
+    if zone.upper() in UTC_NAMES:
+        return naive.replace(tzinfo=timezone.utc)
+    if _NUMERIC_OFFSET.match(zone):
+        return datetime.strptime(clock + " " + zone.replace(":", ""), "%Y-%m-%d %H:%M:%S %z").astimezone(timezone.utc)
+    raise ValueError(
+        f"START TIME zone {zone!r} is a named non-UTC abbreviation; only a numeric offset or UTC/GMT "
+        f"is accepted (PostgreSQL writes the server zone; set timezone=UTC or log_timezone for labels): {raw!r}"
+    )
+
+
+def parse_backup_label(text: str) -> tuple[str, datetime | UnknownAge]:
+    """Return ``(start_segment, taken_at)``; ``taken_at`` is ``UnknownAge`` when no START TIME.
+
+    Both a missing START WAL LOCATION and an unparseable START TIME raise ``ValueError``
+    (fail-closed: the operator gets an explicit error, never a plan built on a guessed
+    age).  No filesystem time is ever substituted for the label time.
+    """
     m = START_WAL.search(text)
     if not m:
         raise ValueError("backup_label without START WAL LOCATION")
     t = START_TIME.search(text)
-    taken = fallback_time
-    if t:
-        raw = t.group(1).strip()
-        for fmt in ("%Y-%m-%d %H:%M:%S %Z", "%Y-%m-%d %H:%M:%S%z", "%Y-%m-%d %H:%M:%S"):
-            try:
-                taken = datetime.strptime(raw, fmt)
-                if taken.tzinfo is None:
-                    taken = taken.replace(tzinfo=timezone.utc)
-                break
-            except ValueError:
-                continue
-    return m.group(1), taken
+    if not t:
+        return m.group(1), UnknownAge()
+    return m.group(1), parse_start_time(t.group(1))
 
 
 def load_backups(backups_dir: Path) -> list[BaseBackup]:
@@ -117,9 +161,11 @@ def load_backups(backups_dir: Path) -> list[BaseBackup]:
         label = child / "backup_label"
         if not child.is_dir() or not label.is_file():
             continue
-        fallback = datetime.fromtimestamp(child.stat().st_mtime, timezone.utc)
-        start, taken = parse_backup_label(label.read_text(encoding="utf-8", errors="replace"), fallback)
-        found.append(BaseBackup(child.name, start, taken))
+        try:
+            start, taken = parse_backup_label(label.read_text(encoding="utf-8", errors="replace"))
+        except ValueError as error:
+            raise ValueError(f"{child.name}/backup_label: {error}") from None
+        found.append(BaseBackup(child.name, start, None if isinstance(taken, UnknownAge) else taken))
     return found
 
 
@@ -139,8 +185,14 @@ def plan(archive: list[str], backups: list[BaseBackup], *, retention_days: int, 
         result.reason = "no base backup: nothing is deletable (archive without a base is not recoverable; deleting WAL cannot help)"
         return result
     cutoff = now - timedelta(days=retention_days)
-    newest = max(backups, key=lambda b: (b.taken_at, b.name))
-    retained = [b for b in backups if b.taken_at >= cutoff or b is newest]
+    # Unknown-age backups (label without START TIME) are always retained and never take
+    # part in the "newest" choice: a guessed age must not decide what gets deleted, and a
+    # backup of unknown age must not shadow a known-age one as "the newest".
+    known = [b for b in backups if b.taken_at is not None]
+    unknown = [b for b in backups if b.taken_at is None]
+    result.unknown_age_backups = sorted(b.name for b in unknown)
+    newest = max(known, key=lambda b: (b.taken_at, b.name)) if known else None
+    retained = [b for b in known if b.taken_at >= cutoff or b is newest] + unknown
     result.retained_backups = sorted(b.name for b in retained)
     result.delete_backups = sorted(b.name for b in backups if b not in retained)
     # The boundary is the SMALLEST start segment among retained backups -- not the start of
@@ -167,8 +219,9 @@ def plan(archive: list[str], backups: list[BaseBackup], *, retention_days: int, 
         result.delete_archive.append(name)
     result.delete_archive.sort()
     result.reason = (
-        f"retain backups newer than {cutoff.isoformat()} plus the newest; "
-        f"keep WAL from {boundary} onward on timeline {tli}"
+        f"retain backups newer than {cutoff.isoformat()} plus the newest"
+        + (f" plus {len(unknown)} of unknown age" if unknown else "")
+        + f"; keep WAL from {boundary} onward on timeline {tli}"
     )
     return result
 
@@ -198,7 +251,15 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     now = datetime.fromisoformat(args.now).astimezone(timezone.utc) if args.now else datetime.now(timezone.utc)
     archive_dir, backups_dir = Path(args.archive), Path(args.backups)
-    plan_ = plan(load_archive(archive_dir), load_backups(backups_dir), retention_days=args.days, now=now)
+    try:
+        backups = load_backups(backups_dir)
+    except ValueError as error:
+        # Fail closed: an unreadable label time means no plan at all -- nothing is deleted
+        # and the operator sees which label and why.  Exit 3 (argparse already owns 2).
+        print(json.dumps({"scope": "filesystem-plan-only", "mode": "refused", "error": str(error),
+                          "deleteBackups": [], "deleteArchive": []}, indent=2))
+        return 3
+    plan_ = plan(load_archive(archive_dir), backups, retention_days=args.days, now=now)
     report = plan_.as_dict()
     report["mode"] = "apply" if args.apply else "dry-run"
     print(json.dumps(report, indent=2))
