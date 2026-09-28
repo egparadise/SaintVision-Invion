@@ -1,7 +1,7 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.206"
+version: "1.0.212"
 status: "review"
 author: "Codex"
 updated: "2026-09-28T20:35:25+09:00"
@@ -15,6 +15,37 @@ source_of_truth: "Git"
 - 합친 tree Core run `36413452211`은 준비·통합 10분 11초 뒤 pytest가 15분 01초 실행되던 중 25분 job 상한으로 취소됐고, skip ratchet·build·Go·TypeScript gate에는 도달하지 못했다. 시험 실패로 분류하지 않는다.
 - `.github/workflows/core.yml`의 `core` job만 45분으로 올렸다. 개별 test stack dump용 `faulthandler_timeout=45`, 직렬 pytest, 후속 `s01-storage-roundtrip` 10분 예산은 불변이다.
 - YAML·diff·docs gate 후 PR에 `run-core` label을 붙여 동일 head 완주 시간을 측정한다. 현재는 hosted 완주 전 `review`, reviewer Claude다. [[2026-09-28_20-35-25_KST_Core_CI_timeout_budget_Codex_구현]].
+## 2026-09-28 Card45 S3 ObjectStore 제품 결속 v2 — 제품 restore 보강·hosted 재검증
+
+- Claude r1 지적을 반영해 승인 v1 head `5a794ae9`를 merge commit `82df64a0`으로 일반 push했다. persisted provider 불일치는 read/delete/state mutation 전에 `STORE-0001`/503/retryable로 닫고, configured app은 Workspace recovery Local과 준비된 S3를 read registry에 함께 등록한다. S3 restore는 row provider로 선택하며 prefix 이탈도 retryable 503이다.
+- Claude r2에서 미사용 `SnapshotStore.restore`만 S3를 읽고 실제 `WorkspaceRecovery.restore`가 Local writer에 고정된 공백을 확인했다. 제품 restore와 checkout이 row provider를 registry에서 선택하도록 고치고 PG-free 선택 시험을 추가했으며, hosted 시험도 실제 `WorkspaceRecovery.restore`·receipt replay를 호출한다. `deploy/CONFIGURED-SERVER.md`에는 Local root 일치, legacy/new 동시 거부, worker mount, 전환 전 drain을 기록했다.
+- PR #149 위 stack에서 provider/locator migration, strict `configurationReadiness.objectStore`, worker/API 단일 설정 정본, 두 checkpoint 생산자 replay guard, provider-body Artifact download와 Local provider→DB lock order를 결속했다. 코드 head는 `51ffdc26`; 문서 head는 후속 커밋이다.
+- receipt body fallback은 제거했고 provider 부재는 `STORE-0001`/503으로 닫는다. S3 예약 local provider ID·endpoint path·unknown inner key·dual provider를 거부하며, 공개 route/schema의 objectId/locator 입력은 positional·keyword-only·Query alias까지 0건을 단언한다.
+- PG-free focused 87 passed/3 명시 skip, 추가 경계 58 passed/1 symlink skip, r2 설정/provider 26 passed/1 Windows symlink skip, route coverage 40 passed, bindings/frontend/freshness/ontology/YAML/compile/diff exit 0이다. 최종 head `249b73e2`는 Core `36372821204`(3362 passed/36 skipped/2 deselected/0 failed, exact skip gate·Python build·Go·TS exit 0), Backend `36372821119`, Docs `36372821243`, Frontend `36372821191`, Desktop `36372821245`가 모두 success다. S01 job은 conformance 2건과 disposable MinIO·PostgreSQL 제품 경로 3건을 0 failure/error/skip으로 실행했다. 로컬 실 PG·Docker는 실행하지 않았고 Claude 최종 재검토·사용자 병합·운영 S3 인수는 별도다. [[2026-09-28_10-36-00_KST_S3_ObjectStore_제품결속_v2_Codex]].
+
+## 2026-09-28 Card45 S3 ObjectStore 구현 1단계 — reviewer 인계
+
+- 승인된 #140 v1.2 설계를 #135 head 위에서 구현했다. locator 기반 `ObjectStore` SPI, 기존 Local compatibility wrapper, scoped `S3Objects`, 단일 제품 SigV4 client를 추가하고 #135 preflight의 signer 복사본을 제거했다.
+- S3 timeout/5xx/409는 실제 bytes 재조회로만 멱등 성공, 403은 성공 강등 금지, delete는 HEAD 404 확인으로 고정했다. PG-free 35 passed에서 prefix 이탈·digest/metadata/size drift·잔존 delete·공개 request의 objectId/locator 입력 0건을 단언했다.
+- Claude 1차 검토의 차단 3건을 반영했다. lane은 pinned pytest를 설치하고 conformance 실패와 #135 evidence를 독립 실행한다. S3는 서명된 `If-None-Match: *`와 412 재조회로 다른 byte 덮어쓰기를 `STORE-0005`/409로 막고, Local도 같은 충돌 의미를 지킨다. AWS 공식 SigV4 known-answer와 중첩 schema·route 입력 스캔을 추가해 PG-free 38 passed다. 수정 head의 hosted S3/Local JUnit과 #135 evidence는 대기이며, migration·strict 설정·두 producer·Artifact provider-body download는 다음 stack PR이라 아직 제품 경로 완료가 아니다. [[2026-09-28_17-15-00_KST_S3_ObjectStore_SPI_Codex]].
+
+## 2026-09-28 S01-ST Storage SHA-256 왕복 검증기 — hosted 인계 준비
+
+- `agent/codex/s01-storage-roundtrip`, base `1e8baf04`, owner Codex/reviewer Claude. 설계→예상 red 시험→구현 순서를 지켰고 v1.1 PG-free focused 20 passed(M2 잔존 object 부정 대조 포함), 저장소 입력 없는 CLI는 외부 호출 0·`BLOCKED`/exit 3, YAML parse exit 0이다.
+- S3 호환 후보 PUT/GET의 body·metadata SHA-256과 자신이 만든 object의 DELETE 뒤 GET 404를 증명한다. 제품 S3 adapter가 없어 제품 Artifact 결속 주장은 철회했다. 출력은 `targetKind` 필수 redacted JSON/JUnit이며 자격·endpoint·bucket·key·provider 오류 원문은 금지한다.
+- hosted run `36356313380`의 격리 candidate job은 PASS: JSON six checks true·cleanup true·head SHA 일치, JUnit 1/0/0/0, image digest 일치다. `ci-candidate` evidence는 U6 PASS가 아니며 #122는 `operational`만 받는다. 실제 Run 전체 S3 adapter, 운영 TLS/자격, retention/GC/restore는 미측정이다. [[2026-09-28_07-35-00_KST_S01_ST_Storage_SHA256_왕복검증기_Codex]], [[S01_ST_Storage_SHA256_왕복_검증기_설계]].
+
+## 2026-09-28 S01-BE 운영 설정 미해결 관측 route
+
+- 운영 정본 `inv.app.create_configured_app`에 인증+operator grant 전용 `GET /v1/operations/configuration-readiness`를 추가했다. Claude 1차 검토 뒤 단순 env 존재 검사를 폐기하고 `api.json.configurationReadiness` 및 기존 read-only config volume에 결속했다. 값은 반환하지 않고 `INV_NODE_MTLS_CA_BUNDLE`·`INV_OBJECT_STORE_ENDPOINT` 호환 이름만 엄격한 `ConfigurationReadinessView`로 반환한다.
+- CA는 읽을 수 있는 bounded PEM에 CA 인증서 1장 이상, endpoint는 자격증명 없는 HTTP(S) URL일 때만 해결된다. 1개만 미해결·없는/깨진/non-CA PEM·잘못된 URL은 계속 `blocked`; `/readyz` 의미는 유지하고 provider 미구성은 `SYS-0001/503`이다. focused PG-free **58 passed, 2 opt-in skipped, 3 postgres deselected**, bindings·schema check 0을 확보했다.
+- PR #122의 `--health-url`은 `--settings-url`+Bearer로, PR #125 §7은 새 운영 route로 후속 정정한다. U2·U3·U6은 미해결이며 S01-BE `in_progress` 유지. [[S01_BE_운영_설정_미해결_관측_결정]], [[2026-09-28_08-35-00_KST_S01_BE_운영_설정_미해결_관측_Codex]].
+
+## 2026-09-28 Card36 hosted Core CX01 19 skip 실행 전환 — 검토 인계
+
+- base `9a837fd7`(#117 lock-wait skip map hotfix 포함), branch `agent/codex/cx01-hosted-core`, owner Codex/reviewer Claude. Core job이 고유 owner label·tmpfs·loopback으로 PostgreSQL 16을 직접 생성하고 같은 컨테이너를 recovery source/CX01 identity로 쓰며 `if: always()` 정리하는 설계를 고정했다.
+- mock·identity/ownership 단언 완화·옛 PC 보호 컨테이너 사용 없이 head `bc27588d`의 Core `36353272311`이 success했다. focused recovery는 18 passed/2 구체적 internal-network skip/0 failed·error, main은 3236 passed/17 declared skip/0 failed·error이며 build·Go·TS·owned cleanup도 success다. 기존 unset 19 skip은 0건이다.
+- 앞선 shared-session 14 fail은 owner-only 음성 시험이 trigger를 끄고 남긴 orphan `inv.result_commitments`를 다음 restore가 FK로 거부한 시험 격리 오염으로 재현했다. 제품 drill은 손상을 통과시키지 않았고 fresh restore는 통과했으므로 recovery를 fresh session으로 분리했으며, 음성 시험 cleanup은 별도 test-hygiene 관찰로 남긴다. S07-DB 물리 인수는 `review` 유지, Claude 독립 재검토가 다음이다. [[Core CX01 hosted disposable container 설계]], [[2026-09-28_06-53-26_KST_Card36_CX01_hosted_Core_Codex]]
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 
