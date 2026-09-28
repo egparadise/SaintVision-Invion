@@ -224,7 +224,7 @@ def _import_reference_only_dry_run(
         "schemaVersion", "runPurpose", "referenceOnly", "acceptanceClaim",
         "verdict", "sourceRunId", "sourceHeadSha", "checkoutTreeSha",
         "cleanCheckout", "generatedAt", "inventoryRevision", "environment",
-        "operatorResources", "caseIdentities", "faultClasses", "cases", "caseReceipts",
+        "operatorResources", "caseIdentities", "faultClasses", "cases", "casePlans",
         "execution", "cleanup", "storageReferenceSha256", "hostedReferenceSha256",
     }
     if set(report) != required_keys or report.get("schemaVersion") != SCHEMA_VERSION:
@@ -271,38 +271,44 @@ def _import_reference_only_dry_run(
         raise EvidenceImportError("dry-run fault-class identities are not exact")
     cases = report.get("cases")
     expected_cases = [
-        {"caseIdentity": identity, "verdict": "SIMULATED", "faultClass": None}
+        {"caseIdentity": identity, "status": "DECLARED_ONLY", "faultClass": None}
         for identity in CASE_IDENTITIES
     ]
     if cases != expected_cases:
         raise EvidenceImportError("dry-run cases must traverse the exact case universe")
-    receipts = report.get("caseReceipts")
-    if not isinstance(receipts, list) or len(receipts) != len(CASE_IDENTITIES):
-        raise EvidenceImportError("dry-run case receipts are incomplete")
-    for identity, receipt in zip(CASE_IDENTITIES, receipts, strict=True):
+    plans = report.get("casePlans")
+    if not isinstance(plans, list) or len(plans) != len(CASE_IDENTITIES):
+        raise EvidenceImportError("dry-run case plans are incomplete")
+    for identity, plan in zip(CASE_IDENTITIES, plans, strict=True):
         prefix = identity.split("/", 1)[0]
-        expected_receipt = {
+        expected_plan = {
             "caseIdentity": identity,
-            "phases": [
+            "plannedPhases": [
                 "preflight", "observe-baseline", "simulate-fault",
                 "observe-recovery", "cleanup",
             ],
+            "executedPhases": [],
             "candidateFaultClasses": sorted(ALLOWED_FAULT_CLASSES_BY_PREFIX[prefix]),
-            "containerLifecycle": {
-                "created": True, "started": True, "stopped": True, "removed": True,
+            "containerPlan": {
+                "declaredTransitions": ["create", "start", "stop", "remove"],
+                "executedTransitions": [],
             },
+            "observed": False,
             "physicalActions": False,
         }
-        if receipt != expected_receipt:
-            raise EvidenceImportError("dry-run case receipt is not exact")
+        if plan != expected_plan:
+            raise EvidenceImportError("dry-run case plan is not exact")
     if report.get("execution") != {
         "driver": "synthetic-lan-pilot-v1",
-        "started": True,
+        "mode": "plan-only",
+        "planned": True,
+        "simulationExecuted": False,
         "physicalActions": False,
-        "executedCaseCount": len(CASE_IDENTITIES),
+        "declaredCaseCount": len(CASE_IDENTITIES),
+        "observedCaseCount": 0,
     }:
         raise EvidenceImportError("dry-run execution receipt is invalid")
-    if report.get("cleanup") != {"residueCount": 0}:
+    if report.get("cleanup") != {"observed": False, "physicalResidueCount": None}:
         raise EvidenceImportError("dry-run cleanup receipt is invalid")
 
     if report.get("storageReferenceSha256") != _canonical_sha(storage):
@@ -344,6 +350,8 @@ def _import_reference_only_dry_run(
         "schemaVersion": SCHEMA_VERSION,
         "runPurpose": "ac11-axis-evidence",
         "axis": AXIS,
+        "referenceOnly": True,
+        "acceptanceClaim": False,
         "sourceRunId": report["sourceRunId"],
         "sourceHeadSha": source,
         "checkoutTreeSha": report["checkoutTreeSha"],

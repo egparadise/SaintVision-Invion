@@ -46,6 +46,14 @@ G19_SCHEMA_VERSION = "s01-readiness-inventory:1"
 REPORT_SCHEMA_VERSION = "1.0.0"
 _HEX64 = re.compile(r"^[0-9a-f]{64}$")
 _NODE_ID = re.compile(r"^nod_[A-Za-z0-9][A-Za-z0-9_-]{0,126}$")
+DRY_RUN_PHASES = (
+    "preflight",
+    "observe-baseline",
+    "simulate-fault",
+    "observe-recovery",
+    "cleanup",
+)
+DRY_RUN_CONTAINER_TRANSITIONS = ("create", "start", "stop", "remove")
 
 
 class InventoryError(ValueError):
@@ -175,8 +183,13 @@ def validate_g19_inventory(payload: Any) -> dict[str, Any]:
             _integer(allowed[field], f"{where}.allowedResources.{field}", allow_zero=field == "gpuDevices")
             if allowed[field] > capacity[field]:
                 raise InventoryError(f"{where}.allowedResources exceeds capacity")
+        storage_role = node["storageRole"]
+        if storage_role not in {"provider", "archive", "none"}:
+            raise InventoryError(f"{where}.storageRole is invalid")
         folders = node["allowedFolders"]
-        if not isinstance(folders, list) or not folders:
+        if not isinstance(folders, list):
+            raise InventoryError(f"{where}.allowedFolders must be a list")
+        if storage_role != "none" and not folders:
             raise InventoryError(f"{where}.allowedFolders must authorize at least one path")
         for folder in folders:
             _nonempty(folder, f"{where}.allowedFolders")
@@ -189,15 +202,13 @@ def validate_g19_inventory(payload: Any) -> dict[str, Any]:
         skew = ntp["maxSkewSeconds"]
         if isinstance(skew, bool) or not isinstance(skew, (int, float)) or not 0 <= skew <= 5:
             raise InventoryError(f"{where}.ntp.maxSkewSeconds must be in [0,5]")
-        if node["storageRole"] not in {"provider", "archive", "none"}:
-            raise InventoryError(f"{where}.storageRole is invalid")
     if (colocated, workers) != (1, 4):
         raise InventoryError("AC-11 target requires one CP-colocated node and four workers")
     return root
 
 
 def _inventory_revision(payload: dict[str, Any]) -> str:
-    return f"sha256:{hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(',', ':')).encode()).hexdigest()}"
+    return f"sha256:{_canonical_sha(payload)}"
 
 
 def _exercise_reused_lan_boundaries(payload: dict[str, Any], source_sha: str) -> dict[str, Any]:
@@ -300,36 +311,36 @@ def build_dry_run_report(
         "caseIdentities": list(CASE_IDENTITIES),
         "faultClasses": list(FAULT_CLASSES),
         "cases": [
-            {"caseIdentity": identity, "verdict": "SIMULATED", "faultClass": None}
+            {"caseIdentity": identity, "status": "DECLARED_ONLY", "faultClass": None}
             for identity in CASE_IDENTITIES
         ],
-        "caseReceipts": [
+        "casePlans": [
             {
                 "caseIdentity": identity,
-                "phases": [
-                    "preflight", "observe-baseline", "simulate-fault",
-                    "observe-recovery", "cleanup",
-                ],
+                "plannedPhases": list(DRY_RUN_PHASES),
+                "executedPhases": [],
                 "candidateFaultClasses": sorted(
                     ALLOWED_FAULT_CLASSES_BY_PREFIX[identity.split("/", 1)[0]]
                 ),
-                "containerLifecycle": {
-                    "created": True,
-                    "started": True,
-                    "stopped": True,
-                    "removed": True,
+                "containerPlan": {
+                    "declaredTransitions": list(DRY_RUN_CONTAINER_TRANSITIONS),
+                    "executedTransitions": [],
                 },
+                "observed": False,
                 "physicalActions": False,
             }
             for identity in CASE_IDENTITIES
         ],
         "execution": {
             "driver": "synthetic-lan-pilot-v1",
-            "started": True,
+            "mode": "plan-only",
+            "planned": True,
+            "simulationExecuted": False,
             "physicalActions": False,
-            "executedCaseCount": len(CASE_IDENTITIES),
+            "declaredCaseCount": len(CASE_IDENTITIES),
+            "observedCaseCount": 0,
         },
-        "cleanup": {"residueCount": 0},
+        "cleanup": {"observed": False, "physicalResidueCount": None},
         "storageReferenceSha256": _canonical_sha(storage),
         "hostedReferenceSha256": _canonical_sha(hosted),
     }
@@ -367,7 +378,8 @@ def _git_value(*args: str) -> str:
 
 def _write_json(path: Path, value: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    with path.open("x", encoding="utf-8", newline="\n") as stream:
+        stream.write(json.dumps(value, ensure_ascii=False, indent=2) + "\n")
 
 
 def _write_junit(path: Path, report: dict[str, Any], envelope: dict[str, Any]) -> None:
@@ -385,7 +397,8 @@ def _write_junit(path: Path, report: dict[str, Any], envelope: dict[str, Any]) -
     imported = ElementTree.SubElement(suite, "testcase", name="importer-reference-only-boundary")
     ElementTree.SubElement(imported, "skipped", message=envelope["verdict"])
     path.parent.mkdir(parents=True, exist_ok=True)
-    ElementTree.ElementTree(suite).write(path, encoding="utf-8", xml_declaration=True)
+    with path.open("xb") as stream:
+        ElementTree.ElementTree(suite).write(stream, encoding="utf-8", xml_declaration=True)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -400,8 +413,6 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--evidence-output", type=Path, required=True)
     parser.add_argument("--junit", type=Path)
     args = parser.parse_args(argv)
-    source = args.source_head_sha or _git_value("rev-parse", "HEAD")
-
     protected_inputs = {
         path.resolve()
         for path in (args.inventory, args.storage_reference, args.hosted_reference)
@@ -412,6 +423,8 @@ def main(argv: list[str] | None = None) -> int:
         outputs.append(args.junit.resolve())
     if len(outputs) != len(set(outputs)) or any(path in protected_inputs for path in outputs):
         parser.error("output paths must be distinct and must not replace an input")
+    if any(path.exists() for path in outputs):
+        parser.error("output paths must not already exist")
 
     if args.mode == "physical":
         if args.inventory is None:
@@ -423,7 +436,7 @@ def main(argv: list[str] | None = None) -> int:
         else:
             try:
                 inventory = validate_g19_inventory(_read_json(args.inventory))
-                _exercise_reused_lan_boundaries(inventory, source)
+                _exercise_reused_lan_boundaries(inventory, "0" * 40)
             except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
                 report = blocked_physical_report(
                     source_run_id=args.source_run_id,
@@ -444,6 +457,7 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("dry-run requires --inventory, --storage-reference, and --hosted-reference")
     try:
         head = _git_value("rev-parse", "HEAD")
+        source = args.source_head_sha or head
         if source != head or _git_value("status", "--porcelain"):
             raise ValueError("dry-run provenance requires an exact clean HEAD checkout")
         tree = _git_value("rev-parse", f"{source}^{{tree}}")

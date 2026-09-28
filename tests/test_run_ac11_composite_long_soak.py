@@ -164,25 +164,35 @@ def test_dry_run_traverses_exact_cases_but_imports_as_not_observed() -> None:
     envelope = import_report(report, storage, hosted, FakeGit())
 
     assert [case["caseIdentity"] for case in report["cases"]] == list(CASE_IDENTITIES)
-    assert all(case["verdict"] == "SIMULATED" for case in report["cases"])
+    assert all(case["status"] == "DECLARED_ONLY" for case in report["cases"])
     assert report["referenceOnly"] is True
     assert report["acceptanceClaim"] is False
     assert report["execution"] == {
         "driver": "synthetic-lan-pilot-v1",
-        "started": True,
+        "mode": "plan-only",
+        "planned": True,
+        "simulationExecuted": False,
         "physicalActions": False,
-        "executedCaseCount": 14,
+        "declaredCaseCount": 14,
+        "observedCaseCount": 0,
     }
-    assert len(report["caseReceipts"]) == len(CASE_IDENTITIES)
+    assert len(report["casePlans"]) == len(CASE_IDENTITIES)
     assert all(
-        receipt["phases"]
+        plan["plannedPhases"]
         == ["preflight", "observe-baseline", "simulate-fault", "observe-recovery", "cleanup"]
-        and receipt["containerLifecycle"]
-        == {"created": True, "started": True, "stopped": True, "removed": True}
-        and receipt["physicalActions"] is False
-        for receipt in report["caseReceipts"]
+        and plan["executedPhases"] == []
+        and plan["containerPlan"]
+        == {
+            "declaredTransitions": ["create", "start", "stop", "remove"],
+            "executedTransitions": [],
+        }
+        and plan["observed"] is False
+        and plan["physicalActions"] is False
+        for plan in report["casePlans"]
     )
     assert envelope["verdict"] == "NOT_OBSERVED"
+    assert envelope["referenceOnly"] is True
+    assert envelope["acceptanceClaim"] is False
     assert "reference-only" in envelope["reason"]
     assert "targetRef" not in envelope
 
@@ -190,10 +200,15 @@ def test_dry_run_traverses_exact_cases_but_imports_as_not_observed() -> None:
 @pytest.mark.parametrize(
     "mutate, message",
     [
+        (lambda report: report.update(referenceOnly=False), "cannot claim"),
         (lambda report: report.update(acceptanceClaim=True), "cannot claim"),
         (lambda report: report.update(verdict="MEASURED_PASS"), "cannot claim"),
+        (lambda report: report.update(operatorResources=["G-24"]), "operator resources"),
+        (lambda report: report["environment"].update(topology="physical-five-node"), "environment"),
+        (lambda report: report.update(checkoutTreeSha="c" * 40), "clean source tree"),
         (lambda report: report["cases"].pop(), "exact case universe"),
-        (lambda report: report["caseReceipts"].pop(), "receipts are incomplete"),
+        (lambda report: report["casePlans"].pop(), "plans are incomplete"),
+        (lambda report: report["casePlans"][0]["executedPhases"].append("preflight"), "plan is not exact"),
         (lambda report: report["execution"].update(physicalActions=True), "execution receipt"),
     ],
 )
@@ -209,6 +224,14 @@ def test_reference_substitution_fails_closed() -> None:
     hosted["artifactSha256"] = "d" * 64
     hosted["artifactObservedSha256"] = "d" * 64
     with pytest.raises(EvidenceImportError, match="hosted reference digest"):
+        import_report(report, storage, hosted, FakeGit())
+
+
+def test_storage_reference_must_remain_exact_even_when_its_digest_is_rebound() -> None:
+    report, storage, hosted = _report()
+    storage["verdict"] = "MEASURED_PASS"
+    report["storageReferenceSha256"] = hashlib_sha(storage)
+    with pytest.raises(EvidenceImportError, match="storage reference is not exact"):
         import_report(report, storage, hosted, FakeGit())
 
 
@@ -228,6 +251,21 @@ def test_target_inventory_mismatch_is_rejected_before_execution(mutate) -> None:
     mutate(inventory)
     with pytest.raises(InventoryError):
         validate_g19_inventory(inventory)
+
+
+def test_storage_none_allows_no_folders_but_provider_requires_one() -> None:
+    inventory = _inventory()
+    inventory["nodes"][1]["allowedFolders"] = []
+    validate_g19_inventory(inventory)
+    inventory["nodes"][1]["storageRole"] = "provider"
+    with pytest.raises(InventoryError, match="authorize at least one path"):
+        validate_g19_inventory(inventory)
+
+
+def test_inventory_revision_uses_utf8_canonical_json() -> None:
+    inventory = _inventory()
+    inventory["nodes"][1]["allowedFolders"] = ["/srv/측정"]
+    assert _inventory_revision(inventory) == f"sha256:{hashlib_sha(inventory)}"
 
 
 def test_physical_blocked_report_never_marks_execution_started() -> None:
@@ -307,7 +345,13 @@ def test_cli_dry_run_writes_reference_report_evidence_and_junit(
     }
 
 
-def test_cli_physical_missing_inventory_stops_before_any_action(tmp_path: Path) -> None:
+def test_cli_physical_missing_inventory_stops_before_any_action(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(
+        "tools.run_ac11_composite_long_soak._git_value",
+        lambda *_args: (_ for _ in ()).throw(AssertionError("physical preflight must not read Git")),
+    )
     report_path = tmp_path / "report.json"
     evidence_path = tmp_path / "evidence.json"
     exit_code = main(
@@ -319,6 +363,27 @@ def test_cli_physical_missing_inventory_stops_before_any_action(tmp_path: Path) 
         ]
     )
     assert exit_code == 2
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert report["blocker"] == "G-19"
+    assert report["execution"] == {"started": False, "physicalActions": False}
+
+
+def test_cli_physical_invalid_inventory_reports_g19_before_g24(tmp_path: Path) -> None:
+    inventory = _inventory()
+    inventory["nodes"].pop()
+    inventory_path = tmp_path / "inventory.json"
+    inventory_path.write_text(json.dumps(inventory), encoding="utf-8")
+    report_path = tmp_path / "report.json"
+    evidence_path = tmp_path / "evidence.json"
+    assert main(
+        [
+            "--mode", "physical",
+            "--inventory", str(inventory_path),
+            "--source-run-id", "physical-invalid-g19-fixture",
+            "--report-output", str(report_path),
+            "--evidence-output", str(evidence_path),
+        ]
+    ) == 2
     report = json.loads(report_path.read_text(encoding="utf-8"))
     assert report["blocker"] == "G-19"
     assert report["execution"] == {"started": False, "physicalActions": False}
@@ -361,6 +426,21 @@ def test_cli_refuses_to_replace_inventory_before_running(tmp_path: Path) -> None
         )
 
 
+def test_cli_refuses_to_overwrite_an_existing_output(tmp_path: Path) -> None:
+    report_path = tmp_path / "report.json"
+    report_path.write_text("preserve-me", encoding="utf-8")
+    with pytest.raises(SystemExit):
+        main(
+            [
+                "--mode", "physical",
+                "--source-run-id", "existing-output-fixture",
+                "--report-output", str(report_path),
+                "--evidence-output", str(tmp_path / "evidence.json"),
+            ]
+        )
+    assert report_path.read_text(encoding="utf-8") == "preserve-me"
+
+
 def test_cli_dry_run_refuses_dirty_or_non_head_provenance(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -398,6 +478,43 @@ def test_cli_dry_run_refuses_dirty_or_non_head_provenance(
     assert not report_path.exists()
 
 
+def test_cli_dry_run_refuses_a_clean_non_head_source(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    inventory = _inventory()
+    storage, hosted = _references(inventory)
+    paths = {
+        "inventory": tmp_path / "inventory.json",
+        "storage": tmp_path / "storage.json",
+        "hosted": tmp_path / "hosted.json",
+    }
+    for name, value in (("inventory", inventory), ("storage", storage), ("hosted", hosted)):
+        paths[name].write_text(json.dumps(value), encoding="utf-8")
+
+    def clean_head(*args: str) -> str:
+        if args == ("rev-parse", "HEAD"):
+            return SOURCE
+        if args == ("status", "--porcelain"):
+            return ""
+        raise AssertionError(args)
+
+    monkeypatch.setattr("tools.run_ac11_composite_long_soak._git_value", clean_head)
+    report_path = tmp_path / "report.json"
+    assert main(
+        [
+            "--mode", "dry-run",
+            "--inventory", str(paths["inventory"]),
+            "--storage-reference", str(paths["storage"]),
+            "--hosted-reference", str(paths["hosted"]),
+            "--source-run-id", "non-head-provenance-fixture",
+            "--source-head-sha", "c" * 40,
+            "--report-output", str(report_path),
+            "--evidence-output", str(tmp_path / "evidence.json"),
+        ]
+    ) == 2
+    assert not report_path.exists()
+
+
 def test_hosted_expiry_is_bound_to_dry_run_time() -> None:
     report, storage, hosted = _report()
     hosted["artifactExpiresAt"] = (
@@ -410,5 +527,5 @@ def test_hosted_expiry_is_bound_to_dry_run_time() -> None:
 
 def hashlib_sha(value: dict) -> str:
     return hashlib.sha256(
-        json.dumps(value, sort_keys=True, separators=(",", ":")).encode()
+        json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
