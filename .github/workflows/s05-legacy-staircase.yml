@@ -4,9 +4,6 @@ on:
   pull_request:
     types:
       - labeled
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
@@ -14,6 +11,9 @@ jobs:
     if: >-
       github.event_name == 'workflow_dispatch' ||
       github.event.label.name == 'run-s05-legacy-staircase'
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     timeout-minutes: 35
     services:
@@ -45,7 +45,12 @@ jobs:
       - name: Install focused benchmark dependencies
         run: python -m pip install -r requirements-test.txt
       - name: Run preregistered legacy staircase sequentially
-        run: python tools/run_s05_legacy_staircase.py --output-dir dist/s05-legacy-staircase
+        run: >-
+          python tools/run_s05_legacy_staircase.py
+          --output-dir dist/s05-legacy-staircase
+          --run-purpose clean-integration-base-execution-compatibility
+          --canonical-decision-evidence-run-id 36362386530
+          --measurement-scope hosted-single-runner-legacy-only-postgresql16
       - name: Upload S05 legacy staircase evidence
         if: always()
         uses: actions/upload-artifact@v4
