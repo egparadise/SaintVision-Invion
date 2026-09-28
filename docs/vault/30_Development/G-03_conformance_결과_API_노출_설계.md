@@ -1,11 +1,11 @@
 ---
 doc_id: "CLAUDE-G03-CONFORMANCE-API-DESIGN-001"
-title: "G-03 conformance 결과 API 노출 설계 v1.1 — 1단계 status는 Literal[NOT_OBSERVED] 하나, check 목록은 conformance.py의 단일 정본 descriptor에서, RES-0004는 2단계 deferred (docs-only)"
-version: "1.1.0"
+title: "G-03 conformance 결과 API 노출 설계 v1.2 — 1단계 status는 Literal[NOT_OBSERVED] 하나, check 목록은 conformance.py의 단일 정본 descriptor에서 + 15개 이름 독립 set ratchet, RES-0004는 2단계 deferred (docs-only)"
+version: "1.2.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T14:28:30+09:00"
+updated: "2026-09-28T15:06:38+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -132,9 +132,57 @@ CHECKLIST: tuple[CheckSpec, ...] = (...)
 - **route는 `[{"name": s.name, "capabilityGated": s.capability is not None} for s in CHECKLIST]`** 를 낸다. 소스 파싱도, 복제도 없다.
 - 기존 helper들은 이미 `adapter`(`_authenticate`는 `adapter, credential_ref`)를 받으므로 `run(adapter, credential_ref)` 한 모양으로 맞추면 된다.
 
-**목록의 완전성은 무엇이 지키는가**: route와 시험이 둘 다 `CHECKLIST`를 읽으므로 "항목 하나를 지우는" 변이는 그 둘만으로는 잡히지 않는다. 그것을 잡는 것은 **이미 있는 `tests/test_adapters.py`** 다 — 일부러 망가뜨린 adapter가 **이름이 지정된 check에서** 실패해야 한다고 단언하므로(예: `LeakyAdapter` → `collect_returns_redacted_content`), spec을 지우면 그 시험이 깨진다. 그래서 이 설계는 **개수를 복제하지 않고** 그 시험을 완전성의 근거로 인용한다. 판정 논리를 시험에 복제하지 않는다는 규칙과 같은 방향이다.
+**목록의 완전성은 무엇이 지키는가 (v1.2, Codex 재검토 — v1.1의 근거가 틀렸다)**: v1.1은 "이미 있는 `tests/test_adapters.py`가 지킨다"고 적었다. **실측이 그것을 부정한다.** 15개 이름 전부에 `git grep -n -F "<이름>" -- . ':!docs'` 를 돌린 결과다.
 
-**구현 범위가 늘어난다는 뜻이다**: 이 카드의 구현 PR은 시험만이 아니라 `conformance.py`를 건드린다. 안전망은 `tests/test_adapters.py`가 **바뀌지 않은 채로 통과**해야 한다는 것이다(refactor의 관측 가능한 결과가 0이어야 한다).
+| 확인 | 결과 |
+|---|---|
+| `implements_every_member` · `run_returns_a_usable_handle` · `redact_is_idempotent` | **제품 소스 `conformance.py` 한 줄에만 있다** — `tests/` 등장 **0건** |
+| 나머지 12개 | `tests/test_adapters.py`에만 있고 전부 `assert "<이름>" in {c.name for c in report.failures()}` 꼴의 **단방향 membership**이다(일부러 망가뜨린 adapter가 그 check에서 실패해야 한다는 단언) |
+| 15개 이름의 **집합**을 단언하는 곳 | 전체 tree에 **0건** |
+
+그러므로 **`CheckSpec` 하나를 지우는 변이는 그 세 이름에 대해서는 어떤 시험도 죽이지 않는다.** 12개에서 시험이 깨지는 것도 목록 완전성을 지키는 장치 때문이 아니라 실패 단언이 **우연히 그 이름을 적고 있어서**이고, 방향이 `in` 하나뿐이므로 **새 이름을 몰래 더하는 변이는 15개 어느 쪽도 잡지 못한다.** v1.1의 문장은 사실과 달랐다.
+
+**그래서 구현 PR에 15개 이름 전체의 독립 exact-name set ratchet을 함께 넣는다**(부정 시험 7c). `CHECKLIST` 정의에서 그대로 복사한 기대값을 **시험 파일이 직접 들고** 대조한다.
+
+```python
+# tests/core/test_conformance_checklist_ratchet.py
+EXPECTED_CHECKS = (
+    "declares_contract_version",
+    "implements_every_member",
+    "probe_without_credentials",
+    "install_reports_without_installing",
+    "authenticate_takes_a_reference",
+    "run_returns_a_usable_handle",
+    "collect_returns_redacted_content",
+    "redact_removes_known_secrets",
+    "redact_is_idempotent",
+    "cancel_returns_a_tri_state",
+    "cancel_after_completion_is_not_stopped",
+    "attest_does_not_overclaim",
+    "declared_server_cancel_actually_stops",
+    "declared_usage_is_reported",
+    "declared_model_pinning_returns_an_id",
+)
+EXPECTED_GATED = {
+    "declared_server_cancel_actually_stops": Capability.SERVER_SIDE_CANCEL,
+    "declared_usage_is_reported": Capability.USAGE_REPORTING,
+    "declared_model_pinning_returns_an_id": Capability.MODEL_PINNING,
+}
+
+
+def test_the_checklist_is_exactly_these_fifteen_checks_in_this_order():
+    assert tuple(spec.name for spec in CHECKLIST) == EXPECTED_CHECKS
+
+
+def test_exactly_these_three_checks_are_capability_gated():
+    assert {s.name: s.capability for s in CHECKLIST if s.capability} == EXPECTED_GATED
+```
+
+- **순서까지 고정한다** — 응답의 `checks[]`가 `CHECKLIST` 순서를 그대로 내므로 순서가 바뀌면 상태 화면이 새로고침마다 뒤섞인다(`GET /v1/adapters`가 adapter 순서를 보존하는 것과 같은 이유). 순서 단언은 집합 단언을 포함한다.
+- **정본이 둘이 되는 것이 아니다.** 실행되는 것(route·`run_conformance()`)은 `CHECKLIST` **하나만** 읽고, 시험은 **정책 baseline**을 든다 — `tools/definer-policy.json`의 `revision`이나 hosted Backend의 skip 분포 baseline과 같은 종류다. 이름은 판정 논리가 아니므로 "판정 논리를 시험에 복제하지 않는다"는 규칙과 충돌하지 않는다.
+- 그래서 check을 **더하거나 빼는 것은 두 곳을 고치는 의도적 변경**이 된다. 그것이 ratchet의 뜻이다. `tools/`의 JSON 정책 파일로 두는 방법도 동등하지만, 그쪽은 CI에 검사기를 새로 배선해야 하므로 시험 파일 literal을 골랐다.
+
+**구현 범위가 늘어난다는 뜻이다**: 이 카드의 구현 PR은 시험만이 아니라 `conformance.py`를 건드린다. refactor의 안전망은 둘이다 — `tests/test_adapters.py`가 **바뀌지 않은 채로 통과**하는 것(관측 가능한 동작 변화 0), 그리고 위 ratchet(목록 완전성).
 
 ### 5-2. 1단계의 오류는 둘이다 (v1.1, 범위 정정)
 
@@ -152,7 +200,7 @@ v1.0이 "오류 3종"이라 적은 것을 철회한다.
 |---|---|---|
 | `contracts/v1alpha1/core.schema.json` | **아니다** | business 응답 타입은 정본 `$defs`가 아니라 `api/schemas.py`의 `Strict` 클래스다 |
 | `api/schemas.py` | **예** — `ConformanceStatusResponse` 1개(`status`는 `Literal["NOT_OBSERVED"]`) |  |
-| `adapters/conformance.py` | **예** — `CheckSpec`·`CHECKLIST` 추출과 `run_conformance()`가 그것을 소비(§5-1). **관측 가능한 동작 변화 0**이 조건이고 `tests/test_adapters.py` 무변경 통과가 그 근거다 |  |
+| `adapters/conformance.py` | **예** — `CheckSpec`·`CHECKLIST` 추출과 `run_conformance()`가 그것을 소비(§5-1). **관측 가능한 동작 변화 0**이 조건이고 `tests/test_adapters.py` 무변경 통과가 그 근거다 | 목록 완전성은 그 파일이 지키지 못한다(실측 §5-1) → **새 set ratchet 시험 1개**를 함께 넣는다(7c) |
 | `contracts/conformance-status-response.schema.json` | **예**(생성물) | `tools/export_schemas.py`가 `Strict` 파생 중 **이름이 `Request`/`Response`로 끝나는 것**을 찾는다(`:60`). 그래서 타입 이름이 `…Response`여야 생성된다 — #167에서 `ModelReleaseResult`가 이 규칙에 걸리지 않아 schema가 생성되지 않던 사례가 있었다 |
 | `export_schemas --check` | **잡는다** | 모델과 생성물이 어긋나면 `backend.yml`의 `--check`가 실패한다 |
 | openapi | 자동 — route 등록으로 `/v1/openapi.json`에 들어간다. 별도 파일 편집 없음 |  |
@@ -178,8 +226,9 @@ v1.0이 "오류 3종"이라 적은 것을 철회한다.
 4. `reason`을 지우면 → 왜 미측정인지 말하지 않는 응답이 된다.
 5. `scope`를 지우거나 `"project"`로 바꾸면 → payload가 project 범위 데이터인 척하게 된다(§4-1).
 6. route가 `run_conformance()`를 부르면 → **읽기 route가 호스트 프로세스를 구동한다.** 호출 없음을 단언한다(§3).
-7. `checks[]`가 `CHECKLIST`에서 오지 않고 하드코딩되면 → 응답과 `CHECKLIST`를 대조하는 단언이 실패한다. `adapters[]`도 `agents.TOOLS`와 대조한다. **개수를 복제하지 않는다** — 목록의 완전성은 `tests/test_adapters.py`가 지킨다(§5-1).
+7. `checks[]`가 `CHECKLIST`에서 오지 않고 하드코딩되면 → 응답과 `CHECKLIST`를 대조하는 단언이 실패한다. `adapters[]`도 `agents.TOOLS`와 대조한다. **이 시험은 개수도 이름도 복제하지 않는다** — 응답이 정본을 읽는지만 본다. 목록 자체의 완전성은 7c가 지킨다(v1.2에서 정정, §5-1).
 7b. `run_conformance()`가 `CHECKLIST`를 돌지 않고 자기 literal로 되돌아가면 → suite가 만든 check 이름 집합과 `CHECKLIST`의 이름 집합이 같아야 한다는 단언이 실패한다(두 정본이 생기는 것을 막는다).
+7c. **(v1.2, Codex 재검토)** `CHECKLIST`에서 `CheckSpec` 하나를 지우거나 이름을 바꾸거나 새 이름을 더하거나 capability gate를 `None`으로 바꾸면 → **15개 이름 전체의 독립 exact-name set ratchet**(`tests/core/test_conformance_checklist_ratchet.py`, 순서까지)이 실패한다. v1.1까지는 `implements_every_member`·`run_returns_a_usable_handle`·`redact_is_idempotent`를 지우는 변이가 **어떤 시험도 죽이지 않았다**(§5-1의 실측). 7b는 "두 정본이 갈라지지 않음"을, 7c는 "정본이 조용히 줄거나 늘지 않음"을 본다 — 7b만으로는 양쪽이 함께 줄어드는 변이가 생존한다.
 
 ### 8-2. 권한·존재 비노출 (PG-free + 실 PG)
 
@@ -197,7 +246,7 @@ v1.0이 "오류 3종"이라 적은 것을 철회한다.
 16. 응답 타입 이름이 `…Response`가 아니면 `export_schemas`가 schema를 만들지 않는다 → 생성물 존재와 `--check` drift 0을 단언한다(§6의 #167 사례 재발 방지).
 17. route가 `projects` router의 `routes`에 실제로 있다(= `BusinessDispatch`가 서빙한다). `include_router`로 되돌리면 지연 placeholder만 남아 도달하지 않는다.
 
-열거는 **18건**이다(v1.0의 17 + 7b). 그중 **1단계에서 구현하는 것은 17건**이고 **13번 하나가 2단계 deferred**다(§5-2). 실 PG는 12번 하나(다른 tenant)이고 나머지는 PG-free다. 로컬은 메모리 규칙상 단일 파일만 돌리고, 실 PG 근거는 hosted Backend에 둔다.
+열거는 **19건**이다(v1.0의 17 + v1.1의 7b + v1.2의 7c). 그중 **1단계에서 구현하는 것은 18건**이고 **13번 하나가 2단계 deferred**다(§5-2). 실 PG는 12번 하나(다른 tenant)이고 나머지는 PG-free다. 로컬은 메모리 규칙상 단일 파일만 돌리고, 실 PG 근거는 hosted Backend에 둔다.
 
 ## 9. #146 FE 어휘 대응표
 
@@ -223,4 +272,5 @@ v1.0이 "오류 3종"이라 적은 것을 철회한다.
 - **`compare_reports()`(AC-10 "계약 동일")도 노출하지 않는다** — 두 adapter의 실행 기록이 있어야 비교가 성립하므로 2단계 이후다.
 - `run_conformance`의 `credential_ref` 기본값은 `"conformance://dummy"`다. 실제 credential로 도는 conformance는 통합 분류표의 **G-25**(BLOCKED_EXTERNAL)다 — 1단계가 `NOT_OBSERVED`라고 말하는 것은 "기록이 없다"까지이고 "실 credential로 검증됐다"를 뜻하지 않는다.
 - **v1.1에서 구현 범위가 늘었다**: `conformance.py`에 `CheckSpec`·`CHECKLIST`를 추가한다(§5-1). 시험만 추가하는 카드가 아니다.
+- **v1.2에서 하나 더 늘었다**: `tests/core/test_conformance_checklist_ratchet.py`(15개 이름 독립 baseline). v1.1이 "기존 시험이 완전성을 지킨다"고 적은 것이 **실측과 달랐기 때문**이고, 그 문장을 지우는 것만으로는 공백이 남으므로 장치를 넣는다.
 - 실행하지 않았다: 로컬 실 PG·Docker·전체 suite. 이 문서의 실측은 전부 `git grep -n -F`·정독이다.

@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-G03-CONFORMANCE-API-DESIGN-001"
-title: "G-03 conformance 결과 API 노출 설계 v1.0 — 저장된 결과가 0건이라 1단계는 NOT_OBSERVED, counts·boolean 금지, 2단계는 migration 선요청 (docs-only)"
-version: "1.1.0"
+title: "G-03 conformance 결과 API 노출 설계 v1.2 — 저장된 결과가 0건이라 1단계는 NOT_OBSERVED, counts·boolean 금지, check 목록은 단일 정본 + 15개 이름 독립 set ratchet, 2단계는 migration 선요청 (docs-only)"
+version: "1.2.0"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T14:28:30+09:00"
+updated: "2026-09-28T15:06:38+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -93,7 +93,7 @@ check 이름 15개와 capability gate는 `run_conformance()` **본문의 문자�
 
 그래서 **구현 PR의 첫 변경을 `conformance.py`의 descriptor 추출로 바꿨다** — `CheckSpec(name, capability, run)`과 `CHECKLIST: tuple[CheckSpec, ...]`를 만들고 `run_conformance()`가 그것을 돌며, route는 `[{"name": …, "capabilityGated": s.capability is not None}]`를 낸다. 기존 helper들이 이미 `adapter`(와 `credential_ref`)를 받으므로 한 모양으로 맞춰진다.
 
-**목록의 완전성은 무엇이 지키는가**를 함께 적었다: route와 시험이 둘 다 `CHECKLIST`를 읽으므로 "항목 하나 삭제"는 그 둘로는 잡히지 않고, 그것을 잡는 것은 **이미 있는 `tests/test_adapters.py`** 다(일부러 망가뜨린 adapter가 **이름이 지정된 check**에서 실패해야 한다고 단언한다). 그래서 개수를 복제하지 않고 그 시험을 근거로 인용한다 — 판정 논리를 시험에 복제하지 않는 규칙과 같은 방향이다. 새 부정 시험 7b가 "suite가 만든 이름 집합 == `CHECKLIST`의 이름 집합"을 단언해 정본이 둘로 갈라지는 것을 막는다.
+**목록의 완전성은 무엇이 지키는가**를 함께 적었다(**이 단락의 근거는 v1.2에서 철회했다 — §12**): route와 시험이 둘 다 `CHECKLIST`를 읽으므로 "항목 하나 삭제"는 그 둘로는 잡히지 않고, 그것을 잡는 것은 **이미 있는 `tests/test_adapters.py`** 다(일부러 망가뜨린 adapter가 **이름이 지정된 check**에서 실패해야 한다고 단언한다). 그래서 개수를 복제하지 않고 그 시험을 근거로 인용한다 — 판정 논리를 시험에 복제하지 않는 규칙과 같은 방향이다. 새 부정 시험 7b가 "suite가 만든 이름 집합 == `CHECKLIST`의 이름 집합"을 단언해 정본이 둘로 갈라지는 것을 막는다.
 
 **구현 범위가 늘었다**: 이 카드의 구현 PR은 시험만이 아니라 제품 파일 `conformance.py`를 건드린다. 안전망은 `tests/test_adapters.py`가 **바뀌지 않은 채 통과**하는 것이다(리팩터의 관측 가능한 결과가 0이어야 한다).
 
@@ -104,3 +104,21 @@ check 이름 15개와 capability gate는 `run_conformance()` **본문의 문자�
 ### 11-4. 남은 사실
 
 hosted Backend(`36380067351` 양 버전)와 docs(`36380067483`)는 success이지만 **docs-only이므로 새 route의 실행 증거는 아니다** — 그 지적도 맞고, 실행은 구현 PR에서만 나온다.
+
+## 12. v1.2 — Codex 재검토 잔여 1건: v1.1의 완전성 근거가 사실과 달랐다
+
+Codex가 v1.1(head `1cad094f`)을 조건부 수정 요청으로 두고 남긴 한 건이다 — §5-1의 *"기존 `tests/test_adapters.py`가 목록 완전성을 지킨다"* 가 **틀렸다**는 것. 15개 check 이름 전부에 `git grep -n -F "<이름>" -- . ':!docs'` 를 돌려 직접 확인했고, **지적이 맞다.**
+
+| 확인한 것 | 결과 |
+|---|---|
+| `implements_every_member` · `run_returns_a_usable_handle` · `redact_is_idempotent` | 각각 **제품 소스 `conformance.py` 한 줄에만** 있다 — `tests/` 등장 **0건** |
+| 나머지 12개 이름 | `tests/test_adapters.py`에만 있고 전부 `assert "<이름>" in {c.name for c in report.failures()}` 꼴 **단방향 membership**이다 |
+| 15개 이름의 **집합**을 단언하는 곳 | 전체 tree **0건** |
+
+그러므로 v1.1이 인용한 안전망은 (i) 세 이름에는 **아예 없고**, (ii) 나머지 12개에서도 "그 check이 실패 목록에 있다"는 단언이 우연히 이름을 적고 있는 것일 뿐이며, (iii) 방향이 `in` 하나여서 **이름을 더하는 변이는 15개 어느 쪽도 잡지 못한다**. `CheckSpec` 삭제 변이는 세 이름에 대해 **어떤 시험도 죽이지 않고 생존**했다.
+
+**고친 것**: 문장을 지우는 것만으로는 공백이 남으므로 장치를 넣었다 — 구현 계획에 **15개 이름 전체의 독립 exact-name set ratchet**(`tests/core/test_conformance_checklist_ratchet.py`)을 추가했다. 기대값은 `CHECKLIST` 정의에서 그대로 복사한 시험 파일 literal이고 **순서까지** 단언하며(응답 `checks[]`가 `CHECKLIST` 순서를 내므로 순서가 곧 화면 순서다), capability gate 3건의 `name → Capability` 대응도 단언한다. 정본이 둘이 되는 것은 아니다 — 실행되는 것은 `CHECKLIST` 하나만 읽고 시험은 `tools/definer-policy.json`의 `revision`이나 hosted skip 분포 baseline과 같은 **정책 baseline**을 든다. 이름은 판정 논리가 아니므로 "판정 논리를 시험에 복제하지 않는다"와 충돌하지 않는다. check을 더하거나 빼는 것은 이제 **두 곳을 고치는 의도적 변경**이다.
+
+부정 시험은 **7c**로 열거에 들어가 총 **19건**(1단계 구현 **18건**, 13번 하나 2단계 deferred)이 됐다. 7b와 겹치지 않는다 — 7b는 "suite와 `CHECKLIST`가 갈라지지 않음", 7c는 "정본이 조용히 줄거나 늘지 않음"이고, 7b만으로는 **양쪽이 함께 줄어드는 변이가 생존**한다. 구현 범위도 한 줄 늘었다(§10).
+
+실행은 여전히 0건이다(docs-only). `check_docs`·`check_doc_single_source --ratchet` exit 0.
