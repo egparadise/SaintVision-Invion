@@ -570,15 +570,23 @@ def test_live_archiver_configuration_cannot_certify_operational_rpo(archiver_ima
         assert not any((inspected.get("HostConfig", {}).get("PortBindings") or {}).values()), (
             "Owned archiver must not publish a host port"
         )
-        deadline = time.monotonic() + 30
+        # The official image runs a temporary server for initdb, stops it, then
+        # starts the real one. A probe that succeeds against the temporary
+        # server is followed by "psql exited 2" seconds later (hosted run
+        # 36383260001), so readiness is the init-complete marker *and* a query.
+        deadline = time.monotonic() + 60
         while True:
+            logs = subprocess.run(["docker", "logs", "--tail", "200", name], capture_output=True, timeout=10)
+            log_text = (logs.stdout or b"").decode("utf-8", errors="replace") + (logs.stderr or b"").decode("utf-8", errors="replace")
+            init_done = "PostgreSQL init process complete; ready for start up." in log_text
             try:
-                assert _exec_sql(name, "SELECT 1") == ["1"]
-                break
+                if init_done and _exec_sql(name, "SELECT 1") == ["1"]:
+                    break
             except (RuntimeError, subprocess.TimeoutExpired, AssertionError):
-                if time.monotonic() > deadline:
-                    _classify_archiver_connection_failure(name)
-                time.sleep(0.1)
+                pass
+            if time.monotonic() > deadline:
+                _classify_archiver_connection_failure(name)
+            time.sleep(0.2)
         execute = drill.docker_exec_settings_executor(name)
         capability = drill._recovery_capability(execute=execute)
         assert capability["archivingConfigured"] is True

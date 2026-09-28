@@ -315,5 +315,5 @@ def test_ready_archiver_with_published_host_port_is_failure_not_internal_network
         port_bindings={"5432/tcp": [{"HostIp": "127.0.0.1", "HostPort": "54321"}]},
     )
 
-    with raises_without_skip(AssertionError, "with a published host port, but host connection still failed"):
+    with raises_without_skip(AssertionError, r"in-container probe still failed \(hostPortPublished=True\)"):
         classify(name, run=run)
