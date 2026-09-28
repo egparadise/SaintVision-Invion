@@ -56,8 +56,14 @@ class S3Objects:
         if not isinstance(locator, str) or locator.startswith("/") or locator.endswith("/"):
             raise DomainError("STORE-0002", "Invalid object locator", 422)
         values = tuple(locator.split("/"))
+        if any(not _SEGMENT.fullmatch(value) or value in {".", ".."} for value in values):
+            raise DomainError("STORE-0002", "Invalid object locator", 422)
+        if values[: len(self._prefix)] != self._prefix:
+            # A canonical locator bound to another configured prefix is a
+            # provider-identity/configuration mismatch, not requester input.
+            raise self._unavailable()
         suffix = values[len(self._prefix) :]
-        if values[: len(self._prefix)] != self._prefix or len(suffix) != 7:
+        if len(suffix) != 7:
             raise DomainError("STORE-0002", "Invalid object locator", 422)
         version, tenants, tenant, projects, project, namespace, object_id = suffix
         try:

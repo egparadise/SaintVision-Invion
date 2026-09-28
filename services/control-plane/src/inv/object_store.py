@@ -20,6 +20,7 @@ from .errors import DomainError
 
 PART_BYTES = 16 * 1024 * 1024
 MAX_BYTES = 64 * 1024 * 1024
+LOCAL_PROVIDER_ID = "local-bounded-v1"
 
 
 @dataclass(frozen=True)
@@ -60,6 +61,26 @@ class ObjectStoreRegistry:
         if provider is None:
             raise DomainError("STORE-0001", "Object provider unavailable", 503, True)
         return provider
+
+
+def provider_id(provider):
+    """Return the stable identity of an opened provider/session."""
+
+    return getattr(provider, "provider_id", LOCAL_PROVIDER_ID)
+
+
+def require_object_provider(provider, row):
+    """Reject metadata/provider drift before bytes or object state are touched."""
+
+    if row["provider_id"] != provider_id(provider):
+        raise DomainError("STORE-0001", "Object provider unavailable", 503, True)
+    return provider
+
+
+def registered_provider(provider):
+    """Adapt the legacy local handle only at the registry boundary."""
+
+    return provider if hasattr(provider, "provider_id") else LocalObjectStore(provider)
 
 
 class LocalObjects:
@@ -107,7 +128,7 @@ class LocalObjectStore:
     synthesized from requester input here.
     """
 
-    provider_id = "local-bounded-v1"
+    provider_id = LOCAL_PROVIDER_ID
 
     def __init__(self, legacy: LocalObjects):
         self.legacy = legacy
@@ -116,13 +137,8 @@ class LocalObjectStore:
         with self.legacy.locked() as files:
             if files.exists(locator):
                 observed = files.hash(locator)
-                if (
-                    observed.sha256 != expected_sha256
-                    or observed.size_bytes != len(body)
-                ):
-                    raise DomainError(
-                        "STORE-0005", "Immutable object already differs", 409
-                    )
+                if observed.sha256 != expected_sha256 or observed.size_bytes != len(body):
+                    raise DomainError("STORE-0005", "Immutable object already differs", 409)
                 files.read(locator, expected_sha256, len(body))
                 return
             files.put(locator, body, expected_sha256)
@@ -153,8 +169,11 @@ class LocalObjectStore:
 
 
 class _LegacyObjectSession:
-    def __init__(self, files):
+    provider_id = LOCAL_PROVIDER_ID
+
+    def __init__(self, files, provider_id=LOCAL_PROVIDER_ID):
         self.files = files
+        self.provider_id = provider_id
 
     def put(self, locator, body, expected_sha256):
         self.files.put(locator, body, expected_sha256)
@@ -182,7 +201,7 @@ def object_store_session(provider):
         yield provider
     else:
         with locked() as files:
-            yield _LegacyObjectSession(files)
+            yield _LegacyObjectSession(files, provider_id(provider))
 
 
 class ObjectHandle:

@@ -13,10 +13,17 @@ from uuid import UUID, uuid5, NAMESPACE_URL
 from psycopg.types.json import Jsonb
 from .errors import DomainError
 from .leases import lock_run, assert_fences
-from .object_store import PART_BYTES, MAX_BYTES, object_store_session
+from .object_store import (
+    LOCAL_PROVIDER_ID,
+    MAX_BYTES,
+    PART_BYTES,
+    ObjectStoreRegistry,
+    object_store_session,
+    provider_id,
+    registered_provider,
+    require_object_provider,
+)
 from .runs import event
-
-LOCAL_PROVIDER_ID = "local-bounded-v1"
 
 
 def identity(value):
@@ -86,9 +93,16 @@ def attach_checkpoint(
 
 
 class SnapshotStore:
-    def __init__(self, database, provider):
+    def __init__(self, database, provider, object_stores=None):
         self.db, self.provider = database, provider
-        self.provider_id = getattr(provider, "provider_id", LOCAL_PROVIDER_ID)
+        self.provider_id = provider_id(provider)
+        self.object_stores = object_stores or ObjectStoreRegistry([registered_provider(provider)])
+
+    def _writer(self, row):
+        return require_object_provider(self.provider, row)
+
+    def _reader(self, row):
+        return self.object_stores.resolve(row["provider_id"])
 
     def _new_locator(self, tenant, project, object_id, namespace="objects"):
         if self.provider_id == LOCAL_PROVIDER_ID:
@@ -173,6 +187,7 @@ class SnapshotStore:
             if authorize is not None:
                 authorize(conn)
             row = self._row(conn, project, object_id)
+            self._writer(row)
             if row["state"] != "uploading" or len(data) != min(
                 PART_BYTES, row["size_bytes"] - index * PART_BYTES
             ):
@@ -210,6 +225,7 @@ class SnapshotStore:
             if authorize is not None:
                 authorize(conn)
             row = self._row(conn, project, object_id)
+            self._writer(row)
             if row["state"] not in {"uploading", "ready"}:
                 raise DomainError("STORE-0005", "Object is unavailable")
             if row["state"] == "ready":
@@ -249,6 +265,7 @@ class SnapshotStore:
                 raise DomainError("GRAPH-0002", "Checkpoint requires running attempt")
             assert_fences(conn, run_id, proofs)
             row = self._row(conn, run["project_id"], object_id)
+            self._writer(row)
             if row["state"] != "ready":
                 raise DomainError("STORE-0005", "Checkpoint requires published content")
             files.get(row["locator"], row["content_hash"], row["size_bytes"])
@@ -273,7 +290,9 @@ class SnapshotStore:
     def restore(self, tenant, project, run_id, attempt, step_id):
         # Returns verified bytes to a trusted workspace adapter. It never extracts
         # an archive, accepts a browser filesystem path or starts a process.
-        with object_store_session(self.provider) as files, self.db.transaction(tenant) as conn:
+        # Read provider identity without holding a provider lock, then acquire
+        # provider -> DB and revalidate the immutable row before byte access.
+        with self.db.transaction(tenant) as conn:
             pin = conn.execute(
                 "SELECT object_id FROM inv.checkpoint_objects WHERE project_id=%s AND run_id=%s AND attempt=%s AND step_id=%s",
                 (project, run_id, attempt, step_id),
@@ -281,6 +300,10 @@ class SnapshotStore:
             if not pin:
                 raise DomainError("RES-0004", "Checkpoint object not found", 404)
             row = self._row(conn, project, pin["object_id"])
+            provider = self._reader(row)
+        with object_store_session(provider) as files, self.db.transaction(tenant) as conn:
+            row = self._row(conn, project, pin["object_id"])
+            require_object_provider(files, row)
             if row["state"] != "ready":
                 raise DomainError("STORE-0005", "Checkpoint object unavailable")
             return files.get(row["locator"], row["content_hash"], row["size_bytes"])
@@ -293,6 +316,7 @@ class SnapshotStore:
                     (project,),
                 ).fetchone()
                 row = self._row(conn, project, object_id)
+                self._writer(row)
                 if conn.execute(
                     "SELECT 1 FROM inv.checkpoint_objects WHERE project_id=%s AND object_id=%s",
                     (project, identity(object_id)),

@@ -25,7 +25,14 @@ Compose는 자동 DB 초기화/마이그레이션/운영 로그인 생성을 수
   },
   "configurationReadiness": {
     "nodeMtlsCaBundle": "/run/saintvision/node-mtls-ca.pem",
-    "objectStoreEndpoint": "https://objects.example.invalid"
+    "objectStore": {
+      "providerId": "s3-compatible-v1",
+      "endpoint": "https://objects.example.invalid",
+      "bucket": "saintvision-artifacts",
+      "region": "us-east-1",
+      "credentialFile": "/run/saintvision/object-store.json",
+      "prefix": "production"
+    }
   },
   "allowedOrigins": ["https://studio.example.invalid"]
 }
@@ -33,7 +40,9 @@ Compose는 자동 DB 초기화/마이그레이션/운영 로그인 생성을 수
 
 `jwks.json`은 관리자가 검증한 공개 RSA 키만 포함하는 로컬 신뢰 묶음이다. `{ "issuer": "동일 issuer", "expiresAt": 정수 Unix 시각, "keys": [RS256 공개 JWK] }` 형식이며 만료는 현재부터 7일 이내다. 실제 issuer/audience/client와 키 출처를 확인한 뒤 배포한다. 개인 키를 서버 설정 디렉터리에 넣지 않는다. 네트워크에서 임의 키를 자동 신뢰하지 않는다.
 
-`configurationReadiness.nodeMtlsCaBundle`이 참조하는 파일은 같은 입력 디렉터리에 두며 `tools/prepare_server_config.py`가 검증된 Linux config volume으로 복사한다. 운영 route는 경로 문자열 존재만 보지 않고 PEM을 읽어 `BasicConstraints.ca=true` 인증서가 하나 이상인지 확인한다. `objectStoreEndpoint`도 단순 비어 있지 않음이 아니라 자격증명 없는 HTTP(S) URL인지 확인한다. 두 값·경로·인증서 내용은 응답에 나오지 않고, 실패하면 호환 이름 `INV_NODE_MTLS_CA_BUNDLE` 또는 `INV_OBJECT_STORE_ENDPOINT`만 `unresolvedSettings`에 남는다.
+`configurationReadiness.nodeMtlsCaBundle`이 참조하는 파일은 같은 입력 디렉터리에 두며 `tools/prepare_server_config.py`가 검증된 Linux config volume으로 복사한다. 운영 route는 경로 문자열 존재만 보지 않고 PEM을 읽어 `BasicConstraints.ca=true` 인증서가 하나 이상인지 확인한다. `objectStore`의 여섯 안쪽 키는 exact set이며 오타·미지 키·누락 키는 startup을 거부한다. endpoint는 자격증명 없는 root HTTP(S) URL, bucket·region·prefix는 canonical 값이어야 한다. `object-store.json`은 정확히 `accessKeyId`와 `secretAccessKey`만 가진 0600·single-link·bounded regular file이다. 값·경로·자격 내용은 응답에 나오지 않고, 실패하면 `INV_NODE_MTLS_CA_BUNDLE`, `INV_OBJECT_STORE_ENDPOINT`, `INV_OBJECT_STORE_BUCKET`, `INV_OBJECT_STORE_CREDENTIAL_FILE` 중 해당 호환 이름만 `unresolvedSettings`에 남는다.
+
+Workspace에 `snapshotObjectRoot`·`restoreRoot`가 구성되면 API는 그 recovery root의 `local-bounded-v1`과 준비된 S3 provider를 같은 read registry에 함께 등록한다. 이는 dual-write가 아니다. 새 output의 writer는 실행 worker에 명시된 한 provider이고, 저장 행의 `provider_id`가 이후 read/delete provider를 결정한다. 등록되지 않은 provider, 주입된 writer와 다른 row, 또는 현재 설정과 prefix가 다른 locator는 fallback 없이 `STORE-0001`/503/retryable로 닫힌다. 따라서 prefix·providerId 변경 전에는 기존 row가 가리키는 provider 구성을 계속 등록하거나 명시적 migration/복구 절차를 먼저 수행해야 한다.
 
 컨테이너 UID/GID `65532:65532`가 디렉터리를 탐색하고 파일을 읽을 수 있어야 한다. Linux 설정 파일은 일반 파일이고 group/other 쓰기 권한이 없어야 한다(예: 소유자 65532, 파일 0600, 디렉터리 0700). 이 서버의 Windows bind mount는 파일이0777로 노출되어 trusted_file 검사가 실제 거부했다. 아래 전용 Linux volume 준비 경로를 사용한다. 운영 키 파일에 일괄 chmod/chown을 적용하지 않는다.
 

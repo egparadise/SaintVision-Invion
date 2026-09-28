@@ -12,7 +12,7 @@ from .contracts import validate_contract
 from .ids import new_id
 from .leases import lock_run
 from .runs import RunStore, event, public
-from .object_store import object_store_session
+from .object_store import object_store_session, require_object_provider
 from .state import TERMINAL
 
 
@@ -104,6 +104,7 @@ class ShardCompletion:
             if len(rows) != len(members) or any(r["state"] != "ready" for r in rows):
                 return "idle"
             for row in rows:
+                require_object_provider(files, row)
                 files.get(row["locator"], row["content_hash"], row["size_bytes"])
             manifest = [
                 {

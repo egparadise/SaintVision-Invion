@@ -16,7 +16,7 @@ from .contracts import validate_contract
 from .errors import DomainError
 from .leases import assert_fences, lock_run
 from .runs import RunStore, event, public
-from .object_store import object_store_session
+from .object_store import object_store_session, require_object_provider
 from .snapshots import SnapshotStore, identity
 
 
@@ -121,6 +121,7 @@ class ResultStore:
                     422,
                 )
             obj = SnapshotStore._row(conn, project, object_id)
+            require_object_provider(files, obj)
             if obj["state"] != "ready" or evidence["outputSha256"] != obj["content_hash"]:
                 raise DomainError("VERIFY-0010", "Result object is not verified and ready", 422)
             files.get(obj["locator"], obj["content_hash"], obj["size_bytes"])
@@ -205,6 +206,7 @@ class ResultStore:
             ).fetchone():
                 raise DomainError("LEASE-0003", "Completion awaits physical resource release")
             obj = SnapshotStore._row(conn, project, result["object_id"])
+            require_object_provider(files, obj)
             if obj["state"] != "ready":
                 raise DomainError("STORE-0005", "Prepared output unavailable")
             data = files.get(obj["locator"], obj["content_hash"], obj["size_bytes"])

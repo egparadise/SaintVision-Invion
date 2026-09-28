@@ -205,6 +205,27 @@ class Boundary:
             await problem(error, scope["state"]["trace_id"])(scope, receive, send)
 
 
+def _configured_object_stores(workspace, remote=None):
+    """Build the read registry from the same Local root used for recovery."""
+
+    from .object_store import LocalObjectStore, ObjectStoreRegistry, registered_provider
+
+    providers = []
+    recovery = getattr(workspace, "recovery", None) if workspace is not None else None
+    snapshots = getattr(recovery, "snapshots", None)
+    if snapshots is not None:
+        local = registered_provider(snapshots.provider)
+        if not isinstance(local, LocalObjectStore):
+            raise ValueError("Workspace recovery must use the bounded Local provider")
+        providers.append(local)
+    if remote is not None:
+        providers.append(remote)
+    registry = ObjectStoreRegistry(providers)
+    if snapshots is not None:
+        snapshots.object_stores = registry
+    return registry
+
+
 def create_app(
     database=None,
     tokens=None,
@@ -1167,7 +1188,6 @@ def create_configured_app():
                 ConfiguredModelVerifier(**configured_model_roots(settings["modelVerifier"])),
             )
         from .configuration_readiness import configured_s01_readiness
-        from .object_store import ObjectStoreRegistry
         from .object_store_config import (
             configured_object_store,
             parse_object_store_configuration,
@@ -1176,15 +1196,14 @@ def create_configured_app():
 
         readiness_settings = settings.get("configurationReadiness")
         unresolved_settings = configured_s01_readiness(readiness_settings)
-        object_stores = ObjectStoreRegistry()
+        remote_object_store = None
         if isinstance(readiness_settings, dict) and "objectStore" in readiness_settings:
             object_store_configuration = parse_object_store_configuration(
                 readiness_settings["objectStore"]
             )
             if not unresolved_object_store(object_store_configuration):
-                object_stores = ObjectStoreRegistry(
-                    [configured_object_store(object_store_configuration)]
-                )
+                remote_object_store = configured_object_store(object_store_configuration)
+        object_stores = _configured_object_stores(workspace, remote_object_store)
 
         return create_app(
             database,

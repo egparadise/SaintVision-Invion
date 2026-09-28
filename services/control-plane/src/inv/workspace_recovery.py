@@ -14,7 +14,7 @@ from .contracts import validate_contract
 from .control import Control
 from .errors import DomainError
 from .leases import lock_run
-from .object_store import PART_BYTES, object_store_session
+from .object_store import PART_BYTES, object_store_session, require_object_provider
 from .runs import event
 from .snapshots import identity
 
@@ -179,6 +179,7 @@ class WorkspaceRecovery:
             if not pin:
                 raise DomainError("RES-0004", "Workspace checkpoint not found", 404)
             obj = self.snapshots._row(conn, project, pin["object_id"])
+            require_object_provider(files, obj)
             if obj["state"] != "ready":
                 raise DomainError("STORE-0005", "Workspace checkpoint unavailable")
             raw = files.get(obj["locator"], obj["content_hash"], obj["size_bytes"])
@@ -323,6 +324,7 @@ class WorkspaceRecovery:
                 (run_id, restored["source_attempt"], restored["step_id"]),
             ).fetchone()
             obj = self.snapshots._row(conn, project, pin["object_id"])
+            require_object_provider(files, obj)
             if obj["state"] != "ready" or obj["content_hash"] != restored["content_hash"]:
                 raise DomainError("VERIFY-0023", "Restore source content changed")
             raw = files.get(obj["locator"], obj["content_hash"], obj["size_bytes"])

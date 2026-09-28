@@ -335,6 +335,9 @@ def commit_workspace_output(conn, files, tenant, project, run, command, receipt,
     raw = workspace_output(strict_json(result_bytes), launch)
     oid = str(uuid5(NAMESPACE_URL, "inv.workspace-output:" + tenant + ":" + command))
     obj = SnapshotStore._row(conn, project, oid)
+    from .object_store import require_object_provider
+
+    require_object_provider(files, obj)
     if (
         obj["state"] != "ready"
         or files.get(obj["locator"], obj["content_hash"], obj["size_bytes"]) != raw

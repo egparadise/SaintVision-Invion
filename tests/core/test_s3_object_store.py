@@ -253,19 +253,14 @@ def test_public_request_contracts_never_accept_object_id_or_provider_locator():
 
     forbidden = {"objectId", "locator"}
     violations = {
-        name: sorted(
-            forbidden
-            & property_names(schema["$defs"][name], schema["$defs"], {name})
-        )
+        name: sorted(forbidden & property_names(schema["$defs"][name], schema["$defs"], {name}))
         for name in request_names
         if forbidden & property_names(schema["$defs"][name], schema["$defs"], {name})
     }
     standalone_requests = sorted((ROOT / "contracts").glob("*-request.schema.json"))
     for path in standalone_requests:
         standalone = json.loads(path.read_text(encoding="utf-8"))
-        leaked = sorted(
-            forbidden & property_names(standalone, standalone.get("$defs", {}))
-        )
+        leaked = sorted(forbidden & property_names(standalone, standalone.get("$defs", {})))
         if leaked:
             violations[path.name] = leaked
     app = ast.parse(
@@ -310,6 +305,23 @@ def test_s3_provider_requires_lowercase_non_reserved_identity(provider_id):
         S3Objects(provider_id, "product", FakeClient())
 
 
+def test_config_secret_is_not_exposed_by_repr():
+    config = S3Config("https://storage.invalid", "bucket", "ACCESS", "secret-value", "us-east-1")
+    assert "secret-value" not in repr(config)
+
+
+def test_locator_from_another_configured_prefix_is_retryable_unavailable():
+    provider = S3Objects("s3-compatible-v1", "current", FakeClient())
+    other = make_s3_locator("retired", TENANT, PROJECT, "objects", OBJECT)
+    with pytest.raises(DomainError) as raised:
+        provider.get(other, SHA, len(BODY))
+    assert (raised.value.code, raised.value.status, raised.value.retryable) == (
+        "STORE-0001",
+        503,
+        True,
+    )
+
+
 def test_sigv4_path_encoding_is_deterministic_and_secret_free_from_url():
     transport = FakeClient()
     # Reuse only its request recording surface; S3Client does not depend on its
@@ -337,9 +349,7 @@ def test_put_condition_is_signed_so_an_intermediary_cannot_strip_it():
     client.put("object", BODY, SHA)
     headers = transport.calls[0][2]
     assert headers["if-none-match"] == "*"
-    assert "SignedHeaders=host;if-none-match;x-amz-content-sha256;" in headers[
-        "authorization"
-    ]
+    assert "SignedHeaders=host;if-none-match;x-amz-content-sha256;" in headers["authorization"]
 
 
 def test_sigv4_matches_the_aws_s3_get_object_known_answer_vector():
