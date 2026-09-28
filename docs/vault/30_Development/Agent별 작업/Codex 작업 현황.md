@@ -1,20 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.210"
+version: "1.0.211"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T09:00:00+09:00"
+updated: "2026-09-28T15:40:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
 
-## 2026-09-28 S05 Card42 bounded admission 후속 결정 — Claude 검토 요청
+## 2026-09-28 S05 Card42 bounded admission 후속 결정 v1.1 — 재검토 요청
 
-- Card39 hosted N=4·wait 0ms의 4/20 성공·16 fast reject를 기준으로, N=4를 유지하고 permit wait 450ms를 주는 다음 실험을 권고한다. `h=99.531ms`에서 마지막 cohort 대기 `398.124ms`, 예측 20/20·외부 실패 0이나 P95 all 약 759ms로 legacy 401.090ms보다 악화될 가능성을 함께 고정했다.
-- admission reject와 SQL timeout은 분리 계측하되 합계 외부 실패 gate는 blocking으로 유지한다. N 확대는 N=20 전까지 `20−N` 거절을 남기고 N=20은 보호 상한을 없애며, B′ 1500ms는 기존 3조건 실패 때문에 이번 arm에서 제외한다.
-- docs-only이며 새 wave·제품·계약·migration 변경은 0이다. flag off·S05 `in_progress`·승격 없음이며 reviewer Claude와 코디네이터 결정 뒤에만 hosted 20동시×3을 실행한다. [[S05 bounded admission 후속 결정 제안]], [[2026-09-28_09-00-00_KST_S05_bounded_admission_후속결정_Codex]].
+- Claude F1~F6과 코디네이터 결정을 반영해 W=450을 포함한 모든 W>0 arm을 철회했다. hosted `h_obs_max=99.531ms`와 `h_limit(W)=W/4`를 분리했고, 한 cohort만 추가해도 P95가 460.759ms로 legacy 401.090ms를 넘으며 현재 permit 위치는 idempotency `FOR UPDATE` 뒤라 transaction 대기 위험이 있음을 기록했다.
+- 세 gate는 유지하고 다음 측정은 legacy(flag off)만 hosted 20→35→50 동시로 높인다. 각 rung 3회, 한 wave라도 `55P03+57014>0` 또는 세 wave P95 all 중앙 `>2000ms`면 첫 degrade 후보로 고정하며, 50까지 degrade가 없으면 semaphore 라인을 닫는다.
+- docs-only이며 새 wave·제품·workflow·계약·migration 변경은 0이다. flag off·S05 `in_progress`·승격 없음이고 staircase lane은 v1.1 승인 뒤 별도 카드다. [[S05 bounded admission 후속 결정 제안]], [[2026-09-28_09-00-00_KST_S05_bounded_admission_후속결정_Codex]].
 
 ## 2026-09-28 S05 Card39 hosted 20동시 wave — GATES_FAILED, 검토 요청
 

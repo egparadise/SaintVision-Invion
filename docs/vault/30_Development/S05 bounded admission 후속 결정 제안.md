@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-S05-BOUNDED-ADMISSION-DECISION-001"
 title: "S05 bounded admission 후속 결정 제안"
-version: "1.0.0"
-status: "proposed"
+version: "1.1.0"
+status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T09:00:00+09:00"
+updated: "2026-09-28T15:40:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S05-DB"]
@@ -14,8 +14,8 @@ tags: ["s05", "placement", "admission", "semaphore", "decision"]
 
 # S05 bounded admission 후속 결정 제안
 
-> [!summary] 권고
-> **(a) N=4를 유지하고 bounded permit wait 450ms를 실험 arm으로 추가하며, (d) 빠른 admission reject와 SQL timeout을 별도 gate로 분리하되 기존 외부 실패 합계 gate는 유지한다.** 이는 운영 활성화 결정이 아니라 다음 hosted 20동시×3 wave 하나를 승인하기 위한 제안이다. flag 기본 off, S05-DB `in_progress`, 50동시·5노드·승격 금지는 유지한다.
+> [!summary] 코디네이터 결정
+> **W=450ms를 포함한 모든 permit wait `W>0` arm은 실행하지 않는다. 세 판정 gate는 바꾸지 않고, 다음 측정은 legacy(flag off)만 20→35→50 동시로 높여 실제 degrade 지점을 찾는다.** 첫 degrade 지점이 확인될 때만 candidate(W=0) 비교 arm을 별도로 제안한다. 50동시까지 degrade가 없으면 semaphore 라인을 "현 hosted 부하에서 불필요"로 닫고 legacy를 확정한다. flag 기본 off, S05-DB `in_progress`, 승격 없음은 유지한다.
 
 ## 1. 확정된 입력
 
@@ -29,76 +29,115 @@ hosted Card39 run [36359052826](https://github.com/egparadise/SaintVision-Invion
 | request P95 success 중앙 | 401.090ms | 361.228ms |
 | post-acquire hold P95 중앙 | 12.428ms | 12.232ms |
 | permit hold P95, wave별 | n/a | 99.531 / 94.159 / 99.295ms |
+| permit hold max, wave별 | n/a | 99.531 / 94.159 / 99.295ms |
 
-낮은 candidate P95 all은 48건의 빠른 거절 효과라 개선으로 세지 않는다. 아래 산술은 hosted 관측 상한 `h=99.531ms`를 한 permit cohort의 근사 시간으로 사용한 **반증 가능한 예측**이다. 분산·DB 경합·scheduler 비용이 일정하다는 보장은 없다.
+candidate는 wave마다 허용 표본이 4개뿐이라 nearest-rank P95와 max가 같다. 따라서 이후 산술에서 hosted 관측치는 P95라는 모호한 `h`가 아니라 **`h_obs_max=99.531ms`**로 쓴다. 로컬 Card25의 별도 관측은 **`h_local_max=234.974ms`**이며 hosted 값과 합치지 않는다. 낮은 candidate P95 all은 48건의 빠른 거절 효과이므로 개선으로 세지 않는다.
 
-## 2. 선택지와 예상값
+## 2. Claude F1~F6 검토와 결정
 
-### (a) permit wait budget을 0ms보다 크게 둔다 — 권고 실험값 450ms
+### F1·F5 — max 기준과 기호 정정
 
-N=4에서 20개 barrier 요청은 최대 5개 cohort다. `W` 안에 끝나는 cohort 수를 `1+floor(W/h)`로 근사하면 다음과 같다.
+N=4에서 20 요청을 다섯 cohort로 모두 받아들이려면 마지막 cohort가 네 구간을 기다린다. wait budget `W`가 허용하는 구간당 최대값을 **`h_limit(W)=W/4`**로 정의한다.
 
-| W | 예상 성공/빠른 거절 | 마지막 허용 cohort 대기 | 성공 P95 거친 상한 |
-|---:|---:|---:|---:|
-| 0ms | 4/16 | 0ms | 관측 361.228ms |
-| 100ms | 8/12 | 99.531ms | 약 461ms |
-| 200ms | 12/8 | 199.062ms | 약 560ms |
-| 300ms | 16/4 | 298.593ms | 약 660ms |
-| 450ms | 20/0 | 398.124ms | 약 759ms |
+| 항목 | 값 | 해석 |
+|---|---:|---|
+| Card39 hosted `h_obs_max` | 99.531ms | 즉시 거절 16건이 존재한 n=4 관측 max |
+| W=450ms의 `h_limit(W)` | 112.500ms | `W/4`; `h_obs_max` 대비 여유 12.969ms(약 13%) |
+| W=450ms에서 관측 max를 단순 반복한 마지막 대기 | 398.124ms | `4×99.531`; W>0 arm의 안전성 증거가 아님 |
+| Card25 local `h_local_max` | 234.974ms | 다른 환경·다른 arm의 max; hosted 예측에 대입 금지 |
 
-450ms는 `4×99.531=398.124ms`에 약 52ms 여유를 둔 값이다. 외부 실패 0을 만들 가능성은 있으나 legacy P95 401.090ms보다 느려질 가능성이 높다. 따라서 이는 성공을 기대한 승격 arm이 아니라 **성공률과 지연의 실제 교환비를 한 번에 반증하는 arm**이다. budget 만료는 기존 `RES-0007`/503/retryable이고 공개 계약은 바꾸지 않는다.
+W=450 예측은 나머지 16건이 즉시 거절된 상태의 `h_obs_max`를 20건 생존 상태로 외삽하므로 20/20을 보장하지 않는다. `h_obs_max`가 13%만 커져도 `h_limit(450)`을 넘는다. v1.0의 "permit hold P95 상한"과 `h`/`h_max` 혼용은 철회한다.
 
-다음 wave가 20/20이 아니거나 P95 all 중앙이 legacy보다 악화되면 이 선택지는 기각한다. 20/20이어도 permit wait P95/max, cancellation cleanup, registry 잔존 0과 불변식이 모두 필요하다.
+### F2 — 현재 구현에서 W>0은 transaction/row-lock 위험을 만든다
 
-### (b) N을 조정한다 — 이번 결정에서는 보류
+현재 candidate는 루트 트랜잭션 안에서 `approvals._ledger()`가 `inv.idempotency ... FOR UPDATE`를 수행한 뒤 project permit을 얻는다. `lock_timeout` 설정도 permit 획득 뒤다. 따라서 W>0 대기는 statement timeout의 보호를 받지 않는 idle-in-transaction 구간이며 다음 위험이 있다.
 
-wait 0ms와 완전 동시 barrier를 그대로 두면 산술상 빠른 거절은 `20−N`이다.
+- 서로 다른 key라도 connection/worker를 W 동안 점유한다.
+- 같은 key replay는 선행 요청의 idempotency row lock에 막혀 별도 `55P03`/`57014`를 만들 수 있다.
+- limit-row 도착 분산은 `55P03`을 줄일 수 있지만, 그 개선이 replay 잠금·pool 점유 위험을 상쇄하지 않는다.
+- replay-before-permit과 wait-outside-transaction을 동시에 보존하려면 별도 설계가 필요하다. 설정 rollback만으로 충분한 작은 변경이라고 주장하지 않는다.
 
-| N | 예상 성공/빠른 거절 | 의미 |
-|---:|---:|---|
-| 4 | 4/16 | Card39 실측과 정확히 일치 |
-| 8 | 8/12 | 외부 실패 gate는 여전히 실패 |
-| 12 | 12/8 | 외부 실패 gate는 여전히 실패 |
-| 16 | 16/4 | 외부 실패 gate는 여전히 실패 |
-| 20 | 20/0 | admission 상한의 보호 효과가 사실상 사라짐 |
+따라서 permit 위치·공정성·queue cap·취소·단조 시계·외부 timeout 관계를 먼저 설계하지 않은 W>0 구현과 측정은 금지한다.
 
-로컬 Card25 sampler-off 한 wave의 `h_max=234.974ms`에서는 N=4의 깊은 구간 `2h=469.948ms<500ms`, N=5는 `3h=704.922ms>500ms`였다. 이 값은 hosted와 직접 비교할 수 없지만 N 확대가 limit-row `55P03`을 다시 만들 수 있다는 위험 경계다. 다음 hosted wave에서 N만 높여 성공률을 맞추는 것은 DB 보호 목표를 훼손하므로 선택하지 않는다.
+### F3 — gate 2는 모든 W>0에서 구조적으로 실패한다
 
-### (c) B′ lock budget으로 복귀한다 — 기각
+Card39 candidate success P95는 361.228ms다. 두 번째 cohort를 허용하는 순간 관측 max 한 구간만 더해도 `361.228+99.531=460.759ms`로 legacy P95 401.090ms를 넘는다. 즉 성공 수를 늘리면서 request P95 all 비악화를 지키는 W>0은 현재 근거 안에 존재하지 않는다.
 
-로컬 Card24 observer-on B′=1500ms는 3회 합계 11/60 성공, `55P03` 49, P95 all 1785.486→2315.099ms, hold P95 141.932→767.708ms로 세 조건을 모두 실패했다. Card25 sampler-off 단일 wave는 20/20·timeout 0이었지만 P95 all 2014.409ms, hold P95/max 155.873/234.974ms였고 단일 로컬 wave다.
+결과가 정해진 W=450 arm은 실행하지 않는다. 데이터를 본 뒤 gate를 바꾸지 않으며, 세 gate를 다음처럼 유지한다.
 
-관측자 효과 때문에 두 결과가 갈렸으므로 hosted B′ 1500ms×3은 기전을 반증할 수 있다. 그러나 이미 실패한 방향으로 정책을 되돌릴 근거는 아니며 Card42의 다음 wave로 선택하지 않는다. `statement_timeout=2s`와 맞닿는 1900ms arm도 제외한다.
+1. `externalFailureCount(candidate) ≤ externalFailureCount(legacy)` — admission reject 포함
+2. request P95 all 중앙 비악화
+3. 성공 hold P95 중앙 비악화
 
-### (d) gate 1을 빠른 거절과 timeout으로 분리한다 — 진단용 채택, 완화는 금지
+### F4 — 20동시 legacy에는 admission이 풀 문제가 없다
 
-Card39를 분리하면 SQL timeout gate는 `0≤0`으로 통과하지만 admission reject는 `48>0`, 비율 80%로 실패한다. 분리 자체는 병목이 DB timeout인지 admission 정책인지 보여 주지만, admission reject를 제외하면 12/60 성공 후보가 green이 되는 fail-open이다.
+Card39 legacy는 60/60 성공, 외부 실패 0, SQL timeout 0, P95 all 401.090ms였다. 이 조건에서 admission은 순수 비용이다. 따라서 다음 질문은 "W가 얼마인가"가 아니라 **legacy가 어느 hosted 부하에서 처음 degrade하는가**다.
 
-따라서 다음 report는 `admissionRejectCount`와 `sqlTimeoutCount(55P03+57014)`를 각각 gate로 내되, 합계 `externalFailureCount` 비증가를 계속 blocking gate로 유지한다. client retry 수렴 시간·시도 상한·최종 성공률의 계약과 SLO가 별도 결정되기 전에는 retryable 503을 성공으로 바꾸어 세지 않는다.
+### F6 — 진단 분리는 유지하고 fail-open은 금지한다
 
-## 3. 다음 hosted wave가 반증할 것
+`admissionRejectCount`와 `sqlTimeoutCount(55P03+57014)`는 계속 분리 기록한다. 그러나 합계 `externalFailureCount` 비증가를 blocking gate로 유지한다. retry 수렴 시간·시도 상한·최종 성공률 SLO가 정해지기 전에는 retryable 503을 성공으로 세지 않는다.
 
-Claude 검토와 코디네이터 결정 뒤에만 다음 한 arm을 실행한다.
+## 3. 선택지 판정
 
-- legacy(flag off) 20동시×3 뒤 candidate(N=4, permit wait 450ms, lock budget 500ms) 20동시×3, 한 wave씩 순차 실행
-- JSON/JUnit: all/success P95, permit wait/hold P50·P95·max, admission reject, `55P03`, `57014`, in-use/queue depth, cancellation/release cause, registry residue
-- 통과 조건: `externalFailureCount(candidate)≤legacy`, P95 all 중앙 비악화, 성공 hold P95 중앙 비악화, 불변식 전부 true
-- 반증: 성공 20/20 미달, P95 all 악화, SQL timeout 재등장, permit/registry 잔존, replay·fencing·RLS·no-overbooking 회귀 중 하나라도 발생
+### (a) bounded permit wait W>0 — 기각, 실행 금지
 
-예측은 candidate 20/20·외부 실패 0, P95 all 약 759ms다. **따라서 외부 실패 조건은 좋아질 수 있으나 P95 조건은 실패할 가능성이 높다.** 실측이 이를 뒤집으면 queueing 모델 또는 `h` 안정성 가정이 틀린 것이다. hosted runner 수치는 로컬 Card24/25나 물리 5노드 AC-05와 직접 합치지 않는다.
+게이트 2가 모든 W>0에서 확정 실패하고 현재 permit 위치가 idempotency row lock을 잡은 채 대기하게 하므로 W=450 arm을 포함해 실행하지 않는다.
 
-## 4. 불변식·롤백·결정 요청
+### (b) N 조정 — 보류
 
-- 공개 route/schema/ProblemDetails 변경 0. timeout 표면은 계속 `RES-0007`/503/retryable다.
-- tenant+project 격리, exact replay/changed-body 409, fencing/epoch, RLS, no-overbooking, root transaction 종료 뒤 release를 보존한다.
-- process-local 한계와 multi-CP에서 최악 `P×N`은 그대로다. global FIFO나 운영 공정성을 주장하지 않는다.
-- rollback은 permit wait 설정을 0ms로 되돌리고 flag를 off로 유지하는 것이다. migration·DB cleanup은 없다.
+wait 0ms의 완전 동시 barrier에서 빠른 거절은 구조적으로 `20−N`이다. N=20은 상한 보호를 없앤다. legacy가 degrade하는 지점을 찾기 전에 N을 높이지 않는다.
 
-결정 요청:
+### (c) B′ lock budget 복귀 — 기각 유지
 
-- [ ] 권고 승인: (a) N=4/W=450ms 실험 + (d) 분리 계측/합계 blocking gate
-- [ ] 대안: (b) N 조정 — 승인 N과 위험 수용 근거 필요
-- [ ] 대안: (c) hosted B′ 1500ms 재검증 — semaphore 실험보다 우선할 이유 필요
-- [ ] 보류: legacy/flag off 유지, 추가 wave 없음
+Card24 observer-on B′=1500ms는 세 조건을 모두 실패했고 Card25 sampler-off는 단일 로컬 wave다. hosted legacy degrade 지점 없이 실패한 방향으로 돌아가지 않는다.
 
-근거: [[S05 project별 bounded semaphore 사양]], [[S05 hosted 20동시 wave opt-in lane 사양]], [[2026-09-23_12-20-00_KST_S05_Bprime_구현_교정실험_Codex]], [[2026-09-23_13-28-00_KST_S05_bounded_semaphore_사양_Codex]], [[2026-09-28_08-35-00_KST_S05_hosted_20동시_wave_Codex]].
+### (d) 빠른 거절과 SQL timeout 분리 — 진단용 채택, gate 완화 금지
+
+분리 계측은 병목 분류에 쓰되 합계 외부 실패 gate는 그대로 blocking이다.
+
+### (e) legacy-only hosted staircase — 다음 측정으로 채택
+
+다음 카드는 Card39와 같은 opt-in hosted PostgreSQL 16 lane에서 **legacy(flag off)만** 20→35→50 동시 순서로 실행한다. lane 구현과 실행은 이 v1.1 승인 뒤 별도 카드다.
+
+## 4. legacy staircase 사전 등록
+
+### 실행 순서
+
+- 각 rung은 동일 runner·동일 disposable DB 설정에서 `20×3`, `35×3`, `50×3` wave를 한 번에 하나씩 순차 실행한다.
+- 한 rung의 세 wave를 끝낸 뒤 아래 degrade 기준을 판정한다. degrade면 더 높은 rung은 실행하지 않는다.
+- 제품 SHA, runner OS/CPU, PostgreSQL 버전과 `lock_timeout=500ms`·`statement_timeout=2000ms`, wave별 JSON/JUnit을 artifact로 보존한다.
+- candidate, permit wait, B′ arm은 이 lane에서 실행하지 않는다. 제품 flag는 off다.
+
+### 실행 전 고정한 degrade 기준
+
+다음 중 하나면 해당 concurrency를 **첫 degrade 후보**로 판정한다.
+
+1. 세 wave 중 하나라도 `externalFailureCount = 55P03 + 57014 > 0`
+2. 세 wave의 request P95 all 중앙값이 **2000.000ms 초과**
+
+hold P95/max와 legacy lock-wait P95/max는 반드시 기록하지만 degrade trigger는 아니다. workflow/service-container/pull/setup 실패는 제품 degrade가 아니라 `INVALID_RUN`이며 같은 rung 재실행에는 별도 코디네이터 승인이 필요하다.
+
+### 결과에 따른 다음 결정
+
+- 20 또는 35에서 degrade: 해당 rung에서 중단하고 같은 concurrency의 candidate(W=0, N 후보) 비교 사양을 세 gate와 함께 별도 제안한다.
+- 50에서 degrade: 50의 세 wave까지 보존하고 같은 concurrency candidate 비교를 별도 제안한다.
+- 50까지 degrade 없음: 측정한 hosted 범위에서 admission이 풀 문제가 없으므로 semaphore 라인을 닫고 legacy(+기존 fail-fast)를 확정한다. flag는 off로 남긴다.
+
+첫 degrade 후보는 candidate 승격이나 AC-05 판정이 아니다. candidate 비교·50 초과·5노드 측정은 각각 별도 승인 대상이다.
+
+## 5. 불변식·경계·결정 기록
+
+- 공개 route/schema/ProblemDetails, migration, registry 상태 변경 0.
+- exact replay/changed-body 409, fencing/epoch, RLS, no-overbooking 불변식은 후속 candidate 비교에서도 유지한다.
+- 세 판정 gate는 유지하며 측정 뒤 재정의하지 않는다.
+- flag 기본 off, S05-DB `in_progress`, 운영 활성화·승격 없음이다.
+- v1.1은 docs-only이고 wave·제품·workflow 변경을 포함하지 않는다.
+
+결정 기록:
+
+- [x] (a) W=450 포함 W>0 arm 실행 안 함
+- [x] (d) 진단 분리 + 합계 외부 실패 blocking gate 유지
+- [x] (e) legacy-only 20→35→50 hosted staircase를 다음 별도 카드로 채택
+- [x] flag off·S05 `in_progress`·승격 없음
+
+근거: [[S05 project별 bounded semaphore 사양]], [[S05 hosted 20동시 wave opt-in lane 사양]], [[2026-09-23_12-20-00_KST_S05_Bprime_구현_교정실험_Codex]], [[2026-09-23_13-28-00_KST_S05_bounded_semaphore_사양_Codex]], [[2026-09-28_08-35-00_KST_S05_hosted_20동시_wave_Codex]], [[2026-09-28_09-00-00_KST_S05_bounded_admission_후속결정_Codex]].
