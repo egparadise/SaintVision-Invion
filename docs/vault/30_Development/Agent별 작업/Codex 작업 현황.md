@@ -10,6 +10,18 @@ source_of_truth: "Git"
 
 # Codex 작업 현황
 
+## 2026-09-28 CARD-S11-AC11-REGISTRY-REPIN-01 — 구현·게이트 완료
+
+- #177 `b246e7db` 위에 #185 승인 head `33ed1b8c`를 merge commit `067e6a48`로 결속했고 merge-tree exact 일치를 확인했다.
+- 정본 registry에서 old PITR target을 제거하고 fault 종류별 recovery를 요구하는 새 target을 적용했다. registry blob `e8c01340…`을 aggregator·migration importer에 함께 pin하고 PITR `REQUIRED_TARGET_BY_AXIS`를 닫았다. long-soak은 `NOT_REGISTERED` 유지다.
+- 구현 commit `ffd99bfd`; aggregator 단일 파일 55 passed, importer 단일 파일 14 passed, docs·ontology·bindings·ratchet 게이트 exit 0. task registry는 sprint 고정 schema와 미완료 S10 dependency 때문에 S11-ST `planned`를 유지하고 카드 ID는 History에서 추적한다. [[2026-09-28_16-05-00_KST_S11_AC11_registry_repin_Codex]], [[S11-ST_손상_용량_backup_장애시험_설계]].
+
+## 2026-09-28 S11-ST 손상·용량·backup 장애 시험 설계 v1.2 — Claude r2 반영
+
+- Claude r2 N1을 반영해 raw 22-case universe를 PG-free 12개와 hosted 10개 실행 subset으로 분리하고 각각 identity SHA를 고정했다. 한 계층 run이 다른 계층 case를 실행하지 않아도 누락이 아니다.
+- storage-only evidence로 AC-11 `long-soak`을 닫던 우회를 없앴다. PG-free·hosted·물리 storage는 모두 reference-only이며, 열·전원·NTP·스위치·WAN·원격 WS를 포함한 composite target 승인 전 `long-soak=NOT_REGISTERED`다. registry patch는 PITR target 교체만 제안한다.
+- physical storage와 PITR은 부류별 identity·recovery를 요구하고, Local byte 변조는 read 전 mode 복원, metric 계수 의미, 선행 카드 `CARD-S11-AC11-REGISTRY-REPIN-01`을 명시했다. target source는 commit `3363ab77…`·blob `421d4d3a…`로 고정했고 문서·bindings·ontology·ratchet 게이트는 exit 0이다. 공개 계약·migration·registry 상태는 불변이며 S11-ST `planned`, 측정 `NOT_OBSERVED`; push 뒤 Claude 재검토를 요청한다. [[S11-ST_손상_용량_backup_장애시험_설계]], [[S11_ST_storage_failure_target_v0]], [[2026-09-28_14-16-18_KST_S11-ST_손상_용량_backup_장애시험_설계_Codex]].
+
 ## 2026-09-28 카드 90 — AC-11 migration 0047~0053 통합·재핀 cascade
 
 - #177에서 manifest를 0047·0050·0053 `PRESERVED`까지 확장하고 source graph로 0052 barrier 뒤 reversible tail을 재계산한다. 0053 scoped-row downgrade refusal은 exact revision 0053까지 upgrade한 뒤 0052 거부·version/project_id 원자 보존을 확인해, 이후 0054가 들어와도 fixture 의미가 바뀌지 않는다.
