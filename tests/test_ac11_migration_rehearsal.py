@@ -93,8 +93,47 @@ def test_catalog_fingerprint_detects_existing_object_deletion():
         counts={"tables": 1},
         sections={"tables": [["public", "tenants"]]},
     )
-    with pytest.raises(runner.RehearsalError, match="catalog fingerprint mismatch: tables"):
+    with pytest.raises(runner.CatalogMismatch, match="catalog fingerprint mismatch: tables") as exc:
         runner.compare_catalogs(expected, actual)
+    assert exc.value.diagnostics == {
+        "tables": {
+            "expectedCount": 2,
+            "actualCount": 1,
+            "expectedOnlyCount": 1,
+            "actualOnlyCount": 0,
+            "expectedOnlySample": [{"rowSha256": runner.canonical_sha256(["public", "projects"])}],
+            "actualOnlySample": [],
+        }
+    }
+
+
+def test_catalog_diagnostics_hash_function_definitions_and_routine_specific_names():
+    expected = runner.CatalogFingerprint(
+        sha256="a" * 64,
+        counts={"functions": 1, "routineGrants": 1},
+        sections={
+            "functions": [["inv", "f", "", "void", "sql", "owner", True, "", "secret body"]],
+            "routineGrants": [["inv", "f", "f_123", "inv_app", "EXECUTE", "NO"]],
+        },
+    )
+    actual = runner.CatalogFingerprint(
+        sha256="b" * 64,
+        counts={"functions": 1, "routineGrants": 1},
+        sections={
+            "functions": [["inv", "f", "", "void", "sql", "owner", True, "", "changed body"]],
+            "routineGrants": [["inv", "f", "f_456", "inv_app", "EXECUTE", "NO"]],
+        },
+    )
+    diagnostics = runner.catalog_diff_diagnostics(
+        expected, actual, ["functions", "routineGrants"]
+    )
+    serialized = str(diagnostics)
+    assert "secret body" not in serialized and "changed body" not in serialized
+    assert "f_123" not in serialized and "f_456" not in serialized
+    assert diagnostics["functions"]["expectedOnlySample"][0]["key"] == ["inv", "f", ""]
+    assert diagnostics["routineGrants"]["expectedOnlySample"][0]["key"] == [
+        "inv", "f", "inv_app", "EXECUTE", "NO"
+    ]
 
 
 def test_junit_declares_zero_tail_as_skip_and_restore_as_pass():

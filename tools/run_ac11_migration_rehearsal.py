@@ -72,6 +72,14 @@ class RehearsalError(RuntimeError):
     """Fail-closed validation error whose message contains no credential data."""
 
 
+class CatalogMismatch(RehearsalError):
+    """Catalog mismatch with credential-free structural diagnostics."""
+
+    def __init__(self, differing: list[str], diagnostics: dict[str, Any]) -> None:
+        super().__init__("catalog fingerprint mismatch: " + ",".join(differing))
+        self.diagnostics = diagnostics
+
+
 @dataclass(frozen=True, slots=True)
 class CatalogFingerprint:
     sha256: str
@@ -378,7 +386,78 @@ def compare_catalogs(expected: CatalogFingerprint, actual: CatalogFingerprint) -
         name for name in set(expected.sections) | set(actual.sections)
         if expected.sections.get(name) != actual.sections.get(name)
     )
-    raise RehearsalError("catalog fingerprint mismatch: " + ",".join(differing))
+    raise CatalogMismatch(differing, catalog_diff_diagnostics(expected, actual, differing))
+
+
+def _catalog_row_diagnostic(section: str, row: list[Any]) -> dict[str, Any]:
+    """Return structural keys and hashes without serializing executable definitions."""
+    if section == "columns":
+        return {
+            "key": row[:4],
+            "type": row[4],
+            "notNull": row[5],
+            "defaultSha256": canonical_sha256(row[6]),
+        }
+    if section == "constraints":
+        return {
+            "key": row[:4],
+            "validated": row[4],
+            "definitionSha256": canonical_sha256(row[5]),
+        }
+    if section == "functions":
+        return {
+            "key": row[:3],
+            "result": row[3],
+            "language": row[4],
+            "owner": row[5],
+            "securityDefiner": row[6],
+            "configSha256": canonical_sha256(row[7]),
+            "definitionSha256": canonical_sha256(row[8]),
+        }
+    if section == "routineGrants":
+        # specific_name contains a database-local function OID, so keep it visible
+        # only as a hash while retaining the stable privilege identity.
+        return {
+            "key": [row[0], row[1], row[3], row[4], row[5]],
+            "specificNameSha256": canonical_sha256(row[2]),
+        }
+    return {"rowSha256": canonical_sha256(row)}
+
+
+def catalog_diff_diagnostics(
+    expected: CatalogFingerprint,
+    actual: CatalogFingerprint,
+    differing: list[str],
+) -> dict[str, Any]:
+    diagnostics: dict[str, Any] = {}
+    for section in differing:
+        expected_rows = expected.sections.get(section, [])
+        actual_rows = actual.sections.get(section, [])
+        expected_serialized = {
+            json.dumps(row, sort_keys=True, separators=(",", ":"), ensure_ascii=False): row
+            for row in expected_rows
+        }
+        actual_serialized = {
+            json.dumps(row, sort_keys=True, separators=(",", ":"), ensure_ascii=False): row
+            for row in actual_rows
+        }
+        expected_only = sorted(set(expected_serialized) - set(actual_serialized))
+        actual_only = sorted(set(actual_serialized) - set(expected_serialized))
+        diagnostics[section] = {
+            "expectedCount": len(expected_rows),
+            "actualCount": len(actual_rows),
+            "expectedOnlyCount": len(expected_only),
+            "actualOnlyCount": len(actual_only),
+            "expectedOnlySample": [
+                _catalog_row_diagnostic(section, expected_serialized[key])
+                for key in expected_only[:5]
+            ],
+            "actualOnlySample": [
+                _catalog_row_diagnostic(section, actual_serialized[key])
+                for key in actual_only[:5]
+            ],
+        }
+    return diagnostics
 
 
 def _postgres_version(admin_dsn: str) -> dict[str, str]:
@@ -456,6 +535,7 @@ def run_rehearsal(
     success = False
     failure: str | None = None
     failure_reason: str | None = None
+    catalog_difference: dict[str, Any] | None = None
     details: dict[str, Any] = {}
     try:
         for name in names:
@@ -512,6 +592,8 @@ def run_rehearsal(
     except Exception as exc:  # noqa: BLE001 - serialized as a type-only failure
         failure = type(exc).__name__
         failure_reason = redacted_failure_reason(exc)
+        if isinstance(exc, CatalogMismatch):
+            catalog_difference = exc.diagnostics
     finally:
         for name in reversed(created):
             try:
@@ -587,6 +669,7 @@ def run_rehearsal(
         },
         "failureType": failure,
         "failureReason": failure_reason,
+        "catalogDifference": catalog_difference,
     }
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
