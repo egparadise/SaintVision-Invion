@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.121"
+version: "1.0.122"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-23T10:30:00+09:00"
+updated: "2026-09-28T10:41:29+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,26 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-23T10:30:00+09:00 (최신 tip `fdd4a895`, 작업 브랜치 `agent/gemini/s04-fe-matrix-measured`).
+- 확인 기준: 2026-09-28T10:41:29+09:00 (최신 tip `1e8baf04`, 작업 브랜치 `agent/gemini/s05-s06-fe-fixes`).
+
+## 2026-09-28 S05·S06-FE 제품 결함 후속 감사 및 수정 (`agent/gemini/s05-s06-fe-fixes`)
+
+- **작업 개요**: S05 매트릭스(v1.2.2), S06 매트릭스(v1.1.2) 및 PR #151 S05 결정(legacy 배치 경로 정본) 대조를 통해 도출된 7대 결함(허위 상태 표기, 모의 데이터 위장, 서버 계약에 없는 가짜 풀 필드, 모달 Esc/포커스 트랩, 키보드 접근성)을 전수 치유.
+- **7대 결함 치유 내역**:
+  1. `PlacementExplainView.tsx`: 로컬 시뮬레이션 고지 배지(`[로컬 시뮬레이션 (UNVERIFIED · 모의)]`) 추가, 점수 라벨 `로컬 모의 점수 (미측정)` 정정.
+  2. `PlacementSimulator.tsx`: 비계약 가짜 풀 용량 필드(`(activePool as any).availableCores` 등) 접근 전면 제거, `pool-capacity-pending` 대기 배너 도입.
+  3. `ResourceExplorer.tsx`: 후보 노드 여유 자원 와이어 스키마(`c.spare?.cpuMillicores`) 안전 폴백 및 `[서버 유휴 우선 후보 순위 · 샤드 미할당]` 명시.
+  4. `WorkspaceCreateModal.tsx`: Escape 닫기, 포커스 트랩(Tab/Shift+Tab 순환 잠금), 포커스 복원 및 `aria-labelledby` 부여.
+  5. `WorkspaceList.tsx`: 작업공간 카드 `role="button"`, `tabIndex={0}`, `aria-label`, `onKeyDown`(Enter/Space) 부여.
+  6. `TerminalSessionView.tsx`: `activeCommandId` 유무에 따라 PTY 티켓 발급 상태 조건부 렌더링 (`승인 명령 ID 대기 중 (티켓 미발급 · mTLS)` vs 발급 완료).
+  7. `DesktopWindow.tsx`: `isActive` 조건 하에서만 Escape 닫기 핸들러 동작.
+- **검증 실측**:
+  - `pytest tests/test_route_coverage.py`: 39 passed (100%).
+  - `python tools/check_frontend_integrity.py`: 0 violations, 9개 규칙 전체 통과.
+  - `python tools/check_contract_bindings.py`: PASS.
+  - `apps/web/tests/s05-s06-defect-fixes.test.tsx`: 신규 회귀 시험 6건 작성.
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-28_10-41-29_KST_S05_S06_FE_Gemini_제품결함_감사_및_수정.md`
+- **독립 검토 요청**: Claude (UI 경로 축), Codex (계약 축).
 
 ## 2026-09-23 S04-FE Claude 리뷰 F1~F5 전수 조치 및 정직 증거 갱신 (`agent/gemini/s04-fe-matrix-measured`)
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/shared/ui/Button';
 
 export interface WorkspaceCreateModalProps {
@@ -17,6 +17,52 @@ export const WorkspaceCreateModal: React.FC<WorkspaceCreateModalProps> = ({
   const [name, setName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const previousActiveElement = document.activeElement as HTMLElement | null;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+
+      if (e.key === 'Tab') {
+        if (!modalRef.current) return;
+        const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      if (previousActiveElement && typeof previousActiveElement.focus === 'function') {
+        previousActiveElement.focus();
+      }
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -52,6 +98,7 @@ export const WorkspaceCreateModal: React.FC<WorkspaceCreateModalProps> = ({
     <div
       role="dialog"
       aria-modal="true"
+      aria-labelledby="workspace-create-title"
       style={{
         position: 'fixed',
         inset: 0,
@@ -64,6 +111,7 @@ export const WorkspaceCreateModal: React.FC<WorkspaceCreateModalProps> = ({
       }}
     >
       <div
+        ref={modalRef}
         style={{
           backgroundColor: 'var(--color-bg-surface)',
           borderRadius: 'var(--radius-lg)',
@@ -76,7 +124,7 @@ export const WorkspaceCreateModal: React.FC<WorkspaceCreateModalProps> = ({
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 600 }}>작업공간 생성 (Workspace Provisioning)</h3>
+            <h3 id="workspace-create-title" style={{ fontSize: '1.25rem', fontWeight: 600 }}>작업공간 생성 (Workspace Provisioning)</h3>
             <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
               프로젝트: <code>{projectId}</code> · 백엔드 초기 레코드 등록
             </p>
