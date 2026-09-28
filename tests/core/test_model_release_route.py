@@ -1040,3 +1040,57 @@ def test_fr3_the_request_body_bound_is_applied_while_reading(monkeypatch):
     client = build(monkeypatch, {})
     payload = b"{" + b'"pad":"' + b"x" * (MAX_REQUEST_BYTES * 4) + b'"}'
     canonical(post(client, data=payload), code="VAL-0003", status=413)
+
+
+# ---------------------------------------------------------------------------
+# The real-PostgreSQL fixture, exercised without PostgreSQL
+# ---------------------------------------------------------------------------
+
+
+def test_the_real_pg_seed_builds_every_row_without_a_database():
+    """Run the integration fixture's body against a stub connection.
+
+    This exists because the six real-PostgreSQL nodes all failed on hosted CI in
+    ``_seed`` -- ``new_id("code_commit")`` is not an entity kind, the id kind is
+    ``commit`` -- and every product assertion behind them went unrun. The failure
+    needed no database to find, so it should not have needed one: importing the
+    fixture and handing it a connection that only records statements catches this
+    whole class before the hosted run.
+    """
+    import datetime as dt
+    import importlib.util
+    from pathlib import Path
+
+    from saintvision.db.models.lineage import LINEAGE_KINDS
+    from saintvision.ids import PREFIXES
+
+    path = (
+        Path(__file__).resolve().parents[1]
+        / "integration/test_model_release_real_pg.py"
+    )
+    spec = importlib.util.spec_from_file_location("real_pg_release_fixture", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    class Recorder:
+        def __init__(self):
+            self.statements: list[str] = []
+
+        def execute(self, statement, params=None):
+            self.statements.append(str(statement))
+            return None
+
+    recorder = Recorder()
+    seeded = module._seed(
+        recorder,
+        tenant_id=TENANT,
+        now=dt.datetime(2026, 9, 9, tzinfo=dt.timezone.utc),
+        project_code="fixture-guard",
+    )
+    assert set(seeded) == {"user_id", "project_id", "model_id", "version_id"}
+    # users, projects, project_members, models, model_versions, four edges.
+    assert len(recorder.statements) == 9
+
+    # The trap itself, named: two lineage kinds are not entity kinds, so a fixture
+    # that reuses an edge kind as an id kind raises.
+    assert set(LINEAGE_KINDS) - set(PREFIXES) == {"code_commit", "container_image"}

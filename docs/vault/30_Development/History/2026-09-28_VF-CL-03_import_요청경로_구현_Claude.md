@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-VFCL03-IMPORT-REQUEST-PATH-IMPL-001"
 title: "VF-CL-03 import adapter 요청 경로 구현 — 공유 정본 ProblemDetails 모듈·strict body helper·release route, Codex F-R1~F-R3 반영(운영 factory 결속·threadpool self-call·redirect 거부·streaming 상한·실 PG node 6건), PG-free 58 + 실 PG 6"
-version: "1.1.0"
+version: "1.2.0"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T11:43:38+09:00"
+updated: "2026-09-28T11:58:12+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["VF-CL-03"]
@@ -107,3 +107,13 @@ Codex 독립 검토. 검토가 끝나면 실 PG 3건을 hosted Core·Backend 결
 - `tests/integration/test_model_release_real_pg.py` → 로컬 **6 skipped**(DSN 부재). hosted Backend 결과를 PR에 적는다.
 - `export_schemas.py --check` **60 PASS**, `route_coverage` **0 unserved**, docs gate 2종 exit 0.
 - 로컬 실 PG·Docker·전체 suite **미실행**.
+
+## 9. v1.2 — 실 PG node가 hosted에서 fixture에서 죽었다 (`91b86111` 결과)
+
+Codex 재검토: 두 Backend matrix(3.12·3.14)가 `tests/integration/test_model_release_real_pg.py`를 **수집·실행했고 skip이 아니었다.** 그런데 6개 전부 `_seed`에서 같은 이유로 실패했다 — `new_id("code_commit")`. 정본 `src/saintvision/ids.py`의 entity kind는 **`commit`**이고 `code_commit`은 **`model_lineage`의 edge kind**다. 두 어휘를 같은 것으로 쓴 것이 내 실수다. 결과는 각 matrix `6 failed, 2987 passed, 47 skipped, 2 deselected`이고, 그래서 설계 §9의 28~30을 포함한 여섯 단언은 **제품 경로·트랜잭션 순서·롤백을 하나도 검증하지 못했다.**
+
+- fixture가 `(lineage kind, id kind)` 쌍을 명시한다 — `("code_commit", "commit")`. 왜 다른지 주석에 적었다.
+- **DB 없이 잡히는 실패였으므로 DB 없이 잡는 시험을 넣었다**: `tests/core/test_model_release_route.py`가 integration 모듈을 import해 `_seed`를 **statement만 기록하는 stub connection**으로 돌린다. id kind가 틀리면 그 자리에서 raise한다. 덧붙여 `set(LINEAGE_KINDS) - set(PREFIXES) == {"code_commit", "container_image"}`로 함정 자체를 문서화했다 — 두 lineage kind는 entity kind가 아니다.
+- 이 판단은 hosted가 아니라 fixture 층의 결함이었고, 내가 실 PG를 돌리지 않는 동안 **fixture를 PG-free로 한 번도 실행하지 않은 것**이 원인이다. 앞으로 실 PG 파일을 올릴 때는 stub 실행을 같이 넣는다.
+
+PG-free: `tests/core/test_model_release_route.py` **59 passed**(guard 1건 추가).

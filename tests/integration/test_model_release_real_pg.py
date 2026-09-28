@@ -113,9 +113,15 @@ def _seed(connection, *, tenant_id, now, project_code, role="approver"):
         },
     )
     # Every required lineage kind, so the release is refused for no other reason.
-    for kind, prefix in (
+    #
+    # The lineage kind and the identifier kind are not the same vocabulary: the
+    # edge kind is ``code_commit`` (the model_lineage CHECK) while the id kind is
+    # ``commit`` (ids.PREFIXES). Passing the edge kind to new_id raises, which is
+    # how this fixture failed on hosted PostgreSQL before every assertion below
+    # had a chance to run.
+    for kind, id_kind in (
         ("dataset_version", "dataset_version"),
-        ("code_commit", "code_commit"),
+        ("code_commit", "commit"),
         ("eval_run", "eval_run"),
         ("approval", "approval"),
     ):
@@ -130,7 +136,7 @@ def _seed(connection, *, tenant_id, now, project_code, role="approver"):
                 "tenant": tenant_id,
                 "version_id": version_id,
                 "kind": kind,
-                "subject": new_id(prefix),
+                "subject": new_id(id_kind),
                 "now": now,
             },
         )
