@@ -34,6 +34,7 @@ TOOL_BLOBS = {
         *APPROVED_ALLOWLIST["secVf001"]["testFiles"],
     ]
 }
+TOOL_BLOBS[tool.ALLOWLIST_REPO_PATH] = tool.ALLOWLIST_BLOB
 TARGET_CRITERIA = {
     "target-" + axis: (
         {} if axis == "security-critical-high-zero" else {"sampleCount": {"operator": "gte", "value": 1}}

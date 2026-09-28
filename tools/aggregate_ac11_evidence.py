@@ -27,8 +27,9 @@ from typing import Any, Protocol
 
 
 ROOT = Path(__file__).resolve().parents[1]
+ALLOWLIST_REPO_PATH = "docs/vault/30_Development/Evidence/s11-security-allowlist-v0.json"
 DEFAULT_ALLOWLIST = (
-    ROOT / "docs/vault/30_Development/Evidence/s11-security-allowlist-v0.json"
+    ROOT / ALLOWLIST_REPO_PATH
 )
 TARGET_REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
 ALLOWLIST_BLOB = "ff2f9966956da677ebcdee92ec1de2292bd5ec52"
@@ -639,6 +640,8 @@ def _security_observations(
     envelope: dict[str, Any], allowlist: dict[str, Any], now: datetime, git: GitReader, source: str
 ) -> Verdict:
     reports = envelope.get("observations")
+    if git.blob(source, ALLOWLIST_REPO_PATH) != ALLOWLIST_BLOB:
+        return Verdict.INVALID_RUN
     if not isinstance(reports, list) or not reports:
         raise ValueError("security observations must be a non-empty list")
     by_id: dict[str, dict[str, Any]] = {}
