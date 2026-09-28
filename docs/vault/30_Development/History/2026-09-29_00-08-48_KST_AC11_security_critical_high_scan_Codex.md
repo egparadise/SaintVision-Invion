@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-S11-AC11-SECURITY-SCAN-20260929"
 title: "AC-11 security critical/high hosted scan과 fail-closed 집계"
-version: "1.0.2"
+version: "1.0.3"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-29T00:14:43+09:00"
+updated: "2026-09-29T00:18:59+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_id: "S11-BE"
@@ -30,17 +30,18 @@ tags: ["S11", "AC-11", "security", "SAST", "dependency-audit", "hosted"]
 
 ## 현재 검증
 
-- `python -m pytest -q tests/test_ac11_security_scan.py` → **6 passed**, exit 0.
+- `python -m pytest -q tests/test_ac11_security_scan.py` → **7 passed**, exit 0. Git object ID용 SHA-1에 `usedforsecurity=False`가 없으면 실패하는 AST 회귀 시험을 포함한다.
 - `python -m pytest -q tests/test_aggregate_ac11_evidence.py` → **63 passed**, exit 0.
 - `python -m py_compile tools/run_ac11_security_scan.py tools/aggregate_ac11_evidence.py` → exit 0.
 - workflow YAML safe-load와 `git diff --check` → exit 0. producer blob `de439f28…4c5b`, 수정 workflow blob `aabc8270…288a`, allowlist blob `74dde5cb…2f70`을 서로 대조했다.
 - `check_docs`(935 versioned documents), `check_contract_bindings`(55 fixtures·20 response types·14 replay guards), `check_ontology`, `check_doc_single_source --ratchet` → 모두 exit 0.
 - 최초 push run `36441818573`은 job 0으로 workflow validation 실패했다. job-level `env`에서 step 실행 전에는 사용할 수 없는 `runner.temp` context를 쓴 것이 원인이므로 raw scanner 경로를 `/tmp`로 고정하고 workflow·allowlist blob pin을 함께 갱신했다. 보안 scan이 실행된 결과가 아니며 PASS 또는 finding 0 증거로 세지 않는다.
-- hosted opt-in run은 PR 생성 뒤 exact head에서 실행한다. 실행 전 상태를 PASS로 기록하지 않는다.
+- 첫 실제 scan run `36442219055`(head `7e8d765c`)은 `pip-audit` finding 0, Bandit LOW 13·MEDIUM 4·HIGH 1로 artifact를 보존한 뒤 gate가 실패했다. 유일한 HIGH는 `remote_git.py`의 Git wire object ID 계산 `B324`였고, 예외 등록 없이 제품 코드에 `usedforsecurity=False`를 명시했다.
+- 수정 exact head `d64dd7fdd84bd6749e3998c1bd3d76d69cd4ecfa`의 opt-in run `36442706696`은 **success**다. `pip-audit` 41 dependencies·finding 0, Bandit LOW 13·MEDIUM 4·HIGH 0, critical/high 0, verdict `MEASURED_PASS`, JUnit 4/0/0/0이다. artifact `10979282713`, digest `sha256:01cb09e5da2a865e7780da99569bc218b5f69402720338170ed59c06f9b14f0c`, payload SHA-256 `f0a8425e483fad3898de8604a3d561495140fb2f0ba73517dafccf6bc4d965a4`, 만료 `2026-10-28T15:19:58Z`를 직접 내려받아 대조했다.
+- 제품 경로 단일 파일 `tests/core/test_workspace_bridge.py`는 로컬 기본 Python 3.10에 `enum.StrEnum`이 없어 수집 전 차단됐고, 설치된 Python 3.14에는 pytest가 없었다. 이를 통과로 세지 않으며 최종 제품 회귀 근거는 hosted Backend 결과로 보완한다.
 
 ## 남은 일
 
-- branch를 push하고 PR을 만든 뒤 `run-ac11-security` label로 hosted lane을 실행한다. 실제 finding이 나오면 자동 예외로 숨기지 않고 제품 수정 또는 사유·만료가 있는 독립 검토 대상 allowlist 변경으로 처리한다.
-- hosted report·JUnit·artifact 식별자와 최종 게이트 결과를 이 문서와 작업판에 기록하고 Claude 독립 검토를 요청한다. 전체 AC-11은 다른 필수 축 때문에 계속 미완료다.
+- PR #226에서 Claude 독립 검토와 hosted Backend green을 확인한다. 전체 AC-11은 다른 필수 축 때문에 계속 미완료다.
 
 관련 문서: [[S11-BE_DB_AC-11_통합_인수_설계]], [[Codex 작업 현황]].
