@@ -446,7 +446,11 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
         const errorBanner = container.querySelector('[data-testid="commitment-error-banner"]');
         expect(errorBanner).not.toBeNull();
         expect(errorBanner?.getAttribute('role')).toBe('alert');
+        expect(errorBanner?.textContent).toContain('클라이언트 응답 계약 검증 실패');
         expect(errorBanner?.textContent).toContain('ModelCommitObservation 응답 계약 불일치');
+        expect(errorBanner?.textContent).not.toContain('500');
+        expect(errorBanner?.textContent).not.toContain('(500)');
+        expect(errorBanner?.textContent).not.toContain('FETCH_ERROR');
 
         // Critical: corrupt data must NOT be rendered
         const resultContainer = container.querySelector('[data-testid="commitment-result-container"]');
@@ -521,7 +525,11 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
         const errorBanner = container.querySelector('[data-testid="commitment-error-banner"]');
         expect(errorBanner).not.toBeNull();
         expect(errorBanner?.getAttribute('role')).toBe('alert');
+        expect(errorBanner?.textContent).toContain('클라이언트 응답 계약 검증 실패');
         expect(errorBanner?.textContent).toContain('ModelCommitObservation 응답 계약 불일치');
+        expect(errorBanner?.textContent).not.toContain('500');
+        expect(errorBanner?.textContent).not.toContain('(500)');
+        expect(errorBanner?.textContent).not.toContain('FETCH_ERROR');
 
         const resultContainer = container.querySelector('[data-testid="commitment-result-container"]');
         expect(resultContainer).toBeNull();
@@ -594,7 +602,11 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
         const errorBanner = container.querySelector('[data-testid="commitment-error-banner"]');
         expect(errorBanner).not.toBeNull();
         expect(errorBanner?.getAttribute('role')).toBe('alert');
+        expect(errorBanner?.textContent).toContain('클라이언트 응답 계약 검증 실패');
         expect(errorBanner?.textContent).toContain('ModelCommitObservation 응답 계약 불일치');
+        expect(errorBanner?.textContent).not.toContain('500');
+        expect(errorBanner?.textContent).not.toContain('(500)');
+        expect(errorBanner?.textContent).not.toContain('FETCH_ERROR');
 
         const resultContainer = container.querySelector('[data-testid="commitment-result-container"]');
         expect(resultContainer).toBeNull();

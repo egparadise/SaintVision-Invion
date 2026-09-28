@@ -86,7 +86,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       setLineages(mlopsManager.getLineages());
       setActionNotice({
         type: 'success',
-        text: `✔ [${res.isSimulated ? '모의 시뮬레이션' : '배포 완료'}] [${res.deployedModel?.modelName}] 로컬 배포 게이트 시뮬레이션 완료 (백엔드 서빙 배포 API 미노출 상태로 실제 인프라 미반영 · 백엔드 digest 고정과 무관 · Digest: ${res.deployedModel?.deploymentDigest.slice(0, 24)}...)`,
+        text: `✔ [모의 시뮬레이션] [${res.deployedModel?.modelName}] 로컬 배포 게이트 시뮬레이션 완료 (백엔드 서빙 배포 API 미노출 상태로 실제 인프라 미반영 · 백엔드 digest 고정과 무관 · Digest: ${res.deployedModel?.deploymentDigest.slice(0, 24)}...)`,
       });
     }
   };
@@ -108,12 +108,21 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
     } catch (err: any) {
       setCommitmentData(null);
       const prob = err?.problem;
-      setCommitmentError({
-        code: prob?.code || 'FETCH_ERROR',
-        status: prob?.status || (err?.status ?? 500),
-        title: prob?.title || 'Error',
-        detail: prob?.detail || err.message || 'Commitment 조회 중 오류가 발생했습니다.',
-      });
+      if (prob) {
+        setCommitmentError({
+          code: prob.code,
+          status: prob.status,
+          title: prob.title,
+          detail: prob.detail || '요청이 거절되었습니다.',
+        });
+      } else {
+        const isContractMismatch = err?.message && err.message.includes('계약 불일치');
+        setCommitmentError({
+          detail: isContractMismatch
+            ? `클라이언트 응답 계약 검증 실패: ${err.message}`
+            : (err?.message || '네트워크 오류가 발생했습니다.'),
+        });
+      }
     } finally {
       setCommitmentLoading(false);
     }
@@ -608,7 +617,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               color: '#f85149',
             }}
           >
-            ❌ [{commitmentError.code || 'ERROR'}] ({commitmentError.status || 500}) {commitmentError.title ? `${commitmentError.title}: ` : ''}{commitmentError.detail}
+            ❌ {commitmentError.code && commitmentError.status ? `[${commitmentError.code}] (${commitmentError.status}) ${commitmentError.title ? `${commitmentError.title}: ` : ''}` : ''}{commitmentError.detail}
           </div>
         )}
 

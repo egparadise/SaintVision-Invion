@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.123"
+version: "1.0.124"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-28T17:45:00+09:00"
+updated: "2026-09-28T09:50:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,15 +19,15 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-28T17:45:00+09:00 (최신 tip `904d0f08`, 작업 브랜치 `agent/gemini/s10-fe-fixes`, PR #146).
+- 확인 기준: 2026-09-28T09:50:00+09:00 (최신 tip `agent/gemini/s10-fe-fixes`, PR #146).
 
 ## 2026-09-28 S10-FE 제품 결함 수정 및 Claude UI / Codex 계약 재검토 전수 반영 (agent/gemini/s10-fe-fixes, PR #146)
 
 - **Claude UI 검토 의견 전수 조치 완결**:
   - **[차단 1] Model Commitment 시험 입력 및 Fixture 정규화**: `tests/model-lineage.test.ts`에서 컴포넌트 렌더 후 입력값 주입 후 fetch 트리거, Crockford Base32 정본 ULID(`prj_`/`mdl_`/`run_` + 26자), 64자 소문자 hex `manifestHash`, UUID `commitRecoveryEpoch` 정합.
-  - **[차단 2] 배포 알림 문구 동기화**: 배포 완료 문구를 `✔ [모의 시뮬레이션] [...] 로컬 배포 게이트 시뮬레이션 완료`로 일원화하고 `write-actions-integrity-wiring.test.tsx`에서 '검증 완료' 부재를 단언.
+  - **[차단 2] 배포 알림 문구 고정 및 도달 불가 분기 제거**: `res.isSimulated ? ... : '배포 완료'` 삼항 연산자를 제거하고 `✔ [모의 시뮬레이션] [...] 로컬 배포 게이트 시뮬레이션 완료` 고정 문구로 일원화. `write-actions-integrity-wiring.test.tsx`에서 '검증 완료' 부재를 단언.
   - **[중 3] Commitment 조회 패널 기본값 공백화**: `commitmentProject`, `commitmentModelId`, `commitmentVersion`의 초기값을 `''`로 설정하여 명시적 오퍼레이터 입력 강제.
-  - **[경 4] 오류 배너 구조화**: `❌ [{code}] ({status}) {title}: {detail}` 형식으로 ProblemDetails 필드 보존 및 2인 승인 모의 게이트 표기, `CURRENT AVAILABILITY` 및 `EXECUTION REVALIDATION` 필드 표출.
+  - **[경 4] 오류 배너 합성 값 제거 및 정직한 표기**: problem이 없는 오류(가드의 계약 불일치 throw, 네트워크 오류)에 합성 `FETCH_ERROR` 및 status `500`을 채우지 않고 `클라이언트 응답 계약 검증 실패`로 명확히 구분. `tests/model-lineage.test.ts` 3대 계약 불일치 시험에 `(500)` 및 `FETCH_ERROR` 부재 단언 추가. 2인 승인 모의 게이트 표기, `CURRENT AVAILABILITY` 및 `EXECUTION REVALIDATION` 필드 표출.
 - **Codex 계약 축 재확인 의견 전수 조치 완결**:
   - **`isModelCommitObservation` 엄격 런타임 가드 구현**: `core.schema.json` 정본에 따라 Crockford ULID 패턴, manifestHash 64자 hex, epoch UUID, ISO datetime, required 필드 전수 및 const 불변식(`committed === true`, `currentAvailability === 'unknown'`, `requiresExecutionRevalidation === true`)을 런타임에 전수 검증.
   - **`additionalProperties: false` 엄격 대조 실장**: `MODEL_COMMIT_OBSERVATION_KEYS`(정확히 15개 허용 key 집합)를 정의하고, 응답 객체의 모든 key가 허용 집합에 속하며 길이가 일치하는지 전수 대조하여 임의 필드 유입 차단.
