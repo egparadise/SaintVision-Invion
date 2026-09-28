@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.121"
+version: "1.0.126"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-23T10:30:00+09:00"
+updated: "2026-09-28T18:58:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,68 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-23T10:30:00+09:00 (최신 tip `fdd4a895`, 작업 브랜치 `agent/gemini/s04-fe-matrix-measured`).
+- 확인 기준: 2026-09-28T18:58:00+09:00 (최신 tip `agent/gemini/s10-fe-conformance-status`).
+
+## 2026-09-28 S10-FE 어댑터 conformance 관측 화면 새 API(G-03 1단계) 연동 및 Claude UI·Codex 계약 리뷰 전수 반영 (agent/gemini/s10-fe-conformance-status)
+
+- **Claude UI (F1~F7, 변이 M1~M10) 및 Codex 계약 (F-R1) 리뷰 결함 전수 조치 완결**:
+  - **F1 / F-R1 (생성 계약 타입 결속 및 손편집 완전 제거)**:
+    - `packages/contracts-ts/src/index.ts` 수작업 추가 15줄을 base 커밋(`18a59027`) 상태로 되돌리고 `types.ts` 수작업 re-export 제거.
+    - `adapterObservation.ts` 및 `ModelLineageView.tsx`가 생성 모듈 `@/contracts/conformance-status-response`를 직결 import.
+    - `model-lineage.test.ts`에 생성 타입 결속 회귀 시험 추가.
+    - `npm run contracts:check` PASS (17 API response types match schemas).
+  - **F2 (PR #200 백엔드 실 응답 정합 및 허위 오류 코드 전면 제거)**:
+    - 403: 실제 RFC 9457 정본(`AUTH-0030`, `detail: "This project is not accessible."`) fixture 적용.
+    - 401: 실제 InvError 레거시 형태(`AUTH-MISSING-CREDENTIAL`) 및 FE `client.ts`의 `[NET-0401] (401) Request rejected: a bearer credential is required` 폴백 표출 검증.
+    - 404: 미존재 `RES-0004` 및 가짜 문구 '프로젝트를 찾을 수 없습니다' 전면 제거, 라우트 미배포 폴백(`NET-0404` / 404 / "Not Found")만 정직하게 검증.
+    - 체크리스트 Fixture: `adapters/conformance.py:357-389`의 `CHECKLIST` 정본 15개 명칭, 12 Standard / 3 Gated 게이팅, 실제 어댑터 4종, 실제 reason 문자열로 교체.
+    - 대소문자 무관 `/pass/i` 거부 단언 적용. `AUTH-0001`, `RES-0004`, 가짜 문구 검색 0건.
+  - **F3 (500, 네트워크, 502 HTML 에러 및 성공→403 전이 시험, M8 변이 사살)**:
+    - 성공 → 403 전이 시 이전 체크리스트 컨테이너 완전 격리(null) 단언으로 변이 M8 사살.
+    - 네트워크 단절(`TypeError: Failed to fetch`), 500(`SYS-0002`), 502 HTML 프록시 에러 시험 추가.
+    - 비JSON/HTML 및 5xx NET 에러 수신 시 안전한 한국어 문구 변환으로 마크업 누출 원천 차단.
+  - **F4 (하드코딩 "15개" 표기 제거)**: 소제목 및 미측정 안내문에서 "15개" 제거, 동적 시험에서 패널 textContent에 "15개" 미포함 단언.
+  - **F5 (Standard 배지 색상 상향 및 DOM 스타일 직접 실측 대비 계산)**:
+    - Standard 배지 텍스트를 `#a0a8b2`로 상향하여 `#161b22` 위 15% 알파 블렌딩 배경 대비 5.52:1 확보.
+    - 렌더된 DOM 엘리먼트의 `style.color`와 `backgroundColor`를 직접 읽어 sRGB 상대휘도 및 알파 합성 대비율 실측 계산.
+  - **F6 (문구 정직성 정비)**: 조회 전 `미측정 (미조회)`, 에러 시 `조회 실패`, 성공 알림 `조회 완료: 미측정(NOT_OBSERVED)`. 에러 라이브 알림 간결화.
+  - **F7 (미사용 initialConformance prop 및 마운트 useEffect 제거)**: 비동기 abort 누락 및 가드 우회 경로 원천 차단.
+  - **변이 사살 및 a11y 강화**: M6(부정 descriptor 필드 거부), M8(성공->403 잔존 사살), M9(HTML 누출 차단), M10(DOM 스타일 실측 대비), 테이블 `<caption>` / `th scope="col"` / 고유 key(`${idx}-${check.name}`) 적용.
+- **백엔드 소스 변경 0**: 프런트엔드 소스 및 테스트만 변경.
+- **실측 검증 결과**:
+  - `npm test -- model-lineage`: PASS (23 tests passed).
+  - `npm test`: PASS (78 files, 707 passed).
+  - `npx tsc -b && npm run build`: PASS (타입 에러 0건, 806.38 kB 번들 생성 성공).
+  - `pytest tests/test_route_coverage.py`: PASS (40 passed).
+  - `python tools/check_frontend_integrity.py`: PASS (0 violations).
+  - `python tools/check_contract_bindings.py`: PASS (55 fixtures, 20 bound types, 14 replay guards).
+  - `python tools/check_docs.py`: PASS (911 versioned docs, DAG 무결성).
+  - `python tools/sync_obsidian.py --check`: PASS (0 conflicts).
+
+## 2026-09-28 S10-FE 제품 결함 수정 및 Claude UI / Codex 계약 재검토 전수 반영 (agent/gemini/s10-fe-fixes, PR #146)
+
+- **Claude UI 검토 의견 전수 조치 완결**:
+  - **[차단 1] Model Commitment 시험 입력 및 Fixture 정규화**: `tests/model-lineage.test.ts`에서 컴포넌트 렌더 후 입력값 주입 후 fetch 트리거, Crockford Base32 정본 ULID(`prj_`/`mdl_`/`run_` + 26자), 64자 소문자 hex `manifestHash`, UUID `commitRecoveryEpoch` 정합.
+  - **[차단 2] 배포 알림 문구 고정 및 도달 불가 분기 제거**: `res.isSimulated ? ... : '배포 완료'` 삼항 연산자를 제거하고 `✔ [모의 시뮬레이션] [...] 로컬 배포 게이트 시뮬레이션 완료` 고정 문구로 일원화. `write-actions-integrity-wiring.test.tsx`에서 '검증 완료' 부재를 단언.
+  - **[중 3] Commitment 조회 패널 기본값 공백화**: `commitmentProject`, `commitmentModelId`, `commitmentVersion`의 초기값을 `''`로 설정하여 명시적 오퍼레이터 입력 강제.
+  - **[경 4] 오류 배너 합성 값 제거 및 정직한 표기**: problem이 없는 오류(가드의 계약 불일치 throw, 네트워크 오류)에 합성 `FETCH_ERROR` 및 status `500`을 채우지 않고 `클라이언트 응답 계약 검증 실패`로 명확히 구분. `tests/model-lineage.test.ts` 3대 계약 불일치 시험에 `(500)` 및 `FETCH_ERROR` 부재 단언 추가. 2인 승인 모의 게이트 표기, `CURRENT AVAILABILITY` 및 `EXECUTION REVALIDATION` 필드 표출.
+- **Codex 계약 축 재확인 의견 전수 조치 완결**:
+  - **`isModelCommitObservation` 엄격 런타임 가드 구현**: `core.schema.json` 정본에 따라 Crockford ULID 패턴, manifestHash 64자 hex, epoch UUID, ISO datetime, required 필드 전수 및 const 불변식(`committed === true`, `currentAvailability === 'unknown'`, `requiresExecutionRevalidation === true`)을 런타임에 전수 검증.
+  - **`additionalProperties: false` 엄격 대조 실장**: `MODEL_COMMIT_OBSERVATION_KEYS`(정확히 15개 허용 key 집합)를 정의하고, 응답 객체의 모든 key가 허용 집합에 속하며 길이가 일치하는지 전수 대조하여 임의 필드 유입 차단.
+  - **RFC 3339 달력 정합성 검증 (`isValidIsoDateTime`)**: 윤년 판정, 월별 일수(28/29/30/31일), 시·분·초(0~23, 0~59, 0~60), 타임존 오프셋 범위 및 `Date.parse()` 왕복 검증을 통해 `2026-02-30T25:61:00Z` 등 달력상 불가능한 값의 유입 원천 차단.
+  - **정본 `ProblemDetails` Mock 및 UI 단언**: 404 시험에 RFC 9457 / core.schema.json 정본 mock(`type: 'about:blank'`, `status: 404`, `code: 'MODEL-0004'`, `category: 'RES'`, `traceId`)을 적용하여 `apiClient`의 `isProblemDetails` 통과 및 UI의 `code`/`status` 보존 렌더링 단언.
+  - **3대 부정 회귀 시험 실장 (`model-lineage.test.ts`)**:
+    1. 비정본 manifestHash (`bad_hash_not_64_hex`) 거부
+    2. 추가 필드 (`unexpectedProperty`) 거부 (additionalProperties: false 검증)
+    3. 불가능한 달력 일시 (`2026-02-30T25:61:00Z`) 거부
+    위반 시 상세 결과 컨테이너 미렌더링 및 계약 불일치 에러 배너 표출 실측.
+- **실측 검증 증거 (HEAD: `904d0f08`)**:
+  - Hosted CI 전수 PASS (All Green):
+    - `Frontend Build & Test` (Run `36363112955`, Job `108744093154`): **PASS (47s)** - Vitest 78 suites / 682 passed (+2 tests), `tsc -b` 타입 오류 0건, 번들 생성 성공.
+    - `Documentation Build` (Run `36363112963`, Job `108744093222`): **PASS (19s)**
+    - `Desktop HTTP Browser Acceptance` (Run `36362842043` / `36363112956`): **PASS (1m58s)**
+    - `Backend Build` (Run `36362150709`): **PASS (Python 3.12 9m20s / Python 3.14 8m10s)**
+  - 로컬 게이트: `check_frontend_integrity.py` PASS (0 violations), `test_route_coverage.py` PASS (39 passed), `check_contract_bindings.py` PASS, `check_docs.py` PASS, `sync_obsidian.py --check` PASS (0 conflicts).
 
 ## 2026-09-23 S04-FE Claude 리뷰 F1~F5 전수 조치 및 정직 증거 갱신 (`agent/gemini/s04-fe-matrix-measured`)
 
