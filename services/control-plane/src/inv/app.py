@@ -214,6 +214,7 @@ def create_app(
     workspace=None,
     business=None,
     model_retry=None,
+    unresolved_settings=None,
 ):
     @asynccontextmanager
     async def lifespan(api):
@@ -302,6 +303,23 @@ def create_app(
                  "expiresAt": identity.expires_at}
         validate_contract("SessionView", value)
         return value
+
+    @api.get("/v1/operations/configuration-readiness")
+    def configuration_readiness(identity=Depends(authenticated)):
+        """Name unresolved operator inputs without exposing their values."""
+        from .containment import operator
+
+        with database.transaction(identity.principal.tenant_id) as conn:
+            operator(conn, identity.principal)
+        if unresolved_settings is None:
+            raise DomainError("SYS-0001", "Configuration observation unavailable", 503)
+        unresolved = unresolved_settings()
+        response = {
+            "status": "ready" if not unresolved else "blocked",
+            "unresolvedSettings": unresolved,
+        }
+        validate_contract("ConfigurationReadinessView", response)
+        return response
 
     @api.get("/v1/projects")
     def projects(identity=Depends(authenticated)):
@@ -1080,6 +1098,7 @@ def create_configured_app():
             "modelRegistryPolicy",
             "modelVerifier",
             "placementShortCommit",
+            "configurationReadiness",
         }:
             raise ValueError()
         identity = AccessTokens(**settings["identity"])
@@ -1114,6 +1133,8 @@ def create_configured_app():
                 database,
                 ConfiguredModelVerifier(**configured_model_roots(settings["modelVerifier"])),
             )
+        from .configuration_readiness import configured_s01_readiness
+
         return create_app(
             database,
             identity,
@@ -1121,6 +1142,9 @@ def create_configured_app():
             workspace=workspace,
             business=business,
             model_retry=model_retry,
+            unresolved_settings=configured_s01_readiness(
+                settings.get("configurationReadiness")
+            ),
         )
     except Exception:
         raise RuntimeError(
