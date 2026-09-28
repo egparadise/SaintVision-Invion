@@ -269,6 +269,28 @@ def test_two_model_versions_cannot_share_content(app_sessionmaker, catalogue):
                     )
 
 
+def test_the_same_version_with_a_different_digest_is_refused(app_sessionmaker, catalogue):
+    """S10-ST immutable version (card aw gap G1): re-registering ``1.0.0`` under a different
+    content digest is refused by ``uq_model_versions_model_id_version`` -- a version name can
+    never be re-pointed at other bytes, only a new version can be cut."""
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, catalogue["tenant_a"]):
+                lineage_service.register_model_version(
+                    session, tenant_id=catalogue["tenant_a"], model_id=catalogue["model_id"],
+                    version="1.0.0", content_sha256=WEIGHTS_SHA,
+                    uri="inv://models/classifier@1.0.0", now=NOW,
+                )
+        with pytest.raises(IntegrityError):
+            with session.begin():
+                with tenant_scope(session, catalogue["tenant_a"]):
+                    lineage_service.register_model_version(
+                        session, tenant_id=catalogue["tenant_a"], model_id=catalogue["model_id"],
+                        version="1.0.0", content_sha256="e" * 64,
+                        uri="inv://models/classifier@1.0.0", now=NOW,
+                    )
+
+
 def test_model_versions_are_append_only_for_the_application(app_sessionmaker, catalogue):
     with app_sessionmaker() as session:
         with session.begin():
