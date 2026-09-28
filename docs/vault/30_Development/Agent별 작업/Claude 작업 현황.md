@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.21"
+version: "1.2.22"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T09:55:00+09:00"
+updated: "2026-09-28T23:53:17+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+외부 전제 인수 준비 패키지 카드 109 (Claude, 2026-09-28, 분석 tree `9f1c2be4` = `origin/coord/train-ci-2207`, base `integration/all-agents-unified`, docs-only): 재채점(PR #220) v1.3이 보인 "48 중 34개가 75점 천장"의 원인 18개(`G-15`~`G-26`·`U1`~`U6`)를 **사용자가 가장 빨리 줄 수 있는 형태**로 정리했다 — 항목마다 (1) 줄 것 (2) 양식 (3) 꽂히는 곳(env·경로, `git grep`으로 실재 확인) (4) 직후 명령·lane (5) 기대 증거 (6) 열리는 관측·task. **전제 제공이 곧 점수가 아니라는 것을 §0에 먼저 적었다** — 전제는 막힌 관측을 열고 점수는 그 관측을 기록한 뒤에 오른다. 빠른 순서는 `G-19`+`U1`·`U5`(10+ task, 풀리면 AC-11 네 축이 동시에) → `G-24` → `G-15`+`U2` → `G-20`+`U6` → `G-22` → `G-25`·`G-26` 순이다. **`G-15`에서 중요한 사실 하나**: JWKS는 **URL이 아니라 파일**이다 — `config.py:17-23`이 `INV_OIDC_JWKS_URL`을 **제거한 결정**을 기록한다(검증기는 설계상 offline이고, 검증 시점 fetch는 IdP 가용성을 모든 요청의 의존성으로, 그 DNS를 신뢰 경계로 만든다). **`G-19`·`G-24`는 2026-09-23 LAN pilot을 읽기 전용으로 정리했다**(ssh·서비스 재시작·Docker 조작 0건) — 상태 파일의 `nodes` 3개가 모두 `provisioned: true`이고 PKI·agent 이미지·worker.zip까지 있어 **3대 경로는 이미 걸어 본 길**이다. 남은 것은 4·5번째 PC(당시 미확인), 이 PC의 CP 동거 worker(Docker Desktop API 1.41 제약 — ADR-100상 timed 분모 제외이므로 all-five smoke만 채운다), 그리고 **현재 release SHA에서의 재수립**(pilot `baseSHA`는 `d01c931a`)이다. 상태 파일에 DSN 비밀번호가 평문으로 있어 **문서에 옮기지 않고 재발급을 권고**했다. 인용 경로 11개·env 16개 실재 확인, 비밀·IP 누출 0, wiki link 0. 다음 첫 행동: Codex 검토. 전문 [[외부 전제 인수 준비 패키지]].
 
 hosted Core junit로 S04/05/07-DB 케이스 수치 보강 카드 12 (Claude, 2026-09-22, 읽기 전용): artifact `saintvision-core-evidence`(run 35706465645 `3d1892c0` + proof 35714470445 `f2aa2b14`)를 .work/ci-junit에 받아(바이너리 삭제 후 1.4MB) 파일별 수치(core 2948/58/0·shard-recovery 21·containment 28·workspace 22·business-handoff 17·lan-installer 15·docker-host 2, f2aa2b14는 core 2998/58/0 외 동일)와 카드 10의 hosted-only 항목 케이스 이름을 classname으로 추출 — 재전송 hash(output_ingestion 5·node_delivery 18·results 21), placement Explain(placement 12), shard replacement 21, containment 28, workspace 복구 12+11, 노드 스토리지 전송 27 — **전부 passed**. hosted에도 없는 것(AC-05 결정성/P95·AC-07 60초/95%·CX01)은 그대로 물리/5노드 대기로 명시. 패키지 §C-2 + 검증상태지도 §12 보강. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 
