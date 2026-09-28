@@ -44,7 +44,8 @@ describe('G-07 100 Prompt / 30 Coding Golden Eval Runner (EVL-05)', () => {
 
   it('verifies committed canonical Evidence JSON against drift (eval:check, F1 & F4)', () => {
     const freshEvidence = runSyntheticEvalSuite();
-    const evidenceDir = path.resolve(__dirname, '../../../docs/vault/30_Development/Evidence');
+    const rootDir = path.resolve(__dirname, '../../..');
+    const evidenceDir = path.join(rootDir, 'docs/vault/30_Development/Evidence');
 
     // Locate committed evidence file
     const files = fs.readdirSync(evidenceDir).filter((f) => f.startsWith('s09-g07-eval-evidence-') && f.endsWith('.json'));
@@ -64,25 +65,39 @@ describe('G-07 100 Prompt / 30 Coding Golden Eval Runner (EVL-05)', () => {
 
     // 2. Invariant: sourceHeadSha is a real 40-hex commit object (F1)
     expect(loaded.sourceHeadSha).toMatch(/^[0-9a-f]{40}$/);
-    execFileSync('git', ['cat-file', '-e', `${loaded.sourceHeadSha}^{commit}`]);
-    const objType = execFileSync('git', ['cat-file', '-t', loaded.sourceHeadSha], { encoding: 'utf-8' }).trim();
+    execFileSync('git', ['cat-file', '-e', `${loaded.sourceHeadSha}^{commit}`], { cwd: rootDir });
+    const objType = execFileSync('git', ['cat-file', '-t', loaded.sourceHeadSha], { cwd: rootDir, encoding: 'utf-8' }).trim();
     expect(objType).toBe('commit');
 
     // 3. Invariant: gitBlobOids match git blob hashes of target files in that commit
-    const expectedAgentEngine = execSync(`git rev-parse ${loaded.sourceHeadSha}:apps/web/src/features/agent/agentEngine.ts`, { encoding: 'utf-8' }).trim();
+    const expectedAgentEngine = execSync(`git rev-parse ${loaded.sourceHeadSha}:apps/web/src/features/agent/agentEngine.ts`, { cwd: rootDir, encoding: 'utf-8' }).trim();
     expect(loaded.gitBlobOids.agentEngine).toBe(expectedAgentEngine);
 
-    const expectedEvalRunner = execSync(`git rev-parse ${loaded.sourceHeadSha}:apps/web/src/features/agent/evalRunner.ts`, { encoding: 'utf-8' }).trim();
+    const expectedEvalRunner = execSync(`git rev-parse ${loaded.sourceHeadSha}:apps/web/src/features/agent/evalRunner.ts`, { cwd: rootDir, encoding: 'utf-8' }).trim();
     expect(loaded.gitBlobOids.evalRunner).toBe(expectedEvalRunner);
 
-    const expectedMutationTools = execSync(`git rev-parse ${loaded.sourceHeadSha}:apps/web/src/features/agent/mutationTools.ts`, { encoding: 'utf-8' }).trim();
+    const expectedMutationTools = execSync(`git rev-parse ${loaded.sourceHeadSha}:apps/web/src/features/agent/mutationTools.ts`, { cwd: rootDir, encoding: 'utf-8' }).trim();
     expect(loaded.gitBlobOids.mutationTools).toBe(expectedMutationTools);
 
-    const expectedPrompts = execSync(`git rev-parse ${loaded.sourceHeadSha}:apps/web/tests/fixtures/prompts_100.json`, { encoding: 'utf-8' }).trim();
+    const expectedPrompts = execSync(`git rev-parse ${loaded.sourceHeadSha}:apps/web/tests/fixtures/prompts_100.json`, { cwd: rootDir, encoding: 'utf-8' }).trim();
     expect(loaded.gitBlobOids.promptsFixture).toBe(expectedPrompts);
 
-    const expectedCoding = execSync(`git rev-parse ${loaded.sourceHeadSha}:apps/web/tests/fixtures/coding_tasks_30.json`, { encoding: 'utf-8' }).trim();
+    const expectedCoding = execSync(`git rev-parse ${loaded.sourceHeadSha}:apps/web/tests/fixtures/coding_tasks_30.json`, { cwd: rootDir, encoding: 'utf-8' }).trim();
     expect(loaded.gitBlobOids.codingTasksFixture).toBe(expectedCoding);
+
+    // 3b. Invariant: Disk files match committed gitBlobOids (1-byte runner change fails drift check)
+    const diskBlobOids = {
+      agentEngine: execSync(`git hash-object "${path.join(rootDir, 'apps/web/src/features/agent/agentEngine.ts')}"`, { cwd: rootDir, encoding: 'utf-8' }).trim(),
+      evalRunner: execSync(`git hash-object "${path.join(rootDir, 'apps/web/src/features/agent/evalRunner.ts')}"`, { cwd: rootDir, encoding: 'utf-8' }).trim(),
+      mutationTools: execSync(`git hash-object "${path.join(rootDir, 'apps/web/src/features/agent/mutationTools.ts')}"`, { cwd: rootDir, encoding: 'utf-8' }).trim(),
+      promptsFixture: execSync(`git hash-object "${path.join(rootDir, 'apps/web/tests/fixtures/prompts_100.json')}"`, { cwd: rootDir, encoding: 'utf-8' }).trim(),
+      codingTasksFixture: execSync(`git hash-object "${path.join(rootDir, 'apps/web/tests/fixtures/coding_tasks_30.json')}"`, { cwd: rootDir, encoding: 'utf-8' }).trim(),
+    };
+    expect(diskBlobOids.agentEngine).toBe(loaded.gitBlobOids.agentEngine);
+    expect(diskBlobOids.evalRunner).toBe(loaded.gitBlobOids.evalRunner);
+    expect(diskBlobOids.mutationTools).toBe(loaded.gitBlobOids.mutationTools);
+    expect(diskBlobOids.promptsFixture).toBe(loaded.gitBlobOids.promptsFixture);
+    expect(diskBlobOids.codingTasksFixture).toBe(loaded.gitBlobOids.codingTasksFixture);
 
     // 4. Invariant: Summary arithmetic sum consistency and zero fail (Codex C3)
     expect(loaded.summary.promptsPass + loaded.summary.promptsFail + loaded.summary.promptsKnownFalsePositive).toBe(100);
