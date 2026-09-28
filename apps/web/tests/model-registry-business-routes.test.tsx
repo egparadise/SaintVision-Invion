@@ -1820,7 +1820,7 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
 
     const approvalInput = container.querySelector('[data-testid="approval-input"]') as HTMLInputElement;
     expect(approvalInput).not.toBeNull();
-    expect(approvalInput.getAttribute('placeholder')).toBe('승인 식별자 입력 (apv_...)');
+    expect(approvalInput.getAttribute('placeholder')).toBe('승인 식별자 입력 (apr_...)');
   });
 
   it('Test 25 (Card 138 Item 6): W2 register generation guard alone discards late responses when generation changes', async () => {

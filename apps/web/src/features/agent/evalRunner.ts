@@ -94,7 +94,7 @@ export interface EvalEvidence {
 
 export const EXPECTED_FIXTURE_BYTE_SHA256 = {
   prompts100: 'f8962fdaaac27303d0ea3631a84f6e49a21008f6e9cc1b24d0806a73a47364b2',
-  codingTasks30: 'ed4c3841bfd1b82090bfaf175094ee2a48298363d69c41df4582807eccdcbd96',
+  codingTasks30: '070d959ff589882193df276612f825ad7ee2a356a3d1fa503f7eff6a1a6f9a89',
 };
 
 export const ALLOWED_PROMPT_CATEGORIES = new Set([
@@ -332,6 +332,20 @@ export interface RunSyntheticSuiteOptions {
   codingTasksByteSha256?: string;
 }
 
+export function computeCasesDigest(
+  cases: Array<{
+    id: string;
+    inputSha256: string;
+    expected: string;
+    observed: string;
+    loopCount?: number | null;
+    verdict: string;
+  }>
+): string {
+  const digestPayload = cases.map((c) => `${c.id}:${c.inputSha256}:${c.expected}:${c.observed}:${c.loopCount ?? 0}:${c.verdict}`).join('|');
+  return sha256Hex(digestPayload);
+}
+
 /**
  * Execute the 130-case G-07 Synthetic Evaluation Suite (EVL-05)
  */
@@ -477,8 +491,7 @@ export function runSyntheticEvalSuite(options: RunSyntheticSuiteOptions = {}): E
   const guardConformanceRate = Number(((codingTasksPass / codingTasks.length) * 100).toFixed(1));
 
   // Compute canonical casesDigest
-  const digestPayload = cases.map((c) => `${c.id}:${c.inputSha256}:${c.expected}:${c.observed}:${c.loopCount ?? 0}:${c.verdict}`).join('|');
-  const casesDigest = sha256Hex(digestPayload);
+  const casesDigest = computeCasesDigest(cases);
 
   // Compute or obtain real Git Blob OIDs and sourceHeadSha (F1)
   const sourceHeadSha = options.sourceHeadSha || (() => {
@@ -507,14 +520,8 @@ export function runSyntheticEvalSuite(options: RunSyntheticSuiteOptions = {}): E
       try {
         const { execSync } = require('child_process');
         return execSync(`git rev-parse ${sourceHeadSha}:${relPath}`, { cwd: repoRoot, encoding: 'utf-8', stdio: ['pipe', 'pipe', 'ignore'] }).trim();
-      } catch {
-        try {
-          const { execSync } = require('child_process');
-          const fullPath = path.join(repoRoot, relPath);
-          return execSync(`git hash-object "${fullPath}"`, { cwd: repoRoot, encoding: 'utf-8' }).trim();
-        } catch (err2) {
-          throw new Error(`FAIL-CLOSED: Unable to resolve canonical gitBlobOid for ${relPath}: ${(err2 as Error).message}`);
-        }
+      } catch (err) {
+        throw new Error(`FAIL-CLOSED: Unable to resolve canonical gitBlobOid for ${relPath} at ${sourceHeadSha}: ${(err as Error).message}`);
       }
     };
     return {

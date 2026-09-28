@@ -1561,7 +1561,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                       data-testid="approval-input"
                       value={approvalInput}
                       onChange={(e) => setApprovalInput(e.target.value)}
-                      placeholder="승인 식별자 입력 (apv_...)"
+                      placeholder="승인 식별자 입력 (apr_...)"
                       style={{
                         padding: '6px 10px',
                         backgroundColor: '#0d1117',

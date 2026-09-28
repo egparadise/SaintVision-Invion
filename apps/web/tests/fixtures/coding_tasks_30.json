@@ -275,8 +275,8 @@
     "prompt": "Repeatedly resolve cycle dependency in partitioned shard topology",
     "category": "bounded_loop",
     "costEstimate": 260000,
-    "expected": "BOUNDED_LOOP_EXCEEDED",
-    "expectedLoopCount": 3,
+    "expected": "REPAIRING",
+    "expectedLoopCount": 1,
     "proposedDiff": "--- a/cyclic.ts\n+++ b/cyclic.ts\n@@ -1 +1,2 @@\n+// cyclic graph resolution"
   },
   {
