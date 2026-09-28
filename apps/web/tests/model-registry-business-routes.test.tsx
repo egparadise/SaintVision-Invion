@@ -343,8 +343,8 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     expect(banner?.textContent).toContain('보존 고정 판정 완료 (200 OK)');
   });
 
-  // 4. Model Release Route Client
-  it('calls releaseModelVersion via POST /release without Idempotency-Key and parses 200 response', async () => {
+  // 4. Model Release Route Client (Card 118: Idempotency-Key header enabled)
+  it('calls releaseModelVersion via POST /release with Idempotency-Key and parses 200 response', async () => {
     let capturedUrl = '';
     let capturedMethod = '';
     let capturedHeaders: Record<string, string> = {};
@@ -375,13 +375,14 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
       'prj_alpha',
       'mdl_01JLLAMA30000000000000000',
       '1.0.0-rc1',
-      { licensePolicy: 'Apache-2.0', classification: 'internal' }
+      { licensePolicy: 'Apache-2.0', classification: 'internal' },
+      { idempotencyKey: 'idem_rel_sample_001' }
     );
 
     expect(capturedMethod).toBe('POST');
     expect(capturedUrl).toBe('/v1/projects/prj_alpha/models/mdl_01JLLAMA30000000000000000/versions/1.0.0-rc1/release');
-    // Release does NOT consume Idempotency-Key on server until Card 113
-    expect(capturedHeaders['idempotency-key']).toBeUndefined();
+    // Release consumes Idempotency-Key on server (Card 113 & Card 118)
+    expect(capturedHeaders['idempotency-key']).toBe('idem_rel_sample_001');
 
     const parsedBody = JSON.parse(capturedBody);
     expect(parsedBody.licensePolicy).toBe('Apache-2.0');
@@ -1391,12 +1392,27 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     expect(container.querySelector('[data-testid="registry-register-success"]')).toBeNull();
   });
 
-  // 20. Release Write UI Fail-Closed Pending Server Idempotency Contract (Card 113)
-  it('strictly keeps release write UI fail-closed pending server idempotency contract (Card 113) with disabled button and no network requests', async () => {
-    let capturedUrls: string[] = [];
-    globalThis.fetch = vi.fn().mockImplementation((url) => {
-      capturedUrls.push(String(url));
-      return Promise.reject(new Error('Should not make any network requests'));
+  // 20. Release Write UI Re-exposed (Card 118: Server Idempotency Contract Active)
+  it('re-exposes release write UI with enabled submit button and Idempotency-Key lifecycle', async () => {
+    let capturedHeaders: Record<string, string>[] = [];
+    globalThis.fetch = vi.fn().mockImplementation((url, init) => {
+      const h: Record<string, string> = {};
+      if (init?.headers instanceof Headers) {
+        init.headers.forEach((v, k) => {
+          h[k.toLowerCase()] = v;
+        });
+      } else if (init?.headers) {
+        Object.entries(init.headers).forEach(([k, v]) => {
+          h[k.toLowerCase()] = String(v);
+        });
+      }
+      capturedHeaders.push(h);
+      return Promise.resolve(
+        new Response(JSON.stringify(validReleaseResponse), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      );
     });
 
     await act(async () => {
@@ -1404,7 +1420,7 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
         <ModelLineageView
           projectId="prj_alpha"
           initialModelId="mdl_01JLLAMA30000000000000000"
-          initialVersion="1.0.0"
+          initialVersion="1.0.0-rc1"
           currentUser={{ canApprove: true }}
         />
       );
@@ -1417,46 +1433,65 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
       releaseTabBtn?.click();
     });
 
-    // 1. Release submit button must be strictly disabled and aria-disabled="true"
+    // 1. Release button must be enabled and pending banner must be absent
     const releaseBtn = container.querySelector('[data-testid="btn-release-model"]') as HTMLButtonElement;
     expect(releaseBtn).not.toBeNull();
-    expect(releaseBtn.disabled).toBe(true);
-    expect(releaseBtn.getAttribute('aria-disabled')).toBe('true');
+    expect(releaseBtn.disabled).toBe(false);
+    expect(releaseBtn.textContent).toContain('모델 릴리스 (POST /release)');
+    expect(container.querySelector('[data-testid="banner-release-pending-idempotency"]')).toBeNull();
 
-    // 2. Banner and button text must explicitly guide user about Card 113
-    expect(releaseBtn.textContent).toContain('서버 멱등 계약 대기(카드 113)');
-    const banner = container.querySelector('[data-testid="banner-release-pending-idempotency"]');
-    expect(banner).not.toBeNull();
-    expect(banner?.textContent).toContain('서버 멱등 계약 대기(카드 113)');
-
-    // 3. Attempting to click the button or submit the form must NOT invoke /release
+    // 2. Submit release and verify Idempotency-Key header is sent
     await act(async () => {
       releaseBtn.click();
     });
 
-    const releaseForm = releaseBtn.closest('form');
-    if (releaseForm) {
-      await act(async () => {
-        releaseForm.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-      });
-    }
+    expect(capturedHeaders.length).toBe(1);
+    const firstKey = capturedHeaders[0]['idempotency-key'];
+    expect(firstKey).toBeDefined();
+    expect(firstKey).toMatch(/^rel_/);
 
-    const releaseCalls = capturedUrls.filter((u) => u.includes('/release'));
-    expect(releaseCalls.length).toBe(0);
-    expect(container.querySelector('[data-testid="registry-release-success"]')).toBeNull();
+    // 3. Verify success card and fresh release indicator
+    const successCard = container.querySelector('[data-testid="registry-release-success"]');
+    expect(successCard).not.toBeNull();
+    expect(successCard?.textContent).toContain('모델 릴리스 완료 (200 OK)');
+    const indicator = container.querySelector('[data-testid="release-replay-indicator"]');
+    expect(indicator?.textContent).toBe('신규 릴리스 완료 (Fresh)');
 
-    // 4. Verify releaseModelVersion API client does NOT send Idempotency-Key
-    let capturedHeaders: Record<string, string> = {};
-    globalThis.fetch = vi.fn().mockImplementation((url, init) => {
-      if (init?.headers instanceof Headers) {
-        init.headers.forEach((v, k) => {
-          capturedHeaders[k.toLowerCase()] = v;
-        });
-      } else if (init?.headers) {
-        Object.entries(init.headers).forEach(([k, v]) => {
-          capturedHeaders[k.toLowerCase()] = String(v);
-        });
+    // 4. On subsequent submit after success, key must rotate to a new intent
+    await act(async () => {
+      releaseBtn.click();
+    });
+    expect(capturedHeaders.length).toBe(2);
+    const secondKey = capturedHeaders[1]['idempotency-key'];
+    expect(secondKey).toBeDefined();
+    expect(secondKey).not.toBe(firstKey);
+  });
+
+  // 21. Release Idempotency-Key Preservation Across Failures and Replay Indication
+  it('preserves Idempotency-Key on failure retry and distinguishes replay response', async () => {
+    let capturedHeaders: Record<string, string>[] = [];
+    let callCount = 0;
+
+    globalThis.fetch = vi.fn().mockImplementation(() => {
+      callCount++;
+      if (callCount === 1) {
+        // First attempt fails with 503 transient lock
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({
+              type: 'about:blank',
+              title: 'SYS-0001',
+              status: 503,
+              code: 'SYS-0001',
+              category: 'SYS',
+              detail: 'The resource is locked by another request; retry.',
+              retryable: true,
+            }),
+            { status: 503, headers: { 'Content-Type': 'application/problem+json' } }
+          )
+        );
       }
+      // Second attempt succeeds
       return Promise.resolve(
         new Response(JSON.stringify(validReleaseResponse), {
           status: 200,
@@ -1465,14 +1500,162 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
       );
     });
 
-    await modelRegistryObservation.releaseModelVersion(
-      'prj_alpha',
-      'mdl_01JLLAMA30000000000000000',
-      '1.0.0',
-      { licensePolicy: 'Apache-2.0', classification: 'internal' }
+    await act(async () => {
+      root.render(
+        <ModelLineageView
+          projectId="prj_alpha"
+          initialModelId="mdl_01JLLAMA30000000000000000"
+          initialVersion="1.0.0-rc1"
+          currentUser={{ canApprove: true }}
+        />
+      );
+    });
+
+    const releaseTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('모델 릴리스')
+    );
+    await act(async () => {
+      releaseTabBtn?.click();
+    });
+
+    const releaseBtn = container.querySelector('[data-testid="btn-release-model"]') as HTMLButtonElement;
+
+    // First attempt fails
+    await act(async () => {
+      releaseBtn.click();
+    });
+
+    expect(container.querySelector('[data-testid="registry-problem-alert"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="registry-release-success"]')).toBeNull();
+
+    function extractIdempotencyKey(init: any): string | null {
+      if (init?.headers instanceof Headers) {
+        return init.headers.get('idempotency-key') || init.headers.get('Idempotency-Key');
+      }
+      if (init?.headers) {
+        return init.headers['Idempotency-Key'] || init.headers['idempotency-key'] || null;
+      }
+      return null;
+    }
+
+    // Now inspect fetch calls for idempotency-key preservation
+    const fetchCalls = (globalThis.fetch as any).mock.calls;
+    expect(fetchCalls.length).toBe(1);
+    const key1 = extractIdempotencyKey(fetchCalls[0][1]);
+    expect(key1).not.toBeNull();
+    expect(key1).toMatch(/^rel_/);
+
+    // Retry submission without changing inputs: MUST reuse identical key
+    await act(async () => {
+      releaseBtn.click();
+    });
+
+    expect(fetchCalls.length).toBe(2);
+    const key2 = extractIdempotencyKey(fetchCalls[1][1]);
+    expect(key2).toBe(key1); // Preserved on retry!
+
+    // Second attempt succeeded
+    expect(container.querySelector('[data-testid="registry-release-success"]')).not.toBeNull();
+  });
+
+  // 22. Release Idempotency-Key Rotation on Input Changes
+  it('rotates release Idempotency-Key when licensePolicy or classification changes', async () => {
+    function extractIdempotencyKey(init: any): string | null {
+      if (init?.headers instanceof Headers) {
+        return init.headers.get('idempotency-key') || init.headers.get('Idempotency-Key');
+      }
+      if (init?.headers) {
+        return init.headers['Idempotency-Key'] || init.headers['idempotency-key'] || null;
+      }
+      return null;
+    }
+
+    globalThis.fetch = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify(validReleaseResponse), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
     );
 
-    expect(capturedHeaders['idempotency-key']).toBeUndefined();
+    await act(async () => {
+      root.render(
+        <ModelLineageView
+          projectId="prj_alpha"
+          initialModelId="mdl_01JLLAMA30000000000000000"
+          initialVersion="1.0.0-rc1"
+          currentUser={{ canApprove: true }}
+        />
+      );
+    });
+
+    const releaseTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('모델 릴리스')
+    );
+    await act(async () => {
+      releaseTabBtn?.click();
+    });
+
+    const releaseBtn = container.querySelector('[data-testid="btn-release-model"]') as HTMLButtonElement;
+    await act(async () => {
+      releaseBtn.click();
+    });
+
+    const fetchCalls = (globalThis.fetch as any).mock.calls;
+    const initialKey = extractIdempotencyKey(fetchCalls[0][1]);
+    expect(initialKey).not.toBeNull();
+
+    // Change licensePolicy input
+    const licenseInput = container.querySelector('#input-release-license') as HTMLInputElement;
+    await act(async () => {
+      setInputValue(licenseInput, 'MIT');
+    });
+
+    await act(async () => {
+      releaseBtn.click();
+    });
+
+    expect(fetchCalls.length).toBe(2);
+    const changedKey = extractIdempotencyKey(fetchCalls[1][1]);
+    expect(changedKey).not.toBeNull();
+    expect(changedKey).not.toBe(initialKey);
+  });
+
+  // 23. Fail-Closed Release Authorization Guard
+  it('disables release submit button when canApprove is false or undefined', async () => {
+    globalThis.fetch = vi.fn().mockImplementation(() =>
+      Promise.reject(new Error('Network should not be reached'))
+    );
+
+    await act(async () => {
+      root.render(
+        <ModelLineageView
+          projectId="prj_alpha"
+          initialModelId="mdl_01JLLAMA30000000000000000"
+          initialVersion="1.0.0-rc1"
+          currentUser={{ canApprove: false }}
+        />
+      );
+    });
+
+    const releaseTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('모델 릴리스')
+    );
+    await act(async () => {
+      releaseTabBtn?.click();
+    });
+
+    const releaseBtn = container.querySelector('[data-testid="btn-release-model"]') as HTMLButtonElement;
+    expect(releaseBtn.disabled).toBe(true);
+    expect(container.textContent).toContain('승인 권한(canApprove)이 필요한 작업입니다.');
+
+    const form = releaseBtn.closest('form');
+    await act(async () => {
+      form?.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    });
+
+    // Zero calls to /release
+    expect((globalThis.fetch as any).mock.calls.length).toBe(0);
+    expect(container.querySelector('[role="alert"]')?.textContent).toContain('승인 권한(canApprove)이 없는 계정은 모델을 릴리스할 수 없습니다.');
   });
 
 });
