@@ -13,7 +13,8 @@ Two tables, both tenant-scoped under RLS. The application role may INSERT and
 SELECT; lifecycle columns (``revoked_at`` on a version, ``enabled`` and
 ``revoked_at`` on a grant) get column-level UPDATE so a credential can be
 disabled or revoked without anything else being rewritable (the 0004 lifecycle
-pattern). No secret bytes live here: a version is a file reference pinned by
+pattern), and a BEFORE UPDATE trigger makes those moves one-way: a revocation
+cannot be cleared or moved and a disabled grant cannot be re-enabled. No secret bytes live here: a version is a file reference pinned by
 device/inode and content digest, read by the existing descriptor-bound reader.
 
 Boundary: ``inv.credential_*`` (0035) remains the run-bound contract and is not
@@ -114,6 +115,32 @@ def upgrade() -> None:
         sa.CheckConstraint("recovery_epoch >= 0", name="recovery_epoch_non_negative"),
         sa.CheckConstraint("expires_at > created_at", name="expiry_after_creation"),
     )
+
+    # Lifecycle moves one way only. Column-level UPDATE lets the application
+    # revoke and disable; these triggers refuse the reverse (Codex #176
+    # finding 2): revoked_at may only go NULL -> timestamp and never change
+    # again, enabled may only go true -> false. Plain trigger functions, not
+    # SECURITY DEFINER, so the reviewed definer catalogue is unchanged.
+    op.execute(
+        "CREATE FUNCTION public.service_credential_lifecycle_forward() RETURNS trigger "
+        "LANGUAGE plpgsql AS $fn$ "
+        "BEGIN "
+        "  IF OLD.revoked_at IS NOT NULL AND NEW.revoked_at IS DISTINCT FROM OLD.revoked_at THEN "
+        "    RAISE EXCEPTION 'service credential revocation is final' "
+        "      USING ERRCODE = 'check_violation', CONSTRAINT = 'revocation_is_final'; "
+        "  END IF; "
+        "  IF TG_TABLE_NAME = 'service_credential_grants' AND OLD.enabled = false AND NEW.enabled = true THEN "
+        "    RAISE EXCEPTION 'a disabled service credential grant cannot be re-enabled' "
+        "      USING ERRCODE = 'check_violation', CONSTRAINT = 'disable_is_final'; "
+        "  END IF; "
+        "  RETURN NEW; "
+        "END $fn$"
+    )
+    for table in LIFECYCLE_UPDATE_COLUMNS:
+        op.execute(
+            f"CREATE TRIGGER {table}_lifecycle_forward BEFORE UPDATE ON {table} "
+            f"FOR EACH ROW EXECUTE FUNCTION public.service_credential_lifecycle_forward()"
+        )
 
     for table, columns in LIFECYCLE_UPDATE_COLUMNS.items():
         op.execute(f"GRANT SELECT, INSERT ON {table} TO {APP_ROLE}")

@@ -40,7 +40,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
-from ..tracking.canonical import UriError, canonical_bytes, normalize_tracking_uri
+from ..tracking.canonical import UriError, canonical_json, normalize_tracking_uri
 from ..tracking.codes import (
     TRACK_CONFIG_INVALID,
     TRACK_REFUSED,
@@ -56,6 +56,11 @@ TAG_INTENT: Final[str] = "inv.intent_id"
 TAG_PAYLOAD: Final[str] = "inv.payload"
 TAG_PAYLOAD_SHA256: Final[str] = "inv.payload_sha256"
 TAG_SUBJECT_KIND: Final[str] = "inv.subject_kind"
+#: Written last, after params, metrics and the model version: its value is the
+#: payload digest, and only a FINISHED run carrying it is "mirrored". A run
+#: without it is a partial remote write that the next delivery resumes
+#: (Codex #176 finding 1).
+TAG_COMPLETE: Final[str] = "inv.mirror_complete"
 _LOOPBACK_HOSTS: Final[frozenset[str]] = frozenset({"127.0.0.1", "localhost", "::1"})
 _MAX_BODY: Final[int] = 1 << 20
 
@@ -182,10 +187,17 @@ class MlflowSink:
         payload: dict[str, Any] = {}
         if 200 <= status < 300 and raw:
             try:
-                decoded = json.loads(raw.decode("utf-8"))
+                text = raw.decode("utf-8")
+            except UnicodeDecodeError:
+                text = ""
+            try:
+                decoded = json.loads(text)
                 payload = decoded if isinstance(decoded, dict) else {"value": decoded}
-            except (ValueError, UnicodeDecodeError):
-                payload = {}
+            except ValueError:
+                # ``GET /version`` answers plain text ("2.17.2"), not JSON
+                # (hosted run 36376769104); keep a short text body as a value.
+                stripped = text.strip()
+                payload = {"value": stripped} if stripped and len(stripped) <= 64 else {}
         return _Response(status, payload)
 
     @staticmethod
@@ -234,12 +246,21 @@ class MlflowSink:
         return AuthResult(authenticated=True, principal_ref="service-credential")
 
     def find(self, intent_id: str) -> str | None:
-        """The run tagged with ``intent_id``, or None when the server says there is none.
+        """The *complete* run tagged with ``intent_id``, or None.
 
-        A failure to ask is not "none": it is raised as :class:`MirrorFailure`
-        with the coded result, so the worker records it instead of creating a
-        duplicate on the next ``mirror``.
+        A run that exists but lacks the completion marker (or is not FINISHED)
+        is a partial remote write: it is not returned here, so the worker calls
+        ``mirror``, which resumes it, and it never attests as mirrored. A
+        failure to ask is raised as :class:`MirrorFailure` with the coded
+        result, so the worker records it instead of creating a duplicate.
         """
+        found = self._find_any(intent_id)
+        if found is None:
+            return None
+        run_id, complete = found
+        return run_id if complete else None
+
+    def _find_any(self, intent_id: str) -> tuple[str, bool] | None:
         try:
             experiment_ids = self._experiment_ids()
             if not experiment_ids:
@@ -255,8 +276,17 @@ class MlflowSink:
         runs = response.payload.get("runs") or []
         if not runs:
             return None
-        run_id = runs[0].get("info", {}).get("run_id")
-        return run_id if isinstance(run_id, str) and run_id else None
+        run = runs[0]
+        run_id = run.get("info", {}).get("run_id")
+        if not isinstance(run_id, str) or not run_id:
+            return None
+        return run_id, self._is_complete(run)
+
+    @staticmethod
+    def _is_complete(run: dict[str, Any]) -> bool:
+        tags = {t.get("key"): t.get("value") for t in run.get("data", {}).get("tags", [])}
+        expected = tags.get(TAG_PAYLOAD_SHA256)
+        return bool(expected) and tags.get(TAG_COMPLETE) == expected and run.get("info", {}).get("status") == "FINISHED"
 
     def mirror(self, record: MirrorRecord) -> MirrorResult:
         try:
@@ -267,36 +297,26 @@ class MlflowSink:
             return MirrorResult(MirrorStatus.UNAVAILABLE, error_code=TRACK_UNAVAILABLE, detail=str(exc))
 
     def _mirror(self, record: MirrorRecord) -> MirrorResult:
-        existing = self.find(record.intent_id)
-        if existing is not None:
-            return MirrorResult(MirrorStatus.MIRRORED, reference_id=existing, response_payload_sha256=record.payload_sha256)
+        found = self._find_any(record.intent_id)
+        if found is not None and found[1]:
+            return MirrorResult(MirrorStatus.MIRRORED, reference_id=found[0], response_payload_sha256=record.payload_sha256)
 
-        experiment_id = self._ensure_experiment(record.experiment)
-        if isinstance(experiment_id, MirrorResult):
-            return experiment_id
-
-        canonical = canonical_bytes(record.payload).decode("utf-8")
-        payload = record.payload
-        tags = {
-            TAG_INTENT: record.intent_id,
-            TAG_PAYLOAD_SHA256: record.payload_sha256,
-            TAG_SUBJECT_KIND: record.subject_kind,
-            TAG_PAYLOAD: canonical,
-            **{k: str(v) for k, v in (payload.get("tags") or {}).items()},
-        }
-        run_name, _ = self.redact(f"{record.subject_kind}:{record.intent_id}")
         now_ms = int(dt.datetime.now(dt.timezone.utc).timestamp() * 1000)
-        created = self._call(
-            "POST", f"{API}/runs/create",
-            {"experiment_id": experiment_id, "run_name": run_name, "start_time": now_ms,
-             "tags": [{"key": k, "value": v} for k, v in tags.items()]},
-        )
-        if created.status != 200:
-            return self._failure(created.status, "runs/create")
-        run_id = created.payload.get("run", {}).get("info", {}).get("run_id")
-        if not isinstance(run_id, str) or not run_id:
-            raise MlflowRequestInvalid(created.status, "runs/create:no-run-id")
+        if found is None:
+            experiment_id = self._ensure_experiment(record.experiment)
+            if isinstance(experiment_id, MirrorResult):
+                return experiment_id
+            run_id = self._create_run(record, experiment_id, now_ms)
+            if isinstance(run_id, MirrorResult):
+                return run_id
+        else:
+            run_id = found[0]                       # partial write: resume it, never a second run
 
+        # Every step below is idempotent on the server (the same params and
+        # metrics are accepted again; a model version for this run is created
+        # at most once) and the completion marker is written last, so a fault
+        # at any step leaves a run the next delivery resumes rather than trusts.
+        payload = record.payload
         params = [{"key": k, "value": self._param_value(v)} for k, v in (payload.get("params") or {}).items() if v is not None]
         metrics = [
             {"key": m["key"], "value": float(m["value"]), "timestamp": int(m.get("timestamp_ms", now_ms)), "step": int(m.get("step", 0))}
@@ -312,10 +332,35 @@ class MlflowSink:
             if registry is not None:
                 return registry
 
+        marked = self._call("POST", f"{API}/runs/set-tag", {"run_id": run_id, "key": TAG_COMPLETE, "value": record.payload_sha256})
+        if marked.status != 200:
+            return self._failure(marked.status, "runs/set-tag")
         finished = self._call("POST", f"{API}/runs/update", {"run_id": run_id, "status": "FINISHED", "end_time": now_ms})
         if finished.status != 200:
             return self._failure(finished.status, "runs/update")
         return MirrorResult(MirrorStatus.MIRRORED, reference_id=run_id, response_payload_sha256=record.payload_sha256)
+
+    def _create_run(self, record: MirrorRecord, experiment_id: str, now_ms: int) -> str | MirrorResult:
+        canonical = canonical_json(record.payload).decode("utf-8")
+        tags = {
+            TAG_INTENT: record.intent_id,
+            TAG_PAYLOAD_SHA256: record.payload_sha256,
+            TAG_SUBJECT_KIND: record.subject_kind,
+            TAG_PAYLOAD: canonical,
+            **{k: str(v) for k, v in (record.payload.get("tags") or {}).items()},
+        }
+        run_name, _ = self.redact(f"{record.subject_kind}:{record.intent_id}")
+        created = self._call(
+            "POST", f"{API}/runs/create",
+            {"experiment_id": experiment_id, "run_name": run_name, "start_time": now_ms,
+             "tags": [{"key": k, "value": v} for k, v in tags.items()]},
+        )
+        if created.status != 200:
+            return self._failure(created.status, "runs/create")
+        run_id = created.payload.get("run", {}).get("info", {}).get("run_id")
+        if not isinstance(run_id, str) or not run_id:
+            raise MlflowRequestInvalid(created.status, "runs/create:no-run-id")
+        return run_id
 
     def redact(self, content: str) -> tuple[str, bool]:
         return redact_text(content)
@@ -327,9 +372,13 @@ class MlflowSink:
             return Attestation(result=AttestationResult.UNVERIFIABLE, detail="unreachable")
         if response.status != 200:
             return Attestation(result=AttestationResult.UNVERIFIABLE, detail=f"http {response.status}")
-        tags = {t.get("key"): t.get("value") for t in response.payload.get("run", {}).get("data", {}).get("tags", [])}
+        run = response.payload.get("run", {})
+        tags = {t.get("key"): t.get("value") for t in run.get("data", {}).get("tags", [])}
         stored = tags.get(TAG_PAYLOAD)
         claimed = tags.get(TAG_PAYLOAD_SHA256)
+        if not self._is_complete(run):
+            # A partial write: not verified, not a mismatch -- the next delivery resumes it.
+            return Attestation(result=AttestationResult.UNVERIFIABLE, request_sha256=claimed, detail="incomplete mirror")
         if not isinstance(stored, str) or not stored:
             return Attestation(result=AttestationResult.MISMATCH, request_sha256=claimed, detail="payload tag absent")
         digest = hashlib.sha256(stored.encode("utf-8")).hexdigest()
@@ -381,6 +430,11 @@ class MlflowSink:
         params = record.payload.get("params") or {}
         tags = record.payload.get("tags") or {}
         name = f"{self._prefix}/{params.get('model_id', 'unknown')}"
+        existing = self._call("POST", f"{API}/model-versions/search", {"filter": f"run_id = '{run_id}'", "max_results": 1})
+        if existing.status != 200:
+            return self._failure(existing.status, "model-versions/search")
+        if existing.payload.get("model_versions"):
+            return None                              # resumed delivery: the version already exists
         created = self._call("POST", f"{API}/registered-models/create", {"name": name})
         if created.status not in (200, 400):        # 400 = RESOURCE_ALREADY_EXISTS
             return self._failure(created.status, "registered-models/create")

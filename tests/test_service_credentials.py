@@ -234,6 +234,50 @@ def test_only_lifecycle_columns_can_move_and_nothing_can_be_deleted(app_sessionm
         assert ServiceCredentialRegistry(session).lookup(_request(tenant)) is None      # revoked now
 
 
+@pytest.mark.parametrize(
+    "statement,constraint",
+    [
+        ("UPDATE service_credential_grants SET revoked_at = NULL", "revocation_is_final"),
+        ("UPDATE service_credential_grants SET revoked_at = now() + interval '1 day'", "revocation_is_final"),
+        ("UPDATE service_credential_grants SET enabled = true", "disable_is_final"),
+        ("UPDATE service_credential_versions SET revoked_at = NULL", "revocation_is_final"),
+        ("UPDATE service_credential_versions SET revoked_at = now() + interval '1 day'", "revocation_is_final"),
+    ],
+)
+def test_a_revoked_or_disabled_credential_cannot_be_revived(app_sessionmaker, two_tenants, clean_tables, statement, constraint):
+    """Codex #176 finding 2: revoke and disable are one-way, enforced in the database."""
+    tenant, _ = two_tenants
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, tenant):
+                _seed_credential(session, tenant)
+                session.execute(text("UPDATE service_credential_grants SET enabled = false, revoked_at = now()"))
+                session.execute(text("UPDATE service_credential_versions SET revoked_at = now()"))
+    with app_sessionmaker() as session:
+        with pytest.raises(IntegrityError) as exc:
+            with session.begin():
+                with tenant_scope(session, tenant):
+                    session.execute(text(statement))
+        assert constraint in str(exc.value)
+    with app_sessionmaker() as session, session.begin(), tenant_scope(session, tenant):
+        assert ServiceCredentialRegistry(session).lookup(_request(tenant)) is None       # still refused
+
+
+def test_the_forward_moves_are_still_allowed_once(app_sessionmaker, two_tenants, clean_tables):
+    tenant, _ = two_tenants
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, tenant):
+                _seed_credential(session, tenant)
+                session.execute(text("UPDATE service_credential_grants SET enabled = false"))          # true -> false
+                session.execute(text("UPDATE service_credential_grants SET revoked_at = now()"))       # NULL -> ts
+                session.execute(text("UPDATE service_credential_grants SET enabled = false"))          # idempotent
+                session.execute(text("UPDATE service_credential_versions SET revoked_at = now()"))
+    with app_sessionmaker() as session, session.begin(), tenant_scope(session, tenant):
+        grant = session.scalars(select(ServiceCredentialGrant)).one()
+        assert grant.enabled is False and grant.revoked_at is not None
+
+
 def test_credentials_are_invisible_across_tenants(app_sessionmaker, two_tenants, clean_tables):
     tenant_a, tenant_b = two_tenants
     with app_sessionmaker() as session:
@@ -293,10 +337,24 @@ def test_a_refused_credential_records_a_terminal_refused_attempt_without_any_sin
         assert len(session.scalars(select(MlflowMirrorAttempt)).all()) == 1
 
 
+class _HandleConsumingSink(ReferenceSink):
+    """Like the real sink: authentication reads the handle, so an unreadable file refuses."""
+
+    def authenticate(self, secret_handle):
+        use = getattr(secret_handle, "use", None)
+        if not callable(use):
+            return super().authenticate(None)
+        try:
+            ok = use(lambda content: bool(content))
+        except Exception:  # noqa: BLE001 - CredentialDenied and anything else: refused
+            ok = False
+        return super().authenticate("ok" if ok else None)
+
+
 def test_a_valid_grant_but_unreadable_file_is_refused_not_unavailable(app_sessionmaker, catalogue, configured, tmp_path):
-    """The grant resolves; the descriptor-bound reader cannot admit the file (not Linux / wrong identity)."""
+    """The grant resolves; the descriptor-bound reader cannot admit the file (absent / wrong identity)."""
     tenant = catalogue["tenant_a"]
-    sink = ReferenceSink()
+    sink = _HandleConsumingSink()
     with app_sessionmaker() as session:
         with session.begin():
             with tenant_scope(session, tenant):

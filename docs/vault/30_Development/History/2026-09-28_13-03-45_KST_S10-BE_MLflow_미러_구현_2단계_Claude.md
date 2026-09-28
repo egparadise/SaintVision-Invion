@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-2026-09-28-S10-BE-MLFLOW-MIRROR-IMPL-2"
 title: "S10-BE MLflow 미러 구현 2단계 — 실 MLflow REST sink(push-only, transport seam, TRACK 매핑, provider 문구 비노출), tenant 범위 service credential 계약(0051, 0035 경계), worker 경로(credential→sink→deliver_intent, 부재·거부는 NOT_OBSERVED·refused), PG-free fake transport 20 + 실 PG 24 + opt-in run-mlflow live lane (카드 bh, PR #172 위 stack)"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T13:06:57+09:00"
+updated: "2026-09-28T13:27:20+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "41256e4f"
@@ -44,3 +44,18 @@ tags: ["S10-BE", "AC-10", "mlflow", "tracking", "credential", "ci", "claude"]
 
 - 범위 밖(durable): 일반 `artifacts` row·학습 `output_ref` 미러(1단계 History §6과 동일), MLflow 컨테이너 digest pin, operator provisioning CLI(secret 파일 배치·version INSERT), outbox consumer 루프 배선(`claim_pending_events` → `deliver_outbox_event` → `mark_published`)은 서비스 함수까지만이고 데몬 배선은 없음, readiness의 `configurationReadiness.mlflow` 노출(#159 패턴 병합 뒤).
 - owner Claude / reviewer Codex / 병합 금지(#172 뒤). branch `agent/claude/s10-be-mlflow-mirror-p2`, base #172 head `41256e4f`, force-push 없음, 시각 `date`.
+
+## 5. Codex 1차 검토 + hosted 결과 반영 (v1.2, 2026-09-28T13:27:20+09:00)
+
+hosted(head 6cfe4a76): Backend run **36376369209** 3.12 = **3249 passed / 50 skipped / 2 deselected / 27 failed**; mlflow-live run **36376769104**(Codex가 label `run-mlflow` 생성·dispatch) = **2 passed / 1 failed**(서버 기동·`run_tracking_conformance` 12/12 live 통과).
+
+실패 27 분류: **head pin 상호작용 22+1**(`tools/definer-policy.json`과 #159 시험이 #174의 0050을 head로 고정 → 0051이 head가 되며 `migration_revision_mismatch`; `check_migration_upgrade`도 같은 원인) / **#172 결함 2**(canonical 재정규화·NULL CHECK — #172 bda7ef86에서 수정, 이 branch에 merge) / **#176 자체 1**(`test_a_valid_grant_but_unreadable_file…`: `ReferenceSink.authenticate`가 handle을 읽지 않아 mirrored — 시험이 handle을 소비하는 sink를 쓰도록 정정; 실 `MlflowSink`는 원래 읽음) / **#174 관찰 1**(`test_lineage_digest_index_real_pg::test_35` planner가 `uq_dataset_versions_tenant_id_version_id`를 선택 — #174(Claude tab) 소관, 이 PR 변경과 무관, Claude tab에 통지).
+
+| # | 지적 | 반영 |
+|---|---|---|
+| 1 (차단) 원격 부분 쓰기 승격 | runs/create 뒤 log-batch·model-version·update 실패 시 RUNNING run이 남고 다음 delivery의 `find`가 그 id를 돌려주며 attest가 create 시 쓴 tag digest만 봐 `mirrored`로 승격 | **완료 marker를 마지막에**: `runs/set-tag inv.mirror_complete = payload_sha256` → `runs/update FINISHED`. `find`는 marker == `inv.payload_sha256`이고 status FINISHED인 **complete run만** 반환; 불완전 run은 `_find_any`로 찾아 `mirror`가 **같은 run을 resume**(runs/create 재호출 0; log-batch 재기록은 동일 값이라 멱등; model version은 `model-versions/search run_id=`로 **run당 최대 1**). `attest`는 marker/FINISHED 없으면 **UNVERIFIABLE**(→ unavailable, 재시도) — VERIFIED는 marker·payload tag digest 일치 시에만. 시험: post-create 6단계 각각 5xx 주입 → unavailable·find None·attest UNVERIFIABLE → 재배달이 같은 run 완성(create 0, params 기록, model version 1, marker, FINISHED, find/attest VERIFIED); set-tag 403 → refused |
+| 2 (차단·보안) revoke/disable 되살림 | column UPDATE가 양방향이라 `revoked_at=NULL`·`enabled=true` 복원 가능 | 0051에 BEFORE UPDATE trigger `service_credential_lifecycle_forward`(plain plpgsql, SECURITY DEFINER 아님 → definer catalogue 불변): `OLD.revoked_at IS NOT NULL AND NEW.revoked_at IS DISTINCT FROM OLD.revoked_at` → `revocation_is_final`; grants `false→true` → `disable_is_final`(ERRCODE check_violation). 시험: 5 역방향 UPDATE 거부(grant NULL 복원·시각 변경·재enable, version NULL 복원·시각 변경) + lookup 여전히 None, 순방향 1회·멱등 허용 |
+| live 1 failed | `GET /version`이 **plain text**("2.17.2")라 JSON 파싱 실패 → `api_version=None` | `_call`이 JSON이 아닌 짧은 본문(≤64자)을 `value`로 유지 → probe가 버전을 보고. 시험: JSON·plain text·HTML(버전 아님) 3형 |
+| head pin | policy·#159 시험이 0050 고정 | `tools/definer-policy.json` revision → `0051_service_credentials`(catalogue 13 불변), 시험은 0048·0049·0050 속성 + head=0051 |
+
+동시에 #174 head `51f4f426`(#172 bda7ef86 포함)를 merge. 로컬 PG-free 192 passed / 30 skipped; offline render에 trigger DDL 존재; `migration_graph` head 단일 0051. **digest pin은 여전히 NOT_OBSERVED**(Codex 관찰과 동일).

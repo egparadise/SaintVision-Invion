@@ -17,6 +17,7 @@ import pytest
 
 from saintvision.adapters.contract import AttestationResult
 from saintvision.adapters.mlflow_sink import (
+    TAG_COMPLETE,
     TAG_INTENT,
     TAG_PAYLOAD,
     TAG_PAYLOAD_SHA256,
@@ -84,10 +85,18 @@ class FakeMlflow:
         if path.endswith("/runs/search"):
             wanted = payload["filter"].split("'")[1]
             hits = [
-                {"info": {"run_id": rid}} for rid, run in self.runs.items()
+                {"info": {"run_id": rid, "status": run["status"]},
+                 "data": {"tags": [{"key": k, "value": v} for k, v in run["tags"].items()]}}
+                for rid, run in self.runs.items()
                 if run["experiment_id"] in payload["experiment_ids"] and run["tags"].get(TAG_INTENT) == wanted
             ]
             return self._ok({"runs": hits})
+        if path.endswith("/runs/set-tag"):
+            self.runs[payload["run_id"]]["tags"][payload["key"]] = payload["value"]
+            return self._ok({})
+        if path.endswith("/model-versions/search"):
+            run_id = payload["filter"].split("'")[1]
+            return self._ok({"model_versions": [v for v in self.versions if v["run_id"] == run_id]})
         if path.endswith("/runs/create"):
             run_id = f"run-{len(self.runs) + 1:04d}"
             self.runs[run_id] = {
@@ -108,7 +117,8 @@ class FakeMlflow:
             run = self.runs.get(query["run_id"])
             if run is None:
                 return 404, b'{"error_code":"RESOURCE_DOES_NOT_EXIST"}'
-            return self._ok({"run": {"info": {"run_id": query["run_id"]}, "data": {"tags": [{"key": k, "value": v} for k, v in run["tags"].items()]}}})
+            return self._ok({"run": {"info": {"run_id": query["run_id"], "status": run["status"]},
+                                     "data": {"tags": [{"key": k, "value": v} for k, v in run["tags"].items()]}}})
         if path.endswith("/registered-models/create"):
             if payload["name"] in self.registered:
                 return 400, b'{"error_code":"RESOURCE_ALREADY_EXISTS"}'
@@ -170,8 +180,10 @@ def test_mirror_writes_experiment_run_batch_and_finish_in_order_with_the_canonic
         "/api/2.0/mlflow/experiments/create",
         "/api/2.0/mlflow/runs/create",
         "/api/2.0/mlflow/runs/log-batch",
+        "/api/2.0/mlflow/runs/set-tag",             # completion marker, after everything else
         "/api/2.0/mlflow/runs/update",
     ]
+    assert server.runs["run-0001"]["tags"][TAG_COMPLETE] == record.payload_sha256
     create = next(p for m, path, p in server.requests if path.endswith("/runs/create"))
     tags = {t["key"]: t["value"] for t in create["tags"]}
     assert tags[TAG_INTENT] == record.intent_id
@@ -189,11 +201,12 @@ def test_mirror_writes_experiment_run_batch_and_finish_in_order_with_the_canonic
 def test_param_values_are_strings_and_metric_values_numbers():
     server = FakeMlflow()
     sink = _sink(server)
-    payload = {"params": {"byte_size": 1024, "flag": True, "none": None}, "metrics": [{"key": "m", "value": 0.5, "step": 2, "timestamp_ms": 7}]}
     from saintvision.adapters.tracking import MirrorRecord
-    from saintvision.tracking.canonical import payload_sha256
+    from saintvision.tracking.canonical import canonical_digest, canonical_payload
 
-    sink.mirror(MirrorRecord("mmi_x", "eval_run", "inv/t/p", payload, payload_sha256(payload)))
+    payload = canonical_payload({"params": {"byte_size": 1024, "flag": True, "none": None},
+                                 "metrics": [{"key": "m", "value": 0.5, "step": 2, "timestamp_ms": 7}]})
+    sink.mirror(MirrorRecord("mmi_x", "eval_run", "inv/t/p", payload, canonical_digest(payload)))
     batch = next(p for m, path, p in server.requests if path.endswith("/runs/log-batch"))
     assert batch["params"] == [{"key": "byte_size", "value": "1024"}, {"key": "flag", "value": "true"}]
     assert batch["metrics"] == [{"key": "m", "value": 0.5, "timestamp": 7, "step": 2}]
@@ -212,6 +225,7 @@ def test_a_model_version_also_registers_a_model_version_with_our_stage_as_a_tag(
     assert server.versions[0]["source"] == "inv://models/x@1" and server.versions[0]["run_id"] == "run-0001"
     assert {t["key"]: t["value"] for t in server.versions[0]["tags"]}["inv.stage"] == "released"
     assert not any(path.endswith("/model-versions/transition-stage") for _, path, _ in server.requests)
+    assert any(path.endswith("/model-versions/search") for _, path, _ in server.requests)   # at most once per run
     # Registering again for another intent: the model exists (400) and that is fine.
     sink.mirror(MirrorRecord("mmi_n", "model_version", "inv/t/p", payload, payload_sha256(payload)))
     assert len(server.versions) == 2
@@ -329,10 +343,103 @@ def test_authenticate_uses_the_handle_once_and_the_token_is_only_ever_a_header()
     assert denied.failure_code == "TRACK-0002" and PROVIDER_TEXT not in repr(denied)
 
 
-def test_probe_reports_the_server_version():
+def test_probe_reports_the_server_version_from_json_or_plain_text():
     server = FakeMlflow()
     probe = _sink(server).probe()
     assert probe.reachable and probe.api_version == "2.17.2"
+    # The real server answers /version as plain text, not JSON (hosted run 36376769104).
+    server.faults = [(200, b"2.17.2\n")]
+    probe = _sink(server).probe()
+    assert probe.reachable and probe.api_version == "2.17.2"
+    server.faults = [(200, b"<html>" + b"x" * 200)]                # not a version: reachable, no claim
+    probe = _sink(server).probe()
+    assert probe.reachable and probe.api_version is None
+
+
+# ---------------------------------------------------------------- partial remote writes (Codex #176 finding 1)
+
+
+def _model_version_record(intent_id: str):
+    from saintvision.adapters.tracking import MirrorRecord
+    from saintvision.tracking.canonical import canonical_digest, canonical_payload
+
+    payload = canonical_payload({
+        "params": {"model_id": "mdl_1", "uri": "inv://models/x@1", "version": "1.0.0"},
+        "tags": {"inv.stage": "draft", "inv.model_version_id": "mdv_1"},
+        "metrics": [{"key": "gate_passed", "value": 1, "step": 0, "timestamp_ms": 0}],
+    })
+    return MirrorRecord(intent_id, "model_version", "inv/t/p", payload, canonical_digest(payload))
+
+
+#: The request index (after runs/create) at which each post-create step happens
+#: for a model-version record, and the fault to inject there.
+POST_CREATE_STEPS = ["runs/log-batch", "model-versions/search", "registered-models/create", "model-versions/create", "runs/set-tag", "runs/update"]
+
+
+@pytest.mark.parametrize("step", POST_CREATE_STEPS)
+def test_a_fault_after_runs_create_is_not_promoted_to_mirrored_on_redelivery(step):
+    """First delivery dies at ``step``: unavailable. Second delivery resumes the same run and completes it."""
+    server = FakeMlflow()
+    sink = _sink(server)
+    record = _model_version_record("mmi_0000000000000000000000000P")
+
+    real_route = server._route
+
+    def faulting(method, parts, payload):
+        if parts.path.endswith("/" + step) and not server.faults_done:
+            server.faults_done = True
+            return 503, PROVIDER_TEXT.encode()
+        return real_route(method, parts, payload)
+
+    server.faults_done = False
+    server._route = faulting
+    first = sink.mirror(record)
+    assert (first.status, first.error_code) == (MirrorStatus.UNAVAILABLE, "TRACK-0001") and step in first.detail
+    assert PROVIDER_TEXT not in first.detail
+    assert len(server.runs) == 1                                   # the run exists remotely, incomplete
+    run_id = next(iter(server.runs))
+    assert TAG_COMPLETE not in server.runs[run_id]["tags"] or server.runs[run_id]["status"] != "FINISHED"
+    # Not "found": an incomplete run is never returned as mirrored, and attest does not verify it.
+    assert sink.find(record.intent_id) is None
+    assert sink.attest(run_id).result is AttestationResult.UNVERIFIABLE
+    creates_before = sum(1 for _, p, _ in server.requests if p.endswith("/runs/create"))
+    second = sink.mirror(record)
+    assert second.status is MirrorStatus.MIRRORED and second.reference_id == run_id      # resumed, same run
+    assert sum(1 for _, p, _ in server.requests if p.endswith("/runs/create")) == creates_before   # no second run
+    assert server.runs[run_id]["status"] == "FINISHED"
+    assert server.runs[run_id]["tags"][TAG_COMPLETE] == record.payload_sha256
+    assert server.runs[run_id]["params"] == {"model_id": "mdl_1", "uri": "inv://models/x@1", "version": "1.0.0"}
+    assert len([v for v in server.versions if v["run_id"] == run_id]) == 1               # at most one model version
+    assert sink.find(record.intent_id) == run_id
+    assert sink.attest(run_id).result is AttestationResult.VERIFIED
+
+
+def test_a_partial_run_is_completed_before_any_worker_can_trust_it():
+    """Straight from the worker's view: find -> None, mirror -> resume, attest -> verified only then."""
+    server = FakeMlflow()
+    sink = _sink(server)
+    record = canonical_record("mmi_0000000000000000000000000Q")
+    server.faults = [(200, b'{"experiments":[]}'), (404, b"{}"), (200, b'{"experiment_id":"exp-1"}'),
+                     (200, b'{"run":{"info":{"run_id":"run-manual"}}}'), (504, b"")]      # dies at log-batch
+    server.runs["run-manual"] = {"experiment_id": "exp-1", "tags": {TAG_INTENT: record.intent_id, TAG_PAYLOAD_SHA256: record.payload_sha256,
+                                 TAG_PAYLOAD: json.dumps(record.payload, sort_keys=True, separators=(",", ":"))},
+                                 "params": {}, "metrics": [], "status": "RUNNING", "name": "x"}
+    server.experiments["conf/t/prj_00000000000000000000000000"] = "exp-1"
+    assert sink.mirror(record).status is MirrorStatus.UNAVAILABLE
+    assert sink.find(record.intent_id) is None
+    assert sink.attest("run-manual").result is AttestationResult.UNVERIFIABLE
+    assert sink.mirror(record).reference_id == "run-manual"
+    assert sink.attest("run-manual").result is AttestationResult.VERIFIED
+
+
+def test_a_refusal_after_runs_create_is_refused_not_unavailable():
+    server = FakeMlflow()
+    sink = _sink(server)
+    record = canonical_record("mmi_0000000000000000000000000R")
+    server.faults = [(200, b'{"experiments":[]}'), (404, b"{}"), (200, b'{"experiment_id":"exp-1"}'),
+                     (200, b'{"run":{"info":{"run_id":"run-r"}}}'), (200, b"{}"), (403, b"")]       # dies at set-tag
+    result = sink.mirror(record)
+    assert (result.status, result.error_code) == (MirrorStatus.REFUSED, "TRACK-0002") and "set-tag" in result.detail
 
 
 # ---------------------------------------------------------------- the contract suite
