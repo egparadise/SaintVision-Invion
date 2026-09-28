@@ -258,7 +258,11 @@ def test_a_revoked_or_disabled_credential_cannot_be_revived(app_sessionmaker, tw
             with session.begin():
                 with tenant_scope(session, tenant):
                     session.execute(text(statement))
-        assert constraint in str(exc.value)
+        # RAISE ... USING CONSTRAINT puts the name in the diagnostics, not the message
+        # (hosted run 36378728263); the trigger's ERRCODE is check_violation.
+        diag = exc.value.orig.diag
+        assert diag.constraint_name == constraint, (diag.constraint_name, str(exc.value)[:200])
+        assert diag.sqlstate == "23514"
     with app_sessionmaker() as session, session.begin(), tenant_scope(session, tenant):
         assert ServiceCredentialRegistry(session).lookup(_request(tenant)) is None       # still refused
 
