@@ -1,14 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.214"
+version: "1.0.215"
 status: "review"
 author: "Codex"
-updated: "2026-09-29T02:08:04+09:00"
+updated: "2026-09-29T02:20:41+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-29 카드 122 Medium 후속 — storage contribution idempotency
+
+- 선택적 key가 있으면 bounded advisory lock→ledger read→service/audit→ledger write를 한 transaction에 결속해 동시 최초 요청의 두 번째 side effect와 ledger unique 500을 막는다. key가 없으면 registered path unique만 `GRAPH-INVALID-TRANSITION`/409로 번역하고 unknown IntegrityError는 전파한다.
+- PG-free 58 passed; real PG에는 동시 2요청 동일 201/replay·row 1건과 no-key duplicate 409를 추가했고 hosted 대기다. 공개 schema·migration 변경 0. [[2026-09-29_02-20-41_KST_storage_contribution_idempotency_Codex]].
 
 ## 2026-09-29 카드 122 Medium 후속 — pool write 권한·unique 충돌
 

@@ -11,11 +11,12 @@ from __future__ import annotations
 import datetime as dt
 
 from fastapi import APIRouter, Depends, Header, Query, Request
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from ...config import Settings
 from ...identity.principal import Principal
-from ...errors import InvError, RES_ARTIFACT_NOT_FOUND, VAL_SCHEMA
+from ...errors import GRAPH_INVALID_TRANSITION, InvError, RES_ARTIFACT_NOT_FOUND, VAL_SCHEMA
 from ...services import resolver
 from ...services.replica_observation import observe_replicas
 from ...services import storage as storage_service
@@ -27,10 +28,23 @@ from ..deps import (
     get_session,
     get_settings,
     replay_or_reserve,
+    serialise_idempotent_write,
     store_idempotent_response,
 )
+from ..lock_wait import bounded_lock_wait
 
 router = APIRouter(prefix="/v1", tags=["storage"])
+
+_CONTRIBUTION_PATH_UNIQUE = "uq_storage_contributions_node_id_normalized_path"
+
+
+def _constraint_name(error: IntegrityError) -> str | None:
+    original = error.orig
+    constraint = getattr(getattr(original, "diag", None), "constraint_name", None)
+    if constraint is not None:
+        return constraint
+    detail = str(original)
+    return _CONTRIBUTION_PATH_UNIQUE if _CONTRIBUTION_PATH_UNIQUE in detail else None
 
 
 def _contribution_body(contribution) -> dict:
@@ -79,67 +93,87 @@ def register_contribution(
     endpoint = "POST /v1/storage/contributions"
     body_for_hash = payload.model_dump(by_alias=True, mode="json")
 
-    replayed = replay_or_reserve(
-        session,
-        principal=principal,
-        endpoint=endpoint,
-        idempotency_key=idempotency_key,
-        payload=body_for_hash,
-        now=now,
-        ttl_seconds=settings.idempotency_ttl_seconds,
-        # Registering a contribution is tenant-wide: a folder belongs to a
-        # node, not a project. Recorded as None so it collides with other
-        # tenant-wide operations and not with a project's.
-        project_id=None,
-    )
-    if replayed is not None:
-        return replayed
+    with bounded_lock_wait(session, timeout_ms=settings.business_lock_timeout_ms):
+        if idempotency_key is not None:
+            serialise_idempotent_write(
+                session,
+                tenant_id=principal.tenant_id,
+                endpoint=endpoint,
+                idempotency_key=idempotency_key,
+                project_id=None,
+            )
+        replayed = replay_or_reserve(
+            session,
+            principal=principal,
+            endpoint=endpoint,
+            idempotency_key=idempotency_key,
+            payload=body_for_hash,
+            now=now,
+            ttl_seconds=settings.idempotency_ttl_seconds,
+            # Registering a contribution is tenant-wide: a folder belongs to a
+            # node, not a project. Recorded as None so it collides with other
+            # tenant-wide operations and not with a project's.
+            project_id=None,
+        )
+        if replayed is not None:
+            return replayed
 
-    contribution = storage_service.register_contribution(
-        session,
-        tenant_id=principal.tenant_id,
-        registered_by_user_id=principal.user_id,
-        payload=storage_service.ContributionInput(
-            node_id=payload.node_id,
-            declared_path=payload.declared_path,
-            mode=payload.mode,
-            capacity_bytes=payload.capacity_bytes,
-            available_bytes=payload.available_bytes,
-        ),
-        now=now,
-    )
-    body = {"contribution": _contribution_body(contribution)}
+        try:
+            with session.begin_nested():
+                contribution = storage_service.register_contribution(
+                    session,
+                    tenant_id=principal.tenant_id,
+                    registered_by_user_id=principal.user_id,
+                    payload=storage_service.ContributionInput(
+                        node_id=payload.node_id,
+                        declared_path=payload.declared_path,
+                        mode=payload.mode,
+                        capacity_bytes=payload.capacity_bytes,
+                        available_bytes=payload.available_bytes,
+                    ),
+                    now=now,
+                )
+        except IntegrityError as error:
+            if _constraint_name(error) == _CONTRIBUTION_PATH_UNIQUE:
+                raise InvError(
+                    GRAPH_INVALID_TRANSITION,
+                    "this node path is already registered as a storage contribution",
+                    status=409,
+                ) from None
+            raise
 
-    record_event(
-        session,
-        now=now,
-        actor_type="user",
-        actor_id=principal.user_id,
-        action="storage.contribution.register",
-        outcome="allow",
-        tenant_id=principal.tenant_id,
-        trace_id=getattr(request.state, "trace_id", None),
-        target_type="storage_contribution",
-        target_id=contribution.contribution_id,
-        # The normalised path is recorded; the raw declared string is not, since
-        # it is attacker-influenced text.
-        detail={"nodeId": contribution.node_id, "normalizedPath": contribution.normalized_path},
-        source_ip=request.client.host if request.client else None,
-        user_agent=request.headers.get("user-agent"),
-    )
-    store_idempotent_response(
-        session,
-        principal=principal,
-        endpoint=endpoint,
-        idempotency_key=idempotency_key,
-        payload=body_for_hash,
-        response_status=201,
-        response_body=body,
-        now=now,
-        ttl_seconds=settings.idempotency_ttl_seconds,
-        project_id=None,
-    )
-    return body
+        body = {"contribution": _contribution_body(contribution)}
+
+        record_event(
+            session,
+            now=now,
+            actor_type="user",
+            actor_id=principal.user_id,
+            action="storage.contribution.register",
+            outcome="allow",
+            tenant_id=principal.tenant_id,
+            trace_id=getattr(request.state, "trace_id", None),
+            target_type="storage_contribution",
+            target_id=contribution.contribution_id,
+            # The normalised path is recorded; the raw declared string is not, since
+            # it is attacker-influenced text.
+            detail={"nodeId": contribution.node_id, "normalizedPath": contribution.normalized_path},
+            source_ip=request.client.host if request.client else None,
+            user_agent=request.headers.get("user-agent"),
+        )
+        store_idempotent_response(
+            session,
+            principal=principal,
+            endpoint=endpoint,
+            idempotency_key=idempotency_key,
+            payload=body_for_hash,
+            response_status=201,
+            response_body=body,
+            now=now,
+            ttl_seconds=settings.idempotency_ttl_seconds,
+            project_id=None,
+        )
+        return body
 
 
 @router.post(
