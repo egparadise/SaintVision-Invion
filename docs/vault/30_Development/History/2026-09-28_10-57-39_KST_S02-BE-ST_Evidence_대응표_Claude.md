@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-2026-09-28-S02-BE-ST-EVIDENCE-MAP"
-title: "S02-BE·S02-ST Evidence 대응표 — OIDC·mTLS 등록·Heartbeat·인증 실패 기록·제공 폴더·DataLocation 카탈로그 대응, 외부 U2~U6 BLOCKED_EXTERNAL 5·audit_events RLS F-S02-01, 구현 추가 0 (카드 ba, docs-only)"
+title: "S02-BE·S02-ST Evidence 대응표 — OIDC·mTLS 등록·Heartbeat·인증 실패 기록·제공 폴더·DataLocation 카탈로그 대응, 외부 U2~U6 BLOCKED_EXTERNAL 5·audit_events RLS F-S02-01 = PR #128 승인·병합 대기, 구현 추가 0 (카드 ba, docs-only)"
 version: "1.0.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T10:57:39+09:00"
+updated: "2026-09-28T10:58:33+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -24,7 +24,7 @@ tags: ["S02-BE", "S02-ST", "AC-02", "evidence", "claude", "docs-only"]
 ## 2. 결과
 
 - 대응: OIDC 4·mTLS/Heartbeat 7·인증 실패 기록 2·제공 폴더 4·DataLocation 카탈로그 4 항목을 file:line + run ID/실측 기록에 대응하고 U1~U6에 연결(U1 결정됨).
-- 공백: E1~E5 실 IdP·운영 CA·DNS·물리 5노드·Storage 제품 값 → BLOCKED_EXTERNAL(U2~U6); G1 `public.audit_events` RLS → F-S02-01 별도 카드.
+- 공백: E1~E5 실 IdP·운영 CA·DNS·물리 5노드·Storage 제품 값 → BLOCKED_EXTERNAL(U2~U6); G1 `public.audit_events` RLS → F-S02-01 = PR #128(head 4c78afc6, 0047_audit_events_isolation) 승인·병합 대기(base 미착지; #159 선행 의존).
 - 작은 PG-free 시험으로 메울 행동 공백 없음 → docs-only. 판정 논리 복제 없음.
 
 ## 3. 게이트·인계

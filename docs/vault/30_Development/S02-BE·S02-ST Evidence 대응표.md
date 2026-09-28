@@ -5,7 +5,7 @@ version: "1.0.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T10:57:39+09:00"
+updated: "2026-09-28T10:58:33+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -15,7 +15,7 @@ tags: ["S02-BE", "S02-ST", "AC-02", "evidence", "oidc", "mtls", "heartbeat", "st
 
 # S02-BE·S02-ST Evidence 대응표 (2026-09-28, 카드 ba)
 
-task-registry: S02-BE scope "OIDC·mTLS 등록·Heartbeat", S02-ST scope "제공 폴더·DataLocation 카탈로그", evidence 둘 다 "실제 API·브라우저 여정·인증 실패 기록", AC-02. 원칙은 #155·#160·#161·#163과 같다: 이미 있는 것을 file:line·run ID로 대응하고 공백만 골라낸다, 관측 안 된 값은 NOT_OBSERVED, 판정 논리 복제 없음. 사용자 입력·외부가 필요한 것은 **BLOCKED_EXTERNAL**로 두고 [[S02_선행입력_체크리스트_2026-09-22]]의 U1~U6에 연결한다. 결론 먼저 — **두 scope 모두 코드·시험·hosted lane과 실측 기록이 있다. 이 PR은 대응표만 담는다(구현·시험 추가 0). 남은 것은 U2 실 IdP·U3 운영 CA·U4 DNS·U5 물리 5노드·U6 Storage 제품 값(BLOCKED_EXTERNAL) 5건과 `public.audit_events` RLS(F-S02-01 별도 카드) 1건이다.**
+task-registry: S02-BE scope "OIDC·mTLS 등록·Heartbeat", S02-ST scope "제공 폴더·DataLocation 카탈로그", evidence 둘 다 "실제 API·브라우저 여정·인증 실패 기록", AC-02. 원칙은 #155·#160·#161·#163과 같다: 이미 있는 것을 file:line·run ID로 대응하고 공백만 골라낸다, 관측 안 된 값은 NOT_OBSERVED, 판정 논리 복제 없음. 사용자 입력·외부가 필요한 것은 **BLOCKED_EXTERNAL**로 두고 [[S02_선행입력_체크리스트_2026-09-22]]의 U1~U6에 연결한다. 결론 먼저 — **두 scope 모두 코드·시험·hosted lane과 실측 기록이 있다. 이 PR은 대응표만 담는다(구현·시험 추가 0). 남은 것은 U2 실 IdP·U3 운영 CA·U4 DNS·U5 물리 5노드·U6 Storage 제품 값(BLOCKED_EXTERNAL) 5건과 `public.audit_events` RLS(F-S02-01 = **PR #128 승인·병합 대기**(head `4c78afc6`, `0047_audit_events_isolation`; Codex 보안 재검토 승인·hosted Backend 검증 완료; base `1e8baf04` 미착지라 base 기준 공백; #159는 #128에 선행 의존)) 1건이다.**
 
 ## 0. 사용자 입력 U1~U6 (체크리스트 §0~§5)와 이 대응표의 관계
 
@@ -69,7 +69,7 @@ task-registry: S02-BE scope "OIDC·mTLS 등록·Heartbeat", S02-ST scope "제공
 | 항목 | 코드 | 시험 | hosted / 실측 | 상태 |
 |---|---|---|---|---|
 | 거부·인증 실패 audit 기록(redaction, 트랜잭션 밖) | `src/saintvision/services/audit.py:47 redact`, `:66 record_event`, `:106 record_denial_out_of_band` | `tests/test_api.py:242 denials_are_recorded` · `:263,:275,:289`(타 tenant/project 차단) | Backend; #120 `authentication-failures-recorded`·`cross-tenant-project-isolation` PASS | 관측됨 |
-| 인증 실패 기록 테이블의 RLS ENABLE+FORCE | — | `tools/collect_rls_evidence.py` E2 위반 1(#120 evidence) | Backend 36351674808 | **F-S02-01 별도 카드** |
+| 인증 실패 기록 테이블의 RLS ENABLE+FORCE | — | `tools/collect_rls_evidence.py` E2 위반 1(#120 evidence) | Backend 36351674808 | **PR #128 승인·병합 대기**(head `4c78afc6`, `0047_audit_events_isolation`; Codex 보안 재검토 승인·hosted Backend 검증 완료; base `1e8baf04` 미착지라 base 기준 공백; #159는 #128에 선행 의존) |
 
 ### 2.4 제공 폴더 (S02-ST)
 
@@ -98,7 +98,7 @@ task-registry: S02-BE scope "OIDC·mTLS 등록·Heartbeat", S02-ST scope "제공
 | E3 | DNS·호스트명 | BLOCKED_EXTERNAL(U4) |
 | E4 | 물리 5노드(등록 3·미등록 1·겸임 BLOCKED)·계정·허용 폴더 | BLOCKED_EXTERNAL(U5) |
 | E5 | Storage 제품 값(contribution 루트·storage-policy·아카이브) | BLOCKED_EXTERNAL(U6) |
-| G1 | `public.audit_events` RLS ENABLE+FORCE(인증 실패 기록의 tenant 경계) | F-S02-01 별도 카드(Codex 판정) |
+| G1 | `public.audit_events` RLS ENABLE+FORCE(인증 실패 기록의 tenant 경계) | F-S02-01 = **PR #128 승인·병합 대기**(head `4c78afc6`, `0047_audit_events_isolation`; Codex 보안 재검토 승인·hosted Backend 검증 완료; base `1e8baf04` 미착지라 base 기준 공백; #159는 #128에 선행 의존) |
 
 작은 PG-free 시험으로 메울 행동 공백 없음(OIDC 검증·등록·replay·heartbeat·channel·discovery·카탈로그 격리·audit 기록이 전부 기존 시험으로 단언). 따라서 docs-only.
 
