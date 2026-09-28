@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CODEX-CARD135-LEGACY-PROBLEM-LOCK-001"
 title: "카드 135 — legacy RES 404·denial audit·lock-wait Low 항목 종결"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-29T03:20:47+09:00"
+updated: "2026-09-29T03:40:51+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["G-04"]
@@ -35,6 +35,7 @@ tags: ["card-135", "problem-details", "existence-nondisclosure", "lock-wait"]
 - GREEN: 같은 두 파일 → **43 passed, exit 0**.
 - 관련 PG-free 회귀(`canonical_denial_audit`, legacy idempotency, discovery admission/announcement, pool write security, storage registration security 포함) → **87 passed, exit 0**.
 - write/workspace/discovery response contract 회귀 → **90 passed, exit 0**.
+- 첫 hosted Backend 3.14 run `36465143025`는 제품 경로가 아니라 `test_pool_placement_response_contract.py`의 PG-free app이 옛 `get_session`만 override해 pool mutation 2건이 `app.state.engine`을 찾으면서 실패했다(**4580 passed, 50 skipped, 2 failed**). fixture가 새 `get_write_session`도 override하도록 고정했고 해당 파일은 **24 passed, exit 0**; exact-head 재실행 증거를 기다린다.
 - real PostgreSQL은 로컬에서 실행하지 않았다. `tests/test_api.py`의 타 tenant node 404와 `tests/test_storage_api.py`의 unknown node 404 기대를 갱신했으며 hosted Core `run-core`에서 실행 증거를 남긴다.
 - migration과 JSON Schema 변경은 없다.
 

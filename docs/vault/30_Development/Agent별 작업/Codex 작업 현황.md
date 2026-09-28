@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.218"
+version: "1.0.219"
 status: "review"
 author: "Codex"
-updated: "2026-09-29T03:20:47+09:00"
+updated: "2026-09-29T03:40:51+09:00"
 source_of_truth: "Git"
 ---
 
@@ -14,6 +14,7 @@ source_of_truth: "Git"
 
 - legacy not-found 5종만 정본 `RES-0004`/404/non-retryable exact ProblemDetails로 변환하고 resource kind·내부 message를 숨긴다. resource 404는 AUTH/SEC 401·403 denial이 아니므로 audit 미기록을 회귀 시험으로 고정해 `DENIAL_CATEGORIES` 지적은 변경 불필요로 닫았다.
 - #240/#241에서 이미 bounded인 8개 외 남은 write 14개를 shared dependency와 manual span으로 묶어 legacy 22개 전체가 55P03/40P01을 `SYS-0001`/503/retryable로 끝낸다. RED 10 failed/33 passed 뒤 GREEN 43 passed, 관련 PG-free 87 passed; real PG는 hosted Core 대기다. [[2026-09-29_03-20-47_KST_legacy_problem_404_lock_wait_Codex]].
+- 첫 Backend 3.14은 PG-free pool response fixture가 새 dependency를 override하지 않아 2 failed/4580 passed였고 제품 결함은 아니었다. override 회귀를 추가해 단일 파일 24 passed; 새 exact-head Backend/Core를 대기한다.
 
 ## 2026-09-29 카드 122 Medium 후속 — legacy audit write optional idempotency
 

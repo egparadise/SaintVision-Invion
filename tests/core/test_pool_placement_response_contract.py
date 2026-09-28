@@ -47,6 +47,7 @@ def client(*, raise_server_exceptions: bool = True) -> TestClient:
     app.include_router(pools.router)
     app.dependency_overrides[pools.get_principal] = lambda: PRINCIPAL
     app.dependency_overrides[pools.get_session] = ContractSession
+    app.dependency_overrides[pools.get_write_session] = ContractSession
     app.dependency_overrides[pools.get_now] = lambda: NOW
     return TestClient(app, raise_server_exceptions=raise_server_exceptions)
 
