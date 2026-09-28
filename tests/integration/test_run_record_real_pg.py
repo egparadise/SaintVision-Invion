@@ -184,10 +184,37 @@ def test_a_finished_but_unsealed_run_is_404_from_the_service(owner_engine, app_e
         assert body["detail"] == "No sealed record for this run."
 
 
-# The unauthenticated case is in the PG-free suite: the app's out-of-band
-# denial audit (services.audit.record_denial_out_of_band) fails under the
-# application-role engine of this harness (hosted run 36382121571, 500), which
-# is the shared auth boundary's behaviour, not this route's. Flagged in the PR.
+def test_without_a_credential_the_route_is_401_and_the_anonymous_denial_is_audited(
+    owner_engine, app_engine, app_sessionmaker, two_tenants, clean_tables
+):
+    """The real path (configured app, app-role engine): 401 + WWW-Authenticate and
+    exactly one anonymous denial row. Before 0047 (audit isolation, #128) the
+    out-of-band audit write failed under the app role (hosted run 36382121571,
+    500); this branch carries 0047, so the outcome is observed, not assumed."""
+    tenant_a, _ = two_tenants
+    with owner_engine.begin() as connection:
+        mine = _seed_project(connection, tenant_id=tenant_a, code="mine")
+    run_id, _ = _sealed_run(app_sessionmaker, tenant_id=tenant_a, seed=mine)
+    with owner_engine.begin() as connection:
+        before = connection.execute(text("SELECT count(*) FROM audit_events WHERE outcome = 'deny'")).scalar_one()
+    app = create_app(
+        engine=app_engine,
+        settings=Settings(database_url="test-only"),
+        verifier=StaticPrincipalVerifier({}, allow_outside_dev=True),
+        clock=lambda: NOW,
+        check_partitions_on_startup=False,
+    )
+    with TestClient(app, raise_server_exceptions=False) as client:
+        response = client.get(_path(mine["project_id"], run_id))
+        assert response.status_code == 401, response.text
+        assert response.headers.get("www-authenticate") == "Bearer"
+        assert "recordId" not in response.text
+    with owner_engine.begin() as connection:
+        rows = connection.execute(
+            text("SELECT actor_type, reason_code FROM audit_events WHERE outcome = 'deny' ORDER BY occurred_at DESC")
+        ).fetchall()
+    assert len(rows) == before + 1
+    assert rows[0][0] == "anonymous" and rows[0][1] == "AUTH-MISSING-CREDENTIAL"
 
 
 def test_a_non_member_of_an_existing_project_is_403_not_404(owner_engine, app_engine, app_sessionmaker, two_tenants, clean_tables):

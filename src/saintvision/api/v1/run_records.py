@@ -26,7 +26,13 @@ from ...identity.principal import Principal
 from ...services import records as record_service
 from .. import schemas
 from ..deps import get_principal, get_session
-from ..problem import AUTH_PROJECT, RES_NOT_FOUND, require_absent_body, translate
+from ..problem import (
+    AUTH_PROJECT,
+    RES_NOT_FOUND,
+    read_bounded_body,
+    require_absent_body,
+    translate,
+)
 from .lineage_query import _membership
 from .project_scope import run_in_project
 
@@ -64,8 +70,11 @@ async def read_run_record(
     principal: Principal = Depends(get_principal),
     session: Session = Depends(get_session),
 ) -> schemas.RunRecordResponse:
-    require_absent_body(await request.body())
+    # Live membership first, so a non-member learns nothing from how the body is
+    # judged; then the shared bounded reader refuses a body (bounded, so an
+    # oversized one is 413/422 rather than an allocation), as ``model_release`` does.
     _membership(session, principal=principal, project_id=project_id)
+    require_absent_body(await read_bounded_body(request))
     run = run_in_project(
         session, tenant_id=principal.tenant_id, project_id=project_id, run_id=run_id
     )
