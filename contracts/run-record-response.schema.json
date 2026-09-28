@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The sealed record of a run, reduced to identifiers, digests and counts.\n\nNo person and no free text: who requested the run and what it produced are\nother routes' business. ``bundleId``/``bundleHash`` are null when the run\nwas sealed without a context bundle; that is a fact about the record, not a\ngap in this response.",
+  "properties": {
+    "attemptCount": {
+      "minimum": 0,
+      "title": "Attemptcount",
+      "type": "integer"
+    },
+    "bundleHash": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Bundlehash"
+    },
+    "bundleId": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Bundleid"
+    },
+    "componentVersions": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Componentversions",
+      "type": "object"
+    },
+    "evidenceId": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Evidenceid"
+    },
+    "finalState": {
+      "maxLength": 16,
+      "minLength": 1,
+      "title": "Finalstate",
+      "type": "string"
+    },
+    "recordId": {
+      "title": "Recordid",
+      "type": "string"
+    },
+    "runId": {
+      "title": "Runid",
+      "type": "string"
+    },
+    "sealedAt": {
+      "format": "date-time",
+      "title": "Sealedat",
+      "type": "string"
+    },
+    "terminationReason": {
+      "maxLength": 24,
+      "minLength": 1,
+      "title": "Terminationreason",
+      "type": "string"
+    },
+    "workloadSpecSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Workloadspecsha256",
+      "type": "string"
+    }
+  },
+  "required": [
+    "recordId",
+    "runId",
+    "finalState",
+    "terminationReason",
+    "workloadSpecSha256",
+    "componentVersions",
+    "attemptCount",
+    "sealedAt"
+  ],
+  "title": "RunRecordResponse",
+  "type": "object"
+}

@@ -810,6 +810,30 @@ class LineageUnresolved(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+class RunRecordResponse(Strict):
+    """The sealed record of a run, reduced to identifiers, digests and counts.
+
+    No person and no free text: who requested the run and what it produced are
+    other routes' business. ``bundleId``/``bundleHash`` are null when the run
+    was sealed without a context bundle; that is a fact about the record, not a
+    gap in this response.
+    """
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True, populate_by_name=True)
+
+    record_id: str = Field(alias="recordId")
+    run_id: str = Field(alias="runId")
+    final_state: str = Field(min_length=1, max_length=16, alias="finalState")
+    termination_reason: str = Field(min_length=1, max_length=24, alias="terminationReason")
+    evidence_id: str | None = Field(default=None, alias="evidenceId")
+    bundle_id: str | None = Field(default=None, alias="bundleId")
+    bundle_hash: str | None = Field(default=None, pattern="^[0-9a-f]{64}$", alias="bundleHash")
+    workload_spec_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="workloadSpecSha256")
+    component_versions: dict[str, str] = Field(alias="componentVersions")
+    attempt_count: int = Field(ge=0, alias="attemptCount")
+    sealed_at: dt.datetime = Field(alias="sealedAt")
+
+
 class ModelLineageTraceResponse(Strict):
     """AC-10's traceback, reduced to what a project member may be shown.
 
