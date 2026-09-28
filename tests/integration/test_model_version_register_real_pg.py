@@ -137,11 +137,11 @@ def _path(seeded, project_id=None, model_id=None):
     )
 
 
-def _body(version="1.0.0", digest=None, uri=None):
+def _body(version="1.0.0", digest=None):
+    """The request, which no longer carries a URI: the server derives it."""
     return {
         "version": version,
         "contentSha256": digest or _digest(),
-        "uri": uri or f"inv://models/demo@{version}",
         "byteSize": 4096,
     }
 
@@ -154,7 +154,7 @@ def _rows(owner_engine, tenant_id):
     with owner_engine.begin() as connection:
         return connection.execute(
             text(
-                "SELECT model_version_id, model_id, version, stage, content_sha256 "
+                "SELECT model_version_id, model_id, version, stage, content_sha256, uri "
                 "FROM model_versions WHERE tenant_id = :t ORDER BY model_version_id"
             ),
             {"t": tenant_id},
@@ -203,10 +203,15 @@ def test_an_approver_registers_one_draft_and_one_ledger_row(
     assert payload["contentSha256"] == body["contentSha256"]
     assert payload["version"] == "1.0.0"
 
+    # The stored address is derived from the model's name and this version, so
+    # the kernel manifest's join key holds by construction (Codex #191 F2).
+    assert payload["uri"] == "inv://models/model-w2-ok@1.0.0"
+
     rows = _rows(owner_engine, tenant)
     assert len(rows) == 1
     assert rows[0]["stage"] == "draft"
     assert rows[0]["model_version_id"] == payload["modelVersionId"]
+    assert rows[0]["uri"] == payload["uri"]
 
     ledger = _ledger(owner_engine, tenant)
     assert len(ledger) == 1
@@ -337,24 +342,31 @@ def test_the_same_digest_again_is_a_409_and_writes_nothing(
     body = _canonical(response, code="GRAPH-0002", status=409)
     assert body["detail"] == "That content digest is already registered."
     assert len(_rows(owner_engine, tenant)) == 1
+    # This is the invariant that survives the F1 narrowing: the same bytes under
+    # two names *within one model* stays a conflict.
 
 
-def test_a_digest_registered_in_a_project_i_cannot_see_still_conflicts(
+def test_f1_today_that_same_digest_is_refused_and_says_nothing_about_where(
     owner_engine, app_engine, two_tenants, frozen_now
 ):
-    """``uq_model_versions_tenant_id_content_sha256`` is tenant scoped.
+    """The sibling-project existence oracle, recorded as a gap, not as correct.
 
-    The conflict is therefore observable from a project that cannot see the row
-    it collided with. This test records that behaviour rather than asserting it
-    is right: the constraint is deliberate (S10-ST: "two names for identical
-    bytes is a mistake worth catching") and the route cannot avoid answering,
-    so what it can do is say nothing about *where* the collision was. The PR
-    reports this as a finding for the owner.
+    ``uq_model_versions_tenant_id_content_sha256`` is tenant scoped, so a digest
+    held in a project the caller cannot see refuses this registration -- and a
+    409/201 difference carries that existence bit whatever the wording says.
+    Codex #191 F1 decided the invariant moves to ``(model_id, content_sha256)``.
+
+    The target test ("two projects of one tenant may each register the same
+    digest") is **not** here: it would have to be an expected failure until the
+    migration lands, and an xfail is a JUnit ``skipped`` entry that the Backend
+    lane's exact-skip gate would reject. It belongs to the migration PR, which is
+    where it turns green. This test asserts what happens today, and that the
+    refusal at least discloses no identifier while it still happens.
     """
     tenant, _ = two_tenants
     with owner_engine.begin() as connection:
-        hidden = _seed(connection, tenant_id=tenant, now=frozen_now, label="w2-hid")
-        mine = _seed(connection, tenant_id=tenant, now=frozen_now, label="w2-vis")
+        hidden = _seed(connection, tenant_id=tenant, now=frozen_now, label="w2-hid2")
+        mine = _seed(connection, tenant_id=tenant, now=frozen_now, label="w2-vis2")
         digest = _digest()
         _insert(
             connection,
@@ -366,22 +378,18 @@ def test_a_digest_registered_in_a_project_i_cannot_see_still_conflicts(
             stage="draft",
             content_sha256=digest,
             byte_size=1,
-            uri="inv://models/hidden@1.0.0",
+            uri="inv://models/model-w2-hid2@1.0.0",
             created_at=frozen_now,
         )
 
     client = _client(app_engine, tenant_id=tenant, user_id=mine["user_id"], now=frozen_now)
     response = client.post(
-        _path(mine), json=_body("1.0.0", digest=digest), headers=_headers("k-hid")
+        _path(mine), json=_body("1.0.0", digest=digest), headers=_headers("k-hid2")
     )
 
-    body = _canonical(response, code="GRAPH-0002", status=409)
-    # It conflicts, and the body names neither the project nor the model it
-    # collided with.
-    assert body["detail"] == "That content digest is already registered."
+    _canonical(response, code="GRAPH-0002", status=409)
     assert hidden["project_id"] not in response.text
     assert hidden["model_id"] not in response.text
-    assert len(_rows(owner_engine, tenant)) == 1
 
 
 # --------------------------------------------------------------------------

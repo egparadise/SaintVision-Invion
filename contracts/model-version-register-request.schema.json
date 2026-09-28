@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
-  "description": "What an importer must state to register one model build (G-04 W2).\n\nThe fields are exactly ``register_model_version``'s own required arguments,\nand nothing more: the service is the judge of what a registration means, so\na field here that it does not take would be this route inventing state.\n\n``contentSha256`` carries the service's rule as a pattern rather than\ntrusting it: the service raises ``VAL-SCHEMA`` for a non-lowercase digest\nand the column has ``checksum_is_lowercase``, so a caller who sends\n``ABC...`` gets a request error at the boundary instead of a service error\ntranslated later. Both defences stay.\n\n``producedByRunId`` and ``lineage`` are deliberately absent -- see the\nmodule docstring of ``api/v1/model_versions.py`` for why neither can be\nbound to the path's project on this branch.",
+  "description": "What an importer must state to register one model build (G-04 W2).\n\nThe fields are exactly ``register_model_version``'s own required arguments,\nand nothing more: the service is the judge of what a registration means, so\na field here that it does not take would be this route inventing state.\n\n``contentSha256`` carries the service's rule as a pattern rather than\ntrusting it: the service raises ``VAL-SCHEMA`` for a non-lowercase digest\nand the column has ``checksum_is_lowercase``, so a caller who sends\n``ABC...`` gets a request error at the boundary instead of a service error\ntranslated later. Both defences stay.\n\n``uri`` is **not** here (Codex #191 F2). A caller-supplied URI was accepted\nand stored verbatim, so ``https://user:secret@host``, ``javascript:...`` and\nanother model version's ``inv://`` address all persisted -- and the kernel\nmanifest's join key assumes the URI's version *is* the row's version. The\ncanonical address is fully determined by the model's name and the version, so\nthe server derives it instead of validating a string that has no reason to\nvary.\n\n``producedByRunId`` and ``lineage`` are deliberately absent -- see the\nmodule docstring of ``api/v1/model_versions.py`` for why neither can be\nbound to the path's project on this branch.",
   "properties": {
     "byteSize": {
       "default": 0,
@@ -14,12 +14,6 @@
       "title": "Contentsha256",
       "type": "string"
     },
-    "uri": {
-      "maxLength": 2048,
-      "minLength": 1,
-      "title": "Uri",
-      "type": "string"
-    },
     "version": {
       "maxLength": 64,
       "minLength": 1,
@@ -29,8 +23,7 @@
   },
   "required": [
     "version",
-    "contentSha256",
-    "uri"
+    "contentSha256"
   ],
   "title": "ModelVersionRegisterRequest",
   "type": "object"

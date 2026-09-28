@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-G04-W2-MODEL-VERSION-REGISTER-001"
-title: "G-04 W2 model version 등록 route 구현 — canApprove·부모 결속 404·정본 ProblemDetails·IDEM-6 advisory 직렬화, UNIQUE 충돌 409(500 아님), PG-free 64 + 실 PG 13 시험"
-version: "1.0.0"
+title: "G-04 W2 model version 등록 route 구현 v1.1 — canApprove·부모 결속 404·정본 ProblemDetails·IDEM-6 advisory 직렬화, URI 서버 파생·잠금 뒤 시각 취득(Codex F2·F3), UNIQUE 충돌 409, PG-free 80 + 실 PG 13 시험"
+version: "1.1.0"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T15:56:53+09:00"
+updated: "2026-09-28T16:28:56+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S10-BE"]
@@ -101,3 +101,53 @@ permission → body-read → lock → permission → ledger-read → model-get �
 ## 9. 다음 첫 행동
 
 Codex 검토. 병합 순서는 `#167` → `#175` → 이 PR(`#159` merge 포함). 승인 뒤 같은 설계의 W4(pin, PR 6)가 이 PR 위에 stack한다.
+
+## 10. v1.1 — Codex 사전 검토 delta (#191, head `266adfc6` 기준)
+
+순서·IDEM barrier 시험은 승인 방향으로 확인받았고(hosted Backend `36389688954` 3.12·3.14 각각 3263 passed / 47 skipped / 2 deselected, exact skip gate green), 차단점 넷 중 셋을 이 delta에서 고쳤다.
+
+### 10-1. F2 — caller `uri`를 **없앴다**(결속이 아니라 파생)
+
+지적이 정확했다. schema가 `uri`를 1~2048 임의 문자열로 받고 route가 `_model_in_project()`의 `Model`을 버린 뒤 그대로 서비스에 넘겼으므로 `https://user:secret@host`, `javascript:...`, **다른 model/version의 `inv://`** 가 모두 201로 영구 저장됐다. 그리고 `tests/test_model_registry.py::test_a_version_carries_the_join_key_the_kernel_manifest_is_addressed_by`가 "URI version == row version"을 전제한다.
+
+Codex가 허용한 두 안 중 **서버 파생**을 골랐다 — `inv://models/<model.name>@<version>`은 부모 model의 이름과 이 요청의 version으로 완전히 결정되므로 **caller가 줄 것이 없고 검증할 것도 없다**. 필터링이 아니라 부류 자체를 제거한다. builder는 제품의 `storage.pathsafe.build_uri`(ADR-010)라 resolver 문법과 갈라질 수 없고, 문법이 표현할 수 없는 이름·version(`@`·`/`)은 500이 아니라 **422**다(해결될 수 없는 등록이므로 요청 오류다).
+
+요청에서 `uri`를 **제거**했으니 위 세 종류는 모두 `extra="forbid"`의 422이고, 부정 시험 7개가 그것을 고정한다.
+
+### 10-2. F3 — 시각을 **잠금 뒤에** 한 번 읽는다
+
+`Depends(get_now)`는 handler 진입 전에 평가되고, 그 뒤 route는 caller가 속도를 정하는 body를 읽고 advisory lock에서 기다린다. 오래 걸린 요청은 **기다리기 전의 시각**으로 `created_at`·audit·원장 `expires_at`을 적었다. `now` dependency를 없애고 **lock 획득 + 두 번째 live 권한 확인 뒤** `request.app.state.clock()`을 한 번 읽어 service·audit·ledger에 같이 쓴다.
+
+시험은 sleep 없이 이것을 죽인다 — fake session의 `execute`(잠금)와 body reader가 clock을 전진시키고, 기록된 `now`가 **전진한 값**임을 단언한다. 시각 취득을 원래 위치로 되돌리는 변이에서 3건이 죽었다.
+
+### 10-3. 비차단 — 모르는 `23505`를 duplicate라 부르지 않는다
+
+`_unique_conflict()`의 sqlstate fallback을 없앴다. **알려진 constraint 이름만** 409이고 나머지는 전파된다(500). 뒤에 생긴 UNIQUE나 생성 ULID 충돌(`uq_model_versions_tenant_id_version_id`)을 "당신의 digest가 중복"으로 위장하면 우리 결함을 caller 잘못으로 보고하는 것이다. 그 ULID constraint도 표에서 **뺐다**. 변이 1건이 죽었다.
+
+### 10-4. 비차단 — advisory lock 무한 대기를 운영 공백으로 명시
+
+제품 engine에 `lock_timeout`·`statement_timeout`이 없어 키를 쥔 장기 tx가 있으면 요청이 무기한 기다린다. bounded timeout은 이 route 혼자 정할 것이 아니라 **쓰기 lane 전체의 timeout 계약**이므로, 모듈 docstring에 공백으로 적고 별 카드로 분리했다. 조용한 raw DB detail 노출은 없다.
+
+### 10-5. F1 — Codex 결정을 받았고, migration은 이 branch에 둘 수 없다
+
+Codex 결정: tenant-wide `uq_model_versions_tenant_id_content_sha256`은 sibling-project 존재 oracle이므로 **`(model_id, content_sha256)`로 좁히는 migration을 이 route의 선행**으로 둔다. wire 문구만 숨기는 해법은 불가.
+
+**이 branch에 넣을 수 없다**: W2의 base(#175 + #159)가 품은 migration head는 `0048_object_store_locator`이고, 고정된 중앙 순서는 `0049`(#172)·`0050`(#174)·`0051`(#176)·`0052`(W5 예약)다. 여기에 새 revision을 두면 `down_revision`이 가리킬 것이 없거나 head가 둘이 된다. 그래서 **별 PR**(사슬 꼬리를 품은 branch 위)로 올려야 하고, revision 번호와 그 base branch를 조정자에게 요청했다(조정자 사전 배정 `0053`).
+
+시험은 그 사이를 정직하게 비웠다 — 누출을 "옳다"로 고정했던 시험을 지우고, **오늘의 동작을 공백으로 기록하는 시험**(409이고 식별자는 노출하지 않음)만 남겼다. 목표 시험("한 tenant의 두 project가 같은 digest를 각각 등록할 수 있다")은 **여기 두지 않았다**: 지금은 예상 실패여야 하고 `xfail`은 JUnit `skipped` 항목이라 Backend lane의 exact-skip gate가 거부한다. 그 시험은 **migration PR 소유**다.
+
+### 10-6. F4 — 정본 403 denial audit
+
+내가 보고한 공백에 Codex가 계약을 걸었다(`issuecomment-5865205424`). route-local 기록 금지, #189의 action + 공유 canonical handler 사용, 403 한 건이 tenant/actor/project/action/trace를 가진 denial 정확히 1행, audit write 실패는 500 fail-closed. **카드 69의 공유 PR이 구현 중**이고 그것이 나오면 merge한다. 이 PR에서 직접 고치지 않는다.
+
+### 10-7. 검증(delta)
+
+| 명령 | 결과 |
+|---|---|
+| `pytest tests/core/test_model_version_register_route.py -q` | **80 passed** (v1.0의 64 + F2 10 + F3 3 + 모르는 23505 3) |
+| `pytest tests/core/test_model_release_route.py tests/core/test_write_response_contracts.py -q` | 113 passed |
+| `export_schemas --check` · `check_contract_bindings` · `check_response_freshness` | PASS |
+| `git diff --check` | 깨끗 |
+| 실 PG | 13건(목표 F1 시험 1건은 migration PR로 이동) |
+
+**변이 3건이 죽었다**: URI를 다른 model로 파생(6건 이상), 시각 취득을 lock 앞으로 되돌림(3건), sqlstate fallback 복원(1건).

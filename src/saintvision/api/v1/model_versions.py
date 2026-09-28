@@ -41,11 +41,30 @@ model:
 
 Both are follow-ups with an owner decision attached, not omissions. Tests pin
 the refusal so re-adding either field has to be deliberate.
+
+**The stored address is derived, not accepted** (Codex #191 F2). The row's URI is
+``inv://models/<model name>@<version>``, built here from the parent model's name
+and the requested version. A caller-supplied string was stored verbatim, which
+meant a credential-bearing ``https://`` URL, a ``javascript:`` scheme and another
+model version's address were all valid registrations -- and the kernel manifest's
+join key assumes the URI's version is the row's version. Deriving removes the
+class rather than filtering it.
+
+**The clock is read after the lock** (Codex #191 F3). ``Depends(get_now)`` is
+evaluated before the handler runs, and this handler then reads a body the caller
+paces and waits on an advisory lock. A request that took a minute to arrive would
+have stamped ``created_at``, the audit and the ledger's ``expires_at`` with a time
+from before it waited.
+
+**Known operational gap**: the advisory lock wait is unbounded. The product engine
+sets no ``lock_timeout`` or ``statement_timeout``, so a request whose key is held
+by a long transaction waits without a deadline. Bounding it is a timeout contract
+for the whole write lane rather than something this route should invent alone, so
+it is stated here and carried as a separate card instead of being left implicit.
 """
 
 from __future__ import annotations
 
-import datetime as dt
 import re
 import uuid
 from typing import Any, Mapping
@@ -68,9 +87,9 @@ from ...identity.principal import Principal
 from ...services import projects as project_service
 from ...services.audit import record_event
 from ...services.lineage import register_model_version
+from ...storage.pathsafe import build_uri
 from .. import schemas
 from ..deps import (
-    get_now,
     get_principal,
     get_settings,
     replay_or_reserve,
@@ -122,10 +141,10 @@ UNIQUE_CONFLICTS: Mapping[str, str] = {
     "uq_model_versions_tenant_id_content_sha256": (
         "That content digest is already registered."
     ),
-    "uq_model_versions_tenant_id_version_id": (
-        "That content digest is already registered."
-    ),
 }
+# ``uq_model_versions_tenant_id_version_id`` is deliberately absent: a collision
+# on a generated ULID is our defect, not a duplicate the caller sent, so it
+# propagates rather than being reported as their conflict.
 
 #: Every ``InvError`` reachable from the calls below, and its canonical form. A
 #: code missing here becomes ``SYS-0002``; a test enumerates the reachable codes
@@ -202,10 +221,14 @@ def _unique_conflict(error: IntegrityError) -> CanonicalProblem | None:
 
     The constraints are the second defence the design counts on, so the caller
     has to be told the registration conflicted -- a raw 500 would report our bug
-    for their duplicate. Anything that is *not* a unique violation is left to
-    propagate: an unexpected database refusal is a defect here and hiding it
-    behind a 409 would tell the caller to stop retrying something that is our
-    fault.
+    for their duplicate.
+
+    Only the constraints named in ``UNIQUE_CONFLICTS`` become 409. A unique
+    violation this module does not know about is left to propagate (Codex #191,
+    non-blocking): matching on the state code alone would dress a constraint added
+    later as "your digest is a duplicate", which is our defect reported as the
+    caller's mistake. Anything that is not a unique violation propagates for the
+    same reason.
     """
     original = error.orig
     constraint = getattr(getattr(original, "diag", None), "constraint_name", None)
@@ -216,11 +239,31 @@ def _unique_conflict(error: IntegrityError) -> CanonicalProblem | None:
         constraint = next((name for name in UNIQUE_CONFLICTS if name in text), None)
     if constraint in UNIQUE_CONFLICTS:
         return CanonicalProblem(GRAPH_PRECONDITION, 409, UNIQUE_CONFLICTS[constraint])
-    if getattr(original, "sqlstate", None) == "23505":
-        return CanonicalProblem(
-            GRAPH_PRECONDITION, 409, "That content digest is already registered."
-        )
     return None
+
+
+def _derived_uri(model: Model, version: str) -> str:
+    """The canonical address of the version being registered (Codex #191 F2).
+
+    Built from the parent model's name and the requested version, which is all
+    ``inv://models/<name>@<version>`` contains, so there is nothing for a caller
+    to supply and nothing to validate. ``build_uri`` is the product's own builder
+    (ADR-010) rather than an f-string here, so this address and the resolver's
+    grammar cannot drift.
+
+    A model name or version that the grammar cannot express is a request error,
+    not a 500: the version comes from this request, and a name that cannot be
+    addressed is a registration that could never be resolved.
+    """
+    try:
+        return build_uri("model", name=model.name, version=version)
+    except ValueError:
+        raise CanonicalProblem(
+            VAL_REQUEST,
+            422,
+            "This model and version cannot be addressed: a name must not contain "
+            "'@' or '/' and a version must not contain '/'.",
+        ) from None
 
 
 def _response(row) -> schemas.ModelVersionResponse:
@@ -242,7 +285,6 @@ async def register_version(
     request: Request,
     principal: Principal = Depends(get_principal),
     settings: Settings = Depends(get_settings),
-    now: dt.datetime = Depends(get_now),
     idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> Any:
     """Register a draft model version, once per idempotency key.
@@ -250,7 +292,9 @@ async def register_version(
     The body is parsed here rather than declared as a parameter: FastAPI
     validates a declared model before the handler runs and its
     ``RequestValidationError`` handler adds a top-level ``fields`` key that the
-    canonical schema forbids.
+    canonical schema forbids. The clock is read for the same kind of reason: a
+    dependency would fix the time before the body and the lock, so it is read
+    once, after both.
     """
     factory = make_session_factory(request.app.state.engine)
 
@@ -294,6 +338,10 @@ async def register_version(
                 # two spans must not be able to write, and must not be able to
                 # read a stored response either.
                 _require_approval(session, principal=principal, project_id=project_id)
+                # Read once, here: after the body the caller paced and after the
+                # wait for the lock, so every stamp this request writes is the
+                # time it actually did the work (Codex #191 F3).
+                now = request.app.state.clock()
                 try:
                     replayed = replay_or_reserve(
                         session,
@@ -315,7 +363,7 @@ async def register_version(
                     # Exact replay: the stored body, and the status this route
                     # always returns, which is the status that was stored.
                     return replayed
-                _model_in_project(
+                model = _model_in_project(
                     session,
                     tenant_id=principal.tenant_id,
                     project_id=project_id,
@@ -328,7 +376,7 @@ async def register_version(
                         model_id=model_id,
                         version=proposal.version,
                         content_sha256=proposal.content_sha256,
-                        uri=proposal.uri,
+                        uri=_derived_uri(model, proposal.version),
                         now=now,
                         byte_size=proposal.byte_size,
                     )

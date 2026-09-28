@@ -54,10 +54,11 @@ NOW = dt.datetime(2026, 9, 28, 6, 0, tzinfo=dt.timezone.utc)
 PATH = f"/v1/projects/{PROJECT}/models/{MODEL}/versions"
 KEY = "idem-0001"
 AUTH = {"Authorization": "Bearer register-token", "Idempotency-Key": KEY}
+MODEL_NAME = "demo"
+DERIVED_URI = f"inv://models/{MODEL_NAME}@1.4.0"
 BODY = {
     "version": "1.4.0",
     "contentSha256": SHA,
-    "uri": "inv://models/demo@1.4.0",
     "byteSize": 4096,
 }
 
@@ -65,10 +66,11 @@ BODY = {
 class Parent:
     """The columns ``_model_in_project`` reads. Not an ORM object."""
 
-    def __init__(self, *, tenant_id=TENANT, project_id=PROJECT):
+    def __init__(self, *, tenant_id=TENANT, project_id=PROJECT, name=MODEL_NAME):
         self.model_id = MODEL
         self.tenant_id = tenant_id
         self.project_id = project_id
+        self.name = name
 
 
 class Row:
@@ -82,7 +84,7 @@ class Row:
         self.stage = "draft"
         self.content_sha256 = content_sha256
         self.byte_size = byte_size
-        self.uri = "inv://models/demo@1.4.0"
+        self.uri = DERIVED_URI
         self.created_at = NOW
 
 
@@ -95,6 +97,11 @@ class Session:
     def execute(self, statement, params=None):
         self.world["log"].append("lock")
         self.world["locks"].append({"sql": str(statement), "params": params})
+        # A real lock can wait. Advancing the clock here is how a waiting
+        # request is expressed without sleeping.
+        advance = self.world["advance_on_lock"]
+        if advance is not None:
+            self.world["clock"] = advance
         return None
 
     def get(self, _model, _key, **_kwargs):
@@ -147,6 +154,10 @@ def build(monkeypatch, world):
     world.setdefault("depth", 0)
     world.setdefault("spans", 0)
     world.setdefault("body_depth", [])
+    world.setdefault("clock", NOW)
+    world.setdefault("clock_reads", [])
+    world.setdefault("advance_on_body", None)
+    world.setdefault("advance_on_lock", None)
 
     monkeypatch.setattr(model_versions, "make_session_factory", lambda _engine: Factory(world))
     monkeypatch.setattr(
@@ -174,6 +185,10 @@ def build(monkeypatch, world):
     async def read_bounded_body(request, **kwargs):
         world["body_depth"].append(world["depth"])
         world["log"].append("body-read")
+        # The caller paces the body; a slow one is time passing.
+        advance = world["advance_on_body"]
+        if advance is not None:
+            world["clock"] = advance
         return await original_read(request, **kwargs)
 
     monkeypatch.setattr(model_versions, "read_bounded_body", read_bounded_body)
@@ -215,11 +230,16 @@ def build(monkeypatch, world):
         external_subject="oidc:register",
         project_ids=frozenset({PROJECT}),
     )
+
+    def clock():
+        world["clock_reads"].append(len(world["log"]))
+        return world["clock"]
+
     app = create_app(
         engine=object(),
         settings=Settings(database_url="postgresql://unused", idempotency_ttl_seconds=600),
         verifier=StaticPrincipalVerifier({"register-token": principal}, allow_outside_dev=True),
-        clock=lambda: NOW,
+        clock=clock,
         check_partitions_on_startup=False,
     )
     return TestClient(app, raise_server_exceptions=False)
@@ -547,11 +567,9 @@ def test_the_model_is_bound_before_the_service_is_called(monkeypatch):
         {**BODY, "contentSha256": "a" * 65},
         {**BODY, "version": ""},
         {**BODY, "version": "v" * 65},
-        {**BODY, "uri": ""},
         {**BODY, "byteSize": -1},
         {key: value for key, value in BODY.items() if key != "version"},
         {key: value for key, value in BODY.items() if key != "contentSha256"},
-        {key: value for key, value in BODY.items() if key != "uri"},
     ],
     ids=[
         "uppercase-digest",
@@ -559,11 +577,9 @@ def test_the_model_is_bound_before_the_service_is_called(monkeypatch):
         "long-digest",
         "empty-version",
         "long-version",
-        "empty-uri",
         "negative-size",
         "no-version",
         "no-digest",
-        "no-uri",
     ],
 )
 def test_the_request_contract_is_enforced_at_the_boundary(monkeypatch, body):
@@ -573,7 +589,9 @@ def test_the_request_contract_is_enforced_at_the_boundary(monkeypatch, body):
     assert world["registered"] == []
 
 
-@pytest.mark.parametrize("field", ["producedByRunId", "lineage", "stage", "modelId"])
+@pytest.mark.parametrize(
+    "field", ["producedByRunId", "lineage", "stage", "modelId", "uri"]
+)
 def test_the_request_refuses_the_fields_this_route_deliberately_does_not_take(
     monkeypatch, field
 ):
@@ -582,7 +600,12 @@ def test_the_request_refuses_the_fields_this_route_deliberately_does_not_take(
     provenance nothing has checked."""
     world = {}
     client = build(monkeypatch, world)
-    value = [] if field == "lineage" else "run_01J8Z3XQ2K9WMV5T7N4B6C8D0E"
+    if field == "lineage":
+        value = []
+    elif field == "uri":
+        value = "https://user:secret@host/model.safetensors"
+    else:
+        value = "run_01J8Z3XQ2K9WMV5T7N4B6C8D0E"
     canonical(post(client, {**BODY, field: value}), code="VAL-0003", status=422)
     assert world["registered"] == []
 
@@ -597,13 +620,117 @@ def test_the_service_is_called_with_only_what_the_request_carried(monkeypatch):
         "model_id": MODEL,
         "version": "1.4.0",
         "content_sha256": SHA,
-        "uri": "inv://models/demo@1.4.0",
+        # Derived from the parent model's name and the requested version, never
+        # taken from the request (Codex #191 F2).
+        "uri": DERIVED_URI,
         "now": NOW,
         "byte_size": 4096,
     }
     # The service's own defaults for the provenance arguments stay in force.
     assert "produced_by_run_id" not in call
     assert "lineage" not in call
+
+
+# --------------------------------------------------------------------------
+# F2: the stored address is derived, so there is nothing to smuggle
+# --------------------------------------------------------------------------
+
+
+def test_f2_the_stored_uri_is_derived_from_the_parent_model_and_the_version(monkeypatch):
+    world = {}
+    client = build(monkeypatch, world)
+    response = post(client)
+    assert response.status_code == 201
+    assert world["registered"][0]["uri"] == DERIVED_URI
+    assert response.json()["uri"] == DERIVED_URI
+
+
+@pytest.mark.parametrize(
+    "smuggled",
+    [
+        "https://user:secret@host/model.safetensors",
+        "javascript:alert(1)",
+        "file:///etc/passwd",
+        "inv://models/other@9.9.9",
+        "inv://models/demo@1.4.0/../../secret",
+        "inv://artifacts/run_1/art_1",
+        "",
+    ],
+)
+def test_f2_no_caller_uri_can_reach_the_row(monkeypatch, smuggled):
+    """The request has no ``uri`` field at all, so every one of these is a
+    request error rather than something the route has to filter."""
+    world = {}
+    client = build(monkeypatch, world)
+    canonical(post(client, {**BODY, "uri": smuggled}), code="VAL-0003", status=422)
+    assert world["registered"] == []
+
+
+def test_f2_the_derived_uri_carries_the_row_version_the_manifest_joins_on(monkeypatch):
+    """``test_model_registry`` requires the URI's version to be the row's version.
+    Derivation makes that structural rather than a thing to check."""
+    from saintvision.storage.pathsafe import parse_uri
+
+    world = {"row": Row(version="2.5.1")}
+    client = build(monkeypatch, world)
+    post(client, {**BODY, "version": "2.5.1"})
+    parsed = parse_uri(world["registered"][0]["uri"])
+    assert parsed.kind == "model"
+    assert parsed.name == MODEL_NAME
+    assert parsed.version == "2.5.1"
+    assert parsed.relative_path == ""
+
+
+@pytest.mark.parametrize("name", ["has/slash", "has@at"])
+def test_f2_a_model_name_the_grammar_cannot_address_is_a_request_error(monkeypatch, name):
+    """Not a 500: a model whose name cannot be addressed is a registration that
+    could never be resolved, and the caller can be told so."""
+    world = {"parent": Parent(name=name)}
+    client = build(monkeypatch, world)
+    canonical(post(client), code="VAL-0003", status=422)
+    assert world["registered"] == []
+
+
+def test_f2_a_version_the_grammar_cannot_address_is_a_request_error(monkeypatch):
+    world = {}
+    client = build(monkeypatch, world)
+    canonical(post(client, {**BODY, "version": "1.0/0"}), code="VAL-0003", status=422)
+    assert world["registered"] == []
+
+
+# --------------------------------------------------------------------------
+# F3: the clock is read after the body and after the lock
+# --------------------------------------------------------------------------
+
+
+def test_f3_the_clock_is_read_once_and_after_the_lock(monkeypatch):
+    world = {}
+    client = build(monkeypatch, world)
+    post(client)
+    # One read, and it happened after "lock" was logged.
+    assert len(world["clock_reads"]) == 1
+    assert world["clock_reads"][0] > world["log"].index("lock")
+
+
+def test_f3_a_slow_body_does_not_stamp_the_row_with_the_earlier_time(monkeypatch):
+    later = NOW + dt.timedelta(minutes=5)
+    world = {"advance_on_body": later}
+    client = build(monkeypatch, world)
+    post(client)
+    assert world["registered"][0]["now"] == later
+    assert world["audits"][0]["now"] == later
+    assert world["stored"][0]["now"] == later
+
+
+def test_f3_waiting_on_the_lock_does_not_stamp_the_row_with_the_earlier_time(monkeypatch):
+    later = NOW + dt.timedelta(hours=2)
+    world = {"advance_on_lock": later}
+    client = build(monkeypatch, world)
+    post(client)
+    # Every stamp this request writes is the time it actually did the work.
+    assert world["registered"][0]["now"] == later
+    assert world["audits"][0]["now"] == later
+    assert world["stored"][0]["now"] == later
 
 
 @pytest.mark.parametrize(
@@ -668,12 +795,8 @@ def _integrity(message, *, constraint=None, sqlstate=None):
             ),
             "That content digest is already registered.",
         ),
-        (
-            _integrity("duplicate key", sqlstate="23505"),
-            "That content digest is already registered.",
-        ),
     ],
-    ids=["by-constraint-name", "digest-by-name", "by-message", "by-sqlstate"],
+    ids=["by-constraint-name", "digest-by-name", "by-message"],
 )
 def test_a_unique_violation_is_a_409_not_a_500(monkeypatch, error, detail):
     world = {"service_error": error}
@@ -706,6 +829,28 @@ def test_an_integrity_error_that_is_not_a_unique_violation_is_not_disguised(monk
     client = build(monkeypatch, world)
     assert post(client).status_code == 500
     assert world["stored"] == []
+
+
+@pytest.mark.parametrize(
+    "error",
+    [
+        _integrity("duplicate key", sqlstate="23505"),
+        _integrity("dup", constraint="uq_something_added_later"),
+        _integrity("dup", constraint="uq_model_versions_tenant_id_version_id"),
+    ],
+    ids=["unknown-by-state", "unknown-by-name", "generated-id-collision"],
+)
+def test_a_unique_violation_this_module_does_not_know_is_not_called_a_duplicate(
+    monkeypatch, error
+):
+    """Codex #191, non-blocking: matching on the state code alone would dress a
+    constraint added later -- or a collision on a generated ULID, which is our
+    defect -- as "your digest is a duplicate"."""
+    world = {"service_error": error}
+    client = build(monkeypatch, world)
+    assert post(client).status_code == 500
+    assert world["stored"] == []
+    assert world["audits"] == []
 
 
 # --------------------------------------------------------------------------
