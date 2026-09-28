@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.21"
+version: "1.2.22"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T09:55:00+09:00"
+updated: "2026-09-28T13:44:31+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+G-01 adapters route HTTP 레벨 시험 (Claude, 2026-09-28, base `1e8baf04`, branch `agent/claude/adapters-route-http-tests`): PR #179의 통합 분류표 1순위 구현. **시험 파일 하나(15 test)이고 제품 코드는 한 줄도 바꾸지 않았다.** 공백의 실체: `GET /v1/adapters`·`/{name}`이 S03부터 서빙됐는데 `tests/`의 `v1/adapters` grep 0건 — route 층(인증·응답 shape·404·`readyCount`)이 한 번도 실행된 적이 없었다. 담은 것 15건: 키 집합·`measurementScope`/`remoteNodeReadiness`(G-12 정직성을 시험으로 고정)·순서 보존·`readyCount` near-miss 4 + 양성 대조 1·깨진 tool 1개가 요청을 실패시키지 않음·단건 조회의 probe 병합·도달 불가 200·두 route 401·`BusinessDispatch` 가시성·선언 타입 부재 기록. 판단 둘: ①`agents.readiness()`를 **stub**한다(대상은 route, 실 바이너리 탐지는 G-11 — 섞으면 route 회귀와 바이너리 부재가 같은 실패로 보인다). ②**정본 `ProblemDetails`가 아닌 404를 그대로 pin**한다(`code`·`type` 없음까지 단언) — 공개 오류 body 변경은 계약 변경이고 #167이 기존 표면을 건드리지 않은 결정과 같다. 관찰: 두 route가 `-> dict`라 `export_schemas`가 schema를 만들지 않아 **모양 변화를 gate가 못 잡는다**. 응답 타입 추가는 계약 변경이라 범위 밖이고 사실만 시험으로 남겼다(후속 후보). 검증: 신규 파일 **15 passed**, `pytest tests/core` **1047 passed / 4 skipped**, docs gate 2종 exit 0. 로컬 실 PG·Docker·전체 suite 미실행. 다음 첫 행동: Codex 검토. 그 뒤 2순위(G-02 live archiver hosted 실행)는 접근 경로 결정이 먼저라 짧은 설계 문서부터 올린다. 전문 [[2026-09-28_G-01_adapters_route_HTTP시험_Claude]].
 
 hosted Core junit로 S04/05/07-DB 케이스 수치 보강 카드 12 (Claude, 2026-09-22, 읽기 전용): artifact `saintvision-core-evidence`(run 35706465645 `3d1892c0` + proof 35714470445 `f2aa2b14`)를 .work/ci-junit에 받아(바이너리 삭제 후 1.4MB) 파일별 수치(core 2948/58/0·shard-recovery 21·containment 28·workspace 22·business-handoff 17·lan-installer 15·docker-host 2, f2aa2b14는 core 2998/58/0 외 동일)와 카드 10의 hosted-only 항목 케이스 이름을 classname으로 추출 — 재전송 hash(output_ingestion 5·node_delivery 18·results 21), placement Explain(placement 12), shard replacement 21, containment 28, workspace 복구 12+11, 노드 스토리지 전송 27 — **전부 passed**. hosted에도 없는 것(AC-05 결정성/P95·AC-07 60초/95%·CX01)은 그대로 물리/5노드 대기로 명시. 패키지 §C-2 + 검증상태지도 §12 보강. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 
