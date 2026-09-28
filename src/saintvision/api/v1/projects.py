@@ -35,12 +35,14 @@ router = APIRouter(prefix="/v1", tags=["projects"])
 # this router's ``routes``, so a separate top-level router would be registered
 # and never reached, and a nested ``include_router`` would only leave a lazy
 # placeholder. ``register`` adds the real route.
-from . import lineage_query, model_release, run_records, run_seal  # noqa: E402
+from . import context_bundles, lineage_query, model_release, model_versions, run_records, run_seal  # noqa: E402
 
 model_release.register(router)
 lineage_query.register(router)
 run_records.register(router)
 run_seal.register(router)
+context_bundles.register(router)
+model_versions.register(router)
 
 
 @router.get("/projects", response_model=schemas.ProjectListResponse)
