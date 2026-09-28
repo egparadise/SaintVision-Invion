@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.209"
+version: "1.0.211"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T08:55:00+09:00"
+updated: "2026-09-28T15:40:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-28 S05 Card42 bounded admission 후속 결정 v1.1 — 재검토 요청
+
+- Claude F1~F6과 코디네이터 결정을 반영해 W=450을 포함한 모든 W>0 arm을 철회했다. hosted `h_obs_max=99.531ms`와 `h_limit(W)=W/4`를 분리했고, 한 cohort만 추가해도 P95가 460.759ms로 legacy 401.090ms를 넘으며 현재 permit 위치는 idempotency `FOR UPDATE` 뒤라 transaction 대기 위험이 있음을 기록했다.
+- 세 gate는 유지하고 다음 측정은 legacy(flag off)만 hosted 20→35→50 동시로 높인다. 각 rung 3회, 한 wave라도 `55P03+57014>0` 또는 세 wave P95 all 중앙 `>2000ms`면 첫 degrade 후보로 고정하며, 50까지 degrade가 없으면 semaphore 라인을 닫는다.
+- docs-only이며 새 wave·제품·workflow·계약·migration 변경은 0이다. flag off·S05 `in_progress`·승격 없음이고 staircase lane은 v1.1 승인 뒤 별도 카드다. [[S05 bounded admission 후속 결정 제안]], [[2026-09-28_09-00-00_KST_S05_bounded_admission_후속결정_Codex]].
 
 ## 2026-09-28 S05 Card39 hosted 20동시 wave — GATES_FAILED, 검토 요청
 
