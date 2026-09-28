@@ -4,7 +4,7 @@ title: "Codex 작업 현황"
 version: "1.0.216"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T20:35:25+09:00"
+updated: "2026-09-28T20:55:02+09:00"
 source_of_truth: "Git"
 ---
 
@@ -57,6 +57,11 @@ source_of_truth: "Git"
 - PR #159 Claude r3의 비차단 관찰을 #159 위 PR #173으로 분리했다. S3 checkout은 persisted provider를 exact resolve하고, collect는 locator prefix를 `deleting` 커밋 전에 검증하며, begin/prefix drift는 `STORE-0001`/503/retryable로 통일했다. malformed locator 422와 upload content identity 409는 유지한다.
 - restore의 새 요청은 Run state/version/attempt를 checkpoint pin보다 먼저 검증해 `GRAPH-0003`을 유지한다. object byte/delete 호출 11곳의 provider mismatch guard 순서를 회귀 시험으로 고정했다.
 - Claude 조건부 검토 뒤 실제 checkout 호출 지점과 ResultStore prepare/complete·ShardCompletion once의 mismatch 동작 시험을 보강해 focused 26 passed, 최종 head `f02dacf6`이다. hosted Backend `36377648185`는 3.12/3.14 각각 3077 passed/47 skipped/2 deselected/0 failed, Core `36377648156`은 3383 passed/36 skipped/2 deselected/0 failed와 exact skip gate, S01은 2+3 passed, Docs·desktop-browser도 success다. Claude 재대조 r2는 해당 head를 승인했으며, #159 병합 뒤 retarget·병합은 코디네이터 담당이다. 로컬 실 PG·Docker는 미실행이다. [[2026-09-28_12-40-00_KST_S3_ObjectStore_관찰후속_Codex]].
+## 2026-09-28 카드 90 — AC-11 migration 0047~0053 통합·재핀 cascade
+
+- #177에서 manifest를 0047·0050·0053 `PRESERVED`까지 확장하고 source graph로 0052 barrier 뒤 reversible tail을 재계산한다. 0053 scoped-row downgrade refusal은 exact revision 0053까지 upgrade한 뒤 0052 거부·version/project_id 원자 보존을 확인해, 이후 0054가 들어와도 fixture 의미가 바뀌지 않는다.
+- hosted run `36416624234`는 source `da112daf`, JUnit 7/0/0/0, reversible·restore 두 축 PASS, 부정 fixture 4/4, residue 0, Backend 3592 passed·50 skipped·0 failed다. 다만 source에 새 registry pin이 없어 **reference-only**이며 release evidence로 소비하지 않는다.
+- #192가 새 target과 restore criteria 4를 registry blob `c08a45f8…`으로 aggregator·importer에 함께 재핀한다. 소비 가능한 evidence는 이 registry를 포함한 #192 이후 exact head에서 재생성해야 한다. #193 standalone LocalObjectStore 경계와 #204 hosted lane까지 force 없이 cascade하고 S11/AC-11 상태 승격은 하지 않는다. [[2026-09-28_13-06-51_KST_S11_AC11_migration_리허설_Codex]].
 
 ## 2026-09-28 Card45 S3 ObjectStore 제품 결속 v2 — 제품 restore 보강·hosted 재검증
 
@@ -1375,3 +1380,13 @@ AOA-05 follow-up: the old 18 setup errors had two distinct causes: unset CX01_CO
 - History: [[2026-09-28_11-43-52_KST_S11_AC11_집계기_1단계_Codex]].
 - Claude r2 follow-up: target registry reviewed blob 고정, manifest `releaseSha` 단일 tree 결속, 축별 `requiredEnvironment`(물리 5노드 ADR-100 / 실제 PITR 분리 장애영역·운영 archive), PITR 주간 반복 기준을 추가했다. 변이 포함 PG-free focused 시험은 54 passed이며 AC-11 상태는 미완료다.
 - Claude r3 조건부 승인 C1: #170 security sourceDocument가 branch commit `c62cb671`에 결속되므로 #157 뒤 **merge commit(`--merge`)만 허용**, squash/rebase 금지. PR 본문과 History에 고정했다.
+
+## 2026-09-28 Card 51 — S11 AC-11 migration restore rehearsal
+
+- Branch/stack: `agent/codex/s11-migration-rehearsal` / PR #170 C1 head `960fdc6b`; owner/reviewer Codex/Claude.
+- Opt-in hosted lane, exact PR-head checkout, disposable PostgreSQL 16 source/restore DB, pre/post-forward sentinel, final catalog fingerprint, residue-zero JSON/JUnit evidence를 구현했다. reversible tail 0은 조건부 `NOT_APPLICABLE`, 짝인 `0045→snapshot restore→0046`만 실제 PASS 후보이며 lossy-reversible 10개는 개별 측정이 아닌 restore-route 사전 분류로 유지한다.
+- History: [[2026-09-28_13-06-51_KST_S11_AC11_migration_리허설_Codex]].
+- Hosted 후속 정정: PG-free focused 12 passed. 정본 run `36377513831`(head `de9d8a4e`)은 `0045→snapshot restore→0046`를 `MEASURED_PASS`, JUnit 3/0/0/1 skip, disposable DB residue 0으로 확인했다. 앞선 네 run의 진단·owner 보존·OID/attnum·동등 CHECK deparse 교정도 History에 보존했다. 이는 단일 hosted restore 축만의 PASS이며 AC-11 전체와 S11 상태는 미완료다.
+- Claude F1~F5 보강 head `abe8435a`: shallow Backend 분리, future reversible 기준 DB 비교, 임시 Alembic 부정 fixture 3종, AC-11 importer/target registry, 좁은 CHECK 정규화를 추가했다. hosted run `36379743674`는 JUnit 6/0/0/1 skip·disposable DB 7개 residue 0·artifact `10952510591`로 PASS했고, PG-free 75 passed와 문서/ontology/contract/ratchet 게이트 exit 0이다. 단일 hosted restore 축만의 증거이며 새 cluster role·운영 PITR·물리 복구는 미측정이다.
+- Claude r2 N1~N4 대응: importer가 artifact zip을 직접 hash하고 zip 내부 report/JUnit 및 GitHub run/artifact metadata의 run ID·head·결론·이름·만료를 exact 대조한다. 정본 artifact 재수입은 expected/observed `d4437410…`·report `cfa3b678…`·JUnit `1cbc2ffe…`, exit 0이며 임의 digest/failed·expired·head/run drift/sourceRunId 누락/JUnit 실패를 거부한다. 0009는 23505와 rollback state를 요구하고 JUnit은 negative case 실제 실행을 반영하며, PG-free focused 87 passed다.
+- Claude r3 조건부 승인 N5/N6 경계: 정본 hosted run `36379743674`는 느슨한 0009 판정이 있던 `abe8435a` 산출물이고, `b2b4db3c`의 N2/N3 강화는 PG-free만 검증돼 release 전 lane 재실행이 필요하다. importer는 `gh api`로 취득한 zip/run/artifact JSON의 상호 결속을 검사하지만 metadata 출처를 인증하지 않으므로, canonical repository 조회 명령·artifact id `10952510591`·일관된 입력 위조 한계를 History와 docstring에 고정했다.
