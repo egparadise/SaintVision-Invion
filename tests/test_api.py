@@ -335,6 +335,50 @@ def test_a_denial_with_no_tenant_is_still_recorded(client, owner_engine):
     assert rows[0]["action"] == "GET /v1/nodes"
 
 
+def test_a_long_route_without_a_credential_is_401_and_its_denial_is_recorded(client, owner_engine, seeded):
+    """The shared boundary behind Codex #184 F3: with prefixed ids in the path,
+    ``PUT /v1/projects/{p}/members/{u}`` is 86 characters and the raw-path
+    action overflowed ``audit_events.action`` (64), so the denial INSERT failed
+    and the 401 surfaced as a 500. The action now records the matched template."""
+    path = f"/v1/projects/{seeded['project_a']}/members/{seeded['user_b']}"
+    assert len(f"PUT {path}") > 64
+    response = client.put(path, json={"role": "operator"})
+    assert response.status_code == 401, response.text
+    assert response.headers["WWW-Authenticate"] == "Bearer"
+    assert response.json()["code"] == "AUTH-MISSING-CREDENTIAL"
+    with owner_engine.connect() as connection:
+        rows = connection.execute(
+            text(
+                "SELECT outcome, actor_type, action FROM audit_events "
+                "WHERE tenant_id IS NULL AND reason_code = 'AUTH-MISSING-CREDENTIAL'"
+            )
+        ).mappings().all()
+    assert len(rows) == 1
+    assert rows[0]["outcome"] == "deny" and rows[0]["actor_type"] == "anonymous"
+    assert rows[0]["action"] == "PUT /v1/projects/{project_id}/members/{user_id}"
+    assert seeded["project_a"] not in rows[0]["action"] and seeded["user_b"] not in rows[0]["action"]
+
+
+def test_the_raw_path_action_reproduces_the_overflow_on_a_long_route(client, owner_engine, seeded, monkeypatch):
+    """Revert-fail pin: with the previous ``METHOD path`` derivation the denial
+    write itself raises on the real column, and no row is recorded. The
+    client raises server exceptions, so the DBAPI cause is asserted directly."""
+    from sqlalchemy.exc import DataError
+
+    from saintvision.api import app as app_module
+
+    monkeypatch.setattr(app_module, "audit_action", lambda request: f"{request.method} {request.url.path}")
+    path = f"/v1/projects/{seeded['project_a']}/members/{seeded['user_b']}"
+    with pytest.raises(DataError) as caught:
+        client.put(path, json={"role": "operator"})
+    assert type(caught.value.orig).__name__ == "StringDataRightTruncation"
+    with owner_engine.connect() as connection:
+        count = connection.execute(
+            text("SELECT count(*) FROM audit_events WHERE reason_code = 'AUTH-MISSING-CREDENTIAL'")
+        ).scalar_one()
+    assert count == 0
+
+
 def test_unknown_credential_is_refused(client):
     response = client.get("/v1/nodes", headers={"Authorization": "Bearer nope"})
     assert response.status_code == 403

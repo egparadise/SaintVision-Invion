@@ -114,6 +114,11 @@ class Session:
     def __init__(self, world):
         self.world = world
 
+    def execute(self, statement, params=None):
+        # Card 84: the lane's lock-wait bound, SET LOCAL before the row lock.
+        self.world.setdefault("lock_timeouts", []).append(str(statement))
+        return None
+
     def get(self, _model, _key, **_kwargs):
         return self.world["parent"]
 
@@ -166,6 +171,15 @@ def build(monkeypatch, world, *, kernel_base_url="http://kernel.invalid"):
 
     factory = Factory(world)
     monkeypatch.setattr(model_release, "make_session_factory", lambda _engine: factory)
+    # The shared denial recorder writes through the app's engine, which these
+    # tests do not have; recorded here so a 403's audit call is asserted, not lost.
+    from saintvision.api import app as app_module
+
+    monkeypatch.setattr(
+        app_module,
+        "record_denial_out_of_band",
+        lambda _engine, **kwargs: world.setdefault("denials_recorded", []).append(kwargs),
+    )
     monkeypatch.setattr(
         model_release, "tenant_scope", lambda _session, _tenant: contextlib.nullcontext()
     )
@@ -1126,3 +1140,13 @@ def test_the_real_pg_seed_builds_every_row_without_a_database():
     # The trap itself, named: two lineage kinds are not entity kinds, so a fixture
     # that reuses an edge kind as an id kind raises.
     assert set(LINEAGE_KINDS) - set(PREFIXES) == {"code_commit", "container_image"}
+
+
+def test_card84_both_spans_bound_their_lock_waits(monkeypatch):
+    """Permission preflight and the write transaction both SET LOCAL lock_timeout
+    (Codex #211 F1: the preflight's FOR SHARE on the user row can wait too)."""
+    world: dict = {}
+    client = build(monkeypatch, world)
+    response = post(client)
+    assert response.status_code == 200, response.text
+    assert world["lock_timeouts"] == ["SET LOCAL lock_timeout = '5000ms'"] * 2
