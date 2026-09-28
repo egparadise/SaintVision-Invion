@@ -20,6 +20,43 @@ source_of_truth: "Git"
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
 - 확인 기준: 2026-09-28T20:25:00+09:00 (최신 tip `agent/gemini/g07-eval-runner-impl`, commit `e2011893`, PR #190).
+- 확인 기준: 2026-09-28T18:58:00+09:00 (최신 tip `agent/gemini/s10-fe-conformance-status`).
+
+## 2026-09-28 S10-FE 어댑터 conformance 관측 화면 새 API(G-03 1단계) 연동 및 Claude UI·Codex 계약 리뷰 전수 반영 (agent/gemini/s10-fe-conformance-status)
+
+- **Claude UI (F1~F7, 변이 M1~M10) 및 Codex 계약 (F-R1) 리뷰 결함 전수 조치 완결**:
+  - **F1 / F-R1 (생성 계약 타입 결속 및 손편집 완전 제거)**:
+    - `packages/contracts-ts/src/index.ts` 수작업 추가 15줄을 base 커밋(`18a59027`) 상태로 되돌리고 `types.ts` 수작업 re-export 제거.
+    - `adapterObservation.ts` 및 `ModelLineageView.tsx`가 생성 모듈 `@/contracts/conformance-status-response`를 직결 import.
+    - `model-lineage.test.ts`에 생성 타입 결속 회귀 시험 추가.
+    - `npm run contracts:check` PASS (17 API response types match schemas).
+  - **F2 (PR #200 백엔드 실 응답 정합 및 허위 오류 코드 전면 제거)**:
+    - 403: 실제 RFC 9457 정본(`AUTH-0030`, `detail: "This project is not accessible."`) fixture 적용.
+    - 401: 실제 InvError 레거시 형태(`AUTH-MISSING-CREDENTIAL`) 및 FE `client.ts`의 `[NET-0401] (401) Request rejected: a bearer credential is required` 폴백 표출 검증.
+    - 404: 미존재 `RES-0004` 및 가짜 문구 '프로젝트를 찾을 수 없습니다' 전면 제거, 라우트 미배포 폴백(`NET-0404` / 404 / "Not Found")만 정직하게 검증.
+    - 체크리스트 Fixture: `adapters/conformance.py:357-389`의 `CHECKLIST` 정본 15개 명칭, 12 Standard / 3 Gated 게이팅, 실제 어댑터 4종, 실제 reason 문자열로 교체.
+    - 대소문자 무관 `/pass/i` 거부 단언 적용. `AUTH-0001`, `RES-0004`, 가짜 문구 검색 0건.
+  - **F3 (500, 네트워크, 502 HTML 에러 및 성공→403 전이 시험, M8 변이 사살)**:
+    - 성공 → 403 전이 시 이전 체크리스트 컨테이너 완전 격리(null) 단언으로 변이 M8 사살.
+    - 네트워크 단절(`TypeError: Failed to fetch`), 500(`SYS-0002`), 502 HTML 프록시 에러 시험 추가.
+    - 비JSON/HTML 및 5xx NET 에러 수신 시 안전한 한국어 문구 변환으로 마크업 누출 원천 차단.
+  - **F4 (하드코딩 "15개" 표기 제거)**: 소제목 및 미측정 안내문에서 "15개" 제거, 동적 시험에서 패널 textContent에 "15개" 미포함 단언.
+  - **F5 (Standard 배지 색상 상향 및 DOM 스타일 직접 실측 대비 계산)**:
+    - Standard 배지 텍스트를 `#a0a8b2`로 상향하여 `#161b22` 위 15% 알파 블렌딩 배경 대비 5.52:1 확보.
+    - 렌더된 DOM 엘리먼트의 `style.color`와 `backgroundColor`를 직접 읽어 sRGB 상대휘도 및 알파 합성 대비율 실측 계산.
+  - **F6 (문구 정직성 정비)**: 조회 전 `미측정 (미조회)`, 에러 시 `조회 실패`, 성공 알림 `조회 완료: 미측정(NOT_OBSERVED)`. 에러 라이브 알림 간결화.
+  - **F7 (미사용 initialConformance prop 및 마운트 useEffect 제거)**: 비동기 abort 누락 및 가드 우회 경로 원천 차단.
+  - **변이 사살 및 a11y 강화**: M6(부정 descriptor 필드 거부), M8(성공->403 잔존 사살), M9(HTML 누출 차단), M10(DOM 스타일 실측 대비), 테이블 `<caption>` / `th scope="col"` / 고유 key(`${idx}-${check.name}`) 적용.
+- **백엔드 소스 변경 0**: 프런트엔드 소스 및 테스트만 변경.
+- **실측 검증 결과**:
+  - `npm test -- model-lineage`: PASS (23 tests passed).
+  - `npm test`: PASS (78 files, 707 passed).
+  - `npx tsc -b && npm run build`: PASS (타입 에러 0건, 806.38 kB 번들 생성 성공).
+  - `pytest tests/test_route_coverage.py`: PASS (40 passed).
+  - `python tools/check_frontend_integrity.py`: PASS (0 violations).
+  - `python tools/check_contract_bindings.py`: PASS (55 fixtures, 20 bound types, 14 replay guards).
+  - `python tools/check_docs.py`: PASS (911 versioned docs, DAG 무결성).
+  - `python tools/sync_obsidian.py --check`: PASS (0 conflicts).
 
 ## 2026-09-28 S10-FE 제품 결함 수정 및 Claude UI / Codex 계약 재검토 전수 반영 (agent/gemini/s10-fe-fixes, PR #146)
 
