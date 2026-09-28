@@ -1,11 +1,11 @@
 ---
 doc_id: "CLAUDE-EVIDENCE-GAP-TRIAGE-001"
-title: "Claude Evidence 대응표 6종의 공백 통합 분류 v1.1 — 출처 29행을 distinct 23행으로(IMPLEMENTATION/DESIGN 7 · CI_LANE_GAP/NOT_OBSERVED 4 · BLOCKED_EXTERNAL 12), actionable 9 · 관찰 2, Claude 큐 6단 (카드 bi, docs-only)"
-version: "1.1.0"
+title: "Claude Evidence 대응표 6종의 공백 통합 분류 v1.2 — 출처 29행을 distinct 23행으로(IMPLEMENTATION/DESIGN 7 · CI_LANE_GAP/NOT_OBSERVED 4 · BLOCKED_EXTERNAL 12), actionable 9 · 관찰 2, Claude 큐 5순위·6공백 (카드 bi, docs-only)"
+version: "1.2.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T13:36:40+09:00"
+updated: "2026-09-28T14:34:52+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -43,7 +43,7 @@ v1.0의 산술이 어긋나 있었다 — 표는 22행인데 21건이라 적고,
 
 ## 1. 통합 분류표
 
-원래 표 6종의 공백 **29행**을 중복 제거해 **21건**으로 모았다(중복 8: Windows 게이트 2, `audit_events` RLS 2, 실 Provider 2, MLflow 2).
+원래 표 6종의 공백 **29행**을 **distinct 23행**으로 모았다 — 합친 것 7건, 나눈 것 1건이다(§1-4의 행 단위 대응). 서론의 세는 단위 표와 §1-5의 분류가 모두 같은 23을 쓴다.
 
 ### 1-1. IMPLEMENTATION / DESIGN GAP — 7건
 
