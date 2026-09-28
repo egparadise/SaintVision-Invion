@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.123"
+version: "1.0.124"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-28T10:30:31+09:00"
+updated: "2026-09-28T10:51:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,21 +19,23 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-28T10:30:31+09:00 (최신 tip `1e8baf04`, 작업 브랜치 `agent/gemini/s11-fe-matrix`).
+- 확인 기준: 2026-09-28T10:51:00+09:00 (최신 tip `1e8baf04`, 작업 브랜치 `agent/gemini/s11-fe-matrix`).
 
-## 2026-09-28 S11-FE 접근성·시각 회귀·배포 후보 시나리오 매트릭스 v1.0.1 정정 (docs-only, `agent/gemini/s11-fe-matrix`)
+## 2026-09-28 S11-FE 접근성·시각 회귀·배포 후보 시나리오 매트릭스 v1.0.2 개정 (docs-only, `agent/gemini/s11-fe-matrix`)
 
 - **작업 개요 및 목적**:
-  - Claude UI 축 독립 검토 지적 9개 항목 전수 정정 및 S11-FE 시나리오 매트릭스 정본 v1.0.1 갱신.
+  - Claude UI 축 r2 조건부 승인 조건 7건(C1~C7) 및 관측 사항 전수 정정 및 S11-FE 시나리오 매트릭스 정본 v1.0.2 확정.
 - **주요 정정 사항 (`[[2026-09-28_S11-FE_접근성_시각회귀_배포후보_시나리오_매트릭스_Gemini]]`)**:
-  1. **코드 및 문자열 인용 정정**: `result.success` (:108) / `result.activeCandidate?.rollbackVerified` (:111) 원문 단언으로 수정, 렌더링 문자열 `"100% (5/5 적합)"`(:93) 및 라벨(:91) 반영, 5대 규칙 전체 식별자(`wcag21-1.4.3-contrast-minimum` 등) 명시, CI 스텝(이름 line 57, 단언 line 77, step 10) 명시.
-  2. **ACC-08 근거 및 관측 방법 교정**: `test_route_coverage.py` pytest 소스 검사 범위(ResourceExplorer, DeveloperStudio) 명시, 컴포넌트별 DOM 단언(ApprovalCenter, IDV, Login) 매핑 및 미구현(ErrorState, NodeList) 구분, `accessibility-status-and-guards.test.tsx` 정식 인용.
-  3. **ACC-09 색 대비율 재계산**: 기본 Dark 테마 기준 Button primary 3.68:1, danger 3.76:1 미달 결함(DEF-S11-09) 및 입력창 테두리 미달(DEF-S11-10) 수록, 수동 계산 명시.
-  4. **결함 목록 확충 (DEF-S11-01 ~ DEF-S11-19, 총 19건)**: RCV:145 직접적 허위 표기(DEF-S11-08), RCV:231-242 하드코딩 PASS 배지(DEF-S11-15), releaseEngine.ts:144 초기값 rollbackVerified: true(DEF-S11-16), RCV 반응형 결함(DEF-S11-17), 모달 오버레이 role/Esc 누락 전수 수록.
-  5. **VIS 실행성 정정**: 모바일 2열 고정 및 7열 테이블 넘침 반응형 결함 반영, `test_web_container.py:150` 비로그인 로그인 화면 캡처 한정 및 RCV 미포함 명시, `@playwright/test` 미지원 및 Python 비교/마스킹 필요성 명시, 본 PR head run `36364721470` 명시.
-  6. **REL 관측 정정**: REL-01 vitest 미구현 표기, IDV 및 MLV의 타 매트릭스(#156, #146) 이관 범위 명시.
+  1. **C1 (RCV:91 라벨 원문 정정)**: `접근성 점검 (WCAG 2.1 AA)`를 실제 소스 원문인 `WCAG 2.1 AA 접근성 적합도`(:91)로 정정.
+  2. **C2 (CI 스텝 이름 정정)**: `.github/workflows/desktop-browser.yml:57` 스텝 명칭을 `- name: Require every canonical browser journey to execute`로 정정.
+  3. **C3 (소스코드 경로 3종 정정)**: `apps/web/src/features/runs/RunDetail.tsx` (기존 agent 오기 정정), `apps/web/src/features/studio/DeveloperStudio.tsx` (기존 developer 오기 정정), `apps/web/src/app/App.tsx` (기존 src/App.tsx 오기 정정) 전수 교체 (`git cat-file -e HEAD:<path>` 검증 완료).
+  4. **C4 (DEF-S11-09 Danger 버튼 토큰명 정정)**: `var(--color-status-offline)` (`Button.tsx:49`, `index.css:67`)으로 정정하고, 다크 테마 권고안에 `#0f172a` 다크 텍스트 전환(대비율 7.02:1 / 6.45:1) 명시.
+  5. **C5 (ACC-09 인라인 텍스트 색 쌍 정정)**: `#c9d1d9` on `#0d1117` = 12.26:1이 `releaseEngine.ts:99` 주석 쌍임을 명시하고, 실제 RCV는 `#c9d1d9` on `#161b22` = 11.21:1 (:149, :287) 및 `#0d1117` (:210) 분리임을 기술. "수동 계산 실측" 표현을 "수동 계산 (렌더 실측 아님)"으로 정정.
+  6. **C6 (ruleId 행 번호 정정)**: `wcag21-1.4.3-contrast-minimum` 줄 번호를 `releaseEngine.ts:95`로 정정 (:96은 `wcagLevel: 'AA'`).
+  7. **C7 (IDV 이관 대기 명시)**: `IntranetDeploymentView.tsx`의 허위 상태(:114, :194, :576 등)를 S12-FE 매트릭스(PR #156) 이관 대기 및 전담 관리 대상으로 상호 참조 갱신.
+  8. **관측 사항 반영**: Monaco 에디터 textarea(`MonacoWorkspaceEditor.tsx:706`) `outline: 'none'` 결함을 ACC-01 및 DEF-S11-01에 추가, DEF-S11-12 결함 본질(전체 UI 일반화 과장 표기) 명시, hosted desktop-browser 실행 ID `36366313817` 반영, 닫힘 확인 7대 문자열 grep 0건 달성.
 - **다음 행동 및 인계**:
-  - Claude UI 축 및 Codex 계약 축 재검토 요청.
+  - Claude UI 축 및 Codex 계약 축 최종 병합 승인 요청.
 
 ## 2026-09-23 S04-FE Claude 리뷰 F1~F5 전수 조치 및 정직 증거 갱신 (`agent/gemini/s04-fe-matrix-measured`)
 
