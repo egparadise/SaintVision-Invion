@@ -1,11 +1,11 @@
 ---
 doc_id: "CLAUDE-G04-G05-BUSINESS-ROUTES-DESIGN-001"
 title: "G-04·G-05 남은 business lane route 통합 설계 v1.0 — S09 넷(Context bundle 조회·RunRecord 봉인·pin 조회·eval 실행) + model-registry 셋(register·verify·pin_retention): 기존 서비스·index·route 재사용 표, 읽기 membership/쓰기 canApprove 등급, 정본 ProblemDetails·strict·path→row·404·IDEM, tx/lock 순서와 Codex 계약 지점, persistence 판정(eval suite project 결속 = migration 필요·번호 요청), 계약·FE 영향, route별 PR 분할 (카드 58, docs-only)"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T14:22:04+09:00"
+updated: "2026-09-28T15:11:46+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -38,13 +38,13 @@ tags: ["G-04", "G-05", "business-lane", "route", "design", "claude"]
 | R1 | `GET /projects/{p}/runs/{run_id}/record` | 읽기 | **membership** — `require_project_access`(`services/projects.py:204`; membership 없으면 `AUTH_PROJECT_SCOPE`), #158 §6-3 "읽기에 필요한 등급은 membership" | `get_record` |
 | R2 | `GET /projects/{p}/runs/{run_id}/record/artifacts[?role=]` + `GET …/record/artifacts/{artifact_id}/verify` | 읽기 | membership | `list_pinned_artifacts`, `verify_pin` |
 | R3 | `GET /projects/{p}/runs/{run_id}/context-bundle` | 읽기 | membership | `read_bundle` + `verify_bundle`(응답에 `hashVerified`) |
-| W1 | `POST /projects/{p}/runs/{run_id}/record` (봉인) | 쓰기 | **canApprove** — #152 §3·#167 `_require_approval`(`model_release.py:233-250`); 봉인은 "영구 기록으로 승격"이라 release와 같은 등급 | `seal_run_record` |
+| W1 | `POST /projects/{p}/runs/{run_id}/record` (봉인) | 쓰기 | **canApprove는 필요조건일 뿐**(Codex F1). integrity 값(`component_versions`·artifact 목록·`bundle_id`)은 request가 아니라 **서버가 잠근 정본(Run/Evidence/Context/Artifact)에서 파생**; request는 선택 의도 최소값만(§5-2) | `seal_run_record` |
 | W2 | `POST /projects/{p}/models/{model_id}/versions` (등록) | 쓰기 | canApprove | `register_model_version` |
-| W3 | `POST /projects/{p}/models/{model_id}/versions/{version}/verify` | 쓰기 | canApprove | `verify_model_version` |
+| W3 | `POST /projects/{p}/models/{model_id}/versions/{version}/verify` | 쓰기 | **보류**(Codex F1 최종 승인 불가): `lineage.py:279`의 정본은 "trusted worker hashed the actual weights"인데 canApprove 사용자가 DB에 있는 digest를 그대로 제출해 `verified_at`을 세울 수 있음. **trusted-worker identity + 실제 object read/hash Evidence 결속 seam**을 먼저 정한 뒤에만 구현 | `verify_model_version` |
 | W4 | `POST /projects/{p}/models/{model_id}/versions/{version}/retention-pin` | 쓰기 | canApprove | `pin_retention` |
 | W5 | `POST /projects/{p}/eval/suites/{suite_id}/runs` (실행) | 쓰기 | canApprove(외부 adapter 호출·비용 발생) — **§5에서 project 결속 불가 판정 → migration 번호 요청 뒤 진행** | `run_suite` |
 
-등급 판단 근거: #152 §3은 "release = 배포 가능 상태로 승격"에 canApprove를 요구했고 그것이 첫 강제 지점(§3 "다른 승격류 행위에도 같은 등급을 적용할지는 별 결정")이었다. 이 설계는 **영구 기록·정본 변경·외부 비용**(W1~W5)을 같은 승격류로 보고 canApprove로 통일한다. 이 결정은 코디네이터/Codex 재검토 대상이며 문서에 남긴다.
+등급 결정(v1.2, Codex F1 최종): **W2 register·W4 retention-pin = canApprove 최종 승인**; **W5 eval 실행 = canApprove 최종 승인**(요청자가 endpoint/credential을 주입하지 못하고 서버 `adapter_for()`의 구성된 allowlist만 고르는 조건에서; 외부 비용 권한 신설 근거 없음); **W1 seal = canApprove 필요조건 + 서버 파생 integrity**(§5-2); **W3 verify = 보류**(trusted measurement seam 결정 전 구현 금지). 읽기 3 = membership 승인.
 
 **project 결속 방법(#158 §1-4의 제약 그대로)**: `run_records`·`context_bundles`는 `run_id` → `runs.workload_id` → `workloads.project_id`(`db/models/execution.py` `Workload.project_id`)로 부모 join; `model_versions`는 `models.project_id`로 부모 join(#175 `_version_in_project` 재사용). **`eval_suites`·`eval_runs`는 어떤 join으로도 project를 증명할 수 없다**(`db/models/evaluation.py:52-72`에 project 열 없음; #158 §1-4 표) → §5.
 
@@ -66,6 +66,7 @@ tags: ["G-04", "G-05", "business-lane", "route", "design", "claude"]
 | IDEM-2 | 원장 키 = `(tenant_id, project_id, endpoint, idempotency_key)`; `endpoint`는 route 상수(예 `POST:/projects/{p}/runs/{run}/record`) |
 | IDEM-3 | 같은 키 + 같은 `request_sha256` → **저장된 응답을 재생**(status 포함), 서비스 미호출. 같은 키 + 다른 body → `GRAPH_IDEMPOTENCY_CONFLICT` 번역 `GRAPH-0002` 409 |
 | IDEM-4 | 원장 기록은 **서비스 tx와 같은 tx**에서 commit(둘 중 하나만 남지 않게). 실패(4xx/5xx)는 원장에 남기지 않는다(재시도 허용) |
+| **IDEM-6 (Codex F4)** | 현재 helper는 예약하지 않는다: `deps.py:81 replay_or_reserve()`는 **조회만**(FOR UPDATE·placeholder INSERT·advisory lock 없음)이고 `store_idempotent_response()`는 서비스 뒤 INSERT → 동시 최초 같은 키 2건이 둘 다 서비스를 실행하고 하나가 unique error가 된다. W1~W5 공통 **직렬화점**: tx 진입 직후 `pg_advisory_xact_lock(hash(tenant, project, endpoint, idempotency_key))`(deterministic, tx-scoped)를 잡고 그 **뒤에** 원장을 조회한다 — 두 번째 요청은 첫 tx commit을 기다린 뒤 저장 응답을 **exact replay**(status+body). unique violation은 정상 흐름이 아니며(부정 시험: 동시 최초 2건 → 서비스 호출 1·원장 1·unique error 0), **lock 순서는 모든 route에서 이 직렬화점 → resource row(FOR UPDATE)** 순으로 고정한다 |
 | IDEM-5 | 자연 멱등과 겹칠 때: W2 등록은 `uq_model_versions_tenant_id_content_sha256`가 있어 같은 digest 재등록이 서비스에서 거부됨 — 키가 다르면 거부(409), 키가 같으면 재생. W4 pin은 `until`이 더 짧으면 서비스가 no-op(“never shortens”) — 키 규칙은 그대로 |
 
 ## 5. 서비스 시그니처·tx·lock 순서 — Codex 계약 지점
@@ -74,10 +75,39 @@ tags: ["G-04", "G-05", "business-lane", "route", "design", "claude"]
 |---|---|---|---|---|
 | R1~R3 | `get_record`, `list_pinned_artifacts(role=)`, `verify_pin`, `read_bundle`, `verify_bundle` **변경 0** | 읽기 1 tx: `tenant_scope` → `require_project_access` → `_run_in_project` → 서비스 | 낮음 | Claude 구현 |
 | W2 register | `register_model_version(session, tenant_id, model_id, version, content_sha256, uri, now, byte_size, produced_by_run_id, lineage)` **변경 0** | 1 tx: access(canApprove) → `Model` row가 path project인지 → 서비스(UNIQUE가 2차 방어) → IDEM 저장 | 중 | Claude 구현 |
-| W3 verify | `verify_model_version(…, content_sha256, now)` **변경 0** | 1 tx: access → `_locked_version`(#167 `:256`, `FOR UPDATE`) → `_rebind_identity`(`:279`) → 서비스(digest 불일치는 서비스가 거부) → IDEM | 중 | Claude 구현 |
-| W4 pin | `pin_retention(…, until)` **변경 0** | **경합**: 두 요청이 동시에 `until`을 늘릴 때 "never shortens"는 row lock 없이는 lost-update 가능. `_locked_version`으로 잠근 뒤 호출. release(#167)가 같은 row를 잠그므로 **lock 순서 = model_versions 단일 row**(교착 없음) | **높음(동시성)** | **Codex 계약 필요** — 잠금 순서·verify/release와의 상호작용 시험을 Codex가 계약으로 정한 뒤 구현 |
-| W1 seal | `seal_run_record(…, artifacts: list[ArtifactPin], bundle_id)` **변경 0** | 전제: run 종료(서비스가 `RES_RUN_NOT_FOUND`/전제 거부) · artifact 검증됨 · bundle이 같은 run. **경합**: 동시 봉인 2건 → `run_records`는 append-only(`APPEND_ONLY_TABLES`)이고 `uq_run_records_run_id`(`migrations/versions/0003_s09_context_eval.py:174`)가 2번째 INSERT를 거부한다. 계약이 정할 것: (i) 그 IntegrityError를 부분 행 없이 409 `GRAPH-0002`로 번역하는 경계(artifact pin 행이 먼저 들어가지 않게 한 tx), (ii) run 종료와 봉인 사이 TOCTOU(run이 되살아남)를 `runs` row `FOR UPDATE` 뒤 상태 재확인으로 막는 순서 | **높음(동시성·보안: 영구 기록)** | **Codex 계약 필요** |
+| W3 verify | `verify_model_version(…, content_sha256, now)` **변경 0** | (보류) 잠금은 W4와 같은 `_locked_version` 한 행; **digest는 request가 아니라 trusted worker의 측정 Evidence에서** 와야 함 | **높음(보안: 측정 신원)** | **보류** — seam 결정 후 |
+| W4 pin | `pin_retention(…, until)` **변경 0**(단, 잠금 전 값을 읽는 경로 금지 — route가 잠근 row를 넘김) | **Codex F3 계약(§5-3)**: idempotency 직렬화 → live canApprove → Model parent path 결속 → **ModelVersion 한 행 FOR UPDATE + populate_existing** → canApprove 재확인 → `max(current, until)` → ledger. #167 release·W3도 같은 `_locked_version`만 사용(parent read 후 ModelVersion 한 행) | **높음(동시성)** | 계약 고정됨(v1.2) → 구현 가능 |
+| W1 seal | `seal_run_record(…)` 호출은 유지하되 **인자는 서버 파생**(§5-2) | **Codex F2 계약(§5-2)**: READ COMMITTED + 명시 잠금, 6단계 순서 고정, 기존 record는 canonical seal intent 비교로 자연 멱등/409, IntegrityError 500 금지, lock timeout `SYS-0001/503 retryable` | **높음(동시성·보안: 영구 기록)** | 계약 고정됨(v1.2) → 구현 가능 |
 | W5 eval run | `run_suite(session, tenant_id, suite_id, adapter, now, component_versions, require_model_pinning)` **변경 0**; adapter = `adapter_for(name)` | **project 결속 불가**(§2): `eval_suites`에 `project_id`가 없다 → route가 `/projects/{p}/…`로 path→row를 묶을 수 없다 | 구조 | **persistence 필요 → §5-1** |
+
+### 5-2. W1 seal 계약 (Codex F2, v1.2 고정)
+
+격리 수준 **READ COMMITTED + 명시 잠금**(SERIALIZABLE 불요). 한 tx에서 순서 고정:
+
+1. `tenant_scope` + 저비용 live `canApprove` preflight.
+2. `(tenant, project, endpoint, Idempotency-Key)` **직렬화점**(IDEM-6 advisory lock) 확보 → 원장 조회(있으면 exact replay 또는 `GRAPH-0002/409`).
+3. `runs` 대상 행 **`FOR UPDATE` + `populate_existing`**, path→`workload.project` 재결속, terminal 상태·최종 필드 재확인.
+4. live `canApprove` **재확인**(회수 TOCTOU).
+5. bundle/workload와 artifact를 **서버 정본에서 읽고**, 변경 가능한 행(`artifacts`)은 **`artifact_id` 오름차순으로 잠근 뒤** active/verified/run 결속 재확인. request가 주는 것은 선택 의도 최소값(예: 어떤 artifact를 어떤 role로 pin할지의 **선택**)뿐이며 `component_versions`·checksum·`bundle_id`·`workload_spec_sha256`은 서버가 파생.
+6. 기존 RunRecord 확인 → 없으면 record + pin + idempotency 응답을 **같은 tx**에 기록. 있으면 요청의 **canonical seal intent**(정렬된 pin (artifact_id, role) 집합 + 파생 값)와 저장된 record+pin 집합을 비교해 **동일할 때만 자연 멱등 성공**, 다르면 `GRAPH-0002/409`.
+
+`uq_run_records_run_id`(`0003:174`)는 최후 방어이지 정상 직렬화 수단이 아니다. IntegrityError가 raw 500으로 새거나 pin 일부가 남으면 안 된다(한 tx). 오류 표: 동일 키·동일 body → exact replay; 동일 키·다른 body → `GRAPH-0002/409`; lock timeout/deadlock → 값 비노출 **`SYS-0001/503/retryable=true`**; 그 밖 전제 위반 → `GRAPH-0002/409`.
+
+**되살림 시험(독립 PG session + barrier)**: (a) 동일 intent 동시 2건 → record 1·pin 집합 1·양쪽 성공 또는 exact replay; (b) 다른 intent 동시 2건 → 승자 1·패자 409·부분 pin 0; (c) terminal 전환과 봉인 경합 → 잠금 뒤 최신 상태만 봉인; (d) 권한 회수 대기 뒤 최종 재검사 403. mock Session만으로는 lost-update 되살림을 죽인 것으로 세지 않는다.
+
+### 5-3. W4 pin / release / verify 잠금 계약 (Codex F3, v1.2 고정)
+
+READ COMMITTED. 순서: **idempotency 직렬화점 → live canApprove → Model parent path 결속 → ModelVersion 단일 행 `FOR UPDATE` + `populate_existing` → live canApprove 재확인 → `max(current, until)` → ledger**. `pin_retention()`이 잠금 전 값을 읽는 경로는 금지: route가 **이미 잠긴 최신 row**를 넘기고 서비스는 그 row만 본다(route↔service 불변식). #167 release와 W3 verify도 같은 `_locked_version`만 사용 → 잠금 순서는 항상 **parent read 후 ModelVersion 한 행**.
+
+| 경합 | 기대 |
+|---|---|
+| pin 먼저 | release는 기다린 뒤 새 pin을 본다 |
+| release 먼저 | pin은 기다린 뒤 released row의 retention만 연장 |
+| 짧거나 같은 `until` | 200 no-op, 절대 단축 없음 |
+| 서로 다른 두 연장 | commit 순서와 무관하게 최종값 `max(old, a, b)` |
+| idempotency conflict / lock timeout·deadlock | `GRAPH-0002/409` / `SYS-0001/503/retryable=true` |
+
+시험(독립 PG session + barrier): 역순 commit 두 경우, verify↔pin, release↔pin, shorter no-op.
 
 ### 5-1. persistence·index 판정
 
@@ -94,6 +124,7 @@ tags: ["G-04", "G-05", "business-lane", "route", "design", "claude"]
 ## 7. 부정 시험 — 되돌리면 실패해야 하는 것 (route별 공통 + 개별)
 
 공통(모든 route): (a) membership 없음 → 403 `AUTH-0030`, (b) 다른 project의 row를 path로 → 404 `RES-0004`(존재 비노출, body 동일), (c) 다른 tenant → 404, (d) body 있는 GET → 422 `VAL-0003`, (e) `additionalProperties` → 422, (f) 응답이 `Strict` 계약을 통과(`validate_contract`), (g) `InvError`가 표 밖 code → `SYS-0002`. 쓰기 공통: (h) `canRequest`만 있는 principal → 403, (i) IDEM 헤더 없음 → 422, (j) 같은 키·다른 body → 409, (k) 같은 키·같은 body → 재생(서비스 호출 0, DB 행 증가 0), (l) 권한 통과 뒤 회수 → 잠금 뒤 재확인에서 403이고 정본 불변(#152 F-R5).
+동시성(§5-2·§5-3, 독립 PG session+barrier, mock 불인정): W1 (a)~(d); W4 역순 commit 2·verify↔pin·release↔pin·shorter no-op; IDEM-6 동시 최초 2건 → 서비스 1·원장 1·unique error 0.
 개별: R2 `verify_pin` digest 불일치 → `verified:false`(200, 사실 보고; 실패 아님); R3 hash 불일치 → `hashVerified:false`; W1 미종료 run → 409 `GRAPH-0002`·기록 0, 미검증 artifact → 409, 다른 run의 bundle_id → 409, **동시 봉인 2 → 1행**(Codex 계약); W2 같은 digest 재등록(다른 키) → 409, `content_sha256` 대문자 → 422; W3 digest 불일치 → 409·`verified_at` NULL 유지; W4 더 짧은 until → 200 no-op(`retention_pinned_until` 불변), **동시 연장 2 → max 유지**(Codex 계약); W5(번호 뒤) adapter 이름 미지 → 422, `MODEL_PINNING` 없는 adapter + `requireModelPinning:true` → 409.
 
 ## 8. 구현 PR 분할 순서 (각 PR = route 1 + 시험 + 계약)
@@ -104,15 +135,16 @@ tags: ["G-04", "G-05", "business-lane", "route", "design", "claude"]
 | 2 | R2 pin 조회·검증 | 1 | |
 | 3 | R3 Context bundle 조회(메타+hashVerified) | 1 | 본문 노출은 별 카드(§9) |
 | 4 | W2 model version 등록 | #167 병합(`_require_approval`) | IDEM 첫 소비자 |
-| 5 | W3 verify | 4 | `_locked_version` 재사용 |
-| 6 | W4 pin_retention | 5 + **Codex 계약** | |
-| 7 | W1 seal | 1 + **Codex 계약** | |
+| 5 | W3 verify | **보류** | trusted measurement seam(측정 신원·Evidence 결속) 결정 뒤 |
+| 6 | W4 pin_retention | 4 | §5-3 계약 고정됨 |
+| 7 | W1 seal | 1 | §5-2 계약 고정됨(서버 파생 integrity) |
 | 8 | W5 eval 실행 | **migration 번호** + 4 | |
 
 ## 9. 범위 밖 · 미해결
 
 - bundle 본문(`content`) 노출 route: 비밀 스캔(`context.py:71 _refuse_recognised_secrets`)이 저장 시점에만 있어 읽기 노출은 별 결정.
 - 봉인 시 outbox/mirror 훅 여부(#172의 `enqueue_mirror`는 lineage·eval에만) — 봉인은 미러 대상 아님(설계 #168 §1 표에 없음).
+- **Codex 설계 판정(v1.2 반영)**: F1 등급 최종(W2·W4·W5 canApprove 승인, W1 필요조건+서버 파생, **W3 보류**), F2 W1 계약(§5-2), F3 W4 계약(§5-3), F4 IDEM 예약(IDEM-6). 실 PG 계약 시험은 각 구현 PR에서 독립 PG session+barrier로.
 - **코디네이터 결정(v1.1 반영)**: (1) W5 migration 번호 **0052** 예약(§5-1). (2) W1~W5 canApprove 통일 **잠정 승인**(#152 §3·#167 `_require_approval` 선례) — 권한 경계 결정이므로 **최종 확정은 Codex 설계 검토**에서: 특히 W5(외부 adapter 호출·비용)가 canApprove로 충분한지, W1 봉인·W4 pin 경합 계약(§5)과 함께 판단.
 - **진행 결정**: 계약 지점이 없는 **PR 1(R1 RunRecord 조회 + `_run_in_project` helper)**은 설계 승인 전이라도 #175 branch 위에 **draft**로 올려 검토 대기 시간을 줄인다(설계가 바뀌면 draft를 따라 고침). W1·W4는 Codex 계약 전 착수하지 않는다.
 - owner Claude / reviewer Codex / 병합 금지. worktree 재사용, branch `agent/claude/g04-g05-business-routes-design`, base `1e8baf04`, force-push·`git add -A` 없음. 시각은 `date`.
