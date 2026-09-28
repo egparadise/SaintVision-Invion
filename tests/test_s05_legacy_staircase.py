@@ -159,6 +159,7 @@ def test_integration_report_records_redacted_disposable_fingerprint():
     assert '"fingerprintSha256"' in source
     assert '"nameExposed": False' in source
     assert "a.e.database_name.encode" in source
+    assert "import hashlib" in source
 
 
 def test_aggregate_junit_records_measurement_not_promotion(tmp_path):
