@@ -253,14 +253,19 @@ def test_public_request_contracts_never_accept_object_id_or_provider_locator():
 
     forbidden = {"objectId", "locator"}
     violations = {
-        name: sorted(forbidden & property_names(schema["$defs"][name], schema["$defs"], {name}))
+        name: sorted(
+            forbidden
+            & property_names(schema["$defs"][name], schema["$defs"], {name})
+        )
         for name in request_names
         if forbidden & property_names(schema["$defs"][name], schema["$defs"], {name})
     }
     standalone_requests = sorted((ROOT / "contracts").glob("*-request.schema.json"))
     for path in standalone_requests:
         standalone = json.loads(path.read_text(encoding="utf-8"))
-        leaked = sorted(forbidden & property_names(standalone, standalone.get("$defs", {})))
+        leaked = sorted(
+            forbidden & property_names(standalone, standalone.get("$defs", {}))
+        )
         if leaked:
             violations[path.name] = leaked
     app = ast.parse(
@@ -332,7 +337,9 @@ def test_put_condition_is_signed_so_an_intermediary_cannot_strip_it():
     client.put("object", BODY, SHA)
     headers = transport.calls[0][2]
     assert headers["if-none-match"] == "*"
-    assert "SignedHeaders=host;if-none-match;x-amz-content-sha256;" in headers["authorization"]
+    assert "SignedHeaders=host;if-none-match;x-amz-content-sha256;" in headers[
+        "authorization"
+    ]
 
 
 def test_sigv4_matches_the_aws_s3_get_object_known_answer_vector():
