@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { ModelLineage, ModelCommitObservation, ConformanceStatusResponse } from '@/contracts/types';
+import React, { useState } from 'react';
+import { ModelLineage, ModelCommitObservation } from '@/contracts/types';
+import type { ConformanceStatusResponse } from '@/contracts/conformance-status-response';
 import { Button } from '@/shared/ui/Button';
 import { fetchModelCommitment } from '@/shared/api/modelCommitmentObservation';
 import { fetchConformanceStatus } from '@/shared/api/adapterObservation';
@@ -8,13 +9,11 @@ import { MlopsManager } from './mlopsEngine';
 export interface ModelLineageViewProps {
   initialLineages?: ModelLineage[];
   currentProjectId?: string;
-  initialConformance?: ConformanceStatusResponse;
 }
 
 export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   initialLineages = [],
   currentProjectId,
-  initialConformance,
 }) => {
   const [mlopsManager] = useState<MlopsManager>(() => new MlopsManager(initialLineages));
   const [lineages, setLineages] = useState<ModelLineage[]>(mlopsManager.getLineages());
@@ -25,9 +24,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
 
   // Adapter conformance observation state (G-03 Phase 1)
   const [conformanceProjectId, setConformanceProjectId] = useState(currentProjectId || '');
-  const [conformanceData, setConformanceData] = useState<ConformanceStatusResponse | null>(
-    () => initialConformance || null
-  );
+  const [conformanceData, setConformanceData] = useState<ConformanceStatusResponse | null>(null);
   const [conformanceLoading, setConformanceLoading] = useState(false);
   const [conformanceError, setConformanceError] = useState<{
     code?: string;
@@ -50,45 +47,35 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       setConformanceData(null);
       const prob = err?.problem;
       if (prob) {
+        let safeDetail = prob.detail || '요청이 거절되었습니다.';
+        // Prevent raw HTML / proxy markup leakage (F3)
+        if (/<[a-z][\s\S]*>/i.test(safeDetail)) {
+          safeDetail = '서버 게이트웨이 또는 프록시 오류가 발생했습니다. (HTML 응답 수신)';
+        } else if (prob.status && prob.status >= 500 && prob.category === 'NET') {
+          safeDetail = '서버 내부 오류 또는 업스트림 통신 장애가 발생했습니다.';
+        }
         setConformanceError({
           code: prob.code,
           status: prob.status,
           title: prob.title,
-          detail: prob.detail || '요청이 거절되었습니다.',
+          detail: safeDetail,
         });
       } else {
         const isContractMismatch = err?.message && err.message.includes('계약 불일치');
+        let fallbackMessage = err?.message || '네트워크 오류가 발생했습니다.';
+        if (/<[a-z][\s\S]*>/i.test(fallbackMessage)) {
+          fallbackMessage = '서버 또는 프록시 오류가 발생했습니다.';
+        }
         setConformanceError({
           detail: isContractMismatch
             ? `클라이언트 응답 계약 검증 실패: ${err.message}`
-            : (err?.message || '네트워크 오류가 발생했습니다.'),
+            : fallbackMessage,
         });
       }
     } finally {
       setConformanceLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (currentProjectId?.trim() && !initialConformance) {
-      setConformanceProjectId(currentProjectId.trim());
-      fetchConformanceStatus(currentProjectId.trim())
-        .then((data) => setConformanceData(data))
-        .catch((err) => {
-          const prob = err?.problem;
-          if (prob) {
-            setConformanceError({
-              code: prob.code,
-              status: prob.status,
-              title: prob.title,
-              detail: prob.detail || '요청이 거절되었습니다.',
-            });
-          } else {
-            setConformanceError({ detail: err?.message || '오류가 발생했습니다.' });
-          }
-        });
-    }
-  }, [currentProjectId]);
 
   // Model commitment observation state (starts empty, requiring explicit project/model context)
   const [commitmentProject, setCommitmentProject] = useState(currentProjectId || '');
@@ -233,14 +220,20 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>Provider 계약 동일성 (AC-10 / G-03)</div>
           <div
             data-testid="conformance-top-status"
-            style={{ fontSize: '18px', fontWeight: 700, color: '#e3b341', marginTop: '4px' }}
+            style={{ fontSize: '18px', fontWeight: 700, color: conformanceError ? '#ff7b72' : conformanceData ? '#f0883e' : '#8b949e', marginTop: '4px' }}
           >
-            {conformanceData ? `미측정 (${conformanceData.status})` : '미측정 (NOT_OBSERVED)'}
+            {conformanceError
+              ? '조회 실패'
+              : conformanceData
+              ? `미측정 (${conformanceData.status})`
+              : '미측정 (미조회)'}
           </div>
           <div data-testid="conformance-top-subtext" style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
-            {conformanceData
+            {conformanceError
+              ? '어댑터 conformance 조회 실패'
+              : conformanceData
               ? `${conformanceData.checks.length}개 정본 체크 항목 미측정 (${conformanceData.scope})`
-              : '실제 conformance API (G-03 1단계) 연동'}
+              : '실제 conformance API (G-03 1단계) 연동 대기'}
           </div>
         </div>
 
@@ -547,7 +540,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               Multi-LLM Provider Adapter Conformance (G-03 1단계 API 연동)
             </h4>
             <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
-              컨트롤 플레인 호스트의 실제 어댑터 적합성 상태를 조회합니다. 1단계는 저장된 결과가 없어 정직하게 <code style={{ color: '#e3b341' }}>NOT_OBSERVED</code>(미측정) 및 15개 정본 체크리스트 규격을 반환합니다.
+              컨트롤 플레인 호스트의 실제 어댑터 적합성 상태를 조회합니다. 1단계는 저장된 결과가 없어 정직하게 <code style={{ color: '#e3b341' }}>NOT_OBSERVED</code>(미측정) 및 정본 체크리스트 규격을 반환합니다.
             </p>
           </div>
         </div>
@@ -620,12 +613,11 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           }
         >
           {conformanceLoading && '⏳ 어댑터 Conformance 상태 조회 중...'}
-          {conformanceError &&
-            `❌ ${conformanceError.code && conformanceError.status ? `[${conformanceError.code}] (${conformanceError.status}) ${conformanceError.title ? `${conformanceError.title}: ` : ''}` : ''}${conformanceError.detail}`}
+          {conformanceError && '❌ 어댑터 Conformance 조회 실패'}
           {!conformanceLoading &&
             !conformanceError &&
             conformanceData &&
-            `ℹ️ 어댑터 Conformance 관측 완료: ${conformanceData.status} (${conformanceData.checks.length}개 정본 체크 항목)`}
+            `ℹ️ 어댑터 Conformance 조회 완료: 미측정(NOT_OBSERVED) (${conformanceData.checks.length}개 정본 체크 항목)`}
         </div>
 
         {/* Explicit Role Alert Error Banner on ProblemDetails (401, 403, 404) */}
@@ -661,7 +653,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               lineHeight: '1.5',
             }}
           >
-            ℹ️ <strong style={{ color: '#f0883e' }}>미측정 (NOT_OBSERVED)</strong>: 실제 컨트롤 플레인 HTTP 엔드포인트(<code>GET /v1/projects/:projectId/adapters/conformance</code>)를 호출하여 15개 정본 체크리스트 규격 상태를 조회합니다. 프로젝트 ID를 입력하고 조회 버튼을 누르십시오.
+            ℹ️ <strong style={{ color: '#f0883e' }}>미측정 (미조회)</strong>: 실제 컨트롤 플레인 HTTP 엔드포인트(<code>GET /v1/projects/:projectId/adapters/conformance</code>)를 호출하여 정본 체크리스트 규격 상태를 조회합니다. 프로젝트 ID를 입력하고 조회 버튼을 누르십시오.
           </div>
         )}
 
@@ -747,18 +739,21 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 data-testid="conformance-checks-table"
                 style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}
               >
+                <caption style={{ textAlign: 'left', fontSize: '12px', color: '#8b949e', marginBottom: '8px' }}>
+                  컨트롤 플레인 호스트 어댑터 Conformance 체크리스트
+                </caption>
                 <thead>
                   <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
-                    <th style={{ padding: '8px' }}>#</th>
-                    <th style={{ padding: '8px' }}>Check Name (CHECKLIST 정본)</th>
-                    <th style={{ padding: '8px' }}>Capability Gated</th>
-                    <th style={{ padding: '8px' }}>Status</th>
+                    <th scope="col" style={{ padding: '8px' }}>#</th>
+                    <th scope="col" style={{ padding: '8px' }}>Check Name (CHECKLIST 정본)</th>
+                    <th scope="col" style={{ padding: '8px' }}>Capability Gated</th>
+                    <th scope="col" style={{ padding: '8px' }}>Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {conformanceData.checks.map((check, idx) => (
                     <tr
-                      key={check.name}
+                      key={`${idx}-${check.name}`}
                       data-testid={`conformance-check-row-${idx}`}
                       style={{ borderBottom: '1px solid #21262d' }}
                     >
@@ -774,8 +769,8 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                             borderRadius: '4px',
                             fontSize: '11px',
                             fontWeight: 600,
-                            backgroundColor: check.capabilityGated ? 'rgba(56, 139, 253, 0.15)' : 'rgba(139, 148, 158, 0.15)',
-                            color: check.capabilityGated ? '#58a6ff' : '#8b949e',
+                            backgroundColor: check.capabilityGated ? 'rgba(56, 139, 253, 0.15)' : 'rgba(160, 168, 178, 0.15)',
+                            color: check.capabilityGated ? '#58a6ff' : '#a0a8b2',
                           }}
                         >
                           {check.capabilityGated ? 'Capability Gated' : 'Standard'}

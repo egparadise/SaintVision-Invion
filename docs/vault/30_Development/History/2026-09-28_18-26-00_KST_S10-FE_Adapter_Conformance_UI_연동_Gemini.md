@@ -50,7 +50,7 @@ PR #200(Claude, G-03 1단계, Codex 승인)에서 컨트롤 플레인 `GET /v1/p
   - `data-testid="conformance-live-status"` 컨테이너를 조건부 렌더가 아닌 마운트 시점부터 DOM에 상시 배치(`role="status" aria-live="polite"`).
   - 로딩(`조회 중...`), 완료(`관측 완료: NOT_OBSERVED`), 오류 상태를 스크린리더에 안정적으로 안내.
 - **RFC 9457 ProblemDetails 표준 오류 처리**:
-  - 401(인증 실패), 403(권한 거부), 404(프로젝트 부재) 등 ProblemDetails 응답 시 `role="alert"` 에러 배너(`conformance-error-banner`)에 code, status, title, detail을 온전히 표출하고 상세 컨테이너는 격리(null).
+  - 401(인증 실패), 403(권한 거부), 404(엔드포인트 미배포 폴백) 등 오류 응답 시 `role="alert"` 에러 배너(`conformance-error-banner`)에 code, status, title, detail을 온전히 표출하고 상세 컨테이너는 격리(null).
 - **다크 테마 WCAG AA 대비율 (>= 4.5:1)**:
   - `#161b22` 다크 배경 기준:
     - 주황 배지 텍스트 `#f0883e`: 대비율 6.83:1

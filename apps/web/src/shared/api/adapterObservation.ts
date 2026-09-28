@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import type { ConformanceStatusResponse, ConformanceCheckDescriptor } from '@/contracts/types';
+import type { ConformanceStatusResponse, ConformanceCheckDescriptor } from '@/contracts/conformance-status-response';
 
 const CONFORMANCE_STATUS_KEYS = new Set([
   'status',

@@ -1258,18 +1258,3 @@ export interface ModelCommitObservation {
   currentAvailability: "unknown";
   requiresExecutionRevalidation: true;
 }
-
-export interface ConformanceCheckDescriptor {
-  capabilityGated: boolean;
-  name: string;
-}
-
-export interface ConformanceStatusResponse {
-  adapters: Array<string>;
-  checks: Array<ConformanceCheckDescriptor>;
-  contractVersion: string;
-  reason: string;
-  recordedAt: null;
-  scope: "control-plane-host";
-  status: "NOT_OBSERVED";
-}

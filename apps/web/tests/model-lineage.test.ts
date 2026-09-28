@@ -6,6 +6,8 @@ import { MlopsManager } from '../src/features/mlops/mlopsEngine';
 import { TEST_FIXTURE_LINEAGES } from './fixtures/model-lineage';
 import { ModelLineageView } from '../src/features/mlops/ModelLineageView';
 import type { ProblemDetails } from '../src/contracts/types';
+import type { ConformanceStatusResponse, ConformanceCheckDescriptor } from '../src/contracts/conformance-status-response';
+import { isConformanceStatusResponse, isConformanceCheckDescriptor } from '../src/shared/api/adapterObservation';
 
 describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (AC-10)', () => {
   describe('Provider Adapter Conformance (AC-10 Codex = Claude)', () => {
@@ -211,7 +213,7 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
       });
     });
 
-    it('verifies Adapter Conformance displays unmeasured "미측정 (NOT_OBSERVED)" and NEVER "100% CONFORMING" or fake PASS counts', async () => {
+    it('verifies Adapter Conformance displays unmeasured "미측정 (미조회)" and NEVER "100% CONFORMING" or fake PASS counts', async () => {
       await act(async () => {
         root.render(React.createElement(ModelLineageView, { initialLineages: TEST_FIXTURE_LINEAGES }));
       });
@@ -219,17 +221,17 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
       // Strict Invariant 1: "100% CONFORMING" is strictly forbidden (must be unmeasured)
       expect(container.textContent).not.toContain('100% CONFORMING');
       expect(container.textContent).not.toContain('100%');
-      expect(container.textContent).not.toContain('PASS');
+      expect(container.textContent).not.toMatch(/pass/i);
 
       // Strict Invariant 2: Explicit unmeasured status is rendered in top metrics and panel
       const topStatus = container.querySelector('[data-testid="conformance-top-status"]');
-      expect(topStatus?.textContent).toBe('미측정 (NOT_OBSERVED)');
-      expect(container.textContent).toContain('미측정 (NOT_OBSERVED)');
+      expect(topStatus?.textContent).toBe('미측정 (미조회)');
+      expect(container.textContent).toContain('미측정 (미조회)');
 
       // Strict Invariant 3: Unmeasured notice guides user to real control-plane API
       const unmeasuredNotice = container.querySelector('[data-testid="conformance-unmeasured-notice"]');
       expect(unmeasuredNotice).not.toBeNull();
-      expect(unmeasuredNotice?.textContent).toContain('미측정 (NOT_OBSERVED)');
+      expect(unmeasuredNotice?.textContent).toContain('미측정 (미조회)');
       expect(unmeasuredNotice?.textContent).toContain('GET /v1/projects/:projectId/adapters/conformance');
 
       // Strict Invariant 4: Live region container is permanently mounted in DOM
@@ -633,33 +635,45 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
         el.dispatchEvent(new Event('change', { bubbles: true }));
       };
 
-      const canonical15Checks = [
-        { name: 'conformance_metadata_present', capabilityGated: false },
-        { name: 'schema_validation_passed', capabilityGated: false },
-        { name: 'streaming_chunk_boundary_valid', capabilityGated: true },
-        { name: 'trace_context_propagated', capabilityGated: true },
-        { name: 'cancellation_respected', capabilityGated: true },
-        { name: 'timeout_fail_closed', capabilityGated: true },
-        { name: 'token_usage_reported', capabilityGated: false },
-        { name: 'error_envelope_rfc9457', capabilityGated: false },
-        { name: 'auth_credential_isolated', capabilityGated: true },
-        { name: 'rate_limit_handled', capabilityGated: false },
-        { name: 'payload_size_enforced', capabilityGated: false },
-        { name: 'content_type_strictly_checked', capabilityGated: false },
-        { name: 'idempotency_key_supported', capabilityGated: true },
-        { name: 'lifecycle_hook_executed', capabilityGated: false },
-        { name: 'deterministic_fallback_verified', capabilityGated: true },
+      // F2: Real 15 CHECKLIST items and capability gating from adapters/conformance.py:358-389
+      const canonical15Checks: ConformanceCheckDescriptor[] = [
+        { name: 'declares_contract_version', capabilityGated: false },
+        { name: 'implements_every_member', capabilityGated: false },
+        { name: 'probe_without_credentials', capabilityGated: false },
+        { name: 'install_reports_without_installing', capabilityGated: false },
+        { name: 'authenticate_takes_a_reference', capabilityGated: false },
+        { name: 'run_returns_a_usable_handle', capabilityGated: false },
+        { name: 'collect_returns_redacted_content', capabilityGated: false },
+        { name: 'redact_removes_known_secrets', capabilityGated: false },
+        { name: 'redact_is_idempotent', capabilityGated: false },
+        { name: 'cancel_returns_a_tri_state', capabilityGated: false },
+        { name: 'cancel_after_completion_is_not_stopped', capabilityGated: false },
+        { name: 'attest_does_not_overclaim', capabilityGated: false },
+        { name: 'declared_server_cancel_actually_stops', capabilityGated: true },
+        { name: 'declared_usage_is_reported', capabilityGated: true },
+        { name: 'declared_model_pinning_returns_an_id', capabilityGated: true },
       ];
 
-      const canonicalConformancePayload = {
+      // F2: Real adapters from agents.py:99 and reason from conformance_status.py:65-68
+      const canonicalConformancePayload: ConformanceStatusResponse = {
         contractVersion: '1.0.0',
         scope: 'control-plane-host',
         status: 'NOT_OBSERVED',
         recordedAt: null,
-        adapters: ['codex', 'claude'],
+        adapters: ['claude-code', 'codex-cli', 'gemini-cli', 'antigravity'],
         checks: canonical15Checks,
-        reason: 'phase 1 control-plane conformance observation baseline (stored result absent)',
+        reason: 'No conformance run is recorded; this platform does not persist conformance results yet.',
       };
+
+      it('statically and dynamically verifies types are bound to generated @/contracts/conformance-status-response (Codex F-R1)', () => {
+        expect(isConformanceStatusResponse(canonicalConformancePayload)).toBe(true);
+        expect(isConformanceCheckDescriptor(canonical15Checks[0])).toBe(true);
+
+        // Kills mutation M6: check descriptor with extra property (e.g. passed: true) must be rejected
+        expect(isConformanceCheckDescriptor({ name: 'check_a', capabilityGated: false, passed: true })).toBe(false);
+        expect(isConformanceCheckDescriptor({ name: '', capabilityGated: false })).toBe(false);
+        expect(isConformanceCheckDescriptor({ name: 'check_a' })).toBe(false);
+      });
 
       it('renders unmeasured status NOT_OBSERVED without fake counts or pass indicators on valid canonical API response', async () => {
         const originalFetch = globalThis.fetch;
@@ -698,9 +712,11 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
             expect.anything()
           );
 
-          // Invariant 1: Top metrics card updates honestly to unmeasured NOT_OBSERVED
+          // Invariant 1: Top metrics card updates honestly to unmeasured NOT_OBSERVED (F6)
           const topStatus = container.querySelector('[data-testid="conformance-top-status"]');
           expect(topStatus?.textContent).toBe('미측정 (NOT_OBSERVED)');
+          const topSubtext = container.querySelector('[data-testid="conformance-top-subtext"]');
+          expect(topSubtext?.textContent).toBe('15개 정본 체크 항목 미측정 (control-plane-host)');
 
           // Invariant 2: Result container rendered
           const resultContainer = container.querySelector('[data-testid="conformance-result-container"]');
@@ -710,20 +726,20 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
           const statusBadge = container.querySelector('[data-testid="conformance-status-badge"]');
           expect(statusBadge?.textContent).toContain('미측정 (NOT_OBSERVED)');
 
-          // Invariant 4: Zero fake scores or fake pass counts
+          // Invariant 4: Zero fake scores or fake pass counts (case-insensitive regex, F2)
+          expect(resultContainer?.textContent).not.toMatch(/pass/i);
           expect(resultContainer?.textContent).not.toContain('100%');
           expect(resultContainer?.textContent).not.toContain('0 / 15');
           expect(resultContainer?.textContent).not.toContain('15 / 15');
-          expect(resultContainer?.textContent).not.toContain('PASS');
 
           // Invariant 5: Metadata fields match canonical response
           expect(container.querySelector('[data-testid="conformance-scope"]')?.textContent).toBe('control-plane-host');
           expect(container.querySelector('[data-testid="conformance-contract-version"]')?.textContent).toBe('1.0.0');
-          expect(container.querySelector('[data-testid="conformance-adapters"]')?.textContent).toBe('codex, claude');
+          expect(container.querySelector('[data-testid="conformance-adapters"]')?.textContent).toBe('claude-code, codex-cli, gemini-cli, antigravity');
           expect(container.querySelector('[data-testid="conformance-recorded-at"]')?.textContent).toBe('null (미측정)');
           expect(container.querySelector('[data-testid="conformance-reason"]')?.textContent).toBe(canonicalConformancePayload.reason);
 
-          // Invariant 6: All 15 checks are rendered in table
+          // Invariant 6: All 15 checks are rendered in table with exact CHECKLIST names and gating
           const checksTable = container.querySelector('[data-testid="conformance-checks-table"]');
           expect(checksTable).not.toBeNull();
           for (let i = 0; i < 15; i++) {
@@ -735,16 +751,16 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
             expect(checkStatus?.textContent).toContain('NOT_OBSERVED (미측정)');
           }
 
-          // Invariant 7: Live status announcements
+          // Invariant 7: Live status announcements (F6)
           const liveStatus = container.querySelector('[data-testid="conformance-live-status"]');
-          expect(liveStatus?.textContent).toContain('NOT_OBSERVED');
+          expect(liveStatus?.textContent).toContain('조회 완료: 미측정(NOT_OBSERVED)');
           expect(liveStatus?.textContent).toContain('15개 정본 체크 항목');
         } finally {
           globalThis.fetch = originalFetch;
         }
       });
 
-      it('dynamically reads and renders check names directly from server response without FE hardcoding', async () => {
+      it('dynamically reads and renders check names directly from server response without FE hardcoding (F4)', async () => {
         const originalFetch = globalThis.fetch;
         const testProjectId = 'prj_0123456789ABCDEFGHJKMNPQRS';
         const dynamicCustomChecks = [
@@ -753,12 +769,12 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
           { name: 'fail_closed_gate_verification', capabilityGated: true },
         ];
 
-        const customPayload = {
+        const customPayload: ConformanceStatusResponse = {
           contractVersion: '1.0.0',
           scope: 'control-plane-host',
           status: 'NOT_OBSERVED',
           recordedAt: null,
-          adapters: ['codex'],
+          adapters: ['codex-cli'],
           checks: dynamicCustomChecks,
           reason: 'custom test checklist',
         };
@@ -797,12 +813,16 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
           }
           // Row 4 MUST NOT exist
           expect(container.querySelector('[data-testid="conformance-check-row-3"]')).toBeNull();
+
+          // F4 Invariant: Panel textContent MUST NOT contain '15개' when dynamic checks are rendered
+          const panel = container.querySelector('[data-testid="adapter-conformance-panel"]');
+          expect(panel?.textContent).not.toContain('15개');
         } finally {
           globalThis.fetch = originalFetch;
         }
       });
 
-      it('handles canonical 401, 403, and 404 ProblemDetails errors displaying RFC 9457 envelope without crashing', async () => {
+      it('handles canonical 403 Forbidden, 401 Unauthorized legacy shape, and 404 Route Not Deployed without crashing (F2)', async () => {
         const originalFetch = globalThis.fetch;
         const testProjectId = 'prj_0123456789ABCDEFGHJKMNPQRS';
 
@@ -818,14 +838,14 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
             setInputValue(projectInput!, testProjectId);
           });
 
-          // Case A: 401 Unauthorized
-          const problem401: ProblemDetails = {
+          // Case A: Real 403 Forbidden (#200 problem.py AUTH-0030)
+          const canonical403Problem: ProblemDetails = {
             type: 'about:blank',
-            title: 'Unauthorized',
-            status: 401,
+            title: 'AUTH-0030',
+            status: 403,
             code: 'AUTH-0030',
             category: 'AUTH',
-            detail: '인증 정보가 유효하지 않습니다.',
+            detail: 'This project is not accessible.',
             retryable: false,
             traceId: '0123456789abcdef0123456789abcdef',
             causeRef: null,
@@ -834,10 +854,10 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
 
           globalThis.fetch = vi.fn().mockResolvedValue({
             ok: false,
-            status: 401,
-            statusText: 'Unauthorized',
+            status: 403,
+            statusText: 'Forbidden',
             headers: new Headers({ 'content-type': 'application/problem+json' }),
-            json: async () => problem401,
+            json: async () => canonical403Problem,
           } as any);
 
           await act(async () => {
@@ -851,18 +871,114 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
           expect(errorBanner).not.toBeNull();
           expect(errorBanner?.getAttribute('role')).toBe('alert');
           expect(errorBanner?.textContent).toContain('AUTH-0030');
-          expect(errorBanner?.textContent).toContain('401');
-          expect(errorBanner?.textContent).toContain('인증 정보가 유효하지 않습니다.');
+          expect(errorBanner?.textContent).toContain('403');
+          expect(errorBanner?.textContent).toContain('This project is not accessible.');
+          expect(container.querySelector('[data-testid="conformance-top-status"]')?.textContent).toBe('조회 실패');
+          expect(container.querySelector('[data-testid="conformance-top-subtext"]')?.textContent).toBe('어댑터 conformance 조회 실패');
           expect(container.querySelector('[data-testid="conformance-result-container"]')).toBeNull();
 
-          // Case B: 403 Forbidden
+          // Case B: Real 401 Unauthorized legacy shape (#200 deps.py AUTH_MISSING_CREDENTIAL)
+          const real401LegacyPayload = {
+            type: 'https://saintvision.invenio/problems/auth-missing-credential',
+            title: 'a bearer credential is required',
+            status: 401,
+            code: 'AUTH-MISSING-CREDENTIAL',
+            detail: 'a bearer credential is required',
+            instance: `/v1/projects/${testProjectId}/adapters/conformance`,
+          };
+
+          globalThis.fetch = vi.fn().mockResolvedValue({
+            ok: false,
+            status: 401,
+            statusText: 'Unauthorized',
+            headers: new Headers({ 'content-type': 'application/problem+json' }),
+            json: async () => real401LegacyPayload,
+          } as any);
+
+          await act(async () => {
+            fetchBtn!.click();
+          });
+          await act(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 0));
+          });
+
+          errorBanner = container.querySelector('[data-testid="conformance-error-banner"]');
+          expect(errorBanner).not.toBeNull();
+          // client.ts rejects legacy problem -> localProblem classifies as NET-0401 Request rejected
+          expect(errorBanner?.textContent).toContain('NET-0401');
+          expect(errorBanner?.textContent).toContain('401');
+          expect(errorBanner?.textContent).toContain('Request rejected');
+          expect(errorBanner?.textContent).toContain('a bearer credential is required');
+          expect(container.querySelector('[data-testid="conformance-result-container"]')).toBeNull();
+
+          // Case C: 404 Route Not Deployed (Starlette standard 404 {"detail": "Not Found"})
+          globalThis.fetch = vi.fn().mockResolvedValue({
+            ok: false,
+            status: 404,
+            statusText: 'Not Found',
+            headers: new Headers({ 'content-type': 'application/json' }),
+            json: async () => ({ detail: 'Not Found' }),
+          } as any);
+
+          await act(async () => {
+            fetchBtn!.click();
+          });
+          await act(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 0));
+          });
+
+          errorBanner = container.querySelector('[data-testid="conformance-error-banner"]');
+          expect(errorBanner).not.toBeNull();
+          expect(errorBanner?.textContent).toContain('NET-0404');
+          expect(errorBanner?.textContent).toContain('404');
+          expect(errorBanner?.textContent).toContain('Not Found');
+        } finally {
+          globalThis.fetch = originalFetch;
+        }
+      });
+
+      it('isolates state across fetch transitions (killing M8 setConformanceData null mutation) (F3)', async () => {
+        const originalFetch = globalThis.fetch;
+        const testProjectIdA = 'prj_0123456789ABCDEFGHJKMNPQRA';
+        const testProjectIdB = 'prj_0123456789ABCDEFGHJKMNPQRB';
+
+        try {
+          await act(async () => {
+            root.render(React.createElement(ModelLineageView, { initialLineages: TEST_FIXTURE_LINEAGES }));
+          });
+
+          const projectInput = container.querySelector<HTMLInputElement>('[data-testid="conformance-project-input"]');
+          const fetchBtn = container.querySelector<HTMLButtonElement>('[data-testid="conformance-fetch-btn"]');
+
+          // Step 1: Project A succeeds
+          globalThis.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            status: 200,
+            headers: new Headers({ 'content-type': 'application/json' }),
+            json: async () => canonicalConformancePayload,
+          } as any);
+
+          await act(async () => {
+            setInputValue(projectInput!, testProjectIdA);
+          });
+          await act(async () => {
+            fetchBtn!.click();
+          });
+          await act(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 0));
+          });
+
+          expect(container.querySelector('[data-testid="conformance-result-container"]')).not.toBeNull();
+          expect(container.querySelector('[data-testid="conformance-error-banner"]')).toBeNull();
+
+          // Step 2: Project B is refused with 403 AUTH-0030
           const problem403: ProblemDetails = {
             type: 'about:blank',
-            title: 'Forbidden',
+            title: 'AUTH-0030',
             status: 403,
-            code: 'AUTH-0001',
+            code: 'AUTH-0030',
             category: 'AUTH',
-            detail: '프로젝트 접근 권한이 없습니다.',
+            detail: 'This project is not accessible.',
             retryable: false,
             traceId: '0123456789abcdef0123456789abcdef',
             causeRef: null,
@@ -878,27 +994,66 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
           } as any);
 
           await act(async () => {
+            setInputValue(projectInput!, testProjectIdB);
+          });
+          await act(async () => {
             fetchBtn!.click();
           });
           await act(async () => {
             await new Promise((resolve) => setTimeout(resolve, 0));
           });
 
-          errorBanner = container.querySelector('[data-testid="conformance-error-banner"]');
+          // Invariant: Result container from Project A MUST be cleared (setConformanceData(null) is executed)
+          expect(container.querySelector('[data-testid="conformance-result-container"]')).toBeNull();
+          const errorBanner = container.querySelector('[data-testid="conformance-error-banner"]');
           expect(errorBanner).not.toBeNull();
-          expect(errorBanner?.textContent).toContain('AUTH-0001');
-          expect(errorBanner?.textContent).toContain('403');
-          expect(errorBanner?.textContent).toContain('프로젝트 접근 권한이 없습니다.');
+          expect(errorBanner?.textContent).toContain('AUTH-0030');
+          expect(errorBanner?.textContent).toContain('This project is not accessible.');
+        } finally {
+          globalThis.fetch = originalFetch;
+        }
+      });
 
-          // Case C: 404 Project Not Found
-          const problem404: ProblemDetails = {
+      it('handles network failure, canonical 500 SYS-0002, and 502 HTML without leaking markup (F3)', async () => {
+        const originalFetch = globalThis.fetch;
+        const testProjectId = 'prj_0123456789ABCDEFGHJKMNPQRS';
+
+        try {
+          await act(async () => {
+            root.render(React.createElement(ModelLineageView, { initialLineages: TEST_FIXTURE_LINEAGES }));
+          });
+
+          const projectInput = container.querySelector<HTMLInputElement>('[data-testid="conformance-project-input"]');
+          const fetchBtn = container.querySelector<HTMLButtonElement>('[data-testid="conformance-fetch-btn"]');
+
+          await act(async () => {
+            setInputValue(projectInput!, testProjectId);
+          });
+
+          // Sub-case 1: Network TypeError (fetch rejected)
+          globalThis.fetch = vi.fn().mockRejectedValue(new TypeError('Failed to fetch'));
+
+          await act(async () => {
+            fetchBtn!.click();
+          });
+          await act(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 0));
+          });
+
+          let errorBanner = container.querySelector('[data-testid="conformance-error-banner"]');
+          expect(errorBanner).not.toBeNull();
+          expect(errorBanner?.textContent).toContain('Failed to fetch');
+          expect(container.querySelector('[data-testid="conformance-result-container"]')).toBeNull();
+
+          // Sub-case 2: Canonical 500 SYS-0002 ProblemDetails
+          const canonical500: ProblemDetails = {
             type: 'about:blank',
-            title: 'Not Found',
-            status: 404,
-            code: 'RES-0004',
-            category: 'RES',
-            detail: '프로젝트를 찾을 수 없습니다.',
-            retryable: false,
+            title: 'Internal Server Error',
+            status: 500,
+            code: 'SYS-0002',
+            category: 'SYS',
+            detail: 'Internal server error occurred.',
+            retryable: true,
             traceId: '0123456789abcdef0123456789abcdef',
             causeRef: null,
             evidenceId: null,
@@ -906,10 +1061,10 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
 
           globalThis.fetch = vi.fn().mockResolvedValue({
             ok: false,
-            status: 404,
-            statusText: 'Not Found',
+            status: 500,
+            statusText: 'Internal Server Error',
             headers: new Headers({ 'content-type': 'application/problem+json' }),
-            json: async () => problem404,
+            json: async () => canonical500,
           } as any);
 
           await act(async () => {
@@ -921,9 +1076,34 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
 
           errorBanner = container.querySelector('[data-testid="conformance-error-banner"]');
           expect(errorBanner).not.toBeNull();
-          expect(errorBanner?.textContent).toContain('RES-0004');
-          expect(errorBanner?.textContent).toContain('404');
-          expect(errorBanner?.textContent).toContain('프로젝트를 찾을 수 없습니다.');
+          expect(errorBanner?.textContent).toContain('SYS-0002');
+          expect(errorBanner?.textContent).toContain('500');
+          expect(errorBanner?.textContent).toContain('Internal server error occurred.');
+          expect(container.querySelector('[data-testid="conformance-result-container"]')).toBeNull();
+
+          // Sub-case 3: 502 HTML Proxy Error (MUST NOT leak raw HTML tags)
+          globalThis.fetch = vi.fn().mockResolvedValue({
+            ok: false,
+            status: 502,
+            statusText: 'Bad Gateway',
+            headers: new Headers({ 'content-type': 'text/html' }),
+            text: async () => '<html><body><h1>502 Bad Gateway</h1><p>Proxy connection failed</p></body></html>',
+          } as any);
+
+          await act(async () => {
+            fetchBtn!.click();
+          });
+          await act(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 0));
+          });
+
+          errorBanner = container.querySelector('[data-testid="conformance-error-banner"]');
+          expect(errorBanner).not.toBeNull();
+          expect(errorBanner?.textContent).toContain('502');
+          expect(errorBanner?.textContent).not.toContain('<html>');
+          expect(errorBanner?.textContent).not.toContain('<body>');
+          expect(errorBanner?.textContent).not.toContain('<h1>');
+          expect(errorBanner?.textContent).toContain('서버 게이트웨이 또는 프록시 오류가 발생했습니다.');
         } finally {
           globalThis.fetch = originalFetch;
         }
@@ -984,7 +1164,7 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
           const completedLiveRegion = container.querySelector('[data-testid="conformance-live-status"]');
           // Invariant 3: Element node identity remains identical
           expect(completedLiveRegion).toBe(initialLiveRegion);
-          expect(completedLiveRegion?.textContent).toContain('관측 완료');
+          expect(completedLiveRegion?.textContent).toContain('조회 완료: 미측정(NOT_OBSERVED)');
         } finally {
           globalThis.fetch = originalFetch;
         }
@@ -1086,76 +1266,123 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
         }
       });
 
-      it('satisfies WCAG AA text contrast ratio (>= 4.5:1) in dark theme for all status elements and badges', () => {
-        const getRelativeLuminance = (r: number, g: number, b: number) => {
-          const ch = (v: number) => {
-            const normalized = v / 255;
-            return normalized <= 0.03928 ? normalized / 12.92 : Math.pow((normalized + 0.055) / 1.055, 2.4);
+      it('satisfies WCAG AA text contrast ratio (>= 4.5:1) in dark theme by reading rendered DOM styles directly (F5)', async () => {
+        const originalFetch = globalThis.fetch;
+        const testProjectId = 'prj_0123456789ABCDEFGHJKMNPQRS';
+
+        try {
+          globalThis.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            status: 200,
+            headers: new Headers({ 'content-type': 'application/json' }),
+            json: async () => canonicalConformancePayload,
+          } as any);
+
+          await act(async () => {
+            root.render(React.createElement(ModelLineageView, { initialLineages: TEST_FIXTURE_LINEAGES }));
+          });
+
+          const projectInput = container.querySelector<HTMLInputElement>('[data-testid="conformance-project-input"]');
+          const fetchBtn = container.querySelector<HTMLButtonElement>('[data-testid="conformance-fetch-btn"]');
+
+          await act(async () => {
+            setInputValue(projectInput!, testProjectId);
+          });
+          await act(async () => {
+            fetchBtn!.click();
+          });
+          await act(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 0));
+          });
+
+          const getRelativeLuminance = (r: number, g: number, b: number) => {
+            const ch = (v: number) => {
+              const normalized = v / 255;
+              return normalized <= 0.03928 ? normalized / 12.92 : Math.pow((normalized + 0.055) / 1.055, 2.4);
+            };
+            return 0.2126 * ch(r) + 0.7152 * ch(g) + 0.0722 * ch(b);
           };
-          return 0.2126 * ch(r) + 0.7152 * ch(g) + 0.0722 * ch(b);
-        };
 
-        const getContrastRatio = (lum1: number, lum2: number) => {
-          const lighter = Math.max(lum1, lum2);
-          const darker = Math.min(lum1, lum2);
-          return (lighter + 0.05) / (darker + 0.05);
-        };
+          const getContrastRatio = (lum1: number, lum2: number) => {
+            const lighter = Math.max(lum1, lum2);
+            const darker = Math.min(lum1, lum2);
+            return (lighter + 0.05) / (darker + 0.05);
+          };
 
-        const hexToRgb = (hex: string): [number, number, number] => {
-          const clean = hex.replace('#', '');
-          return [
-            parseInt(clean.substring(0, 2), 16),
-            parseInt(clean.substring(2, 4), 16),
-            parseInt(clean.substring(4, 6), 16),
-          ];
-        };
+          const parseRgba = (colorStr: string): [number, number, number, number] => {
+            if (colorStr.startsWith('#')) {
+              const clean = colorStr.replace('#', '');
+              return [
+                parseInt(clean.substring(0, 2), 16),
+                parseInt(clean.substring(2, 4), 16),
+                parseInt(clean.substring(4, 6), 16),
+                1,
+              ];
+            }
+            const match = colorStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+            if (match) {
+              return [
+                parseInt(match[1], 10),
+                parseInt(match[2], 10),
+                parseInt(match[3], 10),
+                match[4] !== undefined ? parseFloat(match[4]) : 1,
+              ];
+            }
+            throw new Error(`Unrecognized color format: ${colorStr}`);
+          };
 
-        const blendRgb = (fg: [number, number, number], alpha: number, bg: [number, number, number]): [number, number, number] => {
-          return [
-            Math.round(fg[0] * alpha + bg[0] * (1 - alpha)),
-            Math.round(fg[1] * alpha + bg[1] * (1 - alpha)),
-            Math.round(fg[2] * alpha + bg[2] * (1 - alpha)),
-          ];
-        };
+          const blend = (fgRgba: [number, number, number, number], bgRgb: [number, number, number]): [number, number, number] => {
+            const alpha = fgRgba[3];
+            return [
+              Math.round(fgRgba[0] * alpha + bgRgb[0] * (1 - alpha)),
+              Math.round(fgRgba[1] * alpha + bgRgb[1] * (1 - alpha)),
+              Math.round(fgRgba[2] * alpha + bgRgb[2] * (1 - alpha)),
+            ];
+          };
 
-        const bgDark = hexToRgb('#161b22');
-        const bgLum = getRelativeLuminance(...bgDark);
+          const darkBgRgb: [number, number, number] = [22, 27, 34]; // #161b22
 
-        // 1. Orange status badge text (#f0883e)
-        const orangeRgb = hexToRgb('#f0883e');
-        const orangeLum = getRelativeLuminance(...orangeRgb);
-        const orangeContrast = getContrastRatio(orangeLum, bgLum);
-        expect(orangeContrast).toBeGreaterThanOrEqual(4.5);
+          // 1. Read DOM style of Status Badge (미측정 NOT_OBSERVED)
+          const statusBadge = container.querySelector<HTMLElement>('[data-testid="conformance-status-badge"]');
+          expect(statusBadge).not.toBeNull();
+          const badgeFg = parseRgba(statusBadge!.style.color);
+          const badgeBg = parseRgba(statusBadge!.style.backgroundColor);
+          const blendedBadgeBg = blend(badgeBg, darkBgRgb);
+          const badgeContrast = getContrastRatio(
+            getRelativeLuminance(badgeFg[0], badgeFg[1], badgeFg[2]),
+            getRelativeLuminance(...blendedBadgeBg)
+          );
+          expect(badgeContrast).toBeGreaterThanOrEqual(4.5);
 
-        // 2. Red error banner text (#ff7b72)
-        const redRgb = hexToRgb('#ff7b72');
-        const redLum = getRelativeLuminance(...redRgb);
-        const redContrast = getContrastRatio(redLum, bgLum);
-        expect(redContrast).toBeGreaterThanOrEqual(4.5);
+          // 2. Read DOM style of Standard Capability Badge (check 0 is standard)
+          const standardBadge = container.querySelector<HTMLElement>('[data-testid="conformance-check-gated-0"]');
+          expect(standardBadge).not.toBeNull();
+          expect(standardBadge!.textContent).toBe('Standard');
+          const stdFg = parseRgba(standardBadge!.style.color);
+          const stdBg = parseRgba(standardBadge!.style.backgroundColor);
+          const blendedStdBg = blend(stdBg, darkBgRgb);
+          const stdContrast = getContrastRatio(
+            getRelativeLuminance(stdFg[0], stdFg[1], stdFg[2]),
+            getRelativeLuminance(...blendedStdBg)
+          );
+          expect(stdContrast).toBeGreaterThanOrEqual(4.5);
+          expect(stdContrast).toBeGreaterThanOrEqual(5.0); // comfortably above WCAG AA threshold
 
-        // 3. Blue loading text (#58a6ff)
-        const blueRgb = hexToRgb('#58a6ff');
-        const blueLum = getRelativeLuminance(...blueRgb);
-        const blueContrast = getContrastRatio(blueLum, bgLum);
-        expect(blueContrast).toBeGreaterThanOrEqual(4.5);
-
-        // 4. Muted text (#8b949e)
-        const mutedRgb = hexToRgb('#8b949e');
-        const mutedLum = getRelativeLuminance(...mutedRgb);
-        const mutedContrast = getContrastRatio(mutedLum, bgLum);
-        expect(mutedContrast).toBeGreaterThanOrEqual(4.5);
-
-        // 5. Alpha-blended badge backgrounds (15% orange on #161b22)
-        const blendedOrange = blendRgb(orangeRgb, 0.15, bgDark);
-        const blendedOrangeLum = getRelativeLuminance(...blendedOrange);
-        const orangeOnBlended = getContrastRatio(orangeLum, blendedOrangeLum);
-        expect(orangeOnBlended).toBeGreaterThanOrEqual(4.5);
-
-        // 6. Alpha-blended error backgrounds (15% red on #161b22)
-        const blendedRed = blendRgb(redRgb, 0.15, bgDark);
-        const blendedRedLum = getRelativeLuminance(...blendedRed);
-        const redOnBlended = getContrastRatio(redLum, blendedRedLum);
-        expect(redOnBlended).toBeGreaterThanOrEqual(4.5);
+          // 3. Read DOM style of Capability Gated Badge (check 12 is gated)
+          const gatedBadge = container.querySelector<HTMLElement>('[data-testid="conformance-check-gated-12"]');
+          expect(gatedBadge).not.toBeNull();
+          expect(gatedBadge!.textContent).toBe('Capability Gated');
+          const gatedFg = parseRgba(gatedBadge!.style.color);
+          const gatedBg = parseRgba(gatedBadge!.style.backgroundColor);
+          const blendedGatedBg = blend(gatedBg, darkBgRgb);
+          const gatedContrast = getContrastRatio(
+            getRelativeLuminance(gatedFg[0], gatedFg[1], gatedFg[2]),
+            getRelativeLuminance(...blendedGatedBg)
+          );
+          expect(gatedContrast).toBeGreaterThanOrEqual(4.5);
+        } finally {
+          globalThis.fetch = originalFetch;
+        }
       });
     });
   });
