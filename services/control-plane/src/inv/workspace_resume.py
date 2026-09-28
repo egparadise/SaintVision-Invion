@@ -15,7 +15,7 @@ from .contracts import validate_contract
 from .errors import DomainError
 from .leases import lock_run
 from .runs import event
-from .snapshots import attach_checkpoint, checkpoint_content, identity, SnapshotStore, object_key
+from .snapshots import attach_checkpoint, checkpoint_content, identity, SnapshotStore
 from .workspace_files import canonical, decode_snapshot
 
 MAX_RESUME_BYTES = 65536
@@ -337,7 +337,7 @@ def commit_workspace_output(conn, files, tenant, project, run, command, receipt,
     obj = SnapshotStore._row(conn, project, oid)
     if (
         obj["state"] != "ready"
-        or files.read(object_key(oid), obj["content_hash"], obj["size_bytes"]) != raw
+        or files.get(obj["locator"], obj["content_hash"], obj["size_bytes"]) != raw
     ):
         raise DomainError("VERIFY-0023", "Modified Workspace object differs")
     content = checkpoint_content(obj)

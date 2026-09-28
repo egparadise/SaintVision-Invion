@@ -16,7 +16,8 @@ from .contracts import validate_contract
 from .errors import DomainError
 from .leases import assert_fences, lock_run
 from .runs import RunStore, event, public
-from .snapshots import SnapshotStore, identity, object_key
+from .object_store import object_store_session
+from .snapshots import SnapshotStore, identity
 
 
 class ResultStore:
@@ -59,7 +60,7 @@ class ResultStore:
         fingerprint = digest({"command": command_id, "object": object_id, "evidence": evidence})
         # Provider before Run before Node/resources before object, matching
         # checkpoint publication. GC never acquires Run after holding an object.
-        with self.provider.locked() as files, self.db.transaction(tenant) as conn:
+        with object_store_session(self.provider) as files, self.db.transaction(tenant) as conn:
             run = lock_run(conn, run_id, project)
             execution = self._execution(conn, run, command_id)
             if str(execution["recovery_epoch"]) != self.db.recovery_epoch:
@@ -122,7 +123,7 @@ class ResultStore:
             obj = SnapshotStore._row(conn, project, object_id)
             if obj["state"] != "ready" or evidence["outputSha256"] != obj["content_hash"]:
                 raise DomainError("VERIFY-0010", "Result object is not verified and ready", 422)
-            files.read(object_key(object_id), obj["content_hash"], obj["size_bytes"])
+            files.get(obj["locator"], obj["content_hash"], obj["size_bytes"])
             conn.execute(
                 """INSERT INTO inv.result_commitments
                 (tenant_id,project_id,run_id,attempt,command_id,object_id,evidence_id,envelope,content_hash)
@@ -159,7 +160,7 @@ class ResultStore:
 
     def complete(self, tenant, project, run_id, command_id, *, expected_version):
         command_id = str(UUID(command_id))
-        with self.provider.locked() as files, self.db.transaction(tenant) as conn:
+        with object_store_session(self.provider) as files, self.db.transaction(tenant) as conn:
             run = lock_run(conn, run_id, project)
             execution = self._execution(conn, run, command_id)
             if str(execution["recovery_epoch"]) != self.db.recovery_epoch:
@@ -206,7 +207,7 @@ class ResultStore:
             obj = SnapshotStore._row(conn, project, result["object_id"])
             if obj["state"] != "ready":
                 raise DomainError("STORE-0005", "Prepared output unavailable")
-            data = files.read(object_key(obj["object_id"]), obj["content_hash"], obj["size_bytes"])
+            data = files.get(obj["locator"], obj["content_hash"], obj["size_bytes"])
             # A resumed Step must commit its actual modified files with completion.
             # Publication may be retried independently, but success cannot precede
             # the immutable checkpoint/pin in this same transaction.

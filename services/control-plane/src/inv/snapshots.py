@@ -9,13 +9,12 @@ Deletion tombstones precede unlink; quota is released only after durable unlink.
 import hashlib
 import json
 import re
-from uuid import UUID
+from uuid import UUID, uuid5, NAMESPACE_URL
 from psycopg.types.json import Jsonb
 from .errors import DomainError
 from .leases import lock_run, assert_fences
-from .object_store import PART_BYTES, MAX_BYTES
+from .object_store import PART_BYTES, MAX_BYTES, object_store_session
 from .runs import event
-
 
 LOCAL_PROVIDER_ID = "local-bounded-v1"
 
@@ -66,8 +65,7 @@ def attach_checkpoint(
 
     content_hash = checkpoint_digest(content)
     prior = conn.execute(
-        "SELECT content_hash FROM inv.checkpoints "
-        "WHERE run_id=%s AND attempt=%s AND step_id=%s",
+        "SELECT content_hash FROM inv.checkpoints " "WHERE run_id=%s AND attempt=%s AND step_id=%s",
         (run_id, attempt, step_id),
     ).fetchone()
     if prior and prior["content_hash"] != content_hash:
@@ -81,8 +79,7 @@ def attach_checkpoint(
         )
         event(conn, tenant, run_id, event_name, event_payload(content_hash))
     conn.execute(
-        "INSERT INTO inv.checkpoint_objects VALUES(%s,%s,%s,%s,%s,%s) "
-        "ON CONFLICT DO NOTHING",
+        "INSERT INTO inv.checkpoint_objects VALUES(%s,%s,%s,%s,%s,%s) " "ON CONFLICT DO NOTHING",
         (tenant, project, run_id, attempt, step_id, identity(object_id)),
     )
     return content
@@ -100,6 +97,15 @@ class SnapshotStore:
         if locator is None:
             raise DomainError("STORE-0001", "Object provider has no locator factory", 503)
         return locator(tenant, project, namespace, identity(object_id))
+
+    def _part_locator(self, tenant, project, object_id, index):
+        if self.provider_id == LOCAL_PROVIDER_ID:
+            return part_key(object_id, index)
+        part_id = uuid5(
+            NAMESPACE_URL,
+            f"inv.storage-part:{tenant}:{project}:{identity(object_id)}:{index}",
+        )
+        return self._new_locator(tenant, project, part_id, "objects")
 
     @staticmethod
     def _row(conn, project, object_id):
@@ -121,15 +127,13 @@ class SnapshotStore:
             or not 0 <= size <= MAX_BYTES
         ):
             raise DomainError("VAL-0013", "Invalid bounded upload", 422)
-        with self.provider.locked(), self.db.transaction(tenant) as conn:
+        with object_store_session(self.provider), self.db.transaction(tenant) as conn:
             budget = conn.execute(
                 "SELECT quota_bytes FROM inv.storage_budgets WHERE project_id=%s FOR UPDATE",
                 (project,),
             ).fetchone()
             if not budget:
-                raise DomainError(
-                    "STORE-0004", "Explicit project storage budget required", 403
-                )
+                raise DomainError("STORE-0004", "Explicit project storage budget required", 403)
             row = conn.execute(
                 "SELECT * FROM inv.storage_objects WHERE project_id=%s AND object_id=%s",
                 (project, object_id),
@@ -137,8 +141,7 @@ class SnapshotStore:
             if row:
                 if (
                     (row["content_hash"], row["size_bytes"]) != (digest, size)
-                    or (row["provider_id"], row["locator"])
-                    != (self.provider_id, locator)
+                    or (row["provider_id"], row["locator"]) != (self.provider_id, locator)
                     or row["state"] in {"deleting", "deleted"}
                 ):
                     raise DomainError("IDEM-0001", "Upload identity conflicts")
@@ -166,25 +169,21 @@ class SnapshotStore:
         ):
             raise DomainError("VAL-0013", "Invalid upload part", 422)
         digest = hashlib.sha256(data).hexdigest()
-        with self.provider.locked() as files, self.db.transaction(tenant) as conn:
+        with object_store_session(self.provider) as files, self.db.transaction(tenant) as conn:
             if authorize is not None:
                 authorize(conn)
             row = self._row(conn, project, object_id)
             if row["state"] != "uploading" or len(data) != min(
                 PART_BYTES, row["size_bytes"] - index * PART_BYTES
             ):
-                raise DomainError(
-                    "STORE-0005", "Upload part does not fit current manifest"
-                )
+                raise DomainError("STORE-0005", "Upload part does not fit current manifest")
             prior = conn.execute(
                 "SELECT content_hash FROM inv.storage_parts WHERE project_id=%s AND object_id=%s AND part_index=%s",
                 (project, identity(object_id), index),
             ).fetchone()
             if prior and prior["content_hash"] != digest:
-                raise DomainError(
-                    "IDEM-0001", "Upload part already has different bytes"
-                )
-            files.put(part_key(object_id, index), data, digest)
+                raise DomainError("IDEM-0001", "Upload part already has different bytes")
+            files.put(self._part_locator(tenant, project, object_id, index), data, digest)
             conn.execute(
                 "INSERT INTO inv.storage_parts VALUES(%s,%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING",
                 (tenant, project, identity(object_id), index, digest, len(data)),
@@ -207,16 +206,14 @@ class SnapshotStore:
             }
 
     def finalize(self, tenant, project, object_id, *, authorize=None):
-        with self.provider.locked() as files, self.db.transaction(tenant) as conn:
+        with object_store_session(self.provider) as files, self.db.transaction(tenant) as conn:
             if authorize is not None:
                 authorize(conn)
             row = self._row(conn, project, object_id)
             if row["state"] not in {"uploading", "ready"}:
                 raise DomainError("STORE-0005", "Object is unavailable")
             if row["state"] == "ready":
-                files.read(
-                    object_key(object_id), row["content_hash"], row["size_bytes"]
-                )
+                files.get(row["locator"], row["content_hash"], row["size_bytes"])
                 return row["content_hash"]
             parts = conn.execute(
                 "SELECT * FROM inv.storage_parts WHERE project_id=%s AND object_id=%s ORDER BY part_index",
@@ -226,8 +223,8 @@ class SnapshotStore:
             if [part["part_index"] for part in parts] != list(range(count)):
                 raise DomainError("STORE-0006", "Upload has missing parts")
             data = b"".join(
-                files.read(
-                    part_key(object_id, p["part_index"]),
+                files.get(
+                    self._part_locator(tenant, project, object_id, p["part_index"]),
                     p["content_hash"],
                     p["size_bytes"],
                 )
@@ -235,7 +232,7 @@ class SnapshotStore:
             )
             if len(data) != row["size_bytes"]:
                 raise DomainError("VERIFY-0010", "Assembled size differs", 422)
-            files.put(object_key(object_id), data, row["content_hash"])
+            files.put(row["locator"], data, row["content_hash"])
             conn.execute(
                 "UPDATE inv.storage_objects SET state='ready' WHERE project_id=%s AND object_id=%s",
                 (project, identity(object_id)),
@@ -246,7 +243,7 @@ class SnapshotStore:
     def checkpoint(self, tenant, run_id, step_id, object_id, *, proofs):
         if not isinstance(step_id, str) or not 1 <= len(step_id) <= 200:
             raise DomainError("VAL-0003", "Invalid step ID", 422)
-        with self.provider.locked() as files, self.db.transaction(tenant) as conn:
+        with object_store_session(self.provider) as files, self.db.transaction(tenant) as conn:
             run = lock_run(conn, run_id)
             if run["state"] != "running":
                 raise DomainError("GRAPH-0002", "Checkpoint requires running attempt")
@@ -254,7 +251,7 @@ class SnapshotStore:
             row = self._row(conn, run["project_id"], object_id)
             if row["state"] != "ready":
                 raise DomainError("STORE-0005", "Checkpoint requires published content")
-            files.read(object_key(object_id), row["content_hash"], row["size_bytes"])
+            files.get(row["locator"], row["content_hash"], row["size_bytes"])
             content = checkpoint_content(row)
             return attach_checkpoint(
                 conn,
@@ -276,7 +273,7 @@ class SnapshotStore:
     def restore(self, tenant, project, run_id, attempt, step_id):
         # Returns verified bytes to a trusted workspace adapter. It never extracts
         # an archive, accepts a browser filesystem path or starts a process.
-        with self.provider.locked() as files, self.db.transaction(tenant) as conn:
+        with object_store_session(self.provider) as files, self.db.transaction(tenant) as conn:
             pin = conn.execute(
                 "SELECT object_id FROM inv.checkpoint_objects WHERE project_id=%s AND run_id=%s AND attempt=%s AND step_id=%s",
                 (project, run_id, attempt, step_id),
@@ -286,12 +283,10 @@ class SnapshotStore:
             row = self._row(conn, project, pin["object_id"])
             if row["state"] != "ready":
                 raise DomainError("STORE-0005", "Checkpoint object unavailable")
-            return files.read(
-                object_key(row["object_id"]), row["content_hash"], row["size_bytes"]
-            )
+            return files.get(row["locator"], row["content_hash"], row["size_bytes"])
 
     def collect(self, tenant, project, object_id):
-        with self.provider.locked() as files:
+        with object_store_session(self.provider) as files:
             with self.db.transaction(tenant) as conn:
                 conn.execute(
                     "SELECT quota_bytes FROM inv.storage_budgets WHERE project_id=%s FOR UPDATE",
@@ -316,9 +311,9 @@ class SnapshotStore:
                     "UPDATE inv.storage_objects SET state='deleting' WHERE project_id=%s AND object_id=%s",
                     (project, identity(object_id)),
                 )
-            files.remove(object_key(object_id))
+            files.delete(row["locator"])
             for index in range(4):
-                files.remove(part_key(object_id, index))
+                files.delete(self._part_locator(tenant, project, object_id, index))
             with self.db.transaction(tenant) as conn:
                 self._row(conn, project, object_id)
                 conn.execute(

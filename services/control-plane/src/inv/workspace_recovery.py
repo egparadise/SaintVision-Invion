@@ -14,9 +14,9 @@ from .contracts import validate_contract
 from .control import Control
 from .errors import DomainError
 from .leases import lock_run
-from .object_store import PART_BYTES
+from .object_store import PART_BYTES, object_store_session
 from .runs import event
-from .snapshots import identity, object_key
+from .snapshots import identity
 
 
 def restore_view(run_id, restore_id, workspace_id, generation, sha256, replayed):
@@ -134,7 +134,7 @@ class WorkspaceRecovery:
         )
         with (
             self.generations.locked() as root_fd,
-            self.snapshots.provider.locked() as files,
+            object_store_session(self.snapshots.provider) as files,
             self.db.transaction(tenant) as conn,
         ):
             run = lock_run(conn, run_id, project)
@@ -181,7 +181,7 @@ class WorkspaceRecovery:
             obj = self.snapshots._row(conn, project, pin["object_id"])
             if obj["state"] != "ready":
                 raise DomainError("STORE-0005", "Workspace checkpoint unavailable")
-            raw = files.read(object_key(obj["object_id"]), obj["content_hash"], obj["size_bytes"])
+            raw = files.get(obj["locator"], obj["content_hash"], obj["size_bytes"])
             generation = self.generations.publish(
                 root_fd, restore_id, raw, workspace_id, allow_create=stored is None
             )
@@ -262,7 +262,7 @@ class WorkspaceRecovery:
         with (
             working.locked() as work_fd,
             self.generations.locked() as restored_fd,
-            self.snapshots.provider.locked() as files,
+            object_store_session(self.snapshots.provider) as files,
             self.db.transaction(tenant) as conn,
         ):
             run = lock_run(conn, run_id, project)
@@ -325,7 +325,7 @@ class WorkspaceRecovery:
             obj = self.snapshots._row(conn, project, pin["object_id"])
             if obj["state"] != "ready" or obj["content_hash"] != restored["content_hash"]:
                 raise DomainError("VERIFY-0023", "Restore source content changed")
-            raw = files.read(object_key(obj["object_id"]), obj["content_hash"], obj["size_bytes"])
+            raw = files.get(obj["locator"], obj["content_hash"], obj["size_bytes"])
             self.generations.publish(
                 restored_fd, restore_id, raw, restored["workspace_id"], allow_create=False
             )
