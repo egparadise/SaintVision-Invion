@@ -266,10 +266,15 @@ def _locked_version(
     parent = session.get(Model, model_id, populate_existing=True)
     if parent is None or parent.tenant_id != tenant_id or parent.project_id != project_id:
         raise CanonicalProblem(RES_NOT_FOUND, 404, "No such model version.")
+    # ``populate_existing``: if this session already holds the row (a parent
+    # relationship load, an earlier read), the locked SELECT overwrites it with
+    # the committed state the lock now guards, instead of returning the stale
+    # identity-map copy. W4's pin and #167's release both act on this row.
     row = session.scalars(
         select(ModelVersion)
         .where(ModelVersion.model_id == model_id, ModelVersion.version == version)
         .with_for_update()
+        .execution_options(populate_existing=True)
     ).one_or_none()
     if row is None or row.tenant_id != tenant_id:
         raise CanonicalProblem(RES_NOT_FOUND, 404, "No such model version.")
