@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.21"
+version: "1.2.29"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T09:55:00+09:00"
+updated: "2026-09-28T11:15:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+S10-DB lineage 조회 API 설계 카드 ar (Claude, 2026-09-28, base `1e8baf04`, branch `agent/claude/s10-lineage-query-design`, docs-only): #144·#146이 찾은 '데이터셋 해시 역추적 미지원'을 닫는 읽기 전용 API v1.0. 실측: `trace_model`(`lineage.py:343`)은 구현·시험됐으나 **HTTP 라우트가 없어 도달 불가**이고 역조회는 **함수부터 없다**; `deployments`는 `LINEAGE_KINDS`에 없어 trace가 조회하지 않으므로 서비스 확장 필요. **핵심 제약 실측 — project 범위가 테이블마다 다르다**: `models`·`datasets`·`container_images`에만 `project_id`가 있고 `model_versions`·`dataset_versions`·`model_lineage`·`deployments`·`eval_runs`·`approvals`·`code_commits`에는 **없다**. 따라서 진입점 둘(model version·dataset digest)은 **부모 join**으로 project 강제가 가능하지만 일부 kind는 tenant 범위 사실이라, 응답이 `projectScopedKinds`/`tenantScopedKinds`로 **어느 항목이 걸러졌는지 스스로 말하게** 했다. 그리고 `record_lineage`(`:243-250`)가 `kind`만 검사하고 subject의 project를 **검사하지 않아 교차 project edge가 기록 가능**하다 → 내보내면 누설, 빼면 완전성 위장이라 **`outOfScope{kind, count}`(식별자 없음)** 범주를 신설해 둘 다 피했다. `fullyTraceable`은 `missing`·`dangling`·`outOfScope`·`truncated`가 **모두 비어야** true. **인덱스·migration 필요 확정**: `dataset_versions.content_sha256`에 인덱스가 **없다**(모델 `__table_args__`와 migrations grep 0건)이므로 역조회 1단계가 전체 스캔 → additive `ix_dataset_versions_tenant_id_content_sha256`(tenant 선행, UNIQUE 아님 — 같은 바이트를 여러 dataset version이 참조 가능) 한 개, 가역 downgrade 포함, 라우트와 같은 PR에 착지. `model_lineage`는 `ix_model_lineage_subject_id`가 이미 있어 추가 안 함(측정 없이 인덱스 늘리지 않음). **계약 변경 2건 명시**(라우트 2 + 응답 타입 2, `additionalProperties:false`, 커널 무변경). 페이지네이션은 기존 `pagination.py`의 `clamp_limit(50/200)`·`validate_cursor`·`build_page` 재사용, 순방향은 kind별 상한 200 + `truncated` 보고(조용한 slice 금지). 404는 없음과 남의 것을 **구분하지 않고**(경로 변수 존재 탐침 차단) grant 부재만 403. **새 오류 코드 0** — `VAL_SCHEMA`·`VAL_CURSOR`·`AUTH_PROJECT_SCOPE`·`RES_ARTIFACT_NOT_FOUND` 재사용. 부정 시험 16건(PG-free 9 + 실 PG 7), 로컬 실 PG는 메모리 규칙으로 미실행이라 근거는 hosted. 미해결 5(쓰기 라우트 범위 밖·`record_lineage` 교차 project 거부 여부는 backfill 조사 필요·project 컬럼 추가는 별 카드·image가 REQUIRED_KINDS 아님 유지·상한 200 측정 근거 없음). check_docs·ratchet exit 0. 전문 [[S10-DB_lineage_조회_API_설계]].
 
 hosted Core junit로 S04/05/07-DB 케이스 수치 보강 카드 12 (Claude, 2026-09-22, 읽기 전용): artifact `saintvision-core-evidence`(run 35706465645 `3d1892c0` + proof 35714470445 `f2aa2b14`)를 .work/ci-junit에 받아(바이너리 삭제 후 1.4MB) 파일별 수치(core 2948/58/0·shard-recovery 21·containment 28·workspace 22·business-handoff 17·lan-installer 15·docker-host 2, f2aa2b14는 core 2998/58/0 외 동일)와 카드 10의 hosted-only 항목 케이스 이름을 classname으로 추출 — 재전송 hash(output_ingestion 5·node_delivery 18·results 21), placement Explain(placement 12), shard replacement 21, containment 28, workspace 복구 12+11, 노드 스토리지 전송 27 — **전부 passed**. hosted에도 없는 것(AC-05 결정성/P95·AC-07 60초/95%·CX01)은 그대로 물리/5노드 대기로 명시. 패키지 §C-2 + 검증상태지도 §12 보강. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 
