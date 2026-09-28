@@ -278,3 +278,70 @@ jobs:
           name: saintvision-core-evidence
           path: dist/
           retention-days: 30
+  s01-storage-roundtrip:
+    # Keep registry or candidate failures isolated from the normal Core proof.
+    if: >-
+      github.event_name != 'pull_request' ||
+      contains(github.event.pull_request.labels.*.name, 'run-core')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      MINIO_IMAGE: docker.io/coollabsio/minio@sha256:72b4794d7faa001823364f8ee239717141327fc450a3264414f573a6abf3c629
+      MINIO_ROOT_USER: s01-roundtrip-ci
+      MINIO_ROOT_PASSWORD: s01-roundtrip-ci-only-secret
+      INV_OBJECT_STORE_ENDPOINT: http://127.0.0.1:9000
+      INV_OBJECT_STORE_BUCKET: saintvision-roundtrip-ci
+      INV_OBJECT_STORE_ACCESS_KEY_ID: s01-roundtrip-ci
+      INV_OBJECT_STORE_SECRET_ACCESS_KEY: s01-roundtrip-ci-only-secret
+      INV_OBJECT_STORE_REGION: us-east-1
+      INV_OBJECT_STORE_TARGET_KIND: ci-candidate
+      INV_EVIDENCE_CODE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Start disposable MinIO candidate
+        run: |
+          mkdir -p dist
+          docker pull --platform linux/amd64 "$MINIO_IMAGE"
+          docker image inspect --format '{{index .RepoDigests 0}}' "$MINIO_IMAGE" > dist/s01-minio-image.txt
+          docker run --detach --rm --platform linux/amd64 \
+            --name saintvision-s01-minio \
+            --tmpfs /data:rw,noexec,nosuid,size=64m \
+            --publish 127.0.0.1:9000:9000 \
+            --env MINIO_ROOT_USER \
+            --env MINIO_ROOT_PASSWORD \
+            "$MINIO_IMAGE" server /data --address ':9000'
+          for attempt in $(seq 1 45); do
+            if curl --fail --silent --show-error http://127.0.0.1:9000/minio/health/live > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs saintvision-s01-minio
+          exit 1
+      - name: Create disposable S01 Storage test bucket
+        run: |
+          python - <<'PY'
+          import os
+          from tools.verify_storage_roundtrip import S3Client, load_config
+
+          response = S3Client(load_config(os.environ)).create_bucket()
+          assert response.status == 200, f'redacted bucket setup failed ({response.status})'
+          PY
+      - name: Verify S01 Storage candidate SHA-256 roundtrip and cleanup
+        run: >-
+          python tools/verify_storage_roundtrip.py
+          --target-kind ci-candidate
+          --output dist/s01-storage-roundtrip.json
+          --junit dist/s01-storage-roundtrip.xml
+      - name: Stop disposable S01 Storage service
+        if: always()
+        run: docker rm --force saintvision-s01-minio 2>/dev/null || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: saintvision-s01-storage-evidence-${{ github.run_id }}
+          path: dist/
+          retention-days: 30
