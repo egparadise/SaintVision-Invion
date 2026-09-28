@@ -1,11 +1,11 @@
 ---
 doc_id: "DESIGN-S11-AC11-ACCEPTANCE-001"
 title: "S11-BE·S11-DB AC-11 통합 인수 설계"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T10:16:34+09:00"
+updated: "2026-09-28T10:51:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tasks: ["S11-BE", "S11-DB"]
@@ -34,15 +34,16 @@ tags: ["s11", "acceptance", "migration", "rollback", "restore", "slo", "fail-clo
 | 필드 | 규칙 |
 |---|---|
 | `schemaVersion`, `runPurpose` | 알려진 버전·목적만 허용한다. |
-| `sourceRunId`, `sourceHeadSha`, `artifactSha256` | GitHub run과 실제 PR head/commit에 도달해야 한다. merge SHA와 dirty tree는 거부한다. |
+| `sourceRunId`, `sourceHeadSha`, `checkoutTreeSha`, `artifactSha256` | GitHub run과 실제 PR head/commit에 도달해야 한다. `checkoutTreeSha == sourceHeadSha^{tree}`여야 하고 merge ref checkout은 거부한다. |
+| `cleanCheckout` | `true`만 허용한다. `git status --porcelain`이 비었음을 producer가 기록하고 aggregator가 workflow log와 함께 확인한다. |
 | `environment` | hosted runner 이미지, PostgreSQL 버전·설정, topology, 실제/합성 여부를 분리한다. |
 | `startedAt`, `finishedAt` | UTC RFC 3339. 종료가 시작보다 앞서면 `INVALID_RUN`이다. |
 | `observations` | 값, 단위, 표본 수, 성공/실패/skip 분모, SQLSTATE 또는 오류 분류를 함께 기록한다. |
-| `targetRef` | 목표가 적힌 문서 SHA와 그 SHA의 run 이전성을 기록한다. 없으면 `NOT_REGISTERED`다. |
-| `verdict` | `MEASURED_PASS`, `MEASURED_FAIL`, `NOT_OBSERVED`, `BLOCKED_EXTERNAL`, `NOT_APPLICABLE`, `INVALID_RUN` 중 하나다. |
+| `targetRef` | 목표 문서의 commit·path·blob SHA를 기록한다. target commit은 `sourceHeadSha`의 조상이고, 측정 tree의 같은 path blob이 target blob과 동일해야 한다. 없으면 `NOT_REGISTERED`다. |
+| `verdict` | 닫힌 enum `MEASURED_PASS`, `MEASURED_FAIL`, `NOT_OBSERVED`, `BLOCKED_EXTERNAL`, `NOT_APPLICABLE`, `NOT_REGISTERED`, `INVALID_RUN` 중 하나다. 모르는 문자열은 `INVALID_RUN`이다. |
 | `cleanup` | disposable resource 이름·소유 label·정리 결과·잔존 수를 기록한다. 잔존이 있으면 FAIL이다. |
 
-상위 집계기는 `MEASURED_PASS`만 합격 분자에 넣는다. `skip`, `NOT_OBSERVED`, `BLOCKED_EXTERNAL`, `NOT_APPLICABLE`은 PASS가 아니다. 필수 필드 누락, artifact hash 불일치, source SHA 도달 불가, 다른 환경의 수치 합산, 실패가 있는데 오류 합계가 맞지 않는 보고서는 `INVALID_RUN`이다.
+상위 집계기는 producer의 `verdict`를 신뢰하지 않고 observation·targetRef·분모로 다시 계산한다. `MEASURED_PASS`인데 관측값이 비었거나 `n=0`이거나 목표를 위반하면 `INVALID_RUN`이다. `skip`, `NOT_OBSERVED`, `BLOCKED_EXTERNAL`, `NOT_APPLICABLE`, `NOT_REGISTERED`는 PASS가 아니다. 필수 필드나 필수 축 누락, artifact hash 불일치, source SHA/tree 도달 불가, 다른 환경 수치 합산, 실패가 있는데 오류 합계가 맞지 않는 보고서도 `INVALID_RUN`이다. `MEASURED_NO_TARGET`과 일반 문자열 `PASS`는 허용하지 않는다.
 
 ## 2. migration forward→rollback→forward 리허설
 
@@ -69,6 +70,17 @@ tags: ["s11", "acceptance", "migration", "rollback", "restore", "slo", "fail-clo
 - 보안: table owner, role membership, GRANT/REVOKE, RLS enable/force, policy expression, SECURITY DEFINER owner/search_path/EXECUTE 대상.
 - sequence와 시간: 복원 뒤 다음 값이 기존 최대값을 덮어쓰지 않고, timestamp precision·timezone이 바뀌지 않는다.
 
+sentinel은 **forward 전과 forward 후에 각각** 넣는다. forward 후 sentinel은 downgrade가 새 열·새 객체의 데이터를 버리는지 드러내며, revision manifest는 각 sentinel을 `PRESERVED` 또는 `DECLARED_LOSS_REQUIRES_RESTORE` 중 하나로 미리 분류한다. 결과를 본 뒤 등급을 바꿀 수 없다.
+
+`reversible`은 두 등급으로 나눈다.
+
+| 등급 | 의미 | 현재 고정 fixture |
+|---|---|---|
+| `lossless-reversible` | forward 후 데이터까지 downgrade→re-forward 뒤 보존 | 일반 additive/constraint migration |
+| `lossy-reversible` | 코드상 downgrade는 있으나 데이터·의미 손실 가능; SQL downgrade PASS로 release gate를 충족하지 못하고 snapshot restore가 필요 | base `0001_s02_baseline`~`0007_locality_replicas`의 `DROP TABLE ... CASCADE`, `0009_idempotency_and_inbox_scope`, `0010_canonical_resource_units`, `0025_workspace_tool_choice` |
+
+downgrade 뒤 catalog는 단순 “추가 객체 없음”이 아니라 **새 DB를 같은 `down_revision`까지 upgrade한 기준 DB**와 fingerprint가 같아야 한다. fingerprint 범위는 table·column·constraint·index·function signature/body hash·owner·GRANT·role membership·RLS enable/force·policy expression이다. 이 비교는 `0026`/`0028`처럼 같은 함수 이름을 다루는 revision이 기존 객체를 조용히 지우는 회귀도 잡는다.
+
 fixture가 revision에 존재하지 않는 열을 요구하거나 owner-only trigger 우회로 운영상 불가능한 orphan을 만들면 실행기는 시작 전에 거부한다. fingerprint 비교는 row count만 보지 않고 key와 canonical JSON/hash를 함께 비교한다.
 
 ### 2.3 현재 비가역 inventory와 처리
@@ -90,6 +102,9 @@ fixture가 revision에 존재하지 않는 열을 요구하거나 owner-only tri
 | branch/cycle/multiple head, 알 수 없는 prior, manifest와 graph 불일치 | `INVALID_RUN` |
 | `target == head`를 rollback 성공으로 집계 | 집계기 FAIL |
 | 비가역 revision에 downgrade 실행 또는 조용한 schema drop | FAIL |
+| `downgrade(): pass`를 가역 성공으로 분류 | `INVALID_RUN` |
+| 기존 객체를 삭제했는데 “추가 객체 없음”만 확인 | catalog fingerprint 불일치로 FAIL |
+| `0009`처럼 forward 후 project별 동일 key가 생긴 뒤 downgrade가 실패하거나 데이터를 접음 | `lossy-reversible`; SQL rollback PASS 금지, restore 요구 |
 | sentinel 값·FK·RLS·role membership·DEFINER grant·sequence 훼손 | FAIL |
 | restore는 0인데 checksum/fingerprint 불일치 | FAIL |
 | 한 DB를 case 간 재사용하거나 residue 존재 | FAIL |
@@ -99,15 +114,15 @@ fixture가 revision에 존재하지 않는 열을 요구하거나 owner-only tri
 
 ### 3.1 재사용하는 hosted restore 증거
 
-[PR #126](https://github.com/egparadise/SaintVision-Invion/pull/126)의 final-head Core run [36355139230](https://github.com/egparadise/SaintVision-Invion/actions/runs/36355139230)은 owned disposable CX01 PostgreSQL의 복구 drill을 실행했다. 기록값은 `cx01-recovery-tests.xml` 20 total / 18 passed / 2 skipped / 0 failed / 0 error, 전체 Core 3253 / 3236 passed / 17 skipped / 0 failed다. 두 skip은 내부망 archiver의 host 비노출이며 **복구 PASS로 승격하지 않는다**. 이 run은 disposable restore와 cleanup 증거이지 실제 운영 PITR, RPO/RTO 또는 off-device media 증거가 아니다.
+[PR #126](https://github.com/egparadise/SaintVision-Invion/pull/126)의 Core run [36355139230](https://github.com/egparadise/SaintVision-Invion/actions/runs/36355139230)은 owned disposable CX01 PostgreSQL의 복구 drill을 실행했다. 2026-09-28 10:51 KST 확인 시 PR은 **OPEN**이며 head는 `08ff220b6a5e13ada2268bb143ba152a29bd72bc`다. 기록값은 `cx01-recovery-tests.xml` 20 total / 18 passed / 2 skipped / 0 failed / 0 error, 전체 Core 3253 / 3236 passed / 17 skipped / 0 failed다. 두 skip은 내부망 archiver의 host 비노출이며 **복구 PASS로 승격하지 않는다**. 이 run은 disposable restore와 cleanup 증거이지 실제 운영 PITR, RPO/RTO 또는 off-device media 증거가 아니다.
 
-새 AC-11 집계기는 #126 증거를 가져올 때 run conclusion, head `08ff220b6a5e13ada2268bb143ba152a29bd72bc`, artifact hash, owned resource label, residue 0을 다시 검증한다. PR이 integration에 없으면 외부 candidate evidence로만 표시하고 integration release 판정에 섞지 않는다.
+새 AC-11 집계기는 #126 증거를 가져올 때 run conclusion, head, artifact digest `sha256:3b38ef2a…0262c`, 만료 `2026-10-27T22:43:03Z`, owned resource label, residue 0을 다시 검증한다. PR이 integration에 없으면 외부 candidate evidence로만 표시하고 integration release 판정에 섞지 않는다. run-specific JSON은 아직 Git에 없으므로 artifact 만료 전에 커밋되지 않으면 이후 판정은 `INVALID_RUN`이다. 현재 출처 스냅샷은 `Evidence/s11-ac11-source-baseline.json`에 고정한다.
 
 ### 3.2 VF-CL-04와 CX-09
 
 [[VF-CL-04 replica 복구와 PITR 운영 runbook]]의 `pitr_readiness`는 설정을 `possible | absent | inconclusive`로 분류할 뿐 실제 복구를 증명하지 않는다. retention dry-run과 7일 정책도 삭제 계획의 안전성을 검증할 뿐 RPO/RTO가 아니다.
 
-실 PITR은 [[2026-09-22_CX-09_PITR_Tier-A_활성여부_결정준비_Claude]] 결정과 사용자 제공 저장소·자격·복구 목표가 필요하다. base backup + WAL로 별도 인스턴스에 목표 시점 복원, checksum/row fingerprint, RPO/RTO, timeline, cleanup까지 얻기 전에는 `BLOCKED_EXTERNAL(CX-09)` 또는 `NOT_OBSERVED`다.
+실 PITR은 [[2026-09-22_CX-09_PITR_Tier-A_활성여부_결정준비_Claude]] 결정과 사용자 제공 저장소·자격·복구 목표가 필요하다. `tools/pitr_rehearsal.sh`는 같은 호스트의 별도 cluster에서 base backup+WAL promotion을 확인하는 **메커니즘 증거**이고 운영 장애 영역·지속 archive·RPO/RTO를 증명하지 않는다. 별도 장애 영역 인스턴스에 목표 시점 복원, checksum/row fingerprint, RPO/RTO, timeline, cleanup까지 얻기 전에는 `BLOCKED_EXTERNAL(CX-09)` 또는 `NOT_OBSERVED`다.
 
 ### 3.3 restore 부정 시험
 
@@ -115,44 +130,66 @@ fixture가 revision에 존재하지 않는 열을 요구하거나 owner-only tri
 - corrupted/truncated backup, 잘못된 role owner, 누락된 extension, `pg_restore` nonzero, fingerprint mismatch는 FAIL.
 - restore 뒤 cleanup 실패·잔존 resource는 FAIL.
 - readiness `possible`, archive 설정, retention 계획, logical dump만으로 PITR PASS를 내면 집계기 FAIL.
+- 같은 호스트 disposable `pitr_rehearsal.sh` PASS를 운영 PITR 또는 RPO/RTO PASS로 승격하면 FAIL.
 - #126의 두 archiver skip을 0 또는 pass로 보충하면 `INVALID_RUN`.
 
 ## 4. SLO 집계
 
 ### 4.1 허용 입력과 비교 경계
 
-| 입력 | 관측값 | AC-11에서의 용도·한계 |
+| 입력 | 출처·상태·확인 시각 | artifact digest·만료·Git 기준점 | 관측값과 AC-11 경계 |
+|---|---|---|---|
+| S05 Card46 run [36362386530](https://github.com/egparadise/SaintVision-Invion/actions/runs/36362386530), 측정 head `3a1790ff3431706e81a2ba258eb0b26ea456ed31` | PR #148 **OPEN**, 2026-09-28 10:51 KST | `sha256:44be1e7a…2a10`, `2026-10-12T00:30:21Z`; #151 candidate blob `ff6af431…b374` | legacy 20/35/50 P95 411.382/705.026/990.625ms, timeout 0. #115 제품 tree의 hosted 합성-node 참고값이며 integration/물리 5노드 AC-05 판정값이 아니다. |
+| S05 clean-base run [36363327477](https://github.com/egparadise/SaintVision-Invion/actions/runs/36363327477), 측정 head `0892f8e84441d76e2313e2136b003e012f7c2ae1` | PR #151 **OPEN**, 2026-09-28 10:51 KST | `sha256:e4994e4e…767`, `2026-10-12T00:46:10Z`; #151 candidate blob `904b9030…517d` | 20/35/50 P95 665.154/1109.917/1558.406ms, timeout 0, c50 여유 441.594ms. clean-base 호환 1회이며 canonical decision이나 AC-05 판정을 대체하지 않는다. |
+| CX01 run [36355139230](https://github.com/egparadise/SaintVision-Invion/actions/runs/36355139230) | PR #126 **OPEN**, 2026-09-28 10:51 KST | `sha256:3b38ef2a…0262c`, `2026-10-27T22:43:03Z`; run-specific committed JSON 없음 | 18 pass / 2 honest skip, cleanup success. disposable restore 메커니즘이며 실제 PITR·장시간·5노드 지표가 아니다. |
+| VF-CL-04 readiness·retention | Git 문서·도구, candidate | 설정 분류와 dry-run | 운영 준비 관측. 복구 SLO가 아니다. |
+
+집계기는 `comparableGroup`이 같은 수치만 median/percentile로 합친다. 제품 tree, runner, PostgreSQL 설정, topology, 관측자 유무가 다르면 별도 행이다. 기존 evidence의 목표가 사전 등록되지 않았으면 `NOT_REGISTERED`로 보고하고, 결과를 본 뒤 목표를 정해 과거 run을 PASS로 만들지 않는다. 위 artifact metadata의 오래 남는 기준점은 `Evidence/s11-ac11-source-baseline.json`이다. 단, OPEN PR의 blob은 integration 증거가 아니며 CX01 run-specific JSON 부재도 그대로 gap이다.
+
+### 4.2 사전 등록된 목표와 신규 목표 규칙
+
+이미 측정보다 앞서 Git에 등록된 목표는 아래와 같다. 둘 다 commit `d74e82ec5d0dda0b9f379e56fea2aad2a9b714f3`(2026-09-09)의 blob을 `targetRef`로 쓴다.
+
+| metric | targetRef | 목표 | 이 설계의 판정 |
+|---|---|---|---|
+| AC-05 50동시 배치 | `docs/vault/30_Development/Sprints/S05 자원 배치.md` at `d74e82ec` | 초과 예약 0, all-request P95 ≤ 2초 | hosted 합성-node rung은 **참고값**이다. 물리 5노드·정본 topology가 아니므로 목표와 숫자 비교는 보고하되 AC-05 PASS로 세지 않는다. |
+| 복구 RPO/RTO·보존 | `docs/vault/30_Development/DB 최종 개발 계획.md` at `d74e82ec` | RPO ≤15분, RTO ≤1시간, 35일 보존 | 실제 별도 장애 영역 복구와 운영 archive가 없으므로 `NOT_OBSERVED`/`BLOCKED_EXTERNAL`; readiness·same-host rehearsal로 PASS 금지. |
+
+VF-CL-04 파일럿 retention 기본값 **7일**과 정본 DB 계획의 **35일**은 불일치다. 7일 dry-run은 운영 35일 목표의 합격 증거가 아니며, 운영 결정이 35일을 바꾸려면 새 목표 문서를 **측정 전에** merge해야 한다. 그 전까지 보존 축은 미충족이다.
+
+그 밖의 신규 목표는 target 문서를 먼저 merge하고 나서만 측정한다. commit timestamp가 빠른지만 보지 않고 targetRef가 sourceHeadSha의 조상이며 source tree의 해당 blob과 동일한지 확인한다.
+
+| metric | 집계 | 현재 상태 |
 |---|---|---|
-| S05 Card46 canonical run [36362386530](https://github.com/egparadise/SaintVision-Invion/actions/runs/36362386530), 측정 head `3a1790ff3431706e81a2ba258eb0b26ea456ed31` | legacy 20/35/50 동시 P95 중앙 411.382 / 705.026 / 990.625ms, timeout 0 | #115 제품 tree(flag off, root-transaction lifecycle 포함)의 hosted 합성-node 결과. integration tree 또는 5노드 AC-05 수치로 쓰지 않는다. |
-| S05 clean integration compatibility run [36363327477](https://github.com/egparadise/SaintVision-Invion/actions/runs/36363327477), 측정 head `0892f8e84441d76e2313e2136b003e012f7c2ae1` | 20/35/50 P95 중앙 665.154 / 1109.917 / 1558.406ms, timeout 0, c50 2초 여유 441.594ms | integration tree legacy 호환 측정 1회. canonical decision을 대체하지 않고 서로 직접 합산하지 않는다. |
-| CX01 run `36355139230` | 18 pass / 2 honest skip, cleanup success | disposable restore 가용성. 실제 PITR·장시간·5노드 지표 아님. |
-| VF-CL-04 readiness·retention | 설정 분류와 dry-run | 운영 준비 관측. 복구 SLO 아님. |
-
-집계기는 `comparableGroup`이 같은 수치만 median/percentile로 합친다. 제품 tree, runner, PostgreSQL 설정, topology, 관측자 유무가 다르면 별도 행이다. 기존 evidence의 목표가 사전 등록되지 않았으면 `MEASURED_NO_TARGET` 성격의 `NOT_REGISTERED`로 보고하고, 결과를 본 뒤 목표를 정해 과거 run을 PASS로 만들지 않는다.
-
-### 4.2 사전 등록할 주요 SLO
-
-구현 카드에서 목표 문서 SHA를 먼저 merge한 뒤 측정한다. 다음 값은 **필드와 판정 방식의 제안**이며 숫자는 아직 승인하지 않는다.
-
-| metric | 집계 | 사전 등록 전 상태 |
-|---|---|---|
-| migration case 성공률·총시간 | case별 성공/실패와 p50/p95 | `NOT_REGISTERED` |
-| rollback/restore RTO, data-loss/RPO | 실제 restore/promotion 시계와 row/hash delta | CX-09 전 `NOT_OBSERVED` |
+| migration case 성공률·총시간 | case별 성공/실패와 p50/p95 | 신규 목표 merge 전 `NOT_REGISTERED` |
 | 장시간 오류율·resource drift | 고정 시간 window의 요청/실패/누수 | `NOT_OBSERVED` |
-| 배치 요청 p95·SQL timeout | topology·동시성별 all-request p95와 SQLSTATE | hosted 합성 값만 관측, 5노드 `NOT_OBSERVED` |
 | 장애 감지·복구 성공률 | 반복 횟수·분모·감지/복구 분포 | 5노드 `NOT_OBSERVED` |
-| critical/high 미완화 | 스캐너/침투 시나리오 finding ID와 disposition | 완전한 allowlisted report 전 `NOT_OBSERVED` |
+| critical/high 미완화 | allowlist v0 finding ID와 disposition | report 전 `NOT_OBSERVED` |
 | 접근성 | 동일 release SHA의 자동+수동 기준별 결과 | 동일 SHA evidence 전 `NOT_OBSERVED` |
 
 `critical/high 미완화 0`은 보고서가 없다는 뜻이 아니다. allowlisted scanner와 threat scenario가 전부 실행되고, 각 finding이 fixed/accepted-with-expiry/false-positive-with-proof 중 하나이며 만료된 예외가 0일 때만 0이다. 미실행 도구나 누락된 report는 `NOT_OBSERVED`다.
 
-### 4.3 SLO 부정 시험
+### 4.3 security allowlist v0
+
+현재 dependency/static scanner는 등록된 것이 **0개**이므로 dependency/static critical/high 축의 현재 판정은 `NOT_OBSERVED`다. 아래 repo-native 보안 evidence도 “scanner 전체”로 부풀리지 않고 각 threat ID 범위만 덮는다.
+
+| threat ID | 도구·고정 버전(blob) | 범위 | severity 규칙 |
+|---|---|---|---|
+| `SEC-DEF-001` | `tools/check_definer_functions.py` `5831f8d8…3952` + `definer-policy.json` `c1581f1f…70e` | SECURITY DEFINER owner/search_path/EXECUTE 정책 drift | 미등록 definer·PUBLIC EXECUTE·비고정 search_path = high |
+| `SEC-RLS-001` | `tools/collect_rls_evidence.py` `329da31a…932` + `rls-boundary-baseline.json` `698a5b55…404` | tenant isolation·RLS boundary evidence | reachable cross-tenant read/write 또는 fail-open provenance = critical; 미측정 = NOT_OBSERVED |
+| `SEC-VF-001` | `tools/run_vf_security_tests.py` `d9a40a03…8d8` | VF security test manifest가 명시한 인증·비밀·경계 시나리오 | policy bypass/credential disclosure = critical, 다른 강제 경계 회귀 = high |
+
+도구·blob·범위·severity mapping·threat ID 중 하나라도 문서 갱신 없이 바뀌면 `INVALID_RUN`이다. allowlist 도구 report 누락은 `NOT_OBSERVED`, accepted-with-expiry가 만료되면 `MEASURED_FAIL`이다. 새 scanner는 이 표를 merge한 뒤에만 분모에 넣는다.
+
+### 4.4 SLO 부정 시험
 
 - target 문서 commit이 run보다 늦음, targetRef 누락, 결과를 보고 임계치 변경 → `INVALID_RUN`.
 - P95 all을 P95 success로 바꾸거나 timeout을 분모에서 제거 → FAIL.
 - 다른 제품 tree·topology·observer 결과 합산 → `INVALID_RUN`.
 - `errorsBySqlState` 합계와 failure count 불일치, unknown failure 누락 → `INVALID_RUN`.
 - security report 누락을 critical/high 0으로 변환 → FAIL.
+- allowlist 도구 report 누락 → `NOT_OBSERVED`; 문서 변경 없는 도구/blob 교체 → `INVALID_RUN`; 만료된 accepted-with-expiry → `MEASURED_FAIL`.
+- producer가 관측값 없음·`n=0`·목표 위반인데 `MEASURED_PASS` 제출 → 집계기 재계산으로 `INVALID_RUN`.
 - failed/cancelled hosted run 또는 만료·삭제된 artifact를 재도장 → `INVALID_RUN`.
 
 ## 5. hosted 범위와 물리 자원 범위
@@ -167,7 +204,7 @@ fixture가 revision에 존재하지 않는 열을 요구하거나 owner-only tri
 | 복구 | 합성 node/container failure와 deterministic replay | 5노드 전원 차단·디스크/네트워크 장애·late write·실 byte 재확보 |
 | 접근성/E2E | 동일 SHA의 hosted browser 자동 검사 | 사용자 장비·실제 배포 URL에서 수동 키보드/스크린리더 인수 |
 
-hosted 결과에는 runner 사양과 “로컬/물리 5노드와 직접 비교 불가”를 기록한다. ADR-100에 따른 CP와 같은 호스트의 Node는 timed S05/S07 분모에서 제외하고 별도 smoke/상관 장애로 표시한다.
+hosted 결과에는 runner 사양과 “로컬/물리 5노드와 직접 비교 불가”를 기록한다. GitHub-hosted job의 6시간 상한을 넘는 soak는 hosted 가능 범위가 아니라 외부 자원 범위다. ADR-100에 따른 CP와 같은 호스트의 Node는 timed S05/S07 분모에서 제외하고 별도 smoke/상관 장애로 표시한다. 접근성/E2E producer는 S11-FE(owner Gemini)이며, 동일 release SHA·artifact를 이 집계기에 인계한다.
 
 ## 6. 실행 순서와 release gate
 
@@ -176,16 +213,22 @@ hosted 결과에는 runner 사양과 “로컬/물리 5노드와 직접 비교 �
 3. **hosted canary:** 한 가역 fixture와 한 비가역 restore fixture로 fail-closed 부정 시험을 먼저 실행한다.
 4. **hosted 전체:** published prior matrix, CX01 restore, allowlisted security/E2E evidence를 같은 release manifest에 수집한다.
 5. **물리/외부:** CX-09 실제 PITR, 5노드 부하·복구, 장시간 soak와 사용자 접근성 인수를 별도 실행한다.
-6. **최종 판정:** 필수 항목 하나라도 `NOT_OBSERVED`, `BLOCKED_EXTERNAL`, `INVALID_RUN`, `MEASURED_FAIL`이면 AC-11은 `done`이 아니다. 알려진 critical/high 미완화가 1건 이상이면 즉시 FAIL이다.
+6. **최종 판정:** 아래 필수 축은 모두 집계기가 재계산한 `MEASURED_PASS`여야 AC-11이 `done`이다. 알려진 critical/high 미완화가 1건 이상이면 즉시 FAIL이다. 차단 verdict를 나열하는 방식은 쓰지 않는다.
+
+필수 축은 `(1) migration reversible-segment, (2) irreversible restore/forward, (3) actual PITR·RPO/RTO·retention, (4) AC-05 load SLO, (5) physical 5-node load/recovery, (6) long soak, (7) security critical/high zero, (8) accessibility/E2E`다. 축 누락은 `INVALID_RUN`이다.
+
+유일한 구조 예외는 `reversible-segment`다. targetRef에 고정된 graph가 reversible tail 0을 증명한 경우에만 미리 선언한 `NOT_APPLICABLE(no reversible tail)`을 허용하고, 짝인 `irreversible restore/forward`가 `MEASURED_PASS`여야 한다. 이때 reversible 축은 필수 집합에서 조건부 제외될 뿐 PASS 분자에 들어가지 않는다. 다른 축의 `NOT_APPLICABLE`, 모든 축의 `NOT_APPLICABLE`, `NOT_REGISTERED`, `NOT_OBSERVED`, `BLOCKED_EXTERNAL`, `MEASURED_FAIL`, `INVALID_RUN`은 모두 `done`을 막는다.
+
+집계기 부정 시험은 최소 세 건을 고정한다: 모든 축 `NOT_APPLICABLE` → not done, verdict 문자열 `"PASS"` → `INVALID_RUN`, 필수 축 하나 누락 → `INVALID_RUN` + not done.
 
 ### release manifest 최소 결과
 
 | 축 | 현재 상태 |
 |---|---|
-| migration forward/rollback/forward | 설계만 존재; current reversible tail 0, `NOT_APPLICABLE` |
+| migration forward/rollback/forward | 설계만 존재; current reversible tail 0, 조건부 `NOT_APPLICABLE`이지만 짝인 restore PASS 전에는 gate 미충족 |
 | irreversible restore/forward | 설계만 존재; #126은 후보 restore 증거, integration 판정 미수행 |
 | actual PITR | `BLOCKED_EXTERNAL(CX-09)` |
-| hosted synthetic load | 기존 수치 존재, 비교군 분리 필요 |
+| hosted synthetic load | 기존 참고 수치 존재; 물리 5노드 AC-05 판정 아님 |
 | physical 5-node load/recovery | `NOT_OBSERVED` |
 | long soak | `NOT_OBSERVED` |
 | security critical/high zero | 완전한 allowlisted report 전 `NOT_OBSERVED` |

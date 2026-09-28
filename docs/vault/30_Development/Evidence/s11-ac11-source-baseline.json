@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "1.0.0",
+  "verifiedAt": "2026-09-28T10:51:00+09:00",
+  "sources": [
+    {
+      "sourceRunId": "36355139230",
+      "sourceHeadSha": "08ff220b6a5e13ada2268bb143ba152a29bd72bc",
+      "sourcePr": 126,
+      "sourcePrState": "OPEN",
+      "artifactName": "saintvision-core-evidence",
+      "artifactSha256": "3b38ef2aaa987351c9ae7639f583c606258cb5dbb49aa3c5348949a3eee0262c",
+      "expiresAt": "2026-10-27T22:43:03Z",
+      "committedRunEvidencePath": null,
+      "boundary": "Hosted disposable CX01 mechanism evidence; no operational PITR or RPO/RTO claim. Run-specific JSON must be committed before expiry for later adjudication."
+    },
+    {
+      "sourceRunId": "36362386530",
+      "sourceHeadSha": "3a1790ff3431706e81a2ba258eb0b26ea456ed31",
+      "sourcePr": 148,
+      "sourcePrState": "OPEN",
+      "artifactName": "saintvision-s05-legacy-staircase-36362386530",
+      "artifactSha256": "44be1e7ab94515e223cb8937de53e85e83ee67d17933acac421e93fbe4212a10",
+      "expiresAt": "2026-10-12T00:30:21Z",
+      "committedRunEvidencePath": "docs/vault/30_Development/Evidence/s05-card46-legacy-staircase-36362386530.json",
+      "committedRunEvidenceBlob": "ff6af4314b955eb8e669f64bc63cd756d170b374",
+      "boundary": "Hosted synthetic-node reference only; not physical five-node AC-05 adjudication."
+    },
+    {
+      "sourceRunId": "36363327477",
+      "sourceHeadSha": "0892f8e84441d76e2313e2136b003e012f7c2ae1",
+      "sourcePr": 151,
+      "sourcePrState": "OPEN",
+      "artifactName": "saintvision-s05-legacy-staircase-36363327477",
+      "artifactSha256": "e4994e4e84bc01f8de83f142b584bf93ee1224e45b5930146b984089c10fe767",
+      "expiresAt": "2026-10-12T00:46:10Z",
+      "committedRunEvidencePath": "docs/vault/30_Development/Evidence/s05-card47-clean-base-36363327477.json",
+      "committedRunEvidenceBlob": "904b90306dd870936dc293816751d082aa554c7c",
+      "boundary": "Hosted clean-base compatibility result; not canonical decision evidence and not physical five-node AC-05 adjudication."
+    }
+  ]
+}
