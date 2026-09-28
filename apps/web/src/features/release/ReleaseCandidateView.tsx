@@ -150,7 +150,9 @@ export const ReleaseCandidateView: React.FC = () => {
               주요 SLO 실측치 및 목표 비교 (AC-11)
             </h3>
             <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
-              측정 환경: 5-Node 분산 클러스터 및 실제 원격 호출 계측 결과
+              {slos.some((s) => s.status !== 'unmeasured')
+                ? '측정 환경: 5-Node 분산 클러스터 및 실제 원격 호출 계측 결과'
+                : '측정 환경: 실측 텔레메트리 연동 대기 (미측정)'}
             </p>
           </div>
 
@@ -302,7 +304,7 @@ export const ReleaseCandidateView: React.FC = () => {
           </div>
         </div>
 
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}>
+        <table data-testid="candidates-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
               <th style={{ padding: '8px' }}>Release Tag</th>
@@ -321,8 +323,12 @@ export const ReleaseCandidateView: React.FC = () => {
                 <td style={{ padding: '10px 8px', fontFamily: 'var(--font-mono, monospace)' }}>
                   <code>{rc.buildSha}</code>
                 </td>
-                <td style={{ padding: '10px 8px', color: '#3fb950' }}>{rc.sloComplianceRate}%</td>
-                <td style={{ padding: '10px 8px' }}>{rc.unresolvedVulnerabilities} 건</td>
+                <td style={{ padding: '10px 8px', color: rc.sloComplianceRate !== null ? '#3fb950' : '#8b949e' }}>
+                  {rc.sloComplianceRate !== null ? `${rc.sloComplianceRate}%` : '미측정 (NOT_OBSERVED)'}
+                </td>
+                <td style={{ padding: '10px 8px', color: rc.unresolvedVulnerabilities !== null ? '#f0f6fc' : '#8b949e' }}>
+                  {rc.unresolvedVulnerabilities !== null ? `${rc.unresolvedVulnerabilities} 건` : '미측정 (NOT_OBSERVED)'}
+                </td>
                 <td style={{ padding: '10px 8px' }}>
                   <span style={{ color: rc.rollbackVerified ? '#3fb950' : '#8b949e' }}>
                     {rc.rollbackVerified ? '✔ 검증 완료' : '대기'}

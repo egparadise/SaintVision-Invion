@@ -91,11 +91,33 @@ export function getAuthToken(): string | null {
   return inMemoryAuthToken;
 }
 
+declare global {
+  // eslint-disable-next-line no-var
+  var __sv_auth_teardown_listeners: Set<() => void> | undefined;
+}
+
+export function onAuthTeardown(listener: () => void): () => void {
+  if (!globalThis.__sv_auth_teardown_listeners) {
+    globalThis.__sv_auth_teardown_listeners = new Set();
+  }
+  globalThis.__sv_auth_teardown_listeners.add(listener);
+  return () => {
+    globalThis.__sv_auth_teardown_listeners?.delete(listener);
+  };
+}
+
 /**
- * Clear the in-memory access token on logout.
+ * Clear the in-memory access token on logout and notify teardown listeners.
  */
 export function clearAuthToken(): void {
   inMemoryAuthToken = null;
+  globalThis.__sv_auth_teardown_listeners?.forEach((fn) => {
+    try {
+      fn();
+    } catch {
+      // ignore listener errors during teardown
+    }
+  });
 }
 
 export type UnauthorizedHandler = (problem: ProblemDetails) => void;

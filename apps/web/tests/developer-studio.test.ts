@@ -434,7 +434,7 @@ describe('Developer Studio: Unified 4-Step Workflow & Governance Verification', 
 
     it('isRouteNotFoundError returns false for non-404, canonical application 404, and any structured problem code (fail-closed)', () => {
       // 401 Unauthorized (canonical server auth denial)
-      expect(isRouteNotFoundError({ status: 401, problem: { status: 401, code: 'AUTH-0030' } })).toBe(false);
+      expect(isRouteNotFoundError({ status: 401, problem: { status: 401, code: 'AUTH-0050' } })).toBe(false);
       // 403 Forbidden (canonical net auth error)
       expect(isRouteNotFoundError({ status: 403, problem: { status: 403, code: 'NET-0403' } })).toBe(false);
       // 500 Internal Error (canonical system error)

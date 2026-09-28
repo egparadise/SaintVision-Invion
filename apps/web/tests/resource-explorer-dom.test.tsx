@@ -1173,6 +1173,8 @@ describe('VF-GM-02: My Computer / Resource Explorer Fabric & Topology Harness', 
             availableBytes: 500 * 1024 ** 3,
             status: 'pending',
             createdAt: '2026-09-29T00:00:00Z',
+            normalizedPath: 'C:\\SaintVision\\StorageData',
+            registeredAt: '2026-09-29T00:00:00Z',
           },
         };
       });
@@ -1224,6 +1226,8 @@ describe('VF-GM-02: My Computer / Resource Explorer Fabric & Topology Harness', 
             availableBytes: 10 * 1024 ** 3,
             status: 'pending',
             createdAt: '2026-09-29T00:00:00Z',
+            normalizedPath: 'C:\\SaintVision\\StorageData',
+            registeredAt: '2026-09-29T00:00:00Z',
           },
         };
       });

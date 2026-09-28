@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.136"
+version: "1.0.137"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-29T03:11:00+09:00"
+updated: "2026-09-29T03:28:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -22,6 +22,12 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-29T00:20:00+09:00 (최신 tip `agent/gemini/g05-fe-model-registry`, PR #219 Codex r4 F1 조치: Release 쓰기 UI fail-closed 미노출 및 Idempotency-Key 헤더 제거).
 
 ## 2026-09-29 apps/web 전역 감사 지적사항(F1~F7) 시정 완료 (Card 126, `agent/gemini/card126-audit-fixes`)
+- **독립 검토 r1 (Claude UI M1/L1~L3, Codex 계약 C1/C2) 전수 조치 완료**:
+  - M1: `kernelMutations.ts` non-retryable 에러(409 GRAPH-0003, 403 AUTH-0034) 시 캐시 즉시 폐기 및 재조회 회귀 시험 완결.
+  - C1: `ReleaseCandidate` SLO/취약점 nullable(`null`)화, 기본 화면에서 100%/0건 허위 주장 배제 및 미측정(NOT_OBSERVED) 표출, 환경 문구 조건화.
+  - C2: 재시도 시 cached key/payload 절대적 유지(caller 옵션 우회 차단), auth teardown(`clearAuthToken`/로그아웃) 시 캐시 자동 삭제.
+  - L1~L3: mock fixture 서버 형상 정합, 401 코드 정정, History status review 정정.
+  - 실측: Vitest 81 files / 764 passed, `tsc -b` 0 errors, `npm run build` 성공, 파이썬 라우트 게이트 40 passed.
 
 - **PR**: Card 126 (생성 예정)
 - **Base / Head**: Base `f23c0423` (PR #219 head) 위 전역 감사 F1~F7 전수 시정 완료.

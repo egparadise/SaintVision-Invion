@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-GEMINI-CARD126-001"
 title: "Card 126 apps/web 전역 감사 지적사항(F1~F7) 시정 보고"
-version: "1.0.0"
-status: "approved"
+version: "1.1.0"
+status: "review"
 author: "Gemini"
 date: "2026-09-29T03:11:00+09:00"
-updated: "2026-09-29T03:11:00+09:00"
+updated: "2026-09-29T03:28:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -94,3 +94,26 @@ Claude의 전역 감사 PR #235(착지 후보 `b91ab72f`)에서 도출된 `apps/
   - `python tools/check_contract_bindings.py`: 55 fixtures / 20 bound types PASS (exit 0)
   - `python tools/check_docs.py`: 24 hashes, 919 docs PASS (exit 0)
   - `python tools/sync_obsidian.py --check`: 1762 files, 0 conflicts PASS (exit 0)
+
+---
+
+## 4. 독립 검토 r1 조치 (Claude UI M1 / L1~L3, Codex 계약 C1 / C2)
+
+### 4.1 조치 대조표
+
+| 지적 | 축 | 구분 | 지적 내용 | 조치 내용 및 근거 코드 | 검증 시험 |
+|---|---|---|---|---|---|
+| **M1** | UI | **수정 요청** | 비재시도 실패(409 GRAPH-0003, 403 AUTH-0034) 뒤에도 캐시가 남아 stale expectedVersion/nonce를 영구 재전송 | `kernelMutations.ts`의 catch 블록에서 `isRetryableMutationError` 분기 적용: non-retryable 에러 발생 시 캐시 즉시 삭제, 네트워크/5xx/408/429 등 재시도 가능 실패만 유지 | `tests/kernel-mutations.test.ts`: 409 후 재호출 시 Run 버전 재조회 및 새 키 발행 실측, 403 후 재호출 시 challenge 재요청 및 새 키 발행 실측 |
+| **C1** | 계약 | **수정 요청** | `releaseCandidates` 기본값에 허위 `100.0%`, `0건` 및 실측 환경 주장 문구 잔류 | `types.ts`에서 `ReleaseCandidate`의 `sloComplianceRate` 및 `unresolvedVulnerabilities`를 `number | null`로 변경, `releaseEngine.ts` 기본값을 `null`로 정직화, `ReleaseCandidateView.tsx`에서 텔레메트리 부재 시 `미측정 (NOT_OBSERVED)` 표출 및 "실측 텔레메트리 연동 대기 (미측정)" 문구로 전환 | `tests/release-candidate.test.ts` (null 반환 단언), `tests/deployment-release-integrity-wiring.test.tsx` (기본 화면에서 100% / 0건 미표출 및 미측정 표출 단언) |
+| **C2** | 계약 | **수정 요청** | 첫 dispatch 후 재시도 시 caller가 새 key를 전달해 same-key 불변식을 깰 수 있으며, auth teardown 시 mutation cache가 미폐기됨 | (1) `kernelMutations.ts`에서 retry 시 cached key/payload를 절대적(authoritative)으로 사용하여 caller 옵션 무력화 및 `forceNewKey` 제거<br>(2) `globalThis.__sv_auth_teardown_listeners` 도입 및 `clearAuthToken()` / `App.tsx:resetAuthenticatedState`에서 캐시 자동 삭제 | `tests/kernel-mutations.test.ts`: 재시도 시 다른 idempotencyKey 전달해도 최초 캐시 키 유지 실측, `clearAuthToken()` 후 재호출 시 캐시 폐기 및 새 키 발행 실측 |
+| **L1** | UI | 권고 | 스토리지 기여 mock fixture에 필수 필드(`normalizedPath`, `registeredAt`) 누락 | `tests/resource-explorer-dom.test.tsx`의 mock fixture를 서버 형상(`normalizedPath`, `registeredAt`)으로 정합 | `tests/resource-explorer-dom.test.tsx` (27 passed) |
+| **L2** | UI | 권고 | `developer-studio.test.ts`의 401 케이스에 403 코드(`AUTH-0030`) 사용 | `tests/developer-studio.test.ts:437`에서 `AUTH-0050`으로 정정 | `tests/developer-studio.test.ts` (13 passed) |
+| **L3** | UI | 권고 | History frontmatter `status: "approved"` 사전 선언 | `status: "review"`로 정정 | 문서 검사 통과 |
+
+### 4.2 추가 실측 검증
+- Vitest: **81 test files / 764 passed** (0 failures, 6 tests 신설/확장)
+- TypeScript: `cd apps/web && npx tsc -b` 0 errors
+- 빌드: `npm run build` dist/ 번들 생성 성공 (`dist/assets/index-ZGpF2ZqK.js` 875.03 kB)
+- 계약: `npm run contracts:check` 28 passed
+- 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed
+- 무결성 도구: `python -X utf8 tools/check_frontend_integrity.py` 88 files 0 violations

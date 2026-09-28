@@ -477,8 +477,8 @@ export interface ReleaseCandidate {
   tag: string;
   buildSha: string;
   builtAt: string;
-  unresolvedVulnerabilities: number;
-  sloComplianceRate: number;
+  unresolvedVulnerabilities: number | null;
+  sloComplianceRate: number | null;
   rollbackVerified: boolean;
   isActive: boolean;
 }

@@ -71,6 +71,15 @@ describe('S11-FE: Release Candidate, WCAG 2.1 AA & Web Rollback Verification (AC
       const bypassSlo = breachedSlos.find((s) => s.name.includes('우회'));
       expect(bypassSlo?.actualValue).toBe('2 건 위반');
     });
+    it('C1: returns unmeasured (null) for release candidates sloComplianceRate and vulnerabilities when telemetry is absent', () => {
+      const rm = new ReleaseManager();
+      const candidates = rm.getReleaseCandidates();
+      expect(candidates.length).toBeGreaterThan(0);
+      candidates.forEach((c) => {
+        expect(c.sloComplianceRate).toBeNull();
+        expect(c.unresolvedVulnerabilities).toBeNull();
+      });
+    });
   });
 
   describe('WCAG 2.1 AA Accessibility Conformance (AC-11)', () => {
