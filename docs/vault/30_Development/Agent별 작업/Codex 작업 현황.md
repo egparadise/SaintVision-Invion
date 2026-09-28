@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.219"
+version: "1.0.221"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T21:56:36+09:00"
+updated: "2026-09-28T22:01:22+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-28 Card96 S11 AC-11 composite long-soak registry repin — Claude 검토 요청
+
+- branch `agent/codex/ac11-composite-long-soak-repin`, base #204 cascade head `887e4f08`, #214 설계 merge `a4e0c466`. 정본 registry에 `s11-ac11-composite-long-soak-v0`를 새 ID로 추가하고 blob `be99a506…`에 aggregator·migration importer·physical importer를 함께 repin했다. migration target 문서는 docs commit `4c68bc8e`의 graph 파생 tail 규칙과 blob `55ee8b65…`에 재결속했다.
+- physical importer는 exact case/fault identity, topology, 24시간 창, physical storage와 hosted drift child의 SHA·inventory·window 결속을 fail-closed로 검사한다. G-19/G-24 부재는 `BLOCKED_EXTERNAL`, pre-registration fixture는 `NOT_REGISTERED`이고 hosted/synthetic 결과만으로 PASS를 만들지 않는다.
+- PG-free focused 95 passed, compile·JSON·diff와 docs·bindings·ontology·ratchet gate 모두 exit 0. 물리 5노드·fault injection·PG·Docker는 실행하지 않았고 `long-soak`은 완료 또는 승격이 아니다. [[2026-09-28_21-38-56_KST_S11_AC11_composite_long_soak_repin_Codex]].
 
 ## 2026-09-28 S11-ST hosted 10-case reference lane — PR #204
 
@@ -17,6 +23,7 @@ source_of_truth: "Git"
 - 관측형 head `51fada85`의 run `36405534113`은 10/10 exact 오류 표면, classification mismatch·false success·unexpected·quota overshoot·committed loss 0을 확인했다. 그러나 `OBJ-04` 두 case에서 cleanup 전 partial object 합 2가 관측되어 verdict는 **`MEASURED_FAIL`**이며, cleanup residue는 0이다. temp-residue 5개는 0으로 채우지 않고 `NOT_OBSERVED`다. artifact `10962202766`, digest `sha256:9ab687af…d6fd`, 만료 2026-10-28이고 offline zip/run/artifact 교차검증도 exit 0이다.
 - Claude r2 잔여 조건을 반영해 OBJ committed loss·quota를 실제 DB 전후값으로 계산하고, BAK 설정 readiness exit와 미실행 PITR(`null`)을 분리했다. importer는 0초 run과 미등록 metric 숫자 주입을 거부한다. 기존 artifact는 finding 이력으로 보존하되 final review에서는 superseded이며 새 exact-head run 식별자는 PR 코멘트에 기록한다.
 - 이 증거는 storage reference 전용(`referenceOnly=true`, `axis=null`, `targetRef=null`)이라 AC-11 축 PASS·S11-ST 승격으로 세지 않는다. 전용 lane 밖에서는 정확한 opt-in 사유로 1건 skip하며 Backend/Core exact skip map에 같은 사유를 등록했다. PG-free 단일 파일 40 passed이며 로컬 PostgreSQL·Docker·전체 suite는 실행하지 않았다. [[2026-09-28_18-00-00_KST_S11_ST_hosted_10_case_reference_Codex]], [[S11-ST_손상_용량_backup_장애시험_설계]].
+
 ## 2026-09-28 Card 50 — S11 AC-11 aggregator stage 1
 
 - Branch/base: `agent/codex/s11-ac11-aggregator` / `1e8baf045c5a554209aaef601ae4883b64da50a7`; owner/reviewer Codex/Claude; approved design PR #157 head `a793f258`.
@@ -103,6 +110,17 @@ source_of_truth: "Git"
 - base `9a837fd7`(#117 lock-wait skip map hotfix 포함), branch `agent/codex/cx01-hosted-core`, owner Codex/reviewer Claude. Core job이 고유 owner label·tmpfs·loopback으로 PostgreSQL 16을 직접 생성하고 같은 컨테이너를 recovery source/CX01 identity로 쓰며 `if: always()` 정리하는 설계를 고정했다.
 - mock·identity/ownership 단언 완화·옛 PC 보호 컨테이너 사용 없이 head `bc27588d`의 Core `36353272311`이 success했다. focused recovery는 18 passed/2 구체적 internal-network skip/0 failed·error, main은 3236 passed/17 declared skip/0 failed·error이며 build·Go·TS·owned cleanup도 success다. 기존 unset 19 skip은 0건이다.
 - 앞선 shared-session 14 fail은 owner-only 음성 시험이 trigger를 끄고 남긴 orphan `inv.result_commitments`를 다음 restore가 FK로 거부한 시험 격리 오염으로 재현했다. 제품 drill은 손상을 통과시키지 않았고 fresh restore는 통과했으므로 recovery를 fresh session으로 분리했으며, 음성 시험 cleanup은 별도 test-hygiene 관찰로 남긴다. S07-DB 물리 인수는 `review` 유지, Claude 독립 재검토가 다음이다. [[Core CX01 hosted disposable container 설계]], [[2026-09-28_06-53-26_KST_Card36_CX01_hosted_Core_Codex]]
+## 2026-09-28 S11 AC-11 composite long-soak target 설계 — Claude 검토 요청
+
+- #157의 필수 `long-soak`과 #185의 storage reference 경계를 결합해 열·전원·NTP·스위치·WAN·실 WS/PTY·물리 storage를 한 24시간 물리 창에 묶었다. ADR-100의 등록 5/eligible Ubuntu 4/CP 겸임 제외 1, external monotonic observer, 14개 exact case와 20개 fault-class SHA를 고정했다.
+- hosted storage/drift는 같은 SHA의 필수 하위 관측이지만 성공만으로 축 PASS를 만들 수 없고, storage-only도 PASS가 아니다. 실제 registry 변경은 #192 방식의 별도 repin 카드로 남겼다.
+- 이 카드는 docs-only이며 실제 장비·fault·hosted 실행은 0건이다. 운영자 자원 전 `BLOCKED_EXTERNAL(G-19/G-24)`이고 reviewer Claude 승인 뒤 registry/importer repin이 첫 후속이다. [[S11_AC11_composite_long_soak_설계]], [[S11_AC11_composite_long_soak_target_v0]], [[2026-09-28_19-59-12_KST_S11_AC11_composite_long_soak_설계_Codex]].
+
+## 2026-09-28 S11-BE·S11-DB AC-11 통합 인수 설계 v1.1.1 — Claude 재검토 요청
+
+- migration을 가역 `forward→downgrade→forward`와 비가역 `forward→verified restore→forward`로 분리했다. 현재 head `0046_model_manifest_readiness`는 비가역이고 reversible tail이 0개이므로 no-op downgrade를 PASS로 세지 않는다.
+- PR #126 CX01 hosted restore, VF-CL-04 readiness/retention, S05 hosted 두 비교군을 재사용하되 실제 PITR·5노드·장시간·완전한 security/accessibility는 `NOT_OBSERVED`/`BLOCKED_EXTERNAL`로 유지한다.
+- Claude r1 수정 요청에 따라 verdict 닫힌 enum·필수 8축 allowlist·집계기 재계산, `d74e82ec` 목표 결속, forward 후 sentinel/손실형 가역/catalog fingerprint, OPEN evidence digest·만료 기준점을 v1.1에 반영했다. r2 조건으로 `s11-security-allowlist-v0.json`에 실제 VF runner·workflow·시험 blob과 node ID 5개, RLS accepted 3건의 사전 disposition을 고정하고 definer/RLS 결과·exit의 severity/verdict 표를 v1.1.1에 추가했다. 구현·실행·registry 변경은 없고 S11-BE/S11-DB/AC-11은 `planned`다. [[S11-BE_DB_AC-11_통합_인수_설계]], [[2026-09-28_10-16-34_KST_S11_AC11_통합인수_설계_Codex]].
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 

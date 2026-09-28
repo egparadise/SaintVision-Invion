@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "1.0.0",
+  "kind": "ac11-target-registry-patch",
+  "patchId": "CARD-S11-AC11-LONG-SOAK-REPIN-01",
+  "applied": true,
+  "canonicalRegistryPath": "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json",
+  "predecessorBlob": "c08a45f8cd3a32fe6631d7f135496a5e7809ee2d",
+  "resultBlob": "be99a506efecdb2ff29cf4e7a96a8772f5524473",
+  "requiredTargetByAxis": {
+    "long-soak": "s11-ac11-composite-long-soak-v0"
+  },
+  "addedTarget": {
+    "targetId": "s11-ac11-composite-long-soak-v0",
+    "axis": "long-soak",
+    "sourceDocument": {
+      "commit": "938ad3eb1c1664890c714f6ec86f409b7dab65b9",
+      "path": "docs/vault/30_Development/S11_AC11_composite_long_soak_target_v0.md",
+      "blob": "0bf74f90557a237b50ebdf571ed9e3dac89ea23b"
+    }
+  },
+  "modifiedTargets": [
+    {
+      "targetId": "s11-irreversible-restore-forward-v0",
+      "previousSourceDocument": {
+        "commit": "d55c97a0e2ba5248f60a498272dfda2a882c3a0a",
+        "path": "docs/vault/30_Development/S11_AC11_migration_restore_target_v0.md",
+        "blob": "dc1db2587dacc461a2814d45e11610d8d5973181"
+      },
+      "resultSourceDocument": {
+        "commit": "4c68bc8e086d9b68c14a386264b630ffa4bc8c8e",
+        "path": "docs/vault/30_Development/S11_AC11_migration_restore_target_v0.md",
+        "blob": "55ee8b65a62a25f5a027770cf602ae2ecc62e45c"
+      }
+    },
+    {
+      "targetId": "s11-migration-reversible-roundtrip-v1",
+      "previousSourceDocument": {
+        "commit": "d55c97a0e2ba5248f60a498272dfda2a882c3a0a",
+        "path": "docs/vault/30_Development/S11_AC11_migration_restore_target_v0.md",
+        "blob": "dc1db2587dacc461a2814d45e11610d8d5973181"
+      },
+      "resultSourceDocument": {
+        "commit": "4c68bc8e086d9b68c14a386264b630ffa4bc8c8e",
+        "path": "docs/vault/30_Development/S11_AC11_migration_restore_target_v0.md",
+        "blob": "55ee8b65a62a25f5a027770cf602ae2ecc62e45c"
+      }
+    }
+  ],
+  "removedTargetIds": [],
+  "physicalExecutionStatus": "BLOCKED_EXTERNAL",
+  "blockers": ["G-19", "G-24"]
+}
