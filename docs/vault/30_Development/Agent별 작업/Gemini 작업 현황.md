@@ -149,7 +149,6 @@ source_of_truth: "Git"
     - `Desktop HTTP Browser Acceptance` (Run `36362842043` / `36363112956`): **PASS (1m58s)**
     - `Backend Build` (Run `36362150709`): **PASS (Python 3.12 9m20s / Python 3.14 8m10s)**
   - 로컬 게이트: `check_frontend_integrity.py` PASS (0 violations), `test_route_coverage.py` PASS (39 passed), `check_contract_bindings.py` PASS, `check_docs.py` PASS, `sync_obsidian.py --check` PASS (0 conflicts).
->>>>>>> 0f0d82df9b5916a90b36e07b27652a385abca70e
 
 ## 2026-09-23 S04-FE Claude 리뷰 F1~F5 전수 조치 및 정직 증거 갱신 (`agent/gemini/s04-fe-matrix-measured`)
 
