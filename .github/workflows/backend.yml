@@ -170,6 +170,9 @@ jobs:
               # S05 lock-wait evidence is a separately approved two-wave diagnostic.
               # Normal Backend collection must expose, but never execute, that load.
               'run only through tools/placement_lock_wait_diagnostic.py': 1,
+              # S05 c50 is a preregistered load measurement. Its dedicated CLI/lane
+              # owns the disposable DB, exact inputs, repeats, and evidence files.
+              'run only through tools/placement_benchmark.py': 1,
           })
           actual_skips = Counter(
               (skipped.get('message') or '').strip()

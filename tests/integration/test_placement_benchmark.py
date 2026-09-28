@@ -23,9 +23,21 @@ from inv.db import Database
 from inv.placement import PlacementStore
 from inv.scheduler import Request
 from test_postgres import planned
-from tools.placement_benchmark import percentile_nearest_rank, run_round, summarize
+from tools.placement_benchmark import (
+    BENCHMARK_OPT_IN_ENV,
+    BENCHMARK_OPT_IN_REASON,
+    percentile_nearest_rank,
+    run_round,
+    summarize,
+)
 
-pytestmark = pytest.mark.postgres
+pytestmark = [
+    pytest.mark.postgres,
+    pytest.mark.skipif(
+        os.getenv(BENCHMARK_OPT_IN_ENV) != "1",
+        reason=BENCHMARK_OPT_IN_REASON,
+    ),
+]
 
 CPU_PER_REQUEST = 10
 MEMORY_PER_REQUEST = 1_048_576

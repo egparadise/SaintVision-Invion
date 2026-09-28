@@ -175,6 +175,10 @@ jobs:
               'codex is not installed on this machine': 1,
               'gemini is not installed on this machine': 1,
               'antigravity is not installed on this machine': 1,
+              # S05 diagnostics and c50 are explicit load lanes, not incidental
+              # full-suite work. Keep both visible in the exact skip ratchet.
+              'run only through tools/placement_lock_wait_diagnostic.py': 1,
+              'run only through tools/placement_benchmark.py': 1,
           })
           actual_skips = Counter(
               (skipped.get('message') or '').strip()
