@@ -157,3 +157,10 @@ def test_object_store_locator_revision_is_the_single_irreversible_head():
     assert head.down_revision == "0047_audit_events_isolation"
     assert head.irreversible is True
     assert head.recovery_note and "restore" in head.recovery_note.lower()
+
+
+def test_definer_policy_tracks_object_store_locator_head_without_catalog_drift():
+    policy = json.loads(
+        (ROOT / "tools/definer-policy.json").read_text(encoding="utf-8")
+    )
+    assert policy["revision"] == chain()[-1].revision == "0048_object_store_locator"
