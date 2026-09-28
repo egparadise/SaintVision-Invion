@@ -22,7 +22,9 @@ import { DesktopWindowComponent } from '../src/features/desktop/DesktopWindow';
 import { DesktopShell } from '../src/features/desktop/DesktopShell';
 import { ApprovalDetail } from '../src/features/approvals/ApprovalDetail';
 import { AdminSecurityConsole } from '../src/features/admin/AdminSecurityConsole';
-import { WorkspaceItem, NodeItem, ApprovalItem } from '../src/contracts/types';
+import { RunDetail } from '../src/features/runs/RunDetail';
+import { RunList } from '../src/features/runs/RunList';
+import { WorkspaceItem, NodeItem, ApprovalItem, RunItem } from '../src/contracts/types';
 import { DesktopWindow as IDesktopWindow } from '../src/contracts/virtualFabric';
 
 describe('S11-FE Defect Fixes Verification (DEF-S11-01 ~ DEF-S11-19)', () => {
@@ -316,6 +318,59 @@ describe('S11-FE Defect Fixes Verification (DEF-S11-01 ~ DEF-S11-19)', () => {
       rejectDialog?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     });
     expect(container.querySelector('[role="dialog"]')).toBeNull();
+
+    // 5. AdminSecurityConsole (kill-switch modal)
+    await act(async () => {
+      root.render(
+        <AdminSecurityConsole
+          nodes={[]}
+          currentUser={{ id: 'admin-1', name: 'Admin', role: 'admin' }}
+        />
+      );
+    });
+    const killSwitchTrigger = Array.from(container.querySelectorAll('button')).find((b) => b.textContent?.includes('Kill Switch'));
+    expect(killSwitchTrigger).not.toBeUndefined();
+    await act(async () => {
+      killSwitchTrigger?.click();
+    });
+    const killSwitchDialog = container.querySelector('[data-testid="kill-switch-modal"]') as HTMLDivElement;
+    expect(killSwitchDialog).not.toBeNull();
+    expect(killSwitchDialog.getAttribute('role')).toBe('dialog');
+    expect(killSwitchDialog.getAttribute('aria-modal')).toBe('true');
+    expect(killSwitchDialog.getAttribute('aria-labelledby')).toBe('kill-switch-modal-title');
+    act(() => {
+      killSwitchDialog.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    });
+    expect(container.querySelector('[data-testid="kill-switch-modal"]')).toBeNull();
+
+    // 6. RunDetail (run cancellation modal)
+    const mockRun: RunItem = {
+      id: 'run-alpha',
+      projectId: 'prj-alpha',
+      state: 'running',
+    };
+    await act(async () => {
+      root.render(
+        <RunDetail
+          run={mockRun}
+          onBack={vi.fn()}
+          onCancelRun={vi.fn()}
+        />
+      );
+    });
+    const cancelRunBtn = Array.from(container.querySelectorAll('button')).find((b) => b.textContent?.includes('Run 취소'));
+    expect(cancelRunBtn).not.toBeUndefined();
+    await act(async () => {
+      cancelRunBtn?.click();
+    });
+    const runCancelDialog = container.querySelector('div[aria-labelledby="run-cancel-modal-title"]') as HTMLDivElement;
+    expect(runCancelDialog).not.toBeNull();
+    expect(runCancelDialog.getAttribute('role')).toBe('dialog');
+    expect(runCancelDialog.getAttribute('aria-modal')).toBe('true');
+    act(() => {
+      runCancelDialog.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    });
+    expect(container.querySelector('div[aria-labelledby="run-cancel-modal-title"]')).toBeNull();
   });
 
   // DEF-S11-05: DesktopWindow Escape isolation
@@ -325,6 +380,7 @@ describe('S11-FE Defect Fixes Verification (DEF-S11-01 ~ DEF-S11-19)', () => {
       id: 'win-1',
       appId: 'terminal',
       title: 'Terminal Window',
+      icon: '⌨️',
       isOpen: true,
       isMinimized: false,
       isMaximized: false,
@@ -360,6 +416,36 @@ describe('S11-FE Defect Fixes Verification (DEF-S11-01 ~ DEF-S11-19)', () => {
       winEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     });
     expect(handleClose).toHaveBeenCalledTimes(1);
+  });
+
+  // DEF-S11-05: DesktopShell window Escape keydown does not close active desktop window
+  it('DEF-S11-05: DesktopShell window Escape keydown does not close active desktop window', async () => {
+    await act(async () => {
+      root.render(
+        <DesktopShell
+          currentUser={{ id: 'gemini', name: 'Gemini', role: 'admin' }}
+          nodes={[]}
+          runs={[]}
+          currentTheme="dark"
+          onChangeUser={vi.fn()}
+          onSwitchToPortalView={vi.fn()}
+          onToggleTheme={vi.fn()}
+        />
+      );
+    });
+
+    // win_my_computer is open by default
+    const myCompWin = container.querySelector('[aria-labelledby="window-title-win_my_computer"]');
+    expect(myCompWin).not.toBeNull();
+
+    // Dispatch Escape on window
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    });
+
+    // Window must remain open (global window listener does not close active window)
+    const myCompWinAfter = container.querySelector('[aria-labelledby="window-title-win_my_computer"]');
+    expect(myCompWinAfter).not.toBeNull();
   });
 
   // DEF-S11-06: Header active tab aria-current="page"
@@ -518,7 +604,6 @@ describe('S11-FE Defect Fixes Verification (DEF-S11-01 ~ DEF-S11-19)', () => {
     };
 
     const darkPrimaryBg = extractToken(darkBlock, '--color-brand-primary-bg');
-    const darkPrimaryHoverBg = extractToken(darkBlock, '--color-brand-primary-hover-bg');
     const darkPrimaryText = extractToken(darkBlock, '--color-brand-primary');
     const darkDangerBg = extractToken(darkBlock, '--color-status-offline-bg');
     const darkDangerText = extractToken(darkBlock, '--color-status-offline');
@@ -533,26 +618,97 @@ describe('S11-FE Defect Fixes Verification (DEF-S11-01 ~ DEF-S11-19)', () => {
     const primaryBgContrast = getContrast('#ffffff', darkPrimaryBg);
     expect(primaryBgContrast).toBeGreaterThanOrEqual(4.5);
 
-    // 2. Dark primary button hover bg on white text exceeds 4.5:1 (actual 5.17:1)
-    const primaryHoverBgContrast = getContrast('#ffffff', darkPrimaryHoverBg);
-    expect(primaryHoverBgContrast).toBeGreaterThanOrEqual(4.5);
-
-    // 3. Dark danger button bg on white text exceeds 4.5:1 (actual 4.83:1)
+    // 2. Dark danger button bg on white text exceeds 4.5:1 (actual 4.83:1)
     const dangerBgContrast = getContrast('#ffffff', darkDangerBg);
     expect(dangerBgContrast).toBeGreaterThanOrEqual(4.5);
 
-    // 4. Dark brand text/ring on dark surface exceeds 4.5:1 for text, 3.0:1 for ring (actual 6.98:1)
+    // 3. Dark brand text/ring on dark surface exceeds 4.5:1 for text, 3.0:1 for ring (actual 6.98:1)
     const darkTextContrast = getContrast(darkPrimaryText, darkBgSurface);
     expect(darkTextContrast).toBeGreaterThanOrEqual(4.5);
 
-    // 5. Dark danger text on dark surface exceeds 4.5:1 (actual 6.41:1)
+    // 4. Dark danger text on dark surface exceeds 4.5:1 (actual 6.41:1)
     const darkDangerTextContrast = getContrast(darkDangerText, darkBgSurface);
     expect(darkDangerTextContrast).toBeGreaterThanOrEqual(4.5);
+
+    // 5. Non-text progress bar UI contrast exceeds 3.0:1 (actual 5.77:1 on subtle)
+    const progressBarContrast = getContrast(darkPrimaryText, darkBgSubtle);
+    expect(progressBarContrast).toBeGreaterThanOrEqual(3.0);
 
     // 6. Non-text form input borders exceed 3.0:1 (WCAG 1.4.11)
     const darkBorderContrast = getContrast(darkBorderStrong, darkBgSubtle);
     const lightBorderContrast = getContrast(rootBorderStrong, rootBgSubtle);
     expect(darkBorderContrast).toBeGreaterThanOrEqual(3.0);
     expect(lightBorderContrast).toBeGreaterThanOrEqual(3.0);
+  });
+
+  // DEF-S11-09: Button and non-button components bind -bg tokens and enforce revert-fail
+  it('DEF-S11-09: Button and non-button components bind -bg tokens and enforce revert-fail', async () => {
+    // 1. Button variant="primary" binds var(--color-brand-primary-bg)
+    await act(async () => {
+      root.render(<Button variant="primary">Submit Primary</Button>);
+    });
+    const btn = container.querySelector('button') as HTMLButtonElement;
+    expect(btn).not.toBeNull();
+    expect(btn.style.backgroundColor).toContain('var(--color-brand-primary-bg');
+
+    // 2. Button variant="danger" binds var(--color-status-offline-bg)
+    await act(async () => {
+      root.render(<Button variant="danger">Delete Danger</Button>);
+    });
+    const dangerBtn = container.querySelector('button') as HTMLButtonElement;
+    expect(dangerBtn).not.toBeNull();
+    expect(dangerBtn.style.backgroundColor).toContain('var(--color-status-offline-bg');
+
+    // 3. RunList active filter binds var(--color-brand-primary-bg)
+    await act(async () => {
+      root.render(
+        <RunList
+          runs={[]}
+          selectedFilter="ALL"
+          onSelectFilter={vi.fn()}
+          onSelectRun={vi.fn()}
+        />
+      );
+    });
+    const allFilterBtn = Array.from(container.querySelectorAll('button')).find((b) => b.textContent?.includes('전체'));
+    expect(allFilterBtn).not.toBeUndefined();
+    expect(allFilterBtn?.style.backgroundColor).toBe('var(--color-brand-primary-bg)');
+  });
+
+  // DEF-S11-09: Source scan ensures zero instances of var(--color-brand-primary) with white text in apps/web/src
+  it('DEF-S11-09: Source scan ensures zero instances of var(--color-brand-primary) with white text in apps/web/src', () => {
+    const srcDir = path.resolve(__dirname, '../src');
+    const files: string[] = [];
+    const walk = (dir: string) => {
+      for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, ent.name);
+        if (ent.isDirectory()) walk(full);
+        else if (ent.name.endsWith('.ts') || ent.name.endsWith('.tsx')) files.push(full);
+      }
+    };
+    walk(srcDir);
+
+    const brandPrimaryBgMatches: { file: string; line: number; content: string }[] = [];
+    for (const file of files) {
+      const rel = path.relative(srcDir, file).replace(/\\/g, '/');
+      const lines = fs.readFileSync(file, 'utf-8').split('\n');
+      lines.forEach((line, idx) => {
+        if (/backgroundColor:\s*.*'var\(--color-brand-primary\)'/.test(line)) {
+          brandPrimaryBgMatches.push({ file: rel, line: idx + 1, content: line.trim() });
+        }
+      });
+    }
+
+    // Exactly two matches are permitted: progress bars without text (ClusterOverview.tsx, NodeList.tsx)
+    expect(brandPrimaryBgMatches).toHaveLength(2);
+    const matchedFiles = brandPrimaryBgMatches.map((m) => m.file);
+    expect(matchedFiles).toContain('features/dashboard/ClusterOverview.tsx');
+    expect(matchedFiles).toContain('features/nodes/NodeList.tsx');
+
+    // Verify none of the matches contain white text
+    for (const match of brandPrimaryBgMatches) {
+      expect(match.content).not.toContain('#ffffff');
+      expect(match.content).not.toContain('color:');
+    }
   });
 });

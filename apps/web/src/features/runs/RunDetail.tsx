@@ -1073,7 +1073,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
                         fontSize: '0.875rem',
                         fontWeight: 700,
                         backgroundColor: isCurrent
-                          ? 'var(--color-brand-primary)'
+                          ? 'var(--color-brand-primary-bg)'
                           : isPassed
                           ? 'var(--color-status-online)'
                           : 'var(--color-bg-subtle)',

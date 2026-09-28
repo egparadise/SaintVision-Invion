@@ -902,7 +902,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                       justifyContent: 'center',
                       fontSize: '0.75rem',
                       fontWeight: 700,
-                      backgroundColor: isActive ? 'var(--color-brand-primary)' : isPassed ? '#2ea043' : 'var(--color-border-strong)',
+                      backgroundColor: isActive ? 'var(--color-brand-primary-bg)' : isPassed ? '#2ea043' : 'var(--color-border-strong)',
                       color: '#ffffff',
                     }}
                   >
