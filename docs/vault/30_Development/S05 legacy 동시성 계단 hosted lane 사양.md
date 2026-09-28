@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-S05-LEGACY-STAIRCASE-LANE-SPEC-001"
 title: "S05 legacy 동시성 계단 hosted lane 사양"
-version: "1.3.0"
+version: "1.3.1"
 status: "hosted-measured-review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T17:55:00+09:00"
+updated: "2026-09-28T10:08:35+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S05-DB"]
@@ -36,6 +36,8 @@ lane은 다음을 fail closed로 확인한다.
 5. wave별 JSON·JUnit·redacted log와 aggregate JSON·JUnit을 artifact로 14일 보존한다.
 
 runner OS/arch/image, CPU·메모리, Python·PostgreSQL 버전, service default timeout/max connections를 기록한다. DSN·password·DB 이름·tenant/project/run 식별자는 aggregate에 넣지 않는다. hosted 수치는 환경 고유 calibration이므로 개발 PC 수치와 직접 합치거나 절대값 비교하지 않는다.
+
+현재 wave JSON/JUnit의 `scope`는 `tests/integration/test_placement_benchmark.py`가 하드코딩한 `development-PC; one synthetic measured-node row; pre-five-node-lab`이라는 낡은 라벨이다. 실제 Card46·Card47 실행은 GitHub hosted runner에서 수행됐으며, 다음 계단 실행 전 topology 환경값을 wave report까지 전달·검증하는 후속 보강이 필요하다.
 
 ## 3. 사전 degrade 기준
 
@@ -74,6 +76,8 @@ PR #148 측정 head `3a1790ff3431706e81a2ba258eb0b26ea456ed31`의 run [363623865
 
 첫 run `36362223316`은 fingerprint report의 Python import 누락으로 첫 wave JSON 전에 fail closed한 `INVALID_RUN`이며 어떤 수치도 쓰지 않는다.
 
+정본 run `36362386530`은 #115 제품 tree(flag off, root-transaction lifecycle 포함)를 측정했다. integration tree의 legacy 수치는 run `36363327477`뿐이며, 그 c50 request P95 all 중앙값 `1558.406ms`의 2000ms gate까지 여유는 `441.594ms`다.
+
 ## 6. Card47 clean-base 재구성
 
 #115와 #141은 병합하지 않는다는 코디네이터 결정에 따라 integration `1e8baf04` 위에서 제품 semaphore 의존을 제거했다. 가져온 최소 benchmark 변경은 schema 1.7 report에 DB 이름 대신 SHA-256 fingerprint·비노출·일회용 lifecycle 3필드를 더한 것뿐이다. `db.py`, `placement.py`, public contract, migration, `tools/placement_benchmark.py`는 integration base와 동일하다.
@@ -81,3 +85,5 @@ PR #148 측정 head `3a1790ff3431706e81a2ba258eb0b26ea456ed31`의 run [363623865
 Card47 hosted run의 목적은 새 PR lane이 clean base에서도 같은 legacy 명령으로 실행된다는 **실행 호환성 확인**이다. `runPurpose=clean-integration-base-execution-compatibility`, `canonicalDecisionEvidenceRunId=36362386530`, `mayReplaceCanonicalDecision=false`를 JSON/JUnit에 고정한다. 새 수치로 위 §5의 정본 결론을 소급 변경하지 않는다.
 
 PR #151 clean-base run [36363327477](https://github.com/egparadise/SaintVision-Invion/actions/runs/36363327477)은 9개 wave·aggregate JUnit을 success로 완료했다. 20/35/50 성공은 60/60·105/105·150/150, timeout 최대는 모두 0, P95 all 중앙은 665.154/1109.917/1558.406ms다. fingerprint 9개 유일·잔존 0이고 `semaphoreProductCodePresent=false`다. 이는 실행 호환성 확인일 뿐 §5 Card46 정본 수치와 직접 비교하거나 결론을 교체하지 않는다. artifact ID `10946163808`, 보존 JSON SHA-256 `1538dc3b303955f22f96f1cc7284df0822f2014b730eed8ad5ddaadd19f677c1`.
+
+정본 run `36362386530`은 #115 제품 tree(flag off, root-transaction lifecycle 포함)를 측정했고, integration tree의 legacy 수치는 run `36363327477`뿐이다. integration c50의 2000ms gate 여유는 `441.594ms`이므로 정본 run의 더 큰 여유를 integration 경로 여유로 인용하지 않는다.

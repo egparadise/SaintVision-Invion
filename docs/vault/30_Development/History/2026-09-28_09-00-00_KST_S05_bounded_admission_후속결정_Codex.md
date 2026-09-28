@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CODEX-S05-CARD42-ADMISSION-DECISION-001"
 title: "S05 Card42 bounded admission 후속 결정"
-version: "1.3.0"
+version: "1.3.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T17:40:00+09:00"
+updated: "2026-09-28T10:08:35+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S05-DB"]
@@ -49,7 +49,7 @@ Claude 승인 조건과 코디네이터 결정을 Card46 실행 전에 반영했
 - timeout 기준은 세 wave 최대값(any wave), request P95 all은 세 wave 중앙값을 쓰며 혼용은 의도적이다.
 - `2000.000ms` 기준은 개별 SQL timeout을 대신하지 않고 여러 statement를 포함한 요청 전체 누적 경로만 판정한다. 따라서 `57014=0`인 상태에서도 도달 가능하다.
 - 각 wave를 새 pytest session·새 일회용 DB에서 실행한다. 9개 fingerprint의 유일성과 wave 전후 DB 잔존 0을 집계 증거가 fail closed로 확인한다. 이는 rung별 새 DB 요구보다 강하다.
-- 구현/실행 정본은 [[S05 legacy 동시성 계단 hosted lane 사양]]과 [[2026-09-28_16-50-00_KST_S05_legacy_동시성_계단_Codex]]로 분리한다.
+- 구현/실행 정본은 [[S05 legacy 동시성 계단 hosted lane 사양]]과 [[2026-09-28_09-29-09_KST_S05_legacy_동시성_계단_Codex]]로 분리한다.
 
 ## Card47 clean-base 결정
 

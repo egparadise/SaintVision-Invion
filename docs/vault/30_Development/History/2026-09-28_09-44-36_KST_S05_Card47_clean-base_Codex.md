@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CODEX-S05-CARD47-CLEAN-BASE-001"
 title: "S05 Card47 semaphore 없는 clean-base legacy lane"
-version: "1.1.0"
+version: "1.1.1"
 status: "hosted-verified-review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T17:55:00+09:00"
+updated: "2026-09-28T10:08:35+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S05-DB"]
@@ -33,7 +33,7 @@ Card46 aggregate JSON은 `docs/vault/30_Development/Evidence/s05-card46-legacy-s
 
 로컬은 PG-free focused 시험과 workflow/docs/ontology 게이트만 실행한다. 새 hosted run은 PR head에서 동일한 legacy staircase 명령이 clean base에서도 완결되는지만 확인하며 `runPurpose=clean-integration-base-execution-compatibility`, `canonicalDecisionEvidenceRunId=36362386530`, `mayReplaceCanonicalDecision=false`를 남긴다. 수치가 달라도 기존 정본 결론을 소급 변경하지 않는다.
 
-정본: [[S05 bounded admission 후속 결정 제안]], [[S05 legacy 동시성 계단 hosted lane 사양]], [[2026-09-28_16-50-00_KST_S05_legacy_동시성_계단_Codex]].
+정본: [[S05 bounded admission 후속 결정 제안]], [[S05 legacy 동시성 계단 hosted lane 사양]], [[2026-09-28_09-29-09_KST_S05_legacy_동시성_계단_Codex]].
 
 ## clean-base hosted 실행 호환성 결과
 
@@ -48,3 +48,7 @@ PR #151 측정 head `0892f8e84441d76e2313e2136b003e012f7c2ae1`, run [36363327477
 9개 DB fingerprint는 전부 유일하고 잔존은 0이다. JSON은 `runPurpose=clean-integration-base-execution-compatibility`, `canonicalDecisionEvidenceRunId=36362386530`, `mayReplaceCanonicalDecision=false`, `semaphoreProductCodePresent=false`를 기록했다. 이 run은 integration base에서도 동일 명령이 작동함을 확인하며, 더 낮은 Card46 정본 수치와 합치거나 바꾸지 않는다.
 
 aggregate JSON은 `docs/vault/30_Development/Evidence/s05-card47-clean-base-36363327477.json`에 보존했다(SHA-256 `1538dc3b303955f22f96f1cc7284df0822f2014b730eed8ad5ddaadd19f677c1`).
+
+## provenance 정정
+
+정본 run `36362386530`은 #115 제품 tree(flag off, root-transaction lifecycle 포함)를 측정했다. integration tree의 legacy 수치는 이 PR의 run `36363327477`뿐이며 c50의 2000ms gate 여유는 `441.594ms`다. wave별 `scope=development-PC; ...`는 시험에 남은 낡은 라벨이고 두 run은 모두 hosted 측정이다. Card46/47 History 파일명과 `updated`는 GitHub run `createdAt`/`updatedAt`을 KST로 변환한 실제 시각으로 정정했다.

@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-S05-BOUNDED-ADMISSION-DECISION-001"
 title: "S05 bounded admission 후속 결정 제안"
-version: "1.5.0"
+version: "1.5.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T17:55:00+09:00"
+updated: "2026-09-28T10:08:35+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S05-DB"]
@@ -158,10 +158,12 @@ PR #148 측정 head `3a1790ff3431706e81a2ba258eb0b26ea456ed31`, hosted run [3636
 
 9개 DB fingerprint는 모두 달랐고 종료 뒤 `inv_test_%` 잔존은 0이다. 기준 1·2 모두 false이며 실행 뒤 기준 변경은 없었다. 따라서 `NO_DEGRADE_THROUGH_50_CLOSE_SEMAPHORE_LINE`을 채택한다.
 
+정본 run `36362386530`은 #115 제품 tree(flag off, root-transaction lifecycle 포함)를 측정했다. integration tree의 legacy 수치는 run `36363327477`뿐이며 c50 request P95 all 중앙 `1558.406ms`에서 2000ms gate까지 여유는 `441.594ms`다. 두 run의 판정은 같지만 정본 run의 더 큰 여유를 integration legacy 경로 수치로 대체 인용하지 않는다.
+
 - 현 hosted 4 CPU/PostgreSQL 16.15/합성 단일 Node 조건에서 bounded semaphore 후속 구현·측정 라인은 종료한다.
 - legacy 경로를 이 범위의 기본으로 확정한다. #115·#141을 병합하지 않으므로 integration에는 private semaphore flag·DB lifecycle wrapper·permit 경로가 없다.
 - S05-DB는 `in_progress`를 유지한다. 이 결과는 물리 5노드 AC-05나 운영 승격이 아니다.
-- hosted 수치는 개발 PC evidence와 직접 비교하지 않는다. 정본: [[S05 legacy 동시성 계단 hosted lane 사양]], [[2026-09-28_16-50-00_KST_S05_legacy_동시성_계단_Codex]].
+- hosted 수치는 개발 PC evidence와 직접 비교하지 않는다. 정본: [[S05 legacy 동시성 계단 hosted lane 사양]], [[2026-09-28_09-29-09_KST_S05_legacy_동시성_계단_Codex]].
 
 ## 7. Card47 clean-base 비준
 
