@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.211"
+version: "1.0.212"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T17:15:00+09:00"
+updated: "2026-09-28T20:35:25+09:00"
 source_of_truth: "Git"
 ---
 
@@ -41,6 +41,11 @@ source_of_truth: "Git"
 - base `1e8baf04`, branch `agent/codex/s01-readiness-preflight`, 구현 `c959e158`, owner Codex/reviewer Claude. U1~U6이 들어오면 health/ready/session 200·401, CA→Node chain, DNS, 5 Node inventory lint, pilot PG capability 대조를 한 번에 수행하는 read-only 수집기를 추가했다.
 - 출력은 PASS/FAIL/BLOCKED와 개수·불리언만 포함한다. token/DSN/URL/hostname/IP/Node·tenant ID/fingerprint/path/인증서·예외 원문을 배제하고 stale output을 선삭제한다. DB는 repeatable-read read-only·2초 timeout·tenant scope SELECT만 쓴다.
 - Claude 1차 검토의 null fail-open·보호 입력 선삭제·비제품 인증서 identity·health 표면 혼합·`nodes:null`·redaction 시험 공백을 `15f84413`에서 보정했다. r2 조건의 무입력 실제 probe 7건/U1~U6 전부 BLOCKED·exit 2와 `PYTHONPATH` 없는 CLI help도 추가해 focused 25 passed다. 제품 `certificate_identity`와 pilot 형식 5장을 결속하고 1/5는 BLOCKED로 고정했으며 Node/HTTP CA 분리와 평문 토큰 거부를 추가했다. 표준 게이트 재실행 후 Claude 재검토가 다음이며, 현재 실 inventory·token은 합성하지 않아 S01 합격을 주장하지 않는다. [[S01 준비 상태 preflight 수집기 설계]], [[2026-09-28_05-45-04_KST_S01_준비상태_preflight_Codex_구현]].
+## 2026-09-28 카드 92 Core CI 시간 예산 보정 — 검토 요청
+
+- 합친 tree Core run `36413452211`은 준비·통합 10분 11초 뒤 pytest가 15분 01초 실행되던 중 25분 job 상한으로 취소됐고, skip ratchet·build·Go·TypeScript gate에는 도달하지 못했다. 시험 실패로 분류하지 않는다.
+- `.github/workflows/core.yml`의 `core` job만 45분으로 올렸다. 개별 test stack dump용 `faulthandler_timeout=45`, 직렬 pytest, 후속 `s01-storage-roundtrip` 10분 예산은 불변이다.
+- YAML·diff·docs gate 후 PR에 `run-core` label을 붙여 동일 head 완주 시간을 측정한다. 현재는 hosted 완주 전 `review`, reviewer Claude다. [[2026-09-28_20-35-25_KST_Core_CI_timeout_budget_Codex_구현]].
 ## 2026-09-28 Card45 S3 ObjectStore 제품 결속 v2 — 제품 restore 보강·hosted 재검증
 
 - Claude r1 지적을 반영해 승인 v1 head `5a794ae9`를 merge commit `82df64a0`으로 일반 push했다. persisted provider 불일치는 read/delete/state mutation 전에 `STORE-0001`/503/retryable로 닫고, configured app은 Workspace recovery Local과 준비된 S3를 read registry에 함께 등록한다. S3 restore는 row provider로 선택하며 prefix 이탈도 retryable 503이다.
