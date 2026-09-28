@@ -115,6 +115,10 @@ def canonical_metrics(metrics: list[dict[str, Any]]) -> list[dict[str, Any]]:
             if isinstance(number, bool) or not isinstance(number, int):
                 raise CanonicalizationError("unsupported-type", f"metric {name} must be an int")
         raw = metric["value"]
+        # Raw input contract: a metric value is a number. A string -- even the
+        # exact repr of a float -- is refused here; a persisted canonical
+        # payload is never passed back through this function (see
+        # ``canonical_json`` / ``canonical_digest``).
         if isinstance(raw, bool) or not isinstance(raw, (int, float)):
             raise CanonicalizationError("unsupported-type", "metric value must be numeric")
         value = canonicalize(raw)
@@ -148,15 +152,31 @@ def canonical_payload(payload: dict[str, Any]) -> dict[str, Any]:
 
 
 def canonical_bytes(payload: dict[str, Any]) -> bytes:
-    canonical = canonical_payload(payload)
+    """Canonicalise raw input once and serialise it."""
+    return canonical_json(canonical_payload(payload))
+
+
+def payload_sha256(payload: dict[str, Any]) -> str:
+    """The digest stored on an intent and compared at attest (canonicalises first)."""
+    return hashlib.sha256(canonical_bytes(payload)).hexdigest()
+
+
+def canonical_json(canonical: dict[str, Any]) -> bytes:
+    """Serialise an *already canonical* payload (as persisted on an intent).
+
+    Never re-canonicalises: a non-integral float metric is already its
+    ``repr`` string here and must not go through the raw-input rules again.
+    Everything that handles a persisted intent payload -- the enqueue digest,
+    ``MirrorRecord``, the sinks' payload tag and attest -- uses this pair.
+    """
     return json.dumps(
         canonical, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False
     ).encode("utf-8")
 
 
-def payload_sha256(payload: dict[str, Any]) -> str:
-    """The digest stored on an intent and compared at attest."""
-    return hashlib.sha256(canonical_bytes(payload)).hexdigest()
+def canonical_digest(canonical: dict[str, Any]) -> str:
+    """The digest of an already canonical payload; ``payload_sha256`` is for raw input."""
+    return hashlib.sha256(canonical_json(canonical)).hexdigest()
 
 
 # --------------------------------------------------------------------------

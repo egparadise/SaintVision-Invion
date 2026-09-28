@@ -69,11 +69,16 @@ SUBJECT_KIND_MATCH = (
 )
 PROJECT_BOUND = "subject_kind = 'eval_run' OR project_id IS NOT NULL"
 #: Design §5, stated at this revision's moment (see module docstring).
+#: NULL-safe: ``=`` against a NULL error_code is UNKNOWN and a CHECK passes on
+#: UNKNOWN, so a failure status with no code would slip through (hosted run
+#: 36375872884 caught exactly that row). Every other CHECK in this revision
+#: was audited for the same trap: they compare NOT NULL columns, use
+#: ``num_nonnulls``, or spell ``IS NULL`` / ``IS NOT NULL`` explicitly.
 STATUS_CODE_PAIR = (
     "(status = 'mirrored' AND error_code IS NULL) OR "
-    "(status = 'unavailable' AND error_code = 'TRACK-0001') OR "
-    "(status = 'refused' AND error_code = 'TRACK-0002') OR "
-    "(status = 'mismatch' AND error_code = 'TRACK-0003')"
+    "(status = 'unavailable' AND error_code IS NOT NULL AND error_code = 'TRACK-0001') OR "
+    "(status = 'refused' AND error_code IS NOT NULL AND error_code = 'TRACK-0002') OR "
+    "(status = 'mismatch' AND error_code IS NOT NULL AND error_code = 'TRACK-0003')"
 )
 
 #: Every table in this revision is append-only for the application role.

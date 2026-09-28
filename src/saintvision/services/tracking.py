@@ -54,7 +54,7 @@ from ..db.models.tracking import (
     MlflowMirrorIntent,
 )
 from ..ids import new_id
-from ..tracking.canonical import CanonicalizationError, canonical_payload, payload_sha256
+from ..tracking.canonical import CanonicalizationError, canonical_digest, canonical_payload
 from ..tracking.codes import (
     TRACK_MISMATCH,
     TRACK_PAYLOAD_INVALID,
@@ -218,7 +218,7 @@ def enqueue_mirror(
         session.flush()
         return EnqueueOutcome("defect", defect_id=defect.defect_id, reason=exc.reason_class)
 
-    digest = payload_sha256(canonical)
+    digest = canonical_digest(canonical)   # canonicalised once, above
     existing = _existing_intent(session, tenant_id, subject_kind, subject, project_id, digest)
     if existing is not None:
         return EnqueueOutcome("existing", intent_id=existing.intent_id)
@@ -233,7 +233,7 @@ def enqueue_mirror(
             experiment_intent_id = _insert_intent(
                 session, tenant_id=tenant_id, subject_kind="experiment", subject={},
                 project_id=project_id, canonical=experiment_payload,
-                digest=payload_sha256(experiment_payload), now=now, trace_id=trace_id,
+                digest=canonical_digest(experiment_payload), now=now, trace_id=trace_id,
             )
 
     intent_id = _insert_intent(
