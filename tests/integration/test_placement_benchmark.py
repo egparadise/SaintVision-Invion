@@ -436,7 +436,10 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
     report = summarize(
         first,
         second,
-        topology="development-PC; one synthetic measured-node row; pre-five-node-lab",
+        topology=os.getenv(
+            "INV_PLACEMENT_BENCHMARK_TOPOLOGY",
+            "development-PC; one synthetic measured-node row; pre-five-node-lab",
+        ),
         code_sha=os.getenv("INV_PLACEMENT_BENCHMARK_CODE_SHA", "working-tree"),
         active_after_first=active_after_rounds[0],
         active_after_rounds=active_after_rounds,

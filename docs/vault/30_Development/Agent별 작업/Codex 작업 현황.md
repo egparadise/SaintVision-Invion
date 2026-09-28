@@ -1276,3 +1276,9 @@ AOA-05 follow-up: the old 18 setup errors had two distinct causes: unset CX01_CO
 - #115·#141은 병합하지 않고 integration `1e8baf04`에서 제품 semaphore 코드 0줄로 재구성한다. `db.py`, `placement.py`, public contract, migration, `tools/placement_benchmark.py`는 base와 동일하며 schema 1.7 integration report에 redacted disposable DB fingerprint만 더한다.
 - 새 PR hosted run은 clean-base에서 동일 legacy 명령이 실행되는지 확인하는 별도 증거다. 정본 run은 #115 제품 tree를 측정했고 integration legacy 수치는 run `36363327477`뿐이며 c50 gate 여유는 441.594ms다. wave별 `scope=development-PC`는 낡은 라벨임을 문서화했다. S05-DB `in_progress`, 물리 5노드 AC-05 별도. [[2026-09-28_09-44-36_KST_S05_Card47_clean-base_Codex]]
 - PR #151 head `0892f8e8`, run `36363327477` success: 20/35/50×3 전부 성공, timeout0, P95 all 중앙 665.154/1109.917/1558.406ms, DB fingerprint 9개 유일·잔존0. `mayReplaceCanonicalDecision=false`이므로 Card46 정본 run `36362386530`의 결론·수치를 교체하지 않는다.
+
+## 2026-09-28 Card49 S05 hosted lane 품질 보강
+
+- #151 Claude r1 후속: SQLSTATE 완전성·미분류 실패 `INVALID_RUN`, job concurrency 취소 방지, dirty checkout, CLI provenance, hosted topology, stale 산출물 삭제를 구현했다.
+- 생존 변이 1~7을 직접 겨냥한 PG-free `main()`/부정 시험을 추가해 focused 26 passed. YAML parse·compile·Black·diff exit 0이며 legacy staircase·실 PG·Docker·브라우저는 실행하지 않았다.
+- 새 측정이나 gate 변경이 아니며 Card46 정본 run과 Card47 compatibility run을 소급 변경하지 않는다. [[2026-09-28_10-44-24_KST_S05_Card49_lane_quality_Codex]]
