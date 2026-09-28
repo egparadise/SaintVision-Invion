@@ -22,6 +22,7 @@ from ..errors import PROBLEM_CONTENT_TYPE, VAL_SCHEMA, InvError
 from ..ids import is_trace_id, new_trace_id
 from ..identity.principal import PrincipalVerifier
 from ..services.audit import record_denial_out_of_band
+from .problem import install_canonical_problem_handler
 from .v1 import adapters as adapters_router
 from .v1 import nodes as nodes_router
 from .v1 import pools as pools_router
@@ -167,6 +168,10 @@ def create_app(
                 {"table": s.table, "monthsAhead": s.months_ahead} for s in statuses
             ],
         }
+
+    # One registration, beside the existing handlers rather than replacing
+    # them: the legacy InvError shape stays on the routes that already serve it.
+    install_canonical_problem_handler(app)
 
     app.include_router(nodes_router.router)
     app.include_router(storage_router.router)
