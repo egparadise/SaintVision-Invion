@@ -115,18 +115,37 @@ def _seed(connection, *, tenant_id, now, label, role="approver"):
     return {"user_id": user_id, "project_id": project_id, "model_id": model_id}
 
 
-def _client(app_engine, *, tenant_id, user_id, now, authenticate=True):
+#: A bearer the real verifier knows, for the tests that need ``get_principal`` to
+#: actually run.
+TOKEN = "register-real-token"
+
+
+def _client(app_engine, *, tenant_id, user_id, now, authenticate=True, verified=False):
+    """A client for this app.
+
+    ``verified=True`` registers a real credential instead of overriding
+    ``get_principal``. That distinction is load-bearing for the denial audit: the
+    shared recorder reads the actor and the tenant from what ``get_principal``
+    pinned on ``request.state``, so a dependency override leaves them unset and the
+    row comes out anonymous with no tenant. The first hosted run of the F4 test
+    showed exactly that -- ``tenant_id`` was NULL -- and the product was right: it
+    records only what the request proved. Tests that assert those columns therefore
+    have to go through the real verifier.
+    """
+    principal = Principal(
+        user_id=user_id, tenant_id=tenant_id, external_subject="synthetic-register"
+    )
     app = create_app(
         engine=app_engine,
         settings=Settings(database_url="test-only", idempotency_ttl_seconds=600),
-        verifier=StaticPrincipalVerifier({}, allow_outside_dev=True),
+        verifier=StaticPrincipalVerifier(
+            {TOKEN: principal} if verified else {}, allow_outside_dev=True
+        ),
         clock=lambda: now,
         check_partitions_on_startup=False,
     )
-    if authenticate:
-        app.dependency_overrides[get_principal] = lambda: Principal(
-            user_id=user_id, tenant_id=tenant_id, external_subject="synthetic-register"
-        )
+    if authenticate and not verified:
+        app.dependency_overrides[get_principal] = lambda: principal
     return TestClient(app, raise_server_exceptions=False)
 
 
@@ -148,6 +167,11 @@ def _body(version="1.0.0", digest=None):
 
 def _headers(key):
     return {"Idempotency-Key": key, "Content-Type": "application/json"}
+
+
+def _bearer_headers(key):
+    """The same headers plus a credential the real verifier accepts."""
+    return {**_headers(key), "Authorization": f"Bearer {TOKEN}"}
 
 
 def _rows(owner_engine, tenant_id):
@@ -435,9 +459,15 @@ def test_f4_a_refused_registration_leaves_exactly_one_denial_row(
             connection, tenant_id=tenant, now=frozen_now, label="w2-deny", role="requester"
         )
 
-    client = _client(app_engine, tenant_id=tenant, user_id=seeded["user_id"], now=frozen_now)
+    client = _client(
+        app_engine,
+        tenant_id=tenant,
+        user_id=seeded["user_id"],
+        now=frozen_now,
+        verified=True,
+    )
     body = _canonical(
-        client.post(_path(seeded), json=_body(), headers=_headers("k-deny")),
+        client.post(_path(seeded), json=_body(), headers=_bearer_headers("k-deny")),
         code="AUTH-0030",
         status=403,
     )
@@ -476,9 +506,15 @@ def test_f4_a_registration_that_succeeds_records_an_allow_and_no_denial(
     with owner_engine.begin() as connection:
         seeded = _seed(connection, tenant_id=tenant, now=frozen_now, label="w2-allow")
 
-    client = _client(app_engine, tenant_id=tenant, user_id=seeded["user_id"], now=frozen_now)
+    client = _client(
+        app_engine,
+        tenant_id=tenant,
+        user_id=seeded["user_id"],
+        now=frozen_now,
+        verified=True,
+    )
     assert client.post(
-        _path(seeded), json=_body(), headers=_headers("k-allow")
+        _path(seeded), json=_body(), headers=_bearer_headers("k-allow")
     ).status_code == 201
 
     with owner_engine.begin() as connection:
