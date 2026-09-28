@@ -71,9 +71,9 @@
       "targetId": "s11-irreversible-restore-forward-v0",
       "axis": "irreversible-restore-forward",
       "sourceDocument": {
-        "commit": "d55c97a0e2ba5248f60a498272dfda2a882c3a0a",
+        "commit": "4c68bc8e086d9b68c14a386264b630ffa4bc8c8e",
         "path": "docs/vault/30_Development/S11_AC11_migration_restore_target_v0.md",
-        "blob": "dc1db2587dacc461a2814d45e11610d8d5973181"
+        "blob": "55ee8b65a62a25f5a027770cf602ae2ecc62e45c"
       },
       "criteria": {
         "catalogMismatchCount": {"operator": "eq", "value": 0},
@@ -89,9 +89,9 @@
       "targetId": "s11-migration-reversible-roundtrip-v1",
       "axis": "migration-reversible-segment",
       "sourceDocument": {
-        "commit": "d55c97a0e2ba5248f60a498272dfda2a882c3a0a",
+        "commit": "4c68bc8e086d9b68c14a386264b630ffa4bc8c8e",
         "path": "docs/vault/30_Development/S11_AC11_migration_restore_target_v0.md",
-        "blob": "dc1db2587dacc461a2814d45e11610d8d5973181"
+        "blob": "55ee8b65a62a25f5a027770cf602ae2ecc62e45c"
       },
       "criteria": {
         "catalogMismatchCount": {"operator": "eq", "value": 0},

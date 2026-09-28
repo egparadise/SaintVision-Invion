@@ -5,7 +5,7 @@
   "applied": true,
   "canonicalRegistryPath": "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json",
   "predecessorBlob": "c08a45f8cd3a32fe6631d7f135496a5e7809ee2d",
-  "resultBlob": "e80b252a39c0842dfc58004a41e1ac328390ab08",
+  "resultBlob": "be99a506efecdb2ff29cf4e7a96a8772f5524473",
   "requiredTargetByAxis": {
     "long-soak": "s11-ac11-composite-long-soak-v0"
   },
