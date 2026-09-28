@@ -2,20 +2,33 @@
 
 Design PR #168 v1.3, decision B. Two entry points:
 
-* :func:`enqueue_mirror` is called by the lineage and evaluation services
+* :func:`enqueue_mirror` is called by the lineage, evaluation and run services
   *inside* the transaction that records the canonical change. With the sink
   configured it writes an outbox event and an ``mlflow_mirror_intents`` row;
   when the payload cannot be canonicalised it writes an ``mlflow_mirror_defects``
   row instead (``TRACK-0005``). In every case the canonical change commits:
   no mirror reason rolls back lineage. Only a failure to write the defect row
-  itself -- a database failure -- fails the transaction.
+  itself -- a database failure -- fails the transaction. The first intent for
+  a project also enqueues that project's ``experiment`` intent (design §1).
 
 * :func:`deliver_intent` is what the outbox consumer calls with a sink. It
-  locks the intent row, returns an existing terminal attempt without touching
-  the sink (duplicate delivery and competing consumers produce one row and
-  zero extra runs), otherwise assigns ``attempt_no`` under that lock, asks the
-  sink to ``find`` before it ``mirror``s, attests, and appends exactly one
-  attempt row.
+  serialises on the intent (a transaction-scoped advisory lock keyed by the
+  intent, see below), refuses a delivery whose event is not the one the intent
+  was enqueued with, returns an existing terminal attempt without touching the
+  sink (duplicate delivery and competing consumers produce one row and zero
+  extra runs), otherwise assigns ``attempt_no`` under that lock, asks the sink
+  to ``find`` before it ``mirror``s, attests, and appends exactly one attempt
+  row.
+
+**Why an advisory lock and not ``SELECT ... FOR UPDATE``.** The design wrote
+``FOR UPDATE`` on the intent row. PostgreSQL grants a row lock only to a role
+holding UPDATE privilege on the table, and the intents table is append-only
+for the application role by design (INSERT and SELECT). Granting UPDATE, even
+on one column, to obtain the lock would contradict the invariant the table
+exists for. ``pg_advisory_xact_lock`` keyed by ``(tenant_id, intent_id)`` gives
+the same serialisation -- a competing consumer waits, then sees the terminal
+attempt the first one wrote -- with SELECT privilege only, and the UNIQUE on
+``(tenant_id, intent_id, attempt_no)`` remains the second line of defence.
 
 The real MLflow HTTP sink and the operator service credential are stage 2;
 this module only ever sees a :class:`TrackingSink`.
@@ -24,11 +37,12 @@ this module only ever sees a :class:`TrackingSink`.
 from __future__ import annotations
 
 import datetime as dt
+import hashlib
 import uuid
 from dataclasses import dataclass
 from typing import Any, Final, Literal
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
 
 from ..adapters.contract import AttestationResult
@@ -46,6 +60,7 @@ from ..tracking.codes import (
     TRACK_PAYLOAD_INVALID,
     TRACK_UNAVAILABLE,
     MirrorStatus,
+    check_pair,
 )
 from ..tracking.config import TrackingConfiguration, TrackingSettings, resolve
 from .evidence import enqueue_event
@@ -63,6 +78,10 @@ SUBJECT_COLUMN: Final[dict[str, str | None]] = {
 }
 
 
+class DeliveryIdentityError(ValueError):
+    """The delivery names an event that is not the intent's own (fail-closed)."""
+
+
 @dataclass(frozen=True, slots=True)
 class EnqueueOutcome:
     """What :func:`enqueue_mirror` did. ``skipped`` carries the readiness value."""
@@ -71,6 +90,8 @@ class EnqueueOutcome:
     intent_id: str | None = None
     defect_id: str | None = None
     reason: str | None = None
+    #: The experiment intent enqueued alongside, when this was the project's first.
+    experiment_intent_id: str | None = None
 
 
 def _subject_values(subject_kind: str, subject_id: str | None) -> dict[str, str]:
@@ -84,6 +105,56 @@ def _subject_values(subject_kind: str, subject_id: str | None) -> dict[str, str]
     if not subject_id:
         raise ValueError(f"{subject_kind} needs a subject id")
     return {column: subject_id}
+
+
+def _existing_intent(
+    session: Session, tenant_id: uuid.UUID, subject_kind: str, subject: dict[str, str],
+    project_id: str | None, digest: str | None,
+) -> MlflowMirrorIntent | None:
+    conditions = [
+        MlflowMirrorIntent.tenant_id == tenant_id,
+        MlflowMirrorIntent.subject_kind == subject_kind,
+        *[getattr(MlflowMirrorIntent, column) == value for column, value in subject.items()],
+    ]
+    if not subject:
+        conditions.append(MlflowMirrorIntent.project_id == project_id)
+    if digest is not None:
+        conditions.append(MlflowMirrorIntent.payload_sha256 == digest)
+    return session.scalar(select(MlflowMirrorIntent).where(*conditions).limit(1))
+
+
+def _insert_intent(
+    session: Session, *, tenant_id: uuid.UUID, subject_kind: str, subject: dict[str, str],
+    project_id: str | None, canonical: dict[str, Any], digest: str, now: dt.datetime,
+    trace_id: str | None,
+) -> str:
+    intent_id = new_id("mirror_intent")
+    event_id = enqueue_event(
+        session,
+        tenant_id=tenant_id,
+        event_type=MIRROR_EVENT_TYPE,
+        aggregate_type=MIRROR_AGGREGATE_TYPE,
+        aggregate_id=intent_id,
+        payload={"intentId": intent_id, "subjectKind": subject_kind, "payloadSha256": digest},
+        now=now,
+        trace_id=trace_id,
+    )
+    session.add(
+        MlflowMirrorIntent(
+            tenant_id=tenant_id,
+            intent_id=intent_id,
+            project_id=project_id,
+            subject_kind=subject_kind,
+            payload=canonical,
+            payload_sha256=digest,
+            outbox_event_id=event_id,
+            recovery_epoch=0,
+            created_at=now,
+            **subject,
+        )
+    )
+    session.flush()
+    return intent_id
 
 
 def enqueue_mirror(
@@ -125,44 +196,28 @@ def enqueue_mirror(
         return EnqueueOutcome("defect", defect_id=defect.defect_id, reason=exc.reason_class)
 
     digest = payload_sha256(canonical)
-    existing = session.scalar(
-        select(MlflowMirrorIntent).where(
-            MlflowMirrorIntent.tenant_id == tenant_id,
-            MlflowMirrorIntent.subject_kind == subject_kind,
-            MlflowMirrorIntent.payload_sha256 == digest,
-            *[getattr(MlflowMirrorIntent, column) == value for column, value in subject.items()],
-            *([MlflowMirrorIntent.project_id == project_id] if not subject else []),
-        )
-    )
+    existing = _existing_intent(session, tenant_id, subject_kind, subject, project_id, digest)
     if existing is not None:
         return EnqueueOutcome("existing", intent_id=existing.intent_id)
 
-    intent_id = new_id("mirror_intent")
-    event_id = enqueue_event(
-        session,
-        tenant_id=tenant_id,
-        event_type=MIRROR_EVENT_TYPE,
-        aggregate_type=MIRROR_AGGREGATE_TYPE,
-        aggregate_id=intent_id,
-        payload={"intentId": intent_id, "subjectKind": subject_kind, "payloadSha256": digest},
-        now=now,
-        trace_id=trace_id,
+    # Design §1: a project is an experiment. The first intent under a project
+    # enqueues the experiment itself, in the same transaction, so the worker
+    # never has to invent one.
+    experiment_intent_id = None
+    if subject_kind != "experiment" and project_id is not None:
+        if _existing_intent(session, tenant_id, "experiment", {}, project_id, None) is None:
+            experiment_payload = canonical_payload(experiment_mirror_payload(project_id, tenant_id))
+            experiment_intent_id = _insert_intent(
+                session, tenant_id=tenant_id, subject_kind="experiment", subject={},
+                project_id=project_id, canonical=experiment_payload,
+                digest=payload_sha256(experiment_payload), now=now, trace_id=trace_id,
+            )
+
+    intent_id = _insert_intent(
+        session, tenant_id=tenant_id, subject_kind=subject_kind, subject=subject,
+        project_id=project_id, canonical=canonical, digest=digest, now=now, trace_id=trace_id,
     )
-    intent = MlflowMirrorIntent(
-        tenant_id=tenant_id,
-        intent_id=intent_id,
-        project_id=project_id,
-        subject_kind=subject_kind,
-        payload=canonical,
-        payload_sha256=digest,
-        outbox_event_id=event_id,
-        recovery_epoch=0,
-        created_at=now,
-        **subject,
-    )
-    session.add(intent)
-    session.flush()
-    return EnqueueOutcome("intent", intent_id=intent_id)
+    return EnqueueOutcome("intent", intent_id=intent_id, experiment_intent_id=experiment_intent_id)
 
 
 # --------------------------------------------------------------------------
@@ -172,6 +227,33 @@ def enqueue_mirror(
 
 def _timestamp_ms(now: dt.datetime) -> int:
     return int(now.timestamp() * 1000)
+
+
+def experiment_mirror_payload(project_id: str, tenant_id: uuid.UUID) -> dict[str, Any]:
+    return {
+        "tags": {"inv.tenant_id": str(tenant_id), "inv.project_id": project_id},
+    }
+
+
+def training_run_mirror_payload(
+    run: Any, workload: Any, *, evidence_id: str | None, now: dt.datetime
+) -> dict[str, Any]:
+    return {
+        "params": {
+            "workload_id": workload.workload_id,
+            "objective": workload.objective,
+            "contract_version": workload.contract_version,
+            "workload_spec_sha256": workload.spec_sha256,
+            "termination_reason": run.termination_reason,
+        },
+        "tags": {
+            "inv.run_id": run.run_id,
+            "inv.workload_spec_sha256": workload.spec_sha256,
+            "inv.evidence_id": evidence_id or "",
+            "inv.state": run.state,
+        },
+        "recorded_at_ms": _timestamp_ms(now),
+    }
 
 
 def model_version_mirror_payload(version: Any, *, model_name: str, now: dt.datetime) -> dict[str, Any]:
@@ -184,6 +266,26 @@ def model_version_mirror_payload(version: Any, *, model_name: str, now: dt.datet
             "uri": version.uri,
             "byte_size": int(version.byte_size or 0),
             "produced_by_run_id": version.produced_by_run_id,
+        },
+        "tags": {
+            "inv.model_version_id": version.model_version_id,
+            "inv.content_sha256": version.content_sha256,
+            "inv.stage": version.stage,
+            "inv.model_id": version.model_id,
+        },
+        "recorded_at_ms": _timestamp_ms(now),
+    }
+
+
+def release_mirror_payload(version: Any, *, now: dt.datetime) -> dict[str, Any]:
+    """The stage transition: our stage as a tag, never MLflow's stage API (§1)."""
+    return {
+        "params": {
+            "content_sha256": version.content_sha256,
+            "verified_at_ms": _timestamp_ms(version.verified_at) if version.verified_at else None,
+            "retention_pinned_until_ms": (
+                _timestamp_ms(version.retention_pinned_until) if version.retention_pinned_until else None
+            ),
         },
         "tags": {
             "inv.model_version_id": version.model_version_id,
@@ -212,17 +314,33 @@ def deployment_mirror_payload(deployment: Any, *, now: dt.datetime) -> dict[str,
     }
 
 
-def eval_run_mirror_payload(run: Any, *, now: dt.datetime) -> dict[str, Any]:
+def eval_run_mirror_payload(
+    run: Any, *, suite: Any, report: dict[str, Any], now: dt.datetime
+) -> dict[str, Any]:
+    """Suite identity, the gate, and one metric per category (design §1)."""
     stamp = _timestamp_ms(now)
+    metrics = [
+        {"key": "passed_cases", "value": int(run.passed_cases), "step": 0, "timestamp_ms": stamp},
+        {"key": "total_cases", "value": int(run.total_cases), "step": 0, "timestamp_ms": stamp},
+        {"key": "violations", "value": int(run.violations), "step": 0, "timestamp_ms": stamp},
+        {"key": "gate_passed", "value": 1 if run.passed_gate else 0, "step": 0, "timestamp_ms": stamp},
+    ]
+    for name, bucket in sorted(report.get("categories", {}).items()):
+        metrics.append({"key": f"category.{name}.pass_rate", "value": float(bucket["passRate"]),
+                        "step": 0, "timestamp_ms": stamp})
+        if bucket.get("meanScore") is not None:
+            metrics.append({"key": f"category.{name}.mean_score", "value": float(bucket["meanScore"]),
+                            "step": 0, "timestamp_ms": stamp})
     return {
-        "params": {"suite_id": run.suite_id, "status": run.status},
+        "params": {
+            "suite_id": run.suite_id,
+            "suite_name": suite.name,
+            "suite_version": suite.version,
+            "suite_definition_sha256": suite.definition_sha256,
+            "status": run.status,
+        },
         "tags": {"inv.eval_run_id": run.eval_run_id, "inv.suite_id": run.suite_id},
-        "metrics": [
-            {"key": "passed_cases", "value": int(run.passed_cases), "step": 0, "timestamp_ms": stamp},
-            {"key": "total_cases", "value": int(run.total_cases), "step": 0, "timestamp_ms": stamp},
-            {"key": "violations", "value": int(run.violations), "step": 0, "timestamp_ms": stamp},
-            {"key": "gate_passed", "value": 1 if run.passed_gate else 0, "step": 0, "timestamp_ms": stamp},
-        ],
+        "metrics": metrics,
     }
 
 
@@ -248,6 +366,15 @@ def _terminal_attempt(session: Session, tenant_id: uuid.UUID, intent_id: str) ->
     )
 
 
+def _lock_intent(session: Session, tenant_id: uuid.UUID, intent_id: str) -> None:
+    """Transaction-scoped advisory lock keyed by the intent (see module docstring)."""
+    key = hashlib.sha256(f"{tenant_id}:{intent_id}".encode("utf-8")).digest()[:8]
+    session.execute(
+        text("SELECT pg_advisory_xact_lock(:key)"),
+        {"key": int.from_bytes(key, "big", signed=True)},
+    )
+
+
 def deliver_intent(
     session: Session,
     sink: TrackingSink,
@@ -262,23 +389,28 @@ def deliver_intent(
 ) -> MlflowMirrorAttempt:
     """Deliver one intent through ``sink`` and append exactly one attempt row.
 
-    Runs inside the consumer's transaction. The intent row is locked first, so
-    a competing consumer waits and then sees the terminal attempt this one
-    wrote. A terminal attempt is returned as-is: no ``find``, no ``mirror``.
+    Runs inside the consumer's transaction. Order: lock, load, verify the
+    delivery identity, return a terminal attempt if any, otherwise push. The
+    identity check precedes every sink call so a wrong event id costs nothing
+    external and leaves no row.
     """
     if delivery_no < 1:
         raise ValueError("delivery_no starts at 1")
+    _lock_intent(session, tenant_id, intent_id)
     intent = session.scalar(
         select(MlflowMirrorIntent)
         .where(
             MlflowMirrorIntent.tenant_id == tenant_id,
             MlflowMirrorIntent.intent_id == intent_id,
         )
-        .with_for_update()
         .execution_options(populate_existing=True)
     )
     if intent is None:
         raise LookupError(f"intent {intent_id} not found for tenant")
+    if outbox_event_id != intent.outbox_event_id:
+        raise DeliveryIdentityError(
+            "delivery names an outbox event that is not the intent's own; refusing before any sink call"
+        )
 
     terminal = _terminal_attempt(session, tenant_id, intent_id)
     if terminal is not None:
@@ -296,12 +428,13 @@ def deliver_intent(
 
     started = now
     status, error_code, reference_id, response_digest = _push(sink, intent, settings)
+    check_pair(status, error_code)
     attempt = MlflowMirrorAttempt(
         tenant_id=tenant_id,
         attempt_id=new_id("mirror_attempt"),
         intent_id=intent_id,
         attempt_no=attempt_no,
-        outbox_event_id=outbox_event_id,
+        outbox_event_id=intent.outbox_event_id,
         delivery_no=delivery_no,
         status=status.value,
         error_code=error_code,

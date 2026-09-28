@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-S10DB-DIGEST-INDEX-MIGRATION-001"
 title: "S10-DB dataset digest 인덱스 migration 0050 — CONCURRENTLY와 재시도 정리, 고정 순서 0047→0048→0049→0050"
-version: "1.0.0"
+version: "1.1.0"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T12:45:57+09:00"
+updated: "2026-09-28T12:55:28+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S10-DB"]
@@ -54,16 +54,41 @@ autocommit block 안에서 **`DROP INDEX CONCURRENTLY IF EXISTS` → `CREATE IND
 
 ## 5. 검증 증거 (실행)
 
-- `pytest tests/core -q` → **1035 passed, 4 skipped**. 신규 `tests/core/test_dataset_digest_index_migration.py` → **3 passed**.
-- `pytest tests/integration/test_lineage_digest_index_real_pg.py` → 로컬 **2 skipped**(`INV_TEST_ADMIN_DSN` 부재). 실행 근거는 hosted Backend다.
+- `pytest tests/core -q` → **1138 passed, 5 skipped**(#172 head merge 이후). 신규 `tests/core/test_dataset_digest_index_migration.py` → **4 passed**(경로 guard 1건 추가).
+- `pytest tests/integration/test_lineage_digest_index_real_pg.py` → 로컬 **2 skipped**(`INV_TEST_ADMIN_DSN` 부재). **로컬 skip은 실행이 아니므로** 실행 근거는 이 head의 hosted Backend run이고, run ID와 두 matrix 수치를 PR에 적는다.
 - `python tools/migration_graph.py` → head `0050_dataset_digest_lookup`, reversible, safe downgrade target `0049_mlflow_mirror`.
 - `check_docs`·`check_doc_single_source --ratchet` → exit 0.
 - 로컬 실 PG·Docker·전체 suite **미실행**.
 
-## 6. 보고할 사실 — #172가 아직 `0046` 위에 있다
+## 6. v1.1 — Codex 검토 3건 반영, 그리고 v1.0의 내 보고는 이미 낡았다
 
-#172의 `0049_mlflow_mirror`는 현재 `down_revision = "0046_model_manifest_readiness"`다. #128(`0047`→`0046`)과 #159(`0048`→`0047`)가 먼저 들어가면 `0046`에서 가지가 갈라져 **head가 둘**(`0048`과 `0050`)이 된다. 코디네이터가 고정한 순서대로 단일 head를 유지하려면 **#172가 `0049`의 `down_revision`을 `0048_object_store_locator`로 바꿔야** 한다. 내 카드로는 닫을 수 없으므로 여기 남긴다.
+### 6-1. 실 PG 재시도 node가 없는 파일을 읽고 있었다
+
+`tests/integration/test_lineage_digest_index_real_pg.py`의 경로가 renumber 이전의 `0047_dataset_digest_lookup.py`였다. 그 node는 migration source를 읽어 **그 안의 statement로** 재시도를 돌리므로, 수집은 되고 본문이 `FileNotFoundError`로 죽는다 — 즉 재시도·downgrade 검증이 **한 번도 실행되지 않았다.** 카드 be에서 시험 본문을 그대로 옮겨오면서 renumber를 따라가지 않은 내 실수다.
+
+경로를 `0050`으로 고치고 그 node 안에 `path.exists()` 단언을 넣었다. 그리고 **경로는 DB 없이 확인할 수 있으므로 DB 없이 확인한다** — `tests/core/test_dataset_digest_index_migration.py`가 그 실 PG 파일의 소스에서 `migrations/versions/*.py` 문자열을 뽑아 **전부 존재하는지**, 첫 항목이 이 migration인지 단언한다. #167에서 두 번, 여기서 한 번, 같은 부류(실 PG 파일의 결함을 hosted에서야 발견)라 guard를 남긴다.
+
+### 6-2. stack base가 #172의 현재 head가 아니었다
+
+내 head의 parent는 `44654021`이었고 #172는 그동안 `faa2e470`으로 수정됐다(GitHub이 이 PR을 CONFLICTING으로 표시하고 hosted check가 0건이었다). force 없이 `faa2e470`을 **merge**했다. 그 head는 이미 #159를 병합해 `0047`·`0048`을 갖고 있으므로, 이제 이 브랜치에 **`0047 → 0048 → 0049 → 0050` 전체 사슬**이 있고 `migration_graph`가 head 하나(`0050`, reversible, safe downgrade `0049`)로 본다.
+
+### 6-3. 내가 보고한 "#172의 `0049`가 `0046` 위" 는 이미 정정됐다
+
+v1.0에서 "#128·#159가 먼저 들어가면 head가 둘이 된다"고 적었는데, **`faa2e470`에서 `0049`의 `down_revision`이 이미 `0048_object_store_locator`로 고쳐졌다.** 그 보고는 `44654021` 시점에는 참이었고 지금은 아니므로 철회한다 — 고정 순서는 #172 쪽에서 이미 닫혔다.
+
+### 6-4. head를 옮기니 따라와야 하는 것이 둘 있었다
+
+#172 head를 merge하고 `0050`을 그 위에 두자 #159 lane의 시험 둘이 깨졌다 — 둘 다 **migration head를 상수로 pin**하고 있었다.
+
+- `tests/core/test_object_store_locator_migration.py`가 `head.revision == "0049_mlflow_mirror"`를 단언한다. 그 파일의 docstring이 이미 "0048이 head였다가 0049가 위에 왔다"는 이력을 적고 있으므로, 같은 방식으로 `0050`까지 적고 `0049`는 **중간 고리로** 계속 단언하게 바꿨다(`0049.down_revision == 0048`).
+- 같은 파일이 `tools/definer-policy.json`의 `revision`이 chain head와 같아야 한다고 단언하고, `tools/check_definer_functions.py:64-70`이 **살아 있는 DB의 `alembic_version`과 그 필드를 비교**해 다르면 `migration_revision_mismatch`를 낸다. 그래서 policy의 `revision`을 `0050_dataset_digest_lookup`으로 옮겼다.
+
+**`functions` 목록은 건드리지 않았다** — 이 migration은 SECURITY DEFINER 함수를 만들지 않으므로 옮겨야 하는 것은 head 표시뿐이고, 13개 항목이 그대로임을 시험이 확인한다. 다른 lane의 시험을 고치는 것이라 여기 명시한다: 바꾼 것은 **기대 head 상수**이고 그 시험의 뜻("사슬에 head가 하나이고 policy가 그것을 따라간다")은 그대로다.
+
+### 6-5. 실행 증거
+
+이 head의 hosted Backend 결과로 갱신한다. v1.0이 적은 "core 1035 passed / 실 PG 2 skipped"는 **새 head의 hosted 실행을 대신하지 않는다**는 지적이 맞다 — 로컬 skip은 실행이 아니다.
 
 ## 7. 다음 첫 행동
 
-Codex 독립 검토. #159·#172가 정리되면 이 PR을 먼저 병합하고, 그 다음에 lineage 조회 PR을 병합한다.
+이 head의 hosted Backend에서 두 postgres case가 failure·skip 0으로 돌고 graph가 단일 head임을 run ID로 제시한 뒤 Codex 재검토를 받는다. #172 head가 다시 바뀌면 force 없이 다시 merge한다. 병합은 이 PR이 lineage 조회 PR(#175)보다 먼저다.

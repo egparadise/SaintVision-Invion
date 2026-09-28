@@ -60,3 +60,25 @@ def test_the_model_declares_the_index_the_migration_creates():
     # tenant_id leads because every read is inside an RLS tenant scope, so the
     # index and the policy predicate point the same way.
     assert index.unique is False
+
+
+def test_the_real_pg_node_points_at_a_migration_that_exists():
+    """The path in the PostgreSQL node, checked without PostgreSQL.
+
+    That node reads the migration source to run its own statements, and the path
+    it read was the pre-renumber one: collection succeeded and the body raised
+    FileNotFoundError, so the retry it exists to prove never ran. A path is
+    checkable here, so it is checked here.
+    """
+    import re
+
+    node = Path(__file__).resolve().parents[1] / (
+        "integration/test_lineage_digest_index_real_pg.py"
+    )
+    source = node.read_text(encoding="utf-8")
+    referenced = re.findall(r'"(migrations/versions/[^"]+\.py)"', source)
+    assert referenced, "the node no longer names a migration; this guard is stale"
+    root = Path(__file__).resolve().parents[2]
+    for relative in referenced:
+        assert (root / relative).exists(), relative
+    assert MIGRATION.name in referenced[0]

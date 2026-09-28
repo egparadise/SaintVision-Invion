@@ -21,7 +21,7 @@ from dataclasses import dataclass, field
 from typing import Any, Callable, Protocol, runtime_checkable
 
 from ..tracking.canonical import payload_sha256
-from ..tracking.codes import MirrorStatus, TRACK_CODE
+from ..tracking.codes import MirrorStatus, check_pair
 from .contract import Attestation, AttestationResult, AuthResult, ProbeResult
 
 TRACKING_CONTRACT_VERSION = "1.0.0"
@@ -64,11 +64,12 @@ class MirrorResult:
     detail: str | None = None
 
     def __post_init__(self) -> None:
-        if self.status is MirrorStatus.MIRRORED:
-            if not self.reference_id or self.error_code is not None:
-                raise ValueError("a mirrored result has a reference and no error code")
-        elif self.error_code is None or not TRACK_CODE.match(self.error_code):
-            raise ValueError(f"a {self.status.value} result needs a TRACK code")
+        # Exactly the design §5 pair: mirrored/None, unavailable/0001,
+        # refused/0002, mismatch/0003. Anything else is refused here so a
+        # refusal can never be recorded (and later read) as "unavailable".
+        check_pair(self.status, self.error_code)
+        if self.status is MirrorStatus.MIRRORED and not self.reference_id:
+            raise ValueError("a mirrored result carries the sink's reference")
 
 
 @runtime_checkable

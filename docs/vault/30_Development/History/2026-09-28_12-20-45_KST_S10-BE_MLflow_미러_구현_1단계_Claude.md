@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-2026-09-28-S10-BE-MLFLOW-MIRROR-IMPL-1"
 title: "S10-BE MLflow 미러 구현 1단계 — TrackingSink 계약·run_tracking_conformance·ReferenceSink, TRACK-0001~0005 표, canonical payload/URI, migration 0049(intents·attempts·defects, append-only·RLS·CHECK), 정본 tx enqueue 훅, deliver_intent(FOR UPDATE·terminal 반환), PG-free 76 + 실 PG 42(hosted) (카드 bg)"
-version: "1.0.0"
+version: "1.2.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T12:20:45+09:00"
+updated: "2026-09-28T12:46:08+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -30,7 +30,7 @@ tags: ["S10-BE", "AC-10", "mlflow", "tracking", "mirror", "migration", "claude"]
 | 서비스 | `src/saintvision/services/tracking.py` | `enqueue_mirror`: readiness≠configured → skipped(행 0); canonicalize 실패 → **같은 tx에 defect 1행**(TRACK-0005, reason_class), intent 0; 같은 subject+digest 존재 → existing(no-op); 아니면 outbox `inv.mlflow.mirror.requested` + intent **같은 tx**. `deliver_intent`: intent `FOR UPDATE` → terminal attempt 있으면 그 행 반환(sink 호출 0) → `COALESCE(MAX(attempt_no),0)+1` → `find` → 없으면 `mirror` → `attest`(VERIFIED+digest 일치=mirrored / MISMATCH·불일치=mismatch 0003 / UNVERIFIABLE=unavailable 0001) → attempt 1행. payload 빌더 3종(참조·digest만, 바이트 0) |
 | 훅 | `src/saintvision/services/lineage.py`, `src/saintvision/services/evaluation.py` | `register_model_version`·`record_deployment`·`finish_eval_run` 끝에서 `enqueue_mirror` 호출(정본 flush 뒤, 같은 tx). 정본 결과·예외 경로 변경 0 |
 
-설계와의 차이 1건(명시): **`project_id`는 `eval_run` subject에서만 NULL 허용**(`project_bound_unless_eval_run` CHECK). `eval_runs`에 project 열이 없어 결속할 대상이 없다(설계 §2는 NOT NULL). 수정안은 Codex 검토 대상.
+설계와의 차이(v1.2에서 정정): (a) **`project_id`는 `eval_run` subject에서만 NULL 허용**(`project_bound_unless_eval_run` CHECK; `eval_runs`에 project 열이 없음). (b) **§2의 `FOR UPDATE` 대신 `pg_advisory_xact_lock`**(intents는 append-only라 app role에 UPDATE 권한이 없고, 행 잠금은 UPDATE 권한을 요구 — §5 아래 설명). (c) 훅은 v1.2에서 §1 표 전부로 확장(아래 §5). 그 밖의 차이 없음.
 
 ## 2. 시험
 
@@ -42,11 +42,26 @@ tags: ["S10-BE", "AC-10", "mlflow", "tracking", "mirror", "migration", "claude"]
 
 로컬(가벼운 명령만): PG-free `test_tracking_canonical`+`test_tracking_sink`+`test_migrations`+`test_adapters` **124 passed**; `test_tracking_mirror` 42 skipped(DSN 없음, hosted에서 실행). `alembic upgrade head --sql` offline render OK(mlflow_mirror 57줄), `tools/migration_graph.py` head 단일 `0049_mlflow_mirror`.
 
-## 3. migration 번호·충돌
+## 3. migration 순서 (코디네이터 결정 2026-09-28 12:23 KST, v1.1 2026-09-28T12:24:55+09:00)
 
-integration head는 0046. PR #159(codex object-store)가 **0047·0048**을 이미 쓰므로 이 PR은 **0049**, `down_revision = 0046`. #159가 먼저 병합되면 이 PR의 `down_revision`을 `0048_object_store_locator`로 재지정(1줄), 이 PR이 먼저면 #159의 0047 `down_revision`을 0049로. 두 head 상태는 `tests/test_migrations.py`·`tools/migration_graph.py`가 거부하므로 조용히 지나가지 않는다.
+순서를 하나로 고정: **0047_audit_events_isolation(#128) → 0048_object_store_locator(#159) → 0049_mlflow_mirror(이 PR) → 0050(카드 be)**. 처음 push(head 44654021)는 `down_revision=0046`이었고 #128·#159가 먼저 병합되면 head가 둘로 갈라졌다. 조치: origin의 #159 head(`249b73e2`)를 이 branch에 **merge**(force-push 없음)하고 `down_revision`을 `0048_object_store_locator`로 변경. 충돌은 진행판·Claude 작업판 2개(양쪽 본문 모두 유지, version은 큰 쪽+1). PR base는 integration 그대로, **병합은 #159 뒤**. #159 head가 바뀌면 다시 merge한다. 확인: `tools/migration_graph.py` head 단일 `0049_mlflow_mirror`, `tests/test_migrations.py`.
 
 ## 4. 경계·다음
 
 - 2단계(별도 카드): `MlflowSink`(실 HTTP, extras), `service_credential_*` migration 2 + `ServiceCredentialRegistry`, outbox consumer 배선(`claim_pending_events` → `deliver_intent`), readiness를 `configurationReadiness.mlflow`에 노출(#159 objectStore 패턴 병합 뒤), collector INVALID_RUN 대조(§5.1).
 - owner Claude / reviewer Codex / 병합 금지. worktree 재사용, branch `agent/claude/s10-be-mlflow-mirror-impl`, base `1e8baf04`, force-push 없음. 시각은 `date`.
+
+## 5. Codex 1차 검토 반영 (v1.2, 2026-09-28T12:46:08+09:00; head 322488fb → 수정 head)
+
+hosted Backend run **36373656210**(head 322488fb) = 3.12 **3138 passed / 47 skipped / 2 deselected / 35 failed**, 3.14 동류. 실패 35 분류: **#159 merge 상호작용 22**(`tools/definer-policy.json`과 #159 시험이 head를 `0048`로 고정 → 0049가 head가 되며 `migration_revision_mismatch`; `check_migration_upgrade`도 마지막에 definer audit을 돌려 같은 원인) / **#172 자체 결함 13**(`FOR UPDATE` 권한, 시험 fixture 3종).
+
+| # | 지적 | 반영 |
+|---|---|---|
+| 1 (차단) 정본→미러 매핑 누락 | 훅이 3곳뿐(등록·배포·eval 종료); Experiment·학습 run·suite 식별/분류 점수·release stage 전이 없음; History "차이 1건" 오기 | 훅 **§1 전부**: `enqueue_mirror`가 project의 **첫 intent에서 `experiment` intent를 같은 tx에 자동 생성**; `runs.complete_run` → `training_run`(workload spec sha·objective·contract_version·evidence_id·termination_reason); `release_model_version` → 별도 `model_version` intent(`inv.stage=released`, verified/pinned ms); `finish_eval_run` payload에 suite name/version/definition_sha256 + **분류별 pass_rate/mean_score metric**. artifact 참조는 model_version payload의 uri·content_sha256·byte_size(설계 §1 "참조만"). 시험: 경로 5(등록·release·배포·eval·training run)마다 intent+outbox 확인 + **rollback 5 parametrize**(intent·defect·정본·event 전부 0) |
+| 2 (차단) status↔code 결속이 regex뿐 | `MirrorResult(REFUSED, "TRACK-0001")` 허용, DB도, `verdict_for_attempt`가 교차검증 없이 NOT_OBSERVED; `code_for_status(INVALID)→0005` | 정본 하나 `codes.STATUS_CODE_PAIRS`(mirrored/None·unavailable/0001·refused/0002·mismatch/0003). `check_pair`를 `MirrorResult.__post_init__`·`deliver_intent`·`verdict_for_attempt`가 호출; DB CHECK `status_code_pair`는 migration에 literal로 박고 시험이 `codes.sql_pair_check()`와 동일함을 고정. **`invalid` status 삭제**(0004/0005는 sink 전 결정, attempt 없음). 되살림: PG-free 4 status × 6 code 전 조합(맞는 4쌍만 통과), `MirrorResult` wrong-pair 6, DB wrong-pair 6 + 옛 형식 3 + `invalid` 1 |
+| 3 (차단) delivery identity 미결속 | `deliver_intent`가 인자 event id를 그대로 기록, attempts에 outbox FK 없음 | 서비스: lock 뒤 `outbox_event_id != intent.outbox_event_id`면 **`DeliveryIdentityError`(sink 호출 0·행 0)**, 기록은 `intent.outbox_event_id`. DB: `outbox_events (tenant_id, event_id)` UNIQUE index 신설 → intents `(tenant_id, outbox_event_id)` FK, intents `UNIQUE(tenant_id, intent_id, outbox_event_id)` → attempts **composite FK `(tenant_id, intent_id, outbox_event_id)`** + `(tenant_id, outbox_event_id)` FK. 시험: 다른 event 주입 2형(실재 event·부재 event) → 예외·sink 0·attempt 0; 타 tenant → LookupError; DB 직접 INSERT 다른 event → FK 위반 |
+| hosted 실패 (a) #159 상호작용 22 | policy·#159 시험 0048 고정 | `tools/definer-policy.json` `revision` → `0049_mlflow_mirror`(**functions 13 catalogue 불변**), #159 시험 2개를 "0048 속성 + head=0049" 로 재고정 |
+| hosted 실패 (b) `FOR UPDATE` permission denied 9 | intents가 append-only(SELECT/INSERT)라 행 잠금 불가 | **`pg_advisory_xact_lock`**(tenant:intent sha256 8byte 키)로 직렬화. 권한 추가 0, append-only 유지. 경쟁 consumer 시험은 그대로(잠금 대기 → terminal 반환 → 1행) |
+| hosted 실패 (c) fixture 3 | `verify_model_version` `content_sha256` 누락; 옛 긴 code가 varchar(16) DataError; `status='done'`이 pair CHECK에 먼저 걸림 | `_release` helper에 `content_sha256=WEIGHTS_SHA`; 옛 형식은 14자; 각 행이 기대 제약 **집합** 중 하나를 맞히도록 독립 fixture 15 |
+
+로컬(3.10, 가벼운 명령): PG-free `test_tracking_canonical`+`test_tracking_sink`+`test_migrations`+`test_adapters` **160 passed**; offline render에 새 DDL 3(outbox unique·pair CHECK·composite FK) 존재; `migration_graph` head 단일 0049. `tests/core/test_object_store_locator_migration.py`는 3.11+ 전용(`StrEnum`)이라 로컬 미실행 → hosted. `test_tracking_mirror` **62 case**(hosted).

@@ -167,6 +167,8 @@ def test_mirror_record_binds_its_digest_and_kind():
 def test_mirror_result_is_consistent():
     MirrorResult(MirrorStatus.MIRRORED, reference_id="r")
     MirrorResult(MirrorStatus.UNAVAILABLE, error_code="TRACK-0001")
+    MirrorResult(MirrorStatus.REFUSED, error_code="TRACK-0002")
+    MirrorResult(MirrorStatus.MISMATCH, error_code="TRACK-0003")
     with pytest.raises(ValueError):
         MirrorResult(MirrorStatus.MIRRORED)                                      # no reference
     with pytest.raises(ValueError):
@@ -176,3 +178,19 @@ def test_mirror_result_is_consistent():
     with pytest.raises(ValueError):
         MirrorResult(MirrorStatus.REFUSED, error_code="TRACK-MLFLOW-REFUSED")   # old shape
     assert dataclasses.is_dataclass(MirrorResult)
+
+
+@pytest.mark.parametrize(
+    "status,code",
+    [
+        (MirrorStatus.REFUSED, "TRACK-0001"),       # Codex #172 finding 2: the exact counter-example
+        (MirrorStatus.UNAVAILABLE, "TRACK-0002"),
+        (MirrorStatus.MISMATCH, "TRACK-0001"),
+        (MirrorStatus.UNAVAILABLE, "TRACK-0004"),
+        (MirrorStatus.REFUSED, "TRACK-0005"),
+        (MirrorStatus.MISMATCH, None),
+    ],
+)
+def test_a_wrong_status_code_pair_cannot_be_constructed(status, code):
+    with pytest.raises(ValueError):
+        MirrorResult(status, error_code=code)

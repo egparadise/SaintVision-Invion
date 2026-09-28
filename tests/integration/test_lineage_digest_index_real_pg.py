@@ -75,8 +75,9 @@ def test_36_the_concurrent_index_migration_is_safe_to_run_again(owner_engine, mi
 
     path = (
         Path(__file__).resolve().parents[2]
-        / "migrations/versions/0047_dataset_digest_lookup.py"
+        / "migrations/versions/0050_dataset_digest_lookup.py"
     )
+    assert path.exists(), f"the migration this node exercises is not at {path}"
     source = path.read_text(encoding="utf-8")
     drop = f"DROP INDEX CONCURRENTLY IF EXISTS {INDEX}"
     create = (

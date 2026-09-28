@@ -42,6 +42,16 @@ jobs:
     env:
       INV_TEST_ADMIN_DSN: postgresql://postgres:inv_test_only@127.0.0.1:5432/postgres
       INV_TEST_EVIDENCE_DIR: ${{ github.workspace }}/dist
+      MINIO_IMAGE: docker.io/coollabsio/minio@sha256:72b4794d7faa001823364f8ee239717141327fc450a3264414f573a6abf3c629
+      MINIO_ROOT_USER: product-store-ci
+      MINIO_ROOT_PASSWORD: product-store-ci-only-secret
+      INV_OBJECT_STORE_ENDPOINT: http://127.0.0.1:9000
+      INV_OBJECT_STORE_BUCKET: saintvision-product-ci
+      INV_OBJECT_STORE_ACCESS_KEY_ID: product-store-ci
+      INV_OBJECT_STORE_SECRET_ACCESS_KEY: product-store-ci-only-secret
+      INV_OBJECT_STORE_REGION: us-east-1
+      INV_OBJECT_STORE_TARGET_KIND: ci-candidate
+      INV_EVIDENCE_CODE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
       # Role-shape rejection tests own a separate disposable cluster. Keep the
       # same explicit image opt-in as Backend Build, but let the normal Core
       # pytest collection execute the cases once instead of adding another
@@ -64,6 +74,33 @@ jobs:
         with:
           node-version: '22'
       - run: python -m pip install -r requirements-test.txt -r requirements-docs.txt
+      - name: Start digest-pinned product ObjectStore service
+        run: |
+          docker pull --platform linux/amd64 "$MINIO_IMAGE"
+          docker run --detach --rm --platform linux/amd64 \
+            --name saintvision-product-object-store \
+            --tmpfs /data:rw,noexec,nosuid,size=128m \
+            --publish 127.0.0.1:9000:9000 \
+            --env MINIO_ROOT_USER \
+            --env MINIO_ROOT_PASSWORD \
+            "$MINIO_IMAGE" server /data --address ':9000'
+          for attempt in $(seq 1 45); do
+            if curl --fail --silent --show-error http://127.0.0.1:9000/minio/health/live > /dev/null; then
+              break
+            fi
+            if test "$attempt" = 45; then
+              docker logs saintvision-product-object-store
+              exit 1
+            fi
+            sleep 1
+          done
+          python - <<'PY'
+          import os
+          from tools.verify_storage_roundtrip import S3Client, load_config
+
+          response = S3Client(load_config(os.environ)).create_bucket()
+          assert response.status == 200, f'redacted product bucket setup failed ({response.status})'
+          PY
       - name: Regenerate contracts and detect drift
         run: |
           python tools/generate_contracts.py
@@ -150,7 +187,10 @@ jobs:
       # Desktop browser tests execute in desktop-browser.yml with Chromium and Vite.
       # Web-container acceptance belongs to desktop-browser.yml. The two LAN
       # image-opt-in suites run in the explicit provisioned step above.
-      - run: python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py --ignore=tests/integration/test_web_container.py --ignore=tests/integration/test_workspace_upgrade.py --ignore=tests/integration/test_lan_storage_install.py
+      - run: python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py --ignore=tests/integration/test_web_container.py --ignore=tests/integration/test_workspace_upgrade.py --ignore=tests/integration/test_lan_storage_install.py --ignore=tests/integration/test_s3_object_store_postgres.py
+      - name: Stop disposable product ObjectStore service
+        if: always()
+        run: docker rm --force saintvision-product-object-store 2>/dev/null || true
       - name: Docker host hygiene (explicit lane)
         # These prune real host residue. Keep them off the default/backend path.
         # This job already owns a disposable runner with a working Docker daemon.
@@ -170,6 +210,7 @@ jobs:
               'PowerShell and csc.exe shim require Windows': 1,
               'Actual Windows PowerShell launcher': 10,
               'Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)': 1,
+              'run only through tools/placement_lock_wait_diagnostic.py': 1,
               'CX01_CONTAINER is unset; container identity/ownership cannot be verified': 19,
               'claude is not installed on this machine': 1,
               'codex is not installed on this machine': 1,
@@ -199,5 +240,100 @@ jobs:
         if: always()
         with:
           name: saintvision-core-evidence
+          path: dist/
+          retention-days: 30
+  s01-storage-roundtrip:
+    # Keep registry or candidate failures isolated from the normal Core proof.
+    if: >-
+      github.event_name != 'pull_request' ||
+      contains(github.event.pull_request.labels.*.name, 'run-core')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: inv_test_only
+          POSTGRES_DB: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      MINIO_IMAGE: docker.io/coollabsio/minio@sha256:72b4794d7faa001823364f8ee239717141327fc450a3264414f573a6abf3c629
+      MINIO_ROOT_USER: s01-roundtrip-ci
+      MINIO_ROOT_PASSWORD: s01-roundtrip-ci-only-secret
+      INV_OBJECT_STORE_ENDPOINT: http://127.0.0.1:9000
+      INV_OBJECT_STORE_BUCKET: saintvision-roundtrip-ci
+      INV_OBJECT_STORE_ACCESS_KEY_ID: s01-roundtrip-ci
+      INV_OBJECT_STORE_SECRET_ACCESS_KEY: s01-roundtrip-ci-only-secret
+      INV_OBJECT_STORE_REGION: us-east-1
+      INV_OBJECT_STORE_TARGET_KIND: ci-candidate
+      INV_EVIDENCE_CODE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      INV_TEST_ADMIN_DSN: postgresql://postgres:inv_test_only@127.0.0.1:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-test.txt
+      - name: Install pinned product-conformance test dependencies
+        run: python -m pip install -r requirements-test.txt
+      - name: Start disposable MinIO candidate
+        run: |
+          mkdir -p dist
+          docker pull --platform linux/amd64 "$MINIO_IMAGE"
+          docker image inspect --format '{{index .RepoDigests 0}}' "$MINIO_IMAGE" > dist/s01-minio-image.txt
+          docker run --detach --rm --platform linux/amd64 \
+            --name saintvision-s01-minio \
+            --tmpfs /data:rw,noexec,nosuid,size=64m \
+            --publish 127.0.0.1:9000:9000 \
+            --env MINIO_ROOT_USER \
+            --env MINIO_ROOT_PASSWORD \
+            "$MINIO_IMAGE" server /data --address ':9000'
+          for attempt in $(seq 1 45); do
+            if curl --fail --silent --show-error http://127.0.0.1:9000/minio/health/live > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs saintvision-s01-minio
+          exit 1
+      - name: Create disposable S01 Storage test bucket
+        run: |
+          python - <<'PY'
+          import os
+          from tools.verify_storage_roundtrip import S3Client, load_config
+
+          response = S3Client(load_config(os.environ)).create_bucket()
+          assert response.status == 200, f'redacted bucket setup failed ({response.status})'
+          PY
+      - name: Verify product ObjectStore adapter conformance
+        env:
+          PYTHONPATH: services/control-plane/src
+        run: >-
+          python -m pytest -q tools/test_s3_object_store_hosted.py
+          --junitxml=dist/s3-product-object-store.xml
+      - name: Verify product S3 persistence and PostgreSQL tenant boundary
+        env:
+          PYTHONPATH: services/control-plane/src
+        run: >-
+          python -m pytest -q tests/integration/test_s3_object_store_postgres.py
+          --junitxml=dist/s3-product-postgres.xml
+      - name: Verify S01 Storage candidate SHA-256 roundtrip and cleanup
+        if: always()
+        run: >-
+          python tools/verify_storage_roundtrip.py
+          --target-kind ci-candidate
+          --output dist/s01-storage-roundtrip.json
+          --junit dist/s01-storage-roundtrip.xml
+      - name: Stop disposable S01 Storage service
+        if: always()
+        run: docker rm --force saintvision-s01-minio 2>/dev/null || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: saintvision-s01-storage-evidence-${{ github.run_id }}
           path: dist/
           retention-days: 30

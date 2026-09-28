@@ -1,7 +1,7 @@
 """MLflow mirror: intents, attempts, defects (S10-BE, design PR #168 v1.3).
 
 Revision ID: 0049_mlflow_mirror
-Revises: 0046_model_manifest_readiness
+Revises: 0048_object_store_locator
 Create Date: 2026-09-28
 
 Three append-only tables for decision B (mirror). The canonical lineage tables
@@ -9,11 +9,22 @@ are not touched: an intent (or a defect) is written in the same transaction as
 the canonical change, a worker records each delivery outcome as a new attempt
 row, and nothing here grants the application role UPDATE or DELETE.
 
-Numbering: 0047 and 0048 are taken by PR #159 (object store), which is not on
-the integration head yet. This revision therefore chains from 0046 and takes
-0049. Whichever of the two merges second re-points its ``down_revision`` so
-the graph keeps one head; ``tools/migration_graph.py`` and
-``tests/test_migrations.py`` refuse two heads.
+Numbering (coordinator decision 2026-09-28 12:23 KST): 0047 (PR #128) ->
+0048 (PR #159) -> 0049 (this) -> 0050 (card be). This branch carries the #159
+head merged in, so 0048 exists here and the graph has one head;
+``tools/migration_graph.py`` and ``tests/test_migrations.py`` refuse two.
+This PR merges after #159.
+
+Delivery identity (Codex #172 finding 3): an attempt row is bound to the
+intent it belongs to *and* to the outbox event that intent was enqueued
+with, through two composite foreign keys. ``outbox_events`` gains a unique
+index on ``(tenant_id, event_id)`` to be that target; ``event_id`` was already
+globally unique, so no existing row can violate it.
+
+The ``(status, error_code)`` pair on an attempt is exactly one of the design
+§5 pairs (finding 2). The predicate is written out here, pinned to this
+revision's moment; ``tests/test_tracking_canonical.py`` holds it equal to the
+live ``tracking.codes.sql_pair_check()`` so the two cannot drift silently.
 
 Partitioned tables: none added by this revision.
 
@@ -28,7 +39,7 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 
 revision = "0049_mlflow_mirror"
-down_revision = "0046_model_manifest_readiness"
+down_revision = "0048_object_store_locator"
 branch_labels = None
 depends_on = None
 
@@ -42,7 +53,7 @@ APP_ROLE = "inv_app"
 TENANT_EXPR = "NULLIF(current_setting('inv.tenant_id', true), '')::uuid"
 
 SUBJECT_KINDS = ("experiment", "training_run", "eval_run", "model_version", "deployment")
-ATTEMPT_STATUSES = ("mirrored", "unavailable", "refused", "mismatch", "invalid")
+ATTEMPT_STATUSES = ("mirrored", "unavailable", "refused", "mismatch")
 DEFECT_REASONS = ("nan-or-infinity", "key-collision", "unsupported-type", "non-string-tag", "list-null")
 
 KIND_ALLOWED = "subject_kind IN (" + ",".join(f"'{k}'" for k in SUBJECT_KINDS) + ")"
@@ -57,6 +68,13 @@ SUBJECT_KIND_MATCH = (
     "(subject_kind <> 'deployment' OR deployment_id IS NOT NULL)"
 )
 PROJECT_BOUND = "subject_kind = 'eval_run' OR project_id IS NOT NULL"
+#: Design §5, stated at this revision's moment (see module docstring).
+STATUS_CODE_PAIR = (
+    "(status = 'mirrored' AND error_code IS NULL) OR "
+    "(status = 'unavailable' AND error_code = 'TRACK-0001') OR "
+    "(status = 'refused' AND error_code = 'TRACK-0002') OR "
+    "(status = 'mismatch' AND error_code = 'TRACK-0003')"
+)
 
 #: Every table in this revision is append-only for the application role.
 NEW_APPEND_ONLY = ("mlflow_mirror_intents", "mlflow_mirror_attempts", "mlflow_mirror_defects")
@@ -109,6 +127,12 @@ def _subject_constraints(table: str):
 
 
 def upgrade() -> None:
+    # Target for the tenant-scoped delivery-identity foreign keys below.
+    op.execute(
+        "CREATE UNIQUE INDEX uq_outbox_events_tenant_id_event_id "
+        "ON outbox_events (tenant_id, event_id)"
+    )
+
     op.create_table(
         "mlflow_mirror_intents",
         sa.Column("tenant_id", UUID, nullable=False),
@@ -122,8 +146,13 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("tenant_id", "intent_id", name="pk_mlflow_mirror_intents"),
         *_subject_constraints("mlflow_mirror_intents"),
         sa.ForeignKeyConstraint(
-            ["outbox_event_id"], ["outbox_events.event_id"],
-            name="fk_mlflow_mirror_intents_outbox_event_id",
+            ["tenant_id", "outbox_event_id"],
+            ["outbox_events.tenant_id", "outbox_events.event_id"],
+            name="fk_mlflow_mirror_intents_tenant_id_outbox_event_id",
+        ),
+        sa.UniqueConstraint(
+            "tenant_id", "intent_id", "outbox_event_id",
+            name="uq_mlflow_mirror_intents_intent_event",
         ),
         sa.CheckConstraint("payload_sha256 ~ '^[0-9a-f]{64}$'", name="payload_sha256_hex"),
         sa.CheckConstraint("recovery_epoch >= 0", name="recovery_epoch_non_negative"),
@@ -161,9 +190,18 @@ def upgrade() -> None:
         sa.Column("finished_at", TS, nullable=False),
         sa.PrimaryKeyConstraint("tenant_id", "attempt_id", name="pk_mlflow_mirror_attempts"),
         sa.ForeignKeyConstraint(
-            ["tenant_id", "intent_id"],
-            ["mlflow_mirror_intents.tenant_id", "mlflow_mirror_intents.intent_id"],
-            name="fk_mlflow_mirror_attempts_tenant_id_intent_id",
+            ["tenant_id", "intent_id", "outbox_event_id"],
+            [
+                "mlflow_mirror_intents.tenant_id",
+                "mlflow_mirror_intents.intent_id",
+                "mlflow_mirror_intents.outbox_event_id",
+            ],
+            name="fk_mlflow_mirror_attempts_intent_event",
+        ),
+        sa.ForeignKeyConstraint(
+            ["tenant_id", "outbox_event_id"],
+            ["outbox_events.tenant_id", "outbox_events.event_id"],
+            name="fk_mlflow_mirror_attempts_tenant_id_outbox_event_id",
         ),
         sa.UniqueConstraint(
             "tenant_id", "intent_id", "attempt_no",
@@ -182,9 +220,7 @@ def upgrade() -> None:
         sa.CheckConstraint(
             "error_code IS NULL OR error_code ~ '^TRACK-[0-9]{4}$'", name="error_code_track"
         ),
-        sa.CheckConstraint(
-            "(status = 'mirrored') = (error_code IS NULL)", name="error_code_iff_not_mirrored"
-        ),
+        sa.CheckConstraint(STATUS_CODE_PAIR, name="status_code_pair"),
         sa.CheckConstraint(
             "tracking_uri_sha256 ~ '^[0-9a-f]{64}$'", name="tracking_uri_sha256_hex"
         ),

@@ -27,6 +27,7 @@ from inv.ids import new_id
 from inv.leases import LeaseStore
 from inv.node_channels import provision_channel
 from inv.output_ingestion import OutputIngestion, output_bytes
+from inv.object_store import LocalObjectStore, ObjectStoreRegistry
 from inv.workspace_api import RestrictedWorkspaceRuntime, WorkspaceAPI
 from inv.workspace_files import canonical, decode_snapshot, WorkingGenerations
 from jwt_support import jwt_fixture
@@ -137,7 +138,12 @@ def first(remote, storage, tmp_path):
     working_root.mkdir(mode=0o700)
     a.working = WorkingGenerations(working_root)
     a.http = TestClient(
-        create_app(a.e.db, a.jwt.auth, workspace=WorkspaceAPI(a.e.db, a.working, a.runtime)),
+        create_app(
+            a.e.db,
+            a.jwt.auth,
+            workspace=WorkspaceAPI(a.e.db, a.working, a.runtime),
+            object_stores=ObjectStoreRegistry([LocalObjectStore(a.storage.provider)]),
+        ),
         raise_server_exceptions=False,
     )
     a.headers = lambda actor="requester", key="first-prepare": {
