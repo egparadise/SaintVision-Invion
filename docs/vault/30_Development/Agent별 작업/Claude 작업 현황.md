@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.21"
+version: "1.2.28"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T09:55:00+09:00"
+updated: "2026-09-28T10:35:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+VF-CL-03 import adapter 요청경로 결속 설계 카드 ap (Claude, 2026-09-28, base `1e8baf04`, branch `agent/claude/vfcl03-import-request-path`, docs-only): blocker `import-adapter-has-no-request-path-contract` 해소안 v1.0. **실측으로 문제를 다시 규정**: 막힌 것은 adapter가 아니라 **business model-registry lane 전체에 라우트가 없다**는 것 — `lineage.py`의 `register_model_version`(184)·`verify_model_version`(271)·`pin_retention`(292)·`release_model_version`(308) 네 함수의 호출부가 `src/saintvision/api/`와 커널 양쪽에서 **0건**이다. **커널 변경은 불필요**: `ModelCommitObservation`·`ModelExecutionManifestObservation` 두 계약이 이미 `licensePolicy`·`classification`을 `required`로 담고 `app.py:449`·`:454` 라우트가 서빙하므로 선언을 얻는 새 커널 라우트가 필요 없다. 권고는 **B — `release_model_version`에 선언 게이트 + business 라우트 1개 신설**(draft가 아니라 release인 이유: 선언은 커널 commit이 만들고 release가 이미 unverified·unpinned·untraceable을 거부하는 검사 단계다). **계약 변경 1건 명시**: `POST /v1/projects/{project_id}/models/{model_id}/versions/{version}/release` + `ModelReleaseRequest`(`additionalProperties:false`, 두 필드만, 제약을 ModelManifest에서 복제) — 그 부작용으로 adapter의 `extra:<field>` 분기가 라우트 경유로는 도달 불가해지므로 서비스·PG-free 시험에서만 덮인다고 적고 '스키마가 막으니 adapter 검사 불필요'로 줄이지 않았다. **오류 코드 정밀 발견**: `ProblemDetails.code` 패턴이 `^[A-Z]+-[0-9]{4}$`인데 business 어휘(`VAL-SCHEMA`·adapter의 `VAL-MODEL-IMPORT-DECLARATION`)는 **맞지 않고**, `to_problem()`이 `extra`를 top-level로 올리는데 `ProblemDetails`는 `additionalProperties:false`라 `mismatches`가 들어갈 계약 자리가 없다 — 기존 분기를 드러낸 것이며 이 카드가 확대하지 않는다(커널 `MODEL-0001~0008` 사용 중, 다음 빈 번호 `MODEL-0009`는 대안 2로만 기록). **검사 순서**: 커널 관측 HTTP를 **트랜잭션 밖**에서(내 #145 F2와 같은 부류 회피), 트랜잭션 안에서 관측 identity 재결속 → 기존 승격 거부(422) → 그 **뒤** 선언 비교(409). 값은 오류·감사·로그 어디에도 넣지 않으며 `audit.redact`의 marker에 license·classification이 **없어** 자동 보호가 없다는 것까지 확인해 부정 시험으로 고정. 부정 시험 12건(PG-free 8 + 실 PG 4) 목록화, 로컬 실 PG는 메모리 규칙으로 미실행이라 실행 근거는 hosted. 미해결 4(관측 불가 오류 코드 이름·신선도 한계 수치·승격 외 라우트는 범위 밖·응답 타입 신설 여부). check_docs·ratchet exit 0. 전문 [[VF-CL-03_import_adapter_요청경로_결속_설계]].
 
 hosted Core junit로 S04/05/07-DB 케이스 수치 보강 카드 12 (Claude, 2026-09-22, 읽기 전용): artifact `saintvision-core-evidence`(run 35706465645 `3d1892c0` + proof 35714470445 `f2aa2b14`)를 .work/ci-junit에 받아(바이너리 삭제 후 1.4MB) 파일별 수치(core 2948/58/0·shard-recovery 21·containment 28·workspace 22·business-handoff 17·lan-installer 15·docker-host 2, f2aa2b14는 core 2998/58/0 외 동일)와 카드 10의 hosted-only 항목 케이스 이름을 classname으로 추출 — 재전송 hash(output_ingestion 5·node_delivery 18·results 21), placement Explain(placement 12), shard replacement 21, containment 28, workspace 복구 12+11, 노드 스토리지 전송 27 — **전부 passed**. hosted에도 없는 것(AC-05 결정성/P95·AC-07 60초/95%·CX01)은 그대로 물리/5노드 대기로 명시. 패키지 §C-2 + 검증상태지도 §12 보강. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 
