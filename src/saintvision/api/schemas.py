@@ -14,7 +14,7 @@ from __future__ import annotations
 import datetime as dt
 from typing import Literal
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr, field_validator
 
 
 class Strict(BaseModel):
@@ -900,6 +900,76 @@ class LineageUnresolved(Strict):
     count: int = Field(ge=1)
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class RunRecordSealRequest(Strict):
+    """What a caller may say when sealing a run (G-04 W1, design §5-2).
+
+    Only the *role* of each server-derived artifact. The sealed set, the
+    digests, the bundle and the component versions are derived from the rows
+    the server locks; a request cannot add, omit or name any of them. An
+    artifact the mapping leaves out is sealed as ``other``; an id outside the
+    server's set is refused.
+    """
+
+    roles: dict[str, str] = Field(default_factory=dict)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    @field_validator("roles")
+    @classmethod
+    def _roles_are_known(cls, value: dict[str, str]) -> dict[str, str]:
+        allowed = {"diff", "test_report", "trace", "log", "model", "dataset", "other"}
+        for artifact_id, role in value.items():
+            if not (isinstance(artifact_id, str) and artifact_id.startswith("art_") and len(artifact_id) == 30):
+                raise ValueError("roles keys must be artifact ids")
+            if role not in allowed:
+                raise ValueError("unknown artifact role")
+        if len(value) > 1000:
+            raise ValueError("too many role mappings")
+        return value
+class ContextBundleItemSummary(Strict):
+    """One bundle item without its content: what was read, in what version,
+    and the digest and byte length of the text -- never the text itself and
+    not the caller-written source URI."""
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True, populate_by_name=True)
+
+    ordinal: int = Field(ge=0)
+    item_id: str = Field(min_length=1, max_length=255, alias="itemId")
+    item_version: int = Field(ge=1, alias="itemVersion")
+    kind: str = Field(pattern="^(document|code|message|tool_output|summary)$")
+    content_hash: str = Field(pattern="^[0-9a-f]{64}$", alias="contentHash")
+    byte_size: int = Field(ge=0, alias="byteSize")
+    confidence: float | None = Field(default=None, ge=0.0, le=1.0)
+    redacted: bool
+
+
+class ContextBundleResponse(Strict):
+    """A run's context bundle as metadata (G-04 R3).
+
+    ``hashVerified`` is ``verify_bundle``'s answer, reported as a fact: false
+    means the stored content no longer reproduces the bundle hash. ``sealed``
+    says whether this is the bundle the run's sealed record pins (true) or the
+    run's most recently built bundle (false). ``itemCount``/``totalBytes`` are
+    the bundle's own columns; ``items`` is the ordered item list. No content,
+    no person, no free text.
+    """
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True, populate_by_name=True)
+
+    bundle_id: str = Field(alias="bundleId")
+    run_id: str = Field(alias="runId")
+    bundle_hash: str = Field(pattern="^[0-9a-f]{64}$", alias="bundleHash")
+    hash_verified: bool = Field(alias="hashVerified")
+    sealed: bool
+    item_count: int = Field(ge=0, alias="itemCount")
+    total_bytes: int = Field(ge=0, alias="totalBytes")
+    retrieval_strategy: str = Field(pattern="^(lexical|metadata|hybrid|explicit)$", alias="retrievalStrategy")
+    component_versions: dict[str, str] = Field(alias="componentVersions")
+    token_estimate: int | None = Field(default=None, ge=0, alias="tokenEstimate")
+    built_at: dt.datetime = Field(alias="builtAt")
+    items: list[ContextBundleItemSummary]
 
 
 class RunRecordResponse(Strict):
