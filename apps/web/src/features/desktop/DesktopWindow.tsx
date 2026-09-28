@@ -19,6 +19,7 @@ export const DesktopWindowComponent: React.FC<DesktopWindowProps> = ({
   onMinimize,
   onToggleMaximize,
   children,
+}) => {
   React.useEffect(() => {
     if (!isActive || !window.isOpen || window.isMinimized) return;
 
@@ -29,9 +30,9 @@ export const DesktopWindowComponent: React.FC<DesktopWindowProps> = ({
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
+    globalThis.addEventListener('keydown', handleKeyDown);
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      globalThis.removeEventListener('keydown', handleKeyDown);
     };
   }, [isActive, window.isOpen, window.isMinimized, onClose]);
 
