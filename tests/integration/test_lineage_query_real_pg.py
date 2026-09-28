@@ -32,6 +32,7 @@ from saintvision.api.deps import get_principal
 from saintvision.api.problem import CANONICAL_KEYS
 from saintvision.config import Settings
 from saintvision.identity.principal import Principal, StaticPrincipalVerifier
+from measurement_support import insert_measurement
 from saintvision.ids import new_id
 
 pytestmark = pytest.mark.postgres
@@ -149,6 +150,12 @@ def _seed(
         name=f"model-{project_code}",
         created_at=now,
     )
+    content_sha256 = _digest()
+    # Verified means bound to a kernel-recorded measurement (0054).
+    measurement_id = insert_measurement(
+        connection, tenant_id=tenant_id, model_version_id=version_id, sha256=content_sha256, byte_size=1,
+        project_id=project_id, observed_at=now - dt.timedelta(minutes=1),
+    )
     _insert(
         connection,
         "model_versions",
@@ -157,11 +164,12 @@ def _seed(
         model_id=model_id,
         version="1.0.0",
         stage="released",
-        content_sha256=_digest(),
+        content_sha256=content_sha256,
         byte_size=1,
         uri=f"inv://models/model-{project_code}@1.0.0",
         # A released row must carry both, by table CHECK.
         verified_at=now,
+        verified_measurement_id=measurement_id,
         retention_pinned_until=now + dt.timedelta(days=365),
         created_at=now,
     )
