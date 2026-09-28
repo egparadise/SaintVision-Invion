@@ -299,5 +299,6 @@ def test_every_reachable_business_code_is_in_the_translation_table():
 def test_the_route_is_registered_once_on_the_projects_router():
     from saintvision.api.v1 import projects
 
-    paths = [route.path for route in projects.router.routes]
-    assert paths.count("/v1" + run_records.RECORD_PATH) + paths.count(run_records.RECORD_PATH) == 1
+    # The path is shared with W1's POST (the seal); the GET is registered once.
+    reads = [route.path for route in projects.router.routes if "GET" in (route.methods or ())]
+    assert reads.count("/v1" + run_records.RECORD_PATH) + reads.count(run_records.RECORD_PATH) == 1

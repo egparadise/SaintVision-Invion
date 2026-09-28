@@ -14,7 +14,7 @@ from __future__ import annotations
 import datetime as dt
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr
+from pydantic import field_validator, BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr
 
 
 class Strict(BaseModel):
@@ -768,6 +768,63 @@ class ModelReleaseResponse(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+class ModelVersionRegisterRequest(Strict):
+    """What an importer must state to register one model build (G-04 W2).
+
+    The fields are exactly ``register_model_version``'s own required arguments,
+    and nothing more: the service is the judge of what a registration means, so
+    a field here that it does not take would be this route inventing state.
+
+    ``contentSha256`` carries the service's rule as a pattern rather than
+    trusting it: the service raises ``VAL-SCHEMA`` for a non-lowercase digest
+    and the column has ``checksum_is_lowercase``, so a caller who sends
+    ``ABC...`` gets a request error at the boundary instead of a service error
+    translated later. Both defences stay.
+
+    ``uri`` is **not** here (Codex #191 F2). A caller-supplied URI was accepted
+    and stored verbatim, so ``https://user:secret@host``, ``javascript:...`` and
+    another model version's ``inv://`` address all persisted -- and the kernel
+    manifest's join key assumes the URI's version *is* the row's version. The
+    canonical address is fully determined by the model's name and the version, so
+    the server derives it instead of validating a string that has no reason to
+    vary.
+
+    ``producedByRunId`` and ``lineage`` are deliberately absent -- see the
+    module docstring of ``api/v1/model_versions.py`` for why neither can be
+    bound to the path's project on this branch.
+    """
+
+    version: str = Field(min_length=1, max_length=64)
+    content_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="contentSha256")
+    byte_size: int = Field(default=0, ge=0, alias="byteSize")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ModelVersionResponse(Strict):
+    """The registered build, echoed back by identity.
+
+    ``stage`` is a literal: registration creates a draft and nothing else, so a
+    change that returns a released version under this type breaks the contract
+    rather than widening it quietly. There is no person and no free text here --
+    the same rule ``LineageDeployment`` states.
+
+    Python field names avoid the ``model_`` prefix because Pydantic reserves
+    that namespace; the wire names are the aliases.
+    """
+
+    version_id: str = Field(alias="modelVersionId")
+    parent_model_id: str = Field(alias="modelId")
+    version: str = Field(min_length=1, max_length=64)
+    stage: Literal["draft"]
+    content_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="contentSha256")
+    byte_size: int = Field(ge=0, alias="byteSize")
+    uri: str = Field(min_length=1)
+    created_at: dt.datetime = Field(alias="createdAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
 class LineageDatasetVersion(Strict):
     dataset_version_id: str = Field(alias="datasetVersionId")
     version: str = Field(min_length=1, max_length=64)
@@ -808,6 +865,76 @@ class LineageUnresolved(Strict):
     count: int = Field(ge=1)
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class RunRecordSealRequest(Strict):
+    """What a caller may say when sealing a run (G-04 W1, design §5-2).
+
+    Only the *role* of each server-derived artifact. The sealed set, the
+    digests, the bundle and the component versions are derived from the rows
+    the server locks; a request cannot add, omit or name any of them. An
+    artifact the mapping leaves out is sealed as ``other``; an id outside the
+    server's set is refused.
+    """
+
+    roles: dict[str, str] = Field(default_factory=dict)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    @field_validator("roles")
+    @classmethod
+    def _roles_are_known(cls, value: dict[str, str]) -> dict[str, str]:
+        allowed = {"diff", "test_report", "trace", "log", "model", "dataset", "other"}
+        for artifact_id, role in value.items():
+            if not (isinstance(artifact_id, str) and artifact_id.startswith("art_") and len(artifact_id) == 30):
+                raise ValueError("roles keys must be artifact ids")
+            if role not in allowed:
+                raise ValueError("unknown artifact role")
+        if len(value) > 1000:
+            raise ValueError("too many role mappings")
+        return value
+class ContextBundleItemSummary(Strict):
+    """One bundle item without its content: what was read, in what version,
+    and the digest and byte length of the text -- never the text itself and
+    not the caller-written source URI."""
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True, populate_by_name=True)
+
+    ordinal: int = Field(ge=0)
+    item_id: str = Field(min_length=1, max_length=255, alias="itemId")
+    item_version: int = Field(ge=1, alias="itemVersion")
+    kind: str = Field(pattern="^(document|code|message|tool_output|summary)$")
+    content_hash: str = Field(pattern="^[0-9a-f]{64}$", alias="contentHash")
+    byte_size: int = Field(ge=0, alias="byteSize")
+    confidence: float | None = Field(default=None, ge=0.0, le=1.0)
+    redacted: bool
+
+
+class ContextBundleResponse(Strict):
+    """A run's context bundle as metadata (G-04 R3).
+
+    ``hashVerified`` is ``verify_bundle``'s answer, reported as a fact: false
+    means the stored content no longer reproduces the bundle hash. ``sealed``
+    says whether this is the bundle the run's sealed record pins (true) or the
+    run's most recently built bundle (false). ``itemCount``/``totalBytes`` are
+    the bundle's own columns; ``items`` is the ordered item list. No content,
+    no person, no free text.
+    """
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True, populate_by_name=True)
+
+    bundle_id: str = Field(alias="bundleId")
+    run_id: str = Field(alias="runId")
+    bundle_hash: str = Field(pattern="^[0-9a-f]{64}$", alias="bundleHash")
+    hash_verified: bool = Field(alias="hashVerified")
+    sealed: bool
+    item_count: int = Field(ge=0, alias="itemCount")
+    total_bytes: int = Field(ge=0, alias="totalBytes")
+    retrieval_strategy: str = Field(pattern="^(lexical|metadata|hybrid|explicit)$", alias="retrievalStrategy")
+    component_versions: dict[str, str] = Field(alias="componentVersions")
+    token_estimate: int | None = Field(default=None, ge=0, alias="tokenEstimate")
+    built_at: dt.datetime = Field(alias="builtAt")
+    items: list[ContextBundleItemSummary]
 
 
 class RunRecordResponse(Strict):
