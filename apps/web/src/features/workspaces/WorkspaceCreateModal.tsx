@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/shared/ui/Button';
 import { useModalA11y } from '@/shared/ui/useModalA11y';
 
@@ -18,10 +18,12 @@ export const WorkspaceCreateModal: React.FC<WorkspaceCreateModalProps> = ({
   const [name, setName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
   const { containerRef, handleKeyDown } = useModalA11y({
     isOpen,
     onClose,
+    initialFocusRef: nameInputRef,
   });
 
   if (!isOpen) return null;
@@ -60,8 +62,8 @@ export const WorkspaceCreateModal: React.FC<WorkspaceCreateModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-labelledby="workspace-create-title"
-      onKeyDown={handleKeyDown}
       tabIndex={-1}
+      onKeyDown={handleKeyDown}
       style={{
         position: 'fixed',
         inset: 0,
@@ -74,6 +76,7 @@ export const WorkspaceCreateModal: React.FC<WorkspaceCreateModalProps> = ({
       }}
     >
       <div
+        ref={modalRef}
         style={{
           backgroundColor: 'var(--color-bg-surface)',
           borderRadius: 'var(--radius-lg)',
@@ -158,6 +161,7 @@ export const WorkspaceCreateModal: React.FC<WorkspaceCreateModalProps> = ({
               Workspace 명칭 (필수)
             </label>
             <input
+              ref={nameInputRef}
               id="wsp-name-input"
               data-testid="workspace-name-input"
               type="text"

@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.122"
+version: "1.0.125"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-28T13:05:00+09:00"
+updated: "2026-09-28T13:30:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,26 +19,47 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-28T13:05:00+09:00 (최신 작업 브랜치 `agent/gemini/s11-fe-fixes`).
+- 확인 기준: 2026-09-28T13:30:00+09:00 (최신 작업 브랜치 `agent/gemini/s11-fe-fixes`).
 
 ## 2026-09-28 S11-FE 제품 결함 DEF-S11-01~19 전수 치유 완료 (`agent/gemini/s11-fe-fixes`)
 
 - **19대 제품 결함 전수 치유 완결**:
   - **DEF-S11-01 (키보드 포커스 링 복원)**: `Button.tsx`, `MonacoWorkspaceEditor.tsx`, `WebTerminal.tsx`에서 `outline: 'none'` 하드코딩 제거 및 `index.css` 전역 `:focus-visible` 고대비 링 정의.
   - **DEF-S11-02 (WorkspaceList 키보드 접근성)**: 카드에 `role="button"`, `tabIndex={0}`, `aria-label`, Enter/Space `onKeyDown` 및 자식 Studio 버튼 이벤트 버블링 차단 가드 적용.
-  - **DEF-S11-03~06 (모달 A11y 표준화)**: `useModalA11y` 훅 신설로 Tab/Shift+Tab 포커스 트랩, 종료 시 트리거 복귀, Esc 닫기(`e.stopPropagation()`) 구현. `WorkspaceCreateModal`, `GitCommitModal`, `ConflictResolutionModal`, `AdminSecurityConsole` (kill-switch), `ApprovalDetail` (reject), `RunDetail` (cancel, receipt), `DeveloperStudio` (cancel, receipt) 전면 배선 및 `role="dialog"`, `aria-modal="true"`, `aria-labelledby` 부여. `Header.tsx` 활성 탭 `aria-current="page"` 부여. `DesktopShell.tsx`에서 활성 창 Esc 닫기 연동.
+  - **DEF-S11-03~06 (모달 A11y 표준화)**: `useModalA11y` 훅 신설로 Tab/Shift+Tab 포커스 트랩(컨테이너 래핑 포함), 종료 시 트리거 복귀, Esc 닫기(`e.stopPropagation()`) 구현. `WorkspaceCreateModal`, `GitCommitModal`, `ConflictResolutionModal`, `AdminSecurityConsole` (kill-switch), `ApprovalDetail` (reject), `RunDetail` (cancel, receipt), `DeveloperStudio` (cancel, receipt) 전면 배선 및 `role="dialog"`, `aria-modal="true"`, `aria-labelledby` 부여. `Header.tsx` 활성 탭 `aria-current="page"` 부여.
   - **DEF-S11-07 (동적 알림 Live Region)**: `ReleaseCandidateView`, `NaturalLanguageRunView`, `DistributedRecoveryView`에 `role="alert"` / `role="status"` 및 `aria-live` 부여.
   - **DEF-S11-08, DEF-S11-11~16 (RCV 허위 상태 격리)**: 백엔드 API 미노출 상태에서 5-Node 계측 허위 문구 정정(`[정적 예시] 원격 텔레메트리 미연동`), 'ACTIVE LIVE'/'STANDBY' 배지를 '모의 활성'/'모의 대기'로 격리, `releaseEngine.ts` 초기값 `rollbackVerified: false` 설정 및 롤백 플래그 연동 배지 격리, WCAG 자동화 감사 과장 문구 정정, 명도대비 수동 계산값 표기 정정, 무중단 롤백 보증 문구 정정, WCAG 배지 동적 바인딩(`audit.status`).
-  - **DEF-S11-09 & DEF-S11-10 (WCAG 명도 대비율 적합화)**: 다크 테마 Primary 버튼 `#1d4ed8`(6.81:1 $\ge$ 4.5:1), Danger 버튼 `#dc2626`(4.86:1 $\ge$ 4.5:1) 보정. 폼 경계선 Dark `#9ca3af`(4.87:1 $\ge$ 3.0:1), Light `#64748b`(3.44:1 $\ge$ 3.0:1) 보정.
+  - **DEF-S11-09 & DEF-S11-10 (WCAG 명도 대비율 적합화)**: 버튼 배경 토큰(`--color-brand-primary-bg: #1d4ed8`, 6.70:1 $\ge$ 4.5:1 / `--color-status-offline-bg: #dc2626`, 4.83:1 $\ge$ 4.5:1)과 전경·링 토큰(`--color-brand-primary: #60a5fa`, dark surface 6.98:1 / `--color-status-offline: #f87171`, dark surface 6.41:1)을 완전 분리하여 텍스트 4.5:1, 링 3.0:1 이상 전수 충족. 폼 경계선 Dark `#9ca3af`(5.78:1 $\ge$ 3.0:1), Light `#64748b`(4.34:1 $\ge$ 3.0:1) 보정.
   - **DEF-S11-17~19 (반응형 뷰포트 및 롤백 식별)**: auto-fit 유동 그리드, 테이블 `overflow-x: auto` 래퍼, Desktop/Tablet/Mobile 뷰포트 버튼 클릭 시 컨테이너 `maxWidth` 동적 전환, 롤백 버튼 버전 식별 aria-label 부여.
 - **검증 실측**:
-  - `apps/web/tests/s11-defect-fixes.test.tsx`: **9 tests 100% PASS** (1.09s).
-  - `pytest tests/test_route_coverage.py`: **39 passed** (2.64s).
+  - `apps/web/tests/s11-defect-fixes.test.tsx`: 전수 통과.
+  - `pytest tests/test_route_coverage.py`: **39 passed**.
   - `tools/check_frontend_integrity.py`: **0 violations, exit 0**.
   - `tools/check_contract_bindings.py`: **exit 0**.
   - `tools/check_docs.py` & `tools/check_ontology.py`: **exit 0**.
 - **보고서**: [[2026-09-28_13-05-00_KST_S11_FE_Gemini_제품결함_수정]]
 
+- **작업 개요**: S05 매트릭스(v1.2.2), S06 매트릭스(v1.1.2) 및 PR #151 S05 공식 결정(legacy 배치 경로 정본)에 입각하여 현재 `apps/web` 제품 코드를 전수 감사하고, Claude UI 축 독립 검토(issuecomment-5862081355) 지적 F-1~F-9 및 r2 조건부 승인 C-1~C-4를 전수 치유.
+- **결함 수정 내역 (F-1 ~ F-9 및 r2 C-1 ~ C-4)**:
+  1. **F-1 (WorkspaceList 키보드 격리)**: 카드 `onKeyDown`에 `if (e.target !== e.currentTarget) return;` 가드를 추가하고, `⚡ Studio에서 열기` 버튼에 독립 `onKeyDown`을 부여하여 Enter/Space 시 작업공간 선택 방지 및 Studio 열기 정상 동작.
+  2. **F-2 (WorkspaceCreateModal 포커스 안정화)**: `onClose`를 ref로 추적하고 opener 저장/복원을 `[isOpen]` effect로 한정하여 5초 폴링 시 포커스 튐 차단, 초기 포커스 부여, Escape를 dialog `onKeyDown`으로 한정.
+  3. **F-3 & C-1 (DesktopWindow Escape 격리 및 시작 메뉴 오버레이 연동)**: 전역 `globalThis` Escape 리스너를 제거하고 윈도우 루트 `onKeyDown`으로 한정, 입력창/터미널 Escape 무시, `isOverlayOpen` prop을 통해 시작 메뉴 등 셸 오버레이 활성 시 창 Escape 닫기를 억제하고 시작 메뉴가 우선 닫히도록 연동(C-1), 닫기 버튼 타이틀을 `창 닫기`로 정정.
+  4. **F-4 & C-3 (PlacementSimulator 시험 전용 props 롤백 및 동기화 effect 제거)**: `nodes?`, `activePool?`, `allPools?`, `projectId?` 및 폴백 제거, `nodes: NodeItem[]` 필수 props로 복구하고, props→state 동기화 `useEffect` 3개를 전면 제거(C-3).
+  5. **F-5 (ResourceExplorer 정밀 렌더링)**: `c: any` 제거 및 정본 타입 복원, 0 코어 자원을 '미측정'이 아닌 `0C 가용` 및 `0 GPU`로 정직 표출.
+  6. **F-6 (pool-capacity-pending 배너 격리)**: `poolCapacityState === 'idle'`로 제한하여 loading/error 시 거짓 배너 표출 차단.
+  7. **F-7 (TerminalSessionView 인증 방식 설명)**: 배지를 '30초 암호학적 1회용 PTY 티켓 인증 연동 (mTLS 격리)'로 명시하여 발급과 인증 방식 구분.
+  8. **F-8 & C-2 (시험 스위트 정합화)**: `contracts/pool-list-response` 정본 import, `nodes={[]}`, `onCreateWorkspace` prop 정합, `appId: 'terminal'` 교정, `WorkspaceItem` mock 정합(`status: 'ready'`, `updatedAt` 제거), 공허 단언(`undefined/NaN Cores`) 삭제(C-2), 시작 메뉴 우선 닫힘 단언 포함 8개 단언 완결.
+  9. **F-9 & C-4 (문서 및 증거 실측 최신화)**: hosted run `36370517229`(frontend 79/682, tsc+build pass) 기록 및 표현 정합화.
+- **검증 실측**:
+  - `apps/web/tests/s05-s06-defect-fixes.test.tsx`: 8/8 tests passed (`[S06-DEF-G-C1]` 시작 메뉴 우선 닫힘 실단언 포함).
+  - `npx vitest run`: **79 passed (79), 683 passed (683), 0 failed** (exit code 0).
+  - `npx tsc -b`: **0 errors** (exit code 0).
+  - `npm run build`: **built in 3.74s** (exit code 0).
+  - `pytest tests/test_route_coverage.py`: **39 passed in 1.33s** (exit code 0).
+  - hosted run 실측: `36370517229` (frontend pass, 682 tests, tsc+build pass), `36370517141` (desktop-browser pass), `36370517406` (docs pass), `36370517149` (backend 3.14 pass).
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-28_10-41-29_KST_S05_S06_FE_Gemini_제품결함_감사_및_수정.md` (v1.0.2)
+- **독립 검토 재확인 요청**: Claude (UI 경로 축), Codex (계약 축).
+>>>>>>> b16b6dde
 
 ## 2026-09-23 S04-FE Claude 리뷰 F1~F5 전수 조치 및 정직 증거 갱신 (`agent/gemini/s04-fe-matrix-measured`)
 
