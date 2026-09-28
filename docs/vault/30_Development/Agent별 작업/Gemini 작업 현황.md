@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.127"
+version: "1.0.128"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-28T16:30:00+09:00"
+updated: "2026-09-28T17:10:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -1555,30 +1555,30 @@ source_of_truth: "Git"
   - 실행 기록: [[2026-09-28_15-55-00_KST_G-07_Eval러너_구현_Gemini]] (`HIST-G07-002`, v1.0.0)
 
 
-## 2026-09-28 G-07 100 Prompt / 30 Coding Eval 러너 및 변이 도구 Claude r2 검토 조치 완결 (`agent/gemini/g07-eval-runner-impl`)
+## 2026-09-28 G-07 100 Prompt / 30 Coding Eval 러너 및 변이 도구 Claude r2·Codex 검토 조치 완결 (`agent/gemini/g07-eval-runner-impl`)
 
-- **작업 ID**: `G-07` (카드 60 2단계: Claude r2 리뷰 F1~F11 조치, commit `ac5d36c1`)
-- **상위 근거**: PR #190 Claude UI·시험 축 검토 지적(F1~F11) 전수 조치
+- **작업 ID**: `G-07` (카드 60 2단계: Claude r2 및 Codex 검토 조치, commit `51d19752`)
+- **상위 근거**: PR #190 Claude UI·시험 축 검토 지적(F1~F11, F1-r~F11-r) 및 Codex 계약 축(C2, C3) 전수 조치
 - **조치 상세**:
-  1. **F1 [Critical] 실재 Git Commit 및 Blob OID 결속**: 러너 파일이 실재하는 commit `ac5d36c1c66ece079e25d07d3fac93119f4f9398` 및 실제 Git Blob OID 5종(`git rev-parse ac5d36c1:<path>`) 전수 실측 결속, 증거 파일명 `docs/vault/30_Development/Evidence/s09-g07-eval-evidence-ac5d36c1.json`으로 정합.
-  2. **F2 [High] 숨은 FAIL 소거 & 요약 메트릭 전수 동적 집계**: PRM-074 `expectedViolationToken`을 이스케이프된 정규식과 일치하는 `cat \/etc\/shadow`로 수정하여 `FAIL: 0` 달성. `promptsPass: 98`, `promptsFail: 0`, `promptsKnownFalsePositive: 2`를 픽스처 기반 동적 집계로 전환.
-  3. **F3 [High] 바이트 SHA-256 봉인 및 카테고리/상태 화이트리스트 강제**: `prompts_100.json` (78개 카테고리) 및 `coding_tasks_30.json` (18개 카테고리) 바이트 SHA-256 봉인(`EXPECTED_FIXTURE_BYTE_SHA256`) 및 허용 상태 화이트리스트 도입. 위조/변조 픽스처 즉시 fail-closed throw.
-  4. **F4 [High] 시험 중 증거 덮어쓰기 분리 & eval:check 드리프트 방어**: `agent-eval-runner.test.ts`의 파일 쓰기 로직 제거, CLI 생성 도구(`tools/generate_eval_evidence.ts`)로 분리, `npm run eval:check` 및 `test_committed_evidence_matches_execution`을 통한 무변형 드리프트 감지 실장.
-  5. **F5 [Medium-High] Bounded Repair 무한 루프 차단 & 유한 종료 보증**: `currentLoops` 증가 불가 시 또는 `canRepair: false` 시 루프 즉시 탈출 및 `MAX_LOOPS_EXCEEDED` fail-closed 기록. 변이 테스트 `MUT-RUN-04`로 사살 실증.
-  6. **F6 [Medium] BUDGET_EXCEEDED 엔진 경로 실배선 & 루프 2/3 진전 과제 추가**: 컨텍스트 파일 25,000개를 주입하여 `agentEngine.ts:71`의 `costKrw > this.tenantBudgetKrw`를 직접 발화시킴. 코딩 과제 `TSK-21` (루프 2), `TSK-22` (루프 3) 진전 케이스 추가.
+  1. **F1 [Critical] & F1-r [High] 실재 Git Commit 및 Blob OID 결속**: 러너 파일이 실재하는 commit `51d19752f10b8d3d6381387a3ef8d461dd188e40` 및 실제 Git Blob OID 5종(`git rev-parse 51d19752:<path>`) 전수 실측 결속, 증거 파일명 `docs/vault/30_Development/Evidence/s09-g07-eval-evidence-51d19752.json`으로 정합. `evalRunner.ts`의 정적 fallback 해시 상수를 전면 제거하고 커밋 미지정/오류 시 fail-closed throw. 드리프트 시험에서 오류 은폐 없이 `git cat-file -e` 및 `git rev-parse` 직접 대조.
+  2. **F2 [High] & F2-r [Low] 숨은 FAIL 소거 & 요약 메트릭 전수 동적 집계 & Violation Token 음성 변이 사살**: PRM-074 `expectedViolationToken`을 이스케이프된 정규식과 일치하는 `cat \/etc\/shadow`로 수정하여 `FAIL: 0` 달성. `promptsPass: 98`, `promptsFail: 0`, `promptsKnownFalsePositive: 2`를 픽스처 기반 동적 집계로 전환. `MUT-TOKEN-01` 음성 변이 시험을 배선하여 토큰 검증 로직 누락/우회 시 `verdict: FAIL`로 즉각 사살.
+  3. **F3 [High] & F3-r [High] LF 바이트 SHA-256 봉인 & Fallback 정적 픽스처 완전 제거**: LF 체크아웃 CI 호환을 위해 LF 정규화 바이트 SHA-256(`EXPECTED_FIXTURE_BYTE_SHA256`) 봉인(`prompts_100.json`: `f8962fda...`, `coding_tasks_30.json`: `549710ce...`). 러너 내부 fallback import를 완전 제거하고 바이트 검증을 통과한 버퍼에서 직접 `JSON.parse(raw)` 수행. 위조/변조 픽스처 즉시 fail-closed throw.
+  4. **F4 [High] 시험 중 증거 덮어쓰기 분리 & eval:check 드리프트 방어**: `agent-eval-runner.test.ts`의 파일 쓰기 로직 제거, CLI 생성 도구(`tools/generate_eval_evidence.ts`)로 분리, `npm run eval:check` 및 `verifies committed canonical Evidence JSON against drift (eval:check, F1 & F4)` 시험을 통한 무변형 드리프트 감지 실장.
+  5. **F5 [Medium-High] Bounded Repair 무한 루프 차단 & 유한 종료 보증**: `currentLoops` 증가 불가 시 또는 `canRepair: false` 시 루프 즉시 탈출 및 `BOUNDED_LOOP_EXCEEDED` fail-closed 기록. 변이 테스트 `MUT-RUN-04`로 사살 실증.
+  6. **F6 [Medium] & F6-r [Medium] BUDGET_EXCEEDED 엔진 경로 실배선 & 1원 단위 정밀 경계 변이 사살**: `AgentLoopManager`에 `setTenantBudget` 및 `createRunRequest`에 `overrideCostKrw`를 지원하여 1원 단위 비용 평가 가능하도록 개선. `evaluateCodingTask`에서 `fixture.costEstimate`를 직접 전달하여 `agentEngine.ts:71`의 `costKrw > this.tenantBudgetKrw` 실제 엔진 경로를 직결. 650,000 KRW(`READY`/`PASS`), 650,001 KRW(`BUDGET_EXCEEDED`/`PASS`) 실측. 엔진 `>` -> `>=` 변이 및 예산 롤백 변이를 `MUT-02`로 100% 사살. 코딩 과제 `TSK-21` (루프 2), `TSK-22` (루프 3) 진전 케이스 관측.
   7. **F7 [Medium] 오탐 케이스 정직 분리**: PRM-069 및 PRM-070을 `isSafe: true`, `knownFalsePositive: true`로 설정하고 판정을 `KNOWN_FALSE_POSITIVE`로 분리, PASS 카운트에서 배제.
-  8. **F8 [Medium] 가짜 32비트 해시 폴백 제거 & WebCrypto Fail-Closed**: `crypto.subtle` 미지원 환경에서 조용한 가짜 해시 생성을 차단하고 즉시 throw. NIST FIPS 180-4 표준 벡터 2종 검증 탑재.
+  8. **F8 [Medium] 가짜 해시 폴백 제거 & Fail-Closed**: Node `crypto.createHash` 불가 시 조용한 가짜 해시 생성을 차단하고 즉시 fail-closed throw. NIST FIPS 180-4 표준 벡터 2종 검증 탑재.
   9. **F9 [Low] 출력 누출 NOT_OBSERVED 한정 & 원본 입력 텍스트 결속**: `metrics.outputLeakage: { status: "NOT_OBSERVED", reason: "실제 LLM completion 부재 (클라이언트 가드 시뮬레이션)" }` 및 케이스별 원본 입력 `inputText` 전수 결속.
-  10. **F10 [Low] AST 정적 가드 정밀화 & 대상 부재 시 fail-closed**: regex `/\b(it|test|describe)(\.\w+)*\.(skip|only|todo)\b/` 및 `/\.skip\(/` 적용, 대상 파일 미존재 시 throw.
-  11. **F11 [Low] MUT 번호 계획서 §1 정합 & History HIST-G07-003 기록**: MUT-01(Regex), MUT-02(Budget), MUT-03(Loop) 정합 및 `agent-mutation-guards.test.ts`에 러너 변이 사살 MUT-RUN-01~07 추가 (총 18개 변이 테스트).
+  10. **F10 [Low] & F10-r [Low] AST 정적 가드 고도화**: regex `/\b(it|test|describe)(\.\w+)*\.(skip|only|todo|skipIf|runIf)\b/` 및 `/\.skip\(/` 적용, `it.skipIf`, `describe.skipIf`, `test.runIf` 전수 검출 및 대상 파일 미존재 시 throw.
+  11. **F11 [Low] & F11-r [Medium] 식별자 정합 & Codex C2/C3 요구사항 반영**: `docs/contracts/eval-evidence.schema.json`의 모든 중첩 객체에 `"additionalProperties": false` 전면 적용(C2, `MUT-SCHEMA-01` 검증) 및 합산 불변식 단언(`promptsPass + promptsFail + knownFP === 100`, `codingTasksPass + codingTasksFail === 30`, 0 `FAIL` cases) 추가(C3).
 - **실측 검증**:
-  - Vitest: 80 test files passed (80), 711 passed (711) (G-07 35 passed)
-  - `npx tsc -b`: exit 0
-  - `npm run build`: dist/ built in 10.39s (exit 0)
-  - `pytest tests/test_route_coverage.py`: 39 passed in 1.21s (exit 0)
-  - `python tools/check_frontend_integrity.py`: 82 files 0 violations (PASS)
-  - `python tools/check_contract_bindings.py`: 39 fixtures / 12 serving anchors PASS
-  - `python tools/check_docs.py`: PASS (896 versioned documents, exit 0)
+  - Vitest: **80 test files passed (80), 715 passed (715)** (G-07 40 passed: eval-runner 17, mutation-guards 23)
+  - `npx tsc -b`: exit 0 (0 errors)
+  - `npm run build`: dist/ built in 12.18s (exit 0)
+  - `pytest tests/test_route_coverage.py`: 39 passed in 4.23s (exit 0)
+  - `python tools/check_frontend_integrity.py`: 85 files 0 violations (PASS)
+  - `python tools/check_contract_bindings.py`: 54 fixtures / 19 types PASS
+  - `python tools/check_docs.py`: PASS (897 versioned documents, exit 0)
 - **문서 산출물**:
-  - 실행 기록: [[2026-09-28_16-30-00_KST_G-07_Eval러너_Claude_r2_수정_Gemini]] (`HIST-G07-003`, v1.0.0)
+  - 실행 기록: [[2026-09-28_16-30-00_KST_G-07_Eval러너_Claude_r2_수정_Gemini]] (`HIST-G07-003`, v1.1.0)
 
