@@ -152,8 +152,9 @@ def test_migration_backfills_exact_local_locator_and_makes_it_immutable():
 
 def test_object_store_locator_revision_is_irreversible_and_the_chain_has_one_head():
     """0048 was the head when this file was written; the coordinator's fixed order
-    0047 -> 0048 -> 0049 -> 0050 -> 0051 has since put the MLflow mirror (PR #172), the
-    dataset digest index (PR #174) and the service credentials (PR #176) above it. The properties of 0048 are
+    0047 -> 0048 -> 0049 -> 0050 -> 0051 -> 0052 has since put the MLflow mirror (PR #172), the
+    dataset digest index (PR #174), the service credentials (PR #176) and the model
+    version digest scope (PR for #191 F1) above it. The properties of 0048 are
     unchanged and the chain still has exactly one head."""
     revisions = chain()
     locator = next(r for r in revisions if r.revision == "0048_object_store_locator")
@@ -164,13 +165,18 @@ def test_object_store_locator_revision_is_irreversible_and_the_chain_has_one_hea
     assert mirror.down_revision == "0048_object_store_locator"
     digest_index = next(r for r in revisions if r.revision == "0050_dataset_digest_lookup")
     assert digest_index.down_revision == "0049_mlflow_mirror"
+    credentials = next(r for r in revisions if r.revision == "0051_service_credentials")
+    assert credentials.down_revision == "0050_dataset_digest_lookup"
     head = revisions[-1]
-    assert head.revision == "0051_service_credentials"          # PR #176, above 0050 (PR #174)
-    assert head.down_revision == "0050_dataset_digest_lookup"
+    assert head.revision == "0052_model_version_digest_scope"   # #191 F1, above 0051 (PR #176)
+    assert head.down_revision == "0051_service_credentials"
+    # Narrowing the digest scope cannot be undone; the refusal says why.
+    assert head.irreversible is True
+    assert head.recovery_note and "forward fix" in head.recovery_note.lower()
 
 
 def test_definer_policy_tracks_object_store_locator_head_without_catalog_drift():
     policy = json.loads(
         (ROOT / "tools/definer-policy.json").read_text(encoding="utf-8")
     )
-    assert policy["revision"] == chain()[-1].revision == "0051_service_credentials"
+    assert policy["revision"] == chain()[-1].revision == "0052_model_version_digest_scope"
