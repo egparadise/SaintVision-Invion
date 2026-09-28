@@ -8,8 +8,8 @@ describe('S12-FE: Intranet HTTPS Web Deployment, 5-Node Journey & Training Walkt
       const tls = dm.getTlsDetails();
 
       expect(tls.domain).toBe('saintvision.internal');
-      expect(tls.tlsVersion).toContain('TLSv1.3');
-      expect(tls.cipherSuite).toContain('TLS_AES_256_GCM_SHA384');
+      expect(tls.tlsVersion).toContain('TLSv1.2');
+      expect(tls.cipherSuite).toContain('HIGH:!aNULL:!MD5');
       expect(tls.hstsEnabled).toBe(true);
       expect(tls.sanList).toContain('saintvision.internal');
       expect(tls.sanList).toContain('*.node.saintvision.internal');
@@ -42,8 +42,8 @@ describe('S12-FE: Intranet HTTPS Web Deployment, 5-Node Journey & Training Walkt
       const dm = new DeploymentManager();
       const conf = dm.generateNginxConfig();
 
-      expect(conf).toContain('listen 8443 ssl http2;');
-      expect(conf).toContain('ssl_protocols TLSv1.3;');
+      expect(conf).toContain('listen 443 ssl http2;');
+      expect(conf).toContain('ssl_protocols TLSv1.2 TLSv1.3;');
       expect(conf).toContain('Strict-Transport-Security');
       expect(conf).toContain('proxy_buffering off;');
       expect(conf).toContain('proxy_set_header Upgrade $http_upgrade;');
@@ -69,6 +69,7 @@ describe('S12-FE: Intranet HTTPS Web Deployment, 5-Node Journey & Training Walkt
         expect(node.smokeStatus).toBe('passed');
         expect(node.latencyMs).toBeLessThanOrEqual(30);
         expect(node.roles.length).toBeGreaterThan(0);
+        expect(node.lastVerifiedAt).toBe('2026-09-28T09:00:00Z');
       });
     });
   });
@@ -78,8 +79,8 @@ describe('S12-FE: Intranet HTTPS Web Deployment, 5-Node Journey & Training Walkt
       const dm = new DeploymentManager();
       const manifest = dm.getReleaseManifest();
 
-      expect(manifest.releaseId).toBe('REL-2026-R4-GA');
-      expect(manifest.version).toBe('v1.0.0-final-GA');
+      expect(manifest.releaseId).toBe('REL-2026-PILOT-RC');
+      expect(manifest.version).toBe('v1.0.0-pilot-rc');
       expect(manifest.imageDigest).toMatch(/^sha256:[0-9a-f]{64}$/);
       expect(manifest.totalNodes).toBe(5);
       expect(manifest.smokePassedRatio).toBe(100.0);
@@ -136,10 +137,10 @@ describe('S12-FE: Intranet HTTPS Web Deployment, 5-Node Journey & Training Walkt
       expect(preflight.smokePassedRatio).toBe(100.0);
       expect(preflight.physicalHardwareAcceptance).toBe('pending');
 
-      // Once signed off, physical hardware acceptance transitions to accepted
+      // Software sign-off does NOT auto-accept physical hardware (DEF-S12-16)
       dm.signOffRelease('usr_operator_lead');
       const updated = dm.getPreflightStatus();
-      expect(updated.physicalHardwareAcceptance).toBe('accepted');
+      expect(updated.physicalHardwareAcceptance).toBe('pending');
     });
 
     it('reconciles live cluster node states including draining and observation-only flags', () => {

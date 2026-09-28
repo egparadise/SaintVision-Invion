@@ -22,22 +22,38 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
   useEffect(() => {
     if (currentUser?.id) {
       setOperatorId(currentUser.id);
+    } else {
+      setOperatorId('');
     }
   }, [currentUser]);
 
+  const passedNodesCount = clusterNodes
+    ? nodes.filter((n) => n.smokeStatus === 'passed' && n.liveStatus === 'online').length
+    : 0;
+  const clusterComplianceLabel = clusterNodes && clusterNodes.length > 0
+    ? `${passedNodesCount}/${clusterNodes.length} Nodes PASSED (${Math.round((passedNodesCount / clusterNodes.length) * 100)}%)`
+    : '미측정 (라이브 클러스터 미연결)';
+
   const handleSignOff = () => {
-    if (!operatorId.trim()) {
-      setActionNotice({ type: 'error', text: '서명 실패: 운영자 계정 식별자가 지정되지 않았습니다. 로그인이 필요합니다.' });
+    if (!currentUser) {
+      setActionNotice({ type: 'error', text: '서명 실패: 로그인된 운영자 세션이 없습니다. 로그인이 필요합니다.' });
       return;
     }
-    const res = manager.signOffRelease(operatorId);
+    if (currentUser.role !== 'admin' && currentUser.role !== 'operator') {
+      setActionNotice({
+        type: 'error',
+        text: `서명 실패: 현재 사용자 권한('${currentUser.role}')은 운영 인수 서명 권한이 없습니다. (operator/admin 필요)`,
+      });
+      return;
+    }
+    const res = manager.signOffRelease(currentUser.id, { roles: [currentUser.role] });
     if (!res.success) {
       setActionNotice({ type: 'error', text: `서명 실패: ${res.error}` });
     } else {
       setManifest(res.manifest);
       setActionNotice({
         type: 'success',
-        text: `✔ [모의 시뮬레이션] 최종 프로덕션 릴리스 [${res.manifest.version}]에 대한 운영자 [${operatorId}]의 인수가 로컬 시뮬레이션 승인되었습니다. (백엔드 배포 API 미노출)`,
+        text: `✔ [모의 시뮬레이션] 파일럿 후보 릴리스 [${res.manifest.version}]에 대한 운영자 [${currentUser.id}]의 인수가 로컬 시뮬레이션 서명되었습니다. (백엔드 배포 API 미연결 · 실 환경 미배포)`,
       });
     }
   };
@@ -48,13 +64,45 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
       setTrainingSteps(res.steps);
       setActionNotice({
         type: 'success',
-        text: `✔ 운영 교육 모듈 Step ${stepNumber} 이수가 확인되었습니다.`,
+        text: `✔ [자율 실습 확인] 운영 교육 모듈 Step ${stepNumber} 실습이 확인되었습니다.`,
       });
     }
   };
 
   return (
     <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      {/* DEF-S12-01: Accessible Skip Navigation Link */}
+      <a
+        href="#deployment-main-content"
+        style={{
+          position: 'absolute',
+          left: '-9999px',
+          top: 'auto',
+          width: '1px',
+          height: '1px',
+          overflow: 'hidden',
+          zIndex: 100,
+        }}
+        onFocus={(e) => {
+          e.currentTarget.style.position = 'static';
+          e.currentTarget.style.width = 'auto';
+          e.currentTarget.style.height = 'auto';
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.position = 'absolute';
+          e.currentTarget.style.left = '-9999px';
+          e.currentTarget.style.width = '1px';
+          e.currentTarget.style.height = '1px';
+        }}
+      >
+        본문으로 바로가기
+      </a>
+
+      {/* DEF-S12-02: Heading Level 1 */}
+      <h1 id="deployment-main-content" style={{ fontSize: '20px', fontWeight: 700, color: '#f0f6fc', margin: '0 0 4px 0' }}>
+        내부망 HTTPS 배포 및 운영 인수 검증 (AC-12)
+      </h1>
+
       {/* Unexposed Deployment Notice Banner */}
       <div
         role="status"
@@ -102,22 +150,24 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
       >
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
           <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>내부망 HTTPS 암호화 (AC-12)</div>
-          <div style={{ fontSize: '24px', fontWeight: 700, color: '#3fb950', marginTop: '4px' }}>
-            TLS 1.3 (STRICT)
+          <div style={{ fontSize: '22px', fontWeight: 700, color: '#3fb950', marginTop: '4px' }}>
+            TLS 1.2 / TLSv1.3 협상 (개발용 자체서명 CA)
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>HSTS 365일 &amp; 전용 Enterprise CA</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>HSTS 365일 (개발용 자체서명 CA)</div>
         </div>
 
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
           <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>5대 노드 여정 검증 [AC-12 기준 규격]</div>
-          <div style={{ fontSize: '24px', fontWeight: 700, color: '#3fb950', marginTop: '4px' }}>
-            100% (5/5 PASSED)
+          <div style={{ fontSize: '24px', fontWeight: 700, color: clusterNodes && clusterNodes.length > 0 ? '#3fb950' : '#8b949e', marginTop: '4px' }}>
+            {clusterNodes && clusterNodes.length > 0
+              ? `${Math.round((passedNodesCount / clusterNodes.length) * 100)}% (${passedNodesCount}/${clusterNodes.length} PASSED)`
+              : '미측정 (라이브 클러스터 미연결)'}
           </div>
           <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>Windows 3대 + Linux 2대 통합 여정 규격</div>
         </div>
 
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
-          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>최종 프로덕션 릴리스 (R4)</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>파일럿 후보 릴리스 (Pilot RC)</div>
           <div style={{ fontSize: '24px', fontWeight: 700, color: '#58a6ff', marginTop: '4px' }}>
             {manifest.version}
           </div>
@@ -134,19 +184,22 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
               marginTop: '4px',
             }}
           >
-            {manifest.operatorSignOff ? 'SIGNED-OFF ✔' : 'SIGN-OFF 대기'}
+            {manifest.operatorSignOff ? '모의 서명 완료 ✔' : 'SIGN-OFF 대기'}
           </div>
           <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
-            {manifest.operatorSignOff ? '프로덕션 가동 승인 완료' : '운영자 확인 대기 중'}
+            {manifest.operatorSignOff ? `서명자: ${currentUser?.id || 'usr_operator_lead'}` : '운영자 확인 대기 중'}
           </div>
         </div>
       </div>
 
-      {/* Action Notice */}
+      {/* Dynamic Action Notice */}
       {actionNotice && (
         <div
+          role={actionNotice.type === 'error' ? 'alert' : 'status'}
+          aria-live={actionNotice.type === 'error' ? 'assertive' : 'polite'}
+          data-testid="deployment-action-notice"
           style={{
-            padding: '12px 18px',
+            padding: '12px 16px',
             borderRadius: '6px',
             fontSize: '13px',
             fontWeight: 500,
@@ -187,11 +240,11 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
               PREFLIGHT PASS ✔
             </span>
             <strong style={{ fontSize: '14px', color: '#f0f6fc' }}>
-              내부망 배포 사전 검증 파이프라인 무오류 통과 (202/202 Checks PASS)
+              내부망 배포 사전 검증 파이프라인 [설계 규격 예시 (202개 검증 항목)]
             </strong>
           </div>
           <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
-            Nginx TLS 1.3 Strict, SSE 버퍼링 차단, PTY 30초 일회용 티켓, ADR-038 노드 Drain 및 제어 평면 게이트웨이 라이브 프로브(HTTP 200) 검증 완료
+            [사전 설계 규격 항목] Nginx TLS 1.2/1.3 협상, SSE 버퍼링 차단, PTY 30초 일회용 티켓, ADR-038 노드 Drain (게이트웨이 실시간 프로브 미연결)
           </p>
         </div>
         <div style={{ textAlign: 'right', flexShrink: 0 }}>
@@ -205,157 +258,13 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
             }}
           >
             {manifest.operatorSignOff
-              ? '운영자 인수 완료 (docker compose up -d 가능)'
+              ? '모의 인수 절차 확인됨 (온프레미스 실장비 기동 별도 필요)'
               : '현장 운영자 인수 대기 (Pending Acceptance)'}
           </div>
         </div>
       </div>
 
-      {/* Section 1: TLS 1.3 & Nginx Reverse Proxy Architecture */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-        {/* Left: TLS Certificate Inspector */}
-        <div
-          style={{
-            backgroundColor: '#161b22',
-            border: '1px solid #30363d',
-            borderRadius: '8px',
-            padding: '20px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '14px',
-          }}
-        >
-          <div>
-            <h3 style={{ margin: 0, fontSize: '16px', color: '#f0f6fc' }}>
-              내부망 전용 TLS 인증서 정보 (AC-12)
-            </h3>
-            <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
-              격리 폐쇄망 내부 도메인 보안 및 HSTS 강제 암호화
-            </p>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #21262d', paddingBottom: '6px' }}>
-              <span style={{ color: '#8b949e' }}>도메인 (Domain)</span>
-              <strong style={{ color: '#58a6ff' }}>{tls.domain}</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #21262d', paddingBottom: '6px' }}>
-              <span style={{ color: '#8b949e' }}>발급 기관 (Issuer)</span>
-              <span style={{ color: '#c9d1d9' }}>{tls.issuer}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #21262d', paddingBottom: '6px' }}>
-              <span style={{ color: '#8b949e' }}>프로토콜 및 암호군</span>
-              <span style={{ color: '#3fb950', fontWeight: 600 }}>{tls.tlsVersion} · {tls.cipherSuite}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #21262d', paddingBottom: '6px' }}>
-              <span style={{ color: '#8b949e' }}>HSTS 보안 헤더</span>
-              <span style={{ color: '#3fb950', fontWeight: 600 }}>활성화 (31,536,000초 / includeSubDomains)</span>
-            </div>
-            <div>
-              <span style={{ color: '#8b949e' }}>주체 대체 이름 (SAN 목록):</span>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
-                {tls.sanList.map((san) => (
-                  <span
-                    key={san}
-                    style={{
-                      padding: '2px 8px',
-                      backgroundColor: '#21262d',
-                      borderRadius: '4px',
-                      fontSize: '11px',
-                      color: '#f0f6fc',
-                      fontFamily: 'var(--font-mono, monospace)',
-                    }}
-                  >
-                    {san}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right: Nginx Reverse Proxy Routing */}
-        <div
-          style={{
-            backgroundColor: '#161b22',
-            border: '1px solid #30363d',
-            borderRadius: '8px',
-            padding: '20px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '14px',
-          }}
-        >
-          <div>
-            <h3 style={{ margin: 0, fontSize: '16px', color: '#f0f6fc' }}>
-              Nginx 단일 오리진 라우팅 매트릭스
-            </h3>
-            <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
-              동일 Origin (`:8443`) 기반 정적 SPA, REST API, SSE 스트리밍, PTY 웹소켓
-            </p>
-          </div>
-
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', color: '#c9d1d9' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
-                <th style={{ padding: '6px 8px' }}>Location</th>
-                <th style={{ padding: '6px 8px' }}>Target</th>
-                <th style={{ padding: '6px 8px' }}>Protocol</th>
-                <th style={{ padding: '6px 8px' }}>버퍼링/헤더</th>
-              </tr>
-            </thead>
-            <tbody>
-              {nginxRules.map((rule) => (
-                <tr key={rule.location} style={{ borderBottom: '1px solid #21262d' }}>
-                  <td style={{ padding: '6px 8px', fontWeight: 600, color: '#58a6ff' }}>{rule.location}</td>
-                  <td style={{ padding: '6px 8px', fontFamily: 'monospace', color: '#8b949e' }}>{rule.targetUpstream}</td>
-                  <td style={{ padding: '6px 8px' }}>
-                    <span
-                      style={{
-                        padding: '1px 6px',
-                        borderRadius: '4px',
-                        fontSize: '10px',
-                        fontWeight: 700,
-                        backgroundColor: rule.protocol === 'SSE' ? 'rgba(56, 139, 253, 0.2)' : 'rgba(46, 160, 67, 0.2)',
-                        color: rule.protocol === 'SSE' ? '#58a6ff' : '#3fb950',
-                      }}
-                    >
-                      {rule.protocol}
-                    </span>
-                  </td>
-                  <td style={{ padding: '6px 8px', color: '#8b949e' }}>
-                    {rule.bufferingOff ? 'Buffering OFF' : 'Standard'}
-                    {rule.upgradeHeader && ' / Upgrade: ws'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          <details style={{ marginTop: 'auto' }}>
-            <summary style={{ cursor: 'pointer', fontSize: '12px', color: '#58a6ff', fontWeight: 600 }}>
-              ▶ 배포용 nginx.conf 구성 파일 전문 보기
-            </summary>
-            <pre
-              style={{
-                backgroundColor: '#0d1117',
-                border: '1px solid #30363d',
-                borderRadius: '6px',
-                padding: '10px',
-                fontSize: '11px',
-                color: '#8b949e',
-                overflowX: 'auto',
-                maxHeight: '180px',
-                marginTop: '8px',
-              }}
-            >
-              {nginxConfig}
-            </pre>
-          </details>
-        </div>
-      </div>
-
-      {/* Section 2: 5-Node Journey & Smoke Test Matrix (AC-12) */}
+      {/* Section 1: TLS Certificate & Nginx Reverse Proxy Details */}
       <div
         style={{
           backgroundColor: '#161b22',
@@ -364,19 +273,191 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
           padding: '20px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '14px',
+          gap: '16px',
         }}
       >
         <div>
           <h3 style={{ margin: 0, fontSize: '16px', color: '#f0f6fc' }}>
-            5대 노드 분산 클러스터 전수 여정 검증 (AC-12 5-Node Journey)
+            내부망 전용 TLS 인증서 정보 (AC-12) [정적 구성 예시 (실시간 인증서 조회 아님)]
           </h3>
           <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
-            Control Plane부터 GPU 가속 추론 및 빌드 팜까지 5대 장비의 기능 여정과 Smoke 테스트 결과
+            격리 폐쇄망 내부 도메인 보안 및 HSTS 강제 암호화
           </p>
         </div>
 
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: '12px',
+            backgroundColor: '#0d1117',
+            padding: '16px',
+            borderRadius: '6px',
+            border: '1px solid #30363d',
+            fontSize: '12px',
+          }}
+        >
+          <div>
+            <div style={{ color: '#8b949e' }}>도메인 (Domain)</div>
+            <div style={{ color: '#f0f6fc', fontWeight: 600, marginTop: '2px' }}>{tls.domain}</div>
+          </div>
+          <div>
+            <div style={{ color: '#8b949e' }}>발급 기관 (Issuer)</div>
+            <div style={{ color: '#f0f6fc', fontWeight: 600, marginTop: '2px' }}>{tls.issuer}</div>
+          </div>
+          <div>
+            <div style={{ color: '#8b949e' }}>프로토콜 및 암호군</div>
+            <div style={{ color: '#3fb950', fontWeight: 600, marginTop: '2px' }}>
+              {tls.tlsVersion} · {tls.cipherSuite}
+            </div>
+          </div>
+          <div>
+            <div style={{ color: '#8b949e' }}>HSTS 보안 헤더</div>
+            <div style={{ color: '#3fb950', fontWeight: 600, marginTop: '2px' }}>
+              {tls.hstsEnabled ? '활성화 (31,536,000초 / includeSubDomains)' : '비활성'}
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginBottom: '6px' }}>
+            주체 대체 이름 (SAN 목록):
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+            {tls.sanList.map((san) => (
+              <span
+                key={san}
+                style={{
+                  fontSize: '11px',
+                  fontFamily: 'monospace',
+                  padding: '2px 8px',
+                  borderRadius: '4px',
+                  backgroundColor: '#21262d',
+                  color: '#58a6ff',
+                  border: '1px solid #30363d',
+                }}
+              >
+                {san}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Nginx Routing Table */}
+        <div>
+          <h4 style={{ margin: '12px 0 8px 0', fontSize: '13px', color: '#f0f6fc' }}>
+            Nginx 단일 오리진 라우팅 매트릭스
+          </h4>
+          <p style={{ margin: '0 0 10px 0', fontSize: '11px', color: '#8b949e' }}>
+            동일 Origin (<code>:443 또는 :8443</code>) 기반 정적 SPA, REST API, SSE 스트리밍, PTY 웹소켓
+          </p>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
+                <th style={{ padding: '8px' }}>Location</th>
+                <th style={{ padding: '8px' }}>Target</th>
+                <th style={{ padding: '8px' }}>Protocol</th>
+                <th style={{ padding: '8px' }}>버퍼링/헤더</th>
+              </tr>
+            </thead>
+            <tbody>
+              {nginxRules.map((rule) => (
+                <tr key={rule.location} style={{ borderBottom: '1px solid #21262d' }}>
+                  <td style={{ padding: '8px', fontFamily: 'monospace', color: '#58a6ff' }}>{rule.location}</td>
+                  <td style={{ padding: '8px', color: '#8b949e' }}>{rule.targetUpstream}</td>
+                  <td style={{ padding: '8px' }}>
+                    <span
+                      style={{
+                        padding: '1px 6px',
+                        borderRadius: '3px',
+                        fontSize: '11px',
+                        backgroundColor:
+                          rule.protocol === 'WebSocket'
+                            ? 'rgba(163, 113, 247, 0.2)'
+                            : rule.protocol === 'SSE'
+                            ? 'rgba(56, 139, 253, 0.2)'
+                            : 'rgba(46, 160, 67, 0.2)',
+                        color:
+                          rule.protocol === 'WebSocket'
+                            ? '#a371f7'
+                            : rule.protocol === 'SSE'
+                            ? '#58a6ff'
+                            : '#3fb950',
+                      }}
+                    >
+                      {rule.protocol}
+                    </span>
+                  </td>
+                  <td style={{ padding: '8px', color: '#8b949e' }}>
+                    {rule.bufferingOff && 'Buffering OFF'}
+                    {rule.upgradeHeader && ' / Upgrade: ws'}
+                    {!rule.bufferingOff && !rule.upgradeHeader && 'Standard'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Nginx Config Code Block */}
+        <details style={{ marginTop: '8px', fontSize: '12px' }}>
+          <summary style={{ cursor: 'pointer', color: '#58a6ff' }}>
+            ▶ 배포용 nginx.conf 구성 파일 전문 보기 (실제 apps/web/nginx.conf 정합)
+          </summary>
+          <pre
+            style={{
+              marginTop: '8px',
+              backgroundColor: '#0d1117',
+              border: '1px solid #30363d',
+              borderRadius: '6px',
+              padding: '12px',
+              overflowX: 'auto',
+              fontSize: '11px',
+              color: '#c9d1d9',
+              lineHeight: 1.5,
+            }}
+          >
+            {nginxConfig}
+          </pre>
+        </details>
+      </div>
+
+      {/* Section 2: 5-Node Journey & Smoke Verification Table (AC-12) */}
+      <div
+        style={{
+          backgroundColor: '#161b22',
+          border: '1px solid #30363d',
+          borderRadius: '8px',
+          padding: '20px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '16px',
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h3 style={{ margin: 0, fontSize: '16px', color: '#f0f6fc' }}>
+              5-Node 통합 여정 및 Smoke 검증 매트릭스 (AC-12)
+            </h3>
+            <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
+              Windows/Linux 혼합 노드 여정, 역할 격리, mTLS 보안 통신 및 저지연 상태
+            </p>
+          </div>
+          <span
+            style={{
+              padding: '3px 10px',
+              borderRadius: '4px',
+              fontSize: '12px',
+              fontWeight: 600,
+              backgroundColor: clusterNodes && clusterNodes.length > 0 ? 'rgba(46, 160, 67, 0.2)' : 'rgba(139, 148, 158, 0.2)',
+              color: clusterNodes && clusterNodes.length > 0 ? '#3fb950' : '#8b949e',
+            }}
+          >
+            {clusterComplianceLabel}
+          </span>
+        </div>
+
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
               <th style={{ padding: '8px' }}>Node ID / Hostname</th>
@@ -390,7 +471,7 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
           </thead>
           <tbody>
             {nodes.map((node) => (
-              <tr key={node.nodeId} style={{ borderBottom: '1px solid #21262d' }}>
+              <tr key={node.nodeId} data-testid={`node-row-${node.nodeId}`} style={{ borderBottom: '1px solid #21262d' }}>
                 <td style={{ padding: '10px 8px' }}>
                   <div style={{ fontWeight: 600, color: '#f0f6fc' }}>{node.hostname}</div>
                   <div style={{ fontSize: '11px', color: '#8b949e', fontFamily: 'monospace' }}>{node.nodeId}</div>
@@ -398,11 +479,12 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
                 <td style={{ padding: '10px 8px' }}>
                   <span
                     style={{
-                      padding: '2px 6px',
+                      padding: '2px 8px',
                       borderRadius: '4px',
                       fontSize: '11px',
-                      backgroundColor: node.os === 'windows' ? 'rgba(56, 139, 253, 0.15)' : 'rgba(210, 153, 34, 0.15)',
-                      color: node.os === 'windows' ? '#58a6ff' : '#d29922',
+                      fontWeight: 600,
+                      backgroundColor: node.os === 'windows' ? 'rgba(56, 139, 253, 0.2)' : 'rgba(219, 109, 40, 0.2)',
+                      color: node.os === 'windows' ? '#58a6ff' : '#f0883e',
                     }}
                   >
                     {node.os.toUpperCase()}
@@ -410,35 +492,32 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
                 </td>
                 <td style={{ padding: '10px 8px' }}>
                   {node.liveStatus ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                      <span
-                        style={{
-                          padding: '2px 6px',
-                          borderRadius: '4px',
-                          fontSize: '11px',
-                          fontWeight: 700,
-                          backgroundColor:
-                            node.liveStatus === 'draining'
-                              ? 'rgba(210, 153, 34, 0.2)'
-                              : node.liveStatus === 'online'
-                              ? 'rgba(46, 160, 67, 0.2)'
-                              : 'rgba(248, 81, 73, 0.2)',
-                          color:
-                            node.liveStatus === 'draining'
-                              ? '#d29922'
-                              : node.liveStatus === 'online'
-                              ? '#3fb950'
-                              : '#f85149',
-                        }}
-                      >
-                        {node.liveStatus === 'draining' ? 'DRAINING (스케줄 배제)' : node.liveStatus.toUpperCase()}
-                      </span>
-                      {node.liveObservationOnly && (
-                        <span style={{ fontSize: '10px', color: '#8b949e' }}>관측 전용 (.225)</span>
-                      )}
-                    </div>
+                    <span
+                      style={{
+                        padding: '2px 8px',
+                        borderRadius: '4px',
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        backgroundColor:
+                          node.liveStatus === 'online'
+                            ? 'rgba(46, 160, 67, 0.2)'
+                            : node.liveStatus === 'draining'
+                            ? 'rgba(210, 153, 34, 0.2)'
+                            : 'rgba(248, 81, 73, 0.2)',
+                        color:
+                          node.liveStatus === 'online'
+                            ? '#3fb950'
+                            : node.liveStatus === 'draining'
+                            ? '#d29922'
+                            : '#f85149',
+                      }}
+                    >
+                      {node.liveStatus.toUpperCase()}
+                      {node.liveIsDraining && ' (Draining)'}
+                      {node.liveObservationOnly && ' (Obs-Only)'}
+                    </span>
                   ) : (
-                    <span style={{ fontSize: '11px', color: '#8b949e' }}>아키텍처 규격 노드</span>
+                    <span style={{ color: '#8b949e', fontSize: '12px' }}>미측정 (미연결)</span>
                   )}
                 </td>
                 <td style={{ padding: '10px 8px' }}>
@@ -459,23 +538,40 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
                     ))}
                   </div>
                 </td>
-                <td style={{ padding: '10px 8px', color: '#3fb950', fontWeight: 600 }}>{node.latencyMs} ms</td>
+                <td style={{ padding: '10px 8px', color: node.smokeStatus === 'passed' && (!node.liveStatus || node.liveStatus === 'online') ? '#3fb950' : '#8b949e', fontWeight: 600 }}>
+                  {node.smokeStatus === 'passed' && (!node.liveStatus || node.liveStatus === 'online') ? `${node.latencyMs} ms` : '미측정'}
+                </td>
                 <td style={{ padding: '10px 8px' }}>
                   <span
+                    aria-label={`Smoke status: ${node.smokeStatus}`}
                     style={{
                       padding: '2px 8px',
                       borderRadius: '4px',
                       fontSize: '11px',
                       fontWeight: 700,
-                      backgroundColor: 'rgba(46, 160, 67, 0.2)',
-                      color: '#3fb950',
+                      backgroundColor:
+                        node.smokeStatus === 'passed' && (!node.liveStatus || node.liveStatus === 'online')
+                          ? 'rgba(46, 160, 67, 0.2)'
+                          : node.liveStatus === 'offline' || node.smokeStatus === 'failed'
+                          ? 'rgba(248, 81, 73, 0.2)'
+                          : 'rgba(139, 148, 158, 0.2)',
+                      color:
+                        node.smokeStatus === 'passed' && (!node.liveStatus || node.liveStatus === 'online')
+                          ? '#3fb950'
+                          : node.liveStatus === 'offline' || node.smokeStatus === 'failed'
+                          ? '#f85149'
+                          : '#8b949e',
                     }}
                   >
-                    PASSED ✔
+                    {node.smokeStatus === 'passed' && (!node.liveStatus || node.liveStatus === 'online')
+                      ? 'PASSED ✔'
+                      : node.liveStatus === 'offline' || node.smokeStatus === 'failed'
+                      ? 'FAILED ✘'
+                      : '미측정'}
                   </span>
                 </td>
                 <td style={{ padding: '10px 8px', fontSize: '12px', color: '#8b949e' }}>
-                  {new Date(node.lastVerifiedAt).toLocaleTimeString()}
+                  {node.lastVerifiedAt ? `${node.lastVerifiedAt} (기준 시각)` : '미측정'}
                 </td>
               </tr>
             ))}
@@ -483,7 +579,7 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
         </table>
       </div>
 
-      {/* Section 3: Release Manifest & Operator GA Sign-off (AC-12) */}
+      {/* Section 3: Release Manifest & Operator Sign-off Workflow (AC-12) */}
       <div
         style={{
           backgroundColor: '#161b22',
@@ -498,7 +594,7 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h3 style={{ margin: 0, fontSize: '16px', color: '#f0f6fc' }}>
-              프로덕션 릴리스 선언서 (Release Manifest R4) 및 운영자 인수 서명
+              모의 릴리스 선언서 (Release Manifest Pilot RC) 및 운영자 인수 서명
             </h3>
             <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
               품질 게이트 G0~G6 인수 및 배포용 아티팩트의 불변 다이제스트
@@ -510,8 +606,10 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
               type="text"
               data-testid="deployment-operator-id-input"
               value={operatorId}
+              readOnly={true}
               onChange={(e) => setOperatorId(e.target.value)}
               placeholder="운영자 계정 ID"
+              title={currentUser ? '운영자 ID는 로그인된 세션 계정으로 고정됩니다' : '운영자 계정 ID'}
               style={{
                 backgroundColor: '#0d1117',
                 border: '1px solid #30363d',
@@ -519,25 +617,32 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
                 padding: '6px 12px',
                 fontSize: '13px',
                 color: '#f0f6fc',
+                opacity: currentUser ? 0.8 : 1,
               }}
             />
             <Button
               data-testid="deployment-signoff-btn"
               variant={manifest.operatorSignOff ? 'secondary' : 'primary'}
               onClick={handleSignOff}
-              disabled={manifest.operatorSignOff || !operatorId.trim()}
+              disabled={manifest.operatorSignOff || !currentUser}
               title={
-                !operatorId.trim()
+                !currentUser
                   ? '운영자 계정 로그인이 필요합니다'
+                  : currentUser.role !== 'admin' && currentUser.role !== 'operator'
+                  ? '운영자 권한(operator/admin)이 필요합니다'
                   : manifest.operatorSignOff
                   ? '이미 인수가 서명되었습니다'
-                  : '프로덕션 운영 인수를 로컬 시뮬레이션 서명합니다'
+                  : '파일럿 운영 인수를 로컬 시뮬레이션 서명합니다'
               }
-              aria-disabled={manifest.operatorSignOff || !operatorId.trim() ? 'true' : 'false'}
+              aria-disabled={manifest.operatorSignOff || !currentUser ? 'true' : 'false'}
             >
-              {manifest.operatorSignOff ? '✔ 서명 완료됨' : '최종 운영 인수 서명'}
+              {manifest.operatorSignOff ? '✔ 모의 서명 완료됨' : '운영 인수 모의 서명'}
             </Button>
           </div>
+        </div>
+
+        <div data-testid="deployment-manifest-static-banner" style={{ fontSize: '11px', color: '#8b949e', marginBottom: '-4px' }}>
+          [정적 픽스처 / 백엔드 릴리스 매니페스트 REST API 미연결]
         </div>
 
         <div
@@ -554,43 +659,39 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
         >
           <div>
             <div style={{ color: '#8b949e' }}>Release Version</div>
-            <div style={{ fontWeight: 700, color: '#f0f6fc', fontSize: '14px', marginTop: '2px' }}>
-              {manifest.version}
-            </div>
+            <div style={{ color: '#58a6ff', fontWeight: 600, marginTop: '2px' }}>{manifest.version}</div>
           </div>
           <div>
             <div style={{ color: '#8b949e' }}>Immutable Image Digest</div>
-            <div style={{ fontFamily: 'monospace', color: '#58a6ff', marginTop: '2px', wordBreak: 'break-all' }}>
+            <div style={{ color: '#f0f6fc', fontFamily: 'monospace', fontSize: '11px', marginTop: '2px', wordBreak: 'break-all' }}>
               {manifest.imageDigest}
             </div>
           </div>
           <div>
             <div style={{ color: '#8b949e' }}>Git Commit SHA</div>
-            <div style={{ fontFamily: 'monospace', color: '#f0f6fc', marginTop: '2px' }}>
-              <code>{manifest.builtCommitSha}</code>
-            </div>
+            <div style={{ color: '#f0f6fc', fontFamily: 'monospace', marginTop: '2px' }}>{manifest.builtCommitSha}</div>
           </div>
           <div>
             <div style={{ color: '#8b949e' }}>클러스터 적합성</div>
-            <div style={{ color: '#3fb950', fontWeight: 600, marginTop: '2px' }}>
-              5/5 Nodes PASSED (100%)
+            <div style={{ color: clusterNodes && clusterNodes.length > 0 ? '#3fb950' : '#8b949e', fontWeight: 600, marginTop: '2px' }}>
+              {clusterComplianceLabel}
             </div>
           </div>
         </div>
 
         <div>
           <h4 style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#f0f6fc' }}>
-            알려진 제한 사항 (Known Limitations &amp; Operating Boundary):
+            알려진 제한 사항 (Known Limitations & Operating Boundary):
           </h4>
           <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '12px', color: '#8b949e', display: 'flex', flexDirection: 'column', gap: '4px' }}>
             {manifest.knownLimitations.map((lim, idx) => (
-              <li key={idx} style={{ color: '#c9d1d9' }}>{lim}</li>
+              <li key={idx}>{lim}</li>
             ))}
           </ul>
         </div>
       </div>
 
-      {/* Section 4: Operator Training & Education Walkthrough Guide */}
+      {/* Section 4: Operator Training & Education Walkthrough */}
       <div
         style={{
           backgroundColor: '#161b22',
@@ -599,22 +700,23 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
           padding: '20px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '14px',
+          gap: '16px',
         }}
       >
         <div>
           <h3 style={{ margin: 0, fontSize: '16px', color: '#f0f6fc' }}>
-            운영자 교육 및 훈련 가이드 (AC-12 Operator Training)
+            운영자 실무 교육 훈련 모듈 (AC-12 Walkthrough)
           </h3>
           <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
-            장애 복구, 승인 체계, 응급 차단 및 롤백 절차를 실제 시스템에서 검증하는 단계별 훈련 프로그램
+            현장 운영자의 L0~L3 거버넌스, 배치 정책, Kill Switch, 무중단 롤백 자율 실습
           </p>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {trainingSteps.map((step) => (
             <div
               key={step.stepNumber}
+              data-testid={`training-step-${step.stepNumber}`}
               style={{
                 backgroundColor: '#0d1117',
                 border: '1px solid #30363d',
@@ -626,27 +728,27 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
                 gap: '16px',
               }}
             >
-              <div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span
                     style={{
                       width: '22px',
                       height: '22px',
                       borderRadius: '50%',
-                      backgroundColor: '#21262d',
-                      color: '#58a6ff',
-                      display: 'inline-flex',
+                      backgroundColor: step.status === 'completed' ? '#238636' : '#8b949e',
+                      color: '#ffffff',
+                      display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '12px',
+                      fontSize: '11px',
                       fontWeight: 700,
                     }}
                   >
                     {step.stepNumber}
                   </span>
-                  <strong style={{ fontSize: '14px', color: '#f0f6fc' }}>{step.title}</strong>
+                  <strong style={{ fontSize: '13px', color: '#f0f6fc' }}>{step.title}</strong>
                 </div>
-                <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px', marginLeft: '30px' }}>
+                <div style={{ fontSize: '12px', color: '#8b949e', marginLeft: '30px' }}>
                   {step.description}
                 </div>
                 <div style={{ fontSize: '11px', color: '#58a6ff', marginTop: '2px', marginLeft: '30px' }}>
@@ -654,21 +756,27 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
                 </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
                 <span
                   style={{
-                    padding: '3px 10px',
+                    padding: '2px 8px',
                     borderRadius: '4px',
                     fontSize: '11px',
                     fontWeight: 700,
-                    backgroundColor: 'rgba(46, 160, 67, 0.2)',
-                    color: '#3fb950',
+                    backgroundColor: step.status === 'completed' ? 'rgba(46, 160, 67, 0.2)' : 'rgba(139, 148, 158, 0.2)',
+                    color: step.status === 'completed' ? '#3fb950' : '#8b949e',
                   }}
                 >
-                  COMPLETED ✔
+                  {step.status === 'completed' ? 'COMPLETED ✔' : 'PENDING'}
                 </span>
-                <Button size="sm" variant="secondary" onClick={() => handleCompleteStep(step.stepNumber)}>
-                  재실습 완료
+                <Button
+                  data-testid={`training-complete-btn-${step.stepNumber}`}
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => handleCompleteStep(step.stepNumber)}
+                  disabled={step.status === 'completed'}
+                >
+                  {step.status === 'completed' ? '실습 완료됨' : '실습 완료 확인'}
                 </Button>
               </div>
             </div>

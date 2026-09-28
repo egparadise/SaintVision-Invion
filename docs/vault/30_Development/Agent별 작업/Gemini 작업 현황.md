@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.121"
+version: "1.0.122"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-23T10:30:00+09:00"
+updated: "2026-09-28T12:20:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,27 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-23T10:30:00+09:00 (최신 tip `fdd4a895`, 작업 브랜치 `agent/gemini/s04-fe-matrix-measured`).
+- 확인 기준: 2026-09-28T12:20:00+09:00 (작업 브랜치 `agent/gemini/s12-fe-fixes`).
+
+## 2026-09-28 S12-FE 제품 결함 DEF-S12-01~18 치유 완결 (apps/web 및 시험 100% 통과, `agent/gemini/s12-fe-fixes`)
+
+- **작업 개요**: 승인된 PR #156 (S12-FE 시나리오 매트릭스 v1.0.4, `6057936e`)의 18대 제품 결함(DEF-S12-01 ~ DEF-S12-18)을 전수 치유.
+- **주요 수정 내역**:
+  - **DEF-S12-18**: 운영자 ID 입력란을 `currentUser.id`로 고정(`readOnly={true}`), 미인증 세션 시 버튼 비활성화(`disabled`), `currentUser.role`이 `admin` 또는 `operator`가 아니면 서명 거부 및 role="alert" 통지, 성공 시 `[모의 시뮬레이션]` 고지 부여 및 `SIGNED-OFF ✔` / `프로덕션 가동 승인 완료` 허위 라벨 완전 제거.
+  - **DEF-S12-11**: `generateNginxConfig()` 및 `nginxRules`를 실제 `apps/web/nginx.conf` (`listen 443`, `http://control-plane:8080`, `ssl_protocols TLSv1.2 TLSv1.3`, `ssl_ciphers HIGH:!aNULL:!MD5;`, `include /etc/nginx/security-headers.conf;`)와 1:1로 정합.
+  - **DEF-S12-09·10·13**: 허위 `TLS 1.3 (STRICT)` 및 `전용 Enterprise CA`를 `TLS 1.2 / TLSv1.3 협상 (개발용 자체서명 CA)`로 교정, 인증서 패널에 `[정적 구성 예시 (실시간 인증서 조회 아님)]`, 게이트웨이 프로브에 `[사전 설계 규격 항목] ... (게이트웨이 실시간 프로브 미연결)` 안내 추가.
+  - **DEF-S12-12·14·15**: 클러스터 적합성을 라이브 노드 온라인/합격 수 기반 동적 계산(미연결 시 `미측정 (라이브 클러스터 미연결)`), 동적 `Date.now()`를 고정 기준 시각(`2026-09-28T09:00:00Z`)으로 정정, 릴리스 라벨을 `REL-2026-PILOT-RC` / `v1.0.0-pilot-rc` (파일럿 후보 릴리스)로 하향.
+  - **DEF-S12-16·17**: 소프트웨어 서명 후에도 `physicalHardwareAcceptance`는 `'pending'`을 유지(물리 현장 실물 검수 전제 분리), 훈련 완료 시 `[자율 실습 확인]` 고지 부여.
+  - **DEF-S12-01~08**: 스킵 링크 `<a href="#deployment-main-content">` 및 `<h1 id="deployment-main-content">` 접근성 계층 추가, 노드 테이블 `data-testid` 및 `aria-label` 바인딩, 훈련 단계 `COMPLETED ✔` vs `PENDING` 바인딩, 기존 시험(`intranet-deployment.test.ts`, `deployment-release-integrity-wiring.test.tsx`, `browser-matrix-acceptance.test.tsx`) 갱신 및 신규 18대 결함 전용 검증 스위트(`s12-defect-fixes.test.tsx`, 15개 시험) 착지.
+- **검증 실측 증거**:
+  - `npx vitest run`: **79개 파일 690개 시험 100% 통과 (690 passed, 0 failed)**.
+  - `npx tsc -b`: **타입 에러 0건 (Zero errors, exit 0)**.
+  - `npm run build`: **프로덕션 번들 빌드 성공 (7.11초, exit 0)**.
+  - `pytest tests/test_route_coverage.py`: **39 passed in 1.38s (exit 0)**.
+  - `python tools/check_frontend_integrity.py`: **83개 소스 대상 9대 무결성 규칙 전수 준수 (0 violations, exit 0)**.
+  - `python tools/check_contract_bindings.py`: **54 fixtures / 19 kernel types / 25 anchor sites 통과 (exit 0)**.
+- **정본 기록**: [[2026-09-28_12-20-00_KST_S12_FE_Gemini_제품결함_수정]]
+- **다음 행동 및 담당**: Claude UI 경로 축 및 Codex 계약 축 독립 검토 요청.
 
 ## 2026-09-23 S04-FE Claude 리뷰 F1~F5 전수 조치 및 정직 증거 갱신 (`agent/gemini/s04-fe-matrix-measured`)
 
