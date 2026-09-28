@@ -47,6 +47,11 @@ source_of_truth: "Git"
 - Claude r2 N1을 반영해 raw 22-case universe를 PG-free 12개와 hosted 10개 실행 subset으로 분리하고 각각 identity SHA를 고정했다. 한 계층 run이 다른 계층 case를 실행하지 않아도 누락이 아니다.
 - storage-only evidence로 AC-11 `long-soak`을 닫던 우회를 없앴다. PG-free·hosted·물리 storage는 모두 reference-only이며, 열·전원·NTP·스위치·WAN·원격 WS를 포함한 composite target 승인 전 `long-soak=NOT_REGISTERED`다. registry patch는 PITR target 교체만 제안한다.
 - physical storage와 PITR은 부류별 identity·recovery를 요구하고, Local byte 변조는 read 전 mode 복원, metric 계수 의미, 선행 카드 `CARD-S11-AC11-REGISTRY-REPIN-01`을 명시했다. target source는 commit `3363ab77…`·blob `421d4d3a…`로 고정했고 문서·bindings·ontology·ratchet 게이트는 exit 0이다. 공개 계약·migration·registry 상태는 불변이며 S11-ST `planned`, 측정 `NOT_OBSERVED`; push 뒤 Claude 재검토를 요청한다. [[S11-ST_손상_용량_backup_장애시험_설계]], [[S11_ST_storage_failure_target_v0]], [[2026-09-28_14-16-18_KST_S11-ST_손상_용량_backup_장애시험_설계_Codex]].
+## 2026-09-28 S01-BE·S01-ST 준비 상태 preflight — 검토 요청
+
+- base `1e8baf04`, branch `agent/codex/s01-readiness-preflight`, 구현 `c959e158`, owner Codex/reviewer Claude. U1~U6이 들어오면 health/ready/session 200·401, CA→Node chain, DNS, 5 Node inventory lint, pilot PG capability 대조를 한 번에 수행하는 read-only 수집기를 추가했다.
+- 출력은 PASS/FAIL/BLOCKED와 개수·불리언만 포함한다. token/DSN/URL/hostname/IP/Node·tenant ID/fingerprint/path/인증서·예외 원문을 배제하고 stale output을 선삭제한다. DB는 repeatable-read read-only·2초 timeout·tenant scope SELECT만 쓴다.
+- Claude 1차 검토의 null fail-open·보호 입력 선삭제·비제품 인증서 identity·health 표면 혼합·`nodes:null`·redaction 시험 공백을 `15f84413`에서 보정했다. r2 조건의 무입력 실제 probe 7건/U1~U6 전부 BLOCKED·exit 2와 `PYTHONPATH` 없는 CLI help도 추가해 focused 25 passed다. 제품 `certificate_identity`와 pilot 형식 5장을 결속하고 1/5는 BLOCKED로 고정했으며 Node/HTTP CA 분리와 평문 토큰 거부를 추가했다. 표준 게이트 재실행 후 Claude 재검토가 다음이며, 현재 실 inventory·token은 합성하지 않아 S01 합격을 주장하지 않는다. [[S01 준비 상태 preflight 수집기 설계]], [[2026-09-28_05-45-04_KST_S01_준비상태_preflight_Codex_구현]].
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 
