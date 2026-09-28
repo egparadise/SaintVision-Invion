@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-2026-09-28-S10-BE-MLFLOW-MIRROR-IMPL-2"
 title: "S10-BE MLflow 미러 구현 2단계 — 실 MLflow REST sink(push-only, transport seam, TRACK 매핑, provider 문구 비노출), tenant 범위 service credential 계약(0051, 0035 경계), worker 경로(credential→sink→deliver_intent, 부재·거부는 NOT_OBSERVED·refused), PG-free fake transport 20 + 실 PG 24 + opt-in run-mlflow live lane (카드 bh, PR #172 위 stack)"
-version: "1.2.1"
+version: "1.2.2"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T13:40:09+09:00"
+updated: "2026-09-28T14:04:26+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "41256e4f"
@@ -63,3 +63,7 @@ hosted(head 6cfe4a76): Backend run **36376369209** 3.12 = **3249 passed / 50 ski
 ### 5.1 Codex r2 — trigger 분리 (v1.2.1, 2026-09-28T13:40:09+09:00)
 
 hosted(39f1a9da): mlflow-live run 36377857338 **3 passed**(version·conformance·roundtrip). Backend 3.14 job 108787266063 **7 failed / 3287 passed / 50 skipped / 2 deselected**: 공유 trigger가 versions row에서도 `OLD.enabled`를 평가(PL/pgSQL은 `TG_TABLE_NAME = … AND` 뒤 field 접근을 건너뛰지 않음) → `record "old" has no field "enabled"`. 반영: **함수 2개로 분리** — `service_credential_revocation_forward`(revoked_at만; 두 table에 `BEFORE UPDATE OF revoked_at`)와 `service_credential_grant_disable_forward`(enabled만; grants에 `BEFORE UPDATE OF enabled`). 시험: table별 순방향 5 parametrize(versions revoke, grants revoke, grants disable, 멱등, 동시) + 기존 역행 거부 5(두 table 각각) 유지.
+
+### 5.2 hosted run 36379482254(head 5886921c) — exact skip-map (v1.2.2, 2026-09-28T14:04:26+09:00)
+
+Backend 3.12·3.14 모두 **3298 passed / 50 skipped / 2 deselected / 0 failed**, mlflow-live 3 passed. job이 red인 이유는 시험이 아니라 post-test **exact skip-map 단언**: `tests/integration/test_mlflow_live_conformance.py`가 이 job에서 `Set INV_MLFLOW_LIVE_URI (the run-mlflow lane starts the server)` 사유로 3 skip → 고정 map(47)과 불일치. 반영: `backend.yml`·`core.yml`의 `expected_skips`에 그 사유 **3**을 추가(가시적 skip, 성공으로 세지 않음; Core도 tests/integration을 수집하므로 동일). 그 밖 변경 0.

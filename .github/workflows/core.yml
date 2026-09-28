@@ -207,6 +207,9 @@ jobs:
           # opt-in, or third-party agent CLIs.  Keep the exact reason/count map as
           # a ratchet: a new or silently broader skip makes this job fail.
           expected_skips = Counter({
+              # S10-BE stage 2: the live MLflow conformance file runs only in the run-mlflow
+              # lane (INV_MLFLOW_LIVE_URI); in this job it skips, visibly, 3 cases.
+              'Set INV_MLFLOW_LIVE_URI (the run-mlflow lane starts the server)': 3,
               'PowerShell and csc.exe shim require Windows': 1,
               'Actual Windows PowerShell launcher': 10,
               'Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)': 1,
