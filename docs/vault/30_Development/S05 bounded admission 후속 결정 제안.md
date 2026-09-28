@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-S05-BOUNDED-ADMISSION-DECISION-001"
 title: "S05 bounded admission 후속 결정 제안"
-version: "1.1.0"
+version: "1.3.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T15:40:00+09:00"
+updated: "2026-09-28T17:15:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S05-DB"]
@@ -16,6 +16,8 @@ tags: ["s05", "placement", "admission", "semaphore", "decision"]
 
 > [!summary] 코디네이터 결정
 > **W=450ms를 포함한 모든 permit wait `W>0` arm은 실행하지 않는다. 세 판정 gate는 바꾸지 않고, 다음 측정은 legacy(flag off)만 20→35→50 동시로 높여 실제 degrade 지점을 찾는다.** 첫 degrade 지점이 확인될 때만 candidate(W=0) 비교 arm을 별도로 제안한다. 50동시까지 degrade가 없으면 semaphore 라인을 "현 hosted 부하에서 불필요"로 닫고 legacy를 확정한다. flag 기본 off, S05-DB `in_progress`, 승격 없음은 유지한다.
+>
+> **Card46 run 36362386530에서 20·35·50동시 모두 사전 degrade 기준을 통과했다. 따라서 이 문서의 조건대로 bounded semaphore 라인을 닫고 측정한 hosted 50동시 범위에서는 legacy를 확정한다.** 제품의 private semaphore flag는 off로 유지하며 삭제·승격·AC-05 주장은 하지 않는다.
 
 ## 1. 확정된 입력
 
@@ -103,7 +105,7 @@ Card24 observer-on B′=1500ms는 세 조건을 모두 실패했고 Card25 sampl
 
 ### 실행 순서
 
-- 각 rung은 동일 runner·동일 disposable DB 설정에서 `20×3`, `35×3`, `50×3` wave를 한 번에 하나씩 순차 실행한다.
+- 각 wave는 별도 pytest session이 만든 새 일회용 DB를 사용한다. 따라서 rung마다 새 DB라는 하한보다 강하게 9개 wave가 모두 서로 다른 DB fingerprint를 가져야 하며 wave 전후 `inv_test_%` 잔존은 0이어야 한다.
 - 한 rung의 세 wave를 끝낸 뒤 아래 degrade 기준을 판정한다. degrade면 더 높은 rung은 실행하지 않는다.
 - 제품 SHA, runner OS/CPU, PostgreSQL 버전과 `lock_timeout=500ms`·`statement_timeout=2000ms`, wave별 JSON/JUnit을 artifact로 보존한다.
 - candidate, permit wait, B′ arm은 이 lane에서 실행하지 않는다. 제품 flag는 off다.
@@ -114,6 +116,8 @@ Card24 observer-on B′=1500ms는 세 조건을 모두 실패했고 Card25 sampl
 
 1. 세 wave 중 하나라도 `externalFailureCount = 55P03 + 57014 > 0`
 2. 세 wave의 request P95 all 중앙값이 **2000.000ms 초과**
+
+기준 1은 드문 timeout 한 건도 숨기지 않도록 세 wave의 **최대값(any wave)**을 쓰고, 기준 2는 지연의 대표값을 보도록 세 wave의 **중앙값**을 쓴다. 이 혼용은 의도적이다. 기준 2는 단일 SQL의 `statement_timeout=2000ms`와 같은 숫자를 쓰지만, 여러 statement·트랜잭션 경계를 포함한 **요청 전체 누적 경로 전용 기준**이다. 그러므로 개별 statement가 2초 전에 끝나 `57014=0`이어도 요청 P95 all 중앙값은 2초를 넘을 수 있다. 측정 뒤 임계나 집계 방식을 바꾸지 않는다.
 
 hold P95/max와 legacy lock-wait P95/max는 반드시 기록하지만 degrade trigger는 아니다. workflow/service-container/pull/setup 실패는 제품 degrade가 아니라 `INVALID_RUN`이며 같은 rung 재실행에는 별도 코디네이터 승인이 필요하다.
 
@@ -141,3 +145,20 @@ hold P95/max와 legacy lock-wait P95/max는 반드시 기록하지만 degrade tr
 - [x] flag off·S05 `in_progress`·승격 없음
 
 근거: [[S05 project별 bounded semaphore 사양]], [[S05 hosted 20동시 wave opt-in lane 사양]], [[2026-09-23_12-20-00_KST_S05_Bprime_구현_교정실험_Codex]], [[2026-09-23_13-28-00_KST_S05_bounded_semaphore_사양_Codex]], [[2026-09-28_08-35-00_KST_S05_hosted_20동시_wave_Codex]], [[2026-09-28_09-00-00_KST_S05_bounded_admission_후속결정_Codex]].
+
+## 6. Card46 결과와 semaphore 라인 종료
+
+PR #148 측정 head `3a1790ff3431706e81a2ba258eb0b26ea456ed31`, hosted run [36362386530](https://github.com/egparadise/SaintVision-Invion/actions/runs/36362386530)은 9개 wave를 모두 순차 실행했다.
+
+| concurrency | 성공/실패 | 55P03+57014 최대 | request P95 all 중앙 | degrade |
+|---:|---:|---:|---:|---|
+| 20 | 60/0 | 0 | 411.382ms | false |
+| 35 | 105/0 | 0 | 705.026ms | false |
+| 50 | 150/0 | 0 | 990.625ms | false |
+
+9개 DB fingerprint는 모두 달랐고 종료 뒤 `inv_test_%` 잔존은 0이다. 기준 1·2 모두 false이며 실행 뒤 기준 변경은 없었다. 따라서 `NO_DEGRADE_THROUGH_50_CLOSE_SEMAPHORE_LINE`을 채택한다.
+
+- 현 hosted 4 CPU/PostgreSQL 16.15/합성 단일 Node 조건에서 bounded semaphore 후속 구현·측정 라인은 종료한다.
+- legacy 경로를 이 범위의 기본으로 확정하고 private semaphore flag는 계속 off로 둔다. 코드 삭제는 별도 cleanup 판단이며 이번 PR에서 하지 않는다.
+- S05-DB는 `in_progress`를 유지한다. 이 결과는 물리 5노드 AC-05나 운영 승격이 아니다.
+- hosted 수치는 개발 PC evidence와 직접 비교하지 않는다. 정본: [[S05 legacy 동시성 계단 hosted lane 사양]], [[2026-09-28_16-50-00_KST_S05_legacy_동시성_계단_Codex]].
