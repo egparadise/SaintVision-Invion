@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-2026-09-28-S10-BE-MLFLOW-MIRROR-IMPL-1"
 title: "S10-BE MLflow 미러 구현 1단계 — TrackingSink 계약·run_tracking_conformance·ReferenceSink, TRACK-0001~0005 표, canonical payload/URI, migration 0049(intents·attempts·defects, append-only·RLS·CHECK), 정본 tx enqueue 훅, deliver_intent(FOR UPDATE·terminal 반환), PG-free 76 + 실 PG 42(hosted) (카드 bg)"
-version: "1.3.3"
+version: "1.3.4"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T13:14:55+09:00"
+updated: "2026-09-28T13:18:18+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -90,3 +90,7 @@ hosted Backend run **36373656210**(head 322488fb) = 3.12 **3138 passed / 47 skip
 - canonicalize **한 번**: `enqueue_mirror`는 `canonical_payload(payload)` 1회 뒤 **`canonical_digest(canonical)`**(직렬화만, 재canonicalize 없음)로 digest. `payload_sha256`은 원본 payload 진입점으로 남고, 멱등성(6.2)도 유지되어 둘이 일치(시험).
 - pair CHECK를 코디네이터 형식으로: non-mirrored 분기마다 **`error_code IS NOT NULL AND error_code = '…'`**, mirrored는 `error_code IS NULL`. `sql_pair_check()`와 0049 literal 동일(시험이 3 분기의 `IS NOT NULL` 명시를 확인).
 - 0049·0051 다른 CHECK의 3값 논리 감사: subject XOR는 `num_nonnulls`(NULL 불가), kind↔컬럼·project 결속·`mirrored_has_reference`는 `IS NOT NULL` 명시, `error_code_track`은 `IS NULL OR ~`, 나머지는 NOT NULL 열의 regex/비교(`payload_sha256`·`tracking_uri_sha256`·`attempt_no`·`delivery_no`·`recovery_epoch`; 0051 `purpose`·`destination`·`file_name`·`content_sha256`·`device/inode`·`expires_at > created_at`). 추가 함정 없음.
+
+### 6.4 Codex r5 — 입력 계약 복원 + 경계 분리 (v1.3.4, 2026-09-28T13:18:18+09:00)
+
+지적: 6.2의 "float repr 문자열 되돌려 받기"는 raw payload의 문자열 metric(`"0.9"`, `"1.0"`)까지 통과시켜 **입력 계약을 약화**했다. 반영: `canonical_metrics`는 문자열을 전부 거부(원래 계약·문구 "metric value must be numeric"). 분리: **`canonical_json(canonical)`/`canonical_digest(canonical)`**(persisted canonical을 직렬화/hash만, 재canonicalize 없음) vs `canonical_payload`/`payload_sha256`(raw 진입점). 사용처를 전부 persisted 쪽으로: `enqueue_mirror` digest, `MirrorRecord.__post_init__`(persisted payload 검증), `ReferenceSink` 저장/attest digest, conformance `canonical_record`(canonical로 생성), 2단계 sink의 payload tag(다음 head). 시험 (a) raw `"0.9"`·`"1.0"` 거부, (b) float 0.9 payload가 1회 canonicalize 뒤 `canonical_digest == payload_sha256(raw)`이고 persisted 형식을 raw 규칙에 다시 넣으면 거부, (c) persisted canonical로 `MirrorRecord` 검증·`ReferenceSink` mirror·attest digest 일치.

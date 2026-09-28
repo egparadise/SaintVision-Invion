@@ -18,7 +18,7 @@ import hashlib
 from dataclasses import dataclass, field
 from typing import Any
 
-from ..tracking.canonical import payload_sha256
+from ..tracking.canonical import canonical_digest
 from ..tracking.codes import MirrorStatus, code_for_status
 from .contract import Attestation, AttestationResult, AuthResult, ProbeResult
 from .reference import redact_text
@@ -102,7 +102,7 @@ class ReferenceSink:
         if stored is None:
             return Attestation(result=AttestationResult.UNVERIFIABLE, detail="unknown reference")
         digest = self._digest(reference_id)
-        expected = payload_sha256(stored.payload)
+        expected = canonical_digest(stored.payload)
         result = AttestationResult.VERIFIED if digest == expected else AttestationResult.MISMATCH
         return Attestation(
             result=result,
@@ -118,5 +118,5 @@ class ReferenceSink:
         if reference_id in self._tampered:
             tampered = dict(stored.payload)
             tampered["tags"] = {**tampered.get("tags", {}), "inv.tampered": "1"}
-            return payload_sha256(tampered)
-        return payload_sha256(stored.payload)
+            return canonical_digest(tampered)
+        return canonical_digest(stored.payload)
