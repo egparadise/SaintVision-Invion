@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-G04-RELEASE-IDEMPOTENCY-001"
 title: "release route에 W2/W4와 같은 서버 idempotency 계약 — 응답 유실 뒤 재시도가 stage 재기록·mirror intent 중복을 내지 않는다 (카드 113)"
-version: "1.1.0"
+version: "1.2.0"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-29T00:53:02+09:00"
+updated: "2026-09-29T01:17:13+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["G-04"]
@@ -25,6 +25,11 @@ Codex #219 r4 F1: `POST /projects/{p}/models/{m}/versions/{v}/release`(`src/sain
 ### 1-1. Codex 1차(head `fa04b9d8`) 반영 — replay가 kernel에 종속되지 않게
 Codex F1: 저장 응답을 읽기 전에 kernel 관측을 요구해 응답 유실 재시도가 upstream 가용성에 종속됐다(kernel 불가 시 저장된 200이 있어도 503). 반영: permission preflight → key/body 뒤에 **짧은 별도 DB span(1b)**에서 live canApprove 재확인 + `replay_or_reserve`로 replay/409를 **먼저** 끝내고, ledger miss일 때만 tx를 닫고 kernel 관측 → 쓰기 span(advisory lock → canApprove → clock → ledger 재조회(동시 최초 요청 수렴) → row lock …). 네트워크 동안 tx 0 유지. span은 3개(전부 bounded, `test_lock_wait` ratchet 통과). F2: 시험이 옛 순서를 고정하지 않도록 `FULL_ORDER`를 새 순서로, "replay path는 kernel을 호출하지 않는다"(fetcher `OSError`에서도 저장 200·fetch 0), "conflict는 kernel 앞에서 409", "ledger miss만 kernel로 가고 lock 아래서 ledger를 다시 읽어 수렴"(첫 조회 None·둘째 STORED → 200 STORED·fetch 1·release 0)을 PG-free로, 실 PG에 "첫 release 뒤 fetcher를 OSError로 교체 → 같은 key 200 동일·다른 body 409·kernel 호출 0·intent/audit/ledger 각 1"을 추가했다. 카드의 "두 span 유지"는 reviewer 지시로 세 span이 됐다.
 
+### 1-2. Codex 2차(head `236e8219`, Backend run 36446971153 red) 반영 — 시험 fixture 경계 2건
+hosted Backend 3.12·3.14 모두 6 failed(4529 passed / 50 skipped / 2 deselected). 코드가 아니라 시험 두 곳의 경계였다.
+- **[blocking 1] denial-audit 실 PG 시험이 422를 받음**: `tests/integration/test_canonical_denial_audit_real_pg.py`의 세 release 호출은 `Idempotency-Key` 없이 보냈다. 첫·셋째 시험은 preflight(403)·out-of-band 500이 key 검사보다 앞이라 그대로였지만, 쓰기 tx 안의 live 재검사로 403을 기대하는 둘째 시험은 preflight를 통과한 뒤 key 검사에서 `VAL-0003/422`가 났다. 세 호출 모두에 유효한 key(`denial-k1`)를 넣었다. 기대값(403·denial audit 1행·쓰기 0, 500·denial 0)은 바꾸지 않았다.
+- **[blocking 2] mirror intent 단언 5건이 configured 경로를 만들지 않았음**: `enqueue_mirror`는 `tracking.config.resolve(os.environ)`가 `absent`이면 의도대로 `skipped`(intent 0). hosted Backend에는 `INV_MLFLOW_*`가 없어 `== 1`이 전부 `0 == 1`로 실패했다. 제품 계약은 그대로 두고, 시험 fixture `configured_mirror`(monkeypatch로 `INV_MLFLOW_TRACKING_URI`·`INV_MLFLOW_DESTINATION`·`INV_MLFLOW_EXPERIMENT_PREFIX` strict 설정 + `mlflow_client_present` 대체, `tests/test_tracking_mirror.py`의 `configured`와 같은 값)를 intent를 단언하는 5건(같은 key replay·다른 body 409·다른 key 409·동시 최초 2건·F1 kernel 불가 replay)에만 붙였다. absent 경로의 의미는 양성 대조 `test_30c`에 명시했다: readiness `absent`에서 release 200·audit 1·**intent 0**. 키 없는 422 시험은 절대 intent를 남기지 않으므로 fixture 없이 둔다.
+
 ## 2. 판단한 것
 
 - **이미 released인 row의 재release는 409**로 했다. 카드는 같은 key replay만 요구했지만, 다른 key의 두 번째 release가 만드는 두 번째 mirror intent가 바로 이 계약이 막으려는 중복이다. 200 no-op(W4의 extended:false 식)은 "release가 일어났다"로 읽히므로 고르지 않았다. Codex 확인 요청.
@@ -34,7 +39,7 @@ Codex F1: 저장 응답을 읽기 전에 kernel 관측을 요구해 응답 유�
 
 ## 3. 검증 (실제 수행한 것만)
 
-로컬 PG-free: `tests/core/test_model_release_route.py` 74 passed(신규 12 포함) + `test_lock_wait.py`; 이웃 6파일(`test_canonical_denial_audit`·`test_lock_wait`·`test_low_risk_write_response_contracts`·`test_model_retention_pin_route`·`test_model_verify_route`·`test_route_coverage`) 241 passed. 실 PG 3파일 27 collected — **NOT_OBSERVED**, hosted 인용은 PR 코멘트. 게이트 chain exit 0, `export_schemas --check` 78, FE `contracts:check` 20(변경 없음).
+로컬 PG-free: `tests/core/test_model_release_route.py` 74 passed(신규 12 포함) + `test_lock_wait.py`; 이웃 6파일(`test_canonical_denial_audit`·`test_lock_wait`·`test_low_risk_write_response_contracts`·`test_model_retention_pin_route`·`test_model_verify_route`·`test_route_coverage`) 241 passed. 실 PG 3파일 27 collected — **NOT_OBSERVED**, hosted 인용은 PR 코멘트. v1.2: `test_model_release_route`+`test_lock_wait`+`test_canonical_denial_audit` 127 passed, 실 PG 2파일 17 collected, 작은 python 호출로 fixture 값이 `services.tracking.resolve()`에서 `configured`가 되는 것을 확인 — 실 PG 실측은 hosted Backend가 유일한 근거(**NOT_OBSERVED** until cited). 게이트 chain exit 0, `export_schemas --check` 78, FE `contracts:check` 20(변경 없음).
 
 ## 4. 다음
 

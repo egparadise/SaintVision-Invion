@@ -26,6 +26,7 @@ from saintvision.api.problem import CANONICAL_KEYS
 from saintvision.api.v1 import model_release
 from saintvision.config import Settings
 from saintvision.identity.principal import Principal, StaticPrincipalVerifier
+from saintvision.tracking import config as tracking_config
 from saintvision.ids import new_id
 from measurement_support import insert_measurement
 
@@ -343,6 +344,31 @@ def _headers(key="release-k1"):
     return {"Idempotency-Key": key}
 
 
+CONFIGURED_MIRROR_ENV = {
+    "INV_MLFLOW_TRACKING_URI": "https://mlflow.lab.example/",
+    "INV_MLFLOW_DESTINATION": "lab-mlflow",
+    "INV_MLFLOW_EXPERIMENT_PREFIX": "inv",
+}
+
+
+@pytest.fixture
+def configured_mirror(monkeypatch):
+    """Card 113: a strict ``configured`` tracking environment, so a release
+    writes exactly one mirror intent and the idempotency assertions measure a
+    real duplicate-suppression instead of the ``absent`` skip.
+
+    ``enqueue_mirror`` resolves ``os.environ`` at call time; hosted Backend
+    sets no ``INV_MLFLOW_*`` variable, and this fixture never leaks past the
+    test (monkeypatch restores the environment and the client probe)."""
+    for key, value in CONFIGURED_MIRROR_ENV.items():
+        monkeypatch.setenv(key, value)
+    monkeypatch.delenv("INV_MLFLOW_TIMEOUT_SECONDS", raising=False)
+    monkeypatch.setattr(tracking_config, "mlflow_client_present", lambda: True)
+    resolved = tracking_config.resolve()
+    assert resolved.readiness.value == "configured", resolved.readiness
+    return resolved
+
+
 def _mirror_intents(owner_engine, version_id):
     """Mirror intents for one version, read as the owner (the duplicate this
     contract exists to prevent)."""
@@ -555,6 +581,11 @@ def test_30c_a_release_that_satisfies_everything_commits_and_audits_once(
     serialised = str(detail)
     assert DECLARATION["licensePolicy"] not in serialised
     assert "restricted" not in serialised
+    # Tracking is ``absent`` here (no ``INV_MLFLOW_*``): the canonical change
+    # succeeds and no mirror intent is written. The configured path is the
+    # ``configured_mirror`` fixture below.
+    assert tracking_config.resolve().readiness.value == "absent"
+    assert _mirror_intents(owner_engine, mine["version_id"]) == []
 
 
 def test_29d_a_member_without_the_approval_grade_cannot_release(
@@ -591,7 +622,7 @@ def test_29d_a_member_without_the_approval_grade_cannot_release(
 
 
 def test_113_the_same_key_replays_the_stored_answer_and_the_mirror_intent_is_not_duplicated(
-    owner_engine, app_engine, two_tenants, frozen_now
+    owner_engine, app_engine, two_tenants, frozen_now, configured_mirror
 ):
     tenant_a, _ = two_tenants
     with owner_engine.begin() as connection:
@@ -618,7 +649,7 @@ def test_113_the_same_key_replays_the_stored_answer_and_the_mirror_intent_is_not
 
 
 def test_113_the_same_key_with_a_different_declaration_is_409_and_changes_nothing(
-    owner_engine, app_engine, two_tenants, frozen_now
+    owner_engine, app_engine, two_tenants, frozen_now, configured_mirror
 ):
     tenant_a, _ = two_tenants
     with owner_engine.begin() as connection:
@@ -640,7 +671,7 @@ def test_113_the_same_key_with_a_different_declaration_is_409_and_changes_nothin
 
 
 def test_113_a_second_release_under_another_key_is_409_and_does_not_mirror_again(
-    owner_engine, app_engine, two_tenants, frozen_now
+    owner_engine, app_engine, two_tenants, frozen_now, configured_mirror
 ):
     tenant_a, _ = two_tenants
     with owner_engine.begin() as connection:
@@ -678,7 +709,7 @@ def test_113_a_release_without_a_key_is_422_and_leaves_the_version_in_draft(
 
 
 def test_113_two_concurrent_first_requests_with_one_key_release_once_and_replay(
-    owner_engine, app_engine, two_tenants, frozen_now, monkeypatch
+    owner_engine, app_engine, two_tenants, frozen_now, monkeypatch, configured_mirror
 ):
     """IDEM-6 on the real database: the advisory lock serialises the two, the
     second finds the stored answer. One stage write, one mirror intent."""
@@ -714,7 +745,7 @@ def test_113_two_concurrent_first_requests_with_one_key_release_once_and_replay(
 
 
 def test_113_F1_a_lost_response_replays_while_the_kernel_is_unavailable_and_a_conflict_is_409_first(
-    owner_engine, app_engine, two_tenants, frozen_now
+    owner_engine, app_engine, two_tenants, frozen_now, configured_mirror
 ):
     """Codex #229 F1 on the real ledger: after a committed release the retry is
     answered from ``idempotency_records`` with the kernel unreachable, and a
