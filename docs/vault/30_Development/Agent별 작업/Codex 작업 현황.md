@@ -22,6 +22,12 @@ source_of_truth: "Git"
 - S3 호환 후보 PUT/GET의 body·metadata SHA-256과 자신이 만든 object의 DELETE 뒤 GET 404를 증명한다. 제품 S3 adapter가 없어 제품 Artifact 결속 주장은 철회했다. 출력은 `targetKind` 필수 redacted JSON/JUnit이며 자격·endpoint·bucket·key·provider 오류 원문은 금지한다.
 - hosted run `36356313380`의 격리 candidate job은 PASS: JSON six checks true·cleanup true·head SHA 일치, JUnit 1/0/0/0, image digest 일치다. `ci-candidate` evidence는 U6 PASS가 아니며 #122는 `operational`만 받는다. 실제 Run 전체 S3 adapter, 운영 TLS/자격, retention/GC/restore는 미측정이다. [[2026-09-28_07-35-00_KST_S01_ST_Storage_SHA256_왕복검증기_Codex]], [[S01_ST_Storage_SHA256_왕복_검증기_설계]].
 
+## 2026-09-28 S01-BE 운영 설정 미해결 관측 route
+
+- 운영 정본 `inv.app.create_configured_app`에 인증+operator grant 전용 `GET /v1/operations/configuration-readiness`를 추가했다. Claude 1차 검토 뒤 단순 env 존재 검사를 폐기하고 `api.json.configurationReadiness` 및 기존 read-only config volume에 결속했다. 값은 반환하지 않고 `INV_NODE_MTLS_CA_BUNDLE`·`INV_OBJECT_STORE_ENDPOINT` 호환 이름만 엄격한 `ConfigurationReadinessView`로 반환한다.
+- CA는 읽을 수 있는 bounded PEM에 CA 인증서 1장 이상, endpoint는 자격증명 없는 HTTP(S) URL일 때만 해결된다. 1개만 미해결·없는/깨진/non-CA PEM·잘못된 URL은 계속 `blocked`; `/readyz` 의미는 유지하고 provider 미구성은 `SYS-0001/503`이다. focused PG-free **58 passed, 2 opt-in skipped, 3 postgres deselected**, bindings·schema check 0을 확보했다.
+- PR #122의 `--health-url`은 `--settings-url`+Bearer로, PR #125 §7은 새 운영 route로 후속 정정한다. U2·U3·U6은 미해결이며 S01-BE `in_progress` 유지. [[S01_BE_운영_설정_미해결_관측_결정]], [[2026-09-28_08-35-00_KST_S01_BE_운영_설정_미해결_관측_Codex]].
+
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 
 - Card24 local 실행 head `4c8a7363…`와 Card25 local 실행 head `6c389a1d…`가 origin integration 조상이 아님을 확인했다. 실행 위치는 evidence `executionHeadAtRun`에 보존하고 재현 anchor로는 쓰지 않는다.
