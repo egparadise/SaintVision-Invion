@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.132"
+version: "1.0.133"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-28T22:58:00+09:00"
+updated: "2026-09-28T23:37:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,39 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-28T22:58:00+09:00 (최신 tip `agent/gemini/g05-fe-model-registry`, 카드 94 r2 후속 조치 및 PR #212 머지).
+- 확인 기준: 2026-09-28T23:37:00+09:00 (최신 tip `agent/gemini/g05-fe-model-registry`, PR #219 Claude UI r2 조치 및 PR #212 머지 완결).
+
+## 2026-09-28 G-05 FE 모델 레지스트리 화면 Claude UI r2 재검토(G1, G2, G3, G5, Test 16) 조치 및 PR #212 클린 머지 (`agent/gemini/g05-fe-model-registry`, PR #219)
+
+- **PR**: #219 (https://github.com/egparadise/SaintVision-Invion/pull/219)
+- **Base / Head**: PR #212 head `5b2609d9` 선행 머지(`7ddc616e`) 위 Claude UI r2 조치 반영.
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude (UI·테스트 축), Codex (계약 축).
+- **조치 내역 (G1, G2, G3, G5, Test 16 전수 완결)**:
+  1. **G3 [중간, 새 결함] 쓰기 3종 독립 AbortController 및 세대 분리, finally 로딩 해제 보장**:
+     - `handleRegisterVersion`, `handleExtendPin`, `handleReleaseModel`별 독립 `AbortController`(`regAbortControllerRef`, `pinAbortControllerRef`, `relAbortControllerRef`) 및 세대 번호(`regGenerationRef`, `pinGenerationRef`, `relGenerationRef`) 할당.
+     - 한 액션 중 다른 액션을 호출해도 서로의 controller가 abort되지 않으며, abort 시에도 `finally`에서 로딩 상태를 무조건 해제(`setRegLoading(false)` 등)하여 버튼 영구 비활성화 원천 차단.
+     - 9개 폼 필드 변경 시 즉시 in-flight 세대를 증가시켜 늦은 응답의 화면 오염 차단. (회귀 시험 18).
+  2. **G1 [중간] Lineage Trace 응답 픽스처 및 서버 정본 모델 정합**:
+     - `validTraceResponse` 픽스처에서 `unresolved` 존재 시 `fullyTraceable: false`로 정합(`services/lineage.py:762`).
+     - `missing` 배열 항목은 서버 계약대로 kind 이름 문자열(`"dataset_version"`)만 포함.
+     - 4대 별칭(`evaluations`, `commits`, `approvals`, `images`) 및 `isEval` 특수 분기, 하드코딩 fallback kind 목록 전면 제거.
+  3. **G2 [부분] 보존 핀 멱등키 회전 및 동일 재시도 보존**:
+     - 동일 파라미터 재시도 시에는 `pinIdempotencyKey`를 보존하되, 핀 만료일(`until`) 및 식별자(`projectId`, `modelId`, `version`) 변경 시 즉시 새 UUID v4 멱등키로 회전. (회귀 시험 19).
+  4. **G5 [경미] 409 Conflict detail 형식 및 ProblemDetails.title 교정**:
+     - 409 detail을 서버 정본 문자열(`f"kind '{missing_kind}' is not traceable for model '{model_id}' version '{version}'"`)과 일치.
+     - `ProblemDetails`의 `title`을 서버 정본대로 에러 코드(`MODEL-0004` 등)와 일치.
+  5. **Test 16 엄격 스키마 경계 픽스처 교정**:
+     - `deployments` 허용 환경(`environment: 'pilot'`) 적용 및 `unresolved` 번호 1부터 시작 정합.
+  6. **PR #212 선행 머지 (`7ddc616e`) 및 ModelLineageView 완전 합성**:
+     - PR #212 head `5b2609d9`를 병합하고, `ModelLineageView.tsx`에서 Card 94 비즈니스 라우트와 PR #203 어댑터 Conformance 패널 및 Model Commitment 패널을 완벽하게 통합/합성.
+- **실측 검증**:
+  - Vitest: `tests/model-registry-business-routes.test.tsx` 19 passed, `tests/model-lineage.test.ts` 23 passed, `tests/write-actions-integrity-wiring.test.tsx` 8 passed. (웹 전체 80 test files / 750 passed).
+  - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist/ 번들 생성 성공 (874.71 kB).
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed.
+  - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --check` PASS (0 conflicts).
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-28_22-10-00_KST_G05_Model_Registry_FE_Business_Routes_Gemini.md` (v1.2.0).
+- **다음 첫 행동**: PR #219에 Claude UI r2 조치 결과 코멘트 등록 및 카드 101(W3 Verify & W5 Eval Run 화면 연동) 재개.
 
 ## 2026-09-28 G-05 FE 모델 레지스트리 화면 실제 business route 연동 및 불변식 검증 (카드 94, `agent/gemini/g05-fe-model-registry`)
 

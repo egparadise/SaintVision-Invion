@@ -42,20 +42,24 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
 
   // Server exact entity prefixes (ids.py): mdv_, mdl_, dsv_, dpl_, apv_
   // Server exact kind vocabulary (services/lineage.py): dataset_version, deployment, code_commit, container_image, eval_run, approval
+  // Server exact kind vocabulary (services/lineage.py): dataset_version, deployment, code_commit, container_image, eval_run, approval
+  // Server invariant: fullyTraceable = not missing and not unresolved and not truncated (services/lineage.py:762)
   const validTraceResponse: ModelLineageTraceResponse = {
     modelVersionId: 'mdv_01JABCDEF1234567890ABCDEF',
     version: '1.0.0',
     stage: 'released',
     contentSha256: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
     producedByRunId: 'run_01J9876543210',
-    fullyTraceable: true,
-    traceabilityLimitedByScope: false,
+    fullyTraceable: false,
+    traceabilityLimitedByScope: true,
     detailedKinds: ['dataset_version', 'deployment'],
-    countOnlyKinds: ['eval_run', 'code_commit', 'approval', 'container_image'],
+    countOnlyKinds: ['code_commit', 'container_image', 'eval_run', 'approval'],
     missing: [],
     unresolved: [
-      { kind: 'eval_run', count: 2 },
+      { kind: 'approval', count: 1 },
       { kind: 'code_commit', count: 1 },
+      { kind: 'container_image', count: 1 },
+      { kind: 'eval_run', count: 2 },
     ],
     datasets: [
       {
@@ -159,9 +163,11 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     expect(realContainer).not.toBeNull();
     expect(realContainer?.textContent).toContain('[1.0.0] 실서버 계보 추적 결과');
 
-    // Fully traceable and scope limited badges
+    // Incomplete trace and scope limited badges (server invariant: unresolved items exist -> not fully traceable)
     const traceableBadge = container.querySelector('[data-testid="badge-fully-traceable"]');
-    expect(traceableBadge?.textContent).toContain('완전 추적 가능');
+    expect(traceableBadge?.textContent).toContain('불완전 추적 (Incomplete Trace)');
+    const scopeBadge = container.querySelector('[data-testid="badge-scope-limited"]');
+    expect(scopeBadge?.textContent).toContain('프로젝트 범위 제한 적용');
 
     // Datasets Table with real dsv_ prefix
     const datasetsSection = container.querySelector('[data-testid="real-lineage-datasets"]');
@@ -177,7 +183,7 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     // Dynamic unobserved rendering from server kinds (Claude G1 & G5)
     const evalUnobserved = container.querySelector('[data-testid="trace-eval_run-unobserved"]');
     expect(evalUnobserved).not.toBeNull();
-    expect(evalUnobserved?.textContent).toContain('NOT_OBSERVED (미관측)');
+    expect(evalUnobserved?.textContent).toContain('상세 범위 외 (2건 관측)');
     expect(evalUnobserved?.textContent).toContain('상세 범위 외 (2건 관측)');
 
     const commitsUnobserved = container.querySelector('[data-testid="trace-code_commit-unobserved"]');
@@ -404,11 +410,11 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
   it('renders RFC 9457 ProblemDetails with exact code, title, detail, and traceId on 409 Conflict', async () => {
     const canonical409Problem = {
       type: 'about:blank',
-      title: 'Graph invariant violated',
+      title: 'GRAPH-0002',
       status: 409,
       code: 'GRAPH-0002',
       category: 'GRAPH',
-      detail: 'The model version is not fully traceable: missing dataset_version:dsv_01J112233445566778899001',
+      detail: 'The model version is not fully traceable: missing dataset_version',
       retryable: false,
       traceId: '0123456789abcdef0123456789abcdef',
       causeRef: 'mdv_01JNEWREGISTERED001',
@@ -449,9 +455,9 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     const alert = container.querySelector('[data-testid="registry-problem-alert"]');
     expect(alert).not.toBeNull();
     expect(container.querySelector('[data-testid="problem-code"]')?.textContent).toBe('GRAPH-0002');
-    expect(alert?.textContent).toContain('Graph invariant violated');
-    expect(container.querySelector('[data-testid="problem-detail"]')?.textContent).toContain(
-      'The model version is not fully traceable: missing dataset_version:dsv_01J112233445566778899001'
+    expect(alert?.textContent).toContain('GRAPH-0002');
+    expect(container.querySelector('[data-testid="problem-detail"]')?.textContent).toBe(
+      'The model version is not fully traceable: missing dataset_version'
     );
     expect(container.querySelector('[data-testid="problem-trace-id"]')?.textContent).toContain(
       '0123456789abcdef0123456789abcdef'
@@ -660,7 +666,7 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
       ...validTraceResponse,
       fullyTraceable: false,
       traceabilityLimitedByScope: true,
-      missing: ['dataset:curated-v2', 'commit:abcdef123456'],
+      missing: ['dataset_version', 'code_commit'],
       datasets: [],
       deployments: [],
     };
@@ -697,8 +703,8 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     );
 
     const missingSection = container.querySelector('[data-testid="real-lineage-missing"]');
-    expect(missingSection?.textContent).toContain('dataset:curated-v2');
-    expect(missingSection?.textContent).toContain('commit:abcdef123456');
+    expect(missingSection?.textContent).toContain('dataset_version');
+    expect(missingSection?.textContent).toContain('code_commit');
 
     // Empty datasets & deployments message
     expect(container.querySelector('[data-testid="real-lineage-datasets"]')?.textContent).toContain(
@@ -1029,7 +1035,7 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
 
     const overflowDeployments = Array.from({ length: 201 }, (_, i) => ({
       deploymentId: `dpl_${i}`,
-      environment: 'prod',
+      environment: 'pilot',
       status: 'active',
       deployedDigest: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
       deployedAt: '2026-09-28T12:00:00Z',
@@ -1041,7 +1047,7 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     const overflowMissing = Array.from({ length: 17 }, (_, i) => `item_${i}`);
     expect(isModelLineageTraceResponse({ ...validTraceResponse, missing: overflowMissing })).toBe(false);
 
-    const overflowUnresolved = Array.from({ length: 17 }, (_, i) => ({ kind: `k_${i}`, count: i }));
+    const overflowUnresolved = Array.from({ length: 17 }, (_, i) => ({ kind: `k_${i}`, count: i + 1 }));
     expect(isModelLineageTraceResponse({ ...validTraceResponse, unresolved: overflowUnresolved })).toBe(false);
 
     const overflowDetailedKinds = Array.from({ length: 17 }, (_, i) => `kind_${i}`);
@@ -1119,5 +1125,197 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     });
 
     expect(capturedSignal?.aborted).toBe(true);
+  });
+
+  // 18. Pin Idempotency-Key Rotation on Parameter Change (Claude G2)
+  it('preserves pin Idempotency-Key across identical retries but rotates upon parameter change', async () => {
+    let capturedKeys: string[] = [];
+
+    globalThis.fetch = vi.fn().mockImplementation((url, init) => {
+      let key = '';
+      if (init?.headers instanceof Headers) {
+        key = init.headers.get('Idempotency-Key') || '';
+      } else if (init?.headers) {
+        key = (init.headers as any)['Idempotency-Key'] || (init.headers as any)['idempotency-key'] || '';
+      }
+      capturedKeys.push(key);
+      return Promise.resolve(
+        new Response(
+          JSON.stringify({
+            type: 'about:blank',
+            title: 'Temporary lock contention',
+            status: 503,
+            code: 'SYS-0001',
+            category: 'SYS',
+            detail: 'Locked; retry later.',
+            retryable: true,
+            traceId: '0123456789abcdef0123456789abcdef',
+            causeRef: null,
+            evidenceId: null,
+          }),
+          {
+            status: 503,
+            headers: { 'Content-Type': 'application/problem+json' },
+          }
+        )
+      );
+    });
+
+    await act(async () => {
+      root.render(
+        <ModelLineageView
+          projectId="prj_alpha"
+          initialModelId="mdl_01JLLAMA30000000000000000"
+          initialVersion="1.0.0"
+          currentUser={{ canApprove: true }}
+        />
+      );
+    });
+
+    const tabs = container.querySelectorAll('button');
+    const pinTabBtn = Array.from(tabs).find((b) => b.textContent?.includes('보존 고정'));
+    await act(async () => {
+      pinTabBtn?.click();
+    });
+
+    const untilInput = container.querySelector('[data-testid="input-pin-until"]') as HTMLInputElement;
+    const pinBtn = container.querySelector('[data-testid="btn-pin-retention"]') as HTMLButtonElement;
+
+    // First submission
+    await act(async () => {
+      setInputValue(untilInput, '2026-12-31T23:59:59Z');
+    });
+    await act(async () => {
+      pinBtn.click();
+    });
+
+    // Second submission with exact same input (retry scenario after failure)
+    await act(async () => {
+      pinBtn.click();
+    });
+
+    // Third submission: change until date
+    await act(async () => {
+      setInputValue(untilInput, '2027-06-30T23:59:59Z');
+    });
+    await act(async () => {
+      pinBtn.click();
+    });
+
+    expect(capturedKeys.length).toBe(3);
+    expect(capturedKeys[0]).toBeTruthy();
+    // Key 1 and Key 2 should be the same on retry
+    expect(capturedKeys[1]).toBe(capturedKeys[0]);
+    // Key 3 should rotate because parameter changed
+    expect(capturedKeys[2]).not.toBe(capturedKeys[0]);
+  });
+
+  // 19. Separate Abort Controllers and Non-stuck Loading across Writes (Claude G3)
+  it('releases loading state and ignores stale responses when write operations overlap', async () => {
+    let resolveRegister: (res: Response) => void;
+    const registerPromise = new Promise<Response>((resolve) => {
+      resolveRegister = resolve;
+    });
+
+    globalThis.fetch = vi.fn().mockImplementation((url) => {
+      const urlStr = String(url);
+      if (urlStr.endsWith('/versions')) {
+        return registerPromise;
+      }
+      if (urlStr.endsWith('/retention-pin')) {
+        return Promise.resolve(
+          new Response(JSON.stringify(validPinResponse), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          })
+        );
+      }
+      return Promise.reject(new Error('Unexpected URL'));
+    });
+
+    await act(async () => {
+      root.render(
+        <ModelLineageView
+          projectId="prj_alpha"
+          initialModelId="mdl_01JLLAMA30000000000000000"
+          initialVersion="1.0.0"
+          currentUser={{ canApprove: true }}
+        />
+      );
+    });
+
+    // 1. Start Register operation (will be delayed in-flight)
+    const tabs = container.querySelectorAll('button');
+    const registerTabBtn = Array.from(tabs).find((b) => b.textContent?.includes('버전 등록'));
+    await act(async () => {
+      registerTabBtn?.click();
+    });
+
+    const versionInput = container.querySelector('[data-testid="input-register-version"]') as HTMLInputElement;
+    const shaInput = container.querySelector('[data-testid="input-register-sha256"]') as HTMLInputElement;
+    await act(async () => {
+      setInputValue(versionInput, '2.0.0-rc1');
+      setInputValue(shaInput, '00001111222233334444555566667777aaaabbbbccccddddeeeeffff01234567');
+    });
+
+    const regBtn = container.querySelector('[data-testid="btn-register-version"]') as HTMLButtonElement;
+    act(() => {
+      regBtn.click();
+    });
+
+    // Register is now in-flight
+    expect(regBtn.textContent).toContain('등록 중...');
+    expect(regBtn.disabled).toBe(true);
+
+    // 2. While Register is in-flight, change an input (invalidates currentGen)
+    await act(async () => {
+      setInputValue(versionInput, '2.0.0-final');
+    });
+
+    // 3. Switch to Pin tab and submit Pin
+    const pinTabBtn = Array.from(tabs).find((b) => b.textContent?.includes('보존 고정'));
+    await act(async () => {
+      pinTabBtn?.click();
+    });
+
+    const untilInput = container.querySelector('[data-testid="input-pin-until"]') as HTMLInputElement;
+    await act(async () => {
+      setInputValue(untilInput, '2026-12-31T23:59:59Z');
+    });
+
+    const pinBtn = container.querySelector('[data-testid="btn-pin-retention"]') as HTMLButtonElement;
+    await act(async () => {
+      pinBtn.click();
+    });
+
+    // Pin should succeed
+    expect(container.querySelector('[data-testid="registry-pin-success"]')).not.toBeNull();
+
+    // 4. Switch back to Register tab: Register button must NOT be permanently stuck! (Claude G3)
+    await act(async () => {
+      registerTabBtn?.click();
+    });
+
+    const regBtnAfterPin = container.querySelector('[data-testid="btn-register-version"]') as HTMLButtonElement;
+
+    // Resolve the delayed in-flight register response
+    await act(async () => {
+      resolveRegister!(
+        new Response(
+          JSON.stringify({
+            ...validVersionResponse,
+            modelVersionId: 'mdv_STALE_OVERWRITE',
+            version: '2.0.0-rc1',
+          }),
+          { status: 201, headers: { 'Content-Type': 'application/json' } }
+        )
+      );
+    });
+
+    // Stale register response must NOT overwrite DOM with success banner (since version was changed)
+    // AND register button must NOT remain stuck in loading!
+    expect(regBtnAfterPin.disabled).toBe(false);
+    expect(regBtnAfterPin.textContent).toContain('모델 버전 등록');
+    expect(container.querySelector('[data-testid="registry-register-success"]')).toBeNull();
   });
 });
