@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-G03-CONFORMANCE-API-DESIGN-001"
 title: "G-03 conformance 결과 API 노출 설계 v1.0 — 저장된 결과가 0건이라 1단계는 NOT_OBSERVED, counts·boolean 금지, 2단계는 migration 선요청 (docs-only)"
-version: "1.0.0"
+version: "1.1.0"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T13:55:28+09:00"
+updated: "2026-09-28T14:28:30+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -76,3 +76,31 @@ route 1 + 응답 타입 1 = **2건**, 새 오류 code **0개**. 정본 `core.sch
 ## 10. 다음 첫 행동
 
 Codex 검토. 승인되면 구현 PR을 이 설계 위에 stack하고, **#167 병합 뒤**에 착지시킨다. 2단계(기록·노출)는 migration 번호 요청부터 시작하는 별 카드다.
+
+## 11. v1.1 — Codex 검토 F1·F2와 범위 정정
+
+세 건 모두 타당했다.
+
+### 11-1. F1 — 계약이 스스로 금지한 조합을 광고하고 있었다
+
+v1.0은 `status: Literal["NOT_OBSERVED", "RECORDED"]`를 **단일 모델**에 두고 counts는 없고 `recordedAt`은 `null`로 두었다. 그러면 **생성 JSON Schema가 `RECORDED` + `recordedAt: null` + 결과 0개를 유효하다고 광고**한다 — §2가 금지한 그 조합이고 부정 시험 1번과 모순이다. **계약이 시험보다 넓었다.**
+
+1단계는 `Literal["NOT_OBSERVED"]` **하나**로 좁혔다. `RECORDED`는 2단계가 **discriminated union의 두 번째 branch**로 들여오고, 그 branch가 non-null `recordedAt`과 counts·report를 **required로 결속**해 "기록됐다"와 "기록이 있다"가 스키마 수준에서 떨어질 수 없게 한다. 부정 시험 1번도 "생성물에서 `status`의 허용값이 정확히 하나"를 단언하도록 바꿨다.
+
+### 11-2. F2 — "소스에서 파생"할 정본이 없었다
+
+check 이름 15개와 capability gate는 `run_conformance()` **본문의 문자열 literal**이고, suite를 실행하지 않고 읽을 public 상수가 없다. 그 상태에서 route가 할 수 있는 것은 소스 파싱이나 이름 복제뿐이고, 시험이 같은 복제본과 비교하면 **되살림 변이가 생존**한다. 지적이 맞다.
+
+그래서 **구현 PR의 첫 변경을 `conformance.py`의 descriptor 추출로 바꿨다** — `CheckSpec(name, capability, run)`과 `CHECKLIST: tuple[CheckSpec, ...]`를 만들고 `run_conformance()`가 그것을 돌며, route는 `[{"name": …, "capabilityGated": s.capability is not None}]`를 낸다. 기존 helper들이 이미 `adapter`(와 `credential_ref`)를 받으므로 한 모양으로 맞춰진다.
+
+**목록의 완전성은 무엇이 지키는가**를 함께 적었다: route와 시험이 둘 다 `CHECKLIST`를 읽으므로 "항목 하나 삭제"는 그 둘로는 잡히지 않고, 그것을 잡는 것은 **이미 있는 `tests/test_adapters.py`** 다(일부러 망가뜨린 adapter가 **이름이 지정된 check**에서 실패해야 한다고 단언한다). 그래서 개수를 복제하지 않고 그 시험을 근거로 인용한다 — 판정 논리를 시험에 복제하지 않는 규칙과 같은 방향이다. 새 부정 시험 7b가 "suite가 만든 이름 집합 == `CHECKLIST`의 이름 집합"을 단언해 정본이 둘로 갈라지는 것을 막는다.
+
+**구현 범위가 늘었다**: 이 카드의 구현 PR은 시험만이 아니라 제품 파일 `conformance.py`를 건드린다. 안전망은 `tests/test_adapters.py`가 **바뀌지 않은 채 통과**하는 것이다(리팩터의 관측 가능한 결과가 0이어야 한다).
+
+### 11-3. 범위 정정 — `RES-0004`는 2단계 deferred
+
+1단계에는 adapter-name path가 없으므로 `RES-0004`와 unknown-adapter 시험은 **현재 route의 실행 증거가 아니다.** v1.0의 "오류 3종"을 철회하고 1단계는 `VAL-0003`·`AUTH-0030` **둘**로 적었다. 부정 시험은 열거 **18건** 중 **1단계 구현 17건**, 13번 하나가 deferred다.
+
+### 11-4. 남은 사실
+
+hosted Backend(`36380067351` 양 버전)와 docs(`36380067483`)는 success이지만 **docs-only이므로 새 route의 실행 증거는 아니다** — 그 지적도 맞고, 실행은 구현 PR에서만 나온다.

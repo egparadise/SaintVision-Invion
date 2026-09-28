@@ -1,11 +1,11 @@
 ---
 doc_id: "CLAUDE-G03-CONFORMANCE-API-DESIGN-001"
-title: "G-03 conformance 결과 API 노출 설계 v1.0 — 저장된 결과가 없으므로 1단계는 NOT_OBSERVED와 계약 표면만, 기록·노출은 migration이 필요한 2단계 (docs-only)"
-version: "1.0.0"
+title: "G-03 conformance 결과 API 노출 설계 v1.1 — 1단계 status는 Literal[NOT_OBSERVED] 하나, check 목록은 conformance.py의 단일 정본 descriptor에서, RES-0004는 2단계 deferred (docs-only)"
+version: "1.1.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T13:55:28+09:00"
+updated: "2026-09-28T14:28:30+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -47,7 +47,15 @@ PR #179 통합 분류표의 **G-03**("conformance 결과의 API 노출이 없다
 | `conformancePassed: false` / `passed: 0` | **금지.** `false`와 `0`은 "돌렸고 실패했다"로 읽힌다. 미측정과 실패는 다른 사실이다 |
 | **`status: "NOT_OBSERVED"` + 계약 표면** | **권고.** 서버가 "이 플랫폼은 conformance를 기록하지 않는다"를 스스로 말하고, 정적으로 참인 것(계약 버전·check 이름·대상 adapter)만 낸다 |
 
-boolean을 아예 두지 않는 것이 핵심이다 — `conformant: bool`에는 제3의 값이 없으므로 미측정을 표현할 자리가 없다. 그래서 응답은 **`status` enum**(`NOT_OBSERVED` | `RECORDED`)을 쓰고, `RECORDED`일 때만 counts가 존재한다. 1단계는 항상 `NOT_OBSERVED`이며, 그 사실을 부정 시험이 고정한다(§8-1).
+boolean을 아예 두지 않는 것이 핵심이다 — `conformant: bool`에는 제3의 값이 없으므로 미측정을 표현할 자리가 없다.
+
+### 2-1. 1단계의 `status`는 `Literal["NOT_OBSERVED"]` **하나**다 (v1.1, Codex F1)
+
+v1.0은 `Literal["NOT_OBSERVED", "RECORDED"]`를 **단일 모델**에 두고 counts는 없고 `recordedAt`은 `null`로 두었다. 그러면 **생성된 JSON Schema가 `RECORDED` + `recordedAt: null` + 결과 0개를 유효하다고 광고한다** — §2가 금지한 바로 그 조합이고 부정 시험 1번과도 모순이다. 계약은 시험보다 넓어서는 안 된다.
+
+그래서 1단계는 `status: Literal["NOT_OBSERVED"]`만 허용한다. 저장이 전혀 없는 현재 범위에서 그것이 참인 유일한 값이다.
+
+`RECORDED`는 2단계가 **discriminated union의 두 번째 branch**로 들여온다 — 그 branch는 non-null `recordedAt`과 counts·report를 **required로 결속**해, "기록됐다"는 말과 "기록이 있다"는 사실이 스키마 수준에서 떨어질 수 없게 한다. 그것은 공개 계약 확대이므로 2단계 카드가 계약 변경으로 센다.
 
 ## 3. 두 단계
 
@@ -90,31 +98,68 @@ GET /v1/projects/{project_id}/adapters/conformance
 
 | 필드 | 1단계 값 | 근거 |
 |---|---|---|
-| `status` | `"NOT_OBSERVED"` | `Literal["NOT_OBSERVED", "RECORDED"]`. 2단계가 `RECORDED`를 쓴다 |
+| `status` | `"NOT_OBSERVED"` | **`Literal["NOT_OBSERVED"]` 하나**(§2-1). `RECORDED`는 2단계가 discriminated union으로 들여온다 |
 | `reason` | 고정 문구 — *"No conformance run is recorded; this platform does not persist conformance results yet."* | 왜 미측정인지 |
 | `scope` | `"control-plane-host"` | §4-1. `/v1/adapters`와 같은 어휘 |
 | `contractVersion` | `"1.0.0"` (`contract.py:35`) | 정적으로 참 |
 | `adapters[]` | `["claude-code", "codex-cli", "gemini-cli", "antigravity"]` — suite가 돌 대상 | `agents.TOOLS`에서 파생. **상태·결과가 아니라 대상 목록**이다 |
-| `checks[]` | check **이름 15개**와 `capabilityGated: bool` | `conformance.py:131-160`에서 파생 |
+| `checks[]` | check **이름**과 `capabilityGated: bool` | **`conformance.py`의 단일 정본 descriptor에서 읽는다**(§5-1). 개수를 응답 계약에 고정하지 않는다 — 목록이 자라면 응답이 자란다 |
 | `recordedAt` | `null` | 기록이 없다 |
 
-**counts를 두지 않는다.** `total`·`passed`·`failed`·`skipped`는 `RECORDED`일 때만 의미가 있고, 1단계 응답에 `0`으로 넣으면 §2가 금지한 그것이 된다. 2단계에서 `status: "RECORDED"`와 함께 **한 묶음으로** 추가한다 — 그것이 계약 변경임을 2단계 카드가 적는다.
+**counts를 두지 않는다.** `total`·`passed`·`failed`·`skipped`는 `RECORDED`일 때만 의미가 있고, 1단계 응답에 `0`으로 넣으면 §2가 금지한 그것이 된다. 2단계에서 `RECORDED` branch와 함께 **한 묶음으로** 추가한다.
 
-단건 조회(`…/adapters/{name}/conformance`)는 **1단계에 두지 않는다**: 기록이 없으므로 adapter별로 다를 것이 없고, 지금 만들면 2단계에서 뜻이 바뀐다.
+단건 조회(`…/adapters/{name}/conformance`)는 **1단계에 두지 않는다**: 기록이 없으므로 adapter별로 다를 것이 없고, 지금 만들면 2단계에서 뜻이 바뀐다. **그러므로 1단계에는 adapter-name path 변수가 없고, `RES-0004`도 없다**(§5-2).
+
+### 5-1. check 목록의 단일 정본을 먼저 만든다 (v1.1, Codex F2)
+
+v1.0은 "`conformance.py:131-160`에서 파생"이라고 적었는데, **파생할 정본이 없다.** 그 줄들은 `run_conformance()` **본문의 문자열 literal**이고, suite를 실행하지 않고 읽을 public 상수가 없다. 그 상태에서 route가 할 수 있는 것은 (i) 소스를 문자열·AST로 파싱하거나 (ii) 이름을 복제하는 것뿐이고, 둘 다 drift를 만든다. 시험이 같은 복제본과 비교하면 **되살림 변이도 생존한다.** 지적이 맞다.
+
+**그래서 구현 PR의 첫 변경은 `conformance.py`에 불변 descriptor를 추출하는 것이다.**
+
+```python
+@dataclass(frozen=True)
+class CheckSpec:
+    name: str
+    #: None이면 무조건 실행. 값이 있으면 그 capability를 선언한 adapter에서만
+    #: 실행되고, 아니면 skipped로 보고된다.
+    capability: Capability | None
+    run: Callable[[ProviderAdapter, str], tuple[bool, str]]
+
+CHECKLIST: tuple[CheckSpec, ...] = (...)
+```
+
+- **`run_conformance()`가 `CHECKLIST`를 돌면서** 지금의 12 + capability 3을 만든다. 이름과 gate가 한 곳에만 있으므로 route와 suite가 갈라질 수 없다.
+- **route는 `[{"name": s.name, "capabilityGated": s.capability is not None} for s in CHECKLIST]`** 를 낸다. 소스 파싱도, 복제도 없다.
+- 기존 helper들은 이미 `adapter`(`_authenticate`는 `adapter, credential_ref`)를 받으므로 `run(adapter, credential_ref)` 한 모양으로 맞추면 된다.
+
+**목록의 완전성은 무엇이 지키는가**: route와 시험이 둘 다 `CHECKLIST`를 읽으므로 "항목 하나를 지우는" 변이는 그 둘만으로는 잡히지 않는다. 그것을 잡는 것은 **이미 있는 `tests/test_adapters.py`** 다 — 일부러 망가뜨린 adapter가 **이름이 지정된 check에서** 실패해야 한다고 단언하므로(예: `LeakyAdapter` → `collect_returns_redacted_content`), spec을 지우면 그 시험이 깨진다. 그래서 이 설계는 **개수를 복제하지 않고** 그 시험을 완전성의 근거로 인용한다. 판정 논리를 시험에 복제하지 않는다는 규칙과 같은 방향이다.
+
+**구현 범위가 늘어난다는 뜻이다**: 이 카드의 구현 PR은 시험만이 아니라 `conformance.py`를 건드린다. 안전망은 `tests/test_adapters.py`가 **바뀌지 않은 채로 통과**해야 한다는 것이다(refactor의 관측 가능한 결과가 0이어야 한다).
+
+### 5-2. 1단계의 오류는 둘이다 (v1.1, 범위 정정)
+
+| 오류 | 언제 | 1단계 |
+|---|---|---|
+| `VAL-0003` 422 | 허용하지 않는 query key, 중복 key, GET 본문 1바이트 이상 | **있다** |
+| `AUTH-0030` 403 | project 접근 불가(없는 project와 동형) | **있다** |
+| `RES-0004` 404 | 알 수 없는 adapter 이름 | **없다 — 2단계 deferred.** 1단계에 adapter-name path가 없으므로 이 코드는 현재 route의 실행 증거가 아니다 |
+
+v1.0이 "오류 3종"이라 적은 것을 철회한다.
 
 ## 6. 계약 변경 범위와 gate
 
 | 무엇 | 바뀌는가 | 근거 |
 |---|---|---|
 | `contracts/v1alpha1/core.schema.json` | **아니다** | business 응답 타입은 정본 `$defs`가 아니라 `api/schemas.py`의 `Strict` 클래스다 |
-| `api/schemas.py` | **예** — `ConformanceStatusResponse` 1개 |  |
+| `api/schemas.py` | **예** — `ConformanceStatusResponse` 1개(`status`는 `Literal["NOT_OBSERVED"]`) |  |
+| `adapters/conformance.py` | **예** — `CheckSpec`·`CHECKLIST` 추출과 `run_conformance()`가 그것을 소비(§5-1). **관측 가능한 동작 변화 0**이 조건이고 `tests/test_adapters.py` 무변경 통과가 그 근거다 |  |
 | `contracts/conformance-status-response.schema.json` | **예**(생성물) | `tools/export_schemas.py`가 `Strict` 파생 중 **이름이 `Request`/`Response`로 끝나는 것**을 찾는다(`:60`). 그래서 타입 이름이 `…Response`여야 생성된다 — #167에서 `ModelReleaseResult`가 이 규칙에 걸리지 않아 schema가 생성되지 않던 사례가 있었다 |
 | `export_schemas --check` | **잡는다** | 모델과 생성물이 어긋나면 `backend.yml`의 `--check`가 실패한다 |
 | openapi | 자동 — route 등록으로 `/v1/openapi.json`에 들어간다. 별도 파일 편집 없음 |  |
 | route coverage | `tools/route_coverage.py` 대상. 새 서빙 경로 1개 |  |
 | **route 등록 위치** | `projects` router에 `add_api_route`로 넣는다 | `inv.business_surface.BusinessDispatch`가 `projects`·`settings`·`adapters` router의 `routes`를 읽으므로 새 top-level router는 도달하지 않고, `include_router`는 지연 placeholder만 남긴다(#167 실측) |
 
-계약 변경 = **route 1 + 응답 타입 1 = 2건**, 새 오류 code **0개**(`VAL-0003`·`AUTH-0030`·`RES-0004` 재사용).
+계약 변경 = **route 1 + 응답 타입 1 = 2건**, 새 오류 code **0개**(`VAL-0003`·`AUTH-0030` 재사용, `RES-0004`는 2단계). `conformance.py`의 descriptor 추출은 **내부 리팩터**라 공개 계약이 아니지만 제품 파일을 건드리므로 위 표에 적었다.
 
 ## 7. persistence·index 판정
 
@@ -127,13 +172,14 @@ GET /v1/projects/{project_id}/adapters/conformance
 
 ### 8-1. `NOT_OBSERVED`를 지키는 것 (PG-free)
 
-1. `status`를 `"RECORDED"`로 바꾸거나 `conformant: true`를 넣으면 → "저장된 실행이 없는데 결과를 주장한다" 단언이 실패한다.
+1. `status`의 `Literal`을 `["NOT_OBSERVED", "RECORDED"]`로 넓히면 → **생성 schema가 `RECORDED`를 유효로 광고한다**. 생성물에서 `status`의 허용값이 정확히 하나임을 단언한다(§2-1). `conformant: true` 추가도 같은 시험이 잡는다.
 2. `passed`/`failed`/`total`/`skipped` 중 하나라도 응답에 넣으면(값이 `0`이어도) → **counts 금지** 단언이 실패한다. `0`이 "돌렸고 0개 통과"로 읽히는 것이 금지 이유다.
 3. `recordedAt`에 현재 시각을 넣으면 → `null`이어야 한다는 단언이 실패한다(지금 응답을 만든 시각은 **측정 시각이 아니다**).
 4. `reason`을 지우면 → 왜 미측정인지 말하지 않는 응답이 된다.
 5. `scope`를 지우거나 `"project"`로 바꾸면 → payload가 project 범위 데이터인 척하게 된다(§4-1).
 6. route가 `run_conformance()`를 부르면 → **읽기 route가 호스트 프로세스를 구동한다.** 호출 없음을 단언한다(§3).
-7. `checks[]`와 `adapters[]`가 소스에서 파생되지 않고 하드코딩되면 → `conformance.py`의 check 목록·`agents.TOOLS`와 비교하는 단언이 실패한다. **판정 논리를 복제하지 않고 이름만 가져온다.**
+7. `checks[]`가 `CHECKLIST`에서 오지 않고 하드코딩되면 → 응답과 `CHECKLIST`를 대조하는 단언이 실패한다. `adapters[]`도 `agents.TOOLS`와 대조한다. **개수를 복제하지 않는다** — 목록의 완전성은 `tests/test_adapters.py`가 지킨다(§5-1).
+7b. `run_conformance()`가 `CHECKLIST`를 돌지 않고 자기 literal로 되돌아가면 → suite가 만든 check 이름 집합과 `CHECKLIST`의 이름 집합이 같아야 한다는 단언이 실패한다(두 정본이 생기는 것을 막는다).
 
 ### 8-2. 권한·존재 비노출 (PG-free + 실 PG)
 
@@ -142,7 +188,7 @@ GET /v1/projects/{project_id}/adapters/conformance
 10. **비회원**: 접근 권한 없는 project id로 조회 → `AUTH-0030` 403이고 body에 `projectId`가 없다.
 11. **없는 project id** → 10번과 **같은 거부**(존재 비노출). 두 응답이 구분되면 실패다.
 12. **다른 tenant의 project id** → 같은 거부(실 PG, RLS).
-13. 알 수 없는 adapter 이름을 경로에 넣는 변형(2단계 단건 조회가 생겼을 때) → `RES-0004` 404.
+13. **(2단계 deferred)** 알 수 없는 adapter 이름 → `RES-0004` 404. 1단계에 그 path가 없으므로 지금 구현하지 않는다(§5-2).
 
 ### 8-3. 계약 (PG-free)
 
@@ -151,7 +197,7 @@ GET /v1/projects/{project_id}/adapters/conformance
 16. 응답 타입 이름이 `…Response`가 아니면 `export_schemas`가 schema를 만들지 않는다 → 생성물 존재와 `--check` drift 0을 단언한다(§6의 #167 사례 재발 방지).
 17. route가 `projects` router의 `routes`에 실제로 있다(= `BusinessDispatch`가 서빙한다). `include_router`로 되돌리면 지연 placeholder만 남아 도달하지 않는다.
 
-**실 PG는 12번 하나**이고(다른 tenant), 나머지는 PG-free다. 로컬은 메모리 규칙상 단일 파일만 돌리고, 실 PG 근거는 hosted Backend에 둔다.
+열거는 **18건**이다(v1.0의 17 + 7b). 그중 **1단계에서 구현하는 것은 17건**이고 **13번 하나가 2단계 deferred**다(§5-2). 실 PG는 12번 하나(다른 tenant)이고 나머지는 PG-free다. 로컬은 메모리 규칙상 단일 파일만 돌리고, 실 PG 근거는 hosted Backend에 둔다.
 
 ## 9. #146 FE 어휘 대응표
 
@@ -176,4 +222,5 @@ GET /v1/projects/{project_id}/adapters/conformance
 - **2단계를 설계하지 않았다.** 실행 주체(CI job / 운영 명령 / 요청)·주기·보존 기간이 owner 결정이고, 그것이 정해지지 않은 상태에서 table을 그리면 잘못된 스키마가 남는다. 2단계는 **migration 번호 요청부터** 시작한다.
 - **`compare_reports()`(AC-10 "계약 동일")도 노출하지 않는다** — 두 adapter의 실행 기록이 있어야 비교가 성립하므로 2단계 이후다.
 - `run_conformance`의 `credential_ref` 기본값은 `"conformance://dummy"`다. 실제 credential로 도는 conformance는 통합 분류표의 **G-25**(BLOCKED_EXTERNAL)다 — 1단계가 `NOT_OBSERVED`라고 말하는 것은 "기록이 없다"까지이고 "실 credential로 검증됐다"를 뜻하지 않는다.
+- **v1.1에서 구현 범위가 늘었다**: `conformance.py`에 `CheckSpec`·`CHECKLIST`를 추가한다(§5-1). 시험만 추가하는 카드가 아니다.
 - 실행하지 않았다: 로컬 실 PG·Docker·전체 suite. 이 문서의 실측은 전부 `git grep -n -F`·정독이다.
