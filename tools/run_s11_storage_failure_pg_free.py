@@ -32,7 +32,7 @@ sys.path.insert(0, str(CONTROL_PLANE))
 sys.path.insert(0, str(ROOT / "tools"))
 
 from inv.errors import DomainError  # noqa: E402
-from inv.object_store import LocalObjects  # noqa: E402
+from inv.object_store import LocalObjectStore, LocalObjects  # noqa: E402
 import inv.object_store as object_store  # noqa: E402
 import pitr_archive_retention as retention  # noqa: E402
 from verify_backup_artifact import BackupArtifactInvalid, verify_physical_backup_archive  # noqa: E402
@@ -253,7 +253,11 @@ def _local_write_fault(identity: str) -> dict[str, Any]:
     with tempfile.TemporaryDirectory(prefix="s11-storage-") as temporary:
         root = Path(temporary)
         root.chmod(0o700)
-        provider = LocalObjects(root)
+        # Exercise the registered product boundary.  ``LocalObjects`` is the
+        # low-level, locked filesystem handle; host failures are deliberately
+        # translated to STORE-0001 by ``LocalObjectStore`` before they reach a
+        # caller or an evidence receipt.
+        provider = LocalObjectStore(LocalObjects(root))
         if identity.endswith("write-enospc"):
             patcher = mock.patch.object(object_store.os, "fdopen", side_effect=failing_fdopen)
         elif "fsync" in identity:
@@ -262,8 +266,7 @@ def _local_write_fault(identity: str) -> dict[str, Any]:
             patcher = mock.patch.object(object_store.os, "open", side_effect=failing_open)
         try:
             with patcher:
-                with provider.locked() as handle:
-                    handle.put(key, data, digest)
+                provider.put(key, data, digest)
         except BaseException as exc:
             actual = _surface(exc)
         else:

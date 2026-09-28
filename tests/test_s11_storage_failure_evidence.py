@@ -129,6 +129,32 @@ def test_product_finding_is_preserved_as_measured_fail():
     assert evidence["metrics"]["classificationMismatchCount"] == 1
 
 
+def test_local_write_fault_uses_the_registered_translation_boundary(monkeypatch):
+    legacy = object()
+    wrapped = []
+
+    class Provider:
+        def put(self, _locator, _body, _digest):
+            raise producer.DomainError("STORE-0001", "Object provider unavailable", 503, True)
+
+    monkeypatch.setattr(producer, "LocalObjects", lambda _root: legacy)
+
+    def wrap(value):
+        wrapped.append(value)
+        return Provider()
+
+    monkeypatch.setattr(producer, "LocalObjectStore", wrap)
+    case = producer._local_write_fault("CAP-02/local/enospc-new-key")
+    assert wrapped == [legacy]
+    assert case["matched"] is True
+    assert case["actualSurface"] == {
+        "kind": "problem",
+        "code": "STORE-0001",
+        "status": 503,
+        "retryable": True,
+    }
+
+
 @pytest.mark.parametrize("identity", producer.PG_FREE_CASES[:2])
 def test_retention_and_backup_fault_cases_execute_hermetically(identity, monkeypatch):
     receipts = []
