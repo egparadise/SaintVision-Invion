@@ -322,6 +322,18 @@ def test_locator_from_another_configured_prefix_is_retryable_unavailable():
     )
 
 
+def test_locator_with_nested_configured_prefix_drift_is_retryable_unavailable():
+    provider = S3Objects("s3-compatible-v1", "product", FakeClient())
+    nested = make_s3_locator("product/nested", TENANT, PROJECT, "objects", OBJECT)
+    with pytest.raises(DomainError) as raised:
+        provider.validate_locator(nested)
+    assert (raised.value.code, raised.value.status, raised.value.retryable) == (
+        "STORE-0001",
+        503,
+        True,
+    )
+
+
 def test_sigv4_path_encoding_is_deterministic_and_secret_free_from_url():
     transport = FakeClient()
     # Reuse only its request recording surface; S3Client does not depend on its
