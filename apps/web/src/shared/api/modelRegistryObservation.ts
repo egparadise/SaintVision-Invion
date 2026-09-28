@@ -26,11 +26,24 @@ import type {
 
 const HEX_64_REGEX = /^[0-9a-f]{64}$/;
 const ISO_DATE_TIME_REGEX =
-  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/;
+  /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(Z|[+-]\d{2}:\d{2})$/;
 
 export function isValidIsoDateTime(value: unknown): boolean {
   if (typeof value !== 'string') return false;
-  if (!ISO_DATE_TIME_REGEX.test(value)) return false;
+  const match = ISO_DATE_TIME_REGEX.exec(value);
+  if (!match) return false;
+  const [, yStr, mStr, dStr, hStr, minStr, sStr] = match;
+  const year = parseInt(yStr, 10);
+  const month = parseInt(mStr, 10);
+  const day = parseInt(dStr, 10);
+  const hour = parseInt(hStr, 10);
+  const min = parseInt(minStr, 10);
+  const sec = parseInt(sStr, 10);
+  if (month < 1 || month > 12) return false;
+  if (hour < 0 || hour > 23 || min < 0 || min > 59 || sec < 0 || sec > 60) return false;
+  const isLeap = (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0));
+  const daysInMonth = [31, isLeap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  if (day < 1 || day > daysInMonth[month - 1]) return false;
   const parsed = Date.parse(value);
   return !Number.isNaN(parsed);
 }
@@ -44,9 +57,20 @@ export function generateIdempotencyKey(prefix = 'idem'): string {
   return `${prefix}_${Date.now()}_${nonce}`.slice(0, 128);
 }
 
+const LINEAGE_DATASET_VERSION_KEYS = new Set([
+  'datasetVersionId',
+  'version',
+  'contentSha256',
+  'uri',
+]);
+
 export function isLineageDatasetVersion(data: unknown): data is LineageDatasetVersion {
-  if (!data || typeof data !== 'object') return false;
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return false;
   const d = data as Record<string, unknown>;
+  const keys = Object.keys(d);
+  if (keys.length !== LINEAGE_DATASET_VERSION_KEYS.size) return false;
+  if (!keys.every((k) => LINEAGE_DATASET_VERSION_KEYS.has(k))) return false;
+
   return (
     typeof d.datasetVersionId === 'string' &&
     d.datasetVersionId.length > 0 &&
@@ -60,9 +84,23 @@ export function isLineageDatasetVersion(data: unknown): data is LineageDatasetVe
   );
 }
 
+const LINEAGE_DEPLOYMENT_KEYS = new Set([
+  'deploymentId',
+  'environment',
+  'status',
+  'deployedDigest',
+  'deployedAt',
+  'approvalId',
+  'imageId',
+  'supersededAt',
+]);
+
 export function isLineageDeployment(data: unknown): data is LineageDeployment {
-  if (!data || typeof data !== 'object') return false;
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return false;
   const d = data as Record<string, unknown>;
+  const keys = Object.keys(d);
+  if (!keys.every((k) => LINEAGE_DEPLOYMENT_KEYS.has(k))) return false;
+
   const validEnvironments = ['lab', 'staging', 'pilot'];
   const validStatuses = ['pending', 'active', 'superseded', 'rolled_back', 'failed'];
 
@@ -97,9 +135,15 @@ export function isLineageDeployment(data: unknown): data is LineageDeployment {
   return true;
 }
 
+const LINEAGE_UNRESOLVED_KEYS = new Set(['kind', 'count']);
+
 export function isLineageUnresolved(data: unknown): data is LineageUnresolved {
-  if (!data || typeof data !== 'object') return false;
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return false;
   const d = data as Record<string, unknown>;
+  const keys = Object.keys(d);
+  if (keys.length !== LINEAGE_UNRESOLVED_KEYS.size) return false;
+  if (!keys.every((k) => LINEAGE_UNRESOLVED_KEYS.has(k))) return false;
+
   return (
     typeof d.kind === 'string' &&
     d.kind.length >= 1 &&
@@ -110,9 +154,28 @@ export function isLineageUnresolved(data: unknown): data is LineageUnresolved {
   );
 }
 
+const MODEL_LINEAGE_TRACE_RESPONSE_KEYS = new Set([
+  'modelVersionId',
+  'version',
+  'stage',
+  'contentSha256',
+  'datasets',
+  'deployments',
+  'missing',
+  'unresolved',
+  'fullyTraceable',
+  'traceabilityLimitedByScope',
+  'detailedKinds',
+  'countOnlyKinds',
+  'producedByRunId',
+  'truncated',
+]);
+
 export function isModelLineageTraceResponse(data: unknown): data is ModelLineageTraceResponse {
-  if (!data || typeof data !== 'object') return false;
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return false;
   const r = data as Record<string, unknown>;
+  const keys = Object.keys(r);
+  if (!keys.every((k) => MODEL_LINEAGE_TRACE_RESPONSE_KEYS.has(k))) return false;
 
   const validStages = ['draft', 'candidate', 'released', 'retired'];
   if (
@@ -131,22 +194,23 @@ export function isModelLineageTraceResponse(data: unknown): data is ModelLineage
     return false;
   }
 
-  if (!Array.isArray(r.datasets) || !r.datasets.every(isLineageDatasetVersion)) {
+  // Collection bounds: datasets max 200, deployments max 200, missing max 16, unresolved max 16, detailedKinds max 16, countOnlyKinds max 16
+  if (!Array.isArray(r.datasets) || r.datasets.length > 200 || !r.datasets.every(isLineageDatasetVersion)) {
     return false;
   }
-  if (!Array.isArray(r.deployments) || !r.deployments.every(isLineageDeployment)) {
+  if (!Array.isArray(r.deployments) || r.deployments.length > 200 || !r.deployments.every(isLineageDeployment)) {
     return false;
   }
-  if (!Array.isArray(r.missing) || !r.missing.every((m) => typeof m === 'string')) {
+  if (!Array.isArray(r.missing) || r.missing.length > 16 || !r.missing.every((m) => typeof m === 'string')) {
     return false;
   }
-  if (!Array.isArray(r.unresolved) || !r.unresolved.every(isLineageUnresolved)) {
+  if (!Array.isArray(r.unresolved) || r.unresolved.length > 16 || !r.unresolved.every(isLineageUnresolved)) {
     return false;
   }
-  if (!Array.isArray(r.detailedKinds) || !r.detailedKinds.every((k) => typeof k === 'string')) {
+  if (!Array.isArray(r.detailedKinds) || r.detailedKinds.length > 16 || !r.detailedKinds.every((k) => typeof k === 'string')) {
     return false;
   }
-  if (!Array.isArray(r.countOnlyKinds) || !r.countOnlyKinds.every((k) => typeof k === 'string')) {
+  if (!Array.isArray(r.countOnlyKinds) || r.countOnlyKinds.length > 16 || !r.countOnlyKinds.every((k) => typeof k === 'string')) {
     return false;
   }
 
@@ -168,9 +232,24 @@ export function isModelLineageTraceResponse(data: unknown): data is ModelLineage
   return true;
 }
 
+const MODEL_VERSION_RESPONSE_KEYS = new Set([
+  'modelVersionId',
+  'modelId',
+  'version',
+  'stage',
+  'contentSha256',
+  'byteSize',
+  'uri',
+  'createdAt',
+]);
+
 export function isModelVersionResponse(data: unknown): data is ModelVersionResponse {
-  if (!data || typeof data !== 'object') return false;
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return false;
   const r = data as Record<string, unknown>;
+  const keys = Object.keys(r);
+  if (keys.length !== MODEL_VERSION_RESPONSE_KEYS.size) return false;
+  if (!keys.every((k) => MODEL_VERSION_RESPONSE_KEYS.has(k))) return false;
+
   return (
     typeof r.modelVersionId === 'string' &&
     r.modelVersionId.length > 0 &&
@@ -191,9 +270,22 @@ export function isModelVersionResponse(data: unknown): data is ModelVersionRespo
   );
 }
 
+const RETENTION_PIN_RESPONSE_KEYS = new Set([
+  'modelVersionId',
+  'modelId',
+  'version',
+  'stage',
+  'retentionPinnedUntil',
+  'extended',
+]);
+
 export function isRetentionPinResponse(data: unknown): data is RetentionPinResponse {
-  if (!data || typeof data !== 'object') return false;
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return false;
   const r = data as Record<string, unknown>;
+  const keys = Object.keys(r);
+  if (keys.length !== RETENTION_PIN_RESPONSE_KEYS.size) return false;
+  if (!keys.every((k) => RETENTION_PIN_RESPONSE_KEYS.has(k))) return false;
+
   const validStages = ['draft', 'candidate', 'released', 'retired'];
   return (
     typeof r.modelVersionId === 'string' &&
@@ -210,9 +302,21 @@ export function isRetentionPinResponse(data: unknown): data is RetentionPinRespo
   );
 }
 
+const MODEL_RELEASE_RESPONSE_KEYS = new Set([
+  'modelVersionId',
+  'modelId',
+  'version',
+  'stage',
+  'contentSha256',
+]);
+
 export function isModelReleaseResponse(data: unknown): data is ModelReleaseResponse {
-  if (!data || typeof data !== 'object') return false;
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return false;
   const r = data as Record<string, unknown>;
+  const keys = Object.keys(r);
+  if (keys.length !== MODEL_RELEASE_RESPONSE_KEYS.size) return false;
+  if (!keys.every((k) => MODEL_RELEASE_RESPONSE_KEYS.has(k))) return false;
+
   return (
     typeof r.modelVersionId === 'string' &&
     r.modelVersionId.length > 0 &&
@@ -254,8 +358,7 @@ export async function registerModelVersion(
   projectId: string,
   modelId: string,
   payload: ModelVersionRegisterRequest,
-  idempotencyKey?: string,
-  signal?: AbortSignal
+  options?: { signal?: AbortSignal; idempotencyKey?: string }
 ): Promise<ModelVersionResponse> {
   if (!projectId || !modelId) {
     throw new Error('프로젝트 ID와 모델 ID를 확인하세요.');
@@ -264,7 +367,7 @@ export async function registerModelVersion(
     throw new Error('버전 및 contentSha256(64자 16진수) 필드가 필수입니다.');
   }
 
-  const key = idempotencyKey || generateIdempotencyKey('reg');
+  const key = options?.idempotencyKey || generateIdempotencyKey('reg');
   const path = [projectId, modelId].map(encodeURIComponent);
   const result = await apiClient<ModelVersionResponse>(
     `/v1/projects/${path[0]}/models/${path[1]}/versions`,
@@ -272,7 +375,7 @@ export async function registerModelVersion(
       method: 'POST',
       body: JSON.stringify(payload),
       idempotencyKey: key,
-      signal,
+      signal: options?.signal,
     }
   );
 
@@ -288,8 +391,7 @@ export async function extendRetentionPin(
   modelId: string,
   version: string,
   payload: RetentionPinRequest,
-  idempotencyKey?: string,
-  signal?: AbortSignal
+  options?: { signal?: AbortSignal; idempotencyKey?: string }
 ): Promise<RetentionPinResponse> {
   if (!projectId || !modelId || !version) {
     throw new Error('프로젝트 ID, 모델 ID, 버전을 확인하세요.');
@@ -298,7 +400,7 @@ export async function extendRetentionPin(
     throw new Error('유효한 ISO date-time 형식의 until 필드가 필수입니다.');
   }
 
-  const key = idempotencyKey || generateIdempotencyKey('pin');
+  const key = options?.idempotencyKey || generateIdempotencyKey('pin');
   const path = [projectId, modelId, version].map(encodeURIComponent);
   const result = await apiClient<RetentionPinResponse>(
     `/v1/projects/${path[0]}/models/${path[1]}/versions/${path[2]}/retention-pin`,
@@ -306,7 +408,7 @@ export async function extendRetentionPin(
       method: 'POST',
       body: JSON.stringify(payload),
       idempotencyKey: key,
-      signal,
+      signal: options?.signal,
     }
   );
 
@@ -322,7 +424,7 @@ export async function releaseModelVersion(
   modelId: string,
   version: string,
   payload: ModelReleaseRequest,
-  signal?: AbortSignal
+  options?: { signal?: AbortSignal }
 ): Promise<ModelReleaseResponse> {
   if (!projectId || !modelId || !version) {
     throw new Error('프로젝트 ID, 모델 ID, 버전을 확인하세요.');
@@ -337,7 +439,7 @@ export async function releaseModelVersion(
     {
       method: 'POST',
       body: JSON.stringify(payload),
-      signal,
+      signal: options?.signal,
     }
   );
 

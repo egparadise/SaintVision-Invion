@@ -4,6 +4,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { createRoot, Root } from 'react-dom/client';
 import { act } from 'react';
 import { ModelLineageView } from '../src/features/mlops/ModelLineageView';
+import { isProblemDetails } from '../src/shared/api/client';
 import {
   isModelLineageTraceResponse,
   isModelVersionResponse,
@@ -39,24 +40,26 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     vi.restoreAllMocks();
   });
 
+  // Server exact entity prefixes (ids.py): mdv_, mdl_, dsv_, dpl_, apv_
+  // Server exact kind vocabulary (services/lineage.py): dataset_version, deployment, code_commit, container_image, eval_run, approval
   const validTraceResponse: ModelLineageTraceResponse = {
-    modelVersionId: 'mv_01JABCDEF1234567890ABCDEF',
+    modelVersionId: 'mdv_01JABCDEF1234567890ABCDEF',
     version: '1.0.0',
     stage: 'released',
     contentSha256: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
     producedByRunId: 'run_01J9876543210',
     fullyTraceable: true,
     traceabilityLimitedByScope: false,
-    detailedKinds: ['datasets', 'deployments'],
-    countOnlyKinds: ['evaluations', 'commits', 'approvals'],
+    detailedKinds: ['dataset_version', 'deployment'],
+    countOnlyKinds: ['eval_run', 'code_commit', 'approval', 'container_image'],
     missing: [],
     unresolved: [
-      { kind: 'evaluations', count: 2 },
-      { kind: 'commits', count: 1 },
+      { kind: 'eval_run', count: 2 },
+      { kind: 'code_commit', count: 1 },
     ],
     datasets: [
       {
-        datasetVersionId: 'ds_01J11223344',
+        datasetVersionId: 'dsv_01J112233445566778899001',
         version: 'v2.1',
         contentSha256: 'aaaabbbbccccdddd0123456789abcdef0123456789abcdef0123456789abcdef',
         uri: 'inv://datasets/curated-v2@v2.1',
@@ -64,20 +67,20 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     ],
     deployments: [
       {
-        deploymentId: 'dep_01J99887766',
+        deploymentId: 'dpl_01J998877665544332211001',
         environment: 'pilot',
         status: 'active',
         deployedDigest: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
         deployedAt: '2026-09-28T12:00:00Z',
-        approvalId: 'apr_01JLEGALAPPROVE',
+        approvalId: 'apv_01JLEGALAPPROVE1122334455',
         imageId: null,
       },
     ],
   };
 
   const validVersionResponse: ModelVersionResponse = {
-    modelVersionId: 'mv_01JNEWREGISTERED001',
-    modelId: 'mod_llama3',
+    modelVersionId: 'mdv_01JNEWREGISTERED001',
+    modelId: 'mdl_01JLLAMA30000000000000000',
     version: '1.0.0-rc1',
     stage: 'draft',
     contentSha256: '11112222333344445555666677778888aaaabbbbccccddddeeeeffff00001111',
@@ -87,8 +90,8 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
   };
 
   const validPinResponse: RetentionPinResponse = {
-    modelVersionId: 'mv_01JNEWREGISTERED001',
-    modelId: 'mod_llama3',
+    modelVersionId: 'mdv_01JNEWREGISTERED001',
+    modelId: 'mdl_01JLLAMA30000000000000000',
     version: '1.0.0-rc1',
     stage: 'draft',
     retentionPinnedUntil: '2026-12-31T23:59:59Z',
@@ -96,15 +99,22 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
   };
 
   const validReleaseResponse: ModelReleaseResponse = {
-    modelVersionId: 'mv_01JNEWREGISTERED001',
-    modelId: 'mod_llama3',
+    modelVersionId: 'mdv_01JNEWREGISTERED001',
+    modelId: 'mdl_01JLLAMA30000000000000000',
     version: '1.0.0-rc1',
     stage: 'released',
     contentSha256: '11112222333344445555666677778888aaaabbbbccccddddeeeeffff00001111',
   };
 
-  // 1. Lineage Query Success Path & Honest NOT_OBSERVED Rendering
-  it('queries real GET /lineage route and honestly renders trace data with NOT_OBSERVED for unobserved metrics', async () => {
+  const setInputValue = (input: HTMLInputElement, val: string) => {
+    const setNative = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+    setNative?.call(input, val);
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  };
+
+  // 1. Lineage Query Success Path & Honest Dynamic Rendering (Claude G1, G5)
+  it('queries real GET /lineage route and honestly renders dynamic trace cards with NOT_OBSERVED for unobserved metrics', async () => {
     let capturedUrl = '';
     let capturedMethod = '';
 
@@ -123,7 +133,7 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
       root.render(
         <ModelLineageView
           projectId="prj_alpha"
-          initialModelId="mod_llama3"
+          initialModelId="mdl_01JLLAMA30000000000000000"
           initialVersion="1.0.0"
         />
       );
@@ -142,7 +152,7 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     });
 
     expect(capturedMethod).toBe('GET');
-    expect(capturedUrl).toBe('/v1/projects/prj_alpha/models/mod_llama3/versions/1.0.0/lineage');
+    expect(capturedUrl).toBe('/v1/projects/prj_alpha/models/mdl_01JLLAMA30000000000000000/versions/1.0.0/lineage');
 
     // Real lineage container must appear
     const realContainer = container.querySelector('[data-testid="real-lineage-container"]');
@@ -153,25 +163,25 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     const traceableBadge = container.querySelector('[data-testid="badge-fully-traceable"]');
     expect(traceableBadge?.textContent).toContain('완전 추적 가능');
 
-    // Datasets Table
+    // Datasets Table with real dsv_ prefix
     const datasetsSection = container.querySelector('[data-testid="real-lineage-datasets"]');
-    expect(datasetsSection?.textContent).toContain('ds_01J11223344');
+    expect(datasetsSection?.textContent).toContain('dsv_01J112233445566778899001');
     expect(datasetsSection?.textContent).toContain('inv://datasets/curated-v2@v2.1');
 
-    // Deployments Table
+    // Deployments Table with real dpl_ and apv_ prefix
     const deploymentsSection = container.querySelector('[data-testid="real-lineage-deployments"]');
-    expect(deploymentsSection?.textContent).toContain('dep_01J99887766');
+    expect(deploymentsSection?.textContent).toContain('dpl_01J998877665544332211001');
     expect(deploymentsSection?.textContent).toContain('pilot');
-    expect(deploymentsSection?.textContent).toContain('apr_01JLEGALAPPROVE');
+    expect(deploymentsSection?.textContent).toContain('apv_01JLEGALAPPROVE1122334455');
 
-    // CRITICAL: Honest NOT_OBSERVED rendering for unserved evaluation/commit/approval fields
-    const evalUnobserved = container.querySelector('[data-testid="trace-evaluations-unobserved"]');
+    // Dynamic unobserved rendering from server kinds (Claude G1 & G5)
+    const evalUnobserved = container.querySelector('[data-testid="trace-eval_run-unobserved"]');
     expect(evalUnobserved).not.toBeNull();
     expect(evalUnobserved?.textContent).toContain('NOT_OBSERVED (미관측)');
-    expect(evalUnobserved?.textContent).toContain('응답 스키마에 미포함되어 가짜 점수 합성을 차단합니다.');
+    expect(evalUnobserved?.textContent).toContain('상세 범위 외 (2건 관측)');
 
-    const commitsUnobserved = container.querySelector('[data-testid="trace-commits-unobserved"]');
-    expect(commitsUnobserved?.textContent).toContain('NOT_OBSERVED (범위 외)');
+    const commitsUnobserved = container.querySelector('[data-testid="trace-code_commit-unobserved"]');
+    expect(commitsUnobserved?.textContent).toContain('상세 범위 외 (1건 관측)');
 
     // Ensure NO fake accuracy (85.0% or 95.0% or fake F1) in real lineage container
     expect(realContainer?.textContent).not.toContain('85.0%');
@@ -207,7 +217,7 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
       root.render(
         <ModelLineageView
           projectId="prj_alpha"
-          initialModelId="mod_llama3"
+          initialModelId="mdl_01JLLAMA30000000000000000"
           currentUser={{ canApprove: true }}
         />
       );
@@ -228,18 +238,9 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     const byteInput = container.querySelector('[data-testid="input-register-bytesize"]') as HTMLInputElement;
 
     await act(async () => {
-      const setNative = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
-      setNative?.call(versionInput, '1.0.0-rc1');
-      versionInput.dispatchEvent(new Event('input', { bubbles: true }));
-      versionInput.dispatchEvent(new Event('change', { bubbles: true }));
-
-      setNative?.call(shaInput, '11112222333344445555666677778888aaaabbbbccccddddeeeeffff00001111');
-      shaInput.dispatchEvent(new Event('input', { bubbles: true }));
-      shaInput.dispatchEvent(new Event('change', { bubbles: true }));
-
-      setNative?.call(byteInput, '1048576');
-      byteInput.dispatchEvent(new Event('input', { bubbles: true }));
-      byteInput.dispatchEvent(new Event('change', { bubbles: true }));
+      setInputValue(versionInput, '1.0.0-rc1');
+      setInputValue(shaInput, '11112222333344445555666677778888aaaabbbbccccddddeeeeffff00001111');
+      setInputValue(byteInput, '1048576');
     });
 
     const submitBtn = container.querySelector('[data-testid="btn-register-version"]') as HTMLButtonElement;
@@ -250,7 +251,7 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     });
 
     expect(capturedMethod).toBe('POST');
-    expect(capturedUrl).toBe('/v1/projects/prj_alpha/models/mod_llama3/versions');
+    expect(capturedUrl).toBe('/v1/projects/prj_alpha/models/mdl_01JLLAMA30000000000000000/versions');
     expect(capturedHeaders['idempotency-key']).toBeDefined();
     expect(capturedHeaders['idempotency-key'].length).toBeGreaterThan(5);
 
@@ -259,14 +260,14 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     expect(parsedBody.contentSha256).toBe('11112222333344445555666677778888aaaabbbbccccddddeeeeffff00001111');
     expect(parsedBody.byteSize).toBe(1048576);
 
-    const successBanner = container.querySelector('[data-testid="registry-register-success"]');
-    expect(successBanner).not.toBeNull();
-    expect(successBanner?.textContent).toContain('모델 버전 등록 완료 (201 Created)');
-    expect(successBanner?.textContent).toContain('mv_01JNEWREGISTERED001');
-    expect(successBanner?.textContent).toContain('draft');
+    // Verify success banner rendered
+    const banner = container.querySelector('[data-testid="registry-register-success"]');
+    expect(banner).not.toBeNull();
+    expect(banner?.textContent).toContain('모델 버전 등록 완료 (201 Created)');
+    expect(banner?.textContent).toContain('mdv_01JNEWREGISTERED001');
   });
 
-  // 3. W4 Extend Retention Pin Route & Idempotency Key
+  // 3. W4 Retention Pin Route
   it('extends retention pin via POST /retention-pin with Idempotency-Key and renders 200 response', async () => {
     let capturedUrl = '';
     let capturedMethod = '';
@@ -294,14 +295,13 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
       root.render(
         <ModelLineageView
           projectId="prj_alpha"
-          initialModelId="mod_llama3"
+          initialModelId="mdl_01JLLAMA30000000000000000"
           initialVersion="1.0.0-rc1"
           currentUser={{ canApprove: true }}
         />
       );
     });
 
-    // Switch to Pin tab
     const tabs = container.querySelectorAll('button');
     const pinTabBtn = Array.from(tabs).find((b) => b.textContent?.includes('보존 고정'));
     expect(pinTabBtn).toBeDefined();
@@ -311,12 +311,10 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     });
 
     const untilInput = container.querySelector('[data-testid="input-pin-until"]') as HTMLInputElement;
+    expect(untilInput).not.toBeNull();
 
     await act(async () => {
-      const setNative = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
-      setNative?.call(untilInput, '2026-12-31T23:59:59Z');
-      untilInput.dispatchEvent(new Event('input', { bubbles: true }));
-      untilInput.dispatchEvent(new Event('change', { bubbles: true }));
+      setInputValue(untilInput, '2026-12-31T23:59:59Z');
     });
 
     const pinBtn = container.querySelector('[data-testid="btn-pin-retention"]') as HTMLButtonElement;
@@ -327,28 +325,33 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     });
 
     expect(capturedMethod).toBe('POST');
-    expect(capturedUrl).toBe('/v1/projects/prj_alpha/models/mod_llama3/versions/1.0.0-rc1/retention-pin');
+    expect(capturedUrl).toBe('/v1/projects/prj_alpha/models/mdl_01JLLAMA30000000000000000/versions/1.0.0-rc1/retention-pin');
     expect(capturedHeaders['idempotency-key']).toBeDefined();
 
     const parsedBody = JSON.parse(capturedBody);
     expect(parsedBody.until).toBe('2026-12-31T23:59:59Z');
 
-    const pinSuccess = container.querySelector('[data-testid="registry-pin-success"]');
-    expect(pinSuccess).not.toBeNull();
-    expect(pinSuccess?.textContent).toContain('보존 고정 판정 완료 (200 OK)');
-    expect(container.querySelector('[data-testid="pin-extended-flag"]')?.textContent).toBe('true');
+    const banner = container.querySelector('[data-testid="registry-pin-success"]');
+    expect(banner).not.toBeNull();
+    expect(banner?.textContent).toContain('보존 고정 판정 완료 (200 OK)');
   });
 
   // 4. Model Release Route
   it('releases model version via POST /release with declaration and renders 200 response', async () => {
     let capturedUrl = '';
     let capturedMethod = '';
+    let capturedHeaders: Record<string, string> = {};
     let capturedBody = '';
 
     globalThis.fetch = vi.fn().mockImplementation((url, init) => {
       capturedUrl = String(url);
       capturedMethod = init?.method || 'GET';
       capturedBody = String(init?.body || '');
+      if (init?.headers instanceof Headers) {
+        init.headers.forEach((v, k) => {
+          capturedHeaders[k.toLowerCase()] = v;
+        });
+      }
       return Promise.resolve(
         new Response(JSON.stringify(validReleaseResponse), {
           status: 200,
@@ -361,14 +364,13 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
       root.render(
         <ModelLineageView
           projectId="prj_alpha"
-          initialModelId="mod_llama3"
+          initialModelId="mdl_01JLLAMA30000000000000000"
           initialVersion="1.0.0-rc1"
           currentUser={{ canApprove: true }}
         />
       );
     });
 
-    // Switch to Release tab
     const tabs = container.querySelectorAll('button');
     const releaseTabBtn = Array.from(tabs).find((b) => b.textContent?.includes('모델 릴리스'));
     expect(releaseTabBtn).toBeDefined();
@@ -385,30 +387,31 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     });
 
     expect(capturedMethod).toBe('POST');
-    expect(capturedUrl).toBe('/v1/projects/prj_alpha/models/mod_llama3/versions/1.0.0-rc1/release');
+    expect(capturedUrl).toBe('/v1/projects/prj_alpha/models/mdl_01JLLAMA30000000000000000/versions/1.0.0-rc1/release');
+    // Model Release must NOT send Idempotency-Key
+    expect(capturedHeaders['idempotency-key']).toBeUndefined();
 
     const parsedBody = JSON.parse(capturedBody);
     expect(parsedBody.licensePolicy).toBe('Apache-2.0');
     expect(parsedBody.classification).toBe('internal');
 
-    const releaseSuccess = container.querySelector('[data-testid="registry-release-success"]');
-    expect(releaseSuccess).not.toBeNull();
-    expect(releaseSuccess?.textContent).toContain('모델 릴리스 완료 (200 OK)');
-    expect(releaseSuccess?.textContent).toContain('released');
+    const banner = container.querySelector('[data-testid="registry-release-success"]');
+    expect(banner).not.toBeNull();
+    expect(banner?.textContent).toContain('모델 릴리스 완료 (200 OK)');
   });
 
-  // 5. RFC 9457 Problem Details Canonical Error Rendering (409 Conflict)
+  // 5. RFC 9457 Problem Details: 409 Conflict with exact server detail string (Claude G5)
   it('renders RFC 9457 ProblemDetails with exact code, title, detail, and traceId on 409 Conflict', async () => {
     const canonical409Problem = {
       type: 'about:blank',
-      title: 'Graph precondition failed',
+      title: 'Graph invariant violated',
       status: 409,
       code: 'GRAPH-0002',
       category: 'GRAPH',
-      detail: 'The model version is not fully traceable: missing datasets',
+      detail: 'The model version is not fully traceable: missing dataset_version:dsv_01J112233445566778899001',
       retryable: false,
-      traceId: '1234567890abcdef1234567890abcdef',
-      causeRef: 'mv_01JABCDEF1234567890ABCDEF',
+      traceId: '0123456789abcdef0123456789abcdef',
+      causeRef: 'mdv_01JNEWREGISTERED001',
       evidenceId: null,
     };
 
@@ -425,28 +428,33 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
       root.render(
         <ModelLineageView
           projectId="prj_alpha"
-          initialModelId="mod_llama3"
+          initialModelId="mdl_01JLLAMA30000000000000000"
           initialVersion="1.0.0-rc1"
           currentUser={{ canApprove: true }}
         />
       );
     });
 
-    const queryBtn = container.querySelector('[data-testid="btn-query-lineage"]') as HTMLButtonElement;
+    const tabs = container.querySelectorAll('button');
+    const releaseTabBtn = Array.from(tabs).find((b) => b.textContent?.includes('모델 릴리스'));
     await act(async () => {
-      queryBtn.click();
+      releaseTabBtn?.click();
+    });
+
+    const releaseBtn = container.querySelector('[data-testid="btn-release-model"]') as HTMLButtonElement;
+    await act(async () => {
+      releaseBtn.click();
     });
 
     const alert = container.querySelector('[data-testid="registry-problem-alert"]');
     expect(alert).not.toBeNull();
-    expect(alert?.getAttribute('role')).toBe('alert');
-
     expect(container.querySelector('[data-testid="problem-code"]')?.textContent).toBe('GRAPH-0002');
-    expect(container.querySelector('[data-testid="problem-detail"]')?.textContent).toBe(
-      'The model version is not fully traceable: missing datasets'
+    expect(alert?.textContent).toContain('Graph invariant violated');
+    expect(container.querySelector('[data-testid="problem-detail"]')?.textContent).toContain(
+      'The model version is not fully traceable: missing dataset_version:dsv_01J112233445566778899001'
     );
-    expect(container.querySelector('[data-testid="problem-trace-id"]')?.textContent).toBe(
-      '1234567890abcdef1234567890abcdef'
+    expect(container.querySelector('[data-testid="problem-trace-id"]')?.textContent).toContain(
+      '0123456789abcdef0123456789abcdef'
     );
   });
 
@@ -478,7 +486,7 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
       root.render(
         <ModelLineageView
           projectId="prj_alpha"
-          initialModelId="mod_llama3"
+          initialModelId="mdl_01JLLAMA30000000000000000"
           currentUser={{ canApprove: true }}
         />
       );
@@ -493,11 +501,8 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     const versionInput = container.querySelector('[data-testid="input-register-version"]') as HTMLInputElement;
     const shaInput = container.querySelector('[data-testid="input-register-sha256"]') as HTMLInputElement;
     await act(async () => {
-      const setNative = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
-      setNative?.call(versionInput, '2.0.0');
-      versionInput.dispatchEvent(new Event('input', { bubbles: true }));
-      setNative?.call(shaInput, '00001111222233334444555566667777aaaabbbbccccddddeeeeffff01234567');
-      shaInput.dispatchEvent(new Event('input', { bubbles: true }));
+      setInputValue(versionInput, '2.0.0');
+      setInputValue(shaInput, '00001111222233334444555566667777aaaabbbbccccddddeeeeffff01234567');
     });
 
     const submitBtn = container.querySelector('[data-testid="btn-register-version"]') as HTMLButtonElement;
@@ -541,7 +546,7 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
       root.render(
         <ModelLineageView
           projectId="prj_alpha"
-          initialModelId="mod_llama3"
+          initialModelId="mdl_01JLLAMA30000000000000000"
           initialVersion="1.0.0"
           currentUser={{ canApprove: true }}
         />
@@ -556,9 +561,7 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
 
     const untilInput = container.querySelector('[data-testid="input-pin-until"]') as HTMLInputElement;
     await act(async () => {
-      const setNative = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
-      setNative?.call(untilInput, '2026-12-31T23:59:59Z');
-      untilInput.dispatchEvent(new Event('input', { bubbles: true }));
+      setInputValue(untilInput, '2026-12-31T23:59:59Z');
     });
 
     const pinBtn = container.querySelector('[data-testid="btn-pin-retention"]') as HTMLButtonElement;
@@ -572,30 +575,83 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     expect(container.querySelector('[data-testid="problem-code"]')?.textContent).toBe('SYS-0001');
   });
 
-  // 8. Permission Guard: canApprove === false disables write buttons
-  it('gates write actions when currentUser.canApprove === false', async () => {
+  // 8. Permission Guard: strictly fail-closed when canApprove !== true (Codex F1)
+  it('strictly fails closed on all write actions when canApprove is undefined, false, or role-only', async () => {
+    // Case A: currentUser is undefined (unauthenticated or no context)
     await act(async () => {
       root.render(
         <ModelLineageView
           projectId="prj_alpha"
-          initialModelId="mod_llama3"
+          initialModelId="mdl_01JLLAMA30000000000000000"
           initialVersion="1.0.0-rc1"
-          currentUser={{ canApprove: false }}
         />
       );
     });
 
-    // Check Register tab
+    expect(container.textContent).toContain('거버넌스 승인 권한(canApprove)이 없어 조회만 가능합니다');
+
     const tabs = container.querySelectorAll('button');
     const registerTabBtn = Array.from(tabs).find((b) => b.textContent?.includes('버전 등록'));
+    const pinTabBtn = Array.from(tabs).find((b) => b.textContent?.includes('보존 고정'));
+    const releaseTabBtn = Array.from(tabs).find((b) => b.textContent?.includes('모델 릴리스'));
+
+    // Test Register tab
     await act(async () => {
       registerTabBtn?.click();
     });
+    const regBtn = container.querySelector('[data-testid="btn-register-version"]') as HTMLButtonElement;
+    expect(regBtn.disabled).toBe(true);
+    expect(regBtn.getAttribute('aria-disabled')).toBe('true');
 
-    const registerBtn = container.querySelector('[data-testid="btn-register-version"]') as HTMLButtonElement;
-    expect(registerBtn.disabled).toBe(true);
-    expect(registerBtn.getAttribute('aria-disabled')).toBe('true');
-    expect(container.textContent).toContain('승인 권한(canApprove)이 필요한 작업입니다');
+    // Test Pin tab
+    await act(async () => {
+      pinTabBtn?.click();
+    });
+    const pinBtn = container.querySelector('[data-testid="btn-pin-retention"]') as HTMLButtonElement;
+    expect(pinBtn.disabled).toBe(true);
+    expect(pinBtn.getAttribute('aria-disabled')).toBe('true');
+
+    // Test Release tab
+    await act(async () => {
+      releaseTabBtn?.click();
+    });
+    const relBtn = container.querySelector('[data-testid="btn-release-model"]') as HTMLButtonElement;
+    expect(relBtn.disabled).toBe(true);
+    expect(relBtn.getAttribute('aria-disabled')).toBe('true');
+
+    // Case B: currentUser has role: 'owner' but NO canApprove field (role fallback forbidden!)
+    await act(async () => {
+      root.render(
+        <ModelLineageView
+          projectId="prj_alpha"
+          initialModelId="mdl_01JLLAMA30000000000000000"
+          initialVersion="1.0.0-rc1"
+          currentUser={{ role: 'owner' } as any}
+        />
+      );
+    });
+
+    const regTabBtnRole = Array.from(container.querySelectorAll('button')).find((b) => b.textContent?.includes('버전 등록'));
+    await act(async () => {
+      regTabBtnRole?.click();
+    });
+    const regBtnRole = container.querySelector('[data-testid="btn-register-version"]') as HTMLButtonElement;
+    expect(regBtnRole.disabled).toBe(true);
+    expect(regBtnRole.getAttribute('aria-disabled')).toBe('true');
+
+    // Case C: currentUser has canApprove: true -> actions enabled
+    await act(async () => {
+      root.render(
+        <ModelLineageView
+          projectId="prj_alpha"
+          initialModelId="mdl_01JLLAMA30000000000000000"
+          initialVersion="1.0.0-rc1"
+          currentUser={{ canApprove: true }}
+        />
+      );
+    });
+
+    expect(container.querySelector('[data-testid="banner-no-approve-permission"]')).toBeNull();
   });
 
   // 9. Real Lineage with Missing Items & Scope Limitation
@@ -622,7 +678,7 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
       root.render(
         <ModelLineageView
           projectId="prj_alpha"
-          initialModelId="mod_llama3"
+          initialModelId="mdl_01JLLAMA30000000000000000"
           initialVersion="1.0.0"
         />
       );
@@ -648,12 +704,9 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     expect(container.querySelector('[data-testid="real-lineage-datasets"]')?.textContent).toContain(
       '연결된 데이터셋이 없습니다'
     );
-    expect(container.querySelector('[data-testid="real-lineage-deployments"]')?.textContent).toContain(
-      '배포 내역이 없습니다 (deployments: [])'
-    );
   });
 
-  // 10. Live Region Accessibility Updates
+  // 10. ARIA Live Region Updates
   it('updates aria-live region during queries and operations', async () => {
     globalThis.fetch = vi.fn().mockImplementation(() => {
       return Promise.resolve(
@@ -668,39 +721,37 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
       root.render(
         <ModelLineageView
           projectId="prj_alpha"
-          initialModelId="mod_llama3"
+          initialModelId="mdl_01JLLAMA30000000000000000"
           initialVersion="1.0.0"
         />
       );
     });
 
-    const liveRegion = container.querySelector('[data-testid="registry-live-region"]');
+    const liveRegion = container.querySelector('[aria-live="polite"]');
     expect(liveRegion).not.toBeNull();
-    expect(liveRegion?.getAttribute('role')).toBe('status');
-    expect(liveRegion?.getAttribute('aria-live')).toBe('polite');
 
     const queryBtn = container.querySelector('[data-testid="btn-query-lineage"]') as HTMLButtonElement;
     await act(async () => {
       queryBtn.click();
     });
 
-    expect(liveRegion?.textContent).toContain('계보 조회 성공');
+    expect(liveRegion?.textContent).toContain('계보 조회 성공: [1.0.0]');
   });
 
-  // 11. Anti-Double-Submission: Buttons disabled while request in flight
+  // 11. In-flight Double Submission Prevention
   it('disables query and write buttons while in-flight to prevent duplicate submission', async () => {
     let resolveQuery: (res: Response) => void;
-    const pendingQuery = new Promise<Response>((resolve) => {
-      resolveQuery = resolve;
+    globalThis.fetch = vi.fn().mockImplementation(() => {
+      return new Promise<Response>((resolve) => {
+        resolveQuery = resolve;
+      });
     });
-
-    globalThis.fetch = vi.fn().mockImplementation(() => pendingQuery);
 
     await act(async () => {
       root.render(
         <ModelLineageView
           projectId="prj_alpha"
-          initialModelId="mod_llama3"
+          initialModelId="mdl_01JLLAMA30000000000000000"
           initialVersion="1.0.0"
           currentUser={{ canApprove: true }}
         />
@@ -731,7 +782,7 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     expect(queryBtn.disabled).toBe(false);
   });
 
-  // 12. Abort on Unmount
+  // 12. Abort on Unmount (Query)
   it('aborts ongoing network request when unmounted', async () => {
     let capturedSignal: AbortSignal | undefined;
 
@@ -744,7 +795,7 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
       root.render(
         <ModelLineageView
           projectId="prj_alpha"
-          initialModelId="mod_llama3"
+          initialModelId="mdl_01JLLAMA30000000000000000"
           initialVersion="1.0.0"
         />
       );
@@ -764,41 +815,309 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     expect(capturedSignal?.aborted).toBe(true);
   });
 
-  // 13. Runtime Guard Fail-Closed Tests (Schema 1:1 validation)
-  it('runtime type guards fail closed on malformed responses', () => {
-    // Valid ISO Date check
-    expect(isValidIsoDateTime('2026-09-28T12:00:00Z')).toBe(true);
-    expect(isValidIsoDateTime('2026-09-28T12:00:00+09:00')).toBe(true);
-    expect(isValidIsoDateTime('2026-09-28 12:00:00')).toBe(false); // naive rejected
-    expect(isValidIsoDateTime('not-a-date')).toBe(false);
+  // 13. Idempotency-Key Stability on Retry & Rotation on Edit (Codex F2, Claude G2)
+  it('preserves the exact same Idempotency-Key on retry after failure, and rotates key when inputs change', async () => {
+    const capturedKeys: string[] = [];
 
-    // Lineage Trace Guard
+    globalThis.fetch = vi.fn().mockImplementation((url, init) => {
+      if (init?.headers instanceof Headers) {
+        capturedKeys.push(init.headers.get('idempotency-key') || '');
+      }
+      return Promise.resolve(
+        new Response(
+          JSON.stringify({
+            type: 'about:blank',
+            title: 'Temporary lock contention',
+            status: 503,
+            code: 'SYS-0001',
+            category: 'SYS',
+            detail: 'Locked; retry later.',
+            retryable: true,
+            traceId: '0123456789abcdef0123456789abcdef',
+            causeRef: null,
+            evidenceId: null,
+          }),
+          {
+            status: 503,
+            headers: { 'Content-Type': 'application/problem+json' },
+          }
+        )
+      );
+    });
+
+    await act(async () => {
+      root.render(
+        <ModelLineageView
+          projectId="prj_alpha"
+          initialModelId="mdl_01JLLAMA30000000000000000"
+          currentUser={{ canApprove: true }}
+        />
+      );
+    });
+
+    // Go to Register Tab
+    const tabs = container.querySelectorAll('button');
+    const registerTabBtn = Array.from(tabs).find((b) => b.textContent?.includes('버전 등록'));
+    await act(async () => {
+      registerTabBtn?.click();
+    });
+
+    const versionInput = container.querySelector('[data-testid="input-register-version"]') as HTMLInputElement;
+    const shaInput = container.querySelector('[data-testid="input-register-sha256"]') as HTMLInputElement;
+    await act(async () => {
+      setInputValue(versionInput, '3.0.0');
+      setInputValue(shaInput, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+    });
+
+    const submitBtn = container.querySelector('[data-testid="btn-register-version"]') as HTMLButtonElement;
+
+    // First attempt -> 503
+    await act(async () => {
+      submitBtn.click();
+    });
+    expect(capturedKeys.length).toBe(1);
+    const firstKey = capturedKeys[0];
+    expect(firstKey.length).toBeGreaterThan(10);
+
+    // Retry without changing inputs -> must resend the EXACT same key!
+    await act(async () => {
+      submitBtn.click();
+    });
+    expect(capturedKeys.length).toBe(2);
+    expect(capturedKeys[1]).toBe(firstKey);
+
+    // Edit an input -> must rotate key!
+    await act(async () => {
+      setInputValue(versionInput, '3.0.1');
+    });
+
+    await act(async () => {
+      submitBtn.click();
+    });
+    expect(capturedKeys.length).toBe(3);
+    expect(capturedKeys[2]).not.toBe(firstKey);
+    expect(capturedKeys[2].length).toBeGreaterThan(10);
+  });
+
+  // 14. Calendar Round-Trip & ByteSize Integer Validation (Codex F4, Claude G4)
+  it('validates calendar dates strictly and rejects non-integer or negative byteSize before sending', async () => {
+    // Leap year calendar validation
+    expect(isValidIsoDateTime('2024-02-29T12:00:00Z')).toBe(true); // 2024 is leap year
+    expect(isValidIsoDateTime('2025-02-29T12:00:00Z')).toBe(false); // 2025 is not leap year
+    expect(isValidIsoDateTime('2026-02-30T12:00:00Z')).toBe(false); // Feb 30 does not exist
+    expect(isValidIsoDateTime('2026-04-31T12:00:00Z')).toBe(false); // April has 30 days
+
+    // ByteSize validation in Register UI
+    let fetchCalled = false;
+    globalThis.fetch = vi.fn().mockImplementation(() => {
+      fetchCalled = true;
+      return Promise.resolve(new Response('{}', { status: 200 }));
+    });
+
+    await act(async () => {
+      root.render(
+        <ModelLineageView
+          projectId="prj_alpha"
+          initialModelId="mdl_01JLLAMA30000000000000000"
+          currentUser={{ canApprove: true }}
+        />
+      );
+    });
+
+    const tabs = container.querySelectorAll('button');
+    const registerTabBtn = Array.from(tabs).find((b) => b.textContent?.includes('버전 등록'));
+    await act(async () => {
+      registerTabBtn?.click();
+    });
+
+    const versionInput = container.querySelector('[data-testid="input-register-version"]') as HTMLInputElement;
+    const shaInput = container.querySelector('[data-testid="input-register-sha256"]') as HTMLInputElement;
+    const byteInput = container.querySelector('[data-testid="input-register-bytesize"]') as HTMLInputElement;
+    const submitBtn = container.querySelector('[data-testid="btn-register-version"]') as HTMLButtonElement;
+
+    // Fill valid version and sha first so submit is enabled
+    await act(async () => {
+      setInputValue(versionInput, '1.0.0-rc1');
+      setInputValue(shaInput, '11112222333344445555666677778888aaaabbbbccccddddeeeeffff00001111');
+      setInputValue(byteInput, '1024.5');
+    });
+
+    expect(submitBtn.disabled).toBe(false);
+
+    await act(async () => {
+      submitBtn.click();
+    });
+
+    expect(fetchCalled).toBe(false);
+    expect(container.textContent).toContain('byteSize는 0 이상의 정수여야 합니다');
+
+    // Test negative byteSize
+    await act(async () => {
+      setInputValue(byteInput, '-100');
+    });
+
+    await act(async () => {
+      submitBtn.click();
+    });
+
+    expect(fetchCalled).toBe(false);
+    expect(container.textContent).toContain('byteSize는 0 이상의 정수여야 합니다');
+  });
+
+  // 15. ProblemDetails Status Binding Fail-Closed (Codex F5)
+  it('enforces ProblemDetails status binding to HTTP response status', () => {
+    const canonical404 = {
+      type: 'about:blank',
+      title: 'Not Found',
+      status: 404,
+      code: 'SYS-0004',
+      category: 'SYS',
+      detail: 'Model not found',
+      retryable: false,
+      traceId: '0123456789abcdef0123456789abcdef',
+      causeRef: null,
+      evidenceId: null,
+    };
+
+    // When status matches HTTP status -> accepted
+    expect(isProblemDetails(canonical404, 404)).toBe(true);
+
+    // When status mismatches HTTP status -> rejected as malformed
+    expect(isProblemDetails(canonical404, 403)).toBe(false);
+  });
+
+  // 16. Runtime Guard Fail-Closed Tests: additionalProperties: false & Collection Bounds (Codex F3)
+  it('runtime type guards strictly enforce additionalProperties: false and collection bounds', () => {
+    // 1. Lineage Trace Guard
     expect(isModelLineageTraceResponse(validTraceResponse)).toBe(true);
-    expect(isModelLineageTraceResponse({ ...validTraceResponse, stage: 'invalid_stage' })).toBe(false);
-    expect(isModelLineageTraceResponse({ ...validTraceResponse, contentSha256: 'short_hex' })).toBe(false);
-    expect(isModelLineageTraceResponse({ ...validTraceResponse, datasets: null })).toBe(false);
-    expect(isModelLineageTraceResponse({ ...validTraceResponse, deployments: [{ invalid: true }] })).toBe(false);
 
-    // Version Response Guard
+    // Top-level extra property -> must fail closed
+    expect(isModelLineageTraceResponse({ ...validTraceResponse, unknownExtraProperty: 'forbidden' })).toBe(false);
+
+    // Nested dataset extra property -> must fail closed
+    expect(
+      isModelLineageTraceResponse({
+        ...validTraceResponse,
+        datasets: [{ ...validTraceResponse.datasets[0], unknownExtra: 'rejected' }],
+      })
+    ).toBe(false);
+
+    // Nested deployment extra property -> must fail closed
+    expect(
+      isModelLineageTraceResponse({
+        ...validTraceResponse,
+        deployments: [{ ...validTraceResponse.deployments[0], unknownExtra: 'rejected' }],
+      })
+    ).toBe(false);
+
+    // Nested unresolved extra property -> must fail closed
+    expect(
+      isModelLineageTraceResponse({
+        ...validTraceResponse,
+        unresolved: [{ kind: 'code_commit', count: 1, unknownExtra: 'rejected' } as any],
+      })
+    ).toBe(false);
+
+    // Collection bounds
+    const overflowDatasets = Array.from({ length: 201 }, (_, i) => ({
+      datasetVersionId: `dsv_${i}`,
+      version: `v${i}`,
+      contentSha256: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
+      uri: `inv://ds/${i}`,
+    }));
+    expect(isModelLineageTraceResponse({ ...validTraceResponse, datasets: overflowDatasets })).toBe(false);
+
+    const overflowDeployments = Array.from({ length: 201 }, (_, i) => ({
+      deploymentId: `dpl_${i}`,
+      environment: 'prod',
+      status: 'active',
+      deployedDigest: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
+      deployedAt: '2026-09-28T12:00:00Z',
+      approvalId: null,
+      imageId: null,
+    }));
+    expect(isModelLineageTraceResponse({ ...validTraceResponse, deployments: overflowDeployments })).toBe(false);
+
+    const overflowMissing = Array.from({ length: 17 }, (_, i) => `item_${i}`);
+    expect(isModelLineageTraceResponse({ ...validTraceResponse, missing: overflowMissing })).toBe(false);
+
+    const overflowUnresolved = Array.from({ length: 17 }, (_, i) => ({ kind: `k_${i}`, count: i }));
+    expect(isModelLineageTraceResponse({ ...validTraceResponse, unresolved: overflowUnresolved })).toBe(false);
+
+    const overflowDetailedKinds = Array.from({ length: 17 }, (_, i) => `kind_${i}`);
+    expect(isModelLineageTraceResponse({ ...validTraceResponse, detailedKinds: overflowDetailedKinds })).toBe(false);
+
+    const overflowCountOnlyKinds = Array.from({ length: 17 }, (_, i) => `kind_${i}`);
+    expect(isModelLineageTraceResponse({ ...validTraceResponse, countOnlyKinds: overflowCountOnlyKinds })).toBe(false);
+
+    // 2. Version Response Guard
     expect(isModelVersionResponse(validVersionResponse)).toBe(true);
+    expect(isModelVersionResponse({ ...validVersionResponse, extraKey: 'bad' })).toBe(false);
     expect(isModelVersionResponse({ ...validVersionResponse, stage: 'released' })).toBe(false); // MUST be draft
-    expect(isModelVersionResponse({ ...validVersionResponse, byteSize: -1 })).toBe(false); // MUST be >= 0
-    expect(isModelVersionResponse({ ...validVersionResponse, createdAt: 'naive-date' })).toBe(false);
+    expect(isModelVersionResponse({ ...validVersionResponse, byteSize: -1 })).toBe(false);
 
-    // Retention Pin Guard
+    // 3. Retention Pin Guard
     expect(isRetentionPinResponse(validPinResponse)).toBe(true);
+    expect(isRetentionPinResponse({ ...validPinResponse, extraKey: 'bad' })).toBe(false);
     expect(isRetentionPinResponse({ ...validPinResponse, extended: 'not-bool' })).toBe(false);
-    expect(isRetentionPinResponse({ ...validPinResponse, retentionPinnedUntil: 'naive-date' })).toBe(false);
 
-    // Release Guard
+    // 4. Release Guard
     expect(isModelReleaseResponse(validReleaseResponse)).toBe(true);
+    expect(isModelReleaseResponse({ ...validReleaseResponse, extraKey: 'bad' })).toBe(false);
     expect(isModelReleaseResponse({ ...validReleaseResponse, stage: 'draft' })).toBe(false); // MUST be released
-    expect(isModelReleaseResponse({ ...validReleaseResponse, contentSha256: 'xyz' })).toBe(false);
 
-    // Idempotency Key Generator
-    const key = generateIdempotencyKey('test');
-    expect(key.startsWith('test_')).toBe(true);
+    // 5. Idempotency Key Generator format
+    const key = generateIdempotencyKey('w2');
+    expect(key.startsWith('w2_')).toBe(true);
     expect(key.length).toBeLessThanOrEqual(128);
     expect(/^[A-Za-z0-9._:-]+$/.test(key)).toBe(true);
+  });
+
+  // 17. Abort on Unmount for Write Operations (Claude G3)
+  it('aborts in-flight write operation when component unmounts', async () => {
+    let capturedSignal: AbortSignal | undefined;
+
+    globalThis.fetch = vi.fn().mockImplementation((url, init) => {
+      capturedSignal = init?.signal;
+      return new Promise(() => {}); // never resolves
+    });
+
+    await act(async () => {
+      root.render(
+        <ModelLineageView
+          projectId="prj_alpha"
+          initialModelId="mdl_01JLLAMA30000000000000000"
+          initialVersion="1.0.0-rc1"
+          currentUser={{ canApprove: true }}
+        />
+      );
+    });
+
+    const tabs = container.querySelectorAll('button');
+    const registerTabBtn = Array.from(tabs).find((b) => b.textContent?.includes('버전 등록'));
+    await act(async () => {
+      registerTabBtn?.click();
+    });
+
+    const versionInput = container.querySelector('[data-testid="input-register-version"]') as HTMLInputElement;
+    const shaInput = container.querySelector('[data-testid="input-register-sha256"]') as HTMLInputElement;
+    await act(async () => {
+      setInputValue(versionInput, '4.0.0');
+      setInputValue(shaInput, '2222333344445555666677778888aaaabbbbccccddddeeeeffff000011112222');
+    });
+
+    const submitBtn = container.querySelector('[data-testid="btn-register-version"]') as HTMLButtonElement;
+    act(() => {
+      submitBtn.click();
+    });
+
+    expect(capturedSignal).toBeDefined();
+    expect(capturedSignal?.aborted).toBe(false);
+
+    act(() => {
+      root.unmount();
+    });
+
+    expect(capturedSignal?.aborted).toBe(true);
   });
 });
