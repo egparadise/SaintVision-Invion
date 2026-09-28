@@ -1,15 +1,15 @@
 ---
 doc_id: "HIST-CODEX-S3-OBJECT-STORE-OBSERVATIONS-003"
 title: "S3 ObjectStore 비차단 관찰 후속 — checkout provider pin·GC prefix 선검증·오류/restore 순서 결속"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T12:53:48+09:00"
+updated: "2026-09-28T13:58:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "c654fada64a3d6804416c928908fdeb7566dfb2e"
-implementation_sha: "ae20b0e446a35f42f6ae2304567426d622316b9c"
+implementation_sha: "f02dacf6eacc67cd08d13c9bc8fd9413ddb23037"
 task_ids: ["S01-ST"]
 tags: ["object-store", "s3", "workspace", "gc", "provider-binding", "codex"]
 ---
@@ -29,6 +29,7 @@ tags: ["object-store", "s3", "workspace", "gc", "provider-binding", "codex"]
 - `SnapshotStore.begin`의 provider/locator drift도 `IDEM-0001`/409에서 `STORE-0001`/503/retryable로 통일했다. 같은 provider/locator에서 digest·size·terminal state가 달라지는 실제 upload identity 충돌은 계속 `IDEM-0001`이다.
 - 새 restore는 Run이 `recovering`이고 version/attempt가 현재인지 checkpoint pin 조회 전에 검사한다. 실패는 기존 `GRAPH-0003`이고 exact replay는 저장된 restore를 확인해 기존 우회 의미를 유지한다.
 - result prepare/complete, shard completion, snapshot put/finalize/checkpoint/restore/collect, workspace restore/checkout/output commit의 모든 byte I/O·삭제 상태 변경 앞에 provider mismatch guard가 존재함을 호출 지점별 회귀 시험으로 고정했다.
+- Claude 1차 조건부 검토에서 helper만 검증하던 checkout provider 경계와 구조 검색만 있던 result/shard 경계를 지적했다. 실제 `WorkspaceRecovery.checkout()` 호출 지점은 row provider=S3·writer=Local 상태에서 S3 sentinel까지 도달하고 Local 호출 0회를 확인하며, `ResultStore.prepare/complete`와 `ShardCompletion.once`는 provider drift를 byte I/O 전에 `STORE-0001`로 거부하고 provider 호출 0회를 확인한다.
 
 ## 검증
 
@@ -44,10 +45,15 @@ tags: ["object-store", "s3", "workspace", "gc", "provider-binding", "codex"]
 | `tools/check_doc_single_source.py --ratchet` | baseline 18 pairs, new/stale 0, exit 0 |
 | `tools/check_docs.py` | 구현 push 전 900 docs, exit 0 |
 | `git diff --check` | exit 0 |
+| `pytest tests/core/test_object_store_provider_binding.py -q` (조건부 검토 보강 뒤) | 26 passed, exit 0 |
+| hosted Backend run `36377648185` | Python 3.12/3.14 각각 3077 passed / 47 skipped / 2 deselected / 0 failed |
+| hosted Core run `36377648156`, job `108786723105` | 3383 passed / 36 skipped / 2 deselected / 0 failed; exact skip distribution gate 통과 |
+| hosted S01 job `108786723154` | Local/S3 conformance 2 passed + disposable MinIO/PostgreSQL tenant boundary 3 passed |
+| hosted Docs `36377648148`, desktop-browser `36377648141` | success |
 
 ## Hosted·인계
 
-- 구현 head `ae20b0e4`를 force 없이 push했고 PR #173을 #159 branch 위에 stack했다. `run-core` label을 붙여 Core와 `s01-storage-roundtrip`을 실제 실행한다.
-- 이 문서 작성 시 hosted Backend/Core가 진행 중이다. 완료 run ID·passed/skip/failed 분포와 Claude 독립 검토 판정은 후속 revision에서 적는다. 진행 중을 통과로 세지 않는다.
+- 구현 head `ae20b0e4` 뒤 조건부 검토 보강 `11cb5425`, `f02dacf6`을 force 없이 push했고 PR #173은 #159 branch 위에 stack돼 있다. 최신 head의 Backend/Core/S01/Docs/desktop-browser는 위 표와 같이 모두 green이다.
+- Claude 1차 독립 검토는 조건부 승인으로 checkout 호출 지점 변이와 ResultStore/ShardCompletion 동작 시험을 요구했고, 두 항목은 최신 head에서 보강됐다. 재대조 r2는 head `f02dacf6`을 승인했다([PR #173 코멘트](https://github.com/egparadise/SaintVision-Invion/pull/173#issuecomment-5863726930)). checkout 호출 지점 fallback과 세 동작 경계의 되살림은 해소됐고, 초기 Core의 무관한 1 failed도 최신 run에서 재현되지 않았다.
 - `sync_obsidian.py --check`는 기존 공유 진행판 `both-diverged`와 Gemini 작업판 `destination-edited` 충돌 2건을 보고하고 쓰기 없이 종료했다. 코디네이터 지시대로 이 worktree에서는 `--apply`를 실행하지 않았고, 해당 충돌 파일을 편집하지 않았다.
-- 다음 Claude: direct checkout provider 선택, prefix-only collect tombstone 선차단, `STORE-0001` 일관성, restore `GRAPH-0003` 순서와 호출 지점 되살림을 독립 재검토한다. 병합은 사용자/코디네이터 결정이다.
+- 다음 코디네이터: #159 병합 뒤 PR #173 base를 `integration/all-agents-unified`로 retarget하고 승인 head를 병합 목록에서 처리한다. owner는 self-close하지 않는다.
