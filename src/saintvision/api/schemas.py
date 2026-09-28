@@ -14,7 +14,7 @@ from __future__ import annotations
 import datetime as dt
 from typing import Literal
 
-from pydantic import field_validator, BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr, field_validator
 
 
 class Strict(BaseModel):
@@ -821,6 +821,41 @@ class ModelVersionResponse(Strict):
     byte_size: int = Field(ge=0, alias="byteSize")
     uri: str = Field(min_length=1)
     created_at: dt.datetime = Field(alias="createdAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class RetentionPinRequest(Strict):
+    """What a caller asks of W4: keep this version at least until ``until``.
+
+    One field, because ``pin_retention`` takes one: the service decides what the
+    request means (extend, never shorten). The instant must carry an offset --
+    a naive time would be compared with the stored aware value by whatever the
+    driver assumes, and "retained until when?" is not a question to answer with
+    an assumption.
+    """
+
+    until: AwareDatetime
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class RetentionPinResponse(Strict):
+    """The version's retention after the request was judged.
+
+    ``retentionPinnedUntil`` is the committed value, which is the requested one
+    only when it extended the pin; ``extended`` says which, so a no-op is
+    visible to the caller instead of looking like success by coincidence.
+    ``stage`` is whatever the row is in -- a released version can still be
+    extended (design §5-3) -- and is the closed set the column allows.
+    """
+
+    version_id: str = Field(alias="modelVersionId")
+    parent_model_id: str = Field(alias="modelId")
+    version: str = Field(min_length=1, max_length=64)
+    stage: Literal["draft", "candidate", "released", "retired"]
+    retention_pinned_until: AwareDatetime = Field(alias="retentionPinnedUntil")
+    extended: bool
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
