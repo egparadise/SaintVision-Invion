@@ -371,7 +371,30 @@ def _run_fixture_alembic(
     )
 
 
-def _negative_fixture_probes(admin_dsn: str, created: list[str]) -> dict[str, Any]:
+def _validate_duplicate_fixture_failure(
+    result: subprocess.CompletedProcess[bytes],
+    *,
+    version: str | None,
+    constraints: set[str],
+    columns: set[str],
+) -> None:
+    if result.returncode == 0:
+        raise RehearsalError("0009 duplicate fixture unexpectedly downgraded")
+    diagnostic = (result.stdout + result.stderr).decode("utf-8", errors="replace")
+    if not re.search(r"\b(?:UniqueViolation|23505)\b", diagnostic):
+        raise RehearsalError("0009 duplicate fixture failed for an unexpected reason")
+    if (
+        version != "fixture_head"
+        or "uq_ac11_fixture_project" not in constraints
+        or "uq_ac11_fixture_old" in constraints
+        or "project_id" not in columns
+    ):
+        raise RehearsalError("0009 duplicate fixture did not roll back atomically")
+
+
+def _negative_fixture_probes(
+    admin_dsn: str, created: list[str], passed_cases: list[str]
+) -> dict[str, Any]:
     """Execute the three preregistered bad downgrades in owned disposable DBs."""
     cases: list[dict[str, Any]] = []
     fixture_heads = {
@@ -425,7 +448,12 @@ def _negative_fixture_probes(admin_dsn: str, created: list[str]) -> dict[str, An
                     catalog_fingerprint(admin_dsn, reference),
                     catalog_fingerprint(admin_dsn, candidate),
                 )
-            except CatalogMismatch:
+            except CatalogMismatch as exc:
+                if "tables" not in exc.diagnostics:
+                    raise RehearsalError(
+                        f"{label} fixture did not expose the expected table difference"
+                    ) from exc
+                passed_cases.append(label)
                 cases.append({"case": label, "verdict": "EXPECTED_FINDING"})
             else:
                 raise RehearsalError(f"{label} fixture was not detected")
@@ -475,8 +503,34 @@ def _negative_fixture_probes(admin_dsn: str, created: list[str]) -> dict[str, An
         result = _run_fixture_alembic(
             admin_dsn, duplicate, config, "downgrade", "fixture_base"
         )
-        if result.returncode == 0:
-            raise RehearsalError("0009 duplicate fixture unexpectedly downgraded")
+        with psycopg.connect(_db_conninfo(admin_dsn, duplicate)) as conn:
+            version_row = conn.execute("SELECT version_num FROM alembic_version").fetchone()
+            constraints = {
+                row[0]
+                for row in conn.execute(
+                    """SELECT con.conname FROM pg_constraint con
+                    JOIN pg_class rel ON rel.oid=con.conrelid
+                    JOIN pg_namespace n ON n.oid=rel.relnamespace
+                    WHERE n.nspname='public' AND rel.relname='ac11_fixture_existing'"""
+                ).fetchall()
+            }
+            columns = {
+                row[0]
+                for row in conn.execute(
+                    """SELECT a.attname FROM pg_attribute a
+                    JOIN pg_class rel ON rel.oid=a.attrelid
+                    JOIN pg_namespace n ON n.oid=rel.relnamespace
+                    WHERE n.nspname='public' AND rel.relname='ac11_fixture_existing'
+                    AND a.attnum>0 AND NOT a.attisdropped"""
+                ).fetchall()
+            }
+        _validate_duplicate_fixture_failure(
+            result,
+            version=version_row[0] if version_row else None,
+            constraints=constraints,
+            columns=columns,
+        )
+        passed_cases.append("0009-duplicate-key")
         cases.append({"case": "0009-duplicate-key", "verdict": "EXPECTED_FINDING"})
 
     return {"passedCount": len(cases), "cases": cases}
@@ -624,6 +678,17 @@ def compare_catalogs(expected: CatalogFingerprint, actual: CatalogFingerprint) -
     raise CatalogMismatch(differing, catalog_diff_diagnostics(expected, actual, differing))
 
 
+def validate_reversible_roundtrip(
+    expected_catalog: CatalogFingerprint,
+    actual_catalog: CatalogFingerprint,
+    expected_sentinel: dict[str, str],
+    actual_sentinel: dict[str, str] | None,
+) -> None:
+    compare_catalogs(expected_catalog, actual_catalog)
+    if actual_sentinel != expected_sentinel:
+        raise RehearsalError("reversible downgrade changed the preservation sentinel")
+
+
 def _catalog_row_diagnostic(section: str, row: list[Any]) -> dict[str, Any]:
     """Return structural keys and hashes without serializing executable definitions."""
     if section == "columns":
@@ -705,12 +770,25 @@ def _postgres_version(admin_dsn: str) -> dict[str, str]:
     }
 
 
-def _junit_bytes(*, success: bool, reversible_tail: int, failure: str | None = None) -> bytes:
+def _junit_bytes(
+    *,
+    success: bool,
+    reversible_tail: int,
+    negative_cases: list[str],
+    failure: str | None = None,
+) -> bytes:
+    expected_negative = (
+        "existing-object-deletion",
+        "0009-duplicate-key",
+        "ellipsis-noop",
+    )
+    missing_negative = [name for name in expected_negative if name not in negative_cases]
+    failure_count = (0 if success else 1) + len(missing_negative)
     suite = ET.Element(
         "testsuite",
         name="s11-ac11-migration-rehearsal",
         tests="6",
-        failures="0" if success else "1",
+        failures=str(failure_count),
         errors="0",
         skipped="1" if reversible_tail == 0 else "0",
     )
@@ -725,12 +803,16 @@ def _junit_bytes(*, success: bool, reversible_tail: int, failure: str | None = N
     )
     if not success:
         ET.SubElement(restore, "failure", message=failure or "rehearsal failed")
-    for name in (
-        "negative-existing-object-deletion",
-        "negative-0009-duplicate-key",
-        "negative-ellipsis-noop",
-    ):
-        ET.SubElement(suite, "testcase", classname="ac11.migration", name=name)
+    for name in expected_negative:
+        case = ET.SubElement(
+            suite, "testcase", classname="ac11.migration", name="negative-" + name
+        )
+        if name in missing_negative:
+            ET.SubElement(
+                case,
+                "failure",
+                message="negative fixture was not observed as EXPECTED_FINDING",
+            )
     return ET.tostring(suite, encoding="utf-8", xml_declaration=True)
 
 
@@ -776,6 +858,7 @@ def run_rehearsal(
     failure_reason: str | None = None
     catalog_difference: dict[str, Any] | None = None
     details: dict[str, Any] = {}
+    passed_negative_cases: list[str] = []
     try:
         for name in names:
             _create_database(admin_dsn, name)
@@ -836,14 +919,14 @@ def run_rehearsal(
             downgrade_sentinel = _seed_sentinel(admin_dsn, candidate)
             _alembic_upgrade(admin_dsn, candidate, "head")
             _alembic_downgrade(admin_dsn, candidate, restore_barrier.revision)
-            compare_catalogs(
+            validate_reversible_roundtrip(
                 catalog_fingerprint(admin_dsn, reference),
                 catalog_fingerprint(admin_dsn, candidate),
+                downgrade_sentinel,
+                _read_sentinel(
+                    admin_dsn, candidate, downgrade_sentinel["tenantId"]
+                ),
             )
-            if _read_sentinel(
-                admin_dsn, candidate, downgrade_sentinel["tenantId"]
-            ) != downgrade_sentinel:
-                raise RehearsalError("reversible downgrade changed the preservation sentinel")
             reversible_details = {
                 "startingRevision": head.revision,
                 "endingRevision": restore_barrier.revision,
@@ -855,7 +938,9 @@ def run_rehearsal(
                 "reason": "no-reversible-tail",
                 "reversibleTailCount": 0,
             }
-        negative_fixtures = _negative_fixture_probes(admin_dsn, created)
+        negative_fixtures = _negative_fixture_probes(
+            admin_dsn, created, passed_negative_cases
+        )
         details["reversibleSegment"] = reversible_details
         details["negativeFixtures"] = negative_fixtures
         success = True
@@ -879,6 +964,7 @@ def run_rehearsal(
     junit = _junit_bytes(
         success=success,
         reversible_tail=reversible_tail,
+        negative_cases=passed_negative_cases,
         failure=failure_reason or failure,
     )
     junit_path.parent.mkdir(parents=True, exist_ok=True)

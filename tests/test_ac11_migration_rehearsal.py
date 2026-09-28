@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import copy
 import importlib.util
+import inspect
 import json
+import subprocess
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -15,6 +17,7 @@ from tools.migration_graph import Revision, chain
 
 
 ROOT = Path(__file__).resolve().parents[1]
+REVIEWED_DESIGN_BLOB = "99776a491772c4a62e1be26644d35a365d80a030"
 SPEC = importlib.util.spec_from_file_location(
     "run_ac11_migration_rehearsal", ROOT / "tools" / "run_ac11_migration_rehearsal.py"
 )
@@ -25,8 +28,7 @@ SPEC.loader.exec_module(runner)
 
 
 def _load_manifest_with_reviewed_design(monkeypatch):
-    payload = json.loads(runner.MANIFEST_PATH.read_text(encoding="utf-8"))
-    monkeypatch.setattr(runner, "_git", lambda *_args: payload["designRef"]["blob"])
+    monkeypatch.setattr(runner, "_git", lambda *_args: REVIEWED_DESIGN_BLOB)
     return runner.load_fixture_manifest()
 
 
@@ -126,6 +128,26 @@ def test_catalog_fingerprint_detects_existing_object_deletion():
     }
 
 
+def test_reversible_roundtrip_requires_catalog_and_sentinel_and_is_called_by_runner():
+    catalog = runner.CatalogFingerprint(
+        sha256="a" * 64,
+        counts={"tables": 1},
+        sections={"tables": [["public", "tenants"]]},
+    )
+    sentinel = {"tenantId": "tenant", "slug": "sentinel", "displayName": "preserve"}
+    runner.validate_reversible_roundtrip(catalog, catalog, sentinel, sentinel)
+    with pytest.raises(runner.RehearsalError, match="preservation sentinel"):
+        runner.validate_reversible_roundtrip(catalog, catalog, sentinel, None)
+    changed = runner.CatalogFingerprint(
+        sha256="b" * 64,
+        counts={"tables": 0},
+        sections={"tables": []},
+    )
+    with pytest.raises(runner.CatalogMismatch):
+        runner.validate_reversible_roundtrip(catalog, changed, sentinel, sentinel)
+    assert "validate_reversible_roundtrip(" in inspect.getsource(runner.run_rehearsal)
+
+
 def test_catalog_diagnostics_hash_function_definitions_and_routine_specific_names():
     expected = runner.CatalogFingerprint(
         sha256="a" * 64,
@@ -185,7 +207,17 @@ def test_catalog_constraint_normalization_only_collapses_equivalent_array_text_c
 
 
 def test_junit_declares_zero_tail_as_skip_and_restore_as_pass():
-    root = ET.fromstring(runner._junit_bytes(success=True, reversible_tail=0))
+    root = ET.fromstring(
+        runner._junit_bytes(
+            success=True,
+            reversible_tail=0,
+            negative_cases=[
+                "existing-object-deletion",
+                "0009-duplicate-key",
+                "ellipsis-noop",
+            ],
+        )
+    )
     assert root.attrib == {
         "name": "s11-ac11-migration-rehearsal",
         "tests": "6",
@@ -201,6 +233,51 @@ def test_junit_declares_zero_tail_as_skip_and_restore_as_pass():
         "negative-0009-duplicate-key",
         "negative-ellipsis-noop",
     }.issubset(cases)
+
+
+def test_junit_marks_unobserved_negative_fixture_as_failure():
+    root = ET.fromstring(
+        runner._junit_bytes(
+            success=False,
+            reversible_tail=0,
+            negative_cases=["existing-object-deletion"],
+            failure="fixture stopped",
+        )
+    )
+    assert root.attrib["failures"] == "3"
+    cases = {case.attrib["name"]: case for case in root.findall("testcase")}
+    assert cases["negative-existing-object-deletion"].find("failure") is None
+    assert cases["negative-0009-duplicate-key"].find("failure") is not None
+    assert cases["negative-ellipsis-noop"].find("failure") is not None
+
+
+def test_0009_negative_fixture_requires_unique_violation_and_atomic_rollback():
+    valid = subprocess.CompletedProcess(
+        args=[], returncode=1, stdout=b"", stderr=b"psycopg.errors.UniqueViolation 23505"
+    )
+    runner._validate_duplicate_fixture_failure(
+        valid,
+        version="fixture_head",
+        constraints={"uq_ac11_fixture_project"},
+        columns={"id", "payload", "project_id"},
+    )
+    unrelated = subprocess.CompletedProcess(
+        args=[], returncode=1, stdout=b"", stderr=b"connection refused"
+    )
+    with pytest.raises(runner.RehearsalError, match="unexpected reason"):
+        runner._validate_duplicate_fixture_failure(
+            unrelated,
+            version="fixture_head",
+            constraints={"uq_ac11_fixture_project"},
+            columns={"project_id"},
+        )
+    with pytest.raises(runner.RehearsalError, match="roll back atomically"):
+        runner._validate_duplicate_fixture_failure(
+            valid,
+            version="fixture_base",
+            constraints={"uq_ac11_fixture_old"},
+            columns={"id", "payload"},
+        )
 
 
 def test_missing_dsn_refuses_without_writing_evidence(tmp_path, monkeypatch, capsys):
