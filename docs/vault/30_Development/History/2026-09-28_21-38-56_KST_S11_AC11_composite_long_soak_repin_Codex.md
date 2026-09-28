@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-S11-AC11-LONG-SOAK-REPIN-20260928"
 title: "S11 AC-11 composite long-soak registry repin과 physical importer"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T22:01:22+09:00"
+updated: "2026-09-28T22:12:37+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_id: "S11-BE"
@@ -25,7 +25,7 @@ tags: ["S11", "AC-11", "long-soak", "registry", "importer"]
 
 ## 검증
 
-- `python -m pytest -q tests/test_import_ac11_composite_long_soak.py tests/test_aggregate_ac11_evidence.py tests/test_import_ac11_migration_rehearsal.py` → **95 passed**, exit 0. 닫힌 operator resource, case별 fault-class 결속, 실패 case를 통과 metric으로 숨기는 변이도 포함한다.
+- `python -m pytest -q tests/test_import_ac11_composite_long_soak.py tests/test_aggregate_ac11_evidence.py tests/test_import_ac11_migration_rehearsal.py` → **101 passed**, exit 0. 닫힌 operator resource, predecessor registry blob 거부, hosted drift 실패·누락·만료 거부, migration source-document repin 기록, case별 fault-class 결속, 실패 case를 통과 metric으로 숨기는 변이도 포함한다.
 - `python -m py_compile tools/import_ac11_composite_long_soak.py tools/aggregate_ac11_evidence.py tools/import_ac11_migration_rehearsal.py` → exit 0.
 - registry와 applied patch JSON을 `python -m json.tool`로 각각 검증 → exit 0.
 - `python tools/check_docs.py` → exit 0 (24 original hashes, 934 versioned documents, 48 tasks).

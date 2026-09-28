@@ -32,10 +32,20 @@ ARTIFACT = "c" * 64
 DOC_COMMIT = "938ad3eb1c1664890c714f6ec86f409b7dab65b9"
 DOC_PATH = "docs/vault/30_Development/S11_AC11_composite_long_soak_target_v0.md"
 DOC_BLOB = "0bf74f90557a237b50ebdf571ed9e3dac89ea23b"
+PATCH_PATH = (
+    ROOT
+    / "docs/vault/30_Development/Evidence/s11-ac11-composite-long-soak-target-patch-v1.json"
+)
 
 
 class FakeGit:
-    def __init__(self, *, registered: bool = True, document_blob: str = DOC_BLOB):
+    def __init__(
+        self,
+        *,
+        registered: bool = True,
+        document_blob: str = DOC_BLOB,
+        registry_blob: str = REGISTRY_BLOB,
+    ):
         registry = json.loads((ROOT / REGISTRY_PATH).read_text(encoding="utf-8"))
         if not registered:
             registry["targets"] = [
@@ -44,6 +54,7 @@ class FakeGit:
             ]
         self.registry = json.dumps(registry)
         self.document_blob = document_blob
+        self.registry_blob = registry_blob
 
     def tree(self, commit: str) -> str:
         assert commit == SOURCE
@@ -52,7 +63,7 @@ class FakeGit:
     def blob(self, commit: str, path: str) -> str:
         if path == REGISTRY_PATH:
             assert commit == SOURCE
-            return REGISTRY_BLOB
+            return self.registry_blob
         if path == DOC_PATH and commit in {DOC_COMMIT, SOURCE}:
             return self.document_blob
         raise AssertionError((commit, path))
@@ -151,6 +162,39 @@ def test_registry_blob_and_required_axis_are_repin_bound() -> None:
     assert REQUIRED_TARGET_BY_AXIS["long-soak"] == "s11-ac11-composite-long-soak-v0"
 
 
+def test_patch_records_both_migration_source_document_repins() -> None:
+    patch = json.loads(PATCH_PATH.read_text(encoding="utf-8"))
+    expected_before = {
+        "commit": "d55c97a0e2ba5248f60a498272dfda2a882c3a0a",
+        "path": "docs/vault/30_Development/S11_AC11_migration_restore_target_v0.md",
+        "blob": "dc1db2587dacc461a2814d45e11610d8d5973181",
+    }
+    expected_after = {
+        "commit": "4c68bc8e086d9b68c14a386264b630ffa4bc8c8e",
+        "path": "docs/vault/30_Development/S11_AC11_migration_restore_target_v0.md",
+        "blob": "55ee8b65a62a25f5a027770cf602ae2ecc62e45c",
+    }
+    assert {
+        row["targetId"] for row in patch["modifiedTargets"]
+    } == {
+        "s11-irreversible-restore-forward-v0",
+        "s11-migration-reversible-roundtrip-v1",
+    }
+    assert all(row["previousSourceDocument"] == expected_before for row in patch["modifiedTargets"])
+    assert all(row["resultSourceDocument"] == expected_after for row in patch["modifiedTargets"])
+
+
+def test_predecessor_registry_blob_fails_closed() -> None:
+    report, storage, hosted = _fixture()
+    with pytest.raises(EvidenceImportError, match="reviewed registry blob"):
+        import_report(
+            report,
+            storage,
+            hosted,
+            FakeGit(registry_blob="c08a45f8cd3a32fe6631d7f135496a5e7809ee2d"),
+        )
+
+
 def test_missing_operator_resources_remain_blocked_external() -> None:
     report, storage, hosted = _fixture()
     report["operatorResources"] = ["G-19"]
@@ -192,6 +236,23 @@ def test_child_digest_substitution_fails_closed() -> None:
     report, storage, hosted = _fixture()
     storage["artifactSha256"] = "0" * 64
     with pytest.raises(EvidenceImportError, match="storage reference digest"):
+        import_report(report, storage, hosted, FakeGit())
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        lambda hosted: hosted.update(runConclusion="failure"),
+        lambda hosted: hosted.update(verdict="MEASURED_FAIL"),
+        lambda hosted: hosted.update(artifactAvailable=False),
+        lambda hosted: hosted.update(artifactExpiresAt="2026-09-01T12:00:00Z"),
+    ],
+)
+def test_red_or_unavailable_hosted_drift_reference_fails_closed(mutation) -> None:
+    report, storage, hosted = _fixture()
+    mutation(hosted)
+    report["hostedReferenceSha256"] = _canonical_sha(hosted)
+    with pytest.raises(EvidenceImportError, match="hosted drift"):
         import_report(report, storage, hosted, FakeGit())
 
 
