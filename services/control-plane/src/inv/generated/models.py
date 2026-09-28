@@ -579,6 +579,26 @@ class ProblemDetails(BaseModel):
     evidenceId: EvidenceId | None
 
 
+class Status3(StrEnum):
+    ready = 'ready'
+    blocked = 'blocked'
+
+
+class UnresolvedSetting(StrEnum):
+    INV_NODE_MTLS_CA_BUNDLE = 'INV_NODE_MTLS_CA_BUNDLE'
+    INV_OBJECT_STORE_BUCKET = 'INV_OBJECT_STORE_BUCKET'
+    INV_OBJECT_STORE_CREDENTIAL_FILE = 'INV_OBJECT_STORE_CREDENTIAL_FILE'
+    INV_OBJECT_STORE_ENDPOINT = 'INV_OBJECT_STORE_ENDPOINT'
+
+
+class ConfigurationReadinessView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    status: Status3
+    unresolvedSettings: list[UnresolvedSetting]
+
+
 class NodeResourceSnapshot(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -989,7 +1009,7 @@ class ContainmentDecisionInput(BaseModel):
     nonce: constr(pattern=r'^[0-9a-f]{64}$')
 
 
-class Status3(StrEnum):
+class Status4(StrEnum):
     pending = 'pending'
     approved = 'approved'
     rejected = 'rejected'
@@ -1007,7 +1027,7 @@ class ContainmentApprovalView(BaseModel):
     gateVersion: conint(ge=0, le=9007199254740991)
     reasonCode: ReasonCode
     contentDigest: constr(pattern=r'^[0-9a-f]{64}$')
-    status: Status3
+    status: Status4
     expiresAt: AwareDatetime
     requiredApprovals: Literal[2]
 
@@ -1491,7 +1511,7 @@ class RecordedStorageObservation(BaseModel):
     unsampled: conint(ge=0)
 
 
-class Status4(StrEnum):
+class Status5(StrEnum):
     pending = 'pending'
     expired = 'expired'
     recorded = 'recorded'
@@ -1506,7 +1526,7 @@ class StorageObservationView(BaseModel):
     projectId: ProjectId
     runId: RunId
     contributionId: constr(pattern=r'^stc_[0-9A-HJKMNP-TV-Z]{26}$')
-    status: Status4
+    status: Status5
     createdAt: AwareDatetime
     expiresAt: conint(ge=0)
     currentHealth: Literal['unknown']

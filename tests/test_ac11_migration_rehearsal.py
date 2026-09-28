@@ -38,6 +38,21 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
     assert set(mapping) == {revision.revision for revision in chain() if not revision.irreversible}
     assert {key for key, value in mapping.items() if value == "DECLARED_LOSS_REQUIRES_RESTORE"} == runner.EXPECTED_LOSSY
     assert len(runner.EXPECTED_LOSSY) == 10
+    assert {key for key in mapping if key.startswith(("0047_", "0050_", "0053_"))} == {
+        "0047_audit_events_isolation",
+        "0050_dataset_digest_lookup",
+        "0053_eval_suite_project_scope",
+    }
+    assert all(mapping[key] == "PRESERVED" for key in (
+        "0047_audit_events_isolation",
+        "0050_dataset_digest_lookup",
+        "0053_eval_suite_project_scope",
+    ))
+    ordered = chain()
+    last_irreversible = max(index for index, item in enumerate(ordered) if item.irreversible)
+    assert [item.revision for item in ordered[last_irreversible + 1 :]] == [
+        "0053_eval_suite_project_scope"
+    ]
 
 
 def test_noop_downgrade_is_invalid_before_any_database_call(tmp_path, monkeypatch):
@@ -215,12 +230,13 @@ def test_junit_declares_zero_tail_as_skip_and_restore_as_pass():
                 "existing-object-deletion",
                 "0009-duplicate-key",
                 "ellipsis-noop",
+                "0053-scoped-row-refusal",
             ],
         )
     )
     assert root.attrib == {
         "name": "s11-ac11-migration-rehearsal",
-        "tests": "6",
+        "tests": "7",
         "failures": "0",
         "errors": "0",
         "skipped": "1",
@@ -232,7 +248,33 @@ def test_junit_declares_zero_tail_as_skip_and_restore_as_pass():
         "negative-existing-object-deletion",
         "negative-0009-duplicate-key",
         "negative-ellipsis-noop",
+        "negative-0053-scoped-row-refusal",
     }.issubset(cases)
+
+
+def test_junit_declares_reversible_tail_as_measured_not_skipped():
+    root = ET.fromstring(
+        runner._junit_bytes(
+            success=True,
+            reversible_tail=1,
+            negative_cases=[
+                "existing-object-deletion",
+                "0009-duplicate-key",
+                "ellipsis-noop",
+                "0053-scoped-row-refusal",
+            ],
+        )
+    )
+    assert root.attrib == {
+        "name": "s11-ac11-migration-rehearsal",
+        "tests": "7",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0",
+    }
+    cases = {case.attrib["name"]: case for case in root.findall("testcase")}
+    assert cases["reversible-segment"].find("skipped") is None
+    assert cases["reversible-segment"].find("failure") is None
 
 
 def test_junit_marks_unobserved_negative_fixture_as_failure():
@@ -244,11 +286,35 @@ def test_junit_marks_unobserved_negative_fixture_as_failure():
             failure="fixture stopped",
         )
     )
-    assert root.attrib["failures"] == "3"
+    assert root.attrib["failures"] == "4"
     cases = {case.attrib["name"]: case for case in root.findall("testcase")}
     assert cases["negative-existing-object-deletion"].find("failure") is None
     assert cases["negative-0009-duplicate-key"].find("failure") is not None
     assert cases["negative-ellipsis-noop"].find("failure") is not None
+    assert cases["negative-0053-scoped-row-refusal"].find("failure") is not None
+
+
+def test_0053_scoped_row_refusal_requires_exact_reason_and_atomic_state():
+    refused = subprocess.CompletedProcess(
+        args=[], returncode=1, stdout=b"", stderr=b"1 suite(s) belong to a project"
+    )
+    runner._validate_0053_scoped_refusal(
+        refused,
+        version="0053_eval_suite_project_scope",
+        project_id="prj_ac11_scoped_refusal",
+    )
+    with pytest.raises(runner.RehearsalError, match="unexpected reason"):
+        runner._validate_0053_scoped_refusal(
+            subprocess.CompletedProcess(args=[], returncode=1, stdout=b"", stderr=b"connection refused"),
+            version="0053_eval_suite_project_scope",
+            project_id="prj_ac11_scoped_refusal",
+        )
+    with pytest.raises(runner.RehearsalError, match="atomically"):
+        runner._validate_0053_scoped_refusal(
+            refused,
+            version="0052_model_version_digest_scope",
+            project_id=None,
+        )
 
 
 def test_0009_negative_fixture_requires_unique_violation_and_atomic_rollback():
@@ -317,4 +383,4 @@ def test_workflow_is_opt_in_exact_head_and_non_cancelling():
     assert 'test -z "$(git status --porcelain)"' in source
     assert "postgres:16" in source
     assert "actions/upload-artifact@v4" in source
-    assert "'tests': '6'" in source
+    assert "'tests': '7'" in source

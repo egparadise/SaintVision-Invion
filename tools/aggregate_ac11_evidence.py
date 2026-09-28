@@ -380,8 +380,8 @@ def _generic_observations(envelope: dict[str, Any], criteria: dict[str, Any]) ->
     return Verdict.MEASURED_FAIL if failed else Verdict.MEASURED_PASS
 
 
-def _migration_reversible_tail(git: GitReader, source: str) -> tuple[str, int]:
-    """Read the migration graph from sourceHeadSha and return (head, reversible tail size)."""
+def _migration_reversible_segment(git: GitReader, source: str) -> tuple[str, str, int]:
+    """Return (head, last irreversible barrier or ``base``, reversible tail size)."""
     paths = sorted(path for path in git.list_paths(source, "migrations/versions") if path.endswith(".py"))
     if not paths:
         raise ValueError("sourceHeadSha has no migration graph")
@@ -452,7 +452,15 @@ def _migration_reversible_tail(git: GitReader, source: str) -> tuple[str, int]:
         (index for index, revision in enumerate(ordered) if revisions[revision][1]),
         default=-1,
     )
-    return head, len(ordered) - last_irreversible - 1
+    barrier = ordered[last_irreversible] if last_irreversible >= 0 else "base"
+    return head, barrier, len(ordered) - last_irreversible - 1
+
+
+def _migration_reversible_tail(git: GitReader, source: str) -> tuple[str, int]:
+    """Backward-compatible head/tail view used by structural N/A validation."""
+
+    head, _barrier, tail = _migration_reversible_segment(git, source)
+    return head, tail
 
 
 def evaluate_definer(report: dict[str, Any], allowlist: dict[str, Any]) -> Verdict:
@@ -712,6 +720,18 @@ def evaluate_axis(envelope: dict[str, Any], git: GitReader, allowlist: dict[str,
             if criteria is None:
                 raise ValueError("security targetRef is required")
             recomputed = _security_observations(envelope, allowlist, now, git, source)
+        elif axis == "migration-reversible-segment" and envelope.get("observations"):
+            head, barrier, tail_count = _migration_reversible_segment(git, source)
+            if tail_count < 1 or envelope.get("reversibleSegment") != {
+                "startingRevision": head,
+                "endingRevision": barrier,
+                "reversibleTailCount": tail_count,
+            }:
+                raise ValueError("reversible evidence differs from the source migration graph")
+            if criteria is None:
+                recomputed = Verdict.NOT_REGISTERED
+            else:
+                recomputed = _generic_observations(envelope, criteria)
         elif envelope.get("observations"):
             if criteria is None:
                 recomputed = Verdict.NOT_REGISTERED

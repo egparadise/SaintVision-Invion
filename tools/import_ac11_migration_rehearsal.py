@@ -28,11 +28,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from aggregate_ac11_evidence import RepositoryGit, _migration_reversible_segment
+
 
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
 REGISTRY_BLOB = "e8c0134081dde18b2aa2bcadd42fe76f42cff667"
 TARGET_ID = "s11-irreversible-restore-forward-v0"
+REVERSIBLE_TARGET_ID = "s11-migration-reversible-roundtrip-v1"
 HEX40 = re.compile(r"^[0-9a-f]{40}$")
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
 RUN_ID = re.compile(r"^[0-9]+$")
@@ -85,7 +88,7 @@ def _metadata_id(value: Any, field: str) -> str:
     return rendered
 
 
-def _read_bundle(archive: bytes) -> tuple[dict[str, Any], bytes, bytes]:
+def _read_bundle(archive: bytes) -> tuple[dict[str, Any], bytes, bytes, bool]:
     if not isinstance(archive, bytes) or not 0 < len(archive) <= MAX_ARCHIVE_BYTES:
         raise EvidenceImportError("artifact zip is missing or exceeds the import bound")
     try:
@@ -115,13 +118,15 @@ def _read_bundle(archive: bytes) -> tuple[dict[str, Any], bytes, bytes]:
         root = ET.fromstring(junit_bytes)
     except ET.ParseError as exc:
         raise EvidenceImportError("producer JUnit is not valid XML") from exc
-    if root.tag != "testsuite" or root.attrib != {
-        "name": "s11-ac11-migration-rehearsal",
-        "tests": "6",
-        "failures": "0",
-        "errors": "0",
-        "skipped": "1",
-    }:
+    if (
+        root.tag != "testsuite"
+        or set(root.attrib) != {"name", "tests", "failures", "errors", "skipped"}
+        or root.attrib.get("name") != "s11-ac11-migration-rehearsal"
+        or root.attrib.get("tests") != "7"
+        or root.attrib.get("failures") != "0"
+        or root.attrib.get("errors") != "0"
+        or root.attrib.get("skipped") not in {"0", "1"}
+    ):
         raise EvidenceImportError("producer JUnit summary is not the reviewed passing shape")
     cases = {case.attrib.get("name"): case for case in root.findall("testcase")}
     expected_cases = {
@@ -131,15 +136,30 @@ def _read_bundle(archive: bytes) -> tuple[dict[str, Any], bytes, bytes]:
         "negative-existing-object-deletion",
         "negative-0009-duplicate-key",
         "negative-ellipsis-noop",
+        "negative-0053-scoped-row-refusal",
     }
     if set(cases) != expected_cases:
         raise EvidenceImportError("producer JUnit cases are missing or duplicated")
-    if cases["reversible-segment"].find("skipped") is None or any(
+    reversible_skipped = cases["reversible-segment"].find("skipped") is not None
+    if root.attrib["skipped"] != ("1" if reversible_skipped else "0") or any(
         case.find("failure") is not None or case.find("error") is not None
         for case in cases.values()
     ):
         raise EvidenceImportError("producer JUnit does not prove the passing rehearsal")
-    return report, report_bytes, junit_bytes
+    if any(
+        case.find("skipped") is not None
+        for name, case in cases.items()
+        if name != "reversible-segment"
+    ):
+        raise EvidenceImportError("producer JUnit skips an executable case")
+    return report, report_bytes, junit_bytes, reversible_skipped
+
+
+def _source_migration_segment(source: str) -> tuple[str, str, int]:
+    try:
+        return _migration_reversible_segment(RepositoryGit(ROOT), source)
+    except (OSError, ValueError) as exc:
+        raise EvidenceImportError("source migration graph is invalid or unreachable") from exc
 
 
 def _observation(metric: str, value: int) -> dict[str, Any]:
@@ -162,7 +182,7 @@ def import_artifact(
     artifact_metadata: dict[str, Any],
     now: datetime | None = None,
 ) -> dict[str, Any]:
-    report, report_bytes, junit_bytes = _read_bundle(archive)
+    report, report_bytes, junit_bytes, reversible_skipped = _read_bundle(archive)
     if not isinstance(run_metadata, dict) or not isinstance(artifact_metadata, dict):
         raise EvidenceImportError("run and artifact metadata must be JSON objects")
     if report.get("schemaVersion") != "1.0.0" or report.get("runPurpose") != (
@@ -179,21 +199,39 @@ def import_artifact(
         raise EvidenceImportError("checkoutTreeSha is invalid")
     if _git("rev-parse", f"{source}^{{tree}}") != tree or report.get("cleanCheckout") is not True:
         raise EvidenceImportError("producer checkout provenance is invalid")
+    reversible_head, reversible_barrier, reversible_tail = _source_migration_segment(source)
+    if reversible_skipped != (reversible_tail == 0):
+        raise EvidenceImportError("producer JUnit reversible result differs from the source graph")
     if _git("rev-parse", f"{source}:{REGISTRY_PATH}") != REGISTRY_BLOB:
         raise EvidenceImportError("source tree does not contain the reviewed target registry")
     registry = json.loads(_git("show", f"{source}:{REGISTRY_PATH}"))
-    targets = [row for row in registry.get("targets", []) if row.get("targetId") == TARGET_ID]
-    if len(targets) != 1:
-        raise EvidenceImportError("restore target is absent or duplicated")
-    target = targets[0]
-    criteria = target.get("criteria")
+    targets = registry.get("targets", [])
+    if not isinstance(targets, list):
+        raise EvidenceImportError("target registry has no target list")
+
+    def registered_target(target_id: str, axis: str, expected: dict[str, Any]) -> dict[str, Any]:
+        matches = [row for row in targets if isinstance(row, dict) and row.get("targetId") == target_id]
+        if len(matches) != 1 or matches[0].get("axis") != axis:
+            raise EvidenceImportError(f"{axis} target is absent, duplicated, or misbound")
+        if matches[0].get("criteria") != expected:
+            raise EvidenceImportError(f"{axis} target criteria differ from the importer contract")
+        return matches[0]
+
     expected_criteria = {
         "catalogMismatchCount": {"operator": "eq", "value": 0},
-        "negativeFixturePassCount": {"operator": "eq", "value": 3},
+        "negativeFixturePassCount": {"operator": "eq", "value": 4},
         "restoreForwardPassCount": {"operator": "eq", "value": 1},
     }
-    if criteria != expected_criteria:
-        raise EvidenceImportError("restore target criteria differ from the importer contract")
+    registered_target(TARGET_ID, "irreversible-restore-forward", expected_criteria)
+    reversible_criteria = {
+        "catalogMismatchCount": {"operator": "eq", "value": 0},
+        "reversibleRoundtripPassCount": {"operator": "eq", "value": 1},
+        "sentinelMismatchCount": {"operator": "eq", "value": 0},
+    }
+    if reversible_tail:
+        registered_target(
+            REVERSIBLE_TARGET_ID, "migration-reversible-segment", reversible_criteria
+        )
     axes = report.get("axes")
     if not isinstance(axes, list) or len(axes) != 2:
         raise EvidenceImportError("producer axes are missing or duplicated")
@@ -202,21 +240,46 @@ def import_artifact(
     restore = by_name.get("irreversible-restore-forward")
     if set(by_name) != {"migration-reversible-segment", "irreversible-restore-forward"}:
         raise EvidenceImportError("producer axes are missing or duplicated")
-    if reversible != {
-        "axis": "migration-reversible-segment",
-        "verdict": "NOT_APPLICABLE",
-        "structuralException": {"reason": "no-reversible-tail", "reversibleTailCount": 0},
-    }:
-        raise EvidenceImportError("reversible axis lacks the approved structural exception")
+    expected_reversible = (
+        {
+            "axis": "migration-reversible-segment",
+            "verdict": "MEASURED_PASS",
+            "observationCount": 1,
+            "details": {
+                "startingRevision": reversible_head,
+                "endingRevision": reversible_barrier,
+                "catalogEquivalent": True,
+                "sentinelPreserved": True,
+            },
+        }
+        if reversible_tail
+        else {
+            "axis": "migration-reversible-segment",
+            "verdict": "NOT_APPLICABLE",
+            "structuralException": {
+                "reason": "no-reversible-tail",
+                "reversibleTailCount": 0,
+            },
+        }
+    )
+    if reversible != expected_reversible:
+        raise EvidenceImportError(
+            "reversible tail roundtrip does not match the source migration graph"
+        )
     if not isinstance(restore, dict) or restore.get("verdict") != "MEASURED_PASS":
         raise EvidenceImportError("restore axis did not pass")
     details = restore.get("details")
     negative = details.get("negativeFixtures") if isinstance(details, dict) else None
     if (
         not isinstance(negative, dict)
-        or negative.get("passedCount") != 3
+        or negative.get("passedCount") != 4
         or sorted(row.get("case") for row in negative.get("cases", []) if isinstance(row, dict))
-        != ["0009-duplicate-key", "ellipsis-noop", "existing-object-deletion"]
+        != [
+            "0009-duplicate-key",
+            "0053-scoped-row-refusal",
+            "ellipsis-noop",
+            "existing-object-deletion",
+        ]
         or any(row.get("verdict") != "EXPECTED_FINDING" for row in negative.get("cases", []))
     ):
         raise EvidenceImportError("negative fixture evidence is incomplete")
@@ -285,28 +348,50 @@ def import_artifact(
         "finishedAt": finished,
         "cleanup": cleanup,
     }
-    target_ref = {
-        "commit": source,
-        "path": REGISTRY_PATH,
-        "blob": REGISTRY_BLOB,
-        "targetId": TARGET_ID,
-        "criteria": criteria,
-    }
-    imported_axes = [
+    def target_ref(target_id: str, criteria: dict[str, Any]) -> dict[str, Any]:
+        return {
+            "commit": source,
+            "path": REGISTRY_PATH,
+            "blob": REGISTRY_BLOB,
+            "targetId": target_id,
+            "criteria": criteria,
+        }
+
+    reversible_axis = (
         {
+            **common,
+            "axis": "migration-reversible-segment",
+            "targetRef": target_ref(REVERSIBLE_TARGET_ID, reversible_criteria),
+            "verdict": "MEASURED_PASS",
+            "reversibleSegment": {
+                "startingRevision": reversible_head,
+                "endingRevision": reversible_barrier,
+                "reversibleTailCount": reversible_tail,
+            },
+            "observations": [
+                _observation("catalogMismatchCount", 0),
+                _observation("reversibleRoundtripPassCount", 1),
+                _observation("sentinelMismatchCount", 0),
+            ],
+        }
+        if reversible_tail
+        else {
             **common,
             "axis": "migration-reversible-segment",
             "verdict": "NOT_APPLICABLE",
             "structuralException": reversible["structuralException"],
-        },
+        }
+    )
+    imported_axes = [
+        reversible_axis,
         {
             **common,
             "axis": "irreversible-restore-forward",
-            "targetRef": target_ref,
+            "targetRef": target_ref(TARGET_ID, expected_criteria),
             "verdict": "MEASURED_PASS",
             "observations": [
                 _observation("catalogMismatchCount", 0),
-                _observation("negativeFixturePassCount", 3),
+                _observation("negativeFixturePassCount", 4),
                 _observation("restoreForwardPassCount", 1),
             ],
         },
