@@ -1283,5 +1283,5 @@ AOA-05 follow-up: the old 18 setup errors had two distinct causes: unset CX01_CO
 
 - Branch/stack: `agent/codex/s11-migration-rehearsal` / PR #170 C1 head `960fdc6b`; owner/reviewer Codex/Claude.
 - Opt-in hosted lane, exact PR-head checkout, disposable PostgreSQL 16 source/restore DB, pre/post-forward sentinel, final catalog fingerprint, residue-zero JSON/JUnit evidence를 구현했다. reversible tail 0은 조건부 `NOT_APPLICABLE`, 짝인 `0045→snapshot restore→0046`만 실제 PASS 후보이며 lossy-reversible 10개는 개별 측정이 아닌 restore-route 사전 분류로 유지한다.
-- PG-free focused 8 passed, py_compile/YAML/diff-check exit 0. hosted run 전이므로 실제 restore는 `NOT_OBSERVED`, AC-11은 미완료다.
 - History: [[2026-09-28_13-06-51_KST_S11_AC11_migration_리허설_Codex]].
+- Hosted 후속 정정: PG-free focused 12 passed. 정본 run `36377513831`(head `de9d8a4e`)은 `0045→snapshot restore→0046`를 `MEASURED_PASS`, JUnit 3/0/0/1 skip, disposable DB residue 0으로 확인했다. 앞선 네 run의 진단·owner 보존·OID/attnum·동등 CHECK deparse 교정도 History에 보존했다. 이는 단일 hosted restore 축만의 PASS이며 AC-11 전체와 S11 상태는 미완료다.

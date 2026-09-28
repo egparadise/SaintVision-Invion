@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-S11-AC11-MIGRATION-REHEARSAL-20260928-CODEX"
 title: "S11 AC-11 migration restore 리허설 구현"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T13:06:51+09:00"
+updated: "2026-09-28T13:25:07+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tasks: ["S11-BE", "S11-DB"]
@@ -18,7 +18,7 @@ tags: ["s11", "ac-11", "migration", "restore", "hosted", "fail-closed"]
 ## 기준과 범위
 
 - 승인 설계: PR #157 v1.1.1, head `a793f258dac9b2a4951df084089bf3a3a3ae1bcc`, 설계 blob `99776a491772c4a62e1be26644d35a365d80a030`.
-- stack base: PR #170 r2 head `ea93e2e79e4776cad57b101d07b1bf9a8b4126b5`.
+- stack base: PR #170 C1 문서화 head `960fdc6b70fe89ff63ce24e8125b449eb75abf99`를 merge commit `e5e1059a`로 포함했다. #170의 merge-commit-only provenance 조건을 보존한다.
 - 공개 API·계약·기존 migration은 바꾸지 않는다. 로컬 PostgreSQL·Docker는 실행하지 않고 실제 리허설은 opt-in hosted lane에서만 수행한다.
 
 ## 구현
@@ -35,7 +35,7 @@ workflow `AC-11 Migration Rehearsal`은 manual dispatch 또는 PR label `run-ac1
 
 | 명령 | 결과 |
 |---|---|
-| `PYTHONUTF8=1 python -m pytest tests/test_ac11_migration_rehearsal.py -q` | exit 0, **8 passed** |
+| `PYTHONUTF8=1 python -m pytest tests/test_ac11_migration_rehearsal.py -q` | exit 0, **12 passed** |
 | `python -m py_compile tools/run_ac11_migration_rehearsal.py` | exit 0 |
 | workflow YAML parse | exit 0 |
 | `git diff --check` | exit 0 |
@@ -44,4 +44,18 @@ workflow `AC-11 Migration Rehearsal`은 manual dispatch 또는 PR label `run-ac1
 
 ## 현재 판정
 
-위 결과는 runner의 PG-free 검증일 뿐 migration restore 측정값이 아니다. hosted lane 실행 전 `irreversible-restore-forward`는 `NOT_OBSERVED`이며 AC-11과 S11 상태를 변경하지 않는다. hosted run ID·head·JUnit·JSON digest·cleanup receipt는 실행 후 이 문서에 추가한다.
+### hosted 실행 이력
+
+| run | source head | 결과 | 확인된 원인/조치 |
+|---|---|---|---|
+| `36376475798` | `6ecd29ae` | `MEASURED_FAIL` | type-only 진단만 남아 원인 미분류. safe owned diagnostic을 추가했다. |
+| `36376639439` | `1daf4fac` | `MEASURED_FAIL` | catalog fingerprint가 columns·constraints·functions·routine grants에서 달랐다. |
+| `36377155444` | `bf84c37a` | `MEASURED_FAIL` | 실제 보안 차이(function owner 유실)와 DB-local OID/physical attnum 비교 잡음을 분리했다. |
+| `36377328717` | `2b4fc0d5` | `MEASURED_FAIL` | owner/grant는 일치했다. 남은 차이는 dropped-column 물리 slot과 동등한 CHECK cast deparse 표현이었다. |
+| `36377513831` | `de9d8a4e` | **`MEASURED_PASS`** | 논리 column 순서와 동등 CHECK 표현만 정규화하고 owner·grant·function definition·policy 비교는 유지했다. |
+
+정본 hosted 결과는 [run 36377513831](https://github.com/egparadise/SaintVision-Invion/actions/runs/36377513831)이다. exact source head는 `de9d8a4e76e3895325e79c46b536ad42b54dbea1`, checkout tree는 `c29f49bcfdac85e7e37c8a0b3d7ed1c17b8f72f4`, clean checkout은 `true`다. PostgreSQL은 `16.15`, source/restore disposable DB 2개를 만들고 둘 다 제거해 residue `0`, cleanup error `0`이다. JUnit은 **3 tests / 0 failures / 0 errors / 1 skipped**이며 skip은 reversible tail 0의 구조적 `NOT_APPLICABLE`이다.
+
+실행은 `0045_discovery_machine_cred` snapshot을 복원해 `0046_model_manifest_readiness`까지 forward했다. pre-forward sentinel 보존, post-forward sentinel의 snapshot 비포함, catalog 9개 section(table 155, column 1393, constraint 844, index 387, function 42, table grant 1509, routine grant 55, policy 149, role membership 0)이 일치했다. catalog hash는 `df97a8f84c63901870efad6393554e164afe7464340af54d62c57ac6170ba902`, JUnit hash는 `abf6a0b9daa2edc11b8150d0e43633786ab93a5b7eec5f7b791353ef5a4ed7b4`다. artifact `10952070190`의 digest는 `sha256:9813e6aa323e06811ce35f065a5e0f04929ffe4a21346eba4a5e644df4a9c5be`, 만료는 `2026-10-28T04:24:17Z`다.
+
+이 결과는 hosted 단일 PostgreSQL restore 축의 PASS다. lossy-reversible 10개 개별 published-prior restore, 실제 PITR, 5노드·실장비 축은 측정하지 않았으며 AC-11 전체 done이나 S11 상태 승격을 주장하지 않는다.
