@@ -3,6 +3,7 @@
 from collections import Counter
 from datetime import datetime, timezone
 from decimal import Decimal
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -571,6 +572,13 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
         else report["legacyLockWait"]
     )
     report["schemaVersion"] = "1.7.0"
+    report["disposableDatabase"] = {
+        "fingerprintSha256": hashlib.sha256(
+            a.e.database_name.encode("utf-8")
+        ).hexdigest(),
+        "nameExposed": False,
+        "lifecycle": "unique-pytest-session-database",
+    }
     report["contentionObservation"]["candidateLimitLockTimeoutMs"] = int(
         os.getenv("INV_PLACEMENT_CANDIDATE_LIMIT_LOCK_TIMEOUT_MS", "500")
     )
