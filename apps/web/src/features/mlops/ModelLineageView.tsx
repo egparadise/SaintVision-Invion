@@ -1,17 +1,20 @@
-import React, { useState } from 'react';
-import { ModelLineage, ModelCommitObservation } from '@/contracts/types';
+import React, { useState, useEffect } from 'react';
+import { ModelLineage, ModelCommitObservation, ConformanceStatusResponse } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { fetchModelCommitment } from '@/shared/api/modelCommitmentObservation';
+import { fetchConformanceStatus } from '@/shared/api/adapterObservation';
 import { MlopsManager } from './mlopsEngine';
 
 export interface ModelLineageViewProps {
   initialLineages?: ModelLineage[];
   currentProjectId?: string;
+  initialConformance?: ConformanceStatusResponse;
 }
 
 export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   initialLineages = [],
   currentProjectId,
+  initialConformance,
 }) => {
   const [mlopsManager] = useState<MlopsManager>(() => new MlopsManager(initialLineages));
   const [lineages, setLineages] = useState<ModelLineage[]>(mlopsManager.getLineages());
@@ -19,6 +22,73 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [approvalInput, setApprovalInput] = useState('');
   const [actionNotice, setActionNotice] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Adapter conformance observation state (G-03 Phase 1)
+  const [conformanceProjectId, setConformanceProjectId] = useState(currentProjectId || '');
+  const [conformanceData, setConformanceData] = useState<ConformanceStatusResponse | null>(
+    () => initialConformance || null
+  );
+  const [conformanceLoading, setConformanceLoading] = useState(false);
+  const [conformanceError, setConformanceError] = useState<{
+    code?: string;
+    status?: number;
+    title?: string;
+    detail: string;
+  } | null>(null);
+
+  const handleFetchConformance = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!conformanceProjectId.trim()) {
+      return;
+    }
+    setConformanceLoading(true);
+    setConformanceError(null);
+    try {
+      const data = await fetchConformanceStatus(conformanceProjectId.trim());
+      setConformanceData(data);
+    } catch (err: any) {
+      setConformanceData(null);
+      const prob = err?.problem;
+      if (prob) {
+        setConformanceError({
+          code: prob.code,
+          status: prob.status,
+          title: prob.title,
+          detail: prob.detail || '요청이 거절되었습니다.',
+        });
+      } else {
+        const isContractMismatch = err?.message && err.message.includes('계약 불일치');
+        setConformanceError({
+          detail: isContractMismatch
+            ? `클라이언트 응답 계약 검증 실패: ${err.message}`
+            : (err?.message || '네트워크 오류가 발생했습니다.'),
+        });
+      }
+    } finally {
+      setConformanceLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (currentProjectId?.trim() && !initialConformance) {
+      setConformanceProjectId(currentProjectId.trim());
+      fetchConformanceStatus(currentProjectId.trim())
+        .then((data) => setConformanceData(data))
+        .catch((err) => {
+          const prob = err?.problem;
+          if (prob) {
+            setConformanceError({
+              code: prob.code,
+              status: prob.status,
+              title: prob.title,
+              detail: prob.detail || '요청이 거절되었습니다.',
+            });
+          } else {
+            setConformanceError({ detail: err?.message || '오류가 발생했습니다.' });
+          }
+        });
+    }
+  }, [currentProjectId]);
 
   // Model commitment observation state (starts empty, requiring explicit project/model context)
   const [commitmentProject, setCommitmentProject] = useState(currentProjectId || '');
@@ -33,7 +103,6 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
     detail: string;
   } | null>(null);
 
-  const conformances = mlopsManager.verifyProviderConformances();
   const selectedModel = lineages.find((m) => m.modelId === selectedModelId) || lineages[0];
 
   const handleSelectModel = (modelId: string) => {
@@ -161,12 +230,17 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
         }}
       >
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
-          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>Provider 계약 동일성 (AC-10)</div>
-          <div style={{ fontSize: '18px', fontWeight: 700, color: '#d29922', marginTop: '4px' }}>
-            미측정 (모의/정적 예시 · 검증 아님)
+          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>Provider 계약 동일성 (AC-10 / G-03)</div>
+          <div
+            data-testid="conformance-top-status"
+            style={{ fontSize: '18px', fontWeight: 700, color: '#e3b341', marginTop: '4px' }}
+          >
+            {conformanceData ? `미측정 (${conformanceData.status})` : '미측정 (NOT_OBSERVED)'}
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
-            실제 conformance API 부재 · {conformances.map((c) => c.provider).join(' = ')} 스키마 예시
+          <div data-testid="conformance-top-subtext" style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
+            {conformanceData
+              ? `${conformanceData.checks.length}개 정본 체크 항목 미측정 (${conformanceData.scope})`
+              : '실제 conformance API (G-03 1단계) 연동'}
           </div>
         </div>
 
@@ -457,8 +531,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
         </>
       )}
 
-      {/* Multi-Provider Adapter Conformance Table (AC-10) */}
+      {/* Real Multi-LLM Provider Adapter Conformance Panel (G-03 Phase 1: GET /v1/projects/{project_id}/adapters/conformance) */}
       <div
+        data-testid="adapter-conformance-panel"
         style={{
           backgroundColor: '#161b22',
           border: '1px solid #30363d',
@@ -469,54 +544,265 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
           <div>
             <h4 style={{ margin: 0, fontSize: '15px', color: '#f0f6fc' }}>
-              Multi-LLM Provider Adapter Conformance (AC-10)
+              Multi-LLM Provider Adapter Conformance (G-03 1단계 API 연동)
             </h4>
             <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
-              Codex와 Claude 어댑터 공통 계약 스키마 정적 예시입니다 (실제 어댑터 conformance API 부재로 '미측정' · 실시간 측정값 아님).
+              컨트롤 플레인 호스트의 실제 어댑터 적합성 상태를 조회합니다. 1단계는 저장된 결과가 없어 정직하게 <code style={{ color: '#e3b341' }}>NOT_OBSERVED</code>(미측정) 및 15개 정본 체크리스트 규격을 반환합니다.
             </p>
           </div>
         </div>
 
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}>
-          <thead>
-            <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
-              <th style={{ padding: '8px' }}>Provider</th>
-              <th style={{ padding: '8px' }}>Contract Version</th>
-              <th style={{ padding: '8px' }}>Conformance Status</th>
-              <th style={{ padding: '8px' }}>Avg Latency</th>
-              <th style={{ padding: '8px' }}>Token Throughput</th>
-              <th style={{ padding: '8px' }}>Supported Protocols</th>
-            </tr>
-          </thead>
-          <tbody>
-            {conformances.map((conf) => (
-              <tr key={conf.provider} style={{ borderBottom: '1px solid #21262d' }}>
-                <td style={{ padding: '10px 8px', fontWeight: 600, color: '#f0f6fc' }}>{conf.provider}</td>
-                <td style={{ padding: '10px 8px', fontFamily: 'var(--font-mono, monospace)' }}>{conf.contractVersion}</td>
-                <td style={{ padding: '10px 8px' }}>
-                  <span
-                    data-testid={`conformance-status-${conf.provider}`}
-                    style={{
-                      padding: '2px 8px',
-                      borderRadius: '4px',
-                      fontSize: '11px',
-                      fontWeight: 700,
-                      backgroundColor: 'rgba(210, 153, 34, 0.2)',
-                      color: '#d29922',
-                    }}
-                  >
-                    미측정 (모의/정적 예시 · 검증 아님)
-                  </span>
-                </td>
-                <td style={{ padding: '10px 8px' }}>{conf.avgLatencyMs} ms (모의/정적 예시)</td>
-                <td style={{ padding: '10px 8px', color: '#58a6ff' }}>{conf.tokensPerSec} tok/s (모의/정적 예시)</td>
-                <td style={{ padding: '10px 8px', color: '#8b949e', fontSize: '12px' }}>
-                  {conf.supportedProtocols.join(', ')}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {/* Project ID input & Fetch Form */}
+        <form
+          onSubmit={handleFetchConformance}
+          style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap' }}
+        >
+          <input
+            type="text"
+            data-testid="conformance-project-input"
+            placeholder="Project ID (prj_...)"
+            value={conformanceProjectId}
+            onChange={(e) => setConformanceProjectId(e.target.value)}
+            style={{
+              padding: '6px 10px',
+              backgroundColor: '#0d1117',
+              border: '1px solid #30363d',
+              borderRadius: '6px',
+              color: '#c9d1d9',
+              fontSize: '13px',
+              fontFamily: 'var(--font-mono, monospace)',
+              minWidth: '220px',
+            }}
+          />
+          <Button
+            size="sm"
+            variant="primary"
+            type="submit"
+            data-testid="conformance-fetch-btn"
+            disabled={conformanceLoading || !conformanceProjectId.trim()}
+          >
+            {conformanceLoading ? '조회 중...' : 'Conformance 조회'}
+          </Button>
+        </form>
+
+        {/* Permanent Live Region for Conformance Status Announcements (WAI-ARIA a11y, F1 lesson) */}
+        <div
+          data-testid="conformance-live-status"
+          role="status"
+          aria-live="polite"
+          style={
+            conformanceLoading || conformanceError || conformanceData
+              ? {
+                  padding: '10px 14px',
+                  borderRadius: '6px',
+                  fontSize: '13px',
+                  fontWeight: 500,
+                  marginBottom: '14px',
+                  backgroundColor: conformanceLoading
+                    ? 'rgba(56, 139, 253, 0.15)'
+                    : conformanceError
+                    ? 'rgba(248, 81, 73, 0.15)'
+                    : 'rgba(240, 136, 62, 0.15)',
+                  border: `1px solid ${
+                    conformanceLoading
+                      ? '#58a6ff'
+                      : conformanceError
+                      ? '#ff7b72'
+                      : '#f0883e'
+                  }`,
+                  color: conformanceLoading
+                    ? '#58a6ff'
+                    : conformanceError
+                    ? '#ff7b72'
+                    : '#f0883e',
+                }
+              : undefined
+          }
+        >
+          {conformanceLoading && '⏳ 어댑터 Conformance 상태 조회 중...'}
+          {conformanceError &&
+            `❌ ${conformanceError.code && conformanceError.status ? `[${conformanceError.code}] (${conformanceError.status}) ${conformanceError.title ? `${conformanceError.title}: ` : ''}` : ''}${conformanceError.detail}`}
+          {!conformanceLoading &&
+            !conformanceError &&
+            conformanceData &&
+            `ℹ️ 어댑터 Conformance 관측 완료: ${conformanceData.status} (${conformanceData.checks.length}개 정본 체크 항목)`}
+        </div>
+
+        {/* Explicit Role Alert Error Banner on ProblemDetails (401, 403, 404) */}
+        {conformanceError && (
+          <div
+            role="alert"
+            data-testid="conformance-error-banner"
+            style={{
+              padding: '10px 14px',
+              borderRadius: '6px',
+              fontSize: '13px',
+              backgroundColor: 'rgba(248, 81, 73, 0.15)',
+              border: '1px solid #ff7b72',
+              color: '#ff7b72',
+              marginBottom: '14px',
+            }}
+          >
+            ❌ {conformanceError.code && conformanceError.status ? `[${conformanceError.code}] (${conformanceError.status}) ${conformanceError.title ? `${conformanceError.title}: ` : ''}` : ''}{conformanceError.detail}
+          </div>
+        )}
+
+        {/* Initial Unmeasured Guidance Notice */}
+        {!conformanceData && !conformanceError && !conformanceLoading && (
+          <div
+            data-testid="conformance-unmeasured-notice"
+            style={{
+              padding: '12px 14px',
+              borderRadius: '6px',
+              backgroundColor: '#0d1117',
+              border: '1px solid #30363d',
+              color: '#8b949e',
+              fontSize: '13px',
+              lineHeight: '1.5',
+            }}
+          >
+            ℹ️ <strong style={{ color: '#f0883e' }}>미측정 (NOT_OBSERVED)</strong>: 실제 컨트롤 플레인 HTTP 엔드포인트(<code>GET /v1/projects/:projectId/adapters/conformance</code>)를 호출하여 15개 정본 체크리스트 규격 상태를 조회합니다. 프로젝트 ID를 입력하고 조회 버튼을 누르십시오.
+          </div>
+        )}
+
+        {/* Conformance Observation Results Container */}
+        {conformanceData && (
+          <div
+            data-testid="conformance-result-container"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px',
+            }}
+          >
+            {/* Metadata Summary Grid */}
+            <div
+              style={{
+                backgroundColor: '#0d1117',
+                border: '1px solid #30363d',
+                borderRadius: '6px',
+                padding: '16px',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                gap: '12px',
+                fontSize: '13px',
+              }}
+            >
+              <div>
+                <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>CONFORMANCE STATUS</span>
+                <span
+                  data-testid="conformance-status-badge"
+                  style={{
+                    display: 'inline-block',
+                    marginTop: '4px',
+                    padding: '2px 8px',
+                    borderRadius: '4px',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    backgroundColor: 'rgba(240, 136, 62, 0.15)',
+                    color: '#f0883e',
+                  }}
+                >
+                  미측정 ({conformanceData.status})
+                </span>
+              </div>
+              <div>
+                <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>SCOPE</span>
+                <code data-testid="conformance-scope" style={{ color: '#58a6ff' }}>
+                  {conformanceData.scope}
+                </code>
+              </div>
+              <div>
+                <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>CONTRACT VERSION</span>
+                <span data-testid="conformance-contract-version" style={{ color: '#c9d1d9', fontFamily: 'var(--font-mono, monospace)' }}>
+                  {conformanceData.contractVersion}
+                </span>
+              </div>
+              <div>
+                <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>TARGET ADAPTERS</span>
+                <span data-testid="conformance-adapters" style={{ color: '#f0f6fc' }}>
+                  {conformanceData.adapters.join(', ')}
+                </span>
+              </div>
+              <div>
+                <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>RECORDED AT</span>
+                <span data-testid="conformance-recorded-at" style={{ color: '#8b949e' }}>
+                  {conformanceData.recordedAt === null ? 'null (미측정)' : String(conformanceData.recordedAt)}
+                </span>
+              </div>
+              <div style={{ gridColumn: '1 / -1' }}>
+                <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>REASON</span>
+                <span data-testid="conformance-reason" style={{ color: '#c9d1d9' }}>
+                  {conformanceData.reason}
+                </span>
+              </div>
+            </div>
+
+            {/* Dynamic Checklist Table from API Response (FE Hardcoding Prohibited) */}
+            <div style={{ overflowX: 'auto' }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#f0f6fc', marginBottom: '8px' }}>
+                정본 Conformance Checklist ({conformanceData.checks.length}개 항목 · 서버 응답 동적 렌더링)
+              </div>
+              <table
+                data-testid="conformance-checks-table"
+                style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}
+              >
+                <thead>
+                  <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
+                    <th style={{ padding: '8px' }}>#</th>
+                    <th style={{ padding: '8px' }}>Check Name (CHECKLIST 정본)</th>
+                    <th style={{ padding: '8px' }}>Capability Gated</th>
+                    <th style={{ padding: '8px' }}>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {conformanceData.checks.map((check, idx) => (
+                    <tr
+                      key={check.name}
+                      data-testid={`conformance-check-row-${idx}`}
+                      style={{ borderBottom: '1px solid #21262d' }}
+                    >
+                      <td style={{ padding: '8px', color: '#8b949e' }}>{idx + 1}</td>
+                      <td style={{ padding: '8px', fontWeight: 600, color: '#f0f6fc', fontFamily: 'var(--font-mono, monospace)' }}>
+                        <span data-testid={`conformance-check-name-${idx}`}>{check.name}</span>
+                      </td>
+                      <td style={{ padding: '8px' }}>
+                        <span
+                          data-testid={`conformance-check-gated-${idx}`}
+                          style={{
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            backgroundColor: check.capabilityGated ? 'rgba(56, 139, 253, 0.15)' : 'rgba(139, 148, 158, 0.15)',
+                            color: check.capabilityGated ? '#58a6ff' : '#8b949e',
+                          }}
+                        >
+                          {check.capabilityGated ? 'Capability Gated' : 'Standard'}
+                        </span>
+                      </td>
+                      <td style={{ padding: '8px' }}>
+                        <span
+                          data-testid={`conformance-check-status-${idx}`}
+                          style={{
+                            padding: '2px 8px',
+                            borderRadius: '4px',
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            backgroundColor: 'rgba(240, 136, 62, 0.15)',
+                            color: '#f0883e',
+                          }}
+                        >
+                          NOT_OBSERVED (미측정)
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Real Model Commitment Observation Panel (Control-Plane GET /v1/.../commitment) */}

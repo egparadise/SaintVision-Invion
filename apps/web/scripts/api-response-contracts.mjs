@@ -46,6 +46,7 @@ const contracts = [
   { schema: 'distributed-plan-response', output: 'distributed-plan-response' },
   { schema: 'node-page-response', output: 'node-page-response' },
   { schema: 'node-detail-response', output: 'node-detail-response' },
+  { schema: 'conformance-status-response', output: 'conformance-status-response' },
 ];
 const mode = process.argv[2];
 

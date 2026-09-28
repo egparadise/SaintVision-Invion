@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.124"
+version: "1.0.125"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-28T09:50:00+09:00"
+updated: "2026-09-28T18:26:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,28 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-28T09:50:00+09:00 (최신 tip `agent/gemini/s10-fe-fixes`, PR #146).
+- 확인 기준: 2026-09-28T18:26:00+09:00 (최신 tip `agent/gemini/s10-fe-conformance-status`).
+
+## 2026-09-28 S10-FE 어댑터 conformance 관측 화면 새 API(G-03 1단계) 연동 (agent/gemini/s10-fe-conformance-status)
+
+- **PR #200(Claude, G-03 1단계, Codex 승인) API 및 스키마 정합**:
+  - `GET /v1/projects/{project_id}/adapters/conformance` 엔드포인트 연동.
+  - `contracts/conformance-status-response.schema.json`으로부터 TypeScript 타입 생성(`conformance-status-response.ts`), `packages/contracts-ts` 및 `apps/web/src/contracts/types.ts`에 re-export.
+  - 엄격 런타임 가드 `isConformanceStatusResponse` 및 `isConformanceCheckDescriptor` 실장 (`additionalProperties: false`, `status: "NOT_OBSERVED"`, `recordedAt: null`, `scope: "control-plane-host"`).
+- **ModelLineageView 화면 연동 및 무결성 불변식**:
+  - **Zero-Synthesis 원칙**: 가짜 수치(`100% CONFORMING`, `0 / 15`, `PASS`) 배제, 서버 응답에 따라 정직하게 `미측정 (NOT_OBSERVED)` 표출.
+  - **동적 체크리스트**: 15개 정본 체크 규격(`CHECKLIST`)을 응답 `checks[]`에서 동적으로 순회 렌더링 (FE 하드코딩 0).
+  - **WAI-ARIA 접근성 (PR #203 F1 교훈)**: `data-testid="conformance-live-status"` 컨테이너를 조건부 렌더가 아닌 마운트 시점부터 DOM에 상시 배치(`role="status" aria-live="polite"`).
+  - **RFC 9457 ProblemDetails**: 401, 403, 404 오류 수신 시 `role="alert"` 에러 배너에 code, status, title, detail 표출 및 결과 컨테이너 격리.
+  - **다크 테마 WCAG AA 대비율**: `#161b22` 배경 대비 주황 배지 6.83:1, 에러 6.86:1, 로딩 6.85:1, 반투명 합성 5.3:1 이상 확보.
+- **백엔드 소스 변경 0**: 프런트엔드 및 테스트 코드만 추가/수정.
+- **회귀 시험 6대 불변식 검증 (`apps/web/tests/model-lineage.test.ts`)**:
+  1. `NOT_OBSERVED` 수신 시 가짜 PASS/수치 없는 정직한 미측정 표출
+  2. 동적 체크리스트 서버 응답 파동 렌더링 (FE 비하드코딩 입증)
+  3. RFC 9457 401/403/404 ProblemDetails 오류 표출
+  4. Live region 상시 DOM 유지 불변식 (node identity 불변)
+  5. 비정본 payload 거부 스키마 가드
+  6. 다크 테마 WCAG AA 대비율 (>= 4.5:1) 수식 검증
 
 ## 2026-09-28 S10-FE 제품 결함 수정 및 Claude UI / Codex 계약 재검토 전수 반영 (agent/gemini/s10-fe-fixes, PR #146)
 

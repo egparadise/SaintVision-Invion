@@ -556,6 +556,8 @@ import type {
   WorkspaceEditView,
   WorkspaceSnapshot,
   WorkspaceSnapshotFile,
+  ConformanceStatusResponse,
+  ConformanceCheckDescriptor,
 } from '../../../../packages/contracts-ts/src/index';
 
 export type {
@@ -581,6 +583,8 @@ export type {
   WorkspaceEditView,
   WorkspaceSnapshot,
   WorkspaceSnapshotFile,
+  ConformanceStatusResponse,
+  ConformanceCheckDescriptor,
 };
 
 export type RunArtifactItem = RunArtifactFile;
