@@ -13,6 +13,7 @@ Exit 2: the manifest or one of its current-schema envelopes is invalid.
 from __future__ import annotations
 
 import argparse
+import ast
 import hashlib
 import json
 import math
@@ -29,6 +30,9 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_ALLOWLIST = (
     ROOT / "docs/vault/30_Development/Evidence/s11-security-allowlist-v0.json"
 )
+TARGET_REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
+ALLOWLIST_BLOB = "ff2f9966956da677ebcdee92ec1de2292bd5ec52"
+ALLOWLIST_CANONICAL_SHA256 = "b73aba8ff97443bbd1e314d5ca0375fdcbce8205a1a746bc5a73759a04083707"
 SCHEMA_VERSION = "1.0.0"
 RUN_PURPOSE = "ac11-release-gate"
 AXIS_PURPOSE = "ac11-axis-evidence"
@@ -90,6 +94,8 @@ class GitReader(Protocol):
     def tree(self, commit: str) -> str: ...
     def is_ancestor(self, ancestor: str, descendant: str) -> bool: ...
     def blob(self, commit: str, path: str) -> str: ...
+    def show(self, commit: str, path: str) -> str: ...
+    def list_paths(self, commit: str, prefix: str) -> list[str]: ...
 
 
 class RepositoryGit:
@@ -121,6 +127,13 @@ class RepositoryGit:
 
     def blob(self, commit: str, path: str) -> str:
         return self._run("rev-parse", f"{commit}:{path}")
+
+    def show(self, commit: str, path: str) -> str:
+        return self._run("show", f"{commit}:{path}")
+
+    def list_paths(self, commit: str, prefix: str) -> list[str]:
+        output = self._run("ls-tree", "-r", "--name-only", commit, "--", prefix)
+        return [line for line in output.splitlines() if line]
 
 
 @dataclass(frozen=True)
@@ -182,22 +195,58 @@ def _compare(value: float, operator: str, target: float) -> bool:
     raise ValueError("target operator is unknown")
 
 
-def _validate_target(target: Any, source: str, git: GitReader) -> dict[str, Any]:
+def _load_json_from_git(git: GitReader, commit: str, path: str, label: str) -> dict[str, Any]:
+    try:
+        value = json.loads(git.show(commit, path))
+    except (json.JSONDecodeError, TypeError) as exc:
+        raise ValueError(f"{label} is not valid JSON") from exc
+    if not isinstance(value, dict):
+        raise ValueError(f"{label} must be an object")
+    return value
+
+
+def _validate_target(target: Any, axis: str, source: str, git: GitReader) -> dict[str, Any]:
     if not isinstance(target, dict):
         raise ValueError("targetRef is required")
-    required = {"commit", "path", "blob", "criteria"}
-    if not required.issubset(target):
-        raise ValueError("targetRef requires commit/path/blob/criteria")
+    required = {"commit", "path", "blob", "targetId", "criteria"}
+    if set(target) != required:
+        raise ValueError("targetRef requires exact commit/path/blob/targetId/criteria keys")
     commit, path, blob = str(target["commit"]), str(target["path"]), str(target["blob"])
-    if not SHA1_RE.fullmatch(commit) or not SHA1_RE.fullmatch(blob) or not path:
+    if path != TARGET_REGISTRY_PATH:
+        raise ValueError("targetRef path is not the AC-11 target registry")
+    if not SHA1_RE.fullmatch(commit) or not SHA1_RE.fullmatch(blob):
         raise ValueError("targetRef contains an invalid commit, path or blob")
     if not git.is_ancestor(commit, source):
         raise ValueError("targetRef commit is not an ancestor of sourceHeadSha")
     if git.blob(commit, path) != blob or git.blob(source, path) != blob:
         raise ValueError("targetRef blob is not identical in target and source trees")
-    if not isinstance(target["criteria"], dict):
+    registry = _load_json_from_git(git, commit, path, "target registry")
+    if registry.get("schemaVersion") != SCHEMA_VERSION or not isinstance(registry.get("targets"), list):
+        raise ValueError("target registry schema is unknown")
+    target_id = target["targetId"]
+    matches = [row for row in registry["targets"] if isinstance(row, dict) and row.get("targetId") == target_id]
+    if len(matches) != 1:
+        raise ValueError("targetId is absent or duplicated in target registry")
+    registered = matches[0]
+    if set(registered) != {"targetId", "axis", "sourceDocument", "criteria"} or registered["axis"] != axis:
+        raise ValueError("target registry entry does not bind the requested axis")
+    source_document = registered["sourceDocument"]
+    if not isinstance(source_document, dict) or set(source_document) != {"commit", "path", "blob"}:
+        raise ValueError("target sourceDocument is malformed")
+    doc_commit = str(source_document["commit"])
+    doc_path = str(source_document["path"])
+    doc_blob = str(source_document["blob"])
+    if not SHA1_RE.fullmatch(doc_commit) or not SHA1_RE.fullmatch(doc_blob) or not doc_path:
+        raise ValueError("target sourceDocument contains invalid provenance")
+    if not git.is_ancestor(doc_commit, source):
+        raise ValueError("target source document is not an ancestor of sourceHeadSha")
+    if git.blob(doc_commit, doc_path) != doc_blob or git.blob(source, doc_path) != doc_blob:
+        raise ValueError("target source document blob is not identical in source tree")
+    if not isinstance(registered["criteria"], dict) or not isinstance(target["criteria"], dict):
         raise ValueError("targetRef criteria must be an object")
-    return target["criteria"]
+    if target["criteria"] != registered["criteria"]:
+        raise ValueError("targetRef criteria differ from the registered Git target")
+    return registered["criteria"]
 
 
 def _validate_common(
@@ -243,7 +292,7 @@ def _validate_common(
     if isinstance(residue, bool) or not isinstance(residue, int) or residue < 0:
         raise ValueError("cleanup.residueCount must be a non-negative integer")
     target = envelope.get("targetRef")
-    criteria = None if target is None else _validate_target(target, source, git)
+    criteria = None if target is None else _validate_target(target, str(envelope.get("axis", "")), source, git)
     return producer, criteria, source
 
 
@@ -252,6 +301,7 @@ def _generic_observations(envelope: dict[str, Any], criteria: dict[str, Any]) ->
     if not isinstance(observations, list) or not observations:
         raise ValueError("observations must be a non-empty list")
     failed = False
+    skipped = False
     metrics: set[str] = set()
     for item in observations:
         if not isinstance(item, dict):
@@ -269,6 +319,7 @@ def _generic_observations(envelope: dict[str, Any], criteria: dict[str, Any]) ->
             raise ValueError("observation counts must be non-negative integers")
         if n == 0 or success + failure + skip != n:
             raise ValueError("observation denominator is empty or inconsistent")
+        skipped = skipped or skip > 0
         errors = item.get("errorsByClass", {})
         if failure:
             if not isinstance(errors, dict) or not errors or any(
@@ -298,28 +349,126 @@ def _generic_observations(envelope: dict[str, Any], criteria: dict[str, Any]) ->
         failed = failed or not _compare(float(value), operator, float(target))
     if set(criteria) != metrics:
         raise ValueError("target criteria and observation metrics must match exactly")
+    if skipped:
+        return Verdict.NOT_OBSERVED
     return Verdict.MEASURED_FAIL if failed else Verdict.MEASURED_PASS
 
 
-def evaluate_definer(report: dict[str, Any]) -> Verdict:
+def _migration_reversible_tail(git: GitReader, source: str) -> tuple[str, int]:
+    """Read the migration graph from sourceHeadSha and return (head, reversible tail size)."""
+    paths = sorted(path for path in git.list_paths(source, "migrations/versions") if path.endswith(".py"))
+    if not paths:
+        raise ValueError("sourceHeadSha has no migration graph")
+    revisions: dict[str, tuple[tuple[str, ...], bool]] = {}
+    for path in paths:
+        try:
+            tree = ast.parse(git.show(source, path))
+            assignments: dict[str, Any] = {}
+            downgrade: ast.FunctionDef | None = None
+            for node in tree.body:
+                if isinstance(node, ast.Assign):
+                    for target in node.targets:
+                        if isinstance(target, ast.Name) and target.id in {"revision", "down_revision"}:
+                            assignments[target.id] = ast.literal_eval(node.value)
+                elif isinstance(node, ast.FunctionDef) and node.name == "downgrade":
+                    downgrade = node
+            if set(assignments) != {"revision", "down_revision"}:
+                raise ValueError("revision declarations missing")
+            revision = assignments["revision"]
+            down = assignments["down_revision"]
+            if not isinstance(revision, str) or revision in revisions:
+                raise ValueError("duplicate or invalid revision")
+            parents = () if down is None else (down,) if isinstance(down, str) else tuple(down)
+            if not parents and down is not None or any(not isinstance(item, str) for item in parents):
+                raise ValueError("invalid down_revision")
+            if downgrade is None:
+                irreversible = True
+            else:
+                body = [
+                    node for node in downgrade.body
+                    if not (isinstance(node, ast.Expr) and isinstance(getattr(node, "value", None), ast.Constant))
+                ]
+                # A no-op ``pass`` is not an approved irreversible declaration. Treat
+                # it as a reversible tail candidate so a structural N/A cannot hide
+                # the stage-2 negative fixture that must reject no-op downgrades.
+                irreversible = len(body) == 1 and isinstance(body[0], ast.Raise)
+            revisions[revision] = (parents, irreversible or len(parents) > 1)
+        except (SyntaxError, ValueError, TypeError) as exc:
+            raise ValueError(f"invalid migration graph entry: {path}") from exc
+    referenced = {parent for parents, _ in revisions.values() for parent in parents}
+    if referenced - revisions.keys():
+        raise ValueError("migration graph has an unknown parent")
+    roots = [revision for revision, (parents, _) in revisions.items() if not parents]
+    heads = set(revisions) - referenced
+    if len(roots) != 1 or len(heads) != 1:
+        raise ValueError("migration graph must have one root and one head")
+    ordered: list[str] = []
+    visiting: set[str] = set()
+    visited: set[str] = set()
+
+    def visit(revision: str) -> None:
+        if revision in visiting:
+            raise ValueError("migration graph contains a cycle")
+        if revision in visited:
+            return
+        visiting.add(revision)
+        for parent in sorted(revisions[revision][0]):
+            visit(parent)
+        visiting.remove(revision)
+        visited.add(revision)
+        ordered.append(revision)
+
+    head = next(iter(heads))
+    visit(head)
+    if len(visited) != len(revisions):
+        raise ValueError("migration graph contains unreachable revisions")
+    last_irreversible = max(
+        (index for index, revision in enumerate(ordered) if revisions[revision][1]),
+        default=-1,
+    )
+    return head, len(ordered) - last_irreversible - 1
+
+
+def evaluate_definer(report: dict[str, Any], allowlist: dict[str, Any]) -> Verdict:
     if _files(report.get("toolFiles")) != _files(DEFINER_FILES):
         return Verdict.INVALID_RUN
     exit_code = report.get("exitCode")
-    findings = report.get("findings")
     if exit_code == 2:
-        return Verdict.NOT_OBSERVED
+        return Verdict.NOT_OBSERVED if report.get("status") == "unavailable" else Verdict.INVALID_RUN
+    findings = report.get("functions")
     if exit_code not in (0, 1) or not isinstance(findings, list):
         return Verdict.INVALID_RUN
-    problems = []
+    expected = set(allowlist.get("definerPolicySignatures", []))
+    if len(expected) != 12:
+        return Verdict.INVALID_RUN
+    seen: set[str] = set()
+    problems: list[str] = []
     for finding in findings:
-        if not isinstance(finding, dict) or not isinstance(finding.get("problems"), list):
+        if (
+            not isinstance(finding, dict)
+            or not isinstance(finding.get("function"), str)
+            or finding["function"] in seen
+            or not isinstance(finding.get("problems"), list)
+        ):
             return Verdict.INVALID_RUN
+        seen.add(finding["function"])
         problems.extend(finding["problems"])
+    if not expected.issubset(seen):
+        return Verdict.INVALID_RUN
     if any(problem not in DEFINER_KNOWN for problem in problems):
         return Verdict.INVALID_RUN
+    unsafe = report.get("unsafe")
+    if isinstance(unsafe, bool) or not isinstance(unsafe, int) or unsafe != sum(bool(row["problems"]) for row in findings):
+        return Verdict.INVALID_RUN
     if exit_code == 0:
-        return Verdict.MEASURED_PASS if not problems else Verdict.INVALID_RUN
+        return (
+            Verdict.MEASURED_PASS
+            if report.get("status") == "matches_reviewed_policy" and unsafe == 0 and seen == expected
+            else Verdict.INVALID_RUN
+        )
     if not problems:
+        return Verdict.INVALID_RUN
+    if report.get("status") != "requires_review":
         return Verdict.INVALID_RUN
     if DEFINER_INVALID.intersection(problems):
         return Verdict.INVALID_RUN
@@ -349,8 +498,11 @@ def _accepted_disposition(violation: dict[str, Any], allowlist: dict[str, Any], 
 
 
 def validate_allowlist(allowlist: Any) -> None:
+    canonical = json.dumps(allowlist, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    if hashlib.sha256(canonical).hexdigest() != ALLOWLIST_CANONICAL_SHA256:
+        raise ValueError("security allowlist does not match the reviewed content")
     if not isinstance(allowlist, dict) or set(allowlist) != {
-        "schemaVersion", "verifiedAt", "secVf001", "rlsAcceptedDispositions"
+        "schemaVersion", "verifiedAt", "definerPolicySignatures", "secVf001", "rlsAcceptedDispositions"
     }:
         raise ValueError("security allowlist requires the exact v0 top-level fields")
     if allowlist["schemaVersion"] != SCHEMA_VERSION:
@@ -358,6 +510,30 @@ def validate_allowlist(allowlist: Any) -> None:
     verified = datetime.fromisoformat(str(allowlist["verifiedAt"]).replace("Z", "+00:00"))
     if verified.tzinfo is None:
         raise ValueError("security allowlist verifiedAt must include a timezone")
+    signatures = allowlist["definerPolicySignatures"]
+    if (
+        not isinstance(signatures, list)
+        or len(signatures) != 12
+        or len(set(signatures)) != len(signatures)
+        or any(not isinstance(item, str) or not item for item in signatures)
+    ):
+        raise ValueError("definerPolicySignatures must contain 12 unique signatures")
+    vf = allowlist["secVf001"]
+    vf_keys = {
+        "runner", "workflow", "nodeDependencyResolver", "testFiles", "requiredNodeIds",
+        "requiredCaseIdentitiesSha256", "expectedTests",
+    }
+    if not isinstance(vf, dict) or set(vf) != vf_keys:
+        raise ValueError("secVf001 structure is not the reviewed v0 shape")
+    _files([vf["runner"], vf["workflow"], vf["nodeDependencyResolver"], *vf["testFiles"]])
+    if (
+        not isinstance(vf["requiredNodeIds"], list)
+        or len(vf["requiredNodeIds"]) != 5
+        or len(set(vf["requiredNodeIds"])) != 5
+        or not SHA256_RE.fullmatch(str(vf["requiredCaseIdentitiesSha256"]))
+        or vf["expectedTests"] != {"failure": 0, "error": 0, "skipped": 0, "passed": 6}
+    ):
+        raise ValueError("secVf001 node and case inventory is malformed")
     entries = allowlist["rlsAcceptedDispositions"]
     if not isinstance(entries, list):
         raise ValueError("rlsAcceptedDispositions must be a list")
@@ -383,34 +559,53 @@ def validate_allowlist(allowlist: Any) -> None:
 def evaluate_rls(report: dict[str, Any], allowlist: dict[str, Any], now: datetime) -> Verdict:
     if _files(report.get("toolFiles")) != _files(RLS_FILES):
         return Verdict.INVALID_RUN
-    if report.get("baselineDispositions") != allowlist.get("rlsAcceptedDispositions"):
+    baseline = report.get("baselineAccepted")
+    if not isinstance(baseline, list):
+        return Verdict.INVALID_RUN
+    expected_baseline = {
+        (entry["role"], entry["table"], tuple(sorted(entry["rules"])))
+        for entry in allowlist["rlsAcceptedDispositions"]
+    }
+    observed_baseline = {
+        (entry.get("role"), entry.get("table"), tuple(sorted(entry.get("rules", []))))
+        for entry in baseline if isinstance(entry, dict)
+    }
+    if observed_baseline != expected_baseline or len(observed_baseline) != len(baseline):
         return Verdict.INVALID_RUN
     for entry in allowlist["rlsAcceptedDispositions"]:
         if entry["disposition"] == "accepted-with-expiry":
             expires = datetime.fromisoformat(str(entry["expiresAt"]).replace("Z", "+00:00"))
             if expires <= now:
                 return Verdict.MEASURED_FAIL
-    exit_code, violations = report.get("exitCode"), report.get("violations")
-    if exit_code in (2, 3):
+    exit_code = report.get("exitCode")
+    if exit_code == 2:
         return Verdict.NOT_OBSERVED
-    if exit_code not in (0, 1) or not isinstance(violations, list):
+    violations = report.get("violations")
+    accepted = report.get("accepted")
+    unmeasured = report.get("unmeasured")
+    roles = report.get("roles")
+    ground_truth = report.get("ground_truth")
+    if (
+        exit_code not in (0, 1, 3)
+        or not all(isinstance(value, list) for value in (violations, accepted, unmeasured))
+        or not isinstance(roles, dict) or not roles
+        or not isinstance(ground_truth, dict) or not ground_truth
+    ):
+        return Verdict.INVALID_RUN
+    for row in [*violations, *accepted, *unmeasured]:
+        if not isinstance(row, dict) or row.get("rule") not in RLS_RULES:
+            return Verdict.INVALID_RUN
+    allowed_identities = {
+        (entry["role"], entry["table"], rule)
+        for entry in allowlist["rlsAcceptedDispositions"] for rule in entry["rules"]
+    }
+    if any((row.get("role"), row.get("table"), row.get("rule")) not in allowed_identities for row in accepted):
         return Verdict.INVALID_RUN
     if exit_code == 0:
-        return Verdict.MEASURED_PASS if not violations else Verdict.INVALID_RUN
-    if not violations:
-        return Verdict.INVALID_RUN
-    unresolved = False
-    for violation in violations:
-        if not isinstance(violation, dict) or violation.get("rule") not in RLS_RULES:
-            return Verdict.INVALID_RUN
-        disposition = _accepted_disposition(violation, allowlist, now)
-        if disposition is Verdict.INVALID_RUN:
-            return Verdict.INVALID_RUN
-        if disposition is Verdict.MEASURED_FAIL:
-            return Verdict.MEASURED_FAIL
-        if disposition is None:
-            unresolved = True
-    return Verdict.MEASURED_FAIL if unresolved else Verdict.MEASURED_PASS
+        return Verdict.MEASURED_PASS if report.get("verdict") == "PASS" and not violations and not unmeasured else Verdict.INVALID_RUN
+    if exit_code == 1:
+        return Verdict.MEASURED_FAIL if report.get("verdict") == "VIOLATIONS" and violations else Verdict.INVALID_RUN
+    return Verdict.NOT_OBSERVED if report.get("verdict") == "UNMEASURED" and unmeasured and not violations else Verdict.INVALID_RUN
 
 
 def evaluate_vf(report: dict[str, Any], allowlist: dict[str, Any]) -> Verdict:
@@ -425,10 +620,17 @@ def evaluate_vf(report: dict[str, Any], allowlist: dict[str, Any]) -> Verdict:
         return Verdict.INVALID_RUN
     exit_code = report.get("exitCode")
     if exit_code == 0:
-        return Verdict.MEASURED_PASS
-    if exit_code == 1:
+        return (
+            Verdict.MEASURED_PASS
+            if report.get("subprocessExitCode") == 0
+            and report.get("evidenceStatus") == "complete"
+            and report.get("caseIdentitiesSha256") == spec["requiredCaseIdentitiesSha256"]
+            and report.get("tests") == spec["expectedTests"]
+            else Verdict.INVALID_RUN
+        )
+    if exit_code in (1, 124):
         return Verdict.MEASURED_FAIL
-    if exit_code == 2:
+    if exit_code in (2, 125):
         return Verdict.NOT_OBSERVED
     return Verdict.INVALID_RUN
 
@@ -454,7 +656,7 @@ def _security_observations(
             if git.blob(source, item["path"]) != item["blob"]:
                 return Verdict.INVALID_RUN
     verdicts = [
-        evaluate_definer(by_id["SEC-DEF-001"]),
+        evaluate_definer(by_id["SEC-DEF-001"], allowlist),
         evaluate_rls(by_id["SEC-RLS-001"], allowlist, now),
         evaluate_vf(by_id["SEC-VF-001"], allowlist),
     ]
@@ -499,11 +701,14 @@ def evaluate_axis(envelope: dict[str, Any], git: GitReader, allowlist: dict[str,
                 "reason": "no-reversible-tail", "reversibleTailCount": 0
             }:
                 raise ValueError("NOT_APPLICABLE lacks the sole approved structural proof")
+            _, tail_count = _migration_reversible_tail(git, source)
+            if tail_count != 0:
+                raise ValueError("sourceHeadSha migration graph has a reversible tail")
             recomputed = Verdict.NOT_APPLICABLE
         else:
             raise ValueError("empty observations have no fail-closed classification")
-        if producer is Verdict.MEASURED_PASS and recomputed is not Verdict.MEASURED_PASS:
-            raise ValueError("producer MEASURED_PASS contradicts recomputed evidence")
+        if producer is not recomputed:
+            raise ValueError("producer verdict contradicts recomputed evidence")
         return AxisResult(axis, recomputed, ())
     except (KeyError, TypeError, ValueError) as exc:
         return AxisResult(axis, Verdict.INVALID_RUN, (str(exc),))
@@ -539,10 +744,26 @@ def aggregate(manifest: dict[str, Any], git: GitReader, allowlist: dict[str, Any
         overall = Verdict.INVALID_RUN
     elif any(result.verdict is Verdict.MEASURED_FAIL for result in results):
         overall = Verdict.MEASURED_FAIL
-    elif all(result.verdict is Verdict.MEASURED_PASS for result in results):
-        overall = Verdict.MEASURED_PASS
     else:
-        overall = Verdict.NOT_OBSERVED
+        by_axis = {result.axis: result for result in results}
+        reversible = by_axis.get("migration-reversible-segment")
+        restore = by_axis.get("irreversible-restore-forward")
+        conditional_reversible = (
+            reversible is not None
+            and reversible.verdict is Verdict.NOT_APPLICABLE
+            and restore is not None
+            and restore.verdict is Verdict.MEASURED_PASS
+        )
+        required_pass = all(
+            result.verdict is Verdict.MEASURED_PASS
+            for result in results
+            if result.axis != "migration-reversible-segment"
+        )
+        all_pass = all(result.verdict is Verdict.MEASURED_PASS for result in results)
+        if all_pass or (conditional_reversible and required_pass):
+            overall = Verdict.MEASURED_PASS
+        else:
+            overall = Verdict.NOT_OBSERVED
     done = overall is Verdict.MEASURED_PASS and len(results) == len(REQUIRED_AXES)
     return {
         "schemaVersion": SCHEMA_VERSION,
@@ -563,7 +784,11 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
-        allowlist = json.loads(args.allowlist.read_text(encoding="utf-8"))
+        allowlist_bytes = args.allowlist.read_bytes()
+        actual_blob = hashlib.sha1(f"blob {len(allowlist_bytes)}\0".encode() + allowlist_bytes).hexdigest()
+        if actual_blob != ALLOWLIST_BLOB:
+            raise ValueError("security allowlist file does not match the reviewed Git blob")
+        allowlist = json.loads(allowlist_bytes.decode("utf-8"))
         result = aggregate(manifest, RepositoryGit(args.repo), allowlist)
     except (OSError, json.JSONDecodeError, ValueError) as exc:
         result = {

@@ -34,6 +34,12 @@ TOOL_BLOBS = {
         *APPROVED_ALLOWLIST["secVf001"]["testFiles"],
     ]
 }
+TARGET_CRITERIA = {
+    "target-" + axis: (
+        {} if axis == "security-critical-high-zero" else {"sampleCount": {"operator": "gte", "value": 1}}
+    )
+    for axis in tool.REQUIRED_AXES
+}
 
 
 class FakeGit:
@@ -47,14 +53,42 @@ class FakeGit:
         return self.source_tree
 
     def is_ancestor(self, ancestor: str, descendant: str) -> bool:
-        assert ancestor == TARGET and descendant == SOURCE
+        assert descendant == SOURCE
         return self.ancestor
 
     def blob(self, commit: str, path: str) -> str:
-        if path == "docs/target.md":
+        if path == tool.TARGET_REGISTRY_PATH:
             return self.target_blob if commit == TARGET else self.source_blob
+        if path.startswith("docs/targets/"):
+            return BLOB
         assert commit == SOURCE and path in TOOL_BLOBS
         return TOOL_BLOBS[path]
+
+    def show(self, commit: str, path: str) -> str:
+        if path == tool.TARGET_REGISTRY_PATH:
+            targets = []
+            for target_id, criteria in TARGET_CRITERIA.items():
+                axis = target_id.split("target-", 1)[1].split("--", 1)[0]
+                targets.append({
+                    "targetId": target_id,
+                    "axis": axis,
+                    "sourceDocument": {
+                        "commit": TARGET,
+                        "path": f"docs/targets/{axis}.md",
+                        "blob": BLOB,
+                    },
+                    "criteria": criteria,
+                })
+            return json.dumps({"schemaVersion": tool.SCHEMA_VERSION, "targets": targets})
+        if path == "migrations/versions/0001_base.py":
+            return 'revision = "0001_base"\ndown_revision = None\ndef downgrade():\n    pass\n'
+        if path == "migrations/versions/0002_head.py":
+            return 'revision = "0002_head"\ndown_revision = "0001_base"\ndef downgrade():\n    raise RuntimeError("restore")\n'
+        raise AssertionError((commit, path))
+
+    def list_paths(self, commit: str, prefix: str) -> list[str]:
+        assert commit == SOURCE and prefix == "migrations/versions"
+        return ["migrations/versions/0001_base.py", "migrations/versions/0002_head.py"]
 
 
 @pytest.fixture
@@ -62,12 +96,20 @@ def allowlist() -> dict:
     return json.loads(tool.DEFAULT_ALLOWLIST.read_text(encoding="utf-8"))
 
 
-def target(criteria: dict | None = None) -> dict:
+def target(axis: str, criteria: dict | None = None) -> dict:
+    actual = {} if axis == "security-critical-high-zero" else (
+        criteria or {"sampleCount": {"operator": "gte", "value": 1}}
+    )
+    target_id = "target-" + axis
+    if actual != TARGET_CRITERIA.get(target_id):
+        target_id += "--" + str(len(TARGET_CRITERIA))
+        TARGET_CRITERIA[target_id] = copy.deepcopy(actual)
     return {
         "commit": TARGET,
-        "path": "docs/target.md",
+        "path": tool.TARGET_REGISTRY_PATH,
         "blob": BLOB,
-        "criteria": criteria or {"sampleCount": {"operator": "gte", "value": 1}},
+        "targetId": target_id,
+        "criteria": actual,
     }
 
 
@@ -88,7 +130,7 @@ def envelope(axis: str, verdict: str = "MEASURED_PASS") -> dict:
         "environment": {"comparableGroup": "hosted-ubuntu-pg16"},
         "startedAt": "2026-09-28T01:00:00Z",
         "finishedAt": "2026-09-28T01:01:00Z",
-        "targetRef": target(),
+        "targetRef": target(axis),
         "verdict": verdict,
         "observations": [
             {
@@ -114,20 +156,37 @@ def security_reports(allowlist: dict) -> list[dict]:
             "threatId": "SEC-DEF-001",
             "exitCode": 0,
             "toolFiles": copy.deepcopy(tool.DEFINER_FILES),
-            "findings": [{"function": "inv.safe()", "problems": []}],
+            "status": "matches_reviewed_policy",
+            "unsafe": 0,
+            "functions": [
+                {"function": signature, "problems": []}
+                for signature in allowlist["definerPolicySignatures"]
+            ],
         },
         {
             "threatId": "SEC-RLS-001",
             "exitCode": 0,
             "toolFiles": copy.deepcopy(tool.RLS_FILES),
-            "baselineDispositions": copy.deepcopy(allowlist["rlsAcceptedDispositions"]),
+            "baselineAccepted": [
+                {"role": row["role"], "table": row["table"], "rules": copy.deepcopy(row["rules"])}
+                for row in allowlist["rlsAcceptedDispositions"]
+            ],
+            "verdict": "PASS",
             "violations": [],
+            "accepted": [],
+            "unmeasured": [],
+            "roles": {"inv_app": {"present": True}},
+            "ground_truth": {"public.projects": {"tenantScoped": True}},
         },
         {
             "threatId": "SEC-VF-001",
             "exitCode": 0,
             "toolFiles": copy.deepcopy(vf_files),
             "nodeIds": copy.deepcopy(vf["requiredNodeIds"]),
+            "subprocessExitCode": 0,
+            "evidenceStatus": "complete",
+            "caseIdentitiesSha256": vf["requiredCaseIdentitiesSha256"],
+            "tests": copy.deepcopy(vf["expectedTests"]),
         },
     ]
 
@@ -135,7 +194,25 @@ def security_reports(allowlist: dict) -> list[dict]:
 def security_envelope(allowlist: dict) -> dict:
     value = envelope("security-critical-high-zero")
     value["observations"] = security_reports(allowlist)
-    value["targetRef"] = target({})
+    value["targetRef"] = target("security-critical-high-zero", {})
+    return value
+
+
+def rls_report(allowlist: dict, exit_code: int = 0) -> dict:
+    value = {
+        "exitCode": exit_code,
+        "toolFiles": copy.deepcopy(tool.RLS_FILES),
+        "baselineAccepted": [
+            {"role": row["role"], "table": row["table"], "rules": copy.deepcopy(row["rules"])}
+            for row in allowlist["rlsAcceptedDispositions"]
+        ],
+        "verdict": "PASS",
+        "violations": [],
+        "accepted": [],
+        "unmeasured": [],
+        "roles": {"inv_app": {"present": True}},
+        "ground_truth": {"public.projects": {"tenantScoped": True}},
+    }
     return value
 
 
@@ -242,7 +319,7 @@ def test_target_violation_is_fail_but_false_pass_is_invalid(allowlist):
 
 def test_p95_success_only_population_is_invalid(allowlist):
     value = envelope(tool.REQUIRED_AXES[3])
-    value["targetRef"] = target({"requestP95Ms": {"operator": "lte", "value": 2000}})
+    value["targetRef"] = target(tool.REQUIRED_AXES[3], {"requestP95Ms": {"operator": "lte", "value": 2000}})
     value["observations"][0].update(metric="requestP95Ms", value=1200, population="success")
     assert axis_result(value, allowlist).verdict is tool.Verdict.INVALID_RUN
 
@@ -257,49 +334,54 @@ def test_p95_success_only_population_is_invalid(allowlist):
         ("unknown_problem", tool.Verdict.INVALID_RUN),
     ],
 )
-def test_definer_problem_mapping_is_fail_closed(problem, expected):
+def test_definer_problem_mapping_is_fail_closed(problem, expected, allowlist):
+    functions = [
+        {"function": signature, "problems": [problem] if index == 0 else []}
+        for index, signature in enumerate(allowlist["definerPolicySignatures"])
+    ]
     report = {
         "exitCode": 1,
         "toolFiles": copy.deepcopy(tool.DEFINER_FILES),
-        "findings": [{"function": "x", "problems": [problem]}],
+        "status": "requires_review",
+        "unsafe": 1,
+        "functions": functions,
     }
-    assert tool.evaluate_definer(report) is expected
+    assert tool.evaluate_definer(report, allowlist) is expected
 
 
 @pytest.mark.parametrize(
     ("exit_code", "expected"),
     [(0, tool.Verdict.MEASURED_PASS), (2, tool.Verdict.NOT_OBSERVED), (7, tool.Verdict.INVALID_RUN)],
 )
-def test_definer_exit_mapping(exit_code, expected):
-    report = {"exitCode": exit_code, "toolFiles": copy.deepcopy(tool.DEFINER_FILES), "findings": []}
-    assert tool.evaluate_definer(report) is expected
+def test_definer_exit_mapping(exit_code, expected, allowlist):
+    report = {
+        "exitCode": exit_code,
+        "toolFiles": copy.deepcopy(tool.DEFINER_FILES),
+        "status": "unavailable" if exit_code == 2 else "matches_reviewed_policy",
+        "unsafe": 0,
+        "functions": [
+            {"function": signature, "problems": []}
+            for signature in allowlist["definerPolicySignatures"]
+        ],
+    }
+    assert tool.evaluate_definer(report, allowlist) is expected
 
 
 @pytest.mark.parametrize("rule", sorted(tool.RLS_RULES))
 def test_each_unaccepted_rls_rule_is_critical(rule, allowlist):
-    report = {
-        "exitCode": 1,
-        "toolFiles": copy.deepcopy(tool.RLS_FILES),
-        "baselineDispositions": copy.deepcopy(allowlist["rlsAcceptedDispositions"]),
-        "violations": [{"rule": rule, "role": "unlisted", "table": "public.secret"}],
-    }
+    report = rls_report(allowlist, 1)
+    report.update(verdict="VIOLATIONS", violations=[{"rule": rule, "role": "unlisted", "table": "public.secret"}])
     assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.MEASURED_FAIL
 
 
 def test_rls_accepted_expiry_and_baseline_exact_match(allowlist):
-    report = {
-        "exitCode": 1,
-        "toolFiles": copy.deepcopy(tool.RLS_FILES),
-        "baselineDispositions": copy.deepcopy(allowlist["rlsAcceptedDispositions"]),
-        "violations": [{"rule": "E2", "role": "inv_app", "table": "public.tenants"}],
-    }
+    report = rls_report(allowlist)
+    report["accepted"] = [{"rule": "E2", "role": "inv_app", "table": "public.tenants"}]
     assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.MEASURED_PASS
     expired = datetime(2026, 11, 1, tzinfo=timezone.utc)
     assert tool.evaluate_rls(report, allowlist, expired) is tool.Verdict.MEASURED_FAIL
-    report["exitCode"] = 0
-    report["violations"] = []
     assert tool.evaluate_rls(report, allowlist, expired) is tool.Verdict.MEASURED_FAIL
-    report["baselineDispositions"] = []
+    report["baselineAccepted"] = []
     assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.INVALID_RUN
 
 
@@ -308,12 +390,9 @@ def test_rls_accepted_expiry_and_baseline_exact_match(allowlist):
     [(2, tool.Verdict.NOT_OBSERVED), (3, tool.Verdict.NOT_OBSERVED), (9, tool.Verdict.INVALID_RUN)],
 )
 def test_rls_unmeasured_and_unknown_exit_mapping(exit_code, expected, allowlist):
-    report = {
-        "exitCode": exit_code,
-        "toolFiles": copy.deepcopy(tool.RLS_FILES),
-        "baselineDispositions": copy.deepcopy(allowlist["rlsAcceptedDispositions"]),
-        "violations": [],
-    }
+    report = rls_report(allowlist, exit_code)
+    if exit_code == 3:
+        report.update(verdict="UNMEASURED", unmeasured=[{"rule": "E4", "role": "inv_app", "table": "public.projects"}])
     assert tool.evaluate_rls(report, allowlist, NOW) is expected
 
 
@@ -380,4 +459,75 @@ def test_only_reversible_axis_accepts_declared_zero_tail(allowlist):
     value["structuralException"] = {"reason": "no-reversible-tail", "reversibleTailCount": 0}
     assert axis_result(value, allowlist).verdict is tool.Verdict.NOT_APPLICABLE
     value["axis"] = tool.REQUIRED_AXES[1]
+    assert axis_result(value, allowlist).verdict is tool.Verdict.INVALID_RUN
+
+
+def test_zero_tail_is_conditionally_excluded_only_when_restore_passes(allowlist):
+    value = manifest(allowlist)
+    reversible = value["axes"][0]
+    reversible.update(
+        verdict="NOT_APPLICABLE",
+        observations=[],
+        structuralException={"reason": "no-reversible-tail", "reversibleTailCount": 0},
+    )
+    result = tool.aggregate(value, FakeGit(), allowlist, NOW)
+    assert result["verdict"] == "MEASURED_PASS" and result["done"] is True
+
+    restore = value["axes"][1]
+    restore["verdict"] = "MEASURED_FAIL"
+    restore["observations"][0]["value"] = 0
+    result = tool.aggregate(value, FakeGit(), allowlist, NOW)
+    assert result["verdict"] == "MEASURED_FAIL" and result["done"] is False
+
+
+def test_zero_tail_claim_is_invalid_when_git_graph_has_reversible_tail(allowlist):
+    class ReversibleHeadGit(FakeGit):
+        def show(self, commit: str, path: str) -> str:
+            if path == "migrations/versions/0002_head.py":
+                return 'revision = "0002_head"\ndown_revision = "0001_base"\ndef downgrade():\n    pass\n'
+            return super().show(commit, path)
+
+    value = envelope(tool.REQUIRED_AXES[0], "NOT_APPLICABLE")
+    value.update(
+        observations=[],
+        structuralException={"reason": "no-reversible-tail", "reversibleTailCount": 0},
+    )
+    assert axis_result(value, allowlist, ReversibleHeadGit()).verdict is tool.Verdict.INVALID_RUN
+
+
+def test_looser_envelope_criteria_cannot_override_git_registry(allowlist):
+    value = envelope(tool.REQUIRED_AXES[1])
+    value["targetRef"]["criteria"]["sampleCount"]["value"] = 0
+    assert axis_result(value, allowlist).verdict is tool.Verdict.INVALID_RUN
+
+
+def test_skip_is_not_pass_and_producer_must_agree(allowlist):
+    value = envelope(tool.REQUIRED_AXES[1], "NOT_OBSERVED")
+    value["observations"][0].update(successCount=0, skipCount=1)
+    assert axis_result(value, allowlist).verdict is tool.Verdict.NOT_OBSERVED
+    value["verdict"] = "MEASURED_PASS"
+    assert axis_result(value, allowlist).verdict is tool.Verdict.INVALID_RUN
+
+
+def test_empty_definer_catalogue_and_empty_rls_scope_are_invalid(allowlist):
+    definer = security_reports(allowlist)[0]
+    definer.update(functions=[], unsafe=0)
+    assert tool.evaluate_definer(definer, allowlist) is tool.Verdict.INVALID_RUN
+
+    rls = rls_report(allowlist)
+    rls["roles"] = {}
+    assert tool.evaluate_rls(rls, allowlist, NOW) is tool.Verdict.INVALID_RUN
+
+
+def test_vf_requires_complete_unskipped_case_identity_set(allowlist):
+    report = security_reports(allowlist)[2]
+    report["tests"] = {"failure": 0, "error": 0, "skipped": 1, "passed": 5}
+    assert tool.evaluate_vf(report, allowlist) is tool.Verdict.INVALID_RUN
+    report = security_reports(allowlist)[2]
+    report["caseIdentitiesSha256"] = "0" * 64
+    assert tool.evaluate_vf(report, allowlist) is tool.Verdict.INVALID_RUN
+
+
+def test_false_fail_is_rejected_when_observations_recompute_pass(allowlist):
+    value = envelope(tool.REQUIRED_AXES[1], "MEASURED_FAIL")
     assert axis_result(value, allowlist).verdict is tool.Verdict.INVALID_RUN
