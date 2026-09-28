@@ -22,7 +22,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 
 import pitr_archive_retention as retention  # noqa: E402
 from inv.errors import DomainError  # noqa: E402
-from inv.object_store import LocalObjectStore, LocalObjects, object_store_session  # noqa: E402
+from inv.object_store import (  # noqa: E402
+    LocalObjectStore,
+    LocalObjects,
+    ObjectHandle,
+    object_store_session,
+)
 
 NOW = datetime(2026, 9, 28, 8, 0, tzinfo=timezone.utc)
 CAP_02 = {"code": "STORE-0001", "status": 503, "retryable": True}
@@ -146,6 +151,34 @@ def test_cap02_real_locked_scope_does_not_relabel_unrelated_consumer_oserror(tmp
         with provider.locked():
             raise OSError(errno.EIO, "workspace disk")
     assert not isinstance(raised.value, DomainError)
+
+
+@pytest.mark.skipif(sys.platform != "linux", reason="real LocalObjects flock requires Linux")
+@pytest.mark.parametrize(
+    "operation,handle_method", [("put", "put"), ("get", "read"), ("delete", "remove")]
+)
+def test_cap02_real_object_store_session_translates_provider_oserror(
+    tmp_path, monkeypatch, operation, handle_method
+):
+    root = tmp_path / "objects"
+    root.mkdir(mode=0o700)
+    provider = LocalObjects(root)
+
+    def fail(*_args, **_kwargs):
+        raise OSError(errno.EIO, "private provider path")
+
+    monkeypatch.setattr(ObjectHandle, handle_method, fail)
+    locator = "obj-" + "2" * 32
+    digest = hashlib.sha256(b"x").hexdigest()
+    with object_store_session(provider) as files:
+        with pytest.raises(DomainError) as raised:
+            if operation == "put":
+                files.put(locator, b"x", digest)
+            elif operation == "get":
+                files.get(locator, digest, 1)
+            else:
+                files.delete(locator)
+    _assert_store_unavailable(raised.value)
 
 
 @pytest.mark.skipif(sys.platform != "linux", reason="real LocalObjects handle checks require Linux")
