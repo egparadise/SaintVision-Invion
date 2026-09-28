@@ -18,6 +18,7 @@ from tools import operational_evidence as shared
 
 
 SHA = "1" * 40
+SEED = collector.O2_SAMPLE_SEED
 DIGEST = "a" * 64
 
 
@@ -75,12 +76,12 @@ def test_nothing_measured_is_not_observed_and_claims_nothing():
 
 def test_o2_below_the_registered_sample_is_not_a_pass():
     below = collector.evaluate_context_reproducibility(
-        {"sampled": 19, "verified": 19, "mismatched": 0, "errored": 0}
+        {"sampled": 19, "verified": 19, "mismatched": 0, "errored": 0, "sampleSeed": SEED}
     )
     assert below["status"] == "NOT_OBSERVED"
     assert below["minimumSample"] == 20
     at = collector.evaluate_context_reproducibility(
-        {"sampled": 20, "verified": 20, "mismatched": 0, "errored": 0}
+        {"sampled": 20, "verified": 20, "mismatched": 0, "errored": 0, "sampleSeed": SEED}
     )
     assert at["status"] == "MEASURED_PASS"
 
@@ -88,8 +89,8 @@ def test_o2_below_the_registered_sample_is_not_a_pass():
 @pytest.mark.parametrize(
     "summary",
     [
-        {"sampled": 40, "verified": 39, "mismatched": 1, "errored": 0},
-        {"sampled": 40, "verified": 39, "mismatched": 0, "errored": 1},
+        {"sampled": 40, "verified": 39, "mismatched": 1, "errored": 0, "sampleSeed": SEED},
+        {"sampled": 40, "verified": 39, "mismatched": 0, "errored": 1, "sampleSeed": SEED},
     ],
 )
 def test_o2_one_bad_bundle_fails_however_large_the_sample(summary):
@@ -98,7 +99,7 @@ def test_o2_one_bad_bundle_fails_however_large_the_sample(summary):
 
 def test_o2_accounting_that_does_not_add_up_fails():
     result = collector.evaluate_context_reproducibility(
-        {"sampled": 40, "verified": 10, "mismatched": 0, "errored": 0}
+        {"sampled": 40, "verified": 10, "mismatched": 0, "errored": 0, "sampleSeed": SEED}
     )
     assert result["status"] == "MEASURED_FAIL"
     assert "add up" in result["reason"]
@@ -355,3 +356,111 @@ def test_the_expectation_comes_from_the_migration_not_a_copy():
     assert shapes["expected_check"][2] is True
     assert shapes["expected_fk"][0] == "f"
     assert "pg_constraint" in shapes["check_sql"]
+
+
+# ------------------------------------------------- F1-F3 regressions (card 128 r2)
+
+
+def test_o2_without_a_recorded_seed_cannot_pass():
+    """A sample nobody can redraw is not a measurement."""
+    result = collector.evaluate_context_reproducibility(
+        {"sampled": 40, "verified": 40, "mismatched": 0, "errored": 0}
+    )
+    assert result["status"] == "MEASURED_FAIL"
+    assert "seed" in result["reason"]
+
+
+def test_o2_sample_is_ordered_by_a_seeded_digest_not_by_id():
+    """Ordering by id would only ever look at the oldest bundles."""
+    assert "md5(%(seed)s || b.bundle_id)" in collector.O2_BUNDLE_SQL
+    assert "ORDER BY b.bundle_id" not in collector.O2_BUNDLE_SQL
+    assert collector.O2_SAMPLE_SEED
+
+
+def test_o2_pass_carries_the_seed_it_sampled_with():
+    result = collector.evaluate_context_reproducibility(
+        {
+            "sampled": 25,
+            "verified": 25,
+            "mismatched": 0,
+            "errored": 0,
+            "sampleSeed": SEED,
+            "sampleOrder": "md5(seed || bundle_id)",
+        }
+    )
+    assert result["status"] == "MEASURED_PASS"
+    assert result["sampleSeed"] == SEED
+
+
+def test_o11_prime_fails_when_public_holds_the_update_grant():
+    result = collector.evaluate_enforcement_shape(
+        {
+            "checkPresent": True,
+            "checkMatchesExpected": True,
+            "checkValidated": True,
+            "fkPresent": True,
+            "fkMatchesExpected": True,
+            "fkValidated": True,
+            "nonOwnerUpdateGrantCount": 2,
+            "updateGranteesMatchExpected": False,
+            "publicUpdateGrant": True,
+        }
+    )
+    assert result["status"] == "MEASURED_FAIL"
+    assert "PUBLIC" in result["reason"]
+
+
+def test_o11_prime_fails_on_an_extra_grantee_even_without_public():
+    result = collector.evaluate_enforcement_shape(
+        {
+            "checkPresent": True,
+            "checkMatchesExpected": True,
+            "checkValidated": True,
+            "fkPresent": True,
+            "fkMatchesExpected": True,
+            "fkValidated": True,
+            "nonOwnerUpdateGrantCount": 2,
+            "updateGranteesMatchExpected": False,
+            "publicUpdateGrant": False,
+        }
+    )
+    assert result["status"] == "MEASURED_FAIL"
+    assert "grantees" in result["reason"]
+
+
+def test_o11_prime_passes_only_when_the_grantees_match_the_migration():
+    result = collector.evaluate_enforcement_shape(
+        {
+            "checkPresent": True,
+            "checkMatchesExpected": True,
+            "checkValidated": True,
+            "fkPresent": True,
+            "fkMatchesExpected": True,
+            "fkValidated": True,
+            "nonOwnerUpdateGrantCount": 1,
+            "updateGranteesMatchExpected": True,
+            "publicUpdateGrant": False,
+        }
+    )
+    assert result["status"] == "MEASURED_PASS"
+    assert result["grantShapeSource"] == "information_schema.column_privileges"
+
+
+def test_the_expected_grantee_comes_from_the_migration_grant_statement():
+    shapes = collector.load_enforcement_expectation()
+    assert shapes["expected_update_grantees"] == ("inv_app",)
+
+
+def test_o6_and_its_independent_count_share_one_connection_by_construction():
+    """The snapshot handle exists so the SQL cannot get a second connection.
+
+    If someone reintroduces a separate engine or psycopg.connect for the count,
+    this assertion is the thing that notices.
+    """
+    import inspect
+
+    source = inspect.getsource(collector.collect_database)
+    assert "SnapshotHandle(session)" in source
+    assert "psycopg.connect" not in source
+    handle_source = inspect.getsource(collector.SnapshotHandle)
+    assert "session.connection().connection.driver_connection" in handle_source

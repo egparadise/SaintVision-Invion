@@ -43,14 +43,14 @@ tags: ["done-criteria", "s09-db", "s10-db", "s10-st", "operational-acceptance", 
 
 | task | 이미 강제되는 불변식 | 출처 |
 |---|---|---|
-| S09-DB | **빈 suite는 pass가 아니다** — `total_cases > 0 and recorded >= total_cases and passed == total_cases and violations == 0`. 모든 case가 error인 run이 green이 되지 않는다 | `services/evaluation.py:223` `def gate_passed` |
-| S09-DB | sealed `run_records`·`run_record_artifacts`는 append-only(app role에 UPDATE·DELETE 없음) | `db/models/__init__.py:233` `APPEND_ONLY_TABLES` |
-| S09-DB | **run identity를 서비스가 정한다** — 호출자가 `adapter`·`contractVersion`·`modelPinned`를 보내면 경계에서 **422로 거부**된다 (v1.0의 O4) | `api/v1/eval_runs.py` `_reject_service_owned_versions` |
-| S10-DB | **잘린 답이 완전한 답처럼 보이지 않는다** — `truncated`가 있으면 `complete`는 false다 (v1.0의 O7) | `services/lineage.py:672` `_bounded`, `:699` |
-| S10-ST | **digest만으로 `verified_at`을 세울 수 없다** — kernel accept 경로만 쓰는 measurement가 필요하고 digest가 measurement·row 양쪽과 일치해야 한다 | `services/lineage.py:299` `def verify_model_version` |
+| S09-DB | **빈 suite는 pass가 아니다** — `total_cases > 0 and recorded >= total_cases and passed == total_cases and violations == 0`. 모든 case가 error인 run이 green이 되지 않는다 | `src/saintvision/services/evaluation.py:223` `def gate_passed` |
+| S09-DB | sealed `run_records`·`run_record_artifacts`는 append-only(app role에 UPDATE·DELETE 없음) | `src/saintvision/db/models/__init__.py:233` `APPEND_ONLY_TABLES` |
+| S09-DB | **run identity를 서비스가 정한다** — 호출자가 `adapter`·`contractVersion`·`modelPinned`를 보내면 경계에서 **422로 거부**된다 (v1.0의 O4) | `src/saintvision/api/v1/eval_runs.py` `_reject_service_owned_versions` |
+| S10-DB | **잘린 답이 완전한 답처럼 보이지 않는다** — `truncated`가 있으면 `complete`는 false다 (v1.0의 O7) | `src/saintvision/services/lineage.py:672` `_bounded`, `:699` |
+| S10-ST | **digest만으로 `verified_at`을 세울 수 없다** — kernel accept 경로만 쓰는 measurement가 필요하고 digest가 measurement·row 양쪽과 일치해야 한다 | `src/saintvision/services/lineage.py:299` `def verify_model_version` |
 | S10-ST | **DB가 반쪽 verified를 거부한다** — `CHECK ((verified_at IS NULL) = (verified_measurement_id IS NULL))`가 **validated** 상태로 설치된다 | `migrations/versions/0054_model_version_measurements.py` `CHECK`·`EXPECTED_CHECK`(세 번째 요소 `True` = `convalidated`) |
-| S10-ST | retention pin은 **늘리기만** 한다 | `services/lineage.py:353` `def pin_retention` |
-| S10-ST | **측정 신선도를 route가 거부한다** — `Settings.model_measurement_max_age_seconds`(기본 86,400초, 상한 검증) | `config.py:90`·`:114`, `api/v1/model_verify.py:402` `_require_fresh(...)` |
+| S10-ST | retention pin은 **늘리기만** 한다 | `src/saintvision/services/lineage.py:353` `def pin_retention` |
+| S10-ST | **측정 신선도를 route가 거부한다** — `Settings.model_measurement_max_age_seconds`(기본 86,400초, 상한 검증) | `config.py:90`·`:114`, `src/saintvision/api/v1/model_verify.py:402` `_require_fresh(...)` |
 
 ## 2. S09-DB — 불변 Context·RunRecord·eval
 
@@ -75,7 +75,7 @@ tags: ["done-criteria", "s09-db", "s10-db", "s10-st", "operational-acceptance", 
 
 v1.0은 "`len(items) + unresolved` == SQL count"라고 적었다. **그 정의는 정상 제품을 FAIL시킨다.**
 
-`services/lineage.py:895-923`을 읽으면 두 수의 범위가 다르다.
+`src/saintvision/services/lineage.py:895-923`을 읽으면 두 수의 범위가 다르다.
 
 - `unresolvedModelVersions`는 **전체 `wanted` 집합** 기준이다 — `len(wanted) - resolvable`이고, 주석이 "**page 1과 page 4에서 같은 뜻이도록** 전체 집합에서 센다"고 적는다.
 - `items`는 **현재 page**다 — `statement.limit(limit + 1)`로 잘라 `build_page`가 만든다.
@@ -93,7 +93,7 @@ v1.0은 "`len(items) + unresolved` == SQL count"라고 적었다. **그 정의�
 
 v1.1은 "`REPEATABLE READ` transaction에서 **page 순회와 독립 SQL count를 함께** 수행한다"고 적었다. **현재 제품 경계로는 실행할 수 없다.**
 
-`api/deps.py:61` `def get_session`은 **요청마다** `make_session_factory(...)` → `factory()` → `session.begin()` → `tenant_scope(...)`를 열고 그 session을 `yield`한다. `api/v1/lineage_query.py:227`의 route는 그것을 `Depends(get_session)`로 받는다. 그러므로 **cursor의 다음 HTTP 요청은 다른 transaction**이고, 외부 collector의 SQL을 그 snapshot에 참여시킬 **snapshot token이나 API가 없다.** 없는 계약을 있다고 쓴 것이 잘못이었다.
+`src/saintvision/api/deps.py:61` `def get_session`은 **요청마다** `make_session_factory(...)` → `factory()` → `session.begin()` → `tenant_scope(...)`를 열고 그 session을 `yield`한다. `src/saintvision/api/v1/lineage_query.py:227`의 route는 그것을 `Depends(get_session)`로 받는다. 그러므로 **cursor의 다음 HTTP 요청은 다른 transaction**이고, 외부 collector의 SQL을 그 snapshot에 참여시킬 **snapshot token이나 API가 없다.** 없는 계약을 있다고 쓴 것이 잘못이었다.
 
 **O6을 service 수준 판정으로 고정한다.**
 

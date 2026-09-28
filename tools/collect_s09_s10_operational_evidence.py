@@ -44,6 +44,7 @@ import argparse
 import json
 import os
 from pathlib import Path
+import re
 import sys
 from typing import Any
 
@@ -64,6 +65,7 @@ from tools.operational_evidence import (  # noqa: E402
     iso,
     normalise_dsn,
     overall_verdict,
+    sha256_text,
     validate_common,
     write_evidence as write_evidence_pair,
 )
@@ -165,6 +167,12 @@ def evaluate_context_reproducibility(summary: dict[str, Any] | None) -> dict[str
         return _measured(
             "NOT_OBSERVED", reason="context bundles were not read", minimumSample=O2_MINIMUM_SAMPLE
         )
+    seed = summary.get("sampleSeed")
+    if not isinstance(seed, str) or not seed:
+        return _measured(
+            "MEASURED_FAIL",
+            reason="the sample seed was not recorded, so the sample cannot be reproduced",
+        )
     sampled = int(summary.get("sampled", 0))
     verified = int(summary.get("verified", 0))
     mismatched = int(summary.get("mismatched", 0))
@@ -202,6 +210,8 @@ def evaluate_context_reproducibility(summary: dict[str, Any] | None) -> dict[str
         mismatched=0,
         errored=0,
         minimumSample=O2_MINIMUM_SAMPLE,
+        sampleSeed=seed,
+        sampleOrder=summary.get("sampleOrder"),
     )
 
 
@@ -266,29 +276,43 @@ def evaluate_enforcement_shape(summary: dict[str, Any] | None) -> dict[str, Any]
         return _measured("NOT_OBSERVED", reason="constraint shapes were not read")
     check_matches = summary.get("checkMatchesExpected")
     fk_matches = summary.get("fkMatchesExpected")
+    grantees_match = summary.get("updateGranteesMatchExpected")
+    public_grant = summary.get("publicUpdateGrant")
+    shape = {
+        "checkPresent": bool(summary.get("checkPresent")),
+        "checkMatchesExpected": bool(check_matches),
+        "checkValidated": summary.get("checkValidated"),
+        "fkPresent": bool(summary.get("fkPresent")),
+        "fkMatchesExpected": bool(fk_matches),
+        "fkValidated": summary.get("fkValidated"),
+        "nonOwnerUpdateGrantCount": summary.get("nonOwnerUpdateGrantCount"),
+        "updateGranteesSha256": summary.get("updateGranteesSha256"),
+        "expectedUpdateGranteesSha256": summary.get("expectedUpdateGranteesSha256"),
+        "updateGranteesMatchExpected": bool(grantees_match),
+        "publicUpdateGrant": bool(public_grant),
+        "grantShapeSource": "information_schema.column_privileges",
+    }
     if check_matches is not True or fk_matches is not True:
         return _measured(
             "MEASURED_FAIL",
             reason="the enforcement installed in the database no longer matches migration 0054",
-            checkPresent=bool(summary.get("checkPresent")),
-            checkMatchesExpected=bool(check_matches),
-            checkValidated=summary.get("checkValidated"),
-            fkPresent=bool(summary.get("fkPresent")),
-            fkMatchesExpected=bool(fk_matches),
-            fkValidated=summary.get("fkValidated"),
-            nonOwnerUpdateGrantCount=summary.get("nonOwnerUpdateGrantCount"),
+            **shape,
         )
-    return _measured(
-        "MEASURED_PASS",
-        checkPresent=True,
-        checkMatchesExpected=True,
-        checkValidated=summary.get("checkValidated"),
-        fkPresent=True,
-        fkMatchesExpected=True,
-        fkValidated=summary.get("fkValidated"),
-        nonOwnerUpdateGrantCount=summary.get("nonOwnerUpdateGrantCount"),
-        grantShapeSource="information_schema.role_table_grants",
-    )
+    # A grant nobody declared can rewrite the column the CHECK protects, so the
+    # privilege shape is part of the verdict rather than a recorded curiosity.
+    if public_grant is True:
+        return _measured(
+            "MEASURED_FAIL",
+            reason="PUBLIC holds UPDATE on the enforced column",
+            **shape,
+        )
+    if grantees_match is not True:
+        return _measured(
+            "MEASURED_FAIL",
+            reason="the non-owner UPDATE grantees are not exactly the set migration 0054 declares",
+            **shape,
+        )
+    return _measured("MEASURED_PASS", **shape)
 
 
 # --------------------------------------------------------------------------- O14
@@ -351,15 +375,17 @@ SELECT count(*) AS verified_rows,
  WHERE v.verified_at IS NOT NULL
 """
 
-#: Non-owner UPDATE grants on the enforced column. Read, never assumed.
+#: Non-owner UPDATE grantees on the enforced column. Read, never assumed -- the
+#: expected grantee comes from migration 0054's own GRANT statement.
 O11_GRANT_SQL = """
-SELECT count(*) AS grant_count
+SELECT grantee
   FROM information_schema.column_privileges
  WHERE table_schema = 'public'
    AND table_name = 'model_versions'
    AND column_name = 'verified_measurement_id'
    AND privilege_type = 'UPDATE'
    AND grantee <> current_user
+ ORDER BY grantee
 """
 
 #: Candidate digests for O6: dataset versions whose digest is set, with the
@@ -401,13 +427,22 @@ SELECT count(DISTINCT l.model_version_id) AS wanted_count
    AND l.subject_id IN (SELECT dataset_version_id FROM bounded)
 """
 
-#: Sealed bundles for O2, oldest first so the sample is stable across reruns.
+#: The O2 sample. The criteria call for a *random* sample, and ordering by id
+#: would only ever examine the oldest bundles -- twenty good ones at the front
+#: would hide every later corruption. Ordering by a digest of a pre-registered
+#: seed and the bundle id spreads the sample across the whole space while staying
+#: reproducible: the same seed on an unchanged database picks the same bundles.
+#: The seed is recorded with the result.
 O2_BUNDLE_SQL = """
 SELECT b.tenant_id, b.bundle_id
   FROM public.context_bundles b
- ORDER BY b.bundle_id
+ ORDER BY md5(%(seed)s || b.bundle_id), b.bundle_id
  LIMIT %(limit)s
 """
+
+#: Pre-registered before any result was seen. Changing it re-draws the sample, so
+#: it belongs in the evidence rather than in a caller's head.
+O2_SAMPLE_SEED = "s09-o2-context-reproducibility-v1"
 
 
 def load_enforcement_expectation() -> dict[str, Any]:
@@ -424,11 +459,15 @@ def load_enforcement_expectation() -> dict[str, Any]:
         raise ValueError("migration 0054 could not be loaded")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
+    grantee = re.search(r"\bTO\s+([A-Za-z0-9_]+)\s*$", module.GRANT)
+    if grantee is None:  # pragma: no cover - defensive
+        raise ValueError("migration 0054 GRANT does not name a grantee")
     return {
         "check_sql": module.CHECK_SHAPE,
         "fk_sql": module.FK_SHAPE,
         "expected_check": module.EXPECTED_CHECK,
         "expected_fk": module.EXPECTED_FK,
+        "expected_update_grantees": (grantee.group(1),),
     }
 
 
@@ -439,7 +478,10 @@ def read_enforcement_shape(conn) -> dict[str, Any]:
     fk_rows = conn.execute(shapes["fk_sql"]).fetchall()
     check_observed = tuple(check_rows[0].values()) if check_rows else None
     fk_observed = tuple(fk_rows[0].values()) if fk_rows else None
-    grant_count = int(conn.execute(O11_GRANT_SQL).fetchone()["grant_count"])
+    observed_grantees = tuple(
+        str(row["grantee"]) for row in conn.execute(O11_GRANT_SQL).fetchall()
+    )
+    expected_grantees = tuple(shapes["expected_update_grantees"])
     return {
         "checkPresent": check_observed is not None,
         "checkMatchesExpected": check_observed == shapes["expected_check"],
@@ -447,7 +489,13 @@ def read_enforcement_shape(conn) -> dict[str, Any]:
         "fkPresent": fk_observed is not None,
         "fkMatchesExpected": fk_observed == shapes["expected_fk"],
         "fkValidated": bool(fk_observed[-1]) if fk_observed else None,
-        "nonOwnerUpdateGrantCount": grant_count,
+        "nonOwnerUpdateGrantCount": len(observed_grantees),
+        # The names are hashed: the judgement is "exactly the declared role, and
+        # never PUBLIC", which does not require publishing the role name.
+        "updateGranteesSha256": sha256_text("\0".join(sorted(observed_grantees))),
+        "expectedUpdateGranteesSha256": sha256_text("\0".join(sorted(expected_grantees))),
+        "updateGranteesMatchExpected": sorted(observed_grantees) == sorted(expected_grantees),
+        "publicUpdateGrant": any(name.upper() == "PUBLIC" for name in observed_grantees),
     }
 
 
@@ -461,11 +509,11 @@ def read_measurement_freshness(conn, *, max_age_seconds: int) -> dict[str, Any]:
     }
 
 
-def read_context_reproducibility(session, conn, *, limit: int) -> dict[str, Any]:
+def read_context_reproducibility(session, conn, *, limit: int, seed: str) -> dict[str, Any]:
     """O2 over the same database, through the product's own verifier."""
     from saintvision.services.context import verify_bundle
 
-    rows = conn.execute(O2_BUNDLE_SQL, {"limit": limit}).fetchall()
+    rows = conn.execute(O2_BUNDLE_SQL, {"limit": limit, "seed": seed}).fetchall()
     verified = mismatched = errored = 0
     for row in rows:
         try:
@@ -483,6 +531,8 @@ def read_context_reproducibility(session, conn, *, limit: int) -> dict[str, Any]
         "verified": verified,
         "mismatched": mismatched,
         "errored": errored,
+        "sampleSeed": seed,
+        "sampleOrder": "md5(seed || bundle_id)",
     }
 
 
@@ -541,6 +591,35 @@ def read_reverse_lookup(session, conn, *, limit: int, page_limit: int) -> dict[s
     }
 
 
+class SnapshotHandle:
+    """Raw SQL access over the *same* connection an ORM session is using.
+
+    O6 compares a service page walk with an independent SQL count, and that
+    comparison only means something if both see one snapshot. Handing the SQL a
+    second connection -- which is what an independent engine or ``psycopg.connect``
+    would do -- silently turns the check into a comparison of two moments in time.
+    So the collector takes the session's own DBAPI connection and runs the raw
+    statements through it. ``pg_backend_pid`` and ``txid_current_snapshot`` are
+    therefore identical for both paths, which the integration test asserts.
+    """
+
+    def __init__(self, session) -> None:
+        from psycopg.rows import dict_row
+
+        self._session = session
+        self._driver = session.connection().connection.driver_connection
+        self._row_factory = dict_row
+
+    def execute(self, statement: str, params: dict[str, Any] | None = None):
+        cursor = self._driver.cursor(row_factory=self._row_factory)
+        cursor.execute(statement, params)
+        return cursor
+
+    @property
+    def session(self):
+        return self._session
+
+
 def collect_database(
     dsn: str,
     *,
@@ -548,41 +627,42 @@ def collect_database(
     o2_limit: int,
     o6_limit: int,
     o6_page_limit: int,
+    o2_seed: str,
 ) -> dict[str, Any]:
     """Read one target database in a single repeatable-read, read-only snapshot.
 
-    O6's arithmetic only means anything inside one snapshot, so every input here
-    is read in the same transaction and nothing is written.
+    Everything -- identity, constraint shapes, freshness, the O2 sample and the
+    O6 page walk with its independent count -- runs on one connection inside one
+    transaction, and nothing is written.
     """
-    import psycopg
-    from psycopg.rows import dict_row
-    from sqlalchemy import create_engine
+    from sqlalchemy import create_engine, text
     from sqlalchemy.orm import Session
 
     normalised = normalise_dsn(dsn)
     engine = create_engine(
-        normalised if normalised.startswith("postgresql+") else normalised.replace(
-            "postgresql://", "postgresql+psycopg://", 1
-        ),
+        normalised
+        if normalised.startswith("postgresql+")
+        else normalised.replace("postgresql://", "postgresql+psycopg://", 1),
         isolation_level="REPEATABLE READ",
         future=True,
     )
-    with psycopg.connect(normalised, row_factory=dict_row) as conn:
-        conn.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY")
-        conn.execute("SET LOCAL statement_timeout = '120s'")
-        identity = database_identity(conn)
-        started_at = conn.execute("SELECT clock_timestamp() AS value").fetchone()["value"]
-        enforcement = read_enforcement_shape(conn)
-        freshness = read_measurement_freshness(conn, max_age_seconds=max_age_seconds)
+    try:
         with Session(engine) as session:
-            context = read_context_reproducibility(session, conn, limit=o2_limit)
-            reverse = read_reverse_lookup(
-                session, conn, limit=o6_limit, page_limit=o6_page_limit
-            )
+            # First statements of the transaction, so the snapshot every later
+            # read sees is the read-only repeatable-read one.
+            session.execute(text("SET TRANSACTION READ ONLY"))
+            session.execute(text("SET LOCAL statement_timeout = '120s'"))
+            conn = SnapshotHandle(session)
+            identity = database_identity(conn)
+            started_at = conn.execute("SELECT clock_timestamp() AS value").fetchone()["value"]
+            enforcement = read_enforcement_shape(conn)
+            freshness = read_measurement_freshness(conn, max_age_seconds=max_age_seconds)
+            context = read_context_reproducibility(session, conn, limit=o2_limit, seed=o2_seed)
+            reverse = read_reverse_lookup(session, conn, limit=o6_limit, page_limit=o6_page_limit)
+            finished_at = conn.execute("SELECT clock_timestamp() AS value").fetchone()["value"]
             session.rollback()
-        finished_at = conn.execute("SELECT clock_timestamp() AS value").fetchone()["value"]
-        conn.rollback()
-    engine.dispose()
+    finally:
+        engine.dispose()
     return {
         "identity": identity,
         "sourceStartedAt": iso(started_at),
@@ -612,6 +692,7 @@ def build_evidence(
         "sourceStartedAt": database["sourceStartedAt"],
         "sourceFinishedAt": database["sourceFinishedAt"],
         "maxAgeSeconds": (database.get("freshness") or {}).get("maxAgeSeconds"),
+        "o2SampleSeed": (database.get("context") or {}).get("sampleSeed"),
     }
     evidence = {
         "schemaVersion": SCHEMA_VERSION,
@@ -736,6 +817,11 @@ def parser() -> argparse.ArgumentParser:
         help="O14 freshness bound; defaults to INV_MODEL_MEASUREMENT_MAX_AGE_SECONDS or 86400",
     )
     result.add_argument("--o2-limit", type=int, default=200)
+    result.add_argument(
+        "--o2-seed",
+        default=O2_SAMPLE_SEED,
+        help="pre-registered O2 sample seed; recorded in the evidence",
+    )
     result.add_argument("--o6-limit", type=int, default=200)
     result.add_argument("--o6-page-limit", type=int, default=50)
     result.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
@@ -783,6 +869,7 @@ def main(argv: list[str] | None = None) -> int:
             o2_limit=args.o2_limit,
             o6_limit=args.o6_limit,
             o6_page_limit=args.o6_page_limit,
+            o2_seed=args.o2_seed,
         )
         evidence = build_evidence(
             database=database, provenance=provenance, source_env=args.dsn_env
