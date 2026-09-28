@@ -139,7 +139,7 @@ def test_positive_report_imports_as_reference_only_pass():
             "failedCountDelta": None,
             "unobservedInvariantCount": 0,
             "observedCaseCountByMetric": {
-            "quotaOvershootBytes": 3,
+            "quotaOvershootBytes": 8,
             "committedObjectLossCount": 8,
             "partialResidueCount": 8,
             "tempResidueCount": 8,
@@ -193,6 +193,31 @@ def test_finished_at_is_sampled_after_all_cases(monkeypatch):
     monkeypatch.setattr(producer, "utc_now", lambda: next(values))
     raw = report()
     assert raw["finishedAt"] == "2026-09-28T08:02:00Z"
+
+
+def test_importer_rejects_zero_duration_and_unregistered_metric_observation():
+    raw = report()
+    raw["finishedAt"] = raw["startedAt"]
+    with pytest.raises(importer.HostedEvidenceImportError, match="later than startedAt"):
+        importer.import_evidence(raw, producer.junit_xml(raw), FakeGit())
+
+    raw = report()
+    raw["cases"][0]["tempResidueCount"] = 0
+    with pytest.raises(importer.HostedEvidenceImportError, match="unregistered metric"):
+        importer.import_evidence(raw, producer.junit_xml(raw), FakeGit())
+
+
+def test_archive_verifier_is_configuration_only_and_pitr_stays_unobserved():
+    expected_exit = {
+        "BAK-01/postgresql/archive-command-false": "zero-observed",
+        "BAK-03/postgresql/archive-command-true-empty": "nonzero-observed",
+    }
+    for identity, exit_class in expected_exit.items():
+        invariants = producer.EXPECTED_INVARIANTS[identity]
+        assert invariants["verifierExitClass"] == exit_class
+        assert invariants["pitrVerified"] is None
+    for identity in producer.HOSTED_CASES[5:]:
+        assert producer.EXPECTED_INVARIANTS[identity]["quotaOvershootBytes"] == 0
 
 
 def test_importer_cli_returns_zero_for_valid_measured_fail(tmp_path, monkeypatch):

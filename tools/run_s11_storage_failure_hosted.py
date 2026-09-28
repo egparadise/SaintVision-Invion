@@ -126,7 +126,7 @@ EXPECTED_INVARIANTS: dict[str, dict[str, Any]] = {
         identity: {
             "dbRowDelta": None,
             "readyTransitionCount": None,
-            "quotaOvershootBytes": None,
+            "quotaOvershootBytes": 0,
             "committedObjectLossCount": 0,
             "partialResidueCount": 0,
             "tempResidueCount": 0,
@@ -211,9 +211,9 @@ EXPECTED_INVARIANTS: dict[str, dict[str, Any]] = {
         "failedCountDelta": None,
         "archiveNetworkInternal": True,
         "sourceExitClass": "nonzero-observed",
-        "verifierExitClass": "nonzero-observed",
+        "verifierExitClass": "zero-observed",
         "archiveByteCount": 0,
-        "pitrVerified": False,
+        "pitrVerified": None,
     },
     "BAK-03/postgresql/archive-command-true-empty": {
         "dbRowDelta": None,
@@ -231,8 +231,25 @@ EXPECTED_INVARIANTS: dict[str, dict[str, Any]] = {
         "sourceExitClass": "zero-observed",
         "verifierExitClass": "nonzero-observed",
         "archiveByteCount": 0,
-        "pitrVerified": False,
+        "pitrVerified": None,
     },
+}
+
+# Metrics whose values are genuinely measured but do not have one fixed
+# expected value.  Every other metric whose expected invariant is ``None`` is
+# out of scope for that case and must remain unobserved rather than accepting a
+# fabricated zero into an aggregate denominator.
+DYNAMIC_OBSERVED_METRICS: dict[str, frozenset[str]] = {
+    **{
+        identity: frozenset({"providerPutCount"})
+        for identity in HOSTED_CASES[5:]
+    },
+    "BAK-01/postgresql/archive-command-false": frozenset(
+        {"archivedCountDelta", "failedCountDelta"}
+    ),
+    "BAK-03/postgresql/archive-command-true-empty": frozenset(
+        {"archivedCountDelta", "failedCountDelta"}
+    ),
 }
 
 _S3_ENV = (
@@ -437,6 +454,15 @@ def _s3_corruption_case(identity: str, env) -> dict[str, Any]:
                 (env.project, object_id),
             ).fetchone()
             ready_after = int(bool(row) and row["state"] == "ready")
+            used = conn.execute(
+                "SELECT coalesce(sum(size_bytes),0) AS used FROM inv.storage_objects "
+                "WHERE project_id=%s AND state<>'deleted'",
+                (env.project,),
+            ).fetchone()["used"]
+            quota = conn.execute(
+                "SELECT quota_bytes FROM inv.storage_budgets WHERE project_id=%s",
+                (env.project,),
+            ).fetchone()["quota_bytes"]
         # A finalized object's retained part is an intentional reconciliation
         # source (snapshots.py), not a failed-upload residue.  Only uploading
         # rows classify a surviving part as partial residue here.
@@ -452,8 +478,8 @@ def _s3_corruption_case(identity: str, env) -> dict[str, Any]:
         injectionObserved=injected,
         dbRowDelta=after - before,
         readyTransitionCount=max(0, ready_after - ready_before),
-        quotaOvershootBytes=0,
-        committedObjectLossCount=0,
+        quotaOvershootBytes=max(0, int(used) - int(quota)),
+        committedObjectLossCount=max(0, ready_before - ready_after),
         partialResidueCount=partial_residue,
         tempResidueCount=None,
         cleanupResidueCount=residue,
@@ -708,7 +734,10 @@ def _archive_case(identity: str, *, image: str, owner: str) -> dict[str, Any]:
             "archive_library": "",
             "wal_level": safe_settings.get("wal_level"),
         })
-        verifier_code = pitr_readiness.verifier_exit(readiness, require_pitr=True)
+        # This is the product's configuration-readiness verifier, not a PITR
+        # restore proof.  ``require_pitr=True`` is structurally nonzero for the
+        # configuration-only report and would turn this receipt into a constant.
+        verifier_code = pitr_readiness.verifier_exit(readiness, require_pitr=False)
         verifier_exit = "zero-observed" if verifier_code == 0 else "nonzero-observed"
         before_archived, before_failed = (
             int(value) for value in _docker_sql(
@@ -768,7 +797,8 @@ def _archive_case(identity: str, *, image: str, owner: str) -> dict[str, Any]:
         sourceExitClass=source_exit,
         verifierExitClass=verifier_exit,
         archiveByteCount=archive_bytes,
-        pitrVerified=readiness["pitrVerified"] if "readiness" in locals() else None,
+        # No point-in-time restore is executed in this reference lane.
+        pitrVerified=None,
         archivedCountDelta=archived_delta,
         failedCountDelta=failed_delta,
         archiveNetworkInternal=network_internal,

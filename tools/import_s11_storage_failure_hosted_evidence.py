@@ -20,6 +20,7 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 from run_s11_storage_failure_hosted import (
+    DYNAMIC_OBSERVED_METRICS,
     EXECUTION_LAYER,
     EXPECTED,
     EXPECTED_INVARIANTS,
@@ -220,8 +221,8 @@ def import_evidence(report: dict[str, Any], junit: bytes, git: Any) -> dict[str,
             raise HostedEvidenceImportError(f"{field} differs from source head")
     started = _utc(report["startedAt"], "startedAt")
     finished = _utc(report["finishedAt"], "finishedAt")
-    if finished < started:
-        raise HostedEvidenceImportError("finishedAt precedes startedAt")
+    if finished <= started:
+        raise HostedEvidenceImportError("finishedAt must be later than startedAt")
     _validate_environment(report["environment"])
     cleanup = report["cleanup"]
     if not isinstance(cleanup, dict) or cleanup != {
@@ -271,7 +272,7 @@ def import_evidence(report: dict[str, Any], junit: bytes, git: Any) -> dict[str,
                 raise HostedEvidenceImportError("case numeric receipt is invalid")
         if case["archiveNetworkInternal"] not in {None, False, True}:
             raise HostedEvidenceImportError("archive network receipt is invalid")
-        if case["sourceExitClass"] not in {None, "zero-observed", "nonzero-observed"} or case["verifierExitClass"] not in {None, "nonzero-observed"}:
+        if case["sourceExitClass"] not in {None, "zero-observed", "nonzero-observed"} or case["verifierExitClass"] not in {None, "zero-observed", "nonzero-observed"}:
             raise HostedEvidenceImportError("case process-exit receipt is invalid")
         if case["pitrVerified"] not in {None, False}:
             raise HostedEvidenceImportError("hosted evidence cannot claim PITR verification")
@@ -316,6 +317,14 @@ def import_evidence(report: dict[str, Any], junit: bytes, git: Any) -> dict[str,
         for name in metric_names:
             value = case[name]
             if value is not None:
+                registered = (
+                    EXPECTED_INVARIANTS[identity].get(name) is not None
+                    or name in DYNAMIC_OBSERVED_METRICS.get(identity, frozenset())
+                )
+                if not registered:
+                    raise HostedEvidenceImportError(
+                        "case reports an unregistered metric observation"
+                    )
                 observed_counts[name] += 1
                 metric_totals[name] += value
     if (
