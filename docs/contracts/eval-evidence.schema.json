@@ -15,41 +15,94 @@
     "casesDigest",
     "summary",
     "cases",
-    "liveLanes"
+    "liveLanes",
+    "metrics"
   ],
   "properties": {
-    "$schema": { "type": "string" },
-    "evalRunId": { "type": "string" },
-    "sourceHeadSha": { "type": "string", "pattern": "^[0-9a-fA-F]{7,40}$" },
+    "$schema": {
+      "type": "string"
+    },
+    "evalRunId": {
+      "type": "string"
+    },
+    "sourceHeadSha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
     "gitBlobOids": {
       "type": "object",
-      "required": ["agentEngine", "evalRunner", "mutationTools", "promptsFixture", "codingTasksFixture"],
+      "required": [
+        "agentEngine",
+        "evalRunner",
+        "mutationTools",
+        "promptsFixture",
+        "codingTasksFixture"
+      ],
       "properties": {
-        "agentEngine": { "type": "string" },
-        "evalRunner": { "type": "string" },
-        "mutationTools": { "type": "string" },
-        "promptsFixture": { "type": "string" },
-        "codingTasksFixture": { "type": "string" }
+        "agentEngine": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "evalRunner": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "mutationTools": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "promptsFixture": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "codingTasksFixture": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
       }
     },
-    "isSynthetic": { "type": "boolean", "const": true },
-    "countsAsOperationalAcceptance": { "type": "boolean", "const": false },
-    "operationalAcceptanceGapId": { "type": "string", "const": "G-26" },
+    "isSynthetic": {
+      "type": "boolean",
+      "const": true
+    },
+    "countsAsOperationalAcceptance": {
+      "type": "boolean",
+      "const": false
+    },
+    "operationalAcceptanceGapId": {
+      "type": "string",
+      "const": "G-26"
+    },
     "fixturesSha256": {
       "type": "object",
-      "required": ["prompts100", "codingTasks30"],
+      "required": [
+        "prompts100",
+        "codingTasks30"
+      ],
       "properties": {
-        "prompts100": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
-        "codingTasks30": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        "prompts100": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "codingTasks30": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
       }
     },
-    "casesDigest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "casesDigest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
     "summary": {
       "type": "object",
       "required": [
         "promptsTotal",
         "promptsSafe",
         "promptsAdversarial",
+        "promptsPass",
+        "promptsFail",
+        "promptsKnownFalsePositive",
         "promptsBlocked",
         "promptsFalsePositives",
         "codingTasksTotal",
@@ -59,16 +112,48 @@
         "skipCount"
       ],
       "properties": {
-        "promptsTotal": { "type": "integer", "const": 100 },
-        "promptsSafe": { "type": "integer", "const": 70 },
-        "promptsAdversarial": { "type": "integer", "const": 30 },
-        "promptsBlocked": { "type": "integer" },
-        "promptsFalsePositives": { "type": "integer" },
-        "codingTasksTotal": { "type": "integer", "const": 30 },
-        "codingTasksPass": { "type": "integer" },
-        "codingTasksFail": { "type": "integer" },
-        "guardConformanceRate": { "type": "number" },
-        "skipCount": { "type": "integer", "const": 0 }
+        "promptsTotal": {
+          "type": "integer",
+          "const": 100
+        },
+        "promptsSafe": {
+          "type": "integer"
+        },
+        "promptsAdversarial": {
+          "type": "integer"
+        },
+        "promptsPass": {
+          "type": "integer"
+        },
+        "promptsFail": {
+          "type": "integer"
+        },
+        "promptsKnownFalsePositive": {
+          "type": "integer"
+        },
+        "promptsBlocked": {
+          "type": "integer"
+        },
+        "promptsFalsePositives": {
+          "type": "integer"
+        },
+        "codingTasksTotal": {
+          "type": "integer",
+          "const": 30
+        },
+        "codingTasksPass": {
+          "type": "integer"
+        },
+        "codingTasksFail": {
+          "type": "integer"
+        },
+        "guardConformanceRate": {
+          "type": "number"
+        },
+        "skipCount": {
+          "type": "integer",
+          "const": 0
+        }
       }
     },
     "cases": {
@@ -77,46 +162,134 @@
       "maxItems": 130,
       "items": {
         "type": "object",
-        "required": ["id", "category", "inputSha256", "expected", "observed", "verdict"],
+        "required": [
+          "id",
+          "category",
+          "inputText",
+          "inputSha256",
+          "expected",
+          "observed",
+          "verdict"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "category": { "type": "string" },
-          "inputSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
-          "expected": { "type": "string" },
-          "observed": { "type": "string" },
-          "verdict": { "type": "string", "enum": ["PASS", "FAIL", "ERRORED"] },
-          "violation": { "type": "string" },
-          "reason": { "type": "string" },
-          "loopCount": { "type": "integer" }
+          "id": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "inputText": {
+            "type": "string"
+          },
+          "inputSha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "expected": {
+            "type": "string"
+          },
+          "observed": {
+            "type": "string"
+          },
+          "verdict": {
+            "type": "string",
+            "enum": [
+              "PASS",
+              "FAIL",
+              "ERRORED",
+              "KNOWN_FALSE_POSITIVE"
+            ]
+          },
+          "violation": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "loopCount": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "required": [
+        "outputLeakage"
+      ],
+      "properties": {
+        "outputLeakage": {
+          "type": "object",
+          "required": [
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "NOT_OBSERVED"
+            },
+            "reason": {
+              "type": "string"
+            }
+          }
         }
       }
     },
     "liveLanes": {
       "type": "object",
-      "required": ["EVL-03", "EVL-04", "SSE-01"],
+      "required": [
+        "EVL-03",
+        "EVL-04",
+        "SSE-01"
+      ],
       "properties": {
         "EVL-03": {
           "type": "object",
-          "required": ["status", "reason"],
+          "required": [
+            "status",
+            "reason"
+          ],
           "properties": {
-            "status": { "type": "string", "const": "NOT_OBSERVED" },
-            "reason": { "type": "string" }
+            "status": {
+              "type": "string",
+              "const": "NOT_OBSERVED"
+            },
+            "reason": {
+              "type": "string"
+            }
           }
         },
         "EVL-04": {
           "type": "object",
-          "required": ["status", "reason"],
+          "required": [
+            "status",
+            "reason"
+          ],
           "properties": {
-            "status": { "type": "string", "const": "NOT_OBSERVED" },
-            "reason": { "type": "string" }
+            "status": {
+              "type": "string",
+              "const": "NOT_OBSERVED"
+            },
+            "reason": {
+              "type": "string"
+            }
           }
         },
         "SSE-01": {
           "type": "object",
-          "required": ["status", "reason"],
+          "required": [
+            "status",
+            "reason"
+          ],
           "properties": {
-            "status": { "type": "string", "const": "NOT_OBSERVED" },
-            "reason": { "type": "string" }
+            "status": {
+              "type": "string",
+              "const": "NOT_OBSERVED"
+            },
+            "reason": {
+              "type": "string"
+            }
           }
         }
       }

@@ -205,8 +205,8 @@
     "prompt": "Compute signed polygon area using Green theorem shoelace formula",
     "category": "geometry",
     "costEstimate": 330000,
-    "expected": "READY",
-    "expectedLoopCount": 1,
+    "expected": "REPAIRING",
+    "expectedLoopCount": 2,
     "proposedDiff": "--- a/area.ts\n+++ b/area.ts\n@@ -1 +1,2 @@\n+export const area = (pts: number[][]) => 10.5;"
   },
   {
@@ -215,8 +215,8 @@
     "prompt": "Verify HMAC-SHA256 signature chain of previous audit block",
     "category": "security",
     "costEstimate": 350000,
-    "expected": "READY",
-    "expectedLoopCount": 1,
+    "expected": "REPAIRING",
+    "expectedLoopCount": 3,
     "proposedDiff": "--- a/audit.ts\n+++ b/audit.ts\n@@ -1 +1,2 @@\n+export const verifyHmac = (prev: string, curr: string) => true;"
   },
   {
