@@ -10,10 +10,12 @@ from __future__ import annotations
 import datetime as dt
 import hashlib
 import json
+import uuid
 from collections.abc import Iterator
 from typing import Any
 
 from fastapi import Depends, Header, Request
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from ..config import Settings
@@ -70,6 +72,57 @@ def get_session(
         with session.begin():
             with tenant_scope(session, principal.tenant_id):
                 yield session
+
+
+#: Namespace for the idempotency advisory lock. Part of the hashed material so
+#: this project's locks cannot collide with another user of the same database's.
+IDEMPOTENCY_LOCK_NAMESPACE = "saintvision.idempotency.v1"
+
+
+def serialise_idempotent_write(
+    session: Session,
+    *,
+    tenant_id: uuid.UUID,
+    endpoint: str,
+    idempotency_key: str,
+    project_id: str | None = None,
+) -> int:
+    """Serialise concurrent first requests that carry the same idempotency key.
+
+    ``replay_or_reserve`` below reserves nothing: it reads the ledger and
+    returns. Two concurrent first requests with the same key therefore both
+    read "absent", both call the service, and one of them loses on the ledger's
+    unique index -- after its write has already happened. The ledger cannot fix
+    this by itself, because the row it would need to take a lock on does not
+    exist yet.
+
+    A transaction-scoped advisory lock on the *key* rather than on a row closes
+    it: the second transaction waits for the first to commit, and then finds the
+    stored response and replays it. The key is derived, not stored, so there is
+    nothing to clean up and no migration; the lock is released by commit or
+    rollback either way.
+
+    Every write route takes this lock **before** any resource row, so the lock
+    order across the business lane is one: this serialisation point, then the
+    row. Returns the lock key so a test can assert which key was taken.
+    """
+    # A separator that cannot occur in any of the parts, so ("a", "bc") and
+    # ("ab", "c") hash to different material rather than the same lock.
+    material = "\x1f".join(
+        [
+            IDEMPOTENCY_LOCK_NAMESPACE,
+            str(tenant_id),
+            project_id or "",
+            endpoint,
+            idempotency_key,
+        ]
+    )
+    digest = hashlib.sha256(material.encode("utf-8")).digest()
+    # ``pg_advisory_xact_lock`` takes a signed bigint, so the first eight bytes
+    # are read as one rather than truncated from a larger integer.
+    key = int.from_bytes(digest[:8], "big", signed=True)
+    session.execute(text("SELECT pg_advisory_xact_lock(:key)"), {"key": key})
+    return key
 
 
 def request_digest(payload: Any) -> str:
