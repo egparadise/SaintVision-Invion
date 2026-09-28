@@ -289,7 +289,12 @@ def finish_eval_run(
         subject_kind="eval_run",
         subject_id=run.eval_run_id,
         project_id=None,
-        payload=eval_run_mirror_payload(run, now=now),
+        payload=eval_run_mirror_payload(
+            run,
+            suite=session.get(EvalSuite, run.suite_id),
+            report=score_report(session, tenant_id=tenant_id, eval_run_id=eval_run_id),
+            now=now,
+        ),
         now=now,
     )
     return run

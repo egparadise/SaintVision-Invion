@@ -7,12 +7,20 @@ outcome can never be read as a change to the lineage tables it mirrors.
 * ``mlflow_mirror_intents`` -- written in the *same transaction* as the
   canonical change, with the outbox event that will deliver it. An intent
   without an attempt is a pending mirror, not a lost one.
-* ``mlflow_mirror_attempts`` -- one row per delivery outcome, ``attempt_no``
-  assigned under a lock on the intent row. A terminal attempt is returned on
-  redelivery rather than duplicated.
+* ``mlflow_mirror_attempts`` -- one row per delivery outcome. Its delivery
+  identity is bound to the intent it belongs to twice over: a composite
+  foreign key ``(tenant_id, intent_id, outbox_event_id)`` onto the intent
+  row, and ``(tenant_id, outbox_event_id)`` onto the outbox event itself. An
+  attempt cannot cite an event that is not the one its intent was enqueued
+  with (Codex #172 finding 3).
 * ``mlflow_mirror_defects`` -- written in the canonical transaction when the
   payload could not be canonicalised (``TRACK-0005``). The canonical change
   commits; the defect is the durable record that no intent could be made.
+
+The ``(status, error_code)`` pair on an attempt is exactly one of the design
+§5 pairs; the predicate is generated from ``tracking.codes.STATUS_CODE_PAIRS``
+here and stated literally in the migration, and a test holds the two equal.
+There is no ``invalid`` status: ``TRACK-0004``/``0005`` never reach a sink.
 
 ``project_id`` is nullable only for ``eval_run`` subjects: an evaluation run
 belongs to a suite, not a project, so there is nothing to bind. The CHECK
@@ -34,6 +42,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
+from ...tracking.codes import MirrorStatus, sql_pair_check
 from ..base import Base, InvId, Sha256, TenantId, Utc
 
 MIRROR_SUBJECT_KINDS: tuple[str, ...] = (
@@ -43,13 +52,7 @@ MIRROR_SUBJECT_KINDS: tuple[str, ...] = (
     "model_version",
     "deployment",
 )
-MIRROR_ATTEMPT_STATUSES: tuple[str, ...] = (
-    "mirrored",
-    "unavailable",
-    "refused",
-    "mismatch",
-    "invalid",
-)
+MIRROR_ATTEMPT_STATUSES: tuple[str, ...] = tuple(s.value for s in MirrorStatus)
 MIRROR_DEFECT_REASONS: tuple[str, ...] = (
     "nan-or-infinity",
     "key-collision",
@@ -109,8 +112,14 @@ class MlflowMirrorIntent(Base):
         PrimaryKeyConstraint("tenant_id", "intent_id", name="pk_mlflow_mirror_intents"),
         *_subject_foreign_keys("mlflow_mirror_intents"),
         ForeignKeyConstraint(
-            ["outbox_event_id"], ["outbox_events.event_id"],
-            name="fk_mlflow_mirror_intents_outbox_event_id",
+            ["tenant_id", "outbox_event_id"],
+            ["outbox_events.tenant_id", "outbox_events.event_id"],
+            name="fk_mlflow_mirror_intents_tenant_id_outbox_event_id",
+        ),
+        # The target of the attempts' delivery-identity foreign key.
+        UniqueConstraint(
+            "tenant_id", "intent_id", "outbox_event_id",
+            name="uq_mlflow_mirror_intents_intent_event",
         ),
         CheckConstraint(_KIND_ALLOWED, name="subject_kind_allowed"),
         CheckConstraint(_SUBJECT_XOR, name="exactly_one_subject"),
@@ -152,10 +161,22 @@ class MlflowMirrorAttempt(Base):
     __tablename__ = "mlflow_mirror_attempts"
     __table_args__ = (
         PrimaryKeyConstraint("tenant_id", "attempt_id", name="pk_mlflow_mirror_attempts"),
+        # Delivery identity: this attempt belongs to this intent *and* to the
+        # event that intent was enqueued with. Both edges, so neither a foreign
+        # event id nor another tenant's event can be recorded.
         ForeignKeyConstraint(
-            ["tenant_id", "intent_id"],
-            ["mlflow_mirror_intents.tenant_id", "mlflow_mirror_intents.intent_id"],
-            name="fk_mlflow_mirror_attempts_tenant_id_intent_id",
+            ["tenant_id", "intent_id", "outbox_event_id"],
+            [
+                "mlflow_mirror_intents.tenant_id",
+                "mlflow_mirror_intents.intent_id",
+                "mlflow_mirror_intents.outbox_event_id",
+            ],
+            name="fk_mlflow_mirror_attempts_intent_event",
+        ),
+        ForeignKeyConstraint(
+            ["tenant_id", "outbox_event_id"],
+            ["outbox_events.tenant_id", "outbox_events.event_id"],
+            name="fk_mlflow_mirror_attempts_tenant_id_outbox_event_id",
         ),
         UniqueConstraint(
             "tenant_id", "intent_id", "attempt_no",
@@ -174,9 +195,8 @@ class MlflowMirrorAttempt(Base):
         CheckConstraint(
             "error_code IS NULL OR error_code ~ '^TRACK-[0-9]{4}$'", name="error_code_track"
         ),
-        CheckConstraint(
-            "(status = 'mirrored') = (error_code IS NULL)", name="error_code_iff_not_mirrored"
-        ),
+        # The exact (status, error_code) pairs of design §5, from one source.
+        CheckConstraint(sql_pair_check(), name="status_code_pair"),
         CheckConstraint("tracking_uri_sha256 ~ '^[0-9a-f]{64}$'", name="tracking_uri_sha256_hex"),
         CheckConstraint(
             "status <> 'mirrored' OR reference_id IS NOT NULL", name="mirrored_has_reference"

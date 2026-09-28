@@ -205,6 +205,44 @@ def test_verdict_for_attempt_follows_the_table_and_refuses_inconsistent_rows():
         codes.verdict_for_attempt("unavailable", None)
 
 
+ALL_CODES = ("TRACK-0001", "TRACK-0002", "TRACK-0003", "TRACK-0004", "TRACK-0005", None)
+
+
+@pytest.mark.parametrize("status", list(MirrorStatus))
+@pytest.mark.parametrize("code", ALL_CODES)
+def test_every_wrong_status_code_pair_is_refused_and_every_right_one_accepted(status, code):
+    """Codex #172 finding 2: a refusal must never be readable as 'unavailable'."""
+    expected = codes.STATUS_CODE_PAIRS[status]
+    if code == expected:
+        assert codes.check_pair(status, code) is status
+        codes.verdict_for_attempt(status.value, code)
+    else:
+        with pytest.raises(ValueError):
+            codes.check_pair(status, code)
+        with pytest.raises(ValueError):
+            codes.verdict_for_attempt(status.value, code)
+
+
+def test_there_is_no_invalid_attempt_status_and_0004_0005_have_no_attempt():
+    assert [s.value for s in MirrorStatus] == ["mirrored", "unavailable", "refused", "mismatch"]
+    assert codes.entry("TRACK-0004").mirror_status is None
+    assert codes.entry("TRACK-0005").mirror_status is None
+    assert set(codes.STATUS_CODE_PAIRS.values()) == {None, "TRACK-0001", "TRACK-0002", "TRACK-0003"}
+
+
+def test_the_migration_states_the_same_pairs_as_the_live_table():
+    """0049 pins the predicate literally; it must equal the generated one."""
+    import importlib.util
+    from pathlib import Path
+
+    path = Path(__file__).resolve().parents[1] / "migrations" / "versions" / "0049_mlflow_mirror.py"
+    spec = importlib.util.spec_from_file_location("rev0049", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    assert module.STATUS_CODE_PAIR == codes.sql_pair_check()
+    assert tuple(module.ATTEMPT_STATUSES) == tuple(s.value for s in MirrorStatus)
+
+
 def test_verdict_for_unattempted_changes():
     v = codes.verdict_for_unattempted
     assert v(configured="absent", has_intent=False, has_defect=False) is Verdict.NOT_OBSERVED

@@ -28,13 +28,17 @@ CATEGORY: Final[str] = "TRACK"
 
 
 class MirrorStatus(str, Enum):
-    """``mlflow_mirror_attempts.status``. Terminal unless ``UNAVAILABLE``."""
+    """``mlflow_mirror_attempts.status``. Terminal unless ``UNAVAILABLE``.
+
+    There is no ``invalid`` status: ``TRACK-0004`` (configuration) and
+    ``TRACK-0005`` (canonicalisation) are decided before any sink is called,
+    so no attempt row ever carries them (design §5, Codex #172 finding 2).
+    """
 
     MIRRORED = "mirrored"
     UNAVAILABLE = "unavailable"
     REFUSED = "refused"
     MISMATCH = "mismatch"
-    INVALID = "invalid"
 
     @property
     def terminal(self) -> bool:
@@ -120,26 +124,47 @@ def entry(code: str) -> TrackCode:
         raise ValueError(f"{code!r} is not a defined TRACK code") from None
 
 
+#: The one exact pairing of attempt status and error code (design §5). Every
+#: consumer -- ``MirrorResult``, the DB CHECK in 0049, ``verdict_for_attempt``
+#: -- is derived from or checked against this table, never re-derived.
+STATUS_CODE_PAIRS: Final[dict[MirrorStatus, str | None]] = {
+    MirrorStatus.MIRRORED: None,
+    MirrorStatus.UNAVAILABLE: TRACK_UNAVAILABLE,
+    MirrorStatus.REFUSED: TRACK_REFUSED,
+    MirrorStatus.MISMATCH: TRACK_MISMATCH,
+}
+
+
 def code_for_status(status: MirrorStatus) -> str | None:
     """The error code an attempt with ``status`` carries; None for ``mirrored``."""
-    if status is MirrorStatus.MIRRORED:
-        return None
-    if status is MirrorStatus.INVALID:
-        # An invalid attempt is a sink-side refusal of our record; it is our
-        # defect, so it carries the payload code.
-        return TRACK_PAYLOAD_INVALID
-    return _BY_STATUS[status].code
+    return STATUS_CODE_PAIRS[MirrorStatus(status)]
+
+
+def check_pair(status: MirrorStatus | str, error_code: str | None) -> MirrorStatus:
+    """Raise unless ``(status, error_code)`` is exactly one of the design pairs."""
+    status = MirrorStatus(status)
+    expected = STATUS_CODE_PAIRS[status]
+    if error_code != expected:
+        raise ValueError(
+            f"attempt status {status.value!r} carries {expected!r}, not {error_code!r}"
+        )
+    return status
+
+
+def sql_pair_check() -> str:
+    """The SQL predicate that states the same pairs, for the migration and the model."""
+    parts = []
+    for status, code in STATUS_CODE_PAIRS.items():
+        clause = "error_code IS NULL" if code is None else f"error_code = '{code}'"
+        parts.append(f"(status = '{status.value}' AND {clause})")
+    return " OR ".join(parts)
 
 
 def verdict_for_attempt(status: MirrorStatus | str, error_code: str | None) -> Verdict:
-    """The verdict for a recorded attempt. ``mirrored`` needs no code."""
-    status = MirrorStatus(status)
+    """The verdict for a recorded attempt; a wrong (status, code) pair is refused."""
+    status = check_pair(status, error_code)
     if status is MirrorStatus.MIRRORED:
-        if error_code is not None:
-            raise ValueError("a mirrored attempt carries no error code")
         return Verdict.MIRRORED
-    if error_code is None:
-        raise ValueError(f"a {status.value} attempt requires an error code")
     return entry(error_code).verdict
 
 
