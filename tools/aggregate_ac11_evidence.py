@@ -239,8 +239,9 @@ def _validate_common(
     if not isinstance(environment, dict) or not str(environment.get("comparableGroup", "")).strip():
         raise ValueError("environment.comparableGroup is required")
     cleanup = envelope["cleanup"]
-    if not isinstance(cleanup, dict) or not isinstance(cleanup.get("residueCount"), int):
-        raise ValueError("cleanup.residueCount is required")
+    residue = cleanup.get("residueCount") if isinstance(cleanup, dict) else None
+    if isinstance(residue, bool) or not isinstance(residue, int) or residue < 0:
+        raise ValueError("cleanup.residueCount must be a non-negative integer")
     target = envelope.get("targetRef")
     criteria = None if target is None else _validate_target(target, source, git)
     return producer, criteria, source
@@ -261,7 +262,10 @@ def _generic_observations(envelope: dict[str, Any], criteria: dict[str, Any]) ->
         metrics.add(metric)
         n = item.get("n")
         success, failure, skip = item.get("successCount"), item.get("failureCount"), item.get("skipCount")
-        if not all(isinstance(value, int) and value >= 0 for value in (n, success, failure, skip)):
+        if not all(
+            isinstance(value, int) and not isinstance(value, bool) and value >= 0
+            for value in (n, success, failure, skip)
+        ):
             raise ValueError("observation counts must be non-negative integers")
         if n == 0 or success + failure + skip != n:
             raise ValueError("observation denominator is empty or inconsistent")
@@ -282,7 +286,12 @@ def _generic_observations(envelope: dict[str, Any], criteria: dict[str, Any]) ->
         if operator not in KNOWN_OPERATORS:
             raise ValueError("target operator is unknown")
         value, target = item.get("value"), rule["value"]
-        if not isinstance(value, (int, float)) or not isinstance(target, (int, float)):
+        if (
+            isinstance(value, bool)
+            or isinstance(target, bool)
+            or not isinstance(value, (int, float))
+            or not isinstance(target, (int, float))
+        ):
             raise ValueError("observation and target values must be numeric")
         if not math.isfinite(float(value)) or not math.isfinite(float(target)):
             raise ValueError("observation and target values must be finite")

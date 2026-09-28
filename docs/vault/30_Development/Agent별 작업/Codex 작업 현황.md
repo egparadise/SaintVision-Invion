@@ -1274,5 +1274,5 @@ AOA-05 follow-up: the old 18 setup errors had two distinct causes: unset CX01_CO
 
 - Branch/base: `agent/codex/s11-ac11-aggregator` / `1e8baf045c5a554209aaef601ae4883b64da50a7`; owner/reviewer Codex/Claude; approved design PR #157 head `a793f258`.
 - Added a PG-free fail-closed aggregator for the eight required AC-11 axes plus the reviewed security allowlist v0. Producer verdicts cannot override observation, target, Git provenance, denominator, expiry, cleanup, or security mapping failures.
-- Focused evidence: `tests/test_aggregate_ac11_evidence.py` 39 passed, module compilation, docs, ontology, contract bindings, and document single-source ratchet all exit 0. No PostgreSQL, Docker, migration rehearsal, hosted lane, or full suite was run. AC-11 remains incomplete; migration/real-PG execution belongs to stage 2.
+- Focused evidence: `tests/test_aggregate_ac11_evidence.py` 42 passed, module compilation, docs, ontology, contract bindings, and document single-source ratchet all exit 0. No PostgreSQL, Docker, migration rehearsal, hosted lane, or full suite was run. AC-11 remains incomplete; migration/real-PG execution belongs to stage 2.
 - History: [[2026-09-28_11-43-52_KST_S11_AC11_집계기_1단계_Codex]].

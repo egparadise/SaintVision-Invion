@@ -357,6 +357,23 @@ def test_cleanup_residue_cannot_be_pass(allowlist):
     assert axis_result(value, allowlist).verdict is tool.Verdict.INVALID_RUN
 
 
+@pytest.mark.parametrize("residue", [-1, False])
+def test_cleanup_residue_rejects_negative_and_boolean_values(residue, allowlist):
+    value = envelope(tool.REQUIRED_AXES[1])
+    value["cleanup"]["residueCount"] = residue
+    assert axis_result(value, allowlist).verdict is tool.Verdict.INVALID_RUN
+
+
+def test_observation_counts_and_values_reject_booleans(allowlist):
+    boolean_count = envelope(tool.REQUIRED_AXES[1])
+    boolean_count["observations"][0]["n"] = True
+    assert axis_result(boolean_count, allowlist).verdict is tool.Verdict.INVALID_RUN
+
+    boolean_value = envelope(tool.REQUIRED_AXES[1])
+    boolean_value["observations"][0]["value"] = True
+    assert axis_result(boolean_value, allowlist).verdict is tool.Verdict.INVALID_RUN
+
+
 def test_only_reversible_axis_accepts_declared_zero_tail(allowlist):
     value = envelope(tool.REQUIRED_AXES[0], "NOT_APPLICABLE")
     value["observations"] = []
