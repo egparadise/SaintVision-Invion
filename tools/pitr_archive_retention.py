@@ -317,6 +317,18 @@ def _path_exists_no_follow(path: Path) -> bool:
         return False
 
 
+def _candidate_identity(root: Path, name: str, kind: str) -> dict:
+    path = _candidate_path(root, name, kind)
+    try:
+        info = path.stat(follow_symlinks=False)
+    except OSError as error:
+        raise RetentionApplyRefused("retention candidate is unavailable") from error
+    expected_type = stat.S_ISREG if kind == "archive" else stat.S_ISDIR
+    if not expected_type(info.st_mode):
+        raise RetentionApplyRefused("retention candidate changed type")
+    return {"device": int(info.st_dev), "inode": int(info.st_ino)}
+
+
 def _journal_path(backups_dir: Path, journal_path: Path | None) -> Path:
     return journal_path or backups_dir / ".pitr-retention-apply-journal.json"
 
@@ -387,8 +399,22 @@ def _new_journal(plan_: Plan, archive_dir: Path, backups_dir: Path) -> dict:
     retained_labels = {name: _label_sha256(backups_dir, name) for name in plan_.retained_backups}
     candidate_labels = {name: _label_sha256(backups_dir, name) for name in plan_.delete_backups}
     targets = [
-        {"kind": "archive", "name": name, "state": "pending"} for name in plan_.delete_archive
-    ] + [{"kind": "backups", "name": name, "state": "pending"} for name in plan_.delete_backups]
+        {
+            "kind": "archive",
+            "name": name,
+            "state": "pending",
+            "identity": _candidate_identity(archive_dir, name, "archive"),
+        }
+        for name in plan_.delete_archive
+    ] + [
+        {
+            "kind": "backups",
+            "name": name,
+            "state": "pending",
+            "identity": _candidate_identity(backups_dir, name, "backups"),
+        }
+        for name in plan_.delete_backups
+    ]
     journal = {
         "schemaVersion": APPLY_JOURNAL_SCHEMA,
         "planSha256": _digest(contract),
@@ -496,10 +522,16 @@ def _load_journal(path: Path) -> dict:
     targets = journal["targets"]
     if not isinstance(targets, list) or any(
         not isinstance(target, dict)
-        or set(target) != {"kind", "name", "state"}
+        or set(target) != {"kind", "name", "state", "identity"}
         or target["kind"] not in {"archive", "backups"}
         or not isinstance(target["name"], str)
         or target["state"] not in {"pending", "removed", "already-absent"}
+        or not isinstance(target["identity"], dict)
+        or set(target["identity"]) != {"device", "inode"}
+        or any(
+            not isinstance(value, int) or isinstance(value, bool) or value < 0
+            for value in target["identity"].values()
+        )
         for target in targets
     ):
         raise RetentionApplyRefused("retention journal targets are invalid")
@@ -589,19 +621,20 @@ def _validate_resume(journal: dict, plan_: Plan, archive_dir: Path, backups_dir:
     ):
         raise RetentionApplyRefused("retention journal targets are invalid")
     for target in journal["targets"]:
-        path = _candidate_path(
-            archive_dir if target["kind"] == "archive" else backups_dir,
-            target["name"],
-            target["kind"],
-        )
+        root = archive_dir if target["kind"] == "archive" else backups_dir
+        path = _candidate_path(root, target["name"], target["kind"])
         if target["state"] != "pending" and _path_exists_no_follow(path):
             raise RetentionApplyRefused("a completed retention candidate reappeared")
-        if (
-            target["kind"] == "backups"
-            and target["state"] == "pending"
-            and _path_exists_no_follow(path)
-        ):
-            if (
+        if target["state"] != "pending" or not _path_exists_no_follow(path):
+            continue
+        if _candidate_identity(root, target["name"], target["kind"]) != target["identity"]:
+            raise RetentionApplyRefused("retention candidate identity changed")
+        if target["kind"] == "backups":
+            label = path / "backup_label"
+            # rmtree can remove the label before a process dies. The journal's
+            # directory inode proves this is still the authorised candidate;
+            # a surviving label must retain its exact bytes as well.
+            if _path_exists_no_follow(label) and (
                 _label_sha256(backups_dir, target["name"])
                 != journal["candidateBackupLabelSha256"][target["name"]]
             ):
@@ -615,6 +648,8 @@ def _delete_candidate(target: dict, archive_dir: Path, backups_dir: Path) -> boo
         info = path.stat(follow_symlinks=False)
     except FileNotFoundError:
         return False
+    if {"device": int(info.st_dev), "inode": int(info.st_ino)} != target["identity"]:
+        raise RetentionApplyRefused("retention candidate identity changed")
     if target["kind"] == "archive":
         if not stat.S_ISREG(info.st_mode):
             raise RetentionApplyRefused("archive candidate changed type")

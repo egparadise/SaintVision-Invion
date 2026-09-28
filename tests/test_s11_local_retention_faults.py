@@ -284,6 +284,62 @@ def test_bak02_process_interruption_after_unlink_resumes_as_already_absent_witho
     assert final["status"] == "completed" and final["attemptCount"] == 2
 
 
+def test_bak02_partial_backup_rmtree_resumes_only_the_same_directory_inode(tmp_path, monkeypatch):
+    archive, backups, planned, journal = _retention_world(tmp_path)
+    real_rmtree = retention.shutil.rmtree
+    interrupted = False
+
+    def remove_label_then_fail(path):
+        nonlocal interrupted
+        if path.name == "old" and not interrupted:
+            interrupted = True
+            (path / "backup_label").unlink()
+            raise OSError(errno.ENOSPC, "private retention mount")
+        return real_rmtree(path)
+
+    monkeypatch.setattr(retention.shutil, "rmtree", remove_label_then_fail)
+    with pytest.raises(retention.RetentionApplyPartial) as raised:
+        retention.apply(planned, archive, backups, journal_path=journal)
+    assert raised.value.receipt["failureClass"] == BAK_02["failureClass"]
+    assert (backups / "old").is_dir() and not (backups / "old" / "backup_label").exists()
+
+    monkeypatch.setattr(retention.shutil, "rmtree", real_rmtree)
+    current = retention.plan(
+        retention.load_archive(archive),
+        retention.load_backups(backups),
+        retention_days=7,
+        now=NOW,
+    )
+    retention.apply(current, archive, backups, journal_path=journal)
+    receipt = retention.load_apply_receipt(journal)
+    assert not (backups / "old").exists()
+    assert receipt["removed"]["backups"] == ["old"]
+    assert receipt["status"] == "completed" and receipt["attemptCount"] == 2
+
+
+def test_bak02_replaced_candidate_directory_is_refused_before_delete(tmp_path, monkeypatch):
+    archive, backups, planned, journal = _retention_world(tmp_path)
+
+    def stop_before_delete(*_args):
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr(retention, "_delete_candidate", stop_before_delete)
+    with pytest.raises(KeyboardInterrupt):
+        retention.apply(planned, archive, backups, journal_path=journal)
+    retention.shutil.rmtree(backups / "old")
+    _write_backup(backups, "old", seg(2), NOW - timedelta(days=20))
+    monkeypatch.undo()
+    current = retention.plan(
+        retention.load_archive(archive),
+        retention.load_backups(backups),
+        retention_days=7,
+        now=NOW,
+    )
+    with pytest.raises(retention.RetentionApplyRefused, match="candidate identity changed"):
+        retention.apply(current, archive, backups, journal_path=journal)
+    assert (backups / "old").is_dir()
+
+
 def test_bak02_changed_retained_label_refuses_before_another_delete(tmp_path, monkeypatch):
     archive, backups, planned, journal = _retention_world(tmp_path)
 
