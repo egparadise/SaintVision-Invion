@@ -1,20 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.207"
+version: "1.0.208"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T15:17:15+09:00"
+updated: "2026-09-28T15:47:09+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
 
-## 2026-09-28 S11-ST 손상·용량·backup 장애 시험 설계 v1.1 — 재검토 요청 준비
+## 2026-09-28 S11-ST 손상·용량·backup 장애 시험 설계 v1.2 — Claude r2 반영
 
-- Claude 검토 F1~F9를 반영해 별도 registry 소비 경로를 폐기했다. #177의 단일 정본 registry에 물리 5노드 24시간 long-soak target을 추가하고 약한 PITR target을 archive fault target으로 교체하며, 축별 targetId를 닫는 Codex 선행 카드를 확정했다.
-- hosted fault matrix는 AC-11 축 PASS가 아닌 reference-only다. raw producer→storage importer→AC-11 envelope 두 층, 22 case identity hash·exact 분류, `/bin/true`·empty/truncated backup `BAK-03`, 기존 #173·recovery drill·G-02·#150 재사용을 고정했다.
-- Local disk-full의 raw `OSError`와 retention apply journal 부재는 구현 공백이다. 공개 계약·migration·registry 상태는 아직 불변이며 S11-ST `planned`, 측정 `NOT_OBSERVED`; target pin·정적 게이트·push 뒤 Claude 재검토를 요청한다. [[S11-ST_손상_용량_backup_장애시험_설계]], [[S11_ST_storage_failure_target_v0]], [[2026-09-28_14-16-18_KST_S11-ST_손상_용량_backup_장애시험_설계_Codex]].
+- Claude r2 N1을 반영해 raw 22-case universe를 PG-free 12개와 hosted 10개 실행 subset으로 분리하고 각각 identity SHA를 고정했다. 한 계층 run이 다른 계층 case를 실행하지 않아도 누락이 아니다.
+- storage-only evidence로 AC-11 `long-soak`을 닫던 우회를 없앴다. PG-free·hosted·물리 storage는 모두 reference-only이며, 열·전원·NTP·스위치·WAN·원격 WS를 포함한 composite target 승인 전 `long-soak=NOT_REGISTERED`다. registry patch는 PITR target 교체만 제안한다.
+- physical storage와 PITR은 부류별 identity·recovery를 요구하고, Local byte 변조는 read 전 mode 복원, metric 계수 의미, 선행 카드 `CARD-S11-AC11-REGISTRY-REPIN-01`을 명시했다. 공개 계약·migration·registry 상태는 아직 불변이며 S11-ST `planned`, 측정 `NOT_OBSERVED`; final pin·게이트·push 뒤 Claude 재검토를 요청한다. [[S11-ST_손상_용량_backup_장애시험_설계]], [[S11_ST_storage_failure_target_v0]], [[2026-09-28_14-16-18_KST_S11-ST_손상_용량_backup_장애시험_설계_Codex]].
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 
