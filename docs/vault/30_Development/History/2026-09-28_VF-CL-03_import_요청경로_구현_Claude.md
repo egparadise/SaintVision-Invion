@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-VFCL03-IMPORT-REQUEST-PATH-IMPL-001"
-title: "VF-CL-03 import adapter 요청 경로 구현 — 공유 정본 ProblemDetails 모듈·strict body helper·release route, PG-free 49 시험 통과, 실 PG 3건은 hosted"
-version: "1.0.0"
+title: "VF-CL-03 import adapter 요청 경로 구현 — 공유 정본 ProblemDetails 모듈·strict body helper·release route, Codex F-R1~F-R3 반영(운영 factory 결속·threadpool self-call·redirect 거부·streaming 상한·실 PG node 6건), PG-free 58 + 실 PG 6"
+version: "1.1.0"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T11:14:32+09:00"
+updated: "2026-09-28T11:43:38+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["VF-CL-03"]
@@ -74,3 +74,36 @@ tags: ["vf-cl-03", "model-registry", "import", "problem-details", "implementatio
 ## 7. 다음 첫 행동
 
 Codex 독립 검토. 검토가 끝나면 실 PG 3건을 hosted Core·Backend 결과로 확인하고, 남은 model-registry 쓰기 경로(등록·검증·pin)를 별 카드로 올린다.
+
+## 8. v1.1 — Codex 계약·보안 검토 F-R1~F-R3 반영 (`10c89c91` 대상)
+
+세 건 모두 타당했다. 특히 F-R1은 **운영에서 route가 항상 503**이었다는 것이므로, 요청 경로 blocker가 실제로 닫히지 않은 상태로 올린 것이다.
+
+### 8-1. F-R1 — 운영 factory에 `kernel_base_url`이 결속되지 않았다
+
+`services/control-plane/src/inv/business_surface.py:72`가 `Settings(database_url="configured")`만 만들어 `kernel_base_url=None`이었고, 그러면 `_observation()`이 fetch 전에 항상 `SYS-0001` 503이다. `Settings.from_env()`는 개발 helper라 배포 경로와 무관하다.
+
+- 운영 factory가 `INV_KERNEL_BASE_URL`을 읽고, 없으면 `http://127.0.0.1:${PORT}`를 쓴다. 커널과 business가 **같은 프로세스·같은 포트**(`BusinessDispatch`)이므로 self URL은 추측이 아니라 프로세스가 바인딩하는 값 그대로다. `docker-compose.prod.yml`에도 같은 입력을 넣었다.
+- **event loop 차단**도 지적대로 실재했다. 같은 프로세스 self-call에서 `urllib`을 async handler에서 직접 부르면, 그 GET을 처리해야 하는 loop가 막혀 5초 timeout으로 끝난다. fetch를 `starlette.concurrency.run_in_threadpool`로 옮겼다(커널이 이미 쓰는 방식).
+- 대안으로 커널 관측 객체를 in-process로 부르는 길이 있었지만, 커널 소유 코드와 그 identity 객체를 재조립해야 하고 **커널 authorization이 관측의 유일한 관문이라는 성질을 잃는다**. 그래서 HTTP를 유지했다.
+- 회귀 시험: fetcher가 **loop thread가 아닌 곳에서, running loop 없이** 실행됨을 단언한다(`run_in_threadpool`을 지우면 deadlock 대신 시험이 깨진다). 운영 factory 결속과 compose 입력도 단언한다.
+
+### 8-2. F-R3 — caller bearer의 transport 경계
+
+- **redirect 자동 추종**이 실재했다. Python `HTTPRedirectHandler`는 `Authorization`을 redirect 요청에 복사하므로, 커널이 다른 origin으로 30x를 내면 **호출자 bearer가 그 origin으로 간다.** `_RefuseRedirect` opener로 모든 redirect를 거부한다. 시험은 **실제 HTTP 서버**를 띄워 30x를 내고, redirect 대상이 요청을 아예 받지 못함을 확인한다.
+- **무제한 read**도 실재했다. `MAX_OBSERVATION_BYTES = 65536`으로 상한+1만 읽고 넘으면 거부한다. 상한 초과·redirect 거부·scheme 위반 모두 값 비노출 `SYS-0001` 503이다.
+- **invalid UTF-8이 500으로 빠진다**는 지적은 **재현되지 않았다.** `UnicodeDecodeError`는 `ValueError`의 파생이고(`UnicodeDecodeError → UnicodeError → ValueError`) `_observation()`의 catch 목록에 `ValueError`가 있으므로 이미 canonical `SYS-0001`이다. 실제 HTTP 서버가 invalid UTF-8을 내는 시험으로 그 동작을 고정했다 — 주장만 하지 않고 시험으로 남긴다.
+- **요청 8 KiB가 parser 상한일 뿐이라는 지적도 맞았다.** `await request.body()`는 전부 버퍼링한 뒤에야 길이를 볼 수 있다. 공유 `read_bounded_body()`를 만들어 `request.stream()`을 읽으며 **상한을 넘는 첫 chunk에서 거부**한다(커널 ASGI 미들웨어와 같은 성질의 per-route 버전). 문서로 한계를 적는 쪽이 아니라 streaming cap을 택했다.
+
+### 8-3. F-R2 — 실 PG node가 diff에 없었다
+
+`tests/core/test_model_release_route.py` 하나만 올렸으므로 hosted Backend green이 실 PG 3건의 실행 증거가 아니라는 지적이 정확하다. PR 본문의 "hosted에 둔다"는 **그 시험이 존재할 때만** 참이다.
+
+`tests/integration/test_model_release_real_pg.py`(신규, `pytest.mark.postgres`) 6 node를 추가했다 — 타 tenant model version이 같은 거부로 끝나고 행 불변 · 접근 가능한 project 아래의 타 tenant model이 404 · 같은 tenant 다른 project의 model도 **같은** 404 · 선언 불일치 후 `stage='draft'` 유지 + 감사 0행 · 양성 대조(200 `released`, 감사 1행, 선언 값 0) · `operator` 등급은 403. disposable 실 PG 단일 파일이고 로컬은 `INV_TEST_ADMIN_DSN` 부재로 skip이므로 **실행 근거는 hosted Backend JUnit**이다.
+
+### 8-4. v1.1 검증 증거
+
+- `pytest tests/core -q` → **1090 passed, 4 skipped**. `tests/core/test_model_release_route.py` → **58 passed**(v1.0의 49 + F-R1/F-R3 9건).
+- `tests/integration/test_model_release_real_pg.py` → 로컬 **6 skipped**(DSN 부재). hosted Backend 결과를 PR에 적는다.
+- `export_schemas.py --check` **60 PASS**, `route_coverage` **0 unserved**, docs gate 2종 exit 0.
+- 로컬 실 PG·Docker·전체 suite **미실행**.

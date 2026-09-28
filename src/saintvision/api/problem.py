@@ -234,6 +234,27 @@ def strict_json_object(
         ) from None
 
 
+async def read_bounded_body(request: Request, *, max_bytes: int = MAX_REQUEST_BYTES) -> bytes:
+    """Read the body, refusing as soon as it passes the bound.
+
+    ``await request.body()`` buffers the whole payload and only then can its
+    length be checked, which makes the bound a parser limit rather than an
+    allocation limit: a caller could still make the process hold whatever they
+    sent. Reading the stream and stopping at the first chunk that crosses the
+    bound makes the limit mean what it says. The kernel does the same thing in
+    its ASGI middleware; this is the per-route equivalent for an app that has no
+    such middleware.
+    """
+    chunks: list[bytes] = []
+    total = 0
+    async for chunk in request.stream():
+        total += len(chunk)
+        if total > max_bytes:
+            raise CanonicalProblem(VAL_REQUEST, 413, "The request body is too large.")
+        chunks.append(chunk)
+    return b"".join(chunks)
+
+
 def require_absent_body(raw: bytes) -> None:
     """Refuse a body on a route that has none.
 

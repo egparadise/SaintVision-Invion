@@ -50,6 +50,11 @@ services:
       - INV_RECOVERY_EPOCH=${INV_RECOVERY_EPOCH:?Set the reconciled database recovery epoch}
       - INV_API_CONFIG=/run/saintvision/api.json
       - PORT=8080
+      # The business release route reads the kernel commitment observation back
+      # over HTTP. Kernel and business share this process and port, so the
+      # default is the loopback self URL; set it explicitly only for a split
+      # deployment.
+      - INV_KERNEL_BASE_URL=${INV_KERNEL_BASE_URL:-http://127.0.0.1:8080}
     volumes:
       - type: volume
         source: server_config

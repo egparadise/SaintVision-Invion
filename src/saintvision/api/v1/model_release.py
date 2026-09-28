@@ -26,6 +26,24 @@ it. ``add_api_route`` puts the real route there, with no kernel change.
 bearer token, not a service identity, so the kernel applies its authorisation to
 the same principal. A service identity here would let this route read
 commitments the caller could not read for themselves.
+
+That choice puts the credential on the wire, so the transport is fail-closed
+around it: only http/https, **no redirects at all** (Python's redirect handler
+copies ``Authorization`` onto the new request, so a 30x from the kernel to
+another origin would hand the caller's bearer to that origin), and a bounded
+read. Every one of those refusals is the same ``SYS-0001`` and carries no value
+from the response.
+
+**Why a thread.** In the canonical topology the kernel and this app are the same
+process behind ``BusinessDispatch``, so this GET can be a self-call. ``urllib``
+is synchronous, and calling it directly from an async handler would block the
+event loop that has to serve the very request being made -- the call would sit
+there until its own timeout. The fetch therefore runs in a worker thread, which
+is what the kernel already does for its blocking work. The alternative was to
+call the kernel's observation object in-process and skip HTTP; that would mean
+reaching into kernel-owned code and rebuilding its identity object, so the
+kernel's own authorisation would no longer be the single gate on the
+observation.
 """
 
 from __future__ import annotations
@@ -33,6 +51,7 @@ from __future__ import annotations
 import datetime as dt
 import json
 import urllib.error
+import urllib.parse
 import urllib.request
 import uuid
 from typing import Any, Mapping
@@ -40,6 +59,7 @@ from typing import Any, Mapping
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from starlette.concurrency import run_in_threadpool
 
 from ...adapters.model_import import (
     MODEL_IMPORT_DECLARATION_MISMATCH,
@@ -60,6 +80,7 @@ from ..problem import (
     RES_NOT_FOUND,
     SYS_UPSTREAM_UNAVAILABLE,
     CanonicalProblem,
+    read_bounded_body,
     strict_json_object,
     translate,
     validate_strict,
@@ -87,6 +108,27 @@ TRANSLATION: Mapping[str, tuple[str, int, bool]] = {
 #: on the kernel is worse than one that refuses: the caller can retry a 503.
 OBSERVATION_TIMEOUT_SECONDS = 5.0
 
+#: The most the observation may weigh. ``ModelCommitObservation`` is fifteen short
+#: fields; 64 KiB is the kernel's own request ceiling and is generous here. An
+#: unbounded ``read()`` would let an upstream decide how much memory this process
+#: spends.
+MAX_OBSERVATION_BYTES = 65536
+
+
+class _RefuseRedirect(urllib.request.HTTPRedirectHandler):
+    """Refuse every redirect instead of following it.
+
+    ``HTTPRedirectHandler`` copies the request headers onto the redirected
+    request, ``Authorization`` included, so following a 30x to another origin
+    would disclose the caller's bearer token to that origin. There is no
+    legitimate reason for the kernel to redirect this GET.
+    """
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):  # noqa: D102
+        raise urllib.error.HTTPError(
+            req.full_url, code, "redirect refused", headers, fp
+        )
+
 
 def fetch_commitment(
     *, base_url: str, credential: str, project_id: str, model_id: str, version: str
@@ -95,22 +137,35 @@ def fetch_commitment(
 
     ``urllib`` rather than a client library: the runtime dependency list has no
     HTTP client, and adding one for a single GET would widen the deployment
-    surface more than the call is worth.
+    surface more than the call is worth. What that costs is an opener that has to
+    be assembled deliberately -- the default one follows redirects and reads
+    without a bound.
     """
+    base = base_url.rstrip("/")
+    if urllib.parse.urlsplit(base).scheme not in ("http", "https"):
+        raise ValueError("kernel base URL must be http or https")
     url = (
-        f"{base_url.rstrip('/')}/v1/projects/{project_id}"
+        f"{base}/v1/projects/{project_id}"
         f"/models/{model_id}/versions/{version}/commitment"
     )
-    request = urllib.request.Request(  # noqa: S310 - base URL is operator-supplied
+    request = urllib.request.Request(  # noqa: S310 - scheme checked above
         url,
         headers={"Authorization": f"Bearer {credential}", "Accept": "application/json"},
         method="GET",
     )
-    with urllib.request.urlopen(request, timeout=OBSERVATION_TIMEOUT_SECONDS) as response:
-        return json.loads(response.read())
+    opener = urllib.request.build_opener(_RefuseRedirect)
+    with opener.open(request, timeout=OBSERVATION_TIMEOUT_SECONDS) as response:
+        # One byte over the bound is enough to know it is over; the rest is never
+        # allocated.
+        raw = response.read(MAX_OBSERVATION_BYTES + 1)
+    if len(raw) > MAX_OBSERVATION_BYTES:
+        raise ValueError("kernel observation exceeds the permitted size")
+    return json.loads(raw)
 
 
-def _observation(request: Request, *, project_id: str, model_id: str, version: str) -> dict[str, Any]:
+async def _observation(
+    request: Request, *, project_id: str, model_id: str, version: str
+) -> dict[str, Any]:
     """The observation, strictly validated, or a canonical refusal.
 
     Validated even though the kernel sent it: "our own service produced it" is
@@ -131,12 +186,16 @@ def _observation(request: Request, *, project_id: str, model_id: str, version: s
         )
     credential = (request.headers.get("authorization") or "").split(" ", 1)[-1].strip()
     try:
-        body = fetcher(
-            base_url=base_url,
-            credential=credential,
-            project_id=project_id,
-            model_id=model_id,
-            version=version,
+        # Blocking I/O off the event loop: in the canonical topology this is a
+        # self-call, and blocking the loop would stop the request it is making.
+        body = await run_in_threadpool(
+            lambda: fetcher(
+                base_url=base_url,
+                credential=credential,
+                project_id=project_id,
+                model_id=model_id,
+                version=version,
+            )
         )
         validate_contract("ModelCommitObservation", body)
     except CanonicalProblem:
@@ -303,7 +362,7 @@ async def release_model(
     permission it no longer holds.
     """
     payload = strict_json_object(
-        await request.body(),
+        await read_bounded_body(request),
         content_type=request.headers.get("content-type"),
         content_encoding=request.headers.get("content-encoding"),
     )
@@ -320,7 +379,7 @@ async def release_model(
                 _require_approval(session, principal=principal, project_id=project_id)
 
     # (2) The observation, with no transaction open.
-    observation = _observation(
+    observation = await _observation(
         request, project_id=project_id, model_id=model_id, version=version
     )
 

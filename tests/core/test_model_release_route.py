@@ -17,6 +17,7 @@ from __future__ import annotations
 import contextlib
 import datetime as dt
 import json
+import urllib.error
 import uuid
 
 import pytest
@@ -811,3 +812,231 @@ def test_the_existing_error_handlers_are_left_in_place(monkeypatch):
     # The legacy shape still serves the legacy path, untouched by this card.
     assert body["code"] == "AUTH-MISSING-CREDENTIAL"
     assert response.headers["www-authenticate"] == "Bearer"
+
+
+# ---------------------------------------------------------------------------
+# F-R1: the deployed factory must bind the kernel URL, and the blocking fetch
+# must not run on the event loop it may be calling back into
+# ---------------------------------------------------------------------------
+
+
+def test_fr1_the_production_factory_binds_the_kernel_base_url():
+    """The defect: ``Settings(database_url=...)`` alone leaves it None.
+
+    A route that answers 503 in every deployment has not closed the blocker,
+    however well the development helper is configured, so the binding is checked
+    where the deployed app is actually built.
+    """
+    assert Settings(database_url="configured").kernel_base_url is None
+
+    from pathlib import Path
+
+    factory = (
+        Path(__file__).resolve().parents[2]
+        / "services/control-plane/src/inv/business_surface.py"
+    )
+    source = factory.read_text(encoding="utf-8")
+    assert "kernel_base_url=kernel_base_url" in source
+    assert "INV_KERNEL_BASE_URL" in source
+    # Kernel and business are the same process and port here, so the fallback is
+    # the loopback self URL rather than a guessed host.
+    assert 'os.environ.get(\'PORT\', \'8080\')' in source or 'os.environ.get("PORT", "8080")' in source
+
+    compose = (Path(__file__).resolve().parents[2] / "docker-compose.prod.yml").read_text(
+        encoding="utf-8"
+    )
+    assert "INV_KERNEL_BASE_URL" in compose
+
+
+def test_fr1_the_kernel_fetch_does_not_run_on_the_event_loop(monkeypatch):
+    """A self-call on the loop would wait for a request only the loop can serve.
+
+    Asserted by where the fetch runs: off the loop thread, with no running loop
+    in it. Remove ``run_in_threadpool`` and this fails instead of deadlocking in
+    production.
+    """
+    import asyncio
+    import threading
+
+    observed: dict[str, object] = {}
+    world: dict = {}
+
+    def fetcher(**kwargs):
+        observed["thread"] = threading.current_thread().name
+        try:
+            asyncio.get_running_loop()
+            observed["loop"] = True
+        except RuntimeError:
+            observed["loop"] = False
+        return observation()
+
+    client = build(monkeypatch, world)
+    client.app.state.model_commitment_fetcher = fetcher
+    assert post(client).status_code == 200
+    assert observed["loop"] is False, "the blocking GET ran on the event loop"
+    assert observed["thread"] != threading.current_thread().name
+
+
+# ---------------------------------------------------------------------------
+# F-R3: the transport around the caller's bearer token
+# ---------------------------------------------------------------------------
+
+
+@contextlib.contextmanager
+def kernel_stub(handler_factory):
+    """A real HTTP server, because what is under test is the HTTP client."""
+    import threading
+    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+    received: list[dict] = []
+
+    class Handler(BaseHTTPRequestHandler):
+        def log_message(self, *_args):
+            pass
+
+        def do_GET(self):
+            received.append(
+                {"path": self.path, "authorization": self.headers.get("Authorization")}
+            )
+            handler_factory(self)
+
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        yield f"http://127.0.0.1:{server.server_port}", received
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=5)
+
+
+def _send(handler, status, body: bytes, headers=None):
+    handler.send_response(status)
+    for name, value in (headers or {}).items():
+        handler.send_header(name, value)
+    handler.send_header("Content-Length", str(len(body)))
+    handler.end_headers()
+    if body:
+        handler.wfile.write(body)
+
+
+def test_fr3_a_redirect_is_refused_and_the_bearer_never_reaches_the_target():
+    """Python's redirect handler copies ``Authorization`` onto the new request."""
+
+    def redirect(handler):
+        if handler.path.endswith("/commitment"):
+            _send(handler, 302, b"", {"Location": "/elsewhere"})
+        else:
+            _send(handler, 200, json.dumps(observation()).encode("utf-8"))
+
+    with kernel_stub(redirect) as (base_url, received):
+        with pytest.raises(urllib.error.HTTPError):
+            model_release.fetch_commitment(
+                base_url=base_url,
+                credential="release-token",
+                project_id=PROJECT,
+                model_id=MODEL,
+                version=VERSION,
+            )
+    assert [entry["path"].endswith("/commitment") for entry in received] == [True]
+    assert not any(entry["path"] == "/elsewhere" for entry in received)
+
+
+def test_fr3_a_refused_redirect_reaches_the_caller_as_a_retryable_503(monkeypatch):
+    def redirect(handler):
+        _send(handler, 302, b"", {"Location": "http://other.invalid/steal"})
+
+    with kernel_stub(redirect) as (base_url, _received):
+        client = build(monkeypatch, {}, kernel_base_url=base_url)
+        client.app.state.model_commitment_fetcher = None
+        canonical(post(client), code="SYS-0001", status=503, retryable=True)
+
+
+def test_fr3_an_oversize_response_is_refused_without_being_held(monkeypatch):
+    def huge(handler):
+        _send(handler, 200, b"[" + b"0," * 60000 + b"0]")
+
+    with kernel_stub(huge) as (base_url, _received):
+        with pytest.raises(ValueError, match="permitted size"):
+            model_release.fetch_commitment(
+                base_url=base_url,
+                credential="release-token",
+                project_id=PROJECT,
+                model_id=MODEL,
+                version=VERSION,
+            )
+        client = build(monkeypatch, {}, kernel_base_url=base_url)
+        client.app.state.model_commitment_fetcher = None
+        canonical(post(client), code="SYS-0001", status=503, retryable=True)
+
+
+def test_fr3_invalid_utf8_in_the_response_is_a_canonical_503(monkeypatch):
+    """Reported as an uncaught 500; it is not, and this pins that.
+
+    ``UnicodeDecodeError`` derives from ``ValueError``, which the observation
+    reader already catches, so the answer is the canonical ``SYS-0001``. The test
+    exists because the claim is worth checking rather than arguing about.
+    """
+    assert issubclass(UnicodeDecodeError, ValueError)
+
+    def invalid(handler):
+        _send(handler, 200, b'{"projectId": "\xff\xfe"}')
+
+    with kernel_stub(invalid) as (base_url, _received):
+        with pytest.raises(UnicodeDecodeError):
+            model_release.fetch_commitment(
+                base_url=base_url,
+                credential="release-token",
+                project_id=PROJECT,
+                model_id=MODEL,
+                version=VERSION,
+            )
+        client = build(monkeypatch, {}, kernel_base_url=base_url)
+        client.app.state.model_commitment_fetcher = None
+        canonical(post(client), code="SYS-0001", status=503, retryable=True)
+
+
+def test_fr3_only_http_and_https_are_accepted_as_a_kernel_base_url():
+    for base_url in ("file:///etc/passwd", "ftp://kernel.invalid", "gopher://x"):
+        with pytest.raises(ValueError, match="http or https"):
+            model_release.fetch_commitment(
+                base_url=base_url,
+                credential="release-token",
+                project_id=PROJECT,
+                model_id=MODEL,
+                version=VERSION,
+            )
+
+
+def test_fr3_the_positive_path_still_works_over_real_http(monkeypatch):
+    """The stub is a real server, so this is the self-call shape end to end."""
+
+    def ok(handler):
+        _send(handler, 200, json.dumps(observation()).encode("utf-8"))
+
+    with kernel_stub(ok) as (base_url, received):
+        client = build(monkeypatch, {}, kernel_base_url=base_url)
+        client.app.state.model_commitment_fetcher = None
+        assert post(client).status_code == 200
+    assert received[0]["authorization"] == "Bearer release-token"
+    assert received[0]["path"] == (
+        f"/v1/projects/{PROJECT}/models/{MODEL}/versions/{VERSION}/commitment"
+    )
+
+
+def test_fr3_the_request_body_bound_is_applied_while_reading(monkeypatch):
+    """The bound is an allocation limit, not only a parser limit.
+
+    ``await request.body()`` buffers everything before its length can be checked;
+    the streaming read refuses at the first chunk that crosses the bound.
+    """
+    from saintvision.api.problem import read_bounded_body
+
+    source = open(model_release.__file__, encoding="utf-8").read()
+    assert "read_bounded_body(request)" in source
+    assert "await request.body()" not in source
+
+    client = build(monkeypatch, {})
+    payload = b"{" + b'"pad":"' + b"x" * (MAX_REQUEST_BYTES * 4) + b'"}'
+    canonical(post(client, data=payload), code="VAL-0003", status=413)
