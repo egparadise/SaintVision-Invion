@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-F1-MODEL-VERSION-DIGEST-SCOPE-0052-001"
-title: "F1 model version digest UNIQUE 범위 좁히기 migration 0052 — tenant-wide에서 (model_id, content_sha256)로, sibling-project 존재 oracle 제거, 사전 데이터 검사·fail-closed downgrade·CONCURRENTLY"
-version: "1.0.0"
+title: "F1 model version digest UNIQUE 범위 좁히기 migration 0052 v1.1 — tenant-wide에서 (model_id, content_sha256)로, sibling-project 존재 oracle 제거, catalogue 확인 기반 재시도 수렴(Codex #197)·사전 데이터 검사·fail-closed downgrade·CONCURRENTLY"
+version: "1.1.0"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T16:44:42+09:00"
+updated: "2026-09-28T17:00:42+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S10-BE"]
@@ -34,9 +34,9 @@ W2에서 내가 한 것은 "어디서 충돌했는지 말하지 않기"까지였
 
 ## 3. 순서와 잠금
 
-- **생성 → 승격 → 제거**: 새 UNIQUE INDEX를 `CONCURRENTLY`로 만들고 `ADD CONSTRAINT … USING INDEX`로 승격한 **뒤에** 옛 제약을 지운다. 그래서 테이블이 보호 없이 있는 순간이 없고, 둘 사이에서 죽으면 **양쪽이 남는다**(둘 다 성립하므로 재시도가 수렴한다). 반대 순서는 무보호 구간을 만든다.
+- **생성 → 승격 → 제거**: 새 UNIQUE INDEX를 `CONCURRENTLY`로 만들고 `ADD CONSTRAINT … USING INDEX`로 승격한 **뒤에** 옛 제약을 지운다. 그래서 테이블이 보호 없이 있는 순간이 없고, 둘 사이에서 죽으면 **양쪽이 남는다**(둘 다 성립하므로 재시도가 수렴한다). (**v1.1에서 철회: 양쪽이 남는 것은 맞지만 재시도가 수렴하지 않았다 — §8.**) 반대 순서는 무보호 구간을 만든다.
 - **`CONCURRENTLY`**: 평범한 unique 제약 추가는 인덱스 빌드 전체 동안 `model_versions`에 ACCESS EXCLUSIVE를 들고 있어 등록을 막는다(`0050`이 같은 이유로 세운 선례).
-- 실패한 `CREATE UNIQUE INDEX CONCURRENTLY`는 **INVALID 인덱스가 이름을 붙잡은 채** 남고 `ADD CONSTRAINT … USING INDEX`가 그것을 거부하므로, upgrade가 그 이름을 **먼저 drop**한다. 그것이 재시도를 안전하게 만든다.
+- 실패한 `CREATE UNIQUE INDEX CONCURRENTLY`는 **INVALID 인덱스가 이름을 붙잡은 채** 남고 `ADD CONSTRAINT … USING INDEX`가 그것을 거부하므로, upgrade가 그 이름을 **먼저 drop**한다. 그것이 재시도를 안전하게 만든다. (**v1.1 정정: 그 drop은 새 constraint가 없을 때만 한다 — constraint가 소유한 index를 drop하려 해서 재시도가 wedge됐다. §8.**)
 - **offline render**: `alembic upgrade --sql`은 mock connection으로 렌더하므로 질의할 수 없다(`MockConnection`에 `exec_driver_sql`이 없다 — 이 migration의 첫 판이 Backend lane의 `Migration renders offline` 단계를 깼고 로컬에서 잡았다). 그 모드에서는 검사를 건너뛴다 — 물어볼 데이터베이스가 없고 출력은 사람이 읽을 SQL이다. 부정 시험이 **bind를 요구하는 것 자체**를 회귀로 잡는다.
 
 ## 4. downgrade는 거부한다 — 이유가 둘이다
@@ -77,3 +77,51 @@ W2에서 내가 한 것은 "어디서 충돌했는지 말하지 않기"까지였
 ## 7. 다음 첫 행동
 
 Codex 검토. 승인되면 **#191이 이 head를 merge**해 oracle 시험을 뒤집어 고정한다(목표 시험 "두 project가 같은 digest를 각각 등록"은 지금 #191에 xfail로 둘 수 없다 — xfail은 JUnit `skipped`이고 Backend lane의 exact-skip gate가 거부한다). #191은 이어서 새 #184 head(= #195, 정본 403 denial audit)도 merge해 F4와 register route action 회귀를 고정한다.
+
+## 8. v1.1 — Codex 재검토: "ADD 뒤 중단도 수렴"이 **거짓이었다** (#197, head `d9526198`)
+
+범위 축소 방향은 승인받았고 차단 1건이 왔다. **내가 문서에 적은 수렴 주장이 틀렸다.**
+
+`upgrade()`가 새 UNIQUE INDEX를 constraint로 승격한 뒤 옛 constraint를 drop하기 전에 중단되면 revision은 아직 `0051`이고 새 constraint는 이미 있다. 재실행은 무조건 `DROP INDEX CONCURRENTLY IF EXISTS uq_model_versions_model_id_content_sha256`부터 했는데, **그 index는 새 constraint가 소유**하므로 PostgreSQL이 `cannot drop index ... because constraint ... requires it`로 거부한다. 즉 **"안전하다"고 서술한 바로 그 지점에서 migration이 영구 wedge된다.** 지적이 정확하다.
+
+### 8-1. catalogue를 먼저 읽고 세 갈래로 수렴한다
+
+`CONSTRAINT_SHAPE`가 `pg_constraint`에서 이름·table·`contype`·컬럼 순서를 읽는다(table로 한정해 다른 table의 동명 constraint를 이것으로 오인하지 않는다).
+
+| catalogue 상태 | 하는 일 |
+|---|---|
+| 새 constraint **없음** | index 이름 정리(실패한 concurrent 빌드가 남긴 standalone/INVALID) → `CONCURRENTLY` 빌드 → 승격 |
+| 새 constraint **정확히 있음**(`u`, `(model_id, content_sha256)`) | **아무것도 건드리지 않는다.** 옛 constraint만 제거해 수렴 |
+| 이름만 같고 정의가 다름 | **fail-closed.** 이 migration이 아닌 것이 그 이름을 소유하고 있고, 추측이 멈추는 것보다 나쁘다 |
+
+INVALID/standalone index 정리는 **새 constraint가 없을 때만** 수행한다(요구 2). 옛 constraint 제거는 `DROP CONSTRAINT IF EXISTS`로 바꿔 **두 번째 중단 지점**(drop 뒤 revision 기록 전)도 수렴한다.
+
+### 8-2. 시험을 source 읽기에서 **동작 관찰**로 바꿨다
+
+v1.0의 순서 시험은 migration **소스의 부분문자열 순서**를 봤고, 그래서 `ADD CONSTRAINT`를 **설명 주석에서** 매칭해 통과했다(v1.0에서 이미 한 번 잡았다). 이제 `upgrade()`를 stand-in catalogue로 **직접 돌려** 발행되는 SQL을 기록한다. catalogue 상태 네 가지가 각각 시험이다:
+
+- 깨끗 → `autocommit` + DROP INDEX + CREATE UNIQUE INDEX + ADD CONSTRAINT + DROP CONSTRAINT IF EXISTS, **5건 정확히**;
+- **승격 뒤 재시도** → **`DROP CONSTRAINT IF EXISTS` 한 건뿐**이고 `DROP INDEX`·`CREATE UNIQUE INDEX`·`ADD CONSTRAINT`·autocommit block이 **없다**. 위반 질의도 돌지 않는다(constraint가 이미 그것을 강제한다);
+- 이름 충돌 5종(다른 컬럼·순서 뒤바뀜·컬럼 부족·`contype` 다름·컬럼 없음) → `RuntimeError`, 실행 0건;
+- 위반 행 → `RuntimeError`, 실행 0건;
+- offline(`as_sql`) → 전체 5건 렌더, **bind 요구 자체가 실패**로 잡힌다.
+
+**무조건 DROP INDEX로 되돌리는 변이에서 6건이 죽는다**(요구 3의 되살림 조건). shape 확인만 없애는 변이에서도 5건이 죽는다.
+
+### 8-3. 실 PG crash-resume 2건
+
+- **`test_a_run_interrupted_after_the_promotion_resumes_and_converges`**: 옛 constraint를 다시 만들고 `alembic_version`을 `0051`로 되돌려 **중단 상태를 실제로 만든 뒤** 진짜 Alembic으로 `upgrade head`를 돌린다. 끝난 뒤 새 constraint의 **oid가 그대로**(drop-and-rebuild였다면 바뀐다), 옛 constraint는 없고, revision은 `0052`다. `finally`로 head 상태를 복원해 뒤 시험에 영향이 없다.
+- **`test_the_index_the_new_constraint_owns_cannot_be_dropped_on_its_own`**: PostgreSQL이 그 index 단독 drop을 거부하는 것을 직접 단언한다 — 재시도 로직이 **상상한 오류**를 막는 것이 아니라는 근거다.
+
+실 PG는 6건 → **8건**이 됐다.
+
+### 8-4. 검증(delta)
+
+| 명령 | 결과 |
+|---|---|
+| `pytest tests/core/test_model_version_digest_scope_migration.py -q` | **19 passed**(v1.0의 11에서) |
+| `pytest … test_object_store_locator_migration.py tests/test_migrations.py -q` | 합계 **54 passed** |
+| `python tools/migration_graph.py` | head `0052` 단일, safe downgrade target `0052` |
+| 변이 | 무조건 DROP INDEX 복원 **6건 사망**, shape 확인 제거 **5건 사망** |
+
+공개 응답 code·route 변화는 없다.

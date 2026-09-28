@@ -1,18 +1,23 @@
 """0052: scoping the model version digest uniqueness to the model.
 
-Three things are worth a test here and none of them is the DDL string.
+These drive ``upgrade()`` itself with a stand-in catalogue and record the SQL it
+issues. The first version of this file read the migration's source and asserted
+the order of substrings in it, which passed while matching ``ADD CONSTRAINT``
+inside an explanatory *comment* -- so the statements are now observed rather than
+read.
 
-* The **order**. The new constraint is created before the old one is dropped, so
-  the table is never briefly unprotected, and the concurrent index is dropped by
-  name first so a retry after a failed build can succeed.
-* The **pre-check**. The argument that no existing row can violate the narrower
-  constraint is an argument; the migration reads the database before acting on it
-  and refuses with a sentence rather than an opaque DDL error.
-* The **refusal to reverse**. Narrowing cannot be undone, and the reason is not
-  "it is hard" -- restoring the wide constraint would reopen the cross-project
-  existence oracle the narrowing closed.
+Four catalogue states, because which one the database is in decides what
+converges:
 
-What the constraint *does* is the database's behaviour and lives in
+* nothing there yet -- build the index concurrently and promote it;
+* **the new constraint already there, exactly right** -- a run interrupted between
+  the promotion and the drop. It must be left completely alone. Codex found that
+  the first version dropped the index that constraint owns, which PostgreSQL
+  refuses, wedging the migration at the crash point the docstring called safe;
+* the name taken by something with a different shape -- refuse;
+* rows that would violate the narrower rule -- refuse, before any DDL.
+
+What the constraint *does*, and the same resume against a real database, are in
 ``tests/integration/test_model_version_digest_scope_real_pg.py``.
 """
 
@@ -37,6 +42,67 @@ def _module():
     return module
 
 
+class Bind:
+    """Answers the two questions the migration asks, and records that it was asked."""
+
+    def __init__(self, *, constraint=None, violations=()):
+        self.constraint = constraint
+        self.violations = list(violations)
+        self.asked = []
+
+    def exec_driver_sql(self, sql):
+        self.asked.append(sql)
+        rows = (
+            [self.constraint] if "pg_constraint" in sql and self.constraint else []
+        )
+        if "GROUP BY" in sql:
+            rows = self.violations
+        return _Result(rows)
+
+
+class _Result:
+    def __init__(self, rows):
+        self._rows = rows
+
+    def fetchall(self):
+        return self._rows
+
+
+class Context:
+    def __init__(self, *, as_sql=False, record=None):
+        self.as_sql = as_sql
+        self._record = record
+
+    def autocommit_block(self):
+        import contextlib
+
+        if self._record is not None:
+            self._record.append("<autocommit>")
+        return contextlib.nullcontext()
+
+
+def _run(monkeypatch, *, bind=None, as_sql=False):
+    """Run ``upgrade()`` against a stand-in and return the SQL it issued."""
+    import alembic.op as alembic_op
+
+    module = _module()
+    statements: list[str] = []
+    monkeypatch.setattr(
+        alembic_op, "get_context", lambda: Context(as_sql=as_sql, record=statements)
+    )
+    if bind is None:
+
+        def no_bind():
+            pytest.fail("this path must not ask for a connection")
+
+        monkeypatch.setattr(alembic_op, "get_bind", no_bind)
+    else:
+        monkeypatch.setattr(alembic_op, "get_bind", lambda: bind)
+    monkeypatch.setattr(alembic_op, "execute", lambda sql: statements.append(sql))
+    module.upgrade()
+    return statements
+
+
 def test_it_sits_on_the_fixed_order_at_the_number_the_coordinator_assigned():
     source = MIGRATION.read_text(encoding="utf-8")
     assert 'revision = "0052_model_version_digest_scope"' in source
@@ -45,87 +111,110 @@ def test_it_sits_on_the_fixed_order_at_the_number_the_coordinator_assigned():
     assert 'down_revision = "0051_service_credentials"' in source
 
 
-def _executed_statements():
-    """The SQL the upgrade actually executes, in order.
+# --------------------------------------------------------------------------
+# Nothing there yet: build, promote, then drop the wide one
+# --------------------------------------------------------------------------
 
-    Extracted from the ``op.execute`` calls rather than by searching the function
-    body: the body also *explains* these statements in comments, and a test that
-    matched the prose would pass on a reordered migration whose comments still
-    said the right thing. That is the failure this helper exists to avoid -- the
-    first version of this file found "ADD CONSTRAINT" in a comment.
-    """
-    import ast
 
-    source = MIGRATION.read_text(encoding="utf-8")
-    tree = ast.parse(source)
-    upgrade = next(
-        node
-        for node in tree.body
-        if isinstance(node, ast.FunctionDef) and node.name == "upgrade"
+def test_a_clean_catalogue_builds_promotes_and_then_drops_the_old_constraint(monkeypatch):
+    statements = _run(monkeypatch, bind=Bind())
+    assert statements[0] == "<autocommit>"
+    assert "DROP INDEX CONCURRENTLY IF EXISTS" in statements[1]
+    assert "CREATE UNIQUE INDEX CONCURRENTLY IF NOT EXISTS" in statements[2]
+    assert f"ADD CONSTRAINT {NEW} UNIQUE USING INDEX {NEW}" in statements[3]
+    assert f"DROP CONSTRAINT IF EXISTS {OLD}" in statements[4]
+    assert len(statements) == 5
+
+
+def test_the_index_name_is_cleared_before_the_concurrent_build(monkeypatch):
+    """A failed ``CREATE UNIQUE INDEX CONCURRENTLY`` leaves an INVALID index
+    holding the name, which ``ADD CONSTRAINT ... USING INDEX`` refuses."""
+    statements = _run(monkeypatch, bind=Bind())
+    drop = next(i for i, s in enumerate(statements) if "DROP INDEX CONCURRENTLY" in s)
+    create = next(
+        i for i, s in enumerate(statements) if "CREATE UNIQUE INDEX CONCURRENTLY" in s
     )
-    found = []
-    for node in ast.walk(upgrade):
-        if not isinstance(node, ast.Call):
-            continue
-        callee = node.func
-        if getattr(callee, "attr", None) != "execute" or not node.args:
-            continue
-        argument = node.args[0]
-        if isinstance(argument, ast.JoinedStr):
-            # An f-string: keep the literal parts and the interpolated names, so
-            # the statement reads the way it was written.
-            parts = []
-            for value in argument.values:
-                if isinstance(value, ast.Constant):
-                    parts.append(str(value.value))
-                elif isinstance(value, ast.FormattedValue):
-                    parts.append("{" + ast.unparse(value.value) + "}")
-            text = "".join(parts)
-        elif isinstance(argument, ast.Constant):
-            text = str(argument.value)
-        else:
-            continue
-        # ``ast.walk`` is breadth first, so position is what puts these in the
-        # order the migration runs them.
-        found.append((node.lineno, node.col_offset, text))
-    return [text for _line, _col, text in sorted(found)]
+    assert drop < create
 
 
-def test_the_new_constraint_is_created_before_the_old_one_is_dropped():
-    statements = _executed_statements()
-    create = next(i for i, s in enumerate(statements) if "CREATE UNIQUE INDEX" in s)
+def test_the_new_constraint_exists_before_the_old_one_is_dropped(monkeypatch):
+    statements = _run(monkeypatch, bind=Bind())
     add = next(i for i, s in enumerate(statements) if "ADD CONSTRAINT" in s)
     drop = next(i for i, s in enumerate(statements) if "DROP CONSTRAINT" in s)
-    assert create < add < drop
-    # A crash between the add and the drop leaves both constraints, which both
-    # hold, so a retry converges. The other order leaves the table unprotected.
-    assert "{NEW_CONSTRAINT}" in statements[add]
-    assert "{OLD_CONSTRAINT}" in statements[drop]
+    assert add < drop, "the table must never be left with no uniqueness at all"
 
 
-def test_the_concurrent_build_clears_its_own_failed_attempt_first():
-    source = MIGRATION.read_text(encoding="utf-8")
-    assert "autocommit_block()" in source, "CONCURRENTLY cannot run in a transaction"
-    statements = _executed_statements()
-    drop_index = next(
-        i for i, s in enumerate(statements) if "DROP INDEX CONCURRENTLY IF EXISTS" in s
-    )
-    create = next(
-        i
-        for i, s in enumerate(statements)
-        if "CREATE UNIQUE INDEX CONCURRENTLY IF NOT EXISTS" in s
-    )
-    assert drop_index < create, (
-        "ADD CONSTRAINT USING INDEX refuses an INVALID index holding the name"
-    )
+# --------------------------------------------------------------------------
+# Interrupted after the promotion: leave the constraint completely alone
+# --------------------------------------------------------------------------
 
 
-def test_the_check_groups_by_the_columns_the_new_constraint_covers():
+def test_a_resume_after_the_promotion_only_drops_the_old_constraint(monkeypatch):
+    """The crash point the first version of this migration wedged on.
+
+    Revision still 0051, the new constraint already promoted. A re-run that begins
+    with ``DROP INDEX CONCURRENTLY IF EXISTS`` meets an index the constraint owns,
+    and PostgreSQL answers ``cannot drop index ... because constraint ... requires
+    it``. So the only statement this path may issue is the drop of the old one.
+    """
+    bind = Bind(constraint=("u", ["model_id", "content_sha256"]))
+    statements = _run(monkeypatch, bind=bind)
+    assert len(statements) == 1
+    assert f"DROP CONSTRAINT IF EXISTS {OLD}" in statements[0]
+    # Nothing touched the index or the constraint that owns it.
+    joined = " ".join(statements)
+    assert "DROP INDEX" not in joined
+    assert "CREATE UNIQUE INDEX" not in joined
+    assert "ADD CONSTRAINT" not in joined
+    assert "<autocommit>" not in statements
+    # And the violations query is not run either: the constraint already enforces
+    # what it would have been checking.
+    assert not any("GROUP BY" in sql for sql in bind.asked)
+
+
+def test_the_resume_reads_the_catalogue_before_anything_else(monkeypatch):
+    bind = Bind(constraint=("u", ["model_id", "content_sha256"]))
+    _run(monkeypatch, bind=bind)
+    assert bind.asked, "the catalogue decides which path converges"
+    assert "pg_constraint" in bind.asked[0]
+    assert NEW in bind.asked[0]
+    assert "model_versions" in bind.asked[0]
+
+
+@pytest.mark.parametrize(
+    "constraint",
+    [
+        ("u", ["tenant_id", "content_sha256"]),
+        ("u", ["content_sha256", "model_id"]),
+        ("u", ["model_id"]),
+        ("p", ["model_id", "content_sha256"]),
+        ("u", None),
+    ],
+    ids=["other-columns", "wrong-order", "too-few", "not-unique", "no-columns"],
+)
+def test_the_same_name_with_a_different_shape_is_refused(monkeypatch, constraint):
+    """Something other than this migration owns the name. Guessing is worse."""
+    import alembic.op as alembic_op
+
     module = _module()
-    query = " ".join(module.VIOLATIONS.split())
-    assert "GROUP BY model_id, content_sha256" in query
-    assert "HAVING count(*) > 1" in query
-    assert "FROM model_versions" in query
+    statements: list[str] = []
+    bind = Bind(constraint=constraint)
+    monkeypatch.setattr(alembic_op, "get_context", lambda: Context(record=statements))
+    monkeypatch.setattr(alembic_op, "get_bind", lambda: bind)
+    monkeypatch.setattr(alembic_op, "execute", lambda sql: statements.append(sql))
+
+    with pytest.raises(RuntimeError) as raised:
+        module.upgrade()
+
+    message = str(raised.value)
+    assert NEW in message
+    assert "reviewed fix" in message
+    assert statements == [], "nothing was executed"
+
+
+# --------------------------------------------------------------------------
+# Data that would violate the narrower rule
+# --------------------------------------------------------------------------
 
 
 def test_a_row_that_would_violate_the_narrower_rule_stops_the_migration(monkeypatch):
@@ -138,27 +227,11 @@ def test_a_row_that_would_violate_the_narrower_rule_stops_the_migration(monkeypa
     import alembic.op as alembic_op
 
     module = _module()
-    touched = []
-
-    class Bind:
-        def exec_driver_sql(self, _sql):
-            class Result:
-                def fetchall(self_inner):
-                    return [("mdl_one", "a" * 64, 2)]
-
-            return Result()
-
-    class Context:
-        """Online mode, so the guard reads the database."""
-
-        as_sql = False
-
-        def autocommit_block(self):
-            pytest.fail("the check must refuse before any DDL")
-
-    monkeypatch.setattr(alembic_op, "get_bind", lambda: Bind())
-    monkeypatch.setattr(alembic_op, "execute", lambda sql: touched.append(sql))
-    monkeypatch.setattr(alembic_op, "get_context", lambda: Context())
+    statements: list[str] = []
+    bind = Bind(violations=[("mdl_one", "a" * 64, 2)])
+    monkeypatch.setattr(alembic_op, "get_context", lambda: Context(record=statements))
+    monkeypatch.setattr(alembic_op, "get_bind", lambda: bind)
+    monkeypatch.setattr(alembic_op, "execute", lambda sql: statements.append(sql))
 
     with pytest.raises(RuntimeError) as raised:
         module.upgrade()
@@ -167,53 +240,52 @@ def test_a_row_that_would_violate_the_narrower_rule_stops_the_migration(monkeypa
     assert NEW in message
     assert "mdl_one" in message, "the operator needs to know which rows"
     assert "reviewed data fix" in message
-    assert touched == [], "nothing was executed"
+    assert statements == [], "nothing was executed"
 
 
-def test_a_clean_database_lets_the_migration_proceed(monkeypatch):
-    """The same path with no offending rows reaches the DDL, in order."""
-    import alembic.op as alembic_op
-
+def test_the_check_groups_by_the_columns_the_new_constraint_covers():
     module = _module()
-    statements = []
+    query = " ".join(module.VIOLATIONS.split())
+    assert "GROUP BY model_id, content_sha256" in query
+    assert "HAVING count(*) > 1" in query
+    assert "FROM model_versions" in query
 
-    class Bind:
-        def exec_driver_sql(self, _sql):
-            class Result:
-                def fetchall(self_inner):
-                    return []
 
-            return Result()
+def test_the_catalogue_query_asks_about_this_table_and_this_name():
+    module = _module()
+    query = " ".join(module.CONSTRAINT_SHAPE.split())
+    assert "FROM pg_constraint" in query
+    assert f"c.conname = '{NEW}'" in query
+    # Scoped to the table, so a same-named constraint elsewhere is not mistaken
+    # for this one.
+    assert "c.conrelid = 'model_versions'::regclass" in query
+    assert "contype" in query
 
-    class Context:
-        as_sql = False
 
-        def autocommit_block(self):
-            import contextlib
+# --------------------------------------------------------------------------
+# Offline rendering
+# --------------------------------------------------------------------------
 
-            statements.append("<autocommit>")
-            return contextlib.nullcontext()
 
-    monkeypatch.setattr(alembic_op, "get_bind", lambda: Bind())
-    monkeypatch.setattr(alembic_op, "get_context", lambda: Context())
-    monkeypatch.setattr(alembic_op, "execute", lambda sql: statements.append(sql))
+def test_offline_rendering_does_not_try_to_query_a_database(monkeypatch):
+    """``alembic upgrade --sql`` renders against a mock connection.
 
-    module.upgrade()
-
+    The Backend lane has a "Migration renders offline" step, and the first version
+    of this migration broke it: the mock connection has no ``exec_driver_sql``. In
+    that mode there is nothing to check and the output is SQL for review, so every
+    read is skipped -- and asking the bind at all is the regression. ``_run`` fails
+    the test if the bind is requested.
+    """
+    statements = _run(monkeypatch, bind=None, as_sql=True)
+    # Every statement is still rendered, in order, for the reviewer.
     assert statements[0] == "<autocommit>"
-    kinds = [
-        "DROP INDEX CONCURRENTLY" in s
-        or "CREATE UNIQUE INDEX CONCURRENTLY" in s
-        or "ADD CONSTRAINT" in s
-        or "DROP CONSTRAINT" in s
-        for s in statements[1:]
-    ]
-    assert all(kinds), statements
-    assert "DROP INDEX CONCURRENTLY IF EXISTS" in statements[1]
-    assert "CREATE UNIQUE INDEX CONCURRENTLY IF NOT EXISTS" in statements[2]
-    assert f"ADD CONSTRAINT {NEW} UNIQUE USING INDEX {NEW}" in statements[3]
-    assert f"DROP CONSTRAINT {OLD}" in statements[4]
     assert len(statements) == 5
+    assert f"DROP CONSTRAINT IF EXISTS {OLD}" in statements[-1]
+
+
+# --------------------------------------------------------------------------
+# The refusal to reverse, and the metadata
+# --------------------------------------------------------------------------
 
 
 def test_the_downgrade_refuses_and_says_why_it_cannot_be_undone():
@@ -252,9 +324,7 @@ def test_the_original_invariant_is_still_expressible():
     """
     from saintvision.db.models.lineage import ModelVersion
 
-    constraint = next(
-        c for c in ModelVersion.__table__.constraints if c.name == NEW
-    )
+    constraint = next(c for c in ModelVersion.__table__.constraints if c.name == NEW)
     columns = [column.name for column in constraint.columns]
     assert "content_sha256" in columns
     assert "tenant_id" not in columns
@@ -297,9 +367,7 @@ def test_the_real_pg_fixture_builds_its_rows_without_a_database():
     recorder = Recorder()
     now = dt.datetime(2026, 9, 28, tzinfo=dt.timezone.utc)
     tenant = uuid_module.UUID("11111111-1111-1111-1111-111111111111")
-    model = module._project_with_model(
-        recorder, tenant_id=tenant, now=now, label="guard"
-    )
+    model = module._project_with_model(recorder, tenant_id=tenant, now=now, label="guard")
     assert set(model) == {"project_id", "model_id", "name"}
     module._version(
         recorder,
@@ -322,38 +390,3 @@ def test_the_real_pg_fixture_builds_its_rows_without_a_database():
     # 64 lowercase hex, which is what the checksum column's CHECK requires.
     digest = module._digest()
     assert len(digest) == 64 and digest == digest.lower()
-
-
-def test_offline_rendering_does_not_try_to_query_a_database(monkeypatch):
-    """``alembic upgrade --sql`` renders against a mock connection.
-
-    The Backend lane has a "Migration renders offline" step, and the first version
-    of this migration broke it: the mock connection has no ``exec_driver_sql``.
-    In that mode there is nothing to check and the output is SQL for review, so
-    the guard is skipped -- and asking the bind at all is the regression.
-    """
-    import alembic.op as alembic_op
-
-    module = _module()
-    statements = []
-
-    class Context:
-        as_sql = True
-
-        def autocommit_block(self):
-            import contextlib
-
-            return contextlib.nullcontext()
-
-    def no_bind():
-        pytest.fail("offline rendering must not ask for a connection")
-
-    monkeypatch.setattr(alembic_op, "get_context", lambda: Context())
-    monkeypatch.setattr(alembic_op, "get_bind", no_bind)
-    monkeypatch.setattr(alembic_op, "execute", lambda sql: statements.append(sql))
-
-    module.upgrade()
-
-    # Every statement is still rendered, in order, for the reviewer.
-    assert len(statements) == 4
-    assert f"DROP CONSTRAINT {OLD}" in statements[-1]

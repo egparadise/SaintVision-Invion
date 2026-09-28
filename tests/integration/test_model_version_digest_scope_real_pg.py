@@ -4,7 +4,7 @@ The migration has run by the time these start (the ``migrated`` fixture upgrades
 to head), so this is not a test of the DDL text -- it is a test of the rule the
 catalogue now enforces, which is the only place that can be observed.
 
-The three cases are the ones Codex named in #191 F1:
+The cases Codex named in #191 F1:
 
 * two projects of one tenant may each register the same bytes -- the
   cross-project existence oracle is gone;
@@ -12,11 +12,17 @@ The three cases are the ones Codex named in #191 F1:
   the original S10-ST invariant survives where it means something;
 * and the old tenant-wide constraint is actually gone from the catalogue, not
   merely unused.
+
+Plus the retry boundary from the review of this migration (#197): a run
+interrupted between the promotion and the drop must resume, and it must leave the
+new constraint *the same object* rather than rebuilding it. The reason the first
+version could not is asserted here too, from PostgreSQL's own refusal to drop an
+index a constraint owns -- so the resume logic is not defending against an
+imagined error.
 """
 
 from __future__ import annotations
 
-import datetime as dt
 import uuid
 
 import pytest
@@ -289,3 +295,96 @@ def test_another_tenant_is_unaffected_by_the_narrowing(
             {"d": digest},
         ).scalar_one()
     assert count == 2
+
+def _constraint_oid(owner_engine, name):
+    with owner_engine.begin() as connection:
+        return connection.execute(
+            text(
+                "SELECT oid FROM pg_constraint "
+                "WHERE conname = :n AND conrelid = 'model_versions'::regclass"
+            ),
+            {"n": name},
+        ).scalar_one_or_none()
+
+
+def test_a_run_interrupted_after_the_promotion_resumes_and_converges(
+    owner_engine, database_url, migrated, clean_tables, monkeypatch
+):
+    """The crash point the first version of this migration wedged on.
+
+    The catalogue is put back into the interrupted state -- both constraints
+    present, the revision still 0051 -- and the migration is re-run through the
+    real Alembic machinery. It must finish by removing only the old constraint,
+    leaving the new one *the same object*: its oid is unchanged, which a drop and
+    rebuild would not be.
+
+    Before the fix this raised ``cannot drop index
+    uq_model_versions_model_id_content_sha256 because constraint ... requires
+    it``, because the re-run began by dropping the index the constraint owns.
+    """
+    from alembic import command
+    from alembic.config import Config
+
+    before = _constraint_oid(owner_engine, NEW)
+    assert before is not None, "the migration has run, so the new constraint is there"
+
+    # Recreate the pre-crash catalogue: the wide constraint back, revision 0051.
+    # model_versions is empty here (clean_tables), so the wide rule is satisfiable.
+    with owner_engine.begin() as connection:
+        connection.execute(
+            text(
+                f"ALTER TABLE model_versions ADD CONSTRAINT {OLD} "
+                "UNIQUE (tenant_id, content_sha256)"
+            )
+        )
+        connection.execute(
+            text("UPDATE alembic_version SET version_num = '0051_service_credentials'")
+        )
+
+    config = Config("alembic.ini")
+    config.set_main_option("script_location", "migrations")
+    try:
+        with monkeypatch.context() as patch:
+            patch.setenv("INV_DATABASE_URL", database_url)
+            patch.setenv("INV_MIGRATION_DSN", database_url)
+            command.upgrade(config, "head")
+    finally:
+        # Whatever happened, leave the database at head for the tests after this
+        # one: the old constraint gone, the revision recorded.
+        with owner_engine.begin() as connection:
+            connection.execute(
+                text(f"ALTER TABLE model_versions DROP CONSTRAINT IF EXISTS {OLD}")
+            )
+            connection.execute(
+                text(
+                    "UPDATE alembic_version SET version_num = "
+                    "'0052_model_version_digest_scope'"
+                )
+            )
+
+    names = _constraints(owner_engine)
+    assert NEW in names
+    assert OLD not in names, "the resume has to finish the job"
+    # The same constraint object, not a rebuilt one.
+    assert _constraint_oid(owner_engine, NEW) == before
+
+    with owner_engine.begin() as connection:
+        recorded = connection.execute(
+            text("SELECT version_num FROM alembic_version")
+        ).scalar_one()
+    assert recorded == "0052_model_version_digest_scope"
+
+
+def test_the_index_the_new_constraint_owns_cannot_be_dropped_on_its_own(owner_engine, migrated):
+    """Why the resume path must not touch the index -- stated by PostgreSQL itself.
+
+    This is the refusal that wedged the first version. Asserting it here means the
+    resume logic is not defending against an imagined error.
+    """
+    from sqlalchemy.exc import DBAPIError
+
+    with pytest.raises(DBAPIError) as raised:
+        with owner_engine.begin() as connection:
+            connection.execute(text(f"DROP INDEX {NEW}"))
+    message = str(raised.value).lower()
+    assert "constraint" in message and "requires it" in message
