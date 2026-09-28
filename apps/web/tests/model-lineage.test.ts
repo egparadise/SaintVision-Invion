@@ -253,12 +253,12 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
 
     it('renders Real Model Commitment Observation Panel and fetches commitment via control-plane API', async () => {
       const originalFetch = globalThis.fetch;
-      const testProjectId = 'prj_01JTESTPROJ01234567890ABCD';
-      const testModelId = 'mdl_01JTESTMODEL0123456789ABCD';
+      const testProjectId = 'prj_0123456789ABCDEFGHJKMNPQRS';
+      const testModelId = 'mdl_0123456789ABCDEFGHJKMNPQRS';
       const testVersion = '1.0.0';
       const testManifestHash = '7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069';
-      const testSourceRunId = 'run_01JTESTRUN01234567890ABCDE';
-      const testRecoveryEpoch = 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d';
+      const testSourceRunId = 'run_0123456789ABCDEFGHJKMNPQRS';
+      const testRecoveryEpoch = '33333333-3333-4333-8333-333333333333';
 
       const mockCommitmentResponse = {
         projectId: testProjectId,
@@ -384,8 +384,8 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
 
     it('rejects invalid ModelCommitObservation violating strict schema guard and hides corrupted details', async () => {
       const originalFetch = globalThis.fetch;
-      const testProjectId = 'prj_01JTESTPROJ01234567890ABCD';
-      const testModelId = 'mdl_01JTESTMODEL0123456789ABCD';
+      const testProjectId = 'prj_0123456789ABCDEFGHJKMNPQRS';
+      const testModelId = 'mdl_0123456789ABCDEFGHJKMNPQRS';
       const testVersion = '1.0.0';
 
       const corruptedPayload = {
@@ -393,9 +393,9 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
         modelId: testModelId,
         version: testVersion,
         manifestHash: 'bad_hash_not_64_hex', // violates manifestHash schema
-        sourceRunId: 'run_01JTESTRUN01234567890ABCDE',
+        sourceRunId: 'run_0123456789ABCDEFGHJKMNPQRS',
         committedAt: '2026-09-28T09:00:00Z',
-        commitRecoveryEpoch: 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d',
+        commitRecoveryEpoch: '33333333-3333-4333-8333-333333333333',
         format: 'safetensors',
         totalBytes: 52428800,
         shardCount: 4,
