@@ -35,9 +35,10 @@ router = APIRouter(prefix="/v1", tags=["projects"])
 # this router's ``routes``, so a separate top-level router would be registered
 # and never reached, and a nested ``include_router`` would only leave a lazy
 # placeholder. ``register`` adds the real route.
-from . import model_release  # noqa: E402
+from . import conformance_status, model_release  # noqa: E402
 
 model_release.register(router)
+conformance_status.register(router)
 
 
 @router.get("/projects", response_model=schemas.ProjectListResponse)
