@@ -5,6 +5,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { MlopsManager } from '../src/features/mlops/mlopsEngine';
 import { TEST_FIXTURE_LINEAGES } from './fixtures/model-lineage';
 import { ModelLineageView } from '../src/features/mlops/ModelLineageView';
+import type { ProblemDetails } from '../src/contracts/types';
 
 describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (AC-10)', () => {
   describe('Provider Adapter Conformance (AC-10 Codex = Claude)', () => {
@@ -342,14 +343,17 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
         expect(revalidationEl?.textContent).toContain('Required (true)');
 
         // Now test 404 canonical ProblemDetails failure handling
-        const canonical404Problem = {
-          type: 'https://saintvision.ai/errors/MODEL-0004',
-          code: 'MODEL-0004',
+        const canonical404Problem: ProblemDetails = {
+          type: 'about:blank',
           title: 'Not Found',
           status: 404,
+          code: 'MODEL-0004',
+          category: 'RES',
           detail: 'Committed model not found',
-          instance: `/v1/projects/${encodeURIComponent(testProjectId)}/models/${encodeURIComponent(testModelId)}/versions/${encodeURIComponent(testVersion)}/commitment`,
-          invalidParams: [],
+          retryable: false,
+          traceId: '0123456789abcdef0123456789abcdef',
+          causeRef: null,
+          evidenceId: null,
         };
 
         globalThis.fetch = vi.fn().mockResolvedValue({
@@ -373,6 +377,80 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
         expect(errorBanner?.textContent).toContain('MODEL-0004');
         expect(errorBanner?.textContent).toContain('404');
         expect(errorBanner?.textContent).toContain('Committed model not found');
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    });
+
+    it('rejects invalid ModelCommitObservation violating strict schema guard and hides corrupted details', async () => {
+      const originalFetch = globalThis.fetch;
+      const testProjectId = 'prj_01JTESTPROJ01234567890ABCD';
+      const testModelId = 'mdl_01JTESTMODEL0123456789ABCD';
+      const testVersion = '1.0.0';
+
+      const corruptedPayload = {
+        projectId: testProjectId,
+        modelId: testModelId,
+        version: testVersion,
+        manifestHash: 'bad_hash_not_64_hex', // violates manifestHash schema
+        sourceRunId: 'run_01JTESTRUN01234567890ABCDE',
+        committedAt: '2026-09-28T09:00:00Z',
+        commitRecoveryEpoch: 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d',
+        format: 'safetensors',
+        totalBytes: 52428800,
+        shardCount: 4,
+        licensePolicy: 'Apache-2.0',
+        classification: 'internal',
+        committed: true,
+        currentAvailability: 'unknown',
+        requiresExecutionRevalidation: true,
+      };
+
+      try {
+        globalThis.fetch = vi.fn().mockResolvedValue({
+          ok: true,
+          status: 200,
+          headers: new Headers({ 'content-type': 'application/json' }),
+          json: async () => corruptedPayload,
+        } as any);
+
+        await act(async () => {
+          root.render(React.createElement(ModelLineageView, { initialLineages: TEST_FIXTURE_LINEAGES }));
+        });
+
+        const projectInput = container.querySelector<HTMLInputElement>('[data-testid="commitment-project-input"]');
+        const modelInput = container.querySelector<HTMLInputElement>('[data-testid="commitment-model-input"]');
+        const versionInput = container.querySelector<HTMLInputElement>('[data-testid="commitment-version-input"]');
+        const fetchBtn = container.querySelector<HTMLButtonElement>('[data-testid="commitment-fetch-btn"]');
+
+        const setInputValue = (el: HTMLInputElement, val: string) => {
+          const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+          setter?.call(el, val);
+          el.dispatchEvent(new Event('input', { bubbles: true }));
+          el.dispatchEvent(new Event('change', { bubbles: true }));
+        };
+
+        await act(async () => {
+          setInputValue(projectInput!, testProjectId);
+          setInputValue(modelInput!, testModelId);
+          setInputValue(versionInput!, testVersion);
+        });
+
+        await act(async () => {
+          fetchBtn!.click();
+        });
+        await act(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 0));
+        });
+
+        const errorBanner = container.querySelector('[data-testid="commitment-error-banner"]');
+        expect(errorBanner).not.toBeNull();
+        expect(errorBanner?.getAttribute('role')).toBe('alert');
+        expect(errorBanner?.textContent).toContain('ModelCommitObservation 응답 계약 불일치');
+
+        // Critical: corrupt data must NOT be rendered
+        const resultContainer = container.querySelector('[data-testid="commitment-result-container"]');
+        expect(resultContainer).toBeNull();
       } finally {
         globalThis.fetch = originalFetch;
       }
