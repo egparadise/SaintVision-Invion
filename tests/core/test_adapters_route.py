@@ -265,22 +265,45 @@ def test_both_routes_require_a_credential(monkeypatch, path):
     assert response.headers["www-authenticate"] == "Bearer"
 
 
-def test_both_routes_are_visible_to_the_business_dispatch_selection():
-    """A route the deployed topology never reaches is not a served route.
-
-    ``BusinessDispatch`` picks business traffic out of the projects, settings and
-    adapters routers, so these two are reachable by construction -- pinned here
-    because that is the property the rest of this file depends on.
-    """
-    from saintvision.api.v1 import projects, settings as settings_router
-
+def test_the_router_declares_exactly_these_two_adapter_paths():
+    """About the router itself: two GETs, no more and no fewer."""
     routes = {
         route.path: route.methods
-        for module in (projects, settings_router, adapters_route)
-        for route in module.router.routes
+        for route in adapters_route.router.routes
         if "adapters" in getattr(route, "path", "")
     }
     assert routes == {"/v1/adapters": {"GET"}, "/v1/adapters/{name}": {"GET"}}
+
+
+def test_the_real_dispatch_sends_these_paths_to_the_business_app():
+    """A route the deployed topology never reaches is not a served route.
+
+    The first version of this test restated ``BusinessDispatch``'s selection --
+    projects, settings, adapters -- inside the test, which means removing
+    ``adapters`` from that tuple in ``inv.business_surface`` would have changed
+    nothing here. So the real dispatch is constructed and asked, and the answer
+    that matters is which of two apps received the request.
+    """
+    from fastapi import FastAPI
+    from inv.business_surface import BusinessDispatch
+
+    kernel, business = FastAPI(), FastAPI()
+
+    @kernel.get("/{rest:path}")
+    def kernel_catch_all(rest: str):
+        return {"servedBy": "kernel"}
+
+    @business.get("/{rest:path}")
+    def business_catch_all(rest: str):
+        return {"servedBy": "business"}
+
+    with TestClient(BusinessDispatch(kernel, business)) as client:
+        for path in ("/v1/adapters", "/v1/adapters/claude-code"):
+            assert client.get(path).json() == {"servedBy": "business"}, path
+        # A path the business app does not declare still goes to the kernel,
+        # or the two assertions above would also pass with a dispatch that
+        # forwarded everything.
+        assert client.get("/v1/runs").json() == {"servedBy": "kernel"}
 
 
 def test_the_list_response_has_no_declared_type_yet():

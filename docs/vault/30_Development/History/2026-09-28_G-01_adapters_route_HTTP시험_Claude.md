@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-G01-ADAPTERS-ROUTE-HTTP-001"
 title: "G-01 구현 — GET /v1/adapters·/{name}의 HTTP 레벨 시험 15건, 서빙 표면 첫 검증(시험만, 제품 변경 0)"
-version: "1.0.0"
+version: "1.1.0"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T13:44:31+09:00"
+updated: "2026-09-28T14:26:41+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -33,7 +33,7 @@ PR #179의 통합 분류표(`Evidence 공백 통합 분류와 구현 순서.md`)
 | 도달 불가도 **200**이고 `reachable: false` | 도구에 대한 답이고 요청에 대한 오류가 아니다 |
 | 알 수 없는 이름은 404 | **현재 동작을 pin한다**(§3) |
 | 두 route 모두 자격증명 없으면 401 | 기존 `AUTH-MISSING-CREDENTIAL` body와 `WWW-Authenticate: Bearer` |
-| 두 route가 `BusinessDispatch` 선택 목록에 있다 | 배포 토폴로지에서 도달하지 않는 route는 서빙되는 route가 아니다. 이 파일의 나머지가 의존하는 성질이라 함께 pin한다 |
+| **실제 `BusinessDispatch`가** 두 경로를 business app으로 보낸다 | 배포 토폴로지에서 도달하지 않는 route는 서빙되는 route가 아니다. v1.1에서 고쳤다(§6) |
 | 목록 응답에 **선언된 타입이 없다**는 사실 | §4 |
 
 `agents.readiness()`·`adapter_for()`는 **stub한다.** 대상은 route이고, 실 CLI 바이너리 탐지는 통합 분류표의 **G-11**(hosted provisioning)이다. 둘을 한 시험에 섞으면 route 회귀와 바이너리 부재가 같은 실패로 보인다.
@@ -48,7 +48,7 @@ business 요청·응답 계약은 `api/schemas.py`에 있고 `tools/export_schem
 
 ## 5. 검증 증거 (실행)
 
-- `pytest tests/core/test_adapters_route.py -q` → **15 passed**.
+- `pytest tests/core/test_adapters_route.py -q` → **16 passed**(v1.1).
 - `pytest tests/core -q` → **1047 passed, 4 skipped**.
 - `check_docs`·`check_doc_single_source --ratchet` → exit 0.
 - 제품 코드·계약·migration **무변경**. 로컬 실 PG·Docker·전체 suite **미실행**.
@@ -56,3 +56,13 @@ business 요청·응답 계약은 `api/schemas.py`에 있고 `tools/export_schem
 ## 6. 다음 첫 행동
 
 Codex 검토. 그 뒤 통합 분류표의 2순위(G-02 live archiver hosted 실행)는 접근 경로 결정이 먼저이므로 짧은 설계 문서를 올린다.
+
+## 6. v1.1 — 배포 도달성 시험이 변이를 살려 두고 있었다 (Codex #180 검토)
+
+v1.0의 `test_both_routes_are_visible_to_the_business_dispatch_selection`이 `BusinessDispatch`의 선택 목록 `(projects, settings, adapters)`을 **시험 안에 다시 적었다**. 그러면 `inv/business_surface.py:15`의 그 tuple에서 `adapters`를 빼도 시험은 자기 복제본을 보고 통과한다 — **배포에서 도달하지 못하게 되는 변이가 살아남는다.** 지적이 정확하다.
+
+고친 방식: **실제 `BusinessDispatch`를 생성해** 물어본다. kernel과 business 자리에 각각 `{"servedBy": ...}`를 돌려주는 최소 app을 두고 `TestClient(BusinessDispatch(kernel, business))`로 `/v1/adapters`·`/v1/adapters/claude-code`가 **business로 갔는지**를 단언한다. 그리고 `/v1/runs`가 **kernel로 가는지**도 단언한다 — 그것이 없으면 "전부 business로 보내는" dispatch에서도 앞의 두 단언이 통과한다.
+
+**변이 사멸을 확인했다**: `(projects, settings, adapters)`에서 `adapters`를 빼면 `test_the_real_dispatch_sends_these_paths_to_the_business_app`이 **실패**한다(1 failed / 15 passed). 확인 뒤 파일을 되돌렸다.
+
+router 자체에 대한 단언은 `test_the_router_declares_exactly_these_two_adapter_paths`로 남겼다 — 그것은 production 목록을 복제하지 않고 **이 router가 선언한 것**만 본다.
