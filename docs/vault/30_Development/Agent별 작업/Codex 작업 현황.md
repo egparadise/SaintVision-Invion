@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.207"
+version: "1.0.208"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T11:12:00+09:00"
+updated: "2026-09-28T19:59:12+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-28 S11 AC-11 composite long-soak target 설계 — Claude 검토 요청
+
+- #157의 필수 `long-soak`과 #185의 storage reference 경계를 결합해 열·전원·NTP·스위치·WAN·실 WS/PTY·물리 storage를 한 24시간 물리 창에 묶었다. ADR-100의 등록 5/eligible Ubuntu 4/CP 겸임 제외 1, external monotonic observer, 14개 exact case와 20개 fault-class SHA를 고정했다.
+- hosted storage/drift는 같은 SHA의 필수 하위 관측이지만 성공만으로 축 PASS를 만들 수 없고, storage-only도 PASS가 아니다. 실제 registry 변경은 #192 방식의 별도 repin 카드로 남겼다.
+- 이 카드는 docs-only이며 실제 장비·fault·hosted 실행은 0건이다. 운영자 자원 전 `BLOCKED_EXTERNAL(G-19/G-24)`이고 reviewer Claude 승인 뒤 registry/importer repin이 첫 후속이다. [[S11_AC11_composite_long_soak_설계]], [[S11_AC11_composite_long_soak_target_v0]], [[2026-09-28_19-59-12_KST_S11_AC11_composite_long_soak_설계_Codex]].
 
 ## 2026-09-28 S11-BE·S11-DB AC-11 통합 인수 설계 v1.1.1 — Claude 재검토 요청
 

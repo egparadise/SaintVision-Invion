@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "1.0.0",
+  "kind": "ac11-target-registry-patch-proposal",
+  "consumableAsTargetRef": false,
+  "canonicalRegistryPath": "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json",
+  "predecessor": {
+    "commit": "7be9154f2ec6b7ad28040f986893e4e31fbc5fce",
+    "blob": "e8c0134081dde18b2aa2bcadd42fe76f42cff667"
+  },
+  "removeTargetIds": [],
+  "requiredTargetByAxis": {
+    "long-soak": "s11-ac11-composite-long-soak-v0"
+  },
+  "addTargets": [
+    {
+      "targetId": "s11-ac11-composite-long-soak-v0",
+      "axis": "long-soak",
+      "sourceDocument": {
+        "commit": "938ad3eb1c1664890c714f6ec86f409b7dab65b9",
+        "path": "docs/vault/30_Development/S11_AC11_composite_long_soak_target_v0.md",
+        "blob": "0bf74f90557a237b50ebdf571ed9e3dac89ea23b"
+      },
+      "criteria": {
+        "windowSeconds": {"operator": "gte", "value": 86400},
+        "registeredNodeCount": {"operator": "eq", "value": 5},
+        "eligibleNodeCount": {"operator": "eq", "value": 4},
+        "excludedNodeCount": {"operator": "eq", "value": 1},
+        "cpIndependentWorkerHostCount": {"operator": "eq", "value": 4},
+        "cpColocatedNodeCount": {"operator": "eq", "value": 1},
+        "requiredCaseCount": {"operator": "eq", "value": 14},
+        "executedRequiredCaseCount": {"operator": "eq", "value": 14},
+        "telemetryCoveragePpm": {"operator": "gte", "value": 990000},
+        "externalObserverCoveragePpm": {"operator": "gte", "value": 990000},
+        "minThermalHeadroomMilliC": {"operator": "gte", "value": 5000},
+        "thermalThrottleSeconds": {"operator": "eq", "value": 0},
+        "criticalThermalEventCount": {"operator": "eq", "value": 0},
+        "plannedPowerFaultCaseCount": {"operator": "gte", "value": 2},
+        "powerRecoveryPassCount": {"operator": "gte", "value": 2},
+        "maxPowerRecoverySeconds": {"operator": "lte", "value": 900},
+        "unexpectedPowerLossCount": {"operator": "eq", "value": 0},
+        "maxAbsClockSkewMillis": {"operator": "lte", "value": 5000},
+        "clockSkewUnmeasuredSampleCount": {"operator": "eq", "value": 0},
+        "clockResyncPassCount": {"operator": "gte", "value": 1},
+        "maxClockResyncSeconds": {"operator": "lte", "value": 300},
+        "switchFaultCaseCount": {"operator": "gte", "value": 2},
+        "switchRecoveryPassCount": {"operator": "gte", "value": 2},
+        "maxSwitchRecoverySeconds": {"operator": "lte", "value": 300},
+        "wanFaultCaseCount": {"operator": "gte", "value": 2},
+        "wanRecoveryPassCount": {"operator": "gte", "value": 2},
+        "maxWanRecoverySeconds": {"operator": "lte", "value": 120},
+        "wsSteadySessionCount": {"operator": "gte", "value": 4},
+        "wsRoundTripCount": {"operator": "gte", "value": 1000},
+        "wsReconnectPassCount": {"operator": "gte", "value": 1},
+        "maxWsReconnectSeconds": {"operator": "lte", "value": 60},
+        "wsPayloadMismatchCount": {"operator": "eq", "value": 0},
+        "wsDuplicateExecutionCount": {"operator": "eq", "value": 0},
+        "unauthorizedWsReplayAcceptanceCount": {"operator": "eq", "value": 0},
+        "storagePhysicalReferencePassCount": {"operator": "eq", "value": 1},
+        "hostedDriftReferencePassCount": {"operator": "eq", "value": 1},
+        "hostedDriftReferenceFailureCount": {"operator": "eq", "value": 0},
+        "memoryGrowthBytes": {"operator": "lte", "value": 268435456},
+        "fileDescriptorGrowthCount": {"operator": "lte", "value": 32},
+        "dbConnectionGrowthCount": {"operator": "lte", "value": 4},
+        "falseSuccessCount": {"operator": "eq", "value": 0},
+        "classificationMismatchCount": {"operator": "eq", "value": 0},
+        "unexpectedProcessRestartCount": {"operator": "eq", "value": 0},
+        "identityDriftCount": {"operator": "eq", "value": 0},
+        "committedDataLossCount": {"operator": "eq", "value": 0},
+        "staleWriteCount": {"operator": "eq", "value": 0},
+        "unclassifiedFaultCount": {"operator": "eq", "value": 0},
+        "cleanupResidueCount": {"operator": "eq", "value": 0}
+      },
+      "requiredEnvironment": {
+        "topology": "physical-five-node",
+        "registeredNodeCount": 5,
+        "eligibleNodeCount": 4,
+        "excludedNodeCount": 1,
+        "cpIndependentWorkerHostCount": 4,
+        "cpColocatedNodeCount": 1,
+        "timedPopulation": "cp-independent-ubuntu-four",
+        "observer": "external-monotonic-v1",
+        "faultInjection": "controlled-v1",
+        "windowClass": "physical-24h"
+      }
+    }
+  ]
+}
