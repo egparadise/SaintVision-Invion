@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-S05-LEGACY-STAIRCASE-LANE-SPEC-001"
 title: "S05 legacy 동시성 계단 hosted lane 사양"
-version: "1.3.1"
+version: "1.4.1"
 status: "hosted-measured-review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T10:08:35+09:00"
+updated: "2026-09-28T10:59:32+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S05-DB"]
@@ -37,7 +37,7 @@ lane은 다음을 fail closed로 확인한다.
 
 runner OS/arch/image, CPU·메모리, Python·PostgreSQL 버전, service default timeout/max connections를 기록한다. DSN·password·DB 이름·tenant/project/run 식별자는 aggregate에 넣지 않는다. hosted 수치는 환경 고유 calibration이므로 개발 PC 수치와 직접 합치거나 절대값 비교하지 않는다.
 
-현재 wave JSON/JUnit의 `scope`는 `tests/integration/test_placement_benchmark.py`가 하드코딩한 `development-PC; one synthetic measured-node row; pre-five-node-lab`이라는 낡은 라벨이다. 실제 Card46·Card47 실행은 GitHub hosted runner에서 수행됐으며, 다음 계단 실행 전 topology 환경값을 wave report까지 전달·검증하는 후속 보강이 필요하다.
+Card46·Card47 기존 artifact의 wave JSON/JUnit `scope=development-PC; one synthetic measured-node row; pre-five-node-lab`은 당시 시험에 하드코딩된 낡은 라벨이고 실제 실행은 GitHub hosted runner였다. Card49부터 runner가 `--measurement-scope`를 `placement_benchmark.py --topology`와 `INV_PLACEMENT_BENCHMARK_TOPOLOGY`로 전달하고 wave report가 같은 값을 갖는지 검증한다. 기존 artifact는 소급 변경하지 않는다.
 
 ## 3. 사전 degrade 기준
 
@@ -87,3 +87,16 @@ Card47 hosted run의 목적은 새 PR lane이 clean base에서도 같은 legacy 
 PR #151 clean-base run [36363327477](https://github.com/egparadise/SaintVision-Invion/actions/runs/36363327477)은 9개 wave·aggregate JUnit을 success로 완료했다. 20/35/50 성공은 60/60·105/105·150/150, timeout 최대는 모두 0, P95 all 중앙은 665.154/1109.917/1558.406ms다. fingerprint 9개 유일·잔존 0이고 `semaphoreProductCodePresent=false`다. 이는 실행 호환성 확인일 뿐 §5 Card46 정본 수치와 직접 비교하거나 결론을 교체하지 않는다. artifact ID `10946163808`, 보존 JSON SHA-256 `1538dc3b303955f22f96f1cc7284df0822f2014b730eed8ad5ddaadd19f677c1`.
 
 정본 run `36362386530`은 #115 제품 tree(flag off, root-transaction lifecycle 포함)를 측정했고, integration tree의 legacy 수치는 run `36363327477`뿐이다. integration c50의 2000ms gate 여유는 `441.594ms`이므로 정본 run의 더 큰 여유를 integration 경로 여유로 인용하지 않는다.
+
+## 7. Card49 다음 실행 전 품질 게이트
+
+Card49는 측정 결과나 gate를 재정의하지 않고 다음 opt-in 실행 전에 runner의 fail-closed 경계를 닫는다. 계단 lane은 이 카드에서 실행하지 않는다.
+
+- `requestCount`·`successCount`·`failureCount`는 bool이 아닌 음이 아닌 정수이며 성공+실패가 요청 수와 같아야 한다. `errorsBySqlState`는 필수 object이고 합계가 `failureCount`와 같아야 하며, `failureCount > 55P03+57014`면 미분류 실패가 있으므로 `INVALID_RUN`이다.
+- checkout은 `git status --porcelain`이 비어 있어야 한다. `codeSHA`, CLI 입력 `runPurpose`, `canonicalDecisionEvidenceRunId`, `measurementScope`를 검증하고 wave report scope와 교차 확인한다.
+- `semaphoreProductCodePresent=false`라는 검증하지 않은 상수는 미래 증거에서 `semaphoreProductCodeExpected=false`로 이름을 바꾼다. wave report의 `projectSemaphore` 부재 검사는 유지한다.
+- 각 wave 전에 이전 JSON·JUnit·log를, 실행 시작 전에 이전 aggregate JSON·JUnit을 삭제한다. 새 프로세스가 산출하지 못하면 stale 파일로 통과할 수 없다.
+- workflow concurrency는 실제 opt-in job 안에서 `cancel-in-progress: false`다. 다른 label 이벤트가 진행 중 측정 run을 취소하지 않는다. 구조 시험은 workflow root에 concurrency가 없고 opt-in job에만 있는지 YAML로 확인한다.
+- aggregate JUnit도 `measurementScope`를 기록한다. PG-free 시험은 `main()`의 degrade 결정·첫 rung 뒤 중단, dirty checkout DB 선차단, all-request P95 보존, SQL timeout·요청 합계, stale unlink, fingerprint 재사용, 비정상 exit, SHA·scope·lifecycle·fingerprint 부정 경로를 직접 실행한다.
+
+Card49의 field rename과 stricter validation은 과거 Card46·Card47 JSON을 다시 해석하거나 수정하지 않는다. 다음 실행부터 새 규칙을 적용하며, 이 카드의 hosted Backend는 코드 품질 증거일 뿐 성능 측정 증거가 아니다.
