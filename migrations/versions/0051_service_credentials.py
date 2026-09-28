@@ -118,18 +118,27 @@ def upgrade() -> None:
 
     # Lifecycle moves one way only. Column-level UPDATE lets the application
     # revoke and disable; these triggers refuse the reverse (Codex #176
-    # finding 2): revoked_at may only go NULL -> timestamp and never change
-    # again, enabled may only go true -> false. Plain trigger functions, not
-    # SECURITY DEFINER, so the reviewed definer catalogue is unchanged.
+    # finding 2). Two functions, one per column: PL/pgSQL evaluates
+    # ``OLD.enabled`` even behind ``TG_TABLE_NAME = ... AND``, and versions
+    # have no ``enabled`` (hosted job 108787266063: record "old" has no field
+    # "enabled"). Plain trigger functions, not SECURITY DEFINER, so the
+    # reviewed definer catalogue is unchanged.
     op.execute(
-        "CREATE FUNCTION public.service_credential_lifecycle_forward() RETURNS trigger "
+        "CREATE FUNCTION public.service_credential_revocation_forward() RETURNS trigger "
         "LANGUAGE plpgsql AS $fn$ "
         "BEGIN "
         "  IF OLD.revoked_at IS NOT NULL AND NEW.revoked_at IS DISTINCT FROM OLD.revoked_at THEN "
         "    RAISE EXCEPTION 'service credential revocation is final' "
         "      USING ERRCODE = 'check_violation', CONSTRAINT = 'revocation_is_final'; "
         "  END IF; "
-        "  IF TG_TABLE_NAME = 'service_credential_grants' AND OLD.enabled = false AND NEW.enabled = true THEN "
+        "  RETURN NEW; "
+        "END $fn$"
+    )
+    op.execute(
+        "CREATE FUNCTION public.service_credential_grant_disable_forward() RETURNS trigger "
+        "LANGUAGE plpgsql AS $fn$ "
+        "BEGIN "
+        "  IF OLD.enabled = false AND NEW.enabled = true THEN "
         "    RAISE EXCEPTION 'a disabled service credential grant cannot be re-enabled' "
         "      USING ERRCODE = 'check_violation', CONSTRAINT = 'disable_is_final'; "
         "  END IF; "
@@ -138,9 +147,13 @@ def upgrade() -> None:
     )
     for table in LIFECYCLE_UPDATE_COLUMNS:
         op.execute(
-            f"CREATE TRIGGER {table}_lifecycle_forward BEFORE UPDATE ON {table} "
-            f"FOR EACH ROW EXECUTE FUNCTION public.service_credential_lifecycle_forward()"
+            f"CREATE TRIGGER {table}_revocation_forward BEFORE UPDATE OF revoked_at ON {table} "
+            f"FOR EACH ROW EXECUTE FUNCTION public.service_credential_revocation_forward()"
         )
+    op.execute(
+        "CREATE TRIGGER service_credential_grants_disable_forward BEFORE UPDATE OF enabled "
+        "ON service_credential_grants FOR EACH ROW EXECUTE FUNCTION public.service_credential_grant_disable_forward()"
+    )
 
     for table, columns in LIFECYCLE_UPDATE_COLUMNS.items():
         op.execute(f"GRANT SELECT, INSERT ON {table} TO {APP_ROLE}")

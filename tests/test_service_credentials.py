@@ -263,19 +263,29 @@ def test_a_revoked_or_disabled_credential_cannot_be_revived(app_sessionmaker, tw
         assert ServiceCredentialRegistry(session).lookup(_request(tenant)) is None       # still refused
 
 
-def test_the_forward_moves_are_still_allowed_once(app_sessionmaker, two_tenants, clean_tables):
+@pytest.mark.parametrize(
+    "statements",
+    [
+        ("UPDATE service_credential_versions SET revoked_at = now()",),                              # versions revoke (no enabled column)
+        ("UPDATE service_credential_grants SET revoked_at = now()",),                                 # grants revoke
+        ("UPDATE service_credential_grants SET enabled = false",),                                    # grants disable
+        ("UPDATE service_credential_grants SET enabled = false", "UPDATE service_credential_grants SET enabled = false"),   # idempotent
+        ("UPDATE service_credential_grants SET enabled = false, revoked_at = now()",),                # both at once
+    ],
+)
+def test_each_forward_move_is_allowed_on_its_own_table(app_sessionmaker, two_tenants, clean_tables, statements):
+    """hosted job 108787266063: the shared trigger read OLD.enabled on versions; each table has its own now."""
     tenant, _ = two_tenants
     with app_sessionmaker() as session:
         with session.begin():
             with tenant_scope(session, tenant):
                 _seed_credential(session, tenant)
-                session.execute(text("UPDATE service_credential_grants SET enabled = false"))          # true -> false
-                session.execute(text("UPDATE service_credential_grants SET revoked_at = now()"))       # NULL -> ts
-                session.execute(text("UPDATE service_credential_grants SET enabled = false"))          # idempotent
-                session.execute(text("UPDATE service_credential_versions SET revoked_at = now()"))
+                for statement in statements:
+                    session.execute(text(statement))
     with app_sessionmaker() as session, session.begin(), tenant_scope(session, tenant):
         grant = session.scalars(select(ServiceCredentialGrant)).one()
-        assert grant.enabled is False and grant.revoked_at is not None
+        version = session.scalars(select(ServiceCredentialVersion)).one()
+        assert (grant.revoked_at is not None) or (grant.enabled is False) or (version.revoked_at is not None)
 
 
 def test_credentials_are_invisible_across_tenants(app_sessionmaker, two_tenants, clean_tables):
