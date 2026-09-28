@@ -28,7 +28,10 @@ jobs:
       github.event_name != 'pull_request' ||
       contains(github.event.pull_request.labels.*.name, 'run-core')
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    # Combined-train run 36413452211 spent 10m11s on required setup/integration
+    # before pytest, then exhausted the remaining 15m01s inside the expanded
+    # suite. Keep a bounded 45m job budget for pytest plus the post-test gates.
+    timeout-minutes: 45
     env:
       INV_TEST_ADMIN_DSN: postgresql://postgres:inv_test_only@127.0.0.1:5432/postgres
       INV_TEST_EVIDENCE_DIR: ${{ github.workspace }}/dist
