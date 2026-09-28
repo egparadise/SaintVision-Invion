@@ -155,12 +155,40 @@ def test_a_missing_setting_is_not_reported_as_unset():
 # ---------------------------------------------------------------- the judgement is not copied here
 
 
-def test_this_file_reads_the_report_and_never_calls_the_judgement():
-    source = Path(__file__).read_text(encoding="utf-8")
-    assert "rpo_bound_from" not in source.replace("never calls the judgement", "").split("def test_this_file")[0] or True
-    # The only place the fold and the judgement live:
+def _called_names(source: str) -> set[str]:
+    """Every callee name in ``source`` (bare names and attribute tails), via the AST."""
+    import ast
+
+    names: set[str] = set()
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, ast.Call):
+            target = node.func
+            if isinstance(target, ast.Name):
+                names.add(target.id)
+            elif isinstance(target, ast.Attribute):
+                names.add(target.attr)
+    return names
+
+
+def test_this_file_and_the_live_case_read_the_report_and_never_call_the_judgement():
+    """The fold and the judgement live in the tool; tests read fields, they do not compute them."""
+    here = Path(__file__).read_text(encoding="utf-8")
+    live = (ROOT / "tests" / "integration" / "test_recovery_drill.py").read_text(encoding="utf-8")
+    assert "rpo_bound_from" not in _called_names(here)
+    assert "rpo_bound_from" not in _called_names(live)
+    assert "_settings_from_rows" not in _called_names(live)          # the live case injects, never re-folds
+    tool = (ROOT / "tools" / "recovery_drill.py").read_text(encoding="utf-8")
+    assert "rpo_bound_from" in _called_names(tool)                    # the only caller
     assert drill.rpo_bound_from.__module__ == drill.__name__
-    assert "rpo_bound_from(" in Path(ROOT / "tools" / "recovery_drill.py").read_text(encoding="utf-8")
+
+
+def test_a_duplicate_settings_row_is_refused_not_overwritten():
+    rows = [(name, "on") for name in NAMES] + [("archive_mode", "off")]
+    with pytest.raises(RuntimeError, match="duplicate settings row: archive_mode"):
+        drill._settings_from_rows(rows, source="test")
+    run = _fake_run(_psql_stdout() + b"archive_mode\toff\n")
+    with pytest.raises(RuntimeError, match="duplicate settings row: archive_mode"):
+        drill._recovery_capability(execute=drill.docker_exec_settings_executor("c", run=run))
 
 
 def test_the_live_archiver_case_no_longer_needs_the_cx01_fixture():

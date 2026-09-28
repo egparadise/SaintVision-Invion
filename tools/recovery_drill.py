@@ -509,6 +509,10 @@ def _settings_from_rows(rows: list[tuple[str, str]], *, source: str) -> dict[str
     for row in rows:
         if len(row) != 2 or row[0] not in _CAPABILITY_SETTING_NAMES:
             raise RuntimeError(f"{source}: unexpected settings row")
+        if row[0] in settings:
+            # Two rows for one setting is not an observation of that setting:
+            # neither value can be trusted over the other, so neither is used.
+            raise RuntimeError(f"{source}: duplicate settings row: {row[0]}")
         settings[row[0]] = row[1]
     missing = [name for name in _CAPABILITY_SETTING_NAMES if name not in settings]
     if missing:
