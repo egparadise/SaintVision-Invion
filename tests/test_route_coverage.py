@@ -138,6 +138,15 @@ def test_model_retry_product_route_is_present_and_model_specific() -> None:
     assert "/v1/projects/{}/runs/{}/retry" not in routes
 
 
+def test_operational_configuration_readiness_route_is_registered_separately_from_readyz() -> None:
+    source = (
+        Path(__file__).resolve().parents[1] / "services/control-plane/src/inv/app.py"
+    ).read_text("utf-8")
+    routes = served_routes(source)
+    assert "/v1/operations/configuration-readiness" in routes
+    assert "/readyz" in routes  # operational input observation does not replace process readiness
+
+
 def test_model_execution_manifest_route_is_project_scoped_and_separate_from_commitment() -> None:
     source = (
         Path(__file__).resolve().parents[1] / "services/control-plane/src/inv/app.py"

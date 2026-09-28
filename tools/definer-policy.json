@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "revision": "0046_model_manifest_readiness",
-  "referenceSource": "4473c7f1668eb3ea459b217d6af59bb9e6c113d3",
+  "revision": "0048_object_store_locator",
+  "referenceSource": "1e8baf045c5a554209aaef601ae4883b64da50a7",
   "scope": "Exact catalogue definitions and execute grants; runtime authorization tests remain required",
   "functions": {
     "public.apply_capability_offer(uuid, character, character, bigint)": {
@@ -85,6 +85,14 @@
       ],
       "kind": "tenant-bound",
       "sourceMigrationSHA256": "c7105a2dcef3b24b0323e0e737169606502fa80093d452b451e5c5bece02f4a7"
+    },
+    "public.record_auth_denial(text, text, text, text, text, text, text, text, jsonb, text, text)": {
+      "definitionSHA256": "397bfe6933220324c36678605f48e79bddb02eff0445177bb783707a60536a85",
+      "executeRoles": [
+        "inv_app"
+      ],
+      "kind": "tenant-less-audit-append",
+      "sourceMigrationSHA256": "82e1126db57a15efa91764fc1da97a74e3efc2653d1364d9b8ce5974831e59da"
     }
   }
 }

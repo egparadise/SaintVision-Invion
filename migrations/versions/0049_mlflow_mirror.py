@@ -1,7 +1,7 @@
 """MLflow mirror: intents, attempts, defects (S10-BE, design PR #168 v1.3).
 
 Revision ID: 0049_mlflow_mirror
-Revises: 0046_model_manifest_readiness
+Revises: 0048_object_store_locator
 Create Date: 2026-09-28
 
 Three append-only tables for decision B (mirror). The canonical lineage tables
@@ -9,11 +9,11 @@ are not touched: an intent (or a defect) is written in the same transaction as
 the canonical change, a worker records each delivery outcome as a new attempt
 row, and nothing here grants the application role UPDATE or DELETE.
 
-Numbering: 0047 and 0048 are taken by PR #159 (object store), which is not on
-the integration head yet. This revision therefore chains from 0046 and takes
-0049. Whichever of the two merges second re-points its ``down_revision`` so
-the graph keeps one head; ``tools/migration_graph.py`` and
-``tests/test_migrations.py`` refuse two heads.
+Numbering (coordinator decision 2026-09-28 12:23 KST): 0047 (PR #128) ->
+0048 (PR #159) -> 0049 (this) -> 0050 (card be). This branch carries the #159
+head merged in, so 0048 exists here and the graph has one head;
+``tools/migration_graph.py`` and ``tests/test_migrations.py`` refuse two.
+This PR merges after #159.
 
 Partitioned tables: none added by this revision.
 
@@ -28,7 +28,7 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 
 revision = "0049_mlflow_mirror"
-down_revision = "0046_model_manifest_readiness"
+down_revision = "0048_object_store_locator"
 branch_labels = None
 depends_on = None
 

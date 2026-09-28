@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-2026-09-28-S10-BE-MLFLOW-MIRROR-IMPL-1"
 title: "S10-BE MLflow 미러 구현 1단계 — TrackingSink 계약·run_tracking_conformance·ReferenceSink, TRACK-0001~0005 표, canonical payload/URI, migration 0049(intents·attempts·defects, append-only·RLS·CHECK), 정본 tx enqueue 훅, deliver_intent(FOR UPDATE·terminal 반환), PG-free 76 + 실 PG 42(hosted) (카드 bg)"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T12:20:45+09:00"
+updated: "2026-09-28T12:24:55+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -42,9 +42,9 @@ tags: ["S10-BE", "AC-10", "mlflow", "tracking", "mirror", "migration", "claude"]
 
 로컬(가벼운 명령만): PG-free `test_tracking_canonical`+`test_tracking_sink`+`test_migrations`+`test_adapters` **124 passed**; `test_tracking_mirror` 42 skipped(DSN 없음, hosted에서 실행). `alembic upgrade head --sql` offline render OK(mlflow_mirror 57줄), `tools/migration_graph.py` head 단일 `0049_mlflow_mirror`.
 
-## 3. migration 번호·충돌
+## 3. migration 순서 (코디네이터 결정 2026-09-28 12:23 KST, v1.1 2026-09-28T12:24:55+09:00)
 
-integration head는 0046. PR #159(codex object-store)가 **0047·0048**을 이미 쓰므로 이 PR은 **0049**, `down_revision = 0046`. #159가 먼저 병합되면 이 PR의 `down_revision`을 `0048_object_store_locator`로 재지정(1줄), 이 PR이 먼저면 #159의 0047 `down_revision`을 0049로. 두 head 상태는 `tests/test_migrations.py`·`tools/migration_graph.py`가 거부하므로 조용히 지나가지 않는다.
+순서를 하나로 고정: **0047_audit_events_isolation(#128) → 0048_object_store_locator(#159) → 0049_mlflow_mirror(이 PR) → 0050(카드 be)**. 처음 push(head 44654021)는 `down_revision=0046`이었고 #128·#159가 먼저 병합되면 head가 둘로 갈라졌다. 조치: origin의 #159 head(`249b73e2`)를 이 branch에 **merge**(force-push 없음)하고 `down_revision`을 `0048_object_store_locator`로 변경. 충돌은 진행판·Claude 작업판 2개(양쪽 본문 모두 유지, version은 큰 쪽+1). PR base는 integration 그대로, **병합은 #159 뒤**. #159 head가 바뀌면 다시 merge한다. 확인: `tools/migration_graph.py` head 단일 `0049_mlflow_mirror`, `tests/test_migrations.py`.
 
 ## 4. 경계·다음
 

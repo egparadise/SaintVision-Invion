@@ -241,6 +241,14 @@ APPEND_ONLY_TABLES: tuple[str, ...] = (
     "mlflow_mirror_defects",
 )
 
+#: Append-only tables the application role may write but **not read**. Their
+#: tenant_id is nullable — an authentication failure may resolve to no tenant, and
+#: AC-02 requires keeping that record — so a tenant policy cannot cover every row
+#: and a reader scoped by tenant would miss exactly the rows that matter. Reading
+#: belongs to ``inv_audit_reader``; 0047_audit_events_isolation is the DDL, and
+#: the difference from APPEND_ONLY_TABLES is the withheld SELECT.
+AUDIT_TABLES: tuple[str, ...] = ("audit_events",)
+
 #: Tables whose *identity* is immutable but whose lifecycle advances. The
 #: application role gets column-level UPDATE on exactly these columns and no
 #: others, so content_sha256 and version cannot be rewritten while stage,
@@ -317,6 +325,7 @@ __all__ = [
     "RunRecordArtifact",
     "SNAPSHOT_SOFT_LIMIT_BYTES",
     "APPEND_ONLY_TABLES",
+    "AUDIT_TABLES",
     "ARTIFACT_STATUSES",
     "Approval",
     "Artifact",
