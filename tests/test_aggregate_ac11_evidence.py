@@ -21,6 +21,7 @@ SOURCE = "a" * 40
 TREE = "b" * 40
 TARGET = "c" * 40
 BLOB = "d" * 40
+REGISTRY_BLOB = tool.TARGET_REGISTRY_BLOB
 NOW = datetime(2026, 9, 28, 3, 0, tzinfo=timezone.utc)
 APPROVED_ALLOWLIST = json.loads(tool.DEFAULT_ALLOWLIST.read_text(encoding="utf-8"))
 TOOL_BLOBS = {
@@ -41,20 +42,22 @@ TARGET_CRITERIA = {
     )
     for axis in tool.REQUIRED_AXES
 }
+TARGET_ENVIRONMENTS = {
+    "target-" + axis: {"topology": "hosted-synthetic"}
+    for axis in tool.REQUIRED_AXES
+}
 
 
 class FakeGit:
     ancestor = True
-    target_blob = BLOB
-    source_blob = BLOB
+    target_blob = REGISTRY_BLOB
+    source_blob = REGISTRY_BLOB
     source_tree = TREE
 
     def tree(self, commit: str) -> str:
-        assert commit == SOURCE
         return self.source_tree
 
     def is_ancestor(self, ancestor: str, descendant: str) -> bool:
-        assert descendant == SOURCE
         return self.ancestor
 
     def blob(self, commit: str, path: str) -> str:
@@ -79,6 +82,7 @@ class FakeGit:
                         "blob": BLOB,
                     },
                     "criteria": criteria,
+                    "requiredEnvironment": TARGET_ENVIRONMENTS[target_id],
                 })
             return json.dumps({"schemaVersion": tool.SCHEMA_VERSION, "targets": targets})
         if path == "migrations/versions/0001_base.py":
@@ -97,7 +101,11 @@ def allowlist() -> dict:
     return json.loads(tool.DEFAULT_ALLOWLIST.read_text(encoding="utf-8"))
 
 
-def target(axis: str, criteria: dict | None = None) -> dict:
+def target(
+    axis: str,
+    criteria: dict | None = None,
+    required_environment: dict | None = None,
+) -> dict:
     actual = {} if axis == "security-critical-high-zero" else (
         criteria or {"sampleCount": {"operator": "gte", "value": 1}}
     )
@@ -105,10 +113,13 @@ def target(axis: str, criteria: dict | None = None) -> dict:
     if actual != TARGET_CRITERIA.get(target_id):
         target_id += "--" + str(len(TARGET_CRITERIA))
         TARGET_CRITERIA[target_id] = copy.deepcopy(actual)
+    TARGET_ENVIRONMENTS[target_id] = copy.deepcopy(
+        required_environment or {"topology": "hosted-synthetic"}
+    )
     return {
         "commit": TARGET,
         "path": tool.TARGET_REGISTRY_PATH,
-        "blob": BLOB,
+        "blob": REGISTRY_BLOB,
         "targetId": target_id,
         "criteria": actual,
     }
@@ -128,7 +139,10 @@ def envelope(axis: str, verdict: str = "MEASURED_PASS") -> dict:
         "artifactExpiresAt": "2030-01-01T00:00:00Z",
         "cleanCheckout": True,
         "runConclusion": "success",
-        "environment": {"comparableGroup": "hosted-ubuntu-pg16"},
+        "environment": {
+            "comparableGroup": "hosted-ubuntu-pg16",
+            "topology": "hosted-synthetic",
+        },
         "startedAt": "2026-09-28T01:00:00Z",
         "finishedAt": "2026-09-28T01:01:00Z",
         "targetRef": target(axis),
@@ -221,7 +235,12 @@ def manifest(allowlist: dict) -> dict:
     axes = []
     for axis in tool.REQUIRED_AXES:
         axes.append(security_envelope(allowlist) if axis == "security-critical-high-zero" else envelope(axis))
-    return {"schemaVersion": "1.0.0", "runPurpose": "ac11-release-gate", "axes": axes}
+    return {
+        "schemaVersion": "1.0.0",
+        "runPurpose": "ac11-release-gate",
+        "releaseSha": SOURCE,
+        "axes": axes,
+    }
 
 
 def axis_result(value: dict, allowlist: dict, git: FakeGit | None = None) -> tool.AxisResult:
@@ -296,6 +315,94 @@ def test_target_must_be_ancestor_and_same_blob(allowlist):
     git.ancestor = True
     git.source_blob = "f" * 40
     assert axis_result(envelope(tool.REQUIRED_AXES[1]), allowlist, git).verdict is tool.Verdict.INVALID_RUN
+
+
+def test_registry_blob_is_pinned_not_merely_stable_on_branch(allowlist):
+    loose_blob = "9" * 40
+
+    class LooseRegistryGit(FakeGit):
+        target_blob = loose_blob
+        source_blob = loose_blob
+
+    value = envelope(tool.REQUIRED_AXES[1])
+    value["targetRef"]["blob"] = loose_blob
+    assert axis_result(value, allowlist, LooseRegistryGit()).verdict is tool.Verdict.INVALID_RUN
+
+
+def test_release_sha_binds_every_axis_to_one_release(allowlist):
+    value = manifest(allowlist)
+    value["axes"][0]["sourceHeadSha"] = "f" * 40
+    result = tool.aggregate(value, FakeGit(), allowlist, NOW)
+    assert result["verdict"] == "INVALID_RUN"
+    assert "sourceHeadSha differs from releaseSha" in result["reasons"][0]
+
+    missing = manifest(allowlist)
+    missing.pop("releaseSha")
+    result = tool.aggregate(missing, FakeGit(), allowlist, NOW)
+    assert result["verdict"] == "INVALID_RUN"
+    assert "releaseSha" in result["reasons"][0]
+
+
+@pytest.mark.parametrize(
+    ("axis", "required_environment", "wrong_environment"),
+    [
+        (
+            "physical-five-node-ac05-placement-load",
+            {"topology": "physical-five-node", "eligibleNodeCount": 4, "excludedNodeCount": 1},
+            {"topology": "hosted-synthetic", "eligibleNodeCount": 0, "excludedNodeCount": 0},
+        ),
+        (
+            "actual-pitr-rpo-rto-retention",
+            {
+                "topology": "physical",
+                "failureDomain": "separate",
+                "archiveKind": "operational",
+                "sameHost": False,
+            },
+            {
+                "topology": "same-host",
+                "failureDomain": "same",
+                "archiveKind": "logical-dump",
+                "sameHost": True,
+            },
+        ),
+    ],
+)
+def test_target_environment_class_rejects_synthetic_substitution(
+    axis, required_environment, wrong_environment, allowlist
+):
+    value = envelope(axis)
+    value["targetRef"] = target(
+        axis,
+        {"sampleCount": {"operator": "gte", "value": 1}},
+        required_environment,
+    )
+    value["environment"] = {"comparableGroup": "untrusted", **wrong_environment}
+    result = axis_result(value, allowlist)
+    assert result.verdict is tool.Verdict.INVALID_RUN
+    assert "registered requirement" in result.reasons[0]
+
+
+def test_repository_registry_targets_match_current_tree_and_pitr_is_weekly_registered():
+    registry_path = ROOT / tool.TARGET_REGISTRY_PATH
+    content = registry_path.read_bytes()
+    actual_blob = __import__("hashlib").sha1(
+        f"blob {len(content)}\0".encode() + content
+    ).hexdigest()
+    assert actual_blob == tool.TARGET_REGISTRY_BLOB
+
+    registry = json.loads(content.decode("utf-8"))
+    git = tool.RepositoryGit(ROOT)
+    for registered in registry["targets"]:
+        document = registered["sourceDocument"]
+        assert git.blob("HEAD", document["path"]) == document["blob"]
+
+    pitr = next(row for row in registry["targets"] if row["targetId"] == "s11-actual-pitr-v0")
+    assert pitr["criteria"]["consecutiveWeeklyRestoreSmokeWeeks"] == {
+        "operator": "gte",
+        "value": 2,
+    }
+    assert pitr["criteria"]["maxRestoreSmokeGapDays"] == {"operator": "lte", "value": 7}
 
 
 def test_empty_n_and_bad_failure_denominator_are_invalid(allowlist):

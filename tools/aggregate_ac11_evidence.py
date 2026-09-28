@@ -32,6 +32,7 @@ DEFAULT_ALLOWLIST = (
     ROOT / ALLOWLIST_REPO_PATH
 )
 TARGET_REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
+TARGET_REGISTRY_BLOB = "34c975cba77fada5abfd5afd025f411fa85bddfa"
 ALLOWLIST_BLOB = "ff2f9966956da677ebcdee92ec1de2292bd5ec52"
 ALLOWLIST_CANONICAL_SHA256 = "b73aba8ff97443bbd1e314d5ca0375fdcbce8205a1a746bc5a73759a04083707"
 SCHEMA_VERSION = "1.0.0"
@@ -206,7 +207,9 @@ def _load_json_from_git(git: GitReader, commit: str, path: str, label: str) -> d
     return value
 
 
-def _validate_target(target: Any, axis: str, source: str, git: GitReader) -> dict[str, Any]:
+def _validate_target(
+    target: Any, axis: str, source: str, git: GitReader
+) -> tuple[dict[str, Any], dict[str, Any]]:
     if not isinstance(target, dict):
         raise ValueError("targetRef is required")
     required = {"commit", "path", "blob", "targetId", "criteria"}
@@ -217,6 +220,8 @@ def _validate_target(target: Any, axis: str, source: str, git: GitReader) -> dic
         raise ValueError("targetRef path is not the AC-11 target registry")
     if not SHA1_RE.fullmatch(commit) or not SHA1_RE.fullmatch(blob):
         raise ValueError("targetRef contains an invalid commit, path or blob")
+    if blob != TARGET_REGISTRY_BLOB:
+        raise ValueError("target registry blob is not the reviewed registry")
     if not git.is_ancestor(commit, source):
         raise ValueError("targetRef commit is not an ancestor of sourceHeadSha")
     if git.blob(commit, path) != blob or git.blob(source, path) != blob:
@@ -229,7 +234,9 @@ def _validate_target(target: Any, axis: str, source: str, git: GitReader) -> dic
     if len(matches) != 1:
         raise ValueError("targetId is absent or duplicated in target registry")
     registered = matches[0]
-    if set(registered) != {"targetId", "axis", "sourceDocument", "criteria"} or registered["axis"] != axis:
+    if set(registered) != {
+        "targetId", "axis", "sourceDocument", "criteria", "requiredEnvironment"
+    } or registered["axis"] != axis:
         raise ValueError("target registry entry does not bind the requested axis")
     source_document = registered["sourceDocument"]
     if not isinstance(source_document, dict) or set(source_document) != {"commit", "path", "blob"}:
@@ -247,7 +254,10 @@ def _validate_target(target: Any, axis: str, source: str, git: GitReader) -> dic
         raise ValueError("targetRef criteria must be an object")
     if target["criteria"] != registered["criteria"]:
         raise ValueError("targetRef criteria differ from the registered Git target")
-    return registered["criteria"]
+    required_environment = registered["requiredEnvironment"]
+    if not isinstance(required_environment, dict) or not required_environment:
+        raise ValueError("target requiredEnvironment must be a non-empty object")
+    return registered["criteria"], required_environment
 
 
 def _validate_common(
@@ -293,7 +303,15 @@ def _validate_common(
     if isinstance(residue, bool) or not isinstance(residue, int) or residue < 0:
         raise ValueError("cleanup.residueCount must be a non-negative integer")
     target = envelope.get("targetRef")
-    criteria = None if target is None else _validate_target(target, str(envelope.get("axis", "")), source, git)
+    if target is None:
+        criteria = None
+    else:
+        criteria, required_environment = _validate_target(
+            target, str(envelope.get("axis", "")), source, git
+        )
+        for name, expected in required_environment.items():
+            if name not in environment or environment[name] != expected:
+                raise ValueError(f"environment does not satisfy registered requirement: {name}")
     return producer, criteria, source
 
 
@@ -728,6 +746,9 @@ def aggregate(manifest: dict[str, Any], git: GitReader, allowlist: dict[str, Any
         invalid_top.append("unknown release manifest schemaVersion")
     if manifest.get("runPurpose") != RUN_PURPOSE:
         invalid_top.append("unknown release manifest runPurpose")
+    release_sha = manifest.get("releaseSha")
+    if not isinstance(release_sha, str) or not SHA1_RE.fullmatch(release_sha):
+        invalid_top.append("releaseSha must be a full Git SHA")
     rows = manifest.get("axes")
     if not isinstance(rows, list):
         invalid_top.append("axes must be a list")
@@ -741,6 +762,16 @@ def aggregate(manifest: dict[str, Any], git: GitReader, allowlist: dict[str, Any
         invalid_top.append("missing required axes: " + ", ".join(missing))
     if len(results) != len(rows):
         invalid_top.append("axis entries must be objects")
+    if isinstance(release_sha, str) and SHA1_RE.fullmatch(release_sha):
+        mismatched = sorted(
+            str(row.get("axis", "<missing>"))
+            for row in rows
+            if isinstance(row, dict) and row.get("sourceHeadSha") != release_sha
+        )
+        if mismatched:
+            invalid_top.append(
+                "axis sourceHeadSha differs from releaseSha: " + ", ".join(mismatched)
+            )
     if invalid_top:
         overall = Verdict.INVALID_RUN
     elif any(result.verdict is Verdict.INVALID_RUN for result in results):

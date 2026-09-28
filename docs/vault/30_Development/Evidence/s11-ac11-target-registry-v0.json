@@ -14,6 +14,11 @@
         "determinismMismatchCount": {"operator": "eq", "value": 0},
         "requestP95Ms": {"operator": "lte", "value": 2000},
         "reservationOverflowCount": {"operator": "eq", "value": 0}
+      },
+      "requiredEnvironment": {
+        "topology": "physical-five-node",
+        "eligibleNodeCount": 4,
+        "excludedNodeCount": 1
       }
     },
     {
@@ -25,20 +30,32 @@
         "blob": "4cf99daa4156e852448b61040f3085977cc3e2d8"
       },
       "criteria": {
+        "consecutiveWeeklyRestoreSmokeWeeks": {"operator": "gte", "value": 2},
+        "maxRestoreSmokeGapDays": {"operator": "lte", "value": 7},
         "retentionDays": {"operator": "gte", "value": 35},
         "rpoSeconds": {"operator": "lte", "value": 900},
         "rtoSeconds": {"operator": "lte", "value": 3600}
+      },
+      "requiredEnvironment": {
+        "topology": "physical",
+        "failureDomain": "separate",
+        "archiveKind": "operational",
+        "sameHost": false
       }
     },
     {
       "targetId": "s11-security-critical-high-zero-v0",
       "axis": "security-critical-high-zero",
       "sourceDocument": {
-        "commit": "1e8baf045c5a554209aaef601ae4883b64da50a7",
-        "path": "docs/vault/30_Development/Sprints/S11 릴리스 후보.md",
-        "blob": "8751a17309ab40ed0ff4323382563055f3ac1548"
+        "commit": "c62cb671692479b0ee2bc2cc8a12d3c10587174b",
+        "path": "docs/vault/30_Development/Evidence/s11-security-allowlist-v0.json",
+        "blob": "ff2f9966956da677ebcdee92ec1de2292bd5ec52"
       },
-      "criteria": {}
+      "criteria": {},
+      "requiredEnvironment": {
+        "topology": "hosted",
+        "evidenceClass": "security-tools-v0"
+      }
     }
   ]
 }
