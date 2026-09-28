@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-2026-09-28-S03-ST-EVIDENCE-MAP"
-title: "S03-ST Evidence 대응표 — 볼륨·Artifact 전송·checksum·허용/거부 기록·exit code/증거 ID 대응, S3는 #149/#159 인용, 공백 G1 Windows 게이트·G2 #159·G3 F-S02-01·외부 1, 구현 추가 0 (카드 az, docs-only)"
-version: "1.0.0"
+title: "S03-ST Evidence 대응표 — 볼륨·Artifact 전송·checksum·허용/거부 기록·exit code/증거 ID 대응, S3는 #149/#159 인용, 공백 G1 Windows 게이트·G2 #159·G3 F-S02-01 = PR #128 승인·병합 대기·외부 1, 구현 추가 0 (카드 az, docs-only)"
+version: "1.1.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T10:51:32+09:00"
+updated: "2026-09-28T10:56:37+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -24,8 +24,12 @@ tags: ["S03-ST", "AC-03", "evidence", "claude", "docs-only"]
 ## 2. 결과
 
 - 대응: Workspace 볼륨 4·Artifact 업로드/다운로드 5·checksum 4·허용/거부 기록 5·exit code/증거 ID 4 항목을 file:line + run ID로 대응.
-- 공백: G1 `test_results.py` Windows 게이트 → NOT_OBSERVED(로컬)·hosted 실행; G2 S3 제품 경로 → #159 검토 중(인용만); G3 `public.audit_events` RLS → F-S02-01 별도 카드; E1 실 5노드 전송 → BLOCKED_EXTERNAL.
+- 공백: G1 `test_results.py` Windows 게이트 → NOT_OBSERVED(로컬)·hosted 실행; G2 S3 제품 경로 → #159 검토 중(인용만); G3 `public.audit_events` RLS → F-S02-01은 PR #128(head 4c78afc6, 0047_audit_events_isolation) 승인·병합 대기(base 미착지라 base 기준 공백; #159는 #128에 선행 의존); E1 실 5노드 전송 → BLOCKED_EXTERNAL.
 - 작은 PG-free 시험으로 메울 행동 공백 없음 → docs-only. 판정 논리 복제 없음.
+
+## 2b. Codex 검토 반영(#163 코멘트)
+
+G3/F-S02-01을 '별도 카드·배정 대기'로 적은 것은 사실과 달랐다 — PR #128이 이미 구현·Codex 보안 재검토 승인·hosted Backend 검증을 마치고 병합 대기이며 #159가 그에 선행 의존한다. 대응표 결론·G3 행·§3, 이 History, 진행판 문구를 정정(v1.1). 코드·시험 변경 0.
 
 ## 3. 게이트·인계
 

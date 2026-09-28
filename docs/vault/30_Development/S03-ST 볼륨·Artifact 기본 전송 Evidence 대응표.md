@@ -1,11 +1,11 @@
 ---
 doc_id: "CLAUDE-S03-ST-EVIDENCE-MAP-001"
 title: "S03-ST 볼륨·Artifact 기본 전송 Evidence 대응표 — Workspace 볼륨·Artifact 업로드/다운로드·checksum 검증·허용/거부 기록·exit code·증거 ID를 기존 코드·시험·hosted run에 file:line과 run ID로 대응, S3 ObjectStore는 #149/#159 인용, 공백 NOT_OBSERVED 1·설계/타 PR 2·BLOCKED_EXTERNAL 1 (구현 추가 0, 카드 az)"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T10:51:32+09:00"
+updated: "2026-09-28T10:56:37+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -15,7 +15,7 @@ tags: ["S03-ST", "AC-03", "evidence", "workspace", "artifact", "checksum", "audi
 
 # S03-ST Evidence 대응표 (2026-09-28, 카드 az)
 
-task-registry S03-ST: scope "볼륨·Artifact 기본 전송", evidence "허용·거부 로그·exit code·증거 ID", AC-03 "허용 실행 성공, 금지 경로/명령 차단, 종료 후 자원 회수". 원칙은 #155·#160·#161과 같다: 이미 있는 것을 file:line·run ID로 대응하고 공백만 골라낸다, 관측 안 된 값은 NOT_OBSERVED, 판정 논리 복제 없음. S3 ObjectStore와 겹치는 부분은 **#149(v1 승인)·#159(v2 검토 중)를 인용**하고 새로 만들지 않는다. 결론 먼저 — **다섯 범위 모두 코드·시험·hosted lane이 있다(#121 S03 collector가 AC-03 4조항으로 매핑). 이 PR은 대응표만 담는다(구현·시험 추가 0). 공백은 Windows 로컬의 Linux 게이트(NOT_OBSERVED) 1, S3 제품 경로(#159 검토 중)·`public.audit_events` RLS(F-S02-01 별도 카드) 2, 실 5노드 전송(BLOCKED_EXTERNAL) 1.**
+task-registry S03-ST: scope "볼륨·Artifact 기본 전송", evidence "허용·거부 로그·exit code·증거 ID", AC-03 "허용 실행 성공, 금지 경로/명령 차단, 종료 후 자원 회수". 원칙은 #155·#160·#161과 같다: 이미 있는 것을 file:line·run ID로 대응하고 공백만 골라낸다, 관측 안 된 값은 NOT_OBSERVED, 판정 논리 복제 없음. S3 ObjectStore와 겹치는 부분은 **#149(v1 승인)·#159(v2 검토 중)를 인용**하고 새로 만들지 않는다. 결론 먼저 — **다섯 범위 모두 코드·시험·hosted lane이 있다(#121 S03 collector가 AC-03 4조항으로 매핑). 이 PR은 대응표만 담는다(구현·시험 추가 0). 공백은 Windows 로컬의 Linux 게이트(NOT_OBSERVED) 1, S3 제품 경로(#159 검토 중, #128에 선행 의존)·`public.audit_events` RLS(F-S02-01 = PR #128 승인·병합 대기, base 미착지) 2, 실 5노드 전송(BLOCKED_EXTERNAL) 1.**
 
 ## 0. 인용 run·근거
 
@@ -64,7 +64,7 @@ task-registry S03-ST: scope "볼륨·Artifact 기본 전송", evidence "허용·
 | 샌드박스 필수 capability(`network_deny`·`read_only_root`·`cap_drop_all`…) 없으면 실행 거부 | `inv/sandbox.py:14-28 REQUIRED_CAPABILITIES`, `:33 SandboxProfile`, `:81 RuntimeCapabilities`, `:106 compile_launch` | `tests/core/test_sandbox_contracts.py` 5 · `tests/test_execution.py` 25 | Backend | 관측됨 |
 | 격리·물리 정리(containment) | `inv/containment.py:15 require_execution`, `:55 Containment`, `:204 ContainmentReconciler` | `tests/integration/test_containment.py` 23 함수(Core 28 케이스) | Core `containment-tests.xml` 28/28 | 관측됨 |
 | 거부·인증 실패의 audit 기록(redaction, 트랜잭션 밖 기록) | `src/saintvision/services/audit.py:47 redact`, `:66 record_event`, `:106 record_denial_out_of_band` | `tests/test_api.py`(denials_are_recorded 등, #120 S02 collector 조항) · `tests/test_database.py` · `tests/integration/test_definer_audit.py` 8 | Backend | 관측됨 |
-| `public.audit_events`의 RLS ENABLE+FORCE | — | `tools/collect_rls_evidence.py` E2 위반 1(#120 evidence) | Backend | **F-S02-01 별도 카드**(Codex 판정: baseline 수용 기각, RLS+audit writer/reader 역할) |
+| `public.audit_events`의 RLS ENABLE+FORCE | — | `tools/collect_rls_evidence.py` E2 위반 1(#120 evidence) | Backend | **PR #128 승인·병합 대기**(head `4c78afc6`, `0047_audit_events_isolation`; Codex 보안 재검토 승인·hosted Backend 검증 완료. 통합 base `1e8baf04`에는 미착지라 base 기준으로는 공백, 착지 시 해소. #159는 #128에 **선행 의존**하며 그 내용을 포함) |
 
 ### 1.5 exit code·증거 ID
 
@@ -81,11 +81,11 @@ task-registry S03-ST: scope "볼륨·Artifact 기본 전송", evidence "허용·
 |---|---|---|---|
 | G1 | `test_results.py` 14 케이스(RunRecord 완료·실 출력 바이트)가 Windows(이 PC)에서 Linux 사설 스토리지 게이트로 skip | **NOT_OBSERVED(로컬)** | hosted Core/Backend(ubuntu)에서 실행됨; 로컬에서 메울 도구 없음(#131·#161과 동일 판단) |
 | G2 | S3 ObjectStore 제품 경로(provider identity·read ticket·MinIO hosted) | **#159 검토 중** | #149 v1 승인·#159 v2 Codex 검토 — 이 문서는 인용만, 새로 만들지 않음 |
-| G3 | `public.audit_events` RLS ENABLE+FORCE 부재(허용·거부 로그 테이블의 tenant 경계) | **별도 카드(F-S02-01)** | #120 evidence E2 위반 1; Codex가 baseline 수용을 기각하고 RLS + 별도 writer/reader 역할 + 시험 4종을 요구 — 코디네이터 배정 대기 |
+| G3 | `public.audit_events` RLS ENABLE+FORCE 부재(허용·거부 로그 테이블의 tenant 경계) | **PR #128 승인·병합 대기**(head `4c78afc6`, `0047_audit_events_isolation`; Codex 보안 재검토 승인·hosted Backend 검증 완료. 통합 base `1e8baf04`에는 미착지라 base 기준으로는 공백, 착지 시 해소. #159는 #128에 **선행 의존**하며 그 내용을 포함) | #120 evidence E2 위반 1(base 시점). F-S02-01은 PR #128이 `0047_audit_events_isolation`으로 구현·검증 완료, 병합 대기. #159(S3 v2)는 #128 다음에 병합되는 선행 의존 관계 |
 | E1 | 실 5노드 Node→CP Artifact 전송·볼륨 마운트 | **BLOCKED_EXTERNAL** | 물리 PC(ADR-100: Ubuntu worker 3 등록·CP 겸임 BLOCKED); hosted는 synthetic Node·컨테이너 |
 
 작은 PG-free 불변식 시험으로 메울 행동 공백은 **없다**: 허용/거부·exit code·증거 ID·checksum·볼륨 보존이 전부 기존 시험(Backend·Core)으로 단언된다. 따라서 docs-only.
 
 ## 3. 경계
 
-로컬 실 PG·Docker·전체 suite·무거운 명령 없음(메모리 0.6GB). 판정 논리 복제 없음. owner Claude / reviewer Codex / 병합 금지. worktree 재사용, branch `agent/claude/s03-st-evidence-map`, base `1e8baf04`. S03-ST `planned` 유지. 다음 첫 행동: Codex 검토 → G2는 #159, G3는 F-S02-01 카드.
+로컬 실 PG·Docker·전체 suite·무거운 명령 없음(메모리 0.6GB). 판정 논리 복제 없음. owner Claude / reviewer Codex / 병합 금지. worktree 재사용, branch `agent/claude/s03-st-evidence-map`, base `1e8baf04`. S03-ST `planned` 유지. 다음 첫 행동: Codex 검토 → G3는 PR #128 병합(선행) → G2 #159 병합 순.
