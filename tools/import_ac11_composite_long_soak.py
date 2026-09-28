@@ -58,6 +58,22 @@ FAULT_CLASSES = (
     "WAN_PATH_UNAVAILABLE", "WAN_RECOVERY_TIMEOUT", "WS_CONNECT_FAILED",
     "WS_FRAME_MISMATCH", "WS_RECONNECT_TIMEOUT", "WS_REPLAY_ACCEPTED",
 )
+ALLOWED_FAULT_CLASSES_BY_PREFIX = {
+    "HOSTED-DRIFT-01": {"STORAGE_REFERENCE_FAILED"},
+    "NTP-01": {"CLOCK_SKEW_EXCEEDED", "CLOCK_SYNC_UNAVAILABLE", "TELEMETRY_GAP"},
+    "NTP-02": {"CLOCK_SKEW_EXCEEDED", "CLOCK_SYNC_UNAVAILABLE", "TELEMETRY_GAP"},
+    "POWER-01": {"POWER_RECOVERY_TIMEOUT", "POWER_UNEXPECTED_LOSS", "IDENTITY_DRIFT", "COMMITTED_DATA_LOSS", "TELEMETRY_GAP"},
+    "POWER-02": {"POWER_RECOVERY_TIMEOUT", "POWER_UNEXPECTED_LOSS", "PROCESS_RESTART_UNEXPECTED", "COMMITTED_DATA_LOSS", "TELEMETRY_GAP"},
+    "STORAGE-01": {"STORAGE_REFERENCE_FAILED", "COMMITTED_DATA_LOSS"},
+    "SWITCH-01": {"SWITCH_PATH_UNAVAILABLE", "SWITCH_RECOVERY_TIMEOUT", "TELEMETRY_GAP"},
+    "SWITCH-02": {"SWITCH_PATH_UNAVAILABLE", "SWITCH_RECOVERY_TIMEOUT", "TELEMETRY_GAP"},
+    "THERM-01": {"THERMAL_CRITICAL", "THERMAL_THROTTLE", "TELEMETRY_GAP"},
+    "TOP-01": {"IDENTITY_DRIFT", "TELEMETRY_GAP"},
+    "WAN-01": {"WAN_PATH_UNAVAILABLE", "WAN_RECOVERY_TIMEOUT", "TELEMETRY_GAP"},
+    "WAN-02": {"WAN_PATH_UNAVAILABLE", "WAN_RECOVERY_TIMEOUT", "TELEMETRY_GAP"},
+    "WS-01": {"WS_CONNECT_FAILED", "WS_FRAME_MISMATCH", "WS_REPLAY_ACCEPTED", "TELEMETRY_GAP"},
+    "WS-02": {"WS_CONNECT_FAILED", "WS_FRAME_MISMATCH", "WS_RECONNECT_TIMEOUT", "WS_REPLAY_ACCEPTED", "TELEMETRY_GAP"},
+}
 
 
 class EvidenceImportError(ValueError):
@@ -213,7 +229,15 @@ def import_report(
 ) -> dict[str, Any]:
     if not isinstance(report, dict):
         raise EvidenceImportError("physical report must be an object")
-    status = readiness(str(report.get("sourceHeadSha", "")), set(report.get("operatorResources", [])), git)
+    resource_values = report.get("operatorResources")
+    if (
+        not isinstance(resource_values, list)
+        or any(not isinstance(value, str) for value in resource_values)
+        or len(set(resource_values)) != len(resource_values)
+        or not set(resource_values).issubset(REQUIRED_RESOURCES)
+    ):
+        raise EvidenceImportError("operatorResources must be the unique registered G-19/G-24 identifiers")
+    status = readiness(str(report.get("sourceHeadSha", "")), set(resource_values), git)
     if status["verdict"] != "NOT_OBSERVED":
         return status
     target = _load_target(git, report["sourceHeadSha"])
@@ -253,6 +277,7 @@ def import_report(
         raise EvidenceImportError("physical cases are missing or duplicated")
     seen: set[str] = set()
     unclassified = 0
+    failed_case_count = 0
     for case in cases:
         if not isinstance(case, dict) or set(case) != {"caseIdentity", "verdict", "faultClass"}:
             raise EvidenceImportError("physical case shape is invalid")
@@ -264,6 +289,14 @@ def import_report(
             raise EvidenceImportError("passing case cannot carry a fault class")
         if case["verdict"] == "FAIL" and case["faultClass"] not in FAULT_CLASSES:
             raise EvidenceImportError("failed case has an unknown fault class")
+        prefix = str(identity).split("/", 1)[0]
+        if (
+            case["verdict"] == "FAIL"
+            and case["faultClass"] != "UNCLASSIFIED"
+            and case["faultClass"] not in ALLOWED_FAULT_CLASSES_BY_PREFIX[prefix]
+        ):
+            raise EvidenceImportError("failed case fault class does not match its identity")
+        failed_case_count += int(case["verdict"] == "FAIL")
         unclassified += int(case["faultClass"] == "UNCLASSIFIED")
     if seen != set(CASE_IDENTITIES):
         raise EvidenceImportError("physical case universe is incomplete")
@@ -305,6 +338,8 @@ def import_report(
         or (rule["operator"] == "lte" and metrics[name] > rule["value"])
         for name, rule in criteria.items()
     )
+    if failed_case_count and not failed:
+        raise EvidenceImportError("failed physical case has no failed registered criterion")
     return {
         "schemaVersion": SCHEMA_VERSION, "runPurpose": "ac11-axis-evidence", "axis": AXIS,
         "sourceRunId": report["sourceRunId"], "sourceHeadSha": report["sourceHeadSha"],

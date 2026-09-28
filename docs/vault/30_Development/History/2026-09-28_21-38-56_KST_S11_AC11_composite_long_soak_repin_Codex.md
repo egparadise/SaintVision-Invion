@@ -25,7 +25,7 @@ tags: ["S11", "AC-11", "long-soak", "registry", "importer"]
 
 ## 검증
 
-- `python -m pytest -q tests/test_import_ac11_composite_long_soak.py tests/test_aggregate_ac11_evidence.py tests/test_import_ac11_migration_rehearsal.py` → **92 passed**, exit 0.
+- `python -m pytest -q tests/test_import_ac11_composite_long_soak.py tests/test_aggregate_ac11_evidence.py tests/test_import_ac11_migration_rehearsal.py` → **95 passed**, exit 0. 닫힌 operator resource, case별 fault-class 결속, 실패 case를 통과 metric으로 숨기는 변이도 포함한다.
 - `python -m py_compile tools/import_ac11_composite_long_soak.py tools/aggregate_ac11_evidence.py tools/import_ac11_migration_rehearsal.py` → exit 0.
 - registry와 applied patch JSON을 `python -m json.tool`로 각각 검증 → exit 0.
 - `python tools/check_docs.py` → exit 0 (24 original hashes, 934 versioned documents, 48 tasks).

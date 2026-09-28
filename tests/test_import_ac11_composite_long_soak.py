@@ -171,6 +171,7 @@ def test_absent_registry_target_is_not_registered() -> None:
         (lambda r, s, h: r["caseIdentities"].pop(), "case identities"),
         (lambda r, s, h: r["cases"].__setitem__(1, copy.deepcopy(r["cases"][0])), "identity or verdict"),
         (lambda r, s, h: r["cases"][0].update(verdict="FAIL", faultClass="UNKNOWN"), "unknown fault class"),
+        (lambda r, s, h: r["cases"][1].update(verdict="FAIL", faultClass="THERMAL_CRITICAL"), "does not match"),
         (lambda r, s, h: r["environment"].update(eligibleNodeCount=5), "physical environment"),
         (lambda r, s, h: s.update(sourceHeadSha="f" * 40), "same run window"),
         (lambda r, s, h: h.update(sourceHeadSha="f" * 40), "same-source reference"),
@@ -191,6 +192,20 @@ def test_child_digest_substitution_fails_closed() -> None:
     report, storage, hosted = _fixture()
     storage["artifactSha256"] = "0" * 64
     with pytest.raises(EvidenceImportError, match="storage reference digest"):
+        import_report(report, storage, hosted, FakeGit())
+
+
+def test_failed_case_cannot_be_hidden_by_passing_metrics() -> None:
+    report, storage, hosted = _fixture()
+    report["cases"][1].update(verdict="FAIL", faultClass="CLOCK_SYNC_UNAVAILABLE")
+    with pytest.raises(EvidenceImportError, match="no failed registered criterion"):
+        import_report(report, storage, hosted, FakeGit())
+
+
+def test_operator_resource_identifiers_are_closed() -> None:
+    report, storage, hosted = _fixture()
+    report["operatorResources"].append("G-999")
+    with pytest.raises(EvidenceImportError, match="operatorResources"):
         import_report(report, storage, hosted, FakeGit())
 
 
