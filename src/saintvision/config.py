@@ -62,6 +62,10 @@ class Settings:
     page_limit_max: int = 200
     #: Idempotency ledger retention.
     idempotency_ttl_seconds: int = 86_400
+    #: ``SET LOCAL lock_timeout`` for the business lane's write transactions
+    #: (G-04 §5-3). Ordinary contention waits and proceeds on the committed
+    #: row; a wait past this budget is answered ``SYS-0001/503/retryable``.
+    business_lock_timeout_ms: int = 5_000
     #: Base URL of the execution kernel, for the observations business routes
     #: read back over HTTP (VF-CL-03). Absent is a valid deployment: a route
     #: that needs an observation then refuses with 503 rather than guessing a
@@ -102,6 +106,7 @@ class Settings:
             page_limit_default=_get_int("INV_PAGE_LIMIT_DEFAULT", 50),
             page_limit_max=_get_int("INV_PAGE_LIMIT_MAX", 200),
             idempotency_ttl_seconds=_get_int("INV_IDEMPOTENCY_TTL_SECONDS", 86_400),
+            business_lock_timeout_ms=_get_int("INV_BUSINESS_LOCK_TIMEOUT_MS", 5_000),
             tenant_id=os.environ.get("INV_TENANT_ID"),
             oidc_issuer=os.environ.get("INV_OIDC_ISSUER"),
             oidc_audience=os.environ.get("INV_OIDC_AUDIENCE"),
