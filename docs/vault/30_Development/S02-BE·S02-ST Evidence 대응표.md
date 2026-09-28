@@ -1,11 +1,11 @@
 ---
 doc_id: "CLAUDE-S02-BE-ST-EVIDENCE-MAP-001"
 title: "S02-BE·S02-ST Evidence 대응표 — OIDC·mTLS 등록·Heartbeat와 제공 폴더·DataLocation 카탈로그를 실제 API·브라우저 여정·인증 실패 기록(#120 collector·#125/#138 체크리스트·VF-CL-01 카탈로그·S02-FE Chrome 실측·#134 파일럿 3노드)에 file:line과 run ID로 대응, 사용자 입력 U1~U6·외부는 BLOCKED_EXTERNAL (구현 추가 0, 카드 ba)"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T10:58:33+09:00"
+updated: "2026-09-28T11:07:37+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -32,10 +32,10 @@ task-registry: S02-BE scope "OIDC·mTLS 등록·Heartbeat", S02-ST scope "제공
 
 | lane / 근거 | run / head | 결과 |
 |---|---|---|
-| Backend | **36351202242** `a0dab579`(#125 = base 집합) | 2929 passed / 47 skipped / 0 failed — `tests/test_api.py` 28·`tests/core/test_identity.py` 10·`test_node_tls.py` 8·`test_discovery_response_contract.py` 4·`tests/integration/test_storage_catalog_api.py` 8·`test_discovery_machine_credentials.py` 5·`tests/core/test_lan_storage.py` 6·`tests/test_lan_pilot_multinode.py` 13 포함 |
-| Backend(#120) | **36351674808** `fc0bf0ce` | S02 collector 실PG 1회: API 28 passed·AC-02 4/4·RLS VIOLATIONS 1(E2 audit_events) → 묶음 FAIL(acceptanceClaim=false); evidence `Evidence/s02-db-acceptance/s02-acceptance-fc0bf0ceb590-20260927.*`(#120 브랜치) |
+| Backend | **36351202242** head `a0dab579b188`(#125 = base 집합; `gh run view --json headSha`) | 3.12·3.14 각각 **2929 passed / 47 skipped / 2 deselected / 0 failed** — `tests/test_api.py` 28·`tests/core/test_identity.py` 10·`test_node_tls.py` 8·`test_discovery_response_contract.py` 4·`tests/integration/test_storage_catalog_api.py` 8·`test_discovery_machine_credentials.py` 5·`tests/core/test_lan_storage.py` 6·`tests/test_lan_pilot_multinode.py` 13 포함 |
+| Backend(#120) | **36351674808** head `11dc816241fb`(run SHA; `gh run view --json headSha`) | 3.12·3.14 각각 **2955 passed / 47 skipped / 2 deselected / 0 failed**. 별도로, #120 브랜치에 커밋된 collector 산출물의 `codeSha`는 그 앞 커밋 `fc0bf0ceb590`(로컬 단일 invocation, run SHA와 다름). S02 collector 실PG 1회: API 28 passed·AC-02 4/4·RLS VIOLATIONS 1(E2 audit_events) → 묶음 FAIL(acceptanceClaim=false); evidence `Evidence/s02-db-acceptance/s02-acceptance-fc0bf0ceb590-20260927.*`(#120 브랜치) |
 | desktop-browser | **36364528322** `30f5ca83`(#153) | pass — 실 브라우저 여정 5(quorum snapshot·stale run/revoked review·catalogue owner scope/revocation·committed model/current permission·full studio login→approval→logout), `desktop-browser.yml:57-77` 집합 고정 |
-| Core | **36353272311** `bc27588d` | `lan-installer-tests.xml` 15/15(`test_lan_storage_install`+`test_workspace_upgrade`), core-tests 3253/0 failed |
+| Core | **36353272311** head `bc27588d2139` | `lan-installer-tests.xml` **15 passed / 0 skipped / 0 failed**(`test_lan_storage_install`+`test_workspace_upgrade`), main `core-tests.xml` **3236 passed / 17 skipped / 2 deselected / 0 failed**(skip은 pass에 합산하지 않음) |
 | S02-FE 실측(Gemini) | [[2026-09-23_S02-FE_실제API_Chrome_로그인_Node0대_401_403_수용실측_Gemini]] · 독립검토 [[2026-09-23_PR77_S02-FE_실제API_Chrome_독립검토_Claude]] | Headless Chrome 153, 실 Uvicorn 8080·Dev IdP 8090(실 OIDC `/auth/authorize`·`/auth/token`·JWKS): 로그인 성공·Node 0대 정직 표기·미인가 프로젝트 403 `AUTH-0030`·토큰 만료 401 `AUTH-0050` 재로그인 — 정본 `Evidence/s02_fe_real_api_acceptance.json` |
 | LAN 파일럿 | #134 v0.2(`28e8836e`) · [[2026-09-23_06-15-00_KST_LAN-PILOT-CP-COLOCATED_Codex_구현]] | Ubuntu worker 3 등록(online 2·offline 1, CP 관측 skew −0.05/−0.08 s), state 내부 CA로 CSR enroll(`tools/lan_pilot.py enroll`), CP 겸임 BLOCKED(API 1.41) |
 | 체크리스트 | #125 v1.2(`a0dab579`) · #138(§7 configuration-readiness route) | 표면 분리: core API `/v1/health`·`/v1/readiness`(`src/saintvision/api/app.py:141~151`) vs 운영 factory `/readyz`·`/v1/session`(`inv/app.py:272,:297`) |
