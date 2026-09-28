@@ -225,3 +225,25 @@ def test_a_non_member_of_an_existing_project_is_403_not_404(owner_engine, app_en
     run_id, _ = _sealed_run(app_sessionmaker, tenant_id=tenant_a, seed=mine)
     with _client(app_engine, tenant_id=tenant_a, user_id=outsider["user_id"]) as client:
         _canonical(client.get(_path(mine["project_id"], run_id)), code="AUTH-0030", status=403)
+
+
+def test_diagnostic_anonymous_denial_writer_on_the_app_role_engine(app_engine, two_tenants, clean_tables):
+    """TEMPORARY diagnostic (Codex #184 F3, coordinator order): surface the DBAPI
+    exception behind the 500 with the exact action string the handler builds for
+    this route, and for a #175 lineage route, directly on the app-role engine.
+    Removed once the cause is on record."""
+    from saintvision.services.audit import record_denial_out_of_band
+
+    project_id, run_id, model_id = new_id("project"), new_id("run"), new_id("model")
+    for action in (
+        f"GET {_path(project_id, run_id)}",
+        f"GET /v1/projects/{project_id}/models/{model_id}/versions/1/lineage",
+        "GET /v1/nodes",
+    ):
+        try:
+            record_denial_out_of_band(
+                app_engine, now=NOW, actor_type="anonymous", action=action, reason_code="AUTH-MISSING-CREDENTIAL"
+            )
+        except Exception as exc:  # noqa: BLE001 -- diagnostic: the class and first line are the finding
+            first = str(exc).splitlines()[0]
+            raise AssertionError(f"len(action)={len(action)}: {type(exc).__name__}: {first}") from None
