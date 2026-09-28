@@ -62,6 +62,11 @@ class Settings:
     page_limit_max: int = 200
     #: Idempotency ledger retention.
     idempotency_ttl_seconds: int = 86_400
+    #: Base URL of the execution kernel, for the observations business routes
+    #: read back over HTTP (VF-CL-03). Absent is a valid deployment: a route
+    #: that needs an observation then refuses with 503 rather than guessing a
+    #: host, which is the same rule the rest of this module follows.
+    kernel_base_url: str | None = None
 
     #: Real login. Absent means the static development verifier, which refuses
     #: to be constructed outside dev and test — so a deployment either has all
@@ -106,6 +111,7 @@ class Settings:
                 if value.strip()
             ),
             oidc_jwks_file=os.environ.get("INV_OIDC_JWKS_FILE"),
+            kernel_base_url=os.environ.get("INV_KERNEL_BASE_URL"),
         )
 
 
