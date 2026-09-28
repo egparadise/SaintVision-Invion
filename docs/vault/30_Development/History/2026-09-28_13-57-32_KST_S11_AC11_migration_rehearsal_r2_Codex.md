@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-S11-AC11-MIGRATION-REHEARSAL-R2-20260928-CODEX"
 title: "S11 AC-11 migration rehearsal r2 — Claude F1~F5 보강과 hosted 증거"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T14:26:42+09:00"
+updated: "2026-09-28T14:43:45+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tasks: ["S11-BE", "S11-DB"]
@@ -41,7 +41,13 @@ artifact `10952510591`, GitHub digest `sha256:d4437410c8273241cf535dd994ef8825fb
 - N3: JUnit의 세 negative testcase는 실제 `EXPECTED_FINDING` 진행 목록으로 계산한다. 실행되지 않거나 finding이 아닌 case는 통과 testcase가 아니라 failure다.
 - N4: 현재 tail 0 경계는 유지하되, future reversible 분기의 catalog+sentinel 검증을 공통 helper로 묶고 양성·catalog drift·sentinel drift 단위 시험과 runner 호출 구조 시험을 추가했다. revision별 영향 테이블 sentinel은 실제 reversible tail이 생기는 카드의 선행 조건으로 남는다.
 
-정본 run `36379743674` artifact를 다시 다운로드해 importer CLI를 실행한 결과 exit 0이다. 직접 계산한 `artifactObservedSha256`은 GitHub `artifactSha256`과 같은 `d4437410c8273241cf535dd994ef8825fb6127825e5e423f16c295640632b343`, report file hash는 `cfa3b678a3361146be560d40fbca1eef57d20c667ebc73919504961d17595c28`, JUnit hash는 report의 `1cbc2ffed3f809554a8cae24f017a13c1587e46b29119432f65277d0e651c1ef`, source run은 `36379743674`, conclusion은 `success`다. importer 보강은 기존 제품/migration 측정 결과를 바꾸지 않으며 hosted rehearsal 재실행 대상이 아니다.
+정본 run `36379743674` artifact `10952510591`을 다시 다운로드해 importer CLI를 실행한 결과 exit 0이다. 직접 계산한 `artifactObservedSha256`은 GitHub `artifactSha256`과 같은 `d4437410c8273241cf535dd994ef8825fb6127825e5e423f16c295640632b343`, report file hash는 `cfa3b678a3361146be560d40fbca1eef57d20c667ebc73919504961d17595c28`, JUnit hash는 report의 `1cbc2ffed3f809554a8cae24f017a13c1587e46b29119432f65277d0e651c1ef`, source run은 `36379743674`, conclusion은 `success`다.
+
+### r3 증거 경계(N5·N6)
+
+- 정본 hosted run `36379743674`는 runner head `abe8435a`의 산출물이다. r3 head `b2b4db3c`에서 강화한 N2의 `UniqueViolation`/`23505`·새 connection rollback-state 검사와 N3의 실제 negative-case JUnit 귀속은 **PG-free 단위 시험만** 거쳤으며 hosted PostgreSQL rehearsal에서는 아직 실행되지 않았다. 따라서 위 정본 증거는 세 부정 fixture가 당시의 더 느슨한 0009 판정을 통과했다는 사실만 증명하고, 강화된 runner의 hosted 통과를 주장하지 않는다. release evidence를 만들기 전에는 최종 release SHA에서 lane을 다시 실행해야 한다.
+- importer는 GitHub API를 직접 호출하거나 metadata의 서명을 인증하지 않는다. 운영자는 인증된 `gh` 세션에서 `gh api repos/egparadise/SaintVision-Invion/actions/runs/36379743674`, `gh api repos/egparadise/SaintVision-Invion/actions/artifacts/10952510591`, `gh api repos/egparadise/SaintVision-Invion/actions/artifacts/10952510591/zip`으로 run JSON, artifact JSON, zip을 각각 취득한 뒤 importer에 전달해야 한다. 재검증할 때는 report의 `sourceRunId`로 `gh api repos/egparadise/SaintVision-Invion/actions/runs/36379743674/artifacts`도 조회해 artifact id·name·digest를 다시 대조한다.
+- importer는 zip byte·report·JUnit·두 metadata JSON 사이의 모순을 fail-closed로 거부하지만, 호출자가 zip과 JSON을 일관되게 위조하면 출처 진정성을 증명할 수 없다. 즉 이 도구는 **metadata 인증기**가 아니라 다운로드된 GitHub evidence의 결속 검사기다. canonical repository/workflow 결속과 `artifactId`의 축 봉투 보존은 후속 hardening 항목이다.
 
 ## 게이트와 경계
 

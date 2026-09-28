@@ -2,7 +2,16 @@
 
 The rehearsal cannot include the GitHub artifact digest in the artifact whose
 digest is being computed.  This importer therefore runs after download and
-binds the immutable GitHub artifact metadata to the redacted producer report.
+cross-checks caller-supplied GitHub run/artifact metadata against the redacted
+producer report and downloaded zip.
+
+Trust boundary: this tool does not call or authenticate the GitHub API.  The
+operator must obtain the JSON and zip from the canonical repository with
+``gh api repos/egparadise/SaintVision-Invion/actions/runs/<run-id>``,
+``gh api repos/egparadise/SaintVision-Invion/actions/artifacts/<artifact-id>``,
+and ``gh api repos/egparadise/SaintVision-Invion/actions/artifacts/<artifact-id>/zip``.
+The importer detects inconsistencies among those inputs; it cannot prove that
+coherently forged inputs originated from GitHub.
 """
 
 from __future__ import annotations
