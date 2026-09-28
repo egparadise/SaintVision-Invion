@@ -4,7 +4,7 @@ title: "S11-ST storage failure target v0"
 version: "1.0.0"
 status: "frozen-target"
 author: "Codex"
-updated: "2026-09-28T15:17:15+09:00"
+updated: "2026-09-28T15:29:13+09:00"
 source_of_truth: "Git"
 task_id: "S11-ST"
 acceptance_id: "AC-11"
@@ -33,6 +33,8 @@ acceptance_id: "AC-11"
 - criteria:
   - `windowSeconds >= 86400`
   - `attemptedOperationCount >= 1000`
+  - `observedStorageFaultCaseCount >= 3`
+  - `recoveryAfterStorageFaultPassCount >= 3`
   - `corruptionEscapeCount == 0`
   - `falseSuccessCount == 0`
   - `committedObjectLossCount == 0`
@@ -44,7 +46,7 @@ acceptance_id: "AC-11"
   - `fileDescriptorGrowthCount <= 32`
   - `dbConnectionGrowthCount <= 4`
 
-hosted storage fault soak은 이 target을 만족하지 않으며 reference evidence일 뿐이다.
+관측 fault 3건은 corruption, capacity, partial-write/durability 부류를 각각 1건 이상 포함해야 하고 importer가 injection receipt와 recovery receipt를 대조한다. hosted storage fault soak은 이 target을 만족하지 않으며 reference evidence일 뿐이다.
 
 ### `s11-st-actual-pitr-archive-failure-v0`
 
