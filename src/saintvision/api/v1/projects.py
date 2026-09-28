@@ -35,6 +35,7 @@ from ..deps import (
     get_principal,
     get_session,
     get_settings,
+    get_write_session,
     optional_idempotent_write,
 )
 
@@ -97,7 +98,7 @@ def create_project(
     request: Request,
     response: Response,
     principal: Principal = Depends(get_principal),
-    session: Session = Depends(get_session),
+    session: Session = Depends(get_write_session),
     now: dt.datetime = Depends(get_now),
 ) -> dict:
     """Create a project. The creator becomes its owner in the same transaction.
@@ -144,16 +145,12 @@ def read_project(
     from ...db.models import Project
 
     project = session.get(Project, project_id)
-    body = project_service.project_body(
-        session, project, tenant_id=principal.tenant_id
-    )
+    body = project_service.project_body(session, project, tenant_id=principal.tenant_id)
     body["permission"] = permission
     return body
 
 
-@router.get(
-    "/projects/{project_id}/workspaces", response_model=schemas.ProjectWorkspacesResponse
-)
+@router.get("/projects/{project_id}/workspaces", response_model=schemas.ProjectWorkspacesResponse)
 def list_workspaces(
     project_id: str,
     principal: Principal = Depends(get_principal),
@@ -179,7 +176,7 @@ def create_workspace(
     request: Request,
     response: Response,
     principal: Principal = Depends(get_principal),
-    session: Session = Depends(get_session),
+    session: Session = Depends(get_write_session),
     now: dt.datetime = Depends(get_now),
 ) -> dict:
     """Create a workspace. It starts ``provisioning``, never ``ready``.

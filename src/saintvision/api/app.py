@@ -23,7 +23,7 @@ from ..ids import is_id, is_trace_id, new_trace_id
 from ..identity.principal import PrincipalVerifier
 from ..services.audit import record_denial_out_of_band
 from .audit_action import audit_action
-from .problem import install_canonical_problem_handler
+from .problem import canonical_response, install_canonical_problem_handler, legacy_not_found_problem
 from .v1 import adapters as adapters_router
 from .v1 import nodes as nodes_router
 from .v1 import pools as pools_router
@@ -91,7 +91,9 @@ def create_app(
 
     @app.middleware("http")
     async def _trace(request: Request, call_next):
-        trace_id = getattr(request.state, "trace_id", None) or parse_traceparent(request.headers.get("traceparent"))
+        trace_id = getattr(request.state, "trace_id", None) or parse_traceparent(
+            request.headers.get("traceparent")
+        )
         request.state.trace_id = trace_id
         response = await call_next(request)
         response.headers["traceparent"] = f"{TRACEPARENT_VERSION}-{trace_id}-{'0'*16}-01"
@@ -156,14 +158,15 @@ def create_app(
         # written in its own transaction so the request rollback cannot erase
         # it, and with the trace id the response carries.
         trace_id = getattr(request.state, "trace_id", None) or new_trace_id()
+        not_found = legacy_not_found_problem(exc)
+        if not_found is not None:
+            return canonical_response(not_found, trace_id=trace_id)
         if exc.category.value in DENIAL_CATEGORIES:
             _record_denial(request, code=exc.code, trace_id=trace_id)
         return _problem(request, exc, trace_id=trace_id)
 
     @app.exception_handler(RequestValidationError)
-    async def _validation_error(
-        request: Request, exc: RequestValidationError
-    ) -> JSONResponse:
+    async def _validation_error(request: Request, exc: RequestValidationError) -> JSONResponse:
         # Field names are safe to return; submitted values are not, so only the
         # locations are echoed.
         locations = [".".join(str(p) for p in err["loc"]) for err in exc.errors()]
@@ -198,13 +201,12 @@ def create_app(
                 return {"status": "degraded", "reason": str(exc)}
         return {
             "status": "ok",
-            "partitions": [
-                {"table": s.table, "monthsAhead": s.months_ahead} for s in statuses
-            ],
+            "partitions": [{"table": s.table, "monthsAhead": s.months_ahead} for s in statuses],
         }
 
     # One registration, beside the existing handlers rather than replacing
-    # them: the legacy InvError shape stays on the routes that already serve it.
+    # them: legacy InvError stays on existing routes except for the closed set
+    # of unambiguous not-found codes translated above.
     # The canonical handler records AUTH/SEC 401/403 through the same recorder
     # as the legacy handler; ``problem.py`` takes it as a callback so it keeps
     # no database dependency.

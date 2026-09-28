@@ -27,6 +27,7 @@ from ..deps import (
     get_principal,
     get_session,
     get_settings,
+    get_write_session,
     replay_or_reserve,
     serialise_idempotent_write,
     store_idempotent_response,
@@ -183,7 +184,7 @@ def register_contribution(
 def activate_contribution(
     contribution_id: str,
     principal: Principal = Depends(get_principal),
-    session: Session = Depends(get_session),
+    session: Session = Depends(get_write_session),
 ) -> dict:
     contribution = storage_service.activate_contribution(
         session, tenant_id=principal.tenant_id, contribution_id=contribution_id
@@ -198,7 +199,7 @@ def activate_contribution(
 def revoke_contribution(
     contribution_id: str,
     principal: Principal = Depends(get_principal),
-    session: Session = Depends(get_session),
+    session: Session = Depends(get_write_session),
     now: dt.datetime = Depends(get_now),
 ) -> dict:
     """Withdraw a contribution. The user's files are left alone."""
@@ -208,9 +209,7 @@ def revoke_contribution(
     return {"contribution": _contribution_body(contribution)}
 
 
-@router.get(
-    "/storage/contributions", response_model=schemas.ContributionPageResponse
-)
+@router.get("/storage/contributions", response_model=schemas.ContributionPageResponse)
 def list_contributions(
     principal: Principal = Depends(get_principal),
     session: Session = Depends(get_session),
@@ -267,7 +266,9 @@ def resolve_uri(
     """Resolve owned active catalogue metadata; does not grant byte access."""
     try:
         location = resolver.resolve_location(
-            session, tenant_id=principal.tenant_id, uri=uri,
+            session,
+            tenant_id=principal.tenant_id,
+            uri=uri,
             reader_user_id=principal.user_id,
         )
     except ValueError:
@@ -289,11 +290,15 @@ def replica_status(
     """Recorded states for an owned location; current byte availability is unknown."""
     try:
         observation = observe_replicas(
-            session, tenant_id=principal.tenant_id,
-            reader_user_id=principal.user_id, uri=uri,
+            session,
+            tenant_id=principal.tenant_id,
+            reader_user_id=principal.user_id,
+            uri=uri,
         )
     except ValueError:
         raise InvError(VAL_SCHEMA, "invalid storage URI") from None
-    return {"observation": schemas.ReplicaObservationResponse.model_validate(
-        observation
-    ).model_dump(by_alias=True, mode="json")}
+    return {
+        "observation": schemas.ReplicaObservationResponse.model_validate(observation).model_dump(
+            by_alias=True, mode="json"
+        )
+    }

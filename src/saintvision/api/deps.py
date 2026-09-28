@@ -39,9 +39,7 @@ def get_now(request: Request) -> dt.datetime:
     return request.app.state.clock()
 
 
-def get_principal(
-    request: Request, authorization: str | None = Header(default=None)
-) -> Principal:
+def get_principal(request: Request, authorization: str | None = Header(default=None)) -> Principal:
     """Verify the caller's credential.
 
     A missing header and an unrecognised credential are different codes so the
@@ -72,6 +70,30 @@ def get_session(
     with factory() as session:
         with session.begin():
             with tenant_scope(session, principal.tenant_id):
+                yield session
+
+
+def get_write_session(
+    request: Request, principal: Principal = Depends(get_principal)
+) -> Iterator[Session]:
+    """Yield a tenant-scoped legacy write transaction with bounded lock waits.
+
+    Read routes retain :func:`get_session`; mutation routes use this dependency
+    unless an idempotency span already applies the same bound. PostgreSQL lock
+    timeout/deadlock errors become canonical retryable ``SYS-0001/503``.
+    """
+    from .lock_wait import bounded_lock_wait
+
+    factory = make_session_factory(request.app.state.engine)
+    with factory() as session:
+        with session.begin():
+            with (
+                tenant_scope(session, principal.tenant_id),
+                bounded_lock_wait(
+                    session,
+                    timeout_ms=request.app.state.settings.business_lock_timeout_ms,
+                ),
+            ):
                 yield session
 
 
@@ -163,9 +185,11 @@ def replay_or_reserve(
         session.query(IdempotencyRecord)
         .filter(
             IdempotencyRecord.tenant_id == principal.tenant_id,
-            IdempotencyRecord.project_id.is_(None)
-            if project_id is None
-            else IdempotencyRecord.project_id == project_id,
+            (
+                IdempotencyRecord.project_id.is_(None)
+                if project_id is None
+                else IdempotencyRecord.project_id == project_id
+            ),
             IdempotencyRecord.endpoint == endpoint,
             IdempotencyRecord.idempotency_key == idempotency_key,
         )
