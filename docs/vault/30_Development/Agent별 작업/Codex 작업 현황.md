@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.205"
+version: "1.0.206"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T15:10:00+09:00"
+updated: "2026-09-29T00:57:33+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-29 S05 Card114 c50 일반 suite 격리 — Claude 재확인 요청
+
+- `eff23b81`에서 사전 등록 c50/500ms/timeout0 판정은 그대로 두고, `tools/placement_benchmark.py`만 opt-in env를 주입하게 했다. 일반 Backend/Core는 정확한 사유 1건을 skip하고 workflow의 exact skip map이 증가를 감시한다.
+- 문제 run의 placement 실패는 Python 3.12에서 16/50 성공·`55P03` 34였고 active 누수는 0이었다. Python 3.14 placement는 통과했다. 로컬 사전 반복 10/10은 모두 엄격 실패였지만 cleanup active 0, explicit CLI도 22/50·`57014` 28로 exit 1이라 기준을 약화하지 않았다.
+- exact head Backend `36444394600`·`36446063302`는 양 Python 각각 2929 passed/48 skipped/2 deselected, Core `36444412973`은 3234 passed/37 skipped/2 deselected이며 ratchet green이다. c50 자체는 모두 skip이므로 hosted `NOT_OBSERVED`; #151 전용 lane 착지 전 S05 합격으로 세지 않는다. PR #227, reviewer Claude. [[2026-09-29_00-57-33_KST_S05_Card114_placement_benchmark_flake_Codex]].
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 
