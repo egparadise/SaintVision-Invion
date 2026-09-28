@@ -32,6 +32,7 @@ from saintvision.identity.principal import Principal, StaticPrincipalVerifier
 from saintvision.db.session import make_session_factory, tenant_scope
 from saintvision.ids import new_id
 from saintvision.services.lineage import release_model_version
+from measurement_support import insert_measurement
 from test_model_release_real_pg import _seed as _seed_releasable
 from test_model_version_register_real_pg import _canonical, _digest, _insert, _ledger, _seed
 
@@ -46,6 +47,13 @@ SHORTER = dt.datetime(2026, 12, 1, tzinfo=UTC)
 
 def _version(connection, *, tenant_id, model_id, now, pinned_until=OLD, verified=False):
     version_id = new_id("model_version")
+    digest = _digest()
+    # Verified means bound to a kernel-recorded measurement (0054, #213): the
+    # seed records one first, as the kernel would, or the CHECK refuses the row.
+    measurement_id = (
+        insert_measurement(connection, tenant_id=tenant_id, model_version_id=version_id, sha256=digest, byte_size=4096)
+        if verified else None
+    )
     _insert(
         connection,
         "model_versions",
@@ -54,10 +62,11 @@ def _version(connection, *, tenant_id, model_id, now, pinned_until=OLD, verified
         model_id=model_id,
         version="1.0.0",
         stage="draft",
-        content_sha256=_digest(),
+        content_sha256=digest,
         byte_size=4096,
         uri="inv://models/demo@1.0.0",
         verified_at=now if verified else None,
+        verified_measurement_id=measurement_id,
         retention_pinned_until=pinned_until,
         created_at=now,
     )

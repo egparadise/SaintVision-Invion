@@ -12,6 +12,7 @@ default (공통 계약 §3).
 from __future__ import annotations
 
 import datetime as dt
+import uuid
 from typing import Literal
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr, field_validator
@@ -856,6 +857,79 @@ class RetentionPinResponse(Strict):
     stage: Literal["draft", "candidate", "released", "retired"]
     retention_pinned_until: AwareDatetime = Field(alias="retentionPinnedUntil")
     extended: bool
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+INV_ID = r"^[a-z]{3}_[0-9A-HJKMNP-TV-Z]{26}$"
+MEASUREMENT_ID = r"^mvm_[0-9A-HJKMNP-TV-Z]{26}$"
+
+
+class ModelVerifyRequest(Strict):
+    """What a caller asks of W3: apply this kernel-recorded measurement.
+
+    One field, and ``extra="forbid"`` is load-bearing: a digest, a size or a
+    URI in the body would be a value the caller supplied, and verification
+    is exactly the thing a caller's value must not be able to establish
+    (design #209 v1.1 §6).
+    """
+
+    measurement_id: str = Field(pattern=MEASUREMENT_ID, alias="measurementId")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ModelMeasurementObservation(Strict):
+    """The kernel's record of one signed node measurement, as the W3 route reads it.
+
+    Served by ``GET /v1/projects/{p}/models/{m}/versions/{v}/measurements/{id}``
+    on the kernel (PR A-2 of design #209 v1.1). Every field is what
+    ``inv.model_version_measurements`` holds for the identity, the channel
+    binding, the storage snapshot and the observation itself; the route
+    re-binds each of them before it writes. Unknown keys are refused: an
+    observation carrying something this contract does not name is not one
+    the route decides on.
+    """
+
+    measurement_id: str = Field(pattern=MEASUREMENT_ID, alias="measurementId")
+    tenant_id: uuid.UUID = Field(alias="tenantId")
+    project_id: str = Field(pattern=INV_ID, alias="projectId")
+    model_id: str = Field(pattern=INV_ID, alias="modelId")
+    version_id: str = Field(pattern=INV_ID, alias="modelVersionId")
+    uri: str = Field(min_length=1, max_length=2048)
+    contribution_id: str = Field(pattern=INV_ID, alias="contributionId")
+    contribution_version: StrictInt = Field(ge=1, alias="contributionVersion")
+    location_id: str = Field(pattern=INV_ID, alias="locationId")
+    location_version: StrictInt = Field(ge=1, alias="locationVersion")
+    relative_path: str = Field(min_length=1, max_length=4096, alias="relativePath")
+    node_id: str = Field(pattern=INV_ID, alias="nodeId")
+    recovery_epoch: uuid.UUID = Field(alias="recoveryEpoch")
+    channel_version: StrictInt = Field(ge=1, alias="channelVersion")
+    certificate_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="certificateSha256")
+    sha256: str = Field(pattern="^[0-9a-f]{64}$")
+    byte_size: StrictInt = Field(ge=0, alias="byteSize")
+    observed_at: AwareDatetime = Field(alias="observedAt")
+    recorded_at: AwareDatetime = Field(alias="recordedAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ModelVerifyResponse(Strict):
+    """The version after the measurement was bound (or found already bound).
+
+    ``newlyVerified`` is false when the row was already verified by this very
+    measurement, so a repeat with a fresh idempotency key is visible as the
+    no-op it was.
+    """
+
+    version_id: str = Field(alias="modelVersionId")
+    parent_model_id: str = Field(alias="modelId")
+    version: str = Field(min_length=1, max_length=64)
+    stage: Literal["draft", "candidate", "released", "retired"]
+    verified_at: AwareDatetime = Field(alias="verifiedAt")
+    verified_measurement_id: str = Field(pattern=MEASUREMENT_ID, alias="verifiedMeasurementId")
+    content_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="contentSha256")
+    newly_verified: bool = Field(alias="newlyVerified")
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
