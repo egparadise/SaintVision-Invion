@@ -372,6 +372,8 @@ def _generic_observations(envelope: dict[str, Any], criteria: dict[str, Any]) ->
             raise ValueError("observation and target values must be numeric")
         if not math.isfinite(float(value)) or not math.isfinite(float(target)):
             raise ValueError("observation and target values must be finite")
+        if operator == "eq" and float(target) == 0.0 and float(value) != float(failure):
+            raise ValueError("zero-expected count value must equal failureCount")
         failed = failed or not _compare(float(value), operator, float(target))
     if set(criteria) != metrics:
         raise ValueError("target criteria and observation metrics must match exactly")
