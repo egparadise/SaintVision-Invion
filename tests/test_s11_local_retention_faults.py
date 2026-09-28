@@ -22,7 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 
 import pitr_archive_retention as retention  # noqa: E402
 from inv.errors import DomainError  # noqa: E402
-from inv.object_store import LocalObjectStore, LocalObjects  # noqa: E402
+from inv.object_store import LocalObjectStore, LocalObjects, object_store_session  # noqa: E402
 
 NOW = datetime(2026, 9, 28, 8, 0, tzinfo=timezone.utc)
 CAP_02 = {"code": "STORE-0001", "status": 503, "retryable": True}
@@ -101,6 +101,51 @@ def test_a_missing_local_object_remains_not_found_not_provider_unavailable():
     provider = LocalObjectStore(FakeLocal(FaultFiles("get", FileNotFoundError())))
     with pytest.raises(FileNotFoundError):
         provider.get("obj-" + "c" * 32, "0" * 64, 1)
+
+
+@pytest.mark.parametrize("operation", ["put", "get", "exists", "hash", "delete"])
+def test_cap02_legacy_session_provider_calls_translate_oserror(operation):
+    provider = LocalObjectStore(
+        FakeLocal(FaultFiles(operation, OSError(errno.EIO, "private session path")))
+    )
+    locator = "obj-" + "f" * 32
+    digest = hashlib.sha256(b"x").hexdigest()
+    with object_store_session(provider) as files:
+        calls = {
+            "put": lambda: files.put(locator, b"x", digest),
+            "get": lambda: files.get(locator, digest, 1),
+            "exists": lambda: files.exists(locator),
+            "hash": lambda: files.hash(locator),
+            "delete": lambda: files.delete(locator),
+        }
+        with pytest.raises(DomainError) as raised:
+            calls[operation]()
+    _assert_store_unavailable(raised.value)
+
+
+@pytest.mark.parametrize("operation", ["put", "delete"])
+def test_cap02_legacy_session_mutations_translate_filenotfound(operation):
+    provider = LocalObjectStore(FakeLocal(FaultFiles(operation, FileNotFoundError())))
+    locator = "obj-" + "1" * 32
+    digest = hashlib.sha256(b"x").hexdigest()
+    with object_store_session(provider) as files:
+        with pytest.raises(DomainError) as raised:
+            if operation == "put":
+                files.put(locator, b"x", digest)
+            else:
+                files.delete(locator)
+    _assert_store_unavailable(raised.value)
+
+
+@pytest.mark.skipif(sys.platform != "linux", reason="real LocalObjects flock requires Linux")
+def test_cap02_real_locked_scope_does_not_relabel_unrelated_consumer_oserror(tmp_path):
+    root = tmp_path / "objects"
+    root.mkdir(mode=0o700)
+    provider = LocalObjects(root)
+    with pytest.raises(OSError, match="workspace disk") as raised:
+        with provider.locked():
+            raise OSError(errno.EIO, "workspace disk")
+    assert not isinstance(raised.value, DomainError)
 
 
 @pytest.mark.skipif(sys.platform != "linux", reason="real LocalObjects handle checks require Linux")
@@ -338,6 +383,130 @@ def test_bak02_replaced_candidate_directory_is_refused_before_delete(tmp_path, m
     with pytest.raises(retention.RetentionApplyRefused, match="candidate identity changed"):
         retention.apply(current, archive, backups, journal_path=journal)
     assert (backups / "old").is_dir()
+
+
+def _interrupt_before_first_delete(retention_world, monkeypatch):
+    archive, backups, planned, journal = retention_world
+
+    def stop_before_delete(*_args):
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr(retention, "_delete_candidate", stop_before_delete)
+    with pytest.raises(KeyboardInterrupt):
+        retention.apply(planned, archive, backups, journal_path=journal)
+    monkeypatch.undo()
+    return archive, backups, planned, journal
+
+
+def test_bak02_self_consistent_journal_cannot_add_retained_wal(tmp_path, monkeypatch):
+    archive, backups, planned, journal = _interrupt_before_first_delete(
+        _retention_world(tmp_path), monkeypatch
+    )
+    document = json.loads(journal.read_text(encoding="utf-8"))
+    retained = seg(6)
+    document["plan"]["deleteArchive"].append(retained)
+    document["plan"]["deleteArchive"].sort()
+    document["planSha256"] = retention._digest(document["plan"])
+    target = {
+        "kind": "archive",
+        "name": retained,
+        "state": "pending",
+        "identity": retention._candidate_identity(archive, retained, "archive"),
+    }
+    first_backup = next(
+        index for index, value in enumerate(document["targets"]) if value["kind"] == "backups"
+    )
+    document["targets"].insert(first_backup, target)
+    retention._refresh_incomplete(document)
+    journal.write_text(json.dumps(document), encoding="utf-8")
+
+    with pytest.raises(retention.RetentionApplyRefused, match="no longer deletable"):
+        retention.apply(planned, archive, backups, journal_path=journal)
+    assert (archive / retained).is_file()
+    assert all((archive / seg(index)).exists() for index in range(1, 8))
+
+
+def test_bak02_self_consistent_journal_cannot_target_retained_backup(tmp_path, monkeypatch):
+    archive, backups, planned, journal = _interrupt_before_first_delete(
+        _retention_world(tmp_path), monkeypatch
+    )
+    document = json.loads(journal.read_text(encoding="utf-8"))
+    retained = "recent"
+    document["plan"]["deleteBackups"].append(retained)
+    document["plan"]["deleteBackups"].sort()
+    document["planSha256"] = retention._digest(document["plan"])
+    document["candidateBackupLabelSha256"][retained] = retention._label_sha256(backups, retained)
+    document["targets"].append(
+        {
+            "kind": "backups",
+            "name": retained,
+            "state": "pending",
+            "identity": retention._candidate_identity(backups, retained, "backups"),
+        }
+    )
+    retention._refresh_incomplete(document)
+    journal.write_text(json.dumps(document), encoding="utf-8")
+
+    with pytest.raises(retention.RetentionApplyRefused, match="now retained"):
+        retention.apply(planned, archive, backups, journal_path=journal)
+    assert (backups / retained / "backup_label").is_file()
+    assert all((archive / seg(index)).exists() for index in range(1, 8))
+
+
+def test_bak02_rechecks_the_live_boundary_immediately_before_delete(tmp_path, monkeypatch):
+    archive, backups, planned, journal = _retention_world(tmp_path)
+    real_write = retention._write_journal
+    changed = False
+
+    def write_then_change_boundary(path, document):
+        nonlocal changed
+        real_write(path, document)
+        if not changed:
+            changed = True
+            _write_backup(backups, "new-boundary", seg(1), NOW - timedelta(hours=1))
+
+    monkeypatch.setattr(retention, "_write_journal", write_then_change_boundary)
+    with pytest.raises(retention.RetentionApplyPartial) as raised:
+        retention.apply(planned, archive, backups, journal_path=journal)
+    assert raised.value.receipt["removed"] == {"archive": [], "backups": []}
+    assert all((archive / seg(index)).exists() for index in range(1, 8))
+
+
+def test_bak02_completed_receipt_is_archived_and_next_cycle_runs(tmp_path):
+    archive, backups, planned, journal = _retention_world(tmp_path)
+    retention.apply(planned, archive, backups, journal_path=journal)
+    first = retention.load_apply_receipt(journal)
+    assert first["status"] == "completed"
+
+    later = NOW + timedelta(days=10)
+    _write_backup(backups, "newest", seg(7), later - timedelta(hours=1))
+    current = retention.plan(
+        retention.load_archive(archive),
+        retention.load_backups(backups),
+        retention_days=7,
+        now=later,
+    )
+    removed = retention.apply(current, archive, backups, journal_path=journal)
+    archived = list(journal.parent.glob(f"{journal.stem}.completed-{first['planSha256']}-*.json"))
+    assert len(archived) == 1
+    assert retention.load_apply_receipt(archived[0]) == first
+    assert removed["backups"] == ["recent"]
+    assert retention.load_apply_receipt(journal)["status"] == "completed"
+
+
+def test_bak02_delete_flushes_parent_before_returning(tmp_path, monkeypatch):
+    archive, backups, planned, _journal = _retention_world(tmp_path)
+    target = {
+        "kind": "archive",
+        "name": planned.delete_archive[0],
+        "state": "pending",
+        "identity": retention._candidate_identity(archive, planned.delete_archive[0], "archive"),
+    }
+    flushed: list[Path] = []
+    monkeypatch.setattr(retention, "_fsync_directory", lambda path: flushed.append(path))
+    assert retention._delete_candidate(target, archive, backups) is True
+    assert flushed == [archive]
+    assert not (archive / target["name"]).exists()
 
 
 def test_bak02_changed_retained_label_refuses_before_another_delete(tmp_path, monkeypatch):

@@ -149,12 +149,12 @@ class LocalObjects:
                 raise DomainError("STORE-0001", "Object directory changed", 503)
             try:
                 fcntl.flock(fd, fcntl.LOCK_EX)
-                yield ObjectHandle(fd)
-            except FileNotFoundError:
-                # A missing locator is part of get/hash semantics, not provider outage.
-                raise
             except OSError as error:
                 raise _local_provider_unavailable(error) from error
+            # Provider calls are translated by _LegacyObjectSession.  Do not catch
+            # the whole consumer body here: workspace/generation code can run while
+            # this lock is held, and its unrelated OSError must keep its own meaning.
+            yield ObjectHandle(fd)
         finally:
             active_error = sys.exc_info()[0] is not None
             try:
@@ -239,19 +239,43 @@ class _LegacyObjectSession:
         return ObjectHandle.name(locator)
 
     def put(self, locator, body, expected_sha256):
-        self.files.put(locator, body, expected_sha256)
+        try:
+            self.files.put(locator, body, expected_sha256)
+        except OSError as error:
+            # ENOENT while creating/renaming means the pinned provider directory
+            # disappeared.  A put cannot use "object missing" as a normal result.
+            raise _local_provider_unavailable(error) from error
 
     def get(self, locator, expected_sha256, expected_size):
-        return self.files.read(locator, expected_sha256, expected_size)
+        try:
+            return self.files.read(locator, expected_sha256, expected_size)
+        except FileNotFoundError:
+            # Missing committed bytes are interpreted by the calling service.
+            raise
+        except OSError as error:
+            raise _local_provider_unavailable(error) from error
 
     def exists(self, locator):
-        return self.files.exists(locator)
+        try:
+            return self.files.exists(locator)
+        except OSError as error:
+            raise _local_provider_unavailable(error) from error
 
     def hash(self, locator):
-        return self.files.hash(locator)
+        try:
+            return self.files.hash(locator)
+        except FileNotFoundError:
+            raise
+        except OSError as error:
+            raise _local_provider_unavailable(error) from error
 
     def delete(self, locator):
-        self.files.remove(locator)
+        try:
+            self.files.remove(locator)
+        except OSError as error:
+            # Delete is an explicit provider mutation.  ENOENT here means its
+            # pinned root/entry changed after the caller's existence decision.
+            raise _local_provider_unavailable(error) from error
 
 
 @contextmanager

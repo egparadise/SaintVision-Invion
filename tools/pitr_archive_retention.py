@@ -36,8 +36,11 @@ Invariants (tested in ``tests/test_pitr_archive_retention.py``):
    rejected instead of being stamped UTC, and a naive time is rejected as ambiguous.
 
 The default is a dry run that prints the plan as JSON. ``--apply`` deletes exactly the
-planned paths after printing that same plan, and reports what was removed. Nothing is
-ever downloaded, and no DSN is read: this is a filesystem-only operator tool.
+planned paths after printing that same plan, and reports what was removed. Apply progress
+is journaled under the backup directory (or ``--journal``), partial work exits 4 and is
+resumed with the same inputs, and a completed receipt is archived by plan hash before the
+next cycle starts. Nothing is ever downloaded, and no DSN is read: this is a
+filesystem-only operator tool.
 """
 
 from __future__ import annotations
@@ -333,6 +336,23 @@ def _journal_path(backups_dir: Path, journal_path: Path | None) -> Path:
     return journal_path or backups_dir / ".pitr-retention-apply-journal.json"
 
 
+def _fsync_directory(path: Path) -> None:
+    """Persist directory-entry changes on POSIX.
+
+    Python has no directory handle that can be flushed on Windows.  The caller
+    still gets atomic replace/unlink semantics there; hosted/operator Linux
+    exercises the stronger power-loss boundary.
+    """
+
+    if os.name == "nt":
+        return
+    directory_fd = os.open(path, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
+    try:
+        os.fsync(directory_fd)
+    finally:
+        os.close(directory_fd)
+
+
 def _write_journal(path: Path, journal: dict) -> None:
     parent = path.parent
     if path.is_symlink() or not parent.is_dir():
@@ -346,17 +366,7 @@ def _write_journal(path: Path, journal: dict) -> None:
             stream.flush()
             os.fsync(stream.fileno())
         os.replace(temporary, path)
-        # POSIX lets us fsync the directory entry after the atomic replace.
-        # Windows refuses opening directories through os.open; the file bytes
-        # were flushed and os.replace is atomic there, but no Python directory
-        # handle exists to flush. Hosted/operator Linux exercises the stronger
-        # boundary, while PG-free Windows tests can still verify replay logic.
-        if os.name != "nt":
-            directory_fd = os.open(parent, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
-            try:
-                os.fsync(directory_fd)
-            finally:
-                os.close(directory_fd)
+        _fsync_directory(parent)
     finally:
         try:
             os.unlink(temporary)
@@ -434,6 +444,20 @@ def _new_journal(plan_: Plan, archive_dir: Path, backups_dir: Path) -> dict:
     }
     _refresh_incomplete(journal)
     return journal
+
+
+def _archive_completed_journal(path: Path, journal: dict) -> Path:
+    """Move a completed receipt aside before starting the next retention cycle."""
+
+    if journal["status"] != "completed":
+        raise RetentionApplyRefused("only a completed retention journal can be archived")
+    archived = path.with_name(f"{path.stem}.completed-{journal['planSha256']}-{uuid4().hex}.json")
+    try:
+        os.replace(path, archived)
+        _fsync_directory(path.parent)
+    except OSError as error:
+        raise RetentionApplyRefused("completed retention journal could not be archived") from error
+    return archived
 
 
 def _load_journal(path: Path) -> dict:
@@ -588,14 +612,22 @@ def _load_journal(path: Path) -> dict:
     return journal
 
 
-def _validate_resume(journal: dict, plan_: Plan, archive_dir: Path, backups_dir: Path) -> None:
-    if journal["roots"] != {
-        "archive": _root_identity(archive_dir),
-        "backups": _root_identity(backups_dir),
-    }:
-        raise RetentionApplyRefused("retention root identity changed")
+def _observed_plan(plan_: Plan, archive_dir: Path, backups_dir: Path) -> Plan:
+    """Re-plan from disk with the caller's policy clock; never trust a hand-built Plan."""
+
+    return plan(
+        load_archive(archive_dir),
+        load_backups(backups_dir),
+        retention_days=plan_.retention_days,
+        now=datetime.fromisoformat(plan_.now),
+    )
+
+
+def _validate_current_plan(journal: dict, current_plan: Plan, backups_dir: Path) -> dict:
+    """Bind a resume to the live retention boundary and retained labels."""
+
     original = journal["plan"]
-    current = _plan_contract(plan_)
+    current = _plan_contract(current_plan)
     for key in (
         "retentionDays",
         "retainedBackups",
@@ -611,6 +643,66 @@ def _validate_resume(journal: dict, plan_: Plan, archive_dir: Path, backups_dir:
     retained = {name: _label_sha256(backups_dir, name) for name in original["retainedBackups"]}
     if retained != journal["retainedLabelSha256"]:
         raise RetentionApplyRefused("retained backup label changed")
+    return current
+
+
+def _validate_pending_target(
+    target: dict,
+    *,
+    current: dict,
+    journal: dict,
+    archive_dir: Path,
+    backups_dir: Path,
+) -> None:
+    """A live pending target must still be deletable immediately before removal."""
+
+    root = archive_dir if target["kind"] == "archive" else backups_dir
+    path = _candidate_path(root, target["name"], target["kind"])
+    if not _path_exists_no_follow(path):
+        return
+    if target["kind"] == "backups" and (
+        target["name"] in current["retainedBackups"]
+        or target["name"] in current["unknownAgeBackups"]
+    ):
+        raise RetentionApplyRefused("pending retention target is now retained")
+    allowed = set(
+        current["deleteArchive"] if target["kind"] == "archive" else current["deleteBackups"]
+    )
+    if target["name"] not in allowed:
+        # shutil.rmtree may have removed backup_label before a crash.  The live
+        # planner then cannot enumerate that candidate, but the same directory
+        # inode plus the original label digest still authorises finishing only
+        # that already-started removal.  A surviving label gets no exception.
+        label = path / "backup_label"
+        partial_backup = (
+            target["kind"] == "backups"
+            and not _path_exists_no_follow(label)
+            and target["name"] in journal["candidateBackupLabelSha256"]
+        )
+        if not partial_backup:
+            raise RetentionApplyRefused("pending retention target is no longer deletable")
+    if _candidate_identity(root, target["name"], target["kind"]) != target["identity"]:
+        raise RetentionApplyRefused("retention candidate identity changed")
+    if target["kind"] == "backups":
+        label = path / "backup_label"
+        if _path_exists_no_follow(label) and (
+            _label_sha256(backups_dir, target["name"])
+            != journal["candidateBackupLabelSha256"][target["name"]]
+        ):
+            raise RetentionApplyRefused("candidate backup label changed")
+
+
+def _validate_resume(journal: dict, plan_: Plan, archive_dir: Path, backups_dir: Path) -> None:
+    if journal["roots"] != {
+        "archive": _root_identity(archive_dir),
+        "backups": _root_identity(backups_dir),
+    }:
+        raise RetentionApplyRefused("retention root identity changed")
+    observed = _observed_plan(plan_, archive_dir, backups_dir)
+    if _plan_contract(observed) != _plan_contract(plan_):
+        raise RetentionApplyRefused("retention plan changed before resume")
+    current = _validate_current_plan(journal, observed, backups_dir)
+    original = journal["plan"]
     target_keys = [(target.get("kind"), target.get("name")) for target in journal["targets"]]
     expected_keys = [("archive", name) for name in original["deleteArchive"]] + [
         ("backups", name) for name in original["deleteBackups"]
@@ -627,18 +719,13 @@ def _validate_resume(journal: dict, plan_: Plan, archive_dir: Path, backups_dir:
             raise RetentionApplyRefused("a completed retention candidate reappeared")
         if target["state"] != "pending" or not _path_exists_no_follow(path):
             continue
-        if _candidate_identity(root, target["name"], target["kind"]) != target["identity"]:
-            raise RetentionApplyRefused("retention candidate identity changed")
-        if target["kind"] == "backups":
-            label = path / "backup_label"
-            # rmtree can remove the label before a process dies. The journal's
-            # directory inode proves this is still the authorised candidate;
-            # a surviving label must retain its exact bytes as well.
-            if _path_exists_no_follow(label) and (
-                _label_sha256(backups_dir, target["name"])
-                != journal["candidateBackupLabelSha256"][target["name"]]
-            ):
-                raise RetentionApplyRefused("candidate backup label changed")
+        _validate_pending_target(
+            target,
+            current=current,
+            journal=journal,
+            archive_dir=archive_dir,
+            backups_dir=backups_dir,
+        )
 
 
 def _delete_candidate(target: dict, archive_dir: Path, backups_dir: Path) -> bool:
@@ -658,6 +745,9 @@ def _delete_candidate(target: dict, archive_dir: Path, backups_dir: Path) -> boo
         if not stat.S_ISDIR(info.st_mode):
             raise RetentionApplyRefused("backup candidate changed type")
         shutil.rmtree(path)
+    # The receipt may say "removed" only after the parent entry itself is
+    # durable; otherwise power loss can resurrect a path behind a completed row.
+    _fsync_directory(root)
     return True
 
 
@@ -670,10 +760,14 @@ def apply(
     invocation_removed = {"archive": [], "backups": []}
     if journal_file.exists() or journal_file.is_symlink():
         journal = _load_journal(journal_file)
-        _validate_resume(journal, plan_, archive_dir, backups_dir)
-        journal["attemptCount"] += 1
-        journal["status"] = "running"
-        journal["failureClass"] = None
+        if journal["status"] == "completed":
+            _archive_completed_journal(journal_file, journal)
+            journal = _new_journal(plan_, archive_dir, backups_dir)
+        else:
+            _validate_resume(journal, plan_, archive_dir, backups_dir)
+            journal["attemptCount"] += 1
+            journal["status"] = "running"
+            journal["failureClass"] = None
     else:
         journal = _new_journal(plan_, archive_dir, backups_dir)
     try:
@@ -681,6 +775,15 @@ def apply(
         for target in journal["targets"]:
             if target["state"] != "pending":
                 continue
+            observed = _observed_plan(plan_, archive_dir, backups_dir)
+            current = _validate_current_plan(journal, observed, backups_dir)
+            _validate_pending_target(
+                target,
+                current=current,
+                journal=journal,
+                archive_dir=archive_dir,
+                backups_dir=backups_dir,
+            )
             removed = _delete_candidate(target, archive_dir, backups_dir)
             state = "removed" if removed else "already-absent"
             target["state"] = state
