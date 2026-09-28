@@ -1,6 +1,7 @@
 """Fail-closed provider selection before immutable object I/O or state change."""
 
 from contextlib import contextmanager
+import datetime as dt
 import inspect
 import json
 from types import SimpleNamespace
@@ -9,6 +10,8 @@ from uuid import UUID
 import pytest
 
 from inv.app import _configured_object_stores
+from inv import results as results_module
+from inv import shard_completion as shard_completion_module
 from inv.errors import DomainError
 from inv.object_store import (
     LOCAL_PROVIDER_ID,
@@ -18,6 +21,8 @@ from inv.object_store import (
 )
 from inv.snapshots import SnapshotStore
 from inv.s3_object_store import S3Objects, make_s3_locator
+from inv.results import ResultStore
+from inv.shard_completion import ShardCompletion
 from inv.workspace_recovery import WorkspaceRecovery
 
 OBJECT = UUID("22222222-2222-4222-8222-222222222222")
@@ -224,6 +229,145 @@ def test_checkout_call_site_opens_the_persisted_provider_not_snapshot_writer():
 
     assert local.calls == []
     assert remote.calls == [("get", "opaque-locator", "a" * 64, 7)]
+
+
+def test_result_prepare_rejects_row_provider_mismatch_before_object_io(monkeypatch):
+    now = dt.datetime(2026, 9, 28, tzinfo=dt.timezone.utc)
+
+    class PrepareConnection(Connection):
+        def execute(self, statement, params=()):
+            if "FROM inv.result_commitments" in statement:
+                return Result()
+            if "clock_timestamp" in statement:
+                return Result(one={"now": now})
+            return super().execute(statement, params)
+
+    database = Database(dict(ROW))
+    database.connection = PrepareConnection(dict(ROW))
+    local = Provider(LOCAL_PROVIDER_ID)
+    run = {"run_id": "run", "attempt": 2, "state": "running", "version": 3}
+    execution = {
+        "recovery_epoch": Database.recovery_epoch,
+        "not_after": now + dt.timedelta(minutes=5),
+        "proofs": {},
+        "action_digest": "b" * 64,
+        "policy_decision_id": "policy",
+    }
+    monkeypatch.setattr(results_module, "lock_run", lambda *_args: run)
+    monkeypatch.setattr(results_module, "assert_fences", lambda *_args: None)
+    monkeypatch.setattr(results_module, "validate_contract", lambda *_args: None)
+    monkeypatch.setattr(ResultStore, "_execution", staticmethod(lambda *_args: execution))
+    evidence = {
+        "tenantId": "tenant",
+        "runId": "run",
+        "result": "succeeded",
+        "evidenceId": "evidence",
+        "inputSha256": "b" * 64,
+        "outputSha256": "a" * 64,
+        "policyDecisionId": "policy",
+        "timestamp": now.isoformat(),
+    }
+
+    with pytest.raises(DomainError) as raised:
+        ResultStore(database, local).prepare(
+            "tenant", "project", "run", str(OBJECT), OBJECT, evidence, proofs={}
+        )
+
+    assert (raised.value.code, raised.value.status, raised.value.retryable) == (
+        "STORE-0001",
+        503,
+        True,
+    )
+    assert local.calls == []
+
+
+def test_result_complete_rejects_row_provider_mismatch_before_object_io(monkeypatch):
+    class CompleteConnection(Connection):
+        def execute(self, statement, params=()):
+            if "FROM inv.result_completions" in statement:
+                return Result()
+            if "FROM inv.result_commitments" in statement:
+                return Result(
+                    one={
+                        "object_id": OBJECT,
+                        "evidence_id": "evidence",
+                        "envelope": {},
+                    }
+                )
+            if "FROM inv.node_stop_receipts" in statement:
+                return Result(
+                    one={
+                        "envelope": {
+                            "processStarted": True,
+                            "exitCode": 0,
+                            "reason": "exited",
+                            "allocations": [],
+                        }
+                    }
+                )
+            if "FROM inv.resource_leases" in statement:
+                return Result()
+            return super().execute(statement, params)
+
+    database = Database(dict(ROW))
+    database.connection = CompleteConnection(dict(ROW))
+    local = Provider(LOCAL_PROVIDER_ID)
+    run = {"run_id": "run", "attempt": 2, "state": "running", "version": 3}
+    execution = {"recovery_epoch": Database.recovery_epoch, "proofs": {}}
+    monkeypatch.setattr(results_module, "lock_run", lambda *_args: run)
+    monkeypatch.setattr(ResultStore, "_execution", staticmethod(lambda *_args: execution))
+
+    with pytest.raises(DomainError) as raised:
+        ResultStore(database, local).complete(
+            "tenant", "project", "run", str(OBJECT), expected_version=3
+        )
+
+    assert (raised.value.code, raised.value.status, raised.value.retryable) == (
+        "STORE-0001",
+        503,
+        True,
+    )
+    assert local.calls == []
+
+
+def test_shard_completion_rejects_row_provider_mismatch_before_object_io(monkeypatch):
+    class ShardConnection(Connection):
+        def execute(self, statement, params=()):
+            if "SELECT p.* FROM inv.shard_parents" in statement:
+                return Result(one={"project_id": "project", "plan_id": "plan", "run_id": "parent"})
+            if "SELECT s.shard_index" in statement:
+                return Result(
+                    many=[
+                        {
+                            **ROW,
+                            "shard_index": 0,
+                            "run_id": "child",
+                            "command_id": OBJECT,
+                            "evidence_id": "evidence",
+                        }
+                    ]
+                )
+            return super().execute(statement, params)
+
+    database = Database(dict(ROW))
+    database.connection = ShardConnection(dict(ROW))
+    local = Provider(LOCAL_PROVIDER_ID)
+    parent = {"run_id": "parent", "state": "running", "version": 3}
+    members = [(0, {"run_id": "child", "state": "succeeded", "version": 3})]
+    monkeypatch.setattr(shard_completion_module, "lock_run", lambda *_args: parent)
+    from inv.shards import ShardRuntime
+
+    monkeypatch.setattr(ShardRuntime, "_lock_members", staticmethod(lambda *_args: members))
+
+    with pytest.raises(DomainError) as raised:
+        ShardCompletion(database, local).once("tenant")
+
+    assert (raised.value.code, raised.value.status, raised.value.retryable) == (
+        "STORE-0001",
+        503,
+        True,
+    )
+    assert local.calls == []
 
 
 def test_restore_rejects_invalid_run_before_checkpoint_pin_lookup():
