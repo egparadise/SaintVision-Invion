@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from '@/shared/ui/Button';
+import { useModalA11y } from '@/shared/ui/useModalA11y';
 import { FileDiffResult } from '@/contracts/types';
 import { DiffViewer } from './DiffViewer';
 
@@ -20,8 +21,19 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
   onMerge,
   onCancel,
 }) => {
+  const { containerRef, handleKeyDown } = useModalA11y({
+    isOpen: true,
+    onClose: onCancel,
+  });
+
   return (
     <div
+      ref={containerRef}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="conflict-resolution-title"
+      onKeyDown={handleKeyDown}
+      tabIndex={-1}
       style={{
         position: 'fixed',
         inset: 0,
@@ -60,7 +72,7 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
         >
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ color: '#f85149', fontWeight: 'bold', fontSize: '16px' }}>
+              <span id="conflict-resolution-title" style={{ color: '#f85149', fontWeight: 'bold', fontSize: '16px' }}>
                 ⚠️ 412 Precondition Failed — Concurrency Conflict
               </span>
               <span
