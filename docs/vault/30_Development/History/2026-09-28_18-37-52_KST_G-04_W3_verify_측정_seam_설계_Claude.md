@@ -1,9 +1,9 @@
 ---
 title: "G-04 W3 verify trusted-worker 측정 seam 설계 v1.0 (카드 83, docs-only)"
-version: "1.0"
+version: "1.1"
 status: "review"
 author: "Claude"
-updated: "2026-09-28T18:37:52+09:00"
+updated: "2026-09-28T19:00:18+09:00"
 ---
 
 # G-04 W3 verify trusted-worker 측정 seam 설계 v1.0 (카드 83, docs-only)
@@ -26,3 +26,12 @@ G-04·G-05 설계 v1.2.1(#183)에서 W3 verify는 보류: `services/lineage.py:2
 ## 검증 방법(실제 수행한 것만)
 
 `git grep -n -F`로 인용 라인 확인(base 1e8baf04; `_locked_version`은 #167/#183/#196 인용), kernel `storage_commit.py`·`storage_sampling.py`·`node_transport.py` 정독. 실행한 시험 없음. 검토자 Codex(보안 경계).
+
+## v1.1 (2026-09-28T19:00:18+09:00) — Codex 확정 계약 반영(#209)
+
+- 신원 정본을 inbound `NodePrincipal`에서 **kernel outbound channel**(`ChannelProof`·leaf pin·Ed25519 서명)로 교체; 새 protocol `node-model-measure-v1`(별도 domain·전용 byte/time 한계); accept tx가 request·contribution/location snapshot·`inv.nodes`·`inv.node_channels`를 재잠금해 binding 6 + nodeId exact 일치.
+- v1 측정 단위 = 단일 immutable DataLocation; provider/locator 복사 삭제; 다중 shard·미해결 URI는 fail closed + NOT_OBSERVED.
+- **0054 확정**: kernel-owned append-only `inv.model_version_measurements` + `model_versions.verified_measurement_id`(composite FK) + `verified_at IS NULL iff verified_measurement_id IS NULL` CHECK; `verify_model_version(measurement_id 필수)`; digest-only 경로 0개를 시험으로 고정.
+- generic EvidenceEnvelope/`inv.evidence` 미연결(run 필수); measurement + request/consumption + audit가 정본.
+- W3 3 span(짧은 canApprove tx → tx 없이 kernel 관측 strict → write tx 재결속·freshness·`observedAt ≤ recordedAt ≤ now`). rotation/retire는 과거 measurement를 자동 무효화하지 않음(별도 revocation 계약).
+- 시험 보강 10항(inbound 교체 실패, binding 변이 accept 0행, drift 409, verified_at 단독 UPDATE CHECK 위반 등).

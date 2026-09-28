@@ -1,130 +1,121 @@
 ---
 doc_id: "CLAUDE-G04-W3-VERIFY-SEAM-DESIGN-001"
-title: "G-04 W3 verify trusted-worker 측정 seam 설계 v1.0 — 누가 bytes를 읽는가(node mTLS 신원·challenge-bound signed sample 재사용), 무엇을 기록하는가(measurement 정본), verify route는 measurement만 받는다(사용자 digest 불신), §5-3 잠금 순서, 실패 코드·존재 비노출, migration 0054 필요 판정, 시험 계획 (카드 83, docs-only)"
-version: "1.0.0"
+title: "G-04 W3 verify trusted-worker 측정 seam 설계 v1.1 — kernel outbound channel이 신원 정본(node-model-measure-v1), 단일 immutable DataLocation만 v1, measurement가 verified 상태에 DB로 결속(0054: inv.model_version_measurements + model_versions.verified_measurement_id), generic EvidenceEnvelope 미연결, W3 3-span 재결속, 시험 보강 (카드 83, Codex 계약 v1.1 반영, docs-only)"
+version: "1.1.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T18:37:52+09:00"
+updated: "2026-09-28T19:00:18+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
 task_ids: ["S10-ST"]
-tags: ["G-04", "W3", "verify", "trusted-worker", "evidence", "node-auth", "design", "claude"]
+tags: ["G-04", "W3", "verify", "trusted-worker", "measurement", "node-channels", "design", "claude"]
 ---
 
-# G-04 W3 verify trusted-worker 측정 seam 설계 v1.0 (2026-09-28, 카드 83)
+# G-04 W3 verify trusted-worker 측정 seam 설계 v1.1 (2026-09-28, 카드 83)
 
 > [!note] 범위
-> G-04·G-05 설계 v1.2.1(#183)에서 **보류**된 W3 `POST /projects/{p}/models/{model_id}/versions/{version}/verify`. 보류 이유(Codex): `services/lineage.py:279` `verify_model_version`의 정본은 "trusted worker가 실제 weights를 해시했다"인데, 승인 사용자가 DB의 `content_sha256`을 그대로 제출해 `verified_at`을 세울 수 있으면 그 문장은 거짓이 된다. 이 문서는 **측정 Evidence seam**을 제안한다: 누가 읽고, 무엇을 남기고, verify route가 그 기록만 받도록 결속한다. docs-only. 검토자 Codex가 계약을 확정한다. 코드·workflow 변경 없음.
+> G-04·G-05 설계 v1.2.1(#183)에서 **보류**된 W3 `POST /projects/{p}/models/{model_id}/versions/{version}/verify`. 보류 이유(Codex): `services/lineage.py:279` `verify_model_version`의 정본은 "trusted worker가 실제 weights를 해시했다"인데, 승인 사용자가 DB의 `content_sha256`을 그대로 제출해 `verified_at`을 세울 수 있으면 그 문장은 거짓이 된다. 이 문서는 **측정 정본(measurement) seam**을 정의한다. docs-only. **v1.1 = Codex 확정 계약(#209 코멘트) 반영**; 이 계약이 반영되기 전에는 PR A(측정 seam)·PR B(W3 route)를 시작하지 않는다.
 
-## 0. 결론 먼저
+## 0. 결론
 
-1. **bytes를 읽는 것은 사용자가 아니라 node다.** 읽는 주체는 그 model version의 데이터가 놓인 contribution을 가진 **enrolled node**(`nodes.certificate_fingerprint`, mTLS)이고, 읽기는 kernel이 이미 가진 **challenge-bound signed sample**(`services/control-plane/src/inv/storage_commit.py:186 accept`, `node_transport.py:95 storage_sample`, `storage_sampling.py:251 verify_sample`)과 같은 모양으로 한다: control plane이 nonce·대상·만료를 담은 challenge를 발급 → node가 자기 ReadRoot 아래서만 읽어(`services/verification.py:74 hash_file` → `:56 ByteObservation`) 서명한 envelope + pinned TLS leaf 인증서를 돌려줌 → control plane이 서명·인증서 지문·challenge 신선도를 검증한 뒤에만 기록.
-2. **기록은 measurement 한 행이 정본이다**(§2). 사용자 입력이 아닌 검증된 envelope에서만 만들어지고, model version·object locator·sha256·byte_size·읽은 시각·node id·인증서 지문·challenge/응답 digest·evidence id를 가진다.
-3. **verify route는 `measurementId`만 받는다**(§3). request에 digest 필드는 존재하지 않는다(strict schema). 잠근 ModelVersion 행과 measurement 행을 결속해 `sha256`·`byte_size`·object·신선도·node 상태를 서버가 판정하고, `verify_model_version(content_sha256=measurement.sha256)`(시그니처 변경 0)에 **measurement의 digest**를 넘긴다.
-4. **migration은 필요하다** — measurement 정본 테이블(§6). 번호는 코디네이터 지시대로 **0054**를 요청한다(이 문서에서 확정하지 않음; Codex 계약 확정 뒤).
-5. **지금 W3 route를 구현하지 않는다.** 이 seam(측정 수집·기록)이 먼저 있어야 W3가 "trusted worker" 문장을 참으로 만든다. §7의 순서로 두 PR(측정 seam → W3 route).
+1. **신원 정본은 kernel의 outbound channel이다**(§1). node가 business API로 들어오는 inbound client-cert(`identity/node_auth.py::NodePrincipal.lock_current`)는 measurement 정본으로 쓰지 않는다. kernel `StorageSampleStore._scope`(`inv/storage_commit.py:46`)가 `inv.nodes`·`inv.node_channels`를 잠가 만든 `ChannelProof(tenant_id, node_id, recovery_epoch, version, endpoint, certificate_sha256)`(`inv/node_channels.py:84`)와, 그 endpoint에 mTLS로 접속해 실제 TLS **server leaf**를 pin하고(`node_transport.py:95 storage_sample`, `include_peer_certificate=True`) 같은 leaf의 Ed25519 키로 서명된 payload를 검증하는 `storage_sampling.py:251 verify_sample`이 정본이다.
+2. **새 protocol `node-model-measure-v1`**(§2): 기존 `node-storage-sample-v1`의 cryptographic pattern(domain-separated 서명·leaf pin·nonce·만료)만 재사용하고 domain/version·byte/time 한계는 별도.
+3. **v1 측정 단위는 단일 immutable `DataLocation` 하나**(§3). `provider_id/locator` 결속은 삭제(근거 join 없음). 다중 shard/directory·단일 location으로 resolve되지 않는 URI는 `GRAPH-0002/409` + measurement 0 + **NOT_OBSERVED**.
+4. **measurement는 verified 상태에 DB로 결속된다**(§4, migration **0054 확정**): kernel-owned append-only `inv.model_version_measurements` + `public.model_versions.verified_measurement_id`(nullable, composite FK) + `verified_at IS NULL iff verified_measurement_id IS NULL` CHECK. `verify_model_version`은 `measurement_id`를 **필수**로 받는다(서비스 시그니처 변경; digest 문자열만으로 verified를 세우는 경로 0개).
+5. **generic `EvidenceEnvelope`/`inv.evidence`를 연결하지 않는다**(§5): run이 필수라 run-less subject를 담을 수 없고, 가짜 run·`produced_by_run_id` 대입은 금지. v1 정본 = measurement + request/consumption + bounded audit event.
+6. **W3 route는 3 span**(§6): 짧은 canApprove tx → tx 없이 kernel 관측(`ModelMeasurementObservation`, caller bearer·no redirect·bounded·strict) → write tx(IDEM lock → canApprove → replay → Model parent + ModelVersion `FOR UPDATE/populate_existing` → 관측 identity 재결속 → contribution/location/replica exact version·상태 재확인 → freshness → `verify_model_version(measurement_id, content_sha256=observation.sha256)` → audit + ledger).
 
-## 1. 누가 bytes를 읽는가 — 신원과 결속(기존 체계 재사용)
+## 1. 신원 경계 — kernel outbound channel이 정본
 
-| 요소 | 재사용하는 정본 | 이 설계에서의 역할 |
+| 항목 | 정본 | 인용 |
 |---|---|---|
-| node 신원 | `src/saintvision/identity/node_auth.py:75 NodePrincipal`(`certificate_sha256`, mTLS 또는 allowlist된 trusted proxy만), `:99 lock_current`(변경 tx 안에서 `nodes` 행 `FOR UPDATE` + 지문 재확인, retired 거부) | 측정 응답을 기록하는 tx에서 node 행을 잠그고 지문이 현재 credential과 같을 때만 기록 |
-| bytes 위치 | `model_versions.uri`(`inv://models/<name>@<version>[/<path>]`, `storage/pathsafe.py:235 build_uri`) → `services/resolver.py:37 resolve_location` → `data_locations`(`contribution_id`) → `storage_contributions.node_id`(`normalized_path`, `status='active'`) | **어느 node가 읽을지는 서버가 정한다**(caller가 node를 고르지 않음). object provider/locator(#159 `inv.storage_objects.provider_id/locator`, 불변 trigger)는 measurement에 그대로 복사해 "무엇을 읽었는가"를 고정 |
-| 읽기 경계 | node 측 `storage/readroot.py`(설정된 root만, link·cross-device·변경 중 파일 거부) + `hash_file`(두 번 bounded read 일치, byte budget) | node는 challenge가 가리키는 항목만, 자기 root 아래서만 읽는다 |
-| challenge/응답 | `inv/storage_sampling.py:75 Challenge`(channel = node 인증서 지문·project·run·contribution·root_version·items·now, `validate(now)` 만료), `:251 verify_sample`(payload+signature, `certificate_key`가 pinned leaf 지문 = channel 지문 검증, `observedAt` 시점에도 인증서 유효) | 새 challenge 종류 `model-measure`(§2-1)를 같은 기계로 발급·검증. **위조 envelope는 서명 검증에서 죽고 기록에 도달하지 않는다** |
-| 기록 저장 | kernel `accept`는 `inv.evidence`(EvidenceEnvelope JSON, `action: verify-storage-sample`, `inputSha256=challenge digest`, `outputSha256=payload digest`) + `public.storage_checks` + `inv.storage_sample_consumptions(request_id, response_sha256, evidence_id)`(replay는 같은 response digest만) | 같은 3중 기록 패턴을 measurement에 적용(§2-2) |
+| node 신원 | `ChannelProof(tenant_id, node_id, recovery_epoch, version, endpoint, certificate_sha256)`; `assert_channel(conn, expected)`가 `inv.nodes.recovery_epoch`·`inv.node_channels`(version·endpoint·certificate_sha256·enabled)를 현재 값과 대조 | `inv/node_channels.py:84`, `:104`, `:169-186` |
+| 잠금 | issue/accept tx가 `inv.nodes` `FOR UPDATE`·`storage_contributions` `FOR UPDATE`·location snapshot을 잡고, accept에서 `_current`가 run/root/channel/challenge digest/items를 issue 시점과 exact 비교 | `inv/storage_commit.py:46 _scope`, `:57`, `:63`, `:173 _current` |
+| transport | `NodeTLSClient.storage_sample(channel, challenge)`: channel 불일치 `NODE-0032/403`, endpoint에 mTLS, 응답과 함께 **peer(server leaf) 인증서** 반환 | `inv/node_transport.py:95-118` |
+| 서명 검증 | `verify_sample`: `payload`+`signature`만, `certificate_key`가 leaf DER 지문 == channel 지문·유효기간(`now`·`observedAt` 양쪽) 확인 뒤 `DOMAIN + payload` Ed25519 검증, `observedAt ∈ [issued_at, now]` | `inv/storage_sampling.py:162 certificate_key`, `:251 verify_sample`, `:284` |
 
-**사용자(승인 등급)는 무엇을 하는가.** 측정을 **요청**할 수 있을 뿐(§2-1의 issue), 값을 제출하지 못한다. 이것이 `mark_verified`(`services/storage.py:183`, "Record a checksum computed by a trusted worker")가 route 없이 서비스로만 있는 이유와 같은 원칙이다.
+**measurement가 남기는 binding 6 + nodeId**: `recoveryEpoch`, `channelVersion`, `certificateSha256`, `contributionVersion`, `locationVersion`, (challenge에 박힌) `relativePath`·`nodeId`. accept tx는 request row·contribution/location snapshot·`inv.nodes`·`inv.node_channels`를 **다시 잠가** issue 당시 값과 exact 일치시킨 뒤에만 서명/leaf/만료를 검증한다. 하나라도 다르면 accept 0행.
 
-## 2. 무엇을 기록하는가 — measurement 정본
+**caller가 node를 고르는 필드는 금지**: issue body는 `{}`(IDEM 키만 헤더). node는 `model_versions.uri` → `DataLocation` → `storage_contributions.node_id`로 서버가 정한다.
 
-### 2-1. 측정 요청(issue)과 수집(accept)
+## 2. protocol `node-model-measure-v1`
 
-- **issue** `POST /v1/projects/{p}/models/{model_id}/versions/{version}/measurements` (grade canApprove, IDEM 키 필수, body `{}`만): 서버가 path→row 결속(Model parent → ModelVersion, #183 §2 규칙) 뒤 `uri`를 resolve해 대상 `data_locations`·contribution·node를 정하고 kernel에 `model-measure` challenge 발급을 위임한다. challenge에는 `modelVersionId`, 대상 location id/relative_path/`byte_size`, contribution `root_version`, channel(node 인증서 지문), `now`/만료(기존 `Challenge.validate` 규칙)가 들어간다. 응답은 `{measurementRequestId}`; **digest는 응답에 없다**.
-- **accept**: kernel이 node로부터 signed envelope(`NodeStorageSignedSample` 계약과 같은 `payload`+`signature`, pinned leaf 인증서 동봉)를 받아 `verify_sample`과 같은 검증(서명·지문·만료·`observedAt`)을 통과한 경우에만 measurement 행을 만든다. 통과하지 못하면 **아무것도 기록하지 않고** 요청은 실패로 끝난다(§4). 같은 request의 재응답은 `response_sha256`이 같을 때만 replay(기존 `IDEM-0001` 규칙), 다르면 409.
-- 동기/비동기: kernel `collect`(`storage_commit.py:307`)처럼 issue→node 호출→accept를 한 요청에서 끝내는 형태를 기본으로 하되, node 호출 시간(`timeout=6`)이 business route의 tx 밖에서 일어나야 한다(#167 release가 관측 fetch를 tx 밖 별 span에서 하는 것과 같은 이유). 즉 business route는 (1) 권한 preflight tx → (2) kernel 호출(tx 없음) → (3) 기록 tx.
+- domain `saintvision/node-model-measure/v1\0`(storage-sample의 `DOMAIN`과 분리; 한 키로 서명해도 두 protocol의 payload가 서로 대체될 수 없다).
+- challenge: `{protocol, channel(ChannelProof), tenantId, projectId, modelVersionId, uri, contributionId, contributionVersion, locationId, locationVersion, relativePath, expectedByteSize, nonce, issuedAt, expiresAt}`; `validate(now)`는 storage-sample의 `Challenge.validate`(`storage_sampling.py:87-107`) 규칙(정수·범위·만료 ≤ issued+창)을 따르되 창은 model-measure 전용.
+- **한계(model-measure 전용, 계약에 명시)**: storage-sample의 `MAX_FILE_BYTES = 1 MiB`·`MAX_FILES = 32`·challenge ≤ 30 s·transport 6 s(`storage_sampling.py:35-37`, `:107`, `node_transport.py:114`)는 **재사용하지 않는다**. v1 제안값: `MODEL_MEASURE_MAX_BYTES = 8 GiB`(Settings; 초과는 issue 전에 `expectedByteSize`로 거부), challenge 창 `MODEL_MEASURE_CHALLENGE_SECONDS = 900`, transport deadline `MODEL_MEASURE_TRANSPORT_SECONDS = 600`; node 측 `hash_file`(`services/verification.py:74`)의 **두 번의 bounded read**가 deadline 안에 끝나 일치해야 하고, 아니면 pass가 아니라 실패/NOT_OBSERVED(`unverifiable` 응답은 measurement 행을 만들지 않는다).
+- payload: `{protocol, challengeSha256, locationId, sha256, byteSize, observedAt, durationSeconds}`; 서명은 leaf 키; accept가 `challengeSha256`을 request row와 대조.
 
-### 2-2. measurement 행(정본, append-only)
+## 3. v1 측정 단위 — 단일 immutable DataLocation
 
-| 열 | 값 | 근거 |
-|---|---|---|
-| `measurement_id` | InvId | PK |
-| `tenant_id` | node·model version의 tenant(둘이 같아야 기록) | RLS |
-| `model_version_id` | 잠근 ModelVersion | 결속 대상 |
-| `uri` | `model_versions.uri` 그대로 | "무엇을" |
-| `provider_id`, `locator` | #159 `inv.storage_objects`의 값(있을 때), 없으면 `data_locations.location_id`·`relative_path` | 객체 정체 |
-| `sha256`, `byte_size` | envelope의 `ByteObservation` | 측정값 |
-| `observed_at` | envelope `observedAt`(node 시각, 서명 대상) | 신선도 판정 |
-| `recorded_at` | control plane clock(잠금 뒤 1회 읽기) | 기록 시각 |
-| `node_id`, `certificate_sha256` | `NodePrincipal`(lock_current 통과) | "누가" |
-| `request_id`, `challenge_sha256`, `response_sha256` | issue/accept의 nonce·digest | 재생·위조 방지 |
-| `evidence_id` | `inv.evidence`에 남긴 EvidenceEnvelope id(`action: model_version.measure`, `inputSha256=challenge digest`, `outputSha256=payload digest`, `result`) | 감사 연결 |
-| `duration_seconds` | `ByteObservation.duration_seconds` | 운영 관측(느린 스토리지) |
+issue 조건(모두 서버 판정; 하나라도 아니면 `GRAPH-0002/409`, measurement 0, 문서상 NOT_OBSERVED):
+1. `model_versions.uri`가 `services/resolver.py:37 resolve_location`으로 tenant/project 안의 `kind='model'`인 **정확히 한** `DataLocation`으로 resolve된다(디렉터리·다중 location·미해결 → 409).
+2. 그 location의 contribution이 `active`, location이 `ready`(`checksum_sha256`·`verified_at` 있음), 그 node에 ready replica가 있다.
+3. 기록 정체성 = `(tenantId, projectId, modelVersionId, uri, contributionId, contributionVersion, locationId, locationVersion, relativePath, nodeId, recoveryEpoch, channelVersion, certificateSha256)`.
 
-- **saintvision `EvidenceEnvelope`(`db/models/evidence.py:34`)를 measurement 정본으로 쓰지 않는 이유**: `run_id NOT NULL`(측정은 run이 아니라 version에 속함), `output_ref`는 `inv://`만 허용(`services/evidence.py:73`)이라 provider/locator를 담을 수 없고, 텔레메트리 JSON에서 digest를 꺼내 판정하면 "정본이 JSON 안의 문자열"이 된다. kernel `inv.evidence`도 같은 이유로 **연결(evidence_id)**만 한다.
-- 불변: UPDATE/DELETE grant 없음(app role INSERT·SELECT만), #159 `guard_storage_object`처럼 trigger로 신원 열 변경 거부. `UNIQUE (tenant_id, request_id)`.
+`data_locations` ↔ `inv.storage_objects` 사이에 정의된 FK/join이 없으므로 v1.0의 "provider_id/locator 복사"는 **삭제**. 다중 shard/directory의 aggregate digest는 이 PR에서 추측하지 않는다; 후속은 정렬된 `(shardIndex, byteLength, sha256)`의 **별도 versioned digest 계약**으로만 추가한다. `ModelExecutionManifestObservation`이 여러 shard/location을 뜻하면 v1은 fail closed.
 
-## 3. verify route(W3)가 measurement만 받는 결속
+## 4. measurement ↔ verified 상태의 DB 결속 (migration 0054, 확정)
 
-`POST /projects/{p}/models/{model_id}/versions/{version}/verify`, grade **canApprove**(#183 §2; 사용자가 값을 주지 않으므로 등급은 "이 version을 verified로 승격할 권한"만 뜻함).
+- **`inv.model_version_measurements`**(kernel-owned, append-only, 성공한 signed observation만): `measurement_id`, `tenant_id`, `request_id`, `project_id`, `model_version_id`, `uri`, `contribution_id`, `contribution_version`, `location_id`, `location_version`, `relative_path`, `node_id`, `recovery_epoch`, `channel_version`, `certificate_sha256`, `sha256`, `byte_size`, `observed_at`, `recorded_at`, `challenge_sha256`, `response_sha256`, `duration_seconds`. `UNIQUE (tenant_id, measurement_id)`, `UNIQUE (tenant_id, request_id)`. RLS tenant. application role은 INSERT/UPDATE/DELETE **불가**(SELECT만); accept kernel path만 INSERT(0047 `record_auth_denial`처럼 SECURITY DEFINER 또는 kernel role).
+- **`public.model_versions.verified_measurement_id`** nullable + composite FK `(tenant_id, verified_measurement_id) → inv.model_version_measurements (tenant_id, measurement_id)` + CHECK `(verified_at IS NULL) = (verified_measurement_id IS NULL)`. 허용된 전이는 두 열을 **같은 statement/transaction**에서 함께 설정한다.
+- **`verify_model_version`**: `measurement_id`를 **필수**로 받고(또는 동등한 typed receipt), 그 행을 tenant·model_version_id로 결속해 `sha256`/`byte_size`를 대조한 뒤 `verified_at`·`verified_measurement_id`를 함께 세운다. `content_sha256` 문자열만 받는 호출 경로는 **0개**(전수 grep 시험 + DB 부정 시험: `verified_at`만 단독 UPDATE → CHECK 위반, FK 없는 id → FK 위반). 시그니처 0 유지보다 bypass 불가능성이 우선.
+- 0054는 alembic 파일 하나가 kernel SQL(`inv/migrations/00xx_model_version_measurements.sql`)을 감싸는 #159(0048) 방식 + `public.model_versions` 열·FK·CHECK. 0052 방식의 catalogue 검사·fail-closed·resume 규칙 적용.
 
-- **request**: `ModelVersionVerifyRequest{measurementId: InvId}` strict. `contentSha256`·`byteSize`·`uri` 등 값 필드는 **존재하지 않으며** 있으면 422(extra forbid). 되돌림 시험: body에 digest를 넣으면 422.
-- **순서(#183 §5-3 W4 계약과 동일 골격, READ COMMITTED)**: preflight canApprove(별 tx) → body → `SET LOCAL lock_timeout` → IDEM-6 직렬화점 → live canApprove → app clock 1회 → 원장(replay/409) → **Model parent path 결속 → ModelVersion 단일 행 `FOR UPDATE + populate_existing`(#167 `model_release.py::_locked_version`, W4 #196과 같은 helper)** → live canApprove 재확인 → **measurement 행 `FOR SHARE`**(tenant·`measurement_id`) → 서버 판정(아래) → `verify_model_version(session, tenant_id, model_version_id=row.model_version_id, content_sha256=measurement.sha256, now)` → audit(`model_version.verify`, detail에 measurementId·nodeId·observedAt; digest 값은 열에만) + ledger 같은 tx.
-- **서버 판정(모두 통과해야 함)**:
-  1. measurement.tenant_id == principal.tenant_id, measurement.model_version_id == row.model_version_id (아니면 404 "No such measurement." — 다른 version의 measurement도 같은 404: 존재 비노출).
-  2. measurement.uri == row.uri (등록 뒤 uri가 바뀌었으면 409).
-  3. measurement.sha256 == row.content_sha256 이고 (row.byte_size > 0이면) measurement.byte_size == row.byte_size — 아니면 `GRAPH-0002/409` "The measurement does not match the registered digest."(값 비노출). 서비스의 `VAL_SCHEMA` 검사는 2차 방어.
-  4. `now - measurement.observed_at <= Settings.model_measurement_max_age`(기본 24h; 설정) — 아니면 409 "stale".
-  5. measurement.node_id의 `nodes.status != 'retired'`이고 `certificate_fingerprint == measurement.certificate_sha256`(측정 뒤 인증서 교체·retire된 node의 측정은 승격 불가) — 아니면 409.
-  6. 이미 `verified_at`이 있으면: 같은 measurement 또는 같은 sha256이면 **자연 멱등 200**(변경 0), 다른 sha256이면 409(정본 `content_sha256`은 불변이므로 실제로는 3에서 먼저 걸린다).
-- **응답**: `ModelVersionResponse`류 strict(`verifiedAt`, `measurementId`, `stage`); digest는 이미 등록값이므로 노출 범위 변화 없음.
-- **오류 표**: 키 없음/다른 body 422·409(IDEM), measurement 404, 불일치·stale·node 상태 409 `GRAPH-0002`, lock timeout/deadlock `SYS-0001/503/retryable=true`, 권한 403(공유 denial audit #195), 무토큰 401.
+## 5. generic EvidenceEnvelope는 연결하지 않는다
 
-## 4. 실패 코드와 존재 비노출
+`EvidenceEnvelope`(`db/models/evidence.py:34`, `run_id NOT NULL`)와 kernel `inv.evidence`는 real `run_id`가 필수다. model measurement는 run에 속하지 않으므로 v1.0의 `evidence_id → inv.evidence(action=model_version.measure)`는 현재 계약으로 만들 수 없고, 가짜 run이나 `produced_by_run_id` 대입은 금지한다. v1 정본 = measurement 행 + request/consumption 행 + bounded audit event(`record_event`, `model_version.measure`/`model_version.verify`, detail은 id만). run-less subject를 정식 지원하는 별도 envelope 계약이 생길 때만 연결한다.
 
-| 상황 | 어디서 | 응답 |
-|---|---|---|
-| envelope 서명 불일치·인증서 지문 ≠ channel·challenge 만료·`observedAt` 시 인증서 무효 | accept(기록 전) | 기록 0, `AUTH-0030/403` 아닌 **`GRAPH-0002/409` "The measurement could not be verified."**(어느 검사가 실패했는지는 kernel 로그·evidence `result: failed`에만; 응답에 비노출) |
-| node가 항목을 읽지 못함(root 밖·변경 중·크기 초과) | node → envelope `unverifiable` | measurement `sha256 NULL` 행은 **만들지 않음**(정본은 성공 측정만) — evidence에는 실패로 남김 |
-| measurement가 다른 tenant/version/없음 | verify | `RES-0004/404` 동일 문구 |
-| digest·size·uri 불일치 | verify | `GRAPH-0002/409`, 값 비노출 |
-| stale·node retired·지문 변경 | verify | `GRAPH-0002/409` |
-| 같은 request 재응답이 다른 digest | accept | 409(kernel `IDEM-0001` 규칙) |
+## 6. W3 route — 3 span과 재결속
 
-## 5. 동시성
+`POST /projects/{p}/models/{model_id}/versions/{version}/verify`, grade canApprove, body `{measurementId}`만(strict; digest·size·uri 필드 존재 시 422).
 
-- verify는 W4·release와 **같은 `_locked_version` 한 행**을 잠근다(#183 §5-3 "parent read 후 ModelVersion 한 행"). release↔verify: release가 먼저면 verify는 기다린 뒤 released row에 `verified_at`을 세울 수 있는가 — release는 `verified_at IS NOT NULL`을 전제(`release_requires_verification_and_pin` CHECK)하므로 released row는 이미 verified다; verify는 자연 멱등(3-6). verify가 먼저면 release는 기다린 뒤 verified를 본다. pin↔verify는 값이 겹치지 않는다(W4 실측은 #196에서 NOT_OBSERVED로 남긴 항목을 이 PR의 실 PG 시험이 채운다).
-- measurement 행은 append-only라 잠금 경합이 없고 `FOR SHARE`는 verify 중 삭제 방지(삭제 grant가 없으므로 사실상 문서용).
-- issue 동시 2건(같은 version): kernel `storage_sample_requests`처럼 `request_id`(IDEM 키에서 파생) UNIQUE + 같은 nonce 재발급 금지 규칙 재사용.
+1. **짧은 tx**: live canApprove.
+2. **tx 없이** kernel 관측 `GET {kernel}/…/measurements/{measurementId}` — caller bearer, no redirect, bounded read, strict `ModelMeasurementObservation`(`validate_contract`; unknown key 거부). 응답: `measurementId, tenantId/projectId/modelId/modelVersionId, uri, contributionId/contributionVersion, locationId/locationVersion/relativePath, nodeId/recoveryEpoch/channelVersion/certificateSha256, sha256, byteSize, observedAt, recordedAt`. kernel unreachable/invalid contract/redirect/oversize → `SYS-0001/503/retryable=true`(#167 `_observation` 패턴).
+3. **write tx**(`api/lock_wait.bounded_lock_wait`, 카드 84): IDEM-6 lock → live canApprove → replay → Model parent + ModelVersion `FOR UPDATE/populate_existing`(`_locked_version`) → **관측 identity 재결속**(tenant/project/model/modelVersion/uri = path·row) → business-visible contribution/location/replica의 **exact version·active/ready 상태 재확인** → freshness(`now - observedAt ≤ Settings.model_measurement_max_age_seconds`, 기본 86400; `observedAt ≤ recordedAt ≤ now`, 미래 시각 거부) → `verify_model_version(session, tenant_id, model_version_id, measurement_id, content_sha256=observation.sha256, now)` → audit + ledger.
 
-## 6. migration 필요 여부 — 필요, 번호 0054 요청
+오류 표: missing/other tenant/other version = 동일 404; snapshot drift·digest/size/uri mismatch·stale = 값 비노출 `GRAPH-0002/409`; kernel 문제 = `SYS-0001/503`; 권한 회수 = 403 + denial 1행(#195); lock wait = `SYS-0001/503`.
 
-- 새 테이블 `model_version_measurements`(§2-2) + RLS(tenant) + app role INSERT/SELECT + 불변 trigger + `UNIQUE(tenant_id, request_id)` + index `(tenant_id, model_version_id, observed_at DESC)`. `model_versions`에는 열을 추가하지 않는다(`verified_at`만 세움; 어떤 measurement로 세웠는지는 audit + measurement의 `model_version_id`로 역추적 가능. 열 추가 여부는 Codex 판단에 맡김: 추가 시 `verified_measurement_id` nullable FK, 같은 0054).
-- 위치: kernel이 accept를 수행하면 kernel 스키마(`inv.*`, `services/control-plane/src/inv/migrations/00xx.sql`을 alembic 0054가 감싸는 #159 방식) / business가 기록하면 `public.model_version_measurements`(alembic 0054 직접). **권고: kernel 소유**(node transport·challenge 검증이 kernel에 있고 business app은 node channel을 열지 않는 현 경계 유지; #167 release가 kernel 관측을 HTTP로 읽는 패턴과 같음). 그러면 business W3 route는 `GET {kernel}/…/measurements/{id}` 관측(caller bearer, no-redirect, bounded read = `model_release.py::fetch_commitment` 패턴)으로 measurement를 읽고 §3 판정을 한다 — 단, 이 경우 §3의 `FOR SHARE`는 없고 관측의 `measurementId`·`sha256`·`observedAt`·`nodeId`·`certificateSha256`을 kernel 응답 계약(`ModelMeasurementObservation`, strict, `validate_contract`)으로 받는다. 어느 쪽이든 **번호는 0054 하나**.
+**인증서 rotation/retire와 과거 measurement**: accept 당시 channel/leaf가 검증됐다는 사실은 과거 evidence다. 이후 정상 rotation/retire가 과거 측정을 자동 무효화하지 않는다(그러려면 verified version을 되돌리는 별도 revocation lifecycle이 필요). 대신 freshness 창 안에서 위 snapshot을 재확인한다. 보안 사고로 evidence를 폐기하는 explicit revocation은 후속 계약.
 
-## 7. 시험 계획(되살림)
+## 7. 시험 계획(되살림, Codex 보강 포함)
 
-PR A(측정 seam, kernel 또는 business):
-1. **위조 evidence**: 서명이 다른 키로 된 envelope / 인증서 지문 ≠ channel / 만료된 challenge / `observedAt`에 인증서 무효 → 기록 0·409·evidence `failed`.
-2. **다른 object**: challenge의 항목과 다른 location을 읽은 응답(payload의 item id 불일치) → 거부.
-3. **replay**: 같은 request 같은 응답 → 같은 measurement id; 다른 응답 → 409.
-4. **node 신원 없음**: mTLS/proxy 지문 없는 요청 → `AUTH-MISSING-CREDENTIAL`; retired node → `AUTH-INVALID-CREDENTIAL`(기존 `node_auth` 시험 재사용).
-5. 실 PG: measurement 행 RLS(타 tenant 조회 0), 불변 trigger(UPDATE 거부), UNIQUE request.
+PR A(측정 seam, kernel):
+1. inbound `NodePrincipal`로 바꾸면 실패(정본은 outbound channel); `channelVersion`/`recoveryEpoch`/`certificateSha256` 중 하나만 바뀌어도 accept 0행.
+2. `contributionVersion`/`locationVersion`/ready replica/`relativePath` 중 하나가 바뀌면 accept 409(또는 W3 409)이고 verified 상태 불변.
+3. 위조 envelope(다른 키 서명·지문 불일치·만료·`observedAt` 범위 밖) → 기록 0·409·audit `failed`; 다른 domain(storage-sample 서명)으로 만든 payload는 거부.
+4. provider/locator를 임의 연결할 수 없음; multi-location/shard·미해결 URI는 fail closed(409, measurement 0).
+5. 한계: `expectedByteSize > MODEL_MEASURE_MAX_BYTES` issue 거부; deadline 안에 두 번 read가 안 끝나면 실패.
+6. replay: 같은 request 같은 응답 → 같은 measurement; 다른 응답 → 409. 실 PG: RLS·append-only(UPDATE/DELETE grant 없음)·UNIQUE.
+7. 가짜 runId 없이 measurement 정본이 성립하고 generic `EvidenceEnvelope`/`inv.evidence` 행이 생기지 않음.
+
+0054 + 서비스:
+8. `verified_at`만 단독 UPDATE → CHECK 위반; measurement FK 없는 id → FK 위반; `verify_model_version`에 digest만 넘기는 호출 경로 0개(전수 grep + 시그니처 시험).
 
 PR B(W3 route):
-6. PG-free: body에 `contentSha256`이 있으면 422(사용자 digest 불신의 되돌림); 순서 로그(§3); measurement 404 3경로 동일 문구; 불일치 sha/size/uri → 409 값 비노출; stale → 409; node retired/지문 변경 → 409; 멱등 200; 55P03/40P01 → 503; 서비스에 넘긴 `content_sha256`이 **measurement의 값**임을 단언(요청에 digest가 없으니 다른 출처가 없음).
-7. 실 PG: 정상 측정 → verify 200·`verified_at` 세움·audit 1; **DB digest를 그대로 넣은 위조 measurement 행은 만들 수 없음**(app role INSERT는 accept 경로만; 시험은 owner로 넣은 행이 `certificate_sha256`/node 결속에서 거부됨을 확인); release↔verify·verify↔pin 경합(독립 세션·`pg_stat_activity` barrier, W4 방식); 회수 재검사 403 + denial 1행(#195).
+9. PG-free: body에 digest → 422; 3 span 순서; 관측 identity mismatch → 404; unknown key/redirect/oversize → 503; drift/mismatch/stale/미래 시각 → 409 값 비노출; 서비스에 넘긴 digest = 관측값; Settings 범위(양의 유한 초, startup fail-closed).
+10. 실 PG: W3↔release·W3↔W4가 같은 ModelVersion lock(독립 세션 + `pg_stat_activity` barrier, W4 방식); commit 뒤 `(verified_at, verified_measurement_id)`가 둘 다 있거나 둘 다 NULL; 회수 재검사 403 + denial 1행.
 
-## 8. 열린 질문(Codex 확정 필요)
+## 8. 열린 질문(계약 밖, 후속)
 
-1. **다중 파일 model의 `content_sha256` 정의**: `register_model_version`은 단일 digest를 받는다. `uri`가 디렉터리(여러 `data_locations`)면 "실제 weights의 해시"가 무엇인지(파일 목록의 정렬된 (path, sha256) 해시? 단일 object만 허용?)가 먼저 정해져야 한다. 이 설계는 **단일 object(location 1개) 우선**, 다중 파일은 정의 확정 전 NOT_OBSERVED.
-2. measurement 기록 소유(kernel vs business, §6)와 그에 따른 0054의 스키마 위치.
-3. 신선도 창(24h 기본)과 stale 뒤 재측정 요구 여부.
+- 다중 shard aggregate digest 계약(정렬된 `(shardIndex, byteLength, sha256)`의 versioned digest) — 별도 카드.
+- explicit revocation lifecycle(보안 사고 시 과거 measurement 폐기와 verified 되돌림) — 별도 카드.
 
-## 9. 검증 방법(실제 수행한 것만)
+## 9. v1.0 → v1.1 변경 요지
 
-- `git grep -n -F`(base `1e8baf04`): `lineage.py:279`, `node_auth.py:75/:99`, `storage_commit.py:186 accept`·`:274 consumptions`, `node_transport.py:95`, `storage_sampling.py:75/:142/:162/:251`, `verification.py:56/:74`, `storage.py:183 mark_verified`, `evidence.py:40/:73`, `resolver.py:37`, `pathsafe.py:235`, `projects.py:204`, `lineage.py:205`(uq), 0048 wrapper·`inv/migrations/0026_object_store_locator.sql`(provider_id/locator/불변 trigger).
-- `_locked_version`은 base에 없고 #167/#183 §5-3·#196의 것을 인용(병합 목록).
+| v1.0 | v1.1(Codex 확정) |
+|---|---|
+| `NodePrincipal.lock_current`(inbound)를 신원 정본으로 | kernel outbound `ChannelProof` + leaf pin + 서명이 정본; inbound는 금지 |
+| storage-sample 기계를 그대로 | 별도 domain/version `node-model-measure-v1`, 전용 byte/time 한계 |
+| provider_id/locator 복사 | 삭제(join 근거 없음); 단일 immutable DataLocation만 v1 |
+| `evidence_id → inv.evidence` 연결 | 연결하지 않음(run 필수); measurement + request/consumption + audit가 정본 |
+| `verified_at`만 세우고 measurement는 audit에 | `verified_measurement_id` FK + CHECK; `verify_model_version(measurement_id 필수)` |
+| node retire/rotation 시 409 | 과거 measurement 자동 무효화 없음; freshness 창 안 snapshot 재확인 |
+| 소유 kernel vs business 미정 | **kernel-owned measurement + public ModelVersion FK, 0054 확정** |
+
+## 10. 검증 방법(실제 수행한 것만)
+
+- `git grep -n -F`(base `1e8baf04`): `lineage.py:279`, `node_channels.py:84/:104/:169-186`, `storage_commit.py:46/:57/:63/:173/:186/:274`, `node_transport.py:95-118`, `storage_sampling.py:33-37/:87-107/:162/:251/:284`, `verification.py:56/:74`, `evidence.py:34`·`services/evidence.py:73`, `resolver.py:37`, `pathsafe.py:235`, `lineage.py:205`.
+- Codex #209 코멘트(2026-09-28T09:59:20Z) 정독·반영. `_locked_version`·`bounded_lock_wait`는 #167/#196/#211 인용.
 - 코드·workflow·migration 변경 없음. 실행한 시험 없음(docs-only).
