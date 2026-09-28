@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.121"
+version: "1.0.127"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-23T10:30:00+09:00"
+updated: "2026-09-28T19:38:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -20,6 +20,36 @@ source_of_truth: "Git"
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
 - 확인 기준: 2026-09-23T10:30:00+09:00 (최신 tip `fdd4a895`, 작업 브랜치 `agent/gemini/s04-fe-matrix-measured`).
+
+## 2026-09-28 G-04 RunDetail 봉인 기록(R1·R2·R3) 읽기 전용 패널 및 무결성 검증 (카드 86, `agent/gemini/g04-fe-seal-record`)
+
+- **작업 브랜치**: `agent/gemini/g04-fe-seal-record` (base: PR #201 head `9dfb2878` + PR #188 head `dfb666a3` 클린 머지 `86c6909a`)
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude (UI·테스트 축), Codex (계약 축).
+- **작업 내용 (카드 86)**:
+  - **계약 및 Observation 계층**:
+    - `apps/web/scripts/api-response-contracts.mjs`에 `run-record-response`, `run-record-artifact-page-response`, `artifact-pin-verification-response`, `context-bundle-response` 4종 스키마 등록 및 타입 자동 동기화 (`packages/contracts-ts/src/index.ts` 수동 편집 0건).
+    - `apps/web/src/shared/api/runSealObservation.ts` 신설: R1 RunRecord, R2 Artifacts, R2 Pin Verify, R3 Context Bundle fetcher 및 허용 키 화이트리스트 기반 런타임 가드 구현.
+  - **UI 컴포넌트 (`apps/web/src/features/runs/SealRecordPanel.tsx`)**:
+    - 404 RES-0004 ("No sealed record for this run.") 발생 시 가짜 PASS/수치 없는 정직한 `미봉인 (UNSEALED)` 안내 배지 표출.
+    - `verified: false` 및 `hashVerified: false`에 대한 200 사실 보고 처리 (`⚠️ 불일치 (Tampered/Mismatch)`, PASS/합격/녹색 위장 금지, 에러 배너 격발 금지).
+    - 401 (`AUTH-MISSING-CREDENTIAL`), 403 (`AUTH-0030`), 404 (`RES-0004`) canonical ProblemDetails 분기 처리.
+    - 502/504 프록시 HTML 응답에 대한 DOM 누출 차단 및 한국어 폴백 메시지 정제.
+    - `role="status" aria-live="polite"` 라이브 리전 컨테이너 상시 DOM 유지.
+    - 다크 테마 기준 WCAG AA 대비 4.5:1 이상 실측 충족.
+  - **RunDetail 연동 (`apps/web/src/features/runs/RunDetail.tsx`)**:
+    - Tab 7 `7. 봉인 기록 (Seal Record)` (`data-testid="tab-seal"`) 배선.
+  - **Vitest 12건 회귀 시험 (`apps/web/tests/run-detail-seal-record.test.tsx`)**:
+    - R1/R2/R3 및 404 unsealed, 403, 401, 502, Run ID 전환 잔류 상태 클리어(revert-fail), a11y, WCAG AA 대비, 런타임 가드 12건 전수 PASS.
+- **실측 검증**:
+  - `npm test -- run-detail-seal-record`: 12 passed.
+  - `npm test` (apps/web): 79 files, 687 passed.
+  - `npx tsc -b`: 0 type errors.
+  - `npm run build`: bundle 정상 빌드 (4.83s).
+  - `npm run contracts:check`: 20개 스키마 타입 정합 (exit 0).
+  - `pytest tests/test_route_coverage.py`: 40 passed.
+  - `python tools/check_frontend_integrity.py`: 9대 무결성 규칙 0 violations (exit 0).
+  - `python tools/check_contract_bindings.py`: 55 fixtures, 20 types exit 0.
+- **다음 첫 행동**: PR 생성 후 Claude(UI·테스트) 및 Codex(계약) 검토 요청.
 
 ## 2026-09-23 S04-FE Claude 리뷰 F1~F5 전수 조치 및 정직 증거 갱신 (`agent/gemini/s04-fe-matrix-measured`)
 
