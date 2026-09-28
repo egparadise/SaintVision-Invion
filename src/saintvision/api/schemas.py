@@ -768,6 +768,56 @@ class ModelReleaseResponse(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+class ModelVersionRegisterRequest(Strict):
+    """What an importer must state to register one model build (G-04 W2).
+
+    The fields are exactly ``register_model_version``'s own required arguments,
+    and nothing more: the service is the judge of what a registration means, so
+    a field here that it does not take would be this route inventing state.
+
+    ``contentSha256`` carries the service's rule as a pattern rather than
+    trusting it: the service raises ``VAL-SCHEMA`` for a non-lowercase digest
+    and the column has ``checksum_is_lowercase``, so a caller who sends
+    ``ABC...`` gets a request error at the boundary instead of a service error
+    translated later. Both defences stay.
+
+    ``producedByRunId`` and ``lineage`` are deliberately absent -- see the
+    module docstring of ``api/v1/model_versions.py`` for why neither can be
+    bound to the path's project on this branch.
+    """
+
+    version: str = Field(min_length=1, max_length=64)
+    content_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="contentSha256")
+    uri: str = Field(min_length=1, max_length=2048)
+    byte_size: int = Field(default=0, ge=0, alias="byteSize")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ModelVersionResponse(Strict):
+    """The registered build, echoed back by identity.
+
+    ``stage`` is a literal: registration creates a draft and nothing else, so a
+    change that returns a released version under this type breaks the contract
+    rather than widening it quietly. There is no person and no free text here --
+    the same rule ``LineageDeployment`` states.
+
+    Python field names avoid the ``model_`` prefix because Pydantic reserves
+    that namespace; the wire names are the aliases.
+    """
+
+    version_id: str = Field(alias="modelVersionId")
+    parent_model_id: str = Field(alias="modelId")
+    version: str = Field(min_length=1, max_length=64)
+    stage: Literal["draft"]
+    content_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="contentSha256")
+    byte_size: int = Field(ge=0, alias="byteSize")
+    uri: str = Field(min_length=1)
+    created_at: dt.datetime = Field(alias="createdAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
 class LineageDatasetVersion(Strict):
     dataset_version_id: str = Field(alias="datasetVersionId")
     version: str = Field(min_length=1, max_length=64)
