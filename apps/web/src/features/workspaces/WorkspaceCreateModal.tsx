@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/shared/ui/Button';
+import { useModalA11y } from '@/shared/ui/useModalA11y';
 
 export interface WorkspaceCreateModalProps {
   projectId: string;
@@ -17,71 +18,13 @@ export const WorkspaceCreateModal: React.FC<WorkspaceCreateModalProps> = ({
   const [name, setName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const modalRef = useRef<HTMLDivElement>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
-  const previousActiveElementRef = useRef<HTMLElement | null>(null);
-  const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
 
-  useLayoutEffect(() => {
-    if (isOpen) {
-      if (!previousActiveElementRef.current) {
-        previousActiveElementRef.current = document.activeElement as HTMLElement | null;
-      }
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (isOpen) {
-      nameInputRef.current?.focus();
-    } else {
-      if (previousActiveElementRef.current && typeof previousActiveElementRef.current.focus === 'function') {
-        previousActiveElementRef.current.focus();
-        previousActiveElementRef.current = null;
-      }
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
-    return () => {
-      if (previousActiveElementRef.current && typeof previousActiveElementRef.current.focus === 'function') {
-        previousActiveElementRef.current.focus();
-        previousActiveElementRef.current = null;
-      }
-    };
-  }, []);
-
-  const handleDialogKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Escape') {
-      e.stopPropagation();
-      e.preventDefault();
-      onCloseRef.current();
-      return;
-    }
-
-    if (e.key === 'Tab') {
-      if (!modalRef.current) return;
-      const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
-        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-      );
-      if (focusableElements.length === 0) return;
-
-      const firstElement = focusableElements[0];
-      const lastElement = focusableElements[focusableElements.length - 1];
-
-      if (e.shiftKey) {
-        if (document.activeElement === firstElement) {
-          e.preventDefault();
-          lastElement.focus();
-        }
-      } else {
-        if (document.activeElement === lastElement) {
-          e.preventDefault();
-          firstElement.focus();
-        }
-      }
-    }
-  };
+  const { containerRef, handleKeyDown } = useModalA11y({
+    isOpen,
+    onClose,
+    initialFocusRef: nameInputRef,
+  });
 
   if (!isOpen) return null;
 
@@ -115,11 +58,12 @@ export const WorkspaceCreateModal: React.FC<WorkspaceCreateModalProps> = ({
 
   return (
     <div
+      ref={containerRef}
       role="dialog"
       aria-modal="true"
       aria-labelledby="workspace-create-title"
       tabIndex={-1}
-      onKeyDown={handleDialogKeyDown}
+      onKeyDown={handleKeyDown}
       style={{
         position: 'fixed',
         inset: 0,
@@ -132,7 +76,6 @@ export const WorkspaceCreateModal: React.FC<WorkspaceCreateModalProps> = ({
       }}
     >
       <div
-        ref={modalRef}
         style={{
           backgroundColor: 'var(--color-bg-surface)',
           borderRadius: 'var(--radius-lg)',
