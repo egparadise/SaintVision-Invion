@@ -2,6 +2,7 @@
 
 Never updates an existing volume or starts a server. Secret bytes travel on stdin.
 """
+
 import argparse
 import base64
 import hashlib
@@ -14,8 +15,9 @@ from uuid import uuid4
 
 
 def docker(*args, payload=None):
-    result = subprocess.run(["docker", *args], input=payload, capture_output=True,
-                            text=True, timeout=90)
+    result = subprocess.run(
+        ["docker", *args], input=payload, capture_output=True, text=True, timeout=90
+    )
     if result.returncode:
         raise RuntimeError("Configuration volume operation failed; diagnostics suppressed")
     return result.stdout.strip()
@@ -23,9 +25,12 @@ def docker(*args, payload=None):
 
 def read_regular(path):
     info = path.lstat()
-    if (not stat.S_ISREG(info.st_mode) or info.st_nlink != 1
-            or getattr(info, "st_file_attributes", 0) & 0x400
-            or info.st_size > 65536):
+    if (
+        not stat.S_ISREG(info.st_mode)
+        or info.st_nlink != 1
+        or getattr(info, "st_file_attributes", 0) & 0x400
+        or info.st_size > 65536
+    ):
         raise ValueError("Bounded regular configuration files required")
     return path.read_bytes()
 
@@ -41,7 +46,9 @@ def collect(directory):
     private = set()
 
     def reference(value, *, secret=False):
-        if not isinstance(value, str) or not re.fullmatch(r"/run/saintvision/[A-Za-z0-9][A-Za-z0-9_.-]{0,99}", value):
+        if not isinstance(value, str) or not re.fullmatch(
+            r"/run/saintvision/[A-Za-z0-9][A-Za-z0-9_.-]{0,99}", value
+        ):
             raise ValueError("Configuration references must be flat /run/saintvision paths")
         name = value.rsplit("/", 1)[1]
         if name == "api.json":
@@ -54,11 +61,27 @@ def collect(directory):
     readiness = config.get("configurationReadiness")
     if readiness is not None:
         if not isinstance(readiness, dict) or set(readiness) - {
-            "nodeMtlsCaBundle", "objectStoreEndpoint"
+            "nodeMtlsCaBundle",
+            "objectStoreEndpoint",
+            "objectStore",
         }:
             raise ValueError("Invalid configurationReadiness settings")
+        if "objectStoreEndpoint" in readiness and "objectStore" in readiness:
+            raise ValueError("Duplicate legacy and objectStore settings")
         if "nodeMtlsCaBundle" in readiness:
             reference(readiness["nodeMtlsCaBundle"])
+        if "objectStore" in readiness:
+            object_store = readiness["objectStore"]
+            if not isinstance(object_store, dict) or set(object_store) != {
+                "providerId",
+                "endpoint",
+                "bucket",
+                "region",
+                "credentialFile",
+                "prefix",
+            }:
+                raise ValueError("Invalid objectStore settings")
+            reference(object_store["credentialFile"], secret=True)
     workspace = config.get("workspace")
     if workspace is not None:
         targets = [workspace, *workspace.get("destinations", [])]
@@ -73,7 +96,7 @@ def collect(directory):
     return files, private
 
 
-WRITE = r'''
+WRITE = r"""
 import base64,hashlib,json,os,sys
 from pathlib import Path
 data=json.load(sys.stdin); root=Path('/config')
@@ -86,9 +109,9 @@ for name,value in data.items():
         os.chmod(p,0o600); f.write(raw); f.flush(); os.fsync(f.fileno())
     os.chown(p,65532,65532)
 fd=os.open(root,os.O_RDONLY|os.O_DIRECTORY); os.fsync(fd); os.close(fd)
-'''
+"""
 
-VERIFY = r'''
+VERIFY = r"""
 import hashlib,json,os,sys
 from pathlib import Path
 from inv.identity import AccessTokens,trusted_file,strict_object
@@ -102,7 +125,7 @@ for name,digest in data['hashes'].items():
 for name in data['private']: private_key(root/name)
 config=strict_object(trusted_file(root/'api.json'))
 AccessTokens(**config['identity'])._keys()
-'''
+"""
 
 
 def prepare(directory, volume, image):
@@ -115,24 +138,65 @@ def prepare(directory, volume, image):
         raise ValueError("Existing volume must never be overwritten")
     label = uuid4().hex
     docker("volume", "create", "--label", "ai.saintvision.config=" + label, volume)
-    owned = docker("volume", "inspect", "--format", '{{index .Labels "ai.saintvision.config"}}', volume) == label
+    owned = (
+        docker("volume", "inspect", "--format", '{{index .Labels "ai.saintvision.config"}}', volume)
+        == label
+    )
     if not owned:
         raise ValueError("Volume was concurrently created by another owner")
     hashes = {name: hashlib.sha256(raw).hexdigest() for name, raw in files.items()}
     try:
-        docker("run", "--rm", "-i", "--network", "none", "--user", "0:0", "--mount",
-               f"type=volume,source={volume},target=/config,volume-nocopy", image, "python", "-c", WRITE,
-               payload=json.dumps({n: base64.b64encode(b).decode() for n, b in files.items()}))
-        docker("run", "--rm", "-i", "--network", "none", "--read-only", "--user", "65532:65532",
-               "--mount", f"type=volume,source={volume},target=/run/saintvision,readonly",
-               image, "python", "-c", VERIFY, payload=json.dumps({"hashes": hashes, "private": sorted(private)}))
+        docker(
+            "run",
+            "--rm",
+            "-i",
+            "--network",
+            "none",
+            "--user",
+            "0:0",
+            "--mount",
+            f"type=volume,source={volume},target=/config,volume-nocopy",
+            image,
+            "python",
+            "-c",
+            WRITE,
+            payload=json.dumps({n: base64.b64encode(b).decode() for n, b in files.items()}),
+        )
+        docker(
+            "run",
+            "--rm",
+            "-i",
+            "--network",
+            "none",
+            "--read-only",
+            "--user",
+            "65532:65532",
+            "--mount",
+            f"type=volume,source={volume},target=/run/saintvision,readonly",
+            image,
+            "python",
+            "-c",
+            VERIFY,
+            payload=json.dumps({"hashes": hashes, "private": sorted(private)}),
+        )
     except Exception:
-        if docker("volume", "inspect", "--format", '{{index .Labels "ai.saintvision.config"}}', volume) == label:
+        if (
+            docker(
+                "volume", "inspect", "--format", '{{index .Labels "ai.saintvision.config"}}', volume
+            )
+            == label
+        ):
             docker("volume", "rm", volume)
         raise
     # Do not publish private credential hashes or file contents.
-    return {"volume": volume, "imageId": image, "filesVerified": len(files),
-            "uid": 65532, "mode": "0600", "serverStarted": False}
+    return {
+        "volume": volume,
+        "imageId": image,
+        "filesVerified": len(files),
+        "uid": 65532,
+        "mode": "0600",
+        "serverStarted": False,
+    }
 
 
 if __name__ == "__main__":
@@ -144,4 +208,6 @@ if __name__ == "__main__":
     try:
         print(json.dumps(prepare(args.directory, args.volume, args.image)))
     except Exception:
-        raise SystemExit("Configuration preparation rejected; existing volumes and source files preserved")
+        raise SystemExit(
+            "Configuration preparation rejected; existing volumes and source files preserved"
+        )

@@ -10,10 +10,11 @@ from .errors import DomainError
 from .object_store import MAX_BYTES, ObjectDigest
 from .s3_client import S3Client
 
-
 _SEGMENT = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,127}")
+_PROVIDER_ID = re.compile(r"[a-z0-9][a-z0-9.-]{0,63}")
 _SHA256 = re.compile(r"[0-9a-f]{64}")
 _NAMESPACES = frozenset({"objects", "run-outputs", "workspace-outputs", "checkpoints"})
+_RESERVED_PROVIDER_IDS = frozenset({"local-bounded-v1"})
 
 
 def _prefix_segments(prefix: str) -> tuple[str, ...]:
@@ -34,27 +35,35 @@ def make_s3_locator(prefix, tenant_id, project_id, namespace, object_id):
     object_uuid = str(UUID(str(object_id)))
     if not _SEGMENT.fullmatch(project) or namespace not in _NAMESPACES:
         raise ValueError("Object scope is not canonical")
-    return "/".join(
-        (*base, "v1", "tenants", tenant, "projects", project, namespace, object_uuid)
-    )
+    return "/".join((*base, "v1", "tenants", tenant, "projects", project, namespace, object_uuid))
 
 
 class S3Objects:
     """Bounded immutable provider using persisted scoped opaque locators."""
 
     def __init__(self, provider_id: str, prefix: str, client: S3Client):
-        if not _SEGMENT.fullmatch(provider_id):
+        if not _PROVIDER_ID.fullmatch(provider_id) or provider_id in _RESERVED_PROVIDER_IDS:
             raise ValueError("Stable provider id required")
         self.provider_id = provider_id
         self._prefix = _prefix_segments(prefix)
+        self.prefix = "/".join(self._prefix)
         self.client = client
+
+    def locator(self, tenant_id, project_id, namespace, object_id):
+        return make_s3_locator(self.prefix, tenant_id, project_id, namespace, object_id)
 
     def _key(self, locator: str) -> str:
         if not isinstance(locator, str) or locator.startswith("/") or locator.endswith("/"):
             raise DomainError("STORE-0002", "Invalid object locator", 422)
         values = tuple(locator.split("/"))
+        if any(not _SEGMENT.fullmatch(value) or value in {".", ".."} for value in values):
+            raise DomainError("STORE-0002", "Invalid object locator", 422)
+        if values[: len(self._prefix)] != self._prefix:
+            # A canonical locator bound to another configured prefix is a
+            # provider-identity/configuration mismatch, not requester input.
+            raise self._unavailable()
         suffix = values[len(self._prefix) :]
-        if values[: len(self._prefix)] != self._prefix or len(suffix) != 7:
+        if len(suffix) != 7:
             raise DomainError("STORE-0002", "Invalid object locator", 422)
         version, tenants, tenant, projects, project, namespace, object_id = suffix
         try:

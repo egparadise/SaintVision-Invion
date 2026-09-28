@@ -1,7 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
 from threading import Barrier
-from uuid import uuid4
+from uuid import UUID, uuid4
 from datetime import datetime, timezone
 import hashlib
 import psycopg
@@ -480,9 +480,10 @@ def test_shard_completion_rejects_invalid_EvidenceEnvelope_atomically(env, monke
                 (e.tenant, e.project),
             )
             conn.execute(
-                "INSERT INTO inv.storage_objects(tenant_id,project_id,object_id,content_hash,size_bytes) "
-                "VALUES(%s,%s,%s,%s,1)",
-                (e.tenant, e.project, object_id, "2" * 64),
+                """INSERT INTO inv.storage_objects
+                (tenant_id,project_id,object_id,provider_id,locator,content_hash,size_bytes)
+                VALUES(%s,%s,%s,'local-bounded-v1',%s,%s,1)""",
+                (e.tenant, e.project, object_id, "obj-" + UUID(object_id).hex, "2" * 64),
             )
             conn.execute(
                 "UPDATE inv.storage_objects SET state='ready' WHERE object_id=%s", (object_id,)
