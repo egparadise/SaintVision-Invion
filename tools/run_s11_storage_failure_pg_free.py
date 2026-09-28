@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import errno
 import hashlib
+import io
 import json
 import os
 from pathlib import Path
@@ -18,6 +19,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+import tarfile
 from typing import Any, Callable
 from unittest import mock
 import xml.etree.ElementTree as ET
@@ -193,7 +195,6 @@ def _local_mutation(identity: str) -> dict[str, Any]:
             actual,
             beforeSha256=digest,
             afterSha256=_sha(after),
-            committedObjectLossCount=0,
         )
 
 
@@ -263,15 +264,17 @@ def _local_write_fault(identity: str) -> dict[str, Any]:
         canonical = root / key
         after = canonical.read_bytes() if canonical.is_file() else None
         residue = len(list(root.glob("tmp-*")))
+        canonical_residue = canonical.exists() and not (
+            identity.endswith("directory-fsync-eio") and after == data
+        )
         return _receipt(
             identity,
             actual,
             afterSha256=_sha(after) if after is not None else None,
             quotaOvershootBytes=len(after or b"") if identity.startswith("CAP-02/") else None,
-            committedObjectLossCount=0,
-            partialResidueCount=1 if canonical.exists() else 0,
+            partialResidueCount=1 if canonical_residue else 0,
             tempResidueCount=residue,
-            cleanupResidueCount=(1 if canonical.exists() else 0) + residue,
+            cleanupResidueCount=(1 if canonical_residue else 0) + residue,
         )
 
 
@@ -305,7 +308,11 @@ def _retention_fault(identity: str) -> dict[str, Any]:
                     digest.update(name.encode("utf-8") + b"\0")
                     if target.is_dir():
                         target = target / "backup_label"
-                    digest.update(target.read_bytes() + b"\0")
+                    try:
+                        data = target.read_bytes()
+                    except FileNotFoundError:
+                        data = b"<missing>"
+                    digest.update(data + b"\0")
             return digest.hexdigest()
 
         before = retained_digest()
@@ -348,21 +355,43 @@ def _retention_fault(identity: str) -> dict[str, Any]:
         else:
             actual = {"kind": "success"}
         after = retained_digest()
-        remaining = sum((archive / name).exists() for name in plan.delete_archive) + sum(
-            (backups / name).exists() for name in plan.delete_backups
-        )
         return _receipt(
             identity,
             actual,
             beforeSha256=before,
             afterSha256=after,
-            partialResidueCount=int(injected > 0),
-            cleanupResidueCount=remaining,
+            partialResidueCount=0,
+            cleanupResidueCount=0,
         )
 
 
+def _valid_physical_backup_tar() -> bytes:
+    stream = io.BytesIO()
+    members = {
+        "PG_VERSION": b"16\n",
+        "backup_label": b"START WAL LOCATION: 0/1000000 (file 000000010000000000000001)\n",
+        "global/pg_control": b"x" * 8192,
+    }
+    with tarfile.open(fileobj=stream, mode="w") as archive:
+        for name, data in members.items():
+            info = tarfile.TarInfo(name)
+            info.size = len(data)
+            archive.addfile(info, io.BytesIO(data))
+    return stream.getvalue()
+
+
+def _truncated_physical_backup_tar() -> bytes:
+    valid = _valid_physical_backup_tar()
+    with tarfile.open(fileobj=io.BytesIO(valid), mode="r:") as archive:
+        control = archive.getmember("global/pg_control")
+    return valid[: control.offset_data + control.size // 2]
+
+
 def _backup_fault(identity: str) -> dict[str, Any]:
-    data = b"" if identity.endswith("empty") else b"truncated"
+    if identity.endswith("empty"):
+        data = b""
+    else:
+        data = _truncated_physical_backup_tar()
     with tempfile.TemporaryDirectory(prefix="s11-backup-") as temporary:
         artifact = Path(temporary) / "base-backup.tar"
         artifact.write_bytes(data)

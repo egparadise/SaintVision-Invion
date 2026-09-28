@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import io
 import json
 import sys
 from pathlib import Path
@@ -136,7 +137,8 @@ def test_retention_and_backup_fault_cases_execute_hermetically(identity):
     assert case["matched"] is False
     assert case["observedFindingCount"] == 1
     assert case["beforeSha256"] == case["afterSha256"]
-    assert case["partialResidueCount"] == 1
+    assert case["partialResidueCount"] == 0
+    assert case["cleanupResidueCount"] == 0
 
 
 @pytest.mark.parametrize("identity", producer.PG_FREE_CASES[2:4])
@@ -178,6 +180,80 @@ def test_backup_verifier_accepts_only_structural_physical_archive(tmp_path):
     artifact.write_bytes(b"truncated")
     with pytest.raises(producer.BackupArtifactInvalid):
         producer.verify_physical_backup_archive(artifact)
+
+
+def _backup_tar(members: list[tuple[str, bytes]]) -> bytes:
+    stream = io.BytesIO()
+    with tarfile.open(fileobj=stream, mode="w") as archive:
+        for name, data in members:
+            info = tarfile.TarInfo(name)
+            info.size = len(data)
+            archive.addfile(info, io.BytesIO(data))
+    return stream.getvalue()
+
+
+@pytest.mark.parametrize(
+    "members",
+    [
+        [("PG_VERSION", b"16\n"), ("backup_label", b"START WAL LOCATION: x\n")],
+        [("PG_VERSION", b"sixteen\n"), ("backup_label", b"START WAL LOCATION: x\n"), ("global/pg_control", b"x" * 8192)],
+        [("PG_VERSION", b"16\n"), ("backup_label", b"not a backup label\n"), ("global/pg_control", b"x" * 8192)],
+        [("PG_VERSION", b"16\n"), ("backup_label", b"START WAL LOCATION: x\n"), ("global/pg_control", b"x" * 8191)],
+        [("PG_VERSION", b"16\n"), ("backup_label", b"START WAL LOCATION: x\n"), ("global/pg_control", b"x" * 8192), ("../escape", b"x")],
+        [("PG_VERSION", b"16\n"), ("PG_VERSION", b"17\n"), ("backup_label", b"START WAL LOCATION: x\n"), ("global/pg_control", b"x" * 8192)],
+    ],
+    ids=("missing-member", "bad-version", "missing-label-line", "short-pg-control", "unsafe-member", "duplicate-member"),
+)
+def test_backup_verifier_rejects_each_structural_mutation(tmp_path, members):
+    artifact = tmp_path / "invalid.tar"
+    artifact.write_bytes(_backup_tar(members))
+    with pytest.raises(producer.BackupArtifactInvalid):
+        producer.verify_physical_backup_archive(artifact)
+
+
+def test_truncated_fixture_is_a_real_tar_cut_in_the_data_region():
+    valid = producer._valid_physical_backup_tar()
+    truncated = producer._truncated_physical_backup_tar()
+    with tarfile.open(fileobj=io.BytesIO(valid), mode="r:") as archive:
+        control = archive.getmember("global/pg_control")
+    case = producer.execute_case("BAK-03/local/backup-exit0-truncated")
+    assert valid.startswith(b"PG_VERSION")
+    assert control.offset_data < len(truncated) < control.offset_data + control.size
+    assert case["afterSha256"] != hashlib.sha256(b"truncated").hexdigest()
+    assert case["matched"] is True
+
+
+def test_ideal_future_retention_and_directory_fsync_surfaces_can_pass():
+    digest = "a" * 64
+    retention_case = producer._receipt(
+        "BAK-02/local/retention-unlink",
+        copy.deepcopy(producer.EXPECTED["BAK-02/local/retention-unlink"]),
+        beforeSha256=digest,
+        afterSha256=digest,
+        partialResidueCount=0,
+        cleanupResidueCount=0,
+    )
+    fsync_case = producer._receipt(
+        "OBJ-04/local/directory-fsync-eio",
+        copy.deepcopy(producer.EXPECTED["OBJ-04/local/directory-fsync-eio"]),
+        afterSha256=digest,
+        partialResidueCount=0,
+        tempResidueCount=0,
+        cleanupResidueCount=0,
+    )
+    assert retention_case["matched"] is True
+    assert fsync_case["matched"] is True
+
+
+def test_deleted_retained_boundary_becomes_a_finding_instead_of_crashing(monkeypatch):
+    def delete_boundary_then_fail(_plan, archive, _backups):
+        (archive / "000000010000000000000010").unlink()
+        raise OSError(5, "injected")
+
+    monkeypatch.setattr(producer.retention, "apply", delete_boundary_then_fail)
+    case = producer.execute_case("BAK-02/local/retention-rmtree")
+    assert case["beforeSha256"] != case["afterSha256"]
+    assert case["matched"] is False and case["observedFindingCount"] == 1
 
 
 @pytest.mark.parametrize(

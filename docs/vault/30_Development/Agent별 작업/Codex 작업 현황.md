@@ -1,20 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.212"
+version: "1.0.213"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T16:41:03+09:00"
+updated: "2026-09-28T17:02:13+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
 
-## 2026-09-28 S11-ST PG-free fault evidence producer/importer — Claude r1 D1~D6 보강
+## 2026-09-28 S11-ST PG-free fault evidence producer/importer — Claude r2 C1~C3 보강
 
-- #193 Claude r1에서 발견된 self-check backup, retention 재라벨, 미관측 0, open단계 ENOSPC, 변이표 누락, tier 밖 surface import 오류를 모두 보강한다.
-- backup은 별도 tar verifier와 blob 결속, retention은 retained-set digest와 raw OSError finding, write ENOSPC는 stream.write 주입으로 바꿨다. residue·quota 양수는 판정에 포함하고 미관측 metric은 null로 남긴다.
-- 로컬 단일 시험은 storage evidence 40 passed, aggregator 56 passed이며 PostgreSQL·Docker·전체 suite는 실행하지 않았다. 최종 hosted Linux actual 12-case와 Claude 재검토 전에는 측정 상태를 `NOT_OBSERVED`로 유지한다. [[2026-09-28_16-16-21_KST_S11_ST_PG_free_evidence_importer_Codex]], [[S11-ST_손상_용량_backup_장애시험_설계]].
+- #193 Claude r1 D1~D6에 이어 r2 C1~C2를 보강했다. truncated backup은 유효 tar의 data 구간을 실제 절단하고 verifier source 변이 6종을 부정 시험으로 고정한다.
+- retention 미완료 삭제 후보와 directory-fsync 뒤 exact canonical byte는 허용 상태라 residue로 세지 않는다. retained boundary 삭제는 digest finding이며 관측하지 않은 committed loss는 `null`이다. raw OSError 분류 공백은 숨기지 않는다.
+- 로컬 단일 시험은 storage evidence 49 passed, aggregator 56 passed이며 PostgreSQL·Docker·전체 suite는 실행하지 않았다. 최종 hosted Linux에서 actual LocalObjects 8건·osError finding 7건과 Backend green을 확인하기 전에는 측정 상태를 `NOT_OBSERVED`로 유지한다. [[2026-09-28_16-16-21_KST_S11_ST_PG_free_evidence_importer_Codex]], [[S11-ST_손상_용량_backup_장애시험_설계]].
 
 ## 2026-09-28 CARD-S11-AC11-REGISTRY-REPIN-01 — 구현·게이트 완료
 
