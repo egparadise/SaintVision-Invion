@@ -1,22 +1,28 @@
 """0054 against a real PostgreSQL: what only the database can say.
 
 The migration has run (``migrated`` upgrades to head). Checked here: the
-catalogue rows the migration's shape queries return; that ``verified_at``
-cannot be set without a measurement nor a measurement id without
-``verified_at`` (the CHECK), nor an id that is not a measurement (the key);
-that the application role can read but not write the kernel table and sees
-only its tenant's rows; that the owner cannot rewrite or delete a
-measurement (the immutable trigger); that the service binds both columns in
-one transaction and refuses a measurement of another version, of another
-digest, or a second measurement after the first; and that an interrupted
-run resumes through the real Alembic machinery to the same end state and
-stops on a verified row nothing can bind.
+kernel table's whole shape as the migration reads it and the reader's
+rendered definition are exactly what the migration expects (so the pinned
+policy hash is the hash of what exists); that ``verified_at`` cannot be set
+without a measurement nor a measurement id without ``verified_at`` (the
+CHECK), nor an id that is not a measurement (the key); that the application
+role cannot name the kernel table at all -- not to write, not to read -- and
+sees exactly its tenant's row through the tenant-bound reader; that the owner
+cannot rewrite or delete a measurement (the immutable trigger); that the
+service binds both columns in one transaction and refuses a measurement of
+another version, of another digest, of another size (including a registered
+size of 0, Codex #213 F2) or a second measurement after the first; and that
+an interrupted run resumes through the real Alembic machinery to the same
+end state, stops on a verified row nothing can bind, and stops on a
+same-named kernel table whose security or constraint shape was tampered with
+in any of the ways Codex #213 F1 lists -- before the public side is touched.
 """
 
 from __future__ import annotations
 
 import datetime as dt
 import importlib.util
+import uuid
 from pathlib import Path
 
 import pytest
@@ -48,12 +54,12 @@ def _module():
 M = _module()
 
 
-def _version(connection, *, tenant_id, model, now, digest=DIGEST, version="1"):
+def _version(connection, *, tenant_id, model, now, digest=DIGEST, version="1", byte_size=1):
     version_id = new_id("model_version")
     _insert(
         connection, "model_versions",
         model_version_id=version_id, tenant_id=tenant_id, model_id=model["model_id"], version=version,
-        stage="draft", content_sha256=digest, byte_size=1, uri=f"inv://models/{model['name']}@{version}",
+        stage="draft", content_sha256=digest, byte_size=byte_size, uri=f"inv://models/{model['name']}@{version}",
         created_at=now,
     )
     return version_id
@@ -61,7 +67,7 @@ def _version(connection, *, tenant_id, model, now, digest=DIGEST, version="1"):
 
 @pytest.fixture
 def draft(owner_engine, two_tenants, frozen_now, clean_tables):
-    """Tenant A: one draft version; tenant B: nothing. Returns the ids."""
+    """Tenant A: one draft version of 1 byte; tenant B: nothing. Returns the ids."""
     tenant_a, tenant_b = two_tenants
     with owner_engine.begin() as connection:
         model = _project_with_model(connection, tenant_id=tenant_a, now=frozen_now, label="seam")
@@ -77,22 +83,52 @@ def _row(owner_engine, version_id):
         ).one()
 
 
-# ---------------------------------------------------------------- the catalogue
-
-
-def test_the_catalogue_shape_the_migration_reads_matches_what_it_expects(owner_engine, migrated):
+def _assert_catalogue_is_whole(owner_engine):
     with owner_engine.begin() as connection:
         assert connection.exec_driver_sql(M.MEASUREMENTS_PRESENT).fetchall()
-        table = connection.exec_driver_sql(M.MEASUREMENTS_SHAPE).fetchall()
+        shape = M.kernel_shape(connection)
+        reader = connection.exec_driver_sql(M.READER_PRESENT).fetchall()
         column = connection.exec_driver_sql(M.COLUMN_SHAPE).fetchall()
         fk = connection.exec_driver_sql(M.FK_SHAPE).fetchall()
         check = connection.exec_driver_sql(M.CHECK_SHAPE).fetchall()
-    assert (sorted(table[0][0]), int(table[0][1])) == (M.EXPECTED_MEASUREMENT_COLUMNS, 1)
+    for part, expected in M.EXPECTED_KERNEL_SHAPE.items():
+        assert shape[part] == expected, part
+    assert [r[0] for r in reader] == [M.reader_definition()]
     assert [tuple(column[0])] == [M.EXPECTED_COLUMN]
     r = fk[0]
     assert (r[0], r[1], list(r[2]), list(r[3]), r[4], r[5], r[6], bool(r[7]), bool(r[8]), bool(r[9])) == M.EXPECTED_FK
     c = check[0]
     assert (c[0], c[1], bool(c[2])) == M.EXPECTED_CHECK
+
+
+# ---------------------------------------------------------------- the catalogue
+
+
+def test_the_catalogue_shape_the_migration_reads_matches_what_it_expects(owner_engine, migrated):
+    _assert_catalogue_is_whole(owner_engine)
+
+
+def test_the_check_carries_the_single_convention_name(owner_engine, migrated):
+    with owner_engine.begin() as connection:
+        names = connection.execute(text(
+            "SELECT conname FROM pg_constraint WHERE conrelid = 'public.model_versions'::regclass AND conname LIKE '%verified_iff%'"
+        )).scalars().all()
+    assert names == [M.CHECK]
+
+
+def test_the_reader_is_the_pinned_definition_executable_by_the_application_only(owner_engine, migrated):
+    import hashlib
+    import json
+
+    with owner_engine.begin() as connection:
+        definition = connection.execute(text("SELECT pg_get_functiondef('public.model_version_measurement(text)'::regprocedure)")).scalar_one()
+        app = connection.execute(text("SELECT has_function_privilege('inv_app', 'public.model_version_measurement(text)', 'EXECUTE')")).scalar_one()
+        kernel = connection.execute(text("SELECT has_function_privilege('inv_kernel', 'public.model_version_measurement(text)', 'EXECUTE')")).scalar_one()
+        public = connection.execute(text("SELECT has_function_privilege(0, 'public.model_version_measurement(text)'::regprocedure, 'EXECUTE')")).scalar_one()
+    policy = json.loads((Path(__file__).resolve().parents[2] / "tools/definer-policy.json").read_text(encoding="utf-8"))
+    assert hashlib.sha256(definition.encode()).hexdigest() == policy["functions"]["public.model_version_measurement(text)"]["definitionSHA256"]
+    assert definition == M.reader_definition()
+    assert app is True and kernel is False and public is False
 
 
 def test_the_application_role_may_update_the_new_column_and_nothing_else_new(owner_engine, migrated):
@@ -137,7 +173,6 @@ def test_an_id_that_is_not_a_measurement_is_refused_by_the_key(owner_engine, dra
 
 
 def test_a_measurement_of_another_tenant_is_refused_by_the_composite_key(owner_engine, draft):
-    """Same id text, other tenant: the key is (tenant_id, measurement_id)."""
     with owner_engine.begin() as connection:
         model_b = _project_with_model(connection, tenant_id=draft["tenant_b"], now=draft["now"], label="seam-b")
         version_b = _version(connection, tenant_id=draft["tenant_b"], model=model_b, now=draft["now"])
@@ -151,8 +186,6 @@ def test_a_measurement_of_another_tenant_is_refused_by_the_composite_key(owner_e
 
 
 def test_the_request_is_unique_per_tenant(owner_engine, draft):
-    import uuid
-
     request_id = uuid.uuid4()
     record_measurement(owner_engine, tenant_id=draft["tenant_a"], model_version_id=draft["version_id"], sha256=DIGEST, request_id=request_id)
     with pytest.raises(IntegrityError):
@@ -165,24 +198,25 @@ def test_the_request_is_unique_per_tenant(owner_engine, draft):
 @pytest.mark.parametrize(
     "statement",
     [
+        "SELECT measurement_id FROM inv.model_version_measurements WHERE measurement_id = :i",
         "INSERT INTO inv.model_version_measurements (tenant_id, measurement_id) VALUES (:t, :i)",
         "UPDATE inv.model_version_measurements SET byte_size = 9 WHERE measurement_id = :i",
         "DELETE FROM inv.model_version_measurements WHERE measurement_id = :i",
     ],
-    ids=["insert", "update", "delete"],
+    ids=["select", "insert", "update", "delete"],
 )
-def test_the_application_role_cannot_write_a_measurement(app_sessionmaker, owner_engine, draft, statement):
+def test_the_application_role_cannot_name_the_kernel_table_at_all(app_sessionmaker, owner_engine, draft, statement):
     measurement_id = record_measurement(owner_engine, tenant_id=draft["tenant_a"], model_version_id=draft["version_id"], sha256=DIGEST)
     with pytest.raises(ProgrammingError, match="permission denied"):
         with app_sessionmaker() as session, session.begin(), tenant_scope(session, draft["tenant_a"]):
             session.execute(text(statement), {"t": draft["tenant_a"], "i": measurement_id})
 
 
-def test_the_application_role_reads_only_its_tenants_measurements(app_sessionmaker, owner_engine, draft):
-    measurement_id = record_measurement(owner_engine, tenant_id=draft["tenant_a"], model_version_id=draft["version_id"], sha256=DIGEST)
-    query = text("SELECT measurement_id FROM inv.model_version_measurements WHERE measurement_id = :i")
+def test_the_application_role_reads_only_its_tenants_measurement_through_the_reader(app_sessionmaker, owner_engine, draft):
+    measurement_id = record_measurement(owner_engine, tenant_id=draft["tenant_a"], model_version_id=draft["version_id"], sha256=DIGEST, byte_size=1)
+    query = text("SELECT model_version_id, sha256, byte_size FROM public.model_version_measurement(:i)")
     with app_sessionmaker() as session, session.begin(), tenant_scope(session, draft["tenant_a"]):
-        assert session.execute(query, {"i": measurement_id}).scalar_one() == measurement_id
+        assert session.execute(query, {"i": measurement_id}).one() == (draft["version_id"], DIGEST, 1)
     with app_sessionmaker() as session, session.begin(), tenant_scope(session, draft["tenant_b"]):
         assert session.execute(query, {"i": measurement_id}).fetchall() == []
     with app_sessionmaker() as session, session.begin():                     # no scope at all
@@ -201,9 +235,9 @@ def test_even_the_owner_cannot_rewrite_or_delete_a_measurement(owner_engine, dra
 # ---------------------------------------------------------------- the service through the seam
 
 
-def _verify(session, draft, measurement_id, *, content_sha256=DIGEST):
+def _verify(session, draft, measurement_id, *, content_sha256=DIGEST, version_id=None):
     return lineage_service.verify_model_version(
-        session, tenant_id=draft["tenant_a"], model_version_id=draft["version_id"],
+        session, tenant_id=draft["tenant_a"], model_version_id=version_id or draft["version_id"],
         measurement_id=measurement_id, content_sha256=content_sha256, now=draft["now"],
     )
 
@@ -217,8 +251,8 @@ def test_the_service_binds_both_columns_in_one_transaction(app_sessionmaker, own
 
 
 def test_the_same_measurement_again_is_a_no_op_and_another_is_refused(app_sessionmaker, owner_engine, draft):
-    first = record_measurement(owner_engine, tenant_id=draft["tenant_a"], model_version_id=draft["version_id"], sha256=DIGEST)
-    second = record_measurement(owner_engine, tenant_id=draft["tenant_a"], model_version_id=draft["version_id"], sha256=DIGEST)
+    first = record_measurement(owner_engine, tenant_id=draft["tenant_a"], model_version_id=draft["version_id"], sha256=DIGEST, byte_size=1)
+    second = record_measurement(owner_engine, tenant_id=draft["tenant_a"], model_version_id=draft["version_id"], sha256=DIGEST, byte_size=1)
     with app_sessionmaker() as session, session.begin(), tenant_scope(session, draft["tenant_a"]):
         _verify(session, draft, first)
         assert _verify(session, draft, first).verified_measurement_id == first
@@ -236,13 +270,13 @@ def test_a_measurement_that_does_not_prove_this_version_is_refused_and_nothing_i
     elif case == "other-version":
         with owner_engine.begin() as connection:
             other = _version(connection, tenant_id=tenant, model=draft["model"], now=draft["now"], digest=OTHER, version="2")
-        measurement_id = record_measurement(owner_engine, tenant_id=tenant, model_version_id=other, sha256=OTHER)
+        measurement_id = record_measurement(owner_engine, tenant_id=tenant, model_version_id=other, sha256=OTHER, byte_size=1)
     elif case == "other-digest":
-        measurement_id = record_measurement(owner_engine, tenant_id=tenant, model_version_id=draft["version_id"], sha256=OTHER)
+        measurement_id = record_measurement(owner_engine, tenant_id=tenant, model_version_id=draft["version_id"], sha256=OTHER, byte_size=1)
     elif case == "other-size":
         measurement_id = record_measurement(owner_engine, tenant_id=tenant, model_version_id=draft["version_id"], sha256=DIGEST, byte_size=2)
     else:
-        measurement_id = record_measurement(owner_engine, tenant_id=tenant, model_version_id=draft["version_id"], sha256=DIGEST)
+        measurement_id = record_measurement(owner_engine, tenant_id=tenant, model_version_id=draft["version_id"], sha256=DIGEST, byte_size=1)
         claimed = OTHER
     with app_sessionmaker() as session, session.begin(), tenant_scope(session, tenant):
         with pytest.raises(InvError):
@@ -250,11 +284,27 @@ def test_a_measurement_that_does_not_prove_this_version_is_refused_and_nothing_i
     assert _row(owner_engine, draft["version_id"]) == (None, None)
 
 
+def test_a_registered_size_of_zero_is_a_size_and_only_a_zero_byte_measurement_proves_it(app_sessionmaker, owner_engine, draft):
+    """Codex #213 F2: 0 is not an "unknown" sentinel that skips the comparison."""
+    tenant = draft["tenant_a"]
+    with owner_engine.begin() as connection:
+        zero = _version(connection, tenant_id=tenant, model=draft["model"], now=draft["now"], digest=OTHER, version="0", byte_size=0)
+    one_byte = record_measurement(owner_engine, tenant_id=tenant, model_version_id=zero, sha256=OTHER, byte_size=1)
+    with app_sessionmaker() as session, session.begin(), tenant_scope(session, tenant):
+        with pytest.raises(InvError, match="size"):
+            _verify(session, draft, one_byte, content_sha256=OTHER, version_id=zero)
+    assert _row(owner_engine, zero) == (None, None)
+    zero_bytes = record_measurement(owner_engine, tenant_id=tenant, model_version_id=zero, sha256=OTHER, byte_size=0)
+    with app_sessionmaker() as session, session.begin(), tenant_scope(session, tenant):
+        _verify(session, draft, zero_bytes, content_sha256=OTHER, version_id=zero)
+    assert _row(owner_engine, zero) == (draft["now"], zero_bytes)
+
+
 def test_another_tenants_measurement_is_not_found_through_the_seam(app_sessionmaker, owner_engine, draft):
     with owner_engine.begin() as connection:
         model_b = _project_with_model(connection, tenant_id=draft["tenant_b"], now=draft["now"], label="seam-b")
         version_b = _version(connection, tenant_id=draft["tenant_b"], model=model_b, now=draft["now"])
-    foreign = record_measurement(owner_engine, tenant_id=draft["tenant_b"], model_version_id=version_b, sha256=DIGEST)
+    foreign = record_measurement(owner_engine, tenant_id=draft["tenant_b"], model_version_id=version_b, sha256=DIGEST, byte_size=1)
     with app_sessionmaker() as session, session.begin(), tenant_scope(session, draft["tenant_a"]):
         with pytest.raises(InvError, match="measurement not found"):
             _verify(session, draft, foreign)
@@ -276,7 +326,7 @@ def _rerun(database_url, monkeypatch):
 
 
 def _interrupt_after_the_table(owner_engine):
-    """Table present, the public side gone, revision back at 0053."""
+    """Table and reader present, the public side gone, revision back at 0053."""
     with owner_engine.begin() as connection:
         connection.execute(text(f"ALTER TABLE model_versions DROP CONSTRAINT IF EXISTS {M.CHECK}"))
         connection.execute(text(f"ALTER TABLE model_versions DROP CONSTRAINT IF EXISTS {M.FK}"))
@@ -289,14 +339,18 @@ def _recorded(owner_engine):
         return connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
 
 
+def _restore_head(owner_engine):
+    with owner_engine.begin() as connection:
+        connection.execute(text("UPDATE alembic_version SET version_num = '0054_model_version_measurements'"))
+
+
 def test_a_run_interrupted_after_the_table_resumes_and_converges(owner_engine, database_url, migrated, clean_tables, monkeypatch):
     _interrupt_after_the_table(owner_engine)
     try:
         _rerun(database_url, monkeypatch)
     finally:
-        with owner_engine.begin() as connection:
-            connection.execute(text("UPDATE alembic_version SET version_num = '0054_model_version_measurements'"))
-    test_the_catalogue_shape_the_migration_reads_matches_what_it_expects(owner_engine, migrated)
+        _restore_head(owner_engine)
+    _assert_catalogue_is_whole(owner_engine)
     assert _recorded(owner_engine) == "0054_model_version_measurements"
 
 
@@ -319,30 +373,86 @@ def test_a_resume_stops_on_a_verified_version_nothing_can_bind(owner_engine, dat
             connection.execute(text("UPDATE model_versions SET verified_at = NULL WHERE model_version_id = :m"), {"m": draft["version_id"]})
         _rerun(database_url, monkeypatch)                                          # resolved: converges
     finally:
-        with owner_engine.begin() as connection:
-            connection.execute(text("UPDATE alembic_version SET version_num = '0054_model_version_measurements'"))
-    test_the_catalogue_shape_the_migration_reads_matches_what_it_expects(owner_engine, migrated)
+        _restore_head(owner_engine)
+    _assert_catalogue_is_whole(owner_engine)
 
 
-def test_a_table_of_that_name_without_the_tenant_policy_is_refused_on_resume(owner_engine, database_url, migrated, clean_tables, monkeypatch):
+T = "inv.model_version_measurements"
+POLICY = (
+    f"CREATE POLICY tenant_isolation ON {T} "
+    "USING (tenant_id = nullif(current_setting('inv.tenant_id', true), '')::uuid) "
+    "WITH CHECK (tenant_id = nullif(current_setting('inv.tenant_id', true), '')::uuid)"
+)
+TRIGGER = f"CREATE TRIGGER immutable BEFORE UPDATE OR DELETE ON {T} FOR EACH ROW EXECUTE FUNCTION inv.immutable_record()"
+
+#: Codex #213 F1: each tampering, and how to undo it. Every one must stop the
+#: re-run before the public side is touched.
+TAMPERINGS = {
+    "rls-not-forced": ([f"ALTER TABLE {T} NO FORCE ROW LEVEL SECURITY"], [f"ALTER TABLE {T} FORCE ROW LEVEL SECURITY"]),
+    "rls-disabled": ([f"ALTER TABLE {T} DISABLE ROW LEVEL SECURITY"], [f"ALTER TABLE {T} ENABLE ROW LEVEL SECURITY"]),
+    "policy-true": (
+        [f"DROP POLICY tenant_isolation ON {T}", f"CREATE POLICY tenant_isolation ON {T} USING (true) WITH CHECK (true)"],
+        [f"DROP POLICY tenant_isolation ON {T}", POLICY],
+    ),
+    "policy-missing": ([f"DROP POLICY tenant_isolation ON {T}"], [POLICY]),
+    "trigger-disabled": ([f"ALTER TABLE {T} DISABLE TRIGGER immutable"], [f"ALTER TABLE {T} ENABLE TRIGGER immutable"]),
+    "trigger-dropped": ([f"DROP TRIGGER immutable ON {T}"], [TRIGGER]),
+    "app-insert": ([f"GRANT INSERT ON {T} TO inv_app"], [f"REVOKE INSERT ON {T} FROM inv_app"]),
+    "app-select": ([f"GRANT SELECT ON {T} TO inv_app"], [f"REVOKE SELECT ON {T} FROM inv_app"]),
+    "public-select": ([f"GRANT SELECT ON {T} TO PUBLIC"], [f"REVOKE SELECT ON {T} FROM PUBLIC"]),
+    "kernel-update": ([f"GRANT UPDATE ON {T} TO inv_kernel"], [f"REVOKE UPDATE ON {T} FROM inv_kernel"]),
+    "request-unique-dropped": (
+        [f"ALTER TABLE {T} DROP CONSTRAINT model_version_measurements_tenant_id_request_id_key"],
+        [f"ALTER TABLE {T} ADD CONSTRAINT model_version_measurements_tenant_id_request_id_key UNIQUE (tenant_id, request_id)"],
+    ),
+    "byte-size-integer": ([f"ALTER TABLE {T} ALTER COLUMN byte_size TYPE integer"], [f"ALTER TABLE {T} ALTER COLUMN byte_size TYPE bigint"]),
+    "digest-check-dropped": (
+        [f"ALTER TABLE {T} DROP CONSTRAINT model_version_measurements_sha256_check"],
+        [f"ALTER TABLE {T} ADD CONSTRAINT model_version_measurements_sha256_check CHECK (sha256 ~ '^[0-9a-f]{{64}}$')"],
+    ),
+}
+
+
+@pytest.mark.parametrize("case", sorted(TAMPERINGS), ids=sorted(TAMPERINGS))
+def test_a_tampered_kernel_table_of_that_name_is_refused_on_resume_before_the_public_side(
+    owner_engine, database_url, migrated, clean_tables, monkeypatch, case
+):
+    tamper, restore = TAMPERINGS[case]
     _interrupt_after_the_table(owner_engine)
     with owner_engine.begin() as connection:
-        connection.execute(text(f"DROP POLICY tenant_isolation ON {MEASUREMENTS}"))
+        for statement in tamper:
+            connection.execute(text(statement))
     try:
         with pytest.raises(RuntimeError, match="different definition"):
             _rerun(database_url, monkeypatch)
         assert _recorded(owner_engine) == "0053_eval_suite_project_scope"
+        with owner_engine.begin() as connection:
+            assert not connection.exec_driver_sql(M.COLUMN_SHAPE).fetchall()      # nothing on the public side
     finally:
         with owner_engine.begin() as connection:
-            connection.execute(text(
-                f"CREATE POLICY tenant_isolation ON {MEASUREMENTS} "
-                "USING (tenant_id = nullif(current_setting('inv.tenant_id', true), '')::uuid) "
-                "WITH CHECK (tenant_id = nullif(current_setting('inv.tenant_id', true), '')::uuid)"
-            ))
+            for statement in restore:
+                connection.execute(text(statement))
         _rerun(database_url, monkeypatch)
+        _restore_head(owner_engine)
+    _assert_catalogue_is_whole(owner_engine)
+
+
+def test_a_reader_of_that_name_with_another_definition_is_refused_on_resume(owner_engine, database_url, migrated, clean_tables, monkeypatch):
+    _interrupt_after_the_table(owner_engine)
+    with owner_engine.begin() as connection:
+        connection.execute(text("DROP FUNCTION public.model_version_measurement(text)"))
+        connection.execute(text(M.READER_DDL.replace("AND m.measurement_id = p_measurement_id", "AND true")))
+    try:
+        with pytest.raises(RuntimeError, match="model_version_measurement"):
+            _rerun(database_url, monkeypatch)
         with owner_engine.begin() as connection:
-            connection.execute(text("UPDATE alembic_version SET version_num = '0054_model_version_measurements'"))
-    test_the_catalogue_shape_the_migration_reads_matches_what_it_expects(owner_engine, migrated)
+            assert not connection.exec_driver_sql(M.COLUMN_SHAPE).fetchall()
+    finally:
+        with owner_engine.begin() as connection:
+            connection.execute(text("DROP FUNCTION public.model_version_measurement(text)"))
+        _rerun(database_url, monkeypatch)
+        _restore_head(owner_engine)
+    _assert_catalogue_is_whole(owner_engine)
 
 
 def test_a_downgrade_refuses_while_a_measurement_exists(owner_engine, database_url, migrated, draft, monkeypatch):
@@ -358,4 +468,4 @@ def test_a_downgrade_refuses_while_a_measurement_exists(owner_engine, database_u
         with pytest.raises(RuntimeError, match="discard"):
             command.downgrade(config, "0053_eval_suite_project_scope")
     assert _recorded(owner_engine) == "0054_model_version_measurements"
-    test_the_catalogue_shape_the_migration_reads_matches_what_it_expects(owner_engine, migrated)
+    _assert_catalogue_is_whole(owner_engine)

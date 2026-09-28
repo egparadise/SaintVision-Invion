@@ -4,24 +4,30 @@
 weights" (``services/lineage.py``). Until now nothing in the database said
 *which* observation that was: ``verified_at`` was a timestamp anyone with the
 service in hand could set from the stored digest. Design #209 v1.1 (Codex
-contract) closes that with two things this migration creates together:
+contract) closes that with three things this migration creates together:
 
 * ``inv.model_version_measurements`` -- the kernel-owned, append-only record of
   one signed node observation of one immutable DataLocation: the channel
   binding at issue time (node, recovery epoch, channel version, leaf
   certificate), the contribution/location snapshot, the observed digest and
-  size, and the challenge/response digests. Only the kernel's accept path may
-  insert; the application role may read; nothing may update or delete
-  (``inv.immutable_record``). The DDL is the kernel's SQL
-  (``inv/migrations/0027_model_version_measurements.sql``), executed here the
-  way 0048 executes 0026.
+  size, and the challenge/response digests. Only ``inv_kernel`` may insert;
+  nothing may update or delete (``inv.immutable_record``); the application
+  role has **no privilege on the table and no access to the schema**. The DDL
+  is the kernel's SQL (``inv/migrations/0027_model_version_measurements.sql``),
+  executed here the way 0048 executes 0026.
+* ``public.model_version_measurement(text)`` -- the one way the application
+  reads a measurement: a tenant-bound ``SECURITY DEFINER`` reader in the 0044
+  ``model_registry_snapshot`` shape (``search_path`` pinned, body
+  schema-qualified, the tenant taken from ``inv.tenant_id`` and never from an
+  argument). ``EXECUTE`` to ``inv_app`` only. Its definition is pinned in
+  ``tools/definer-policy.json``, and both the policy hash and the "present and
+  identical" check below are computed from the same body constant.
 * ``public.model_versions.verified_measurement_id`` -- nullable, with the
-  composite foreign key ``(tenant_id, verified_measurement_id)`` to that table
-  and the CHECK ``(verified_at IS NULL) = (verified_measurement_id IS NULL)``.
-  A version is verified exactly when a measurement is bound to it, and both
-  are set in one statement by the service. The application role gets
-  column-level UPDATE on the new column, as 0004 gave it on ``verified_at``
-  (``LIFECYCLE_UPDATE_COLUMNS``); the grant is idempotent and always issued.
+  composite foreign key ``(tenant_id, verified_measurement_id)`` to the kernel
+  table and the CHECK ``(verified_at IS NULL) = (verified_measurement_id IS
+  NULL)``. A version is verified exactly when a measurement is bound to it,
+  and both are set in one statement by the service. The application role gets
+  column-level UPDATE on the new column, as 0004 gave it on ``verified_at``.
 
 **Existing data.** A row with ``verified_at`` set and no measurement to bind
 would violate the CHECK. Such rows are not rewritten and not guessed at: the
@@ -29,21 +35,29 @@ upgrade refuses before any DDL, naming the version ids, so an operator can
 either re-verify them through the seam or clear ``verified_at`` in a reviewed
 data fix. A fresh database has none.
 
-**Convergence** follows 0052/0053: the catalogue is read first and each part
-is added only when absent, kept when present with exactly the expected shape
-(column type and nullability; the foreign key's type, referenced table,
-columns, actions, match type, deferrability and validity; the CHECK's
-expression), and refused when present with a different shape. Offline
+**Convergence** follows 0052/0053, and for the kernel table it is the *whole*
+security and constraint shape, not a name list (Codex #213 F1): every column's
+type and nullability, every constraint's definition, every index's definition,
+``ENABLE`` and ``FORCE`` row security, the policy's command, roles, USING and
+WITH CHECK, the privileges of every non-owner role, and the immutable trigger
+with its function and enabled state. A same-named table that differs in any
+of those is refused before the public side is touched; the kernel SQL is never
+re-run over an existing table (it is not idempotent). The reader function is
+kept only when its definition is byte-identical to this revision's. Offline
 rendering issues everything and asks nothing.
 
 **Downgrade** refuses while any version is bound to a measurement or any
 measurement row exists (dropping either would discard evidence); otherwise it
-drops the CHECK, the foreign key, the column and the table.
+drops the CHECK, the foreign key, the column, the reader and the table.
 
 Numbered 0054 on ``0053_eval_suite_project_scope`` by the coordinator's
 decision (card 83 / #209).
 """
 
+from __future__ import annotations
+
+import hashlib
+import re
 from importlib import resources
 
 from alembic import op
@@ -60,27 +74,216 @@ FK = "fk_model_versions_verified_measurement"
 CHECK = "ck_model_versions_verified_iff_measurement"
 MEASUREMENTS = "inv.model_version_measurements"
 KERNEL_SQL = "migrations/0027_model_version_measurements.sql"
+READER = "public.model_version_measurement(text)"
+
+# ---------------------------------------------------------------- the kernel table's whole shape
 
 #: The kernel table, or no rows.
-MEASUREMENTS_PRESENT = f"SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'inv' AND c.relname = 'model_version_measurements' AND c.relkind = 'r'"
+MEASUREMENTS_PRESENT = (
+    "SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace "
+    "WHERE n.nspname = 'inv' AND c.relname = 'model_version_measurements' AND c.relkind = 'r'"
+)
 
-#: The kernel table's shape when present: the column set (order-free) and the
-#: policy, so a same-named table made by something else is refused.
-MEASUREMENTS_SHAPE = """
-SELECT (
-         SELECT array_agg(a.attname::text ORDER BY a.attname)
-         FROM pg_attribute a
-         WHERE a.attrelid = 'inv.model_version_measurements'::regclass AND a.attnum > 0 AND NOT a.attisdropped
-       ) AS columns,
-       (SELECT count(*) FROM pg_policy p WHERE p.polrelid = 'inv.model_version_measurements'::regclass AND p.polname = 'tenant_isolation') AS policies
+_REL = "'inv.model_version_measurements'::regclass"
+
+#: One question per part of the shape. The marker comment is what the PG-free
+#: stand-in dispatches on; PostgreSQL ignores it.
+KERNEL_SHAPE_QUERIES = {
+    "columns": f"""
+/* shape:columns */
+SELECT a.attname::text, format_type(a.atttypid, a.atttypmod), a.attnotnull
+FROM pg_attribute a
+WHERE a.attrelid = {_REL} AND a.attnum > 0 AND NOT a.attisdropped
+ORDER BY a.attnum
+""",
+    "constraints": f"""
+/* shape:constraints */
+SELECT c.contype::text, pg_get_constraintdef(c.oid)
+FROM pg_constraint c WHERE c.conrelid = {_REL}
+ORDER BY 1, 2
+""",
+    "indexes": f"""
+/* shape:indexes */
+SELECT indexdef FROM pg_indexes
+WHERE schemaname = 'inv' AND tablename = 'model_version_measurements'
+ORDER BY 1
+""",
+    "rls": f"""
+/* shape:rls */
+SELECT c.relrowsecurity, c.relforcerowsecurity FROM pg_class c WHERE c.oid = {_REL}
+""",
+    "policies": f"""
+/* shape:policies */
+SELECT p.polname::text, p.polcmd::text, p.polpermissive,
+       (SELECT array_agg(CASE WHEN r = 0 THEN 'public' ELSE pg_get_userbyid(r) END ORDER BY r) FROM unnest(p.polroles) r),
+       pg_get_expr(p.polqual, p.polrelid), pg_get_expr(p.polwithcheck, p.polrelid)
+FROM pg_policy p WHERE p.polrelid = {_REL}
+ORDER BY 1
+""",
+    "privileges": f"""
+/* shape:privileges */
+SELECT CASE WHEN a.grantee = 0 THEN 'public' ELSE pg_get_userbyid(a.grantee) END, a.privilege_type
+FROM pg_class c, aclexplode(c.relacl) a
+WHERE c.oid = {_REL} AND a.grantee <> c.relowner
+ORDER BY 1, 2
+""",
+    "triggers": f"""
+/* shape:triggers */
+SELECT t.tgname::text, t.tgenabled::text, n.nspname::text, p.proname::text, t.tgtype
+FROM pg_trigger t JOIN pg_proc p ON p.oid = t.tgfoid JOIN pg_namespace n ON n.oid = p.pronamespace
+WHERE t.tgrelid = {_REL} AND NOT t.tgisinternal
+ORDER BY t.tgname
+""",
+}
+
+_CAST = re.compile(r"::[a-z_]+(?: [a-z_]+)*")
+
+
+def normalise(expression: str) -> str:
+    """One spelling for an expression PostgreSQL may render several ways.
+
+    Casts, parentheses, whitespace and case are rendering; operators, names
+    and literals are meaning. ``normalise`` keeps only the latter, and both
+    the expected shape and the catalogue's answer go through it.
+    """
+    text = _CAST.sub("", expression)
+    return re.sub(r"[\s()]", "", text).lower()
+
+
+TENANT_PREDICATE = "tenant_id = nullif(current_setting('inv.tenant_id', true), '')::uuid"
+
+EXPECTED_KERNEL_SHAPE = {
+    "columns": [
+        ("tenant_id", "uuid", True),
+        ("measurement_id", "character(30)", True),
+        ("request_id", "uuid", True),
+        ("project_id", "character(30)", True),
+        ("model_version_id", "character(30)", True),
+        ("uri", "text", True),
+        ("contribution_id", "character(30)", True),
+        ("contribution_version", "bigint", True),
+        ("location_id", "character(30)", True),
+        ("location_version", "bigint", True),
+        ("relative_path", "text", True),
+        ("node_id", "character(30)", True),
+        ("recovery_epoch", "uuid", True),
+        ("channel_version", "bigint", True),
+        ("certificate_sha256", "text", True),
+        ("sha256", "character(64)", True),
+        ("byte_size", "bigint", True),
+        ("observed_at", "timestamp with time zone", True),
+        ("recorded_at", "timestamp with time zone", True),
+        ("challenge_sha256", "text", True),
+        ("response_sha256", "text", True),
+        ("duration_seconds", "double precision", True),
+    ],
+    "constraints": sorted(
+        [
+            ("p", normalise("PRIMARY KEY (tenant_id, measurement_id)")),
+            ("u", normalise("UNIQUE (tenant_id, request_id)")),
+            ("c", normalise("CHECK (uri ~~ 'inv://models/%')")),
+            ("c", normalise("CHECK (contribution_version >= 1)")),
+            ("c", normalise("CHECK (location_version >= 1)")),
+            ("c", normalise("CHECK ((length(relative_path) >= 1) AND (length(relative_path) <= 4096))")),
+            ("c", normalise("CHECK (certificate_sha256 ~ '^[0-9a-f]{64}$')")),
+            ("c", normalise("CHECK (sha256 ~ '^[0-9a-f]{64}$')")),
+            ("c", normalise("CHECK (byte_size >= 0)")),
+            ("c", normalise("CHECK (challenge_sha256 ~ '^[0-9a-f]{64}$')")),
+            ("c", normalise("CHECK (response_sha256 ~ '^[0-9a-f]{64}$')")),
+            ("c", normalise("CHECK (duration_seconds >= 0)")),
+            ("c", normalise("CHECK (observed_at <= recorded_at)")),
+        ]
+    ),
+    "indexes": sorted(
+        normalise(definition)
+        for definition in (
+            "CREATE INDEX model_version_measurements_by_version ON inv.model_version_measurements USING btree (tenant_id, model_version_id, observed_at DESC)",
+            "CREATE UNIQUE INDEX model_version_measurements_pkey ON inv.model_version_measurements USING btree (tenant_id, measurement_id)",
+            "CREATE UNIQUE INDEX model_version_measurements_tenant_id_request_id_key ON inv.model_version_measurements USING btree (tenant_id, request_id)",
+        )
+    ),
+    "rls": [(True, True)],
+    "policies": [("tenant_isolation", "*", True, ["public"], normalise(TENANT_PREDICATE), normalise(TENANT_PREDICATE))],
+    "privileges": [("inv_kernel", "INSERT"), ("inv_kernel", "SELECT")],
+    #: BEFORE (2) | ROW (1) | DELETE (8) | UPDATE (16); enabled ('O').
+    "triggers": [("immutable", "O", "inv", "immutable_record", 27)],
+}
+
+
+def _shape_from(rows_by_part) -> dict:
+    """The catalogue's answers in the expected form."""
+    columns = [(r[0], r[1], bool(r[2])) for r in rows_by_part["columns"]]
+    constraints = sorted((r[0], normalise(r[1])) for r in rows_by_part["constraints"])
+    indexes = sorted(normalise(r[0]) for r in rows_by_part["indexes"])
+    rls = [(bool(r[0]), bool(r[1])) for r in rows_by_part["rls"]]
+    policies = [
+        (r[0], r[1], bool(r[2]), sorted(r[3] or []), normalise(r[4] or ""), normalise(r[5] or ""))
+        for r in rows_by_part["policies"]
+    ]
+    privileges = sorted((r[0], r[1]) for r in rows_by_part["privileges"])
+    triggers = [(r[0], r[1], r[2], r[3], int(r[4])) for r in rows_by_part["triggers"]]
+    return {
+        "columns": columns, "constraints": constraints, "indexes": indexes, "rls": rls,
+        "policies": policies, "privileges": privileges, "triggers": triggers,
+    }
+
+
+def kernel_shape(bind) -> dict:
+    return _shape_from({part: bind.exec_driver_sql(sql).fetchall() for part, sql in KERNEL_SHAPE_QUERIES.items()})
+
+
+# ---------------------------------------------------------------- the reader
+
+#: The reader's body, verbatim between the dollar quotes. Both the DDL and the
+#: definition PostgreSQL renders back (``pg_get_functiondef``) are built from
+#: this one constant, so the policy hash and the resume check cannot drift
+#: from what is created.
+READER_BODY = """
+BEGIN
+  RETURN QUERY SELECT m.model_version_id::text, m.sha256::text, m.byte_size, m.observed_at
+  FROM inv.model_version_measurements m
+  WHERE m.tenant_id = nullif(current_setting('inv.tenant_id', true), '')::uuid
+    AND m.measurement_id = p_measurement_id;
+END
 """
 
-EXPECTED_MEASUREMENT_COLUMNS = sorted([
-    "tenant_id", "measurement_id", "request_id", "project_id", "model_version_id", "uri",
-    "contribution_id", "contribution_version", "location_id", "location_version", "relative_path",
-    "node_id", "recovery_epoch", "channel_version", "certificate_sha256",
-    "sha256", "byte_size", "observed_at", "recorded_at", "challenge_sha256", "response_sha256", "duration_seconds",
-])
+READER_DDL = f"""
+CREATE FUNCTION public.model_version_measurement(p_measurement_id text)
+RETURNS TABLE(model_version_id text, sha256 text, byte_size bigint, observed_at timestamptz)
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog AS $fn${READER_BODY}$fn$;
+"""
+
+READER_GRANTS = (
+    f"REVOKE ALL ON FUNCTION {READER} FROM PUBLIC",
+    f"GRANT EXECUTE ON FUNCTION {READER} TO inv_app",
+)
+
+
+def reader_definition() -> str:
+    """What ``pg_get_functiondef`` renders for the reader (0044's shape, verified)."""
+    return (
+        "CREATE OR REPLACE FUNCTION public.model_version_measurement(p_measurement_id text)\n"
+        " RETURNS TABLE(model_version_id text, sha256 text, byte_size bigint, observed_at timestamp with time zone)\n"
+        " LANGUAGE plpgsql\n"
+        " SECURITY DEFINER\n"
+        " SET search_path TO 'pg_catalog'\n"
+        f"AS $function${READER_BODY}$function$\n"
+    )
+
+
+def reader_definition_sha256() -> str:
+    return hashlib.sha256(reader_definition().encode("utf-8")).hexdigest()
+
+
+READER_PRESENT = """
+/* shape:reader */
+SELECT pg_get_functiondef(p.oid)
+FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+WHERE n.nspname = 'public' AND p.proname = 'model_version_measurement'
+  AND pg_catalog.oidvectortypes(p.proargtypes) = 'text'
+"""
+
+# ---------------------------------------------------------------- the public side
 
 COLUMN_SHAPE = f"""
 SELECT data_type, character_maximum_length, is_nullable
@@ -140,7 +343,20 @@ def _add_fk() -> None:
 
 
 def _add_check() -> None:
-    op.create_check_constraint(CHECK, TABLE, CHECK_EXPRESSION)
+    # ``op.f``: the name is final. Without it Alembic applies the metadata
+    # naming convention a second time and creates ``ck_model_versions_ck_...``.
+    op.create_check_constraint(op.f(CHECK), TABLE, CHECK_EXPRESSION)
+
+
+def _create_reader() -> None:
+    op.execute(READER_DDL)
+
+
+def _grants() -> None:
+    # Idempotent; re-issued on every run so a resume cannot leave them out.
+    op.execute(GRANT)
+    for statement in READER_GRANTS:
+        op.execute(statement)
 
 
 def _refuse(what: str, shape, expected) -> None:
@@ -151,15 +367,24 @@ def _refuse(what: str, shape, expected) -> None:
     )
 
 
+def _require_kernel_shape(bind) -> None:
+    """Every part of the kernel table's shape, or a refusal naming the first that differs."""
+    actual = kernel_shape(bind)
+    for part, expected in EXPECTED_KERNEL_SHAPE.items():
+        if actual[part] != expected:
+            _refuse(f"{MEASUREMENTS} ({part})", actual[part], expected)
+
+
 def upgrade():
     context = op.get_context()
 
     if context.as_sql:
         op.execute(_kernel_sql())
+        _create_reader()
         _add_column()
         _add_fk()
         _add_check()
-        op.execute(GRANT)
+        _grants()
         return
 
     bind = op.get_bind()
@@ -180,13 +405,17 @@ def upgrade():
         )
 
     if bind.exec_driver_sql(MEASUREMENTS_PRESENT).fetchall():
-        row = bind.exec_driver_sql(MEASUREMENTS_SHAPE).fetchall()[0]
-        columns = sorted(row[0] or [])
-        if columns != EXPECTED_MEASUREMENT_COLUMNS or int(row[1]) != 1:
-            _refuse(MEASUREMENTS, (columns, int(row[1])), (EXPECTED_MEASUREMENT_COLUMNS, 1))
-        # Present and right: the kernel SQL is not re-run (it is not idempotent).
+        _require_kernel_shape(bind)
+        # Present and whole: the kernel SQL is not re-run (it is not idempotent).
     else:
         op.execute(_kernel_sql())
+
+    reader = bind.exec_driver_sql(READER_PRESENT).fetchall()
+    if reader:
+        if reader[0][0] != reader_definition():
+            _refuse(READER, hashlib.sha256(reader[0][0].encode("utf-8")).hexdigest(), reader_definition_sha256())
+    else:
+        _create_reader()
 
     column = bind.exec_driver_sql(COLUMN_SHAPE).fetchall()
     if column:
@@ -214,8 +443,7 @@ def upgrade():
     else:
         _add_check()
 
-    # Idempotent; re-issued on every run so a resume cannot leave it out.
-    op.execute(GRANT)
+    _grants()
 
 
 def downgrade():
@@ -241,4 +469,5 @@ def downgrade():
     op.execute(f"ALTER TABLE public.{TABLE} DROP CONSTRAINT IF EXISTS {CHECK}")
     op.execute(f"ALTER TABLE public.{TABLE} DROP CONSTRAINT IF EXISTS {FK}")
     op.execute(f"ALTER TABLE public.{TABLE} DROP COLUMN IF EXISTS {COLUMN}")
+    op.execute(f"DROP FUNCTION IF EXISTS {READER}")
     op.execute(f"DROP TABLE IF EXISTS {MEASUREMENTS}")

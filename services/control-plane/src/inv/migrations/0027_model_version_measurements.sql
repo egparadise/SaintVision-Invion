@@ -48,9 +48,10 @@ CREATE POLICY tenant_isolation ON inv.model_version_measurements
   USING (tenant_id = nullif(current_setting('inv.tenant_id', true), '')::uuid)
   WITH CHECK (tenant_id = nullif(current_setting('inv.tenant_id', true), '')::uuid);
 REVOKE ALL ON inv.model_version_measurements FROM PUBLIC, inv_app, inv_kernel;
--- The kernel's accept path is the only writer; the application reads (the W3
--- route binds a version to a measurement) and never writes.
+-- The kernel's accept path is the only writer. The application has no
+-- privilege on this table and no access to this schema: it reads one
+-- measurement at a time through the tenant-bound SECURITY DEFINER reader
+-- public.model_version_measurement(text) that alembic 0054 creates.
 GRANT SELECT, INSERT ON inv.model_version_measurements TO inv_kernel;
-GRANT SELECT ON inv.model_version_measurements TO inv_app;
 CREATE TRIGGER immutable BEFORE UPDATE OR DELETE ON inv.model_version_measurements
   FOR EACH ROW EXECUTE FUNCTION inv.immutable_record();

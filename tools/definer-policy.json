@@ -37,6 +37,30 @@
       ],
       "kind": "issuer-quota"
     },
+    "public.model_location_readiness(text[])": {
+      "definitionSHA256": "b8f291d23bc2908ad5379934af6328f1a9c2df866542d4a25bac01d61933ca0b",
+      "executeRoles": [
+        "inv_kernel"
+      ],
+      "kind": "tenant-bound",
+      "sourceMigrationSHA256": "c7105a2dcef3b24b0323e0e737169606502fa80093d452b451e5c5bece02f4a7"
+    },
+    "public.model_registry_snapshot(uuid, text, text)": {
+      "definitionSHA256": "f14a43282ee565f8e6e4dd5ef0f363e33fe8c062ba47ac63a90a44cd05043af6",
+      "executeRoles": [
+        "inv_kernel"
+      ],
+      "kind": "tenant-bound",
+      "sourceMigrationSHA256": "b6401933d8ca573e49cede31b6e5e44b32dcd3bbc42dd845b3444f99a3ef9d4a"
+    },
+    "public.model_version_measurement(text)": {
+      "definitionSHA256": "000e9f58b9e5fbd12e906566e1a6a07681475893b0f2765c51499b8ac2198e31",
+      "executeRoles": [
+        "inv_app"
+      ],
+      "kind": "tenant-bound",
+      "sourceMigrationSHA256": "a7e7f577ba3f9e74d50d49cc3f5075fd6e7e109e032cac2896d3d82884f014ec"
+    },
     "public.node_by_certificate(character)": {
       "definitionSHA256": "f8461c2a0de65bab932df2914bfb005a15ee87c6b739c3c1046f59fa97187dc1",
       "executeRoles": [
@@ -50,6 +74,14 @@
         "inv_app"
       ],
       "kind": "tenant-bound"
+    },
+    "public.record_auth_denial(text, text, text, text, text, text, text, text, jsonb, text, text)": {
+      "definitionSHA256": "397bfe6933220324c36678605f48e79bddb02eff0445177bb783707a60536a85",
+      "executeRoles": [
+        "inv_app"
+      ],
+      "kind": "tenant-less-audit-append",
+      "sourceMigrationSHA256": "82e1126db57a15efa91764fc1da97a74e3efc2653d1364d9b8ce5974831e59da"
     },
     "public.run_committed_outputs(uuid, text)": {
       "definitionSHA256": "09203039a0dbfb5b006dff138bc6e6a5f048abeafdb0b22d13f1eba8a0f3d302",
@@ -69,30 +101,6 @@
         "inv_app"
       ],
       "kind": "tenant-bound"
-    },
-    "public.model_registry_snapshot(uuid, text, text)": {
-      "definitionSHA256": "f14a43282ee565f8e6e4dd5ef0f363e33fe8c062ba47ac63a90a44cd05043af6",
-      "executeRoles": [
-        "inv_kernel"
-      ],
-      "kind": "tenant-bound",
-      "sourceMigrationSHA256": "b6401933d8ca573e49cede31b6e5e44b32dcd3bbc42dd845b3444f99a3ef9d4a"
-    },
-    "public.model_location_readiness(text[])": {
-      "definitionSHA256": "b8f291d23bc2908ad5379934af6328f1a9c2df866542d4a25bac01d61933ca0b",
-      "executeRoles": [
-        "inv_kernel"
-      ],
-      "kind": "tenant-bound",
-      "sourceMigrationSHA256": "c7105a2dcef3b24b0323e0e737169606502fa80093d452b451e5c5bece02f4a7"
-    },
-    "public.record_auth_denial(text, text, text, text, text, text, text, text, jsonb, text, text)": {
-      "definitionSHA256": "397bfe6933220324c36678605f48e79bddb02eff0445177bb783707a60536a85",
-      "executeRoles": [
-        "inv_app"
-      ],
-      "kind": "tenant-less-audit-append",
-      "sourceMigrationSHA256": "82e1126db57a15efa91764fc1da97a74e3efc2653d1364d9b8ce5974831e59da"
     }
   }
 }

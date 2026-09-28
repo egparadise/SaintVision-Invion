@@ -286,12 +286,13 @@ def record_lineage(
     return row
 
 
-#: The measurement a verification binds to, read through RLS with the caller's
-#: tenant scope. The application role may only SELECT this kernel-owned table.
+#: The measurement a verification binds to, read through the tenant-bound
+#: SECURITY DEFINER reader of 0054: the application role has no privilege on
+#: the kernel table itself, and the reader takes the tenant from the session's
+#: ``inv.tenant_id`` scope, never from an argument.
 _MEASUREMENT = text(
     "SELECT model_version_id, sha256, byte_size, observed_at "
-    "FROM inv.model_version_measurements "
-    "WHERE tenant_id = :tenant_id AND measurement_id = :measurement_id"
+    "FROM public.model_version_measurement(:measurement_id)"
 )
 
 
@@ -313,12 +314,12 @@ def verify_model_version(
     digest the caller passes must agree with both the measurement and the
     row -- a digest alone cannot set ``verified_at`` (design #209 v1.1 §4).
     ``verified_at`` and ``verified_measurement_id`` are set together; the
-    database CHECK refuses one without the other.
+    database CHECK refuses one without the other. The size is compared exactly
+    as the digest is: a registration that recorded 0 bytes is proved only by a
+    measurement of 0 bytes.
     """
     row = _load_model_version(session, tenant_id=tenant_id, model_version_id=model_version_id)
-    measurement = session.execute(
-        _MEASUREMENT, {"tenant_id": tenant_id, "measurement_id": measurement_id}
-    ).one_or_none()
+    measurement = session.execute(_MEASUREMENT, {"measurement_id": measurement_id}).one_or_none()
     if measurement is None:
         raise InvError(RES_ARTIFACT_NOT_FOUND, "measurement not found", cause_ref=measurement_id)
     if measurement.model_version_id != row.model_version_id:
@@ -331,7 +332,9 @@ def verify_model_version(
             "the computed checksum does not match the recorded one",
             cause_ref=model_version_id,
         )
-    if row.byte_size and int(measurement.byte_size) != int(row.byte_size):
+    # Always, with no sentinel (Codex #213 F2): a registered size of 0 is a
+    # size like any other and must be what the worker measured.
+    if int(measurement.byte_size) != int(row.byte_size):
         raise InvError(
             VAL_SCHEMA, "the measured size does not match the recorded one", cause_ref=model_version_id
         )
