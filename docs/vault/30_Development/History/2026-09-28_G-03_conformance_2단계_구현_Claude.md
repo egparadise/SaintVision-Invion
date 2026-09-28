@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-G03-CONFORMANCE-STAGE2-IMPL-001"
 title: "G-03 2단계 구현 — conformance 실행 기록 저장(0055)·RECORDED branch·fixture 생산자·host 결속"
-version: "1.0.0"
+version: "1.0.1"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T22:54:45+09:00"
+updated: "2026-09-28T23:17:05+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S10-BE"]
@@ -38,6 +38,9 @@ tags: ["s10-be", "g-03", "conformance", "migration", "adapter", "api", "claude"]
 ## 3. 검증 (실제 수행한 것만)
 
 로컬(공유 venv 3.14, PG 없음, 단일 파일): `tests/core/test_conformance_status_route.py` + `tests/core/test_conformance_records.py` + `tests/core/test_lock_wait.py` + `tests/test_migrations.py` + `tests/test_ac11_migration_rehearsal.py` + `tests/core/test_conformance_checklist_ratchet.py` + `tests/test_adapters.py` + `tests/core/test_adapters_route.py` + `tests/core/test_audit_action.py` **326 passed / 0 failed**. 실 PG 파일 2개 **40 collected**(fixture guard가 PG-free에서 seed·tampering shape를 미리 검사) — 실 PG는 **NOT_OBSERVED**, hosted 인용은 PR 코멘트. `tools/export_schemas.py`로 계약 3개 생성, `migration_graph.py --head` = `0055_adapter_conformance_records`. 게이트 결과는 커밋 전 §4에 기록.
+
+### 3-1. hosted 1차 (head `dd4adf40`) — 실패 1종, 수정
+Backend 36432549781: 3.12/3.14 각 **25 failed / 4476 passed / 50 skipped / 2 deselected**, Core 36432550254 core failure. 25건 전부 한 원인 — 0055가 alembic head가 됐는데 `tools/definer-policy.json`의 `revision`과 head를 고정한 시험 4곳(`test_eval_suite_project_scope_migration.py`, `test_model_version_measurements_migration.py` ×2, `test_object_store_locator_migration.py` ×2)이 `0054`를 가리켜 definer audit이 `migration_revision_mismatch`를 내고(`test_definer_audit.py` 20건, `test_account_integration.py`의 disposable migration 검증), head 단언 4건이 깨졌다. **새 conformance 실 PG 시험 40건은 실패 목록에 없다(통과).** 수정: policy `revision` → `0055_adapter_conformance_records`(0055는 definer function을 추가하지 않으므로 항목 무변경), 시험 4곳을 0055로 옮기고 0054는 `down_revision` 단언으로 유지. 로컬 5파일 211 passed.
 
 ## 4. 다음
 
