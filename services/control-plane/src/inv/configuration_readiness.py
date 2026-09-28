@@ -14,15 +14,19 @@ from urllib.parse import urlsplit
 from cryptography import x509
 
 from .identity import trusted_file
-
+from .object_store_config import (
+    BUCKET_SETTING,
+    CREDENTIAL_SETTING,
+    ENDPOINT_SETTING,
+    parse_object_store_configuration,
+    unresolved_object_store,
+)
 
 NODE_CA = "INV_NODE_MTLS_CA_BUNDLE"
-OBJECT_STORE = "INV_OBJECT_STORE_ENDPOINT"
-SETTING_NAMES = frozenset({NODE_CA, OBJECT_STORE})
-_CONFIG_KEYS = frozenset({"nodeMtlsCaBundle", "objectStoreEndpoint"})
-_TRUSTED_CONFIGURATION_PATH = re.compile(
-    r"/run/saintvision/[A-Za-z0-9][A-Za-z0-9_.-]{0,99}"
-)
+OBJECT_STORE = ENDPOINT_SETTING
+SETTING_NAMES = frozenset({NODE_CA, OBJECT_STORE, BUCKET_SETTING, CREDENTIAL_SETTING})
+_CONFIG_KEYS = frozenset({"nodeMtlsCaBundle", "objectStoreEndpoint", "objectStore"})
+_TRUSTED_CONFIGURATION_PATH = re.compile(r"/run/saintvision/[A-Za-z0-9][A-Za-z0-9_.-]{0,99}")
 
 
 def _ca_bundle_ready(value: object) -> bool:
@@ -80,11 +84,19 @@ def configured_s01_readiness(value: object | None):
     else:
         raise ValueError("Invalid configurationReadiness settings")
 
+    if "objectStoreEndpoint" in config and "objectStore" in config:
+        raise ValueError("Duplicate legacy and objectStore settings")
+    object_store = (
+        parse_object_store_configuration(config["objectStore"]) if "objectStore" in config else None
+    )
+
     def unresolved() -> list[str]:
         missing = []
         if not _ca_bundle_ready(config.get("nodeMtlsCaBundle")):
             missing.append(NODE_CA)
-        if not _endpoint_ready(config.get("objectStoreEndpoint")):
+        if object_store is not None:
+            missing.extend(unresolved_object_store(object_store))
+        elif not _endpoint_ready(config.get("objectStoreEndpoint")):
             missing.append(OBJECT_STORE)
         return sorted(missing)
 

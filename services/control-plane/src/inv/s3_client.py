@@ -8,7 +8,7 @@ to the protected Control Plane configuration, not to caller input.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 import hashlib
 import hmac
@@ -22,7 +22,7 @@ class S3Config:
     endpoint: str
     bucket: str
     access_key: str
-    secret_key: str
+    secret_key: str = field(repr=False)
     region: str
 
 
@@ -69,9 +69,7 @@ def _authorization(config, method, canonical_uri, headers, body):
 
     payload_hash = hashlib.sha256(body).hexdigest()
     signed_names = ";".join(sorted(headers))
-    canonical_headers = "".join(
-        f"{name}:{headers[name].strip()}\n" for name in sorted(headers)
-    )
+    canonical_headers = "".join(f"{name}:{headers[name].strip()}\n" for name in sorted(headers))
     canonical_request = "\n".join(
         [method, canonical_uri, "", canonical_headers, signed_names, payload_hash]
     )
@@ -103,18 +101,14 @@ class S3Client:
         self.config = config
         self.transport = transport or UrlLibTransport()
 
-    def _request(
-        self, method, key, body=b"", metadata_digest=None, if_none_match=None, now=None
-    ):
+    def _request(self, method, key, body=b"", metadata_digest=None, if_none_match=None, now=None):
         now = now or datetime.now(timezone.utc)
         parsed = urlsplit(self.config.endpoint)
         host = parsed.netloc
         segments = [self.config.bucket]
         if key is not None:
             segments.extend(key.split("/"))
-        canonical_uri = "/" + "/".join(
-            quote(segment, safe="-_.~") for segment in segments
-        )
+        canonical_uri = "/" + "/".join(quote(segment, safe="-_.~") for segment in segments)
         url = self.config.endpoint + canonical_uri
         payload_hash = hashlib.sha256(body).hexdigest()
         headers = {
@@ -126,9 +120,7 @@ class S3Client:
             headers["x-amz-meta-content-sha256"] = metadata_digest
         if if_none_match is not None:
             headers["if-none-match"] = if_none_match
-        headers["authorization"] = _authorization(
-            self.config, method, canonical_uri, headers, body
-        )
+        headers["authorization"] = _authorization(self.config, method, canonical_uri, headers, body)
         return self.transport.request(method, url, headers, body)
 
     def put(self, key, body, digest):

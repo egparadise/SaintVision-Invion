@@ -389,7 +389,7 @@ export interface ProblemDetails {
 
 export interface ConfigurationReadinessView {
   status: "ready" | "blocked";
-  unresolvedSettings: Array<"INV_NODE_MTLS_CA_BUNDLE" | "INV_OBJECT_STORE_ENDPOINT">;
+  unresolvedSettings: Array<"INV_NODE_MTLS_CA_BUNDLE" | "INV_OBJECT_STORE_BUCKET" | "INV_OBJECT_STORE_CREDENTIAL_FILE" | "INV_OBJECT_STORE_ENDPOINT">;
 }
 
 export interface NodeResourceSnapshot {

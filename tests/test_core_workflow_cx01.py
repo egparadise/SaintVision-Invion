@@ -7,8 +7,9 @@ WORKFLOW = ROOT / ".github" / "workflows" / "core.yml"
 
 def test_core_workflow_owns_one_explicit_cx01_container_lifecycle():
     text = WORKFLOW.read_text(encoding="utf-8")
+    core_job = text[text.index("  core:") : text.index("  s01-storage-roundtrip:")]
 
-    assert "services:\n      postgres:" not in text
+    assert "services:\n      postgres:" not in core_job
     create = text.index("name: Create disposable CX01 PostgreSQL")
     migrations = text.index("name: Upgrade each published migration head")
     cleanup = text.index("name: Cleanup disposable CX01 PostgreSQL")
