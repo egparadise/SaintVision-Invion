@@ -56,6 +56,24 @@
         "topology": "hosted",
         "evidenceClass": "security-tools-v0"
       }
+    },
+    {
+      "targetId": "s11-irreversible-restore-forward-v0",
+      "axis": "irreversible-restore-forward",
+      "sourceDocument": {
+        "commit": "40b592e623da4107d3857fe678e1eb3d8387541d",
+        "path": "docs/vault/30_Development/S11_AC11_migration_restore_target_v0.md",
+        "blob": "d14e09dfabad930f996a3a9d38506627535b2723"
+      },
+      "criteria": {
+        "catalogMismatchCount": {"operator": "eq", "value": 0},
+        "negativeFixturePassCount": {"operator": "eq", "value": 3},
+        "restoreForwardPassCount": {"operator": "eq", "value": 1}
+      },
+      "requiredEnvironment": {
+        "topology": "hosted-single-postgres-service",
+        "synthetic": true
+      }
     }
   ]
 }
