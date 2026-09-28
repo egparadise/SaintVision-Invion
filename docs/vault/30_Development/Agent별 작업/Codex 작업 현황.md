@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.215"
+version: "1.0.216"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T17:36:44+09:00"
+updated: "2026-09-28T18:00:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-28 S11-ST hosted 10-case reference lane — PR #204
+
+- #193 위에 #173 S3 observation과 #187 G-02 archiver 의존성을 merge commit으로 결속하고, 별도 opt-in workflow `S11 Storage Failure Hosted Reference`를 추가했다. exact PR head·clean tree·job-level concurrency(cancel false), digest-pinned MinIO, PostgreSQL 16, secret 0, loopback/internal network와 owner-label cleanup을 강제한다.
+- 첫 run `36399940041`은 `inv.tenant_budgets` composite key를 단일 `project_id`로 upsert한 하네스 결함 때문에 실패했다. 수정 commit `3fe6a7a1` 뒤 run `36400113385`는 frozen hosted subset 10건(`0509d94a…4a33`)을 모두 실행해 exact surface 10/10, classification mismatch·false success·unexpected·quota overshoot·committed loss·residue 0, cleanup residue 0으로 `MEASURED_PASS`를 냈다.
+- 이 증거는 storage reference 전용(`referenceOnly=true`, `axis=null`, `targetRef=null`)이라 AC-11 축 PASS·S11-ST 승격으로 세지 않는다. artifact `10960190326`, digest `sha256:6202aafd…e9e`, 만료 2026-10-28이며 최종 문서 head 재실행은 PR #204에 기록한다. 로컬 PostgreSQL·Docker·전체 suite는 실행하지 않았고 PG-free 단일 파일 28 passed와 YAML/compile/diff 게이트만 수행했다. [[2026-09-28_18-00-00_KST_S11_ST_hosted_10_case_reference_Codex]], [[S11-ST_손상_용량_backup_장애시험_설계]].
 
 ## 2026-09-28 S11-ST PG-free fault evidence producer/importer — Claude r2 C1~C3 보강
 
