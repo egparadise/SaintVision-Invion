@@ -505,3 +505,179 @@ def test_no_credential_is_refused_and_recorded_as_anonymous(
         "POST /v1/projects/{project_id}/eval/suites/{suite_id}/runs"
     )
     assert _runs(owner_engine, tenant) == []
+
+
+def test_an_archive_committed_before_the_cost_check_buys_nothing(
+    owner_engine, app_engine, two_tenants, frozen_now, monkeypatch
+):
+    """The third permission check has to read the project, not remember it.
+
+    Codex found that it did not. ``effective_permission`` refreshed the
+    membership and the user row but took the project out of the identity map, so
+    the second and third checks in one transaction saw whatever ``status`` the
+    first check had loaded. An archive committed by another transaction in
+    between was therefore invisible at the one check whose whole purpose is to
+    stand immediately before a call that spends money.
+
+    This test is the barrier the mock cannot be: ``adapter_for`` is resolved
+    between the second check and the third, so archiving the project *there*, on
+    a different connection, with a real commit, puts a real concurrent change in
+    the real window. Nothing here flips a mock's return value.
+
+    **What this test does not prove.** It passes with or without the
+    ``populate_existing=True`` fix, and saying otherwise would be the kind of
+    claim this suite exists to prevent. SQLAlchemy's identity map holds *weak*
+    references, so the moment ``effective_permission`` returns, nothing in this
+    route still refers to the ``Project`` and it is evicted -- the next
+    ``session.get`` re-reads it whether or not the fix is there. Measured both
+    ways. The test that does discriminate is the one below, which supplies the
+    missing condition (a strong reference) instead of assuming it.
+
+    So this test pins the behaviour a caller depends on -- an archive committed
+    before the cost check buys nothing -- and the next one pins the reason it
+    holds no matter who else is holding the row.
+    """
+    tenant, _ = two_tenants
+    with owner_engine.begin() as connection:
+        seeded = _seed(
+            connection,
+            tenant_id=tenant,
+            now=frozen_now,
+            label="w5-barrier",
+            project_id="own",
+        )
+
+    client = _client(
+        app_engine,
+        tenant_id=tenant,
+        user_id=seeded["user_id"],
+        now=frozen_now,
+        monkeypatch=monkeypatch,
+    )
+
+    archived: list[str] = []
+    ran: list[str] = []
+
+    def archive_then_answer(_name):
+        """Commit the archive on another connection, then hand back the adapter."""
+        with owner_engine.begin() as connection:
+            connection.execute(
+                text(
+                    "UPDATE projects SET status = 'archived', version = version + 1 "
+                    "WHERE tenant_id = :t AND project_id = :p"
+                ),
+                {"t": tenant, "p": seeded["project_id"]},
+            )
+        archived.append(seeded["project_id"])
+        return StubAdapter()
+
+    real_run_suite = eval_runs.run_suite
+
+    def recording_run_suite(*args, **kwargs):
+        ran.append(kwargs.get("suite_id"))
+        return real_run_suite(*args, **kwargs)
+
+    monkeypatch.setattr(eval_runs.agents, "adapter_for", archive_then_answer)
+    monkeypatch.setattr(eval_runs, "run_suite", recording_run_suite)
+
+    response = client.post(
+        _path(seeded["project_id"], seeded["suite_id"]),
+        json={"adapter": "claude-code"},
+        headers=_headers("k-w5-barrier"),
+    )
+
+    # The barrier has to have fired, or this test proves nothing.
+    assert archived == [seeded["project_id"]]
+    with owner_engine.begin() as connection:
+        status = connection.execute(
+            text("SELECT status FROM projects WHERE project_id = :p"),
+            {"p": seeded["project_id"]},
+        ).scalar_one()
+    assert status == "archived"
+
+    body = _canonical(response, code="AUTH-0030", status=403)
+    assert body["detail"]
+    # Nothing was bought and nothing was written.
+    assert ran == []
+    assert _runs(owner_engine, tenant) == []
+    assert _events(owner_engine, "allow") == []
+    denials = _events(owner_engine, "deny")
+    assert len(denials) == 1, denials
+    assert denials[0]["reason_code"] == "AUTH-0030"
+    assert denials[0]["actor_id"] == seeded["user_id"]
+    assert denials[0]["action"] == (
+        "POST /v1/projects/{project_id}/eval/suites/{suite_id}/runs"
+    )
+
+
+def test_the_cost_check_rereads_the_project_even_when_something_holds_it(
+    owner_engine, app_engine, two_tenants, frozen_now
+):
+    """``effective_permission`` asked twice in one transaction must answer twice.
+
+    This is the mutation-sensitive half of the finding above, at the service
+    boundary where the defect actually lived.
+
+    The identity map is weak, so the route above re-read the project by accident:
+    nothing held it. Hold it -- which any relationship load, any helper that
+    returns the row, any future ``lock_project`` in the same request would do --
+    and without ``populate_existing=True`` the second answer is the *first*
+    answer: ``active``/``canApprove`` for a project that is archived and
+    committed in the database. That is the answer the check immediately before a
+    paid provider call would have acted on.
+
+    Removing ``populate_existing=True`` from ``effective_permission`` fails this
+    test. Verified by removing it and re-running: ``second`` comes back
+    ``active``/``True``.
+    """
+    from saintvision.db.models.identity import Project
+    from saintvision.db.session import tenant_scope
+    from saintvision.services import settings as settings_service
+    from sqlalchemy.orm import Session
+
+    tenant, _ = two_tenants
+    with owner_engine.begin() as connection:
+        seeded = _seed(
+            connection,
+            tenant_id=tenant,
+            now=frozen_now,
+            label="w5-reread",
+            project_id="own",
+        )
+
+    with Session(app_engine) as session, session.begin(), tenant_scope(session, tenant):
+        first = settings_service.effective_permission(
+            session,
+            tenant_id=tenant,
+            project_id=seeded["project_id"],
+            user_id=seeded["user_id"],
+        )
+        assert (first["projectStatus"], first["canApprove"]) == ("active", True)
+
+        # The strong reference the route happens not to keep. Anything that
+        # returns or stores the row creates it.
+        held = session.get(Project, seeded["project_id"])
+        assert held is not None
+
+        with owner_engine.begin() as connection:
+            connection.execute(
+                text(
+                    "UPDATE projects SET status = 'archived', version = version + 1 "
+                    "WHERE tenant_id = :t AND project_id = :p"
+                ),
+                {"t": tenant, "p": seeded["project_id"]},
+            )
+
+        second = settings_service.effective_permission(
+            session,
+            tenant_id=tenant,
+            project_id=seeded["project_id"],
+            user_id=seeded["user_id"],
+        )
+
+        assert second["projectStatus"] == "archived"
+        assert second["canApprove"] is False
+        # The held instance is refreshed too, so a caller that kept the row does
+        # not go on acting on the old one. Read inside the session: outside it
+        # the instance is detached and this would be a lazy load, not a check.
+        assert held.status == "archived"

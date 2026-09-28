@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-G05-W5-EVAL-RUN-IMPL-001"
 title: "G-05 W5 eval suite 실행 route 구현 — canApprove·adapter는 구성 allowlist의 이름뿐·외부 호출 직전 권한 재확인, NULL project suite 404, IDEM 재생이 두 번째 청구를 막는다 (설계 #183 §8 PR 8/8)"
-version: "1.0.0"
+version: "1.1.0"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T18:40:59+09:00"
+updated: "2026-09-28T20:12:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S10-BE"]
@@ -92,3 +92,37 @@ hosted가 fixture에서 죽지 않도록 **PG-free guard**를 넣었다 — 두 
 ## 9. 다음 첫 행동
 
 Codex 검토. 이것으로 설계 `#183` §8의 **여덟 중 일곱이 구현**됐다 — 남은 것은 **W3(verify)**이고, `verify_model_version`의 정본이 *"trusted worker hashed the actual weights"* 인데 `canApprove` 사용자가 DB의 digest를 그대로 제출할 수 있으므로 **trusted-worker identity + 실제 object read/hash Evidence 결속 seam**이 정해지기 전에는 구현하지 않는다(설계 §2, Codex F1).
+
+## 10. Codex F1 수정 — 비용 직전 재검사가 project를 실제로 다시 읽는다 (v1.1.0)
+
+Codex가 [high]로 지적했다: 세 번째 `_require_approval()`이 **의도대로 동작하지 않는다.** `services/settings.py::effective_permission`이 membership과 user는 `populate_existing=True`로 새로 읽으면서 **project만 그렇게 하지 않았다** — 같은 transaction의 두 번째·세 번째 물음에서 project는 identity map에서 나올 수 있고, 그 사이에 다른 transaction이 archive를 commit해도 보이지 않는다. 지적이 옳다.
+
+**수정은 한 줄이고, 자리는 route가 아니라 service다.** `effective_permission`의 세 읽기를 대칭으로 만들었다(`populate_existing=True`). 첫 줄의 *"right now"* 가 세 행 모두에 같은 뜻이어야 한다는 것이 이유이고, docstring에 그 이유를 적었다. route에서 국소적으로 고치면 W2를 포함해 두 번 묻는 다른 route가 같은 함정에 그대로 남는다.
+
+### 10.1 그런데 내 첫 시험은 이 결함을 잡지 못했다 — 실측해서 알아냈다
+
+실 PostgreSQL barrier 시험을 먼저 썼다. `adapter_for`가 **두 번째와 세 번째 검사 사이**에서 해석되므로, 그 안에서 **다른 connection으로 archive를 commit**하면 진짜 창에 진짜 동시 변경이 들어간다. 시험은 403 `AUTH-0030`·`run_suite` 호출 0·`eval_runs` 0행·denial 1행을 고정하고 **통과했다.**
+
+그런데 `populate_existing`을 **떼어내도 통과했다.** 원인을 격리 probe로 측정했다.
+
+| project를 붙잡는 강한 참조 | 수정 없이 두 번째 답 | 수정 후 |
+|---|---|---|
+| 없음 | `archived` (**live**) | `archived` |
+| 있음 | **`active` (STALE)** | `archived` |
+
+SQLAlchemy의 identity map은 **약한 참조**다. `effective_permission`이 반환하는 순간 이 route에는 `Project`를 가리키는 것이 아무것도 남지 않아 즉시 퇴출되고, 다음 `session.get`은 수정이 없어도 다시 읽는다. **즉 이 route는 우연히 안전했다.** 결함은 잠재해 있고, relationship load·행을 돌려주는 helper·같은 요청 안의 `lock_project` 등 **누가 그 행을 붙잡기만 하면** 비용 직전 검사가 낡은 값을 본다.
+
+그래서 시험을 둘로 만들었다.
+
+1. **route barrier 시험** — 호출자가 의존하는 행동(비용 직전에 commit된 archive는 아무것도 사지 않는다)을 고정한다. **수정 유무와 무관하게 통과한다**는 사실을 docstring에 그대로 적었다. 실패한다고 적는 것이 바로 이 suite가 막으려는 종류의 거짓말이다.
+2. **service 재조회 시험** — 빠진 조건(강한 참조)을 **시험이 직접 만들어** 보장을 고정한다. `populate_existing=True`를 떼면 `assert 'active' == 'archived'`로 **실패한다** — 실제로 떼고 돌려 확인했다.
+
+### 10.2 대가
+
+`effective_permission`은 모든 route가 쓰고, project 목록 endpoint는 project마다 한 번 부른다 — 그 loop에서 project 수만큼 **PK SELECT 한 번씩**이 늘어난다. 권한 함수에서는 기본값이 정확이어야 한다고 보고 그 대가를 택했다. 선택적 flag로 두면 다음 route가 잊는 순간 같은 함정이 돌아온다.
+
+### 10.3 검증
+
+실 PostgreSQL(로컬 detached PG): `test_eval_run_real_pg.py` **11 passed**, `test_settings.py` **20 passed**, `test_permission_observation.py` **11 passed**. PG-free: `test_eval_run_route.py` **64 passed**, `test_model_version_register_route.py` **91 passed**. 게이트 4종 exit 0. 변이: `populate_existing` 제거 시 service 재조회 시험 **실패**, barrier 시험은 통과(위 10.1의 이유).
+
+비차단 문서 권고도 받았다 — "retry가 두 번째 bill을 막는다"는 서술이 crash-safe exactly-once까지 보장하는 것으로 읽히지 않게 범위를 밝히라는 것이다. provider 비용이 발생한 뒤 commit 전에 process/DB가 끊기면 원장도 rollback되어 재시도가 다시 비용을 쓸 수 있다. 다음 판에서 §5 문구에 그 경계를 적는다.
