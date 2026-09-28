@@ -1,13 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.42"
+version: "1.2.24"
 status: "review"
 author: "Claude"
-updated: "2026-09-28T18:40:59+09:00"
-
-
-
+updated: "2026-09-29T00:09:51+09:00"
 source_of_truth: "Git"
 ---
 
@@ -167,6 +164,7 @@ G-03 conformance 결과 API 노출 설계 카드 55 (Claude, 2026-09-28, base `1
 ### 2026-09-28 카드 58 · G-04·G-05 통합 설계 (branch agent/claude/g04-g05-business-routes-design, base 1e8baf04)
 
 - docs-only: [[G-04_G-05 business lane route 통합 설계 v1.0]] — 재사용 표, 등급, 정본 오류·IDEM, tx/lock·Codex 계약 지점, migration 판정(W5 번호 요청), 계약/FE, PR 분할. 상세: [[2026-09-28_14-15-36_KST_G-04_G-05_business_route_통합설계_Claude]]
+S04-DB·S08-DB 운영 판정 기준 카드 108 (Claude, 2026-09-28, 분석 tree `96a03486` = `origin/coord/train-ci-2305`, PR base `integration/all-agents-unified`, docs-only): 재채점(PR #220) §5의 "S04-DB 재전송·S08-DB 보존 정책의 운영 판정 기준"을 카드 106과 같은 형식으로 채웠다. S04-DB는 안전장치가 전부 코드에 있고(outbox 한 tx·inbox UNIQUE·재시도 예산·승인 만료·취소 멱등·idempotency 원장·replay guard 12·kernel receipt-hash), S08-DB는 RLS fail-closed·audit INSERT-only·definer policy·partition 선행 생성·backup checksum·PITR planner가 코드에 있으나 **보존은 선언만 있고 실행 주체가 없다** — `drop_expired_partitions`(호출자·`retention_months` 값 0), artifact 90일 GC 0, `collect_orphan_snapshots` 호출자 0, backup 35일 삭제 0, PITR 7일은 Tier-A 유예; outbox `claim_pending_events`의 제품 호출자(publisher worker)도 0. 관측 13개(S04 O1~O6, S08 O7~O13) + 결정 항목 D1~D5 + 되돌림 시험 T1~T8; **Codex 1차 5건 반영(v1.1)**: O3/O9 승인 판정을 `assert_approval_valid`와 동일한 C1 계약(최신 approved·기간·digest·취소)으로 + 부정 fixture 5종, O8은 순변화 관측(done 증거 아님)·O8′ DB 감사 feed 인프라 선행, O9는 접근 로그 부재(`access_log=False`)라 응답 traceId probe로 축소·코드 선행, O11은 RPO/RTO 별도 선언 D6(보존 기간 ≠ RPO), O6는 감사되는 처분 command 선행·수동 SQL은 break-glass. 지금 가능 2(O3·O7), 기록만 1(O8), 코드·인프라 선행 6+O8′, 외부 전제 4. **Codex 2차(조건부 승인) 반영 v1.1.1**: C1을 core DB 판정으로 한정하고 epoch 주장 제거, kernel `inv.approval_requests` epoch 계약은 C1-K(별 카드)로 분리 명시. 판정은 내리지 않는다(75 유지). 다음 첫 행동: Codex 재확인. 전문 [[S04-DB_S08-DB_운영_판정_기준]].
 
 hosted Core junit로 S04/05/07-DB 케이스 수치 보강 카드 12 (Claude, 2026-09-22, 읽기 전용): artifact `saintvision-core-evidence`(run 35706465645 `3d1892c0` + proof 35714470445 `f2aa2b14`)를 .work/ci-junit에 받아(바이너리 삭제 후 1.4MB) 파일별 수치(core 2948/58/0·shard-recovery 21·containment 28·workspace 22·business-handoff 17·lan-installer 15·docker-host 2, f2aa2b14는 core 2998/58/0 외 동일)와 카드 10의 hosted-only 항목 케이스 이름을 classname으로 추출 — 재전송 hash(output_ingestion 5·node_delivery 18·results 21), placement Explain(placement 12), shard replacement 21, containment 28, workspace 복구 12+11, 노드 스토리지 전송 27 — **전부 passed**. hosted에도 없는 것(AC-05 결정성/P95·AC-07 60초/95%·CX01)은 그대로 물리/5노드 대기로 명시. 패키지 §C-2 + 검증상태지도 §12 보강. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 
