@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-2026-09-28-S10-BE-MLFLOW-DESIGN"
 title: "S10-BE MLflow 연동 설계 v1.0 — 정본은 lineage(content_sha256·approval digest), MLflow는 미러(B 권고, A 미도입 선택지, C 정본 거부), TrackingSink 계약·strict config·fail-closed·부재 시 NOT_OBSERVED·시험 계획; 결정 요청 (카드 bd, docs-only)"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T11:21:22+09:00"
+updated: "2026-09-28T11:23:22+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -23,9 +23,9 @@ tags: ["S10-BE", "mlflow", "design", "claude", "docs-only"]
 
 ## 2. 결과
 
-- 결정 요청: A 미도입 / **B 미러(권고)** / C 정본(거부 — append-only·approval digest·활성 배포 1 원칙과 충돌).
+- 결정: **B 미러로 진행**(코디네이터 결정 2026-09-28 11:22 KST, 사용자 재검토 가능; 근거 4: scope 명시라 A는 정정 필요·C는 불변식 우회·B는 정본 불변+미러 실패 NOT_OBSERVED·되돌릴 수 있음). A/C는 기록용.
 - B 설계: 범위표(experiment·run·metric·artifact 참조만·model registry 메타 미러, 받는 것은 미러 id뿐), 정본 관계(lineage 불변·edge 추가 없음·`mlflow_mirrors` append-only 미러 참조 테이블·불일치 표면화), `TrackingSink` 계약(ProbeResult/AuthResult/Attestation 재사용, `mirror`·`redact`, conformance + in-memory ReferenceSink), strict config 4(URI https만·userinfo 거부·credential 참조만·timeout), 오류 코드 4(`TRACK-MLFLOW-*`)와 fail-closed(정본 커밋 뒤 outbox, 미러 실패는 성공 아님·정본 불변), 부재 시 NOT_OBSERVED, 시험 계획(PG-free·실PG·hosted pinned 컨테이너·운영 실측 G1b).
 
 ## 3. 게이트·인계
 
-check_docs·single_source·ontology 2·bindings·freshness·export_schemas --check·diff --check exit 0. 코드 변경 0. owner Claude / reviewer Codex / 병합 금지. worktree 재사용. 다음 첫 행동: 코디네이터/사용자 A·B 결정 → Codex 설계 검토 → 구현 카드.
+check_docs·single_source·ontology 2·bindings·freshness·export_schemas --check·diff --check exit 0. 코드 변경 0. owner Claude / reviewer Codex / 병합 금지. worktree 재사용. 다음 첫 행동: Codex 설계 검토(v1.1, 결정 B 반영) → 승인 뒤 구현 카드.

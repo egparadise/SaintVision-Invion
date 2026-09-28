@@ -1,11 +1,11 @@
 ---
 doc_id: "CLAUDE-S10-BE-MLFLOW-INTEGRATION-DESIGN-001"
 title: "S10-BE MLflow 연동 설계 v1.0 — MLflow는 정본이 아닌 미러(tracking·registry 미러링), 정본은 lineage의 content_sha256·approval digest; TrackingSink 계약·strict config·fail-closed·부재 시 NOT_OBSERVED; 도입 여부는 결정 요청(선택지 A 미도입 / B 미러 / C 정본) (카드 bd, G1a 해소안, docs-only)"
-version: "1.0.0"
-status: "proposed-review"
+version: "1.1.0"
+status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T11:21:22+09:00"
+updated: "2026-09-28T11:23:22+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -18,7 +18,15 @@ tags: ["S10-BE", "AC-10", "mlflow", "tracking", "lineage", "adapter", "design", 
 > [!warning] 설계만 — 구현은 승인 뒤 별도 PR
 > S10-BE Evidence 대응표(PR #166) G1a: task-registry S10-BE scope에 "MLflow"가 있으나 코드가 0건(`git grep -i mlflow` → src·services·tools·tests·requirements 0). 아키텍처 문서는 MLflow를 "실험과 model registry **MVP**, 배포 권한은 별도 정책"([[시스템 아키텍처와 기술 스택]] :227), ML Worker 생태계(:214), Dev Workspace `inv mlflow RUN`(연결된 Experiment 열기)로 두었고, 운영 자격증명 계약은 "MLflow-owned artifacts" namespace를 분리했다([[Codex 운영 자격증명과 Storage 계약]] :43). 반면 S10에서 이미 착지한 것은 **우리 lineage·registry**(`register_model_version`·`record_lineage`·`release_model_version`·`record_deployment`, 0004 migration의 append-only·approval digest 결속)다. 따라서 첫 질문은 "MLflow를 어떻게 붙이나"가 아니라 "**MLflow가 무엇의 정본인가**"이고, 답은 **정본이 아니다**여야 한다.
 
-## 0. 결정 요청 (owner 결정 필요 — 이 설계는 B를 권고)
+## 0. 결정 — **B(미러)로 진행** (코디네이터 결정 2026-09-28 11:22 KST, 사용자 재검토 가능)
+
+> [!note] 결정 근거(코디네이터)
+> 1. task-registry S10-BE scope에 MLflow가 명시돼 있어 A(미도입)는 scope 정정이 필요하다.
+> 2. C(정본)는 append-only `model_versions`·release 검증·approval digest·활성 배포 1 불변식을 우회한다.
+> 3. B는 정본 lineage를 그대로 두고, 미러 실패를 NOT_OBSERVED로 하여 release·deploy를 막지 않는다.
+> 4. 필요하면 되돌릴 수 있는 결정이다(미러 테이블·sink는 정본에 영향 없음).
+>
+> 다음: Codex 설계 검토 → 승인 뒤 별도 구현 카드. 아래 선택지 표는 결정 기록으로 유지한다.
 
 | 선택지 | 내용 | 장점 | 비용/위험 | 판정 |
 |---|---|---|---|---|
@@ -26,7 +34,7 @@ tags: ["S10-BE", "AC-10", "mlflow", "tracking", "lineage", "adapter", "design", 
 | **B. 미러(권고)** | MLflow **tracking server**에 우리 정본의 사본을 push(실험/run/metric/param/artifact 참조/model version 메타). 읽기 경로는 없음(우리 서비스가 MLflow에서 상태를 가져오지 않음). 정본은 항상 lineage DB; MLflow 실패는 미러 상태 `NOT_OBSERVED`로 기록되고 release/deploy를 막지 않음 | 사용자에게 MLflow UI/Client 제공; 정본 이중화 없음(MLflow 쪽 변경은 무시·불일치는 표면화); 계약·시험을 우리 쪽에서 완결; 외부 부재 시 제품 동작 불변 | 새 계약·설정·미러 테이블·시험 구현(1 카드); MLflow 서버/credential은 운영 입력(U6 계열); hosted 시험은 pinned 컨테이너 lane 필요 | **권고** |
 | **C. 정본** | MLflow Model Registry stage(Staging/Production)로 release/deploy를 구동 | MLflow 표준 워크플로 | **거부 권고**: `model_versions` append-only·`release_requires_verification_and_pin`·`approval.subject_sha256 == content_sha256`(lineage.py:512)·활성 배포 1(0004:277)을 MLflow가 우회하게 됨; ADR-018·AC-10 "배포 digest는 버전에서" 원칙과 충돌 | 채택 불가 |
 
-결정이 A면 이 문서의 §2 이후는 무효이고 registry S10-BE scope 문구를 "두 Provider adapter·승인 배포"로 정정하는 docs PR만 남는다. 결정이 B면 §2~§8이 구현 카드의 계약이다.
+결정은 B이므로 §1~§8이 구현 카드의 계약이다(A는 기각·기록용; 사용자 재검토로 뒤집히면 registry scope 정정 docs PR만 남는다).
 
 ## 1. 범위 (B): 무엇을 보내고 무엇을 받는가
 
@@ -106,4 +114,4 @@ fail-closed의 뜻: **미러가 정본을 바꾸지 못하고, 미러 실패가 
 
 - 이 문서는 docs-only. 코드·계약·migration 변경 0. **구현은 결정(§0)과 Codex 승인 뒤** 별도 카드(예상 범위: `adapters/tracking.py`·`MlflowSink`·`ReferenceSink`·`mlflow_mirrors` migration·outbox 훅·readiness 필드·시험).
 - 관련: S10-BE Evidence 대응표(PR #166) G1a/G1b, S10-DB lineage 조회 API 설계(PR #158, lineage read API — 미러 참조를 응답에 포함할지는 그 설계의 후속), CL-06(실제 학습·평가·승인 배포).
-- owner Claude / reviewer Codex / 병합 금지. worktree 재사용, branch `agent/claude/s10-be-mlflow-design`, base `1e8baf04`. 다음 첫 행동: 코디네이터/사용자 결정(A/B) → Codex 설계 검토.
+- owner Claude / reviewer Codex / 병합 금지. worktree 재사용, branch `agent/claude/s10-be-mlflow-design`, base `1e8baf04`. 다음 첫 행동: Codex 설계 검토(결정 B 반영본) → 승인 뒤 구현 카드.
