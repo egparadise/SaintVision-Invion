@@ -79,6 +79,11 @@ class CatalogFingerprint:
     sections: dict[str, list[list[Any]]]
 
 
+def redacted_failure_reason(exc: Exception) -> str:
+    """Keep owned diagnostics, but never serialize arbitrary exception text."""
+    return str(exc) if isinstance(exc, RehearsalError) else type(exc).__name__
+
+
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
@@ -450,6 +455,7 @@ def run_rehearsal(
     cleanup_errors: list[str] = []
     success = False
     failure: str | None = None
+    failure_reason: str | None = None
     details: dict[str, Any] = {}
     try:
         for name in names:
@@ -505,6 +511,7 @@ def run_rehearsal(
         success = True
     except Exception as exc:  # noqa: BLE001 - serialized as a type-only failure
         failure = type(exc).__name__
+        failure_reason = redacted_failure_reason(exc)
     finally:
         for name in reversed(created):
             try:
@@ -515,8 +522,13 @@ def run_rehearsal(
         if residue or cleanup_errors:
             success = False
             failure = "cleanup_failed"
+            failure_reason = "owned database cleanup left residue or returned an error"
 
-    junit = _junit_bytes(success=success, reversible_tail=reversible_tail, failure=failure)
+    junit = _junit_bytes(
+        success=success,
+        reversible_tail=reversible_tail,
+        failure=failure_reason or failure,
+    )
     junit_path.parent.mkdir(parents=True, exist_ok=True)
     junit_path.write_bytes(junit)
     junit_sha = sha256_bytes(junit)
@@ -574,6 +586,7 @@ def run_rehearsal(
             "cleanupErrorTypes": cleanup_errors,
         },
         "failureType": failure,
+        "failureReason": failure_reason,
     }
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

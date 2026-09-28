@@ -129,6 +129,12 @@ def test_missing_dsn_refuses_without_writing_evidence(tmp_path, monkeypatch, cap
     assert "DSN" in capsys.readouterr().err
 
 
+def test_failure_diagnostics_keep_owned_reason_but_redact_arbitrary_exception_text():
+    assert runner.redacted_failure_reason(runner.RehearsalError("catalog mismatch")) == "catalog mismatch"
+    secret = "postgresql://user:secret@example.invalid/db"
+    assert runner.redacted_failure_reason(RuntimeError(secret)) == "RuntimeError"
+
+
 def test_workflow_is_opt_in_exact_head_and_non_cancelling():
     source = (ROOT / ".github" / "workflows" / "ac11-migration-rehearsal.yml").read_text(
         encoding="utf-8"
