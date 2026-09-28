@@ -25,6 +25,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import textwrap
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -138,7 +139,22 @@ def downgrade_body_kind(source: str) -> str:
         if body and isinstance(body[0], ast.Expr) and isinstance(body[0].value, ast.Constant):
             if isinstance(body[0].value.value, str):
                 body = body[1:]
-        if not body or all(isinstance(item, ast.Pass) for item in body):
+        if not body or all(
+            isinstance(item, ast.Pass)
+            or (
+                isinstance(item, ast.Expr)
+                and isinstance(item.value, ast.Constant)
+                and item.value.value is Ellipsis
+            )
+            or (
+                isinstance(item, ast.Return)
+                and (
+                    item.value is None
+                    or isinstance(item.value, ast.Constant) and item.value.value is None
+                )
+            )
+            for item in body
+        ):
             return "invalid-noop"
         if len(body) == 1 and isinstance(body[0], ast.Raise):
             return "refusal"
@@ -278,6 +294,194 @@ def _alembic_upgrade(admin_dsn: str, database: str, target: str) -> None:
     )
 
 
+def _alembic_downgrade(admin_dsn: str, database: str, target: str) -> None:
+    env = dict(os.environ)
+    env["INV_MIGRATION_DSN"] = _sqlalchemy_url(admin_dsn, database)
+    _run_checked(
+        [sys.executable, "-m", "alembic", "downgrade", target],
+        env=env,
+        label=f"alembic downgrade {target}",
+    )
+
+
+def _write_fixture_alembic(root: Path, *, head_source: str) -> Path:
+    """Write an isolated two-revision Alembic tree without serializing credentials."""
+    script = root / "fixture_alembic"
+    versions = script / "versions"
+    versions.mkdir(parents=True)
+    (root / "alembic.ini").write_text(
+        "[alembic]\nscript_location = " + script.as_posix() + "\n",
+        encoding="utf-8",
+    )
+    (script / "env.py").write_text(
+        textwrap.dedent(
+            """
+            import os
+            from alembic import context
+            from sqlalchemy import create_engine, pool
+
+            engine = create_engine(os.environ["INV_AC11_FIXTURE_DSN"], poolclass=pool.NullPool)
+            with engine.connect() as connection:
+                context.configure(connection=connection)
+                with context.begin_transaction():
+                    context.run_migrations()
+            """
+        ).lstrip(),
+        encoding="utf-8",
+    )
+    (script / "script.py.mako").write_text("", encoding="utf-8")
+    (versions / "0001_fixture_base.py").write_text(
+        textwrap.dedent(
+            """
+            from alembic import op
+
+            revision = "fixture_base"
+            down_revision = None
+            branch_labels = None
+            depends_on = None
+
+            def upgrade():
+                op.execute("CREATE TABLE public.ac11_fixture_existing (id integer PRIMARY KEY, payload text NOT NULL)")
+                op.execute("INSERT INTO public.ac11_fixture_existing(id,payload) VALUES (1,'preserve')")
+
+            def downgrade():
+                op.execute("DROP TABLE public.ac11_fixture_existing")
+            """
+        ).lstrip(),
+        encoding="utf-8",
+    )
+    (versions / "0002_fixture_head.py").write_text(head_source, encoding="utf-8")
+    return root / "alembic.ini"
+
+
+def _run_fixture_alembic(
+    admin_dsn: str,
+    database: str,
+    config: Path,
+    command: str,
+    target: str,
+) -> subprocess.CompletedProcess[bytes]:
+    env = dict(os.environ)
+    env["INV_AC11_FIXTURE_DSN"] = _sqlalchemy_url(admin_dsn, database)
+    return subprocess.run(
+        [sys.executable, "-m", "alembic", "-c", str(config), command, target],
+        cwd=ROOT,
+        env=env,
+        capture_output=True,
+    )
+
+
+def _negative_fixture_probes(admin_dsn: str, created: list[str]) -> dict[str, Any]:
+    """Execute the three preregistered bad downgrades in owned disposable DBs."""
+    cases: list[dict[str, Any]] = []
+    fixture_heads = {
+        "existing-object-deletion": textwrap.dedent(
+            """
+            from alembic import op
+            revision = "fixture_head"
+            down_revision = "fixture_base"
+            branch_labels = None
+            depends_on = None
+            def upgrade():
+                op.execute("CREATE TABLE public.ac11_fixture_added (id integer PRIMARY KEY)")
+            def downgrade():
+                op.execute("DROP TABLE public.ac11_fixture_added")
+                op.execute("DROP TABLE public.ac11_fixture_existing")
+            """
+        ).lstrip(),
+        "ellipsis-noop": textwrap.dedent(
+            """
+            from alembic import op
+            revision = "fixture_head"
+            down_revision = "fixture_base"
+            branch_labels = None
+            depends_on = None
+            def upgrade():
+                op.execute("CREATE TABLE public.ac11_fixture_added (id integer PRIMARY KEY)")
+            def downgrade():
+                ...
+            """
+        ).lstrip(),
+    }
+    for label, head_source in fixture_heads.items():
+        reference = _database_name("negative_ref")
+        candidate = _database_name("negative_case")
+        for database in (reference, candidate):
+            _create_database(admin_dsn, database)
+            created.append(database)
+        with tempfile.TemporaryDirectory(prefix=f"s11-ac11-{label}-") as temp:
+            config = _write_fixture_alembic(Path(temp), head_source=head_source)
+            for database, target in ((reference, "fixture_base"), (candidate, "head")):
+                result = _run_fixture_alembic(admin_dsn, database, config, "upgrade", target)
+                if result.returncode:
+                    raise RehearsalError(f"{label} fixture setup failed")
+            result = _run_fixture_alembic(
+                admin_dsn, candidate, config, "downgrade", "fixture_base"
+            )
+            if result.returncode:
+                raise RehearsalError(f"{label} fixture downgrade did not reach comparison")
+            try:
+                compare_catalogs(
+                    catalog_fingerprint(admin_dsn, reference),
+                    catalog_fingerprint(admin_dsn, candidate),
+                )
+            except CatalogMismatch:
+                cases.append({"case": label, "verdict": "EXPECTED_FINDING"})
+            else:
+                raise RehearsalError(f"{label} fixture was not detected")
+
+    duplicate = _database_name("negative_0009")
+    _create_database(admin_dsn, duplicate)
+    created.append(duplicate)
+    duplicate_head = textwrap.dedent(
+        """
+        from alembic import op
+        import sqlalchemy as sa
+        revision = "fixture_head"
+        down_revision = "fixture_base"
+        branch_labels = None
+        depends_on = None
+        def upgrade():
+            op.add_column("ac11_fixture_existing", sa.Column("project_id", sa.Text()))
+            op.drop_constraint("uq_ac11_fixture_old", "ac11_fixture_existing", type_="unique")
+            op.create_unique_constraint(
+                "uq_ac11_fixture_project", "ac11_fixture_existing",
+                ["project_id", "payload"],
+            )
+        def downgrade():
+            op.drop_constraint("uq_ac11_fixture_project", "ac11_fixture_existing", type_="unique")
+            op.create_unique_constraint(
+                "uq_ac11_fixture_old", "ac11_fixture_existing", ["payload"]
+            )
+            op.drop_column("ac11_fixture_existing", "project_id")
+        """
+    ).lstrip()
+    with tempfile.TemporaryDirectory(prefix="s11-ac11-0009-") as temp:
+        config = _write_fixture_alembic(Path(temp), head_source=duplicate_head)
+        base_path = Path(temp) / "fixture_alembic" / "versions" / "0001_fixture_base.py"
+        base_source = base_path.read_text(encoding="utf-8").replace(
+            "op.execute(\"INSERT INTO public.ac11_fixture_existing(id,payload) VALUES (1,'preserve')\")",
+            "op.create_unique_constraint('uq_ac11_fixture_old','ac11_fixture_existing',['payload'])",
+        )
+        base_path.write_text(base_source, encoding="utf-8")
+        result = _run_fixture_alembic(admin_dsn, duplicate, config, "upgrade", "head")
+        if result.returncode:
+            raise RehearsalError("0009 duplicate fixture setup failed")
+        with psycopg.connect(_db_conninfo(admin_dsn, duplicate)) as conn:
+            conn.execute(
+                "INSERT INTO public.ac11_fixture_existing(id,payload,project_id) VALUES"
+                "(2,'duplicate','project-a'),(3,'duplicate','project-b')"
+            )
+        result = _run_fixture_alembic(
+            admin_dsn, duplicate, config, "downgrade", "fixture_base"
+        )
+        if result.returncode == 0:
+            raise RehearsalError("0009 duplicate fixture unexpectedly downgraded")
+        cases.append({"case": "0009-duplicate-key", "verdict": "EXPECTED_FINDING"})
+
+    return {"passedCount": len(cases), "cases": cases}
+
+
 def _seed_sentinel(admin_dsn: str, database: str) -> dict[str, str]:
     tenant = str(uuid4())
     slug = "s11-" + tenant.replace("-", "")[:20]
@@ -375,9 +579,18 @@ CATALOG_QUERIES = {
 
 
 def normalize_constraint_definition(definition: str) -> str:
-    return definition.replace(
-        "::character varying::text", "::character varying"
-    ).replace("]::text[]", "]")
+    match = re.fullmatch(
+        r"(CHECK \(.+? = ANY \(ARRAY\[)(?P<items>.+?)(\](?:::text\[\])?\)\))",
+        definition,
+    )
+    if match is None:
+        return definition
+    items = re.sub(
+        r"('(?:''|[^'])*'::character varying)::text(?=\s*(?:,|$))",
+        r"\1",
+        match.group("items"),
+    )
+    return match.group(1) + items + "]))"
 
 
 def catalog_fingerprint(admin_dsn: str, database: str) -> CatalogFingerprint:
@@ -492,7 +705,7 @@ def _junit_bytes(*, success: bool, reversible_tail: int, failure: str | None = N
     suite = ET.Element(
         "testsuite",
         name="s11-ac11-migration-rehearsal",
-        tests="3",
+        tests="6",
         failures="0" if success else "1",
         errors="0",
         skipped="1" if reversible_tail == 0 else "0",
@@ -508,6 +721,12 @@ def _junit_bytes(*, success: bool, reversible_tail: int, failure: str | None = N
     )
     if not success:
         ET.SubElement(restore, "failure", message=failure or "rehearsal failed")
+    for name in (
+        "negative-existing-object-deletion",
+        "negative-0009-duplicate-key",
+        "negative-ellipsis-noop",
+    ):
+        ET.SubElement(suite, "testcase", classname="ac11.migration", name=name)
     return ET.tostring(suite, encoding="utf-8", xml_declaration=True)
 
 
@@ -527,23 +746,25 @@ def run_rehearsal(
     manifest = load_fixture_manifest()
     classifications = validate_fixture_manifest(manifest, ordered)
     head = ordered[-1]
-    parents = (
-        () if head.down_revision is None
-        else (head.down_revision,) if isinstance(head.down_revision, str)
-        else head.down_revision
-    )
-    if not head.irreversible or len(parents) != 1:
-        raise RehearsalError("current head is not a single-parent irreversible revision")
     last_irreversible = max(
         index for index, revision in enumerate(ordered)
         if revision.irreversible or isinstance(revision.down_revision, tuple)
     )
+    restore_barrier = ordered[last_irreversible]
+    parents = (
+        () if restore_barrier.down_revision is None
+        else (restore_barrier.down_revision,)
+        if isinstance(restore_barrier.down_revision, str)
+        else restore_barrier.down_revision
+    )
+    if len(parents) != 1:
+        raise RehearsalError("restore barrier is not a single-parent irreversible revision")
     reversible_tail = len(ordered) - last_irreversible - 1
-    if reversible_tail != 0:
-        raise RehearsalError("this card only authorizes the current zero-length reversible tail")
 
     started_at = utc_now()
     names = [_database_name("source"), _database_name("restore")]
+    if reversible_tail:
+        names.extend([_database_name("down_reference"), _database_name("down_candidate")])
     created: list[str] = []
     cleanup_errors: list[str] = []
     success = False
@@ -595,6 +816,7 @@ def run_rehearsal(
             details = {
                 "startingRevision": parents[0],
                 "headRevision": head.revision,
+                "restoreBarrierRevision": restore_barrier.revision,
                 "snapshotSha256": archive_sha,
                 "sentinelSha256": canonical_sha256(sentinel),
                 "postForwardSentinelSha256": canonical_sha256(post_forward_sentinel),
@@ -602,6 +824,36 @@ def run_rehearsal(
                 "catalogSha256": source_catalog.sha256,
                 "catalogCounts": source_catalog.counts,
             }
+        reversible_details: dict[str, Any]
+        if reversible_tail:
+            reference, candidate = names[2], names[3]
+            _alembic_upgrade(admin_dsn, reference, restore_barrier.revision)
+            _alembic_upgrade(admin_dsn, candidate, restore_barrier.revision)
+            downgrade_sentinel = _seed_sentinel(admin_dsn, candidate)
+            _alembic_upgrade(admin_dsn, candidate, "head")
+            _alembic_downgrade(admin_dsn, candidate, restore_barrier.revision)
+            compare_catalogs(
+                catalog_fingerprint(admin_dsn, reference),
+                catalog_fingerprint(admin_dsn, candidate),
+            )
+            if _read_sentinel(
+                admin_dsn, candidate, downgrade_sentinel["tenantId"]
+            ) != downgrade_sentinel:
+                raise RehearsalError("reversible downgrade changed the preservation sentinel")
+            reversible_details = {
+                "startingRevision": head.revision,
+                "endingRevision": restore_barrier.revision,
+                "catalogEquivalent": True,
+                "sentinelPreserved": True,
+            }
+        else:
+            reversible_details = {
+                "reason": "no-reversible-tail",
+                "reversibleTailCount": 0,
+            }
+        negative_fixtures = _negative_fixture_probes(admin_dsn, created)
+        details["reversibleSegment"] = reversible_details
+        details["negativeFixtures"] = negative_fixtures
         success = True
     except Exception as exc:  # noqa: BLE001 - serialized as a type-only failure
         failure = type(exc).__name__
@@ -614,7 +866,7 @@ def run_rehearsal(
                 _drop_database(admin_dsn, name)
             except Exception as exc:  # noqa: BLE001
                 cleanup_errors.append(type(exc).__name__)
-        residue = _residue(admin_dsn, names)
+        residue = _residue(admin_dsn, created)
         if residue or cleanup_errors:
             success = False
             failure = "cleanup_failed"
@@ -636,8 +888,7 @@ def run_rehearsal(
         "sourceHeadSha": source_head_sha,
         "checkoutTreeSha": checkout_tree,
         "cleanCheckout": clean,
-        "artifactSha256": junit_sha,
-        "artifactObservedSha256": junit_sha,
+        "junitSha256": junit_sha,
         "fixtureManifestSha256": canonical_sha256(manifest),
         "environment": {
             "runnerImage": runner_image,
@@ -652,11 +903,20 @@ def run_rehearsal(
         "axes": [
             {
                 "axis": "migration-reversible-segment",
-                "verdict": "NOT_APPLICABLE",
-                "structuralException": {
-                    "reason": "no-reversible-tail",
-                    "reversibleTailCount": reversible_tail,
-                },
+                "verdict": "NOT_APPLICABLE" if reversible_tail == 0 else "MEASURED_PASS",
+                **(
+                    {
+                        "structuralException": {
+                            "reason": "no-reversible-tail",
+                            "reversibleTailCount": reversible_tail,
+                        }
+                    }
+                    if reversible_tail == 0
+                    else {
+                        "observationCount": 1,
+                        "details": details.get("reversibleSegment", {}),
+                    }
+                ),
             },
             {
                 "axis": "irreversible-restore-forward",
@@ -671,6 +931,9 @@ def run_rehearsal(
         },
         "executionScope": {
             "restoreStartingRevisionsExecuted": [parents[0]],
+            "reversibleDowngradeTargetsExecuted": (
+                [restore_barrier.revision] if reversible_tail else []
+            ),
             "lossyReversibleRevisionsExecuted": [],
             "lossyReversibleRevisionsClassifiedForFutureRestore": sorted(EXPECTED_LOSSY),
         },

@@ -87,7 +87,7 @@ jobs:
           root = ET.parse(junit_path).getroot()
           assert root.attrib == {
               'name': 's11-ac11-migration-rehearsal',
-              'tests': '3',
+              'tests': '6',
               'failures': '0',
               'errors': '0',
               'skipped': '1',

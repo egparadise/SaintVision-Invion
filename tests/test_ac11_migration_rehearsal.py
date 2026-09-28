@@ -59,6 +59,12 @@ def test_noop_downgrade_is_invalid_before_any_database_call(tmp_path, monkeypatc
         )
 
 
+@pytest.mark.parametrize("body", ["...", "return", "return None"])
+def test_other_noop_downgrade_forms_are_invalid(body):
+    source = f'def downgrade():\n    {body}\n'
+    assert runner.downgrade_body_kind(source) == "invalid-noop"
+
+
 def test_successful_downgrade_claim_for_refusal_revision_is_invalid(tmp_path, monkeypatch):
     migration = tmp_path / "refusal.py"
     migration.write_text(
@@ -169,13 +175,15 @@ def test_catalog_constraint_normalization_only_collapses_equivalent_array_text_c
     normalize = runner.normalize_constraint_definition
     assert normalize(direct) == normalize(restored)
     assert normalize(direct) != normalize(direct.replace("deleted", "quarantined"))
+    unrelated = "CHECK ((payload::character varying::text <> ''::text))"
+    assert normalize(unrelated) == unrelated
 
 
 def test_junit_declares_zero_tail_as_skip_and_restore_as_pass():
     root = ET.fromstring(runner._junit_bytes(success=True, reversible_tail=0))
     assert root.attrib == {
         "name": "s11-ac11-migration-rehearsal",
-        "tests": "3",
+        "tests": "6",
         "failures": "0",
         "errors": "0",
         "skipped": "1",
@@ -183,6 +191,11 @@ def test_junit_declares_zero_tail_as_skip_and_restore_as_pass():
     cases = {case.attrib["name"]: case for case in root.findall("testcase")}
     assert cases["reversible-segment"].find("skipped") is not None
     assert cases["irreversible-restore-forward"].find("failure") is None
+    assert {
+        "negative-existing-object-deletion",
+        "negative-0009-duplicate-key",
+        "negative-ellipsis-noop",
+    }.issubset(cases)
 
 
 def test_missing_dsn_refuses_without_writing_evidence(tmp_path, monkeypatch, capsys):
@@ -222,3 +235,4 @@ def test_workflow_is_opt_in_exact_head_and_non_cancelling():
     assert 'test -z "$(git status --porcelain)"' in source
     assert "postgres:16" in source
     assert "actions/upload-artifact@v4" in source
+    assert "'tests': '6'" in source
