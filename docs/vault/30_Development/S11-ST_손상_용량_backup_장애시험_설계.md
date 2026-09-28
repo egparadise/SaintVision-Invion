@@ -1,10 +1,10 @@
 ---
 doc_id: "DESIGN-S11-ST-FAILURE-001"
 title: "S11-ST 손상·용량·backup 장애 시험 설계"
-version: "1.4.1"
+version: "1.5.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T18:15:00+09:00"
+updated: "2026-09-28T18:47:20+09:00"
 source_of_truth: "Git"
 task_id: "S11-ST"
 acceptance_id: "AC-11"
@@ -201,6 +201,6 @@ release manifest는 모든 축의 `sourceHeadSha == releaseSha`를 요구하므�
 
 - 설계·사전 목표: v1.2는 Claude r3 승인됐다. `CARD-S11-AC11-REGISTRY-REPIN-01`은 merge commit `067e6a48` 위 구현 commit `ffd99bfd`에서 old PITR target 제거·새 target 적용·축별 targetId·registry/importer pin을 반영했다. 별도 patch proposal은 계속 소비 금지다.
 - PG-free producer/importer: Claude #193 r1 D1~D6과 r2 C1~C2를 반영했다. backup 2건은 별도 tar verifier를 호출하며 truncated case는 유효 physical tar의 data 구간을 자른다. retention 2건은 receipt/journal 전 raw `OSError` finding이고, 삭제 대상 미완료 후보와 directory-fsync 뒤 완전한 canonical object를 residue로 오인하지 않는다. retained boundary 삭제는 digest finding으로 보존하고 committed-loss 미관측값은 `null`이다. 최종 hosted Linux head 실행 전까지 `NOT_OBSERVED`이며 hosted 10-case와 실장비도 `NOT_OBSERVED`다.
-- Hosted 10-case reference lane: PR #204의 opt-in label `run-s11-storage`가 exact PR head를 checkout하고 MinIO+PostgreSQL fault matrix와 archive `/bin/false`·`/bin/true`를 실행한다. 첫 run `36399940041`은 composite quota key upsert 결함으로 실패했고 숨기지 않았다. 수정 head `3fe6a7a1`의 run `36400113385`와 docs head `b972a70e`의 run `36400962763`은 10/10 exact surface, finding 0, residue 0, secret 0으로 `MEASURED_PASS`를 냈다. 최종 artifact `10960581532`의 digest는 `sha256:dfaf7cf4…6c37`, 만료일은 2026-10-28이다. 전용 환경변수가 없는 기본 Backend/Core에서는 정확한 opt-in 사유로 skip하고 exact skip map이 1건을 고정한다. 이 결과는 `referenceOnly=true`, `axis=null`, `targetRef=null`이며 AC-11 축 판정·S11-ST 승격에 쓰지 않는다. opt-in 경계 hotfix를 포함한 최종 head 실행 식별자는 PR #204 코멘트에 보존한다.
+- Hosted 10-case reference lane: PR #204의 opt-in label `run-s11-storage`가 exact PR head를 checkout하고 MinIO+PostgreSQL fault matrix와 archive `/bin/false`·`/bin/true`를 실행한다. 첫 run `36399940041`은 composite quota key upsert 결함으로 실패했다. run `36400113385`·`36400962763`의 `MEASURED_PASS`는 하드코딩된 invariant 수치가 드러나 철회했다. 관측형 최종 코드 head `51fada85`의 run `36405534113`은 exact 표면 10/10, classification mismatch·false success·unexpected·quota overshoot·committed loss 0이지만, `OBJ-04` 두 case에서 cleanup 전 partial object 합 2를 실제 관측해 **`MEASURED_FAIL`**이다. temp-residue 5개는 prefix listing 부재로 `NOT_OBSERVED`, cleanup 뒤 residue·secret은 0이다. artifact `10962202766`, digest `sha256:9ab687af…d6fd`, 만료 2026-10-28이며 offline zip/run/artifact 교차검증도 통과했다. 이 결과는 `referenceOnly=true`, `axis=null`, `targetRef=null`이며 AC-11 축 판정·S11-ST 승격에 쓰지 않는다.
 - 공개 계약·migration 변경: 없음.
 - S11-ST registry 상태 변경: 없음(`planned` 유지). 정본 task registry는 sprint task만 허용하고 S10 선행 task가 미완료이므로 synthetic subtask를 추가하거나 parent를 `in_progress`로 올리지 않았다. 카드 ID는 History·Codex 작업판에서 추적한다.
