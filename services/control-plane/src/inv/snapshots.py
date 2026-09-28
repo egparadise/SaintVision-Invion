@@ -17,6 +17,9 @@ from .object_store import PART_BYTES, MAX_BYTES
 from .runs import event
 
 
+LOCAL_PROVIDER_ID = "local-bounded-v1"
+
+
 def identity(value):
     return str(UUID(str(value)))
 
@@ -29,9 +32,74 @@ def part_key(value, index):
     return "part-" + UUID(str(value)).hex + "-" + str(index)
 
 
+def checkpoint_content(row):
+    """Public immutable checkpoint identity; provider locator stays private."""
+
+    return {
+        "objectId": identity(row["object_id"]),
+        "sha256": row["content_hash"],
+        "sizeBytes": row["size_bytes"],
+        "provider": row["provider_id"],
+    }
+
+
+def checkpoint_digest(content):
+    return hashlib.sha256(
+        json.dumps(content, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+
+
+def attach_checkpoint(
+    conn,
+    *,
+    tenant,
+    project,
+    run_id,
+    attempt,
+    step_id,
+    object_id,
+    content,
+    event_name,
+    event_payload,
+):
+    """Attach immutable content once; identical replay is quiet, drift is rejected."""
+
+    content_hash = checkpoint_digest(content)
+    prior = conn.execute(
+        "SELECT content_hash FROM inv.checkpoints "
+        "WHERE run_id=%s AND attempt=%s AND step_id=%s",
+        (run_id, attempt, step_id),
+    ).fetchone()
+    if prior and prior["content_hash"] != content_hash:
+        raise DomainError("GRAPH-0004", "Checkpoint identity already has different content")
+    if not prior:
+        conn.execute(
+            "INSERT INTO inv.checkpoints"
+            "(tenant_id,run_id,attempt,step_id,content_hash,checkpoint) "
+            "VALUES(%s,%s,%s,%s,%s,%s)",
+            (tenant, run_id, attempt, step_id, content_hash, Jsonb(content)),
+        )
+        event(conn, tenant, run_id, event_name, event_payload(content_hash))
+    conn.execute(
+        "INSERT INTO inv.checkpoint_objects VALUES(%s,%s,%s,%s,%s,%s) "
+        "ON CONFLICT DO NOTHING",
+        (tenant, project, run_id, attempt, step_id, identity(object_id)),
+    )
+    return content
+
+
 class SnapshotStore:
     def __init__(self, database, provider):
         self.db, self.provider = database, provider
+        self.provider_id = getattr(provider, "provider_id", LOCAL_PROVIDER_ID)
+
+    def _new_locator(self, tenant, project, object_id, namespace="objects"):
+        if self.provider_id == LOCAL_PROVIDER_ID:
+            return object_key(object_id)
+        locator = getattr(self.provider, "locator", None)
+        if locator is None:
+            raise DomainError("STORE-0001", "Object provider has no locator factory", 503)
+        return locator(tenant, project, namespace, identity(object_id))
 
     @staticmethod
     def _row(conn, project, object_id):
@@ -45,6 +113,7 @@ class SnapshotStore:
 
     def begin(self, tenant, project, object_id, digest, size):
         object_id = identity(object_id)
+        locator = self._new_locator(tenant, project, object_id)
         if (
             not isinstance(digest, str)
             or not re.fullmatch(r"[0-9a-f]{64}", digest)
@@ -66,9 +135,12 @@ class SnapshotStore:
                 (project, object_id),
             ).fetchone()
             if row:
-                if (row["content_hash"], row["size_bytes"]) != (digest, size) or row[
-                    "state"
-                ] in {"deleting", "deleted"}:
+                if (
+                    (row["content_hash"], row["size_bytes"]) != (digest, size)
+                    or (row["provider_id"], row["locator"])
+                    != (self.provider_id, locator)
+                    or row["state"] in {"deleting", "deleted"}
+                ):
                     raise DomainError("IDEM-0001", "Upload identity conflicts")
                 return object_id
             used = conn.execute(
@@ -78,8 +150,10 @@ class SnapshotStore:
             if used + size > budget["quota_bytes"]:
                 raise DomainError("RES-0001", "Storage quota exhausted")
             conn.execute(
-                "INSERT INTO inv.storage_objects(tenant_id,project_id,object_id,content_hash,size_bytes) VALUES(%s,%s,%s,%s,%s)",
-                (tenant, project, object_id, digest, size),
+                """INSERT INTO inv.storage_objects
+                (tenant_id,project_id,object_id,provider_id,locator,content_hash,size_bytes)
+                VALUES(%s,%s,%s,%s,%s,%s,%s)""",
+                (tenant, project, object_id, self.provider_id, locator, digest, size),
             )
         return object_id
 
@@ -181,51 +255,23 @@ class SnapshotStore:
             if row["state"] != "ready":
                 raise DomainError("STORE-0005", "Checkpoint requires published content")
             files.read(object_key(object_id), row["content_hash"], row["size_bytes"])
-            content = {
-                "objectId": identity(object_id),
-                "sha256": row["content_hash"],
-                "sizeBytes": row["size_bytes"],
-                "provider": "local-bounded-v1",
-            }
-            digest = hashlib.sha256(
-                json.dumps(content, sort_keys=True, separators=(",", ":")).encode()
-            ).hexdigest()
-            prior = conn.execute(
-                "SELECT content_hash FROM inv.checkpoints WHERE run_id=%s AND attempt=%s AND step_id=%s",
-                (run_id, run["attempt"], step_id),
-            ).fetchone()
-            if prior and prior["content_hash"] != digest:
-                raise DomainError(
-                    "GRAPH-0004", "Checkpoint identity already has different content"
-                )
-            if not prior:
-                conn.execute(
-                    "INSERT INTO inv.checkpoints(tenant_id,run_id,attempt,step_id,content_hash,checkpoint) VALUES(%s,%s,%s,%s,%s,%s)",
-                    (tenant, run_id, run["attempt"], step_id, digest, Jsonb(content)),
-                )
-                event(
-                    conn,
-                    tenant,
-                    run_id,
-                    "inv.run.checkpoint_published",
-                    {
-                        "attempt": run["attempt"],
-                        "stepId": step_id,
-                        "contentHash": digest,
-                    },
-                )
-            conn.execute(
-                "INSERT INTO inv.checkpoint_objects VALUES(%s,%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING",
-                (
-                    tenant,
-                    run["project_id"],
-                    run_id,
-                    run["attempt"],
-                    step_id,
-                    identity(object_id),
-                ),
+            content = checkpoint_content(row)
+            return attach_checkpoint(
+                conn,
+                tenant=tenant,
+                project=run["project_id"],
+                run_id=run_id,
+                attempt=run["attempt"],
+                step_id=step_id,
+                object_id=object_id,
+                content=content,
+                event_name="inv.run.checkpoint_published",
+                event_payload=lambda content_hash: {
+                    "attempt": run["attempt"],
+                    "stepId": step_id,
+                    "contentHash": content_hash,
+                },
             )
-            return content
 
     def restore(self, tenant, project, run_id, attempt, step_id):
         # Returns verified bytes to a trusted workspace adapter. It never extracts

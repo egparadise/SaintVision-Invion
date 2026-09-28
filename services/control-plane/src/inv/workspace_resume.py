@@ -15,7 +15,7 @@ from .contracts import validate_contract
 from .errors import DomainError
 from .leases import lock_run
 from .runs import event
-from .snapshots import identity, SnapshotStore, object_key
+from .snapshots import attach_checkpoint, checkpoint_content, identity, SnapshotStore, object_key
 from .workspace_files import canonical, decode_snapshot
 
 MAX_RESUME_BYTES = 65536
@@ -340,27 +340,19 @@ def commit_workspace_output(conn, files, tenant, project, run, command, receipt,
         or files.read(object_key(oid), obj["content_hash"], obj["size_bytes"]) != raw
     ):
         raise DomainError("VERIFY-0023", "Modified Workspace object differs")
-    content = {
-        "objectId": oid,
-        "sha256": obj["content_hash"],
-        "sizeBytes": len(raw),
-        "provider": "local-bounded-v1",
-    }
+    content = checkpoint_content(obj)
     step = launch["workspaceInput"]["stepId"]
-    conn.execute(
-        "INSERT INTO inv.checkpoints(tenant_id,run_id,attempt,step_id,content_hash,checkpoint) VALUES(%s,%s,%s,%s,%s,%s)",
-        (tenant, run["run_id"], run["attempt"], step, digest(content), Jsonb(content)),
-    )
-    conn.execute(
-        "INSERT INTO inv.checkpoint_objects VALUES(%s,%s,%s,%s,%s,%s)",
-        (tenant, project, run["run_id"], run["attempt"], step, oid),
-    )
-    event(
+    attach_checkpoint(
         conn,
-        tenant,
-        run["run_id"],
-        "inv.workspace.step_committed",
-        {
+        tenant=tenant,
+        project=project,
+        run_id=run["run_id"],
+        attempt=run["attempt"],
+        step_id=step,
+        object_id=oid,
+        content=content,
+        event_name="inv.workspace.step_committed",
+        event_payload=lambda _content_hash: {
             "commandId": command,
             **{
                 k: launch["workspaceInput"][k]

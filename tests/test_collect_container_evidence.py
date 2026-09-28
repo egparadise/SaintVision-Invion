@@ -253,7 +253,10 @@ def _seed_ledger(owner: str) -> dict:
                         VALUES (%s,%s,%s,%s,%s,1,2,now(),now()+interval '30s',now(),%s,%s)""", (tenant, project, run_failed, resource, lease_failed, epoch, abort))
         # inv.guard_storage_object: objects begin 'uploading' and become 'ready' by transition
         conn.execute("INSERT INTO inv.storage_budgets VALUES (%s,%s,1048576)", (tenant, project))
-        conn.execute("INSERT INTO inv.storage_objects(tenant_id,project_id,object_id,content_hash,size_bytes,state) VALUES (%s,%s,%s,%s,%s,'uploading')", (tenant, project, obj, content_hash, len(data)))
+        conn.execute("""INSERT INTO inv.storage_objects
+            (tenant_id,project_id,object_id,provider_id,locator,content_hash,size_bytes,state)
+            VALUES (%s,%s,%s,'local-bounded-v1',%s,%s,%s,'uploading')""",
+            (tenant, project, obj, "obj-" + obj.hex, content_hash, len(data)))
         conn.execute("UPDATE inv.storage_objects SET state='ready' WHERE object_id=%s", (obj,))
         # A result commitment/completion cannot be seeded here: its FK chain
         # (execution_attempts -> tool_claims -> approval_dispatches) only exists after a real

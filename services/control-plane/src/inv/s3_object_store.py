@@ -47,7 +47,13 @@ class S3Objects:
             raise ValueError("Stable provider id required")
         self.provider_id = provider_id
         self._prefix = _prefix_segments(prefix)
+        self.prefix = "/".join(self._prefix)
         self.client = client
+
+    def locator(self, tenant_id, project_id, namespace, object_id):
+        return make_s3_locator(
+            self.prefix, tenant_id, project_id, namespace, object_id
+        )
 
     def _key(self, locator: str) -> str:
         if not isinstance(locator, str) or locator.startswith("/") or locator.endswith("/"):

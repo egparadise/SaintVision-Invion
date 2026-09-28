@@ -136,8 +136,10 @@ def test_workspace_snapshot_reader_http_rechecks_scope_and_reads_with_kernel_rol
             (a.e.tenant, a.e.project, len(raw) + 1024),
         )
         conn.execute(
-            "INSERT INTO inv.storage_objects(tenant_id,project_id,object_id,content_hash,size_bytes) VALUES(%s,%s,%s,%s,%s)",
-            (a.e.tenant, a.e.project, object_id, digest, len(raw)),
+            """INSERT INTO inv.storage_objects
+            (tenant_id,project_id,object_id,provider_id,locator,content_hash,size_bytes)
+            VALUES(%s,%s,%s,'local-bounded-v1',%s,%s,%s)""",
+            (a.e.tenant, a.e.project, object_id, "obj-" + object_id.hex, digest, len(raw)),
         )
         conn.execute(
             "UPDATE inv.storage_objects SET state='ready' WHERE object_id=%s", (object_id,)
