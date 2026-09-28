@@ -7,6 +7,7 @@ import subprocess
 from uuid import uuid4
 import psycopg
 import pytest
+from db_integrity import suspended_triggers
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from inv.db import Database
 from inv.dispatch import DeliveryWorker
@@ -328,13 +329,13 @@ def test_expired_preparation_can_be_replaced_without_consuming_generation(pair):
     expired = prepare(a, b, original, "expired")
     approve(a, expired)
     # Move the entire approval time window using the migration owner in this fixture.
-    with psycopg.connect(a.e.owner) as conn:
-        conn.execute("ALTER TABLE inv.approval_requests DISABLE TRIGGER USER")
+    # The rows stay valid (no orphan, no check violation), so only the trigger
+    # re-enable needs the finally guarantee.
+    with psycopg.connect(a.e.owner) as conn, suspended_triggers(conn, "inv.approval_requests", "USER"):
         conn.execute(
             "UPDATE inv.approval_requests SET created_at=clock_timestamp()-interval '2 hours',expires_at=clock_timestamp()-interval '1 hour' WHERE tenant_id=%s AND approval_id=ANY(%s)",
             (a.e.tenant, [s["approval"]["approvalId"] for s in expired["shards"]]),
         )
-        conn.execute("ALTER TABLE inv.approval_requests ENABLE TRIGGER USER")
     with pytest.raises(DomainError, match="AUTH-0031"):
         enqueue(a, "expired")
     replacement = prepare(a, b, original, "fresh")

@@ -1,0 +1,105 @@
+{
+  "$defs": {
+    "ModelVersionByDigest": {
+      "additionalProperties": false,
+      "properties": {
+        "contentSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Contentsha256",
+          "type": "string"
+        },
+        "modelId": {
+          "title": "Modelid",
+          "type": "string"
+        },
+        "modelVersionId": {
+          "title": "Modelversionid",
+          "type": "string"
+        },
+        "stage": {
+          "pattern": "^(draft|candidate|released|retired)$",
+          "title": "Stage",
+          "type": "string"
+        },
+        "version": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "modelVersionId",
+        "modelId",
+        "version",
+        "stage",
+        "contentSha256"
+      ],
+      "title": "ModelVersionByDigest",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Model versions built from one set of bytes.\n\n``datasetVersionIds`` is the set the items were derived from, bounded and\nechoed so a caller can check the derivation rather than take it on trust. It\nis a list because the same bytes may be registered as more than one dataset\nversion, and narrowing it to one value would silently drop model versions.",
+  "properties": {
+    "complete": {
+      "title": "Complete",
+      "type": "boolean"
+    },
+    "contentSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Contentsha256",
+      "type": "string"
+    },
+    "datasetVersionIds": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 200,
+      "title": "Datasetversionids",
+      "type": "array"
+    },
+    "items": {
+      "items": {
+        "$ref": "#/$defs/ModelVersionByDigest"
+      },
+      "maxItems": 200,
+      "title": "Items",
+      "type": "array"
+    },
+    "nextCursor": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Nextcursor"
+    },
+    "truncated": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Truncated",
+      "type": "object"
+    },
+    "unresolvedModelVersions": {
+      "minimum": 0,
+      "title": "Unresolvedmodelversions",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "contentSha256",
+    "datasetVersionIds",
+    "items",
+    "unresolvedModelVersions",
+    "complete"
+  ],
+  "title": "ModelVersionByDatasetDigestPageResponse",
+  "type": "object"
+}
