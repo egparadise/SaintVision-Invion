@@ -1,0 +1,138 @@
+{
+  "acceptance": "AC-02",
+  "acceptanceClaim": false,
+  "acceptanceScope": "measured: API<->PostgreSQL clauses and RLS boundary at one code SHA; UNMEASURED: real IdP/CA/DNS/physical Node (U2..U5); browser acceptance belongs to the browser lane",
+  "apiSuite": {
+    "command": "pytest -q -p no:cacheprovider -rs tests/test_api.py --junitxml=<junit>",
+    "counts": {
+      "error": 0,
+      "failed": 0,
+      "passed": 28,
+      "skipped": 0
+    },
+    "elapsedSeconds": 59.502,
+    "exitCode": 0,
+    "junitSha256": "f9525f6579e889b8a1b6d7378c7dc6f362e8a4ffd89c1075eabc0468cbb38439",
+    "status": "complete",
+    "suite": "tests/test_api.py"
+  },
+  "browserAcceptance": {
+    "lane": "browser (Gemini/Codex)",
+    "status": "not_in_scope"
+  },
+  "clauses": {
+    "allowed-node-registration-and-read": {
+      "cases": {
+        "test_enrolled_node_is_registered_and_readable": "passed",
+        "test_heartbeat_advances_and_replays_are_ignored": "passed",
+        "test_heartbeat_observations_land_in_the_right_partition": "passed",
+        "test_node_enrollment_db_route_rejects_invalid_response_shape": "passed"
+      },
+      "status": "pass",
+      "title": "허용 Node 등록·조회 성공"
+    },
+    "bootstrap-token-replay-blocked": {
+      "cases": {
+        "test_bootstrap_token_cannot_be_used_twice": "passed",
+        "test_missing_credential_is_refused": "passed",
+        "test_unknown_bootstrap_token_is_rejected": "passed",
+        "test_unknown_credential_is_refused": "passed"
+      },
+      "status": "pass",
+      "title": "토큰 재사용 차단"
+    },
+    "cross-tenant-project-isolation": {
+      "cases": {
+        "test_a_heartbeat_for_a_node_you_are_not_is_refused": "passed",
+        "test_a_tokens_tenant_is_binding": "passed",
+        "test_another_tenant_cannot_see_the_contribution": "passed",
+        "test_another_tenants_node_is_not_listed": "passed",
+        "test_another_tenants_node_is_not_readable_by_id": "passed",
+        "test_liveness_sweep_does_not_cross_tenants": "passed",
+        "test_project_scope_is_checked_separately_from_tenancy": "passed"
+      },
+      "status": "pass",
+      "title": "다른 project/tenant 정보 접근 차단"
+    },
+    "denial-recorded": {
+      "cases": {
+        "test_denials_are_recorded": "passed"
+      },
+      "status": "pass",
+      "title": "인증 실패 기록"
+    }
+  },
+  "codeSha": "1e8baf045c5a554209aaef601ae4883b64da50a7",
+  "environment": {
+    "ci": false,
+    "database": "disposable PostgreSQL database per pytest session / per collector run, created from INV_TEST_ADMIN_DSN (DSN, host, port and password not recorded)"
+  },
+  "externalWaits": [
+    {
+      "id": "U2",
+      "item": "실 IdP(OIDC issuer/JWKS) 경유 로그인",
+      "owner": "user decision; S02-BE",
+      "status": "UNMEASURED",
+      "value": null
+    },
+    {
+      "id": "U3",
+      "item": "실 CA 발급 Node 인증서",
+      "owner": "user; S01-BE",
+      "status": "UNMEASURED",
+      "value": null
+    },
+    {
+      "id": "U4",
+      "item": "DNS/endpoint 확정",
+      "owner": "user; S01-BE",
+      "status": "UNMEASURED",
+      "value": null
+    },
+    {
+      "id": "U5",
+      "item": "물리 Node mTLS/heartbeat 실장비",
+      "owner": "user hardware; S02-BE",
+      "status": "UNMEASURED",
+      "value": null
+    }
+  ],
+  "note": "card 13 fixed-SHA run; disposable PostgreSQL 16 at 127.0.0.1:55432; sequential single invocation",
+  "provenance": {
+    "branch": "agent/claude/s02-db-evidence-collector",
+    "commit_sha": "1e8baf045c5a554209aaef601ae4883b64da50a7",
+    "content_clean_diff": true,
+    "executor": "Claude",
+    "integration_check_mode": "local (last fetch)",
+    "integration_ref": "origin/integration/all-agents-unified",
+    "integration_sha": "1e8baf045c5a554209aaef601ae4883b64da50a7",
+    "interpreter": "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "modified_paths": [],
+    "os_platform": "Windows-11-10.0.26200-SP0",
+    "runtime_python": "3.14.7",
+    "timestamp_kst": "2026-09-28T05:30:57+09:00",
+    "working_tree_clean_status": false
+  },
+  "rlsBoundary": {
+    "accepted": 9,
+    "baselineSha256": "920d01ca5f20fbb5f23c5c2434ac9d1e3063a452ccb5a8754ae4980ea42730ef",
+    "collectorSha256": "d540c8e906e460bf590674921e7555342c4cd9e5303315560cab78054898def2",
+    "evidenceJson": "docs\\vault\\30_Development\\Evidence\\s02-db-acceptance\\s02-acceptance-1e8baf045c5a-20260927-rls.json",
+    "exitCode": 1,
+    "jsonSha256": "936ee8eb3b854c0d7f6a8f43f0685d0abbc15d37697768ddb3cb046ba06a6212",
+    "roles": [
+      "inv_app",
+      "inv_discovery_issuer",
+      "inv_discovery_issuer_guard",
+      "inv_kernel",
+      "inv_runtime_dev"
+    ],
+    "status": "complete",
+    "unmeasured": 0,
+    "verdict": "VIOLATIONS",
+    "violations": 1
+  },
+  "schemaVersion": "s02-db-acceptance-evidence:1",
+  "task": "S02-DB",
+  "verdict": "FAIL"
+}
