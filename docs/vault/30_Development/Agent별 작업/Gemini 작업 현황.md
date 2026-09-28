@@ -4,7 +4,7 @@ title: "Gemini 작업 현황"
 version: "1.0.132"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-28T20:25:00+09:00"
+updated: "2026-09-28T21:22:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -21,6 +21,75 @@ source_of_truth: "Git"
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
 - 확인 기준: 2026-09-28T20:25:00+09:00 (최신 tip `agent/gemini/g07-eval-runner-impl`, commit `e2011893`, PR #190).
 - 확인 기준: 2026-09-28T18:58:00+09:00 (최신 tip `agent/gemini/s10-fe-conformance-status`).
+- 확인 기준: 2026-09-28T21:22:00+09:00 (최신 tip `agent/gemini/g04-fe-seal-record`, PR #212 r3).
+
+## 2026-09-28 G-04 RunDetail 봉인 기록 패널 Claude UI r2 재검토(G1~G5, O3, O4) 완결 (`agent/gemini/g04-fe-seal-record`, PR #212)
+
+- **PR**: #212 (https://github.com/egparadise/SaintVision-Invion/pull/212)
+- **Base**: `agent/claude/g04-w1-seal-record` (PR #201 head `9dfb2878` + PR #188 head `5c34aaca` 클린 머지 `e1d593ce`)
+- **조치 내역 (G1~G5, O3, O4 전수 완결)**:
+  1. **G1 [중간] 미봉인 경로 R3 401/403/409/5xx 화면 표출**: 미봉인 실행에서도 409 `GRAPH-0002` 재현불가 배지 및 500 에러 배너를 정직하게 표출(`SealRecordPanel.tsx:819`), 라이브 리전에도 번들 상태 안내 부가.
+  2. **G2 [중간] `handleLoadNextPage` 세대 가드**: `generationRef` 및 `runId` 확인 가드를 응답/에러/finally 전 구간에 배치하여 실행 전환 시 이전 페이지 응답 누출 차단.
+  3. **G3 [중간] `isProblemDetails` 계약 엄격 복원**: `causeRef`·`evidenceId`의 `undefined` 허용을 제거하여 canonical required 계약을 엄격 준수하고, 11키 legacy 401 본문은 정밀 수용.
+  4. **G4 & G5 [낮음] 픽스처 및 문서 정합**: 409 서버 정본 detail 일치, SYS-0002(500) 교정, URL 분기 순서 교정, 페이지 교체 동작 명시.
+  5. **O3 & O4 [권고] 접근성 및 항목 복원**: R3 번들 항목 표에 순번, 비식별화([비식별화]), 신뢰도 열 복원. 게이트웨이 에러 판정 범위 정밀화.
+  6. **변이 사살 시험 6건 보강**: 시험 19(미봉인 409), 20(미봉인 500), 21(페이지네이션 전환), 22(검증 전환), 23(아티팩트 리셋), 24(causeRef 누락 거부) 총 24건 전수 통과.
+- **실측 검증**:
+  - Vitest: `tests/run-detail-seal-record.test.tsx` 24 passed (496ms). 웹 전체 79 test files / 699 passed (21.71s).
+  - `npx tsc -b`: 0 errors. `npm run build`: dist/ 번들 생성 성공 (7.14s).
+  - `npm run contracts:check`: PASS (20 API response TypeScript types match).
+  - 파이썬 게이트: `pytest tests/test_route_coverage.py tests/core/test_run_record_artifacts_route.py` 88 passed (18.30s), `check_frontend_integrity.py` 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-28_21-22-00_KST_G04_RunDetail_Seal_Record_Panel_Claude_r3_Gemini.md` (`HIST-G04-003`, v1.0.0).
+
+## 2026-09-28 G-04 RunDetail 봉인 기록 패널 Claude UI r2 및 Codex 계약 검토 조치 완결 (`agent/gemini/g04-fe-seal-record`, PR #212)
+
+- **PR**: #212 (https://github.com/egparadise/SaintVision-Invion/pull/212)
+- **Base**: `agent/claude/g04-w1-seal-record` (PR #201 head `9dfb2878` + PR #188 head `5c34aaca` 클린 머지 `e1d593ce`)
+- **조치 내역 (Claude F1~F9 및 Codex F-R1~F-R4 전수 완결)**:
+  1. **F1 [High] 백엔드 CI 통과 (#188 선행 머지)**: #188 head `5c34aaca` 병합(`e1d593ce`)으로 W1 POST 라우트와의 카운트 중복 해소 (`(path, method)` 단위 계측). `test_run_record_artifacts_route.py` 통과 (88 passed).
+  2. **F2 & F-R3 [High] R2 페이지 개수 및 `nextCursor` 페이지네이션**: `count`를 "이 페이지 N건"으로 정정하고 `nextCursor` 존재 시 추가 항목 안내 및 다음 페이지 버튼(`handleLoadNextPage`, cursor 쿼리 전달) 구현.
+  3. **F3 & F-R2 [High] R2/R3 에러 정직 보존**: `Promise.allSettled` rejected 사유를 버리지 않고 `artifactsError`, `bundleError`, `bundleSpecialStatus`로 보존. R3 409 `GRAPH-0002` 재현 불가 배지 표출 및 라이브 리전 거짓 "0건/없음" 배제.
+  4. **F4 [Medium] R1 404 "No such run." 분리**: exact detail `No sealed record for this run.`만 미봉인으로 판정, 그 외 404는 오류 배너 표출.
+  5. **F5 & F-R1 [High] 401 / 502 실제 fetch 경로 검증**: `client.ts`의 `isProblemDetails`에서 legacy 401 `AUTH-MISSING-CREDENTIAL` 원형 보존. HTML 502/504 정제 한국어 메시지 표출.
+  6. **F6 [Medium] AbortSignal 및 세대 관리**: Run 전환 시 비동기 응답 누출 차단(`signal.aborted` 가드 전수 배치).
+  7. **F7 [Low] 정직성 변이 전수 사살**: 불일치 배지 `#ff7b72` 및 `data-tone="mismatch"` 단언, 한글 정규식 버그 교정, Run 전환 시 번들 잔존 차단.
+  8. **F8 & F-R4 [Medium] 문구 정합 및 RFC 3339 달력 날짜 검증**: `isValidIsoDateTime`으로 `sealedAt`/`builtAt` 윤년·달력 검증, 불일치 문구 정합, `evidenceId`/`tokenEstimate`/`objectVersion`/`nextCursor` 실표출.
+  9. **F9 [Low] 픽스처 규격화**: `bnd_` / `art_` + 26자리 Crockford ULID 및 순수 `RunItem` 사용.
+- **실측 검증**:
+  - Vitest: `tests/run-detail-seal-record.test.tsx` 18 passed. 웹 전체 79 test files / 693 passed.
+  - `npx tsc -b`: 0 errors. `npm run build`: dist/ 번들 생성 성공 (9.02s).
+  - 파이썬 게이트: `pytest tests/test_route_coverage.py tests/core/test_run_record_artifacts_route.py` 88 passed, `check_frontend_integrity.py` 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-28_20-50-00_KST_G04_RunDetail_Seal_Record_Panel_Claude_r2_Codex_Gemini.md` (`HIST-G04-002`, v1.0.0).
+
+## 2026-09-28 G-04 RunDetail 봉인 기록(R1·R2·R3) 읽기 전용 패널 및 무결성 검증 (카드 86, `agent/gemini/g04-fe-seal-record`)
+
+- **작업 브랜치**: `agent/gemini/g04-fe-seal-record` (base: PR #201 head `9dfb2878` + PR #188 head `dfb666a3` 클린 머지 `86c6909a`)
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude (UI·테스트 축), Codex (계약 축).
+- **작업 내용 (카드 86)**:
+  - **계약 및 Observation 계층**:
+    - `apps/web/scripts/api-response-contracts.mjs`에 `run-record-response`, `run-record-artifact-page-response`, `artifact-pin-verification-response`, `context-bundle-response` 4종 스키마 등록 및 타입 자동 동기화 (`packages/contracts-ts/src/index.ts` 수동 편집 0건).
+    - `apps/web/src/shared/api/runSealObservation.ts` 신설: R1 RunRecord, R2 Artifacts, R2 Pin Verify, R3 Context Bundle fetcher 및 허용 키 화이트리스트 기반 런타임 가드 구현.
+  - **UI 컴포넌트 (`apps/web/src/features/runs/SealRecordPanel.tsx`)**:
+    - 404 RES-0004 ("No sealed record for this run.") 발생 시 가짜 PASS/수치 없는 정직한 `미봉인 (UNSEALED)` 안내 배지 표출.
+    - `verified: false` 및 `hashVerified: false`에 대한 200 사실 보고 처리 (`⚠️ 불일치 (Tampered/Mismatch)`, PASS/합격/녹색 위장 금지, 에러 배너 격발 금지).
+    - 401 (`AUTH-MISSING-CREDENTIAL`), 403 (`AUTH-0030`), 404 (`RES-0004`) canonical ProblemDetails 분기 처리.
+    - 502/504 프록시 HTML 응답에 대한 DOM 누출 차단 및 한국어 폴백 메시지 정제.
+    - `role="status" aria-live="polite"` 라이브 리전 컨테이너 상시 DOM 유지.
+    - 다크 테마 기준 WCAG AA 대비 4.5:1 이상 실측 충족.
+  - **RunDetail 연동 (`apps/web/src/features/runs/RunDetail.tsx`)**:
+    - Tab 7 `7. 봉인 기록 (Seal Record)` (`data-testid="tab-seal"`) 배선.
+  - **Vitest 12건 회귀 시험 (`apps/web/tests/run-detail-seal-record.test.tsx`)**:
+    - R1/R2/R3 및 404 unsealed, 403, 401, 502, Run ID 전환 잔류 상태 클리어(revert-fail), a11y, WCAG AA 대비, 런타임 가드 12건 전수 PASS.
+- **실측 검증**:
+  - `npm test -- run-detail-seal-record`: 12 passed.
+  - `npm test` (apps/web): 79 files, 687 passed.
+  - `npx tsc -b`: 0 type errors.
+  - `npm run build`: bundle 정상 빌드 (4.83s).
+  - `npm run contracts:check`: 20개 스키마 타입 정합 (exit 0).
+  - `pytest tests/test_route_coverage.py`: 40 passed.
+  - `python tools/check_frontend_integrity.py`: 9대 무결성 규칙 0 violations (exit 0).
+  - `python tools/check_contract_bindings.py`: 55 fixtures, 20 types exit 0.
+- **다음 첫 행동**: PR 생성 후 Claude(UI·테스트) 및 Codex(계약) 검토 요청.
 
 ## 2026-09-28 S10-FE 어댑터 conformance 관측 화면 새 API(G-03 1단계) 연동 및 Claude UI·Codex 계약 리뷰 전수 반영 (agent/gemini/s10-fe-conformance-status)
 
