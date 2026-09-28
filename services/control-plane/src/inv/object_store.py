@@ -7,17 +7,41 @@ host administrators or a replacement for the pending S3 product adapter.
 """
 
 from contextlib import contextmanager
+from dataclasses import dataclass
 import hashlib
 import os
 from pathlib import Path
 import re
 import stat
 import sys
+from typing import Protocol
 from uuid import uuid4
 from .errors import DomainError
 
 PART_BYTES = 16 * 1024 * 1024
 MAX_BYTES = 64 * 1024 * 1024
+
+
+@dataclass(frozen=True)
+class ObjectDigest:
+    sha256: str
+    size_bytes: int
+
+
+class ObjectStore(Protocol):
+    """Provider-neutral immutable byte store over a persisted opaque locator."""
+
+    provider_id: str
+
+    def put(self, locator: str, body: bytes, expected_sha256: str) -> None: ...
+
+    def get(self, locator: str, expected_sha256: str, expected_size: int) -> bytes: ...
+
+    def exists(self, locator: str) -> bool: ...
+
+    def hash(self, locator: str) -> ObjectDigest: ...
+
+    def delete(self, locator: str) -> None: ...
 
 
 class LocalObjects:
@@ -61,6 +85,59 @@ class LocalObjects:
             os.close(fd)
 
 
+class LocalObjectStore:
+    """ObjectStore compatibility wrapper for the bounded local provider.
+
+    Tenant/project authorization remains at the service and RLS layer. The
+    locator is the existing immutable flat ``obj-<uuidhex>`` key and is never
+    synthesized from requester input here.
+    """
+
+    provider_id = "local-bounded-v1"
+
+    def __init__(self, legacy: LocalObjects):
+        self.legacy = legacy
+
+    def put(self, locator, body, expected_sha256):
+        with self.legacy.locked() as files:
+            if files.exists(locator):
+                observed = files.hash(locator)
+                if (
+                    observed.sha256 != expected_sha256
+                    or observed.size_bytes != len(body)
+                ):
+                    raise DomainError(
+                        "STORE-0005", "Immutable object already differs", 409
+                    )
+                files.read(locator, expected_sha256, len(body))
+                return
+            files.put(locator, body, expected_sha256)
+
+    def get(self, locator, expected_sha256, expected_size):
+        try:
+            with self.legacy.locked() as files:
+                return files.read(locator, expected_sha256, expected_size)
+        except FileNotFoundError:
+            raise FileNotFoundError from None
+
+    def exists(self, locator):
+        with self.legacy.locked() as files:
+            return files.exists(locator)
+
+    def hash(self, locator):
+        try:
+            with self.legacy.locked() as files:
+                return files.hash(locator)
+        except FileNotFoundError:
+            raise FileNotFoundError from None
+
+    def delete(self, locator):
+        with self.legacy.locked() as files:
+            files.remove(locator)
+            if files.exists(locator):
+                raise DomainError("STORE-0001", "Object remained after deletion", 503, True)
+
+
 class ObjectHandle:
     def __init__(self, fd):
         self.fd = fd
@@ -89,6 +166,49 @@ class ObjectHandle:
             if len(data) != size or hashlib.sha256(data).hexdigest() != digest:
                 raise DomainError("VERIFY-0010", "Stored object checksum differs", 422)
             return data
+
+    def exists(self, name):
+        name = self.name(name)
+        try:
+            info = os.stat(name, dir_fd=self.fd, follow_symlinks=False)
+        except FileNotFoundError:
+            return False
+        if (
+            not stat.S_ISREG(info.st_mode)
+            or info.st_nlink != 1
+            or info.st_uid != os.geteuid()
+            or info.st_mode & 0o222
+            or not 0 <= info.st_size <= MAX_BYTES
+        ):
+            raise DomainError("STORE-0003", "Object handle or size is invalid", 422)
+        return True
+
+    def hash(self, name):
+        name = self.name(name)
+        fd = os.open(name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=self.fd)
+        with os.fdopen(fd, "rb") as stream:
+            info = os.fstat(stream.fileno())
+            if (
+                not stat.S_ISREG(info.st_mode)
+                or info.st_nlink != 1
+                or info.st_uid != os.geteuid()
+                or info.st_mode & 0o222
+                or not 0 <= info.st_size <= MAX_BYTES
+            ):
+                raise DomainError("STORE-0003", "Object handle or size is invalid", 422)
+            value = hashlib.sha256()
+            size = 0
+            while True:
+                chunk = stream.read(min(PART_BYTES, MAX_BYTES + 1 - size))
+                if not chunk:
+                    break
+                size += len(chunk)
+                if size > MAX_BYTES:
+                    raise DomainError("STORE-0003", "Object handle or size is invalid", 422)
+                value.update(chunk)
+            if size != info.st_size:
+                raise DomainError("STORE-0003", "Object handle or size is invalid", 422)
+            return ObjectDigest(value.hexdigest(), size)
 
     def put(self, name, data, digest):
         name = self.name(name)
