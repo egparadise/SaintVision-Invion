@@ -81,24 +81,6 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
   );
   const [previewError, setPreviewError] = useState<string | null>(initialPreviewError || null);
 
-  useEffect(() => {
-    if (initialPoolCapacityState !== undefined) {
-      setPoolCapacityState(initialPoolCapacityState);
-    }
-  }, [initialPoolCapacityState]);
-
-  useEffect(() => {
-    if (initialPoolCapacityError !== undefined) {
-      setPoolCapacityError(initialPoolCapacityError);
-    }
-  }, [initialPoolCapacityError]);
-
-  useEffect(() => {
-    if (initialPoolCapacity !== undefined) {
-      setPoolCapacity(initialPoolCapacity);
-    }
-  }, [initialPoolCapacity]);
-
   const loadPools = () => {
     setPoolsState('loading');
     setPoolsError(null);

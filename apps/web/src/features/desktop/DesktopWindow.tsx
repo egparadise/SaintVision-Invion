@@ -4,6 +4,7 @@ import { DesktopWindow as IDesktopWindow } from '@/contracts/virtualFabric';
 export interface DesktopWindowProps {
   window: IDesktopWindow;
   isActive: boolean;
+  isOverlayOpen?: boolean;
   onFocus: () => void;
   onClose: () => void;
   onMinimize: () => void;
@@ -14,6 +15,7 @@ export interface DesktopWindowProps {
 export const DesktopWindowComponent: React.FC<DesktopWindowProps> = ({
   window,
   isActive,
+  isOverlayOpen = false,
   onFocus,
   onClose,
   onMinimize,
@@ -22,7 +24,7 @@ export const DesktopWindowComponent: React.FC<DesktopWindowProps> = ({
 }) => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Escape') {
-      if (e.defaultPrevented) return;
+      if (e.defaultPrevented || isOverlayOpen) return;
       const target = e.target as HTMLElement | null;
       if (target) {
         const tag = target.tagName?.toLowerCase();

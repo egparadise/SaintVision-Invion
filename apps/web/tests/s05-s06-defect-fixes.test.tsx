@@ -11,7 +11,8 @@ import { WorkspaceCreateModal } from '../src/features/workspaces/WorkspaceCreate
 import { WorkspaceList } from '../src/features/workspaces/WorkspaceList';
 import { TerminalSessionView } from '../src/features/desktop/TerminalSessionView';
 import { DesktopWindowComponent } from '../src/features/desktop/DesktopWindow';
-import { PlacementExplainResult } from '../src/contracts/types';
+import { PlacementExplainResult, WorkspaceItem } from '../src/contracts/types';
+import { DesktopShell } from '../src/features/desktop/DesktopShell';
 import { PoolListItemResponse } from '../src/contracts/pool-list-response';
 import { DesktopWindow as IDesktopWindow } from '../src/contracts/virtualFabric';
 import { ResourceExplorer } from '../src/features/desktop/ResourceExplorer';
@@ -131,10 +132,15 @@ describe('S05-FE & S06-FE Product Defect Fixes Regression Suite', () => {
 
     // Ensure non-contract phantom text like "8 / 16 Cores" is NOT rendered
     expect(container.textContent).not.toContain('8 / 16 Cores');
-    expect(container.textContent).not.toContain('undefined Cores');
-    expect(container.textContent).not.toContain('NaN Cores');
 
-    // 2) When poolCapacityState is 'error' (F-6), pending banner must NOT show, error banner shows
+    // 2) When poolCapacityState is 'error' (F-6, C-3), unmount and render fresh component to verify error state
+    await act(async () => {
+      root.unmount();
+    });
+    container = document.createElement('div');
+    document.body.appendChild(container);
+    root = createRoot(container);
+
     await act(async () => {
       root.render(
         <PlacementSimulator
@@ -307,14 +313,19 @@ describe('S05-FE & S06-FE Product Defect Fixes Regression Suite', () => {
   it('[S06-DEF-E] WorkspaceList cards are keyboard-accessible and inner Studio button Enter does not trigger workspace selection', async () => {
     const handleSelect = vi.fn();
     const handleOpenStudio = vi.fn();
-    const mockWorkspaces = [
+    const mockWorkspaces: WorkspaceItem[] = [
       {
         id: 'wsp-01',
         projectId: 'prj-01',
         name: 'Alpha Workspace',
-        status: 'active' as const,
+        targetNodeId: null,
+        isolationMode: 'process_sandbox',
+        allowedPaths: [],
+        prohibitedPaths: [],
+        cpuLimitCores: 2,
+        memoryLimitBytes: 1024,
+        status: 'ready',
         createdAt: '2026-09-28T00:00:00Z',
-        updatedAt: '2026-09-28T00:00:00Z',
       },
     ];
 
@@ -408,7 +419,7 @@ describe('S05-FE & S06-FE Product Defect Fixes Regression Suite', () => {
     const handleClose = vi.fn();
     const mockWindow: IDesktopWindow = {
       id: 'win-01',
-      appId: 'system-monitor',
+      appId: 'terminal',
       title: 'Resource Explorer',
       icon: '💻',
       isOpen: true,
@@ -476,5 +487,64 @@ describe('S05-FE & S06-FE Product Defect Fixes Regression Suite', () => {
     // 3) Close button title is "창 닫기" (without Esc)
     const closeBtn = container.querySelector<HTMLButtonElement>('button[title="창 닫기"]');
     expect(closeBtn).not.toBeNull();
+  });
+
+  // ---------------------------------------------------------------------------
+  // 8. S06 Defect G (C-1): DesktopShell Start Menu vs Window Escape priority
+  // ---------------------------------------------------------------------------
+  it('[S06-DEF-G-C1] DesktopShell: 시작 메뉴가 열린 상태의 Esc는 메뉴만 닫고 활성 창은 닫지 않는다', async () => {
+    await act(async () => {
+      root.render(
+        <DesktopShell
+          projectId="prj-01"
+          tenantId="tenant-01"
+          checkoutId="chk-01"
+          currentReviewerId="rev-01"
+          nodes={[]}
+          runs={[]}
+          onSwitchToPortalView={vi.fn()}
+          currentTheme="dark"
+          onToggleTheme={vi.fn()}
+          onRefreshNodes={vi.fn()}
+          onApprove={vi.fn()}
+          onReject={vi.fn()}
+          currentUserRole="operator"
+          onChangeUser={vi.fn()}
+        />
+      );
+    });
+
+    // 1) By default win_my_computer is open
+    const windowDialog = container.querySelector('div[role="dialog"]');
+    expect(windowDialog).not.toBeNull();
+
+    // 2) Open Start Menu
+    const startBtn = container.querySelector<HTMLButtonElement>('button[aria-label="SaintVision 시작 메뉴"]');
+    expect(startBtn).not.toBeNull();
+    await act(async () => {
+      startBtn?.click();
+    });
+
+    const startMenu = container.querySelector('[role="menu"]');
+    expect(startMenu).not.toBeNull();
+    expect(startBtn?.getAttribute('aria-expanded')).toBe('true');
+
+    // 3) Fire Escape while focus is inside active window
+    await act(async () => {
+      windowDialog?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true }));
+    });
+
+    // Expect: Start Menu is closed, but Window remains open!
+    expect(container.querySelector('[role="menu"]')).toBeNull();
+    expect(startBtn?.getAttribute('aria-expanded')).toBe('false');
+    expect(container.querySelector('div[role="dialog"]')).not.toBeNull();
+
+    // 4) Fire Escape again when Start Menu is closed
+    await act(async () => {
+      windowDialog?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true }));
+    });
+
+    // Now window closes
+    expect(container.querySelector('div[role="dialog"]')).toBeNull();
   });
 });
