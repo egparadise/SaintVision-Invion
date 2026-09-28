@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.121"
+version: "1.0.130"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-23T10:30:00+09:00"
+updated: "2026-09-28T22:10:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,39 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-23T10:30:00+09:00 (최신 tip `fdd4a895`, 작업 브랜치 `agent/gemini/s04-fe-matrix-measured`).
+- 확인 기준: 2026-09-28T22:10:00+09:00 (최신 tip `agent/gemini/g05-fe-model-registry`, 카드 94).
+
+## 2026-09-28 G-05 FE 모델 레지스트리 화면 실제 business route 연동 및 불변식 검증 (카드 94, `agent/gemini/g05-fe-model-registry`)
+
+- **작업 브랜치**: `agent/gemini/g05-fe-model-registry` (base: `agent/claude/g04-w4-retention-pin` head `0b949454`)
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude (UI·테스트 축), Codex (계약 축).
+- **작업 내용 (카드 94)**:
+  - **계약 및 Observation 계층**:
+    - `apps/web/scripts/api-response-contracts.mjs`에 G-04/G-05 스키마 7종(`model-version-register-request`, `model-version-response`, `retention-pin-request`, `retention-pin-response`, `model-release-request`, `model-release-response`, `model-lineage-trace-response`) 등록 및 자동 생성 타입 동기화.
+    - `apps/web/src/shared/api/modelRegistryObservation.ts` 신설: Lineage Trace(GET), W2 Version Register(POST), W4 Retention Pin(POST), Model Release(POST) 4종 API fetcher 및 strict 허용 키 화이트리스트 런타임 가드 구현.
+    - RFC 3339 일시 및 달력 유효성 검증(`isValidIsoDateTime`), 암호학적 UUID v4 기반 멱등키 생성(`generateIdempotencyKey`).
+  - **UI 컴포넌트 (`apps/web/src/features/mlops/ModelLineageView.tsx`)**:
+    - 실제 Business Route 4종 탭(`Lineage Trace`, `W2 Register`, `W4 Retention Pin`, `Release Model`) 구현 및 실 서버 연동.
+    - 서버 미관측 항목에 대해 가짜 수치/PASS를 전면 배제하고 `NOT_OBSERVED (미측정)` 정직 표기.
+    - W3 솔기(seam)에 대한 명시적 안내: `"W3 검증: 미연결 (검증 앵커 #215 대기)"` 배지 표출.
+    - RFC 9457 ProblemDetails (401, 403, 404, 409, 422) 및 502/504 HTML 에러 정제 처리.
+    - `role="status" aria-live="polite"` 라이브 리전 상시 DOM 유지, WCAG AA 다크 테마 대비 4.5:1 이상 실측 확보.
+  - **Vitest 13건 비즈니스 라우트 전용 시험 (`apps/web/tests/model-registry-business-routes.test.tsx`)**:
+    - GET lineage(정상/NOT_OBSERVED/404), POST W2(정상/409/422/Idempotency-Key), POST W4(정상/403/404), POST Release(정상/403/404), 런타임 가드 위조 거부 13건 전수 PASS.
+- **실측 검증**:
+  - `npm test -- model-registry-business-routes`: 13 passed (456ms).
+  - `npm test` (apps/web): 79 files, 688 passed (21.33s).
+  - `npx tsc -b`: 0 errors.
+  - `npm run build`: bundle 정상 빌드 (815.13 kB, 11.92s).
+  - `npm run contracts:check`: 23개 스키마 타입 정합 (PASS).
+  - `python tools/check_frontend_integrity.py`: 84개 파일 대상 9대 무결성 규칙 0 violations (exit 0).
+  - `python tools/check_contract_bindings.py`: 55 fixtures, 20 bound types, 14 replay guards (PASS).
+  - 파이썬 라우트 스위트(`.venv`, Python 3.14.7):
+    - `pytest tests/test_route_coverage.py`: 40 passed.
+    - `pytest tests/core/test_model_release_route.py`: 59 passed.
+    - `pytest tests/core/test_model_retention_pin_route.py tests/core/test_model_version_register_route.py`: 133 passed.
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-28_22-10-00_KST_G05_Model_Registry_FE_Business_Routes_Gemini.md` (`HIST-GEMINI-G05-FE-MODEL-REGISTRY-001`, v1.0.0).
+- **다음 첫 행동**: PR 생성 후 Claude(UI·테스트 축) 및 Codex(계약 축) 검토 요청.
 
 ## 2026-09-23 S04-FE Claude 리뷰 F1~F5 전수 조치 및 정직 증거 갱신 (`agent/gemini/s04-fe-matrix-measured`)
 

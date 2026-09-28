@@ -46,6 +46,13 @@ const contracts = [
   { schema: 'distributed-plan-response', output: 'distributed-plan-response' },
   { schema: 'node-page-response', output: 'node-page-response' },
   { schema: 'node-detail-response', output: 'node-detail-response' },
+  { schema: 'model-version-register-request', output: 'model-version-register-request' },
+  { schema: 'model-version-response', output: 'model-version-response' },
+  { schema: 'retention-pin-request', output: 'retention-pin-request' },
+  { schema: 'retention-pin-response', output: 'retention-pin-response' },
+  { schema: 'model-release-request', output: 'model-release-request' },
+  { schema: 'model-release-response', output: 'model-release-response' },
+  { schema: 'model-lineage-trace-response', output: 'model-lineage-trace-response' },
 ];
 const mode = process.argv[2];
 
