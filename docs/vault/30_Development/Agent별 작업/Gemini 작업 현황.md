@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.138"
+version: "1.0.139"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-29T04:08:00+09:00"
+updated: "2026-09-29T04:35:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -25,6 +25,14 @@ source_of_truth: "Git"
 - **개요**: 앞선 검토(PR #219, #228, #212, #178, #190)에서 비차단으로 남겨진 6대 후속 과제 전수 조치 및 되돌리면 실패하는 자동화 시험 완비.
 - **PR**: Card 138 (Base: `agent/gemini/card126-audit-fixes` head `27a6e4ca` 위 stacked)
 - **담당 및 역할**: Gemini (Frontend / UI / 접근성 소유). Reviewer: Claude (UI·테스트 축), 제어 평면 계약 합의 (계약 축).
+- **독립 검토 r1 (Claude UI H1/M1/M2/L1/L2, Codex 계약 F1~F4) 전수 조치 완료**:
+  - H1: PR #190 최신 헤드(`399e5b57`)를 Card 138 브랜치에 merge (resolution only) 완료 (commit `c13ab928`).
+  - H2 / F1: 실제 푸시될 Git 커밋 SHA(`cbe1a4af51d1e1d6...`)에 바인딩된 정본 `s09-g07-eval-evidence-cbe1a4af.json` 생성.
+  - M1 / F2: `computeCasesDigest` canonical helper export 및 `loaded.cases` 기반 재계산 검증, `loopCount` 변조 시 불일치 단언 완비.
+  - M2 / F4: `gitBlobOids` 및 `generate_eval_evidence.ts`의 fallback fail-open 전수 제거 및 음성 시험(invalid SHA `FAIL-CLOSED`) 추가.
+  - F3: `ModelLineageView.tsx` 승인 입력 플레이스홀더를 `core.schema.json` 정규식 규격 `apr_...`로 정합 복원 및 Test 24 갱신.
+  - L1: `coding_tasks_30.json`의 `TSK-28`을 `expected: "REPAIRING"`, `expectedLoopCount: 1`로 갱신하여 1/3 수리 상태 돌연변이 사살 커버리지 확보.
+  - L2: History 전면 메타데이터 `status: "review"` 정정.
 - **조치 내역 (Items 1~6 전수 완결)**:
   1. **Item (1) ModelLineageView W2/W4 로딩 해제 소유권 가드 및 입력 변경 취소**:
      - W3/W5와 동일하게 `finally`에서 현재 generation이거나 본인 controller일 때만 로딩 해제 (`if (regAbortControllerRef.current === ctrl || regGenerationRef.current === currentGen) setRegLoading(false)`).
@@ -39,21 +47,21 @@ source_of_truth: "Git"
   4. **Item (4) G-07 Eval Runner casesDigest loopCount 포함 (N1) 및 REPAIRING/1 돌연변이 가드 (N2)**:
      - `evalRunner.ts`의 `casesDigest`에 `loopCount` 포함 (N1).
      - `agentEngine.ts` 비용/예산 필드 정합 및 `agent-mutation-guards.test.ts`에 N1 해시 변경 시험 및 N2 `REPAIRING/1` mutant kill 시험 완비 (25 passed).
-     - 정본 Evidence 파일 `s09-g07-eval-evidence-fc1c4eb5.json` 갱신 (130 cases, Conformance 100%).
+     - 정본 Evidence 파일 `s09-g07-eval-evidence-cbe1a4af.json` 갱신 (130 cases, Conformance 100%).
   5. **Item (5) 공용 날짜 검증 가드 (dateTime.ts) 도입 및 무효 타임존 오프셋 차단**:
      - `shared/utils/dateTime.ts` 공용 가드 신설: 타임존 오프셋(`tzHour <= 23 && tzMin <= 59`) 엄격 검증.
      - `modelRegistryObservation.ts`, `modelCommitmentObservation.ts`, `runSealObservation.ts`의 중복 사본 단일화.
      - 시험 23 신설 (`tests/model-registry-business-routes.test.tsx`).
   6. **Item (6) #228 L-항목 잔여 (식별자 prefix 정합 및 세대 단독 가드)**:
-     - `ModelLineageView.tsx` 플레이스홀더 `mdl_...`, `apv_...` 정본 어휘 정합.
+     - `ModelLineageView.tsx` 플레이스홀더 `mdl_...`, `apr_...` 정본 어휘 정합.
      - 시험 24 (플레이스홀더 정합) 및 시험 25 (세대 카운터 단독 stale 응답 폐기) 신설.
 - **실측 검증**:
-  - Vitest: **84 test files / 814 passed** (26.76s, 0 failures).
+  - Vitest: **86 test files / 852 passed** (26.76s, 0 failures).
   - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` 성공 (`dist/assets/index-BLqj7uvO.js` 876.03 kB).
   - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (2.91s).
   - 무결성 도구: `check_frontend_integrity.py` 92 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
   - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --check` 0 conflicts PASS.
-- **산출 문서**: `docs/vault/30_Development/History/2026-09-29_04-08-00_KST_Card138_FE_Audit_Followups_Bundle_Gemini.md` (v1.0.0).
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-29_04-08-00_KST_Card138_FE_Audit_Followups_Bundle_Gemini.md` (v1.0.1).
 - **다음 첫 행동**: `agent/gemini/card138-fe-bundle` push 및 PR 생성 후 리뷰 요청.
 
 ## 2026-09-29 apps/web 전역 감사 지적사항(F1~F7) 시정 완료 (Card 126, `agent/gemini/card126-audit-fixes`)
@@ -91,7 +99,7 @@ source_of_truth: "Git"
   - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (1.94s).
   - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
   - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --check` 0 conflicts PASS.
-- **산출 문서**: `docs/vault/30_Development/History/2026-09-29_03-11-00_KST_Card126_Web_Audit_Fixes_Gemini.md` (v1.0.0).
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-29_03-11-00_KST_Card126_Web_Audit_Fixes_Gemini.md` (v1.0.1).
 - **다음 첫 행동**: `agent/gemini/card126-audit-fixes` 브랜치 push 및 PR 생성 후 리뷰 요청.
 
 ## 2026-09-29 G-05 FE 모델 레지스트리 화면 Codex r4 (F1) 조치: Release 쓰기 UI fail-closed 미노출 및 Idempotency-Key 헤더 제거 (카드 113 대기, PR #219)

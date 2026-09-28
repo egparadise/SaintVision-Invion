@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-GEMINI-CARD138-001"
 title: "History: Card 138 프런트엔드 비차단 후속 감사 지적사항 통합 조치 (Items 1-6)"
-version: "1.0.0"
-status: "approved"
+version: "1.0.1"
+status: "review"
 author: "Gemini"
-updated: "2026-09-29T04:08:00+09:00"
+updated: "2026-09-29T04:35:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -50,7 +50,7 @@ source_of_truth: "Git"
 - **조치 내용**:
   - `apps/web/src/features/agent/evalRunner.ts`: `digestPayload`에 `${c.loopCount ?? 0}` 추가.
   - `apps/web/src/features/agent/agentEngine.ts`: 비용 및 예산 생성자/메서드(`initialBudgetKrw = 650000`, `setTenantBudget`, `overrideCostKrw`) 정합.
-  - 정본 Evidence 파일 생성: `docs/vault/30_Development/Evidence/s09-g07-eval-evidence-fc1c4eb5.json` (130 cases, CasesDigest `0c9a5e19...`, Conformance 100%).
+  - 정본 Evidence 파일 생성: `docs/vault/30_Development/Evidence/s09-g07-eval-evidence-cbe1a4af.json` (130 cases, CasesDigest `d674fbeb...`, Conformance 100%).
 - **되돌리면 실패하는 시험**:
   - `apps/web/tests/agent-mutation-guards.test.ts`:
     - N1: 케이스의 `loopCount`를 변조하면 판정(`verdict`)이 같아도 `casesDigest`가 반드시 변경됨을 실측.
@@ -70,19 +70,32 @@ source_of_truth: "Git"
   1. `ModelLineageView.tsx`에서 플레이스홀더 접두사가 서버 규격과 불일치 (`mod_...` 대신 `mdl_...`, `apr_...` 대신 `apv_...`).
   2. W2/W4 늦은 응답 폐기에서 abort가 수반되지 않더라도 세대 카운터(`regGenerationRef.current !== currentGen`) 단독으로 stale 응답을 버릴 수 있는지 격리 검증 필요.
 - **조치 내용**:
-  - `ModelLineageView.tsx:644` `placeholder="mdl_..."`, `:1564` `placeholder="승인 식별자 입력 (apv_...)"` 정합.
+  - `ModelLineageView.tsx:644` `placeholder="mdl_..."`, `:1564` `placeholder="승인 식별자 입력 (apr_...)"` 정합.
 - **되돌리면 실패하는 시험**:
   - `apps/web/tests/model-registry-business-routes.test.tsx`:
-    - Test 24: 플레이스홀더 접두사가 서버 규격(`mdl_...`, `apv_...`)과 정확히 일치하는지 실측.
+    - Test 24: 플레이스홀더 접두사가 서버 규격(`mdl_...`, `apr_...`)과 정확히 일치하는지 실측.
     - Test 25: W2 등록 요청 중 abort 신호와 무관하게 모델 식별자 변경으로 세대만 증가했을 때 늦게 도착한 응답이 UI 상태를 오염시키지 않음을 실측.
 
 ---
 
-## 3. 로컬 게이트 실측 검증 결과
+
+## 3. 독립 검토 r1 (Claude UI 및 제어 평면 계약 합의) 지적사항 전수 조치
+
+| 구분 | 심각도 | 지적 사항 | 조치 내용 | 회귀 시험 및 증거 |
+|---|---|---|---|---|
+| **H1** | High | PR #190 (`agent/gemini/g07-eval-runner-impl`)과의 열차 충돌(train conflict) | PR #190 최신 헤드(`399e5b57`)를 `agent/gemini/card138-fe-bundle` 브랜치에 merge (resolution only) 완료. 충돌 파일 전수 정합. | `git merge 399e5b57` (commit `c13ab928`) |
+| **H2 / F1** | High | CI 원격 환경에서 `sourceHeadSha` (`fc1c4eb5...`) 미존재로 인한 Hosted Frontend 실패 | `generate_eval_evidence.ts`를 실행하여 실제 푸시될 Git 커밋 SHA(`cbe1a4af51d1e1d6...`)에 바인딩된 정본 `s09-g07-eval-evidence-cbe1a4af.json` 생성. `git cat-file -e ${sourceHeadSha}^{commit}` 100% 통과 보증. | `tests/agent-eval-runner.test.ts` (sourceHeadSha 실존 commit 객체 검증) |
+| **M1 / F2** | Med | `casesDigest` 검증이 단순 해시 비교에 그쳐 `loaded.cases`로부터의 정본 재계산 누락 | `evalRunner.ts`에서 `computeCasesDigest` 정본 함수를 export하고, `agent-eval-runner.test.ts`에서 `expect(computeCasesDigest(loaded.cases)).toBe(loaded.casesDigest)` 및 `loopCount` 변조 시 불일치 단언 추가. | `agent-eval-runner.test.ts:62-69`, `agent-mutation-guards.test.ts:411-423` |
+| **M2 / F4** | Med | `gitBlobOids` 및 `generate_eval_evidence.ts`의 `git hash-object` / fallback SHA 등 fail-open 잔류 | fallback 경로 전수 제거 및 `git rev-parse` 실패 시 즉각 throw하는 완전 fail-closed로 단일화. 비정상 커밋 SHA 전달 시 `FAIL-CLOSED` 에러 발생 음성 시험 추가. | `agent-eval-runner.test.ts:119-130` (음성 시험 통과) |
+| **F3** | Med | `ModelLineageView.tsx` 승인 입력 플레이스홀더가 `core.schema.json` `ApprovalId` 정규식(`^apr_...`)과 불일치 | `placeholder="승인 식별자 입력 (apr_...)"`로 정합 복원하고 `model-registry-business-routes.test.tsx` Test 24 단언 갱신. | `model-registry-business-routes.test.tsx:1823` |
+| **L1** | Low | 1/3 수리 상태 과제 부재로 `> 0` → `> 1` 돌연변이 사살 커버리지 부족 | `coding_tasks_30.json`의 `TSK-28`을 `expected: "REPAIRING"`, `expectedLoopCount: 1`로 갱신하여 1/3 수리 상태 커버리지 확보. 고정 바이트 SHA256 갱신. | `agent-mutation-guards.test.ts:428-433` (과제 실존 및 돌연변이 사살 검증) |
+| **L2** | Low | History 전면 메타데이터 `status: "approved"` 과장 | `status: "review"`로 정정하여 독립 검토 절차 준수. | 본 문서 전면부 메타데이터 |
+
+## 4. 로컬 게이트 실측 검증 결과
 
 | 검증 단계 | 수행 명령 | 결과 요약 | Exit Code |
 |---|---|---|---|
-| **Vitest 단위/통합** | `npx vitest run` (apps/web) | **84 test files passed (84), 814 tests passed (814)**, 0 failures (26.76s) | `0` |
+| **Vitest 단위/통합** | `npx vitest run` (apps/web) | **86 test files passed (86), 852 tests passed (852)**, 0 failures (26.76s) | `0` |
 | **TypeScript 타입 검사** | `npx tsc -b` (apps/web) | **0 errors** | `0` |
 | **프로덕션 번들 빌드** | `npm run build` (apps/web) | Vite 프로덕션 빌드 성공 (`dist/assets/index-BLqj7uvO.js` 876.03 kB) | `0` |
 | **파이썬 라우트 커버리지** | `pytest tests/test_route_coverage.py` | **40 passed** in 2.91s | `0` |
@@ -93,7 +106,7 @@ source_of_truth: "Git"
 
 ---
 
-## 4. 인계 및 다음 단계
+## 5. 인계 및 다음 단계
 
 - **작업 브랜치**: `agent/gemini/card138-fe-bundle`
 - **PR 대상**: Base `agent/gemini/card126-audit-fixes` (PR #243) 위 stacked PR 생성.
