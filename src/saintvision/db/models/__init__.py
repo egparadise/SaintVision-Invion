@@ -266,7 +266,8 @@ AUDIT_TABLES: tuple[str, ...] = ("audit_events",)
 #: the contradiction as "permission denied for table model_versions".
 LIFECYCLE_UPDATE_COLUMNS: dict[str, tuple[str, ...]] = {
     "dataset_versions": ("retention_pinned_until",),
-    "model_versions": ("stage", "verified_at", "retention_pinned_until"),
+    # verified_measurement_id joined in 0054: set with verified_at, never alone.
+    "model_versions": ("stage", "verified_at", "retention_pinned_until", "verified_measurement_id"),
     "discovery_machine_credentials": (
         "revoked_at",
         "announcement_id",

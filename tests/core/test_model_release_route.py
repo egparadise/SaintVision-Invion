@@ -1117,7 +1117,9 @@ def test_the_real_pg_seed_builds_every_row_without_a_database():
     }
     # Five own rows, nine subject-chain rows, four edges. Counted so a row that
     # stops being seeded is noticed here rather than as a refusal on hosted CI.
-    assert len(recorder.statements) == 18
+    # 18 rows plus the two statements the 0054 measurement takes (the tenant
+    # GUC, then the kernel-table insert the seed records before verified_at).
+    assert len(recorder.statements) == 20
 
     # Counting statements was not enough: the first version of this fixture wrote
     # four edges whose subject rows did not exist, and trace_model resolves an
@@ -1126,6 +1128,7 @@ def test_the_real_pg_seed_builds_every_row_without_a_database():
     written = {
         statement.split("INSERT INTO ", 1)[1].split(" ", 1)[0]
         for statement in recorder.statements
+        if "INSERT INTO " in statement          # the 0054 measurement also sets the tenant GUC first
     }
     assert {"dataset_versions", "code_commits", "eval_runs", "approvals"} <= written, (
         "every required lineage kind needs a real subject row, not just an edge"

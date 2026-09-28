@@ -26,6 +26,7 @@ from saintvision.api.problem import CANONICAL_KEYS
 from saintvision.config import Settings
 from saintvision.identity.principal import Principal, StaticPrincipalVerifier
 from saintvision.ids import new_id
+from measurement_support import insert_measurement
 
 pytestmark = pytest.mark.postgres
 
@@ -260,6 +261,15 @@ def _seed(connection, *, tenant_id, now, project_code, role="approver"):
         name=f"model-{project_code}",
         created_at=now,
     )
+    # 64 lowercase hex, unique per tenant: the response contract checks the
+    # shape and the table has a per-tenant unique constraint.
+    digest = _digest()
+    # Verified means bound to a kernel-recorded measurement (0054): the seed
+    # records one, as the kernel would, before it marks the row verified.
+    measurement_id = insert_measurement(
+        connection, tenant_id=tenant_id, model_version_id=version_id, sha256=digest, byte_size=1,
+        project_id=project_id, observed_at=now - dt.timedelta(minutes=1),
+    )
     _insert(
         connection,
         "model_versions",
@@ -268,12 +278,11 @@ def _seed(connection, *, tenant_id, now, project_code, role="approver"):
         model_id=model_id,
         version="1.0.0",
         stage="draft",
-        # 64 lowercase hex, unique per tenant: the response contract checks the
-        # shape and the table has a per-tenant unique constraint.
-        content_sha256=_digest(),
+        content_sha256=digest,
         byte_size=1,
         uri=f"inv://models/model-{project_code}@1.0.0",
         verified_at=now,
+        verified_measurement_id=measurement_id,
         retention_pinned_until=now + dt.timedelta(days=365),
         created_at=now,
     )

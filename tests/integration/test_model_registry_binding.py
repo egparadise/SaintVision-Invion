@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 import psycopg
+from measurement_support import insert_measurement_psycopg
 import pytest
 from inv.approvals import Principal
 from inv.errors import DomainError
@@ -25,11 +26,16 @@ def registered(model):
     with psycopg.connect(a.e.owner) as c:
         c.execute("INSERT INTO public.models(tenant_id,project_id,model_id,name) VALUES(%s,%s,%s,%s)",
                   (a.e.tenant, a.e.project, a.registry_model, uuid4().hex))
+        # Verified means bound to a kernel-recorded measurement (0054).
+        measurement_id = insert_measurement_psycopg(
+            c, tenant_id=a.e.tenant, model_version_id=a.registry_version,
+            sha256=a.body['contentHash'], byte_size=a.body['totalBytes'], project_id=a.e.project, uri='inv://models/synthetic@1',
+        )
         c.execute('''INSERT INTO public.model_versions(tenant_id,model_id,model_version_id,version,
-            stage,content_sha256,byte_size,uri,verified_at,retention_pinned_until)
+            stage,content_sha256,byte_size,uri,verified_at,verified_measurement_id,retention_pinned_until)
             VALUES(%s,%s,%s,'registry-distinct-version','released',%s,%s,'inv://synthetic',
-            clock_timestamp()-interval '1 second',clock_timestamp()+interval '1 hour')''',
-            (a.e.tenant, a.registry_model, a.registry_version, a.body['contentHash'], a.body['totalBytes']))
+            clock_timestamp()-interval '1 second',%s,clock_timestamp()+interval '1 hour')''',
+            (a.e.tenant, a.registry_model, a.registry_version, a.body['contentHash'], a.body['totalBytes'], measurement_id))
     a.binding_policy = RegistryBindingPolicy('synthetic-policy:1', frozenset({
         (a.body['licensePolicy'], a.body['classification'])}))
     a.bindings = ModelRegistryBindingStore(a.e.db, a.binding_policy)
