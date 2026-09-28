@@ -21,14 +21,16 @@ from jwt_support import jwt_fixture
 from inv.configuration_readiness import configured_s01_readiness
 from pki_support import authority, issue
 
-
 FIXTURE = (
     Path(__file__).resolve().parents[2]
     / "contracts"
     / "fixtures"
     / "configuration-readiness-response.json"
 )
-SETTING_NAMES = {"INV_NODE_MTLS_CA_BUNDLE", "INV_OBJECT_STORE_ENDPOINT"}
+SETTING_NAMES = {
+    "INV_NODE_MTLS_CA_BUNDLE",
+    "INV_OBJECT_STORE_ENDPOINT",
+}
 
 
 class _Cursor:

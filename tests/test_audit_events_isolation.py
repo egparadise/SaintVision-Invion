@@ -41,6 +41,7 @@ pytestmark = pytest.mark.postgres
 ROOT = Path(__file__).resolve().parents[1]
 UTC = dt.timezone.utc
 PREVIOUS_REVISION = "0046_model_manifest_readiness"
+TARGET_REVISION = "0047_audit_events_isolation"
 
 APP_ROLE = "inv_app"
 WRITER_ROLE = "inv_audit_writer"
@@ -663,19 +664,19 @@ def test_the_downgrade_removes_the_machinery_without_restoring_the_read(
 ):
     """The reversible tail reverses, and rolling back does not reopen the hole.
 
-    ``backend.yml`` runs ``downgrade <target>`` then ``upgrade head`` for the
-    reversible tail, and 0047 is the first revision that makes that tail
-    non-empty. The property that matters is not just "both commands succeed": a
+    Revision 0047 is the reversible audit-isolation change. Exercise it
+    directly so a later irreversible migration is not crossed by this focused
+    regression. The property that matters is not just "both commands succeed": a
     downgrade that restored ``GRANT SELECT ON audit_events TO inv_app`` would make
     a rollback a way to reintroduce the exposure 0047 fixes. So the app role's
     SELECT is asserted to stay revoked at 0046.
     """
     url = disposable_migration_database
-    assert _alembic(url, "upgrade", "head").returncode == 0
+    assert _alembic(url, "upgrade", TARGET_REVISION).returncode == 0
     at_head = _isolation_state(url)
     assert _alembic(url, "downgrade", PREVIOUS_REVISION).returncode == 0
     at_previous = _isolation_state(url)
-    assert _alembic(url, "upgrade", "head").returncode == 0
+    assert _alembic(url, "upgrade", TARGET_REVISION).returncode == 0
     back_at_head = _isolation_state(url)
 
     assert at_head == {
