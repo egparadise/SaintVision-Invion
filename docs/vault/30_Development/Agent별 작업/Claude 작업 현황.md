@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.21"
+version: "1.2.22"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T09:55:00+09:00"
+updated: "2026-09-28T23:23:05+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+S09-DB·S10-DB·S10-ST 운영 판정 기준 카드 106 (Claude, 2026-09-28, 분석 tree `9f1c2be4` = `origin/coord/train-ci-2207`, PR base `integration/all-agents-unified`, docs-only): 재채점(PR #220) §5가 세 task를 "코드는 있고 무엇을 보면 done인가가 없다"로 남긴 자리를 채웠다. **문서를 지배하는 규칙 하나 — 코드가 이미 강제하는 것을 done 기준으로 다시 세지 않는다.** eval gate의 `total_cases > 0`(빈 suite는 pass가 아니다), verify의 measurement 요구(digest만으로 `verified_at` 불가), retention pin 단조성, lineage의 `truncated`·`unresolved`, 측정 신선도는 **이미 참이고 시험이 지킨다** — 그것을 기준에 적으면 이미 가진 것을 두 번 세는 것이다. 그래서 관측 항목은 **코드가 보장할 수 없는 것**뿐이다(운영 환경에서만 드러나는 것 · DB 밖에서 일어나는 out-of-band 조작 · 사람·자산이 있어야 성립하는 것). **14개 관측**에 관측값·계측 방법·사전 등록 임계치·증거 artefact·외부 전제를 붙였고, **8개는 지금 측정 가능**하며 6개는 G-19·G-20·G-21·G-23·G-26 중 하나를 기다린다. 8개를 다 채워도 **100은 되지 않는다**(필수 운영 인수가 범위 안이다)는 것을 숨기지 않았다. 관측 자체가 거짓이 되는 경로를 막는 되돌림 시험 7종(T1~T7)도 계약으로 적었다 — 권한 snapshot을 하드코딩하지 않기, 분모가 전수임, route와 독립 경로로 카운트, `EXPLAIN` 계획을 볼 것, measurement 3자 일치, out-of-band를 잡을 것, GC를 실제로 돌린 뒤 볼 것. 인용 6곳의 줄 번호를 분석 tree에서 재확인했고 재채점 문서는 **wiki link가 아니라 평문**으로 인용했다(그 문서가 병합 대기라 wiki link면 다른 branch에서 check_docs가 깨진다). 다음 첫 행동: Codex 검토. 전문 [[S09-DB_S10-DB_S10-ST_운영_판정_기준]].
 
 hosted Core junit로 S04/05/07-DB 케이스 수치 보강 카드 12 (Claude, 2026-09-22, 읽기 전용): artifact `saintvision-core-evidence`(run 35706465645 `3d1892c0` + proof 35714470445 `f2aa2b14`)를 .work/ci-junit에 받아(바이너리 삭제 후 1.4MB) 파일별 수치(core 2948/58/0·shard-recovery 21·containment 28·workspace 22·business-handoff 17·lan-installer 15·docker-host 2, f2aa2b14는 core 2998/58/0 외 동일)와 카드 10의 hosted-only 항목 케이스 이름을 classname으로 추출 — 재전송 hash(output_ingestion 5·node_delivery 18·results 21), placement Explain(placement 12), shard replacement 21, containment 28, workspace 복구 12+11, 노드 스토리지 전송 27 — **전부 passed**. hosted에도 없는 것(AC-05 결정성/P95·AC-07 60초/95%·CX01)은 그대로 물리/5노드 대기로 명시. 패키지 §C-2 + 검증상태지도 §12 보강. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 
