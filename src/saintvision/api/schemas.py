@@ -729,3 +729,144 @@ class WorkspaceToolRequest(Strict):
     )
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ModelReleaseRequest(Strict):
+    """An importer's claim about what it is releasing (VF-CL-03).
+
+    The two fields and their constraints are copied from the kernel's
+    ``ModelManifest``, because the point of the request is to be compared
+    against that immutable declaration for exact equality. ``extra="forbid"``
+    is load-bearing here rather than conventional: a proposal carrying a field
+    the declaration does not have is itself a mismatch.
+    """
+
+    license_policy: str = Field(min_length=1, max_length=200, alias="licensePolicy")
+    classification: str = Field(pattern="^(public|internal|restricted)$")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ModelReleaseResponse(Strict):
+    """The released version, echoed back by identity.
+
+    ``stage`` is a literal rather than a free string: the only state this
+    response can describe is the one the route just established, so a future
+    change that returns a different stage under the same type breaks the
+    contract instead of quietly widening it.
+
+    Python field names avoid the ``model_`` prefix because Pydantic reserves
+    that namespace; the wire names are the aliases.
+    """
+
+    version_id: str = Field(alias="modelVersionId")
+    parent_model_id: str = Field(alias="modelId")
+    version: str = Field(min_length=1, max_length=64)
+    stage: Literal["released"]
+    content_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="contentSha256")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class LineageDatasetVersion(Strict):
+    dataset_version_id: str = Field(alias="datasetVersionId")
+    version: str = Field(min_length=1, max_length=64)
+    content_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="contentSha256")
+    uri: str = Field(min_length=1)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class LineageDeployment(Strict):
+    """A deployment of the traced version.
+
+    ``deployedByUserId`` and ``notes`` are on the row and are deliberately not
+    here: reading lineage does not need a person's identifier or free text.
+    """
+
+    deployment_id: str = Field(alias="deploymentId")
+    environment: str = Field(pattern="^(lab|staging|pilot)$")
+    status: str = Field(pattern="^(pending|active|superseded|rolled_back|failed)$")
+    deployed_digest: str = Field(pattern="^[0-9a-f]{64}$", alias="deployedDigest")
+    image_id: str | None = Field(default=None, alias="imageId")
+    approval_id: str | None = Field(default=None, alias="approvalId")
+    deployed_at: dt.datetime = Field(alias="deployedAt")
+    superseded_at: dt.datetime | None = Field(default=None, alias="supersededAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class LineageUnresolved(Strict):
+    """How many subjects of one kind this response does not describe.
+
+    A count and a kind, and nothing else. An identifier would leak another
+    project's row, and a reason would tell the caller whether a hidden
+    identifier exists -- which is the same disclosure by a longer route.
+    """
+
+    kind: str = Field(min_length=1, max_length=32)
+    count: int = Field(ge=1)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ModelLineageTraceResponse(Strict):
+    """AC-10's traceback, reduced to what a project member may be shown.
+
+    ``commits``, ``images``, ``evaluations`` and ``approvals`` are absent rather
+    than empty. An empty array would read as "nothing was recorded", which is a
+    different and much more alarming statement than "this route cannot prove who
+    owns those rows"; the second is what ``unresolved`` and ``countOnlyKinds``
+    say.
+
+    ``deployments: []`` *is* an empty array, because it means something
+    complete: nothing has been deployed. That difference is the reason the two
+    are shaped differently.
+    """
+
+    model_version_id: str = Field(alias="modelVersionId")
+    version: str = Field(min_length=1, max_length=64)
+    stage: str = Field(pattern="^(draft|candidate|released|retired)$")
+    content_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="contentSha256")
+    produced_by_run_id: str | None = Field(default=None, alias="producedByRunId")
+    datasets: list[LineageDatasetVersion] = Field(max_length=200)
+    deployments: list[LineageDeployment] = Field(max_length=200)
+    missing: list[str] = Field(max_length=16)
+    unresolved: list[LineageUnresolved] = Field(max_length=16)
+    truncated: dict[str, int] = Field(default_factory=dict)
+    fully_traceable: bool = Field(alias="fullyTraceable")
+    traceability_limited_by_scope: bool = Field(alias="traceabilityLimitedByScope")
+    detailed_kinds: list[str] = Field(alias="detailedKinds", max_length=16)
+    count_only_kinds: list[str] = Field(alias="countOnlyKinds", max_length=16)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ModelVersionByDigest(Strict):
+    model_version_id: str = Field(alias="modelVersionId")
+    parent_model_id: str = Field(alias="modelId")
+    version: str = Field(min_length=1, max_length=64)
+    stage: str = Field(pattern="^(draft|candidate|released|retired)$")
+    content_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="contentSha256")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ModelVersionByDatasetDigestPageResponse(Strict):
+    """Model versions built from one set of bytes.
+
+    ``datasetVersionIds`` is the set the items were derived from, bounded and
+    echoed so a caller can check the derivation rather than take it on trust. It
+    is a list because the same bytes may be registered as more than one dataset
+    version, and narrowing it to one value would silently drop model versions.
+    """
+
+    content_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="contentSha256")
+    dataset_version_ids: list[str] = Field(alias="datasetVersionIds", max_length=200)
+    items: list[ModelVersionByDigest] = Field(max_length=200)
+    next_cursor: str | None = Field(default=None, alias="nextCursor")
+    unresolved_model_versions: int = Field(ge=0, alias="unresolvedModelVersions")
+    truncated: dict[str, int] = Field(default_factory=dict)
+    complete: bool
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
