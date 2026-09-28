@@ -1,0 +1,366 @@
+"""PG-free contract and mutation tests for the AC-11 stage-1 aggregator."""
+
+from __future__ import annotations
+
+import copy
+import json
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+import pytest
+
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools"))
+
+import aggregate_ac11_evidence as tool  # noqa: E402
+
+
+SOURCE = "a" * 40
+TREE = "b" * 40
+TARGET = "c" * 40
+BLOB = "d" * 40
+NOW = datetime(2026, 9, 28, 3, 0, tzinfo=timezone.utc)
+APPROVED_ALLOWLIST = json.loads(tool.DEFAULT_ALLOWLIST.read_text(encoding="utf-8"))
+TOOL_BLOBS = {
+    item["path"]: item["blob"]
+    for item in [
+        *tool.DEFINER_FILES,
+        *tool.RLS_FILES,
+        APPROVED_ALLOWLIST["secVf001"]["runner"],
+        APPROVED_ALLOWLIST["secVf001"]["workflow"],
+        APPROVED_ALLOWLIST["secVf001"]["nodeDependencyResolver"],
+        *APPROVED_ALLOWLIST["secVf001"]["testFiles"],
+    ]
+}
+
+
+class FakeGit:
+    ancestor = True
+    target_blob = BLOB
+    source_blob = BLOB
+    source_tree = TREE
+
+    def tree(self, commit: str) -> str:
+        assert commit == SOURCE
+        return self.source_tree
+
+    def is_ancestor(self, ancestor: str, descendant: str) -> bool:
+        assert ancestor == TARGET and descendant == SOURCE
+        return self.ancestor
+
+    def blob(self, commit: str, path: str) -> str:
+        if path == "docs/target.md":
+            return self.target_blob if commit == TARGET else self.source_blob
+        assert commit == SOURCE and path in TOOL_BLOBS
+        return TOOL_BLOBS[path]
+
+
+@pytest.fixture
+def allowlist() -> dict:
+    return json.loads(tool.DEFAULT_ALLOWLIST.read_text(encoding="utf-8"))
+
+
+def target(criteria: dict | None = None) -> dict:
+    return {
+        "commit": TARGET,
+        "path": "docs/target.md",
+        "blob": BLOB,
+        "criteria": criteria or {"sampleCount": {"operator": "gte", "value": 1}},
+    }
+
+
+def envelope(axis: str, verdict: str = "MEASURED_PASS") -> dict:
+    return {
+        "axis": axis,
+        "schemaVersion": "1.0.0",
+        "runPurpose": "ac11-axis-evidence",
+        "sourceRunId": "36370000000",
+        "sourceHeadSha": SOURCE,
+        "checkoutTreeSha": TREE,
+        "artifactSha256": "e" * 64,
+        "artifactObservedSha256": "e" * 64,
+        "artifactAvailable": True,
+        "artifactExpiresAt": "2030-01-01T00:00:00Z",
+        "cleanCheckout": True,
+        "runConclusion": "success",
+        "environment": {"comparableGroup": "hosted-ubuntu-pg16"},
+        "startedAt": "2026-09-28T01:00:00Z",
+        "finishedAt": "2026-09-28T01:01:00Z",
+        "targetRef": target(),
+        "verdict": verdict,
+        "observations": [
+            {
+                "metric": "sampleCount",
+                "value": 1,
+                "unit": "count",
+                "n": 1,
+                "successCount": 1,
+                "failureCount": 0,
+                "skipCount": 0,
+                "errorsByClass": {},
+            }
+        ],
+        "cleanup": {"residueCount": 0},
+    }
+
+
+def security_reports(allowlist: dict) -> list[dict]:
+    vf = allowlist["secVf001"]
+    vf_files = [vf["runner"], vf["workflow"], vf["nodeDependencyResolver"], *vf["testFiles"]]
+    return [
+        {
+            "threatId": "SEC-DEF-001",
+            "exitCode": 0,
+            "toolFiles": copy.deepcopy(tool.DEFINER_FILES),
+            "findings": [{"function": "inv.safe()", "problems": []}],
+        },
+        {
+            "threatId": "SEC-RLS-001",
+            "exitCode": 0,
+            "toolFiles": copy.deepcopy(tool.RLS_FILES),
+            "baselineDispositions": copy.deepcopy(allowlist["rlsAcceptedDispositions"]),
+            "violations": [],
+        },
+        {
+            "threatId": "SEC-VF-001",
+            "exitCode": 0,
+            "toolFiles": copy.deepcopy(vf_files),
+            "nodeIds": copy.deepcopy(vf["requiredNodeIds"]),
+        },
+    ]
+
+
+def security_envelope(allowlist: dict) -> dict:
+    value = envelope("security-critical-high-zero")
+    value["observations"] = security_reports(allowlist)
+    value["targetRef"] = target({})
+    return value
+
+
+def manifest(allowlist: dict) -> dict:
+    axes = []
+    for axis in tool.REQUIRED_AXES:
+        axes.append(security_envelope(allowlist) if axis == "security-critical-high-zero" else envelope(axis))
+    return {"schemaVersion": "1.0.0", "runPurpose": "ac11-release-gate", "axes": axes}
+
+
+def axis_result(value: dict, allowlist: dict, git: FakeGit | None = None) -> tool.AxisResult:
+    return tool.evaluate_axis(value, git or FakeGit(), allowlist, NOW)
+
+
+def test_all_eight_recomputed_pass_is_the_only_done_state(allowlist):
+    result = tool.aggregate(manifest(allowlist), FakeGit(), allowlist, NOW)
+    assert result["verdict"] == "MEASURED_PASS"
+    assert result["done"] is True
+    assert len(result["axes"]) == 8
+
+
+def test_missing_axis_is_invalid_and_not_done(allowlist):
+    value = manifest(allowlist)
+    value["axes"].pop()
+    result = tool.aggregate(value, FakeGit(), allowlist, NOW)
+    assert result["verdict"] == "INVALID_RUN" and result["done"] is False
+    assert "missing required axes" in result["reasons"][0]
+
+
+def test_unknown_pass_string_is_invalid(allowlist):
+    value = envelope(tool.REQUIRED_AXES[0], "PASS")
+    assert axis_result(value, allowlist).verdict is tool.Verdict.INVALID_RUN
+
+
+def test_all_not_applicable_never_opens_gate(allowlist):
+    value = manifest(allowlist)
+    for item in value["axes"]:
+        item["verdict"] = "NOT_APPLICABLE"
+        item["observations"] = []
+        item["structuralException"] = {"reason": "no-reversible-tail", "reversibleTailCount": 0}
+    result = tool.aggregate(value, FakeGit(), allowlist, NOW)
+    assert result["done"] is False
+    assert result["verdict"] == "INVALID_RUN"
+
+
+@pytest.mark.parametrize(
+    ("mutation", "reason"),
+    [
+        (lambda row: row.update(cleanCheckout=False), "cleanCheckout"),
+        (lambda row: row.update(runConclusion="cancelled"), "cancelled"),
+        (lambda row: row.update(checkoutTreeSha="f" * 40), "checkoutTreeSha"),
+        (lambda row: row.update(artifactAvailable=False), "unavailable"),
+        (lambda row: row.update(artifactObservedSha256="f" * 64), "digest"),
+        (lambda row: row.update(artifactExpiresAt="2020-01-01T00:00:00Z"), "expired"),
+        (lambda row: row.update(finishedAt="2026-09-28T00:59:00Z"), "precedes"),
+    ],
+)
+def test_invalid_envelope_cannot_be_relabelled_pass(allowlist, mutation, reason):
+    value = envelope(tool.REQUIRED_AXES[1])
+    mutation(value)
+    result = axis_result(value, allowlist)
+    assert result.verdict is tool.Verdict.INVALID_RUN
+    assert reason in result.reasons[0]
+
+
+def test_pre_schema_evidence_is_reference_only(allowlist):
+    value = envelope(tool.REQUIRED_AXES[1])
+    value["schemaVersion"] = "0.9.0"
+    value.pop("checkoutTreeSha")
+    value.pop("cleanCheckout")
+    result = axis_result(value, allowlist)
+    assert result.verdict is tool.Verdict.NOT_OBSERVED
+    assert result.reference_only is True
+
+
+def test_target_must_be_ancestor_and_same_blob(allowlist):
+    git = FakeGit()
+    git.ancestor = False
+    assert axis_result(envelope(tool.REQUIRED_AXES[1]), allowlist, git).verdict is tool.Verdict.INVALID_RUN
+    git.ancestor = True
+    git.source_blob = "f" * 40
+    assert axis_result(envelope(tool.REQUIRED_AXES[1]), allowlist, git).verdict is tool.Verdict.INVALID_RUN
+
+
+def test_empty_n_and_bad_failure_denominator_are_invalid(allowlist):
+    empty = envelope(tool.REQUIRED_AXES[1])
+    empty["observations"] = []
+    assert axis_result(empty, allowlist).verdict is tool.Verdict.INVALID_RUN
+    zero = envelope(tool.REQUIRED_AXES[1])
+    zero["observations"][0].update(n=0, successCount=0)
+    assert axis_result(zero, allowlist).verdict is tool.Verdict.INVALID_RUN
+    mismatch = envelope(tool.REQUIRED_AXES[1])
+    mismatch["observations"][0].update(successCount=0, failureCount=1, errorsByClass={"57014": 0})
+    assert axis_result(mismatch, allowlist).verdict is tool.Verdict.INVALID_RUN
+
+
+def test_target_violation_is_fail_but_false_pass_is_invalid(allowlist):
+    value = envelope(tool.REQUIRED_AXES[1], "MEASURED_FAIL")
+    value["observations"][0]["value"] = 0
+    assert axis_result(value, allowlist).verdict is tool.Verdict.MEASURED_FAIL
+    value["verdict"] = "MEASURED_PASS"
+    assert axis_result(value, allowlist).verdict is tool.Verdict.INVALID_RUN
+
+
+def test_p95_success_only_population_is_invalid(allowlist):
+    value = envelope(tool.REQUIRED_AXES[3])
+    value["targetRef"] = target({"requestP95Ms": {"operator": "lte", "value": 2000}})
+    value["observations"][0].update(metric="requestP95Ms", value=1200, population="success")
+    assert axis_result(value, allowlist).verdict is tool.Verdict.INVALID_RUN
+
+
+@pytest.mark.parametrize(
+    ("problem", "expected"),
+    [
+        ("runtime_role_bypasses_rls", tool.Verdict.MEASURED_FAIL),
+        ("definition_differs_from_policy", tool.Verdict.MEASURED_FAIL),
+        ("migration_revision_mismatch", tool.Verdict.INVALID_RUN),
+        ("runtime_role_missing", tool.Verdict.NOT_OBSERVED),
+        ("unknown_problem", tool.Verdict.INVALID_RUN),
+    ],
+)
+def test_definer_problem_mapping_is_fail_closed(problem, expected):
+    report = {
+        "exitCode": 1,
+        "toolFiles": copy.deepcopy(tool.DEFINER_FILES),
+        "findings": [{"function": "x", "problems": [problem]}],
+    }
+    assert tool.evaluate_definer(report) is expected
+
+
+@pytest.mark.parametrize(
+    ("exit_code", "expected"),
+    [(0, tool.Verdict.MEASURED_PASS), (2, tool.Verdict.NOT_OBSERVED), (7, tool.Verdict.INVALID_RUN)],
+)
+def test_definer_exit_mapping(exit_code, expected):
+    report = {"exitCode": exit_code, "toolFiles": copy.deepcopy(tool.DEFINER_FILES), "findings": []}
+    assert tool.evaluate_definer(report) is expected
+
+
+@pytest.mark.parametrize("rule", sorted(tool.RLS_RULES))
+def test_each_unaccepted_rls_rule_is_critical(rule, allowlist):
+    report = {
+        "exitCode": 1,
+        "toolFiles": copy.deepcopy(tool.RLS_FILES),
+        "baselineDispositions": copy.deepcopy(allowlist["rlsAcceptedDispositions"]),
+        "violations": [{"rule": rule, "role": "unlisted", "table": "public.secret"}],
+    }
+    assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.MEASURED_FAIL
+
+
+def test_rls_accepted_expiry_and_baseline_exact_match(allowlist):
+    report = {
+        "exitCode": 1,
+        "toolFiles": copy.deepcopy(tool.RLS_FILES),
+        "baselineDispositions": copy.deepcopy(allowlist["rlsAcceptedDispositions"]),
+        "violations": [{"rule": "E2", "role": "inv_app", "table": "public.tenants"}],
+    }
+    assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.MEASURED_PASS
+    expired = datetime(2026, 11, 1, tzinfo=timezone.utc)
+    assert tool.evaluate_rls(report, allowlist, expired) is tool.Verdict.MEASURED_FAIL
+    report["exitCode"] = 0
+    report["violations"] = []
+    assert tool.evaluate_rls(report, allowlist, expired) is tool.Verdict.MEASURED_FAIL
+    report["baselineDispositions"] = []
+    assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.INVALID_RUN
+
+
+@pytest.mark.parametrize(
+    ("exit_code", "expected"),
+    [(2, tool.Verdict.NOT_OBSERVED), (3, tool.Verdict.NOT_OBSERVED), (9, tool.Verdict.INVALID_RUN)],
+)
+def test_rls_unmeasured_and_unknown_exit_mapping(exit_code, expected, allowlist):
+    report = {
+        "exitCode": exit_code,
+        "toolFiles": copy.deepcopy(tool.RLS_FILES),
+        "baselineDispositions": copy.deepcopy(allowlist["rlsAcceptedDispositions"]),
+        "violations": [],
+    }
+    assert tool.evaluate_rls(report, allowlist, NOW) is expected
+
+
+def test_security_requires_all_registered_reports_and_exact_vf_inventory(allowlist):
+    missing = security_envelope(allowlist)
+    missing["verdict"] = "NOT_OBSERVED"
+    missing["observations"].pop()
+    assert axis_result(missing, allowlist).verdict is tool.Verdict.NOT_OBSERVED
+    false_pass = copy.deepcopy(missing)
+    false_pass["verdict"] = "MEASURED_PASS"
+    assert axis_result(false_pass, allowlist).verdict is tool.Verdict.INVALID_RUN
+    wrong_nodes = security_envelope(allowlist)
+    wrong_nodes["observations"][2]["nodeIds"].pop()
+    assert axis_result(wrong_nodes, allowlist).verdict is tool.Verdict.INVALID_RUN
+
+
+def test_security_report_cannot_claim_reviewed_blob_when_source_tree_differs(allowlist):
+    git = FakeGit()
+    original = TOOL_BLOBS["tools/check_definer_functions.py"]
+    TOOL_BLOBS["tools/check_definer_functions.py"] = "0" * 40
+    try:
+        assert axis_result(security_envelope(allowlist), allowlist, git).verdict is tool.Verdict.INVALID_RUN
+    finally:
+        TOOL_BLOBS["tools/check_definer_functions.py"] = original
+
+
+def test_allowlist_schema_and_disposition_duplicates_are_invalid(allowlist):
+    broken = copy.deepcopy(allowlist)
+    broken["extra"] = True
+    result = tool.aggregate(manifest(allowlist), FakeGit(), broken, NOW)
+    assert result["verdict"] == "INVALID_RUN" and result["done"] is False
+    duplicate = copy.deepcopy(allowlist)
+    duplicate["rlsAcceptedDispositions"].append(copy.deepcopy(duplicate["rlsAcceptedDispositions"][0]))
+    result = tool.aggregate(manifest(allowlist), FakeGit(), duplicate, NOW)
+    assert result["verdict"] == "INVALID_RUN"
+
+
+def test_cleanup_residue_cannot_be_pass(allowlist):
+    value = envelope(tool.REQUIRED_AXES[1])
+    value["cleanup"]["residueCount"] = 1
+    assert axis_result(value, allowlist).verdict is tool.Verdict.INVALID_RUN
+
+
+def test_only_reversible_axis_accepts_declared_zero_tail(allowlist):
+    value = envelope(tool.REQUIRED_AXES[0], "NOT_APPLICABLE")
+    value["observations"] = []
+    value["structuralException"] = {"reason": "no-reversible-tail", "reversibleTailCount": 0}
+    assert axis_result(value, allowlist).verdict is tool.Verdict.NOT_APPLICABLE
+    value["axis"] = tool.REQUIRED_AXES[1]
+    assert axis_result(value, allowlist).verdict is tool.Verdict.INVALID_RUN
