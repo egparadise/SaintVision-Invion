@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.211"
+version: "1.0.212"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T12:38:00+09:00"
+updated: "2026-09-28T20:55:02+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-28 카드 90 — AC-11 migration 0047~0053 통합·재핀 cascade
+
+- #177에서 manifest를 0047·0050·0053 `PRESERVED`까지 확장하고 source graph로 0052 barrier 뒤 reversible tail을 재계산한다. 0053 scoped-row downgrade refusal은 exact revision 0053까지 upgrade한 뒤 0052 거부·version/project_id 원자 보존을 확인해, 이후 0054가 들어와도 fixture 의미가 바뀌지 않는다.
+- hosted run `36416624234`는 source `da112daf`, JUnit 7/0/0/0, reversible·restore 두 축 PASS, 부정 fixture 4/4, residue 0, Backend 3592 passed·50 skipped·0 failed다. 다만 source에 새 registry pin이 없어 **reference-only**이며 release evidence로 소비하지 않는다.
+- #192가 새 target과 restore criteria 4를 registry blob `c08a45f8…`으로 aggregator·importer에 함께 재핀한다. 소비 가능한 evidence는 이 registry를 포함한 #192 이후 exact head에서 재생성해야 한다. #193 standalone LocalObjectStore 경계와 #204 hosted lane까지 force 없이 cascade하고 S11/AC-11 상태 승격은 하지 않는다. [[2026-09-28_13-06-51_KST_S11_AC11_migration_리허설_Codex]].
 
 ## 2026-09-28 Card45 S3 ObjectStore 제품 결속 v2 — 제품 restore 보강·hosted 재검증
 

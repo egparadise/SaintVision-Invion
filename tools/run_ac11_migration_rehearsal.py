@@ -551,7 +551,9 @@ def _negative_fixture_probes(
     scoped = _database_name("negative_0053")
     _create_database(admin_dsn, scoped)
     created.append(scoped)
-    _alembic_upgrade(admin_dsn, scoped, "head")
+    # This negative fixture proves revision 0053's own downgrade guard.  A later
+    # reversible or irreversible head must not change the state under test.
+    _alembic_upgrade(admin_dsn, scoped, "0053_eval_suite_project_scope")
     tenant_id = str(uuid4())
     project_id = "prj_ac11_scoped_refusal"
     with psycopg.connect(_db_conninfo(admin_dsn, scoped)) as conn:
