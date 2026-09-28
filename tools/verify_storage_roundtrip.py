@@ -10,18 +10,29 @@ from __future__ import annotations
 import argparse
 from datetime import datetime, timezone
 import hashlib
-import hmac
 import json
 import os
 from pathlib import Path
 import re
 import stat
 import subprocess
-from urllib.error import HTTPError
-from urllib.parse import quote, urlsplit
-from urllib.request import HTTPRedirectHandler, Request, build_opener
+import sys
+from urllib.parse import urlsplit
 from uuid import uuid4
 import xml.etree.ElementTree as ET
+
+
+ROOT = Path(__file__).resolve().parents[1]
+CONTROL_PLANE_SRC = ROOT / "services" / "control-plane" / "src"
+if str(CONTROL_PLANE_SRC) not in sys.path:
+    sys.path.insert(0, str(CONTROL_PLANE_SRC))
+
+from inv.s3_client import (  # noqa: E402
+    HttpResponse,
+    S3Client,
+    S3Config as Config,
+    UrlLibTransport,
+)
 
 
 EMPTY_SHA256 = hashlib.sha256(b"").hexdigest()
@@ -35,43 +46,6 @@ _SHA = re.compile(r"[0-9a-f]{40}")
 
 class Blocked(Exception):
     """Required trusted inputs are absent or ambiguous."""
-
-
-class Config:
-    def __init__(self, endpoint, bucket, access_key, secret_key, region):
-        self.endpoint = endpoint
-        self.bucket = bucket
-        self.access_key = access_key
-        self.secret_key = secret_key
-        self.region = region
-
-
-class HttpResponse:
-    def __init__(self, status, headers, body):
-        self.status = status
-        self.headers = {str(k).lower(): str(v) for k, v in headers.items()}
-        self.body = body
-
-
-class _NoRedirect(HTTPRedirectHandler):
-    def redirect_request(self, req, fp, code, msg, headers, newurl):
-        return None
-
-
-class UrlLibTransport:
-    def __init__(self, timeout=10):
-        self.timeout = timeout
-        self.opener = build_opener(_NoRedirect())
-
-    def request(self, method, url, headers, body):
-        request = Request(url, data=body if body else None, method=method, headers=headers)
-        try:
-            with self.opener.open(request, timeout=self.timeout) as response:
-                return HttpResponse(response.status, response.headers, response.read())
-        except HTTPError as error:
-            # Provider payloads and messages may contain identifiers. Only status
-            # crosses this transport boundary.
-            return HttpResponse(error.code, {}, b"")
 
 
 def _trusted_credential_file(path):
@@ -173,72 +147,6 @@ def load_config(environment):
     config = Config(endpoint.rstrip("/"), bucket, access, secret, region)
     config.target_kind = target_kind
     return config
-
-
-def _sign(key, value):
-    return hmac.new(key, value.encode("utf-8"), hashlib.sha256).digest()
-
-
-class S3Client:
-    def __init__(self, config, transport=None):
-        self.config = config
-        self.transport = transport or UrlLibTransport()
-
-    def _request(self, method, key, body=b"", metadata_digest=None, now=None):
-        now = now or datetime.now(timezone.utc)
-        parsed = urlsplit(self.config.endpoint)
-        host = parsed.netloc
-        segments = [self.config.bucket]
-        if key is not None:
-            segments.extend(key.split("/"))
-        canonical_uri = "/" + "/".join(quote(segment, safe="-_.~") for segment in segments)
-        url = self.config.endpoint + canonical_uri
-        payload_hash = hashlib.sha256(body).hexdigest()
-        headers = {
-            "host": host,
-            "x-amz-content-sha256": payload_hash,
-            "x-amz-date": now.strftime("%Y%m%dT%H%M%SZ"),
-        }
-        if metadata_digest is not None:
-            headers["x-amz-meta-content-sha256"] = metadata_digest
-        signed_names = ";".join(sorted(headers))
-        canonical_headers = "".join(f"{name}:{headers[name].strip()}\n" for name in sorted(headers))
-        canonical_request = "\n".join(
-            [method, canonical_uri, "", canonical_headers, signed_names, payload_hash]
-        )
-        date = now.strftime("%Y%m%d")
-        scope = f"{date}/{self.config.region}/s3/aws4_request"
-        string_to_sign = "\n".join(
-            [
-                "AWS4-HMAC-SHA256",
-                headers["x-amz-date"],
-                scope,
-                hashlib.sha256(canonical_request.encode()).hexdigest(),
-            ]
-        )
-        date_key = _sign(("AWS4" + self.config.secret_key).encode(), date)
-        region_key = _sign(date_key, self.config.region)
-        service_key = _sign(region_key, "s3")
-        signing_key = _sign(service_key, "aws4_request")
-        signature = hmac.new(signing_key, string_to_sign.encode(), hashlib.sha256).hexdigest()
-        headers["authorization"] = (
-            f"AWS4-HMAC-SHA256 Credential={self.config.access_key}/{scope}, "
-            f"SignedHeaders={signed_names}, Signature={signature}"
-        )
-        return self.transport.request(method, url, headers, body)
-
-    def put(self, key, body, digest):
-        return self._request("PUT", key, body, digest)
-
-    def get(self, key):
-        return self._request("GET", key)
-
-    def delete(self, key):
-        return self._request("DELETE", key)
-
-    def create_bucket(self):
-        """Hosted ephemeral setup helper; not called by the verifier flow."""
-        return self._request("PUT", None)
 
 
 def _code_sha(environment):
