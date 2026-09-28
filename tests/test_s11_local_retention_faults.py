@@ -486,6 +486,7 @@ def test_bak02_marker_publish_is_atomic_and_interrupted_temp_never_blocks_resume
 ):
     archive, backups, planned, journal = _retention_world(tmp_path)
     real_replace = retention.os.replace
+    real_unlink = retention.os.unlink
     interrupted = False
 
     def interrupt_marker_publish(source, destination):
@@ -497,20 +498,33 @@ def test_bak02_marker_publish_is_atomic_and_interrupted_temp_never_blocks_resume
             raise KeyboardInterrupt
         return real_replace(source, destination)
 
+    def preserve_interrupted_temp(path):
+        name = Path(path).name
+        if name.startswith("..pitr-retention-removing-") and ".tmp-" in name:
+            return
+        return real_unlink(path)
+
     monkeypatch.setattr(retention.os, "replace", interrupt_marker_publish)
+    # Model kill/power loss: Python's finally block does not get to clean the
+    # fsynced but unpublished temp file.
+    monkeypatch.setattr(retention.os, "unlink", preserve_interrupted_temp)
     with pytest.raises(KeyboardInterrupt):
         retention.apply(planned, archive, backups, journal_path=journal)
     assert list(backups.glob(".pitr-retention-removing-*")) == []
-    assert list(backups.glob("..pitr-retention-removing-*.tmp-*")) == []
+    stale_temps = list(backups.glob("..pitr-retention-removing-*.tmp-*"))
+    assert len(stale_temps) == 1 and stale_temps[0].read_bytes()
     assert (backups / "old" / "backup_label").is_file()
 
     monkeypatch.setattr(retention.os, "replace", real_replace)
+    monkeypatch.setattr(retention.os, "unlink", real_unlink)
     current = retention.plan(
         retention.load_archive(archive), retention.load_backups(backups), retention_days=7, now=NOW
     )
     retention.apply(current, archive, backups, journal_path=journal)
     assert not (backups / "old").exists()
     assert retention.load_apply_receipt(journal)["status"] == "completed"
+    assert stale_temps[0].is_file()  # a unique temp never becomes authoritative
+    stale_temps[0].unlink()
 
 
 @pytest.mark.skipif(sys.platform != "linux", reason="Linux directory ctime repair boundary")
