@@ -69,7 +69,18 @@ def configured_business(database, tokens):
         with database.transaction(tokens.tenant_id) as conn:
             if conn.execute("SELECT current_database() AS name").fetchone()["name"] != row[0]:
                 raise ValueError("Business and execution must use the same database")
-        business = create_app(engine=engine, settings=Settings(database_url="configured"),
+        # The business release route reads the kernel's commitment observation
+        # back over HTTP, and in this topology the kernel is this same process
+        # behind BusinessDispatch. Without this binding kernel_base_url stays
+        # None and that route answers 503 in every deployment, however the
+        # development helper Settings.from_env() is configured. PORT is the same
+        # value the server binds, so the self URL is read rather than guessed;
+        # INV_KERNEL_BASE_URL overrides it for a split deployment.
+        kernel_base_url = os.environ.get("INV_KERNEL_BASE_URL") or (
+            f"http://127.0.0.1:{os.environ.get('PORT', '8080')}"
+        )
+        business = create_app(engine=engine,
+            settings=Settings(database_url="configured", kernel_base_url=kernel_base_url),
             verifier=OidcPrincipalVerifier(tokens, make_session_factory(engine)))
         business.router.add_event_handler("shutdown", engine.dispose)
         return business
