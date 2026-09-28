@@ -16,7 +16,7 @@ tags: ["S10-BE", "AC-10", "mlflow", "tracking", "lineage", "adapter", "design", 
 # S10-BE MLflow 연동 설계 v1.0 (2026-09-28, 카드 bd)
 
 > [!warning] 설계만 — 구현은 승인 뒤 별도 PR
-> [[S10-BE Evidence 대응표]] G1a: task-registry S10-BE scope에 "MLflow"가 있으나 코드가 0건(`git grep -i mlflow` → src·services·tools·tests·requirements 0). 아키텍처 문서는 MLflow를 "실험과 model registry **MVP**, 배포 권한은 별도 정책"([[시스템 아키텍처와 기술 스택]] :227), ML Worker 생태계(:214), Dev Workspace `inv mlflow RUN`(연결된 Experiment 열기)로 두었고, 운영 자격증명 계약은 "MLflow-owned artifacts" namespace를 분리했다([[Codex 운영 자격증명과 Storage 계약]] :43). 반면 S10에서 이미 착지한 것은 **우리 lineage·registry**(`register_model_version`·`record_lineage`·`release_model_version`·`record_deployment`, 0004 migration의 append-only·approval digest 결속)다. 따라서 첫 질문은 "MLflow를 어떻게 붙이나"가 아니라 "**MLflow가 무엇의 정본인가**"이고, 답은 **정본이 아니다**여야 한다.
+> S10-BE Evidence 대응표(PR #166) G1a: task-registry S10-BE scope에 "MLflow"가 있으나 코드가 0건(`git grep -i mlflow` → src·services·tools·tests·requirements 0). 아키텍처 문서는 MLflow를 "실험과 model registry **MVP**, 배포 권한은 별도 정책"([[시스템 아키텍처와 기술 스택]] :227), ML Worker 생태계(:214), Dev Workspace `inv mlflow RUN`(연결된 Experiment 열기)로 두었고, 운영 자격증명 계약은 "MLflow-owned artifacts" namespace를 분리했다([[Codex 운영 자격증명과 Storage 계약]] :43). 반면 S10에서 이미 착지한 것은 **우리 lineage·registry**(`register_model_version`·`record_lineage`·`release_model_version`·`record_deployment`, 0004 migration의 append-only·approval digest 결속)다. 따라서 첫 질문은 "MLflow를 어떻게 붙이나"가 아니라 "**MLflow가 무엇의 정본인가**"이고, 답은 **정본이 아니다**여야 한다.
 
 ## 0. 결정 요청 (owner 결정 필요 — 이 설계는 B를 권고)
 
@@ -105,5 +105,5 @@ fail-closed의 뜻: **미러가 정본을 바꾸지 못하고, 미러 실패가 
 ## 8. 경계·다음
 
 - 이 문서는 docs-only. 코드·계약·migration 변경 0. **구현은 결정(§0)과 Codex 승인 뒤** 별도 카드(예상 범위: `adapters/tracking.py`·`MlflowSink`·`ReferenceSink`·`mlflow_mirrors` migration·outbox 훅·readiness 필드·시험).
-- 관련: [[S10-BE Evidence 대응표]] G1a/G1b, [[S10-DB_lineage_조회_API_설계]](#158, lineage read API — 미러 참조를 응답에 포함할지는 그 설계의 후속), CL-06(실제 학습·평가·승인 배포).
+- 관련: S10-BE Evidence 대응표(PR #166) G1a/G1b, S10-DB lineage 조회 API 설계(PR #158, lineage read API — 미러 참조를 응답에 포함할지는 그 설계의 후속), CL-06(실제 학습·평가·승인 배포).
 - owner Claude / reviewer Codex / 병합 금지. worktree 재사용, branch `agent/claude/s10-be-mlflow-design`, base `1e8baf04`. 다음 첫 행동: 코디네이터/사용자 결정(A/B) → Codex 설계 검토.
