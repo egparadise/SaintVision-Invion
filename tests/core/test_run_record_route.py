@@ -205,7 +205,9 @@ def test_without_a_credential_the_route_is_401_and_the_denial_is_audited_before_
     body = response.json()                      # legacy InvError shape on the auth boundary, not CanonicalProblem
     assert response.headers["www-authenticate"] == "Bearer"
     assert body["code"] == "AUTH-MISSING-CREDENTIAL" and body["status"] == 401
-    assert RUN not in response.text
+    # The legacy problem body echoes the request path as ``instance``; what must not
+    # appear is anything read from the record.
+    assert "recordId" not in response.text and RECORD not in response.text
     assert [d["reason_code"] for d in denials] == ["AUTH-MISSING-CREDENTIAL"]
     assert denials[0]["actor_type"] == "anonymous" and denials[0]["outcome"] == "deny"
     assert world["access_calls"] == [] and world["session"].gets == [] and "record_calls" not in world
