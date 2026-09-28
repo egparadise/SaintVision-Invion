@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-S10DB-DIGEST-INDEX-MIGRATION-001"
 title: "S10-DB dataset digest 인덱스 migration 0050 — CONCURRENTLY와 재시도 정리, 고정 순서 0047→0048→0049→0050"
-version: "1.1.0"
+version: "1.2.0"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T12:55:28+09:00"
+updated: "2026-09-28T13:14:20+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S10-DB"]
@@ -92,3 +92,17 @@ v1.0에서 "#128·#159가 먼저 들어가면 head가 둘이 된다"고 적었�
 ## 7. 다음 첫 행동
 
 이 head의 hosted Backend에서 두 postgres case가 failure·skip 0으로 돌고 graph가 단일 head임을 run ID로 제시한 뒤 Codex 재검토를 받는다. #172 head가 다시 바뀌면 force 없이 다시 merge한다. 병합은 이 PR이 lineage 조회 PR(#175)보다 먼저다.
+
+## 8. v1.2 — 계획 관측이 아무것도 증명하지 못하고 있었다 (hosted run 36376198678)
+
+merge 뒤 첫 hosted 실행에서 **migration graph 단계는 통과**했다(`head: 0050_dataset_digest_lookup`, `safe downgrade target: 0049_mlflow_mirror`). 그런데 `test_35`가 실패했고, 실패 메시지가 문제를 그대로 보여 준다 — `Index Scan using uq_dataset_versions_tenant_id_version_id`.
+
+**빈 테이블에서는 계획이 아무것도 말해 주지 않는다.** 행이 없으면 모든 비용이 비슷하고 `enable_seqscan = off`로 벌점을 받은 seq scan은 **어떤** 인덱스에도 진다. 그래서 planner가 내 인덱스와 무관한 unique index를 골랐고, 내 인덱스가 있든 없든 같은 결과가 나왔다. 즉 v1.0·v1.1의 그 node는 **통과하든 실패하든 근거가 아니었다.**
+
+고친 방식: 2000행을 심고 `ANALYZE`한 뒤 EXPLAIN한다(`enable_seqscan` 조작 없이). 그러면 `(tenant_id, content_sha256)` 동등 조건에 두 컬럼 인덱스가 선택되는 것이 **결정적**이고, 인덱스를 지우면 그것을 쓸 수 없다는 것이 falsifiable한 단언이 된다. 대체로 무엇을 고르는지는 planner의 몫이라 단언하지 않고 실패 메시지에 계획을 싣는다. 심은 행·project·dataset은 `finally`에서 지우고 다시 `ANALYZE`한다 — 이 node가 다른 시험의 통계를 바꾸지 않는다.
+
+**성능 단언이 아니라는 성질은 그대로다.** 주장하는 것은 "이 술어를 이 인덱스가 담당한다"까지이고 비용 숫자는 아니다.
+
+### 같은 run의 다른 실패 2건은 이 PR의 diff가 아니다
+
+`tests/test_tracking_mirror.py`의 `test_finished_eval_run_enqueues_suite_identity_and_category_scores`와 `test_attempt_check_constraints_refuse_malformed_rows`가 함께 실패했는데, 둘 다 **merge해 온 #172 head(`41256e4f`)의 시험**이고 이 브랜치의 diff는 `0050` migration·모델 인덱스 선언·그 시험들뿐이다. #172는 그 뒤 `0be57050`으로 다시 움직였고 자체 Backend가 돌고 있다. 그 head가 정리되면 force 없이 다시 merge해 재실행한다.

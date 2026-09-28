@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-2026-09-28-S10-BE-MLFLOW-MIRROR-IMPL-1"
 title: "S10-BE MLflow 미러 구현 1단계 — TrackingSink 계약·run_tracking_conformance·ReferenceSink, TRACK-0001~0005 표, canonical payload/URI, migration 0049(intents·attempts·defects, append-only·RLS·CHECK), 정본 tx enqueue 훅, deliver_intent(FOR UPDATE·terminal 반환), PG-free 76 + 실 PG 42(hosted) (카드 bg)"
-version: "1.3.1"
+version: "1.3.4"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T12:59:25+09:00"
+updated: "2026-09-28T13:18:18+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -78,3 +78,19 @@ hosted Backend run **36373656210**(head 322488fb) = 3.12 **3138 passed / 47 skip
 ### 6.1 Codex r3 (v1.3.1, 2026-09-28T12:59:25+09:00) — 경쟁 시험 정정
 
 지적: 시험이 ModelVersion 2개를 config absent인 선행 tx에서 미리 commit하고 thread에서는 `enqueue_mirror`만 호출해 "canonical mutation과 mirror의 같은-tx 결속" 변이가 생존하며, `sleep(0.5)`는 B가 잠금에 도달했다는 신호가 아니다. 정정: 두 thread가 각각 **실제 `register_model_version`(훅 포함)을 자기 tx 안에서** 호출(version 1.0.0/`a`*64, 1.0.1/`b`*64). A는 등록 뒤 tx를 열어둔 채 대기. `_serialize_enqueue`를 감싼 wrapper가 thread B의 잠금 진입 직전에 event를 set → main이 그 신호를 기다린 뒤(0.3s 뒤 B 미완료·오류 없음 확인) A를 release. 기대 그대로: canonical row 2, subject intent 2, experiment 1, event 3 = intent 집합, 오류 0. 잠금 제거 변이(B가 experiment 중복 INSERT → 롤백)와 "canonical 먼저 commit 뒤 mirror 별도 tx" 변이가 각각 죽는다.
+
+### 6.2 hosted Backend run 36375872884(head 41256e4f) — 2 실패 수정 (v1.3.2, 2026-09-28T13:13:15+09:00)
+
+3.12 총계 **3224 passed / 47 skipped / 2 deselected / 2 failed**(3.14 동류). 둘 다 #172 자체 결함:
+- `test_finished_eval_run_…`: `enqueue_mirror`가 `canonical_payload(payload)` 뒤 `payload_sha256(canonical)`로 **canonical 형식을 다시 canonicalize**하는데, 비정수 float metric은 첫 pass에서 `repr` 문자열("0.9")이 되어 두 번째 pass의 "metric value must be numeric"에 걸렸다(멱등 아님). 수정: `canonical_metrics`가 **float의 정확한 repr 문자열만** 숫자로 되돌려 받음(그 밖 문자열·"0.90"·" 0.9"·"1e3"·"nan"은 거부). 시험: `canonical_payload(canonical_payload(p)) == canonical_payload(p)`, digest 3자 일치.
+- `test_attempt_check_constraints…[status=unavailable, error_code=NULL]` DID NOT RAISE: CHECK `error_code = 'TRACK-0001'`은 NULL에서 NULL이고 CHECK는 NULL을 통과시킨다. 수정: `sql_pair_check()`·0049 literal을 **`IS NOT DISTINCT FROM`**으로(NULL-safe). 시험: predicate에 `=` 비교 부재, literal == 생성값.
+
+### 6.3 코디네이터 13:13 반영 (v1.3.3, 2026-09-28T13:14:55+09:00)
+
+- canonicalize **한 번**: `enqueue_mirror`는 `canonical_payload(payload)` 1회 뒤 **`canonical_digest(canonical)`**(직렬화만, 재canonicalize 없음)로 digest. `payload_sha256`은 원본 payload 진입점으로 남고, 멱등성(6.2)도 유지되어 둘이 일치(시험).
+- pair CHECK를 코디네이터 형식으로: non-mirrored 분기마다 **`error_code IS NOT NULL AND error_code = '…'`**, mirrored는 `error_code IS NULL`. `sql_pair_check()`와 0049 literal 동일(시험이 3 분기의 `IS NOT NULL` 명시를 확인).
+- 0049·0051 다른 CHECK의 3값 논리 감사: subject XOR는 `num_nonnulls`(NULL 불가), kind↔컬럼·project 결속·`mirrored_has_reference`는 `IS NOT NULL` 명시, `error_code_track`은 `IS NULL OR ~`, 나머지는 NOT NULL 열의 regex/비교(`payload_sha256`·`tracking_uri_sha256`·`attempt_no`·`delivery_no`·`recovery_epoch`; 0051 `purpose`·`destination`·`file_name`·`content_sha256`·`device/inode`·`expires_at > created_at`). 추가 함정 없음.
+
+### 6.4 Codex r5 — 입력 계약 복원 + 경계 분리 (v1.3.4, 2026-09-28T13:18:18+09:00)
+
+지적: 6.2의 "float repr 문자열 되돌려 받기"는 raw payload의 문자열 metric(`"0.9"`, `"1.0"`)까지 통과시켜 **입력 계약을 약화**했다. 반영: `canonical_metrics`는 문자열을 전부 거부(원래 계약·문구 "metric value must be numeric"). 분리: **`canonical_json(canonical)`/`canonical_digest(canonical)`**(persisted canonical을 직렬화/hash만, 재canonicalize 없음) vs `canonical_payload`/`payload_sha256`(raw 진입점). 사용처를 전부 persisted 쪽으로: `enqueue_mirror` digest, `MirrorRecord.__post_init__`(persisted payload 검증), `ReferenceSink` 저장/attest digest, conformance `canonical_record`(canonical로 생성), 2단계 sink의 payload tag(다음 head). 시험 (a) raw `"0.9"`·`"1.0"` 거부, (b) float 0.9 payload가 1회 canonicalize 뒤 `canonical_digest == payload_sha256(raw)`이고 persisted 형식을 raw 규칙에 다시 넣으면 거부, (c) persisted canonical로 `MirrorRecord` 검증·`ReferenceSink` mirror·attest digest 일치.

@@ -126,6 +126,57 @@ def test_canonical_bytes_are_compact_sorted_utf8_json():
     assert canonical_bytes({"z": "é", "a": [1, "b"]}) == '{"a":[1,"b"],"z":"é"}'.encode("utf-8")
 
 
+FLOAT_METRIC_PAYLOAD = {
+    "params": {"x": 0.1, "n": 2.0},
+    "tags": {"k": "v"},
+    "metrics": [{"key": "category.a.mean_score", "value": 0.9, "step": 0, "timestamp_ms": 5},
+                {"key": "rate", "value": 1.0, "step": 0, "timestamp_ms": 5}],
+}
+
+
+def test_raw_string_metric_values_are_refused_even_as_an_exact_float_repr():
+    """(a) The raw-input contract: a metric value is a number, never a string."""
+    for bad in ("0.9", "1.0", "0.90", " 0.9", "abc", "1e3", "nan", "inf"):
+        with pytest.raises(CanonicalizationError, match="metric value must be numeric"):
+            canonical.canonical_payload({"metrics": [{"key": "m", "value": bad}]})
+
+
+def test_a_float_metric_payload_canonicalises_once_and_digests():
+    """(b) hosted 36375872884: the hook canonicalises once and hashes that form directly."""
+    once = canonical.canonical_payload(FLOAT_METRIC_PAYLOAD)
+    assert once["metrics"][0]["value"] == "0.9" and once["metrics"][1]["value"] == 1
+    assert canonical.canonical_digest(once) == payload_sha256(FLOAT_METRIC_PAYLOAD)
+    assert canonical.canonical_json(once) == canonical.canonical_bytes(FLOAT_METRIC_PAYLOAD)
+    # The persisted canonical form is never fed back through the raw rules.
+    with pytest.raises(CanonicalizationError):
+        canonical.canonical_payload(once)
+
+
+def test_a_persisted_canonical_payload_verifies_and_attests_by_the_same_digest():
+    """(c) What the intent row holds is what MirrorRecord, the sink and attest digest."""
+    from saintvision.adapters.tracking import MirrorRecord
+    from saintvision.adapters.tracking_reference import ReferenceSink
+
+    persisted = canonical.canonical_payload(FLOAT_METRIC_PAYLOAD)      # as stored on the intent
+    digest = canonical.canonical_digest(persisted)
+    record = MirrorRecord("mmi_p", "eval_run", "inv/t/p", persisted, digest)   # validates without re-canonicalising
+    with pytest.raises(ValueError):
+        MirrorRecord("mmi_p", "eval_run", "inv/t/p", persisted, "0" * 64)
+    sink = ReferenceSink()
+    result = sink.mirror(record)
+    attestation = sink.attest(result.reference_id)
+    assert attestation.response_sha256 == digest == record.payload_sha256
+
+
+def test_the_pair_predicate_is_null_safe():
+    """A failure status with a NULL code must fail the CHECK, not pass through NULL."""
+    predicate = codes.sql_pair_check()
+    assert "(status = 'mirrored' AND error_code IS NULL)" in predicate
+    for code in ("TRACK-0001", "TRACK-0002", "TRACK-0003"):
+        assert f"error_code IS NOT NULL AND error_code = '{code}'" in predicate
+    assert predicate.count("IS NOT NULL") == 3
+
+
 def test_canonicalize_does_not_mutate_its_input():
     payload = {"b": {"y": None, "x": 1.0}, "a": [1]}
     before = repr(payload)

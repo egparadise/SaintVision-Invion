@@ -20,7 +20,7 @@ import datetime as dt
 from dataclasses import dataclass, field
 from typing import Any, Callable, Protocol, runtime_checkable
 
-from ..tracking.canonical import payload_sha256
+from ..tracking.canonical import canonical_digest, canonical_payload
 from ..tracking.codes import MirrorStatus, check_pair
 from .contract import Attestation, AttestationResult, AuthResult, ProbeResult
 
@@ -43,14 +43,15 @@ class MirrorRecord:
     subject_kind: str
     #: Experiment name, already prefixed (``<prefix>/<tenant_short>/<project>``).
     experiment: str
+    #: The *canonical* payload as persisted on the intent; never raw input.
     payload: dict[str, Any]
     payload_sha256: str
 
     def __post_init__(self) -> None:
         if self.subject_kind not in SUBJECT_KINDS:
             raise ValueError(f"unknown subject kind {self.subject_kind!r}")
-        if payload_sha256(self.payload) != self.payload_sha256:
-            raise ValueError("payload_sha256 does not match the payload")
+        if canonical_digest(self.payload) != self.payload_sha256:
+            raise ValueError("payload_sha256 does not match the canonical payload")
 
 
 @dataclass(frozen=True, slots=True)
@@ -179,12 +180,13 @@ def canonical_record(intent_id: str = "mmi_00000000000000000000000000") -> Mirro
         "tags": {"inv.intent_id": intent_id, "inv.tenant_id": "t"},
         "metrics": [{"key": "gate_passed", "value": 1, "step": 0, "timestamp_ms": 0}],
     }
+    canonical = canonical_payload(payload)
     return MirrorRecord(
         intent_id=intent_id,
         subject_kind="eval_run",
         experiment="conf/t/prj_00000000000000000000000000",
-        payload=payload,
-        payload_sha256=payload_sha256(payload),
+        payload=canonical,
+        payload_sha256=canonical_digest(canonical),
     )
 
 
