@@ -831,6 +831,8 @@ class LineageDatasetVersion(Strict):
     content_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="contentSha256")
     uri: str = Field(min_length=1)
 
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
 
 class ConformanceCheckDescriptor(Strict):
     """One check the conformance contract defines, named and gated.
@@ -1031,6 +1033,8 @@ class ModelVersionByDatasetDigestPageResponse(Strict):
     unresolved_model_versions: int = Field(ge=0, alias="unresolvedModelVersions")
     truncated: dict[str, int] = Field(default_factory=dict)
     complete: bool
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
 class ConformanceStatusResponse(Strict):
