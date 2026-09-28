@@ -175,6 +175,11 @@ def test_catalog_constraint_normalization_only_collapses_equivalent_array_text_c
     normalize = runner.normalize_constraint_definition
     assert normalize(direct) == normalize(restored)
     assert normalize(direct) != normalize(direct.replace("deleted", "quarantined"))
+    assert normalize(
+        "CHECK (pinned_until IS NULL OR (" + direct.removeprefix("CHECK (")
+    ) == normalize(
+        "CHECK (pinned_until IS NULL OR (" + restored.removeprefix("CHECK (")
+    )
     unrelated = "CHECK ((payload::character varying::text <> ''::text))"
     assert normalize(unrelated) == unrelated
 

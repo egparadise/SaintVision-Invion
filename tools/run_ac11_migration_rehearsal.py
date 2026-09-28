@@ -579,18 +579,22 @@ CATALOG_QUERIES = {
 
 
 def normalize_constraint_definition(definition: str) -> str:
-    match = re.fullmatch(
-        r"(CHECK \(.+? = ANY \(ARRAY\[)(?P<items>.+?)(\](?:::text\[\])?\)\))",
-        definition,
-    )
-    if match is None:
+    if not definition.startswith("CHECK ("):
         return definition
-    items = re.sub(
-        r"('(?:''|[^'])*'::character varying)::text(?=\s*(?:,|$))",
-        r"\1",
-        match.group("items"),
+    array = re.compile(
+        r"ANY \(ARRAY\[(?P<items>"
+        r"'(?:''|[^'])*'::character varying(?:::text)?"
+        r"(?:,\s*'(?:''|[^'])*'::character varying(?:::text)?)*"
+        r")\](?:::text\[\])?\)"
     )
-    return match.group(1) + items + "]))"
+
+    def normalize_array(match: re.Match[str]) -> str:
+        items = match.group("items").replace(
+            "::character varying::text", "::character varying"
+        )
+        return f"ANY (ARRAY[{items}])"
+
+    return array.sub(normalize_array, definition)
 
 
 def catalog_fingerprint(admin_dsn: str, database: str) -> CatalogFingerprint:
