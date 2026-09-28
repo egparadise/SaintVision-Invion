@@ -147,8 +147,16 @@ def effective_permission(
     ``users.status`` is part of the answer, not a separate concern. If
     suspension were only checked at login, a suspended user's open session would
     keep approving until it expired.
+
+    All three reads are ``populate_existing``, and the project is the reason this
+    is spelled out. A caller that asks twice in one transaction -- every route
+    that re-checks before spending money on an external provider -- would
+    otherwise get the project out of the identity map on the second ask, so a
+    concurrent archive committed between the two asks would be invisible while
+    the membership and user rows were refreshed. "Right now" in the first line
+    has to mean the same thing for all three rows.
     """
-    project = session.get(Project, project_id)
+    project = session.get(Project, project_id, populate_existing=True)
     if project is None or project.tenant_id != tenant_id:
         raise InvError(RES_NODE_NOT_FOUND, "project not found")
     user = session.get(User, user_id, populate_existing=True, with_for_update={"read": True})

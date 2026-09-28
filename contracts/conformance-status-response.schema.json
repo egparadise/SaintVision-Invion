@@ -1,0 +1,82 @@
+{
+  "$defs": {
+    "ConformanceCheckDescriptor": {
+      "additionalProperties": false,
+      "description": "One check the conformance contract defines, named and gated.\n\nA descriptor, not a result: there is no ``passed`` here because nothing has\nbeen observed. Read from ``adapters.conformance.CHECKLIST``, which is the\nsingle source for the list.",
+      "properties": {
+        "capabilityGated": {
+          "title": "Capabilitygated",
+          "type": "boolean"
+        },
+        "name": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "capabilityGated"
+      ],
+      "title": "ConformanceCheckDescriptor",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "What this platform can honestly say about adapter conformance (G-03).\n\nPhase one says **NOT_OBSERVED** and nothing more, because nothing is stored:\n``run_conformance`` has no product caller and no table. The consequences are\nin the field list rather than in a comment --\n\n* ``status`` is ``Literal[\"NOT_OBSERVED\"]``, one value. A widened literal\n  would advertise ``RECORDED`` in the generated schema before any code can\n  produce it; phase two brings that branch in with the counts that make it\n  mean something.\n* there is **no** ``conformant`` boolean. A boolean has no third value, so\n  \"not measured\" would have to be spelled ``false``, which reads as \"it was\n  run and it failed\".\n* there are **no counts**. ``passed: 0`` is not the absence of a\n  measurement; it is a measurement of zero.\n* ``recordedAt`` is typed ``None``: the only honest value is null, so the\n  contract says so rather than trusting the route.\n\n``scope`` is the same word ``GET /v1/adapters`` uses. The project in the path\nis who may read this, not who owns it: conformance is a property of the\ncontrol-plane host, not of a tenant's data.",
+  "properties": {
+    "adapters": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Adapters",
+      "type": "array"
+    },
+    "checks": {
+      "items": {
+        "$ref": "#/$defs/ConformanceCheckDescriptor"
+      },
+      "title": "Checks",
+      "type": "array"
+    },
+    "contractVersion": {
+      "maxLength": 32,
+      "minLength": 1,
+      "title": "Contractversion",
+      "type": "string"
+    },
+    "reason": {
+      "maxLength": 300,
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    },
+    "recordedAt": {
+      "title": "Recordedat",
+      "type": "null"
+    },
+    "scope": {
+      "const": "control-plane-host",
+      "title": "Scope",
+      "type": "string"
+    },
+    "status": {
+      "const": "NOT_OBSERVED",
+      "title": "Status",
+      "type": "string"
+    }
+  },
+  "required": [
+    "status",
+    "reason",
+    "scope",
+    "contractVersion",
+    "adapters",
+    "checks",
+    "recordedAt"
+  ],
+  "title": "ConformanceStatusResponse",
+  "type": "object"
+}
