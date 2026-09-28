@@ -431,6 +431,26 @@ def test_repository_registry_targets_match_current_tree_and_pitr_is_weekly_regis
         "operator": "gte",
         "value": 1,
     }
+    restore = next(
+        row
+        for row in registry["targets"]
+        if row["targetId"] == "s11-irreversible-restore-forward-v0"
+    )
+    assert restore["criteria"]["negativeFixturePassCount"] == {
+        "operator": "eq",
+        "value": 4,
+    }
+    reversible = next(
+        row
+        for row in registry["targets"]
+        if row["targetId"] == "s11-migration-reversible-roundtrip-v1"
+    )
+    assert reversible["axis"] == "migration-reversible-segment"
+    assert reversible["criteria"] == {
+        "catalogMismatchCount": {"operator": "eq", "value": 0},
+        "reversibleRoundtripPassCount": {"operator": "eq", "value": 1},
+        "sentinelMismatchCount": {"operator": "eq", "value": 0},
+    }
 
 
 def test_required_target_map_rejects_old_pitr_target(allowlist):
