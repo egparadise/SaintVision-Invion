@@ -53,22 +53,28 @@ describe('S09-FE: Natural Language Run Requester, Budget Quota & Bounded Repair 
 
       const created = mgr.createRunRequest('Fix race condition in threadpool', ['src/threads.ts']);
       expect(created.success).toBe(true);
+      expect(created.request!.boundedRepairLoops).toBe(0);
       const reqId = created.request!.id;
 
-      // Loop 1 -> 2
+      // Loop 0 -> 1 (1st repair iteration)
       const step1 = mgr.advanceRepairLoop(reqId);
       expect(step1.canRepair).toBe(true);
-      expect(step1.currentLoops).toBe(2);
+      expect(step1.currentLoops).toBe(1);
 
-      // Loop 2 -> 3 (max limit reached)
+      // Loop 1 -> 2 (2nd repair iteration)
       const step2 = mgr.advanceRepairLoop(reqId);
       expect(step2.canRepair).toBe(true);
-      expect(step2.currentLoops).toBe(3);
+      expect(step2.currentLoops).toBe(2);
 
-      // Loop 3 -> 4 (attempted breach of bound)
+      // Loop 2 -> 3 (3rd repair iteration, max limit reached)
       const step3 = mgr.advanceRepairLoop(reqId);
-      expect(step3.canRepair).toBe(false);
-      expect(step3.error).toContain('BOUNDED_LOOP_EXCEEDED');
+      expect(step3.canRepair).toBe(true);
+      expect(step3.currentLoops).toBe(3);
+
+      // Loop 3 -> 4 (4th attempt: bound exceeded)
+      const step4 = mgr.advanceRepairLoop(reqId);
+      expect(step4.canRepair).toBe(false);
+      expect(step4.error).toContain('BOUNDED_LOOP_EXCEEDED');
 
       // Request status transitions to rejected
       const updatedReq = mgr.getRequests().find((r) => r.id === reqId);
