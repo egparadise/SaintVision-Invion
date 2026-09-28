@@ -1,20 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.206"
+version: "1.0.207"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T10:16:34+09:00"
+updated: "2026-09-28T11:12:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
 
-## 2026-09-28 S11-BE·S11-DB AC-11 통합 인수 설계 v1.1 — Claude 재검토 요청
+## 2026-09-28 S11-BE·S11-DB AC-11 통합 인수 설계 v1.1.1 — Claude 재검토 요청
 
 - migration을 가역 `forward→downgrade→forward`와 비가역 `forward→verified restore→forward`로 분리했다. 현재 head `0046_model_manifest_readiness`는 비가역이고 reversible tail이 0개이므로 no-op downgrade를 PASS로 세지 않는다.
 - PR #126 CX01 hosted restore, VF-CL-04 readiness/retention, S05 hosted 두 비교군을 재사용하되 실제 PITR·5노드·장시간·완전한 security/accessibility는 `NOT_OBSERVED`/`BLOCKED_EXTERNAL`로 유지한다.
-- Claude r1 수정 요청에 따라 verdict 닫힌 enum·필수 8축 allowlist·집계기 재계산, `d74e82ec` 목표 결속, forward 후 sentinel/손실형 가역/catalog fingerprint, security allowlist v0, OPEN evidence digest·만료 기준점을 v1.1에 반영했다. 구현·실행·registry 변경은 없고 S11-BE/S11-DB/AC-11은 `planned`다. [[S11-BE_DB_AC-11_통합_인수_설계]], [[2026-09-28_10-16-34_KST_S11_AC11_통합인수_설계_Codex]].
+- Claude r1 수정 요청에 따라 verdict 닫힌 enum·필수 8축 allowlist·집계기 재계산, `d74e82ec` 목표 결속, forward 후 sentinel/손실형 가역/catalog fingerprint, OPEN evidence digest·만료 기준점을 v1.1에 반영했다. r2 조건으로 `s11-security-allowlist-v0.json`에 실제 VF runner·workflow·시험 blob과 node ID 5개, RLS accepted 3건의 사전 disposition을 고정하고 definer/RLS 결과·exit의 severity/verdict 표를 v1.1.1에 추가했다. 구현·실행·registry 변경은 없고 S11-BE/S11-DB/AC-11은 `planned`다. [[S11-BE_DB_AC-11_통합_인수_설계]], [[2026-09-28_10-16-34_KST_S11_AC11_통합인수_설계_Codex]].
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 

@@ -1,11 +1,11 @@
 ---
 doc_id: "DESIGN-S11-AC11-ACCEPTANCE-001"
 title: "S11-BE·S11-DB AC-11 통합 인수 설계"
-version: "1.1.0"
+version: "1.1.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T10:51:00+09:00"
+updated: "2026-09-28T11:12:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tasks: ["S11-BE", "S11-DB"]
@@ -55,7 +55,7 @@ tags: ["s11", "acceptance", "migration", "rollback", "restore", "slo", "fail-clo
 
 | matrix | 대상 | 절차 | 합격 조건 |
 |---|---|---|---|
-| `reversible-segment` | PR이 추가·변경한 가역 revision과 최신 비가역 revision 위의 연속 가역 tail | 각 case마다 새 DB → `down_revision`까지 upgrade → sentinel seed → 대상 revision forward → downgrade → 같은 revision forward | 세 단계 exit 0, sentinel·권한·sequence 보존, downgrade 뒤 추가 객체 소거, 재-forward 뒤 schema·RLS·DEFINER 불변식 일치 |
+| `reversible-segment` | PR이 추가·변경한 가역 revision과 최신 비가역 revision 위의 연속 가역 tail | 각 case마다 새 DB → `down_revision`까지 upgrade → sentinel seed → 대상 revision forward → downgrade → 같은 revision forward | 세 단계 exit 0, sentinel·권한·sequence 보존, downgrade 뒤 §2.2 기준 DB catalog fingerprint 동등, 재-forward 뒤 schema·RLS·DEFINER 불변식 일치 |
 | `irreversible-restore` | `check_migration_upgrade.py`의 공개 starting state → 현재 head와, PR이 추가한 비가역 revision | 각 case마다 새 DB → starting state → sentinel·fingerprint → 사전 snapshot → head forward → snapshot을 다른 새 DB에 restore → head forward | downgrade 호출 0, restore 무결성·데이터 보존·최종 head·권한/RLS/DEFINER 불변식, 두 DB 모두 정리 |
 
 매 PR은 변경된 migration case를 필수로 실행한다. scheduled/manual opt-in은 `check_migration_upgrade.py`가 명시적으로 지원하는 curated published-prior matrix 전체를 실행한다. 이 목록은 모든 역사 revision과 같다는 뜻이 아니다. 별도 manifest에서 지원 대상으로 선언한 published prior가 matrix에서 빠지거나, matrix가 graph에 없는 revision을 포함하면 `INVALID_RUN`이며 결과를 본 뒤 prior를 삭제할 수 없다.
@@ -110,6 +110,8 @@ fixture가 revision에 존재하지 않는 열을 요구하거나 owner-only tri
 | 한 DB를 case 간 재사용하거나 residue 존재 | FAIL |
 | JUnit은 green인데 JSON에 실패/누락이 존재 | `INVALID_RUN` |
 
+정적 사전 검사가 `downgrade(): pass`를 먼저 `INVALID_RUN`으로 거부한다. 이 검사가 빠진 변이는 실행 단계의 기준 DB catalog fingerprint에서 다시 FAIL해야 한다. 둘 중 하나라도 없는 구현은 승인하지 않는다.
+
 ## 3. restore·PITR 증거 경계
 
 ### 3.1 재사용하는 hosted restore 증거
@@ -146,6 +148,8 @@ fixture가 revision에 존재하지 않는 열을 요구하거나 owner-only tri
 
 집계기는 `comparableGroup`이 같은 수치만 median/percentile로 합친다. 제품 tree, runner, PostgreSQL 설정, topology, 관측자 유무가 다르면 별도 행이다. 기존 evidence의 목표가 사전 등록되지 않았으면 `NOT_REGISTERED`로 보고하고, 결과를 본 뒤 목표를 정해 과거 run을 PASS로 만들지 않는다. 위 artifact metadata의 오래 남는 기준점은 `Evidence/s11-ac11-source-baseline.json`이다. 단, OPEN PR의 blob은 integration 증거가 아니며 CX01 run-specific JSON 부재도 그대로 gap이다.
 
+#126·#148·#151의 기존 schema에는 `checkoutTreeSha`·`cleanCheckout`이 없고 #126은 merge ref checkout이었다. 따라서 세 run은 모두 **참고 전용**이며 AC-11 PASS 분자에 들어가지 않는다. 새 schema로 sourceHead tree·clean checkout을 다시 증명한 run만 판정 입력이 된다.
+
 ### 4.2 사전 등록된 목표와 신규 목표 규칙
 
 이미 측정보다 앞서 Git에 등록된 목표는 아래와 같다. 둘 다 commit `d74e82ec5d0dda0b9f379e56fea2aad2a9b714f3`(2026-09-09)의 blob을 `targetRef`로 쓴다.
@@ -153,7 +157,7 @@ fixture가 revision에 존재하지 않는 열을 요구하거나 owner-only tri
 | metric | targetRef | 목표 | 이 설계의 판정 |
 |---|---|---|---|
 | AC-05 50동시 배치 | `docs/vault/30_Development/Sprints/S05 자원 배치.md` at `d74e82ec` | 초과 예약 0, all-request P95 ≤ 2초 | hosted 합성-node rung은 **참고값**이다. 물리 5노드·정본 topology가 아니므로 목표와 숫자 비교는 보고하되 AC-05 PASS로 세지 않는다. |
-| 복구 RPO/RTO·보존 | `docs/vault/30_Development/DB 최종 개발 계획.md` at `d74e82ec` | RPO ≤15분, RTO ≤1시간, 35일 보존 | 실제 별도 장애 영역 복구와 운영 archive가 없으므로 `NOT_OBSERVED`/`BLOCKED_EXTERNAL`; readiness·same-host rehearsal로 PASS 금지. |
+| 복구 RPO/RTO·보존 | `docs/vault/30_Development/DB 최종 개발 계획.md` at `d74e82ec` | RPO ≤15분, RTO ≤1시간, 35일 보존, 매주 restore smoke | 실제 별도 장애 영역 복구와 운영 archive·주간 반복 증거가 없으므로 `NOT_OBSERVED`/`BLOCKED_EXTERNAL`; readiness·same-host rehearsal로 PASS 금지. |
 
 VF-CL-04 파일럿 retention 기본값 **7일**과 정본 DB 계획의 **35일**은 불일치다. 7일 dry-run은 운영 35일 목표의 합격 증거가 아니며, 운영 결정이 35일을 바꾸려면 새 목표 문서를 **측정 전에** merge해야 한다. 그 전까지 보존 축은 미충족이다.
 
@@ -177,9 +181,25 @@ VF-CL-04 파일럿 retention 기본값 **7일**과 정본 DB 계획의 **35일**
 |---|---|---|---|
 | `SEC-DEF-001` | `tools/check_definer_functions.py` `5831f8d8…3952` + `definer-policy.json` `c1581f1f…70e` | SECURITY DEFINER owner/search_path/EXECUTE 정책 drift | 미등록 definer·PUBLIC EXECUTE·비고정 search_path = high |
 | `SEC-RLS-001` | `tools/collect_rls_evidence.py` `329da31a…932` + `rls-boundary-baseline.json` `698a5b55…404` | tenant isolation·RLS boundary evidence | reachable cross-tenant read/write 또는 fail-open provenance = critical; 미측정 = NOT_OBSERVED |
-| `SEC-VF-001` | `tools/run_vf_security_tests.py` `d9a40a03…8d8` | VF security test manifest가 명시한 인증·비밀·경계 시나리오 | policy bypass/credential disclosure = critical, 다른 강제 경계 회귀 = high |
+| `SEC-VF-001` | `Evidence/s11-security-allowlist-v0.json`이 runner/workflow/test 3파일 blob과 required node ID 5개를 고정 | 승인 중복·회수, catalogue owner scope, current permission, login/approval/logout 경계 | policy bypass/credential disclosure = critical, 다른 강제 경계 회귀 = high |
 
-도구·blob·범위·severity mapping·threat ID 중 하나라도 문서 갱신 없이 바뀌면 `INVALID_RUN`이다. allowlist 도구 report 누락은 `NOT_OBSERVED`, accepted-with-expiry가 만료되면 `MEASURED_FAIL`이다. 새 scanner는 이 표를 merge한 뒤에만 분모에 넣는다.
+`SEC-VF-001`의 정본 invocation은 `tools/run_vf_security_tests.py tests/integration/test_desktop_browser.py tests/integration/test_approval_browser.py tests/integration/test_studio_browser.py`이고, workflow가 요구하는 node ID 집합이 manifest와 exact match해야 한다. argv로 다른 파일을 넘기거나 node ID가 빠지면 `INVALID_RUN`이다.
+
+`rls-boundary-baseline.json`의 기존 accepted 3건은 manifest에서 측정 전에 disposition을 정한다. `inv_app/public.tenants` E2~E5는 cross-tenant registry 관찰이 남아 있어 `accepted-with-expiry(2026-10-31T23:59:59+09:00)`, discovery issuer의 tenant-id-only grant와 NOLOGIN budget guard는 migration/grant proof가 있는 `false-positive-with-proof`다. baseline 항목이 manifest와 exact match하지 않거나 expiry가 지나면 각각 `INVALID_RUN` 또는 `MEASURED_FAIL`이다.
+
+#### 도구 결과 → severity/verdict 매핑
+
+| 도구 결과 | severity | AC-11 verdict |
+|---|---|---|
+| definer `unrecognized_privileged_function`, `runtime_role_bypasses_rls`, `runtime_can_create_in_trusted_schema`, `runtime_can_assume_function_owner` | critical | `MEASURED_FAIL` |
+| definer `definition_differs_from_policy`, `execute_grants_differ_from_policy`, `expected_privileged_function_missing` | high | `MEASURED_FAIL` |
+| definer `migration_revision_mismatch` | provenance 불일치 | `INVALID_RUN` |
+| definer `runtime_role_missing` | 관측 분모 불완전 | `NOT_OBSERVED` |
+| definer exit 0 / 1 / 2 | tool-scope pass / 위 problem별 판정 / 관측 불가 | `MEASURED_PASS` / 위 표 / `NOT_OBSERVED` |
+| RLS E1(role SUPERUSER/BYPASSRLS), E2(RLS enable+force), E3(unset 노출), E4(cross-tenant/identity mismatch), E5(unknown-tenant 노출), E6(PUBLIC definer EXECUTE) | critical | baseline disposition으로 제거되지 않은 1건이라도 `MEASURED_FAIL` |
+| RLS exit 0 / 1 / 2 / 3 | tool-scope pass / 위반 / 관측 불가 / identity unmeasured | `MEASURED_PASS` / `MEASURED_FAIL` / `NOT_OBSERVED` / `NOT_OBSERVED` |
+
+도구·blob·범위·severity mapping·threat ID 중 하나라도 문서 갱신 없이 바뀌면 `INVALID_RUN`이다. allowlist 도구 report 누락은 `NOT_OBSERVED`, accepted-with-expiry가 만료되면 `MEASURED_FAIL`이다. 새 scanner는 이 표를 merge한 뒤에만 분모에 넣는다. `check_definer_functions.py`에는 검토에서 열거한 8개 외에도 실제 code `expected_privileged_function_missing`이 있으므로 위 표가 함께 fail-closed로 포함한다.
 
 ### 4.4 SLO 부정 시험
 
@@ -215,9 +235,9 @@ hosted 결과에는 runner 사양과 “로컬/물리 5노드와 직접 비교 �
 5. **물리/외부:** CX-09 실제 PITR, 5노드 부하·복구, 장시간 soak와 사용자 접근성 인수를 별도 실행한다.
 6. **최종 판정:** 아래 필수 축은 모두 집계기가 재계산한 `MEASURED_PASS`여야 AC-11이 `done`이다. 알려진 critical/high 미완화가 1건 이상이면 즉시 FAIL이다. 차단 verdict를 나열하는 방식은 쓰지 않는다.
 
-필수 축은 `(1) migration reversible-segment, (2) irreversible restore/forward, (3) actual PITR·RPO/RTO·retention, (4) AC-05 load SLO, (5) physical 5-node load/recovery, (6) long soak, (7) security critical/high zero, (8) accessibility/E2E`다. 축 누락은 `INVALID_RUN`이다.
+필수 축은 `(1) migration reversible-segment, (2) irreversible restore/forward, (3) actual PITR·RPO/RTO·retention, (4) physical 5-node AC-05 placement load SLO, (5) physical 5-node failure detection/recovery SLO, (6) long soak, (7) security critical/high zero, (8) accessibility/E2E`다. hosted synthetic load는 별도 참고행이며 필수 PASS 축이 아니다. 축 누락은 `INVALID_RUN`이다.
 
-유일한 구조 예외는 `reversible-segment`다. targetRef에 고정된 graph가 reversible tail 0을 증명한 경우에만 미리 선언한 `NOT_APPLICABLE(no reversible tail)`을 허용하고, 짝인 `irreversible restore/forward`가 `MEASURED_PASS`여야 한다. 이때 reversible 축은 필수 집합에서 조건부 제외될 뿐 PASS 분자에 들어가지 않는다. 다른 축의 `NOT_APPLICABLE`, 모든 축의 `NOT_APPLICABLE`, `NOT_REGISTERED`, `NOT_OBSERVED`, `BLOCKED_EXTERNAL`, `MEASURED_FAIL`, `INVALID_RUN`은 모두 `done`을 막는다.
+유일한 구조 예외는 `reversible-segment`다. `sourceHeadSha`의 graph가 reversible tail 0을 증명한 경우에만 미리 선언한 `NOT_APPLICABLE(no reversible tail)`을 허용하고, 짝인 `irreversible restore/forward`가 `MEASURED_PASS`여야 한다. 이때 reversible 축은 필수 집합에서 조건부 제외될 뿐 PASS 분자에 들어가지 않는다. 다른 축의 `NOT_APPLICABLE`, 모든 축의 `NOT_APPLICABLE`, `NOT_REGISTERED`, `NOT_OBSERVED`, `BLOCKED_EXTERNAL`, `MEASURED_FAIL`, `INVALID_RUN`은 모두 `done`을 막는다.
 
 집계기 부정 시험은 최소 세 건을 고정한다: 모든 축 `NOT_APPLICABLE` → not done, verdict 문자열 `"PASS"` → `INVALID_RUN`, 필수 축 하나 누락 → `INVALID_RUN` + not done.
 
@@ -228,8 +248,9 @@ hosted 결과에는 runner 사양과 “로컬/물리 5노드와 직접 비교 �
 | migration forward/rollback/forward | 설계만 존재; current reversible tail 0, 조건부 `NOT_APPLICABLE`이지만 짝인 restore PASS 전에는 gate 미충족 |
 | irreversible restore/forward | 설계만 존재; #126은 후보 restore 증거, integration 판정 미수행 |
 | actual PITR | `BLOCKED_EXTERNAL(CX-09)` |
-| hosted synthetic load | 기존 참고 수치 존재; 물리 5노드 AC-05 판정 아님 |
-| physical 5-node load/recovery | `NOT_OBSERVED` |
+| hosted synthetic load (non-gate reference) | 기존 참고 수치 존재; PASS 분자·물리 5노드 AC-05 판정 아님 |
+| physical 5-node AC-05 placement load | `NOT_OBSERVED` |
+| physical 5-node failure detection/recovery | `NOT_OBSERVED` |
 | long soak | `NOT_OBSERVED` |
 | security critical/high zero | 완전한 allowlisted report 전 `NOT_OBSERVED` |
 | accessibility/E2E | 동일 release SHA 통합 전 `NOT_OBSERVED` |

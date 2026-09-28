@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "verifiedAt": "2026-09-28T10:51:00+09:00",
+  "verifiedAt": "2026-09-28T11:12:00+09:00",
   "sources": [
     {
       "sourceRunId": "36355139230",
@@ -23,6 +23,7 @@
       "expiresAt": "2026-10-12T00:30:21Z",
       "committedRunEvidencePath": "docs/vault/30_Development/Evidence/s05-card46-legacy-staircase-36362386530.json",
       "committedRunEvidenceBlob": "ff6af4314b955eb8e669f64bc63cd756d170b374",
+      "candidateEvidenceCommit": "6bb94a2a62cdfb65cf354ccdb2e82722183ad3fa",
       "boundary": "Hosted synthetic-node reference only; not physical five-node AC-05 adjudication."
     },
     {
@@ -35,6 +36,7 @@
       "expiresAt": "2026-10-12T00:46:10Z",
       "committedRunEvidencePath": "docs/vault/30_Development/Evidence/s05-card47-clean-base-36363327477.json",
       "committedRunEvidenceBlob": "904b90306dd870936dc293816751d082aa554c7c",
+      "candidateEvidenceCommit": "6bb94a2a62cdfb65cf354ccdb2e82722183ad3fa",
       "boundary": "Hosted clean-base compatibility result; not canonical decision evidence and not physical five-node AC-05 adjudication."
     }
   ]
