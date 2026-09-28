@@ -108,7 +108,7 @@ hosted job은 label 또는 `workflow_dispatch` opt-in이며 job 수준 `cancel-i
 
 - axis: `long-soak`.
 - requiredEnvironment: `topology=physical-five-node`, `eligibleNodeCount=4`, `excludedNodeCount=1`, `sameHost=false`, `faultInjection=controlled-v1`.
-- criteria: window ≥ 86,400초, attempted operations ≥ 1,000, corruption escape·false success·committed object loss·quota overshoot·classification mismatch·unexpected error·cleanup residue 모두 0, memory growth ≤ 256MiB, FD growth ≤ 32, DB connection growth ≤ 4.
+- criteria: window ≥ 86,400초, attempted operations ≥ 1,000, corruption·capacity·partial-write/durability 각 1건을 포함한 observed storage fault ≥ 3, fault 뒤 recovery pass ≥ 3, corruption escape·false success·committed object loss·quota overshoot·classification mismatch·unexpected error·cleanup residue 모두 0, memory growth ≤ 256MiB, FD growth ≤ 32, DB connection growth ≤ 4.
 - hosted 1시간 storage fault soak은 reference evidence이며 이 axis envelope로 제출하면 `INVALID_RUN`이다.
 
 ### 4.3 `s11-st-actual-pitr-archive-failure-v0`
@@ -119,7 +119,7 @@ hosted job은 label 또는 `workflow_dispatch` opt-in이며 job 수준 `cancel-i
 - criteria: 연속 주간 restore smoke ≥ 2주, smoke gap ≤ 7일, retention ≥ 35일, RPO ≤ 900초, RTO ≤ 3,600초, WAL archive failure ≥ 1, silent archive loss ≥ 1, retention interruption ≥ 1, fault 뒤 recovery pass ≥ 3, false PITR pass·retained-boundary deletion·cleanup residue 모두 0.
 - `pitr_readiness`, `pitr_opt_in_dry_run`, same-host `pitr_rehearsal.sh`, hosted MinIO/PG는 reference observation만 허용한다.
 
-두 target의 `sourceDocument`는 [[S11_ST_storage_failure_target_v0]]의 commit `2ac98cbec2873463f91561a20a706abeb0d776a5`, path `docs/vault/30_Development/S11_ST_storage_failure_target_v0.md`, blob `a9f5f950c14fd4b4d91f6647c5c8473a66e2c5af`를 가리킨다. 이 commit이 integration 조상으로 남도록 이 PR은 merge commit 방식(`--merge`)으로만 병합하고 squash·rebase 병합을 금지한다. envelope의 `targetRef`는 정본 registry commit/path/blob·targetId·criteria exact set을 사용한다. source document와 registry가 `sourceHeadSha`의 조상이 아니거나 source tree의 blob과 다르면 `INVALID_RUN`이다.
+두 target의 `sourceDocument`는 [[S11_ST_storage_failure_target_v0]]의 commit `0606e594f18172a17415f378b258ff4e0ee8d8e8`, path `docs/vault/30_Development/S11_ST_storage_failure_target_v0.md`, blob `d75132a53b7a879df48e02c8b1caf65b9dfe35cf`를 가리킨다. 이 commit이 integration 조상으로 남도록 이 PR은 merge commit 방식(`--merge`)으로만 병합하고 squash·rebase 병합을 금지한다. envelope의 `targetRef`는 정본 registry commit/path/blob·targetId·criteria exact set을 사용한다. source document와 registry가 `sourceHeadSha`의 조상이 아니거나 source tree의 blob과 다르면 `INVALID_RUN`이다.
 
 ## 5. evidence와 fail-closed 판정
 
@@ -166,11 +166,11 @@ release manifest는 모든 축의 `sourceHeadSha == releaseSha`를 요구하므�
 
 | case/범위 | 재사용 | 새로 필요한 것 |
 |---|---|---|
-| S3 corruption·provider 오류 | #173 `tests/core/test_s3_object_store.py`의 body/metadata/size drift, 403·412 시험 | 제품 route·case identity·raw artifact importer |
-| Local corruption·quota | #173 `tests/integration/test_snapshots.py`의 restore rehash, 8-thread quota, publication-before-metadata crash | Local `ENOSPC`/`EDQUOT`·fsync fault exact 분류 |
-| WAL archive failure | `tests/integration/test_recovery_drill.py`의 `/bin/false`·`/bin/true` archiver와 `tools/recovery_drill.py`; G-02 #181/#187 실행자 주입 경로 | `BAK-03` empty/truncated byte와 restore 검증, AC-11 importer |
+| S3 corruption·provider 오류 | #173 `tests/core/test_s3_object_store.py:126,135,146-156`의 403·412와 body/metadata/size drift | 제품 route·case identity·raw artifact importer |
+| Local corruption·quota | #173 `tests/integration/test_snapshots.py:83,151-161,183`의 publication-before-metadata crash, restore rehash, 8-thread quota | Local `ENOSPC`/`EDQUOT`·fsync fault exact 분류 |
+| WAL archive failure | `tests/integration/test_recovery_drill.py:488-489,560-569`의 `/bin/false`·`/bin/true`, `tools/recovery_drill.py:444-506`; G-02 #181/#187 실행자 주입 경로 | `BAK-03` empty/truncated byte와 restore 검증, AC-11 importer |
 | retention | #150 `pitr_archive_retention.py` plan/apply, readiness·dry-run | receipt/journal, interrupted apply retry, 35일 운영 target |
-| 물리 disk full·quota | 없음 | 실장비 target·ADR-100 inventory; `BLOCKED_EXTERNAL` |
+| 물리 disk full·quota | 없음 | `s11-long-soak-physical-five-node-v0`의 controlled fault 3종 중 capacity case; 자원 제공 전 `BLOCKED_EXTERNAL` |
 | part 중단/재개·GC/upload 경합·Workspace restore | Storage 계획과 기존 snapshot/Workspace 카드 | 이 설계의 22-case 밖이며 별도 owner 카드; AC-11 완료 전에 evidence 공백 지도에서 추적 |
 | 실제 backup 매체·네트워크 장애 | 없음 | 별도 장애 영역과 운영 자격; `BLOCKED_EXTERNAL` |
 

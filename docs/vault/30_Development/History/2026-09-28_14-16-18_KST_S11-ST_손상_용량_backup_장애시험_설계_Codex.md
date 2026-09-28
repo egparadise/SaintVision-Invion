@@ -35,7 +35,7 @@ reviewer: "Claude"
 
 ## 사전 등록
 
-- target 기준 문서는 [[S11_ST_storage_failure_target_v0]]이며 고정 commit `2ac98cbec2873463f91561a20a706abeb0d776a5`, blob `a9f5f950c14fd4b4d91f6647c5c8473a66e2c5af`를 사용한다. 이 commit이 조상으로 남도록 merge commit 병합만 허용한다.
+- target 기준 문서는 [[S11_ST_storage_failure_target_v0]]이며 고정 commit `0606e594f18172a17415f378b258ff4e0ee8d8e8`, blob `d75132a53b7a879df48e02c8b1caf65b9dfe35cf`를 사용한다. 물리 long-soak은 corruption·capacity·durability 부류별 주입을 포함한 관측 fault 3건과 fault 뒤 recovery 3건을 양의 기준으로 요구해 무주입 zero-count PASS를 막는다. 이 commit이 조상으로 남도록 merge commit 병합만 허용한다.
 - 정본 registry patch는 `Evidence/s11-st-failure-target-registry-patch-v0.json`에 review artifact로 남기되 `consumableAsTargetRef=false`다. predecessor는 #177 head `b246e7dbd597db52ae5c16be4c0a03ffd056ab93`, registry blob `99e64cb4125d47ae681a2e8e7c8f76c05193a892`다. #177 병합 뒤 정본 registry·집계기·importer pin이 함께 바뀌기 전 측정 금지다.
 - raw case identity 22개의 sorted compact JSON SHA-256은 `5d700981ee429ebbfc66b8ed28d8dc9e37e16e327a673d6061bdec5e7e334fd9`다.
 

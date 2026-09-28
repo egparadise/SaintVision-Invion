@@ -19,13 +19,15 @@
       "targetId": "s11-long-soak-physical-five-node-v0",
       "axis": "long-soak",
       "sourceDocument": {
-        "commit": "2ac98cbec2873463f91561a20a706abeb0d776a5",
+        "commit": "0606e594f18172a17415f378b258ff4e0ee8d8e8",
         "path": "docs/vault/30_Development/S11_ST_storage_failure_target_v0.md",
-        "blob": "a9f5f950c14fd4b4d91f6647c5c8473a66e2c5af"
+        "blob": "d75132a53b7a879df48e02c8b1caf65b9dfe35cf"
       },
       "criteria": {
         "windowSeconds": {"operator": "gte", "value": 86400},
         "attemptedOperationCount": {"operator": "gte", "value": 1000},
+        "observedStorageFaultCaseCount": {"operator": "gte", "value": 3},
+        "recoveryAfterStorageFaultPassCount": {"operator": "gte", "value": 3},
         "corruptionEscapeCount": {"operator": "eq", "value": 0},
         "falseSuccessCount": {"operator": "eq", "value": 0},
         "committedObjectLossCount": {"operator": "eq", "value": 0},
@@ -49,9 +51,9 @@
       "targetId": "s11-st-actual-pitr-archive-failure-v0",
       "axis": "actual-pitr-rpo-rto-retention",
       "sourceDocument": {
-        "commit": "2ac98cbec2873463f91561a20a706abeb0d776a5",
+        "commit": "0606e594f18172a17415f378b258ff4e0ee8d8e8",
         "path": "docs/vault/30_Development/S11_ST_storage_failure_target_v0.md",
-        "blob": "a9f5f950c14fd4b4d91f6647c5c8473a66e2c5af"
+        "blob": "d75132a53b7a879df48e02c8b1caf65b9dfe35cf"
       },
       "criteria": {
         "consecutiveWeeklyRestoreSmokeWeeks": {"operator": "gte", "value": 2},
