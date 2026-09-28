@@ -50,6 +50,8 @@ jobs:
       INV_OBJECT_STORE_ACCESS_KEY_ID: product-store-ci
       INV_OBJECT_STORE_SECRET_ACCESS_KEY: product-store-ci-only-secret
       INV_OBJECT_STORE_REGION: us-east-1
+      INV_OBJECT_STORE_TARGET_KIND: ci-candidate
+      INV_EVIDENCE_CODE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
       # Role-shape rejection tests own a separate disposable cluster. Keep the
       # same explicit image opt-in as Backend Build, but let the normal Core
       # pytest collection execute the cases once instead of adding another
