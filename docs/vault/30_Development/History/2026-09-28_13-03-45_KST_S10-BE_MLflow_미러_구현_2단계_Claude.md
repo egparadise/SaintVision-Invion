@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-2026-09-28-S10-BE-MLFLOW-MIRROR-IMPL-2"
 title: "S10-BE MLflow 미러 구현 2단계 — 실 MLflow REST sink(push-only, transport seam, TRACK 매핑, provider 문구 비노출), tenant 범위 service credential 계약(0051, 0035 경계), worker 경로(credential→sink→deliver_intent, 부재·거부는 NOT_OBSERVED·refused), PG-free fake transport 20 + 실 PG 24 + opt-in run-mlflow live lane (카드 bh, PR #172 위 stack)"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T13:03:45+09:00"
+updated: "2026-09-28T13:06:57+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "41256e4f"
@@ -36,9 +36,9 @@ tags: ["S10-BE", "AC-10", "mlflow", "tracking", "credential", "ci", "claude"]
 
 로컬(3.10, 가벼운 명령): PG-free `test_mlflow_sink`+`test_tracking_canonical`+`test_tracking_sink`+`test_migrations`+`test_adapters`+`test_service_credentials`(PG-free 1) **180 passed / 24 skipped(DSN 없음)**; offline render에 0051 DDL 존재; `migration_graph` head 단일 `0051_service_credentials`. `tests/integration`은 3.11+ 전용(`inv.state` StrEnum)이라 로컬 미수집 → hosted.
 
-## 3. migration 번호
+## 3. migration 순서 (코디네이터 13:06 KST, v1.1 2026-09-28T13:06:57+09:00)
 
-0050은 카드 be(#174, Claude tab)가 #172 위에 stack. 이 PR은 **0051**, `down_revision=0049`. 0050이 먼저 병합되면 0051의 `down_revision`을 `0050_…`으로 1줄 재지정(두 head는 `migration_graph`·`test_migrations`가 거부).
+**0047(#128) → 0048(#159) → 0049(#172) → 0050(#174 `0050_dataset_digest_lookup`) → 0051(이 PR)**. 첫 push(head c7e6c1c9)는 `down_revision=0049`라 #174와 head가 갈라졌다. 조치: origin의 #174 head `4e575faf`를 이 branch에 merge(force-push 없음, 충돌은 Claude 작업판 1개: 양쪽 유지·version max+1)하고 `0051.down_revision = "0050_dataset_digest_lookup"`. 병합 순서 **#172 → #174 → #176**. 확인: `migration_graph` head 단일 `0051`, `test_migrations` 통과, hosted Backend.
 
 ## 4. 경계·다음
 

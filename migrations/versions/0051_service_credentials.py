@@ -1,13 +1,13 @@
 """Tenant-scoped service credentials for the MLflow mirror worker (design #168 §4).
 
 Revision ID: 0051_service_credentials
-Revises: 0049_mlflow_mirror
+Revises: 0050_dataset_digest_lookup
 Create Date: 2026-09-28
 
-Numbering: 0050 is reserved for card be (lineage index, Claude tab) and does
-not exist on this branch yet, so this revision takes 0051 and chains from
-0049. Whichever of 0050 and 0051 merges second re-points its ``down_revision``
-so the graph keeps one head (``tools/migration_graph.py`` refuses two).
+Numbering (coordinator 2026-09-28 13:06 KST): 0047 (#128) -> 0048 (#159) ->
+0049 (#172) -> 0050 (#174, dataset digest lookup) -> 0051 (this). This branch
+carries the #174 head merged in, so 0050 exists here and the graph has one
+head (``tools/migration_graph.py`` refuses two). Merge order #172 -> #174 -> #176.
 
 Two tables, both tenant-scoped under RLS. The application role may INSERT and
 SELECT; lifecycle columns (``revoked_at`` on a version, ``enabled`` and
@@ -32,7 +32,7 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 
 revision = "0051_service_credentials"
-down_revision = "0049_mlflow_mirror"
+down_revision = "0050_dataset_digest_lookup"
 branch_labels = None
 depends_on = None
 
