@@ -92,8 +92,13 @@ class Session:
         self.world = world
 
     def execute(self, statement, params=None):
+        sql = str(statement)
+        self.world["locks"].append({"sql": sql, "params": params})
+        if "lock_timeout" in sql:
+            # Card 122: the lane's lock-wait bound (SET LOCAL) is not a lock;
+            # it is asserted by statement, not by its place in the log.
+            return None
         self.world["log"].append("lock")
-        self.world["locks"].append({"sql": str(statement), "params": params})
         return None
 
     def get(self, _model, _key, **_kwargs):
@@ -411,7 +416,24 @@ def test_the_lock_is_taken_before_the_ledger_and_before_any_row(monkeypatch):
     post(client)
     assert world["log"].index("lock") < world["log"].index("ledger-read")
     assert world["log"].index("lock") < world["log"].index("suite-get")
-    assert "pg_advisory_xact_lock" in world["locks"][0]["sql"]
+    statements = [entry["sql"] for entry in world["locks"] if "lock_timeout" not in entry["sql"]]
+    assert "pg_advisory_xact_lock" in statements[0]
+
+
+def test_card122_both_spans_bound_their_lock_waits(monkeypatch):
+    """Card 122 (audit of #211): the permission preflight and the write
+    transaction both ``SET LOCAL lock_timeout`` before anything else they
+    execute, so a held key or a held row is refused after the budget instead
+    of waited on forever. The bound precedes the advisory lock in the write span."""
+    world = {}
+    client = build(monkeypatch, world)
+    post(client)
+    statements = [entry["sql"] for entry in world["locks"]]
+    bounds = [s for s in statements if s.startswith("SET LOCAL lock_timeout = '")]
+    assert len(bounds) == 2, statements
+    assert statements[0] == bounds[0]  # preflight span: the bound is its only statement
+    first_lock = next(i for i, s in enumerate(statements) if "pg_advisory_xact_lock" in s)
+    assert statements[first_lock - 1] == bounds[1]  # write span: bound, then the key lock
 
 
 @pytest.mark.parametrize(

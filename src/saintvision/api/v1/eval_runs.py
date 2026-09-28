@@ -50,6 +50,7 @@ from ...services import projects as project_service
 from ...services.audit import record_event
 from ...services.eval_execution import run_suite
 from .. import schemas
+from ..lock_wait import bounded_lock_wait
 from ..deps import (
     get_principal,
     get_settings,
@@ -230,7 +231,9 @@ async def start_eval_run(
     # nothing is held open while the body arrives.
     with factory() as session:
         with session.begin():
-            with tenant_scope(session, principal.tenant_id):
+            with tenant_scope(session, principal.tenant_id), bounded_lock_wait(
+                session, timeout_ms=settings.business_lock_timeout_ms
+            ):
                 _require_approval(session, principal=principal, project_id=project_id)
 
     key = _require_idempotency_key(idempotency_key)
@@ -253,7 +256,9 @@ async def start_eval_run(
     # resolve the adapter, re-check again, then spend.
     with factory() as session:
         with session.begin():
-            with tenant_scope(session, principal.tenant_id):
+            with tenant_scope(session, principal.tenant_id), bounded_lock_wait(
+                session, timeout_ms=settings.business_lock_timeout_ms
+            ):
                 # IDEM-6: the serialisation point comes before any resource row, in
                 # every route, so the lock order in this lane is one order.
                 serialise_idempotent_write(

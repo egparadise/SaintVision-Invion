@@ -25,12 +25,14 @@ from sqlalchemy.orm import sessionmaker
 from saintvision.api.app import create_app
 from saintvision.api.deps import get_principal, serialise_idempotent_write
 from saintvision.api.problem import CANONICAL_KEYS
-from saintvision.api.v1 import model_retention, model_versions, run_seal
+from saintvision.api.v1 import eval_runs, model_retention, model_versions, run_seal
 from saintvision.config import Settings
 from saintvision.db.session import tenant_scope
 from saintvision.identity.principal import Principal, StaticPrincipalVerifier
 from saintvision.ids import new_id
 from lock_wait_harness import within_deadline
+from test_eval_run_real_pg import StubAdapter
+from test_eval_run_real_pg import _seed as _seed_eval
 from test_model_release_real_pg import DECLARATION, _observation
 from test_model_release_real_pg import _seed as _seed_releasable
 from test_model_version_register_real_pg import _body as _register_body
@@ -375,3 +377,56 @@ def test_f1_release_ends_within_the_budget_when_the_callers_user_row_is_held_and
     with owner_engine.begin() as connection:
         stage = connection.execute(text("SELECT stage FROM model_versions WHERE model_version_id = :v"), {"v": seeded["version_id"]}).scalar_one()
     assert stage == "draft"
+
+
+# ---------------------------------------------------------------- W3 eval run (card 122)
+
+
+def test_card122_w3_eval_run_ends_within_the_budget_when_the_idempotency_key_is_held(
+    owner_engine, app_engine, two_tenants, clean_tables, monkeypatch
+):
+    """Card 122 audit: the eval-run route was the one business-lane write outside
+    the #211 bound. With its key held by another transaction it must answer the
+    canonical retryable 503 within the budget, and buy no run and no ledger row."""
+    tenant, _ = two_tenants
+    with owner_engine.begin() as connection:
+        seeded = _seed_eval(connection, tenant_id=tenant, now=NOW, label="lw-w3-key", role="approver", project_id="own")
+    monkeypatch.setattr(eval_runs.agents, "adapter_for", lambda _name: StubAdapter())
+    held = _Held(owner_engine).advisory(tenant_id=tenant, endpoint=eval_runs.ENDPOINT, key="k-held", project_id=seeded["project_id"])
+    try:
+        client = _client(app_engine, tenant_id=tenant, user_id=seeded["user_id"])
+        response, elapsed = _within_deadline(lambda: client.post(
+            f"/v1/projects/{seeded['project_id']}/eval/suites/{seeded['suite_id']}/runs",
+            json={"adapter": "claude-code"}, headers={"Idempotency-Key": "k-held", "Content-Type": "application/json"},
+        ))
+    finally:
+        held.close()
+    _canonical_503(response)
+    assert elapsed < DEADLINE_SECONDS
+    with owner_engine.begin() as connection:
+        assert connection.execute(text("SELECT count(*) FROM eval_runs WHERE tenant_id = :t"), {"t": tenant}).scalar_one() == 0
+        assert connection.execute(text("SELECT count(*) FROM idempotency_records WHERE tenant_id = :t"), {"t": tenant}).scalar_one() == 0
+
+
+def test_card122_w3_eval_run_ends_within_the_budget_when_the_callers_user_row_is_held(
+    owner_engine, app_engine, two_tenants, clean_tables, monkeypatch
+):
+    """The permission preflight reads the caller's user row FOR SHARE; a writer
+    holding it must not stall the route past the budget (the #211 F1 shape)."""
+    tenant, _ = two_tenants
+    with owner_engine.begin() as connection:
+        seeded = _seed_eval(connection, tenant_id=tenant, now=NOW, label="lw-w3-user", role="approver", project_id="own")
+    monkeypatch.setattr(eval_runs.agents, "adapter_for", lambda _name: StubAdapter())
+    held = _Held(owner_engine).row("users", "user_id", seeded["user_id"])
+    try:
+        client = _client(app_engine, tenant_id=tenant, user_id=seeded["user_id"])
+        response, elapsed = _within_deadline(lambda: client.post(
+            f"/v1/projects/{seeded['project_id']}/eval/suites/{seeded['suite_id']}/runs",
+            json={"adapter": "claude-code"}, headers={"Idempotency-Key": "k-user", "Content-Type": "application/json"},
+        ))
+    finally:
+        held.close()
+    _canonical_503(response)
+    assert elapsed < DEADLINE_SECONDS
+    with owner_engine.begin() as connection:
+        assert connection.execute(text("SELECT count(*) FROM eval_runs WHERE tenant_id = :t"), {"t": tenant}).scalar_one() == 0
