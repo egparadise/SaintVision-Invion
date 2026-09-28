@@ -564,7 +564,7 @@ def test_08_no_business_transaction_is_open_while_the_kernel_is_called(monkeypat
     client = build(monkeypatch, world)
     assert post(client).status_code == 200
     assert [fetch["depth"] for fetch in world["fetches"]] == [0]
-    assert world["spans"] == 2, "one preflight span and one atomic span"
+    assert world["spans"] == 3, "preflight, ledger lookup, and one atomic span"
     assert world["depth"] == 0
 
 
@@ -1192,7 +1192,7 @@ def test_card84_both_spans_bound_their_lock_waits(monkeypatch):
     client = build(monkeypatch, world)
     response = post(client)
     assert response.status_code == 200, response.text
-    assert world["lock_timeouts"] == ["SET LOCAL lock_timeout = '5000ms'"] * 2
+    assert world["lock_timeouts"] == ["SET LOCAL lock_timeout = '5000ms'"] * 3
 
 
 # ---------------------------------------------------------------------------
@@ -1200,11 +1200,13 @@ def test_card84_both_spans_bound_their_lock_waits(monkeypatch):
 # ---------------------------------------------------------------------------
 
 FULL_ORDER = [
-    "permission",                                    # span 1
-    "advisory-lock", "permission", "ledger-read",    # span 2, before any row
+    "permission",                                    # span 1: preflight
+    "permission", "ledger-read",                     # span 1b: replay/conflict before the kernel
+    "advisory-lock", "permission", "ledger-read",    # span 3, before any row (ledger again, under the lock)
     "parent-get", "version-lock", "permission",      # bind, lock, re-check
     "service", "audit", "ledger-write",              # write, audit, ledger
 ]
+REPLAY_ORDER = ["permission", "permission", "ledger-read"]
 LEDGER_PAYLOAD = {"modelId": MODEL, "version": VERSION, "request": DECLARATION}
 
 
@@ -1215,13 +1217,17 @@ def test_113_a_release_follows_the_lane_lock_order_and_stores_its_answer(monkeyp
     assert response.status_code == 200, response.text
     body = response.json()
     assert world["log"] == FULL_ORDER
-    assert world["spans"] == 2
+    assert world["spans"] == 3
     assert world["locks"] == [
         {"tenant_id": TENANT, "endpoint": model_release.ENDPOINT, "idempotency_key": KEY, "project_id": PROJECT}
     ]
-    assert world["ledger_reads"][0]["payload"] == LEDGER_PAYLOAD
-    assert world["ledger_reads"][0]["endpoint"] == model_release.ENDPOINT
-    assert world["ledger_reads"][0]["idempotency_key"] == KEY
+    assert len(world["ledger_reads"]) == 2
+    for read in world["ledger_reads"]:
+        assert read["payload"] == LEDGER_PAYLOAD
+        assert read["endpoint"] == model_release.ENDPOINT
+        assert read["idempotency_key"] == KEY and read["project_id"] == PROJECT
+    # The kernel was consulted exactly once, and only after the ledger miss.
+    assert len(world["fetches"]) == 1
     stored = world["stored"][0]
     assert stored["response_status"] == 200 and stored["response_body"] == body
     assert stored["payload"] == LEDGER_PAYLOAD and stored["endpoint"] == model_release.ENDPOINT
@@ -1245,21 +1251,71 @@ def test_113_a_missing_or_malformed_key_is_422_after_the_preflight_and_before_th
     body = canonical(response, code="VAL-0003", status=422)
     assert "Idempotency-Key" in body["detail"]
     # After the permission preflight (a non-member learns nothing from how the
-    # key is judged), before the body, the kernel and the write span.
+    # key is judged), before the body, the ledger, the kernel and the write span.
     assert world["log"] == ["permission"] and world["spans"] == 1
     assert world.get("fetches", []) == [] and world["released"] == []
 
 
+STORED = {"modelVersionId": VERSION_ID, "modelId": MODEL, "version": VERSION, "stage": "released", "contentSha256": SHA}
+
+
 def test_113_a_stored_answer_is_replayed_exactly_and_nothing_is_locked_released_or_mirrored(monkeypatch):
-    stored = {"modelVersionId": VERSION_ID, "modelId": MODEL, "version": VERSION, "stage": "released", "contentSha256": SHA}
-    world: dict = {"replay": stored, "row": Row(stage="released")}
+    world: dict = {"replay": STORED, "row": Row(stage="released")}
     client = build(monkeypatch, world)
     response = post(client)
     assert response.status_code == 200, response.text
-    assert response.json() == stored
-    # The ledger answered under the serialisation point, and the row was
-    # never bound, locked, released or audited; nothing was stored again.
-    assert world["log"] == ["permission", "advisory-lock", "permission", "ledger-read"]
+    assert response.json() == STORED
+    # The ledger answered in its own short span, before the kernel; the row
+    # was never bound, locked, released or audited; nothing was stored again.
+    assert world["log"] == REPLAY_ORDER and world["spans"] == 2
+    assert world["released"] == [] and world["audits"] == [] and world["stored"] == []
+    assert world.get("fetches", []) == []
+
+
+def test_113_F1_a_lost_response_is_replayed_while_the_kernel_is_unavailable(monkeypatch):
+    """Codex #229 F1: the stored 200 must not depend on the observation."""
+    world: dict = {"replay": STORED, "row": Row(stage="released"), "fetch_error": OSError("kernel down")}
+    client = build(monkeypatch, world)
+    response = post(client)
+    assert response.status_code == 200, response.text
+    assert response.json() == STORED
+    assert world.get("fetches", []) == []                 # the kernel was never called
+    assert world["log"] == REPLAY_ORDER
+    assert world["released"] == [] and world["audits"] == [] and world["stored"] == []
+
+
+def test_113_F1_a_conflicting_body_is_409_before_the_kernel_is_called(monkeypatch):
+    world: dict = {
+        "replay_error": InvError(GRAPH_IDEMPOTENCY_CONFLICT, "different body"),
+        "fetch_error": OSError("kernel down"),
+    }
+    client = build(monkeypatch, world)
+    body = canonical(post(client), code="GRAPH-0002", status=409)
+    assert body["detail"] == "That idempotency key was used with a different request."
+    assert world.get("fetches", []) == [] and world["log"] == REPLAY_ORDER
+    assert world["released"] == [] and world["stored"] == []
+
+
+def test_113_F2_only_a_ledger_miss_reaches_the_kernel_and_the_ledger_is_read_again_under_the_lock(monkeypatch):
+    """Two concurrent first requests converge: the early lookup misses, the
+    kernel is consulted, and the read under the advisory lock finds what the
+    other request committed meanwhile -- so this one replays instead of
+    releasing twice."""
+    answers = iter([None, STORED])
+    world: dict = {}
+    client = build(monkeypatch, world)
+
+    def replay_or_reserve(_session, **kwargs):
+        world["log"].append("ledger-read")
+        world["ledger_reads"].append(kwargs)
+        return next(answers)
+
+    monkeypatch.setattr(model_release, "replay_or_reserve", replay_or_reserve)
+    response = post(client)
+    assert response.status_code == 200, response.text
+    assert response.json() == STORED
+    assert len(world["fetches"]) == 1                   # the miss path fetched once
+    assert world["log"] == ["permission", "permission", "ledger-read", "advisory-lock", "permission", "ledger-read"]
     assert world["released"] == [] and world["audits"] == [] and world["stored"] == []
 
 
@@ -1295,14 +1351,16 @@ def test_113_an_already_released_version_under_another_key_is_409_not_a_second_r
     assert world["released"] == [] and world["audits"] == [] and world["stored"] == []
 
 
-def test_113_the_clock_is_read_once_after_the_lock_and_the_live_permission(monkeypatch):
+def test_113_the_write_clock_is_read_once_after_the_lock_and_the_live_permission(monkeypatch):
     world: dict = {}
     client = build(monkeypatch, world)
     assert post(client).status_code == 200
-    assert len(world["clock_reads"]) == 1
-    read_at = world["clock_reads"][0]
+    # Two reads: one for the early ledger lookup's expiry judgement, one --
+    # the write instant -- after the serialisation point and the permission.
+    assert len(world["clock_reads"]) == 2
+    read_at = world["clock_reads"][-1]
     log = world["log"]
-    assert log.index("advisory-lock") < read_at <= log.index("ledger-read")
+    assert log.index("advisory-lock") < read_at <= len(log) - 1 - log[::-1].index("ledger-read")
     # The one instant is what the service, the audit and the ledger carry.
     assert world["released"][0]["now"] == NOW
     assert world["audits"][0]["now"] == NOW
@@ -1313,6 +1371,7 @@ def test_113_permission_is_re_checked_after_the_row_lock(monkeypatch):
     """A revocation during the lock wait must not release."""
     world: dict = {"permissions": [
         {"canRequest": True, "canApprove": True},   # preflight
+        {"canRequest": True, "canApprove": True},   # ledger lookup span
         {"canRequest": True, "canApprove": True},   # after the advisory lock
         {"canRequest": True, "canApprove": False},  # after the row lock
     ]}
@@ -1334,7 +1393,9 @@ def test_113_the_route_reuses_the_lane_helpers_and_copies_none():
         assert helper in source, helper
     for copied in ("pg_advisory_xact_lock", "IdempotencyRecord", "hashlib.sha256(material"):
         assert copied not in source, copied
-    assert source.count("with factory() as session:") == 2
-    assert source.count("bounded_lock_wait(") == 2
+    # Three bounded spans: preflight, ledger lookup, write. The kernel is
+    # between the second and the third, with no transaction open.
+    assert source.count("with factory() as session:") == 3
+    assert source.count("bounded_lock_wait(") == 3
     # The kernel observation is fetched with no transaction open, still.
     assert "get_now" not in source

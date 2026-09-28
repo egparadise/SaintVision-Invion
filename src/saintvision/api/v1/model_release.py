@@ -66,14 +66,18 @@ lane's write contract, the one W2 (``model_versions``) and W4
   transaction as the stage write, the mirror intent and the audit row, so a
   crash between them leaves none of them.
 
-The kernel observation is still fetched between the two spans, with no
-transaction open. A replay therefore still performs that read-only GET before
-it finds the stored answer; the write side is what the ledger protects, and
-keeping the observation outside every transaction (the reason this route has
-two spans) mattered more than skipping one GET. A version that is already
-``released`` is refused ``GRAPH-0002/409`` under a *different* key rather than
-released again: a second stage write and a second mirror intent are the very
-side effects this contract exists to prevent.
+**A replay does not depend on the kernel** (Codex #229 F1). The stored answer
+is looked up in a short transaction of its own -- live permission, then the
+ledger -- *before* the observation is fetched, so a retry after a lost
+response is answered from the ledger even while the kernel is unavailable,
+and the same key with a different body is ``GRAPH-0002/409`` before any
+upstream call. Only a ledger miss goes on to the observation (with no
+transaction open, as before) and then to the write transaction, where the
+ledger is read again under the advisory lock so two concurrent first requests
+converge on one release. That makes three transaction spans, each bounded.
+A version that is already ``released`` is refused ``GRAPH-0002/409`` under a
+*different* key rather than released again: a second stage write and a second
+mirror intent are the very side effects this contract exists to prevent.
 """
 
 from __future__ import annotations
@@ -408,13 +412,15 @@ async def release_model(
     Sessions are managed here rather than through ``get_session``, which opens a
     transaction and a tenant scope before the handler is entered. The kernel
     call must happen with no transaction open, so the work is three spans:
-    permission, then HTTP, then one atomic transaction that re-checks the
-    permission it no longer holds.
+    permission, then the ledger (replay or conflict, with no kernel call),
+    then HTTP, then one atomic transaction that re-checks the permission it no
+    longer holds and re-reads the ledger under the serialisation point.
 
-    The clock is read once, after the serialisation point and the live
+    The write's clock is read once, after the serialisation point and the live
     permission (Codex #191 F3 / #196 F2 precedent): the ledger's ``expires_at``,
     the audit row and ``released_at`` all carry the instant the work was done,
-    not the instant the request arrived.
+    not the instant the request arrived. The early ledger lookup reads the
+    clock separately, only to judge a stored row's expiry.
     """
     factory = make_session_factory(request.app.state.engine)
 
@@ -443,15 +449,47 @@ async def release_model(
     # version is a conflict, not a replay of the first version's answer.
     ledger_payload = {"modelId": model_id, "version": version, "request": declared}
 
-    # (2) The observation, with no transaction open.
+    # (1b) The ledger, before the kernel: a retry after a lost response is
+    # answered from the stored row even while the kernel is unavailable, and a
+    # different body under the same key is refused before any upstream call.
+    # Live permission again, because this span decides on the caller's behalf.
+    with factory() as session:
+        with session.begin():
+            with tenant_scope(session, principal.tenant_id), bounded_lock_wait(
+                session, timeout_ms=settings.business_lock_timeout_ms
+            ):
+                _require_approval(session, principal=principal, project_id=project_id)
+                try:
+                    replayed = replay_or_reserve(
+                        session,
+                        principal=principal,
+                        endpoint=ENDPOINT,
+                        idempotency_key=key,
+                        payload=ledger_payload,
+                        now=request.app.state.clock(),
+                        ttl_seconds=settings.idempotency_ttl_seconds,
+                        project_id=project_id,
+                    )
+                except InvError as error:
+                    raise translate(
+                        error,
+                        table=TRANSLATION,
+                        detail="That idempotency key was used with a different request.",
+                    ) from None
+                if replayed is not None:
+                    return replayed
+
+    # (2) The observation, with no transaction open. Reached only on a ledger
+    # miss: nothing stored under this key yet.
     observation = await _observation(
         request, project_id=project_id, model_id=model_id, version=version
     )
 
     # (3) One atomic transaction, in the lane's lock order: serialisation
-    # point, live permission, clock, ledger, parent read, row lock, live
-    # permission again, compare, release, audit, ledger row. The waits are
-    # bounded by the lane's budget (card 84).
+    # point, live permission, clock, ledger again (two concurrent first
+    # requests converge here: the second finds what the first committed),
+    # parent read, row lock, live permission again, compare, release, audit,
+    # ledger row. The waits are bounded by the lane's budget (card 84).
     with factory() as session:
         with session.begin():
             with tenant_scope(session, principal.tenant_id), bounded_lock_wait(

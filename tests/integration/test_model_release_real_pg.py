@@ -711,3 +711,39 @@ def test_113_two_concurrent_first_requests_with_one_key_release_once_and_replay(
     assert len(_mirror_intents(owner_engine, mine["version_id"])) == 1
     assert _release_audits(owner_engine) == [mine["version_id"]]
     assert len(_ledger(owner_engine, tenant_a)) == 1
+
+
+def test_113_F1_a_lost_response_replays_while_the_kernel_is_unavailable_and_a_conflict_is_409_first(
+    owner_engine, app_engine, two_tenants, frozen_now
+):
+    """Codex #229 F1 on the real ledger: after a committed release the retry is
+    answered from ``idempotency_records`` with the kernel unreachable, and a
+    different body under the same key is refused before any upstream call."""
+    tenant_a, _ = two_tenants
+    with owner_engine.begin() as connection:
+        mine = _seed(connection, tenant_id=tenant_a, now=frozen_now, project_code="idem-kernel-down")
+    calls = {"n": 0}
+
+    def broken(**_kwargs):
+        calls["n"] += 1
+        raise OSError("kernel unavailable")
+
+    with _client(
+        app_engine, tenant_id=tenant_a, user_id=mine["user_id"], now=frozen_now,
+        observation=_observation(mine["project_id"], mine["model_id"], "1.0.0"),
+    ) as client:
+        first = client.post(_path(mine), json=DECLARATION, headers=_headers("k-lost"))
+        assert first.status_code == 200, first.text
+        client.app.state.model_commitment_fetcher = broken
+        retry = client.post(_path(mine), json=DECLARATION, headers=_headers("k-lost"))
+        conflict = client.post(
+            _path(mine), json={**DECLARATION, "classification": "internal"}, headers=_headers("k-lost")
+        )
+    assert retry.status_code == 200, retry.text
+    assert retry.json() == first.json()
+    body = _canonical(conflict, code="GRAPH-0002", status=409)
+    assert body["detail"] == "That idempotency key was used with a different request."
+    assert calls["n"] == 0                                    # the kernel was never asked
+    assert len(_mirror_intents(owner_engine, mine["version_id"])) == 1
+    assert _release_audits(owner_engine) == [mine["version_id"]]
+    assert len(_ledger(owner_engine, tenant_a)) == 1
