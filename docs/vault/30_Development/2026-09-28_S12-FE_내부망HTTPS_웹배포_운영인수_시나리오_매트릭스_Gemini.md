@@ -1,11 +1,11 @@
 ---
 doc_id: "GEMINI-S12-FE-SCENARIO-MATRIX-20260928"
 title: "S12-FE 내부망 HTTPS 웹 배포·운영 인수 시나리오 매트릭스 (Gemini)"
-version: "1.0.3"
+version: "1.0.4"
 status: "review"
 author: "Gemini"
 reviewer: "Claude, Codex"
-updated: "2026-09-28T11:09:00+09:00"
+updated: "2026-09-28T11:18:00+09:00"
 source_of_truth: "Git"
 tags: ["s12-fe", "acceptance-matrix", "https", "nginx", "tls", "release-manifest", "web-smoke", "recovery", "operator-training", "gemini"]
 ---
@@ -18,7 +18,7 @@ tags: ["s12-fe", "acceptance-matrix", "https", "nginx", "tls", "release-manifest
 > - [[2026-09-22_Codex_FE_review_map_S02-S12]] (33행: "배포 화면/manifest 단위 시험, 로컬 HTTPS smoke 골격과 manifest 일관성 검사")
 > - [[2026-09-10_02-15-00_KST_S12-FE_Gemini_내부망HTTPS_웹배포_운영인수_개발과정]]
 > - [[S12 파일럿]] (OUT-12 / AC-12)
-> - [[3 Agent 원격 실행과 운영 인수 확정]] (15행: 실제 원격 Node 1대 192.168.45.225 및 서버 192.168.45.99 기록)
+> - [[3 Agent 원격 실행과 운영 인수 확정]] (과거 원격 실행 기록, 현재 5-node inventory 아님)
 > - [[설계 충돌 정정 및 ADR]]
 > - [[2026-09-23_03-10-00_KST_CP호스트_Node겸임_ADR100_Codex]] (ADR-100: CP 호스트 겸임 Node 1 + 독립 Ubuntu Worker 4)
 > - `apps/web/src/features/deployment/IntranetDeploymentView.tsx`
@@ -40,7 +40,7 @@ tags: ["s12-fe", "acceptance-matrix", "https", "nginx", "tls", "release-manifest
 
 ## 1. 개요 및 수용 목표 (OUT-12 / AC-12)
 
-본 문서는 SaintVision 제어 평면 및 릴리스 배포 서브시스템의 **S12-FE (내부망 HTTPS 웹 배포·운영자 인수·교육 화면)** 트랙을 체계적으로 검증하기 위해 수립된 **docs-only 시나리오 매트릭스 정본(v1.0.3)**이다.
+본 문서는 SaintVision 제어 평면 및 릴리스 배포 서브시스템의 **S12-FE (내부망 HTTPS 웹 배포·운영자 인수·교육 화면)** 트랙을 체계적으로 검증하기 위해 수립된 **docs-only 시나리오 매트릭스 정본(v1.0.4)**이다.
 
 S07~S11 선행 시나리오 매트릭스(PR #116, #123, #113, #144, #154)의 거버넌스 체계를 계승하며, 코디네이터 지침, task-registry의 `S12-FE` 요구 증거("Release manifest·사용자 인수·웹 smoke·복구 Evidence"), Codex FE Review Map 33행("배포 화면/manifest 단위 시험, 로컬 HTTPS smoke 골격과 manifest 일관성 검사"), S12 개발과정 History 및 `S12 파일럿.md`의 수용 기준(`AC-12: 5노드 전체 여정·정량 목표·알려진 제한·인수 확인 모두 기록`), 그리고 ADR-100의 5노드 토폴로지(CP 호스트 겸임 Node 1 + 독립 Ubuntu Worker 4)를 프런트엔드 소스코드(`apps/web`), Nginx 리버스 프록시 명세(`apps/web/nginx.conf`), CI 컨테이너 검증 파이프라인(`.github/workflows/desktop-browser.yml`, `tests/integration/test_web_container.py`, `tests/integration/test_studio_browser.py`)과 1:1로 엄격히 대조하여 작성되었다.
 
@@ -80,7 +80,7 @@ S07~S11 선행 시나리오 매트릭스(PR #116, #123, #113, #144, #154)의 거
    - 따라서 단언된 3개 항목만 `MEASURED (엔진 단위시험)`로 표기하고, `authToken`/`roles` 분기 및 실제 서버 인가는 **`UNMEASURED / 미연결`**로 둔다.
 8. **실재 인벤토리 정합성 및 EXT-02 전제값 정정 (F-R5 및 Claude 11 정정)**:
    - 임의로 기재되었던 `192.168.1.101~105`, `NVIDIA RTX A4000 GPU` 등은 `deploymentEngine.ts:37-41, :121`의 클라이언트 픽스처에서 유래한 가공의 값이므로 삭제한다.
-   - 저장소 기록의 실제 랩 기준은 `3 Agent 원격 실행과 운영 인수 확정.md:15` (원격 Node 1대 `192.168.45.225` 및 서버 `192.168.45.99`) 및 **ADR-100 (Windows CP 호스트 겸임 Node 1 + 별도 독립 Ubuntu Worker Node 4)**이며, 실제 물리 IP 및 장비 스펙은 **"미정 (BLOCKED_EXTERNAL)"**으로 격리한다.
+   - 저장소의 과거 원격 실행 기록(`3 Agent 원격 실행과 운영 인수 확정.md:15`)은 현재 5-node inventory가 아니며, 정본 기준은 **ADR-100 토폴로지 (Windows CP 호스트 겸임 Node 1 + 별도 독립 Ubuntu Worker Node 4)**이다. 실제 물리 IP 및 하드웨어 스펙은 현장 배정 전까지 **"미정 (BLOCKED_EXTERNAL)"**으로 엄격히 격리한다.
 
 ---
 
@@ -168,7 +168,7 @@ S07~S11 선행 시나리오 매트릭스(PR #116, #123, #113, #144, #154)의 거
 | 항목 ID | 항목 명 | 필요 환경 및 외부 전제 (ADR-100 및 인벤토리 기준) | 미수행 / 차단 사유 | 현재 상태 판정 |
 |---|---|---|---|:---:|
 | **EXT-01** | 온프레미스 물리 서버 실제 사내 인증서 TLS / Nginx 배포 | 사내 실제 공인/내부 도메인 DNS, 기업 엔터프라이즈 Root CA 인증서 발급, 물리 방화벽 포트 8443 개방, 리눅스 호스트 시스템 프로비저닝 | 개발 Agent 환경(로컬/CI)에서는 물리 온프레미스 서버 인프라에 접근할 수 없으며, 컨테이너 합성 테스트(`test_web_container.py`)로만 골격이 검증됨. 엄격한 TLS 1.3 단독 강제 여부도 현장 검증 대상임. | **BLOCKED_EXTERNAL** (절대 통과로 꾸미지 않음) |
-| **EXT-02** | ADR-100 5노드(CP 겸임 1 + Worker 4) 물리 사내망 분산 환경 실가동 | 정본 토폴로지 ADR-100 및 `3 Agent 원격 실행과 운영 인수 확정.md:15` 기록 기준 (물리 IP 및 하드웨어 스펙은 현장 배정 전까지 **미정**) | 물리적 사내망 LAN 환경 및 5대의 실장비 클러스터가 부재하여 E2E 물리 여정 검증 불가 (`deploymentEngine.ts:80-126`은 가상 상수 배열이며, 클라이언트 픽스처에서 복사된 임의 IP/GPU 할당은 삭제됨). | **BLOCKED_EXTERNAL** (절대 통과로 꾸미지 않음) |
+| **EXT-02** | ADR-100 5노드(CP 겸임 1 + Worker 4) 물리 사내망 분산 환경 실가동 | 정본 토폴로지 ADR-100 기준 (과거 원격 실행 기록은 현재 5-node inventory가 아니며, 물리 IP 및 하드웨어 스펙은 현장 배정 전까지 **미정 / BLOCKED_EXTERNAL**) | 물리적 사내망 LAN 환경 및 5대의 실장비 클러스터가 부재하여 E2E 물리 여정 검증 불가 (`deploymentEngine.ts:80-126`은 가상 상수 배열이며, 클라이언트 픽스처에서 복사된 임의 IP/GPU 할당은 삭제됨). | **BLOCKED_EXTERNAL** (절대 통과로 꾸미지 않음) |
 | **EXT-03** | 현장 운영 책임자(usr_operator_lead) 최종 실물 인수 서명 및 GA 가동 선언 | 실제 운영 총괄 책임자의 현장 실사, 실물 하드웨어 검수, 실제 사내망 접속을 통한 최종 GA 인계 서명 | 실제 운영 인수는 인간 운영 리드의 법적·운영적 승인 행위이며, 클라이언트 인메모리 시뮬레이션 버튼 클릭으로 대체할 수 없음. | **BLOCKED_EXTERNAL** (절대 통과로 꾸미지 않음) |
 
 ---
