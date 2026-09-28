@@ -22,6 +22,10 @@ source_of_truth: "Git"
 
 ## 최근 확인한 진척
 
+### 2026-09-28 카드 bf · 문서 경로 인용 실재 검사 (branch agent/claude/docs-path-citation-check, base 1e8baf04, worktree 재사용)
+
+- `tools/check_doc_path_citations.py`(--ratchet/--report/--write-baseline) + baseline 227 + docs.yml step 1줄 + 시험 12. 되살림 확인. 상세: Codex 검토 반영(v1.1): `--base-ref` floor 검사(baseline은 base의 부분집합이어야)·repo containment(`..`·symlink·root 밖 fail-closed)·들여쓴 fence 인식. r2(v1.2): push는 `github.event.before` base·zero SHA fail-closed·dispatch는 HEAD 일관성만, 2커밋 push 우회 부정 시험. [[2026-09-28_11-51-09_KST_문서_경로인용_실재검사_Claude_구현]]
+- 같은 날: #168 MLflow 설계 v1.3(Codex 재검토 중), #166 대응표 v1.2.1(재검토 중).
 ### 2026-09-28 카드 13 · S02-DB AC-02 Evidence collector (branch agent/claude/s02-db-evidence-collector, base 1e8baf04)
 
 - 만든 것: `tools/collect_s02_acceptance_evidence.py`(기존 `tests/test_api.py` + `collect_rls_evidence.py --disposable`를 한 호출로, 카드 5 §A-1 대조표 16 케이스→AC-02 4조항 매핑, provenance SHA/clean 플래그/collector sha256, stale 산출물 선삭제, DSN·비밀번호 쓰기 거부, U2~U5 UNMEASURED·값 없음, `acceptanceClaim=false`) + PG-free 시험 19(+postgres 1) + Evidence `Evidence/s02-db-acceptance/s02-acceptance-1e8baf045c5a-20260927.{json,md}`(+`-rls`).
