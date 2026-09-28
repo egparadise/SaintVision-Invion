@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.21"
+version: "1.2.22"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T09:55:00+09:00"
+updated: "2026-09-28T23:18:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+48 task 진행률 재채점 카드 99 (Claude, 2026-09-28, 분석 tree `95a59b24` = `origin/coord/train-ci-2150`, PR base `integration/all-agents-unified`, docs-only): 09-18과 **같은 rubric**(48×0/25/50/75/100, 분모 4,800)으로 48 task를 재채점했다. 09-18 기록에 **task별 점수표가 없어** 새로 배정했고 **2,800과는 합계로만 비교 가능**하다고 명시했다. **병합 전 `main`(`f9be6b61`, 09-10) 1,950 = 40.62% / 병합 후 train 3,325 = 69.27%** 로 두 열을 분리했다(병합만으로 done을 올리지 않는다는 원칙 유지 — train 열은 이미 검토·CI를 통과한 구현의 성숙도다). **결론은 69.27%가 아니라 33이다** — 48 중 33개가 75점이고 그 천장은 우리 코드가 아니라 **운영 인수·외부 자산**이 만든다. 100점은 S01-FE·S01-DB 둘뿐이고 범위가 설계·계약 문서로 닫혀 있다. 근거 CI는 분석 tree 자체의 5 workflow success(Backend `36424405419` 5153 passed, Core `36424410039` 5456 passed 등)이고 진행 중 run은 인용하지 않았다. 병합 격차 실측: migration 33→70, v1 route 4→19, 시험 파일 54→317, contracts 12→79이며 `api/problem.py`(정본 ProblemDetails)·lineage 조회·MLflow 미러·AC-11 집계기가 **통째로 미병합**이다. 결론에 **우리 코드로 남은 작업(owner별)** 과 **사용자·외부 조치(G-15~G-26)** 를 분리했고 `G-19`(물리 PC 5대)가 가장 많은 task를 막는다. 다음 첫 행동: Codex 검토. 전문 [[2026-09-28 48 task 진행률 재채점]].
 
 hosted Core junit로 S04/05/07-DB 케이스 수치 보강 카드 12 (Claude, 2026-09-22, 읽기 전용): artifact `saintvision-core-evidence`(run 35706465645 `3d1892c0` + proof 35714470445 `f2aa2b14`)를 .work/ci-junit에 받아(바이너리 삭제 후 1.4MB) 파일별 수치(core 2948/58/0·shard-recovery 21·containment 28·workspace 22·business-handoff 17·lan-installer 15·docker-host 2, f2aa2b14는 core 2998/58/0 외 동일)와 카드 10의 hosted-only 항목 케이스 이름을 classname으로 추출 — 재전송 hash(output_ingestion 5·node_delivery 18·results 21), placement Explain(placement 12), shard replacement 21, containment 28, workspace 복구 12+11, 노드 스토리지 전송 27 — **전부 passed**. hosted에도 없는 것(AC-05 결정성/P95·AC-07 60초/95%·CX01)은 그대로 물리/5노드 대기로 명시. 패키지 §C-2 + 검증상태지도 §12 보강. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 
