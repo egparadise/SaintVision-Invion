@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { ModelLineage, ModelCommitObservation } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { fetchModelCommitment } from '@/shared/api/modelCommitmentObservation';
@@ -105,20 +105,31 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
     detail: string;
     retryable?: boolean;
   } | null>(null);
+  const singleConformanceAbortRef = useRef<AbortController | null>(null);
+  const singleConformanceGenRef = useRef<number>(0);
 
   const handleFetchSingleConformance = async (e?: React.FormEvent, targetAdapter?: string) => {
     if (e) e.preventDefault();
+    if (singleConformanceLoading) return;
     const adapterToFetch = (targetAdapter !== undefined ? targetAdapter : singleAdapterName).trim();
     if (!conformanceProjectId.trim() || !adapterToFetch) {
       return;
     }
+
+    singleConformanceAbortRef.current?.abort();
+    const ctrl = new AbortController();
+    singleConformanceAbortRef.current = ctrl;
+    const currentGen = ++singleConformanceGenRef.current;
+
     setSingleConformanceLoading(true);
     setSingleConformanceError(null);
     setSingleConformanceData(null);
     try {
-      const data = await fetchAdapterConformance(conformanceProjectId.trim(), adapterToFetch);
+      const data = await fetchAdapterConformance(conformanceProjectId.trim(), adapterToFetch, ctrl.signal);
+      if (singleConformanceGenRef.current !== currentGen || ctrl.signal.aborted) return;
       setSingleConformanceData(data);
     } catch (err: any) {
+      if (singleConformanceGenRef.current !== currentGen || ctrl.signal.aborted) return;
       setSingleConformanceData(null);
       const prob = err?.problem;
       if (prob) {
@@ -151,7 +162,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
         });
       }
     } finally {
-      setSingleConformanceLoading(false);
+      if (singleConformanceGenRef.current === currentGen || singleConformanceAbortRef.current === ctrl) {
+        setSingleConformanceLoading(false);
+      }
     }
   };
 
@@ -652,6 +665,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               setConformanceProjectId(e.target.value);
               setConformanceData(null);
               setConformanceError(null);
+              singleConformanceAbortRef.current?.abort();
+              ++singleConformanceGenRef.current;
+              setSingleConformanceLoading(false);
               setSingleConformanceData(null);
               setSingleConformanceError(null);
             }}
@@ -895,6 +911,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                           <Button
                             size="sm"
                             variant="secondary"
+                            disabled={singleConformanceLoading}
                             data-testid={`conformance-inspect-btn-${idx}`}
                             onClick={() => {
                               setSingleAdapterName(record.adapter);
@@ -1010,10 +1027,14 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             <input
               type="text"
               data-testid="single-conformance-adapter-input"
+              aria-label="어댑터 이름"
               placeholder="Adapter Name (e.g. codex-cli)"
               value={singleAdapterName}
               onChange={(e) => {
                 setSingleAdapterName(e.target.value);
+                singleConformanceAbortRef.current?.abort();
+                ++singleConformanceGenRef.current;
+                setSingleConformanceLoading(false);
                 setSingleConformanceData(null);
                 setSingleConformanceError(null);
               }}
@@ -1072,8 +1093,8 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 : undefined
             }
           >
-            {singleConformanceLoading && `⏳ [${singleAdapterName}] 어댑터 Conformance 상태 조회 중...`}
-            {singleConformanceError && `❌ [${singleAdapterName}] 어댑터 Conformance 조회 실패`}
+            {singleConformanceLoading && '⏳ 단건 어댑터 Conformance 상태 조회 중...'}
+            {singleConformanceError && '❌ 단건 어댑터 Conformance 조회 실패'}
             {!singleConformanceLoading &&
               !singleConformanceError &&
               singleConformanceData &&

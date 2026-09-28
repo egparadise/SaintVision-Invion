@@ -1800,8 +1800,13 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
           expect(errBanner?.textContent).toContain('[RES-0004]');
           expect(errBanner?.textContent).toContain('(404)');
           expect(errBanner?.textContent).toContain('어댑터 없음');
-          // Must not echo user's input string "unknown-adapter"
+          // Must not echo user's input string "unknown-adapter" in error banner or live status
           expect(errBanner?.textContent).not.toContain('unknown-adapter');
+          const liveStatus = container.querySelector('[data-testid="single-conformance-live-status"]');
+          expect(liveStatus?.textContent).toBe('❌ 단건 어댑터 Conformance 조회 실패');
+          expect(liveStatus?.textContent).not.toContain('unknown-adapter');
+          const singleSection = container.querySelector('[data-testid="single-conformance-live-status"]')?.parentElement;
+          expect(singleSection?.textContent).not.toContain('unknown-adapter');
           // Retry button must NOT be present
           expect(container.querySelector('[data-testid="single-conformance-retry-btn"]')).toBeNull();
 
@@ -1938,6 +1943,102 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
           });
           expect(container.querySelector('[data-testid="conformance-result-container"]')).toBeNull();
           expect(container.querySelector('[data-testid="single-conformance-result-container"]')).toBeNull();
+        } finally {
+          globalThis.fetch = originalFetch;
+        }
+      });
+
+      it('M2: ignores late in-flight response when adapter input changes and guards against concurrent requests', async () => {
+        const originalFetch = globalThis.fetch;
+        const testProjectId = 'prj_0123456789ABCDEFGHJKMNPQRS';
+        let resolveFirstFetch: ((res: any) => void) | null = null;
+        let firstFetchSignal: AbortSignal | null = null;
+
+        try {
+          globalThis.fetch = vi.fn().mockImplementation((url: string, init?: RequestInit) => {
+            if (url.includes('/adapters/codex-cli/conformance')) {
+              firstFetchSignal = init?.signal || null;
+              return new Promise((resolve) => {
+                resolveFirstFetch = resolve;
+              });
+            }
+            if (url.includes('/adapters/gemini-cli/conformance')) {
+              return Promise.resolve({
+                ok: true,
+                status: 200,
+                headers: new Headers({ 'content-type': 'application/json' }),
+                json: async () => canonicalSingleNotObservedPayload,
+              } as any);
+            }
+            return Promise.reject(new Error(`Unhandled URL: ${url}`));
+          });
+
+          await act(async () => {
+            root.render(React.createElement(ModelLineageView, { initialLineages: TEST_FIXTURE_LINEAGES }));
+          });
+
+          const projectInput = container.querySelector<HTMLInputElement>('[data-testid="conformance-project-input"]');
+          const setInputValue = (el: HTMLInputElement, val: string) => {
+            const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+            setter?.call(el, val);
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+          };
+
+          await act(async () => {
+            setInputValue(projectInput!, testProjectId);
+          });
+
+          const adapterInput = container.querySelector<HTMLInputElement>('[data-testid="single-conformance-adapter-input"]');
+          const singleFetchBtn = container.querySelector<HTMLButtonElement>('[data-testid="single-conformance-fetch-btn"]');
+
+          await act(async () => {
+            setInputValue(adapterInput!, 'codex-cli');
+          });
+
+          // 1. Submit first request -> in-flight
+          await act(async () => {
+            singleFetchBtn!.click();
+          });
+
+          // Loading is true: button is disabled
+          expect(singleFetchBtn?.disabled).toBe(true);
+          expect(singleFetchBtn?.textContent).toBe('조회 중...');
+          const inspectBtn0 = container.querySelector<HTMLButtonElement>('[data-testid="conformance-inspect-btn-0"]');
+          if (inspectBtn0) {
+            expect(inspectBtn0.disabled).toBe(true);
+          }
+
+          // Submitting again while loading must be ignored (early return guard)
+          await act(async () => {
+            singleFetchBtn!.closest('form')?.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+          });
+          expect((globalThis.fetch as any).mock.calls.length).toBe(1);
+
+          // 2. While first request is in-flight, change adapter input to 'gemini-cli'
+          await act(async () => {
+            setInputValue(adapterInput!, 'gemini-cli');
+          });
+
+          // Signal should be aborted and loading cleared
+          expect(firstFetchSignal?.aborted).toBe(true);
+          expect(singleFetchBtn?.disabled).toBe(false);
+          expect(singleFetchBtn?.textContent).toBe('어댑터 Conformance 조회');
+
+          // 3. Resolve delayed first request (which carries codex-cli recorded response)
+          await act(async () => {
+            resolveFirstFetch!({
+              ok: true,
+              status: 200,
+              headers: new Headers({ 'content-type': 'application/json' }),
+              json: async () => canonicalSingleRecordedPayload,
+            });
+            await new Promise((resolve) => setTimeout(resolve, 0));
+          });
+
+          // Late response must be discarded! No result container, no codex-cli rendered
+          expect(container.querySelector('[data-testid="single-conformance-result-container"]')).toBeNull();
+          expect(container.querySelector('[data-testid="single-conformance-live-status"]')?.textContent).not.toContain('codex-cli');
         } finally {
           globalThis.fetch = originalFetch;
         }
