@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.208"
+version: "1.0.209"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T15:47:09+09:00"
+updated: "2026-09-28T15:50:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -14,7 +14,7 @@ source_of_truth: "Git"
 
 - Claude r2 N1을 반영해 raw 22-case universe를 PG-free 12개와 hosted 10개 실행 subset으로 분리하고 각각 identity SHA를 고정했다. 한 계층 run이 다른 계층 case를 실행하지 않아도 누락이 아니다.
 - storage-only evidence로 AC-11 `long-soak`을 닫던 우회를 없앴다. PG-free·hosted·물리 storage는 모두 reference-only이며, 열·전원·NTP·스위치·WAN·원격 WS를 포함한 composite target 승인 전 `long-soak=NOT_REGISTERED`다. registry patch는 PITR target 교체만 제안한다.
-- physical storage와 PITR은 부류별 identity·recovery를 요구하고, Local byte 변조는 read 전 mode 복원, metric 계수 의미, 선행 카드 `CARD-S11-AC11-REGISTRY-REPIN-01`을 명시했다. 공개 계약·migration·registry 상태는 아직 불변이며 S11-ST `planned`, 측정 `NOT_OBSERVED`; final pin·게이트·push 뒤 Claude 재검토를 요청한다. [[S11-ST_손상_용량_backup_장애시험_설계]], [[S11_ST_storage_failure_target_v0]], [[2026-09-28_14-16-18_KST_S11-ST_손상_용량_backup_장애시험_설계_Codex]].
+- physical storage와 PITR은 부류별 identity·recovery를 요구하고, Local byte 변조는 read 전 mode 복원, metric 계수 의미, 선행 카드 `CARD-S11-AC11-REGISTRY-REPIN-01`을 명시했다. target source는 commit `3363ab77…`·blob `421d4d3a…`로 고정했고 문서·bindings·ontology·ratchet 게이트는 exit 0이다. 공개 계약·migration·registry 상태는 불변이며 S11-ST `planned`, 측정 `NOT_OBSERVED`; push 뒤 Claude 재검토를 요청한다. [[S11-ST_손상_용량_backup_장애시험_설계]], [[S11_ST_storage_failure_target_v0]], [[2026-09-28_14-16-18_KST_S11-ST_손상_용량_backup_장애시험_설계_Codex]].
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 

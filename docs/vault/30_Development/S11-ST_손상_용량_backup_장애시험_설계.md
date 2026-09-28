@@ -119,7 +119,7 @@ storage soak target은 정본 registry에 추가하지 않는다. #157의 물리
 - physical PITR identity는 3개와 SHA `a5d0f9e6de439af7eee439605adad13d4badc9f37683a9a1afc8c3be8f96cc18`로 닫는다.
 - `pitr_readiness`, `pitr_opt_in_dry_run`, same-host `pitr_rehearsal.sh`, hosted MinIO/PG는 reference observation만 허용한다.
 
-PITR target의 `sourceDocument`는 [[S11_ST_storage_failure_target_v0]]의 고정 commit/path/blob을 가리킨다. 이 commit이 integration 조상으로 남도록 이 PR은 merge commit 방식(`--merge`)으로만 병합하고 squash·rebase 병합을 금지한다. envelope의 `targetRef`는 정본 registry commit/path/blob·targetId·criteria exact set을 사용한다. source document와 registry가 `sourceHeadSha`의 조상이 아니거나 source tree의 blob과 다르면 `INVALID_RUN`이다.
+PITR target의 `sourceDocument`는 [[S11_ST_storage_failure_target_v0]]의 commit `3363ab77e7fc4ccf3be140466a053a973b0b65a4`, path `docs/vault/30_Development/S11_ST_storage_failure_target_v0.md`, blob `421d4d3a6e39720e74bc6fd832f30e8b45f8680a`를 가리킨다. 이 commit이 integration 조상으로 남도록 이 PR은 merge commit 방식(`--merge`)으로만 병합하고 squash·rebase 병합을 금지한다. envelope의 `targetRef`는 정본 registry commit/path/blob·targetId·criteria exact set을 사용한다. source document와 registry가 `sourceHeadSha`의 조상이 아니거나 source tree의 blob과 다르면 `INVALID_RUN`이다.
 
 ## 5. evidence와 fail-closed 판정
 

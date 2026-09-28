@@ -4,7 +4,7 @@ title: "S11-ST 손상·용량·backup 장애 시험 설계"
 version: "1.2.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T15:47:09+09:00"
+updated: "2026-09-28T15:50:00+09:00"
 source_of_truth: "Git"
 task_id: "S11-ST"
 reviewer: "Claude"
@@ -36,12 +36,12 @@ reviewer: "Claude"
 
 ## 사전 등록
 
-- target 기준 문서는 [[S11_ST_storage_failure_target_v0]]이다. final source commit/blob은 아래 pin commit 뒤 기록하며, 이 commit이 조상으로 남도록 merge commit 병합만 허용한다.
+- target 기준 문서는 [[S11_ST_storage_failure_target_v0]]이며 commit `3363ab77e7fc4ccf3be140466a053a973b0b65a4`, blob `421d4d3a6e39720e74bc6fd832f30e8b45f8680a`로 고정했다. 이 commit이 조상으로 남도록 merge commit 병합만 허용한다.
 - 정본 registry patch는 `Evidence/s11-st-failure-target-registry-patch-v0.json`에 PITR-only review artifact로 남기되 `consumableAsTargetRef=false`다. predecessor는 #177 head `b246e7dbd597db52ae5c16be4c0a03ffd056ab93`, registry blob `99e64cb4125d47ae681a2e8e7c8f76c05193a892`다. 선행 카드 `CARD-S11-AC11-REGISTRY-REPIN-01`이 #177 병합 뒤 정본 registry·집계기·importer pin을 함께 바꾸기 전 측정 금지다.
 - identity SHA-256은 universe 22개 `5d700981...34fd9`, PG-free 12개 `f69d161e...8799`, hosted 10개 `0509d94a...4a33`, physical storage 3개 `f6fef831...90ec`, physical PITR 3개 `a5d0f9e6...cc18`이다.
 
 ## 검증과 남은 일
 
 - 로컬 실 PostgreSQL·Docker·전체 suite는 실행하지 않았다. 문서·JSON·정적 게이트만 실행했다.
-- head `2a557b8a`까지 `check_docs`, `check_ontology`, `check_contract_bindings`, ratchet은 exit 0이었다. r2 반영 delta에는 pin 확정 뒤 같은 게이트를 다시 실행한다. 로컬 실 PostgreSQL·Docker·전체 suite는 실행하지 않는다.
-- 다음 단계는 target source pin 확정, 정적 게이트, push, Claude 재검토다. 승인 뒤 `CARD-S11-AC11-REGISTRY-REPIN-01`, PG-free producer/importer, Local 오류 변환·retention receipt, hosted reference lane, 물리/운영 인수를 분리한다.
+- r2 반영 delta에서 `python tools/check_docs.py`, `check_ontology.py`, `check_contract_bindings.py`, `check_doc_single_source.py --ratchet`을 실행했고 모두 exit 0이었다. JSON parse와 `git diff --check`도 exit 0이며, 로컬 실 PostgreSQL·Docker·전체 suite는 실행하지 않았다.
+- 다음 단계는 push와 Claude 재검토다. 승인 뒤 `CARD-S11-AC11-REGISTRY-REPIN-01`, PG-free producer/importer, Local 오류 변환·retention receipt, hosted reference lane, 물리/운영 인수를 분리한다.

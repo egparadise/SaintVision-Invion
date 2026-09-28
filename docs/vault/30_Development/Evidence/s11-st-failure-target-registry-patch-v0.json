@@ -11,49 +11,16 @@
     "s11-actual-pitr-v0"
   ],
   "requiredTargetByAxis": {
-    "long-soak": "s11-long-soak-physical-five-node-v0",
     "actual-pitr-rpo-rto-retention": "s11-st-actual-pitr-archive-failure-v0"
   },
   "addTargets": [
     {
-      "targetId": "s11-long-soak-physical-five-node-v0",
-      "axis": "long-soak",
-      "sourceDocument": {
-        "commit": "0606e594f18172a17415f378b258ff4e0ee8d8e8",
-        "path": "docs/vault/30_Development/S11_ST_storage_failure_target_v0.md",
-        "blob": "d75132a53b7a879df48e02c8b1caf65b9dfe35cf"
-      },
-      "criteria": {
-        "windowSeconds": {"operator": "gte", "value": 86400},
-        "attemptedOperationCount": {"operator": "gte", "value": 1000},
-        "observedStorageFaultCaseCount": {"operator": "gte", "value": 3},
-        "recoveryAfterStorageFaultPassCount": {"operator": "gte", "value": 3},
-        "corruptionEscapeCount": {"operator": "eq", "value": 0},
-        "falseSuccessCount": {"operator": "eq", "value": 0},
-        "committedObjectLossCount": {"operator": "eq", "value": 0},
-        "quotaOvershootBytes": {"operator": "eq", "value": 0},
-        "classificationMismatchCount": {"operator": "eq", "value": 0},
-        "unexpectedErrorCount": {"operator": "eq", "value": 0},
-        "cleanupResidueCount": {"operator": "eq", "value": 0},
-        "memoryGrowthBytes": {"operator": "lte", "value": 268435456},
-        "fileDescriptorGrowthCount": {"operator": "lte", "value": 32},
-        "dbConnectionGrowthCount": {"operator": "lte", "value": 4}
-      },
-      "requiredEnvironment": {
-        "topology": "physical-five-node",
-        "eligibleNodeCount": 4,
-        "excludedNodeCount": 1,
-        "sameHost": false,
-        "faultInjection": "controlled-v1"
-      }
-    },
-    {
       "targetId": "s11-st-actual-pitr-archive-failure-v0",
       "axis": "actual-pitr-rpo-rto-retention",
       "sourceDocument": {
-        "commit": "0606e594f18172a17415f378b258ff4e0ee8d8e8",
+        "commit": "3363ab77e7fc4ccf3be140466a053a973b0b65a4",
         "path": "docs/vault/30_Development/S11_ST_storage_failure_target_v0.md",
-        "blob": "d75132a53b7a879df48e02c8b1caf65b9dfe35cf"
+        "blob": "421d4d3a6e39720e74bc6fd832f30e8b45f8680a"
       },
       "criteria": {
         "consecutiveWeeklyRestoreSmokeWeeks": {"operator": "gte", "value": 2},
@@ -62,9 +29,11 @@
         "rpoSeconds": {"operator": "lte", "value": 900},
         "rtoSeconds": {"operator": "lte", "value": 3600},
         "walArchiveFaultCaseCount": {"operator": "gte", "value": 1},
+        "recoveryAfterWalArchiveFaultPassCount": {"operator": "gte", "value": 1},
         "silentArchiveLossCaseCount": {"operator": "gte", "value": 1},
+        "recoveryAfterSilentArchiveLossPassCount": {"operator": "gte", "value": 1},
         "retentionInterruptionCaseCount": {"operator": "gte", "value": 1},
-        "recoveryAfterFaultPassCount": {"operator": "gte", "value": 3},
+        "recoveryAfterRetentionInterruptionPassCount": {"operator": "gte", "value": 1},
         "falsePitrPassCount": {"operator": "eq", "value": 0},
         "retainedBoundaryDeletionCount": {"operator": "eq", "value": 0},
         "cleanupResidueCount": {"operator": "eq", "value": 0}
