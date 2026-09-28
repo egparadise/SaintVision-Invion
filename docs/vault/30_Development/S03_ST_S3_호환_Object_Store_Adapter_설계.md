@@ -1,10 +1,10 @@
 ---
 doc_id: "S03-ST-S3-OBJECT-STORE-ADAPTER-DESIGN-001"
 title: "S03-ST S3 호환 Object Store Adapter 설계"
-version: "1.1.0"
+version: "1.2.0"
 status: "proposed"
 author: "Codex"
-updated: "2026-09-28T15:10:00+09:00"
+updated: "2026-09-28T16:10:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -47,6 +47,10 @@ PR #135의 `tools/verify_storage_roundtrip.py`에 있는 SigV4 canonical-request
 `configurationReadiness.unresolvedSettings`에는 endpoint뿐 아니라 bucket·credential file의
 누락도 각각 안정된 설정 이름으로 나타낸다.
 
+새 `objectStore` 내부 키 집합도 정확히 `providerId`, `endpoint`, `bucket`, `region`,
+`credentialFile`, `prefix`만 허용한다. `bukcet` 같은 미지 키, 누락 필드, 중복 legacy/new 입력은
+`blocked` 설정으로 낮추지 않고 startup을 거부한다.
+
 입력 schema는 strict-subset이므로 신 키 추가 자체는 additive가 아니다. rollout은 (1) 먼저
 새 binary를 배포하되 이 binary는 legacy `objectStoreEndpoint` 또는 새 `objectStore` 중 정확히
 하나만 허용하고 둘을 동시에 주면 startup을 거부하고, (2) 그 binary가 동작하는 동안 config를
@@ -66,6 +70,15 @@ conformance로 둔다. Local 격리는 별도 service/RLS 음성 시험에서 �
 얻지 못함을 검증한다. 이를 S3와 같은 provider-internal 격리라고 주장하지 않으며, Local re-key와
 기존 파일 migration은 하지 않는다.
 
+Local locator에는 추가 생성 불변식이 있다. 모든 UUID는 서버가 `(tenant, purpose, command)`를
+namespace에 섞어 결정론적으로 파생한다. 현행 `output_ingestion.py`의
+`inv.output:<tenant>:<command>`와 `workspace_resume.py`의
+`inv.workspace-output:<tenant>:<command>` `uuid5`가 그 예다. 요청자 입력이나 맨 `uuid4()`를
+locator로 받지 않는다. `snapshots.identity()`는 UUID 모양만 검사할 뿐 tenant나 출처를 결속하지
+않으므로 이 함수 자체를 보안 경계로 세지 않는다. 구현 카드의 PG-free 계약 시험은 어떤 HTTP
+route·공개 JSON Schema에도 `objectId` 또는 provider locator가 입력 필드로 존재하지 않음을 전수
+단언하고, 새 입력 표면이 생기면 실패해야 한다.
+
 `put`은 payload hash를 SigV4에 결속하고 같은 digest를 object metadata에 쓰되, 성공 판정은 후속 `get/hash`의 실제 bytes 검증으로 한다. upload timeout은 결과가 모호하므로 같은 key를 재조회한다. 기대 digest와 정확히 같으면 멱등 성공, 404면 retryable unavailable, 다른 bytes면 immutable conflict로 처리하며 덮어쓰지 않는다. 부분 쓰기/중단 upload는 ready DB 상태로 승격하지 않는다. `delete` 뒤 object가 남거나 재조회가 timeout이면 DB를 `deleting`에 유지하고 `deleted`로 바꾸지 않는다. provider timeout·접근 거부·5xx는 존재하지 않음이나 성공으로 낮추지 않고 비밀 없는 안정된 STORE/VERIFY 오류로 변환한다.
 
 Artifact 다운로드는 현행 receipt-only body 경로를 provider body 경로로 **교체**한다. 짧은
@@ -74,6 +87,8 @@ tenant/project-scoped DB transaction이 immutable provider/locator/digest/size r
 provider→DB 순서를 지킨다. S3는 provider-wide lock 없이 원격 read를 DB lock 밖에서 수행한 뒤
 짧은 DB 재검증으로 row가 같은 ticket인지 확인한다. 어떤 경로도 DB lock을 잡은 채 provider
 I/O를 하지 않으므로 GC의 provider→DB 순서와 교착 순환을 만들지 않는다.
+Local 다운로드도 directory-wide provider flock을 잡으므로 commit·checkpoint·GC와 직렬화되고,
+그 작업들의 길이가 다운로드 지연에 결합되는 비용을 수용한다.
 
 receipt는 audit/commit 증거로 남지만 body fallback이나 dual-read가 아니다. ready row인데 provider
 object가 없거나 prefix가 잘못된 경우 과거 receipt 200으로 낮추지 않고 안정된
@@ -111,7 +126,7 @@ JSON Schema, 생성 TS/Go/Python 타입, fixture, serving anchor와 `generate_co
 
 1. 계약 먼저: opaque-locator `ObjectStore` 공통 conformance와 Local service/RLS·S3 prefix 전용 격리 suite를 분리하고, 설정 schema/fixture/generated types, provider-id/locator migration과 두 checkpoint 생산자의 replay guard를 확정한다.
 2. 제품 client로 SigV4를 한 번만 구현하고 #135 도구가 이를 import하게 한다. Local/S3 adapter, 두 checkpoint 생산자, result-view의 read-ticket 기반 provider download를 차례로 결속한다.
-3. PG-free: S3 key/prefix 격리, Local flat-locator 보존, canonical SigV4 fixture, 공통 bytes conformance, body/metadata/digest 불일치, ambiguous PUT 재조회, delete 잔존, timeout·403 fail-closed, redaction을 시험한다. 타 tenant/project 거부는 Local service/RLS와 S3 prefix/IAM 경계를 각각 시험한다.
+3. PG-free: S3 key/prefix 격리, Local flat-locator 보존, 공개 route/schema의 `objectId`·locator 입력 필드 0개 계약 스캔, nested `objectStore` unknown-key startup 거부, canonical SigV4 fixture, 공통 bytes conformance, body/metadata/digest 불일치, ambiguous PUT 재조회, delete 잔존, timeout·403 fail-closed, redaction을 시험한다. 타 tenant/project 거부는 Local service/RLS와 S3 prefix/IAM 경계를 각각 시험한다.
 4. hosted MinIO lane: CI 소유 disposable instance에서 제품 adapter로 `put/get/exists/hash/delete`와 실제 Artifact HTTP download를 실행한다. JUnit에는 case와 passed 수, artifact에는 commit SHA·image digest·비밀 없는 endpoint 분류·정리 결과를 남긴다. #135 도구도 같은 제품 client를 사용해 왕복한다.
 5. 실 PG route 시험은 storage row의 provider/locator 선택, bytes/DB digest/live artifact/header 4중 결속, receipt fallback 부재, ready-row/provider-missing 503, migration backfill과 두 checkpoint replay guard를 확인한다. hosted lane 성공과 별개로 운영 S3·복구 인수는 미측정으로 남긴다.
 

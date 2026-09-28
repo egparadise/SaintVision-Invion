@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.207"
+version: "1.0.208"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T15:10:00+09:00"
+updated: "2026-09-28T16:10:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -15,7 +15,7 @@ source_of_truth: "Git"
 - Base `1e8baf045c5a554209aaef601ae4883b64da50a7`, branch `agent/codex/s3-object-store-design`, owner Codex/reviewer Claude. [[S03_ST_S3_호환_Object_Store_Adapter_설계]]에 구현 전 1쪽 설계를 작성했다.
 - Claude 1차 검토 F1~F5를 반영한 v1.1은 provider-native opaque locator를 공통 SPI로 정하고 Local flat namespace는 service/RLS, S3는 prefix/IAM 격리로 명시해 scope 무시를 금지했다. 제품 모듈 하나의 SigV4를 #135 도구도 재사용한다.
 - immutable `provider_id`+locator migration과 정확한 local backfill, `snapshots.py`/`workspace_resume.py` 양쪽 checkpoint identity/replay 불변, receipt가 아닌 provider body 다운로드와 ready-row/object-missing `STORE-0001`/503을 고정했다. live checksum과 설계-only metadata 필드도 구분했다.
-- `configurationReadiness.objectStore` 단일 정본은 binary-first legacy/new 상호배타 전환을 쓴다. 제품 코드·migration·계약·Docker/MinIO·실 PG는 변경/실행하지 않았다. 다음 행동은 Claude v1.1 재검토이며 승인 전 구현 금지다. [[2026-09-28_13-15-00_KST_S03_ST_S3_Object_Store_설계_Codex]].
+- v1.2는 모든 Local locator UUID가 tenant·purpose·command를 섞은 서버 `uuid5`라는 불변, 공개 route/schema의 objectId·locator 입력 0건 계약 시험, nested objectStore unknown-key startup 거부, Local download flock 직렬화 비용을 추가했다. 제품 코드·migration·계약·Docker/MinIO·실 PG는 변경/실행하지 않았고 Claude 재검토 뒤에도 별도 구현 카드 전에는 구현하지 않는다. [[2026-09-28_13-15-00_KST_S03_ST_S3_Object_Store_설계_Codex]].
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 

@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CODEX-S03-ST-S3-OBJECT-STORE-DESIGN-001"
 title: "S03-ST S3 호환 Object Store Adapter 설계"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T15:10:00+09:00"
+updated: "2026-09-28T16:10:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S03-ST"]
@@ -35,6 +35,12 @@ tags: ["history", "storage", "s3", "sigv4", "design"]
 - F4는 `configurationReadiness.objectStore`를 단일 정본으로 정했다. 새 binary가 legacy 또는 new 중 하나만 받는 binary-first rollout 뒤 config 전환, legacy 제거 순서이며 old binary+new config와 dual-key는 startup 거부다.
 - F5는 live `ArtifactContentResponse.artifact.checksumSha256`과 설계-only `ArtifactDownloadMetadata.contentSha256`을 구분하고 DB/provider/body/header 4중 결속으로 바로잡았다.
 
+## 조건부 승인 보정 v1.2
+
+- 모든 Local locator UUID는 서버가 tenant·purpose·command를 섞은 `uuid5`로 파생하고 요청자 입력이나 맨 `uuid4()`를 받지 않는 불변을 명시했다. `snapshots.identity()`는 UUID 모양만 검사하므로 보안 경계가 아니며, 공개 route/schema에 `objectId`·locator 입력이 0개임을 PG-free 계약 시험으로 고정한다.
+- 새 `configurationReadiness.objectStore` 안쪽 키도 strict allowlist이며 미지 키·누락·legacy/new 중복은 blocked가 아니라 startup 거부다.
+- Local artifact download의 directory-wide flock이 commit·checkpoint·GC와 직렬화돼 지연이 결합되는 비용을 명시했다.
+
 ## 검증
 
 - `PYTHONUTF8=1 PYTHONPATH=src;services/control-plane/src .venv/Scripts/python.exe tools/check_docs.py` → exit 0 (`894 versioned documents`, task 48/outcome 12).
@@ -44,4 +50,4 @@ tags: ["history", "storage", "s3", "sigv4", "design"]
 
 ## 다음 첫 행동과 담당
 
-Claude가 v1.1의 Local 격리 예외, checkpoint provider identity, download lock 순서, strict configuration rollout을 재검토한다. 승인 뒤 Codex가 계약/schema·migration·PG-free conformance부터 별도 구현 카드로 시작하며, hosted MinIO와 실제 Artifact download evidence는 이후 CI 카드에서 수집한다.
+Claude가 v1.2의 locator 생성 불변·nested 설정 strictness·flock 비용 문구를 재검토한다. 승인 뒤에도 별도 구현 카드 지시 전에는 제품 코드를 바꾸지 않으며, hosted MinIO와 실제 Artifact download evidence는 이후 CI 카드에서 수집한다.
