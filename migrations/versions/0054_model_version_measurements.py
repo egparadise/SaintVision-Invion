@@ -39,12 +39,14 @@ data fix. A fresh database has none.
 security and constraint shape, not a name list (Codex #213 F1): every column's
 type and nullability, every constraint's definition, every index's definition,
 ``ENABLE`` and ``FORCE`` row security, the policy's command, roles, USING and
-WITH CHECK, the privileges of every non-owner role, and the immutable trigger
-with its function and enabled state. A same-named table that differs in any
-of those is refused before the public side is touched; the kernel SQL is never
-re-run over an existing table (it is not idempotent). The reader function is
-kept only when its definition is byte-identical to this revision's. Offline
-rendering issues everything and asks nothing.
+WITH CHECK, the privileges of every non-owner role, the immutable trigger
+with its function and enabled state, and the owner: not a runtime role, and
+no runtime role a member of it (Codex #213 R2). A same-named table that
+differs in any of those is refused before the public side is touched; the
+kernel SQL is never re-run over an existing table (it is not idempotent). The
+reader function is kept only when its definition is byte-identical to this
+revision's and its owner passes the same test. Offline rendering issues
+everything and asks nothing.
 
 **Downgrade** refuses while any version is bound to a measurement or any
 measurement row exists (dropping either would discard evidence); otherwise it
@@ -134,6 +136,17 @@ FROM pg_trigger t JOIN pg_proc p ON p.oid = t.tgfoid JOIN pg_namespace n ON n.oi
 WHERE t.tgrelid = {_REL} AND NOT t.tgisinternal
 ORDER BY t.tgname
 """,
+    # The owner is the one identity the ACL query cannot see (its privileges
+    # are implicit). Neither runtime role may own the table nor be a member
+    # of its owner (Codex #213 R2): an owner can drop the policy, the trigger
+    # and the grants, so an owner among the runtime roles is the boundary gone.
+    "owner": f"""
+/* shape:owner */
+SELECT pg_get_userbyid(c.relowner) NOT IN ('inv_app', 'inv_kernel'),
+       pg_has_role('inv_app', c.relowner, 'MEMBER'),
+       pg_has_role('inv_kernel', c.relowner, 'MEMBER')
+FROM pg_class c WHERE c.oid = {_REL}
+""",
 }
 
 _CAST = re.compile(r"::[a-z_]+(?: [a-z_]+)*")
@@ -184,6 +197,7 @@ EXPECTED_KERNEL_SHAPE = {
             ("c", normalise("CHECK (uri ~~ 'inv://models/%')")),
             ("c", normalise("CHECK (contribution_version >= 1)")),
             ("c", normalise("CHECK (location_version >= 1)")),
+            ("c", normalise("CHECK (channel_version >= 1)")),
             ("c", normalise("CHECK ((length(relative_path) >= 1) AND (length(relative_path) <= 4096))")),
             ("c", normalise("CHECK (certificate_sha256 ~ '^[0-9a-f]{64}$')")),
             ("c", normalise("CHECK (sha256 ~ '^[0-9a-f]{64}$')")),
@@ -207,6 +221,8 @@ EXPECTED_KERNEL_SHAPE = {
     "privileges": [("inv_kernel", "INSERT"), ("inv_kernel", "SELECT")],
     #: BEFORE (2) | ROW (1) | DELETE (8) | UPDATE (16); enabled ('O').
     "triggers": [("immutable", "O", "inv", "immutable_record", 27)],
+    #: (owner is not a runtime role, inv_app is a member of the owner, inv_kernel is)
+    "owner": [(True, False, False)],
 }
 
 
@@ -222,9 +238,10 @@ def _shape_from(rows_by_part) -> dict:
     ]
     privileges = sorted((r[0], r[1]) for r in rows_by_part["privileges"])
     triggers = [(r[0], r[1], r[2], r[3], int(r[4])) for r in rows_by_part["triggers"]]
+    owner = [(bool(r[0]), bool(r[1]), bool(r[2])) for r in rows_by_part["owner"]]
     return {
         "columns": columns, "constraints": constraints, "indexes": indexes, "rls": rls,
-        "policies": policies, "privileges": privileges, "triggers": triggers,
+        "policies": policies, "privileges": privileges, "triggers": triggers, "owner": owner,
     }
 
 
@@ -282,6 +299,20 @@ FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
 WHERE n.nspname = 'public' AND p.proname = 'model_version_measurement'
   AND pg_catalog.oidvectortypes(p.proargtypes) = 'text'
 """
+
+#: The reader's owner is not in its definition; a SECURITY DEFINER owned by a
+#: runtime role, or whose owner a runtime role can assume, is that role
+#: reading the kernel table directly. Same expectation as the table's owner.
+READER_OWNER = """
+/* shape:reader-owner */
+SELECT pg_get_userbyid(p.proowner) NOT IN ('inv_app', 'inv_kernel'),
+       pg_has_role('inv_app', p.proowner, 'MEMBER'),
+       pg_has_role('inv_kernel', p.proowner, 'MEMBER')
+FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+WHERE n.nspname = 'public' AND p.proname = 'model_version_measurement'
+  AND pg_catalog.oidvectortypes(p.proargtypes) = 'text'
+"""
+EXPECTED_READER_OWNER = [(True, False, False)]
 
 # ---------------------------------------------------------------- the public side
 
@@ -414,6 +445,9 @@ def upgrade():
     if reader:
         if reader[0][0] != reader_definition():
             _refuse(READER, hashlib.sha256(reader[0][0].encode("utf-8")).hexdigest(), reader_definition_sha256())
+        owner = [(bool(r[0]), bool(r[1]), bool(r[2])) for r in bind.exec_driver_sql(READER_OWNER).fetchall()]
+        if owner != EXPECTED_READER_OWNER:
+            _refuse(f"{READER} (owner)", owner, EXPECTED_READER_OWNER)
     else:
         _create_reader()
 

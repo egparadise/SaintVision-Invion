@@ -65,6 +65,7 @@ def _rows_for(shape: dict) -> dict:
         "policies": [(n, c, p, r, q, w) for n, c, p, r, q, w in shape["policies"]],
         "privileges": list(shape["privileges"]),
         "triggers": list(shape["triggers"]),
+        "owner": list(shape["owner"]),
     }
 
 
@@ -78,9 +79,10 @@ def kernel_rows(**overrides) -> dict:
 class Bind:
     """Answers the catalogue and data questions, and records that it was asked."""
 
-    def __init__(self, *, table=None, reader=None, column=None, fk=None, check=None, unbound=(), bound=(), rows=0):
+    def __init__(self, *, table=None, reader=None, reader_owner=None, column=None, fk=None, check=None, unbound=(), bound=(), rows=0):
         self.table = table                      # kernel_rows(...) when present, None when absent
         self.reader = reader                    # the reader's rendered definition, or None
+        self.reader_owner = reader_owner if reader_owner is not None else list(M.EXPECTED_READER_OWNER)
         self.column = column
         self.fk = fk
         self.check = check
@@ -91,11 +93,13 @@ class Bind:
 
     def exec_driver_sql(self, sql):
         self.asked.append(sql)
-        marker = re.search(r"/\* shape:(\w+) \*/", sql)
+        marker = re.search(r"/\* shape:([\w-]+) \*/", sql)
         if marker:
             part = marker.group(1)
             if part == "reader":
                 return _Result([(self.reader,)] if self.reader else [])
+            if part == "reader-owner":
+                return _Result(self.reader_owner)
             assert self.table is not None, "the shape is asked only when the table is present"
             return _Result(self.table[part])
         if "pg_class" in sql:
@@ -198,6 +202,34 @@ def test_the_kernel_sql_is_the_0037_shape_and_the_application_role_has_no_privil
     assert grants == [("SELECT, INSERT", "inv_kernel")]          # nothing for inv_app, nothing for PUBLIC
     assert re.search(r"CREATE TRIGGER immutable BEFORE UPDATE OR DELETE ON inv\.model_version_measurements\s+FOR EACH ROW EXECUTE FUNCTION inv\.immutable_record\(\)", sql)
     assert "REFERENCES public.model_versions" not in sql
+
+
+def _checks_in(sql: str) -> set[str]:
+    """Every CHECK, PRIMARY KEY and UNIQUE the kernel SQL declares, normalised
+    the way PostgreSQL renders them back (LIKE is ``~~``; BETWEEN is the two
+    comparisons)."""
+    found: set[str] = set()
+    body = sql[sql.index("CREATE TABLE inv.model_version_measurements"):sql.index("\n);")]   # the table, not the policy
+    for line in body.splitlines():
+        for keyword in ("CHECK (", "PRIMARY KEY (", "UNIQUE ("):
+            start = line.find(keyword)
+            if start < 0:
+                continue
+            expression = line[start:].rstrip().rstrip(",")
+            expression = expression.replace(" LIKE ", " ~~ ")
+            expression = re.sub(r"(\w+\([^()]*\)|\w+) BETWEEN (\d+) AND (\d+)", r"(\1 >= \2) AND (\1 <= \3)", expression)
+            found.add(M.normalise(expression))
+    return found
+
+
+def test_every_constraint_in_the_kernel_sql_is_expected_and_nothing_else_is():
+    """Codex #213 R2: the expected set is read against the SQL that creates
+    the table, independently of the stand-in that echoes the expectation
+    back. A CHECK in one and not the other (channel_version was) fails here."""
+    declared = _checks_in(KERNEL_SQL.read_text("utf-8"))
+    expected = {definition for _type, definition in M.EXPECTED_KERNEL_SHAPE["constraints"]}
+    assert declared == expected, {"only in sql": declared - expected, "only expected": expected - declared}
+    assert len(M.EXPECTED_KERNEL_SHAPE["constraints"]) == len(declared) == 14
 
 
 def test_the_migration_wraps_that_file_as_0048_wraps_0026():
@@ -331,6 +363,11 @@ TAMPERED = {
         i.replace("createuniqueindexmodel_version_measurements_tenant_id_request_id_key", "createindexmodel_version_measurements_tenant_id_request_id_key")
         for i in M.EXPECTED_KERNEL_SHAPE["indexes"]
     )),
+    # (f) the owner (Codex #213 R2): a runtime role owning the table, or able to assume its owner
+    "owner-app": kernel_rows(owner=[(False, True, False)]),
+    "owner-kernel": kernel_rows(owner=[(False, False, True)]),
+    "app-member-of-owner": kernel_rows(owner=[(True, True, False)]),
+    "kernel-member-of-owner": kernel_rows(owner=[(True, False, True)]),
 }
 
 
@@ -347,7 +384,7 @@ def test_a_table_of_that_name_whose_security_or_constraint_shape_differs_is_refu
 
 def test_every_part_of_the_shape_is_compared_and_the_stand_in_rows_reproduce_the_expected_shape():
     assert set(M.KERNEL_SHAPE_QUERIES) == set(M.EXPECTED_KERNEL_SHAPE) == {
-        "columns", "constraints", "indexes", "rls", "policies", "privileges", "triggers",
+        "columns", "constraints", "indexes", "rls", "policies", "privileges", "triggers", "owner",
     }
     assert M._shape_from(kernel_rows()) == M.EXPECTED_KERNEL_SHAPE
     for part, sql in M.KERNEL_SHAPE_QUERIES.items():
@@ -362,6 +399,13 @@ def test_the_normaliser_ignores_rendering_and_keeps_meaning():
     assert n("CHECK (sha256 ~ '^[0-9a-f]{64}$')") != n("CHECK (sha256 ~ '^[0-9a-f]+$')")
     assert n("true") != n(M.TENANT_PREDICATE)
     assert n("CHECK (byte_size >= 0)") != n("CHECK (byte_size >= 1)")
+
+
+@pytest.mark.parametrize("owner", [[(False, True, False)], [(True, True, False)], [(True, False, True)], []], ids=["owned-by-app", "app-member", "kernel-member", "absent"])
+def test_a_reader_whose_owner_is_or_admits_a_runtime_role_is_refused(monkeypatch, owner):
+    with pytest.raises(RuntimeError) as raised:
+        _run(monkeypatch, bind=Bind(table=TABLE_OK, reader=READER_OK, reader_owner=owner))
+    assert "model_version_measurement(text) (owner)" in str(raised.value)
 
 
 def test_a_reader_of_that_name_with_a_different_definition_is_refused(monkeypatch):

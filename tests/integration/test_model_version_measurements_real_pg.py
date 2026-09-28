@@ -395,7 +395,9 @@ TAMPERINGS = {
         [f"DROP POLICY tenant_isolation ON {T}", POLICY],
     ),
     "policy-missing": ([f"DROP POLICY tenant_isolation ON {T}"], [POLICY]),
-    "trigger-disabled": ([f"ALTER TABLE {T} DISABLE TRIGGER immutable"], [f"ALTER TABLE {T} ENABLE TRIGGER immutable"]),
+    # (a raw DISABLE TRIGGER is forbidden outside the integrity helper by
+    # tests/test_db_integrity_static.py; the disabled state is covered by the
+    # PG-free stand-in, the dropped trigger here)
     "trigger-dropped": ([f"DROP TRIGGER immutable ON {T}"], [TRIGGER]),
     "app-insert": ([f"GRANT INSERT ON {T} TO inv_app"], [f"REVOKE INSERT ON {T} FROM inv_app"]),
     "app-select": ([f"GRANT SELECT ON {T} TO inv_app"], [f"REVOKE SELECT ON {T} FROM inv_app"]),
@@ -437,6 +439,60 @@ def test_a_tampered_kernel_table_of_that_name_is_refused_on_resume_before_the_pu
     _assert_catalogue_is_whole(owner_engine)
 
 
+def _owner_of(owner_engine, relation: str) -> str:
+    with owner_engine.begin() as connection:
+        return connection.execute(text(f"SELECT pg_get_userbyid(relowner) FROM pg_class WHERE oid = '{relation}'::regclass")).scalar_one()
+
+
+@pytest.mark.parametrize("how", ["owned-by-app", "app-member-of-owner"])
+def test_a_kernel_table_a_runtime_role_owns_or_can_own_is_refused_on_resume(owner_engine, database_url, migrated, clean_tables, monkeypatch, how):
+    """Codex #213 R2: the owner is not in the ACL. ``OWNER TO inv_app`` keeps
+    inv_kernel's grants exactly as they are and hands the application the
+    right to drop the policy, the trigger and the grants."""
+    original = _owner_of(owner_engine, MEASUREMENTS)
+    assert original not in ("inv_app", "inv_kernel")
+    _interrupt_after_the_table(owner_engine)
+    with owner_engine.begin() as connection:
+        if how == "owned-by-app":
+            connection.execute(text(f"ALTER TABLE {MEASUREMENTS} OWNER TO inv_app"))
+        else:
+            connection.execute(text(f'GRANT "{original}" TO inv_app'))
+    try:
+        with pytest.raises(RuntimeError, match=r"different definition"):
+            _rerun(database_url, monkeypatch)
+        assert _recorded(owner_engine) == "0053_eval_suite_project_scope"
+        with owner_engine.begin() as connection:
+            assert not connection.exec_driver_sql(M.COLUMN_SHAPE).fetchall()
+    finally:
+        with owner_engine.begin() as connection:
+            if how == "owned-by-app":
+                connection.execute(text(f'ALTER TABLE {MEASUREMENTS} OWNER TO "{original}"'))
+            else:
+                connection.execute(text(f'REVOKE "{original}" FROM inv_app'))
+        _rerun(database_url, monkeypatch)
+        _restore_head(owner_engine)
+    _assert_catalogue_is_whole(owner_engine)
+
+
+def test_a_reader_a_runtime_role_owns_is_refused_on_resume(owner_engine, database_url, migrated, clean_tables, monkeypatch):
+    with owner_engine.begin() as connection:
+        original = connection.execute(text("SELECT pg_get_userbyid(proowner) FROM pg_proc WHERE oid = 'public.model_version_measurement(text)'::regprocedure")).scalar_one()
+    _interrupt_after_the_table(owner_engine)
+    with owner_engine.begin() as connection:
+        connection.execute(text("ALTER FUNCTION public.model_version_measurement(text) OWNER TO inv_app"))
+    try:
+        with pytest.raises(RuntimeError, match=r"model_version_measurement\(text\) \(owner\)"):
+            _rerun(database_url, monkeypatch)
+        with owner_engine.begin() as connection:
+            assert not connection.exec_driver_sql(M.COLUMN_SHAPE).fetchall()
+    finally:
+        with owner_engine.begin() as connection:
+            connection.execute(text(f'ALTER FUNCTION public.model_version_measurement(text) OWNER TO "{original}"'))
+        _rerun(database_url, monkeypatch)
+        _restore_head(owner_engine)
+    _assert_catalogue_is_whole(owner_engine)
+
+
 def test_a_reader_of_that_name_with_another_definition_is_refused_on_resume(owner_engine, database_url, migrated, clean_tables, monkeypatch):
     _interrupt_after_the_table(owner_engine)
     with owner_engine.begin() as connection:
@@ -460,6 +516,12 @@ def test_a_downgrade_refuses_while_a_measurement_exists(owner_engine, database_u
     from alembic.config import Config
 
     record_measurement(owner_engine, tenant_id=draft["tenant_a"], model_version_id=draft["version_id"], sha256=DIGEST)
+    # Preconditions stated, so a database left behind by another test cannot
+    # turn this into a no-op downgrade that "did not raise".
+    assert _recorded(owner_engine) == "0054_model_version_measurements"
+    with owner_engine.begin() as connection:
+        assert connection.exec_driver_sql(M.MEASUREMENT_ROWS).scalar() >= 1
+        assert connection.exec_driver_sql(M.COLUMN_SHAPE).fetchall()
     config = Config("alembic.ini")
     config.set_main_option("script_location", "migrations")
     with monkeypatch.context() as patch:

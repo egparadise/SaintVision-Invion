@@ -789,7 +789,9 @@ def test_the_real_pg_seed_builds_every_row_without_a_database():
     # users, projects, project_members, models, model_versions, datasets,
     # two dataset_versions, two dataset_version edges, four other edges,
     # one deployment.
-    assert len(recorder.statements) == 15
+    # 15 rows plus the two statements the 0054 measurement takes (the tenant
+    # GUC, then the kernel-table insert the seed records before verified_at).
+    assert len(recorder.statements) == 17
 
     # Empty edge set and a cross-project dataset are the other two branches.
     recorder = Recorder()
@@ -801,7 +803,7 @@ def test_the_real_pg_seed_builds_every_row_without_a_database():
         edge_kinds=(),
         dataset_project_id="prj_other",
     )
-    assert len(recorder.statements) == 7
+    assert len(recorder.statements) == 9                 # 7 rows + the measurement's two statements
 
     # The trap named: two lineage kinds are not entity kinds.
     assert set(LINEAGE_KINDS) - set(PREFIXES) == {"code_commit", "container_image"}

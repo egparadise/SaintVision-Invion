@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-G04-W3-MEASUREMENT-0054-001"
 title: "G-04 W3 측정 seam PR A-1 — migration 0054, kernel-owned measurement 표, verify_model_version(measurement_id 필수)"
-version: "1.1.0"
+version: "1.2.0"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T20:16:37+09:00"
+updated: "2026-09-28T20:40:12+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["G-04"]
@@ -40,11 +40,19 @@ Codex F1/F2 두 건과, 같은 head의 hosted Backend 36411181371(48 failed / 51
 - **application role의 kernel schema 접근.** inv_app에는 `USAGE ON SCHEMA inv`가 없어 서비스의 직접 SELECT가 `permission denied for schema inv`였다. schema USAGE를 주는 대신(kernel schema 전체가 열린다) 0044 `model_registry_snapshot` 모양의 tenant-bound `SECURITY DEFINER` reader `public.model_version_measurement(text)`를 두고 inv_app에 EXECUTE만 준다. kernel SQL의 `GRANT SELECT … TO inv_app`은 삭제 — application은 표를 **이름조차 못 댄다**(실 PG: SELECT/INSERT/UPDATE/DELETE 모두 permission denied). reader의 `pg_get_functiondef` 렌더링을 `reader_definition()`으로 재현해 `tools/definer-policy.json`의 `definitionSHA256`을 오프라인 계산했고(0044 항목의 해시를 같은 렌더러로 재현해 검증), 재개 시 정의가 byte-identical하지 않으면 거부한다. 설계 §4의 "application SELECT만"보다 좁다 — 코디네이터·Codex 확인 요청.
 - **직접 `verified_at`를 심던 시험 seed 4곳**(`test_model_release_real_pg._seed`, `test_lineage_query_real_pg._seed`, `test_model_registry_binding.registered`, `test_model_registry_runtime`)이 CHECK iff에 걸렸다. `measurement_support`에 connection-level `insert_measurement`/psycopg용 `insert_measurement_psycopg`를 추가해 seed가 measurement를 먼저 심고 `verified_measurement_id`를 함께 넣는다. RLS evidence collector의 `unmeasured=1`(inv_app 권한은 있는데 schema 접근이 없어 identity 검증 불가)은 inv_app 권한 자체가 사라져 해소.
 
+## 2-2. R2 — Codex 재검토(ccb35a87)와 hosted 36414777597 반영
+
+- **expected shape에 `channel_version >= 1` CHECK가 빠져 있었다**(Codex R2-1). 실 PG는 정확히 그 한 항목만 다르다고 답했고(다른 13개 제약·인덱스·정책 렌더링은 normalise 뒤 일치), 재개 거부 → 시험 `finally`의 재실행도 거부 → `verified_measurement_id` 없는 DB가 남아 이후 126건이 연쇄 실패했다. 항목을 추가하고, kernel SQL의 CREATE TABLE 본문에서 CHECK/PK/UNIQUE를 독립적으로 파싱해 expected 'c/p/u' 집합과 1:1임을 고정하는 PG-free 시험을 뒀다(stand-in이 expected를 되돌려 주는 구조로는 잡히지 않던 drift).
+- **owner shape**(Codex R2-2): `owner` 부분을 추가 — `(owner ∉ {inv_app, inv_kernel}, pg_has_role(inv_app, owner), pg_has_role(inv_kernel, owner)) == (True, False, False)`; reader에도 같은 검사(`READER_OWNER`). PG-free 되살림 4+4, 실 PG: `OWNER TO inv_app`·owner role membership 부여·reader `OWNER TO inv_app` 각각 public DDL 전 거부·복구 뒤 수렴. definer audit의 `runtime_can_assume_function_owner`는 `tests/integration/test_definer_audit.py::test_runtime_must_not_assume_function_owner`가 hosted에서 실행한다.
+- 실 PG `trigger-disabled` 변이는 `tests/test_db_integrity_static.py`가 helper 밖 raw `DISABLE TRIGGER`를 금지해 삭제(PG-free 'D' 상태·실 PG trigger 삭제가 남는다). downgrade 시험에 전제(revision 0054·행 ≥1·열 존재) 단언 추가. seed에 measurement 2문(GUC·INSERT)이 늘어 PG-free seed 카운트 시험 3곳(15→17, 7→9, 18→20)과 INSERT-only 테이블 집합 필터를 갱신.
+
 ## 3. 소유권 경계 (코디네이터 확인 필요)
 
 PR A-2(kernel `node-model-measure-v1` issue/accept + node 측 endpoint)는 kernel(`services/control-plane/src/inv`)과 **Go node-agent**(`services/node-agent/storage/sample.go`, domain `saintvision/node-storage-sample/v1`)에 걸친다. node-agent는 Claude 배정 영역이 아니므로 착수 전에 owner 결정을 받는다. 이 PR은 그 결정과 독립적으로 병합 가능하다(표와 결속만, 쓰는 코드 없음).
 
 ## 4. 검증 (실제 수행한 것만)
+
+R2 head 기준 로컬(단일 파일): `test_model_version_measurements_migration.py` 77 passed / 0 failed; `test_model_release_route.py` 59; `test_lineage_query_routes.py` 36; `test_db_integrity_static.py` 14; `test_migrations.py` 26; 실 PG 파일 collect-only 44. 실 PG NOT_OBSERVED.
 
 R1 head 기준 로컬(공유 venv 3.14, PG 없음, 단일 파일): `tests/core/test_model_version_measurements_migration.py` 68 passed / 0 failed; `tests/test_migrations.py` 26; `tests/core/test_object_store_locator_migration.py` 9; `tests/test_collect_rls_evidence.py` 17 passed / 3 skipped. 실 PG 파일 `--collect-only`: measurements 42, release 6, lineage_query 6, registry_binding 16, registry_runtime 22, test_lineage 30. 실 PG 결과 NOT_OBSERVED — hosted 인용은 PR 코멘트.
 
