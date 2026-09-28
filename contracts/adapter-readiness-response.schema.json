@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One agent CLI's install, login and reachability state (G-01 follow-up).\n\n#180 recorded that both adapter routes were declared ``-> dict``, so\n``export_schemas`` generated nothing for them and a change to the response\nshape broke no gate. This closes that for the single-adapter route, where the\nshape is one row and has no variants.\n\nThe fields and their types are **observed**, not inferred: ``agents.readiness()``\nwas run and its rows read (eleven keys, the same key set for all four tools),\nand ``probe()`` was run for ``reachable`` and ``latencyMs``. The nullable ones\nare nullable because the tool may be absent (``path``, ``version``), present\nelsewhere (``installedElsewhere``) or have nothing to say\n(``instructions``, ``latencyMs`` when unreachable).\n\n``loginDetail`` is the one unbounded field: it is whatever the adapter's\n``login_state()`` returned, which comes from CLI output. Declaring it as an\nopen mapping is honest about that rather than pretending a shape; narrowing it\n-- and deciding whether tool output belongs in a screen-facing response at all\n-- is a separate question this card does not answer.\n\nThe **list** route keeps ``-> dict`` on purpose. Its rows have two shapes: the\neleven-key row above, and a five-key row when one tool raises\n(``adapter``, ``executable``, ``installed``, ``loginState``, ``error``). A\nresponse model would fill the missing keys with defaults and so change the\nwire shape a screen sees for a broken tool, which is a public change owned by\nthe frontend rather than a side effect of canonicalising a 404.",
+  "properties": {
+    "adapter": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Adapter",
+      "type": "string"
+    },
+    "executable": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Executable",
+      "type": "string"
+    },
+    "headless": {
+      "title": "Headless",
+      "type": "boolean"
+    },
+    "installed": {
+      "title": "Installed",
+      "type": "boolean"
+    },
+    "installedElsewhere": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Installedelsewhere"
+    },
+    "instructions": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Instructions"
+    },
+    "latencyMs": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Latencyms"
+    },
+    "loginDetail": {
+      "additionalProperties": true,
+      "title": "Logindetail",
+      "type": "object"
+    },
+    "loginState": {
+      "pattern": "^(logged_in|logged_out|unknown)$",
+      "title": "Loginstate",
+      "type": "string"
+    },
+    "missing": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Missing",
+      "type": "array"
+    },
+    "path": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Path"
+    },
+    "reachable": {
+      "title": "Reachable",
+      "type": "boolean"
+    },
+    "version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Version"
+    }
+  },
+  "required": [
+    "adapter",
+    "executable",
+    "installed",
+    "loginState",
+    "headless",
+    "reachable"
+  ],
+  "title": "AdapterReadinessResponse",
+  "type": "object"
+}

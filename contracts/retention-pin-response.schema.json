@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The version's retention after the request was judged.\n\n``retentionPinnedUntil`` is the committed value, which is the requested one\nonly when it extended the pin; ``extended`` says which, so a no-op is\nvisible to the caller instead of looking like success by coincidence.\n``stage`` is whatever the row is in -- a released version can still be\nextended (design §5-3) -- and is the closed set the column allows.",
+  "properties": {
+    "extended": {
+      "title": "Extended",
+      "type": "boolean"
+    },
+    "modelId": {
+      "title": "Modelid",
+      "type": "string"
+    },
+    "modelVersionId": {
+      "title": "Modelversionid",
+      "type": "string"
+    },
+    "retentionPinnedUntil": {
+      "format": "date-time",
+      "title": "Retentionpinneduntil",
+      "type": "string"
+    },
+    "stage": {
+      "enum": [
+        "draft",
+        "candidate",
+        "released",
+        "retired"
+      ],
+      "title": "Stage",
+      "type": "string"
+    },
+    "version": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "modelVersionId",
+    "modelId",
+    "version",
+    "stage",
+    "retentionPinnedUntil",
+    "extended"
+  ],
+  "title": "RetentionPinResponse",
+  "type": "object"
+}
