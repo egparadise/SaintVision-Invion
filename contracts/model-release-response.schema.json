@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The released version, echoed back by identity.\n\n``stage`` is a literal rather than a free string: the only state this\nresponse can describe is the one the route just established, so a future\nchange that returns a different stage under the same type breaks the\ncontract instead of quietly widening it.\n\nPython field names avoid the ``model_`` prefix because Pydantic reserves\nthat namespace; the wire names are the aliases.",
+  "properties": {
+    "contentSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Contentsha256",
+      "type": "string"
+    },
+    "modelId": {
+      "title": "Modelid",
+      "type": "string"
+    },
+    "modelVersionId": {
+      "title": "Modelversionid",
+      "type": "string"
+    },
+    "stage": {
+      "const": "released",
+      "title": "Stage",
+      "type": "string"
+    },
+    "version": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "modelVersionId",
+    "modelId",
+    "version",
+    "stage",
+    "contentSha256"
+  ],
+  "title": "ModelReleaseResponse",
+  "type": "object"
+}

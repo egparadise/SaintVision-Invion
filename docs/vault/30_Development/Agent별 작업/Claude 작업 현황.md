@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.21"
+version: "1.2.22"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T09:55:00+09:00"
+updated: "2026-09-28T11:14:32+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+VF-CL-03 import adapter 요청 경로 구현 카드 bb (Claude, 2026-09-28, base `1e8baf04`, branch `agent/claude/vfcl03-import-impl`): 설계 #152 v1.3(`e9e5e78e`) 구현. 신규 `api/problem.py`(정본 `ProblemDetails` 예외·`canonical_response`·handler 1회 등록·`translate`·`strict_json_object`·`require_absent_body`·`validate_strict`)와 신규 `api/v1/model_release.py`(release route, 세 구간, route별 번역표 `VAL-SCHEMA`→`GRAPH-0002`·불일치→`MODEL-0009`·`AUTH-PROJECT-SCOPE`→`AUTH-0030`·미매핑→`SYS-0002`), `schemas.py`에 `ModelReleaseRequest`·`ModelReleaseResponse`, `config.py`에 `kernel_base_url`. **설계와 달라진 3건은 구현 중 실측이다** — ①`exported()`가 `Request`/`Response` 접미만 수집하므로 `ModelReleaseResult`는 schema 미생성·gate 통과(도구 docstring이 말하는 '가장 조용한 실패') → `ModelReleaseResponse`. ②`validate_contract("ModelReleaseRequest", …)`는 불가(정본 `$defs`에 없음) → Pydantic 검증 + `errors()` 미직렬화. ③`BusinessDispatch`가 세 router의 `routes`를 읽고 `include_router`는 `_IncludedRouter` 지연 placeholder만 남기므로 `add_api_route`로 등록해야 도달(부정 시험이 선택 목록에서 경로를 찾는다). **설계에 없던 빈칸 2건도 결정했다** — business에는 커널 HTTP 클라이언트가 없고 `requirements-core.txt`에 HTTP 클라이언트가 없어(httpx는 test 전용) 표준 `urllib.request` GET + timeout 5s를 쓰고 의존성을 늘리지 않았다. `kernel_base_url` 미설정은 `SYS-0001` 503이며 이 경우 fetch가 일어나지 않음까지 단언한다(커널 `inv/app.py:629`·`:932`와 같은 관례). 값 미노출은 `detail`에 필드 이름만·감사 `detail`에 `declarationFields` 이름만이고, `audit.redact`가 `license`·`classification`을 덮지 않는다는 것을 시험이 직접 확인한다. `committed != true` 분기는 정본 `const: true` 때문에 현재 도달 불가이며 검증 stub 시험으로만 덮고 그 사실을 적었다. 검증: `pytest tests/core -q` **1081 passed / 4 skipped**(72s), `tests/core/test_model_release_route.py` **49 passed**, `export_schemas.py --check` **60 PASS**, `route_coverage` 0 unserved, docs gate 2종 exit 0. 로컬 실 PG·Docker·전체 suite 미실행. 다음 첫 행동: Codex 독립 검토(reviewer Codex, 병합 금지). 남은 것 — 실 PG 3건 hosted 확인, `register_model_version`·`verify_model_version`·`pin_retention`은 여전히 HTTP 경로 없음(별 카드). 전문 [[2026-09-28_VF-CL-03_import_요청경로_구현_Claude]].
 
 hosted Core junit로 S04/05/07-DB 케이스 수치 보강 카드 12 (Claude, 2026-09-22, 읽기 전용): artifact `saintvision-core-evidence`(run 35706465645 `3d1892c0` + proof 35714470445 `f2aa2b14`)를 .work/ci-junit에 받아(바이너리 삭제 후 1.4MB) 파일별 수치(core 2948/58/0·shard-recovery 21·containment 28·workspace 22·business-handoff 17·lan-installer 15·docker-host 2, f2aa2b14는 core 2998/58/0 외 동일)와 카드 10의 hosted-only 항목 케이스 이름을 classname으로 추출 — 재전송 hash(output_ingestion 5·node_delivery 18·results 21), placement Explain(placement 12), shard replacement 21, containment 28, workspace 복구 12+11, 노드 스토리지 전송 27 — **전부 passed**. hosted에도 없는 것(AC-05 결정성/P95·AC-07 60초/95%·CX01)은 그대로 물리/5노드 대기로 명시. 패키지 §C-2 + 검증상태지도 §12 보강. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 

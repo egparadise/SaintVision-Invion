@@ -1,0 +1,76 @@
+---
+doc_id: "HIST-CLAUDE-VFCL03-IMPORT-REQUEST-PATH-IMPL-001"
+title: "VF-CL-03 import adapter 요청 경로 구현 — 공유 정본 ProblemDetails 모듈·strict body helper·release route, PG-free 49 시험 통과, 실 PG 3건은 hosted"
+version: "1.0.0"
+status: "active"
+author: "Claude"
+reviewer: "Codex"
+updated: "2026-09-28T11:14:32+09:00"
+timezone: "Asia/Seoul"
+source_of_truth: "Git"
+task_ids: ["VF-CL-03"]
+tags: ["vf-cl-03", "model-registry", "import", "problem-details", "implementation", "claude"]
+---
+
+# VF-CL-03 import adapter 요청 경로 구현
+
+승인된 설계 `#152` v1.3(head `e9e5e78e`)을 그대로 구현했다. base는 `origin/integration/all-agents-unified`(`1e8baf04`)다. 로컬 실 PG·Docker·전체 suite는 돌리지 않았고, 돌린 것은 PG-free 레인이다.
+
+## 1. 착지한 것
+
+| 파일 | 내용 |
+|---|---|
+| `src/saintvision/api/problem.py` (신규) | 정본 `ProblemDetails` 예외·응답·handler, 그리고 공유 `strict_json_object`·`require_absent_body`·`validate_strict`·`translate` |
+| `src/saintvision/api/v1/model_release.py` (신규) | release route와 그 세 구간, route별 번역표 |
+| `src/saintvision/api/schemas.py` | `ModelReleaseRequest`, `ModelReleaseResponse` |
+| `src/saintvision/api/app.py` | canonical handler 1회 등록 (기존 handler 불변) |
+| `src/saintvision/api/v1/projects.py` | `model_release.register(router)` 한 줄 |
+| `src/saintvision/config.py` | `kernel_base_url`(`INV_KERNEL_BASE_URL`) |
+| `contracts/model-release-{request,response}.schema.json` | `export_schemas.py` 생성물 |
+| `tests/core/test_model_release_route.py` (신규) | 설계 §9의 부정 시험, 49 test |
+
+## 2. 설계와 달라진 것 3건 — 구현하며 찾은 사실
+
+### 2-1. 응답 타입 이름을 `ModelReleaseResult` → `ModelReleaseResponse`로 바꿨다
+
+`tools/export_schemas.py::exported()`는 **이름이 `Request` 또는 `Response`로 끝나는 `Strict` 파생 클래스만** 수집한다. `ModelReleaseResult`라는 이름은 그 규칙에 걸리지 않아 **JSON Schema가 생성되지 않고 `--check`도 통과**한다 — 그 도구의 docstring이 스스로 "가장 조용한 실패"라고 부르는 상태다. 설계가 승인된 이름을 바꾸는 것이므로 여기 적는다. 지금은 `contracts/model-release-response.schema.json`이 생성되고 gate가 본다.
+
+### 2-2. 요청 검증은 `validate_contract`가 아니라 Pydantic이다
+
+설계 v1.2가 이미 지적한 대로 business 타입은 정본 `$defs`에 없으므로 `validate_contract("ModelReleaseRequest", …)`는 불가능하다. handler가 `ModelReleaseRequest.model_validate()`를 부르고 `ValidationError`를 잡아 `VAL-0003`으로 번역한다. `errors()`는 직렬화하지 않는다(필드 경로·입력 값이 들어간다). 커널 관측 검증은 정본 `$def`이므로 `validate_contract("ModelCommitObservation", …)` 그대로다.
+
+### 2-3. route를 어디에 등록하는지가 제약이었다
+
+`inv.business_surface.BusinessDispatch`는 `projects`·`settings`·`adapters` 세 router의 `routes`를 읽어 business 트래픽을 고른다. 그래서 (i) 새 top-level router는 business app에 등록되지만 **배포 토폴로지에서 요청이 도달하지 않고**, (ii) `projects.router.include_router(...)`도 안 된다 — 이 FastAPI 버전은 `_IncludedRouter` **지연 placeholder**를 남기므로 dispatch가 읽는 시점에 route 객체가 `routes`에 없다(실측). 그래서 `model_release.register(router)`가 `add_api_route`로 실제 route를 넣는다. 커널 소유 파일은 건드리지 않았다. 부정 시험이 세 router의 선택 목록에서 이 경로를 찾는다.
+
+## 3. 설계대로 구현한 경계
+
+- **세 구간**: 인증·본문 파싱(tx 없음) → 짧은 tx에서 live `require_project_access` + `canApprove` → **tx 종료** → 커널 HTTP + strict 검증(tx 없음) → 새 tx에서 권한 재확인 → parent `models` 소유 확인 → `(model_id, version)` `with_for_update()` → 관측 identity 재결속 → 기존 전제 검사 → 선언 비교 → release → 감사. 커널 호출 시점의 열린 트랜잭션 수가 **0**임을 시험이 깊이로 관측한다.
+- **번역표는 route별**이다. `VAL-SCHEMA`는 이 호출 지점에서 상태 전제이므로 `GRAPH-0002` 409, 선언 불일치는 `MODEL-0009` 409, project 접근 불가는 `AUTH-0030` 403. 표에 없는 code는 `SYS-0002` 500이고, 시험이 `release_model_version` 본문을 정규식으로 읽어 **거기서 나오는 code가 표에 다 있는지** 확인한다(새 거부가 추가되면 시험이 깨진다).
+- **본문 경계**: Content-Type `application/json`(415, `Content-Encoding` 존재도 415) · 8 KiB(413) · 빈 본문·invalid UTF-8·문법·nesting·duplicate key·non-finite·배열·scalar·제약 위반(422). 파싱은 커널 `inv.identity.strict_object`에 위임한다.
+- **정본 body**: 10키 정확히, `about:blank`, code별 status·retryable, `inv.contracts.validate_contract` 앵커, `application/problem+json` + `no-store`.
+- **값 미노출**: 불일치 이유는 `detail`에 **필드 이름만**, 감사 `detail`은 `declarationFields` 이름 배열만. `services/audit.py::redact`가 `license`·`classification`을 덮지 않는다는 것을 시험이 직접 확인한다(자동 보호가 없으므로 넣지 않는 것이 유일한 방어).
+- **커널 자격증명**: 호출자의 bearer를 그대로 전달한다. 서비스 신원을 쓰면 호출자가 스스로 읽을 수 없는 commitment를 이 route가 읽어 주게 된다.
+
+## 4. 새로 결정한 것 2건 (설계에 없던 빈칸)
+
+1. **커널 HTTP 클라이언트가 없었다.** business 제품 코드는 커널과 DB(`project_kernel_link`)로만 이야기하고 `requirements-core.txt`에 HTTP 클라이언트가 없다(`httpx`는 test 전용). 그래서 표준 `urllib.request`로 GET 하나를 보내고 timeout 5초를 둔다. 의존성을 늘리지 않았다.
+2. **`kernel_base_url`이 없으면 `SYS-0001` 503**이다. 호스트를 추측하지 않는 것이 `config.py`의 규칙이고, 커널도 미설정을 503으로 답한다(`inv/app.py:629`·`:932`). 시험은 이 경우 **fetch가 아예 일어나지 않음**도 단언한다.
+
+## 5. 관측하지 못한 것 (정직한 경계)
+
+- **실 PG 3건은 돌리지 않았다** — 타 tenant 404(RLS), path project 불일치가 타 tenant와 같은 404, 실패 시 `draft` 유지. 근거는 hosted Core·Backend에 둔다. PG-free 시험의 세션은 route가 부르는 호출에만 답하는 대역이라, 증명하는 것은 **route의 순서와 wire 계약**이고 데이터베이스의 행동이 아니다.
+- `committed != true` 분기는 정본이 `const: true`를 박고 있어 **현재 도달 불가**다. 검증을 stub한 시험으로만 덮었고, 그 사실을 코드 주석과 시험 이름에 적었다.
+- `register_model_version`·`verify_model_version`·`pin_retention`은 **여전히 HTTP 경로가 없다**. 이 카드는 승격 한 지점만 열었고 blocker의 나머지는 장부에 남는다.
+
+## 6. 검증 증거 (실행)
+
+- `pytest tests/core -q` → **1081 passed, 4 skipped**(72s). 신규 파일만: `tests/core/test_model_release_route.py` → **49 passed**.
+- `python tools/export_schemas.py --check` → **PASS: 60 contract schemas match their models**.
+- `python tools/route_coverage.py --served src --served services/control-plane/src --client apps/web/src` → **0 unserved**, exit 0.
+- `python tools/check_docs.py`, `python tools/check_doc_single_source.py --ratchet` → exit 0.
+- 로컬 실 PG·Docker·전체 suite **미실행**(메모리 규칙).
+
+## 7. 다음 첫 행동
+
+Codex 독립 검토. 검토가 끝나면 실 PG 3건을 hosted Core·Backend 결과로 확인하고, 남은 model-registry 쓰기 경로(등록·검증·pin)를 별 카드로 올린다.
