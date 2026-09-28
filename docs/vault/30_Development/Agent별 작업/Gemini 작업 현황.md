@@ -4,7 +4,7 @@ title: "Gemini 작업 현황"
 version: "1.0.129"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-28T17:55:00+09:00"
+updated: "2026-09-28T17:53:56+09:00"
 source_of_truth: "Git"
 ---
 
