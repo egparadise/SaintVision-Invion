@@ -158,6 +158,19 @@ def build(monkeypatch, world):
     world.setdefault("clock_reads", [])
     world.setdefault("advance_on_body", None)
     world.setdefault("advance_on_lock", None)
+    world.setdefault("audited_denials", [])
+
+    # The shared denial recorder (#195, merged into this branch) writes through
+    # the app's engine, which these tests do not have. Recorded here so a 403's
+    # audit call is asserted rather than lost -- the same stub the sibling route
+    # harnesses use.
+    from saintvision.api import app as app_module
+
+    monkeypatch.setattr(
+        app_module,
+        "record_denial_out_of_band",
+        lambda _engine, **kwargs: world["audited_denials"].append(kwargs),
+    )
 
     monkeypatch.setattr(model_versions, "make_session_factory", lambda _engine: Factory(world))
     monkeypatch.setattr(
@@ -632,6 +645,135 @@ def test_the_service_is_called_with_only_what_the_request_carried(monkeypatch):
 
 
 # --------------------------------------------------------------------------
+# F4: a canonical 403 leaves exactly one denial, at the shared boundary
+# --------------------------------------------------------------------------
+
+
+#: What #189's bounded action must be for this route: 57 characters, so it is the
+#: template verbatim rather than the name-and-digest form -- and it carries no
+#: identifier, which is the point.
+REGISTER_ACTION = "POST /v1/projects/{project_id}/models/{model_id}/versions"
+
+
+def test_f4_the_missing_grade_records_one_denial_with_every_column(monkeypatch):
+    world = {"permissions": [{"canRequest": True, "canApprove": False}]}
+    client = build(monkeypatch, world)
+    body = canonical(post(client), code="AUTH-0030", status=403)
+
+    assert len(world["audited_denials"]) == 1
+    recorded = world["audited_denials"][0]
+    assert recorded["outcome"] == "deny"
+    assert recorded["reason_code"] == "AUTH-0030"
+    assert recorded["actor_type"] == "user"
+    assert recorded["actor_id"] == USER
+    assert recorded["tenant_id"] == TENANT
+    # The path carried a well-formed project id, so it is the target; the tenant
+    # is the caller's, never the project's.
+    assert (recorded["target_type"], recorded["target_id"]) == ("project", PROJECT)
+    assert recorded["trace_id"] == body["traceId"]
+    assert recorded["detail"] == {}
+    assert recorded["action"] == REGISTER_ACTION
+
+
+def test_f4_a_non_member_is_recorded_the_same_way(monkeypatch):
+    world = {"denials": [InvError(AUTH_PROJECT_SCOPE, "no membership", status=403)]}
+    client = build(monkeypatch, world)
+    canonical(post(client), code="AUTH-0030", status=403)
+    assert len(world["audited_denials"]) == 1
+    assert world["audited_denials"][0]["action"] == REGISTER_ACTION
+    assert world["audited_denials"][0]["reason_code"] == "AUTH-0030"
+
+
+def test_f4_a_revocation_between_the_two_spans_is_recorded_too(monkeypatch):
+    """The write is rolled back; the denial is not.
+
+    The first span passes and the post-lock re-check refuses, so this is the one
+    refusal that happens after the transaction opened.
+    """
+    world = {"denials": [None, InvError(AUTH_PROJECT_SCOPE, "revoked", status=403)]}
+    client = build(monkeypatch, world)
+    canonical(post(client), code="AUTH-0030", status=403)
+    assert world["registered"] == []
+    assert world["stored"] == []
+    assert len(world["audited_denials"]) == 1
+    assert world["audited_denials"][0]["action"] == REGISTER_ACTION
+
+
+def test_f4_a_registration_that_succeeds_records_no_denial(monkeypatch):
+    world = {}
+    client = build(monkeypatch, world)
+    assert post(client).status_code == 201
+    assert world["audited_denials"] == []
+    # The allow is recorded, which is a different thing: it is inside the
+    # transaction that made the change.
+    assert len(world["audits"]) == 1
+
+
+@pytest.mark.parametrize(
+    "world_kwargs,code,status",
+    [
+        ({"parent": Parent(project_id=OTHER_PROJECT)}, "RES-0004", 404),
+        ({"service_error": InvError(VAL_SCHEMA, "bad digest", status=422)}, "VAL-0003", 422),
+        (
+            {"replay_error": InvError(GRAPH_IDEMPOTENCY_CONFLICT, "other body", status=409)},
+            "GRAPH-0002",
+            409,
+        ),
+    ],
+    ids=["not-found", "request-error", "conflict"],
+)
+def test_f4_only_authorisation_refusals_are_audited(monkeypatch, world_kwargs, code, status):
+    """A 404, a 422 and a 409 are not denials of authorisation.
+
+    AC-02 is about refused *access*; recording every failed request as a denial
+    would make the trail useless for the thing it exists for.
+    """
+    world = dict(world_kwargs)
+    client = build(monkeypatch, world)
+    canonical(post(client), code=code, status=status)
+    assert world["audited_denials"] == []
+
+
+def test_f4_the_route_does_not_record_the_denial_itself(monkeypatch):
+    """One audit point. A route inside the transaction the refusal rolls back
+    cannot be the place this is written (#195)."""
+    import inspect
+
+    source = inspect.getsource(model_versions)
+    assert "record_denial" not in source
+    # It does record its own allow, which is inside the transaction that made the
+    # change -- a different thing from a refusal.
+    assert "record_event" in source
+
+
+def test_f4_the_action_carries_no_identifier(monkeypatch):
+    world = {"permissions": [{"canRequest": True, "canApprove": False}]}
+    client = build(monkeypatch, world)
+    post(client)
+    action = world["audited_denials"][0]["action"]
+    for identifier in (PROJECT, MODEL, USER, SHA, KEY):
+        assert identifier not in action
+    # The audit_events column bound (#189).
+    assert len(action) <= 64
+
+
+def test_f4_the_action_is_the_real_route_template_not_a_restatement():
+    """Derived from the registered route rather than copied here.
+
+    The constant above would drift silently if the path changed, so it is checked
+    against the route object the app actually serves.
+    """
+    from saintvision.api.v1 import projects
+
+    match = next(
+        route
+        for route in projects.router.routes
+        if getattr(route, "path", None) == f"/v1{model_versions.REGISTER_PATH}"
+    )
+    assert REGISTER_ACTION == f"POST {match.path}"
+
+
+# --------------------------------------------------------------------------
 # F2: the stored address is derived, so there is nothing to smuggle
 # --------------------------------------------------------------------------
 
@@ -785,15 +927,15 @@ def _integrity(message, *, constraint=None, sqlstate=None):
             "This model already has a version with that name.",
         ),
         (
-            _integrity("dup", constraint="uq_model_versions_tenant_id_content_sha256"),
-            "That content digest is already registered.",
+            _integrity("dup", constraint="uq_model_versions_model_id_content_sha256"),
+            "This model already has a version with that content digest.",
         ),
         (
             _integrity(
                 'duplicate key value violates unique constraint '
-                '"uq_model_versions_tenant_id_content_sha256"'
+                '"uq_model_versions_model_id_content_sha256"'
             ),
-            "That content digest is already registered.",
+            "This model already has a version with that content digest.",
         ),
     ],
     ids=["by-constraint-name", "digest-by-name", "by-message"],
@@ -807,19 +949,44 @@ def test_a_unique_violation_is_a_409_not_a_500(monkeypatch, error, detail):
     assert world["audits"] == []
 
 
-def test_the_digest_conflict_does_not_name_the_project_it_collided_in(monkeypatch):
-    """``uq_model_versions_tenant_id_content_sha256`` is tenant scoped, so the
-    row it collided with may be in a project the caller cannot see. The detail
-    says the registration conflicts and nothing about where."""
+def test_f1_the_digest_conflict_is_now_inside_the_model_the_caller_named(monkeypatch):
+    """Migration ``0052`` moved the digest rule to ``(model_id, content_sha256)``.
+
+    Before it, the constraint was tenant-wide and a 409 told a member of one
+    project that those bytes existed in another -- an existence oracle the wording
+    could not hide, because the status code carried it. Now a conflict can only be
+    inside the model in the path, so the detail may say what happened, and it still
+    names no project.
+    """
+    world = {
+        "service_error": _integrity(
+            "dup", constraint="uq_model_versions_model_id_content_sha256"
+        )
+    }
+    client = build(monkeypatch, world)
+    body = post(client).json()
+    assert body["detail"] == "This model already has a version with that content digest."
+    text = json.dumps(body)
+    assert OTHER_PROJECT not in text
+    assert "project" not in text.lower()
+
+
+def test_f1_the_tenant_wide_digest_constraint_is_no_longer_mapped(monkeypatch):
+    """The narrowed constraint replaced it, so the old name cannot occur.
+
+    Kept as a mapping, it would be dead code that quietly resurrects the vague
+    detail if the migration were ever reverted; unmapped, such a violation is the
+    generic internal failure any unknown constraint gets.
+    """
+    assert "uq_model_versions_tenant_id_content_sha256" not in model_versions.UNIQUE_CONFLICTS
     world = {
         "service_error": _integrity(
             "dup", constraint="uq_model_versions_tenant_id_content_sha256"
         )
     }
     client = build(monkeypatch, world)
-    text = json.dumps(post(client).json())
-    assert OTHER_PROJECT not in text
-    assert "project" not in text.lower()
+    assert post(client).status_code == 500
+    assert world["stored"] == []
 
 
 def test_an_integrity_error_that_is_not_a_unique_violation_is_not_disguised(monkeypatch):
