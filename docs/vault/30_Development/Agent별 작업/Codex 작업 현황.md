@@ -4,7 +4,7 @@ title: "Codex 작업 현황"
 version: "1.0.207"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T10:40:00+09:00"
+updated: "2026-09-28T16:25:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -20,6 +20,11 @@ source_of_truth: "Git"
 - 운영 정본 `inv.app.create_configured_app`에 인증+operator grant 전용 `GET /v1/operations/configuration-readiness`를 추가했다. Claude 1차 검토 뒤 단순 env 존재 검사를 폐기하고 `api.json.configurationReadiness` 및 기존 read-only config volume에 결속했다. 값은 반환하지 않고 `INV_NODE_MTLS_CA_BUNDLE`·`INV_OBJECT_STORE_ENDPOINT` 호환 이름만 엄격한 `ConfigurationReadinessView`로 반환한다.
 - CA는 읽을 수 있는 bounded PEM에 CA 인증서 1장 이상, endpoint는 자격증명 없는 HTTP(S) URL일 때만 해결된다. 1개만 미해결·없는/깨진/non-CA PEM·잘못된 URL은 계속 `blocked`; `/readyz` 의미는 유지하고 provider 미구성은 `SYS-0001/503`이다. focused PG-free **58 passed, 2 opt-in skipped, 3 postgres deselected**, bindings·schema check 0을 확보했다.
 - PR #122의 `--health-url`은 `--settings-url`+Bearer로, PR #125 §7은 새 운영 route로 후속 정정한다. U2·U3·U6은 미해결이며 S01-BE `in_progress` 유지. [[S01_BE_운영_설정_미해결_관측_결정]], [[2026-09-28_08-35-00_KST_S01_BE_운영_설정_미해결_관측_Codex]].
+## 2026-09-28 Card44 VF-CL-02~04 독립 검토 공백
+
+- `08ece3bc`의 URI trailing/version slash 수정은 되살림 3건이 exit 1로 KILLED됐다. 정확한 경계는 trailing slash를 parser가, version slash를 `build_uri()`와 `test_builder_rejects_ambiguous_version_path`가 막는다. `0043` pin migration은 직접 PostgreSQL 단언을 정독해 승인했다(로컬 PG 실행은 제한에 따라 NOT_RUN). `c75201af` model shard resolution은 fail-closed/unavailable·tenant/location 경계를 직접 시험해 검토 공백을 닫았다.
+- `34791448` exact-match adapter는 casefold 완화 mutation이 2건 실패해 KILLED됐으며, request path 미결속 blocker는 유지한다. `3e267b05` archive retention은 WAL boundary mutation을 property 시험이 잡았지만 malformed `START TIME`을 directory mtime으로 fail-open 대체하는 F-VFCL04-01과 명명 timezone을 실패/UTC 오해석하는 F-VFCL04-02를 분리해 수정 요청했다.
+- #139·#143 병합 전이라 registry는 건드리지 않고 VF-CL-02/03 true, VF-CL-04 false+두 새 blocker의 의미 diff만 제안했다. 다음은 Claude가 retention timestamp fail-closed와 timezone parsing을 보정한 뒤 Codex 재검토와 registry owner 적용이다. [[2026-09-28_16-25-00_KST_VF-CL_독립검토공백_Codex]].
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 
