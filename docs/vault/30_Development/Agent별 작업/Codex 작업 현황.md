@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.221"
+version: "1.0.222"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T22:01:22+09:00"
+updated: "2026-09-29T02:04:52+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-29 Card124 S11 AC-11 composite long-soak reference-only 생산자 — Claude 검토 요청
+
+- #217 head `35c5b207` 위 PR #236, 구현 commit `0c71f752`에서 strict G-19 inventory와 기존 LAN pilot/five-node 검증을 재사용하는 생산자를 추가했다. dry-run은 14개 exact case와 fault class를 합성 상태로 순회하지만 `referenceOnly=true`, `acceptanceClaim=false`, `NOT_OBSERVED`, JUnit 15 skipped로만 산출한다.
+- 실제 모드는 inventory 누락·수량·identity drift를 실행 전 `BLOCKED_EXTERNAL(G-19)`로, 유효 inventory 뒤 physical adapter 부재를 `BLOCKED_EXTERNAL(G-24)`로 막는다. SSH·Docker·LAN pilot state·PG·물리 Node는 사용하지 않았다.
+- PG-free 관련 3파일 59 passed, compile·diff와 docs·bindings·frontend integrity·ontology·ratchet gate exit 0. 첫 Backend `36454774473`은 shallow checkout을 실제 ancestry reader에 연결한 CLI fixture 1건이 양 Python에서 fail-closed해 red였고, 제품 경계는 유지한 채 fixture reader를 격리한 head `b2976b8a`에서 단일 파일 20 passed를 확인했다. 보정 Backend `36456314532`는 양 Python 각각 3844 passed/49 skipped/2 deselected/0 failed와 exact skip gate green, Docs `36456314587`·desktop-browser `36456314615`도 green이다. sync `--check`의 기존 공유 목적지 충돌 7건은 coordinator에 인계한다. [[2026-09-29_02-04-52_KST_S11_AC11_composite_long_soak_runner_Codex]].
 
 ## 2026-09-28 Card96 S11 AC-11 composite long-soak registry repin — Claude 검토 요청
 
