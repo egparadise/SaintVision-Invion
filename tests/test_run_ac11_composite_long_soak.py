@@ -37,26 +37,28 @@ DOC_BLOB = "0bf74f90557a237b50ebdf571ed9e3dac89ea23b"
 
 
 class FakeGit:
-    def __init__(self) -> None:
+    def __init__(self, *, source: str = SOURCE, tree: str = TREE) -> None:
+        self.source = source
+        self.checkout_tree = tree
         self.registry = (ROOT / REGISTRY_PATH).read_text(encoding="utf-8")
 
     def tree(self, commit: str) -> str:
-        assert commit == SOURCE
-        return TREE
+        assert commit == self.source
+        return self.checkout_tree
 
     def blob(self, commit: str, path: str) -> str:
-        if path == REGISTRY_PATH and commit == SOURCE:
+        if path == REGISTRY_PATH and commit == self.source:
             return REGISTRY_BLOB
-        if path == DOC_PATH and commit in {DOC_COMMIT, SOURCE}:
+        if path == DOC_PATH and commit in {DOC_COMMIT, self.source}:
             return DOC_BLOB
         raise AssertionError((commit, path))
 
     def show(self, commit: str, path: str) -> str:
-        assert commit == SOURCE and path == REGISTRY_PATH
+        assert commit == self.source and path == REGISTRY_PATH
         return self.registry
 
     def is_ancestor(self, ancestor: str, descendant: str) -> bool:
-        return ancestor == DOC_COMMIT and descendant == SOURCE
+        return ancestor == DOC_COMMIT and descendant == self.source
 
 
 def _node(index: int, *, colocated: bool = False) -> dict:
@@ -261,6 +263,10 @@ def test_cli_dry_run_writes_reference_report_evidence_and_junit(
             return tree
         raise AssertionError(args)
     monkeypatch.setattr("tools.run_ac11_composite_long_soak._git_value", fake_git_value)
+    monkeypatch.setattr(
+        "tools.run_ac11_composite_long_soak.RepositoryGit",
+        lambda: FakeGit(source=source, tree=tree),
+    )
     inventory = _inventory()
     storage, hosted = _references(inventory, source=source)
     inventory_path = tmp_path / "inventory.json"
