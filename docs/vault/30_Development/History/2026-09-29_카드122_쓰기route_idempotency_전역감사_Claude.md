@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-CARD122-WRITE-ROUTE-AUDIT-001"
 title: "src/saintvision/api 전역 쓰기 route 감사 — release가 idempotency 없이 나간 것과 같은 부류가 다른 POST/PUT/DELETE에 있는가 (카드 122)"
-version: "1.1.0"
+version: "1.2.0"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-29T01:44:56+09:00"
+updated: "2026-09-29T04:17:11+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["G-04"]
@@ -81,6 +81,21 @@ eval_runs ⑦(v1.1 정정): v1.0은 #229 계열 base가 가진 옛 #210 head `f6
 3. **Medium** 권한: pools 멤버 추가/제거·plan 생성에 project 권한 검사 부재.
 4. **Medium** legacy 7개 PUT/DELETE의 audit 중복(값은 멱등). 제안: FE가 이미 보내는 `Idempotency-Key`를 legacy lane도 소비(필수 아닌 선택적 ledger라도)하거나, 최소한 nodes enroll의 미사용 헤더 선언 제거.
 5. **Low/설계** legacy `RES_*` 409 vs canonical 404, `DENIAL_CATEGORIES` 밖 미기록, `bounded_lock_wait` 미적용(`lock_project` FOR UPDATE 대기 무한).
+
+### 4-A. 인계 결과 (v1.2, 2026-09-29 04:17 KST 기준 — 전부 Claude 독립 검토 완료)
+
+| §4 항목 | Codex PR / head | 상태 | 검토 |
+|---|---|---|---|
+| 1 High admit 2차 token | #234 `4aee7b0f` | announcement `FOR UPDATE` + `admitted_by_user_id` marker → 2회째 `GRAPH-INVALID-TRANSITION`/409, token·audit 생성 전 거부 | 승인(Backend `36454195021`·Core `36454209694` green) |
+| 2 Medium IntegrityError 500 (pool·plan) | #238 `00a59f83` | constraint allowlist(`uq_resource_pools_tenant_id_name`·`uq_distributed_plans_run_id`)만 409, member PK 경합은 exact row 확인 시 200 | 승인(`36459244615`·`36459244375`) |
+| 2 Medium IntegrityError 500 (storage, key 없음) + ⑥⑦ | #240 `5118b5bb` | key 있으면 advisory lock → ledger, 없으면 unique → 409; 등록 전체 `bounded_lock_wait` | 승인(`36459356458`·`36459356553`) |
+| 3 Medium pools 권한 | #238 `00a59f83` | project lock → live membership/`canRequest` → pool lock; plan은 run lock + workload↔pool project; 거부 body에서 유도 `projectId` 제거 | 승인(위) |
+| 4 Medium legacy 7 PUT/DELETE audit 중복 | #241 `77a0620f` | `deps.optional_idempotent_write`(선택적 key: bound → advisory → replay → 같은 tx ledger), 7 route 전부 replay-before-service | 승인(`36459524222`·`36459524248`) |
+| 5 Low legacy `RES_*` 409 → 404 | #244 `75d80847` | `RES-NODE/CONTRIBUTION/RUN/WORKSPACE/ARTIFACT-NOT-FOUND` 5종만 API 경계에서 `RES-0004`/404/고정 detail(비노출) | 승인(`36466998420`·`36466998383`) |
+| 5 Low `DENIAL_CATEGORIES` 밖 미기록 | #244 | 변경 불필요로 종결(resource 404는 denial 아님; 미기록을 시험으로 고정) — 동의 | 승인(위) |
+| 5 Low legacy `bounded_lock_wait` | #244 | 나머지 11 route `get_write_session`, manual 3 span 직접 bound → legacy 22개 전부 ⑦ O | 승인(위) |
+
+따라서 §3 표의 legacy 22개는 이 stack(#234→#238→#240→#241→#244, 모두 #232 위) 착지 시점에 ⑥(key 있을 때)·⑦·⑩(5종 not-found)이 O로 바뀐다. 남은 것: key 형식 검증(#240 L1·#241 L3), 6 route 실 PG replay 실측(#241 L2), member 두 세션 경합 실측(#238 권고), storage 인라인을 `optional_idempotent_write`로 통일(#241 권고). 기준 tree는 여전히 `41fe5c3c`; 표의 file:line은 그 head 기준이라 stack 착지 뒤 줄 번호는 달라진다.
 
 ## 5. 검증 (실제 수행한 것만)
 
