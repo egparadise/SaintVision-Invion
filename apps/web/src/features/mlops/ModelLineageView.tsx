@@ -6,10 +6,12 @@ import { MlopsManager } from './mlopsEngine';
 
 export interface ModelLineageViewProps {
   initialLineages?: ModelLineage[];
+  currentProjectId?: string;
 }
 
 export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   initialLineages = [],
+  currentProjectId,
 }) => {
   const [mlopsManager] = useState<MlopsManager>(() => new MlopsManager(initialLineages));
   const [lineages, setLineages] = useState<ModelLineage[]>(mlopsManager.getLineages());
@@ -18,13 +20,18 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   const [approvalInput, setApprovalInput] = useState('');
   const [actionNotice, setActionNotice] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  // Model commitment observation state
-  const [commitmentProject, setCommitmentProject] = useState('prj_default');
-  const [commitmentModelId, setCommitmentModelId] = useState(lineages[0]?.modelId || '');
-  const [commitmentVersion, setCommitmentVersion] = useState(lineages[0]?.version || '1.0.0');
+  // Model commitment observation state (starts empty, requiring explicit project/model context)
+  const [commitmentProject, setCommitmentProject] = useState(currentProjectId || '');
+  const [commitmentModelId, setCommitmentModelId] = useState('');
+  const [commitmentVersion, setCommitmentVersion] = useState('');
   const [commitmentData, setCommitmentData] = useState<ModelCommitObservation | null>(null);
   const [commitmentLoading, setCommitmentLoading] = useState(false);
-  const [commitmentError, setCommitmentError] = useState<string | null>(null);
+  const [commitmentError, setCommitmentError] = useState<{
+    code?: string;
+    status?: number;
+    title?: string;
+    detail: string;
+  } | null>(null);
 
   const conformances = mlopsManager.verifyProviderConformances();
   const selectedModel = lineages.find((m) => m.modelId === selectedModelId) || lineages[0];
@@ -34,7 +41,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
     const m = lineages.find((item) => item.modelId === modelId);
     if (m) {
       setCommitmentModelId(m.modelId);
-      setCommitmentVersion(m.version || '1.0.0');
+      setCommitmentVersion(m.version || '');
     }
   };
 
@@ -79,7 +86,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       setLineages(mlopsManager.getLineages());
       setActionNotice({
         type: 'success',
-        text: `✔ [모의 시뮬레이션] [${res.deployedModel?.modelName}] 로컬 배포 게이트 검증 완료 (백엔드 서빙 배포 API 미노출 상태로 실제 인프라 미반영 · 백엔드 digest 고정과 무관 · Digest: ${res.deployedModel?.deploymentDigest.slice(0, 24)}...)`,
+        text: `✔ [${res.isSimulated ? '모의 시뮬레이션' : '배포 완료'}] [${res.deployedModel?.modelName}] 로컬 배포 게이트 시뮬레이션 완료 (백엔드 서빙 배포 API 미노출 상태로 실제 인프라 미반영 · 백엔드 digest 고정과 무관 · Digest: ${res.deployedModel?.deploymentDigest.slice(0, 24)}...)`,
       });
     }
   };
@@ -100,7 +107,13 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       setCommitmentData(data);
     } catch (err: any) {
       setCommitmentData(null);
-      setCommitmentError(err.message || 'Commitment 조회 중 오류가 발생했습니다.');
+      const prob = err?.problem;
+      setCommitmentError({
+        code: prob?.code || 'FETCH_ERROR',
+        status: prob?.status || (err?.status ?? 500),
+        title: prob?.title || 'Error',
+        detail: prob?.detail || err.message || 'Commitment 조회 중 오류가 발생했습니다.',
+      });
     } finally {
       setCommitmentLoading(false);
     }
@@ -164,7 +177,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             Accuracy ≥ 85.0%
           </div>
           <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
-            {lineages.length > 0 ? '2인 승인 ID 필수 충족' : '평가 점수 부재로 게이트 대기'}
+            {lineages.length > 0 ? '2인 승인 ID 필수 충족 (모의 게이트)' : '평가 점수 부재로 게이트 대기'}
           </div>
         </div>
 
@@ -523,7 +536,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           <input
             type="text"
             data-testid="commitment-project-input"
-            placeholder="Project ID (예: prj_default)"
+            placeholder="Project ID (prj_...)"
             value={commitmentProject}
             onChange={(e) => setCommitmentProject(e.target.value)}
             style={{
@@ -540,7 +553,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           <input
             type="text"
             data-testid="commitment-model-input"
-            placeholder="Model ID (예: mod_pacs_seg)"
+            placeholder="Model ID (mdl_...)"
             value={commitmentModelId}
             onChange={(e) => setCommitmentModelId(e.target.value)}
             style={{
@@ -595,7 +608,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               color: '#f85149',
             }}
           >
-            ❌ Commitment 조회 실패: {commitmentError}
+            ❌ [{commitmentError.code || 'ERROR'}] ({commitmentError.status || 500}) {commitmentError.title ? `${commitmentError.title}: ` : ''}{commitmentError.detail}
           </div>
         )}
 
@@ -635,6 +648,18 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>RECOVERY EPOCH</span>
               <span data-testid="commitment-recovery-epoch" style={{ color: '#c9d1d9' }}>
                 {commitmentData.commitRecoveryEpoch}
+              </span>
+            </div>
+            <div>
+              <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>CURRENT AVAILABILITY</span>
+              <code data-testid="commitment-availability" style={{ color: '#f59e0b' }}>
+                {commitmentData.currentAvailability}
+              </code>
+            </div>
+            <div>
+              <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>EXECUTION REVALIDATION</span>
+              <span data-testid="commitment-revalidation" style={{ color: '#f0f6fc' }}>
+                {commitmentData.requiresExecutionRevalidation ? 'Required (true)' : 'False'}
               </span>
             </div>
             <div>

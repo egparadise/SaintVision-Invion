@@ -252,14 +252,21 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
 
     it('renders Real Model Commitment Observation Panel and fetches commitment via control-plane API', async () => {
       const originalFetch = globalThis.fetch;
+      const testProjectId = 'prj_01JTESTPROJ01234567890ABCD';
+      const testModelId = 'mdl_01JTESTMODEL0123456789ABCD';
+      const testVersion = '1.0.0';
+      const testManifestHash = '7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069';
+      const testSourceRunId = 'run_01JTESTRUN01234567890ABCDE';
+      const testRecoveryEpoch = 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d';
+
       const mockCommitmentResponse = {
-        projectId: 'prj_default',
-        modelId: 'mod_pacs_seg_v2',
-        version: '2.1.0',
-        manifestHash: 'sha256:7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069',
-        sourceRunId: 'run_01JTESTCOMMITMENT01',
+        projectId: testProjectId,
+        modelId: testModelId,
+        version: testVersion,
+        manifestHash: testManifestHash,
+        sourceRunId: testSourceRunId,
         committedAt: '2026-09-28T09:00:00Z',
-        commitRecoveryEpoch: '42',
+        commitRecoveryEpoch: testRecoveryEpoch,
         format: 'safetensors',
         totalBytes: 52428800,
         shardCount: 4,
@@ -296,6 +303,23 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
         expect(versionInput).not.toBeNull();
         expect(fetchBtn).not.toBeNull();
 
+        // Inputs default to empty string requiring explicit context
+        expect(projectInput?.value).toBe('');
+
+        // Explicitly set inputs according to canonical schema format
+        const setInputValue = (el: HTMLInputElement, val: string) => {
+          const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+          setter?.call(el, val);
+          el.dispatchEvent(new Event('input', { bubbles: true }));
+          el.dispatchEvent(new Event('change', { bubbles: true }));
+        };
+
+        await act(async () => {
+          setInputValue(projectInput!, testProjectId);
+          setInputValue(modelInput!, testModelId);
+          setInputValue(versionInput!, testVersion);
+        });
+
         // Trigger fetch and flush async execution
         await act(async () => {
           fetchBtn!.click();
@@ -306,24 +330,34 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
 
         expect(globalThis.fetch).toHaveBeenCalled();
 
-        // Invariant: manifestHash and sourceRunId must be displayed in read-only panel
+        // Invariant: manifestHash, sourceRunId, availability, and revalidation must be displayed
         const manifestHashEl = container.querySelector('[data-testid="commitment-manifest-hash"]');
         const sourceRunIdEl = container.querySelector('[data-testid="commitment-source-run-id"]');
+        const availabilityEl = container.querySelector('[data-testid="commitment-availability"]');
+        const revalidationEl = container.querySelector('[data-testid="commitment-revalidation"]');
+
         expect(manifestHashEl?.textContent).toBe(mockCommitmentResponse.manifestHash);
         expect(sourceRunIdEl?.textContent).toBe(mockCommitmentResponse.sourceRunId);
+        expect(availabilityEl?.textContent).toBe('unknown');
+        expect(revalidationEl?.textContent).toContain('Required (true)');
 
-        // Now test 404 failure handling
+        // Now test 404 canonical ProblemDetails failure handling
+        const canonical404Problem = {
+          type: 'https://saintvision.ai/errors/MODEL-0004',
+          code: 'MODEL-0004',
+          title: 'Not Found',
+          status: 404,
+          detail: 'Committed model not found',
+          instance: `/v1/projects/${encodeURIComponent(testProjectId)}/models/${encodeURIComponent(testModelId)}/versions/${encodeURIComponent(testVersion)}/commitment`,
+          invalidParams: [],
+        };
+
         globalThis.fetch = vi.fn().mockResolvedValue({
           ok: false,
           status: 404,
           statusText: 'Not Found',
           headers: new Headers({ 'content-type': 'application/problem+json' }),
-          json: async () => ({
-            code: 'MODEL-0004',
-            title: 'Not Found',
-            detail: 'Committed model not found',
-            status: 404,
-          }),
+          json: async () => canonical404Problem,
         } as any);
 
         await act(async () => {
@@ -336,6 +370,8 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
         const errorBanner = container.querySelector('[data-testid="commitment-error-banner"]');
         expect(errorBanner).not.toBeNull();
         expect(errorBanner?.getAttribute('role')).toBe('alert');
+        expect(errorBanner?.textContent).toContain('MODEL-0004');
+        expect(errorBanner?.textContent).toContain('404');
         expect(errorBanner?.textContent).toContain('Committed model not found');
       } finally {
         globalThis.fetch = originalFetch;
