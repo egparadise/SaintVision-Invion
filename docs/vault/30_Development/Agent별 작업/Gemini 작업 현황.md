@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.140"
+version: "1.0.141"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-29T04:56:00+09:00"
+updated: "2026-09-29T05:15:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,12 +19,18 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-29T04:56:00+09:00 (PR #245 Claude r2 H3/L2 전수 조치 완결, Codex 계약 승인 유지).
+- 확인 기준: 2026-09-29T05:15:00+09:00 (PR #245 Claude r3 H3-b 잔여 전수 조치 완결, Codex 계약 승인 유지).
 
 ## 2026-09-29 프런트엔드 비차단 후속 감사 지적사항 통합 조치 완료 (Card 138, `agent/gemini/card138-fe-bundle`)
 - **개요**: 앞선 검토(PR #219, #228, #212, #178, #190)에서 비차단으로 남겨진 6대 후속 과제 전수 조치 및 되돌리면 실패하는 자동화 시험 완비.
 - **PR**: Card 138 (Base: `agent/gemini/card126-audit-fixes` head `27a6e4ca` 위 stacked, PR #245)
 - **담당 및 역할**: Gemini (Frontend / UI / 접근성 소유). Reviewer: Claude (UI·테스트 축), 제어 평면 계약 합의 (계약 축).
+- **독립 검토 r3 (Claude UI H3-b 잔여) 전수 조치 완료 (PR #245)**:
+  - **H3-b [Medium, 잔여] DeveloperStudio 단계 표시 배경 토큰 복원 및 시험 임계 원복**:
+    - `DeveloperStudio.tsx:902`: 단계 번호 원형 배지 배경 토큰을 `b91ab72f` 정본과 일치하도록 `var(--color-brand-primary)`에서 `var(--color-brand-primary-bg)`로 복원 (`isActive ? 'var(--color-brand-primary-bg)' : ...`).
+    - `DeveloperStudio.tsx`의 `b91ab72f` 대비 diff가 0 bytes(완전 일치)임을 실측.
+    - `tests/s11-defect-fixes.test.tsx:934`: `brandPrimaryBgMatches` 허용 임계를 `3`에서 원래의 `2`(`ClusterOverview.tsx`, `NodeList.tsx`)로 원복하고 `expect(matchedFiles).toContain('features/studio/DeveloperStudio.tsx')` 단언 삭제.
+    - 되돌릴 경우 `expect(brandPrimaryBgMatches).toHaveLength(2)` 실패(실측 3건)로 퇴행이 즉시 차단됨을 확인.
 - **독립 검토 r2 (Claude UI H3 및 L2) 전수 조치 완료 (PR #245)**:
   - **H3 [High]**: S11 결함 수정(DEF-S11-08·11~16) 복원 및 Card 126 F1(`unmeasured`) 조화:
     - `ReleaseCandidateView.tsx`와 `releaseEngine.ts`를 S11 정직 모의 라벨(`모의 활성`, `✔ 모의 검증 완료`, `주요 SLO 모의 규격 및 목표 비교`, `모의 PASS`, `[수동 계산값]: 12.26:1` 등) 기준으로 복원하고 Card 126 F1(`unmeasured`)과 조화.

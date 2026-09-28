@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-GEMINI-CARD138-001"
 title: "History: Card 138 프런트엔드 비차단 후속 감사 지적사항 통합 조치 (Items 1-6)"
-version: "1.0.2"
+version: "1.0.3"
 status: "review"
 author: "Gemini"
-updated: "2026-09-29T04:55:00+09:00"
+updated: "2026-09-29T05:15:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -101,14 +101,22 @@ source_of_truth: "Git"
 
 ---
 
-## 5. 로컬 게이트 실측 검증 결과 (r2 조치 후)
+## 5. 독립 검토 r3 (Claude UI 축) 지적사항 H3-b 잔여 전수 조치
+
+| 구분 | 심각도 | 지적 사항 | 조치 내용 | 회귀 시험 및 증거 |
+|---|---|---|---|---|
+| **H3-b** | Med | DeveloperStudio 단계 번호 원형 배지 배경 토큰 옛 토큰 잔류 및 시험 임계 완화 | (1) `DeveloperStudio.tsx:902`: 단계 번호 원형 배지 배경 토큰을 `b91ab72f` 정본과 일치하도록 `var(--color-brand-primary)`에서 `var(--color-brand-primary-bg)`로 복원하여 착지 후보 `b91ab72f` 대비 diff 0 bytes 달성.<br>(2) `tests/s11-defect-fixes.test.tsx:934`: `brandPrimaryBgMatches` 허용 임계를 원래의 `2`(`ClusterOverview.tsx`, `NodeList.tsx`)로 원복하고 `expect(matchedFiles).toContain('features/studio/DeveloperStudio.tsx')` 단언 삭제. | `tests/s11-defect-fixes.test.tsx` (16 passed)<br>`git diff b91ab72f -- apps/web/src/features/studio/DeveloperStudio.tsx` (0 bytes) |
+
+---
+
+## 6. 로컬 게이트 실측 검증 결과 (r3 조치 후)
 
 | 검증 단계 | 수행 명령 | 결과 요약 | Exit Code |
 |---|---|---|---|
-| **Vitest 단위/통합** | `npx vitest run` (apps/web) | **86 test files passed (86), 853 tests passed (853)**, 0 failures (25.33s) | `0` |
+| **Vitest 단위/통합** | `npx vitest run` (apps/web) | **86 test files passed (86), 853 tests passed (853)**, 0 failures (23.19s) | `0` |
 | **TypeScript 타입 검사** | `npx tsc -b` (apps/web) | **0 errors** | `0` |
-| **프로덕션 번들 빌드** | `npm run build` (apps/web) | Vite 프로덕션 빌드 성공 (`dist/assets/index-2am4jENa.js` 881.32 kB) | `0` |
-| **파이썬 라우트 커버리지** | `pytest tests/test_route_coverage.py` | **40 passed** in 1.53s | `0` |
+| **프로덕션 번들 빌드** | `npm run build` (apps/web) | Vite 프로덕션 빌드 성공 (`dist/assets/index-MRLS1r7b.js` 881.32 kB) | `0` |
+| **파이썬 라우트 커버리지** | `pytest tests/test_route_coverage.py` | **40 passed** in 1.60s | `0` |
 | **프런트엔드 무결성** | `python tools/check_frontend_integrity.py` | 92 files 0 violations (All 9 integrity rules satisfied) | `0` |
 | **계약 바인딩 검사** | `python tools/check_contract_bindings.py` | 55 fixtures / 20 bound types / 14 replay guards PASS | `0` |
 | **문서 무결성 검사** | `python tools/check_docs.py` | 24 original hashes, 929 versioned docs, wiki links PASS | `0` |
@@ -116,7 +124,7 @@ source_of_truth: "Git"
 
 ---
 
-## 6. 인계 및 다음 단계
+## 7. 인계 및 다음 단계
 
 - **작업 브랜치**: `agent/gemini/card138-fe-bundle`
 - **PR 대상**: Base `agent/gemini/card126-audit-fixes` (PR #243) 위 stacked PR #245.

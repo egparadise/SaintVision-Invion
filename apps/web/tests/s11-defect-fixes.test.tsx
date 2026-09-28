@@ -930,12 +930,11 @@ describe('S11-FE Defect Fixes Verification (DEF-S11-01 ~ DEF-S11-19)', () => {
       });
     }
 
-    // Exactly three matches are permitted: progress bars and step indicator without text (ClusterOverview.tsx, NodeList.tsx, DeveloperStudio.tsx)
-    expect(brandPrimaryBgMatches).toHaveLength(3);
+    // Exactly two matches are permitted: progress bars without text (ClusterOverview.tsx, NodeList.tsx)
+    expect(brandPrimaryBgMatches).toHaveLength(2);
     const matchedFiles = brandPrimaryBgMatches.map((m) => m.file);
     expect(matchedFiles).toContain('features/dashboard/ClusterOverview.tsx');
     expect(matchedFiles).toContain('features/nodes/NodeList.tsx');
-    expect(matchedFiles).toContain('features/studio/DeveloperStudio.tsx');
 
     // Verify none of the matches contain white text
     for (const match of brandPrimaryBgMatches) {
