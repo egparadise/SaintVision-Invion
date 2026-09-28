@@ -1,11 +1,11 @@
 ---
 doc_id: "CLAUDE-S10-BE-MLFLOW-INTEGRATION-DESIGN-001"
-title: "S10-BE MLflow 연동 설계 v1.0 — MLflow는 정본이 아닌 미러(tracking·registry 미러링), 정본은 lineage의 content_sha256·approval digest; TrackingSink 계약·strict config·fail-closed·부재 시 NOT_OBSERVED; 도입 여부는 결정 요청(선택지 A 미도입 / B 미러 / C 정본) (카드 bd, G1a 해소안, docs-only)"
-version: "1.1.0"
+title: "S10-BE MLflow 연동 설계 v1.2 — 결정 B(미러): 정본은 lineage digest, MLflow는 push-only 미러; intent+outbox 한 tx·append-only attempt·idempotent find; TrackingSink 계약; tenant 범위 operator service credential(0035 run 결속 lookup 미사용); TRACK-0001~0005 canonical code·verdict 매핑; canonical payload/URI 정규화; 부재·부분 실패 관측 (카드 bd, docs-only)"
+version: "1.2.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T11:23:22+09:00"
+updated: "2026-09-28T11:37:30+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -49,69 +49,122 @@ tags: ["S10-BE", "AC-10", "mlflow", "tracking", "lineage", "adapter", "design", 
 
 받는 것은 **미러 참조 id뿐**이다. MLflow에서 우리 상태를 읽어 판정에 쓰는 경로는 없다(아래 §3).
 
-## 2. lineage·정본 digest와의 관계
+## 2. lineage·정본 digest와의 관계 (v1.2: subject/schema 확정)
 
-- **정본**: `model_versions.content_sha256`(append-only, `uq_model_versions_tenant_id_content_sha256`), `verify_model_version`, `pin_retention`(연장만), `release_model_version`(verify+pin+trace), `record_deployment`(`deployed_digest=version.content_sha256`, approval digest 일치). **변경 없음.**
-- **미러 참조 테이블(신규, 구현 카드에서 migration)** `mlflow_mirrors`: `tenant_id`, `subject_kind ∈ {model_version, eval_run, deployment}`, `subject_id`, `tracking_uri_sha256`(URI 자체는 저장하지 않음), `mlflow_experiment_id`, `mlflow_run_id | mlflow_model_version`, `payload_sha256`(우리가 보낸 tag/param 집합의 canonical sha256), `synced_at`, `status ∈ {mirrored, refused, unavailable}`, `error_code`. **INSERT/SELECT만**(0003 `NEW_APPEND_ONLY`와 같은 정책), RLS FORCE. 재시도는 새 행.
-- **lineage edge 추가 없음**: `record_lineage`의 kind 집합(`dataset_version`·`code_commit`·`container_image`·`eval_run`·`approval`)은 그대로. MLflow run은 계보 주체가 아니라 계보의 **미러**이므로 `REQUIRED_KINDS`·`trace_model`에 영향 없음.
-- **불일치 표면화**: 미러 push 응답의 tag가 우리 digest와 다르면(서버가 tag를 바꿨거나 재사용된 run) `TRACK-MLFLOW-DIGEST-MISMATCH`로 기록(status `refused`) — 조용히 덮어쓰지 않음.
+- **정본 불변**: `model_versions.content_sha256`(append-only, `uq_model_versions_tenant_id_content_sha256`), `verify_model_version`, `pin_retention`(연장만), `release_model_version`(verify+pin+trace), `record_deployment`(`deployed_digest=version.content_sha256`, approval digest 일치). **변경 없음.** lineage edge kind 5·`REQUIRED_KINDS`·`trace_model` 불변(MLflow run은 계보 주체가 아니라 미러).
+- **subject 스키마(신규 table 2, 구현 카드 migration)**:
 
-## 3. adapter contract와의 결속
+`mlflow_mirror_intents` — 정본 변경과 **같은 transaction**에서 INSERT되는 불변 의도(F-R3). 앱 role INSERT/SELECT만, RLS FORCE.
 
-MLflow는 프롬프트를 실행하는 Provider가 아니므로 `ProviderAdapter`(`adapters/contract.py:177`) 8 메서드를 그대로 요구하지 않는다. 대신 같은 자료형을 재사용하는 **`TrackingSink` 계약**(`adapters/tracking.py`, 신규)을 둔다:
+| 컬럼 | 규칙 |
+|---|---|
+| `intent_id` (`mmi_` + ULID) | PK(tenant_id, intent_id) |
+| `tenant_id`, `project_id` | NOT NULL; FK projects |
+| `subject_kind` | `CHECK IN ('experiment','training_run','eval_run','model_version','deployment')` |
+| `run_id`, `eval_run_id`, `model_version_id`, `deployment_id` | **정확히 하나만 NOT NULL**(`experiment`는 전부 NULL): `CHECK (num_nonnulls(run_id, eval_run_id, model_version_id, deployment_id) = CASE WHEN subject_kind='experiment' THEN 0 ELSE 1 END)` + kind↔컬럼 일치 CHECK(`training_run`↔`run_id`, `eval_run`↔`eval_run_id`, …); FK는 각 정본 table |
+| `payload` jsonb, `payload_sha256` | §2.1 canonical bytes의 sha256; `CHECK (payload_sha256 ~ '^[0-9a-f]{64}$')` |
+| `outbox_event_id` | FK `outbox_events`(core, 기존 `services/evidence.py:113` "caller의 transaction 안에서 append") — 의도와 outbox row가 한 tx |
+| `created_at`, `recovery_epoch` | 기록; `UNIQUE(tenant_id, subject_kind, COALESCE(run_id,eval_run_id,model_version_id,deployment_id,project_id), payload_sha256)` → 같은 payload 재의도는 no-op(idempotent enqueue) |
 
-| 멤버 | 자료형/의미 | 계약 재사용 |
+`mlflow_mirror_attempts` — worker가 push **뒤** 남기는 append-only outcome(INSERT/SELECT만).
+
+| 컬럼 | 규칙 |
+|---|---|
+| `attempt_id` (`mma_` + ULID), `intent_id` FK | `UNIQUE(tenant_id, intent_id, attempt_no)`, `attempt_no ≥ 1` — 재시도는 **새 행** |
+| `status` | `CHECK IN ('mirrored','unavailable','refused','mismatch','invalid')` |
+| `error_code` | `CHECK (error_code IS NULL OR error_code ~ '^TRACK-[0-9]{4}$')`; `status='mirrored'`이면 NULL, 아니면 NOT NULL(CHECK) |
+| `tracking_uri_sha256` | §2.2 정규화 URI의 sha256(URI 원문 미저장) |
+| `mlflow_experiment_id`, `mlflow_run_id`, `mlflow_model_version` | 미러 참조(nullable; `mirrored`면 kind에 맞는 참조 NOT NULL CHECK) |
+| `response_payload_sha256` | attest에서 서버가 돌려준 tag/param 집합의 canonical sha256 |
+| `started_at`, `finished_at`, `worker_id` | 기록 |
+
+- **순서 고정(F-R3)**: (1) 정본 변경 + `mlflow_mirror_intents` INSERT + `outbox_events` INSERT를 **한 tx**에서 commit(기존 ADR-008 패턴, `services/evidence.py:113`). (2) worker가 outbox를 소비(`mark_published`/`attempts`/`max_attempts` 재사용, `:157-175`) → 설정·credential 해석 → push → attest → `mlflow_mirror_attempts` INSERT(append-only) → outbox published. (3) 어느 단계에서 죽어도: intent가 있고 attempt가 없으면 **pending**(crash-before-send), 재시작 시 outbox가 다시 배달.
+- **idempotency·중복 배달**: 미러 생성 전에 MLflow에서 tag `inv.intent_id = <intent_id>`로 검색(experiment 범위). 있으면 새로 만들지 않고 attest만 하고 `mirrored`를 기록(send-success-before-local-record 복구). 없으면 생성 후 tag 기록. 같은 outbox event가 두 번 배달돼도 결과는 attempt 행 1개 추가·MLflow run 0개 추가.
+- **불일치 표면화**: attest의 `response_payload_sha256 ≠ payload_sha256` → `mismatch`/`TRACK-0003`. 조용히 덮어쓰지 않음.
+
+### 2.1 canonical payload bytes (`payload_sha256`)
+
+`json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)`를 **UTF-8 NFC**로 인코딩한 bytes의 sha256. 규칙: (a) 키 정렬·공백 없음; (b) 문자열은 NFC 정규화; (c) 숫자: 정수는 그대로, float는 `repr()`(최단 왕복) — **NaN/±Infinity는 거부**(`TRACK-0005 payload invalid`, INSERT 전에 실패 → 정본 tx도 실패시키지 않고 의도만 생성하지 않음? — 아니다: 의도 생성 실패는 **정본 tx 실패**로 둔다. 유효하지 않은 payload를 만든 것은 우리 결함이며 조용히 미러를 빼먹지 않기 위함); (d) metric은 `{"key","value","step"(int, 기본 0),"timestamp_ms"(int, 정본 시각)}` 배열을 key·step 순 정렬; (e) `None`은 필드 생략; (f) tag 값은 문자열만. 결정성 시험: 키 순서 뒤섞기·유니코드 NFD 입력·`1.0` vs `1`·metric 순서 뒤섞기가 같은 digest, NaN/Infinity 거부.
+
+### 2.2 URI 정규화 (`tracking_uri_sha256`)
+
+scheme·host 소문자(IDNA 인코딩), 기본 포트(443) 제거, 경로 percent-encoding 정규화 뒤 trailing slash 제거(`/` 단독은 빈 경로), query·fragment는 **거부**(`TRACK-0004`), userinfo 거부. 동치 시험: `HTTPS://Host.Example:443/mlflow/` ≡ `https://host.example/mlflow`; 비동치: 다른 path·다른 port·`http`.
+
+## 3. TrackingSink 계약 (adapter contract 결속)
+
+MLflow는 프롬프트를 실행하는 Provider가 아니므로 `ProviderAdapter`(`adapters/contract.py:177`) 8 메서드를 요구하지 않고, 같은 자료형을 재사용하는 `TrackingSink`(`adapters/tracking.py`, 신규)를 둔다.
+
+| 멤버 | 자료형/의미 | 재사용 |
 |---|---|---|
-| `name`, `contract_version` | `"mlflow"`, `"1.0.0"` | Provider와 동일 규칙(`_declares_version`) |
-| `probe() -> ProbeResult` | tracking server 도달·API 버전 | `contract.py:77` 그대로 |
-| `authenticate(credential_ref) -> AuthResult` | credential **참조**만 받음, 토큰 반환 없음 | `:90` 그대로(`principal_ref`는 opaque) |
-| `mirror(record: MirrorRecord) -> MirrorResult` | 한 subject의 tag/param/metric 집합을 push; `MirrorResult(status, reference_id, payload_sha256, error_code)` | 신규(frozen dataclass) |
-| `redact(content) -> (content, bool)` | run name·param 값에 ADR-014 redaction | `ReferenceAdapter.redact_text` 재사용 |
-| `attest(reference_id) -> Attestation` | 서버가 저장한 tag 집합의 sha256 ↔ `payload_sha256` 비교; 검증 불가면 `UNVERIFIABLE` | `:145` 그대로 |
+| `name`, `contract_version` | `"mlflow"`, `"1.0.0"` | `_declares_version` 규칙 |
+| `probe() -> ProbeResult` | 도달·API 버전 | `contract.py:77` |
+| `authenticate(secret_handle) -> AuthResult` | §4의 worker 전용 handle(파일 fd), 토큰 반환 없음 | `:90` |
+| `find(intent_id) -> str | None` | tag `inv.intent_id` 검색(idempotency) | 신규 |
+| `mirror(record: MirrorRecord) -> MirrorResult` | `MirrorResult(status, reference_id, response_payload_sha256, error_code)` | 신규(frozen) |
+| `redact(content) -> (content, bool)` | run name·param 값 ADR-014 redaction | `ReferenceAdapter.redact_text` |
+| `attest(reference_id) -> Attestation` | 서버 tag 집합 sha256 ↔ `payload_sha256`; 검증 불가면 `UNVERIFIABLE`(→ `mismatch`가 아니라 `unavailable`) | `:145` |
 
-- Provider adapter의 `Attestation.model_id`·`Usage`는 eval run 미러의 param/metric으로 **함께** 보낸다(두 Provider adapter가 남긴 model pin이 MLflow에서도 보이게).
-- conformance: `run_conformance`와 같은 형태의 `run_tracking_conformance`(계약 버전·멤버·probe·redaction·attest가 항상 VERIFIED를 내지 않음·mismatch 표면화) + **in-memory ReferenceSink**로 PG-free 시험. 실제 MLflow Client(`mlflow` 패키지)는 `MlflowSink`에서만 import(optional dependency, extras `mlflow`).
+Provider adapter의 `Attestation.model_id`·`Usage`는 eval run 미러의 param/metric으로 동반. conformance: `run_tracking_conformance`(계약 버전·멤버·probe·redaction·attest가 항상 VERIFIED를 내지 않음·mismatch 표면화·`find` 멱등) + in-memory `ReferenceSink`(PG-free). 실제 `mlflow` Client는 `MlflowSink`에서만 import(extras `mlflow`).
 
-## 4. credential·endpoint 설정 (strict, 비밀 비노출)
+## 4. credential·endpoint (v1.2: 별도 operator service-credential contract — F-R2)
 
-| 설정 | 의미 | 규칙 |
-|---|---|---|
-| `INV_MLFLOW_TRACKING_URI` | tracking server URI(https만; `file:`·`sqlite:` 거부) | 없으면 sink `absent`; 잘못된 scheme은 `invalid`(fail-closed, 부팅 시 `configurationReadiness.mlflow=invalid`) |
-| `INV_MLFLOW_CREDENTIAL_REF` | 기존 credential registry(0035)의 참조 id. 토큰/비밀번호를 env에 직접 두지 않음 | 값은 어디에도 기록되지 않음; 로그·evidence는 `credentialRefPresent: true/false`만 |
-| `INV_MLFLOW_EXPERIMENT_PREFIX` | experiment 이름 접두(기본 `inv`) | `^[a-z0-9-]{1,32}$` |
-| `INV_MLFLOW_TIMEOUT_SECONDS` | 호출 상한(기본 5) | 초과 = `unavailable`, 제품 흐름 계속 |
+**결정 (b)**: 0035 `PostgresCredentialRegistry.lookup(credential_id, version_id, context, purpose, destination)`은 **project·subject·비종료 run·recovery_epoch**에 결속된 **Run 실행용** 계약이다(`inv/credential_registry.py:16-38`). 미러는 정본 커밋 **뒤**, 대개 **종료된 run**에 대해 background worker가 수행하므로 run 결속 lookup은 정의상 거부된다. 0035에 `mlflow.mirror` purpose를 추가해도 grant가 run/subject를 요구하는 구조가 남는다. 따라서 **tenant 범위 operator service credential**을 별도 계약으로 둔다.
 
-- `configurationReadiness.mlflow ∈ {configured, absent, invalid}`를 #159의 `objectStore`와 같은 방식으로 **하나의 strict source**에서 읽는다(API·worker 동일). provider fallback 없음.
-- 비밀 비노출: URI의 userinfo는 거부(`https://user:pw@…` → `invalid`); MLflow Client 로그는 `WARNING` 이상만·본문 미기록; evidence/#153 S12 collector에는 `tracking_uri_sha256`만.
+`service_credential_versions` / `service_credential_grants`(core, 신규 migration):
 
-## 5. 오류 코드·fail-closed
+| 항목 | 규칙 |
+|---|---|
+| `purpose` | `CHECK IN ('mlflow.mirror')`(시작 값; 확장은 migration) |
+| `destination` | alias `^[a-z][a-z0-9-]{0,63}$`; §2.2 정규화 URI의 sha256을 `destination_uri_sha256`로 결속 — worker는 alias→URI 매핑이 **설정의 URI sha256과 일치할 때만** 사용(destination 결속) |
+| 비밀 | 0035와 동일: 파일 `^[0-9a-f]{32}[.]secret$`, device/inode, `content_sha256`(**version pin**); DB에 raw secret 0; worker는 fd로 열어 메모리에서만 사용, 로그·evidence·attempt 행에 미기록 |
+| grant | `tenant_id`, `purpose`, `destination`, `worker_principal`(service subject), `enabled`, `expires_at`, `revoked_at`, `recovery_epoch`; **run/project 결속 없음**(tenant 범위) |
+| lookup | `ServiceCredentialRegistry.lookup(tenant_id, purpose, destination, worker_principal, recovery_epoch)` → 유효(enabled·미revoke·미만료·epoch 일치·content_sha256 일치)일 때만 handle; 아니면 `TRACK-0002`(refused) |
+| worker 권한 | worker는 `service_credential_*` SELECT·`mlflow_mirror_attempts` INSERT·`outbox_events` UPDATE(published/attempts)만; 정본 table UPDATE 권한 없음(미러가 정본을 바꿀 수 없음을 DB 권한으로 보장) |
+| 설정 | `INV_MLFLOW_TRACKING_URI`(https만·userinfo/query/fragment 거부), `INV_MLFLOW_DESTINATION`(alias), `INV_MLFLOW_EXPERIMENT_PREFIX`(`^[a-z0-9-]{1,32}$`), `INV_MLFLOW_TIMEOUT_SECONDS`(기본 5). `INV_MLFLOW_CREDENTIAL_REF`는 폐기(v1.0 문구 삭제) |
+| readiness | `configurationReadiness.mlflow ∈ {configured, absent, invalid}`(#159 `objectStore` 패턴, 단일 strict source, fallback 없음). **URI가 configured인데 `mlflow` client가 없으면 `invalid`(detail `client-missing`)**, absent로 축소 금지(F-R4) |
 
-| 코드(신규, `errors.py`) | 언제 | 제품 동작 |
-|---|---|---|
-| `TRACK-MLFLOW-UNAVAILABLE` | probe 실패·timeout·5xx | 미러 행 `unavailable`; release/deploy **계속**(정본은 우리 DB); readiness에 표시 |
-| `TRACK-MLFLOW-REFUSED` | 401/403·credential 참조 해석 실패 | 미러 행 `refused`; 재시도 없음(자동 재시도는 credential 재사용 위험) |
-| `TRACK-MLFLOW-DIGEST-MISMATCH` | attest에서 서버 tag ≠ 보낸 payload | 미러 행 `refused` + alarm 후보; 정본 불변 |
-| `TRACK-MLFLOW-CONFIG-INVALID` | scheme/userinfo/prefix 규칙 위반 | 부팅 시 readiness `invalid`; 미러 호출 자체를 하지 않음 |
+부정 시험: raw secret이 DB/로그/attempt에 없음, 잘못된 version pin(content_sha256 불일치) 거부, revoke·만료·다른 recovery_epoch 거부, destination alias의 URI sha256 불일치 거부, worker principal 외 grant 거부, 종료 run 뒤 미러가 0035 lookup을 **호출하지 않음**.
 
-fail-closed의 뜻: **미러가 정본을 바꾸지 못하고, 미러 실패가 성공으로 읽히지 않는다.** 미러는 정본 트랜잭션 **커밋 뒤** outbox 방식으로 push한다(정본 커밋 실패 시 미러 없음; 미러 실패 시 정본 롤백 없음).
+## 5. 오류 코드·fail-closed (v1.2: 정본 형식 — F-R1)
 
-## 6. 외부 부재 시 동작
+`ProblemDetails.code` 정본 regex `^[A-Z]+-[0-9]{4}$`(`contracts/v1alpha1/core.schema.json:1737`)에 맞춰 숫자 code. category `TRACK`은 `errors.py::ErrorCategory`에 없으므로 **#167 `api/problem.py::CanonicalProblem`**(status·retryable을 code별로 명시, category `^[A-Z]+$`)이 family owner다.
 
-- `absent`(설정 없음): sink 미생성, 미러 테이블 기록 없음, `#153 S12 collector`·readiness는 `NOT_OBSERVED`(PASS 아님, 0 아님). 제품 기능 전부 동작.
-- `unavailable`/`refused`: 위 §5. 대응표 G1b(운영 실측)는 이때 BLOCKED_EXTERNAL로 남는다.
-- Windows/로컬: `mlflow` extras 미설치면 `MlflowSink` import 실패 → `absent`와 동일하게 처리하되 readiness detail에 `client-missing`.
+| code | 의미 | status | retryable | mirror `status` | evidence verdict(#153 S12·S10 collector 집계) |
+|---|---|---|---|---|---|
+| `TRACK-0001` | tracking server 미도달·timeout·5xx | 503 | true | `unavailable` | **NOT_OBSERVED**(외부 미도달; 값 없음) |
+| `TRACK-0002` | 401/403·service credential 해석 거부(revoke·만료·epoch·pin) | 403 | false | `refused` | **MEASURED_FAIL**(유효 설정으로 시도했고 거부됨) |
+| `TRACK-0003` | attest에서 `response_payload_sha256 ≠ payload_sha256` | 409 | false | `mismatch` | **MEASURED_FAIL** + alarm 후보 |
+| `TRACK-0004` | 설정 무효(scheme·userinfo·query·prefix·client-missing) | 422 | false | (호출 안 함; readiness `invalid`) | **INVALID_RUN**(우리 쪽 결함) |
+| `TRACK-0005` | payload canonicalization 실패(NaN/Infinity·비문자열 tag) | 422 | false | (intent 미생성 → 정본 tx 실패) | **INVALID_RUN** |
+| (code 없음) | 설정 `absent` | — | — | (sink 미생성, intent도 생성 안 함) | **NOT_OBSERVED** |
+| (내부 결함) | 정본 변경이 있는데 intent 없음 / intent 있는데 outbox 없음 | — | — | — | **INVALID_RUN**(enqueue 결함; collector가 정본 행 수 ↔ intent 수 대조) |
 
-## 7. 시험 계획
+DB CHECK: `mlflow_mirror_attempts.error_code ~ '^TRACK-[0-9]{4}$'`. schema validation 부정 시험: `TRACK-MLFLOW-UNAVAILABLE` 같은 옛 형식·소문자·3자리 숫자·category 불일치가 `ProblemDetails` schema와 `CanonicalProblem.__post_init__`에서 거부됨.
+
+fail-closed의 뜻: **미러가 정본을 바꾸지 못하고(권한·순서), 미러 실패가 성공으로 읽히지 않으며(append-only attempt + verdict 분리), 의도 유실이 "설정 없음"으로 위장되지 않는다(intent는 정본과 같은 tx).** 제품 release·deploy는 어느 경우에도 그대로 성공한다.
+
+## 6. 외부 부재·부분 실패 시 동작
+
+| 상황 | 관측 |
+|---|---|
+| 설정 `absent` | sink 미생성·intent 미생성; readiness `absent`; collector `NOT_OBSERVED` |
+| URI configured + client 미설치 | readiness `invalid`(`client-missing`), `TRACK-0004`; **absent와 다름** |
+| 서버 미도달 | intent 있음·attempt `unavailable`(`TRACK-0001`), outbox 재시도(`max_attempts` 뒤 dead-letter는 attempt 행으로 남음) |
+| 거부·불일치 | attempt `refused`/`mismatch`, 재시도 없음(credential 재사용 위험·불일치는 사람이 봐야 함) |
+| crash-before-send | intent 있음·attempt 없음 = pending; 재시작 시 outbox 재배달 |
+| send-success-before-local-record | 재배달 시 `find(intent_id)`가 기존 run을 찾아 attest만 하고 `mirrored` 기록 |
+
+## 7. 시험 계획 (v1.2)
 
 | 종류 | 내용 |
 |---|---|
-| PG-free(구현 카드) | `run_tracking_conformance`(ReferenceSink 적합·attest는 항상 VERIFIED 불가·mismatch 표면화·redaction·credential 반향 금지); strict config(scheme·userinfo·prefix 부정 5+); 미러 payload canonical sha256 결정성; `absent`/`unavailable`/`refused`가 PASS로 승격되지 않음; `record_deployment` 등 정본 경로가 sink 유무에 무관하게 같은 결과(sink stub) |
-| 실 PG(hosted Backend) | `mlflow_mirrors` append-only·RLS·재시도 새 행; outbox 순서(정본 커밋 → 미러) |
-| hosted lane(선택, #159 MinIO 패턴) | digest-pinned MLflow 컨테이너 + disposable PG로 push→attest 1회; runner 없으면 `NOT_OBSERVED`로 선언(exact map) |
-| 운영 실측 | G1b — 실제 endpoint·credential(BLOCKED_EXTERNAL) |
+| PG-free | `run_tracking_conformance`(ReferenceSink·attest 항상-VERIFIED 금지·mismatch·`find` 멱등·redaction·secret 반향 금지); canonical payload 결정성(키 순서·NFD/NFC·`1.0` vs `1`·metric 순서·NaN/Infinity 거부); URI 정규화 동치/비동치 5+; strict config 부정(scheme·userinfo·query·prefix·client-missing → `invalid`); `CanonicalProblem` TRACK-000x code/status/retryable 표 고정 + 옛 형식·소문자·3자리 거부; verdict 매핑 표(0001→NOT_OBSERVED, 0002/0003→MEASURED_FAIL, 0004/0005/enqueue 결함→INVALID_RUN, absent→NOT_OBSERVED); 정본 경로(`record_deployment` 등)가 sink 유무·실패에 무관하게 같은 결과 |
+| 실 PG(hosted Backend) | intent+outbox 한 tx(정본 rollback 시 둘 다 없음); `num_nonnulls` XOR CHECK·kind↔컬럼 CHECK·error_code CHECK·UNIQUE(intent, attempt_no) 위반 거부; attempt append-only(UPDATE/DELETE 거부); worker role이 정본 table UPDATE 불가; service credential lookup 부정 6종(§4); crash-before-send(intent만 존재 → pending 집계); duplicate delivery(같은 event 2회 → attempt 1행·`find` 호출 1회); retry 새 행; 종료 run 뒤 미러가 0035 lookup 미호출 |
+| hosted lane(선택, #159 MinIO 패턴) | digest-pinned MLflow 컨테이너 + disposable PG로 push→find→attest 1회; runner 없으면 exact map에 `NOT_OBSERVED` 선언 |
+| 운영 실측 | G1b — 실제 endpoint·service credential(BLOCKED_EXTERNAL) |
 
 ## 8. 경계·다음
 
-- 이 문서는 docs-only. 코드·계약·migration 변경 0. **구현은 결정(§0)과 Codex 승인 뒤** 별도 카드(예상 범위: `adapters/tracking.py`·`MlflowSink`·`ReferenceSink`·`mlflow_mirrors` migration·outbox 훅·readiness 필드·시험).
-- 관련: S10-BE Evidence 대응표(PR #166) G1a/G1b, S10-DB lineage 조회 API 설계(PR #158, lineage read API — 미러 참조를 응답에 포함할지는 그 설계의 후속), CL-06(실제 학습·평가·승인 배포).
-- owner Claude / reviewer Codex / 병합 금지. worktree 재사용, branch `agent/claude/s10-be-mlflow-design`, base `1e8baf04`. 다음 첫 행동: Codex 설계 검토(결정 B 반영본) → 승인 뒤 구현 카드.
+- docs-only. 코드·계약·migration 변경 0. **구현은 Codex 설계 승인 뒤** 별도 카드(예상 범위: `adapters/tracking.py`·`MlflowSink`·`ReferenceSink`·migration 2(`mlflow_mirror_intents`·`mlflow_mirror_attempts`)+service credential 2·outbox 훅·worker·`api/problem.py` TRACK family·readiness 필드·시험).
+- 관련: S10-BE Evidence 대응표(PR #166) G1a/G1b, S10-DB lineage 조회 API 설계(PR #158 — 미러 참조를 응답에 포함할지는 그 설계의 후속), VF-CL-03 canonical ProblemDetails(PR #167), CL-06.
+- owner Claude / reviewer Codex / 병합 금지. worktree 재사용, branch `agent/claude/s10-be-mlflow-design`, base `1e8baf04`. 다음 첫 행동: Codex delta 재검토(F-R1~F-R4) → 승인 뒤 구현 카드.
