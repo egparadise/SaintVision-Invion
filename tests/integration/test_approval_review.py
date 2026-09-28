@@ -4,6 +4,7 @@ from uuid import uuid4
 import psycopg
 from psycopg.types.json import Jsonb
 import pytest
+from db_integrity import preserved_rows, suspended_triggers
 from inv.contracts import validate_contract
 from inv.approvals import Principal
 from inv.errors import DomainError
@@ -47,23 +48,23 @@ def test_snapshot_is_immutable_and_request_replay_does_not_duplicate(approval):
 @pytest.mark.parametrize('damage', ['workload', 'policy', 'missing'])
 def test_corrupt_or_legacy_snapshot_cannot_be_reviewed_or_approved(approval, damage):
     a = approval; row = request(a); nonce = challenge(a, row)
-    # Privileged corruption simulation in a disposable test database only.
-    with psycopg.connect(a.e.owner) as c:
-        c.execute('ALTER TABLE inv.approval_review_snapshots DISABLE TRIGGER immutable')
-        if damage == 'missing':
-            c.execute('DELETE FROM inv.approval_review_snapshots WHERE tenant_id=%s AND approval_id=%s', (a.e.tenant, row['approvalId']))
-        elif damage == 'workload':
-            altered = deepcopy(a.workload); altered['command'] = ['changed-private-command']
-            c.execute('UPDATE inv.approval_review_snapshots SET workload=%s WHERE tenant_id=%s AND approval_id=%s', (Jsonb(altered), a.e.tenant, row['approvalId']))
-        else:
-            altered = deepcopy(a.policy); altered['riskLevel'] = 'L0'
-            c.execute('UPDATE inv.approval_review_snapshots SET policy=%s WHERE tenant_id=%s AND approval_id=%s', (Jsonb(altered), a.e.tenant, row['approvalId']))
-        c.execute('ALTER TABLE inv.approval_review_snapshots ENABLE TRIGGER immutable')
-    for action in [lambda: a.store.review(a.people['alice'], a.e.project, row['approvalId']),
-                   lambda: decide(a, row, 'alice', nonce)]:
-        with pytest.raises(DomainError) as error: action()
-        assert error.value.status == 409
-        assert 'private-command' not in str(error.value)
+    # Privileged corruption simulation in a disposable test database only; the
+    # snapshot row is restored verbatim when the test ends.
+    with preserved_rows(a.e.owner, ('inv.approval_review_snapshots', 'tenant_id=%s AND approval_id=%s', (a.e.tenant, row['approvalId']))):
+        with psycopg.connect(a.e.owner) as c, suspended_triggers(c, 'inv.approval_review_snapshots', 'immutable'):
+            if damage == 'missing':
+                c.execute('DELETE FROM inv.approval_review_snapshots WHERE tenant_id=%s AND approval_id=%s', (a.e.tenant, row['approvalId']))
+            elif damage == 'workload':
+                altered = deepcopy(a.workload); altered['command'] = ['changed-private-command']
+                c.execute('UPDATE inv.approval_review_snapshots SET workload=%s WHERE tenant_id=%s AND approval_id=%s', (Jsonb(altered), a.e.tenant, row['approvalId']))
+            else:
+                altered = deepcopy(a.policy); altered['riskLevel'] = 'L0'
+                c.execute('UPDATE inv.approval_review_snapshots SET policy=%s WHERE tenant_id=%s AND approval_id=%s', (Jsonb(altered), a.e.tenant, row['approvalId']))
+        for action in [lambda: a.store.review(a.people['alice'], a.e.project, row['approvalId']),
+                       lambda: decide(a, row, 'alice', nonce)]:
+            with pytest.raises(DomainError) as error: action()
+            assert error.value.status == 409
+            assert 'private-command' not in str(error.value)
     with psycopg.connect(a.e.owner) as c:
         assert c.execute('SELECT count(*) FROM inv.approval_votes WHERE tenant_id=%s AND approval_id=%s', (a.e.tenant, row['approvalId'])).fetchone()[0] == 0
         assert c.execute('SELECT consumed_at FROM inv.approval_nonces WHERE tenant_id=%s AND approval_id=%s', (a.e.tenant, row['approvalId'])).fetchone()[0] is None
