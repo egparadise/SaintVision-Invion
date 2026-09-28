@@ -1,0 +1,328 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-09-28T00:30:21.100396+00:00",
+  "codeSha": "3a1790ff3431706e81a2ba258eb0b26ea456ed31",
+  "measurementComplete": true,
+  "measurementScope": "hosted-single-runner-legacy-only-postgresql16",
+  "directlyComparableWithLocalEvidence": false,
+  "comparisonBoundary": "Hosted staircase evidence is environment-specific and must not be numerically merged with development-PC evidence.",
+  "flagDefaultOff": true,
+  "promotionClaim": false,
+  "s05StatusAfterRun": "in_progress",
+  "freshDatabasePolicy": {
+    "scope": "fresh unique disposable database for every wave; stronger than per-rung",
+    "fingerprintCount": 9,
+    "allFingerprintsUnique": true,
+    "residueAfterRun": 0
+  },
+  "wavePlan": {
+    "rungs": [
+      20,
+      35,
+      50
+    ],
+    "wavesPerRung": 3,
+    "order": "ascending; stop only after completing the first degraded rung",
+    "mode": "legacy",
+    "candidateExecuted": false
+  },
+  "runner": {
+    "runnerOS": "Linux",
+    "runnerArch": "X64",
+    "runnerName": "GitHub Actions 1000010146",
+    "imageOS": "ubuntu24",
+    "imageVersion": "20260920.314.1",
+    "cpuCount": 4,
+    "memoryTotalKiB": 16373452,
+    "pythonVersion": "3.12.14",
+    "githubRunId": "36362386530",
+    "githubRunAttempt": "1"
+  },
+  "postgresql": {
+    "serverVersion": "16.15 (Debian 16.15-1.pgdg13+2)",
+    "serverVersionNum": "160015",
+    "serviceDefaultLockTimeout": "0",
+    "serviceDefaultStatementTimeout": "0",
+    "maxConnections": 100,
+    "benchmarkTransactionLockTimeoutMs": 500,
+    "benchmarkTransactionStatementTimeoutMs": 2000
+  },
+  "waves": [
+    {
+      "name": "legacy-c20-1",
+      "concurrency": 20,
+      "ordinal": 1,
+      "benchmarkExitCode": 0,
+      "databaseFingerprintSha256": "4b33e1c9d4ac0be2525e6ad7c01925fa3e5d13b1f42ad000509b839e8e946611",
+      "reportFile": "legacy-c20-1.json",
+      "junitFile": "legacy-c20-1.xml",
+      "logFile": "legacy-c20-1.log",
+      "metrics": {
+        "successCount": 20,
+        "failureCount": 0,
+        "p95AllMs": 416.581,
+        "p95SuccessMs": 416.581,
+        "maxRequestMs": 427.771,
+        "lockTimeout55P03Count": 0,
+        "statementTimeout57014Count": 0,
+        "sqlTimeoutCount": 0,
+        "postAcquireHoldP95Ms": 11.353,
+        "postAcquireHoldMaxMs": 16.911,
+        "legacyLockWaitP95Ms": 212.943,
+        "legacyLockWaitMaxMs": 218.452
+      }
+    },
+    {
+      "name": "legacy-c20-2",
+      "concurrency": 20,
+      "ordinal": 2,
+      "benchmarkExitCode": 0,
+      "databaseFingerprintSha256": "759241108f1500a6b30cd457d34303174547541b34e9982c1ad97e87da0c279e",
+      "reportFile": "legacy-c20-2.json",
+      "junitFile": "legacy-c20-2.xml",
+      "logFile": "legacy-c20-2.log",
+      "metrics": {
+        "successCount": 20,
+        "failureCount": 0,
+        "p95AllMs": 411.382,
+        "p95SuccessMs": 411.382,
+        "maxRequestMs": 423.033,
+        "lockTimeout55P03Count": 0,
+        "statementTimeout57014Count": 0,
+        "sqlTimeoutCount": 0,
+        "postAcquireHoldP95Ms": 11.68,
+        "postAcquireHoldMaxMs": 14.384,
+        "legacyLockWaitP95Ms": 214.68,
+        "legacyLockWaitMaxMs": 227.63
+      }
+    },
+    {
+      "name": "legacy-c20-3",
+      "concurrency": 20,
+      "ordinal": 3,
+      "benchmarkExitCode": 0,
+      "databaseFingerprintSha256": "b465e428a540b7a379a383a965f5d89e34600dd14fa13cfa016d150fbf8426a2",
+      "reportFile": "legacy-c20-3.json",
+      "junitFile": "legacy-c20-3.xml",
+      "logFile": "legacy-c20-3.log",
+      "metrics": {
+        "successCount": 20,
+        "failureCount": 0,
+        "p95AllMs": 385.452,
+        "p95SuccessMs": 385.452,
+        "maxRequestMs": 396.501,
+        "lockTimeout55P03Count": 0,
+        "statementTimeout57014Count": 0,
+        "sqlTimeoutCount": 0,
+        "postAcquireHoldP95Ms": 10.854,
+        "postAcquireHoldMaxMs": 13.312,
+        "legacyLockWaitP95Ms": 200.059,
+        "legacyLockWaitMaxMs": 210.756
+      }
+    },
+    {
+      "name": "legacy-c35-1",
+      "concurrency": 35,
+      "ordinal": 1,
+      "benchmarkExitCode": 0,
+      "databaseFingerprintSha256": "c4d19332ba9a29aa5e49fbfb9e7b329af4169544e2041d93752688db01075de4",
+      "reportFile": "legacy-c35-1.json",
+      "junitFile": "legacy-c35-1.xml",
+      "logFile": "legacy-c35-1.log",
+      "metrics": {
+        "successCount": 35,
+        "failureCount": 0,
+        "p95AllMs": 699.641,
+        "p95SuccessMs": 699.641,
+        "maxRequestMs": 710.412,
+        "lockTimeout55P03Count": 0,
+        "statementTimeout57014Count": 0,
+        "sqlTimeoutCount": 0,
+        "postAcquireHoldP95Ms": 12.642,
+        "postAcquireHoldMaxMs": 84.373,
+        "legacyLockWaitP95Ms": 442.07,
+        "legacyLockWaitMaxMs": 451.94
+      }
+    },
+    {
+      "name": "legacy-c35-2",
+      "concurrency": 35,
+      "ordinal": 2,
+      "benchmarkExitCode": 0,
+      "databaseFingerprintSha256": "02af04effd60ea17c39b41ba0f3a28f0625c613d43043df6182b0808a8ce3417",
+      "reportFile": "legacy-c35-2.json",
+      "junitFile": "legacy-c35-2.xml",
+      "logFile": "legacy-c35-2.log",
+      "metrics": {
+        "successCount": 35,
+        "failureCount": 0,
+        "p95AllMs": 739.044,
+        "p95SuccessMs": 739.044,
+        "maxRequestMs": 750.394,
+        "lockTimeout55P03Count": 0,
+        "statementTimeout57014Count": 0,
+        "sqlTimeoutCount": 0,
+        "postAcquireHoldP95Ms": 13.439,
+        "postAcquireHoldMaxMs": 52.761,
+        "legacyLockWaitP95Ms": 438.854,
+        "legacyLockWaitMaxMs": 476.414
+      }
+    },
+    {
+      "name": "legacy-c35-3",
+      "concurrency": 35,
+      "ordinal": 3,
+      "benchmarkExitCode": 0,
+      "databaseFingerprintSha256": "43a75dc632b5f8ceb97ba366943eee014d4dcef00968353a4ed0b3a20f72ec0c",
+      "reportFile": "legacy-c35-3.json",
+      "junitFile": "legacy-c35-3.xml",
+      "logFile": "legacy-c35-3.log",
+      "metrics": {
+        "successCount": 35,
+        "failureCount": 0,
+        "p95AllMs": 705.026,
+        "p95SuccessMs": 705.026,
+        "maxRequestMs": 715.889,
+        "lockTimeout55P03Count": 0,
+        "statementTimeout57014Count": 0,
+        "sqlTimeoutCount": 0,
+        "postAcquireHoldP95Ms": 12.09,
+        "postAcquireHoldMaxMs": 37.062,
+        "legacyLockWaitP95Ms": 410.943,
+        "legacyLockWaitMaxMs": 417.451
+      }
+    },
+    {
+      "name": "legacy-c50-1",
+      "concurrency": 50,
+      "ordinal": 1,
+      "benchmarkExitCode": 0,
+      "databaseFingerprintSha256": "bde1ed4336b762d96b47bffdc36f4da7038a476eba9e397f6b62e70c64e4b356",
+      "reportFile": "legacy-c50-1.json",
+      "junitFile": "legacy-c50-1.xml",
+      "logFile": "legacy-c50-1.log",
+      "metrics": {
+        "successCount": 50,
+        "failureCount": 0,
+        "p95AllMs": 993.279,
+        "p95SuccessMs": 993.279,
+        "maxRequestMs": 1018.228,
+        "lockTimeout55P03Count": 0,
+        "statementTimeout57014Count": 0,
+        "sqlTimeoutCount": 0,
+        "postAcquireHoldP95Ms": 12.26,
+        "postAcquireHoldMaxMs": 158.393,
+        "legacyLockWaitP95Ms": 589.691,
+        "legacyLockWaitMaxMs": 708.578
+      }
+    },
+    {
+      "name": "legacy-c50-2",
+      "concurrency": 50,
+      "ordinal": 2,
+      "benchmarkExitCode": 0,
+      "databaseFingerprintSha256": "ebd911d61959d777f997faf87b0fed7727e314a6f5a1178d49ea872625124102",
+      "reportFile": "legacy-c50-2.json",
+      "junitFile": "legacy-c50-2.xml",
+      "logFile": "legacy-c50-2.log",
+      "metrics": {
+        "successCount": 50,
+        "failureCount": 0,
+        "p95AllMs": 990.625,
+        "p95SuccessMs": 990.625,
+        "maxRequestMs": 1013.92,
+        "lockTimeout55P03Count": 0,
+        "statementTimeout57014Count": 0,
+        "sqlTimeoutCount": 0,
+        "postAcquireHoldP95Ms": 11.874,
+        "postAcquireHoldMaxMs": 46.755,
+        "legacyLockWaitP95Ms": 561.842,
+        "legacyLockWaitMaxMs": 591.781
+      }
+    },
+    {
+      "name": "legacy-c50-3",
+      "concurrency": 50,
+      "ordinal": 3,
+      "benchmarkExitCode": 0,
+      "databaseFingerprintSha256": "67210a8aa20c1151956afabd681814a97b45e7837b194c44c399095022e00621",
+      "reportFile": "legacy-c50-3.json",
+      "junitFile": "legacy-c50-3.xml",
+      "logFile": "legacy-c50-3.log",
+      "metrics": {
+        "successCount": 50,
+        "failureCount": 0,
+        "p95AllMs": 985.117,
+        "p95SuccessMs": 985.117,
+        "maxRequestMs": 1009.514,
+        "lockTimeout55P03Count": 0,
+        "statementTimeout57014Count": 0,
+        "sqlTimeoutCount": 0,
+        "postAcquireHoldP95Ms": 12.65,
+        "postAcquireHoldMaxMs": 94.719,
+        "legacyLockWaitP95Ms": 559.685,
+        "legacyLockWaitMaxMs": 601.821
+      }
+    }
+  ],
+  "rungs": [
+    {
+      "concurrency": 20,
+      "waveCount": 3,
+      "maximumWaveSqlTimeoutCount": 0,
+      "medianRequestP95AllMs": 411.382,
+      "criteria": {
+        "anyWaveHas55P03Or57014": false,
+        "medianCumulativeRequestP95AllExceeds2000Ms": false
+      },
+      "degraded": false,
+      "criterionAggregationIsIntentional": {
+        "sqlTimeout": "maximum; any one wave triggers",
+        "requestP95All": "median of three waves"
+      },
+      "cumulativeLatencyCriterion": "End-to-end request latency across multiple statements; it may exceed the 2000ms per-statement timeout without any individual statement timing out."
+    },
+    {
+      "concurrency": 35,
+      "waveCount": 3,
+      "maximumWaveSqlTimeoutCount": 0,
+      "medianRequestP95AllMs": 705.026,
+      "criteria": {
+        "anyWaveHas55P03Or57014": false,
+        "medianCumulativeRequestP95AllExceeds2000Ms": false
+      },
+      "degraded": false,
+      "criterionAggregationIsIntentional": {
+        "sqlTimeout": "maximum; any one wave triggers",
+        "requestP95All": "median of three waves"
+      },
+      "cumulativeLatencyCriterion": "End-to-end request latency across multiple statements; it may exceed the 2000ms per-statement timeout without any individual statement timing out."
+    },
+    {
+      "concurrency": 50,
+      "waveCount": 3,
+      "maximumWaveSqlTimeoutCount": 0,
+      "medianRequestP95AllMs": 990.625,
+      "criteria": {
+        "anyWaveHas55P03Or57014": false,
+        "medianCumulativeRequestP95AllExceeds2000Ms": false
+      },
+      "degraded": false,
+      "criterionAggregationIsIntentional": {
+        "sqlTimeout": "maximum; any one wave triggers",
+        "requestP95All": "median of three waves"
+      },
+      "cumulativeLatencyCriterion": "End-to-end request latency across multiple statements; it may exceed the 2000ms per-statement timeout without any individual statement timing out."
+    }
+  ],
+  "evaluation": {
+    "decision": "NO_DEGRADE_THROUGH_50_CLOSE_SEMAPHORE_LINE",
+    "firstDegradeConcurrency": null,
+    "higherRungsNotRun": [],
+    "criterionOneUsesMaximumAcrossWaves": true,
+    "criterionTwoUsesMedianAcrossWaves": true,
+    "criteriaChangedAfterMeasurement": false,
+    "semaphoreLineClosed": true
+  }
+}
+
