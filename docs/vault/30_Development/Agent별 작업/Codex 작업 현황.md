@@ -1,7 +1,7 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.206"
+version: "1.0.207"
 status: "review"
 author: "Codex"
 updated: "2026-09-28T16:25:00+09:00"
@@ -12,9 +12,9 @@ source_of_truth: "Git"
 
 ## 2026-09-28 Card44 VF-CL-02~04 독립 검토 공백
 
-- `08ece3bc`의 URI trailing/version slash 수정은 되살림 3건이 exit 1로 KILLED됐고, `0043` pin migration은 직접 PostgreSQL 단언을 정독해 승인했다(로컬 PG 실행은 제한에 따라 NOT_RUN). `c75201af` model shard resolution은 fail-closed/unavailable·tenant/location 경계를 직접 시험해 검토 공백을 닫았다.
-- `34791448` exact-match adapter는 casefold 완화 mutation이 2건 실패해 KILLED됐으며, request path 미결속 blocker는 유지한다. `3e267b05` archive retention은 WAL boundary mutation을 property 시험이 잡았지만 malformed `START TIME`을 directory mtime으로 fail-open 대체해 삭제 후보를 만들 수 있는 F-VFCL04-01을 새로 발견해 수정 요청했다.
-- #139·#143 병합 전이라 registry는 건드리지 않고 VF-CL-02/03 true, VF-CL-04 false+새 blocker의 의미 diff만 제안했다. 다음은 Claude가 retention timestamp를 fail-closed로 보정한 뒤 Codex 재검토와 registry owner 적용이다. [[2026-09-28_16-25-00_KST_VF-CL_독립검토공백_Codex]].
+- `08ece3bc`의 URI trailing/version slash 수정은 되살림 3건이 exit 1로 KILLED됐다. 정확한 경계는 trailing slash를 parser가, version slash를 `build_uri()`와 `test_builder_rejects_ambiguous_version_path`가 막는다. `0043` pin migration은 직접 PostgreSQL 단언을 정독해 승인했다(로컬 PG 실행은 제한에 따라 NOT_RUN). `c75201af` model shard resolution은 fail-closed/unavailable·tenant/location 경계를 직접 시험해 검토 공백을 닫았다.
+- `34791448` exact-match adapter는 casefold 완화 mutation이 2건 실패해 KILLED됐으며, request path 미결속 blocker는 유지한다. `3e267b05` archive retention은 WAL boundary mutation을 property 시험이 잡았지만 malformed `START TIME`을 directory mtime으로 fail-open 대체하는 F-VFCL04-01과 명명 timezone을 실패/UTC 오해석하는 F-VFCL04-02를 분리해 수정 요청했다.
+- #139·#143 병합 전이라 registry는 건드리지 않고 VF-CL-02/03 true, VF-CL-04 false+두 새 blocker의 의미 diff만 제안했다. 다음은 Claude가 retention timestamp fail-closed와 timezone parsing을 보정한 뒤 Codex 재검토와 registry owner 적용이다. [[2026-09-28_16-25-00_KST_VF-CL_독립검토공백_Codex]].
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 
