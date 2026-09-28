@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-CARD122-WRITE-ROUTE-AUDIT-001"
 title: "src/saintvision/api 전역 쓰기 route 감사 — release가 idempotency 없이 나간 것과 같은 부류가 다른 POST/PUT/DELETE에 있는가 (카드 122)"
-version: "1.0.0"
+version: "1.1.0"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-29T01:40:55+09:00"
+updated: "2026-09-29T01:44:56+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["G-04"]
@@ -22,7 +22,7 @@ tags: ["g-04", "idempotency", "audit", "lock-wait", "claude"]
 
 | 부류 | route | ①~⑥ | ⑦ | 판정 |
 |---|---|---|---|---|
-| **business lane**(add_api_route, 카드 84·113·#211) | eval_runs·model_versions·model_verify·model_retention·model_release·run_seal 6개 | **전부 O** | 5개 O, **eval_runs X** | eval_runs만 이 PR에서 수정 |
+| **business lane**(add_api_route, 카드 84·113·#211) | eval_runs·model_versions·model_verify·model_retention·model_release·run_seal 6개 | **전부 O** | 6개 O(eval_runs는 #210 `a083d6d2` 카드 105 F1에서 이미 bound; #229 계열 base의 옛 #210 `f685ca59`에는 없었음) | 코드 수정 0, ratchet 목록만 보강 |
 | **legacy lane**(`@router.*`, `get_session` 단일 tx) | nodes 3·pools 7·projects 3·settings 6·storage 3 = 22개 | **21개 X**(storage 등록 1개만 선택적 O) | **22개 전부 X** | Claude 소유 아님 → §4 인계 |
 
 release와 "같은 부류"(쓰기 route인데 ①~⑥이 없는 것)는 legacy 22개 전부다. 다만 재시도 시 side effect 중복 **위험 High**는 그중 하나뿐(discovery admit)이고, 나머지는 자연 멱등(upsert/delete-if-exists/유일 제약)이거나 중복이 audit 1행·version 증가·timestamp 재기록에 그친다(Medium/Low). 특히 FE `apps/web/src/shared/api/client.ts`는 Gemini 2026-09-12 보고대로 mutation에 `Idempotency-Key`를 주입하는데, legacy 22개는 그 헤더를 **읽지 않는다**(nodes enroll은 선언만 하고 미사용 `nodes.py:56`) — 클라이언트가 안전한 재시도로 오인할 수 있는 지점이다.
@@ -31,14 +31,14 @@ release와 "같은 부류"(쓰기 route인데 ①~⑥이 없는 것)는 legacy 2
 
 | route | file:line | ① | ② | ③ | ④ | ⑤ | ⑥ | ⑦ | ⑧ | ⑨ | ⑩ | ⑪ | 재시도 중복 위험 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| POST …/eval/suites/{s}/runs | `eval_runs.py:210`(등록 `:364`) | O 필수 `:130` | O | O | O | O `:341` | O `:259` | **X → 이 PR에서 O**(두 span) | O `_require_approval` ×3 `:234,268,301` | O | O `RES_NOT_FOUND` 404 `:181` | O `strict_json_object`/`validate_strict` | Low — ledger replay; 수정 전엔 key·row 대기가 무한 |
+| POST …/eval/suites/{s}/runs | `eval_runs.py:210`(등록 `:364`) | O 필수 `:130` | O | O | O | O `:341` | O `:259` | O — #210 `a083d6d2`(`:238,265`); v1.0의 "X"는 옛 base 기준 오판 | O `_require_approval` ×3 `:234,268,301` | O | O `RES_NOT_FOUND` 404 `:181` | O `strict_json_object`/`validate_strict` | Low — ledger replay |
 | POST …/models/{m}/versions | `model_versions.py:286`(`:447`) | O `:192` | O | O | O | O `:424` | O `:340` | O `:312,335` | O `:315,350` | O | O `:219` | O | Low |
 | POST …/versions/{v}/verify | `model_verify.py:315`(`:457`) | O | O | O | O | O `:440` | O `:360` | O `:330,357` | O ×3 | O | O `:198,245` | O | Low |
 | POST …/versions/{v}/retention-pin | `model_retention.py:141`(`:282`) | O | O | O | O | O `:265` | O `:185` | O `:159,182` | O ×3 | O | O | O | Low |
 | POST …/versions/{v}/release | `model_release.py`(#229) | O | O | O | O | O | O | O ×3 | O ×4 | O | O | O | Low(#229) |
 | POST …/runs/{r}/record | `run_seal.py:260`(`:422`) | O `:137` | O | O | O | O `:405` | O `:296` | O `:276,293` | O ×3 | O | O `:160,163` | O | Low |
 
-eval_runs ⑦: `tests/core/test_lock_wait.py`의 ratchet `test_every_transaction_span_of_every_write_route_is_bounded_and_no_copy_exists`가 module 목록에 eval_runs를 넣지 않아 #211이 이 route를 비켜갔다. 실 PG `test_lock_wait_real_pg.py`에도 W3 case가 없었다.
+eval_runs ⑦(v1.1 정정): v1.0은 #229 계열 base가 가진 옛 #210 head `f685ca59`를 보고 "bound 없음"으로 판정했으나, #210 최신 head `a083d6d2`(카드 105 F1, Codex 승인, 착지 후보 `b91ab72f`에 포함)가 두 span을 이미 bound하고 PG-free 시험(`test_each_span_bounds_its_lock_waits_exactly_once`, 55P03/40P01 → SYS-0001/503)을 가진다. 이 branch는 `a083d6d2`를 merge해 #210 구현·시험을 그대로 채택했고, 남은 실제 구멍은 `tests/core/test_lock_wait.py` ratchet `test_every_transaction_span_of_every_write_route_is_bounded_and_no_copy_exists`의 module 목록에 eval_runs가 없어 되돌림을 잡지 못한다는 점뿐이다 → 목록 보강. 실 PG `test_lock_wait_real_pg.py`에는 여전히 W3 case가 없다(후속 후보, 이 PR 범위 밖).
 
 ## 3. legacy lane (22) — 항목별
 
@@ -73,7 +73,7 @@ eval_runs ⑦: `tests/core/test_lock_wait.py`의 ratchet `test_every_transaction
 
 ## 4. 조치와 인계
 
-**이 PR(Claude, eval_runs ⑦)**: `eval_runs.py` 두 span에 `bounded_lock_wait(session, timeout_ms=settings.business_lock_timeout_ms)` 추가(다른 5 route와 같은 형태). 되돌리면 실패하는 시험: `tests/core/test_lock_wait.py` ratchet module 목록에 `eval_runs` 추가(span 수 == bound 수), `tests/core/test_eval_run_route.py::test_card122_both_spans_bound_their_lock_waits`(SET LOCAL 2회, preflight span의 유일 statement, 쓰기 span에서 advisory lock 직전), 실 PG `tests/integration/test_lock_wait_real_pg.py` W3 2건(key 보유 → SYS-0001/503 within budget·eval_runs 0·ledger 0; 호출자 user row 보유 → 503). PG-free stub은 `SET LOCAL`을 "lock"으로 세지 않게 정정(순서 시험 보존).
+**이 PR(Claude)**: 제품 코드 변경 **0**. `git merge a083d6d2`로 #210의 eval_runs bound·시험을 채택(충돌 2파일은 #210 쪽, v1.0에서 넣었던 중복 PG-free 시험·실 PG W3 2건은 제거). 고유 기여는 (1) 이 감사 문서, (2) `tests/core/test_lock_wait.py` ratchet module 목록에 `eval_runs`(+ `model_verify`·`conformance_status`는 #229 계열이 이미 가짐) — #210의 bound를 되돌리면 이 ratchet이 실패한다.
 
 **Codex 인계(보안·동시성·identity 소유, 카드 122 목록)** — 위험 순:
 1. **High** `POST /discovery/candidates/{id}/admission`: 재시도가 두 번째 bootstrap token을 발급. 제안: announcement row `with_for_update()` + 이미 admitted(`admitted_by_user_id`)면 기존 미소비 token 재제시 또는 409; 또는 business lane 계약(필수 key + ledger) 적용.
@@ -84,7 +84,7 @@ eval_runs ⑦: `tests/core/test_lock_wait.py`의 ratchet `test_every_transaction
 
 ## 5. 검증 (실제 수행한 것만)
 
-로컬 PG-free 단일 파일: `tests/core/test_eval_run_route.py` + `tests/core/test_lock_wait.py` = 97 passed. 실 PG `test_lock_wait_real_pg.py` 13 collected(신규 2 포함) — **NOT_OBSERVED**, hosted Backend 인용은 PR 코멘트. 게이트 chain exit 0. 감사표의 legacy 인용은 파일 열람과 `git grep`으로 확인했고, pools admit·create_pool·storage 등록·`errors.py` 상태표·`app.py` 범주는 Claude가 직접 재확인했다.
+로컬 PG-free 단일 파일(merge 뒤): `tests/core/test_eval_run_route.py` + `tests/core/test_lock_wait.py` = 102 passed. 실 PG `test_lock_wait_real_pg.py` 11 collected(#229 head와 동일 blob) — **NOT_OBSERVED**, hosted Backend 인용은 PR 코멘트. 게이트 chain exit 0. 감사표의 legacy 인용은 파일 열람과 `git grep`으로 확인했고, pools admit·create_pool·storage 등록·`errors.py` 상태표·`app.py` 범주는 Claude가 직접 재확인했다.
 
 ## 6. 다음
 

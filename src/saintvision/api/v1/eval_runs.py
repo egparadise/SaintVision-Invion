@@ -50,7 +50,6 @@ from ...services import projects as project_service
 from ...services.audit import record_event
 from ...services.eval_execution import run_suite
 from .. import schemas
-from ..lock_wait import bounded_lock_wait
 from ..deps import (
     get_principal,
     get_settings,
@@ -58,6 +57,7 @@ from ..deps import (
     serialise_idempotent_write,
     store_idempotent_response,
 )
+from ..lock_wait import bounded_lock_wait
 from ..problem import (
     AUTH_PROJECT,
     GRAPH_PRECONDITION,
@@ -231,6 +231,10 @@ async def start_eval_run(
     # nothing is held open while the body arrives.
     with factory() as session:
         with session.begin():
+            # Bounded like every other business-lane write span (#211, card 84 F1):
+            # effective_permission reads the user row FOR SHARE, so a held
+            # FOR UPDATE on it would otherwise wait here with no limit and the
+            # refusal would never reach the canonical retryable 503.
             with tenant_scope(session, principal.tenant_id), bounded_lock_wait(
                 session, timeout_ms=settings.business_lock_timeout_ms
             ):
@@ -256,6 +260,8 @@ async def start_eval_run(
     # resolve the adapter, re-check again, then spend.
     with factory() as session:
         with session.begin():
+            # The first statement in this span takes pg_advisory_xact_lock, which
+            # waits without a limit of its own; the bound has to be set before it.
             with tenant_scope(session, principal.tenant_id), bounded_lock_wait(
                 session, timeout_ms=settings.business_lock_timeout_ms
             ):
