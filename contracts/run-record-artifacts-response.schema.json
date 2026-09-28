@@ -1,0 +1,101 @@
+{
+  "$defs": {
+    "RunRecordArtifactPin": {
+      "additionalProperties": false,
+      "description": "One artifact as the record pinned it: reference, digest and size, no content.",
+      "properties": {
+        "artifactId": {
+          "title": "Artifactid",
+          "type": "string"
+        },
+        "byteSize": {
+          "minimum": 0,
+          "title": "Bytesize",
+          "type": "integer"
+        },
+        "checksumSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Checksumsha256",
+          "type": "string"
+        },
+        "objectVersion": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Objectversion"
+        },
+        "role": {
+          "pattern": "^(diff|test_report|trace|log|model|dataset|other)$",
+          "title": "Role",
+          "type": "string"
+        },
+        "uri": {
+          "minLength": 1,
+          "title": "Uri",
+          "type": "string"
+        }
+      },
+      "required": [
+        "artifactId",
+        "role",
+        "uri",
+        "checksumSha256",
+        "byteSize"
+      ],
+      "title": "RunRecordArtifactPin",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The artifacts pinned into a sealed record, optionally filtered to one role.",
+  "properties": {
+    "count": {
+      "minimum": 0,
+      "title": "Count",
+      "type": "integer"
+    },
+    "items": {
+      "items": {
+        "$ref": "#/$defs/RunRecordArtifactPin"
+      },
+      "title": "Items",
+      "type": "array"
+    },
+    "recordId": {
+      "title": "Recordid",
+      "type": "string"
+    },
+    "role": {
+      "anyOf": [
+        {
+          "pattern": "^(diff|test_report|trace|log|model|dataset|other)$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Role"
+    },
+    "runId": {
+      "title": "Runid",
+      "type": "string"
+    }
+  },
+  "required": [
+    "recordId",
+    "runId",
+    "items",
+    "count"
+  ],
+  "title": "RunRecordArtifactsResponse",
+  "type": "object"
+}

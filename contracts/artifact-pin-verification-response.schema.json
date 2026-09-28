@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Whether a pinned artifact still matches the digest sealed into the record.\n\n``verified: false`` is a reported fact, not an error: the record stays the\naccount of what was true at sealing, and a changed object is an integrity\nfinding for the caller.",
+  "properties": {
+    "artifactId": {
+      "title": "Artifactid",
+      "type": "string"
+    },
+    "pinnedChecksumSha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Pinnedchecksumsha256"
+    },
+    "recordId": {
+      "title": "Recordid",
+      "type": "string"
+    },
+    "runId": {
+      "title": "Runid",
+      "type": "string"
+    },
+    "verified": {
+      "title": "Verified",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "recordId",
+    "runId",
+    "artifactId",
+    "verified"
+  ],
+  "title": "ArtifactPinVerificationResponse",
+  "type": "object"
+}

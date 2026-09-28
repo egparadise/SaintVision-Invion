@@ -266,7 +266,8 @@ def test_every_reachable_business_code_is_in_the_translation_table():
     reachable = {AUTH_PROJECT_SCOPE, RES_RUN_NOT_FOUND}
     assert reachable <= set(run_records.TRANSLATION)
     for code, status, retryable in run_records.TRANSLATION.values():
-        assert status in (403, 404) and retryable is False and code in ("AUTH-0030", "RES-0004")
+        # R2 adds the service's role refusal (VAL-0003, 422); nothing is retryable.
+        assert status in (403, 404, 422) and retryable is False and code in ("AUTH-0030", "RES-0004", "VAL-0003")
 
 
 def test_the_route_is_registered_once_on_the_projects_router():
