@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "1.0.0",
+  "targets": [
+    {
+      "targetId": "s11-st-hosted-storage-fault-soak-v0",
+      "axis": "long-soak",
+      "sourceDocument": {
+        "commit": "2ce66f2615c1f4a15d02f21b49bfceaff8e083bf",
+        "path": "docs/vault/30_Development/S11-ST_손상_용량_backup_장애시험_설계.md",
+        "blob": "25a92da1abe429a55af4a569a370232828b7c970"
+      },
+      "criteria": {
+        "windowSeconds": {"operator": "gte", "value": 3600},
+        "attemptedOperationCount": {"operator": "gte", "value": 1000},
+        "plannedFaultCaseCount": {"operator": "eq", "value": 6},
+        "executedFaultCaseCount": {"operator": "eq", "value": 6},
+        "corruptionEscapeCount": {"operator": "eq", "value": 0},
+        "falseSuccessCount": {"operator": "eq", "value": 0},
+        "committedObjectLossCount": {"operator": "eq", "value": 0},
+        "quotaOvershootBytes": {"operator": "eq", "value": 0},
+        "classificationMismatchCount": {"operator": "eq", "value": 0},
+        "unexpectedErrorCount": {"operator": "eq", "value": 0},
+        "cleanupResidueCount": {"operator": "eq", "value": 0}
+      },
+      "requiredEnvironment": {
+        "topology": "hosted",
+        "storageProvider": "s3-compatible-minio",
+        "database": "postgresql-16",
+        "sameHost": true,
+        "faultInjection": "controlled-v1",
+        "scope": "s11-st-storage-soak-v0"
+      }
+    },
+    {
+      "targetId": "s11-st-actual-pitr-archive-failure-v0",
+      "axis": "actual-pitr-rpo-rto-retention",
+      "sourceDocument": {
+        "commit": "2ce66f2615c1f4a15d02f21b49bfceaff8e083bf",
+        "path": "docs/vault/30_Development/S11-ST_손상_용량_backup_장애시험_설계.md",
+        "blob": "25a92da1abe429a55af4a569a370232828b7c970"
+      },
+      "criteria": {
+        "consecutiveWeeklyRestoreSmokeWeeks": {"operator": "gte", "value": 2},
+        "maxRestoreSmokeGapDays": {"operator": "lte", "value": 7},
+        "retentionDays": {"operator": "gte", "value": 35},
+        "rpoSeconds": {"operator": "lte", "value": 900},
+        "rtoSeconds": {"operator": "lte", "value": 3600},
+        "walArchiveFaultCaseCount": {"operator": "gte", "value": 1},
+        "retentionInterruptionCaseCount": {"operator": "gte", "value": 1},
+        "recoveryAfterFaultPassCount": {"operator": "gte", "value": 2},
+        "falsePitrPassCount": {"operator": "eq", "value": 0},
+        "retainedBoundaryDeletionCount": {"operator": "eq", "value": 0},
+        "cleanupResidueCount": {"operator": "eq", "value": 0}
+      },
+      "requiredEnvironment": {
+        "topology": "physical",
+        "failureDomain": "separate",
+        "archiveKind": "operational",
+        "sameHost": false,
+        "faultInjection": "controlled-v1"
+      }
+    }
+  ]
+}
