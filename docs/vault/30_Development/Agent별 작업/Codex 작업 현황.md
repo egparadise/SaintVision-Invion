@@ -15,6 +15,10 @@ source_of_truth: "Git"
 - `eff23b81`에서 사전 등록 c50/500ms/timeout0 판정은 그대로 두고, `tools/placement_benchmark.py`만 opt-in env를 주입하게 했다. 일반 Backend/Core는 정확한 사유 1건을 skip하고 workflow의 exact skip map이 증가를 감시한다.
 - 문제 run의 placement 실패는 Python 3.12에서 16/50 성공·`55P03` 34였고 active 누수는 0이었다. Python 3.14 placement는 통과했다. 로컬 사전 반복 10/10은 모두 엄격 실패였지만 cleanup active 0, explicit CLI도 22/50·`57014` 28로 exit 1이라 기준을 약화하지 않았다.
 - exact head Backend `36444394600`·`36446063302`는 양 Python 각각 2929 passed/48 skipped/2 deselected, Core `36444412973`은 3234 passed/37 skipped/2 deselected이며 ratchet green이다. c50 자체는 모두 skip이므로 hosted `NOT_OBSERVED`; #151 전용 lane 착지 전 S05 합격으로 세지 않는다. PR #227, reviewer Claude. [[2026-09-29_00-57-33_KST_S05_Card114_placement_benchmark_flake_Codex]].
+## 2026-09-29 카드 123 — S04·S08 운영 판정 collector 검토 요청
+
+- 판정 기준 v1.1.1의 core C1을 REPEATABLE READ·READ ONLY 전수 SQL로 구현했다. attempt 시점 최신 approved·expiry·workload digest를 판정하고 kernel C1-K는 별도 `NOT_OBSERVED`로 고정한다. core 제품에 canonical cancel audit producer가 없음을 독립 검토에서 확인해, (a)~(c)가 깨끗해도 O3는 `cancelHistorySource: absent`/`NOT_OBSERVED`이며 위반만 `MEASURED_FAIL`이다.
+- O1 clean DB 집계는 publisher/consumer deployment identity 없이 `RECORDED_ONLY`; 물리 Node, 운영 backup/PITR, retention/GC와 미구현 producer는 그대로 차단한다. 시험 basename 충돌을 해소했고 PG-free 8 passed, real PG 6-attempt 부정 matrix는 hosted Core 재실행 대기다. 공개 계약·migration·registry status 변경 0. [[2026-09-29_01-59-38_KST_S04_S08_운영판정_collector_Codex]].
 ## 2026-09-28 Card36 hosted Core CX01 19 skip 실행 전환 — 검토 인계
 
 - base `9a837fd7`(#117 lock-wait skip map hotfix 포함), branch `agent/codex/cx01-hosted-core`, owner Codex/reviewer Claude. Core job이 고유 owner label·tmpfs·loopback으로 PostgreSQL 16을 직접 생성하고 같은 컨테이너를 recovery source/CX01 identity로 쓰며 `if: always()` 정리하는 설계를 고정했다.
