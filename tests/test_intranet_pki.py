@@ -202,6 +202,14 @@ def test_public_pilot_evidence_is_redacted_and_bound_to_the_tooling():
     assert evidence["pki"]["https"]["rootOffline"] is False
     assert evidence["pki"]["https"]["publicKeyAlgorithm"] == "ECDSA-P256"
     assert evidence["databaseBoundary"]["pilotStateRebound"] is False
+    assert evidence["databaseBoundary"]["activePilotStateBound"] is False
+    assert evidence["pilot"]["observationStatus"] == "historical-state-database-stopped"
+    assert evidence["pilot"]["observedAt"] == "2026-09-30T00:08:01+09:00"
+    assert (
+        evidence["pilot"]["observationToolCommit"]
+        == evidence["workers"][0]["observationToolCommit"]
+    )
+    assert all("observedAt" in worker for worker in evidence["workers"])
 
     for relative_path, expected in evidence["source"]["toolSHA256"].items():
         blob_oid = evidence["source"]["toolGitBlobSHA1"][relative_path]

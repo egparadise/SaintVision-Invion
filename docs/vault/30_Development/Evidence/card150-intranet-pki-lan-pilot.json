@@ -44,6 +44,9 @@
     }
   },
   "pilot": {
+    "observationStatus": "historical-state-database-stopped",
+    "observedAt": "2026-09-30T00:08:01+09:00",
+    "observationToolCommit": "d3d8d927e4f959a12786a3c8698c3fd026e43acc",
     "operatorStateDigestSHA256": "afae42e68f12b09d676ac673188ee214d0ceb782c51bedb5d5c817108394e829",
     "agentImageDigest": "sha256:e29a48a796b6643bae6370600850990b28d35248969653532b0ba6a696f8caee",
     "configuredWorkerCount": 3,
@@ -65,6 +68,7 @@
     "runtimeCredentialAccepted": true,
     "legacyTrustCandidatesStopped": 3,
     "legacyDataDeleted": false,
+    "activePilotStateBound": false,
     "pilotStateRebound": false,
     "verdict": "MEASURED_PASS_CANDIDATE_BLOCKED_MIGRATION"
   },
