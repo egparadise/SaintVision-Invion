@@ -69,8 +69,8 @@ tags: ["s10-fe", "g-05", "card-101", "model-verify", "eval-runs", "trusted-worke
 ## 3. 실측 검증 증거
 
 - **Vitest 전용 및 전체 스위트 (`apps/web`)**:
-  - `tests/model-verify-eval-routes.test.tsx`: 10 passed (406ms)
-  - `tests/model-registry-business-routes.test.tsx`: 20 passed (860ms)
+  - `apps/web/tests/model-verify-eval-routes.test.tsx`: 10 passed (406ms)
+  - `apps/web/tests/model-registry-business-routes.test.tsx`: 20 passed (860ms)
   - 웹 전체: 81 test files, 761 passed (30.98s)
 - **TypeScript 타입 점검 및 빌드**:
   - `npx tsc -b`: 0 errors (exit 0)

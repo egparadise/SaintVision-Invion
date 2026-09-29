@@ -39,7 +39,7 @@ source_of_truth: "Git"
   10. **M5 결과 카드 표출 충실도**: status 동적 렌더링, endedAt null 시 `NOT_OBSERVED` 명시, `componentVersions` 화면 표출.
   11. **L1~L5 접근성 및 마이너 정비**: 배지 문구 수정, Crockford Base32 26자리 플레이스홀더, WCAG AA 4.5:1 대비 충족(PASS 5.08:1, FAIL 5.36:1 실측 반영), 클라이언트 권한 에러 문구 정비, 로딩 해제 가드 보강.
 - **실측 검증**:
-  - Vitest: `tests/model-verify-eval-routes.test.tsx` 22 passed (894ms), `tests/model-registry-business-routes.test.tsx` 20 passed (923ms). (웹 전체 81 test files / 773 passed, 0 failures).
+  - Vitest: `apps/web/tests/model-verify-eval-routes.test.tsx` 22 passed (894ms), `apps/web/tests/model-registry-business-routes.test.tsx` 20 passed (923ms). (웹 전체 81 test files / 773 passed, 0 failures).
   - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist/ 번들 생성 성공 (`dist/assets/index-B-CJTiXt.js` 892.68 kB, exit 0).
   - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (3.02s, exit 0).
   - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
@@ -71,10 +71,10 @@ source_of_truth: "Git"
      - 권한 없는 사용자(`canApprove !== true`) 대상 fail-closed 비활성화 및 안내 표출.
      - `role="status"` 결과 카드, `aria-live="polite"` 음성 안내 지원.
   5. **전용 통합 시험 및 전수 검증**:
-     - `tests/model-verify-eval-routes.test.tsx` 10개 전용 시험 구현 및 전수 통과 (되돌리면 실패).
+     - `apps/web/tests/model-verify-eval-routes.test.tsx` 10개 전용 시험 구현 및 전수 통과 (되돌리면 실패).
      - 전체 81 test files / 761 tests 통과.
 - **실측 검증 증거**:
-  - Vitest: `tests/model-verify-eval-routes.test.tsx` 10 passed, `tests/model-registry-business-routes.test.tsx` 20 passed. (웹 전체 81 test files / 761 passed).
+  - Vitest: `apps/web/tests/model-verify-eval-routes.test.tsx` 10 passed, `apps/web/tests/model-registry-business-routes.test.tsx` 20 passed. (웹 전체 81 test files / 761 passed).
   - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist/ 889.27 kB 생성 성공.
   - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed.
   - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
@@ -98,11 +98,11 @@ source_of_truth: "Git"
      - `releaseModelVersion` API 클라이언트에서 `idempotencyKey` 옵션 및 `Idempotency-Key` 헤더 전면 제거.
      - `ModelLineageView.tsx`에서 `relIdempotencyKey` 상태 제거.
   3. **시험 개정 및 미노출 고정 (되돌리면 실패)**:
-     - 시험 20의 릴리스 헤더 재사용 단언을 전면 제거하고, 릴리스 쓰기 UI의 fail-closed 상태 및 `서버 멱등 계약 대기(카드 113)` 안내 미노출을 고정하는 시험으로 전면 전환 (`tests/model-registry-business-routes.test.tsx`: 버튼 disabled/aria-disabled 확인, 안내 문구 실측, 클릭/폼제출 시 /release 네트워크 호출 0건 실측, 되돌리면 실패).
+     - 시험 20의 릴리스 헤더 재사용 단언을 전면 제거하고, 릴리스 쓰기 UI의 fail-closed 상태 및 `서버 멱등 계약 대기(카드 113)` 안내 미노출을 고정하는 시험으로 전면 전환 (`apps/web/tests/model-registry-business-routes.test.tsx`: 버튼 disabled/aria-disabled 확인, 안내 문구 실측, 클릭/폼제출 시 /release 네트워크 호출 0건 실측, 되돌리면 실패).
      - 시험 4: `releaseModelVersion` 클라이언트 호출 시 `Idempotency-Key` 헤더 미전송 및 200 응답 파싱 검증으로 정합.
      - 시험 5: 보존 고정(Pin) 탭을 통해 RFC 9457 409 Conflict ProblemDetails 검증 수행.
 - **실측 검증**:
-  - Vitest: `tests/model-registry-business-routes.test.tsx` 20 passed (819ms). (웹 전체 80 test files / 751 passed, 23.69s, 0 failures).
+  - Vitest: `apps/web/tests/model-registry-business-routes.test.tsx` 20 passed (819ms). (웹 전체 80 test files / 751 passed, 23.69s, 0 failures).
   - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist/ 번들 생성 성공 (873.66 kB, 8.55s).
   - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (8.06s).
   - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
@@ -123,11 +123,11 @@ source_of_truth: "Git"
   2. **Claude UI r3 조건 전수 반영**:
      - `ModelLineageView.tsx:1205` fallback kind 배열 `['eval_run', 'code_commit', 'approval', 'container_image']` 완전 제거 (서버 미제공 시 NOT_OBSERVED 정직 표기).
      - `:1208` `'evaluations'` 옛 별칭 제거, 정본 `kind === 'eval_run'`만 판별.
-     - 시험 9 픽스처 교정: 서버 `services/lineage.py:762-768` 산식에 맞춰 `missing: ['dataset_version']`, `unresolved: [{ kind: 'code_commit', count: 2 }]`, `countOnlyKinds: ['code_commit', 'eval_run']`으로 교정.
+     - 시험 9 픽스처 교정: 서버 `src/saintvision/services/lineage.py:762-768` 산식에 맞춰 `missing: ['dataset_version']`, `unresolved: [{ kind: 'code_commit', count: 2 }]`, `countOnlyKinds: ['code_commit', 'eval_run']`으로 교정.
      - `:203` 안내 문구 복원: `5b2609d9` 원문 `(백엔드 서빙 배포 API 미노출 상태로 실제 인프라 미반영 · 백엔드 digest 고정과 무관 · Digest: ...)`로 복원.
      - View 날짜 검증 중복 제거: `ModelLineageView.tsx` 내부의 중복 함수를 제거하고 정본 공용 가드(`modelRegistryObservation.isValidIsoDateTime`)로 일원화 (`+99:99` 오프셋 누출 차단).
 - **실측 검증**:
-  - Vitest: `tests/model-registry-business-routes.test.tsx` 20 passed (855ms), `tests/model-lineage.test.ts` 23 passed (924ms), `tests/write-actions-integrity-wiring.test.tsx` 8 passed (204ms). (웹 전체 80 test files / 751 passed).
+  - Vitest: `apps/web/tests/model-registry-business-routes.test.tsx` 20 passed (855ms), `apps/web/tests/model-lineage.test.ts` 23 passed (924ms), `apps/web/tests/write-actions-integrity-wiring.test.tsx` 8 passed (204ms). (웹 전체 80 test files / 751 passed).
   - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist/ 번들 생성 성공 (874.53 kB).
   - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (2.85s).
   - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
@@ -146,7 +146,7 @@ source_of_truth: "Git"
      - 한 액션 중 다른 액션을 호출해도 서로의 controller가 abort되지 않으며, abort 시에도 `finally`에서 로딩 상태를 무조건 해제(`setRegLoading(false)` 등)하여 버튼 영구 비활성화 원천 차단.
      - 9개 폼 필드 변경 시 즉시 in-flight 세대를 증가시켜 늦은 응답의 화면 오염 차단. (회귀 시험 18).
   2. **G1 [중간] Lineage Trace 응답 픽스처 및 서버 정본 모델 정합**:
-     - `validTraceResponse` 픽스처에서 `unresolved` 존재 시 `fullyTraceable: false`로 정합(`services/lineage.py:762`).
+     - `validTraceResponse` 픽스처에서 `unresolved` 존재 시 `fullyTraceable: false`로 정합(`src/saintvision/services/lineage.py:762`).
      - `missing` 배열 항목은 서버 계약대로 kind 이름 문자열(`"dataset_version"`)만 포함.
      - 4대 별칭(`evaluations`, `commits`, `approvals`, `images`) 및 `isEval` 특수 분기, 하드코딩 fallback kind 목록 전면 제거.
   3. **G2 [부분] 보존 핀 멱등키 회전 및 동일 재시도 보존**:
@@ -159,7 +159,7 @@ source_of_truth: "Git"
   6. **PR #212 선행 머지 (`7ddc616e`) 및 ModelLineageView 완전 합성**:
      - PR #212 head `5b2609d9`를 병합하고, `ModelLineageView.tsx`에서 Card 94 비즈니스 라우트와 PR #203 어댑터 Conformance 패널 및 Model Commitment 패널을 완벽하게 통합/합성.
 - **실측 검증**:
-  - Vitest: `tests/model-registry-business-routes.test.tsx` 19 passed, `tests/model-lineage.test.ts` 23 passed, `tests/write-actions-integrity-wiring.test.tsx` 8 passed. (웹 전체 80 test files / 750 passed).
+  - Vitest: `apps/web/tests/model-registry-business-routes.test.tsx` 19 passed, `apps/web/tests/model-lineage.test.ts` 23 passed, `apps/web/tests/write-actions-integrity-wiring.test.tsx` 8 passed. (웹 전체 80 test files / 750 passed).
   - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist/ 번들 생성 성공 (874.71 kB).
   - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed.
   - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
