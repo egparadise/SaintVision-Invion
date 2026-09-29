@@ -1,7 +1,7 @@
 ---
 doc_id: "OPS-INTRANET-STORAGE-PITR-001"
 title: "사내 MinIO ObjectStore와 PITR 예행 runbook"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 owner: "Codex"
 reviewer: "Claude"
@@ -42,6 +42,8 @@ provision-minio.sh
 ```
 
 TLS 전 사전 배선은 내부 HTTP로 기동할 수 있으나 `targetKind=ci-candidate`만 허용한다. 운영 전환 때 `minio-certs/public.crt`, `minio-certs/private.key`, `minio-certs/ca-chain.pem` 세 파일을 모두 제공한다. 일부만 있으면 기동을 거부한다. private key는 0600이어야 한다.
+
+MinIO server에는 환경변수만 두지 않고 `server ... --certs-dir /certs`를 명시한다. bootstrap `mc`는 인증서 SAN에 들어 있는 bind IP로 접속하며 `SSL_CERT_FILE=/certs/ca-chain.pem`으로 같은 사내 CA를 검증한다. root·service 자격은 `docker exec -e`나 명령 인자로 넘기지 않고 stdin으로만 전달한다. readiness 1회는 3초로 제한해 인증서·CA·주소가 어긋난 후보가 이전 컨테이너를 무기한 붙잡지 못하게 한다.
 
 ```sh
 ~/.config/saintvision-intranet/provision-minio.sh
@@ -100,11 +102,13 @@ source가 Docker bridge 뒤에 있으면 physical replication HBA가 실제 clie
 | 항목 | 현재 관측 | 판정 |
 |---|---|---|
 | MinIO 고정 image·지속 data·비루트 경계 | 실제 사내 storage node에서 ready | 준비됨 |
-| 제품 service 왕복 | HTTP에서 put/get/body hash/metadata hash/delete/cleanup 6/6 | `ci-candidate` PASS, 운영 PASS 아님 |
-| 권한 음성 | 제품 credential·PITR credential의 교차 prefix PUT 모두 403 | PASS |
-| TLS | 사내 CA server certificate 입력 대기 | BLOCKED_EXTERNAL |
+| 제품 service 왕복 | 사내 CA HTTPS에서 put/get/body hash/metadata hash/delete/cleanup 6/6 | operational PASS |
+| 권한 음성 | 제품 credential→PITR bucket, PITR credential→제품 bucket PUT 모두 403 | PASS |
+| TLS | `objects.sv.lan`·`192.168.45.210` SAN, serverAuth, CA=false leaf와 intermediate chain 검증 | PASS |
 | pilot PostgreSQL 설정 | `archive_mode=off`, archive command disabled | 상시 PITR absent |
 | 물리 replication | Docker gateway source에 replication HBA 없음 | source mutation 전 BLOCKED_EXTERNAL |
 | 실제 target-time restore·RPO/RTO | 실행 전 차단 | NOT_OBSERVED |
+
+2026-09-30 canonical preflight는 storage evidence 자체를 `storage-operational-evidence-valid`로 PASS했다. 그러나 전체 U6 입력은 운영 configuration route의 operator token이 없어서 BLOCKED이고, CP hostname/HTTPS endpoint·실 session token·완성된 5-node inventory도 아직 없다. 따라서 전체 결과는 PASS 1/FAIL 2/BLOCKED 6, `acceptanceAssessed=false`이며 S01 전체 합격으로 올리지 않는다. PITR는 physical replication HBA가 적용되기 전까지 계속 BLOCKED_EXTERNAL이다.
 
 되돌릴 때는 새 dispatch를 중지하고 product object 사용 여부를 확인한 뒤, owner label이 일치하는 MinIO 컨테이너만 중지한다. data directory, bucket, credential, PITR report는 자동 삭제하지 않는다. credential 회수는 scoped user를 disable한 뒤 별도 승인으로 수행한다. `docker system prune`, volume 삭제, 다른 컨테이너 조작은 이 runbook 범위 밖이다.
