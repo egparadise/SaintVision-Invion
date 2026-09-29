@@ -37,7 +37,7 @@ O1 DB 집계는 실패·stale 행을 `MEASURED_FAIL`로 보존하지만, 100건�
 ## 검증
 
 - PG-free `tests/core/test_s04_s08_operational_evidence.py`: **7 passed**. 0행·사유 합계·core/kernel 분리·O1 거짓 PASS·criteria/clean tree/DB binding·C1-K·overwrite·secret/redacted error·unsafe label 변이를 고정했다.
-- real PG `tests/integration/test_s04_s08_operational_evidence.py`: valid 1, valid 뒤 later rejected 1, approval 없음·expired·digest mismatch·선행 cancel 각 1을 실제 migration DB에 넣어 `attempt 6 / valid 2 / violation 4`와 사유별 1을 확인한다. 로컬 Python 3.10은 integration conftest의 `StrEnum`을 import하지 못해 **미실행**이며, PR의 hosted Core Python 3.12에서 실행한다.
+- real PG `tests/core/test_s04_s08_operational_evidence.py`: valid 1, valid 뒤 later rejected 1, approval 없음·expired·digest mismatch·선행 cancel 각 1을 실제 migration DB에 넣어 `attempt 6 / valid 2 / violation 4`와 사유별 1을 확인한다. 로컬 Python 3.10은 integration conftest의 `StrEnum`을 import하지 못해 **미실행**이며, PR의 hosted Core Python 3.12에서 실행한다.
 - 공개 계약·migration 변경 0. 물리 Node 전송 재개, kernel C1-K, 운영 backup/PITR, retention/GC는 계속 `NOT_OBSERVED`/`BLOCKED_EXTERNAL`이다.
 
 재실행: `INV_AUDIT_DSN=<운영 owner DSN> python tools/collect_s04_s08_operational_evidence.py --label <안전한-label> --out-dir <evidence-dir>` (환경값은 기록하지 않는다).
