@@ -72,7 +72,7 @@ describe('S11-FE: Release Candidate, WCAG 2.1 AA & Web Rollback Verification (AC
       expect(textContrast?.status).toBe('pass');
       expect(textContrast?.wcagLevel).toBe('AA');
       expect(textContrast?.contrastRatio).toBeGreaterThanOrEqual(4.5);
-      expect(textContrast?.contrastRatio).toBe(11.4); // #c9d1d9 on #0d1117
+      expect(textContrast?.contrastRatio).toBe(12.26); // #c9d1d9 on #0d1117 (actual computed ratio 12.26)
 
       const uiContrast = audits.find((a) => a.ruleId === 'wcag21-1.4.11-non-text-contrast');
       expect(uiContrast).toBeDefined();

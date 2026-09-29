@@ -38,26 +38,31 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
     assert set(mapping) == {revision.revision for revision in chain() if not revision.irreversible}
     assert {key for key, value in mapping.items() if value == "DECLARED_LOSS_REQUIRES_RESTORE"} == runner.EXPECTED_LOSSY
     assert len(runner.EXPECTED_LOSSY) == 10
-    assert {key for key in mapping if key.startswith(("0047_", "0050_", "0053_", "0054_"))} == {
+    assert {key for key in mapping if key.startswith(("0047_", "0050_", "0053_", "0054_", "0055_"))} == {
         "0047_audit_events_isolation",
         "0050_dataset_digest_lookup",
         "0053_eval_suite_project_scope",
         "0054_model_version_measurements",
+        "0055_adapter_conformance_records",
     }
     # 0054 (W3 seam, #213): the downgrade refuses while any version is bound to
     # a measurement or any measurement row exists, and otherwise drops only
     # empty structures -- nothing is lost either way, so PRESERVED, like 0053.
+    # 0055 (G-03 stage two, card 103) guards the same way: it refuses while any
+    # conformance record exists and otherwise drops an empty table.
     assert all(mapping[key] == "PRESERVED" for key in (
         "0047_audit_events_isolation",
         "0050_dataset_digest_lookup",
         "0053_eval_suite_project_scope",
         "0054_model_version_measurements",
+        "0055_adapter_conformance_records",
     ))
     ordered = chain()
     last_irreversible = max(index for index, item in enumerate(ordered) if item.irreversible)
     assert [item.revision for item in ordered[last_irreversible + 1 :]] == [
         "0053_eval_suite_project_scope",
         "0054_model_version_measurements",
+        "0055_adapter_conformance_records",
     ]
 
 

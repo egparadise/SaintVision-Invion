@@ -1,0 +1,123 @@
+{
+  "$defs": {
+    "ConformanceCheckOutcome": {
+      "additionalProperties": false,
+      "description": "One check's result as stored: name, passed, skipped. No ``detail``: the\nsuite's detail is stringified exceptions and host process output, and this\nrow is readable by every project's members (§2-5).",
+      "properties": {
+        "name": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "passed": {
+          "title": "Passed",
+          "type": "boolean"
+        },
+        "skipped": {
+          "title": "Skipped",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name",
+        "passed",
+        "skipped"
+      ],
+      "title": "ConformanceCheckOutcome",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The single-adapter route's record. Its own class rather than the list\nitem, so one side's needs cannot drag the other's contract; the field\nnames and types are the item's exactly (§4-1).",
+  "properties": {
+    "adapter": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Adapter",
+      "type": "string"
+    },
+    "contractVersion": {
+      "maxLength": 32,
+      "minLength": 1,
+      "title": "Contractversion",
+      "type": "string"
+    },
+    "failed": {
+      "minimum": 0,
+      "title": "Failed",
+      "type": "integer"
+    },
+    "outcomes": {
+      "items": {
+        "$ref": "#/$defs/ConformanceCheckOutcome"
+      },
+      "title": "Outcomes",
+      "type": "array"
+    },
+    "passed": {
+      "minimum": 0,
+      "title": "Passed",
+      "type": "integer"
+    },
+    "provenance": {
+      "const": "in-server",
+      "title": "Provenance",
+      "type": "string"
+    },
+    "recordedAt": {
+      "format": "date-time",
+      "title": "Recordedat",
+      "type": "string"
+    },
+    "scope": {
+      "const": "control-plane-host",
+      "title": "Scope",
+      "type": "string"
+    },
+    "skipped": {
+      "minimum": 0,
+      "title": "Skipped",
+      "type": "integer"
+    },
+    "status": {
+      "const": "RECORDED",
+      "title": "Status",
+      "type": "string"
+    },
+    "subject": {
+      "const": "fixture-adapter",
+      "title": "Subject",
+      "type": "string"
+    },
+    "suiteContractVersion": {
+      "maxLength": 32,
+      "minLength": 1,
+      "title": "Suitecontractversion",
+      "type": "string"
+    },
+    "total": {
+      "minimum": 0,
+      "title": "Total",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "status",
+    "scope",
+    "adapter",
+    "subject",
+    "provenance",
+    "contractVersion",
+    "suiteContractVersion",
+    "total",
+    "passed",
+    "failed",
+    "skipped",
+    "outcomes",
+    "recordedAt"
+  ],
+  "title": "AdapterConformanceRecordedResponse",
+  "type": "object"
+}

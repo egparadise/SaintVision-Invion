@@ -208,14 +208,16 @@ def _archiver_probe(state, logs, *, inspect_return=0, logs_return=0, port_bindin
     return name, run
 
 
-def test_running_ready_internal_archiver_is_a_reasoned_host_network_skip():
+def test_running_ready_internal_archiver_is_a_failure_of_the_in_container_probe_not_a_skip():
+    """G-02: the probe runs inside the container, so "no published host port" is
+    no longer a reason to skip -- a ready server the probe cannot query is a defect."""
     classify = _archiver_failure_classifier()
     name, run = _archiver_probe(
         {"Status": "running", "Running": True, "Restarting": False, "ExitCode": 0, "RestartCount": 0},
         "database system is ready to accept connections",
     )
 
-    with pytest.raises(pytest.skip.Exception, match="internal network has no published host port"):
+    with raises_without_skip(AssertionError, "in-container probe still failed"):
         classify(name, run=run)
 
 
@@ -313,5 +315,5 @@ def test_ready_archiver_with_published_host_port_is_failure_not_internal_network
         port_bindings={"5432/tcp": [{"HostIp": "127.0.0.1", "HostPort": "54321"}]},
     )
 
-    with raises_without_skip(AssertionError, "with a published host port, but host connection still failed"):
+    with raises_without_skip(AssertionError, r"in-container probe still failed \(hostPortPublished=True\)"):
         classify(name, run=run)

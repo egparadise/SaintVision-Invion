@@ -11,7 +11,8 @@ import datetime as dt
 import hashlib
 import json
 import uuid
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from typing import Any
 
 from fastapi import Depends, Header, Request
@@ -38,9 +39,7 @@ def get_now(request: Request) -> dt.datetime:
     return request.app.state.clock()
 
 
-def get_principal(
-    request: Request, authorization: str | None = Header(default=None)
-) -> Principal:
+def get_principal(request: Request, authorization: str | None = Header(default=None)) -> Principal:
     """Verify the caller's credential.
 
     A missing header and an unrecognised credential are different codes so the
@@ -71,6 +70,30 @@ def get_session(
     with factory() as session:
         with session.begin():
             with tenant_scope(session, principal.tenant_id):
+                yield session
+
+
+def get_write_session(
+    request: Request, principal: Principal = Depends(get_principal)
+) -> Iterator[Session]:
+    """Yield a tenant-scoped legacy write transaction with bounded lock waits.
+
+    Read routes retain :func:`get_session`; mutation routes use this dependency
+    unless an idempotency span already applies the same bound. PostgreSQL lock
+    timeout/deadlock errors become canonical retryable ``SYS-0001/503``.
+    """
+    from .lock_wait import bounded_lock_wait
+
+    factory = make_session_factory(request.app.state.engine)
+    with factory() as session:
+        with session.begin():
+            with (
+                tenant_scope(session, principal.tenant_id),
+                bounded_lock_wait(
+                    session,
+                    timeout_ms=request.app.state.settings.business_lock_timeout_ms,
+                ),
+            ):
                 yield session
 
 
@@ -162,9 +185,11 @@ def replay_or_reserve(
         session.query(IdempotencyRecord)
         .filter(
             IdempotencyRecord.tenant_id == principal.tenant_id,
-            IdempotencyRecord.project_id.is_(None)
-            if project_id is None
-            else IdempotencyRecord.project_id == project_id,
+            (
+                IdempotencyRecord.project_id.is_(None)
+                if project_id is None
+                else IdempotencyRecord.project_id == project_id
+            ),
             IdempotencyRecord.endpoint == endpoint,
             IdempotencyRecord.idempotency_key == idempotency_key,
         )
@@ -210,3 +235,64 @@ def store_idempotent_response(
         )
     )
     session.flush()
+
+
+@contextmanager
+def optional_idempotent_write(
+    session: Session,
+    *,
+    principal: Principal,
+    endpoint: str,
+    idempotency_key: str | None,
+    payload: Any,
+    now: dt.datetime,
+    ttl_seconds: int,
+    lock_timeout_ms: int,
+    project_id: str | None = None,
+) -> Iterator[tuple[dict[str, Any] | None, Callable[[dict[str, Any], int], None]]]:
+    """Bound and optionally replay a legacy write without changing its schema.
+
+    The web client already sends ``Idempotency-Key`` on mutations. Legacy
+    handlers historically ignored it and therefore repeated audit rows and
+    version/timestamp writes. When a key is present, the shared advisory lock
+    closes the concurrent-first gap before reading the durable ledger. When it
+    is absent, the route retains its existing behavior while lock waits are
+    still bounded.
+    """
+    from .lock_wait import bounded_lock_wait
+
+    with bounded_lock_wait(session, timeout_ms=lock_timeout_ms):
+        if idempotency_key is not None:
+            serialise_idempotent_write(
+                session,
+                tenant_id=principal.tenant_id,
+                endpoint=endpoint,
+                idempotency_key=idempotency_key,
+                project_id=project_id,
+            )
+        replay = replay_or_reserve(
+            session,
+            principal=principal,
+            endpoint=endpoint,
+            idempotency_key=idempotency_key,
+            payload=payload,
+            now=now,
+            ttl_seconds=ttl_seconds,
+            project_id=project_id,
+        )
+
+        def finish(response_body: dict[str, Any], response_status: int = 200) -> None:
+            store_idempotent_response(
+                session,
+                principal=principal,
+                endpoint=endpoint,
+                idempotency_key=idempotency_key,
+                payload=payload,
+                response_status=response_status,
+                response_body=response_body,
+                now=now,
+                ttl_seconds=ttl_seconds,
+                project_id=project_id,
+            )
+
+        yield replay, finish

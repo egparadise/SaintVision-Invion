@@ -85,7 +85,7 @@ def test_an_authenticated_member_without_the_grade_is_403_with_exactly_one_denia
     observation = _observation(seeded["project_id"], seeded["model_id"], "1.0.0")
     client = _client(app_engine, tenant_id=tenant, user_id=seeded["user_id"], now=frozen_now, observation=observation)
 
-    response = client.post(_path(seeded), json=DECLARATION, headers=AUTH)
+    response = client.post(_path(seeded), json=DECLARATION, headers={**AUTH, "Idempotency-Key": "denial-k1"})
     body = _canonical(response, code="AUTH-0030", status=403)
 
     rows = _denials(owner_engine)
@@ -125,7 +125,7 @@ def test_a_revocation_caught_by_the_re_check_in_the_write_transaction_writes_not
     client = _client(app_engine, tenant_id=tenant, user_id=seeded["user_id"], now=frozen_now, observation=observation)
     client.app.state.model_commitment_fetcher = revoke_then_observe
 
-    response = client.post(_path(seeded), json=DECLARATION, headers=AUTH)
+    response = client.post(_path(seeded), json=DECLARATION, headers={**AUTH, "Idempotency-Key": "denial-k1"})
     _canonical(response, code="AUTH-0030", status=403)
 
     assert _stage(owner_engine, seeded["version_id"]) == "draft"
@@ -148,7 +148,7 @@ def test_a_failing_audit_write_is_a_generic_500_with_nothing_done_not_a_403(
     monkeypatch.setattr(app_module, "record_denial_out_of_band", broken)
     client = _client(app_engine, tenant_id=tenant, user_id=seeded["user_id"], now=frozen_now, observation=observation)
 
-    response = client.post(_path(seeded), json=DECLARATION, headers=AUTH)
+    response = client.post(_path(seeded), json=DECLARATION, headers={**AUTH, "Idempotency-Key": "denial-k1"})
     assert response.status_code == 500, response.text
     assert "AUTH-0030" not in response.text and "permission denied" not in response.text
     assert _stage(owner_engine, seeded["version_id"]) == "draft"

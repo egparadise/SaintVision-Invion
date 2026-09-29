@@ -20,14 +20,23 @@ from __future__ import annotations
 
 import datetime as dt
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Header, Request
 from sqlalchemy.orm import Session
 
+from ...config import Settings
+from ...db.models import Workspace
+from ...errors import RES_NODE_NOT_FOUND, InvError
 from ...identity.principal import Principal
 from ...services import settings as settings_service
 from ...services.audit import record_event
 from .. import schemas
-from ..deps import get_now, get_principal, get_session
+from ..deps import (
+    get_now,
+    get_principal,
+    get_session,
+    get_settings,
+    optional_idempotent_write,
+)
 
 router = APIRouter(prefix="/v1", tags=["settings"])
 
@@ -107,27 +116,47 @@ def set_member_role(
     request: Request,
     principal: Principal = Depends(get_principal),
     session: Session = Depends(get_session),
+    settings: Settings = Depends(get_settings),
     now: dt.datetime = Depends(get_now),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> dict:
     """Grant or change a membership, and return what it now permits."""
-    result = settings_service.set_member_role(
+    request_body = {
+        "projectId": project_id,
+        "userId": user_id,
+        "roleCode": payload.role_code,
+    }
+    settings_service.require_administrator(
         session,
         tenant_id=principal.tenant_id,
         project_id=project_id,
-        user_id=user_id,
-        role_code=payload.role_code,
-        acting_user_id=principal.user_id,
-        now=now,
+        user_id=principal.user_id,
     )
-    _audit(
+    with optional_idempotent_write(
         session,
-        request,
-        principal,
-        "project.member.role_set",
-        {"projectId": project_id, "userId": user_id, "roleCode": payload.role_code},
-        now,
-    )
-    return result
+        principal=principal,
+        endpoint="PUT /v1/projects/{project_id}/members/{user_id}",
+        idempotency_key=idempotency_key,
+        payload=request_body,
+        now=now,
+        ttl_seconds=settings.idempotency_ttl_seconds,
+        lock_timeout_ms=settings.business_lock_timeout_ms,
+        project_id=project_id,
+    ) as (replay, finish):
+        if replay is not None:
+            return replay
+        result = settings_service.set_member_role(
+            session,
+            tenant_id=principal.tenant_id,
+            project_id=project_id,
+            user_id=user_id,
+            role_code=payload.role_code,
+            acting_user_id=principal.user_id,
+            now=now,
+        )
+        _audit(session, request, principal, "project.member.role_set", request_body, now)
+        finish(result)
+        return result
 
 
 @router.delete(
@@ -141,24 +170,41 @@ def remove_member(
     request: Request,
     principal: Principal = Depends(get_principal),
     session: Session = Depends(get_session),
+    settings: Settings = Depends(get_settings),
     now: dt.datetime = Depends(get_now),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> dict:
-    settings_service.remove_member(
+    request_body = {"projectId": project_id, "userId": user_id}
+    settings_service.require_administrator(
         session,
         tenant_id=principal.tenant_id,
         project_id=project_id,
-        user_id=user_id,
-        acting_user_id=principal.user_id,
+        user_id=principal.user_id,
     )
-    _audit(
+    with optional_idempotent_write(
         session,
-        request,
-        principal,
-        "project.member.removed",
-        {"projectId": project_id, "userId": user_id},
-        now,
-    )
-    return {"projectId": project_id, "userId": user_id, "removed": True}
+        principal=principal,
+        endpoint="DELETE /v1/projects/{project_id}/members/{user_id}",
+        idempotency_key=idempotency_key,
+        payload=request_body,
+        now=now,
+        ttl_seconds=settings.idempotency_ttl_seconds,
+        lock_timeout_ms=settings.business_lock_timeout_ms,
+        project_id=project_id,
+    ) as (replay, finish):
+        if replay is not None:
+            return replay
+        settings_service.remove_member(
+            session,
+            tenant_id=principal.tenant_id,
+            project_id=project_id,
+            user_id=user_id,
+            acting_user_id=principal.user_id,
+        )
+        _audit(session, request, principal, "project.member.removed", request_body, now)
+        body = {"projectId": project_id, "userId": user_id, "removed": True}
+        finish(body)
+        return body
 
 
 # --------------------------------------------------------------------------
@@ -173,13 +219,16 @@ def set_user_status(
     request: Request,
     principal: Principal = Depends(get_principal),
     session: Session = Depends(get_session),
+    settings: Settings = Depends(get_settings),
     now: dt.datetime = Depends(get_now),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> dict:
     """Suspend or restore a user.
 
     Effective immediately everywhere, including inside the execution kernel,
     because the kernel reads this row rather than a copy of it.
     """
+    request_body = {"userId": user_id, "status": payload.status}
     settings_service.require_global_administrator(
         session,
         tenant_id=principal.tenant_id,
@@ -187,22 +236,29 @@ def set_user_status(
         permission="users.manage",
         target_user_id=user_id,
     )
-    user = settings_service.set_user_status(
+    with optional_idempotent_write(
         session,
-        tenant_id=principal.tenant_id,
-        user_id=user_id,
-        status=payload.status,
+        principal=principal,
+        endpoint="PUT /v1/users/{user_id}/status",
+        idempotency_key=idempotency_key,
+        payload=request_body,
         now=now,
-    )
-    _audit(
-        session,
-        request,
-        principal,
-        "user.status_set",
-        {"userId": user_id, "status": payload.status},
-        now,
-    )
-    return {"userId": user.user_id, "status": user.status}
+        ttl_seconds=settings.idempotency_ttl_seconds,
+        lock_timeout_ms=settings.business_lock_timeout_ms,
+    ) as (replay, finish):
+        if replay is not None:
+            return replay
+        user = settings_service.set_user_status(
+            session,
+            tenant_id=principal.tenant_id,
+            user_id=user_id,
+            status=payload.status,
+            now=now,
+        )
+        _audit(session, request, principal, "user.status_set", request_body, now)
+        body = {"userId": user.user_id, "status": user.status}
+        finish(body)
+        return body
 
 
 @router.put("/projects/{project_id}/status", response_model=schemas.ProjectStatusResponse)
@@ -212,25 +268,43 @@ def set_project_status(
     request: Request,
     principal: Principal = Depends(get_principal),
     session: Session = Depends(get_session),
+    settings: Settings = Depends(get_settings),
     now: dt.datetime = Depends(get_now),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> dict:
     """Archive or reactivate a project. Archiving stops execution in it."""
-    project = settings_service.set_project_status(
+    request_body = {"projectId": project_id, "status": payload.status}
+    settings_service.require_administrator(
         session,
         tenant_id=principal.tenant_id,
         project_id=project_id,
-        status=payload.status,
-        acting_user_id=principal.user_id,
+        user_id=principal.user_id,
+        allow_archived=True,
     )
-    _audit(
+    with optional_idempotent_write(
         session,
-        request,
-        principal,
-        "project.status_set",
-        {"projectId": project_id, "status": payload.status},
-        now,
-    )
-    return {"projectId": project.project_id, "status": project.status}
+        principal=principal,
+        endpoint="PUT /v1/projects/{project_id}/status",
+        idempotency_key=idempotency_key,
+        payload=request_body,
+        now=now,
+        ttl_seconds=settings.idempotency_ttl_seconds,
+        lock_timeout_ms=settings.business_lock_timeout_ms,
+        project_id=project_id,
+    ) as (replay, finish):
+        if replay is not None:
+            return replay
+        project = settings_service.set_project_status(
+            session,
+            tenant_id=principal.tenant_id,
+            project_id=project_id,
+            status=payload.status,
+            acting_user_id=principal.user_id,
+        )
+        _audit(session, request, principal, "project.status_set", request_body, now)
+        body = {"projectId": project.project_id, "status": project.status}
+        finish(body)
+        return body
 
 
 @router.put(
@@ -243,29 +317,50 @@ def set_workspace_status(
     request: Request,
     principal: Principal = Depends(get_principal),
     session: Session = Depends(get_session),
+    settings: Settings = Depends(get_settings),
     now: dt.datetime = Depends(get_now),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> dict:
-    workspace = settings_service.set_workspace_status(
+    request_body = {"workspaceId": workspace_id, "status": payload.status}
+    workspace_for_access = session.get(Workspace, workspace_id)
+    if workspace_for_access is None or workspace_for_access.tenant_id != principal.tenant_id:
+        raise InvError(RES_NODE_NOT_FOUND, "workspace not found")
+    settings_service.require_administrator(
         session,
         tenant_id=principal.tenant_id,
-        workspace_id=workspace_id,
-        status=payload.status,
-        acting_user_id=principal.user_id,
-        now=now,
+        project_id=workspace_for_access.project_id,
+        user_id=principal.user_id,
     )
-    _audit(
+    with optional_idempotent_write(
         session,
-        request,
-        principal,
-        "workspace.status_set",
-        {"workspaceId": workspace_id, "status": payload.status},
-        now,
-    )
-    return {
-        "workspaceId": workspace.workspace_id,
-        "status": workspace.status,
-        "allowedNext": sorted(settings_service.WORKSPACE_TRANSITIONS.get(workspace.status, ())),
-    }
+        principal=principal,
+        endpoint="PUT /v1/workspaces/{workspace_id}/status",
+        idempotency_key=idempotency_key,
+        payload=request_body,
+        now=now,
+        ttl_seconds=settings.idempotency_ttl_seconds,
+        lock_timeout_ms=settings.business_lock_timeout_ms,
+    ) as (replay, finish):
+        if replay is not None:
+            return replay
+        workspace = settings_service.set_workspace_status(
+            session,
+            tenant_id=principal.tenant_id,
+            workspace_id=workspace_id,
+            status=payload.status,
+            acting_user_id=principal.user_id,
+            now=now,
+        )
+        _audit(session, request, principal, "workspace.status_set", request_body, now)
+        body = {
+            "workspaceId": workspace.workspace_id,
+            "status": workspace.status,
+            "allowedNext": sorted(
+                settings_service.WORKSPACE_TRANSITIONS.get(workspace.status, ())
+            ),
+        }
+        finish(body)
+        return body
 
 
 # --------------------------------------------------------------------------
@@ -300,7 +395,9 @@ def set_resource_offer(
     request: Request,
     principal: Principal = Depends(get_principal),
     session: Session = Depends(get_session),
+    settings: Settings = Depends(get_settings),
     now: dt.datetime = Depends(get_now),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> dict:
     """Change how much of one capability the platform may use.
 
@@ -308,31 +405,49 @@ def set_resource_offer(
     and the response states the canonical unit the platform stored. A screen
     that sends GiB and a screen that sends bytes describe the same machine.
     """
+    request_body = {
+        "capabilityId": capability_id,
+        "offeredQuantity": payload.offered_quantity,
+        "unit": payload.unit,
+    }
     settings_service.require_global_administrator(
         session,
         tenant_id=principal.tenant_id,
         user_id=principal.user_id,
         permission="resources.manage",
     )
-    result = settings_service.set_resource_offer(
+    with optional_idempotent_write(
         session,
-        tenant_id=principal.tenant_id,
-        capability_id=capability_id,
-        acting_user_id=principal.user_id,
-        offered_quantity=payload.offered_quantity,
-        unit=payload.unit,
+        principal=principal,
+        endpoint="PUT /v1/capabilities/{capability_id}/offer",
+        idempotency_key=idempotency_key,
+        payload=request_body,
         now=now,
-    )
-    _audit(
-        session,
-        request,
-        principal,
-        "node.offer_set",
-        {
-            "capabilityId": capability_id,
-            "offeredQuantity": result["offeredQuantity"],
-            "unit": result["unit"],
-        },
-        now,
-    )
-    return result
+        ttl_seconds=settings.idempotency_ttl_seconds,
+        lock_timeout_ms=settings.business_lock_timeout_ms,
+    ) as (replay, finish):
+        if replay is not None:
+            return replay
+        result = settings_service.set_resource_offer(
+            session,
+            tenant_id=principal.tenant_id,
+            capability_id=capability_id,
+            acting_user_id=principal.user_id,
+            offered_quantity=payload.offered_quantity,
+            unit=payload.unit,
+            now=now,
+        )
+        _audit(
+            session,
+            request,
+            principal,
+            "node.offer_set",
+            {
+                "capabilityId": capability_id,
+                "offeredQuantity": result["offeredQuantity"],
+                "unit": result["unit"],
+            },
+            now,
+        )
+        finish(result)
+        return result

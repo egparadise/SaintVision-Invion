@@ -23,8 +23,10 @@ from sqlalchemy import text
 from saintvision.api.app import create_app
 from saintvision.api.deps import get_principal
 from saintvision.api.problem import CANONICAL_KEYS
+from saintvision.api.v1 import model_release
 from saintvision.config import Settings
 from saintvision.identity.principal import Principal, StaticPrincipalVerifier
+from saintvision.tracking import config as tracking_config
 from saintvision.ids import new_id
 from measurement_support import insert_measurement
 
@@ -337,6 +339,65 @@ def _path(seeded, project_id=None):
     )
 
 
+def _headers(key="release-k1"):
+    """Card 113: every release carries an Idempotency-Key."""
+    return {"Idempotency-Key": key}
+
+
+CONFIGURED_MIRROR_ENV = {
+    "INV_MLFLOW_TRACKING_URI": "https://mlflow.lab.example/",
+    "INV_MLFLOW_DESTINATION": "lab-mlflow",
+    "INV_MLFLOW_EXPERIMENT_PREFIX": "inv",
+}
+
+
+@pytest.fixture
+def configured_mirror(monkeypatch):
+    """Card 113: a strict ``configured`` tracking environment, so a release
+    writes exactly one mirror intent and the idempotency assertions measure a
+    real duplicate-suppression instead of the ``absent`` skip.
+
+    ``enqueue_mirror`` resolves ``os.environ`` at call time; hosted Backend
+    sets no ``INV_MLFLOW_*`` variable, and this fixture never leaks past the
+    test (monkeypatch restores the environment and the client probe)."""
+    for key, value in CONFIGURED_MIRROR_ENV.items():
+        monkeypatch.setenv(key, value)
+    monkeypatch.delenv("INV_MLFLOW_TIMEOUT_SECONDS", raising=False)
+    monkeypatch.setattr(tracking_config, "mlflow_client_present", lambda: True)
+    resolved = tracking_config.resolve()
+    assert resolved.readiness.value == "configured", resolved.readiness
+    return resolved
+
+
+def _mirror_intents(owner_engine, version_id):
+    """Mirror intents for one version, read as the owner (the duplicate this
+    contract exists to prevent)."""
+    with owner_engine.begin() as connection:
+        return connection.execute(
+            text(
+                "SELECT intent_id FROM mlflow_mirror_intents "
+                "WHERE subject_kind = 'model_version' AND model_version_id = :v ORDER BY intent_id"
+            ),
+            {"v": version_id},
+        ).scalars().all()
+
+
+def _ledger(owner_engine, tenant_id):
+    with owner_engine.begin() as connection:
+        return connection.execute(
+            text(
+                "SELECT endpoint, idempotency_key, project_id, response_status "
+                "FROM idempotency_records WHERE tenant_id = :t"
+            ),
+            {"t": tenant_id},
+        ).mappings().all()
+
+
+def _release_audits(owner_engine):
+    with owner_engine.begin() as connection:
+        return connection.execute(
+            text("SELECT target_id FROM audit_events WHERE action = 'model_version.release'")
+        ).scalars().all()
 def _stage(owner_engine, version_id):
     with owner_engine.begin() as connection:
         return connection.execute(
@@ -375,6 +436,7 @@ def test_30_another_tenants_model_version_is_the_same_404_and_is_not_changed(
             f"/v1/projects/{theirs['project_id']}/models/{theirs['model_id']}"
             "/versions/1.0.0/release",
             json=DECLARATION,
+            headers=_headers(),
         )
     # 403 here, because the project itself is not visible to this principal, and
     # that is the same answer an absent project gets. Either way nothing moved.
@@ -407,6 +469,7 @@ def test_30b_another_tenants_version_under_an_accessible_project_is_a_404(
             f"/v1/projects/{mine['project_id']}/models/{theirs['model_id']}"
             "/versions/1.0.0/release",
             json=DECLARATION,
+            headers=_headers(),
         )
     body = _canonical(response, code="RES-0004", status=404)
     assert body["detail"] == "No such model version."
@@ -434,6 +497,7 @@ def test_29b_a_model_in_another_project_of_my_tenant_is_the_same_404(
             f"/v1/projects/{first['project_id']}/models/{second['model_id']}"
             "/versions/1.0.0/release",
             json=DECLARATION,
+            headers=_headers(),
         )
     body = _canonical(response, code="RES-0004", status=404)
     assert body["detail"] == "No such model version."
@@ -455,7 +519,7 @@ def test_29c_a_declaration_mismatch_leaves_the_version_in_draft(
         now=frozen_now,
         observation=_observation(mine["project_id"], mine["model_id"], "1.0.0"),
     ) as client:
-        response = client.post(_path(mine), json={**DECLARATION, "classification": "public"})
+        response = client.post(_path(mine), json={**DECLARATION, "classification": "public"}, headers=_headers())
 
     body = _canonical(response, code="MODEL-0009", status=409)
     assert "differs:classification" in body["detail"]
@@ -487,7 +551,7 @@ def test_30c_a_release_that_satisfies_everything_commits_and_audits_once(
         now=frozen_now,
         observation=_observation(mine["project_id"], mine["model_id"], "1.0.0"),
     ) as client:
-        response = client.post(_path(mine), json=DECLARATION)
+        response = client.post(_path(mine), json=DECLARATION, headers=_headers())
 
     assert response.status_code == 200, response.text
     payload = response.json()
@@ -517,6 +581,11 @@ def test_30c_a_release_that_satisfies_everything_commits_and_audits_once(
     serialised = str(detail)
     assert DECLARATION["licensePolicy"] not in serialised
     assert "restricted" not in serialised
+    # Tracking is ``absent`` here (no ``INV_MLFLOW_*``): the canonical change
+    # succeeds and no mirror intent is written. The configured path is the
+    # ``configured_mirror`` fixture below.
+    assert tracking_config.resolve().readiness.value == "absent"
+    assert _mirror_intents(owner_engine, mine["version_id"]) == []
 
 
 def test_29d_a_member_without_the_approval_grade_cannot_release(
@@ -540,8 +609,172 @@ def test_29d_a_member_without_the_approval_grade_cannot_release(
         now=frozen_now,
         observation=_observation(mine["project_id"], mine["model_id"], "1.0.0"),
     ) as client:
-        response = client.post(_path(mine), json=DECLARATION)
+        response = client.post(_path(mine), json=DECLARATION, headers=_headers())
 
     body = _canonical(response, code="AUTH-0030", status=403)
     assert "approval permission" in body["detail"]
     assert _stage(owner_engine, mine["version_id"]) == "draft"
+
+
+# ---------------------------------------------------------------------------
+# Card 113 (Codex #219 r4 F1): a lost response and a retry release once
+# ---------------------------------------------------------------------------
+
+
+def test_113_the_same_key_replays_the_stored_answer_and_the_mirror_intent_is_not_duplicated(
+    owner_engine, app_engine, two_tenants, frozen_now, configured_mirror
+):
+    tenant_a, _ = two_tenants
+    with owner_engine.begin() as connection:
+        mine = _seed(connection, tenant_id=tenant_a, now=frozen_now, project_code="idem-replay")
+    with _client(
+        app_engine, tenant_id=tenant_a, user_id=mine["user_id"], now=frozen_now,
+        observation=_observation(mine["project_id"], mine["model_id"], "1.0.0"),
+    ) as client:
+        first = client.post(_path(mine), json=DECLARATION, headers=_headers("k-replay"))
+        second = client.post(_path(mine), json=DECLARATION, headers=_headers("k-replay"))
+    assert first.status_code == 200, first.text
+    assert second.status_code == 200, second.text
+    assert first.json() == second.json()
+    assert first.json()["stage"] == "released"
+    # One stage write, one mirror intent, one audit row, one ledger row.
+    assert _stage(owner_engine, mine["version_id"]) == "released"
+    assert len(_mirror_intents(owner_engine, mine["version_id"])) == 1
+    assert _release_audits(owner_engine) == [mine["version_id"]]
+    ledger = _ledger(owner_engine, tenant_a)
+    assert len(ledger) == 1
+    assert ledger[0]["endpoint"] == model_release.ENDPOINT
+    assert ledger[0]["idempotency_key"] == "k-replay" and ledger[0]["response_status"] == 200
+    assert ledger[0]["project_id"] == mine["project_id"]
+
+
+def test_113_the_same_key_with_a_different_declaration_is_409_and_changes_nothing(
+    owner_engine, app_engine, two_tenants, frozen_now, configured_mirror
+):
+    tenant_a, _ = two_tenants
+    with owner_engine.begin() as connection:
+        mine = _seed(connection, tenant_id=tenant_a, now=frozen_now, project_code="idem-conflict")
+    with _client(
+        app_engine, tenant_id=tenant_a, user_id=mine["user_id"], now=frozen_now,
+        observation=_observation(mine["project_id"], mine["model_id"], "1.0.0"),
+    ) as client:
+        first = client.post(_path(mine), json=DECLARATION, headers=_headers("k-conflict"))
+        other = client.post(
+            _path(mine), json={**DECLARATION, "classification": "internal"}, headers=_headers("k-conflict")
+        )
+    assert first.status_code == 200, first.text
+    body = _canonical(other, code="GRAPH-0002", status=409)
+    assert body["detail"] == "That idempotency key was used with a different request."
+    assert "internal" not in str(body)
+    assert len(_mirror_intents(owner_engine, mine["version_id"])) == 1
+    assert len(_ledger(owner_engine, tenant_a)) == 1
+
+
+def test_113_a_second_release_under_another_key_is_409_and_does_not_mirror_again(
+    owner_engine, app_engine, two_tenants, frozen_now, configured_mirror
+):
+    tenant_a, _ = two_tenants
+    with owner_engine.begin() as connection:
+        mine = _seed(connection, tenant_id=tenant_a, now=frozen_now, project_code="idem-twice")
+    with _client(
+        app_engine, tenant_id=tenant_a, user_id=mine["user_id"], now=frozen_now,
+        observation=_observation(mine["project_id"], mine["model_id"], "1.0.0"),
+    ) as client:
+        first = client.post(_path(mine), json=DECLARATION, headers=_headers("k-first"))
+        again = client.post(_path(mine), json=DECLARATION, headers=_headers("k-second"))
+    assert first.status_code == 200, first.text
+    body = _canonical(again, code="GRAPH-0002", status=409)
+    assert body["detail"] == "The model version is already released."
+    assert len(_mirror_intents(owner_engine, mine["version_id"])) == 1
+    assert _release_audits(owner_engine) == [mine["version_id"]]
+    # The refused request stored nothing under its key.
+    assert [row["idempotency_key"] for row in _ledger(owner_engine, tenant_a)] == ["k-first"]
+
+
+def test_113_a_release_without_a_key_is_422_and_leaves_the_version_in_draft(
+    owner_engine, app_engine, two_tenants, frozen_now
+):
+    tenant_a, _ = two_tenants
+    with owner_engine.begin() as connection:
+        mine = _seed(connection, tenant_id=tenant_a, now=frozen_now, project_code="idem-nokey")
+    with _client(
+        app_engine, tenant_id=tenant_a, user_id=mine["user_id"], now=frozen_now,
+        observation=_observation(mine["project_id"], mine["model_id"], "1.0.0"),
+    ) as client:
+        response = client.post(_path(mine), json=DECLARATION)
+    _canonical(response, code="VAL-0003", status=422)
+    assert _stage(owner_engine, mine["version_id"]) == "draft"
+    assert _mirror_intents(owner_engine, mine["version_id"]) == []
+    assert _ledger(owner_engine, tenant_a) == []
+
+
+def test_113_two_concurrent_first_requests_with_one_key_release_once_and_replay(
+    owner_engine, app_engine, two_tenants, frozen_now, monkeypatch, configured_mirror
+):
+    """IDEM-6 on the real database: the advisory lock serialises the two, the
+    second finds the stored answer. One stage write, one mirror intent."""
+    import threading
+    from concurrent.futures import ThreadPoolExecutor
+
+    tenant_a, _ = two_tenants
+    with owner_engine.begin() as connection:
+        mine = _seed(connection, tenant_id=tenant_a, now=frozen_now, project_code="idem-race")
+    barrier = threading.Barrier(2, timeout=60)
+    real = model_release.serialise_idempotent_write
+
+    def at_the_same_moment(session, **kwargs):
+        barrier.wait()
+        return real(session, **kwargs)
+
+    monkeypatch.setattr(model_release, "serialise_idempotent_write", at_the_same_moment)
+
+    def send():
+        client = _client(
+            app_engine, tenant_id=tenant_a, user_id=mine["user_id"], now=frozen_now,
+            observation=_observation(mine["project_id"], mine["model_id"], "1.0.0"),
+        )
+        return client.post(_path(mine), json=DECLARATION, headers=_headers("k-race"))
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        responses = [f.result(timeout=90) for f in [pool.submit(send), pool.submit(send)]]
+    assert sorted(r.status_code for r in responses) == [200, 200], [r.text for r in responses]
+    assert responses[0].json() == responses[1].json()
+    assert len(_mirror_intents(owner_engine, mine["version_id"])) == 1
+    assert _release_audits(owner_engine) == [mine["version_id"]]
+    assert len(_ledger(owner_engine, tenant_a)) == 1
+
+
+def test_113_F1_a_lost_response_replays_while_the_kernel_is_unavailable_and_a_conflict_is_409_first(
+    owner_engine, app_engine, two_tenants, frozen_now, configured_mirror
+):
+    """Codex #229 F1 on the real ledger: after a committed release the retry is
+    answered from ``idempotency_records`` with the kernel unreachable, and a
+    different body under the same key is refused before any upstream call."""
+    tenant_a, _ = two_tenants
+    with owner_engine.begin() as connection:
+        mine = _seed(connection, tenant_id=tenant_a, now=frozen_now, project_code="idem-kernel-down")
+    calls = {"n": 0}
+
+    def broken(**_kwargs):
+        calls["n"] += 1
+        raise OSError("kernel unavailable")
+
+    with _client(
+        app_engine, tenant_id=tenant_a, user_id=mine["user_id"], now=frozen_now,
+        observation=_observation(mine["project_id"], mine["model_id"], "1.0.0"),
+    ) as client:
+        first = client.post(_path(mine), json=DECLARATION, headers=_headers("k-lost"))
+        assert first.status_code == 200, first.text
+        client.app.state.model_commitment_fetcher = broken
+        retry = client.post(_path(mine), json=DECLARATION, headers=_headers("k-lost"))
+        conflict = client.post(
+            _path(mine), json={**DECLARATION, "classification": "internal"}, headers=_headers("k-lost")
+        )
+    assert retry.status_code == 200, retry.text
+    assert retry.json() == first.json()
+    body = _canonical(conflict, code="GRAPH-0002", status=409)
+    assert body["detail"] == "That idempotency key was used with a different request."
+    assert calls["n"] == 0                                    # the kernel was never asked
+    assert len(_mirror_intents(owner_engine, mine["version_id"])) == 1
+    assert _release_audits(owner_engine) == [mine["version_id"]]
+    assert len(_ledger(owner_engine, tenant_a)) == 1

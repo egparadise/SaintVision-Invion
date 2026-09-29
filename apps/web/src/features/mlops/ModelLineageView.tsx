@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ModelLineage, ModelCommitObservation, ProblemDetails } from '@/contracts/types';
-import type { ConformanceStatusResponse } from '@/contracts/conformance-status-response';
 import type { ModelVersionResponse } from '@/contracts/model-version-response';
 import type { RetentionPinResponse } from '@/contracts/retention-pin-response';
 import type { ModelReleaseResponse } from '@/contracts/model-release-response';
@@ -9,10 +8,28 @@ import type { ModelVerifyResponse } from '@/contracts/model-verify-response';
 import type { EvalRunResponse } from '@/contracts/eval-run-response';
 import { Button } from '@/shared/ui/Button';
 import { fetchModelCommitment } from '@/shared/api/modelCommitmentObservation';
-import { fetchConformanceStatus } from '@/shared/api/adapterObservation';
+import { fetchConformanceStatus, type ConformanceStatusUnion } from '@/shared/api/adapterObservation';
 import { modelRegistryObservation, isValidIsoDateTime } from '@/shared/api/modelRegistryObservation';
 import { ApiError } from '@/shared/api/client';
 import { MlopsManager } from './mlopsEngine';
+
+/** Per-check tally across the recorded adapters, from the server's outcomes only. */
+function outcomeSummary(
+  records: ReadonlyArray<{ adapter: string; outcomes: ReadonlyArray<{ name: string; passed: boolean; skipped: boolean }> }>,
+  checkName: string
+): string {
+  let ok = 0;
+  let failed = 0;
+  let skipped = 0;
+  for (const record of records) {
+    const outcome = record.outcomes.find((o) => o.name === checkName);
+    if (!outcome) continue;
+    if (outcome.skipped) skipped += 1;
+    else if (outcome.passed) ok += 1;
+    else failed += 1;
+  }
+  return `통과 ${ok} · 실패 ${failed} · 건너뜀 ${skipped} (${records.length}개 기록)`;
+}
 
 const SERVER_KIND_LABELS: Record<string, string> = {
   dataset_version: '데이터셋 버전 (Dataset Version)',
@@ -60,9 +77,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   const [approvalInput, setApprovalInput] = useState('');
   const [actionNotice, setActionNotice] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  // Adapter conformance observation state (G-03 Phase 1)
+  // Adapter conformance observation state (G-03 stage one NOT_OBSERVED / stage two RECORDED)
   const [conformanceProjectId, setConformanceProjectId] = useState(effectiveProjectId);
-  const [conformanceData, setConformanceData] = useState<ConformanceStatusResponse | null>(null);
+  const [conformanceData, setConformanceData] = useState<ConformanceStatusUnion | null>(null);
   const [conformanceLoading, setConformanceLoading] = useState(false);
   const [conformanceError, setConformanceError] = useState<{
     code?: string;
@@ -2006,19 +2023,34 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>Provider 계약 동일성 (AC-10 / G-03)</div>
           <div
             data-testid="conformance-top-status"
-            style={{ fontSize: '18px', fontWeight: 700, color: conformanceError ? '#ff7b72' : conformanceData ? '#f0883e' : '#8b949e', marginTop: '4px' }}
+            style={{
+              fontSize: '18px',
+              fontWeight: 700,
+              color: conformanceError
+                ? '#ff7b72'
+                : conformanceData
+                ? conformanceData.status === 'RECORDED'
+                  ? '#58a6ff'
+                  : '#f0883e'
+                : '#8b949e',
+              marginTop: '4px',
+            }}
           >
             {conformanceError
               ? '조회 실패'
               : conformanceData
-              ? `미측정 (${conformanceData.status})`
+              ? conformanceData.status === 'RECORDED'
+                ? '기록됨 (RECORDED)'
+                : `미측정 (${conformanceData.status})`
               : '미측정 (미조회)'}
           </div>
           <div data-testid="conformance-top-subtext" style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
             {conformanceError
               ? '어댑터 conformance 조회 실패'
               : conformanceData
-              ? `${conformanceData.checks.length}개 정본 체크 항목 미측정 (${conformanceData.scope})`
+              ? conformanceData.status === 'RECORDED'
+                ? `${conformanceData.records.length}/${conformanceData.adapters.length} 어댑터 기록 · fixture-adapter 측정 (${conformanceData.scope})`
+                : `${conformanceData.checks.length}개 정본 체크 항목 미측정 (${conformanceData.scope})`
               : '실제 conformance API (G-03 1단계) 연동 대기'}
           </div>
         </div>
@@ -2313,7 +2345,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               Multi-LLM Provider Adapter Conformance (G-03 1단계 API 연동)
             </h4>
             <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
-              컨트롤 플레인 호스트의 실제 어댑터 적합성 상태를 조회합니다. 1단계는 저장된 결과가 없어 정직하게 <code style={{ color: '#e3b341' }}>NOT_OBSERVED</code>(미측정) 및 정본 체크리스트 규격을 반환합니다.
+              컨트롤 플레인 호스트의 실제 어댑터 적합성 상태를 조회합니다. 저장된 기록이 없으면 정직하게 <code style={{ color: '#e3b341' }}>NOT_OBSERVED</code>(미측정)와 정본 체크리스트 규격을, 기록이 있으면 <code style={{ color: '#e3b341' }}>RECORDED</code>와 어댑터별 기록을 반환합니다. 기록의 측정 대상은 설치된 CLI가 아니라 제품 fixture adapter입니다(<code>subject: fixture-adapter</code>).
             </p>
           </div>
         </div>
@@ -2388,7 +2420,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           {!conformanceLoading &&
             !conformanceError &&
             conformanceData &&
-            `ℹ️ 어댑터 Conformance 조회 완료: 미측정(NOT_OBSERVED) (${conformanceData.checks.length}개 정본 체크 항목)`}
+            (conformanceData.status === 'RECORDED'
+              ? `ℹ️ 어댑터 Conformance 조회 완료: 기록됨(RECORDED) (${conformanceData.records.length}개 어댑터 기록 · fixture-adapter 측정)`
+              : `ℹ️ 어댑터 Conformance 조회 완료: 미측정(NOT_OBSERVED) (${conformanceData.checks.length}개 정본 체크 항목)`)}
         </div>
         {/* Explicit Role Alert Error Banner on ProblemDetails (401, 403, 404) */}
         {conformanceError && (
@@ -2459,11 +2493,11 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                     borderRadius: '4px',
                     fontSize: '11px',
                     fontWeight: 700,
-                    backgroundColor: 'rgba(240, 136, 62, 0.15)',
-                    color: '#f0883e',
+                    backgroundColor: conformanceData.status === 'RECORDED' ? 'rgba(56, 139, 253, 0.15)' : 'rgba(240, 136, 62, 0.15)',
+                    color: conformanceData.status === 'RECORDED' ? '#58a6ff' : '#f0883e',
                   }}
                 >
-                  미측정 ({conformanceData.status})
+                  {conformanceData.status === 'RECORDED' ? '기록됨 (RECORDED)' : `미측정 (${conformanceData.status})`}
                 </span>
               </div>
               <div>
@@ -2485,18 +2519,83 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 </span>
               </div>
               <div>
-                <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>RECORDED AT</span>
+                <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>
+                  {conformanceData.status === 'RECORDED' ? 'LATEST RECORDED AT' : 'RECORDED AT'}
+                </span>
                 <span data-testid="conformance-recorded-at" style={{ color: '#8b949e' }}>
-                  {conformanceData.recordedAt === null ? 'null (미측정)' : String(conformanceData.recordedAt)}
+                  {conformanceData.status === 'RECORDED' ? conformanceData.latestRecordedAt : 'null (미측정)'}
                 </span>
               </div>
-              <div style={{ gridColumn: '1 / -1' }}>
-                <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>REASON</span>
-                <span data-testid="conformance-reason" style={{ color: '#c9d1d9' }}>
-                  {conformanceData.reason}
-                </span>
-              </div>
+              {conformanceData.status === 'NOT_OBSERVED' ? (
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>REASON</span>
+                  <span data-testid="conformance-reason" style={{ color: '#c9d1d9' }}>
+                    {conformanceData.reason}
+                  </span>
+                </div>
+              ) : (
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>SUBJECT</span>
+                  <span data-testid="conformance-subject-note" style={{ color: '#c9d1d9' }}>
+                    fixture-adapter · in-server — 제품 fixture adapter에 대한 suite 실행 기록이며 설치된 CLI의 적합성이 아닙니다. 기록이 없는 어댑터는 목록에 없습니다(미측정).
+                  </span>
+                </div>
+              )}
             </div>
+            {/* Records per adapter (RECORDED branch, design #218 v1.2 §4-1) */}
+            {conformanceData.status === 'RECORDED' && (
+              <div style={{ overflowX: 'auto' }}>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: '#f0f6fc', marginBottom: '8px' }}>
+                  어댑터별 기록 ({conformanceData.records.length}개 · 서버 응답 동적 렌더링)
+                </div>
+                <table
+                  data-testid="conformance-records-table"
+                  style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}
+                >
+                  <caption style={{ textAlign: 'left', fontSize: '12px', color: '#8b949e', marginBottom: '8px' }}>
+                    컨트롤 플레인 호스트의 어댑터별 최신 conformance 기록
+                  </caption>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
+                      <th scope="col" style={{ padding: '8px' }}>Adapter</th>
+                      <th scope="col" style={{ padding: '8px' }}>Subject / Provenance</th>
+                      <th scope="col" style={{ padding: '8px' }}>Contract / Suite</th>
+                      <th scope="col" style={{ padding: '8px' }}>결과 (전체 · 통과 · 실패 · 건너뜀)</th>
+                      <th scope="col" style={{ padding: '8px' }}>Recorded At</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {conformanceData.records.map((record, idx) => (
+                      <tr
+                        key={`${idx}-${record.adapter}`}
+                        data-testid={`conformance-record-row-${idx}`}
+                        style={{ borderBottom: '1px solid #21262d' }}
+                      >
+                        <td style={{ padding: '8px', fontWeight: 600, color: '#f0f6fc', fontFamily: 'var(--font-mono, monospace)' }}>
+                          <span data-testid={`conformance-record-adapter-${idx}`}>{record.adapter}</span>
+                        </td>
+                        <td style={{ padding: '8px' }}>
+                          <span data-testid={`conformance-record-subject-${idx}`}>{record.subject}</span>
+                          {' / '}
+                          <span data-testid={`conformance-record-provenance-${idx}`}>{record.provenance}</span>
+                        </td>
+                        <td style={{ padding: '8px', fontFamily: 'var(--font-mono, monospace)' }}>
+                          {record.contractVersion} / {record.suiteContractVersion}
+                        </td>
+                        <td style={{ padding: '8px' }}>
+                          <span data-testid={`conformance-record-counts-${idx}`}>
+                            {`전체 ${record.total} · 통과 ${record.passed} · 실패 ${record.failed} · 건너뜀 ${record.skipped}`}
+                          </span>
+                        </td>
+                        <td style={{ padding: '8px', color: '#8b949e' }}>
+                          <span data-testid={`conformance-record-recorded-at-${idx}`}>{record.recordedAt}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
             {/* Dynamic Checklist Table from API Response (FE Hardcoding Prohibited) */}
             <div style={{ overflowX: 'auto' }}>
               <div style={{ fontSize: '13px', fontWeight: 600, color: '#f0f6fc', marginBottom: '8px' }}>
@@ -2551,11 +2650,13 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                             borderRadius: '4px',
                             fontSize: '11px',
                             fontWeight: 600,
-                            backgroundColor: 'rgba(240, 136, 62, 0.15)',
-                            color: '#f0883e',
+                            backgroundColor: conformanceData.status === 'RECORDED' ? 'rgba(56, 139, 253, 0.15)' : 'rgba(240, 136, 62, 0.15)',
+                            color: conformanceData.status === 'RECORDED' ? '#58a6ff' : '#f0883e',
                           }}
                         >
-                          NOT_OBSERVED (미측정)
+                          {conformanceData.status === 'RECORDED'
+                            ? outcomeSummary(conformanceData.records, check.name)
+                            : 'NOT_OBSERVED (미측정)'}
                         </span>
                       </td>
                     </tr>
