@@ -63,6 +63,22 @@ PY
 for file in "$SOURCE_ENV" "$CONFIG_DIR/pitr-service-user.env" "$RETENTION_TOOL"; do
   [ -f "$file" ] && [ ! -L "$file" ] || fail 'required protected input is absent'
 done
+. "$CONFIG_DIR/pitr-service-user.env"
+case "$PITR_KEY$PITR_SECRET" in
+  *[!A-Za-z0-9._-]*) fail 'PITR credential alphabet is not URL-safe' ;;
+esac
+case "$MINIO_ENDPOINT" in
+  http://*) MINIO_SCHEME=http ;;
+  https://*) MINIO_SCHEME=https ;;
+  *) fail 'MinIO endpoint must be HTTP(S)' ;;
+esac
+MINIO_AUTHORITY=${MINIO_ENDPOINT#*://}
+case "$MINIO_AUTHORITY" in *'/'*|*'?'*|*'#'*|'') fail 'MinIO endpoint must be a root URL' ;; esac
+MC_ALIAS="$MINIO_SCHEME://${PITR_KEY}:${PITR_SECRET}@${MINIO_AUTHORITY}"
+CA_CHAIN="$CONFIG_DIR/minio-certs/ca-chain.pem"
+if [ "$MINIO_SCHEME" = https ]; then
+  [ -f "$CA_CHAIN" ] && [ ! -L "$CA_CHAIN" ] || fail 'trusted MinIO CA chain is absent'
+fi
 mkdir -p "$BACKUPS" "$ARCHIVE"
 chmod 700 "$WORK_ROOT" "$RUN_DIR" "$BACKUPS" "$ARCHIVE"
 
@@ -73,6 +89,40 @@ remove_owned() {
     run="$(docker inspect --format '{{ index .Config.Labels "ai.saintvision.run" }}' "$name")"
     [ "$owner" = codex ] && [ "$run" = "$RUN_ID" ] || fail 'refusing to remove an unowned container'
     docker rm -f "$name" >/dev/null
+  fi
+}
+
+mc_container() {
+  if [ "$MINIO_SCHEME" = https ]; then
+    docker run --rm \
+      --name "$UPLOAD" \
+      --label ai.saintvision.owner=codex \
+      --label ai.saintvision.task=intranet-storage-card151 \
+      --label "ai.saintvision.run=$RUN_ID" \
+      --user "$(id -u):$(id -g)" \
+      --read-only \
+      --tmpfs /tmp:rw,noexec,nosuid,nodev,size=67108864 \
+      --security-opt no-new-privileges \
+      --cap-drop ALL \
+      --network host \
+      -e "MC_HOST_pitr=$MC_ALIAS" \
+      -e SSL_CERT_FILE=/ca/ca-chain.pem \
+      -v "$CA_CHAIN:/ca/ca-chain.pem:ro" \
+      "$@"
+  else
+    docker run --rm \
+      --name "$UPLOAD" \
+      --label ai.saintvision.owner=codex \
+      --label ai.saintvision.task=intranet-storage-card151 \
+      --label "ai.saintvision.run=$RUN_ID" \
+      --user "$(id -u):$(id -g)" \
+      --read-only \
+      --tmpfs /tmp:rw,noexec,nosuid,nodev,size=67108864 \
+      --security-opt no-new-privileges \
+      --cap-drop ALL \
+      --network host \
+      -e "MC_HOST_pitr=$MC_ALIAS" \
+      "$@"
   fi
 }
 
@@ -152,47 +202,19 @@ remove_owned "$RECEIVER"
 
 python3 "$RETENTION_TOOL" --archive "$ARCHIVE" --backups "$BACKUPS" --days 7 > "$RUN_DIR/retention-plan.json"
 
-# MC_HOST_* encodes credentials before the endpoint. MINIO_ENDPOINT is a
-# trusted operator input restricted to HTTP(S) root URLs by the product gate.
-docker run --rm \
-  --name "$UPLOAD" \
-  --label ai.saintvision.owner=codex \
-  --label ai.saintvision.task=intranet-storage-card151 \
-  --label "ai.saintvision.run=$RUN_ID" \
-  --user "$(id -u):$(id -g)" \
-  --network host \
-  -v "$CONFIG_DIR:/run/saintvision-intranet:ro" \
+# The transient transfer container receives only one scoped alias, the data
+# mount, and (for HTTPS) the public CA chain. It never mounts the config tree.
+mc_container \
   -v "$RUN_DIR:/evidence:ro" \
-  "$MINIO_IMAGE" /bin/sh -ceu '
-    . /run/saintvision-intranet/pitr-service-user.env
-    endpoint="'"$MINIO_ENDPOINT"'"
-    case "$endpoint" in http://*) scheme=http ;; https://*) scheme=https ;; *) exit 2 ;; esac
-    endpoint=${endpoint#*://}
-    export MC_HOST_pitr="${scheme}://${PITR_KEY}:${PITR_SECRET}@${endpoint}"
-    [ "$scheme" = http ] || export SSL_CERT_FILE=/run/saintvision-intranet/minio-certs/ca-chain.pem
-    /usr/bin/mc mirror --overwrite /evidence pitr/saintvision-pitr/pilot/rehearsals/'"$RUN_ID"'
-  ' >/dev/null
+  "$MINIO_IMAGE" /usr/bin/mc mirror --overwrite /evidence \
+  "pitr/saintvision-pitr/pilot/rehearsals/$RUN_ID" >/dev/null
 
 mkdir -p "$DOWNLOAD"
 chmod 700 "$DOWNLOAD"
-docker run --rm \
-  --name "$UPLOAD" \
-  --label ai.saintvision.owner=codex \
-  --label ai.saintvision.task=intranet-storage-card151 \
-  --label "ai.saintvision.run=$RUN_ID" \
-  --user "$(id -u):$(id -g)" \
-  --network host \
-  -v "$CONFIG_DIR:/run/saintvision-intranet:ro" \
+mc_container \
   -v "$DOWNLOAD:/download" \
-  "$MINIO_IMAGE" /bin/sh -ceu '
-    . /run/saintvision-intranet/pitr-service-user.env
-    endpoint="'"$MINIO_ENDPOINT"'"
-    case "$endpoint" in http://*) scheme=http ;; https://*) scheme=https ;; *) exit 2 ;; esac
-    endpoint=${endpoint#*://}
-    export MC_HOST_pitr="${scheme}://${PITR_KEY}:${PITR_SECRET}@${endpoint}"
-    [ "$scheme" = http ] || export SSL_CERT_FILE=/run/saintvision-intranet/minio-certs/ca-chain.pem
-    /usr/bin/mc mirror pitr/saintvision-pitr/pilot/rehearsals/'"$RUN_ID"' /download
-  ' >/dev/null
+  "$MINIO_IMAGE" /usr/bin/mc mirror \
+  "pitr/saintvision-pitr/pilot/rehearsals/$RUN_ID" /download >/dev/null
 
 (cd "$RUN_DIR" && find backups wal -type f -print0 | sort -z | xargs -0 sha256sum) > "$RUN_DIR/source-sha256.txt"
 (cd "$DOWNLOAD" && find backups wal -type f -print0 | sort -z | xargs -0 sha256sum) > "$RUN_DIR/download-sha256.txt"
@@ -273,24 +295,10 @@ Path(path).write_text(json.dumps(payload, sort_keys=True, separators=(",", ":"))
 print(json.dumps({k: payload[k] for k in ("status", "measuredRtoSeconds", "measuredRpoSeconds", "excludedAfterTargetSeconds")}, sort_keys=True))
 PY
 
-docker run --rm \
-  --name "$UPLOAD" \
-  --label ai.saintvision.owner=codex \
-  --label ai.saintvision.task=intranet-storage-card151 \
-  --label "ai.saintvision.run=$RUN_ID" \
-  --user "$(id -u):$(id -g)" \
-  --network host \
-  -v "$CONFIG_DIR:/run/saintvision-intranet:ro" \
+mc_container \
   -v "$REPORT:/pitr-report.json:ro" \
-  "$MINIO_IMAGE" /bin/sh -ceu '
-    . /run/saintvision-intranet/pitr-service-user.env
-    endpoint="'"$MINIO_ENDPOINT"'"
-    case "$endpoint" in http://*) scheme=http ;; https://*) scheme=https ;; *) exit 2 ;; esac
-    endpoint=${endpoint#*://}
-    export MC_HOST_pitr="${scheme}://${PITR_KEY}:${PITR_SECRET}@${endpoint}"
-    [ "$scheme" = http ] || export SSL_CERT_FILE=/run/saintvision-intranet/minio-certs/ca-chain.pem
-    /usr/bin/mc cp /pitr-report.json pitr/saintvision-pitr/pilot/rehearsals/'"$RUN_ID"'/pitr-report.json
-  ' >/dev/null
+  "$MINIO_IMAGE" /usr/bin/mc cp /pitr-report.json \
+  "pitr/saintvision-pitr/pilot/rehearsals/$RUN_ID/pitr-report.json" >/dev/null
 
 remove_owned "$RESTORE_CONTAINER"
 source_psql postgres -c "DROP DATABASE $DB WITH (FORCE)" >/dev/null

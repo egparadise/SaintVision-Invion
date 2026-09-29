@@ -88,7 +88,6 @@ set -- docker run -d \
   --cap-drop ALL \
   --env-file "$ROOT_ENV" \
   -v "$DATA_DIR:/data" \
-  -v "$CONFIG_DIR:/run/saintvision-intranet:ro" \
   -p "$BIND_ADDRESS:$PORT:9000"
 if [ "$TLS_ENABLED" = true ]; then
   set -- "$@" -e MINIO_CERTS_DIR=/certs -v "$CERT_DIR:/certs:ro"
@@ -98,33 +97,35 @@ set -- "$@" "$IMAGE" server /data --address :9000
 
 scheme=http
 [ "$TLS_ENABLED" = true ] && scheme=https
+. "$ROOT_ENV"
+. "$SERVICE_ENV"
+. "$PITR_ENV"
+case "$MINIO_ROOT_USER$MINIO_ROOT_PASSWORD$SVC_KEY$SVC_SECRET$PITR_KEY$PITR_SECRET" in
+  *[!A-Za-z0-9._-]*) fail "credential alphabet is not URL-safe" ;;
+esac
+ADMIN_ALIAS="$scheme://${MINIO_ROOT_USER}:${MINIO_ROOT_PASSWORD}@127.0.0.1:9000"
 attempt=0
-until docker exec "$NAME" /bin/sh -eu -c '
-  . /run/saintvision-intranet/minio-root.env
-  export MC_HOST_local="'"$scheme"'://${MINIO_ROOT_USER}:${MINIO_ROOT_PASSWORD}@127.0.0.1:9000"
-  [ "$(/usr/bin/mc ready local 2>/dev/null | wc -l)" -ge 1 ]
-' >/dev/null 2>&1; do
+until docker exec -e "MC_HOST_local=$ADMIN_ALIAS" "$NAME" /bin/sh -eu -c \
+  '[ "$(/usr/bin/mc ready local 2>/dev/null | wc -l)" -ge 1 ]' >/dev/null 2>&1; do
   attempt=$((attempt + 1))
   [ "$attempt" -lt 30 ] || fail "MinIO did not become ready"
   sleep 1
 done
 
-# Root and scoped credentials stay in protected files mounted read-only. They
-# are never printed; docker-group membership is the administrative boundary.
-docker exec "$NAME" /bin/sh -eu -c '
-  . /run/saintvision-intranet/minio-root.env
-  export MC_HOST_local="'"$scheme"'://${MINIO_ROOT_USER}:${MINIO_ROOT_PASSWORD}@127.0.0.1:9000"
-  /usr/bin/mc mb --ignore-existing local/saintvision-objects >/dev/null
-  /usr/bin/mc mb --ignore-existing local/saintvision-pitr >/dev/null
-  /usr/bin/mc admin policy create local saintvision-product /run/saintvision-intranet/product-policy.json >/dev/null
-  /usr/bin/mc admin policy create local saintvision-pitr /run/saintvision-intranet/pitr-policy.json >/dev/null
-  . /run/saintvision-intranet/minio-service-user.env
-  /usr/bin/mc admin user add local "$SVC_KEY" "$SVC_SECRET" >/dev/null
-  /usr/bin/mc admin policy attach local saintvision-product --user "$SVC_KEY" >/dev/null
-  . /run/saintvision-intranet/pitr-service-user.env
-  /usr/bin/mc admin user add local "$PITR_KEY" "$PITR_SECRET" >/dev/null
-  /usr/bin/mc admin policy attach local saintvision-pitr --user "$PITR_KEY" >/dev/null
-'
+# Root and scoped credentials stay in protected host files and transient exec
+# environments. They are never printed; docker-group membership is the
+# administrative boundary. The server never mounts the broader config tree.
+docker exec -i "$NAME" /bin/sh -eu -c 'cat > /tmp/product-policy.json' < "$PRODUCT_POLICY"
+docker exec -i "$NAME" /bin/sh -eu -c 'cat > /tmp/pitr-policy.json' < "$PITR_POLICY"
+docker exec -e "MC_HOST_local=$ADMIN_ALIAS" "$NAME" /usr/bin/mc mb --ignore-existing local/saintvision-objects >/dev/null
+docker exec -e "MC_HOST_local=$ADMIN_ALIAS" "$NAME" /usr/bin/mc mb --ignore-existing local/saintvision-pitr >/dev/null
+docker exec -e "MC_HOST_local=$ADMIN_ALIAS" "$NAME" /usr/bin/mc admin policy create local saintvision-product /tmp/product-policy.json >/dev/null
+docker exec -e "MC_HOST_local=$ADMIN_ALIAS" "$NAME" /usr/bin/mc admin policy create local saintvision-pitr /tmp/pitr-policy.json >/dev/null
+docker exec -e "MC_HOST_local=$ADMIN_ALIAS" "$NAME" /usr/bin/mc admin user add local "$SVC_KEY" "$SVC_SECRET" >/dev/null
+docker exec -e "MC_HOST_local=$ADMIN_ALIAS" "$NAME" /usr/bin/mc admin policy attach local saintvision-product --user "$SVC_KEY" >/dev/null
+docker exec -e "MC_HOST_local=$ADMIN_ALIAS" "$NAME" /usr/bin/mc admin user add local "$PITR_KEY" "$PITR_SECRET" >/dev/null
+docker exec -e "MC_HOST_local=$ADMIN_ALIAS" "$NAME" /usr/bin/mc admin policy attach local saintvision-pitr --user "$PITR_KEY" >/dev/null
+docker exec "$NAME" /bin/sh -eu -c 'rm -f /tmp/product-policy.json /tmp/pitr-policy.json'
 
 if [ "$OLD_PRESERVED" = true ]; then
   docker rm "$ROLLBACK_NAME" >/dev/null

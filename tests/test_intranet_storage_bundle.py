@@ -56,6 +56,7 @@ def test_minio_script_pins_image_and_keeps_container_boundary():
         assert required in script
     for forbidden in ("docker system", "docker volume prune", "docker image prune", "sudo "):
         assert forbidden not in script
+    assert '$CONFIG_DIR:/run/saintvision-intranet' not in script
 
 
 def test_pitr_rehearsal_uses_uploaded_bytes_and_checks_replication_before_source_mutation():
@@ -75,3 +76,5 @@ def test_pitr_rehearsal_uses_uploaded_bytes_and_checks_replication_before_source
     assert receiver_check < source_mutation
     for forbidden in ("docker system", "docker volume prune", "docker image prune", "rm -rf", "sudo "):
         assert forbidden not in script
+    assert '$CONFIG_DIR:/run/saintvision-intranet' not in script
+    assert 'trusted MinIO CA chain is absent' in script
