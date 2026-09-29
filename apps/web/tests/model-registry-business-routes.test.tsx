@@ -1780,4 +1780,436 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     expect(container.querySelector('[data-testid="registry-release-success"]')).toBeNull();
   });
 
+
+  // 21. Card 138 Item 1: W2 register loading ownership & input cancellation
+  it('Card 138: W2 register loading ownership prevents superseded request from clearing loading, and input change aborts request', async () => {
+    let resolveReg1: ((res: Response) => void) | null = null;
+    let resolveReg2: ((res: Response) => void) | null = null;
+    let callCount = 0;
+    const capturedSignals: AbortSignal[] = [];
+
+    globalThis.fetch = vi.fn().mockImplementation((url, init) => {
+      if (url.includes('/versions')) {
+        callCount++;
+        capturedSignals.push(init?.signal);
+        if (callCount === 1) {
+          return new Promise<Response>((resolve) => {
+            resolveReg1 = resolve;
+          });
+        } else {
+          return new Promise<Response>((resolve) => {
+            resolveReg2 = resolve;
+          });
+        }
+      }
+      return Promise.resolve(new Response('{}', { status: 200 }));
+    });
+
+    await act(async () => {
+      root.render(
+        <ModelLineageView
+          projectId="prj_alpha"
+          initialModelId="mdl_01JLLAMA30000000000000000"
+          initialVersion="1.0.0"
+          currentUser={{ canApprove: true }}
+        />
+      );
+    });
+
+    // Switch to register tab
+    const tabs = container.querySelectorAll('button');
+    const regTabBtn = Array.from(tabs).find((b) => b.textContent?.includes('버전 등록'));
+    await act(async () => {
+      regTabBtn?.click();
+    });
+
+    const vInput = container.querySelector('[data-testid="input-register-version"]') as HTMLInputElement;
+    const sInput = container.querySelector('[data-testid="input-register-sha256"]') as HTMLInputElement;
+    const regBtn = container.querySelector('[data-testid="btn-register-version"]') as HTMLButtonElement;
+
+    // 1. Fill inputs and submit first registration
+    await act(async () => {
+      setInputValue(vInput, '1.0.1');
+      setInputValue(sInput, 'a'.repeat(64));
+    });
+
+    await act(async () => {
+      regBtn.click();
+    });
+
+    expect(callCount).toBe(1);
+    expect(regBtn.disabled).toBe(true);
+    expect(regBtn.textContent).toContain('등록 중');
+    expect(capturedSignals[0]?.aborted).toBe(false);
+
+    // 2. Submit second registration while first is still pending (superseding first)
+    await act(async () => {
+      regBtn.closest('form')?.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    });
+
+    expect(callCount).toBe(2);
+    expect(capturedSignals[0]?.aborted).toBe(true);
+    expect(capturedSignals[1]?.aborted).toBe(false);
+    expect(regBtn.disabled).toBe(true);
+
+    // 3. Resolve first registration. Because it was superseded, its finally block MUST NOT clear loading!
+    await act(async () => {
+      resolveReg1!(
+        new Response(
+          JSON.stringify({
+            modelVersionId: 'mvr_01JLLAMA30000000000000001',
+            projectId: 'prj_alpha',
+            modelId: 'mdl_01JLLAMA30000000000000000',
+            version: '1.0.1',
+            contentSha256: 'a'.repeat(64),
+            byteSize: 0,
+            registeredAt: '2026-09-28T00:00:00Z',
+          }),
+          { status: 201, headers: { 'Content-Type': 'application/json' } }
+        )
+      );
+    });
+
+    // Loading MUST STILL BE TRUE because request 2 is still running!
+    expect(regBtn.disabled).toBe(true);
+    expect(regBtn.textContent).toContain('등록 중');
+
+    // 4. Resolve second registration -> loading clears
+    await act(async () => {
+      resolveReg2!(
+        new Response(
+          JSON.stringify({
+            modelVersionId: 'mvr_01JLLAMA30000000000000002',
+            projectId: 'prj_alpha',
+            modelId: 'mdl_01JLLAMA30000000000000000',
+            version: '1.0.2',
+            contentSha256: 'a'.repeat(64),
+            byteSize: 0,
+            registeredAt: '2026-09-28T00:00:00Z',
+          }),
+          { status: 201, headers: { 'Content-Type': 'application/json' } }
+        )
+      );
+    });
+
+    expect(regBtn.disabled).toBe(false);
+
+    // 5. Test input change during in-flight registration: aborts request and resets loading
+    let signal3: AbortSignal | undefined;
+    globalThis.fetch = vi.fn().mockImplementation((url, init) => {
+      signal3 = init?.signal;
+      return new Promise<Response>(() => {});
+    });
+
+    await act(async () => {
+      regBtn.click();
+    });
+    expect(regBtn.disabled).toBe(true);
+
+    // User edits version input while request is in flight
+    await act(async () => {
+      setInputValue(vInput, '1.0.3');
+    });
+
+    expect(signal3?.aborted).toBe(true);
+    expect(regBtn.disabled).toBe(false);
+  });
+
+  // 22. Card 138 Item 1: W4 pin loading ownership & input cancellation
+  it('Card 138: W4 pin loading ownership prevents superseded request from clearing loading, and input change aborts request', async () => {
+    let resolvePin1: ((res: Response) => void) | null = null;
+    let resolvePin2: ((res: Response) => void) | null = null;
+    let callCount = 0;
+    const capturedSignals: AbortSignal[] = [];
+
+    globalThis.fetch = vi.fn().mockImplementation((url, init) => {
+      if (url.includes('/retention-pin')) {
+        callCount++;
+        capturedSignals.push(init?.signal);
+        if (callCount === 1) {
+          return new Promise<Response>((resolve) => {
+            resolvePin1 = resolve;
+          });
+        } else {
+          return new Promise<Response>((resolve) => {
+            resolvePin2 = resolve;
+          });
+        }
+      }
+      return Promise.resolve(new Response('{}', { status: 200 }));
+    });
+
+    await act(async () => {
+      root.render(
+        <ModelLineageView
+          projectId="prj_alpha"
+          initialModelId="mdl_01JLLAMA30000000000000000"
+          initialVersion="1.0.0"
+          currentUser={{ canApprove: true }}
+        />
+      );
+    });
+
+    // Switch to Pin tab
+    const tabs = container.querySelectorAll('button');
+    const pinTabBtn = Array.from(tabs).find((b) => b.textContent?.includes('보존 고정'));
+    await act(async () => {
+      pinTabBtn?.click();
+    });
+
+    const pinInput = container.querySelector('[data-testid="input-pin-until"]') as HTMLInputElement;
+    const pinBtn = container.querySelector('[data-testid="btn-pin-retention"]') as HTMLButtonElement;
+
+    // 1. Fill input and submit first pin
+    await act(async () => {
+      setInputValue(pinInput, '2026-12-31T23:59:59Z');
+    });
+
+    await act(async () => {
+      pinBtn.click();
+    });
+
+    expect(callCount).toBe(1);
+    expect(pinBtn.disabled).toBe(true);
+    expect(pinBtn.textContent).toContain('연장 중');
+
+    // 2. Submit second pin while first is in flight
+    await act(async () => {
+      pinBtn.closest('form')?.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    });
+
+    expect(callCount).toBe(2);
+    expect(capturedSignals[0]?.aborted).toBe(true);
+    expect(capturedSignals[1]?.aborted).toBe(false);
+    expect(pinBtn.disabled).toBe(true);
+
+    // 3. Resolve first pin request -> loading MUST remain true
+    await act(async () => {
+      resolvePin1!(
+        new Response(
+          JSON.stringify({
+            projectId: 'prj_alpha',
+            modelId: 'mdl_01JLLAMA30000000000000000',
+            version: '1.0.0',
+            retentionPinnedUntil: '2026-12-31T23:59:59Z',
+            extended: true,
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
+        )
+      );
+    });
+
+    expect(pinBtn.disabled).toBe(true);
+    expect(pinBtn.textContent).toContain('연장 중');
+
+    // 4. Resolve second pin request -> loading clears
+    await act(async () => {
+      resolvePin2!(
+        new Response(
+          JSON.stringify({
+            projectId: 'prj_alpha',
+            modelId: 'mdl_01JLLAMA30000000000000000',
+            version: '1.0.0',
+            retentionPinnedUntil: '2027-01-01T00:00:00Z',
+            extended: true,
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
+        )
+      );
+    });
+
+    expect(pinBtn.disabled).toBe(false);
+
+    // 5. Test input change during in-flight pin: aborts request and resets loading
+    let signalPin3: AbortSignal | undefined;
+    globalThis.fetch = vi.fn().mockImplementation((url, init) => {
+      signalPin3 = init?.signal;
+      return new Promise<Response>(() => {});
+    });
+
+    await act(async () => {
+      pinBtn.click();
+    });
+    expect(pinBtn.disabled).toBe(true);
+
+    // User edits pinUntil input while request is in flight
+    await act(async () => {
+      setInputValue(pinInput, '2027-06-30T12:00:00Z');
+    });
+
+    expect(signalPin3?.aborted).toBe(true);
+    expect(pinBtn.disabled).toBe(false);
+  });
+
+  // 23. Card 138 Item 5: Canonical isValidIsoDateTime strictly rejects +99:99 and invalid offsets
+  it('Card 138: canonical isValidIsoDateTime rejects invalid timezone offsets (+99:99, -99:99, +24:00) and blocks pin submit', async () => {
+    // 1. Direct function assertions
+    expect(isValidIsoDateTime('2026-12-31T23:59:59+99:99')).toBe(false);
+    expect(isValidIsoDateTime('2026-12-31T23:59:59-99:99')).toBe(false);
+    expect(isValidIsoDateTime('2026-12-31T23:59:59+24:00')).toBe(false);
+    expect(isValidIsoDateTime('2026-12-31T23:59:59+23:59')).toBe(true);
+    expect(isValidIsoDateTime('2026-12-31T23:59:59-23:59')).toBe(true);
+    expect(isValidIsoDateTime('2026-12-31T23:59:59Z')).toBe(true);
+    expect(isValidIsoDateTime('2026-12-31T23:59:59+09:00')).toBe(true);
+    expect(isValidIsoDateTime('not-a-date')).toBe(false);
+
+    // 2. UI submission rejection
+    let fetchCalled = false;
+    globalThis.fetch = vi.fn().mockImplementation(() => {
+      fetchCalled = true;
+      return Promise.resolve(new Response('{}', { status: 200 }));
+    });
+
+    await act(async () => {
+      root.render(
+        <ModelLineageView
+          projectId="prj_alpha"
+          initialModelId="mdl_01JLLAMA30000000000000000"
+          initialVersion="1.0.0"
+          currentUser={{ canApprove: true }}
+        />
+      );
+    });
+
+    const tabs = container.querySelectorAll('button');
+    const pinTabBtn = Array.from(tabs).find((b) => b.textContent?.includes('보존 고정'));
+    await act(async () => {
+      pinTabBtn?.click();
+    });
+
+    const pinInput = container.querySelector('[data-testid="input-pin-until"]') as HTMLInputElement;
+    const pinBtn = container.querySelector('[data-testid="btn-pin-retention"]') as HTMLButtonElement;
+
+    await act(async () => {
+      setInputValue(pinInput, '2026-12-31T23:59:59+99:99');
+    });
+
+    await act(async () => {
+      pinBtn.click();
+    });
+
+    // Form was rejected by client-side guard
+    expect(fetchCalled).toBe(false);
+    const alertBanner = container.querySelector('[role="alert"]');
+    expect(alertBanner).not.toBeNull();
+    expect(alertBanner?.textContent).toContain('유효한 ISO 8601 일시(예: 2026-12-31T23:59:59Z)를 입력하세요.');
+  });
+
+  it('Test 24 (Card 138 Item 6): placeholder prefixes conform strictly to server ID specifications (mdl_... and apr_...)', async () => {
+    await act(async () => {
+      root.render(
+        <ModelLineageView
+          projectId="prj_alpha"
+          initialModelId="mdl_01JLLAMA30000000000000000"
+          initialVersion="1.0.0"
+          currentUser={{ canApprove: true }}
+          initialLineages={[
+            {
+              modelId: 'mdl_01JLLAMA30000000000000000',
+              modelName: 'Llama 3',
+              version: '1.0.0',
+              status: 'staging',
+              createdAt: '2026-09-01T00:00:00Z',
+              updatedAt: '2026-09-01T00:00:00Z',
+              nodes: [],
+              edges: [],
+            },
+          ]}
+        />
+      );
+    });
+
+    const modelInput = container.querySelector('[data-testid="input-model-id"]') as HTMLInputElement;
+    expect(modelInput).not.toBeNull();
+    expect(modelInput.getAttribute('placeholder')).toBe('mdl_...');
+
+    const approvalInput = container.querySelector('[data-testid="approval-input"]') as HTMLInputElement;
+    expect(approvalInput).not.toBeNull();
+    expect(approvalInput.getAttribute('placeholder')).toBe('승인 식별자 입력 (apr_...)');
+  });
+
+  it('Test 25 (Card 138 Item 6): W2 register generation guard alone discards late responses when generation changes', async () => {
+    let resolveFirstFetch: ((res: Response) => void) | null = null;
+    let fetchCount = 0;
+
+    globalThis.fetch = vi.fn().mockImplementation((url: string) => {
+      if (url.includes('/versions') && !url.includes('/lineage')) {
+        fetchCount++;
+        if (fetchCount === 1) {
+          return new Promise<Response>((resolve) => {
+            resolveFirstFetch = resolve;
+          });
+        }
+      }
+      return Promise.resolve(new Response(JSON.stringify({
+        modelId: 'mdl_01JLLAMA30000000000000000',
+        version: '2.0.0',
+        storageLocator: 's3://bucket/models/2.0.0',
+        sha256Digest: 'a'.repeat(64),
+        byteSize: 1024,
+        createdAt: '2026-09-29T00:00:00Z',
+        isRetained: false,
+        retainedUntil: null,
+      }), { status: 201 }));
+    });
+
+    await act(async () => {
+      root.render(
+        <ModelLineageView
+          projectId="prj_alpha"
+          initialModelId="mdl_01JLLAMA30000000000000000"
+          initialVersion="1.0.0"
+          currentUser={{ canApprove: true }}
+        />
+      );
+    });
+
+    const tabs = container.querySelectorAll('button');
+    const regTabBtn = Array.from(tabs).find((b) => b.textContent?.includes('버전 등록'));
+    await act(async () => {
+      regTabBtn?.click();
+    });
+
+    const regVersionInput = container.querySelector('[data-testid="input-register-version"]') as HTMLInputElement;
+    const regShaInput = container.querySelector('[data-testid="input-register-sha256"]') as HTMLInputElement;
+    const regBytesInput = container.querySelector('[data-testid="input-register-bytesize"]') as HTMLInputElement;
+    const submitBtn = container.querySelector('[data-testid="btn-register-version"]') as HTMLButtonElement;
+
+    await act(async () => {
+      setInputValue(regVersionInput, '1.0.1');
+      setInputValue(regShaInput, 'b'.repeat(64));
+      setInputValue(regBytesInput, '2048');
+    });
+
+    // Start first request (will hang on resolveFirstFetch)
+    await act(async () => {
+      submitBtn.click();
+    });
+    expect(fetchCount).toBe(1);
+    expect(resolveFirstFetch).not.toBeNull();
+
+    // Change model ID to increment generation
+    const modelInput = container.querySelector('[data-testid="input-model-id"]') as HTMLInputElement;
+    await act(async () => {
+      setInputValue(modelInput, 'mdl_01JLLAMA30000000000000001');
+    });
+
+    // Resolve first request with fake response
+    await act(async () => {
+      resolveFirstFetch!(new Response(JSON.stringify({
+        modelId: 'mdl_01JLLAMA30000000000000000',
+        version: '1.0.1',
+        storageLocator: 's3://bucket/models/1.0.1',
+        sha256Digest: 'b'.repeat(64),
+        byteSize: 2048,
+        createdAt: '2026-09-29T00:00:00Z',
+        isRetained: false,
+        retainedUntil: null,
+      }), { status: 201 }));
+    });
+
+    // Ensure success container was NOT rendered for stale first request
+    const successBanner = container.querySelector('[data-testid="reg-success-container"]');
+    expect(successBanner).toBeNull();
+  });
 });

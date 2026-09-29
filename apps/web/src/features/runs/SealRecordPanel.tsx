@@ -102,6 +102,7 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
 
   const loadData = useCallback(async () => {
     generationRef.current += 1;
+    const currentGen = generationRef.current;
 
     if (!projectId || !runId) {
       setRunRecord(null);
@@ -145,10 +146,10 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
       // 1. Fetch R1 RunRecord
       try {
         record = await fetchRunRecord(projectId, runId, signal);
-        if (signal.aborted) return;
+        if (signal.aborted || generationRef.current !== currentGen) return;
         setRunRecord(record);
       } catch (err: any) {
-        if (signal.aborted) return;
+        if (signal.aborted || generationRef.current !== currentGen) return;
         const pErr = cleanErrorMessage(err);
         // Canonical unsealed state: 404 RES-0004 with exact detail 'No sealed record for this run.'
         // Any other 404 (e.g. 'No such run.') is an actual resource error
@@ -177,7 +178,7 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
             bundleStatusDesc = ', 최신 컨텍스트 번들 존재';
           }
         } catch (bErr: any) {
-          if (signal.aborted) return;
+          if (signal.aborted || generationRef.current !== currentGen) return;
           const bPErr = cleanErrorMessage(bErr);
           if (bPErr.status === 404 && (bPErr.detail?.includes('No context bundle') || bPErr.message?.includes('No context bundle'))) {
             setBundleSpecialStatus('not_found');
@@ -189,7 +190,7 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
             bundleStatusDesc = `, 번들 조회 실패 (${bPErr.code || bPErr.status || '오류'})`;
           }
         }
-        if (signal.aborted) return;
+        if (signal.aborted || generationRef.current !== currentGen) return;
         setIsLoading(false);
         setLiveAnnouncement(`봉인 기록 없음: 미봉인 실행${bundleStatusDesc}`);
         return;
@@ -201,7 +202,7 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
         fetchContextBundle(projectId, runId, signal),
       ]);
 
-      if (signal.aborted) return;
+      if (signal.aborted || generationRef.current !== currentGen) return;
 
       let artifactMsg = '없음';
       if (artifactsResult.status === 'fulfilled') {
@@ -234,7 +235,7 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
       setIsLoading(false);
       setLiveAnnouncement(`봉인 기록 조회 완료: 봉인됨 (아티팩트 ${artifactMsg}, 번들 ${bundleMsg})`);
     } catch (err: any) {
-      if (signal.aborted) return;
+      if (signal.aborted || generationRef.current !== currentGen) return;
       setIsLoading(false);
       setError(cleanErrorMessage(err));
       setLiveAnnouncement('❌ 봉인 기록 조회 실패');

@@ -712,11 +712,11 @@ describe('S11-FE Defect Fixes Verification (DEF-S11-01 ~ DEF-S11-19)', () => {
     expect(text).not.toContain('ACTIVE LIVE');
     expect(text).not.toContain('✔ 검증 완료');
 
-    // Truthful simulation labels confirmed
-    expect(text).toContain('(모의 기준 충족)');
+    // Truthful simulation / unmeasured labels confirmed per Card 126 / F1 & S11
     expect(text).toContain('주요 SLO 모의 규격 및 목표 비교 (AC-11)');
     expect(text).toContain('모의 예시값 (서버 미측정)');
-    expect(text).toContain('모의 MET (미측정)');
+    expect(text).toContain('UNMEASURED (미측정)');
+    expect(text).toContain('미측정 (NOT_OBSERVED)');
     expect(text).toContain('WCAG 2.1 AA 접근성 체크리스트 (모의 점검)');
     expect(text).toContain('모의 PASS');
     expect(text).toContain('[정적 예시] 원격 텔레메트리 미연동 (사전 설계 규격 시뮬레이션)');
@@ -755,6 +755,31 @@ describe('S11-FE Defect Fixes Verification (DEF-S11-01 ~ DEF-S11-19)', () => {
     const rollbackBtn = container.querySelector('button[aria-label*="롤백 실행 (AC-11)"]');
     expect(rollbackBtn).not.toBeNull();
     expect(rollbackBtn?.getAttribute('aria-label')).toBe('이 버전(v1.0.0-rc.1)으로 롤백 실행 (AC-11)');
+  });
+
+  it('DEF-S11-08: ReleaseCandidateView renders (모의 기준 충족) and 모의 MET (미측정) when telemetry meeting targets is provided', async () => {
+    await act(async () => {
+      root.render(
+        <ReleaseCandidateView
+          initialEvidence={{
+            schedulerP95LatencySeconds: 1.24,
+            heartbeatDetectionSeconds: 48.0,
+            unapprovedExecutionsCount: 0,
+            dockerSocketExposedCount: 0,
+            rpoMinutes: 4.2,
+            rtoMinutes: 12.5,
+            unresolvedVulnerabilitiesCount: 0,
+          }}
+        />
+      );
+    });
+
+    const text = container.textContent || '';
+    expect(text).toContain('(모의 기준 충족)');
+    expect(text).toContain('모의 MET (미측정)');
+    expect(text).not.toContain('(ZERO BUG)');
+    expect(text).not.toContain('ACTIVE LIVE');
+    expect(text).not.toContain('✔ 검증 완료');
   });
 
   // DEF-S11-16: ReleaseManager candidate initial state

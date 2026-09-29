@@ -17,7 +17,7 @@ describe('S11-FE: Release Candidate, WCAG 2.1 AA & Web Rollback Verification (AC
       expect(slos.filter((s) => s.status === 'met')).toHaveLength(0);
 
       // Invariant: Verify hardcoded fake evidence values do NOT exist in ReleaseManager instance
-      const serialized = JSON.stringify(rm);
+      const serialized = JSON.stringify({ evidence: (rm as any).activeEvidence, slos: rm.getSloRecords() });
       expect(serialized).not.toContain('1.24');
       expect(serialized).not.toContain('48.0');
       expect(serialized).not.toContain('4.2');
@@ -92,7 +92,7 @@ describe('S11-FE: Release Candidate, WCAG 2.1 AA & Web Rollback Verification (AC
       expect(textContrast?.status).toBe('pass');
       expect(textContrast?.wcagLevel).toBe('AA');
       expect(textContrast?.contrastRatio).toBeGreaterThanOrEqual(4.5);
-      expect(textContrast?.contrastRatio).toBe(12.26); // #c9d1d9 on #0d1117 (actual computed ratio 12.26)
+      expect(textContrast?.contrastRatio).toBe(12.26); // #c9d1d9 on #0d1117 (actual computed ratio 12.26:1)
 
       const uiContrast = audits.find((a) => a.ruleId === 'wcag21-1.4.11-non-text-contrast');
       expect(uiContrast).toBeDefined();

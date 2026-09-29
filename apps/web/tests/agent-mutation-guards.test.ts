@@ -7,6 +7,7 @@ import {
   runSyntheticEvalSuite,
   evaluatePrompt,
   evaluateCodingTask,
+  computeCasesDigest,
   sha256Hex,
   PromptFixture,
   CodingTaskFixture,
@@ -38,7 +39,7 @@ describe('G-07 Mutation & Integrity Guards (MUT-01~03 & MUT-RUN-01~07)', () => {
         'f8962fdaaac27303d0ea3631a84f6e49a21008f6e9cc1b24d0806a73a47364b2'
       );
       expect(EXPECTED_FIXTURE_BYTE_SHA256.codingTasks30).toBe(
-        'ed4c3841bfd1b82090bfaf175094ee2a48298363d69c41df4582807eccdcbd96'
+        '070d959ff589882193df276612f825ad7ee2a356a3d1fa503f7eff6a1a6f9a89'
       );
     });
   });
@@ -406,5 +407,87 @@ describe('G-07 Mutation & Integrity Guards (MUT-01~03 & MUT-RUN-01~07)', () => {
       expect(validate(badCase)).toBe(false);
     });
   });
-});
 
+  describe('Card 138 N1: casesDigest covers loopCount (Claude M1 & Codex F2)', () => {
+    it('changes casesDigest when any case loopCount is mutated without changing verdict', () => {
+      const suite = runSyntheticEvalSuite();
+      const originalDigest = suite.casesDigest;
+
+      expect(computeCasesDigest(suite.cases)).toBe(originalDigest);
+
+      // Mutate case loopCount
+      const mutatedCases = suite.cases.map((c, i) =>
+        i === 0 ? { ...c, loopCount: (c.loopCount ?? 0) + 1 } : c
+      );
+      const mutatedDigest = computeCasesDigest(mutatedCases);
+      expect(mutatedDigest).not.toBe(originalDigest);
+    });
+  });
+
+  describe('Card 138 N2: 1/3 repair loop mutation guard (kills > 0 -> > 1 mutant)', () => {
+    it('fixture suite contains at least 1 REPAIRING / expectedLoopCount: 1 task covering 1/3 repair state', () => {
+      const repairTasks = (codingData as CodingTaskFixture[]).filter(
+        (t) => t.expected === 'REPAIRING' && t.expectedLoopCount === 1
+      );
+      expect(repairTasks.length).toBeGreaterThanOrEqual(1);
+    });
+    it('kills mutant that changes repair loop entry condition from > 0 to > 1', () => {
+      const taskWithLoop1: CodingTaskFixture = {
+        id: 'TSK-REPAIR-1',
+        title: 'Single Repair Loop Task',
+        prompt: 'Task requiring exactly 1 repair loop',
+        category: 'geometry',
+        costEstimate: 100000,
+        expected: 'REPAIRING',
+        expectedLoopCount: 1,
+        proposedDiff: '+export const x = 1;',
+      };
+
+      // 1. Valid runner execution correctly evaluates REPAIRING / 1 as PASS
+      const manager = new AgentLoopManager();
+      const validResult = evaluateCodingTask(taskWithLoop1, manager);
+      expect(validResult.verdict).toBe('PASS');
+      expect(validResult.observed).toBe('REPAIRING');
+      expect(validResult.loopCount).toBe(1);
+
+      // 2. Mutant: loop entry condition is changed from > 0 to > 1
+      const mutantEvaluator = (fixture: CodingTaskFixture, mgr: AgentLoopManager) => {
+        const runRes = mgr.createRunRequest(fixture.prompt, ['file:///src/pipeline.ts'], fixture.costEstimate);
+        if (!runRes.success || !runRes.request) return { verdict: 'FAIL', observed: 'ERRORED', loopCount: 0 };
+
+        let currentLoops = runRes.request.boundedRepairLoops;
+        let observedStatus = runRes.request.status.toUpperCase();
+
+        // MUTANT: > 1 instead of > 0
+        if (fixture.expectedLoopCount > 1) {
+          let iterations = 0;
+          while (currentLoops < fixture.expectedLoopCount && currentLoops < 3 && iterations++ < 10) {
+            const adv = mgr.advanceRepairLoop(runRes.request.id);
+            if (!adv.canRepair || adv.currentLoops <= currentLoops) {
+              observedStatus = adv.error?.includes('BOUNDED_LOOP_EXCEEDED') ? 'BOUNDED_LOOP_EXCEEDED' : 'ERRORED';
+              currentLoops = adv.currentLoops;
+              break;
+            }
+            currentLoops = adv.currentLoops;
+            observedStatus = runRes.request.status.toUpperCase();
+          }
+        }
+
+        const statusMatch = observedStatus === fixture.expected;
+        const loopMatch = currentLoops === fixture.expectedLoopCount;
+        return {
+          verdict: statusMatch && loopMatch ? 'PASS' : 'FAIL',
+          observed: observedStatus,
+          loopCount: currentLoops,
+        };
+      };
+
+      const mutantManager = new AgentLoopManager();
+      const mutantResult = mutantEvaluator(taskWithLoop1, mutantManager);
+      // The mutant produces FAIL because loopCount remains 0 and status remains READY
+      expect(mutantResult.verdict).toBe('FAIL');
+      expect(mutantResult.observed).toBe('READY');
+      expect(mutantResult.loopCount).toBe(0);
+    });
+  });
+});

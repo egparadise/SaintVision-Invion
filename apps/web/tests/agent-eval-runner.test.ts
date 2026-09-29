@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { execSync, execFileSync } from 'child_process';
 import { AgentLoopManager } from '../src/features/agent/agentEngine';
-import { runSyntheticEvalSuite } from '../src/features/agent/evalRunner';
+import { runSyntheticEvalSuite, computeCasesDigest } from '../src/features/agent/evalRunner';
 import { MUTATION_OPERATORS, applyMutation } from '../src/features/agent/mutationTools';
 
 describe('G-07 100 Prompt / 30 Coding Golden Eval Runner (EVL-05)', () => {
@@ -59,6 +59,15 @@ describe('G-07 100 Prompt / 30 Coding Golden Eval Runner (EVL-05)', () => {
     expect(loaded.evalRunId).toBe('eval-s09-g07-static');
     expect(loaded.cases).toHaveLength(130);
     expect(loaded.casesDigest).toBe(freshEvidence.casesDigest);
+    expect(computeCasesDigest(loaded.cases)).toBe(loaded.casesDigest);
+
+    // M1 / F2 Invariant: Mutating loopCount in any case changes digest and fails drift check
+    const mutatedCases = JSON.parse(JSON.stringify(loaded.cases));
+    const codingCase = mutatedCases.find((c: any) => c.loopCount !== undefined);
+    expect(codingCase).toBeDefined();
+    codingCase.loopCount = (codingCase.loopCount ?? 0) + 1;
+    expect(computeCasesDigest(mutatedCases)).not.toBe(loaded.casesDigest);
+
     expect(loaded.summary.promptsFail).toBe(0);
     expect(loaded.summary.codingTasksFail).toBe(0);
     expect(loaded.summary.guardConformanceRate).toBe(100.0);
@@ -106,6 +115,19 @@ describe('G-07 100 Prompt / 30 Coding Golden Eval Runner (EVL-05)', () => {
     expect(loaded.summary.codingTasksFail).toBe(0);
     expect(loaded.cases.filter((c: any) => c.verdict === 'FAIL')).toHaveLength(0);
   }, 15000);
+
+  it('strictly fails closed when generate_eval_evidence.ts is invoked with invalid commit (F4)', () => {
+    const rootDir = path.resolve(__dirname, '../../..');
+    const scriptPath = path.join(rootDir, 'tools/generate_eval_evidence.ts');
+
+    expect(() => {
+      execSync(`npx --prefix apps/web tsx "${scriptPath}" 0000000000000000000000000000000000000000`, {
+        cwd: rootDir,
+        encoding: 'utf-8',
+        stdio: 'pipe',
+      });
+    }).toThrow(/FAIL-CLOSED/);
+  }, 30000);
 
   describe('§5: 6대 정규식 1:1 전용 Probe 단독 격리 매칭 검증', () => {
     const manager = new AgentLoopManager();
