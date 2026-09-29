@@ -1,3 +1,4 @@
+import { _resetKernelMutationCache } from '@/shared/api/kernelMutations';
 import { DesktopShell } from '@/features/desktop/DesktopShell';
 import { ResourceExplorer } from '@/features/desktop/ResourceExplorer';
 import { approveReviewed, type ReviewedAction } from '@/shared/api/approvalReview';
@@ -101,6 +102,7 @@ export const App: React.FC = () => {
 
   const resetAuthenticatedState = React.useCallback((errorMessage?: string | null) => {
     clearAuthToken();
+    _resetKernelMutationCache();
     sessionRef.current += 1;
     scopeRef.current += 1;
     runRequest.current += 1;

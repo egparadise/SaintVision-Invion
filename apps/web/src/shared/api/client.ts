@@ -91,11 +91,33 @@ export function getAuthToken(): string | null {
   return inMemoryAuthToken;
 }
 
+declare global {
+  // eslint-disable-next-line no-var
+  var __sv_auth_teardown_listeners: Set<() => void> | undefined;
+}
+
+export function onAuthTeardown(listener: () => void): () => void {
+  if (!globalThis.__sv_auth_teardown_listeners) {
+    globalThis.__sv_auth_teardown_listeners = new Set();
+  }
+  globalThis.__sv_auth_teardown_listeners.add(listener);
+  return () => {
+    globalThis.__sv_auth_teardown_listeners?.delete(listener);
+  };
+}
+
 /**
- * Clear the in-memory access token on logout.
+ * Clear the in-memory access token on logout and notify teardown listeners.
  */
 export function clearAuthToken(): void {
   inMemoryAuthToken = null;
+  globalThis.__sv_auth_teardown_listeners?.forEach((fn) => {
+    try {
+      fn();
+    } catch {
+      // ignore listener errors during teardown
+    }
+  });
 }
 
 export type UnauthorizedHandler = (problem: ProblemDetails) => void;
@@ -125,7 +147,7 @@ export interface RequestOptions extends RequestInit {
  * and an application/resource 404 (Entity Not Found or permission-masked).
  * A migration fallback to a flat route MUST ONLY occur if the route itself does not exist.
  * If the server returned an application RFC 9457 ProblemDetails with a business code
- * (e.g. RES-RUN-404, RES-APPROVAL-404, RES-404), the route exists and the entity was missing or masked;
+ * (e.g. RES-0004, AUTH-0030), the route exists and the entity was missing or masked;
  * in that case, fallback is strictly rejected to prevent duplicate mutation or unauthorized probing.
  */
 export function isRouteNotFoundError(err: any): boolean {
@@ -134,20 +156,16 @@ export function isRouteNotFoundError(err: any): boolean {
   if (status !== 404) return false;
 
   const problem = err.problem;
-  // If the server explicitly returned a structured problem with an application code,
-  // the route is mapped and served by the backend controller.
-  if (
-    problem?.code &&
-    (problem.code.startsWith('RES-') ||
-      problem.code.startsWith('APP-') ||
-      problem.code.startsWith('SEC-') ||
-      problem.code.startsWith('VAL-'))
-  ) {
-    return false;
-  }
-  // Generic Starlette / FastAPI unmapped route response: {"detail": "Not Found"}
-  // or network-level client synth 404: code === "NET-0404"
-  return problem?.detail === 'Not Found' || problem?.code === 'NET-0404' || !problem?.code;
+  const code = problem?.code || err.code;
+
+  // Synthesized network/route absence: client mapped unmapped route to NET-0404
+  if (code === 'NET-0404') return true;
+
+  // Any structured problem code indicates an application controller was reached (fail-closed)
+  if (code) return false;
+
+  // Unmapped HTTP 404 without a structured problem code
+  return true;
 }
 
 /**

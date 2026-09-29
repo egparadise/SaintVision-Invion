@@ -123,5 +123,21 @@ describe('화면 결함 5대 부류 치유 트랙 4차: IntranetDeploymentView �
       expect(container.textContent).toContain('✔ [모의 시뮬레이션] AC-11 롤백 절차 검증 완료');
       expect(container.textContent).toContain('백엔드 릴리스 제어 API 미노출 상태로 실제 인프라 및 CDN 캐시 미반영');
     });
+    it('C1: verifies default ReleaseCandidateView does not claim 100% or 0 건 or false measurement environment when unmeasured', async () => {
+      act(() => {
+        root.render(<ReleaseCandidateView />);
+      });
+
+      // 1. Environment text must NOT claim 5-Node measurement when unmeasured
+      expect(container.textContent).not.toContain('측정 환경: 5-Node 분산 클러스터 및 실제 원격 호출 계측 결과');
+      expect(container.textContent).toContain('측정 환경: 실측 텔레메트리 연동 대기 (미측정)');
+
+      // 2. Candidates table must render '미측정 (NOT_OBSERVED)' and NOT '100%' or '0 건'
+      const candidatesTable = container.querySelector('[data-testid="candidates-table"]');
+      expect(candidatesTable).not.toBeNull();
+      expect(candidatesTable?.textContent).toContain('미측정 (NOT_OBSERVED)');
+      expect(candidatesTable?.textContent).not.toContain('100%');
+      expect(candidatesTable?.textContent).not.toContain('0 건');
+    });
   });
 });

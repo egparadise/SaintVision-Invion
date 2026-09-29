@@ -326,7 +326,7 @@ describe('브라우저 alert() 18개소 전소 및 3분류(오류·성공·미�
     });
 
     vi.spyOn(kernelMutationsModule, 'decideApproval').mockRejectedValue({
-      problem: { detail: '보안 정책 반려 거부 (권한 없음)', code: 'SEC-403' },
+      problem: { detail: '보안 정책 반려 거부 (권한 없음)', code: 'AUTH-0030' },
     });
 
     await act(async () => {

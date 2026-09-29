@@ -101,7 +101,7 @@ export async function registerStorageContribution(
     declaredPath: string;
     mode: 'read_write' | 'read_only';
     capacityBytes: number;
-    availableBytes: number;
+    availableBytes?: number | null;
   },
   idempotencyKey?: string
 ): Promise<ContributionRegistrationResponse> {
@@ -112,7 +112,7 @@ export async function registerStorageContribution(
       declaredPath: data.declaredPath,
       mode: data.mode,
       capacityBytes: data.capacityBytes,
-      availableBytes: data.availableBytes,
+      availableBytes: data.availableBytes ?? null,
     }),
     idempotencyKey,
   });

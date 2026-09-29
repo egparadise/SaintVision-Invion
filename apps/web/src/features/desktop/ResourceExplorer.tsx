@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { NodeItem } from '@/contracts/types';
 import { LogicalResourceSummary } from '@/contracts/virtualFabric';
 import {
@@ -92,6 +92,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   const [newContribNode, setNewContribNode] = useState(nodes[0]?.id || '');
   const [newContribMode, setNewContribMode] = useState<'read_write' | 'read_only'>('read_write');
   const [newContribCapacityGB, setNewContribCapacityGB] = useState(500);
+  const contribIdempotencyKeyRef = useRef<string | null>(null);
 
   // Storage Observation State (StorageObservationView)
   const [sampleRequestId, setSampleRequestId] = useState(initialSampleRequestId || '');
@@ -365,17 +366,21 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
       return;
     }
     try {
-      const idempotencyKey = `idemp_contrib_${Date.now()}`;
+      if (!contribIdempotencyKeyRef.current) {
+        contribIdempotencyKeyRef.current = `idemp_contrib_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      }
+      const idempotencyKey = contribIdempotencyKeyRef.current;
       const res = await registerStorageContribution(
         {
           nodeId: targetNodeId,
           declaredPath: newContribPath,
           mode: newContribMode,
           capacityBytes: newContribCapacityGB * 1024 ** 3,
-          availableBytes: (newContribCapacityGB - 50) * 1024 ** 3,
+          availableBytes: null,
         },
         idempotencyKey
       );
+      contribIdempotencyKeyRef.current = null;
       setContributions((prev) => [res.contribution, ...prev]);
       setStorageMessage(`✔ 스토리지 기여 등록 완료 (${res.contribution.contributionId})`);
     } catch (err: any) {
@@ -1192,7 +1197,10 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 <select
                   value={newContribNode}
                   data-testid="storage-node-select"
-                  onChange={(e) => setNewContribNode(e.target.value)}
+                  onChange={(e) => {
+                    contribIdempotencyKeyRef.current = null;
+                    setNewContribNode(e.target.value);
+                  }}
                   style={{ width: '100%', padding: '6px', borderRadius: '4px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#f8fafc', fontSize: '0.75rem' }}
                 >
                   {nodes.map((n) => (
@@ -1209,7 +1217,10 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                   type="text"
                   value={newContribPath}
                   data-testid="storage-path-input"
-                  onChange={(e) => setNewContribPath(e.target.value)}
+                  onChange={(e) => {
+                    contribIdempotencyKeyRef.current = null;
+                    setNewContribPath(e.target.value);
+                  }}
                   style={{ width: '100%', padding: '6px', borderRadius: '4px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#f8fafc', fontSize: '0.75rem' }}
                 />
               </div>
@@ -1218,7 +1229,10 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 <label style={{ fontSize: '0.6875rem', color: '#94a3b8' }}>접근 모드</label>
                 <select
                   value={newContribMode}
-                  onChange={(e) => setNewContribMode(e.target.value as any)}
+                  onChange={(e) => {
+                    contribIdempotencyKeyRef.current = null;
+                    setNewContribMode(e.target.value as any);
+                  }}
                   style={{ width: '100%', padding: '6px', borderRadius: '4px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#f8fafc', fontSize: '0.75rem' }}
                 >
                   <option value="read_write">읽기/쓰기 (Read/Write)</option>
@@ -1230,8 +1244,12 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 <label style={{ fontSize: '0.6875rem', color: '#94a3b8' }}>용량 (GB)</label>
                 <input
                   type="number"
+                  data-testid="storage-capacity-input"
                   value={newContribCapacityGB}
-                  onChange={(e) => setNewContribCapacityGB(Number(e.target.value))}
+                  onChange={(e) => {
+                    contribIdempotencyKeyRef.current = null;
+                    setNewContribCapacityGB(Number(e.target.value));
+                  }}
                   style={{ width: '100%', padding: '6px', borderRadius: '4px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#f8fafc', fontSize: '0.75rem' }}
                 />
               </div>

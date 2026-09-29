@@ -4,9 +4,11 @@ import type { ModelVersionResponse } from '@/contracts/model-version-response';
 import type { RetentionPinResponse } from '@/contracts/retention-pin-response';
 import type { ModelReleaseResponse } from '@/contracts/model-release-response';
 import type { ModelLineageTraceResponse } from '@/contracts/model-lineage-trace-response';
+import type { ModelVerifyResponse } from '@/contracts/model-verify-response';
+import type { EvalRunResponse } from '@/contracts/eval-run-response';
 import { Button } from '@/shared/ui/Button';
 import { fetchModelCommitment } from '@/shared/api/modelCommitmentObservation';
-import { fetchConformanceStatus, type ConformanceStatusUnion } from '@/shared/api/adapterObservation';
+import { fetchConformanceStatus, fetchAdapterConformance, type ConformanceStatusUnion, type AdapterConformanceUnion } from '@/shared/api/adapterObservation';
 import { modelRegistryObservation, isValidIsoDateTime } from '@/shared/api/modelRegistryObservation';
 import { ApiError } from '@/shared/api/client';
 import { MlopsManager } from './mlopsEngine';
@@ -45,6 +47,9 @@ export interface ModelLineageViewProps {
   currentUser?: { canApprove?: boolean; role?: string; permissions?: string[] };
   initialModelId?: string;
   initialVersion?: string;
+  modelId?: string;
+  version?: string;
+  canApprove?: boolean;
 }
 
 export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
@@ -54,8 +59,17 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   currentUser,
   initialModelId = '',
   initialVersion = '',
+  modelId: propModelId,
+  version: propVersion,
+  canApprove: propCanApprove,
 }) => {
   const effectiveProjectId = propProjectId || currentProjectId || '';
+  const effectiveInitialModelId = propModelId || initialModelId || '';
+  const effectiveInitialVersion = propVersion || initialVersion || '';
+  const effectiveCanApprove =
+    propCanApprove !== undefined
+      ? propCanApprove === true
+      : (currentUser as { canApprove?: boolean } | null | undefined)?.canApprove === true;
   const [mlopsManager] = useState<MlopsManager>(() => new MlopsManager(initialLineages));
   const [lineages, setLineages] = useState<ModelLineage[]>(mlopsManager.getLineages());
   const [selectedModelId, setSelectedModelId] = useState<string>(lineages[0]?.modelId || '');
@@ -117,6 +131,80 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
     }
   };
 
+  // Single adapter conformance observation state (G-03 stage two single route)
+  const [singleAdapterName, setSingleAdapterName] = useState('codex-cli');
+  const [singleConformanceData, setSingleConformanceData] = useState<AdapterConformanceUnion | null>(null);
+  const [singleConformanceLoading, setSingleConformanceLoading] = useState(false);
+  const [singleConformanceError, setSingleConformanceError] = useState<{
+    code?: string;
+    status?: number;
+    title?: string;
+    detail: string;
+    retryable?: boolean;
+  } | null>(null);
+  const singleConformanceAbortRef = useRef<AbortController | null>(null);
+  const singleConformanceGenRef = useRef<number>(0);
+
+  const handleFetchSingleConformance = async (e?: React.FormEvent, targetAdapter?: string) => {
+    if (e) e.preventDefault();
+    if (singleConformanceLoading) return;
+    const adapterToFetch = (targetAdapter !== undefined ? targetAdapter : singleAdapterName).trim();
+    if (!conformanceProjectId.trim() || !adapterToFetch) {
+      return;
+    }
+
+    singleConformanceAbortRef.current?.abort();
+    const ctrl = new AbortController();
+    singleConformanceAbortRef.current = ctrl;
+    const currentGen = ++singleConformanceGenRef.current;
+
+    setSingleConformanceLoading(true);
+    setSingleConformanceError(null);
+    setSingleConformanceData(null);
+    try {
+      const data = await fetchAdapterConformance(conformanceProjectId.trim(), adapterToFetch, ctrl.signal);
+      if (singleConformanceGenRef.current !== currentGen || ctrl.signal.aborted) return;
+      setSingleConformanceData(data);
+    } catch (err: any) {
+      if (singleConformanceGenRef.current !== currentGen || ctrl.signal.aborted) return;
+      setSingleConformanceData(null);
+      const prob = err?.problem;
+      if (prob) {
+        let safeDetail = prob.detail || '요청이 거절되었습니다.';
+        if (prob.code === 'RES-0004') {
+          safeDetail = '어댑터 없음';
+        } else if (/<[a-z][\s\S]*>/i.test(safeDetail)) {
+          safeDetail = '서버 게이트웨이 또는 프록시 오류가 발생했습니다. (HTML 응답 수신)';
+        } else if (prob.status && prob.status >= 500 && prob.category === 'NET') {
+          safeDetail = '서버 내부 오류 또는 업스트림 통신 장애가 발생했습니다.';
+        }
+        setSingleConformanceError({
+          code: prob.code,
+          status: prob.status,
+          title: prob.title,
+          detail: safeDetail,
+          retryable: prob.retryable === true,
+        });
+      } else {
+        const isContractMismatch = err?.message && err.message.includes('계약 불일치');
+        let fallbackMessage = err?.message || '네트워크 오류가 발생했습니다.';
+        if (/<[a-z][\s\S]*>/i.test(fallbackMessage)) {
+          fallbackMessage = '서버 또는 프록시 오류가 발생했습니다.';
+        }
+        setSingleConformanceError({
+          detail: isContractMismatch
+            ? `클라이언트 응답 계약 검증 실패: ${err.message}`
+            : fallbackMessage,
+          retryable: false,
+        });
+      }
+    } finally {
+      if (singleConformanceGenRef.current === currentGen || singleConformanceAbortRef.current === ctrl) {
+        setSingleConformanceLoading(false);
+      }
+    }
+  };
+
   // Model commitment observation state (starts empty, requiring explicit project/model context)
   const [commitmentProject, setCommitmentProject] = useState(effectiveProjectId);
   const [commitmentModelId, setCommitmentModelId] = useState('');
@@ -169,6 +257,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
 
   const handleSelectModel = (modelId: string) => {
     setSelectedModelId(modelId);
+    setVerifyResult(null);
     const m = lineages.find((item) => item.modelId === modelId);
     if (m) {
       setCommitmentModelId(m.modelId);
@@ -224,10 +313,36 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
 
   // --- Real HTTP API / Business Lanes State (Card 94) ---
   const [projectId, setProjectId] = useState<string>(effectiveProjectId);
-  const [modelId, setModelId] = useState<string>(initialModelId);
-  const [version, setVersion] = useState<string>(initialVersion);
+  const [modelId, setModelId] = useState<string>(effectiveInitialModelId);
+  const [version, setVersion] = useState<string>(effectiveInitialVersion);
 
-  const [activeTab, setActiveTab] = useState<'trace' | 'register' | 'pin' | 'release'>('trace');
+  const [activeTab, setActiveTab] = useState<'trace' | 'register' | 'pin' | 'release' | 'verify' | 'eval-run'>('trace');
+
+  // W3 Verify form state
+  const [verifyMeasurementId, setVerifyMeasurementId] = useState('');
+  const [verifyLoading, setVerifyLoading] = useState(false);
+  const [verifyResult, setVerifyResult] = useState<ModelVerifyResponse | null>(null);
+  const [verifyTarget, setVerifyTarget] = useState<{ projectId: string; modelId: string; version: string } | null>(null);
+  const [verifyIdempotencyKey, setVerifyIdempotencyKey] = useState<string>(() =>
+    modelRegistryObservation.generateIdempotencyKey('w3')
+  );
+  const verifyAbortControllerRef = useRef<AbortController | null>(null);
+  const verifyGenerationRef = useRef(0);
+
+  // W5 Eval Run form state
+  const [evalSuiteId, setEvalSuiteId] = useState('');
+  const [evalAdapter, setEvalAdapter] = useState('codex-cli');
+  const [evalPromptVer, setEvalPromptVer] = useState('');
+  const [evalCtxVer, setEvalCtxVer] = useState('');
+  const [evalRequirePinning, setEvalRequirePinning] = useState(true);
+  const [evalLoading, setEvalLoading] = useState(false);
+  const [evalResult, setEvalResult] = useState<EvalRunResponse | null>(null);
+  const [evalTarget, setEvalTarget] = useState<{ projectId: string; suiteId: string } | null>(null);
+  const [evalIdempotencyKey, setEvalIdempotencyKey] = useState<string>(() =>
+    modelRegistryObservation.generateIdempotencyKey('w5')
+  );
+  const evalAbortControllerRef = useRef<AbortController | null>(null);
+  const evalGenerationRef = useRef(0);
   const [queryLoading, setQueryLoading] = useState(false);
   const [realTrace, setRealTrace] = useState<ModelLineageTraceResponse | null>(null);
 
@@ -243,10 +358,12 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   const [pinLoading, setPinLoading] = useState(false);
   const [pinResult, setPinResult] = useState<RetentionPinResponse | null>(null);
 
-  // Release form state (pending server idempotency contract Card 113)
+  // Release form state (Card 118: server idempotency contract active)
   const [relLicensePolicy, setRelLicensePolicy] = useState('Apache-2.0');
   const [relClassification, setRelClassification] = useState<'public' | 'internal' | 'restricted'>('internal');
-  const [relResult] = useState<ModelReleaseResponse | null>(null);
+  const [relLoading, setRelLoading] = useState(false);
+  const [relResult, setRelResult] = useState<ModelReleaseResponse | null>(null);
+  const [relIsReplay, setRelIsReplay] = useState(false);
 
   // Idempotency keys preserved per submission intent
   const [regIdempotencyKey, setRegIdempotencyKey] = useState<string>(() =>
@@ -255,6 +372,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   const [pinIdempotencyKey, setPinIdempotencyKey] = useState<string>(() =>
     modelRegistryObservation.generateIdempotencyKey('pin')
   );
+  const [relIdempotencyKey, setRelIdempotencyKey] = useState<string>(() =>
+    modelRegistryObservation.generateIdempotencyKey('rel')
+  );
+  const submittedRelKeysRef = useRef<Set<string>>(new Set());
 
   // ProblemDetails error and Live Region
   const [problemDetails, setProblemDetails] = useState<ProblemDetails | null>(null);
@@ -274,6 +395,33 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       setProjectId(effectiveProjectId);
       setCommitmentProject(effectiveProjectId);
       setConformanceProjectId(effectiveProjectId);
+      verifyAbortControllerRef.current?.abort();
+      verifyAbortControllerRef.current = null;
+      evalAbortControllerRef.current?.abort();
+      evalAbortControllerRef.current = null;
+      regAbortControllerRef.current?.abort();
+      regAbortControllerRef.current = null;
+      pinAbortControllerRef.current?.abort();
+      pinAbortControllerRef.current = null;
+      relAbortControllerRef.current?.abort();
+      relAbortControllerRef.current = null;
+      verifyGenerationRef.current++;
+      evalGenerationRef.current++;
+      regGenerationRef.current++;
+      pinGenerationRef.current++;
+      relGenerationRef.current++;
+      setVerifyLoading(false);
+      setEvalLoading(false);
+      setRegLoading(false);
+      setPinLoading(false);
+        setVerifyResult(null);
+      setVerifyTarget(null);
+      setEvalResult(null);
+      setEvalTarget(null);
+      setVerifyIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w3'));
+      setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
+      setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
+      setPinIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('pin'));
     }
   }, [effectiveProjectId]);
 
@@ -283,11 +431,13 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       regAbortControllerRef.current?.abort();
       pinAbortControllerRef.current?.abort();
       relAbortControllerRef.current?.abort();
+      verifyAbortControllerRef.current?.abort();
+      evalAbortControllerRef.current?.abort();
     };
   }, []);
 
   // F1: Fail-closed strict canApprove check. Missing / undefined canApprove is strictly FALSE!
-  const canApprove = (currentUser as { canApprove?: boolean } | null | undefined)?.canApprove === true;
+  const canApprove = effectiveCanApprove;
 
   const clearErrors = () => {
     setProblemDetails(null);
@@ -307,66 +457,205 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
     }
   };
 
-  // G2 & G3: Invalidate in-flight responses and rotate idempotency keys when form inputs change
+  // G2 & G3 & H2: Invalidate in-flight responses, reset results, and rotate idempotency keys when form inputs change
   const handleProjectIdChange = (val: string) => {
     setProjectId(val);
+    setVerifyResult(null);
+    setVerifyTarget(null);
+    setEvalResult(null);
+    setEvalTarget(null);
+    verifyAbortControllerRef.current?.abort();
+    verifyAbortControllerRef.current = null;
+    evalAbortControllerRef.current?.abort();
+    evalAbortControllerRef.current = null;
+    regAbortControllerRef.current?.abort();
+    regAbortControllerRef.current = null;
+    pinAbortControllerRef.current?.abort();
+    pinAbortControllerRef.current = null;
+    relAbortControllerRef.current?.abort();
+    relAbortControllerRef.current = null;
     regGenerationRef.current++;
     pinGenerationRef.current++;
     relGenerationRef.current++;
+    verifyGenerationRef.current++;
+    evalGenerationRef.current++;
+    setVerifyLoading(false);
+    setEvalLoading(false);
+    setRegLoading(false);
+    setPinLoading(false);
+    setRelLoading(false);
     setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
     setPinIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('pin'));
+    setRelIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('rel'));
+    setVerifyIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w3'));
+    setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
   };
 
   const handleModelIdChange = (val: string) => {
     setModelId(val);
+    setVerifyResult(null);
+    setVerifyTarget(null);
+    verifyAbortControllerRef.current?.abort();
+    verifyAbortControllerRef.current = null;
+    regAbortControllerRef.current?.abort();
+    regAbortControllerRef.current = null;
+    pinAbortControllerRef.current?.abort();
+    pinAbortControllerRef.current = null;
+    relAbortControllerRef.current?.abort();
+    relAbortControllerRef.current = null;
     regGenerationRef.current++;
     pinGenerationRef.current++;
     relGenerationRef.current++;
+    verifyGenerationRef.current++;
+    setVerifyLoading(false);
+    setRegLoading(false);
+    setPinLoading(false);
+    setRelLoading(false);
     setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
     setPinIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('pin'));
+    setRelIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('rel'));
+    setVerifyIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w3'));
   };
 
   const handleVersionChange = (val: string) => {
     setVersion(val);
-    regGenerationRef.current++;
+    setVerifyResult(null);
+    setVerifyTarget(null);
+    verifyAbortControllerRef.current?.abort();
+    verifyAbortControllerRef.current = null;
+    pinAbortControllerRef.current?.abort();
+    pinAbortControllerRef.current = null;
+    relAbortControllerRef.current?.abort();
+    relAbortControllerRef.current = null;
     pinGenerationRef.current++;
     relGenerationRef.current++;
-    setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
+    verifyGenerationRef.current++;
+    setVerifyLoading(false);
+    setPinLoading(false);
+    setRelLoading(false);
     setPinIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('pin'));
+    setRelIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('rel'));
+    setVerifyIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w3'));
   };
 
   const handleRegVersionChange = (val: string) => {
     setRegVersion(val);
+    regAbortControllerRef.current?.abort();
+    regAbortControllerRef.current = null;
     regGenerationRef.current++;
+    setRegLoading(false);
     setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
   };
 
   const handleRegSha256Change = (val: string) => {
     setRegSha256(val);
+    regAbortControllerRef.current?.abort();
+    regAbortControllerRef.current = null;
     regGenerationRef.current++;
+    setRegLoading(false);
     setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
   };
 
   const handleRegByteSizeChange = (val: string) => {
     setRegByteSize(val);
+    regAbortControllerRef.current?.abort();
+    regAbortControllerRef.current = null;
     regGenerationRef.current++;
+    setRegLoading(false);
     setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
   };
 
   const handlePinUntilChange = (val: string) => {
     setPinUntil(val);
+    pinAbortControllerRef.current?.abort();
+    pinAbortControllerRef.current = null;
     pinGenerationRef.current++;
+    setPinLoading(false);
     setPinIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('pin'));
   };
 
   const handleRelLicensePolicyChange = (val: string) => {
     setRelLicensePolicy(val);
+    relAbortControllerRef.current?.abort();
+    relAbortControllerRef.current = null;
     relGenerationRef.current++;
+    setRelLoading(false);
+    setRelIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('rel'));
   };
 
   const handleRelClassificationChange = (val: 'public' | 'internal' | 'restricted') => {
     setRelClassification(val);
+    relAbortControllerRef.current?.abort();
+    relAbortControllerRef.current = null;
     relGenerationRef.current++;
+    setRelLoading(false);
+    setRelIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('rel'));
+  };
+
+  const handleVerifyMeasurementIdChange = (val: string) => {
+    setVerifyMeasurementId(val);
+    setVerifyResult(null);
+    setVerifyTarget(null);
+    verifyAbortControllerRef.current?.abort();
+    verifyAbortControllerRef.current = null;
+    verifyGenerationRef.current++;
+    setVerifyLoading(false);
+    setVerifyIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w3'));
+  };
+
+  const handleEvalSuiteIdChange = (val: string) => {
+    setEvalSuiteId(val);
+    setEvalResult(null);
+    setEvalTarget(null);
+    evalAbortControllerRef.current?.abort();
+    evalAbortControllerRef.current = null;
+    evalGenerationRef.current++;
+    setEvalLoading(false);
+    setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
+  };
+
+  const handleEvalAdapterChange = (val: string) => {
+    setEvalAdapter(val);
+    setEvalResult(null);
+    setEvalTarget(null);
+    evalAbortControllerRef.current?.abort();
+    evalAbortControllerRef.current = null;
+    evalGenerationRef.current++;
+    setEvalLoading(false);
+    setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
+  };
+
+  const handleEvalPromptVerChange = (val: string) => {
+    setEvalPromptVer(val);
+    setEvalResult(null);
+    setEvalTarget(null);
+    evalAbortControllerRef.current?.abort();
+    evalAbortControllerRef.current = null;
+    evalGenerationRef.current++;
+    setEvalLoading(false);
+    setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
+  };
+
+  const handleEvalCtxVerChange = (val: string) => {
+    setEvalCtxVer(val);
+    setEvalResult(null);
+    setEvalTarget(null);
+    evalAbortControllerRef.current?.abort();
+    evalAbortControllerRef.current = null;
+    evalGenerationRef.current++;
+    setEvalLoading(false);
+    setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
+  };
+
+  const handleEvalRequirePinningChange = (checked: boolean) => {
+    setEvalRequirePinning(checked);
+    setEvalResult(null);
+    setEvalTarget(null);
+    evalAbortControllerRef.current?.abort();
+    evalAbortControllerRef.current = null;
+    evalGenerationRef.current++;
+    setEvalLoading(false);
+    setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
   };
 
   // Real API Actions: Lineage, Register, Pin, Release
@@ -516,10 +805,178 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   const handleReleaseModel = async (e: React.FormEvent) => {
     e.preventDefault();
     clearErrors();
-    // Fail-closed guard: pending server idempotency contract (Card 113)
-    setGeneralError('서버 멱등 계약 대기(카드 113): 백엔드 릴리스 멱등성 계약 수립 전까지 릴리스 쓰기 요청이 차단됩니다.');
-    setLiveAnnouncement('모델 릴리스 차단: 서버 멱등 계약 대기(카드 113)');
-    return;
+    if (!canApprove) {
+      setGeneralError('승인 권한(canApprove)이 없는 계정은 모델을 릴리스할 수 없습니다.');
+      return;
+    }
+    if (!projectId.trim() || !modelId.trim() || !version.trim()) {
+      setGeneralError('프로젝트 ID, 모델 ID, 버전을 확인하세요.');
+      return;
+    }
+    if (!relLicensePolicy.trim()) {
+      setGeneralError('라이선스 정책(licensePolicy)을 입력해야 합니다.');
+      return;
+    }
+
+    relAbortControllerRef.current?.abort();
+    const ctrl = new AbortController();
+    relAbortControllerRef.current = ctrl;
+    const currentGen = ++relGenerationRef.current;
+
+    const isReplaySubmission = submittedRelKeysRef.current.has(relIdempotencyKey);
+    // Key is recorded at transmission time (regardless of outcome) so that retries with the same key are identified as resubmissions
+    submittedRelKeysRef.current.add(relIdempotencyKey);
+
+    setRelLoading(true);
+    setLiveAnnouncement(`모델 릴리스 요청 중 (분류: ${relClassification})...`);
+    try {
+      const res = await modelRegistryObservation.releaseModelVersion(
+        projectId.trim(),
+        modelId.trim(),
+        version.trim(),
+        {
+          licensePolicy: relLicensePolicy.trim(),
+          classification: relClassification,
+        },
+        { signal: ctrl.signal, idempotencyKey: relIdempotencyKey }
+      );
+      if (relGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
+      setRelResult(res);
+      setRelIsReplay(isReplaySubmission);
+      // Key rotates ONLY after success!
+      setRelIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('rel'));
+      if (isReplaySubmission) {
+        setLiveAnnouncement(`재시도 응답 수신(서버 원장 결과): [${res.version}] (Stage: ${res.stage})`);
+      } else {
+        setLiveAnnouncement(`신규 모델 릴리스 완료: [${res.version}] (Stage: ${res.stage})`);
+      }
+    } catch (err: unknown) {
+      if (relGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
+      handleApiError(err, '모델 릴리스 실패');
+      // On failure, Idempotency-Key is preserved for retry!
+    } finally {
+      if (relGenerationRef.current === currentGen || relAbortControllerRef.current === ctrl) {
+        setRelLoading(false);
+      }
+    }
+  };
+
+  const handleVerifyVersion = async (e: React.FormEvent) => {
+    e.preventDefault();
+    clearErrors();
+    setVerifyResult(null);
+    if (!canApprove) {
+      setGeneralError('승인 권한(canApprove)이 없는 계정은 모델 버전을 검증할 수 없습니다.');
+      return;
+    }
+    if (verifyLoading) return;
+    if (!projectId.trim() || !modelId.trim() || !version.trim()) {
+      setGeneralError('프로젝트 ID, 모델 ID, 버전을 확인하세요.');
+      return;
+    }
+    const mId = verifyMeasurementId.trim();
+    if (!mId) {
+      setGeneralError('측정 ID(measurementId)를 입력해야 합니다.');
+      return;
+    }
+    if (!/^mvm_[0-9A-HJKMNP-TV-Z]{26}$/.test(mId)) {
+      setGeneralError('유효한 측정 ID 형식(mvm_... 26자리 Crockford Base32)이어야 합니다.');
+      return;
+    }
+
+    verifyAbortControllerRef.current?.abort();
+    const ctrl = new AbortController();
+    verifyAbortControllerRef.current = ctrl;
+    const currentGen = ++verifyGenerationRef.current;
+
+    setVerifyLoading(true);
+    setLiveAnnouncement(`모델 [${modelId}:${version}] W3 커널 측정 검증 요청 중...`);
+    try {
+      const res = await modelRegistryObservation.verifyModelVersion(
+        projectId.trim(),
+        modelId.trim(),
+        version.trim(),
+        { measurementId: mId },
+        { signal: ctrl.signal, idempotencyKey: verifyIdempotencyKey }
+      );
+      if (verifyGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
+      setVerifyResult(res);
+      setVerifyTarget({ projectId: projectId.trim(), modelId: modelId.trim(), version: version.trim() });
+      setVerifyIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w3'));
+      setLiveAnnouncement(
+        `W3 커널 측정 검증 완료: ${modelId.trim()}:${version.trim()} (${res.newlyVerified ? '새로 검증됨' : '이미 검증됨'})`
+      );
+    } catch (err: unknown) {
+      if (verifyGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
+      setVerifyResult(null);
+      handleApiError(err, 'W3 커널 측정 검증 실패');
+    } finally {
+      if (verifyAbortControllerRef.current === ctrl || verifyGenerationRef.current === currentGen) {
+        setVerifyLoading(false);
+      }
+    }
+  };
+
+  const handleStartEvalRun = async (e: React.FormEvent) => {
+    e.preventDefault();
+    clearErrors();
+    setEvalResult(null);
+    if (!canApprove) {
+      setGeneralError('승인 권한(canApprove)이 없는 계정은 평가 스위트를 실행할 수 없습니다.');
+      return;
+    }
+    if (evalLoading) return;
+    if (!projectId.trim() || !evalSuiteId.trim()) {
+      setGeneralError('프로젝트 ID와 평가 스위트 ID를 확인하세요.');
+      return;
+    }
+    const adapterTrimmed = evalAdapter.trim();
+    if (!adapterTrimmed) {
+      setGeneralError('어댑터 식별자(adapter)를 입력해야 합니다.');
+      return;
+    }
+    if (!/^[a-z0-9-]+$/.test(adapterTrimmed)) {
+      setGeneralError('어댑터 식별자는 소문자, 숫자, 하이픈만 허용됩니다.');
+      return;
+    }
+
+    evalAbortControllerRef.current?.abort();
+    const ctrl = new AbortController();
+    evalAbortControllerRef.current = ctrl;
+    const currentGen = ++evalGenerationRef.current;
+
+    setEvalLoading(true);
+    setLiveAnnouncement(`W5 평가 실행 요청 중 (스위트: ${evalSuiteId})...`);
+
+    const componentVersions: Record<string, string> = {};
+    if (evalPromptVer.trim()) componentVersions.prompt = evalPromptVer.trim();
+    if (evalCtxVer.trim()) componentVersions.context = evalCtxVer.trim();
+
+    try {
+      const res = await modelRegistryObservation.startEvalRun(
+        projectId.trim(),
+        evalSuiteId.trim(),
+        {
+          adapter: adapterTrimmed,
+          requireModelPinning: evalRequirePinning,
+          ...(Object.keys(componentVersions).length > 0 ? { componentVersions } : {}),
+        },
+        { signal: ctrl.signal, idempotencyKey: evalIdempotencyKey }
+      );
+      if (evalGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
+      setEvalResult(res);
+      setEvalTarget({ projectId: projectId.trim(), suiteId: evalSuiteId.trim() });
+      setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
+      setLiveAnnouncement(`W5 평가 실행 완료: ${res.evalRunId}`);
+    } catch (err: unknown) {
+      if (evalGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
+      setEvalResult(null);
+      handleApiError(err, 'W5 평가 실행 실패');
+    } finally {
+      if (evalAbortControllerRef.current === ctrl || evalGenerationRef.current === currentGen) {
+        setEvalLoading(false);
+      }
+    }
   };
 
   const selectedModel = lineages.find((m) => m.modelId === selectedModelId) || lineages[0];
@@ -569,20 +1026,55 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             </p>
           </div>
           {/* W3 Seam Badge */}
-          <div
+          <span
             data-testid="badge-w3-verify-seam"
             style={{
               padding: '4px 10px',
               borderRadius: '4px',
               fontSize: '11px',
               fontWeight: 600,
-              backgroundColor: '#21262d',
-              border: '1px solid #30363d',
-              color: '#8b949e',
+              backgroundColor:
+                verifyResult &&
+                verifyTarget &&
+                verifyTarget.projectId === projectId.trim() &&
+                verifyTarget.modelId === modelId.trim() &&
+                verifyTarget.version === version.trim() &&
+                verifyResult.modelId === modelId.trim() &&
+                verifyResult.version === version.trim()
+                  ? '#1f6feb'
+                  : '#21262d',
+              border:
+                verifyResult &&
+                verifyTarget &&
+                verifyTarget.projectId === projectId.trim() &&
+                verifyTarget.modelId === modelId.trim() &&
+                verifyTarget.version === version.trim() &&
+                verifyResult.modelId === modelId.trim() &&
+                verifyResult.version === version.trim()
+                  ? '1px solid #388bfd'
+                  : '1px solid #30363d',
+              color:
+                verifyResult &&
+                verifyTarget &&
+                verifyTarget.projectId === projectId.trim() &&
+                verifyTarget.modelId === modelId.trim() &&
+                verifyTarget.version === version.trim() &&
+                verifyResult.modelId === modelId.trim() &&
+                verifyResult.version === version.trim()
+                  ? '#ffffff'
+                  : '#8b949e',
             }}
           >
-            W3 검증: 미연결 (검증 앵커 #215 대기)
-          </div>
+            {verifyResult &&
+            verifyTarget &&
+            verifyTarget.projectId === projectId.trim() &&
+            verifyTarget.modelId === modelId.trim() &&
+            verifyTarget.version === version.trim() &&
+            verifyResult.modelId === modelId.trim() &&
+            verifyResult.version === version.trim()
+              ? `W3 검증: 검증 완료 (측정: ${verifyResult.verifiedMeasurementId})`
+              : 'W3 검증: 미검증 (커널 계측 검증 대기)'}
+          </span>
         </div>
         {/* Global Resource Binding Inputs */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
@@ -739,6 +1231,40 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             }}
           >
             🚀 모델 릴리스 (Release)
+          </button>
+          <button
+            type="button"
+            data-testid="tab-verify"
+            onClick={() => setActiveTab('verify')}
+            style={{
+              padding: '6px 14px',
+              borderRadius: '6px',
+              border: activeTab === 'verify' ? '1px solid #58a6ff' : '1px solid transparent',
+              backgroundColor: activeTab === 'verify' ? '#1f242c' : 'transparent',
+              color: activeTab === 'verify' ? '#58a6ff' : '#8b949e',
+              cursor: 'pointer',
+              fontSize: '12px',
+              fontWeight: 600,
+            }}
+          >
+            🛡️ W3 검증 (Verify)
+          </button>
+          <button
+            type="button"
+            data-testid="tab-eval-run"
+            onClick={() => setActiveTab('eval-run')}
+            style={{
+              padding: '6px 14px',
+              borderRadius: '6px',
+              border: activeTab === 'eval-run' ? '1px solid #58a6ff' : '1px solid transparent',
+              backgroundColor: activeTab === 'eval-run' ? '#1f242c' : 'transparent',
+              color: activeTab === 'eval-run' ? '#58a6ff' : '#8b949e',
+              cursor: 'pointer',
+              fontSize: '12px',
+              fontWeight: 600,
+            }}
+          >
+            🧪 W5 평가 실행 (Eval)
           </button>
         </div>
         {/* Tab Content: 1. Trace Query */}
@@ -954,33 +1480,210 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 </select>
               </div>
             </div>
-            <div
-              data-testid="banner-release-pending-idempotency"
-              style={{
-                fontSize: '11px',
-                color: '#d29922',
-                backgroundColor: '#2b2111',
-                padding: '8px 12px',
-                borderRadius: '6px',
-                border: '1px solid #9e6a03',
-              }}
-            >
-              ⚠️ 서버 멱등 계약 대기(카드 113): 백엔드 release route(model_release.py)의 Idempotency-Key 처리 계약이 수립될 때까지 쓰기 작업이 fail-closed로 비활성화됩니다.
-            </div>
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
               <Button
                 size="sm"
                 variant="primary"
                 type="submit"
                 data-testid="btn-release-model"
-                disabled={true}
-                aria-disabled="true"
+                disabled={relLoading || !canApprove || !projectId.trim() || !modelId.trim() || !version.trim() || !relLicensePolicy.trim()}
+                aria-disabled={relLoading || !canApprove || !projectId.trim() || !modelId.trim() || !version.trim() || !relLicensePolicy.trim()}
               >
-                모델 릴리스 (POST /release) — 서버 멱등 계약 대기(카드 113)
+                {relLoading ? '릴리스 중...' : '모델 릴리스 (POST /release)'}
               </Button>
-              <span style={{ fontSize: '11px', color: '#fed7aa' }}>
-                ⚠️ 서버 멱등 계약 대기(카드 113)
-              </span>
+              {!canApprove && (
+                <span style={{ fontSize: '11px', color: '#fed7aa' }}>
+                  ⚠️ 승인 권한(canApprove)이 필요한 작업입니다.
+                </span>
+              )}
+            </div>
+          </form>
+        )}
+        {/* Tab Content: 5. W3 Verify */}
+        {activeTab === 'verify' && (
+          <form noValidate onSubmit={handleVerifyVersion} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ fontSize: '12px', color: '#8b949e' }}>
+              ℹ️ W3 커널 측정 검증: 서버 신뢰 워커(trusted-worker)의 계측 기록(measurementId)을 모델 버전에 결속합니다. 측정값(digest, size 등)은 화면이 조작/생성할 수 없으며 오직 커널 기록된 측정 ID만 전송합니다 (정직성 원칙).
+            </div>
+            <div>
+              <label htmlFor="mvm-measurement-id" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
+                커널 측정 ID (measurementId - mvm_ + 26자리 Crockford Base32) *
+              </label>
+              <input
+                id="mvm-measurement-id"
+                data-testid="input-verify-measurement-id"
+                type="text"
+                placeholder="mvm_01JABCDEF1234567890ABCDEFG"
+                value={verifyMeasurementId}
+                onChange={(e) => handleVerifyMeasurementIdChange(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '6px 10px',
+                  backgroundColor: '#0d1117',
+                  border: '1px solid #30363d',
+                  borderRadius: '4px',
+                  color: '#c9d1d9',
+                  fontSize: '12px',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <Button
+                size="sm"
+                variant="primary"
+                type="submit"
+                data-testid="btn-verify-model"
+                disabled={verifyLoading || !canApprove || !projectId || !modelId || !version}
+                aria-disabled={verifyLoading || !canApprove || !projectId || !modelId || !version}
+              >
+                {verifyLoading ? '검증 처리 중...' : 'W3 커널 측정 검증 제출 (POST /models/.../verify)'}
+              </Button>
+              {!canApprove && (
+                <span style={{ fontSize: '11px', color: '#fed7aa' }}>
+                  ⚠️ 승인 권한(canApprove)이 필요한 작업입니다.
+                </span>
+              )}
+            </div>
+          </form>
+        )}
+        {/* Tab Content: 6. W5 Eval Run */}
+        {activeTab === 'eval-run' && (
+          <form noValidate onSubmit={handleStartEvalRun} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' }}>
+              <div>
+                <label htmlFor="eval-suite-id" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
+                  평가 스위트 ID (suiteId) *
+                </label>
+                <input
+                  id="eval-suite-id"
+                  data-testid="input-eval-suite-id"
+                  type="text"
+                  placeholder="evs_01JABCDEF1234567890ABCDEFG"
+                  value={evalSuiteId}
+                  onChange={(e) => handleEvalSuiteIdChange(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '6px 10px',
+                    backgroundColor: '#0d1117',
+                    border: '1px solid #30363d',
+                    borderRadius: '4px',
+                    color: '#c9d1d9',
+                    fontSize: '12px',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+              <div>
+                <label htmlFor="eval-adapter" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
+                  어댑터 식별자 (adapter - codex-cli | claude-code | gemini-cli | antigravity) *
+                </label>
+                <select
+                  id="eval-adapter"
+                  data-testid="input-eval-adapter"
+                  value={evalAdapter}
+                  onChange={(e) => handleEvalAdapterChange(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '6px 10px',
+                    backgroundColor: '#0d1117',
+                    border: '1px solid #30363d',
+                    borderRadius: '4px',
+                    color: '#c9d1d9',
+                    fontSize: '12px',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  <option value="codex-cli">codex-cli</option>
+                  <option value="claude-code">claude-code</option>
+                  <option value="gemini-cli">gemini-cli</option>
+                  <option value="antigravity">antigravity</option>
+                </select>
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' }}>
+              <div>
+                <label htmlFor="eval-prompt-ver" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
+                  프롬프트 버전 (promptVersion - 선택)
+                </label>
+                <input
+                  id="eval-prompt-ver"
+                  data-testid="input-eval-prompt-ver"
+                  type="text"
+                  placeholder="pmt_01J11111111111111111111111"
+                  value={evalPromptVer}
+                  onChange={(e) => handleEvalPromptVerChange(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '6px 10px',
+                    backgroundColor: '#0d1117',
+                    border: '1px solid #30363d',
+                    borderRadius: '4px',
+                    color: '#c9d1d9',
+                    fontSize: '12px',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+              <div>
+                <label htmlFor="eval-ctx-ver" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
+                  컨텍스트 버전 (contextVersion - 선택)
+                </label>
+                <input
+                  id="eval-ctx-ver"
+                  data-testid="input-eval-ctx-ver"
+                  type="text"
+                  placeholder="ctx_01J22222222222222222222222"
+                  value={evalCtxVer}
+                  onChange={(e) => handleEvalCtxVerChange(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '6px 10px',
+                    backgroundColor: '#0d1117',
+                    border: '1px solid #30363d',
+                    borderRadius: '4px',
+                    color: '#c9d1d9',
+                    fontSize: '12px',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input
+                id="eval-pinning"
+                data-testid="checkbox-eval-pinning"
+                type="checkbox"
+                checked={evalRequirePinning}
+                onChange={(e) => handleEvalRequirePinningChange(e.target.checked)}
+              />
+              <label htmlFor="eval-pinning" style={{ fontSize: '12px', color: '#c9d1d9' }}>
+                모델 고정 필수 요구 (requireModelPinning — 재현 불가능한 빌드 차단)
+              </label>
+            </div>
+
+            <div style={{ fontSize: '11px', color: '#8b949e', backgroundColor: '#161b22', padding: '8px', borderRadius: '4px' }}>
+              ℹ️ W5 평가는 지정된 어댑터 CLI를 통해 테스트 스위트를 실행하고 엄격한 게이트 판정 결과를 반환합니다.
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <Button
+                size="sm"
+                variant="primary"
+                type="submit"
+                data-testid="btn-start-eval-run"
+                disabled={evalLoading || !canApprove || !projectId || !evalSuiteId || !evalAdapter}
+                aria-disabled={evalLoading || !canApprove || !projectId || !evalSuiteId || !evalAdapter}
+              >
+                {evalLoading ? '평가 실행 중...' : 'W5 평가 실행 시작 (POST /eval/suites/.../runs)'}
+              </Button>
+              {!canApprove && (
+                <span style={{ fontSize: '11px', color: '#fed7aa' }}>
+                  ⚠️ 승인 권한(canApprove)이 필요한 작업입니다.
+                </span>
+              )}
             </div>
           </form>
         )}
@@ -1045,6 +1748,100 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
         </div>
       )}
       {/* Mutation Results Displays */}
+      {verifyResult &&
+        verifyTarget &&
+        verifyTarget.projectId === projectId.trim() &&
+        verifyTarget.modelId === modelId.trim() &&
+        verifyTarget.version === version.trim() &&
+        verifyResult.modelId === modelId.trim() &&
+        verifyResult.version === version.trim() && (
+        <div
+          role="status"
+          data-testid="registry-verify-success"
+          className="bg-emerald-950/40"
+          style={{
+            padding: '14px 18px',
+            borderRadius: '8px',
+            backgroundColor: 'rgba(46, 160, 67, 0.12)',
+            border: '1px solid #3fb950',
+            color: '#3fb950',
+            fontSize: '13px',
+          }}
+        >
+          <div style={{ fontWeight: 600 }}>
+            ✔ 모델 무결성 검증 완료 (200 OK) — {verifyResult.newlyVerified ? '새로 검증됨' : '이미 검증됨'}
+          </div>
+          <div style={{ marginTop: '6px', fontSize: '12px', color: '#c9d1d9', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px' }}>
+            <div>Version ID: <code>{verifyResult.modelVersionId}</code></div>
+            <div>Version: <strong>{verifyResult.version}</strong> (Stage: {verifyResult.stage})</div>
+            <div>Content Digest: <code>{verifyResult.contentSha256.slice(0, 16)}...</code></div>
+            <div>Verified Measurement: <code data-testid="verified-measurement-id">{verifyResult.verifiedMeasurementId}</code></div>
+            <div>Verified At: {verifyResult.verifiedAt}</div>
+            <div>Newly Verified: <span data-testid="verify-newly-verified-flag">{String(verifyResult.newlyVerified)}</span></div>
+          </div>
+        </div>
+      )}
+
+      {evalResult &&
+        evalTarget &&
+        evalTarget.projectId === projectId.trim() &&
+        evalTarget.suiteId === evalSuiteId.trim() &&
+        evalResult.suiteId === evalSuiteId.trim() && (
+        <div
+          role="status"
+          data-testid="registry-eval-success"
+          style={{
+            padding: '14px 18px',
+            borderRadius: '8px',
+            backgroundColor: evalResult.passedGate ? 'rgba(46, 160, 67, 0.12)' : 'rgba(248, 81, 73, 0.12)',
+            border: evalResult.passedGate ? '1px solid #3fb950' : '1px solid #f85149',
+            color: evalResult.passedGate ? '#3fb950' : '#f85149',
+            fontSize: '13px',
+          }}
+        >
+          <div style={{ fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>
+              {evalResult.status === 'completed'
+                ? `✔ 평가 스위트 실행 완료 (Status: ${evalResult.status})`
+                : evalResult.status === 'aborted'
+                ? `⚠️ 평가 스위트 중단됨 (Status: ${evalResult.status})`
+                : `⏳ 평가 스위트 실행 중 (Status: ${evalResult.status})`}
+            </span>
+            <span
+              data-testid="eval-gate-badge"
+              style={{
+                padding: '2px 8px',
+                borderRadius: '4px',
+                fontSize: '11px',
+                fontWeight: 700,
+                backgroundColor: evalResult.passedGate ? '#1a7f37' : '#cf222e',
+                color: '#ffffff',
+              }}
+            >
+              {evalResult.passedGate ? 'GATE PASS' : 'GATE FAIL'}
+            </span>
+          </div>
+          <div style={{ marginTop: '6px', fontSize: '12px', color: '#c9d1d9' }}>
+            <div>통과: {evalResult.passedCases} / {evalResult.totalCases} 케이스 (위반 {evalResult.violations}건)</div>
+            <div style={{ marginTop: '4px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px' }}>
+              <div>Run ID: <code>{evalResult.evalRunId}</code></div>
+              <div>Suite ID: <code>{evalResult.suiteId}</code></div>
+              <div>Started: {evalResult.startedAt}</div>
+              <div>Ended: <span data-testid="eval-ended-at">{evalResult.endedAt ? evalResult.endedAt : 'NOT_OBSERVED'}</span></div>
+            </div>
+            {evalResult.componentVersions && Object.keys(evalResult.componentVersions).length > 0 && (
+              <div style={{ marginTop: '6px', fontSize: '11px', color: '#8b949e' }}>
+                <span style={{ fontWeight: 600 }}>구성요소 버전 (componentVersions): </span>
+                <span data-testid="eval-component-versions">
+                  {Object.entries(evalResult.componentVersions)
+                    .map(([k, v]) => `${k}=${v}`)
+                    .join(', ')}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
       {regResult && (
         <div
           role="status"
@@ -1100,13 +1897,24 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           style={{
             padding: '14px 18px',
             borderRadius: '8px',
-            backgroundColor: 'rgba(46, 160, 67, 0.12)',
-            border: '1px solid #3fb950',
-            color: '#3fb950',
+            backgroundColor: relIsReplay ? 'rgba(56, 139, 253, 0.12)' : 'rgba(46, 160, 67, 0.12)',
+            border: `1px solid ${relIsReplay ? '#388bfd' : '#3fb950'}`,
+            color: relIsReplay ? '#58a6ff' : '#3fb950',
             fontSize: '13px',
           }}
         >
-          <div style={{ fontWeight: 600 }}>✔ 모델 릴리스 완료 (200 OK)</div>
+          <div style={{ fontWeight: 600 }}>
+            {relIsReplay
+              ? 'ℹ️ 모델 릴리스 확인 완료 (재시도 응답 — 서버 원장 결과, 200 OK)'
+              : '✔ 모델 릴리스 완료 (200 OK)'}
+          </div>
+          <div style={{ marginTop: '4px', fontSize: '11px', color: '#8b949e' }}>
+            <span data-testid="release-replay-indicator">
+              {relIsReplay
+                ? '재시도 응답 — 서버 원장 결과 (저장된 응답일 수 있음)'
+                : '신규 릴리스 완료 (Fresh)'}
+            </span>
+          </div>
           <div style={{ marginTop: '6px', fontSize: '12px', color: '#c9d1d9', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px' }}>
             <div>Version ID: <code>{relResult.modelVersionId}</code></div>
             <div>Version: <strong>{relResult.version}</strong></div>
@@ -1674,7 +2482,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
           <div>
             <h4 style={{ margin: 0, fontSize: '15px', color: '#f0f6fc' }}>
-              Multi-LLM Provider Adapter Conformance (G-03 1단계 API 연동)
+              Multi-LLM Provider Adapter Conformance (G-03 2단계 API 연동)
             </h4>
             <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
               컨트롤 플레인 호스트의 실제 어댑터 적합성 상태를 조회합니다. 저장된 기록이 없으면 정직하게 <code style={{ color: '#e3b341' }}>NOT_OBSERVED</code>(미측정)와 정본 체크리스트 규격을, 기록이 있으면 <code style={{ color: '#e3b341' }}>RECORDED</code>와 어댑터별 기록을 반환합니다. 기록의 측정 대상은 설치된 CLI가 아니라 제품 fixture adapter입니다(<code>subject: fixture-adapter</code>).
@@ -1691,7 +2499,16 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             data-testid="conformance-project-input"
             placeholder="Project ID (prj_...)"
             value={conformanceProjectId}
-            onChange={(e) => setConformanceProjectId(e.target.value)}
+            onChange={(e) => {
+              setConformanceProjectId(e.target.value);
+              setConformanceData(null);
+              setConformanceError(null);
+              singleConformanceAbortRef.current?.abort();
+              ++singleConformanceGenRef.current;
+              setSingleConformanceLoading(false);
+              setSingleConformanceData(null);
+              setSingleConformanceError(null);
+            }}
             style={{
               padding: '6px 10px',
               backgroundColor: '#0d1117',
@@ -1874,6 +2691,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 </div>
               )}
             </div>
+
             {/* Records per adapter (RECORDED branch, design #218 v1.2 §4-1) */}
             {conformanceData.status === 'RECORDED' && (
               <div style={{ overflowX: 'auto' }}>
@@ -1894,6 +2712,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                       <th scope="col" style={{ padding: '8px' }}>Contract / Suite</th>
                       <th scope="col" style={{ padding: '8px' }}>결과 (전체 · 통과 · 실패 · 건너뜀)</th>
                       <th scope="col" style={{ padding: '8px' }}>Recorded At</th>
+                      <th scope="col" style={{ padding: '8px' }}>단건 조회</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1922,12 +2741,27 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                         <td style={{ padding: '8px', color: '#8b949e' }}>
                           <span data-testid={`conformance-record-recorded-at-${idx}`}>{record.recordedAt}</span>
                         </td>
+                        <td style={{ padding: '8px' }}>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            disabled={singleConformanceLoading}
+                            data-testid={`conformance-inspect-btn-${idx}`}
+                            onClick={() => {
+                              setSingleAdapterName(record.adapter);
+                              handleFetchSingleConformance(undefined, record.adapter);
+                            }}
+                          >
+                            단건 상세 조회
+                          </Button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
             )}
+
             {/* Dynamic Checklist Table from API Response (FE Hardcoding Prohibited) */}
             <div style={{ overflowX: 'auto' }}>
               <div style={{ fontSize: '13px', fontWeight: 600, color: '#f0f6fc', marginBottom: '8px' }}>
@@ -1998,6 +2832,374 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             </div>
           </div>
         )}
+
+        {/* Single Adapter Conformance Observation Section (GET /v1/projects/:projectId/adapters/:name/conformance) */}
+        <div
+          data-testid="single-adapter-conformance-section"
+          style={{
+            marginTop: '24px',
+            paddingTop: '20px',
+            borderTop: '1px solid #30363d',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px',
+          }}
+        >
+          <div>
+            <h5 style={{ margin: 0, fontSize: '14px', color: '#f0f6fc' }}>
+              단건 어댑터 Conformance 조회 (Single Route)
+            </h5>
+            <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
+              엔드포인트 <code>GET /v1/projects/:projectId/adapters/:name/conformance</code>를 통해 개별 어댑터의 정본 체크리스트 규격 또는 상세 테스트 결과를 조회합니다.
+            </p>
+          </div>
+
+          <form
+            onSubmit={handleFetchSingleConformance}
+            style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}
+          >
+            <input
+              type="text"
+              data-testid="single-conformance-adapter-input"
+              aria-label="어댑터 이름"
+              placeholder="Adapter Name (e.g. codex-cli)"
+              value={singleAdapterName}
+              onChange={(e) => {
+                setSingleAdapterName(e.target.value);
+                singleConformanceAbortRef.current?.abort();
+                ++singleConformanceGenRef.current;
+                setSingleConformanceLoading(false);
+                setSingleConformanceData(null);
+                setSingleConformanceError(null);
+              }}
+              style={{
+                padding: '6px 10px',
+                backgroundColor: '#0d1117',
+                border: '1px solid #30363d',
+                borderRadius: '6px',
+                color: '#c9d1d9',
+                fontSize: '13px',
+                fontFamily: 'var(--font-mono, monospace)',
+                minWidth: '200px',
+              }}
+            />
+            <Button
+              size="sm"
+              variant="primary"
+              type="submit"
+              data-testid="single-conformance-fetch-btn"
+              disabled={singleConformanceLoading || !conformanceProjectId.trim() || !singleAdapterName.trim()}
+            >
+              {singleConformanceLoading ? '조회 중...' : '어댑터 Conformance 조회'}
+            </Button>
+          </form>
+
+          {/* Live Region for Single Conformance Status Announcements */}
+          <div
+            data-testid="single-conformance-live-status"
+            role="status"
+            aria-live="polite"
+            style={
+              singleConformanceLoading || singleConformanceError || singleConformanceData
+                ? {
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    fontWeight: 500,
+                    backgroundColor: singleConformanceLoading
+                      ? 'rgba(56, 139, 253, 0.15)'
+                      : singleConformanceError
+                      ? 'rgba(248, 81, 73, 0.15)'
+                      : 'rgba(240, 136, 62, 0.15)',
+                    border: `1px solid ${
+                      singleConformanceLoading
+                        ? '#58a6ff'
+                        : singleConformanceError
+                        ? '#ff7b72'
+                        : '#f0883e'
+                    }`,
+                    color: singleConformanceLoading
+                      ? '#58a6ff'
+                      : singleConformanceError
+                      ? '#ff7b72'
+                      : '#f0883e',
+                  }
+                : undefined
+            }
+          >
+            {singleConformanceLoading && '⏳ 단건 어댑터 Conformance 상태 조회 중...'}
+            {singleConformanceError && '❌ 단건 어댑터 Conformance 조회 실패'}
+            {!singleConformanceLoading &&
+              !singleConformanceError &&
+              singleConformanceData &&
+              (singleConformanceData.status === 'RECORDED'
+                ? `ℹ️ [${singleConformanceData.adapter}] 조회 완료: 기록됨(RECORDED) (총 ${singleConformanceData.total}개 테스트 완료)`
+                : `ℹ️ [${singleConformanceData.adapter}] 조회 완료: 미측정(NOT_OBSERVED) (${singleConformanceData.checks.length}개 정본 체크 항목)`)}
+          </div>
+
+          {/* Single Conformance Error Banner on ProblemDetails (401, 403, 404 RES-0004, 500 SYS-0002, 503 SYS-0001) */}
+          {singleConformanceError && (
+            <div
+              role="alert"
+              data-testid="single-conformance-error-banner"
+              style={{
+                padding: '10px 14px',
+                borderRadius: '6px',
+                fontSize: '13px',
+                backgroundColor: 'rgba(248, 81, 73, 0.15)',
+                border: '1px solid #ff7b72',
+                color: '#ff7b72',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '8px',
+              }}
+            >
+              <div>
+                ❌ {singleConformanceError.code && singleConformanceError.status
+                  ? `[${singleConformanceError.code}] (${singleConformanceError.status}) `
+                  : ''}
+                {singleConformanceError.detail}
+                {singleConformanceError.retryable === false && (
+                  <span style={{ marginLeft: '8px', fontSize: '11px', color: '#8b949e' }}>
+                    (재시도 불가)
+                  </span>
+                )}
+              </div>
+              {singleConformanceError.retryable && (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  data-testid="single-conformance-retry-btn"
+                  onClick={() => handleFetchSingleConformance()}
+                >
+                  다시 시도
+                </Button>
+              )}
+            </div>
+          )}
+
+          {/* Single Conformance Result Container */}
+          {singleConformanceData && (
+            <div
+              data-testid="single-conformance-result-container"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '14px',
+              }}
+            >
+              {/* Metadata Grid */}
+              <div
+                style={{
+                  backgroundColor: '#0d1117',
+                  border: '1px solid #30363d',
+                  borderRadius: '6px',
+                  padding: '14px',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                  gap: '10px',
+                  fontSize: '13px',
+                }}
+              >
+                <div>
+                  <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>CONFORMANCE STATUS</span>
+                  <span
+                    data-testid="single-conformance-status-badge"
+                    style={{
+                      display: 'inline-block',
+                      marginTop: '4px',
+                      padding: '2px 8px',
+                      borderRadius: '4px',
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      backgroundColor:
+                        singleConformanceData.status === 'RECORDED'
+                          ? 'rgba(56, 139, 253, 0.15)'
+                          : 'rgba(240, 136, 62, 0.15)',
+                      color: singleConformanceData.status === 'RECORDED' ? '#58a6ff' : '#f0883e',
+                    }}
+                  >
+                    {singleConformanceData.status === 'RECORDED' ? '기록됨 (RECORDED)' : `미측정 (${singleConformanceData.status})`}
+                  </span>
+                </div>
+                <div>
+                  <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>ADAPTER</span>
+                  <code data-testid="single-conformance-adapter" style={{ color: '#f0f6fc', fontWeight: 600 }}>
+                    {singleConformanceData.adapter}
+                  </code>
+                </div>
+                <div>
+                  <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>SCOPE</span>
+                  <code data-testid="single-conformance-scope" style={{ color: '#58a6ff' }}>
+                    {singleConformanceData.scope}
+                  </code>
+                </div>
+                <div>
+                  <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>CONTRACT VERSION</span>
+                  <span data-testid="single-conformance-contract-version" style={{ color: '#c9d1d9', fontFamily: 'var(--font-mono, monospace)' }}>
+                    {singleConformanceData.contractVersion}
+                  </span>
+                </div>
+
+                {singleConformanceData.status === 'NOT_OBSERVED' ? (
+                  <>
+                    <div>
+                      <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>RECORDED AT</span>
+                      <span data-testid="single-conformance-recorded-at" style={{ color: '#8b949e' }}>
+                        null (미측정)
+                      </span>
+                    </div>
+                    <div style={{ gridColumn: '1 / -1' }}>
+                      <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>REASON</span>
+                      <span data-testid="single-conformance-reason" style={{ color: '#c9d1d9' }}>
+                        {singleConformanceData.reason}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>SUBJECT / PROVENANCE</span>
+                      <span data-testid="single-conformance-subject" style={{ color: '#c9d1d9' }}>
+                        {singleConformanceData.subject} / {singleConformanceData.provenance}
+                      </span>
+                    </div>
+                    <div>
+                      <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>SUITE CONTRACT VERSION</span>
+                      <span data-testid="single-conformance-suite-contract-version" style={{ color: '#c9d1d9', fontFamily: 'var(--font-mono, monospace)' }}>
+                        {singleConformanceData.suiteContractVersion}
+                      </span>
+                    </div>
+                    <div>
+                      <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>RESULTS</span>
+                      <span data-testid="single-conformance-counts" style={{ color: '#f0f6fc', fontWeight: 600 }}>
+                        {`전체 ${singleConformanceData.total} · 통과 ${singleConformanceData.passed} · 실패 ${singleConformanceData.failed} · 건너뜀 ${singleConformanceData.skipped}`}
+                      </span>
+                    </div>
+                    <div>
+                      <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>RECORDED AT</span>
+                      <span data-testid="single-conformance-recorded-at" style={{ color: '#8b949e' }}>
+                        {singleConformanceData.recordedAt}
+                      </span>
+                    </div>
+                    <div style={{ gridColumn: '1 / -1' }}>
+                      <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>SUBJECT NOTE</span>
+                      <span data-testid="single-conformance-subject-note" style={{ color: '#c9d1d9' }}>
+                        fixture-adapter · in-server — 제품 fixture adapter에 대한 suite 실행 기록이며 설치된 CLI의 적합성이 아닙니다.
+                      </span>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* When NOT_OBSERVED: Render Checks Descriptors */}
+              {singleConformanceData.status === 'NOT_OBSERVED' && (
+                <div style={{ overflowX: 'auto' }}>
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#f0f6fc', marginBottom: '8px' }}>
+                    정본 Conformance Checklist ({singleConformanceData.checks.length}개 항목)
+                  </div>
+                  <table
+                    data-testid="single-conformance-checks-table"
+                    style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}
+                  >
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
+                        <th scope="col" style={{ padding: '8px' }}>#</th>
+                        <th scope="col" style={{ padding: '8px' }}>Check Name</th>
+                        <th scope="col" style={{ padding: '8px' }}>Capability Gated</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {singleConformanceData.checks.map((check, idx) => (
+                        <tr
+                          key={`${idx}-${check.name}`}
+                          data-testid={`single-conformance-check-row-${idx}`}
+                          style={{ borderBottom: '1px solid #21262d' }}
+                        >
+                          <td style={{ padding: '8px', color: '#8b949e' }}>{idx + 1}</td>
+                          <td style={{ padding: '8px', fontWeight: 600, color: '#f0f6fc', fontFamily: 'var(--font-mono, monospace)' }}>
+                            <span data-testid={`single-conformance-check-name-${idx}`}>{check.name}</span>
+                          </td>
+                          <td style={{ padding: '8px' }}>
+                            <span
+                              data-testid={`single-conformance-check-gated-${idx}`}
+                              style={{
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                fontSize: '11px',
+                                fontWeight: 600,
+                                backgroundColor: check.capabilityGated ? 'rgba(56, 139, 253, 0.15)' : 'rgba(160, 168, 178, 0.15)',
+                                color: check.capabilityGated ? '#58a6ff' : '#a0a8b2',
+                              }}
+                            >
+                              {check.capabilityGated ? 'Capability Gated' : 'Standard'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* When RECORDED: Render Detailed Outcomes */}
+              {singleConformanceData.status === 'RECORDED' && (
+                <div style={{ overflowX: 'auto' }}>
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#f0f6fc', marginBottom: '8px' }}>
+                    상세 체크 결과 ({singleConformanceData.outcomes.length}개 항목)
+                  </div>
+                  <table
+                    data-testid="single-conformance-outcomes-table"
+                    style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}
+                  >
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
+                        <th scope="col" style={{ padding: '8px' }}>#</th>
+                        <th scope="col" style={{ padding: '8px' }}>Check Name</th>
+                        <th scope="col" style={{ padding: '8px' }}>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {singleConformanceData.outcomes.map((outcome, idx) => (
+                        <tr
+                          key={`${idx}-${outcome.name}`}
+                          data-testid={`single-conformance-outcome-row-${idx}`}
+                          style={{ borderBottom: '1px solid #21262d' }}
+                        >
+                          <td style={{ padding: '8px', color: '#8b949e' }}>{idx + 1}</td>
+                          <td style={{ padding: '8px', fontWeight: 600, color: '#f0f6fc', fontFamily: 'var(--font-mono, monospace)' }}>
+                            <span data-testid={`single-conformance-outcome-name-${idx}`}>{outcome.name}</span>
+                          </td>
+                          <td style={{ padding: '8px' }}>
+                            <span
+                              data-testid={`single-conformance-outcome-status-${idx}`}
+                              style={{
+                                padding: '2px 8px',
+                                borderRadius: '4px',
+                                fontSize: '11px',
+                                fontWeight: 600,
+                                backgroundColor: outcome.skipped
+                                  ? 'rgba(139, 148, 158, 0.15)'
+                                  : outcome.passed
+                                  ? 'rgba(56, 139, 253, 0.15)'
+                                  : 'rgba(248, 81, 73, 0.15)',
+                                color: outcome.skipped ? '#8b949e' : outcome.passed ? '#58a6ff' : '#ff7b72',
+                              }}
+                            >
+                              {outcome.skipped ? '건너뜀 (Skipped)' : outcome.passed ? '통과 (Passed)' : '실패 (Failed)'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
       {/* Real Model Commitment Observation Panel (Control-Plane GET /v1/.../commitment) */}
       <div

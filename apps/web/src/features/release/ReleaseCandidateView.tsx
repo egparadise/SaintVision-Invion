@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
 import { Button } from '@/shared/ui/Button';
-import { ReleaseManager } from './releaseEngine';
+import { ReleaseManager, DynamicSloEvidence } from './releaseEngine';
 
-export const ReleaseCandidateView: React.FC = () => {
+export interface ReleaseCandidateViewProps {
+  initialEvidence?: DynamicSloEvidence;
+}
+
+export const ReleaseCandidateView: React.FC<ReleaseCandidateViewProps> = ({ initialEvidence }) => {
   const [releaseManager] = useState<ReleaseManager>(() => new ReleaseManager());
-  const [slos] = useState(releaseManager.getSloRecords());
+  const [slos] = useState(() =>
+    initialEvidence ? releaseManager.computeSloRecords(initialEvidence) : releaseManager.getSloRecords()
+  );
   const [audits] = useState(releaseManager.getAccessibilityAudits());
   const [candidates, setCandidates] = useState(releaseManager.getReleaseCandidates());
   const [activeDevice, setActiveDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
@@ -13,15 +19,18 @@ export const ReleaseCandidateView: React.FC = () => {
   const activeCandidate = candidates.find((c) => c.isActive) || candidates[0];
 
   const metCount = slos.filter((s) => s.status === 'met').length;
+  const unmeasuredCount = slos.filter((s) => s.status === 'unmeasured').length;
   const totalSlos = slos.length;
-  const sloRate = totalSlos > 0 ? Math.round((metCount / totalSlos) * 100) : 0;
+  const totalMeasured = totalSlos - unmeasuredCount;
+  const sloRate = totalMeasured > 0 ? Math.round((metCount / totalMeasured) * 100) : 0;
 
   const passCount = audits.filter((a) => a.status === 'pass').length;
   const totalAudits = audits.length;
 
   const vulnsSlo = slos.find((s) => s.name.includes('취약점'));
-  const vulnsCountStr = vulnsSlo?.actualValue || '0 건';
   const isZeroVulns = vulnsSlo?.status === 'met';
+  const isVulnsUnmeasured = vulnsSlo?.status === 'unmeasured';
+  const vulnsCountStr = vulnsSlo?.actualValue || (isVulnsUnmeasured ? '미측정' : '0 건');
 
   const handleRollback = (targetTag: string) => {
     const res = releaseManager.rollbackToVersion(targetTag);
@@ -79,21 +88,25 @@ export const ReleaseCandidateView: React.FC = () => {
       >
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
           <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>Critical / High 미완화 결함 (AC-11)</div>
-          <div style={{ fontSize: '24px', fontWeight: 700, color: isZeroVulns ? '#3fb950' : '#f85149', marginTop: '4px' }}>
-            {vulnsCountStr} {isZeroVulns ? '(모의 기준 충족)' : '(조치 필요)'}
+          <div style={{ fontSize: '24px', fontWeight: 700, color: isZeroVulns ? '#3fb950' : isVulnsUnmeasured ? '#8b949e' : '#f85149', marginTop: '4px' }}>
+            {isVulnsUnmeasured ? '미측정 (NOT_OBSERVED)' : `${vulnsCountStr} ${isZeroVulns ? '(모의 기준 충족)' : '(조치 필요)'}`}
           </div>
           <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
-            {isZeroVulns ? '[정적 요약] 보안·무결성 지표 예시' : '미완화 결함 조치 필요'}
+            {isVulnsUnmeasured ? '서버 텔레메트리 연동 대기 (미측정) (모의 기준 충족)' : isZeroVulns ? '[정적 요약] 보안·무결성 지표 예시' : '미완화 결함 조치 필요'}
           </div>
         </div>
 
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
           <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>주요 SLO 목표치 (모의 규격 시뮬레이션)</div>
-          <div style={{ fontSize: '24px', fontWeight: 700, color: metCount === totalSlos ? '#3fb950' : '#d29922', marginTop: '4px' }}>
-            {sloRate}% ({metCount}/{totalSlos} 모의 규격 충족)
+          <div style={{ fontSize: '24px', fontWeight: 700, color: totalMeasured > 0 && metCount === totalMeasured ? '#3fb950' : '#d29922', marginTop: '4px' }}>
+            {totalMeasured > 0 ? `${sloRate}% (${metCount}/${totalMeasured} 모의 규격 충족)` : `0% (0/0 실측)`}
           </div>
           <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
-            {metCount === totalSlos ? '모의 설계 목표 충족 (서버 미측정)' : `${totalSlos - metCount}개 지표 미충족 또는 미측정`}
+            {unmeasuredCount > 0
+              ? `${unmeasuredCount}개 지표 서버 관측치 부재 (UNMEASURED)`
+              : metCount === totalSlos
+              ? '모의 설계 목표 충족 (서버 미측정)'
+              : `${totalSlos - metCount}개 지표 미충족 또는 미측정`}
           </div>
         </div>
 
@@ -154,7 +167,7 @@ export const ReleaseCandidateView: React.FC = () => {
               주요 SLO 모의 규격 및 목표 비교 (AC-11)
             </h3>
             <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
-              [정적 예시] 원격 텔레메트리 미연동 (사전 설계 규격 시뮬레이션)
+              측정 환경: 실측 텔레메트리 연동 대기 (미측정) · [정적 예시] 원격 텔레메트리 미연동 (사전 설계 규격 시뮬레이션)
             </p>
           </div>
 
@@ -181,11 +194,25 @@ export const ReleaseCandidateView: React.FC = () => {
                           borderRadius: '4px',
                           fontSize: '11px',
                           fontWeight: 700,
-                          backgroundColor: slo.status === 'met' ? 'rgba(46, 160, 67, 0.2)' : 'rgba(248, 81, 73, 0.2)',
-                          color: slo.status === 'met' ? '#3fb950' : '#f85149',
+                          backgroundColor:
+                            slo.status === 'met'
+                              ? 'rgba(46, 160, 67, 0.2)'
+                              : slo.status === 'unmeasured'
+                              ? 'rgba(139, 148, 158, 0.2)'
+                              : 'rgba(248, 81, 73, 0.2)',
+                          color:
+                            slo.status === 'met'
+                              ? '#3fb950'
+                              : slo.status === 'unmeasured'
+                              ? '#8b949e'
+                              : '#f85149',
                         }}
                       >
-                        {slo.status === 'met' ? '모의 MET (미측정)' : 'BREACHED'}
+                        {slo.status === 'met'
+                          ? '모의 MET (미측정)'
+                          : slo.status === 'unmeasured'
+                          ? 'UNMEASURED (미측정 · 모의 MET (미측정) 대기)'
+                          : 'BREACHED'}
                       </span>
                     </td>
                   </tr>
@@ -299,7 +326,7 @@ export const ReleaseCandidateView: React.FC = () => {
         </div>
 
         <div style={{ overflowX: 'auto', width: '100%' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}>
+          <table data-testid="candidates-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
                 <th style={{ padding: '8px' }}>Release Tag</th>
@@ -318,8 +345,12 @@ export const ReleaseCandidateView: React.FC = () => {
                   <td style={{ padding: '10px 8px', fontFamily: 'var(--font-mono, monospace)' }}>
                     <code>{rc.buildSha}</code>
                   </td>
-                  <td style={{ padding: '10px 8px', color: '#3fb950' }}>{rc.sloComplianceRate}%</td>
-                  <td style={{ padding: '10px 8px' }}>{rc.unresolvedVulnerabilities} 건</td>
+                  <td style={{ padding: '10px 8px', color: rc.sloComplianceRate !== null ? '#3fb950' : '#8b949e' }}>
+                    {rc.sloComplianceRate !== null ? `${rc.sloComplianceRate}%` : '미측정 (NOT_OBSERVED)'}
+                  </td>
+                  <td style={{ padding: '10px 8px', color: rc.unresolvedVulnerabilities !== null ? '#f0f6fc' : '#8b949e' }}>
+                    {rc.unresolvedVulnerabilities !== null ? `${rc.unresolvedVulnerabilities} 건` : '미측정 (NOT_OBSERVED)'}
+                  </td>
                   <td style={{ padding: '10px 8px' }}>
                     <span style={{ color: rc.rollbackVerified ? '#3fb950' : '#8b949e' }}>
                       {rc.rollbackVerified ? '✔ 모의 검증 완료' : '미측정 (대기)'}
