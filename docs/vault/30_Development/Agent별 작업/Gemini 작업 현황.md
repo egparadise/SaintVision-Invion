@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.135"
+version: "1.0.139"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-29T00:20:00+09:00"
+updated: "2026-09-29T02:05:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,6 +19,70 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
+- 확인 기준: 2026-09-29T02:05:00+09:00 (최신 tip `agent/gemini/g05-fe-verify-eval`, PR #228 1차·2차·3차 리뷰 조치 완료: H1~H3, M1~M5, L1~L5, N1~N2 전수 반영).
+
+## 2026-09-29 G-05 W3 Verify 및 W5 Eval Run Codex/Claude 1차·2차·3차 리뷰 조치 (PR #228)
+
+- **PR**: #228 (https://github.com/egparadise/SaintVision-Invion/pull/228)
+- **Base / Head**: PR #228 (`agent/gemini/g05-fe-verify-eval`, base `f23c0423`).
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude (UI·테스트 축), Codex (계약 축).
+- **조치 요약**:
+  1. **H3 병합 게이트 해소**: base `f23c0423` 머지 및 충돌 해소 커밋 `21607a24` push로 PR MERGEABLE 전환 및 hosted CI backend 3.12/3.14, desktop-browser, docs, frontend 전수 green 실측.
+  2. **H1 어댑터 식별자 정합**: 백엔드 `adapters/agents.py` 정본 어댑터 어휘(`codex-cli`, `claude-code`, `gemini-cli`, `antigravity`)를 `<select>` 선택형으로 제공, 기본값 `codex-cli` 지정, 픽스처 동기화.
+  3. **H2 Zero Fake Verification (#209)**: `verifyResult` 및 `evalResult`를 현재 모델/버전/스위트 입력에 결속. 입력 변경 시 및 새 제출 실패 시 결과를 즉시 비우고, `useEffect([effectiveProjectId])` prop 동기화 시에도 결과 초기화 및 타깃 재설정. 배지와 성공 카드는 발행 당시 타깃과 일치할 때만 렌더링.
+  4. **N1 입력 변경 시 in-flight abort 및 로딩 즉시 해제**: 입력 변경 핸들러에서 진행 중 요청을 abort하고 로딩 상태(`setVerifyLoading(false)`, `setEvalLoading(false)`)를 즉시 해제하여 버튼 잠금 원천 차단. `finally` 블록에서도 안전하게 소유자 로딩 해제.
+  5. **N2 늦은 응답 시험 보강**: Crockford ULID 규격(26자리)에 맞는 `mvm_01JABCDEF01234567890123451`로 수정 및 `expect(resolveFirst).not.toBeNull()` 단언. W5 세대 가드(늦은 응답 폐기) 시험 추가.
+  6. **M1 응답 가드 32키 상한 제거**: `isEvalRunResponse()`에서 정본 스키마와 1:1로 `componentVersions` 32개 상한 제한을 제거하여 서버 34~35개 키 응답 합법 수용.
+  7. **M2 멱등키 수명주기 완결**: W3/W5 성공 수신 시 새 `Idempotency-Key` 회전. 실패 시 키 보존, 입력 변경 시 키 회전.
+  8. **M3 서버 오류 문자열 및 픽스처 일치**: 409 detail을 서버 정본 `SNAPSHOT_DETAIL`로, 503 detail을 `OBSERVATION_DETAIL`로 수정. 시험 픽스처 카테고리 정합화(SYS-0001은 `category: 'SYS'`, GRAPH-0002는 `category: 'GRAPH'` 및 `traceId`, `causeRef: null`, `evidenceId: null` 포함). W5 eval run route는 서버 계약(`eval_runs.py:100-104`)에 503 매핑이 없으므로, 서버가 실제 반환하는 미매핑 내부 장애 정본인 `500 SYS-0002` (`detail: 'The service raised an error this route cannot represent.'`, `retryable: false`) 픽스처로 전면 교체하여 멱등키 보존 검증.
+  9. **M4 회귀 시험 전면 강화 (22개 시험)**: 키 수명주기, generation/abort 늦은 응답 폐기(W3/W5), N1 입력 변경 시 로딩 해제(W3/W5), `canApprove` false 및 undefined 각각 독립 root에서 버튼 disabled + 폼 서밋 핸들러 차단 + 네트워크 호출 0건 + alert 표출 실측 (W3/W5 전수), W3/W5 응답 계약 불일치 alert 시험, endedAt null 표시, H2 결과 초기화 및 prop 동기화 시험 등.
+  10. **M5 결과 카드 표출 충실도**: status 동적 렌더링, endedAt null 시 `NOT_OBSERVED` 명시, `componentVersions` 화면 표출.
+  11. **L1~L5 접근성 및 마이너 정비**: 배지 문구 수정, Crockford Base32 26자리 플레이스홀더, WCAG AA 4.5:1 대비 충족(PASS 5.08:1, FAIL 5.36:1 실측 반영), 클라이언트 권한 에러 문구 정비, 로딩 해제 가드 보강.
+- **실측 검증**:
+  - Vitest: `apps/web/tests/model-verify-eval-routes.test.tsx` 22 passed (894ms), `apps/web/tests/model-registry-business-routes.test.tsx` 20 passed (923ms). (웹 전체 81 test files / 773 passed, 0 failures).
+  - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist/ 번들 생성 성공 (`dist/assets/index-B-CJTiXt.js` 892.68 kB, exit 0).
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (3.02s, exit 0).
+  - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --check` PASS (0 conflicts).
+  - Hosted CI: commit `f0c78462` backend (3.12)/(3.14), desktop-browser, docs, frontend 전수 SUCCESS.
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-29_01-08-00_KST_G05_W3_Verify_W5_Eval_Review_Action_Gemini.md` (v1.2.0).
+
+- 이전 확인 기준: 2026-09-29T00:33:00+09:00 (최신 tip `agent/gemini/g05-fe-verify-eval`, 카드 101 W3 Verify 및 W5 Eval Run 비즈니스 라우트 화면 연동 및 무결성 검증 완결).
+
+## 2026-09-29 G-05 W3 Verify 및 W5 Eval Run 비즈니스 라우트 화면 연동 및 무결성 불변식 검증 (카드 101, `agent/gemini/g05-fe-verify-eval`)
+
+- **작업 브랜치**: `agent/gemini/g05-fe-verify-eval` (base: PR #219 `26edf079` 위 #215 head `3bdc6e70` 선행 머지 및 PR #219 r4 최신 반영).
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude (UI·테스트 축), Codex (계약 축).
+- **작업 내용 (카드 101 전수 완결)**:
+  1. **계약 스키마 등록 및 자동 동기화**:
+     - `model-verify-request`, `model-verify-response`, `eval-run-start-request`, `eval-run-response` 4종 스키마를 `api-response-contracts.mjs`에 등록 (총 32종).
+     - 엄격한 TypeScript 타입 인터페이스 생성 및 `npm run contracts:check` 32개 전수 일치 확인.
+  2. **Zero Fake Measurements / Zero Fake Verification 불변식 확립 (#209 trusted-worker seam)**:
+     - W3 커널 검증 요청 시 커널 측정 ID(`measurementId`: `mvm_...` 26자리 Crockford Base32)만 전송하고 서버 신뢰 워커가 측정 출처 판정.
+     - 화면은 측정값을 위조하거나 자체적으로 "검증됨"을 단언하지 않으며 서버의 검증 응답(`verifiedAt`, `verifiedMeasurementId`, `newlyVerified`)만 표출.
+     - W5 평가 실행 결과(`passedGate`, `totalCases`, `passedCases`, `violations`)를 `GATE PASS` / `GATE FAIL`로 정직하게 시각화.
+  3. **Observation 계층 및 런타임 fail-closed 가드**:
+     - `verifyModelVersion`, `startEvalRun` 구현.
+     - `isModelVerifyResponse`, `isEvalRunResponse` 런타임 가드 구현 (`additionalProperties: false` 차단, Crockford Base32 26자리 정규식 검증, 케이스 범위 제약 `passedCases <= totalCases` 검증).
+     - 멱등키 보존 및 회전: 실패 시 재시도는 동일 키 재사용, 입력 변경 시 새 키로 회전.
+  4. **UI 컴포넌트 강화 (`ModelLineageView.tsx`)**:
+     - Tab 5 (W3 Verify) 및 Tab 6 (W5 Eval Run) 연동.
+     - 독립 `AbortController` 및 세대 가드를 적용하여 입력 변경 시 늦은 응답 무효화 및 로딩 걸림 원천 차단.
+     - 권한 없는 사용자(`canApprove !== true`) 대상 fail-closed 비활성화 및 안내 표출.
+     - `role="status"` 결과 카드, `aria-live="polite"` 음성 안내 지원.
+  5. **전용 통합 시험 및 전수 검증**:
+     - `apps/web/tests/model-verify-eval-routes.test.tsx` 10개 전용 시험 구현 및 전수 통과 (되돌리면 실패).
+     - 전체 81 test files / 761 tests 통과.
+- **실측 검증 증거**:
+  - Vitest: `apps/web/tests/model-verify-eval-routes.test.tsx` 10 passed, `apps/web/tests/model-registry-business-routes.test.tsx` 20 passed. (웹 전체 81 test files / 761 passed).
+  - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist/ 889.27 kB 생성 성공.
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed.
+  - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --check` PASS (0 conflicts).
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-29_00-33-00_KST_G05_W3_Verify_W5_Eval_FE_Gemini.md` (v1.0.0).
+- **다음 첫 행동**: Card 101 브랜치 push 및 PR 생성 후 리뷰어 요청.
+
+
 - 확인 기준: 2026-09-29T00:20:00+09:00 (최신 tip `agent/gemini/g05-fe-model-registry`, PR #219 Codex r4 F1 조치: Release 쓰기 UI fail-closed 미노출 및 Idempotency-Key 헤더 제거).
 - 확인 기준: 2026-09-28T20:25:00+09:00 (최신 tip `agent/gemini/g07-eval-runner-impl`, commit `e2011893`, PR #190).
 - 확인 기준: 2026-09-28T18:58:00+09:00 (최신 tip `agent/gemini/s10-fe-conformance-status`).
