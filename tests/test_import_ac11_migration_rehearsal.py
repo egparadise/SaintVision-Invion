@@ -38,6 +38,12 @@ DESIGN_BLOB = "99776a491772c4a62e1be26644d35a365d80a030"
 RUN_ID = "36380000000"
 REVERSIBLE_HEAD = "0053_eval_suite_project_scope"
 REVERSIBLE_BARRIER = "0052_model_version_digest_scope"
+
+
+def test_importer_and_aggregator_pin_the_same_repository_registry():
+    content = (ROOT / importer.REGISTRY_PATH).read_bytes()
+    actual_blob = hashlib.sha1(f"blob {len(content)}\0".encode() + content).hexdigest()
+    assert importer.REGISTRY_BLOB == aggregator.TARGET_REGISTRY_BLOB == actual_blob
 NOW = datetime(2026, 9, 28, 5, 0, tzinfo=timezone.utc)
 CRITERIA = {
     "catalogMismatchCount": {"operator": "eq", "value": 0},

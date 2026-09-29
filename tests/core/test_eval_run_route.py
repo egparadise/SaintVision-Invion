@@ -22,6 +22,7 @@ import uuid
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy.exc import OperationalError
 
 from saintvision.api import schemas
 from saintvision.api.app import create_app
@@ -51,6 +52,14 @@ BODY = {"adapter": "claude-code"}
 
 #: The bounded, identifier-free action this route's denials must carry (#189).
 EVAL_ACTION = "POST /v1/projects/{project_id}/eval/suites/{suite_id}/runs"
+
+
+class _Driver(Exception):
+    """Stands in for the DBAPI error that carries the SQLSTATE."""
+
+    def __init__(self, sqlstate: str):
+        super().__init__(sqlstate)
+        self.sqlstate = sqlstate
 
 
 class Suite:
@@ -92,8 +101,26 @@ class Session:
         self.world = world
 
     def execute(self, statement, params=None):
-        self.world["log"].append("lock")
-        self.world["locks"].append({"sql": str(statement), "params": params})
+        """Classify the statement instead of calling everything a lock.
+
+        The route now issues two kinds of statement through this fake: the
+        ``SET LOCAL lock_timeout`` that bounds a span (#211) and the
+        ``pg_advisory_xact_lock`` that serialises the write. Logging both as
+        "lock" made the order assertion blind to which one it saw, and made the
+        lock-wait tests below impossible to write.
+        """
+        sql = str(statement)
+        if "lock_timeout" in sql:
+            kind = "lock-timeout"
+        elif "pg_advisory_xact_lock" in sql:
+            kind = "lock"
+        else:
+            kind = "execute"
+        self.world["log"].append(kind)
+        self.world["locks"].append({"sql": sql, "params": params, "kind": kind})
+        sqlstate = (self.world.get("lock_fail") or {}).get(kind)
+        if sqlstate is not None:
+            raise OperationalError("stmt", {}, _Driver(sqlstate))
         return None
 
     def get(self, _model, _key, **_kwargs):
@@ -309,8 +336,12 @@ def test_the_whole_order_is_fixed(monkeypatch):
     client = build(monkeypatch, world)
     assert post(client).status_code == 201, "see the response body"
     assert world["log"] == [
+        # Each span bounds its lock waits before doing anything (#211): the
+        # SET LOCAL is the first statement inside the transaction.
+        "lock-timeout",
         "permission",
         "body-read",
+        "lock-timeout",
         "lock",
         "permission",
         "ledger-read",
@@ -356,7 +387,7 @@ def test_a_caller_without_the_approval_grade_is_refused_before_the_body_is_read(
     oversized = b'{"adapter":"' + b"x" * (MAX_REQUEST_BYTES + 100) + b'"}'
     canonical(post(client, data=oversized), code="AUTH-0030", status=403)
     # 403 rather than 413: the body was never read, so its size never mattered.
-    assert world["log"] == ["permission"]
+    assert world["log"] == ["lock-timeout", "permission"]
     assert world["ran"] == []
 
 
@@ -411,7 +442,11 @@ def test_the_lock_is_taken_before_the_ledger_and_before_any_row(monkeypatch):
     post(client)
     assert world["log"].index("lock") < world["log"].index("ledger-read")
     assert world["log"].index("lock") < world["log"].index("suite-get")
-    assert "pg_advisory_xact_lock" in world["locks"][0]["sql"]
+    # Selected by kind, not by position: each span now also issues its
+    # SET LOCAL lock_timeout, so locks[0] is a bound rather than the lock.
+    advisory = [entry for entry in world["locks"] if entry["kind"] == "lock"]
+    assert len(advisory) == 1
+    assert "pg_advisory_xact_lock" in advisory[0]["sql"]
 
 
 @pytest.mark.parametrize(
@@ -433,7 +468,7 @@ def test_the_idempotency_key_is_required(monkeypatch):
         headers={"Authorization": "Bearer eval-token", "Content-Type": "application/json"},
     )
     canonical(response, code="VAL-0003", status=422)
-    assert world["log"] == ["permission"]
+    assert world["log"] == ["lock-timeout", "permission"]
 
 
 # --------------------------------------------------------------------------
@@ -889,3 +924,93 @@ def test_the_real_pg_fixture_builds_its_rows_without_a_database():
     stub = module.StubAdapter()
     assert Capability.MODEL_PINNING in stub.capabilities
     assert stub.name and stub.contract_version
+
+
+# --------------------------------------------------------------------------
+# Bounded lock waits (#211, card 105 F1)
+#
+# W5 was the one business-lane write route that never set ``lock_timeout``, so
+# both of its spans could wait forever and a refusal could never reach the
+# canonical retryable 503. The three tests below are the reversion of that fix.
+# --------------------------------------------------------------------------
+
+
+def test_each_span_bounds_its_lock_waits_exactly_once(monkeypatch):
+    """Two spans, two bounds -- and the bound comes before the work.
+
+    Remove either ``bounded_lock_wait`` and the count drops to one; remove both
+    and it drops to zero.
+    """
+    world = {}
+    client = build(monkeypatch, world)
+    assert post(client).status_code == 201, "see the response body"
+
+    bounds = [entry for entry in world["locks"] if entry["kind"] == "lock-timeout"]
+    assert len(bounds) == 2, world["log"]
+    assert world["log"].count("lock-timeout") == 2
+    # The permission check of span one and the advisory lock of span two are both
+    # preceded by a bound, which is the whole point: neither may wait unbounded.
+    assert world["log"].index("lock-timeout") < world["log"].index("permission")
+    second = world["log"].index("lock-timeout", world["log"].index("lock-timeout") + 1)
+    assert second < world["log"].index("lock")
+    # The statement is a SET LOCAL, so it dies with the transaction rather than
+    # leaking the bound into a pooled connection.
+    for entry in bounds:
+        assert "SET LOCAL lock_timeout" in entry["sql"]
+
+
+@pytest.mark.parametrize("sqlstate", ["55P03", "40P01"])
+@pytest.mark.parametrize("where", ["preflight", "advisory-lock"])
+def test_a_lock_wait_refusal_is_the_canonical_retryable_503(monkeypatch, sqlstate, where):
+    """``lock_not_available`` and ``deadlock_detected``, in either span.
+
+    The two injection points are the two places this route can wait: the
+    permission preflight (``effective_permission`` reads the user row FOR SHARE)
+    and the ``pg_advisory_xact_lock`` that opens the write span. Both must come
+    back as the canonical retryable 503 with nothing bought or written.
+
+    Note what is *not* injected: the ``SET LOCAL lock_timeout`` statement itself.
+    Failing that is not a lock wait, and ``bounded_lock_wait`` deliberately does
+    not map it -- the bound is set before the ``try``.
+    """
+    driver = OperationalError("stmt", {}, _Driver(sqlstate))
+    world = (
+        {"denials": [driver]} if where == "preflight" else {"lock_fail": {"lock": sqlstate}}
+    )
+    client = build(monkeypatch, world)
+
+    body = canonical(post(client), code="SYS-0001", status=503, retryable=True)
+    assert body["detail"]
+    # Nothing internal leaks: no SQLSTATE, no statement, no suite identifier.
+    serialised = json.dumps(body)
+    assert sqlstate not in serialised
+    assert "lock_timeout" not in serialised
+    assert SUITE not in serialised
+
+    # No provider call, no audit of a success, no stored idempotent response.
+    assert world["ran"] == []
+    assert world["audits"] == []
+    assert world["stored"] == []
+
+
+def test_an_unrelated_operational_error_is_not_dressed_as_a_retryable_lock(monkeypatch):
+    """``57P01`` (admin shutdown) is not a lock wait and must not read like one.
+
+    ``bounded_lock_wait`` re-raises anything outside its two SQLSTATEs, so this
+    must not become SYS-0001/503/retryable. Widen ``LOCK_WAIT_SQLSTATES`` and this
+    test fails -- which is the point, because a client that retries an admin
+    shutdown as if it were contention learns the wrong thing.
+    """
+    world = {"lock_fail": {"lock": "57P01"}}
+    client = build(monkeypatch, world)
+
+    response = post(client)
+    assert response.status_code != 503
+    payload = response.json() if response.headers.get("content-type", "").startswith(
+        "application/problem+json"
+    ) else {}
+    assert payload.get("code") != "SYS-0001"
+    assert payload.get("retryable") is not True
+    assert world["ran"] == []
+    assert world["audits"] == []
+    assert world["stored"] == []

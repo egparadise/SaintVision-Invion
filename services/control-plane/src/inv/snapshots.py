@@ -153,9 +153,12 @@ class SnapshotStore:
                 (project, object_id),
             ).fetchone()
             if row:
+                if (row["provider_id"], row["locator"]) != (self.provider_id, locator):
+                    raise DomainError(
+                        "STORE-0001", "Object provider unavailable", 503, True
+                    )
                 if (
                     (row["content_hash"], row["size_bytes"]) != (digest, size)
-                    or (row["provider_id"], row["locator"]) != (self.provider_id, locator)
                     or row["state"] in {"deleting", "deleted"}
                 ):
                     raise DomainError("IDEM-0001", "Upload identity conflicts")
@@ -317,6 +320,7 @@ class SnapshotStore:
                 ).fetchone()
                 row = self._row(conn, project, object_id)
                 self._writer(row)
+                files.validate_locator(row["locator"])
                 if conn.execute(
                     "SELECT 1 FROM inv.checkpoint_objects WHERE project_id=%s AND object_id=%s",
                     (project, identity(object_id)),

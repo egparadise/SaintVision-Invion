@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
-  "description": "An importer's claim about what it is releasing (VF-CL-03).\n\nThe two fields and their constraints are copied from the kernel's\n``ModelManifest``, because the point of the request is to be compared\nagainst that immutable declaration for exact equality. ``extra=\"forbid\"``\nis load-bearing here rather than conventional: a proposal carrying a field\nthe declaration does not have is itself a mismatch.",
+  "description": "An importer's claim about what it is releasing (VF-CL-03).\n\nThe two fields and their constraints are copied from the kernel's\n``ModelManifest``, because the point of the request is to be compared\nagainst that immutable declaration for exact equality. ``extra=\"forbid\"``\nis load-bearing here rather than conventional: a proposal carrying a field\nthe declaration does not have is itself a mismatch.\n\nThe request carries a required ``Idempotency-Key`` header (card 113). The\nsame key with this same body and path replays the stored\n``ModelReleaseResponse``; the same key with a different body or path is\n``GRAPH-0002``/409; a version that is already released is ``GRAPH-0002``/409\nunder any other key.",
   "properties": {
     "classification": {
       "pattern": "^(public|internal|restricted)$",

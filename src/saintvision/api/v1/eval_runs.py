@@ -57,6 +57,7 @@ from ..deps import (
     serialise_idempotent_write,
     store_idempotent_response,
 )
+from ..lock_wait import bounded_lock_wait
 from ..problem import (
     AUTH_PROJECT,
     GRAPH_PRECONDITION,
@@ -230,7 +231,13 @@ async def start_eval_run(
     # nothing is held open while the body arrives.
     with factory() as session:
         with session.begin():
-            with tenant_scope(session, principal.tenant_id):
+            # Bounded like every other business-lane write span (#211, card 84 F1):
+            # effective_permission reads the user row FOR SHARE, so a held
+            # FOR UPDATE on it would otherwise wait here with no limit and the
+            # refusal would never reach the canonical retryable 503.
+            with tenant_scope(session, principal.tenant_id), bounded_lock_wait(
+                session, timeout_ms=settings.business_lock_timeout_ms
+            ):
                 _require_approval(session, principal=principal, project_id=project_id)
 
     key = _require_idempotency_key(idempotency_key)
@@ -253,7 +260,11 @@ async def start_eval_run(
     # resolve the adapter, re-check again, then spend.
     with factory() as session:
         with session.begin():
-            with tenant_scope(session, principal.tenant_id):
+            # The first statement in this span takes pg_advisory_xact_lock, which
+            # waits without a limit of its own; the bound has to be set before it.
+            with tenant_scope(session, principal.tenant_id), bounded_lock_wait(
+                session, timeout_ms=settings.business_lock_timeout_ms
+            ):
                 # IDEM-6: the serialisation point comes before any resource row, in
                 # every route, so the lock order in this lane is one order.
                 serialise_idempotent_write(

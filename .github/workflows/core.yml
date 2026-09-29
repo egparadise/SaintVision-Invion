@@ -224,24 +224,18 @@ jobs:
           assert not any(root.findall('.//' + tag) for tag in ('failure', 'error')), (
               'Every executable CX01 recovery case must pass'
           )
-          internal_network_reason = (
-              'Docker inspect state confirms status=running, running=True, '
-              'restarting=False, restartCount=0, exitCode=0; PostgreSQL-ready '
-              'log marker is present; hostPortPublished=False. This test\'s Docker '
-              'internal network has no published host port, so host pytest cannot '
-              'reach the container by Docker-only name'
-          )
+          # G-02: the two live archiver cases probe the owned container over
+          # docker exec, so the internal-network skip no longer exists. Every
+          # one of the 20 cases must execute here.
           skips = Counter(
               (skipped.get('message') or '').strip()
               for skipped in root.findall('.//skipped')
           )
-          assert skips == Counter({internal_network_reason: 2}), (
-              f'CX01 recovery skip distribution drifted: {skips}'
-          )
+          assert skips == Counter(), f'CX01 recovery skip distribution drifted: {skips}'
           setup_skip = 'CX01_CONTAINER is unset; container identity/ownership cannot be verified'
           assert setup_skip not in skips
           passed = len(cases) - sum(skips.values())
-          assert passed == 18, f'Expected 18 passed CX01 cases, got {passed}'
+          assert passed == 20, f'Expected 20 passed CX01 cases, got {passed}'
           PY
       # Desktop browser tests execute in desktop-browser.yml with Chromium and Vite.
       # Web-container acceptance belongs to desktop-browser.yml. The two LAN
@@ -273,10 +267,15 @@ jobs:
               'Actual Windows PowerShell launcher': 10,
               'Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)': 1,
               'run only through tools/placement_lock_wait_diagnostic.py': 1,
+              'run only through S11 Storage Failure Hosted Reference opt-in lane': 1,
               'claude is not installed on this machine': 1,
               'codex is not installed on this machine': 1,
               'gemini is not installed on this machine': 1,
               'antigravity is not installed on this machine': 1,
+              # S05 diagnostics and c50 are explicit load lanes, not incidental
+              # full-suite work. Keep both visible in the exact skip ratchet.
+              'run only through tools/placement_lock_wait_diagnostic.py': 1,
+              'run only through tools/placement_benchmark.py': 1,
           })
           actual_skips = Counter(
               (skipped.get('message') or '').strip()

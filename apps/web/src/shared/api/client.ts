@@ -49,20 +49,29 @@ const PROBLEM_DETAIL_KEYS = new Set([
   'traceId', 'causeRef', 'evidenceId',
 ]);
 
-function isProblemDetails(value: unknown): value is ProblemDetails {
+const LEGACY_AUTH_PROBLEM_KEYS = new Set([
+  ...PROBLEM_DETAIL_KEYS,
+  'instance',
+]);
+
+export function isProblemDetails(value: unknown, expectedStatus?: number): value is ProblemDetails {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
   const problem = value as Record<string, unknown>;
-  return Object.keys(problem).every((key) => PROBLEM_DETAIL_KEYS.has(key)) &&
-    problem.type === 'about:blank' &&
+  if (typeof expectedStatus === 'number' && problem.status !== expectedStatus) return false;
+  const isLegacyAuth = problem.status === 401 && problem.code === 'AUTH-MISSING-CREDENTIAL';
+  const allowedKeys = isLegacyAuth ? LEGACY_AUTH_PROBLEM_KEYS : PROBLEM_DETAIL_KEYS;
+  return Object.keys(problem).every((key) => allowedKeys.has(key)) &&
+    (problem.type === 'about:blank' || (isLegacyAuth && problem.type === 'https://saintvision.invenio/problems/auth-missing-credential')) &&
     typeof problem.title === 'string' && problem.title.length > 0 && problem.title.length <= 200 &&
     Number.isInteger(problem.status) && Number(problem.status) >= 400 && Number(problem.status) <= 599 &&
-    typeof problem.code === 'string' && /^[A-Z]+-[0-9]{4}$/.test(problem.code) &&
+    typeof problem.code === 'string' && (/^[A-Z]+-[0-9]{4}$/.test(problem.code) || isLegacyAuth) &&
     typeof problem.category === 'string' && /^[A-Z]+$/.test(problem.category) &&
     typeof problem.detail === 'string' && problem.detail.length <= 1000 &&
     typeof problem.retryable === 'boolean' &&
     typeof problem.traceId === 'string' && /^[0-9a-f]{32}$/.test(problem.traceId) &&
     (problem.causeRef === null || (typeof problem.causeRef === 'string' && problem.causeRef.length > 0 && problem.causeRef.length <= 200)) &&
-    (problem.evidenceId === null || (typeof problem.evidenceId === 'string' && /^evd_[0-9A-HJKMNP-TV-Z]{26}$/.test(problem.evidenceId)));
+    (problem.evidenceId === null || (typeof problem.evidenceId === 'string' && /^evd_[0-9A-HJKMNP-TV-Z]{26}$/.test(problem.evidenceId))) &&
+    (!('instance' in problem) || problem.instance === null || (typeof problem.instance === 'string' && problem.instance.length <= 500));
 }
 
 let inMemoryAuthToken: string | null = null;
@@ -174,7 +183,7 @@ export async function apiClient<T>(endpoint: string, options: RequestOptions = {
       const contentType = response.headers.get('content-type') || '';
       if (contentType.includes('application/problem+json') || contentType.includes('application/json')) {
         const payload: unknown = await response.json();
-        if (isProblemDetails(payload)) {
+        if (isProblemDetails(payload, response.status)) {
           problem = payload;
         } else {
           const detail =

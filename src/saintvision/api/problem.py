@@ -24,13 +24,16 @@ kernel already serves ``MODEL-0001``..``MODEL-0008`` and ``SYS-0001`` through
 status and retryability are stated per code rather than derived from a category
 table, validated against the same anchor the kernel uses.
 
-**Existing errors are translated at the route boundary, not globally.** The same
+**Existing errors are normally translated at the route boundary.** The same
 ``VAL-SCHEMA`` means a state precondition inside ``release_model_version`` and a
 malformed digest on the lineage read routes, so each route passes its own table
 and a code outside that table becomes ``SYS-0002`` rather than being dressed up
-as something it is not. ``SYS-0001`` is deliberately not reused for that case:
-our own ledger records a defect where an internal misclassification surfaced as
-503, which made clients retry and paged operators.
+as something it is not. The one application-boundary exception is the closed
+set of old ``*-NOT-FOUND`` codes below: each always means absent or
+permission-masked and maps to the same non-disclosing ``RES-0004``. ``SYS-0001``
+is deliberately not reused for an unmapped code: our own ledger records a
+defect where an internal misclassification surfaced as 503, which made clients
+retry and paged operators.
 """
 
 from __future__ import annotations
@@ -42,7 +45,14 @@ from typing import Any, Callable, Mapping
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from ..errors import InvError
+from ..errors import (
+    RES_ARTIFACT_NOT_FOUND,
+    RES_CONTRIBUTION_NOT_FOUND,
+    RES_NODE_NOT_FOUND,
+    RES_RUN_NOT_FOUND,
+    RES_WORKSPACE_NOT_FOUND,
+    InvError,
+)
 from ..ids import new_trace_id
 
 #: Exactly the canonical required key set. The body is built from this tuple so
@@ -85,6 +95,19 @@ RES_NOT_FOUND = "RES-0004"
 GRAPH_PRECONDITION = "GRAPH-0002"
 SYS_UPSTREAM_UNAVAILABLE = "SYS-0001"
 SYS_UNMAPPED = "SYS-0002"
+
+# These historical service codes have one unambiguous public meaning: the
+# named resource is absent or intentionally hidden from this caller. Other
+# legacy codes remain route-local because their meaning can vary by operation.
+LEGACY_NOT_FOUND_CODES: frozenset[str] = frozenset(
+    {
+        RES_NODE_NOT_FOUND,
+        RES_CONTRIBUTION_NOT_FOUND,
+        RES_RUN_NOT_FOUND,
+        RES_WORKSPACE_NOT_FOUND,
+        RES_ARTIFACT_NOT_FOUND,
+    }
+)
 
 
 @dataclass(slots=True)
@@ -152,6 +175,18 @@ def canonical_response(error: CanonicalProblem, *, trace_id: str) -> JSONRespons
         status_code=error.status,
         media_type=PROBLEM_CONTENT_TYPE,
         headers=headers,
+    )
+
+
+def legacy_not_found_problem(error: InvError) -> CanonicalProblem | None:
+    """Map only the legacy codes whose public meaning is always absence."""
+    if error.code not in LEGACY_NOT_FOUND_CODES:
+        return None
+    return CanonicalProblem(
+        RES_NOT_FOUND,
+        404,
+        "No such resource.",
+        retryable=False,
     )
 
 
@@ -288,9 +323,7 @@ def require_absent_body(raw: bytes) -> None:
     taken into account. One byte is enough to be ambiguous.
     """
     if raw:
-        raise CanonicalProblem(
-            VAL_REQUEST, 422, "This request takes no body."
-        )
+        raise CanonicalProblem(VAL_REQUEST, 422, "This request takes no body.")
 
 
 def validate_strict(model: type, payload: Mapping[str, Any]) -> Any:

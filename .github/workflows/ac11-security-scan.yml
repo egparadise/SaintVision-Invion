@@ -1,0 +1,143 @@
+name: AC-11 Security Critical High Scan
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [labeled, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  security-critical-high:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.pull_request.labels.*.name, 'run-ac11-security')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: ac11-security-${{ github.event.pull_request.head.sha || github.sha }}
+      cancel-in-progress: false
+    env:
+      SOURCE_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      REPORT: evidence/s11-ac11-security-scan.json
+      JUNIT: evidence/s11-ac11-security-scan.xml
+      PIP_AUDIT_JSON: /tmp/s11-pip-audit.json
+      BANDIT_JSON: /tmp/s11-bandit.json
+      PIP_AUDIT_VERSION: '2.10.1'
+      BANDIT_VERSION: '1.9.4'
+    steps:
+      - name: Checkout exact PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SOURCE_HEAD_SHA }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install pinned scanners
+        run: >-
+          python -m pip install
+          pip-audit==${PIP_AUDIT_VERSION}
+          bandit==${BANDIT_VERSION}
+
+      - name: Run complete registered scanner set
+        id: scan
+        shell: bash
+        run: |
+          echo "started_at=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
+          echo "pip_audit_version=$(python -m pip_audit --version | awk 'NR==1 {print $2}')" >> "$GITHUB_OUTPUT"
+          echo "bandit_version=$(python -m bandit --version | awk 'NR==1 {print $2}')" >> "$GITHUB_OUTPUT"
+          set +e
+          python -m pip_audit \
+            --requirement requirements-core.txt \
+            --format json \
+            --output "$PIP_AUDIT_JSON"
+          pip_audit_exit=$?
+          python -m bandit \
+            --recursive services/control-plane/src src/saintvision \
+            --format json \
+            --output "$BANDIT_JSON"
+          bandit_exit=$?
+          set -e
+          echo "pip_audit_exit=$pip_audit_exit" >> "$GITHUB_OUTPUT"
+          echo "bandit_exit=$bandit_exit" >> "$GITHUB_OUTPUT"
+
+      - name: Normalize redacted fixed-SHA report
+        id: normalize
+        shell: bash
+        run: |
+          set +e
+          python tools/run_ac11_security_scan.py \
+            --source-run-id "${{ github.run_id }}" \
+            --source-head-sha "$SOURCE_HEAD_SHA" \
+            --runner-image "${{ runner.os }}-${{ runner.arch }}" \
+            --pip-audit-json "$PIP_AUDIT_JSON" \
+            --bandit-json "$BANDIT_JSON" \
+            --pip-audit-exit "${{ steps.scan.outputs.pip_audit_exit }}" \
+            --bandit-exit "${{ steps.scan.outputs.bandit_exit }}" \
+            --pip-audit-version "${{ steps.scan.outputs.pip_audit_version }}" \
+            --bandit-version "${{ steps.scan.outputs.bandit_version }}" \
+            --scan-started-at "${{ steps.scan.outputs.started_at }}" \
+            --report "$REPORT" \
+            --junit "$JUNIT"
+          producer_exit=$?
+          set -e
+          echo "producer_exit=$producer_exit" >> "$GITHUB_OUTPUT"
+
+      - name: Validate redacted evidence shape
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+
+          report_path = Path(os.environ['REPORT'])
+          junit_path = Path(os.environ['JUNIT'])
+          assert report_path.is_file(), 'missing security scan JSON'
+          assert junit_path.is_file(), 'missing security scan JUnit'
+          report = json.loads(report_path.read_text(encoding='utf-8'))
+          assert report['sourceHeadSha'] == os.environ['SOURCE_HEAD_SHA']
+          assert report['cleanCheckout'] is True
+          assert report['environment']['credentialsRequired'] is False
+          assert report['environment']['externalServicesRequired'] is True
+          assert set(report['payload']) == {
+              'scannerVersions', 'scannerExitCodes', 'scanInputs', 'summaries',
+              'auditedDependencies', 'scannedPythonFiles',
+              'criticalHighFindings', 'criticalCount', 'highCount',
+              'unallowlistedFindingIds', 'expiredFindingIds',
+              'staleAllowlistFindingIds', 'severityMismatchFindingIds',
+          }
+          forbidden_keys = {'description', 'issue_text', 'more_info', 'password', 'token', 'secret'}
+          def assert_redacted(value):
+              if isinstance(value, dict):
+                  assert not (set(map(str.lower, value)) & forbidden_keys), 'unredacted field in evidence'
+                  for nested in value.values():
+                      assert_redacted(nested)
+              elif isinstance(value, list):
+                  for nested in value:
+                      assert_redacted(nested)
+          assert_redacted(report)
+          root = ET.parse(junit_path).getroot()
+          assert root.attrib['tests'] == '4'
+          PY
+
+      - name: Upload AC-11 security evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: s11-ac11-security-${{ env.SOURCE_HEAD_SHA }}
+          path: evidence/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Enforce critical/high gate after artifact upload
+        if: always()
+        shell: bash
+        run: test "${{ steps.normalize.outputs.producer_exit }}" = '0'
