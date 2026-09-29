@@ -6,6 +6,7 @@ MINIO_IMAGE='docker.io/coollabsio/minio@sha256:72b4794d7faa001823364f8ee23971714
 CONFIG_DIR="${SV_STORAGE_CONFIG_DIR:-$HOME/.config/saintvision-intranet}"
 WORK_ROOT="${SV_PITR_WORK_ROOT:-$HOME/.local/share/saintvision-intranet/pitr}"
 SOURCE_ENV="${SV_PITR_SOURCE_ENV:-$CONFIG_DIR/pilot-postgres.env}"
+PITR_ENV="$CONFIG_DIR/pitr-service-user.env"
 RETENTION_TOOL="${SV_PITR_RETENTION_TOOL:-$CONFIG_DIR/pitr_archive_retention.py}"
 SOURCE_HOST="${SV_PITR_SOURCE_HOST:-127.0.0.1}"
 SOURCE_PORT="${SV_PITR_SOURCE_PORT:-55440}"
@@ -60,21 +61,18 @@ print(json.dumps({"status": payload["status"], "reason": reason}, sort_keys=True
 PY
 }
 
-for file in "$SOURCE_ENV" "$CONFIG_DIR/pitr-service-user.env" "$RETENTION_TOOL"; do
+for file in "$SOURCE_ENV" "$PITR_ENV" "$RETENTION_TOOL"; do
   [ -f "$file" ] && [ ! -L "$file" ] || fail 'required protected input is absent'
 done
-. "$CONFIG_DIR/pitr-service-user.env"
-case "$PITR_KEY$PITR_SECRET" in
-  *[!A-Za-z0-9._-]*) fail 'PITR credential alphabet is not URL-safe' ;;
-esac
 case "$MINIO_ENDPOINT" in
   http://*) MINIO_SCHEME=http ;;
   https://*) MINIO_SCHEME=https ;;
   *) fail 'MinIO endpoint must be HTTP(S)' ;;
 esac
 MINIO_AUTHORITY=${MINIO_ENDPOINT#*://}
-case "$MINIO_AUTHORITY" in *'/'*|*'?'*|*'#'*|'') fail 'MinIO endpoint must be a root URL' ;; esac
-MC_ALIAS="$MINIO_SCHEME://${PITR_KEY}:${PITR_SECRET}@${MINIO_AUTHORITY}"
+case "$MINIO_AUTHORITY" in
+  *[!A-Za-z0-9.:-]*|*'/'*|*'?'*|*'#'*|'') fail 'MinIO endpoint must be a root URL' ;;
+esac
 CA_CHAIN="$CONFIG_DIR/minio-certs/ca-chain.pem"
 if [ "$MINIO_SCHEME" = https ]; then
   [ -f "$CA_CHAIN" ] && [ ! -L "$CA_CHAIN" ] || fail 'trusted MinIO CA chain is absent'
@@ -105,8 +103,10 @@ mc_container() {
       --security-opt no-new-privileges \
       --cap-drop ALL \
       --network host \
-      -e "MC_HOST_pitr=$MC_ALIAS" \
+      -e "SV_MINIO_SCHEME=$MINIO_SCHEME" \
+      -e "SV_MINIO_AUTHORITY=$MINIO_AUTHORITY" \
       -e SSL_CERT_FILE=/ca/ca-chain.pem \
+      -v "$PITR_ENV:/run/secrets/pitr.env:ro" \
       -v "$CA_CHAIN:/ca/ca-chain.pem:ro" \
       "$@"
   else
@@ -121,10 +121,21 @@ mc_container() {
       --security-opt no-new-privileges \
       --cap-drop ALL \
       --network host \
-      -e "MC_HOST_pitr=$MC_ALIAS" \
+      -e "SV_MINIO_SCHEME=$MINIO_SCHEME" \
+      -e "SV_MINIO_AUTHORITY=$MINIO_AUTHORITY" \
+      -v "$PITR_ENV:/run/secrets/pitr.env:ro" \
       "$@"
   fi
 }
+
+MC_WRAPPER='
+  . /run/secrets/pitr.env
+  case "$PITR_KEY$PITR_SECRET" in
+    *[!A-Za-z0-9._-]*) printf "%s\n" "PITR credential alphabet is invalid" >&2; exit 2 ;;
+  esac
+  export MC_HOST_pitr="$SV_MINIO_SCHEME://${PITR_KEY}:${PITR_SECRET}@${SV_MINIO_AUTHORITY}"
+  exec "$@"
+'
 
 source_psql() {
   database="$1"
@@ -202,18 +213,20 @@ remove_owned "$RECEIVER"
 
 python3 "$RETENTION_TOOL" --archive "$ARCHIVE" --backups "$BACKUPS" --days 7 > "$RUN_DIR/retention-plan.json"
 
-# The transient transfer container receives only one scoped alias, the data
-# mount, and (for HTTPS) the public CA chain. It never mounts the config tree.
+# The transient transfer container mounts only the scoped credential file, the
+# data mount, and (for HTTPS) the public CA chain. The secret never appears in
+# the host process arguments or Docker Config.Env, and the broader config tree
+# is never mounted.
 mc_container \
   -v "$RUN_DIR:/evidence:ro" \
-  "$MINIO_IMAGE" /usr/bin/mc mirror --overwrite /evidence \
+  "$MINIO_IMAGE" /bin/sh -ceu "$MC_WRAPPER" shell /usr/bin/mc mirror --overwrite /evidence \
   "pitr/saintvision-pitr/pilot/rehearsals/$RUN_ID" >/dev/null
 
 mkdir -p "$DOWNLOAD"
 chmod 700 "$DOWNLOAD"
 mc_container \
   -v "$DOWNLOAD:/download" \
-  "$MINIO_IMAGE" /usr/bin/mc mirror \
+  "$MINIO_IMAGE" /bin/sh -ceu "$MC_WRAPPER" shell /usr/bin/mc mirror \
   "pitr/saintvision-pitr/pilot/rehearsals/$RUN_ID" /download >/dev/null
 
 (cd "$RUN_DIR" && find backups wal -type f -print0 | sort -z | xargs -0 sha256sum) > "$RUN_DIR/source-sha256.txt"
@@ -288,7 +301,7 @@ payload = {
     "limitations": [
         "source archive_mode remains off; this rehearsal used a bounded pg_receivewal sidecar",
         "continuous post-rehearsal WAL delivery is not configured",
-        "MinIO TLS operational acceptance is pending the intranet CA certificate"
+        "the source physical-replication HBA is an operator-managed prerequisite"
     ],
 }
 Path(path).write_text(json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n", encoding="utf-8")
@@ -297,7 +310,7 @@ PY
 
 mc_container \
   -v "$REPORT:/pitr-report.json:ro" \
-  "$MINIO_IMAGE" /usr/bin/mc cp /pitr-report.json \
+  "$MINIO_IMAGE" /bin/sh -ceu "$MC_WRAPPER" shell /usr/bin/mc cp /pitr-report.json \
   "pitr/saintvision-pitr/pilot/rehearsals/$RUN_ID/pitr-report.json" >/dev/null
 
 remove_owned "$RESTORE_CONTAINER"

@@ -87,3 +87,7 @@ def test_pitr_rehearsal_uses_uploaded_bytes_and_checks_replication_before_source
         assert forbidden not in script
     assert '$CONFIG_DIR:/run/saintvision-intranet' not in script
     assert 'trusted MinIO CA chain is absent' in script
+    assert '-e "MC_HOST_pitr=' not in script
+    assert '$PITR_ENV:/run/secrets/pitr.env:ro' in script
+    assert 'the host process arguments or Docker Config.Env' in script
+    assert 'TLS operational acceptance is pending' not in script
