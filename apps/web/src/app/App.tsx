@@ -546,7 +546,7 @@ export const App: React.FC = () => {
         }}
         currentUser={currentUser}
         onLogout={() => {
-          performLogout();
+          performLogout({ redirectIdp: true, postLogoutRedirectUri: window.location.origin });
           resetAuthenticatedState(null);
         }}
       />

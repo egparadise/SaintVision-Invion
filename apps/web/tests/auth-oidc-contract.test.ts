@@ -11,6 +11,7 @@ import {
   buildLogoutUrl,
   performLogout,
   STORAGE_KEY,
+  CLOCK_SKEW_SEC,
 } from '../src/features/auth/session';
 import { getAuthToken, setAuthToken } from '../src/shared/api/client';
 
@@ -73,20 +74,47 @@ describe('OIDC Corporate IdP & Server Contract Verification (Card 153)', () => {
       expect(cfg.redirectUri).toBe('https://portal.saintvision.lan/callback');
     });
 
-    it('allows explicit endpoint overrides alongside issuer', () => {
+    it('allows explicit endpoint overrides alongside issuer scoped to same origin and path', () => {
       (window as any).__SAINTVISION_CONFIG__ = {
         issuer: 'https://192.168.45.143:8443/realms/saintvision',
         clientId: 'custom-client',
-        idpAuthorizeUrl: 'https://idp.saintvision.lan:8443/custom/auth?realm=sv',
-        idpTokenUrl: 'https://idp.saintvision.lan:8443/custom/token',
-        idpLogoutUrl: 'https://idp.saintvision.lan:8443/custom/logout',
+        idpAuthorizeUrl: 'https://192.168.45.143:8443/realms/saintvision/custom/auth',
+        idpTokenUrl: 'https://192.168.45.143:8443/realms/saintvision/custom/token',
+        idpLogoutUrl: 'https://192.168.45.143:8443/realms/saintvision/custom/logout',
         scope: 'openid profile email inv.api',
       };
       const cfg = authConfig();
-      expect(cfg.idpAuthorizeUrl).toBe('https://idp.saintvision.lan:8443/custom/auth?realm=sv');
-      expect(cfg.idpTokenUrl).toBe('https://idp.saintvision.lan:8443/custom/token');
-      expect(cfg.idpLogoutUrl).toBe('https://idp.saintvision.lan:8443/custom/logout');
+      expect(cfg.idpAuthorizeUrl).toBe('https://192.168.45.143:8443/realms/saintvision/custom/auth');
+      expect(cfg.idpTokenUrl).toBe('https://192.168.45.143:8443/realms/saintvision/custom/token');
+      expect(cfg.idpLogoutUrl).toBe('https://192.168.45.143:8443/realms/saintvision/custom/logout');
       expect(cfg.scope).toBe('openid profile email inv.api');
+    });
+
+    it('rejects cross-origin token endpoint override alongside issuer (Codex Finding 1)', () => {
+      (window as any).__SAINTVISION_CONFIG__ = {
+        issuer: 'https://192.168.45.143:8443/realms/saintvision',
+        clientId: 'saintvision-web',
+        idpTokenUrl: 'https://attacker.evil.lan:8443/steal/token',
+      };
+      expect(() => authConfig()).toThrow('토큰 엔드포인트의 origin 또는 경로가 issuer와 일치하지 않습니다.');
+    });
+
+    it('rejects endpoint overrides outside issuer path hierarchy', () => {
+      (window as any).__SAINTVISION_CONFIG__ = {
+        issuer: 'https://192.168.45.143:8443/realms/saintvision',
+        clientId: 'saintvision-web',
+        idpTokenUrl: 'https://192.168.45.143:8443/other-realm/token',
+      };
+      expect(() => authConfig()).toThrow('토큰 엔드포인트의 origin 또는 경로가 issuer와 일치하지 않습니다.');
+    });
+
+    it('rejects mismatched origins in endpoint-pair mode without issuer', () => {
+      (window as any).__SAINTVISION_CONFIG__ = {
+        clientId: 'saintvision-web',
+        idpAuthorizeUrl: 'https://auth.saintvision.lan/authorize',
+        idpTokenUrl: 'https://token.saintvision.lan/token',
+      };
+      expect(() => authConfig()).toThrow('인가 엔드포인트와 토큰 엔드포인트의 origin이 서로 일치하지 않습니다.');
     });
 
     it('fails closed when clientId is missing or blank', () => {
@@ -118,6 +146,21 @@ describe('OIDC Corporate IdP & Server Contract Verification (Card 153)', () => {
         clientId: 'saintvision-web',
       };
       expect(() => authConfig()).toThrow('인증 서버 issuer URL이 안전한 주소가 아닙니다.');
+    });
+
+    it('rejects redirect_uri with cross-origin or non-/callback path (Claude L4 & L5-②)', () => {
+      (window as any).__SAINTVISION_CONFIG__ = {
+        issuer: 'https://192.168.45.143:8443/realms/saintvision',
+        clientId: 'saintvision-web',
+        redirectUri: 'https://evil.example.com/callback',
+      };
+      expect(() => authConfig()).toThrow('redirect_uri의 origin이 현재 웹 애플리케이션과 일치하지 않습니다.');
+
+      (window as any).__SAINTVISION_CONFIG__.redirectUri = 'https://portal.saintvision.lan/wrong-path';
+      expect(() => authConfig()).toThrow('redirect_uri의 경로는 /callback 이어야 합니다.');
+
+      (window as any).__SAINTVISION_CONFIG__.redirectUri = '/callback';
+      expect(authConfig().redirectUri).toBe('https://portal.saintvision.lan/callback');
     });
   });
 
@@ -154,7 +197,7 @@ describe('OIDC Corporate IdP & Server Contract Verification (Card 153)', () => {
     });
   });
 
-  describe('3. Token Expiration Enforcement (Server Contract: exp - iat <= 3600)', () => {
+  describe('3. Token Expiration Enforcement (Server Contract: exp - iat <= 3600 & Clock Skew)', () => {
     it('accepts tokens strictly complying with server lifetime limit (lifetime <= 3600)', () => {
       const now = Math.floor(Date.now() / 1000);
       const validToken = makeJwt({
@@ -198,17 +241,44 @@ describe('OIDC Corporate IdP & Server Contract Verification (Card 153)', () => {
       );
     });
 
-    it('rejects already expired tokens (exp <= now)', () => {
+    it('rejects already expired tokens beyond clock skew (exp + 120 <= now)', () => {
       const now = Math.floor(Date.now() / 1000);
       const expiredToken = makeJwt({
         iss: 'https://192.168.45.143:8443/realms/saintvision',
         sub: 'user-001',
         iat: now - 1800,
-        exp: now - 10,
+        exp: now - 150, // 150s past, beyond 120s clock skew
       });
 
       expect(() => validateTokenExpiration(expiredToken, now)).toThrow(
         '이미 만료된 인증 토큰입니다.'
+      );
+    });
+
+    it('allows clock skew of up to 120s for expiring tokens (Claude M3)', () => {
+      const now = Math.floor(Date.now() / 1000);
+      // exp is 60s in the past; with 120s clock skew allowance, exp + 120 > now, so it does not throw
+      const slightlyBehindToken = makeJwt({
+        iss: 'https://192.168.45.143:8443/realms/saintvision',
+        sub: 'user-001',
+        iat: now - 1800,
+        exp: now - 60,
+      });
+      expect(() => validateTokenExpiration(slightlyBehindToken, now)).not.toThrow();
+    });
+
+    it('rejects malformed non-JWT tokens when requireJwt is enabled (Codex Finding 5)', () => {
+      expect(() => validateTokenExpiration('opaque-token')).toThrow('인증 토큰(JWT) 형식이 올바르지 않습니다.');
+      expect(() => validateTokenExpiration('a.b.c')).toThrow('인증 토큰(JWT) 형식이 올바르지 않습니다.');
+    });
+
+    it('rejects JWT tokens missing integer exp or iat (Codex Finding 5)', () => {
+      const now = Math.floor(Date.now() / 1000);
+      expect(() => validateTokenExpiration(makeJwt({ sub: 'user' }))).toThrow(
+        '인증 토큰에 유효한 정수형 exp 및 iat 클레임이 필요합니다.'
+      );
+      expect(() => validateTokenExpiration(makeJwt({ exp: 'not-int', iat: now }))).toThrow(
+        '인증 토큰에 유효한 정수형 exp 및 iat 클레임이 필요합니다.'
       );
     });
   });
@@ -229,6 +299,15 @@ describe('OIDC Corporate IdP & Server Contract Verification (Card 153)', () => {
         scope: 'openid inv.api',
       });
 
+      const idToken = makeJwt({
+        iss: 'https://192.168.45.143:8443/realms/saintvision',
+        aud: 'saintvision-web',
+        sub: 'operator-alice',
+        nonce: authUrl.searchParams.get('nonce'),
+        iat: now,
+        exp: now + 300,
+      });
+
       const serverSubject = 'oidc:' + 'f'.repeat(64);
       const serverTenant = '00000000-0000-0000-0000-000000000099';
 
@@ -237,6 +316,7 @@ describe('OIDC Corporate IdP & Server Contract Verification (Card 153)', () => {
         ok: true,
         json: async () => ({
           access_token: oidcToken,
+          id_token: idToken,
           token_type: 'Bearer',
           expires_in: 1800,
         }),
@@ -278,6 +358,132 @@ describe('OIDC Corporate IdP & Server Contract Verification (Card 153)', () => {
       expect(storage.size).toBe(0);
     });
 
+    it('rejects callback when OIDC id_token is missing from token response (Codex Finding 2, Claude M2)', async () => {
+      const authUrl = new URL(await beginLogin());
+      location.pathname = '/callback';
+      location.search = `?code=auth-code-12345&state=${authUrl.searchParams.get('state')}`;
+
+      const now = Math.floor(Date.now() / 1000);
+      const oidcToken = makeJwt({
+        iss: 'https://192.168.45.143:8443/realms/saintvision',
+        sub: 'operator-alice',
+        iat: now,
+        exp: now + 1800,
+      });
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          access_token: oidcToken,
+          token_type: 'Bearer',
+        }),
+      });
+
+      await expect(completeLogin()).rejects.toThrow('OIDC 인증 응답에 ID 토큰(id_token)이 누락되었습니다.');
+    });
+
+    it('rejects callback when OIDC id_token nonce does not match transaction nonce (Codex Finding 2)', async () => {
+      const authUrl = new URL(await beginLogin());
+      location.pathname = '/callback';
+      location.search = `?code=auth-code-12345&state=${authUrl.searchParams.get('state')}`;
+
+      const now = Math.floor(Date.now() / 1000);
+      const oidcToken = makeJwt({
+        iss: 'https://192.168.45.143:8443/realms/saintvision',
+        sub: 'operator-alice',
+        iat: now,
+        exp: now + 1800,
+      });
+
+      const badNonceIdToken = makeJwt({
+        iss: 'https://192.168.45.143:8443/realms/saintvision',
+        aud: 'saintvision-web',
+        sub: 'operator-alice',
+        nonce: 'attacker-tampered-nonce',
+        iat: now,
+        exp: now + 300,
+      });
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          access_token: oidcToken,
+          id_token: badNonceIdToken,
+          token_type: 'Bearer',
+        }),
+      });
+
+      await expect(completeLogin()).rejects.toThrow('ID 토큰의 nonce가 로그인 요청 트랜잭션과 일치하지 않습니다.');
+    });
+
+    it('rejects callback when OIDC id_token aud does not match clientId (Codex Finding 2)', async () => {
+      const authUrl = new URL(await beginLogin());
+      location.pathname = '/callback';
+      location.search = `?code=auth-code-12345&state=${authUrl.searchParams.get('state')}`;
+
+      const now = Math.floor(Date.now() / 1000);
+      const oidcToken = makeJwt({
+        iss: 'https://192.168.45.143:8443/realms/saintvision',
+        sub: 'operator-alice',
+        iat: now,
+        exp: now + 1800,
+      });
+
+      const badAudIdToken = makeJwt({
+        iss: 'https://192.168.45.143:8443/realms/saintvision',
+        aud: 'other-client-id',
+        sub: 'operator-alice',
+        nonce: authUrl.searchParams.get('nonce'),
+        iat: now,
+        exp: now + 300,
+      });
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          access_token: oidcToken,
+          id_token: badAudIdToken,
+          token_type: 'Bearer',
+        }),
+      });
+
+      await expect(completeLogin()).rejects.toThrow('ID 토큰의 대상(aud)이 클라이언트 ID와 일치하지 않습니다.');
+    });
+
+    it('rejects callback when OIDC id_token iss does not match issuer (Codex Finding 2)', async () => {
+      const authUrl = new URL(await beginLogin());
+      location.pathname = '/callback';
+      location.search = `?code=auth-code-12345&state=${authUrl.searchParams.get('state')}`;
+
+      const now = Math.floor(Date.now() / 1000);
+      const oidcToken = makeJwt({
+        iss: 'https://192.168.45.143:8443/realms/saintvision',
+        sub: 'operator-alice',
+        iat: now,
+        exp: now + 1800,
+      });
+
+      const badIssIdToken = makeJwt({
+        iss: 'https://rogue-idp.example.com/realms/rogue',
+        aud: 'saintvision-web',
+        sub: 'operator-alice',
+        nonce: authUrl.searchParams.get('nonce'),
+        iat: now,
+        exp: now + 300,
+      });
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          access_token: oidcToken,
+          id_token: badIssIdToken,
+          token_type: 'Bearer',
+        }),
+      });
+
+      await expect(completeLogin()).rejects.toThrow('ID 토큰의 발급자(iss)가 설정된 issuer와 일치하지 않습니다.');
+    });
+
     it('rejects IdP token that violates server lifetime limit before calling /v1/session', async () => {
       const authUrl = new URL(await beginLogin());
       location.pathname = '/callback';
@@ -291,10 +497,20 @@ describe('OIDC Corporate IdP & Server Contract Verification (Card 153)', () => {
         exp: now + 7200, // 2h > 3600 limit
       });
 
+      const idToken = makeJwt({
+        iss: 'https://192.168.45.143:8443/realms/saintvision',
+        aud: 'saintvision-web',
+        sub: 'bad-token-user',
+        nonce: authUrl.searchParams.get('nonce'),
+        iat: now,
+        exp: now + 300,
+      });
+
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           access_token: invalidLifetimeToken,
+          id_token: idToken,
           token_type: 'Bearer',
         }),
       });
@@ -319,10 +535,20 @@ describe('OIDC Corporate IdP & Server Contract Verification (Card 153)', () => {
         exp: now + 500,
       });
 
+      const idToken = makeJwt({
+        iss: 'https://192.168.45.143:8443/realms/saintvision',
+        aud: 'saintvision-web',
+        sub: 'user-srv-exp',
+        nonce: authUrl.searchParams.get('nonce'),
+        iat: now - 100,
+        exp: now + 500,
+      });
+
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           access_token: oidcToken,
+          id_token: idToken,
           token_type: 'Bearer',
         }),
       });
@@ -332,11 +558,98 @@ describe('OIDC Corporate IdP & Server Contract Verification (Card 153)', () => {
         json: async () => ({
           subjectId: 'oidc:' + 'e'.repeat(64),
           tenantId: '00000000-0000-0000-0000-000000000099',
-          expiresAt: now - 5, // expired on server
+          expiresAt: now - 200, // expired beyond clock skew
         }),
       });
 
       await expect(completeLogin()).rejects.toThrow('서버 사용자 응답이 올바르지 않습니다.');
+    });
+
+    it('rejects server session when identity.expiresAt - nowSec > 3600 + CLOCK_SKEW_SEC (Claude L5-①)', async () => {
+      const authUrl = new URL(await beginLogin());
+      location.pathname = '/callback';
+      location.search = `?code=auth-code-srv-exceed&state=${authUrl.searchParams.get('state')}`;
+
+      const now = Math.floor(Date.now() / 1000);
+      const oidcToken = makeJwt({
+        iss: 'https://192.168.45.143:8443/realms/saintvision',
+        sub: 'user-srv-exceed',
+        iat: now,
+        exp: now + 1800,
+      });
+
+      const idToken = makeJwt({
+        iss: 'https://192.168.45.143:8443/realms/saintvision',
+        aud: 'saintvision-web',
+        sub: 'user-srv-exceed',
+        nonce: authUrl.searchParams.get('nonce'),
+        iat: now,
+        exp: now + 300,
+      });
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          access_token: oidcToken,
+          id_token: idToken,
+          token_type: 'Bearer',
+        }),
+      });
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          subjectId: 'oidc:' + 'e'.repeat(64),
+          tenantId: '00000000-0000-0000-0000-000000000099',
+          expiresAt: now + 3600 + CLOCK_SKEW_SEC + 10, // exceeds 3600 + 120
+        }),
+      });
+
+      await expect(completeLogin()).rejects.toThrow('서버 사용자 세션 유효 기간이 계약 허용치(최대 3600초)를 초과합니다.');
+    });
+
+    it('accepts server session within clock skew allowance (expiresAt - nowSec <= 3600 + 120) (Claude M3)', async () => {
+      const authUrl = new URL(await beginLogin());
+      location.pathname = '/callback';
+      location.search = `?code=auth-code-srv-skew&state=${authUrl.searchParams.get('state')}`;
+
+      const now = Math.floor(Date.now() / 1000);
+      const oidcToken = makeJwt({
+        iss: 'https://192.168.45.143:8443/realms/saintvision',
+        sub: 'user-srv-skew',
+        iat: now,
+        exp: now + 1800,
+      });
+
+      const idToken = makeJwt({
+        iss: 'https://192.168.45.143:8443/realms/saintvision',
+        aud: 'saintvision-web',
+        sub: 'user-srv-skew',
+        nonce: authUrl.searchParams.get('nonce'),
+        iat: now,
+        exp: now + 300,
+      });
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          access_token: oidcToken,
+          id_token: idToken,
+          token_type: 'Bearer',
+        }),
+      });
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          subjectId: 'oidc:' + 'e'.repeat(64),
+          tenantId: '00000000-0000-0000-0000-000000000099',
+          expiresAt: now + 3600 + 60, // 60s clock skew, within 120s allowance
+        }),
+      });
+
+      const session = await completeLogin();
+      expect(session.expiresAt).toBe(now + 3600 + 60);
     });
   });
 

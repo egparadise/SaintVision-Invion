@@ -30,7 +30,7 @@ export interface ResolvedOidcConfig {
 
 export interface Transaction {
   state: string;
-  nonce: string;
+  nonce?: string;
   verifier: string;
   createdAt: number;
   redirectUri: string;
@@ -99,6 +99,14 @@ function triggerTokenExpired(reason: string): void {
   });
 }
 
+export const CLOCK_SKEW_SEC = 120;
+
+function isSubpathOf(targetPath: string, basePath: string): boolean {
+  const normBase = basePath === '/' ? '/' : basePath.replace(/\/+$/, '') + '/';
+  const normTarget = targetPath.replace(/\/+$/, '') + '/';
+  return normBase === '/' || normTarget.startsWith(normBase);
+}
+
 function endpoint(value: unknown, fieldName = '인증 서버 URL'): string {
   if (typeof value !== 'string' || !value.trim()) {
     throw new Error(`${fieldName} 설정이 필요합니다.`);
@@ -145,13 +153,41 @@ export function authConfig(): ResolvedOidcConfig {
   let idpLogoutUrl: string | undefined;
 
   if (issuer) {
+    const issuerUrl = new URL(issuer);
     idpAuthorizeUrl = raw.idpAuthorizeUrl ? endpoint(raw.idpAuthorizeUrl, '인가 엔드포인트 URL') : `${issuer}/protocol/openid-connect/auth`;
     idpTokenUrl = raw.idpTokenUrl ? endpoint(raw.idpTokenUrl, '토큰 엔드포인트 URL') : `${issuer}/protocol/openid-connect/token`;
     idpLogoutUrl = raw.idpLogoutUrl ? endpoint(raw.idpLogoutUrl, '로그아웃 엔드포인트 URL') : `${issuer}/protocol/openid-connect/logout`;
+
+    const authUrl = new URL(idpAuthorizeUrl);
+    const tokenUrl = new URL(idpTokenUrl);
+    if (authUrl.origin !== issuerUrl.origin || !isSubpathOf(authUrl.pathname, issuerUrl.pathname)) {
+      throw new Error('인가 엔드포인트의 origin 또는 경로가 issuer와 일치하지 않습니다.');
+    }
+    if (tokenUrl.origin !== issuerUrl.origin || !isSubpathOf(tokenUrl.pathname, issuerUrl.pathname)) {
+      throw new Error('토큰 엔드포인트의 origin 또는 경로가 issuer와 일치하지 않습니다.');
+    }
+    if (idpLogoutUrl) {
+      const logoutUrl = new URL(idpLogoutUrl);
+      if (logoutUrl.origin !== issuerUrl.origin || !isSubpathOf(logoutUrl.pathname, issuerUrl.pathname)) {
+        throw new Error('로그아웃 엔드포인트의 origin 또는 경로가 issuer와 일치하지 않습니다.');
+      }
+    }
   } else if (raw.idpAuthorizeUrl && raw.idpTokenUrl) {
     idpAuthorizeUrl = endpoint(raw.idpAuthorizeUrl, '인가 엔드포인트 URL');
     idpTokenUrl = endpoint(raw.idpTokenUrl, '토큰 엔드포인트 URL');
     idpLogoutUrl = raw.idpLogoutUrl ? endpoint(raw.idpLogoutUrl, '로그아웃 엔드포인트 URL') : undefined;
+
+    const authUrl = new URL(idpAuthorizeUrl);
+    const tokenUrl = new URL(idpTokenUrl);
+    if (tokenUrl.origin !== authUrl.origin) {
+      throw new Error('인가 엔드포인트와 토큰 엔드포인트의 origin이 서로 일치하지 않습니다.');
+    }
+    if (idpLogoutUrl) {
+      const logoutUrl = new URL(idpLogoutUrl);
+      if (logoutUrl.origin !== authUrl.origin) {
+        throw new Error('로그아웃 엔드포인트의 origin이 인가 엔드포인트와 일치하지 않습니다.');
+      }
+    }
   } else {
     throw new Error('인증 서버 설정(issuer 또는 idpAuthorizeUrl과 idpTokenUrl)이 필요합니다.');
   }
@@ -161,10 +197,17 @@ export function authConfig(): ResolvedOidcConfig {
     : 'openid inv.api';
 
   const origin = window.location.origin;
-  const redirectUri = raw.redirectUri ? raw.redirectUri.trim() : `${origin}/callback`;
-  if (new URL(redirectUri, origin).origin !== origin) {
+  if (raw.redirectUri !== undefined && (typeof raw.redirectUri !== 'string' || !raw.redirectUri.trim())) {
+    throw new Error('redirect_uri 설정 형식이 올바르지 않습니다.');
+  }
+  const resolvedRedirect = raw.redirectUri ? new URL(raw.redirectUri.trim(), origin) : new URL('/callback', origin);
+  if (resolvedRedirect.origin !== origin) {
     throw new Error('redirect_uri의 origin이 현재 웹 애플리케이션과 일치하지 않습니다.');
   }
+  if (resolvedRedirect.pathname !== '/callback') {
+    throw new Error('redirect_uri의 경로는 /callback 이어야 합니다.');
+  }
+  const redirectUri = resolvedRedirect.href;
 
   return {
     issuer,
@@ -193,18 +236,36 @@ export function parseJwtPayload(token: string): JwtClaims | null {
   }
 }
 
-export function validateTokenExpiration(token: string, nowUnixSeconds = Math.floor(Date.now() / 1000)): void {
-  const claims = parseJwtPayload(token);
-  if (!claims) return;
-
-  if (typeof claims.exp === 'number' && typeof claims.iat === 'number') {
-    const lifetime = claims.exp - claims.iat;
-    if (lifetime <= 0 || lifetime > 3600) {
-      throw new Error('인증 토큰 유효 기간이 서버 계약 허용치(최대 3600초)를 초과하거나 올바르지 않습니다.');
+export function validateTokenExpiration(
+  token: string,
+  nowUnixSeconds = Math.floor(Date.now() / 1000),
+  options: { requireJwt?: boolean } = { requireJwt: true },
+): void {
+  if (typeof token !== 'string' || !token.trim()) {
+    throw new Error('인증 토큰이 비어 있습니다.');
+  }
+  const parts = token.split('.');
+  if (parts.length !== 3) {
+    if (options.requireJwt) {
+      throw new Error('인증 토큰(JWT) 형식이 올바르지 않습니다.');
     }
+    return;
+  }
+  const claims = parseJwtPayload(token);
+  if (!claims) {
+    throw new Error('인증 토큰(JWT) 형식이 올바르지 않습니다.');
   }
 
-  if (typeof claims.exp === 'number' && claims.exp <= nowUnixSeconds) {
+  if (!Number.isInteger(claims.exp) || !Number.isInteger(claims.iat)) {
+    throw new Error('인증 토큰에 유효한 정수형 exp 및 iat 클레임이 필요합니다.');
+  }
+
+  const lifetime = claims.exp! - claims.iat!;
+  if (lifetime <= 0 || lifetime > 3600) {
+    throw new Error('인증 토큰 유효 기간이 서버 계약 허용치(최대 3600초)를 초과하거나 올바르지 않습니다.');
+  }
+
+  if (claims.exp! + CLOCK_SKEW_SEC <= nowUnixSeconds) {
     throw new Error('이미 만료된 인증 토큰입니다.');
   }
 }
@@ -240,11 +301,13 @@ export async function beginLogin(): Promise<string> {
   const config = authConfig();
   const verifier = generateCodeVerifier();
   const challenge = await generateCodeChallenge(verifier);
+  const isOpenId = config.scope.split(/\s+/).includes('openid');
+  const nonce = isOpenId ? generateNonce() : undefined;
   const tx: Transaction = {
     config,
     verifier,
     state: generateState(),
-    nonce: generateNonce(),
+    nonce,
     createdAt: Date.now(),
     redirectUri: config.redirectUri,
   };
@@ -255,10 +318,12 @@ export async function beginLogin(): Promise<string> {
     redirect_uri: tx.redirectUri,
     scope: config.scope,
     state: tx.state,
-    nonce: tx.nonce,
     code_challenge: challenge,
     code_challenge_method: 'S256',
   };
+  if (tx.nonce) {
+    params.nonce = tx.nonce;
+  }
   for (const [key, value] of Object.entries(params)) {
     url.searchParams.set(key, value);
   }
@@ -310,8 +375,36 @@ export async function completeLogin(): Promise<{ token: string; user: SessionUse
     throw new Error('인증 토큰 응답이 올바르지 않습니다.');
   }
 
+  const nowSec = Math.floor(Date.now() / 1000);
+
+  // OIDC ID token validation (when nonce was sent or id_token is provided)
+  if (tx.nonce || result.id_token) {
+    if (typeof result.id_token !== 'string' || !result.id_token.trim()) {
+      throw new Error('OIDC 인증 응답에 ID 토큰(id_token)이 누락되었습니다.');
+    }
+    const idClaims = parseJwtPayload(result.id_token);
+    if (!idClaims) {
+      throw new Error('ID 토큰 페이로드가 올바르지 않습니다.');
+    }
+    if (tx.nonce && (typeof idClaims.nonce !== 'string' || idClaims.nonce !== tx.nonce)) {
+      throw new Error('ID 토큰의 nonce가 로그인 요청 트랜잭션과 일치하지 않습니다.');
+    }
+    if (config.issuer && (typeof idClaims.iss !== 'string' || idClaims.iss !== config.issuer)) {
+      throw new Error('ID 토큰의 발급자(iss)가 설정된 issuer와 일치하지 않습니다.');
+    }
+    const audMatch = typeof idClaims.aud === 'string'
+      ? idClaims.aud === config.clientId
+      : Array.isArray(idClaims.aud) && idClaims.aud.includes(config.clientId);
+    if (!audMatch) {
+      throw new Error('ID 토큰의 대상(aud)이 클라이언트 ID와 일치하지 않습니다.');
+    }
+    if (Number.isInteger(idClaims.exp) && idClaims.exp! + CLOCK_SKEW_SEC <= nowSec) {
+      throw new Error('ID 토큰이 이미 만료되었습니다.');
+    }
+  }
+
   // Client-side fail-closed token validity check against server contract (0 < exp - iat <= 3600)
-  validateTokenExpiration(result.access_token);
+  validateTokenExpiration(result.access_token, nowSec, { requireJwt: false });
 
   const session = await fetch('/v1/session', {
     credentials: 'omit',
@@ -321,13 +414,12 @@ export async function completeLogin(): Promise<{ token: string; user: SessionUse
   });
   if (!session.ok) throw new Error('서버가 인증 토큰을 허용하지 않았습니다.');
   const identity = await session.json();
-  const nowSec = Math.floor(Date.now() / 1000);
   if (typeof identity.subjectId !== 'string' || !/^oidc:[0-9a-f]{64}$/.test(identity.subjectId) ||
       typeof identity.tenantId !== 'string' || !identity.tenantId ||
-      !Number.isInteger(identity.expiresAt) || identity.expiresAt <= nowSec) {
+      !Number.isInteger(identity.expiresAt) || identity.expiresAt + CLOCK_SKEW_SEC <= nowSec) {
     throw new Error('서버 사용자 응답이 올바르지 않습니다.');
   }
-  if (identity.expiresAt - nowSec > 3600) {
+  if (identity.expiresAt - nowSec > 3600 + CLOCK_SKEW_SEC) {
     throw new Error('서버 사용자 세션 유효 기간이 계약 허용치(최대 3600초)를 초과합니다.');
   }
 

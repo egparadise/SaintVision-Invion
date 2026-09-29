@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.142"
+version: "1.0.143"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-30T00:05:00+09:00"
+updated: "2026-09-30T08:08:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,17 +19,18 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-30T00:05:00+09:00 (Card 153 사내 IdP Keycloak 연동 FE 점검·수정 및 OIDC PKCE·토큰 만료·로그아웃 검증 완료).
+- 확인 기준: 2026-09-30T08:08:00+09:00 (Card 153 Claude UI M1~M3·L4~L6 및 Codex 1~5 검토 의견 전수 반영 및 재검증 완료).
 
-## 2026-09-30 사내 IdP(Keycloak) 연동 FE 점검·수정 및 OIDC PKCE·토큰 만료·로그아웃 검증 (Card 153, `agent/gemini/card153-idp-login`)
-- **개요**: 사내 IdP(Claude Card 152가 노드 .143에 배포한 Keycloak) 연동을 위한 FE 전면 점검 및 조치 완료: (1) OIDC Authorization Code + PKCE(RFC 7636 S256, nonce, state), (2) 동적 issuer 및 clientId 설정 해석(Keycloak auth/token/logout 엔드포인트 자동 도출 및 하드코딩/dev 폴백 원천 배제), (3) dev IdP 가정 및 비암호화 원격 HTTP 전면 차단, (4) 제어 평면 서버 계약 준수 토큰 유효기간(0 < exp - iat <= 3600) 이중 가드 및 능동 세션 만료 타이머·[AUTH-0050] 재로그인 안내 배너, (5) OIDC RP-Initiated 로그아웃 및 인메모리/스토리지 무결 청소, (6) Mock OIDC 종합 검증 스위트 완비.
-- **담당 및 역할**: Gemini (Frontend / UI / 웹 배포 소유). Reviewer: Claude (UI·테스트 축), 제어 평면 계약 합의 (계약 축).
+## 2026-09-30 사내 IdP(Keycloak) 연동 FE 점검·수정 및 OIDC PKCE·토큰 만료·로그아웃 검증 (Card 153, `agent/gemini/card153-idp-login`, PR #247)
+- **개요**: 사내 IdP(Claude Card 152가 노드 .143에 배포한 Keycloak) 연동을 위한 FE 점검 및 독립 검토 의견 전수 반영: (1) OIDC Authorization Code + PKCE(RFC 7636 S256 verifier/challenge, state, nonce, RFC 부록 B 벡터 100% 일치), (2) 동적 issuer 및 clientId 설정 해석 및 issuer origin/path 계층에 결속하여 cross-origin token override 원천 차단(Codex 1), (3) dev IdP 가정 및 비암호화 원격 HTTP 전면 차단, (4) OIDC ID 토큰(id_token)의 nonce(트랜잭션 일치), aud(clientId 일치), iss(issuer 일치) 클라이언트 검증 완비(Codex 2, Claude M2), (5) 제어 평면 서버 계약 준수 토큰 유효기간(0 < exp - iat <= 3600) fail-closed 검증 및 120초 시계 오차 허용(CLOCK_SKEW_SEC = 120, Claude M3, Codex 5), (6) `App.tsx:549` Header 로그아웃에 `performLogout({ redirectIdp: true, postLogoutRedirectUri: window.location.origin })` 실 배선 및 App 수준 통합 시험 완비(Claude M1, Codex 3), (7) `auth-config.js` 정본 계약(`https://idp.sv.lan/realms/saintvision`, `sv-portal`) 정합(Codex 4), (8) redirectUri 정규화 및 `/callback` strict path 검증(Claude L4).
+- **담당 및 역할**: Gemini (Frontend / UI / 웹 배포 소유). Reviewer: Claude (UI·테스트 축), Codex (계약·보안 축).
 - **관측 근거 (Evidence)**:
-  - 신규 OIDC 종합 계약 시험: `apps/web/tests/auth-oidc-contract.test.ts` (20 passed)
-  - 기존 인증 및 PKCE 회귀 시험: `apps/web/tests/auth-session.test.ts` (17 passed), `apps/web/tests/auth-pkce.test.ts` (4 passed)
-  - 전체 Vitest 스위트: 90 test files / 940 passed 100% (0 failed)
+  - 신규 OIDC 종합 계약 시험: `apps/web/tests/auth-oidc-contract.test.ts` (33 passed)
+  - 기존 인증 및 PKCE 회귀 시험: `apps/web/tests/auth-session.test.ts` (17 passed), `apps/web/tests/auth-pkce.test.ts` (5 passed)
+  - 신규 App 수준 OIDC 통합 시험: `apps/web/tests/auth-app-oidc-integration.test.tsx` (2 passed)
+  - 전체 Vitest 스위트: 91 test files / 956 passed 100% (0 failed)
   - TypeScript 점검: `npx tsc -b` 타입 에러 0건
-  - 프로덕션 번들 빌드: `npm run build` 성공 (Vite production bundle 정상 생성)
+  - 프로덕션 번들 빌드: `npm run build` 성공 (Vite production bundle 정상 생성, 9.07s)
   - 프런트엔드 무결성 점검: `python tools/check_frontend_integrity.py` 92개 파일 스캔, 9대 무결성 규칙 위반 0건 (exit 0)
   - 계약 바인딩 점검: `python tools/check_contract_bindings.py` 55개 픽스처 전수 커버리지, 14개 리플레이 가드 PASS (exit 0)
   - 라우트 커버리지 점검: `pytest tests/test_route_coverage.py` 40 passed 100% (exit 0)
