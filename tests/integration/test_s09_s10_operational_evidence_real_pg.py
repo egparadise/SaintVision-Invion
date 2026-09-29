@@ -182,6 +182,10 @@ def test_o11_prime_passes_against_the_installed_enforcement(owner_engine, databa
     assert summary["fkPresent"] is True
     assert summary["fkMatchesExpected"] is True
     assert summary["fkValidated"] is True
+    # Ten, not nine: the FK shape query selects two columns PostgreSQL both names
+    # array_agg, and a mapping read drops one of them. Reading it through a
+    # mapping cursor reported this healthy FK as changed.
+    assert summary["fkShapeElementCount"] == 10
     assert summary["updateGranteesMatchExpected"] is True
     assert summary["publicUpdateGrant"] is False
     verdict = collector.evaluate_enforcement_shape(summary)

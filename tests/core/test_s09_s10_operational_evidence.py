@@ -499,3 +499,94 @@ def test_the_seed_is_not_an_operator_flag():
     }
     assert "--o2-seed" not in options
     assert "--o2-limit" in options
+
+
+# ------------------------- FK shape must be read positionally (train-2 failure)
+
+
+class _FakeCursor:
+    def __init__(self, rows):
+        self._rows = rows
+
+    def fetchall(self):
+        return self._rows
+
+    def fetchone(self):
+        return self._rows[0] if self._rows else None
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+
+class _FakeShapeConn:
+    """Answers the two shape queries positionally, like the migration does.
+
+    Migration 0054's FK_SHAPE selects two unnamed array_agg columns, so a mapping
+    row factory keeps only one of them. This fake returns the ten-element tuple a
+    positional read gives, which is what the collector must ask for.
+    """
+
+    def __init__(self, fk_row, check_row, grantees=("inv_app",)):
+        self.fk_row = fk_row
+        self.check_row = check_row
+        self.grantees = grantees
+        self.positional_calls = 0
+
+    def execute_positional(self, statement, params=None):
+        self.positional_calls += 1
+        if "pg_get_constraintdef" in statement:
+            return _FakeCursor([self.check_row])
+        return _FakeCursor([self.fk_row])
+
+    def execute(self, statement, params=None):
+        assert "column_privileges" in statement, (
+            "shape queries must not be read through the mapping cursor"
+        )
+        return _FakeCursor([{"grantee": name} for name in self.grantees])
+
+
+def _expected_rows():
+    shapes = collector.load_enforcement_expectation()
+    check = shapes["expected_check"]
+    fk = shapes["expected_fk"]
+    return (
+        tuple(fk[:2]) + (list(fk[2]), list(fk[3])) + tuple(fk[4:7]) + (fk[7], fk[8], fk[9]),
+        (check[0], check[1], check[2]),
+    )
+
+
+def test_the_fk_shape_is_read_positionally_and_keeps_all_ten_elements():
+    fk_row, check_row = _expected_rows()
+    conn = _FakeShapeConn(fk_row, check_row)
+    summary = collector.read_enforcement_shape(conn)
+    assert conn.positional_calls == 2, "both shape queries must use the positional cursor"
+    assert summary["fkShapeElementCount"] == 10, (
+        "a mapping read collapses the two array_agg columns to nine elements"
+    )
+    assert summary["fkMatchesExpected"] is True
+    assert summary["checkMatchesExpected"] is True
+    assert collector.evaluate_enforcement_shape(summary)["status"] == "MEASURED_PASS"
+
+
+def test_a_genuinely_changed_fk_still_fails():
+    """The positional read must not turn the check into a rubber stamp."""
+    fk_row, check_row = _expected_rows()
+    tampered = list(fk_row)
+    tampered[6] = "f"  # confmatchtype: FULL instead of the expected SIMPLE
+    summary = collector.read_enforcement_shape(_FakeShapeConn(tuple(tampered), check_row))
+    assert summary["fkMatchesExpected"] is False
+    assert collector.evaluate_enforcement_shape(summary)["status"] == "MEASURED_FAIL"
+
+
+def test_a_missing_fk_row_is_reported_as_absent():
+    fk_row, check_row = _expected_rows()
+    conn = _FakeShapeConn(fk_row, check_row)
+    conn.execute_positional = lambda statement, params=None: _FakeCursor([])
+    summary = collector.read_enforcement_shape(conn)
+    assert summary["fkPresent"] is False
+    assert summary["checkPresent"] is False
+    assert summary["fkShapeElementCount"] == 0
+    assert collector.evaluate_enforcement_shape(summary)["status"] == "MEASURED_FAIL"
