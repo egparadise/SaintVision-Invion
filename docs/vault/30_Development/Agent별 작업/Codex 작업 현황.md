@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.228"
+version: "1.0.229"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T01:06:00+09:00"
+updated: "2026-09-30T01:10:00+09:00"
 source_of_truth: "Git"
 active_card: "CARD-151 intranet ObjectStore and PITR rehearsal"
 active_card_status: "PR 248 review; TLS operational U6 PASS, canonical S01 partial, source replication HBA blocked external"
@@ -12,6 +12,11 @@ active_card_next: "Claude review; operator-approved physical replication boundar
 ---
 
 # Codex 작업 현황
+
+## 2026-09-30 Card154 사내망 자체 구축 독립 검증
+
+- Card 150 PR #249와 Card 153 PR #247에 보안·계약 수정 요청을 게시했고, Card 152 PR #250의 기존 F-R1~F-R5는 head가 바뀌지 않아 유지한다. Card 151 PR #248은 자기 작성 범위라 독립 승인으로 세지 않고 Claude 검토를 대기한다.
+- canonical preflight는 storage operational evidence만 PASS, 전체 PASS 1/FAIL 2/BLOCKED 6과 `acceptanceAssessed=false`다. 미입력 token·inventory·DNS를 합성하지 않았고 U6 전체도 configuration route/operator token 부재로 BLOCKED다. [[2026-09-30_01-10-00_KST_Card154_사내망_독립검증_Codex_검토]].
 
 ## 2026-09-30 Card151 사내 Storage TLS 운영 증거·canonical 검증
 
