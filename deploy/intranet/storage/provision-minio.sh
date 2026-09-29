@@ -1,0 +1,134 @@
+#!/bin/sh
+set -eu
+
+IMAGE='docker.io/coollabsio/minio@sha256:72b4794d7faa001823364f8ee239717141327fc450a3264414f573a6abf3c629'
+NAME='saintvision-intranet-minio'
+ROLLBACK_NAME='saintvision-intranet-minio-card151-rollback'
+CONFIG_DIR="${SV_STORAGE_CONFIG_DIR:-$HOME/.config/saintvision-intranet}"
+DATA_DIR="${SV_STORAGE_DATA_DIR:-$HOME/.local/share/saintvision-intranet/minio/data}"
+BIND_ADDRESS="${SV_STORAGE_BIND_ADDRESS:-192.168.45.210}"
+PORT="${SV_STORAGE_PORT:-9000}"
+ROOT_ENV="$CONFIG_DIR/minio-root.env"
+SERVICE_ENV="$CONFIG_DIR/minio-service-user.env"
+PITR_ENV="$CONFIG_DIR/pitr-service-user.env"
+PRODUCT_POLICY="$CONFIG_DIR/product-policy.json"
+PITR_POLICY="$CONFIG_DIR/pitr-policy.json"
+CERT_DIR="$CONFIG_DIR/minio-certs"
+
+fail() {
+  printf '%s\n' "$1" >&2
+  exit 2
+}
+
+for file in "$ROOT_ENV" "$SERVICE_ENV" "$PITR_ENV" "$PRODUCT_POLICY" "$PITR_POLICY"; do
+  [ -f "$file" ] || fail "required protected input is absent"
+  [ ! -L "$file" ] || fail "protected input must not be a symlink"
+done
+
+mode() {
+  stat -c '%a' "$1"
+}
+[ "$(mode "$ROOT_ENV")" = 600 ] || fail "root credential mode must be 0600"
+[ "$(mode "$SERVICE_ENV")" = 600 ] || fail "service credential mode must be 0600"
+[ "$(mode "$PITR_ENV")" = 600 ] || fail "PITR credential mode must be 0600"
+
+mkdir -p "$DATA_DIR"
+chmod 700 "$CONFIG_DIR" "$DATA_DIR"
+
+TLS_ENABLED=false
+if [ -f "$CERT_DIR/public.crt" ] || [ -f "$CERT_DIR/private.key" ] || [ -f "$CERT_DIR/ca-chain.pem" ]; then
+  [ -f "$CERT_DIR/public.crt" ] && [ -f "$CERT_DIR/private.key" ] && [ -f "$CERT_DIR/ca-chain.pem" ] \
+    || fail "partial TLS input is forbidden"
+  [ ! -L "$CERT_DIR/public.crt" ] && [ ! -L "$CERT_DIR/private.key" ] && [ ! -L "$CERT_DIR/ca-chain.pem" ] \
+    || fail "TLS input must not be a symlink"
+  [ "$(mode "$CERT_DIR/private.key")" = 600 ] || fail "TLS private key mode must be 0600"
+  TLS_ENABLED=true
+fi
+
+OLD_PRESERVED=false
+rollback() {
+  status=$?
+  trap - EXIT HUP INT TERM
+  if [ "$status" -ne 0 ] && [ "$OLD_PRESERVED" = true ]; then
+    if docker inspect "$NAME" >/dev/null 2>&1; then
+      owner="$(docker inspect --format '{{ index .Config.Labels "ai.saintvision.owner" }}' "$NAME")"
+      task="$(docker inspect --format '{{ index .Config.Labels "ai.saintvision.task" }}' "$NAME")"
+      if [ "$owner" = codex ] && [ "$task" = intranet-storage-card151 ]; then
+        docker rm -f "$NAME" >/dev/null 2>&1 || true
+      fi
+    fi
+    docker rename "$ROLLBACK_NAME" "$NAME" >/dev/null
+    docker start "$NAME" >/dev/null
+  fi
+  exit "$status"
+}
+trap rollback EXIT HUP INT TERM
+
+if docker inspect "$NAME" >/dev/null 2>&1; then
+  owner="$(docker inspect --format '{{ index .Config.Labels "ai.saintvision.owner" }}' "$NAME")"
+  task="$(docker inspect --format '{{ index .Config.Labels "ai.saintvision.task" }}' "$NAME")"
+  [ "$owner" = codex ] && [ "$task" = intranet-storage-card151 ] \
+    || fail "refusing to replace an unowned container"
+  docker inspect "$ROLLBACK_NAME" >/dev/null 2>&1 \
+    && fail "a preserved rollback container already exists"
+  docker stop "$NAME" >/dev/null
+  docker rename "$NAME" "$ROLLBACK_NAME" >/dev/null
+  OLD_PRESERVED=true
+fi
+
+set -- docker run -d \
+  --name "$NAME" \
+  --label ai.saintvision.owner=codex \
+  --label ai.saintvision.task=intranet-storage-card151 \
+  --restart unless-stopped \
+  --user "$(id -u):$(id -g)" \
+  --read-only \
+  --tmpfs /tmp:rw,noexec,nosuid,nodev,size=67108864 \
+  --security-opt no-new-privileges \
+  --cap-drop ALL \
+  --env-file "$ROOT_ENV" \
+  -v "$DATA_DIR:/data" \
+  -v "$CONFIG_DIR:/run/saintvision-intranet:ro" \
+  -p "$BIND_ADDRESS:$PORT:9000"
+if [ "$TLS_ENABLED" = true ]; then
+  set -- "$@" -e MINIO_CERTS_DIR=/certs -v "$CERT_DIR:/certs:ro"
+fi
+set -- "$@" "$IMAGE" server /data --address :9000
+"$@" >/dev/null
+
+scheme=http
+[ "$TLS_ENABLED" = true ] && scheme=https
+attempt=0
+until docker exec "$NAME" /bin/sh -eu -c '
+  . /run/saintvision-intranet/minio-root.env
+  export MC_HOST_local="'"$scheme"'://${MINIO_ROOT_USER}:${MINIO_ROOT_PASSWORD}@127.0.0.1:9000"
+  [ "$(/usr/bin/mc ready local 2>/dev/null | wc -l)" -ge 1 ]
+' >/dev/null 2>&1; do
+  attempt=$((attempt + 1))
+  [ "$attempt" -lt 30 ] || fail "MinIO did not become ready"
+  sleep 1
+done
+
+# Root and scoped credentials stay in protected files mounted read-only. They
+# are never printed; docker-group membership is the administrative boundary.
+docker exec "$NAME" /bin/sh -eu -c '
+  . /run/saintvision-intranet/minio-root.env
+  export MC_HOST_local="'"$scheme"'://${MINIO_ROOT_USER}:${MINIO_ROOT_PASSWORD}@127.0.0.1:9000"
+  /usr/bin/mc mb --ignore-existing local/saintvision-objects >/dev/null
+  /usr/bin/mc mb --ignore-existing local/saintvision-pitr >/dev/null
+  /usr/bin/mc admin policy create local saintvision-product /run/saintvision-intranet/product-policy.json >/dev/null
+  /usr/bin/mc admin policy create local saintvision-pitr /run/saintvision-intranet/pitr-policy.json >/dev/null
+  . /run/saintvision-intranet/minio-service-user.env
+  /usr/bin/mc admin user add local "$SVC_KEY" "$SVC_SECRET" >/dev/null
+  /usr/bin/mc admin policy attach local saintvision-product --user "$SVC_KEY" >/dev/null
+  . /run/saintvision-intranet/pitr-service-user.env
+  /usr/bin/mc admin user add local "$PITR_KEY" "$PITR_SECRET" >/dev/null
+  /usr/bin/mc admin policy attach local saintvision-pitr --user "$PITR_KEY" >/dev/null
+'
+
+if [ "$OLD_PRESERVED" = true ]; then
+  docker rm "$ROLLBACK_NAME" >/dev/null
+  OLD_PRESERVED=false
+fi
+trap - EXIT HUP INT TERM
+printf 'minioReady=true tlsEnabled=%s bindPort=%s\n' "$TLS_ENABLED" "$PORT"
