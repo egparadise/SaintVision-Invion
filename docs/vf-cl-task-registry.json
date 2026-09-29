@@ -1,0 +1,93 @@
+{
+  "version": "1.0.0",
+  "source": "ROADMAP-VIRTUAL-COMPUTER-001@1.0.0",
+  "track": "VF-CL",
+  "owner": "Claude",
+  "acceptanceDenominator": 5,
+  "acceptedCards": 0,
+  "cards": [
+    {
+      "id": "VF-CL-01",
+      "title": "Storage catalogue/API and DataLocation reuse",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "state": "review",
+      "dependsOn": ["VF-CX-02"],
+      "implemented": true,
+      "locallyVerified": true,
+      "ciVerified": true,
+      "independentlyReviewed": true,
+      "operationallyAccepted": false
+    },
+    {
+      "id": "VF-CL-02",
+      "title": "inv:// resolver and model shard/replica resolution",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "state": "review",
+      "dependsOn": ["VF-CL-01"],
+      "implemented": true,
+      "locallyVerified": true,
+      "ciVerified": true,
+      "independentlyReviewed": false,
+      "operationallyAccepted": false,
+      "blockers": [
+        "uri-trailing-and-version-slash-fix-re-review-not-recorded",
+        "c75201af-model-shard-resolution-not-independently-reviewed"
+      ]
+    },
+    {
+      "id": "VF-CL-03",
+      "title": "Model registry, lineage and import adapter",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "state": "review",
+      "dependsOn": ["VF-CX-02"],
+      "implemented": "partial",
+      "locallyVerified": true,
+      "ciVerified": true,
+      "independentlyReviewed": false,
+      "operationallyAccepted": false,
+      "blockers": [
+        "import-adapter-has-no-request-path-contract",
+        "34791448-license-exact-match-adapter-not-independently-reviewed"
+      ]
+    },
+    {
+      "id": "VF-CL-04",
+      "title": "Replica repair, backup/PITR, metrics and runbook",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "state": "review",
+      "dependsOn": ["VF-CL-01"],
+      "implemented": true,
+      "locallyVerified": true,
+      "ciVerified": false,
+      "independentlyReviewed": false,
+      "operationallyAccepted": false,
+      "blockers": [
+        "restore-drill-19-setup-skips-in-hosted-core-until-pr-126",
+        "retention-and-readiness-tools-not-wired-to-any-operational-gate",
+        "0043-retained-replicas-pin-fix-re-review-not-recorded",
+        "3e267b05-archive-retention-tool-not-independently-reviewed"
+      ]
+    },
+    {
+      "id": "VF-CL-05",
+      "title": "Independent review of Codex/Gemini outputs",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "state": "review",
+      "dependsOn": [],
+      "implemented": true,
+      "locallyVerified": true,
+      "ciVerified": false,
+      "independentlyReviewed": false,
+      "operationallyAccepted": false,
+      "notApplicable": [
+        "ciVerified: a review card ships documents, not code CI executes",
+        "independentlyReviewed: this card IS the review function; its own outputs are reviewed per-document by the owner of the reviewed change"
+      ]
+    }
+  ]
+}

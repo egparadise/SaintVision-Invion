@@ -46,6 +46,14 @@ const contracts = [
   { schema: 'distributed-plan-response', output: 'distributed-plan-response' },
   { schema: 'node-page-response', output: 'node-page-response' },
   { schema: 'node-detail-response', output: 'node-detail-response' },
+  { schema: 'conformance-status-response', output: 'conformance-status-response' },
+  { schema: 'conformance-status-recorded-response', output: 'conformance-status-recorded-response' },
+  { schema: 'adapter-conformance-not-observed-response', output: 'adapter-conformance-not-observed-response' },
+  { schema: 'adapter-conformance-recorded-response', output: 'adapter-conformance-recorded-response' },
+  { schema: 'run-record-response', output: 'run-record-response' },
+  { schema: 'run-record-artifact-page-response', output: 'run-record-artifact-page-response' },
+  { schema: 'artifact-pin-verification-response', output: 'artifact-pin-verification-response' },
+  { schema: 'context-bundle-response', output: 'context-bundle-response' },
 ];
 const mode = process.argv[2];
 

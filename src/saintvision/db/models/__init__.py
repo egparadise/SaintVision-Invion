@@ -13,6 +13,12 @@ from .artifacts import (
     Artifact,
     UploadSession,
 )
+from .conformance import (
+    CONFORMANCE_PROVENANCES,
+    CONFORMANCE_SUBJECTS,
+    OUTCOME_KEYS,
+    AdapterConformanceRecord,
+)
 from .context import (
     CONTEXT_ITEM_KINDS,
     SNAPSHOT_SOFT_LIMIT_BYTES,
@@ -246,6 +252,10 @@ APPEND_ONLY_TABLES: tuple[str, ...] = (
     "mlflow_mirror_intents",
     "mlflow_mirror_attempts",
     "mlflow_mirror_defects",
+    # A conformance record is a statement of what the suite observed; a row
+    # that could be rewritten would not be one (design #218 §2-4). Host-global
+    # by design, so it is here and not in TENANT_SCOPED_TABLES.
+    "adapter_conformance_records",
 )
 
 #: Append-only tables the application role may write but **not read**. Their
@@ -277,6 +287,10 @@ LIFECYCLE_UPDATE_COLUMNS: dict[str, tuple[str, ...]] = {
 
 __all__ = [
     "ACCEPTANCE_OUTCOMES",
+    "AdapterConformanceRecord",
+    "CONFORMANCE_PROVENANCES",
+    "CONFORMANCE_SUBJECTS",
+    "OUTCOME_KEYS",
     "CACHE_FILL_LIMIT",
     "DataReplica",
     "MAX_CONCURRENT_TRANSFERS",

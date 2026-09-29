@@ -117,6 +117,7 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 key={tab.id}
                 data-testid={`header-tab-${tab.id}`}
+                aria-current={isActive ? 'page' : undefined}
                 onClick={() => onSelectTab(tab.id)}
                 style={{
                   padding: '8px 12px',

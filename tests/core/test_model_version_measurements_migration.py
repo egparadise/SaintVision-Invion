@@ -181,7 +181,8 @@ def test_the_graph_has_one_head_and_it_is_this_revision():
         capture_output=True, text=True, cwd=ROOT,
     )
     assert head.returncode == 0, head.stderr
-    assert head.stdout.strip() == "0054_model_version_measurements"
+    # 0055 (G-03 conformance records, card 103) sits above this revision now.
+    assert head.stdout.strip() == "0055_adapter_conformance_records"
 
 
 # ---------------------------------------------------------------- the kernel's SQL and the reader
@@ -257,7 +258,8 @@ def test_the_definer_policy_pins_exactly_this_revisions_reader():
     entry = policy["functions"]["public.model_version_measurement(text)"]
     assert entry["definitionSHA256"] == M.reader_definition_sha256() == hashlib.sha256(M.reader_definition().encode()).hexdigest()
     assert entry["executeRoles"] == ["inv_app"] and entry["kind"] == "tenant-bound"
-    assert policy["revision"] == "0054_model_version_measurements"
+    # The policy revision follows the graph head (0055 adds no definer function).
+    assert policy["revision"] == "0055_adapter_conformance_records"
 
 
 def test_the_rendered_definition_follows_the_shape_postgresql_uses_for_0044():

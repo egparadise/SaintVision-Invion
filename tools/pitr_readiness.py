@@ -44,6 +44,12 @@ def assess(settings: dict[str, str | None]) -> dict:
     report['reasons'] = reasons or ['Configuration observed; WAL delivery and recovery have not been verified']
     return report
 
+def verifier_exit(report: dict, *, require_pitr: bool = False) -> int:
+    """Return the CLI contract exit without re-reading private connection input."""
+    if require_pitr:
+        return 1
+    return 0 if report.get('verdict') == 'possible' else 2
+
 def read_settings(dsn: str) -> dict[str, str | None]:
     import psycopg
     out = {}
@@ -78,7 +84,7 @@ def main() -> int:
         print('PITR configuration: ' + report['verdict'])
         print('Recovery verified: false')
         for reason in report['reasons']: print('  - ' + reason)
-    return 1 if args.require_pitr else (0 if report['verdict'] == 'possible' else 2)
+    return verifier_exit(report, require_pitr=args.require_pitr)
 
 if __name__ == '__main__':
     raise SystemExit(main())

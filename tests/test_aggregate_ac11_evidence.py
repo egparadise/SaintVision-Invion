@@ -37,13 +37,17 @@ TOOL_BLOBS = {
 }
 TOOL_BLOBS[tool.ALLOWLIST_REPO_PATH] = tool.ALLOWLIST_BLOB
 TARGET_CRITERIA = {
-    "target-" + axis: (
+    tool.REQUIRED_TARGET_BY_AXIS.get(axis, "target-" + axis): (
         {} if axis == "security-critical-high-zero" else {"sampleCount": {"operator": "gte", "value": 1}}
     )
     for axis in tool.REQUIRED_AXES
 }
 TARGET_ENVIRONMENTS = {
-    "target-" + axis: {"topology": "hosted-synthetic"}
+    tool.REQUIRED_TARGET_BY_AXIS.get(axis, "target-" + axis): {"topology": "hosted-synthetic"}
+    for axis in tool.REQUIRED_AXES
+}
+TARGET_AXES = {
+    tool.REQUIRED_TARGET_BY_AXIS.get(axis, "target-" + axis): axis
     for axis in tool.REQUIRED_AXES
 }
 
@@ -72,7 +76,7 @@ class FakeGit:
         if path == tool.TARGET_REGISTRY_PATH:
             targets = []
             for target_id, criteria in TARGET_CRITERIA.items():
-                axis = target_id.split("target-", 1)[1].split("--", 1)[0]
+                axis = TARGET_AXES[target_id]
                 targets.append({
                     "targetId": target_id,
                     "axis": axis,
@@ -109,10 +113,11 @@ def target(
     actual = {} if axis == "security-critical-high-zero" else (
         criteria or {"sampleCount": {"operator": "gte", "value": 1}}
     )
-    target_id = "target-" + axis
+    target_id = tool.REQUIRED_TARGET_BY_AXIS.get(axis, "target-" + axis)
     if actual != TARGET_CRITERIA.get(target_id):
         target_id += "--" + str(len(TARGET_CRITERIA))
         TARGET_CRITERIA[target_id] = copy.deepcopy(actual)
+        TARGET_AXES[target_id] = axis
     TARGET_ENVIRONMENTS[target_id] = copy.deepcopy(
         required_environment or {"topology": "hosted-synthetic"}
     )
@@ -411,12 +416,49 @@ def test_repository_registry_targets_match_current_tree_and_pitr_is_weekly_regis
         document = registered["sourceDocument"]
         assert git.blob("HEAD", document["path"]) == document["blob"]
 
-    pitr = next(row for row in registry["targets"] if row["targetId"] == "s11-actual-pitr-v0")
+    assert all(row["targetId"] != "s11-actual-pitr-v0" for row in registry["targets"])
+    pitr = next(
+        row
+        for row in registry["targets"]
+        if row["targetId"] == "s11-st-actual-pitr-archive-failure-v0"
+    )
     assert pitr["criteria"]["consecutiveWeeklyRestoreSmokeWeeks"] == {
         "operator": "gte",
         "value": 2,
     }
     assert pitr["criteria"]["maxRestoreSmokeGapDays"] == {"operator": "lte", "value": 7}
+    assert pitr["criteria"]["recoveryAfterWalArchiveFaultPassCount"] == {
+        "operator": "gte",
+        "value": 1,
+    }
+    restore = next(
+        row
+        for row in registry["targets"]
+        if row["targetId"] == "s11-irreversible-restore-forward-v0"
+    )
+    assert restore["criteria"]["negativeFixturePassCount"] == {
+        "operator": "eq",
+        "value": 4,
+    }
+    reversible = next(
+        row
+        for row in registry["targets"]
+        if row["targetId"] == "s11-migration-reversible-roundtrip-v1"
+    )
+    assert reversible["axis"] == "migration-reversible-segment"
+    assert reversible["criteria"] == {
+        "catalogMismatchCount": {"operator": "eq", "value": 0},
+        "reversibleRoundtripPassCount": {"operator": "eq", "value": 1},
+        "sentinelMismatchCount": {"operator": "eq", "value": 0},
+    }
+
+
+def test_required_target_map_rejects_old_pitr_target(allowlist):
+    value = envelope("actual-pitr-rpo-rto-retention")
+    value["targetRef"]["targetId"] = "s11-actual-pitr-v0"
+    result = axis_result(value, allowlist)
+    assert result.verdict is tool.Verdict.INVALID_RUN
+    assert "required target" in result.reasons[0]
 
 
 def test_empty_n_and_bad_failure_denominator_are_invalid(allowlist):
@@ -429,6 +471,24 @@ def test_empty_n_and_bad_failure_denominator_are_invalid(allowlist):
     mismatch = envelope(tool.REQUIRED_AXES[1])
     mismatch["observations"][0].update(successCount=0, failureCount=1, errorsByClass={"57014": 0})
     assert axis_result(mismatch, allowlist).verdict is tool.Verdict.INVALID_RUN
+
+
+def test_zero_expected_count_value_must_equal_failure_count(allowlist):
+    value = envelope(tool.REQUIRED_AXES[1], "MEASURED_PASS")
+    value["targetRef"] = target(
+        tool.REQUIRED_AXES[1],
+        {"cleanupResidueCount": {"operator": "eq", "value": 0}},
+    )
+    value["observations"][0].update(
+        metric="cleanupResidueCount",
+        value=0,
+        n=1,
+        successCount=0,
+        failureCount=1,
+        skipCount=0,
+        errorsByClass={"residue": 1},
+    )
+    assert axis_result(value, allowlist).verdict is tool.Verdict.INVALID_RUN
 
 
 def test_target_violation_is_fail_but_false_pass_is_invalid(allowlist):

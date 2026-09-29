@@ -1,0 +1,81 @@
+{
+  "$defs": {
+    "ConformanceCheckDescriptor": {
+      "additionalProperties": false,
+      "description": "One check the conformance contract defines, named and gated.\n\nA descriptor, not a result: there is no ``passed`` here because nothing has\nbeen observed. Read from ``adapters.conformance.CHECKLIST``, which is the\nsingle source for the list.",
+      "properties": {
+        "capabilityGated": {
+          "title": "Capabilitygated",
+          "type": "boolean"
+        },
+        "name": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "capabilityGated"
+      ],
+      "title": "ConformanceCheckDescriptor",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The single-adapter route when the adapter is known but has no record.\n\n200, not 404: \"no such adapter\" and \"no measurement of this adapter\" are\ndifferent facts, and folding the second into the first makes it read as\nthe first (§4-3).",
+  "properties": {
+    "adapter": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Adapter",
+      "type": "string"
+    },
+    "checks": {
+      "items": {
+        "$ref": "#/$defs/ConformanceCheckDescriptor"
+      },
+      "title": "Checks",
+      "type": "array"
+    },
+    "contractVersion": {
+      "maxLength": 32,
+      "minLength": 1,
+      "title": "Contractversion",
+      "type": "string"
+    },
+    "reason": {
+      "maxLength": 300,
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    },
+    "recordedAt": {
+      "title": "Recordedat",
+      "type": "null"
+    },
+    "scope": {
+      "const": "control-plane-host",
+      "title": "Scope",
+      "type": "string"
+    },
+    "status": {
+      "const": "NOT_OBSERVED",
+      "title": "Status",
+      "type": "string"
+    }
+  },
+  "required": [
+    "status",
+    "reason",
+    "scope",
+    "adapter",
+    "contractVersion",
+    "checks",
+    "recordedAt"
+  ],
+  "title": "AdapterConformanceNotObservedResponse",
+  "type": "object"
+}

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "1.0.0",
+  "kind": "ac11-target-registry-patch-proposal",
+  "consumableAsTargetRef": false,
+  "canonicalRegistryPath": "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json",
+  "predecessor": {
+    "commit": "b246e7dbd597db52ae5c16be4c0a03ffd056ab93",
+    "blob": "99e64cb4125d47ae681a2e8e7c8f76c05193a892"
+  },
+  "removeTargetIds": [
+    "s11-actual-pitr-v0"
+  ],
+  "requiredTargetByAxis": {
+    "actual-pitr-rpo-rto-retention": "s11-st-actual-pitr-archive-failure-v0"
+  },
+  "addTargets": [
+    {
+      "targetId": "s11-st-actual-pitr-archive-failure-v0",
+      "axis": "actual-pitr-rpo-rto-retention",
+      "sourceDocument": {
+        "commit": "3363ab77e7fc4ccf3be140466a053a973b0b65a4",
+        "path": "docs/vault/30_Development/S11_ST_storage_failure_target_v0.md",
+        "blob": "421d4d3a6e39720e74bc6fd832f30e8b45f8680a"
+      },
+      "criteria": {
+        "consecutiveWeeklyRestoreSmokeWeeks": {"operator": "gte", "value": 2},
+        "maxRestoreSmokeGapDays": {"operator": "lte", "value": 7},
+        "retentionDays": {"operator": "gte", "value": 35},
+        "rpoSeconds": {"operator": "lte", "value": 900},
+        "rtoSeconds": {"operator": "lte", "value": 3600},
+        "walArchiveFaultCaseCount": {"operator": "gte", "value": 1},
+        "recoveryAfterWalArchiveFaultPassCount": {"operator": "gte", "value": 1},
+        "silentArchiveLossCaseCount": {"operator": "gte", "value": 1},
+        "recoveryAfterSilentArchiveLossPassCount": {"operator": "gte", "value": 1},
+        "retentionInterruptionCaseCount": {"operator": "gte", "value": 1},
+        "recoveryAfterRetentionInterruptionPassCount": {"operator": "gte", "value": 1},
+        "falsePitrPassCount": {"operator": "eq", "value": 0},
+        "retainedBoundaryDeletionCount": {"operator": "eq", "value": 0},
+        "cleanupResidueCount": {"operator": "eq", "value": 0}
+      },
+      "requiredEnvironment": {
+        "topology": "physical",
+        "failureDomain": "separate",
+        "archiveKind": "operational",
+        "sameHost": false,
+        "faultInjection": "controlled-v1"
+      }
+    }
+  ]
+}

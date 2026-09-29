@@ -13,9 +13,9 @@ from __future__ import annotations
 
 import datetime as dt
 import uuid
-from typing import Any, Literal
+from typing import Annotated, Any, Literal, Union
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr, field_validator
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr, field_validator, model_validator
 
 
 class Strict(BaseModel):
@@ -1191,6 +1191,60 @@ class RunRecordResponse(Strict):
     sealed_at: dt.datetime = Field(alias="sealedAt")
 
 
+class RunRecordArtifactPin(Strict):
+    """One artifact as the record pinned it: reference, digest and size, no content."""
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True, populate_by_name=True)
+
+    artifact_id: str = Field(alias="artifactId")
+    role: str = Field(pattern="^(diff|test_report|trace|log|model|dataset|other)$")
+    uri: str = Field(min_length=1)
+    checksum_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="checksumSha256")
+    object_version: str | None = Field(default=None, alias="objectVersion")
+    byte_size: int = Field(ge=0, alias="byteSize")
+
+
+class RunRecordArtifactPageResponse(Strict):
+    """One bounded page of the artifacts pinned into a sealed record.
+
+    A record pins the run's whole artifact set, which has no bound of its own,
+    so the list is paged: at most ``limit`` (default 50, maximum 200) items in
+    stable ``artifactId`` order. ``count`` is the number of items in *this
+    page*, never the record's total. ``nextCursor`` is the last item's
+    ``artifactId`` when more follow, and null on the last page. ``role`` echoes
+    the filter, which holds across pages.
+    """
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True, populate_by_name=True)
+
+    record_id: str = Field(alias="recordId")
+    run_id: str = Field(alias="runId")
+    role: str | None = Field(default=None, pattern="^(diff|test_report|trace|log|model|dataset|other)$")
+    items: list[RunRecordArtifactPin] = Field(max_length=200)
+    count: int = Field(ge=0, le=200)
+    next_cursor: str | None = Field(default=None, alias="nextCursor")
+
+
+class ArtifactPinVerificationResponse(Strict):
+    """Whether a pinned artifact still matches the digest sealed into the record.
+
+    ``verified: false`` is a reported fact, not an error: the record stays the
+    account of what was true at sealing, and a changed object is an integrity
+    finding for the caller.
+    """
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True, populate_by_name=True)
+
+    record_id: str = Field(alias="recordId")
+    run_id: str = Field(alias="runId")
+    artifact_id: str = Field(alias="artifactId")
+    verified: bool
+    #: Required: a pin exists whenever verification ran (the service is 404
+    #: otherwise) and its checksum is non-null in the database, so a missing or
+    #: null value here would be a fail-open integrity answer (Codex #188 F1).
+    pinned_checksum_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="pinnedChecksumSha256")
+
+
 class ModelLineageTraceResponse(Strict):
     """AC-10's traceback, reduced to what a project member may be shown.
 
@@ -1289,3 +1343,170 @@ class ConformanceStatusResponse(Strict):
     recorded_at: None = Field(alias="recordedAt")
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+# -- G-03 stage two: the RECORDED branches (design #218 v1.2 §4-1) ------------
+#
+# ``ConformanceStatusResponse`` above keeps its name, its seven keys and its
+# contract file: with no record stored the list route still answers exactly
+# that shape (only the ``reason`` text moved on, because "does not persist"
+# stopped being true). Everything below is what a stored record adds. The two
+# union aliases are not ``Strict`` subclasses, so the exporter never sees them
+# and each branch is its own contract file.
+
+CONFORMANCE_SUBJECT = Literal["fixture-adapter"]
+CONFORMANCE_PROVENANCE = Literal["in-server"]
+
+
+class ConformanceCheckOutcome(Strict):
+    """One check's result as stored: name, passed, skipped. No ``detail``: the
+    suite's detail is stringified exceptions and host process output, and this
+    row is readable by every project's members (§2-5)."""
+
+    name: str = Field(min_length=1, max_length=100)
+    passed: StrictBool
+    skipped: StrictBool
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    @model_validator(mode="after")
+    def _not_both(self) -> "ConformanceCheckOutcome":
+        if self.passed and self.skipped:
+            raise ValueError("a check cannot be both passed and skipped")
+        return self
+
+
+def _counts_agree(total: int, passed: int, failed: int, skipped: int, outcomes: list) -> None:
+    """The response side of §2-8: the four counts and the outcome list must be
+    one measurement, not four numbers that merely look like one."""
+    if passed + failed + skipped != total:
+        raise ValueError("passed + failed + skipped must equal total")
+    if len(outcomes) != total:
+        raise ValueError("outcomes must have exactly total entries")
+    recount = (
+        sum(1 for o in outcomes if o.passed and not o.skipped),
+        sum(1 for o in outcomes if not o.passed and not o.skipped),
+        sum(1 for o in outcomes if o.skipped),
+    )
+    if recount != (passed, failed, skipped):
+        raise ValueError("counts do not match the outcomes")
+
+
+class ConformanceRecordItem(Strict):
+    """One stored record inside ``records[]``. Nested, not a contract file."""
+
+    adapter: str = Field(min_length=1, max_length=64)
+    subject: CONFORMANCE_SUBJECT
+    provenance: CONFORMANCE_PROVENANCE
+    contract_version: str = Field(min_length=1, max_length=32, alias="contractVersion")
+    suite_contract_version: str = Field(
+        min_length=1, max_length=32, alias="suiteContractVersion"
+    )
+    total: StrictInt = Field(ge=0)
+    passed: StrictInt = Field(ge=0)
+    failed: StrictInt = Field(ge=0)
+    skipped: StrictInt = Field(ge=0)
+    #: Named ``outcomes`` so it is never confused with ``checks`` (descriptors).
+    outcomes: list[ConformanceCheckOutcome]
+    recorded_at: AwareDatetime = Field(alias="recordedAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    @model_validator(mode="after")
+    def _consistent(self) -> "ConformanceRecordItem":
+        _counts_agree(self.total, self.passed, self.failed, self.skipped, self.outcomes)
+        return self
+
+
+class ConformanceStatusRecordedResponse(Strict):
+    """The list route when at least one record exists.
+
+    ``records`` follows the order of ``adapters`` and holds only adapters that
+    have a record: absence from ``records`` is the absence of a measurement,
+    so there is no per-adapter NOT_OBSERVED entry. ``latestRecordedAt`` is the
+    maximum of the items' ``recordedAt`` -- the aggregate freshness -- and the
+    key is deliberately not ``recordedAt``, which in the NOT_OBSERVED branch is
+    always null (§4-1, R2). No ``reason``: nothing is being explained.
+    """
+
+    status: Literal["RECORDED"]
+    scope: Literal["control-plane-host"]
+    contract_version: str = Field(min_length=1, max_length=32, alias="contractVersion")
+    adapters: list[str]
+    checks: list[ConformanceCheckDescriptor]
+    records: list[ConformanceRecordItem] = Field(min_length=1)
+    latest_recorded_at: AwareDatetime = Field(alias="latestRecordedAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    @model_validator(mode="after")
+    def _records_are_a_subset_in_order(self) -> "ConformanceStatusRecordedResponse":
+        names = [r.adapter for r in self.records]
+        if len(set(names)) != len(names):
+            raise ValueError("an adapter may appear once in records")
+        if [a for a in self.adapters if a in set(names)] != names:
+            raise ValueError("records must follow the adapters order and name only listed adapters")
+        if self.latest_recorded_at != max(r.recorded_at for r in self.records):
+            raise ValueError("latestRecordedAt must be the latest recordedAt")
+        return self
+
+
+class AdapterConformanceNotObservedResponse(Strict):
+    """The single-adapter route when the adapter is known but has no record.
+
+    200, not 404: "no such adapter" and "no measurement of this adapter" are
+    different facts, and folding the second into the first makes it read as
+    the first (§4-3).
+    """
+
+    status: Literal["NOT_OBSERVED"]
+    reason: str = Field(min_length=1, max_length=300)
+    scope: Literal["control-plane-host"]
+    adapter: str = Field(min_length=1, max_length=64)
+    contract_version: str = Field(min_length=1, max_length=32, alias="contractVersion")
+    checks: list[ConformanceCheckDescriptor]
+    recorded_at: None = Field(alias="recordedAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class AdapterConformanceRecordedResponse(Strict):
+    """The single-adapter route's record. Its own class rather than the list
+    item, so one side's needs cannot drag the other's contract; the field
+    names and types are the item's exactly (§4-1)."""
+
+    status: Literal["RECORDED"]
+    scope: Literal["control-plane-host"]
+    adapter: str = Field(min_length=1, max_length=64)
+    subject: CONFORMANCE_SUBJECT
+    provenance: CONFORMANCE_PROVENANCE
+    contract_version: str = Field(min_length=1, max_length=32, alias="contractVersion")
+    suite_contract_version: str = Field(
+        min_length=1, max_length=32, alias="suiteContractVersion"
+    )
+    total: StrictInt = Field(ge=0)
+    passed: StrictInt = Field(ge=0)
+    failed: StrictInt = Field(ge=0)
+    skipped: StrictInt = Field(ge=0)
+    outcomes: list[ConformanceCheckOutcome]
+    recorded_at: AwareDatetime = Field(alias="recordedAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    @model_validator(mode="after")
+    def _consistent(self) -> "AdapterConformanceRecordedResponse":
+        _counts_agree(self.total, self.passed, self.failed, self.skipped, self.outcomes)
+        return self
+
+
+#: The list route's response: one of two branches, told apart by ``status``.
+ConformanceStatusUnion = Annotated[
+    Union[ConformanceStatusResponse, ConformanceStatusRecordedResponse],
+    Field(discriminator="status"),
+]
+
+#: The single-adapter route's response.
+AdapterConformanceUnion = Annotated[
+    Union[AdapterConformanceNotObservedResponse, AdapterConformanceRecordedResponse],
+    Field(discriminator="status"),
+]
