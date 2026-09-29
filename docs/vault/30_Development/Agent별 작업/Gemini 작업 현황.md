@@ -1,7 +1,7 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.139"
+version: "1.0.140"
 status: "approved"
 author: "Gemini"
 updated: "2026-09-29T03:05:00+09:00"
@@ -310,6 +310,46 @@ source_of_truth: "Git"
   - `python tools/check_frontend_integrity.py`: 9대 무결성 규칙 0 violations (exit 0).
   - `python tools/check_contract_bindings.py`: 55 fixtures, 20 types exit 0.
 - **다음 첫 행동**: PR 생성 후 Claude(UI·테스트) 및 Codex(계약) 검토 요청.
+
+- 확인 기준: 2026-09-29T02:24:00+09:00 (최신 tip `agent/gemini/g03-fe-stage2`, 카드 115 G-03 2단계 conformance 관측 화면 및 단건 라우트 연동 Claude r1 조치 완료).
+
+## 2026-09-29 G-03 FE 2단계 어댑터 Conformance 관측 화면 및 단건 라우트 연동 (카드 115, PR #221 대응, Claude r1 조치 완결)
+
+- **작업 브랜치**: `agent/gemini/g03-fe-stage2` (base: `agent/claude/g03-conformance-stage2-impl` head `2f853a94`).
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude, Codex.
+- **작업 내용 (카드 115 및 Claude r1 전수 완결)**:
+  1. **Discriminated Union 계약 수용 및 런타임 가드**:
+     - `ConformanceStatusUnion` (`NOT_OBSERVED` | `RECORDED`) 및 `AdapterConformanceUnion` 구현.
+     - `isConformanceStatusRecordedResponse`, `isAdapterConformanceNotObservedResponse`, `isAdapterConformanceRecordedResponse` strict 가드 구현.
+     - `subject: fixture-adapter`, `provenance: in-server`, `total === passed + failed + skipped`, `outcomes.length === total`, outcome `!(passed && skipped)` 계약 불변식 강제.
+  2. **목록 화면 RECORDED 분기 및 실행 기록 노출**:
+     - `NOT_OBSERVED` 시 신규 reason (`No conformance run is recorded for this host and these adapters.`) 표출.
+     - `RECORDED` 시 `latestRecordedAt` 및 어댑터별 `records` 테이블 표출 (`data-testid="conformance-records-table"`).
+     - 허위 PASS/100% 라벨 없이 `subject`/`provenance`/카운트 서버 정본 그대로 표출.
+  3. **단건 어댑터 Conformance 라우트 및 상세 조회 UI**:
+     - `fetchAdapterConformance(projectId, adapterName)` API 연동 (`GET /v1/projects/{projectId}/adapters/{name}/conformance`).
+     - 목록 테이블에서 어댑터별 상세 드릴다운 및 독립된 단건 어댑터 입력폼 제공.
+     - 단건 결과 표출 카드 (`data-testid="single-conformance-result-container"`).
+  4. **RFC 9457 Fail-Closed 오류 처리**:
+     - 404 `RES-0004`: "어댑터 없음" (입력값 미에코, 재시도 버튼 미노출).
+     - 500 `SYS-0002`: 서버 host identity 미설정 고정 안내 (재시도 버튼 미노출).
+     - 503 `SYS-0001`: 리소스 잠금 안내 및 "다시 시도" 버튼 (`data-testid="single-conformance-retry-btn"`) 표출.
+     - 계약 불일치: fail-closed 에러 배너.
+  5. **상태 격리 (State Isolation)**:
+     - 단건 어댑터 입력 변경 시 단건 결과 초기화, 프로젝트 입력 변경 시 목록 및 단건 결과 동시 초기화.
+  6. **Claude r1 독립 검토 조치 완결 (M1, M2, L1)**:
+     - **M1**: 로딩 및 404 RES-0004 live region 안내 문구에서 사용자 입력값 일절 미에코 고정 문자열 표출, 배너/live region/섹션 전반 미에코 단언 테스트 추가.
+     - **M2**: 세대 카운터(`singleConformanceGenRef`) 및 `AbortController`(`singleConformanceAbortRef`) 적용, `fetchAdapterConformance`에 signal 전달, 로딩 중 엔터/클릭 중복 제출 방지 가드(`if (singleConformanceLoading) return;`), 로딩 중 목록의 어댑터별 [상세 조회] 버튼 비활성화, 입력 변경 시 in-flight abort 및 로딩 해제, M2 회귀 테스트 완비.
+     - **L1**: 단건 어댑터 입력 필드에 `aria-label="어댑터 이름"` 추가.
+  7. **단위 및 통합 테스트**:
+     - `tests/model-lineage.test.ts`에 33개 시험 완비 및 전수 통과.
+- **실측 검증 증거**:
+  - Vitest: `tests/model-lineage.test.ts` 33 passed, 전체 78 test files / 717 tests passed (0 failures).
+  - TypeScript & 빌드: `cd apps/web && npx tsc -b` 0 errors, `npm run build` dist/ 825.74 kB 생성 성공.
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed.
+  - 무결성 도구: `check_frontend_integrity.py` 85 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --check` PASS (0 conflicts).
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-29_01-44-00_KST_G03_Stage2_FE_Gemini.md` (v1.1.0).
 
 ## 2026-09-28 S10-FE 어댑터 conformance 관측 화면 새 API(G-03 1단계) 연동 및 Claude UI·Codex 계약 리뷰 전수 반영 (agent/gemini/s10-fe-conformance-status)
 
