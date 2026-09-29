@@ -681,7 +681,41 @@ describe('OIDC Corporate IdP & Server Contract Verification (Card 153)', () => {
       expect(session.token).toBe(oidcToken);
     });
 
-    it('rejects multi-audience OIDC id_token when azp is missing or does not match clientId (Codex 2)', async () => {
+    it('rejects multi-audience OIDC id_token when azp is missing (Claude R1)', async () => {
+      const authUrl = new URL(await beginLogin());
+      location.pathname = '/callback';
+      location.search = `?code=auth-code-12345&state=${authUrl.searchParams.get('state')}`;
+
+      const now = Math.floor(Date.now() / 1000);
+      const oidcToken = makeJwt({
+        iss: 'https://192.168.45.143:8443/realms/saintvision',
+        sub: 'operator-alice',
+        iat: now,
+        exp: now + 1800,
+      });
+
+      const multiAudMissingAzpIdToken = makeJwt({
+        iss: 'https://192.168.45.143:8443/realms/saintvision',
+        aud: ['saintvision-web', 'other-client'] as any,
+        sub: 'operator-alice',
+        nonce: authUrl.searchParams.get('nonce'),
+        iat: now,
+        exp: now + 300,
+      });
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          access_token: oidcToken,
+          id_token: multiAudMissingAzpIdToken,
+          token_type: 'Bearer',
+        }),
+      });
+
+      await expect(completeLogin()).rejects.toThrow('다중 대상(aud) ID 토큰의 azp가 클라이언트 ID와 일치하지 않습니다.');
+    });
+
+    it('rejects multi-audience OIDC id_token when azp does not match clientId (Codex 2)', async () => {
       const authUrl = new URL(await beginLogin());
       location.pathname = '/callback';
       location.search = `?code=auth-code-12345&state=${authUrl.searchParams.get('state')}`;
@@ -714,6 +748,110 @@ describe('OIDC Corporate IdP & Server Contract Verification (Card 153)', () => {
       });
 
       await expect(completeLogin()).rejects.toThrow('다중 대상(aud) ID 토큰의 azp가 클라이언트 ID와 일치하지 않습니다.');
+    });
+
+    it('rejects single-audience OIDC id_token with foreign azp (Claude R2)', async () => {
+      const authUrl = new URL(await beginLogin());
+      location.pathname = '/callback';
+      location.search = `?code=auth-code-12345&state=${authUrl.searchParams.get('state')}`;
+
+      const now = Math.floor(Date.now() / 1000);
+      const oidcToken = makeJwt({
+        iss: 'https://192.168.45.143:8443/realms/saintvision',
+        sub: 'operator-alice',
+        iat: now,
+        exp: now + 1800,
+      });
+
+      const singleAudBadAzpIdToken = makeJwt({
+        iss: 'https://192.168.45.143:8443/realms/saintvision',
+        aud: 'saintvision-web',
+        azp: 'other-client',
+        sub: 'operator-alice',
+        nonce: authUrl.searchParams.get('nonce'),
+        iat: now,
+        exp: now + 300,
+      });
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          access_token: oidcToken,
+          id_token: singleAudBadAzpIdToken,
+          token_type: 'Bearer',
+        }),
+      });
+
+      await expect(completeLogin()).rejects.toThrow('ID 토큰의 azp가 클라이언트 ID와 일치하지 않습니다.');
+    });
+
+    it('rejects multi-audience OIDC id_token when aud array does not contain clientId (Claude R2)', async () => {
+      const authUrl = new URL(await beginLogin());
+      location.pathname = '/callback';
+      location.search = `?code=auth-code-12345&state=${authUrl.searchParams.get('state')}`;
+
+      const now = Math.floor(Date.now() / 1000);
+      const oidcToken = makeJwt({
+        iss: 'https://192.168.45.143:8443/realms/saintvision',
+        sub: 'operator-alice',
+        iat: now,
+        exp: now + 1800,
+      });
+
+      const audArrayWithoutClientId = makeJwt({
+        iss: 'https://192.168.45.143:8443/realms/saintvision',
+        aud: ['foreign-client-1', 'foreign-client-2'] as any,
+        azp: 'saintvision-web',
+        sub: 'operator-alice',
+        nonce: authUrl.searchParams.get('nonce'),
+        iat: now,
+        exp: now + 300,
+      });
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          access_token: oidcToken,
+          id_token: audArrayWithoutClientId,
+          token_type: 'Bearer',
+        }),
+      });
+
+      await expect(completeLogin()).rejects.toThrow('ID 토큰의 대상(aud) 목록에 클라이언트 ID가 포함되지 않았습니다.');
+    });
+
+    it('rejects OIDC id_token when aud is neither string nor array (Claude R2)', async () => {
+      const authUrl = new URL(await beginLogin());
+      location.pathname = '/callback';
+      location.search = `?code=auth-code-12345&state=${authUrl.searchParams.get('state')}`;
+
+      const now = Math.floor(Date.now() / 1000);
+      const oidcToken = makeJwt({
+        iss: 'https://192.168.45.143:8443/realms/saintvision',
+        sub: 'operator-alice',
+        iat: now,
+        exp: now + 1800,
+      });
+
+      const nonStringOrArrayAudIdToken = makeJwt({
+        iss: 'https://192.168.45.143:8443/realms/saintvision',
+        aud: 12345 as any,
+        sub: 'operator-alice',
+        nonce: authUrl.searchParams.get('nonce'),
+        iat: now,
+        exp: now + 300,
+      });
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          access_token: oidcToken,
+          id_token: nonStringOrArrayAudIdToken,
+          token_type: 'Bearer',
+        }),
+      });
+
+      await expect(completeLogin()).rejects.toThrow('ID 토큰의 대상(aud)이 올바르지 않습니다.');
     });
 
     it('accepts multi-audience OIDC id_token when azp matches clientId (Codex 2)', async () => {

@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-GEMINI-CARD153-001"
 title: "History: Card 153 사내 IdP(Keycloak) 연동 FE 점검·수정 및 OIDC PKCE·토큰 만료·로그아웃 검증"
-version: "1.2.0"
+version: "1.3.0"
 status: "review"
 author: "Gemini"
-updated: "2026-09-30T08:25:00+09:00"
+updated: "2026-09-30T08:44:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -20,8 +20,8 @@ source_of_truth: "Git"
   3. 로컬/dev IdP 가정 및 비안전 원격 HTTP 폴백 전면 제거 (Fail-closed 보안 아키텍처).
   4. 제어 평면 서버 계약 준수 토큰 유효기간(`0 < exp - iat <= 3600`) 클라이언트-서버 이중 가드(120초 시계 오차 허용) 및 능동 세션 만료 타이머·재로그인 안내 배너(`[AUTH-0050]`).
   5. 표준 OIDC RP-Initiated 로그아웃 배선(`App.tsx:549`에서 `performLogout({ redirectIdp: true, postLogoutRedirectUri: origin })` 연동) 및 인메모리 토큰/만료타이머/트랜잭션스토리지 무결 청소.
-  6. OIDC ID 토큰(id_token)의 nonce(트랜잭션 nonce와 일치), aud(clientId 일치), multi-aud 시 azp(clientId 일치), iss(issuer 설정 시 issuer 일치), 필수 정수 exp(120초 시계 오차 허용), iat 클라이언트 fail-closed 검증 완비. (OIDC Core 1.0 §3.1.3.7(6)에 따라 Token Endpoint 직접 TLS 통신으로 암호학적 서명 검증은 생략하고 제어 평면 서버 `/v1/session`에 위임).
-  7. Mock OIDC 서버 기반 종합 자동화 검증 스위트(`apps/web/tests/auth-oidc-contract.test.ts`, 46 passed), RFC 7636 벡터 시험(`auth-pkce.test.ts`, 5 passed), App 수준 로그아웃 및 만료 연동 시험(`auth-app-oidc-integration.test.tsx`, 2 passed) 신설.
+  6. OIDC ID 토큰(id_token)의 nonce(트랜잭션 nonce와 일치), aud(clientId 일치), multi-aud 시 azp(clientId 일치), iss(issuer 설정 시 issuer 일치; endpoint-pair 모드는 iss 미검사), 필수 정수 exp(120초 시계 오차 허용), iat 클라이언트 fail-closed 검증 완비. (OIDC Core 1.0 §3.1.3.7(6)에 따라 Token Endpoint 직접 TLS 통신 환경에서 TLS 서버 검증으로 발급자를 신뢰하며, 웹 클라이언트는 id_token을 클라이언트 fail-closed 관문으로만 검증하고 즉시 폐기하여 표시·저장·로그아웃 힌트에 미사용. 사용자 신원과 권한은 제어 평면 서버 `/v1/session`이 RS256·iss·aud로 정본 검증한 access token 응답에 의해서만 확립).
+  7. Mock OIDC 서버 기반 종합 자동화 검증 스위트(`apps/web/tests/auth-oidc-contract.test.ts`, 50 passed), RFC 7636 벡터 시험(`auth-pkce.test.ts`, 5 passed), App 수준 로그아웃 및 만료 연동 시험(`auth-app-oidc-integration.test.tsx`, 2 passed) 신설.
 
 ---
 
@@ -56,16 +56,17 @@ source_of_truth: "Git"
   - scope에 `openid` 포함 시 OIDC `nonce` (32자 16진수 hex) 생성 및 인가 요청 쿼리에 반영.
   - `sessionStorage` (`saintvision.oauth.transaction`)에 트랜잭션 안전 저장.
   - `apps/web/tests/auth-pkce.test.ts`에 RFC 7636 Appendix B 공식 테스트 벡터 단언 추가 (5 passed).
-- **[Claude C1, Codex Finding 2] ID Token(id_token) 검증 강화 및 서명 생략 근거**:
-  - OIDC Core 1.0 §3.1.3.7 Rule 6에 따라 클라이언트와 토큰 엔드포인트 간 직접 TLS 보안 통신 환경에서 TLS 서버 검증으로 발급자를 검증하므로, 클라이언트 측 JWS 암호 서명 검증은 생략하고 제어 평면 서버(`/v1/session`)의 정본 검증에 위임.
+- **[Claude C1, Codex Finding 2, Claude R1~R3] ID Token(id_token) 검증 강화 및 서명 생략 근거**:
+  - OIDC Core 1.0 §3.1.3.7 Rule 6에 따라 issuer 모드에서 클라이언트와 토큰 엔드포인트 간 직접 TLS 보안 통신 환경에서 TLS 서버 검증으로 발급자를 검증하므로, 클라이언트 측 JWS 암호 서명 검증은 생략.
+  - 웹 클라이언트에서 id_token은 클라이언트 측 fail-closed 검증 후 즉시 폐기되며 표시나 저장, 로그아웃 힌트에 전혀 사용되지 않음 (`buildLogoutUrl`은 오직 clientId와 postLogoutRedirectUri만 사용). 서버(`/v1/session`)는 전달받은 access token을 RS256 서명, issuer, audience로 엄격 검증하여 신원 및 테넌트 권한을 확립.
   - 클라이언트에서는 토큰 클레임을 fail-closed 방식으로 검증:
     - ID 토큰 누락 시 즉시 거부 (`OIDC 인증 응답에 ID 토큰(id_token)이 누락되었습니다.`).
     - `idClaims.nonce === tx.nonce` 일치성 검증 (재전송 및 주입 방어).
-    - `idClaims.iss === config.issuer` 일치성 검증 (issuer 모드 설정 시 한정).
-    - `idClaims.aud` 및 `idClaims.azp` 검증: 단일 대상의 경우 `aud === clientId`, 다중 대상(배열)의 경우 `aud.includes(clientId)` 및 OIDC Core 3.1.3.7 Rule 3&4에 따라 `azp === clientId` 강제.
+    - `idClaims.iss === config.issuer` 일치성 검증 (issuer 모드 설정 시 한정; endpoint-pair 모드는 iss 미검사).
+    - `idClaims.aud` 및 `idClaims.azp` 검증 (OIDC Core 3.1.3.7 Rules 3 & 4): 단일 대상의 경우 `aud === clientId`, 다중 대상(배열)의 경우 `aud.includes(clientId)` 및 `azp === clientId` 필수 강제. 단일 대상이더라도 `azp` 클레임이 존재할 경우 `azp === clientId` 강제.
     - `idClaims.exp`: 필수 정수 검증(누락 및 비정수 즉시 거부) 및 120초 시계 오차 허용 만료 검증.
-    - `idClaims.iat`: 존재하는 경우 정수형 검증.
-  - missing nonce, mismatched nonce, mismatched aud, multi-aud missing/mismatched azp, multi-aud matching azp, mismatched iss, missing exp, non-integer exp, expired beyond clock skew, clock skew allowance (60s), non-integer iat 부정 시험 전수 완비.
+    - `idClaims.iat`: 선택적 클레임이나 존재할 경우 정수형 검증.
+  - 부정 시험 12종 완비: missing nonce, mismatched nonce, mismatched aud, multi-aud missing azp(Claude R1), multi-aud mismatched azp, multi-aud matching azp, single-aud foreign azp(Claude R2), aud array without clientId(Claude R2), aud non-string/non-array(Claude R2), mismatched iss, missing exp, non-integer exp, expired beyond clock skew, clock skew allowance (60s), non-integer iat.
 
 ### 4) 서버 계약 준수 토큰 유효기간 검증 및 능동 만료·재로그인 처리
 - **서버 계약 불변식**: `services/control-plane/src/inv/identity.py:157`의 `0 < exp - iat <= 3600` 계약.
@@ -99,17 +100,17 @@ source_of_truth: "Git"
 
 ### 1) 단위 및 회귀 자동화 시험
 - 신규 OIDC 종합 계약 시험: `apps/web/tests/auth-oidc-contract.test.ts`
-  - **46 tests 100% PASS** (37ms) (기존 20건 + 1차 13건 + 2차 13건)
+  - **50 tests 100% PASS** (31ms) (기존 20건 + 1차 13건 + 2차 13건 + 3차 R1/R2 4건)
 - 기존 인증 시험: `apps/web/tests/auth-session.test.ts` (17 tests) & `apps/web/tests/auth-pkce.test.ts` (5 tests, RFC 벡터 포함)
-  - **22 tests 100% PASS** (38ms)
+  - **22 tests 100% PASS** (33ms)
 - 신규 App 수준 OIDC 통합 시험: `apps/web/tests/auth-app-oidc-integration.test.tsx`
-  - **2 tests 100% PASS** (256ms)
+  - **2 tests 100% PASS** (623ms)
 - `apps/web` 전체 Vitest 스위트:
-  - **91 test files / 969 passed 100%** (0 failed, 0 errors)
+  - **91 test files / 973 passed 100%** (0 failed, 0 errors)
 - TypeScript 타입 점검:
   - `npx tsc -b` 에러 **0건**
 - 프로덕션 번들 빌드:
-  - `npm run build` 성공 (Vite v6.4.3 production bundle 생성 완료, 10.55s)
+  - `npm run build` 성공 (Vite v6.4.3 production bundle 생성 완료, 8.15s)
 
 ### 2) 제어 평면 및 프런트엔드 무결성 게이트 검증
 - `python -X utf8 tools/check_frontend_integrity.py`:
@@ -129,5 +130,5 @@ source_of_truth: "Git"
 
 ## 4. 인계 및 다음 단계
 - **PR**: https://github.com/egparadise/SaintVision-Invion/pull/247
-- **수정사항**: Claude UI r2 조건 C1 (id_token exp 필수 정수화, 만료·exp 누락 시험, OIDC Core 3.1.3.7(6) 서명 생략 근거 문서화, iss 검사 issuer 한정 명시) 및 Codex 2 (azp 다중 대상 검증, requireJwt 구조분해 기본값, override 가드 시험 전수 보강) 반영 완료.
+- **수정사항**: Claude UI r3 조건 R1 (다중 aud azp 누락 거부 시험 추가), 권고 R2 (단일 aud 외국 azp, aud 배열 clientId 미포함, aud 비문자열/비배열 음성 시험 추가로 4대 변이 전수 사살), R3 (access token 서버 검증 및 id_token 폐기, endpoint-pair iss 미검사, iat 설명 정정) 반영 완료.
 - **독립 검토 요청**: Claude (UI·테스트 축) 및 Codex (계약·보안 축) 재확인 요청.

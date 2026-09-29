@@ -382,16 +382,18 @@ export async function completeLogin(): Promise<{ token: string; user: SessionUse
   const nowSec = Math.floor(Date.now() / 1000);
 
   // OIDC ID token validation (when nonce was sent or id_token is provided)
-  // Per OIDC Core 1.0 §3.1.3.7 Rule 6: When ID token is received via direct communication
-  // between Client and TLS Token Endpoint, TLS server validation validates the issuer in place
-  // of checking the JWS token signature. Authoritative token signature and credential validation
-  // is performed by the server-side control plane (/v1/session).
+  // Per OIDC Core 1.0 §3.1.3.7 Rule 6: In issuer mode, direct TLS communication with the Token
+  // Endpoint allows TLS server validation to validate the issuer in place of checking the token signature.
+  // (In endpoint-pair mode, issuer is not configured, so iss is not validated).
+  // In the web client, id_token is validated solely as a client-side fail-closed gate and then discarded;
+  // it is never stored, displayed, or used in logout hints (buildLogoutUrl uses only clientId and postLogoutRedirectUri).
+  // The control-plane server (/v1/session) authoritatively validates the access_token with RS256, iss, and aud.
   // The client fail-closed validates essential token claims:
   // - nonce: matches transaction nonce exactly
-  // - iss: matches configured issuer (when issuer mode is configured)
+  // - iss: matches configured issuer (when issuer mode is configured; endpoint-pair mode does not validate iss)
   // - aud & azp: single aud equals clientId; multi-aud includes clientId and azp equals clientId (Rules 3 & 4)
   // - exp: required integer, not expired within CLOCK_SKEW_SEC (120s) leeway
-  // - iat: required integer if present
+  // - iat: optional; integer when present
   if (tx.nonce || result.id_token) {
     if (typeof result.id_token !== 'string' || !result.id_token.trim()) {
       throw new Error('OIDC 인증 응답에 ID 토큰(id_token)이 누락되었습니다.');
