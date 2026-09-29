@@ -52,8 +52,10 @@ def test_minio_script_pins_image_and_keeps_container_boundary():
         "preserved rollback container",
         'docker rename "$ROLLBACK_NAME" "$NAME"',
         "partial TLS input is forbidden",
+        'set -- "$@" --certs-dir /certs',
     ):
         assert required in script
+    assert "MINIO_CERTS_DIR" not in script
     for forbidden in ("docker system", "docker volume prune", "docker image prune", "sudo "):
         assert forbidden not in script
     assert '$CONFIG_DIR:/run/saintvision-intranet' not in script

@@ -90,9 +90,10 @@ set -- docker run -d \
   -v "$DATA_DIR:/data" \
   -p "$BIND_ADDRESS:$PORT:9000"
 if [ "$TLS_ENABLED" = true ]; then
-  set -- "$@" -e MINIO_CERTS_DIR=/certs -v "$CERT_DIR:/certs:ro"
+  set -- "$@" -v "$CERT_DIR:/certs:ro"
 fi
 set -- "$@" "$IMAGE" server /data --address :9000
+[ "$TLS_ENABLED" = true ] && set -- "$@" --certs-dir /certs
 "$@" >/dev/null
 
 scheme=http
