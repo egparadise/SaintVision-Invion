@@ -1,14 +1,34 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.224"
+version: "1.0.230"
 status: "review"
 author: "Codex"
-updated: "2026-09-29T03:40:51+09:00"
+updated: "2026-09-30T08:05:00+09:00"
 source_of_truth: "Git"
+active_card: "CARD-151 intranet ObjectStore and PITR rehearsal"
+active_card_status: "PR 248 review follow-up; Claude F1-F12 remediated, TLS operational U6 PASS, G-22 replication HBA blocked external"
+active_card_next: "Claude re-review; continue Card 154 independent review and canonical preflight when corrected inputs land"
 ---
 
+## 2026-09-30 Card151 Claude F1-F12 보안·측정 경계 후속
+- PR #248에서 root·service·PITR 자격을 host argv와 Docker `Config.Env`에서 제거하고 단일 보호 파일 mount로 고정했다. PITR policy의 delete 권한을 제거하고 bucket versioning을 활성화했다.
+- bounded PITR rehearsal은 streaming receiver·source major·archive mode·retention tool hash를 확인하며, RTO를 download 시작부터 promotion까지 잰다. 지속 장애 시점이 없는 이 예행은 RPO를 측정하지 않아 `measuredRpoSeconds=null`로 남긴다.
+- 최신 TLS operational roundtrip은 6/6 PASS, 교차 bucket은 403/403이다. redacted evidence를 저장소에 고정했고 G-22는 replication HBA 미승인으로 계속 `BLOCKED_EXTERNAL`이다.
+
 # Codex 작업 현황
+
+## 2026-09-30 Card154 사내망 자체 구축 독립 검증
+
+- Card 150 PR #249와 Card 153 PR #247에 보안·계약 수정 요청을 게시했고, Card 152 PR #250의 기존 F-R1~F-R5는 head가 바뀌지 않아 유지한다. Card 151 PR #248은 자기 작성 범위라 독립 승인으로 세지 않고 Claude 검토를 대기한다.
+- canonical preflight는 storage operational evidence만 PASS, 전체 PASS 1/FAIL 2/BLOCKED 6과 `acceptanceAssessed=false`다. 미입력 token·inventory·DNS를 합성하지 않았고 U6 전체도 configuration route/operator token 부재로 BLOCKED다. [[2026-09-30_01-10-00_KST_Card154_사내망_독립검증_Codex_검토]].
+
+## 2026-09-30 Card151 사내 Storage TLS 운영 증거·canonical 검증
+
+- `.210`의 카드 소유 MinIO를 Card 150 intermediate가 서명한 `objects.sv.lan`/`.210` server leaf로 TLS 전환했다. exact image, non-root/read-only/cap-drop, data+cert 2 mount, 9000 단일 publish를 유지했고 product/PITR 교차 쓰기는 HTTPS에서도 403/403이다.
+- reachable head `c075e669`에서 operational roundtrip 6/6와 cleanup PASS, 별도 attestation SHA·시각 결속을 확보했다. canonical S01은 storage check 1개만 PASS하고 operator/session token·CP DNS/HTTPS·inventory 사용자 값 부재로 FAIL 2/BLOCKED 6, `acceptanceAssessed=false`다.
+- TLS 전환에서 발견한 cert-dir/loopback CA/bootstrap process-argument 문제를 회귀시험과 bounded rollback으로 닫고, 진단 시 노출된 root 자격은 즉시 회전했다. G-22는 source physical replication HBA 미승인 때문에 source mutation 전 BLOCKED_EXTERNAL이며 RPO/RTO는 여전히 null이다. [[2026-09-30_00-19-37_KST_Card151_사내_Storage_PITR_Codex_구현]].
+- PR #248 보안 후속 head `0a768892`는 PITR 전송과 source PostgreSQL 자격을 각각 보호 파일 read-only mount와 컨테이너 내부 읽기로 바꿔 host argv·Docker `Config.Env` 비노출을 고정했다. PG-free 4 passed, local·remote shell syntax와 diff check는 exit 0이다.
 
 ## 2026-09-29 S05 Card114 c50 일반 suite 격리 — Claude 재확인 요청
 

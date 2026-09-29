@@ -21,10 +21,13 @@ NON_CLEANUP_LABELS = {
     "ai.saintvision.config",
     "ai.saintvision.created-by",
     "ai.saintvision.node",
+    "ai.saintvision.owner",
     "ai.saintvision.output",
     "ai.saintvision.pilot",
+    "ai.saintvision.run",
     "ai.saintvision.storage-replace",
     "ai.saintvision.supervisor",
+    "ai.saintvision.task",
     "ai.saintvision.upgrade",
 }
 
