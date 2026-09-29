@@ -482,13 +482,41 @@ def load_enforcement_expectation() -> dict[str, Any]:
     }
 
 
+def _positional_rows(conn, statement: str) -> list[tuple]:
+    """Read a shape query as tuples.
+
+    Migration 0054's FK_SHAPE selects two unnamed ``array_agg`` subqueries, so
+    PostgreSQL names both columns ``array_agg``. Reading that through a mapping
+    row factory silently drops one of them -- the observed shape then has nine
+    elements and can never equal the migration's ten-element expectation, which is
+    how this observation reported a healthy FK as changed. The migration reads the
+    same query positionally (``r[0]``..``r[9]``); so does this.
+    """
+    if hasattr(conn, "execute_positional"):
+        return list(conn.execute_positional(statement).fetchall())
+    from psycopg.rows import tuple_row
+
+    with conn.cursor(row_factory=tuple_row) as cursor:
+        cursor.execute(statement)
+        return list(cursor.fetchall())
+
+
 def read_enforcement_shape(conn) -> dict[str, Any]:
     """Compare the installed constraints with migration 0054's own expectation."""
     shapes = load_enforcement_expectation()
-    check_rows = conn.execute(shapes["check_sql"]).fetchall()
-    fk_rows = conn.execute(shapes["fk_sql"]).fetchall()
-    check_observed = tuple(check_rows[0].values()) if check_rows else None
-    fk_observed = tuple(fk_rows[0].values()) if fk_rows else None
+    check_rows = _positional_rows(conn, shapes["check_sql"])
+    fk_rows = _positional_rows(conn, shapes["fk_sql"])
+    # The same coercion the migration applies before comparing (0054 upgrade()).
+    check_observed = (
+        (check_rows[0][0], check_rows[0][1], bool(check_rows[0][2])) if check_rows else None
+    )
+    fk_observed = None
+    if fk_rows:
+        r = fk_rows[0]
+        fk_observed = (
+            r[0], r[1], list(r[2] or []), list(r[3] or []), r[4], r[5], r[6],
+            bool(r[7]), bool(r[8]), bool(r[9]),
+        )
     observed_grantees = tuple(
         str(row["grantee"]) for row in conn.execute(O11_GRANT_SQL).fetchall()
     )
@@ -496,10 +524,11 @@ def read_enforcement_shape(conn) -> dict[str, Any]:
     return {
         "checkPresent": check_observed is not None,
         "checkMatchesExpected": check_observed == shapes["expected_check"],
-        "checkValidated": bool(check_observed[2]) if check_observed else None,
+        "checkValidated": check_observed[2] if check_observed else None,
         "fkPresent": fk_observed is not None,
         "fkMatchesExpected": fk_observed == shapes["expected_fk"],
-        "fkValidated": bool(fk_observed[-1]) if fk_observed else None,
+        "fkValidated": fk_observed[-1] if fk_observed else None,
+        "fkShapeElementCount": len(fk_observed) if fk_observed else 0,
         "nonOwnerUpdateGrantCount": len(observed_grantees),
         # The names are hashed: the judgement is "exactly the declared role, and
         # never PUBLIC", which does not require publishing the role name.
@@ -623,6 +652,14 @@ class SnapshotHandle:
 
     def execute(self, statement: str, params: dict[str, Any] | None = None):
         cursor = self._driver.cursor(row_factory=self._row_factory)
+        cursor.execute(statement, params)
+        return cursor
+
+    def execute_positional(self, statement: str, params: dict[str, Any] | None = None):
+        """Rows as tuples, for a SELECT whose columns are not uniquely named."""
+        from psycopg.rows import tuple_row
+
+        cursor = self._driver.cursor(row_factory=tuple_row)
         cursor.execute(statement, params)
         return cursor
 
