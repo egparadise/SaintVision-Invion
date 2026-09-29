@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-CODEX-20260930-CARD150"
 title: "사내망 PKI와 LAN pilot 재수립"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T00:19:32+09:00"
+updated: "2026-09-30T00:37:05+09:00"
 source_of_truth: "Git"
 ---
 
@@ -66,7 +66,11 @@ Card 152 inventory는 5행을 갖지만 필수값 71개가 비어 있었다. 정
 
 Card 152가 `cp.sv.lan`을 확정해 DNS+IP SAN CP HTTPS leaf를 발급했다. leaf
 SHA-256은 `317368f916f725770cbdbf9b3a78023827ba6912c75a8bbd954f61af135615c9`,
-만료는 2026-12-29 00:15 KST다. Card 152 inventory의 필수값 71개 완성과
-`.222` docker group 활성화, 네 번째 Ubuntu worker 제공,
+만료는 2026-12-29 00:15 KST다. #250 검토에서 확인한 IdP TLS owner 공백을
+닫기 위해 `idp.sv.lan`+`.143` SAN leaf도 발급했다. SHA-256은
+`9d334908bb3be6fe1deb44b2085117137b59c94bedf77563945b518bde0dfc38`, 만료는
+2026-12-29 00:36 KST이며 아직 배포하지 않아 HTTPS issuer는 미측정이다.
+Card 152 inventory의 필수값 71개 완성과 `.222` docker group 활성화,
+네 번째 Ubuntu worker 제공,
 Windows CP 동거 worker Docker API 1.45 이상이 남았다. 이 셋이 없으면
 5-node readiness는 계속 BLOCKED다.

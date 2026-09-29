@@ -1,10 +1,10 @@
 ---
 doc_id: "OPS-INTRANET-PKI-LAN-001"
 title: "사내망 PKI와 LAN pilot 운영 절차"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T00:10:21+09:00"
+updated: "2026-09-30T00:37:05+09:00"
 source_of_truth: "Git"
 ---
 
@@ -51,6 +51,12 @@ Card 152의 확정 DNS 이름을 받은 뒤 CP HTTPS leaf를 발급한다. 이�
   issue-server --hostname cp.sv.lan --address 192.168.45.74 `
   --output D:\Project\SaintVisionI-Invion\.work\intranet\cp
 ```
+
+Card 152 보안 검토에서 `idp.sv.lan` HTTPS issuer의 인증서 owner 공백을
+확인해 같은 intermediate로 별도 server leaf를 발급했다. SAN은
+`idp.sv.lan`과 `192.168.45.143`이며 CP leaf에 다른 서비스 이름을 섞지
+않는다. fingerprint는 공개 evidence에 남겼지만 TLS 종단 배포와 live HTTPS
+issuer 검증 전에는 IdP 준비 완료로 세지 않는다.
 
 폐기는 두 층이다. 먼저 `lan_pilot.py revoke-node-certificate`로 private
 state를 fail-closed 표시하고 DB channel version을 올려 disable한다. 이어

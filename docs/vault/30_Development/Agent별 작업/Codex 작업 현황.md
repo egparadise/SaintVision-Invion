@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.226"
+version: "1.0.227"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T00:19:32+09:00"
+updated: "2026-09-30T00:37:05+09:00"
 source_of_truth: "Git"
 ---
 
@@ -24,6 +24,9 @@ source_of_truth: "Git"
 - Card 152 inventory는 5행이지만 필수값 71개가 비어 있다. 정본 lint와 두
   readiness probe는 각각 `inventory-values-missing`과 `inventory-not-ready`로
   차단됐으며 이를 PASS로 세지 않았다. focused Python 시험은 68 passed다.
+- #250 보안 검토에서 `idp.sv.lan` TLS owner 공백을 확인해 같은 issuing
+  intermediate로 `.143` SAN server leaf를 발급했다. 공개 fingerprint만
+  기록했고 실제 TLS 종단·HTTPS issuer verify 전이므로 `deployed=false`다.
 - 첫 state의 `18443` 충돌은 숨기지 않고 실패 증거로 보존했다. 최종 state는
   immutable identity에 `18444`를 처음부터 넣었다. 공개 증거에는 비밀·DSN·
   tenant·epoch·nonce가 없다. [[사내망_PKI_LAN_pilot_운영절차_Codex]],

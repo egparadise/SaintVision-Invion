@@ -20,6 +20,13 @@
       "address": "192.168.45.74",
       "certificateSHA256": "317368f916f725770cbdbf9b3a78023827ba6912c75a8bbd954f61af135615c9",
       "notAfter": "2026-12-28T15:15:34+00:00"
+    },
+    "identityProviderCertificate": {
+      "hostname": "idp.sv.lan",
+      "address": "192.168.45.143",
+      "certificateSHA256": "9d334908bb3be6fe1deb44b2085117137b59c94bedf77563945b518bde0dfc38",
+      "notAfter": "2026-12-28T15:36:06+00:00",
+      "deployed": false
     }
   },
   "pilot": {
@@ -69,7 +76,8 @@
     "192.168.45.222 docker group activation and a new login session",
     "one additional Ubuntu worker address and hardware inventory",
     "Control Plane co-located worker Docker API upgrade from 1.41 to at least 1.45",
-    "Card 152 inventory completion: 71 required values are currently missing across five rows"
+    "Card 152 inventory completion: 71 required values are currently missing across five rows",
+    "idp.sv.lan TLS termination deployment and live HTTPS issuer verification"
   ],
   "readinessInputs": {
     "state": "operator-private lan-pilot-6fc0428b-v2 directory",
