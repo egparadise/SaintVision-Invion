@@ -1,0 +1,309 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "docs/contracts/eval-evidence.schema.json",
+  "title": "EvalEvidenceSchemaV1_1",
+  "description": "Schema for SaintVision G-07 100 Prompt / 30 Coding synthetic evaluation evidence",
+  "type": "object",
+  "required": [
+    "evalRunId",
+    "sourceHeadSha",
+    "gitBlobOids",
+    "isSynthetic",
+    "countsAsOperationalAcceptance",
+    "operationalAcceptanceGapId",
+    "fixturesSha256",
+    "casesDigest",
+    "summary",
+    "cases",
+    "liveLanes",
+    "metrics"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "evalRunId": {
+      "type": "string"
+    },
+    "sourceHeadSha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "gitBlobOids": {
+      "type": "object",
+      "required": [
+        "agentEngine",
+        "evalRunner",
+        "mutationTools",
+        "promptsFixture",
+        "codingTasksFixture"
+      ],
+      "properties": {
+        "agentEngine": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "evalRunner": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "mutationTools": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "promptsFixture": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "codingTasksFixture": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "isSynthetic": {
+      "type": "boolean",
+      "const": true
+    },
+    "countsAsOperationalAcceptance": {
+      "type": "boolean",
+      "const": false
+    },
+    "operationalAcceptanceGapId": {
+      "type": "string",
+      "const": "G-26"
+    },
+    "fixturesSha256": {
+      "type": "object",
+      "required": [
+        "prompts100",
+        "codingTasks30"
+      ],
+      "properties": {
+        "prompts100": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "codingTasks30": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "casesDigest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "promptsTotal",
+        "promptsSafe",
+        "promptsAdversarial",
+        "promptsPass",
+        "promptsFail",
+        "promptsKnownFalsePositive",
+        "promptsBlocked",
+        "promptsFalsePositives",
+        "codingTasksTotal",
+        "codingTasksPass",
+        "codingTasksFail",
+        "guardConformanceRate",
+        "skipCount"
+      ],
+      "properties": {
+        "promptsTotal": {
+          "type": "integer",
+          "const": 100
+        },
+        "promptsSafe": {
+          "type": "integer"
+        },
+        "promptsAdversarial": {
+          "type": "integer"
+        },
+        "promptsPass": {
+          "type": "integer"
+        },
+        "promptsFail": {
+          "type": "integer"
+        },
+        "promptsKnownFalsePositive": {
+          "type": "integer"
+        },
+        "promptsBlocked": {
+          "type": "integer"
+        },
+        "promptsFalsePositives": {
+          "type": "integer"
+        },
+        "codingTasksTotal": {
+          "type": "integer",
+          "const": 30
+        },
+        "codingTasksPass": {
+          "type": "integer"
+        },
+        "codingTasksFail": {
+          "type": "integer"
+        },
+        "guardConformanceRate": {
+          "type": "number"
+        },
+        "skipCount": {
+          "type": "integer",
+          "const": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 130,
+      "maxItems": 130,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "category",
+          "inputText",
+          "inputSha256",
+          "expected",
+          "observed",
+          "verdict"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "inputText": {
+            "type": "string"
+          },
+          "inputSha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "expected": {
+            "type": "string"
+          },
+          "observed": {
+            "type": "string"
+          },
+          "verdict": {
+            "type": "string",
+            "enum": [
+              "PASS",
+              "FAIL",
+              "ERRORED",
+              "KNOWN_FALSE_POSITIVE"
+            ]
+          },
+          "violation": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "loopCount": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "required": [
+        "outputLeakage"
+      ],
+      "properties": {
+        "outputLeakage": {
+          "type": "object",
+          "required": [
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "NOT_OBSERVED"
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "liveLanes": {
+      "type": "object",
+      "required": [
+        "EVL-03",
+        "EVL-04",
+        "SSE-01"
+      ],
+      "properties": {
+        "EVL-03": {
+          "type": "object",
+          "required": [
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "NOT_OBSERVED"
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "EVL-04": {
+          "type": "object",
+          "required": [
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "NOT_OBSERVED"
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "SSE-01": {
+          "type": "object",
+          "required": [
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "NOT_OBSERVED"
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

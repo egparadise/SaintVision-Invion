@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.126"
+version: "1.0.139"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-28T18:58:00+09:00"
+updated: "2026-09-29T03:05:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,297 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
+- 확인 기준: 2026-09-29T03:05:00+09:00 (최신 tip `agent/gemini/g05-fe-release-reexpose`, 카드 118 Claude M1/L1~L3 및 Codex C1/C2 전수 반영 완결).
+
+## 2026-09-29 G-05 FE 모델 릴리스 쓰기 UI 재노출 및 서버 멱등 계약 연동 (카드 118, PR #229 기반)
+
+- **작업 브랜치**: `agent/gemini/g05-fe-release-reexpose` (base: `agent/claude/release-idempotency` `41fe5c3c` 위 PR #219 head `f23c0423` 머지 `70b410f5`).
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude (UI·테스트 축), Codex (계약 축).
+- **작업 내용 (카드 118 전수 완결)**:
+  1. **`releaseModelVersion` API 클라이언트 멱등키 복원**: `ReleaseModelVersionOptions`에 `idempotencyKey?: string` 복원 및 `Idempotency-Key` 헤더 1:1 전송.
+  2. **릴리스 쓰기 UI 재노출 및 3단 멱등키 수명주기**:
+     - 카드 113 대기 배너 제거 및 제출 버튼 활성화 (`canApprove === true`).
+     - 실패 재시도 시 동일 `relIdempotencyKey` 보존.
+     - 라이선스 정책, 분류, 모델/버전 변경 시 새 키로 즉시 회전.
+     - 성공 수신 후 다음 제출을 위해 새 키로 자동 회전.
+     - `canApprove === false` 또는 `undefined` 시 fail-closed 방어 (버튼 disabled, 폼 서밋 시 0 network calls, alert 표출).
+  3. **Replay 응답 정직화 표시 (Zero Deception)**:
+     - `release-replay-indicator` 배지 추가: 신규 릴리스(`신규 릴리스 완료 (Fresh)`)와 서버 레저 재생 응답(`재생(Replay) 응답: 기존 멱등성 키에 의해 저장된 릴리스 결과입니다.`)을 분리 표출.
+  4. **계약 스키마 동기화**:
+     - `npm run contracts:generate`를 통해 `model-release-request.ts` 주석 최신화 및 `npm run contracts:check` 31종 전수 일치 확인.
+  5. **되돌리면 실패하는 엄격한 회귀 시험 (총 24개 시험)**:
+     - `apps/web/tests/model-registry-business-routes.test.tsx`: Test 4 (헤더 전송), Test 20 (재노출 및 Fresh indicator, 성공 후 회전), Test 21 (실패 재시도 키 보존 및 replay indicator), Test 22 (입력 변경 시 키 회전), Test 23 (fail-closed 권한 가드).
+- **실측 검증**:
+  - Vitest: `apps/web/tests/model-registry-business-routes.test.tsx` 24 passed (856ms). (웹 전체 80 test files / 757 passed, 0 failures).
+  - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run contracts:check` 31 types PASS, `npm run build` dist/ 번들 생성 성공 (`dist/assets/index-BQ0CZaki.js` 881.08 kB, exit 0).
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (2.12s, exit 0).
+  - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --apply` PASS (0 conflicts).
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-29_02-13-00_KST_G05_Release_Reexpose_FE_Gemini.md` (v1.0.1).
+- **PR 상태**: PR #239 (`agent/claude/release-idempotency` 대상).
+
+- 이전 확인 기준: 2026-09-29T00:20:00+09:00 (최신 tip `agent/gemini/g05-fe-model-registry`, PR #219 Codex r4 F1 조치: Release 쓰기 UI fail-closed 미노출 및 Idempotency-Key 헤더 제거).
+
+- 확인 기준: 2026-09-29T02:05:00+09:00 (최신 tip `agent/gemini/g05-fe-verify-eval`, PR #228 1차·2차·3차 리뷰 조치 완료: H1~H3, M1~M5, L1~L5, N1~N2 전수 반영).
+
+## 2026-09-29 G-05 W3 Verify 및 W5 Eval Run Codex/Claude 1차·2차·3차 리뷰 조치 (PR #228)
+
+- **PR**: #228 (https://github.com/egparadise/SaintVision-Invion/pull/228)
+- **Base / Head**: PR #228 (`agent/gemini/g05-fe-verify-eval`, base `f23c0423`).
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude (UI·테스트 축), Codex (계약 축).
+- **조치 요약**:
+  1. **H3 병합 게이트 해소**: base `f23c0423` 머지 및 충돌 해소 커밋 `21607a24` push로 PR MERGEABLE 전환 및 hosted CI backend 3.12/3.14, desktop-browser, docs, frontend 전수 green 실측.
+  2. **H1 어댑터 식별자 정합**: 백엔드 `adapters/agents.py` 정본 어댑터 어휘(`codex-cli`, `claude-code`, `gemini-cli`, `antigravity`)를 `<select>` 선택형으로 제공, 기본값 `codex-cli` 지정, 픽스처 동기화.
+  3. **H2 Zero Fake Verification (#209)**: `verifyResult` 및 `evalResult`를 현재 모델/버전/스위트 입력에 결속. 입력 변경 시 및 새 제출 실패 시 결과를 즉시 비우고, `useEffect([effectiveProjectId])` prop 동기화 시에도 결과 초기화 및 타깃 재설정. 배지와 성공 카드는 발행 당시 타깃과 일치할 때만 렌더링.
+  4. **N1 입력 변경 시 in-flight abort 및 로딩 즉시 해제**: 입력 변경 핸들러에서 진행 중 요청을 abort하고 로딩 상태(`setVerifyLoading(false)`, `setEvalLoading(false)`)를 즉시 해제하여 버튼 잠금 원천 차단. `finally` 블록에서도 안전하게 소유자 로딩 해제.
+  5. **N2 늦은 응답 시험 보강**: Crockford ULID 규격(26자리)에 맞는 `mvm_01JABCDEF01234567890123451`로 수정 및 `expect(resolveFirst).not.toBeNull()` 단언. W5 세대 가드(늦은 응답 폐기) 시험 추가.
+  6. **M1 응답 가드 32키 상한 제거**: `isEvalRunResponse()`에서 정본 스키마와 1:1로 `componentVersions` 32개 상한 제한을 제거하여 서버 34~35개 키 응답 합법 수용.
+  7. **M2 멱등키 수명주기 완결**: W3/W5 성공 수신 시 새 `Idempotency-Key` 회전. 실패 시 키 보존, 입력 변경 시 키 회전.
+  8. **M3 서버 오류 문자열 및 픽스처 일치**: 409 detail을 서버 정본 `SNAPSHOT_DETAIL`로, 503 detail을 `OBSERVATION_DETAIL`로 수정. 시험 픽스처 카테고리 정합화(SYS-0001은 `category: 'SYS'`, GRAPH-0002는 `category: 'GRAPH'` 및 `traceId`, `causeRef: null`, `evidenceId: null` 포함). W5 eval run route는 서버 계약(`eval_runs.py:100-104`)에 503 매핑이 없으므로, 서버가 실제 반환하는 미매핑 내부 장애 정본인 `500 SYS-0002` (`detail: 'The service raised an error this route cannot represent.'`, `retryable: false`) 픽스처로 전면 교체하여 멱등키 보존 검증.
+  9. **M4 회귀 시험 전면 강화 (22개 시험)**: 키 수명주기, generation/abort 늦은 응답 폐기(W3/W5), N1 입력 변경 시 로딩 해제(W3/W5), `canApprove` false 및 undefined 각각 독립 root에서 버튼 disabled + 폼 서밋 핸들러 차단 + 네트워크 호출 0건 + alert 표출 실측 (W3/W5 전수), W3/W5 응답 계약 불일치 alert 시험, endedAt null 표시, H2 결과 초기화 및 prop 동기화 시험 등.
+  10. **M5 결과 카드 표출 충실도**: status 동적 렌더링, endedAt null 시 `NOT_OBSERVED` 명시, `componentVersions` 화면 표출.
+  11. **L1~L5 접근성 및 마이너 정비**: 배지 문구 수정, Crockford Base32 26자리 플레이스홀더, WCAG AA 4.5:1 대비 충족(PASS 5.08:1, FAIL 5.36:1 실측 반영), 클라이언트 권한 에러 문구 정비, 로딩 해제 가드 보강.
+- **실측 검증**:
+  - Vitest: `apps/web/tests/model-verify-eval-routes.test.tsx` 22 passed (894ms), `apps/web/tests/model-registry-business-routes.test.tsx` 20 passed (923ms). (웹 전체 81 test files / 773 passed, 0 failures).
+  - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist/ 번들 생성 성공 (`dist/assets/index-B-CJTiXt.js` 892.68 kB, exit 0).
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (3.02s, exit 0).
+  - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --check` PASS (0 conflicts).
+  - Hosted CI: commit `f0c78462` backend (3.12)/(3.14), desktop-browser, docs, frontend 전수 SUCCESS.
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-29_01-08-00_KST_G05_W3_Verify_W5_Eval_Review_Action_Gemini.md` (v1.2.0).
+
+- 이전 확인 기준: 2026-09-29T00:33:00+09:00 (최신 tip `agent/gemini/g05-fe-verify-eval`, 카드 101 W3 Verify 및 W5 Eval Run 비즈니스 라우트 화면 연동 및 무결성 검증 완결).
+
+## 2026-09-29 G-05 W3 Verify 및 W5 Eval Run 비즈니스 라우트 화면 연동 및 무결성 불변식 검증 (카드 101, `agent/gemini/g05-fe-verify-eval`)
+
+- **작업 브랜치**: `agent/gemini/g05-fe-verify-eval` (base: PR #219 `26edf079` 위 #215 head `3bdc6e70` 선행 머지 및 PR #219 r4 최신 반영).
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude (UI·테스트 축), Codex (계약 축).
+- **작업 내용 (카드 101 전수 완결)**:
+  1. **계약 스키마 등록 및 자동 동기화**:
+     - `model-verify-request`, `model-verify-response`, `eval-run-start-request`, `eval-run-response` 4종 스키마를 `api-response-contracts.mjs`에 등록 (총 32종).
+     - 엄격한 TypeScript 타입 인터페이스 생성 및 `npm run contracts:check` 32개 전수 일치 확인.
+  2. **Zero Fake Measurements / Zero Fake Verification 불변식 확립 (#209 trusted-worker seam)**:
+     - W3 커널 검증 요청 시 커널 측정 ID(`measurementId`: `mvm_...` 26자리 Crockford Base32)만 전송하고 서버 신뢰 워커가 측정 출처 판정.
+     - 화면은 측정값을 위조하거나 자체적으로 "검증됨"을 단언하지 않으며 서버의 검증 응답(`verifiedAt`, `verifiedMeasurementId`, `newlyVerified`)만 표출.
+     - W5 평가 실행 결과(`passedGate`, `totalCases`, `passedCases`, `violations`)를 `GATE PASS` / `GATE FAIL`로 정직하게 시각화.
+  3. **Observation 계층 및 런타임 fail-closed 가드**:
+     - `verifyModelVersion`, `startEvalRun` 구현.
+     - `isModelVerifyResponse`, `isEvalRunResponse` 런타임 가드 구현 (`additionalProperties: false` 차단, Crockford Base32 26자리 정규식 검증, 케이스 범위 제약 `passedCases <= totalCases` 검증).
+     - 멱등키 보존 및 회전: 실패 시 재시도는 동일 키 재사용, 입력 변경 시 새 키로 회전.
+  4. **UI 컴포넌트 강화 (`ModelLineageView.tsx`)**:
+     - Tab 5 (W3 Verify) 및 Tab 6 (W5 Eval Run) 연동.
+     - 독립 `AbortController` 및 세대 가드를 적용하여 입력 변경 시 늦은 응답 무효화 및 로딩 걸림 원천 차단.
+     - 권한 없는 사용자(`canApprove !== true`) 대상 fail-closed 비활성화 및 안내 표출.
+     - `role="status"` 결과 카드, `aria-live="polite"` 음성 안내 지원.
+  5. **전용 통합 시험 및 전수 검증**:
+     - `apps/web/tests/model-verify-eval-routes.test.tsx` 10개 전용 시험 구현 및 전수 통과 (되돌리면 실패).
+     - 전체 81 test files / 761 tests 통과.
+- **실측 검증 증거**:
+  - Vitest: `apps/web/tests/model-verify-eval-routes.test.tsx` 10 passed, `apps/web/tests/model-registry-business-routes.test.tsx` 20 passed. (웹 전체 81 test files / 761 passed).
+  - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist/ 889.27 kB 생성 성공.
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed.
+  - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --check` PASS (0 conflicts).
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-29_00-33-00_KST_G05_W3_Verify_W5_Eval_FE_Gemini.md` (v1.0.0).
+- **다음 첫 행동**: Card 101 브랜치 push 및 PR 생성 후 리뷰어 요청.
+
+
+- 확인 기준: 2026-09-29T00:20:00+09:00 (최신 tip `agent/gemini/g05-fe-model-registry`, PR #219 Codex r4 F1 조치: Release 쓰기 UI fail-closed 미노출 및 Idempotency-Key 헤더 제거).
+- 확인 기준: 2026-09-28T20:25:00+09:00 (최신 tip `agent/gemini/g07-eval-runner-impl`, commit `e2011893`, PR #190).
 - 확인 기준: 2026-09-28T18:58:00+09:00 (최신 tip `agent/gemini/s10-fe-conformance-status`).
+- 확인 기준: 2026-09-28T21:22:00+09:00 (최신 tip `agent/gemini/g04-fe-seal-record`, PR #212 r3).
+
+## 2026-09-29 G-05 FE 모델 레지스트리 화면 Codex r4 (F1) 조치: Release 쓰기 UI fail-closed 미노출 및 Idempotency-Key 헤더 제거 (카드 113 대기, PR #219)
+
+- **PR**: #219 (https://github.com/egparadise-SaintVision-Invion/pull/219)
+- **Base / Head**: PR #219 `4743b3d7` 위 Codex r4 닫힘 기준 2번 전수 반영.
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude (UI·테스트 축), Codex (계약 축).
+- **조치 내역 (Codex r4 F1 닫힘 기준 2번 전수 반영)**:
+  1. **Release 쓰기 UI fail-closed 미노출 (카드 113 대기)**:
+     - 백엔드 release route(`model_release.py`)가 Idempotency-Key를 소비하지 않으므로 FE 헤더 기반 멱등 주장이 성립하지 않음을 확인.
+     - 서버 계약이 생길 때까지 쓰기 UI를 fail-closed로 미노출: 제출 버튼 `disabled={true}`, `aria-disabled="true"`, 배너 및 버튼에 `서버 멱등 계약 대기(카드 113)` 안내 표출 (`data-testid="banner-release-pending-idempotency"`).
+     - `handleReleaseModel`에서 카드 113 대기 안내와 함께 조기 반환(`setGeneralError('서버 멱등 계약 대기(카드 113): 백엔드 릴리스 멱등성 계약 수립 전까지 릴리스 쓰기 요청이 차단됩니다.')`).
+     - 서버 계약은 Claude가 카드 113으로 추가하고, 그 뒤 재노출은 후속 카드로 배정됨.
+  2. **Release 요청의 Idempotency-Key 헤더 및 멱등 주장 제거**:
+     - `releaseModelVersion` API 클라이언트에서 `idempotencyKey` 옵션 및 `Idempotency-Key` 헤더 전면 제거.
+     - `ModelLineageView.tsx`에서 `relIdempotencyKey` 상태 제거.
+  3. **시험 개정 및 미노출 고정 (되돌리면 실패)**:
+     - 시험 20의 릴리스 헤더 재사용 단언을 전면 제거하고, 릴리스 쓰기 UI의 fail-closed 상태 및 `서버 멱등 계약 대기(카드 113)` 안내 미노출을 고정하는 시험으로 전면 전환 (`apps/web/tests/model-registry-business-routes.test.tsx`: 버튼 disabled/aria-disabled 확인, 안내 문구 실측, 클릭/폼제출 시 /release 네트워크 호출 0건 실측, 되돌리면 실패).
+     - 시험 4: `releaseModelVersion` 클라이언트 호출 시 `Idempotency-Key` 헤더 미전송 및 200 응답 파싱 검증으로 정합.
+     - 시험 5: 보존 고정(Pin) 탭을 통해 RFC 9457 409 Conflict ProblemDetails 검증 수행.
+- **실측 검증**:
+  - Vitest: `apps/web/tests/model-registry-business-routes.test.tsx` 20 passed (819ms). (웹 전체 80 test files / 751 passed, 23.69s, 0 failures).
+  - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist/ 번들 생성 성공 (873.66 kB, 8.55s).
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (8.06s).
+  - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS.
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-28_22-10-00_KST_G05_Model_Registry_FE_Business_Routes_Gemini.md` (v1.4.0).
+- **다음 첫 행동**: PR #219에 조치표 코멘트 등록 및 카드 101(W3 Verify & W5 Eval Run 화면 연동) 계속 진행.
+
+## 2026-09-28 G-05 FE 모델 레지스트리 화면 Claude UI r3 및 Codex Release 멱등 경계·Path 회전 전수 조치 (`agent/gemini/g05-fe-model-registry`, PR #219)
+
+- **PR**: #219 (https://github.com/egparadise-SaintVision-Invion/pull/219)
+- **Base / Head**: PR #212 head `5b2609d9` 선행 머지(`7ddc616e`) 위 Claude UI r3 및 Codex 멱등 경계 조치 완료.
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude (UI·테스트 축), Codex (계약 축).
+- **조치 내역 (Claude UI r3 전수 & Codex Release 멱등/Path 회전 전수 완결)**:
+  1. **Codex Release 멱등 경계 연동**:
+     - `releaseModelVersion` 및 `handleReleaseModel`에 `Idempotency-Key` 헤더 연동 (`relIdempotencyKey` 상태 관리).
+     - 동일 파라미터 재시도 시 동일 키 보존, 폼 변경(`relLicensePolicy`, `relClassification`, `projectId`, `modelId`, `version`) 시 새 UUID v4로 회전.
+     - W2 model path(`modelId`, `projectId`), W4 model/version path(`modelId`, `version`), Release model/version path 변경 시 멱등키 즉시 회전 및 재시도 시 새 멱등키 유지 실측 (시험 13, 시험 18, 시험 20).
+  2. **Claude UI r3 조건 전수 반영**:
+     - `ModelLineageView.tsx:1205` fallback kind 배열 `['eval_run', 'code_commit', 'approval', 'container_image']` 완전 제거 (서버 미제공 시 NOT_OBSERVED 정직 표기).
+     - `:1208` `'evaluations'` 옛 별칭 제거, 정본 `kind === 'eval_run'`만 판별.
+     - 시험 9 픽스처 교정: 서버 `src/saintvision/services/lineage.py:762-768` 산식에 맞춰 `missing: ['dataset_version']`, `unresolved: [{ kind: 'code_commit', count: 2 }]`, `countOnlyKinds: ['code_commit', 'eval_run']`으로 교정.
+     - `:203` 안내 문구 복원: `5b2609d9` 원문 `(백엔드 서빙 배포 API 미노출 상태로 실제 인프라 미반영 · 백엔드 digest 고정과 무관 · Digest: ...)`로 복원.
+     - View 날짜 검증 중복 제거: `ModelLineageView.tsx` 내부의 중복 함수를 제거하고 정본 공용 가드(`modelRegistryObservation.isValidIsoDateTime`)로 일원화 (`+99:99` 오프셋 누출 차단).
+- **실측 검증**:
+  - Vitest: `apps/web/tests/model-registry-business-routes.test.tsx` 20 passed (855ms), `apps/web/tests/model-lineage.test.ts` 23 passed (924ms), `apps/web/tests/write-actions-integrity-wiring.test.tsx` 8 passed (204ms). (웹 전체 80 test files / 751 passed).
+  - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist/ 번들 생성 성공 (874.53 kB).
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (2.85s).
+  - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --check` PASS (0 conflicts).
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-28_22-10-00_KST_G05_Model_Registry_FE_Business_Routes_Gemini.md` (v1.3.0).
+- **다음 첫 행동**: PR #219에 조치표 코멘트 등록 및 카드 101(W3 Verify & W5 Eval Run 화면 연동) 완료.
+
+## 2026-09-28 G-05 FE 모델 레지스트리 화면 Claude UI r2 재검토(G1, G2, G3, G5, Test 16) 조치 및 PR #212 클린 머지 (`agent/gemini/g05-fe-model-registry`, PR #219)
+
+- **PR**: #219 (https://github.com/egparadise/SaintVision-Invion/pull/219)
+- **Base / Head**: PR #212 head `5b2609d9` 선행 머지(`7ddc616e`) 위 Claude UI r2 조치 반영.
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude (UI·테스트 축), Codex (계약 축).
+- **조치 내역 (G1, G2, G3, G5, Test 16 전수 완결)**:
+  1. **G3 [중간, 새 결함] 쓰기 3종 독립 AbortController 및 세대 분리, finally 로딩 해제 보장**:
+     - `handleRegisterVersion`, `handleExtendPin`, `handleReleaseModel`별 독립 `AbortController`(`regAbortControllerRef`, `pinAbortControllerRef`, `relAbortControllerRef`) 및 세대 번호(`regGenerationRef`, `pinGenerationRef`, `relGenerationRef`) 할당.
+     - 한 액션 중 다른 액션을 호출해도 서로의 controller가 abort되지 않으며, abort 시에도 `finally`에서 로딩 상태를 무조건 해제(`setRegLoading(false)` 등)하여 버튼 영구 비활성화 원천 차단.
+     - 9개 폼 필드 변경 시 즉시 in-flight 세대를 증가시켜 늦은 응답의 화면 오염 차단. (회귀 시험 18).
+  2. **G1 [중간] Lineage Trace 응답 픽스처 및 서버 정본 모델 정합**:
+     - `validTraceResponse` 픽스처에서 `unresolved` 존재 시 `fullyTraceable: false`로 정합(`src/saintvision/services/lineage.py:762`).
+     - `missing` 배열 항목은 서버 계약대로 kind 이름 문자열(`"dataset_version"`)만 포함.
+     - 4대 별칭(`evaluations`, `commits`, `approvals`, `images`) 및 `isEval` 특수 분기, 하드코딩 fallback kind 목록 전면 제거.
+  3. **G2 [부분] 보존 핀 멱등키 회전 및 동일 재시도 보존**:
+     - 동일 파라미터 재시도 시에는 `pinIdempotencyKey`를 보존하되, 핀 만료일(`until`) 및 식별자(`projectId`, `modelId`, `version`) 변경 시 즉시 새 UUID v4 멱등키로 회전. (회귀 시험 19).
+  4. **G5 [경미] 409 Conflict detail 형식 및 ProblemDetails.title 교정**:
+     - 409 detail을 서버 정본 문자열(`f"kind '{missing_kind}' is not traceable for model '{model_id}' version '{version}'"`)과 일치.
+     - `ProblemDetails`의 `title`을 서버 정본대로 에러 코드(`MODEL-0004` 등)와 일치.
+  5. **Test 16 엄격 스키마 경계 픽스처 교정**:
+     - `deployments` 허용 환경(`environment: 'pilot'`) 적용 및 `unresolved` 번호 1부터 시작 정합.
+  6. **PR #212 선행 머지 (`7ddc616e`) 및 ModelLineageView 완전 합성**:
+     - PR #212 head `5b2609d9`를 병합하고, `ModelLineageView.tsx`에서 Card 94 비즈니스 라우트와 PR #203 어댑터 Conformance 패널 및 Model Commitment 패널을 완벽하게 통합/합성.
+- **실측 검증**:
+  - Vitest: `apps/web/tests/model-registry-business-routes.test.tsx` 19 passed, `apps/web/tests/model-lineage.test.ts` 23 passed, `apps/web/tests/write-actions-integrity-wiring.test.tsx` 8 passed. (웹 전체 80 test files / 750 passed).
+  - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist/ 번들 생성 성공 (874.71 kB).
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed.
+  - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --check` PASS (0 conflicts).
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-28_22-10-00_KST_G05_Model_Registry_FE_Business_Routes_Gemini.md` (v1.2.0).
+- **다음 첫 행동**: PR #219에 Claude UI r2 조치 결과 코멘트 등록 및 카드 101(W3 Verify & W5 Eval Run 화면 연동) 재개.
+
+## 2026-09-28 G-05 FE 모델 레지스트리 화면 실제 business route 연동 및 불변식 검증 (카드 94, `agent/gemini/g05-fe-model-registry`)
+
+- **작업 브랜치**: `agent/gemini/g05-fe-model-registry` (base: `agent/claude/g04-w4-retention-pin` head `0b949454`)
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude (UI·테스트 축), Codex (계약 축).
+- **작업 내용 (카드 94)**:
+  - **계약 및 Observation 계층**:
+    - `apps/web/scripts/api-response-contracts.mjs`에 G-04/G-05 스키마 7종(`model-version-register-request`, `model-version-response`, `retention-pin-request`, `retention-pin-response`, `model-release-request`, `model-release-response`, `model-lineage-trace-response`) 등록 및 자동 생성 타입 동기화.
+    - `apps/web/src/shared/api/modelRegistryObservation.ts` 신설: Lineage Trace(GET), W2 Version Register(POST), W4 Retention Pin(POST), Model Release(POST) 4종 API fetcher 및 strict 허용 키 화이트리스트 런타임 가드 구현.
+    - RFC 3339 일시 및 달력 유효성 검증(`isValidIsoDateTime`), 암호학적 UUID v4 기반 멱등키 생성(`generateIdempotencyKey`).
+  - **UI 컴포넌트 (`apps/web/src/features/mlops/ModelLineageView.tsx`)**:
+    - 실제 Business Route 4종 탭(`Lineage Trace`, `W2 Register`, `W4 Retention Pin`, `Release Model`) 구현 및 실 서버 연동.
+    - 서버 미관측 항목에 대해 가짜 수치/PASS를 전면 배제하고 `NOT_OBSERVED (미측정)` 정직 표기.
+    - W3 솔기(seam)에 대한 명시적 안내: `"W3 검증: 미연결 (검증 앵커 #215 대기)"` 배지 표출.
+    - RFC 9457 ProblemDetails (401, 403, 404, 409, 422) 및 502/504 HTML 에러 정제 처리.
+    - `role="status" aria-live="polite"` 라이브 리전 상시 DOM 유지, WCAG AA 다크 테마 대비 4.5:1 이상 실측 확보.
+  - **Vitest 17건 비즈니스 라우트 전용 시험 (`apps/web/tests/model-registry-business-routes.test.tsx`)**:
+    - GET lineage(서버 kind 동적 렌더링/NOT_OBSERVED 정직 분리), POST W2(Idempotency-Key 재시도 안정성 및 회전), POST W4, POST Release, 409 Conflict(서버 원문 detail), 403 Forbidden, 503 Retryable, fail-closed canApprove, missing/scope 표출, live-region, in-flight 중복 차단, query/write unmount abort, calendar round-trip, byteSize 정수 검증, ProblemDetails status 결속, additionalProperties:false 및 컬렉션 상한 17건 전수 PASS.
+  - **Codex F1~F5 & Claude G1~G6 1차 리뷰 전수 반영**:
+    - F1/G1: canApprove fail-closed 엄격화 (role fallback 배제, 3종 쓰기 aria-disabled, 전역 배너).
+    - F2/G2: Idempotency-Key 재시도 안정성 유지 및 폼 의도별 관리.
+    - F3/G4: 4종 최상위 및 3종 중첩 응답 strict key 화이트리스트 및 컬렉션 상한 강제.
+    - F4/G4: 달력 유효성(윤년/월별 일수) 및 byteSize 정수 문자열 엄격 검증.
+    - F5: ProblemDetails HTTP status 결속 검증.
+    - G1/G5: 서버 kind 어휘(`dataset_version`, `deployment`, `code_commit`, `container_image`, `eval_run`, `approval`), 실 ID 접두(`mdv_`, `mdl_`, `dsv_`, `dpl_`, `apv_`), 409 detail 형식 일치.
+    - G3: 쓰기 3종 writeAbortController 및 writeGeneration 세대 가드 추가.
+- **실측 검증**:
+  - `npm test -- model-registry-business-routes`: 17 passed (644ms).
+  - `npm test` (apps/web): 79 files, 691 passed (24.70s).
+  - `npx tsc -b`: 0 errors.
+  - `npm run build`: bundle 정상 빌드 (815.13 kB, 11.92s).
+  - `npm run contracts:check`: 23개 스키마 타입 정합 (PASS).
+  - `python tools/check_frontend_integrity.py`: 84개 파일 대상 9대 무결성 규칙 0 violations (exit 0).
+  - `python tools/check_contract_bindings.py`: 55 fixtures, 20 bound types, 14 replay guards (PASS).
+  - 파이썬 라우트 스위트(`.venv`, Python 3.14.7):
+    - `pytest tests/test_route_coverage.py`: 40 passed.
+    - `pytest tests/core/test_model_release_route.py`: 59 passed.
+    - `pytest tests/core/test_model_retention_pin_route.py tests/core/test_model_version_register_route.py`: 133 passed.
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-28_22-10-00_KST_G05_Model_Registry_FE_Business_Routes_Gemini.md` (`HIST-GEMINI-G05-FE-MODEL-REGISTRY-001`, v1.0.0).
+- **다음 첫 행동**: PR 생성 후 Claude(UI·테스트 축) 및 Codex(계약 축) 검토 요청.
+
+## 2026-09-28 G-04 RunDetail 봉인 기록 패널 Claude UI r2 재검토(G1~G5, O3, O4) 완결 (`agent/gemini/g04-fe-seal-record`, PR #212)
+
+- **PR**: #212 (https://github.com/egparadise/SaintVision-Invion/pull/212)
+- **Base**: `agent/claude/g04-w1-seal-record` (PR #201 head `9dfb2878` + PR #188 head `5c34aaca` 클린 머지 `e1d593ce`)
+- **조치 내역 (G1~G5, O3, O4 전수 완결)**:
+  1. **G1 [중간] 미봉인 경로 R3 401/403/409/5xx 화면 표출**: 미봉인 실행에서도 409 `GRAPH-0002` 재현불가 배지 및 500 에러 배너를 정직하게 표출(`SealRecordPanel.tsx:819`), 라이브 리전에도 번들 상태 안내 부가.
+  2. **G2 [중간] `handleLoadNextPage` 세대 가드**: `generationRef` 및 `runId` 확인 가드를 응답/에러/finally 전 구간에 배치하여 실행 전환 시 이전 페이지 응답 누출 차단.
+  3. **G3 [중간] `isProblemDetails` 계약 엄격 복원**: `causeRef`·`evidenceId`의 `undefined` 허용을 제거하여 canonical required 계약을 엄격 준수하고, 11키 legacy 401 본문은 정밀 수용.
+  4. **G4 & G5 [낮음] 픽스처 및 문서 정합**: 409 서버 정본 detail 일치, SYS-0002(500) 교정, URL 분기 순서 교정, 페이지 교체 동작 명시.
+  5. **O3 & O4 [권고] 접근성 및 항목 복원**: R3 번들 항목 표에 순번, 비식별화([비식별화]), 신뢰도 열 복원. 게이트웨이 에러 판정 범위 정밀화.
+  6. **변이 사살 시험 6건 보강**: 시험 19(미봉인 409), 20(미봉인 500), 21(페이지네이션 전환), 22(검증 전환), 23(아티팩트 리셋), 24(causeRef 누락 거부) 총 24건 전수 통과.
+- **실측 검증**:
+  - Vitest: `tests/run-detail-seal-record.test.tsx` 24 passed (496ms). 웹 전체 79 test files / 699 passed (21.71s).
+  - `npx tsc -b`: 0 errors. `npm run build`: dist/ 번들 생성 성공 (7.14s).
+  - `npm run contracts:check`: PASS (20 API response TypeScript types match).
+  - 파이썬 게이트: `pytest tests/test_route_coverage.py tests/core/test_run_record_artifacts_route.py` 88 passed (18.30s), `check_frontend_integrity.py` 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-28_21-22-00_KST_G04_RunDetail_Seal_Record_Panel_Claude_r3_Gemini.md` (`HIST-G04-003`, v1.0.0).
+
+## 2026-09-28 G-04 RunDetail 봉인 기록 패널 Claude UI r2 및 Codex 계약 검토 조치 완결 (`agent/gemini/g04-fe-seal-record`, PR #212)
+
+- **PR**: #212 (https://github.com/egparadise/SaintVision-Invion/pull/212)
+- **Base**: `agent/claude/g04-w1-seal-record` (PR #201 head `9dfb2878` + PR #188 head `5c34aaca` 클린 머지 `e1d593ce`)
+- **조치 내역 (Claude F1~F9 및 Codex F-R1~F-R4 전수 완결)**:
+  1. **F1 [High] 백엔드 CI 통과 (#188 선행 머지)**: #188 head `5c34aaca` 병합(`e1d593ce`)으로 W1 POST 라우트와의 카운트 중복 해소 (`(path, method)` 단위 계측). `test_run_record_artifacts_route.py` 통과 (88 passed).
+  2. **F2 & F-R3 [High] R2 페이지 개수 및 `nextCursor` 페이지네이션**: `count`를 "이 페이지 N건"으로 정정하고 `nextCursor` 존재 시 추가 항목 안내 및 다음 페이지 버튼(`handleLoadNextPage`, cursor 쿼리 전달) 구현.
+  3. **F3 & F-R2 [High] R2/R3 에러 정직 보존**: `Promise.allSettled` rejected 사유를 버리지 않고 `artifactsError`, `bundleError`, `bundleSpecialStatus`로 보존. R3 409 `GRAPH-0002` 재현 불가 배지 표출 및 라이브 리전 거짓 "0건/없음" 배제.
+  4. **F4 [Medium] R1 404 "No such run." 분리**: exact detail `No sealed record for this run.`만 미봉인으로 판정, 그 외 404는 오류 배너 표출.
+  5. **F5 & F-R1 [High] 401 / 502 실제 fetch 경로 검증**: `client.ts`의 `isProblemDetails`에서 legacy 401 `AUTH-MISSING-CREDENTIAL` 원형 보존. HTML 502/504 정제 한국어 메시지 표출.
+  6. **F6 [Medium] AbortSignal 및 세대 관리**: Run 전환 시 비동기 응답 누출 차단(`signal.aborted` 가드 전수 배치).
+  7. **F7 [Low] 정직성 변이 전수 사살**: 불일치 배지 `#ff7b72` 및 `data-tone="mismatch"` 단언, 한글 정규식 버그 교정, Run 전환 시 번들 잔존 차단.
+  8. **F8 & F-R4 [Medium] 문구 정합 및 RFC 3339 달력 날짜 검증**: `isValidIsoDateTime`으로 `sealedAt`/`builtAt` 윤년·달력 검증, 불일치 문구 정합, `evidenceId`/`tokenEstimate`/`objectVersion`/`nextCursor` 실표출.
+  9. **F9 [Low] 픽스처 규격화**: `bnd_` / `art_` + 26자리 Crockford ULID 및 순수 `RunItem` 사용.
+- **실측 검증**:
+  - Vitest: `tests/run-detail-seal-record.test.tsx` 18 passed. 웹 전체 79 test files / 693 passed.
+  - `npx tsc -b`: 0 errors. `npm run build`: dist/ 번들 생성 성공 (9.02s).
+  - 파이썬 게이트: `pytest tests/test_route_coverage.py tests/core/test_run_record_artifacts_route.py` 88 passed, `check_frontend_integrity.py` 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-28_20-50-00_KST_G04_RunDetail_Seal_Record_Panel_Claude_r2_Codex_Gemini.md` (`HIST-G04-002`, v1.0.0).
+
+## 2026-09-28 G-04 RunDetail 봉인 기록(R1·R2·R3) 읽기 전용 패널 및 무결성 검증 (카드 86, `agent/gemini/g04-fe-seal-record`)
+
+- **작업 브랜치**: `agent/gemini/g04-fe-seal-record` (base: PR #201 head `9dfb2878` + PR #188 head `dfb666a3` 클린 머지 `86c6909a`)
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude (UI·테스트 축), Codex (계약 축).
+- **작업 내용 (카드 86)**:
+  - **계약 및 Observation 계층**:
+    - `apps/web/scripts/api-response-contracts.mjs`에 `run-record-response`, `run-record-artifact-page-response`, `artifact-pin-verification-response`, `context-bundle-response` 4종 스키마 등록 및 타입 자동 동기화 (`packages/contracts-ts/src/index.ts` 수동 편집 0건).
+    - `apps/web/src/shared/api/runSealObservation.ts` 신설: R1 RunRecord, R2 Artifacts, R2 Pin Verify, R3 Context Bundle fetcher 및 허용 키 화이트리스트 기반 런타임 가드 구현.
+  - **UI 컴포넌트 (`apps/web/src/features/runs/SealRecordPanel.tsx`)**:
+    - 404 RES-0004 ("No sealed record for this run.") 발생 시 가짜 PASS/수치 없는 정직한 `미봉인 (UNSEALED)` 안내 배지 표출.
+    - `verified: false` 및 `hashVerified: false`에 대한 200 사실 보고 처리 (`⚠️ 불일치 (Tampered/Mismatch)`, PASS/합격/녹색 위장 금지, 에러 배너 격발 금지).
+    - 401 (`AUTH-MISSING-CREDENTIAL`), 403 (`AUTH-0030`), 404 (`RES-0004`) canonical ProblemDetails 분기 처리.
+    - 502/504 프록시 HTML 응답에 대한 DOM 누출 차단 및 한국어 폴백 메시지 정제.
+    - `role="status" aria-live="polite"` 라이브 리전 컨테이너 상시 DOM 유지.
+    - 다크 테마 기준 WCAG AA 대비 4.5:1 이상 실측 충족.
+  - **RunDetail 연동 (`apps/web/src/features/runs/RunDetail.tsx`)**:
+    - Tab 7 `7. 봉인 기록 (Seal Record)` (`data-testid="tab-seal"`) 배선.
+  - **Vitest 12건 회귀 시험 (`apps/web/tests/run-detail-seal-record.test.tsx`)**:
+    - R1/R2/R3 및 404 unsealed, 403, 401, 502, Run ID 전환 잔류 상태 클리어(revert-fail), a11y, WCAG AA 대비, 런타임 가드 12건 전수 PASS.
+- **실측 검증**:
+  - `npm test -- run-detail-seal-record`: 12 passed.
+  - `npm test` (apps/web): 79 files, 687 passed.
+  - `npx tsc -b`: 0 type errors.
+  - `npm run build`: bundle 정상 빌드 (4.83s).
+  - `npm run contracts:check`: 20개 스키마 타입 정합 (exit 0).
+  - `pytest tests/test_route_coverage.py`: 40 passed.
+  - `python tools/check_frontend_integrity.py`: 9대 무결성 규칙 0 violations (exit 0).
+  - `python tools/check_contract_bindings.py`: 55 fixtures, 20 types exit 0.
+- **다음 첫 행동**: PR 생성 후 Claude(UI·테스트) 및 Codex(계약) 검토 요청.
 
 ## 2026-09-28 S10-FE 어댑터 conformance 관측 화면 새 API(G-03 1단계) 연동 및 Claude UI·Codex 계약 리뷰 전수 반영 (agent/gemini/s10-fe-conformance-status)
 
@@ -82,6 +372,269 @@ source_of_truth: "Git"
     - `Backend Build` (Run `36362150709`): **PASS (Python 3.12 9m20s / Python 3.14 8m10s)**
   - 로컬 게이트: `check_frontend_integrity.py` PASS (0 violations), `test_route_coverage.py` PASS (39 passed), `check_contract_bindings.py` PASS, `check_docs.py` PASS, `sync_obsidian.py --check` PASS (0 conflicts).
 
+## 2026-09-28 G-07 PR 4 NaturalLanguageRunView 화면 연동 및 Claude UI 결함 F1/F2 조치 완료 (PR #203, `agent/gemini/g07-nl-run-view-ui`)
+
+- **PR**: #203 (https://github.com/egparadise/SaintVision-Invion/pull/203)
+- **베이스 커밋**: `90a2021a` (PR #190 승인 헤드)
+- **카드 67 4대 핵심 요구사항 구현 완료**:
+  - REP-03 상한 초과(3차 클릭) 시 화면 상태 `rejected` 즉시 갱신 및 diff 액션 버튼 DOM 제거.
+  - REP-02/03 클릭 수 = 엔진 초기값 1·`>=` 일치 (제출 후 1/3 → 클릭 1 2/3 → 클릭 2 3/3 → 클릭 3 거절 `BOUNDED_LOOP_EXCEEDED (3)`).
+  - REP-04 승인 결과 알림에 `role="status"` `aria-live="polite"` 신설 및 거버넌스 고지 배너(`agent-unexposed-notice`)와 엄격 분리.
+  - EVL-01 / G-26 KPI 카드 라벨 `합성 · 운영 인수 아님(G-26)` 표기.
+- **Claude UI·시험 축 검토 F1·F2 결함 전수 조치**:
+  - **F1 (접근성)**: `agent-action-notice` live region을 영구 렌더링 컨테이너로 DOM에 유지하여 스크린리더 공지 누락(announcement drop) 차단. 초기 마운트 시 컨테이너 존재 및 갱신 후 동일 DOM 참조 재사용 단언.
+  - **F2 (대비비)**: `REJECTED` 배지 색상을 Primer 다크모드 전용 `#ff7b72` 및 `rgba(248, 81, 73, 0.15)`로 보정하여 카드 배경 `#161b22` 위 **5.79:1** (≥ 4.5:1, WCAG AA) 달성. 알파 블렌딩 합성 함수를 통한 전 배지/배너 실측 검증 및 이전 변이 색상 조합(4.04:1) 사살 테스트 완료.
+- **백엔드/러너/픽스처 변경 0건**: 프런트엔드 컴포넌트 및 단위 시험만 수정되어 PR #190 증거 파일 재생성 불요.
+- **실측 검증**: Hosted/로컬 vitest 81 test files / 723 passed, `tsc -b` 통과, `npm run build` 통과, `pytest tests/test_route_coverage.py` 39 passed, `check_frontend_integrity.py` 0 violations, `check_docs.py` PASS.
+- **정본 기록**: [[2026-09-28_17-45-00_KST_G-07_PR4_화면연동_Gemini]] (`HIST-G07-004`).
+
+## 2026-09-23 S09-FE 100 Prompt·30 Coding Eval 러너 및 자연어 요청·예산·Diff UI 시나리오 매트릭스 v1.1.1 개정 (docs-only, `agent/gemini/s09-fe-matrix`)
+
+- **Codex 백엔드 계약 승인 및 Claude r2 UI 지적 2건 전수 반영 매트릭스 v1.1.1 개정**:
+  - **PRM (프롬프트 보안 및 누출 차단, AC-09 Zero Leakage)**:
+    - 정상 코딩 과제 프롬프트(DICOM 전처리 버그 수정) 및 Context 파일 바인딩 (`PRM-01`).
+    - API Key(`sk-...`), AWS Secret Key, SSH 개인키, `cat /etc/shadow`, 시스템 프롬프트 덤프, API 키 노출 요구 등 6대 정규식 사전 비행 차단 및 `LEAK_ATTEMPT_DETECTED` 에러 표출 (`PRM-02`, Client-only HTTP 없음).
+    - 시스템 프롬프트 덤프 및 탈옥 시도 사전 차단 (`PRM-03`, Client-only HTTP 없음).
+    - 백엔드 불변식: 금지 행동(Forbidden Behaviour) 위반은 가중치 1(unit weight) 고정, 다른 문항 고득점으로 상쇄 불가 및 게이트 즉시 탈락(`run.passed_gate = False`) (`PRM-04`).
+  - **QTA (예산 쿼터 및 사전 토큰/비용 계산)**:
+    - 프롬프트 길이(3.5자/토큰) + Context 파일(1,200토큰/개) 실시간 계산 및 1,000토큰당 25 KRW 원화 비용 환산 (`QTA-01`).
+    - 자연어 Run 요청 제출 시 테넌트 잔여 예산(650,000 KRW) 실시간 차감 렌더링 (`QTA-02`, Client-only 시뮬레이션, Network Request 0, DistributedPlan 미생성/UNMEASURED).
+    - 테넌트 잔여 예산 초과 요청 사전 차단 (`BUDGET_EXCEEDED`, Client-only HTTP 없음) (`QTA-03`).
+  - **REP (Bounded Repair 루프 및 코드 Diff 검토 UX)**:
+    - 제안된 코드 Diff 렌더링 및 `READY` 상태 배지 표출 (`REP-01`).
+    - 대화형 추가 보정 루프 진행: 알림 배너를 코드와 일치하는 `div:has-text("🔄 Bounded Repair Loop 2/3 실행 완료")`로 정정 (`REP-02`).
+    - 4회 시도 시 3회 상한 초과 거절: 에러 알림을 코드와 일치하는 `div:has-text("🛑 BOUNDED_LOOP_EXCEEDED")`로 정정 (`REP-03`, Client-only HTTP 없음).
+    - Diff 승인 액션 및 백엔드 패치 API 미노출 정직 고지 배너 표출 (`REP-04`).
+  - **EVL (100 Prompt / 30 Coding Golden Eval 러너)**:
+    - 클라이언트 픽스처 Golden Eval 성적표 렌더링 (100-Prompt 유효율 ≥ 99%, 30-Coding 성공률 ≥ 70%, 누출 0건) (`EVL-01`).
+    - 백엔드 에이전트 엔드포인트 미노출 거버넌스 고지 배너 (`agent-unexposed-notice`, `role="status"`, `aria-live="polite"`) (`EVL-02`).
+    - 실 ProviderAdapter 100건 프롬프트 골든 평가 러너: **UNMEASURED ('운영 모델/Provider 어댑터 배선 후')**, 모듈 `tools/run_s09_golden_eval.py` [제안·미구현] 명시 (`EVL-03`).
+    - 실 샌드박스 30건 코딩 과제 Bounded 실행 및 바이트 검증: **UNMEASURED ('운영 모델/도구 어댑터 배선 후')**, 모듈 `tools/run_s09_coding_tasks.py` [제안·미구현] 명시 (`EVL-04`).
+  - **SSE (커널 Run 이벤트 스트림 및 SSE 재연결 계약)**:
+    - 커널 Run 이벤트 SSE 스트림 및 `Last-Event-ID` 재연결 불변식 (`GET /v1/projects/{project}/runs/{run_id}/events`, Bearer 토큰 루프별 재검증, 25초 주기 reconnect, 인가 실패 시 `inv.stream.closed`) (`SSE-01`). UI 레벨에서는 **UNMEASURED ('runId 생성 API 배선 후')** 명시.
+  - **오류 코드 분류 체계 정밀화 (Codex 반영)**: 인증 헤더 누락 시 HTTP 401 `AUTH-MISSING-CREDENTIAL`, 유효하지 않은 자격증명/인가 실패 시 HTTP 403 `AUTH-*` 계열로 분리.
+  - **계획서 정본**: [[2026-09-23_S09-FE_100Prompt_30Coding_Eval러너_자연어요청_시나리오_매트릭스_Gemini]] (v1.1.1).
+  - **독립 검토 상태**: Codex 승인 확인 완료, Claude r2 지적 2건 정정 후 최종 승인 대기.
+- 확인 기준: 2026-09-28T05:35:00+09:00 (최신 tip `1e8baf04`, 작업 브랜치 `agent/gemini/s07-fe-matrix`).
+
+## 2026-09-28 S07-FE 분산 복구·Node 이탈·Heartbeat 60s Stale 전이·Fencing Token·Zombie Late Write 차단 UX 시나리오 매트릭스 v1.0.1 개정 (docs-only, `agent/gemini/s07-fe-matrix`)
+
+- **Codex 계약 검토(F-C1, F-C2, F-C3) 전면 반영 5대 핵심 영역 15대 시나리오 정본 개정 (v1.0.1)**:
+  - **F-C1 (UI 합성 상태 vs 커널 정본 분리)**:
+    - `stale` 및 `fenced`는 DB 상태가 아니며 `recoveryEngine.ts` 클라이언트 인메모리 시뮬레이션 상태임으로 한정 (`HBD-01~03`).
+    - 백엔드 DB 커널 `inv.nodes.status`는 4종(`online|offline|draining|quarantined`)만 허용하며, observer(`observation.py:138-150`)는 60s 초과 시 곧바로 `offline`으로 전환함.
+    - 실행/리스 디스패치 경로는 별도 `15s freshness`(`heartbeat_at >= clock_timestamp() - 15s`)를 요구함 (`dispatch.py:79-85`, `leases.py:253-263`).
+    - `HBD-03`의 '스케줄러 영구 제외'를 인메모리 반환값(`offline`) 단언으로 정정하고 스케줄러 연동은 UNMEASURED로 분리.
+  - **F-C2 (합성 거절/복구 vs 물리 AC-07 분리)**:
+    - `ZMB-01~03`: 50회 연속 지연 쓰기 거절(`staleTokenWritesAllowed === 0`)을 'UI 인메모리 합성 거절 시나리오'로 명시하고, 운영 AC-07의 클러스터 전체 물리 영속 쓰기 완전 차단은 **UNMEASURED**로 유지.
+    - `REC-01~03`: 20/20 복구를 'UI 인메모리 모의 복구 시나리오'로 명시하고, 물리 바이트 전송 및 실행 샤드 재생을 수반하는 운영 AC-07 복구율(≥95%)은 **UNMEASURED**로 유지.
+  - **F-C3 (돌연변이 PLANNED/SURVIVED 정정 및 recovery_epoch UUID 경계 반영)**:
+    - MUT-01, MUT-02, MUT-03, MUT-05의 판정 결과를 provenance 실행 전이므로 `PLANNED / NOT_RUN`으로 정정.
+    - MUT-04: `distributed-recovery.test.ts:89-113`이 `record.newEpoch`를 단언하지 않아 `epoch += 1` 제거 시에도 통과하므로 `SURVIVED (미측정) [단언 보강 필요]`로 정직 표기.
+    - 백엔드 `recovery_epoch`(`0001_core.sql:19`) 근거를 `tests/integration/test_shard_recovery.py:371-383`로 교체하고, 단조 증가 카운터가 아닌 UUID equality boundary(`str(uuid4())` 불일치 시 `LEASE-0004` 거절)임을 명시.
+- **계획서 정본**: [[2026-09-28_S07-FE_분산복구_Heartbeat60s_FencingToken_Zombie차단_시나리오_매트릭스_Gemini]] (v1.0.1).
+- **독립 검토 상태**: Codex 지적 3건 전수 조치 완료 후 재대조 대기, Claude UI 경로 독립 검토 대기.
+
+## 2026-09-28 S08-FE 보안 감사·Docker 소켓 차단·Kill Switch·백업 복원 UI 시나리오 매트릭스 v1.0.3 개정 (`agent/gemini/s08-fe-matrix`)
+
+- **작업 개요**: PR #123 Claude r3 UI 경로 승인(`issuecomment-5859910871`) 및 Codex 계약 재대조(`issuecomment-5859916746`) 전수 반영하여 시나리오 매트릭스 v1.0.3 개정.
+  - 409 충돌 경계(`GRAPH-0003`, `NODE-0033`, `NODE-0062`, `LEASE-0003`, `IDEM-0001`)와 403 권한 경계(`AUTH-0062`) 분리 정정.
+  - `Idempotency-Key` 규격을 `app.py:key()` 기준 1~200자 printable ASCII (ordinals 33..126)로 정밀 명시.
+- **문서 정본**: `docs/vault/30_Development/2026-09-28_S08-FE_보안감사_Docker소켓차단_KillSwitch_백업복원_시나리오_매트릭스_Gemini.md` (v1.0.3, docs-only).
+- **v1.0.2 조치 내역**:
+  1. **Kill Switch canonical 계약 (F-C1)**: 백엔드 `app.py:310, :358, :370` API 실재(`GET/POST /v1/operations/kill-switch`, `/clear`) 및 POST 필수 규격(Bearer identity, operator grant, `Idempotency-Key`, `ContainmentInput`), tenant execution barrier/reconciler 정지 규약(ADR-053) 명시. 문서 내 "API 미노출" 전면 정정.
+  2. **Drain/Resume canonical 계약 (F-C2)**: `POST /v1/nodes/{id}/drain` 및 `/resume`의 필수 규격(`Idempotency-Key` 헤더, `ContainmentInput`, principal actor 추출), 성공 canonical nodeStatus enum(`online|offline|draining|quarantined|null`, 비계약 상태 `drained` 배제), 409 경계(`GRAPH-0003`, `NODE-0033`, `NODE-0062`, `LEASE-0003`, `IDEM-0001`, `AUTH-0062`), `ContainmentResult` 응답 명시 및 mock UI와의 불일치 고지.
+  3. **계층 분리 대비표 신설 (F-C3, Table §1.1)**: 클라이언트 전용 모의 계층(`SECURITY_VIOLATION`, `APPROVAL_REQUIRED`, `apr_*`, 인메모리 원장/카운터) vs 백엔드 정본 제어평면 계약 계층(`ContainmentInput/Result/View`, UUID `approvalId`, RFC 7807 ProblemDetails, PostgreSQL 불변 원장) 완전 분리.
+  4. **올바른 Node Drain ADR-054 반영 (N1)**: Drain 탭 라벨의 `ADR-038` 표기 오류 및 정본 Node drain ADR-054 반영 (`FE-DEFECT-S08-06`).
+  5. **스키마 경로 정정 (N2)**: `contracts/v1alpha1/core.schema.json` 정본 경로 명시.
+  6. **단방향 Drain 동기화 결함 본문 기술 (N3)**: `AdminSecurityConsole.tsx:27-39` 및 `:728`의 서버 drain 해제 미반영/로컬 state 의존 결함 기술.
+  7. **문구 일치 (N4, Item 1)**: `AdminSecurityConsole:246` 문구를 KPI 타일 부제 `L2/L3 위험 작업 Two-Person 강제`로 정정, 제품 문구 "비상 정지 API 미노출 상태"(`adm:181, :830`) 결함 명시 및 `FE-DEFECT-S08-01`에 수정 과제 포함.
+  8. **DOM 단언 부재 명시 및 수치 정정 (Item 9)**: BYP-01/02, GPU-01 DOM 단언 없음 명시, AUD-01 `checkedRecords >= 6` 정정.
+- **다음 행동**: `check_docs.py` 통과 확인 후 커밋·푸시, PR #123에 조치 보고 코멘트 작성.
+- 확인 기준: 2026-09-28T09:50:00+09:00 (최신 tip `agent/gemini/s10-fe-fixes`, PR #146).
+
+## 2026-09-28 S10-FE 제품 결함 수정 및 Claude UI / Codex 계약 재검토 전수 반영 (agent/gemini/s10-fe-fixes, PR #146)
+
+- **Claude UI 검토 의견 전수 조치 완결**:
+  - **[차단 1] Model Commitment 시험 입력 및 Fixture 정규화**: `tests/model-lineage.test.ts`에서 컴포넌트 렌더 후 입력값 주입 후 fetch 트리거, Crockford Base32 정본 ULID(`prj_`/`mdl_`/`run_` + 26자), 64자 소문자 hex `manifestHash`, UUID `commitRecoveryEpoch` 정합.
+  - **[차단 2] 배포 알림 문구 고정 및 도달 불가 분기 제거**: `res.isSimulated ? ... : '배포 완료'` 삼항 연산자를 제거하고 `✔ [모의 시뮬레이션] [...] 로컬 배포 게이트 시뮬레이션 완료` 고정 문구로 일원화. `write-actions-integrity-wiring.test.tsx`에서 '검증 완료' 부재를 단언.
+  - **[중 3] Commitment 조회 패널 기본값 공백화**: `commitmentProject`, `commitmentModelId`, `commitmentVersion`의 초기값을 `''`로 설정하여 명시적 오퍼레이터 입력 강제.
+  - **[경 4] 오류 배너 합성 값 제거 및 정직한 표기**: problem이 없는 오류(가드의 계약 불일치 throw, 네트워크 오류)에 합성 `FETCH_ERROR` 및 status `500`을 채우지 않고 `클라이언트 응답 계약 검증 실패`로 명확히 구분. `tests/model-lineage.test.ts` 3대 계약 불일치 시험에 `(500)` 및 `FETCH_ERROR` 부재 단언 추가. 2인 승인 모의 게이트 표기, `CURRENT AVAILABILITY` 및 `EXECUTION REVALIDATION` 필드 표출.
+- **Codex 계약 축 재확인 의견 전수 조치 완결**:
+  - **`isModelCommitObservation` 엄격 런타임 가드 구현**: `core.schema.json` 정본에 따라 Crockford ULID 패턴, manifestHash 64자 hex, epoch UUID, ISO datetime, required 필드 전수 및 const 불변식(`committed === true`, `currentAvailability === 'unknown'`, `requiresExecutionRevalidation === true`)을 런타임에 전수 검증.
+  - **`additionalProperties: false` 엄격 대조 실장**: `MODEL_COMMIT_OBSERVATION_KEYS`(정확히 15개 허용 key 집합)를 정의하고, 응답 객체의 모든 key가 허용 집합에 속하며 길이가 일치하는지 전수 대조하여 임의 필드 유입 차단.
+  - **RFC 3339 달력 정합성 검증 (`isValidIsoDateTime`)**: 윤년 판정, 월별 일수(28/29/30/31일), 시·분·초(0~23, 0~59, 0~60), 타임존 오프셋 범위 및 `Date.parse()` 왕복 검증을 통해 `2026-02-30T25:61:00Z` 등 달력상 불가능한 값의 유입 원천 차단.
+  - **정본 `ProblemDetails` Mock 및 UI 단언**: 404 시험에 RFC 9457 / core.schema.json 정본 mock(`type: 'about:blank'`, `status: 404`, `code: 'MODEL-0004'`, `category: 'RES'`, `traceId`)을 적용하여 `apiClient`의 `isProblemDetails` 통과 및 UI의 `code`/`status` 보존 렌더링 단언.
+  - **3대 부정 회귀 시험 실장 (`model-lineage.test.ts`)**:
+    1. 비정본 manifestHash (`bad_hash_not_64_hex`) 거부
+    2. 추가 필드 (`unexpectedProperty`) 거부 (additionalProperties: false 검증)
+    3. 불가능한 달력 일시 (`2026-02-30T25:61:00Z`) 거부
+    위반 시 상세 결과 컨테이너 미렌더링 및 계약 불일치 에러 배너 표출 실측.
+- **실측 검증 증거 (HEAD: `904d0f08`)**:
+  - Hosted CI 전수 PASS (All Green):
+    - `Frontend Build & Test` (Run `36363112955`, Job `108744093154`): **PASS (47s)** - Vitest 78 suites / 682 passed (+2 tests), `tsc -b` 타입 오류 0건, 번들 생성 성공.
+    - `Documentation Build` (Run `36363112963`, Job `108744093222`): **PASS (19s)**
+    - `Desktop HTTP Browser Acceptance` (Run `36362842043` / `36363112956`): **PASS (1m58s)**
+    - `Backend Build` (Run `36362150709`): **PASS (Python 3.12 9m20s / Python 3.14 8m10s)**
+  - 로컬 게이트: `check_frontend_integrity.py` PASS (0 violations), `test_route_coverage.py` PASS (39 passed), `check_contract_bindings.py` PASS, `check_docs.py` PASS, `sync_obsidian.py --check` PASS (0 conflicts).
+- 확인 기준: 2026-09-28T11:52:00+09:00 (최신 tip `1e8baf04`, 작업 브랜치 `agent/gemini/s05-s06-fe-fixes`).
+
+## 2026-09-28 S05·S06-FE 제품 결함 후속 감사 및 수정 (`agent/gemini/s05-s06-fe-fixes`)
+- 확인 기준: 2026-09-28T13:30:00+09:00 (최신 작업 브랜치 `agent/gemini/s11-fe-fixes`).
+
+## 2026-09-28 S11-FE 제품 결함 DEF-S11-01~19 전수 치유 완료 (`agent/gemini/s11-fe-fixes`)
+
+- **19대 제품 결함 전수 치유 완결**:
+  - **DEF-S11-01 (키보드 포커스 링 복원)**: `Button.tsx`, `MonacoWorkspaceEditor.tsx`, `WebTerminal.tsx`에서 `outline: 'none'` 하드코딩 제거 및 `index.css` 전역 `:focus-visible` 고대비 링 정의.
+  - **DEF-S11-02 (WorkspaceList 키보드 접근성)**: 카드에 `role="button"`, `tabIndex={0}`, `aria-label`, Enter/Space `onKeyDown` 및 자식 Studio 버튼 이벤트 버블링 차단 가드 적용.
+  - **DEF-S11-03~06 (모달 A11y 표준화)**: `useModalA11y` 훅 신설로 Tab/Shift+Tab 포커스 트랩(컨테이너 래핑 포함), 종료 시 트리거 복귀, Esc 닫기(`e.stopPropagation()`) 구현. `WorkspaceCreateModal`, `GitCommitModal`, `ConflictResolutionModal`, `AdminSecurityConsole` (kill-switch), `ApprovalDetail` (reject), `RunDetail` (cancel, receipt), `DeveloperStudio` (cancel, receipt) 전면 배선 및 `role="dialog"`, `aria-modal="true"`, `aria-labelledby` 부여. `Header.tsx` 활성 탭 `aria-current="page"` 부여.
+  - **DEF-S11-07 (동적 알림 Live Region)**: `ReleaseCandidateView`, `NaturalLanguageRunView`, `DistributedRecoveryView`에 `role="alert"` / `role="status"` 및 `aria-live` 부여.
+  - **DEF-S11-08, DEF-S11-11~16 (RCV 허위 상태 격리)**: 백엔드 API 미노출 상태에서 5-Node 계측 허위 문구 정정(`[정적 예시] 원격 텔레메트리 미연동`), 'ACTIVE LIVE'/'STANDBY' 배지를 '모의 활성'/'모의 대기'로 격리, `releaseEngine.ts` 초기값 `rollbackVerified: false` 설정 및 롤백 플래그 연동 배지 격리, WCAG 자동화 감사 과장 문구 정정, 명도대비 수동 계산값 표기 정정, 무중단 롤백 보증 문구 정정, WCAG 배지 동적 바인딩(`audit.status`).
+  - **DEF-S11-09 & DEF-S11-10 (WCAG 명도 대비율 적합화)**: 버튼 배경 토큰(`--color-brand-primary-bg: #1d4ed8`, 6.70:1 $\ge$ 4.5:1 / `--color-status-offline-bg: #dc2626`, 4.83:1 $\ge$ 4.5:1)과 전경·링 토큰(`--color-brand-primary: #60a5fa`, dark surface 6.98:1 / `--color-status-offline: #f87171`, dark surface 6.41:1)을 완전 분리하여 텍스트 4.5:1, 링 3.0:1 이상 전수 충족. 폼 경계선 Dark `#9ca3af`(5.78:1 $\ge$ 3.0:1), Light `#64748b`(4.34:1 $\ge$ 3.0:1) 보정.
+  - **DEF-S11-17~19 (반응형 뷰포트 및 롤백 식별)**: auto-fit 유동 그리드, 테이블 `overflow-x: auto` 래퍼, Desktop/Tablet/Mobile 뷰포트 버튼 클릭 시 컨테이너 `maxWidth` 동적 전환, 롤백 버튼 버전 식별 aria-label 부여.
+- **검증 실측**:
+  - `apps/web/tests/s11-defect-fixes.test.tsx`: 전수 통과.
+  - `pytest tests/test_route_coverage.py`: **39 passed**.
+  - `tools/check_frontend_integrity.py`: **0 violations, exit 0**.
+  - `tools/check_contract_bindings.py`: **exit 0**.
+  - `tools/check_docs.py` & `tools/check_ontology.py`: **exit 0**.
+- **보고서**: [[2026-09-28_13-05-00_KST_S11_FE_Gemini_제품결함_수정]]
+
+- **작업 개요**: S05 매트릭스(v1.2.2), S06 매트릭스(v1.1.2) 및 PR #151 S05 공식 결정(legacy 배치 경로 정본)에 입각하여 현재 `apps/web` 제품 코드를 전수 감사하고, Claude UI 축 독립 검토(issuecomment-5862081355) 지적 F-1~F-9 및 r2 조건부 승인 C-1~C-4를 전수 치유.
+- **결함 수정 내역 (F-1 ~ F-9 및 r2 C-1 ~ C-4)**:
+  1. **F-1 (WorkspaceList 키보드 격리)**: 카드 `onKeyDown`에 `if (e.target !== e.currentTarget) return;` 가드를 추가하고, `⚡ Studio에서 열기` 버튼에 독립 `onKeyDown`을 부여하여 Enter/Space 시 작업공간 선택 방지 및 Studio 열기 정상 동작.
+  2. **F-2 (WorkspaceCreateModal 포커스 안정화)**: `onClose`를 ref로 추적하고 opener 저장/복원을 `[isOpen]` effect로 한정하여 5초 폴링 시 포커스 튐 차단, 초기 포커스 부여, Escape를 dialog `onKeyDown`으로 한정.
+  3. **F-3 & C-1 (DesktopWindow Escape 격리 및 시작 메뉴 오버레이 연동)**: 전역 `globalThis` Escape 리스너를 제거하고 윈도우 루트 `onKeyDown`으로 한정, 입력창/터미널 Escape 무시, `isOverlayOpen` prop을 통해 시작 메뉴 등 셸 오버레이 활성 시 창 Escape 닫기를 억제하고 시작 메뉴가 우선 닫히도록 연동(C-1), 닫기 버튼 타이틀을 `창 닫기`로 정정.
+  4. **F-4 & C-3 (PlacementSimulator 시험 전용 props 롤백 및 동기화 effect 제거)**: `nodes?`, `activePool?`, `allPools?`, `projectId?` 및 폴백 제거, `nodes: NodeItem[]` 필수 props로 복구하고, props→state 동기화 `useEffect` 3개를 전면 제거(C-3).
+  5. **F-5 (ResourceExplorer 정밀 렌더링)**: `c: any` 제거 및 정본 타입 복원, 0 코어 자원을 '미측정'이 아닌 `0C 가용` 및 `0 GPU`로 정직 표출.
+  6. **F-6 (pool-capacity-pending 배너 격리)**: `poolCapacityState === 'idle'`로 제한하여 loading/error 시 거짓 배너 표출 차단.
+  7. **F-7 (TerminalSessionView 인증 방식 설명)**: 배지를 '30초 암호학적 1회용 PTY 티켓 인증 연동 (mTLS 격리)'로 명시하여 발급과 인증 방식 구분.
+  8. **F-8 & C-2 (시험 스위트 정합화)**: `contracts/pool-list-response` 정본 import, `nodes={[]}`, `onCreateWorkspace` prop 정합, `appId: 'terminal'` 교정, `WorkspaceItem` mock 정합(`status: 'ready'`, `updatedAt` 제거), 공허 단언(`undefined/NaN Cores`) 삭제(C-2), 시작 메뉴 우선 닫힘 단언 포함 8개 단언 완결.
+  9. **F-9 & C-4 (문서 및 증거 실측 최신화)**: hosted run `36370517229`(frontend 79/682, tsc+build pass) 기록 및 표현 정합화.
+- **검증 실측**:
+  - `apps/web/tests/s05-s06-defect-fixes.test.tsx`: 8/8 tests passed (`[S06-DEF-G-C1]` 시작 메뉴 우선 닫힘 실단언 포함).
+  - `npx vitest run`: **79 passed (79), 683 passed (683), 0 failed** (exit code 0).
+  - `npx tsc -b`: **0 errors** (exit code 0).
+  - `npm run build`: **built in 3.74s** (exit code 0).
+  - `pytest tests/test_route_coverage.py`: **39 passed in 1.33s** (exit code 0).
+  - hosted run 실측: `36370517229` (frontend pass, 682 tests, tsc+build pass), `36370517141` (desktop-browser pass), `36370517406` (docs pass), `36370517149` (backend 3.14 pass).
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-28_10-41-29_KST_S05_S06_FE_Gemini_제품결함_감사_및_수정.md` (v1.0.2)
+- **독립 검토 재확인 요청**: Claude (UI 경로 축), Codex (계약 축).
+
+## 2026-09-28 S11-FE 제품 결함 DEF-S11-01~19 전수 치유 완료 (`agent/gemini/s11-fe-fixes`)
+
+- **19대 제품 결함 전수 치유 완결**:
+  - **DEF-S11-01 (키보드 포커스 링 복원)**: `Button.tsx`, `MonacoWorkspaceEditor.tsx`, `WebTerminal.tsx`에서 `outline: 'none'` 하드코딩 제거 및 `index.css` 전역 `:focus-visible` 고대비 링 정의.
+  - **DEF-S11-02 (WorkspaceList 키보드 접근성)**: 카드에 `role="button"`, `tabIndex={0}`, `aria-label`, Enter/Space `onKeyDown` 및 자식 Studio 버튼 이벤트 버블링 차단 가드 적용.
+  - **DEF-S11-03~06 (모달 A11y 표준화)**: `useModalA11y` 훅 신설로 Tab/Shift+Tab 포커스 트랩(컨테이너 래핑 포함), 종료 시 트리거 복귀, Esc 닫기(`e.stopPropagation()`) 구현. `WorkspaceCreateModal`, `GitCommitModal`, `ConflictResolutionModal`, `AdminSecurityConsole` (kill-switch), `ApprovalDetail` (reject), `RunDetail` (cancel, receipt), `DeveloperStudio` (cancel, receipt) 전면 배선 및 `role="dialog"`, `aria-modal="true"`, `aria-labelledby` 부여. `Header.tsx` 활성 탭 `aria-current="page"` 부여.
+  - **DEF-S11-07 (동적 알림 Live Region)**: `ReleaseCandidateView`, `NaturalLanguageRunView`, `DistributedRecoveryView`에 `role="alert"` / `role="status"` 및 `aria-live` 부여.
+  - **DEF-S11-08, DEF-S11-11~16 (RCV 허위 상태 격리)**: 백엔드 API 미노출 상태에서 5-Node 계측 허위 문구 정정(`[정적 예시] 원격 텔레메트리 미연동`), 'ACTIVE LIVE'/'STANDBY' 배지를 '모의 활성'/'모의 대기'로 격리, `releaseEngine.ts` 초기값 `rollbackVerified: false` 설정 및 롤백 플래그 연동 배지 격리, WCAG 자동화 감사 과장 문구 정정, 명도대비 수동 계산값 표기 정정, 무중단 롤백 보증 문구 정정, WCAG 배지 동적 바인딩(`audit.status`).
+  - **DEF-S11-09 & DEF-S11-10 (WCAG 명도 대비율 적합화)**: 버튼 배경 토큰(`--color-brand-primary-bg: #1d4ed8`, 6.70:1 $\ge$ 4.5:1 / `--color-status-offline-bg: #dc2626`, 4.83:1 $\ge$ 4.5:1)과 전경·링 토큰(`--color-brand-primary: #60a5fa`, dark surface 6.98:1 / `--color-status-offline: #f87171`, dark surface 6.41:1)을 완전 분리하여 텍스트 4.5:1, 링 3.0:1 이상 전수 충족. 폼 경계선 Dark `#9ca3af`(5.78:1 $\ge$ 3.0:1), Light `#64748b`(4.34:1 $\ge$ 3.0:1) 보정.
+  - **DEF-S11-17~19 (반응형 뷰포트 및 롤백 식별)**: auto-fit 유동 그리드, 테이블 `overflow-x: auto` 래퍼, Desktop/Tablet/Mobile 뷰포트 버튼 클릭 시 컨테이너 `maxWidth` 동적 전환, 롤백 버튼 버전 식별 aria-label 부여.
+- **검증 실측**:
+  - `apps/web/tests/s11-defect-fixes.test.tsx`: 전수 통과.
+  - `pytest tests/test_route_coverage.py`: **39 passed**.
+  - `tools/check_frontend_integrity.py`: **0 violations, exit 0**.
+  - `tools/check_contract_bindings.py`: **exit 0**.
+  - `tools/check_docs.py` & `tools/check_ontology.py`: **exit 0**.
+- **보고서**: [[2026-09-28_13-05-00_KST_S11_FE_Gemini_제품결함_수정]]
+
+- **작업 개요**: S05 매트릭스(v1.2.2), S06 매트릭스(v1.1.2) 및 PR #151 S05 공식 결정(legacy 배치 경로 정본)에 입각하여 현재 `apps/web` 제품 코드를 전수 감사하고, Claude UI 축 독립 검토(issuecomment-5862081355) 지적 F-1~F-9 및 r2 조건부 승인 C-1~C-4를 전수 치유.
+- **결함 수정 내역 (F-1 ~ F-9 및 r2 C-1 ~ C-4)**:
+  1. **F-1 (WorkspaceList 키보드 격리)**: 카드 `onKeyDown`에 `if (e.target !== e.currentTarget) return;` 가드를 추가하고, `⚡ Studio에서 열기` 버튼에 독립 `onKeyDown`을 부여하여 Enter/Space 시 작업공간 선택 방지 및 Studio 열기 정상 동작.
+  2. **F-2 (WorkspaceCreateModal 포커스 안정화)**: `onClose`를 ref로 추적하고 opener 저장/복원을 `[isOpen]` effect로 한정하여 5초 폴링 시 포커스 튐 차단, 초기 포커스 부여, Escape를 dialog `onKeyDown`으로 한정.
+  3. **F-3 & C-1 (DesktopWindow Escape 격리 및 시작 메뉴 오버레이 연동)**: 전역 `globalThis` Escape 리스너를 제거하고 윈도우 루트 `onKeyDown`으로 한정, 입력창/터미널 Escape 무시, `isOverlayOpen` prop을 통해 시작 메뉴 등 셸 오버레이 활성 시 창 Escape 닫기를 억제하고 시작 메뉴가 우선 닫히도록 연동(C-1), 닫기 버튼 타이틀을 `창 닫기`로 정정.
+  4. **F-4 & C-3 (PlacementSimulator 시험 전용 props 롤백 및 동기화 effect 제거)**: `nodes?`, `activePool?`, `allPools?`, `projectId?` 및 폴백 제거, `nodes: NodeItem[]` 필수 props로 복구하고, props→state 동기화 `useEffect` 3개를 전면 제거(C-3).
+  5. **F-5 (ResourceExplorer 정밀 렌더링)**: `c: any` 제거 및 정본 타입 복원, 0 코어 자원을 '미측정'이 아닌 `0C 가용` 및 `0 GPU`로 정직 표출.
+  6. **F-6 (pool-capacity-pending 배너 격리)**: `poolCapacityState === 'idle'`로 제한하여 loading/error 시 거짓 배너 표출 차단.
+  7. **F-7 (TerminalSessionView 인증 방식 설명)**: 배지를 '30초 암호학적 1회용 PTY 티켓 인증 연동 (mTLS 격리)'로 명시하여 발급과 인증 방식 구분.
+  8. **F-8 & C-2 (시험 스위트 정합화)**: `contracts/pool-list-response` 정본 import, `nodes={[]}`, `onCreateWorkspace` prop 정합, `appId: 'terminal'` 교정, `WorkspaceItem` mock 정합(`status: 'ready'`, `updatedAt` 제거), 공허 단언(`undefined/NaN Cores`) 삭제(C-2), 시작 메뉴 우선 닫힘 단언 포함 8개 단언 완결.
+  9. **F-9 & C-4 (문서 및 증거 실측 최신화)**: hosted run `36370517229`(frontend 79/682, tsc+build pass) 기록 및 표현 정합화.
+- **검증 실측**:
+  - `apps/web/tests/s05-s06-defect-fixes.test.tsx`: 8/8 tests passed (`[S06-DEF-G-C1]` 시작 메뉴 우선 닫힘 실단언 포함).
+  - `npx vitest run`: **79 passed (79), 683 passed (683), 0 failed** (exit code 0).
+  - `npx tsc -b`: **0 errors** (exit code 0).
+  - `npm run build`: **built in 3.74s** (exit code 0).
+  - `pytest tests/test_route_coverage.py`: **39 passed in 1.33s** (exit code 0).
+  - hosted run 실측: `36370517229` (frontend pass, 682 tests, tsc+build pass), `36370517141` (desktop-browser pass), `36370517406` (docs pass), `36370517149` (backend 3.14 pass).
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-28_10-41-29_KST_S05_S06_FE_Gemini_제품결함_감사_및_수정.md` (v1.0.2)
+- **독립 검토 재확인 요청**: Claude (UI 경로 축), Codex (계약 축).
+- 확인 기준: 2026-09-28T10:51:00+09:00 (최신 tip `1e8baf04`, 작업 브랜치 `agent/gemini/s11-fe-matrix`).
+
+## 2026-09-28 S11-FE 접근성·시각 회귀·배포 후보 시나리오 매트릭스 v1.0.2 개정 (docs-only, `agent/gemini/s11-fe-matrix`)
+
+- **작업 개요 및 목적**:
+  - Claude UI 축 r2 조건부 승인 조건 7건(C1~C7) 및 관측 사항 전수 정정 및 S11-FE 시나리오 매트릭스 정본 v1.0.2 확정.
+- **주요 정정 사항 (`[[2026-09-28_S11-FE_접근성_시각회귀_배포후보_시나리오_매트릭스_Gemini]]`)**:
+  1. **C1 (RCV:91 라벨 원문 정정)**: `접근성 점검 (WCAG 2.1 AA)`를 실제 소스 원문인 `WCAG 2.1 AA 접근성 적합도`(:91)로 정정.
+  2. **C2 (CI 스텝 이름 정정)**: `.github/workflows/desktop-browser.yml:57` 스텝 명칭을 `- name: Require every canonical browser journey to execute`로 정정.
+  3. **C3 (소스코드 경로 3종 정정)**: `apps/web/src/features/runs/RunDetail.tsx` (기존 agent 오기 정정), `apps/web/src/features/studio/DeveloperStudio.tsx` (기존 developer 오기 정정), `apps/web/src/app/App.tsx` (기존 src/App.tsx 오기 정정) 전수 교체 (`git cat-file -e HEAD:<path>` 검증 완료).
+  4. **C4 (DEF-S11-09 Danger 버튼 토큰명 정정)**: `var(--color-status-offline)` (`Button.tsx:49`, `index.css:67`)으로 정정하고, 다크 테마 권고안에 `#0f172a` 다크 텍스트 전환(대비율 7.02:1 / 6.45:1) 명시.
+  5. **C5 (ACC-09 인라인 텍스트 색 쌍 정정)**: `#c9d1d9` on `#0d1117` = 12.26:1이 `releaseEngine.ts:99` 주석 쌍임을 명시하고, 실제 RCV는 `#c9d1d9` on `#161b22` = 11.21:1 (:149, :287) 및 `#0d1117` (:210) 분리임을 기술. "수동 계산 실측" 표현을 "수동 계산 (렌더 실측 아님)"으로 정정.
+  6. **C6 (ruleId 행 번호 정정)**: `wcag21-1.4.3-contrast-minimum` 줄 번호를 `releaseEngine.ts:95`로 정정 (:96은 `wcagLevel: 'AA'`).
+  7. **C7 (IDV 이관 대기 명시)**: `IntranetDeploymentView.tsx`의 허위 상태(:114, :194, :576 등)를 S12-FE 매트릭스(PR #156) 이관 대기 및 전담 관리 대상으로 상호 참조 갱신.
+  8. **관측 사항 반영**: Monaco 에디터 textarea(`MonacoWorkspaceEditor.tsx:706`) `outline: 'none'` 결함을 ACC-01 및 DEF-S11-01에 추가, DEF-S11-12 결함 본질(전체 UI 일반화 과장 표기) 명시, hosted desktop-browser 실행 ID `36366313817` 반영, 닫힘 확인 7대 문자열 grep 0건 달성.
+- **다음 행동 및 인계**:
+  - Claude UI 축 및 Codex 계약 축 최종 병합 승인 요청.
+- 확인 기준: 2026-09-28T11:18:00+09:00 (작업 브랜치 `agent/gemini/s12-fe-matrix`).
+
+## 2026-09-28 S12-FE 내부망 HTTPS 웹 배포·운영자 교육 시나리오 매트릭스 v1.0.4 개정 (`agent/gemini/s12-fe-matrix`)
+
+- **작업 개요**: Claude UI r2 조건부 승인(C1~C8) 및 Codex 계약 축 지적(1~3)을 전수 반영하여 정본 시나리오 매트릭스를 v1.0.3으로 확정.
+- **주요 규격 및 식별자 정정 (Zero Fake Invariants)**:
+  1. **SMK-05 Transport Fixture 응답 JSON 정합 (C1, Codex 1)**: `tests/fixtures/nginx_transport.py:26, :30` 및 `tests/integration/test_web_container.py:160, :162` 원문 그대로 `{"code": "FIXTURE-404", "scope": "transport-fixture"}` 및 `{"status": "not_ready", "scope": "transport-fixture"}`로 정정.
+  2. **RCV-03 SSE Location 정규식 정합 (C2)**: 존재하지 않는 `/v1/run-events` 인용을 제거하고 실제 `nginx.conf:101`의 `~ ^/v1/projects/[^/]+/runs/[^/]+/events`, `:112` `/v1/events`, `:122` `/v1/runs/events`로 정정.
+  3. **권고 사항 C3~C8 및 Codex 2~3 정정**:
+     - C3: `nginx.conf:53` -> `:56` (`/callback` no-store) 정정.
+     - C4 / Codex 최종 확인: 과거 원격 실행 기록의 IP를 현재 5-node inventory로 오인하지 않도록 문서에서 완전히 제거하고, 정본 ADR-100 토폴로지 참조로 한정하며 EXT-02 실제 물리 IP/하드웨어는 "미정 / BLOCKED_EXTERNAL"로 엄격 격리.
+     - C5/Codex 3: 백엔드 `inv/app.py`에 다수의 라우트 데코레이터가 있으나 release manifest/acceptance 노출 REST 라우트는 0건임을 정밀 표기.
+     - C6/Codex 2: MAN-02 `authToken`/`roles` 미단언 및 UNMEASURED 분리, MAN-03 서명 후 disabled 미단언, RCV-01 502/504 둘 다 허용 명시.
+     - C7: §5 거버넌스 표의 SMK-03 HTTPS 로그인 UNMEASURED, SMK-04 배포 탭 UNMEASURED 한정어 보강.
+- **주요 규격 및 정직한 경계 정정 (Zero Fake / Honest Boundary)**:
+  1. **TLS 1.2 이상 협상 규격 통일 (Claude 1, Codex F-R1)**: `nginx.conf:42` 및 테스트에 일치하도록 SMK-01을 "TLS 1.2 이상 협상 (1.3 전용 아님)"으로 정정하고, 화면의 TLS 1.3 STRICT 표출을 결함(DEF-S12-09)으로 수록.
+  2. **관측 경로 분리 (Claude 2)**: HTTPS Nginx 컨테이너(transport fixture 업스트림)와 HTTP Vite 개발서버(실 CP + PG)를 명확히 분리하고, HTTPS 경유 IdP 로그인은 미관측(`UNMEASURED`)으로 지정. SMK-05 게이트웨이 검증에서 401 분리.
+  3. **배포 화면 진입 미관측 명시 (Claude 3)**: hosted 브라우저 4개 시험에서 '내부망 배포' 탭 진입 0건 확인, SMK-04를 '부분 측정 (Studio·Desktop 한정)'으로 하향하고 배포탭 진입은 미관측(`UNMEASURED`)으로 명시.
+  4. **RCV-02 세션 만료 경로 정정 (Claude 4)**: 전체 앱은 401 시 `resetAuthenticatedState`에 의해 `Login.tsx`의 `login-error-alert`로 전환되므로, `IntranetDeploymentView`의 `deployment-auth-required-notice`는 컴포넌트 단독 렌더(`wiring.test.tsx:71`)에서만 보임을 명시. 체류 중 만료는 `UNMEASURED`.
+  5. **18대 결함 백로그 확충 (Claude 5, 5-a ~ 5-j 반영)**:
+     - DEF-S12-09 (5-a): TLS 1.3 STRICT 왜곡 표출.
+     - DEF-S12-10 (5-b): TLS 인증서 정보 패널 픽스처의 실제 조회 가장.
+     - DEF-S12-11 (5-c): 화면의 배포용 nginx.conf 전문이 실제 `apps/web/nginx.conf`와 심각하게 괴리 (port 8443 vs 443, TLS 1.3 vs 1.2/1.3, pacs-backend vs control-plane, /etc/nginx/ssl vs /etc/ssl/certs).
+     - DEF-S12-12 (5-d): `:114` 100% (5/5 PASSED) 및 `:576` 5/5 Nodes PASSED (100%) 하드코딩 리터럴 결함.
+     - DEF-S12-13 (5-e): `:194` 라이브 프로브(HTTP 200) 검증 완료 과장 표기.
+     - DEF-S12-14 (5-f): `:388, :478` Date.now() 기반 동적 계산으로 항상 '방금 전 검증'으로 위장.
+     - DEF-S12-15 (5-g): GA/프로덕션 확정 라벨 하드코딩 표출.
+     - DEF-S12-16 (5-h): 클라이언트 서명 1회로 physicalHardwareAcceptance: 'accepted' 전이 및 시험 고정.
+     - DEF-S12-17 (5-i): 재실습 완료 버튼 클릭만으로 자기보고 승인되는 무검증 교육 이수.
+     - DEF-S12-18 (5-j): 운영자 ID 임의 편집 가능 및 정규식 취약성(`/^(usr_operator_|usr_admin_|admin|operator)/`)으로 인한 심각한 클라이언트 권한 우회 결함.
+  6. **결함 분석 및 수정 계획 오류 정정 (Claude 6)**: DEF-S12-03(:474 PASSED)과 DEF-S12-08(:668 COMPLETED)이 상태값 미바인딩 리터럴임을 명시하고, offline 노드 PASSED 숨김 및 기존 시험(`intranet-deployment.test.ts:56-73, :128-143`) 수정 계획 수립.
+  7. **RCV-03 시험 파일 부재 정정 (Claude 7)**: `recovery.test.ts` 부재, `distributed-recovery.test.ts` 및 `sse-stream.test.ts` 인용, 백오프 코드 실재하나 단언 시험 부재 및 UI 미연결 명시.
+  8. **시험 단언 정밀 분리 및 it 9개 정정 (Claude 8)**: `intranet-deployment.test.ts` 시험 수 9개(it 9개) 반영, hosted run `35795657531` 명시, 단언 있음과 코드 존재·단언 없음 분리.
+  9. **서버 도메인 모델 실재 명시 (Claude 9)**: `operations_pilot.py:221` `ReleaseManifest`, `:251` `AcceptanceRecord`, `pilot.py:358/396` 실재하나 REST 라우트 부재임을 명시하여 DEF-S12-06/07의 연결 대상으로 인용.
+  10. **문서 위생 및 EXT-02 전제값 정정 (Claude 10, 11)**: index.html no-cache/must-revalidate 정정, 33행 남는 전제·차단 표기, EXT-02 전제값 '미정' 격리.
+- **산출 문서**: `docs/vault/30_Development/2026-09-28_S12-FE_내부망HTTPS_웹배포_운영인수_시나리오_매트릭스_Gemini.md`
+- **독립 검토 요청**: Claude (UI 경로 축), Codex (계약 축).
+
+- 확인 기준: 2026-09-28T12:43:00+09:00 (작업 브랜치 `agent/gemini/s12-fe-fixes`).
+
+## 2026-09-28 S12-FE 제품 결함 DEF-S12-01~18 치유 및 검토 피드백 반영 완결 (apps/web 및 시험 100% 통과, `agent/gemini/s12-fe-fixes`)
+
+- **작업 개요**: 승인된 PR #156 (S12-FE 시나리오 매트릭스 v1.0.4, `6057936e`)의 18대 제품 결함(DEF-S12-01 ~ DEF-S12-18) 및 PR #171에 대한 Claude UI 축과 Codex 계약 축(차단 3건 F-R1~F-R3)의 검토 피드백을 전수 반영.
+- **주요 수정 내역**:
+  - **Codex F-R1 & DEF-S12-18 (운영자 서명 권한 가드 & 계약 불변성)**: 백엔드 서명 route 부재에 따라 `ReleaseManifest.operatorSignOff = false` (pending/unmeasured) 불변성을 유지하고, 클라이언트 로컬 시뮬레이션 상태(`localSimulationCompleted: true`)로 격리. `deploymentEngine.ts`에서 ID 정규식 bypass fallback을 완전 제거하고 `roles`(`operator`/`admin`/`cluster:admin`) 명시 전달 시에만 시뮬레이션 허용. `IntranetDeploymentView.tsx`에서 입력란 `readOnly`, 비인증 차단, fallback `'usr_operator_lead'` 제거 -> `${signedOperatorId || currentUser?.id || '미확인'}` 표기, `SIGNED-OFF ✔` 및 `프로덕션 가동 승인 완료` 허위 라벨 완전 제거.
+  - **Codex F-R2 & DEF-S12-11 (Nginx 설정 정합 및 발췌 라벨 격하)**: `generateNginxConfig()` 및 `nginxRules`를 실제 `apps/web/nginx.conf` (`listen 443`, `http://control-plane:8080`, `ssl_protocols TLSv1.2 TLSv1.3`, `ssl_ciphers HIGH:!aNULL:!MD5;`, `include /etc/nginx/security-headers.conf;`)와 맞추고, summary 라벨을 `▶ 배포용 nginx.conf 구성 파일 발췌 보기 [발췌 예시 — 전문은 apps/web/nginx.conf]`로 정정 (`apps/web/src` 내 허위 정합 주장 0건).
+  - **Codex F-R3 & DEF-S12-04·13 (사전 검증 및 게이트웨이 프로브 미측정 정합)**: `deploymentEngine.ts` `getPreflightStatus()`를 `isPreflightPassed: false`, `smokePassedRatio: 0` 등 미측정으로 정정하고, 화면에서 `PREFLIGHT PASS ✔` 배지를 완전 제거하여 `미측정 (설계 규격 예시)` 표기 (`apps/web/src` 내 `PREFLIGHT PASS ✔` 0건). 게이트웨이 프로브에 `[사전 설계 규격 항목] ... (게이트웨이 실시간 프로브 미연결)` 안내 추가.
+  - **Claude 결함 1 (DEF-S12-03 노드 테이블 상태 무결성)**: 미연결 노드(`!node.liveStatus`)는 `미측정` 및 지연시간 숨김(`미측정`), `aria-label="Smoke status: unmeasured"`. 매칭 오프라인 노드는 `FAILED ✘` (`aria-label="Smoke status: failed"`), 매칭 온라인 노드는 `PASSED ✔` (`aria-label="Smoke status: passed"`). 결함을 고정하던 `intranet-deployment.test.ts` 수정 및 `s12-defect-fixes.test.tsx` 3대 분기 시험 완료.
+  - **Claude 결함 3 (DEF-S12-01·02 번호 정합 및 전용 시험)**: 스킵 링크와 H1 제목을 "DEF 외 접근성 추가"로 정상 재분류(H1에 `tabIndex={-1}` 추가). 실제 DEF-S12-01(`'프로덕션 가동 승인 완료'` 차단 및 모의 서명 완료)과 DEF-S12-02(`'운영자 인수 완료 (docker compose up -d 가능)'` 차단 및 서명 후 `'모의 인수 절차 확인됨'`, `docker compose up -d` 0건) 전용 되돌림 감지 시험 착지.
+  - **DEF-S12-09·10 (보안 규격 및 자체서명 CA)**: `TLS 1.2 / TLSv1.3 협상 (개발용 자체서명 CA)` 교정, 인증서 패널에 `[정적 구성 예시 (실시간 인증서 조회 아님)]`, issuer: `SaintVision Internal Dev Self-Signed CA` 명시.
+  - **DEF-S12-12·14·15 (클러스터 적합성 heartbeat 기준·기준시각 표기·Pilot RC 하향)**: 상단 배지 `${onlineNodesCount}/${clusterNodes.length} online (heartbeat 기준, smoke 미측정)`, 테이블 헤더 `기준 시각 (예시) / heartbeat` (미연결 `[정적 예시]`, 라이브 `(heartbeat)`), 릴리스 라벨 `REL-2026-PILOT-RC` / `v1.0.0-pilot-rc`.
+  - **DEF-S12-16·17 (물리 하드웨어 수락 분리·자율 실습 확인)**: `physicalHardwareAcceptance: 'pending'` 유지, 훈련 완료 시 `[자율 실습 확인]` 고지 부여.
+  - **DEF-S12-05 (동적 알림 접근성)**: `role="alert"` / `aria-live="assertive"` (권한 부족 에러) 및 `role="status"` / `aria-live="polite"` (모의 서명 성공) 양방향 시험 착지.
+- **검증 실측 증거**:
+  - `npx vitest run tests/s12-defect-fixes.test.tsx`: **23개 시험 100% 통과 (23 passed, 0 failed, 688ms)**.
+  - `npx vitest run tests/intranet-deployment.test.ts`: **9개 시험 100% 통과 (9 passed, 0 failed, 7ms)**.
+  - `npx vitest run tests/browser-matrix-acceptance.test.tsx`: **10개 시험 100% 통과 (10 passed, 0 failed, 99ms)**.
+  - `pytest tests/test_route_coverage.py`: **39 passed in 2.96s (exit 0)**.
+  - `git grep -n` 정적 감사: `PREFLIGHT PASS`, `|| 'usr_operator_lead'`, `실제 apps/web/nginx.conf 정합`, `mTLS 보안 통신 및 저지연 상태`, `프로덕션 운영 인수 서명`, `docker compose` 모두 `apps/web/src` 내 **0건**.
 ## 2026-09-23 S04-FE Claude 리뷰 F1~F5 전수 조치 및 정직 증거 갱신 (`agent/gemini/s04-fe-matrix-measured`)
 
 - **Claude 검토 의견 F1~F5 전수 반영 완결 (`a40ca438`)**:
@@ -1545,3 +2098,96 @@ source_of_truth: "Git"
 > 4) **3대 돌연변이 실측 사살 (KILLED)**: `fetchRunAttempts` source 가드 주석 처리, RunDetail 에러 배너 `role="alert"` 변조, Ajv 스키마 `additionalProperties` 무단 주입 등 3대 돌연변이 전수 즉시 실패 포착 증명.
 > 결과: 전체 Vitest **51개 파일 464/464 tests 100% 통과** (from 447 to 464, net +17 tests 순증; `run-attempt-contract.test.ts` 9 passed, `run-detail-attempts-dom.test.tsx` 8 passed), Vite 프로덕션 빌드 3.18s 클린 번들링(93 modules), Pytest 7 passed, check_docs/ontology PASS. 상세 [[2026-09-21_run-attempts_프론트엔드_계약결속_및_RunDetail배선_Gemini]].
 
+
+## 2026-09-28 G-07 100 Prompt / 30 Coding Eval 러너 및 변이 도구 구현 계획 v1.1 개정 (`agent/gemini/g07-eval-runner-plan`)
+
+- **작업 ID**: `G-07` (카드 60 1단계: 구현 계획 v1.1 개정, docs-only)
+- **상위 근거**: PR #179 통합 분류표 및 정본 차단 지도([[2026-09-22_21-55-00_KST_review_done_차단지도_Codex]]:42)
+- **정본 설계**: S09-FE 매트릭스 v1.1.1([[2026-09-23_S09-FE_100Prompt_30Coding_Eval러너_자연어요청_시나리오_매트릭스_Gemini]], PR #113)
+- **리뷰 피드백(Claude F1~F8, Codex C1~C2) 전면 반영 내역**:
+  1. **Codex C1 (백엔드 run_suite 인용 정합 & EVL-05 분리)**: 부재 식별자 `execute_suite` 삭제 및 정본 `src/saintvision/services/eval_execution.py:run_suite` 정합. EVL-03/04는 라이브 레인으로서 `NOT_OBSERVED` 유지, 클라이언트 합성 러너는 `EVL-05`로 명시 분리.
+  2. **Codex C2 & Claude F3 (고정 SHA 증거 스키마 v1.1 & provenance 결속)**: `sourceHeadSha`, `gitBlobOids`, `fixturesSha256`, `casesDigest`, 130개 case 레코드 전수 수록, 파일명 `<sha>` 반영(`Evidence/s09-g07-eval-evidence-<sha>.json`), CI `eval:check` 배선 계획.
+  3. **Claude F1 (30 코딩 과제 판정 함수 및 지표 정정)**: 80% 하드코딩 삭제, 관측 가능한 결과 코드와 루프 수 기반 판정 함수 `evaluateCodingTask` 도입, 지표명 `guardConformanceRate` 분리.
+  4. **Claude F2 (6대 정규식 전용 Probe 표 & 오탐 정직 기록)**: 정규식 6종 전용 Probe 표 수립, 오탐 식별자 2건 `KNOWN_FALSE_POSITIVE` 정직 기록, no-op 스캐너 사살 revert-fail 사전 등록.
+  5. **Claude F4 (skip 0 & fail-closed 강제 장치, 결정성)**: 매 case 독립 `AgentLoopManager` 및 결정론적 ID `req_eval_${caseId}` 부여, Fail-closed 표 명시, AST skip guard 시험 배선, 러너 자체 변이체 4종 사살 계획.
+  6. **Claude F5 (변이 도구 카탈로그 & 소스 변이 절차)**: 6대 입력 변이 연산자 카탈로그(`OP-CASE-01` ~ `OP-SYN-01`) 정의, 금지행동 소유 경계 명시.
+  7. **Claude F6 (매트릭스 v1.1.1 대비 5대 이탈 정정 표)**: 상태 어휘(`NOT_OBSERVED`), 증거 경로(`<sha>`), 클릭 수(2차/3차), 거절 화면 갱신(PR 4 신설), 러너 행 ID(`EVL-05`) 5대 항목 완비.
+  8. **Claude F7 (식별자 3건 정정)**: REP-04 role='status' 신설 계획, SSE 경로 전체 경로화(`services/control-plane/src/inv/app.py:1030~1057`), MUT-04 `:590` 기사살 정적 대조 명시, MUT-05 정적 대조 표기.
+  9. **Claude F8 (수치 정정)**: 문서 수 실측치("895 versioned documents") 정정, 시나리오 수 16대 정정.
+  11. **Claude r2 피드백 반영 (N1~N4, v1.1.1)**: N1(§5 정규식 표를 agentEngine.ts:29-35 글자 그대로 인용 및 1:1 probe/변이 연산자 재산출), N2(§9 증거 예시 사전 단정 수치를 <observed> 자리표시자로 교체), N3(frontmatter updated 시각 정합), N4($schema 외부 URL 제거 및 내부 스키마 경로 지정). Codex 계약 축 승인(head 091e830f) 유지.
+- **문서 산출물**:
+  - 구현 계획 정본: [[G-07 100 Prompt 30 Coding Eval 러너 및 변이 도구 구현 계획 v1.0]] (`PLAN-G07-001`, v1.1.1)
+  - 실행 기록: [[2026-09-28_14-35-00_KST_G-07_Eval러너_구현계획_Gemini]] (`HIST-G07-001`, v1.1.1)
+
+
+## 2026-09-28 G-07 100 Prompt / 30 Coding Eval 러너 및 변이 도구 구현 (`agent/gemini/g07-eval-runner-impl`)
+
+- **작업 ID**: `G-07` (카드 60 2단계: 골든 러너 및 변이 도구 구현, apps/web)
+- **상위 근거**: PR #179 통합 분류표 및 정본 차단 지도([[2026-09-22_21-55-00_KST_review_done_차단지도_Codex]]:42)
+- **정본 계획**: [[G-07 100 Prompt 30 Coding Eval 러너 및 변이 도구 구현 계획 v1.0]] (`PLAN-G07-001`, v1.1.1, PR #186 head `b8e71c36`)
+- **구현 산출물**:
+  1. **픽스처**: `apps/web/tests/fixtures/prompts_100.json` (100건, SHA256 봉인), `coding_tasks_30.json` (30건, SHA256 봉인).
+  2. **러너**: `apps/web/src/features/agent/evalRunner.ts` (EVL-05 합성 러너, 결정론적 ID, case별 AgentLoopManager 격리, fail-closed 표, evaluateCodingTask, guardConformanceRate 100.0%, casesDigest, NOT_OBSERVED 라이브 레인 격리).
+  3. **변이 도구**: `apps/web/src/features/agent/mutationTools.ts` (agentEngine.ts:29-35 정규식 6종 대응 6대 입력 변이 연산자 OP-CASE-01 ~ OP-SYN-01, KNOWN_BYPASS 5종 사전 등록).
+  4. **증거 및 스키마**: `docs/contracts/eval-evidence.schema.json` 스키마 v1.1, `docs/vault/30_Development/Evidence/s09-g07-eval-evidence-b8e71c36.json` 130건 원본 입출력 증거.
+  5. **테스트 스위트**: `tests/agent-eval-runner.test.ts` (16 passed), `tests/agent-mutation-guards.test.ts` (11 passed). no-op 스캐너 변이 사살, AST .skip/.todo/.only 정적 가드.
+- **실측 검증**:
+  - Vitest: 80 test files passed (80), 702 passed (702) (G-07 27 passed)
+  - `npx tsc -b`: exit 0
+  - `npm run build`: dist/ built in 6.56s (exit 0)
+  - `pytest tests/test_route_coverage.py`: 39 passed in 2.58s (exit 0)
+  - `python tools/check_docs.py`: PASS (896 versioned documents, exit 0)
+- **문서 산출물**:
+  - 실행 기록: [[2026-09-28_15-55-00_KST_G-07_Eval러너_구현_Gemini]] (`HIST-G07-002`, v1.0.0)
+
+
+## 2026-09-28 G-07 100 Prompt / 30 Coding Eval 러너 및 변이 도구 Claude r2·Codex 검토 조치 완결 (`agent/gemini/g07-eval-runner-impl`)
+
+- **작업 ID**: `G-07` (카드 60 2단계: Claude r2 및 Codex 검토 조치, commit `51d19752`)
+- **상위 근거**: PR #190 Claude UI·시험 축 검토 지적(F1~F11, F1-r~F11-r) 및 Codex 계약 축(C2, C3) 전수 조치
+- **조치 상세**:
+  1. **F1 [Critical] & F1-r [High] 실재 Git Commit 및 Blob OID 결속**: 러너 파일이 실재하는 commit `51d19752f10b8d3d6381387a3ef8d461dd188e40` 및 실제 Git Blob OID 5종(`git rev-parse 51d19752:<path>`) 전수 실측 결속, 증거 파일명 `docs/vault/30_Development/Evidence/s09-g07-eval-evidence-51d19752.json`으로 정합. `evalRunner.ts`의 정적 fallback 해시 상수를 전면 제거하고 커밋 미지정/오류 시 fail-closed throw. 드리프트 시험에서 오류 은폐 없이 `git cat-file -e` 및 `git rev-parse` 직접 대조.
+  2. **F2 [High] & F2-r [Low] 숨은 FAIL 소거 & 요약 메트릭 전수 동적 집계 & Violation Token 음성 변이 사살**: PRM-074 `expectedViolationToken`을 이스케이프된 정규식과 일치하는 `cat \/etc\/shadow`로 수정하여 `FAIL: 0` 달성. `promptsPass: 98`, `promptsFail: 0`, `promptsKnownFalsePositive: 2`를 픽스처 기반 동적 집계로 전환. `MUT-TOKEN-01` 음성 변이 시험을 배선하여 토큰 검증 로직 누락/우회 시 `verdict: FAIL`로 즉각 사살.
+  3. **F3 [High] & F3-r [High] LF 바이트 SHA-256 봉인 & Fallback 정적 픽스처 완전 제거**: LF 체크아웃 CI 호환을 위해 LF 정규화 바이트 SHA-256(`EXPECTED_FIXTURE_BYTE_SHA256`) 봉인(`prompts_100.json`: `f8962fda...`, `coding_tasks_30.json`: `549710ce...`). 러너 내부 fallback import를 완전 제거하고 바이트 검증을 통과한 버퍼에서 직접 `JSON.parse(raw)` 수행. 위조/변조 픽스처 즉시 fail-closed throw.
+  4. **F4 [High] 시험 중 증거 덮어쓰기 분리 & eval:check 드리프트 방어**: `agent-eval-runner.test.ts`의 파일 쓰기 로직 제거, CLI 생성 도구(`tools/generate_eval_evidence.ts`)로 분리, `npm run eval:check` 및 `verifies committed canonical Evidence JSON against drift (eval:check, F1 & F4)` 시험을 통한 무변형 드리프트 감지 실장.
+  5. **F5 [Medium-High] Bounded Repair 무한 루프 차단 & 유한 종료 보증**: `currentLoops` 증가 불가 시 또는 `canRepair: false` 시 루프 즉시 탈출 및 `BOUNDED_LOOP_EXCEEDED` fail-closed 기록. 변이 테스트 `MUT-RUN-04`로 사살 실증.
+  6. **F6 [Medium] & F6-r [Medium] BUDGET_EXCEEDED 엔진 경로 실배선 & 1원 단위 정밀 경계 변이 사살**: `AgentLoopManager`에 `setTenantBudget` 및 `createRunRequest`에 `overrideCostKrw`를 지원하여 1원 단위 비용 평가 가능하도록 개선. `evaluateCodingTask`에서 `fixture.costEstimate`를 직접 전달하여 `agentEngine.ts:71`의 `costKrw > this.tenantBudgetKrw` 실제 엔진 경로를 직결. 650,000 KRW(`READY`/`PASS`), 650,001 KRW(`BUDGET_EXCEEDED`/`PASS`) 실측. 엔진 `>` -> `>=` 변이 및 예산 롤백 변이를 `MUT-02`로 100% 사살. 코딩 과제 `TSK-21` (루프 2), `TSK-22` (루프 3) 진전 케이스 관측.
+  7. **F7 [Medium] 오탐 케이스 정직 분리**: PRM-069 및 PRM-070을 `isSafe: true`, `knownFalsePositive: true`로 설정하고 판정을 `KNOWN_FALSE_POSITIVE`로 분리, PASS 카운트에서 배제.
+  8. **F8 [Medium] 가짜 해시 폴백 제거 & Fail-Closed**: Node `crypto.createHash` 불가 시 조용한 가짜 해시 생성을 차단하고 즉시 fail-closed throw. NIST FIPS 180-4 표준 벡터 2종 검증 탑재.
+  9. **F9 [Low] 출력 누출 NOT_OBSERVED 한정 & 원본 입력 텍스트 결속**: `metrics.outputLeakage: { status: "NOT_OBSERVED", reason: "실제 LLM completion 부재 (클라이언트 가드 시뮬레이션)" }` 및 케이스별 원본 입력 `inputText` 전수 결속.
+  10. **F10 [Low] & F10-r [Low] AST 정적 가드 고도화**: regex `/\b(it|test|describe)(\.\w+)*\.(skip|only|todo|skipIf|runIf)\b/` 및 `/\.skip\(/` 적용, `it.skipIf`, `describe.skipIf`, `test.runIf` 전수 검출 및 대상 파일 미존재 시 throw.
+  11. **F11 [Low] & F11-r [Medium] 식별자 정합 & Codex C2/C3 요구사항 반영**: `docs/contracts/eval-evidence.schema.json`의 모든 중첩 객체에 `"additionalProperties": false` 전면 적용(C2, `MUT-SCHEMA-01` 검증) 및 합산 불변식 단언(`promptsPass + promptsFail + knownFP === 100`, `codingTasksPass + codingTasksFail === 30`, 0 `FAIL` cases) 추가(C3).
+- **실측 검증**:
+  - Vitest: **80 test files passed (80), 715 passed (715)** (G-07 40 passed: eval-runner 17, mutation-guards 23)
+  - `npx tsc -b`: exit 0 (0 errors)
+  - `npm run build`: dist/ built in 12.18s (exit 0)
+  - `pytest tests/test_route_coverage.py`: 39 passed in 4.23s (exit 0)
+  - `python tools/check_frontend_integrity.py`: 85 files 0 violations (PASS)
+  - `python tools/check_contract_bindings.py`: 54 fixtures / 19 types PASS
+  - `python tools/check_docs.py`: PASS (897 versioned documents, exit 0)
+- **문서 산출물**:
+  - 실행 기록: [[2026-09-28_16-30-00_KST_G-07_Eval러너_Claude_r2_수정_Gemini]] (`HIST-G07-003`, v1.1.0)
+
+
+## 2026-09-28 G-07 100 Prompt / 30 Coding Eval 러너 #146·#178 병합 및 #136 엔진 루프 카운트 정합 완결 (`agent/gemini/g07-eval-runner-impl`)
+
+- **작업 ID**: `G-07` (카드 60 2단계: #146·#178 병합 및 #136 엔진 루프 카운트 정합, commit `e2011893`)
+- **상위 근거**: 병합 대기 전체 트리 통합 CI (`coord/train-ci-2001`, run `36413455649`) 시 #190 G-07 시험 3건 실패에 대한 코디네이터 최우선 긴급 조치 지시
+- **조치 상세**:
+  1. **후행 브랜치 순차 병합**: `agent/gemini/g07-eval-runner-impl` 브랜치에서 PR #146 head `2e318022`(`aba89bee`) 및 PR #178 head `7da1fd66`(`92a0ba59`) 순차 병합 (충돌 해소만, force-push 없음).
+  2. **#136 엔진 정합성 및 루프 진전부 탈출 가드 정정**:
+     - 후행 PR #136·#146·#178이 `apps/web/src/features/agent/agentEngine.ts:98`의 `boundedRepairLoops` 초기값을 `1`에서 `0`으로 정정(초기 diff 0/3 표기)함에 따라, `evalRunner.ts:258`의 `let currentLoops = 1;` 하드코딩을 제거하고 `runRes.request.boundedRepairLoops`(0)로부터 읽도록 정정.
+     - 사전 비행 거절(BUDGET_EXCEEDED, LEAK_ATTEMPT_DETECTED) 시 `loopCount: 0`, `loopMatch = 0 === fixture.expectedLoopCount`로 정합.
+     - `coding_tasks_30.json` 픽스처 26건(초기 diff 22건, 사전 비행 거절 4건)의 `expectedLoopCount`를 `0`으로 정합 (TSK-21 2회, TSK-22 3회, TSK-27/28 3회 상한초과 정상 보존).
+  3. **픽스처 바이트 봉인 및 실재 커밋 증거 갱신**:
+     - `coding_tasks_30.json` LF 정규화 바이트 SHA-256 `ed4c3841bfd1b82090bfaf175094ee2a48298363d69c41df4582807eccdcbd96` 봉인 갱신.
+     - 코드 커밋 `e2011893ce6e10d3f950a2c1516b7bd782d8d647` 기반 증거 생성 도구 실행으로 실제 Git Blob OID 5종 결속 증거 파일(`docs/vault/30_Development/Evidence/s09-g07-eval-evidence-e2011893.json`) 생성 (Pass 98, Known FP 2, Fail 0 / Coding Pass 30, Fail 0, Conformance 100.0%).
+- **실측 검증**:
+  - Vitest: G-07 전용 40 passed (eval-runner 17, mutation-guards 23). 웹 전체 **82 test files passed (82), 774 passed (774)** in 29.66s.
+  - `npx tsc -b`: exit 0 (0 errors).
+  - `npm run build`: dist/ built in 5.21s (exit 0).
+  - `pytest tests/test_route_coverage.py`: **39 passed** in 1.97s (exit 0).
+  - `python tools/check_frontend_integrity.py`: 87 files 0 violations (PASS, exit 0).
+  - `python tools/check_contract_bindings.py`: 54 fixtures / 19 types PASS (exit 0).
+- **문서 산출물**:
+  - 실행 기록: [[2026-09-28_20-25-00_KST_G-07_Eval러너_136_병합_및_루프카운트_정합_Gemini]] (`HIST-G07-005`, v1.0.0)

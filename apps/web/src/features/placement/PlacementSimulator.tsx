@@ -49,7 +49,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
   const [requiredRamGb, setRequiredRamGb] = useState<number>(8);
   const [requiresGpu, setRequiresGpu] = useState<boolean>(false);
   const [preferredOs, setPreferredOs] = useState<'windows' | 'linux' | undefined>(undefined);
-  const [localityNodeId, setLocalityNodeId] = useState<string>(() => nodes[0]?.id || '');
+  const [localityNodeId, setLocalityNodeId] = useState<string>(() => nodes?.[0]?.id || '');
   const [fencedNodeIds, setFencedNodeIds] = useState<Set<string>>(new Set());
 
   // Real backend pool list state
@@ -58,7 +58,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
   const [poolsError, setPoolsError] = useState<string | null>(initialPoolsError || null);
 
   const [selectedPoolId, setSelectedPoolId] = useState<string>(
-    () => initialPools?.[0]?.poolId || (initialPools?.[0] as any)?.id || ''
+    () => initialPools?.[0]?.poolId || ''
   );
 
   // Pool capacity state fetched on demand (canonical separation: pool list does NOT bundle volatile capacity)
@@ -313,7 +313,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
                     fontWeight: 600,
                     cursor: 'pointer',
                     border: '1px solid var(--color-border-strong)',
-                    backgroundColor: isSelected ? 'var(--color-brand-primary)' : 'var(--color-bg-subtle)',
+                    backgroundColor: isSelected ? 'var(--color-brand-primary-bg)' : 'var(--color-bg-subtle)',
                     color: isSelected ? '#ffffff' : 'var(--color-text-secondary)',
                   }}
                 >
@@ -364,28 +364,22 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
             </div>
           )}
 
-          {!poolCapacity && activePool && (activePool as any).availableCores !== undefined && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px' }}>
-              <div style={{ padding: '10px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)' }}>
-                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>풀 할당 가용 코어</div>
-                <div style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                  {(activePool as any).availableCores} / {(activePool as any).totalCores} Cores
-                </div>
-              </div>
-              <div style={{ padding: '10px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)' }}>
-                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>풀 가용 메모리</div>
-                <div style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                  {Math.round((activePool as any).availableMemoryBytes / 1024 ** 3)} / {Math.round((activePool as any).totalMemoryBytes / 1024 ** 3)} GB
-                </div>
-              </div>
-              <div style={{ padding: '10px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)' }}>
-                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>가속 GPU 장치</div>
-                <div style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                  {(activePool as any).totalGpus > 0
-                    ? `${(activePool as any).availableGpus}/${(activePool as any).totalGpus} GPUs`
-                    : 'GPU 없음 (CPU 풀)'}
-                </div>
-              </div>
+          {!poolCapacity && activePool && poolCapacityState === 'idle' && (
+            <div
+              data-testid="pool-capacity-pending"
+              style={{
+                padding: '12px 16px',
+                backgroundColor: 'var(--color-bg-subtle)',
+                borderRadius: 'var(--radius-sm)',
+                fontSize: '0.8125rem',
+                color: 'var(--color-text-muted)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+            >
+              <span>⏳</span>
+              <span>풀 3원 용량 조회 대기 중 (미측정 · GET /v1/pools/{activePool.poolId}/capacity)</span>
             </div>
           )}
         </div>
@@ -502,7 +496,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
                 fontWeight: 600,
                 cursor: 'pointer',
                 border: '1px solid var(--color-border-strong)',
-                backgroundColor: requiresGpu ? 'var(--color-brand-primary)' : 'var(--color-bg-subtle)',
+                backgroundColor: requiresGpu ? 'var(--color-brand-primary-bg)' : 'var(--color-bg-subtle)',
                 color: requiresGpu ? '#ffffff' : 'var(--color-text-secondary)',
               }}
             >
