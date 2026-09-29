@@ -140,8 +140,8 @@ MC_WRAPPER='
 source_psql() {
   database="$1"
   shift
-  docker run --rm --network host --env-file "$SOURCE_ENV" "$POSTGRES_IMAGE" \
-    /bin/sh -ceu 'export PGPASSWORD="$POSTGRES_PASSWORD"; host=$1; port=$2; database=$3; shift 3; exec psql -v ON_ERROR_STOP=1 -h "$host" -p "$port" -U "$POSTGRES_USER" -d "$database" "$@"' \
+  docker run --rm --network host -v "$SOURCE_ENV:/run/secrets/source.env:ro" "$POSTGRES_IMAGE" \
+    /bin/sh -ceu '. /run/secrets/source.env; export PGPASSWORD="$POSTGRES_PASSWORD"; host=$1; port=$2; database=$3; shift 3; exec psql -v ON_ERROR_STOP=1 -h "$host" -p "$port" -U "$POSTGRES_USER" -d "$database" "$@"' \
     shell "$SOURCE_HOST" "$SOURCE_PORT" "$database" "$@"
 }
 
@@ -169,10 +169,10 @@ docker run -d \
   --label "ai.saintvision.run=$RUN_ID" \
   --user "$(id -u):$(id -g)" \
   --network host \
-  --env-file "$SOURCE_ENV" \
+  -v "$SOURCE_ENV:/run/secrets/source.env:ro" \
   -v "$RUN_DIR:/work" \
   "$POSTGRES_IMAGE" \
-  /bin/sh -ceu 'export PGPASSWORD="$POSTGRES_PASSWORD"; exec pg_receivewal --synchronous --verbose -D /work/wal -h "$1" -p "$2" -U "$POSTGRES_USER"' shell "$SOURCE_HOST" "$SOURCE_PORT" >/dev/null
+  /bin/sh -ceu '. /run/secrets/source.env; export PGPASSWORD="$POSTGRES_PASSWORD"; exec pg_receivewal --synchronous --verbose -D /work/wal -h "$1" -p "$2" -U "$POSTGRES_USER"' shell "$SOURCE_HOST" "$SOURCE_PORT" >/dev/null
 sleep 2
 if [ "$(docker inspect --format '{{.State.Running}}' "$RECEIVER")" != true ]; then
   receiver_log="$(docker logs "$RECEIVER" 2>&1 || true)"
@@ -190,10 +190,10 @@ source_psql "$DB" -c 'CREATE TABLE public.card151_pitr_marker(label text PRIMARY
 docker run --rm \
   --user "$(id -u):$(id -g)" \
   --network host \
-  --env-file "$SOURCE_ENV" \
+  -v "$SOURCE_ENV:/run/secrets/source.env:ro" \
   -v "$RUN_DIR:/work" \
   "$POSTGRES_IMAGE" \
-  /bin/sh -ceu 'export PGPASSWORD="$POSTGRES_PASSWORD"; exec pg_basebackup -h "$1" -p "$2" -U "$POSTGRES_USER" -D /work/backups/base-'"$RUN_ID"' -Fp -X stream -c fast -l card151-'"$RUN_ID"'' shell "$SOURCE_HOST" "$SOURCE_PORT"
+  /bin/sh -ceu '. /run/secrets/source.env; export PGPASSWORD="$POSTGRES_PASSWORD"; exec pg_basebackup -h "$1" -p "$2" -U "$POSTGRES_USER" -D /work/backups/base-'"$RUN_ID"' -Fp -X stream -c fast -l card151-'"$RUN_ID"'' shell "$SOURCE_HOST" "$SOURCE_PORT"
 
 BEFORE_TIME="$(source_psql "$DB" -At -c "INSERT INTO public.card151_pitr_marker(label) VALUES ('before') RETURNING committed_at AT TIME ZONE 'UTC'")"
 TARGET_TIME="$(source_psql "$DB" -At -c "SELECT clock_timestamp() AT TIME ZONE 'UTC'")"
