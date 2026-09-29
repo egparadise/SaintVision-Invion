@@ -5,13 +5,10 @@
 # citation in the document, then delete its line here. Never add a line to hide a new invented path.
 00_Index/전체 개발 진행 현황.md || deploy/certs
 00_Index/전체 개발 진행 현황.md || services/lineage.py
-00_Index/전체 개발 진행 현황.md || tests/browser-matrix-acceptance.test.tsx
 00_Index/전체 개발 진행 현황.md || tests/dashboard-runlist-freshness-wiring.test.tsx
 00_Index/전체 개발 진행 현황.md || tests/defect-recovery-admin-recovery-editor.test.tsx
 00_Index/전체 개발 진행 현황.md || tests/fixtures/prompts_100.json
 00_Index/전체 개발 진행 현황.md || tests/inv-file-explorer-dom.test.tsx
-00_Index/전체 개발 진행 현황.md || tests/model-studio-dom.test.tsx
-00_Index/전체 개발 진행 현황.md || tests/resource-explorer-dom.test.tsx
 00_Index/전체 개발 진행 현황.md || tests/run-attempt-contract.test.ts
 00_Index/전체 개발 진행 현황.md || tests/run-detail-attempts-dom.test.tsx
 00_Index/전체 개발 진행 현황.md || tests/run-detail-logs-dom.test.tsx
@@ -195,7 +192,6 @@
 30_Development/History/2026-09-19_TLS외부주입전환_Claude_독립검토.md || deploy/certs
 30_Development/History/2026-09-21_PTY보안경계_토큰제로누설_사전연결허위성공제거_Gemini.md || tests/terminal-session-dom.test.tsx
 30_Development/History/2026-09-21_ShardObservation_앵커와_검증정보_노출판정_Codex.md || services/lineage.py
-30_Development/History/2026-09-21_UI_FB_contract_readiness_review_Codex.md || apps/web/tests/developer-studio.test.ts:448
 30_Development/History/2026-09-21_UI_FB_contract_readiness_review_Codex.md || tests/browser/desktop.tsx
 30_Development/History/2026-09-21_VF-GM-03-05_Codex_경계지적_치유_및_계약결속_Gemini.md || packages/contracts-ts/src/index
 30_Development/History/2026-09-21_VF-GM-03-05_Codex_경계지적_치유_및_계약결속_Gemini.md || tests/desktop-layout.test.tsx
