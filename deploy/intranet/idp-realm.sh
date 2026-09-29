@@ -23,8 +23,12 @@ SCOPE="${SV_IDP_SCOPE:-inv.api}"
 CONTAINER="${SV_IDP_CONTAINER:-sv-idp}"
 ENV_FILE="${SV_IDP_ENV:-$HOME/.sv-idp/env}"
 USERS_FILE="${SV_IDP_USERS_ENV:-$HOME/.sv-idp/env-users}"
-PORTAL_ORIGINS="${SV_IDP_PORTAL_ORIGINS:-https://portal.sv.lan http://portal.sv.lan http://localhost:3005}"
+# https, or loopback. A loopback redirect never leaves the machine, which is why
+# native-app flows may use it; "http://portal.sv.lan" would carry codes over the LAN.
+PORTAL_ORIGINS="${SV_IDP_PORTAL_ORIGINS:-https://portal.sv.lan http://localhost:3005}"
 EMAIL_DOMAIN="${SV_IDP_EMAIL_DOMAIN:-sv.lan}"
+TOKEN_LIFESPAN="${SV_IDP_TOKEN_LIFESPAN:-300}"
+CHECKER="${SV_REALM_CHECKER:-}"
 
 set -a; . "$ENV_FILE"; . "$USERS_FILE"; set +a
 
@@ -39,17 +43,23 @@ kc config credentials --server http://localhost:8080 --realm master \
   --user "$SV_IDP_ADMIN_USER" --password "$SV_IDP_ADMIN_PASSWORD" >/dev/null
 
 if ! kc get "realms/$REALM" --fields realm >/dev/null 2>&1; then
-  kc create realms -s "realm=$REALM" -s enabled=true -s accessTokenLifespan=300
+  kc create realms -s "realm=$REALM" -s enabled=true
 fi
+# Re-asserted every run, not only on create. The verifier refuses exp - iat > 3600,
+# so a widened lifespan is a broken realm that still has all the right objects in it,
+# and a "create if missing" script would keep reporting success.
+kc update "realms/$REALM" -s enabled=true -s "accessTokenLifespan=$TOKEN_LIFESPAN"
 
 client_id_of() { csv get clients -r "$REALM" -q "clientId=$1" --fields id | head -1; }
 
 # The API client exists only to name an audience; it never logs anyone in.
 if [ -z "$(client_id_of "$API_CLIENT")" ]; then
-  kc create clients -r "$REALM" -s "clientId=$API_CLIENT" -s enabled=true \
-    -s publicClient=false -s standardFlowEnabled=false \
-    -s directAccessGrantsEnabled=false -s serviceAccountsEnabled=false
+  kc create clients -r "$REALM" -s "clientId=$API_CLIENT" -s enabled=true
 fi
+API_ID="$(client_id_of "$API_CLIENT")"
+kc update "clients/$API_ID" -r "$REALM" -s enabled=true -s publicClient=false \
+  -s standardFlowEnabled=false -s directAccessGrantsEnabled=false \
+  -s implicitFlowEnabled=false -s serviceAccountsEnabled=false
 
 # The portal is a browser client: public, so PKCE S256 is mandatory, and no
 # direct access grants -- a password grant from a public client is a credential
@@ -66,9 +76,11 @@ for origin in $PORTAL_ORIGINS; do
 done
 kc_in update "clients/$PORTAL_ID" -r "$REALM" -f - <<JSON
 {
+  "enabled": true,
   "publicClient": true,
   "standardFlowEnabled": true,
   "directAccessGrantsEnabled": false,
+  "implicitFlowEnabled": false,
   "serviceAccountsEnabled": false,
   "redirectUris": [${redirects%,}],
   "webOrigins": [${origins%,}],
@@ -90,6 +102,13 @@ if [ -z "$(mapper_id "$API_CLIENT-audience")" ]; then
             "access.token.claim": "true", "id.token.claim": "false"}}
 JSON
 fi
+AUDIENCE_MAPPER_ID="$(mapper_id "$API_CLIENT-audience")"
+kc_in update "clients/$PORTAL_ID/protocol-mappers/models/$AUDIENCE_MAPPER_ID" -r "$REALM" -f - <<JSON
+{"id": "$AUDIENCE_MAPPER_ID", "name": "$API_CLIENT-audience", "protocol": "openid-connect",
+ "protocolMapper": "oidc-audience-mapper",
+ "config": {"included.client.audience": "$API_CLIENT",
+            "access.token.claim": "true", "id.token.claim": "false"}}
+JSON
 
 # inv.identity requires a client_id claim; Keycloak emits azp and nothing else.
 if [ -z "$(mapper_id "client-id")" ]; then
@@ -101,6 +120,14 @@ if [ -z "$(mapper_id "client-id")" ]; then
             "access.token.claim": "true", "id.token.claim": "false"}}
 JSON
 fi
+CLIENT_ID_MAPPER_ID="$(mapper_id "client-id")"
+kc_in update "clients/$PORTAL_ID/protocol-mappers/models/$CLIENT_ID_MAPPER_ID" -r "$REALM" -f - <<JSON
+{"id": "$CLIENT_ID_MAPPER_ID", "name": "client-id", "protocol": "openid-connect",
+ "protocolMapper": "oidc-hardcoded-claim-mapper",
+ "config": {"claim.name": "client_id", "claim.value": "$PORTAL_CLIENT",
+            "jsonType.label": "String",
+            "access.token.claim": "true", "id.token.claim": "false"}}
+JSON
 
 # strict_aud forbids an audience list, and the built-in "roles" scope adds
 # "account" through its audience-resolve mapper. Drop the scope, not the mapper:
@@ -143,4 +170,44 @@ JSON
   kc set-password -r "$REALM" --userid "$uid" --new-password "$password"
 done
 
-echo "realm=$REALM portal=$PORTAL_CLIENT audience=$API_CLIENT scope=$SCOPE configured"
+# Setting the realm is not the same as knowing it is still set. Read the live
+# configuration back and judge it; an admin-console click that relaxes any of this
+# leaves every object in place, so only a read-back catches it.
+if [ -z "$CHECKER" ]; then
+  for candidate in "$(dirname "${BASH_SOURCE[0]}")/../../tools/check_idp_realm_config.py" \
+                   "$HOME/.sv-idp/bin/check_idp_realm_config.py"; do
+    [ -f "$candidate" ] && CHECKER="$candidate" && break
+  done
+fi
+if [ -z "$CHECKER" ]; then
+  echo "refusing to report success: check_idp_realm_config.py not found." \
+       "Set SV_REALM_CHECKER to its path." >&2
+  exit 2
+fi
+
+SNAPSHOT="$(
+  {
+    kc get "realms/$REALM"
+    kc get "clients/$API_ID" -r "$REALM"
+    kc get "clients/$PORTAL_ID" -r "$REALM"
+    kc get "clients/$PORTAL_ID/default-client-scopes" -r "$REALM"
+  } | python3 -c '
+import json, sys
+# kcadm prints one JSON document per call; read them in order.
+decoder, text, at, documents = json.JSONDecoder(), sys.stdin.read(), 0, []
+while at < len(text):
+    while at < len(text) and text[at].isspace():
+        at += 1
+    if at >= len(text):
+        break
+    value, at = decoder.raw_decode(text, at)
+    documents.append(value)
+realm, api, portal, scopes = documents
+portal["defaultClientScopes"] = [s.get("name") for s in scopes]
+print(json.dumps({"realm": realm,
+                  "clients": {api["clientId"]: api, portal["clientId"]: portal}}))
+'
+)"
+
+printf "%s" "$SNAPSHOT" | python3 "$CHECKER" --realm "$REALM" \
+  --api-client "$API_CLIENT" --portal-client "$PORTAL_CLIENT" --scope "$SCOPE"

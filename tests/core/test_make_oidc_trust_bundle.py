@@ -293,3 +293,87 @@ def test_the_verifier_refuses_a_bundle_repinned_past_a_week(tmp_path):
             client_ids=["sv-portal"],
             jwks_file=str(out),
         )
+
+
+# --- the JWKS fetch is bound to the issuer, not to whatever answers -------------
+#
+# The bundle stamps --issuer onto the keys it fetched. If the fetch may come from
+# anywhere, this tool becomes a way to present a stranger's signing key as the
+# issuer's own, and the resulting file looks entirely correct.
+
+
+def test_a_plain_http_jwks_url_is_refused():
+    with pytest.raises(builder.BundleRefused, match="https"):
+        builder.assert_same_origin("http://idp.sv.lan/realms/saintvision/certs", ISSUER)
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://evil.example/realms/saintvision/protocol/openid-connect/certs",
+        "https://idp.sv.lan:8443/realms/saintvision/protocol/openid-connect/certs",
+        "https://idp.sv.lan.evil.example/realms/saintvision/certs",
+    ],
+)
+def test_a_jwks_url_on_another_origin_is_refused(url):
+    with pytest.raises(builder.BundleRefused, match="same origin"):
+        builder.assert_same_origin(url, ISSUER)
+
+
+def test_the_issuers_own_certs_endpoint_is_accepted():
+    builder.assert_same_origin(ISSUER + "/protocol/openid-connect/certs", ISSUER)
+
+
+@pytest.mark.parametrize(
+    ("url", "reason"),
+    [
+        ("https://user:pass@idp.sv.lan/certs", "credentials"),
+        ("https://idp.sv.lan/certs#fragment", "fragment"),
+        ("https:///certs", "without a host"),
+    ],
+)
+def test_a_url_carrying_credentials_or_a_fragment_is_refused(url, reason):
+    with pytest.raises(builder.BundleRefused, match=reason):
+        builder.origin(url)
+
+
+def test_a_cross_origin_redirect_is_not_followed():
+    handler = builder.SameOriginOnly(builder.origin(ISSUER))
+    with pytest.raises(builder.BundleRefused, match="redirected"):
+        handler.redirect_request(None, None, 302, "Found", {}, "https://evil.example/certs")
+
+
+def test_a_same_origin_redirect_is_still_followed():
+    """A realm may redirect within itself; only leaving the origin is the problem."""
+    from email.message import Message
+    from urllib.request import Request
+
+    handler = builder.SameOriginOnly(builder.origin(ISSUER))
+    target = ISSUER + "/protocol/openid-connect/certs"
+    followed = handler.redirect_request(
+        Request(ISSUER + "/certs"), None, 302, "Found", Message(), target
+    )
+    assert followed.get_full_url() == target
+
+
+def test_a_downgrade_to_http_counts_as_another_origin():
+    handler = builder.SameOriginOnly(builder.origin(ISSUER))
+    with pytest.raises(builder.BundleRefused, match="redirected"):
+        handler.redirect_request(None, None, 302, "Found", {}, "http://idp.sv.lan/certs")
+
+
+class _Body:
+    def __init__(self, size):
+        self._payload = b"x" * size
+
+    def read(self, limit):
+        return self._payload[:limit]
+
+
+def test_an_oversized_jwks_body_is_refused_rather_than_read():
+    with pytest.raises(builder.BundleRefused, match="exceeds"):
+        builder.read_bounded(_Body(builder.MAX_JWKS_BYTES + 1))
+
+
+def test_a_body_at_the_bound_is_accepted():
+    assert len(builder.read_bounded(_Body(builder.MAX_JWKS_BYTES))) == builder.MAX_JWKS_BYTES

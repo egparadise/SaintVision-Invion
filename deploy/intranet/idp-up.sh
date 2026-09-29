@@ -21,6 +21,15 @@ VOLUME="${SV_IDP_VOLUME:-sv-idp-db-data}"
 DB_CONTAINER="${SV_IDP_DB_CONTAINER:-sv-idp-db}"
 CONTAINER="${SV_IDP_CONTAINER:-sv-idp}"
 PORT="${SV_IDP_PORT:-8080}"
+# Loopback by default. Before TLS termination exists, publishing 8080 on the LAN
+# puts a plaintext login form and a plaintext token endpoint on the network; reach
+# it over an SSH tunnel instead. Widening this is an explicit act, and it belongs
+# after the https cutover, not before it.
+BIND_ADDRESS="${SV_IDP_BIND_ADDRESS:-127.0.0.1}"
+# Ignore the request Host header and always issue the configured hostname. With
+# hostname-strict=false a request arriving under any other name would be echoed
+# back into the URLs Keycloak publishes.
+HOSTNAME_STRICT="${SV_IDP_HOSTNAME_STRICT:-true}"
 # The issuer Keycloak advertises. Every token carries it and the control plane
 # compares it byte for byte, so changing this is a coordinated change: see the
 # TLS cutover step in the runbook.
@@ -69,21 +78,21 @@ done
 
 docker rm -f "$CONTAINER" >/dev/null 2>&1 || true
 docker run -d --name "$CONTAINER" --network "$NETWORK" --restart unless-stopped \
-  -p "$PORT:8080" \
+  -p "$BIND_ADDRESS:$PORT:8080" \
   -e KC_DB=postgres -e KC_DB_URL_HOST="$DB_CONTAINER" \
   -e KC_DB_USERNAME=keycloak -e KC_DB_PASSWORD="$SV_IDP_DB_PASSWORD" \
   -e KC_BOOTSTRAP_ADMIN_USERNAME="$SV_IDP_ADMIN_USER" \
   -e KC_BOOTSTRAP_ADMIN_PASSWORD="$SV_IDP_ADMIN_PASSWORD" \
   -e KC_HEALTH_ENABLED=true \
   "$KEYCLOAK_IMAGE" \
-  start --http-enabled=true "--hostname=$HOSTNAME_URL" --hostname-strict=false >/dev/null
+  start --http-enabled=true "--hostname=$HOSTNAME_URL" "--hostname-strict=$HOSTNAME_STRICT" >/dev/null
 
 for i in $(seq 1 120); do
   if curl -fsS "http://127.0.0.1:$PORT/realms/master" >/dev/null 2>&1; then
-    echo "idp up after ${i}s on port $PORT, issuing as $HOSTNAME_URL"
+    echo "idp up after ${i}s on $BIND_ADDRESS:$PORT, issuing as $HOSTNAME_URL"
     exit 0
   fi
   sleep 1
 done
-echo "idp did not answer on port $PORT" >&2
+echo "idp did not answer on $BIND_ADDRESS:$PORT" >&2
 exit 1

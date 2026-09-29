@@ -31,6 +31,13 @@ to rewrite key material.
 The file is written ``0644``. ``trusted_file`` refuses a bundle that is group- or
 world-writable, or larger than 65536 bytes, so both are checked here first.
 
+``--jwks-url`` is bound to the issuer, not merely to *a* server: HTTPS, the same
+origin as ``--issuer``, no userinfo or fragment, no cross-origin redirect, and a
+bounded body. Without that binding the tool would happily stamp some other
+provider's signing keys with the issuer the control plane trusts, which is the
+whole attack it is supposed to make impossible. Before TLS exists, fetch the JWKS
+out of band -- over an SSH tunnel, say -- and pass ``--jwks-file``.
+
 Usage:
     python tools/make_oidc_trust_bundle.py --issuer URL --jwks-file in.json --output bundle.json
     python tools/make_oidc_trust_bundle.py --issuer URL --jwks-url URL --output bundle.json
@@ -47,6 +54,8 @@ import json
 from pathlib import Path
 import sys
 from typing import Any
+from urllib.parse import urlsplit
+from urllib.request import HTTPRedirectHandler, build_opener
 
 
 BUNDLE_KEYS = ("issuer", "expiresAt", "keys")
@@ -56,6 +65,7 @@ MIN_MODULUS_BITS = 2048
 MAX_MODULUS_BITS = 4096
 KID_MAX = 128
 MAX_BUNDLE_BYTES = 65_536  # trusted_file
+MAX_JWKS_BYTES = 262_144  # a realm JWKS is a few KiB; this is slack, not a budget
 BUNDLE_MODE = 0o644  # trusted_file refuses group/other write
 
 
@@ -139,19 +149,63 @@ def validate_bundle(bundle: Any, *, now: dt.datetime) -> None:
             raise BundleRefused("every key must be an RS256 RSA signing key")
 
 
-def read_jwks(*, jwks_file: Path | None, jwks_url: str | None, timeout: float) -> Any:
+def origin(url: str) -> tuple[str, str, int | None]:
+    """Scheme, host and port -- what "the same server" has to mean here."""
+    parts = urlsplit(url)
+    if parts.username or parts.password:
+        raise BundleRefused("a URL with embedded credentials is refused")
+    if parts.fragment:
+        raise BundleRefused("a URL with a fragment is refused")
+    if not parts.hostname:
+        raise BundleRefused("a URL without a host is refused")
+    return parts.scheme.lower(), parts.hostname.lower(), parts.port
+
+
+def assert_same_origin(jwks_url: str, issuer: str) -> None:
+    """The keys must come from the issuer, not from somewhere that answers.
+
+    The bundle stamps ``--issuer`` onto whatever keys were fetched. If the fetch may
+    come from anywhere, the tool becomes a way to present a stranger's signing key as
+    the issuer's own -- and nothing downstream can tell, because the file looks right.
+    """
+    if not jwks_url.lower().startswith("https://"):
+        raise BundleRefused("--jwks-url must be https; fetch out of band and use --jwks-file")
+    if origin(jwks_url) != origin(issuer):
+        raise BundleRefused("--jwks-url must have the same origin as --issuer")
+
+
+class SameOriginOnly(HTTPRedirectHandler):
+    """A redirect off the issuer's origin is the attack, so it is not followed."""
+
+    def __init__(self, expected: tuple[str, str, int | None]) -> None:
+        self.expected = expected
+
+    def redirect_request(self, request, fp, code, msg, headers, newurl):
+        if origin(newurl) != self.expected:
+            raise BundleRefused("--jwks-url redirected off the issuer's origin")
+        return super().redirect_request(request, fp, code, msg, headers, newurl)
+
+
+def read_bounded(response: Any) -> bytes:
+    """Read the body, or refuse -- an unbounded read is a memory budget nobody set."""
+    body = response.read(MAX_JWKS_BYTES + 1)
+    if len(body) > MAX_JWKS_BYTES:
+        raise BundleRefused(f"JWKS body exceeds {MAX_JWKS_BYTES} bytes")
+    return body
+
+
+def read_jwks(*, jwks_file: Path | None, jwks_url: str | None, issuer: str, timeout: float) -> Any:
     if jwks_file is not None:
         return json.loads(jwks_file.read_text(encoding="utf-8"))
     if jwks_url is None:  # pragma: no cover - argparse enforces one of the two
         raise BundleRefused("either --jwks-file or --jwks-url is required")
-    if not jwks_url.startswith(("http://", "https://")):
-        raise BundleRefused("--jwks-url must be an absolute http(s) URL")
-    from urllib.request import urlopen
-
-    with urlopen(jwks_url, timeout=timeout) as response:  # noqa: S310 - operator-supplied URL
+    assert_same_origin(jwks_url, issuer)
+    opener = build_opener(SameOriginOnly(origin(jwks_url)))
+    with opener.open(jwks_url, timeout=timeout) as response:
         if response.status != 200:
             raise BundleRefused(f"JWKS endpoint answered {response.status}")
-        return json.loads(response.read().decode("utf-8"))
+        body = read_bounded(response)
+    return json.loads(body.decode("utf-8"))
 
 
 def parser() -> argparse.ArgumentParser:
@@ -174,7 +228,10 @@ def main(argv: list[str] | None = None) -> int:
     now = dt.datetime.now(dt.timezone.utc)
     try:
         jwks = read_jwks(
-            jwks_file=args.jwks_file, jwks_url=args.jwks_url, timeout=args.timeout_seconds
+            jwks_file=args.jwks_file,
+            jwks_url=args.jwks_url,
+            issuer=args.issuer,
+            timeout=args.timeout_seconds,
         )
         _, dropped = signing_keys(jwks)
         bundle = build_bundle(jwks, issuer=args.issuer, now=now, ttl_seconds=args.ttl_seconds)
