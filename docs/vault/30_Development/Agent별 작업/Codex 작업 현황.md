@@ -4,7 +4,7 @@ title: "Codex 작업 현황"
 version: "1.0.221"
 status: "review"
 author: "Codex"
-updated: "2026-09-29T02:34:48+09:00"
+updated: "2026-09-29T03:40:51+09:00"
 source_of_truth: "Git"
 ---
 
@@ -124,6 +124,12 @@ source_of_truth: "Git"
 - PR #159 Claude r3의 비차단 관찰을 #159 위 PR #173으로 분리했다. S3 checkout은 persisted provider를 exact resolve하고, collect는 locator prefix를 `deleting` 커밋 전에 검증하며, begin/prefix drift는 `STORE-0001`/503/retryable로 통일했다. malformed locator 422와 upload content identity 409는 유지한다.
 - restore의 새 요청은 Run state/version/attempt를 checkpoint pin보다 먼저 검증해 `GRAPH-0003`을 유지한다. object byte/delete 호출 11곳의 provider mismatch guard 순서를 회귀 시험으로 고정했다.
 - Claude 조건부 검토 뒤 실제 checkout 호출 지점과 ResultStore prepare/complete·ShardCompletion once의 mismatch 동작 시험을 보강해 focused 26 passed, 최종 head `f02dacf6`이다. hosted Backend `36377648185`는 3.12/3.14 각각 3077 passed/47 skipped/2 deselected/0 failed, Core `36377648156`은 3383 passed/36 skipped/2 deselected/0 failed와 exact skip gate, S01은 2+3 passed, Docs·desktop-browser도 success다. Claude 재대조 r2는 해당 head를 승인했으며, #159 병합 뒤 retarget·병합은 코디네이터 담당이다. 로컬 실 PG·Docker는 미실행이다. [[2026-09-28_12-40-00_KST_S3_ObjectStore_관찰후속_Codex]].
+## 2026-09-29 카드 135 — legacy ProblemDetails·lock-wait Low 항목
+
+- legacy not-found 5종만 정본 `RES-0004`/404/non-retryable exact ProblemDetails로 변환하고 resource kind·내부 message를 숨긴다. resource 404는 AUTH/SEC 401·403 denial이 아니므로 audit 미기록을 회귀 시험으로 고정해 `DENIAL_CATEGORIES` 지적은 변경 불필요로 닫았다.
+- #240/#241에서 이미 bounded인 8개 외 남은 write 14개를 shared dependency와 manual span으로 묶어 legacy 22개 전체가 55P03/40P01을 `SYS-0001`/503/retryable로 끝낸다. RED 10 failed/33 passed 뒤 GREEN 43 passed, 관련 PG-free 87 passed; real PG는 hosted Core 대기다. [[2026-09-29_03-20-47_KST_legacy_problem_404_lock_wait_Codex]].
+- 첫 Backend 3.14은 PG-free pool response fixture가 새 dependency를 override하지 않아 2 failed/4580 passed였고 제품 결함은 아니었다. override 회귀를 추가해 단일 파일 24 passed; 새 exact-head Backend/Core를 대기한다.
+
 ## 2026-09-29 카드 122 Medium 후속 — legacy audit write optional idempotency
 
 - workspace tool, member role/삭제, user/project/workspace status, capability offer 7개가 FE의 선택적 `Idempotency-Key`를 실제 소비한다. live 권한 preflight 뒤 bounded advisory lock→ledger replay를 수행하고, replay는 service·audit·ledger 재기록이 0이다. 최초 service/audit/ledger는 한 transaction이다.
