@@ -15,8 +15,8 @@ source_of_truth: "Git"
   Node mTLS Ed25519 hierarchy는 별도 유지한다. root는 현재 operator host에
   있으므로 `rootOffline=false`이고 passphrase만 online CA directory 밖으로
   분리했다.
-- `.143`·`.210`은 Node-local CSR→intermediate leaf→DB channel pin→실제 mTLS
-  heartbeat/snapshot까지 완료했다. `.222`는 Docker socket 권한, CP 동거
+- worker-1·worker-2는 Node-local CSR→intermediate leaf→DB channel pin→실제
+  mTLS heartbeat/snapshot까지 완료했다. worker-3은 Docker socket 권한, CP 동거
   worker는 API 1.41, 네 번째 Ubuntu worker는 미제공이라 configured 3 /
   enrolled 2 / observed 2이며 5-node readiness는 `BLOCKED_EXTERNAL`이다.
 - 원격 DB trust 경계를 폐기했다. v5 candidate는 SCRAM, admin/runtime 분리

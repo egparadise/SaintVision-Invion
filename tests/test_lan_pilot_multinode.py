@@ -561,6 +561,18 @@ def test_external_database_dsn_requires_exact_private_passfile_and_loopback(tmp_
         lan_pilot.read_external_dsn(dsn, "postgres")
 
     passfile.write_text(
+        "198.51.100.20:55440:saintvision_lan:postgres:" + ("a" * 64) + "\n",
+        encoding="utf-8",
+    )
+    dsn.write_text(
+        "host=198.51.100.20 port=55440 dbname=saintvision_lan user=postgres "
+        f"passfile='{passfile.as_posix()}'",
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="passfile-backed loopback"):
+        lan_pilot.read_external_dsn(dsn, "postgres")
+
+    passfile.write_text(
         "127.0.0.1:55440:saintvision_lan:inv_lan_runtime:" + ("a" * 64) + "\n",
         encoding="utf-8",
     )
@@ -618,6 +630,7 @@ def test_bind_db_auth_requires_negative_rejection_and_role_bound_credentials(
     runtime_passfile.chmod(0o600)
     rejected = []
     runtime_privileges = [False, False, False, False, False]
+    auth_methods = ["scram-sha-256", "scram-sha-256"]
 
     class Result:
         def __init__(self, *, one=None, rows=None):
@@ -644,7 +657,7 @@ def test_bind_db_auth_requires_negative_rejection_and_role_bound_credentials(
             if query == "SHOW password_encryption":
                 return Result(one=("scram-sha-256",))
             if "pg_hba_file_rules" in query:
-                return Result(rows=[("scram-sha-256",), ("scram-sha-256",)])
+                return Result(rows=[(method,) for method in auth_methods])
             if "FROM pg_roles" in query:
                 return Result(one=tuple(runtime_privileges))
             if query == "SELECT current_user":
@@ -681,6 +694,17 @@ def test_bind_db_auth_requires_negative_rejection_and_role_bound_credentials(
 
     runtime_privileges[0] = True
     with pytest.raises(ValueError, match="elevated privileges"):
+        lan_pilot.bind_db_auth(
+            Namespace(
+                state=tmp_path,
+                admin_passfile=admin_passfile,
+                runtime_passfile=runtime_passfile,
+            )
+        )
+
+    runtime_privileges[0] = False
+    auth_methods[1] = "md5"
+    with pytest.raises(ValueError, match="not exclusively SCRAM"):
         lan_pilot.bind_db_auth(
             Namespace(
                 state=tmp_path,

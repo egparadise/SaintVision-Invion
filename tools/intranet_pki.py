@@ -89,6 +89,25 @@ def secure_write(path: Path, data: bytes) -> None:
     path.chmod(0o600)
 
 
+def private_file(path: Path) -> None:
+    if path.is_symlink() or not path.is_file():
+        raise ValueError("Private material must be a regular file")
+    if os.name == "nt":
+        _run(
+            [
+                "icacls.exe",
+                path,
+                "/inheritance:r",
+                "/grant:r",
+                f"{getpass.getuser()}:F",
+                "*S-1-5-18:F",
+                "*S-1-5-32-544:F",
+            ]
+        )
+    else:
+        path.chmod(0o600)
+
+
 def _name(common_name: str) -> x509.Name:
     return x509.Name(
         [
@@ -220,7 +239,9 @@ def initialize(
         pass
     else:
         raise ValueError("Root passphrase must be stored outside the online CA directory")
-    private_directory(root_password_file.parent)
+    root_password_file.parent.mkdir(parents=True, exist_ok=True)
+    if root_password_file.parent.is_symlink():
+        raise ValueError("Root passphrase directory must not be a symlink")
 
     if profile == "https":
         root_key = ec.generate_private_key(ec.SECP256R1())
@@ -287,6 +308,7 @@ def initialize(
     intermediate_pem = intermediate_certificate.public_bytes(serialization.Encoding.PEM)
     secure_write(paths["root_key"], _encrypted_key(root_key, root_password))
     secure_write(root_password_file, root_password)
+    private_file(root_password_file)
     secure_write(paths["root_certificate"], root_pem)
     secure_write(
         paths["intermediate_key"],

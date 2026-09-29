@@ -3,6 +3,7 @@
 import hashlib
 import json
 import re
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -72,6 +73,10 @@ def test_initializes_browser_compatible_chain_with_separated_root_passphrase(tmp
             tmp_path / "other-ca",
             root_password_file=tmp_path / "other-ca" / "root.pass",
         )
+
+    source = (REPO_ROOT / "tools" / "intranet_pki.py").read_text(encoding="utf-8")
+    assert "private_file(root_password_file)" in source
+    assert "private_directory(root_password_file.parent)" not in source
 
 
 def test_issues_exact_cp_dns_and_private_ip_without_printing_key(tmp_path: Path):
@@ -199,8 +204,22 @@ def test_public_pilot_evidence_is_redacted_and_bound_to_the_tooling():
     assert evidence["databaseBoundary"]["pilotStateRebound"] is False
 
     for relative_path, expected in evidence["source"]["toolSHA256"].items():
-        actual = hashlib.sha256((REPO_ROOT / relative_path).read_bytes()).hexdigest()
-        assert actual == expected
+        blob_oid = evidence["source"]["toolGitBlobSHA1"][relative_path]
+        blob = subprocess.run(
+            ["git", "cat-file", "blob", blob_oid],
+            cwd=REPO_ROOT,
+            check=True,
+            capture_output=True,
+        ).stdout
+        assert hashlib.sha256(blob).hexdigest() == expected
+        head_oid = subprocess.run(
+            ["git", "rev-parse", f"HEAD:{relative_path}"],
+            cwd=REPO_ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+        assert head_oid == blob_oid
 
 
 def test_cli_accepts_root_password_after_init_subcommand(tmp_path: Path, monkeypatch, capsys):

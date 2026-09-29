@@ -47,11 +47,11 @@ python tools/intranet_pki.py `
   --root-password-file D:\Project\SaintVisionI-Invion\.work\intranet\offline-secrets\https-root-key.pass
 python tools/intranet_pki.py `
   --ca-dir D:\Project\SaintVisionI-Invion\.work\intranet\https-ca `
-  issue-server --hostname cp.sv.lan --address 192.168.45.74 `
+  issue-server --hostname cp.sv.lan --address <cp-lan-ip> `
   --output D:\Project\SaintVisionI-Invion\.work\intranet\https-cp
 python tools/intranet_pki.py `
   --ca-dir D:\Project\SaintVisionI-Invion\.work\intranet\https-ca `
-  issue-server --hostname idp.sv.lan --address 192.168.45.143 `
+  issue-server --hostname idp.sv.lan --address <idp-node-lan-ip> `
   --output D:\Project\SaintVisionI-Invion\.work\intranet\https-idp
 ```
 

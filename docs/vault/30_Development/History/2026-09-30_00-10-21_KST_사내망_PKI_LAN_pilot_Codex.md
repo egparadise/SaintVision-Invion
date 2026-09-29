@@ -19,11 +19,11 @@ source_of_truth: "Git"
   철회했다. HTTPS용 root/intermediate/leaf는 ECDSA P-256으로 다시 만들고,
   root key가 운영자 PC에 남아 있어 `rootOffline=false`로 기록했다. root
   passphrase는 online CA directory 밖의 별도 operator-private 파일로 옮겼다.
-- 로컬 Docker Desktop은 사용하지 않았다. 최초 원격 PostgreSQL trust 후보는
+- 로컬 Docker Desktop은 사용하지 않았다. 최초 worker-1 원격 PostgreSQL trust 후보는
   독립 검토에서 수용 불가로 판정했다. 최종 v5 candidate는 SCRAM, admin/runtime
   분리 credential, 전용 user-defined network, loopback publish를 사용한다.
   기존 후보 3개는 stop했고 data·volume은 보존했다.
-- Node private key는 `.143`과 `.210`의 `prepare-worker.sh`가 로컬 생성했다.
+- Node private key는 worker-1과 worker-2의 `prepare-worker.sh`가 로컬 생성했다.
   CP로 가져온 것은 CSR뿐이며 private key export는 0건이다.
 - 자체감사에서 encrypted intermediate와 password를 pilot state에 함께
   복제한 경계를 제거했다. public chain만 pin하고 후속 enrollment가 중앙 CA
@@ -41,10 +41,10 @@ source_of_truth: "Git"
 immutable `nodePort`를 소급 변경하지 않고 두 번째 fresh state를 `18444`로
 처음부터 만들었다.
 
-두 번째 state에서 `.143`과 `.210`의 archive SHA, CSR CN, leaf file SHA,
+두 번째 state에서 worker-1과 worker-2의 archive SHA, CSR CN, leaf file SHA,
 intermediate 서명, DB channel fingerprint를 대조했다. 두 Node 컨테이너는
 각각 running이 됐고 `observe --once`가 2026-09-30 00:08 KST에 두 Node의
-mTLS heartbeat와 `lan-observe-v1` snapshot을 commit했다. `.222`는 Docker
+mTLS heartbeat와 `lan-observe-v1` snapshot을 commit했다. worker-3은 Docker
 socket permission denied라 CSR·leaf·heartbeat를 실행하지 않았다.
 
 현재 실측은 configured 3, enrolled 2, observed 2다. CP 동거 worker는 Docker
@@ -64,10 +64,10 @@ Card 152 inventory는 5행을 갖지만 필수값 71개가 비어 있었다. 정
   `ai.saintvision.lan-pilot`의 cleanup 정책 미분류 1건으로 실패했다. 이를
   age-prunable owner가 아닌 persistent runtime label로 명시하고 focused
   회귀를 통과시켰다.
-- 실제 `.143`: Docker 29.1/API 1.52, 12 CPU,
-  `MemAvailable=12,406,200 KiB`; `.210`: Docker 29.8/API 1.56, 12 CPU,
+- 실제 worker-1: Docker 29.1/API 1.52, 12 CPU,
+  `MemAvailable=12,406,200 KiB`; worker-2: Docker 29.8/API 1.56, 12 CPU,
   `MemAvailable=14,036,016 KiB`.
-- `.222`: 12 CPU, `MemAvailable=13,575,632 KiB`, Docker socket permission
+- worker-3: 12 CPU, `MemAvailable=13,575,632 KiB`, Docker socket permission
   denied. 사용자 명령은 `sudo usermod -aG docker saintvision-invion3`이며
   Codex는 sudo를 실행하지 않았다.
 - 공개 redacted evidence:
@@ -95,7 +95,7 @@ Card 152가 확정한 CP와 IdP 이름으로 새 ECDSA P-256 HTTPS leaf를 발�
 두 leaf의 파일 수준 Web PKI 검증은 통과했지만 실제 TLS 종단에 배포하지
 않았으므로 HTTPS issuer는 미측정이다. certificate fingerprint와 private
 network identity는 공개 Evidence에 싣지 않는다.
-Card 152 inventory의 필수값 71개 완성과 `.222` docker group 활성화,
+Card 152 inventory의 필수값 71개 완성과 worker-3 docker group 활성화,
 네 번째 Ubuntu worker 제공,
 Windows CP 동거 worker Docker API 1.45 이상이 남았다. 이 셋이 없으면
 5-node readiness는 계속 BLOCKED다. 또한 v5 SCRAM DB로 pilot state를
