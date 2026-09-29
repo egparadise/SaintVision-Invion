@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.226"
+version: "1.0.227"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T00:47:06+09:00"
+updated: "2026-09-30T01:01:40+09:00"
 source_of_truth: "Git"
 active_card: "CARD-151 intranet ObjectStore and PITR rehearsal"
 active_card_status: "PR 248 review; TLS operational U6 PASS, canonical S01 partial, source replication HBA blocked external"
@@ -18,6 +18,7 @@ active_card_next: "Claude review; operator-approved physical replication boundar
 - `.210`의 카드 소유 MinIO를 Card 150 intermediate가 서명한 `objects.sv.lan`/`.210` server leaf로 TLS 전환했다. exact image, non-root/read-only/cap-drop, data+cert 2 mount, 9000 단일 publish를 유지했고 product/PITR 교차 쓰기는 HTTPS에서도 403/403이다.
 - reachable head `c075e669`에서 operational roundtrip 6/6와 cleanup PASS, 별도 attestation SHA·시각 결속을 확보했다. canonical S01은 storage check 1개만 PASS하고 operator/session token·CP DNS/HTTPS·inventory 사용자 값 부재로 FAIL 2/BLOCKED 6, `acceptanceAssessed=false`다.
 - TLS 전환에서 발견한 cert-dir/loopback CA/bootstrap process-argument 문제를 회귀시험과 bounded rollback으로 닫고, 진단 시 노출된 root 자격은 즉시 회전했다. G-22는 source physical replication HBA 미승인 때문에 source mutation 전 BLOCKED_EXTERNAL이며 RPO/RTO는 여전히 null이다. [[2026-09-30_00-19-37_KST_Card151_사내_Storage_PITR_Codex_구현]].
+- PR #248 보안 후속 head `f420530a`는 PITR 전송 자격도 보호 파일 read-only mount와 컨테이너 내부 alias 구성으로 바꿔 host argv·Docker `Config.Env` 비노출을 고정했다. PG-free 4 passed, local·remote shell syntax와 diff check는 exit 0이다.
 
 ## 2026-09-29 S05 Card114 c50 일반 suite 격리 — Claude 재확인 요청
 
