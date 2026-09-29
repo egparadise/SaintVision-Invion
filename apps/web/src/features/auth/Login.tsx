@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '@/shared/ui/Button';
 import { setAuthToken } from '@/shared/api/client';
-import { authConfig, beginLogin, completeLogin, hasLoginCallback, type SessionUser } from './session';
+import { authConfig, beginLogin, completeLogin, hasLoginCallback, registerSessionExpiration, type SessionUser } from './session';
 
 export interface LoginProps {
   onLoginSuccess: (user: SessionUser) => void;
@@ -22,8 +22,14 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, initialError }) =>
     if (!exchange.current && hasLoginCallback()) exchange.current = completeLogin();
     if (exchange.current) {
       setLoading(true);
-      exchange.current.then(({ token, user }) => {
-        if (active) { setAuthToken(token); success.current(user); }
+      exchange.current.then(({ token, user, expiresAt }) => {
+        if (active) {
+          setAuthToken(token);
+          if (typeof expiresAt === 'number') {
+            registerSessionExpiration(expiresAt);
+          }
+          success.current(user);
+        }
       }).catch(err => { if (active) setError(err.message); })
         .finally(() => { if (active) setLoading(false); });
     } else {

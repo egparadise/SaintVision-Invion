@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.141"
+version: "1.0.142"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-29T05:15:00+09:00"
+updated: "2026-09-30T00:05:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,21 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-29T05:15:00+09:00 (PR #245 Claude r3 H3-b 잔여 전수 조치 완결, Codex 계약 승인 유지).
+- 확인 기준: 2026-09-30T00:05:00+09:00 (Card 153 사내 IdP Keycloak 연동 FE 점검·수정 및 OIDC PKCE·토큰 만료·로그아웃 검증 완료).
+
+## 2026-09-30 사내 IdP(Keycloak) 연동 FE 점검·수정 및 OIDC PKCE·토큰 만료·로그아웃 검증 (Card 153, `agent/gemini/card153-idp-login`)
+- **개요**: 사내 IdP(Claude Card 152가 노드 .143에 배포한 Keycloak) 연동을 위한 FE 전면 점검 및 조치 완료: (1) OIDC Authorization Code + PKCE(RFC 7636 S256, nonce, state), (2) 동적 issuer 및 clientId 설정 해석(Keycloak auth/token/logout 엔드포인트 자동 도출 및 하드코딩/dev 폴백 원천 배제), (3) dev IdP 가정 및 비암호화 원격 HTTP 전면 차단, (4) 제어 평면 서버 계약 준수 토큰 유효기간(0 < exp - iat <= 3600) 이중 가드 및 능동 세션 만료 타이머·[AUTH-0050] 재로그인 안내 배너, (5) OIDC RP-Initiated 로그아웃 및 인메모리/스토리지 무결 청소, (6) Mock OIDC 종합 검증 스위트 완비.
+- **담당 및 역할**: Gemini (Frontend / UI / 웹 배포 소유). Reviewer: Claude (UI·테스트 축), 제어 평면 계약 합의 (계약 축).
+- **관측 근거 (Evidence)**:
+  - 신규 OIDC 종합 계약 시험: `apps/web/tests/auth-oidc-contract.test.ts` (20 passed)
+  - 기존 인증 및 PKCE 회귀 시험: `apps/web/tests/auth-session.test.ts` (17 passed), `apps/web/tests/auth-pkce.test.ts` (4 passed)
+  - 전체 Vitest 스위트: 90 test files / 940 passed 100% (0 failed)
+  - TypeScript 점검: `npx tsc -b` 타입 에러 0건
+  - 프로덕션 번들 빌드: `npm run build` 성공 (Vite production bundle 정상 생성)
+  - 프런트엔드 무결성 점검: `python tools/check_frontend_integrity.py` 92개 파일 스캔, 9대 무결성 규칙 위반 0건 (exit 0)
+  - 계약 바인딩 점검: `python tools/check_contract_bindings.py` 55개 픽스처 전수 커버리지, 14개 리플레이 가드 PASS (exit 0)
+  - 라우트 커버리지 점검: `pytest tests/test_route_coverage.py` 40 passed 100% (exit 0)
+- **전문 문서**: [[2026-09-30_00-05-00_KST_Card153_Corporate_IdP_Login_FE_Gemini]]
 
 ## 2026-09-29 프런트엔드 비차단 후속 감사 지적사항 통합 조치 완료 (Card 138, `agent/gemini/card138-fe-bundle`)
 - **개요**: 앞선 검토(PR #219, #228, #212, #178, #190)에서 비차단으로 남겨진 6대 후속 과제 전수 조치 및 되돌리면 실패하는 자동화 시험 완비.

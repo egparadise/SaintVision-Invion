@@ -24,6 +24,7 @@ import { EvidenceViewer } from '@/features/evidence/EvidenceViewer';
 import { ApprovalCenter } from '@/features/approvals/ApprovalCenter';
 import { WebTerminal } from '@/features/terminal/WebTerminal';
 import { Login } from '@/features/auth/Login';
+import { clearSessionExpiration, onTokenExpired, performLogout } from '@/features/auth/session';
 import { DeveloperStudio } from '@/features/studio/DeveloperStudio';
 import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem, ProjectItem } from '@/contracts/types';
 import { apiClient, clearAuthToken, isRouteNotFoundError, onUnauthorized } from '@/shared/api/client';
@@ -101,6 +102,7 @@ export const App: React.FC = () => {
   const nodeRequest = useRef(0);
 
   const resetAuthenticatedState = React.useCallback((errorMessage?: string | null) => {
+    clearSessionExpiration();
     clearAuthToken();
     _resetKernelMutationCache();
     sessionRef.current += 1;
@@ -165,6 +167,13 @@ export const App: React.FC = () => {
       resetAuthenticatedState(`[${problem.code}] ${problem.detail}`);
     });
     return () => onUnauthorized(null);
+  }, [resetAuthenticatedState]);
+
+  useEffect(() => {
+    const unsubscribe = onTokenExpired((reason) => {
+      resetAuthenticatedState(reason);
+    });
+    return () => unsubscribe();
   }, [resetAuthenticatedState]);
 
   const selectedProject = projects.find(p => p.id === projectId);
@@ -537,6 +546,7 @@ export const App: React.FC = () => {
         }}
         currentUser={currentUser}
         onLogout={() => {
+          performLogout();
           resetAuthenticatedState(null);
         }}
       />
