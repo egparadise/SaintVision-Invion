@@ -284,10 +284,12 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   const [pinLoading, setPinLoading] = useState(false);
   const [pinResult, setPinResult] = useState<RetentionPinResponse | null>(null);
 
-  // Release form state (pending server idempotency contract Card 113)
+  // Release form state (Card 118: server idempotency contract active)
   const [relLicensePolicy, setRelLicensePolicy] = useState('Apache-2.0');
   const [relClassification, setRelClassification] = useState<'public' | 'internal' | 'restricted'>('internal');
-  const [relResult] = useState<ModelReleaseResponse | null>(null);
+  const [relLoading, setRelLoading] = useState(false);
+  const [relResult, setRelResult] = useState<ModelReleaseResponse | null>(null);
+  const [relIsReplay, setRelIsReplay] = useState(false);
 
   // Idempotency keys preserved per submission intent
   const [regIdempotencyKey, setRegIdempotencyKey] = useState<string>(() =>
@@ -296,6 +298,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   const [pinIdempotencyKey, setPinIdempotencyKey] = useState<string>(() =>
     modelRegistryObservation.generateIdempotencyKey('pin')
   );
+  const [relIdempotencyKey, setRelIdempotencyKey] = useState<string>(() =>
+    modelRegistryObservation.generateIdempotencyKey('rel')
+  );
+  const submittedRelKeysRef = useRef<Set<string>>(new Set());
 
   // ProblemDetails error and Live Region
   const [problemDetails, setProblemDetails] = useState<ProblemDetails | null>(null);
@@ -403,8 +409,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
     setEvalLoading(false);
     setRegLoading(false);
     setPinLoading(false);
+    setRelLoading(false);
     setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
     setPinIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('pin'));
+    setRelIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('rel'));
     setVerifyIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w3'));
     setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
   };
@@ -428,8 +436,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
     setVerifyLoading(false);
     setRegLoading(false);
     setPinLoading(false);
+    setRelLoading(false);
     setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
     setPinIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('pin'));
+    setRelIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('rel'));
     setVerifyIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w3'));
   };
 
@@ -448,7 +458,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
     verifyGenerationRef.current++;
     setVerifyLoading(false);
     setPinLoading(false);
+    setRelLoading(false);
     setPinIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('pin'));
+    setRelIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('rel'));
     setVerifyIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w3'));
   };
 
@@ -493,6 +505,8 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
     relAbortControllerRef.current?.abort();
     relAbortControllerRef.current = null;
     relGenerationRef.current++;
+    setRelLoading(false);
+    setRelIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('rel'));
   };
 
   const handleRelClassificationChange = (val: 'public' | 'internal' | 'restricted') => {
@@ -500,6 +514,8 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
     relAbortControllerRef.current?.abort();
     relAbortControllerRef.current = null;
     relGenerationRef.current++;
+    setRelLoading(false);
+    setRelIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('rel'));
   };
 
   const handleVerifyMeasurementIdChange = (val: string) => {
@@ -715,10 +731,60 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   const handleReleaseModel = async (e: React.FormEvent) => {
     e.preventDefault();
     clearErrors();
-    // Fail-closed guard: pending server idempotency contract (Card 113)
-    setGeneralError('서버 멱등 계약 대기(카드 113): 백엔드 릴리스 멱등성 계약 수립 전까지 릴리스 쓰기 요청이 차단됩니다.');
-    setLiveAnnouncement('모델 릴리스 차단: 서버 멱등 계약 대기(카드 113)');
-    return;
+    if (!canApprove) {
+      setGeneralError('승인 권한(canApprove)이 없는 계정은 모델을 릴리스할 수 없습니다.');
+      return;
+    }
+    if (!projectId.trim() || !modelId.trim() || !version.trim()) {
+      setGeneralError('프로젝트 ID, 모델 ID, 버전을 확인하세요.');
+      return;
+    }
+    if (!relLicensePolicy.trim()) {
+      setGeneralError('라이선스 정책(licensePolicy)을 입력해야 합니다.');
+      return;
+    }
+
+    relAbortControllerRef.current?.abort();
+    const ctrl = new AbortController();
+    relAbortControllerRef.current = ctrl;
+    const currentGen = ++relGenerationRef.current;
+
+    const isReplaySubmission = submittedRelKeysRef.current.has(relIdempotencyKey);
+    // Key is recorded at transmission time (regardless of outcome) so that retries with the same key are identified as resubmissions
+    submittedRelKeysRef.current.add(relIdempotencyKey);
+
+    setRelLoading(true);
+    setLiveAnnouncement(`모델 릴리스 요청 중 (분류: ${relClassification})...`);
+    try {
+      const res = await modelRegistryObservation.releaseModelVersion(
+        projectId.trim(),
+        modelId.trim(),
+        version.trim(),
+        {
+          licensePolicy: relLicensePolicy.trim(),
+          classification: relClassification,
+        },
+        { signal: ctrl.signal, idempotencyKey: relIdempotencyKey }
+      );
+      if (relGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
+      setRelResult(res);
+      setRelIsReplay(isReplaySubmission);
+      // Key rotates ONLY after success!
+      setRelIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('rel'));
+      if (isReplaySubmission) {
+        setLiveAnnouncement(`재시도 응답 수신(서버 원장 결과): [${res.version}] (Stage: ${res.stage})`);
+      } else {
+        setLiveAnnouncement(`신규 모델 릴리스 완료: [${res.version}] (Stage: ${res.stage})`);
+      }
+    } catch (err: unknown) {
+      if (relGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
+      handleApiError(err, '모델 릴리스 실패');
+      // On failure, Idempotency-Key is preserved for retry!
+    } finally {
+      if (relGenerationRef.current === currentGen || relAbortControllerRef.current === ctrl) {
+        setRelLoading(false);
+      }
+    }
   };
 
   const handleVerifyVersion = async (e: React.FormEvent) => {
@@ -1340,33 +1406,22 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 </select>
               </div>
             </div>
-            <div
-              data-testid="banner-release-pending-idempotency"
-              style={{
-                fontSize: '11px',
-                color: '#d29922',
-                backgroundColor: '#2b2111',
-                padding: '8px 12px',
-                borderRadius: '6px',
-                border: '1px solid #9e6a03',
-              }}
-            >
-              ⚠️ 서버 멱등 계약 대기(카드 113): 백엔드 release route(model_release.py)의 Idempotency-Key 처리 계약이 수립될 때까지 쓰기 작업이 fail-closed로 비활성화됩니다.
-            </div>
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
               <Button
                 size="sm"
                 variant="primary"
                 type="submit"
                 data-testid="btn-release-model"
-                disabled={true}
-                aria-disabled="true"
+                disabled={relLoading || !canApprove || !projectId.trim() || !modelId.trim() || !version.trim() || !relLicensePolicy.trim()}
+                aria-disabled={relLoading || !canApprove || !projectId.trim() || !modelId.trim() || !version.trim() || !relLicensePolicy.trim()}
               >
-                모델 릴리스 (POST /release) — 서버 멱등 계약 대기(카드 113)
+                {relLoading ? '릴리스 중...' : '모델 릴리스 (POST /release)'}
               </Button>
-              <span style={{ fontSize: '11px', color: '#fed7aa' }}>
-                ⚠️ 서버 멱등 계약 대기(카드 113)
-              </span>
+              {!canApprove && (
+                <span style={{ fontSize: '11px', color: '#fed7aa' }}>
+                  ⚠️ 승인 권한(canApprove)이 필요한 작업입니다.
+                </span>
+              )}
             </div>
           </form>
         )}
@@ -1768,13 +1823,24 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           style={{
             padding: '14px 18px',
             borderRadius: '8px',
-            backgroundColor: 'rgba(46, 160, 67, 0.12)',
-            border: '1px solid #3fb950',
-            color: '#3fb950',
+            backgroundColor: relIsReplay ? 'rgba(56, 139, 253, 0.12)' : 'rgba(46, 160, 67, 0.12)',
+            border: `1px solid ${relIsReplay ? '#388bfd' : '#3fb950'}`,
+            color: relIsReplay ? '#58a6ff' : '#3fb950',
             fontSize: '13px',
           }}
         >
-          <div style={{ fontWeight: 600 }}>✔ 모델 릴리스 완료 (200 OK)</div>
+          <div style={{ fontWeight: 600 }}>
+            {relIsReplay
+              ? 'ℹ️ 모델 릴리스 확인 완료 (재시도 응답 — 서버 원장 결과, 200 OK)'
+              : '✔ 모델 릴리스 완료 (200 OK)'}
+          </div>
+          <div style={{ marginTop: '4px', fontSize: '11px', color: '#8b949e' }}>
+            <span data-testid="release-replay-indicator">
+              {relIsReplay
+                ? '재시도 응답 — 서버 원장 결과 (저장된 응답일 수 있음)'
+                : '신규 릴리스 완료 (Fresh)'}
+            </span>
+          </div>
           <div style={{ marginTop: '6px', fontSize: '12px', color: '#c9d1d9', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px' }}>
             <div>Version ID: <code>{relResult.modelVersionId}</code></div>
             <div>Version: <strong>{relResult.version}</strong></div>
@@ -2542,6 +2608,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 </div>
               )}
             </div>
+
             {/* Records per adapter (RECORDED branch, design #218 v1.2 §4-1) */}
             {conformanceData.status === 'RECORDED' && (
               <div style={{ overflowX: 'auto' }}>
@@ -2596,6 +2663,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 </table>
               </div>
             )}
+
             {/* Dynamic Checklist Table from API Response (FE Hardcoding Prohibited) */}
             <div style={{ overflowX: 'auto' }}>
               <div style={{ fontSize: '13px', fontWeight: 600, color: '#f0f6fc', marginBottom: '8px' }}>

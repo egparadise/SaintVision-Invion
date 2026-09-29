@@ -4,7 +4,7 @@ title: "Gemini 작업 현황"
 version: "1.0.139"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-29T02:05:00+09:00"
+updated: "2026-09-29T03:05:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,6 +19,37 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
+- 확인 기준: 2026-09-29T03:05:00+09:00 (최신 tip `agent/gemini/g05-fe-release-reexpose`, 카드 118 Claude M1/L1~L3 및 Codex C1/C2 전수 반영 완결).
+
+## 2026-09-29 G-05 FE 모델 릴리스 쓰기 UI 재노출 및 서버 멱등 계약 연동 (카드 118, PR #229 기반)
+
+- **작업 브랜치**: `agent/gemini/g05-fe-release-reexpose` (base: `agent/claude/release-idempotency` `41fe5c3c` 위 PR #219 head `f23c0423` 머지 `70b410f5`).
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude (UI·테스트 축), Codex (계약 축).
+- **작업 내용 (카드 118 전수 완결)**:
+  1. **`releaseModelVersion` API 클라이언트 멱등키 복원**: `ReleaseModelVersionOptions`에 `idempotencyKey?: string` 복원 및 `Idempotency-Key` 헤더 1:1 전송.
+  2. **릴리스 쓰기 UI 재노출 및 3단 멱등키 수명주기**:
+     - 카드 113 대기 배너 제거 및 제출 버튼 활성화 (`canApprove === true`).
+     - 실패 재시도 시 동일 `relIdempotencyKey` 보존.
+     - 라이선스 정책, 분류, 모델/버전 변경 시 새 키로 즉시 회전.
+     - 성공 수신 후 다음 제출을 위해 새 키로 자동 회전.
+     - `canApprove === false` 또는 `undefined` 시 fail-closed 방어 (버튼 disabled, 폼 서밋 시 0 network calls, alert 표출).
+  3. **Replay 응답 정직화 표시 (Zero Deception)**:
+     - `release-replay-indicator` 배지 추가: 신규 릴리스(`신규 릴리스 완료 (Fresh)`)와 서버 레저 재생 응답(`재생(Replay) 응답: 기존 멱등성 키에 의해 저장된 릴리스 결과입니다.`)을 분리 표출.
+  4. **계약 스키마 동기화**:
+     - `npm run contracts:generate`를 통해 `model-release-request.ts` 주석 최신화 및 `npm run contracts:check` 31종 전수 일치 확인.
+  5. **되돌리면 실패하는 엄격한 회귀 시험 (총 24개 시험)**:
+     - `apps/web/tests/model-registry-business-routes.test.tsx`: Test 4 (헤더 전송), Test 20 (재노출 및 Fresh indicator, 성공 후 회전), Test 21 (실패 재시도 키 보존 및 replay indicator), Test 22 (입력 변경 시 키 회전), Test 23 (fail-closed 권한 가드).
+- **실측 검증**:
+  - Vitest: `apps/web/tests/model-registry-business-routes.test.tsx` 24 passed (856ms). (웹 전체 80 test files / 757 passed, 0 failures).
+  - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run contracts:check` 31 types PASS, `npm run build` dist/ 번들 생성 성공 (`dist/assets/index-BQ0CZaki.js` 881.08 kB, exit 0).
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (2.12s, exit 0).
+  - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --apply` PASS (0 conflicts).
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-29_02-13-00_KST_G05_Release_Reexpose_FE_Gemini.md` (v1.0.1).
+- **PR 상태**: PR #239 (`agent/claude/release-idempotency` 대상).
+
+- 이전 확인 기준: 2026-09-29T00:20:00+09:00 (최신 tip `agent/gemini/g05-fe-model-registry`, PR #219 Codex r4 F1 조치: Release 쓰기 UI fail-closed 미노출 및 Idempotency-Key 헤더 제거).
+
 - 확인 기준: 2026-09-29T02:05:00+09:00 (최신 tip `agent/gemini/g05-fe-verify-eval`, PR #228 1차·2차·3차 리뷰 조치 완료: H1~H3, M1~M5, L1~L5, N1~N2 전수 반영).
 
 ## 2026-09-29 G-05 W3 Verify 및 W5 Eval Run Codex/Claude 1차·2차·3차 리뷰 조치 (PR #228)
