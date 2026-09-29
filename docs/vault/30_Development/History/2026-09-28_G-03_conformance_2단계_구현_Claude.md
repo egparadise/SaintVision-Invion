@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-G03-CONFORMANCE-STAGE2-IMPL-001"
 title: "G-03 2단계 구현 — conformance 실행 기록 저장(0055)·RECORDED branch·fixture 생산자·host 결속"
-version: "1.1.0"
+version: "1.1.1"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T23:28:08+09:00"
+updated: "2026-09-29T10:29:42+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S10-BE"]
@@ -44,7 +44,7 @@ Backend 36432549781: 3.12/3.14 각 **25 failed / 4476 passed / 50 skipped / 2 de
 
 ### 3-2. Codex 1차 수정 요청 (head `dd4adf40`) — 3건 반영
 - **F1**(migration/definer 정본·head 시험 0054 고정) → `f1926427`(§3-1). `git grep -n '0054_model_version_measurements'` 전수: 남은 곳은 0054 자기 migration·`down_revision` 단언·0054 real-PG의 자기 revision 단언·AC-11 tail(0055 포함)뿐.
-- **F2**(T5b/착지 단위 — #208 FE fixture와 RECORDED 소비자) → #208 head `0f0d82df`를 해소만으로 merge(`3104a211`, 충돌 0, classcheck ok)한 뒤 소비자 delta를 **이 PR에 포함**: `apps/web/scripts/api-response-contracts.mjs`에 계약 3개 등록 → `node scripts/api-response-contracts.mjs --write`로 생성 TS 3개(`--check` PASS 20), `shared/api/adapterObservation.ts`에 `isConformanceCheckOutcome`·`isConformanceRecordItem`·`isConformanceStatusRecordedResponse`·`isConformanceStatusUnion` strict guard(exact key·subject/provenance const·counts↔outcomes 재대조·`latestRecordedAt` = max·adapters 순서) + `fetchConformanceStatus`가 union 반환, `ModelLineageView.tsx`가 RECORDED를 "기록됨 (RECORDED)"·어댑터별 기록 표(subject/provenance·counts 한국어 라벨, 'PASS'·'100%' 없음)·check별 tally로 그림(NOT_OBSERVED 렌더링·testid 무변경), `tests/model-lineage.test.ts` fixture reason을 새 문장으로 고정(T5b)하고 RECORDED guard 부정 14건 + 렌더링 시험 추가. vitest·tsc는 로컬 미실행(금지) — esbuild 문법 검사만, 결과는 hosted Frontend run.
+- **F2**(T5b/착지 단위 — #208 FE fixture와 RECORDED 소비자) → #208 head `0f0d82df`를 해소만으로 merge(`3104a211`, 충돌 0, classcheck ok)한 뒤 소비자 delta를 **이 PR에 포함**: `apps/web/scripts/api-response-contracts.mjs`에 계약 3개 등록 → `node scripts/api-response-contracts.mjs --write`로 생성 TS 3개(`--check` PASS 20), `shared/api/adapterObservation.ts`에 `isConformanceCheckOutcome`·`isConformanceRecordItem`·`isConformanceStatusRecordedResponse`·`isConformanceStatusUnion` strict guard(exact key·subject/provenance const·counts↔outcomes 재대조·`latestRecordedAt` = max·adapters 순서) + `fetchConformanceStatus`가 union 반환, `ModelLineageView.tsx`가 RECORDED를 "기록됨 (RECORDED)"·어댑터별 기록 표(subject/provenance·counts 한국어 라벨, 'PASS'·'100%' 없음)·check별 tally로 그림(NOT_OBSERVED 렌더링·testid 무변경), `apps/web/tests/model-lineage.test.ts` fixture reason을 새 문장으로 고정(T5b)하고 RECORDED guard 부정 14건 + 렌더링 시험 추가. vitest·tsc는 로컬 미실행(금지) — esbuild 문법 검사만, 결과는 hosted Frontend run.
 - **F3**(DB-valid row가 고정 SYS-0002를 우회) → `to_recorded()`가 contract_version/suite_contract_version(1..32, 공백 없음)·counts 정수를 먼저 검사해 `StoredRecordInvalid`, route는 응답 조립을 `_assembled()`로 감싸 `ValidationError`도 같은 고정 `SYS-0002`로(2중 망). PG-free: reader 부정 7 + "lifted는 항상 item으로 validate"(bound 상수 = schema bound) + route stub 시험; 실 PG TAMPERINGS에 `empty-contract-version` 추가(목록·단건 고정 detail, 값 비노출). 로컬 3파일 213 passed.
 
 ## 4. 다음
