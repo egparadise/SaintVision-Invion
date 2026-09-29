@@ -40,11 +40,11 @@ tags: ["s10-fe", "g-05", "card-118", "model-release", "idempotency", "re-exposur
 3. **Replay 응답 정직화 표시 (Zero Deception)**:
    - 서버 레저에서 기존 키에 의해 재현된 replay 응답을 신규 릴리스 완료인 것처럼 오인하지 않도록 `release-replay-indicator` 배지 추가.
    - 클라이언트 제출 이력 추적(`submittedRelKeysRef`)을 통해 신규 릴리스(`신규 릴리스 완료 (Fresh)`)와 재현 응답(`재생(Replay) 응답: 기존 멱등성 키에 의해 저장된 릴리스 결과입니다.`)을 명확히 구분하여 사용자 및 스크린 리더(`aria-live`)에 안내.
-4. **계약 스키마 1:1 일치 (`contracts/model-release-request`, `model-release-response`)**:
+4. **계약 스키마 1:1 일치 (`contracts/model-release-request.schema.json`, `model-release-response`)**:
    - 요청: `licensePolicy` (1~200자), `classification` (`public | internal | restricted`).
    - 응답: `modelVersionId`, `modelId`, `version`, `stage: 'released'`, `contentSha256`.
    - `npm run contracts:generate`를 통해 최신 schema 주석 동기화 및 `npm run contracts:check` 통과 확인.
-5. **되돌리면 실패하는 엄격한 회귀 시험 체계 (`tests/model-registry-business-routes.test.tsx`)**:
+5. **되돌리면 실패하는 엄격한 회귀 시험 체계 (`apps/web/tests/model-registry-business-routes.test.tsx`)**:
    - **Test 4**: `releaseModelVersion` 클라이언트 호출 시 `Idempotency-Key` 헤더 전송 및 200 응답 파싱 검증.
    - **Test 20**: 릴리스 쓰기 UI 재노출 검증 (버튼 활성화, 배너 미노출, Idempotency-Key 헤더 전송, 신규 릴리스 indicator 확인, 성공 후 키 회전 실측).
    - **Test 21**: 릴리스 실패(503 SYS-0001) 재시도 시 동일 Idempotency-Key 보존 및 재현 응답 검증.
@@ -81,7 +81,7 @@ tags: ["s10-fe", "g-05", "card-118", "model-release", "idempotency", "re-exposur
 ## 3. 실측 검증 증거
 
 - **단위/통합 테스트 (Vitest)**:
-  - `tests/model-registry-business-routes.test.tsx`: **24 passed** (2312ms, 0 failures)
+  - `apps/web/tests/model-registry-business-routes.test.tsx`: **24 passed** (2312ms, 0 failures)
   - 웹 전체: **80 test files / 758 passed** (24.12s, 0 failures)
 - **TypeScript 타입 컴파일 & 프로덕션 번들 빌드**:
   - `cd apps/web && npx tsc -b`: **0 errors** (exit 0)
