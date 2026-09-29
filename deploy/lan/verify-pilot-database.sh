@@ -40,12 +40,18 @@ admin=$(docker exec "$container" sh -ec \
     'PGPASSWORD=$(cat /run/secrets/postgres-password); export PGPASSWORD; exec psql -h 127.0.0.1 -U postgres -d saintvision_lan -Atqc "SELECT current_user"')
 runtime=$(docker exec "$container" sh -ec \
     'PGPASSWORD=$(cat /run/secrets/runtime-password); export PGPASSWORD; exec psql -h 127.0.0.1 -U inv_lan_runtime -d saintvision_lan -Atqc "SELECT current_user"')
+runtime_privileges=$(docker exec "$container" sh -ec \
+    'PGPASSWORD=$(cat /run/secrets/postgres-password); export PGPASSWORD; exec psql -U postgres -d saintvision_lan -Atqc "SELECT rolsuper, rolbypassrls, rolcreatedb, rolcreaterole, rolreplication FROM pg_roles WHERE rolname = '\''inv_lan_runtime'\''"')
 methods=$(docker exec "$container" sh -ec \
     'PGPASSWORD=$(cat /run/secrets/postgres-password); export PGPASSWORD; exec psql -U postgres -d saintvision_lan -Atqc "SELECT string_agg(DISTINCT auth_method, '"'"','"'"' ORDER BY auth_method) FROM pg_hba_file_rules WHERE type='"'"'host'"'"' AND error IS NULL"')
 encryption=$(docker exec "$container" sh -ec \
     'PGPASSWORD=$(cat /run/secrets/postgres-password); export PGPASSWORD; exec psql -U postgres -d saintvision_lan -Atqc "SHOW password_encryption"')
 [[ "$admin" == postgres && "$runtime" == inv_lan_runtime ]] || {
     echo 'Pilot database credentials are not role-bound.' >&2
+    exit 1
+}
+[[ "$runtime_privileges" == 'f|f|f|f|f' ]] || {
+    echo 'Pilot runtime role has elevated privileges.' >&2
     exit 1
 }
 [[ "$methods" == scram-sha-256 && "$encryption" == scram-sha-256 ]] || {

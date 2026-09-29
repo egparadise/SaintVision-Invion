@@ -112,9 +112,8 @@ done
 docker exec -i "$container" sh -s <<'CONTAINER' >/dev/null
 set -eu
 export PGPASSWORD="$(cat /run/secrets/postgres-password)"
-runtime_password=$(cat /run/secrets/runtime-password)
-psql -U postgres -d saintvision_lan -v ON_ERROR_STOP=1 \
-    --set=runtime_password="$runtime_password" <<'SQL'
+psql -U postgres -d saintvision_lan -v ON_ERROR_STOP=1 <<'SQL'
+\set runtime_password `cat /run/secrets/runtime-password`
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'inv_lan_runtime') THEN
@@ -122,7 +121,10 @@ BEGIN
     END IF;
 END
 $$;
-SELECT format('ALTER ROLE inv_lan_runtime PASSWORD %L', :'runtime_password') \gexec
+SELECT format(
+    'ALTER ROLE inv_lan_runtime LOGIN NOSUPERUSER NOBYPASSRLS NOCREATEDB NOCREATEROLE NOREPLICATION PASSWORD %L',
+    :'runtime_password'
+) \gexec
 SQL
 CONTAINER
 printf '{"database":"ready","listen":"127.0.0.1:%s","authenticationBoundary":"scram-plus-ssh-tunnel","credentialStorage":"operator-private-files","network":"dedicated-user-defined"}\n' "$host_port"

@@ -576,6 +576,7 @@ def test_external_database_dsn_requires_exact_private_passfile_and_loopback(tmp_
 def test_remote_database_script_uses_scram_dedicated_network_and_private_files():
     root = Path(__file__).resolve().parents[1]
     script = (root / "deploy/lan/prepare-pilot-database.sh").read_text(encoding="utf-8")
+    verifier = (root / "deploy/lan/verify-pilot-database.sh").read_text(encoding="utf-8")
 
     assert "POSTGRES_HOST_AUTH_METHOD=trust" not in script
     assert "--auth-host=scram-sha-256 --auth-local=scram-sha-256" in script
@@ -585,6 +586,12 @@ def test_remote_database_script_uses_scram_dedicated_network_and_private_files()
     assert '--publish "127.0.0.1:${host_port}:5432"' in script
     assert "POSTGRES_PASSWORD_FILE=/run/secrets/postgres-password" in script
     assert 'credentialStorage":"operator-private-files' in script
+    assert "--set=runtime_password" not in script
+    assert "\\set runtime_password `cat /run/secrets/runtime-password`" in script
+    assert "ALTER ROLE inv_lan_runtime LOGIN NOSUPERUSER NOBYPASSRLS" in script
+    assert "NOCREATEDB NOCREATEROLE NOREPLICATION" in script
+    assert "rolsuper, rolbypassrls, rolcreatedb, rolcreaterole, rolreplication" in verifier
+    assert "'f|f|f|f|f'" in verifier
 
 
 def test_bind_db_auth_requires_negative_rejection_and_role_bound_credentials(
@@ -610,6 +617,7 @@ def test_bind_db_auth_requires_negative_rejection_and_role_bound_credentials(
     admin_passfile.chmod(0o600)
     runtime_passfile.chmod(0o600)
     rejected = []
+    runtime_privileges = [False, False, False, False, False]
 
     class Result:
         def __init__(self, *, one=None, rows=None):
@@ -637,6 +645,8 @@ def test_bind_db_auth_requires_negative_rejection_and_role_bound_credentials(
                 return Result(one=("scram-sha-256",))
             if "pg_hba_file_rules" in query:
                 return Result(rows=[("scram-sha-256",), ("scram-sha-256",)])
+            if "FROM pg_roles" in query:
+                return Result(one=tuple(runtime_privileges))
             if query == "SELECT current_user":
                 return Result(one=(self.info["user"],))
             raise AssertionError(query)
@@ -668,6 +678,16 @@ def test_bind_db_auth_requires_negative_rejection_and_role_bound_credentials(
     assert json.loads(output)["wrongCredentialRejected"] is True
     assert "a" * 64 not in output
     assert "b" * 64 not in output
+
+    runtime_privileges[0] = True
+    with pytest.raises(ValueError, match="elevated privileges"):
+        lan_pilot.bind_db_auth(
+            Namespace(
+                state=tmp_path,
+                admin_passfile=admin_passfile,
+                runtime_passfile=runtime_passfile,
+            )
+        )
 
 
 def test_prebuilt_image_archive_is_bound_to_inspection_and_tag(tmp_path):

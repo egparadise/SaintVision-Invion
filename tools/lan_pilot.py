@@ -227,6 +227,12 @@ def bind_db_auth(args):
         ]
         if encryption != "scram-sha-256" or not methods or set(methods) != {"scram-sha-256"}:
             raise ValueError("Pilot database host authentication is not exclusively SCRAM")
+        role_privileges = conn.execute(
+            "SELECT rolsuper, rolbypassrls, rolcreatedb, rolcreaterole, rolreplication "
+            "FROM pg_roles WHERE rolname = 'inv_lan_runtime'"
+        ).fetchone()
+        if role_privileges != (False, False, False, False, False):
+            raise ValueError("Pilot runtime role has elevated privileges")
     with psycopg.connect(runtime_dsn) as conn:
         if conn.execute("SELECT current_user").fetchone()[0] != "inv_lan_runtime":
             raise ValueError("Pilot runtime credential is not role-bound")

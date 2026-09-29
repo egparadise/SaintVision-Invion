@@ -43,8 +43,8 @@ offline root라고 부르지 않는다.
 ```powershell
 python tools/intranet_pki.py `
   --ca-dir D:\Project\SaintVisionI-Invion\.work\intranet\https-ca `
-  --root-password-file D:\Project\SaintVisionI-Invion\.work\intranet\offline-secrets\https-root-key.pass `
-  init
+  init `
+  --root-password-file D:\Project\SaintVisionI-Invion\.work\intranet\offline-secrets\https-root-key.pass
 python tools/intranet_pki.py `
   --ca-dir D:\Project\SaintVisionI-Invion\.work\intranet\https-ca `
   issue-server --hostname cp.sv.lan --address 192.168.45.74 `

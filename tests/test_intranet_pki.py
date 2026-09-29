@@ -201,3 +201,25 @@ def test_public_pilot_evidence_is_redacted_and_bound_to_the_tooling():
     for relative_path, expected in evidence["source"]["toolSHA256"].items():
         actual = hashlib.sha256((REPO_ROOT / relative_path).read_bytes()).hexdigest()
         assert actual == expected
+
+
+def test_cli_accepts_root_password_after_init_subcommand(tmp_path: Path, monkeypatch, capsys):
+    ca_dir = tmp_path / "ca"
+    root_password = tmp_path / "offline-secret" / "root.pass"
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "intranet_pki.py",
+            "--ca-dir",
+            str(ca_dir),
+            "init",
+            "--root-password-file",
+            str(root_password),
+        ],
+    )
+
+    assert intranet_pki.main() == 0
+    output = json.loads(capsys.readouterr().out)
+    assert output["publicKeyAlgorithm"] == "ECDSA-P256"
+    assert root_password.is_file()
