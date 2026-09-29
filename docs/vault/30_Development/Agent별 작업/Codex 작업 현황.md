@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.229"
+version: "1.0.230"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T00:44:29+09:00"
+updated: "2026-09-30T00:47:04+09:00"
 source_of_truth: "Git"
 ---
 
@@ -32,6 +32,9 @@ source_of_truth: "Git"
   입력을 다시 요구한다. Node-local private key 경계는 그대로다.
 - pilot status/observe의 snapshot에서 tenant·epoch·nonce를 제거하고 profile·
   capacity·관측 시각만 남겼다. 정리 뒤 실제 state는 DB ready·observed 2다.
+- hosted Backend 두 버전의 유일한 실패였던 새 Docker label 미분류를
+  age-prunable 시험 owner가 아닌 persistent LAN runtime으로 분류했다. cleanup
+  inventory 포함 focused run은 69 passed이며 hosted 재실행 대상이다.
 - 첫 state의 `18443` 충돌은 숨기지 않고 실패 증거로 보존했다. 최종 state는
   immutable identity에 `18444`를 처음부터 넣었다. 공개 증거에는 비밀·DSN·
   tenant·epoch·nonce가 없다. [[사내망_PKI_LAN_pilot_운영절차_Codex]],

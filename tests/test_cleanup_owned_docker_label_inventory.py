@@ -20,6 +20,10 @@ NON_CLEANUP_LABELS = {
     "ai.saintvision.command",
     "ai.saintvision.config",
     "ai.saintvision.created-by",
+    # Card 150's LAN PostgreSQL is persistent operator pilot state, not an
+    # age-prunable test container. Its script validates the exact label/image
+    # before restart and never deletes an existing resource.
+    "ai.saintvision.lan-pilot",
     "ai.saintvision.node",
     "ai.saintvision.output",
     "ai.saintvision.pilot",

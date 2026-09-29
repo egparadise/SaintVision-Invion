@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-CODEX-20260930-CARD150"
 title: "사내망 PKI와 LAN pilot 재수립"
-version: "1.0.4"
+version: "1.0.5"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T00:44:29+09:00"
+updated: "2026-09-30T00:47:04+09:00"
 source_of_truth: "Git"
 ---
 
@@ -57,8 +57,12 @@ Card 152 inventory는 5행을 갖지만 필수값 71개가 비어 있었다. 정
 
 - Python 3.14 venv:
   `tests/test_intranet_pki.py`, `tests/test_lan_pilot_multinode.py`,
-  `tests/test_s01_readiness_preflight.py` focused run **68 passed**. Black 검사와
-  compileall도 exit 0이다.
+  `tests/test_s01_readiness_preflight.py`와 Docker label inventory focused run
+  **69 passed**. Black 검사와 compileall도 exit 0이다.
+- 첫 hosted Backend 3.12/3.14는 제품 시험 5,610건 뒤 새 persistent label
+  `ai.saintvision.lan-pilot`의 cleanup 정책 미분류 1건으로 실패했다. 이를
+  age-prunable owner가 아닌 persistent runtime label로 명시하고 focused
+  회귀를 통과시켰다.
 - 실제 `.143`: Docker 29.1/API 1.52, 12 CPU,
   `MemAvailable=12,406,200 KiB`; `.210`: Docker 29.8/API 1.56, 12 CPU,
   `MemAvailable=14,036,016 KiB`.
