@@ -148,6 +148,7 @@ printf '%s\n' "$ADMIN_ALIAS" "$SVC_KEY" "$SVC_SECRET" "$PITR_KEY" "$PITR_SECRET"
     export MC_HOST_local
     /usr/bin/mc mb --ignore-existing local/saintvision-objects >/dev/null
     /usr/bin/mc mb --ignore-existing local/saintvision-pitr >/dev/null
+    /usr/bin/mc version enable local/saintvision-pitr >/dev/null
     /usr/bin/mc admin policy create local saintvision-product /tmp/product-policy.json >/dev/null
     /usr/bin/mc admin policy create local saintvision-pitr /tmp/pitr-policy.json >/dev/null
     /usr/bin/mc admin user add local "$SVC_KEY" "$SVC_SECRET" >/dev/null

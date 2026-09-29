@@ -35,6 +35,9 @@ fail() {
   exit 2
 }
 
+case "$CODE_SHA" in *[!0-9a-f]*|'') fail 'SV_CODE_SHA must be a lowercase 40-hex commit' ;; esac
+[ "${#CODE_SHA}" -eq 40 ] || fail 'SV_CODE_SHA must be a lowercase 40-hex commit'
+
 write_blocked_report() {
   reason="$1"
   python3 - "$REPORT" "$RUN_ID" "$CODE_SHA" "$reason" <<'PY'
@@ -181,8 +184,19 @@ if [ "$(docker inspect --format '{{.State.Running}}' "$RECEIVER")" != true ]; th
   write_blocked_report "$reason"
   fail 'WAL receiver did not start'
 fi
+attempt=0
+while [ "$(source_psql postgres -At -c "SELECT count(*) FROM pg_stat_replication WHERE application_name='pg_receivewal' AND state='streaming'")" -lt 1 ]; do
+  attempt=$((attempt + 1))
+  [ "$attempt" -lt 15 ] || fail 'WAL receiver is running but not streaming'
+  sleep 1
+done
 
 # Do not mutate the source until the physical replication boundary is proven.
+SOURCE_ARCHIVE_MODE="$(source_psql postgres -At -c 'SHOW archive_mode')"
+SOURCE_SERVER_VERSION_NUM="$(source_psql postgres -At -c 'SHOW server_version_num')"
+SOURCE_DB_USER="$(source_psql postgres -At -c 'SELECT current_user')"
+IMAGE_MAJOR="$(docker run --rm "$POSTGRES_IMAGE" postgres --version | sed -n 's/.* \([0-9][0-9]*\).*/\1/p')"
+[ "$((SOURCE_SERVER_VERSION_NUM / 10000))" = "$IMAGE_MAJOR" ] || fail 'source and restore PostgreSQL major versions differ'
 source_psql postgres -c "CREATE DATABASE $DB" >/dev/null
 DB_CREATED=true
 source_psql "$DB" -c 'CREATE TABLE public.card151_pitr_marker(label text PRIMARY KEY, committed_at timestamptz NOT NULL DEFAULT clock_timestamp())' >/dev/null
@@ -211,6 +225,7 @@ while :; do
 done
 remove_owned "$RECEIVER"
 
+RETENTION_TOOL_SHA256="$(sha256sum "$RETENTION_TOOL" | awk '{print $1}')"
 python3 "$RETENTION_TOOL" --archive "$ARCHIVE" --backups "$BACKUPS" --days 7 > "$RUN_DIR/retention-plan.json"
 
 # The transient transfer container mounts only the scoped credential file, the
@@ -222,6 +237,7 @@ mc_container \
   "$MINIO_IMAGE" /bin/sh -ceu "$MC_WRAPPER" shell /usr/bin/mc mirror --overwrite /evidence \
   "pitr/saintvision-pitr/pilot/rehearsals/$RUN_ID" >/dev/null
 
+restore_started_ns="$(date +%s%N)"
 mkdir -p "$DOWNLOAD"
 chmod 700 "$DOWNLOAD"
 mc_container \
@@ -241,7 +257,6 @@ recovery_target_action = 'promote'
 EOF
 : > "$RESTORE/recovery.signal"
 
-restore_started_ns="$(date +%s%N)"
 docker run -d \
   --name "$RESTORE_CONTAINER" \
   --label ai.saintvision.owner=codex \
@@ -258,7 +273,7 @@ docker run -d \
   --entrypoint postgres \
   "$POSTGRES_IMAGE" -D /var/lib/postgresql/data -k /tmp >/dev/null
 attempt=0
-until docker exec "$RESTORE_CONTAINER" pg_isready -h /tmp -U postgres -d "$DB" >/dev/null 2>&1; do
+until [ "$(docker exec "$RESTORE_CONTAINER" psql -h /tmp -U "$SOURCE_DB_USER" -d "$DB" -At -c 'SELECT NOT pg_is_in_recovery()' 2>/dev/null || true)" = t ]; do
   attempt=$((attempt + 1))
   if [ "$attempt" -ge 90 ]; then
     docker logs --tail 30 "$RESTORE_CONTAINER" >&2
@@ -267,12 +282,12 @@ until docker exec "$RESTORE_CONTAINER" pg_isready -h /tmp -U postgres -d "$DB" >
   sleep 1
 done
 restore_ready_ns="$(date +%s%N)"
-RESTORED="$(docker exec "$RESTORE_CONTAINER" psql -h /tmp -v ON_ERROR_STOP=1 -U postgres -d "$DB" -At -c "SELECT string_agg(label, ',' ORDER BY label) FROM public.card151_pitr_marker")"
-PROMOTED="$(docker exec "$RESTORE_CONTAINER" psql -h /tmp -v ON_ERROR_STOP=1 -U postgres -d "$DB" -At -c 'SELECT NOT pg_is_in_recovery()')"
+RESTORED="$(docker exec "$RESTORE_CONTAINER" psql -h /tmp -v ON_ERROR_STOP=1 -U "$SOURCE_DB_USER" -d "$DB" -At -c "SELECT string_agg(label, ',' ORDER BY label) FROM public.card151_pitr_marker")"
+PROMOTED="$(docker exec "$RESTORE_CONTAINER" psql -h /tmp -v ON_ERROR_STOP=1 -U "$SOURCE_DB_USER" -d "$DB" -At -c 'SELECT NOT pg_is_in_recovery()')"
 [ "$RESTORED" = before ] || fail 'target-time restore did not preserve/exclude the expected markers'
 [ "$PROMOTED" = t ] || fail 'target-time restore did not promote'
 
-python3 - "$REPORT" "$RUN_ID" "$CODE_SHA" "$BEFORE_TIME" "$TARGET_TIME" "$AFTER_TIME" "$restore_started_ns" "$restore_ready_ns" "$complete_segments" <<'PY'
+python3 - "$REPORT" "$RUN_ID" "$CODE_SHA" "$BEFORE_TIME" "$TARGET_TIME" "$AFTER_TIME" "$restore_started_ns" "$restore_ready_ns" "$complete_segments" "$SOURCE_ARCHIVE_MODE" "$SOURCE_SERVER_VERSION_NUM" "$RETENTION_TOOL_SHA256" <<'PY'
 from datetime import datetime, timezone
 import json
 from pathlib import Path
@@ -282,7 +297,7 @@ def stamp(value):
     parsed = datetime.fromisoformat(value.replace(" ", "T"))
     return parsed.replace(tzinfo=timezone.utc) if parsed.tzinfo is None else parsed.astimezone(timezone.utc)
 
-path, run_id, code_sha, before, target, after, started, ready, segments = sys.argv[1:]
+path, run_id, code_sha, before, target, after, started, ready, segments, archive_mode, server_version_num, retention_sha = sys.argv[1:]
 before_at, target_at, after_at = map(stamp, (before, target, after))
 payload = {
     "schemaVersion": "intranet-pitr-rehearsal:1",
@@ -290,17 +305,19 @@ payload = {
     "runId": run_id,
     "codeSha": code_sha,
     "observedAt": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-    "source": {"kind": "lan-pilot", "archiveModeObserved": "off", "mutatedOnlyDisposableDatabase": True},
+    "source": {"kind": "lan-pilot", "archiveModeObserved": archive_mode, "serverVersionNum": int(server_version_num)},
     "storage": {"provider": "s3-compatible-v1", "bucketScope": "pilot/rehearsals", "uploadDownloadDigestMatched": True},
     "physicalBackup": {"pgBasebackup": True, "continuousWalReceiver": True, "completedWalSegmentCount": int(segments)},
     "restore": {"recoveryTargetTime": target_at.isoformat().replace("+00:00", "Z"), "beforeMarkerPresent": True, "afterMarkerAbsent": True, "promoted": True},
     "measuredRtoSeconds": round((int(ready) - int(started)) / 1_000_000_000, 3),
-    "measuredRpoSeconds": round((target_at - before_at).total_seconds(), 6),
+    "measuredRpoSeconds": None,
+    "targetGapSeconds": round((target_at - before_at).total_seconds(), 6),
     "excludedAfterTargetSeconds": round((after_at - target_at).total_seconds(), 6),
-    "retentionPlanner": {"tool": "tools/pitr_archive_retention.py", "days": 7, "apply": False},
+    "retentionPlanner": {"protectedCopySha256": retention_sha, "days": 7, "apply": False},
     "limitations": [
         "source archive_mode remains off; this rehearsal used a bounded pg_receivewal sidecar",
         "continuous post-rehearsal WAL delivery is not configured",
+        "RPO is not measured by this bounded target-time rehearsal",
         "the source physical-replication HBA is an operator-managed prerequisite"
     ],
 }

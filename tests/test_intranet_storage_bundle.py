@@ -4,6 +4,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 BUNDLE = ROOT / "deploy" / "intranet" / "storage"
+EVIDENCE = ROOT / "docs" / "vault" / "30_Development" / "Evidence" / "card151-intranet-storage-redacted.json"
 
 
 def test_product_policy_has_only_product_and_u6_object_permissions():
@@ -29,7 +30,6 @@ def test_pitr_policy_separates_object_and_prefix_scoped_list_permissions():
     assert statements[0]["Action"] == [
         "s3:GetObject",
         "s3:PutObject",
-        "s3:DeleteObject",
     ]
     assert statements[0]["Resource"] == "arn:aws:s3:::saintvision-pitr/pilot/*"
     assert statements[1] == {
@@ -59,6 +59,7 @@ def test_minio_script_pins_image_and_keeps_container_boundary():
         'printf \'%s\\n\' "$ADMIN_ALIAS" "$SVC_KEY" "$SVC_SECRET"',
         "IFS= read -r MC_HOST_local",
         "exec stdin, never host process arguments",
+        "/usr/bin/mc version enable local/saintvision-pitr",
     ):
         assert required in script
     assert "MINIO_CERTS_DIR" not in script
@@ -78,6 +79,12 @@ def test_pitr_rehearsal_uses_uploaded_bytes_and_checks_replication_before_source
         "recovery_target_time",
         "afterMarkerAbsent",
         "refusing to remove an unowned container",
+        "SV_CODE_SHA must be a lowercase 40-hex commit",
+        "pg_stat_replication",
+        "source and restore PostgreSQL major versions differ",
+        'SELECT NOT pg_is_in_recovery()',
+        '"measuredRpoSeconds": None',
+        '"targetGapSeconds"',
     ):
         assert required in script
     receiver_check = script.index("WAL receiver did not start")
@@ -93,3 +100,18 @@ def test_pitr_rehearsal_uses_uploaded_bytes_and_checks_replication_before_source
     assert script.count('$SOURCE_ENV:/run/secrets/source.env:ro') == 3
     assert 'the host process arguments or Docker Config.Env' in script
     assert 'TLS operational acceptance is pending' not in script
+
+
+def test_redacted_operational_evidence_is_sha_and_time_bound():
+    evidence = json.loads(EVIDENCE.read_text(encoding="utf-8"))
+    assert len(evidence["codeSha"]) == 40
+    assert evidence["observedAt"].endswith("Z")
+    assert evidence["storageRoundtrip"]["status"] == "PASS"
+    assert all(evidence["storageRoundtrip"]["checks"].values())
+    assert evidence["scopeNegative"] == {
+        "productCredentialToPitrBucketStatus": 403,
+        "pitrCredentialToProductBucketStatus": 403,
+    }
+    assert evidence["pitrPreflight"]["status"] == "BLOCKED_EXTERNAL"
+    assert evidence["pitrPreflight"]["sourceMutated"] is False
+    assert evidence["pitrPreflight"]["measuredRpoSeconds"] is None
