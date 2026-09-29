@@ -1,0 +1,1354 @@
+"""Collect redacted, read-only S01-BE/S01-ST readiness evidence."""
+
+from __future__ import annotations
+
+import argparse
+from datetime import datetime, timedelta, timezone
+import hashlib
+import ipaddress
+import json
+import os
+from pathlib import Path, PurePosixPath, PureWindowsPath
+import re
+import socket
+import ssl
+import subprocess
+import sys
+from typing import Any, Callable
+from urllib.error import HTTPError
+from urllib.parse import urlsplit
+from urllib.request import HTTPRedirectHandler, Request, build_opener, HTTPSHandler
+
+from cryptography import x509
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import ec, ed448, ed25519, padding, rsa
+
+ROOT = Path(__file__).resolve().parents[1]
+CONTROL_PLANE_SRC = ROOT / "services" / "control-plane" / "src"
+if str(CONTROL_PLANE_SRC) not in sys.path:
+    sys.path.insert(0, str(CONTROL_PLANE_SRC))
+
+from inv.node_channels import certificate_identity
+from inv.tooling import NodePrincipal
+
+
+SCHEMA_VERSION = "s01-readiness-preflight:2"
+INVENTORY_SCHEMA_VERSION = "s01-readiness-inventory:1"
+_HEX_64 = re.compile(r"^[0-9a-f]{64}$")
+_NODE_ID = re.compile(r"^nod_[A-Za-z0-9][A-Za-z0-9_-]{0,126}$")
+_COMMIT_SHA = re.compile(r"^[0-9a-f]{40}$")
+_NODE_CA_SETTING = "INV_NODE_MTLS_CA_BUNDLE"
+_OBJECT_STORE_SETTING = "INV_OBJECT_STORE_ENDPOINT"
+_SETTINGS = frozenset({_NODE_CA_SETTING, _OBJECT_STORE_SETTING})
+_STORAGE_CHECKS = (
+    "put",
+    "get",
+    "bodySha256",
+    "metadataSha256",
+    "delete",
+    "cleanupVerified",
+)
+_STORAGE_EVIDENCE_FIELDS = frozenset(
+    {
+        "schemaVersion",
+        "status",
+        "targetKind",
+        "checks",
+        "payloadBytes",
+        "cleanupVerified",
+        "codeSha",
+        "observedAt",
+    }
+)
+_STORAGE_ATTESTATION_FIELDS = frozenset(
+    {
+        "executedBy",
+        "configurationProfile",
+        "runbookRevision",
+        "codeSha",
+        "observedAt",
+    }
+)
+_ATTESTATION_TEXT_FIELDS = ("executedBy", "configurationProfile", "runbookRevision")
+_DEFAULT_EVIDENCE_MAX_AGE = timedelta(hours=24)
+_FORBIDDEN_REPORT_KEYS = {
+    "token",
+    "dsn",
+    "baseurl",
+    "url",
+    "hostname",
+    "ip",
+    "nodeid",
+    "tenantid",
+    "fingerprint",
+    "path",
+    "certificate",
+    "subjectid",
+}
+
+
+def _check(check_id: str, status: str, code: str, **facts: Any) -> dict[str, Any]:
+    return {"id": check_id, "status": status, "code": code, "facts": facts}
+
+
+def _mapping_counts(value: Any, expected: set[str]) -> tuple[int, int]:
+    if not isinstance(value, dict):
+        return len(expected), 1 if value is not None else 0
+    missing = {key for key in expected if key not in value or value[key] is None}
+    return len(missing), len(set(value) - expected)
+
+
+def _positive_integer(value: Any, *, allow_zero: bool = False) -> bool:
+    return (
+        isinstance(value, int)
+        and not isinstance(value, bool)
+        and (value >= 0 if allow_zero else value > 0)
+    )
+
+
+def lint_inventory(payload: dict[str, Any] | None) -> dict[str, Any]:
+    """Validate the protected S01 inventory without returning any input value."""
+
+    if payload is None:
+        return _check(
+            "inventory-lint",
+            "BLOCKED",
+            "inventory-input-missing",
+            nodeCount=0,
+            missingFieldCount=1,
+            invalidFieldCount=0,
+        )
+    missing, invalid = _mapping_counts(
+        payload, {"schemaVersion", "topology", "hostnames", "nodes"}
+    )
+    if not isinstance(payload, dict):
+        return _check(
+            "inventory-lint",
+            "FAIL",
+            "inventory-invalid",
+            nodeCount=0,
+            missingFieldCount=missing,
+            invalidFieldCount=max(invalid, 1),
+        )
+    if payload.get("schemaVersion") != INVENTORY_SCHEMA_VERSION:
+        if payload.get("schemaVersion") is not None:
+            invalid += 1
+    topology = payload.get("topology")
+    if topology not in {"five-workers-dedicated-cp", "cp-colocated-plus-four-workers"}:
+        if topology is not None:
+            invalid += 1
+
+    hostnames = payload.get("hostnames")
+    add_missing, add_invalid = _mapping_counts(
+        hostnames, {"controlPlane", "portal", "idp"}
+    )
+    missing += add_missing
+    invalid += add_invalid
+    hostname_values: list[str] = []
+    if isinstance(hostnames, dict):
+        for field in ("controlPlane", "portal", "idp"):
+            values = hostnames.get(field)
+            if values is None:
+                continue
+            if not isinstance(values, list) or not values:
+                invalid += 1
+                continue
+            for value in values:
+                if not isinstance(value, str) or not value.strip():
+                    invalid += 1
+                else:
+                    hostname_values.append(value)
+    if len(hostname_values) != len(set(hostname_values)):
+        invalid += 1
+
+    nodes = payload.get("nodes")
+    if not isinstance(nodes, list):
+        if nodes is not None:
+            invalid += 1
+        node_count = 0
+    else:
+        node_count = len(nodes)
+        if node_count < 5:
+            missing += 5 - node_count
+        elif node_count > 5:
+            invalid += node_count - 5
+
+    node_keys = {
+        "nodeId",
+        "hostname",
+        "dnsName",
+        "ip",
+        "installationId",
+        "os",
+        "role",
+        "certificateSHA256",
+        "profile",
+        "hardware",
+        "capacity",
+        "allowedResources",
+        "allowedFolders",
+        "ntp",
+        "storageRole",
+    }
+    os_keys = {"family", "version", "containerRuntime"}
+    hardware_keys = {
+        "cpuModel",
+        "physicalCoreCount",
+        "logicalThreadCount",
+        "gpus",
+        "storageDevice",
+        "networkInterface",
+    }
+    gpu_keys = {"model", "vramBytes", "driver"}
+    capacity_keys = {
+        "cpuMillis",
+        "memoryBytes",
+        "gpuDevices",
+        "storageBytes",
+        "networkBitsPerSecond",
+    }
+    allowed_keys = {"cpuMillis", "memoryBytes", "gpuDevices", "storageBytes"}
+    ntp_keys = {"configured", "source", "maxSkewSeconds"}
+    unique_fields = {
+        "nodeId": set(),
+        "hostname": set(),
+        "dnsName": set(),
+        "ip": set(),
+        "installationId": set(),
+        "certificateSHA256": set(),
+    }
+    colocated_count = 0
+    if isinstance(nodes, list):
+        for node in nodes:
+            add_missing, add_invalid = _mapping_counts(node, node_keys)
+            missing += add_missing
+            invalid += add_invalid
+            if not isinstance(node, dict):
+                continue
+            for field in ("nodeId", "hostname", "dnsName", "ip", "installationId"):
+                value = node.get(field)
+                if value is None:
+                    continue
+                if not isinstance(value, str) or not value.strip():
+                    invalid += 1
+                    continue
+                if value in unique_fields[field]:
+                    invalid += 1
+                unique_fields[field].add(value)
+            node_id = node.get("nodeId")
+            if isinstance(node_id, str) and not _NODE_ID.fullmatch(node_id):
+                invalid += 1
+            address = node.get("ip")
+            if isinstance(address, str) and address:
+                try:
+                    parsed = ipaddress.ip_address(address)
+                    if parsed.version != 4 or not parsed.is_private or parsed.is_loopback:
+                        invalid += 1
+                except ValueError:
+                    invalid += 1
+            fingerprint = node.get("certificateSHA256")
+            if fingerprint is not None:
+                if not isinstance(fingerprint, str) or not _HEX_64.fullmatch(fingerprint):
+                    invalid += 1
+                elif fingerprint in unique_fields["certificateSHA256"]:
+                    invalid += 1
+                else:
+                    unique_fields["certificateSHA256"].add(fingerprint)
+            if node.get("profile") not in {"lan-workspace-v1", "lan-observe-v1"}:
+                if node.get("profile") is not None:
+                    invalid += 1
+            role = node.get("role")
+            if role == "cp-colocated":
+                colocated_count += 1
+            elif role != "worker" and role is not None:
+                invalid += 1
+            if node.get("storageRole") not in {"provider", "archive", "none"}:
+                if node.get("storageRole") is not None:
+                    invalid += 1
+
+            os_value = node.get("os")
+            add_missing, add_invalid = _mapping_counts(os_value, os_keys)
+            missing += add_missing
+            invalid += add_invalid
+            if isinstance(os_value, dict):
+                for field in os_keys:
+                    value = os_value.get(field)
+                    if value is not None and (not isinstance(value, str) or not value.strip()):
+                        invalid += 1
+
+            hardware = node.get("hardware")
+            add_missing, add_invalid = _mapping_counts(hardware, hardware_keys)
+            missing += add_missing
+            invalid += add_invalid
+            if isinstance(hardware, dict):
+                for field in ("cpuModel", "storageDevice", "networkInterface"):
+                    value = hardware.get(field)
+                    if value is not None and (not isinstance(value, str) or not value.strip()):
+                        invalid += 1
+                physical = hardware.get("physicalCoreCount")
+                logical = hardware.get("logicalThreadCount")
+                if physical is not None and not _positive_integer(physical):
+                    invalid += 1
+                if logical is not None and not _positive_integer(logical):
+                    invalid += 1
+                if isinstance(physical, int) and isinstance(logical, int) and logical < physical:
+                    invalid += 1
+                gpus = hardware.get("gpus")
+                if gpus is not None and not isinstance(gpus, list):
+                    invalid += 1
+                elif isinstance(gpus, list):
+                    for gpu in gpus:
+                        gpu_missing, gpu_invalid = _mapping_counts(gpu, gpu_keys)
+                        missing += gpu_missing
+                        invalid += gpu_invalid
+                        if not isinstance(gpu, dict):
+                            continue
+                        for field in ("model", "driver"):
+                            value = gpu.get(field)
+                            if value is not None and (
+                                not isinstance(value, str) or not value.strip()
+                            ):
+                                invalid += 1
+                        if gpu.get("vramBytes") is not None and not _positive_integer(
+                            gpu.get("vramBytes")
+                        ):
+                            invalid += 1
+
+            capacity = node.get("capacity")
+            add_missing, add_invalid = _mapping_counts(capacity, capacity_keys)
+            missing += add_missing
+            invalid += add_invalid
+            if isinstance(capacity, dict):
+                for field in capacity_keys:
+                    value = capacity.get(field)
+                    if value is not None and not _positive_integer(
+                        value, allow_zero=field == "gpuDevices"
+                    ):
+                        invalid += 1
+                if (
+                    isinstance(hardware, dict)
+                    and isinstance(hardware.get("gpus"), list)
+                    and capacity.get("gpuDevices") is not None
+                ):
+                    if len(hardware["gpus"]) != capacity.get("gpuDevices"):
+                        invalid += 1
+
+            allowed = node.get("allowedResources")
+            add_missing, add_invalid = _mapping_counts(allowed, allowed_keys)
+            missing += add_missing
+            invalid += add_invalid
+            if isinstance(allowed, dict):
+                for field in allowed_keys:
+                    value = allowed.get(field)
+                    if value is not None and not _positive_integer(value, allow_zero=True):
+                        invalid += 1
+                    cap_value = capacity.get(field) if isinstance(capacity, dict) else None
+                    if isinstance(value, int) and isinstance(cap_value, int) and value > cap_value:
+                        invalid += 1
+
+            folders = node.get("allowedFolders")
+            if folders is not None and (
+                not isinstance(folders, list)
+                or (node.get("storageRole") != "none" and not folders)
+                or any(not isinstance(value, str) or not value.strip() for value in folders)
+            ):
+                invalid += 1
+            elif isinstance(folders, list):
+                for folder in folders:
+                    if isinstance(folder, str) and not (
+                        PurePosixPath(folder).is_absolute()
+                        or PureWindowsPath(folder).is_absolute()
+                    ):
+                        invalid += 1
+
+            ntp = node.get("ntp")
+            add_missing, add_invalid = _mapping_counts(ntp, ntp_keys)
+            missing += add_missing
+            invalid += add_invalid
+            if isinstance(ntp, dict):
+                if ntp.get("configured") is not None and ntp["configured"] is not True:
+                    invalid += 1
+                source = ntp.get("source")
+                if source is not None and (
+                    not isinstance(source, str) or not source.strip()
+                ):
+                    invalid += 1
+                skew = ntp.get("maxSkewSeconds")
+                if skew is not None and (
+                    not isinstance(skew, (int, float))
+                    or isinstance(skew, bool)
+                    or skew < 0
+                    or skew > 5
+                ):
+                    invalid += 1
+
+    roles_complete = isinstance(nodes, list) and all(
+        isinstance(node, dict) and node.get("role") is not None for node in nodes
+    )
+    if roles_complete:
+        if topology == "cp-colocated-plus-four-workers" and colocated_count != 1:
+            invalid += 1
+        if topology == "five-workers-dedicated-cp" and colocated_count != 0:
+            invalid += 1
+
+    if invalid:
+        status, code = "FAIL", "inventory-invalid"
+    elif missing:
+        status, code = "BLOCKED", "inventory-values-missing"
+    else:
+        status, code = "PASS", "inventory-valid"
+    return _check(
+        "inventory-lint",
+        status,
+        code,
+        nodeCount=node_count,
+        missingFieldCount=missing,
+        invalidFieldCount=invalid,
+    )
+
+
+def probe_control_plane(
+    *,
+    base_url: str | None,
+    settings_url: str | None,
+    session_token: str | None,
+    operator_token: str | None,
+    fetch: Callable[..., tuple[int, Any, dict[str, str]]],
+    settings_fetch: Callable[..., tuple[int, Any, dict[str, str]]],
+) -> list[dict[str, Any]]:
+    """Probe HTTP signals while returning no response or endpoint value."""
+
+    setting_checks: list[dict[str, Any]]
+    if not settings_url:
+        setting_checks = [
+            _check(
+                "configuration-node-ca",
+                "BLOCKED",
+                "settings-url-missing",
+                settingReady=False,
+            ),
+            _check(
+                "configuration-object-store",
+                "BLOCKED",
+                "settings-url-missing",
+                settingReady=False,
+            ),
+        ]
+    elif not operator_token or not operator_token.strip():
+        setting_checks = [
+            _check(
+                "configuration-node-ca",
+                "BLOCKED",
+                "operator-token-missing",
+                settingReady=False,
+            ),
+            _check(
+                "configuration-object-store",
+                "BLOCKED",
+                "operator-token-missing",
+                settingReady=False,
+            ),
+        ]
+    elif urlsplit(settings_url).scheme.lower() != "https":
+        setting_checks = [
+            _check(
+                "configuration-node-ca",
+                "FAIL",
+                "plaintext-operator-token-transport-rejected",
+                settingReady=False,
+            ),
+            _check(
+                "configuration-object-store",
+                "FAIL",
+                "plaintext-operator-token-transport-rejected",
+                settingReady=False,
+            ),
+        ]
+    else:
+        try:
+            settings_status, settings_body, _ = settings_fetch("", authenticated=True)
+            if settings_status in {401, 403, 503}:
+                setting_checks = [
+                    _check(
+                        "configuration-node-ca",
+                        "BLOCKED",
+                        "settings-access-blocked",
+                        settingReady=False,
+                    ),
+                    _check(
+                        "configuration-object-store",
+                        "BLOCKED",
+                        "settings-access-blocked",
+                        settingReady=False,
+                    ),
+                ]
+            else:
+                unresolved = (
+                    settings_body.get("unresolvedSettings")
+                    if isinstance(settings_body, dict)
+                    else None
+                )
+                declared_status = (
+                    settings_body.get("status") if isinstance(settings_body, dict) else None
+                )
+                valid_names = (
+                    settings_status == 200
+                    and isinstance(unresolved, list)
+                    and len(unresolved) == len(set(unresolved))
+                    and all(isinstance(name, str) and name in _SETTINGS for name in unresolved)
+                )
+                derived_status = "ready" if valid_names and not unresolved else "blocked"
+                response_valid = valid_names and declared_status == derived_status
+                if not response_valid:
+                    setting_checks = [
+                        _check(
+                            "configuration-node-ca",
+                            "FAIL",
+                            "settings-response-invalid",
+                            settingReady=False,
+                        ),
+                        _check(
+                            "configuration-object-store",
+                            "FAIL",
+                            "settings-response-invalid",
+                            settingReady=False,
+                        ),
+                    ]
+                else:
+                    unresolved_set = set(unresolved)
+                    setting_checks = []
+                    for check_id, setting in (
+                        ("configuration-node-ca", _NODE_CA_SETTING),
+                        ("configuration-object-store", _OBJECT_STORE_SETTING),
+                    ):
+                        ready = setting not in unresolved_set
+                        setting_checks.append(
+                            _check(
+                                check_id,
+                                "PASS" if ready else "BLOCKED",
+                                "setting-structure-ready"
+                                if ready
+                                else "setting-unresolved",
+                                settingReady=ready,
+                            )
+                        )
+        except Exception:
+            setting_checks = [
+                _check(
+                    "configuration-node-ca",
+                    "FAIL",
+                    "settings-probe-failed",
+                    settingReady=False,
+                ),
+                _check(
+                    "configuration-object-store",
+                    "FAIL",
+                    "settings-probe-failed",
+                    settingReady=False,
+                ),
+            ]
+
+    if not base_url:
+        ready = _check("readyz", "BLOCKED", "base-url-missing", readySignalValid=False)
+        session = _check(
+            "session-boundary",
+            "BLOCKED",
+            "base-url-missing",
+            authenticatedSessionValid=False,
+            anonymousBoundaryValid=False,
+        )
+        return [*setting_checks, ready, session]
+
+    try:
+        ready_status, ready_body, _ = fetch("/readyz", authenticated=False)
+        ready_valid = (
+            ready_status == 200
+            and isinstance(ready_body, dict)
+            and ready_body.get("status") == "ready"
+        )
+        ready = _check(
+            "readyz",
+            "PASS" if ready_valid else "FAIL",
+            "ready-signal-valid" if ready_valid else "ready-signal-invalid",
+            readySignalValid=ready_valid,
+        )
+    except Exception:
+        ready = _check("readyz", "FAIL", "ready-probe-failed", readySignalValid=False)
+
+    anonymous_valid = False
+    anonymous_failed = False
+    try:
+        anonymous_status, _, anonymous_headers = fetch("/v1/session", authenticated=False)
+        anonymous_valid = (
+            anonymous_status == 401
+            and anonymous_headers.get("www-authenticate", "").lower() == "bearer"
+        )
+    except Exception:
+        anonymous_failed = True
+    if session_token is None or not session_token.strip():
+        session = _check(
+            "session-boundary",
+            "BLOCKED" if anonymous_valid else "FAIL",
+            "access-token-missing" if anonymous_valid else "anonymous-session-boundary-invalid",
+            authenticatedSessionValid=False,
+            anonymousBoundaryValid=anonymous_valid,
+        )
+    elif urlsplit(base_url).scheme.lower() != "https":
+        session = _check(
+            "session-boundary",
+            "FAIL",
+            "plaintext-token-transport-rejected",
+            authenticatedSessionValid=False,
+            anonymousBoundaryValid=anonymous_valid,
+        )
+    else:
+        authenticated_valid = False
+        try:
+            authenticated_status, authenticated_body, _ = fetch(
+                "/v1/session", authenticated=True
+            )
+            authenticated_valid = authenticated_status == 200 and isinstance(
+                authenticated_body, dict
+            )
+        except Exception:
+            authenticated_valid = False
+        boundary_valid = anonymous_valid and authenticated_valid and not anonymous_failed
+        session = _check(
+            "session-boundary",
+            "PASS" if boundary_valid else "FAIL",
+            "session-boundary-valid" if boundary_valid else "session-boundary-invalid",
+            authenticatedSessionValid=authenticated_valid,
+            anonymousBoundaryValid=anonymous_valid,
+        )
+    return [*setting_checks, ready, session]
+
+
+class _NoRedirect(HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):  # noqa: ANN001
+        return None
+
+
+def http_fetcher(
+    base_url: str,
+    token: str | None,
+    ca_bundle: Path | None,
+    timeout_seconds: float,
+    *,
+    exact_url: bool = False,
+) -> Callable[..., tuple[int, Any, dict[str, str]]]:
+    context = ssl.create_default_context(cafile=str(ca_bundle)) if ca_bundle else None
+    handlers: list[Any] = [_NoRedirect()]
+    if context is not None:
+        handlers.append(HTTPSHandler(context=context))
+    opener = build_opener(*handlers)
+
+    def fetch(path: str, *, authenticated: bool) -> tuple[int, Any, dict[str, str]]:
+        headers = {"Accept": "application/json"}
+        if authenticated:
+            headers["Authorization"] = "Bearer " + (token or "")
+        request_url = base_url if exact_url else base_url.rstrip("/") + path
+        request = Request(request_url, headers=headers, method="GET")
+        try:
+            response = opener.open(request, timeout=timeout_seconds)
+        except HTTPError as error:
+            response = error
+        raw = response.read(1_048_577)
+        if len(raw) > 1_048_576:
+            raise ValueError("response too large")
+        try:
+            body = json.loads(raw.decode("utf-8")) if raw else {}
+        except (UnicodeError, json.JSONDecodeError):
+            body = None
+        response_headers = {key.lower(): value for key, value in response.headers.items()}
+        return int(response.status), body, response_headers
+
+    return fetch
+
+
+def _load_inventory(path: Path | None) -> dict[str, Any] | None:
+    if path is None:
+        return None
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+        return value if isinstance(value, dict) else {"schemaVersion": "invalid-root"}
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return {"schemaVersion": "unreadable-input"}
+
+
+def probe_dns(
+    inventory: dict[str, Any] | None,
+    *,
+    resolver: Callable[..., Any] = socket.getaddrinfo,
+) -> dict[str, Any]:
+    lint = lint_inventory(inventory)
+    if inventory is None:
+        return _check("dns-resolution", "BLOCKED", "inventory-input-missing", hostnameCount=0, resolvedCount=0)
+    if lint["status"] != "PASS":
+        return _check("dns-resolution", "BLOCKED", "inventory-not-ready", hostnameCount=0, resolvedCount=0)
+    hostnames: list[str] = []
+    groups = inventory.get("hostnames") if isinstance(inventory, dict) else None
+    if isinstance(groups, dict):
+        for field in ("controlPlane", "portal", "idp"):
+            values = groups.get(field)
+            if isinstance(values, list):
+                hostnames.extend(value for value in values if isinstance(value, str) and value)
+    nodes = inventory.get("nodes") if isinstance(inventory, dict) else None
+    if isinstance(nodes, list):
+        hostnames.extend(
+            node.get("dnsName")
+            for node in nodes
+            if isinstance(node, dict) and isinstance(node.get("dnsName"), str) and node.get("dnsName")
+        )
+    hostnames = list(dict.fromkeys(hostnames))
+    if not hostnames:
+        return _check("dns-resolution", "BLOCKED", "dns-input-missing", hostnameCount=0, resolvedCount=0)
+    resolved = 0
+    for hostname in hostnames:
+        try:
+            if resolver(hostname, None):
+                resolved += 1
+        except Exception:
+            pass
+    valid = resolved == len(hostnames)
+    return _check(
+        "dns-resolution",
+        "PASS" if valid else "FAIL",
+        "dns-resolved" if valid else "dns-resolution-failed",
+        hostnameCount=len(hostnames),
+        resolvedCount=resolved,
+    )
+
+
+def _pem_certificates(path: Path) -> list[x509.Certificate]:
+    raw = path.read_bytes()
+    blocks = re.findall(
+        b"-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----",
+        raw,
+        flags=re.DOTALL,
+    )
+    return [x509.load_pem_x509_certificate(block) for block in blocks]
+
+
+def _signed_by(leaf: x509.Certificate, authority: x509.Certificate) -> bool:
+    if leaf.issuer != authority.subject:
+        return False
+    key = authority.public_key()
+    try:
+        if isinstance(key, (ed25519.Ed25519PublicKey, ed448.Ed448PublicKey)):
+            key.verify(leaf.signature, leaf.tbs_certificate_bytes)
+        elif isinstance(key, rsa.RSAPublicKey):
+            key.verify(
+                leaf.signature,
+                leaf.tbs_certificate_bytes,
+                padding.PKCS1v15(),
+                leaf.signature_hash_algorithm,
+            )
+        elif isinstance(key, ec.EllipticCurvePublicKey):
+            key.verify(
+                leaf.signature,
+                leaf.tbs_certificate_bytes,
+                ec.ECDSA(leaf.signature_hash_algorithm),
+            )
+        else:
+            return False
+    except Exception:
+        return False
+    return True
+
+
+def _state_nodes(state: Any) -> list[dict[str, Any]]:
+    if not isinstance(state, dict):
+        return []
+    nodes = state.get("nodes")
+    if nodes is None and state.get("nodeId") and state.get("nodeIP"):
+        nodes = [
+            {
+                "nodeId": state["nodeId"],
+                "nodeIP": state["nodeIP"],
+                "provisioned": bool(state.get("initialized")),
+            }
+        ]
+    if not isinstance(nodes, list):
+        return []
+    return [node for node in nodes if isinstance(node, dict) and not node.get("disabled", False)]
+
+
+def _node_certificate_file(state_path: Path, state: dict[str, Any], node: dict[str, Any]) -> Path:
+    specific = state_path / "public" / "nodes" / str(node.get("nodeId")) / "node-cert.pem"
+    if specific.is_file():
+        return specific
+    nodes = _state_nodes(state)
+    if nodes and node.get("nodeId") == nodes[0].get("nodeId"):
+        return state_path / "public" / "node-cert.pem"
+    return specific
+
+
+def probe_certificate_chain(
+    state_path: Path | None,
+    inventory: dict[str, Any] | None,
+    ca_bundle: Path | None,
+) -> dict[str, Any]:
+    if state_path is None or inventory is None:
+        return _check("node-certificate-chain", "BLOCKED", "certificate-input-missing", registeredLeafCount=0, verifiedLeafCount=0)
+    if lint_inventory(inventory)["status"] != "PASS":
+        return _check("node-certificate-chain", "BLOCKED", "inventory-not-ready", registeredLeafCount=0, verifiedLeafCount=0)
+    state_file = state_path / "private-state.json"
+    if not state_file.is_file():
+        return _check("node-certificate-chain", "FAIL", "pilot-state-invalid", registeredLeafCount=0, verifiedLeafCount=0)
+    ca_path = ca_bundle or (state_path / "ca.pem")
+    if not ca_path.is_file():
+        return _check("node-certificate-chain", "BLOCKED", "ca-bundle-missing", registeredLeafCount=0, verifiedLeafCount=0)
+    try:
+        state = json.loads(state_file.read_text(encoding="utf-8"))
+        authorities = _pem_certificates(ca_path)
+    except Exception:
+        return _check("node-certificate-chain", "FAIL", "certificate-input-invalid", registeredLeafCount=0, verifiedLeafCount=0)
+    now = datetime.now(timezone.utc)
+    valid_authorities = []
+    for authority in authorities:
+        try:
+            if (
+                authority.extensions.get_extension_for_class(x509.BasicConstraints).value.ca
+                and authority.not_valid_before_utc <= now < authority.not_valid_after_utc
+            ):
+                valid_authorities.append(authority)
+        except x509.ExtensionNotFound:
+            pass
+    if not valid_authorities:
+        return _check("node-certificate-chain", "FAIL", "certificate-authority-invalid", registeredLeafCount=0, verifiedLeafCount=0)
+    if not isinstance(state, dict):
+        return _check("node-certificate-chain", "FAIL", "pilot-state-invalid", registeredLeafCount=0, verifiedLeafCount=0)
+    tenant_id = state.get("tenantId")
+    epoch = state.get("epoch")
+    if not isinstance(tenant_id, str) or not tenant_id or not isinstance(epoch, str) or not epoch:
+        return _check("node-certificate-chain", "BLOCKED", "certificate-identity-input-missing", registeredLeafCount=0, verifiedLeafCount=0)
+    raw_inventory_nodes = inventory.get("nodes")
+    if not isinstance(raw_inventory_nodes, list):
+        return _check("node-certificate-chain", "BLOCKED", "inventory-not-ready", registeredLeafCount=0, verifiedLeafCount=0)
+    inventory_nodes = {
+        node.get("nodeId"): node
+        for node in raw_inventory_nodes
+        if isinstance(node, dict)
+    }
+    candidates = [node for node in _state_nodes(state) if node.get("provisioned")]
+    candidate_ids = {node.get("nodeId") for node in candidates}
+    if len(candidates) != 5 or candidate_ids != set(inventory_nodes):
+        return _check("node-certificate-chain", "BLOCKED", "registered-node-certificates-incomplete", registeredLeafCount=len(candidates), verifiedLeafCount=0)
+    verified = 0
+    for node in candidates:
+        cert_path = _node_certificate_file(state_path, state, node)
+        inventory_node = inventory_nodes.get(node.get("nodeId"))
+        try:
+            if cert_path.is_symlink() or not cert_path.is_file() or inventory_node is None:
+                continue
+            leaf = x509.load_pem_x509_certificate(cert_path.read_bytes())
+            fingerprint = hashlib.sha256(
+                leaf.public_bytes(serialization.Encoding.DER)
+            ).hexdigest()
+            identity_fingerprint, _ = certificate_identity(
+                leaf.public_bytes(serialization.Encoding.DER),
+                NodePrincipal(tenant_id, str(node.get("nodeId"))),
+                epoch,
+                now=now,
+            )
+            valid = (
+                inventory_node.get("certificateSHA256") == fingerprint
+                and identity_fingerprint == fingerprint
+                and any(_signed_by(leaf, authority) for authority in valid_authorities)
+            )
+            if valid:
+                verified += 1
+        except Exception:
+            continue
+    passed = verified == len(candidates)
+    return _check(
+        "node-certificate-chain",
+        "PASS" if passed else "FAIL",
+        "certificate-chain-valid" if passed else "certificate-chain-invalid",
+        registeredLeafCount=len(candidates),
+        verifiedLeafCount=verified,
+    )
+
+
+def evaluate_capability_rows(
+    inventory: dict[str, Any], rows: list[dict[str, Any]], *, database_read_only: bool
+) -> dict[str, Any]:
+    expected = {
+        node.get("nodeId"): node
+        for node in inventory.get("nodes", [])
+        if isinstance(node, dict) and node.get("nodeId")
+    }
+    matched = 0
+    seen: set[str] = set()
+    duplicate = False
+    for row in rows:
+        node_id = str(row.get("node_id", ""))
+        if node_id in seen:
+            duplicate = True
+            continue
+        seen.add(node_id)
+        node = expected.get(node_id)
+        snapshot = row.get("snapshot")
+        if not node or not isinstance(snapshot, dict):
+            continue
+        capacity = node.get("capacity")
+        if not isinstance(capacity, dict):
+            continue
+        if (
+            row.get("certificate_sha256") == node.get("certificateSHA256")
+            and snapshot.get("profileVersion") == node.get("profile")
+            and snapshot.get("cpuCapacityMillis") == capacity.get("cpuMillis")
+            and snapshot.get("memoryCapacityBytes") == capacity.get("memoryBytes")
+        ):
+            matched += 1
+    passed = (
+        database_read_only
+        and not duplicate
+        and len(expected) == 5
+        and len(rows) == 5
+        and seen == set(expected)
+        and matched == 5
+    )
+    return _check(
+        "pilot-capability-match",
+        "PASS" if passed else "FAIL",
+        "pilot-capabilities-match" if passed else "pilot-capabilities-differ",
+        inventoryNodeCount=len(expected),
+        registeredNodeCount=len(rows),
+        matchedNodeCount=matched,
+        databaseReadOnly=database_read_only,
+    )
+
+
+def probe_pilot_capabilities(
+    state_path: Path | None,
+    inventory: dict[str, Any] | None,
+    *,
+    connect: Callable[..., Any] | None = None,
+) -> dict[str, Any]:
+    if state_path is None or inventory is None:
+        return _check("pilot-capability-match", "BLOCKED", "pilot-input-missing", inventoryNodeCount=0, registeredNodeCount=0, matchedNodeCount=0, databaseReadOnly=False)
+    if lint_inventory(inventory)["status"] != "PASS":
+        return _check("pilot-capability-match", "BLOCKED", "inventory-not-ready", inventoryNodeCount=0, registeredNodeCount=0, matchedNodeCount=0, databaseReadOnly=False)
+    state_file = state_path / "private-state.json"
+    if not state_file.is_file():
+        return _check("pilot-capability-match", "FAIL", "pilot-state-invalid", inventoryNodeCount=5, registeredNodeCount=0, matchedNodeCount=0, databaseReadOnly=False)
+    try:
+        state = json.loads(state_file.read_text(encoding="utf-8"))
+        dsn = state.get("runtimeDSN")
+        tenant_id = state.get("tenantId")
+        if not isinstance(dsn, str) or not dsn or not isinstance(tenant_id, str) or not tenant_id:
+            return _check("pilot-capability-match", "BLOCKED", "pilot-database-input-missing", inventoryNodeCount=5, registeredNodeCount=0, matchedNodeCount=0, databaseReadOnly=False)
+        if connect is None:
+            import psycopg
+            from psycopg.rows import dict_row
+
+            connect = lambda value: psycopg.connect(value, row_factory=dict_row)
+        with connect(dsn) as connection:
+            connection.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY")
+            connection.execute("SET LOCAL statement_timeout = '2s'")
+            read_only_row = connection.execute("SHOW transaction_read_only").fetchone()
+            read_only = str(
+                next(iter(read_only_row.values()))
+                if isinstance(read_only_row, dict)
+                else read_only_row[0]
+            ).lower() == "on"
+            connection.execute("SELECT set_config('inv.tenant_id', %s, true)", (tenant_id,))
+            rows = connection.execute(
+                """SELECT n.node_id,c.certificate_sha256,s.snapshot
+                FROM inv.nodes n
+                LEFT JOIN inv.node_channels c
+                  ON c.tenant_id=n.tenant_id AND c.node_id=n.node_id
+                LEFT JOIN inv.node_resource_snapshots s
+                  ON s.tenant_id=n.tenant_id AND s.node_id=n.node_id
+                WHERE n.tenant_id=%s ORDER BY n.node_id""",
+                (tenant_id,),
+            ).fetchall()
+            normalized = [dict(row) if not isinstance(row, dict) else row for row in rows]
+        return evaluate_capability_rows(inventory, normalized, database_read_only=read_only)
+    except Exception:
+        return _check("pilot-capability-match", "FAIL", "pilot-database-probe-failed", inventoryNodeCount=5, registeredNodeCount=0, matchedNodeCount=0, databaseReadOnly=False)
+
+
+def _commit_reachable(code_sha: str) -> bool:
+    if not _COMMIT_SHA.fullmatch(code_sha):
+        return False
+    try:
+        completed = subprocess.run(
+            ["git", "merge-base", "--is-ancestor", code_sha, "HEAD"],
+            cwd=ROOT,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            timeout=5,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return completed.returncode == 0
+
+
+def evaluate_storage_evidence(
+    payload: Any,
+    attestation: Any,
+    *,
+    now: datetime | None = None,
+    reachable: Callable[[str], bool] | None = None,
+    max_age: timedelta = _DEFAULT_EVIDENCE_MAX_AGE,
+) -> dict[str, Any]:
+    """Validate operational roundtrip evidence without returning any input value."""
+
+    payload_shape_valid = isinstance(payload, dict) and set(payload) == set(
+        _STORAGE_EVIDENCE_FIELDS
+    )
+    checks = payload.get("checks") if isinstance(payload, dict) else None
+    checks_shape_valid = isinstance(checks, dict) and set(checks) == set(
+        _STORAGE_CHECKS
+    )
+    verified_count = (
+        sum(checks.get(name) is True for name in _STORAGE_CHECKS)
+        if isinstance(checks, dict)
+        else 0
+    )
+    sha = payload.get("codeSha") if isinstance(payload, dict) else None
+    reachability = reachable or _commit_reachable
+    code_reachable = (
+        isinstance(sha, str)
+        and bool(_COMMIT_SHA.fullmatch(sha))
+        and reachability(sha)
+    )
+
+    observed_valid = False
+    observed = payload.get("observedAt") if isinstance(payload, dict) else None
+    current = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    if isinstance(observed, str) and (
+        observed.endswith("Z") or observed.endswith("+00:00")
+    ):
+        try:
+            parsed = datetime.fromisoformat(observed.replace("Z", "+00:00"))
+            observed_valid = (
+                parsed.tzinfo is not None
+                and parsed.utcoffset() == timedelta(0)
+                and timedelta(0) <= current - parsed <= max_age
+            )
+        except ValueError:
+            observed_valid = False
+
+    attestation_complete = isinstance(attestation, dict) and set(attestation) == set(
+        _STORAGE_ATTESTATION_FIELDS
+    )
+    if attestation_complete:
+        attestation_complete = all(
+            isinstance(attestation[field], str)
+            and bool(attestation[field].strip())
+            and len(attestation[field]) <= 200
+            for field in _ATTESTATION_TEXT_FIELDS
+        ) and all(
+            isinstance(attestation[field], str)
+            for field in ("codeSha", "observedAt")
+        )
+    attestation_bound = bool(
+        attestation_complete
+        and isinstance(payload, dict)
+        and attestation["codeSha"] == payload.get("codeSha")
+        and attestation["observedAt"] == payload.get("observedAt")
+    )
+
+    facts = {
+        "requiredCheckCount": len(_STORAGE_CHECKS),
+        "verifiedCheckCount": verified_count,
+        "codeReachable": code_reachable,
+        "observedAtValid": observed_valid,
+        "attestationComplete": attestation_complete,
+        "attestationBound": attestation_bound,
+    }
+    if (
+        not payload_shape_valid
+        or not checks_shape_valid
+        or payload.get("schemaVersion") != "1.1"
+    ):
+        return _check(
+            "storage-roundtrip-evidence", "BLOCKED", "storage-evidence-invalid", **facts
+        )
+    if payload.get("targetKind") != "operational":
+        return _check(
+            "storage-roundtrip-evidence",
+            "BLOCKED",
+            "storage-evidence-not-operational",
+            **facts,
+        )
+    if not code_reachable:
+        return _check(
+            "storage-roundtrip-evidence",
+            "BLOCKED",
+            "storage-evidence-code-unreachable",
+            **facts,
+        )
+    if not observed_valid:
+        return _check(
+            "storage-roundtrip-evidence",
+            "BLOCKED",
+            "storage-evidence-time-invalid",
+            **facts,
+        )
+    if not attestation_complete or not attestation_bound:
+        return _check(
+            "storage-roundtrip-evidence",
+            "BLOCKED",
+            "storage-attestation-invalid",
+            **facts,
+        )
+    if payload.get("status") == "FAIL":
+        return _check(
+            "storage-roundtrip-evidence",
+            "FAIL",
+            "storage-operational-evidence-failed",
+            **facts,
+        )
+    evidence_verified = (
+        payload.get("status") == "PASS"
+        and verified_count == len(_STORAGE_CHECKS)
+        and payload.get("cleanupVerified") is True
+        and _positive_integer(payload.get("payloadBytes"))
+    )
+    if not evidence_verified:
+        return _check(
+            "storage-roundtrip-evidence",
+            "BLOCKED",
+            "storage-evidence-unverified",
+            **facts,
+        )
+    return _check(
+        "storage-roundtrip-evidence",
+        "PASS",
+        "storage-operational-evidence-valid",
+        **facts,
+    )
+
+
+def probe_storage_evidence(
+    path: Path | None,
+    attestation_path: Path | None,
+    *,
+    now: datetime | None = None,
+    reachable: Callable[[str], bool] | None = None,
+    max_age: timedelta = _DEFAULT_EVIDENCE_MAX_AGE,
+) -> dict[str, Any]:
+    if path is None or attestation_path is None:
+        return _check(
+            "storage-roundtrip-evidence",
+            "BLOCKED",
+            "storage-evidence-or-attestation-missing",
+            requiredCheckCount=len(_STORAGE_CHECKS),
+            verifiedCheckCount=0,
+            codeReachable=False,
+            observedAtValid=False,
+            attestationComplete=False,
+            attestationBound=False,
+        )
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        payload = None
+    try:
+        attestation = json.loads(attestation_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        attestation = None
+    return evaluate_storage_evidence(
+        payload,
+        attestation,
+        now=now,
+        reachable=reachable,
+        max_age=max_age,
+    )
+
+
+_INPUT_CHECKS = {
+    "U1": ("inventory-lint",),
+    "U2": ("readyz", "session-boundary"),
+    "U3": ("configuration-node-ca", "readyz", "node-certificate-chain"),
+    "U4": ("dns-resolution",),
+    "U5": ("inventory-lint", "node-certificate-chain", "pilot-capability-match"),
+    "U6": (
+        "configuration-object-store",
+        "inventory-lint",
+        "storage-roundtrip-evidence",
+    ),
+}
+
+
+def aggregate_inputs(checks: list[dict[str, Any]]) -> dict[str, dict[str, str]]:
+    by_id = {check["id"]: check for check in checks}
+    result: dict[str, dict[str, str]] = {}
+    for input_id, check_ids in _INPUT_CHECKS.items():
+        statuses = [by_id.get(check_id, {"status": "BLOCKED"})["status"] for check_id in check_ids]
+        if "FAIL" in statuses:
+            status = "FAIL"
+        elif "BLOCKED" in statuses:
+            status = "BLOCKED"
+        else:
+            status = "PASS"
+        result[input_id] = {"status": status, "code": f"input-{status.lower()}"}
+    return result
+
+
+def report_exit_code(checks: list[dict[str, Any]]) -> int:
+    if not checks:
+        return 2
+    statuses = {check["status"] for check in checks}
+    if "FAIL" in statuses:
+        return 1
+    if "BLOCKED" in statuses:
+        return 2
+    return 0
+
+
+def _assert_redacted(value: Any) -> None:
+    if isinstance(value, dict):
+        for key, item in value.items():
+            normalized = re.sub(r"[^a-z0-9]", "", str(key).lower())
+            if normalized in _FORBIDDEN_REPORT_KEYS:
+                raise ValueError("forbidden report field")
+            _assert_redacted(item)
+    elif isinstance(value, list):
+        for item in value:
+            _assert_redacted(item)
+    elif isinstance(value, str):
+        lowered = value.lower()
+        if (
+            "-----begin " in lowered
+            or "postgresql://" in lowered
+            or "postgresql+psycopg://" in lowered
+            or "http://" in lowered
+            or "https://" in lowered
+        ):
+            raise ValueError("forbidden report value")
+
+
+def write_redacted_report(path: Path, report: dict[str, Any]) -> None:
+    path.unlink(missing_ok=True)
+    _assert_redacted(report)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    try:
+        path.chmod(0o600)
+    except OSError:
+        pass
+
+
+def _overall_status(checks: list[dict[str, Any]]) -> str:
+    code = report_exit_code(checks)
+    return {0: "PASS", 1: "FAIL", 2: "BLOCKED"}[code]
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--base-url", default=os.environ.get("INV_S01_BASE_URL"))
+    parser.add_argument("--settings-url", default=os.environ.get("INV_S01_SETTINGS_URL"))
+    parser.add_argument(
+        "--session-token-env", "--token-env", dest="session_token_env", default="INV_S01_ACCESS_TOKEN"
+    )
+    parser.add_argument("--operator-token-env", default="INV_S01_OPERATOR_TOKEN")
+    parser.add_argument("--inventory", type=Path, default=os.environ.get("INV_S01_INVENTORY"))
+    parser.add_argument("--state", type=Path, default=os.environ.get("INV_LAN_PILOT_STATE"))
+    parser.add_argument("--ca-bundle", type=Path, default=os.environ.get("INV_NODE_MTLS_CA_BUNDLE"))
+    parser.add_argument("--http-ca-bundle", type=Path, default=os.environ.get("INV_S01_HTTP_CA_BUNDLE"))
+    parser.add_argument(
+        "--storage-evidence",
+        type=Path,
+        default=os.environ.get("INV_S01_STORAGE_EVIDENCE"),
+    )
+    parser.add_argument(
+        "--storage-attestation",
+        type=Path,
+        default=os.environ.get("INV_S01_STORAGE_ATTESTATION"),
+    )
+    parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--timeout-seconds", type=float, default=5.0)
+    parser.add_argument("--storage-max-age-seconds", type=float, default=86_400.0)
+    args = parser.parse_args(argv)
+    if args.timeout_seconds <= 0 or args.timeout_seconds > 30:
+        parser.error("--timeout-seconds must be in (0, 30]")
+    if args.storage_max_age_seconds <= 0 or args.storage_max_age_seconds > 604_800:
+        parser.error("--storage-max-age-seconds must be in (0, 604800]")
+    output_path = args.output.resolve()
+    protected_inputs = [
+        path.resolve()
+        for path in (
+            args.inventory,
+            args.ca_bundle,
+            args.http_ca_bundle,
+            args.storage_evidence,
+            args.storage_attestation,
+        )
+        if path is not None
+    ]
+    state_path = args.state.resolve() if args.state is not None else None
+    if output_path in protected_inputs or (
+        state_path is not None and (output_path == state_path or state_path in output_path.parents)
+    ):
+        parser.error("--output must not replace an input")
+    args.output.unlink(missing_ok=True)
+
+    session_token = os.environ.get(args.session_token_env)
+    operator_token = os.environ.get(args.operator_token_env) or session_token
+    inventory = _load_inventory(args.inventory)
+    inventory_check = lint_inventory(inventory)
+    if args.base_url:
+        fetch = http_fetcher(
+            args.base_url,
+            session_token,
+            args.http_ca_bundle,
+            args.timeout_seconds,
+        )
+    else:
+        fetch = lambda path, authenticated: (_ for _ in ()).throw(RuntimeError())
+    if args.settings_url:
+        settings_fetch = http_fetcher(
+            args.settings_url,
+            operator_token,
+            args.http_ca_bundle,
+            args.timeout_seconds,
+            exact_url=True,
+        )
+    else:
+        settings_fetch = lambda path, authenticated: (_ for _ in ()).throw(RuntimeError())
+    checks = probe_control_plane(
+        base_url=args.base_url,
+        settings_url=args.settings_url,
+        session_token=session_token,
+        operator_token=operator_token,
+        fetch=fetch,
+        settings_fetch=settings_fetch,
+    )
+    checks.extend(
+        [
+            probe_certificate_chain(args.state, inventory, args.ca_bundle),
+            probe_dns(inventory),
+            inventory_check,
+            probe_pilot_capabilities(args.state, inventory),
+            probe_storage_evidence(
+                args.storage_evidence,
+                args.storage_attestation,
+                max_age=timedelta(seconds=args.storage_max_age_seconds),
+            ),
+        ]
+    )
+    report = {
+        "schemaVersion": SCHEMA_VERSION,
+        "observedAt": datetime.now(timezone.utc).isoformat(),
+        "readOnly": True,
+        "redacted": True,
+        "overallStatus": _overall_status(checks),
+        "checks": checks,
+        "inputs": aggregate_inputs(checks),
+        "acceptanceAssessed": False,
+    }
+    write_redacted_report(args.output, report)
+    counts = {status: sum(check["status"] == status for check in checks) for status in ("PASS", "FAIL", "BLOCKED")}
+    print(json.dumps({"overallStatus": report["overallStatus"], "counts": counts}, separators=(",", ":")))
+    return report_exit_code(checks)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

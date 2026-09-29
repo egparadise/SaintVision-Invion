@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The version after the measurement was bound (or found already bound).\n\n``newlyVerified`` is false when the row was already verified by this very\nmeasurement, so a repeat with a fresh idempotency key is visible as the\nno-op it was.",
+  "properties": {
+    "contentSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Contentsha256",
+      "type": "string"
+    },
+    "modelId": {
+      "title": "Modelid",
+      "type": "string"
+    },
+    "modelVersionId": {
+      "title": "Modelversionid",
+      "type": "string"
+    },
+    "newlyVerified": {
+      "title": "Newlyverified",
+      "type": "boolean"
+    },
+    "stage": {
+      "enum": [
+        "draft",
+        "candidate",
+        "released",
+        "retired"
+      ],
+      "title": "Stage",
+      "type": "string"
+    },
+    "verifiedAt": {
+      "format": "date-time",
+      "title": "Verifiedat",
+      "type": "string"
+    },
+    "verifiedMeasurementId": {
+      "pattern": "^mvm_[0-9A-HJKMNP-TV-Z]{26}$",
+      "title": "Verifiedmeasurementid",
+      "type": "string"
+    },
+    "version": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "modelVersionId",
+    "modelId",
+    "version",
+    "stage",
+    "verifiedAt",
+    "verifiedMeasurementId",
+    "contentSha256",
+    "newlyVerified"
+  ],
+  "title": "ModelVerifyResponse",
+  "type": "object"
+}

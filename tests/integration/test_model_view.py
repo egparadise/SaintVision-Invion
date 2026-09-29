@@ -5,6 +5,7 @@ import hashlib
 import psycopg
 from psycopg.types.json import Jsonb
 import pytest
+from db_integrity import preserved_rows, suspended_triggers
 from fastapi.testclient import TestClient
 
 from inv.app import create_app
@@ -85,13 +86,12 @@ def test_current_project_permission_revocation_hides_summary(view, change):
 
 def test_unlinked_project_is_not_legacy_kernel_grant_fallback(view):
     a = view
-    with psycopg.connect(a.e.owner) as c:
-        # Simulate a legacy/incomplete restore with a missing business link.
-        # Ordinary runtime writes cannot remove this immutable mapping.
-        c.execute('ALTER TABLE inv.business_projects DISABLE TRIGGER USER')
-        c.execute('DELETE FROM inv.business_projects WHERE project_id=%s', (a.e.project,))
-        c.execute('ALTER TABLE inv.business_projects ENABLE TRIGGER USER')
-    assert get(a).status_code == 403
+    with preserved_rows(a.e.owner, ('inv.business_projects', 'project_id=%s', (a.e.project,))):
+        with psycopg.connect(a.e.owner) as c, suspended_triggers(c, 'inv.business_projects', 'USER'):
+            # Simulate a legacy/incomplete restore with a missing business link.
+            # Ordinary runtime writes cannot remove this immutable mapping.
+            c.execute('DELETE FROM inv.business_projects WHERE project_id=%s', (a.e.project,))
+        assert get(a).status_code == 403
 
 
 def test_same_subject_in_another_tenant_cannot_observe_commitment(view):
@@ -124,16 +124,15 @@ def test_corrupt_stored_manifest_is_rejected_without_reflection(view, fault):
     if fault == 'schema':
         body['totalBytes'] += 1
     digest = hashlib.sha256(canonical(body)).hexdigest() if fault == 'schema' else '0' * 64
-    with psycopg.connect(a.e.owner) as c:
-        # Only the disposable owner injects corruption; runtime cannot do this.
-        c.execute('ALTER TABLE inv.model_manifests DISABLE TRIGGER USER')
-        c.execute('UPDATE inv.model_manifests SET manifest=%s,manifest_sha256=%s WHERE tenant_id=%s',
-                  (Jsonb(body), digest, a.e.tenant))
-        c.execute('ALTER TABLE inv.model_manifests ENABLE TRIGGER USER')
-    response = get(a)
-    assert response.status_code == 409
-    assert response.json()['code'] == 'MODEL-0001'
-    assert 'private-corruption-marker' not in response.text
+    with preserved_rows(a.e.owner, ('inv.model_manifests', 'tenant_id=%s', (a.e.tenant,))):
+        with psycopg.connect(a.e.owner) as c, suspended_triggers(c, 'inv.model_manifests', 'USER'):
+            # Only the disposable owner injects corruption; runtime cannot do this.
+            c.execute('UPDATE inv.model_manifests SET manifest=%s,manifest_sha256=%s WHERE tenant_id=%s',
+                      (Jsonb(body), digest, a.e.tenant))
+        response = get(a)
+        assert response.status_code == 409
+        assert response.json()['code'] == 'MODEL-0001'
+        assert 'private-corruption-marker' not in response.text
 
 
 @pytest.mark.parametrize('version', ['latest', 'head', 'current', 'x' * 65])

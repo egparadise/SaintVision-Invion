@@ -4,16 +4,25 @@ import base64
 from copy import deepcopy
 import hashlib
 import json
+import os
+from uuid import uuid4
 
 import psycopg
 import pytest
+from fastapi.testclient import TestClient
 
+from inv.app import create_app
 from inv.dispatch import DeliveryWorker
 from inv.approvals import Principal
 from inv.contracts import validate_contract
 from inv.errors import DomainError
 from inv.output_ingestion import OutputIngestion
+from inv.object_store import LocalObjectStore, ObjectStoreRegistry
 from inv.result_view import ResultView
+from inv.s3_client import S3Client, S3Config
+from inv.s3_object_store import S3Objects
+from inv.snapshots import SnapshotStore
+from inv.workspace_api import WorkspaceAPI
 from test_approvals import approval
 from test_workspace_start import (
     first,
@@ -44,6 +53,31 @@ def _execute(a, *, publish=True):
         a.e.db, a.delivery, output_provider=a.storage.provider if publish else None
     )
     assert worker.once(a.e.tenant) == "stopped"
+
+
+def _hosted_s3_provider():
+    required = (
+        "INV_OBJECT_STORE_ENDPOINT",
+        "INV_OBJECT_STORE_BUCKET",
+        "INV_OBJECT_STORE_ACCESS_KEY_ID",
+        "INV_OBJECT_STORE_SECRET_ACCESS_KEY",
+        "INV_OBJECT_STORE_REGION",
+    )
+    missing = [name for name in required if not os.environ.get(name)]
+    assert not missing, "Core product ObjectStore configuration is incomplete"
+    return S3Objects(
+        "s3-compatible-v1",
+        "core/" + uuid4().hex,
+        S3Client(
+            S3Config(
+                endpoint=os.environ["INV_OBJECT_STORE_ENDPOINT"],
+                bucket=os.environ["INV_OBJECT_STORE_BUCKET"],
+                access_key=os.environ["INV_OBJECT_STORE_ACCESS_KEY_ID"],
+                secret_key=os.environ["INV_OBJECT_STORE_SECRET_ACCESS_KEY"],
+                region=os.environ["INV_OBJECT_STORE_REGION"],
+            )
+        ),
+    )
 
 
 def test_result_and_download_match_actual_node_output_and_current_grant(first):
@@ -119,6 +153,17 @@ def test_result_and_download_match_actual_node_output_and_current_grant(first):
     with pytest.raises(DomainError) as denied:
         ResultView(a.e.db).result(Principal(a.e.other, a.jwt.subject("requester")), a.run["runId"])
     assert denied.value.status == 403
+    local = ObjectStoreRegistry([LocalObjectStore(a.storage.provider)])
+    with pytest.raises(DomainError) as denied_download:
+        ResultView(a.e.db, local).download(
+            Principal(a.e.other, a.jwt.subject("requester")),
+            a.run["runId"],
+            item["path"],
+            a.e.project,
+        )
+    # The project-scoped download follows the existing non-disclosure policy:
+    # another tenant cannot observe the run row, so provider I/O never starts.
+    assert denied_download.value.status == 404
     # A corrupted stored receipt cannot produce a verified downloadable file.
     bad = deepcopy(facts)
     bad["receipt"]["output"]["data"] = base64.b64encode(b"changed").decode()
@@ -137,6 +182,55 @@ def test_result_and_download_match_actual_node_output_and_current_grant(first):
         "/artifacts/content?path=outputs/metrics.json",
     ):
         assert a.http.get(alias + suffix, headers=a.headers()).status_code == 403
+
+
+def test_s3_published_result_downloads_through_http_and_missing_object_fails_closed(first):
+    a = first
+    provider = _hosted_s3_provider()
+    a.storage = SnapshotStore(a.e.db, provider)
+    a.http.close()
+    a.http = TestClient(
+        create_app(
+            a.e.db,
+            a.jwt.auth,
+            workspace=WorkspaceAPI(a.e.db, a.working, a.runtime),
+            object_stores=ObjectStoreRegistry([provider]),
+        ),
+        raise_server_exceptions=False,
+    )
+
+    input_files(a, "ai")
+    _execute(a)
+    item = next(
+        artifact
+        for artifact in _get(a, "/artifacts").json()["artifacts"]
+        if artifact["path"] == "outputs/metrics.json"
+    )
+    response = _get(a, "/artifacts/content", params={"path": item["path"]})
+    assert hashlib.sha256(response.content).hexdigest() == item["checksumSha256"]
+    assert response.headers["x-content-sha256"] == item["checksumSha256"]
+
+    with a.e.db.transaction(a.e.tenant) as connection:
+        row = connection.execute(
+            """SELECT o.provider_id,o.locator,o.content_hash,o.size_bytes
+            FROM inv.storage_objects o JOIN inv.result_commitments c USING(tenant_id,project_id,object_id)
+            WHERE c.run_id=%s""",
+            (a.run["runId"],),
+        ).fetchone()
+    assert row["provider_id"] == provider.provider_id
+    # The storage digest covers the outer bounded output object. The HTTP hash
+    # covers the selected manifest file; neither level is silently substituted.
+    outer = provider.get(row["locator"], row["content_hash"], row["size_bytes"])
+    assert hashlib.sha256(outer).hexdigest() == row["content_hash"]
+
+    provider.delete(row["locator"])
+    missing = a.http.get(
+        a.url + "/artifacts/content",
+        params={"path": item["path"]},
+        headers=a.headers(),
+    )
+    assert missing.status_code == 503
+    assert missing.json()["code"] == "STORE-0001"
 
 
 def test_draft_and_cancelled_run_never_report_success_or_placeholder_output(first):

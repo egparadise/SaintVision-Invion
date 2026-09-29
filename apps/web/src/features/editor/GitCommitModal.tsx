@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/shared/ui/Button';
+import { useModalA11y } from '@/shared/ui/useModalA11y';
 import { GitCommitRecord } from '@/contracts/types';
 import { createGitCommit } from './diffEngine';
 
@@ -21,6 +22,11 @@ export const GitCommitModal: React.FC<GitCommitModalProps> = ({
   );
   const [commitMessage, setCommitMessage] = useState('');
   const [author, setAuthor] = useState('Gemini Developer <gemini@saintvision.internal>');
+
+  const { containerRef, handleKeyDown } = useModalA11y({
+    isOpen: true,
+    onClose: onCancel,
+  });
 
   const toggleStage = (path: string) => {
     setStagedFiles((prev) =>
@@ -58,6 +64,12 @@ export const GitCommitModal: React.FC<GitCommitModalProps> = ({
 
   return (
     <div
+      ref={containerRef}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="git-commit-modal-title"
+      onKeyDown={handleKeyDown}
+      tabIndex={-1}
       style={{
         position: 'fixed',
         inset: 0,
@@ -93,7 +105,7 @@ export const GitCommitModal: React.FC<GitCommitModalProps> = ({
           }}
         >
           <div>
-            <h3 style={{ margin: 0, fontSize: '16px', color: '#f0f6fc' }}>
+            <h3 id="git-commit-modal-title" style={{ margin: 0, fontSize: '16px', color: '#f0f6fc' }}>
               Git Source Commit (AC-06)
             </h3>
             <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
