@@ -233,6 +233,17 @@ def bind_db_auth(args):
         ).fetchone()
         if role_privileges != (False, False, False, False, False):
             raise ValueError("Pilot runtime role has elevated privileges")
+        memberships = [
+            row[0]
+            for row in conn.execute(
+                "SELECT parent.rolname FROM pg_auth_members m "
+                "JOIN pg_roles child ON child.oid=m.member "
+                "JOIN pg_roles parent ON parent.oid=m.roleid "
+                "WHERE child.rolname='inv_lan_runtime' ORDER BY parent.rolname"
+            ).fetchall()
+        ]
+        if memberships != ["inv_kernel"]:
+            raise ValueError("Pilot runtime role membership differs from inv_kernel only")
     with psycopg.connect(runtime_dsn) as conn:
         if conn.execute("SELECT current_user").fetchone()[0] != "inv_lan_runtime":
             raise ValueError("Pilot runtime credential is not role-bound")

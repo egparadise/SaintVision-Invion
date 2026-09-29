@@ -16,6 +16,9 @@ source_of_truth: "Git"
 G-19/G-24 입력을 사내 LAN에서 준비한다. agent image 기준 source는
 `6fc0428b49f28379cb4da17830d92256b55c2eb2`이고, CP 도구는 Evidence의 별도
 `controlPlaneToolingCommit` 및 파일별 SHA-256에 결속한다.
+Evidence의 Git blob 결속은 의도적인 fail-closed 규칙이다. 고정한 다섯 파일을
+후속 변경하면 과거 증거가 자동 승계되지 않으며 새 측정 또는 명시적 repin이
+필요하다.
 
 - 비밀번호·private key·token은 Git, 콘솔, PR, 공개 Evidence에 넣지 않는다.
   운영자 private material은 ignored `.work/intranet/` 아래에만 둔다.

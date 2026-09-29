@@ -205,11 +205,16 @@ def test_public_pilot_evidence_is_redacted_and_bound_to_the_tooling():
     assert evidence["databaseBoundary"]["activePilotStateBound"] is False
     assert evidence["pilot"]["observationStatus"] == "historical-state-database-stopped"
     assert evidence["pilot"]["observedAt"] == "2026-09-30T00:08:01+09:00"
+    assert evidence["pilot"]["observationToolState"] == "uncommitted-working-tree"
     assert (
-        evidence["pilot"]["observationToolCommit"]
-        == evidence["workers"][0]["observationToolCommit"]
+        evidence["pilot"]["observationToolFirstCommittedIn"]
+        == evidence["workers"][0]["observationToolFirstCommittedIn"]
     )
     assert all("observedAt" in worker for worker in evidence["workers"])
+    assert evidence["workers"][2]["observedAt"] is None
+    assert evidence["workers"][2]["observationToolFirstCommittedIn"] is None
+    assert evidence["workers"][2]["observationToolState"] == "not-run"
+    assert evidence["pilot"]["agentImageBuildRecipe"]["presentInAgentImageSourceCommit"] is False
 
     for relative_path, expected in evidence["source"]["toolSHA256"].items():
         blob_oid = evidence["source"]["toolGitBlobSHA1"][relative_path]

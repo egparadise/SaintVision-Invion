@@ -112,8 +112,13 @@ done
 docker exec -i "$container" sh -s <<'CONTAINER' >/dev/null
 set -eu
 export PGPASSWORD="$(cat /run/secrets/postgres-password)"
-psql -U postgres -d saintvision_lan -v ON_ERROR_STOP=1 <<'SQL'
+psql -U postgres -d saintvision_lan -v ON_ERROR_STOP=1 2>/dev/null <<'SQL' || {
+    echo 'Pilot runtime role hardening failed; diagnostics suppressed.' >&2
+    exit 1
+}
 \set runtime_password `cat /run/secrets/runtime-password`
+SET log_statement = 'none';
+SET log_min_error_statement = 'panic';
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'inv_lan_runtime') THEN

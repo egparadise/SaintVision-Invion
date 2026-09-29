@@ -42,6 +42,10 @@ source_of_truth: "Git"
 - commit `8ce88ba9` 스크립트를 원격 v5에 재적용해 no/wrong credential 거부,
   두 role 양성, SCRAM-only, 최소 권한, network 1개, loopback을 재검증했다.
   active state 이관은 하지 않았다. 임시 script만 삭제하고 DB volume은 보존했다.
+- 00:08 worker/pilot 값은 `d3d8d927` commit보다 먼저 실행된 working tree
+  관측이므로 commit 재현 주장 대신 `uncommitted-working-tree`와
+  `firstCommittedIn`으로 정정했다. 미관측 worker-3에는 도구 commit을 붙이지
+  않는다.
 - 수정 후 focused PG-free는 PKI 6 passed, LAN pilot 22 passed이며 두 DB shell
   script 문법과 diff gate가 exit 0이다. hosted CI 재실행과 Claude 재검토가
   다음이다.

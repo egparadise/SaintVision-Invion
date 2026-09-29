@@ -46,12 +46,18 @@ methods=$(docker exec "$container" sh -ec \
     'PGPASSWORD=$(cat /run/secrets/postgres-password); export PGPASSWORD; exec psql -U postgres -d saintvision_lan -Atqc "SELECT string_agg(DISTINCT auth_method, '"'"','"'"' ORDER BY auth_method) FROM pg_hba_file_rules WHERE type='"'"'host'"'"' AND error IS NULL"')
 encryption=$(docker exec "$container" sh -ec \
     'PGPASSWORD=$(cat /run/secrets/postgres-password); export PGPASSWORD; exec psql -U postgres -d saintvision_lan -Atqc "SHOW password_encryption"')
+unexpected_memberships=$(docker exec "$container" sh -ec \
+    'PGPASSWORD=$(cat /run/secrets/postgres-password); export PGPASSWORD; exec psql -U postgres -d saintvision_lan -Atqc "SELECT count(*) FROM pg_auth_members m JOIN pg_roles child ON child.oid=m.member JOIN pg_roles parent ON parent.oid=m.roleid WHERE child.rolname='\''inv_lan_runtime'\'' AND parent.rolname<>'\''inv_kernel'\''"')
 [[ "$admin" == postgres && "$runtime" == inv_lan_runtime ]] || {
     echo 'Pilot database credentials are not role-bound.' >&2
     exit 1
 }
 [[ "$runtime_privileges" == 'f|f|f|f|f' ]] || {
     echo 'Pilot runtime role has elevated privileges.' >&2
+    exit 1
+}
+[[ "$unexpected_memberships" == 0 ]] || {
+    echo 'Pilot runtime role has an unexpected inherited membership.' >&2
     exit 1
 }
 [[ "$methods" == scram-sha-256 && "$encryption" == scram-sha-256 ]] || {

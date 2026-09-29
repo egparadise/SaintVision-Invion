@@ -2,6 +2,9 @@
 
 import io
 import json
+import os
+import re
+import subprocess
 import sys
 import tarfile
 import zipfile
@@ -598,12 +601,62 @@ def test_remote_database_script_uses_scram_dedicated_network_and_private_files()
     assert '--publish "127.0.0.1:${host_port}:5432"' in script
     assert "POSTGRES_PASSWORD_FILE=/run/secrets/postgres-password" in script
     assert 'credentialStorage":"operator-private-files' in script
-    assert "--set=runtime_password" not in script
+    assert not re.search(
+        r"(?m)^psql\b[^\n]*(?:runtime_password|\$\([^\n]*runtime-password)", script
+    )
     assert "\\set runtime_password `cat /run/secrets/runtime-password`" in script
+    assert "SET log_statement = 'none'" in script
+    assert "SET log_min_error_statement = 'panic'" in script
     assert "ALTER ROLE inv_lan_runtime LOGIN NOSUPERUSER NOBYPASSRLS" in script
     assert "NOCREATEDB NOCREATEROLE NOREPLICATION" in script
     assert "rolsuper, rolbypassrls, rolcreatedb, rolcreaterole, rolreplication" in verifier
     assert "'f|f|f|f|f'" in verifier
+
+
+@pytest.mark.skipif(os.name == "nt", reason="POSIX shell verifier runs in hosted Linux")
+def test_remote_database_verifier_fails_closed_for_role_and_hba_drift(tmp_path):
+    root = Path(__file__).resolve().parents[1]
+    fake_docker = tmp_path / "docker"
+    fake_docker.write_text(
+        """#!/usr/bin/env bash
+set -eu
+command_line="$*"
+case "$command_line" in
+  *'{{.Internal}}'*) echo false ;;
+  *'ai.saintvision.lan-pilot'*) echo card150 ;;
+  *'len .NetworkSettings.Networks'*) echo 1 ;;
+  *'if index .NetworkSettings.Networks'*) echo yes ;;
+  *'HostConfig.PortBindings'*) echo 127.0.0.1 ;;
+  *'PGPASSFILE=/dev/null'*) exit 1 ;;
+  *'PGPASSWORD=wrong'*) exit 1 ;;
+  *'rolsuper, rolbypassrls'*) echo "${FAKE_RUNTIME_PRIVILEGES:-f|f|f|f|f}" ;;
+  *'pg_auth_members'*) echo "${FAKE_UNEXPECTED_MEMBERSHIPS:-0}" ;;
+  *'pg_hba_file_rules'*) echo "${FAKE_AUTH_METHODS:-scram-sha-256}" ;;
+  *'SHOW password_encryption'*) echo scram-sha-256 ;;
+  *'SELECT current_user'*'inv_lan_runtime'*) echo inv_lan_runtime ;;
+  *'SELECT current_user'*) echo postgres ;;
+  *) echo "unexpected docker invocation" >&2; exit 3 ;;
+esac
+""",
+        encoding="utf-8",
+    )
+    fake_docker.chmod(0o700)
+    command = [
+        "bash",
+        str(root / "deploy/lan/verify-pilot-database.sh"),
+        "saintvision-test-db",
+        "saintvision-test-network",
+    ]
+    environment = {**os.environ, "PATH": f"{tmp_path}{os.pathsep}{os.environ['PATH']}"}
+
+    assert subprocess.run(command, env=environment, check=False).returncode == 0
+    for variable, value in (
+        ("FAKE_RUNTIME_PRIVILEGES", "f|f|f|f|t"),
+        ("FAKE_UNEXPECTED_MEMBERSHIPS", "1"),
+        ("FAKE_AUTH_METHODS", "md5"),
+    ):
+        drifted = {**environment, variable: value}
+        assert subprocess.run(command, env=drifted, check=False).returncode == 1
 
 
 def test_bind_db_auth_requires_negative_rejection_and_role_bound_credentials(
@@ -630,6 +683,7 @@ def test_bind_db_auth_requires_negative_rejection_and_role_bound_credentials(
     runtime_passfile.chmod(0o600)
     rejected = []
     runtime_privileges = [False, False, False, False, False]
+    runtime_memberships = ["inv_kernel"]
     auth_methods = ["scram-sha-256", "scram-sha-256"]
 
     class Result:
@@ -658,6 +712,8 @@ def test_bind_db_auth_requires_negative_rejection_and_role_bound_credentials(
                 return Result(one=("scram-sha-256",))
             if "pg_hba_file_rules" in query:
                 return Result(rows=[(method,) for method in auth_methods])
+            if "FROM pg_auth_members" in query:
+                return Result(rows=[(role,) for role in runtime_memberships])
             if "FROM pg_roles" in query:
                 return Result(one=tuple(runtime_privileges))
             if query == "SELECT current_user":
@@ -692,8 +748,20 @@ def test_bind_db_auth_requires_negative_rejection_and_role_bound_credentials(
     assert "a" * 64 not in output
     assert "b" * 64 not in output
 
-    runtime_privileges[0] = True
-    with pytest.raises(ValueError, match="elevated privileges"):
+    for privilege_index in range(len(runtime_privileges)):
+        runtime_privileges[privilege_index] = True
+        with pytest.raises(ValueError, match="elevated privileges"):
+            lan_pilot.bind_db_auth(
+                Namespace(
+                    state=tmp_path,
+                    admin_passfile=admin_passfile,
+                    runtime_passfile=runtime_passfile,
+                )
+            )
+        runtime_privileges[privilege_index] = False
+
+    auth_methods[1] = "md5"
+    with pytest.raises(ValueError, match="not exclusively SCRAM"):
         lan_pilot.bind_db_auth(
             Namespace(
                 state=tmp_path,
@@ -702,9 +770,9 @@ def test_bind_db_auth_requires_negative_rejection_and_role_bound_credentials(
             )
         )
 
-    runtime_privileges[0] = False
-    auth_methods[1] = "md5"
-    with pytest.raises(ValueError, match="not exclusively SCRAM"):
+    auth_methods[1] = "scram-sha-256"
+    runtime_memberships.append("pg_write_server_files")
+    with pytest.raises(ValueError, match="membership differs"):
         lan_pilot.bind_db_auth(
             Namespace(
                 state=tmp_path,

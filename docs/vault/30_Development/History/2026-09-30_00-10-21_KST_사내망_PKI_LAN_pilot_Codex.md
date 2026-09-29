@@ -68,7 +68,7 @@ Card 152 inventory는 5행을 갖지만 필수값 71개가 비어 있었다. 정
   `MemAvailable=12,406,200 KiB`; worker-2: Docker 29.8/API 1.56, 12 CPU,
   `MemAvailable=14,036,016 KiB`.
 - worker-3: 12 CPU, `MemAvailable=13,575,632 KiB`, Docker socket permission
-  denied. 사용자 명령은 `sudo usermod -aG docker saintvision-invion3`이며
+  denied. 사용자 명령은 `sudo usermod -aG docker <worker-3-operator-account>`이며
   Codex는 sudo를 실행하지 않았다.
 - 공개 redacted evidence:
   `docs/vault/30_Development/Evidence/card150-intranet-pki-lan-pilot.json`.
@@ -91,8 +91,10 @@ Card 152 inventory는 5행을 갖지만 필수값 71개가 비어 있었다. 정
 | worker r2 DB secret | runtime password의 `psql --set` argv 전달을 제거했다. 보호 파일은 psql stdin meta-command로만 읽으며 정적 회귀가 argv 재도입을 막는다. |
 | worker r2 role drift | role을 매 실행 최소 권한으로 재고정하고 shell verifier와 `bind-db-auth`가 `pg_roles` 5개 권한을 모두 false로 요구한다. SUPERUSER 및 md5 변이를 음성 시험으로 고정했다. |
 | Claude r2 C1·L3 | password 없는 non-loopback DSN 단독 사례와 SCRAM-only 무력화 사례를 추가했다. |
-| Claude r2 C2·L5 | worker 행마다 과거 관측 시각·관측 도구 commit을 기록하고 remote Dockerfile을 포함한 Git blob OID+SHA-256 결속으로 바꿨다. |
+| Claude r2 C2·L5 | worker 행마다 과거 관측 시각을 기록하고 remote Dockerfile을 포함한 Git blob OID+SHA-256 결속으로 바꿨다. |
 | Claude r2 L6·runbook | root passphrase는 parent가 아니라 파일 자체 ACL을 제한한다. 공개 운영절차·History의 LAN 주소는 역할 placeholder로 바꿨다. |
+| Claude r3 C4 | 00:08 관측은 00:24 최초 commit 전 working tree에서 수행됐다. 도구 revision은 증명할 수 없으므로 `observationToolState=uncommitted-working-tree`, `observationToolFirstCommittedIn=d3d8d927…`로 정정했고 미관측 worker-3은 둘을 null/not-run으로 기록했다. |
+| Claude r3 L7~L12 | argv 정규식, 위험 role bit 5개, unexpected membership, shell verifier 음성 실행을 보강했다. ALTER session logging을 none/panic으로 제한하고 stderr를 일반화했다. |
 
 commit `8ce88ba9c2958df8cbed95ab8ea4bf9286ae55f1`의 두 DB script를 원격 v5에
 재적용했다. secret 출력 없이 no/wrong credential 거부, admin/runtime 수락,
