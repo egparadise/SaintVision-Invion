@@ -1,11 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.224"
+version: "1.0.225"
 status: "review"
 author: "Codex"
-updated: "2026-09-29T03:40:51+09:00"
+updated: "2026-09-30T00:19:37+09:00"
 source_of_truth: "Git"
+active_card: "CARD-151 intranet ObjectStore and PITR rehearsal"
+active_card_status: "PR 248 review; HTTP candidate measured, TLS and source replication HBA blocked external"
+active_card_next: "Claude review, intranet CA input, operator-approved physical replication boundary"
 ---
 
 # Codex 작업 현황
