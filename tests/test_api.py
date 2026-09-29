@@ -8,7 +8,9 @@ Browser evidence is S02-FE and belongs to Gemini; this file covers the API half.
 
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
 import datetime as dt
+from threading import Barrier
 import uuid
 
 import pytest
@@ -608,6 +610,41 @@ def test_contribution_registration_is_idempotent(client, app_engine, seeded):
         "/v1/storage/contributions", headers={"Authorization": "Bearer token-a"}
     )
     assert len(listed.json()["items"]) == 1
+
+
+def test_concurrent_first_contribution_requests_replay_one_response(client, app_engine, seeded):
+    node_id = register_node(client, app_engine, seeded)
+    body = {"nodeId": node_id, "declaredPath": "/srv/inv/concurrent"}
+    headers = {"Authorization": "Bearer token-a", "Idempotency-Key": "concurrent-key"}
+    start = Barrier(2, timeout=30)
+
+    def send():
+        start.wait()
+        return client.post("/v1/storage/contributions", json=body, headers=headers)
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        futures = (executor.submit(send), executor.submit(send))
+        responses = [future.result(timeout=30) for future in futures]
+
+    assert [response.status_code for response in responses] == [201, 201]
+    assert responses[0].json() == responses[1].json()
+    listed = client.get(
+        "/v1/storage/contributions", headers={"Authorization": "Bearer token-a"}
+    )
+    assert len(listed.json()["items"]) == 1
+
+
+def test_duplicate_contribution_without_key_is_a_registered_409(client, app_engine, seeded):
+    node_id = register_node(client, app_engine, seeded)
+    body = {"nodeId": node_id, "declaredPath": "/srv/inv/no-key-duplicate"}
+    headers = {"Authorization": "Bearer token-a"}
+
+    first = client.post("/v1/storage/contributions", json=body, headers=headers)
+    duplicate = client.post("/v1/storage/contributions", json=body, headers=headers)
+
+    assert first.status_code == 201
+    assert duplicate.status_code == 409
+    assert duplicate.json()["code"] == "GRAPH-INVALID-TRANSITION"
 
 
 def test_db_idempotency_replay_is_checked_by_response_contract(
