@@ -1,11 +1,11 @@
 ---
 doc_id: "DESIGN-S11-AC11-COMPOSITE-LONG-SOAK-001"
 title: "S11 AC-11 composite long-soak 설계"
-version: "1.0.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T19:59:12+09:00"
+updated: "2026-09-29T02:34:12+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_id: "S11-BE"
@@ -101,3 +101,18 @@ registry patch와 importer 구현 전에는 target이 승인돼도 `NOT_REGISTER
 - 실제 fault card는 maintenance window, 대상, rollback, external observer, 금지 명령을 사전 승인받아야 한다. `rm`, prune, volume/key/state 교체와 보호 컨테이너 조작은 금지한다.
 - docs-only rollback은 이 PR revert다. target criteria 변경은 기존 ID를 덮어쓰지 않고 새 target version으로 제안한다.
 - 현재는 설계·target proposal만 있으며 `long-soak`은 PASS가 아니다.
+
+## 7. Card 124 producer 경계
+
+`tools/run_ac11_composite_long_soak.py`는 registry 적용 뒤의 importer를 생산자 쪽에서 호출한다. 입력 인벤토리는 #224 외부 전제 인수 준비 패키지 §5-3의 `s01-readiness-inventory:1` exact shape다. 이 target은 ADR-100 topology B만 받으므로 `cp-colocated-plus-four-workers`, CP 겸임 1대, Ubuntu worker 4대, `lan-workspace-v1`, 고유 Node/IP/설치/cert identity, 허용 자원·NTP 값이 모두 있어야 한다. `storageRole=provider|archive`인 Node는 하나 이상의 절대 `allowedFolders`가 필수이고 `storageRole=none`인 Node는 빈 목록을 허용한다. 입력 원문 식별자는 report에 쓰지 않고 UTF-8 canonical JSON의 SHA-256 revision만 남긴다.
+
+`--mode dry-run`은 검증한 G-19 값을 기존 `five_node_lab_preflight.py` inventory와 `lan_pilot.py` schema-v3 manifest로 변환해 ADR-100의 5 registered / 4 eligible / 1 excluded 경계를 다시 검사한다. 이 모드는 14개 case의 `preflight → observe-baseline → simulate-fault → observe-recovery → cleanup` 순서와 synthetic container lifecycle 전이를 **계획으로 선언·검증할 뿐 실행하지 않는다**. 따라서 실행·관측 receipt를 만들지 않고 `casePlans[].executedPhases=[]`, `containerPlan.executedTransitions=[]`, `execution.mode=plan-only`, `simulationExecuted=false`, `observedCaseCount=0`, `cleanup.observed=false`를 exact shape로 남긴다. OS·Docker·SSH·PG·LAN state에는 접근하지 않는다. report는 항상 다음을 함께 가진다.
+
+- `referenceOnly=true`, `acceptanceClaim=false`, `verdict=NOT_OBSERVED`, `physicalActions=false`
+- exact 14 case·20 fault-class와 case별 허용 fault-class 집합 및 미실행 `DECLARED_ONLY` 계획
+- 같은 source SHA와 inventory revision의 storage reference digest, 같은 source의 hosted drift digest
+- synthetic topology와 `comparableGroup=reference-only`; 물리 targetRef와 관측 metric은 없음
+
+importer는 이 dry-run branch를 physical branch와 별도 exact key set으로 검사하고 envelope에도 `referenceOnly=true`, `acceptanceClaim=false`를 보존한다. 따라서 `MEASURED_PASS`나 `referenceOnly=false`로 바꾸기, case/plan 누락·실행 phase 위조, child digest 교체, operator resource·physical environment 위조, dirty/non-HEAD provenance는 `INVALID_RUN`이고 dry-run 성공 exit 0도 AC-11 합격이 아니다. report/evidence/JUnit 경로는 기존 파일이나 입력을 덮어쓰지 않는다. 생성 JUnit 15건은 전부 reference-only skip으로 기록해 계획 검증 성공을 acceptance pass와 분리한다.
+
+`--mode physical`은 인벤토리 부재·5대/identity/topology 불일치를 **첫 외부 동작 전에** `BLOCKED_EXTERNAL(G-19)`로 끝낸다. 유효한 인벤토리여도 이 저장소에 operator-owned G-24 fault-control adapter가 아직 없으므로 `BLOCKED_EXTERNAL(G-24)`, `execution.started=false`로 끝난다. runner가 임의 SSH/Docker/PDU/switch 명령을 조립하거나 기존 `.work/lan-5node`를 쓰는 경로는 없다. G-24가 제공될 때에는 별도 승인 카드에서 실제 adapter, maintenance window, external observer와 복구 명령을 추가하고 이 section의 fail-before-start 시험을 유지해야 한다.

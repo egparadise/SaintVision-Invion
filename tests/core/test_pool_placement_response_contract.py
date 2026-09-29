@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from contextlib import nullcontext
 from datetime import datetime, timezone
 import json
 from pathlib import Path
@@ -33,13 +34,36 @@ def fixture(name: str) -> dict:
     return json.loads((FIXTURES / name).read_text(encoding="utf-8"))
 
 
+class ContractSession:
+    def begin_nested(self):
+        return nullcontext()
+
+    def get(self, *_args, **_kwargs):
+        return SimpleNamespace()
+
+
 def client(*, raise_server_exceptions: bool = True) -> TestClient:
     app = FastAPI()
     app.include_router(pools.router)
     app.dependency_overrides[pools.get_principal] = lambda: PRINCIPAL
-    app.dependency_overrides[pools.get_session] = lambda: object()
+    app.dependency_overrides[pools.get_session] = ContractSession
+    app.dependency_overrides[pools.get_write_session] = ContractSession
     app.dependency_overrides[pools.get_now] = lambda: NOW
     return TestClient(app, raise_server_exceptions=raise_server_exceptions)
+
+
+@pytest.fixture(autouse=True)
+def _allow_pool_mutations(monkeypatch):
+    monkeypatch.setattr(
+        pools,
+        "_require_pool_write_access",
+        lambda *_args, **_kwargs: SimpleNamespace(project_id="prj_contract"),
+    )
+    monkeypatch.setattr(
+        pools,
+        "_require_plan_write_access",
+        lambda *_args, **_kwargs: SimpleNamespace(project_id="prj_contract"),
+    )
 
 
 def test_all_pool_and_placement_serving_routes_declare_response_contracts():

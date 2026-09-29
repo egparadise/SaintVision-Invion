@@ -8,7 +8,9 @@ Browser evidence is S02-FE and belongs to Gemini; this file covers the API half.
 
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
 import datetime as dt
+from threading import Barrier
 import uuid
 
 import pytest
@@ -126,10 +128,22 @@ def enroll_payload(secret: str, hostname: str = "lab-01") -> dict:
         "osVersion": "22.04",
         "agentVersion": "0.1.0",
         "capabilities": [
-            {"kind": "ram", "totalQuantity": 64, "unit": "GiB", "divisible": True,
-             "offeredQuantity": 48},
-            {"kind": "gpu", "deviceIndex": 0, "totalQuantity": 1, "unit": "device",
-             "vendor": "NVIDIA", "model": "RTX", "offeredQuantity": 1},
+            {
+                "kind": "ram",
+                "totalQuantity": 64,
+                "unit": "GiB",
+                "divisible": True,
+                "offeredQuantity": 48,
+            },
+            {
+                "kind": "gpu",
+                "deviceIndex": 0,
+                "totalQuantity": 1,
+                "unit": "device",
+                "vendor": "NVIDIA",
+                "model": "RTX",
+                "offeredQuantity": 1,
+            },
         ],
         "certificateFingerprint": "b" * 64,
         "labels": {"room": "lab"},
@@ -247,11 +261,13 @@ def test_denials_are_recorded(client, app_engine, seeded, owner_engine):
     )
     # Read as the owner: the denial may carry no tenant, so RLS would hide it.
     with owner_engine.connect() as connection:
-        rows = connection.execute(
-            text(
-                "SELECT reason_code, outcome FROM audit_events WHERE outcome = 'deny'"
+        rows = (
+            connection.execute(
+                text("SELECT reason_code, outcome FROM audit_events WHERE outcome = 'deny'")
             )
-        ).mappings().all()
+            .mappings()
+            .all()
+        )
     assert any(r["reason_code"] == "AUTH-BOOTSTRAP-TOKEN-INVALID" for r in rows)
 
 
@@ -282,8 +298,9 @@ def test_another_tenants_node_is_not_readable_by_id(client, app_engine, seeded):
     node_id = created.json()["node"]["nodeId"]
     response = client.get(f"/v1/nodes/{node_id}", headers={"Authorization": "Bearer token-b"})
     # Reported as absent, not forbidden: "forbidden" would confirm it exists.
-    assert response.status_code == 409
-    assert response.json()["code"] == "RES-NODE-NOT-FOUND"
+    assert response.status_code == 404
+    assert response.json()["code"] == "RES-0004"
+    assert response.json()["detail"] == "No such resource."
 
 
 def test_project_scope_is_checked_separately_from_tenancy(seeded):
@@ -323,19 +340,25 @@ def test_a_denial_with_no_tenant_is_still_recorded(client, owner_engine):
     """
     assert client.get("/v1/nodes").status_code == 401
     with owner_engine.connect() as connection:
-        rows = connection.execute(
-            text(
-                "SELECT outcome, actor_type, action FROM audit_events "
-                "WHERE tenant_id IS NULL AND reason_code = 'AUTH-MISSING-CREDENTIAL'"
+        rows = (
+            connection.execute(
+                text(
+                    "SELECT outcome, actor_type, action FROM audit_events "
+                    "WHERE tenant_id IS NULL AND reason_code = 'AUTH-MISSING-CREDENTIAL'"
+                )
             )
-        ).mappings().all()
+            .mappings()
+            .all()
+        )
     assert len(rows) == 1
     assert rows[0]["outcome"] == "deny"
     assert rows[0]["actor_type"] == "anonymous"
     assert rows[0]["action"] == "GET /v1/nodes"
 
 
-def test_a_long_route_without_a_credential_is_401_and_its_denial_is_recorded(client, owner_engine, seeded):
+def test_a_long_route_without_a_credential_is_401_and_its_denial_is_recorded(
+    client, owner_engine, seeded
+):
     """The shared boundary behind Codex #184 F3: with prefixed ids in the path,
     ``PUT /v1/projects/{p}/members/{u}`` is 86 characters and the raw-path
     action overflowed ``audit_events.action`` (64), so the denial INSERT failed
@@ -347,19 +370,27 @@ def test_a_long_route_without_a_credential_is_401_and_its_denial_is_recorded(cli
     assert response.headers["WWW-Authenticate"] == "Bearer"
     assert response.json()["code"] == "AUTH-MISSING-CREDENTIAL"
     with owner_engine.connect() as connection:
-        rows = connection.execute(
-            text(
-                "SELECT outcome, actor_type, action FROM audit_events "
-                "WHERE tenant_id IS NULL AND reason_code = 'AUTH-MISSING-CREDENTIAL'"
+        rows = (
+            connection.execute(
+                text(
+                    "SELECT outcome, actor_type, action FROM audit_events "
+                    "WHERE tenant_id IS NULL AND reason_code = 'AUTH-MISSING-CREDENTIAL'"
+                )
             )
-        ).mappings().all()
+            .mappings()
+            .all()
+        )
     assert len(rows) == 1
     assert rows[0]["outcome"] == "deny" and rows[0]["actor_type"] == "anonymous"
     assert rows[0]["action"] == "PUT /v1/projects/{project_id}/members/{user_id}"
-    assert seeded["project_a"] not in rows[0]["action"] and seeded["user_b"] not in rows[0]["action"]
+    assert (
+        seeded["project_a"] not in rows[0]["action"] and seeded["user_b"] not in rows[0]["action"]
+    )
 
 
-def test_the_raw_path_action_reproduces_the_overflow_on_a_long_route(client, owner_engine, seeded, monkeypatch):
+def test_the_raw_path_action_reproduces_the_overflow_on_a_long_route(
+    client, owner_engine, seeded, monkeypatch
+):
     """Revert-fail pin: with the previous ``METHOD path`` derivation the denial
     write itself raises on the real column, and no row is recorded. The
     client raises server exceptions, so the DBAPI cause is asserted directly."""
@@ -367,7 +398,9 @@ def test_the_raw_path_action_reproduces_the_overflow_on_a_long_route(client, own
 
     from saintvision.api import app as app_module
 
-    monkeypatch.setattr(app_module, "audit_action", lambda request: f"{request.method} {request.url.path}")
+    monkeypatch.setattr(
+        app_module, "audit_action", lambda request: f"{request.method} {request.url.path}"
+    )
     path = f"/v1/projects/{seeded['project_a']}/members/{seeded['user_b']}"
     with pytest.raises(DataError) as caught:
         client.put(path, json={"role": "operator"})
@@ -393,9 +426,9 @@ def test_unknown_credential_is_refused(client):
 def test_heartbeat_advances_and_replays_are_ignored(client, app_engine, seeded):
     secret = mint_token(app_engine, seeded["tenant_a"], seeded["user_a"])
     headers = {"X-Inv-Tenant": str(seeded["tenant_a"])}
-    node_id = client.post("/v1/nodes", json=enroll_payload(secret), headers=headers).json()[
-        "node"
-    ]["nodeId"]
+    node_id = client.post("/v1/nodes", json=enroll_payload(secret), headers=headers).json()["node"][
+        "nodeId"
+    ]
 
     first = client.post(
         f"/v1/nodes/{node_id}/heartbeats", json={"sequence": 1}, headers=node_headers()
@@ -422,23 +455,17 @@ def test_heartbeat_observations_land_in_the_right_partition(client, app_engine, 
     headers = {"X-Inv-Tenant": str(seeded["tenant_a"])}
     created = client.post("/v1/nodes", json=enroll_payload(secret), headers=headers).json()
     node_id = created["node"]["nodeId"]
-    detail = client.get(
-        f"/v1/nodes/{node_id}", headers={"Authorization": "Bearer token-a"}
-    ).json()
+    detail = client.get(f"/v1/nodes/{node_id}", headers={"Authorization": "Bearer token-a"}).json()
     # By kind, not by position. GiB is a unit of memory and the first
     # capability in the list is whichever id sorted lowest — reporting GiB
     # against a GPU is now refused, which is the point.
-    capability_id = next(
-        c["capabilityId"] for c in detail["capabilities"] if c["kind"] == "ram"
-    )
+    capability_id = next(c["capabilityId"] for c in detail["capabilities"] if c["kind"] == "ram")
 
     response = client.post(
         f"/v1/nodes/{node_id}/heartbeats",
         json={
             "sequence": 2,
-            "observations": [
-                {"capabilityId": capability_id, "usedQuantity": 3.5, "unit": "GiB"}
-            ],
+            "observations": [{"capabilityId": capability_id, "usedQuantity": 3.5, "unit": "GiB"}],
         },
         headers=node_headers(),
     )
@@ -454,9 +481,7 @@ def test_heartbeat_observations_land_in_the_right_partition(client, app_engine, 
             {"t": str(seeded["tenant_a"])},
         )
         stored = connection.execute(
-            _text(
-                "SELECT used_quantity FROM resource_snapshots WHERE capability_id = :c"
-            ),
+            _text("SELECT used_quantity FROM resource_snapshots WHERE capability_id = :c"),
             {"c": capability_id},
         ).scalar_one()
     assert stored == int(3.5 * 1024**3)
@@ -472,9 +497,9 @@ def test_liveness_sweep_marks_a_silent_node_lost(client, app_engine, seeded):
     """
     secret = mint_token(app_engine, seeded["tenant_a"], seeded["user_a"])
     headers = {"X-Inv-Tenant": str(seeded["tenant_a"])}
-    node_id = client.post("/v1/nodes", json=enroll_payload(secret), headers=headers).json()[
-        "node"
-    ]["nodeId"]
+    node_id = client.post("/v1/nodes", json=enroll_payload(secret), headers=headers).json()["node"][
+        "nodeId"
+    ]
     client.post(f"/v1/nodes/{node_id}/heartbeats", json={"sequence": 1}, headers=node_headers())
 
     auth = {"Authorization": "Bearer token-a"}
@@ -490,9 +515,7 @@ def test_liveness_sweep_marks_a_silent_node_lost(client, app_engine, seeded):
         with session.begin():
             with tenant_scope(session, seeded["tenant_a"]):
                 session.execute(
-                    text(
-                        "UPDATE nodes SET last_heartbeat_at = :t WHERE node_id = :i"
-                    ),
+                    text("UPDATE nodes SET last_heartbeat_at = :t WHERE node_id = :i"),
                     {"t": NOW - dt.timedelta(seconds=120), "i": node_id},
                 )
 
@@ -519,12 +542,12 @@ def test_liveness_sweep_does_not_cross_tenants(client, app_engine, seeded):
     with factory() as session:
         with session.begin():
             with tenant_scope(session, seeded["tenant_a"]):
-                session.execute(text("UPDATE nodes SET last_heartbeat_at = :t"),
-                                {"t": NOW - dt.timedelta(seconds=600)})
+                session.execute(
+                    text("UPDATE nodes SET last_heartbeat_at = :t"),
+                    {"t": NOW - dt.timedelta(seconds=600)},
+                )
 
-    other = client.post(
-        "/v1/nodes/liveness-sweeps", headers={"Authorization": "Bearer token-b"}
-    )
+    other = client.post("/v1/nodes/liveness-sweeps", headers={"Authorization": "Bearer token-b"})
     assert other.json()["markedLost"] == 0
 
 
@@ -604,10 +627,41 @@ def test_contribution_registration_is_idempotent(client, app_engine, seeded):
     assert second_contract == first_contract
     assert second.json() == first.json()
 
-    listed = client.get(
-        "/v1/storage/contributions", headers={"Authorization": "Bearer token-a"}
-    )
+    listed = client.get("/v1/storage/contributions", headers={"Authorization": "Bearer token-a"})
     assert len(listed.json()["items"]) == 1
+
+
+def test_concurrent_first_contribution_requests_replay_one_response(client, app_engine, seeded):
+    node_id = register_node(client, app_engine, seeded)
+    body = {"nodeId": node_id, "declaredPath": "/srv/inv/concurrent"}
+    headers = {"Authorization": "Bearer token-a", "Idempotency-Key": "concurrent-key"}
+    start = Barrier(2, timeout=30)
+
+    def send():
+        start.wait()
+        return client.post("/v1/storage/contributions", json=body, headers=headers)
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        futures = (executor.submit(send), executor.submit(send))
+        responses = [future.result(timeout=30) for future in futures]
+
+    assert [response.status_code for response in responses] == [201, 201]
+    assert responses[0].json() == responses[1].json()
+    listed = client.get("/v1/storage/contributions", headers={"Authorization": "Bearer token-a"})
+    assert len(listed.json()["items"]) == 1
+
+
+def test_duplicate_contribution_without_key_is_a_registered_409(client, app_engine, seeded):
+    node_id = register_node(client, app_engine, seeded)
+    body = {"nodeId": node_id, "declaredPath": "/srv/inv/no-key-duplicate"}
+    headers = {"Authorization": "Bearer token-a"}
+
+    first = client.post("/v1/storage/contributions", json=body, headers=headers)
+    duplicate = client.post("/v1/storage/contributions", json=body, headers=headers)
+
+    assert first.status_code == 201
+    assert duplicate.status_code == 409
+    assert duplicate.json()["code"] == "GRAPH-INVALID-TRANSITION"
 
 
 def test_db_idempotency_replay_is_checked_by_response_contract(
@@ -671,9 +725,7 @@ def test_another_tenant_cannot_see_the_contribution(client, app_engine, seeded):
         json={"nodeId": node_id, "declaredPath": "/srv/inv/share"},
         headers={"Authorization": "Bearer token-a"},
     )
-    other = client.get(
-        "/v1/storage/contributions", headers={"Authorization": "Bearer token-b"}
-    )
+    other = client.get("/v1/storage/contributions", headers={"Authorization": "Bearer token-b"})
     assert other.json()["items"] == []
 
 
@@ -694,25 +746,19 @@ def test_unknown_fields_are_rejected(client, app_engine, seeded):
 
 
 def test_page_limit_is_capped(client, app_engine, seeded):
-    response = client.get(
-        "/v1/nodes?limit=100000", headers={"Authorization": "Bearer token-a"}
-    )
+    response = client.get("/v1/nodes?limit=100000", headers={"Authorization": "Bearer token-a"})
     assert response.status_code == 200
 
 
 def test_invalid_cursor_is_rejected(client):
-    response = client.get(
-        "/v1/nodes?cursor=nonsense", headers={"Authorization": "Bearer token-a"}
-    )
+    response = client.get("/v1/nodes?cursor=nonsense", headers={"Authorization": "Bearer token-a"})
     assert response.status_code == 422
     assert response.json()["code"] == "VAL-CURSOR"
 
 
 def test_traceparent_is_honoured_and_echoed(client):
     trace_id = new_trace_id()
-    response = client.get(
-        "/v1/health", headers={"traceparent": f"00-{trace_id}-{'a'*16}-01"}
-    )
+    response = client.get("/v1/health", headers={"traceparent": f"00-{trace_id}-{'a'*16}-01"})
     assert trace_id in response.headers["traceparent"]
 
 

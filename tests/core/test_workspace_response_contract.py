@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from contextlib import contextmanager
 import json
 import datetime as dt
 from pathlib import Path
+from types import SimpleNamespace
 import uuid
 
 import pytest
@@ -13,7 +15,13 @@ from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
 from saintvision.api import schemas
-from saintvision.api.deps import get_now, get_principal, get_session
+from saintvision.api.deps import (
+    get_now,
+    get_principal,
+    get_session,
+    get_settings,
+    get_write_session,
+)
 from saintvision.api.v1 import projects, readiness
 from saintvision.identity.principal import Principal
 
@@ -30,7 +38,10 @@ def _fixture(name: str) -> dict:
     [
         ("project-list-response.json", schemas.ProjectListResponse),
         ("project-workspaces-response.json", schemas.ProjectWorkspacesResponse),
-        ("workspace-execution-readiness-response.json", schemas.WorkspaceExecutionReadinessResponse),
+        (
+            "workspace-execution-readiness-response.json",
+            schemas.WorkspaceExecutionReadinessResponse,
+        ),
         ("workspace-tool-result-response.json", schemas.WorkspaceToolResultResponse),
     ],
 )
@@ -45,14 +56,42 @@ def test_shared_workspace_fixture_matches_strict_response_model(filename, model)
     [
         ("project-list-response.json", schemas.ProjectListResponse, "missing-project-name"),
         ("project-list-response.json", schemas.ProjectListResponse, "extra-project-field"),
-        ("project-workspaces-response.json", schemas.ProjectWorkspacesResponse, "missing-page-count"),
+        (
+            "project-workspaces-response.json",
+            schemas.ProjectWorkspacesResponse,
+            "missing-page-count",
+        ),
         ("project-workspaces-response.json", schemas.ProjectWorkspacesResponse, "extra-page-field"),
-        ("project-workspaces-response.json", schemas.ProjectWorkspacesResponse, "missing-workspace-field"),
-        ("project-workspaces-response.json", schemas.ProjectWorkspacesResponse, "extra-workspace-field"),
-        ("workspace-execution-readiness-response.json", schemas.WorkspaceExecutionReadinessResponse, "missing-workspace-id"),
-        ("workspace-execution-readiness-response.json", schemas.WorkspaceExecutionReadinessResponse, "extra-response-field"),
-        ("workspace-execution-readiness-response.json", schemas.WorkspaceExecutionReadinessResponse, "missing-check-field"),
-        ("workspace-execution-readiness-response.json", schemas.WorkspaceExecutionReadinessResponse, "extra-check-field"),
+        (
+            "project-workspaces-response.json",
+            schemas.ProjectWorkspacesResponse,
+            "missing-workspace-field",
+        ),
+        (
+            "project-workspaces-response.json",
+            schemas.ProjectWorkspacesResponse,
+            "extra-workspace-field",
+        ),
+        (
+            "workspace-execution-readiness-response.json",
+            schemas.WorkspaceExecutionReadinessResponse,
+            "missing-workspace-id",
+        ),
+        (
+            "workspace-execution-readiness-response.json",
+            schemas.WorkspaceExecutionReadinessResponse,
+            "extra-response-field",
+        ),
+        (
+            "workspace-execution-readiness-response.json",
+            schemas.WorkspaceExecutionReadinessResponse,
+            "missing-check-field",
+        ),
+        (
+            "workspace-execution-readiness-response.json",
+            schemas.WorkspaceExecutionReadinessResponse,
+            "extra-check-field",
+        ),
     ],
 )
 def test_workspace_contract_rejects_shared_fixture_shape_drift(filename, model, mutate):
@@ -87,17 +126,31 @@ def test_workspace_contract_rejects_shared_fixture_shape_drift(filename, model, 
     [
         ("/v1/projects", "project-list-response.json", "project-list"),
         ("/v1/projects/prj_contract/workspaces", "project-workspaces-response.json", "workspaces"),
-        ("/v1/workspaces/wsp_contract/execution-readiness", "workspace-execution-readiness-response.json", "readiness"),
+        (
+            "/v1/workspaces/wsp_contract/execution-readiness",
+            "workspace-execution-readiness-response.json",
+            "readiness",
+        ),
     ],
 )
-def test_fastapi_workspace_routes_serialize_the_shared_fixture(monkeypatch, path, filename, service):
+def test_fastapi_workspace_routes_serialize_the_shared_fixture(
+    monkeypatch, path, filename, service
+):
     payload = _fixture(filename)
     if service == "project-list":
-        monkeypatch.setattr(projects.project_service, "list_projects", lambda *_args, **_kwargs: payload["projects"])
+        monkeypatch.setattr(
+            projects.project_service, "list_projects", lambda *_args, **_kwargs: payload["projects"]
+        )
     elif service == "workspaces":
-        monkeypatch.setattr(projects.project_service, "list_workspaces", lambda *_args, **_kwargs: payload["workspaces"])
+        monkeypatch.setattr(
+            projects.project_service,
+            "list_workspaces",
+            lambda *_args, **_kwargs: payload["workspaces"],
+        )
     else:
-        monkeypatch.setattr(readiness.readiness_service, "workspace_readiness", lambda *_args, **_kwargs: payload)
+        monkeypatch.setattr(
+            readiness.readiness_service, "workspace_readiness", lambda *_args, **_kwargs: payload
+        )
 
     principal = Principal(
         user_id="usr_workspace_contract",
@@ -109,6 +162,7 @@ def test_fastapi_workspace_routes_serialize_the_shared_fixture(monkeypatch, path
     app.include_router(readiness.router)
     app.dependency_overrides[get_principal] = lambda: principal
     app.dependency_overrides[get_session] = lambda: object()
+    app.dependency_overrides[get_write_session] = lambda: object()
 
     response = TestClient(app).get(path)
 
@@ -161,7 +215,10 @@ def _create_app(monkeypatch, service_return):
     app.include_router(projects.router)
     app.dependency_overrides[get_principal] = lambda: principal
     app.dependency_overrides[get_session] = lambda: object()
-    app.dependency_overrides[get_now] = lambda: dt.datetime(2026, 9, 21, 12, 0, 0, tzinfo=dt.timezone.utc)
+    app.dependency_overrides[get_write_session] = lambda: object()
+    app.dependency_overrides[get_now] = lambda: dt.datetime(
+        2026, 9, 21, 12, 0, 0, tzinfo=dt.timezone.utc
+    )
     return app
 
 
@@ -193,10 +250,20 @@ def test_create_workspace_response_model_rejects_contract_violation(monkeypatch)
 
 
 def _tool_app(monkeypatch, service_return):
+    @contextmanager
+    def optional_write(*_args, **_kwargs):
+        yield None, lambda _body, _status=200: None
+
     monkeypatch.setattr(
         projects.project_service, "set_workspace_tool", lambda *_a, **_k: service_return
     )
+    monkeypatch.setattr(
+        projects.project_service,
+        "require_project_access",
+        lambda *_a, **_k: {"canRequest": True, "roleCode": "owner"},
+    )
     monkeypatch.setattr(projects, "record_event", lambda *_a, **_k: None)
+    monkeypatch.setattr(projects, "optional_idempotent_write", optional_write)
     principal = Principal(
         user_id="usr_workspace_contract",
         tenant_id=uuid.UUID("00000000-0000-4000-8000-000000000041"),
@@ -205,7 +272,16 @@ def _tool_app(monkeypatch, service_return):
     app = FastAPI()
     app.include_router(projects.router)
     app.dependency_overrides[get_principal] = lambda: principal
-    app.dependency_overrides[get_session] = lambda: object()
+    app.dependency_overrides[get_session] = lambda: SimpleNamespace(
+        get=lambda *_a, **_k: SimpleNamespace(
+            tenant_id=principal.tenant_id,
+            project_id="prj_workspace_contract",
+        )
+    )
+    app.dependency_overrides[get_settings] = lambda: SimpleNamespace(
+        idempotency_ttl_seconds=600,
+        business_lock_timeout_ms=5_000,
+    )
     app.dependency_overrides[get_now] = lambda: dt.datetime(
         2026, 9, 22, 9, 0, tzinfo=dt.timezone.utc
     )
@@ -251,7 +327,7 @@ def test_workspace_tool_route_allows_selected_tool_without_assigned_node(monkeyp
 def test_workspace_tool_route_rejects_invalid_readiness(monkeypatch):
     payload = _fixture("workspace-tool-result-response.json")
     payload["toolReadiness"]["inventedReady"] = True
-    response = TestClient(
-        _tool_app(monkeypatch, payload), raise_server_exceptions=False
-    ).put("/v1/workspaces/wsp_contract_tool/tool", json={"toolName": "codex-cli"})
+    response = TestClient(_tool_app(monkeypatch, payload), raise_server_exceptions=False).put(
+        "/v1/workspaces/wsp_contract_tool/tool", json={"toolName": "codex-cli"}
+    )
     assert response.status_code == 500

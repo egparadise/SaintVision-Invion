@@ -52,6 +52,8 @@ except ModuleNotFoundError:  # Direct `python tools/placement_benchmark.py` exec
     )
 
 ROOT = Path(__file__).resolve().parents[1]
+BENCHMARK_OPT_IN_ENV = "INV_PLACEMENT_BENCHMARK"
+BENCHMARK_OPT_IN_REASON = "run only through tools/placement_benchmark.py"
 
 
 @dataclass(frozen=True)
@@ -442,6 +444,7 @@ def _run_pytest_adapter(args: argparse.Namespace) -> int:
     code_sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     env = {
         **os.environ,
+        BENCHMARK_OPT_IN_ENV: "1",
         "INV_PLACEMENT_BENCHMARK_REQUESTS": str(args.requests),
         "INV_PLACEMENT_BENCHMARK_CONCURRENCY": str(args.concurrency),
         "INV_PLACEMENT_BENCHMARK_ROUNDS": str(args.rounds),

@@ -1,15 +1,24 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.221"
+version: "1.0.224"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T22:01:22+09:00"
+updated: "2026-09-29T03:40:51+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
 
+## 2026-09-29 S05 Card114 c50 일반 suite 격리 — Claude 재확인 요청
+
+- `eff23b81`에서 사전 등록 c50/500ms/timeout0 판정은 그대로 두고, `tools/placement_benchmark.py`만 opt-in env를 주입하게 했다. 일반 Backend/Core는 정확한 사유 1건을 skip하고 workflow의 exact skip map이 증가를 감시한다.
+- 문제 run의 placement 실패는 Python 3.12에서 16/50 성공·`55P03` 34였고 active 누수는 0이었다. Python 3.14 placement는 통과했다. 로컬 사전 반복 10/10은 모두 엄격 실패였지만 cleanup active 0, explicit CLI도 22/50·`57014` 28로 exit 1이라 기준을 약화하지 않았다.
+- exact head Backend `36444394600`·`36446063302`는 양 Python 각각 2929 passed/48 skipped/2 deselected, Core `36444412973`은 3234 passed/37 skipped/2 deselected이며 ratchet green이다. c50 자체는 모두 skip이므로 hosted `NOT_OBSERVED`; #151 전용 lane 착지 전 S05 합격으로 세지 않는다. PR #227, reviewer Claude. [[2026-09-29_00-57-33_KST_S05_Card114_placement_benchmark_flake_Codex]].
+## 2026-09-29 카드 123 — S04·S08 운영 판정 collector 검토 요청
+
+- 판정 기준 v1.1.1의 core C1을 REPEATABLE READ·READ ONLY 전수 SQL로 구현했다. attempt 시점 최신 approved·expiry·workload digest를 판정하고 kernel C1-K는 별도 `NOT_OBSERVED`로 고정한다. core 제품에 canonical cancel audit producer가 없음을 독립 검토에서 확인해, (a)~(c)가 깨끗해도 O3는 `cancelHistorySource: absent`/`NOT_OBSERVED`이며 위반만 `MEASURED_FAIL`이다.
+- O1 clean DB 집계는 publisher/consumer deployment identity 없이 `RECORDED_ONLY`; 물리 Node, 운영 backup/PITR, retention/GC와 미구현 producer는 그대로 차단한다. 시험 basename 충돌을 해소했고 PG-free 8 passed, real PG 6-attempt 부정 matrix는 hosted Core 재실행 대기다. 공개 계약·migration·registry status 변경 0. [[2026-09-29_01-59-38_KST_S04_S08_운영판정_collector_Codex]].
 ## 2026-09-28 Card36 hosted Core CX01 19 skip 실행 전환 — 검토 인계
 
 - base `9a837fd7`(#117 lock-wait skip map hotfix 포함), branch `agent/codex/cx01-hosted-core`, owner Codex/reviewer Claude. Core job이 고유 owner label·tmpfs·loopback으로 PostgreSQL 16을 직접 생성하고 같은 컨테이너를 recovery source/CX01 identity로 쓰며 `if: always()` 정리하는 설계를 고정했다.
@@ -57,6 +66,18 @@ source_of_truth: "Git"
 - PR #159 Claude r3의 비차단 관찰을 #159 위 PR #173으로 분리했다. S3 checkout은 persisted provider를 exact resolve하고, collect는 locator prefix를 `deleting` 커밋 전에 검증하며, begin/prefix drift는 `STORE-0001`/503/retryable로 통일했다. malformed locator 422와 upload content identity 409는 유지한다.
 - restore의 새 요청은 Run state/version/attempt를 checkpoint pin보다 먼저 검증해 `GRAPH-0003`을 유지한다. object byte/delete 호출 11곳의 provider mismatch guard 순서를 회귀 시험으로 고정했다.
 - Claude 조건부 검토 뒤 실제 checkout 호출 지점과 ResultStore prepare/complete·ShardCompletion once의 mismatch 동작 시험을 보강해 focused 26 passed, 최종 head `f02dacf6`이다. hosted Backend `36377648185`는 3.12/3.14 각각 3077 passed/47 skipped/2 deselected/0 failed, Core `36377648156`은 3383 passed/36 skipped/2 deselected/0 failed와 exact skip gate, S01은 2+3 passed, Docs·desktop-browser도 success다. Claude 재대조 r2는 해당 head를 승인했으며, #159 병합 뒤 retarget·병합은 코디네이터 담당이다. 로컬 실 PG·Docker는 미실행이다. [[2026-09-28_12-40-00_KST_S3_ObjectStore_관찰후속_Codex]].
+## 2026-09-29 Card111 AC-11 security critical/high hosted scan — PR #226 r1 조치·hosted PASS·재검토 요청
+
+- branch `agent/codex/ac11-security-hosted-scan`, base #217 승인 head `35c5b207`, owner Codex·reviewer Claude. 기본 CI에는 넣지 않고 label `run-ac11-security` 또는 `workflow_dispatch`로만 실행하는 credential 0 hosted lane을 추가한다. `pip-audit`는 PyPI/vulnerability database를 쓰므로 외부 서비스 0으로 표기하지 않는다.
+- `pip-audit 2.10.1`은 `requirements-core.txt`의 모든 취약점을 high로 보수 분류하고, `bandit 1.9.4`는 두 production Python tree의 HIGH를 수집한다. finding은 설명·source snippet 없이 stable ID만 남기며 allowlist는 exact ID·사유·만료를 요구한다.
+- AC-11 집계기는 기존 definer/RLS/VF와 새 `SEC-SCAN-001` 네 report를 모두 요구한다. Claude r1의 provenance 미결속·Bandit parse error·freshness·direct pin 공백은 canonical run/artifact JSON과 zip digest를 재검증하는 importer, exact source inventory, 30일 freshness로 닫았다. registry target은 바꾸지 않아 `be99a506…` repin은 없다.
+- 첫 실제 scan `36442219055`은 Git wire object SHA-1을 Bandit `B324` HIGH로 찾았고 `usedforsecurity=False`로 제품을 정정했다. r1 조치 head `ac374c49` run `36446788145`는 dependency 41·Python file 179·critical/high 0으로 success다. artifact `10980753683`, GitHub/direct zip digest `335d0398…98de`, payload `00c7c9e8…56dd`를 importer로 결속해 aggregator `MEASURED_PASS`를 재현했다. focused 101 passed이고 AC-11 전체는 다른 필수 축 때문에 미완료다. [[2026-09-29_00-08-48_KST_AC11_security_critical_high_scan_Codex]].
+## 2026-09-29 Card124 S11 AC-11 composite long-soak reference-only 생산자 — 검토 조건 충족·병합 인계
+
+- #217 head `35c5b207` 위 PR #236, 구현 commit `0c71f752`에서 strict G-19 inventory와 기존 LAN pilot/five-node 검증을 재사용하는 생산자를 추가했다. 최종 코드 head `c28e4b0b`에서 dry-run은 14개 exact case와 fault class를 실행하지 않은 `DECLARED_ONLY` plan으로 기록하며 `referenceOnly=true`, `acceptanceClaim=false`, `NOT_OBSERVED`, JUnit 15 skipped로만 산출한다.
+- 실제 모드는 inventory 누락·수량·identity drift를 실행 전 `BLOCKED_EXTERNAL(G-19)`로, 유효 inventory 뒤 physical adapter 부재를 `BLOCKED_EXTERNAL(G-24)`로 막는다. SSH·Docker·LAN pilot state·PG·물리 Node는 사용하지 않았다.
+- PG-free 관련 3파일 70 passed, compile·diff와 docs·bindings·frontend integrity·ontology·ratchet gate exit 0. 첫 Backend `36454774473`은 shallow checkout fixture 문제로 red였고, 제품 경계를 유지한 `b2976b8a` 보정 run `36456314532`는 양 Python 각각 3844 passed/49 skipped/2 deselected/0 failed였다. Claude가 합격 승격 경로 없음과 F2~F9 해소를 확인한 뒤 aggregator cleanup 계약 충돌 R1을 찾았고, `c28e4b0b`에서 report 미관측 의미를 유지한 채 envelope `residueCount=0` 호환과 importer→aggregator `NOT_OBSERVED` 회귀를 추가했다. exact-head Backend `36461040244`는 양 Python 각각 3855 passed/49 skipped/2 deselected/0 failed와 exact skip gate green으로 Claude r3의 마지막 조건을 충족했다. sync `--check`는 기존 공유 목적지 충돌 7건으로 exit 1이며 coordinator에 인계한다. 다음 담당은 병합 여부를 결정하는 coordinator다. [[2026-09-29_02-04-52_KST_S11_AC11_composite_long_soak_runner_Codex]].
+
 ## 2026-09-28 Card96 S11 AC-11 composite long-soak registry repin — Claude 검토 요청
 
 - branch `agent/codex/ac11-composite-long-soak-repin`, base #204 cascade head `887e4f08`, #214 설계 merge `a4e0c466`. 정본 registry에 `s11-ac11-composite-long-soak-v0`를 새 ID로 추가하고 blob `be99a506…`에 aggregator·migration importer·physical importer를 함께 repin했다. migration target 문서는 docs commit `4c68bc8e`의 graph 파생 tail 규칙과 blob `55ee8b65…`에 재결속했다.
@@ -119,6 +140,31 @@ source_of_truth: "Git"
 - PR #159 Claude r3의 비차단 관찰을 #159 위 PR #173으로 분리했다. S3 checkout은 persisted provider를 exact resolve하고, collect는 locator prefix를 `deleting` 커밋 전에 검증하며, begin/prefix drift는 `STORE-0001`/503/retryable로 통일했다. malformed locator 422와 upload content identity 409는 유지한다.
 - restore의 새 요청은 Run state/version/attempt를 checkpoint pin보다 먼저 검증해 `GRAPH-0003`을 유지한다. object byte/delete 호출 11곳의 provider mismatch guard 순서를 회귀 시험으로 고정했다.
 - Claude 조건부 검토 뒤 실제 checkout 호출 지점과 ResultStore prepare/complete·ShardCompletion once의 mismatch 동작 시험을 보강해 focused 26 passed, 최종 head `f02dacf6`이다. hosted Backend `36377648185`는 3.12/3.14 각각 3077 passed/47 skipped/2 deselected/0 failed, Core `36377648156`은 3383 passed/36 skipped/2 deselected/0 failed와 exact skip gate, S01은 2+3 passed, Docs·desktop-browser도 success다. Claude 재대조 r2는 해당 head를 승인했으며, #159 병합 뒤 retarget·병합은 코디네이터 담당이다. 로컬 실 PG·Docker는 미실행이다. [[2026-09-28_12-40-00_KST_S3_ObjectStore_관찰후속_Codex]].
+## 2026-09-29 카드 135 — legacy ProblemDetails·lock-wait Low 항목
+
+- legacy not-found 5종만 정본 `RES-0004`/404/non-retryable exact ProblemDetails로 변환하고 resource kind·내부 message를 숨긴다. resource 404는 AUTH/SEC 401·403 denial이 아니므로 audit 미기록을 회귀 시험으로 고정해 `DENIAL_CATEGORIES` 지적은 변경 불필요로 닫았다.
+- #240/#241에서 이미 bounded인 8개 외 남은 write 14개를 shared dependency와 manual span으로 묶어 legacy 22개 전체가 55P03/40P01을 `SYS-0001`/503/retryable로 끝낸다. RED 10 failed/33 passed 뒤 GREEN 43 passed, 관련 PG-free 87 passed; real PG는 hosted Core 대기다. [[2026-09-29_03-20-47_KST_legacy_problem_404_lock_wait_Codex]].
+- 첫 Backend 3.14은 PG-free pool response fixture가 새 dependency를 override하지 않아 2 failed/4580 passed였고 제품 결함은 아니었다. override 회귀를 추가해 단일 파일 24 passed; 새 exact-head Backend/Core를 대기한다.
+
+## 2026-09-29 카드 122 Medium 후속 — legacy audit write optional idempotency
+
+- workspace tool, member role/삭제, user/project/workspace status, capability offer 7개가 FE의 선택적 `Idempotency-Key`를 실제 소비한다. live 권한 preflight 뒤 bounded advisory lock→ledger replay를 수행하고, replay는 service·audit·ledger 재기록이 0이다. 최초 service/audit/ledger는 한 transaction이다.
+- PG-free 91 passed; real PG member role replay에 동일 response·audit 1행·ledger 1행 단언을 추가해 hosted 대기다. key 없음 동작·공개 schema·migration은 불변이다. [[2026-09-29_02-30-04_KST_legacy_write_optional_idempotency_Codex]].
+
+## 2026-09-29 카드 122 Medium 후속 — storage contribution idempotency
+
+- 선택적 key가 있으면 bounded advisory lock→ledger read→service/audit→ledger write를 한 transaction에 결속해 동시 최초 요청의 두 번째 side effect와 ledger unique 500을 막는다. key가 없으면 registered path unique만 `GRAPH-INVALID-TRANSITION`/409로 번역하고 unknown IntegrityError는 전파한다.
+- PG-free 58 passed; real PG에는 동시 2요청 동일 201/replay·row 1건과 no-key duplicate 409를 추가했고 hosted 대기다. 공개 schema·migration 변경 0. [[2026-09-29_02-20-41_KST_storage_contribution_idempotency_Codex]].
+
+## 2026-09-29 카드 122 Medium 후속 — pool write 권한·unique 충돌
+
+- member 추가·삭제는 project lock→live membership/canRequest→pool lock·project 재결속 순서로 닫고, plan은 run lock→workload project가 pool project와 같은지까지 확인한다. Claude r1 뒤 pool에서 유도한 `projectId`도 제거해 viewer·비회원·없는 pool의 전체 ProblemDetails가 동일하다.
+- pool name·run plan의 등록된 unique constraint만 `GRAPH-INVALID-TRANSITION`/409로 번역하고, concurrent member PK는 savepoint 뒤 exact row가 있을 때만 idempotent 200이다. 최초 PG-free 32 passed, r1 보완 단일 파일 8 passed와 문서·계약·온톨로지 gate exit 0; real PG 4경계는 hosted Core 대기다. Storage unique와 legacy audit/idempotency는 후속 유지. [[2026-09-29_02-08-04_KST_pool_쓰기권한_및_unique충돌_Codex]].
+
+## 2026-09-29 카드 122 후속 — node admission token 재발급 차단
+
+- announcement row를 `FOR UPDATE`로 잠그고 `admitted_by_user_id`를 단일 발급 marker로 사용한다. 첫 bootstrap token 뒤 같은 candidate의 재시도·경합은 token과 audit을 추가하지 않고 `GRAPH-INVALID-TRANSITION`/409/non-retryable로 닫는다. 평문 token 비저장 불변식 때문에 기존 token 재제시는 하지 않는다.
+- PG-free 회귀는 1 passed, compile exit 0이다. 실 PG service·HTTP 회귀는 hosted Core `run-core`에서 실행 전까지 미측정이다. 카드 122 Medium 3건은 pool↔project/run 권한 결속, constraint allowlist 기반 IntegrityError 번역, legacy idempotency/audit 계약으로 분리한다. [[2026-09-29_01-49-48_KST_노드_admission_토큰_재발급_차단_Codex]].
 
 ## 2026-09-28 카드 90 — AC-11 migration 0047~0053 통합·재핀 cascade
 
@@ -178,6 +224,10 @@ source_of_truth: "Git"
 - migration을 가역 `forward→downgrade→forward`와 비가역 `forward→verified restore→forward`로 분리했다. 현재 head `0046_model_manifest_readiness`는 비가역이고 reversible tail이 0개이므로 no-op downgrade를 PASS로 세지 않는다.
 - PR #126 CX01 hosted restore, VF-CL-04 readiness/retention, S05 hosted 두 비교군을 재사용하되 실제 PITR·5노드·장시간·완전한 security/accessibility는 `NOT_OBSERVED`/`BLOCKED_EXTERNAL`로 유지한다.
 - Claude r1 수정 요청에 따라 verdict 닫힌 enum·필수 8축 allowlist·집계기 재계산, `d74e82ec` 목표 결속, forward 후 sentinel/손실형 가역/catalog fingerprint, OPEN evidence digest·만료 기준점을 v1.1에 반영했다. r2 조건으로 `s11-security-allowlist-v0.json`에 실제 VF runner·workflow·시험 blob과 node ID 5개, RLS accepted 3건의 사전 disposition을 고정하고 definer/RLS 결과·exit의 severity/verdict 표를 v1.1.1에 추가했다. 구현·실행·registry 변경은 없고 S11-BE/S11-DB/AC-11은 `planned`다. [[S11-BE_DB_AC-11_통합_인수_설계]], [[2026-09-28_10-16-34_KST_S11_AC11_통합인수_설계_Codex]].
+## 2026-09-29 카드 123 — S04·S08 운영 판정 collector 검토 요청
+
+- 판정 기준 v1.1.1의 core C1을 REPEATABLE READ·READ ONLY 전수 SQL로 구현했다. attempt 시점 최신 approved·expiry·workload digest·선행 cancel audit을 판정하고 kernel C1-K는 별도 `NOT_OBSERVED`로 고정한다. 입력 0건·미관측 안전성은 PASS가 아니며 DB identity/time/snapshot·collector/code SHA와 clean tree를 결속한다.
+- O1 clean DB 집계는 publisher/consumer deployment identity 없이 `RECORDED_ONLY`; 물리 Node, 운영 backup/PITR, retention/GC와 미구현 producer는 그대로 차단한다. PG-free 7 passed, real PG 6-attempt 부정 matrix는 로컬 Python 3.10 `StrEnum` 제약으로 미실행·hosted Core 대기다. 공개 계약·migration·registry status 변경 0. [[2026-09-29_01-59-38_KST_S04_S08_운영판정_collector_Codex]].
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 

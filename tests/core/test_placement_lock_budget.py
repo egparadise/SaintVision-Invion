@@ -125,4 +125,5 @@ def test_benchmark_adapter_passes_private_budget_only_through_test_env(monkeypat
     assert placement_benchmark._run_pytest_adapter(args) == 0
     assert captured["env"]["INV_PLACEMENT_SHORT_COMMIT"] == "1"
     assert captured["env"]["INV_PLACEMENT_CANDIDATE_LIMIT_LOCK_TIMEOUT_MS"] == "1500"
+    assert captured["env"][placement_benchmark.BENCHMARK_OPT_IN_ENV] == "1"
     assert "tests/integration/test_placement_benchmark.py" in captured["command"]

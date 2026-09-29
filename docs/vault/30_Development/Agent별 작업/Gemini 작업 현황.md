@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.132"
+version: "1.0.140"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-28T21:22:00+09:00"
+updated: "2026-09-29T03:05:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,229 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
+- 확인 기준: 2026-09-29T03:05:00+09:00 (최신 tip `agent/gemini/g05-fe-release-reexpose`, 카드 118 Claude M1/L1~L3 및 Codex C1/C2 전수 반영 완결).
+
+## 2026-09-29 G-05 FE 모델 릴리스 쓰기 UI 재노출 및 서버 멱등 계약 연동 (카드 118, PR #229 기반)
+
+- **작업 브랜치**: `agent/gemini/g05-fe-release-reexpose` (base: `agent/claude/release-idempotency` `41fe5c3c` 위 PR #219 head `f23c0423` 머지 `70b410f5`).
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude (UI·테스트 축), Codex (계약 축).
+- **작업 내용 (카드 118 전수 완결)**:
+  1. **`releaseModelVersion` API 클라이언트 멱등키 복원**: `ReleaseModelVersionOptions`에 `idempotencyKey?: string` 복원 및 `Idempotency-Key` 헤더 1:1 전송.
+  2. **릴리스 쓰기 UI 재노출 및 3단 멱등키 수명주기**:
+     - 카드 113 대기 배너 제거 및 제출 버튼 활성화 (`canApprove === true`).
+     - 실패 재시도 시 동일 `relIdempotencyKey` 보존.
+     - 라이선스 정책, 분류, 모델/버전 변경 시 새 키로 즉시 회전.
+     - 성공 수신 후 다음 제출을 위해 새 키로 자동 회전.
+     - `canApprove === false` 또는 `undefined` 시 fail-closed 방어 (버튼 disabled, 폼 서밋 시 0 network calls, alert 표출).
+  3. **Replay 응답 정직화 표시 (Zero Deception)**:
+     - `release-replay-indicator` 배지 추가: 신규 릴리스(`신규 릴리스 완료 (Fresh)`)와 서버 레저 재생 응답(`재생(Replay) 응답: 기존 멱등성 키에 의해 저장된 릴리스 결과입니다.`)을 분리 표출.
+  4. **계약 스키마 동기화**:
+     - `npm run contracts:generate`를 통해 `model-release-request.ts` 주석 최신화 및 `npm run contracts:check` 31종 전수 일치 확인.
+  5. **되돌리면 실패하는 엄격한 회귀 시험 (총 24개 시험)**:
+     - `apps/web/tests/model-registry-business-routes.test.tsx`: Test 4 (헤더 전송), Test 20 (재노출 및 Fresh indicator, 성공 후 회전), Test 21 (실패 재시도 키 보존 및 replay indicator), Test 22 (입력 변경 시 키 회전), Test 23 (fail-closed 권한 가드).
+- **실측 검증**:
+  - Vitest: `apps/web/tests/model-registry-business-routes.test.tsx` 24 passed (856ms). (웹 전체 80 test files / 757 passed, 0 failures).
+  - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run contracts:check` 31 types PASS, `npm run build` dist/ 번들 생성 성공 (`dist/assets/index-BQ0CZaki.js` 881.08 kB, exit 0).
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (2.12s, exit 0).
+  - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --apply` PASS (0 conflicts).
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-29_02-13-00_KST_G05_Release_Reexpose_FE_Gemini.md` (v1.0.1).
+- **PR 상태**: PR #239 (`agent/claude/release-idempotency` 대상).
+
+- 이전 확인 기준: 2026-09-29T00:20:00+09:00 (최신 tip `agent/gemini/g05-fe-model-registry`, PR #219 Codex r4 F1 조치: Release 쓰기 UI fail-closed 미노출 및 Idempotency-Key 헤더 제거).
+
+- 확인 기준: 2026-09-29T02:05:00+09:00 (최신 tip `agent/gemini/g05-fe-verify-eval`, PR #228 1차·2차·3차 리뷰 조치 완료: H1~H3, M1~M5, L1~L5, N1~N2 전수 반영).
+
+## 2026-09-29 G-05 W3 Verify 및 W5 Eval Run Codex/Claude 1차·2차·3차 리뷰 조치 (PR #228)
+
+- **PR**: #228 (https://github.com/egparadise/SaintVision-Invion/pull/228)
+- **Base / Head**: PR #228 (`agent/gemini/g05-fe-verify-eval`, base `f23c0423`).
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude (UI·테스트 축), Codex (계약 축).
+- **조치 요약**:
+  1. **H3 병합 게이트 해소**: base `f23c0423` 머지 및 충돌 해소 커밋 `21607a24` push로 PR MERGEABLE 전환 및 hosted CI backend 3.12/3.14, desktop-browser, docs, frontend 전수 green 실측.
+  2. **H1 어댑터 식별자 정합**: 백엔드 `adapters/agents.py` 정본 어댑터 어휘(`codex-cli`, `claude-code`, `gemini-cli`, `antigravity`)를 `<select>` 선택형으로 제공, 기본값 `codex-cli` 지정, 픽스처 동기화.
+  3. **H2 Zero Fake Verification (#209)**: `verifyResult` 및 `evalResult`를 현재 모델/버전/스위트 입력에 결속. 입력 변경 시 및 새 제출 실패 시 결과를 즉시 비우고, `useEffect([effectiveProjectId])` prop 동기화 시에도 결과 초기화 및 타깃 재설정. 배지와 성공 카드는 발행 당시 타깃과 일치할 때만 렌더링.
+  4. **N1 입력 변경 시 in-flight abort 및 로딩 즉시 해제**: 입력 변경 핸들러에서 진행 중 요청을 abort하고 로딩 상태(`setVerifyLoading(false)`, `setEvalLoading(false)`)를 즉시 해제하여 버튼 잠금 원천 차단. `finally` 블록에서도 안전하게 소유자 로딩 해제.
+  5. **N2 늦은 응답 시험 보강**: Crockford ULID 규격(26자리)에 맞는 `mvm_01JABCDEF01234567890123451`로 수정 및 `expect(resolveFirst).not.toBeNull()` 단언. W5 세대 가드(늦은 응답 폐기) 시험 추가.
+  6. **M1 응답 가드 32키 상한 제거**: `isEvalRunResponse()`에서 정본 스키마와 1:1로 `componentVersions` 32개 상한 제한을 제거하여 서버 34~35개 키 응답 합법 수용.
+  7. **M2 멱등키 수명주기 완결**: W3/W5 성공 수신 시 새 `Idempotency-Key` 회전. 실패 시 키 보존, 입력 변경 시 키 회전.
+  8. **M3 서버 오류 문자열 및 픽스처 일치**: 409 detail을 서버 정본 `SNAPSHOT_DETAIL`로, 503 detail을 `OBSERVATION_DETAIL`로 수정. 시험 픽스처 카테고리 정합화(SYS-0001은 `category: 'SYS'`, GRAPH-0002는 `category: 'GRAPH'` 및 `traceId`, `causeRef: null`, `evidenceId: null` 포함). W5 eval run route는 서버 계약(`eval_runs.py:100-104`)에 503 매핑이 없으므로, 서버가 실제 반환하는 미매핑 내부 장애 정본인 `500 SYS-0002` (`detail: 'The service raised an error this route cannot represent.'`, `retryable: false`) 픽스처로 전면 교체하여 멱등키 보존 검증.
+  9. **M4 회귀 시험 전면 강화 (22개 시험)**: 키 수명주기, generation/abort 늦은 응답 폐기(W3/W5), N1 입력 변경 시 로딩 해제(W3/W5), `canApprove` false 및 undefined 각각 독립 root에서 버튼 disabled + 폼 서밋 핸들러 차단 + 네트워크 호출 0건 + alert 표출 실측 (W3/W5 전수), W3/W5 응답 계약 불일치 alert 시험, endedAt null 표시, H2 결과 초기화 및 prop 동기화 시험 등.
+  10. **M5 결과 카드 표출 충실도**: status 동적 렌더링, endedAt null 시 `NOT_OBSERVED` 명시, `componentVersions` 화면 표출.
+  11. **L1~L5 접근성 및 마이너 정비**: 배지 문구 수정, Crockford Base32 26자리 플레이스홀더, WCAG AA 4.5:1 대비 충족(PASS 5.08:1, FAIL 5.36:1 실측 반영), 클라이언트 권한 에러 문구 정비, 로딩 해제 가드 보강.
+- **실측 검증**:
+  - Vitest: `apps/web/tests/model-verify-eval-routes.test.tsx` 22 passed (894ms), `apps/web/tests/model-registry-business-routes.test.tsx` 20 passed (923ms). (웹 전체 81 test files / 773 passed, 0 failures).
+  - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist/ 번들 생성 성공 (`dist/assets/index-B-CJTiXt.js` 892.68 kB, exit 0).
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (3.02s, exit 0).
+  - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --check` PASS (0 conflicts).
+  - Hosted CI: commit `f0c78462` backend (3.12)/(3.14), desktop-browser, docs, frontend 전수 SUCCESS.
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-29_01-08-00_KST_G05_W3_Verify_W5_Eval_Review_Action_Gemini.md` (v1.2.0).
+
+- 이전 확인 기준: 2026-09-29T00:33:00+09:00 (최신 tip `agent/gemini/g05-fe-verify-eval`, 카드 101 W3 Verify 및 W5 Eval Run 비즈니스 라우트 화면 연동 및 무결성 검증 완결).
+
+## 2026-09-29 G-05 W3 Verify 및 W5 Eval Run 비즈니스 라우트 화면 연동 및 무결성 불변식 검증 (카드 101, `agent/gemini/g05-fe-verify-eval`)
+
+- **작업 브랜치**: `agent/gemini/g05-fe-verify-eval` (base: PR #219 `26edf079` 위 #215 head `3bdc6e70` 선행 머지 및 PR #219 r4 최신 반영).
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude (UI·테스트 축), Codex (계약 축).
+- **작업 내용 (카드 101 전수 완결)**:
+  1. **계약 스키마 등록 및 자동 동기화**:
+     - `model-verify-request`, `model-verify-response`, `eval-run-start-request`, `eval-run-response` 4종 스키마를 `api-response-contracts.mjs`에 등록 (총 32종).
+     - 엄격한 TypeScript 타입 인터페이스 생성 및 `npm run contracts:check` 32개 전수 일치 확인.
+  2. **Zero Fake Measurements / Zero Fake Verification 불변식 확립 (#209 trusted-worker seam)**:
+     - W3 커널 검증 요청 시 커널 측정 ID(`measurementId`: `mvm_...` 26자리 Crockford Base32)만 전송하고 서버 신뢰 워커가 측정 출처 판정.
+     - 화면은 측정값을 위조하거나 자체적으로 "검증됨"을 단언하지 않으며 서버의 검증 응답(`verifiedAt`, `verifiedMeasurementId`, `newlyVerified`)만 표출.
+     - W5 평가 실행 결과(`passedGate`, `totalCases`, `passedCases`, `violations`)를 `GATE PASS` / `GATE FAIL`로 정직하게 시각화.
+  3. **Observation 계층 및 런타임 fail-closed 가드**:
+     - `verifyModelVersion`, `startEvalRun` 구현.
+     - `isModelVerifyResponse`, `isEvalRunResponse` 런타임 가드 구현 (`additionalProperties: false` 차단, Crockford Base32 26자리 정규식 검증, 케이스 범위 제약 `passedCases <= totalCases` 검증).
+     - 멱등키 보존 및 회전: 실패 시 재시도는 동일 키 재사용, 입력 변경 시 새 키로 회전.
+  4. **UI 컴포넌트 강화 (`ModelLineageView.tsx`)**:
+     - Tab 5 (W3 Verify) 및 Tab 6 (W5 Eval Run) 연동.
+     - 독립 `AbortController` 및 세대 가드를 적용하여 입력 변경 시 늦은 응답 무효화 및 로딩 걸림 원천 차단.
+     - 권한 없는 사용자(`canApprove !== true`) 대상 fail-closed 비활성화 및 안내 표출.
+     - `role="status"` 결과 카드, `aria-live="polite"` 음성 안내 지원.
+  5. **전용 통합 시험 및 전수 검증**:
+     - `apps/web/tests/model-verify-eval-routes.test.tsx` 10개 전용 시험 구현 및 전수 통과 (되돌리면 실패).
+     - 전체 81 test files / 761 tests 통과.
+- **실측 검증 증거**:
+  - Vitest: `apps/web/tests/model-verify-eval-routes.test.tsx` 10 passed, `apps/web/tests/model-registry-business-routes.test.tsx` 20 passed. (웹 전체 81 test files / 761 passed).
+  - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist/ 889.27 kB 생성 성공.
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed.
+  - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --check` PASS (0 conflicts).
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-29_00-33-00_KST_G05_W3_Verify_W5_Eval_FE_Gemini.md` (v1.0.0).
+- **다음 첫 행동**: Card 101 브랜치 push 및 PR 생성 후 리뷰어 요청.
+
+
+- 확인 기준: 2026-09-29T00:20:00+09:00 (최신 tip `agent/gemini/g05-fe-model-registry`, PR #219 Codex r4 F1 조치: Release 쓰기 UI fail-closed 미노출 및 Idempotency-Key 헤더 제거).
 - 확인 기준: 2026-09-28T20:25:00+09:00 (최신 tip `agent/gemini/g07-eval-runner-impl`, commit `e2011893`, PR #190).
 - 확인 기준: 2026-09-28T18:58:00+09:00 (최신 tip `agent/gemini/s10-fe-conformance-status`).
 - 확인 기준: 2026-09-28T21:22:00+09:00 (최신 tip `agent/gemini/g04-fe-seal-record`, PR #212 r3).
+
+## 2026-09-29 G-05 FE 모델 레지스트리 화면 Codex r4 (F1) 조치: Release 쓰기 UI fail-closed 미노출 및 Idempotency-Key 헤더 제거 (카드 113 대기, PR #219)
+
+- **PR**: #219 (https://github.com/egparadise-SaintVision-Invion/pull/219)
+- **Base / Head**: PR #219 `4743b3d7` 위 Codex r4 닫힘 기준 2번 전수 반영.
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude (UI·테스트 축), Codex (계약 축).
+- **조치 내역 (Codex r4 F1 닫힘 기준 2번 전수 반영)**:
+  1. **Release 쓰기 UI fail-closed 미노출 (카드 113 대기)**:
+     - 백엔드 release route(`model_release.py`)가 Idempotency-Key를 소비하지 않으므로 FE 헤더 기반 멱등 주장이 성립하지 않음을 확인.
+     - 서버 계약이 생길 때까지 쓰기 UI를 fail-closed로 미노출: 제출 버튼 `disabled={true}`, `aria-disabled="true"`, 배너 및 버튼에 `서버 멱등 계약 대기(카드 113)` 안내 표출 (`data-testid="banner-release-pending-idempotency"`).
+     - `handleReleaseModel`에서 카드 113 대기 안내와 함께 조기 반환(`setGeneralError('서버 멱등 계약 대기(카드 113): 백엔드 릴리스 멱등성 계약 수립 전까지 릴리스 쓰기 요청이 차단됩니다.')`).
+     - 서버 계약은 Claude가 카드 113으로 추가하고, 그 뒤 재노출은 후속 카드로 배정됨.
+  2. **Release 요청의 Idempotency-Key 헤더 및 멱등 주장 제거**:
+     - `releaseModelVersion` API 클라이언트에서 `idempotencyKey` 옵션 및 `Idempotency-Key` 헤더 전면 제거.
+     - `ModelLineageView.tsx`에서 `relIdempotencyKey` 상태 제거.
+  3. **시험 개정 및 미노출 고정 (되돌리면 실패)**:
+     - 시험 20의 릴리스 헤더 재사용 단언을 전면 제거하고, 릴리스 쓰기 UI의 fail-closed 상태 및 `서버 멱등 계약 대기(카드 113)` 안내 미노출을 고정하는 시험으로 전면 전환 (`apps/web/tests/model-registry-business-routes.test.tsx`: 버튼 disabled/aria-disabled 확인, 안내 문구 실측, 클릭/폼제출 시 /release 네트워크 호출 0건 실측, 되돌리면 실패).
+     - 시험 4: `releaseModelVersion` 클라이언트 호출 시 `Idempotency-Key` 헤더 미전송 및 200 응답 파싱 검증으로 정합.
+     - 시험 5: 보존 고정(Pin) 탭을 통해 RFC 9457 409 Conflict ProblemDetails 검증 수행.
+- **실측 검증**:
+  - Vitest: `apps/web/tests/model-registry-business-routes.test.tsx` 20 passed (819ms). (웹 전체 80 test files / 751 passed, 23.69s, 0 failures).
+  - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist/ 번들 생성 성공 (873.66 kB, 8.55s).
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (8.06s).
+  - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS.
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-28_22-10-00_KST_G05_Model_Registry_FE_Business_Routes_Gemini.md` (v1.4.0).
+- **다음 첫 행동**: PR #219에 조치표 코멘트 등록 및 카드 101(W3 Verify & W5 Eval Run 화면 연동) 계속 진행.
+
+## 2026-09-28 G-05 FE 모델 레지스트리 화면 Claude UI r3 및 Codex Release 멱등 경계·Path 회전 전수 조치 (`agent/gemini/g05-fe-model-registry`, PR #219)
+
+- **PR**: #219 (https://github.com/egparadise-SaintVision-Invion/pull/219)
+- **Base / Head**: PR #212 head `5b2609d9` 선행 머지(`7ddc616e`) 위 Claude UI r3 및 Codex 멱등 경계 조치 완료.
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude (UI·테스트 축), Codex (계약 축).
+- **조치 내역 (Claude UI r3 전수 & Codex Release 멱등/Path 회전 전수 완결)**:
+  1. **Codex Release 멱등 경계 연동**:
+     - `releaseModelVersion` 및 `handleReleaseModel`에 `Idempotency-Key` 헤더 연동 (`relIdempotencyKey` 상태 관리).
+     - 동일 파라미터 재시도 시 동일 키 보존, 폼 변경(`relLicensePolicy`, `relClassification`, `projectId`, `modelId`, `version`) 시 새 UUID v4로 회전.
+     - W2 model path(`modelId`, `projectId`), W4 model/version path(`modelId`, `version`), Release model/version path 변경 시 멱등키 즉시 회전 및 재시도 시 새 멱등키 유지 실측 (시험 13, 시험 18, 시험 20).
+  2. **Claude UI r3 조건 전수 반영**:
+     - `ModelLineageView.tsx:1205` fallback kind 배열 `['eval_run', 'code_commit', 'approval', 'container_image']` 완전 제거 (서버 미제공 시 NOT_OBSERVED 정직 표기).
+     - `:1208` `'evaluations'` 옛 별칭 제거, 정본 `kind === 'eval_run'`만 판별.
+     - 시험 9 픽스처 교정: 서버 `src/saintvision/services/lineage.py:762-768` 산식에 맞춰 `missing: ['dataset_version']`, `unresolved: [{ kind: 'code_commit', count: 2 }]`, `countOnlyKinds: ['code_commit', 'eval_run']`으로 교정.
+     - `:203` 안내 문구 복원: `5b2609d9` 원문 `(백엔드 서빙 배포 API 미노출 상태로 실제 인프라 미반영 · 백엔드 digest 고정과 무관 · Digest: ...)`로 복원.
+     - View 날짜 검증 중복 제거: `ModelLineageView.tsx` 내부의 중복 함수를 제거하고 정본 공용 가드(`modelRegistryObservation.isValidIsoDateTime`)로 일원화 (`+99:99` 오프셋 누출 차단).
+- **실측 검증**:
+  - Vitest: `apps/web/tests/model-registry-business-routes.test.tsx` 20 passed (855ms), `apps/web/tests/model-lineage.test.ts` 23 passed (924ms), `apps/web/tests/write-actions-integrity-wiring.test.tsx` 8 passed (204ms). (웹 전체 80 test files / 751 passed).
+  - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist/ 번들 생성 성공 (874.53 kB).
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (2.85s).
+  - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --check` PASS (0 conflicts).
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-28_22-10-00_KST_G05_Model_Registry_FE_Business_Routes_Gemini.md` (v1.3.0).
+- **다음 첫 행동**: PR #219에 조치표 코멘트 등록 및 카드 101(W3 Verify & W5 Eval Run 화면 연동) 완료.
+
+## 2026-09-28 G-05 FE 모델 레지스트리 화면 Claude UI r2 재검토(G1, G2, G3, G5, Test 16) 조치 및 PR #212 클린 머지 (`agent/gemini/g05-fe-model-registry`, PR #219)
+
+- **PR**: #219 (https://github.com/egparadise/SaintVision-Invion/pull/219)
+- **Base / Head**: PR #212 head `5b2609d9` 선행 머지(`7ddc616e`) 위 Claude UI r2 조치 반영.
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude (UI·테스트 축), Codex (계약 축).
+- **조치 내역 (G1, G2, G3, G5, Test 16 전수 완결)**:
+  1. **G3 [중간, 새 결함] 쓰기 3종 독립 AbortController 및 세대 분리, finally 로딩 해제 보장**:
+     - `handleRegisterVersion`, `handleExtendPin`, `handleReleaseModel`별 독립 `AbortController`(`regAbortControllerRef`, `pinAbortControllerRef`, `relAbortControllerRef`) 및 세대 번호(`regGenerationRef`, `pinGenerationRef`, `relGenerationRef`) 할당.
+     - 한 액션 중 다른 액션을 호출해도 서로의 controller가 abort되지 않으며, abort 시에도 `finally`에서 로딩 상태를 무조건 해제(`setRegLoading(false)` 등)하여 버튼 영구 비활성화 원천 차단.
+     - 9개 폼 필드 변경 시 즉시 in-flight 세대를 증가시켜 늦은 응답의 화면 오염 차단. (회귀 시험 18).
+  2. **G1 [중간] Lineage Trace 응답 픽스처 및 서버 정본 모델 정합**:
+     - `validTraceResponse` 픽스처에서 `unresolved` 존재 시 `fullyTraceable: false`로 정합(`src/saintvision/services/lineage.py:762`).
+     - `missing` 배열 항목은 서버 계약대로 kind 이름 문자열(`"dataset_version"`)만 포함.
+     - 4대 별칭(`evaluations`, `commits`, `approvals`, `images`) 및 `isEval` 특수 분기, 하드코딩 fallback kind 목록 전면 제거.
+  3. **G2 [부분] 보존 핀 멱등키 회전 및 동일 재시도 보존**:
+     - 동일 파라미터 재시도 시에는 `pinIdempotencyKey`를 보존하되, 핀 만료일(`until`) 및 식별자(`projectId`, `modelId`, `version`) 변경 시 즉시 새 UUID v4 멱등키로 회전. (회귀 시험 19).
+  4. **G5 [경미] 409 Conflict detail 형식 및 ProblemDetails.title 교정**:
+     - 409 detail을 서버 정본 문자열(`f"kind '{missing_kind}' is not traceable for model '{model_id}' version '{version}'"`)과 일치.
+     - `ProblemDetails`의 `title`을 서버 정본대로 에러 코드(`MODEL-0004` 등)와 일치.
+  5. **Test 16 엄격 스키마 경계 픽스처 교정**:
+     - `deployments` 허용 환경(`environment: 'pilot'`) 적용 및 `unresolved` 번호 1부터 시작 정합.
+  6. **PR #212 선행 머지 (`7ddc616e`) 및 ModelLineageView 완전 합성**:
+     - PR #212 head `5b2609d9`를 병합하고, `ModelLineageView.tsx`에서 Card 94 비즈니스 라우트와 PR #203 어댑터 Conformance 패널 및 Model Commitment 패널을 완벽하게 통합/합성.
+- **실측 검증**:
+  - Vitest: `apps/web/tests/model-registry-business-routes.test.tsx` 19 passed, `apps/web/tests/model-lineage.test.ts` 23 passed, `apps/web/tests/write-actions-integrity-wiring.test.tsx` 8 passed. (웹 전체 80 test files / 750 passed).
+  - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist/ 번들 생성 성공 (874.71 kB).
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed.
+  - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --check` PASS (0 conflicts).
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-28_22-10-00_KST_G05_Model_Registry_FE_Business_Routes_Gemini.md` (v1.2.0).
+- **다음 첫 행동**: PR #219에 Claude UI r2 조치 결과 코멘트 등록 및 카드 101(W3 Verify & W5 Eval Run 화면 연동) 재개.
+
+## 2026-09-28 G-05 FE 모델 레지스트리 화면 실제 business route 연동 및 불변식 검증 (카드 94, `agent/gemini/g05-fe-model-registry`)
+
+- **작업 브랜치**: `agent/gemini/g05-fe-model-registry` (base: `agent/claude/g04-w4-retention-pin` head `0b949454`)
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude (UI·테스트 축), Codex (계약 축).
+- **작업 내용 (카드 94)**:
+  - **계약 및 Observation 계층**:
+    - `apps/web/scripts/api-response-contracts.mjs`에 G-04/G-05 스키마 7종(`model-version-register-request`, `model-version-response`, `retention-pin-request`, `retention-pin-response`, `model-release-request`, `model-release-response`, `model-lineage-trace-response`) 등록 및 자동 생성 타입 동기화.
+    - `apps/web/src/shared/api/modelRegistryObservation.ts` 신설: Lineage Trace(GET), W2 Version Register(POST), W4 Retention Pin(POST), Model Release(POST) 4종 API fetcher 및 strict 허용 키 화이트리스트 런타임 가드 구현.
+    - RFC 3339 일시 및 달력 유효성 검증(`isValidIsoDateTime`), 암호학적 UUID v4 기반 멱등키 생성(`generateIdempotencyKey`).
+  - **UI 컴포넌트 (`apps/web/src/features/mlops/ModelLineageView.tsx`)**:
+    - 실제 Business Route 4종 탭(`Lineage Trace`, `W2 Register`, `W4 Retention Pin`, `Release Model`) 구현 및 실 서버 연동.
+    - 서버 미관측 항목에 대해 가짜 수치/PASS를 전면 배제하고 `NOT_OBSERVED (미측정)` 정직 표기.
+    - W3 솔기(seam)에 대한 명시적 안내: `"W3 검증: 미연결 (검증 앵커 #215 대기)"` 배지 표출.
+    - RFC 9457 ProblemDetails (401, 403, 404, 409, 422) 및 502/504 HTML 에러 정제 처리.
+    - `role="status" aria-live="polite"` 라이브 리전 상시 DOM 유지, WCAG AA 다크 테마 대비 4.5:1 이상 실측 확보.
+  - **Vitest 17건 비즈니스 라우트 전용 시험 (`apps/web/tests/model-registry-business-routes.test.tsx`)**:
+    - GET lineage(서버 kind 동적 렌더링/NOT_OBSERVED 정직 분리), POST W2(Idempotency-Key 재시도 안정성 및 회전), POST W4, POST Release, 409 Conflict(서버 원문 detail), 403 Forbidden, 503 Retryable, fail-closed canApprove, missing/scope 표출, live-region, in-flight 중복 차단, query/write unmount abort, calendar round-trip, byteSize 정수 검증, ProblemDetails status 결속, additionalProperties:false 및 컬렉션 상한 17건 전수 PASS.
+  - **Codex F1~F5 & Claude G1~G6 1차 리뷰 전수 반영**:
+    - F1/G1: canApprove fail-closed 엄격화 (role fallback 배제, 3종 쓰기 aria-disabled, 전역 배너).
+    - F2/G2: Idempotency-Key 재시도 안정성 유지 및 폼 의도별 관리.
+    - F3/G4: 4종 최상위 및 3종 중첩 응답 strict key 화이트리스트 및 컬렉션 상한 강제.
+    - F4/G4: 달력 유효성(윤년/월별 일수) 및 byteSize 정수 문자열 엄격 검증.
+    - F5: ProblemDetails HTTP status 결속 검증.
+    - G1/G5: 서버 kind 어휘(`dataset_version`, `deployment`, `code_commit`, `container_image`, `eval_run`, `approval`), 실 ID 접두(`mdv_`, `mdl_`, `dsv_`, `dpl_`, `apv_`), 409 detail 형식 일치.
+    - G3: 쓰기 3종 writeAbortController 및 writeGeneration 세대 가드 추가.
+- **실측 검증**:
+  - `npm test -- model-registry-business-routes`: 17 passed (644ms).
+  - `npm test` (apps/web): 79 files, 691 passed (24.70s).
+  - `npx tsc -b`: 0 errors.
+  - `npm run build`: bundle 정상 빌드 (815.13 kB, 11.92s).
+  - `npm run contracts:check`: 23개 스키마 타입 정합 (PASS).
+  - `python tools/check_frontend_integrity.py`: 84개 파일 대상 9대 무결성 규칙 0 violations (exit 0).
+  - `python tools/check_contract_bindings.py`: 55 fixtures, 20 bound types, 14 replay guards (PASS).
+  - 파이썬 라우트 스위트(`.venv`, Python 3.14.7):
+    - `pytest tests/test_route_coverage.py`: 40 passed.
+    - `pytest tests/core/test_model_release_route.py`: 59 passed.
+    - `pytest tests/core/test_model_retention_pin_route.py tests/core/test_model_version_register_route.py`: 133 passed.
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-28_22-10-00_KST_G05_Model_Registry_FE_Business_Routes_Gemini.md` (`HIST-GEMINI-G05-FE-MODEL-REGISTRY-001`, v1.0.0).
+- **다음 첫 행동**: PR 생성 후 Claude(UI·테스트 축) 및 Codex(계약 축) 검토 요청.
 
 ## 2026-09-28 G-04 RunDetail 봉인 기록 패널 Claude UI r2 재검토(G1~G5, O3, O4) 완결 (`agent/gemini/g04-fe-seal-record`, PR #212)
 
@@ -90,6 +310,46 @@ source_of_truth: "Git"
   - `python tools/check_frontend_integrity.py`: 9대 무결성 규칙 0 violations (exit 0).
   - `python tools/check_contract_bindings.py`: 55 fixtures, 20 types exit 0.
 - **다음 첫 행동**: PR 생성 후 Claude(UI·테스트) 및 Codex(계약) 검토 요청.
+
+- 확인 기준: 2026-09-29T02:24:00+09:00 (최신 tip `agent/gemini/g03-fe-stage2`, 카드 115 G-03 2단계 conformance 관측 화면 및 단건 라우트 연동 Claude r1 조치 완료).
+
+## 2026-09-29 G-03 FE 2단계 어댑터 Conformance 관측 화면 및 단건 라우트 연동 (카드 115, PR #221 대응, Claude r1 조치 완결)
+
+- **작업 브랜치**: `agent/gemini/g03-fe-stage2` (base: `agent/claude/g03-conformance-stage2-impl` head `2f853a94`).
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude, Codex.
+- **작업 내용 (카드 115 및 Claude r1 전수 완결)**:
+  1. **Discriminated Union 계약 수용 및 런타임 가드**:
+     - `ConformanceStatusUnion` (`NOT_OBSERVED` | `RECORDED`) 및 `AdapterConformanceUnion` 구현.
+     - `isConformanceStatusRecordedResponse`, `isAdapterConformanceNotObservedResponse`, `isAdapterConformanceRecordedResponse` strict 가드 구현.
+     - `subject: fixture-adapter`, `provenance: in-server`, `total === passed + failed + skipped`, `outcomes.length === total`, outcome `!(passed && skipped)` 계약 불변식 강제.
+  2. **목록 화면 RECORDED 분기 및 실행 기록 노출**:
+     - `NOT_OBSERVED` 시 신규 reason (`No conformance run is recorded for this host and these adapters.`) 표출.
+     - `RECORDED` 시 `latestRecordedAt` 및 어댑터별 `records` 테이블 표출 (`data-testid="conformance-records-table"`).
+     - 허위 PASS/100% 라벨 없이 `subject`/`provenance`/카운트 서버 정본 그대로 표출.
+  3. **단건 어댑터 Conformance 라우트 및 상세 조회 UI**:
+     - `fetchAdapterConformance(projectId, adapterName)` API 연동 (`GET /v1/projects/{projectId}/adapters/{name}/conformance`).
+     - 목록 테이블에서 어댑터별 상세 드릴다운 및 독립된 단건 어댑터 입력폼 제공.
+     - 단건 결과 표출 카드 (`data-testid="single-conformance-result-container"`).
+  4. **RFC 9457 Fail-Closed 오류 처리**:
+     - 404 `RES-0004`: "어댑터 없음" (입력값 미에코, 재시도 버튼 미노출).
+     - 500 `SYS-0002`: 서버 host identity 미설정 고정 안내 (재시도 버튼 미노출).
+     - 503 `SYS-0001`: 리소스 잠금 안내 및 "다시 시도" 버튼 (`data-testid="single-conformance-retry-btn"`) 표출.
+     - 계약 불일치: fail-closed 에러 배너.
+  5. **상태 격리 (State Isolation)**:
+     - 단건 어댑터 입력 변경 시 단건 결과 초기화, 프로젝트 입력 변경 시 목록 및 단건 결과 동시 초기화.
+  6. **Claude r1 독립 검토 조치 완결 (M1, M2, L1)**:
+     - **M1**: 로딩 및 404 RES-0004 live region 안내 문구에서 사용자 입력값 일절 미에코 고정 문자열 표출, 배너/live region/섹션 전반 미에코 단언 테스트 추가.
+     - **M2**: 세대 카운터(`singleConformanceGenRef`) 및 `AbortController`(`singleConformanceAbortRef`) 적용, `fetchAdapterConformance`에 signal 전달, 로딩 중 엔터/클릭 중복 제출 방지 가드(`if (singleConformanceLoading) return;`), 로딩 중 목록의 어댑터별 [상세 조회] 버튼 비활성화, 입력 변경 시 in-flight abort 및 로딩 해제, M2 회귀 테스트 완비.
+     - **L1**: 단건 어댑터 입력 필드에 `aria-label="어댑터 이름"` 추가.
+  7. **단위 및 통합 테스트**:
+     - `tests/model-lineage.test.ts`에 33개 시험 완비 및 전수 통과.
+- **실측 검증 증거**:
+  - Vitest: `tests/model-lineage.test.ts` 33 passed, 전체 78 test files / 717 tests passed (0 failures).
+  - TypeScript & 빌드: `cd apps/web && npx tsc -b` 0 errors, `npm run build` dist/ 825.74 kB 생성 성공.
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed.
+  - 무결성 도구: `check_frontend_integrity.py` 85 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --check` PASS (0 conflicts).
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-29_01-44-00_KST_G03_Stage2_FE_Gemini.md` (v1.1.0).
 
 ## 2026-09-28 S10-FE 어댑터 conformance 관측 화면 새 API(G-03 1단계) 연동 및 Claude UI·Codex 계약 리뷰 전수 반영 (agent/gemini/s10-fe-conformance-status)
 
