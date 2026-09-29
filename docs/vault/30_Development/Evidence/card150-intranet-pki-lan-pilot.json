@@ -1,119 +1,117 @@
 {
-  "schemaVersion": "card150-intranet-pki-lan-pilot:1",
-  "observedAt": "2026-09-29T15:08:01.486069+00:00",
-  "readinessObservedAt": "2026-09-30T00:19:32+09:00",
-  "sourceHeadSha": "6fc0428b49f28379cb4da17830d92256b55c2eb2",
+  "schemaVersion": "card150-intranet-pki-lan-pilot:2",
+  "observedAt": "2026-09-30T08:15:22+09:00",
   "scope": "observation-only",
   "secretsEmitted": false,
   "localDockerTouched": false,
+  "source": {
+    "agentImageSourceCommit": "6fc0428b49f28379cb4da17830d92256b55c2eb2",
+    "controlPlaneToolingCommit": "d4540dc81afea2d1f38ceb232a1f062a9f670c92",
+    "toolSHA256": {
+      "tools/intranet_pki.py": "2d4c3fd9c42d1724ea1e89c4acc225c249dc0f7960fc87c65fd0a30b6420b748",
+      "tools/lan_pilot.py": "0839bf6cf5fd69f72438b7d645cab71d7eae470ece0717ebe922f7d8f89b219d",
+      "deploy/lan/prepare-pilot-database.sh": "38828209ed2266ed0b427808d5b1aacaf5a8e2df3d8f9e0e03eb20bcbfdd2c15",
+      "deploy/lan/verify-pilot-database.sh": "cc19d07d36599111bba08d0118c6c1ca05d3db53fb7e74d140d90fc8f49c3f5f"
+    }
+  },
   "pki": {
-    "rootCertificateSHA256": "f0e42a995c526105209fc1df9501f108ec4fcab1d3e1488d9321bb3c98e124c1",
-    "rootNotAfter": "2036-09-26T14:55:37+00:00",
-    "rootOffline": true,
-    "intermediateCertificateSHA256": "dbd3d60cb0e403bbaf3d82380ece9348a01a53bbd42376a645daf2b67a3e80a9",
-    "intermediateNotAfter": "2029-09-28T14:55:37+00:00",
-    "caBundleSHA256": "64d31686cefadda38c92a08f7203a99e7ea3fcf041582ab26043305ed4be6399",
-    "nodePrivateKeysExported": 0,
-    "crlInitialized": true,
-    "controlPlaneCertificate": {
-      "hostname": "cp.sv.lan",
-      "address": "192.168.45.74",
-      "certificateSHA256": "317368f916f725770cbdbf9b3a78023827ba6912c75a8bbd954f61af135615c9",
-      "notAfter": "2026-12-28T15:15:34+00:00"
+    "https": {
+      "publicKeyAlgorithm": "ECDSA-P256",
+      "trustBundleDigestSHA256": "92455f1b778130334da43b0eee977357b5ae498eb1005bc29ecc6c3afb7192ba",
+      "rootOffline": false,
+      "rootOperatorIsolated": true,
+      "rootPassphraseSeparated": true,
+      "issuedServiceLeafCount": 2,
+      "webPKIVerifiedLeafCount": 2,
+      "deployedServiceLeafCount": 0,
+      "crlInitialized": true,
+      "crlRefreshCommandAvailable": true,
+      "crlDistributionEnforced": false
     },
-    "identityProviderCertificate": {
-      "hostname": "idp.sv.lan",
-      "address": "192.168.45.143",
-      "certificateSHA256": "9d334908bb3be6fe1deb44b2085117137b59c94bedf77563945b518bde0dfc38",
-      "notAfter": "2026-12-28T15:36:06+00:00",
-      "deployed": false
+    "nodeMtls": {
+      "publicKeyAlgorithm": "Ed25519",
+      "separateFromHttpsHierarchy": true,
+      "privateKeyExports": 0,
+      "channelPinIsPrimaryRevocation": true
     }
   },
   "pilot": {
-    "stateGeneration": "412070f9",
-    "databaseBoundary": "remote-loopback-over-operator-ssh-tunnel",
-    "databasePasswordStored": false,
-    "downloadPort": 18083,
-    "nodePort": 18444,
-    "agentImage": "sha256:e29a48a796b6643bae6370600850990b28d35248969653532b0ba6a696f8caee",
-    "configuredNodeCount": 3,
+    "operatorStateDigestSHA256": "afae42e68f12b09d676ac673188ee214d0ceb782c51bedb5d5c817108394e829",
+    "agentImageDigest": "sha256:e29a48a796b6643bae6370600850990b28d35248969653532b0ba6a696f8caee",
+    "configuredWorkerCount": 3,
     "enrolledLeafCount": 2,
-    "observedNodeCount": 2,
-    "expectedReadinessNodeCount": 5,
+    "observedWorkerCount": 2,
+    "expectedReadinessWorkerCount": 5,
     "readinessVerdict": "BLOCKED_EXTERNAL"
   },
-  "nodes": [
+  "databaseBoundary": {
+    "candidateVersion": "v5",
+    "authentication": "scram-sha-256",
+    "credentialStorage": "operator-private-files",
+    "publishAddress": "loopback",
+    "network": "dedicated-user-defined",
+    "networkCount": 1,
+    "missingCredentialRejected": true,
+    "wrongCredentialRejected": true,
+    "adminCredentialAccepted": true,
+    "runtimeCredentialAccepted": true,
+    "legacyTrustCandidatesStopped": 3,
+    "legacyDataDeleted": false,
+    "pilotStateRebound": false,
+    "verdict": "MEASURED_PASS_CANDIDATE_BLOCKED_MIGRATION"
+  },
+  "workers": [
     {
-      "nodeId": "nod_01M3PV6FRK6Z32Y7W3Y5RGJNZT",
-      "address": "192.168.45.143",
-      "certificateSHA256": "63c9e2edf67454ecc2adaaa46b57636f30792e283b3daa87bd9204aeb62bf5c0",
+      "ordinal": 1,
       "status": "online",
       "snapshotObserved": true,
-      "profile": "lan-observe-v1",
-      "cpuCapacityMillis": 12000,
-      "memoryCapacityBytes": 15938523136
+      "profile": "lan-observe-v1"
     },
     {
-      "nodeId": "nod_01M3PV6FRKTJ53FQNCDT2K2ACV",
-      "address": "192.168.45.210",
-      "certificateSHA256": "7f8b055e6cea0814c35bbe13045a2c07f52f7834db0563b027e656701c8a2586",
+      "ordinal": 2,
       "status": "online",
       "snapshotObserved": true,
-      "profile": "lan-observe-v1",
-      "cpuCapacityMillis": 12000,
-      "memoryCapacityBytes": 16480641024
+      "profile": "lan-observe-v1"
     },
     {
-      "nodeId": "nod_01M3PV6FRK9J9AWET14KPG3YW5",
-      "address": "192.168.45.222",
-      "certificateSHA256": null,
+      "ordinal": 3,
       "status": "offline",
       "snapshotObserved": false,
-      "blockedBy": "docker-socket-permission"
+      "blockedBy": "operator-host-permission"
     }
   ],
   "remainingExternalInputs": [
-    "192.168.45.222 docker group activation and a new login session",
-    "one additional Ubuntu worker address and hardware inventory",
-    "Control Plane co-located worker Docker API upgrade from 1.41 to at least 1.45",
-    "Card 152 inventory completion: 71 required values are currently missing across five rows",
-    "idp.sv.lan TLS termination deployment and live HTTPS issuer verification"
+    "activate the third worker's container-engine group and start a new login session",
+    "provide one additional independent worker and hardware inventory",
+    "upgrade the co-located worker engine API to the documented minimum",
+    "complete the five-row private inventory",
+    "deploy the HTTPS termination and verify the live issuer",
+    "migrate or recreate pilot state on the measured SCRAM database candidate"
   ],
-  "readinessInputs": {
-    "state": "operator-private lan-pilot-6fc0428b-v2 directory",
-    "caBundle": "operator-private intermediate/certs/ca-chain.pem",
-    "inventory": {
-      "nodeCount": 5,
-      "status": "BLOCKED",
-      "code": "inventory-values-missing",
-      "missingFieldCount": 71,
-      "invalidFieldCount": 0
-    },
+  "readiness": {
+    "inventoryStatus": "BLOCKED",
+    "inventoryCode": "inventory-values-missing",
+    "missingFieldCount": 71,
+    "invalidFieldCount": 0,
     "nodeCertificateChain": "prepared-partial",
     "pilotCapabilities": "prepared-partial",
     "probeResults": [
       {
-        "id": "node-certificate-chain",
+        "ordinal": 1,
         "status": "BLOCKED",
-        "code": "inventory-not-ready",
-        "registeredLeafCount": 0,
-        "verifiedLeafCount": 0
+        "code": "inventory-not-ready"
       },
       {
-        "id": "pilot-capability-match",
+        "ordinal": 2,
         "status": "BLOCKED",
-        "code": "inventory-not-ready",
-        "inventoryNodeCount": 0,
-        "registeredNodeCount": 0,
-        "matchedNodeCount": 0,
-        "databaseReadOnly": false
+        "code": "inventory-not-ready"
       }
     ]
   },
-  "discardedAttempt": {
-    "stateGeneration": "a4792c78",
-    "reason": "existing preserved pilot occupied node port 18443",
+  "discardedAttempts": {
+    "count": 3,
     "usedForAcceptance": false,
-    "databaseStoppedAndPreserved": true
+    "stoppedAndPreserved": true,
+    "deleted": false
   }
 }

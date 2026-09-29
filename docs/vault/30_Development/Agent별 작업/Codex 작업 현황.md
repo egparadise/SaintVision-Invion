@@ -1,43 +1,47 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.230"
+version: "1.0.231"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T00:47:04+09:00"
+updated: "2026-09-30T08:18:49+09:00"
 source_of_truth: "Git"
 ---
 
 ## 2026-09-30 Card 150 — 사내망 PKI·LAN pilot 재수립
 
-- `6fc0428b` exact source에서 offline root+issuing intermediate, encrypted
-  key, CRL, CP HTTPS 발급 도구와 외부 CA·SSH-tunnel DB·remote-built image를
-  받는 LAN pilot 경계를 구현했다. 로컬 Docker Desktop·기존 프로젝트
-  컨테이너·과거 `.work/lan-5node/node1`은 건드리지 않았다.
+- 독립 검토 F1~F10과 worker 3건을 반영했다. HTTPS root/intermediate/leaf는
+  ECDSA P-256으로 다시 만들고 Web PKI verifier로 CP·IdP leaf 2장을 검증했다.
+  Node mTLS Ed25519 hierarchy는 별도 유지한다. root는 현재 operator host에
+  있으므로 `rootOffline=false`이고 passphrase만 online CA directory 밖으로
+  분리했다.
 - `.143`·`.210`은 Node-local CSR→intermediate leaf→DB channel pin→실제 mTLS
   heartbeat/snapshot까지 완료했다. `.222`는 Docker socket 권한, CP 동거
   worker는 API 1.41, 네 번째 Ubuntu worker는 미제공이라 configured 3 /
   enrolled 2 / observed 2이며 5-node readiness는 `BLOCKED_EXTERNAL`이다.
-- Card 152 확정 이름 `cp.sv.lan`과 `192.168.45.74`를 SAN으로 둔 CP HTTPS
-  leaf를 발급했다. leaf SHA-256은 `317368f9…15c9`, 만료는 2026-12-29
-  00:15 KST이며 private key는 operator-private 경로 밖으로 내보내지 않았다.
+- 원격 DB trust 경계를 폐기했다. v5 candidate는 SCRAM, admin/runtime 분리
+  credential, 전용 user-defined network 1개, loopback publish이며 no/wrong
+  credential 거부와 두 양성 role을 실측했다. 과거 후보 3개는 stop·보존했고
+  active pilot state는 아직 v5로 이관하지 않아 DB readiness는 BLOCKED다.
 - Card 152 inventory는 5행이지만 필수값 71개가 비어 있다. 정본 lint와 두
   readiness probe는 각각 `inventory-values-missing`과 `inventory-not-ready`로
   차단됐으며 이를 PASS로 세지 않았다. focused Python 시험은 68 passed다.
-- #250 보안 검토에서 `idp.sv.lan` TLS owner 공백을 확인해 같은 issuing
-  intermediate로 `.143` SAN server leaf를 발급했다. 공개 fingerprint만
-  기록했고 실제 TLS 종단·HTTPS issuer verify 전이므로 `deployed=false`다.
+- 공개 Evidence에서 private IP·hostname·Node ID·certificate fingerprint를
+  제거했다. ordinal·count·status·digest만 남기고 agent image source와 CP
+  tooling commit, 도구 4개 SHA-256을 분리 결속했다. 회귀 시험이 redaction과
+  hash 일치를 강제한다.
 - intermediate encrypted key와 password의 pilot-state 동시 복제를 자체감사로
   제거했다. state는 public chain만 가지며 외부 CA enrollment마다 중앙 세
   입력을 다시 요구한다. Node-local private key 경계는 그대로다.
 - pilot status/observe의 snapshot에서 tenant·epoch·nonce를 제거하고 profile·
-  capacity·관측 시각만 남겼다. 정리 뒤 실제 state는 DB ready·observed 2다.
-- hosted Backend 두 버전의 유일한 실패였던 새 Docker label 미분류를
-  age-prunable 시험 owner가 아닌 persistent LAN runtime으로 분류했다. cleanup
-  inventory 포함 focused run은 69 passed이며 hosted 재실행 대상이다.
+  capacity·관측 시각만 남겼다. CRL refresh는 구현했지만 배포·강제는 없고,
+  Node leaf 자동 회전도 미구현이라 두 항목을 완료로 세지 않는다.
+- 수정 후 focused PG-free는 PKI 5 passed, LAN pilot 22 passed이며 두 DB shell
+  script 문법과 diff gate가 exit 0이다. hosted CI 재실행과 Claude 재검토가
+  다음이다.
 - 첫 state의 `18443` 충돌은 숨기지 않고 실패 증거로 보존했다. 최종 state는
   immutable identity에 `18444`를 처음부터 넣었다. 공개 증거에는 비밀·DSN·
-  tenant·epoch·nonce가 없다. [[사내망_PKI_LAN_pilot_운영절차_Codex]],
+  tenant·epoch·nonce·network identity가 없다. [[사내망_PKI_LAN_pilot_운영절차_Codex]],
   [[2026-09-30_00-10-21_KST_사내망_PKI_LAN_pilot_Codex]].
 
 # Codex 작업 현황

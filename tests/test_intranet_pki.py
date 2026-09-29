@@ -1,6 +1,8 @@
 """PG-free checks for the private root/intermediate certificate boundary."""
 
+import hashlib
 import json
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -14,6 +16,9 @@ from cryptography.x509.verification import PolicyBuilder, Store
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 import intranet_pki
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 def initialize(tmp_path: Path) -> tuple[Path, Path]:
@@ -169,3 +174,30 @@ def test_rejects_a_certificate_from_another_issuer(tmp_path: Path):
 
     with pytest.raises(ValueError, match="not issued"):
         intranet_pki.revoke(ca_dir, certificate_path, reason="key-compromise", now=now)
+
+
+def test_public_pilot_evidence_is_redacted_and_bound_to_the_tooling():
+    evidence_path = (
+        REPO_ROOT
+        / "docs"
+        / "vault"
+        / "30_Development"
+        / "Evidence"
+        / "card150-intranet-pki-lan-pilot.json"
+    )
+    evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
+    serialized = json.dumps(evidence, sort_keys=True).lower()
+
+    assert not re.search(
+        r"\b(?:10|192\.168|172\.(?:1[6-9]|2\d|3[01]))\.\d{1,3}\.\d{1,3}\b", serialized
+    )
+    assert ".sv.lan" not in serialized
+    assert "nod_" not in serialized
+    assert "fingerprint" not in serialized
+    assert evidence["pki"]["https"]["rootOffline"] is False
+    assert evidence["pki"]["https"]["publicKeyAlgorithm"] == "ECDSA-P256"
+    assert evidence["databaseBoundary"]["pilotStateRebound"] is False
+
+    for relative_path, expected in evidence["source"]["toolSHA256"].items():
+        actual = hashlib.sha256((REPO_ROOT / relative_path).read_bytes()).hexdigest()
+        assert actual == expected
