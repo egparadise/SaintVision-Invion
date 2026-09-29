@@ -98,15 +98,17 @@ set -- "$@" "$IMAGE" server /data --address :9000
 
 scheme=http
 [ "$TLS_ENABLED" = true ] && scheme=https
+admin_host=127.0.0.1
+[ "$TLS_ENABLED" = true ] && admin_host="$BIND_ADDRESS"
 . "$ROOT_ENV"
 . "$SERVICE_ENV"
 . "$PITR_ENV"
 case "$MINIO_ROOT_USER$MINIO_ROOT_PASSWORD$SVC_KEY$SVC_SECRET$PITR_KEY$PITR_SECRET" in
   *[!A-Za-z0-9._-]*) fail "credential alphabet is not URL-safe" ;;
 esac
-ADMIN_ALIAS="$scheme://${MINIO_ROOT_USER}:${MINIO_ROOT_PASSWORD}@127.0.0.1:9000"
+ADMIN_ALIAS="$scheme://${MINIO_ROOT_USER}:${MINIO_ROOT_PASSWORD}@$admin_host:9000"
 attempt=0
-until docker exec -e "MC_HOST_local=$ADMIN_ALIAS" "$NAME" /bin/sh -eu -c \
+until timeout 3 docker exec -e "MC_HOST_local=$ADMIN_ALIAS" "$NAME" /bin/sh -eu -c \
   '[ "$(/usr/bin/mc ready local 2>/dev/null | wc -l)" -ge 1 ]' >/dev/null 2>&1; do
   attempt=$((attempt + 1))
   [ "$attempt" -lt 30 ] || fail "MinIO did not become ready"

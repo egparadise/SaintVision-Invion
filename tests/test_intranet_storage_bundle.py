@@ -53,6 +53,8 @@ def test_minio_script_pins_image_and_keeps_container_boundary():
         'docker rename "$ROLLBACK_NAME" "$NAME"',
         "partial TLS input is forbidden",
         'set -- "$@" --certs-dir /certs',
+        '[ "$TLS_ENABLED" = true ] && admin_host="$BIND_ADDRESS"',
+        "until timeout 3 docker exec",
     ):
         assert required in script
     assert "MINIO_CERTS_DIR" not in script
