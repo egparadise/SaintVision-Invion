@@ -153,9 +153,9 @@ printf '%s\n' "$ADMIN_ALIAS" "$SVC_KEY" "$SVC_SECRET" "$PITR_KEY" "$PITR_SECRET"
     /usr/bin/mc version enable local/saintvision-pitr >/dev/null
     /usr/bin/mc admin policy create local saintvision-product /tmp/product-policy.json >/dev/null
     /usr/bin/mc admin policy create local saintvision-pitr /tmp/pitr-policy.json >/dev/null
-    /usr/bin/mc admin user add local "$SVC_KEY" "$SVC_SECRET" >/dev/null
+    printf "%s\n%s\n" "$SVC_KEY" "$SVC_SECRET" | /usr/bin/mc admin user add local >/dev/null
     /usr/bin/mc admin policy attach local saintvision-product --user "$SVC_KEY" >/dev/null
-    /usr/bin/mc admin user add local "$PITR_KEY" "$PITR_SECRET" >/dev/null
+    printf "%s\n%s\n" "$PITR_KEY" "$PITR_SECRET" | /usr/bin/mc admin user add local >/dev/null
     /usr/bin/mc admin policy attach local saintvision-pitr --user "$PITR_KEY" >/dev/null
   '
 docker exec "$NAME" /bin/sh -eu -c 'rm -f /tmp/product-policy.json /tmp/pitr-policy.json'

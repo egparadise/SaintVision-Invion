@@ -1,4 +1,5 @@
 import json
+import re
 from pathlib import Path
 
 
@@ -58,6 +59,8 @@ def test_minio_script_pins_image_and_keeps_container_boundary():
         "until mc_ready",
         'printf \'%s\\n\' "$ADMIN_ALIAS" "$SVC_KEY" "$SVC_SECRET"',
         "IFS= read -r MC_HOST_local",
+        'printf "%s\\n%s\\n" "$SVC_KEY" "$SVC_SECRET" | /usr/bin/mc admin user add local',
+        'printf "%s\\n%s\\n" "$PITR_KEY" "$PITR_SECRET" | /usr/bin/mc admin user add local',
         "exec stdin, never host process arguments",
         '$ROOT_ENV:/run/secrets/root.env:ro',
         "/usr/bin/mc version enable local/saintvision-pitr",
@@ -66,6 +69,13 @@ def test_minio_script_pins_image_and_keeps_container_boundary():
     assert "MINIO_CERTS_DIR" not in script
     assert '-e "MC_HOST_local=$ADMIN_ALIAS"' not in script
     assert '--env-file "$ROOT_ENV"' not in script
+    assert not re.search(
+        r"admin user add[^\n]*(?:\$SVC_SECRET|\$PITR_SECRET)", script
+    ), "service secrets must be piped to mc, never placed after the command in argv"
+    assert not re.search(
+        r"docker (?:run|exec)[^\n]*(?:-e|--env)[^\n]*(?:ALIAS|SECRET|PASSWORD)",
+        script,
+    ), "credential variables must not enter docker argv through environment flags"
     for forbidden in ("docker system", "docker volume prune", "docker image prune", "sudo "):
         assert forbidden not in script
     assert '$CONFIG_DIR:/run/saintvision-intranet' not in script
@@ -102,6 +112,9 @@ def test_pitr_rehearsal_uses_uploaded_bytes_and_checks_replication_before_source
     assert script.count('$SOURCE_ENV:/run/secrets/source.env:ro') == 3
     assert 'the host process arguments or Docker Config.Env' in script
     assert 'TLS operational acceptance is pending' not in script
+    assert script.index('restore_started_ns="$(date +%s%N)"') < script.index(
+        '"pitr/saintvision-pitr/pilot/rehearsals/$RUN_ID" /download'
+    )
 
 
 def test_redacted_operational_evidence_is_sha_and_time_bound():

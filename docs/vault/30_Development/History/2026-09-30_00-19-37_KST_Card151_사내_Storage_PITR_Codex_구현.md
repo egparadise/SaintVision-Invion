@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-20260930-CODEX-CARD151-001"
 title: "Card 151 사내 Storage U6/G-20·PITR G-22 구현과 실측"
-version: "1.3.0"
+version: "1.3.1"
 status: "review"
 author: "Codex"
 owner: "Codex"
 reviewer: "Claude"
-updated: "2026-09-30T08:01:30+09:00"
+updated: "2026-09-30T08:30:00+09:00"
 source_of_truth: "Git"
 task: "CARD-151"
 base_sha: "6fc0428b49f28379cb4da17830d92256b55c2eb2"
@@ -66,6 +66,7 @@ canonical preflight는 storage check만 PASS했고 전체는 PASS 1/FAIL 2/BLOCK
 - hosted PR #248 evidence head `c075e669`: Docs run `36592638603` success, Core의 `s01-storage-roundtrip` job도 success. 보안 후속 head `f420530a`의 Docs run `36594438509`도 success이며 Backend·desktop-browser는 본 기록 시점 진행 중이다.
 - PITR·source DB 자격 비노출 후속: `tests/test_intranet_storage_bundle.py` 4 passed, local·remote shell syntax와 `git diff --check` exit 0.
 - Claude F1~F12 후속 focused: storage bundle+cleanup inventory 6 passed. redacted evidence는 `docs/vault/30_Development/Evidence/card151-intranet-storage-redacted.json`에 codeSha·observedAt·source digest와 403/403을 고정했다.
+- Claude r2 F1 잔여: pinned `mc admin user add --help`가 access/secret 인자 생략 시 stdin prompt/pipe를 지원함을 실제 노드에서 확인하고, service·PITR access/secret도 pipe로 바꿔 `mc` argv에서 제거했다. 회귀 시험은 두 stdin 명령의 존재와 `admin user add ... $*_SECRET` 부재를 함께 단언한다.
 - canonical `tools/s01_readiness_preflight.py`: exit 1, 전체 FAIL(PASS 1/FAIL 2/BLOCKED 6), storage check만 `storage-operational-evidence-valid`; 미입력을 합성하지 않은 기대된 부분 판정이다.
 - focused 첫 재실행은 `PYTHONPATH`에서 `tools` 누락으로 두 모듈 collection error였고 통과로 세지 않았다. 정정한 `tools;src;services/control-plane/src` 환경에서 `11 passed`를 다시 확보했다. citation gate도 PR #249 전용 경로를 현 branch 실재 경로로 오인한 새 인용 1건을 제거한 뒤 PASS했다.
 - `python tools/sync_obsidian.py --check`: exit 3, 기존 unmanaged collision 15건(11 no-baseline, 4 both-diverged). 파일은 쓰지 않았고 `--apply`는 실행하지 않았다.
