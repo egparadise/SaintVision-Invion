@@ -84,7 +84,7 @@ source_of_truth: "Git"
 | 구분 | 심각도 | 지적 사항 | 조치 내용 | 회귀 시험 및 증거 |
 |---|---|---|---|---|
 | **H1** | High | PR #190 (`agent/gemini/g07-eval-runner-impl`)과의 열차 충돌(train conflict) | PR #190 최신 헤드(`399e5b57`)를 `agent/gemini/card138-fe-bundle` 브랜치에 merge (resolution only) 완료. 충돌 파일 전수 정합. | `git merge 399e5b57` (commit `c13ab928`) |
-| **H2 / F1** | High | CI 원격 환경에서 `sourceHeadSha` (`fc1c4eb5...`) 미존재로 인한 Hosted Frontend 실패 | `generate_eval_evidence.ts`를 실행하여 실제 푸시될 Git 커밋 SHA(`cbe1a4af51d1e1d6...`)에 바인딩된 정본 `s09-g07-eval-evidence-cbe1a4af.json` 생성. `git cat-file -e ${sourceHeadSha}^{commit}` 100% 통과 보증. | `tests/agent-eval-runner.test.ts` (sourceHeadSha 실존 commit 객체 검증) |
+| **H2 / F1** | High | CI 원격 환경에서 `sourceHeadSha` (`fc1c4eb5...`) 미존재로 인한 Hosted Frontend 실패 | `generate_eval_evidence.ts`를 실행하여 실제 푸시될 Git 커밋 SHA(`cbe1a4af51d1e1d6...`)에 바인딩된 정본 `s09-g07-eval-evidence-cbe1a4af.json` 생성. `git cat-file -e ${sourceHeadSha}^{commit}` 100% 통과 보증. | `apps/web/tests/agent-eval-runner.test.ts` (sourceHeadSha 실존 commit 객체 검증) |
 | **M1 / F2** | Med | `casesDigest` 검증이 단순 해시 비교에 그쳐 `loaded.cases`로부터의 정본 재계산 누락 | `evalRunner.ts`에서 `computeCasesDigest` 정본 함수를 export하고, `agent-eval-runner.test.ts`에서 `expect(computeCasesDigest(loaded.cases)).toBe(loaded.casesDigest)` 및 `loopCount` 변조 시 불일치 단언 추가. | `agent-eval-runner.test.ts:62-69`, `agent-mutation-guards.test.ts:411-423` |
 | **M2 / F4** | Med | `gitBlobOids` 및 `generate_eval_evidence.ts`의 `git hash-object` / fallback SHA 등 fail-open 잔류 | fallback 경로 전수 제거 및 `git rev-parse` 실패 시 즉각 throw하는 완전 fail-closed로 단일화. 비정상 커밋 SHA 전달 시 `FAIL-CLOSED` 에러 발생 음성 시험 추가. | `agent-eval-runner.test.ts:119-130` (음성 시험 통과) |
 | **F3** | Med | `ModelLineageView.tsx` 승인 입력 플레이스홀더가 `core.schema.json` `ApprovalId` 정규식(`^apr_...`)과 불일치 | `placeholder="승인 식별자 입력 (apr_...)"`로 정합 복원하고 `model-registry-business-routes.test.tsx` Test 24 단언 갱신. | `model-registry-business-routes.test.tsx:1823` |
@@ -95,9 +95,9 @@ source_of_truth: "Git"
 
 | 구분 | 심각도 | 지적 사항 | 조치 내용 | 회귀 시험 및 증거 |
 |---|---|---|---|---|
-| **H3** | High | PR #190 머지 충돌 해소 과정에서 S11 제품 결함 수정(DEF-S11-08·11~16) 누락 및 시험 퇴행 | (1) `ReleaseCandidateView.tsx`와 `releaseEngine.ts`를 S11 정직 모의 배지(`모의 활성`, `✔ 모의 검증 완료`, `주요 SLO 모의 규격 및 목표 비교`, `모의 PASS`, `[수동 계산값]: 12.26:1` 등) 기준으로 복원하고 Card 126 F1(`unmeasured`)과 조화.<br>(2) 명도대비 `11.4` 오기를 수동 계산값 및 index.css 토큰과 일치하는 `12.26:1`로 정합 (`releaseEngine.ts:78`, `release-candidate.test.ts:95`, `browser-matrix-acceptance.test.tsx:243`).<br>(3) `v1.0.0-rc.1` 초기 `rollbackVerified: false` 복원 (DEF-S11-16).<br>(4) `tests/s11-defect-fixes.test.tsx`에서 허위 배지 부정 단언 5종 복원 및 모의 기준 충족 실측 시험(`DEF-S11-08`) 추가. | `tests/s11-defect-fixes.test.tsx` (16 passed), `tests/release-candidate.test.ts` (8 passed), `tests/browser-matrix-acceptance.test.tsx` (10 passed) |
+| **H3** | High | PR #190 머지 충돌 해소 과정에서 S11 제품 결함 수정(DEF-S11-08·11~16) 누락 및 시험 퇴행 | (1) `ReleaseCandidateView.tsx`와 `releaseEngine.ts`를 S11 정직 모의 배지(`모의 활성`, `✔ 모의 검증 완료`, `주요 SLO 모의 규격 및 목표 비교`, `모의 PASS`, `[수동 계산값]: 12.26:1` 등) 기준으로 복원하고 Card 126 F1(`unmeasured`)과 조화.<br>(2) 명도대비 `11.4` 오기를 수동 계산값 및 index.css 토큰과 일치하는 `12.26:1`로 정합 (`releaseEngine.ts:78`, `release-candidate.test.ts:95`, `browser-matrix-acceptance.test.tsx:243`).<br>(3) `v1.0.0-rc.1` 초기 `rollbackVerified: false` 복원 (DEF-S11-16).<br>(4) `apps/web/tests/s11-defect-fixes.test.tsx`에서 허위 배지 부정 단언 5종 복원 및 모의 기준 충족 실측 시험(`DEF-S11-08`) 추가. | `apps/web/tests/s11-defect-fixes.test.tsx` (16 passed), `apps/web/tests/release-candidate.test.ts` (8 passed), `apps/web/tests/browser-matrix-acceptance.test.tsx` (10 passed) |
 | **L2** | Low | 진행판 머지 충돌 해소 시 ours 전면 채택으로 인한 #190 계보 항목 누락 | `Gemini 작업 현황.md`에 누락되었던 6개 섹션(G-07 및 S11-FE) 및 `전체 개발 진행 현황.md`에 누락되었던 4개 G-07 로그 항목을 완벽히 union 병합 복원. | `docs/vault/00_Index/전체 개발 진행 현황.md`, `docs/vault/30_Development/Agent별 작업/Gemini 작업 현황.md` |
-| **비차단** | Low | `model-registry-business-routes.test.tsx` Test 24 이름 내 `apv_...` 잔류 | Test 24 이름을 `apv_...`에서 canonical 정규식과 일치하는 `apr_...`로 정정. | `tests/model-registry-business-routes.test.tsx:1793` |
+| **비차단** | Low | `model-registry-business-routes.test.tsx` Test 24 이름 내 `apv_...` 잔류 | Test 24 이름을 `apv_...`에서 canonical 정규식과 일치하는 `apr_...`로 정정. | `apps/web/tests/model-registry-business-routes.test.tsx:1793` |
 
 ---
 
@@ -105,7 +105,7 @@ source_of_truth: "Git"
 
 | 구분 | 심각도 | 지적 사항 | 조치 내용 | 회귀 시험 및 증거 |
 |---|---|---|---|---|
-| **H3-b** | Med | DeveloperStudio 단계 번호 원형 배지 배경 토큰 옛 토큰 잔류 및 시험 임계 완화 | (1) `DeveloperStudio.tsx:902`: 단계 번호 원형 배지 배경 토큰을 `b91ab72f` 정본과 일치하도록 `var(--color-brand-primary)`에서 `var(--color-brand-primary-bg)`로 복원하여 착지 후보 `b91ab72f` 대비 diff 0 bytes 달성.<br>(2) `tests/s11-defect-fixes.test.tsx:934`: `brandPrimaryBgMatches` 허용 임계를 원래의 `2`(`ClusterOverview.tsx`, `NodeList.tsx`)로 원복하고 `expect(matchedFiles).toContain('features/studio/DeveloperStudio.tsx')` 단언 삭제. | `tests/s11-defect-fixes.test.tsx` (16 passed)<br>`git diff b91ab72f -- apps/web/src/features/studio/DeveloperStudio.tsx` (0 bytes) |
+| **H3-b** | Med | DeveloperStudio 단계 번호 원형 배지 배경 토큰 옛 토큰 잔류 및 시험 임계 완화 | (1) `DeveloperStudio.tsx:902`: 단계 번호 원형 배지 배경 토큰을 `b91ab72f` 정본과 일치하도록 `var(--color-brand-primary)`에서 `var(--color-brand-primary-bg)`로 복원하여 착지 후보 `b91ab72f` 대비 diff 0 bytes 달성.<br>(2) `apps/web/tests/s11-defect-fixes.test.tsx:934`: `brandPrimaryBgMatches` 허용 임계를 원래의 `2`(`ClusterOverview.tsx`, `NodeList.tsx`)로 원복하고 `expect(matchedFiles).toContain('features/studio/DeveloperStudio.tsx')` 단언 삭제. | `apps/web/tests/s11-defect-fixes.test.tsx` (16 passed)<br>`git diff b91ab72f -- apps/web/src/features/studio/DeveloperStudio.tsx` (0 bytes) |
 
 ---
 

@@ -66,7 +66,7 @@ tags: ["s10-fe", "g-05", "model-registry", "lineage", "retention-pin", "model-re
 ## 3. 실측 검증 증거
 
 - **Vitest 전용 및 전체 스위트 (`apps/web`)**:
-  - `tests/model-registry-business-routes.test.tsx`: 13 passed (456ms)
+  - `apps/web/tests/model-registry-business-routes.test.tsx`: 13 passed (456ms)
   - 웹 전체: 79 test files, 688 passed (21.33s)
 - **TypeScript 타입 점검 및 빌드**:
   - `npx tsc -b`: 0 errors (exit 0)
@@ -114,15 +114,15 @@ tags: ["s10-fe", "g-05", "model-registry", "lineage", "retention-pin", "model-re
   - 9개 폼 입력 필드 변경 시 즉시 해당 작업의 in-flight 세대 번호를 증가시켜 이전 파라미터로 진행 중이던 응답이 새 입력 상태를 덮어쓰지 못하도록 무효화.
   - 되돌리면 실패하는 회귀 시험 실장 (시험 19: 쓰기 간 독립 abort 및 finally 로딩 해제 검증).
 - **G1 [중간] Lineage Trace 응답 픽스처 및 서버 정본 모델 정합**:
-  - `validTraceResponse` 픽스처에서 `unresolved`가 비어있지 않을 때 서버 `services/lineage.py:762` 계약에 따라 `fullyTraceable: false`로 정합.
-  - `missing` 배열 항목은 서버 `services/lineage.py:747` 정본대로 kind 이름 문자열(`"dataset_version"`)만 포함하도록 교정.
+  - `validTraceResponse` 픽스처에서 `unresolved`가 비어있지 않을 때 서버 `src/saintvision/services/lineage.py:762` 계약에 따라 `fullyTraceable: false`로 정합.
+  - `missing` 배열 항목은 서버 `src/saintvision/services/lineage.py:747` 정본대로 kind 이름 문자열(`"dataset_version"`)만 포함하도록 교정.
   - 비정본 4대 별칭(`evaluations`, `commits`, `approvals`, `images`), `isEval` 특수 분기, 임의의 하드코딩 fallback kind 목록을 전면 제거.
 - **G2 [부분] 보존 핀 멱등키 회전 및 동일 재시도 보존**:
   - 동일 파라미터 재시도 시에는 `pinIdempotencyKey`를 보존하여 멱등적 재시도를 지원하되, 핀 만료일(`until`) 또는 프로젝트/모델/버전 식별자가 변경될 때는 즉시 새 UUID v4 멱등키로 회전.
   - 파라미터 변경 시 멱등키가 회전하지 않으면 서버가 409 `GRAPH-0002` 충돌을 반환하는 문제를 방지.
   - 되돌리면 실패하는 회귀 시험 실장 (시험 18: 핀 파라미터 변경 시 멱등키 즉시 회전 실측).
 - **G5 [경미] 409 Conflict detail 형식 및 ProblemDetails.title 교정**:
-  - 409 Conflict detail을 서버 `services/lineage.py` 및 `model_release.py:326-327`의 정본 문자열(`f"kind '{missing_kind}' is not traceable for model '{model_id}' version '{version}'"`)과 일치.
+  - 409 Conflict detail을 서버 `src/saintvision/services/lineage.py` 및 `model_release.py:326-327`의 정본 문자열(`f"kind '{missing_kind}' is not traceable for model '{model_id}' version '{version}'"`)과 일치.
   - `ProblemDetails`의 `title`을 서버 `api/problem.py:131` 정본대로 에러 코드(`code`, 예: `GRAPH-0002`, `RES-0004`)와 일치화.
 - **Test 16 엄격 스키마 경계 픽스처 교정**:
   - `deployments` 컬렉션 상한 검증 시 스키마 허용 환경(`environment: 'pilot'`) 적용.
@@ -131,9 +131,9 @@ tags: ["s10-fe", "g-05", "model-registry", "lineage", "retention-pin", "model-re
   - PR #212 head `5b2609d9`를 병합하고, `ModelLineageView.tsx`에서 Card 94 비즈니스 라우트(상단 4개 탭)와 PR #203 어댑터 Conformance 패널(`adapter-conformance-panel`) 및 Model Commitment 패널(`model-commitment-panel`)을 완벽하게 통합/합성.
   - `write-actions-integrity-wiring.test.tsx` 무결성 검증 통과 (`로컬 배포 게이트 시뮬레이션 완료` 정직 표출).
 - **실측 검증 증거**:
-  - Vitest: `tests/model-registry-business-routes.test.tsx` 19 passed (826ms).
-  - Vitest: `tests/model-lineage.test.ts` 23 passed (997ms).
-  - Vitest: `tests/write-actions-integrity-wiring.test.tsx` 8 passed (204ms).
+  - Vitest: `apps/web/tests/model-registry-business-routes.test.tsx` 19 passed (826ms).
+  - Vitest: `apps/web/tests/model-lineage.test.ts` 23 passed (997ms).
+  - Vitest: `apps/web/tests/write-actions-integrity-wiring.test.tsx` 8 passed (204ms).
   - 웹 전체: 80 test files, 750 passed (23.88s).
   - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist 번들 정상 빌드 (874.71 kB).
   - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (2.46s).
@@ -145,7 +145,7 @@ tags: ["s10-fe", "g-05", "model-registry", "lineage", "retention-pin", "model-re
 - **Claude UI r3 조건부 승인 전수 반영**:
   1. `ModelLineageView.tsx:1205` fallback kind 배열 `['eval_run', 'code_commit', 'approval', 'container_image']` 완전 제거: 서버에서 `countOnlyKinds`를 제공하지 않을 경우 임의의 fallback을 합성하지 않고 정직하게 NOT_OBSERVED 표기.
   2. `:1208` `'evaluations'` 옛 별칭 제거: 정본 `kind === 'eval_run'` 단일 조건으로 판별.
-  3. 시험 9 픽스처 교정: 서버 `services/lineage.py:762-768` 산식(`traceabilityLimitedByScope = any(kind in unresolved for kind in COUNT_ONLY_KINDS)`)과 일치하도록 `missing: ['dataset_version']`, `unresolved: [{ kind: 'code_commit', count: 2 }]`, `countOnlyKinds: ['code_commit', 'eval_run']`으로 교정하여 서버가 실제로 생성 가능한 데이터로 검증.
+  3. 시험 9 픽스처 교정: 서버 `src/saintvision/services/lineage.py:762-768` 산식(`traceabilityLimitedByScope = any(kind in unresolved for kind in COUNT_ONLY_KINDS)`)과 일치하도록 `missing: ['dataset_version']`, `unresolved: [{ kind: 'code_commit', count: 2 }]`, `countOnlyKinds: ['code_commit', 'eval_run']`으로 교정하여 서버가 실제로 생성 가능한 데이터로 검증.
   4. `:203` 안내 문구 복원: `5b2609d9` 원문인 `✔ [모의 시뮬레이션] [...] 로컬 배포 게이트 시뮬레이션 완료 (백엔드 서빙 배포 API 미노출 상태로 실제 인프라 미반영 · 백엔드 digest 고정과 무관 · Digest: ...)`로 완전 복원.
   5. View 날짜 검증 중복 제거: `ModelLineageView.tsx` 내부의 중복 `isValidIsoDateTime` 로컬 함수를 제거하고 `@/shared/api/modelRegistryObservation`의 정본 함수로 일원화하여 `+99:99` 등 비정상 타임존 오프셋 누출 차단.
 - **Codex 계약 축 Release 멱등 경계 및 Path 회전 전수 반영**:
@@ -154,9 +154,9 @@ tags: ["s10-fe", "g-05", "model-registry", "lineage", "retention-pin", "model-re
   3. 파라미터(`relLicensePolicy`, `relClassification`) 또는 경로(`projectId`, `modelId`, `version`) 변경 시 즉시 새 UUID v4 멱등키로 회전.
   4. W2 model path(`modelId`, `projectId`), W4 model/version path(`modelId`, `version`), Release model/version path 변경 시 멱등키 즉시 회전 및 변경된 path+payload 재시도 시 새 멱등키 유지 실측 (시험 13, 시험 18, 시험 20).
 - **실측 검증 증거**:
-  - Vitest: `tests/model-registry-business-routes.test.tsx` 20 passed (855ms).
-  - Vitest: `tests/model-lineage.test.ts` 23 passed (924ms).
-  - Vitest: `tests/write-actions-integrity-wiring.test.tsx` 8 passed (204ms).
+  - Vitest: `apps/web/tests/model-registry-business-routes.test.tsx` 20 passed (855ms).
+  - Vitest: `apps/web/tests/model-lineage.test.ts` 23 passed (924ms).
+  - Vitest: `apps/web/tests/write-actions-integrity-wiring.test.tsx` 8 passed (204ms).
   - 웹 전체: 80 test files, 751 passed (27.53s, 0 failures).
   - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist 번들 정상 생성 (874.53 kB, 6.05s).
   - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (2.85s).
@@ -183,7 +183,7 @@ tags: ["s10-fe", "g-05", "model-registry", "lineage", "retention-pin", "model-re
   4. **후속 배정 연계**:
      - 릴리스 서버 멱등 계약은 Claude가 카드 113으로 추가하고, 그 뒤 재노출은 후속 카드로 배정됨.
 - **실측 검증 증거**:
-  - Vitest: `tests/model-registry-business-routes.test.tsx` 20 passed (819ms).
+  - Vitest: `apps/web/tests/model-registry-business-routes.test.tsx` 20 passed (819ms).
   - 웹 전체: 80 test files, 751 passed (23.69s, 0 failures).
   - TypeScript: `npx tsc -b` 0 errors.
   - 빌드: `npm run build` dist 번들 정상 생성 (873.66 kB, 8.55s).
