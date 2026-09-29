@@ -1,17 +1,25 @@
 {
   "schemaVersion": "card150-intranet-pki-lan-pilot:2",
-  "observedAt": "2026-09-30T08:15:22+09:00",
+  "observedAt": "2026-09-30T08:40:35+09:00",
   "scope": "observation-only",
   "secretsEmitted": false,
   "localDockerTouched": false,
   "source": {
     "agentImageSourceCommit": "6fc0428b49f28379cb4da17830d92256b55c2eb2",
-    "controlPlaneToolingCommit": "d4540dc81afea2d1f38ceb232a1f062a9f670c92",
+    "controlPlaneToolingCommit": "8ce88ba9c2958df8cbed95ab8ea4bf9286ae55f1",
     "toolSHA256": {
-      "tools/intranet_pki.py": "2d4c3fd9c42d1724ea1e89c4acc225c249dc0f7960fc87c65fd0a30b6420b748",
-      "tools/lan_pilot.py": "0839bf6cf5fd69f72438b7d645cab71d7eae470ece0717ebe922f7d8f89b219d",
-      "deploy/lan/prepare-pilot-database.sh": "38828209ed2266ed0b427808d5b1aacaf5a8e2df3d8f9e0e03eb20bcbfdd2c15",
-      "deploy/lan/verify-pilot-database.sh": "cc19d07d36599111bba08d0118c6c1ca05d3db53fb7e74d140d90fc8f49c3f5f"
+      "tools/intranet_pki.py": "13774a637ccfa8d3ae10f1a996a0d5334e7b0a7a0d19248910a245de53189f01",
+      "tools/lan_pilot.py": "a5074c7c1289c5c55e23b1d51135aeb7c3c0dfd2aad6bc1f612f70f471c34fb3",
+      "deploy/lan/prepare-pilot-database.sh": "9590de80c8eca3d26fa11e94ea49e10f1410a83099ff822c7af363f9103c3385",
+      "deploy/lan/verify-pilot-database.sh": "cf644ddbd2eda304b3f3ccb1c9c4d78393cf99dbe24726319892be177a313d8f",
+      "deploy/lan/Dockerfile.node.remote": "38e3b6ea2d4dcdef6c85108124324bfafd012fcd5119912bf0f61eca9999b1ae"
+    },
+    "toolGitBlobSHA1": {
+      "tools/intranet_pki.py": "ef10834d2ffa7d36456ce0cbaaddf0135df4886d",
+      "tools/lan_pilot.py": "ab0165811199cd6032540e4e3a1f45d1cdad8b00",
+      "deploy/lan/prepare-pilot-database.sh": "31dd91e6d7af06cec04582591ef84215dd012c35",
+      "deploy/lan/verify-pilot-database.sh": "bcc9959ebf1ebb106a6661682698fe038938a3a9",
+      "deploy/lan/Dockerfile.node.remote": "9139956d1102abe35422b81642c68b6ecd308216"
     }
   },
   "pki": {
@@ -63,18 +71,24 @@
   "workers": [
     {
       "ordinal": 1,
+      "observedAt": "2026-09-30T00:08:01+09:00",
+      "observationToolCommit": "d3d8d927e4f959a12786a3c8698c3fd026e43acc",
       "status": "online",
       "snapshotObserved": true,
       "profile": "lan-observe-v1"
     },
     {
       "ordinal": 2,
+      "observedAt": "2026-09-30T00:08:01+09:00",
+      "observationToolCommit": "d3d8d927e4f959a12786a3c8698c3fd026e43acc",
       "status": "online",
       "snapshotObserved": true,
       "profile": "lan-observe-v1"
     },
     {
       "ordinal": 3,
+      "observedAt": null,
+      "observationToolCommit": "d3d8d927e4f959a12786a3c8698c3fd026e43acc",
       "status": "offline",
       "snapshotObserved": false,
       "blockedBy": "operator-host-permission"

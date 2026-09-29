@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-CODEX-20260930-CARD150"
 title: "사내망 PKI와 LAN pilot 재수립"
-version: "1.1.0"
+version: "1.1.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T08:18:49+09:00"
+updated: "2026-09-30T08:40:35+09:00"
 source_of_truth: "Git"
 ---
 
@@ -58,7 +58,7 @@ Card 152 inventory는 5행을 갖지만 필수값 71개가 비어 있었다. 정
 ## 검증
 
 - 독립 검토 수정 후 PG-free focused run은 `tests/test_intranet_pki.py`
-  **5 passed**, `tests/test_lan_pilot_multinode.py` **22 passed**다. 두 DB shell
+  **6 passed**, `tests/test_lan_pilot_multinode.py` **22 passed**다. 두 DB shell
   script의 `bash -n`과 `git diff --check`도 exit 0이다.
 - 첫 hosted Backend 3.12/3.14는 제품 시험 5,610건 뒤 새 persistent label
   `ai.saintvision.lan-pilot`의 cleanup 정책 미분류 1건으로 실패했다. 이를
@@ -88,6 +88,17 @@ Card 152 inventory는 5행을 갖지만 필수값 71개가 비어 있었다. 정
 | F9 stateGeneration | 출처가 불명확한 값을 제거하고 redacted operator-state digest 및 count만 남겼다. |
 | F10 rotation | 최대 6일 Node leaf 자동 회전은 미구현 blocker로 명시했다. |
 | worker 공개 Evidence | private IP·hostname·Node ID·certificate fingerprint를 제거하고 ordinal·count·status·digest만 남겼다. 회귀 시험이 이를 강제한다. |
+| worker r2 DB secret | runtime password의 `psql --set` argv 전달을 제거했다. 보호 파일은 psql stdin meta-command로만 읽으며 정적 회귀가 argv 재도입을 막는다. |
+| worker r2 role drift | role을 매 실행 최소 권한으로 재고정하고 shell verifier와 `bind-db-auth`가 `pg_roles` 5개 권한을 모두 false로 요구한다. SUPERUSER 및 md5 변이를 음성 시험으로 고정했다. |
+| Claude r2 C1·L3 | password 없는 non-loopback DSN 단독 사례와 SCRAM-only 무력화 사례를 추가했다. |
+| Claude r2 C2·L5 | worker 행마다 과거 관측 시각·관측 도구 commit을 기록하고 remote Dockerfile을 포함한 Git blob OID+SHA-256 결속으로 바꿨다. |
+| Claude r2 L6·runbook | root passphrase는 parent가 아니라 파일 자체 ACL을 제한한다. 공개 운영절차·History의 LAN 주소는 역할 placeholder로 바꿨다. |
+
+commit `8ce88ba9c2958df8cbed95ab8ea4bf9286ae55f1`의 두 DB script를 원격 v5에
+재적용했다. secret 출력 없이 no/wrong credential 거부, admin/runtime 수락,
+SCRAM-only, 최소 권한 runtime role, dedicated network 1개, loopback publish가
+모두 통과했다. 전달한 `/tmp` script 두 개는 실행 직후 삭제했으며 DB data와
+volume은 삭제하지 않았다.
 
 ## 남은 입력
 

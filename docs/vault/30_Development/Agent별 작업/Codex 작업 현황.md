@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.231"
+version: "1.0.232"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T08:18:49+09:00"
+updated: "2026-09-30T08:40:35+09:00"
 source_of_truth: "Git"
 ---
 
@@ -36,7 +36,13 @@ source_of_truth: "Git"
 - pilot status/observe의 snapshot에서 tenant·epoch·nonce를 제거하고 profile·
   capacity·관측 시각만 남겼다. CRL refresh는 구현했지만 배포·강제는 없고,
   Node leaf 자동 회전도 미구현이라 두 항목을 완료로 세지 않는다.
-- 수정 후 focused PG-free는 PKI 5 passed, LAN pilot 22 passed이며 두 DB shell
+- worker·Claude r2에 따라 runtime secret argv 전달을 stdin 파일 경계로
+  바꾸고 runtime role의 5개 위험 권한을 매 실행 재고정·검증한다. nonloopback
+  DSN, md5 HBA, SUPERUSER 변이와 실제 CLI option 순서도 회귀로 고정했다.
+- commit `8ce88ba9` 스크립트를 원격 v5에 재적용해 no/wrong credential 거부,
+  두 role 양성, SCRAM-only, 최소 권한, network 1개, loopback을 재검증했다.
+  active state 이관은 하지 않았다. 임시 script만 삭제하고 DB volume은 보존했다.
+- 수정 후 focused PG-free는 PKI 6 passed, LAN pilot 22 passed이며 두 DB shell
   script 문법과 diff gate가 exit 0이다. hosted CI 재실행과 Claude 재검토가
   다음이다.
 - 첫 state의 `18443` 충돌은 숨기지 않고 실패 증거로 보존했다. 최종 state는

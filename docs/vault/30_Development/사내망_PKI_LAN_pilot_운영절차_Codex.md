@@ -1,10 +1,10 @@
 ---
 doc_id: "OPS-INTRANET-PKI-LAN-001"
 title: "사내망 PKI와 LAN pilot 운영 절차"
-version: "1.1.0"
+version: "1.1.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T08:18:49+09:00"
+updated: "2026-09-30T08:40:35+09:00"
 source_of_truth: "Git"
 ---
 
@@ -79,16 +79,20 @@ Node leaf의 자동 회전은 아직 구현되지 않았으므로 readiness bloc
 만들고 `127.0.0.1`에만 publish한다. host/local 인증은 `scram-sha-256`이며,
 admin과 `inv_lan_runtime`의 무작위 credential 및 한 줄 pgpass를 지정한
 operator-private directory에 생성한다. URI 안 password와 passwordless
-접속은 금지한다.
+접속은 금지한다. runtime secret은 `/run/secrets` 파일에서 psql stdin 변수로
+읽으며 `docker exec`·`psql` argv에 넣지 않는다. `inv_lan_runtime`은 매 실행
+`NOSUPERUSER NOBYPASSRLS NOCREATEDB NOCREATEROLE NOREPLICATION`으로 재고정한다.
 
 `deploy/lan/verify-pilot-database.sh`는 다음을 모두 검사한다.
 
 - 무 credential 및 잘못된 credential 거부
 - admin과 runtime credential 수락 및 role identity 일치
+- runtime role의 superuser·RLS bypass·DB/role create·replication 권한이 모두 false
 - HBA가 SCRAM이고 container가 정확히 한 dedicated user-defined network만 사용
 - publish address가 loopback
 
-실측한 v5 candidate는 위 조건을 모두 만족했다. 과거 trust candidate 세
+commit `8ce88ba9c2958df8cbed95ab8ea4bf9286ae55f1`의 스크립트를 원격 v5에
+재적용한 실측은 위 조건을 모두 만족했다. 과거 trust candidate 세
 개는 정확한 owner label을 확인한 뒤 stop했고 volume과 data는 삭제하지
 않았다. active pilot state는 아직 v5에 rebind하지 않았으므로 판정은
 `MEASURED_PASS_CANDIDATE_BLOCKED_MIGRATION`이다. `lan_pilot.py bind-db-auth`는
