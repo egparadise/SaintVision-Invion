@@ -1,0 +1,44 @@
+{
+  "acceptanceClaim": false,
+  "codeSha": "b64ba4cb84e10c11df1bd156dffc4ce53a2bf5d6",
+  "collectorSha256": "f7f11c3196086d6ca804c59bb1e2c32f7fc6c71d9e11114617cc519c837cf49b",
+  "criteria": {
+    "bundleAccepted": "inv.identity.AccessTokens._keys loads the bundle this repo built",
+    "liveTokenVerified": "a token the running provider issued passes AccessTokens.verify",
+    "tamperedTokenRefused": "the same verifier refuses a one-character payload edit"
+  },
+  "observations": {
+    "bundleAccepted": {
+      "reason": "measurement raised BundleRefused",
+      "status": "NOT_OBSERVED"
+    },
+    "liveTokenVerified": {
+      "reason": "measurement raised BundleRefused",
+      "status": "NOT_OBSERVED"
+    },
+    "tamperedTokenRefused": {
+      "reason": "measurement raised BundleRefused",
+      "status": "NOT_OBSERVED"
+    }
+  },
+  "provenance": {
+    "branch": "agent/claude/card152-intranet-idp",
+    "contentClean": true,
+    "executor": "claude",
+    "workingTreeClean": true
+  },
+  "schemaVersion": "oidc-identity-evidence:1",
+  "source": {
+    "audienceSha256": "a7c0f1ec44785d07a39bae0b48f1d114c723931f9e3eb96bdeb8258b3c85da48",
+    "clientIdSha256": "13c95d85eba6d768927953300fc8136037048105df85461f86b76c87dd8ee17f",
+    "inputBindingSha256": "087ed38683ba29a28148447532f8b30dfbd4e732a086b671cec8c81034fb3887",
+    "issuerScheme": "http",
+    "issuerSha256": "c3c087f30dcaaaea458c9361160b427ac74fa555e5f27aa1e5486d12cff38ddb",
+    "observedAt": "2026-09-29T23:17:34Z",
+    "providerRole": "production",
+    "sourceFinishedAt": "2026-09-29T23:17:35Z",
+    "sourceStartedAt": "2026-09-29T23:17:34Z",
+    "temporaryBundleRemoved": true
+  },
+  "verdict": "NOT_OBSERVED"
+}
