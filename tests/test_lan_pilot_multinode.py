@@ -478,7 +478,11 @@ def test_external_intermediate_stays_central_and_signs_control_identity(tmp_path
     ca_dir = tmp_path / "ca"
     state_dir = tmp_path / "pilot"
     state_dir.mkdir()
-    intranet_pki.initialize(ca_dir)
+    intranet_pki.initialize(
+        ca_dir,
+        root_password_file=tmp_path / "offline-secret" / "node-root.pass",
+        profile="node-mtls",
+    )
     paths = intranet_pki._paths(ca_dir)
     configured = state(
         [
@@ -520,10 +524,18 @@ def test_external_intermediate_stays_central_and_signs_control_identity(tmp_path
         lan_pilot.ensure_pilot_pki(state_dir, configured, args)
 
 
-def test_external_database_dsn_is_passwordless_loopback_only(tmp_path):
+def test_external_database_dsn_requires_exact_private_passfile_and_loopback(tmp_path):
     dsn = tmp_path / "admin.dsn"
+    passfile = tmp_path / "admin.pgpass"
+    passfile.write_text(
+        "127.0.0.1:55440:saintvision_lan:postgres:" + ("a" * 64) + "\n",
+        encoding="utf-8",
+    )
+    passfile.chmod(0o600)
     dsn.write_text(
-        "host=127.0.0.1 port=55440 dbname=saintvision_lan user=postgres", encoding="utf-8"
+        "host=127.0.0.1 port=55440 dbname=saintvision_lan user=postgres "
+        f"passfile='{passfile.as_posix()}'",
+        encoding="utf-8",
     )
 
     value = lan_pilot.read_external_dsn(dsn, "postgres")
@@ -531,12 +543,47 @@ def test_external_database_dsn_is_passwordless_loopback_only(tmp_path):
     assert parsed["host"] == "127.0.0.1"
     assert parsed["connect_timeout"] == "5"
     assert "password" not in parsed
+    assert lan_pilot.external_dsn_password(value, "postgres") == "a" * 64
 
     dsn.write_text(
-        "host=192.168.45.143 dbname=saintvision_lan user=postgres password=secret", encoding="utf-8"
+        "host=127.0.0.1 port=55440 dbname=saintvision_lan user=postgres "
+        f"passfile='{passfile.as_posix()}' password=secret",
+        encoding="utf-8",
     )
-    with pytest.raises(ValueError, match="passwordless loopback"):
+    with pytest.raises(ValueError, match="passfile-backed loopback"):
         lan_pilot.read_external_dsn(dsn, "postgres")
+
+    dsn.write_text(
+        "host=127.0.0.1 port=55440 dbname=saintvision_lan user=postgres",
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="passfile-backed loopback"):
+        lan_pilot.read_external_dsn(dsn, "postgres")
+
+    passfile.write_text(
+        "127.0.0.1:55440:saintvision_lan:inv_lan_runtime:" + ("a" * 64) + "\n",
+        encoding="utf-8",
+    )
+    dsn.write_text(
+        "host=127.0.0.1 port=55440 dbname=saintvision_lan user=postgres "
+        f"passfile='{passfile.as_posix()}'",
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="identity differs"):
+        lan_pilot.read_external_dsn(dsn, "postgres")
+
+
+def test_remote_database_script_uses_scram_internal_network_and_private_files():
+    root = Path(__file__).resolve().parents[1]
+    script = (root / "deploy/lan/prepare-pilot-database.sh").read_text(encoding="utf-8")
+
+    assert "POSTGRES_HOST_AUTH_METHOD=trust" not in script
+    assert "--auth-host=scram-sha-256 --auth-local=scram-sha-256" in script
+    assert "docker network create --internal" in script
+    assert '--network "$network"' in script
+    assert '--publish "127.0.0.1:${host_port}:5432"' in script
+    assert "POSTGRES_PASSWORD_FILE=/run/secrets/postgres-password" in script
+    assert 'credentialStorage":"operator-private-files' in script
 
 
 def test_prebuilt_image_archive_is_bound_to_inspection_and_tag(tmp_path):
@@ -566,7 +613,7 @@ def test_prebuilt_image_archive_is_bound_to_inspection_and_tag(tmp_path):
         json.dumps(
             [
                 {
-                    "Id": "sha256:" + ("b" * 64),
+                    "Id": "sha256:" + image_hex,
                     "RepoTags": [tag],
                     "RootFS": {"Layers": []},
                     "Config": config_value["config"],
@@ -580,7 +627,7 @@ def test_prebuilt_image_archive_is_bound_to_inspection_and_tag(tmp_path):
         archive_path, inspect_path, tag, tmp_path / "copied.tar"
     )
 
-    assert image_id == "sha256:" + ("b" * 64)
+    assert image_id == "sha256:" + image_hex
     assert inspected["Config"]["Entrypoint"] == ["/inv-node"]
     assert (tmp_path / "copied.tar").read_bytes() == archive_path.read_bytes()
 
@@ -597,6 +644,12 @@ def test_prebuilt_image_archive_is_bound_to_inspection_and_tag(tmp_path):
         ),
         encoding="utf-8",
     )
+    with pytest.raises(ValueError, match="image ID differs"):
+        lan_pilot.load_prebuilt_image(archive_path, inspect_path, tag, tmp_path / "rejected.tar")
+
+    inspected = json.loads(inspect_path.read_text(encoding="utf-8"))
+    inspected[0]["Id"] = "sha256:" + image_hex
+    inspect_path.write_text(json.dumps(inspected), encoding="utf-8")
     with pytest.raises(ValueError, match="layers differ"):
         lan_pilot.load_prebuilt_image(archive_path, inspect_path, tag, tmp_path / "rejected.tar")
 

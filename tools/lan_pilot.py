@@ -14,6 +14,7 @@ import json
 import os
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import tarfile
@@ -93,8 +94,30 @@ def private_directory(path):
         path.chmod(0o700)
 
 
+def _read_pgpass(path, *, host, port, dbname, user):
+    passfile = Path(path)
+    if not passfile.is_absolute() or passfile.is_symlink() or not passfile.is_file():
+        raise ValueError("External database passfile is missing or unsafe")
+    if os.name != "nt" and stat.S_IMODE(passfile.stat().st_mode) & 0o077:
+        raise ValueError("External database passfile must be owner-only")
+    raw = passfile.read_bytes()
+    if len(raw) > 1024 or b"\x00" in raw:
+        raise ValueError("External database passfile is invalid")
+    rows = raw.decode("utf-8").splitlines()
+    if len(rows) != 1:
+        raise ValueError("External database passfile must contain one exact entry")
+    fields = rows[0].split(":")
+    if (
+        len(fields) != 5
+        or fields[:4] != [host, str(port), dbname, user]
+        or not re.fullmatch(r"[a-f0-9]{64}", fields[4])
+    ):
+        raise ValueError("External database passfile identity differs")
+    return fields[4]
+
+
 def read_external_dsn(path, expected_user):
-    """Accept only passwordless loopback DSNs intended for an SSH tunnel."""
+    """Accept a loopback SSH-tunnel DSN backed by one owner-private pgpass entry."""
     if path is None or path.is_symlink() or not path.is_file():
         raise ValueError("External database DSN file is missing or unsafe")
     raw = path.read_bytes()
@@ -106,13 +129,32 @@ def read_external_dsn(path, expected_user):
         info.get("host") not in ("127.0.0.1", "localhost")
         or info.get("user") != expected_user
         or info.get("password")
+        or not info.get("passfile")
         or info.get("dbname") != "saintvision_lan"
     ):
-        raise ValueError("External database DSN must be passwordless loopback tunnel input")
+        raise ValueError("External database DSN must use a passfile-backed loopback tunnel")
     port = int(info.get("port", 5432))
     if not 1024 <= port <= 65535:
         raise ValueError("External database tunnel port is invalid")
+    _read_pgpass(
+        info["passfile"],
+        host=info["host"],
+        port=port,
+        dbname=info["dbname"],
+        user=expected_user,
+    )
     return make_conninfo(value, connect_timeout=5)
+
+
+def external_dsn_password(value, expected_user):
+    info = psycopg.conninfo.conninfo_to_dict(value)
+    return _read_pgpass(
+        info["passfile"],
+        host=info["host"],
+        port=int(info.get("port", 5432)),
+        dbname=info["dbname"],
+        user=expected_user,
+    )
 
 
 def _pem_certificates(raw):
@@ -273,6 +315,8 @@ def load_prebuilt_image(archive_path, inspect_path, tag, target):
         )
         if not config_match or tag not in entry.get("RepoTags", []):
             raise ValueError("Prebuilt archive and inspection identity differ")
+        if image_id != "sha256:" + config_match.group(1):
+            raise ValueError("Prebuilt image ID differs from archive config digest")
         config_member = archive.getmember(config_name)
         if not config_member.isfile() or config_member.size > 2 * 1024 * 1024:
             raise ValueError("Prebuilt image config is missing")
@@ -759,23 +803,26 @@ def init(args):
         host=info["host"],
         port=int(info["port"]),
         database=info["dbname"],
+        query={"passfile": info["passfile"]} if info.get("passfile") else None,
     )
     env = dict(os.environ, INV_MIGRATION_DSN=url.render_as_string(hide_password=False))
     print("Applying published migrations to the isolated pilot database.", flush=True)
     run([sys.executable, "-m", "alembic", "upgrade", "head"], env=env, cwd=ROOT, timeout=120)
     with psycopg.connect(state["adminDSN"]) as conn:
+        runtime_info = psycopg.conninfo.conninfo_to_dict(state["runtimeDSN"])
+        runtime_password = runtime_info.get("password")
+        if state["databaseMode"] == EXTERNAL_DATABASE_MODE:
+            runtime_password = external_dsn_password(state["runtimeDSN"], "inv_lan_runtime")
         if not conn.execute("SELECT 1 FROM pg_roles WHERE rolname='inv_lan_runtime'").fetchone():
-            password = psycopg.conninfo.conninfo_to_dict(state["runtimeDSN"]).get("password")
-            if password:
-                conn.execute(
-                    sql.SQL(
-                        "CREATE ROLE inv_lan_runtime LOGIN PASSWORD {} NOSUPERUSER NOBYPASSRLS NOCREATEDB NOCREATEROLE"
-                    ).format(sql.Literal(password))
+            conn.execute(
+                "CREATE ROLE inv_lan_runtime LOGIN NOSUPERUSER NOBYPASSRLS NOCREATEDB NOCREATEROLE"
+            )
+        if runtime_password:
+            conn.execute(
+                sql.SQL("ALTER ROLE inv_lan_runtime PASSWORD {}").format(
+                    sql.Literal(runtime_password)
                 )
-            else:
-                conn.execute(
-                    "CREATE ROLE inv_lan_runtime LOGIN NOSUPERUSER NOBYPASSRLS NOCREATEDB NOCREATEROLE"
-                )
+            )
         conn.execute("GRANT inv_kernel TO inv_lan_runtime")
         prior = conn.execute("SELECT epoch FROM inv.control_epoch").fetchone()
         if prior and str(prior[0]) != state["epoch"]:

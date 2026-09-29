@@ -7,23 +7,36 @@ from pathlib import Path
 
 import pytest
 from cryptography import x509
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.x509.oid import ExtendedKeyUsageOID
+from cryptography.x509.verification import PolicyBuilder, Store
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 import intranet_pki
 
 
-def test_initializes_encrypted_offline_root_and_issuing_chain(tmp_path: Path):
+def initialize(tmp_path: Path) -> tuple[Path, Path]:
     ca_dir = tmp_path / "ca"
+    root_password = tmp_path / "offline-secret" / "root-key.pass"
+    intranet_pki.initialize(ca_dir, root_password_file=root_password)
+    return ca_dir, root_password
 
-    metadata = intranet_pki.initialize(ca_dir)
+
+def test_initializes_browser_compatible_chain_with_separated_root_passphrase(tmp_path: Path):
+    ca_dir = tmp_path / "ca"
+    root_password = tmp_path / "offline-secret" / "root-key.pass"
+
+    metadata = intranet_pki.initialize(ca_dir, root_password_file=root_password)
 
     paths = intranet_pki._paths(ca_dir)
     root = x509.load_pem_x509_certificate(paths["root_certificate"].read_bytes())
     intermediate = x509.load_pem_x509_certificate(paths["intermediate_certificate"].read_bytes())
-    root.public_key().verify(intermediate.signature, intermediate.tbs_certificate_bytes)
+    root.public_key().verify(
+        intermediate.signature,
+        intermediate.tbs_certificate_bytes,
+        ec.ECDSA(intermediate.signature_hash_algorithm),
+    )
     chain = paths["chain"].read_bytes()
     assert chain.startswith(intermediate.public_bytes(serialization.Encoding.PEM))
     assert chain.endswith(root.public_bytes(serialization.Encoding.PEM))
@@ -36,17 +49,29 @@ def test_initializes_encrypted_offline_root_and_issuing_chain(tmp_path: Path):
         serialization.load_pem_private_key(paths["root_key"].read_bytes(), password=None)
     with pytest.raises(TypeError):
         serialization.load_pem_private_key(paths["intermediate_key"].read_bytes(), password=None)
-    assert metadata["root"]["offline"] is True
+    assert isinstance(root.public_key(), ec.EllipticCurvePublicKey)
+    assert isinstance(root.public_key().curve, ec.SECP256R1)
+    assert isinstance(intermediate.public_key().curve, ec.SECP256R1)
+    assert metadata["root"]["offline"] is False
+    assert metadata["root"]["operatorIsolated"] is True
+    assert metadata["root"]["passphraseSeparated"] is True
+    assert root_password.is_file()
+    assert ca_dir.resolve() not in root_password.resolve().parents
     assert json.loads(paths["revocations"].read_text(encoding="utf-8")) == []
 
     with pytest.raises(ValueError, match="already exists"):
-        intranet_pki.initialize(ca_dir)
+        intranet_pki.initialize(ca_dir, root_password_file=tmp_path / "another.pass")
+
+    with pytest.raises(ValueError, match="outside the online CA"):
+        intranet_pki.initialize(
+            tmp_path / "other-ca",
+            root_password_file=tmp_path / "other-ca" / "root.pass",
+        )
 
 
 def test_issues_exact_cp_dns_and_private_ip_without_printing_key(tmp_path: Path):
-    ca_dir = tmp_path / "ca"
+    ca_dir, _ = initialize(tmp_path)
     output = tmp_path / "cp"
-    intranet_pki.initialize(ca_dir)
 
     result = intranet_pki.issue_server(
         ca_dir,
@@ -63,11 +88,22 @@ def test_issues_exact_cp_dns_and_private_ip_without_printing_key(tmp_path: Path)
         ExtendedKeyUsageOID.SERVER_AUTH
     ]
     assert result["privateKeyExported"] is False
+    assert result["publicKeyAlgorithm"] == "ECDSA-P256"
     assert "PRIVATE" not in json.dumps(result)
     intermediate = x509.load_pem_x509_certificate(
         intranet_pki._paths(ca_dir)["intermediate_certificate"].read_bytes()
     )
-    intermediate.public_key().verify(certificate.signature, certificate.tbs_certificate_bytes)
+    intermediate.public_key().verify(
+        certificate.signature,
+        certificate.tbs_certificate_bytes,
+        ec.ECDSA(certificate.signature_hash_algorithm),
+    )
+    root = x509.load_pem_x509_certificate(
+        intranet_pki._paths(ca_dir)["root_certificate"].read_bytes()
+    )
+    verifier = PolicyBuilder().store(Store([root])).build_server_verifier(x509.DNSName("cp.sv.lan"))
+    verified = verifier.verify(certificate, [intermediate])
+    assert verified[0] == certificate
 
     with pytest.raises(ValueError, match="canonical .sv.lan"):
         intranet_pki.issue_server(
@@ -79,9 +115,8 @@ def test_issues_exact_cp_dns_and_private_ip_without_printing_key(tmp_path: Path)
 
 
 def test_revocation_registry_and_crl_bind_the_issued_certificate(tmp_path: Path):
-    ca_dir = tmp_path / "ca"
+    ca_dir, _ = initialize(tmp_path)
     output = tmp_path / "cp"
-    intranet_pki.initialize(ca_dir)
     intranet_pki.issue_server(
         ca_dir,
         output,
@@ -105,11 +140,18 @@ def test_revocation_registry_and_crl_bind_the_issued_certificate(tmp_path: Path)
     assert entries[0]["certificateSHA256"] == result["revokedCertificateSHA256"]
     assert entries[0]["reason"] == "superseded"
 
+    refreshed = intranet_pki.refresh_crl(
+        ca_dir,
+        now=datetime.now(timezone.utc),
+    )
+    assert refreshed["revocationCount"] == 1
+    assert refreshed["distributionEnforced"] is False
+    assert refreshed["nextUpdate"]
+
 
 def test_rejects_a_certificate_from_another_issuer(tmp_path: Path):
-    ca_dir = tmp_path / "ca"
-    intranet_pki.initialize(ca_dir)
-    foreign_key = Ed25519PrivateKey.generate()
+    ca_dir, _ = initialize(tmp_path)
+    foreign_key = ec.generate_private_key(ec.SECP256R1())
     now = datetime.now(timezone.utc)
     # The parser reaches the issuer check before any use of this certificate.
     foreign = (
@@ -120,7 +162,7 @@ def test_rejects_a_certificate_from_another_issuer(tmp_path: Path):
         .serial_number(x509.random_serial_number())
         .not_valid_before(now)
         .not_valid_after(now.replace(year=now.year + 1))
-        .sign(foreign_key, algorithm=None)
+        .sign(foreign_key, algorithm=hashes.SHA256())
     )
     certificate_path = tmp_path / "foreign.pem"
     certificate_path.write_bytes(foreign.public_bytes(serialization.Encoding.PEM))
