@@ -224,6 +224,10 @@ source_of_truth: "Git"
 - migration을 가역 `forward→downgrade→forward`와 비가역 `forward→verified restore→forward`로 분리했다. 현재 head `0046_model_manifest_readiness`는 비가역이고 reversible tail이 0개이므로 no-op downgrade를 PASS로 세지 않는다.
 - PR #126 CX01 hosted restore, VF-CL-04 readiness/retention, S05 hosted 두 비교군을 재사용하되 실제 PITR·5노드·장시간·완전한 security/accessibility는 `NOT_OBSERVED`/`BLOCKED_EXTERNAL`로 유지한다.
 - Claude r1 수정 요청에 따라 verdict 닫힌 enum·필수 8축 allowlist·집계기 재계산, `d74e82ec` 목표 결속, forward 후 sentinel/손실형 가역/catalog fingerprint, OPEN evidence digest·만료 기준점을 v1.1에 반영했다. r2 조건으로 `s11-security-allowlist-v0.json`에 실제 VF runner·workflow·시험 blob과 node ID 5개, RLS accepted 3건의 사전 disposition을 고정하고 definer/RLS 결과·exit의 severity/verdict 표를 v1.1.1에 추가했다. 구현·실행·registry 변경은 없고 S11-BE/S11-DB/AC-11은 `planned`다. [[S11-BE_DB_AC-11_통합_인수_설계]], [[2026-09-28_10-16-34_KST_S11_AC11_통합인수_설계_Codex]].
+## 2026-09-29 카드 123 — S04·S08 운영 판정 collector 검토 요청
+
+- 판정 기준 v1.1.1의 core C1을 REPEATABLE READ·READ ONLY 전수 SQL로 구현했다. attempt 시점 최신 approved·expiry·workload digest·선행 cancel audit을 판정하고 kernel C1-K는 별도 `NOT_OBSERVED`로 고정한다. 입력 0건·미관측 안전성은 PASS가 아니며 DB identity/time/snapshot·collector/code SHA와 clean tree를 결속한다.
+- O1 clean DB 집계는 publisher/consumer deployment identity 없이 `RECORDED_ONLY`; 물리 Node, 운영 backup/PITR, retention/GC와 미구현 producer는 그대로 차단한다. PG-free 7 passed, real PG 6-attempt 부정 matrix는 로컬 Python 3.10 `StrEnum` 제약으로 미실행·hosted Core 대기다. 공개 계약·migration·registry status 변경 0. [[2026-09-29_01-59-38_KST_S04_S08_운영판정_collector_Codex]].
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 
