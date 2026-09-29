@@ -59,13 +59,12 @@ unset postgres_value runtime_value
 if docker network inspect "$network" >/dev/null 2>&1; then
     owner=$(docker network inspect --format '{{index .Labels "ai.saintvision.lan-pilot"}}' "$network")
     internal=$(docker network inspect --format '{{.Internal}}' "$network")
-    [[ "$owner" == 'card150' && "$internal" == true ]] || {
+    [[ "$owner" == 'card150' && "$internal" == false ]] || {
         echo 'Existing network ownership or isolation differs; preserving it.' >&2
         exit 1
     }
 else
-    docker network create --internal \
-        --label ai.saintvision.lan-pilot=card150 "$network" >/dev/null
+    docker network create --label ai.saintvision.lan-pilot=card150 "$network" >/dev/null
 fi
 
 if docker container inspect "$container" >/dev/null 2>&1; then
@@ -91,18 +90,39 @@ else
         --env POSTGRES_PASSWORD_FILE=/run/secrets/postgres-password \
         --env 'POSTGRES_INITDB_ARGS=--auth-host=scram-sha-256 --auth-local=scram-sha-256' \
         --mount "type=bind,source=$postgres_password,target=/run/secrets/postgres-password,readonly" \
+        --mount "type=bind,source=$runtime_password,target=/run/secrets/runtime-password,readonly" \
         --mount "type=volume,source=$volume,target=/var/lib/postgresql/data" \
         "$image" >/dev/null
 fi
 
+ready=false
 for _attempt in $(seq 1 40); do
     if docker exec "$container" sh -ec \
         'PGPASSWORD=$(cat /run/secrets/postgres-password); export PGPASSWORD; exec psql -U postgres -d saintvision_lan -Atqc "SELECT 1"' \
-        | grep -qx 1; then
-        printf '{"database":"ready","listen":"127.0.0.1:%s","authenticationBoundary":"scram-plus-ssh-tunnel","credentialStorage":"operator-private-files","network":"internal-user-defined"}\n' "$host_port"
-        exit 0
+        2>/dev/null | grep -qx 1; then
+        ready=true
+        break
     fi
     sleep 1
 done
-echo 'Pilot database readiness timed out.' >&2
-exit 1
+[[ "$ready" == true ]] || {
+    echo 'Pilot database readiness timed out.' >&2
+    exit 1
+}
+docker exec -i "$container" sh -s <<'CONTAINER' >/dev/null
+set -eu
+export PGPASSWORD="$(cat /run/secrets/postgres-password)"
+runtime_password=$(cat /run/secrets/runtime-password)
+psql -U postgres -d saintvision_lan -v ON_ERROR_STOP=1 \
+    --set=runtime_password="$runtime_password" <<'SQL'
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'inv_lan_runtime') THEN
+        CREATE ROLE inv_lan_runtime LOGIN NOSUPERUSER NOBYPASSRLS NOCREATEDB NOCREATEROLE;
+    END IF;
+END
+$$;
+SELECT format('ALTER ROLE inv_lan_runtime PASSWORD %L', :'runtime_password') \gexec
+SQL
+CONTAINER
+printf '{"database":"ready","listen":"127.0.0.1:%s","authenticationBoundary":"scram-plus-ssh-tunnel","credentialStorage":"operator-private-files","network":"dedicated-user-defined"}\n' "$host_port"

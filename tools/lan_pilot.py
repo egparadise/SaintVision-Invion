@@ -157,6 +157,97 @@ def external_dsn_password(value, expected_user):
     )
 
 
+def _dsn_with_passfile(value, expected_user, passfile):
+    info = psycopg.conninfo.conninfo_to_dict(value)
+    host = info.get("host")
+    port = int(info.get("port", 5432))
+    if (
+        host not in ("127.0.0.1", "localhost")
+        or info.get("user") != expected_user
+        or info.get("dbname") != "saintvision_lan"
+        or info.get("password")
+    ):
+        raise ValueError("Existing external database identity differs")
+    passfile = Path(passfile).resolve()
+    _read_pgpass(
+        passfile,
+        host=host,
+        port=port,
+        dbname=info["dbname"],
+        user=expected_user,
+    )
+    return make_conninfo(
+        host=host,
+        port=port,
+        dbname=info["dbname"],
+        user=expected_user,
+        passfile=str(passfile),
+        connect_timeout=5,
+    )
+
+
+def bind_db_auth(args):
+    """Move an existing external pilot state from trust to private pgpass credentials."""
+    path, state = args.state, load(args.state)
+    if state.get("databaseMode") != EXTERNAL_DATABASE_MODE:
+        raise ValueError("Only an external pilot database can bind external credentials")
+    admin_dsn = _dsn_with_passfile(state["adminDSN"], "postgres", args.admin_passfile)
+    runtime_dsn = _dsn_with_passfile(state["runtimeDSN"], "inv_lan_runtime", args.runtime_passfile)
+    admin_info = psycopg.conninfo.conninfo_to_dict(admin_dsn)
+    no_credential = make_conninfo(
+        host=admin_info["host"],
+        port=int(admin_info["port"]),
+        dbname=admin_info["dbname"],
+        user="postgres",
+        passfile=str(path / ".missing-pgpass"),
+        connect_timeout=2,
+    )
+    wrong_credential = make_conninfo(
+        host=admin_info["host"],
+        port=int(admin_info["port"]),
+        dbname=admin_info["dbname"],
+        user="postgres",
+        password="0" * 64,
+        connect_timeout=2,
+    )
+    for rejected in (no_credential, wrong_credential):
+        try:
+            with psycopg.connect(rejected):
+                pass
+        except psycopg.OperationalError:
+            continue
+        raise ValueError("Pilot database accepted a missing or incorrect credential")
+    with psycopg.connect(admin_dsn) as conn:
+        encryption = conn.execute("SHOW password_encryption").fetchone()[0]
+        methods = [
+            row[0]
+            for row in conn.execute(
+                "SELECT auth_method FROM pg_hba_file_rules " "WHERE type='host' AND error IS NULL"
+            ).fetchall()
+        ]
+        if encryption != "scram-sha-256" or not methods or set(methods) != {"scram-sha-256"}:
+            raise ValueError("Pilot database host authentication is not exclusively SCRAM")
+    with psycopg.connect(runtime_dsn) as conn:
+        if conn.execute("SELECT current_user").fetchone()[0] != "inv_lan_runtime":
+            raise ValueError("Pilot runtime credential is not role-bound")
+    state["adminDSN"] = admin_dsn
+    state["runtimeDSN"] = runtime_dsn
+    state["databaseAuthentication"] = "scram-sha-256"
+    save(path, state)
+    print(
+        json.dumps(
+            {
+                "databaseAuthentication": "scram-sha-256",
+                "missingCredentialRejected": True,
+                "wrongCredentialRejected": True,
+                "adminCredentialAccepted": True,
+                "runtimeCredentialAccepted": True,
+                "credentialsPrinted": False,
+            }
+        )
+    )
+
+
 def _pem_certificates(raw):
     blocks = re.findall(
         b"-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----", raw, flags=re.DOTALL
@@ -1351,16 +1442,22 @@ def main():
     p.add_argument(
         "--admin-dsn-file",
         type=Path,
-        help="Passwordless loopback admin DSN behind an operator SSH tunnel",
+        help="Passfile-backed loopback admin DSN behind an operator SSH tunnel",
     )
     p.add_argument(
         "--runtime-dsn-file",
         type=Path,
-        help="Passwordless loopback runtime DSN behind the same SSH tunnel",
+        help="Passfile-backed loopback runtime DSN behind the same SSH tunnel",
     )
     p.add_argument("--ca-key", type=Path, help="Encrypted Ed25519 issuing-intermediate private key")
     p.add_argument("--ca-key-password-file", type=Path, help="Private password file for --ca-key")
     p.add_argument("--ca-chain", type=Path, help="Issuing intermediate followed by offline root")
+    p = commands.add_parser(
+        "bind-db-auth",
+        help="Verify SCRAM rejection/acceptance and bind private pgpass files to existing state",
+    )
+    p.add_argument("--admin-passfile", type=Path, required=True)
+    p.add_argument("--runtime-passfile", type=Path, required=True)
     commands.add_parser(
         "revoke-server-node-colocation",
         help="Preserve but disable the Control Plane co-located Node and channel",

@@ -573,17 +573,101 @@ def test_external_database_dsn_requires_exact_private_passfile_and_loopback(tmp_
         lan_pilot.read_external_dsn(dsn, "postgres")
 
 
-def test_remote_database_script_uses_scram_internal_network_and_private_files():
+def test_remote_database_script_uses_scram_dedicated_network_and_private_files():
     root = Path(__file__).resolve().parents[1]
     script = (root / "deploy/lan/prepare-pilot-database.sh").read_text(encoding="utf-8")
 
     assert "POSTGRES_HOST_AUTH_METHOD=trust" not in script
     assert "--auth-host=scram-sha-256 --auth-local=scram-sha-256" in script
-    assert "docker network create --internal" in script
+    assert "docker network create --label ai.saintvision.lan-pilot=card150" in script
+    assert "docker network create --internal" not in script
     assert '--network "$network"' in script
     assert '--publish "127.0.0.1:${host_port}:5432"' in script
     assert "POSTGRES_PASSWORD_FILE=/run/secrets/postgres-password" in script
     assert 'credentialStorage":"operator-private-files' in script
+
+
+def test_bind_db_auth_requires_negative_rejection_and_role_bound_credentials(
+    tmp_path, monkeypatch, capsys
+):
+    configured = state([node("nod_01HZZZZZZZZZZZZZZZZZZZZZZZ", "192.168.45.81")])
+    configured.update(
+        databaseMode=lan_pilot.EXTERNAL_DATABASE_MODE,
+        adminDSN="host=127.0.0.1 port=55442 dbname=saintvision_lan user=postgres",
+        runtimeDSN=("host=127.0.0.1 port=55442 dbname=saintvision_lan user=inv_lan_runtime"),
+    )
+    (tmp_path / "private-state.json").write_text(json.dumps(configured), encoding="utf-8")
+    admin_passfile = tmp_path / "admin.pgpass"
+    runtime_passfile = tmp_path / "runtime.pgpass"
+    admin_passfile.write_text(
+        "127.0.0.1:55442:saintvision_lan:postgres:" + ("a" * 64) + "\n",
+        encoding="utf-8",
+    )
+    runtime_passfile.write_text(
+        "127.0.0.1:55442:saintvision_lan:inv_lan_runtime:" + ("b" * 64) + "\n",
+        encoding="utf-8",
+    )
+    admin_passfile.chmod(0o600)
+    runtime_passfile.chmod(0o600)
+    rejected = []
+
+    class Result:
+        def __init__(self, *, one=None, rows=None):
+            self.one = one
+            self.rows = rows or []
+
+        def fetchone(self):
+            return self.one
+
+        def fetchall(self):
+            return self.rows
+
+    class Connection:
+        def __init__(self, dsn):
+            self.info = lan_pilot.psycopg.conninfo.conninfo_to_dict(dsn)
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_):
+            return False
+
+        def execute(self, query):
+            if query == "SHOW password_encryption":
+                return Result(one=("scram-sha-256",))
+            if "pg_hba_file_rules" in query:
+                return Result(rows=[("scram-sha-256",), ("scram-sha-256",)])
+            if query == "SELECT current_user":
+                return Result(one=(self.info["user"],))
+            raise AssertionError(query)
+
+    def connect(dsn):
+        info = lan_pilot.psycopg.conninfo.conninfo_to_dict(dsn)
+        if info.get("password") == "0" * 64 or str(info.get("passfile", "")).endswith(
+            ".missing-pgpass"
+        ):
+            rejected.append(info["user"])
+            raise lan_pilot.psycopg.OperationalError("expected rejection")
+        return Connection(dsn)
+
+    monkeypatch.setattr(lan_pilot.psycopg, "connect", connect)
+    lan_pilot.bind_db_auth(
+        Namespace(
+            state=tmp_path,
+            admin_passfile=admin_passfile,
+            runtime_passfile=runtime_passfile,
+        )
+    )
+
+    saved = json.loads((tmp_path / "private-state.json").read_text(encoding="utf-8"))
+    assert rejected == ["postgres", "postgres"]
+    assert "password=" not in saved["adminDSN"]
+    assert "password=" not in saved["runtimeDSN"]
+    assert saved["databaseAuthentication"] == "scram-sha-256"
+    output = capsys.readouterr().out
+    assert json.loads(output)["wrongCredentialRejected"] is True
+    assert "a" * 64 not in output
+    assert "b" * 64 not in output
 
 
 def test_prebuilt_image_archive_is_bound_to_inspection_and_tag(tmp_path):
