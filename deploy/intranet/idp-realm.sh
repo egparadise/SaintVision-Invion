@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 # Configure the intranet Keycloak realm so it mints tokens inv.identity accepts.
 #
-# Run on the IdP node. Re-runnable: every step checks before it creates.
+# Run on the IdP node. Re-runnable, and re-runnable is the point: it re-applies the
+# canonical values every time rather than only creating what is missing, because a
+# relaxed setting leaves every object in place and a create-if-missing script would
+# keep reporting success. It ends by reading the live configuration back and failing
+# closed if anything drifted.
 #
 # The realm is not the interesting part -- the token shape is. inv.identity.verify
 # is far stricter than a default OIDC client, and each setting below exists because
@@ -10,10 +14,15 @@
 #   typ=at+jwt      header["typ"] must be at+jwt (RFC 9068), not the Keycloak default JWT
 #   aud=sv-api      strict_aud forbids a list, so "account" must not be in the audience
 #   client_id       "require" lists client_id; Keycloak emits azp instead
-#   scope inv.api   the verifier refuses a token whose scope lacks inv.api
+#   scope inv.api   the verifier refuses a token whose scope lacks inv.api, which needs
+#                   both the default-scope assignment AND include.in.token.scope on the
+#                   scope itself -- the assignment alone puts nothing in the token
 #   exp-iat<=3600   accessTokenLifespan stays at 300s
 #
-# Secrets come from ~/.sv-idp/env and ~/.sv-idp/env-users (0600, never printed).
+# NO PASSWORD APPEARS IN ANY ARGV. The admin password is read inside the container
+# from the mounted secrets file and piped to kcadm's own prompt; user passwords are
+# sent as stdin JSON to the reset-password endpoint. tests/core/
+# test_idp_scripts_keep_secrets_out_of_argv.py fails if this regresses.
 set -euo pipefail
 
 REALM="${SV_IDP_REALM:-saintvision}"
@@ -21,16 +30,20 @@ API_CLIENT="${SV_IDP_API_CLIENT:-sv-api}"
 PORTAL_CLIENT="${SV_IDP_PORTAL_CLIENT:-sv-portal}"
 SCOPE="${SV_IDP_SCOPE:-inv.api}"
 CONTAINER="${SV_IDP_CONTAINER:-sv-idp}"
-ENV_FILE="${SV_IDP_ENV:-$HOME/.sv-idp/env}"
 USERS_FILE="${SV_IDP_USERS_ENV:-$HOME/.sv-idp/env-users}"
+SECRETS_IN_CONTAINER="${SV_IDP_CONTAINER_SECRETS:-/run/secrets/keycloak.env}"
 # https, or loopback. A loopback redirect never leaves the machine, which is why
 # native-app flows may use it; "http://portal.sv.lan" would carry codes over the LAN.
 PORTAL_ORIGINS="${SV_IDP_PORTAL_ORIGINS:-https://portal.sv.lan http://localhost:3005}"
 EMAIL_DOMAIN="${SV_IDP_EMAIL_DOMAIN:-sv.lan}"
 TOKEN_LIFESPAN="${SV_IDP_TOKEN_LIFESPAN:-300}"
+# "external" rather than "all": the plaintext listener is not published, so the only
+# http reachability is inside the container, which is where kcadm runs. "all" would
+# reject that path and buy nothing, because no network client can reach http at all.
+SSL_REQUIRED="${SV_IDP_SSL_REQUIRED:-external}"
 CHECKER="${SV_REALM_CHECKER:-}"
 
-set -a; . "$ENV_FILE"; . "$USERS_FILE"; set +a
+set -a; . "$USERS_FILE"; set +a
 
 # -i only where a heredoc feeds kcadm. Without that split, a "docker exec -i"
 # with no input of its own swallows the rest of this script when it is piped
@@ -39,8 +52,24 @@ kc() { docker exec "$CONTAINER" /opt/keycloak/bin/kcadm.sh "$@"; }
 kc_in() { docker exec -i "$CONTAINER" /opt/keycloak/bin/kcadm.sh "$@"; }
 csv() { kc "$@" --format csv --noquotes; }
 
-kc config credentials --server http://localhost:8080 --realm master \
-  --user "$SV_IDP_ADMIN_USER" --password "$SV_IDP_ADMIN_PASSWORD" >/dev/null
+# The admin password is read from the mounted 0400 file INSIDE the container and
+# handed to kcadm through KC_CLI_PASSWORD, which is kcadm's own documented
+# alternative to --password. What this achieves, precisely:
+#   * nothing on the host command line, so it is not in the host process list;
+#   * nothing in "docker run -e", so it is not in Config.Env and not in the
+#     permanent record "docker inspect" returns;
+#   * nothing in any argv, so no process list on either side shows it.
+# It is in the environment of that one short-lived process, readable through
+# /proc by uid 1000 in this container -- the same uid that can already read the
+# mounted file, so this adds no reader. kcadm's interactive prompt is not an
+# option here: without a TTY it refuses with "Console is not active".
+docker exec "$CONTAINER" sh -c '
+  set -eu
+  . '"$SECRETS_IN_CONTAINER"'
+  KC_CLI_PASSWORD="$KC_BOOTSTRAP_ADMIN_PASSWORD" \
+    /opt/keycloak/bin/kcadm.sh config credentials \
+      --server http://localhost:8080 --realm master --user "$KC_BOOTSTRAP_ADMIN_USERNAME"
+' >/dev/null
 
 if ! kc get "realms/$REALM" --fields realm >/dev/null 2>&1; then
   kc create realms -s "realm=$REALM" -s enabled=true
@@ -48,7 +77,8 @@ fi
 # Re-asserted every run, not only on create. The verifier refuses exp - iat > 3600,
 # so a widened lifespan is a broken realm that still has all the right objects in it,
 # and a "create if missing" script would keep reporting success.
-kc update "realms/$REALM" -s enabled=true -s "accessTokenLifespan=$TOKEN_LIFESPAN"
+kc update "realms/$REALM" -s enabled=true -s "accessTokenLifespan=$TOKEN_LIFESPAN" \
+  -s "sslRequired=$SSL_REQUIRED"
 
 client_id_of() { csv get clients -r "$REALM" -q "clientId=$1" --fields id | head -1; }
 
@@ -94,6 +124,8 @@ JSON
 mapper_id() { csv get "clients/$PORTAL_ID/protocol-mappers/models" -r "$REALM" --fields id,name \
   | awk -F, -v want="$1" '$2 == want {print $1}' | head -1; }
 
+# Created if absent, then overwritten either way: a mapper that stopped writing to
+# the access token is still a mapper, and "create if missing" would leave it alone.
 if [ -z "$(mapper_id "$API_CLIENT-audience")" ]; then
   kc_in create "clients/$PORTAL_ID/protocol-mappers/models" -r "$REALM" -f - <<JSON
 {"name": "$API_CLIENT-audience", "protocol": "openid-connect",
@@ -148,6 +180,13 @@ if [ -z "$(scope_id "$SCOPE")" ]; then
 JSON
 fi
 SCOPE_ID="$(scope_id "$SCOPE")"
+# Re-applied every run. Assigning the scope to the client is not enough: with
+# include.in.token.scope false the scope is assigned and the token still has no
+# inv.api in it, so the verifier answers 401 while this script reports success.
+kc_in update "client-scopes/$SCOPE_ID" -r "$REALM" -f - <<JSON
+{"id": "$SCOPE_ID", "name": "$SCOPE", "protocol": "openid-connect",
+ "attributes": {"include.in.token.scope": "true", "display.on.consent.screen": "false"}}
+JSON
 if ! csv get "clients/$PORTAL_ID/default-client-scopes" -r "$REALM" --fields name \
   | grep -qx "$SCOPE"; then
   kc update "clients/$PORTAL_ID/default-client-scopes/$SCOPE_ID" -r "$REALM"
@@ -167,7 +206,11 @@ for pair in "$SV_USER1:$SV_USER1_PASSWORD" "$SV_USER2:$SV_USER2_PASSWORD"; do
  "email": "$username@$EMAIL_DOMAIN",
  "firstName": "${username%%.*}", "lastName": "${username#*.}"}
 JSON
-  kc set-password -r "$REALM" --userid "$uid" --new-password "$password"
+  # reset-password over stdin, so the value is in no argv. "kcadm set-password
+  # --new-password X" would put it in both the host and the container process list.
+  kc_in update "users/$uid/reset-password" -r "$REALM" -f - <<JSON
+{"type": "password", "value": "$password", "temporary": false}
+JSON
 done
 
 # Setting the realm is not the same as knowing it is still set. Read the live
@@ -191,6 +234,7 @@ SNAPSHOT="$(
     kc get "clients/$API_ID" -r "$REALM"
     kc get "clients/$PORTAL_ID" -r "$REALM"
     kc get "clients/$PORTAL_ID/default-client-scopes" -r "$REALM"
+    kc get "client-scopes/$SCOPE_ID" -r "$REALM"
   } | python3 -c '
 import json, sys
 # kcadm prints one JSON document per call; read them in order.
@@ -202,10 +246,11 @@ while at < len(text):
         break
     value, at = decoder.raw_decode(text, at)
     documents.append(value)
-realm, api, portal, scopes = documents
+realm, api, portal, scopes, scope = documents
 portal["defaultClientScopes"] = [s.get("name") for s in scopes]
 print(json.dumps({"realm": realm,
-                  "clients": {api["clientId"]: api, portal["clientId"]: portal}}))
+                  "clients": {api["clientId"]: api, portal["clientId"]: portal},
+                  "clientScopes": {scope["name"]: scope}}))
 '
 )"
 

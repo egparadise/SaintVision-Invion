@@ -18,9 +18,15 @@ from tools import check_idp_realm_config as checker
 
 def matching_config():
     return {
-        "realm": {"realm": "saintvision", "enabled": True, "accessTokenLifespan": 300},
+        "realm": {
+            "realm": "saintvision",
+            "enabled": True,
+            "accessTokenLifespan": 300,
+            "sslRequired": "external",
+        },
         "clients": {
             "sv-api": {
+                "enabled": True,
                 "publicClient": False,
                 "standardFlowEnabled": False,
                 "directAccessGrantsEnabled": False,
@@ -28,6 +34,7 @@ def matching_config():
                 "serviceAccountsEnabled": False,
             },
             "sv-portal": {
+                "enabled": True,
                 "publicClient": True,
                 "standardFlowEnabled": True,
                 "directAccessGrantsEnabled": False,
@@ -62,6 +69,16 @@ def matching_config():
                 ],
             },
         },
+        "clientScopes": {
+            "inv.api": {
+                "name": "inv.api",
+                "protocol": "openid-connect",
+                "attributes": {
+                    "include.in.token.scope": "true",
+                    "display.on.consent.screen": "false",
+                },
+            },
+        },
     }
 
 
@@ -78,6 +95,12 @@ def test_the_configured_realm_reports_no_drift():
 def relax(mutate):
     config = matching_config()
     mutate(config, config["clients"]["sv-portal"], config["clients"]["sv-api"])
+    return findings(config)
+
+
+def relax_scope(mutate):
+    config = matching_config()
+    mutate(config["clientScopes"]["inv.api"])
     return findings(config)
 
 
@@ -140,6 +163,14 @@ def relax(mutate):
          "plaintext or wildcard"),
         ("redirect uris emptied",
          lambda c, p, a: p.__setitem__("redirectUris", None), "has no redirectUris"),
+        # The three Codex r2 named: a disabled client on either side, and a scope
+        # that is assigned but contributes nothing to the token.
+        ("api client disabled",
+         lambda c, p, a: a.__setitem__("enabled", False), "sv-api is disabled"),
+        ("portal client disabled",
+         lambda c, p, a: p.__setitem__("enabled", False), "sv-portal is disabled"),
+        ("realm stops requiring https",
+         lambda c, p, a: c["realm"].__setitem__("sslRequired", "none"), "sslRequired"),
     ],
 )
 def test_one_relaxation_at_a_time_is_reported(label, mutate, expected):
@@ -181,3 +212,51 @@ def test_the_cli_separates_drift_from_an_unusable_snapshot(tmp_path, capsys):
     broken = tmp_path / "broken.json"
     broken.write_text("{not json", encoding="utf-8")
     assert checker.main(["--config", str(broken)]) == 2
+
+
+# --- the scope's own representation, not just its name on the client -------------
+#
+# Assigning inv.api to the client and leaving include.in.token.scope false is the
+# failure mode that looks exactly like success: the scope is listed, the token has
+# no inv.api in it, the product answers 401, and the configurator exits 0.
+
+
+def test_a_scope_that_contributes_nothing_to_the_token_is_reported():
+    reported = relax_scope(
+        lambda scope: scope["attributes"].__setitem__("include.in.token.scope", "false")
+    )
+    assert any("include.in.token.scope" in line for line in reported), reported
+
+
+def test_a_scope_with_the_attribute_removed_is_reported():
+    reported = relax_scope(lambda scope: scope["attributes"].pop("include.in.token.scope"))
+    assert any("include.in.token.scope" in line for line in reported), reported
+
+
+def test_a_scope_with_no_attributes_at_all_is_reported():
+    reported = relax_scope(lambda scope: scope.pop("attributes"))
+    assert any("no attributes" in line for line in reported), reported
+
+
+def test_a_scope_on_another_protocol_is_reported():
+    reported = relax_scope(lambda scope: scope.__setitem__("protocol", "saml"))
+    assert any("openid-connect" in line for line in reported), reported
+
+
+def test_an_absent_scope_representation_is_unusable_not_silent():
+    """Judging the assignment while the scope itself is unknown would read as a pass."""
+    config = matching_config()
+    del config["clientScopes"]["inv.api"]
+    with pytest.raises(checker.ConfigUnusable, match="clientScopes"):
+        findings(config)
+    config = matching_config()
+    del config["clientScopes"]
+    with pytest.raises(checker.ConfigUnusable, match="clientScopes"):
+        findings(config)
+
+
+@pytest.mark.parametrize("value", ["external", "all"])
+def test_both_https_enforcement_levels_are_accepted(value):
+    config = matching_config()
+    config["realm"]["sslRequired"] = value
+    assert findings(config) == []

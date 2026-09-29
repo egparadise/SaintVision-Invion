@@ -20,7 +20,14 @@ without it, or because a browser client without it is exploitable:
   list and ``verify`` uses ``strict_aud``, which forbids lists;
 * an audience mapper naming the API client, and a ``client_id`` claim, which Keycloak
   does not emit on its own -- it emits ``azp``;
-* the ``inv.api`` scope, without which ``verify`` refuses the token;
+* the ``inv.api`` scope, assigned AND with ``include.in.token.scope`` true. The
+  assignment alone puts nothing in the token: with the attribute false the scope is
+  listed on the client, the token has no ``inv.api``, the product answers 401, and a
+  configurator that only checks the assignment reports success;
+* both clients ``enabled``. A disabled client cannot issue or be an audience, and
+  nothing else in this list notices;
+* ``sslRequired`` not ``none``, so the realm does not stop requiring https on its
+  own once the certificate is in place;
 * every redirect URI and web origin is https, or loopback. Loopback never crosses the
   network, which is why native-app flows are allowed to use it; a plaintext origin on
   a real hostname is a credential path over the LAN.
@@ -44,6 +51,8 @@ MAX_TOKEN_LIFESPAN = 3600  # inv.identity.verify: 0 < exp - iat <= 3600
 PINNED_TOKEN_LIFESPAN = 300
 RFC9068_ATTRIBUTE = "access.token.header.type.rfc9068"
 PKCE_ATTRIBUTE = "pkce.code.challenge.method"
+SCOPE_IN_TOKEN_ATTRIBUTE = "include.in.token.scope"
+ALLOWED_SSL_REQUIRED = ("external", "all")
 FORBIDDEN_SCOPES = ("roles",)  # its audience-resolve mapper makes aud a list
 LOGIN_FLAGS = (
     "standardFlowEnabled",
@@ -117,8 +126,13 @@ def drift(config: Any, *, realm: str, api_client: str, portal_client: str, scope
         findings.append(f"accessTokenLifespan {lifespan}s exceeds the verifier's {MAX_TOKEN_LIFESPAN}s")
     elif lifespan != PINNED_TOKEN_LIFESPAN:
         findings.append(f"accessTokenLifespan drifted to {lifespan}s from {PINNED_TOKEN_LIFESPAN}s")
+    ssl_required = realm_config.get("sslRequired")
+    if ssl_required not in ALLOWED_SSL_REQUIRED:
+        findings.append(f"sslRequired is {ssl_required!r}, not one of {ALLOWED_SSL_REQUIRED}")
 
     api = _client(config, api_client)
+    if api.get("enabled") is not True:
+        findings.append(f"{api_client} is disabled; it cannot be an audience")
     if api.get("publicClient") is not False:
         findings.append(f"{api_client} is a public client")
     for flag in LOGIN_FLAGS:
@@ -126,6 +140,8 @@ def drift(config: Any, *, realm: str, api_client: str, portal_client: str, scope
             findings.append(f"{api_client} has {flag} enabled; it must not log anyone in")
 
     portal = _client(config, portal_client)
+    if portal.get("enabled") is not True:
+        findings.append(f"{portal_client} is disabled; nobody can log in")
     if portal.get("publicClient") is not True:
         findings.append(f"{portal_client} is not a public client")
     if portal.get("standardFlowEnabled") is not True:
@@ -154,6 +170,26 @@ def drift(config: Any, *, realm: str, api_client: str, portal_client: str, scope
             findings.append(
                 f"{portal_client} still has the {forbidden} scope, which makes aud a list"
             )
+
+    # The scope's own representation, not just its name on the client. Assignment
+    # without include.in.token.scope is the failure that looks like success.
+    scope_representations = config.get("clientScopes")
+    if not isinstance(scope_representations, dict) or scope not in scope_representations:
+        raise ConfigUnusable(f"config.clientScopes[{scope}] is missing")
+    representation = scope_representations[scope]
+    if not isinstance(representation, dict):
+        raise ConfigUnusable(f"config.clientScopes[{scope}] must be an object")
+    scope_attributes = representation.get("attributes")
+    if not isinstance(scope_attributes, dict):
+        findings.append(f"the {scope} scope has no attributes")
+        scope_attributes = {}
+    if str(scope_attributes.get(SCOPE_IN_TOKEN_ATTRIBUTE)).lower() != "true":
+        findings.append(
+            f"the {scope} scope is assigned but {SCOPE_IN_TOKEN_ATTRIBUTE} is not true, "
+            "so the token carries no scope and the verifier answers 401"
+        )
+    if representation.get("protocol") not in (None, "openid-connect"):
+        findings.append(f"the {scope} scope is not an openid-connect scope")
 
     mappers = _mappers(portal)
     audience = next(
