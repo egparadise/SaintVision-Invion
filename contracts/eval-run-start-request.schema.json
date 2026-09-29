@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "What a caller may choose when starting an eval run (G-05 W5).\n\nThree fields, and what is *absent* matters as much as what is here.\n\n``adapter`` is a **name**, not an endpoint or a credential. The server resolves\nit through ``adapters.agents.adapter_for``, whose ``BY_NAME`` is the configured\nallowlist, so a caller can pick one of the platform's four CLIs and nothing\nelse. A request that could name a URL would let the caller point this route --\nwhich spends money -- at a host of their choosing.\n\n``componentVersions`` is part of the run's identity: \"the agent scored 72%\"\nmeans nothing without which prompt, context and model produced it. It is\nbounded, and the three keys the service fills in itself are **refused**:\n``run_suite`` merges them with ``setdefault``, so a caller who sent\n``{\"adapter\": \"something-else\"}`` would have their own value recorded as the\nidentity of the run. Refusing them is the only place that can be stopped\nwithout changing the service's signature.\n\n``requireModelPinning`` defaults to **true**, which is the service's own\ndefault: a score from an adapter that cannot say which model build produced it\nis not reproducible. Passing false is allowed and is recorded on the run\n(``modelPinned: \"false\"``) rather than merely decided at the call site.",
+  "properties": {
+    "adapter": {
+      "maxLength": 64,
+      "minLength": 1,
+      "pattern": "^[a-z0-9-]+$",
+      "title": "Adapter",
+      "type": "string"
+    },
+    "componentVersions": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "maxProperties": 32,
+      "title": "Componentversions",
+      "type": "object"
+    },
+    "requireModelPinning": {
+      "default": true,
+      "title": "Requiremodelpinning",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "adapter"
+  ],
+  "title": "EvalRunStartRequest",
+  "type": "object"
+}

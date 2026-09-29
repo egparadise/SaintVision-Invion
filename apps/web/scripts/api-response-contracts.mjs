@@ -46,6 +46,21 @@ const contracts = [
   { schema: 'distributed-plan-response', output: 'distributed-plan-response' },
   { schema: 'node-page-response', output: 'node-page-response' },
   { schema: 'node-detail-response', output: 'node-detail-response' },
+  { schema: 'conformance-status-response', output: 'conformance-status-response' },
+  { schema: 'conformance-status-recorded-response', output: 'conformance-status-recorded-response' },
+  { schema: 'adapter-conformance-not-observed-response', output: 'adapter-conformance-not-observed-response' },
+  { schema: 'adapter-conformance-recorded-response', output: 'adapter-conformance-recorded-response' },
+  { schema: 'run-record-response', output: 'run-record-response' },
+  { schema: 'run-record-artifact-page-response', output: 'run-record-artifact-page-response' },
+  { schema: 'artifact-pin-verification-response', output: 'artifact-pin-verification-response' },
+  { schema: 'context-bundle-response', output: 'context-bundle-response' },
+  { schema: 'model-version-register-request', output: 'model-version-register-request' },
+  { schema: 'model-version-response', output: 'model-version-response' },
+  { schema: 'retention-pin-request', output: 'retention-pin-request' },
+  { schema: 'retention-pin-response', output: 'retention-pin-response' },
+  { schema: 'model-release-request', output: 'model-release-request' },
+  { schema: 'model-release-response', output: 'model-release-response' },
+  { schema: 'model-lineage-trace-response', output: 'model-lineage-trace-response' },
 ];
 const mode = process.argv[2];
 

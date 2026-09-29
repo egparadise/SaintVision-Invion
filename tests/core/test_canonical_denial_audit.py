@@ -236,6 +236,11 @@ def _denied_app(monkeypatch, recorded):
     for module in (model_release,):
         monkeypatch.setattr(module, "make_session_factory", lambda _engine: _NullFactory())
         monkeypatch.setattr(module, "tenant_scope", lambda _session, _tenant: contextlib.nullcontext())
+        # Card 84 F1 put the permission span under the lock-wait bound too; the
+        # bound issues SET LOCAL on the session, which this PG-free stand-in
+        # does not execute. Stubbed like tenant_scope: the subject here is the
+        # denial audit action, and the bound has its own tests (test_lock_wait).
+        monkeypatch.setattr(module, "bounded_lock_wait", lambda _session, *, timeout_ms: contextlib.nullcontext())
     from saintvision.api.deps import get_session
 
     principal = Principal(user_id=USER, tenant_id=TENANT, external_subject="oidc:denial")

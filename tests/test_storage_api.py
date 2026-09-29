@@ -8,8 +8,8 @@ Each assertion is a place the route, not the service, is responsible for:
 * a missing bearer credential is refused by HTTPBearer (401 + challenge);
   an unrecognised token reaches the domain verifier and is also refused;
 * an unknown field in the body is refused (the request models are strict, 422);
-* an unknown node is a RESOURCE error, which this API maps to 409 by category
-  (errors.py _STATUS), not 404 -- the test asserts the API's own convention;
+* an unknown node is translated from the internal legacy code to canonical
+  ``RES-0004/404`` without disclosing the resource kind;
 * the happy path returns 201 and the contribution lifecycle is reachable over
   HTTP end to end, catalogued locations included.
 """
@@ -134,10 +134,11 @@ def test_registering_a_contribution_returns_201_and_the_lifecycle_is_reachable(a
 
 
 def test_registering_against_an_unknown_node_is_a_resource_error(api):
-    # RESOURCE errors (a node not found) map to 409 by category in this API.
+    # Absence uses the canonical, non-retryable resource-not-found surface.
     resp = api["client"].post(
         "/v1/storage/contributions",
         json={"nodeId": new_id("node"), "declaredPath": "/srv/inv/0"},
         headers=_auth(),
     )
-    assert resp.status_code == 409
+    assert resp.status_code == 404
+    assert resp.json()["code"] == "RES-0004"

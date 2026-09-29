@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "What a caller asks of W3: apply this kernel-recorded measurement.\n\nOne field, and ``extra=\"forbid\"`` is load-bearing: a digest, a size or a\nURI in the body would be a value the caller supplied, and verification\nis exactly the thing a caller's value must not be able to establish\n(design #209 v1.1 §6).",
+  "properties": {
+    "measurementId": {
+      "pattern": "^mvm_[0-9A-HJKMNP-TV-Z]{26}$",
+      "title": "Measurementid",
+      "type": "string"
+    }
+  },
+  "required": [
+    "measurementId"
+  ],
+  "title": "ModelVerifyRequest",
+  "type": "object"
+}

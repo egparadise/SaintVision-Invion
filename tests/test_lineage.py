@@ -21,6 +21,7 @@ from saintvision.runs.state import TerminationReason
 from saintvision.services import evaluation as eval_service
 from saintvision.services import lineage as lineage_service
 from saintvision.services import runs as run_service
+from measurement_support import record_measurement
 
 pytestmark = pytest.mark.postgres
 
@@ -50,6 +51,9 @@ def catalogue(owner_engine, two_tenants):
     }
     digest = run_service.workload_digest({"objective": "train"})
     ids["spec_sha256"] = digest
+    # Measurements are kernel-written (0054); these tests stand in for the
+    # kernel as the owner, so the engine travels with the ids.
+    ids["owner_engine"] = owner_engine
     with owner_engine.begin() as c:
         c.execute(
             text(
@@ -98,6 +102,20 @@ def catalogue(owner_engine, two_tenants):
             {"m": ids["model_id"], "t": tenant_a, "p": ids["project_id"]},
         )
     return ids
+
+
+def _verify(session, catalogue, *, model_version_id, content_sha256, measured_sha256=None, now=NOW):
+    """Verify through the seam: a measurement of the version is recorded first
+    (as the kernel would), then bound. ``measured_sha256`` is what the node
+    saw when that should differ from what the caller claims."""
+    measurement_id = record_measurement(
+        catalogue["owner_engine"], tenant_id=catalogue["tenant_a"],
+        model_version_id=model_version_id, sha256=measured_sha256 or content_sha256,
+    )
+    return lineage_service.verify_model_version(
+        session, tenant_id=catalogue["tenant_a"], model_version_id=model_version_id,
+        measurement_id=measurement_id, content_sha256=content_sha256, now=now,
+    )
 
 
 def _full_lineage(session, catalogue, *, now=NOW, with_approval=True):
@@ -269,6 +287,28 @@ def test_two_model_versions_cannot_share_content(app_sessionmaker, catalogue):
                     )
 
 
+def test_the_same_version_with_a_different_digest_is_refused(app_sessionmaker, catalogue):
+    """S10-ST immutable version (card aw gap G1): re-registering ``1.0.0`` under a different
+    content digest is refused by ``uq_model_versions_model_id_version`` -- a version name can
+    never be re-pointed at other bytes, only a new version can be cut."""
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, catalogue["tenant_a"]):
+                lineage_service.register_model_version(
+                    session, tenant_id=catalogue["tenant_a"], model_id=catalogue["model_id"],
+                    version="1.0.0", content_sha256=WEIGHTS_SHA,
+                    uri="inv://models/classifier@1.0.0", now=NOW,
+                )
+        with pytest.raises(IntegrityError):
+            with session.begin():
+                with tenant_scope(session, catalogue["tenant_a"]):
+                    lineage_service.register_model_version(
+                        session, tenant_id=catalogue["tenant_a"], model_id=catalogue["model_id"],
+                        version="1.0.0", content_sha256="e" * 64,
+                        uri="inv://models/classifier@1.0.0", now=NOW,
+                    )
+
+
 def test_model_versions_are_append_only_for_the_application(app_sessionmaker, catalogue):
     with app_sessionmaker() as session:
         with session.begin():
@@ -405,10 +445,7 @@ def test_release_requires_verification_pin_and_traceability(app_sessionmaker, ca
                         session, tenant_id=catalogue["tenant_a"],
                         model_version_id=version_id, now=NOW,
                     )
-                lineage_service.verify_model_version(
-                    session, tenant_id=catalogue["tenant_a"],
-                    model_version_id=version_id, content_sha256=WEIGHTS_SHA, now=NOW,
-                )
+                _verify(session, catalogue, model_version_id=version_id, content_sha256=WEIGHTS_SHA)
 
                 # Unpinned.
                 with pytest.raises(InvError, match="retention pinned"):
@@ -437,11 +474,7 @@ def test_an_untraceable_model_cannot_be_released(app_sessionmaker, catalogue):
                     version="0.2.0", content_sha256="7" * 64,
                     uri="inv://models/classifier@0.2.0", now=NOW,
                 )
-                lineage_service.verify_model_version(
-                    session, tenant_id=catalogue["tenant_a"],
-                    model_version_id=bare.model_version_id,
-                    content_sha256="7" * 64, now=NOW,
-                )
+                _verify(session, catalogue, model_version_id=bare.model_version_id, content_sha256="7" * 64)
                 lineage_service.pin_retention(
                     session, tenant_id=catalogue["tenant_a"],
                     model_version_id=bare.model_version_id, until=LATER,
@@ -460,10 +493,9 @@ def test_verification_refuses_a_mismatched_checksum(app_sessionmaker, catalogue)
             with tenant_scope(session, catalogue["tenant_a"]):
                 built = _full_lineage(session, catalogue)
                 with pytest.raises(InvError):
-                    lineage_service.verify_model_version(
-                        session, tenant_id=catalogue["tenant_a"],
-                        model_version_id=built["version"].model_version_id,
-                        content_sha256="0" * 64, now=NOW,
+                    _verify(
+                        session, catalogue, model_version_id=built["version"].model_version_id,
+                        content_sha256="0" * 64, measured_sha256=WEIGHTS_SHA,
                     )
 
 
@@ -510,10 +542,7 @@ def test_the_database_refuses_a_release_without_verification(app_sessionmaker, c
 def _released(session, catalogue):
     built = _full_lineage(session, catalogue)
     version_id = built["version"].model_version_id
-    lineage_service.verify_model_version(
-        session, tenant_id=catalogue["tenant_a"], model_version_id=version_id,
-        content_sha256=WEIGHTS_SHA, now=NOW,
-    )
+    _verify(session, catalogue, model_version_id=version_id, content_sha256=WEIGHTS_SHA)
     lineage_service.pin_retention(
         session, tenant_id=catalogue["tenant_a"], model_version_id=version_id, until=LATER
     )

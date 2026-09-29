@@ -1,14 +1,46 @@
+import os
 from pathlib import Path
+import subprocess
+import sys
 
 import pytest
 
 from tools.placement_benchmark import (
+    BENCHMARK_OPT_IN_REASON,
     RoundEvidence,
     percentile_nearest_rank,
     run_round,
     summarize,
     write_junit,
 )
+
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_real_pg_benchmark_is_only_collected_by_its_explicit_cli():
+    env = os.environ.copy()
+    env.pop("INV_PLACEMENT_BENCHMARK", None)
+    env.pop("INV_TEST_ADMIN_DSN", None)
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pytest",
+            "-q",
+            "-rs",
+            "tests/integration/test_placement_benchmark.py::test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded",
+        ],
+        cwd=ROOT,
+        env=env,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    output = completed.stdout + completed.stderr
+    assert completed.returncode == 0, output
+    assert "1 skipped" in output
+    assert BENCHMARK_OPT_IN_REASON in output
 
 
 def test_nearest_rank_p95_is_reproducible():

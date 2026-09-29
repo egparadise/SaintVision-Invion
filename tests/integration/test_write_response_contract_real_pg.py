@@ -136,12 +136,21 @@ def test_member_role_write_response_matches_real_postgres_state(
         external_subject="synthetic-pg-role-operator",
     )
     with TestClient(_app(app_engine, now, principal), raise_server_exceptions=False) as client:
+        headers = {"Idempotency-Key": "member-role-replay"}
         response = client.put(
             f"/v1/projects/{project_id}/members/{member_id}",
             json={"roleCode": "maintainer"},
+            headers=headers,
+        )
+        replay = client.put(
+            f"/v1/projects/{project_id}/members/{member_id}",
+            json={"roleCode": "maintainer"},
+            headers=headers,
         )
 
     assert response.status_code == 200, "real PostgreSQL role update route must succeed"
+    assert replay.status_code == 200
+    assert replay.json() == response.json()
     payload = response.json()
     parsed = MemberRoleResultResponse.model_validate(payload)
     assert parsed.project_id == project_id
@@ -161,7 +170,25 @@ def test_member_role_write_response_matches_real_postgres_state(
             ),
             {"tenant_id": tenant_id, "project_id": project_id, "user_id": member_id},
         ).scalar_one()
+        audit_count = connection.execute(
+            text(
+                "SELECT count(*) FROM audit_events "
+                "WHERE tenant_id=:tenant_id AND action='project.member.role_set'"
+            ),
+            {"tenant_id": tenant_id},
+        ).scalar_one()
+        ledger_count = connection.execute(
+            text(
+                "SELECT count(*) FROM idempotency_records "
+                "WHERE tenant_id=:tenant_id AND endpoint="
+                "'PUT /v1/projects/{project_id}/members/{user_id}' "
+                "AND idempotency_key='member-role-replay'"
+            ),
+            {"tenant_id": tenant_id},
+        ).scalar_one()
     assert saved_role == parsed.role_code
+    assert audit_count == 1
+    assert ledger_count == 1
 
 
 def test_workspace_status_response_allowed_next_matches_real_lifecycle_state(
