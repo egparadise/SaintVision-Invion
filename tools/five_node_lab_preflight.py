@@ -39,13 +39,9 @@ def _require_exact_keys(value: dict[str, Any], expected: set[str], *, where: str
         raise ValueError(f"{where} keys mismatch: missing={missing}, extra={extra}")
 
 
-def load_five_node_inventory(path: Path) -> dict[str, Any]:
-    """Load and strictly validate the revision-fixed physical-node inventory."""
+def validate_five_node_inventory(payload: Any) -> dict[str, Any]:
+    """Strictly validate an already-loaded revision-fixed inventory."""
 
-    try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, UnicodeError, json.JSONDecodeError) as error:
-        raise ValueError(f"Cannot read five-node inventory: {error}") from None
     if not isinstance(payload, dict):
         raise ValueError("five-node inventory root must be an object")
     _require_exact_keys(
@@ -141,6 +137,16 @@ def load_five_node_inventory(path: Path) -> dict[str, Any]:
                 raise ValueError(f"{where}.{field} duplicates another physical node")
             seen[field].add(value)
     return payload
+
+
+def load_five_node_inventory(path: Path) -> dict[str, Any]:
+    """Load and strictly validate the revision-fixed physical-node inventory."""
+
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise ValueError(f"Cannot read five-node inventory: {error}") from None
+    return validate_five_node_inventory(payload)
 
 
 _FIVE_NODE_PREFLIGHT_SQL = """

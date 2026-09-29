@@ -195,6 +195,13 @@ def test_cli_credential_is_digest_only_and_works_from_issue_to_admission(
             assert parsed.expires_at > now[0]
             assert parsed.next == "POST /v1/nodes with this token to complete enrollment"
             _require_secret_absent(token, caplog.text, "discovery bearer appeared in application logs")
+
+            replay = client.post(
+                f"/v1/discovery/candidates/{candidate['announcementId']}/admission"
+            )
+            assert replay.status_code == 409
+            assert replay.json()["code"] == "GRAPH-INVALID-TRANSITION"
+            assert "bootstrapToken" not in replay.json()
             with owner_engine.connect() as connection:
                 active = connection.execute(
                     text(
@@ -203,7 +210,15 @@ def test_cli_credential_is_digest_only_and_works_from_issue_to_admission(
                     ),
                     {"id": credential_id},
                 ).scalar_one()
+                issued_tokens = connection.execute(
+                    text(
+                        "SELECT count(*) FROM node_bootstrap_tokens "
+                        "WHERE tenant_id=:tenant AND consumed_at IS NULL"
+                    ),
+                    {"tenant": tenant_a},
+                ).scalar_one()
             assert active == 0
+            assert issued_tokens == 1
 
         revoke_out, revoke_err = io.StringIO(), io.StringIO()
         assert discovery_credential.run(

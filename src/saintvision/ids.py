@@ -70,6 +70,8 @@ PREFIXES: Final[dict[str, str]] = {
     #: by the kernel's accept path with the same three letters.
     "model_measurement": "mvm",
     "deployment": "dpl",
+    #: One recorded run of the adapter conformance suite (0055, G-03 stage two).
+    "conformance_record": "cfr",
     # S12
     "backup": "bkp",
     "drill": "drl",
