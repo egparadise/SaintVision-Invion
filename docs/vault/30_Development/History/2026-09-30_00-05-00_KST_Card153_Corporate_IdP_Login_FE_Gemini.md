@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-GEMINI-CARD153-001"
 title: "History: Card 153 사내 IdP(Keycloak) 연동 FE 점검·수정 및 OIDC PKCE·토큰 만료·로그아웃 검증"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Gemini"
-updated: "2026-09-30T08:08:00+09:00"
+updated: "2026-09-30T08:25:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -14,14 +14,14 @@ source_of_truth: "Git"
 
 - **카드 번호**: Card 153 (Owner: Gemini, Reviewers: Claude, Codex)
 - **작업 브랜치**: `agent/gemini/card153-idp-login` (Base: `origin/integration/all-agents-unified` `6fc0428b`)
-- **목적**: 사내 IdP(Claude Card 152가 노드 `192.168.45.143`에 배포한 Keycloak)로 웹 포털 로그인이 실제로 원활히 구동될 수 있도록 프런트엔드 인증 및 세션 아키텍처 전면 점검 및 조치:
+- **목적**: 사내 IdP(Claude Card 152가 사내망에 프로비저닝하는 Keycloak)로 웹 포털 로그인이 실제로 원활히 구동될 수 있도록 프런트엔드 인증 및 세션 아키텍처 전면 점검 및 조치:
   1. 표준 OIDC Authorization Code Flow + PKCE (RFC 7636 S256 verifier/challenge, state, nonce).
   2. 동적 OIDC Issuer(`issuer`) 및 클라이언트 ID(`clientId`) 설정 해석 (하드코딩 금지, Keycloak 표준 엔드포인트 자동 도출 및 동일 origin/path 결속 오버라이드 지원).
   3. 로컬/dev IdP 가정 및 비안전 원격 HTTP 폴백 전면 제거 (Fail-closed 보안 아키텍처).
   4. 제어 평면 서버 계약 준수 토큰 유효기간(`0 < exp - iat <= 3600`) 클라이언트-서버 이중 가드(120초 시계 오차 허용) 및 능동 세션 만료 타이머·재로그인 안내 배너(`[AUTH-0050]`).
   5. 표준 OIDC RP-Initiated 로그아웃 배선(`App.tsx:549`에서 `performLogout({ redirectIdp: true, postLogoutRedirectUri: origin })` 연동) 및 인메모리 토큰/만료타이머/트랜잭션스토리지 무결 청소.
-  6. OIDC ID 토큰(id_token)의 nonce(트랜잭션 nonce와 일치), aud(clientId 일치), iss(issuer 일치) 클라이언트 검증 완비.
-  7. Mock OIDC 서버 기반 종합 자동화 검증 스위트(`apps/web/tests/auth-oidc-contract.test.ts`, 33 passed), RFC 7636 벡터 시험(`auth-pkce.test.ts`, 5 passed), App 수준 로그아웃 및 만료 연동 시험(`auth-app-oidc-integration.test.tsx`, 2 passed) 신설.
+  6. OIDC ID 토큰(id_token)의 nonce(트랜잭션 nonce와 일치), aud(clientId 일치), multi-aud 시 azp(clientId 일치), iss(issuer 설정 시 issuer 일치), 필수 정수 exp(120초 시계 오차 허용), iat 클라이언트 fail-closed 검증 완비. (OIDC Core 1.0 §3.1.3.7(6)에 따라 Token Endpoint 직접 TLS 통신으로 암호학적 서명 검증은 생략하고 제어 평면 서버 `/v1/session`에 위임).
+  7. Mock OIDC 서버 기반 종합 자동화 검증 스위트(`apps/web/tests/auth-oidc-contract.test.ts`, 46 passed), RFC 7636 벡터 시험(`auth-pkce.test.ts`, 5 passed), App 수준 로그아웃 및 만료 연동 시험(`auth-app-oidc-integration.test.tsx`, 2 passed) 신설.
 
 ---
 
@@ -34,18 +34,19 @@ source_of_truth: "Git"
   - `idpLogoutUrl`: `${cleanIssuer}/protocol/openid-connect/logout`
   - `scope`: 기본값 `'openid inv.api'` (운영자 설정 시 커스텀 scope 우선)
   - `redirectUri`: `${window.location.origin}/callback` 정규화
-- **[Codex Finding 1] Cross-Origin Token Override 원천 차단**:
-  - `issuer`가 지정된 경우, 모든 커스텀 오버라이드(`idpAuthorizeUrl`, `idpTokenUrl`, `idpLogoutUrl`)는 반드시 `issuer`와 동일한 origin 및 하위 경로 계층(`isSubpathOf`) 내에 위치해야 함을 강제. 불일치 시 `authConfig()`에서 즉각 예외 발생 (부정 시험 완비).
-  - `issuer` 없이 엔드포인트 쌍만 지정하는 경우에도 인가 엔드포인트와 토큰 엔드포인트가 서로 다른 origin을 가질 수 없도록 강제.
-- **[Claude L4] redirectUri 정규화 및 strict path 검증**:
+- **[Codex Finding 1, Claude L5] Cross-Origin 및 경로 계층 오버라이드 차단**:
+  - `issuer`가 지정된 경우, 모든 커스텀 오버라이드(`idpAuthorizeUrl`, `idpTokenUrl`, `idpLogoutUrl`)는 반드시 `issuer`와 동일한 origin 및 하위 경로 계층(`isSubpathOf`) 내에 위치해야 함을 강제. 불일치 시 `authConfig()`에서 즉각 예외 발생 (부정 시험 4종 완비).
+  - `issuer` 없이 엔드포인트 쌍만 지정하는 경우에도 인가 엔드포인트, 토큰 엔드포인트, 로그아웃 엔드포인트가 서로 다른 origin을 가질 수 없도록 강제 (부정 시험 2종 완비).
+- **[Claude L4] redirectUri 정규화, strict path 검증 및 URL fragment 차단**:
   - `redirectUri`가 문자열이 아니거나 빈 값인 경우 즉시 거부.
   - `new URL(raw, origin).href`로 안전하게 정규화하여 상대 경로(`/callback`) 지원.
   - 현재 웹 애플리케이션과 origin이 일치하지 않거나 pathname이 `/callback`이 아닌 경우 즉시 fail-closed 차단.
+  - RFC 6749 §3.1.2에 따라 fragment(해시 `#...`)가 포함된 경우 fail-closed 거부 (부정 시험 완비).
 
 ### 2) dev IdP 가정 및 비안전 원격 HTTP 전면 제거
 - `endpoint()` 및 `cleanIssuerUrl()` 검증기:
   - `http://` 프로토콜은 오직 로컬 개발 루프백(`127.0.0.1`, `localhost`, `[::1]`)에만 제한 허용.
-  - 사내망 원격 IP(`192.168.45.143`) 및 도메인은 반드시 `https://` 암호화 채널을 강제.
+  - 사내망 원격 IP 및 도메인은 반드시 `https://` 암호화 채널을 강제.
   - URL 내 자격증명(`user:pass@...`) 및 해시 프래그먼트(`#...`) 포함 시 즉각 거부.
 
 ### 3) 표준 OIDC Authorization Code Flow + PKCE (RFC 7636) 및 Nonce/ID Token 검증
@@ -54,21 +55,23 @@ source_of_truth: "Git"
   - CSRF 방어용 `state` (32자 16진수 hex) 생성.
   - scope에 `openid` 포함 시 OIDC `nonce` (32자 16진수 hex) 생성 및 인가 요청 쿼리에 반영.
   - `sessionStorage` (`saintvision.oauth.transaction`)에 트랜잭션 안전 저장.
-  - [auth-pkce.test.ts](file:///D:/Project/SaintVisionI-Invion/https-github.com-egparadise-SaintVision-Invion.git/.worktrees/gemini-card153-idp-login/apps/web/tests/auth-pkce.test.ts)에 RFC 7636 Appendix B 공식 테스트 벡터 단언 추가 (5 passed).
-- **[Codex Finding 2, Claude M2] ID Token(id_token) 검증 완비**:
-  - `completeLogin()` 시 토큰 엔드포인트 응답에서 `result.id_token` 추출.
-  - `tx.nonce`가 전송되었거나 `result.id_token`이 존재하는 경우:
+  - `apps/web/tests/auth-pkce.test.ts`에 RFC 7636 Appendix B 공식 테스트 벡터 단언 추가 (5 passed).
+- **[Claude C1, Codex Finding 2] ID Token(id_token) 검증 강화 및 서명 생략 근거**:
+  - OIDC Core 1.0 §3.1.3.7 Rule 6에 따라 클라이언트와 토큰 엔드포인트 간 직접 TLS 보안 통신 환경에서 TLS 서버 검증으로 발급자를 검증하므로, 클라이언트 측 JWS 암호 서명 검증은 생략하고 제어 평면 서버(`/v1/session`)의 정본 검증에 위임.
+  - 클라이언트에서는 토큰 클레임을 fail-closed 방식으로 검증:
     - ID 토큰 누락 시 즉시 거부 (`OIDC 인증 응답에 ID 토큰(id_token)이 누락되었습니다.`).
-    - ID 토큰 페이로드 파싱 후 `idClaims.nonce === tx.nonce` 일치성 검증 (재전송 및 주입 방어).
-    - `idClaims.iss === config.issuer` 일치성 검증.
-    - `idClaims.aud === config.clientId` 일치성 검증.
-    - `idClaims.exp` 만료 여부 검증 (120초 시계 오차 허용).
-  - missing/mismatched nonce/mismatched aud/mismatched iss/expired 부정 시험 전수 추가.
+    - `idClaims.nonce === tx.nonce` 일치성 검증 (재전송 및 주입 방어).
+    - `idClaims.iss === config.issuer` 일치성 검증 (issuer 모드 설정 시 한정).
+    - `idClaims.aud` 및 `idClaims.azp` 검증: 단일 대상의 경우 `aud === clientId`, 다중 대상(배열)의 경우 `aud.includes(clientId)` 및 OIDC Core 3.1.3.7 Rule 3&4에 따라 `azp === clientId` 강제.
+    - `idClaims.exp`: 필수 정수 검증(누락 및 비정수 즉시 거부) 및 120초 시계 오차 허용 만료 검증.
+    - `idClaims.iat`: 존재하는 경우 정수형 검증.
+  - missing nonce, mismatched nonce, mismatched aud, multi-aud missing/mismatched azp, multi-aud matching azp, mismatched iss, missing exp, non-integer exp, expired beyond clock skew, clock skew allowance (60s), non-integer iat 부정 시험 전수 완비.
 
 ### 4) 서버 계약 준수 토큰 유효기간 검증 및 능동 만료·재로그인 처리
 - **서버 계약 불변식**: `services/control-plane/src/inv/identity.py:157`의 `0 < exp - iat <= 3600` 계약.
-- **[Codex Finding 5] validateTokenExpiration fail-closed 강화**:
-  - `validateTokenExpiration`은 JWT 토큰에 대해 malformed JWT, 누락/비정수형 exp/iat, 수명 `<= 0` 또는 `> 3600`, 만료 토큰을 전수 fail-closed 거부.
+- **[Codex Finding 5 & Codex 2] validateTokenExpiration fail-closed 강화**:
+  - `validateTokenExpiration`은 기본 옵션 구조 분해 `const { requireJwt = true } = options;`를 채택하여 `options={}` 빈 객체 전달 시에도 JWT 필수 검사를 안전하게 fail-closed 강제.
+  - JWT 토큰에 대해 malformed JWT, 누락/비정수형 exp/iat, 수명 `<= 0` 또는 `> 3600`, 만료 토큰을 전수 fail-closed 거부.
   - `completeLogin`에서는 하위 호환을 위해 3-part JWT에 대해 엄격 fail-closed 검증을 수행하고 opaque 토큰은 `/v1/session` 서버 검증에 위임.
 - **[Claude M3] 120초 시계 오차 허용 (`CLOCK_SKEW_SEC = 120`)**:
   - 클라이언트 시계와 서버 시계 간 오차로 인한 부당한 거부를 방지하기 위해 120초 여유 적용 (`identity.expiresAt - nowSec > 3600 + CLOCK_SKEW_SEC` 및 `claims.exp + CLOCK_SKEW_SEC <= nowUnixSeconds`).
@@ -83,7 +86,7 @@ source_of_truth: "Git"
 - **[Claude M1, Codex Finding 3] App 로그아웃 버튼 배선**:
   - `App.tsx:549`: `onLogout` 핸들러가 `performLogout({ redirectIdp: true, postLogoutRedirectUri: window.location.origin })`를 호출하여 Keycloak OIDC RP-Initiated 로그아웃 엔드포인트(`protocol/openid-connect/logout`)로 실제 브라우저 리다이렉트(`window.location.assign`) 수행.
   - 인메모리 토큰 제거, 만료 타이머 해제, 미완료 트랜잭션 스토리지 파기, 상태 초기화 완비.
-  - [auth-app-oidc-integration.test.tsx](file:///D:/Project/SaintVisionI-Invion/https-github.com-egparadise-SaintVision-Invion.git/.worktrees/gemini-card153-idp-login/apps/web/tests/auth-app-oidc-integration.test.tsx)를 신설하여 Header 로그아웃 클릭 시 `location.assign` 호출 및 세션 정리를 App 수준에서 실측 검증.
+  - `apps/web/tests/auth-app-oidc-integration.test.tsx`를 신설하여 Header 로그아웃 클릭 시 `location.assign` 호출 및 세션 정리를 App 수준에서 실측 검증.
 
 ### 6) Tracked Public 예제 및 사내망 계약 정합 (`apps/web/public/auth-config.js`)
 - **[Codex Finding 4]**:
@@ -96,17 +99,17 @@ source_of_truth: "Git"
 
 ### 1) 단위 및 회귀 자동화 시험
 - 신규 OIDC 종합 계약 시험: `apps/web/tests/auth-oidc-contract.test.ts`
-  - **33 tests 100% PASS** (32ms) (기존 20건 + 신규 13건)
+  - **46 tests 100% PASS** (37ms) (기존 20건 + 1차 13건 + 2차 13건)
 - 기존 인증 시험: `apps/web/tests/auth-session.test.ts` (17 tests) & `apps/web/tests/auth-pkce.test.ts` (5 tests, RFC 벡터 포함)
   - **22 tests 100% PASS** (38ms)
 - 신규 App 수준 OIDC 통합 시험: `apps/web/tests/auth-app-oidc-integration.test.tsx`
   - **2 tests 100% PASS** (256ms)
 - `apps/web` 전체 Vitest 스위트:
-  - **91 test files / 956 passed 100%** (0 failed, 0 errors)
+  - **91 test files / 969 passed 100%** (0 failed, 0 errors)
 - TypeScript 타입 점검:
   - `npx tsc -b` 에러 **0건**
 - 프로덕션 번들 빌드:
-  - `npm run build` 성공 (Vite v6.4.3 production bundle 생성 완료, 9.07s)
+  - `npm run build` 성공 (Vite v6.4.3 production bundle 생성 완료, 10.55s)
 
 ### 2) 제어 평면 및 프런트엔드 무결성 게이트 검증
 - `python -X utf8 tools/check_frontend_integrity.py`:
@@ -126,6 +129,5 @@ source_of_truth: "Git"
 
 ## 4. 인계 및 다음 단계
 - **PR**: https://github.com/egparadise/SaintVision-Invion/pull/247
-- **수정사항**: Claude UI (M1, M2, M3, L4, L5, L6) 및 Codex (1~5) 지적사항 전수 반영.
+- **수정사항**: Claude UI r2 조건 C1 (id_token exp 필수 정수화, 만료·exp 누락 시험, OIDC Core 3.1.3.7(6) 서명 생략 근거 문서화, iss 검사 issuer 한정 명시) 및 Codex 2 (azp 다중 대상 검증, requireJwt 구조분해 기본값, override 가드 시험 전수 보강) 반영 완료.
 - **독립 검토 요청**: Claude (UI·테스트 축) 및 Codex (계약·보안 축) 재확인 요청.
-

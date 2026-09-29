@@ -207,6 +207,9 @@ export function authConfig(): ResolvedOidcConfig {
   if (resolvedRedirect.pathname !== '/callback') {
     throw new Error('redirect_uri의 경로는 /callback 이어야 합니다.');
   }
+  if (resolvedRedirect.hash) {
+    throw new Error('redirect_uri에 fragment(해시)를 포함할 수 없습니다 (RFC 6749 §3.1.2).');
+  }
   const redirectUri = resolvedRedirect.href;
 
   return {
@@ -239,14 +242,15 @@ export function parseJwtPayload(token: string): JwtClaims | null {
 export function validateTokenExpiration(
   token: string,
   nowUnixSeconds = Math.floor(Date.now() / 1000),
-  options: { requireJwt?: boolean } = { requireJwt: true },
+  options: { requireJwt?: boolean } = {},
 ): void {
+  const { requireJwt = true } = options;
   if (typeof token !== 'string' || !token.trim()) {
     throw new Error('인증 토큰이 비어 있습니다.');
   }
   const parts = token.split('.');
   if (parts.length !== 3) {
-    if (options.requireJwt) {
+    if (requireJwt) {
       throw new Error('인증 토큰(JWT) 형식이 올바르지 않습니다.');
     }
     return;
@@ -378,6 +382,16 @@ export async function completeLogin(): Promise<{ token: string; user: SessionUse
   const nowSec = Math.floor(Date.now() / 1000);
 
   // OIDC ID token validation (when nonce was sent or id_token is provided)
+  // Per OIDC Core 1.0 §3.1.3.7 Rule 6: When ID token is received via direct communication
+  // between Client and TLS Token Endpoint, TLS server validation validates the issuer in place
+  // of checking the JWS token signature. Authoritative token signature and credential validation
+  // is performed by the server-side control plane (/v1/session).
+  // The client fail-closed validates essential token claims:
+  // - nonce: matches transaction nonce exactly
+  // - iss: matches configured issuer (when issuer mode is configured)
+  // - aud & azp: single aud equals clientId; multi-aud includes clientId and azp equals clientId (Rules 3 & 4)
+  // - exp: required integer, not expired within CLOCK_SKEW_SEC (120s) leeway
+  // - iat: required integer if present
   if (tx.nonce || result.id_token) {
     if (typeof result.id_token !== 'string' || !result.id_token.trim()) {
       throw new Error('OIDC 인증 응답에 ID 토큰(id_token)이 누락되었습니다.');
@@ -392,14 +406,31 @@ export async function completeLogin(): Promise<{ token: string; user: SessionUse
     if (config.issuer && (typeof idClaims.iss !== 'string' || idClaims.iss !== config.issuer)) {
       throw new Error('ID 토큰의 발급자(iss)가 설정된 issuer와 일치하지 않습니다.');
     }
-    const audMatch = typeof idClaims.aud === 'string'
-      ? idClaims.aud === config.clientId
-      : Array.isArray(idClaims.aud) && idClaims.aud.includes(config.clientId);
-    if (!audMatch) {
-      throw new Error('ID 토큰의 대상(aud)이 클라이언트 ID와 일치하지 않습니다.');
+    if (typeof idClaims.aud === 'string') {
+      if (idClaims.aud !== config.clientId) {
+        throw new Error('ID 토큰의 대상(aud)이 클라이언트 ID와 일치하지 않습니다.');
+      }
+    } else if (Array.isArray(idClaims.aud)) {
+      if (!idClaims.aud.includes(config.clientId)) {
+        throw new Error('ID 토큰의 대상(aud) 목록에 클라이언트 ID가 포함되지 않았습니다.');
+      }
+      if (idClaims.aud.length > 1 && idClaims.azp !== config.clientId) {
+        throw new Error('다중 대상(aud) ID 토큰의 azp가 클라이언트 ID와 일치하지 않습니다.');
+      }
+    } else {
+      throw new Error('ID 토큰의 대상(aud)이 올바르지 않습니다.');
     }
-    if (Number.isInteger(idClaims.exp) && idClaims.exp! + CLOCK_SKEW_SEC <= nowSec) {
+    if (idClaims.azp !== undefined && idClaims.azp !== config.clientId) {
+      throw new Error('ID 토큰의 azp가 클라이언트 ID와 일치하지 않습니다.');
+    }
+    if (!Number.isInteger(idClaims.exp)) {
+      throw new Error('ID 토큰의 만료 시각(exp)이 정수가 아니거나 누락되었습니다.');
+    }
+    if (idClaims.exp! + CLOCK_SKEW_SEC <= nowSec) {
       throw new Error('ID 토큰이 이미 만료되었습니다.');
+    }
+    if (idClaims.iat !== undefined && !Number.isInteger(idClaims.iat)) {
+      throw new Error('ID 토큰의 발급 시각(iat)이 정수가 아닙니다.');
     }
   }
 
