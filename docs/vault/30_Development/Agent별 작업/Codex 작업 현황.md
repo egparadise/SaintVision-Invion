@@ -1,12 +1,33 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.224"
+version: "1.0.226"
 status: "review"
 author: "Codex"
-updated: "2026-09-29T03:40:51+09:00"
+updated: "2026-09-30T00:19:32+09:00"
 source_of_truth: "Git"
 ---
+
+## 2026-09-30 Card 150 — 사내망 PKI·LAN pilot 재수립
+
+- `6fc0428b` exact source에서 offline root+issuing intermediate, encrypted
+  key, CRL, CP HTTPS 발급 도구와 외부 CA·SSH-tunnel DB·remote-built image를
+  받는 LAN pilot 경계를 구현했다. 로컬 Docker Desktop·기존 프로젝트
+  컨테이너·과거 `.work/lan-5node/node1`은 건드리지 않았다.
+- `.143`·`.210`은 Node-local CSR→intermediate leaf→DB channel pin→실제 mTLS
+  heartbeat/snapshot까지 완료했다. `.222`는 Docker socket 권한, CP 동거
+  worker는 API 1.41, 네 번째 Ubuntu worker는 미제공이라 configured 3 /
+  enrolled 2 / observed 2이며 5-node readiness는 `BLOCKED_EXTERNAL`이다.
+- Card 152 확정 이름 `cp.sv.lan`과 `192.168.45.74`를 SAN으로 둔 CP HTTPS
+  leaf를 발급했다. leaf SHA-256은 `317368f9…15c9`, 만료는 2026-12-29
+  00:15 KST이며 private key는 operator-private 경로 밖으로 내보내지 않았다.
+- Card 152 inventory는 5행이지만 필수값 71개가 비어 있다. 정본 lint와 두
+  readiness probe는 각각 `inventory-values-missing`과 `inventory-not-ready`로
+  차단됐으며 이를 PASS로 세지 않았다. focused Python 시험은 68 passed다.
+- 첫 state의 `18443` 충돌은 숨기지 않고 실패 증거로 보존했다. 최종 state는
+  immutable identity에 `18444`를 처음부터 넣었다. 공개 증거에는 비밀·DSN·
+  tenant·epoch·nonce가 없다. [[사내망_PKI_LAN_pilot_운영절차_Codex]],
+  [[2026-09-30_00-10-21_KST_사내망_PKI_LAN_pilot_Codex]].
 
 # Codex 작업 현황
 

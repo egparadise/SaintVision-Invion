@@ -38,6 +38,32 @@ only. The runtime role inherits `inv_kernel`, has no ownership or RLS bypass.
 Keep the state directory: it contains the independently generated recovery epoch
 and CA. A partial failure is preserved for inspection, never reset automatically.
 
+When Docker Desktop must not be used on the Control Plane host, `init` also
+accepts `--admin-dsn-file` and `--runtime-dsn-file`. Both files must describe a
+passwordless loopback connection to `saintvision_lan`; the supported boundary is
+an operator-owned SSH tunnel to a remote database that itself publishes only on
+the remote loopback address. `deploy/lan/prepare-pilot-database.sh` creates that
+digest-pinned, separately named database without deleting or reusing another
+pilot. `--download-port` and `--node-port` let a fresh state avoid ports owned by
+an older preserved pilot. A Node port is part of the immutable manifest identity
+and is never changed after a CSR has been prepared.
+
+An intranet issuing intermediate can replace the seven-day self-signed pilot CA
+by supplying all of `--ca-key`, `--ca-key-password-file`, and `--ca-chain` to the
+first `init`. The chain is ordered issuing intermediate then offline root. The
+encrypted intermediate key remains in the ignored operator directory; Node
+private keys are still created only by `prepare-worker.sh` on their assigned
+hosts. `tools/intranet_pki.py` creates the root/intermediate, issues the CP HTTPS
+certificate, and maintains the intermediate CRL.
+
+For a Linux remote build, use the digest-pinned
+`deploy/lan/Dockerfile.node.remote`, save the image and its `docker image
+inspect` JSON on that host, then pass both to `bundle --prebuilt-image ...
+--prebuilt-inspect ...`. The bundle command validates the archive config digest,
+layers, runtime fields, and tag without contacting local Docker. This path is
+for an exact Git source archive; it is not permission to reuse an image from an
+older source SHA.
+
 The download service exposes only the requesting Node's `worker.zip`,
 `node-cert.pem`, optional workspace bundle, and its own `/healthz`. It binds only
 the configured LAN address and maps the TCP source address to one configured
@@ -223,6 +249,14 @@ harmless idempotent opt-out: it persists
 `serverNodeColocationAllowed: false`, reports empty `disabledNodes` and
 `channels`, and does not alter any independent Node. It is not evidence that a
 co-located identity or channel ever existed.
+
+For an ordinary Node certificate, run `revoke-node-certificate --node-id ...
+--reason ...` before publishing another bootstrap bundle. It writes the private
+state revocation marker first and then disables the pinned DB channel with its
+monotonic version/audit record. Restart the bootstrap server so its in-memory
+allowlist drops the revoked Node. Also run `tools/intranet_pki.py revoke` for the
+same public leaf so the intermediate CRL records the serial. Stopping only the
+container, or writing only the CRL, is not complete Node revocation.
 
 ## Worker enrollment
 
