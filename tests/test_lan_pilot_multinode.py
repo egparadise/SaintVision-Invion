@@ -474,7 +474,7 @@ def test_bundle_emits_distinct_node_archives_and_ip_scoped_downloads(tmp_path, m
         lan_pilot.artifact_for_client(configured, public, "192.168.45.99", "/worker.zip")
 
 
-def test_external_intermediate_is_copied_encrypted_and_signs_control_identity(tmp_path):
+def test_external_intermediate_stays_central_and_signs_control_identity(tmp_path):
     ca_dir = tmp_path / "ca"
     state_dir = tmp_path / "pilot"
     state_dir.mkdir()
@@ -495,9 +495,19 @@ def test_external_intermediate_is_copied_encrypted_and_signs_control_identity(tm
 
     assert result["caMode"] == "external-intermediate"
     assert (state_dir / "ca.pem").read_bytes() == paths["chain"].read_bytes()
-    with pytest.raises(TypeError):
-        serialization.load_pem_private_key((state_dir / "ca-key.pem").read_bytes(), password=None)
-    key = lan_pilot.load_pilot_ca_key(state_dir)
+    assert not (state_dir / "ca-key.pem").exists()
+    assert not (state_dir / "ca-key.pass").exists()
+    (state_dir / "private-state.json").write_text(
+        json.dumps({**configured, "caMode": "external-intermediate"}), encoding="utf-8"
+    )
+    with pytest.raises(ValueError, match="all required"):
+        lan_pilot.load_pilot_ca_key(state_dir)
+    key = lan_pilot.load_pilot_ca_key(
+        state_dir,
+        key_path=paths["intermediate_key"],
+        password_path=paths["intermediate_password"],
+        chain_path=paths["chain"],
+    )
     intermediate = x509.load_pem_x509_certificate(paths["intermediate_certificate"].read_bytes())
     assert key.public_key().public_bytes_raw() == intermediate.public_key().public_bytes_raw()
     control = x509.load_pem_x509_certificate((state_dir / "control-cert.pem").read_bytes())
@@ -613,7 +623,23 @@ def test_status_rows_keep_partial_nodes_visible(monkeypatch):
                     return Result(dict(node_id=node_id, status="online", heartbeat_at="now"))
                 return Result(None)
             if node_id == nodes[0]["nodeId"]:
-                return Result(dict(received_at="now", snapshot={"cpu": 4}))
+                return Result(
+                    dict(
+                        received_at="now",
+                        snapshot={
+                            "tenantId": configured["tenantId"],
+                            "recoveryEpoch": configured["epoch"],
+                            "nonce": "secret-challenge",
+                            "observedAt": "then",
+                            "profileVersion": "lan-observe-v1",
+                            "osType": "linux",
+                            "agentVersion": "0.1.0",
+                            "cpuCapacityMillis": 4000,
+                            "memoryCapacityBytes": 8000,
+                            "memoryAvailableBytes": 6000,
+                        },
+                    )
+                )
             return Result(None)
 
     class Transaction:
@@ -636,5 +662,16 @@ def test_status_rows_keep_partial_nodes_visible(monkeypatch):
         (nodes[1]["nodeId"], "192.168.45.82"),
     ]
     assert rows[0]["observed"] is True
+    assert rows[0]["snapshot"] == {
+        "receivedAt": "now",
+        "observedAt": "then",
+        "profileVersion": "lan-observe-v1",
+        "osType": "linux",
+        "agentVersion": "0.1.0",
+        "cpuCapacityMillis": 4000,
+        "memoryCapacityBytes": 8000,
+        "memoryAvailableBytes": 6000,
+    }
+    assert not {"tenantId", "recoveryEpoch", "nonce"} & set(rows[0]["snapshot"])
     assert rows[1]["node"] is None
     assert rows[1]["observed"] is False

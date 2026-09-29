@@ -171,6 +171,10 @@ def ensure_pilot_pki(path, state, args):
                 != hashlib.sha256(chain_raw).digest()
             ):
                 raise ValueError("Existing pilot CA differs from requested external CA")
+        if state.get("caMode") == "external-intermediate" and any(
+            (path / name).exists() for name in ("ca-key.pem", "ca-key.pass")
+        ):
+            raise ValueError("External issuing key must not be copied into pilot state")
         return state
     if external:
         key_raw, password, chain_raw, ca_key, ca_cert = _load_external_ca(
@@ -191,7 +195,6 @@ def ensure_pilot_pki(path, state, args):
         f'spiffe://saintvision.ai/tenant/{state["tenantId"]}/control-plane/epoch/{state["epoch"]}',
     )
     material = [
-        ("ca-key.pem", key_raw),
         ("control-key.pem", private_pem(control_key)),
         ("control-cert.pem", pem(control)),
         ("signer-key.pem", private_pem(signing_key)),
@@ -203,14 +206,25 @@ def ensure_pilot_pki(path, state, args):
         ),
         ("ca.pem", chain_raw),
     ]
-    if password is not None:
-        material.append(("ca-key.pass", password))
+    if state["caMode"] == "pilot-self-signed":
+        material.append(("ca-key.pem", key_raw))
     for name, data in material:
         write(path / name, data)
     return state
 
 
-def load_pilot_ca_key(path):
+def load_pilot_ca_key(path, *, key_path=None, password_path=None, chain_path=None):
+    state = load(path) if (path / "private-state.json").is_file() else {}
+    if state.get("caMode") == "external-intermediate" or any(
+        value is not None for value in (key_path, password_path, chain_path)
+    ):
+        _, _, chain_raw, key, _ = _load_external_ca(key_path, password_path, chain_path)
+        if (
+            hashlib.sha256((path / "ca.pem").read_bytes()).digest()
+            != hashlib.sha256(chain_raw).digest()
+        ):
+            raise ValueError("External issuing chain differs from pilot trust bundle")
+        return key
     password_path = path / "ca-key.pass"
     password = password_path.read_bytes().strip() if password_path.is_file() else None
     key = serialization.load_pem_private_key((path / "ca-key.pem").read_bytes(), password=password)
@@ -926,7 +940,12 @@ def enroll(args):
             )
     else:
         ca = x509.load_pem_x509_certificate((path / "ca.pem").read_bytes())
-        key = load_pilot_ca_key(path)
+        key = load_pilot_ca_key(
+            path,
+            key_path=getattr(args, "ca_key", None),
+            password_path=getattr(args, "ca_key_password_file", None),
+            chain_path=getattr(args, "ca_chain", None),
+        )
         cert = issue(
             key,
             ca,
@@ -1086,6 +1105,21 @@ def node_status_rows(state):
                 "SELECT received_at,snapshot FROM inv.node_resource_snapshots WHERE node_id=%s",
                 (node["nodeId"],),
             ).fetchone()
+            public_snapshot = None
+            if snap:
+                snapshot = snap["snapshot"] if isinstance(snap, dict) else snap[1]
+                received_at = snap["received_at"] if isinstance(snap, dict) else snap[0]
+                if isinstance(snapshot, dict):
+                    public_snapshot = dict(
+                        receivedAt=received_at,
+                        observedAt=snapshot.get("observedAt"),
+                        profileVersion=snapshot.get("profileVersion"),
+                        osType=snapshot.get("osType"),
+                        agentVersion=snapshot.get("agentVersion"),
+                        cpuCapacityMillis=snapshot.get("cpuCapacityMillis"),
+                        memoryCapacityBytes=snapshot.get("memoryCapacityBytes"),
+                        memoryAvailableBytes=snapshot.get("memoryAvailableBytes"),
+                    )
             result.append(
                 dict(
                     nodeId=node["nodeId"],
@@ -1095,7 +1129,7 @@ def node_status_rows(state):
                     disabledReason=node.get("disabledReason"),
                     node=dict(row) if row else None,
                     observed=bool(snap),
-                    snapshot=dict(snap) if snap else None,
+                    snapshot=public_snapshot,
                 )
             )
     return result
@@ -1302,6 +1336,9 @@ def main():
     )
     p = commands.add_parser("enroll")
     p.add_argument("--csr", type=Path, required=True)
+    p.add_argument("--ca-key", type=Path, help="Encrypted external issuing key")
+    p.add_argument("--ca-key-password-file", type=Path, help="Password file for --ca-key")
+    p.add_argument("--ca-chain", type=Path, help="External issuing chain already pinned by init")
     commands.add_parser("status")
     p = commands.add_parser("observe")
     p.add_argument("--once", action="store_true")

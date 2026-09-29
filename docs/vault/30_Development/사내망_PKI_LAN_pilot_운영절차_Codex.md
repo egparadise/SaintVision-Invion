@@ -1,10 +1,10 @@
 ---
 doc_id: "OPS-INTRANET-PKI-LAN-001"
 title: "사내망 PKI와 LAN pilot 운영 절차"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T00:37:05+09:00"
+updated: "2026-09-30T00:44:29+09:00"
 source_of_truth: "Git"
 ---
 
@@ -36,6 +36,8 @@ G-19/G-24 입력을 사내 LAN에서 준비한다. Control Plane은 Windows
 root는 10년, intermediate는 3년, CP HTTPS leaf는 90일, pilot Node leaf는
 기존 fail-closed bootstrap 정책대로 최대 6일이다. private key는 암호화된
 PKCS#8이고 passphrase 파일과 분리한다. chain 순서는 intermediate, root다.
+pilot state에는 public chain만 pin하며 intermediate key·password를 복제하지
+않는다. 후속 `enroll`은 중앙 CA의 세 입력을 다시 명시해야 한다.
 
 ```powershell
 .venv\Scripts\python.exe tools/intranet_pki.py `
@@ -96,6 +98,12 @@ identity에 넣었다. 기존 pilot의 `18443` 점유를 발견한 첫 state는 
 SPIFFE identity, Node IP SAN, serverAuth EKU를 선택하고 DB channel에
 fingerprint를 pin한다. Node는 독립 전달된 leaf file SHA-256을 확인한 뒤
 `finish-worker.sh`를 실행한다.
+
+외부 CA mode의 `enroll`에는 `--ca-key`, `--ca-key-password-file`,
+`--ca-chain`을 중앙 `.work/intranet/ca` 경로로 모두 넘긴다. 하나라도 빠지거나
+init 때 pin한 chain과 다르면 발급 전에 실패한다.
+`status`와 `observe`의 snapshot 출력은 tenant ID, recovery epoch, nonce를
+제거하고 profile·capacity·관측 시각만 보여 준다.
 
 2026-09-30 00:08 KST 실측은 다음과 같다.
 

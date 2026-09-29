@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-CODEX-20260930-CARD150"
 title: "사내망 PKI와 LAN pilot 재수립"
-version: "1.0.2"
+version: "1.0.4"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T00:37:05+09:00"
+updated: "2026-09-30T00:44:29+09:00"
 source_of_truth: "Git"
 ---
 
@@ -24,6 +24,12 @@ source_of_truth: "Git"
   빌드한 뒤 archive/config/layer/runtime 결속을 검증했다.
 - Node private key는 `.143`과 `.210`의 `prepare-worker.sh`가 로컬 생성했다.
   CP로 가져온 것은 CSR뿐이며 private key export는 0건이다.
+- 자체감사에서 encrypted intermediate와 password를 pilot state에 함께
+  복제한 경계를 제거했다. public chain만 pin하고 후속 enrollment가 중앙 CA
+  key/password/chain을 매번 명시하도록 fail-closed로 바꿨다.
+- 같은 감사에서 `status`/`observe` snapshot의 tenant ID·epoch·nonce 출력을
+  제거하고 profile·capacity·관측 시각만 남겼다. 실제 v2 state status는 DB
+  ready, configured 3, observed 2를 유지했다.
 
 ## 실측 결과
 

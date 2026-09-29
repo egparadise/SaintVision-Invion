@@ -56,6 +56,11 @@ private keys are still created only by `prepare-worker.sh` on their assigned
 hosts. `tools/intranet_pki.py` creates the root/intermediate, issues the CP HTTPS
 certificate, and maintains the intermediate CRL.
 
+Only the public chain is pinned into pilot state. The external issuing key and
+its password are not copied beside the pilot DB credentials. Each external-CA
+`enroll` repeats `--ca-key`, `--ca-key-password-file`, and `--ca-chain`; omission
+fails closed before a certificate is issued.
+
 For a Linux remote build, use the digest-pinned
 `deploy/lan/Dockerfile.node.remote`, save the image and its `docker image
 inspect` JSON on that host, then pass both to `bundle --prebuilt-image ...
@@ -123,7 +128,11 @@ used; enrollment reads the CSR common name and selects the already assigned
 Node ID rather than relying on command order:
 
 ```powershell
-python tools/lan_pilot.py --state C:/Project/SaintVision-Invion/.work/lan-pilot enroll --csr <node-csr.pem>
+python tools/lan_pilot.py --state C:/Project/SaintVision-Invion/.work/lan-pilot enroll `
+  --csr <node-csr.pem> `
+  --ca-key C:/Project/SaintVision-Invion/.work/intranet/ca/intermediate/private/intermediate-key.pem `
+  --ca-key-password-file C:/Project/SaintVision-Invion/.work/intranet/ca/intermediate/private/intermediate-key.pass `
+  --ca-chain C:/Project/SaintVision-Invion/.work/intranet/ca/intermediate/certs/ca-chain.pem
 ```
 
 Send that command's certificate file SHA-256 to the matching worker over the
