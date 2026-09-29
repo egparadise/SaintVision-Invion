@@ -124,6 +124,11 @@ source_of_truth: "Git"
 - PR #159 Claude r3의 비차단 관찰을 #159 위 PR #173으로 분리했다. S3 checkout은 persisted provider를 exact resolve하고, collect는 locator prefix를 `deleting` 커밋 전에 검증하며, begin/prefix drift는 `STORE-0001`/503/retryable로 통일했다. malformed locator 422와 upload content identity 409는 유지한다.
 - restore의 새 요청은 Run state/version/attempt를 checkpoint pin보다 먼저 검증해 `GRAPH-0003`을 유지한다. object byte/delete 호출 11곳의 provider mismatch guard 순서를 회귀 시험으로 고정했다.
 - Claude 조건부 검토 뒤 실제 checkout 호출 지점과 ResultStore prepare/complete·ShardCompletion once의 mismatch 동작 시험을 보강해 focused 26 passed, 최종 head `f02dacf6`이다. hosted Backend `36377648185`는 3.12/3.14 각각 3077 passed/47 skipped/2 deselected/0 failed, Core `36377648156`은 3383 passed/36 skipped/2 deselected/0 failed와 exact skip gate, S01은 2+3 passed, Docs·desktop-browser도 success다. Claude 재대조 r2는 해당 head를 승인했으며, #159 병합 뒤 retarget·병합은 코디네이터 담당이다. 로컬 실 PG·Docker는 미실행이다. [[2026-09-28_12-40-00_KST_S3_ObjectStore_관찰후속_Codex]].
+## 2026-09-29 카드 122 Medium 후속 — legacy audit write optional idempotency
+
+- workspace tool, member role/삭제, user/project/workspace status, capability offer 7개가 FE의 선택적 `Idempotency-Key`를 실제 소비한다. live 권한 preflight 뒤 bounded advisory lock→ledger replay를 수행하고, replay는 service·audit·ledger 재기록이 0이다. 최초 service/audit/ledger는 한 transaction이다.
+- PG-free 91 passed; real PG member role replay에 동일 response·audit 1행·ledger 1행 단언을 추가해 hosted 대기다. key 없음 동작·공개 schema·migration은 불변이다. [[2026-09-29_02-30-04_KST_legacy_write_optional_idempotency_Codex]].
+
 ## 2026-09-29 카드 122 Medium 후속 — storage contribution idempotency
 
 - 선택적 key가 있으면 bounded advisory lock→ledger read→service/audit→ledger write를 한 transaction에 결속해 동시 최초 요청의 두 번째 side effect와 ledger unique 500을 막는다. key가 없으면 registered path unique만 `GRAPH-INVALID-TRANSITION`/409로 번역하고 unknown IntegrityError는 전파한다.

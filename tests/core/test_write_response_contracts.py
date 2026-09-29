@@ -64,6 +64,12 @@ class ContractSession:
     def execute(self, *_args, **_kwargs):
         return None
 
+    def get(self, *_args, **_kwargs):
+        return SimpleNamespace(
+            tenant_id=uuid.UUID("00000000-0000-4000-8000-000000000041"),
+            project_id="prj_contract_create",
+        )
+
 
 def _client(monkeypatch, kind: str, service_result: dict) -> tuple[TestClient, str, str, dict]:
     principal = Principal(
@@ -104,6 +110,9 @@ def _client(monkeypatch, kind: str, service_result: dict) -> tuple[TestClient, s
         return TestClient(app, raise_server_exceptions=False), "POST", "/v1/discovery/candidates/ann_contract_candidate/admission", {}
 
     monkeypatch.setattr(settings_routes.settings_service, "require_global_administrator", lambda *_a, **_k: None)
+    monkeypatch.setattr(
+        settings_routes.settings_service, "require_administrator", lambda *_a, **_k: None
+    )
     monkeypatch.setattr(settings_routes, "_audit", lambda *_a, **_k: None)
     if kind == "member":
         monkeypatch.setattr(settings_routes.settings_service, "set_member_role", lambda *_a, **_k: service_result)
