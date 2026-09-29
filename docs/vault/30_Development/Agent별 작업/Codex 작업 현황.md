@@ -1,7 +1,7 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.221"
+version: "1.0.224"
 status: "review"
 author: "Codex"
 updated: "2026-09-29T03:40:51+09:00"
@@ -62,6 +62,13 @@ source_of_truth: "Git"
 - PR #159 Claude r3의 비차단 관찰을 #159 위 PR #173으로 분리했다. S3 checkout은 persisted provider를 exact resolve하고, collect는 locator prefix를 `deleting` 커밋 전에 검증하며, begin/prefix drift는 `STORE-0001`/503/retryable로 통일했다. malformed locator 422와 upload content identity 409는 유지한다.
 - restore의 새 요청은 Run state/version/attempt를 checkpoint pin보다 먼저 검증해 `GRAPH-0003`을 유지한다. object byte/delete 호출 11곳의 provider mismatch guard 순서를 회귀 시험으로 고정했다.
 - Claude 조건부 검토 뒤 실제 checkout 호출 지점과 ResultStore prepare/complete·ShardCompletion once의 mismatch 동작 시험을 보강해 focused 26 passed, 최종 head `f02dacf6`이다. hosted Backend `36377648185`는 3.12/3.14 각각 3077 passed/47 skipped/2 deselected/0 failed, Core `36377648156`은 3383 passed/36 skipped/2 deselected/0 failed와 exact skip gate, S01은 2+3 passed, Docs·desktop-browser도 success다. Claude 재대조 r2는 해당 head를 승인했으며, #159 병합 뒤 retarget·병합은 코디네이터 담당이다. 로컬 실 PG·Docker는 미실행이다. [[2026-09-28_12-40-00_KST_S3_ObjectStore_관찰후속_Codex]].
+## 2026-09-29 Card111 AC-11 security critical/high hosted scan — PR #226 r1 조치·hosted PASS·재검토 요청
+
+- branch `agent/codex/ac11-security-hosted-scan`, base #217 승인 head `35c5b207`, owner Codex·reviewer Claude. 기본 CI에는 넣지 않고 label `run-ac11-security` 또는 `workflow_dispatch`로만 실행하는 credential 0 hosted lane을 추가한다. `pip-audit`는 PyPI/vulnerability database를 쓰므로 외부 서비스 0으로 표기하지 않는다.
+- `pip-audit 2.10.1`은 `requirements-core.txt`의 모든 취약점을 high로 보수 분류하고, `bandit 1.9.4`는 두 production Python tree의 HIGH를 수집한다. finding은 설명·source snippet 없이 stable ID만 남기며 allowlist는 exact ID·사유·만료를 요구한다.
+- AC-11 집계기는 기존 definer/RLS/VF와 새 `SEC-SCAN-001` 네 report를 모두 요구한다. Claude r1의 provenance 미결속·Bandit parse error·freshness·direct pin 공백은 canonical run/artifact JSON과 zip digest를 재검증하는 importer, exact source inventory, 30일 freshness로 닫았다. registry target은 바꾸지 않아 `be99a506…` repin은 없다.
+- 첫 실제 scan `36442219055`은 Git wire object SHA-1을 Bandit `B324` HIGH로 찾았고 `usedforsecurity=False`로 제품을 정정했다. r1 조치 head `ac374c49` run `36446788145`는 dependency 41·Python file 179·critical/high 0으로 success다. artifact `10980753683`, GitHub/direct zip digest `335d0398…98de`, payload `00c7c9e8…56dd`를 importer로 결속해 aggregator `MEASURED_PASS`를 재현했다. focused 101 passed이고 AC-11 전체는 다른 필수 축 때문에 미완료다. [[2026-09-29_00-08-48_KST_AC11_security_critical_high_scan_Codex]].
+
 ## 2026-09-28 Card96 S11 AC-11 composite long-soak registry repin — Claude 검토 요청
 
 - branch `agent/codex/ac11-composite-long-soak-repin`, base #204 cascade head `887e4f08`, #214 설계 merge `a4e0c466`. 정본 registry에 `s11-ac11-composite-long-soak-v0`를 새 ID로 추가하고 blob `be99a506…`에 aggregator·migration importer·physical importer를 함께 repin했다. migration target 문서는 docs commit `4c68bc8e`의 graph 파생 tail 규칙과 blob `55ee8b65…`에 재결속했다.
