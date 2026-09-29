@@ -59,11 +59,13 @@ def test_minio_script_pins_image_and_keeps_container_boundary():
         'printf \'%s\\n\' "$ADMIN_ALIAS" "$SVC_KEY" "$SVC_SECRET"',
         "IFS= read -r MC_HOST_local",
         "exec stdin, never host process arguments",
+        '$ROOT_ENV:/run/secrets/root.env:ro',
         "/usr/bin/mc version enable local/saintvision-pitr",
     ):
         assert required in script
     assert "MINIO_CERTS_DIR" not in script
     assert '-e "MC_HOST_local=$ADMIN_ALIAS"' not in script
+    assert '--env-file "$ROOT_ENV"' not in script
     for forbidden in ("docker system", "docker volume prune", "docker image prune", "sudo "):
         assert forbidden not in script
     assert '$CONFIG_DIR:/run/saintvision-intranet' not in script

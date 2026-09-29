@@ -86,13 +86,15 @@ set -- docker run -d \
   --tmpfs /tmp:rw,noexec,nosuid,nodev,size=67108864 \
   --security-opt no-new-privileges \
   --cap-drop ALL \
-  --env-file "$ROOT_ENV" \
+  -v "$ROOT_ENV:/run/secrets/root.env:ro" \
   -v "$DATA_DIR:/data" \
   -p "$BIND_ADDRESS:$PORT:9000"
 if [ "$TLS_ENABLED" = true ]; then
   set -- "$@" -v "$CERT_DIR:/certs:ro"
 fi
-set -- "$@" "$IMAGE" server /data --address :9000
+set -- "$@" --entrypoint /bin/sh "$IMAGE" -ceu \
+  '. /run/secrets/root.env; export MINIO_ROOT_USER MINIO_ROOT_PASSWORD; exec /usr/bin/minio "$@"' shell \
+  server /data --address :9000
 [ "$TLS_ENABLED" = true ] && set -- "$@" --certs-dir /certs
 "$@" >/dev/null
 
