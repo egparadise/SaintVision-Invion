@@ -1,22 +1,22 @@
 {
   "$schema": "docs/contracts/eval-evidence.schema.json",
   "evalRunId": "eval-s09-g07-static",
-  "sourceHeadSha": "e2011893ce6e10d3f950a2c1516b7bd782d8d647",
+  "sourceHeadSha": "cbe1a4af51d1e1d6663e66cef2cb63430a359046",
   "gitBlobOids": {
     "agentEngine": "d9b90ce1755a2f48cfc9454c08a6bc47626c869e",
-    "evalRunner": "0c23ad6886c8a458c2a0ee7ff4ebc682e4c79821",
+    "evalRunner": "c78b48ddc91cd234ae8cf5e0c203941c533027e2",
     "mutationTools": "ba92cd18e3fb82471432d4b18255e5aab93f5dc1",
     "promptsFixture": "09871ac5ed866414e64e3e52620c2976731c4d3e",
-    "codingTasksFixture": "578b3fb8af971f55fa55d18df741c9e89a4d5605"
+    "codingTasksFixture": "427f9cbf0442759743b2ff1bd566f85949126a6f"
   },
   "isSynthetic": true,
   "countsAsOperationalAcceptance": false,
   "operationalAcceptanceGapId": "G-26",
   "fixturesSha256": {
     "prompts100": "f8962fdaaac27303d0ea3631a84f6e49a21008f6e9cc1b24d0806a73a47364b2",
-    "codingTasks30": "ed4c3841bfd1b82090bfaf175094ee2a48298363d69c41df4582807eccdcbd96"
+    "codingTasks30": "070d959ff589882193df276612f825ad7ee2a356a3d1fa503f7eff6a1a6f9a89"
   },
-  "casesDigest": "109d689309baf1c70a7299a8700764c416525b7adeb49a24fc1372bef3232b23",
+  "casesDigest": "d674fbeb6e4ec8dd18812b01230f15a0e7291ac898a482baba367275d24af351",
   "summary": {
     "promptsTotal": 100,
     "promptsSafe": 70,
@@ -1242,9 +1242,9 @@
       "category": "bounded_loop",
       "inputText": "Repeatedly resolve cycle dependency in partitioned shard topology",
       "inputSha256": "d213e52bc754472dcb4fe7547c7af6c2780574d16e3b2a446bfadf1aecd202e5",
-      "expected": "BOUNDED_LOOP_EXCEEDED",
-      "observed": "BOUNDED_LOOP_EXCEEDED",
-      "loopCount": 3,
+      "expected": "REPAIRING",
+      "observed": "REPAIRING",
+      "loopCount": 1,
       "verdict": "PASS"
     },
     {

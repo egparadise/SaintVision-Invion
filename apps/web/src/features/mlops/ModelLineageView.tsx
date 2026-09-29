@@ -457,7 +457,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
     }
   };
 
-  // G2 & G3 & H2: Invalidate in-flight responses, reset results, and rotate idempotency keys when form inputs change
+  // G2 & G3 & Card 138 & H2: Invalidate in-flight responses, reset results, and rotate idempotency keys when form inputs change
   const handleProjectIdChange = (val: string) => {
     setProjectId(val);
     setVerifyResult(null);
@@ -523,20 +523,26 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
     setVerifyTarget(null);
     verifyAbortControllerRef.current?.abort();
     verifyAbortControllerRef.current = null;
+    regAbortControllerRef.current?.abort();
+    regAbortControllerRef.current = null;
     pinAbortControllerRef.current?.abort();
     pinAbortControllerRef.current = null;
     relAbortControllerRef.current?.abort();
     relAbortControllerRef.current = null;
+    regGenerationRef.current++;
     pinGenerationRef.current++;
     relGenerationRef.current++;
     verifyGenerationRef.current++;
     setVerifyLoading(false);
+    setRegLoading(false);
     setPinLoading(false);
     setRelLoading(false);
+    setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
     setPinIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('pin'));
     setRelIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('rel'));
     setVerifyIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w3'));
   };
+
 
   const handleRegVersionChange = (val: string) => {
     setRegVersion(val);
@@ -753,7 +759,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       if (regGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
       handleApiError(err, '모델 버전 등록 실패');
     } finally {
-      setRegLoading(false);
+      if (regAbortControllerRef.current === ctrl || regGenerationRef.current === currentGen) {
+        setRegLoading(false);
+      }
     }
   };
 
@@ -798,7 +806,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       if (pinGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
       handleApiError(err, '보존 고정 연장 실패');
     } finally {
-      setPinLoading(false);
+      if (pinAbortControllerRef.current === ctrl || pinGenerationRef.current === currentGen) {
+        setPinLoading(false);
+      }
     }
   };
 
@@ -1110,7 +1120,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               id="reg-model-id"
               data-testid="input-model-id"
               type="text"
-              placeholder="mod_..."
+              placeholder="mdl_..."
               value={modelId}
               onChange={(e) => handleModelIdChange(e.target.value)}
               style={{

@@ -531,7 +531,7 @@ describe('S05-FE & S06-FE Product Defect Fixes Regression Suite', () => {
 
     // 3) Fire Escape while focus is inside active window
     await act(async () => {
-      windowDialog?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true }));
+      windowDialog?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     });
 
     // Expect: Start Menu is closed, but Window remains open!
@@ -541,7 +541,7 @@ describe('S05-FE & S06-FE Product Defect Fixes Regression Suite', () => {
 
     // 4) Fire Escape again when Start Menu is closed
     await act(async () => {
-      windowDialog?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true }));
+      windowDialog?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     });
 
     // Now window closes

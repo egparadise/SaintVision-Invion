@@ -11,23 +11,28 @@ import { runSyntheticEvalSuite } from '../apps/web/src/features/agent/evalRunner
 
 const rootDir = path.resolve(__dirname, '..');
 
-// 1. Determine target commit SHA
+// 1. Determine target commit SHA (Strictly Fail-Closed)
 let targetSha = process.argv[2];
 if (!targetSha) {
-  try {
-    targetSha = execSync('git rev-parse HEAD', { cwd: rootDir, encoding: 'utf-8' }).trim();
-  } catch {
-    targetSha = '5bf957c2064a022fe9e33553b682c73e20e1da1d';
-  }
+  targetSha = execSync('git rev-parse HEAD', { cwd: rootDir, encoding: 'utf-8' }).trim();
 }
 
-// Compute real Git Blob OIDs via git rev-parse <targetSha>:<path>
+// Strictly verify target commit exists and is of type commit
+try {
+  const objType = execSync(`git cat-file -t ${targetSha}`, { cwd: rootDir, encoding: 'utf-8' }).trim();
+  if (objType !== 'commit') {
+    throw new Error(`Target object ${targetSha} is '${objType}', expected 'commit'`);
+  }
+} catch (err: any) {
+  throw new Error(`FAIL-CLOSED: Target commit ${targetSha} does not exist or is invalid: ${err?.message || String(err)}`);
+}
+
+// Compute real Git Blob OIDs via git rev-parse <targetSha>:<path> (Strictly Fail-Closed)
 function getGitBlobOid(commitSha: string, relPath: string): string {
   try {
     return execSync(`git rev-parse ${commitSha}:${relPath}`, { cwd: rootDir, encoding: 'utf-8' }).trim();
-  } catch {
-    const buf = fs.readFileSync(path.join(rootDir, relPath));
-    return crypto.createHash('sha1').update(`blob ${buf.length}\0`).update(buf).digest('hex');
+  } catch (err: any) {
+    throw new Error(`FAIL-CLOSED: Failed to resolve blob OID for ${relPath} at commit ${commitSha}: ${err?.message || String(err)}`);
   }
 }
 

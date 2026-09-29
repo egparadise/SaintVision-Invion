@@ -32,28 +32,9 @@ const HEX_64_REGEX = /^[0-9a-f]{64}$/;
 const MEASUREMENT_ID_REGEX = /^mvm_[0-9A-HJKMNP-TV-Z]{26}$/;
 const EVAL_RUN_ID_REGEX = /^evr_[0-9A-HJKMNP-TV-Z]{26}$/;
 const ADAPTER_REGEX = /^[a-z0-9-]+$/;
-const ISO_DATE_TIME_REGEX =
-  /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(Z|[+-]\d{2}:\d{2})$/;
 
-export function isValidIsoDateTime(value: unknown): boolean {
-  if (typeof value !== 'string') return false;
-  const match = ISO_DATE_TIME_REGEX.exec(value);
-  if (!match) return false;
-  const [, yStr, mStr, dStr, hStr, minStr, sStr] = match;
-  const year = parseInt(yStr, 10);
-  const month = parseInt(mStr, 10);
-  const day = parseInt(dStr, 10);
-  const hour = parseInt(hStr, 10);
-  const min = parseInt(minStr, 10);
-  const sec = parseInt(sStr, 10);
-  if (month < 1 || month > 12) return false;
-  if (hour < 0 || hour > 23 || min < 0 || min > 59 || sec < 0 || sec > 60) return false;
-  const isLeap = (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0));
-  const daysInMonth = [31, isLeap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-  if (day < 1 || day > daysInMonth[month - 1]) return false;
-  const parsed = Date.parse(value);
-  return !Number.isNaN(parsed);
-}
+import { isValidIsoDateTime } from '@/shared/utils/dateTime';
+export { isValidIsoDateTime };
 
 export function generateIdempotencyKey(prefix = 'idem'): string {
   const bytes = new Uint8Array(8);

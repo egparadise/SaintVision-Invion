@@ -211,7 +211,7 @@ export const ReleaseCandidateView: React.FC<ReleaseCandidateViewProps> = ({ init
                         {slo.status === 'met'
                           ? '모의 MET (미측정)'
                           : slo.status === 'unmeasured'
-                          ? 'UNMEASURED (미측정 · 모의 MET (미측정) 대기)'
+                          ? 'UNMEASURED (미측정) · 모의 MET (미측정)'
                           : 'BREACHED'}
                       </span>
                     </td>
