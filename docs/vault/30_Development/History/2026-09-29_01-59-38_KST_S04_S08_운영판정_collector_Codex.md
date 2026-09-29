@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CODEX-S04-S08-OPERATIONAL-COLLECTOR-001"
 title: "S04-DB 재전송·S08-DB 보존 운영 판정 collector"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-29T01:59:38+09:00"
+updated: "2026-09-29T02:14:34+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S04-DB", "S08-DB"]
@@ -13,6 +13,11 @@ tags: ["s04-db", "s08-db", "evidence", "collector", "postgresql", "operational-a
 ---
 
 # S04-DB·S08-DB 운영 판정 collector
+
+## 독립 검토 r1 정정
+
+- PG-free와 실 PG 시험의 basename 충돌을 제거해 hosted 전체 수집이 중단되지 않도록 실 PG 파일을 `test_s04_s08_operational_evidence_real_pg.py`로 바꿨다.
+- core 제품에는 `run.cancel*` audit producer가 없으므로, collector가 직접 넣은 audit fixture를 운영 취소 이력으로 간주하지 않는다. (a)~(c)가 깨끗해도 O3는 `cancelHistorySource: absent`와 함께 `NOT_OBSERVED`이며, 실제 위반이 있으면 `MEASURED_FAIL`이다. 정본 producer 또는 C1-K 결속 전에는 O3 `MEASURED_PASS`가 불가능하다.
 
 ## 범위와 결론
 
@@ -33,6 +38,7 @@ O1 DB 집계는 실패·stale 행을 `MEASURED_FAIL`로 보존하지만, 100건�
 
 - PG-free `tests/core/test_s04_s08_operational_evidence.py`: **7 passed**. 0행·사유 합계·core/kernel 분리·O1 거짓 PASS·criteria/clean tree/DB binding·C1-K·overwrite·secret/redacted error·unsafe label 변이를 고정했다.
 - real PG `tests/integration/test_s04_s08_operational_evidence_real_pg.py`: valid 1, valid 뒤 later rejected 1, approval 없음·expired·digest mismatch·선행 cancel 각 1을 실제 migration DB에 넣어 `attempt 6 / valid 2 / violation 4`와 사유별 1을 확인한다. 로컬 Python 3.10은 integration conftest의 `StrEnum`을 import하지 못해 **미실행**이며, PR의 hosted Core Python 3.12에서 실행한다.
+- real PG `tests/core/test_s04_s08_operational_evidence.py`: valid 1, valid 뒤 later rejected 1, approval 없음·expired·digest mismatch·선행 cancel 각 1을 실제 migration DB에 넣어 `attempt 6 / valid 2 / violation 4`와 사유별 1을 확인한다. 로컬 Python 3.10은 integration conftest의 `StrEnum`을 import하지 못해 **미실행**이며, PR의 hosted Core Python 3.12에서 실행한다.
 - 공개 계약·migration 변경 0. 물리 Node 전송 재개, kernel C1-K, 운영 backup/PITR, retention/GC는 계속 `NOT_OBSERVED`/`BLOCKED_EXTERNAL`이다.
 
 재실행: `INV_AUDIT_DSN=<운영 owner DSN> python tools/collect_s04_s08_operational_evidence.py --label <안전한-label> --out-dir <evidence-dir>` (환경값은 기록하지 않는다).

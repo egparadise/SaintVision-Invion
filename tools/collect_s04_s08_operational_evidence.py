@@ -82,6 +82,7 @@ C1_REASONS = frozenset(
         "cancelled_before_attempt",
     }
 )
+CANCEL_HISTORY_SOURCE = "absent"
 
 
 # C1 is intentionally public/core-only.  ``inv.approval_requests`` and every
@@ -168,6 +169,7 @@ def evaluate_c1_summary(summary: dict[str, int]) -> dict[str, Any]:
         "validCount": valid_count,
         "violationCount": violation_count,
         "violationsByReason": reasons,
+        "cancelHistorySource": CANCEL_HISTORY_SOURCE,
     }
     if attempt_count == 0:
         return {
@@ -182,8 +184,11 @@ def evaluate_c1_summary(summary: dict[str, int]) -> dict[str, Any]:
             "metrics": metrics,
         }
     return {
-        "status": "MEASURED_PASS",
-        "reason": "every observed attempt satisfied core C1",
+        "status": "NOT_OBSERVED",
+        "reason": (
+            "approval and digest predicates were clean, but core has no canonical "
+            "cancel-history producer; complete C1 safety was not observed"
+        ),
         "metrics": metrics,
     }
 
@@ -392,6 +397,11 @@ def validate_evidence(evidence: dict[str, Any]) -> None:
     )
     if (evidence.get("excludedBoundaries") or {}).get("C1-K", {}).get("status") != "NOT_OBSERVED":
         raise ValueError("C1-K must remain explicitly excluded")
+    o3 = (evidence.get("observations") or {}).get("O3") or {}
+    if (o3.get("metrics") or {}).get("cancelHistorySource") != CANCEL_HISTORY_SOURCE:
+        raise ValueError("O3 must disclose the absent core cancel-history source")
+    if o3.get("status") == "MEASURED_PASS":
+        raise ValueError("O3 cannot pass without a canonical core cancel-history producer")
 
 
 def render_markdown(evidence: dict[str, Any]) -> str:

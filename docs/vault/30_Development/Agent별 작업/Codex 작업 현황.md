@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.206"
+version: "1.0.221"
 status: "review"
 author: "Codex"
-updated: "2026-09-29T01:59:38+09:00"
+updated: "2026-09-29T02:14:34+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
 
+## 2026-09-29 카드 123 — S04·S08 운영 판정 collector 검토 요청
+
+- 판정 기준 v1.1.1의 core C1을 REPEATABLE READ·READ ONLY 전수 SQL로 구현했다. attempt 시점 최신 approved·expiry·workload digest를 판정하고 kernel C1-K는 별도 `NOT_OBSERVED`로 고정한다. core 제품에 canonical cancel audit producer가 없음을 독립 검토에서 확인해, (a)~(c)가 깨끗해도 O3는 `cancelHistorySource: absent`/`NOT_OBSERVED`이며 위반만 `MEASURED_FAIL`이다.
+- O1 clean DB 집계는 publisher/consumer deployment identity 없이 `RECORDED_ONLY`; 물리 Node, 운영 backup/PITR, retention/GC와 미구현 producer는 그대로 차단한다. 시험 basename 충돌을 해소했고 PG-free 8 passed, real PG 6-attempt 부정 matrix는 hosted Core 재실행 대기다. 공개 계약·migration·registry status 변경 0. [[2026-09-29_01-59-38_KST_S04_S08_운영판정_collector_Codex]].
 ## 2026-09-28 Card36 hosted Core CX01 19 skip 실행 전환 — 검토 인계
 
 - base `9a837fd7`(#117 lock-wait skip map hotfix 포함), branch `agent/codex/cx01-hosted-core`, owner Codex/reviewer Claude. Core job이 고유 owner label·tmpfs·loopback으로 PostgreSQL 16을 직접 생성하고 같은 컨테이너를 recovery source/CX01 identity로 쓰며 `if: always()` 정리하는 설계를 고정했다.
