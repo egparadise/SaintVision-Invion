@@ -1,16 +1,16 @@
 ---
 doc_id: "HIST-20260930-CODEX-CARD151-001"
 title: "Card 151 사내 Storage U6/G-20·PITR G-22 구현과 실측"
-version: "1.2.1"
+version: "1.3.0"
 status: "review"
 author: "Codex"
 owner: "Codex"
 reviewer: "Claude"
-updated: "2026-09-30T01:06:00+09:00"
+updated: "2026-09-30T08:01:30+09:00"
 source_of_truth: "Git"
 task: "CARD-151"
 base_sha: "6fc0428b49f28379cb4da17830d92256b55c2eb2"
-implementation_sha: "0a768892e506059a61092ff3b83a7ebba1db2d82"
+implementation_sha: "a4f4dde6975fb01cbf3898c2752b1a96d8465ba8"
 pr: 248
 ---
 
@@ -29,6 +29,8 @@ pr: 248
 - `tools/render_intranet_object_store_config.py`: `providerId`, `endpoint`, `bucket`, `region`, `credentialFile`, `prefix` exact six-key block을 보호 `api.json`에 exclusive-write하고 legacy key·unknown key·자격증이 든 URL·비보호 경로를 거부한다.
 - `deploy/intranet/storage/rehearse-pilot-pitr.sh`: source mutation 전 physical WAL receiver 생존을 확인하고, `pg_basebackup`·`pg_receivewal`·MinIO upload/download digest·retention dry-run·`recovery_target_time` 복원·before/after marker를 결속한다.
 - PITR 전송 자격과 source PostgreSQL 자격은 각각 보호 파일 하나만 read-only mount하고 컨테이너 내부에서 읽는다. host process argument와 Docker `Config.Env`에는 자격을 남기지 않으며 broader config tree를 mount하지 않는다.
+- root credential도 단일 보호 파일 mount에서 process 시작 시 읽고 Docker `Config.Env`에 남기지 않는다. PITR credential의 `DeleteObject`를 제거하고 bucket versioning을 활성화했다.
+- PASS runner는 40-hex `SV_CODE_SHA`, 실제 streaming receiver, source `archive_mode`·server major, protected retention-tool hash를 요구한다. RTO는 download 시작부터 promotion까지이며 RPO는 이 bounded rehearsal이 측정하지 않으므로 `null`, 기존 간격은 `targetGapSeconds`다.
 - 운영 절차와 판정 경계는 [[사내 MinIO ObjectStore와 PITR 예행 runbook]]에 고정했다.
 
 ## 실측
@@ -43,6 +45,7 @@ pr: 248
 | physical replication | SSH reverse tunnel 이후 source Docker gateway에 replication HBA rule이 없어 거부 | BLOCKED_EXTERNAL |
 | target-time restore/RPO/RTO | source mutation 전 중단, restore 미시도, 수치 `null` | NOT_OBSERVED |
 | cleanup | 카드 전용 DB 0, 소유 container 0, tunnel 종료 | PASS |
+| latest deployment | `/data`, `/certs`, 단일 root secret file만 mount; root secret `Config.Env` 0; TLS roundtrip 6/6 | PASS |
 
 초기 HTTP 실측은 운영 U6 PASS로 올리지 않았다. Card 150 CA 발급기(PR #249)로 MinIO 전용 leaf를 발급한 뒤 strict six-key config endpoint를 HTTPS로 교체했고, reachable head `c075e669ada2205f234a297c940ae97be87434a0`에서 operational evidence와 별도 attestation의 SHA·시각을 exact 결속했다.
 
@@ -62,6 +65,7 @@ canonical preflight는 storage check만 PASS했고 전체는 PASS 1/FAIL 2/BLOCK
 - `git diff --check`: exit 0.
 - hosted PR #248 evidence head `c075e669`: Docs run `36592638603` success, Core의 `s01-storage-roundtrip` job도 success. 보안 후속 head `f420530a`의 Docs run `36594438509`도 success이며 Backend·desktop-browser는 본 기록 시점 진행 중이다.
 - PITR·source DB 자격 비노출 후속: `tests/test_intranet_storage_bundle.py` 4 passed, local·remote shell syntax와 `git diff --check` exit 0.
+- Claude F1~F12 후속 focused: storage bundle+cleanup inventory 6 passed. redacted evidence는 `docs/vault/30_Development/Evidence/card151-intranet-storage-redacted.json`에 codeSha·observedAt·source digest와 403/403을 고정했다.
 - canonical `tools/s01_readiness_preflight.py`: exit 1, 전체 FAIL(PASS 1/FAIL 2/BLOCKED 6), storage check만 `storage-operational-evidence-valid`; 미입력을 합성하지 않은 기대된 부분 판정이다.
 - focused 첫 재실행은 `PYTHONPATH`에서 `tools` 누락으로 두 모듈 collection error였고 통과로 세지 않았다. 정정한 `tools;src;services/control-plane/src` 환경에서 `11 passed`를 다시 확보했다. citation gate도 PR #249 전용 경로를 현 branch 실재 경로로 오인한 새 인용 1건을 제거한 뒤 PASS했다.
 - `python tools/sync_obsidian.py --check`: exit 3, 기존 unmanaged collision 15건(11 no-baseline, 4 both-diverged). 파일은 쓰지 않았고 `--apply`는 실행하지 않았다.

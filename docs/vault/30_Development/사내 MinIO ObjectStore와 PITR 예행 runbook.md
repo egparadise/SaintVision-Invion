@@ -1,7 +1,7 @@
 ---
 doc_id: "OPS-INTRANET-STORAGE-PITR-001"
 title: "사내 MinIO ObjectStore와 PITR 예행 runbook"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 owner: "Codex"
 reviewer: "Claude"
@@ -18,14 +18,14 @@ tags: ["intranet", "object-store", "minio", "pitr", "u6", "g-20", "g-22"]
 
 이 절차는 사내 ObjectStore 입력 U6/G-20과 물리 PITR 예행 G-22를 준비한다. HTTP MinIO 왕복은 사전 배선 확인일 뿐 운영 PASS가 아니다. U6 PASS는 사내 CA로 검증한 HTTPS endpoint에서 `tools/verify_storage_roundtrip.py --target-kind operational`이 여섯 check를 모두 통과하고, 같은 `codeSha`·`observedAt`의 별도 attestation을 `tools/s01_readiness_preflight.py`가 받아야 한다.
 
-PITR도 설정 관측과 실제 복원을 분리한다. `tools/pitr_readiness.py`의 `possible`은 복구 증거가 아니며, `tools/pitr_archive_retention.py`는 파일시스템 보존 계획기다. 이 카드의 runner는 `pg_basebackup`·연속 `pg_receivewal`·MinIO upload/download byte digest·`recovery_target_time` 격리 복원을 모두 실행할 때만 RPO/RTO를 낸다. source의 지속 archive 설정이 꺼져 있으면 runner 완료 뒤에도 상시 PITR readiness를 주장하지 않는다.
+PITR도 설정 관측과 실제 복원을 분리한다. `tools/pitr_readiness.py`의 `possible`은 복구 증거가 아니며, `tools/pitr_archive_retention.py`는 파일시스템 보존 계획기다. 이 카드의 runner는 `pg_basebackup`·연속 `pg_receivewal`·MinIO upload/download byte digest·`recovery_target_time` 격리 복원을 모두 실행할 때만 RTO를 낸다. 지속 장애 시점이 없는 bounded rehearsal은 RPO를 측정하지 않는다. source의 지속 archive 설정이 꺼져 있으면 runner 완료 뒤에도 상시 PITR readiness를 주장하지 않는다.
 
 ## 2. 비밀과 권한
 
 - root, 제품 service, PITR service credential은 Git 밖 `.work/intranet/`과 대상 노드의 mode 0700 config directory에만 둔다. 명령·PR·문서·Evidence에는 값이 없다.
 - `tools/generate_intranet_storage_secrets.py --directory .work/intranet`은 PITR credential 두 파일을 exclusive create하며 기존 파일을 덮어쓰지 않는다.
 - 제품 policy는 `saintvision/product/*`와 verifier 전용 `saintvision-u6/*`의 get/put/delete만 허용한다. bucket list와 PITR bucket 접근은 없다.
-- PITR policy는 별도 bucket의 `pilot/*` object와 그 prefix의 list만 허용한다. 제품 bucket 접근은 없다.
+- PITR policy는 별도 bucket의 `pilot/*` get/put과 그 prefix의 list만 허용한다. delete는 없고 bucket versioning을 활성화하며, 제품 bucket 접근도 없다.
 - `deploy/intranet/storage/provision-minio.sh`는 기존 컨테이너를 이름만으로 제거하지 않는다. owner/task label이 모두 일치할 때만 자기 컨테이너를 교체하고, 기존 Node 및 다른 프로젝트 컨테이너를 열거·수정하지 않는다.
 
 ## 3. MinIO 배포
@@ -90,9 +90,9 @@ attestation은 `executedBy`, `configurationProfile`, `runbookRevision`, `codeSha
 3. `pg_basebackup -Fp -X stream`과 synchronous `pg_receivewal`을 실행한다.
 4. before marker, UTC target time, after marker를 순서대로 commit하고 WAL switch 완료를 확인한다.
 5. `tools/pitr_archive_retention.py` 7일 dry-run을 실행한다.
-6. base backup·WAL을 별도 PITR credential로 MinIO에 업로드하고 새 directory로 다시 내려받아 전 파일 digest를 비교한다.
+6. base backup·WAL을 별도 PITR credential로 MinIO에 업로드하고 새 directory로 다시 내려받아 전 파일 digest를 비교한다. RTO 시계는 이 download 시작부터다.
 7. 내려받은 bytes만 사용해 network-none 격리 PostgreSQL을 `recovery_target_time`까지 복원한다.
-8. before 존재, after 부재, promotion을 확인한 뒤 RTO와 target 이전 마지막 복원 marker 기준 RPO를 기록한다.
+8. before 존재, after 부재, `NOT pg_is_in_recovery()`를 확인한 뒤 RTO를 기록한다. marker 간격은 `targetGapSeconds`이며 RPO로 세지 않는다.
 9. source disposable database와 owner/run label이 일치하는 자기 컨테이너만 정리한다.
 
 source가 Docker bridge 뒤에 있으면 physical replication HBA가 실제 client source를 허용해야 한다. 필요한 rule과 reload는 source 운영자가 별도 승인·적용한다. runner는 이 경계가 없으면 source database 생성 전에 중단한다. `archive_mode=off` source에 bounded receiver를 붙인 1회 예행은 상시 archive 구성이 아니다.
@@ -110,5 +110,7 @@ source가 Docker bridge 뒤에 있으면 physical replication HBA가 실제 clie
 | 실제 target-time restore·RPO/RTO | 실행 전 차단 | NOT_OBSERVED |
 
 2026-09-30 canonical preflight는 storage evidence 자체를 `storage-operational-evidence-valid`로 PASS했다. 그러나 전체 U6 입력은 운영 configuration route의 operator token이 없어서 BLOCKED이고, CP hostname/HTTPS endpoint·실 session token·완성된 5-node inventory도 아직 없다. 따라서 전체 결과는 PASS 1/FAIL 2/BLOCKED 6, `acceptanceAssessed=false`이며 S01 전체 합격으로 올리지 않는다. PITR는 physical replication HBA가 적용되기 전까지 계속 BLOCKED_EXTERNAL이다.
+
+bounded target-time rehearsal 보고의 `measuredRpoSeconds`는 `null`이다. 운영 RPO는 지속 archiver와 명시적 장애 시점, 마지막 복원 가능 commit을 가진 별도 drill에서 측정한다.
 
 되돌릴 때는 새 dispatch를 중지하고 product object 사용 여부를 확인한 뒤, owner label이 일치하는 MinIO 컨테이너만 중지한다. data directory, bucket, credential, PITR report는 자동 삭제하지 않는다. credential 회수는 scoped user를 disable한 뒤 별도 승인으로 수행한다. `docker system prune`, volume 삭제, 다른 컨테이너 조작은 이 runbook 범위 밖이다.

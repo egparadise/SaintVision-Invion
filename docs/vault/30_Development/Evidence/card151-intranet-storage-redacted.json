@@ -1,7 +1,7 @@
 {
   "schemaVersion": "card151-intranet-storage-redacted:1",
-  "codeSha": "5f7532523014b2abdef680a8cc136b7e532ecddc",
-  "observedAt": "2026-09-29T22:58:49.278436Z",
+  "codeSha": "a4f4dde6975fb01cbf3898c2752b1a96d8465ba8",
+  "observedAt": "2026-09-29T23:00:36.327799Z",
   "storageRoundtrip": {
     "status": "PASS",
     "targetKind": "operational",
@@ -13,8 +13,9 @@
       "delete": true,
       "cleanupVerified": true
     },
-    "sourceSha256": "f751d221fcd709fdb06b15e82bb1114fd5173dff760fba55ec035c577197f0e4",
-    "attestationSha256": "bb7d86b7be9ab9ddfff7163cfcc2b415c270d02c26e5df5153c0b83dff59079b"
+    "sourceSha256": "1aa5d9876037f3599e8a1cb065b3ae29414272f8682493acede5b473b4bff3d2",
+    "attestationSha256": "1f275df127c0c39a2631e956cfae659fcf18d4f0ee212c18dfcf164c519176ef",
+    "pitrBucketVersioningEnabled": true
   },
   "scopeNegative": {
     "productCredentialToPitrBucketStatus": 403,

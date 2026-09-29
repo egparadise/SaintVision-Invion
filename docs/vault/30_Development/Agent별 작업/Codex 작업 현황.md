@@ -1,15 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.229"
+version: "1.0.230"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T01:10:00+09:00"
+updated: "2026-09-30T08:05:00+09:00"
 source_of_truth: "Git"
 active_card: "CARD-151 intranet ObjectStore and PITR rehearsal"
-active_card_status: "PR 248 review; TLS operational U6 PASS, canonical S01 partial, source replication HBA blocked external"
-active_card_next: "Claude review; operator-approved physical replication boundary; Card 152 CP/token/inventory inputs"
+active_card_status: "PR 248 review follow-up; Claude F1-F12 remediated, TLS operational U6 PASS, G-22 replication HBA blocked external"
+active_card_next: "Claude re-review; continue Card 154 independent review and canonical preflight when corrected inputs land"
 ---
+
+## 2026-09-30 Card151 Claude F1-F12 보안·측정 경계 후속
+- PR #248에서 root·service·PITR 자격을 host argv와 Docker `Config.Env`에서 제거하고 단일 보호 파일 mount로 고정했다. PITR policy의 delete 권한을 제거하고 bucket versioning을 활성화했다.
+- bounded PITR rehearsal은 streaming receiver·source major·archive mode·retention tool hash를 확인하며, RTO를 download 시작부터 promotion까지 잰다. 지속 장애 시점이 없는 이 예행은 RPO를 측정하지 않아 `measuredRpoSeconds=null`로 남긴다.
+- 최신 TLS operational roundtrip은 6/6 PASS, 교차 bucket은 403/403이다. redacted evidence를 저장소에 고정했고 G-22는 replication HBA 미승인으로 계속 `BLOCKED_EXTERNAL`이다.
 
 # Codex 작업 현황
 
