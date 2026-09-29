@@ -50,6 +50,10 @@ const contracts = [
   { schema: 'conformance-status-recorded-response', output: 'conformance-status-recorded-response' },
   { schema: 'adapter-conformance-not-observed-response', output: 'adapter-conformance-not-observed-response' },
   { schema: 'adapter-conformance-recorded-response', output: 'adapter-conformance-recorded-response' },
+  { schema: 'run-record-response', output: 'run-record-response' },
+  { schema: 'run-record-artifact-page-response', output: 'run-record-artifact-page-response' },
+  { schema: 'artifact-pin-verification-response', output: 'artifact-pin-verification-response' },
+  { schema: 'context-bundle-response', output: 'context-bundle-response' },
 ];
 const mode = process.argv[2];
 
