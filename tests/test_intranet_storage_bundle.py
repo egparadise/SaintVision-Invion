@@ -54,12 +54,15 @@ def test_minio_script_pins_image_and_keeps_container_boundary():
         "partial TLS input is forbidden",
         'set -- "$@" --certs-dir /certs',
         '[ "$TLS_ENABLED" = true ] && admin_host="$BIND_ADDRESS"',
-        "timeout 3 docker exec -e SSL_CERT_FILE=/certs/ca-chain.pem",
-        "until mc_exec_ready",
-        "mc_exec -e \"MC_HOST_local=$ADMIN_ALIAS\"",
+        "timeout 3 docker exec -i",
+        "until mc_ready",
+        'printf \'%s\\n\' "$ADMIN_ALIAS" "$SVC_KEY" "$SVC_SECRET"',
+        "IFS= read -r MC_HOST_local",
+        "exec stdin, never host process arguments",
     ):
         assert required in script
     assert "MINIO_CERTS_DIR" not in script
+    assert '-e "MC_HOST_local=$ADMIN_ALIAS"' not in script
     for forbidden in ("docker system", "docker volume prune", "docker image prune", "sudo "):
         assert forbidden not in script
     assert '$CONFIG_DIR:/run/saintvision-intranet' not in script

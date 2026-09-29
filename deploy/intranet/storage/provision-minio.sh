@@ -107,41 +107,54 @@ case "$MINIO_ROOT_USER$MINIO_ROOT_PASSWORD$SVC_KEY$SVC_SECRET$PITR_KEY$PITR_SECR
   *[!A-Za-z0-9._-]*) fail "credential alphabet is not URL-safe" ;;
 esac
 ADMIN_ALIAS="$scheme://${MINIO_ROOT_USER}:${MINIO_ROOT_PASSWORD}@$admin_host:9000"
-mc_exec() {
+mc_exec_stdin() {
   if [ "$TLS_ENABLED" = true ]; then
-    docker exec -e SSL_CERT_FILE=/certs/ca-chain.pem "$@"
+    docker exec -i -e SSL_CERT_FILE=/certs/ca-chain.pem "$@"
   else
-    docker exec "$@"
+    docker exec -i "$@"
   fi
 }
-mc_exec_ready() {
+mc_ready() {
   if [ "$TLS_ENABLED" = true ]; then
-    timeout 3 docker exec -e SSL_CERT_FILE=/certs/ca-chain.pem "$@"
+    printf '%s\n' "$ADMIN_ALIAS" | timeout 3 docker exec -i \
+      -e SSL_CERT_FILE=/certs/ca-chain.pem "$NAME" /bin/sh -eu -c \
+      'IFS= read -r MC_HOST_local; export MC_HOST_local; [ "$(/usr/bin/mc ready local 2>/dev/null | wc -l)" -ge 1 ]'
   else
-    timeout 3 docker exec "$@"
+    printf '%s\n' "$ADMIN_ALIAS" | timeout 3 docker exec -i \
+      "$NAME" /bin/sh -eu -c \
+      'IFS= read -r MC_HOST_local; export MC_HOST_local; [ "$(/usr/bin/mc ready local 2>/dev/null | wc -l)" -ge 1 ]'
   fi
 }
 attempt=0
-until mc_exec_ready -e "MC_HOST_local=$ADMIN_ALIAS" "$NAME" /bin/sh -eu -c \
-  '[ "$(/usr/bin/mc ready local 2>/dev/null | wc -l)" -ge 1 ]' >/dev/null 2>&1; do
+until mc_ready >/dev/null 2>&1; do
   attempt=$((attempt + 1))
   [ "$attempt" -lt 30 ] || fail "MinIO did not become ready"
   sleep 1
 done
 
-# Root and scoped credentials stay in protected host files and transient exec
-# environments. They are never printed; docker-group membership is the
-# administrative boundary. The server never mounts the broader config tree.
+# Root and scoped credentials stay in protected host files and travel through
+# exec stdin, never host process arguments or container configuration. They are
+# never printed; docker-group membership is the administrative boundary. The
+# server never mounts the broader config tree.
 docker exec -i "$NAME" /bin/sh -eu -c 'cat > /tmp/product-policy.json' < "$PRODUCT_POLICY"
 docker exec -i "$NAME" /bin/sh -eu -c 'cat > /tmp/pitr-policy.json' < "$PITR_POLICY"
-mc_exec -e "MC_HOST_local=$ADMIN_ALIAS" "$NAME" /usr/bin/mc mb --ignore-existing local/saintvision-objects >/dev/null
-mc_exec -e "MC_HOST_local=$ADMIN_ALIAS" "$NAME" /usr/bin/mc mb --ignore-existing local/saintvision-pitr >/dev/null
-mc_exec -e "MC_HOST_local=$ADMIN_ALIAS" "$NAME" /usr/bin/mc admin policy create local saintvision-product /tmp/product-policy.json >/dev/null
-mc_exec -e "MC_HOST_local=$ADMIN_ALIAS" "$NAME" /usr/bin/mc admin policy create local saintvision-pitr /tmp/pitr-policy.json >/dev/null
-mc_exec -e "MC_HOST_local=$ADMIN_ALIAS" "$NAME" /usr/bin/mc admin user add local "$SVC_KEY" "$SVC_SECRET" >/dev/null
-mc_exec -e "MC_HOST_local=$ADMIN_ALIAS" "$NAME" /usr/bin/mc admin policy attach local saintvision-product --user "$SVC_KEY" >/dev/null
-mc_exec -e "MC_HOST_local=$ADMIN_ALIAS" "$NAME" /usr/bin/mc admin user add local "$PITR_KEY" "$PITR_SECRET" >/dev/null
-mc_exec -e "MC_HOST_local=$ADMIN_ALIAS" "$NAME" /usr/bin/mc admin policy attach local saintvision-pitr --user "$PITR_KEY" >/dev/null
+printf '%s\n' "$ADMIN_ALIAS" "$SVC_KEY" "$SVC_SECRET" "$PITR_KEY" "$PITR_SECRET" | \
+  mc_exec_stdin "$NAME" /bin/sh -eu -c '
+    IFS= read -r MC_HOST_local
+    IFS= read -r SVC_KEY
+    IFS= read -r SVC_SECRET
+    IFS= read -r PITR_KEY
+    IFS= read -r PITR_SECRET
+    export MC_HOST_local
+    /usr/bin/mc mb --ignore-existing local/saintvision-objects >/dev/null
+    /usr/bin/mc mb --ignore-existing local/saintvision-pitr >/dev/null
+    /usr/bin/mc admin policy create local saintvision-product /tmp/product-policy.json >/dev/null
+    /usr/bin/mc admin policy create local saintvision-pitr /tmp/pitr-policy.json >/dev/null
+    /usr/bin/mc admin user add local "$SVC_KEY" "$SVC_SECRET" >/dev/null
+    /usr/bin/mc admin policy attach local saintvision-product --user "$SVC_KEY" >/dev/null
+    /usr/bin/mc admin user add local "$PITR_KEY" "$PITR_SECRET" >/dev/null
+    /usr/bin/mc admin policy attach local saintvision-pitr --user "$PITR_KEY" >/dev/null
+  '
 docker exec "$NAME" /bin/sh -eu -c 'rm -f /tmp/product-policy.json /tmp/pitr-policy.json'
 
 if [ "$OLD_PRESERVED" = true ]; then
