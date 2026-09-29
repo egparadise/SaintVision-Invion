@@ -268,7 +268,7 @@ describe('S1 Codex Security Delta: Deterministic Delayed-Promise Generation Regr
     await act(async () => {
       try {
         rejectApprovalMutation!({
-          problem: { detail: 'Old tenant DB unreachable', code: 'DB-500', traceId: 'trc-123' },
+          problem: { detail: 'Old tenant DB unreachable', code: 'SYS-0002', traceId: 'trc-123' },
         });
       } catch {
         // Expected
