@@ -155,3 +155,67 @@ def test_the_conformance_models_added_by_this_branch_keep_their_own_configuratio
     for model in (schemas.ConformanceCheckDescriptor, schemas.ConformanceStatusResponse):
         assert model.model_config.get("populate_by_name") is True
         assert model.model_config.get("extra") == "forbid"
+
+
+# ---------------------------------------------------------------------------
+# From the #205 side of this merge. Both branches added this file with the same
+# general ratchet above but different named regressions, and the two sets do not
+# overlap: #205 pinned the classes its own merge had combined, #200 pinned the two
+# whose configuration git's auto-merge moved. Keeping only one set would drop a
+# guarantee that a merge had already been needed to establish once.
+# ---------------------------------------------------------------------------
+
+
+def _aliased(model) -> list[str]:
+    return [field for field, info in model.model_fields.items() if info.alias]
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        # The two classes #191 contributed to this file, and the one this branch
+        # did. The merge had to keep all three, bodies included.
+        "ModelVersionRegisterRequest",
+        "ModelVersionResponse",
+        "AdapterReadinessResponse",
+    ],
+)
+def test_the_classes_the_merge_combined_kept_their_configuration(name):
+    model = getattr(schemas, name)
+    assert model.model_config.get("extra") == "forbid"
+    assert model.model_config.get("populate_by_name") is True, (
+        f"{name} lost populate_by_name; a merge boundary can fall before the "
+        "model_config line"
+    )
+    assert _aliased(model), f"{name} is in this list because it has aliases"
+
+
+def test_the_response_can_be_built_by_field_name_and_by_alias():
+    """The property the lost line actually provided, exercised both ways."""
+    import datetime as dt
+
+    values = {
+        "version_id": "mdv_01J8Z3XQ2K9WMV5T7N4B6C8D0E",
+        "parent_model_id": "mdl_01J8Z3XQ2K9WMV5T7N4B6C8D0E",
+        "version": "1.4.0",
+        "stage": "draft",
+        "content_sha256": "a" * 64,
+        "byte_size": 4096,
+        "uri": "inv://models/demo@1.4.0",
+        "created_at": dt.datetime(2026, 9, 28, tzinfo=dt.timezone.utc),
+    }
+    by_field = schemas.ModelVersionResponse(**values)
+    dumped = by_field.model_dump(by_alias=True, mode="json")
+    by_alias = schemas.ModelVersionResponse(**dumped)
+    assert by_alias.model_dump(by_alias=True, mode="json") == dumped
+    # The wire names are the aliases either way round.
+    assert set(dumped) == {
+        "modelVersionId",
+        "modelId",
+        "version",
+        "stage",
+        "contentSha256",
+        "byteSize",
+        "uri",
+        "createdAt",
+    }

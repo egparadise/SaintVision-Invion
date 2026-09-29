@@ -1823,13 +1823,21 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               </button>
 
               {placementPreview && (
-                <div style={{ marginTop: '10px', fontSize: '0.75rem' }}>
-                  <div style={{ fontWeight: 600, color: '#34d399', marginBottom: '4px' }}>유휴 우선 추천 노드:</div>
-                  {placementPreview.candidates.map((c, idx) => (
-                    <div key={c.nodeId} style={{ padding: '4px 6px', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: '4px', marginBottom: '4px' }}>
-                      {idx + 1}. <strong>{c.hostname}</strong> ({c.availableCpuMillicores / 1000}C 가용, {c.availableGpuDevices} GPU)
-                    </div>
-                  ))}
+                <div data-testid="placement-preview-results" style={{ marginTop: '10px', fontSize: '0.75rem' }}>
+                  <div style={{ fontWeight: 600, color: '#34d399', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span>유휴 우선 추천 노드:</span>
+                    <span style={{ fontSize: '0.6875rem', color: '#94a3b8', fontWeight: 400 }}>[서버 유휴 우선 후보 순위 · 샤드 미할당]</span>
+                  </div>
+                  {placementPreview.candidates.map((c, idx) => {
+                    const cpuCores = c.availableCpuMillicores / 1000;
+                    const gpuDevices = c.availableGpuDevices;
+                    const name = c.hostname || c.nodeId;
+                    return (
+                      <div key={c.nodeId} style={{ padding: '4px 6px', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: '4px', marginBottom: '4px' }}>
+                        {idx + 1}. <strong>{name}</strong> ({`${cpuCores}C 가용`}, {gpuDevices > 0 ? `${gpuDevices} GPU` : '0 GPU'})
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>

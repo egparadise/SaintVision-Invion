@@ -230,6 +230,13 @@ class ModelVersion(Base):
             "stage <> 'released' OR (verified_at IS NOT NULL AND retention_pinned_until IS NOT NULL)",
             name="release_requires_verification_and_pin",
         ),
+        # 0054: verified exactly when a measurement is bound. The foreign key to
+        # inv.model_version_measurements lives in the database only; that table
+        # is kernel-owned and deliberately not mapped here.
+        CheckConstraint(
+            "(verified_at IS NULL) = (verified_measurement_id IS NULL)",
+            name="verified_iff_measurement",           # convention renders ck_model_versions_verified_iff_measurement (0054)
+        ),
         Index("ix_model_versions_tenant_id_stage", "tenant_id", "stage"),
     )
 
@@ -244,6 +251,9 @@ class ModelVersion(Base):
     byte_size: Mapped[int] = mapped_column(BigInteger, default=0)
     uri: Mapped[str] = mapped_column(Text)
     verified_at: Mapped[Utc | None] = mapped_column(nullable=True)
+    #: The signed node measurement that verified it (0054, design #209 v1.1):
+    #: set together with ``verified_at`` and never without it.
+    verified_measurement_id: Mapped[InvId | None] = mapped_column(nullable=True)
     #: Manual retention (PLAN-STORAGE-001). Extends only.
     retention_pinned_until: Mapped[Utc | None] = mapped_column(nullable=True)
     #: The Run that produced it, when one did.

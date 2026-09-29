@@ -23,6 +23,12 @@ MAX_BYTES = 64 * 1024 * 1024
 LOCAL_PROVIDER_ID = "local-bounded-v1"
 
 
+def _local_provider_unavailable(error: OSError) -> DomainError:
+    """Translate host filesystem failures without exposing paths or errno details."""
+
+    return DomainError("STORE-0001", "Object provider unavailable", 503, True)
+
+
 @dataclass(frozen=True)
 class ObjectDigest:
     sha256: str
@@ -33,6 +39,8 @@ class ObjectStore(Protocol):
     """Provider-neutral immutable byte store over a persisted opaque locator."""
 
     provider_id: str
+
+    def validate_locator(self, locator: str) -> str: ...
 
     def put(self, locator: str, body: bytes, expected_sha256: str) -> None: ...
 
@@ -92,16 +100,38 @@ class LocalObjects:
             raise ValueError("Explicit absolute object directory required")
         fd = self._open()
         try:
-            info = os.fstat(fd)
+            try:
+                info = os.fstat(fd)
+            except OSError as error:
+                raise _local_provider_unavailable(error) from error
             self.identity = (info.st_dev, info.st_ino)
         finally:
-            os.close(fd)
+            active_error = sys.exc_info()[0] is not None
+            try:
+                os.close(fd)
+            except OSError as error:
+                if not active_error:
+                    raise _local_provider_unavailable(error) from error
 
     def _open(self):
-        fd = os.open(self.root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
-        info = os.fstat(fd)
+        try:
+            fd = os.open(self.root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        except OSError as error:
+            raise _local_provider_unavailable(error) from error
+        try:
+            info = os.fstat(fd)
+        except OSError as error:
+            try:
+                os.close(fd)
+            except OSError:
+                # Preserve the first provider failure; neither host detail is public.
+                pass
+            raise _local_provider_unavailable(error) from error
         if info.st_uid != os.geteuid() or info.st_mode & 0o077:
-            os.close(fd)
+            try:
+                os.close(fd)
+            except OSError:
+                pass
             raise DomainError("STORE-0001", "Private service-owned directory required", 503)
         return fd
 
@@ -111,13 +141,27 @@ class LocalObjects:
 
         fd = self._open()
         try:
-            info = os.fstat(fd)
+            try:
+                info = os.fstat(fd)
+            except OSError as error:
+                raise _local_provider_unavailable(error) from error
             if (info.st_dev, info.st_ino) != self.identity:
                 raise DomainError("STORE-0001", "Object directory changed", 503)
-            fcntl.flock(fd, fcntl.LOCK_EX)
+            try:
+                fcntl.flock(fd, fcntl.LOCK_EX)
+            except OSError as error:
+                raise _local_provider_unavailable(error) from error
+            # Provider calls are translated by _LegacyObjectSession.  Do not catch
+            # the whole consumer body here: workspace/generation code can run while
+            # this lock is held, and its unrelated OSError must keep its own meaning.
             yield ObjectHandle(fd)
         finally:
-            os.close(fd)
+            active_error = sys.exc_info()[0] is not None
+            try:
+                os.close(fd)
+            except OSError as error:
+                if not active_error:
+                    raise _local_provider_unavailable(error) from error
 
 
 class LocalObjectStore:
@@ -133,15 +177,21 @@ class LocalObjectStore:
     def __init__(self, legacy: LocalObjects):
         self.legacy = legacy
 
+    def validate_locator(self, locator):
+        return ObjectHandle.name(locator)
+
     def put(self, locator, body, expected_sha256):
-        with self.legacy.locked() as files:
-            if files.exists(locator):
-                observed = files.hash(locator)
-                if observed.sha256 != expected_sha256 or observed.size_bytes != len(body):
-                    raise DomainError("STORE-0005", "Immutable object already differs", 409)
-                files.read(locator, expected_sha256, len(body))
-                return
-            files.put(locator, body, expected_sha256)
+        try:
+            with self.legacy.locked() as files:
+                if files.exists(locator):
+                    observed = files.hash(locator)
+                    if observed.sha256 != expected_sha256 or observed.size_bytes != len(body):
+                        raise DomainError("STORE-0005", "Immutable object already differs", 409)
+                    files.read(locator, expected_sha256, len(body))
+                    return
+                files.put(locator, body, expected_sha256)
+        except OSError as error:
+            raise _local_provider_unavailable(error) from error
 
     def get(self, locator, expected_sha256, expected_size):
         try:
@@ -149,10 +199,15 @@ class LocalObjectStore:
                 return files.read(locator, expected_sha256, expected_size)
         except FileNotFoundError:
             raise FileNotFoundError from None
+        except OSError as error:
+            raise _local_provider_unavailable(error) from error
 
     def exists(self, locator):
-        with self.legacy.locked() as files:
-            return files.exists(locator)
+        try:
+            with self.legacy.locked() as files:
+                return files.exists(locator)
+        except OSError as error:
+            raise _local_provider_unavailable(error) from error
 
     def hash(self, locator):
         try:
@@ -160,12 +215,17 @@ class LocalObjectStore:
                 return files.hash(locator)
         except FileNotFoundError:
             raise FileNotFoundError from None
+        except OSError as error:
+            raise _local_provider_unavailable(error) from error
 
     def delete(self, locator):
-        with self.legacy.locked() as files:
-            files.remove(locator)
-            if files.exists(locator):
-                raise DomainError("STORE-0001", "Object remained after deletion", 503, True)
+        try:
+            with self.legacy.locked() as files:
+                files.remove(locator)
+                if files.exists(locator):
+                    raise DomainError("STORE-0001", "Object remained after deletion", 503, True)
+        except OSError as error:
+            raise _local_provider_unavailable(error) from error
 
 
 class _LegacyObjectSession:
@@ -175,20 +235,47 @@ class _LegacyObjectSession:
         self.files = files
         self.provider_id = provider_id
 
+    def validate_locator(self, locator):
+        return ObjectHandle.name(locator)
+
     def put(self, locator, body, expected_sha256):
-        self.files.put(locator, body, expected_sha256)
+        try:
+            self.files.put(locator, body, expected_sha256)
+        except OSError as error:
+            # ENOENT while creating/renaming means the pinned provider directory
+            # disappeared.  A put cannot use "object missing" as a normal result.
+            raise _local_provider_unavailable(error) from error
 
     def get(self, locator, expected_sha256, expected_size):
-        return self.files.read(locator, expected_sha256, expected_size)
+        try:
+            return self.files.read(locator, expected_sha256, expected_size)
+        except FileNotFoundError:
+            # Missing committed bytes are interpreted by the calling service.
+            raise
+        except OSError as error:
+            raise _local_provider_unavailable(error) from error
 
     def exists(self, locator):
-        return self.files.exists(locator)
+        try:
+            return self.files.exists(locator)
+        except OSError as error:
+            raise _local_provider_unavailable(error) from error
 
     def hash(self, locator):
-        return self.files.hash(locator)
+        try:
+            return self.files.hash(locator)
+        except FileNotFoundError:
+            raise
+        except OSError as error:
+            raise _local_provider_unavailable(error) from error
 
     def delete(self, locator):
-        self.files.remove(locator)
+        try:
+            self.files.remove(locator)
+        except OSError as error:
+            # Delete is an explicit provider mutation.  ENOENT here means its
+            # pinned root/entry changed after the caller's existence decision.
+            raise _local_provider_unavailable(error) from error
 
 
 @contextmanager

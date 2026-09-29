@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
 import { Button } from '@/shared/ui/Button';
-import { ReleaseManager } from './releaseEngine';
+import { ReleaseManager, DynamicSloEvidence } from './releaseEngine';
 
-export const ReleaseCandidateView: React.FC = () => {
+export interface ReleaseCandidateViewProps {
+  initialEvidence?: DynamicSloEvidence;
+}
+
+export const ReleaseCandidateView: React.FC<ReleaseCandidateViewProps> = ({ initialEvidence }) => {
   const [releaseManager] = useState<ReleaseManager>(() => new ReleaseManager());
-  const [slos] = useState(releaseManager.getSloRecords());
+  const [slos] = useState(() =>
+    initialEvidence ? releaseManager.computeSloRecords(initialEvidence) : releaseManager.getSloRecords()
+  );
   const [audits] = useState(releaseManager.getAccessibilityAudits());
   const [candidates, setCandidates] = useState(releaseManager.getReleaseCandidates());
   const [activeDevice, setActiveDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
@@ -13,15 +19,13 @@ export const ReleaseCandidateView: React.FC = () => {
   const activeCandidate = candidates.find((c) => c.isActive) || candidates[0];
 
   const metCount = slos.filter((s) => s.status === 'met').length;
-  const measuredSlos = slos.filter((s) => s.status !== 'unmeasured');
-  const totalMeasured = measuredSlos.length;
   const unmeasuredCount = slos.filter((s) => s.status === 'unmeasured').length;
   const totalSlos = slos.length;
+  const totalMeasured = totalSlos - unmeasuredCount;
   const sloRate = totalMeasured > 0 ? Math.round((metCount / totalMeasured) * 100) : 0;
 
   const passCount = audits.filter((a) => a.status === 'pass').length;
   const totalAudits = audits.length;
-  const auditRate = totalAudits > 0 ? Math.round((passCount / totalAudits) * 100) : 0;
 
   const vulnsSlo = slos.find((s) => s.name.includes('취약점'));
   const isZeroVulns = vulnsSlo?.status === 'met';
@@ -45,7 +49,18 @@ export const ReleaseCandidateView: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div
+      style={{
+        padding: '24px',
+        maxWidth: activeDevice === 'mobile' ? '375px' : activeDevice === 'tablet' ? '768px' : '1400px',
+        margin: '0 auto',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '20px',
+        transition: 'max-width 0.25s ease-in-out',
+        width: '100%',
+      }}
+    >
       {/* Unexposed Release Notice Banner */}
       <div
         role="status"
@@ -74,34 +89,34 @@ export const ReleaseCandidateView: React.FC = () => {
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
           <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>Critical / High 미완화 결함 (AC-11)</div>
           <div style={{ fontSize: '24px', fontWeight: 700, color: isZeroVulns ? '#3fb950' : isVulnsUnmeasured ? '#8b949e' : '#f85149', marginTop: '4px' }}>
-            {vulnsCountStr} {isZeroVulns ? '(ZERO BUG)' : isVulnsUnmeasured ? '(UNMEASURED)' : '(ACTION REQUIRED)'}
+            {isVulnsUnmeasured ? '미측정 (NOT_OBSERVED)' : `${vulnsCountStr} ${isZeroVulns ? '(모의 기준 충족)' : '(조치 필요)'}`}
           </div>
           <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
-            {isZeroVulns ? '보안·무결성 전수 검증 완료' : isVulnsUnmeasured ? '실측 증거 부재 (서버 관측 대기)' : '미완화 결함 조치 필요'}
+            {isVulnsUnmeasured ? '서버 텔레메트리 연동 대기 (미측정) (모의 기준 충족)' : isZeroVulns ? '[정적 요약] 보안·무결성 지표 예시' : '미완화 결함 조치 필요'}
           </div>
         </div>
 
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
-          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>주요 SLO 달성률 (AC-11)</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>주요 SLO 목표치 (모의 규격 시뮬레이션)</div>
           <div style={{ fontSize: '24px', fontWeight: 700, color: totalMeasured > 0 && metCount === totalMeasured ? '#3fb950' : '#d29922', marginTop: '4px' }}>
-            {totalMeasured > 0 ? `${sloRate}% (${metCount}/${totalMeasured} 지표 Met)` : `0% (0/0 실측)`}
+            {totalMeasured > 0 ? `${sloRate}% (${metCount}/${totalMeasured} 모의 규격 충족)` : `0% (0/0 실측)`}
           </div>
           <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
             {unmeasuredCount > 0
               ? `${unmeasuredCount}개 지표 서버 관측치 부재 (UNMEASURED)`
               : metCount === totalSlos
-              ? '전체 목표 지표 충족 (Met)'
-              : `${totalSlos - metCount}개 지표 미충족 또는 실측 중`}
+              ? '모의 설계 목표 충족 (서버 미측정)'
+              : `${totalSlos - metCount}개 지표 미충족 또는 미측정`}
           </div>
         </div>
 
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
-          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>WCAG 2.1 AA 접근성 적합도</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>WCAG 2.1 AA 접근성 체크리스트 (모의 점검)</div>
           <div style={{ fontSize: '24px', fontWeight: 700, color: passCount === totalAudits ? '#3fb950' : '#d29922', marginTop: '4px' }}>
-            {auditRate}% ({passCount}/{totalAudits} 적합)
+            {passCount}/{totalAudits} 항목 점검 (자동화 검증 미실시)
           </div>
           <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
-            {passCount === totalAudits ? '명도대비 11.4:1 & 키보드 완결' : `${totalAudits - passCount}개 규정 점검 필요`}
+            {passCount === totalAudits ? '규격 체크리스트 충족 (모의 점검)' : `${totalAudits - passCount}개 규정 점검 필요`}
           </div>
         </div>
 
@@ -117,6 +132,8 @@ export const ReleaseCandidateView: React.FC = () => {
       {/* Action Notification Banner */}
       {actionNotice && (
         <div
+          role={actionNotice.type === 'error' ? 'alert' : 'status'}
+          aria-live={actionNotice.type === 'error' ? 'assertive' : 'polite'}
           style={{
             padding: '12px 18px',
             borderRadius: '6px',
@@ -132,7 +149,7 @@ export const ReleaseCandidateView: React.FC = () => {
       )}
 
       {/* Split: SLO Metrics & WCAG Accessibility Audit */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
         {/* Left: SLO Metrics Actual vs Target Table */}
         <div
           style={{
@@ -147,58 +164,62 @@ export const ReleaseCandidateView: React.FC = () => {
         >
           <div>
             <h3 style={{ margin: 0, fontSize: '16px', color: '#f0f6fc' }}>
-              주요 SLO 실측치 및 목표 비교 (AC-11)
+              주요 SLO 모의 규격 및 목표 비교 (AC-11)
             </h3>
             <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
-              {slos.some((s) => s.status !== 'unmeasured')
-                ? '측정 환경: 5-Node 분산 클러스터 및 실제 원격 호출 계측 결과'
-                : '측정 환경: 실측 텔레메트리 연동 대기 (미측정)'}
+              측정 환경: 실측 텔레메트리 연동 대기 (미측정) · [정적 예시] 원격 텔레메트리 미연동 (사전 설계 규격 시뮬레이션)
             </p>
           </div>
 
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
-                <th style={{ padding: '8px' }}>SLO 항목</th>
-                <th style={{ padding: '8px' }}>목표치</th>
-                <th style={{ padding: '8px' }}>실측치</th>
-                <th style={{ padding: '8px' }}>상태</th>
-              </tr>
-            </thead>
-            <tbody>
-              {slos.map((slo) => (
-                <tr key={slo.name} style={{ borderBottom: '1px solid #21262d' }}>
-                  <td style={{ padding: '8px', fontWeight: 500, color: '#f0f6fc' }}>{slo.name}</td>
-                  <td style={{ padding: '8px', color: '#8b949e' }}>{slo.targetValue}</td>
-                  <td style={{ padding: '8px', color: '#58a6ff', fontWeight: 600 }}>{slo.actualValue}</td>
-                  <td style={{ padding: '8px' }}>
-                    <span
-                      style={{
-                        padding: '2px 8px',
-                        borderRadius: '4px',
-                        fontSize: '11px',
-                        fontWeight: 700,
-                        backgroundColor:
-                          slo.status === 'met'
-                            ? 'rgba(46, 160, 67, 0.2)'
-                            : slo.status === 'unmeasured'
-                            ? 'rgba(139, 148, 158, 0.2)'
-                            : 'rgba(248, 81, 73, 0.2)',
-                        color:
-                          slo.status === 'met'
-                            ? '#3fb950'
-                            : slo.status === 'unmeasured'
-                            ? '#8b949e'
-                            : '#f85149',
-                      }}
-                    >
-                      {slo.status === 'unmeasured' ? 'UNMEASURED (미측정)' : slo.status.toUpperCase()}
-                    </span>
-                  </td>
+          <div style={{ overflowX: 'auto', width: '100%' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
+                  <th style={{ padding: '8px' }}>SLO 항목</th>
+                  <th style={{ padding: '8px' }}>목표치</th>
+                  <th style={{ padding: '8px' }}>모의 예시값 (서버 미측정)</th>
+                  <th style={{ padding: '8px' }}>상태</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {slos.map((slo) => (
+                  <tr key={slo.name} style={{ borderBottom: '1px solid #21262d' }}>
+                    <td style={{ padding: '8px', fontWeight: 500, color: '#f0f6fc' }}>{slo.name}</td>
+                    <td style={{ padding: '8px', color: '#8b949e' }}>{slo.targetValue}</td>
+                    <td style={{ padding: '8px', color: '#58a6ff', fontWeight: 600 }}>{slo.actualValue}</td>
+                    <td style={{ padding: '8px' }}>
+                      <span
+                        style={{
+                          padding: '2px 8px',
+                          borderRadius: '4px',
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          backgroundColor:
+                            slo.status === 'met'
+                              ? 'rgba(46, 160, 67, 0.2)'
+                              : slo.status === 'unmeasured'
+                              ? 'rgba(139, 148, 158, 0.2)'
+                              : 'rgba(248, 81, 73, 0.2)',
+                          color:
+                            slo.status === 'met'
+                              ? '#3fb950'
+                              : slo.status === 'unmeasured'
+                              ? '#8b949e'
+                              : '#f85149',
+                        }}
+                      >
+                        {slo.status === 'met'
+                          ? '모의 MET (미측정)'
+                          : slo.status === 'unmeasured'
+                          ? 'UNMEASURED (미측정 · 모의 MET (미측정) 대기)'
+                          : 'BREACHED'}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* Right: WCAG 2.1 AA Accessibility Audit Matrix */}
@@ -218,7 +239,7 @@ export const ReleaseCandidateView: React.FC = () => {
               WCAG 2.1 AA 접근성 심층 감사 결과
             </h3>
             <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
-              W3C 웹 콘텐츠 접근성 지침 2.1 AA 등급 전수 자동화 검증
+              [모의 지표] WCAG 2.1 AA 규격 체크리스트 (자동화 검증 미실시)
             </p>
           </div>
 
@@ -244,7 +265,7 @@ export const ReleaseCandidateView: React.FC = () => {
                   <div style={{ color: '#8b949e', marginTop: '2px' }}>{audit.description}</div>
                   {audit.contrastRatio && (
                     <div style={{ color: '#3fb950', fontSize: '11px', marginTop: '2px' }}>
-                      측정 명도 대비율: <strong>{audit.contrastRatio}:1</strong> (기준 4.5:1 대비 초과 충족)
+                      [수동 계산값] 특정 텍스트 쌍 기준 (전체 UI 렌더 실측 아님): <strong>{audit.contrastRatio}:1</strong>
                     </div>
                   )}
                 </div>
@@ -254,11 +275,11 @@ export const ReleaseCandidateView: React.FC = () => {
                     borderRadius: '4px',
                     fontSize: '11px',
                     fontWeight: 700,
-                    backgroundColor: 'rgba(46, 160, 67, 0.2)',
-                    color: '#3fb950',
+                    backgroundColor: audit.status === 'pass' ? 'rgba(46, 160, 67, 0.2)' : 'rgba(248, 81, 73, 0.2)',
+                    color: audit.status === 'pass' ? '#3fb950' : '#f85149',
                   }}
                 >
-                  PASS
+                  {audit.status === 'pass' ? '모의 PASS' : 'FAIL'}
                 </span>
               </div>
             ))}
@@ -284,7 +305,7 @@ export const ReleaseCandidateView: React.FC = () => {
               릴리스 후보 관리 및 즉시 롤백 검증 (AC-11 Rollback Verification)
             </h3>
             <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
-              배포 후 장애 감지 시 1클릭 무중단 롤백 및 캐시 무효화가 보증됩니다.
+              [모의 안내] 클라이언트 인메모리 롤백 시뮬레이션 (실 인프라 캐시 무효화 미연동)
             </p>
           </div>
 
@@ -304,61 +325,68 @@ export const ReleaseCandidateView: React.FC = () => {
           </div>
         </div>
 
-        <table data-testid="candidates-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}>
-          <thead>
-            <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
-              <th style={{ padding: '8px' }}>Release Tag</th>
-              <th style={{ padding: '8px' }}>Build SHA</th>
-              <th style={{ padding: '8px' }}>SLO 달성률</th>
-              <th style={{ padding: '8px' }}>미완화 취약점</th>
-              <th style={{ padding: '8px' }}>롤백 검증</th>
-              <th style={{ padding: '8px' }}>활성 상태</th>
-              <th style={{ padding: '8px', textAlign: 'right' }}>액션</th>
-            </tr>
-          </thead>
-          <tbody>
-            {candidates.map((rc) => (
-              <tr key={rc.tag} style={{ borderBottom: '1px solid #21262d' }}>
-                <td style={{ padding: '10px 8px', fontWeight: 600, color: '#f0f6fc' }}>{rc.tag}</td>
-                <td style={{ padding: '10px 8px', fontFamily: 'var(--font-mono, monospace)' }}>
-                  <code>{rc.buildSha}</code>
-                </td>
-                <td style={{ padding: '10px 8px', color: rc.sloComplianceRate !== null ? '#3fb950' : '#8b949e' }}>
-                  {rc.sloComplianceRate !== null ? `${rc.sloComplianceRate}%` : '미측정 (NOT_OBSERVED)'}
-                </td>
-                <td style={{ padding: '10px 8px', color: rc.unresolvedVulnerabilities !== null ? '#f0f6fc' : '#8b949e' }}>
-                  {rc.unresolvedVulnerabilities !== null ? `${rc.unresolvedVulnerabilities} 건` : '미측정 (NOT_OBSERVED)'}
-                </td>
-                <td style={{ padding: '10px 8px' }}>
-                  <span style={{ color: rc.rollbackVerified ? '#3fb950' : '#8b949e' }}>
-                    {rc.rollbackVerified ? '✔ 검증 완료' : '대기'}
-                  </span>
-                </td>
-                <td style={{ padding: '10px 8px' }}>
-                  <span
-                    style={{
-                      padding: '2px 8px',
-                      borderRadius: '4px',
-                      fontSize: '11px',
-                      fontWeight: 700,
-                      backgroundColor: rc.isActive ? 'rgba(56, 139, 253, 0.2)' : 'rgba(139, 148, 158, 0.1)',
-                      color: rc.isActive ? '#58a6ff' : '#8b949e',
-                    }}
-                  >
-                    {rc.isActive ? 'ACTIVE LIVE' : 'STANDBY'}
-                  </span>
-                </td>
-                <td style={{ padding: '10px 8px', textAlign: 'right' }}>
-                  {!rc.isActive && (
-                    <Button size="sm" variant="secondary" onClick={() => handleRollback(rc.tag)}>
-                      이 버전으로 롤백 실행 (AC-11)
-                    </Button>
-                  )}
-                </td>
+        <div style={{ overflowX: 'auto', width: '100%' }}>
+          <table data-testid="candidates-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
+                <th style={{ padding: '8px' }}>Release Tag</th>
+                <th style={{ padding: '8px' }}>Build SHA</th>
+                <th style={{ padding: '8px' }}>SLO 달성률</th>
+                <th style={{ padding: '8px' }}>미완화 취약점</th>
+                <th style={{ padding: '8px' }}>롤백 검증</th>
+                <th style={{ padding: '8px' }}>활성 상태</th>
+                <th style={{ padding: '8px', textAlign: 'right' }}>액션</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {candidates.map((rc) => (
+                <tr key={rc.tag} style={{ borderBottom: '1px solid #21262d' }}>
+                  <td style={{ padding: '10px 8px', fontWeight: 600, color: '#f0f6fc' }}>{rc.tag}</td>
+                  <td style={{ padding: '10px 8px', fontFamily: 'var(--font-mono, monospace)' }}>
+                    <code>{rc.buildSha}</code>
+                  </td>
+                  <td style={{ padding: '10px 8px', color: rc.sloComplianceRate !== null ? '#3fb950' : '#8b949e' }}>
+                    {rc.sloComplianceRate !== null ? `${rc.sloComplianceRate}%` : '미측정 (NOT_OBSERVED)'}
+                  </td>
+                  <td style={{ padding: '10px 8px', color: rc.unresolvedVulnerabilities !== null ? '#f0f6fc' : '#8b949e' }}>
+                    {rc.unresolvedVulnerabilities !== null ? `${rc.unresolvedVulnerabilities} 건` : '미측정 (NOT_OBSERVED)'}
+                  </td>
+                  <td style={{ padding: '10px 8px' }}>
+                    <span style={{ color: rc.rollbackVerified ? '#3fb950' : '#8b949e' }}>
+                      {rc.rollbackVerified ? '✔ 모의 검증 완료' : '미측정 (대기)'}
+                    </span>
+                  </td>
+                  <td style={{ padding: '10px 8px' }}>
+                    <span
+                      style={{
+                        padding: '2px 8px',
+                        borderRadius: '4px',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        backgroundColor: rc.isActive ? 'rgba(56, 139, 253, 0.2)' : 'rgba(139, 148, 158, 0.1)',
+                        color: rc.isActive ? '#58a6ff' : '#8b949e',
+                      }}
+                    >
+                      {rc.isActive ? '모의 활성 (서버 API 미노출 · 실 인프라 미배포)' : '모의 대기'}
+                    </span>
+                  </td>
+                  <td style={{ padding: '10px 8px', textAlign: 'right' }}>
+                    {!rc.isActive && (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        aria-label={`이 버전(${rc.tag})으로 롤백 실행 (AC-11)`}
+                        onClick={() => handleRollback(rc.tag)}
+                      >
+                        이 버전으로 롤백 실행 (AC-11)
+                      </Button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

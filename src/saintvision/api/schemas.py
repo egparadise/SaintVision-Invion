@@ -12,9 +12,10 @@ default (공통 계약 §3).
 from __future__ import annotations
 
 import datetime as dt
-from typing import Literal
+import uuid
+from typing import Annotated, Any, Literal, Union
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr, field_validator
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr, field_validator, model_validator
 
 
 class Strict(BaseModel):
@@ -739,6 +740,12 @@ class ModelReleaseRequest(Strict):
     against that immutable declaration for exact equality. ``extra="forbid"``
     is load-bearing here rather than conventional: a proposal carrying a field
     the declaration does not have is itself a mismatch.
+
+    The request carries a required ``Idempotency-Key`` header (card 113). The
+    same key with this same body and path replays the stored
+    ``ModelReleaseResponse``; the same key with a different body or path is
+    ``GRAPH-0002``/409; a version that is already released is ``GRAPH-0002``/409
+    under any other key.
     """
 
     license_policy: str = Field(min_length=1, max_length=200, alias="licensePolicy")
@@ -825,6 +832,86 @@ class ModelVersionResponse(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+class AdapterReadinessResponse(Strict):
+    """One agent CLI's install, login and reachability state (G-01 follow-up).
+
+    #180 recorded that both adapter routes were declared ``-> dict``, so
+    ``export_schemas`` generated nothing for them and a change to the response
+    shape broke no gate. This closes that for the single-adapter route, where the
+    shape is one row and has no variants.
+
+    The fields and their types are **observed**, not inferred: ``agents.readiness()``
+    was run and its rows read (eleven keys, the same key set for all four tools),
+    and ``probe()`` was run for ``reachable`` and ``latencyMs``. The nullable ones
+    are nullable because the tool may be absent (``path``, ``version``), present
+    elsewhere (``installedElsewhere``) or have nothing to say
+    (``instructions``, ``latencyMs`` when unreachable).
+
+    ``loginDetail`` is the one unbounded field: it is whatever the adapter's
+    ``login_state()`` returned, which comes from CLI output. Declaring it as an
+    open mapping is honest about that rather than pretending a shape; narrowing it
+    -- and deciding whether tool output belongs in a screen-facing response at all
+    -- is a separate question this card does not answer.
+
+    The **list** route keeps ``-> dict`` on purpose. Its rows have two shapes: the
+    eleven-key row above, and a five-key row when one tool raises
+    (``adapter``, ``executable``, ``installed``, ``loginState``, ``error``). A
+    response model would fill the missing keys with defaults and so change the
+    wire shape a screen sees for a broken tool, which is a public change owned by
+    the frontend rather than a side effect of canonicalising a 404.
+    """
+
+    adapter: str = Field(min_length=1, max_length=64)
+    executable: str = Field(min_length=1, max_length=128)
+    installed: bool
+    path: str | None = None
+    installed_elsewhere: str | None = Field(default=None, alias="installedElsewhere")
+    version: str | None = None
+    login_state: str = Field(pattern="^(logged_in|logged_out|unknown)$", alias="loginState")
+    login_detail: dict[str, Any] = Field(default_factory=dict, alias="loginDetail")
+    headless: bool
+    missing: list[str] = Field(default_factory=list)
+    instructions: str | None = None
+    reachable: bool
+    latency_ms: int | None = Field(default=None, ge=0, alias="latencyMs")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class EvalRunStartRequest(Strict):
+    """What a caller may choose when starting an eval run (G-05 W5).
+
+    Three fields, and what is *absent* matters as much as what is here.
+
+    ``adapter`` is a **name**, not an endpoint or a credential. The server resolves
+    it through ``adapters.agents.adapter_for``, whose ``BY_NAME`` is the configured
+    allowlist, so a caller can pick one of the platform's four CLIs and nothing
+    else. A request that could name a URL would let the caller point this route --
+    which spends money -- at a host of their choosing.
+
+    ``componentVersions`` is part of the run's identity: "the agent scored 72%"
+    means nothing without which prompt, context and model produced it. It is
+    bounded, and the three keys the service fills in itself are **refused**:
+    ``run_suite`` merges them with ``setdefault``, so a caller who sent
+    ``{"adapter": "something-else"}`` would have their own value recorded as the
+    identity of the run. Refusing them is the only place that can be stopped
+    without changing the service's signature.
+
+    ``requireModelPinning`` defaults to **true**, which is the service's own
+    default: a score from an adapter that cannot say which model build produced it
+    is not reproducible. Passing false is allowed and is recorded on the run
+    (``modelPinned: "false"``) rather than merely decided at the call site.
+    """
+
+    adapter: str = Field(min_length=1, max_length=64, pattern="^[a-z0-9-]+$")
+    require_model_pinning: bool = Field(default=True, alias="requireModelPinning")
+    component_versions: dict[str, str] = Field(
+        default_factory=dict, alias="componentVersions", max_length=32
+    )
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
 class RetentionPinRequest(Strict):
     """What a caller asks of W4: keep this version at least until ``until``.
 
@@ -836,6 +923,33 @@ class RetentionPinRequest(Strict):
     """
 
     until: AwareDatetime
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class EvalRunResponse(Strict):
+    """The finished run, by identity and by count.
+
+    No case content and no model output: ``eval_results.observed`` is a redacted
+    summary and this response does not carry even that. What a caller needs from
+    starting a run is which run it was and whether it passed.
+
+    ``passedGate`` is its own field rather than something a reader derives from
+    the counts, because the row's own rule is stricter than "passed == total": a
+    run with any forbidden-behaviour violation is not a pass whatever the score
+    says.
+    """
+
+    eval_run_id: str = Field(alias="evalRunId")
+    suite_id: str = Field(alias="suiteId")
+    status: Literal["running", "completed", "aborted"]
+    total_cases: int = Field(ge=0, alias="totalCases")
+    passed_cases: int = Field(ge=0, alias="passedCases")
+    violations: int = Field(ge=0)
+    passed_gate: bool = Field(alias="passedGate")
+    component_versions: dict[str, str] = Field(alias="componentVersions")
+    started_at: dt.datetime = Field(alias="startedAt")
+    ended_at: dt.datetime | None = Field(default=None, alias="endedAt")
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
@@ -856,6 +970,79 @@ class RetentionPinResponse(Strict):
     stage: Literal["draft", "candidate", "released", "retired"]
     retention_pinned_until: AwareDatetime = Field(alias="retentionPinnedUntil")
     extended: bool
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+INV_ID = r"^[a-z]{3}_[0-9A-HJKMNP-TV-Z]{26}$"
+MEASUREMENT_ID = r"^mvm_[0-9A-HJKMNP-TV-Z]{26}$"
+
+
+class ModelVerifyRequest(Strict):
+    """What a caller asks of W3: apply this kernel-recorded measurement.
+
+    One field, and ``extra="forbid"`` is load-bearing: a digest, a size or a
+    URI in the body would be a value the caller supplied, and verification
+    is exactly the thing a caller's value must not be able to establish
+    (design #209 v1.1 §6).
+    """
+
+    measurement_id: str = Field(pattern=MEASUREMENT_ID, alias="measurementId")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ModelMeasurementObservation(Strict):
+    """The kernel's record of one signed node measurement, as the W3 route reads it.
+
+    Served by ``GET /v1/projects/{p}/models/{m}/versions/{v}/measurements/{id}``
+    on the kernel (PR A-2 of design #209 v1.1). Every field is what
+    ``inv.model_version_measurements`` holds for the identity, the channel
+    binding, the storage snapshot and the observation itself; the route
+    re-binds each of them before it writes. Unknown keys are refused: an
+    observation carrying something this contract does not name is not one
+    the route decides on.
+    """
+
+    measurement_id: str = Field(pattern=MEASUREMENT_ID, alias="measurementId")
+    tenant_id: uuid.UUID = Field(alias="tenantId")
+    project_id: str = Field(pattern=INV_ID, alias="projectId")
+    model_id: str = Field(pattern=INV_ID, alias="modelId")
+    version_id: str = Field(pattern=INV_ID, alias="modelVersionId")
+    uri: str = Field(min_length=1, max_length=2048)
+    contribution_id: str = Field(pattern=INV_ID, alias="contributionId")
+    contribution_version: StrictInt = Field(ge=1, alias="contributionVersion")
+    location_id: str = Field(pattern=INV_ID, alias="locationId")
+    location_version: StrictInt = Field(ge=1, alias="locationVersion")
+    relative_path: str = Field(min_length=1, max_length=4096, alias="relativePath")
+    node_id: str = Field(pattern=INV_ID, alias="nodeId")
+    recovery_epoch: uuid.UUID = Field(alias="recoveryEpoch")
+    channel_version: StrictInt = Field(ge=1, alias="channelVersion")
+    certificate_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="certificateSha256")
+    sha256: str = Field(pattern="^[0-9a-f]{64}$")
+    byte_size: StrictInt = Field(ge=0, alias="byteSize")
+    observed_at: AwareDatetime = Field(alias="observedAt")
+    recorded_at: AwareDatetime = Field(alias="recordedAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ModelVerifyResponse(Strict):
+    """The version after the measurement was bound (or found already bound).
+
+    ``newlyVerified`` is false when the row was already verified by this very
+    measurement, so a repeat with a fresh idempotency key is visible as the
+    no-op it was.
+    """
+
+    version_id: str = Field(alias="modelVersionId")
+    parent_model_id: str = Field(alias="modelId")
+    version: str = Field(min_length=1, max_length=64)
+    stage: Literal["draft", "candidate", "released", "retired"]
+    verified_at: AwareDatetime = Field(alias="verifiedAt")
+    verified_measurement_id: str = Field(pattern=MEASUREMENT_ID, alias="verifiedMeasurementId")
+    content_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="contentSha256")
+    newly_verified: bool = Field(alias="newlyVerified")
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
@@ -1162,3 +1349,170 @@ class ConformanceStatusResponse(Strict):
     recorded_at: None = Field(alias="recordedAt")
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+# -- G-03 stage two: the RECORDED branches (design #218 v1.2 §4-1) ------------
+#
+# ``ConformanceStatusResponse`` above keeps its name, its seven keys and its
+# contract file: with no record stored the list route still answers exactly
+# that shape (only the ``reason`` text moved on, because "does not persist"
+# stopped being true). Everything below is what a stored record adds. The two
+# union aliases are not ``Strict`` subclasses, so the exporter never sees them
+# and each branch is its own contract file.
+
+CONFORMANCE_SUBJECT = Literal["fixture-adapter"]
+CONFORMANCE_PROVENANCE = Literal["in-server"]
+
+
+class ConformanceCheckOutcome(Strict):
+    """One check's result as stored: name, passed, skipped. No ``detail``: the
+    suite's detail is stringified exceptions and host process output, and this
+    row is readable by every project's members (§2-5)."""
+
+    name: str = Field(min_length=1, max_length=100)
+    passed: StrictBool
+    skipped: StrictBool
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    @model_validator(mode="after")
+    def _not_both(self) -> "ConformanceCheckOutcome":
+        if self.passed and self.skipped:
+            raise ValueError("a check cannot be both passed and skipped")
+        return self
+
+
+def _counts_agree(total: int, passed: int, failed: int, skipped: int, outcomes: list) -> None:
+    """The response side of §2-8: the four counts and the outcome list must be
+    one measurement, not four numbers that merely look like one."""
+    if passed + failed + skipped != total:
+        raise ValueError("passed + failed + skipped must equal total")
+    if len(outcomes) != total:
+        raise ValueError("outcomes must have exactly total entries")
+    recount = (
+        sum(1 for o in outcomes if o.passed and not o.skipped),
+        sum(1 for o in outcomes if not o.passed and not o.skipped),
+        sum(1 for o in outcomes if o.skipped),
+    )
+    if recount != (passed, failed, skipped):
+        raise ValueError("counts do not match the outcomes")
+
+
+class ConformanceRecordItem(Strict):
+    """One stored record inside ``records[]``. Nested, not a contract file."""
+
+    adapter: str = Field(min_length=1, max_length=64)
+    subject: CONFORMANCE_SUBJECT
+    provenance: CONFORMANCE_PROVENANCE
+    contract_version: str = Field(min_length=1, max_length=32, alias="contractVersion")
+    suite_contract_version: str = Field(
+        min_length=1, max_length=32, alias="suiteContractVersion"
+    )
+    total: StrictInt = Field(ge=0)
+    passed: StrictInt = Field(ge=0)
+    failed: StrictInt = Field(ge=0)
+    skipped: StrictInt = Field(ge=0)
+    #: Named ``outcomes`` so it is never confused with ``checks`` (descriptors).
+    outcomes: list[ConformanceCheckOutcome]
+    recorded_at: AwareDatetime = Field(alias="recordedAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    @model_validator(mode="after")
+    def _consistent(self) -> "ConformanceRecordItem":
+        _counts_agree(self.total, self.passed, self.failed, self.skipped, self.outcomes)
+        return self
+
+
+class ConformanceStatusRecordedResponse(Strict):
+    """The list route when at least one record exists.
+
+    ``records`` follows the order of ``adapters`` and holds only adapters that
+    have a record: absence from ``records`` is the absence of a measurement,
+    so there is no per-adapter NOT_OBSERVED entry. ``latestRecordedAt`` is the
+    maximum of the items' ``recordedAt`` -- the aggregate freshness -- and the
+    key is deliberately not ``recordedAt``, which in the NOT_OBSERVED branch is
+    always null (§4-1, R2). No ``reason``: nothing is being explained.
+    """
+
+    status: Literal["RECORDED"]
+    scope: Literal["control-plane-host"]
+    contract_version: str = Field(min_length=1, max_length=32, alias="contractVersion")
+    adapters: list[str]
+    checks: list[ConformanceCheckDescriptor]
+    records: list[ConformanceRecordItem] = Field(min_length=1)
+    latest_recorded_at: AwareDatetime = Field(alias="latestRecordedAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    @model_validator(mode="after")
+    def _records_are_a_subset_in_order(self) -> "ConformanceStatusRecordedResponse":
+        names = [r.adapter for r in self.records]
+        if len(set(names)) != len(names):
+            raise ValueError("an adapter may appear once in records")
+        if [a for a in self.adapters if a in set(names)] != names:
+            raise ValueError("records must follow the adapters order and name only listed adapters")
+        if self.latest_recorded_at != max(r.recorded_at for r in self.records):
+            raise ValueError("latestRecordedAt must be the latest recordedAt")
+        return self
+
+
+class AdapterConformanceNotObservedResponse(Strict):
+    """The single-adapter route when the adapter is known but has no record.
+
+    200, not 404: "no such adapter" and "no measurement of this adapter" are
+    different facts, and folding the second into the first makes it read as
+    the first (§4-3).
+    """
+
+    status: Literal["NOT_OBSERVED"]
+    reason: str = Field(min_length=1, max_length=300)
+    scope: Literal["control-plane-host"]
+    adapter: str = Field(min_length=1, max_length=64)
+    contract_version: str = Field(min_length=1, max_length=32, alias="contractVersion")
+    checks: list[ConformanceCheckDescriptor]
+    recorded_at: None = Field(alias="recordedAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class AdapterConformanceRecordedResponse(Strict):
+    """The single-adapter route's record. Its own class rather than the list
+    item, so one side's needs cannot drag the other's contract; the field
+    names and types are the item's exactly (§4-1)."""
+
+    status: Literal["RECORDED"]
+    scope: Literal["control-plane-host"]
+    adapter: str = Field(min_length=1, max_length=64)
+    subject: CONFORMANCE_SUBJECT
+    provenance: CONFORMANCE_PROVENANCE
+    contract_version: str = Field(min_length=1, max_length=32, alias="contractVersion")
+    suite_contract_version: str = Field(
+        min_length=1, max_length=32, alias="suiteContractVersion"
+    )
+    total: StrictInt = Field(ge=0)
+    passed: StrictInt = Field(ge=0)
+    failed: StrictInt = Field(ge=0)
+    skipped: StrictInt = Field(ge=0)
+    outcomes: list[ConformanceCheckOutcome]
+    recorded_at: AwareDatetime = Field(alias="recordedAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    @model_validator(mode="after")
+    def _consistent(self) -> "AdapterConformanceRecordedResponse":
+        _counts_agree(self.total, self.passed, self.failed, self.skipped, self.outcomes)
+        return self
+
+
+#: The list route's response: one of two branches, told apart by ``status``.
+ConformanceStatusUnion = Annotated[
+    Union[ConformanceStatusResponse, ConformanceStatusRecordedResponse],
+    Field(discriminator="status"),
+]
+
+#: The single-adapter route's response.
+AdapterConformanceUnion = Annotated[
+    Union[AdapterConformanceNotObservedResponse, AdapterConformanceRecordedResponse],
+    Field(discriminator="status"),
+]

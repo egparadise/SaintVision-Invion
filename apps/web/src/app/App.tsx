@@ -662,7 +662,7 @@ export const App: React.FC = () => {
                         fontSize: '0.75rem',
                         cursor: 'pointer',
                         border: '1px solid var(--color-border-strong)',
-                        backgroundColor: nodeSimState === key ? 'var(--color-brand-primary)' : 'var(--color-bg-subtle)',
+                        backgroundColor: nodeSimState === key ? 'var(--color-brand-primary-bg)' : 'var(--color-bg-subtle)',
                         color: nodeSimState === key ? '#ffffff' : 'var(--color-text-secondary)',
                       }}
                     >

@@ -75,7 +75,7 @@ export class ReleaseManager {
       wcagLevel: 'AA',
       description: '본문 텍스트와 배경 간 명도 대비가 최소 4.5:1 이상이어야 함',
       status: 'pass',
-      contrastRatio: 11.4, // #c9d1d9 on #0d1117
+      contrastRatio: 12.26, // #c9d1d9 on #0d1117 (actual computed ratio 12.26:1)
     },
     {
       ruleId: 'wcag21-1.4.11-non-text-contrast',
@@ -120,7 +120,7 @@ export class ReleaseManager {
       builtAt: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
       unresolvedVulnerabilities: null,
       sloComplianceRate: null,
-      rollbackVerified: true,
+      rollbackVerified: false,
       isActive: false,
     },
   ];

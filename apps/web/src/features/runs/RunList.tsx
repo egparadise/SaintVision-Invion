@@ -129,7 +129,7 @@ export const RunList: React.FC<RunListProps> = ({
             fontWeight: 600,
             cursor: 'pointer',
             border: '1px solid var(--color-border-strong)',
-            backgroundColor: selectedFilter === 'ALL' ? 'var(--color-brand-primary)' : 'var(--color-bg-subtle)',
+            backgroundColor: selectedFilter === 'ALL' ? 'var(--color-brand-primary-bg)' : 'var(--color-bg-subtle)',
             color: selectedFilter === 'ALL' ? '#ffffff' : 'var(--color-text-secondary)',
           }}
         >

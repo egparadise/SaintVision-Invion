@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { ApprovalItem } from '@/contracts/types';
 import { RiskBadge } from '@/shared/ui/RiskBadge';
 import { Button } from '@/shared/ui/Button';
+import { useModalA11y } from '@/shared/ui/useModalA11y';
 
 export interface ApprovalDetailProps {
   approval: ApprovalItem;
@@ -25,6 +26,11 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
+
+  const { containerRef: rejectModalRef, handleKeyDown: handleRejectKeyDown } = useModalA11y({
+    isOpen: showRejectModal,
+    onClose: () => setShowRejectModal(false),
+  });
 
   // Countdown timer effect
   useEffect(() => {
@@ -295,6 +301,12 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
       {/* Reject Reason Modal */}
       {showRejectModal && (
         <div
+          ref={rejectModalRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="reject-modal-title"
+          onKeyDown={handleRejectKeyDown}
+          tabIndex={-1}
           style={{
             position: 'fixed',
             inset: 0,
@@ -315,7 +327,7 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
               boxShadow: 'var(--shadow-lg)',
             }}
           >
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '12px' }}>
+            <h3 id="reject-modal-title" style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '12px' }}>
               승인 요청 반려 확인
             </h3>
             <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginBottom: '16px' }}>
