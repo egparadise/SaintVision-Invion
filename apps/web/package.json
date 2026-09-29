@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "test": "vitest run",
+    "eval:check": "vitest run tests/agent-eval-runner.test.ts",
     "contracts:generate": "node scripts/api-response-contracts.mjs --write",
     "contracts:check": "node scripts/api-response-contracts.mjs --check"
   },

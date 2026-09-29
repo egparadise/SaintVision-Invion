@@ -88,6 +88,15 @@ class DatasetVersion(Base):
         CheckConstraint(
             "content_sha256 = lower(content_sha256)", name="checksum_is_lowercase"
         ),
+        # Where the reverse lineage lookup starts (S10-DB query API). Declared so
+        # the model and the database agree; migration 0050 creates it
+        # CONCURRENTLY, and it is deliberately not unique -- the same bytes may be
+        # registered as more than one dataset version.
+        Index(
+            "ix_dataset_versions_tenant_id_content_sha256",
+            "tenant_id",
+            "content_sha256",
+        ),
     )
 
     dataset_version_id: Mapped[InvId] = mapped_column(primary_key=True)
@@ -201,8 +210,12 @@ class ModelVersion(Base):
             "tenant_id", "model_version_id", name="uq_model_versions_tenant_id_version_id"
         ),
         UniqueConstraint("model_id", "version", name="uq_model_versions_model_id_version"),
+        # Scoped to the model, not the tenant (0052). The invariant is still "two
+        # names for identical bytes is a mistake", but a model belongs to one
+        # project, so refusing across projects answered a question the caller had
+        # no access to ask -- see the migration for the whole argument.
         UniqueConstraint(
-            "tenant_id", "content_sha256", name="uq_model_versions_tenant_id_content_sha256"
+            "model_id", "content_sha256", name="uq_model_versions_model_id_content_sha256"
         ),
         CheckConstraint("byte_size >= 0", name="byte_size_non_negative"),
         CheckConstraint(
@@ -216,6 +229,13 @@ class ModelVersion(Base):
         CheckConstraint(
             "stage <> 'released' OR (verified_at IS NOT NULL AND retention_pinned_until IS NOT NULL)",
             name="release_requires_verification_and_pin",
+        ),
+        # 0054: verified exactly when a measurement is bound. The foreign key to
+        # inv.model_version_measurements lives in the database only; that table
+        # is kernel-owned and deliberately not mapped here.
+        CheckConstraint(
+            "(verified_at IS NULL) = (verified_measurement_id IS NULL)",
+            name="verified_iff_measurement",           # convention renders ck_model_versions_verified_iff_measurement (0054)
         ),
         Index("ix_model_versions_tenant_id_stage", "tenant_id", "stage"),
     )
@@ -231,6 +251,9 @@ class ModelVersion(Base):
     byte_size: Mapped[int] = mapped_column(BigInteger, default=0)
     uri: Mapped[str] = mapped_column(Text)
     verified_at: Mapped[Utc | None] = mapped_column(nullable=True)
+    #: The signed node measurement that verified it (0054, design #209 v1.1):
+    #: set together with ``verified_at`` and never without it.
+    verified_measurement_id: Mapped[InvId | None] = mapped_column(nullable=True)
     #: Manual retention (PLAN-STORAGE-001). Extends only.
     retention_pinned_until: Mapped[Utc | None] = mapped_column(nullable=True)
     #: The Run that produced it, when one did.

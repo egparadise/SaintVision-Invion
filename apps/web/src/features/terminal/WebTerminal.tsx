@@ -499,7 +499,6 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
                 backgroundColor: 'transparent',
                 border: 'none',
                 color: '#f0f6fc',
-                outline: 'none',
                 fontFamily: 'inherit',
                 fontSize: 'inherit',
               }}

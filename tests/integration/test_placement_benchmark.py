@@ -3,6 +3,7 @@
 from collections import Counter
 from datetime import datetime, timezone
 from decimal import Decimal
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -89,15 +90,12 @@ class PgQueueObserver:
         if pid in seen or not graph.get(pid):
             return 0
         return 1 + max(
-            PgQueueObserver._chain_depth(blocker, graph, seen | {pid})
-            for blocker in graph[pid]
+            PgQueueObserver._chain_depth(blocker, graph, seen | {pid}) for blocker in graph[pid]
         )
 
     def _run(self) -> None:
         try:
-            with psycopg.connect(
-                self.runtime_dsn, autocommit=True, row_factory=dict_row
-            ) as conn:
+            with psycopg.connect(self.runtime_dsn, autocommit=True, row_factory=dict_row) as conn:
                 self._settings = {
                     "logLockWaits": conn.execute("SHOW log_lock_waits").fetchone()[
                         "log_lock_waits"
@@ -129,8 +127,7 @@ class PgQueueObserver:
                     ).fetchall()
                     if rows and self._wave_origin_ns is not None:
                         graph = {
-                            int(row["pid"]): [int(item) for item in row["blockers"]]
-                            for row in rows
+                            int(row["pid"]): [int(item) for item in row["blockers"]] for row in rows
                         }
                         backends = []
                         for row in rows:
@@ -152,14 +149,11 @@ class PgQueueObserver:
                                     ),
                                 }
                             )
-                        lock_waiters = sum(
-                            item["waitEventType"] == "Lock" for item in backends
-                        )
+                        lock_waiters = sum(item["waitEventType"] == "Lock" for item in backends)
                         self._timeline.append(
                             {
                                 "offsetMs": round(
-                                    (perf_counter_ns() - self._wave_origin_ns)
-                                    / 1_000_000,
+                                    (perf_counter_ns() - self._wave_origin_ns) / 1_000_000,
                                     3,
                                 ),
                                 "activeBackendCount": len(backends),
@@ -177,9 +171,7 @@ class PgQueueObserver:
 
     def report(self) -> dict:
         classes = Counter(
-            backend["statementClass"]
-            for sample in self._timeline
-            for backend in sample["backends"]
+            backend["statementClass"] for sample in self._timeline for backend in sample["backends"]
         )
         return {
             "enabled": True,
@@ -369,9 +361,7 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
         pytest.fail("Benchmark rounds must be 1 or 2")
     if concurrency != a.request_count:
         pytest.fail("Benchmark concurrency must equal request count")
-    runs = [
-        [planned(a.e) for _ in range(a.request_count)] for _ in range(round_count)
-    ]
+    runs = [[planned(a.e) for _ in range(a.request_count)] for _ in range(round_count)]
     _start_observation_window(a)
 
     def reserve(round_index, request_index):
@@ -394,9 +384,7 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
             concurrency=concurrency,
             reserve=lambda index: reserve(0, index),
             on_wave_start=(
-                a.queue_observer.mark_wave_start
-                if a.queue_observer is not None
-                else None
+                a.queue_observer.mark_wave_start if a.queue_observer is not None else None
             ),
         )
     finally:
@@ -447,7 +435,10 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
     report = summarize(
         first,
         second,
-        topology="development-PC; one synthetic measured-node row; pre-five-node-lab",
+        topology=os.getenv(
+            "INV_PLACEMENT_BENCHMARK_TOPOLOGY",
+            "development-PC; one synthetic measured-node row; pre-five-node-lab",
+        ),
         code_sha=os.getenv("INV_PLACEMENT_BENCHMARK_CODE_SHA", "working-tree"),
         active_after_first=active_after_rounds[0],
         active_after_rounds=active_after_rounds,
@@ -507,22 +498,15 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
     hold_metrics = [
         item
         for item in a.lock_hold_metrics
-        if item["mode"]
-        not in {"placement-limit-row-wait", "placement-legacy-lock-wait"}
+        if item["mode"] not in {"placement-limit-row-wait", "placement-legacy-lock-wait"}
     ]
     candidate_wait_metrics = [
         item for item in a.lock_hold_metrics if item["mode"] == "placement-limit-row-wait"
     ]
     legacy_wait_metrics = [
-        item
-        for item in a.lock_hold_metrics
-        if item["mode"] == "placement-legacy-lock-wait"
+        item for item in a.lock_hold_metrics if item["mode"] == "placement-legacy-lock-wait"
     ]
-    committed_holds = [
-        item["lockHoldMs"]
-        for item in hold_metrics
-        if item["outcome"] == "commit"
-    ]
+    committed_holds = [item["lockHoldMs"] for item in hold_metrics if item["outcome"] == "commit"]
     report["lockHold"] = {
         "mode": (
             "placement-short-commit"
@@ -531,21 +515,16 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
         ),
         "samples": hold_metrics,
         "commitCount": len(committed_holds),
-        "rollbackCount": sum(
-            item["outcome"] == "rollback" for item in hold_metrics
-        ),
+        "rollbackCount": sum(item["outcome"] == "rollback" for item in hold_metrics),
         "commitP50Ms": (
-            round(percentile_nearest_rank(committed_holds, 0.50), 3)
-            if committed_holds
-            else None
+            round(percentile_nearest_rank(committed_holds, 0.50), 3) if committed_holds else None
         ),
         "commitP95Ms": (
-            round(percentile_nearest_rank(committed_holds, 0.95), 3)
-            if committed_holds
-            else None
+            round(percentile_nearest_rank(committed_holds, 0.95), 3) if committed_holds else None
         ),
         "commitMaxMs": round(max(committed_holds), 3) if committed_holds else None,
     }
+
     def summarize_waits(metrics, *, mode, policy):
         values = [item["waitMs"] for item in metrics]
         return {
@@ -558,12 +537,8 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
             "acquiredCount": sum(item["outcome"] == "acquired" for item in metrics),
             "timeoutCount": sum(item["outcome"] == "timeout" for item in metrics),
             "timeoutRetryCount": 0,
-            "p50Ms": (
-                round(percentile_nearest_rank(values, 0.50), 3) if values else None
-            ),
-            "p95Ms": (
-                round(percentile_nearest_rank(values, 0.95), 3) if values else None
-            ),
+            "p50Ms": (round(percentile_nearest_rank(values, 0.50), 3) if values else None),
+            "p95Ms": (round(percentile_nearest_rank(values, 0.95), 3) if values else None),
             "maxMs": round(max(values), 3) if values else None,
         }
 
@@ -583,14 +558,17 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
         else report["legacyLockWait"]
     )
     report["schemaVersion"] = "1.7.0"
+    report["disposableDatabase"] = {
+        "fingerprintSha256": hashlib.sha256(a.e.database_name.encode("utf-8")).hexdigest(),
+        "nameExposed": False,
+        "lifecycle": "unique-pytest-session-database",
+    }
     report["contentionObservation"]["candidateLimitLockTimeoutMs"] = int(
         os.getenv("INV_PLACEMENT_CANDIDATE_LIMIT_LOCK_TIMEOUT_MS", "500")
     )
     report["contentionObservation"]["serverSideLockHoldMeasured"] = True
     report["contentionObservation"]["serverSideLockWaitSeparatelyMeasured"] = False
-    report["contentionObservation"][
-        "clientObservedLockAcquireElapsedSeparatelyMeasured"
-    ] = True
+    report["contentionObservation"]["clientObservedLockAcquireElapsedSeparatelyMeasured"] = True
     path = Path(os.getenv("INV_PLACEMENT_BENCHMARK_REPORT", ".work/placement-benchmark.json"))
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -629,12 +607,8 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
         "candidateLimitLockTimeoutMs",
         report["contentionObservation"]["candidateLimitLockTimeoutMs"],
     )
-    record_property(
-        "limitRowTimeoutRetryCount", report["limitRowWait"]["timeoutRetryCount"]
-    )
-    record_property(
-        "sqlTimeoutStatementCount", len(report["sqlDiagnostics"]["timeoutStatements"])
-    )
+    record_property("limitRowTimeoutRetryCount", report["limitRowWait"]["timeoutRetryCount"])
+    record_property("sqlTimeoutStatementCount", len(report["sqlDiagnostics"]["timeoutStatements"]))
     record_property("queueObservationEnabled", report["queueObservation"]["enabled"])
     if report["queueObservation"]["enabled"]:
         record_property(

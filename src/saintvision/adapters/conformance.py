@@ -58,6 +58,30 @@ class Check:
     skipped: bool = False
 
 
+@dataclass(frozen=True, slots=True)
+class CheckSpec:
+    """One check, described rather than executed (G-03 design v1.2 §5-1).
+
+    The names used to be string literals inside ``run_conformance``'s body,
+    which meant nothing could read the check list without running the suite --
+    and running it drives host CLI processes. A caller that wants to know *what*
+    the contract checks (an API describing the surface, a test asserting the
+    list is complete) reads ``CHECKLIST`` instead.
+
+    This is a descriptor, not a second source of truth: ``run_conformance``
+    builds its report from this same tuple, so the list a reader sees is the
+    list the suite runs.
+    """
+
+    name: str
+    #: ``None`` means the check always runs. A capability means it runs only for
+    #: an adapter that declares it, and is reported as skipped otherwise --
+    #: skipped separately from passed, so a narrow adapter cannot look as
+    #: complete as a broad one.
+    capability: Capability | None
+    run: Callable[[ProviderAdapter, str], tuple[bool, str]]
+
+
 @dataclass
 class ConformanceReport:
     adapter: str
@@ -126,38 +150,17 @@ def run_conformance(
         adapter=getattr(adapter, "name", type(adapter).__name__),
         contract_version=getattr(adapter, "contract_version", "unknown"),
     )
-    add = report.checks.append
-
-    add(_check("declares_contract_version", lambda: _declares_version(adapter)))
-    add(_check("implements_every_member", lambda: _implements_members(adapter)))
-    add(_check("probe_without_credentials", lambda: _probe(adapter)))
-    add(_check("install_reports_without_installing", lambda: _install(adapter)))
-    add(_check("authenticate_takes_a_reference", lambda: _authenticate(adapter, credential_ref)))
-    add(_check("run_returns_a_usable_handle", lambda: _run(adapter)))
-    add(_check("collect_returns_redacted_content", lambda: _collect_is_redacted(adapter)))
-    add(_check("redact_removes_known_secrets", lambda: _redact(adapter)))
-    add(_check("redact_is_idempotent", lambda: _redact_idempotent(adapter)))
-    add(_check("cancel_returns_a_tri_state", lambda: _cancel_tri_state(adapter)))
-    add(_check("cancel_after_completion_is_not_stopped", lambda: _cancel_finished(adapter)))
-    add(_check("attest_does_not_overclaim", lambda: _attest(adapter)))
-
-    # Capability-gated checks. Skipped is reported separately from passed so a
-    # narrow adapter cannot look as complete as a broad one.
     caps = getattr(adapter, "capabilities", frozenset())
-    if Capability.SERVER_SIDE_CANCEL in caps:
-        add(_check("declared_server_cancel_actually_stops", lambda: _cancel_stops(adapter)))
-    else:
-        add(Check("declared_server_cancel_actually_stops", True, "not declared", skipped=True))
 
-    if Capability.USAGE_REPORTING in caps:
-        add(_check("declared_usage_is_reported", lambda: _usage(adapter)))
-    else:
-        add(Check("declared_usage_is_reported", True, "not declared", skipped=True))
-
-    if Capability.MODEL_PINNING in caps:
-        add(_check("declared_model_pinning_returns_an_id", lambda: _model_pin(adapter)))
-    else:
-        add(Check("declared_model_pinning_returns_an_id", True, "not declared", skipped=True))
+    # One loop over CHECKLIST, so the names and the gates exist in one place and
+    # a reader of the list cannot disagree with a run of the suite.
+    for spec in CHECKLIST:
+        if spec.capability is not None and spec.capability not in caps:
+            report.checks.append(Check(spec.name, True, "not declared", skipped=True))
+            continue
+        report.checks.append(
+            _check(spec.name, lambda spec=spec: spec.run(adapter, credential_ref))
+        )
 
     return report
 
@@ -322,6 +325,68 @@ def _model_pin(adapter: ProviderAdapter) -> tuple[bool, str]:
     if handle.model_id != result.model_id:
         return False, "the handle and the result disagree about the model"
     return True, result.model_id
+
+
+def _ignoring_credential(
+    fn: Callable[[ProviderAdapter], tuple[bool, str]]
+) -> Callable[[ProviderAdapter, str], tuple[bool, str]]:
+    """Give a one-argument check the two-argument shape ``CheckSpec`` declares.
+
+    Only ``_authenticate`` needs the credential reference. Wrapping the others
+    rather than changing fifteen signatures keeps this extraction to what it is:
+    a descriptor over the checks that already existed.
+    """
+
+    def run(adapter: ProviderAdapter, _credential_ref: str) -> tuple[bool, str]:
+        return fn(adapter)
+
+    return run
+
+
+#: Every check the suite runs, in the order it runs them, with its gate.
+#:
+#: The single source of truth for the check list. ``run_conformance`` loops over
+#: it and a reader (the conformance status route, a test) reads it without
+#: running anything. Defined here rather than at the top of the module because it
+#: names the functions above it.
+#:
+#: **Adding or removing a check is a two-place change**: this tuple and the
+#: independent baseline in ``tests/core/test_conformance_checklist_ratchet.py``.
+#: That is deliberate. Before this existed, deleting a check killed no test for
+#: three of the names, because nothing anywhere asserted the set.
+CHECKLIST: tuple[CheckSpec, ...] = (
+    CheckSpec("declares_contract_version", None, _ignoring_credential(_declares_version)),
+    CheckSpec("implements_every_member", None, _ignoring_credential(_implements_members)),
+    CheckSpec("probe_without_credentials", None, _ignoring_credential(_probe)),
+    CheckSpec("install_reports_without_installing", None, _ignoring_credential(_install)),
+    CheckSpec("authenticate_takes_a_reference", None, _authenticate),
+    CheckSpec("run_returns_a_usable_handle", None, _ignoring_credential(_run)),
+    CheckSpec(
+        "collect_returns_redacted_content", None, _ignoring_credential(_collect_is_redacted)
+    ),
+    CheckSpec("redact_removes_known_secrets", None, _ignoring_credential(_redact)),
+    CheckSpec("redact_is_idempotent", None, _ignoring_credential(_redact_idempotent)),
+    CheckSpec("cancel_returns_a_tri_state", None, _ignoring_credential(_cancel_tri_state)),
+    CheckSpec(
+        "cancel_after_completion_is_not_stopped", None, _ignoring_credential(_cancel_finished)
+    ),
+    CheckSpec("attest_does_not_overclaim", None, _ignoring_credential(_attest)),
+    CheckSpec(
+        "declared_server_cancel_actually_stops",
+        Capability.SERVER_SIDE_CANCEL,
+        _ignoring_credential(_cancel_stops),
+    ),
+    CheckSpec(
+        "declared_usage_is_reported",
+        Capability.USAGE_REPORTING,
+        _ignoring_credential(_usage),
+    ),
+    CheckSpec(
+        "declared_model_pinning_returns_an_id",
+        Capability.MODEL_PINNING,
+        _ignoring_credential(_model_pin),
+    ),
+)
 
 
 def compare_reports(reports: list[ConformanceReport]) -> dict[str, Any]:

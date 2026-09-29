@@ -450,6 +450,7 @@ def _run_pytest_adapter(args: argparse.Namespace) -> int:
         "INV_PLACEMENT_BENCHMARK_ROUNDS": str(args.rounds),
         "INV_PLACEMENT_BENCHMARK_REPORT": str(args.report.resolve()),
         "INV_PLACEMENT_BENCHMARK_CODE_SHA": code_sha,
+        "INV_PLACEMENT_BENCHMARK_TOPOLOGY": args.topology,
         "INV_PLACEMENT_SHORT_COMMIT": "1" if args.mode == "short-commit" else "0",
         "INV_PLACEMENT_CANDIDATE_LIMIT_LOCK_TIMEOUT_MS": str(args.candidate_limit_lock_timeout_ms),
         "INV_PLACEMENT_QUEUE_DIAGNOSTIC": "1" if args.queue_diagnostic else "0",
@@ -479,6 +480,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--junit", type=Path, default=ROOT / ".work/placement-benchmark.xml")
     parser.add_argument("--report", type=Path, default=ROOT / ".work/placement-benchmark.json")
     parser.add_argument("--timeout", type=int, default=300)
+    parser.add_argument(
+        "--topology",
+        default="development-PC; one synthetic measured-node row; pre-five-node-lab",
+        help="truthful measurement topology recorded in the JSON and JUnit evidence",
+    )
     parser.add_argument(
         "--adapter",
         choices=("synthetic", "five-node-lab"),

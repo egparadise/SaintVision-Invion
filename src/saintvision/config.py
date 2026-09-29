@@ -46,6 +46,22 @@ def _get_int(name: str, default: int) -> int:
     return default if raw is None else int(raw)
 
 
+#: The widest freshness window a deployment may configure: one year. A
+#: measurement older than that is evidence of the past, not of the bytes now.
+MEASUREMENT_MAX_AGE_CEILING_SECONDS = 31_536_000
+
+
+def validate_measurement_max_age(value: object) -> int:
+    """A finite, positive number of seconds within the ceiling, or a refusal."""
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise ValueError("model_measurement_max_age_seconds must be an integer number of seconds")
+    if not 1 <= value <= MEASUREMENT_MAX_AGE_CEILING_SECONDS:
+        raise ValueError(
+            f"model_measurement_max_age_seconds must be between 1 and {MEASUREMENT_MAX_AGE_CEILING_SECONDS}"
+        )
+    return value
+
+
 @dataclass(frozen=True, slots=True)
 class Settings:
     database_url: str
@@ -62,6 +78,21 @@ class Settings:
     page_limit_max: int = 200
     #: Idempotency ledger retention.
     idempotency_ttl_seconds: int = 86_400
+    #: ``SET LOCAL lock_timeout`` for every write transaction in the business
+    #: lane (G-04 card 84; ``api/lock_wait.py``). Ordinary contention waits and
+    #: proceeds on the committed row; a wait past this budget is answered
+    #: ``SYS-0001/503/retryable``. Validated in ``__post_init__``: an integer
+    #: between 1 and 600000 milliseconds.
+    business_lock_timeout_ms: int = 5_000
+    #: How old a kernel-recorded model measurement may be and still verify a
+    #: model version (W3, design #209 v1.1 §6 freshness). Validated in
+    #: ``__post_init__``: an integer number of seconds, 1..31536000.
+    model_measurement_max_age_seconds: int = 86_400
+    #: Base URL of the execution kernel, for the observations business routes
+    #: read back over HTTP (VF-CL-03). Absent is a valid deployment: a route
+    #: that needs an observation then refuses with 503 rather than guessing a
+    #: host, which is the same rule the rest of this module follows.
+    kernel_base_url: str | None = None
 
     #: Real login. Absent means the static development verifier, which refuses
     #: to be constructed outside dev and test — so a deployment either has all
@@ -73,6 +104,14 @@ class Settings:
     #: A file, not a URL. Fetching keys at verification time makes the identity
     #: provider's availability a dependency of every request.
     oidc_jwks_file: str | None = None
+
+    def __post_init__(self) -> None:
+        # Fail at construction, not at the first write: a deployment with a
+        # nonsensical budget must not start and then refuse every write.
+        from .api.lock_wait import validate_lock_timeout
+
+        validate_lock_timeout(self.business_lock_timeout_ms)
+        validate_measurement_max_age(self.model_measurement_max_age_seconds)
 
     @property
     def login_configured(self) -> bool:
@@ -97,6 +136,8 @@ class Settings:
             page_limit_default=_get_int("INV_PAGE_LIMIT_DEFAULT", 50),
             page_limit_max=_get_int("INV_PAGE_LIMIT_MAX", 200),
             idempotency_ttl_seconds=_get_int("INV_IDEMPOTENCY_TTL_SECONDS", 86_400),
+            business_lock_timeout_ms=_get_int("INV_BUSINESS_LOCK_TIMEOUT_MS", 5_000),
+            model_measurement_max_age_seconds=_get_int("INV_MODEL_MEASUREMENT_MAX_AGE_SECONDS", 86_400),
             tenant_id=os.environ.get("INV_TENANT_ID"),
             oidc_issuer=os.environ.get("INV_OIDC_ISSUER"),
             oidc_audience=os.environ.get("INV_OIDC_AUDIENCE"),
@@ -106,6 +147,7 @@ class Settings:
                 if value.strip()
             ),
             oidc_jwks_file=os.environ.get("INV_OIDC_JWKS_FILE"),
+            kernel_base_url=os.environ.get("INV_KERNEL_BASE_URL"),
         )
 
 

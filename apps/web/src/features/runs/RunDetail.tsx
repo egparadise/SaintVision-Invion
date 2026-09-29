@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { RunItem, RunState, ShardExecutionItem, NodeStopReceiptView, RunResultView, RunLogView, RunArtifactList, RunAttemptList, ShardObservation, ModelRetryPrepareResult } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
+import { useModalA11y } from '@/shared/ui/useModalA11y';
 import { apiClient, ApiError } from '@/shared/api/client';
 import { cancelKernelRun } from '@/shared/api/kernelMutations';
 import { fetchShardObservation, shardRows, shardRefreshNotice } from '@/shared/api/shardObservation';
@@ -8,6 +9,7 @@ import { fetchRunLogs } from '@/shared/api/runLogObservation';
 import { fetchRunArtifacts, getArtifactDownloadUrl } from '@/shared/api/runArtifactObservation';
 import { fetchRunAttempts } from '@/shared/api/runAttemptObservation';
 import { prepareModelRetry, formatModelRetryProblem } from '@/shared/api/modelRetry';
+import { SealRecordPanel } from './SealRecordPanel';
 
 export interface RunDetailProps {
   run: RunItem;
@@ -41,7 +43,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
   onRefreshRun,
   onOpenStudio,
 }) => {
-  const [activeTab, setActiveTab] = useState<'timeline' | 'logs' | 'artifacts' | 'explain' | 'shards' | 'attempts'>('timeline');
+  const [activeTab, setActiveTab] = useState<'timeline' | 'logs' | 'artifacts' | 'explain' | 'shards' | 'attempts' | 'seal'>('timeline');
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState('user_requested');
   const [isCancelling, setIsCancelling] = useState(false);
@@ -54,6 +56,16 @@ export const RunDetail: React.FC<RunDetailProps> = ({
   const [isPreparingResume, setIsPreparingResume] = useState(false);
   const [resumeNotice, setResumeNotice] = useState<string | null>(null);
   const [selectedReceipt, setSelectedReceipt] = useState<NodeStopReceiptView | null>(null);
+
+  const { containerRef: cancelModalRef, handleKeyDown: handleCancelKeyDown } = useModalA11y({
+    isOpen: showCancelModal,
+    onClose: () => setShowCancelModal(false),
+  });
+
+  const { containerRef: receiptModalRef, handleKeyDown: handleReceiptKeyDown } = useModalA11y({
+    isOpen: Boolean(selectedReceipt),
+    onClose: () => setSelectedReceipt(null),
+  });
   const [isLoadingReceipt, setIsLoadingReceipt] = useState(false);
   const [logView, setLogView] = useState<RunLogView | null>(null);
   const [isLoadingLogs, setIsLoadingLogs] = useState(false);
@@ -633,8 +645,12 @@ export const RunDetail: React.FC<RunDetailProps> = ({
       {/* Cancellation Modal (S04-FE / AC-04) */}
       {showCancelModal && (
         <div
+          ref={cancelModalRef}
           role="dialog"
           aria-modal="true"
+          aria-labelledby="run-cancel-modal-title"
+          onKeyDown={handleCancelKeyDown}
+          tabIndex={-1}
           style={{
             position: 'fixed',
             inset: 0,
@@ -657,7 +673,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
               boxShadow: 'var(--shadow-md)',
             }}
           >
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: 'var(--color-brand-danger)' }}>
+            <h3 id="run-cancel-modal-title" style={{ fontSize: '1.125rem', fontWeight: 600, color: 'var(--color-brand-danger)' }}>
               Run 실행 취소 확인 (AC-04)
             </h3>
             <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginTop: '8px' }}>
@@ -721,6 +737,12 @@ export const RunDetail: React.FC<RunDetailProps> = ({
       {/* NodeStopReceipt Modal (ADR-027 / ADR-028 / ADR-040 / ADR-041) */}
       {selectedReceipt && (
         <div
+          ref={receiptModalRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="receipt-modal-title"
+          onKeyDown={handleReceiptKeyDown}
+          tabIndex={-1}
           data-testid="receipt-modal"
           style={{
             position: 'fixed',
@@ -751,7 +773,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
               <div>
-                <h3 style={{ fontSize: '1.125rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h3 id="receipt-modal-title" style={{ fontSize: '1.125rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span>🧾</span> NodeStopReceipt 물리 정지 영수증 검증
                 </h3>
                 <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
@@ -995,11 +1017,13 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           { id: 'explain', label: '4. 자원 배치 Explain' },
           { id: 'shards', label: `5. 분산 샤드 & 자원 회수 (${shards.length > 0 ? shards.length : 'ADR-040'})` },
           { id: 'attempts', label: `6. 시도 이력 (${attemptList ? attemptList.count : 'Attempts'})` },
+          { id: 'seal', label: '7. 봉인 기록 (Seal Record)' },
         ].map((t) => {
           const isActive = activeTab === t.id;
           return (
             <button
               key={t.id}
+              data-testid={`tab-${t.id}`}
               onClick={() => setActiveTab(t.id as typeof activeTab)}
               style={{
                 padding: '10px 16px',
@@ -1052,7 +1076,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
                         fontSize: '0.875rem',
                         fontWeight: 700,
                         backgroundColor: isCurrent
-                          ? 'var(--color-brand-primary)'
+                          ? 'var(--color-brand-primary-bg)'
                           : isPassed
                           ? 'var(--color-status-online)'
                           : 'var(--color-bg-subtle)',
@@ -1796,6 +1820,11 @@ export const RunDetail: React.FC<RunDetailProps> = ({
             </div>
           )}
         </div>
+      )}
+
+      {/* Tab 7: Seal Record */}
+      {activeTab === 'seal' && (
+        <SealRecordPanel projectId={run.projectId} runId={run.id} />
       )}
     </div>
   );

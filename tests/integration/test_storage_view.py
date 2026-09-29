@@ -6,6 +6,7 @@ from uuid import uuid4
 import psycopg
 from psycopg.types.json import Jsonb
 import pytest
+from db_integrity import preserved_rows, suspended_triggers
 from fastapi.testclient import TestClient
 
 from inv.app import create_app
@@ -154,46 +155,48 @@ def test_tampered_stored_records_cannot_be_reported_verified(view, field):
     _, envelope = prepare(a)
     committed = accept(a, envelope)
     # Corruption injection uses only the disposable DB owner. Runtime cannot
-    # bypass these immutable triggers or mutate recorded observations.
-    with psycopg.connect(a.e.owner) as c:
-        if field == "evidence_hash":
-            c.execute("ALTER TABLE inv.evidence DISABLE TRIGGER USER")
-            c.execute(
-                "UPDATE inv.evidence SET envelope=jsonb_set(envelope,'{outputSha256}',to_jsonb(repeat('0',64))) WHERE evidence_id=%s",
-                (committed["evidenceId"],),
-            )
-            c.execute("ALTER TABLE inv.evidence ENABLE TRIGGER USER")
-        else:
-            c.execute("ALTER TABLE public.storage_checks DISABLE TRIGGER USER")
-            detail = c.execute(
-                "SELECT detail FROM public.storage_checks WHERE check_id=%s",
-                (committed["checkId"],),
-            ).fetchone()[0]
-            if field == "healthy":
-                c.execute(
-                    "UPDATE public.storage_checks SET healthy=false WHERE check_id=%s",
-                    (committed["checkId"],),
-                )
-            elif field == "sampled":
-                c.execute(
-                    "UPDATE public.storage_checks SET sampled_count=0 WHERE check_id=%s",
-                    (committed["checkId"],),
-                )
+    # bypass these immutable triggers or mutate recorded observations.  The
+    # corrupted row is restored verbatim when the test ends.
+    target = (("inv.evidence", "evidence_id=%s", (committed["evidenceId"],)) if field == "evidence_hash"
+              else ("public.storage_checks", "check_id=%s", (committed["checkId"],)))
+    with preserved_rows(a.e.owner, target):
+        with psycopg.connect(a.e.owner) as c:
+            if field == "evidence_hash":
+                with suspended_triggers(c, "inv.evidence", "USER"):
+                    c.execute(
+                        "UPDATE inv.evidence SET envelope=jsonb_set(envelope,'{outputSha256}',to_jsonb(repeat('0',64))) WHERE evidence_id=%s",
+                        (committed["evidenceId"],),
+                    )
             else:
-                if field == "evidenceId":
-                    detail["evidenceId"] = "evd_" + "0" * 26
-                elif field == "signature":
-                    detail["envelope"]["signature"] = "A" * 86 + "=="
-                elif field == "challenge":
-                    detail["challenge"]["nonce"] = "0" * 64
-                c.execute(
-                    "UPDATE public.storage_checks SET detail=%s WHERE check_id=%s",
-                    (Jsonb(detail), committed["checkId"]),
-                )
-            c.execute("ALTER TABLE public.storage_checks ENABLE TRIGGER USER")
-    response = get(a)
-    assert response.status_code == 409, response.text
-    assert "certificateDer" not in response.text
+                with suspended_triggers(c, "public.storage_checks", "USER"):
+                    detail = c.execute(
+                        "SELECT detail FROM public.storage_checks WHERE check_id=%s",
+                        (committed["checkId"],),
+                    ).fetchone()[0]
+                    if field == "healthy":
+                        c.execute(
+                            "UPDATE public.storage_checks SET healthy=false WHERE check_id=%s",
+                            (committed["checkId"],),
+                        )
+                    elif field == "sampled":
+                        c.execute(
+                            "UPDATE public.storage_checks SET sampled_count=0 WHERE check_id=%s",
+                            (committed["checkId"],),
+                        )
+                    else:
+                        if field == "evidenceId":
+                            detail["evidenceId"] = "evd_" + "0" * 26
+                        elif field == "signature":
+                            detail["envelope"]["signature"] = "A" * 86 + "=="
+                        elif field == "challenge":
+                            detail["challenge"]["nonce"] = "0" * 64
+                        c.execute(
+                            "UPDATE public.storage_checks SET detail=%s WHERE check_id=%s",
+                            (Jsonb(detail), committed["checkId"]),
+                        )
+        response = get(a)
+        assert response.status_code == 409, response.text
+        assert "certificateDer" not in response.text
 
 
 def test_storage_view_rejects_invalid_stored_EvidenceEnvelope(view):
@@ -201,17 +204,16 @@ def test_storage_view_rejects_invalid_stored_EvidenceEnvelope(view):
     a = view
     _, envelope = prepare(a)
     committed = accept(a, envelope)
-    with psycopg.connect(a.e.owner) as conn:
-        conn.execute("ALTER TABLE inv.evidence DISABLE TRIGGER USER")
-        conn.execute(
-            "UPDATE inv.evidence SET envelope=envelope-'actorId' WHERE evidence_id=%s",
-            (committed["evidenceId"],),
-        )
-        conn.execute("ALTER TABLE inv.evidence ENABLE TRIGGER USER")
-    with pytest.raises(DomainError, match="VERIFY-0032"):
-        StorageObservationView(a.e.db).result(
-            a.principal, a.e.project, a.run, a.request
-        )
+    with preserved_rows(a.e.owner, ("inv.evidence", "evidence_id=%s", (committed["evidenceId"],))):
+        with psycopg.connect(a.e.owner) as conn, suspended_triggers(conn, "inv.evidence", "USER"):
+            conn.execute(
+                "UPDATE inv.evidence SET envelope=envelope-'actorId' WHERE evidence_id=%s",
+                (committed["evidenceId"],),
+            )
+        with pytest.raises(DomainError, match="VERIFY-0032"):
+            StorageObservationView(a.e.db).result(
+                a.principal, a.e.project, a.run, a.request
+            )
 
 
 def test_read_holds_current_grant_until_verified_response(view, monkeypatch):
