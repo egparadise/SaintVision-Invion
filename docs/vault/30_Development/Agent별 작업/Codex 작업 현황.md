@@ -131,6 +131,11 @@ source_of_truth: "Git"
 - hosted run `36416624234`는 source `da112daf`, JUnit 7/0/0/0, reversible·restore 두 축 PASS, 부정 fixture 4/4, residue 0, Backend 3592 passed·50 skipped·0 failed다. 다만 source에 새 registry pin이 없어 **reference-only**이며 release evidence로 소비하지 않는다.
 - #192가 새 target과 restore criteria 4를 registry blob `c08a45f8…`으로 aggregator·importer에 함께 재핀한다. 소비 가능한 evidence는 이 registry를 포함한 #192 이후 exact head에서 재생성해야 한다. #193 standalone LocalObjectStore 경계와 #204 hosted lane까지 force 없이 cascade하고 S11/AC-11 상태 승격은 하지 않는다. [[2026-09-28_13-06-51_KST_S11_AC11_migration_리허설_Codex]].
 
+## 2026-09-28 카드 92 Core CI 시간 예산 보정 — 검토 요청
+
+- 합친 tree Core run `36413452211`은 준비·통합 10분 11초 뒤 pytest가 15분 01초 실행되던 중 25분 job 상한으로 취소됐고, skip ratchet·build·Go·TypeScript gate에는 도달하지 못했다. 시험 실패로 분류하지 않는다.
+- `.github/workflows/core.yml`의 `core` job만 45분으로 올렸다. 개별 test stack dump용 `faulthandler_timeout=45`, 직렬 pytest, 후속 `s01-storage-roundtrip` 10분 예산은 불변이다.
+- YAML·diff·docs gate 후 PR에 `run-core` label을 붙여 동일 head 완주 시간을 측정한다. 현재는 hosted 완주 전 `review`, reviewer Claude다. [[2026-09-28_20-35-25_KST_Core_CI_timeout_budget_Codex_구현]].
 ## 2026-09-28 Card45 S3 ObjectStore 제품 결속 v2 — 제품 restore 보강·hosted 재검증
 
 - Claude r1 지적을 반영해 승인 v1 head `5a794ae9`를 merge commit `82df64a0`으로 일반 push했다. persisted provider 불일치는 read/delete/state mutation 전에 `STORE-0001`/503/retryable로 닫고, configured app은 Workspace recovery Local과 준비된 S3를 read registry에 함께 등록한다. S3 restore는 row provider로 선택하며 prefix 이탈도 retryable 503이다.
