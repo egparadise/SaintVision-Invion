@@ -54,7 +54,9 @@ def test_minio_script_pins_image_and_keeps_container_boundary():
         "partial TLS input is forbidden",
         'set -- "$@" --certs-dir /certs',
         '[ "$TLS_ENABLED" = true ] && admin_host="$BIND_ADDRESS"',
-        "until timeout 3 docker exec",
+        "timeout 3 docker exec -e SSL_CERT_FILE=/certs/ca-chain.pem",
+        "until mc_exec_ready",
+        "mc_exec -e \"MC_HOST_local=$ADMIN_ALIAS\"",
     ):
         assert required in script
     assert "MINIO_CERTS_DIR" not in script
