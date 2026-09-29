@@ -54,9 +54,10 @@ const LEGACY_AUTH_PROBLEM_KEYS = new Set([
   'instance',
 ]);
 
-function isProblemDetails(value: unknown): value is ProblemDetails {
+export function isProblemDetails(value: unknown, expectedStatus?: number): value is ProblemDetails {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
   const problem = value as Record<string, unknown>;
+  if (typeof expectedStatus === 'number' && problem.status !== expectedStatus) return false;
   const isLegacyAuth = problem.status === 401 && problem.code === 'AUTH-MISSING-CREDENTIAL';
   const allowedKeys = isLegacyAuth ? LEGACY_AUTH_PROBLEM_KEYS : PROBLEM_DETAIL_KEYS;
   return Object.keys(problem).every((key) => allowedKeys.has(key)) &&
@@ -182,7 +183,7 @@ export async function apiClient<T>(endpoint: string, options: RequestOptions = {
       const contentType = response.headers.get('content-type') || '';
       if (contentType.includes('application/problem+json') || contentType.includes('application/json')) {
         const payload: unknown = await response.json();
-        if (isProblemDetails(payload)) {
+        if (isProblemDetails(payload, response.status)) {
           problem = payload;
         } else {
           const detail =
