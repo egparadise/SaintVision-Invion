@@ -114,6 +114,11 @@ class Session:
     def __init__(self, world):
         self.world = world
 
+    def execute(self, statement, params=None):
+        # Card 84: the lane's lock-wait bound, SET LOCAL before the row lock.
+        self.world.setdefault("lock_timeouts", []).append(str(statement))
+        return None
+
     def get(self, _model, _key, **_kwargs):
         return self.world["parent"]
 
@@ -1112,7 +1117,9 @@ def test_the_real_pg_seed_builds_every_row_without_a_database():
     }
     # Five own rows, nine subject-chain rows, four edges. Counted so a row that
     # stops being seeded is noticed here rather than as a refusal on hosted CI.
-    assert len(recorder.statements) == 18
+    # 18 rows plus the two statements the 0054 measurement takes (the tenant
+    # GUC, then the kernel-table insert the seed records before verified_at).
+    assert len(recorder.statements) == 20
 
     # Counting statements was not enough: the first version of this fixture wrote
     # four edges whose subject rows did not exist, and trace_model resolves an
@@ -1121,6 +1128,7 @@ def test_the_real_pg_seed_builds_every_row_without_a_database():
     written = {
         statement.split("INSERT INTO ", 1)[1].split(" ", 1)[0]
         for statement in recorder.statements
+        if "INSERT INTO " in statement          # the 0054 measurement also sets the tenant GUC first
     }
     assert {"dataset_versions", "code_commits", "eval_runs", "approvals"} <= written, (
         "every required lineage kind needs a real subject row, not just an edge"
@@ -1135,3 +1143,13 @@ def test_the_real_pg_seed_builds_every_row_without_a_database():
     # The trap itself, named: two lineage kinds are not entity kinds, so a fixture
     # that reuses an edge kind as an id kind raises.
     assert set(LINEAGE_KINDS) - set(PREFIXES) == {"code_commit", "container_image"}
+
+
+def test_card84_both_spans_bound_their_lock_waits(monkeypatch):
+    """Permission preflight and the write transaction both SET LOCAL lock_timeout
+    (Codex #211 F1: the preflight's FOR SHARE on the user row can wait too)."""
+    world: dict = {}
+    client = build(monkeypatch, world)
+    response = post(client)
+    assert response.status_code == 200, response.text
+    assert world["lock_timeouts"] == ["SET LOCAL lock_timeout = '5000ms'"] * 2

@@ -304,10 +304,10 @@ describe('화면 결함 5대 부류 치유 트랙 (Priority 1: 노드 에러 은
       expect(unexposedNotice?.textContent).toContain('자연어 에이전트 실행 및 골든 평가 제어기 (API 미노출)');
       expect(unexposedNotice?.textContent).toContain('엔드포인트(/v1/agent/*)가 배선되어 있지 않습니다');
 
-      // KPI 배너 텍스트가 [AC-09 픽스처 / 로컬 시뮬레이션]으로 정직하게 고지되어 있는지 확인
+      // KPI 배너 텍스트가 [AC-09 픽스처 / 합성 · 운영 인수 아님(G-26)]으로 정직하게 고지되어 있는지 확인
       expect(container.textContent).toContain('Prompt 100건 유효율 (AC-09 픽스처)');
       expect(container.textContent).toContain('코딩 과제 30건 성공률 (AC-09 픽스처)');
-      expect(container.textContent).toContain('목표: ≥99% (로컬 시뮬레이션)');
+      expect(container.textContent).toContain('목표: ≥99% (합성 · 운영 인수 아님(G-26))');
     });
 
     it('코드 Diff 적용 시 실제 파일시스템에 기록된 양 허위 성공 배너를 표출하지 않고 모의 적용 고지를 표시한다', () => {

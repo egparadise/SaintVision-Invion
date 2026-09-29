@@ -50,7 +50,7 @@ from typing import Any, Mapping
 
 from fastapi import APIRouter, Depends, Header, Request
 from sqlalchemy import select, text
-from sqlalchemy.exc import IntegrityError, OperationalError
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from ...config import Settings
@@ -77,11 +77,11 @@ from ..deps import (
     serialise_idempotent_write,
     store_idempotent_response,
 )
+from ..lock_wait import bounded_lock_wait
 from ..problem import (
     AUTH_PROJECT,
     GRAPH_PRECONDITION,
     RES_NOT_FOUND,
-    SYS_UPSTREAM_UNAVAILABLE,
     VAL_REQUEST,
     CanonicalProblem,
     read_bounded_body,
@@ -99,9 +99,6 @@ ENDPOINT = "POST /v1/projects/{project_id}/runs/{run_id}/record"
 
 #: What an ``Idempotency-Key`` may be (the ledger column is ``String(128)``).
 IDEMPOTENCY_KEY_PATTERN = r"[A-Za-z0-9._:-]{1,128}"
-
-#: PostgreSQL SQLSTATEs answered as a retryable 503 rather than a 500.
-LOCK_WAIT_SQLSTATES = frozenset({"55P03", "40P01"})
 
 #: The role an artifact is sealed under when the request maps none.
 DEFAULT_ROLE = "other"
@@ -145,23 +142,6 @@ def _require_idempotency_key(raw: str | None) -> str:
             "An Idempotency-Key header of up to 128 identifier characters is required.",
         )
     return raw
-
-
-def _bound_lock_wait(session: Session, *, timeout_ms: int) -> None:
-    if not isinstance(timeout_ms, int) or isinstance(timeout_ms, bool) or timeout_ms <= 0:
-        raise RuntimeError("business_lock_timeout_ms must be a positive integer")
-    session.execute(text(f"SET LOCAL lock_timeout = '{int(timeout_ms)}ms'"))
-
-
-def _lock_wait_problem(error: OperationalError) -> CanonicalProblem | None:
-    if getattr(error.orig, "sqlstate", None) in LOCK_WAIT_SQLSTATES:
-        return CanonicalProblem(
-            SYS_UPSTREAM_UNAVAILABLE,
-            503,
-            "The run is locked by another request; retry.",
-            retryable=True,
-        )
-    return None
 
 
 def _locked_run(session: Session, *, tenant_id, project_id: str, run_id: str) -> Run:
@@ -288,10 +268,14 @@ async def seal_run_record(
     """Seal the run's record from the server's own rows, once per key."""
     factory = make_session_factory(request.app.state.engine)
 
+    # Bounded as well (card 84 F1): effective_permission reads the user row FOR
+    # SHARE, so a held FOR UPDATE on it would otherwise wait here forever.
     # (1) Permission first, in its own short transaction, before the body.
     with factory() as session:
         with session.begin():
-            with tenant_scope(session, principal.tenant_id):
+            with tenant_scope(session, principal.tenant_id), bounded_lock_wait(
+                session, timeout_ms=settings.business_lock_timeout_ms
+            ):
                 _require_approval(session, principal=principal, project_id=project_id)
 
     key = _require_idempotency_key(idempotency_key)
@@ -306,53 +290,48 @@ async def seal_run_record(
     # (2..6) One atomic transaction in the §5-2 order.
     with factory() as session:
         with session.begin():
-            with tenant_scope(session, principal.tenant_id):
-                _bound_lock_wait(session, timeout_ms=settings.business_lock_timeout_ms)
+            with tenant_scope(session, principal.tenant_id), bounded_lock_wait(
+                session, timeout_ms=settings.business_lock_timeout_ms
+            ):
+                serialise_idempotent_write(
+                    session,
+                    tenant_id=principal.tenant_id,
+                    endpoint=ENDPOINT,
+                    idempotency_key=key,
+                    project_id=project_id,
+                )
+                _require_approval(session, principal=principal, project_id=project_id)
+                now: dt.datetime = request.app.state.clock()
                 try:
-                    serialise_idempotent_write(
+                    replayed = replay_or_reserve(
                         session,
-                        tenant_id=principal.tenant_id,
+                        principal=principal,
                         endpoint=ENDPOINT,
                         idempotency_key=key,
+                        payload=ledger_payload,
+                        now=now,
+                        ttl_seconds=settings.idempotency_ttl_seconds,
                         project_id=project_id,
                     )
-                    _require_approval(session, principal=principal, project_id=project_id)
-                    now: dt.datetime = request.app.state.clock()
-                    try:
-                        replayed = replay_or_reserve(
-                            session,
-                            principal=principal,
-                            endpoint=ENDPOINT,
-                            idempotency_key=key,
-                            payload=ledger_payload,
-                            now=now,
-                            ttl_seconds=settings.idempotency_ttl_seconds,
-                            project_id=project_id,
-                        )
-                    except InvError as error:
-                        raise translate(
-                            error,
-                            table=TRANSLATION,
-                            detail="That idempotency key was used with a different request.",
-                        ) from None
-                    if replayed is not None:
-                        return replayed
-                    run = _locked_run(
-                        session, tenant_id=principal.tenant_id, project_id=project_id, run_id=run_id
-                    )
-                    _require_approval(session, principal=principal, project_id=project_id)
-                    workload = session.get(Workload, run.workload_id)
-                    bundle = _latest_bundle(session, tenant_id=principal.tenant_id, run_id=run.run_id)
-                    versions = _evidence_versions(session, tenant_id=principal.tenant_id, run=run)
-                    if bundle is not None:
-                        for name, value in (bundle.component_versions or {}).items():
-                            versions.setdefault(name, value)
-                    artifacts = _locked_artifacts(session, tenant_id=principal.tenant_id, run_id=run.run_id)
-                except OperationalError as error:
-                    problem = _lock_wait_problem(error)
-                    if problem is None:
-                        raise
-                    raise problem from None
+                except InvError as error:
+                    raise translate(
+                        error,
+                        table=TRANSLATION,
+                        detail="That idempotency key was used with a different request.",
+                    ) from None
+                if replayed is not None:
+                    return replayed
+                run = _locked_run(
+                    session, tenant_id=principal.tenant_id, project_id=project_id, run_id=run_id
+                )
+                _require_approval(session, principal=principal, project_id=project_id)
+                workload = session.get(Workload, run.workload_id)
+                bundle = _latest_bundle(session, tenant_id=principal.tenant_id, run_id=run.run_id)
+                versions = _evidence_versions(session, tenant_id=principal.tenant_id, run=run)
+                if bundle is not None:
+                    for name, value in (bundle.component_versions or {}).items():
+                        versions.setdefault(name, value)
+                artifacts = _locked_artifacts(session, tenant_id=principal.tenant_id, run_id=run.run_id)
                 roles = _roles(proposal, artifacts)
                 intent = _intent(artifacts=artifacts, roles=roles, bundle=bundle, workload=workload, versions=versions)
 

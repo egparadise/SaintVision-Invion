@@ -38,9 +38,11 @@ router = APIRouter(prefix="/v1", tags=["projects"])
 from . import (  # noqa: E402
     conformance_status,
     context_bundles,
+    eval_runs,
     lineage_query,
     model_release,
     model_retention,
+    model_verify,
     model_versions,
     run_records,
     run_seal,
@@ -52,8 +54,10 @@ run_records.register(router)
 run_seal.register(router)
 context_bundles.register(router)
 model_versions.register(router)
-model_retention.register(router)
 conformance_status.register(router)
+eval_runs.register(router)
+model_retention.register(router)
+model_verify.register(router)
 
 
 @router.get("/projects", response_model=schemas.ProjectListResponse)

@@ -23,14 +23,30 @@ export const PlacementExplainView: React.FC<PlacementExplainViewProps> = ({
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
         <div>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 600 }}>후보 노드 평가 및 제외 Explain 원장 (AC-05)</h3>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            <h3 style={{ fontSize: '1.125rem', fontWeight: 600 }}>후보 노드 평가 및 제외 Explain 원장 (AC-05)</h3>
+            <span
+              data-testid="placement-explain-simulation-badge"
+              style={{
+                padding: '2px 8px',
+                borderRadius: '4px',
+                fontSize: '0.6875rem',
+                fontWeight: 600,
+                backgroundColor: 'rgba(234, 179, 8, 0.15)',
+                color: '#d97706',
+                border: '1px solid rgba(234, 179, 8, 0.3)',
+              }}
+            >
+              [로컬 시뮬레이션 (UNVERIFIED · 모의)]
+            </span>
+          </div>
           <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
-            Hard Filter 탈락 사유 및 가중치 점수 합산에 따른 결정론적 배치 추적
+            클라이언트 결정론적 가중치 시뮬레이션 (서버 API 점수 분해는 미측정 · Hard Filter 탈락 사유 추적)
           </p>
         </div>
         <div style={{ textAlign: 'right', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-          <div>정책: <code>{policyVersion}</code></div>
-          <div>스냅샷: <code>{snapshotVersion}</code></div>
+          <div>정책(모의): <code>{policyVersion}</code></div>
+          <div>스냅샷(모의): <code>{snapshotVersion}</code></div>
           <div>결정 시각: {new Date(decidedAt).toLocaleTimeString('ko-KR')}</div>
         </div>
       </div>
@@ -146,10 +162,14 @@ export const PlacementExplainView: React.FC<PlacementExplainViewProps> = ({
               <div style={{ textAlign: 'right', minWidth: '80px' }}>
                 {passed && cand.scores && (
                   <div>
-                    <span style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', display: 'block' }}>
-                      가중 종합 점수
+                    <span
+                      data-testid="placement-explain-score-label"
+                      style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', display: 'block' }}
+                    >
+                      로컬 모의 점수 (미측정)
                     </span>
                     <span
+                      data-testid="placement-explain-score-value"
                       style={{
                         fontSize: '1.25rem',
                         fontWeight: 700,

@@ -63,9 +63,9 @@ describe('화면 결함 5대 부류 치유 트랙 4차: IntranetDeploymentView �
       });
 
       // 5. 서명 결과 알림에 [모의 시뮬레이션] 및 백엔드 배포 API 미노출이 정직하게 표출되어야 함
-      expect(container.textContent).toContain('✔ [모의 시뮬레이션] 최종 프로덕션 릴리스');
+      expect(container.textContent).toContain('✔ [모의 시뮬레이션] 파일럿 후보 릴리스');
       expect(container.textContent).toContain('usr_operator_lead_99');
-      expect(container.textContent).toContain('(백엔드 배포 API 미노출)');
+      expect(container.textContent).toContain('(백엔드 배포 API 미연결');
     });
 
     it('currentUser가 null일 때 deployment-auth-required-notice(role=alert)를 렌더링하고 서명 버튼을 비활성화한다', async () => {

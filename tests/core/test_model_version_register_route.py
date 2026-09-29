@@ -95,6 +95,11 @@ class Session:
         self.world = world
 
     def execute(self, statement, params=None):
+        if "lock_timeout" in str(statement):
+            # Card 84: the lane's bound on every lock wait; recorded apart from
+            # the order log, once per span (preflight and write).
+            self.world.setdefault("lock_timeouts", []).append(str(statement))
+            return None
         self.world["log"].append("lock")
         self.world["locks"].append({"sql": str(statement), "params": params})
         # A real lock can wait. Advancing the clock here is how a waiting
@@ -1215,3 +1220,12 @@ def test_the_real_pg_fixture_builds_every_row_without_a_database():
         created_at=NOW,
     )
     assert recorder.statements[-1].startswith("INSERT INTO model_versions")
+
+
+def test_card84_both_spans_bound_their_lock_waits(monkeypatch):
+    """The permission preflight reads the user row FOR SHARE (effective_permission),
+    so it is bounded too, not only the write transaction (Codex #211 F1)."""
+    world: dict = {}
+    client = build(monkeypatch, world)
+    assert post(client).status_code == 201
+    assert world["lock_timeouts"] == ["SET LOCAL lock_timeout = '5000ms'"] * 2

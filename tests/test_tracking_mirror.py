@@ -44,7 +44,7 @@ from saintvision.services.evidence import enqueue_event
 from saintvision.tracking import config as tracking_config
 from saintvision.tracking.canonical import CanonicalizationError
 from saintvision.tracking.codes import MirrorStatus
-from test_lineage import NOW, WEIGHTS_SHA, _full_lineage, catalogue  # noqa: F401  (fixture)
+from test_lineage import NOW, WEIGHTS_SHA, _full_lineage, _verify, catalogue  # noqa: F401  (fixture)
 
 pytestmark = pytest.mark.postgres
 
@@ -92,11 +92,9 @@ def _mirror_events(session):
     ).all()
 
 
-def _release(session, tenant, version):
-    lineage_service.verify_model_version(
-        session, tenant_id=tenant, model_version_id=version.model_version_id,
-        content_sha256=WEIGHTS_SHA, now=NOW,
-    )
+def _release(session, catalogue, version):
+    tenant = catalogue["tenant_a"]
+    _verify(session, catalogue, model_version_id=version.model_version_id, content_sha256=WEIGHTS_SHA)
     lineage_service.pin_retention(
         session, tenant_id=tenant, model_version_id=version.model_version_id,
         until=NOW + dt.timedelta(days=365),
@@ -139,7 +137,7 @@ def test_release_enqueues_a_stage_transition_intent(app_sessionmaker, catalogue,
         with session.begin():
             with tenant_scope(session, tenant):
                 version = _register(session, catalogue)
-                _release(session, tenant, version)
+                _release(session, catalogue, version)
     with app_sessionmaker() as session, session.begin(), tenant_scope(session, tenant):
         stages = sorted(i.payload["tags"]["inv.stage"] for i in _intents_by_kind(session)["model_version"])
         assert stages == ["draft", "released"]                        # two intents, one per stage
@@ -154,7 +152,7 @@ def test_deployment_enqueues_its_intent(app_sessionmaker, catalogue, configured)
         with session.begin():
             with tenant_scope(session, tenant):
                 built = _full_lineage(session, catalogue)
-                _release(session, tenant, built["version"])
+                _release(session, catalogue, built["version"])
                 deployment = lineage_service.record_deployment(
                     session, tenant_id=tenant, model_version_id=built["version"].model_version_id,
                     environment="lab", approval_id=built["approval_id"],
@@ -242,9 +240,9 @@ def test_a_rolled_back_canonical_change_leaves_neither_intent_nor_event(
                 with tenant_scope(session, tenant):
                     built = _full_lineage(session, catalogue)
                     if path == "release":
-                        _release(session, tenant, built["version"])
+                        _release(session, catalogue, built["version"])
                     elif path == "deployment":
-                        _release(session, tenant, built["version"])
+                        _release(session, catalogue, built["version"])
                         lineage_service.record_deployment(
                             session, tenant_id=tenant, model_version_id=built["version"].model_version_id,
                             environment="lab", approval_id=built["approval_id"],
@@ -275,7 +273,7 @@ def test_absent_configuration_records_nothing_and_the_canonical_path_is_unchange
         with session.begin():
             with tenant_scope(session, tenant):
                 version = _register(session, catalogue)
-                _release(session, tenant, version)
+                _release(session, catalogue, version)
     with app_sessionmaker() as session, session.begin(), tenant_scope(session, tenant):
         assert session.get(ModelVersion, version.model_version_id).stage == "released"
         assert _rows(session, MlflowMirrorIntent) == [] and _rows(session, MlflowMirrorDefect) == []

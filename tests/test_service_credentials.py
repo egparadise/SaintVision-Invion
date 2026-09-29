@@ -38,7 +38,7 @@ from saintvision.tracking.service_credentials import (
     credential_reference,
     worker_context,
 )
-from test_lineage import NOW, _full_lineage, catalogue  # noqa: F401  (fixture)
+from test_lineage import NOW, _full_lineage, _verify, catalogue  # noqa: F401  (fixture)
 from test_tracking_mirror import GOOD_ENV, configured  # noqa: F401  (fixture)
 
 pytestmark = pytest.mark.postgres
@@ -440,9 +440,7 @@ def test_release_and_deploy_succeed_whatever_the_mirror_does(app_sessionmaker, c
             with tenant_scope(session, tenant):
                 built = _full_lineage(session, catalogue)
                 version = built["version"]
-                lineage_service.verify_model_version(
-                    session, tenant_id=tenant, model_version_id=version.model_version_id, content_sha256="a" * 64, now=NOW
-                )
+                _verify(session, catalogue, model_version_id=version.model_version_id, content_sha256="a" * 64)
                 lineage_service.pin_retention(session, tenant_id=tenant, model_version_id=version.model_version_id, until=LATER)
                 lineage_service.release_model_version(session, tenant_id=tenant, model_version_id=version.model_version_id, now=NOW)
                 deployment = lineage_service.record_deployment(

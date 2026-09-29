@@ -15,7 +15,7 @@ from .errors import DomainError
 from .leases import lock_run
 from .node_transport import strict_json
 from .output_ingestion import output_bytes
-from .object_store import LocalObjectStore, ObjectStoreRegistry
+from .object_store import LocalObjectStore, ObjectStoreRegistry, object_store_session
 from .workspace_files import decode_snapshot, portable_path
 from .workspace_resume import workspace_output
 
@@ -154,9 +154,10 @@ class ResultView:
         try:
             if isinstance(provider, LocalObjectStore):
                 # Preserve the established provider -> DB order through the
-                # caller's short revalidation transaction.
-                with provider.legacy.locked() as files:
-                    yield files.read(
+                # caller's short revalidation transaction.  Use the canonical
+                # session so host OSError is translated only at provider calls.
+                with object_store_session(provider) as files:
+                    yield files.get(
                         ticket["locator"],
                         ticket["content_hash"],
                         ticket["size_bytes"],

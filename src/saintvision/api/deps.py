@@ -105,6 +105,13 @@ def serialise_idempotent_write(
     Every write route takes this lock **before** any resource row, so the lock
     order across the business lane is one: this serialisation point, then the
     row. Returns the lock key so a test can assert which key was taken.
+
+    The wait here is bounded by the caller's ``SET LOCAL lock_timeout``
+    (``api/lock_wait.bounded_lock_wait``, card 84): ``pg_advisory_xact_lock``
+    is a heavyweight lock and honours it, so a key held by a long transaction
+    is refused with ``SYS-0001/503`` after the budget instead of waited on
+    forever. This function sets no timeout of its own, because the budget
+    belongs to the transaction, not to one lock in it.
     """
     # A separator that cannot occur in any of the parts, so ("a", "bc") and
     # ("ab", "c") hash to different material rather than the same lock.
