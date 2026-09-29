@@ -1,0 +1,180 @@
+name: S11 Storage Failure Hosted Reference
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [labeled, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  hosted-storage-fault-matrix:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.pull_request.labels.*.name, 'run-s11-storage')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: s11-storage-hosted-${{ github.event.pull_request.head.sha || github.sha }}
+      cancel-in-progress: false
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: inv_test_only
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      SOURCE_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      INV_EVIDENCE_CODE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      INV_S11_SOURCE_RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}
+      INV_TEST_ADMIN_DSN: postgresql://postgres:inv_test_only@127.0.0.1:5432/postgres
+      INV_S11_STORAGE_REPORT: evidence/s11-storage-hosted-raw.json
+      INV_S11_STORAGE_JUNIT: evidence/s11-storage-hosted-raw.xml
+      INV_S11_STORAGE_EVIDENCE: evidence/s11-storage-hosted-reference.json
+      MINIO_IMAGE: docker.io/coollabsio/minio@sha256:72b4794d7faa001823364f8ee239717141327fc450a3264414f573a6abf3c629
+      MINIO_ROOT_USER: s11-storage-ci
+      MINIO_ROOT_PASSWORD: s11-storage-ci-only
+      INV_OBJECT_STORE_ENDPOINT: http://127.0.0.1:9000
+      INV_OBJECT_STORE_BUCKET: saintvision-s11-storage-ci
+      INV_OBJECT_STORE_ACCESS_KEY_ID: s11-storage-ci
+      INV_OBJECT_STORE_SECRET_ACCESS_KEY: s11-storage-ci-only
+      INV_OBJECT_STORE_REGION: us-east-1
+    steps:
+      - name: Checkout exact PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SOURCE_HEAD_SHA }}
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-test.txt
+
+      - name: Install pinned runner dependencies
+        run: python -m pip install -r requirements-test.txt
+
+      - name: Record clean tree and digest-pinned container inputs
+        run: |
+          test -z "$(git status --porcelain)"
+          test "$(git rev-parse HEAD)" = "$SOURCE_HEAD_SHA"
+          mkdir -p evidence
+          docker pull --platform linux/amd64 "$MINIO_IMAGE"
+          docker pull --platform linux/amd64 postgres:16
+          minio_ref="$(docker image inspect --format '{{index .RepoDigests 0}}' "$MINIO_IMAGE")"
+          archive_ref="$(docker image inspect --format '{{index .RepoDigests 0}}' postgres:16)"
+          test -n "$minio_ref" && test -n "$archive_ref"
+          echo "INV_S11_MINIO_IMAGE_DIGEST=${minio_ref##*@}" >> "$GITHUB_ENV"
+          echo "INV_S11_ARCHIVE_IMAGE_DIGEST=${archive_ref##*@}" >> "$GITHUB_ENV"
+          echo "INV_TEST_ARCHIVER_IMAGE=$archive_ref" >> "$GITHUB_ENV"
+
+      - name: Start loopback-only disposable MinIO
+        run: |
+          owner="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          docker run --detach --rm --platform linux/amd64 \
+            --name saintvision-s11-storage-minio \
+            --label "ai.saintvision.s11-storage-minio=$owner" \
+            --tmpfs /data:rw,noexec,nosuid,size=128m \
+            --publish 127.0.0.1:9000:9000 \
+            --env MINIO_ROOT_USER \
+            --env MINIO_ROOT_PASSWORD \
+            "$MINIO_IMAGE" server /data --address ':9000'
+          for attempt in $(seq 1 45); do
+            if curl --fail --silent --show-error http://127.0.0.1:9000/minio/health/live >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs saintvision-s11-storage-minio
+          exit 1
+
+      - name: Create disposable fault-matrix bucket
+        env:
+          PYTHONPATH: services/control-plane/src
+        run: |
+          python - <<'PY'
+          import os
+          from inv.s3_client import S3Client, S3Config
+
+          client = S3Client(S3Config(
+              endpoint=os.environ['INV_OBJECT_STORE_ENDPOINT'],
+              bucket=os.environ['INV_OBJECT_STORE_BUCKET'],
+              access_key=os.environ['INV_OBJECT_STORE_ACCESS_KEY_ID'],
+              secret_key=os.environ['INV_OBJECT_STORE_SECRET_ACCESS_KEY'],
+              region=os.environ['INV_OBJECT_STORE_REGION'],
+          ))
+          result = client.create_bucket()
+          assert result.status == 200, f'redacted bucket setup failed ({result.status})'
+          PY
+
+      - name: Execute frozen hosted 10-case reference matrix
+        env:
+          PYTHONPATH: services/control-plane/src
+        run: >-
+          python -m pytest -q -s
+          tests/integration/test_s11_storage_failure_hosted.py
+
+      - name: Import fail-closed reference evidence
+        run: >-
+          python tools/import_s11_storage_failure_hosted_evidence.py
+          --report "$INV_S11_STORAGE_REPORT"
+          --junit "$INV_S11_STORAGE_JUNIT"
+          --output "$INV_S11_STORAGE_EVIDENCE"
+
+      - name: Require complete reference-only artifacts
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+
+          raw = json.loads(Path(os.environ['INV_S11_STORAGE_REPORT']).read_text(encoding='utf-8'))
+          evidence = json.loads(Path(os.environ['INV_S11_STORAGE_EVIDENCE']).read_text(encoding='utf-8'))
+          junit = ET.parse(os.environ['INV_S11_STORAGE_JUNIT']).getroot()
+          assert raw['sourceHeadSha'] == os.environ['SOURCE_HEAD_SHA']
+          assert raw['caseCount'] == 10 and raw['cleanup'] == {'performed': True, 'residueCount': 0}
+          assert evidence['referenceOnly'] is True
+          assert evidence['axis'] is None and evidence['targetRef'] is None
+          assert evidence['verdict'] in {'MEASURED_PASS', 'MEASURED_FAIL', 'NOT_OBSERVED'}
+          assert junit.attrib['tests'] == '10'
+          assert junit.attrib['errors'] == '0' and junit.attrib['skipped'] == '0'
+          assert int(junit.attrib['failures']) == raw['findingCount']
+          PY
+
+      - name: Remove only owned disposable containers and networks
+        if: always()
+        run: |
+          owner="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          if docker inspect saintvision-s11-storage-minio >/dev/null 2>&1; then
+            test "$(docker inspect --format '{{index .Config.Labels "ai.saintvision.s11-storage-minio"}}' saintvision-s11-storage-minio)" = "$owner"
+            docker rm --force --volumes saintvision-s11-storage-minio
+          fi
+          for container in $(docker ps -aq --filter "label=ai.saintvision.s11-storage=$owner"); do
+            test "$(docker inspect --format '{{index .Config.Labels "ai.saintvision.s11-storage"}}' "$container")" = "$owner"
+            docker rm --force --volumes "$container"
+          done
+          for network in $(docker network ls -q --filter "label=ai.saintvision.s11-storage-network=$owner"); do
+            test "$(docker network inspect --format '{{index .Labels "ai.saintvision.s11-storage-network"}}' "$network")" = "$owner"
+            docker network rm "$network"
+          done
+          test -z "$(docker ps -aq --filter "label=ai.saintvision.s11-storage=$owner")"
+          test -z "$(docker network ls -q --filter "label=ai.saintvision.s11-storage-network=$owner")"
+
+      - name: Upload S11 storage reference evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: s11-storage-hosted-${{ env.SOURCE_HEAD_SHA }}
+          path: evidence/
+          if-no-files-found: warn
+          retention-days: 30

@@ -66,14 +66,36 @@ class WorkspaceRecovery:
         self.db = snapshots.db
 
     def _checkpoint_reader(
-        self, tenant, project, run_id, source_attempt, step_id, *, authorize=None
+        self,
+        tenant,
+        project,
+        run_id,
+        source_attempt,
+        step_id,
+        *,
+        restore_id,
+        expected_version,
+        authorize=None,
     ):
-        """Resolve the persisted provider without holding a provider/filesystem lock."""
+        """Validate a new restore before resolving its persisted provider."""
 
         with self.db.transaction(tenant) as conn:
-            lock_run(conn, run_id, project)
+            run = lock_run(conn, run_id, project)
             if authorize is not None:
                 authorize(conn)
+            stored = conn.execute(
+                "SELECT restore_id FROM inv.workspace_restores "
+                "WHERE restore_id=%s AND project_id=%s AND run_id=%s",
+                (restore_id, project, run_id),
+            ).fetchone()
+            if stored is None and (
+                run["state"] != "recovering"
+                or run["version"] != expected_version
+                or source_attempt > run["attempt"]
+            ):
+                raise DomainError(
+                    "GRAPH-0003", "Restore requires current recovering Run version"
+                )
             pin = conn.execute(
                 "SELECT object_id FROM inv.checkpoint_objects "
                 "WHERE project_id=%s AND run_id=%s AND attempt=%s AND step_id=%s",
@@ -179,6 +201,8 @@ class WorkspaceRecovery:
             run_id,
             source_attempt,
             step_id,
+            restore_id=restore_id,
+            expected_version=expected_version,
             authorize=authorize,
         )
         with (

@@ -321,8 +321,13 @@ def test_lifecycle_tables_get_column_scoped_update_and_no_delete(rendered_sql):
         assert not any("DELETE" in g.upper() for g in grants), f"{table}: DELETE granted"
 
         scoped = [g for g in grants if g.upper().startswith("UPDATE (")]
-        assert len(scoped) == 1, f"{table}: expected exactly one column-scoped UPDATE"
-        granted = {c.strip() for c in scoped[0][len("UPDATE (") : -1].split(",")}
+        assert scoped, f"{table}: no column-scoped UPDATE"
+        # Grants accumulate: 0004 named the first columns and 0054 added
+        # verified_measurement_id with its own scoped grant. The union is what
+        # the role ends up with, and it must be exactly the whitelist.
+        granted: set[str] = set()
+        for grant in scoped:
+            granted |= {c.strip() for c in grant[len("UPDATE (") : grant.index(")")].split(",")}
         assert granted == set(columns), f"{table}: granted {granted}, expected {set(columns)}"
 
         # An unqualified UPDATE would defeat the point entirely.

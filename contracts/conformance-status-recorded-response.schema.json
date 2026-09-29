@@ -1,0 +1,193 @@
+{
+  "$defs": {
+    "ConformanceCheckDescriptor": {
+      "additionalProperties": false,
+      "description": "One check the conformance contract defines, named and gated.\n\nA descriptor, not a result: there is no ``passed`` here because nothing has\nbeen observed. Read from ``adapters.conformance.CHECKLIST``, which is the\nsingle source for the list.",
+      "properties": {
+        "capabilityGated": {
+          "title": "Capabilitygated",
+          "type": "boolean"
+        },
+        "name": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "capabilityGated"
+      ],
+      "title": "ConformanceCheckDescriptor",
+      "type": "object"
+    },
+    "ConformanceCheckOutcome": {
+      "additionalProperties": false,
+      "description": "One check's result as stored: name, passed, skipped. No ``detail``: the\nsuite's detail is stringified exceptions and host process output, and this\nrow is readable by every project's members (§2-5).",
+      "properties": {
+        "name": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "passed": {
+          "title": "Passed",
+          "type": "boolean"
+        },
+        "skipped": {
+          "title": "Skipped",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name",
+        "passed",
+        "skipped"
+      ],
+      "title": "ConformanceCheckOutcome",
+      "type": "object"
+    },
+    "ConformanceRecordItem": {
+      "additionalProperties": false,
+      "description": "One stored record inside ``records[]``. Nested, not a contract file.",
+      "properties": {
+        "adapter": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Adapter",
+          "type": "string"
+        },
+        "contractVersion": {
+          "maxLength": 32,
+          "minLength": 1,
+          "title": "Contractversion",
+          "type": "string"
+        },
+        "failed": {
+          "minimum": 0,
+          "title": "Failed",
+          "type": "integer"
+        },
+        "outcomes": {
+          "items": {
+            "$ref": "#/$defs/ConformanceCheckOutcome"
+          },
+          "title": "Outcomes",
+          "type": "array"
+        },
+        "passed": {
+          "minimum": 0,
+          "title": "Passed",
+          "type": "integer"
+        },
+        "provenance": {
+          "const": "in-server",
+          "title": "Provenance",
+          "type": "string"
+        },
+        "recordedAt": {
+          "format": "date-time",
+          "title": "Recordedat",
+          "type": "string"
+        },
+        "skipped": {
+          "minimum": 0,
+          "title": "Skipped",
+          "type": "integer"
+        },
+        "subject": {
+          "const": "fixture-adapter",
+          "title": "Subject",
+          "type": "string"
+        },
+        "suiteContractVersion": {
+          "maxLength": 32,
+          "minLength": 1,
+          "title": "Suitecontractversion",
+          "type": "string"
+        },
+        "total": {
+          "minimum": 0,
+          "title": "Total",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "adapter",
+        "subject",
+        "provenance",
+        "contractVersion",
+        "suiteContractVersion",
+        "total",
+        "passed",
+        "failed",
+        "skipped",
+        "outcomes",
+        "recordedAt"
+      ],
+      "title": "ConformanceRecordItem",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The list route when at least one record exists.\n\n``records`` follows the order of ``adapters`` and holds only adapters that\nhave a record: absence from ``records`` is the absence of a measurement,\nso there is no per-adapter NOT_OBSERVED entry. ``latestRecordedAt`` is the\nmaximum of the items' ``recordedAt`` -- the aggregate freshness -- and the\nkey is deliberately not ``recordedAt``, which in the NOT_OBSERVED branch is\nalways null (§4-1, R2). No ``reason``: nothing is being explained.",
+  "properties": {
+    "adapters": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Adapters",
+      "type": "array"
+    },
+    "checks": {
+      "items": {
+        "$ref": "#/$defs/ConformanceCheckDescriptor"
+      },
+      "title": "Checks",
+      "type": "array"
+    },
+    "contractVersion": {
+      "maxLength": 32,
+      "minLength": 1,
+      "title": "Contractversion",
+      "type": "string"
+    },
+    "latestRecordedAt": {
+      "format": "date-time",
+      "title": "Latestrecordedat",
+      "type": "string"
+    },
+    "records": {
+      "items": {
+        "$ref": "#/$defs/ConformanceRecordItem"
+      },
+      "minItems": 1,
+      "title": "Records",
+      "type": "array"
+    },
+    "scope": {
+      "const": "control-plane-host",
+      "title": "Scope",
+      "type": "string"
+    },
+    "status": {
+      "const": "RECORDED",
+      "title": "Status",
+      "type": "string"
+    }
+  },
+  "required": [
+    "status",
+    "scope",
+    "contractVersion",
+    "adapters",
+    "checks",
+    "records",
+    "latestRecordedAt"
+  ],
+  "title": "ConformanceStatusRecordedResponse",
+  "type": "object"
+}

@@ -135,16 +135,16 @@ describe('VF-GM-06: 외부 HTTPS, Browser Matrix, Rollback & Real-Browser Accept
     const tls = dm.getTlsDetails();
 
     expect(tls.domain).toBe('saintvision.internal');
-    expect(tls.tlsVersion).toContain('TLSv1.3');
-    expect(tls.cipherSuite).toContain('TLS_AES_256_GCM_SHA384');
+    expect(tls.tlsVersion).toContain('TLSv1.2');
+    expect(tls.cipherSuite).toContain('HIGH:!aNULL:!MD5');
     expect(tls.hstsEnabled).toBe(true);
     expect(tls.sanList).toContain('saintvision.internal');
     expect(tls.sanList).toContain('*.node.saintvision.internal');
     expect(tls.sanList.length).toBeGreaterThanOrEqual(5);
 
     const conf = dm.generateNginxConfig();
-    expect(conf).toContain('listen 8443 ssl http2;');
-    expect(conf).toContain('ssl_protocols TLSv1.3;');
+    expect(conf).toContain('listen 443 ssl http2;');
+    expect(conf).toContain('ssl_protocols TLSv1.2 TLSv1.3;');
     expect(conf).toContain('Strict-Transport-Security');
     expect(conf).toContain('proxy_buffering off;');
     expect(conf).toContain('proxy_set_header Upgrade $http_upgrade;');
@@ -297,9 +297,10 @@ describe('VF-GM-06: 외부 HTTPS, Browser Matrix, Rollback & Real-Browser Accept
     });
 
     expect(result.success).toBe(true);
-    expect(result.manifest.version).toBe('v1.0.0-final-GA');
-    expect(result.manifest.releaseId).toBe('REL-2026-R4-GA');
-    expect(result.manifest.operatorSignOff).toBe(true);
+    expect(result.localSimulationCompleted).toBe(true);
+    expect(result.manifest.version).toBe('v1.0.0-pilot-rc');
+    expect(result.manifest.releaseId).toBe('REL-2026-PILOT-RC');
+    expect(result.manifest.operatorSignOff).toBe(false);
     expect(result.manifest.imageDigest).toMatch(/^sha256:[a-f0-9]{64}$/);
     expect(result.manifest.totalNodes).toBe(5);
   });
@@ -309,8 +310,8 @@ describe('VF-GM-06: 외부 HTTPS, Browser Matrix, Rollback & Real-Browser Accept
     const before = dm.getPreflightStatus();
     expect(before.physicalHardwareAcceptance).toBe('pending');
 
-    dm.signOffRelease('usr_operator_lead');
+    dm.signOffRelease('usr_operator_lead', { roles: ['operator'] });
     const after = dm.getPreflightStatus();
-    expect(after.physicalHardwareAcceptance).toBe('accepted');
+    expect(after.physicalHardwareAcceptance).toBe('pending');
   });
 });

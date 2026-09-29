@@ -148,7 +148,8 @@ class Session:
     def execute(self, statement, params=None):
         sql = str(statement)
         if "lock_timeout" in sql:
-            self.log.append("set-lock-timeout")
+            # Card 84: recorded apart from the order log; both spans set it.
+            self.world.setdefault("lock_timeouts", []).append(sql)
         elif "pg_advisory_xact_lock" in sql:
             self.log.append("advisory-lock")
             if self.world.get("advance_on_lock") is not None:
@@ -337,7 +338,7 @@ def canonical(response, *, code, status, retryable=False):
 
 FULL_ORDER = [
     "permission", "body-read",
-    "set-lock-timeout", "advisory-lock", "permission", "ledger-read",
+    "advisory-lock", "permission", "ledger-read",
     "select:Run", "get:Workload", "permission",
     "get:Workload", "select:ContextBundle", "select:EvidenceEnvelope", "select:Artifact",
     "record-lookup", "service", "audit", "ledger-write",
@@ -366,6 +367,8 @@ def test_a_seal_follows_the_contract_order_and_derives_everything_from_the_locke
     assert sealed["now"] == NOW
     assert world["stored"][0]["response_status"] == 200 and world["stored"][0]["response_body"] == body
     assert world["stored"][0]["payload"] == {"runId": RUN, "request": {"roles": {ART_A: "diff"}}}
+    # both spans -- the permission preflight and the write -- are bounded (card 84 F1)
+    assert world["lock_timeouts"] == ["SET LOCAL lock_timeout = '5000ms'"] * 2
     assert world["audits"][0]["action"] == "run_record.seal" and world["audits"][0]["detail"]["created"] is True
     assert world["audits"][0]["detail"]["artifactCount"] == 2
 
@@ -501,6 +504,7 @@ def test_a_member_without_the_approval_grade_is_403_before_the_body(monkeypatch)
     client = build(monkeypatch, world)
     canonical(post(client, content=b"{" + b"x" * 20000), code="AUTH-0030", status=403)
     assert world["log"] == ["permission"] and len(world["denials_recorded"]) == 1
+    assert world["lock_timeouts"] == ["SET LOCAL lock_timeout = '5000ms'"]        # the preflight span is bounded too
 
 
 def test_a_revocation_between_the_spans_locks_no_row(monkeypatch):

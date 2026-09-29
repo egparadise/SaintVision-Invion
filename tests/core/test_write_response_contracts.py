@@ -15,7 +15,13 @@ from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
 from saintvision.api import schemas
-from saintvision.api.deps import get_now, get_principal, get_session, get_settings
+from saintvision.api.deps import (
+    get_now,
+    get_principal,
+    get_session,
+    get_settings,
+    get_write_session,
+)
 from saintvision.api.v1 import (
     nodes as node_routes,
     pools,
@@ -57,6 +63,20 @@ CASES = [
 ]
 
 
+class ContractSession:
+    def begin_nested(self):
+        return nullcontext()
+
+    def execute(self, *_args, **_kwargs):
+        return None
+
+    def get(self, *_args, **_kwargs):
+        return SimpleNamespace(
+            tenant_id=uuid.UUID("00000000-0000-4000-8000-000000000041"),
+            project_id="prj_contract_create",
+        )
+
+
 def _client(monkeypatch, kind: str, service_result: dict) -> tuple[TestClient, str, str, dict]:
     principal = Principal(
         user_id="usr_contract_actor",
@@ -65,39 +85,67 @@ def _client(monkeypatch, kind: str, service_result: dict) -> tuple[TestClient, s
     )
     app = FastAPI()
     app.dependency_overrides[get_principal] = lambda: principal
-    app.dependency_overrides[get_session] = lambda: object()
+    app.dependency_overrides[get_session] = ContractSession
+    app.dependency_overrides[get_write_session] = ContractSession
     app.dependency_overrides[get_now] = lambda: dt.datetime(
         2026, 9, 22, 9, 0, tzinfo=dt.timezone.utc
     )
     app.dependency_overrides[get_settings] = lambda: SimpleNamespace(
         bootstrap_token_ttl_seconds=900,
         idempotency_ttl_seconds=600,
+        business_lock_timeout_ms=5_000,
     )
 
     if kind == "project":
-        monkeypatch.setattr(projects.project_service, "create_project", lambda *_a, **_k: service_result)
+        monkeypatch.setattr(
+            projects.project_service, "create_project", lambda *_a, **_k: service_result
+        )
         monkeypatch.setattr(projects, "record_event", lambda *_a, **_k: None)
         app.include_router(projects.router)
-        return TestClient(app, raise_server_exceptions=False), "POST", "/v1/projects", {"code": "contract-create", "displayName": "Contract Create"}
+        return (
+            TestClient(app, raise_server_exceptions=False),
+            "POST",
+            "/v1/projects",
+            {"code": "contract-create", "displayName": "Contract Create"},
+        )
     if kind == "admission":
         monkeypatch.setattr(
             pools.discovery_service,
             "admit_candidate",
             lambda *_a, **_k: SimpleNamespace(
                 secret=service_result["bootstrapToken"],
-                expires_at=dt.datetime.fromisoformat(service_result["expiresAt"]),
+                expires_at=dt.datetime.fromisoformat(
+                    service_result["expiresAt"].replace("Z", "+00:00")
+                ),
             ),
         )
         monkeypatch.setattr(pools, "record_event", lambda *_a, **_k: None)
         app.include_router(pools.router)
-        return TestClient(app, raise_server_exceptions=False), "POST", "/v1/discovery/candidates/ann_contract_candidate/admission", {}
+        return (
+            TestClient(app, raise_server_exceptions=False),
+            "POST",
+            "/v1/discovery/candidates/ann_contract_candidate/admission",
+            {},
+        )
 
-    monkeypatch.setattr(settings_routes.settings_service, "require_global_administrator", lambda *_a, **_k: None)
+    monkeypatch.setattr(
+        settings_routes.settings_service, "require_global_administrator", lambda *_a, **_k: None
+    )
+    monkeypatch.setattr(
+        settings_routes.settings_service, "require_administrator", lambda *_a, **_k: None
+    )
     monkeypatch.setattr(settings_routes, "_audit", lambda *_a, **_k: None)
     if kind == "member":
-        monkeypatch.setattr(settings_routes.settings_service, "set_member_role", lambda *_a, **_k: service_result)
+        monkeypatch.setattr(
+            settings_routes.settings_service, "set_member_role", lambda *_a, **_k: service_result
+        )
         app.include_router(settings_routes.router)
-        return TestClient(app, raise_server_exceptions=False), "PUT", "/v1/projects/prj_contract_create/members/usr_contract_member", {"roleCode": "operator"}
+        return (
+            TestClient(app, raise_server_exceptions=False),
+            "PUT",
+            "/v1/projects/prj_contract_create/members/usr_contract_member",
+            {"roleCode": "operator"},
+        )
     if kind == "workspace-status":
         monkeypatch.setattr(
             settings_routes.settings_service,
@@ -108,7 +156,12 @@ def _client(monkeypatch, kind: str, service_result: dict) -> tuple[TestClient, s
         )
         app.include_router(settings_routes.router)
         request_status = service_result.get("_request_status", "ready")
-        return TestClient(app, raise_server_exceptions=False), "PUT", "/v1/workspaces/wsp_contract_status/status", {"status": request_status}
+        return (
+            TestClient(app, raise_server_exceptions=False),
+            "PUT",
+            "/v1/workspaces/wsp_contract_status/status",
+            {"status": request_status},
+        )
 
     if kind == "node-enroll":
         node_data = service_result["node"]
@@ -119,13 +172,9 @@ def _client(monkeypatch, kind: str, service_result: dict) -> tuple[TestClient, s
             os_version=node_data["osVersion"],
             agent_version=node_data["agentVersion"],
             status=node_data["status"],
-            enrolled_at=dt.datetime.fromisoformat(
-                node_data["enrolledAt"].replace("Z", "+00:00")
-            ),
+            enrolled_at=dt.datetime.fromisoformat(node_data["enrolledAt"].replace("Z", "+00:00")),
             last_heartbeat_at=(
-                dt.datetime.fromisoformat(
-                    node_data["lastHeartbeatAt"].replace("Z", "+00:00")
-                )
+                dt.datetime.fromisoformat(node_data["lastHeartbeatAt"].replace("Z", "+00:00"))
                 if node_data["lastHeartbeatAt"] is not None
                 else None
             ),
@@ -143,13 +192,12 @@ def _client(monkeypatch, kind: str, service_result: dict) -> tuple[TestClient, s
             def begin(self):
                 return nullcontext()
 
-        monkeypatch.setattr(
-            node_routes, "make_session_factory", lambda _engine: FakeSession
-        )
+            def execute(self, *_args, **_kwargs):
+                return None
+
+        monkeypatch.setattr(node_routes, "make_session_factory", lambda _engine: FakeSession)
         monkeypatch.setattr(node_routes, "tenant_scope", lambda *_args: nullcontext())
-        monkeypatch.setattr(
-            node_routes.node_service, "enroll_node", lambda *_a, **_k: node
-        )
+        monkeypatch.setattr(node_routes.node_service, "enroll_node", lambda *_a, **_k: node)
         monkeypatch.setattr(node_routes, "record_event", lambda *_a, **_k: None)
         if service_result.get("_invalid_nested_node") or "unexpected" in service_result:
             valid_node = dict(node_data)
@@ -190,9 +238,7 @@ def _client(monkeypatch, kind: str, service_result: dict) -> tuple[TestClient, s
                 contribution_data["registeredAt"].replace("Z", "+00:00")
             ),
         )
-        monkeypatch.setattr(
-            storage_routes, "_contribution_body", lambda _value: contribution_data
-        )
+        monkeypatch.setattr(storage_routes, "_contribution_body", lambda _value: contribution_data)
         app.include_router(storage_routes.router)
         if kind == "contribution-registration":
             replay = service_result.get("_replay")
@@ -201,9 +247,7 @@ def _client(monkeypatch, kind: str, service_result: dict) -> tuple[TestClient, s
                     "contribution": contribution_data,
                     "unexpected": service_result["unexpected"],
                 }
-            monkeypatch.setattr(
-                storage_routes, "replay_or_reserve", lambda *_a, **_k: replay
-            )
+            monkeypatch.setattr(storage_routes, "replay_or_reserve", lambda *_a, **_k: replay)
             monkeypatch.setattr(
                 storage_routes.storage_service,
                 "register_contribution",
@@ -244,7 +288,9 @@ def _client(monkeypatch, kind: str, service_result: dict) -> tuple[TestClient, s
             request_body,
         )
 
-    monkeypatch.setattr(settings_routes.settings_service, "set_resource_offer", lambda *_a, **_k: service_result)
+    monkeypatch.setattr(
+        settings_routes.settings_service, "set_resource_offer", lambda *_a, **_k: service_result
+    )
     app.include_router(settings_routes.router)
     return (
         TestClient(app, raise_server_exceptions=False),
@@ -256,9 +302,7 @@ def _client(monkeypatch, kind: str, service_result: dict) -> tuple[TestClient, s
 
 def _request(client: TestClient, method: str, path: str, body: dict):
     headers = (
-        {"X-Inv-Tenant": "00000000-0000-4000-8000-000000000041"}
-        if path == "/v1/nodes"
-        else None
+        {"X-Inv-Tenant": "00000000-0000-4000-8000-000000000041"} if path == "/v1/nodes" else None
     )
     return client.request(method, path, json=body, headers=headers)
 
@@ -300,9 +344,7 @@ def test_high_risk_write_route_serves_the_measured_fixture(monkeypatch, kind, fi
     client, method, path, request_body = _client(monkeypatch, kind, payload)
     response = _request(client, method, path, request_body)
     expected_status = (
-        201
-        if kind in {"project", "admission", "node-enroll", "contribution-registration"}
-        else 200
+        201 if kind in {"project", "admission", "node-enroll", "contribution-registration"} else 200
     )
     assert response.status_code == expected_status
     assert response.json() == payload
@@ -394,9 +436,7 @@ def test_contribution_body_serializes_every_nullable_status_shape(
     )
 
     body = storage_routes._contribution_body(contribution)
-    parsed = schemas.ContributionRegistrationResponse.model_validate(
-        {"contribution": body}
-    )
+    parsed = schemas.ContributionRegistrationResponse.model_validate({"contribution": body})
     assert parsed.contribution.status == status
     assert parsed.contribution.capacity_bytes == capacity_bytes
     assert parsed.contribution.available_bytes == available_bytes
@@ -407,9 +447,19 @@ def test_contribution_body_serializes_every_nullable_status_shape(
     "filename,model,field,value",
     [
         ("project-create-response.json", schemas.ProjectCreateResponse, "memberCount", "one"),
-        ("discovery-admission-response.json", schemas.DiscoveryAdmissionResponse, "bootstrapToken", 9),
+        (
+            "discovery-admission-response.json",
+            schemas.DiscoveryAdmissionResponse,
+            "bootstrapToken",
+            9,
+        ),
         ("member-role-result-response.json", schemas.MemberRoleResultResponse, "canApprove", "yes"),
-        ("resource-offer-result-response.json", schemas.ResourceOfferResultResponse, "previousOfferedQuantity", "unknown"),
+        (
+            "resource-offer-result-response.json",
+            schemas.ResourceOfferResultResponse,
+            "previousOfferedQuantity",
+            "unknown",
+        ),
     ],
 )
 def test_high_risk_write_contract_rejects_wrong_field_types(filename, model, field, value):

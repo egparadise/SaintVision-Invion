@@ -53,21 +53,22 @@ export const NaturalLanguageRunView: React.FC = () => {
     if (!activeRequest) return;
     const res = agentManager.advanceRepairLoop(activeRequest.id);
     if (!res.canRepair) {
-      setActiveRequest({
-        ...activeRequest,
-        status: 'rejected',
-      });
+      setActiveRequest((prev) => (prev ? { ...prev, status: 'rejected' } : null));
       setActionNotice({
         type: 'error',
         text: `🛑 ${res.error}`,
       });
     } else {
-      setActiveRequest({
-        ...activeRequest,
-        boundedRepairLoops: res.currentLoops,
-        status: 'repairing',
-        proposedDiff: `${activeRequest.proposedDiff}\n// [Repair Loop ${res.currentLoops}]: Added null safety check and boundary assertion\n`,
-      });
+      setActiveRequest((prev) =>
+        prev
+          ? {
+              ...prev,
+              boundedRepairLoops: res.currentLoops,
+              status: 'repairing',
+              proposedDiff: `${prev.proposedDiff}\n// [Repair Loop ${res.currentLoops}]: Added null safety check and boundary assertion\n`,
+            }
+          : null
+      );
       setActionNotice({
         type: 'info',
         text: `🔄 Bounded Repair Loop ${res.currentLoops}/3 실행 완료. 보정된 Diff를 확인하세요.`,
@@ -122,7 +123,7 @@ export const NaturalLanguageRunView: React.FC = () => {
           <div style={{ fontSize: '24px', fontWeight: 700, color: '#3fb950', marginTop: '4px' }}>
             {goldenMetric.promptValidityRate.toFixed(1)}% ({goldenMetric.promptValid}/{goldenMetric.promptTotal})
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>목표: ≥99% (로컬 시뮬레이션)</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>목표: ≥99% (합성 · 운영 인수 아님(G-26))</div>
         </div>
 
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
@@ -130,7 +131,7 @@ export const NaturalLanguageRunView: React.FC = () => {
           <div style={{ fontSize: '24px', fontWeight: 700, color: '#3fb950', marginTop: '4px' }}>
             {goldenMetric.codingSuccessRate.toFixed(1)}% ({goldenMetric.codingTasksPassed}/{goldenMetric.codingTasksTotal})
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>목표: ≥70% (로컬 시뮬레이션)</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>목표: ≥70% (합성 · 운영 인수 아님(G-26))</div>
         </div>
 
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
@@ -150,40 +151,43 @@ export const NaturalLanguageRunView: React.FC = () => {
         </div>
       </div>
 
-      {/* Action Notification Banner */}
-      {actionNotice && (
-        <div
-          role={actionNotice.type === 'error' ? 'alert' : 'status'}
-          aria-live={actionNotice.type === 'error' ? 'assertive' : 'polite'}
-          style={{
-            padding: '12px 18px',
-            borderRadius: '6px',
-            fontSize: '13px',
-            fontWeight: 500,
-            backgroundColor:
-              actionNotice.type === 'error'
-                ? 'rgba(248, 81, 73, 0.15)'
-                : actionNotice.type === 'success'
-                ? 'rgba(46, 160, 67, 0.15)'
-                : 'rgba(56, 139, 253, 0.15)',
-            border: `1px solid ${
-              actionNotice.type === 'error'
-                ? '#f85149'
-                : actionNotice.type === 'success'
-                ? '#3fb950'
-                : '#58a6ff'
-            }`,
-            color:
-              actionNotice.type === 'error'
-                ? '#f85149'
-                : actionNotice.type === 'success'
-                ? '#3fb950'
-                : '#58a6ff',
-          }}
-        >
-          {actionNotice.text}
-        </div>
-      )}
+      {/* Action Notification Banner (Permanent live region container for screen reader announcements) */}
+      <div
+        data-testid="agent-action-notice"
+        role="status"
+        aria-live="polite"
+        style={
+          actionNotice
+            ? {
+                padding: '12px 18px',
+                borderRadius: '6px',
+                fontSize: '13px',
+                fontWeight: 500,
+                backgroundColor:
+                  actionNotice.type === 'error'
+                    ? 'rgba(248, 81, 73, 0.15)'
+                    : actionNotice.type === 'success'
+                    ? 'rgba(46, 160, 67, 0.15)'
+                    : 'rgba(56, 139, 253, 0.15)',
+                border: `1px solid ${
+                  actionNotice.type === 'error'
+                    ? '#f85149'
+                    : actionNotice.type === 'success'
+                    ? '#3fb950'
+                    : '#58a6ff'
+                }`,
+                color:
+                  actionNotice.type === 'error'
+                    ? '#f85149'
+                    : actionNotice.type === 'success'
+                    ? '#3fb950'
+                    : '#58a6ff',
+              }
+            : undefined
+        }
+      >
+        {actionNotice?.text}
+      </div>
 
       {/* Natural Language Requester and Diff Review Split View */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
@@ -347,7 +351,7 @@ export const NaturalLanguageRunView: React.FC = () => {
               <h3 style={{ margin: 0, fontSize: '16px', color: '#f0f6fc' }}>
                 제안된 코드 Diff 검토 및 Bounded Repair
               </h3>
-              <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
+              <p data-testid="agent-loop-info" style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
                 {activeRequest
                   ? `요청 ID: ${activeRequest.id} • 루프: ${activeRequest.boundedRepairLoops}/${activeRequest.maxRepairLoops}`
                   : '대기 중인 제안 diff가 없습니다.'}
@@ -356,6 +360,7 @@ export const NaturalLanguageRunView: React.FC = () => {
 
             {activeRequest && (
               <span
+                data-testid="agent-status-badge"
                 style={{
                   padding: '2px 8px',
                   borderRadius: '4px',
@@ -365,13 +370,13 @@ export const NaturalLanguageRunView: React.FC = () => {
                     activeRequest.status === 'completed'
                       ? 'rgba(46, 160, 67, 0.2)'
                       : activeRequest.status === 'rejected'
-                      ? 'rgba(248, 81, 73, 0.2)'
+                      ? 'rgba(248, 81, 73, 0.15)'
                       : 'rgba(56, 139, 253, 0.2)',
                   color:
                     activeRequest.status === 'completed'
                       ? '#3fb950'
                       : activeRequest.status === 'rejected'
-                      ? '#f85149'
+                      ? '#ff7b72'
                       : '#58a6ff',
                 }}
               >
@@ -403,10 +408,10 @@ export const NaturalLanguageRunView: React.FC = () => {
           {/* Diff Action Buttons */}
           {activeRequest && activeRequest.status !== 'completed' && activeRequest.status !== 'rejected' && (
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-              <Button size="sm" variant="secondary" onClick={handleRequestRefinement}>
+              <Button size="sm" variant="secondary" onClick={handleRequestRefinement} data-testid="agent-refine-btn">
                 🔄 추가 보정 요청 (Bounded Repair +1)
               </Button>
-              <Button size="sm" variant="primary" onClick={handleApplyDiff}>
+              <Button size="sm" variant="primary" onClick={handleApplyDiff} data-testid="agent-apply-diff-btn">
                 ✔ Diff 승인 및 코드 적용
               </Button>
             </div>

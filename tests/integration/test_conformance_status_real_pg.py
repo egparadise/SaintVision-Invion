@@ -34,6 +34,9 @@ from saintvision.ids import new_id
 pytestmark = pytest.mark.postgres
 
 TOKEN = "conformance-real-token"
+#: Stage two binds every read to the process's host identity (design #218
+#: §2-9); with none configured the route refuses rather than answering.
+HOST = uuid.UUID("0f8fad5b-d9cb-469f-a165-70867728950e")
 
 
 def _insert(connection, table_name, **values):
@@ -102,7 +105,7 @@ def _client(app_engine, *, tenant_id, user_id, now):
     )
     app = create_app(
         engine=app_engine,
-        settings=Settings(database_url="test-only"),
+        settings=Settings(database_url="test-only", control_plane_host_id=HOST),
         verifier=StaticPrincipalVerifier({TOKEN: principal}, allow_outside_dev=True),
         clock=lambda: now,
         check_partitions_on_startup=False,

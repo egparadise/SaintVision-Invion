@@ -14,12 +14,28 @@ import uuid
 
 from fastapi import APIRouter, Depends, Header, Query, Request, Response
 from sqlalchemy import select, text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from ...config import Settings
-from ...db.models import DiscoveryCredentialEvent, DiscoveryMachineCredential, NodeAnnouncement
+from ...db.models import (
+    DiscoveryCredentialEvent,
+    DiscoveryMachineCredential,
+    NodeAnnouncement,
+    ResourcePool,
+    ResourcePoolMember,
+    Run,
+    Workload,
+)
 from ...db.session import make_session_factory, tenant_scope
-from ...errors import AUTH_INVALID_CREDENTIAL, AUTH_TENANT_SCOPE, VAL_SCHEMA, InvError
+from ...errors import (
+    AUTH_INVALID_CREDENTIAL,
+    AUTH_PROJECT_SCOPE,
+    AUTH_TENANT_SCOPE,
+    GRAPH_INVALID_TRANSITION,
+    VAL_SCHEMA,
+    InvError,
+)
 from ...identity.discovery_credentials import (
     reject_discovery_credential,
     token_sha256,
@@ -29,12 +45,136 @@ from ...identity.principal import Principal
 from ...services import discovery as discovery_service
 from ...services import pools as pool_service
 from ...services import projects as project_service
+from ...services import settings as settings_service
 from ...services.audit import record_event
 from ...units import CANONICAL_UNIT
 from .. import schemas
-from ..deps import get_now, get_principal, get_session, get_settings
+from ..deps import get_now, get_principal, get_session, get_settings, get_write_session
+from ..lock_wait import bounded_lock_wait
 
 router = APIRouter(prefix="/v1", tags=["pools"])
+
+_POOL_UNIQUE_CONFLICTS = {
+    "uq_resource_pools_tenant_id_name": "a resource pool with this name already exists",
+    "uq_distributed_plans_run_id": "this run already has a distributed plan",
+}
+_POOL_MEMBER_PRIMARY_KEY = "resource_pool_members_pkey"
+
+
+def _constraint_name(error: IntegrityError, known: set[str]) -> str | None:
+    original = error.orig
+    constraint = getattr(getattr(original, "diag", None), "constraint_name", None)
+    if constraint is not None:
+        return constraint
+    detail = str(original)
+    return next((name for name in known if name in detail), None)
+
+
+def _translate_pool_conflict(error: IntegrityError) -> InvError | None:
+    constraint = _constraint_name(error, set(_POOL_UNIQUE_CONFLICTS))
+    if constraint in _POOL_UNIQUE_CONFLICTS:
+        return InvError(
+            GRAPH_INVALID_TRANSITION,
+            _POOL_UNIQUE_CONFLICTS[constraint],
+            status=409,
+        )
+    return None
+
+
+def _require_pool_write_access(
+    session: Session, *, tenant_id: uuid.UUID, pool_id: str, user_id: str
+) -> ResourcePool:
+    """Lock the project authority before the pool and revalidate both.
+
+    The first read discovers the project's lock key only. Membership writers
+    serialize on that project row, so taking it before the final permission
+    check closes the revoke-vs-write race. The pool is then locked and its
+    project binding is revalidated in the same transaction.
+    """
+    project_id = session.scalar(
+        select(ResourcePool.project_id).where(
+            ResourcePool.tenant_id == tenant_id,
+            ResourcePool.pool_id == pool_id,
+        )
+    )
+    if project_id is None:
+        raise InvError(
+            AUTH_PROJECT_SCOPE,
+            "project is not accessible to this principal",
+        )
+    settings_service.lock_project(session, tenant_id, project_id)
+    try:
+        permission = project_service.require_project_access(
+            session,
+            tenant_id=tenant_id,
+            project_id=project_id,
+            user_id=user_id,
+        )
+    except InvError as error:
+        if error.code != AUTH_PROJECT_SCOPE:
+            raise
+        # ``project_id`` was derived from a pool the caller cannot see.  Do not
+        # expose it through require_project_access's otherwise useful extra.
+        raise InvError(
+            AUTH_PROJECT_SCOPE,
+            "project is not accessible to this principal",
+        ) from None
+    if not permission["canRequest"]:
+        raise InvError(
+            AUTH_PROJECT_SCOPE,
+            "project is not accessible to this principal",
+        )
+    pool = session.scalar(
+        select(ResourcePool)
+        .where(
+            ResourcePool.tenant_id == tenant_id,
+            ResourcePool.pool_id == pool_id,
+            ResourcePool.project_id == project_id,
+        )
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    )
+    if pool is None:
+        raise InvError(
+            AUTH_PROJECT_SCOPE,
+            "project is not accessible to this principal",
+        )
+    return pool
+
+
+def _require_plan_write_access(
+    session: Session,
+    *,
+    tenant_id: uuid.UUID,
+    pool_id: str,
+    run_id: str,
+    user_id: str,
+) -> ResourcePool:
+    pool = _require_pool_write_access(
+        session,
+        tenant_id=tenant_id,
+        pool_id=pool_id,
+        user_id=user_id,
+    )
+    run = session.scalar(
+        select(Run)
+        .where(Run.tenant_id == tenant_id, Run.run_id == run_id)
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    )
+    workload = (
+        session.get(Workload, run.workload_id, populate_existing=True) if run is not None else None
+    )
+    if (
+        workload is None
+        or workload.tenant_id != tenant_id
+        or workload.project_id != pool.project_id
+    ):
+        raise InvError(
+            AUTH_PROJECT_SCOPE,
+            "project is not accessible to this principal",
+        )
+    return pool
 
 
 def _tenant(value: str) -> uuid.UUID:
@@ -80,7 +220,13 @@ def announce(
         denied = False
         response_state: str | None = None
         with factory() as session:
-            with session.begin():
+            with (
+                session.begin(),
+                bounded_lock_wait(
+                    session,
+                    timeout_ms=request.app.state.settings.business_lock_timeout_ms,
+                ),
+            ):
                 # Digest-scoped lookup obtains tenant identity from the grant;
                 # the caller's tenant header is checked only after this read.
                 session.execute(
@@ -196,7 +342,13 @@ def announce(
     factory = make_session_factory(request.app.state.engine)
     with factory() as session:
         with session.begin():
-            with tenant_scope(session, tenant_id):
+            with (
+                tenant_scope(session, tenant_id),
+                bounded_lock_wait(
+                    session,
+                    timeout_ms=request.app.state.settings.business_lock_timeout_ms,
+                ),
+            ):
                 row = discovery_service.record_announcement(
                     session,
                     tenant_id=tenant_id,
@@ -218,9 +370,7 @@ def announce(
     return {"accepted": True, "state": state}
 
 
-@router.get(
-    "/discovery/candidates", response_model=schemas.DiscoveryCandidatesResponse
-)
+@router.get("/discovery/candidates", response_model=schemas.DiscoveryCandidatesResponse)
 def list_candidates(
     principal: Principal = Depends(get_principal),
     session: Session = Depends(get_session),
@@ -251,7 +401,7 @@ def admit(
     request: Request,
     announcement_id: str,
     principal: Principal = Depends(get_principal),
-    session: Session = Depends(get_session),
+    session: Session = Depends(get_write_session),
     settings: Settings = Depends(get_settings),
     now: dt.datetime = Depends(get_now),
 ) -> dict:
@@ -298,7 +448,7 @@ def admit(
 def decline(
     announcement_id: str,
     principal: Principal = Depends(get_principal),
-    session: Session = Depends(get_session),
+    session: Session = Depends(get_write_session),
     now: dt.datetime = Depends(get_now),
     reason: str | None = Query(default=None),
 ) -> dict:
@@ -326,7 +476,7 @@ def create_pool(
     payload: schemas.PoolRequest,
     response: Response,
     principal: Principal = Depends(get_principal),
-    session: Session = Depends(get_session),
+    session: Session = Depends(get_write_session),
     now: dt.datetime = Depends(get_now),
 ) -> dict:
     # Read now, not from the credential: a project created a moment ago
@@ -338,15 +488,21 @@ def create_pool(
         project_id=payload.project_id,
         user_id=principal.user_id,
     )
-    pool = pool_service.create_pool(
-        session,
-        tenant_id=principal.tenant_id,
-        project_id=payload.project_id,
-        name=payload.name,
-        description=payload.description,
-        created_by_user_id=principal.user_id,
-        now=now,
-    )
+    try:
+        pool = pool_service.create_pool(
+            session,
+            tenant_id=principal.tenant_id,
+            project_id=payload.project_id,
+            name=payload.name,
+            description=payload.description,
+            created_by_user_id=principal.user_id,
+            now=now,
+        )
+    except IntegrityError as error:
+        conflict = _translate_pool_conflict(error)
+        if conflict is not None:
+            raise conflict from None
+        raise
     response.headers["Location"] = f"/v1/pools/{pool.pool_id}"
     return {"poolId": pool.pool_id, "name": pool.name}
 
@@ -360,17 +516,38 @@ def add_member(
     pool_id: str,
     node_id: str,
     principal: Principal = Depends(get_principal),
-    session: Session = Depends(get_session),
+    session: Session = Depends(get_write_session),
     now: dt.datetime = Depends(get_now),
 ) -> dict:
-    pool_service.add_member(
+    _require_pool_write_access(
         session,
         tenant_id=principal.tenant_id,
         pool_id=pool_id,
-        node_id=node_id,
-        added_by_user_id=principal.user_id,
-        now=now,
+        user_id=principal.user_id,
     )
+    try:
+        with session.begin_nested():
+            pool_service.add_member(
+                session,
+                tenant_id=principal.tenant_id,
+                pool_id=pool_id,
+                node_id=node_id,
+                added_by_user_id=principal.user_id,
+                now=now,
+            )
+    except IntegrityError as error:
+        constraint = _constraint_name(error, {_POOL_MEMBER_PRIMARY_KEY})
+        if constraint != _POOL_MEMBER_PRIMARY_KEY:
+            raise
+        # PUT is idempotent. After the savepoint rollback, accept only if the
+        # exact membership that won the race is now visible.
+        existing = session.get(
+            ResourcePoolMember,
+            (principal.tenant_id, pool_id, node_id),
+            populate_existing=True,
+        )
+        if existing is None:
+            raise
     return {"poolId": pool_id, "nodeId": node_id, "member": True}
 
 
@@ -382,8 +559,14 @@ def remove_member(
     pool_id: str,
     node_id: str,
     principal: Principal = Depends(get_principal),
-    session: Session = Depends(get_session),
+    session: Session = Depends(get_write_session),
 ) -> dict:
+    _require_pool_write_access(
+        session,
+        tenant_id=principal.tenant_id,
+        pool_id=pool_id,
+        user_id=principal.user_id,
+    )
     removed = pool_service.remove_member(
         session, tenant_id=principal.tenant_id, pool_id=pool_id, node_id=node_id
     )
@@ -451,7 +634,7 @@ def create_plan(
     pool_id: str,
     payload: schemas.DistributedPlanRequest,
     principal: Principal = Depends(get_principal),
-    session: Session = Depends(get_session),
+    session: Session = Depends(get_write_session),
     now: dt.datetime = Depends(get_now),
 ) -> dict:
     """Spread one Run over the idlest nodes that fit.
@@ -460,21 +643,34 @@ def create_plan(
     partial placement — three of five shards running would report success for a
     job that did not happen.
     """
-    plan, placements = pool_service.plan_distributed_run(
+    _require_plan_write_access(
         session,
         tenant_id=principal.tenant_id,
-        run_id=payload.run_id,
         pool_id=pool_id,
-        strategy=payload.strategy,
-        shard_count=payload.shard_count,
-        requirement=pool_service.ShardRequirement(
-            cpu_millicores=payload.shard_cpu_millicores,
-            ram_bytes=payload.shard_ram_bytes,
-            gpu_devices=payload.shard_gpu_devices,
-        ),
-        splittable_declared=payload.splittable_declared,
-        now=now,
+        run_id=payload.run_id,
+        user_id=principal.user_id,
     )
+    try:
+        plan, placements = pool_service.plan_distributed_run(
+            session,
+            tenant_id=principal.tenant_id,
+            run_id=payload.run_id,
+            pool_id=pool_id,
+            strategy=payload.strategy,
+            shard_count=payload.shard_count,
+            requirement=pool_service.ShardRequirement(
+                cpu_millicores=payload.shard_cpu_millicores,
+                ram_bytes=payload.shard_ram_bytes,
+                gpu_devices=payload.shard_gpu_devices,
+            ),
+            splittable_declared=payload.splittable_declared,
+            now=now,
+        )
+    except IntegrityError as error:
+        conflict = _translate_pool_conflict(error)
+        if conflict is not None:
+            raise conflict from None
+        raise
     return {
         "planId": plan.plan_id,
         "runId": plan.run_id,

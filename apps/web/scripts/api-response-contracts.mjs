@@ -47,6 +47,9 @@ const contracts = [
   { schema: 'node-page-response', output: 'node-page-response' },
   { schema: 'node-detail-response', output: 'node-detail-response' },
   { schema: 'conformance-status-response', output: 'conformance-status-response' },
+  { schema: 'conformance-status-recorded-response', output: 'conformance-status-recorded-response' },
+  { schema: 'adapter-conformance-not-observed-response', output: 'adapter-conformance-not-observed-response' },
+  { schema: 'adapter-conformance-recorded-response', output: 'adapter-conformance-recorded-response' },
   { schema: 'run-record-response', output: 'run-record-response' },
   { schema: 'run-record-artifact-page-response', output: 'run-record-artifact-page-response' },
   { schema: 'artifact-pin-verification-response', output: 'artifact-pin-verification-response' },
@@ -58,6 +61,10 @@ const contracts = [
   { schema: 'model-release-request', output: 'model-release-request' },
   { schema: 'model-release-response', output: 'model-release-response' },
   { schema: 'model-lineage-trace-response', output: 'model-lineage-trace-response' },
+  { schema: 'model-verify-request', output: 'model-verify-request' },
+  { schema: 'model-verify-response', output: 'model-verify-response' },
+  { schema: 'eval-run-start-request', output: 'eval-run-start-request' },
+  { schema: 'eval-run-response', output: 'eval-run-response' },
 ];
 const mode = process.argv[2];
 

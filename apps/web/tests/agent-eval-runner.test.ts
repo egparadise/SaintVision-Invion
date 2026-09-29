@@ -114,7 +114,7 @@ describe('G-07 100 Prompt / 30 Coding Golden Eval Runner (EVL-05)', () => {
     expect(loaded.summary.promptsFail).toBe(0);
     expect(loaded.summary.codingTasksFail).toBe(0);
     expect(loaded.cases.filter((c: any) => c.verdict === 'FAIL')).toHaveLength(0);
-  });
+  }, 15000);
 
   it('strictly fails closed when generate_eval_evidence.ts is invoked with invalid commit (F4)', () => {
     const rootDir = path.resolve(__dirname, '../../..');

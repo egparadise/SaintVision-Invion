@@ -7,7 +7,21 @@ import { TEST_FIXTURE_LINEAGES } from './fixtures/model-lineage';
 import { ModelLineageView } from '../src/features/mlops/ModelLineageView';
 import type { ProblemDetails } from '../src/contracts/types';
 import type { ConformanceStatusResponse, ConformanceCheckDescriptor } from '../src/contracts/conformance-status-response';
-import { isConformanceStatusResponse, isConformanceCheckDescriptor } from '../src/shared/api/adapterObservation';
+import type { ConformanceStatusRecordedResponse, ConformanceRecordItem } from '../src/contracts/conformance-status-recorded-response';
+import type { AdapterConformanceNotObservedResponse } from '../src/contracts/adapter-conformance-not-observed-response';
+import type { AdapterConformanceRecordedResponse } from '../src/contracts/adapter-conformance-recorded-response';
+import {
+  isConformanceStatusResponse,
+  isConformanceCheckDescriptor,
+  isConformanceStatusRecordedResponse,
+  isConformanceRecordItem,
+  isConformanceCheckOutcome,
+  isConformanceStatusUnion,
+  isAdapterConformanceNotObservedResponse,
+  isAdapterConformanceRecordedResponse,
+  isAdapterConformanceUnion,
+  fetchAdapterConformance,
+} from '../src/shared/api/adapterObservation';
 
 describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (AC-10)', () => {
   describe('Provider Adapter Conformance (AC-10 Codex = Claude)', () => {
@@ -654,7 +668,10 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
         { name: 'declared_model_pinning_returns_an_id', capabilityGated: true },
       ];
 
-      // F2: Real adapters from agents.py:99 and reason from conformance_status.py:65-68
+      // F2: Real adapters from agents.py:99 and reason from conformance_status.py
+      // NOT_OBSERVED_REASON (G-03 stage two, #221: the platform now persists records, so
+      // the sentence states the absence only -- design #218 v1.2 §4-4 / T5b).
+      const NOT_OBSERVED_REASON = 'No conformance run is recorded for this host and these adapters.';
       const canonicalConformancePayload: ConformanceStatusResponse = {
         contractVersion: '1.0.0',
         scope: 'control-plane-host',
@@ -662,8 +679,134 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
         recordedAt: null,
         adapters: ['claude-code', 'codex-cli', 'gemini-cli', 'antigravity'],
         checks: canonical15Checks,
-        reason: 'No conformance run is recorded; this platform does not persist conformance results yet.',
+        reason: NOT_OBSERVED_REASON,
       };
+
+      // G-03 stage two: one record, the fixture adapter's real result shape (15 checks,
+      // the one ungated-but-undeclared capability check skipped).
+      const canonicalRecord: ConformanceRecordItem = {
+        adapter: 'codex-cli',
+        subject: 'fixture-adapter',
+        provenance: 'in-server',
+        contractVersion: '1.0.0',
+        suiteContractVersion: '1.0.0',
+        total: 15,
+        passed: 14,
+        failed: 0,
+        skipped: 1,
+        outcomes: canonical15Checks.map((check) => ({
+          name: check.name,
+          passed: check.name !== 'declared_server_cancel_actually_stops',
+          skipped: check.name === 'declared_server_cancel_actually_stops',
+        })),
+        recordedAt: '2026-09-28T06:00:00Z',
+      };
+      const canonicalRecordedPayload: ConformanceStatusRecordedResponse = {
+        status: 'RECORDED',
+        scope: 'control-plane-host',
+        contractVersion: '1.0.0',
+        adapters: ['claude-code', 'codex-cli', 'gemini-cli', 'antigravity'],
+        checks: canonical15Checks,
+        records: [canonicalRecord],
+        latestRecordedAt: '2026-09-28T06:00:00Z',
+      };
+
+      it('pins the stage-two NOT_OBSERVED reason and no longer carries the stage-one sentence (design #218 T5b)', () => {
+        expect(canonicalConformancePayload.reason).toBe('No conformance run is recorded for this host and these adapters.');
+        expect(canonicalConformancePayload.reason).not.toContain('does not persist');
+        expect(isConformanceStatusResponse(canonicalConformancePayload)).toBe(true);
+      });
+
+      it('accepts the RECORDED branch and rejects every invariant break (design #218 §2-8, §4-1)', () => {
+        expect(isConformanceStatusRecordedResponse(canonicalRecordedPayload)).toBe(true);
+        expect(isConformanceStatusUnion(canonicalRecordedPayload)).toBe(true);
+        expect(isConformanceStatusUnion(canonicalConformancePayload)).toBe(true);
+        expect(isConformanceRecordItem(canonicalRecord)).toBe(true);
+        expect(isConformanceCheckOutcome(canonicalRecord.outcomes[0])).toBe(true);
+
+        // T1: no detail on an outcome; T2: counts must be one measurement.
+        expect(isConformanceCheckOutcome({ ...canonicalRecord.outcomes[0], detail: 'x' })).toBe(false);
+        expect(isConformanceCheckOutcome({ name: 'a', passed: true, skipped: true })).toBe(false);
+        expect(isConformanceRecordItem({ ...canonicalRecord, passed: 13 })).toBe(false);
+        expect(isConformanceRecordItem({ ...canonicalRecord, total: 16 })).toBe(false);
+        expect(isConformanceRecordItem({ ...canonicalRecord, outcomes: canonicalRecord.outcomes.slice(1) })).toBe(false);
+        // T3: only the producible subject/provenance.
+        expect(isConformanceRecordItem({ ...canonicalRecord, subject: 'installed-cli' })).toBe(false);
+        expect(isConformanceRecordItem({ ...canonicalRecord, provenance: 'hosted-ci-import' })).toBe(false);
+        // T4: the aggregate has latestRecordedAt (the maximum) and no recordedAt/reason.
+        expect(isConformanceStatusRecordedResponse({ ...canonicalRecordedPayload, latestRecordedAt: '2026-09-28T05:00:00Z' })).toBe(false);
+        expect(isConformanceStatusRecordedResponse({ ...canonicalRecordedPayload, recordedAt: null })).toBe(false);
+        expect(isConformanceStatusRecordedResponse({ ...canonicalRecordedPayload, reason: 'x' })).toBe(false);
+        expect(isConformanceStatusRecordedResponse({ ...canonicalRecordedPayload, records: [] })).toBe(false);
+        expect(isConformanceStatusRecordedResponse({ ...canonicalRecordedPayload, records: [canonicalRecord, canonicalRecord] })).toBe(false);
+        expect(isConformanceStatusRecordedResponse({ ...canonicalRecordedPayload, records: [{ ...canonicalRecord, adapter: 'not-a-tool' }] })).toBe(false);
+        expect(isConformanceStatusRecordedResponse({ ...canonicalRecordedPayload, conformant: true })).toBe(false);
+        // A NOT_OBSERVED payload is not a RECORDED one and vice versa.
+        expect(isConformanceStatusRecordedResponse(canonicalConformancePayload)).toBe(false);
+        expect(isConformanceStatusResponse(canonicalRecordedPayload)).toBe(false);
+        expect(isConformanceStatusUnion({ ...canonicalRecordedPayload, status: 'PASS' })).toBe(false);
+      });
+
+      it('renders a RECORDED response as per-adapter records of the fixture subject without a conformant verdict', async () => {
+        const originalFetch = globalThis.fetch;
+        const testProjectId = 'prj_0123456789ABCDEFGHJKMNPQRS';
+
+        try {
+          globalThis.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            status: 200,
+            headers: new Headers({ 'content-type': 'application/json' }),
+            json: async () => canonicalRecordedPayload,
+          } as any);
+
+          await act(async () => {
+            root.render(React.createElement(ModelLineageView, { initialLineages: TEST_FIXTURE_LINEAGES }));
+          });
+          const projectInput = container.querySelector<HTMLInputElement>('[data-testid="conformance-project-input"]');
+          const fetchBtn = container.querySelector<HTMLButtonElement>('[data-testid="conformance-fetch-btn"]');
+          await act(async () => {
+            setInputValue(projectInput!, testProjectId);
+          });
+          await act(async () => {
+            fetchBtn!.click();
+          });
+          await act(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 0));
+          });
+
+          expect(container.querySelector('[data-testid="conformance-top-status"]')?.textContent).toBe('기록됨 (RECORDED)');
+          expect(container.querySelector('[data-testid="conformance-top-subtext"]')?.textContent).toBe(
+            '1/4 어댑터 기록 · fixture-adapter 측정 (control-plane-host)'
+          );
+          expect(container.querySelector('[data-testid="conformance-status-badge"]')?.textContent).toBe('기록됨 (RECORDED)');
+          expect(container.querySelector('[data-testid="conformance-recorded-at"]')?.textContent).toBe('2026-09-28T06:00:00Z');
+          // No reason on the RECORDED branch; the subject note says what was measured.
+          expect(container.querySelector('[data-testid="conformance-reason"]')).toBeNull();
+          expect(container.querySelector('[data-testid="conformance-subject-note"]')?.textContent).toContain('fixture-adapter');
+          expect(container.querySelector('[data-testid="conformance-subject-note"]')?.textContent).toContain('설치된 CLI');
+
+          const recordsTable = container.querySelector('[data-testid="conformance-records-table"]');
+          expect(recordsTable).not.toBeNull();
+          expect(container.querySelector('[data-testid="conformance-record-adapter-0"]')?.textContent).toBe('codex-cli');
+          expect(container.querySelector('[data-testid="conformance-record-subject-0"]')?.textContent).toBe('fixture-adapter');
+          expect(container.querySelector('[data-testid="conformance-record-provenance-0"]')?.textContent).toBe('in-server');
+          expect(container.querySelector('[data-testid="conformance-record-counts-0"]')?.textContent).toBe('전체 15 · 통과 14 · 실패 0 · 건너뜀 1');
+          expect(container.querySelector('[data-testid="conformance-record-row-1"]')).toBeNull();
+
+          // The checklist is still the server's descriptor list, tallied from outcomes only.
+          expect(container.querySelector('[data-testid="conformance-check-status-0"]')?.textContent).toBe('통과 1 · 실패 0 · 건너뜀 0 (1개 기록)');
+          expect(container.querySelector('[data-testid="conformance-check-status-12"]')?.textContent).toBe('통과 0 · 실패 0 · 건너뜀 1 (1개 기록)');
+
+          // No verdict: a record of the fixture is not "conforming", and there is no percentage.
+          const resultContainer = container.querySelector('[data-testid="conformance-result-container"]');
+          expect(resultContainer?.textContent).not.toContain('100%');
+          expect(resultContainer?.textContent).not.toMatch(/conforming/i);
+          expect(resultContainer?.textContent).not.toMatch(/\bPASS\b/);
+          expect(container.querySelector('[data-testid="conformance-live-status"]')?.textContent).toContain('기록됨(RECORDED)');
+        } finally {
+          globalThis.fetch = originalFetch;
+        }
+      });
 
       it('statically and dynamically verifies types are bound to generated @/contracts/conformance-status-response (Codex F-R1)', () => {
         expect(isConformanceStatusResponse(canonicalConformancePayload)).toBe(true);
@@ -1380,6 +1523,522 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
             getRelativeLuminance(...blendedGatedBg)
           );
           expect(gatedContrast).toBeGreaterThanOrEqual(4.5);
+        } finally {
+          globalThis.fetch = originalFetch;
+        }
+      });
+
+      // =========================================================================
+      // G-03 Stage Two Single Route: GET /v1/projects/:projectId/adapters/:name/conformance
+      // =========================================================================
+      const ADAPTER_NOT_OBSERVED_REASON = 'No conformance run is recorded for this host and this adapter.';
+
+      const canonicalSingleNotObservedPayload: AdapterConformanceNotObservedResponse = {
+        status: 'NOT_OBSERVED',
+        reason: ADAPTER_NOT_OBSERVED_REASON,
+        scope: 'control-plane-host',
+        adapter: 'gemini-cli',
+        contractVersion: '1.0.0',
+        checks: canonical15Checks,
+        recordedAt: null,
+      };
+
+      const canonicalSingleRecordedPayload: AdapterConformanceRecordedResponse = {
+        status: 'RECORDED',
+        scope: 'control-plane-host',
+        adapter: 'codex-cli',
+        subject: 'fixture-adapter',
+        provenance: 'in-server',
+        contractVersion: '1.0.0',
+        suiteContractVersion: '1.0.0',
+        total: 15,
+        passed: 14,
+        failed: 0,
+        skipped: 1,
+        outcomes: canonical15Checks.map((check) => ({
+          name: check.name,
+          passed: check.name !== 'declared_server_cancel_actually_stops',
+          skipped: check.name === 'declared_server_cancel_actually_stops',
+        })),
+        recordedAt: '2026-09-28T06:00:00Z',
+      };
+
+      it('strictly guards single adapter NOT_OBSERVED and RECORDED schemas and rejects invalid mutations', () => {
+        // Valid responses pass
+        expect(isAdapterConformanceNotObservedResponse(canonicalSingleNotObservedPayload)).toBe(true);
+        expect(isAdapterConformanceUnion(canonicalSingleNotObservedPayload)).toBe(true);
+
+        expect(isAdapterConformanceRecordedResponse(canonicalSingleRecordedPayload)).toBe(true);
+        expect(isAdapterConformanceUnion(canonicalSingleRecordedPayload)).toBe(true);
+
+        // NOT_OBSERVED rejects mutations
+        expect(isAdapterConformanceNotObservedResponse({ ...canonicalSingleNotObservedPayload, recordedAt: '2026-09-28T06:00:00Z' })).toBe(false);
+        expect(isAdapterConformanceNotObservedResponse({ ...canonicalSingleNotObservedPayload, status: 'RECORDED' })).toBe(false);
+        expect(isAdapterConformanceNotObservedResponse({ ...canonicalSingleNotObservedPayload, scope: 'worker-node' })).toBe(false);
+        expect(isAdapterConformanceNotObservedResponse({ ...canonicalSingleNotObservedPayload, extraKey: 'invalid' })).toBe(false);
+        expect(isAdapterConformanceNotObservedResponse({ ...canonicalSingleNotObservedPayload, reason: '' })).toBe(false);
+
+        // RECORDED rejects mutations (invariant enforcement)
+        expect(isAdapterConformanceRecordedResponse({ ...canonicalSingleRecordedPayload, subject: 'installed-cli' })).toBe(false);
+        expect(isAdapterConformanceRecordedResponse({ ...canonicalSingleRecordedPayload, provenance: 'hosted-ci-import' })).toBe(false);
+        expect(isAdapterConformanceRecordedResponse({ ...canonicalSingleRecordedPayload, passed: 15 })).toBe(false);
+        expect(isAdapterConformanceRecordedResponse({ ...canonicalSingleRecordedPayload, total: 16 })).toBe(false);
+        expect(isAdapterConformanceRecordedResponse({ ...canonicalSingleRecordedPayload, outcomes: canonicalSingleRecordedPayload.outcomes.slice(1) })).toBe(false);
+        expect(isAdapterConformanceRecordedResponse({ ...canonicalSingleRecordedPayload, conformant: true })).toBe(false);
+        expect(isAdapterConformanceRecordedResponse({ ...canonicalSingleRecordedPayload, reason: 'unwanted' })).toBe(false);
+        expect(isAdapterConformanceRecordedResponse({ ...canonicalSingleRecordedPayload, checks: canonical15Checks })).toBe(false);
+
+        // Cross-branch rejection
+        expect(isAdapterConformanceRecordedResponse(canonicalSingleNotObservedPayload)).toBe(false);
+        expect(isAdapterConformanceNotObservedResponse(canonicalSingleRecordedPayload)).toBe(false);
+        expect(isAdapterConformanceUnion({ ...canonicalSingleRecordedPayload, status: 'PASS' })).toBe(false);
+      });
+
+      it('fetches single adapter conformance via fetchAdapterConformance and enforces client guards', async () => {
+        const originalFetch = globalThis.fetch;
+        const testProjectId = 'prj_0123456789ABCDEFGHJKMNPQRS';
+        const testAdapter = 'gemini-cli';
+
+        try {
+          // 1. Successful NOT_OBSERVED fetch
+          globalThis.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            status: 200,
+            headers: new Headers({ 'content-type': 'application/json' }),
+            json: async () => canonicalSingleNotObservedPayload,
+          } as any);
+
+          const res1 = await fetchAdapterConformance(testProjectId, testAdapter);
+          expect(res1.status).toBe('NOT_OBSERVED');
+          expect((res1 as AdapterConformanceNotObservedResponse).reason).toBe(ADAPTER_NOT_OBSERVED_REASON);
+
+          // 2. Successful RECORDED fetch
+          globalThis.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            status: 200,
+            headers: new Headers({ 'content-type': 'application/json' }),
+            json: async () => canonicalSingleRecordedPayload,
+          } as any);
+
+          const res2 = await fetchAdapterConformance(testProjectId, 'codex-cli');
+          expect(res2.status).toBe('RECORDED');
+          expect((res2 as AdapterConformanceRecordedResponse).total).toBe(15);
+          expect((res2 as AdapterConformanceRecordedResponse).subject).toBe('fixture-adapter');
+
+          // 3. Rejects on contract mismatch
+          globalThis.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            status: 200,
+            headers: new Headers({ 'content-type': 'application/json' }),
+            json: async () => ({ ...canonicalSingleRecordedPayload, subject: 'fake-adapter' }),
+          } as any);
+
+          await expect(fetchAdapterConformance(testProjectId, 'codex-cli')).rejects.toThrow(
+            'AdapterConformanceResponse 응답 계약 불일치'
+          );
+
+          // 4. Guard against empty inputs
+          await expect(fetchAdapterConformance('', 'codex-cli')).rejects.toThrow('프로젝트 ID를 확인하세요.');
+          await expect(fetchAdapterConformance(testProjectId, '')).rejects.toThrow('어댑터 이름을 확인하세요.');
+        } finally {
+          globalThis.fetch = originalFetch;
+        }
+      });
+
+      it('renders single adapter NOT_OBSERVED response with exact reason and check descriptors in UI', async () => {
+        const originalFetch = globalThis.fetch;
+        const testProjectId = 'prj_0123456789ABCDEFGHJKMNPQRS';
+
+        try {
+          globalThis.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            status: 200,
+            headers: new Headers({ 'content-type': 'application/json' }),
+            json: async () => canonicalSingleNotObservedPayload,
+          } as any);
+
+          await act(async () => {
+            root.render(React.createElement(ModelLineageView, { initialLineages: TEST_FIXTURE_LINEAGES }));
+          });
+
+          const projectInput = container.querySelector<HTMLInputElement>('[data-testid="conformance-project-input"]');
+          const adapterInput = container.querySelector<HTMLInputElement>('[data-testid="single-conformance-adapter-input"]');
+          const singleFetchBtn = container.querySelector<HTMLButtonElement>('[data-testid="single-conformance-fetch-btn"]');
+
+          await act(async () => {
+            setInputValue(projectInput!, testProjectId);
+            setInputValue(adapterInput!, 'gemini-cli');
+          });
+
+          await act(async () => {
+            singleFetchBtn!.click();
+          });
+          await act(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 0));
+          });
+
+          expect(container.querySelector('[data-testid="single-conformance-status-badge"]')?.textContent).toBe('미측정 (NOT_OBSERVED)');
+          expect(container.querySelector('[data-testid="single-conformance-adapter"]')?.textContent).toBe('gemini-cli');
+          expect(container.querySelector('[data-testid="single-conformance-scope"]')?.textContent).toBe('control-plane-host');
+          expect(container.querySelector('[data-testid="single-conformance-contract-version"]')?.textContent).toBe('1.0.0');
+          expect(container.querySelector('[data-testid="single-conformance-recorded-at"]')?.textContent).toBe('null (미측정)');
+          expect(container.querySelector('[data-testid="single-conformance-reason"]')?.textContent).toBe(ADAPTER_NOT_OBSERVED_REASON);
+
+          const checksTable = container.querySelector('[data-testid="single-conformance-checks-table"]');
+          expect(checksTable).not.toBeNull();
+          expect(container.querySelector('[data-testid="single-conformance-check-name-0"]')?.textContent).toBe('declares_contract_version');
+          expect(container.querySelector('[data-testid="single-conformance-live-status"]')?.textContent).toContain('조회 완료: 미측정(NOT_OBSERVED)');
+        } finally {
+          globalThis.fetch = originalFetch;
+        }
+      });
+
+      it('renders single adapter RECORDED response with exact counts, outcomes, and subject note in UI', async () => {
+        const originalFetch = globalThis.fetch;
+        const testProjectId = 'prj_0123456789ABCDEFGHJKMNPQRS';
+
+        try {
+          globalThis.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            status: 200,
+            headers: new Headers({ 'content-type': 'application/json' }),
+            json: async () => canonicalSingleRecordedPayload,
+          } as any);
+
+          await act(async () => {
+            root.render(React.createElement(ModelLineageView, { initialLineages: TEST_FIXTURE_LINEAGES }));
+          });
+
+          const projectInput = container.querySelector<HTMLInputElement>('[data-testid="conformance-project-input"]');
+          const adapterInput = container.querySelector<HTMLInputElement>('[data-testid="single-conformance-adapter-input"]');
+          const singleFetchBtn = container.querySelector<HTMLButtonElement>('[data-testid="single-conformance-fetch-btn"]');
+
+          await act(async () => {
+            setInputValue(projectInput!, testProjectId);
+            setInputValue(adapterInput!, 'codex-cli');
+          });
+
+          await act(async () => {
+            singleFetchBtn!.click();
+          });
+          await act(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 0));
+          });
+
+          expect(container.querySelector('[data-testid="single-conformance-status-badge"]')?.textContent).toBe('기록됨 (RECORDED)');
+          expect(container.querySelector('[data-testid="single-conformance-adapter"]')?.textContent).toBe('codex-cli');
+          expect(container.querySelector('[data-testid="single-conformance-subject"]')?.textContent).toBe('fixture-adapter / in-server');
+          expect(container.querySelector('[data-testid="single-conformance-suite-contract-version"]')?.textContent).toBe('1.0.0');
+          expect(container.querySelector('[data-testid="single-conformance-counts"]')?.textContent).toBe('전체 15 · 통과 14 · 실패 0 · 건너뜀 1');
+          expect(container.querySelector('[data-testid="single-conformance-recorded-at"]')?.textContent).toBe('2026-09-28T06:00:00Z');
+          expect(container.querySelector('[data-testid="single-conformance-subject-note"]')?.textContent).toContain('fixture-adapter');
+
+          // Outcomes table
+          const outcomesTable = container.querySelector('[data-testid="single-conformance-outcomes-table"]');
+          expect(outcomesTable).not.toBeNull();
+          expect(container.querySelector('[data-testid="single-conformance-outcome-name-0"]')?.textContent).toBe('declares_contract_version');
+          expect(container.querySelector('[data-testid="single-conformance-outcome-status-0"]')?.textContent).toBe('통과 (Passed)');
+          expect(container.querySelector('[data-testid="single-conformance-outcome-name-12"]')?.textContent).toBe('declared_server_cancel_actually_stops');
+          expect(container.querySelector('[data-testid="single-conformance-outcome-status-12"]')?.textContent).toBe('건너뜀 (Skipped)');
+
+          // Zero-verdict invariant: no fake 100% or conformant label
+          const singleContainer = container.querySelector('[data-testid="single-conformance-result-container"]');
+          expect(singleContainer?.textContent).not.toContain('100%');
+          expect(singleContainer?.textContent).not.toMatch(/conforming/i);
+          expect(container.querySelector('[data-testid="single-conformance-live-status"]')?.textContent).toContain('조회 완료: 기록됨(RECORDED)');
+        } finally {
+          globalThis.fetch = originalFetch;
+        }
+      });
+
+      it('handles single route ProblemDetails (404 RES-0004 without echo, 500 SYS-0002 without retry, 503 SYS-0001 with retry)', async () => {
+        const originalFetch = globalThis.fetch;
+        const testProjectId = 'prj_0123456789ABCDEFGHJKMNPQRS';
+
+        try {
+          await act(async () => {
+            root.render(React.createElement(ModelLineageView, { initialLineages: TEST_FIXTURE_LINEAGES }));
+          });
+
+          const projectInput = container.querySelector<HTMLInputElement>('[data-testid="conformance-project-input"]');
+          const adapterInput = container.querySelector<HTMLInputElement>('[data-testid="single-conformance-adapter-input"]');
+          const singleFetchBtn = container.querySelector<HTMLButtonElement>('[data-testid="single-conformance-fetch-btn"]');
+
+          await act(async () => {
+            setInputValue(projectInput!, testProjectId);
+            setInputValue(adapterInput!, 'unknown-adapter');
+          });
+
+          // 1. 404 RES-0004 (retryable: false): do not echo input string, no retry button
+          globalThis.fetch = vi.fn().mockResolvedValue({
+            ok: false,
+            status: 404,
+            headers: new Headers({ 'content-type': 'application/problem+json' }),
+            json: async () => ({
+              type: 'about:blank',
+              title: 'RES-0004',
+              status: 404,
+              code: 'RES-0004',
+              category: 'RES',
+              detail: 'No adapter with that name exists.',
+              retryable: false,
+              traceId: '00000000000000000000000000000000',
+              causeRef: null,
+              evidenceId: null,
+            }),
+          } as any);
+
+          await act(async () => {
+            singleFetchBtn!.click();
+          });
+          await act(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 0));
+          });
+
+          let errBanner = container.querySelector('[data-testid="single-conformance-error-banner"]');
+          expect(errBanner).not.toBeNull();
+          expect(errBanner?.textContent).toContain('[RES-0004]');
+          expect(errBanner?.textContent).toContain('(404)');
+          expect(errBanner?.textContent).toContain('어댑터 없음');
+          // Must not echo user's input string "unknown-adapter" in error banner or live status
+          expect(errBanner?.textContent).not.toContain('unknown-adapter');
+          const liveStatus = container.querySelector('[data-testid="single-conformance-live-status"]');
+          expect(liveStatus?.textContent).toBe('❌ 단건 어댑터 Conformance 조회 실패');
+          expect(liveStatus?.textContent).not.toContain('unknown-adapter');
+          const singleSection = container.querySelector('[data-testid="single-conformance-live-status"]')?.parentElement;
+          expect(singleSection?.textContent).not.toContain('unknown-adapter');
+          // Retry button must NOT be present
+          expect(container.querySelector('[data-testid="single-conformance-retry-btn"]')).toBeNull();
+
+          // 2. 500 SYS-0002 (retryable: false): no retry button
+          globalThis.fetch = vi.fn().mockResolvedValue({
+            ok: false,
+            status: 500,
+            headers: new Headers({ 'content-type': 'application/problem+json' }),
+            json: async () => ({
+              type: 'about:blank',
+              title: 'SYS-0002',
+              status: 500,
+              code: 'SYS-0002',
+              category: 'SYS',
+              detail: 'This control plane has no host identity configured, so it cannot report conformance records.',
+              retryable: false,
+              traceId: '00000000000000000000000000000000',
+              causeRef: null,
+              evidenceId: null,
+            }),
+          } as any);
+
+          await act(async () => {
+            singleFetchBtn!.click();
+          });
+          await act(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 0));
+          });
+
+          errBanner = container.querySelector('[data-testid="single-conformance-error-banner"]');
+          expect(errBanner?.textContent).toContain('[SYS-0002]');
+          expect(errBanner?.textContent).toContain('host identity');
+          expect(container.querySelector('[data-testid="single-conformance-retry-btn"]')).toBeNull();
+
+          // 3. 503 SYS-0001 (retryable: true): displays retry button
+          globalThis.fetch = vi.fn().mockResolvedValue({
+            ok: false,
+            status: 503,
+            headers: new Headers({ 'content-type': 'application/problem+json' }),
+            json: async () => ({
+              type: 'about:blank',
+              title: 'SYS-0001',
+              status: 503,
+              code: 'SYS-0001',
+              category: 'SYS',
+              detail: 'The resource is locked by another request; retry.',
+              retryable: true,
+              traceId: '00000000000000000000000000000000',
+              causeRef: null,
+              evidenceId: null,
+            }),
+          } as any);
+
+          await act(async () => {
+            singleFetchBtn!.click();
+          });
+          await act(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 0));
+          });
+
+          errBanner = container.querySelector('[data-testid="single-conformance-error-banner"]');
+          expect(errBanner?.textContent).toContain('[SYS-0001]');
+          expect(errBanner?.textContent).toContain('locked');
+          const retryBtn = container.querySelector<HTMLButtonElement>('[data-testid="single-conformance-retry-btn"]');
+          expect(retryBtn).not.toBeNull();
+          expect(retryBtn?.textContent).toBe('다시 시도');
+        } finally {
+          globalThis.fetch = originalFetch;
+        }
+      });
+
+      it('supports single adapter drilldown from list records table and clears state on input change', async () => {
+        const originalFetch = globalThis.fetch;
+        const testProjectId = 'prj_0123456789ABCDEFGHJKMNPQRS';
+
+        try {
+          // List route fetch mock
+          globalThis.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            status: 200,
+            headers: new Headers({ 'content-type': 'application/json' }),
+            json: async () => canonicalRecordedPayload,
+          } as any);
+
+          await act(async () => {
+            root.render(React.createElement(ModelLineageView, { initialLineages: TEST_FIXTURE_LINEAGES }));
+          });
+
+          const projectInput = container.querySelector<HTMLInputElement>('[data-testid="conformance-project-input"]');
+          const fetchBtn = container.querySelector<HTMLButtonElement>('[data-testid="conformance-fetch-btn"]');
+
+          await act(async () => {
+            setInputValue(projectInput!, testProjectId);
+          });
+          await act(async () => {
+            fetchBtn!.click();
+          });
+          await act(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 0));
+          });
+
+          // Records table contains inspect button
+          const inspectBtn = container.querySelector<HTMLButtonElement>('[data-testid="conformance-inspect-btn-0"]');
+          expect(inspectBtn).not.toBeNull();
+
+          // Single route fetch mock
+          globalThis.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            status: 200,
+            headers: new Headers({ 'content-type': 'application/json' }),
+            json: async () => canonicalSingleRecordedPayload,
+          } as any);
+
+          await act(async () => {
+            inspectBtn!.click();
+          });
+          await act(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 0));
+          });
+
+          expect(container.querySelector('[data-testid="single-conformance-result-container"]')).not.toBeNull();
+          expect(container.querySelector('[data-testid="single-conformance-adapter"]')?.textContent).toBe('codex-cli');
+
+          // State isolation on input change: changing single adapter input clears single result container
+          const adapterInput = container.querySelector<HTMLInputElement>('[data-testid="single-conformance-adapter-input"]');
+          await act(async () => {
+            setInputValue(adapterInput!, 'claude-code');
+          });
+          expect(container.querySelector('[data-testid="single-conformance-result-container"]')).toBeNull();
+
+          // Changing project input clears both list and single results
+          await act(async () => {
+            setInputValue(projectInput!, 'prj_DIFFERENT');
+          });
+          expect(container.querySelector('[data-testid="conformance-result-container"]')).toBeNull();
+          expect(container.querySelector('[data-testid="single-conformance-result-container"]')).toBeNull();
+        } finally {
+          globalThis.fetch = originalFetch;
+        }
+      });
+
+      it('M2: ignores late in-flight response when adapter input changes and guards against concurrent requests', async () => {
+        const originalFetch = globalThis.fetch;
+        const testProjectId = 'prj_0123456789ABCDEFGHJKMNPQRS';
+        let resolveFirstFetch: ((res: any) => void) | null = null;
+        let firstFetchSignal: AbortSignal | null = null;
+
+        try {
+          globalThis.fetch = vi.fn().mockImplementation((url: string, init?: RequestInit) => {
+            if (url.includes('/adapters/codex-cli/conformance')) {
+              firstFetchSignal = init?.signal || null;
+              return new Promise((resolve) => {
+                resolveFirstFetch = resolve;
+              });
+            }
+            if (url.includes('/adapters/gemini-cli/conformance')) {
+              return Promise.resolve({
+                ok: true,
+                status: 200,
+                headers: new Headers({ 'content-type': 'application/json' }),
+                json: async () => canonicalSingleNotObservedPayload,
+              } as any);
+            }
+            return Promise.reject(new Error(`Unhandled URL: ${url}`));
+          });
+
+          await act(async () => {
+            root.render(React.createElement(ModelLineageView, { initialLineages: TEST_FIXTURE_LINEAGES }));
+          });
+
+          const projectInput = container.querySelector<HTMLInputElement>('[data-testid="conformance-project-input"]');
+          const setInputValue = (el: HTMLInputElement, val: string) => {
+            const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+            setter?.call(el, val);
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+          };
+
+          await act(async () => {
+            setInputValue(projectInput!, testProjectId);
+          });
+
+          const adapterInput = container.querySelector<HTMLInputElement>('[data-testid="single-conformance-adapter-input"]');
+          const singleFetchBtn = container.querySelector<HTMLButtonElement>('[data-testid="single-conformance-fetch-btn"]');
+
+          await act(async () => {
+            setInputValue(adapterInput!, 'codex-cli');
+          });
+
+          // 1. Submit first request -> in-flight
+          await act(async () => {
+            singleFetchBtn!.click();
+          });
+
+          // Loading is true: button is disabled
+          expect(singleFetchBtn?.disabled).toBe(true);
+          expect(singleFetchBtn?.textContent).toBe('조회 중...');
+          const inspectBtn0 = container.querySelector<HTMLButtonElement>('[data-testid="conformance-inspect-btn-0"]');
+          if (inspectBtn0) {
+            expect(inspectBtn0.disabled).toBe(true);
+          }
+
+          // Submitting again while loading must be ignored (early return guard)
+          await act(async () => {
+            singleFetchBtn!.closest('form')?.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+          });
+          expect((globalThis.fetch as any).mock.calls.length).toBe(1);
+
+          // 2. While first request is in-flight, change adapter input to 'gemini-cli'
+          await act(async () => {
+            setInputValue(adapterInput!, 'gemini-cli');
+          });
+
+          // Signal should be aborted and loading cleared
+          expect(firstFetchSignal?.aborted).toBe(true);
+          expect(singleFetchBtn?.disabled).toBe(false);
+          expect(singleFetchBtn?.textContent).toBe('어댑터 Conformance 조회');
+
+          // 3. Resolve delayed first request (which carries codex-cli recorded response)
+          await act(async () => {
+            resolveFirstFetch!({
+              ok: true,
+              status: 200,
+              headers: new Headers({ 'content-type': 'application/json' }),
+              json: async () => canonicalSingleRecordedPayload,
+            });
+            await new Promise((resolve) => setTimeout(resolve, 0));
+          });
+
+          // Late response must be discarded! No result container, no codex-cli rendered
+          expect(container.querySelector('[data-testid="single-conformance-result-container"]')).toBeNull();
+          expect(container.querySelector('[data-testid="single-conformance-live-status"]')?.textContent).not.toContain('codex-cli');
         } finally {
           globalThis.fetch = originalFetch;
         }

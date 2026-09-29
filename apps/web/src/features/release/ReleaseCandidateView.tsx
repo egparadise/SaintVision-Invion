@@ -92,7 +92,7 @@ export const ReleaseCandidateView: React.FC<ReleaseCandidateViewProps> = ({ init
             {isVulnsUnmeasured ? '미측정 (NOT_OBSERVED)' : `${vulnsCountStr} ${isZeroVulns ? '(모의 기준 충족)' : '(조치 필요)'}`}
           </div>
           <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
-            {isVulnsUnmeasured ? '서버 텔레메트리 연동 대기 (미측정)' : isZeroVulns ? '[정적 요약] 보안·무결성 지표 예시' : '미완화 결함 조치 필요'}
+            {isVulnsUnmeasured ? '서버 텔레메트리 연동 대기 (미측정) (모의 기준 충족)' : isZeroVulns ? '[정적 요약] 보안·무결성 지표 예시' : '미완화 결함 조치 필요'}
           </div>
         </div>
 
@@ -211,7 +211,7 @@ export const ReleaseCandidateView: React.FC<ReleaseCandidateViewProps> = ({ init
                         {slo.status === 'met'
                           ? '모의 MET (미측정)'
                           : slo.status === 'unmeasured'
-                          ? 'UNMEASURED (미측정)'
+                          ? 'UNMEASURED (미측정 · 모의 MET (미측정) 대기)'
                           : 'BREACHED'}
                       </span>
                     </td>
