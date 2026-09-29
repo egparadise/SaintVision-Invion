@@ -66,6 +66,9 @@ PREFIXES: Final[dict[str, str]] = {
     "image": "img",
     "model": "mdl",
     "model_version": "mdv",
+    #: A trusted worker's measurement of a model version's bytes (0054); minted
+    #: by the kernel's accept path with the same three letters.
+    "model_measurement": "mvm",
     "deployment": "dpl",
     # S12
     "backup": "bkp",
@@ -80,6 +83,11 @@ PREFIXES: Final[dict[str, str]] = {
     "pool": "pol",
     "plan": "pln",
     "replica": "rep",
+    # S10-BE MLflow mirror (design #168)
+    "mirror_intent": "mmi",
+    "mirror_attempt": "mma",
+    "mirror_defect": "mmd",
+    "service_credential_grant": "scg",
 }
 
 _PREFIX_RE: Final[re.Pattern[str]] = re.compile(r"^[a-z]{3}$")

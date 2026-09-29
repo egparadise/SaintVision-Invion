@@ -467,27 +467,127 @@ def rpo_bound_from(settings: dict[str, Any]) -> tuple[bool, None, str]:
     )
 
 
-def _recovery_capability(dsn: str) -> dict[str, Any]:
-    # Never retrieve archive shell/library text: it may embed credentials.
-    names = [
-        "wal_level",
-        "archive_mode",
-        "archive_command",
-        "archive_library",
-        "archive_timeout",
-        "data_checksums",
-        "full_page_writes",
+#: The archiving settings the capability report reads. Fixed here, never from
+#: input, so the SQL below can carry them as literals for an executor that has
+#: no bind parameters (``psql -c``).
+_CAPABILITY_SETTING_NAMES: tuple[str, ...] = (
+    "wal_level",
+    "archive_mode",
+    "archive_command",
+    "archive_library",
+    "archive_timeout",
+    "data_checksums",
+    "full_page_writes",
+)
+
+#: One SQL text for every executor. The folding of ``archive_command`` /
+#: ``archive_library`` to ``configured`` / ``not configured`` lives *here*:
+#: neither executor -- and no test -- ever sees the command text, which may
+#: embed credentials, and no caller re-implements the fold.
+_CAPABILITY_SETTINGS_SQL = (
+    "SELECT name, CASE WHEN name IN ('archive_command','archive_library') "
+    "THEN CASE WHEN btrim(setting) IN ('','(disabled)') "
+    "THEN 'not configured' ELSE 'configured' END "
+    "ELSE setting END "
+    "FROM pg_settings WHERE name IN ("
+    + ",".join("'" + name + "'" for name in _CAPABILITY_SETTING_NAMES)
+    + ") ORDER BY name"
+)
+
+#: ``execute() -> {setting name: setting}`` for exactly the names above.
+SettingsExecutor = Any
+
+
+def _settings_from_rows(rows: list[tuple[str, str]], *, source: str) -> dict[str, str]:
+    """Validate an executor's rows: every expected name once, nothing else.
+
+    A missing name is not "unset": it means the probe did not observe the
+    server, and a report built on it would state archiving facts that were not
+    read. Fail closed instead (NOT_OBSERVED, never a default).
+    """
+    settings: dict[str, str] = {}
+    for row in rows:
+        if len(row) != 2 or row[0] not in _CAPABILITY_SETTING_NAMES:
+            raise RuntimeError(f"{source}: unexpected settings row")
+        if row[0] in settings:
+            # Two rows for one setting is not an observation of that setting:
+            # neither value can be trusted over the other, so neither is used.
+            raise RuntimeError(f"{source}: duplicate settings row: {row[0]}")
+        settings[row[0]] = row[1]
+    missing = [name for name in _CAPABILITY_SETTING_NAMES if name not in settings]
+    if missing:
+        raise RuntimeError(f"{source}: settings not observed: " + ", ".join(missing))
+    return settings
+
+
+def psycopg_settings_executor(dsn: str) -> SettingsExecutor:
+    """The default executor: the drill's own host connection (unchanged path)."""
+
+    def execute() -> dict[str, str]:
+        with _conn(dsn) as conn:
+            rows = conn.execute(_CAPABILITY_SETTINGS_SQL).fetchall()
+        return _settings_from_rows([tuple(row) for row in rows], source="psycopg")
+
+    return execute
+
+
+def docker_exec_settings_executor(
+    container: str, *, user: str = "postgres", run=subprocess.run, timeout: float = 20
+) -> SettingsExecutor:
+    """Read the same settings from inside a container, over ``docker exec psql``.
+
+    For an archiver that lives on an internal Docker network with no published
+    port (the recovery tests' isolation), the host cannot connect; ``psql``
+    inside the container can, over its local socket. Nothing about the report
+    changes -- the SQL is the shared constant -- only the transport.
+
+    Failures are closed: a non-zero exit, a timeout, a malformed line or a
+    missing setting raises ``RuntimeError`` carrying the exit code and the
+    missing names, never the command's stdout/stderr (which could echo server
+    configuration).
+    """
+    argv = [
+        "docker", "exec", container,
+        "psql", "-X", "-At", "-F", "	", "-v", "ON_ERROR_STOP=1",
+        "-U", user, "-d", "postgres", "-c", _CAPABILITY_SETTINGS_SQL,
     ]
-    with _conn(dsn) as conn:
-        rows = conn.execute(
-            """SELECT name, CASE WHEN name IN ('archive_command','archive_library')
-                THEN CASE WHEN btrim(setting) IN ('','(disabled)')
-                     THEN 'not configured' ELSE 'configured' END
-                ELSE setting END
-                FROM pg_settings WHERE name=ANY(%s)""",
-            (names,),
-        ).fetchall()
-    settings = dict(rows)
+
+    def execute() -> dict[str, str]:
+        try:
+            completed = run(argv, capture_output=True, timeout=timeout)
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            raise RuntimeError(f"docker exec: {type(exc).__name__}") from None
+        if completed.returncode != 0:
+            raise RuntimeError(f"docker exec: psql exited {completed.returncode}")
+        text = (completed.stdout or b"").decode("utf-8", errors="replace")
+        rows: list[tuple[str, str]] = []
+        for line in text.splitlines():
+            if not line.strip():
+                continue
+            parts = line.split("	")
+            if len(parts) != 2:
+                raise RuntimeError("docker exec: malformed settings line")
+            rows.append((parts[0], parts[1]))
+        return _settings_from_rows(rows, source="docker exec")
+
+    return execute
+
+
+def _recovery_capability(
+    dsn: str | None = None, *, execute: SettingsExecutor | None = None
+) -> dict[str, Any]:
+    """The archiving capability report.
+
+    ``execute`` is the settings executor; when it is None the drill's own
+    host connection to ``dsn`` is used (the CLI path, unchanged). Given an
+    executor, ``dsn`` is ignored. The judgement below is the same for both.
+    """
+    if execute is None:
+        if not dsn:
+            raise ValueError("_recovery_capability needs a dsn or an executor")
+        execute = psycopg_settings_executor(dsn)
+    # Never retrieve archive shell/library text: it may embed credentials.
+    settings = execute()
     configured, bound, basis = rpo_bound_from(settings)
     timeout = settings.get("archive_timeout", "")
     return {

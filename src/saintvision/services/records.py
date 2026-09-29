@@ -28,6 +28,7 @@ from ..errors import (
 )
 from ..ids import new_id
 from ..runs.state import is_terminal
+from .pagination import Page, build_page
 
 ARTIFACT_ROLES = ("diff", "test_report", "trace", "log", "model", "dataset", "other")
 
@@ -162,6 +163,37 @@ def list_pinned_artifacts(
             raise InvError(VAL_SCHEMA, f"unknown artifact role: {role!r}")
         query = query.where(RunRecordArtifact.role == role)
     return list(session.scalars(query.order_by(RunRecordArtifact.artifact_id)).all())
+
+
+def page_pinned_artifacts(
+    session: Session,
+    *,
+    tenant_id: uuid.UUID,
+    record_id: str,
+    role: str | None = None,
+    limit: int,
+    cursor: str | None = None,
+) -> Page:
+    """A bounded page of the pins, in stable ``artifact_id`` order.
+
+    The record's artifact set is the run's whole active+checksum set (W1), so
+    it has no bound of its own; the page is where the bound lives. ``cursor``
+    is the last ``artifact_id`` of the previous page, so a pin is neither
+    skipped nor repeated across pages, and the role filter is applied before
+    the cursor and the limit so it holds across page boundaries.
+    """
+    if role is not None and role not in ARTIFACT_ROLES:
+        raise InvError(VAL_SCHEMA, f"unknown artifact role: {role!r}")
+    query = select(RunRecordArtifact).where(
+        RunRecordArtifact.tenant_id == tenant_id,
+        RunRecordArtifact.record_id == record_id,
+    )
+    if role is not None:
+        query = query.where(RunRecordArtifact.role == role)
+    if cursor is not None:
+        query = query.where(RunRecordArtifact.artifact_id > cursor)
+    rows = list(session.scalars(query.order_by(RunRecordArtifact.artifact_id).limit(limit + 1)).all())
+    return build_page(rows, limit=limit, id_attr="artifact_id")
 
 
 def verify_pin(
