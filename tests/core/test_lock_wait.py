@@ -6,12 +6,16 @@ is ``tests/integration/test_lock_wait_real_pg.py``.
 
 from __future__ import annotations
 
+import contextlib
 import inspect
+from types import SimpleNamespace
+import uuid
 
 import pytest
 from sqlalchemy.exc import OperationalError
 
 from saintvision.api import lock_wait
+from saintvision.api import deps
 from saintvision.api.lock_wait import (
     LOCK_WAIT_DETAIL,
     MAX_LOCK_TIMEOUT_MS,
@@ -22,8 +26,18 @@ from saintvision.api.lock_wait import (
     validate_lock_timeout,
 )
 from saintvision.api.problem import CanonicalProblem
-from saintvision.api.v1 import conformance_status, model_release, model_retention, model_verify, model_versions, run_seal
+from saintvision.api.v1 import (
+    conformance_status,
+    eval_runs,
+    model_release,
+    model_retention,
+    model_verify,
+    model_versions,
+    run_seal,
+)
+from saintvision.api.v1 import nodes, pools, projects, storage
 from saintvision.config import Settings
+from saintvision.identity.principal import Principal
 
 
 class _Session:
@@ -51,7 +65,10 @@ def test_a_budget_within_bounds_is_accepted(value):
     assert validate_lock_timeout(value) == value
 
 
-@pytest.mark.parametrize("value", [0, -1, MIN_LOCK_TIMEOUT_MS - 1, MAX_LOCK_TIMEOUT_MS + 1, True, False, "5000", 5.0, None])
+@pytest.mark.parametrize(
+    "value",
+    [0, -1, MIN_LOCK_TIMEOUT_MS - 1, MAX_LOCK_TIMEOUT_MS + 1, True, False, "5000", 5.0, None],
+)
 def test_a_budget_that_is_not_a_positive_integer_within_bounds_is_refused(value):
     with pytest.raises(ValueError):
         validate_lock_timeout(value)
@@ -127,7 +144,16 @@ def test_the_context_manager_sets_the_bound_then_maps_a_wait_and_reraises_anythi
 
 
 @pytest.mark.parametrize(
-    "module", [run_seal, model_retention, model_versions, model_release, model_verify, conformance_status]
+    "module",
+    [
+        run_seal,
+        model_retention,
+        model_versions,
+        model_release,
+        model_verify,
+        conformance_status,
+        eval_runs,
+    ],
 )
 def test_every_transaction_span_of_every_write_route_is_bounded_and_no_copy_exists(module):
     """Structure, not a substring (Codex #211 F1): each route opens N sessions
@@ -140,8 +166,12 @@ def test_every_transaction_span_of_every_write_route_is_bounded_and_no_copy_exis
     spans = source.count("with factory() as session:")
     assert spans >= 2, module.__name__
     assert source.count("bounded_lock_wait(") == spans, module.__name__
-    assert not re.search(r"with tenant_scope\(session, principal\.tenant_id\):\n", source), module.__name__
-    assert "SET LOCAL lock_timeout = '" not in source, module.__name__  # no private copy of the bound
+    assert not re.search(
+        r"with tenant_scope\(session, principal\.tenant_id\):\n", source
+    ), module.__name__
+    assert (
+        "SET LOCAL lock_timeout = '" not in source
+    ), module.__name__  # no private copy of the bound
     assert "55P03" not in source and "40P01" not in source, module.__name__
 
 
@@ -157,8 +187,8 @@ def test_the_deadline_harness_returns_on_timeout_instead_of_waiting_for_the_bloc
     started = time.monotonic()
     with pytest.raises(DeadlineExceeded):
         within_deadline(release.wait, seconds=0.5)
-    assert time.monotonic() - started < 3.0                         # returned promptly, did not join the worker
-    release.set()                                                    # let the worker finish
+    assert time.monotonic() - started < 3.0  # returned promptly, did not join the worker
+    release.set()  # let the worker finish
     result, elapsed = within_deadline(lambda: "ok", seconds=5)
     assert result == "ok" and elapsed < 5
 
@@ -166,3 +196,74 @@ def test_the_deadline_harness_returns_on_timeout_instead_of_waiting_for_the_bloc
 def test_statement_timeout_is_a_stated_decision_not_an_omission():
     assert "statement_timeout" in (lock_wait.__doc__ or "")
     assert "SET LOCAL statement_timeout" not in inspect.getsource(lock_wait)
+
+
+# ------------------------------------------------------- legacy write lane
+
+
+def test_the_shared_legacy_write_dependency_bounds_the_whole_transaction(monkeypatch):
+    dependency = getattr(deps, "get_write_session", None)
+    assert callable(dependency), "legacy write transactions need a bounded dependency"
+
+    session = _Session()
+
+    class _Factory:
+        def __call__(self):
+            return contextlib.nullcontext(session)
+
+    session.begin = contextlib.nullcontext
+    monkeypatch.setattr(deps, "make_session_factory", lambda _engine: _Factory())
+    monkeypatch.setattr(deps, "tenant_scope", lambda _session, _tenant: contextlib.nullcontext())
+    principal = Principal(
+        user_id="usr_01J8Z3XQ2K9WMV5T7N4B6C8D0E",
+        tenant_id=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+        external_subject="oidc:card-135",
+    )
+    request = SimpleNamespace(
+        app=SimpleNamespace(
+            state=SimpleNamespace(
+                engine=object(),
+                settings=Settings(database_url="postgresql://unused", business_lock_timeout_ms=321),
+            )
+        )
+    )
+
+    generator = dependency(request, principal)
+    assert next(generator) is session
+    with pytest.raises(CanonicalProblem) as raised:
+        generator.throw(_operational("55P03"))
+    assert (raised.value.code, raised.value.status, raised.value.retryable) == (
+        "SYS-0001",
+        503,
+        True,
+    )
+    assert session.statements == ["SET LOCAL lock_timeout = '321ms'"]
+
+
+def test_every_remaining_dependency_injected_legacy_write_uses_the_bounded_dependency():
+    dependency = getattr(deps, "get_write_session", None)
+    assert callable(dependency)
+    routes = (
+        nodes.sweep_liveness,
+        pools.admit,
+        pools.decline,
+        pools.create_pool,
+        pools.add_member,
+        pools.remove_member,
+        pools.create_plan,
+        projects.create_project,
+        projects.create_workspace,
+        storage.activate_contribution,
+        storage.revoke_contribution,
+    )
+    for route in routes:
+        session = inspect.signature(route).parameters["session"].default
+        assert session.dependency is dependency, route.__name__
+
+
+@pytest.mark.parametrize(
+    ("route", "spans"),
+    ((nodes.enroll_node, 1), (nodes.post_heartbeat, 1), (pools.announce, 2)),
+)
+def test_every_manual_legacy_write_span_is_bounded(route, spans):
+    assert inspect.getsource(route).count("bounded_lock_wait(") == spans

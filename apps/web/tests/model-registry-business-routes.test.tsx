@@ -147,7 +147,7 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     // Verify W3 seam badge is always present
     const w3Badge = container.querySelector('[data-testid="badge-w3-verify-seam"]');
     expect(w3Badge).not.toBeNull();
-    expect(w3Badge?.textContent).toContain('W3 검증: 미연결 (검증 앵커 #215 대기)');
+    expect(w3Badge?.textContent).toContain('W3 검증: 미검증 (커널 계측 검증 대기)');
 
     const queryBtn = container.querySelector('[data-testid="btn-query-lineage"]') as HTMLButtonElement;
     expect(queryBtn).not.toBeNull();

@@ -140,3 +140,26 @@ def test_cli_require_possible_fails_for_deferred_absent_state(tmp_path: Path, mo
 
     assert rc == 3
     assert json.loads(capsys.readouterr().out)["readiness"]["verdict"] == "absent"
+
+
+def test_cli_refuses_an_unreadable_backup_label_time_instead_of_guessing(tmp_path: Path, monkeypatch, capsys):
+    """The retention planner is fail-closed on label times (PR #150): a server-zone abbreviation the
+    planner cannot resolve makes the rehearsal an explicit argparse error (exit 2) with no report."""
+    import pytest
+
+    archive, backups = _fixture_tree(tmp_path)
+    (backups / "base-001" / "backup_label").write_text(
+        "START WAL LOCATION: 0/2000028 (file 000000010000000000000002)\n"
+        "START TIME: 2026-09-22 10:30:00 KST\n",
+        encoding="utf-8",
+    )
+    output = tmp_path / "report.json"
+    monkeypatch.setenv("TEST_PITR_DSN", "private")
+    monkeypatch.setattr(harness, "read_settings", lambda _dsn: POSSIBLE)
+    with pytest.raises(SystemExit) as exit_info:
+        harness.main(["--dsn-env", "TEST_PITR_DSN", "--archive", str(archive), "--backups", str(backups),
+                      "--now", NOW.isoformat(), "--output", str(output)])
+    assert exit_info.value.code == 2
+    captured = capsys.readouterr()
+    assert "base-001/backup_label" in captured.err and "KST" in captured.err
+    assert captured.out == "" and not output.exists()

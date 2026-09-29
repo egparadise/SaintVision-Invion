@@ -20,14 +20,24 @@ from __future__ import annotations
 
 import datetime as dt
 
-from fastapi import APIRouter, Depends, Request, Response
+from fastapi import APIRouter, Depends, Header, Request, Response
 from sqlalchemy.orm import Session
 
+from ...config import Settings
+from ...db.models import Workspace
+from ...errors import AUTH_PROJECT_SCOPE, RES_NODE_NOT_FOUND, InvError
 from ...identity.principal import Principal
 from ...services import projects as project_service
 from ...services.audit import record_event
 from .. import schemas
-from ..deps import get_now, get_principal, get_session
+from ..deps import (
+    get_now,
+    get_principal,
+    get_session,
+    get_settings,
+    get_write_session,
+    optional_idempotent_write,
+)
 
 router = APIRouter(prefix="/v1", tags=["projects"])
 
@@ -88,7 +98,7 @@ def create_project(
     request: Request,
     response: Response,
     principal: Principal = Depends(get_principal),
-    session: Session = Depends(get_session),
+    session: Session = Depends(get_write_session),
     now: dt.datetime = Depends(get_now),
 ) -> dict:
     """Create a project. The creator becomes its owner in the same transaction.
@@ -135,16 +145,12 @@ def read_project(
     from ...db.models import Project
 
     project = session.get(Project, project_id)
-    body = project_service.project_body(
-        session, project, tenant_id=principal.tenant_id
-    )
+    body = project_service.project_body(session, project, tenant_id=principal.tenant_id)
     body["permission"] = permission
     return body
 
 
-@router.get(
-    "/projects/{project_id}/workspaces", response_model=schemas.ProjectWorkspacesResponse
-)
+@router.get("/projects/{project_id}/workspaces", response_model=schemas.ProjectWorkspacesResponse)
 def list_workspaces(
     project_id: str,
     principal: Principal = Depends(get_principal),
@@ -170,7 +176,7 @@ def create_workspace(
     request: Request,
     response: Response,
     principal: Principal = Depends(get_principal),
-    session: Session = Depends(get_session),
+    session: Session = Depends(get_write_session),
     now: dt.datetime = Depends(get_now),
 ) -> dict:
     """Create a workspace. It starts ``provisioning``, never ``ready``.
@@ -212,7 +218,9 @@ def set_workspace_tool(
     request: Request,
     principal: Principal = Depends(get_principal),
     session: Session = Depends(get_session),
+    settings: Settings = Depends(get_settings),
     now: dt.datetime = Depends(get_now),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> dict:
     """Choose which development tool this workspace uses.
 
@@ -223,22 +231,51 @@ def set_workspace_tool(
     requests. A screen that shows only the choice will eventually offer to run
     something that cannot run.
     """
-    body = project_service.set_workspace_tool(
+    request_body = {"workspaceId": workspace_id, "toolName": payload.tool_name}
+    workspace = session.get(Workspace, workspace_id)
+    if workspace is None or workspace.tenant_id != principal.tenant_id:
+        raise InvError(RES_NODE_NOT_FOUND, "workspace not found")
+    permission = project_service.require_project_access(
         session,
         tenant_id=principal.tenant_id,
-        workspace_id=workspace_id,
-        tool_name=payload.tool_name,
-        acting_user_id=principal.user_id,
+        project_id=workspace.project_id,
+        user_id=principal.user_id,
     )
-    record_event(
+    if not permission["canRequest"]:
+        raise InvError(
+            AUTH_PROJECT_SCOPE,
+            "this project role may not configure a workspace tool",
+            extra={"roleCode": permission["roleCode"]},
+        )
+    with optional_idempotent_write(
         session,
+        principal=principal,
+        endpoint="PUT /v1/workspaces/{workspace_id}/tool",
+        idempotency_key=idempotency_key,
+        payload=request_body,
         now=now,
-        actor_type="user",
-        actor_id=principal.user_id,
-        action="workspace.tool_set",
-        outcome="allow",
-        tenant_id=principal.tenant_id,
-        trace_id=getattr(request.state, "trace_id", None),
-        detail={"workspaceId": workspace_id, "toolName": payload.tool_name},
-    )
-    return body
+        ttl_seconds=settings.idempotency_ttl_seconds,
+        lock_timeout_ms=settings.business_lock_timeout_ms,
+    ) as (replay, finish):
+        if replay is not None:
+            return replay
+        body = project_service.set_workspace_tool(
+            session,
+            tenant_id=principal.tenant_id,
+            workspace_id=workspace_id,
+            tool_name=payload.tool_name,
+            acting_user_id=principal.user_id,
+        )
+        record_event(
+            session,
+            now=now,
+            actor_type="user",
+            actor_id=principal.user_id,
+            action="workspace.tool_set",
+            outcome="allow",
+            tenant_id=principal.tenant_id,
+            trace_id=getattr(request.state, "trace_id", None),
+            detail=request_body,
+        )
+        finish(body)
+        return body

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NodeItem, SyntheticGpuResult, ContainmentInput, ContainmentView, ContainmentResult } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
+import { useModalA11y } from '@/shared/ui/useModalA11y';
 import { apiClient } from '@/shared/api/client';
 import { SecurityControlManager } from './securityEngine';
 
@@ -320,6 +321,11 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [showKillSwitchModal]);
+
+  const { containerRef: killSwitchModalRef, handleKeyDown: handleKillSwitchKeyDown } = useModalA11y({
+    isOpen: showKillSwitchModal,
+    onClose: () => setShowKillSwitchModal(false),
+  });
 
   const refreshState = () => {
     setStatus(secManager.getStatus());
@@ -1145,9 +1151,12 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       {/* Emergency Kill Switch Confirmation Modal */}
       {showKillSwitchModal && (
         <div
+          ref={killSwitchModalRef}
           role="dialog"
           aria-modal="true"
           aria-labelledby="kill-switch-modal-title"
+          onKeyDown={handleKillSwitchKeyDown}
+          tabIndex={-1}
           data-testid="kill-switch-modal"
           style={{
             position: 'fixed',

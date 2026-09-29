@@ -364,9 +364,14 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
             </strong>
           </span>
           <span>
-            인증:{' '}
-            <strong data-testid="pty-ticket-badge" style={{ color: '#fbbf24' }}>
-              30초 암호학적 1회용 PTY 티켓 (mTLS 격리)
+            인증 방식:{' '}
+            <strong
+              data-testid="pty-ticket-badge"
+              style={{ color: activeCommandId.trim() ? '#fbbf24' : '#94a3b8' }}
+            >
+              {activeCommandId.trim()
+                ? '30초 암호학적 1회용 PTY 티켓 인증 연동 (mTLS 격리)'
+                : '승인 명령 ID 대기 중 (인증 대기 · mTLS)'}
             </strong>
           </span>
         </div>

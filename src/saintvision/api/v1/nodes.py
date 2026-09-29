@@ -25,7 +25,8 @@ from ...identity.principal import Principal
 from ...services import nodes as node_service
 from ...services.audit import record_event
 from .. import schemas
-from ..deps import get_now, get_principal, get_session, get_settings
+from ..deps import get_now, get_principal, get_session, get_settings, get_write_session
+from ..lock_wait import bounded_lock_wait
 
 router = APIRouter(prefix="/v1", tags=["nodes"])
 
@@ -45,9 +46,7 @@ def _node_body(node) -> dict:
     ).model_dump(by_alias=True, mode="json")
 
 
-@router.post(
-    "/nodes", status_code=201, response_model=schemas.NodeEnrollResponse
-)
+@router.post("/nodes", status_code=201, response_model=schemas.NodeEnrollResponse)
 def enroll_node(
     request: Request,
     payload: schemas.NodeEnrollRequest,
@@ -75,7 +74,10 @@ def enroll_node(
     factory = make_session_factory(request.app.state.engine)
     with factory() as session:
         with session.begin():
-            with tenant_scope(session, tenant_id):
+            with (
+                tenant_scope(session, tenant_id),
+                bounded_lock_wait(session, timeout_ms=settings.business_lock_timeout_ms),
+            ):
                 capabilities = [
                     node_service.CapabilityInput(
                         kind=c.kind,
@@ -132,6 +134,7 @@ def post_heartbeat(
     node_id: str,
     payload: schemas.HeartbeatRequest,
     now: dt.datetime = Depends(get_now),
+    settings: Settings = Depends(get_settings),
 ) -> dict:
     """Record a heartbeat and any observations that came with it.
 
@@ -167,7 +170,10 @@ def post_heartbeat(
 
     with factory() as session:
         with session.begin():
-            with tenant_scope(session, tenant_id):
+            with (
+                tenant_scope(session, tenant_id),
+                bounded_lock_wait(session, timeout_ms=settings.business_lock_timeout_ms),
+            ):
                 principal.lock_current(session)
                 # The read-then-compare that used to decide `applied` is gone.
                 # Two heartbeats arriving together both read the old sequence
@@ -214,7 +220,7 @@ def post_heartbeat(
 def sweep_liveness(
     request: Request,
     principal: Principal = Depends(get_principal),
-    session: Session = Depends(get_session),
+    session: Session = Depends(get_write_session),
     settings: Settings = Depends(get_settings),
     now: dt.datetime = Depends(get_now),
 ) -> dict:

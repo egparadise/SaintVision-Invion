@@ -30,7 +30,7 @@ from ..db.models import (
     MAX_CANDIDATES_PER_TENANT,
     NodeAnnouncement,
 )
-from ..errors import RES_NODE_NOT_FOUND, VAL_SCHEMA, InvError
+from ..errors import GRAPH_INVALID_TRANSITION, RES_NODE_NOT_FOUND, VAL_SCHEMA, InvError
 from ..identity.tokens import IssuedToken, issue_bootstrap_token
 from ..ids import new_id
 
@@ -277,13 +277,34 @@ def admit_candidate(
     Keeping admission and enrollment apart is the point: the person authorises
     a machine to join, and the machine still has to prove what it is.
     """
-    row = session.get(NodeAnnouncement, announcement_id)
+    # Admission returns a plaintext bootstrap token exactly once.  Lock the
+    # announcement before inspecting its issuance marker so two concurrent
+    # operators cannot both mint a valid credential for the same candidate.
+    row = session.scalar(
+        select(NodeAnnouncement)
+        .where(
+            NodeAnnouncement.announcement_id == announcement_id,
+            NodeAnnouncement.tenant_id == tenant_id,
+        )
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    )
     if row is None or row.tenant_id != tenant_id:
         raise InvError(RES_NODE_NOT_FOUND, "announcement not found")
     if row.state != "candidate":
         raise InvError(
             VAL_SCHEMA,
             f"only a candidate can be admitted, not one that is {row.state}",
+            cause_ref=announcement_id,
+        )
+    if row.admitted_by_user_id is not None:
+        # Only the digest is persisted, so replaying the original plaintext is
+        # intentionally impossible.  Refuse instead of minting a second live
+        # credential after a lost response or concurrent retry.
+        raise InvError(
+            GRAPH_INVALID_TRANSITION,
+            "this candidate already has an issued admission token",
+            status=409,
             cause_ref=announcement_id,
         )
 

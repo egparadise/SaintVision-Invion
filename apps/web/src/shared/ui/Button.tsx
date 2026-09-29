@@ -24,7 +24,6 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
     transition: 'background-color 0.2s, border-color 0.2s, opacity 0.2s',
     cursor: disabled || isLoading ? 'not-allowed' : 'pointer',
     opacity: disabled || isLoading ? 0.6 : 1,
-    outline: 'none',
     userSelect: 'none',
   };
 
@@ -36,7 +35,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
 
   const variantStyles: Record<string, React.CSSProperties> = {
     primary: {
-      backgroundColor: 'var(--color-brand-primary)',
+      backgroundColor: 'var(--color-brand-primary-bg, var(--color-brand-primary))',
       color: '#ffffff',
       border: '1px solid transparent',
     },
@@ -46,7 +45,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
       border: '1px solid var(--color-border-strong)',
     },
     danger: {
-      backgroundColor: 'var(--color-status-offline)',
+      backgroundColor: 'var(--color-status-offline-bg, var(--color-status-offline))',
       color: '#ffffff',
       border: '1px solid transparent',
     },

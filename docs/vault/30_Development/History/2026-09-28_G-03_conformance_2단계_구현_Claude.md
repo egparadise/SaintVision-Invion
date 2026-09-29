@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-G03-CONFORMANCE-STAGE2-IMPL-001"
 title: "G-03 2단계 구현 — conformance 실행 기록 저장(0055)·RECORDED branch·fixture 생산자·host 결속"
-version: "1.1.0"
+version: "1.1.1"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T23:28:08+09:00"
+updated: "2026-09-29T10:29:42+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S10-BE"]

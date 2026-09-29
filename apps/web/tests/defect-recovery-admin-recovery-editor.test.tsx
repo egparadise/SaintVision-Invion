@@ -21,7 +21,7 @@ const MOCK_NODES: NodeItem[] = [
     memoryUsagePercent: 30,
     gpuName: 'NVIDIA RTX 4090',
     gpuCount: 1,
-    status: 'healthy',
+    status: 'online',
     labels: { tier: 'gpu' },
   },
 ];
@@ -999,6 +999,253 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       expect(container.textContent).toContain('ℹ️ [모의 시뮬레이션] ADR-043 Writable Generation 생성');
       expect(container.textContent).toContain('백엔드 파일시스템에는 기록되지 않습니다');
       expect(container.textContent).toContain('sim_chk_1');
+    });
+
+    it('Defect 1: nodes=[] 일 때 selectedNode.hostname 렌더 예외 없이 recovery-empty-nodes-screen 빈 화면을 안전하게 렌더링한다', () => {
+      act(() => {
+        root.render(<DistributedRecoveryView nodes={[]} />);
+      });
+
+      const emptyScreen = container.querySelector('[data-testid="recovery-empty-nodes-screen"]');
+      expect(emptyScreen).not.toBeNull();
+      expect(emptyScreen?.textContent).toContain('클러스터에 등록된 노드가 없거나 관측 대기 중입니다');
+      expect(emptyScreen?.textContent).toContain('0대');
+      const nodeCards = container.querySelectorAll('[data-testid^="node-card-"]');
+      expect(nodeCards.length).toBe(0);
+    });
+
+    it('Defect 2: KPI 타일에 UNMEASURED(미측정/물리 실측)를 올바르게 표기하고, Heartbeat Drop 시 AC-07 verified 허위 문구를 배제한다', () => {
+      act(() => {
+        root.render(<DistributedRecoveryView nodes={MOCK_NODES} />);
+      });
+
+      // 1. KPI detection time 검증 (정적 ≤60초 실측 통과 리터럴 제거 확인)
+      const detectionTile = container.querySelector('[data-testid="kpi-detection-time"]');
+      expect(detectionTile).not.toBeNull();
+      expect(detectionTile?.textContent).toContain('UNMEASURED (물리 실측)');
+
+      // 2. 초기 recovery rate 검증 (0건일 때 100% 하드코딩 제거 확인)
+      const rateTile = container.querySelector('[data-testid="kpi-recovery-rate"]');
+      expect(rateTile).not.toBeNull();
+      expect(rateTile?.textContent).toContain('UNMEASURED (미측정)');
+
+      // 3. Heartbeat Delay 버튼 클릭 (정확한 data-testid 셀렉터 사용)
+      const hbBtn = container.querySelector('[data-testid="simulate-heartbeat-delay-btn"]') as HTMLButtonElement;
+      expect(hbBtn).not.toBeNull();
+
+      act(() => {
+        hbBtn.click();
+      });
+
+      // 4. 액션 알림창에서 '(AC-07 verified)'가 없어야 하고 '(모의 시뮬레이션; 물리 AC-07 UNMEASURED)'가 포함되어야 함
+      const notice = container.querySelector('[data-testid="recovery-action-notice"]');
+      expect(notice).not.toBeNull();
+      expect(notice?.textContent).not.toContain('(AC-07 verified)');
+      expect(notice?.textContent).toContain('(모의 시뮬레이션; 물리 AC-07 UNMEASURED)');
+    });
+
+    it('Defect 3: 노드 카드에 백엔드 제어 평면 실제 보고 상태(offline/lost/degraded)와 클라이언트 시뮬레이션 상태를 정확히 분리 표기한다', () => {
+      const TEST_NODES: NodeItem[] = [
+        {
+          id: 'nod_offline_01',
+          hostname: 'node-offline-01',
+          os: 'windows',
+          cpuCores: 8,
+          cpuUsagePercent: 10,
+          memoryTotalBytes: 32 * 1024 ** 3,
+          memoryUsagePercent: 20,
+          status: 'offline',
+          heartbeatAt: new Date(Date.now() - 75000).toISOString(),
+        },
+        {
+          id: 'nod_lost_02',
+          hostname: 'node-lost-02',
+          os: 'linux',
+          cpuCores: 4,
+          cpuUsagePercent: 5,
+          memoryTotalBytes: 16 * 1024 ** 3,
+          memoryUsagePercent: 10,
+          status: 'lost',
+          heartbeatAt: null,
+        },
+        {
+          id: 'nod_degraded_03',
+          hostname: 'node-degraded-03',
+          os: 'linux',
+          cpuCores: 16,
+          cpuUsagePercent: 50,
+          memoryTotalBytes: 64 * 1024 ** 3,
+          memoryUsagePercent: 60,
+          status: 'degraded',
+          heartbeatAt: new Date(Date.now() - 10000).toISOString(),
+        },
+      ];
+
+      act(() => {
+        root.render(<DistributedRecoveryView nodes={TEST_NODES} />);
+      });
+
+      // 1. offline 노드 검증
+      const cardOffline = container.querySelector('[data-testid="node-card-nod_offline_01"]');
+      expect(cardOffline?.textContent).toMatch(/Heartbeat: 7[5-6]s ago/);
+      const actualOffline = container.querySelector('[data-testid="node-actual-status-nod_offline_01"]');
+      expect(actualOffline).not.toBeNull();
+      expect(actualOffline?.textContent).toContain('실제: offline');
+      const simOffline = container.querySelector('[data-testid="node-sim-status-nod_offline_01"]');
+      expect(simOffline).not.toBeNull();
+      expect(simOffline?.textContent).toContain('시뮬레이션: OFFLINE');
+
+      // 2. lost 노드 검증 (하트비트 부재 시 ONLINE으로 둔갑하지 않고 OFFLINE, DOM 'Heartbeat: 미보고' 단언)
+      const cardLost = container.querySelector('[data-testid="node-card-nod_lost_02"]');
+      expect(cardLost?.textContent).toContain('Heartbeat: 미보고');
+      const actualLost = container.querySelector('[data-testid="node-actual-status-nod_lost_02"]');
+      expect(actualLost).not.toBeNull();
+      expect(actualLost?.textContent).toContain('실제: lost');
+      const simLost = container.querySelector('[data-testid="node-sim-status-nod_lost_02"]');
+      expect(simLost).not.toBeNull();
+      expect(simLost?.textContent).toContain('시뮬레이션: OFFLINE');
+
+      // 3. degraded 노드 검증 (STALE 매핑)
+      const actualDegraded = container.querySelector('[data-testid="node-actual-status-nod_degraded_03"]');
+      expect(actualDegraded).not.toBeNull();
+      expect(actualDegraded?.textContent).toContain('실제: degraded');
+      const simDegraded = container.querySelector('[data-testid="node-sim-status-nod_degraded_03"]');
+      expect(simDegraded).not.toBeNull();
+      expect(simDegraded?.textContent).toContain('시뮬레이션: STALE');
+    });
+
+    it('Defect 4: 조작 시 액션 알림창(recovery-action-notice)에 role="status" / "alert" 및 aria-live 속성을 올바르게 적용한다', () => {
+      act(() => {
+        root.render(<DistributedRecoveryView nodes={MOCK_NODES} />);
+      });
+
+      // Network Partition 버튼 클릭 -> 에러 알림 (role="alert", aria-live="assertive")
+      const partitionBtn = container.querySelector('[data-testid="simulate-partition-btn"]') as HTMLButtonElement;
+      expect(partitionBtn).not.toBeNull();
+
+      act(() => {
+        partitionBtn.click();
+      });
+
+      const notice = container.querySelector('[data-testid="recovery-action-notice"]');
+      expect(notice).not.toBeNull();
+      expect(notice?.getAttribute('role')).toBe('alert');
+      expect(notice?.getAttribute('aria-live')).toBe('assertive');
+      expect(notice?.textContent).toContain('Network partition simulated');
+
+      // 체크아웃 생성 버튼 클릭 -> 정보 알림 (role="status", aria-live="polite")
+      const checkoutBtn = container.querySelector('[data-testid="create-checkout-btn"]') as HTMLButtonElement;
+      expect(checkoutBtn).not.toBeNull();
+
+      act(() => {
+        checkoutBtn.click();
+      });
+
+      const infoNotice = container.querySelector('[data-testid="recovery-action-notice"]');
+      expect(infoNotice).not.toBeNull();
+      expect(infoNotice?.getAttribute('role')).toBe('status');
+      expect(infoNotice?.getAttribute('aria-live')).toBe('polite');
+    });
+
+    it('Defect 5: 노드 카드에 role="button", tabIndex=0, aria-pressed 속성을 부여하고 키보드(Enter/Space) 조작을 지원한다', () => {
+      const TWO_NODES: NodeItem[] = [
+        ...MOCK_NODES,
+        {
+          id: 'nod_test_02',
+          hostname: 'node-win-02',
+          os: 'linux',
+          cpuCores: 8,
+          cpuUsagePercent: 15,
+          memoryTotalBytes: 32 * 1024 ** 3,
+          memoryUsagePercent: 25,
+          gpuName: 'NVIDIA RTX 3080',
+          gpuCount: 1,
+          status: 'online',
+          labels: { tier: 'general' },
+        },
+      ];
+
+      act(() => {
+        root.render(<DistributedRecoveryView nodes={TWO_NODES} />);
+      });
+
+      const card1 = container.querySelector('[data-testid="node-card-nod_test_01"]');
+      const card2 = container.querySelector('[data-testid="node-card-nod_test_02"]');
+      expect(card1).not.toBeNull();
+      expect(card2).not.toBeNull();
+
+      expect(card1?.getAttribute('role')).toBe('button');
+      expect(card1?.getAttribute('tabindex')).toBe('0');
+      expect(card1?.getAttribute('aria-pressed')).toBe('true');
+      expect(card2?.getAttribute('aria-pressed')).toBe('false');
+
+      // 키보드 Enter 키로 2번 노드 선택
+      act(() => {
+        card2?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      });
+
+      expect(card1?.getAttribute('aria-pressed')).toBe('false');
+      expect(card2?.getAttribute('aria-pressed')).toBe('true');
+
+      // 키보드 Space 키로 1번 노드 재선택
+      act(() => {
+        card1?.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      });
+
+      expect(card1?.getAttribute('aria-pressed')).toBe('true');
+      expect(card2?.getAttribute('aria-pressed')).toBe('false');
+    });
+
+    it('체크아웃 영역의 recovery-no-checkouts testid와 0400/0600/0700 권한 설명 및 Reconcile 모의 배지를 단언한다', () => {
+      act(() => {
+        root.render(<DistributedRecoveryView nodes={MOCK_NODES} />);
+      });
+
+      // 1. 체크아웃 비어있을 때 recovery-no-checkouts testid 및 실제 view:479 모의 표기 단언
+      const noCheckouts = container.querySelector('[data-testid="recovery-no-checkouts"]');
+      expect(noCheckouts).not.toBeNull();
+      expect(noCheckouts?.textContent).toContain('생성된 시뮬레이션 체크아웃이 없습니다. (모의)');
+
+      // 2. 권한 설명 문구 단언 (ADR-043 원문: 0400 readonly, 0600 file / 0700 dir, 단조 epoch 보증)
+      expect(container.textContent).toContain('0400 readonly');
+      expect(container.textContent).toContain('0600 file / 0700 dir');
+      expect(container.textContent).toContain('단조 epoch 보증');
+
+      // 3. Reconcile 헤더의 모의 표기 및 물리 AC-07 UNMEASURED 단언
+      expect(container.textContent).toContain('Cluster Reconciliation Audit Trail (AC-07 모의 복구 시뮬레이션; 물리 AC-07 UNMEASURED)');
+
+      // 4. Drain & Reconcile 실행 후 Reconcile 표의 RECOVERED (모의) 배지 단언 (실제 view:429 drain-reconcile-btn 사용)
+      const reconcileBtn = container.querySelector('[data-testid="drain-reconcile-btn"]') as HTMLButtonElement;
+      expect(reconcileBtn).not.toBeNull();
+      act(() => {
+        reconcileBtn.click();
+      });
+
+      expect(container.textContent).toContain('RECOVERED (모의)');
+      expect(container.textContent).not.toContain('RECOVERY COMPLETE');
+    });
+
+    it('nodes=[] 빈 상태 마운트 후 nodes 공급 시 동적으로 뷰를 갱신한다 (root.render([]) -> root.render(nodes))', () => {
+      // 1. 빈 노드 배열로 초기 렌더링 -> 실제 view:275 recovery-empty-nodes-screen 표시 확인
+      act(() => {
+        root.render(<DistributedRecoveryView nodes={[]} />);
+      });
+
+      const emptyScreen = container.querySelector('[data-testid="recovery-empty-nodes-screen"]');
+      expect(emptyScreen).not.toBeNull();
+      expect(emptyScreen?.textContent).toContain('클러스터에 등록된 노드가 없거나 관측 대기 중입니다');
+      expect(emptyScreen?.textContent).toContain('0대 또는 관측 수집 대기');
+      expect(container.querySelector('[data-testid="node-card-nod_test_01"]')).toBeNull();
+
+      // 2. 후속으로 노드 공급하여 재렌더링 -> recovery-empty-nodes-screen 소멸 및 실제 MOCK_NODES 노드 카드(node-win-01) 노출 확인
+      act(() => {
+        root.render(<DistributedRecoveryView nodes={MOCK_NODES} />);
+      });
+
+      expect(container.querySelector('[data-testid="recovery-empty-nodes-screen"]')).toBeNull();
+      const nodeCard = container.querySelector('[data-testid="node-card-nod_test_01"]');
+      expect(nodeCard).not.toBeNull();
+      expect(nodeCard?.textContent).toContain('node-win-01');
     });
   });
 

@@ -52,19 +52,15 @@ class S3Objects:
     def locator(self, tenant_id, project_id, namespace, object_id):
         return make_s3_locator(self.prefix, tenant_id, project_id, namespace, object_id)
 
-    def _key(self, locator: str) -> str:
+    def validate_locator(self, locator: str) -> str:
         if not isinstance(locator, str) or locator.startswith("/") or locator.endswith("/"):
             raise DomainError("STORE-0002", "Invalid object locator", 422)
         values = tuple(locator.split("/"))
         if any(not _SEGMENT.fullmatch(value) or value in {".", ".."} for value in values):
             raise DomainError("STORE-0002", "Invalid object locator", 422)
-        if values[: len(self._prefix)] != self._prefix:
-            # A canonical locator bound to another configured prefix is a
-            # provider-identity/configuration mismatch, not requester input.
-            raise self._unavailable()
-        suffix = values[len(self._prefix) :]
-        if len(suffix) != 7:
+        if len(values) < 7:
             raise DomainError("STORE-0002", "Invalid object locator", 422)
+        prefix, suffix = values[:-7], values[-7:]
         version, tenants, tenant, projects, project, namespace, object_id = suffix
         try:
             canonical_tenant = str(UUID(tenant))
@@ -81,7 +77,14 @@ class S3Objects:
             or namespace not in _NAMESPACES
         ):
             raise DomainError("STORE-0002", "Invalid object locator", 422)
+        if prefix != self._prefix:
+            # A canonical locator bound to another configured prefix is a
+            # provider-identity/configuration mismatch, not requester input.
+            raise self._unavailable()
         return locator
+
+    def _key(self, locator: str) -> str:
+        return self.validate_locator(locator)
 
     @staticmethod
     def _expected(body, digest, size=None):

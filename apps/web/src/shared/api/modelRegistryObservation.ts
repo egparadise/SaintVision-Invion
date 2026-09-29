@@ -23,8 +23,15 @@ import type {
   LineageDeployment,
   LineageUnresolved,
 } from '@/contracts/model-lineage-trace-response';
+import type { ModelVerifyRequest } from '@/contracts/model-verify-request';
+import type { ModelVerifyResponse } from '@/contracts/model-verify-response';
+import type { EvalRunStartRequest } from '@/contracts/eval-run-start-request';
+import type { EvalRunResponse } from '@/contracts/eval-run-response';
 
 const HEX_64_REGEX = /^[0-9a-f]{64}$/;
+const MEASUREMENT_ID_REGEX = /^mvm_[0-9A-HJKMNP-TV-Z]{26}$/;
+const EVAL_RUN_ID_REGEX = /^evr_[0-9A-HJKMNP-TV-Z]{26}$/;
+const ADAPTER_REGEX = /^[a-z0-9-]+$/;
 const ISO_DATE_TIME_REGEX =
   /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(Z|[+-]\d{2}:\d{2})$/;
 
@@ -453,15 +460,209 @@ export async function releaseModelVersion(
   return result;
 }
 
+const MODEL_VERIFY_RESPONSE_KEYS = new Set([
+  'modelVersionId',
+  'modelId',
+  'version',
+  'stage',
+  'verifiedAt',
+  'verifiedMeasurementId',
+  'contentSha256',
+  'newlyVerified',
+]);
+
+export function isModelVerifyResponse(data: unknown): data is ModelVerifyResponse {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return false;
+  const r = data as Record<string, unknown>;
+  const keys = Object.keys(r);
+  if (keys.length !== MODEL_VERIFY_RESPONSE_KEYS.size) return false;
+  if (!keys.every((k) => MODEL_VERIFY_RESPONSE_KEYS.has(k))) return false;
+
+  const validStages = ['draft', 'candidate', 'released', 'retired'];
+  return (
+    typeof r.modelVersionId === 'string' &&
+    r.modelVersionId.length > 0 &&
+    typeof r.modelId === 'string' &&
+    r.modelId.length > 0 &&
+    typeof r.version === 'string' &&
+    r.version.length >= 1 &&
+    r.version.length <= 64 &&
+    typeof r.stage === 'string' &&
+    validStages.includes(r.stage) &&
+    isValidIsoDateTime(r.verifiedAt) &&
+    typeof r.verifiedMeasurementId === 'string' &&
+    MEASUREMENT_ID_REGEX.test(r.verifiedMeasurementId) &&
+    typeof r.contentSha256 === 'string' &&
+    HEX_64_REGEX.test(r.contentSha256) &&
+    typeof r.newlyVerified === 'boolean'
+  );
+}
+
+export async function verifyModelVersion(
+  projectId: string,
+  modelId: string,
+  version: string,
+  payload: ModelVerifyRequest,
+  options?: { signal?: AbortSignal; idempotencyKey?: string }
+): Promise<ModelVerifyResponse> {
+  if (!projectId || !modelId || !version) {
+    throw new Error('프로젝트 ID, 모델 ID, 버전을 확인하세요.');
+  }
+  if (!payload || !payload.measurementId) {
+    throw new Error('measurementId 필드가 필수입니다.');
+  }
+  if (!MEASUREMENT_ID_REGEX.test(payload.measurementId)) {
+    throw new Error('유효한 측정 ID(mvm_... 26자리 Crockford Base32)여야 합니다.');
+  }
+
+  const key = options?.idempotencyKey || generateIdempotencyKey('w3');
+  const path = [projectId, modelId, version].map(encodeURIComponent);
+  const result = await apiClient<ModelVerifyResponse>(
+    `/v1/projects/${path[0]}/models/${path[1]}/versions/${path[2]}/verify`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ measurementId: payload.measurementId }),
+      idempotencyKey: key,
+      signal: options?.signal,
+    }
+  );
+
+  if (!isModelVerifyResponse(result)) {
+    throw new Error('ModelVerifyResponse 응답 계약 불일치');
+  }
+
+  return result;
+}
+
+const EVAL_RUN_RESPONSE_REQUIRED_KEYS = new Set([
+  'evalRunId',
+  'suiteId',
+  'status',
+  'totalCases',
+  'passedCases',
+  'violations',
+  'passedGate',
+  'componentVersions',
+  'startedAt',
+]);
+
+const EVAL_RUN_RESPONSE_ALL_KEYS = new Set([
+  'evalRunId',
+  'suiteId',
+  'status',
+  'totalCases',
+  'passedCases',
+  'violations',
+  'passedGate',
+  'componentVersions',
+  'startedAt',
+  'endedAt',
+]);
+
+export function isEvalRunResponse(data: unknown): data is EvalRunResponse {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return false;
+  const r = data as Record<string, unknown>;
+  const keys = Object.keys(r);
+  if (!keys.every((k) => EVAL_RUN_RESPONSE_ALL_KEYS.has(k))) return false;
+  for (const req of EVAL_RUN_RESPONSE_REQUIRED_KEYS) {
+    if (!(req in r) || r[req] === undefined) return false;
+  }
+
+  const validStatuses = ['running', 'completed', 'aborted'];
+  if (
+    typeof r.evalRunId !== 'string' ||
+    !EVAL_RUN_ID_REGEX.test(r.evalRunId) ||
+    typeof r.suiteId !== 'string' ||
+    r.suiteId.length === 0 ||
+    typeof r.status !== 'string' ||
+    !validStatuses.includes(r.status) ||
+    typeof r.totalCases !== 'number' ||
+    !Number.isInteger(r.totalCases) ||
+    r.totalCases < 0 ||
+    typeof r.passedCases !== 'number' ||
+    !Number.isInteger(r.passedCases) ||
+    r.passedCases < 0 ||
+    r.passedCases > r.totalCases ||
+    typeof r.violations !== 'number' ||
+    !Number.isInteger(r.violations) ||
+    r.violations < 0 ||
+    typeof r.passedGate !== 'boolean' ||
+    !isValidIsoDateTime(r.startedAt)
+  ) {
+    return false;
+  }
+
+  if (r.endedAt !== undefined && r.endedAt !== null) {
+    if (!isValidIsoDateTime(r.endedAt)) return false;
+  }
+
+  if (!r.componentVersions || typeof r.componentVersions !== 'object' || Array.isArray(r.componentVersions)) {
+    return false;
+  }
+  for (const v of Object.values(r.componentVersions as Record<string, unknown>)) {
+    if (typeof v !== 'string') return false;
+  }
+
+  return true;
+}
+
+export async function startEvalRun(
+  projectId: string,
+  suiteId: string,
+  payload: EvalRunStartRequest,
+  options?: { signal?: AbortSignal; idempotencyKey?: string }
+): Promise<EvalRunResponse> {
+  if (!projectId || !suiteId) {
+    throw new Error('프로젝트 ID와 suite ID를 확인하세요.');
+  }
+  if (!payload || !payload.adapter) {
+    throw new Error('adapter 필드가 필수입니다.');
+  }
+  if (!ADAPTER_REGEX.test(payload.adapter) || payload.adapter.length > 64) {
+    throw new Error('유효한 어댑터 이름(소문자 영숫자 및 하이픈, 최대 64자)이어야 합니다.');
+  }
+
+  if (payload.componentVersions) {
+    const forbiddenKeys = ['adapter', 'contractVersion', 'modelPinned'];
+    for (const key of forbiddenKeys) {
+      if (key in payload.componentVersions) {
+        throw new Error(`componentVersions에 서비스 소유 키 '${key}'는 포함할 수 없습니다.`);
+      }
+    }
+  }
+
+  const key = options?.idempotencyKey || generateIdempotencyKey('w5');
+  const path = [projectId, suiteId].map(encodeURIComponent);
+  const result = await apiClient<EvalRunResponse>(
+    `/v1/projects/${path[0]}/eval/suites/${path[1]}/runs`,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      idempotencyKey: key,
+      signal: options?.signal,
+    }
+  );
+
+  if (!isEvalRunResponse(result)) {
+    throw new Error('EvalRunResponse 응답 계약 불일치');
+  }
+
+  return result;
+}
+
 export const modelRegistryObservation = {
   fetchModelLineage,
   registerModelVersion,
   extendRetentionPin,
   releaseModelVersion,
+  verifyModelVersion,
+  startEvalRun,
   isModelLineageTraceResponse,
   isModelVersionResponse,
   isRetentionPinResponse,
   isModelReleaseResponse,
+  isModelVerifyResponse,
+  isEvalRunResponse,
   isValidIsoDateTime,
   generateIdempotencyKey,
 };
