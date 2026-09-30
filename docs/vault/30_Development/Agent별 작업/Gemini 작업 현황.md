@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.148"
+version: "1.0.149"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-30T09:42:00+09:00"
+updated: "2026-09-30T10:05:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,26 +19,29 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-30T09:42:00+09:00 (Card 156 사내망 portal 웹 배포 독립 검토 Codex 7건 + Claude UI·운영 10건 전수 조치 완료: 스테이징 사전검증 교체, Dockerfile.dockerignore, server-chain/key 기본명 및 권한 보존, daemon off 중복 해소, 주석 면역 토큰 검증기, CSP 강화, 확장자 404 분기, 정적 불변식 전수 검증).
+- 확인 기준: 2026-09-30T10:05:00+09:00 (Card 156 사내망 portal 웹 배포 독립 검토 r2 Codex '수정 요청 유지' + Claude r2 '변경 요청' 전수 조치: 레지스트리 실재 Base Digest 고정(B1), 호스트 UID:GID 컨테이너 실행 방식 B 단일화 및 root:root 정적 자산 권한(B2), RFC2253 DN 정규화 self-signed 거부 및 CA:FALSE 필수(H1), 전용 0700 상태 디렉터리 원자적 격리 및 cp.sv.lan:443 엄격 fail-closed(M2), SSE/WS Host 전파 및 /v1/ keepalive(L1), ^~ /assets/ 접두사 캐시 우선순위(M1), 64-hex sha256 고유 Image ID 해석 및 실행 결속(M3), 엄격한 HTTPS 사전 프로브 및 1초 안정화 검증(M4), 변이 8종 전수 사살 33 passed 실측(H2), dev 인증서 기본 경로 일치(L3), 제어 평면 allowed_origins 인계 문서화).
 
 ## 2026-09-30 사내망 portal 웹 배포 비root read-only rootfs Nginx 및 동일 origin 리버스 프록시·안전 기동 검증 (Card 156, `agent/gemini/c156-intranet-portal-deploy`, PR #252)
-- **개요**: 사내망 포털 웹 애플리케이션(`apps/web`)을 노드2(object store 노드)에 안전하게 배포하기 위한 자산(`deploy/intranet/portal/`)을 전수 구축하고 독립 검토 및 코디네이터 지침을 전수 반영했다:
-  1. `nginx.conf`: 동일 origin 리버스 프록시(`/v1/`, SSE `proxy_buffering off;`, 터미널 WebSocket을 업스트림 제어 평면으로 포워딩), `proxy_ssl_verify on;`, `proxy_ssl_name cp.sv.lan;`, 비root 실행(UID 101, PID `/tmp/nginx.pid`, temp 경로 `/tmp`), 읽기 전용 루트 파일시스템(`--read-only`), HTTPS 전용(포트 80 $\rightarrow$ 고정 도메인 `https://portal.sv.lan$request_uri` 301 리다이렉트, 포트 80 `/healthz` 로컬 평문 200 OK 예외), TLS 1.2+ 한정, HSTS(1년), 엄격한 CSP(`connect-src 'self' https://idp.sv.lan;`, `style-src 'self'`, `form-action 'self'`), SPA fallback, `/auth-config.js` 및 `/index.html` no-cache, `/assets/` 1년 immutable, 확장자 누락 파일 404 응답, 로그 개인정보 보호(쿼리/리퍼러 제외, `/callback` access_log off), daemon off 중복 해소(H1).
+- **개요**: 사내망 포털 웹 애플리케이션(`apps/web`)을 노드2(object store 노드)에 안전하게 배포하기 위한 자산(`deploy/intranet/portal/`)에 대해 독립 검토 r2 및 코디네이터 지침을 전수 반영했다:
+  1. `nginx.conf`: 동일 origin 리버스 프록시(`/v1/`, SSE `proxy_buffering off;`, 터미널 WebSocket을 업스트림 제어 평면으로 포워딩, Host `cp.sv.lan` 전파, `/v1/` keepalive 활성화), `proxy_ssl_verify on;`, `proxy_ssl_name cp.sv.lan;`, 읽기 전용 루트 파일시스템(`--read-only`), HTTPS 전용(포트 80 $\rightarrow$ 고정 도메인 `https://portal.sv.lan$request_uri` 301 리다이렉트, 포트 80 `/healthz` 로컬 평문 200 OK 예외), TLS 1.2+ 한정, HSTS(1년), 엄격한 CSP(`connect-src 'self' https://idp.sv.lan;`, `style-src 'self'`, `form-action 'self'`, script-src unsafe-inline 거부, frame-ancestors * 거부), SPA fallback, `/auth-config.js` 및 `/index.html` no-cache, `^~ /assets/` 접두사로 1년 immutable 우선 보장(M1), 확장자 누락 파일 404 응답, 로그 개인정보 보호(쿼리/리퍼러 제외, `/callback` access_log off), daemon off 중복 해소(H1).
   2. `security-headers.conf`: server 블록 및 `add_header`를 선언하는 모든 location 블록에 include하여 Nginx 1.27 헤더 상속 누락 원천 방지.
-  3. `conf.d/upstream.conf`: 업스트림 제어 평면 정의 스니펫 (`PORTAL_UPSTREAM_CP_HOST` 미설정 시 기동 즉각 거부 fail-closed).
+  3. `conf.d/upstream.conf`: 업스트림 제어 평면 정의 스니펫 (`PORTAL_UPSTREAM_CP_HOST="cp.sv.lan:443"` 엄격 일치 요구, 미설정 시 기동 즉각 거부 fail-closed, M2).
   4. `auth-config.js`: 사내망 Keycloak IdP 연동(`https://idp.sv.lan/realms/saintvision`, `sv-portal`, `https://portal.sv.lan/callback`).
-  5. `Dockerfile` & `Dockerfile.dockerignore`: 다단계 빌드(`node:22-alpine` + `nginx:1.27-alpine` 불변 `@sha256:` digest 고정), BuildKit 전용 ignore 분리로 루트 python .dockerignore 오버라이드(H5), 소유자 4-튜플 라벨, USER 101:101.
-  6. `portal-up.sh`: 스테이징 임시 컨테이너(`saintvision-portal-staging-$$`)로 내부 `nginx -t` 및 HTTPS `/healthz` 사전 실측 후 기존 컨테이너 교체(M3), 소유자 라벨 4-튜플(`service=portal`, `workload=intranet-portal`, `node=node2`, `instance=${PORTAL_INSTANCE:-main}`) 일치 컨테이너만 안전하게 교체, exited 컨테이너 한정 정리, 비밀 argv 및 `-e`/`--env` 주입 원천 차단, 사내 CA 번들 기반 leaf chain 검증, self-signed 거부, SAN `portal.sv.lan`, EKU `serverAuth`, CA:FALSE 검증, 키 기본명 `server-chain.pem` 및 `server-key.pem` 일치 및 운영자 파일 권한 chmod 변경 금지(H2), 단일 파일 read-only bind mount, 기동 후 `RestartCount == 0` 확인.
-  7. `portal-smoke-up.sh`: 로컬 개발/스모크 전용 기동 스크립트(별도 컨테이너 `saintvision-portal-smoke`, 별도 인스턴스 `smoke`, 별도 경로 `certs/dev/`).
+  5. `Dockerfile` & `Dockerfile.dockerignore`: 다단계 빌드(`node:22-alpine` + `nginx:1.27-alpine` Docker Hub 레지스트리 실재 `@sha256:` digest 고정, B1), 이미지 내부 정적 자산 `root:root` 0444(파일)/0555(디렉터리) 설정(B2), BuildKit 전용 ignore 분리로 루트 python .dockerignore 오버라이드(H5), 소유자 4-튜플 라벨.
+  6. `portal-up.sh`: 호스트 `PORTAL_UID="$(id -u)"` 및 `PORTAL_GID="$(id -g)"` 컨테이너 실행 방식 B 단일화(B2), 운영자 키/인증서 권한(0400/0600) 엄격 보존, 전용 `0700` 상태 디렉터리(`~/.local/state/saintvision-portal/${PORTAL_INSTANCE}`)에 `upstream.conf` 원자적 생성(M2), OpenSSL `-nameopt RFC2253` 및 prefix 제거 DN 정규화 self-signed 거부(H1), `CA:FALSE` 필수 요구 및 `CA:TRUE` 거부(H1), 64-hex sha256 고유 Image ID 해석 및 실행 결속(M3), 스테이징 임시 컨테이너(`saintvision-portal-staging-$$`)로 내부 `nginx -t` 및 엄격한 HTTPS 프로브(`/healthz`, `/index.html`, `/auth-config.js`, HTTP fallback 없음) 사전 실측 후 기존 컨테이너 안전 교체(M3, M4), 1초 안정화 후 `RestartCount == 0` 검증(M4), 소유자 라벨 4-튜플 일치 컨테이너만 교체, 비소유 컨테이너 보존, 비밀 argv 및 `-e`/`--env`/`--env-file` 주입 원천 차단(L2).
+  7. `portal-smoke-up.sh` & `generate-dev-certs.sh`: 로컬 개발/스모크 전용 기동 스크립트 및 인증서 생성기 (`certs/dev/` 기본 경로 일치, L3).
   8. `portal-down.sh`: 4-튜플 소유자 라벨 검증 기반 안전 정지.
   9. **노드2 배포 상태**: Card 150 PKI 전달 증거(`card156-portal-pki-handoff.json`): 노드2 물리 전달 완료(`DELIVERED_NOT_ACTIVATED`).
+  10. **제어 평면 인계**: 제어 평면(`app.py:773-778`)의 `allowed_origins`에 `https://portal.sv.lan` 등록 필요성 문서화.
 - **담당 및 역할**: Gemini (Frontend / UI / 웹 배포 소유). Reviewer: Claude (UI·테스트 축), Codex (계약·보안 축).
 - **관측 근거 (Evidence)**:
-  - 배포 정적 및 변이 검증 시험: `pytest tests/test_intranet_portal_deploy.py` (23 passed 100%, 0.10s, M4 주석 면역 검증 포함)
+  - 배포 정적 및 변이 사살 시험: `pytest tests/test_intranet_portal_deploy.py` (33 passed 100%, 0.13s, H2 변이 8종 전수 사살 및 M4 주석 면역 검증 포함)
   - 셸 스크립트 문법 점검: `bash -n` 4대 스크립트 오류 0건 (exit 0)
   - 웹 빌드 및 TypeScript 점검: `npx tsc -b` (에러 0건), `npm run build` (성공, 7.82s)
   - 프런트엔드 무결성 점검: `python tools/check_frontend_integrity.py` (92개 파일 스캔, 9대 규칙 위반 0건)
+  - 계약 바인딩 점검: `python tools/check_contract_bindings.py` (55개 픽스처 전수 커버리지 PASS)
   - 라우트 커버리지 점검: `pytest tests/test_route_coverage.py` (40 passed 100%)
+
 
 ## 2026-09-30 사내 IdP(Keycloak) 연동 FE 점검·수정 및 OIDC PKCE·토큰 만료·로그아웃 검증 (Card 153, `agent/gemini/card153-idp-login`, PR #247)
 - **개요**: 사내 IdP(Claude Card 152가 사내망에 프로비저닝하는 Keycloak) 연동을 위한 FE 점검 및 독립 검토 의견 전수 반영: (1) OIDC Authorization Code + PKCE(RFC 7636 S256 verifier/challenge, state, nonce, RFC 부록 B 벡터 100% 일치), (2) 동적 issuer 및 clientId 설정 해석 및 issuer origin/path 계층에 결속하여 authorize/token/logout cross-origin 및 경로 이탈 override 원천 차단(Codex 1, Claude L5), (3) dev IdP 가정 및 비암호화 원격 HTTP 전면 차단, (4) OIDC ID 토큰(id_token)의 nonce(트랜잭션 일치), aud(clientId 일치), 다중 aud 시 azp(clientId 일치 필수), iss(issuer 설정 시 일치; endpoint-pair 모드는 iss 미검사), 필수 정수 exp(120초 시계 오차 허용), iat(존재 시 정수) 클라이언트 fail-closed 검증 완비, 4대 변이(azp 누락 허용, 단일 aud 외국 azp, aud 배열 clientId 미포함, aud 비문자열/비배열) 사살 음성 시험 완비 및 id_token 클라이언트 검증 후 폐기, access token 서버 검증 정본 위임 명시(Claude R1~R3, Codex 2), (5) 제어 평면 서버 계약 준수 토큰 유효기간(0 < exp - iat <= 3600) fail-closed 검증 및 120초 시계 오차 허용(CLOCK_SKEW_SEC = 120, Claude M3, Codex 5, validateTokenExpiration 구조분해 기본값 requireJwt: true 완비), (6) `App.tsx:549` Header 로그아웃에 `performLogout({ redirectIdp: true, postLogoutRedirectUri: window.location.origin })` 실 배선 및 App 수준 통합 시험 완비(Claude M1, Codex 3), (7) `auth-config.js` 정본 계약(`https://idp.sv.lan/realms/saintvision`, `sv-portal`) 정합(Codex 4), (8) redirectUri 정규화, `/callback` strict path 검증 및 RFC 6749 §3.1.2 해시 차단(Claude L4).

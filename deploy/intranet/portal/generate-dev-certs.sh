@@ -7,7 +7,7 @@ set -euo pipefail
 umask 077
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-CERTS_DIR="${1:-${SCRIPT_DIR}/certs}"
+CERTS_DIR="${1:-${SCRIPT_DIR}/certs/dev}"
 
 mkdir -p "$CERTS_DIR"
 
