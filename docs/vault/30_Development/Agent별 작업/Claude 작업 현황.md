@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.47"
+version: "1.2.60"
 status: "review"
 author: "Claude"
-updated: "2026-09-29T12:19:52+09:00"
+updated: "2026-09-30T14:41:26+09:00"
 
 
 
@@ -14,6 +14,8 @@ source_of_truth: "Git"
 ---
 
 # Claude 작업 현황
+
+48 task 진척 재산정 v1.6 (Claude, 2026-09-30, 카드 161, docs-only, branch `agent/claude/c161-progress-rescore`): 기준을 **integration 현재 tip `6fc0428b`** 으로 옮겨 재채점했다. **3,375 / 4,800 = 70.31%, 오르는 행 0.** 미착지 **train 3 `d9c53e1a`**(#247~#251, 사용자 착지 대기)와 **train 4 후보 `486dab3e`**(#254·#256·#255, 통합 CI 진행 중)를 **점수 열이 아니라 후보 열로 분리**해 각각 판정했고 **셋 다 같은 수치**다. 식별은 기계로 확인했다 — v1.5의 A `b91ab72f`는 C의 조상이고 `C..D`는 정확히 5개 PR, `D..E`는 정확히 3개다. **이 판의 내용은 오르지 않는 이유다.** 사내망 track이 `G-15`·`G-17`·`G-18`·`G-20`이 요구하던 것을 **산출물로는 실제로 가져왔다** — live OIDC 신원 증거가 `verdict: PASS`에 `bundleAccepted`·`liveTokenVerified`·`tamperedTokenRefused` 전부 `MEASURED_PASS`이고, storage 왕복이 PASS, scope 격리가 **403/403**이다. 그런데도 **48행 중 한 행도 움직이지 않는다.** 결정적인 실측 하나: **#248의 PITR 예행이 `pitrPreflight.status: BLOCKED_EXTERNAL`, `restoreAttempted: false`, RPO·RTO `null`** 이다 — 복원을 **시도하지 않았으므로** `G-22`는 열려 있고 `S11-DB`·`S12-DB`·`S12-ST`가 그대로다. `S02-FE`는 `#247`이 OIDC PKCE 로그인을 구현했어도 **이름이 어디서도 해석되지 않아**(hosts 미적용) 여정 관측이 없다. `S12-FE`의 구현은 **#252**(미착지·검토 중)이고 D에 없다. v1.5가 다음 판정 조건으로 적은 네 가지도 **하나도 충족되지 않았다** — AC-11 security lane은 최근 실행이 전부 `skipped`(label·dispatch 전용)라 **착지 SHA에 묶인 실행 기록이 0건**이다. `tests/`가 339 → 353으로 늘었지만 §3-2가 시험 없음으로 50에 둔 **세 행(`S08-BE`·`S02-ST`·`S09-ST`)의 시험은 그 안에 없다**(파일명 검색 0건, 재확인). **§6-1에 사용자 조치 여섯 항목을 행동 단위로 적었다** — 물리 PC 2대 추가·CP 호스트·**hosts 적용**·node3 docker 그룹·train 3 착지·U1~U6. 그중 **train 3 착지는 산출물을 옮기는 일이고 나머지는 관측을 가능하게 하는 일**이며, 세 tree의 점수가 같은 이유가 정확히 그 차이다. **바뀐 행이 0이므로 §3의 48행 표는 손대지 않았다.** 확인하지 않은 것도 적었다 — D·E를 착지시켜 보지 않았고, `S12-DB`의 50/75는 그 근거가 **이 델타의 변화가 아니므로**(해당 CI step이 `bc27588d`로 A 이전에 들어왔다) 다시 묻지 않고 owner 판단으로 남겼다. 문서 gate 3종 exit 0·인용 floor 불변. 전문 [[2026-09-28 48 task 진행률 재채점]]. 다음 첫 행동: Codex 검토.
 
 [[전체 개발 진행 현황]] → 이 페이지 → [[Agent 지속 개발 운영 규칙]] 순서로 확인한다. 이 페이지는 현재 후속 카드 목록이며 이전 장문 보고서는 SHA별 근거다.
 
