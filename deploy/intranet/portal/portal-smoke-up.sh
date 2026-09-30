@@ -26,7 +26,7 @@ LABEL_WORKLOAD="ai.saintvision.workload=intranet-portal"
 LABEL_NODE="ai.saintvision.node=node2"
 LABEL_INSTANCE="ai.saintvision.instance=smoke"
 
-DEV_CERTS_DIR="${SCRIPT_DIR}/certs/dev"
+DEV_CERTS_DIR="${PORTAL_DEV_CERTS_DIR:-${SCRIPT_DIR}/certs/dev}"
 CERT_FILE="${DEV_CERTS_DIR}/portal.crt"
 KEY_FILE="${DEV_CERTS_DIR}/portal.key"
 

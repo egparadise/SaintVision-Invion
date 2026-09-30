@@ -14,19 +14,39 @@ mkdir -p "$CERTS_DIR"
 KEY_FILE="${CERTS_DIR}/portal.key"
 CERT_FILE="${CERTS_DIR}/portal.crt"
 
-echo "Generating temporary ECDSA P-256 self-signed certificate for portal.sv.lan..."
+(
+    cd "$CERTS_DIR"
 
-# Generate ECDSA P-256 (prime256v1) private key
-openssl ecparam -name prime256v1 -genkey -noout -out "$KEY_FILE"
-chmod 600 "$KEY_FILE"
+    # Generate ECDSA P-256 (prime256v1) private key
+    openssl ecparam -name prime256v1 -genkey -noout -out "portal.key"
+    chmod 600 "portal.key"
 
-# Generate self-signed X.509 certificate with SAN DNS:portal.sv.lan
-MSYS_NO_PATHCONV=1 openssl req -new -x509 -sha256 -key "$KEY_FILE" \
-    -subj "/C=KR/O=SaintVision/OU=IntranetPortal/CN=portal.sv.lan" \
-    -addext "subjectAltName=DNS:portal.sv.lan" \
-    -days 30 \
-    -out "$CERT_FILE"
-chmod 644 "$CERT_FILE"
+    # Generate self-signed X.509 certificate with SAN DNS:portal.sv.lan using config file
+    # This avoids MSYS path conversion issues on Windows Git Bash and empty subject issues on Linux
+    cat > "req.cnf" << 'EOF'
+[req]
+distinguished_name = req_distinguished_name
+x509_extensions = v3_req
+prompt = no
+
+[req_distinguished_name]
+C = KR
+O = SaintVision
+OU = IntranetPortal
+CN = portal.sv.lan
+
+[v3_req]
+subjectAltName = DNS:portal.sv.lan
+EOF
+
+    openssl req -new -x509 -sha256 -key "portal.key" \
+        -config "req.cnf" \
+        -days 30 \
+        -out "portal.crt"
+
+    rm -f "req.cnf"
+    chmod 644 "portal.crt"
+)
 
 echo "✔ Temporary certificate generated successfully:"
 echo "  Certificate: $CERT_FILE"

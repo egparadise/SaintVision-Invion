@@ -71,12 +71,15 @@ jobs:
             -f deploy/intranet/portal/Dockerfile \
             -t saintvision-portal:test .
 
-      - name: Resolve Built Image Digest
+      - name: Verify Lane-Internal Built Image Identity (Self-Derived)
         id: image_info
         run: |
+          # Lane-internal image identity check only: verify that the locally built image inspect .Id
+          # is passed to portal-up.sh. This validates local pipeline execution consistency,
+          # but does NOT constitute external supply-chain provenance or an independently signed release record.
           IMAGE_ID=$(docker image inspect --format '{{.Id}}' saintvision-portal:test)
           echo "IMAGE_ID=$IMAGE_ID" >> "$GITHUB_OUTPUT"
-          echo "Built Image ID: $IMAGE_ID"
+          echo "Built Image ID (lane-internal identity check): $IMAGE_ID"
 
       - name: Setup Mock Upstream HTTPS Server and Test PKI
         run: |
@@ -161,6 +164,10 @@ jobs:
                       self.end_headers()
                       self.wfile.write(b'data: {"type":"connected","project":"mock"}\n\n')
                       self.wfile.flush()
+                      import time
+                      time.sleep(2)
+                      self.wfile.write(b'data: {"type":"heartbeat","seq":1}\n\n')
+                      self.wfile.flush()
                       self.close_connection = True
                   elif self.path == "/v1/terminal/ws":
                       sec_key = self.headers.get("Sec-WebSocket-Key", "")
@@ -191,7 +198,7 @@ jobs:
       - name: Launch Portal Container via portal-up.sh
         env:
           PORTAL_IMAGE: saintvision-portal:test
-          PORTAL_IMAGE_DIGEST: ${{ steps.image_info.outputs.IMAGE_ID }}
+          PORTAL_IMAGE_ID: ${{ steps.image_info.outputs.IMAGE_ID }}
           PORTAL_ALLOWED_ROOT_FINGERPRINTS: ${{ env.ROOT_FP }}
           PORTAL_CERTS_DIR: /tmp/portal-ci/certs
           PORTAL_CERT_FILE: /tmp/portal-ci/certs/server-chain.pem
@@ -225,17 +232,26 @@ jobs:
           HTTPS_HEALTH=$(curl -fsS --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/healthz)
           [[ "$HTTPS_HEALTH" == "OK" ]]
 
-          # 4. Verified HTTPS Security Headers, CSP values, and status 200 on /index.html
+          # 4. Verified HTTPS Security Headers, full CSP string match, and status 200 on /index.html
           echo "Checking HTTPS status 200 and security headers on /index.html..."
           INDEX_HTML=$(curl -fsS --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/index.html)
           INDEX_HEADERS=$(curl -fsS -I --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/index.html | tr -d '\r')
           echo "$INDEX_HEADERS" | grep -iq "HTTP/.* 200"
-          echo "$INDEX_HEADERS" | grep -iq "Strict-Transport-Security: max-age=31536000"
-          echo "$INDEX_HEADERS" | grep -iq "Content-Security-Policy:"
-          echo "$INDEX_HEADERS" | grep -iq "connect-src 'self' https://idp.sv.lan"
+          echo "$INDEX_HEADERS" | grep -iq "Strict-Transport-Security: max-age=31536000; includeSubDomains"
           echo "$INDEX_HEADERS" | grep -iq "X-Content-Type-Options: nosniff"
           echo "$INDEX_HEADERS" | grep -iq "X-Frame-Options: DENY"
           echo "$INDEX_HEADERS" | grep -iq "Cache-Control: no-cache, no-store, must-revalidate"
+
+          echo "Asserting full exact match for Content-Security-Policy (R5-M3)..."
+          EXPECTED_CSP="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://idp.sv.lan; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';"
+          ACTUAL_CSP=$(echo "$INDEX_HEADERS" | grep -i "^content-security-policy:" | head -n 1 | sed -e 's/^[cC][oO][nN][tT][eE][nN][tT]-[sS][eE][cC][uU][rR][iI][tT][yY]-[pP][oO][lL][iI][cC][yY]:[ ]*//' | tr -d '\r')
+          if [[ "$ACTUAL_CSP" != "$EXPECTED_CSP" ]]; then
+              echo "ERROR: Full CSP header mismatch!" >&2
+              echo "  Expected: '$EXPECTED_CSP'" >&2
+              echo "  Actual:   '$ACTUAL_CSP'" >&2
+              exit 1
+          fi
+          echo "✔ Full CSP header matched exactly."
 
           # 5. Verified HTTPS /assets/ immutable caching on REAL hashed asset, assert 404 on missing
           echo "Extracting real hashed asset from /index.html..."
@@ -266,7 +282,8 @@ jobs:
           echo "$V1_RESPONSE" | grep -q "authenticated"
 
           echo "Checking reverse proxy SSE streaming (/v1/projects/mock/runs/run-1/events)..."
-          SSE_RESPONSE=$(curl -fsS --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/v1/projects/mock/runs/run-1/events)
+          # With proxy_buffering off, the first event arrives immediately within --max-time 1.2s despite server delay
+          SSE_RESPONSE=$(curl -s -N --max-time 1.2 --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/v1/projects/mock/runs/run-1/events || true)
           echo "$SSE_RESPONSE" | grep -q "connected"
 
           echo "Checking reverse proxy Terminal WebSocket upgrade (/v1/terminal/ws)..."
@@ -280,15 +297,50 @@ jobs:
           echo "$WS_RESPONSE" | grep -iq "Upgrade: websocket"
           echo "$WS_RESPONSE" | grep -iq "Connection: Upgrade"
 
-          # 8. Verify strict TLS version: reject legacy TLS 1.1 handshake
-          echo "Verifying rejection of legacy TLS 1.1..."
-          if curl -fsS --tlsv1.1 --tls-max 1.1 --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/healthz >/dev/null 2>&1; then
-              echo "ERROR: Legacy TLS 1.1 handshake unexpectedly succeeded. Nginx must enforce TLS 1.2+." >&2
+          # 8. Verify strict TLS version: server rejection of legacy TLS 1.1 (R5-M3)
+          echo "Verifying server rejection of legacy TLS 1.1 with SECLEVEL=0 client..."
+          TLS11_OUT=$(echo "Q" | openssl s_client -connect 127.0.0.1:8443 -servername portal.sv.lan -CAfile "$CA_FILE" -tls1_1 -cipher 'DEFAULT:@SECLEVEL=0' 2>&1 || true)
+          echo "$TLS11_OUT"
+          if echo "$TLS11_OUT" | grep -iq "CONNECTED" && echo "$TLS11_OUT" | grep -iq "Protocol  : TLSv1.1"; then
+              echo "ERROR: Server unexpectedly negotiated legacy TLS 1.1!" >&2
               exit 1
           fi
-          echo "✔ Legacy TLS 1.1 handshake rejected (fail-closed)."
+          if ! echo "$TLS11_OUT" | grep -iqE "alert|handshake failure|protocol version|wrong version|error"; then
+              echo "ERROR: Expected server rejection alert or error for TLS 1.1, got: $TLS11_OUT" >&2
+              exit 1
+          fi
+          echo "✔ Server actively rejected legacy TLS 1.1 (fail-closed)."
 
           echo "✔ Hosted Portal Container Build & Hardened Runtime Smoke PASSED!"
+
+      - name: Verify Automatic Rollback on Production Swap Failure (R5-H1 & R5-M3)
+        env:
+          PORTAL_IMAGE: saintvision-portal:test
+          PORTAL_IMAGE_ID: ${{ steps.image_info.outputs.IMAGE_ID }}
+          PORTAL_ALLOWED_ROOT_FINGERPRINTS: ${{ env.ROOT_FP }}
+          PORTAL_CERTS_DIR: /tmp/portal-ci/certs
+          PORTAL_CERT_FILE: /tmp/portal-ci/certs/server-chain.pem
+          PORTAL_KEY_FILE: /tmp/portal-ci/certs/server-key.pem
+          PORTAL_CA_BUNDLE: /tmp/portal-ci/certs/ca-bundle.crt
+          PORTAL_UPSTREAM_CP_HOST: cp.sv.lan:443
+          PORTAL_ADD_HOSTS: "cp.sv.lan:host-gateway"
+          PORTAL_HTTP_PORT: 8080
+          PORTAL_HTTPS_PORT: 8443
+          PORTAL_TEST_TRIGGER_ROLLBACK: probe_fail
+        run: |
+          echo "Triggering simulated production probe failure to execute automatic rollback..."
+          if bash deploy/intranet/portal/portal-up.sh; then
+              echo "ERROR: Expected portal-up.sh to fail on simulated probe failure!" >&2
+              exit 1
+          fi
+          echo "Checking that rollback restored previous healthy production container..."
+          CA_FILE="/tmp/portal-ci/certs/ca-bundle.crt"
+          RESTORED_HEALTH=$(curl -fsS --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/healthz)
+          if [[ "$RESTORED_HEALTH" != "OK" ]]; then
+              echo "ERROR: Restored container health check failed after rollback!" >&2
+              exit 1
+          fi
+          echo "✔ Automatic rollback successfully restored running container and /healthz is OK."
 
       - name: Teardown Portal Container via portal-down.sh
         if: always()

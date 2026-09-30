@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-GEMINI-CARD156-001"
 title: "History: Card 156 사내망 portal 웹 배포 자산 및 비root read-only rootfs Nginx·안전 기동 검증"
-version: "1.8.0"
+version: "2.0.0"
 status: "review"
 author: "Gemini"
-updated: "2026-09-30T12:14:00+09:00"
+updated: "2026-09-30T12:54:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -16,6 +16,40 @@ source_of_truth: "Git"
 - **작업 브랜치**: `agent/gemini/c156-intranet-portal-deploy` (Base: `origin/integration/all-agents-unified`, PR #247 최신 커밋 `2f93cbba` 병합)
 - **배치 대상 도메인**: `portal.sv.lan`
 - **배치 대상 노드**: 노드2 (object store 노드, Docker 지원)
+- **독립 검토 r5 조치 (Codex 계약·보안 축 + Claude UI·운영 축 '변경 요청' 전수 반영)**:
+  1. **R5-H1 [운영/보안] 운영 docker run 실패 감지, 자동 롤백 및 백업 보호, 사전 포트 점검**:
+     - `portal-up.sh`: `docker run` 실행을 `if ! docker run ...; then rollback_production; return 1; fi`로 감싸 run 실패(exit 125 등) 시 즉시 롤백 진입.
+     - 컨테이너 swap 구간(`docker rename` 직후)에 `trap rollback_production INT TERM`을 설치하여 예기치 않은 인터럽트/시그널 시 백업 복구.
+     - `validate_environment`에 사전 포트 점검 추가: `docker ps --filter publish`를 통해 대상 포트(80/443)가 다른 컨테이너에 의해 점유되어 있는지 사전 검증.
+     - stale cleanup 로직에서 `*-backup-*` 이름 컨테이너를 영구 제외하여 이전 실행의 백업이 자동 삭제되는 위험 차단.
+     - `rollback_production` 복구 완료 문구 출력 전 `State.Running==true` 및 컨테이너 이름 일치 검증 추가.
+  2. **R5-M1 [문서 정정] 루트 CA DER 지문 allowlist 정정 및 Card 150 해시 구분**:
+     - README 및 History에 기재되었던 `92455f1b...`가 Card 150 신뢰 번들 파일 해시(`trustBundleDigestSHA256`)였음을 명시하고, `portal-up.sh`가 요구하는 루트 CA 인증서 자체의 SHA-256 DER 지문(`openssl x509 -in root.crt -noout -fingerprint -sha256 | sed 's/.*=//; s/://g' | tr '[:upper:]' '[:lower:]'`) 산출 명령 및 placeholder로 정정.
+  3. **R5-M2 [실측 검증] 잔여 변이 격리 사살 5대 독립 롤백 시험 및 시퀀스 순서 엄격 단언**:
+     - `test_intranet_portal_deploy.py` 내 `test_behavioral_fake_docker_swap_...` 스위트를 5종으로 분리:
+       1) `test_behavioral_fake_docker_swap_docker_run_failure_triggers_rollback` (docker run exit 125)
+       2) `test_behavioral_fake_docker_swap_not_running_triggers_rollback` (State.Running=false)
+       3) `test_behavioral_fake_docker_swap_healthz_probe_failure_triggers_rollback` (healthz 실패)
+       4) `test_behavioral_fake_docker_swap_index_probe_failure_triggers_rollback` (index.html 실패)
+       5) `test_behavioral_fake_docker_swap_auth_config_probe_failure_triggers_rollback` (auth-config.js 실패)
+     - 각 시험에서 `docker stop broken -> docker rm -f broken -> docker start backup -> docker rename backup saintvision-portal` 호출의 정확한 순서와 백업 인스턴스 이름 일치 단언.
+  4. **R5-M3 [CI 파이프라인] Hosted 런타임 비공허 TLS 1.1 거부, 전체 CSP 일치, SSE 비버퍼링, 롤백 실측, DNS 전제 문서화**:
+     - `.github/workflows/frontend.yml`:
+       - TLS 1.1: `openssl s_client -tls1_1 -cipher 'DEFAULT:@SECLEVEL=0'`을 사용하여 클라이언트 제약을 풀고 서버 측 alert 거부 실측.
+       - CSP: `security-headers.conf` 정본과 전체 문자열 일치 단언.
+       - SSE: 목 서버에서 2초 지연을 두고, 클라이언트가 `--max-time 1.2` 내에 첫 이벤트를 즉시 수신하는지 검증 (`proxy_buffering off` 실측).
+       - CI 롤백 단계: 2회차 `portal-up.sh`를 기동하여 롤백 발동 및 이전 정상 컨테이너 복원 실측.
+       - README: 내부 DNS 미구성 환경을 위한 `PORTAL_ADD_HOSTS` 문서화.
+  5. **R5-L1 [테스트 격리] Windows Git Bash dev certs 수정 및 임시 cert 디렉터리 격리**:
+     - `generate-dev-certs.sh`: `req.cnf` 서브셸 생성 방식을 적용하여 `MSYS_NO_PATHCONV=1` 없이 Linux 및 Windows Git Bash 양쪽 완벽 지원.
+     - `portal-smoke-up.sh`: `PORTAL_DEV_CERTS_DIR` 지원, smoke 테스트 시 임시 디렉터리로 격리하여 소스 트리 오염 원천 차단.
+  6. **R5-L2 [빌드 명세] Dockerfile 패키지 버전 제약 문구 정정**:
+     - `Dockerfile` 내 `'curl>=8' 'openssl>=3'` 주석을 "하한 제약(minimum version constraints)"으로 정정하고 빌드 변이는 최종 Docker config Image ID(.Id)로 봉인됨을 명시.
+  7. **R5-L3 [문서 정정 및 stub 가드] 과장 문구 정정 및 Fake Docker Stub PATH 강제**:
+     - '무중단 swap' -> '안전 컨테이너 교체 (이전 컨테이너 정지 및 새 컨테이너 기동 간 짧은 전환 간격 존재)' 정정.
+     - Fake docker 테스트 시작 시 `command -v docker`가 stub 경로인지 assert하여 호스트 바이너리 폴스루 원천 차단.
+     - 라벨 오기(R4-H1/R4-L4) 정정.
+     - Codex r5 config Image ID(`PORTAL_IMAGE_ID`) 개명 및 승인 출처 계약 명시.
 - **독립 검토 r4 조치 (Codex 계약·보안 축 + Claude UI·운영 축 '변경 요청' 전수 반영)**:
   1. **R4-H1 [핵심/보안] 비밀키 0400 권한 엄격 강제 및 PORTAL_GID != 0 강제**:
      - `stat -c '%a'` 실측을 통해 비밀키 퍼미션 모드가 정확히 `0400`이어야만 실행 허용 (chmod를 통한 임의 변경 금지, 0644/0440/0600 등 fail-closed 즉시 거부).
@@ -150,16 +184,22 @@ deploy/intranet/portal/
     38. `test_behavioral_fake_docker_smoke_non_matching_owner_labels_preserved`: smoke 비소유 라벨 컨테이너 미접촉 행동 검증.
     39. `test_behavioral_environment_key_mode_fail_closed`: 비밀키 퍼미션 모드 0400 엄격 fail-closed 검증 (R4-H1).
     40. `test_behavioral_environment_root_gid_rejected`: PORTAL_GID=0 기동 거부 검증 (R4-H1).
-    41. `test_behavioral_fake_docker_swap_https_probe_failure_triggers_rollback`: 컨테이너 swap 사후 HTTPS 프로브 실패 시 자동 롤백 및 이전 컨테이너 복원 실측 (R4-M1, R4-H2-u).
-    42. `test_behavioral_fake_docker_staging_index_html_probe_failure`: staging index.html 프로브 실패 시 cleanup trap 실측 (R4-H2-o).
-    43. `test_behavioral_environment_key_owner_mismatch_rejected`: 키 파일 소유자 UID 불일치 fail-closed 실측 (R4-H2-t).
-    44. `test_behavioral_pki_leaf_signed_by_different_ca_fails`: 외래 CA 서명 리프 체인 검증 거부 실측 (R4-H2-d).
-    45. `test_behavioral_fake_docker_instance_mismatch_preserved`: instance 불일치 컨테이너 미접촉 보존 실측 (R4-H2-e).
-    46. `test_behavioral_environment_upstream_mismatch_independent_fail`: upstream 불일치 독립 fail-closed 실측 (R4-H2-h).
-    47. `test_portal_up_sh_no_cap_add_net_bind_service`: portal-up.sh 내 NET_BIND_SERVICE 부재 단언 (R4-L2).
-    48. `test_portal_smoke_up_sh_no_cap_add_net_bind_service`: portal-smoke-up.sh 내 NET_BIND_SERVICE 부재 단언 (R4-L2).
+    41. `test_behavioral_fake_docker_staging_index_html_probe_failure`: staging index.html 프로브 실패 시 cleanup trap 실측 (R4-H2-o).
+    42. `test_behavioral_environment_key_owner_mismatch_rejected`: 키 파일 소유자 UID 불일치 fail-closed 실측 (R4-H2-t).
+    43. `test_behavioral_pki_leaf_signed_by_different_ca_fails`: 외래 CA 서명 리프 체인 검증 거부 실측 (R4-H2-d).
+    44. `test_behavioral_fake_docker_instance_mismatch_preserved`: instance 불일치 컨테이너 미접촉 보존 실측 (R4-H2-e).
+    45. `test_behavioral_environment_upstream_mismatch_independent_fail`: upstream 불일치 독립 fail-closed 실측 (R4-H2-h).
+    46. `test_portal_up_sh_no_cap_add_net_bind_service`: portal-up.sh 내 NET_BIND_SERVICE 부재 단언 (R4-L2).
+    47. `test_portal_smoke_up_sh_no_cap_add_net_bind_service`: portal-smoke-up.sh 내 NET_BIND_SERVICE 부재 단언 (R4-L2).
+    48. `test_behavioral_image_id_mismatch_different_image_with_same_tag_rejected`: 동일 태그 다른 이미지 ID 기동 거부 실측 (Codex r5).
+    49. `test_behavioral_fake_docker_swap_docker_run_failure_triggers_rollback`: swap 중 docker run 실패(exit 125/포트 충돌) 시 자동 롤백 및 백업 복원 실측 (R5-H1).
+    50. `test_behavioral_fake_docker_swap_not_running_triggers_rollback`: State.Running=false 시 롤백 및 백업 복원 실측 (R5-M2, Mutation R6).
+    51. `test_behavioral_fake_docker_swap_healthz_probe_failure_triggers_rollback`: /healthz 프로브 실패 시 롤백 및 백업 복원 실측 (R5-M2, Mutation u).
+    52. `test_behavioral_fake_docker_swap_index_probe_failure_triggers_rollback`: /index.html 프로브 실패 시 롤백 및 백업 복원 실측 (R5-M2, Mutation R4).
+    53. `test_behavioral_fake_docker_swap_auth_config_probe_failure_triggers_rollback`: /auth-config.js 프로브 실패 시 롤백 및 백업 복원 실측 (R5-M2, Mutation R5).
+- **단위/통합 테스트 전수 통과 실측**: `pytest tests/test_intranet_portal_deploy.py` **53 passed (100%)**.
 - **Docker 라벨 인벤토리 검증 점검**: `pytest tests/test_cleanup_owned_docker_label_inventory.py` 통과 (포털 서비스 메타데이터 라벨 `service`, `workload`, `role`, `instance` 4종을 `NON_CLEANUP_LABELS`로 정확히 분류, 1 passed exit 0).
-- **Stub 실행 스크립트 실행 권한 보정**: `tests/test_intranet_portal_deploy.py` 내 임시 생성되는 stub 스크립트(`bin/stat`, `bin/docker`) 10곳에 대해 `os.chmod(..., 0o755)`를 명시적으로 부여하여 Linux CI 환경에서 비실행 파일 취급으로 인한 호스트 실제 바이너리(/usr/bin/docker, /usr/bin/stat) 폴스루 및 1001 runner UID 불일치 오류 원천 차단.
+- **Stub 실행 스크립트 실행 권한 보정 및 가드**: `tests/test_intranet_portal_deploy.py` 내 임시 생성되는 stub 스크립트(`bin/stat`, `bin/docker`)에 대해 `os.chmod(..., 0o755)`를 부여하고, fake docker 테스트 시작 시 `command -v docker`가 stub 경로인지 assert하여 호스트 바이너리 폴스루 원천 차단.
 - **스크립트 구문 점검**: `bash -n` 4대 셸 스크립트 전원 문법 오류 0건 (exit 0).
 - **TypeScript 타입 점검**: `npx tsc -b` 에러 **0건**.
 - **프로덕션 번들 빌드**: `npm run build` 성공 (Vite bundle).
@@ -175,4 +215,4 @@ deploy/intranet/portal/
 - **노드2 배포 상태**:
   - Leaf 인증서: 노드2 전달 완료 (`DELIVERED_NOT_ACTIVATED`).
   - 활성화 조건: 제어 평면 `allowed_origins`에 `https://portal.sv.lan` 등록 후 `portal-up.sh` 기동.
-- **독립 검토 요청**: Claude (UI·운영 축) 및 Codex (계약·보안 축) r4 재검토 요청.
+- **독립 검토 요청**: Claude (UI·운영 축) 및 Codex (계약·보안 축) r5 재검토 요청.

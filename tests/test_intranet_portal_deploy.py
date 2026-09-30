@@ -296,8 +296,8 @@ def test_portal_up_sh_mandatory_root_ca_allowlist():
 
 def test_portal_up_sh_mandatory_image_digest():
     content = read_file(PORTAL_UP_SH)
-    # Mandatory image digest check (R3-M1)
-    assert 'PORTAL_IMAGE_DIGEST is mandatory in production' in content
+    # Mandatory image ID check (Codex r5 / R3-M1)
+    assert 'PORTAL_IMAGE_ID is mandatory in production' in content
     assert 'TARGET_IMAGE="$resolved_id"' in content
 
 
@@ -498,7 +498,8 @@ def run_pki_func(env: dict, func_name: str, overrides: dict) -> subprocess.Compl
     default_ca = f"{posix_temp}/ca-bundle.crt"
     default_cert = f"{posix_temp}/server-chain.pem"
     default_key = f"{posix_temp}/server-key.pem"
-    digest_default = "sha256:" + "a" * 64
+    id_default = "sha256:" + "a" * 64
+    image_id_val = overrides.get("PORTAL_IMAGE_ID", overrides.get("PORTAL_IMAGE_DIGEST", id_default))
     script_lines = [
         f'source "{env["portal_up"]}"',
         f'STATE_DIR="{posix_temp}/state_{func_name}"',
@@ -510,7 +511,8 @@ def run_pki_func(env: dict, func_name: str, overrides: dict) -> subprocess.Compl
         f'PORTAL_UID="{overrides.get("PORTAL_UID", "1000")}"',
         f'PORTAL_GID="{overrides.get("PORTAL_GID", "1000")}"',
         f'UPSTREAM_CP_HOST="{overrides.get("UPSTREAM_CP_HOST", "cp.sv.lan:443")}"',
-        f'PORTAL_IMAGE_DIGEST="{overrides.get("PORTAL_IMAGE_DIGEST", digest_default)}"',
+        f'PORTAL_IMAGE_ID="{image_id_val}"',
+        f'PORTAL_IMAGE_DIGEST="{image_id_val}"',
         func_name,
     ]
     return subprocess.run(
@@ -681,9 +683,56 @@ fi
 
 
 def test_behavioral_image_digest_mandatory_rejected(pki_test_env):
-    res = run_pki_func(pki_test_env, "validate_image_and_digest", {"PORTAL_IMAGE_DIGEST": ""})
+    res = run_pki_func(pki_test_env, "validate_image_and_digest", {"PORTAL_IMAGE_ID": "", "PORTAL_IMAGE_DIGEST": ""})
     assert res.returncode == 1
-    assert "PORTAL_IMAGE_DIGEST is mandatory in production" in res.stderr
+    assert "PORTAL_IMAGE_ID is mandatory in production" in res.stderr
+
+def test_behavioral_image_id_mismatch_different_image_with_same_tag_rejected():
+    """(Codex r5 & Coordinator) Verify that a target image whose config .Id does NOT match approved PORTAL_IMAGE_ID is rejected."""
+    bash_path = get_git_bash()
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_image_id_mismatch_test_"))
+    bin_dir = temp_dir / "bin"
+    bin_dir.mkdir(parents=True, exist_ok=True)
+
+    approved_id = "sha256:" + "1" * 64
+    actual_id = "sha256:" + "2" * 64
+
+    docker_stub = f"""#!/usr/bin/env bash
+if [[ "$1" == "image" && "$2" == "inspect" ]]; then
+    if [[ "$*" == *"--format"* ]]; then
+        echo "{actual_id}"
+    fi
+    exit 0
+fi
+exit 0
+"""
+    (bin_dir / "docker").write_text(docker_stub.replace("\r\n", "\n"), encoding="utf-8")
+    os.chmod(bin_dir / "docker", 0o755)
+
+    test_sh = f"""
+    export PATH="{to_posix_path(bin_dir)}:$PATH"
+    if [[ "$(command -v docker)" != "{to_posix_path(bin_dir)}/docker" ]]; then
+        echo "ERROR: docker resolved to $(command -v docker) instead of stub" >&2
+        exit 99
+    fi
+    source "{to_posix_path(PORTAL_UP_SH)}"
+    IMAGE_NAME="saintvision-portal:latest"
+    PORTAL_IMAGE_ID="{approved_id}"
+    validate_image_and_id
+    """
+    res = subprocess.run(
+        [bash_path, "-c", test_sh],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    assert res.returncode == 1, f"Expected Image ID mismatch to fail, got {res.returncode}: {res.stdout}"
+    assert "Image ID mismatch" in res.stderr
+    assert f"Expected {approved_id}, got {actual_id}" in res.stderr
+
+    shutil.rmtree(temp_dir, ignore_errors=True)
+
 
 
 # =========================================================================
@@ -732,6 +781,10 @@ fi
 
     test_sh = f"""
     export PATH="{to_posix_path(bin_dir)}:$PATH"
+    if [[ "$(command -v docker)" != "{to_posix_path(bin_dir)}/docker" ]]; then
+        echo "ERROR: docker resolved to $(command -v docker) instead of stub" >&2
+        exit 99
+    fi
     source "{to_posix_path(PORTAL_UP_SH)}"
     TARGET_IMAGE="sha256:0000000000000000000000000000000000000000000000000000000000000000"
     CERT_FILE_ABS="/tmp/cert"
@@ -810,6 +863,10 @@ fi
 
     test_sh = f"""
     export PATH="{to_posix_path(bin_dir)}:$PATH"
+    if [[ "$(command -v docker)" != "{to_posix_path(bin_dir)}/docker" ]]; then
+        echo "ERROR: docker resolved to $(command -v docker) instead of stub" >&2
+        exit 99
+    fi
     source "{to_posix_path(PORTAL_UP_SH)}"
     TARGET_IMAGE="sha256:0000000000000000000000000000000000000000000000000000000000000000"
     CERT_FILE_ABS="/tmp/cert"
@@ -861,6 +918,10 @@ fi
 
     test_sh = f"""
     export PATH="{to_posix_path(bin_dir)}:$PATH"
+    if [[ "$(command -v docker)" != "{to_posix_path(bin_dir)}/docker" ]]; then
+        echo "ERROR: docker resolved to $(command -v docker) instead of stub" >&2
+        exit 99
+    fi
     source "{to_posix_path(PORTAL_UP_SH)}"
     TARGET_IMAGE="sha256:0000000000000000000000000000000000000000000000000000000000000000"
     CERT_FILE_ABS="/tmp/cert"
@@ -929,6 +990,11 @@ fi
 
     test_sh = f"""
     export PATH="{to_posix_path(bin_dir)}:$PATH"
+    if [[ "$(command -v docker)" != "{to_posix_path(bin_dir)}/docker" ]]; then
+        echo "ERROR: docker resolved to $(command -v docker) instead of stub" >&2
+        exit 99
+    fi
+    export PORTAL_DEV_CERTS_DIR="{to_posix_path(temp_dir / 'certs')}"
     bash "{to_posix_path(PORTAL_SMOKE_UP_SH)}"
     """
 
@@ -1002,6 +1068,10 @@ fi
 
     test_sh = f"""
     export PATH="{to_posix_path(bin_dir)}:$PATH"
+    if [[ "$(command -v docker)" != "{to_posix_path(bin_dir)}/docker" ]]; then
+        echo "ERROR: docker resolved to $(command -v docker) instead of stub" >&2
+        exit 99
+    fi
     source "{to_posix_path(PORTAL_UP_SH)}"
     TARGET_IMAGE="sha256:0000000000000000000000000000000000000000000000000000000000000000"
     CERT_FILE_ABS="/tmp/cert"
@@ -1134,6 +1204,10 @@ fi
 
     test_sh = f"""
     export PATH="{to_posix_path(bin_dir)}:$PATH"
+    if [[ "$(command -v docker)" != "{to_posix_path(bin_dir)}/docker" ]]; then
+        echo "ERROR: docker resolved to $(command -v docker) instead of stub" >&2
+        exit 99
+    fi
     source "{to_posix_path(PORTAL_UP_SH)}"
     TARGET_IMAGE="sha256:0000000000000000000000000000000000000000000000000000000000000000"
     CERT_FILE_ABS="/tmp/cert"
@@ -1212,10 +1286,182 @@ fi
     shutil.rmtree(temp_dir, ignore_errors=True)
 
 
-def test_behavioral_fake_docker_swap_https_probe_failure_triggers_rollback():
-    """(Mutation u & R4-M1) Verify that swap post-launch HTTPS probe failure initiates rollback and restores previous container."""
+def _run_swap_rollback_harness(bin_dir, calls_log, bash_path, temp_dir):
+    test_sh = f"""
+    export PATH="{to_posix_path(bin_dir)}:$PATH"
+    if [[ "$(command -v docker)" != "{to_posix_path(bin_dir)}/docker" ]]; then
+        echo "ERROR: docker resolved to $(command -v docker) instead of stub" >&2
+        exit 99
+    fi
+    source "{to_posix_path(PORTAL_UP_SH)}"
+    TARGET_IMAGE="sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    CERT_FILE_ABS="/tmp/cert"
+    KEY_FILE_ABS="/tmp/key"
+    CA_BUNDLE_ABS="/tmp/ca"
+    UPSTREAM_CONF_ABS="/tmp/up"
+    swap_and_launch_production
+    """
+    res = subprocess.run(
+        [bash_path, "-c", test_sh],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    calls = calls_log.read_text(encoding="utf-8") if calls_log.exists() else ""
+    return res, calls
+
+
+def _assert_exact_rollback_sequence(calls):
+    m = re.search(r"docker rename saintvision-portal (saintvision-portal-backup-\S+)", calls)
+    assert m, f"Initial backup rename missing in calls: {calls}"
+    backup_name = m.group(1)
+
+    assert f"docker stop {backup_name}" in calls
+    assert "docker stop saintvision-portal" in calls
+    assert "docker rm -f saintvision-portal" in calls
+    assert f"docker start {backup_name}" in calls
+    assert f"docker rename {backup_name} saintvision-portal" in calls
+
+    stop_broken_idx = calls.find("docker stop saintvision-portal")
+    rm_broken_idx = calls.find("docker rm -f saintvision-portal")
+    start_backup_idx = calls.find(f"docker start {backup_name}")
+    rename_backup_idx = calls.find(f"docker rename {backup_name} saintvision-portal")
+
+    assert 0 <= stop_broken_idx < rm_broken_idx < start_backup_idx < rename_backup_idx, (
+        f"Invalid rollback sequence ordering in calls: {calls}"
+    )
+
+
+def test_behavioral_fake_docker_swap_docker_run_failure_triggers_rollback():
+    """(R5-H1) Verify that when production docker run fails (exit 125, port conflict), backup is restored and running."""
     bash_path = get_git_bash()
-    temp_dir = Path(tempfile.mkdtemp(prefix="sv_fake_docker_swap_rollback_test_"))
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_fake_docker_run_fail_"))
+    bin_dir = temp_dir / "bin"
+    bin_dir.mkdir(parents=True, exist_ok=True)
+    calls_log = temp_dir / "calls.log"
+
+    docker_stub = f"""#!/usr/bin/env bash
+cmd="$1"
+shift
+echo "docker $cmd $*" >> "{to_posix_path(calls_log)}"
+if [[ "$cmd" == "container" && "$1" == "inspect" ]]; then
+    exit 0
+elif [[ "$cmd" == "inspect" ]]; then
+    while [[ $# -gt 0 ]]; do
+        if [[ "$1" == "--format" ]]; then
+            fmt="$2"
+            shift 2
+        else
+            shift
+        fi
+    done
+    if [[ "$fmt" == *ai.saintvision.service* ]]; then
+        echo "portal"
+    elif [[ "$fmt" == *ai.saintvision.workload* ]]; then
+        echo "intranet-portal"
+    elif [[ "$fmt" == *ai.saintvision.node* ]]; then
+        echo "node2"
+    elif [[ "$fmt" == *ai.saintvision.instance* ]]; then
+        echo "main"
+    elif [[ "$fmt" == *State.Running* ]]; then
+        echo "true"
+    elif [[ "$fmt" == *RestartCount* ]]; then
+        echo "0"
+    else
+        echo "true"
+    fi
+    exit 0
+elif [[ "$cmd" == "run" ]]; then
+    echo "docker: Error response from daemon: driver failed programming external connectivity on endpoint: Bind for 0.0.0.0:8443 failed: port is already allocated." >&2
+    exit 125
+elif [[ "$cmd" == "rename" || "$cmd" == "stop" || "$cmd" == "rm" || "$cmd" == "start" ]]; then
+    exit 0
+fi
+exit 0
+"""
+    (bin_dir / "docker").write_text(docker_stub.replace("\r\n", "\n"), encoding="utf-8")
+    os.chmod(bin_dir / "docker", 0o755)
+
+    res, calls = _run_swap_rollback_harness(bin_dir, calls_log, bash_path, temp_dir)
+    assert res.returncode == 1, f"Expected swap failure on docker run exit 125, got {res.returncode}: {res.stdout}"
+    assert "Failed to run production container. Initiating automatic rollback..." in res.stderr
+    assert "Rollback complete: previous production container restored and running." in res.stderr
+
+    _assert_exact_rollback_sequence(calls)
+    shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_behavioral_fake_docker_swap_not_running_triggers_rollback():
+    """(Mutation R6) Verify that when production container fails to enter running state, rollback is triggered and backup restored."""
+    bash_path = get_git_bash()
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_fake_docker_not_running_"))
+    bin_dir = temp_dir / "bin"
+    bin_dir.mkdir(parents=True, exist_ok=True)
+    calls_log = temp_dir / "calls.log"
+
+    docker_stub = f"""#!/usr/bin/env bash
+cmd="$1"
+shift
+echo "docker $cmd $*" >> "{to_posix_path(calls_log)}"
+if [[ "$cmd" == "container" && "$1" == "inspect" ]]; then
+    exit 0
+elif [[ "$cmd" == "inspect" ]]; then
+    while [[ $# -gt 0 ]]; do
+        if [[ "$1" == "--format" ]]; then
+            fmt="$2"
+            shift 2
+        else
+            shift
+        fi
+    done
+    if [[ "$fmt" == *ai.saintvision.service* ]]; then
+        echo "portal"
+    elif [[ "$fmt" == *ai.saintvision.workload* ]]; then
+        echo "intranet-portal"
+    elif [[ "$fmt" == *ai.saintvision.node* ]]; then
+        echo "node2"
+    elif [[ "$fmt" == *ai.saintvision.instance* ]]; then
+        echo "main"
+    elif [[ "$fmt" == *State.Running* ]]; then
+        # Return false for the newly launched container to trigger not-running rollback
+        if [[ -f "{to_posix_path(temp_dir)}/restored" ]]; then
+            echo "true"
+        else
+            echo "false"
+        fi
+    elif [[ "$fmt" == *RestartCount* ]]; then
+        echo "0"
+    else
+        echo "true"
+    fi
+    exit 0
+elif [[ "$cmd" == "rename" ]]; then
+    if [[ "$*" == *" saintvision-portal" ]]; then
+        touch "{to_posix_path(temp_dir)}/restored"
+    fi
+    exit 0
+elif [[ "$cmd" == "stop" || "$cmd" == "run" || "$cmd" == "rm" || "$cmd" == "start" ]]; then
+    exit 0
+fi
+exit 0
+"""
+    (bin_dir / "docker").write_text(docker_stub.replace("\r\n", "\n"), encoding="utf-8")
+    os.chmod(bin_dir / "docker", 0o755)
+
+    res, calls = _run_swap_rollback_harness(bin_dir, calls_log, bash_path, temp_dir)
+    assert res.returncode == 1, f"Expected swap failure on not-running state, got {res.returncode}: {res.stdout}"
+    assert "failed to enter running state" in res.stderr
+    assert "Rollback complete: previous production container restored and running." in res.stderr
+
+    _assert_exact_rollback_sequence(calls)
+    shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_behavioral_fake_docker_swap_healthz_probe_failure_triggers_rollback():
+    """(Mutation u) Verify that when /healthz HTTPS probe fails in production, rollback is triggered and backup restored."""
+    bash_path = get_git_bash()
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_fake_docker_healthz_fail_"))
     bin_dir = temp_dir / "bin"
     bin_dir.mkdir(parents=True, exist_ok=True)
     calls_log = temp_dir / "calls.log"
@@ -1252,44 +1498,150 @@ elif [[ "$cmd" == "inspect" ]]; then
     fi
     exit 0
 elif [[ "$cmd" == "exec" ]]; then
-    echo "Simulated failure of docker exec curl /healthz" >&2
-    exit 1
+    cmdline="$*"
+    if [[ "$cmdline" == *healthz* ]]; then
+        echo "Simulated 503 Service Unavailable on /healthz" >&2
+        exit 1
+    fi
+    exit 0
 elif [[ "$cmd" == "rename" || "$cmd" == "stop" || "$cmd" == "run" || "$cmd" == "rm" || "$cmd" == "start" ]]; then
     exit 0
 fi
+exit 0
 """
     (bin_dir / "docker").write_text(docker_stub.replace("\r\n", "\n"), encoding="utf-8")
     os.chmod(bin_dir / "docker", 0o755)
 
-    test_sh = f"""
-    export PATH="{to_posix_path(bin_dir)}:$PATH"
-    source "{to_posix_path(PORTAL_UP_SH)}"
-    TARGET_IMAGE="sha256:0000000000000000000000000000000000000000000000000000000000000000"
-    CERT_FILE_ABS="/tmp/cert"
-    KEY_FILE_ABS="/tmp/key"
-    CA_BUNDLE_ABS="/tmp/ca"
-    UPSTREAM_CONF_ABS="/tmp/up"
-    swap_and_launch_production
-    """
-
-    res = subprocess.run(
-        [bash_path, "-c", test_sh],
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-    )
-    assert res.returncode == 1, f"Expected swap_and_launch_production to fail on probe failure, got {res.returncode}: {res.stdout}"
+    res, calls = _run_swap_rollback_harness(bin_dir, calls_log, bash_path, temp_dir)
+    assert res.returncode == 1, f"Expected swap failure on healthz probe failure, got {res.returncode}: {res.stdout}"
     assert "Production verified HTTPS /healthz failed." in res.stderr
     assert "Rollback complete: previous production container restored and running." in res.stderr
 
-    calls = calls_log.read_text(encoding="utf-8") if calls_log.exists() else ""
-    assert "docker rename saintvision-portal saintvision-portal-backup-" in calls
-    assert "docker stop saintvision-portal-backup-" in calls
-    assert "docker run -d --name saintvision-portal" in calls
-    assert "docker stop saintvision-portal" in calls
-    assert "docker rm -f saintvision-portal" in calls
-    assert "docker start saintvision-portal-backup-" in calls
-    assert "docker rename saintvision-portal-backup-" in calls
+    _assert_exact_rollback_sequence(calls)
+    shutil.rmtree(temp_dir, ignore_errors=True)
 
+
+def test_behavioral_fake_docker_swap_index_probe_failure_triggers_rollback():
+    """(Mutation R4) Verify that when /index.html HTTPS probe fails in production (/healthz passing), rollback is triggered and backup restored."""
+    bash_path = get_git_bash()
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_fake_docker_index_fail_"))
+    bin_dir = temp_dir / "bin"
+    bin_dir.mkdir(parents=True, exist_ok=True)
+    calls_log = temp_dir / "calls.log"
+
+    docker_stub = f"""#!/usr/bin/env bash
+cmd="$1"
+shift
+echo "docker $cmd $*" >> "{to_posix_path(calls_log)}"
+if [[ "$cmd" == "container" && "$1" == "inspect" ]]; then
+    exit 0
+elif [[ "$cmd" == "inspect" ]]; then
+    while [[ $# -gt 0 ]]; do
+        if [[ "$1" == "--format" ]]; then
+            fmt="$2"
+            shift 2
+        else
+            shift
+        fi
+    done
+    if [[ "$fmt" == *ai.saintvision.service* ]]; then
+        echo "portal"
+    elif [[ "$fmt" == *ai.saintvision.workload* ]]; then
+        echo "intranet-portal"
+    elif [[ "$fmt" == *ai.saintvision.node* ]]; then
+        echo "node2"
+    elif [[ "$fmt" == *ai.saintvision.instance* ]]; then
+        echo "main"
+    elif [[ "$fmt" == *State.Running* ]]; then
+        echo "true"
+    elif [[ "$fmt" == *RestartCount* ]]; then
+        echo "0"
+    else
+        echo "true"
+    fi
+    exit 0
+elif [[ "$cmd" == "exec" ]]; then
+    cmdline="$*"
+    if [[ "$cmdline" == *index.html* ]]; then
+        echo "Simulated 500 Internal Server Error on /index.html" >&2
+        exit 1
+    fi
+    exit 0
+elif [[ "$cmd" == "rename" || "$cmd" == "stop" || "$cmd" == "run" || "$cmd" == "rm" || "$cmd" == "start" ]]; then
+    exit 0
+fi
+exit 0
+"""
+    (bin_dir / "docker").write_text(docker_stub.replace("\r\n", "\n"), encoding="utf-8")
+    os.chmod(bin_dir / "docker", 0o755)
+
+    res, calls = _run_swap_rollback_harness(bin_dir, calls_log, bash_path, temp_dir)
+    assert res.returncode == 1, f"Expected swap failure on index.html probe failure, got {res.returncode}: {res.stdout}"
+    assert "Production verified HTTPS /index.html failed." in res.stderr
+    assert "Rollback complete: previous production container restored and running." in res.stderr
+
+    _assert_exact_rollback_sequence(calls)
+    shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_behavioral_fake_docker_swap_auth_config_probe_failure_triggers_rollback():
+    """(Mutation R5) Verify that when /auth-config.js HTTPS probe fails in production (/healthz & /index.html passing), rollback is triggered and backup restored."""
+    bash_path = get_git_bash()
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_fake_docker_auth_fail_"))
+    bin_dir = temp_dir / "bin"
+    bin_dir.mkdir(parents=True, exist_ok=True)
+    calls_log = temp_dir / "calls.log"
+
+    docker_stub = f"""#!/usr/bin/env bash
+cmd="$1"
+shift
+echo "docker $cmd $*" >> "{to_posix_path(calls_log)}"
+if [[ "$cmd" == "container" && "$1" == "inspect" ]]; then
+    exit 0
+elif [[ "$cmd" == "inspect" ]]; then
+    while [[ $# -gt 0 ]]; do
+        if [[ "$1" == "--format" ]]; then
+            fmt="$2"
+            shift 2
+        else
+            shift
+        fi
+    done
+    if [[ "$fmt" == *ai.saintvision.service* ]]; then
+        echo "portal"
+    elif [[ "$fmt" == *ai.saintvision.workload* ]]; then
+        echo "intranet-portal"
+    elif [[ "$fmt" == *ai.saintvision.node* ]]; then
+        echo "node2"
+    elif [[ "$fmt" == *ai.saintvision.instance* ]]; then
+        echo "main"
+    elif [[ "$fmt" == *State.Running* ]]; then
+        echo "true"
+    elif [[ "$fmt" == *RestartCount* ]]; then
+        echo "0"
+    else
+        echo "true"
+    fi
+    exit 0
+elif [[ "$cmd" == "exec" ]]; then
+    cmdline="$*"
+    if [[ "$cmdline" == *auth-config.js* ]]; then
+        echo "Simulated 502 Bad Gateway on /auth-config.js" >&2
+        exit 1
+    fi
+    exit 0
+elif [[ "$cmd" == "rename" || "$cmd" == "stop" || "$cmd" == "run" || "$cmd" == "rm" || "$cmd" == "start" ]]; then
+    exit 0
+fi
+exit 0
+"""
+    (bin_dir / "docker").write_text(docker_stub.replace("\r\n", "\n"), encoding="utf-8")
+    os.chmod(bin_dir / "docker", 0o755)
+
+    res, calls = _run_swap_rollback_harness(bin_dir, calls_log, bash_path, temp_dir)
+    assert res.returncode == 1, f"Expected swap failure on auth-config.js probe failure, got {res.returncode}: {res.stdout}"
+    assert "Production verified HTTPS /auth-config.js failed." in res.stderr
+    assert "Rollback complete: previous production container restored and running." in res.stderr
+
+    _assert_exact_rollback_sequence(calls)
     shutil.rmtree(temp_dir, ignore_errors=True)

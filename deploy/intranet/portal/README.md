@@ -106,21 +106,31 @@ DOCKER_BUILDKIT=1 docker build -f deploy/intranet/portal/Dockerfile -t saintvisi
 # 필수 1: 업스트림 제어 평면 호스트 지정 (cp.sv.lan:443 고정)
 export PORTAL_UPSTREAM_CP_HOST="cp.sv.lan:443"
 
-# 필수 2: 승인된 불변 이미지 digest (sha256:64hex)
-# 주의: 로컬의 가변 태그(:latest)에서 임의 추출하는 것이 아니라,
-# 승인된 CI 빌드 아티팩트 서명 기록 또는 릴리스 거버넌스 승인 문서(Evidence)에 등록된
-# 불변 OCI Image Digest(sha256:64hex)를 주입해야 합니다.
-export PORTAL_IMAGE_DIGEST="sha256:<approved-oci-image-digest-from-ci-release-evidence>"
+# 필수 2: 승인된 불변 이미지 ID (IMAGE ID, sha256:64hex config ID)
+# 승인 출처 계약 (사내망 폐쇄망 registry 부재에 따른 단일 계약):
+# - 승인 출처: Hosted CI 파이프라인에서 빌드한 이미지를 `docker save`한 tarball을 아티팩트로 등록하고,
+#   그 tarball의 SHA-256 및 Docker config Image ID(.Id, sha256:64hex)를 커밋 SHA와 결속된 릴리스 증거(Evidence JSON)에 기록합니다.
+# - 노드2 운영 배포 절차: 노드2에서 전달받은 tarball SHA-256 검증 -> `docker load` -> `docker image inspect --format '{{.Id}}'` 결과가
+#   릴리스 증거에 봉인된 PORTAL_IMAGE_ID와 일치해야만 기동이 승인됩니다.
+# - 주의: 로컬 임의 재빌드로 생성된 Image ID는 승인 출처 값이 아니므로 운영 기동이 엄격히 거부됩니다.
+export PORTAL_IMAGE_ID="sha256:<approved-image-id-from-release-evidence>"
 
-# 필수 3: Card 150/151 사내 루트 CA 지문 allowlist (콜론/공백 무관, 소문자 정규화 비교)
-# #249 / #251 사내망 PKI 런북 및 거버넌스 승인 공개 루트 CA 지문 예시:
-export PORTAL_ALLOWED_ROOT_FINGERPRINTS="92455f1b778130334da43b0eee977357b5ae498eb1005bc29ecc6c3afb7192ba"
+# 필수 3: Card 150/151 사내 루트 CA DER 지문 allowlist (콜론/공백 무관, 소문자 정규화 비교)
+# 주의: 번들 파일 해시(trustBundleDigestSHA256)가 아닌, 루트 CA 인증서 자체의 SHA-256 DER 지문이어야 합니다 (R5-M1).
+# 산출 명령: openssl x509 -in root-ca.crt -noout -fingerprint -sha256 | sed 's/.*=//; s/://g' | tr '[:upper:]' '[:lower:]'
+export PORTAL_ALLOWED_ROOT_FINGERPRINTS="<64-hex-root-ca-der-fingerprint>"
+
+# 선택: 사내망 내부 DNS 미구성 또는 스테이징/테스트 환경용 호스트 매핑 (컨테이너 --add-host 주입, R4-H1 / R5-M3)
+# 컨테이너 내부에서 업스트림 제어 평면(cp.sv.lan)과 IdP(idp.sv.lan)를 해석할 수 있도록 IP를 지정합니다.
+export PORTAL_ADD_HOSTS="cp.sv.lan:192.168.1.10 idp.sv.lan:192.168.1.11"
 
 # 인증서 디렉터리 지정 (기본값: deploy/intranet/portal/certs)
 # 요구 파일: server-chain.pem (0600), server-key.pem (0400), ca-bundle.crt
 export PORTAL_CERTS_DIR="/path/to/certs"
 
 # 컨테이너 실행 (호스트 사용자 UID 매핑, B2 방식)
+# 스테이징 사전 검증(preflight staging) 통과 후 기존 컨테이너를 백업으로 보존하며 안전 교체(swap)를 진행합니다.
+# 교체 후 docker run 실패 또는 HTTPS 프로브 실패 시 즉시 이전 백업 컨테이너로 자동 롤백(rollback)되어 복원됩니다.
 PORTAL_UID="$(id -u)" PORTAL_GID="$(id -g)" bash deploy/intranet/portal/portal-up.sh
 ```
 

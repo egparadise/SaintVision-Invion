@@ -107,6 +107,38 @@ validate_environment() {
     mkdir -p "$STATE_DIR"
     chmod 0700 "$STATE_DIR"
 
+    # 5. Preflight port collision check (R5-H1)
+    # Check if target host ports are already bound by another container (excluding our current target container)
+    if command -v docker >/dev/null 2>&1; then
+        local cur_cid=""
+        if docker container inspect "$CONTAINER_NAME" >/dev/null 2>&1; then
+            cur_cid=$(docker inspect --format '{{.Id}}' "$CONTAINER_NAME" 2>/dev/null || true)
+        fi
+
+        local p_occupants
+        p_occupants=$(docker ps -q --filter "publish=${HTTP_PORT}" 2>/dev/null || true)
+        for occupant in $p_occupants; do
+            if [[ -n "$cur_cid" && "$occupant" == "$cur_cid"* ]]; then
+                continue
+            fi
+            local occ_name
+            occ_name=$(docker inspect --format '{{.Name}}' "$occupant" 2>/dev/null | sed -e 's|^/||' || echo "$occupant")
+            echo "ERROR: HTTP port $HTTP_PORT is already occupied by container '$occ_name'." >&2
+            return 1
+        done
+
+        p_occupants=$(docker ps -q --filter "publish=${HTTPS_PORT}" 2>/dev/null || true)
+        for occupant in $p_occupants; do
+            if [[ -n "$cur_cid" && "$occupant" == "$cur_cid"* ]]; then
+                continue
+            fi
+            local occ_name
+            occ_name=$(docker inspect --format '{{.Name}}' "$occupant" 2>/dev/null | sed -e 's|^/||' || echo "$occupant")
+            echo "ERROR: HTTPS port $HTTPS_PORT is already occupied by container '$occ_name'." >&2
+            return 1
+        done
+    fi
+
     return 0
 }
 
@@ -267,14 +299,17 @@ validate_leaf_certificate() {
     return 0
 }
 
-validate_image_and_digest() {
-    # Mandatory image digest requirement (R3-M1)
-    if [[ -z "${PORTAL_IMAGE_DIGEST:-}" ]]; then
-        echo "ERROR: PORTAL_IMAGE_DIGEST is mandatory in production (fail-closed, provenance enforcement)." >&2
+validate_image_and_id() {
+    # Resolve PORTAL_IMAGE_ID (with backward-compatible fallback to PORTAL_IMAGE_DIGEST)
+    PORTAL_IMAGE_ID="${PORTAL_IMAGE_ID:-${PORTAL_IMAGE_DIGEST:-}}"
+
+    # Mandatory image ID requirement (Codex r5 & Coordinator decision)
+    if [[ -z "${PORTAL_IMAGE_ID:-}" ]]; then
+        echo "ERROR: PORTAL_IMAGE_ID is mandatory in production (fail-closed, image ID provenance enforcement)." >&2
         return 1
     fi
-    if [[ ! "$PORTAL_IMAGE_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]]; then
-        echo "ERROR: PORTAL_IMAGE_DIGEST must be a valid 64-hex sha256 digest." >&2
+    if [[ ! "$PORTAL_IMAGE_ID" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+        echo "ERROR: PORTAL_IMAGE_ID must be a valid 64-hex sha256 Docker config image ID (prefixed with 'sha256:')." >&2
         return 1
     fi
 
@@ -286,13 +321,18 @@ validate_image_and_digest() {
 
     local resolved_id
     resolved_id=$(docker image inspect --format '{{.Id}}' "$IMAGE_NAME" 2>/dev/null || true)
-    if [[ "$resolved_id" != "$PORTAL_IMAGE_DIGEST" ]]; then
-        echo "ERROR: Image ID mismatch. Expected $PORTAL_IMAGE_DIGEST, got $resolved_id." >&2
+    if [[ "$resolved_id" != "$PORTAL_IMAGE_ID" ]]; then
+        echo "ERROR: Image ID mismatch. Expected $PORTAL_IMAGE_ID, got $resolved_id." >&2
         return 1
     fi
 
     TARGET_IMAGE="$resolved_id"
     return 0
+}
+
+# Alias for backward compatibility
+validate_image_and_digest() {
+    validate_image_and_id "$@"
 }
 
 validate_owner_tuple() {
@@ -446,6 +486,32 @@ run_staging_preflight() {
 
 swap_and_launch_production() {
     local backup_name=""
+
+    rollback_production() {
+        trap - INT TERM
+        echo "CRITICAL: Production verification failed. Initiating automatic rollback..." >&2
+        docker stop "$CONTAINER_NAME" >/dev/null 2>&1 || true
+        docker rm -f "$CONTAINER_NAME" >/dev/null 2>&1 || true
+        if [[ -n "$backup_name" ]] && docker inspect "$backup_name" >/dev/null 2>&1; then
+            echo "Restoring previous production container from '$backup_name'..." >&2
+            if docker start "$backup_name" >/dev/null 2>&1 && \
+               docker rename "$backup_name" "$CONTAINER_NAME" >/dev/null 2>&1; then
+                local rb_running
+                rb_running=$(docker inspect --format '{{.State.Running}}' "$CONTAINER_NAME" 2>/dev/null || echo "false")
+                if [[ "$rb_running" == "true" ]]; then
+                    echo "Rollback complete: previous production container restored and running." >&2
+                else
+                    echo "ERROR: Previous production container restored but failed to enter running state." >&2
+                fi
+            else
+                echo "ERROR: Failed to restart and rename backup container '$backup_name'." >&2
+            fi
+        else
+            echo "No previous production container backup available; broken container removed." >&2
+        fi
+        return 1
+    }
+
     # Owner Label 4-Tuple Verification and Safe Container Replacement (R4-M1)
     if docker container inspect "$CONTAINER_NAME" >/dev/null 2>&1; then
         if ! validate_owner_tuple "$CONTAINER_NAME" "portal" "intranet-portal" "node2" "$PORTAL_INSTANCE"; then
@@ -459,9 +525,10 @@ swap_and_launch_production() {
         echo "Preserving existing container '$CONTAINER_NAME' as backup '$backup_name'..."
         docker rename "$CONTAINER_NAME" "$backup_name"
         docker stop "$backup_name" >/dev/null
+        trap rollback_production INT TERM
     fi
 
-    # Clean up only stopped/exited containers matching the exact 4-tuple (excluding our active backup)
+    # Clean up only stopped/exited containers matching the exact 4-tuple (excluding our active backup and any prior backups)
     local stale_ids
     stale_ids=$(docker ps -aq \
         --filter "status=exited" \
@@ -473,7 +540,8 @@ swap_and_launch_production() {
         for sid in $stale_ids; do
             local sname
             sname=$(docker inspect --format '{{.Name}}' "$sid" 2>/dev/null | sed -e 's|^/||' || true)
-            if [[ -n "$backup_name" && "$sname" == "$backup_name" ]]; then
+            if [[ "$sname" == *"-backup-"* ]]; then
+                echo "Preserving backup container '$sname'; skipping automated cleanup." >&2
                 continue
             fi
             docker rm "$sid" >/dev/null 2>&1 || true
@@ -487,7 +555,7 @@ swap_and_launch_production() {
         done
     fi
 
-    docker run -d \
+    if [[ "${PORTAL_TEST_TRIGGER_ROLLBACK:-}" == "run_fail" ]] || ! docker run -d \
         --name "$CONTAINER_NAME" \
         --label "${LABEL_SERVICE}" \
         --label "${LABEL_WORKLOAD}" \
@@ -509,22 +577,11 @@ swap_and_launch_production() {
         --mount "type=bind,source=${KEY_FILE_ABS},target=/etc/nginx/certs/portal.key,readonly" \
         --mount "type=bind,source=${CA_BUNDLE_ABS},target=/etc/nginx/certs/ca-bundle.crt,readonly" \
         --mount "type=bind,source=${UPSTREAM_CONF_ABS},target=/etc/nginx/conf.d/upstream.conf,readonly" \
-        "$TARGET_IMAGE"
-
-    rollback_production() {
-        echo "CRITICAL: Production verification failed. Initiating automatic rollback..." >&2
-        docker stop "$CONTAINER_NAME" >/dev/null 2>&1 || true
-        docker rm -f "$CONTAINER_NAME" >/dev/null 2>&1 || true
-        if [[ -n "$backup_name" ]] && docker inspect "$backup_name" >/dev/null 2>&1; then
-            echo "Restoring previous production container from '$backup_name'..." >&2
-            docker start "$backup_name" >/dev/null 2>&1 || true
-            docker rename "$backup_name" "$CONTAINER_NAME" >/dev/null 2>&1 || true
-            echo "Rollback complete: previous production container restored and running." >&2
-        else
-            echo "No previous production container backup available; broken container removed." >&2
-        fi
+        "$TARGET_IMAGE"; then
+        echo "ERROR: Failed to run production container. Initiating automatic rollback..." >&2
+        rollback_production
         return 1
-    }
+    fi
 
     echo "Verifying production container status and stability..."
     local running="false"
@@ -558,6 +615,12 @@ swap_and_launch_production() {
     if [[ "$restart_count_after" -ne 0 ]]; then
         echo "ERROR: Portal container crashed during startup stabilization ($restart_count_after restarts)." >&2
         docker logs "$CONTAINER_NAME" 2>&1 || true
+        rollback_production
+        return 1
+    fi
+
+    if [[ "${PORTAL_TEST_TRIGGER_ROLLBACK:-}" == "probe_fail" ]]; then
+        echo "TEST HOOK: Simulating production probe failure..." >&2
         rollback_production
         return 1
     fi
@@ -596,6 +659,9 @@ swap_and_launch_production() {
         return 1
     fi
 
+    # Disarm swap rollback trap upon successful production launch and verification
+    trap - INT TERM
+
     # Only remove preserved backup container after all production probes succeed! (R4-M1)
     if [[ -n "$backup_name" ]] && docker inspect "$backup_name" >/dev/null 2>&1; then
         echo "Removing preserved backup container '$backup_name' after verified deployment..."
@@ -622,7 +688,7 @@ main() {
     prepare_upstream_config
     validate_ca_bundle_and_allowlist
     validate_leaf_certificate
-    validate_image_and_digest
+    validate_image_and_id
 
     CERT_FILE_ABS="$(cd -- "$(dirname -- "$CERT_FILE")" && pwd)/$(basename -- "$CERT_FILE")"
     KEY_FILE_ABS="$(cd -- "$(dirname -- "$KEY_FILE")" && pwd)/$(basename -- "$KEY_FILE")"
