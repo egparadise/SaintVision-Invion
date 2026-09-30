@@ -1,11 +1,11 @@
 ---
 doc_id: "CLAUDE-DONE-CRITERIA-S04DB-S08DB-001"
 title: "S04-DB·S08-DB 운영 판정 기준 — 재전송은 코드가 이미 안전하게 만들었고 보존은 코드가 선언만 했다: 코드가 보장할 수 없는 것만 관측·계측·사전 등록 임계치로 고정한다 (카드 108, docs-only)"
-version: "1.2.1"
+version: "1.3.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-29T10:37:39+09:00"
+updated: "2026-09-30T12:17:56+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "96a03486"
@@ -20,6 +20,22 @@ tags: ["done-criteria", "s04-db", "s08-db", "operational-acceptance", "retransmi
 분석 tree는 **`96a03486`**(`origin/coord/train-ci-2305`, 병합 목록 합성 commit)이고, 인용한 경로·줄은 그 tree에서 `git show`·`git grep -n`으로 확인했다. PR base(`integration/all-agents-unified`, `1e8baf04`)가 아니라 합성 commit을 고른 이유는 재채점이 S08-DB의 결속으로 든 `tests/core/test_canonical_denial_audit.py`·`tests/core/test_audit_action.py`가 base에는 없고 합성 commit에만 있기 때문이다(base에서 `git show`가 실패함을 확인했다). 그 밖의 인용은 두 tree에서 같다.
 
 재채점 문서는 **wiki link가 아니라 평문(PR 번호·파일 경로)으로** 인용한다 — 병합 대기 문서를 wiki link로 두면 그것이 없는 branch에서 `check_docs`가 깨진다.
+
+### v1.3 — CARD-159 core 취소 이력 producer와 운영 coverage 경계
+
+core C1의 마지막 코드 공백이던 취소 이력 producer를
+`src/saintvision/services/runs.py`의 `cancel_run` transaction에 둔다. 첫
+non-terminal → `cancelled` 전이만 `run.cancel.requested`/`allow` audit 1행을
+같이 기록하고, 이미 취소된 replay는 중복 행을 만들지 않는다. audit insert가
+실패하면 상태 전이도 rollback되어야 한다. collector와 producer는 이 exact action
+문자열을 시험으로 결속하며 `LIKE 'run.cancel%'`로 범위를 넓히지 않는다.
+
+다만 source tree에 producer가 있다는 사실만으로 운영 target이 그 tree를 배포했고
+과거 모든 attempt가 producer 활성화 뒤에 생성됐다고 볼 수 없다. 따라서 producer
+코드와 hosted 제품 시험이 green이어도, 배포 SHA·활성 시각·관측 창을 독립 입력으로
+결속하기 전 clean C1은 **`RECORDED_ONLY`**다. 위반이 있으면 즉시
+`MEASURED_FAIL`, row가 없으면 `NOT_OBSERVED`이고, 이 카드만으로
+`MEASURED_PASS`는 만들지 않는다.
 
 ### v1.1 — Codex 1차 검토(head `85b66da0`) 반영: 관측하지 않은 안전성을 PASS로 만들 수 있던 판정 경계 5곳
 
@@ -193,6 +209,7 @@ tags: ["done-criteria", "s04-db", "s08-db", "operational-acceptance", "retransmi
 | T9 | O6의 처분이 **감사되는 command**를 거친다 | `failed` 행을 raw `UPDATE`로 `pending`으로 되돌린 fixture는 audit 행이 없으므로 "처분됨"으로 집계되면 실패 — break-glass 관찰로만 남아야 한다 |
 | T10 | O4의 증거에 **raw `Idempotency-Key`가 없다** | 증거 파일에서 요청 header 원문이 발견되면 실패; fingerprint는 salt 없이 재계산되지 않아야 한다 |
 | T11 | O2의 "정확히 1회"가 **E1의 event type별 effect identity**로 센다 | 등록되지 않은 event type을 "효과 0 = 정상"으로 집계하면 실패 — 미등록은 관측 제외다 |
+| T12 | core 취소 상태와 정본 audit가 **같은 transaction에서 정확히 한 번** 기록된다 | 첫 취소에서 `run.cancel.requested` 행이 없거나 둘 이상이면 실패, replay가 행을 늘리면 실패, audit insert 오류 뒤 run이 `cancelled`로 남으면 실패한다. collector의 action literal을 바꾸거나 prefix `LIKE`로 넓히는 변이도 producer 상수와의 exact-binding 시험에서 실패한다 |
 
 ## 6. 경계 · 미해결
 
@@ -201,7 +218,7 @@ tags: ["done-criteria", "s04-db", "s08-db", "operational-acceptance", "retransmi
 - **접근 로그 생산자를 둘지는 이 문서가 정하지 않는다.** O4·O9는 그것 없이 probe·fingerprint로 성립하도록 좁혔다. 두면 무엇을 남기고 무엇을 남기지 않는지(header 원문 금지)가 먼저다.
 - **O8′의 DB 감사 로그/change feed는 인프라 결정**이다(pgaudit·logical replication slot 등). 어느 쪽이든 그 feed의 무결성(gap 0)이 O8′의 전제다.
 - **C1의 취소 조건은 `runs.state`의 이력이 필요하다.** `runs`는 현재 상태만 갖고 전이 이력은 `audit_events`·evidence에 있으므로, C1 구현은 attempt 시작 시각과 취소 audit 행의 시각을 비교한다. 이력이 없는 run은 판정 불가로 기록하고 pass로 세지 않는다.
-- **core에는 취소 이력의 정본 producer가 없다(v1.2, collector #237 검토에서 확정).** `git grep`으로 `src/saintvision` 전체의 `record_event(action=…)`를 모으면 `cancel`을 담은 action이 0개이고, kernel의 `inv.run.cancel_requested`는 kernel 자기 테이블에만 남아 `public.audit_events`로 오지 않는다. 따라서 C1 (d)는 지금 **항상 판정 불가**다 — collector는 `cancelHistorySource: absent`를 명시하고, (a)~(c) 위반이 있으면 `MEASURED_FAIL`, 없으면 `MEASURED_PASS`가 아니라 **`NOT_OBSERVED`**로 내린다. O3 `MEASURED_PASS`는 core 취소 audit producer(별 카드, action 이름을 SQL·fixture가 공유) 또는 C1-K 결속 뒤에만 가능하다. producer가 생기면 실패하는 시험(`src`에 `run.cancel` 문자열 부재 단언)이 이 경계를 지킨다.
+- **core 취소 이력 producer는 CARD-159에서 등록한다(v1.3).** `cancel_run`의 첫 상태 전이와 `public.audit_events.action='run.cancel.requested'`를 같은 transaction에 결속하고 replay 중복을 금지한다. 그러나 source tree의 구현은 운영 배포·과거 row coverage와 다르다. collector는 `cancelHistorySource: public.audit_events:run.cancel.requested`와 `cancelHistoryBindingStatus: RECORDED_ONLY`를 명시하고, (a)~(d)가 깨끗해도 배포 SHA·활성 시각·관측 창 결속 전에는 O3를 `RECORDED_ONLY`로 내린다. 위반은 `MEASURED_FAIL`, row 부재는 `NOT_OBSERVED`이며, CARD-159은 clean 결과를 `MEASURED_PASS`로 만들지 않는다.
 - **관측 상태 어휘(v1.2).** collector가 쓰는 상태는 `MEASURED_PASS`·`MEASURED_FAIL`·`NOT_OBSERVED`·`NOT_REGISTERED`·`BLOCKED_EXTERNAL`·**`RECORDED_ONLY`** 여섯이다. `RECORDED_ONLY`는 "집계는 깨끗하지만 독립 producer/배포 identity가 결속되지 않아 done 증거로 세지 않는 값"(O1의 publisher/consumer 미배포 상태)이며 PASS로 승격되지 않는다. 전체 verdict는 O1~O13 전부 `MEASURED_PASS`일 때만 `PASS`다.
 - **C1은 core 경계만이다(Codex 2차).** kernel `inv.approval_requests`의 recovery epoch·bound run version·dispatch/execution 기록 대조(C1-K)와 stale epoch 부정 fixture는 **이 문서가 정의하지 않는다.** 전체 제품 경계의 "승인 우회 0"은 C1 + C1-K 둘 다 있어야 하고, C1-K는 kernel owner의 별 카드다.
 - **D1~D5는 이 문서가 정하지 않는다.** 코드가 지금 가진 숫자를 적었을 뿐이고, 그 숫자를 결정으로 승격하는 것은 owner의 일이다.
