@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-VFCL-NEXT-CARD-REGISTRY-2026-09-30"
-title: "VF-CL 다음 카드 선택과 registry 정정 — 외부 전제 없는 가장 앞 카드를 고르려고 registry를 착지 tree와 대조했더니, 구현측 blocker 중 하나는 이미 닫혀 있었고 하나는 이미 병합된 PR을 기다리고 있었다. 정정하고, 같은 방식으로 다시 낡지 않도록 재도출 검사기를 붙였다. v1.1에서 검토가 두 가지를 더 찾았다 — restore drill은 **처음부터 hosted CI에서 측정되고 있었고**(exact-SHA run 36521298082, 0 skip · 20 passed) 제가 두 번 연속 외부 전제로 적었다, 그리고 검사기가 **형식만 봐서** registry를 거짓으로 만드는 편집 네 가지가 통과했다"
-version: "1.1.0"
+title: "VF-CL 다음 카드 선택과 registry 정정 — 외부 전제 없는 가장 앞 카드를 고르려고 registry를 착지 tree와 대조했더니, 구현측 blocker 중 하나는 이미 닫혀 있었고 하나는 이미 병합된 PR을 기다리고 있었다. 정정하고, 같은 방식으로 다시 낡지 않도록 재도출 검사기를 붙였다. v1.1에서 검토가 두 가지를 더 찾았다 — restore drill은 **처음부터 hosted CI에서 측정되고 있었고**(exact-SHA run 36521298082, 0 skip · 20 passed) 제가 두 번 연속 외부 전제로 적었다, 그리고 검사기가 **형식만 봐서** registry를 거짓으로 만드는 편집 네 가지가 통과했다. v1.2에서 두 건을 더 닫았다 — 규칙 6이 파일 경로와 blocker 문장을 비교해서 **실제로 썼던 그 blocker 문자열을 그대로 다시 넣으면 통과**했고, 파이썬에서 `False == 0`이라 `acceptedCards: false`가 지적 0건이었다"
+version: "1.2.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 audience: "user"
-updated: "2026-09-30T11:09:34+09:00"
+updated: "2026-09-30T12:10:08+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "6fc0428b"
@@ -125,6 +125,26 @@ drill 자체는 그 run에서 **ci-verified다.** 그래서 이 boolean이 false
 
 manifest에 아무것도 주장하지 않는 항목(`impliesImplemented: null`)은 **`why`를 반드시 적는다.** VF-CL-05가 그 경우다 — 검토 카드의 산출물은 문서이고, 파일 이름을 찾는 check는 **아무것도 단언하지 않으면서 검증된 것처럼 읽힌다.** 없는 것보다 나쁘므로, 주장하지 않는다고 적었다.
 
+### 5-1. 규칙 6이 잡지 못한 것 (v1.2)
+
+규칙 6은 `localUnmeasured.what`을 열린 blocker와 비교했다. **`what`은 파일 경로이고 blocker는 그것에 대한 문장이다.** 그래서 제가 실제로 썼던
+
+```
+restore-drill-19-skips-need-CX01_CONTAINER-17-and-INV_TEST_ARCHIVER_IMAGE-2
+```
+
+를 **그대로 다시 넣으면 어느 것과도 일치하지 않아 통과했다.** 검토가 그것을 재현했다. 즉 제가 두 번 한 실수를 막으려고 만든 규칙이 **그 실수의 실제 문자열은 막지 못했다.**
+
+manifest에 카드별 **`forbiddenBlockers`** — 정정이 **폐기한 blocker id 전부** — 를 두고, 그중 하나라도 열려 있으면 drift로 본다. **manifest에 두는 이유**: 자기가 말하면 안 되는 것의 목록을 스스로 편집할 수 있는 파일은 그 말을 못 하게 된 것이 아니다. `localUnmeasured`에는 `blockerIdsThisReplaces`를 두고 **manifest가 뒷받침하지 않는 id를 주장할 수 없게** 했다 — registry가 자기 면제증을 발급하지 못한다.
+
+VF-CL-04의 폐기 목록은 넷이다: `...-until-pr-126`(v1.1), `...-need-CX01_CONTAINER-17-...`(v1.2), `...-are-an-external-precondition`, `retention-and-readiness-tools-not-wired-to-any-operational-gate`.
+
+### 5-2. `False == 0` (v1.2)
+
+`acceptedCards: false`가 **지적 0건**이었다 — 파이썬에서 `False == 0`이고 인수된 카드가 0개였으므로 **숫자가 맞았다.** 그리고 `operationallyAccepted: 1`은 `is True`가 아니므로 **인수 개수에 세어지지 않으면서** 사람에게는 인수된 것으로 읽힌다. 양쪽 다 아무 말도 하지 않았다.
+
+이제 bool 필드는 `type(x) is bool`, count는 `type(x) is int`로 본다 — `type(True) is int`가 거짓이므로 이 한 줄이 양쪽을 덮는다.
+
 ## 6. 다시 낡지 않게 — `tools/check_vf_cl_registry.py`
 
 **아무것도 이 파일을 검사하지 않았다.** 그래서 조용히 낡었다. 재도출 검사기를 붙였고 규칙은 셋이다.
@@ -143,9 +163,10 @@ manifest에 아무것도 주장하지 않는 항목(`impliesImplemented: null`)�
 
 | 확인 | 결과 |
 |---|---|
-| 검사기 부정 시험 | `tests/core/test_check_vf_cl_registry.py` **54 passed**(v1.0은 32. 로컬, 단일 파일 — 메모리 여유가 작아 전체 suite는 hosted CI 몫) |
+| 검사기 부정 시험 | `tests/core/test_check_vf_cl_registry.py` **86 passed**(v1.1 54, v1.0 32) — 이하 v1.1 기준 서술은 v1.2에서 아래 행으로 갱신됐다. 원래 기록: **54 passed**(v1.0은 32. 로컬, 단일 파일 — 메모리 여유가 작아 전체 suite는 hosted CI 몫) |
 | 정정된 registry | `tools/check_vf_cl_registry.py` **exit 0** |
 | 정정 전 registry | 다섯 drift 부류 **전부 잡힘** |
+| **검토가 준 편집 11종 (v1.2)** | 착지된 실제 registry 파일에 하나씩 적용해 **전부 잡힌다** — 앞의 6종에 **폐기된 v1.2 문자열 그대로**(exit 1) · **폐기된 v1.1 문자열**(exit 1, `#126` 규칙도 함께 발화) · `acceptedCards: false`(exit 1) · `operationallyAccepted: 1`(exit 1) · **local gap이 자기 폐기 목록을 비움**(exit 1). 적용 후 registry·manifest를 원본과 byte 단위로 대조했다 |
 | **검토가 준 편집 6종** | **착지된 실제 registry 파일에** 하나씩 적용해 **전부 잡히는 것**을 확인했다 — `acceptedCards: 5`(exit 1) · 전 카드 인수(exit 1, 12건 지적) · VF-CL-03 되돌림(exit 1, `implemented`·열림·기록 삭제 3건) · retention blocker 재개방(exit 1) · drill을 다시 외부 전제로(exit 1) · **manifest 삭제(exit 2)**. 적용 후 두 파일을 원본과 **byte 단위로 대조**했다 |
 | 시험이 찾아 준 제 결함 | `implemented: 1`이 통과했다 — `1 in (True, False, "partial")`이 파이썬에서 **참**이다. identity 비교로 고쳤다 |
 | VF-CL-03 요청 경로 | 파일 존재·adapter 호출·`register(router)` mount·projects router의 model-registry 경로 **6개** 확인 |

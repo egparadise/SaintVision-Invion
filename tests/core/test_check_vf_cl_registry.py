@@ -26,6 +26,11 @@ import pytest
 from tools import check_vf_cl_registry as checker
 
 
+#: The blocker this project actually carried, verbatim. The regression Codex found is that
+#: this exact string went back in as an open blocker and nothing objected.
+RETIRED = "restore-drill-19-skips-need-CX01_CONTAINER-17-and-INV_TEST_ARCHIVER_IMAGE-2"
+
+
 def registry(tmp_path, **overrides):
     """A registry that agrees with a tiny tree built under tmp_path."""
     (tmp_path / "src").mkdir(exist_ok=True)
@@ -80,6 +85,7 @@ def manifest(**overrides):
         "cards": {
             "VF-CL-0X": {
                 "impliesImplemented": True,
+                "forbiddenBlockers": [RETIRED],
                 "checks": [{"kind": "path-exists", "path": "src/route.py"}],
                 "closedBlockers": {
                     "the-request-path-was-missing": [
@@ -112,6 +118,17 @@ def audit(document, tmp_path, manifest_document=None):
 
 def checks_for(manifest_document, blocker="the-request-path-was-missing"):
     return manifest_document["cards"]["VF-CL-0X"]["closedBlockers"][blocker]
+
+
+def local_gap(**overrides):
+    gap = {
+        "what": "tests/integration/test_recovery_drill.py",
+        "condition": "no CX01 container on this workstation",
+        "measuredIn": "hosted Core run 36521298082 at 6fc0428b: 0 skips, 20 passed",
+        "blockerIdsThisReplaces": [RETIRED],
+    }
+    gap.update(overrides)
+    return gap
 
 
 def test_a_registry_that_matches_the_tree_reports_nothing(tmp_path):
@@ -498,11 +515,7 @@ def test_a_local_gap_filed_as_a_blocker_is_reported(tmp_path):
     document = registry(tmp_path)
     card = document["cards"][0]
     card["blockers"] = ["tests/integration/test_recovery_drill.py"]
-    card["localUnmeasured"] = [{
-        "what": "tests/integration/test_recovery_drill.py",
-        "condition": "no CX01 container on this workstation",
-        "measuredIn": "hosted Core run 36521298082 at 6fc0428b: 0 skips, 20 passed",
-    }]
+    card["localUnmeasured"] = [local_gap()]
     findings = audit(document, tmp_path)
     assert any("both a local gap and a blocker" in finding for finding in findings), findings
 
@@ -518,11 +531,7 @@ def test_a_local_gap_must_say_where_it_is_measured(tmp_path):
 
 def test_a_local_gap_that_names_where_it_is_measured_is_accepted(tmp_path):
     document = registry(tmp_path)
-    document["cards"][0]["localUnmeasured"] = [{
-        "what": "tests/integration/test_recovery_drill.py",
-        "condition": "no CX01 container on this workstation",
-        "measuredIn": "hosted Core run 36521298082 at 6fc0428b: 0 skips, 20 passed",
-    }]
+    document["cards"][0]["localUnmeasured"] = [local_gap()]
     assert audit(document, tmp_path) == []
 
 
@@ -544,3 +553,110 @@ def test_the_shipped_registry_records_the_hosted_run_that_closed_the_drill():
                if entry["what"].endswith("test_recovery_drill.py"))
     assert "36521298082" in gap["measuredIn"]
     assert "collect_s12_acceptance_evidence.py" in four["ciVerifiedNote"]
+
+
+# --- Codex r2 F1: the exact string that went back in unnoticed --------------------
+
+
+def test_the_exact_retired_blocker_string_cannot_come_back(tmp_path):
+    """The regression, verbatim.
+
+    Rule 6 compared the gap's subject -- a file path -- against blocker text, so putting
+    the real retired sentence back as an open blocker matched nothing and passed. The
+    manifest now names the retired ids, and the registry cannot edit that list.
+    """
+    document = registry(tmp_path)
+    card = document["cards"][0]
+    card["blockers"] = [RETIRED]
+    card["localUnmeasured"] = [local_gap()]
+    findings = audit(document, tmp_path)
+    assert any(f"{RETIRED} was retired by a correction and is open again" in finding
+               for finding in findings), findings
+    assert any("is still open" in finding for finding in findings), findings
+
+
+def test_a_retired_blocker_is_caught_without_any_local_gap_recorded(tmp_path):
+    """Deleting the gap must not delete the prohibition: the manifest holds it."""
+    document = registry(tmp_path)
+    document["cards"][0]["blockers"] = [RETIRED]
+    document["cards"][0].pop("localUnmeasured", None)
+    findings = audit(document, tmp_path)
+    assert any("was retired by a correction and is open again" in finding
+               for finding in findings), findings
+
+
+def test_a_local_gap_must_say_which_blocker_ids_it_replaced(tmp_path):
+    document = registry(tmp_path)
+    document["cards"][0]["localUnmeasured"] = [local_gap(blockerIdsThisReplaces=[])]
+    findings = audit(document, tmp_path)
+    assert any("does not say which blocker ids it replaced" in finding
+               for finding in findings), findings
+
+
+def test_a_local_gap_cannot_claim_a_retirement_the_manifest_does_not_record(tmp_path):
+    """Otherwise the registry writes its own permission slip."""
+    document = registry(tmp_path)
+    document["cards"][0]["localUnmeasured"] = [
+        local_gap(blockerIdsThisReplaces=["something-i-decided-was-retired"])
+    ]
+    findings = audit(document, tmp_path)
+    assert any("which the manifest does not list as retired" in finding
+               for finding in findings), findings
+
+
+@pytest.mark.parametrize("value", [["id", 7], "not-a-list", [""], [None]])
+def test_a_manifest_forbidden_list_that_is_not_ids_is_unusable(tmp_path, value):
+    document = registry(tmp_path)
+    odd = manifest()
+    odd["cards"]["VF-CL-0X"]["forbiddenBlockers"] = value
+    with pytest.raises(checker.RegistryUnusable, match="forbiddenBlockers"):
+        audit(document, tmp_path, odd)
+
+
+# --- Codex r2 F2: True is 1 and False is 0 ---------------------------------------
+
+
+@pytest.mark.parametrize("value", [False, True, "5", None, 5.0])
+def test_a_count_that_is_not_a_whole_number_is_reported(tmp_path, value):
+    """`acceptedCards: false` compared equal to the count 0 and produced no findings."""
+    document = registry(tmp_path)
+    document["acceptedCards"] = value
+    findings = audit(document, tmp_path)
+    assert any("acceptedCards is" in finding and "not a whole number" in finding
+               for finding in findings), findings
+
+
+def test_a_denominator_that_is_a_boolean_is_reported(tmp_path):
+    document = registry(tmp_path)
+    document["acceptanceDenominator"] = True
+    findings = audit(document, tmp_path)
+    assert any("acceptanceDenominator is True" in finding for finding in findings), findings
+
+
+@pytest.mark.parametrize("field", checker.BOOLEAN_FIELDS)
+@pytest.mark.parametrize("value", [1, 0, "true", None])
+def test_a_state_field_that_is_not_a_boolean_is_reported(tmp_path, field, value):
+    """`operationallyAccepted: 1` is not True by identity, so it was never counted as
+    accepted -- while reading as accepted to a person. Neither half objected."""
+    document = registry(tmp_path)
+    document["cards"][0][field] = value
+    findings = audit(document, tmp_path)
+    assert any(f"{field} is {value!r}, which is not true or false" in finding
+               for finding in findings), findings
+
+
+def test_the_booleans_the_registry_ships_are_booleans():
+    document = json.loads(checker.DEFAULT_REGISTRY.read_text(encoding="utf-8"))
+    for field in checker.COUNT_FIELDS:
+        assert type(document[field]) is int, field
+    for card in document["cards"]:
+        for field in checker.BOOLEAN_FIELDS:
+            assert type(card[field]) is bool, f"{card['id']}.{field}"
+
+
+def test_the_shipped_registry_records_which_ids_its_local_gap_retired():
+    document = json.loads(checker.DEFAULT_REGISTRY.read_text(encoding="utf-8"))
+    four = next(card for card in document["cards"] if card["id"] == "VF-CL-04")
+    replaced = four["localUnmeasured"][0]["blockerIdsThisReplaces"]
+    assert RETIRED in replaced
+    assert "restore-drill-19-setup-skips-in-hosted-core-until-pr-126" in replaced

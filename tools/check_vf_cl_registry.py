@@ -53,6 +53,15 @@ Six rules:
    The restore drill was filed as an external precondition when it was measured in hosted
    CI all along -- that is the mistake this rule exists for.
 
+   Comparing the gap's subject against blocker text was not enough. The subject is a file
+   path and the blocker was a sentence about it, so re-inserting the exact retired string
+   ``restore-drill-19-skips-need-CX01_CONTAINER-17-and-INV_TEST_ARCHIVER_IMAGE-2`` matched
+   nothing and passed. The manifest therefore names ``forbiddenBlockers`` per card -- every
+   id a correction retired -- and any of them open again is drift. It lives in the manifest
+   because a file that can edit the list of things it may not say has not been stopped from
+   saying them. Each gap also lists ``blockerIdsThisReplaces``, which must be backed by
+   that list, so the registry cannot claim a retirement the manifest does not record.
+
 The check vocabulary is small on purpose -- a large one invites claims nobody verifies:
 
 ``{"kind": "references", "path": ..., "text": ...}``
@@ -93,6 +102,18 @@ CHECK_KINDS = ("references", "absent", "path-exists")
 #: A card may only be called accepted when these hold, or when ``notApplicable`` names the
 #: field and says why. Acceptance is the one claim nobody downstream re-checks.
 ACCEPTANCE_REQUIRES = ("ciVerified", "independentlyReviewed")
+#: Fields that must be exactly booleans, and counts that must be exactly whole numbers.
+#: `True == 1` and `False == 0` in Python, so `acceptedCards: false` compared equal to the
+#: count 0, and `operationallyAccepted: 1` is not `True` by identity, so the card was not
+#: counted as accepted while reading as accepted to a person. Both produced no findings.
+#: `type(True) is int` is False, so comparing by type covers the counts as well.
+BOOLEAN_FIELDS = (
+    "locallyVerified",
+    "ciVerified",
+    "independentlyReviewed",
+    "operationallyAccepted",
+)
+COUNT_FIELDS = ("acceptedCards", "acceptanceDenominator")
 
 
 class RegistryUnusable(ValueError):
@@ -170,6 +191,11 @@ def load_manifest(path: Path, identifiers: list[str]) -> dict:
             raise RegistryUnusable(f"{name} claims implemented={implied!r} with no checks")
         if not isinstance(entry.get("closedBlockers", {}), dict):
             raise RegistryUnusable(f"{name}.closedBlockers must be an object")
+        forbidden = entry.get("forbiddenBlockers", [])
+        if not isinstance(forbidden, list) or not all(
+            isinstance(value, str) and value.strip() for value in forbidden
+        ):
+            raise RegistryUnusable(f"{name}.forbiddenBlockers must be a list of ids")
     return manifest
 
 
@@ -221,17 +247,22 @@ def audit(registry: dict, root: Path, manifest_path: Path = DEFAULT_MANIFEST) ->
             # something else. The numbers may be right; they are not about here.
             findings.append(f"verifiedAgainst.tree {tree} is not an ancestor of HEAD")
 
+    for field in COUNT_FIELDS:
+        value = registry.get(field)
+        if type(value) is not int:
+            findings.append(f"{field} is {value!r}, which is not a whole number")
+
     accepted = [card for card in registry["cards"]
                 if card.get("operationallyAccepted") is True]
     declared = registry.get("acceptedCards")
-    if declared != len(accepted):
+    if type(declared) is int and declared != len(accepted):
         # Stated rather than counted, this is the one number a reader takes at face value.
         findings.append(
             f"acceptedCards says {declared!r} but {len(accepted)} card(s) are "
             f"operationallyAccepted"
         )
     denominator = registry.get("acceptanceDenominator")
-    if denominator != len(registry["cards"]):
+    if type(denominator) is int and denominator != len(registry["cards"]):
         findings.append(
             f"acceptanceDenominator says {denominator!r} for {len(registry['cards'])} cards"
         )
@@ -247,6 +278,11 @@ def audit(registry: dict, root: Path, manifest_path: Path = DEFAULT_MANIFEST) ->
         for field in STATE_FIELDS:
             if field not in card:
                 findings.append(f"{identifier} does not say {field}")
+        for field in BOOLEAN_FIELDS:
+            if field in card and type(card[field]) is not bool:
+                findings.append(
+                    f"{identifier}.{field} is {card[field]!r}, which is not true or false"
+                )
         implemented = card.get("implemented")
         # Identity, not equality: `1 in (True, False, "partial")` is True in Python, so
         # a card could say `implemented: 1` and be read as done.
@@ -293,6 +329,11 @@ def audit(registry: dict, root: Path, manifest_path: Path = DEFAULT_MANIFEST) ->
 
         # Rule 6: a local gap is not a blocker.
         open_blockers = [b for b in card.get("blockers") or [] if isinstance(b, str)]
+        forbidden = entry.get("forbiddenBlockers") or []
+        for blocker in sorted(set(forbidden) & set(open_blockers)):
+            findings.append(
+                f"{identifier}: {blocker} was retired by a correction and is open again"
+            )
         for gap in card.get("localUnmeasured") or []:
             if not isinstance(gap, dict):
                 raise RegistryUnusable(f"{identifier} has a localUnmeasured entry that is "
@@ -309,6 +350,28 @@ def audit(registry: dict, root: Path, manifest_path: Path = DEFAULT_MANIFEST) ->
                 findings.append(
                     f"{identifier}: {subject} is filed as both a local gap and a blocker; "
                     f"it is measured in {where}"
+                )
+            # The ids this gap retired. Checked against the manifest, so the registry cannot
+            # shorten its own list of retired blockers, and against the open ones, so a
+            # revival is reported beside the gap it contradicts.
+            replaces = gap.get("blockerIdsThisReplaces")
+            if not isinstance(replaces, list) or not replaces:
+                findings.append(
+                    f"{identifier}: the local gap for {subject} does not say which blocker "
+                    f"ids it replaced"
+                )
+                continue
+            unbacked = sorted(set(replaces) - set(forbidden))
+            if unbacked:
+                findings.append(
+                    f"{identifier}: the local gap for {subject} claims to replace "
+                    f"{', '.join(unbacked)}, which the manifest does not list as retired"
+                )
+            still_open = sorted(set(replaces) & set(open_blockers))
+            if still_open:
+                findings.append(
+                    f"{identifier}: {subject} is recorded as measured in {where} while "
+                    f"{', '.join(still_open)} is still open"
                 )
 
         for blocker in card.get("blockers") or []:
