@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.47"
+version: "1.2.54"
 status: "review"
 author: "Claude"
-updated: "2026-09-29T12:19:52+09:00"
+updated: "2026-09-30T09:48:23+09:00"
 
 
 
@@ -23,6 +23,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+VF-CL 다음 카드 선택과 registry 정정 (Claude, 2026-09-30, base 착지 `6fc0428b`, branch `agent/claude/vf-cl-next`): 로드맵 VF-CL에서 **외부 전제 없는 가장 앞 카드**를 고르려고 registry를 착지 tree와 대조했는데 **고를 카드가 없었다** — 그리고 그 이유가 이 작업이다. 구현측 blocker 넷 중 **하나는 이미 닫혀 있었고 하나는 이미 병합된 PR을 기다린다고 적혀 있었다**. **VF-CL-03** `import-adapter-has-no-request-path-contract`는 닫혀 있다 — `src/saintvision/api/v1/model_release.py`가 `require_exact_declaration(manifest, declared)`를 실제로 호출하고, `projects.py`의 `model_release.register(router)`로 **모듈 import 시점에 `add_api_route`로 mount**되며(그래서 `BusinessDispatch`가 `routes`를 읽을 때 실제로 거기 있다), projects router에 model-registry 경로가 **6개**(등록·verify·retention-pin·release·lineage·dataset-digest) 있다. 설계가 "호출부 0건"이라 적었던 lane 전체가 서 있다. `implemented`를 `partial` → `true`로. **VF-CL-04** `retention-and-readiness-tools-not-wired-to-any-operational-gate`도 닫혀 있다 — `tools/collect_s12_acceptance_evidence.py`가 그 게이트이고 `operational_readiness`·`pitr_readiness`·`pitr_opt_in_dry_run`을 실행해 `pitr-configuration-possible`·`pitr-rehearsal-dry-run-observed`를 이름 있는 관측으로 낸다. retention은 `pitr_opt_in_dry_run`이 `pitr_archive_retention`을 import해 `retention.as_dict()`를 담는 경로로 **그 게이트를 통해 도달**한다. **그리고 `restore-drill-...-until-pr-126`은 사유가 틀렸다 — #126은 `9de490fd`로 병합됐다.** 그 문장을 믿고 기다리면 영원히 기다린다. 로컬 단일 파일로 두 번 돌려 확인했다: DSN 없으면 19 skip(사유 `INV_TEST_ADMIN_DSN`), **DSN을 주면 여전히 19 skip인데 사유가 바뀐다 — `CX01_CONTAINER` 17건 + `INV_TEST_ARCHIVER_IMAGE` 2건**. 숫자가 아니라 사유가 바뀐 것이고 blocker를 그대로 다시 적었다(여전히 열려 있고 여전히 외부 전제다. 다만 무엇을 기다리는지가 이제 맞다). 그 실행에서 17건이 `alembic` 미설치로 error였던 것은 **제 로컬 환경 결함**이고 제품 결함이 아니다 — 설치 후 위 결과가 나왔다. **아무것도 이 registry를 검사하지 않았고 그래서 조용히 낡었다** — `tools/check_vf_cl_registry.py`를 붙였다. 규칙 셋: 모양, **blocker가 이미 병합된 PR을 가리키면 drift**(#126 실수를 일반화한 규칙), **닫힌 blocker는 `checks`로 tree에서 재도출**(산문만 두는 것이 지난 두 항목이 낡은 방식이었다). 검사 어휘는 셋으로 좁히고 모르는 `kind`는 조용히 건너뛰지 않고 **exit 2**다 — 아무도 돌리지 않는 검사는 검사된 것처럼 읽히므로 없는 검사보다 나쁘다. `verifiedAgainst.tree`가 HEAD 조상인지도 본다. **정정 전 registry로 돌려 다섯 drift 부류가 전부 잡히는 것**을 확인했다. 시험 **32 passed**(단일 파일, 전체는 hosted)이고 그 시험이 제 결함을 찾아 줬다 — `implemented: 1`이 통과했다(`1 in (True, False, "partial")`이 파이썬에서 참이다). identity 비교로 고쳤다. **독립 검토 boolean과 그 blocker는 건드리지 않았다** — reviewer 몫이다. 제품 코드·migration 변경 0, sudo 0건. 전문 [[2026-09-30_VF-CL_다음카드_선택과_registry_정정_Claude]]. 다음 첫 행동: Codex 검토.
 
 release route idempotency 카드 113 (Claude, 2026-09-29, base #221 head `2f853a94` stack, branch `agent/claude/release-idempotency`, migration 없음): Codex #219 r4 F1 — `release_model`에 W2/W4와 같은 계약: `Idempotency-Key` 필수(422), `ENDPOINT` 상수, ledger payload `{modelId, version, request}`, 쓰기 tx 안 advisory lock → canApprove → clock 1회 → replay/409 → row lock → canApprove 재확인 → 이미 released 409 → release → audit → 원장 저장. helper 재사용·사본 0, span 2 유지, `get_now` 제거. PG-free 신규 12·기존 62 key 갱신(74 passed), 실 PG 신규 5(같은 key replay·mirror intent 1·409 2종·422·동시 최초 2건), 이웃 241 passed. 판단: 다른 key 재release 409, replay는 kernel GET 뒤, key 검사는 preflight 뒤. 다음 첫 행동: hosted green 인용 → Codex 검토. 전문 [[2026-09-29_G-04_release_idempotency_Claude]].
 

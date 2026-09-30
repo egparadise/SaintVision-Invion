@@ -1,93 +1,201 @@
 {
-  "version": "1.0.0",
-  "source": "ROADMAP-VIRTUAL-COMPUTER-001@1.0.0",
-  "track": "VF-CL",
-  "owner": "Claude",
-  "acceptanceDenominator": 5,
-  "acceptedCards": 0,
-  "cards": [
+ "version": "1.2.0",
+ "source": "ROADMAP-VIRTUAL-COMPUTER-001@1.0.0",
+ "track": "VF-CL",
+ "owner": "Claude",
+ "acceptanceDenominator": 5,
+ "acceptedCards": 0,
+ "cards": [
+  {
+   "id": "VF-CL-01",
+   "title": "Storage catalogue/API and DataLocation reuse",
+   "owner": "Claude",
+   "reviewer": "Codex",
+   "state": "review",
+   "dependsOn": [
+    "VF-CX-02"
+   ],
+   "implemented": true,
+   "locallyVerified": true,
+   "ciVerified": true,
+   "independentlyReviewed": true,
+   "operationallyAccepted": false
+  },
+  {
+   "id": "VF-CL-02",
+   "title": "inv:// resolver and model shard/replica resolution",
+   "owner": "Claude",
+   "reviewer": "Codex",
+   "state": "review",
+   "dependsOn": [
+    "VF-CL-01"
+   ],
+   "implemented": true,
+   "locallyVerified": true,
+   "ciVerified": true,
+   "independentlyReviewed": false,
+   "operationallyAccepted": false,
+   "blockers": [
+    "uri-trailing-and-version-slash-fix-re-review-not-recorded",
+    "c75201af-model-shard-resolution-not-independently-reviewed"
+   ]
+  },
+  {
+   "id": "VF-CL-03",
+   "title": "Model registry, lineage and import adapter",
+   "owner": "Claude",
+   "reviewer": "Codex",
+   "state": "review",
+   "dependsOn": [
+    "VF-CX-02"
+   ],
+   "implemented": true,
+   "locallyVerified": true,
+   "ciVerified": true,
+   "independentlyReviewed": false,
+   "operationallyAccepted": false,
+   "blockers": [
+    "34791448-license-exact-match-adapter-not-independently-reviewed"
+   ],
+   "closedBlockers": [
     {
-      "id": "VF-CL-01",
-      "title": "Storage catalogue/API and DataLocation reuse",
-      "owner": "Claude",
-      "reviewer": "Codex",
-      "state": "review",
-      "dependsOn": ["VF-CX-02"],
-      "implemented": true,
-      "locallyVerified": true,
-      "ciVerified": true,
-      "independentlyReviewed": true,
-      "operationallyAccepted": false
-    },
-    {
-      "id": "VF-CL-02",
-      "title": "inv:// resolver and model shard/replica resolution",
-      "owner": "Claude",
-      "reviewer": "Codex",
-      "state": "review",
-      "dependsOn": ["VF-CL-01"],
-      "implemented": true,
-      "locallyVerified": true,
-      "ciVerified": true,
-      "independentlyReviewed": false,
-      "operationallyAccepted": false,
-      "blockers": [
-        "uri-trailing-and-version-slash-fix-re-review-not-recorded",
-        "c75201af-model-shard-resolution-not-independently-reviewed"
-      ]
-    },
-    {
-      "id": "VF-CL-03",
-      "title": "Model registry, lineage and import adapter",
-      "owner": "Claude",
-      "reviewer": "Codex",
-      "state": "review",
-      "dependsOn": ["VF-CX-02"],
-      "implemented": "partial",
-      "locallyVerified": true,
-      "ciVerified": true,
-      "independentlyReviewed": false,
-      "operationallyAccepted": false,
-      "blockers": [
-        "import-adapter-has-no-request-path-contract",
-        "34791448-license-exact-match-adapter-not-independently-reviewed"
-      ]
-    },
-    {
-      "id": "VF-CL-04",
-      "title": "Replica repair, backup/PITR, metrics and runbook",
-      "owner": "Claude",
-      "reviewer": "Codex",
-      "state": "review",
-      "dependsOn": ["VF-CL-01"],
-      "implemented": true,
-      "locallyVerified": true,
-      "ciVerified": false,
-      "independentlyReviewed": false,
-      "operationallyAccepted": false,
-      "blockers": [
-        "restore-drill-19-setup-skips-in-hosted-core-until-pr-126",
-        "retention-and-readiness-tools-not-wired-to-any-operational-gate",
-        "0043-retained-replicas-pin-fix-re-review-not-recorded",
-        "3e267b05-archive-retention-tool-not-independently-reviewed"
-      ]
-    },
-    {
-      "id": "VF-CL-05",
-      "title": "Independent review of Codex/Gemini outputs",
-      "owner": "Claude",
-      "reviewer": "Codex",
-      "state": "review",
-      "dependsOn": [],
-      "implemented": true,
-      "locallyVerified": true,
-      "ciVerified": false,
-      "independentlyReviewed": false,
-      "operationallyAccepted": false,
-      "notApplicable": [
-        "ciVerified: a review card ships documents, not code CI executes",
-        "independentlyReviewed: this card IS the review function; its own outputs are reviewed per-document by the owner of the reviewed change"
-      ]
+     "blocker": "import-adapter-has-no-request-path-contract",
+     "closedAt": "6fc0428b",
+     "evidence": [
+      "src/saintvision/api/v1/model_release.py exists and line 553 calls require_exact_declaration(manifest, declared) from adapters/model_import.py",
+      "register() mounts the handler with add_api_route on the projects router, so the route object is present when BusinessDispatch reads projects.router.routes",
+      "the projects router carries six model-registry paths at import time: versions, verify, retention-pin, release, lineage, and the dataset-digest lineage read",
+      "src/saintvision/api/problem.py exists, which design v1.2 required for MODEL-0009"
+     ],
+     "checks": [
+      {
+       "kind": "path-exists",
+       "path": "src/saintvision/api/v1/model_release.py"
+      },
+      {
+       "kind": "references",
+       "path": "src/saintvision/api/v1/model_release.py",
+       "text": "from ...adapters.model_import import"
+      },
+      {
+       "kind": "references",
+       "path": "src/saintvision/api/v1/model_release.py",
+       "text": "require_exact_declaration(manifest, declared)"
+      },
+      {
+       "kind": "references",
+       "path": "src/saintvision/api/v1/projects.py",
+       "text": "model_release.register(router)"
+      },
+      {
+       "kind": "path-exists",
+       "path": "src/saintvision/api/problem.py"
+      }
+     ]
     }
-  ]
+   ]
+  },
+  {
+   "id": "VF-CL-04",
+   "title": "Replica repair, backup/PITR, metrics and runbook",
+   "owner": "Claude",
+   "reviewer": "Codex",
+   "state": "review",
+   "dependsOn": [
+    "VF-CL-01"
+   ],
+   "implemented": true,
+   "locallyVerified": true,
+   "ciVerified": false,
+   "independentlyReviewed": false,
+   "operationallyAccepted": false,
+   "blockers": [
+    "restore-drill-19-skips-need-CX01_CONTAINER-17-and-INV_TEST_ARCHIVER_IMAGE-2",
+    "0043-retained-replicas-pin-fix-re-review-not-recorded",
+    "3e267b05-archive-retention-tool-not-independently-reviewed"
+   ],
+   "closedBlockers": [
+    {
+     "blocker": "retention-and-readiness-tools-not-wired-to-any-operational-gate",
+     "closedAt": "6fc0428b",
+     "evidence": [
+      "tools/collect_s12_acceptance_evidence.py is the operational gate: it runs operational_readiness.py, pitr_readiness.py and pitr_opt_in_dry_run.py and turns each into a named acceptance observation",
+      "pitr-configuration-possible is sourced from pitr_readiness and pitr-rehearsal-dry-run-observed from pitr_opt_in_dry_run",
+      "tools/pitr_opt_in_dry_run.py imports plan, load_archive, load_backups and DEFAULT_DAYS from pitr_archive_retention and reports retention.as_dict(), so the retention tool is reached through that gate rather than left unwired"
+     ],
+     "checks": [
+      {
+       "kind": "path-exists",
+       "path": "tools/collect_s12_acceptance_evidence.py"
+      },
+      {
+       "kind": "references",
+       "path": "tools/collect_s12_acceptance_evidence.py",
+       "text": "operational_readiness.py"
+      },
+      {
+       "kind": "references",
+       "path": "tools/collect_s12_acceptance_evidence.py",
+       "text": "pitr_readiness.py"
+      },
+      {
+       "kind": "references",
+       "path": "tools/collect_s12_acceptance_evidence.py",
+       "text": "pitr_opt_in_dry_run.py"
+      },
+      {
+       "kind": "references",
+       "path": "tools/collect_s12_acceptance_evidence.py",
+       "text": "pitr-configuration-possible"
+      },
+      {
+       "kind": "references",
+       "path": "tools/collect_s12_acceptance_evidence.py",
+       "text": "pitr-rehearsal-dry-run-observed"
+      },
+      {
+       "kind": "references",
+       "path": "tools/pitr_opt_in_dry_run.py",
+       "text": "from pitr_archive_retention import"
+      },
+      {
+       "kind": "references",
+       "path": "tools/pitr_opt_in_dry_run.py",
+       "text": "retention.as_dict()"
+      }
+     ]
+    }
+   ],
+   "restatedBlockers": [
+    {
+     "was": "restore-drill-19-setup-skips-in-hosted-core-until-pr-126",
+     "now": "restore-drill-19-skips-need-CX01_CONTAINER-17-and-INV_TEST_ARCHIVER_IMAGE-2",
+     "why": "PR #126 landed as 9de490fd, so the stated precondition is satisfied and waiting for it would wait forever. Measured at 6fc0428b with a PostgreSQL DSN supplied: 1 passed, 19 skipped, and every skip reason is a container input -- 17 on CX01_CONTAINER and 2 on INV_TEST_ARCHIVER_IMAGE. The count did not move; only the reason did, from a missing DSN to missing container identity."
+    }
+   ]
+  },
+  {
+   "id": "VF-CL-05",
+   "title": "Independent review of Codex/Gemini outputs",
+   "owner": "Claude",
+   "reviewer": "Codex",
+   "state": "review",
+   "dependsOn": [],
+   "implemented": true,
+   "locallyVerified": true,
+   "ciVerified": false,
+   "independentlyReviewed": false,
+   "operationallyAccepted": false,
+   "notApplicable": [
+    "ciVerified: a review card ships documents, not code CI executes",
+    "independentlyReviewed: this card IS the review function; its own outputs are reviewed per-document by the owner of the reviewed change"
+   ]
+  }
+ ],
+ "verifiedAgainst": {
+  "tree": "6fc0428b",
+  "ref": "origin/integration/all-agents-unified",
+  "note": "Implementation-side claims re-verified by reading the landed tree; review-side booleans and their blockers are the reviewer's and were not touched."
+ },
+ "verifiedBy": "tools/check_vf_cl_registry.py"
 }
