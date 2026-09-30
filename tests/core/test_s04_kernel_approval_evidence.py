@@ -362,6 +362,11 @@ def test_clean_chain_is_measured_but_historical_epoch_never_false_passes():
     with pytest.raises(ValueError, match="FORCE RLS"):
         collector.validate_evidence(changed)
 
+    changed = deepcopy(evidence)
+    changed["observations"]["K1"]["metrics"]["currentPolicyDecisionBindingStatus"] = "MEASURED_PASS"
+    with pytest.raises(ValueError, match="current policy decision"):
+        collector.validate_evidence(changed)
+
 
 def test_database_collection_forces_complete_read_only_repeatable_read_snapshot(monkeypatch):
     commands = []
