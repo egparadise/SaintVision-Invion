@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.145"
+version: "1.0.146"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-30T08:44:00+09:00"
+updated: "2026-09-30T09:15:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,23 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-30T08:44:00+09:00 (Card 153 Claude UI r3 R1 조건 및 R2·R3 권고 전수 반영 및 재검증 완료).
+- 확인 기준: 2026-09-30T09:15:00+09:00 (Card 156 사내망 portal 웹 배포 비root Nginx·안전기동 자산 구축 및 정적 검증 완료; Card 150 Leaf 대기로 원격 물리 배포는 BLOCKED).
+
+## 2026-09-30 사내망 portal 웹 배포 비root read-only rootfs Nginx 및 컨테이너 안전 기동 검증 (Card 156, `agent/gemini/c156-intranet-portal-deploy`)
+- **개요**: 사내망 포털 웹 애플리케이션(`apps/web`)을 노드2(object store 노드)에 안전하게 배포하기 위한 정적 서빙 및 컨테이너화 배포 자산(`deploy/intranet/portal/`)을 전수 구축 및 검증했다:
+  1. `nginx.conf`: 비root 실행(UID:GID 101:101, PID `/tmp/nginx.pid`, temp 경로 `/tmp`), 읽기 전용 루트 파일시스템(`--read-only`), HTTPS 전용(포트 80 $\rightarrow$ 443 301 리다이렉트, 포트 443 ssl), TLS 1.2+ 한정(TLS 1.2/1.3, 레거시 차단), HSTS(1년, includeSubDomains), 엄격한 CSP(`connect-src`는 `https://idp.sv.lan`과 `https://cp.sv.lan`만 허용), SPA fallback(`try_files $uri $uri/ /index.html`), `/auth-config.js` 및 `/index.html` no-cache, `/assets/` 1년 immutable 캐싱.
+  2. `auth-config.js`: 사내망 Keycloak IdP 연동(`https://idp.sv.lan/realms/saintvision`, `sv-portal`, `https://portal.sv.lan/callback`).
+  3. `Dockerfile`: 다단계 빌드(`node:20-alpine` 번들 빌드 + `nginx:1.27-alpine` 비root 런타임), 소유자 라벨(`ai.saintvision.service="portal"`, `ai.saintvision.role="web-portal"`, `ai.saintvision.node="node2"`), USER 101:101.
+  4. `portal-up.sh` & `portal-down.sh`: 소유자 라벨(`ai.saintvision.service=portal`) 일치 컨테이너만 안전하게 교체·정리, 비밀 argv 및 `-e`/`--env` 주입 원천 차단, TLS 인증서 및 비밀키의 단일 파일 읽기 전용 바인드 마운트(`readonly`), `--read-only`, `--cap-drop ALL`, `--security-opt no-new-privileges`, `--tmpfs` 격리.
+  5. `generate-dev-certs.sh`: 로컬 스모크 및 오프라인 검증용 임시 ECDSA P-256 자체 서명 인증서 생성기.
+  6. 정적 검증 및 변이 사살 시험(`tests/test_intranet_portal_deploy.py`, 19 passed) 완비.
+  7. **배포 진행 상태**: Card 150(Codex)의 `portal.sv.lan` ECDSA P-256 Leaf 인증서 발급 대기로 원격 물리 배포는 `BLOCKED` 표기(설정·컨테이너·시험·로컬 스모크 100% 완료).
+- **담당 및 역할**: Gemini (Frontend / UI / 웹 배포 소유). Reviewer: Claude (UI·테스트 축), Codex (계약·보안 축).
+- **관측 근거 (Evidence)**:
+  - 배포 정적 및 변이 검증 시험: `pytest tests/test_intranet_portal_deploy.py` (19 passed 100%, 0.09s)
+  - 웹 빌드 및 TypeScript 점검: `npx tsc -b` (에러 0건), `npm run build` (성공, 7.82s)
+  - 프런트엔드 무결성 점검: `python tools/check_frontend_integrity.py` (92개 파일 스캔, 9대 규칙 위반 0건)
+  - 라우트 커버리지 점검: `pytest tests/test_route_coverage.py` (40 passed 100%)
 
 ## 2026-09-30 사내 IdP(Keycloak) 연동 FE 점검·수정 및 OIDC PKCE·토큰 만료·로그아웃 검증 (Card 153, `agent/gemini/card153-idp-login`, PR #247)
 - **개요**: 사내 IdP(Claude Card 152가 사내망에 프로비저닝하는 Keycloak) 연동을 위한 FE 점검 및 독립 검토 의견 전수 반영: (1) OIDC Authorization Code + PKCE(RFC 7636 S256 verifier/challenge, state, nonce, RFC 부록 B 벡터 100% 일치), (2) 동적 issuer 및 clientId 설정 해석 및 issuer origin/path 계층에 결속하여 authorize/token/logout cross-origin 및 경로 이탈 override 원천 차단(Codex 1, Claude L5), (3) dev IdP 가정 및 비암호화 원격 HTTP 전면 차단, (4) OIDC ID 토큰(id_token)의 nonce(트랜잭션 일치), aud(clientId 일치), 다중 aud 시 azp(clientId 일치 필수), iss(issuer 설정 시 일치; endpoint-pair 모드는 iss 미검사), 필수 정수 exp(120초 시계 오차 허용), iat(존재 시 정수) 클라이언트 fail-closed 검증 완비, 4대 변이(azp 누락 허용, 단일 aud 외국 azp, aud 배열 clientId 미포함, aud 비문자열/비배열) 사살 음성 시험 완비 및 id_token 클라이언트 검증 후 폐기, access token 서버 검증 정본 위임 명시(Claude R1~R3, Codex 2), (5) 제어 평면 서버 계약 준수 토큰 유효기간(0 < exp - iat <= 3600) fail-closed 검증 및 120초 시계 오차 허용(CLOCK_SKEW_SEC = 120, Claude M3, Codex 5, validateTokenExpiration 구조분해 기본값 requireJwt: true 완비), (6) `App.tsx:549` Header 로그아웃에 `performLogout({ redirectIdp: true, postLogoutRedirectUri: window.location.origin })` 실 배선 및 App 수준 통합 시험 완비(Claude M1, Codex 3), (7) `auth-config.js` 정본 계약(`https://idp.sv.lan/realms/saintvision`, `sv-portal`) 정합(Codex 4), (8) redirectUri 정규화, `/callback` strict path 검증 및 RFC 6749 §3.1.2 해시 차단(Claude L4).
