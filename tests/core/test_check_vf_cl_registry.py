@@ -315,8 +315,26 @@ def test_a_card_without_an_id_is_unusable(tmp_path):
 
 
 def test_the_shipped_registry_agrees_with_this_tree():
-    """The point of the exercise: the committed file re-derives from the real tree."""
-    assert checker.main([]) == 0
+    """The point of the exercise: the committed file re-derives from the real tree.
+
+    The depth of the checkout is a fact about the environment, not about the registry. With
+    full history every rule is re-derived and the checker must be silent. In a shallow
+    checkout the two history rules cannot be re-derived and the checker says so rather than
+    passing -- so this requires the shallow notice to be the **only** finding, which still
+    holds every other rule to account.
+
+    Written this way because hosted Core collects this test with the default fetch-depth 1,
+    and a test that only works at one depth reports the environment as registry drift. Core
+    is also given the history (see the workflow test below), so both halves are covered.
+    """
+    document = json.loads(checker.DEFAULT_REGISTRY.read_text(encoding="utf-8"))
+    findings = checker.audit(document, checker.REPO_ROOT, checker.DEFAULT_MANIFEST)
+    if checker.shallow_repository(checker.REPO_ROOT):
+        assert len(findings) == 1, findings
+        assert "shallow checkout" in findings[0], findings
+    else:
+        assert findings == []
+        assert checker.main([]) == 0
 
 
 def test_the_cli_separates_drift_from_an_unusable_file(tmp_path):
@@ -751,15 +769,24 @@ def test_a_full_clone_of_the_same_history_passes(tmp_path):
     assert checker.audit(document, full, written(tmp_path, manifest())) == []
 
 
-def test_the_backend_job_checks_out_the_history_this_check_needs():
-    """The rule above only runs in CI if that job has the history. Pinned here.
+@pytest.mark.parametrize(
+    ("workflow", "job", "next_job"),
+    [
+        ("backend.yml", "  backend:", "  mlflow-live:"),
+        # Core's whole-suite pytest collects tests/core/ too, and it was left shallow: the
+        # first fix covered backend.yml alone and train 4's Core run failed on this test.
+        ("core.yml", "  core:", "  s01-storage-roundtrip:"),
+    ],
+)
+def test_every_job_that_collects_this_check_has_the_history_it_needs(workflow, job, next_job):
+    """The rules only run in CI if the job can answer them. Pinned per job.
 
-    Judge the job, not the file: the backend job is the one that runs this checker.
+    Judge the job, not the file. A job that collects this test with fetch-depth 1 gets the
+    shallow notice instead of a re-derivation, which is honest but verifies nothing about
+    the two history rules.
     """
-    workflow = (checker.REPO_ROOT / ".github/workflows/backend.yml").read_text(
-        encoding="utf-8"
-    )
-    backend = workflow[workflow.index("  backend:"):workflow.index("  mlflow-live:")]
-    checkout = backend.index("uses: actions/checkout@v4")
-    setup = backend.index("uses: actions/setup-python@v5")
-    assert "fetch-depth: 0" in backend[checkout:setup], backend[checkout:setup]
+    text = (checker.REPO_ROOT / ".github/workflows" / workflow).read_text(encoding="utf-8")
+    section = text[text.index(job):text.index(next_job)]
+    checkout = section.index("uses: actions/checkout@v4")
+    setup = section.index("uses: actions/setup-python@v5")
+    assert "fetch-depth: 0" in section[checkout:setup], section[checkout:setup]
