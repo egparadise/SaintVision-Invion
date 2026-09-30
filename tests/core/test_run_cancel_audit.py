@@ -25,9 +25,14 @@ def test_first_cancel_records_one_exact_audit_in_the_same_session(monkeypatch):
     cancelled = SimpleNamespace(state=RunState.CANCELLED.value)
     calls: list[tuple[str, object, dict]] = []
 
-    monkeypatch.setattr(run_service, "get_run", lambda *_args, **_kwargs: current)
+    def get_run(*_args, **kwargs):
+        assert kwargs["for_update"] is True
+        return current
 
-    def advance(received_session, **kwargs):
+    monkeypatch.setattr(run_service, "get_run", get_run)
+
+    def advance(received_session, received_run, **kwargs):
+        assert received_run is current
         calls.append(("advance", received_session, kwargs))
         return cancelled
 
@@ -35,7 +40,7 @@ def test_first_cancel_records_one_exact_audit_in_the_same_session(monkeypatch):
         calls.append(("audit", received_session, kwargs))
         return "audit_event_01KERNELCANCELAUDIT"
 
-    monkeypatch.setattr(run_service, "advance", advance)
+    monkeypatch.setattr(run_service, "_advance_locked_run", advance)
     monkeypatch.setattr(run_service, "record_event", record_event)
 
     result = run_service.cancel_run(
@@ -71,7 +76,7 @@ def test_cancel_replay_does_not_advance_or_duplicate_audit(monkeypatch):
     monkeypatch.setattr(run_service, "get_run", lambda *_args, **_kwargs: cancelled)
     monkeypatch.setattr(
         run_service,
-        "advance",
+        "_advance_locked_run",
         lambda *_args, **_kwargs: pytest.fail("cancel replay advanced state"),
     )
     monkeypatch.setattr(
@@ -95,7 +100,7 @@ def test_cancel_replay_does_not_advance_or_duplicate_audit(monkeypatch):
 
 @pytest.mark.parametrize(
     ("actor_type", "actor_id"),
-    (("anonymous", None), ("user", None), ("unknown", USER_ID)),
+    (("anonymous", None), ("anonymous", USER_ID), ("user", None), ("unknown", USER_ID)),
 )
 def test_cancel_rejects_unattributed_or_unsupported_actors_before_mutation(
     monkeypatch, actor_type, actor_id
@@ -120,7 +125,7 @@ def test_audit_failure_is_not_swallowed(monkeypatch):
     current = SimpleNamespace(state=RunState.DRAFT.value)
     cancelled = SimpleNamespace(state=RunState.CANCELLED.value)
     monkeypatch.setattr(run_service, "get_run", lambda *_args, **_kwargs: current)
-    monkeypatch.setattr(run_service, "advance", lambda *_args, **_kwargs: cancelled)
+    monkeypatch.setattr(run_service, "_advance_locked_run", lambda *_args, **_kwargs: cancelled)
 
     def fail_audit(*_args, **_kwargs):
         raise RuntimeError("audit insert failed")

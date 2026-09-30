@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-20260930-CARD159-S04-C1-CANCEL-PRODUCER-CODEX"
 title: "Card 159 S04-DB C1 core 취소 이력 producer 착수"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-30T12:30:23+09:00"
+updated: "2026-09-30T12:56:39+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "6fc0428b49f28379cb4da17830d92256b55c2eb2"
@@ -77,9 +77,24 @@ S04의 취소 상태 전이와 append-only audit 원장을 원자적으로 결�
   올렸다. SQL은 prefix가 아니라 exact action을 사용한다. clean C1은 운영 배포
   결속 전 `RECORDED_ONLY`, 위반은 `MEASURED_FAIL`, row 0은 `NOT_OBSERVED`다.
 
+## Claude 독립 검토 반영
+
+- 첫 구현의 `session.get`은 행 잠금이 없어 두 connection이 동시에 첫 취소를 읽으면
+  audit 2행과 lost update가 가능했다. 기준 v1.3.1과 구현에서 취소·일반 상태 전이·
+  성공 전이가 run 행을 `FOR UPDATE`로 읽고 최신 상태를 다시 판정하도록 고쳤다.
+- 실 PG 시험은 두 동시 취소가 모두 멱등 결과를 받되 exact audit는 1행인지, 성공
+  transaction이 먼저 행을 보유한 동안 취소가 `FOR UPDATE`에서 기다린 뒤
+  `VAL-SCHEMA`로 거부되어 `succeeded`와 audit 0행이 유지되는지를 검사한다.
+- actor 허용 목록에 `anonymous`를 다시 넣는 변이를 잡도록 actor ID가 있는 anonymous
+  음성 사례를 추가했다. collector 실 PG fixture에는 `run.cancel.denied`만 있는 정상
+  attempt를 추가해 exact 조건 뒤에 `OR LIKE 'run.c%'`를 붙이는 변이도 잡는다.
+- 현재 `src/` 제품 HTTP·worker에는 이 core `cancel_run` 호출자가 없다. 따라서 호출
+  경로 존재·배포 SHA·활성 시각·관측 창이 모두 결속되기 전에는 clean C1이 계속
+  `RECORDED_ONLY`이며, 코드 존재를 운영 관측으로 바꾸지 않는다.
+
 ## 로컬 검증
 
-- `tests/core/test_run_cancel_audit.py`: **6 passed**.
+- `tests/core/test_run_cancel_audit.py`: **7 passed**.
 - `tests/core/test_s04_s08_operational_evidence.py`: **8 passed**.
 - 선택 파일 `py_compile`, Black check, `git diff --check`: exit 0.
 - `check_contract_bindings.py`, `check_ontology.py`, `check_docs.py`: exit 0.

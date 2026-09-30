@@ -54,8 +54,8 @@ from tools.operational_evidence import overall_verdict as _overall_verdict  # no
 
 
 SCHEMA_VERSION = "s04-s08-operational-evidence:1.1"
-CRITERIA_VERSION = "1.3.0"
-CRITERIA_HEAD = "06c57ca9a2fadeaeee061744d8e5381a3194fa71"
+CRITERIA_VERSION = "1.3.1"
+CRITERIA_HEAD = "1efda4ed328599b8ca4165c6f5aaf7fbe21ca303"
 CRITERIA_PATH = "docs/vault/30_Development/S04-DB_S08-DB_운영_판정_기준.md"
 DEFAULT_OUT_DIR = REPO_ROOT / "docs/vault/30_Development/Evidence/s04-s08-operational"
 

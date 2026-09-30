@@ -91,10 +91,41 @@ def create_run(
     return run
 
 
-def get_run(session: Session, *, tenant_id: uuid.UUID, run_id: str) -> Run:
-    run = session.get(Run, run_id)
+def get_run(
+    session: Session,
+    *,
+    tenant_id: uuid.UUID,
+    run_id: str,
+    for_update: bool = False,
+) -> Run:
+    get_options = {"populate_existing": True, "with_for_update": True} if for_update else {}
+    run = session.get(Run, run_id, **get_options)
     if run is None or run.tenant_id != tenant_id:
         raise InvError(RES_RUN_NOT_FOUND, "run not found")
+    return run
+
+
+def _advance_locked_run(
+    session: Session,
+    run: Run,
+    *,
+    target: RunState | str,
+    now: dt.datetime,
+    reason: TerminationReason | str | None = None,
+) -> Run:
+    """Apply one transition after the caller has locked ``run`` for update."""
+    destination = assert_transition(run.state, target, reason=reason, run_id=run.run_id)
+
+    run.state = destination.value
+    if destination is RunState.RUNNING and run.started_at is None:
+        run.started_at = now
+    if is_terminal(destination):
+        run.termination_reason = (
+            reason.value if isinstance(reason, TerminationReason) else str(reason)
+        )
+        run.ended_at = now
+    run.version += 1
+    session.flush()
     return run
 
 
@@ -113,20 +144,8 @@ def advance(
     which is the only place that can guarantee Evidence in the same
     transaction.
     """
-    run = get_run(session, tenant_id=tenant_id, run_id=run_id)
-    destination = assert_transition(run.state, target, reason=reason, run_id=run_id)
-
-    run.state = destination.value
-    if destination is RunState.RUNNING and run.started_at is None:
-        run.started_at = now
-    if is_terminal(destination):
-        run.termination_reason = (
-            reason.value if isinstance(reason, TerminationReason) else str(reason)
-        )
-        run.ended_at = now
-    run.version += 1
-    session.flush()
-    return run
+    run = get_run(session, tenant_id=tenant_id, run_id=run_id, for_update=True)
+    return _advance_locked_run(session, run, target=target, now=now, reason=reason)
 
 
 def cancel_run(
@@ -151,7 +170,7 @@ def cancel_run(
     if actor_type != "system" and not actor_id:
         raise ValueError(f"{actor_type} cancellation requires actor_id")
 
-    run = get_run(session, tenant_id=tenant_id, run_id=run_id)
+    run = get_run(session, tenant_id=tenant_id, run_id=run_id, for_update=True)
     if run.state == RunState.CANCELLED.value:
         return run
     if is_terminal(run.state):
@@ -160,10 +179,9 @@ def cancel_run(
             f"run already ended as {run.state}",
             cause_ref=run_id,
         )
-    cancelled = advance(
+    cancelled = _advance_locked_run(
         session,
-        tenant_id=tenant_id,
-        run_id=run_id,
+        run,
         target=RunState.CANCELLED,
         now=now,
         reason=reason,
@@ -286,7 +304,7 @@ def complete_run(
 
     Returns the run, the evidence id and the outbox event id.
     """
-    run = get_run(session, tenant_id=tenant_id, run_id=run_id)
+    run = get_run(session, tenant_id=tenant_id, run_id=run_id, for_update=True)
     if run.state != RunState.VERIFYING.value:
         raise InvError(
             VAL_SCHEMA,

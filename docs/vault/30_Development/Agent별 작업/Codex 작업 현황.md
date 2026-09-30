@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.225"
+version: "1.0.226"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T12:30:23+09:00"
+updated: "2026-09-30T12:56:39+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,7 +18,11 @@ source_of_truth: "Git"
 - `06c57ca9`에서 기준 v1.3.0을 먼저 고정하고 `6e2039c2`에서 첫 취소 상태 전이와
   exact `run.cancel.requested` audit 1행을 같은 transaction에 결속했다. replay는
   중복 audit 0, audit 실패는 취소 상태 rollback이며 actor·trace를 명시적으로 받는다.
-- PG-free **6+8 passed**, 계약·ontology·docs 게이트 exit 0. 운영 배포 SHA·활성 시각·
+- Claude 조건 C-1~C-3을 반영해 기준 v1.3.1에서 run 행 `FOR UPDATE` 직렬화와
+  두 connection 실 PG 경쟁 시험을 추가했다. actor ID가 있는 anonymous와 비정본
+  `run.cancel.denied` fixture도 fail-closed로 고정했다. 제품 HTTP·worker 호출자는
+  아직 0이므로 호출 경로 존재를 운영 PASS의 추가 선행 조건으로 기록했다.
+- PG-free **7+8 passed**, 계약·ontology·docs 게이트 exit 0. 운영 배포 SHA·활성 시각·
   관측 창 미결속 때문에 clean C1은 `RECORDED_ONLY`, C1-K·물리 Node 경계는 계속
   미관측이고 S04-DB `review`를 유지한다.
   [[2026-09-30_12-17-56_KST_S04-DB_C1_cancel_history_producer_착수_Codex]].
