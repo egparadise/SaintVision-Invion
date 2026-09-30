@@ -1,12 +1,23 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.233"
+version: "1.0.234"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T09:01:42+09:00"
+updated: "2026-09-30T09:13:57+09:00"
 source_of_truth: "Git"
 ---
+
+## 2026-09-30 Card 156 지원 — portal.sv.lan TLS 인계
+
+- Card 150의 ECDSA P-256 HTTPS CA로 `portal.sv.lan` leaf를 발급해 object-store
+  provider인 node2의 신규 전용 디렉터리에 전달했다. directory `0700`, key
+  `0400`, owner·fingerprint·chain 일치와 staging 잔존 0을 확인했다.
+- 서비스·DNS·container는 변경하지 않아 상태는 `DELIVERED_NOT_ACTIVATED`다.
+  운영자 사본은 후속 leaf 활성화와 이전 leaf 폐기 완료까지 ignored private
+  저장소에 보관하며 CRL 파일 생성만으로 폐기 완료를 주장하지 않는다.
+- 기존 `cp.sv.lan` leaf는 CP 호스트가 정해질 때까지 전송하지 않는다. 선택한
+  주소가 현 SAN과 다르면 재발급한다. [[2026-09-30_09-13-57_KST_portal_sv_lan_TLS_인계_Codex]].
 
 ## 2026-09-30 Card 150 — 사내망 PKI·LAN pilot 재수립
 
