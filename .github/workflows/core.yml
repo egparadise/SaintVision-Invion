@@ -51,7 +51,14 @@ jobs:
       # focused test step.
       INV_TEST_ROLE_GUARD_IMAGE: postgres:16
     steps:
+      # Full history: this job's whole-suite pytest collects
+      # tests/core/test_check_vf_cl_registry.py, which re-derives two rules from history --
+      # whether verifiedAgainst.tree is an ancestor of HEAD, and which pull requests merged.
+      # With the default fetch-depth 1 neither is knowable and the checker reports that
+      # instead of passing quietly.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'

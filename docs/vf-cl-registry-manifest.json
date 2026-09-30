@@ -1,0 +1,209 @@
+{
+ "schemaVersion": "vf-cl-registry-manifest:1",
+ "purpose": "Per-card assertions re-derived from the tree, kept apart from the registry so that editing the registry cannot also edit what the registry is judged against. tools/check_vf_cl_registry.py refuses to run without this file, refuses a card it does not cover, and refuses a closed blocker it carries no checks for -- deleting an entry is a failure, not a silence.",
+ "note": "impliesImplemented states what the tree shows. When every check under a card holds, the registry's implemented field must equal it: that is what catches a card being reverted to an earlier, internally consistent, but no longer true state. A null means no assertion is made, and why says so out loud rather than leaving a gap that reads as coverage. forbiddenBlockers lists the blocker ids a correction retired; any of them open again is drift. They live here rather than in the registry because a file that can edit the list of things it may not say has not been stopped from saying them.",
+ "cards": {
+  "VF-CL-01": {
+   "impliesImplemented": true,
+   "checks": [
+    {
+     "kind": "path-exists",
+     "path": "src/saintvision/api/v1/storage.py"
+    },
+    {
+     "kind": "references",
+     "path": "src/saintvision/api/v1/storage.py",
+     "text": "@router.get(\"/storage/locations\""
+    },
+    {
+     "kind": "references",
+     "path": "src/saintvision/api/v1/storage.py",
+     "text": "@router.get(\"/storage/resolve\")"
+    },
+    {
+     "kind": "path-exists",
+     "path": "src/saintvision/db/models/locality.py"
+    },
+    {
+     "kind": "path-exists",
+     "path": "migrations/versions/0007_locality_replicas.py"
+    }
+   ],
+   "closedBlockers": {},
+   "forbiddenBlockers": []
+  },
+  "VF-CL-02": {
+   "impliesImplemented": true,
+   "checks": [
+    {
+     "kind": "path-exists",
+     "path": "src/saintvision/storage/pathsafe.py"
+    },
+    {
+     "kind": "references",
+     "path": "src/saintvision/storage/pathsafe.py",
+     "text": "_URI_PREFIX = \"inv://\""
+    },
+    {
+     "kind": "references",
+     "path": "src/saintvision/storage/pathsafe.py",
+     "text": "inv://workspaces/"
+    },
+    {
+     "kind": "references",
+     "path": "src/saintvision/api/v1/storage.py",
+     "text": "@router.get(\"/storage/replica-status\")"
+    }
+   ],
+   "closedBlockers": {},
+   "forbiddenBlockers": []
+  },
+  "VF-CL-03": {
+   "impliesImplemented": true,
+   "checks": [
+    {
+     "kind": "path-exists",
+     "path": "src/saintvision/api/v1/model_release.py"
+    },
+    {
+     "kind": "path-exists",
+     "path": "src/saintvision/api/problem.py"
+    }
+   ],
+   "closedBlockers": {
+    "import-adapter-has-no-request-path-contract": [
+     {
+      "kind": "path-exists",
+      "path": "src/saintvision/api/v1/model_release.py"
+     },
+     {
+      "kind": "references",
+      "path": "src/saintvision/api/v1/model_release.py",
+      "text": "from ...adapters.model_import import"
+     },
+     {
+      "kind": "references",
+      "path": "src/saintvision/api/v1/model_release.py",
+      "text": "require_exact_declaration(manifest, declared)"
+     },
+     {
+      "kind": "references",
+      "path": "src/saintvision/api/v1/projects.py",
+      "text": "model_release.register(router)"
+     },
+     {
+      "kind": "path-exists",
+      "path": "src/saintvision/api/problem.py"
+     }
+    ]
+   },
+   "forbiddenBlockers": [
+    "import-adapter-has-no-request-path-contract"
+   ]
+  },
+  "VF-CL-04": {
+   "impliesImplemented": true,
+   "checks": [
+    {
+     "kind": "path-exists",
+     "path": "tools/pitr_archive_retention.py"
+    },
+    {
+     "kind": "path-exists",
+     "path": "tools/pitr_readiness.py"
+    },
+    {
+     "kind": "path-exists",
+     "path": "tools/collect_s12_acceptance_evidence.py"
+    },
+    {
+     "kind": "path-exists",
+     "path": "tests/integration/test_recovery_drill.py"
+    }
+   ],
+   "closedBlockers": {
+    "retention-and-readiness-tools-not-wired-to-any-operational-gate": [
+     {
+      "kind": "path-exists",
+      "path": "tools/collect_s12_acceptance_evidence.py"
+     },
+     {
+      "kind": "references",
+      "path": "tools/collect_s12_acceptance_evidence.py",
+      "text": "operational_readiness.py"
+     },
+     {
+      "kind": "references",
+      "path": "tools/collect_s12_acceptance_evidence.py",
+      "text": "pitr_readiness.py"
+     },
+     {
+      "kind": "references",
+      "path": "tools/collect_s12_acceptance_evidence.py",
+      "text": "pitr_opt_in_dry_run.py"
+     },
+     {
+      "kind": "references",
+      "path": "tools/collect_s12_acceptance_evidence.py",
+      "text": "pitr-configuration-possible"
+     },
+     {
+      "kind": "references",
+      "path": "tools/collect_s12_acceptance_evidence.py",
+      "text": "pitr-rehearsal-dry-run-observed"
+     },
+     {
+      "kind": "references",
+      "path": "tools/pitr_opt_in_dry_run.py",
+      "text": "from pitr_archive_retention import"
+     },
+     {
+      "kind": "references",
+      "path": "tools/pitr_opt_in_dry_run.py",
+      "text": "retention.as_dict()"
+     }
+    ],
+    "restore-drill-setup-skips-are-an-external-precondition": [
+     {
+      "kind": "references",
+      "path": ".github/workflows/core.yml",
+      "text": "name: Run owned CX01 recovery drill evidence"
+     },
+     {
+      "kind": "references",
+      "path": ".github/workflows/core.yml",
+      "text": "echo \"CX01_CONTAINER=$cx01_id\" >> \"$GITHUB_ENV\""
+     },
+     {
+      "kind": "references",
+      "path": ".github/workflows/core.yml",
+      "text": "assert skips == Counter(), f'CX01 recovery skip distribution drifted: {skips}'"
+     },
+     {
+      "kind": "references",
+      "path": ".github/workflows/core.yml",
+      "text": "assert setup_skip not in skips"
+     },
+     {
+      "kind": "references",
+      "path": ".github/workflows/core.yml",
+      "text": "assert passed == 20, f'Expected 20 passed CX01 cases, got {passed}'"
+     }
+    ]
+   },
+   "forbiddenBlockers": [
+    "restore-drill-19-setup-skips-in-hosted-core-until-pr-126",
+    "restore-drill-19-skips-need-CX01_CONTAINER-17-and-INV_TEST_ARCHIVER_IMAGE-2",
+    "restore-drill-setup-skips-are-an-external-precondition",
+    "retention-and-readiness-tools-not-wired-to-any-operational-gate"
+   ]
+  },
+  "VF-CL-05": {
+   "impliesImplemented": null,
+   "why": "A review card ships review documents. Their existence in the tree does not re-derive that the reviews were performed, and a check that looked only for file names would read as coverage while asserting nothing. So this card's implemented field is not re-derived here, and that is stated rather than left as an empty entry.",
+   "checks": [],
+   "closedBlockers": {},
+   "forbiddenBlockers": []
+  }
+ }
+}
