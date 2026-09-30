@@ -76,7 +76,7 @@
       "kind": "tenant-bound"
     },
     "public.record_kernel_run_cancel(text, text, text, text, text)": {
-      "definitionSHA256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "definitionSHA256": "51bab08e8b3085b0feb7f8bc52820d62649b4137ea23347a50033d32a12fc286",
       "executeRoles": [
         "inv_kernel"
       ],
