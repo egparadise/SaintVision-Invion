@@ -180,7 +180,9 @@ def test_k2_rejects_unknown_missing_duplicate_claim_keys_and_bad_signature():
     assert collector.evaluate_k2([missing])["status"] == "MEASURED_FAIL"
 
     row = _k2_row()
-    duplicate = b'{"claim":{},"claim":{},"launch":{},"allocations":[],"issuedAt":"2026-09-30T01:00:00Z"}'
+    duplicate = (
+        b'{"claim":{},"claim":{},"launch":{},"allocations":[],"issuedAt":"2026-09-30T01:00:00Z"}'
+    )
     row["envelope"]["payload"] = base64.b64encode(duplicate).decode()
     assert collector.evaluate_k2([row])["metrics"]["violationsByReason"] == {
         "invalid_payload_encoding": 1
@@ -201,16 +203,12 @@ def test_k2_rejects_changed_claim_and_naive_or_late_issued_at():
         "claim_payload_mismatch": 1
     }
 
-    naive = _payload_mutation(
-        _k2_row(), lambda value: value.update(issuedAt="2026-09-30T01:00:00")
-    )
+    naive = _payload_mutation(_k2_row(), lambda value: value.update(issuedAt="2026-09-30T01:00:00"))
     assert collector.evaluate_k2([naive])["metrics"]["violationsByReason"] == {
         "invalid_issued_at": 1
     }
 
-    late = _payload_mutation(
-        _k2_row(), lambda value: value.update(issuedAt="2026-09-30T01:03:00Z")
-    )
+    late = _payload_mutation(_k2_row(), lambda value: value.update(issuedAt="2026-09-30T01:03:00Z"))
     assert collector.evaluate_k2([late])["status"] == "MEASURED_FAIL"
 
 
@@ -267,7 +265,9 @@ def test_clean_chain_is_measured_but_historical_epoch_never_false_passes():
     assert evidence["observations"]["K4"]["status"] == "NOT_REGISTERED"
     assert evidence["verdict"] == "NOT_OBSERVED"
     assert evidence["acceptanceClaim"] is False
-    assert evidence["observations"]["K2"]["metrics"]["signatureVerificationStatus"] == "RECORDED_ONLY"
+    assert (
+        evidence["observations"]["K2"]["metrics"]["signatureVerificationStatus"] == "RECORDED_ONLY"
+    )
 
     changed = deepcopy(evidence)
     changed["observations"]["K4"]["status"] = "MEASURED_PASS"

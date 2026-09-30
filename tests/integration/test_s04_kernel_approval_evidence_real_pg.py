@@ -18,9 +18,7 @@ pytestmark = pytest.mark.postgres
 def test_real_product_approval_claim_delivery_and_attempt_chain_is_observed(gateway):
     a = gateway
     queued(a)
-    attempt = DeliveryQueue(a.e.db).acquire(
-        a.e.tenant, command_id=a.command["commandId"]
-    )
+    attempt = DeliveryQueue(a.e.db).acquire(a.e.tenant, command_id=a.command["commandId"])
     assert attempt is not None and attempt.operation == "execute"
 
     measured = collector.collect_database(a.e.owner)
@@ -58,4 +56,3 @@ def test_real_product_approval_claim_delivery_and_attempt_chain_is_observed(gate
         a.command["commandId"],
     ):
         assert identifier not in rendered
-

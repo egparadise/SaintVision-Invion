@@ -46,9 +46,7 @@ from tools.operational_evidence import overall_verdict as _overall_verdict  # no
 SCHEMA_VERSION = "s04-kernel-approval-evidence:1"
 CRITERIA_VERSION = "1.0.0"
 CRITERIA_HEAD = "8cf8c1ab1385d56faa8ca8e33d22fc00dd80109c"
-CRITERIA_PATH = (
-    "docs/vault/30_Development/S04-DB_C1-K_kernel_승인_결속_Evidence_계약.md"
-)
+CRITERIA_PATH = "docs/vault/30_Development/S04-DB_C1-K_kernel_승인_결속_Evidence_계약.md"
 DEFAULT_OUT_DIR = REPO_ROOT / "docs/vault/30_Development/Evidence/s04-kernel-approval"
 REQUIRED_OBSERVATIONS = ("K1", "K2", "K3", "K4")
 
@@ -242,7 +240,9 @@ def _observation(rows: list[dict[str, Any]], reasons: Counter[str], *, noun: str
     }
 
 
-def _first_reason(row: dict[str, Any], checks: tuple[tuple[str, Callable[[], bool]], ...]) -> str | None:
+def _first_reason(
+    row: dict[str, Any], checks: tuple[tuple[str, Callable[[], bool]], ...]
+) -> str | None:
     for reason, check in checks:
         try:
             if check():
@@ -258,24 +258,53 @@ def evaluate_k1(rows: list[dict[str, Any]]) -> dict[str, Any]:
         reason = _first_reason(
             row,
             (
-                ("missing_approval_dispatch", lambda: not row.get("approval_id") or not row.get("dispatch_approval_id")),
+                (
+                    "missing_approval_dispatch",
+                    lambda: not row.get("approval_id") or not row.get("dispatch_approval_id"),
+                ),
                 ("approval_not_dispatched", lambda: row.get("approval_status") != "dispatched"),
                 (
                     "scope_mismatch",
                     lambda: len(
                         {
-                            (row.get("claim_tenant_id"), row.get("claim_project_id"), row.get("claim_run_id")),
-                            (row.get("dispatch_tenant_id"), row.get("approval_project_id"), row.get("approval_run_id")),
-                            (row.get("approval_tenant_id"), row.get("approval_project_id"), row.get("approval_run_id")),
+                            (
+                                row.get("claim_tenant_id"),
+                                row.get("claim_project_id"),
+                                row.get("claim_run_id"),
+                            ),
+                            (
+                                row.get("dispatch_tenant_id"),
+                                row.get("approval_project_id"),
+                                row.get("approval_run_id"),
+                            ),
+                            (
+                                row.get("approval_tenant_id"),
+                                row.get("approval_project_id"),
+                                row.get("approval_run_id"),
+                            ),
                         }
-                    ) != 1
+                    )
+                    != 1
                     or row.get("claim_command_id") != row.get("dispatch_command_id")
                     or row.get("dispatch_approval_id") != row.get("approval_id"),
                 ),
-                ("action_digest_mismatch", lambda: row.get("claim_action_digest") != row.get("approval_action_digest")),
-                ("policy_version_mismatch", lambda: row.get("claim_policy_version") != row.get("approval_policy_version")),
-                ("policy_decision_mismatch", lambda: row.get("claim_policy_decision_id") != row.get("approval_policy_decision_id")),
-                ("recovery_epoch_mismatch", lambda: row.get("claim_recovery_epoch") != row.get("approval_recovery_epoch")),
+                (
+                    "action_digest_mismatch",
+                    lambda: row.get("claim_action_digest") != row.get("approval_action_digest"),
+                ),
+                (
+                    "policy_version_mismatch",
+                    lambda: row.get("claim_policy_version") != row.get("approval_policy_version"),
+                ),
+                (
+                    "policy_decision_mismatch",
+                    lambda: row.get("claim_policy_decision_id")
+                    != row.get("approval_policy_decision_id"),
+                ),
+                (
+                    "recovery_epoch_mismatch",
+                    lambda: row.get("claim_recovery_epoch") != row.get("approval_recovery_epoch"),
+                ),
                 (
                     "timestamp_mismatch",
                     lambda: any(
@@ -356,7 +385,14 @@ def _k2_reason(row: dict[str, Any]) -> str | None:
     try:
         payload_raw = base64.b64decode(envelope["payload"], validate=True)
         payload = _strict_object(payload_raw)
-    except (binascii.Error, UnicodeError, json.JSONDecodeError, RecursionError, TypeError, ValueError):
+    except (
+        binascii.Error,
+        UnicodeError,
+        json.JSONDecodeError,
+        RecursionError,
+        TypeError,
+        ValueError,
+    ):
         return "invalid_payload_encoding"
     if set(payload) != {"claim", "launch", "allocations", "issuedAt"}:
         return "invalid_payload_shape"
@@ -431,10 +467,26 @@ def evaluate_k3(rows: list[dict[str, Any]]) -> dict[str, Any]:
                     "scope_mismatch",
                     lambda: len(
                         {
-                            (row.get("attempt_project_id"), row.get("attempt_run_id"), row.get("attempt_node_id")),
-                            (row.get("claim_project_id"), row.get("claim_run_id"), row.get("claim_node_id")),
-                            (row.get("delivery_project_id"), row.get("delivery_run_id"), row.get("delivery_node_id")),
-                            (row.get("approval_project_id"), row.get("approval_run_id"), row.get("attempt_node_id")),
+                            (
+                                row.get("attempt_project_id"),
+                                row.get("attempt_run_id"),
+                                row.get("attempt_node_id"),
+                            ),
+                            (
+                                row.get("claim_project_id"),
+                                row.get("claim_run_id"),
+                                row.get("claim_node_id"),
+                            ),
+                            (
+                                row.get("delivery_project_id"),
+                                row.get("delivery_run_id"),
+                                row.get("delivery_node_id"),
+                            ),
+                            (
+                                row.get("approval_project_id"),
+                                row.get("approval_run_id"),
+                                row.get("attempt_node_id"),
+                            ),
                         }
                     )
                     != 1,
@@ -457,7 +509,10 @@ def evaluate_k3(rows: list[dict[str, Any]]) -> dict[str, Any]:
                         <= _aware(row["attempt_started_at"])
                     ),
                 ),
-                ("run_attempt_mismatch", lambda: row.get("execution_attempt") != row.get("run_attempt")),
+                (
+                    "run_attempt_mismatch",
+                    lambda: row.get("execution_attempt") != row.get("run_attempt"),
+                ),
                 (
                     "scheduled_event_mismatch",
                     lambda: type(bound) is not int
@@ -515,7 +570,9 @@ def collect_database(dsn: str) -> dict[str, Any]:
     }
 
 
-def build_evidence(*, database: dict[str, Any], provenance: dict[str, Any], source_env: str) -> dict[str, Any]:
+def build_evidence(
+    *, database: dict[str, Any], provenance: dict[str, Any], source_env: str
+) -> dict[str, Any]:
     observations = {
         "K1": evaluate_k1(database["k1"]),
         "K2": evaluate_k2(database["k2"]),
@@ -587,9 +644,13 @@ def validate_evidence(evidence: dict[str, Any]) -> None:
         raise ValueError("observation set mismatch")
     if observations["K4"].get("status") != "NOT_REGISTERED":
         raise ValueError("K4 cannot pass without an execution-time epoch producer")
-    if (observations["K4"].get("metrics") or {}).get("currentEpochSubstitutionAllowed") is not False:
+    if (observations["K4"].get("metrics") or {}).get(
+        "currentEpochSubstitutionAllowed"
+    ) is not False:
         raise ValueError("current epoch cannot substitute for execution-time history")
-    if (observations["K2"].get("metrics") or {}).get("signatureVerificationStatus") != "RECORDED_ONLY":
+    if (observations["K2"].get("metrics") or {}).get(
+        "signatureVerificationStatus"
+    ) != "RECORDED_ONLY":
         raise ValueError("signature verification must remain recorded-only without key provenance")
     if evidence.get("redaction") != {
         "identifiersRecorded": False,
@@ -669,7 +730,9 @@ def main(argv: list[str] | None = None) -> int:
         json.dumps(
             {
                 "verdict": evidence["verdict"],
-                "observations": {key: value["status"] for key, value in evidence["observations"].items()},
+                "observations": {
+                    key: value["status"] for key, value in evidence["observations"].items()
+                },
                 "json": str(json_path),
                 "markdown": str(markdown_path),
             },
