@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-CODEX-CARD156-PORTAL-PKI-20260930"
 title: "portal.sv.lan TLS 인증서 발급과 노드2 인계"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T09:13:57+09:00"
+updated: "2026-09-30T09:23:57+09:00"
 source_of_truth: "Git"
 ---
 
@@ -29,6 +29,8 @@ staging은 제거했다. 기존 object-store container·설정·서비스는 변
 공개 redacted evidence는
 `docs/vault/30_Development/Evidence/card156-portal-pki-handoff.json`이다. private
 key, credential, private address, 운영자 계정은 기록하지 않았다.
+HTTPS service leaf fingerprint는 public certificate의 인계 무결성 식별자로만
+기록했다. Node/topology identity fingerprint를 공개하지 않는 정책과 구분한다.
 
 ## 운영자 사본과 폐기
 
