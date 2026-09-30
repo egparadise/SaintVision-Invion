@@ -46,6 +46,7 @@ TARGET_REVISION = "0047_audit_events_isolation"
 APP_ROLE = "inv_app"
 WRITER_ROLE = "inv_audit_writer"
 READER_ROLE = "inv_audit_reader"
+BRIDGE_ROLE = "inv_cancel_bridge_owner"
 
 PRIMITIVE = (
     "SELECT public.record_auth_denial("
@@ -143,11 +144,15 @@ def test_audit_events_rls_is_enabled_forced_and_policed(app_engine, migrated):
         ("audit_events_audit_read", "SELECT"),
         ("audit_events_denial_append", "INSERT"),
         ("audit_events_tenant_isolation", "ALL"),
+        ("cancel_bridge_audit_append", "INSERT"),
+        ("cancel_bridge_audit_read", "SELECT"),
     ]
     by_name = {p["policyname"]: p["roles"] for p in policies}
     assert READER_ROLE in by_name["audit_events_audit_read"]
     assert WRITER_ROLE in by_name["audit_events_denial_append"]
     assert APP_ROLE in by_name["audit_events_tenant_isolation"]
+    assert BRIDGE_ROLE in by_name["cancel_bridge_audit_append"]
+    assert BRIDGE_ROLE in by_name["cancel_bridge_audit_read"]
     # A policy for PUBLIC would apply to every role, including the two new ones.
     assert not any("public" in p["roles"].lower().strip("{}").split(",") for p in policies)
 
