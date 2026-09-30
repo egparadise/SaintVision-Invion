@@ -112,13 +112,15 @@ validate_environment() {
     if command -v docker >/dev/null 2>&1; then
         local cur_cid=""
         if docker container inspect "$CONTAINER_NAME" >/dev/null 2>&1; then
-            cur_cid=$(docker inspect --format '{{.Id}}' "$CONTAINER_NAME" 2>/dev/null || true)
+            cur_cid=$(docker inspect --format '{{.Id}}' "$CONTAINER_NAME" 2>/dev/null | cut -c 1-12 || true)
         fi
 
         local p_occupants
         p_occupants=$(docker ps -q --filter "publish=${HTTP_PORT}" 2>/dev/null || true)
         for occupant in $p_occupants; do
-            if [[ -n "$cur_cid" && "$occupant" == "$cur_cid"* ]]; then
+            local short_occ
+            short_occ=$(echo "$occupant" | cut -c 1-12)
+            if [[ -n "$cur_cid" && "$short_occ" == "$cur_cid" ]]; then
                 continue
             fi
             local occ_name
@@ -129,7 +131,9 @@ validate_environment() {
 
         p_occupants=$(docker ps -q --filter "publish=${HTTPS_PORT}" 2>/dev/null || true)
         for occupant in $p_occupants; do
-            if [[ -n "$cur_cid" && "$occupant" == "$cur_cid"* ]]; then
+            local short_occ
+            short_occ=$(echo "$occupant" | cut -c 1-12)
+            if [[ -n "$cur_cid" && "$short_occ" == "$cur_cid" ]]; then
                 continue
             fi
             local occ_name
