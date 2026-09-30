@@ -79,7 +79,57 @@ jobs:
           # but does NOT constitute external supply-chain provenance or an independently signed release record.
           IMAGE_ID=$(docker image inspect --format '{{.Id}}' saintvision-portal:test)
           echo "IMAGE_ID=$IMAGE_ID" >> "$GITHUB_OUTPUT"
-          echo "Built Image ID (lane-internal identity check): $IMAGE_ID"
+          echo "Built Image ID (lane-internal execution consistency check): $IMAGE_ID"
+
+      - name: Produce Portal Release Tarball and Strict Release Evidence (Codex r6 Block 1)
+        run: |
+          mkdir -p /tmp/portal-release
+          TAR_FILE="/tmp/portal-release/portal-image.tar"
+          EVIDENCE_FILE="/tmp/portal-release/portal-release-evidence.json"
+
+          echo "Saving portal docker image to tarball..."
+          docker save saintvision-portal:test -o "$TAR_FILE"
+
+          TAR_SHA256=$(sha256sum "$TAR_FILE" | awk '{print $1}')
+          IMAGE_ID="${{ steps.image_info.outputs.IMAGE_ID }}"
+          COMMIT_SHA="${{ github.sha }}"
+          RUN_ID="${{ github.run_id }}"
+          BUILD_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          echo "Generating strict release evidence JSON..."
+          python3 - <<EOF
+          import json
+          data = {
+              "schemaVersion": "1.0.0",
+              "codeSha": "$COMMIT_SHA",
+              "imageId": "$IMAGE_ID",
+              "tarSha256": "$TAR_SHA256",
+              "buildRunId": str("$RUN_ID"),
+              "buildTimestamp": "$BUILD_TIME",
+              "imageTag": "saintvision-portal:test"
+          }
+          with open("$EVIDENCE_FILE", "w", encoding="utf-8") as f:
+              json.dump(data, f, indent=2)
+          EOF
+
+          echo "Release evidence generated at $EVIDENCE_FILE:"
+          cat "$EVIDENCE_FILE"
+
+      - name: Upload Portal Release Artifacts (Tarball & Evidence JSON)
+        uses: actions/upload-artifact@v4
+        with:
+          name: saintvision-portal-release
+          path: |
+            /tmp/portal-release/portal-image.tar
+            /tmp/portal-release/portal-release-evidence.json
+          retention-days: 14
+
+      - name: Verify Portal Load Release Script (--verify-only)
+        run: |
+          bash deploy/intranet/portal/portal-load-release.sh \
+            --evidence /tmp/portal-release/portal-release-evidence.json \
+            --tar /tmp/portal-release/portal-image.tar \
+            --verify-only
 
       - name: Setup Mock Upstream HTTPS Server and Test PKI
         run: |
@@ -165,7 +215,7 @@ jobs:
                       self.wfile.write(b'data: {"type":"connected","project":"mock"}\n\n')
                       self.wfile.flush()
                       import time
-                      time.sleep(2)
+                      time.sleep(3)
                       self.wfile.write(b'data: {"type":"heartbeat","seq":1}\n\n')
                       self.wfile.flush()
                       self.close_connection = True
@@ -282,8 +332,8 @@ jobs:
           echo "$V1_RESPONSE" | grep -q "authenticated"
 
           echo "Checking reverse proxy SSE streaming (/v1/projects/mock/runs/run-1/events)..."
-          # With proxy_buffering off, the first event arrives immediately within --max-time 1.2s despite server delay
-          SSE_RESPONSE=$(curl -s -N --max-time 1.2 --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/v1/projects/mock/runs/run-1/events || true)
+          # With proxy_buffering off, the first event arrives immediately within --max-time 1.5s despite server 3s delay (R6-L3)
+          SSE_RESPONSE=$(curl -s -N --max-time 1.5 --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/v1/projects/mock/runs/run-1/events || true)
           echo "$SSE_RESPONSE" | grep -q "connected"
 
           echo "Checking reverse proxy Terminal WebSocket upgrade (/v1/terminal/ws)..."
@@ -297,20 +347,24 @@ jobs:
           echo "$WS_RESPONSE" | grep -iq "Upgrade: websocket"
           echo "$WS_RESPONSE" | grep -iq "Connection: Upgrade"
 
-          # 8. Verify strict TLS version: server rejection of legacy TLS 1.1 (R5-M3)
+          # 8. Verify strict TLS version: server rejection of legacy TLS 1.1 (R5-M3, R6-L2)
           echo "Verifying server rejection of legacy TLS 1.1 with SECLEVEL=0 client..."
-          TLS11_OUT=$(echo "Q" | openssl s_client -connect 127.0.0.1:8443 -servername portal.sv.lan -CAfile "$CA_FILE" -tls1_1 -cipher 'DEFAULT:@SECLEVEL=0' 2>&1 || true)
-          echo "$TLS11_OUT"
-          if echo "$TLS11_OUT" | grep -iq "Cipher is (NONE)" && echo "$TLS11_OUT" | grep -iqE "alert protocol version|alert number 70|handshake failure"; then
-              echo "✔ Server actively rejected legacy TLS 1.1 with protocol version alert (fail-closed)."
+          if ! openssl s_client -help 2>&1 | grep -q -- "-tls1_1"; then
+              echo "NOTICE: OpenSSL client binary does not support -tls1_1 flag on this runner; skipping client probe (R6-L2)."
           else
-              echo "ERROR: Server did not reject legacy TLS 1.1 with protocol version alert!" >&2
-              exit 1
+              TLS11_OUT=$(echo "Q" | openssl s_client -connect 127.0.0.1:8443 -servername portal.sv.lan -CAfile "$CA_FILE" -tls1_1 -cipher 'DEFAULT:@SECLEVEL=0' 2>&1 || true)
+              echo "$TLS11_OUT"
+              if echo "$TLS11_OUT" | grep -iq "Cipher is (NONE)" && echo "$TLS11_OUT" | grep -iqE "alert protocol version|alert number 70|handshake failure"; then
+                  echo "✔ Server actively rejected legacy TLS 1.1 with protocol version alert (fail-closed)."
+              else
+                  echo "ERROR: Server did not reject legacy TLS 1.1 with protocol version alert!" >&2
+                  exit 1
+              fi
           fi
 
           echo "✔ Hosted Portal Container Build & Hardened Runtime Smoke PASSED!"
 
-      - name: Verify Automatic Rollback on Production Swap Failure (R5-H1 & R5-M3)
+      - name: Verify Automatic Rollback on Production Swap Failure (R6-H1 & R6-H2)
         env:
           PORTAL_IMAGE: saintvision-portal:test
           PORTAL_IMAGE_ID: ${{ steps.image_info.outputs.IMAGE_ID }}
@@ -323,13 +377,59 @@ jobs:
           PORTAL_ADD_HOSTS: "cp.sv.lan:host-gateway"
           PORTAL_HTTP_PORT: 8080
           PORTAL_HTTPS_PORT: 8443
-          PORTAL_TEST_TRIGGER_ROLLBACK: probe_fail
         run: |
-          echo "Triggering simulated production probe failure to execute automatic rollback..."
-          if bash deploy/intranet/portal/portal-up.sh; then
-              echo "ERROR: Expected portal-up.sh to fail on simulated probe failure!" >&2
+          echo "Capturing pre-swap running container ID..."
+          PRE_SWAP_ID=$(docker inspect --format '{{.Id}}' saintvision-portal)
+          echo "Pre-swap container ID: $PRE_SWAP_ID"
+
+          # External failure injection (R6-H2): Create a wrapper around docker that passes through
+          # to real docker for all operations EXCEPT when probing /healthz on the target container.
+          # This forces portal-up.sh's post-launch probe to fail naturally from the outside without test hooks.
+          WRAPPER_DIR="/tmp/docker-fail-wrapper"
+          mkdir -p "$WRAPPER_DIR"
+          REAL_DOCKER_BIN="$(command -v docker)"
+          cat > "${WRAPPER_DIR}/docker" <<EOF
+          #!/usr/bin/env bash
+          # Pass through to real docker for everything except the post-launch HTTPS probe
+          if [[ "\$1" == "exec" && "\$2" == "saintvision-portal" && "\$*" == *"/healthz"* ]]; then
+              echo "EXTERNAL_INJECTION: Simulating post-launch HTTPS probe failure on target container..." >&2
               exit 1
           fi
+          exec "$REAL_DOCKER_BIN" "\$@"
+          EOF
+          chmod +x "${WRAPPER_DIR}/docker"
+
+          echo "Running portal-up.sh with external probe failure wrapper..."
+          set +e
+          UP_OUTPUT=$(PATH="${WRAPPER_DIR}:${PATH}" bash deploy/intranet/portal/portal-up.sh 2>&1)
+          UP_EXIT=$?
+          set -e
+
+          echo "--- portal-up.sh execution log ---"
+          echo "$UP_OUTPUT"
+          echo "--- end portal-up.sh execution log (exit $UP_EXIT) ---"
+
+          if [[ $UP_EXIT -eq 0 ]]; then
+              echo "ERROR: Expected portal-up.sh to fail on post-launch probe failure, but it succeeded!" >&2
+              exit 1
+          fi
+
+          echo "Asserting exact rollback log lines occurred (R6-H1)..."
+          echo "$UP_OUTPUT" | grep -q "Preserving existing container 'saintvision-portal' as backup"
+          echo "$UP_OUTPUT" | grep -q "Initiating automatic rollback..."
+          echo "$UP_OUTPUT" | grep -q "Restoring previous production container from 'saintvision-portal-backup-"
+          echo "$UP_OUTPUT" | grep -q "Rollback complete: previous production container restored and running."
+          echo "✔ Exact rollback call sequence verified in execution output."
+
+          echo "Asserting that post-rollback container ID strictly equals pre-swap ID (R6-H1)..."
+          POST_ROLLBACK_ID=$(docker inspect --format '{{.Id}}' saintvision-portal)
+          echo "Post-rollback container ID: $POST_ROLLBACK_ID"
+          if [[ "$POST_ROLLBACK_ID" != "$PRE_SWAP_ID" ]]; then
+              echo "ERROR: Post-rollback container ID ($POST_ROLLBACK_ID) does not match pre-swap container ID ($PRE_SWAP_ID)!" >&2
+              exit 1
+          fi
+          echo "✔ Container ID preserved: exact pre-swap container restored."
+
           echo "Checking that rollback restored previous healthy production container..."
           CA_FILE="/tmp/portal-ci/certs/ca-bundle.crt"
           RESTORED_HEALTH=$(curl -fsS --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/healthz)

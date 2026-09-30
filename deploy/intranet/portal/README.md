@@ -134,6 +134,24 @@ export PORTAL_CERTS_DIR="/path/to/certs"
 PORTAL_UID="$(id -u)" PORTAL_GID="$(id -g)" bash deploy/intranet/portal/portal-up.sh
 ```
 
+### 릴리스 아티팩트 검증 및 적재 (`portal-load-release.sh`)
+
+Hosted CI에서 다운로드한 릴리스 아티팩트(`portal-release-evidence.json`, `portal-image.tar`)를 노드2에서 검증하고 이미지를 Docker 데몬에 적재한 후 안전하게 운영 컨테이너를 기동합니다:
+
+```bash
+# 릴리스 Evidence 스키마 검증 -> tarball SHA-256 해시 검증 -> docker load -> config .Id 검증 -> portal-up.sh 연계
+bash deploy/intranet/portal/portal-load-release.sh \
+  --evidence /path/to/portal-release-evidence.json \
+  --tar /path/to/portal-image.tar
+
+# (선택) 컨테이너 기동 없이 릴리스 이미지 검증 및 Docker 데몬 적재만 수행할 경우:
+bash deploy/intranet/portal/portal-load-release.sh \
+  --evidence /path/to/portal-release-evidence.json \
+  --tar /path/to/portal-image.tar \
+  --verify-only
+```
+
+
 ---
 
 ## 5. 제어 평면(Control Plane) 인계 요건 (Hand-off)

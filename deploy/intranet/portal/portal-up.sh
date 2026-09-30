@@ -304,8 +304,11 @@ validate_leaf_certificate() {
 }
 
 validate_image_and_id() {
-    # Resolve PORTAL_IMAGE_ID (with backward-compatible fallback to PORTAL_IMAGE_DIGEST)
-    PORTAL_IMAGE_ID="${PORTAL_IMAGE_ID:-${PORTAL_IMAGE_DIGEST:-}}"
+    # Check for deprecated PORTAL_IMAGE_DIGEST and fail-closed (Codex r6 Block 2)
+    if [[ -n "${PORTAL_IMAGE_DIGEST:-}" ]]; then
+        echo "ERROR: PORTAL_IMAGE_DIGEST is deprecated and forbidden. Use PORTAL_IMAGE_ID with Docker config image ID (sha256:...)." >&2
+        return 1
+    fi
 
     # Mandatory image ID requirement (Codex r5 & Coordinator decision)
     if [[ -z "${PORTAL_IMAGE_ID:-}" ]]; then
@@ -516,6 +519,13 @@ swap_and_launch_production() {
         return 1
     }
 
+    trap_swap_handler() {
+        echo "Received signal during production swap/launch. Initiating rollback..." >&2
+        rollback_production || true
+        exit 1
+    }
+    trap trap_swap_handler INT TERM
+
     # Owner Label 4-Tuple Verification and Safe Container Replacement (R4-M1)
     if docker container inspect "$CONTAINER_NAME" >/dev/null 2>&1; then
         if ! validate_owner_tuple "$CONTAINER_NAME" "portal" "intranet-portal" "node2" "$PORTAL_INSTANCE"; then
@@ -529,10 +539,11 @@ swap_and_launch_production() {
         echo "Preserving existing container '$CONTAINER_NAME' as backup '$backup_name'..."
         docker rename "$CONTAINER_NAME" "$backup_name"
         docker stop "$backup_name" >/dev/null
-        trap rollback_production INT TERM
     fi
 
-    # Clean up only stopped/exited containers matching the exact 4-tuple (excluding our active backup and any prior backups)
+    # Clean up stopped/exited containers matching the exact 4-tuple.
+    # Retention Policy (R6-M2): Preserve at most 1 most recent backup container matching exact pattern "${CONTAINER_NAME}-backup-[0-9a-f]+".
+    # Older backup containers and non-backup exited containers are safely removed.
     local stale_ids
     stale_ids=$(docker ps -aq \
         --filter "status=exited" \
@@ -541,13 +552,18 @@ swap_and_launch_production() {
         --filter "label=${LABEL_NODE}" \
         --filter "label=${LABEL_INSTANCE}" 2>/dev/null || true)
     if [[ -n "$stale_ids" ]]; then
+        local backup_kept=0
         for sid in $stale_ids; do
             local sname
             sname=$(docker inspect --format '{{.Name}}' "$sid" 2>/dev/null | sed -e 's|^/||' || true)
-            if [[ "$sname" == *"-backup-"* ]]; then
-                echo "Preserving backup container '$sname'; skipping automated cleanup." >&2
-                continue
+            if [[ "$sname" =~ ^${CONTAINER_NAME}-backup-[0-9a-f]+$ ]]; then
+                if [[ "$backup_kept" -lt 1 ]]; then
+                    echo "Preserving recent backup container '$sname'; skipping automated cleanup." >&2
+                    backup_kept=$((backup_kept + 1))
+                    continue
+                fi
             fi
+            echo "Pruning stale container '$sname' ($sid)..." >&2
             docker rm "$sid" >/dev/null 2>&1 || true
         done
     fi
@@ -559,7 +575,7 @@ swap_and_launch_production() {
         done
     fi
 
-    if [[ "${PORTAL_TEST_TRIGGER_ROLLBACK:-}" == "run_fail" ]] || ! docker run -d \
+    if ! docker run -d \
         --name "$CONTAINER_NAME" \
         --label "${LABEL_SERVICE}" \
         --label "${LABEL_WORKLOAD}" \
@@ -619,12 +635,6 @@ swap_and_launch_production() {
     if [[ "$restart_count_after" -ne 0 ]]; then
         echo "ERROR: Portal container crashed during startup stabilization ($restart_count_after restarts)." >&2
         docker logs "$CONTAINER_NAME" 2>&1 || true
-        rollback_production
-        return 1
-    fi
-
-    if [[ "${PORTAL_TEST_TRIGGER_ROLLBACK:-}" == "probe_fail" ]]; then
-        echo "TEST HOOK: Simulating production probe failure..." >&2
         rollback_production
         return 1
     fi

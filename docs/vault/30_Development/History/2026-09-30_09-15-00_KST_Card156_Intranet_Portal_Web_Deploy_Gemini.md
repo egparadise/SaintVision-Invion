@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-GEMINI-CARD156-001"
 title: "History: Card 156 사내망 portal 웹 배포 자산 및 비root read-only rootfs Nginx·안전 기동 검증"
-version: "2.0.0"
+version: "2.1.0"
 status: "review"
 author: "Gemini"
-updated: "2026-09-30T12:54:00+09:00"
+updated: "2026-09-30T13:45:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -16,6 +16,36 @@ source_of_truth: "Git"
 - **작업 브랜치**: `agent/gemini/c156-intranet-portal-deploy` (Base: `origin/integration/all-agents-unified`, PR #247 최신 커밋 `2f93cbba` 병합)
 - **배치 대상 도메인**: `portal.sv.lan`
 - **배치 대상 노드**: 노드2 (object store 노드, Docker 지원)
+- **독립 검토 r6 조치 (Codex 계약·보안 축 + Claude UI·운영 축 '변경 요청' 전수 반영)**:
+  1. **Codex r6 차단 1 [계약/보안] 릴리스 증거(Release Evidence) 계약 구현 및 소비자 검증 스크립트 완비**:
+     - `deploy/intranet/portal/portal-release-evidence.schema.json`: `additionalProperties: false`가 적용된 엄격한 JSON 스키마 (`schemaVersion`, `codeSha`, `imageId`, `tarSha256`, `buildRunId`, `buildTimestamp`).
+     - `.github/workflows/frontend.yml`: 빌드된 포털 이미지를 `docker save`하여 `portal-image.tar`로 내보내고, `GITHUB_SHA`에 결속된 엄격한 `portal-release-evidence.json`을 생성하여 `saintvision-portal-release` 아티팩트로 게시.
+     - `deploy/intranet/portal/portal-load-release.sh`: 노드 환경에서 Python 후보군(`python3`, `python`, `py`)을 hermetic하게 탐색하여 스키마 엄격 검증, `portal-image.tar`의 sha256 대조, `docker load`, 로드된 이미지의 `.Id`와 Evidence의 `imageId` 일치 검증, `--verify-only` 지원 및 `portal-up.sh` 안전 연계.
+     - 행위 시험 10종 완비: 미지 필드 거부, 필수 필드 누락 거부, 스키마 버전 불일치 거부, tar sha256 불일치 거부, 이미지 ID 불일치 거부, 도움말 플래그 및 파일 부재 fail-closed 전수 검증.
+  2. **Codex r6 차단 2 [계약 정합] 레거시 PORTAL_IMAGE_DIGEST 별칭 완전 제거 및 거부**:
+     - `portal-up.sh`: `PORTAL_IMAGE_DIGEST` 설정 시 fail-closed 명시적 감내 거부 (`PORTAL_IMAGE_DIGEST is deprecated and forbidden. Use PORTAL_IMAGE_ID`).
+     - 테스트 헬퍼 및 회귀 시험: `PORTAL_IMAGE_DIGEST` 주입 시 실패 및 `PORTAL_IMAGE_ID` 단독 성공 행위 시험 추가.
+  3. **Claude r6 R6-H1 [차단/검증] CI 롤백 단계 엄격 단언 및 컨테이너 ID 동일성 검증**:
+     - `.github/workflows/frontend.yml`: 롤백 단계에서 `portal-up.sh` 출력을 캡처하여 필수 롤백 로그 라인(`Preserving existing container`, `Initiating automatic rollback`, `Restoring previous production container from`, `Rollback complete`) 전수 출현 단언.
+     - 롤백 전후 컨테이너 ID 동일성 단언 (`POST_ROLLBACK_ID == PRE_SWAP_ID`).
+  4. **Claude r6 R6-H2 [차단/격리] 프로덕션 내부 테스트 훅 전면 제거 및 외부 래퍼 주입**:
+     - `portal-up.sh` 내부의 `PORTAL_TEST_TRIGGER_ROLLBACK` (`probe_fail`, `run_fail`) 테스트 훅 전면 삭제.
+     - CI 파이프라인에서 PATH 선두에 외부 `docker` 래퍼 스크립트를 배치하여 후속 `/healthz` 프로브 호출만을 외부에서 모의 실패 유발.
+  5. **Claude r6 R6-M1 [중/사전검증] 포트 충돌 사전 점검 자기 자신 제외 및 외래 컨테이너 차단 행위 시험**:
+     - 12자리 축약 ID와 inspect ID 간의 매칭을 통한 자기 자신 제외 (`test_behavioral_preflight_port_check_self_excluded`).
+     - 타 컨테이너의 포트 점유 시 fail-closed 거부 및 에러 메시지 검증 (`test_behavioral_preflight_port_check_foreign_occupant_rejected`).
+  6. **Claude r6 R6-M2 [중/보존정책] Stale 컨테이너 정리의 백업 보존 상한 정책 및 엄격 패턴 검증**:
+     - Stale cleanup 루프에서 `^${CONTAINER_NAME}-backup-[0-9a-f]+$` 정규식 엄격 매칭.
+     - 가장 최근 백업 1개만 보존(`backup_kept < 1`), 이전 오래된 백업 및 무관한 종료 컨테이너는 정상 가지치기(`test_behavioral_stale_cleanup_retains_recent_backup_and_prunes_older`).
+  7. **Claude r6 R6-M3 [중/시그널안전] Swap 구간 Trap 핸들러 명시적 exit 1 및 시그널 롤백 시험**:
+     - `swap_and_launch_production` 진입 즉시(기존 컨테이너 유무 무관) `trap trap_swap_handler INT TERM` 설치.
+     - 핸들러 내에서 `rollback_production` 후 명시적으로 `exit 1` 호출 (Claude 변이 m7 사살 및 핸들러 반환값 취약점 원천 해소).
+     - 시그널 수신 시 롤백 및 정상 백업 복원 행위 시험 (`test_behavioral_swap_trap_handler_triggers_rollback_and_exits`).
+  8. **Claude r6 R6-L1~L3 [하/품질] Image ID 정규식 시험, TLS 1.1 러너 분기 가드, SSE 타이밍 마진**:
+     - R6-L1: `PORTAL_IMAGE_ID` 정규식 형식 검사 행위 시험 추가 (Claude 변이 m4 사살).
+     - R6-L2: OpenSSL 클라이언트의 `-tls1_1` 플래그 지원 여부 사전 확인 후 프로브 실행.
+     - R6-L3: Mock SSE 서버 3초 지연 및 curl `--max-time 1.5`로 타이밍 마진 확대.
+
 - **독립 검토 r5 조치 (Codex 계약·보안 축 + Claude UI·운영 축 '변경 요청' 전수 반영)**:
   1. **R5-H1 [운영/보안] 운영 docker run 실패 감지, 자동 롤백 및 백업 보호, 사전 포트 점검**:
      - `portal-up.sh`: `docker run` 실행을 `if ! docker run ...; then rollback_production; return 1; fi`로 감싸 run 실패(exit 125 등) 시 즉시 롤백 진입.

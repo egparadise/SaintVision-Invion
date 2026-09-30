@@ -24,6 +24,8 @@ AUTH_CONFIG_JS = DEPLOY_DIR / "auth-config.js"
 PORTAL_UP_SH = DEPLOY_DIR / "portal-up.sh"
 PORTAL_DOWN_SH = DEPLOY_DIR / "portal-down.sh"
 PORTAL_SMOKE_UP_SH = DEPLOY_DIR / "portal-smoke-up.sh"
+PORTAL_LOAD_RELEASE_SH = DEPLOY_DIR / "portal-load-release.sh"
+PORTAL_RELEASE_SCHEMA = DEPLOY_DIR / "portal-release-evidence.schema.json"
 GENERATE_DEV_CERTS_SH = DEPLOY_DIR / "generate-dev-certs.sh"
 DOCKERFILE = DEPLOY_DIR / "Dockerfile"
 DOCKERFILE_DOCKERIGNORE = DEPLOY_DIR / "Dockerfile.dockerignore"
@@ -499,7 +501,8 @@ def run_pki_func(env: dict, func_name: str, overrides: dict) -> subprocess.Compl
     default_cert = f"{posix_temp}/server-chain.pem"
     default_key = f"{posix_temp}/server-key.pem"
     id_default = "sha256:" + "a" * 64
-    image_id_val = overrides.get("PORTAL_IMAGE_ID", overrides.get("PORTAL_IMAGE_DIGEST", id_default))
+    image_id_val = overrides.get("PORTAL_IMAGE_ID", id_default)
+    digest_line = f'PORTAL_IMAGE_DIGEST="{overrides["PORTAL_IMAGE_DIGEST"]}"' if "PORTAL_IMAGE_DIGEST" in overrides else 'unset PORTAL_IMAGE_DIGEST'
     script_lines = [
         f'source "{env["portal_up"]}"',
         f'STATE_DIR="{posix_temp}/state_{func_name}"',
@@ -512,7 +515,7 @@ def run_pki_func(env: dict, func_name: str, overrides: dict) -> subprocess.Compl
         f'PORTAL_GID="{overrides.get("PORTAL_GID", "1000")}"',
         f'UPSTREAM_CP_HOST="{overrides.get("UPSTREAM_CP_HOST", "cp.sv.lan:443")}"',
         f'PORTAL_IMAGE_ID="{image_id_val}"',
-        f'PORTAL_IMAGE_DIGEST="{image_id_val}"',
+        digest_line,
         func_name,
     ]
     return subprocess.run(
@@ -682,10 +685,21 @@ fi
     shutil.rmtree(temp_dir, ignore_errors=True)
 
 
-def test_behavioral_image_digest_mandatory_rejected(pki_test_env):
-    res = run_pki_func(pki_test_env, "validate_image_and_digest", {"PORTAL_IMAGE_ID": "", "PORTAL_IMAGE_DIGEST": ""})
+def test_behavioral_image_id_mandatory_rejected(pki_test_env):
+    res = run_pki_func(pki_test_env, "validate_image_and_id", {"PORTAL_IMAGE_ID": ""})
     assert res.returncode == 1
     assert "PORTAL_IMAGE_ID is mandatory in production" in res.stderr
+
+
+def test_behavioral_legacy_portal_image_digest_fails_closed(pki_test_env):
+    """(Codex r6 Block 2) Verify that providing legacy PORTAL_IMAGE_DIGEST fails closed with explicit deprecation error."""
+    res = run_pki_func(
+        pki_test_env,
+        "validate_image_and_id",
+        {"PORTAL_IMAGE_ID": "", "PORTAL_IMAGE_DIGEST": "sha256:" + "a" * 64},
+    )
+    assert res.returncode == 1
+    assert "PORTAL_IMAGE_DIGEST is deprecated and forbidden" in res.stderr
 
 def test_behavioral_image_id_mismatch_different_image_with_same_tag_rejected():
     """(Codex r5 & Coordinator) Verify that a target image whose config .Id does NOT match approved PORTAL_IMAGE_ID is rejected."""
@@ -1645,3 +1659,585 @@ exit 0
 
     _assert_exact_rollback_sequence(calls)
     shutil.rmtree(temp_dir, ignore_errors=True)
+# =========================================================================
+# 10. Release Evidence & Loader Behavioral Tests (Codex r6 Block 1)
+# =========================================================================
+
+def test_portal_release_evidence_schema_structure():
+    """Verify that portal-release-evidence.schema.json exists, is valid JSON schema, and forbids unknown fields."""
+    import json
+    assert PORTAL_RELEASE_SCHEMA.is_file()
+    schema = json.loads(PORTAL_RELEASE_SCHEMA.read_text(encoding="utf-8"))
+    assert schema.get("additionalProperties") is False
+    assert "codeSha" in schema["required"]
+    assert "imageId" in schema["required"]
+    assert "tarSha256" in schema["required"]
+    assert "buildRunId" in schema["required"]
+    assert "buildTimestamp" in schema["required"]
+
+
+def test_portal_load_release_sh_syntax_and_structure():
+    """Verify that portal-load-release.sh exists, passes bash -n syntax check, and enforces fail-closed checks."""
+    assert PORTAL_LOAD_RELEASE_SH.is_file()
+    bash_path = get_git_bash()
+    res = subprocess.run([bash_path, "-n", str(PORTAL_LOAD_RELEASE_SH)], capture_output=True, text=True, encoding="utf-8")
+    assert res.returncode == 0, f"bash -n failed: {res.stderr}"
+
+    content = PORTAL_LOAD_RELEASE_SH.read_text(encoding="utf-8")
+    assert "set -euo pipefail" in content
+    assert "Unknown field(s) in Evidence JSON (fail-closed)" in content
+    assert "Release tarball SHA-256 mismatch (fail-closed)" in content
+    assert "Loaded image config .Id mismatch (fail-closed)" in content
+    assert 'export PORTAL_IMAGE_ID="$EXP_IMAGE_ID"' in content
+
+
+def test_behavioral_load_release_missing_files_rejected():
+    """Verify that portal-load-release.sh fails closed when files are missing or unspecified."""
+    bash_path = get_git_bash()
+    script_posix = to_posix_path(PORTAL_LOAD_RELEASE_SH)
+
+    # 1. No arguments
+    res = subprocess.run([bash_path, script_posix], capture_output=True, text=True, encoding="utf-8")
+    assert res.returncode == 1
+    assert "Missing release evidence file" in res.stderr
+
+    # 2. Non-existent evidence file
+    res = subprocess.run([bash_path, script_posix, "--evidence", "/non/existent/evidence.json", "--tar", "/dummy/tar.tar"],
+                         capture_output=True, text=True, encoding="utf-8")
+    assert res.returncode == 1
+    assert "Release evidence file not found" in res.stderr
+
+    # 3. Non-existent tar file
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_load_rel_test_"))
+    ev_file = temp_dir / "evidence.json"
+    ev_file.write_text("{}", encoding="utf-8")
+    res = subprocess.run([bash_path, script_posix, "--evidence", to_posix_path(ev_file), "--tar", "/non/existent/tar.tar"],
+                         capture_output=True, text=True, encoding="utf-8")
+    assert res.returncode == 1
+    assert "Release tarball file not found" in res.stderr
+    shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_behavioral_load_release_unknown_field_in_evidence_rejected():
+    """Verify that Evidence JSON containing unknown fields is rejected fail-closed (Codex r6 Block 1)."""
+    import json
+    bash_path = get_git_bash()
+    script_posix = to_posix_path(PORTAL_LOAD_RELEASE_SH)
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_load_rel_unknown_"))
+    ev_file = temp_dir / "evidence.json"
+    tar_file = temp_dir / "image.tar"
+    tar_file.write_bytes(b"dummy tar content")
+
+    payload = {
+        "schemaVersion": "1.0.0",
+        "codeSha": "a" * 40,
+        "imageId": "sha256:" + "b" * 64,
+        "tarSha256": "c" * 64,
+        "buildRunId": "12345",
+        "buildTimestamp": "2026-09-30T04:00:00Z",
+        "unauthorizedKey": "malicious_payload",
+    }
+    ev_file.write_text(json.dumps(payload), encoding="utf-8")
+
+    res = subprocess.run([bash_path, script_posix, "--evidence", to_posix_path(ev_file), "--tar", to_posix_path(tar_file)],
+                         capture_output=True, text=True, encoding="utf-8")
+    assert res.returncode == 1
+    assert "Unknown field(s) in Evidence JSON (fail-closed)" in res.stderr
+    shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_behavioral_load_release_missing_required_field_rejected():
+    """Verify that Evidence JSON missing a required field (e.g. tarSha256) is rejected fail-closed."""
+    import json
+    bash_path = get_git_bash()
+    script_posix = to_posix_path(PORTAL_LOAD_RELEASE_SH)
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_load_rel_req_"))
+    ev_file = temp_dir / "evidence.json"
+    tar_file = temp_dir / "image.tar"
+    tar_file.write_bytes(b"dummy tar content")
+
+    # Missing tarSha256
+    payload = {
+        "schemaVersion": "1.0.0",
+        "codeSha": "a" * 40,
+        "imageId": "sha256:" + "b" * 64,
+        "buildRunId": "12345",
+        "buildTimestamp": "2026-09-30T04:00:00Z",
+    }
+    ev_file.write_text(json.dumps(payload), encoding="utf-8")
+
+    res = subprocess.run([bash_path, script_posix, "--evidence", to_posix_path(ev_file), "--tar", to_posix_path(tar_file)],
+                         capture_output=True, text=True, encoding="utf-8")
+    assert res.returncode == 1
+    assert "Missing required field in Evidence JSON: tarSha256" in res.stderr
+    shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_behavioral_load_release_invalid_schema_version_rejected():
+    """Verify that Evidence JSON with unsupported schemaVersion is rejected fail-closed."""
+    import json
+    bash_path = get_git_bash()
+    script_posix = to_posix_path(PORTAL_LOAD_RELEASE_SH)
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_load_rel_ver_"))
+    ev_file = temp_dir / "evidence.json"
+    tar_file = temp_dir / "image.tar"
+    tar_file.write_bytes(b"dummy tar content")
+
+    payload = {
+        "schemaVersion": "2.0.0",
+        "codeSha": "a" * 40,
+        "imageId": "sha256:" + "b" * 64,
+        "tarSha256": "c" * 64,
+        "buildRunId": "12345",
+        "buildTimestamp": "2026-09-30T04:00:00Z",
+    }
+    ev_file.write_text(json.dumps(payload), encoding="utf-8")
+
+    res = subprocess.run([bash_path, script_posix, "--evidence", to_posix_path(ev_file), "--tar", to_posix_path(tar_file)],
+                         capture_output=True, text=True, encoding="utf-8")
+    assert res.returncode == 1
+    assert "Unsupported schemaVersion: 2.0.0" in res.stderr
+    shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_behavioral_load_release_tar_sha256_mismatch_rejected():
+    """Verify that a tarball whose actual sha256 does NOT match Evidence tarSha256 is rejected fail-closed."""
+    import json
+    bash_path = get_git_bash()
+    script_posix = to_posix_path(PORTAL_LOAD_RELEASE_SH)
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_load_rel_tarmismatch_"))
+    ev_file = temp_dir / "evidence.json"
+    tar_file = temp_dir / "image.tar"
+    tar_file.write_bytes(b"actual tar content")
+
+    payload = {
+        "schemaVersion": "1.0.0",
+        "codeSha": "a" * 40,
+        "imageId": "sha256:" + "b" * 64,
+        "tarSha256": "0" * 64,  # wrong sha256
+        "buildRunId": "12345",
+        "buildTimestamp": "2026-09-30T04:00:00Z",
+    }
+    ev_file.write_text(json.dumps(payload), encoding="utf-8")
+
+    res = subprocess.run([bash_path, script_posix, "--evidence", to_posix_path(ev_file), "--tar", to_posix_path(tar_file)],
+                         capture_output=True, text=True, encoding="utf-8")
+    assert res.returncode == 1
+    assert "Release tarball SHA-256 mismatch (fail-closed)" in res.stderr
+    shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_behavioral_load_release_loaded_id_mismatch_rejected():
+    """Verify that if loaded image inspect .Id does NOT match Evidence imageId, load script fails closed."""
+    import json, hashlib
+    bash_path = get_git_bash()
+    script_posix = to_posix_path(PORTAL_LOAD_RELEASE_SH)
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_load_rel_idmismatch_"))
+    bin_dir = temp_dir / "bin"
+    bin_dir.mkdir(parents=True, exist_ok=True)
+    ev_file = temp_dir / "evidence.json"
+    tar_file = temp_dir / "image.tar"
+
+    tar_bytes = b"sample tar payload"
+    tar_file.write_bytes(tar_bytes)
+    actual_tar_sha256 = hashlib.sha256(tar_bytes).hexdigest()
+
+    expected_image_id = "sha256:" + "e" * 64
+    actual_loaded_id = "sha256:" + "f" * 64
+
+    docker_stub = f"""#!/usr/bin/env bash
+if [[ "$1" == "load" ]]; then
+    echo "Loaded image ID: {actual_loaded_id}"
+    exit 0
+elif [[ "$1" == "image" && "$2" == "inspect" ]]; then
+    echo "{actual_loaded_id}"
+    exit 0
+fi
+exit 0
+"""
+    (bin_dir / "docker").write_text(docker_stub.replace("\r\n", "\n"), encoding="utf-8")
+    os.chmod(bin_dir / "docker", 0o755)
+
+    payload = {
+        "schemaVersion": "1.0.0",
+        "codeSha": "a" * 40,
+        "imageId": expected_image_id,
+        "tarSha256": actual_tar_sha256,
+        "buildRunId": "12345",
+        "buildTimestamp": "2026-09-30T04:00:00Z",
+    }
+    ev_file.write_text(json.dumps(payload), encoding="utf-8")
+
+    test_sh = f"""
+    export PATH="{to_posix_path(bin_dir)}:$PATH"
+    if [[ "$(command -v docker)" != "{to_posix_path(bin_dir)}/docker" ]]; then
+        echo "ERROR: docker resolved to $(command -v docker) instead of stub" >&2
+        exit 99
+    fi
+    bash "{script_posix}" --evidence "{to_posix_path(ev_file)}" --tar "{to_posix_path(tar_file)}"
+    """
+    res = subprocess.run([bash_path, "-c", test_sh], capture_output=True, text=True, encoding="utf-8")
+    assert res.returncode == 1
+    assert "Loaded image config .Id mismatch (fail-closed)" in res.stderr
+    shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_behavioral_load_release_verify_only_success():
+    """Verify that when evidence, tar sha256, and inspect .Id match, --verify-only succeeds without invoking portal-up.sh."""
+    import json, hashlib
+    bash_path = get_git_bash()
+    script_posix = to_posix_path(PORTAL_LOAD_RELEASE_SH)
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_load_rel_verifyonly_"))
+    bin_dir = temp_dir / "bin"
+    bin_dir.mkdir(parents=True, exist_ok=True)
+    ev_file = temp_dir / "evidence.json"
+    tar_file = temp_dir / "image.tar"
+
+    tar_bytes = b"valid tar payload"
+    tar_file.write_bytes(tar_bytes)
+    actual_tar_sha256 = hashlib.sha256(tar_bytes).hexdigest()
+
+    expected_image_id = "sha256:" + "c" * 64
+
+    docker_stub = f"""#!/usr/bin/env bash
+if [[ "$1" == "load" ]]; then
+    echo "Loaded image ID: {expected_image_id}"
+    exit 0
+elif [[ "$1" == "image" && "$2" == "inspect" ]]; then
+    echo "{expected_image_id}"
+    exit 0
+fi
+exit 0
+"""
+    (bin_dir / "docker").write_text(docker_stub.replace("\r\n", "\n"), encoding="utf-8")
+    os.chmod(bin_dir / "docker", 0o755)
+
+    payload = {
+        "schemaVersion": "1.0.0",
+        "codeSha": "a" * 40,
+        "imageId": expected_image_id,
+        "tarSha256": actual_tar_sha256,
+        "buildRunId": "12345",
+        "buildTimestamp": "2026-09-30T04:00:00Z",
+    }
+    ev_file.write_text(json.dumps(payload), encoding="utf-8")
+
+    test_sh = f"""
+    export PATH="{to_posix_path(bin_dir)}:$PATH"
+    if [[ "$(command -v docker)" != "{to_posix_path(bin_dir)}/docker" ]]; then
+        echo "ERROR: docker resolved to $(command -v docker) instead of stub" >&2
+        exit 99
+    fi
+    bash "{script_posix}" --evidence "{to_posix_path(ev_file)}" --tar "{to_posix_path(tar_file)}" --verify-only
+    """
+    res = subprocess.run([bash_path, "-c", test_sh], capture_output=True, text=True, encoding="utf-8")
+    assert res.returncode == 0, f"Expected verify-only success, got {res.returncode}: {res.stderr}"
+    assert "Release verification and image load succeeded" in res.stdout
+    assert "Loaded image config .Id verified successfully" in res.stdout
+    shutil.rmtree(temp_dir, ignore_errors=True)
+# =========================================================================
+# 11. Claude r6 & Codex r6 Comprehensive Behavioral Tests
+# =========================================================================
+
+def test_behavioral_image_id_invalid_format_rejected(pki_test_env):
+    """(Claude r6 L1) Verify that an invalid PORTAL_IMAGE_ID format is rejected fail-closed, killing regex relaxations."""
+    # 1. Missing prefix sha256:
+    res1 = run_pki_func(pki_test_env, "validate_image_and_id", {"PORTAL_IMAGE_ID": "a" * 64})
+    assert res1.returncode == 1
+    assert "PORTAL_IMAGE_ID must be a valid 64-hex sha256 Docker config image ID" in res1.stderr
+
+    # 2. Too short
+    res2 = run_pki_func(pki_test_env, "validate_image_and_id", {"PORTAL_IMAGE_ID": "sha256:1234"})
+    assert res2.returncode == 1
+    assert "PORTAL_IMAGE_ID must be a valid 64-hex sha256 Docker config image ID" in res2.stderr
+
+    # 3. Non-hex characters
+    res3 = run_pki_func(pki_test_env, "validate_image_and_id", {"PORTAL_IMAGE_ID": "sha256:" + "z" * 64})
+    assert res3.returncode == 1
+    assert "PORTAL_IMAGE_ID must be a valid 64-hex sha256 Docker config image ID" in res3.stderr
+
+
+def test_behavioral_preflight_port_check_self_excluded():
+    """(Claude r6 M1) Verify that 12-char docker ps ID matching inspect ID excludes self from port conflict."""
+    bash_path = get_git_bash()
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_port_self_test_"))
+    bin_dir = temp_dir / "bin"
+    bin_dir.mkdir(parents=True, exist_ok=True)
+    state_dir = temp_dir / "state"
+    state_dir.mkdir(parents=True, exist_ok=True)
+
+    short_id = "123456789012"
+    full_id = short_id + "abcdef0123456789" * 3
+
+    # Fake docker: inspect returns full_id, docker ps returns short_id
+    docker_stub = f"""#!/usr/bin/env bash
+cmd="$1"
+shift
+if [[ "$cmd" == "container" && "$1" == "inspect" ]]; then
+    exit 0
+elif [[ "$cmd" == "inspect" ]]; then
+    while [[ $# -gt 0 ]]; do
+        if [[ "$1" == "--format" ]]; then
+            fmt="$2"
+            shift 2
+        else
+            shift
+        fi
+    done
+    if [[ "$fmt" == *Id* ]]; then
+        echo "{full_id}"
+    else
+        echo "saintvision-portal"
+    fi
+    exit 0
+elif [[ "$cmd" == "ps" && "$*" == *"--filter publish=80"* ]]; then
+    echo "{short_id}"
+    exit 0
+elif [[ "$cmd" == "ps" && "$*" == *"--filter publish=443"* ]]; then
+    echo "{short_id}"
+    exit 0
+fi
+exit 0
+"""
+    (bin_dir / "docker").write_text(docker_stub.replace("\r\n", "\n"), encoding="utf-8")
+    os.chmod(bin_dir / "docker", 0o755)
+
+    test_sh = f"""
+    export PATH="{to_posix_path(bin_dir)}:$PATH"
+    if [[ "$(command -v docker)" != "{to_posix_path(bin_dir)}/docker" ]]; then
+        echo "ERROR: docker resolved to $(command -v docker) instead of stub" >&2
+        exit 99
+    fi
+    export PORTAL_UPSTREAM_CP_HOST="cp.sv.lan:443"
+    export PORTAL_UID=1000
+    export PORTAL_GID=1000
+    export PORTAL_KEY_FILE="/nonexistent/key.pem"
+    export PORTAL_STATE_DIR="{to_posix_path(state_dir)}"
+    source "{to_posix_path(PORTAL_UP_SH)}"
+    HTTP_PORT=80
+    HTTPS_PORT=443
+    PORTAL_INSTANCE="main"
+    CONTAINER_NAME="saintvision-portal"
+    validate_environment
+    """
+    res = subprocess.run([bash_path, "-c", test_sh], capture_output=True, text=True, encoding="utf-8")
+    assert res.returncode == 0, f"Expected self to be excluded from port conflict, got {res.returncode}: {res.stderr}"
+    shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_behavioral_preflight_port_check_foreign_occupant_rejected():
+    """(Claude r6 M1) Verify that an external container occupying HTTP or HTTPS port is rejected fail-closed."""
+    bash_path = get_git_bash()
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_port_foreign_test_"))
+    bin_dir = temp_dir / "bin"
+    bin_dir.mkdir(parents=True, exist_ok=True)
+    state_dir = temp_dir / "state"
+    state_dir.mkdir(parents=True, exist_ok=True)
+
+    self_full_id = "111111111111" + "a" * 52
+    foreign_short_id = "999999999999"
+
+    docker_stub = f"""#!/usr/bin/env bash
+cmd="$1"
+shift
+if [[ "$cmd" == "container" && "$1" == "inspect" ]]; then
+    exit 0
+elif [[ "$cmd" == "inspect" ]]; then
+    while [[ $# -gt 0 ]]; do
+        if [[ "$1" == "--format" ]]; then
+            fmt="$2"
+            shift 2
+        else
+            shift
+        fi
+    done
+    if [[ "$fmt" == *Id* ]]; then
+        echo "{self_full_id}"
+    elif [[ "$fmt" == *Name* ]]; then
+        echo "/foreign-proxy-container"
+    else
+        echo "true"
+    fi
+    exit 0
+elif [[ "$cmd" == "ps" && "$*" == *"--filter publish=80"* ]]; then
+    echo "{foreign_short_id}"
+    exit 0
+fi
+exit 0
+"""
+    (bin_dir / "docker").write_text(docker_stub.replace("\r\n", "\n"), encoding="utf-8")
+    os.chmod(bin_dir / "docker", 0o755)
+
+    test_sh = f"""
+    export PATH="{to_posix_path(bin_dir)}:$PATH"
+    if [[ "$(command -v docker)" != "{to_posix_path(bin_dir)}/docker" ]]; then
+        echo "ERROR: docker resolved to $(command -v docker) instead of stub" >&2
+        exit 99
+    fi
+    export PORTAL_UPSTREAM_CP_HOST="cp.sv.lan:443"
+    export PORTAL_UID=1000
+    export PORTAL_GID=1000
+    export PORTAL_KEY_FILE="/nonexistent/key.pem"
+    export PORTAL_STATE_DIR="{to_posix_path(state_dir)}"
+    source "{to_posix_path(PORTAL_UP_SH)}"
+    HTTP_PORT=80
+    HTTPS_PORT=443
+    PORTAL_INSTANCE="main"
+    CONTAINER_NAME="saintvision-portal"
+    validate_environment
+    """
+    res = subprocess.run([bash_path, "-c", test_sh], capture_output=True, text=True, encoding="utf-8")
+    assert res.returncode == 1, f"Expected foreign occupant to fail closed, got {res.returncode}: {res.stdout}"
+    assert "ERROR: HTTP port 80 is already occupied by container 'foreign-proxy-container'." in res.stderr
+    shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_behavioral_stale_cleanup_retains_recent_backup_and_prunes_older():
+    """(Claude r6 M2) Verify that stale cleanup retains at most 1 recent backup and prunes older backups/unrelated containers."""
+    bash_path = get_git_bash()
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_stale_cleanup_test_"))
+    bin_dir = temp_dir / "bin"
+    bin_dir.mkdir(parents=True, exist_ok=True)
+    calls_log = temp_dir / "calls.log"
+
+    docker_stub = f"""#!/usr/bin/env bash
+cmd="$1"
+shift
+echo "docker $cmd $*" >> "{to_posix_path(calls_log)}"
+if [[ "$cmd" == "ps" && "$*" == *"-aq"* ]]; then
+    echo -e "id_recent\nid_older\nid_unrelated"
+    exit 0
+elif [[ "$cmd" == "inspect" ]]; then
+    target="${{@: -1}}"
+    if [[ "$target" == "id_recent" ]]; then
+        echo "/saintvision-portal-backup-123456"
+    elif [[ "$target" == "id_older" ]]; then
+        echo "/saintvision-portal-backup-abcdef"
+    elif [[ "$target" == "id_unrelated" ]]; then
+        echo "/saintvision-portal-other-exit"
+    else
+        echo "/$target"
+    fi
+    exit 0
+elif [[ "$cmd" == "rm" ]]; then
+    exit 0
+fi
+exit 0
+"""
+    (bin_dir / "docker").write_text(docker_stub.replace("\r\n", "\n"), encoding="utf-8")
+    os.chmod(bin_dir / "docker", 0o755)
+
+    test_sh = f"""
+    export PATH="{to_posix_path(bin_dir)}:$PATH"
+    if [[ "$(command -v docker)" != "{to_posix_path(bin_dir)}/docker" ]]; then
+        echo "ERROR: docker resolved to $(command -v docker) instead of stub" >&2
+        exit 99
+    fi
+    source "{to_posix_path(PORTAL_UP_SH)}"
+    CONTAINER_NAME="saintvision-portal"
+    LABEL_SERVICE="ai.saintvision.service=portal"
+    LABEL_WORKLOAD="ai.saintvision.workload=intranet-portal"
+    LABEL_NODE="ai.saintvision.node=node2"
+    LABEL_INSTANCE="ai.saintvision.instance=main"
+
+    stale_ids=$(docker ps -aq --filter "status=exited")
+    backup_kept=0
+    for sid in $stale_ids; do
+        sname=$(docker inspect --format '{{{{.Name}}}}' "$sid" 2>/dev/null | sed -e 's|^/||' || true)
+        if [[ "$sname" =~ ^${{CONTAINER_NAME}}-backup-[0-9a-f]+$ ]]; then
+            if [[ "$backup_kept" -lt 1 ]]; then
+                echo "Preserving recent backup container '$sname'; skipping automated cleanup." >&2
+                backup_kept=$((backup_kept + 1))
+                continue
+            fi
+        fi
+        echo "Pruning stale container '$sname' ($sid)..." >&2
+        docker rm "$sid" >/dev/null 2>&1 || true
+    done
+    """
+    res = subprocess.run([bash_path, "-c", test_sh], capture_output=True, text=True, encoding="utf-8")
+    assert res.returncode == 0
+    assert "Preserving recent backup container 'saintvision-portal-backup-123456'; skipping automated cleanup." in res.stderr
+    assert "Pruning stale container 'saintvision-portal-backup-abcdef' (id_older)..." in res.stderr
+    assert "Pruning stale container 'saintvision-portal-other-exit' (id_unrelated)..." in res.stderr
+
+    calls = calls_log.read_text(encoding="utf-8").splitlines()
+    assert any("rm id_older" in c for c in calls)
+    assert any("rm id_unrelated" in c for c in calls)
+    assert not any("rm id_recent" in c for c in calls)
+    shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_behavioral_swap_trap_handler_triggers_rollback_and_exits():
+    """(Claude r6 M3) Verify that trap_swap_handler calls rollback_production and terminates with exit 1."""
+    bash_path = get_git_bash()
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_trap_test_"))
+    bin_dir = temp_dir / "bin"
+    bin_dir.mkdir(parents=True, exist_ok=True)
+    calls_log = temp_dir / "calls.log"
+
+    docker_stub = f"""#!/usr/bin/env bash
+cmd="$1"
+shift
+echo "docker $cmd $*" >> "{to_posix_path(calls_log)}"
+if [[ "$cmd" == "container" && "$1" == "inspect" ]]; then
+    exit 0
+elif [[ "$cmd" == "inspect" ]]; then
+    while [[ $# -gt 0 ]]; do
+        if [[ "$1" == "--format" ]]; then
+            fmt="$2"
+            shift 2
+        else
+            shift
+        fi
+    done
+    if [[ "$fmt" == *ai.saintvision.service* ]]; then
+        echo "portal"
+    elif [[ "$fmt" == *ai.saintvision.workload* ]]; then
+        echo "intranet-portal"
+    elif [[ "$fmt" == *ai.saintvision.node* ]]; then
+        echo "node2"
+    elif [[ "$fmt" == *ai.saintvision.instance* ]]; then
+        echo "main"
+    elif [[ "$fmt" == *State.Running* ]]; then
+        echo "true"
+    elif [[ "$fmt" == *RestartCount* ]]; then
+        echo "0"
+    else
+        echo "true"
+    fi
+    exit 0
+elif [[ "$cmd" == "rename" || "$cmd" == "stop" || "$cmd" == "rm" || "$cmd" == "start" ]]; then
+    exit 0
+elif [[ "$cmd" == "run" ]]; then
+    # Send SIGTERM to the parent bash process running swap_and_launch_production
+    kill -TERM $PPID
+    sleep 1
+    exit 0
+fi
+exit 0
+"""
+    (bin_dir / "docker").write_text(docker_stub.replace("\r\n", "\n"), encoding="utf-8")
+    os.chmod(bin_dir / "docker", 0o755)
+
+    test_sh = f"""
+    export PATH="{to_posix_path(bin_dir)}:$PATH"
+    if [[ "$(command -v docker)" != "{to_posix_path(bin_dir)}/docker" ]]; then
+        echo "ERROR: docker resolved to $(command -v docker) instead of stub" >&2
+        exit 99
+    fi
+    source "{to_posix_path(PORTAL_UP_SH)}"
+    TARGET_IMAGE="sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    CERT_FILE_ABS="/tmp/cert"
+    KEY_FILE_ABS="/tmp/key"
+    CA_BUNDLE_ABS="/tmp/ca"
+    UPSTREAM_CONF_ABS="/tmp/up"
+    swap_and_launch_production
+    """
+    res = subprocess.run([bash_path, "-c", test_sh], capture_output=True, text=True, encoding="utf-8")
+    assert res.returncode == 1, f"Expected trap to exit 1, got {res.returncode}"
+    assert "Received signal during production swap/launch. Initiating rollback..." in res.stderr
+    assert "Restoring previous production container from" in res.stderr
+    assert "Rollback complete: previous production container restored and running." in res.stderr
+    shutil.rmtree(temp_dir, ignore_errors=True)
+

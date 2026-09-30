@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "deploy/intranet/portal/portal-release-evidence.schema.json",
+  "title": "PortalReleaseEvidenceSchemaV1_0",
+  "description": "Schema for SaintVision Card 156 Intranet Portal release provenance evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "codeSha",
+    "imageId",
+    "tarSha256",
+    "buildRunId",
+    "buildTimestamp"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "type": "string",
+      "enum": ["1.0.0"]
+    },
+    "codeSha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "imageId": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "tarSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "buildRunId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "buildTimestamp": {
+      "type": "string"
+    },
+    "imageTag": {
+      "type": "string"
+    }
+  }
+}

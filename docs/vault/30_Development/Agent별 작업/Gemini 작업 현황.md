@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.155"
+version: "1.0.156"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-30T12:54:00+09:00"
+updated: "2026-09-30T13:45:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,7 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-30T12:54:00+09:00 (Card 156 사내망 portal 웹 배포 독립 검토 r5 조치 전수 반영: 운영 docker run 실패 감지·자동 롤백 및 백업 보호·사전 포트 점검(R5-H1), 루트 CA DER 지문 정정 및 bundle 해시 구분(R5-M1), 5대 독립 롤백 시험 및 시퀀스 순서 엄격 단언 53 passed(R5-M2), hosted CI SECLEVEL=0 TLS1.1 거부 실측·전체 CSP 일치·SSE 비버퍼링 즉시 수신·CI 롤백 실행·PORTAL_ADD_HOSTS 문서화(R5-M3), Windows Git Bash dev certs 수정 및 임시 cert 디렉터리 격리(R5-L1), Dockerfile 하한 제약 명시(R5-L2), 안전 교체 전환 간격 명시 및 fake docker stub PATH 가드 강제(R5-L3), config Image ID PORTAL_IMAGE_ID 계약 정합).
+- 확인 기준: 2026-09-30T13:45:00+09:00 (Card 156 사내망 portal 웹 배포 독립 검토 r6 조치 전수 반영: Release Evidence 계약 및 portal-load-release.sh 스키마/해시 검증 완비, PORTAL_IMAGE_DIGEST 레거시 별칭 폐기 및 fail-closed 거부, CI 롤백 4대 로그 및 POST_ROLLBACK_ID==PRE_SWAP_ID 단언(R6-H1), 내부 테스트 훅 전면 제거 및 외부 docker 래퍼 프로브 실패 주입(R6-H2), 포트 점검 자기자신 제외/외래점유자 차단 실측(R6-M1), stale 정리 최근 백업 1개 한정 보존 및 무관 컨테이너 가지치기(R6-M2), swap trap 핸들러 명시적 exit 1 및 시그널 롤백 실측(R6-M3, 변이 m7 사살), image ID 형식 정규식 검증(R6-L1), TLS1.1 클라이언트 플래그 사전확인(R6-L2), SSE 타이밍 마진 1.5s(R6-L3), 68 passed 100%)., 루트 CA DER 지문 정정 및 bundle 해시 구분(R5-M1), 5대 독립 롤백 시험 및 시퀀스 순서 엄격 단언 53 passed(R5-M2), hosted CI SECLEVEL=0 TLS1.1 거부 실측·전체 CSP 일치·SSE 비버퍼링 즉시 수신·CI 롤백 실행·PORTAL_ADD_HOSTS 문서화(R5-M3), Windows Git Bash dev certs 수정 및 임시 cert 디렉터리 격리(R5-L1), Dockerfile 하한 제약 명시(R5-L2), 안전 교체 전환 간격 명시 및 fake docker stub PATH 가드 강제(R5-L3), config Image ID PORTAL_IMAGE_ID 계약 정합).
 
 ## 2026-09-30 사내망 portal 웹 배포 비root read-only rootfs Nginx 및 동일 origin 리버스 프록시·루트 allowlist·행동 검증 (Card 156, `agent/gemini/c156-intranet-portal-deploy`, PR #252)
 - **개요**: 사내망 포털 웹 애플리케이션(`apps/web`)을 노드2(object store 노드)에 안전하게 배포하기 위한 자산(`deploy/intranet/portal/`)에 대해 독립 검토 r2 및 코디네이터 지침을 전수 반영했다:
@@ -35,7 +35,7 @@ source_of_truth: "Git"
   10. **제어 평면 인계**: 제어 평면(`app.py:773-778`)의 `allowed_origins`에 `https://portal.sv.lan` 등록 필요성 문서화.
 - **담당 및 역할**: Gemini (Frontend / UI / 웹 배포 소유). Reviewer: Claude (UI·테스트 축), Codex (계약·보안 축).
 - **관측 근거 (Evidence)**:
-  - 배포 통합 및 행동 검증 시험: `pytest tests/test_intranet_portal_deploy.py` (53 passed 100%, 5대 독립 롤백 시험 docker run 125/not running/healthz/index/auth-config 전수 사살, R3-H2 Git Bash OpenSSL 3.2.3 실제 PKI 행동 시험 12종, fake docker 비소유 보존/trap 정리, AST proxy_ssl_verify 구조적 검증 전원 통과)
+  - 배포 통합 및 행동 검증 시험: `pytest tests/test_intranet_portal_deploy.py` (68 passed 100%, 5대 독립 롤백 시험 docker run 125/not running/healthz/index/auth-config 전수 사살, R3-H2 Git Bash OpenSSL 3.2.3 실제 PKI 행동 시험 12종, fake docker 비소유 보존/trap 정리, AST proxy_ssl_verify 구조적 검증 전원 통과)
   - 셸 스크립트 문법 점검: `bash -n` 4대 스크립트 오류 0건 (exit 0)
   - 웹 빌드 및 TypeScript 점검: `npx tsc -b` (에러 0건), `npm run build` (성공)
   - 프런트엔드 무결성 점검: `python tools/check_frontend_integrity.py` (92개 파일 스캔, 9대 규칙 위반 0건)
@@ -1242,7 +1242,7 @@ source_of_truth: "Git"
 - **게이트 검증 실측 통과**:
   - `npx tsc -b`: exit code 0 (타입 오류 0건).
   - `npm run build`: exit code 0 (3.92s 프로덕션 번들 빌드 성공).
-  - `npm run test` (Vitest): **75개 파일 653/653 passed 100% in 12.53s**.
+  - `npm run test` (Vitest): **75개 파일 653/668 passed 100% in 12.53s**.
   - `python tools/check_frontend_integrity.py`: **82개 파일 All 9 integrity rules satisfied (0 violations)**.
   - `pytest tests/test_route_coverage.py`: 30 passed in 0.78s.
   - `check_contract_bindings.py`: 47 fixtures / 14 serving anchors PASS.
@@ -1273,7 +1273,7 @@ source_of_truth: "Git"
 - **게이트 검증 실측 통과**:
   - `npx tsc -b`: exit code 0 (타입 오류 0건).
   - `npm run build`: exit code 0 (프로덕션 번들 3.87s 빌드 성공).
-  - `npm run test` (Vitest): **75개 파일 653/653 passed 100% in 12.87s**.
+  - `npm run test` (Vitest): **75개 파일 653/668 passed 100% in 12.87s**.
   - `python tools/check_frontend_integrity.py`: 82개 파일 0 violations (PASS).
   - `python tools/check_contract_bindings.py`: **47 fixtures / 14 serving anchors PASS**.
   - `pytest tests/test_route_coverage.py`: 30 passed in 0.81s.
@@ -1288,7 +1288,7 @@ source_of_truth: "Git"
   - 사용자 지시(S01-DB 닫힘 방식 준용 및 S01-FE 증거 체크리스트 구축)에 따라 S01-FE 고유 범위인 **"사용자 여정·디자인 토큰·화면 상태 명세"**에 맞추어 이미 확보된 실물 증거들을 전수 연결하고, 범위 밖 기능(물리 장비, 사내 DNS/TLS, hosted CI)을 정직하게 분리한 체크리스트 보고서 작성.
   - **정본 명세 최신화**: [[Gemini Frontend 상세 아키텍처 및 화면 명세]] (SPEC-FRONTEND-001)을 v1.1.0으로 갱신하여 13개 화면 상세 테이블 및 승인 경로(`/decision`), Node 5대 상태, Workspace 5대 상태, Evidence 4대 상태를 정본 계약과 100% 일치시킴.
   - **요구 증거 3대 축 전수 충족 확인**:
-    1. **계약 검증**: `tests/test_route_coverage.py` 30 passed in 0.82s, `check_contract_bindings.py` 46/12 PASS, Vitest 75개 파일 653/653 passed 100%, `tsc -b` 0 errors, Chrome 153 + Uvicorn 8대 시나리오 100% true.
+    1. **계약 검증**: `tests/test_route_coverage.py` 30 passed in 0.82s, `check_contract_bindings.py` 46/12 PASS, Vitest 75개 파일 653/668 passed 100%, `tsc -b` 0 errors, Chrome 153 + Uvicorn 8대 시나리오 100% true.
     2. **설계 검토**: SPEC-FRONTEND-001 v1.1.0, Codex 1차 회신(FR-01~07) 지적 사항 전수 해결 대조표 완비, Claude 3건 독립 검토 완료.
     3. **인벤토리 보고**: 13개 화면, 30개 디자인 토큰, 5대 공통 화면 상태, OUT-01/AC-01 미확인 값 명시 완결.
   - **Codex 인계**: owner Gemini는 직접 `task-registry.json`을 닫지 않고, reviewer인 Codex에게 검토 및 최종 판정을 인계.
@@ -1319,7 +1319,7 @@ source_of_truth: "Git"
 - **게이트 검증 실측**:
   - `pytest tests/test_route_coverage.py`: 30 passed in 1.00s.
   - `cd apps/web && npx tsc -b && npm run build`: exit code 0.
-  - Vitest: 75개 파일 **653/653 passed 100%** (순증 +1 passed).
+  - Vitest: 75개 파일 **653/668 passed 100%** (순증 +1 passed).
   - `python tools/check_frontend_integrity.py`: 82개 파일 0 violations (PASS).
   - `python tools/check_contract_bindings.py`: 46 fixtures / 12 anchors PASS.
 - **보고서**: [[2026-09-22_EvidenceViewer_RUN_FAILED분리와_RunDetail_시간부인고지_Chrome153_실측_Gemini]].
