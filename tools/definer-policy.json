@@ -76,12 +76,12 @@
       "kind": "tenant-bound"
     },
     "public.record_kernel_run_cancel(text, text, text, text, text)": {
-      "definitionSHA256": "8f0b533d36d57621d7b6596a1879bf55af49b0c51574d7d41012f89ef37878c0",
+      "definitionSHA256": "0000000000000000000000000000000000000000000000000000000000000000",
       "executeRoles": [
         "inv_kernel"
       ],
       "kind": "tenant-bound-cancel-audit",
-      "sourceMigrationSHA256": "d1b30a7219f151a000e83bc590d9512b0d6473797668770275faf74c22ed7e00"
+      "sourceMigrationSHA256": "cb4369730ea0b186b4f8198845bfda9eb1e560e178477bddc77fb1122b75b8bc"
     },
     "public.record_auth_denial(text, text, text, text, text, text, text, text, jsonb, text, text)": {
       "definitionSHA256": "397bfe6933220324c36678605f48e79bddb02eff0445177bb783707a60536a85",

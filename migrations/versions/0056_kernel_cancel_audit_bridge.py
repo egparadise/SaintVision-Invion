@@ -153,8 +153,7 @@ def upgrade() -> None:
           SELECT r.state, r.project_id
             INTO v_kernel_state, v_kernel_project
             FROM inv.runs r
-           WHERE r.tenant_id = v_tenant AND r.run_id = p_run_id
-           FOR SHARE;
+           WHERE r.tenant_id = v_tenant AND r.run_id = p_run_id;
           IF v_kernel_state IS DISTINCT FROM 'cancelled'
              OR v_kernel_project IS DISTINCT FROM p_project_id THEN
             RAISE EXCEPTION 'kernel cancellation authority is absent'
@@ -166,8 +165,7 @@ def upgrade() -> None:
             FROM inv.business_runs br
            WHERE br.tenant_id = v_tenant
              AND br.project_id = p_project_id
-             AND br.run_id = p_run_id
-           FOR SHARE;
+             AND br.run_id = p_run_id;
           IF v_workspace_id IS NULL THEN
             RAISE EXCEPTION 'business run mapping is absent' USING ERRCODE = '23514';
           END IF;

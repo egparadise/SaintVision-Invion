@@ -153,6 +153,19 @@ def test_definer_rechecks_kernel_authority_and_contains_no_dynamic_sql():
         assert forbidden not in body
 
 
+def test_definer_does_not_relock_caller_locked_or_immutable_kernel_rows():
+    source = MIGRATION.read_text(encoding="utf-8")
+    body = source.split("AS $fn$", 1)[1].split("$fn$;", 1)[0]
+    kernel_check = body.split("SELECT r.state, r.project_id", 1)[1].split(
+        "IF v_kernel_state", 1
+    )[0]
+    mapping_check = body.split("SELECT br.workspace_id", 1)[1].split(
+        "IF v_workspace_id", 1
+    )[0]
+    assert "FOR SHARE" not in kernel_check
+    assert "FOR SHARE" not in mapping_check
+
+
 def test_definer_and_rls_inputs_are_pinned_to_the_changed_repository_blobs():
     policy_path = ROOT / "tools/definer-policy.json"
     migration_digest = hashlib.sha256(MIGRATION.read_bytes()).hexdigest()
