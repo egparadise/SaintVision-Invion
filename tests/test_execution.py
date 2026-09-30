@@ -8,7 +8,10 @@ approval does not survive an edit to what it approved.
 
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
 import datetime as dt
+from threading import Barrier
+import time
 import uuid
 
 import pytest
@@ -342,19 +345,220 @@ def test_a_terminal_state_without_a_reason_is_rejected(app_sessionmaker, project
                     )
 
 
-def test_cancel_is_idempotent(app_sessionmaker, project):
+def test_cancel_is_idempotent(app_sessionmaker, owner_engine, project):
     with app_sessionmaker() as session:
         with session.begin():
             with tenant_scope(session, project["tenant_a"]):
                 run = _new_run(session, project)
                 once = run_service.cancel_run(
-                    session, tenant_id=project["tenant_a"], run_id=run.run_id, now=NOW
+                    session,
+                    tenant_id=project["tenant_a"],
+                    run_id=run.run_id,
+                    now=NOW,
+                    actor_type="user",
+                    actor_id=project["user_id"],
+                    trace_id="1" * 32,
                 )
                 twice = run_service.cancel_run(
-                    session, tenant_id=project["tenant_a"], run_id=run.run_id, now=NOW
+                    session,
+                    tenant_id=project["tenant_a"],
+                    run_id=run.run_id,
+                    now=NOW,
+                    actor_type="user",
+                    actor_id=project["user_id"],
+                    trace_id="1" * 32,
                 )
+                run_id = run.run_id
     assert once.state == twice.state == "cancelled"
     assert once.termination_reason == "cancelled_by_user"
+    with owner_engine.connect() as connection:
+        audit = (
+            connection.execute(
+                text(
+                    "SELECT actor_type,actor_id,action,outcome,trace_id,target_type,target_id,detail "
+                    "FROM audit_events WHERE tenant_id=:tenant AND target_id=:run"
+                ),
+                {"tenant": project["tenant_a"], "run": run_id},
+            )
+            .mappings()
+            .one()
+        )
+    assert dict(audit) == {
+        "actor_type": "user",
+        "actor_id": project["user_id"],
+        "action": "run.cancel.requested",
+        "outcome": "allow",
+        "trace_id": "1" * 32,
+        "target_type": "run",
+        "target_id": run_id,
+        "detail": {"reason": "cancelled_by_user"},
+    }
+
+
+def test_two_concurrent_first_cancels_write_exactly_one_audit(
+    app_sessionmaker, owner_engine, project
+):
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, project["tenant_a"]):
+                run_id = _new_run(session, project).run_id
+
+    start = Barrier(2, timeout=10)
+
+    def cancel_once(actor_id: str) -> str:
+        with app_sessionmaker() as session:
+            with session.begin():
+                with tenant_scope(session, project["tenant_a"]):
+                    start.wait()
+                    return run_service.cancel_run(
+                        session,
+                        tenant_id=project["tenant_a"],
+                        run_id=run_id,
+                        now=NOW,
+                        actor_type="user",
+                        actor_id=actor_id,
+                    ).state
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        states = list(pool.map(cancel_once, (project["user_id"], project["user_id"])))
+
+    with owner_engine.connect() as connection:
+        state = connection.execute(
+            text("SELECT state FROM runs WHERE tenant_id=:tenant AND run_id=:run"),
+            {"tenant": project["tenant_a"], "run": run_id},
+        ).scalar_one()
+        audit_count = connection.execute(
+            text(
+                "SELECT count(*) FROM audit_events "
+                "WHERE tenant_id=:tenant AND target_id=:run "
+                "AND action='run.cancel.requested'"
+            ),
+            {"tenant": project["tenant_a"], "run": run_id},
+        ).scalar_one()
+
+    assert states == ["cancelled", "cancelled"]
+    assert state == "cancelled"
+    assert audit_count == 1
+
+
+def test_cancel_waits_to_lock_then_cannot_overwrite_a_concurrent_success(
+    app_sessionmaker, owner_engine, project
+):
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, project["tenant_a"]):
+                run = _new_run(session, project)
+                _to_verifying(session, project, run)
+                run_id = run.run_id
+
+    application_name = "s04-cancel-after-success-" + uuid.uuid4().hex
+
+    def cancel_after_success() -> str:
+        try:
+            with app_sessionmaker() as session:
+                with session.begin():
+                    session.execute(
+                        text("SELECT set_config('application_name', :name, true)"),
+                        {"name": application_name},
+                    )
+                    with tenant_scope(session, project["tenant_a"]):
+                        run_service.cancel_run(
+                            session,
+                            tenant_id=project["tenant_a"],
+                            run_id=run_id,
+                            now=NOW + dt.timedelta(seconds=1),
+                            actor_type="user",
+                            actor_id=project["user_id"],
+                        )
+        except InvError as error:
+            return error.code
+        return "unexpected-success"
+
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        with app_sessionmaker() as session:
+            with session.begin():
+                with tenant_scope(session, project["tenant_a"]):
+                    run_service.complete_run(
+                        session,
+                        tenant_id=project["tenant_a"],
+                        run_id=run_id,
+                        now=NOW,
+                        actor_type="system",
+                        actor_id="control-plane",
+                        action="run.complete",
+                        input_schema="RunInput@1",
+                        input_payload=project["spec"],
+                    )
+                    contender = pool.submit(cancel_after_success)
+
+                    waiting_query = None
+                    deadline = time.monotonic() + 10
+                    while time.monotonic() < deadline:
+                        with owner_engine.connect() as observer:
+                            waiting_query = observer.execute(
+                                text(
+                                    "SELECT query FROM pg_stat_activity "
+                                    "WHERE application_name=:name AND wait_event_type='Lock'"
+                                ),
+                                {"name": application_name},
+                            ).scalar_one_or_none()
+                        if waiting_query is not None:
+                            break
+                        time.sleep(0.02)
+                    assert waiting_query is not None, "cancel contender never waited on the run row"
+                    assert "FOR UPDATE" in waiting_query.upper()
+
+        assert contender.result(timeout=10) == "VAL-SCHEMA"
+
+    with owner_engine.connect() as connection:
+        row = connection.execute(
+            text(
+                "SELECT state, (SELECT count(*) FROM audit_events "
+                "WHERE tenant_id=:tenant AND target_id=:run "
+                "AND action='run.cancel.requested') AS cancel_audits "
+                "FROM runs WHERE tenant_id=:tenant AND run_id=:run"
+            ),
+            {"tenant": project["tenant_a"], "run": run_id},
+        ).one()
+    assert row == ("succeeded", 0)
+
+
+def test_cancel_state_rolls_back_when_the_audit_insert_fails(
+    app_sessionmaker, owner_engine, project, monkeypatch
+):
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, project["tenant_a"]):
+                run_id = _new_run(session, project).run_id
+
+    def fail_audit(*_args, **_kwargs):
+        raise RuntimeError("audit insert failed")
+
+    monkeypatch.setattr(run_service, "record_event", fail_audit)
+    with pytest.raises(RuntimeError, match="audit insert failed"):
+        with app_sessionmaker() as session:
+            with session.begin():
+                with tenant_scope(session, project["tenant_a"]):
+                    run_service.cancel_run(
+                        session,
+                        tenant_id=project["tenant_a"],
+                        run_id=run_id,
+                        now=NOW,
+                        actor_type="system",
+                        actor_id=None,
+                    )
+
+    with owner_engine.connect() as connection:
+        state = connection.execute(
+            text("SELECT state FROM runs WHERE tenant_id=:tenant AND run_id=:run"),
+            {"tenant": project["tenant_a"], "run": run_id},
+        ).scalar_one()
+        audit_count = connection.execute(
+            text("SELECT count(*) FROM audit_events WHERE tenant_id=:tenant AND target_id=:run"),
+            {"tenant": project["tenant_a"], "run": run_id},
+        ).scalar_one()
+    assert state == "draft"
+    assert audit_count == 0
 
 
 def test_cancelling_a_finished_run_is_refused(app_sessionmaker, project):
@@ -371,7 +575,12 @@ def test_cancelling_a_finished_run_is_refused(app_sessionmaker, project):
                 )
                 with pytest.raises(InvError):
                     run_service.cancel_run(
-                        session, tenant_id=project["tenant_a"], run_id=run.run_id, now=NOW
+                        session,
+                        tenant_id=project["tenant_a"],
+                        run_id=run.run_id,
+                        now=NOW,
+                        actor_type="user",
+                        actor_id=project["user_id"],
                     )
 
 
