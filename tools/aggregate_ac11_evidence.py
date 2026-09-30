@@ -79,7 +79,7 @@ PIN_RE = re.compile(r"^([A-Za-z0-9_.-]+)(?:\[[^\]]+\])?==([^\s;]+)$")
 
 DEFINER_FILES = [
     {"path": "tools/check_definer_functions.py", "blob": "5831f8d8806900146add2e5e7b51b934dced3952"},
-    {"path": "tools/definer-policy.json", "blob": "759d686aef21283c978442cac1b446ad20eefe52"},
+    {"path": "tools/definer-policy.json", "blob": "8c28282e1e9fb70db7c149626b7d7f1cffc9dee5"},
 ]
 RLS_FILES = [
     {"path": "tools/collect_rls_evidence.py", "blob": "446c6cc12ccdd2df373713ba4558792f02701c62"},
