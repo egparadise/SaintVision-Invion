@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-CODEX-20260930-CARD150"
 title: "사내망 PKI와 LAN pilot 재수립"
-version: "1.1.1"
+version: "1.1.2"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T08:40:35+09:00"
+updated: "2026-09-30T09:01:42+09:00"
 source_of_truth: "Git"
 ---
 

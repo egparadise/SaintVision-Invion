@@ -6,19 +6,19 @@
   "localDockerTouched": false,
   "source": {
     "agentImageSourceCommit": "6fc0428b49f28379cb4da17830d92256b55c2eb2",
-    "controlPlaneToolingCommit": "8ce88ba9c2958df8cbed95ab8ea4bf9286ae55f1",
+    "controlPlaneToolingCommit": "dea0a2b33ddc9726d9e8d7f9cab8b67610a4f6cf",
     "toolSHA256": {
       "tools/intranet_pki.py": "13774a637ccfa8d3ae10f1a996a0d5334e7b0a7a0d19248910a245de53189f01",
-      "tools/lan_pilot.py": "a5074c7c1289c5c55e23b1d51135aeb7c3c0dfd2aad6bc1f612f70f471c34fb3",
-      "deploy/lan/prepare-pilot-database.sh": "9590de80c8eca3d26fa11e94ea49e10f1410a83099ff822c7af363f9103c3385",
-      "deploy/lan/verify-pilot-database.sh": "cf644ddbd2eda304b3f3ccb1c9c4d78393cf99dbe24726319892be177a313d8f",
+      "tools/lan_pilot.py": "00dfd4e21c37b61c60c8e358ee61741a228cf8b9ef1ecdf0ff3221cc9261314e",
+      "deploy/lan/prepare-pilot-database.sh": "0fbc0deeb2e95b7865dd440a0da3bf365e6bfdcf3435a002ff9517b7a8be90c3",
+      "deploy/lan/verify-pilot-database.sh": "10efdf6552cd970b53764440b9e26765944986fa11df17fa3fc1659533a4a081",
       "deploy/lan/Dockerfile.node.remote": "38e3b6ea2d4dcdef6c85108124324bfafd012fcd5119912bf0f61eca9999b1ae"
     },
     "toolGitBlobSHA1": {
       "tools/intranet_pki.py": "ef10834d2ffa7d36456ce0cbaaddf0135df4886d",
-      "tools/lan_pilot.py": "ab0165811199cd6032540e4e3a1f45d1cdad8b00",
-      "deploy/lan/prepare-pilot-database.sh": "31dd91e6d7af06cec04582591ef84215dd012c35",
-      "deploy/lan/verify-pilot-database.sh": "bcc9959ebf1ebb106a6661682698fe038938a3a9",
+      "tools/lan_pilot.py": "edbe38ec4e887c3c1a993c7fda593b9908565075",
+      "deploy/lan/prepare-pilot-database.sh": "bd4182742c09e187096a8b168c5760d17f0d821e",
+      "deploy/lan/verify-pilot-database.sh": "b895491137b4fb376180bc6e02d1e118f8f364d0",
       "deploy/lan/Dockerfile.node.remote": "9139956d1102abe35422b81642c68b6ecd308216"
     }
   },
@@ -46,7 +46,14 @@
   "pilot": {
     "observationStatus": "historical-state-database-stopped",
     "observedAt": "2026-09-30T00:08:01+09:00",
-    "observationToolCommit": "d3d8d927e4f959a12786a3c8698c3fd026e43acc",
+    "observationToolState": "uncommitted-working-tree",
+    "observationToolFirstCommittedIn": "d3d8d927e4f959a12786a3c8698c3fd026e43acc",
+    "agentImageBuildRecipe": {
+      "path": "deploy/lan/Dockerfile.node.remote",
+      "gitBlobSHA1": "9139956d1102abe35422b81642c68b6ecd308216",
+      "firstCommittedIn": "d3d8d927e4f959a12786a3c8698c3fd026e43acc",
+      "presentInAgentImageSourceCommit": false
+    },
     "operatorStateDigestSHA256": "afae42e68f12b09d676ac673188ee214d0ceb782c51bedb5d5c817108394e829",
     "agentImageDigest": "sha256:e29a48a796b6643bae6370600850990b28d35248969653532b0ba6a696f8caee",
     "configuredWorkerCount": 3,
@@ -76,7 +83,8 @@
     {
       "ordinal": 1,
       "observedAt": "2026-09-30T00:08:01+09:00",
-      "observationToolCommit": "d3d8d927e4f959a12786a3c8698c3fd026e43acc",
+      "observationToolState": "uncommitted-working-tree",
+      "observationToolFirstCommittedIn": "d3d8d927e4f959a12786a3c8698c3fd026e43acc",
       "status": "online",
       "snapshotObserved": true,
       "profile": "lan-observe-v1"
@@ -84,7 +92,8 @@
     {
       "ordinal": 2,
       "observedAt": "2026-09-30T00:08:01+09:00",
-      "observationToolCommit": "d3d8d927e4f959a12786a3c8698c3fd026e43acc",
+      "observationToolState": "uncommitted-working-tree",
+      "observationToolFirstCommittedIn": "d3d8d927e4f959a12786a3c8698c3fd026e43acc",
       "status": "online",
       "snapshotObserved": true,
       "profile": "lan-observe-v1"
@@ -92,7 +101,8 @@
     {
       "ordinal": 3,
       "observedAt": null,
-      "observationToolCommit": "d3d8d927e4f959a12786a3c8698c3fd026e43acc",
+      "observationToolState": "not-run",
+      "observationToolFirstCommittedIn": null,
       "status": "offline",
       "snapshotObserved": false,
       "blockedBy": "operator-host-permission"

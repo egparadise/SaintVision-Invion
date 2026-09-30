@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.232"
+version: "1.0.233"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T08:40:35+09:00"
+updated: "2026-09-30T09:01:42+09:00"
 source_of_truth: "Git"
 ---
 
