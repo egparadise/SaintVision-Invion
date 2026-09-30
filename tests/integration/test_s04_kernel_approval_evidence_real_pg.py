@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 
 import psycopg
+from psycopg import sql
 import pytest
 from inv.dispatch import DeliveryQueue
 
@@ -21,24 +22,26 @@ pytestmark = pytest.mark.postgres
 def clean_kernel_evidence_tables(postgres):
     """Give this database-wide collector an explicit empty kernel boundary."""
     with psycopg.connect(postgres.owner) as conn:
+        names = [
+            row[0]
+            for row in conn.execute(
+                "SELECT tablename FROM pg_tables WHERE schemaname='inv' ORDER BY tablename"
+            ).fetchall()
+        ]
+        required = {
+            "approval_dispatches",
+            "approval_requests",
+            "execution_attempts",
+            "execution_deliveries",
+            "outbox",
+            "run_attempts",
+            "tool_claims",
+        }
+        assert required <= set(names)
         conn.execute(
-            """
-            TRUNCATE inv.execution_attempts,
-                     inv.execution_deliveries,
-                     inv.tool_claims,
-                     inv.approval_dispatches,
-                     inv.approval_requests,
-                     inv.run_attempts,
-                     inv.outbox,
-                     inv.leases,
-                     inv.resources,
-                     inv.nodes,
-                     inv.runs,
-                     inv.projects,
-                     inv.tenants,
-                     inv.control_epoch
-            CASCADE
-            """
+            sql.SQL("TRUNCATE {} CASCADE").format(
+                sql.SQL(", ").join(sql.Identifier("inv", name) for name in names)
+            )
         )
 
 
