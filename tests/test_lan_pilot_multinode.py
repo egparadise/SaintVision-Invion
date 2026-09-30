@@ -633,7 +633,7 @@ case "$command_line" in
   *'pg_auth_members'*) echo "${FAKE_UNEXPECTED_MEMBERSHIPS:-0}" ;;
   *'pg_hba_file_rules'*) echo "${FAKE_AUTH_METHODS:-scram-sha-256}" ;;
   *'SHOW password_encryption'*) echo scram-sha-256 ;;
-  *'SELECT current_user'*'inv_lan_runtime'*) echo inv_lan_runtime ;;
+  *'-U inv_lan_runtime'*'SELECT current_user'*) echo inv_lan_runtime ;;
   *'SELECT current_user'*) echo postgres ;;
   *) echo "unexpected docker invocation" >&2; exit 3 ;;
 esac
