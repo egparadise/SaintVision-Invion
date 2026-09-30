@@ -6,6 +6,7 @@ import base64
 from copy import deepcopy
 import datetime as dt
 import json
+from pathlib import Path
 
 import pytest
 
@@ -29,7 +30,6 @@ def _k1_row(**changes):
         "claim_plan_digest": "b" * 64,
         "claim_policy_version": "policy:1",
         "claim_profile_version": "profile:1",
-        "claim_policy_decision_id": "decision",
         "claim_recovery_epoch": "00000000-0000-0000-0000-000000000003",
         "claim_not_after": NOW + dt.timedelta(minutes=2),
         "claim_created_at": NOW + dt.timedelta(seconds=1),
@@ -43,7 +43,6 @@ def _k1_row(**changes):
         "approval_id": "approval",
         "approval_action_digest": "a" * 64,
         "approval_policy_version": "policy:1",
-        "approval_policy_decision_id": "decision",
         "approval_recovery_epoch": "00000000-0000-0000-0000-000000000003",
         "bound_run_version": 4,
         "approval_status": "dispatched",
@@ -144,7 +143,6 @@ def _provenance():
         ({"approval_run_id": "other"}, "scope_mismatch"),
         ({"approval_action_digest": "f" * 64}, "action_digest_mismatch"),
         ({"approval_policy_version": "other"}, "policy_version_mismatch"),
-        ({"approval_policy_decision_id": "other"}, "policy_decision_mismatch"),
         ({"approval_recovery_epoch": "other"}, "recovery_epoch_mismatch"),
         ({"approval_expires_at": NOW}, "timestamp_mismatch"),
     ],
@@ -261,6 +259,18 @@ def test_empty_rows_never_pass_and_sql_reads_only_registered_kernel_tables():
     ):
         assert table in sql
     assert "UPDATE " not in sql and "INSERT " not in sql and "DELETE " not in sql
+    assert "policy_decision_id" not in collector.K1_SQL
+
+
+def test_current_policy_decision_is_new_claim_context_not_approval_identity():
+    source = Path("services/control-plane/src/inv/tooling.py").read_text(encoding="utf-8")
+    assert "decision = deepcopy(policy.decision)" in source
+    assert 'decision["approvedBy"] = sorted(actors)' in source
+    assert 'decision["decisionId"]' in source
+    assert (
+        collector.evaluate_k1([_k1_row()])["metrics"]["currentPolicyDecisionBindingStatus"]
+        == "RECORDED_ONLY"
+    )
 
 
 def test_clean_chain_is_measured_but_historical_epoch_never_false_passes():
@@ -277,6 +287,10 @@ def test_clean_chain_is_measured_but_historical_epoch_never_false_passes():
     assert evidence["acceptanceClaim"] is False
     assert (
         evidence["observations"]["K2"]["metrics"]["signatureVerificationStatus"] == "RECORDED_ONLY"
+    )
+    assert (
+        evidence["observations"]["K1"]["metrics"]["currentPolicyDecisionBindingStatus"]
+        == "RECORDED_ONLY"
     )
 
     changed = deepcopy(evidence)

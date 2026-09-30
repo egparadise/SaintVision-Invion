@@ -44,8 +44,8 @@ from tools.operational_evidence import overall_verdict as _overall_verdict  # no
 
 
 SCHEMA_VERSION = "s04-kernel-approval-evidence:1"
-CRITERIA_VERSION = "1.0.0"
-CRITERIA_HEAD = "8cf8c1ab1385d56faa8ca8e33d22fc00dd80109c"
+CRITERIA_VERSION = "1.0.1"
+CRITERIA_HEAD = "8a506612826fe3a63a2e0c71a88bd3563b3f89c3"
 CRITERIA_PATH = "docs/vault/30_Development/S04-DB_C1-K_kernel_승인_결속_Evidence_계약.md"
 DEFAULT_OUT_DIR = REPO_ROOT / "docs/vault/30_Development/Evidence/s04-kernel-approval"
 REQUIRED_OBSERVATIONS = ("K1", "K2", "K3", "K4")
@@ -72,7 +72,6 @@ K1_REASONS = (
     "scope_mismatch",
     "action_digest_mismatch",
     "policy_version_mismatch",
-    "policy_decision_mismatch",
     "recovery_epoch_mismatch",
     "timestamp_mismatch",
 )
@@ -106,7 +105,6 @@ SELECT c.tenant_id::text AS claim_tenant_id,
        c.plan_digest AS claim_plan_digest,
        c.policy_version AS claim_policy_version,
        c.profile_version AS claim_profile_version,
-       c.policy_decision_id AS claim_policy_decision_id,
        c.recovery_epoch::text AS claim_recovery_epoch,
        c.not_after AS claim_not_after,
        c.created_at AS claim_created_at,
@@ -120,7 +118,6 @@ SELECT c.tenant_id::text AS claim_tenant_id,
        a.approval_id,
        a.action_digest AS approval_action_digest,
        a.policy_version AS approval_policy_version,
-       a.policy_decision_id AS approval_policy_decision_id,
        a.recovery_epoch::text AS approval_recovery_epoch,
        a.bound_run_version,
        a.status AS approval_status,
@@ -302,11 +299,6 @@ def evaluate_k1(rows: list[dict[str, Any]]) -> dict[str, Any]:
                     lambda: row.get("claim_policy_version") != row.get("approval_policy_version"),
                 ),
                 (
-                    "policy_decision_mismatch",
-                    lambda: row.get("claim_policy_decision_id")
-                    != row.get("approval_policy_decision_id"),
-                ),
-                (
                     "recovery_epoch_mismatch",
                     lambda: row.get("claim_recovery_epoch") != row.get("approval_recovery_epoch"),
                 ),
@@ -332,7 +324,9 @@ def evaluate_k1(rows: list[dict[str, Any]]) -> dict[str, Any]:
         )
         if reason:
             reasons[reason] += 1
-    return _observation(rows, reasons, noun="claim")
+    result = _observation(rows, reasons, noun="claim")
+    result["metrics"]["currentPolicyDecisionBindingStatus"] = "RECORDED_ONLY"
+    return result
 
 
 def _strict_object(raw: bytes) -> dict[str, Any]:
@@ -676,6 +670,8 @@ def validate_evidence(evidence: dict[str, Any]) -> None:
             "violationCount",
             "violationsByReason",
         }
+        if key == "K1":
+            expected_keys.add("currentPolicyDecisionBindingStatus")
         if key == "K2":
             expected_keys.add("signatureVerificationStatus")
         if set(metrics) != expected_keys:
@@ -701,6 +697,8 @@ def validate_evidence(evidence: dict[str, Any]) -> None:
         )
         if item.get("status") != expected_status:
             raise ValueError(f"{key} status does not match recomputed counts")
+    if observations["K1"]["metrics"].get("currentPolicyDecisionBindingStatus") != "RECORDED_ONLY":
+        raise ValueError("current policy decision binding must remain recorded-only")
 
 
 def render_markdown(evidence: dict[str, Any]) -> str:

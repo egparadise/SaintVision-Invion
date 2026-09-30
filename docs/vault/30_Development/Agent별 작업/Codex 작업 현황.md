@@ -13,7 +13,7 @@ source_of_truth: "Git"
 ## 2026-09-30 Card 158 — S04-DB C1-K kernel 승인 결속 collector 검토 요청
 
 - 선행 착지 `6fc0428b`에서 S04-DB의 별도 kernel 경계 C1-K를 가장 앞의 외부 전제 없는 Codex 고난도 카드로 선택했다. 계약은 `8cf8c1ab`, collector·PG-free/실 PG 단일 파일은 `fc08a856`·`b0ff6b69`, evidence count 재계산 보강은 `26448c94`에 구현했다.
-- K1~K3는 approval→dispatch→claim→permit→execution attempt의 scope·digest·policy·epoch·bound version·state event를 fail-closed로 대조한다. 실행 당시 epoch history K4와 permit 공개키 provenance는 각각 `NOT_REGISTERED`·`RECORDED_ONLY`로 남겨 거짓 합격을 막는다.
+- K1~K3는 approval→dispatch→claim→permit→execution attempt의 scope·digest·policy version·epoch·bound version·state event를 fail-closed로 대조한다. claim 직전 current policy decision ID, 실행 당시 epoch history K4, permit 공개키 provenance는 각각 독립 durable peer 부재·`NOT_REGISTERED`·`RECORDED_ONLY`로 남겨 거짓 합격을 막는다.
 - PG-free **20 passed**, Black·diff check exit 0. 실 PG는 hosted Core 결과 대기이며 공개 계약·migration·registry status 변경 0, S04-DB `review` 유지다. [[2026-09-30_10-27-14_KST_S04-DB_C1-K_착수_Codex]], [[S04-DB_C1-K_kernel_승인_결속_Evidence_계약]].
 
 ## 2026-09-29 S05 Card114 c50 일반 suite 격리 — Claude 재확인 요청
