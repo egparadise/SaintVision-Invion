@@ -18,6 +18,7 @@ pytestmark = pytest.mark.postgres
 
 def test_real_product_approval_claim_delivery_and_attempt_chain_is_observed(gateway):
     a = gateway
+    before = collector.collect_database(a.e.owner)
     queued(a)
     attempt = DeliveryQueue(a.e.db).acquire(a.e.tenant, command_id=a.command["commandId"])
     assert attempt is not None and attempt.operation == "execute"
@@ -40,9 +41,11 @@ def test_real_product_approval_claim_delivery_and_attempt_chain_is_observed(gate
         "MEASURED_PASS",
         "MEASURED_PASS",
     ]
-    assert evidence["observations"]["K1"]["metrics"]["claimCount"] == 1
-    assert evidence["observations"]["K2"]["metrics"]["deliveryCount"] == 1
-    assert evidence["observations"]["K3"]["metrics"]["executionAttemptCount"] == 1
+    assert evidence["observations"]["K1"]["metrics"]["claimCount"] == len(before["k1"]) + 1
+    assert evidence["observations"]["K2"]["metrics"]["deliveryCount"] == len(before["k2"]) + 1
+    assert (
+        evidence["observations"]["K3"]["metrics"]["executionAttemptCount"] == len(before["k3"]) + 1
+    )
     assert evidence["observations"]["K4"]["status"] == "NOT_REGISTERED"
     assert evidence["verdict"] == "NOT_OBSERVED"
     assert evidence["acceptanceClaim"] is False
