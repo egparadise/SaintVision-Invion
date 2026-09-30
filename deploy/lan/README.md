@@ -38,6 +38,49 @@ only. The runtime role inherits `inv_kernel`, has no ownership or RLS bypass.
 Keep the state directory: it contains the independently generated recovery epoch
 and CA. A partial failure is preserved for inspection, never reset automatically.
 
+When Docker Desktop must not be used on the Control Plane host, `init` also
+accepts `--admin-dsn-file` and `--runtime-dsn-file`. Both files must describe a
+SCRAM-authenticated loopback connection to `saintvision_lan` and must not embed
+a password in the URI. The supported boundary is an operator-owned SSH tunnel
+plus one-entry PostgreSQL passfiles stored outside the pilot state. The remote
+database publishes only on `127.0.0.1`, belongs to one dedicated user-defined
+Docker network, and has distinct admin and `inv_lan_runtime` credentials.
+`deploy/lan/prepare-pilot-database.sh` creates that digest-pinned, separately
+named database; `deploy/lan/verify-pilot-database.sh` proves missing and wrong
+credentials are rejected before the files may be used. `bind-db-auth` rebinds a
+preserved state only after those checks pass. It does not delete or silently
+reuse another pilot. `--download-port` and `--node-port` let a fresh state avoid
+ports owned by an older preserved pilot. A Node port is part of the immutable
+manifest identity and is never changed after a CSR has been prepared.
+
+The HTTPS and Node mTLS hierarchies are deliberately separate. Web PKI uses an
+ECDSA P-256 root, intermediate, and service leaf so browsers, Windows, and the
+Python Web PKI verifier accept the chain. The root passphrase must be outside
+the online CA directory; when root material is still on the operator host its
+metadata says `rootOffline: false`, never a paper claim of offline custody. The
+Node channel may retain its dedicated Ed25519 hierarchy. An intranet Node
+issuing intermediate replaces the seven-day self-signed pilot CA by supplying
+all of `--ca-key`, `--ca-key-password-file`, and `--ca-chain` to the first
+`init`. The chain is ordered issuing intermediate then root. The encrypted
+intermediate key remains in the ignored operator directory; Node private keys
+are still created only by `prepare-worker.sh` on their assigned hosts.
+`tools/intranet_pki.py` creates the ECDSA Web PKI hierarchy, issues HTTPS leaves,
+and signs or refreshes its intermediate CRL.
+
+Only the public chain is pinned into pilot state. The external issuing key and
+its password are not copied beside the pilot DB credentials. Each external-CA
+`enroll` repeats `--ca-key`, `--ca-key-password-file`, and `--ca-chain`; omission
+fails closed before a certificate is issued.
+
+For a Linux remote build, use the digest-pinned
+`deploy/lan/Dockerfile.node.remote`, save the image and its `docker image
+inspect` JSON on that host, then pass both to `bundle --prebuilt-image ...
+--prebuilt-inspect ...`. The bundle command validates the archive config digest,
+layers, runtime fields, tag, and the exact inspected image ID against the
+archive config digest without contacting local Docker. This path is
+for an exact Git source archive; it is not permission to reuse an image from an
+older source SHA.
+
 The download service exposes only the requesting Node's `worker.zip`,
 `node-cert.pem`, optional workspace bundle, and its own `/healthz`. It binds only
 the configured LAN address and maps the TCP source address to one configured
@@ -97,7 +140,11 @@ used; enrollment reads the CSR common name and selects the already assigned
 Node ID rather than relying on command order:
 
 ```powershell
-python tools/lan_pilot.py --state C:/Project/SaintVision-Invion/.work/lan-pilot enroll --csr <node-csr.pem>
+python tools/lan_pilot.py --state C:/Project/SaintVision-Invion/.work/lan-pilot enroll `
+  --csr <node-csr.pem> `
+  --ca-key C:/Project/SaintVision-Invion/.work/intranet/ca/intermediate/private/intermediate-key.pem `
+  --ca-key-password-file C:/Project/SaintVision-Invion/.work/intranet/ca/intermediate/private/intermediate-key.pass `
+  --ca-chain C:/Project/SaintVision-Invion/.work/intranet/ca/intermediate/certs/ca-chain.pem
 ```
 
 Send that command's certificate file SHA-256 to the matching worker over the
@@ -224,6 +271,22 @@ harmless idempotent opt-out: it persists
 `channels`, and does not alter any independent Node. It is not evidence that a
 co-located identity or channel ever existed.
 
+For an ordinary Node certificate, run `revoke-node-certificate --node-id ...
+--reason ...` before publishing another bootstrap bundle. It writes the private
+state revocation marker first and then disables the pinned DB channel with its
+monotonic version/audit record. Restart the bootstrap server so its in-memory
+allowlist drops the revoked Node. Also run `tools/intranet_pki.py revoke` for the
+same public leaf so the intermediate CRL records the serial. Stopping only the
+container, or writing only the CRL, is not complete Node revocation.
+
+For the separate HTTPS hierarchy, `tools/intranet_pki.py refresh-crl` re-signs
+the CRL and advances `nextUpdate`. The application does not yet publish or
+enforce that CRL, so `distributionEnforced` remains false. Emergency Web PKI
+withdrawal therefore requires replacing the service leaf and deployed trust
+bundle in addition to updating the operator CRL; a local CRL file alone is not
+an acceptance result. Node mTLS revocation continues to use the pinned channel
+version as its primary enforcement boundary.
+
 ## Worker enrollment
 
 1. Obtain `http://192.168.45.99:18081/worker.zip` and verify its SHA-256 against
@@ -279,7 +342,8 @@ CA lifetime is seven days; peer certificates and the initial allowlist last at
 most six days. Expiry fails closed. This first bootstrap intentionally does not
 implement renewal: preserve keys, advance the peer-policy version, and reconcile
 the certificate channel through the existing operator contracts before extending
-the pilot. Windows reboot does not automatically relaunch the server's observer
+the pilot. Automated Node leaf rotation is therefore still a readiness blocker,
+not an implied capability. Windows reboot does not automatically relaunch the server's observer
 or download process. The worker and database use `unless-stopped`.
 
 Stop the bootstrap and observer processes by their recorded PIDs after validating
