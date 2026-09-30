@@ -374,6 +374,22 @@ def product_verifier():
     return AccessTokens
 
 
+def seal_of(path: Path) -> tuple[str, int, int, int]:
+    """What the copy is, tightly enough that a replacement cannot look the same.
+
+    The bytes' digest is the substance. The inode catches a file swapped in under the same
+    name -- the case a digest alone would miss if the replacement were later swapped back --
+    and size and modification time in nanoseconds catch a rewrite in place.
+    """
+    info = os.stat(path)
+    return (
+        hashlib.sha256(path.read_bytes()).hexdigest(),
+        info.st_ino,
+        info.st_size,
+        info.st_mtime_ns,
+    )
+
+
 def verifier_refusal(verifier, identity: dict, bundle_raw: bytes, bundle_sha: str) -> list[str]:
     """Ask the product verifier about the bytes that were hashed, not about a path.
 
@@ -383,8 +399,17 @@ def verifier_refusal(verifier, identity: dict, bundle_raw: bytes, bundle_sha: st
     reverse. The verifier is security-critical product code and is not changed for this
     check, so the bytes already read and hashed here are written once into a directory this
     run owns (0700) as a regular file (0600), and the verifier is pointed at that copy. The
-    copy is re-hashed before the verifier sees it, so what was judged is provably what this
-    report hashes, and it is removed afterwards whatever happens.
+    copy is sealed before the verifier sees it **and the seal is checked again after the
+    verifier returns**, so what was judged is provably what this report hashes, and it is
+    removed afterwards whatever happens.
+
+    Checking only before was not enough. Round 5 hashed the copy and then handed the path
+    over, which still leaves a window: the copy could be replaced between the hash and
+    ``_keys()``'s read, and a review reproduced a false clean that way. The window cannot be
+    removed while the verifier takes a path, so it is **closed by checking both ends** --
+    the file's identity (inode, size, modification time in nanoseconds) and its bytes must
+    be unchanged afterwards, or the run refuses. A swap inside the window has to alter one
+    of those to have had any effect.
     """
     directory = Path(tempfile.mkdtemp(prefix="inv-smoke-bundle-"))
     try:
@@ -400,18 +425,28 @@ def verifier_refusal(verifier, identity: dict, bundle_raw: bytes, bundle_sha: st
             os.write(handle, bundle_raw)
         finally:
             os.close(handle)
-        if hashlib.sha256(copy.read_bytes()).hexdigest() != bundle_sha:
+        sealed = seal_of(copy)
+        if sealed[0] != bundle_sha:
             raise SmokeRefused(
                 "the trust bundle copy does not hash to the bytes this report recorded"
             )
+        refused: list[str] = []
         try:
             verifier(**{**identity, "jwks_file": str(copy)})
         except Exception as error:
             # The authority, and it enforces more than the names below: key type,
             # algorithm, use, absence of a private exponent, key-id uniqueness, RSA size.
-            return [f"the-verifier-that-loads-it-refuses-this-configuration-"
-                    f"{type(error).__name__}"]
-        return []
+            refused = [f"the-verifier-that-loads-it-refuses-this-configuration-"
+                       f"{type(error).__name__}"]
+        # The other end of the window. A verdict about bytes that changed while being read
+        # is not a verdict about anything, so it is refused rather than reported -- in both
+        # directions, because a swap towards an acceptable bundle manufactures a pass just
+        # as a swap away from one manufactures a defect.
+        if seal_of(copy) != sealed:
+            raise SmokeRefused(
+                "the trust bundle copy changed while the verifier was reading it"
+            )
+        return refused
     finally:
         try:
             copy.unlink(missing_ok=True)

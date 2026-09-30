@@ -1949,3 +1949,140 @@ def test_a_duplicate_root_still_has_to_be_an_approved_root(world):
     doubled.write_text(w["foreign"]["pem"] + w["foreign"]["pem"], encoding="utf-8")
     with pytest.raises(smoke.SmokeRefused, match="unapproved anchor"):
         run(w, ca_bundle=doubled)
+
+
+# --- Codex r5: the window between the copy's hash and the verifier's read ----------
+
+
+def identity_for(tmp_path, issuer="https://idp.example.invalid/realms/sv"):
+    return {
+        "tenant_id": "00000000-0000-4000-8000-000000000001",
+        "issuer": issuer,
+        "audience": "sv-api",
+        "client_ids": ["sv-portal"],
+        "jwks_file": str(tmp_path / "configured.json"),
+    }
+
+
+def bundle_bytes(**overrides):
+    now = int(dt.datetime.now(dt.timezone.utc).timestamp())
+    document = {"issuer": "https://idp.example.invalid/realms/sv",
+                "expiresAt": now + 3 * 86_400,
+                "keys": [dict(SIGNING_KEY)]}
+    document.update(overrides)
+    return json.dumps(document).encode()
+
+
+def swapping_verifier(replacement, *, delete_first=False):
+    """A verifier that rewrites the very file it was handed, as a racing writer would.
+
+    This is the window Codex found: round 5 hashed the copy and then passed the path, so
+    anything that wrote to that path before `_keys()` read it would be judged instead.
+    """
+    class Swapper:
+        seen: list = []
+
+        def __init__(self, **identity):
+            target = Path(identity["jwks_file"])
+            Swapper.seen.append(str(target))
+            if delete_first:
+                # A different file under the same name: new inode, same length possible.
+                target.unlink()
+                target.write_bytes(replacement)
+            else:
+                target.write_bytes(replacement)
+
+    Swapper.seen = []
+    return Swapper
+
+
+def test_a_swap_inside_the_verifier_window_refuses_the_run(tmp_path):
+    """Codex r5's probe: the copy is replaced while the verifier is reading it."""
+    sealed = bundle_bytes()
+    with pytest.raises(smoke.SmokeRefused, match="changed while the verifier was reading it"):
+        smoke.verifier_refusal(
+            swapping_verifier(bundle_bytes(expiresAt=1)),
+            identity_for(tmp_path),
+            sealed,
+            hashlib.sha256(sealed).hexdigest(),
+        )
+
+
+def test_a_swap_towards_an_acceptable_bundle_also_refuses(tmp_path):
+    """The other direction. A swap that would manufacture a pass is refused too.
+
+    The sealed bytes are unacceptable here, so a naive check might have reported the defect
+    and moved on; what matters is that the verdict was formed over bytes that changed, and
+    such a verdict is not a verdict.
+    """
+    sealed = bundle_bytes(keys=[{**SIGNING_KEY, "alg": "RSA-OAEP", "use": "enc"}])
+    with pytest.raises(smoke.SmokeRefused, match="changed while the verifier was reading it"):
+        smoke.verifier_refusal(
+            swapping_verifier(bundle_bytes()),
+            identity_for(tmp_path),
+            sealed,
+            hashlib.sha256(sealed).hexdigest(),
+        )
+
+
+def test_a_replacement_file_under_the_same_name_is_refused(tmp_path):
+    """Unlinked and recreated: the digest could match while the file is a different one."""
+    sealed = bundle_bytes()
+    with pytest.raises(smoke.SmokeRefused, match="changed while the verifier was reading it"):
+        smoke.verifier_refusal(
+            swapping_verifier(sealed, delete_first=True),
+            identity_for(tmp_path),
+            sealed,
+            hashlib.sha256(sealed).hexdigest(),
+        )
+
+
+def test_a_verifier_that_only_reads_leaves_the_seal_intact(tmp_path):
+    """The control: an honest verifier changes nothing and the run proceeds."""
+    sealed = bundle_bytes()
+    reads = []
+
+    class Reader:
+        def __init__(self, **identity):
+            reads.append(Path(identity["jwks_file"]).read_bytes())
+
+    assert smoke.verifier_refusal(
+        Reader, identity_for(tmp_path), sealed, hashlib.sha256(sealed).hexdigest()
+    ) == []
+    assert reads == [sealed]
+
+
+def test_a_refusal_by_the_real_verifier_still_checks_the_seal_afterwards(tmp_path):
+    """A defect verdict is returned only when the bytes it was formed over held still."""
+    sealed = bundle_bytes(keys=[{**SIGNING_KEY, "alg": "RSA-OAEP", "use": "enc"}])
+    defects = smoke.verifier_refusal(
+        smoke.product_verifier(), identity_for(tmp_path), sealed,
+        hashlib.sha256(sealed).hexdigest(),
+    )
+    assert any("refuses-this-configuration" in defect for defect in defects), defects
+
+
+def test_the_seal_covers_identity_as_well_as_bytes(tmp_path):
+    """Judge the seal: a digest alone would not see a file swapped in under one name."""
+    target = tmp_path / "sealed.json"
+    target.write_bytes(b'{"a": 1}')
+    first = smoke.seal_of(target)
+    assert first[0] == hashlib.sha256(b'{"a": 1}').hexdigest()
+    assert len(first) == 4, "digest, inode, size and mtime_ns"
+
+    target.unlink()
+    target.write_bytes(b'{"a": 1}')
+    second = smoke.seal_of(target)
+    assert second[0] == first[0], "same bytes, so the digest cannot tell them apart"
+    assert second != first, "the seal must, through inode or mtime"
+
+
+def test_the_copy_is_still_removed_when_the_seal_check_refuses(tmp_path):
+    before = set(Path(tempfile.gettempdir()).glob("inv-smoke-bundle-*"))
+    sealed = bundle_bytes()
+    with pytest.raises(smoke.SmokeRefused):
+        smoke.verifier_refusal(
+            swapping_verifier(bundle_bytes(expiresAt=1)),
+            identity_for(tmp_path), sealed, hashlib.sha256(sealed).hexdigest(),
+        )
+    assert set(Path(tempfile.gettempdir()).glob("inv-smoke-bundle-*")) == before

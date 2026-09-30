@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-INTRANET-E2E-SMOKE-2026-09-30"
-title: "사내망 종단 smoke v1.4 (카드 155) — 검토 두 축이 찾은 fail-open을 닫았다: 시험 대상 신원이 CLI 인자였기 때문에 foreign issuer로 PASS가 재현됐다. issuer·client·신뢰 키를 제어 평면 설정에서 읽고 TLS 대상을 그 issuer에서 유도해 SNI·Host·announced issuer가 한 문자열이 되게 했다. invalid_client를 grant-disabled PASS에서 제거하고, 제어 평면 401은 정본 ProblemDetails·AUTH-0050만 인정하며, 서명까지 도달하는 토큰으로 검증한다. 해석된 뒤의 연결 실패는 FAIL이다. 되살림 변이 12종 전부 죽는다. v1.2에서 검토 두 축의 11건을 더 닫았다 — 승인 root 옆에 CA:FALSE self-signed leaf를 끼우면 `get_ca_certs()`가 그것을 빼고 돌려주므로 basicConstraints·승인 목록 검사를 **전부 우회해 TLS가 통과했다**(실측), 설정 digest만으로 PASS를 주던 결속을 NOT_BOUND로 정직하게 바꿨고, JWKS는 교집합이 아니라 **정확히 같은 집합**을 요구하며 key material까지 비교한다, OAuth error는 token endpoint의 status와 함께만 증거가 된다. v1.3에서 여섯 건을 더 닫았다 — `unsupported_grant_type`은 **client 조회 전에** 나오므로 client id 오타 하나가 세 관측을 동시에 통과시켰고, bundle 판정이 제품 `AccessTokens._keys()`보다 약해 RSA-OAEP 키를 통과시켰다. v1.4에서 다섯 건을 더 닫았다 — 그 제품 verifier에게 **경로**를 넘겨 두 번째 read가 다른 bytes를 볼 수 있었고(TOCTOU), 401을 400과 똑같이 취급해 **client 인증 실패를 grant 증거로** 읽었다"
-version: "1.4.0"
+title: "사내망 종단 smoke v1.5 (카드 155) — 검토 두 축이 찾은 fail-open을 닫았다: 시험 대상 신원이 CLI 인자였기 때문에 foreign issuer로 PASS가 재현됐다. issuer·client·신뢰 키를 제어 평면 설정에서 읽고 TLS 대상을 그 issuer에서 유도해 SNI·Host·announced issuer가 한 문자열이 되게 했다. invalid_client를 grant-disabled PASS에서 제거하고, 제어 평면 401은 정본 ProblemDetails·AUTH-0050만 인정하며, 서명까지 도달하는 토큰으로 검증한다. 해석된 뒤의 연결 실패는 FAIL이다. 되살림 변이 12종 전부 죽는다. v1.2에서 검토 두 축의 11건을 더 닫았다 — 승인 root 옆에 CA:FALSE self-signed leaf를 끼우면 `get_ca_certs()`가 그것을 빼고 돌려주므로 basicConstraints·승인 목록 검사를 **전부 우회해 TLS가 통과했다**(실측), 설정 digest만으로 PASS를 주던 결속을 NOT_BOUND로 정직하게 바꿨고, JWKS는 교집합이 아니라 **정확히 같은 집합**을 요구하며 key material까지 비교한다, OAuth error는 token endpoint의 status와 함께만 증거가 된다. v1.3에서 여섯 건을 더 닫았다 — `unsupported_grant_type`은 **client 조회 전에** 나오므로 client id 오타 하나가 세 관측을 동시에 통과시켰고, bundle 판정이 제품 `AccessTokens._keys()`보다 약해 RSA-OAEP 키를 통과시켰다. v1.4에서 다섯 건을 더 닫았다 — 그 제품 verifier에게 **경로**를 넘겨 두 번째 read가 다른 bytes를 볼 수 있었고(TOCTOU), 401을 400과 똑같이 취급해 **client 인증 실패를 grant 증거로** 읽었다. v1.5에서 그 사본의 창을 양쪽에서 닫았다 — 사본을 해시한 뒤 verifier가 읽기 **전에** 사본 자체를 교체할 수 있었다"
+version: "1.5.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 audience: "user"
-updated: "2026-09-30T12:53:09+09:00"
+updated: "2026-09-30T13:54:05+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "6fc0428b"
@@ -97,6 +97,18 @@ provider가 client를 **찾아야만** 낼 수 있는 답으로 좁혔다 — `u
 - **중복 root 제거에 시험이 없었다.** `len(distinct)`를 `len(parsed)`로 되돌리는 변이가 생존했다. 같은 root를 두 번 넣으면 통과하고 anchor가 **하나로** 세어지는 것, 그리고 중복이어도 **승인 목록은 그대로 적용**되는 것을 고정했다.
 - **짧은 계정명에서 조각 검사가 오탐할 수 있었다.** 계정명이 `ab` 같으면 평범한 단어 안에 들어가 거짓 경보가 된다. 4자 이상만 찾고, 경로를 실제로 배제하는 것은 **구분자 단언**이라는 점을 적어 두었다.
 
+### 1-3. v1.5에서 바뀐 것 — 창을 좁히는 것과 닫는 것은 다르다
+
+v1.4는 해시한 bytes를 사본에 써서 verifier를 그 사본에 겨눴다. **그것은 창을 좁혔을 뿐 닫지 않았다.** 사본을 해시한 시점과 `_keys()`가 그 경로를 읽는 시점 사이에 **사본 자체를 교체할 수 있고**, 검토가 그 방법으로 **거짓 clean을 재현**했다.
+
+verifier가 경로를 받는 한 창 자체는 없앨 수 없다(그리고 제품 코드는 여전히 건드리지 않는다). 그래서 **양쪽 끝을 확인해 닫는다** — 사본을 쓴 직후 **봉인**하고, verifier가 돌아온 **직후 같은 봉인을 다시 확인**한다. 다르면 `SmokeRefused`다.
+
+봉인은 넷이다: **bytes의 sha256 · inode · 크기 · 수정시각(ns)**. bytes가 본질이고, inode는 **같은 이름으로 바꿔 끼운 다른 파일**을 잡고(digest만으로는 같은 내용으로 되돌려 놓으면 구분되지 않는다), 크기와 ns 수정시각은 제자리 덮어쓰기를 잡는다. **창 안의 교체가 효과를 내려면 이 중 하나는 반드시 달라진다.**
+
+**양방향 모두 거부한다.** 받아들일 수 없는 쪽으로 바꾸는 것만 문제가 아니다 — 받아들일 수 있는 쪽으로 바꾸면 **통과가 조작**되기 때문이다. 어느 쪽이든 **읽히는 동안 바뀐 bytes에 대한 판정은 판정이 아니다.**
+
+시험은 지시대로 양방향이고, 여기에 **같은 이름의 다른 파일**(unlink 후 재생성, 내용 동일) 사례를 더했다 — digest만 보는 봉인이라면 통과하는 경우다. 봉인을 digest 하나로 줄이는 변이가 그 시험에서 죽는다. 그리고 봉인 검사가 거부할 때도 **사본은 지워진다.**
+
 ## 2. 무엇이 나왔나
 
 `tools/intranet_e2e_smoke.py`. 신원 경로의 조각들은 각각 측정돼 있었지만, 그것이 **배포된 상태로 줄이 맞는지**는 다른 주장이다 — 이름이 해석되는지, 제시되는 인증서가 사내 CA가 낸 그것인지, discovery의 issuer가 제어 평면에 설정된 문자열과 같은지, 제어 평면이 거부해야 할 토큰을 거부하는지.
@@ -181,7 +193,7 @@ ISO 시각도 콜론 때문에 IPv6로 읽히므로 검사 전에 제거한다. 
 
 | 확인 | 결과 |
 |---|---|
-| 단위·부정 시험 | `tests/core/test_intranet_e2e_smoke.py` **182 passed**(v1.3 171 수집, v1.2 140, v1.1 103). v1.3에서는 전체 실행이 메모리 부족으로 중단됐으므로(51 passed 지점) 그때는 focused 실행만 기록했다. v1.4에서는 파일을 **두 덩이로 나눠 각각 별도 프로세스**로 돌려 **91 + 91 = 182 passed**로 전체를 확인했다(4m28s + 7m30s) — 대부분 **실제 TLS 서버와 실제 socket**, 서로 다른 CA 두 개. 첫 판의 60건은 helper를 monkeypatch해 "helper가 시킨 값을 돌려준다"만 증명했고, 그래서 host↔issuer 불일치를 놓쳤다 |
+| 단위·부정 시험 | `tests/core/test_intranet_e2e_smoke.py` **189 passed**(v1.4 182, (v1.3 171 수집, v1.2 140, v1.1 103). v1.3에서는 전체 실행이 메모리 부족으로 중단됐으므로(51 passed 지점) 그때는 focused 실행만 기록했다. v1.4부터 파일을 **두 덩이로 나눠 각각 별도 프로세스**로 돌린다 — v1.5는 **95 + 94 = 189 passed**(4m34s + 7m27s) — 대부분 **실제 TLS 서버와 실제 socket**, 서로 다른 CA 두 개. 첫 판의 60건은 helper를 monkeypatch해 "helper가 시킨 값을 돌려준다"만 증명했고, 그래서 host↔issuer 불일치를 놓쳤다 |
 | **되살림 변이** | 검토 12건을 **실제 도구에 하나씩 주입해 전부 죽는 것**을 확인했다(CLI issuer 복구·`invalid_client` 복귀·아무 401 수용·`cafile` 복귀·default context·해석 후 강등·IPv6 누락·`reason` 키워드·빈 집합 PASS·deadline 흡수·oversize 절단·`503` 수용) |
 | 전 경로 측정 | 시험 안에서 **내부 CA로 서명한 localhost leaf**를 쓰는 provider를 세워 **관측 가능한 9건 전부 `MEASURED_PASS`**, 결속 1건은 `NOT_BOUND`, 전체 `NOT_OBSERVED`를 확인했다. v1.1은 여기서 10/10 PASS를 주장했고 그 10번째가 파일 digest였다 |
 | 검증 무력화 수단 부재 | option 집합에 `--insecure`·`--no-verify`·`--skip-verify`·`-k`·`--allow-insecure` **없음**, `--ca-bundle`은 **필수** |
@@ -192,6 +204,7 @@ ISO 시각도 콜론 때문에 IPv6로 읽히므로 검사 전에 제거한다. 
 | 자격증명 차단 | URL userinfo·bearer·JWT·PEM·`Authorization:` 거부, JSON·Markdown·stdout **셋 다** 검사 |
 | CA 결속 | **PEM을 직접 전수 파싱**해 전부 CA임을 `basicConstraints`로 확인, 개수를 `cert_store_stats()['x509']`와 대조, store가 나열하는 CA가 검사한 bytes에 없으면 거부, 승인 목록과 대조, **한 번 읽은 bytes를 `cadata`로** 신뢰. **승인 root + CA:FALSE self-signed leaf**를 넣으면 거부(v1.1은 통과시켰다), leaf 단독도 거부, 승인 안 된 root가 섞이면 네트워크 전에 거부 |
 | 환경 독립 | `SSL_CERT_FILE`·`SSL_CERT_DIR`·`REQUESTS_CA_BUNDLE`·`PYTHONHTTPSVERIFY`·`CURL_CA_BUNDLE`을 세워도 anchor 불변, `SSLKEYLOGFILE`에도 `keylog_filename is None` |
+| **읽히는 동안 바뀌지 않았다** | verifier가 사본을 읽는 창 안에서 교체하면 **양방향 모두 `SmokeRefused`**(받아들일 수 없는 쪽·받아들일 수 있는 쪽), **같은 이름의 다른 파일**(내용 동일, inode 변경)도 거부, 정직한 verifier는 봉인을 그대로 두고 통과, 봉인 검사가 거부할 때도 사본 삭제. 변이 2종(사후 검사 제거 · 봉인을 digest만으로 축소) **전부 죽는다** |
 | **해시한 bytes = 판정한 bytes** | 첫 read 직후 원래 경로를 유효 bundle로 바꾸는 probe에서 판정이 **FAIL 유지**, 반대 방향에서 **PASS가 만들어지지 않음**, verifier에게 준 경로가 설정 경로와 **다름**, 사본이 남지 않음(예외 경로 포함), digest 불일치 시 **run 거부** |
 | **400만 grant 증거** | 400에서 세 관측 PASS, **401에서 세 관측 전부 FAIL**(이유 문구까지), `GRANT_EVIDENCE_STATUS == 400` 고정 |
 | **bundle 권위** | `named_bundle_defects`가 RSA-OAEP `use: enc` 키에 **아무 결함도 못 보는 것**을 시험으로 고정하고, 같은 bundle을 `AccessTokens`가 거부하는 것을 확인했다. enc 키·다른 alg·비-RSA·private `d`·9개·1024비트·8192비트·비-base64url modulus **각각 FAIL**, 0개·중복 `kid`·비-문자열 `kid`는 **run 거부**(probe 토큰이 지목할 `kid`가 없으므로 관측이 성립하지 않는다) |
