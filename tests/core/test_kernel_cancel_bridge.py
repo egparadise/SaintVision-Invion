@@ -113,6 +113,10 @@ def test_route_passes_boundary_trace_and_only_real_transitions_call_bridge():
     assert shards.index("if run[\"state\"] not in TERMINAL:") < shards.index(
         "record_user_cancel("
     )
+    parent_branch = shards.split("if parent:", 1)[1].split("pending =", 1)[0]
+    assert parent_branch.index('if parent["state"] not in TERMINAL:') < parent_branch.index(
+        "record_user_cancel("
+    ) < parent_branch.index("else:")
 
 
 def test_migration_closes_owner_function_policy_and_downgrade_boundaries():
@@ -129,14 +133,16 @@ def test_migration_closes_owner_function_policy_and_downgrade_boundaries():
         "ALTER FUNCTION {SIGNATURE} OWNER"
     ) < source.index("REVOKE CREATE ON SCHEMA public")
     assert "CREATE POLICY cancel_bridge_audit_append" in source
+    assert "CREATE POLICY cancel_bridge_audit_read" in source
     assert "action = 'run.cancel.requested'" in source
     assert "outcome = 'allow'" in source
     assert "target_type = 'run'" in source
     assert "GRANT UPDATE (state,termination_reason,ended_at,version)" in source
-    assert "GRANT UPDATE (lock_sentinel)" in source
-    assert "GRANT UPDATE (kernel_lock_sentinel)" in source
+    assert "GRANT UPDATE (lock_sentinel)" not in source
+    assert "GRANT UPDATE (kernel_lock_sentinel)" not in source
     assert "GRANT UPDATE (state)" not in source
     assert "GRANT UPDATE (workspace_id)" not in source
+    assert "GRANT SELECT (tenant_id,event_id) ON public.audit_events" in source
     assert "DROP ROLE" not in source
 
 
@@ -168,6 +174,23 @@ def test_definer_does_not_relock_caller_locked_or_immutable_kernel_rows():
     )[0]
     assert "FOR SHARE" not in kernel_check
     assert "FOR SHARE" not in mapping_check
+
+
+def test_definer_reuses_control_grant_authority_locks_without_extra_row_locks():
+    source = MIGRATION.read_text(encoding="utf-8")
+    body = source.split("AS $fn$", 1)[1].split("$fn$;", 1)[0]
+    authority_check = body.split("SELECT s.user_id", 1)[1].split(
+        "IF v_user_id", 1
+    )[0]
+    assert "FOR SHARE" not in authority_check
+    assert "FOR SHARE OF bp, s, p, u, pm" not in body
+
+
+def test_definer_rejects_reused_audit_event_identifiers():
+    source = MIGRATION.read_text(encoding="utf-8")
+    body = source.split("AS $fn$", 1)[1].split("$fn$;", 1)[0]
+    assert "a.event_id = p_event_id" in body
+    assert "ERRCODE = '23505'" in body
 
 
 def test_definer_and_rls_inputs_are_pinned_to_the_changed_repository_blobs():

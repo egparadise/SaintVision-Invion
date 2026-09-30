@@ -275,11 +275,114 @@ def test_business_authority_is_rederived_and_failure_rolls_back_kernel_state(bus
         json=_body(a),
         headers=a.headers("stranger", key="cancel-bridge-no-business-role"),
     )
-    assert response.status_code == 503, response.text
-    assert response.json()["code"] == "SYS-0001"
+    assert response.status_code == 403, response.text
+    assert response.json()["code"] == "AUTH-0030"
     kernel, public, audit, ledger = _facts(a)
     assert kernel[0] != "cancelled" and public[0] != "cancelled"
     assert audit == [] and ledger == []
+
+    a.e.runs.transition(
+        a.e.tenant, a.run["runId"], "cancelled", expected_version=kernel[1]
+    )
+    with pytest.raises(psycopg.Error) as denied:
+        _direct_call(a, subject="stranger")
+    assert denied.value.sqlstate == "42501"
+    assert _facts(a)[1][0] == "draft" and _facts(a)[2] == []
+
+
+@pytest.mark.parametrize("authority_change", ["subject-disabled", "user-suspended", "approver"])
+def test_direct_function_rejects_stale_or_non_requesting_business_authority(
+    business, authority_change
+):
+    a = business
+    current = _body(a)["expectedVersion"]
+    a.e.runs.transition(a.e.tenant, a.run["runId"], "cancelled", expected_version=current)
+    with psycopg.connect(a.e.owner) as conn:
+        if authority_change == "subject-disabled":
+            conn.execute(
+                "UPDATE inv.business_subjects SET enabled=false WHERE tenant_id=%s AND user_id=%s",
+                (a.e.tenant, a.users["requester"]),
+            )
+        elif authority_change == "user-suspended":
+            conn.execute(
+                "UPDATE public.users SET status='suspended' WHERE tenant_id=%s AND user_id=%s",
+                (a.e.tenant, a.users["requester"]),
+            )
+        else:
+            conn.execute(
+                "UPDATE public.project_members SET role_code='approver' "
+                "WHERE tenant_id=%s AND project_id=%s AND user_id=%s",
+                (a.e.tenant, a.e.project, a.users["requester"]),
+            )
+    with pytest.raises(psycopg.Error) as denied:
+        _direct_call(a)
+    assert denied.value.sqlstate == "42501"
+    assert _facts(a)[1][0] == "draft" and _facts(a)[2] == []
+
+
+def test_direct_function_rejects_cancelled_kernel_run_without_business_mapping(business):
+    a = business
+    run = a.e.runs.create(a.e.tenant, a.e.project)
+    for state in ("validated", "planned", "cancelled"):
+        run = a.e.runs.transition(
+            a.e.tenant, run["runId"], state, expected_version=run["version"]
+        )
+    with pytest.raises(psycopg.Error) as missing:
+        _direct_call(a, run_id=run["runId"])
+    assert missing.value.sqlstate == "23514"
+
+
+def test_duplicate_audit_event_id_is_rejected(business):
+    a = business
+    current = _body(a)["expectedVersion"]
+    a.e.runs.transition(a.e.tenant, a.run["runId"], "cancelled", expected_version=current)
+    event_id = new_id("aud")
+    assert _direct_call(a, event_id=event_id)
+    with pytest.raises(psycopg.Error) as duplicate:
+        _direct_call(a, event_id=event_id)
+    assert duplicate.value.sqlstate == "23505"
+    assert len(_facts(a)[2]) == 1
+
+
+def test_public_terminal_mismatch_rolls_back_kernel_and_ledger(business):
+    a = business
+    with psycopg.connect(a.e.owner) as conn:
+        conn.execute(
+            "UPDATE public.runs SET state='succeeded' WHERE tenant_id=%s AND run_id=%s",
+            (a.e.tenant, a.run["runId"]),
+        )
+    response = a.http.post(
+        _url(a), json=_body(a), headers=a.headers(key="cancel-public-terminal")
+    )
+    assert response.status_code == 503, response.text
+    assert response.json()["code"] == "SYS-0001"
+    kernel, public, audit, ledger = _facts(a)
+    assert kernel[0] != "cancelled" and public[0] == "succeeded"
+    assert audit == [] and ledger == []
+
+
+def test_execute_revoke_fails_closed_and_same_key_retries_after_restore(business):
+    a = business
+    body = _body(a)
+    with psycopg.connect(a.e.owner) as conn:
+        conn.execute(f"REVOKE EXECUTE ON FUNCTION {SIGNATURE} FROM inv_kernel")
+    try:
+        denied = a.http.post(
+            _url(a), json=body, headers=a.headers(key="cancel-execute-revoked")
+        )
+        assert denied.status_code == 503, denied.text
+        assert denied.json()["code"] == "SYS-0001"
+        kernel, public, audit, ledger = _facts(a)
+        assert kernel[0] != "cancelled" and public[0] != "cancelled"
+        assert audit == [] and ledger == []
+    finally:
+        with psycopg.connect(a.e.owner) as conn:
+            conn.execute(f"GRANT EXECUTE ON FUNCTION {SIGNATURE} TO inv_kernel")
+    retry = a.http.post(
+        _url(a), json=body, headers=a.headers(key="cancel-execute-revoked")
+    )
+    assert retry.status_code == 200, retry.text
+    assert len(_facts(a)[2]) == 1
 
 
 def test_definer_policy_matches_the_live_catalogue_definition(business):

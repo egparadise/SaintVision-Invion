@@ -60,14 +60,10 @@ def upgrade() -> None:
           ON inv.business_projects TO {OWNER};
         GRANT SELECT (tenant_id,subject_id,user_id,enabled)
           ON inv.business_subjects TO {OWNER};
-        GRANT UPDATE (lock_sentinel)
-          ON inv.business_projects, inv.business_subjects TO {OWNER};
         GRANT SELECT (tenant_id,project_id,status) ON public.projects TO {OWNER};
         GRANT SELECT (tenant_id,user_id,status) ON public.users TO {OWNER};
         GRANT SELECT (tenant_id,project_id,user_id,role_code)
           ON public.project_members TO {OWNER};
-        GRANT UPDATE (kernel_lock_sentinel)
-          ON public.projects, public.users, public.project_members TO {OWNER};
         GRANT SELECT (tenant_id,run_id,workspace_id,workload_id,state,version)
           ON public.runs TO {OWNER};
         GRANT UPDATE (state,termination_reason,ended_at,version)
@@ -79,6 +75,7 @@ def upgrade() -> None:
         GRANT INSERT (event_id,occurred_at,tenant_id,actor_type,actor_id,action,
           outcome,reason_code,trace_id,target_type,target_id,detail)
           ON public.audit_events TO {OWNER};
+        GRANT SELECT (tenant_id,event_id) ON public.audit_events TO {OWNER};
 
         CREATE POLICY cancel_bridge_projects_read ON public.projects
           FOR SELECT TO {OWNER}
@@ -121,6 +118,10 @@ def upgrade() -> None:
             AND target_type = 'run'
             AND detail = '{{"reason":"cancelled_by_user"}}'::jsonb
           );
+        CREATE POLICY cancel_bridge_audit_read ON public.audit_events
+          FOR SELECT TO {OWNER}
+          USING (tenant_id = NULLIF(
+            pg_catalog.current_setting('inv.tenant_id',true),'')::uuid);
 
         CREATE FUNCTION {FUNCTION}(
           p_subject_id text,
@@ -152,6 +153,13 @@ def upgrade() -> None:
              OR p_trace_id !~ '^[0-9a-f]{{32}}$' THEN
             RAISE EXCEPTION 'canonical event and trace identifiers are required'
               USING ERRCODE = '22023';
+          END IF;
+          IF EXISTS (
+            SELECT 1 FROM public.audit_events a
+             WHERE a.tenant_id = v_tenant AND a.event_id = p_event_id
+          ) THEN
+            RAISE EXCEPTION 'audit event identifier already exists'
+              USING ERRCODE = '23505';
           END IF;
 
           SELECT r.state, r.project_id
@@ -191,8 +199,7 @@ def upgrade() -> None:
              AND s.enabled
              AND p.status = 'active'
              AND u.status = 'active'
-             AND pm.role_code IN ('owner','maintainer','operator')
-           FOR SHARE OF bp, s, p, u, pm;
+             AND pm.role_code IN ('owner','maintainer','operator');
           IF v_user_id IS NULL THEN
             RAISE EXCEPTION 'active business cancellation authority is absent'
               USING ERRCODE = '42501';
@@ -255,6 +262,7 @@ def downgrade() -> None:
     op.execute(
         f"""
         DROP FUNCTION IF EXISTS {SIGNATURE};
+        DROP POLICY IF EXISTS cancel_bridge_audit_read ON public.audit_events;
         DROP POLICY IF EXISTS cancel_bridge_audit_append ON public.audit_events;
         DROP POLICY IF EXISTS cancel_bridge_runs_update ON public.runs;
         DROP POLICY IF EXISTS cancel_bridge_runs_read ON public.runs;
@@ -266,6 +274,7 @@ def downgrade() -> None:
         REVOKE INSERT (event_id,occurred_at,tenant_id,actor_type,actor_id,action,
           outcome,reason_code,trace_id,target_type,target_id,detail)
           ON public.audit_events FROM {OWNER};
+        REVOKE SELECT (tenant_id,event_id) ON public.audit_events FROM {OWNER};
         REVOKE SELECT (tenant_id,run_id,workspace_id,workload_id,state,version),
           UPDATE (state,termination_reason,ended_at,version)
           ON public.runs FROM {OWNER};
@@ -275,16 +284,12 @@ def downgrade() -> None:
           ON public.workspaces FROM {OWNER};
         REVOKE SELECT (tenant_id,project_id,user_id,role_code)
           ON public.project_members FROM {OWNER};
-        REVOKE UPDATE (kernel_lock_sentinel)
-          ON public.projects, public.users, public.project_members FROM {OWNER};
         REVOKE SELECT (tenant_id,user_id,status) ON public.users FROM {OWNER};
         REVOKE SELECT (tenant_id,project_id,status) ON public.projects FROM {OWNER};
         REVOKE SELECT (tenant_id,subject_id,user_id,enabled)
           ON inv.business_subjects FROM {OWNER};
         REVOKE SELECT (tenant_id,project_id,enabled)
           ON inv.business_projects FROM {OWNER};
-        REVOKE UPDATE (lock_sentinel)
-          ON inv.business_projects, inv.business_subjects FROM {OWNER};
         REVOKE SELECT (tenant_id,project_id,run_id,workspace_id)
           ON inv.business_runs FROM {OWNER};
         REVOKE SELECT (tenant_id,project_id,run_id,state) ON inv.runs FROM {OWNER};
