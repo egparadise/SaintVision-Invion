@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-S04-C1K-EVIDENCE-CONTRACT-001"
 title: "S04-DB C1-K kernel 승인 결속 Evidence 계약"
-version: "1.0.0"
+version: "1.0.1"
 status: "proposed"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-30T10:32:34+09:00"
+updated: "2026-09-30T10:55:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S04-DB"]
@@ -34,7 +34,7 @@ collector는 REPEATABLE READ·READ ONLY snapshot 하나만 읽는다. 공개 계
 
 | ID | 관측 | `MEASURED_PASS` 조건 | 0행 또는 입력 공백 |
 |---|---|---|---|
-| K1 | approval→dispatch→claim 기록 결속 | claim이 1건 이상이고 모든 claim의 scope·command·action digest·policy version·policy decision·recovery epoch가 연결 approval/dispatch와 일치하며, dispatch≤claim이고 claim 만료가 승인 만료를 넘지 않는다 | `NOT_OBSERVED` |
+| K1 | approval→dispatch→claim 기록 결속 | claim이 1건 이상이고 모든 claim의 scope·command·action digest·policy version·recovery epoch가 연결 approval/dispatch와 일치하며, dispatch≤claim이고 claim 만료가 승인 만료를 넘지 않는다 | `NOT_OBSERVED` |
 | K2 | claim→delivery permit payload 결속 | delivery가 1건 이상이고 base64/JSON object payload가 해석되며 payload의 claim exact field set이 DB claim과 일치하고 issuedAt≤notAfter다 | `NOT_OBSERVED` |
 | K3 | approval→run version→execution attempt 결속 | execution attempt가 1건 이상이고 scheduled event version=`bound_run_version+1`, running event version=`bound_run_version+2`, running attempt와 run_attempt/execution_attempt가 일치하며 dispatch≤claim≤attempt다 | `NOT_OBSERVED` |
 | K4 | 실행 당시 control epoch 독립 증명 | 실행 시각의 epoch history 또는 동등한 독립 producer가 있고 approval·claim·Node 실행 epoch가 모두 그 값과 일치한다 | producer 부재 시 `NOT_REGISTERED` |
@@ -42,6 +42,8 @@ collector는 REPEATABLE READ·READ ONLY snapshot 하나만 읽는다. 공개 계
 K1~K3 중 하나라도 불일치·파싱 실패·중복 state event·필수 연결 누락이 있으면 해당 관측은 `MEASURED_FAIL`이다. K4는 현재 `inv.control_epoch`의 단일 현재값만으로 과거 실행 당시 값을 재구성하지 않는다. 승인과 claim의 epoch가 서로 같은 것은 K1에서 측정하지만, 그것을 실행 당시 current epoch였다는 독립 증거로 바꾸지 않는다. 그러므로 현재 구현의 전체 verdict는 위반 발견 시 `FAIL`, 그 외에는 K4 때문에 `NOT_OBSERVED`이며 `acceptanceClaim`은 false다.
 
 서명 문자열의 base64 형식과 존재는 검사하되 공개키 provenance가 없는 snapshot에서 암호학적 검증을 주장하지 않는다. `signatureVerificationStatus`는 `RECORDED_ONLY`로 고정한다.
+
+`tool_claims.policy_decision_id`는 승인 당시 `approval_requests.policy_decision_id`를 복사하는 필드가 아니다. `services/control-plane/src/inv/tooling.py:253` 이후 claim 직전의 current policy를 다시 평가하고 그 새 decision ID를 `:326`에 기록한다. current decision 본문이나 그 ID의 독립 durable peer는 남지 않으므로 두 ID의 동일성을 요구하지 않으며 `currentPolicyDecisionBindingStatus`를 `RECORDED_ONLY`로 고정한다. action digest·policy version·fresh evaluation window는 제품 코드가 검사하지만, snapshot collector는 durable record끼리 독립 대조할 수 있는 앞의 두 필드만 K1로 판정한다.
 
 ## 3. Fail-closed 규칙
 
