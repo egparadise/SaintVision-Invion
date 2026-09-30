@@ -20,9 +20,11 @@
 #   exp-iat<=3600   accessTokenLifespan stays at 300s
 #
 # NO PASSWORD APPEARS IN ANY ARGV. The admin password is read inside the container
-# from the mounted secrets file and piped to kcadm's own prompt; user passwords are
-# sent as stdin JSON to the reset-password endpoint. tests/core/
-# test_idp_scripts_keep_secrets_out_of_argv.py fails if this regresses.
+# from the mounted secrets file and handed to kcadm through KC_CLI_PASSWORD -- its
+# interactive prompt is not usable here, because without a TTY kcadm refuses with
+# "Console is not active". User passwords are sent as stdin JSON to the
+# reset-password endpoint. tests/core/test_idp_scripts_keep_secrets_out_of_argv.py
+# fails if this regresses.
 set -euo pipefail
 
 REALM="${SV_IDP_REALM:-saintvision}"

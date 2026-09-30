@@ -17,10 +17,22 @@ The third matters as much as the second. A verifier that accepts everything woul
 pass the second check, so measuring acceptance without measuring refusal measures
 nothing.
 
-Inputs are supplied out of band, deliberately: the token and the JWKS are fetched by
-whoever has access (an SSH tunnel before TLS exists) and passed as files. The token
-never reaches the evidence -- only its lifetime, and the SHA-256 of the key id that
-signed it.
+Inputs may be supplied out of band -- the token and the JWKS fetched by whoever has
+access and passed as files -- or the JWKS may be fetched here over TLS. Those are
+different claims, so the artifact records which one it was in ``jwksTransport``:
+
+* ``out-of-band-file`` -- the keys arrived as a file. **This artifact then says
+  nothing about how they travelled.** Whatever verified that transport did so
+  elsewhere, and this record must not be read as evidence of it.
+* ``verified-https`` -- fetched here, same-origin with the issuer, against the trust
+  anchor in ``SSL_CERT_FILE``, whose bytes are recorded as ``caBundleSha256``.
+
+That anchor is a *trust anchor*, not a pin: it says which CA may vouch for the name,
+not which certificate must appear. Recording its hash makes the anchor identifiable;
+it does not make the leaf fixed.
+
+The token never reaches the evidence -- only its lifetime, and the SHA-256 of the key
+id that signed it.
 
 Exit codes follow the house convention: 0 PASS, 1 FAIL, 3 NOT_OBSERVED.
 """
@@ -31,6 +43,7 @@ import argparse
 import base64
 import datetime as dt
 import json
+import os
 from pathlib import Path
 import shutil
 import sys
@@ -48,6 +61,7 @@ if str(CONTROL_PLANE_SRC) not in sys.path:
 from tools import make_oidc_trust_bundle as builder  # noqa: E402
 from tools.operational_evidence import (  # noqa: E402
     COMMIT_PATTERN,
+    SHA256_PATTERN,
     EXIT_BY_VERDICT,
     LABEL_PATTERN,
     assert_no_secrets,
@@ -61,11 +75,14 @@ from tools.operational_evidence import (  # noqa: E402
     write_evidence,
 )
 
-SCHEMA_VERSION = "oidc-identity-evidence:1"
+SCHEMA_VERSION = "oidc-identity-evidence:2"
 #: Which provider was measured. A rehearsal proves the cutover shape on a throwaway
 #: instance; it is not evidence about the provider users will actually log in to, and
 #: conflating the two is exactly the confusion this field exists to prevent.
 PROVIDER_ROLES = ("production", "cutover-rehearsal")
+#: How the signing keys reached this run. See the module docstring: only
+#: "verified-https" lets the artifact speak about the transport at all.
+JWKS_TRANSPORTS = ("out-of-band-file", "verified-https")
 DEFAULT_OUT_DIR = REPO_ROOT / "docs/vault/30_Development/Evidence/oidc-identity"
 REQUIRED = ("bundleAccepted", "liveTokenVerified", "tamperedTokenRefused")
 CRITERIA = {
@@ -186,6 +203,17 @@ def validate_evidence(evidence: dict[str, Any]) -> None:
         raise ValueError("issuerScheme must be recorded")
     if source.get("providerRole") not in PROVIDER_ROLES:
         raise ValueError("providerRole must say which provider was measured")
+    transport = source.get("jwksTransport")
+    if transport not in JWKS_TRANSPORTS:
+        raise ValueError("jwksTransport must say how the signing keys arrived")
+    if transport == "verified-https" and not SHA256_PATTERN.fullmatch(
+        str(source.get("caBundleSha256") or "")
+    ):
+        # Claiming a verified fetch without naming the trust anchor claims more than
+        # was observed: any CA the process happened to trust would have done.
+        raise ValueError("a verified-https fetch must record the trust anchor's SHA-256")
+    if not SHA256_PATTERN.fullmatch(str(source.get("jwksSha256") or "")):
+        raise ValueError("the JWKS bytes must be identified by SHA-256")
     if evidence["verdict"] == "PASS" and source.get("issuerScheme") != "https":
         # AccessTokens.__init__ refuses a non-https issuer, so a PASS here would mean
         # the evidence and the product disagree about what was even possible.
@@ -203,6 +231,12 @@ def render_markdown(evidence: dict[str, Any]) -> str:
         f"- collector SHA-256: `{evidence['collectorSha256']}`",
         f"- observed: {source['observedAt']}",
         f"- provider: **{source['providerRole']}**",
+        f"- signing keys arrived: **{source['jwksTransport']}**"
+        + (
+            f", trust anchor SHA-256 `{source['caBundleSha256']}`"
+            if source.get("caBundleSha256")
+            else " (this artifact says nothing about that transport)"
+        ),
         f"- issuer mode: **{source['issuerScheme']}**, issuer SHA-256 `{source['issuerSha256']}`",
         f"- keys in bundle: {source.get('keyCount')} (dropped non-signing: "
         f"{source.get('droppedNonSigningKeys')})",
@@ -227,7 +261,9 @@ def render_markdown(evidence: dict[str, Any]) -> str:
 def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser(description=(__doc__ or "").split("\n\n", 1)[0])
     result.add_argument("--issuer", required=True, help="exactly the configured identity.issuer")
-    result.add_argument("--jwks-file", required=True, type=Path)
+    source = result.add_mutually_exclusive_group(required=True)
+    source.add_argument("--jwks-file", type=Path, help="keys supplied out of band")
+    source.add_argument("--jwks-url", help="fetch here over TLS, same origin as --issuer")
     result.add_argument("--token-file", required=True, type=Path, help="a live access token")
     result.add_argument("--tenant-id", required=True)
     result.add_argument("--audience", default="sv-api")
@@ -248,7 +284,25 @@ def main(argv: list[str] | None = None) -> int:
     args = parser().parse_args(argv)
     started = dt.datetime.now(dt.timezone.utc)
     provenance = collect_provenance_at_root(args.executor)
-    jwks = json.loads(args.jwks_file.read_text(encoding="utf-8"))
+    if args.jwks_file is not None:
+        raw_jwks = args.jwks_file.read_text(encoding="utf-8")
+        jwks = json.loads(raw_jwks)
+        transport = "out-of-band-file"
+        anchor = None
+    else:
+        jwks = builder.read_jwks(
+            jwks_file=None, jwks_url=args.jwks_url, issuer=args.issuer, timeout=15.0
+        )
+        raw_jwks = json.dumps(jwks, sort_keys=True, separators=(",", ":"))
+        transport = "verified-https"
+        bundle = os.environ.get("SSL_CERT_FILE")
+        if not bundle:
+            print(
+                "refused: set SSL_CERT_FILE to the CA bundle before fetching over https",
+                file=sys.stderr,
+            )
+            return 2
+        anchor = sha256_text(Path(bundle).read_text(encoding="utf-8"))
     token = args.token_file.read_text(encoding="utf-8").strip()
 
     observations, facts = measure(
@@ -279,6 +333,9 @@ def main(argv: list[str] | None = None) -> int:
             "sourceFinishedAt": iso(finished),
             "issuerScheme": urlsplit(args.issuer).scheme.lower(),
             "providerRole": args.provider_role,
+            "jwksTransport": transport,
+            "jwksSha256": sha256_text(raw_jwks),
+            **({"caBundleSha256": anchor} if anchor else {}),
             "issuerSha256": sha256_text(args.issuer),
             "audienceSha256": sha256_text(args.audience),
             "clientIdSha256": sha256_text(args.client_id),

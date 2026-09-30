@@ -26,6 +26,8 @@ def passing_evidence():
             "issuerScheme": "https",
             "providerRole": "cutover-rehearsal",
             "issuerSha256": "b" * 64,
+            "jwksTransport": "out-of-band-file",
+            "jwksSha256": "c" * 64,
             "temporaryBundleRemoved": True,
         },
         "observations": {name: {"status": "MEASURED_PASS"} for name in collector.REQUIRED},
@@ -151,3 +153,52 @@ def test_a_short_or_absent_code_sha_is_refused():
         evidence["codeSha"] = value
         with pytest.raises(ValueError, match="codeSha"):
             collector.validate_evidence(evidence)
+
+
+# --- the artifact must say how the signing keys arrived ---------------------------
+#
+# The first version took the JWKS from a file and said nothing about the transport,
+# which left a reader free to assume it had been fetched over the verified TLS the
+# runbook describes elsewhere. Those are different claims.
+
+
+def test_the_transport_must_be_named():
+    evidence = passing_evidence()
+    del evidence["source"]["jwksTransport"]
+    with pytest.raises(ValueError, match="jwksTransport"):
+        collector.validate_evidence(evidence)
+    evidence["source"]["jwksTransport"] = "probably-https"
+    with pytest.raises(ValueError, match="jwksTransport"):
+        collector.validate_evidence(evidence)
+
+
+def test_a_verified_fetch_must_name_its_trust_anchor():
+    """Without the anchor, "verified" means only that some CA the process trusted."""
+    evidence = passing_evidence()
+    evidence["source"]["jwksTransport"] = "verified-https"
+    evidence["source"].pop("caBundleSha256", None)
+    with pytest.raises(ValueError, match="trust anchor"):
+        collector.validate_evidence(evidence)
+    evidence["source"]["caBundleSha256"] = "d" * 64
+    collector.validate_evidence(evidence)
+
+
+def test_an_out_of_band_file_needs_no_anchor_but_claims_no_transport():
+    evidence = passing_evidence()
+    evidence["source"]["jwksTransport"] = "out-of-band-file"
+    evidence["source"].pop("caBundleSha256", None)
+    collector.validate_evidence(evidence)
+    rendered = collector.render_markdown(evidence)
+    assert "says nothing about that transport" in rendered
+
+
+def test_the_jwks_bytes_must_be_identified():
+    evidence = passing_evidence()
+    evidence["source"]["jwksSha256"] = "not-a-hash"
+    with pytest.raises(ValueError, match="JWKS bytes"):
+        collector.validate_evidence(evidence)
+
+
+def test_the_schema_version_moved_with_the_new_required_fields():
+    """Old artifacts stay valid as :1; they simply do not carry these fields."""
+    assert collector.SCHEMA_VERSION == "oidc-identity-evidence:2"

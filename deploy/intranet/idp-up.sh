@@ -17,8 +17,22 @@
 #   * Keycloak starts through a launcher that sources a mounted file and execs
 #     kc.sh, so KC_DB_PASSWORD and the bootstrap admin password exist only inside
 #     the process, never in Config.Env.
-# The mount is a directory with mode 0700 holding 0400 files. tests/core/
-# test_idp_scripts_keep_secrets_out_of_argv.py fails if this regresses.
+#
+# EACH CONTAINER GETS ONLY THE FILES IT NEEDS, mounted one by one. Mounting the
+# whole secrets directory into both would hand the database container the
+# Keycloak bootstrap admin password -- a credential it has no use for, in a
+# container whose job is to serve one database to one client. The database sees
+# exactly one file; Keycloak sees its own env file and the launcher.
+# tests/core/test_idp_scripts_keep_secrets_out_of_argv.py fails if this regresses.
+#
+# THE 0700/0400/0500 MODES DEPEND ON A UID COINCIDENCE, and it is worth stating.
+# These files are owned by the host user (uid 1000 on this node) and the Keycloak
+# image runs as uid 1000, so the container reads them as their owner. The PostgreSQL
+# image starts as root and drops to postgres afterwards, so root reads db-password
+# before the step-down regardless of mode. On a host where the login user is not
+# uid 1000, Keycloak would be unable to read its own secrets and would fail to start
+# -- loudly, not silently, but the cause would be non-obvious. Fixing that properly
+# means aligning the ownership rather than loosening the mode.
 #
 # TLS: pass SV_IDP_CERT_DIR pointing at a directory holding server-chain.pem and
 # server-key.pem, and set SV_IDP_HOSTNAME_URL to the https issuer. Without it the
@@ -130,7 +144,7 @@ docker run -d --name "$DB_CONTAINER" --network "$NETWORK" --restart unless-stopp
   --label "$OWNER_KEY=$OWNER" \
   -e POSTGRES_DB=keycloak -e POSTGRES_USER=keycloak \
   -e POSTGRES_PASSWORD_FILE=/run/secrets/db-password \
-  -v "$SECRETS:/run/secrets:ro" \
+  -v "$SECRETS/db-password:/run/secrets/db-password:ro" \
   -v "$VOLUME:/var/lib/postgresql/data" \
   "$POSTGRES_IMAGE" >/dev/null
 
@@ -163,7 +177,8 @@ docker run -d --name "$CONTAINER" --network "$NETWORK" --restart unless-stopped 
   $publish $mounts \
   -e KC_DB=postgres -e KC_DB_URL_HOST="$DB_CONTAINER" -e KC_DB_USERNAME=keycloak \
   -e KC_HEALTH_ENABLED=true \
-  -v "$SECRETS:/run/secrets:ro" \
+  -v "$SECRETS/keycloak.env:/run/secrets/keycloak.env:ro" \
+  -v "$SECRETS/keycloak-entry.sh:/run/secrets/keycloak-entry.sh:ro" \
   --entrypoint /run/secrets/keycloak-entry.sh \
   "$KEYCLOAK_IMAGE" \
   $start_args >/dev/null
