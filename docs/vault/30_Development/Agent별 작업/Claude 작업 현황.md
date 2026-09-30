@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.47"
+version: "1.2.52"
 status: "review"
 author: "Claude"
-updated: "2026-09-29T12:19:52+09:00"
+updated: "2026-09-30T09:34:45+09:00"
 
 
 
@@ -23,6 +23,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+사내망 종단 smoke 카드 155 (Claude, 2026-09-30, base 착지 `6fc0428b`, branch `agent/claude/c155-intranet-e2e-smoke`): `tools/intranet_e2e_smoke.py` — 조각별로 측정된 신원 경로가 **배포된 상태로 줄이 맞는지**를 한 번 걸어 본다. 판정 **`BLOCKED_EXTERNAL`**(exit 3): `idpNameResolves`가 **`hosts-not-applied`** 이고 그 뒤 다섯 관측이 같은 이유로 막힌다. **제어 평면 401 두 건은 실측 PASS**(`AUTH-0050`, 잘못된 bearer·토큰 없음). **하지 않기로 구조로 막은 세 가지**: (1) **인증서 검증을 끄는 flag가 없다** — 시험이 `--insecure`·`--no-verify`·`-k` 부재를 단정한다. 끌 수 있는 smoke는 언젠가 그렇게 돌려지고 그때의 PASS는 무의미하다. (2) **이름 해석 대체 수단이 없다** — `--resolve` 없이 `BLOCKED_EXTERNAL`로 멈춘다. 주소로 우회하면 운영자가 아직 해야 할 일을 가린다. 다만 **측정된 실패가 미충족 전제보다 우선**하도록 고정했다(인증서가 틀린 것은 결함이고 '아직 준비 안 됨'이 아니다). (3) **실제 사용자 password grant를 쓰지 않는다** — 존재할 수 없는 계정으로 거부만 확인한다. **여기서 이 검사를 의미 있게 만드는 구분**: `invalid_grant`는 **틀린 거부**다(그 client가 grant를 쓸 수 있다는 뜻이고 그 자체가 결함). grant 수준 거부만 PASS로 보며, '200이 아니면 통과'로 만들었다면 **살아 있는 password grant를 잠긴 문으로 보고**했을 것이다. **보고서 redaction을 만드는 코드에 맡기지 않고 직렬화된 출력에서 검사**한다 — 그 과정에서 인증서 `notAfter`의 시각 부분이 검사기에 **IPv6로 읽히는** 것을 발견해 기록을 날짜로 정규화하고(예외를 가르치는 대신), 제어 평면은 주소가 아니라 `loopback`/`non-loopback`+포트로 적는다. **제어 평면 401의 출처를 바꿨다**: 이 PC의 `8080`은 **다른 프로세스가 점유**하고 있어 처음 측정한 401은 **내가 설정하지 않은 앱**의 응답이었다 — 그 앱의 issuer·JWKS 신뢰를 모르므로 카드 조건을 만족하지 않아 **버리고**, 카드 152의 다섯 값과 검증된 https로 받은 JWKS 기반 bundle로 **내가 설정한 인스턴스**를 loopback 다른 포트에 띄워 다시 측정했다(포트가 보고서에 적혀 감춰지지 않는다). 남의 프로세스는 읽기만 했다. **해석되는 환경에서 한 번 더 돌리지 않은 이유를 적었다** — `--add-host` container에는 git이 없어 `codeSha`가 비고, 이 도구는 40-hex commit 없이는 증거를 쓰지 않는다. SHA를 만들어 넣는 것은 측정하지 않은 것을 측정한 것처럼 만드는 일이라 측정하지 않는 쪽을 택하고, `runEnvironment`를 **필수 필드**로 만들어 나중의 보고서와 혼동할 수 없게 했다. 부수 확인 2건: 제어 평면은 `jsonschema[format]` 없이는 **오류 응답을 만들다가 500**이 되고(`date-time` 검증이 필수), landed 앱은 `src`와 `services/control-plane/src` **둘 다** import 경로에 있어야 기동한다. 시험 **60 passed**(네트워크 없이), 세 doc gate exit 0·인용 floor 불변, 증거 2파일에 **주소 형태 0건**, sudo **0건**. 전문 [[2026-09-30_사내망_종단_smoke_Claude]]. 다음 첫 행동: 사용자 hosts 적용 뒤 같은 도구 재실행, Codex 검토.
 
 release route idempotency 카드 113 (Claude, 2026-09-29, base #221 head `2f853a94` stack, branch `agent/claude/release-idempotency`, migration 없음): Codex #219 r4 F1 — `release_model`에 W2/W4와 같은 계약: `Idempotency-Key` 필수(422), `ENDPOINT` 상수, ledger payload `{modelId, version, request}`, 쓰기 tx 안 advisory lock → canApprove → clock 1회 → replay/409 → row lock → canApprove 재확인 → 이미 released 409 → release → audit → 원장 저장. helper 재사용·사본 0, span 2 유지, `get_now` 제거. PG-free 신규 12·기존 62 key 갱신(74 passed), 실 PG 신규 5(같은 key replay·mirror intent 1·409 2종·422·동시 최초 2건), 이웃 241 passed. 판단: 다른 key 재release 409, replay는 kernel GET 뒤, key 검사는 preflight 뒤. 다음 첫 행동: hosted green 인용 → Codex 검토. 전문 [[2026-09-29_G-04_release_idempotency_Claude]].
 
