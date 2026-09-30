@@ -28,6 +28,8 @@ import http.server
 import json
 import socket
 import ssl
+import sys
+import tempfile
 import threading
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -1269,12 +1271,35 @@ def test_a_refusal_with_no_named_oauth_error_is_not_client_knowledge(world):
     assert known["answeredBeforeClientLookup"] is False
 
 
-@pytest.mark.parametrize("status", [400, 401])
-def test_the_statuses_an_oauth_token_endpoint_uses_are_accepted(world, status):
-    w = world(token_status=status, token_error="unauthorized_client")
+def test_only_a_400_refusal_speaks_about_the_grant_or_the_client(world):
+    """RFC 6749 section 5.2 puts a grant the client may not use at 400.
+
+    401 is for a client the endpoint could not authenticate -- a confidential client that
+    sent no secret answers 401 -- so `unauthorized_client` at 401 is an authentication
+    outcome, not a locked door. This case asserted the opposite: it required all three
+    observations to PASS at 401 as well as 400.
+    """
+    w = world(token_status=400, token_error="unauthorized_client")
     observations, _ = run(w)
     for name in ("passwordGrantRefused", "clientCredentialsRefused", "portalClientKnown"):
         assert observations[name]["status"] == "MEASURED_PASS", name
+
+
+def test_the_same_error_at_401_is_not_evidence_about_the_grant_or_the_client(world):
+    w = world(token_status=401, token_error="unauthorized_client")
+    observations, _ = run(w)
+    known = observations["portalClientKnown"]
+    assert known["status"] == "MEASURED_FAIL"
+    assert "client-authentication outcome" in known["reason"]
+    for name in ("passwordGrantRefused", "clientCredentialsRefused"):
+        assert observations[name]["status"] == "MEASURED_FAIL", name
+        assert "client-authentication outcome" in observations[name]["reason"], name
+    assert smoke.smoke_verdict(observations) == "FAIL"
+
+
+def test_the_status_that_carries_grant_evidence_is_pinned():
+    assert smoke.GRANT_EVIDENCE_STATUS == 400
+    assert smoke.GRANT_EVIDENCE_STATUS in smoke.TOKEN_REFUSAL_STATUSES
 
 
 # --- Codex 4 and R6: the whole body, parsed strictly ------------------------------
@@ -1397,10 +1422,15 @@ def test_stdout_carries_no_path_and_is_what_was_checked(world, capsys, monkeypat
     # check exists to keep out of the output. Both fixed: a real assertion, and the
     # account read from the running environment.
     assert not {"/", "\\"} & set(printed), "a separator in the output means a path"
+    # A very short account name ("ab") would appear inside ordinary words and make this a
+    # false alarm, so only names long enough to be distinctive are searched for. The
+    # separator assertion above is what actually rules a path out, whatever it is called.
     account = getpass.getuser()
-    for fragment in (str(out), str(w["tmp"]), "Users", account, Path.home().name):
+    fragments = [str(out), str(w["tmp"]), "Users"]
+    fragments += [name for name in (account, Path.home().name) if len(name) >= 4]
+    for fragment in fragments:
         if fragment:
-            assert fragment not in printed
+            assert fragment not in printed, fragment
     smoke.assert_publishable(printed)
 
 
@@ -1733,3 +1763,189 @@ def test_the_concession_is_an_argument_and_not_a_broadened_error_set():
     assert smoke.UNKNOWN_CLIENT_ERROR not in smoke.CLIENT_RESOLVED_ERRORS
     observation = smoke.observe_grant_refused.__doc__ or ""
     assert "invalid_client" in observation
+
+
+# --- Codex r4 M2: the verifier judges the bytes that were hashed -------------------
+
+
+def test_the_verifier_judges_the_copy_of_the_bytes_that_were_hashed(tmp_path, monkeypatch):
+    """A swap between the two reads must not change the verdict.
+
+    The tool read the bundle and hashed it, then handed AccessTokens the *path*, which
+    ``_keys()`` reads again. Codex reproduced the gap with a swap probe. The fix copies the
+    already-hashed bytes into a file this run owns and points the verifier at the copy, so
+    the second read cannot see different bytes.
+
+    Here the original path is rewritten with a perfectly valid bundle immediately after the
+    first read. The verdict must still be FAIL, because the bytes that were hashed carry an
+    encryption key.
+    """
+    issuer = "https://idp.example.invalid/realms/sv"
+    now = int(dt.datetime.now(dt.timezone.utc).timestamp())
+    enc_bundle = {"issuer": issuer, "expiresAt": now + 3 * 86_400,
+                  "keys": [{**SIGNING_KEY, "alg": "RSA-OAEP", "use": "enc"}]}
+    good_bundle = {"issuer": issuer, "expiresAt": now + 3 * 86_400,
+                   "keys": [dict(SIGNING_KEY)]}
+    config = configuration(tmp_path, document=enc_bundle, issuer=issuer)
+    bundle_path = tmp_path / "bundle.json"
+
+    original = Path.read_bytes
+    swapped = {"done": False}
+
+    def read_then_swap(self, *args, **kwargs):
+        data = original(self, *args, **kwargs)
+        if Path(self) == bundle_path and not swapped["done"]:
+            # The instant after the tool's read: the path now holds an acceptable bundle.
+            swapped["done"] = True
+            bundle_path.write_text(json.dumps(good_bundle), encoding="utf-8")
+        return data
+
+    monkeypatch.setattr(Path, "read_bytes", read_then_swap)
+    result = smoke.read_control_plane_configuration(config)
+    monkeypatch.undo()
+
+    assert swapped["done"], "the probe did not get a chance to swap the file"
+    assert json.loads(bundle_path.read_text(encoding="utf-8")) == good_bundle
+    assert any("refuses-this-configuration" in defect for defect in result["bundleDefects"]), (
+        result["bundleDefects"]
+    )
+    assert result["bundleSha256"] == hashlib.sha256(
+        json.dumps(enc_bundle).encode()
+    ).hexdigest()
+
+
+def test_the_swap_in_the_other_direction_does_not_manufacture_a_pass(tmp_path, monkeypatch):
+    """The mirror: hashed bytes are acceptable, the path becomes unacceptable."""
+    issuer = "https://idp.example.invalid/realms/sv"
+    now = int(dt.datetime.now(dt.timezone.utc).timestamp())
+    good_bundle = {"issuer": issuer, "expiresAt": now + 3 * 86_400,
+                   "keys": [dict(SIGNING_KEY)]}
+    enc_bundle = {"issuer": issuer, "expiresAt": now + 3 * 86_400,
+                  "keys": [{**SIGNING_KEY, "alg": "RSA-OAEP", "use": "enc"}]}
+    config = configuration(tmp_path, document=good_bundle, issuer=issuer)
+    bundle_path = tmp_path / "bundle.json"
+
+    original = Path.read_bytes
+    swapped = {"done": False}
+
+    def read_then_swap(self, *args, **kwargs):
+        data = original(self, *args, **kwargs)
+        if Path(self) == bundle_path and not swapped["done"]:
+            swapped["done"] = True
+            bundle_path.write_text(json.dumps(enc_bundle), encoding="utf-8")
+        return data
+
+    monkeypatch.setattr(Path, "read_bytes", read_then_swap)
+    result = smoke.read_control_plane_configuration(config)
+    monkeypatch.undo()
+
+    assert swapped["done"]
+    assert result["bundleDefects"] == [], result["bundleDefects"]
+    assert result["bundleSha256"] == hashlib.sha256(
+        json.dumps(good_bundle).encode()
+    ).hexdigest()
+
+
+def test_the_bundle_copy_is_removed_and_its_directory_with_it(tmp_path):
+    """Nothing this check writes may outlive it."""
+    before = set(Path(tempfile.gettempdir()).glob("inv-smoke-bundle-*"))
+    smoke.read_control_plane_configuration(configuration(tmp_path))
+    after = set(Path(tempfile.gettempdir()).glob("inv-smoke-bundle-*"))
+    assert after == before, sorted(after - before)
+
+
+def test_the_copy_is_removed_even_when_the_verifier_raises(tmp_path):
+    before = set(Path(tempfile.gettempdir()).glob("inv-smoke-bundle-*"))
+    smoke.read_control_plane_configuration(
+        configuration(tmp_path, keys=[{**SIGNING_KEY, "alg": "RSA-OAEP", "use": "enc"}])
+    )
+    after = set(Path(tempfile.gettempdir()).glob("inv-smoke-bundle-*"))
+    assert after == before, sorted(after - before)
+
+
+def test_a_copy_that_does_not_match_the_recorded_digest_refuses_the_run(tmp_path):
+    """The copy is re-hashed, so a copy that is not the hashed bytes stops the run."""
+    with pytest.raises(smoke.SmokeRefused, match="does not hash to the bytes"):
+        smoke.verifier_refusal(
+            smoke.product_verifier(),
+            {"tenant_id": "00000000-0000-4000-8000-000000000001",
+             "issuer": "https://idp.example.invalid/realms/sv",
+             "audience": "sv-api", "client_ids": ["sv-portal"],
+             "jwks_file": str(tmp_path / "unused.json")},
+            b'{"issuer": "x"}',
+            "0" * 64,
+        )
+
+
+def test_the_verifier_is_given_the_copy_and_never_the_configured_path(tmp_path):
+    """Judge the call: the path handed to AccessTokens must not be the configured one."""
+    seen = {}
+
+    class Recorder:
+        def __init__(self, **identity):
+            seen.update(identity)
+
+    configured = tmp_path / "bundle.json"
+    smoke.verifier_refusal(
+        Recorder,
+        {"tenant_id": "00000000-0000-4000-8000-000000000001",
+         "issuer": "https://idp.example.invalid/realms/sv",
+         "audience": "sv-api", "client_ids": ["sv-portal"],
+         "jwks_file": str(configured)},
+        b'{"issuer": "x"}',
+        hashlib.sha256(b'{"issuer": "x"}').hexdigest(),
+    )
+    assert seen["jwks_file"] != str(configured)
+    assert Path(seen["jwks_file"]).name == "trust-bundle.json"
+    assert "inv-smoke-bundle-" in seen["jwks_file"]
+
+
+# --- Codex r4 M3: a real import failure, not a patched-out function ---------------
+
+
+def test_an_unimportable_verifier_refuses_the_run_for_real(monkeypatch, tmp_path):
+    """The earlier test patched `product_verifier` itself, so its except branch never ran.
+
+    A mutation that replaced the except body with a permissive stub survived. This induces
+    the real failure: the module cache is cleared, the control-plane source is taken off
+    sys.path, and CONTROL_PLANE_SRC points at a directory with no `inv` package.
+    """
+    monkeypatch.setattr(smoke, "CONTROL_PLANE_SRC", tmp_path / "nowhere")
+    monkeypatch.setattr(
+        sys, "path", [p for p in sys.path if "control-plane" not in p.replace("\\", "/")]
+    )
+    for name in [n for n in list(sys.modules) if n == "inv" or n.startswith("inv.")]:
+        monkeypatch.delitem(sys.modules, name, raising=False)
+    with pytest.raises(smoke.SmokeRefused, match="could not be imported"):
+        smoke.product_verifier()
+
+
+def test_the_verifier_import_recovers_after_that(monkeypatch):
+    """The previous test must not leave the tool unable to find the product."""
+    from inv.identity import AccessTokens
+
+    assert smoke.product_verifier() is AccessTokens
+
+
+# --- Coordinator N7 / Codex r4 M4: the same root twice is not a finding ------------
+
+
+def test_the_same_root_twice_is_accepted_and_counted_once(world):
+    """OpenSSL keeps one copy, so counting PEM blocks refused a duplicate as unchecked."""
+    w = world()
+    doubled = w["tmp"] / "root-twice.pem"
+    doubled.write_text(w["internal"]["pem"] + w["internal"]["pem"], encoding="utf-8")
+    pem = doubled.read_text(encoding="utf-8")
+    context = smoke.trusted_context(pem, {w["internal"]["sha256"]})
+    assert smoke.certificate_authorities(context, pem) == [w["internal"]["sha256"]]
+    observations, _ = run(w, ca_bundle=doubled)
+    assert observations["idpHttpsVerified"]["status"] == "MEASURED_PASS"
+
+
+def test_a_duplicate_root_still_has_to_be_an_approved_root(world):
+    """Deduplicating must not also drop the allowlist."""
+    w = world()
+    doubled = w["tmp"] / "foreign-twice.pem"
+    doubled.write_text(w["foreign"]["pem"] + w["foreign"]["pem"], encoding="utf-8")
+    with pytest.raises(smoke.SmokeRefused, match="unapproved anchor"):
+        run(w, ca_bundle=doubled)

@@ -49,10 +49,12 @@ import datetime as dt
 import hashlib
 import ipaddress
 import json
+import os
 import re
 import secrets
 import socket
 import ssl
+import tempfile
 import time
 from pathlib import Path
 import sys
@@ -130,6 +132,13 @@ CLIENT_RESOLVED_ERRORS = frozenset({"unauthorized_client", "invalid_grant"})
 UNKNOWN_CLIENT_ERROR = "invalid_client"
 #: Answered before the client is resolved, so they say nothing about this client.
 CLIENT_BLIND_ERRORS = frozenset({"unsupported_grant_type", "invalid_request"})
+#: The status at which the two sets above mean what they say. RFC 6749 section 5.2 puts a
+#: grant the client may not use at 400, and reserves 401 for a client the endpoint could
+#: not authenticate -- a confidential client that sent no secret answers 401, and
+#: `unauthorized_client` at 401 is that authentication outcome, not a disabled grant. Both
+#: sets were honoured at 400 and 401 alike, so an authentication failure read as proof
+#: about a grant and about the client being known. Only 400 does that.
+GRANT_EVIDENCE_STATUS = 400
 #: The only statuses an OAuth 2.0 token endpoint uses to refuse: 400 for a request or a
 #: grant it will not honour, 401 for a client it cannot authenticate (RFC 6749 section
 #: 5.2). A 404, 502 or 503 carrying `"error": "unauthorized_client"` came from something
@@ -365,6 +374,55 @@ def product_verifier():
     return AccessTokens
 
 
+def verifier_refusal(verifier, identity: dict, bundle_raw: bytes, bundle_sha: str) -> list[str]:
+    """Ask the product verifier about the bytes that were hashed, not about a path.
+
+    ``AccessTokens`` re-reads ``jwks_file`` from disk inside ``_keys()``, so the bundle it
+    judged was a second read of the path -- and a swap between the two reads would let an
+    unacceptable bundle be reported clean against the digest of an acceptable one, or the
+    reverse. The verifier is security-critical product code and is not changed for this
+    check, so the bytes already read and hashed here are written once into a directory this
+    run owns (0700) as a regular file (0600), and the verifier is pointed at that copy. The
+    copy is re-hashed before the verifier sees it, so what was judged is provably what this
+    report hashes, and it is removed afterwards whatever happens.
+    """
+    directory = Path(tempfile.mkdtemp(prefix="inv-smoke-bundle-"))
+    try:
+        os.chmod(directory, 0o700)
+    except OSError:
+        # Windows does not honour POSIX directory modes; the path is still per-run.
+        pass
+    copy = directory / "trust-bundle.json"
+    try:
+        # O_EXCL: this run created it, so nothing else wrote the bytes being judged.
+        handle = os.open(copy, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        try:
+            os.write(handle, bundle_raw)
+        finally:
+            os.close(handle)
+        if hashlib.sha256(copy.read_bytes()).hexdigest() != bundle_sha:
+            raise SmokeRefused(
+                "the trust bundle copy does not hash to the bytes this report recorded"
+            )
+        try:
+            verifier(**{**identity, "jwks_file": str(copy)})
+        except Exception as error:
+            # The authority, and it enforces more than the names below: key type,
+            # algorithm, use, absence of a private exponent, key-id uniqueness, RSA size.
+            return [f"the-verifier-that-loads-it-refuses-this-configuration-"
+                    f"{type(error).__name__}"]
+        return []
+    finally:
+        try:
+            copy.unlink(missing_ok=True)
+        except OSError:
+            pass
+        try:
+            directory.rmdir()
+        except OSError:
+            pass
+
+
 def named_bundle_defects(bundle: Any) -> list[str]:
     """Readable names for the refusals a reader will want spelled out.
 
@@ -459,13 +517,8 @@ def read_control_plane_configuration(path: Path) -> dict[str, Any]:
     expires_at = bundle.get("expiresAt")
     remaining = (expires_at - int(dt.datetime.now(dt.timezone.utc).timestamp())
                  if type(expires_at) is int else None)
-    try:
-        verifier(**identity)
-    except Exception as error:
-        # The authority, and it enforces more than the names above: key type, algorithm,
-        # use, absence of a private exponent, key-id uniqueness and RSA size.
-        defects.append(f"the-verifier-that-loads-it-refuses-this-configuration-"
-                       f"{type(error).__name__}")
+    bundle_sha = hashlib.sha256(bundle_raw).hexdigest()
+    defects.extend(verifier_refusal(verifier, identity, bundle_raw, bundle_sha))
     return {
         "issuer": issuer,
         "host": host,
@@ -477,7 +530,7 @@ def read_control_plane_configuration(path: Path) -> dict[str, Any]:
         "bundleDefects": defects,
         "bundleSecondsRemaining": remaining,
         "configSha256": hashlib.sha256(raw).hexdigest(),
-        "bundleSha256": hashlib.sha256(bundle_raw).hexdigest(),
+        "bundleSha256": bundle_sha,
     }
 
 
@@ -928,6 +981,14 @@ def observe_client_known(context, config, deadline):
     if error == UNKNOWN_CLIENT_ERROR:
         return failed("the configured client id is not known to the provider",
                       httpStatus=status, oauthError=error)
+    if status != GRANT_EVIDENCE_STATUS:
+        # 401 is an authentication outcome (RFC 6749 section 5.2). Whatever error name it
+        # carries, it does not establish that this client was found and refused.
+        return failed(
+            "the refusal came with 401, which is a client-authentication outcome rather "
+            "than an answer about this client",
+            httpStatus=status, oauthError=error or "unnamed",
+        )
     if error not in CLIENT_RESOLVED_ERRORS:
         return failed(
             "the provider's answer does not show it resolved the configured client",
@@ -963,8 +1024,14 @@ def observe_grant_refused(context, config, deadline, form, label, *,
         # grant that is off, and its body is not this provider's answer.
         return failed(f"{label} was refused with a status no OAuth token endpoint uses",
                       httpStatus=status, oauthError=error or "unnamed")
-    if error in GRANT_DISABLED_ERRORS:
+    if error in GRANT_DISABLED_ERRORS and status == GRANT_EVIDENCE_STATUS:
         return passed(httpStatus=status, oauthError=error)
+    if error in GRANT_DISABLED_ERRORS:
+        # Same error name, wrong status: 401 says the endpoint could not authenticate the
+        # client, which is not the same as the client being told it may not use the grant.
+        return failed(f"{label} was refused with 401, which is a client-authentication "
+                      f"outcome rather than a disabled grant",
+                      httpStatus=status, oauthError=error)
     if (
         allow_unauthenticated_client
         and client_is_known
