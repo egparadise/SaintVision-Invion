@@ -208,7 +208,12 @@ def _aware(value: Any) -> dt.datetime | None:
 
 
 def _observation(rows: list[dict[str, Any]], reasons: Counter[str], *, noun: str) -> dict[str, Any]:
-    unknown = set(reasons) - set(K1_REASONS) - set(K2_REASONS) - set(K3_REASONS)
+    allowed = {
+        "claim": K1_REASONS,
+        "delivery": K2_REASONS,
+        "executionAttempt": K3_REASONS,
+    }[noun]
+    unknown = set(reasons) - set(allowed)
     if unknown or any(not isinstance(value, int) or value < 0 for value in reasons.values()):
         raise ValueError("invalid violation reason counts")
     count = len(rows)
@@ -217,7 +222,7 @@ def _observation(rows: list[dict[str, Any]], reasons: Counter[str], *, noun: str
         f"{noun}Count": count,
         "validCount": count - violation_count,
         "violationCount": violation_count,
-        "violationsByReason": dict(sorted(reasons.items())),
+        "violationsByReason": {reason: reasons.get(reason, 0) for reason in allowed},
     }
     if violation_count > count:
         raise ValueError("violation count exceeds observed row count")
@@ -406,7 +411,7 @@ def _k2_reason(row: dict[str, Any]) -> str | None:
         return "claim_payload_mismatch"
     try:
         issued = parse_timestamp(payload.get("issuedAt"))
-    except (TypeError, ValueError):
+    except (AttributeError, TypeError, ValueError):
         return "invalid_issued_at"
     not_after = _aware(row.get("claim_not_after"))
     if issued is None or not_after is None or issued > not_after:
@@ -658,6 +663,44 @@ def validate_evidence(evidence: dict[str, Any]) -> None:
         "rawErrorsRecorded": False,
     }:
         raise ValueError("redaction declaration mismatch")
+    for key, noun, reasons in (
+        ("K1", "claim", K1_REASONS),
+        ("K2", "delivery", K2_REASONS),
+        ("K3", "executionAttempt", K3_REASONS),
+    ):
+        item = observations[key]
+        metrics = item.get("metrics") or {}
+        expected_keys = {
+            f"{noun}Count",
+            "validCount",
+            "violationCount",
+            "violationsByReason",
+        }
+        if key == "K2":
+            expected_keys.add("signatureVerificationStatus")
+        if set(metrics) != expected_keys:
+            raise ValueError(f"{key} metric set mismatch")
+        counts = [
+            metrics.get(f"{noun}Count"),
+            metrics.get("validCount"),
+            metrics.get("violationCount"),
+        ]
+        by_reason = metrics.get("violationsByReason")
+        if (
+            any(type(value) is not int or value < 0 for value in counts)
+            or not isinstance(by_reason, dict)
+            or tuple(by_reason) != reasons
+            or any(type(value) is not int or value < 0 for value in by_reason.values())
+        ):
+            raise ValueError(f"{key} count shape mismatch")
+        observed, valid, violated = counts
+        if valid + violated != observed or sum(by_reason.values()) != violated:
+            raise ValueError(f"{key} count identity mismatch")
+        expected_status = (
+            "NOT_OBSERVED" if observed == 0 else "MEASURED_FAIL" if violated else "MEASURED_PASS"
+        )
+        if item.get("status") != expected_status:
+            raise ValueError(f"{key} status does not match recomputed counts")
 
 
 def render_markdown(evidence: dict[str, Any]) -> str:

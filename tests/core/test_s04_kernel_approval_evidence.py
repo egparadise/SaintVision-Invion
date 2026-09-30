@@ -152,7 +152,8 @@ def _provenance():
 def test_k1_rejects_each_approval_claim_binding_mutation(change, reason):
     result = collector.evaluate_k1([_k1_row(**change)])
     assert result["status"] == "MEASURED_FAIL"
-    assert result["metrics"]["violationsByReason"] == {reason: 1}
+    assert result["metrics"]["violationsByReason"][reason] == 1
+    assert sum(result["metrics"]["violationsByReason"].values()) == 1
 
 
 def _payload_mutation(row, mutate):
@@ -167,14 +168,16 @@ def _payload_mutation(row, mutate):
 
 def test_k2_rejects_unknown_missing_duplicate_claim_keys_and_bad_signature():
     missing_claim = _k2_row(claim_id=None)
-    assert collector.evaluate_k2([missing_claim])["metrics"]["violationsByReason"] == {
-        "missing_claim_row": 1
-    }
+    assert (
+        collector.evaluate_k2([missing_claim])["metrics"]["violationsByReason"]["missing_claim_row"]
+        == 1
+    )
 
     unknown = _payload_mutation(_k2_row(), lambda value: value["claim"].update(extra=True))
-    assert collector.evaluate_k2([unknown])["metrics"]["violationsByReason"] == {
-        "invalid_claim_shape": 1
-    }
+    assert (
+        collector.evaluate_k2([unknown])["metrics"]["violationsByReason"]["invalid_claim_shape"]
+        == 1
+    )
 
     missing = _payload_mutation(_k2_row(), lambda value: value["claim"].pop("runId"))
     assert collector.evaluate_k2([missing])["status"] == "MEASURED_FAIL"
@@ -184,32 +187,38 @@ def test_k2_rejects_unknown_missing_duplicate_claim_keys_and_bad_signature():
         b'{"claim":{},"claim":{},"launch":{},"allocations":[],"issuedAt":"2026-09-30T01:00:00Z"}'
     )
     row["envelope"]["payload"] = base64.b64encode(duplicate).decode()
-    assert collector.evaluate_k2([row])["metrics"]["violationsByReason"] == {
-        "invalid_payload_encoding": 1
-    }
+    assert (
+        collector.evaluate_k2([row])["metrics"]["violationsByReason"]["invalid_payload_encoding"]
+        == 1
+    )
 
     row = _k2_row()
     row["envelope"]["signature"] = base64.b64encode(b"short").decode()
-    assert collector.evaluate_k2([row])["metrics"]["violationsByReason"] == {
-        "invalid_signature_encoding": 1
-    }
+    assert (
+        collector.evaluate_k2([row])["metrics"]["violationsByReason"]["invalid_signature_encoding"]
+        == 1
+    )
 
 
 def test_k2_rejects_changed_claim_and_naive_or_late_issued_at():
     changed = _payload_mutation(
         _k2_row(), lambda value: value["claim"].update(recoveryEpoch="other")
     )
-    assert collector.evaluate_k2([changed])["metrics"]["violationsByReason"] == {
-        "claim_payload_mismatch": 1
-    }
+    assert (
+        collector.evaluate_k2([changed])["metrics"]["violationsByReason"]["claim_payload_mismatch"]
+        == 1
+    )
 
     naive = _payload_mutation(_k2_row(), lambda value: value.update(issuedAt="2026-09-30T01:00:00"))
-    assert collector.evaluate_k2([naive])["metrics"]["violationsByReason"] == {
-        "invalid_issued_at": 1
-    }
+    assert collector.evaluate_k2([naive])["metrics"]["violationsByReason"]["invalid_issued_at"] == 1
 
     late = _payload_mutation(_k2_row(), lambda value: value.update(issuedAt="2026-09-30T01:03:00Z"))
     assert collector.evaluate_k2([late])["status"] == "MEASURED_FAIL"
+
+    scalar = _payload_mutation(_k2_row(), lambda value: value.update(issuedAt=7))
+    assert (
+        collector.evaluate_k2([scalar])["metrics"]["violationsByReason"]["invalid_issued_at"] == 1
+    )
 
 
 @pytest.mark.parametrize(
@@ -232,7 +241,8 @@ def test_k2_rejects_changed_claim_and_naive_or_late_issued_at():
 def test_k3_rejects_each_execution_chain_mutation(change, reason):
     result = collector.evaluate_k3([_k3_row(**change)])
     assert result["status"] == "MEASURED_FAIL"
-    assert result["metrics"]["violationsByReason"] == {reason: 1}
+    assert result["metrics"]["violationsByReason"][reason] == 1
+    assert sum(result["metrics"]["violationsByReason"].values()) == 1
 
 
 def test_empty_rows_never_pass_and_sql_reads_only_registered_kernel_tables():
@@ -274,6 +284,16 @@ def test_clean_chain_is_measured_but_historical_epoch_never_false_passes():
     changed["verdict"] = "PASS"
     changed["acceptanceClaim"] = True
     with pytest.raises(ValueError, match="K4 cannot pass"):
+        collector.validate_evidence(changed)
+
+    changed = deepcopy(evidence)
+    changed["observations"]["K1"]["metrics"]["claimCount"] = 2
+    with pytest.raises(ValueError, match="count identity"):
+        collector.validate_evidence(changed)
+
+    changed = deepcopy(evidence)
+    changed["observations"]["K3"]["metrics"]["violationsByReason"].pop("running_event_mismatch")
+    with pytest.raises(ValueError, match="count shape"):
         collector.validate_evidence(changed)
 
 
