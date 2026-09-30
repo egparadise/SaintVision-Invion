@@ -17,6 +17,7 @@ from inv.errors import DomainError
 
 ROOT = Path(__file__).resolve().parents[2]
 MIGRATION = ROOT / "migrations/versions/0056_kernel_cancel_audit_bridge.py"
+REAL_PG = ROOT / "tests/integration/test_kernel_cancel_bridge_real_pg.py"
 
 
 class Result:
@@ -56,6 +57,19 @@ def test_unmapped_kernel_run_never_calls_the_definer():
     )
     assert len(conn.calls) == 1
     assert "inv.business_runs" in conn.calls[0][0]
+
+
+def test_real_pg_suite_registers_the_standalone_business_fixture_chain():
+    source = REAL_PG.read_text(encoding="utf-8")
+    for fixture_import in (
+        "from test_approvals import approval",
+        "from test_business_handoff import business",
+        "from test_node_delivery import remote",
+        "from test_node_runtime import node_runtime",
+        "from test_snapshots import storage",
+        "from test_workspace_api import workspace_http",
+    ):
+        assert fixture_import in source
 
 
 def test_mapped_run_uses_the_closed_named_argument_surface(monkeypatch):
