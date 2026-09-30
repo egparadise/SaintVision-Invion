@@ -308,12 +308,22 @@ def test_portal_up_sh_root_uid_rejected():
     assert 'PORTAL_UID cannot be 0' in content
 
 
-def test_portal_up_sh_key_owner_match():
+def test_portal_up_sh_key_owner_and_mode_match():
     content = read_file(PORTAL_UP_SH)
     # Key file owner must match PORTAL_UID (R3-M2)
     assert 'stat -c \'%u\' "$KEY_FILE"' in content
     assert 'owner UID' in content
     assert 'does not match PORTAL_UID' in content
+    # Key file mode must strictly be 0400 (R4-H1)
+    assert 'stat -c \'%a\' "$KEY_FILE"' in content
+    assert 'permission mode must be strictly 0400' in content
+
+
+def test_portal_up_sh_gid_zero_rejected():
+    content = read_file(PORTAL_UP_SH)
+    # Reject root GID execution (R4-H1)
+    assert '"$PORTAL_GID" -eq 0' in content
+    assert 'PORTAL_GID cannot be 0' in content
 
 
 def test_portal_up_sh_staging_preflight_and_safety():
@@ -331,12 +341,16 @@ def test_portal_up_sh_staging_preflight_and_safety():
     assert "/index.html" in content
     assert "/auth-config.js" in content
 
+    # Automatic rollback function and backup container verification (R4-M1)
+    assert "rollback_production()" in content
+    assert "Restoring previous production container" in content
+
 
 def test_dockerfile_default_user_101():
     content = read_file(DOCKERFILE)
     # Dockerfile maintains default non-root USER 101:101 (R3-M2)
     assert "USER 101:101" in content
-    assert "RUN apk add --no-cache curl openssl" in content
+    assert "RUN apk add --no-cache 'curl>=8' 'openssl>=3'" in content
 
 
 # =========================================================================
@@ -354,9 +368,10 @@ def pki_test_env():
     # Generate Root CA
     gen_root_script = f"""
     set -e
+    export MSYS_NO_PATHCONV=1
     cd "{posix_temp}"
     openssl ecparam -name prime256v1 -genkey -noout -out root.key
-    openssl req -new -x509 -sha256 -key root.key -out root.crt -subj "//CN=SaintVision Root CA" -days 30
+    openssl req -new -x509 -sha256 -key root.key -out root.crt -subj "/CN=SaintVision Root CA" -days 30
     openssl x509 -in root.crt -noout -fingerprint -sha256 | sed 's/.*=//' | tr -d ': ' | tr '[:upper:]' '[:lower:]'
     """
     res_root = subprocess.run([bash_path, "-c", gen_root_script], capture_output=True, text=True)
@@ -366,9 +381,10 @@ def pki_test_env():
     # Generate Intermediate CA
     gen_inter_script = f"""
     set -e
+    export MSYS_NO_PATHCONV=1
     cd "{posix_temp}"
     openssl ecparam -name prime256v1 -genkey -noout -out inter.key
-    openssl req -new -key inter.key -out inter.csr -subj "//CN=SaintVision Intermediate CA"
+    openssl req -new -key inter.key -out inter.csr -subj "/CN=SaintVision Intermediate CA"
     cat > inter.ext <<'EOF'
 basicConstraints=critical,CA:TRUE,pathlen:0
 keyUsage=critical,digitalSignature,keyCertSign,cRLSign
@@ -382,9 +398,11 @@ EOF
     # Generate Valid Leaf Cert
     gen_leaf_script = f"""
     set -e
+    export MSYS_NO_PATHCONV=1
     cd "{posix_temp}"
     openssl ecparam -name prime256v1 -genkey -noout -out server-key.pem
-    openssl req -new -key server-key.pem -out leaf.csr -subj "//CN=portal.sv.lan"
+    chmod 0400 server-key.pem
+    openssl req -new -key server-key.pem -out leaf.csr -subj "/CN=portal.sv.lan"
     cat > leaf.ext <<'EOF'
 basicConstraints=critical,CA:FALSE
 keyUsage=critical,digitalSignature,keyEncipherment
@@ -400,14 +418,15 @@ EOF
     # Generate Variations for Negative Controls
     gen_variants_script = f"""
     set -e
+    export MSYS_NO_PATHCONV=1
     cd "{posix_temp}"
     # 1. Attacker Root
     openssl ecparam -name prime256v1 -genkey -noout -out attacker_root.key
-    openssl req -new -x509 -sha256 -key attacker_root.key -out attacker_root.crt -subj "//CN=Attacker Root CA" -days 30
+    openssl req -new -x509 -sha256 -key attacker_root.key -out attacker_root.crt -subj "/CN=Attacker Root CA" -days 30
 
     # 2. Self-signed leaf
     openssl ecparam -name prime256v1 -genkey -noout -out self_signed.key
-    openssl req -new -x509 -sha256 -key self_signed.key -out self_signed.crt -subj "//CN=portal.sv.lan" -days 30
+    openssl req -new -x509 -sha256 -key self_signed.key -out self_signed.crt -subj "/CN=portal.sv.lan" -days 30
 
     # 3. Leaf with CA:TRUE
     cat > ca_true.ext <<'EOF'
@@ -453,6 +472,12 @@ EOF
     # 9. Intermediate signed by attacker root
     openssl x509 -req -in inter.csr -CA attacker_root.crt -CAkey attacker_root.key -CAcreateserial -out attacker_inter.crt -days 30
     cat attacker_inter.crt root.crt > bad_intermediate_bundle.crt
+
+    # 10. Leaf signed by foreign attacker CA with foreign key (mutation d: leaf chain verification failure)
+    openssl ecparam -name prime256v1 -genkey -noout -out attacker_ca.key
+    openssl req -new -x509 -sha256 -key attacker_ca.key -out attacker_ca.crt -subj "/CN=Attacker Intermediate CA" -days 30
+    openssl x509 -req -in leaf.csr -CA attacker_ca.crt -CAkey attacker_ca.key -CAcreateserial -out leaf_attacker_ca.crt -extfile leaf.ext -days 30
+    cat leaf_attacker_ca.crt attacker_ca.crt > server_chain_attacker.pem
     """
     res_var = subprocess.run([bash_path, "-c", gen_variants_script], capture_output=True, text=True)
     assert res_var.returncode == 0, f"Variant gen failed: {res_var.stderr}"
@@ -594,6 +619,66 @@ def test_behavioral_environment_upstream_mismatch_rejected(pki_test_env):
     assert "PORTAL_UPSTREAM_CP_HOST must be exactly 'cp.sv.lan:443'" in res.stderr
 
 
+def test_behavioral_environment_root_gid_rejected(pki_test_env):
+    res = run_pki_func(pki_test_env, "validate_environment", {"PORTAL_GID": "0"})
+    assert res.returncode == 1
+    assert "PORTAL_GID cannot be 0" in res.stderr
+
+
+def test_behavioral_environment_key_mode_fail_closed(pki_test_env):
+    """Verify that non-0400 key permission modes (0644, 0440, 0600) are rejected fail-closed."""
+    bash_path = get_git_bash()
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_stat_stub_test_"))
+    bin_dir = temp_dir / "bin"
+    bin_dir.mkdir(parents=True, exist_ok=True)
+
+    for mode, expected_ok in [("400", True), ("0400", True), ("644", False), ("440", False), ("600", False)]:
+        stat_stub = f"""#!/usr/bin/env bash
+while [[ $# -gt 0 ]]; do
+    if [[ "$1" == "-c" ]]; then
+        format="$2"
+        shift 2
+    else
+        file="$1"
+        shift
+    fi
+done
+if [[ "$format" == "%u" ]]; then
+    echo "1000"
+elif [[ "$format" == "%a" ]]; then
+    echo "{mode}"
+fi
+"""
+        (bin_dir / "stat").write_text(stat_stub.replace("\r\n", "\n"), encoding="utf-8")
+
+        test_sh = f"""
+        export PATH="{to_posix_path(bin_dir)}:$PATH"
+        source "{to_posix_path(PORTAL_UP_SH)}"
+        STATE_DIR="{to_posix_path(temp_dir)}/state"
+        mkdir -p "$STATE_DIR"
+        PORTAL_UID=1000
+        PORTAL_GID=1000
+        UPSTREAM_CP_HOST="cp.sv.lan:443"
+        KEY_FILE="{to_posix_path(temp_dir)}/key.pem"
+        touch "$KEY_FILE"
+        validate_environment
+        """
+        res = subprocess.run(
+            [bash_path, "-c", test_sh],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+        )
+        if expected_ok:
+            assert res.returncode == 0, f"Expected mode {mode} to pass, got {res.returncode}: {res.stderr}"
+        else:
+            assert res.returncode == 1, f"Expected mode {mode} to be rejected, got 0"
+            assert "permission mode must be strictly 0400" in res.stderr
+
+    shutil.rmtree(temp_dir, ignore_errors=True)
+
+
 def test_behavioral_image_digest_mandatory_rejected(pki_test_env):
     res = run_pki_func(pki_test_env, "validate_image_and_digest", {"PORTAL_IMAGE_DIGEST": ""})
     assert res.returncode == 1
@@ -687,7 +772,27 @@ if [[ "$cmd" == "run" ]]; then
     echo "staging-container-id"
     exit 0
 elif [[ "$cmd" == "inspect" ]]; then
-    echo "true"
+    while [[ $# -gt 0 ]]; do
+        if [[ "$1" == "--format" ]]; then
+            fmt="$2"
+            shift 2
+        else
+            shift
+        fi
+    done
+    if [[ "$fmt" == *ai.saintvision.instance* ]]; then
+        echo "preflight"
+    elif [[ "$fmt" == *ai.saintvision.service* ]]; then
+        echo "portal"
+    elif [[ "$fmt" == *ai.saintvision.workload* ]]; then
+        echo "intranet-portal"
+    elif [[ "$fmt" == *ai.saintvision.node* ]]; then
+        echo "node2"
+    elif [[ "$fmt" == *State.Running* ]]; then
+        echo "true"
+    else
+        echo "true"
+    fi
     exit 0
 elif [[ "$cmd" == "exec" ]]; then
     # Fail preflight nginx -t to trigger cleanup
@@ -725,6 +830,55 @@ fi
     assert "rm -f saintvision-portal-staging-" in calls, (
         f"staging_cleanup must call docker rm -f on staging container! Found calls: {calls}"
     )
+
+    shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_behavioral_fake_docker_staging_preexisting_conflict_no_stop_or_rm():
+    """Verify that when staging docker run fails (e.g. name conflict with foreign container), stop or rm is 0 times."""
+    bash_path = get_git_bash()
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_fake_docker_conflict_test_"))
+    bin_dir = temp_dir / "bin"
+    bin_dir.mkdir(parents=True, exist_ok=True)
+    calls_log = temp_dir / "calls.log"
+
+    docker_stub = f"""#!/usr/bin/env bash
+cmd="$1"
+shift
+if [[ "$cmd" == "run" ]]; then
+    echo "Conflict: container name already in use" >&2
+    exit 125
+elif [[ "$cmd" == "rm" || "$cmd" == "stop" ]]; then
+    echo "$cmd $*" >> "{to_posix_path(calls_log)}"
+    exit 0
+fi
+"""
+    (bin_dir / "docker").write_text(docker_stub.replace("\r\n", "\n"), encoding="utf-8")
+
+    test_sh = f"""
+    export PATH="{to_posix_path(bin_dir)}:$PATH"
+    source "{to_posix_path(PORTAL_UP_SH)}"
+    TARGET_IMAGE="sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    CERT_FILE_ABS="/tmp/cert"
+    KEY_FILE_ABS="/tmp/key"
+    CA_BUNDLE_ABS="/tmp/ca"
+    UPSTREAM_CONF_ABS="/tmp/up"
+    run_staging_preflight
+    """
+
+    res = subprocess.run(
+        [bash_path, "-c", test_sh],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    assert res.returncode == 1, "Expected run_staging_preflight to fail when docker run fails"
+    assert "Failed to launch staging preflight container" in res.stderr
+
+    calls = calls_log.read_text(encoding="utf-8") if calls_log.exists() else ""
+    assert "stop" not in calls, f"Forbidden docker stop called on failed run: {calls}"
+    assert "rm" not in calls, f"Forbidden docker rm called on failed run: {calls}"
 
     shutil.rmtree(temp_dir, ignore_errors=True)
 
@@ -786,5 +940,346 @@ fi
     calls = calls_log.read_text(encoding="utf-8") if calls_log.exists() else ""
     assert "stop" not in calls, f"Forbidden docker stop called: {calls}"
     assert "rm" not in calls, f"Forbidden docker rm called: {calls}"
+
+    shutil.rmtree(temp_dir, ignore_errors=True)
+
+# =========================================================================
+# 8. R4 Surviving Mutations and Rollback Behavioral Tests (R4-H2)
+# =========================================================================
+
+def test_behavioral_pki_leaf_signed_by_different_ca_fails(pki_test_env):
+    """(Mutation d) Verify that leaf certificate signed by a foreign/attacker CA fails verification against the legitimate CA bundle."""
+    attacker_leaf = f"{pki_test_env['posix_temp']}/leaf_attacker_ca.crt"
+    res = run_pki_func(pki_test_env, "validate_leaf_certificate", {"CERT_FILE": attacker_leaf})
+    assert res.returncode == 1, f"Expected leaf signed by different CA to fail verification, got {res.returncode}"
+    assert "Certificate chain verification failed against CA bundle" in res.stderr
+
+
+def test_behavioral_fake_docker_instance_mismatch_preserved():
+    """(Mutation e) Verify that production launcher preserves existing container when ONLY instance label differs."""
+    bash_path = get_git_bash()
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_fake_docker_instance_test_"))
+    bin_dir = temp_dir / "bin"
+    bin_dir.mkdir(parents=True, exist_ok=True)
+    calls_log = temp_dir / "calls.log"
+
+    docker_stub = f"""#!/usr/bin/env bash
+cmd="$1"
+shift
+if [[ "$cmd" == "container" && "$1" == "inspect" ]]; then
+    exit 0
+elif [[ "$cmd" == "inspect" ]]; then
+    while [[ $# -gt 0 ]]; do
+        if [[ "$1" == "--format" ]]; then
+            fmt="$2"
+            shift 2
+        else
+            shift
+        fi
+    done
+    if [[ "$fmt" == *ai.saintvision.service* ]]; then
+        echo "portal"
+    elif [[ "$fmt" == *ai.saintvision.workload* ]]; then
+        echo "intranet-portal"
+    elif [[ "$fmt" == *ai.saintvision.node* ]]; then
+        echo "node2"
+    elif [[ "$fmt" == *ai.saintvision.instance* ]]; then
+        echo "canary-instance"
+    fi
+    exit 0
+elif [[ "$cmd" == "stop" || "$cmd" == "rm" || "$cmd" == "rename" ]]; then
+    echo "$cmd $*" >> "{to_posix_path(calls_log)}"
+    exit 0
+fi
+"""
+    (bin_dir / "docker").write_text(docker_stub.replace("\r\n", "\n"), encoding="utf-8")
+
+    test_sh = f"""
+    export PATH="{to_posix_path(bin_dir)}:$PATH"
+    source "{to_posix_path(PORTAL_UP_SH)}"
+    TARGET_IMAGE="sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    CERT_FILE_ABS="/tmp/cert"
+    KEY_FILE_ABS="/tmp/key"
+    CA_BUNDLE_ABS="/tmp/ca"
+    UPSTREAM_CONF_ABS="/tmp/up"
+    swap_and_launch_production
+    """
+
+    res = subprocess.run(
+        [bash_path, "-c", test_sh],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    assert res.returncode == 1, f"Expected swap_and_launch_production to fail on instance mismatch, got 0: {res.stdout}"
+    assert "Refusing to touch non-matching container on node2" in res.stderr
+
+    calls = calls_log.read_text(encoding="utf-8") if calls_log.exists() else ""
+    assert "stop" not in calls, f"Forbidden docker stop called on instance mismatch: {calls}"
+    assert "rm" not in calls, f"Forbidden docker rm called on instance mismatch: {calls}"
+    assert "rename" not in calls, f"Forbidden docker rename called on instance mismatch: {calls}"
+
+    shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_behavioral_environment_upstream_mismatch_independent_fail():
+    """(Mutation h) Verify that UPSTREAM_CP_HOST != cp.sv.lan:443 fails independently even when all other inputs (stat 0400, UID 1000, GID 1000) are valid."""
+    bash_path = get_git_bash()
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_upstream_stat_test_"))
+    bin_dir = temp_dir / "bin"
+    bin_dir.mkdir(parents=True, exist_ok=True)
+
+    stat_stub = f"""#!/usr/bin/env bash
+while [[ $# -gt 0 ]]; do
+    if [[ "$1" == "-c" ]]; then
+        format="$2"
+        shift 2
+    else
+        file="$1"
+        shift
+    fi
+done
+if [[ "$format" == "%u" ]]; then
+    echo "1000"
+elif [[ "$format" == "%a" ]]; then
+    echo "0400"
+fi
+"""
+    (bin_dir / "stat").write_text(stat_stub.replace("\r\n", "\n"), encoding="utf-8")
+
+    test_sh = f"""
+    export PATH="{to_posix_path(bin_dir)}:$PATH"
+    source "{to_posix_path(PORTAL_UP_SH)}"
+    STATE_DIR="{to_posix_path(temp_dir)}/state"
+    mkdir -p "$STATE_DIR"
+    PORTAL_UID=1000
+    PORTAL_GID=1000
+    UPSTREAM_CP_HOST="cp.sv.lan:8443"
+    KEY_FILE="{to_posix_path(temp_dir)}/key.pem"
+    touch "$KEY_FILE"
+    validate_environment
+    """
+    res = subprocess.run(
+        [bash_path, "-c", test_sh],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    assert res.returncode == 1, f"Expected UPSTREAM_CP_HOST mismatch to fail, got {res.returncode}"
+    assert "PORTAL_UPSTREAM_CP_HOST must be exactly 'cp.sv.lan:443'" in res.stderr
+
+    shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_behavioral_fake_docker_staging_index_html_probe_failure():
+    """(Mutation o) Verify that staging preflight fails and cleans up if /index.html probe fails."""
+    bash_path = get_git_bash()
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_fake_docker_index_test_"))
+    bin_dir = temp_dir / "bin"
+    bin_dir.mkdir(parents=True, exist_ok=True)
+    calls_log = temp_dir / "calls.log"
+
+    docker_stub = f"""#!/usr/bin/env bash
+cmd="$1"
+shift
+if [[ "$cmd" == "run" ]]; then
+    echo "staging-container-id"
+    exit 0
+elif [[ "$cmd" == "inspect" ]]; then
+    while [[ $# -gt 0 ]]; do
+        if [[ "$1" == "--format" ]]; then
+            fmt="$2"
+            shift 2
+        else
+            shift
+        fi
+    done
+    if [[ "$fmt" == *ai.saintvision.instance* ]]; then
+        echo "preflight"
+    elif [[ "$fmt" == *ai.saintvision.service* ]]; then
+        echo "portal"
+    elif [[ "$fmt" == *ai.saintvision.workload* ]]; then
+        echo "intranet-portal"
+    elif [[ "$fmt" == *ai.saintvision.node* ]]; then
+        echo "node2"
+    elif [[ "$fmt" == *State.Running* ]]; then
+        echo "true"
+    else
+        echo "true"
+    fi
+    exit 0
+elif [[ "$cmd" == "exec" ]]; then
+    cmdline="$*"
+    if [[ "$cmdline" == *index.html* ]]; then
+        echo "Simulated 500 Internal Server Error for /index.html" >&2
+        exit 1
+    fi
+    exit 0
+elif [[ "$cmd" == "rm" || "$cmd" == "stop" ]]; then
+    echo "$cmd $*" >> "{to_posix_path(calls_log)}"
+    exit 0
+fi
+"""
+    (bin_dir / "docker").write_text(docker_stub.replace("\r\n", "\n"), encoding="utf-8")
+
+    test_sh = f"""
+    export PATH="{to_posix_path(bin_dir)}:$PATH"
+    source "{to_posix_path(PORTAL_UP_SH)}"
+    TARGET_IMAGE="sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    CERT_FILE_ABS="/tmp/cert"
+    KEY_FILE_ABS="/tmp/key"
+    CA_BUNDLE_ABS="/tmp/ca"
+    UPSTREAM_CONF_ABS="/tmp/up"
+    run_staging_preflight
+    """
+
+    res = subprocess.run(
+        [bash_path, "-c", test_sh],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    assert res.returncode == 1, "Expected run_staging_preflight to fail on /index.html probe failure"
+    assert "Staging preflight verified HTTPS /index.html failed." in res.stderr
+
+    calls = calls_log.read_text(encoding="utf-8") if calls_log.exists() else ""
+    assert "rm -f saintvision-portal-staging-" in calls, (
+        f"staging_cleanup must remove staging container on probe failure! Found calls: {calls}"
+    )
+
+    shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_behavioral_environment_key_owner_mismatch_rejected():
+    """(Mutation t) Verify that key file owner UID mismatch (stat %u != PORTAL_UID) fails closed."""
+    bash_path = get_git_bash()
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_owner_test_"))
+    bin_dir = temp_dir / "bin"
+    bin_dir.mkdir(parents=True, exist_ok=True)
+
+    stat_stub = f"""#!/usr/bin/env bash
+while [[ $# -gt 0 ]]; do
+    if [[ "$1" == "-c" ]]; then
+        format="$2"
+        shift 2
+    else
+        file="$1"
+        shift
+    fi
+done
+if [[ "$format" == "%u" ]]; then
+    echo "2000"
+elif [[ "$format" == "%a" ]]; then
+    echo "0400"
+fi
+"""
+    (bin_dir / "stat").write_text(stat_stub.replace("\r\n", "\n"), encoding="utf-8")
+
+    test_sh = f"""
+    export PATH="{to_posix_path(bin_dir)}:$PATH"
+    source "{to_posix_path(PORTAL_UP_SH)}"
+    STATE_DIR="{to_posix_path(temp_dir)}/state"
+    mkdir -p "$STATE_DIR"
+    PORTAL_UID=1000
+    PORTAL_GID=1000
+    UPSTREAM_CP_HOST="cp.sv.lan:443"
+    KEY_FILE="{to_posix_path(temp_dir)}/key.pem"
+    touch "$KEY_FILE"
+    validate_environment
+    """
+    res = subprocess.run(
+        [bash_path, "-c", test_sh],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    assert res.returncode == 1, f"Expected key owner mismatch to fail, got {res.returncode}"
+    assert "owner UID (2000) does not match PORTAL_UID (1000)" in res.stderr
+
+    shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_behavioral_fake_docker_swap_https_probe_failure_triggers_rollback():
+    """(Mutation u & R4-M1) Verify that swap post-launch HTTPS probe failure initiates rollback and restores previous container."""
+    bash_path = get_git_bash()
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_fake_docker_swap_rollback_test_"))
+    bin_dir = temp_dir / "bin"
+    bin_dir.mkdir(parents=True, exist_ok=True)
+    calls_log = temp_dir / "calls.log"
+
+    docker_stub = f"""#!/usr/bin/env bash
+cmd="$1"
+shift
+echo "docker $cmd $*" >> "{to_posix_path(calls_log)}"
+if [[ "$cmd" == "container" && "$1" == "inspect" ]]; then
+    exit 0
+elif [[ "$cmd" == "inspect" ]]; then
+    while [[ $# -gt 0 ]]; do
+        if [[ "$1" == "--format" ]]; then
+            fmt="$2"
+            shift 2
+        else
+            shift
+        fi
+    done
+    if [[ "$fmt" == *ai.saintvision.service* ]]; then
+        echo "portal"
+    elif [[ "$fmt" == *ai.saintvision.workload* ]]; then
+        echo "intranet-portal"
+    elif [[ "$fmt" == *ai.saintvision.node* ]]; then
+        echo "node2"
+    elif [[ "$fmt" == *ai.saintvision.instance* ]]; then
+        echo "main"
+    elif [[ "$fmt" == *State.Running* ]]; then
+        echo "true"
+    elif [[ "$fmt" == *RestartCount* ]]; then
+        echo "0"
+    else
+        echo "true"
+    fi
+    exit 0
+elif [[ "$cmd" == "exec" ]]; then
+    echo "Simulated failure of docker exec curl /healthz" >&2
+    exit 1
+elif [[ "$cmd" == "rename" || "$cmd" == "stop" || "$cmd" == "run" || "$cmd" == "rm" || "$cmd" == "start" ]]; then
+    exit 0
+fi
+"""
+    (bin_dir / "docker").write_text(docker_stub.replace("\r\n", "\n"), encoding="utf-8")
+
+    test_sh = f"""
+    export PATH="{to_posix_path(bin_dir)}:$PATH"
+    source "{to_posix_path(PORTAL_UP_SH)}"
+    TARGET_IMAGE="sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    CERT_FILE_ABS="/tmp/cert"
+    KEY_FILE_ABS="/tmp/key"
+    CA_BUNDLE_ABS="/tmp/ca"
+    UPSTREAM_CONF_ABS="/tmp/up"
+    swap_and_launch_production
+    """
+
+    res = subprocess.run(
+        [bash_path, "-c", test_sh],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    assert res.returncode == 1, f"Expected swap_and_launch_production to fail on probe failure, got {res.returncode}: {res.stdout}"
+    assert "Production verified HTTPS /healthz failed." in res.stderr
+    assert "Rollback complete: previous production container restored and running." in res.stderr
+
+    calls = calls_log.read_text(encoding="utf-8") if calls_log.exists() else ""
+    assert "docker rename saintvision-portal saintvision-portal-backup-" in calls
+    assert "docker stop saintvision-portal-backup-" in calls
+    assert "docker run -d --name saintvision-portal" in calls
+    assert "docker stop saintvision-portal" in calls
+    assert "docker rm -f saintvision-portal" in calls
+    assert "docker start saintvision-portal-backup-" in calls
+    assert "docker rename saintvision-portal-backup-" in calls
 
     shutil.rmtree(temp_dir, ignore_errors=True)

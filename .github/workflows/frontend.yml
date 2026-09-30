@@ -144,7 +144,7 @@ jobs:
 
           # 5. Start lightweight Python SSL upstream stub for cp.sv.lan on port 443
           sudo python3 - <<'EOF' > /tmp/portal-ci/mock_upstream.log 2>&1 &
-          import http.server, ssl, json
+          import http.server, ssl, json, hashlib, base64
 
           class Handler(http.server.BaseHTTPRequestHandler):
               def do_GET(self):
@@ -153,6 +153,23 @@ jobs:
                       self.send_header("Content-Type", "application/json")
                       self.end_headers()
                       self.wfile.write(b'{"authenticated":true,"tenantId":"mock"}')
+                  elif "/events" in self.path:
+                      self.send_response(200)
+                      self.send_header("Content-Type", "text/event-stream")
+                      self.send_header("Cache-Control", "no-cache")
+                      self.send_header("Connection", "keep-alive")
+                      self.end_headers()
+                      self.wfile.write(b'data: {"type":"connected","project":"mock"}\n\n')
+                      self.wfile.flush()
+                  elif self.path == "/v1/terminal/ws":
+                      sec_key = self.headers.get("Sec-WebSocket-Key", "")
+                      self.send_response(101, "Switching Protocols")
+                      self.send_header("Upgrade", "websocket")
+                      self.send_header("Connection", "Upgrade")
+                      if sec_key:
+                          accept = base64.b64encode(hashlib.sha1((sec_key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11").encode()).digest()).decode()
+                          self.send_header("Sec-WebSocket-Accept", accept)
+                      self.end_headers()
                   else:
                       self.send_response(200)
                       self.end_headers()
@@ -206,29 +223,68 @@ jobs:
           HTTPS_HEALTH=$(curl -fsS --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/healthz)
           [[ "$HTTPS_HEALTH" == "OK" ]]
 
-          # 4. Verified HTTPS Security Headers on /index.html
-          echo "Checking HTTPS security headers on /index.html..."
-          INDEX_HEADERS=$(curl -sI --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/index.html | tr -d '\r')
+          # 4. Verified HTTPS Security Headers, CSP values, and status 200 on /index.html
+          echo "Checking HTTPS status 200 and security headers on /index.html..."
+          INDEX_HTML=$(curl -fsS --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/index.html)
+          INDEX_HEADERS=$(curl -fsS -I --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/index.html | tr -d '\r')
+          echo "$INDEX_HEADERS" | grep -iq "HTTP/.* 200"
           echo "$INDEX_HEADERS" | grep -iq "Strict-Transport-Security: max-age=31536000"
           echo "$INDEX_HEADERS" | grep -iq "Content-Security-Policy:"
+          echo "$INDEX_HEADERS" | grep -iq "connect-src 'self' https://idp.sv.lan"
           echo "$INDEX_HEADERS" | grep -iq "X-Content-Type-Options: nosniff"
           echo "$INDEX_HEADERS" | grep -iq "X-Frame-Options: DENY"
           echo "$INDEX_HEADERS" | grep -iq "Cache-Control: no-cache, no-store, must-revalidate"
 
-          # 5. Verified HTTPS /assets/ immutable caching header
-          echo "Checking HTTPS /assets/ immutable caching..."
-          ASSET_HEADERS=$(curl -sI --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/assets/test.js | tr -d '\r')
-          echo "$ASSET_HEADERS" | grep -iq "Cache-Control: public, immutable"
+          # 5. Verified HTTPS /assets/ immutable caching on REAL hashed asset, assert 404 on missing
+          echo "Extracting real hashed asset from /index.html..."
+          REAL_ASSET=$(echo "$INDEX_HTML" | grep -oE '/assets/[^"'\''> ]+\.(js|css)' | head -n 1)
+          if [[ -z "$REAL_ASSET" ]]; then
+              echo "ERROR: No hashed asset found in /index.html" >&2
+              exit 1
+          fi
+          echo "Found real hashed asset: $REAL_ASSET"
+          REAL_ASSET_HEADERS=$(curl -fsS -I --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 "https://portal.sv.lan:8443${REAL_ASSET}" | tr -d '\r')
+          echo "$REAL_ASSET_HEADERS" | grep -iq "HTTP/.* 200"
+          echo "$REAL_ASSET_HEADERS" | grep -iq "Cache-Control: public, immutable"
+
+          echo "Asserting HTTP 404 for non-existent asset..."
+          MISSING_CODE=$(curl -s -o /dev/null -w "%{http_code}" --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/assets/non-existent-test-404.js)
+          if [[ "$MISSING_CODE" != "404" ]]; then
+              echo "ERROR: Expected HTTP 404 for missing asset, got $MISSING_CODE" >&2
+              exit 1
+          fi
 
           # 6. Container exec nginx -t verification
           echo "Checking container nginx -t..."
           docker exec saintvision-portal nginx -t
 
-          # 7. Reverse Proxy to Upstream Control Plane verification
-          echo "Checking reverse proxy /v1/session..."
+          # 7. Reverse Proxy to Upstream Control Plane: REST API, SSE, and Terminal WebSocket
+          echo "Checking reverse proxy REST API (/v1/session)..."
           V1_RESPONSE=$(curl -fsS --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/v1/session)
-          echo "$V1_RESPONSE"
           echo "$V1_RESPONSE" | grep -q "authenticated"
+
+          echo "Checking reverse proxy SSE streaming (/v1/projects/mock/runs/run-1/events)..."
+          SSE_RESPONSE=$(curl -fsS --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 --max-time 3 https://portal.sv.lan:8443/v1/projects/mock/runs/run-1/events)
+          echo "$SSE_RESPONSE" | grep -q "connected"
+
+          echo "Checking reverse proxy Terminal WebSocket upgrade (/v1/terminal/ws)..."
+          WS_RESPONSE=$(curl -i -s -N --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 \
+            -H "Connection: Upgrade" \
+            -H "Upgrade: websocket" \
+            -H "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==" \
+            -H "Sec-WebSocket-Version: 13" \
+            https://portal.sv.lan:8443/v1/terminal/ws | tr -d '\r')
+          echo "$WS_RESPONSE" | grep -iq "101 Switching Protocols"
+          echo "$WS_RESPONSE" | grep -iq "Upgrade: websocket"
+          echo "$WS_RESPONSE" | grep -iq "Connection: Upgrade"
+
+          # 8. Verify strict TLS version: reject legacy TLS 1.1 handshake
+          echo "Verifying rejection of legacy TLS 1.1..."
+          if curl -fsS --tlsv1.1 --tls-max 1.1 --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/healthz >/dev/null 2>&1; then
+              echo "ERROR: Legacy TLS 1.1 handshake unexpectedly succeeded. Nginx must enforce TLS 1.2+." >&2
+              exit 1
+          fi
+          echo "✔ Legacy TLS 1.1 handshake rejected (fail-closed)."
 
           echo "✔ Hosted Portal Container Build & Hardened Runtime Smoke PASSED!"
 
@@ -236,4 +292,3 @@ jobs:
         if: always()
         run: |
           bash deploy/intranet/portal/portal-down.sh || true
-

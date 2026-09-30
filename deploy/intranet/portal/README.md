@@ -107,10 +107,14 @@ DOCKER_BUILDKIT=1 docker build -f deploy/intranet/portal/Dockerfile -t saintvisi
 export PORTAL_UPSTREAM_CP_HOST="cp.sv.lan:443"
 
 # 필수 2: 승인된 불변 이미지 digest (sha256:64hex)
-export PORTAL_IMAGE_DIGEST="sha256:$(docker image inspect --format '{{.Id}}' saintvision-portal:latest | sed 's/sha256://')"
+# 주의: 로컬의 가변 태그(:latest)에서 임의 추출하는 것이 아니라,
+# 승인된 CI 빌드 아티팩트 서명 기록 또는 릴리스 거버넌스 승인 문서(Evidence)에 등록된
+# 불변 OCI Image Digest(sha256:64hex)를 주입해야 합니다.
+export PORTAL_IMAGE_DIGEST="sha256:<approved-oci-image-digest-from-ci-release-evidence>"
 
 # 필수 3: Card 150/151 사내 루트 CA 지문 allowlist (콜론/공백 무관, 소문자 정규화 비교)
-export PORTAL_ALLOWED_ROOT_FINGERPRINTS="<approved-root-ca-sha256-fingerprint>"
+# #249 / #251 사내망 PKI 런북 및 거버넌스 승인 공개 루트 CA 지문 예시:
+export PORTAL_ALLOWED_ROOT_FINGERPRINTS="92455f1b778130334da43b0eee977357b5ae498eb1005bc29ecc6c3afb7192ba"
 
 # 인증서 디렉터리 지정 (기본값: deploy/intranet/portal/certs)
 # 요구 파일: server-chain.pem (0600), server-key.pem (0400), ca-bundle.crt
@@ -127,4 +131,3 @@ PORTAL_UID="$(id -u)" PORTAL_GID="$(id -g)" bash deploy/intranet/portal/portal-u
 - **WebSocket / API Origin 허용 목록 (`allowed_origins`)**:
   - `services/control-plane/src/inv/app.py:773-778`에 따라 제어 평면은 WebSocket 연결 및 CORS 요청 수신 시 Origin 헤더를 검증합니다.
   - 사내망 포털(`https://portal.sv.lan`)이 제어 평면의 터미널 WebSocket(`/v1/terminal/ws`, `/v1/workspaces/{id}/terminals/`) 및 REST API(`/v1/`)를 역방향 프록시하여 정상 통신하려면, **제어 평면의 `allowed_origins` 설정에 `https://portal.sv.lan`이 반드시 포함**되어 있어야 합니다.
-

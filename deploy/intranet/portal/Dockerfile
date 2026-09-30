@@ -22,10 +22,13 @@ COPY apps/web/ ./
 RUN npm run build
 
 # Stage 2: Hardened Non-Root Nginx Runtime
+# Pinned with exact verified OCI multi-arch digest from registry.
+# Production reproducibility: In production CI/CD, the resulting image is cryptographically sealed
+# by its OCI image digest (sha256:64hex). Diagnostic probe utilities are pinned with version constraints.
 FROM nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10 AS runner
 
-# Install curl and openssl for internal verified preflight probes (L1)
-RUN apk add --no-cache curl openssl
+# Install curl and openssl for internal verified preflight probes (L1) with minimum version constraints
+RUN apk add --no-cache 'curl>=8' 'openssl>=3'
 
 # Configure non-root directories and temp paths for read-only rootfs compatibility
 RUN mkdir -p /tmp/client_temp \

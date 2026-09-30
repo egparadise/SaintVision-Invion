@@ -21,8 +21,8 @@ openssl ecparam -name prime256v1 -genkey -noout -out "$KEY_FILE"
 chmod 600 "$KEY_FILE"
 
 # Generate self-signed X.509 certificate with SAN DNS:portal.sv.lan
-openssl req -new -x509 -sha256 -key "$KEY_FILE" \
-    -subj "//C=KR/O=SaintVision/OU=IntranetPortal/CN=portal.sv.lan" \
+MSYS_NO_PATHCONV=1 openssl req -new -x509 -sha256 -key "$KEY_FILE" \
+    -subj "/C=KR/O=SaintVision/OU=IntranetPortal/CN=portal.sv.lan" \
     -addext "subjectAltName=DNS:portal.sv.lan" \
     -days 30 \
     -out "$CERT_FILE"

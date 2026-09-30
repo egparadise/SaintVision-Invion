@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-GEMINI-CARD156-001"
 title: "History: Card 156 사내망 portal 웹 배포 자산 및 비root read-only rootfs Nginx·안전 기동 검증"
-version: "1.4.0"
+version: "1.6.0"
 status: "review"
 author: "Gemini"
-updated: "2026-09-30T10:30:00+09:00"
+updated: "2026-09-30T11:22:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -16,6 +16,40 @@ source_of_truth: "Git"
 - **작업 브랜치**: `agent/gemini/c156-intranet-portal-deploy` (Base: `origin/integration/all-agents-unified`, PR #247 최신 커밋 `2f93cbba` 병합)
 - **배치 대상 도메인**: `portal.sv.lan`
 - **배치 대상 노드**: 노드2 (object store 노드, Docker 지원)
+- **독립 검토 r4 조치 (Codex 계약·보안 축 + Claude UI·운영 축 '변경 요청' 전수 반영)**:
+  1. **R4-H1 [핵심/보안] 비밀키 0400 권한 엄격 강제 및 PORTAL_GID != 0 강제**:
+     - `stat -c '%a'` 실측을 통해 비밀키 퍼미션 모드가 정확히 `0400`이어야만 실행 허용 (chmod를 통한 임의 변경 금지, 0644/0440/0600 등 fail-closed 즉시 거부).
+     - `PORTAL_GID=0` 기동 시 즉시 거부 (fail-closed).
+     - `Dockerfile` 런타임 패키지 버전 제약 고정 (`RUN apk add --no-cache 'curl>=8' 'openssl>=3'`).
+     - OCI 이미지 다이제스트 증명 봉인(CI 빌드 attestation 또는 서명된 릴리스 레코드에서 가져온 sha256 고정 다이제스트) 명시.
+  2. **R4-L2 [권한 축소] 불필요한 NET_BIND_SERVICE 기능 제거**:
+     - 최신 Docker 컨테이너 네트워크 네임스페이스의 비특권 포트 바인딩 지원에 따라 `portal-up.sh` 및 `portal-smoke-up.sh`에서 `--cap-add NET_BIND_SERVICE`를 전면 제거.
+  3. **R4-M1 [운영 안정성] 비파괴적 컨테이너 스왑 및 자동 롤백(Rollback) 구현**:
+     - 기존 운영 컨테이너를 먼저 삭제하지 않고, 임시 백업 이름(`${CONTAINER_NAME}-backup-${rand_suffix}`)으로 rename 및 stop하여 포트 80/443 점유를 해제하면서 원본을 보존.
+     - 신규 컨테이너를 `${CONTAINER_NAME}`으로 기동하고 1초 안정화 및 HTTPS 사전 프로브(`/healthz`, `/index.html`, `/auth-config.js`) 수행.
+     - 신규 컨테이너 기동 또는 사후 검증 실패 시 자동 롤백 함수(`rollback_production`)가 발동하여 깨진 컨테이너를 stop/rm하고 보존된 백업 컨테이너를 원상태로 rename 및 start 복구.
+     - 모든 프로브가 완벽히 성공한 이후에만 보존된 백업 컨테이너를 안전하게 제거.
+  4. **R4-M2 [문서화] README 루트 CA 지문 예시 갱신**:
+     - README 내 루트 CA 지문 예시를 Card 150/151 사내 공개 신뢰 번들의 실제 SHA-256 해시(`92455f1b778130334da43b0eee977357b5ae498eb1005bc29ecc6c3afb7192ba`)로 갱신.
+  5. **Cross-Platform OpenSSL 정규화**:
+     - Git Bash 우회 표기(`//CN=...`)가 Linux 환경에서 빈 subject를 유발하는 문제를 해소하기 위해 `export MSYS_NO_PATHCONV=1` 설정 후 표준 `/CN=...` 경로를 사용하도록 `generate-dev-certs.sh` 및 테스트 환경 전면 정규화.
+  6. **R4-H2 [실측 검증] 6대 잔여 생존 변이 전수 사살 행동 시험 및 Fake Docker 스위트 완비**:
+     - (d) 외래 CA 서명 리프 체인 검증 해제 사살: 허용된 CA 번들로 타 사설 CA 서명 리프 검증 시 즉시 거부 (`test_behavioral_pki_leaf_signed_by_different_ca_fails`).
+     - (e) 인스턴스 라벨 비교 제거 사살: fake docker에서 instance만 다른 컨테이너 존재 시 무단 변경 방지 및 미접촉 보존 (`test_behavioral_fake_docker_instance_mismatch_preserved`).
+     - (h) 업스트림 검사 return 1 -> true 변이 사살: 키 모드/소유자 등 다른 조건이 완벽한 상태에서도 `UPSTREAM_CP_HOST` 불일치가 독립적으로 차단됨을 실측 (`test_behavioral_environment_upstream_mismatch_independent_fail`).
+     - (o) 스테이징 /index.html 프로브 반환 제거 사살: 정적 파일 프로브 실패 시 스테이징 컨테이너 cleanup trap 발동 실측 (`test_behavioral_fake_docker_staging_index_html_probe_failure`).
+     - (t) 비밀키 소유자 UID 검사 해제 사살: `stat -c %u != PORTAL_UID` 시 독립적 fail-closed 실측 (`test_behavioral_environment_key_owner_mismatch_rejected`).
+     - (u) 스왑 사후 HTTPS 프로브 반환 제거 사살: 프로브 실패 시 롤백 발동 및 이전 컨테이너 복원 실측 (`test_behavioral_fake_docker_swap_https_probe_failure_triggers_rollback`).
+     - 스테이징 docker run 이름 충돌 시 stop/rm 0회 보존 시험 (`test_behavioral_fake_docker_staging_preexisting_conflict_no_stop_or_rm`).
+     - 비밀키 퍼미션 모드 400/0400 통과 및 0644/0440/0600 거부 실측 (`test_behavioral_environment_key_mode_fail_closed`).
+     - GID=0 거부 실측 (`test_behavioral_environment_root_gid_rejected`).
+     - 총 48개 테스트 전원 통과 실측 (`pytest tests/test_intranet_portal_deploy.py`: 48 passed 100%, 40.35s).
+  7. **R4-L4 Hosted 런타임 CI 파이프라인 보강**:
+     - `.github/workflows/frontend.yml`의 `portal-runtime-smoke`에 목 업스트림 REST(`/v1/session`), SSE(`/events`), WebSocket 핸드셰이크(`101 Switching Protocols`) 응답 추가.
+     - curl을 통해 실제 해시된 정적 자산 200 OK + `Cache-Control: public, immutable` 응답 및 비존재 자산 404 응답 실측.
+     - CSP 헤더 값 및 `connect-src 'self' https://idp.sv.lan` 실측.
+     - 레거시 TLS 1.1 핸드셰이크 거부 (`curl --tlsv1.1 --tls-max 1.1` fail-closed) 실측.
+
 - **독립 검토 r3 조치 (Codex 계약·보안 축 + Claude UI·운영 축 '변경 요청' 전수 반영)**:
   1. **R3-H1 [핵심/보안] 루트 CA allowlist 필수화 및 다중 루트 탐지/중간 CA 검증**:
      - `PORTAL_ALLOWED_ROOT_FINGERPRINTS`를 필수 환경변수로 전환 (미설정 시 fail-closed 기동 거부).
@@ -74,7 +108,8 @@ deploy/intranet/portal/
 ## 3. 정량 검증 결과
 
 - **배포 통합 및 행동 검증 시험 (`pytest tests/test_intranet_portal_deploy.py`)**:
-  - **38 passed 100% (30.61s)**:
+  - **48 passed 100% (40.35s)**:
+    0. 6대 생존 변이 전수 사살 (d: 외래 CA 서명 리프 거부, e: instance 불일치 컨테이너 미접촉 보존, h: upstream 불일치 독립 거부, o: staging /index.html 실패 trap, t: key owner 불일치 거부, u: swap post-launch HTTPS probe 실패 자동 롤백 및 이전 컨테이너 복원 실측).
     1. `test_security_headers_conf_invariants`: HSTS, strict CSP connect-src 'self'/idp, style-src 'self', form-action 'self', X-XSS-Protection "0" 검증.
     2. `test_nginx_conf_includes_security_headers_in_all_add_header_locations`: 전 location 헤더 상속 검증.
     3. `test_nginx_conf_reverse_proxy_topology`: /v1/, SSE buffering off, WS upgrade, upstream TLS, Host cp.sv.lan 전파 검증.

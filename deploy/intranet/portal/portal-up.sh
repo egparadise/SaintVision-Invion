@@ -46,6 +46,7 @@ fi
 UPSTREAM_CP_HOST="${PORTAL_UPSTREAM_CP_HOST:-}"
 STATE_DIR="${PORTAL_STATE_DIR:-${HOME}/.local/state/saintvision-portal/${PORTAL_INSTANCE}}"
 STAGING_NAME=""
+STAGING_TARGET_CONTAINER=""
 
 # -----------------------------------------------------------------------------
 # Function Definitions for Modular Testing and Safe Execution (R3-H2)
@@ -65,9 +66,13 @@ validate_argv_secrets() {
 }
 
 validate_environment() {
-    # 1. Reject root UID execution (R3-M2)
+    # 1. Reject root UID or GID execution (R3-M2, fail-closed)
     if [[ "$PORTAL_UID" -eq 0 ]]; then
         echo "ERROR: PORTAL_UID cannot be 0 (root execution is strictly prohibited)." >&2
+        return 1
+    fi
+    if [[ -n "${PORTAL_GID:-}" && "$PORTAL_GID" -eq 0 ]]; then
+        echo "ERROR: PORTAL_GID cannot be 0 (root group execution is strictly prohibited)." >&2
         return 1
     fi
 
@@ -78,12 +83,18 @@ validate_environment() {
         return 1
     fi
 
-    # 3. Verify key file owner UID matches PORTAL_UID (R3-M2)
+    # 3. Verify key file owner UID and exact permission mode 0400 (fail-closed, chmod prohibited)
     if [[ -f "$KEY_FILE" ]]; then
-        local key_owner
+        local key_owner key_mode
         key_owner=$(stat -c '%u' "$KEY_FILE" 2>/dev/null || stat -f '%u' "$KEY_FILE" 2>/dev/null || true)
         if [[ -n "$key_owner" && "$key_owner" -ne "$PORTAL_UID" ]]; then
             echo "ERROR: Private key $KEY_FILE owner UID ($key_owner) does not match PORTAL_UID ($PORTAL_UID)." >&2
+            return 1
+        fi
+        key_mode=$(stat -c '%a' "$KEY_FILE" 2>/dev/null || stat -f '%Lp' "$KEY_FILE" 2>/dev/null || true)
+        key_mode="${key_mode#0}"
+        if [[ "$key_mode" != "400" ]]; then
+            echo "ERROR: Private key $KEY_FILE permission mode must be strictly 0400 (found: $key_mode). Modification prohibited; fail-closed." >&2
             return 1
         fi
     fi
@@ -305,16 +316,30 @@ validate_owner_tuple() {
 }
 
 staging_cleanup() {
-    if [[ -n "${STAGING_NAME:-}" ]] && docker inspect "$STAGING_NAME" >/dev/null 2>&1; then
-        echo "Cleaning up staging container '$STAGING_NAME'..." >&2
-        docker stop "$STAGING_NAME" >/dev/null 2>&1 || true
-        docker rm -f "$STAGING_NAME" >/dev/null 2>&1 || true
+    local target="${STAGING_TARGET_CONTAINER:-}"
+    if [[ -n "$target" ]] && docker inspect "$target" >/dev/null 2>&1; then
+        local inst srv wrk nd
+        inst=$(docker inspect --format '{{index .Config.Labels "ai.saintvision.instance"}}' "$target" 2>/dev/null || true)
+        srv=$(docker inspect --format '{{index .Config.Labels "ai.saintvision.service"}}' "$target" 2>/dev/null || true)
+        wrk=$(docker inspect --format '{{index .Config.Labels "ai.saintvision.workload"}}' "$target" 2>/dev/null || true)
+        nd=$(docker inspect --format '{{index .Config.Labels "ai.saintvision.node"}}' "$target" 2>/dev/null || true)
+        if [[ "$inst" == "preflight" && "$srv" == "portal" && "$wrk" == "intranet-portal" && "$nd" == "node2" ]]; then
+            echo "Cleaning up staging container '$target'..." >&2
+            docker stop "$target" >/dev/null 2>&1 || true
+            docker rm -f "$target" >/dev/null 2>&1 || true
+        else
+            echo "WARNING: Refusing to clean up staging container '$target' (labels do not match preflight 4-tuple)." >&2
+        fi
     fi
+    STAGING_TARGET_CONTAINER=""
+    STAGING_NAME=""
 }
 
 run_staging_preflight() {
-    STAGING_NAME="${CONTAINER_NAME}-staging-$$"
-    echo "Launching staging preflight container '$STAGING_NAME' ($TARGET_IMAGE)..."
+    local rand_suffix
+    rand_suffix=$(head -c 6 /dev/urandom 2>/dev/null | xxd -p 2>/dev/null || date +%s%N 2>/dev/null | cut -c 1-8 || echo "$$")
+    local cand_name="${CONTAINER_NAME}-staging-${rand_suffix}"
+    echo "Launching staging preflight container '$cand_name' ($TARGET_IMAGE)..."
 
     # Trap cleanup on unexpected exit or interrupt during staging (R3-M3)
     trap staging_cleanup EXIT INT TERM
@@ -326,15 +351,14 @@ run_staging_preflight() {
         done
     fi
 
-    docker run -d \
-        --name "$STAGING_NAME" \
+    if ! docker run -d \
+        --name "$cand_name" \
         --label "${LABEL_SERVICE}" \
         --label "${LABEL_WORKLOAD}" \
         --label "${LABEL_NODE}" \
         --label "ai.saintvision.instance=preflight" \
         --read-only \
         --cap-drop ALL \
-        --cap-add NET_BIND_SERVICE \
         --security-opt no-new-privileges \
         --user "${PORTAL_UID}:${PORTAL_GID}" \
         --tmpfs /tmp:rw,noexec,nosuid,size=64m \
@@ -345,7 +369,14 @@ run_staging_preflight() {
         --mount "type=bind,source=${KEY_FILE_ABS},target=/etc/nginx/certs/portal.key,readonly" \
         --mount "type=bind,source=${CA_BUNDLE_ABS},target=/etc/nginx/certs/ca-bundle.crt,readonly" \
         --mount "type=bind,source=${UPSTREAM_CONF_ABS},target=/etc/nginx/conf.d/upstream.conf,readonly" \
-        "$TARGET_IMAGE"
+        "$TARGET_IMAGE"; then
+        echo "ERROR: Failed to launch staging preflight container. Existing container preserved; aborting." >&2
+        return 1
+    fi
+
+    # Only register target container for cleanup after docker run succeeds
+    STAGING_TARGET_CONTAINER="$cand_name"
+    STAGING_NAME="$cand_name"
 
     local staging_running="false"
     for i in {1..10}; do
@@ -376,7 +407,10 @@ run_staging_preflight() {
 
     # Preflight verified HTTPS probes with CA chain and hostname verification (R3-L1: strict TLS verification)
     echo "Running preflight verified HTTPS health check in staging container..."
-    if ! docker exec "$STAGING_NAME" curl -fsS             --cacert /etc/nginx/certs/ca-bundle.crt             --resolve portal.sv.lan:443:127.0.0.1             https://portal.sv.lan/healthz >/dev/null 2>&1; then
+    if ! docker exec "$STAGING_NAME" curl -fsS \
+            --cacert /etc/nginx/certs/ca-bundle.crt \
+            --resolve portal.sv.lan:443:127.0.0.1 \
+            https://portal.sv.lan/healthz >/dev/null 2>&1; then
         echo "ERROR: Staging preflight verified HTTPS /healthz failed. Existing container preserved; aborting." >&2
         docker logs "$STAGING_NAME" 2>&1 || true
         staging_cleanup
@@ -384,14 +418,20 @@ run_staging_preflight() {
     fi
 
     echo "Verifying static assets via HTTPS in staging container..."
-    if ! docker exec "$STAGING_NAME" curl -fsS             --cacert /etc/nginx/certs/ca-bundle.crt             --resolve portal.sv.lan:443:127.0.0.1             https://portal.sv.lan/index.html >/dev/null 2>&1; then
+    if ! docker exec "$STAGING_NAME" curl -fsS \
+            --cacert /etc/nginx/certs/ca-bundle.crt \
+            --resolve portal.sv.lan:443:127.0.0.1 \
+            https://portal.sv.lan/index.html >/dev/null 2>&1; then
         echo "ERROR: Staging preflight verified HTTPS /index.html failed. Existing container preserved; aborting." >&2
         docker logs "$STAGING_NAME" 2>&1 || true
         staging_cleanup
         return 1
     fi
 
-    if ! docker exec "$STAGING_NAME" curl -fsS             --cacert /etc/nginx/certs/ca-bundle.crt             --resolve portal.sv.lan:443:127.0.0.1             https://portal.sv.lan/auth-config.js >/dev/null 2>&1; then
+    if ! docker exec "$STAGING_NAME" curl -fsS \
+            --cacert /etc/nginx/certs/ca-bundle.crt \
+            --resolve portal.sv.lan:443:127.0.0.1 \
+            https://portal.sv.lan/auth-config.js >/dev/null 2>&1; then
         echo "ERROR: Staging preflight verified HTTPS /auth-config.js failed. Existing container preserved; aborting." >&2
         docker logs "$STAGING_NAME" 2>&1 || true
         staging_cleanup
@@ -401,29 +441,43 @@ run_staging_preflight() {
     echo "✔ Preflight staging verified HTTPS health & static asset checks passed."
     staging_cleanup
     trap - EXIT INT TERM
-    STAGING_NAME=""
     return 0
 }
 
 swap_and_launch_production() {
-    # Owner Label 4-Tuple Verification and Safe Container Replacement
+    local backup_name=""
+    # Owner Label 4-Tuple Verification and Safe Container Replacement (R4-M1)
     if docker container inspect "$CONTAINER_NAME" >/dev/null 2>&1; then
         if ! validate_owner_tuple "$CONTAINER_NAME" "portal" "intranet-portal" "node2" "$PORTAL_INSTANCE"; then
             echo "Refusing to touch non-matching container on node2." >&2
             return 1
         fi
 
-        echo "Stopping and replacing existing owned portal container '$CONTAINER_NAME'..."
-        docker stop "$CONTAINER_NAME" >/dev/null
-        docker rm "$CONTAINER_NAME" >/dev/null
+        local rand_suffix
+        rand_suffix=$(head -c 6 /dev/urandom 2>/dev/null | xxd -p 2>/dev/null || date +%s%N 2>/dev/null | cut -c 1-8 || echo "$$")
+        backup_name="${CONTAINER_NAME}-backup-${rand_suffix}"
+        echo "Preserving existing container '$CONTAINER_NAME' as backup '$backup_name'..."
+        docker rename "$CONTAINER_NAME" "$backup_name"
+        docker stop "$backup_name" >/dev/null
     fi
 
-    # Clean up only stopped/exited containers matching the exact 4-tuple
+    # Clean up only stopped/exited containers matching the exact 4-tuple (excluding our active backup)
     local stale_ids
-    stale_ids=$(docker ps -aq         --filter "status=exited"         --filter "label=${LABEL_SERVICE}"         --filter "label=${LABEL_WORKLOAD}"         --filter "label=${LABEL_NODE}"         --filter "label=${LABEL_INSTANCE}" 2>/dev/null || true)
+    stale_ids=$(docker ps -aq \
+        --filter "status=exited" \
+        --filter "label=${LABEL_SERVICE}" \
+        --filter "label=${LABEL_WORKLOAD}" \
+        --filter "label=${LABEL_NODE}" \
+        --filter "label=${LABEL_INSTANCE}" 2>/dev/null || true)
     if [[ -n "$stale_ids" ]]; then
-        echo "Cleaning up exited stale container(s) matching exact tuple..."
-        docker rm $stale_ids >/dev/null 2>&1 || true
+        for sid in $stale_ids; do
+            local sname
+            sname=$(docker inspect --format '{{.Name}}' "$sid" 2>/dev/null | sed -e 's|^/||' || true)
+            if [[ -n "$backup_name" && "$sname" == "$backup_name" ]]; then
+                continue
+            fi
+            docker rm "$sid" >/dev/null 2>&1 || true
+        done
     fi
 
     local add_host_args=()
@@ -443,7 +497,6 @@ swap_and_launch_production() {
         --restart unless-stopped \
         --read-only \
         --cap-drop ALL \
-        --cap-add NET_BIND_SERVICE \
         --security-opt no-new-privileges \
         --user "${PORTAL_UID}:${PORTAL_GID}" \
         --tmpfs /tmp:rw,noexec,nosuid,size=64m \
@@ -458,6 +511,21 @@ swap_and_launch_production() {
         --mount "type=bind,source=${UPSTREAM_CONF_ABS},target=/etc/nginx/conf.d/upstream.conf,readonly" \
         "$TARGET_IMAGE"
 
+    rollback_production() {
+        echo "CRITICAL: Production verification failed. Initiating automatic rollback..." >&2
+        docker stop "$CONTAINER_NAME" >/dev/null 2>&1 || true
+        docker rm -f "$CONTAINER_NAME" >/dev/null 2>&1 || true
+        if [[ -n "$backup_name" ]] && docker inspect "$backup_name" >/dev/null 2>&1; then
+            echo "Restoring previous production container from '$backup_name'..." >&2
+            docker start "$backup_name" >/dev/null 2>&1 || true
+            docker rename "$backup_name" "$CONTAINER_NAME" >/dev/null 2>&1 || true
+            echo "Rollback complete: previous production container restored and running." >&2
+        else
+            echo "No previous production container backup available; broken container removed." >&2
+        fi
+        return 1
+    }
+
     echo "Verifying production container status and stability..."
     local running="false"
     for i in {1..15}; do
@@ -471,6 +539,7 @@ swap_and_launch_production() {
     if [[ "$running" != "true" ]]; then
         echo "ERROR: Portal container '$CONTAINER_NAME' failed to enter running state." >&2
         docker logs "$CONTAINER_NAME" 2>&1 || true
+        rollback_production
         return 1
     fi
 
@@ -479,6 +548,7 @@ swap_and_launch_production() {
     if [[ "$restart_count" -ne 0 ]]; then
         echo "ERROR: Portal container has restarted $restart_count times (crash loop detected)." >&2
         docker logs "$CONTAINER_NAME" 2>&1 || true
+        rollback_production
         return 1
     fi
 
@@ -488,15 +558,48 @@ swap_and_launch_production() {
     if [[ "$restart_count_after" -ne 0 ]]; then
         echo "ERROR: Portal container crashed during startup stabilization ($restart_count_after restarts)." >&2
         docker logs "$CONTAINER_NAME" 2>&1 || true
+        rollback_production
         return 1
     fi
 
-    # Production verified HTTPS health probe (Codex note)
-    echo "Running production verified HTTPS health probe on '$CONTAINER_NAME'..."
-    if ! docker exec "$CONTAINER_NAME" curl -fsS             --cacert /etc/nginx/certs/ca-bundle.crt             --resolve portal.sv.lan:443:127.0.0.1             https://portal.sv.lan/healthz >/dev/null 2>&1; then
+    # Production verified HTTPS health probes (Codex r4 note)
+    echo "Running production verified HTTPS /healthz probe on '$CONTAINER_NAME'..."
+    if ! docker exec "$CONTAINER_NAME" curl -fsS \
+            --cacert /etc/nginx/certs/ca-bundle.crt \
+            --resolve portal.sv.lan:443:127.0.0.1 \
+            https://portal.sv.lan/healthz >/dev/null 2>&1; then
         echo "ERROR: Production verified HTTPS /healthz failed." >&2
         docker logs "$CONTAINER_NAME" 2>&1 || true
+        rollback_production
         return 1
+    fi
+
+    echo "Running production verified HTTPS /index.html probe on '$CONTAINER_NAME'..."
+    if ! docker exec "$CONTAINER_NAME" curl -fsS \
+            --cacert /etc/nginx/certs/ca-bundle.crt \
+            --resolve portal.sv.lan:443:127.0.0.1 \
+            https://portal.sv.lan/index.html >/dev/null 2>&1; then
+        echo "ERROR: Production verified HTTPS /index.html failed." >&2
+        docker logs "$CONTAINER_NAME" 2>&1 || true
+        rollback_production
+        return 1
+    fi
+
+    echo "Running production verified HTTPS /auth-config.js probe on '$CONTAINER_NAME'..."
+    if ! docker exec "$CONTAINER_NAME" curl -fsS \
+            --cacert /etc/nginx/certs/ca-bundle.crt \
+            --resolve portal.sv.lan:443:127.0.0.1 \
+            https://portal.sv.lan/auth-config.js >/dev/null 2>&1; then
+        echo "ERROR: Production verified HTTPS /auth-config.js failed." >&2
+        docker logs "$CONTAINER_NAME" 2>&1 || true
+        rollback_production
+        return 1
+    fi
+
+    # Only remove preserved backup container after all production probes succeed! (R4-M1)
+    if [[ -n "$backup_name" ]] && docker inspect "$backup_name" >/dev/null 2>&1; then
+        echo "Removing preserved backup container '$backup_name' after verified deployment..."
+        docker rm -f "$backup_name" >/dev/null 2>&1 || true
     fi
 
     echo "✔ SaintVision Intranet Portal successfully launched and verified running."
