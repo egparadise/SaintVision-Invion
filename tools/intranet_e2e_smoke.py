@@ -78,7 +78,7 @@ from tools.operational_evidence import (  # noqa: E402
     write_evidence,
 )
 
-SCHEMA_VERSION = "intranet-e2e-smoke:2"
+SCHEMA_VERSION = "intranet-e2e-smoke:3"
 DEFAULT_OUT_DIR = REPO_ROOT / "docs/vault/30_Development/Evidence/intranet-e2e-smoke"
 #: A response larger than this is a finding, not something to quietly truncate.
 MAX_BODY_BYTES = 262_144
@@ -110,6 +110,21 @@ EXPECTED_PROBLEM_CATEGORY = "AUTH"
 #: different fact, and accepting it would let a mistyped client id pass as a refusal.
 GRANT_DISABLED_ERRORS = frozenset({"unauthorized_client", "unsupported_grant_type"})
 UNKNOWN_CLIENT_ERROR = "invalid_client"
+#: The only statuses an OAuth 2.0 token endpoint uses to refuse: 400 for a request or a
+#: grant it will not honour, 401 for a client it cannot authenticate (RFC 6749 section
+#: 5.2). A 404, 502 or 503 carrying `"error": "unauthorized_client"` came from something
+#: that is not this provider's token endpoint -- a proxy page, a maintenance stub, a
+#: sibling service -- and a named error inside such a body says nothing about the
+#: client's grant configuration. Reading the error without the status let
+#: (503, unauthorized_client) pass as a locked door.
+TOKEN_REFUSAL_STATUSES = frozenset({400, 401})
+
+#: The verifier accepts a trust bundle with exactly these keys and a window no longer
+#: than seven days (``inv.identity.AccessTokens._keys``). A bundle outside that is one the
+#: control plane would refuse, so a report that treats it as configuration is describing
+#: something that cannot be running.
+BUNDLE_KEYS = frozenset({"issuer", "expiresAt", "keys"})
+MAX_BUNDLE_TTL_SECONDS = 7 * 86_400
 #: A username that cannot exist. Used so a refusal can be observed without a key.
 SYNTHETIC_ACCOUNT = "smoke-nonexistent-account"
 
@@ -129,7 +144,10 @@ REQUIRED = (
 CRITERIA = {
     "controlPlaneConfigurationBound": (
         "the issuer, client id and trusted keys come from the control plane's own "
-        "configuration, whose bytes are hashed into this report"
+        "configuration, whose bytes are hashed into this report, and the listening control "
+        "plane is not contradicting that configuration: refuted when it is not ready or "
+        "when it is ready despite a bundle its verifier would refuse, and reported "
+        "NOT_BOUND rather than passed while nothing it exposes can confirm it"
     ),
     "idpNameResolves": "the system resolver finds the issuer's host; no substitute is accepted",
     "idpHttpsVerified": (
@@ -139,7 +157,9 @@ CRITERIA = {
     "idpDiscoveryIssuer": "the announced issuer equals the configured issuer, on the same origin",
     "portalClientKnown": "the configured client id is known to the provider",
     "idpJwksMatchesTrustBundle": (
-        "the signing keys the provider serves are the keys the control plane trusts"
+        "the RS256 signing keys the provider serves are exactly the keys the control plane "
+        "trusts, key material included: no rogue key beside them, none of them missing, and "
+        "no trusted key id carrying different material"
     ),
     "passwordGrantRefused": "the portal client refuses a password grant (synthetic account only)",
     "clientCredentialsRefused": "the portal client refuses a client-credentials grant",
@@ -293,6 +313,17 @@ def same_origin(url: str, issuer: str) -> bool:
     return origin(url) == origin(issuer)
 
 
+def key_material(key: dict[str, Any]) -> tuple[str, ...]:
+    """What makes a key that key, not just what labels it.
+
+    Comparing key ids alone would accept a provider publishing an attacker's modulus under
+    a trusted key id -- the substitution a trust bundle exists to prevent. The modulus and
+    exponent are the key; the type, algorithm and use are the terms on which it may be
+    used, so a change in any of them is a different key.
+    """
+    return tuple(str(key.get(field)) for field in ("kty", "alg", "use", "n", "e"))
+
+
 def read_control_plane_configuration(path: Path) -> dict[str, Any]:
     """The issuer, the client id and the trusted keys, from the deployment itself."""
     raw = path.read_bytes()
@@ -316,25 +347,56 @@ def read_control_plane_configuration(path: Path) -> dict[str, Any]:
     bundle_path = identity.get("jwks_file")
     if not isinstance(bundle_path, str) or not bundle_path:
         raise SmokeRefused("the configuration names no jwks_file")
+    if not Path(bundle_path).is_absolute():
+        # A relative jwks_file is read against whatever directory the reader started in.
+        # The control plane starts in its own, so the two would be different files while
+        # this report hashed one of them and named the other.
+        raise SmokeRefused("jwks_file must be an absolute path to be the same file for both")
     bundle_raw = Path(bundle_path).read_bytes()
     try:
         bundle = json.loads(bundle_raw.decode("utf-8"))
     except (UnicodeError, json.JSONDecodeError) as error:
         raise SmokeRefused(f"the trust bundle is not JSON: {type(error).__name__}")
-    trusted = sorted(
-        str(key.get("kid")) for key in (bundle.get("keys") or []) if isinstance(key, dict)
-    )
+    trusted: dict[str, tuple[str, ...]] = {}
+    for key in bundle.get("keys") or []:
+        if not isinstance(key, dict):
+            continue
+        kid = key.get("kid")
+        if not isinstance(kid, str) or not kid:
+            continue
+        if kid in trusted:
+            raise SmokeRefused("the trust bundle repeats a key id")
+        trusted[kid] = key_material(key)
     if not trusted:
         raise SmokeRefused("the trust bundle carries no keys")
     if bundle.get("issuer") != issuer:
         raise SmokeRefused("the trust bundle issuer does not match the configured issuer")
+    # Whether this bundle is one the verifier that loads it would accept. Not a refusal:
+    # an expired bundle is a live defect worth reporting with evidence, and combined with
+    # a ready control plane it is proof the process is running some other file.
+    defects = []
+    if set(bundle) != BUNDLE_KEYS:
+        defects.append("bundle-keys-are-not-exactly-issuer-expiresAt-keys")
+    expires_at = bundle.get("expiresAt")
+    remaining = None
+    if type(expires_at) is not int:
+        defects.append("expiresAt-is-not-an-integer")
+    else:
+        remaining = expires_at - int(dt.datetime.now(dt.timezone.utc).timestamp())
+        if remaining <= 0:
+            defects.append("bundle-has-expired")
+        elif remaining > MAX_BUNDLE_TTL_SECONDS:
+            defects.append("bundle-window-exceeds-the-seven-day-ceiling")
     return {
         "issuer": issuer,
         "host": host,
         "port": port,
         "clientId": clients[0],
         "audience": audience,
-        "trustedKids": trusted,
+        "trustedKids": sorted(trusted),
+        "trustedKeys": trusted,
+        "bundleDefects": defects,
+        "bundleSecondsRemaining": remaining,
         "configSha256": hashlib.sha256(raw).hexdigest(),
         "bundleSha256": hashlib.sha256(bundle_raw).hexdigest(),
     }
@@ -343,25 +405,55 @@ def read_control_plane_configuration(path: Path) -> dict[str, Any]:
 # --- TLS built explicitly, from bytes read once ------------------------------------
 
 
-def certificate_authorities(context: ssl.SSLContext) -> list[str]:
-    """SHA-256 of every loaded anchor, after checking each really is a CA.
+def certificate_authorities(context: ssl.SSLContext, pem: str) -> list[str]:
+    """SHA-256 of every certificate the bundle loaded, each checked to really be a CA.
 
-    A leaf smuggled into the bundle would otherwise act as its own anchor, so
-    basicConstraints is read rather than assumed.
+    ``context.get_ca_certs()`` cannot be the source, and an earlier version of this
+    function used it. OpenSSL's store lists CA certificates, so a self-signed certificate
+    with basicConstraints CA:FALSE is loaded into the store, is usable as an anchor for
+    itself, and is absent from that list. Measured here: a bundle of one approved root plus
+    one rogue self-signed leaf gives ``cert_store_stats()`` ``{'x509': 2, 'x509_ca': 1}``,
+    ``get_ca_certs()`` returns only the root, and TLS to a server presenting that leaf
+    verifies. Both the CA check below and the caller's allowlist were reading a list the
+    rogue certificate was never on.
+
+    So the PEM is parsed directly and every certificate in it is checked, and the count is
+    reconciled against ``cert_store_stats()['x509']`` -- if OpenSSL loaded something this
+    parse did not see, that is a refusal rather than a silent gap.
     """
     from cryptography import x509
+    from cryptography.hazmat.primitives import hashes
 
+    try:
+        parsed = x509.load_pem_x509_certificates(pem.encode("utf-8"))
+    except (ValueError, TypeError) as error:
+        raise SmokeRefused(
+            f"the CA bundle is not readable PEM: {type(error).__name__}"
+        ) from None
+    loaded = context.cert_store_stats().get("x509")
+    if loaded != len(parsed):
+        raise SmokeRefused(
+            f"the trust store holds {loaded} certificate(s) but the bundle parsed as "
+            f"{len(parsed)}: something was loaded that was not checked"
+        )
     anchors = []
-    for der in context.get_ca_certs(binary_form=True):
-        parsed = x509.load_der_x509_certificate(der)
+    for certificate in parsed:
         try:
-            basic = parsed.extensions.get_extension_for_class(x509.BasicConstraints).value
+            basic = certificate.extensions.get_extension_for_class(x509.BasicConstraints).value
         except x509.ExtensionNotFound:
-            raise SmokeRefused("an anchor has no basicConstraints and cannot be a CA")
+            raise SmokeRefused(
+                "a certificate in the CA bundle has no basicConstraints and cannot be a CA"
+            ) from None
         if not basic.ca:
-            raise SmokeRefused("an anchor is not a certificate authority")
-        anchors.append(hashlib.sha256(der).hexdigest())
-    return anchors
+            raise SmokeRefused("a certificate in the CA bundle is not a certificate authority")
+        anchors.append(certificate.fingerprint(hashes.SHA256()).hex())
+    # The count above catches a certificate loaded but absent from this PEM. This catches
+    # the reverse for the part of the store that can be listed: a CA OpenSSL is trusting
+    # that the bytes handed to this function do not contain.
+    listed = {hashlib.sha256(der).hexdigest() for der in context.get_ca_certs(binary_form=True)}
+    if not listed <= set(anchors):
+        raise SmokeRefused("the trust store lists an authority the checked bundle does not")
+    return sorted(anchors)
 
 
 def trusted_context(pem: str, allowed_roots: set[str]) -> ssl.SSLContext:
@@ -380,7 +472,7 @@ def trusted_context(pem: str, allowed_roots: set[str]) -> ssl.SSLContext:
     context.load_verify_locations(cadata=pem)
     if getattr(context, "keylog_filename", None) is not None:
         raise SmokeRefused("TLS key logging is enabled in this environment")
-    anchors = certificate_authorities(context)
+    anchors = certificate_authorities(context, pem)
     if not anchors:
         raise SmokeRefused("the CA bundle contains no certificate authority")
     unexpected = sorted(set(anchors) - allowed_roots)
@@ -510,11 +602,26 @@ def dechunk(body: bytes) -> bytes:
 
 
 def as_json(body: bytes) -> Any:
-    text = body.decode("utf-8", "replace")
-    start, end = text.find("{"), text.rfind("}")
-    if start < 0 or end < start:
+    """The whole body, parsed strictly as one JSON object.
+
+    Slicing from the first ``{`` to the last ``}`` reads a JSON object out of a document
+    that merely contains braces: an HTML error page with a script block, a JSON document
+    with bytes appended after it, two documents concatenated. That is how something which
+    is not the provider could have been read as the provider answering. What arrived
+    either is the object or is not, and undecodable bytes are a finding rather than
+    replacement characters.
+    """
+    try:
+        decoded = body.decode("utf-8")
+    except UnicodeError:
+        raise SmokeRefused("response was not UTF-8") from None
+    try:
+        document = json.loads(decoded)
+    except json.JSONDecodeError:
+        raise SmokeRefused("response was not JSON") from None
+    if not isinstance(document, dict):
         raise SmokeRefused("response was not a JSON object")
-    return json.loads(text[start : end + 1])
+    return document
 
 
 # --- the observations ------------------------------------------------------------
@@ -638,26 +745,48 @@ def observe_jwks(context, document, config, deadline):
         return failed("the key set could not be read", readReason=type(error).__name__)
     if status != 200 or not isinstance(keys, list) or not keys:
         return failed("jwks did not serve a key set", httpStatus=status)
-    signing = sorted(
-        str(key.get("kid")) for key in keys
-        if isinstance(key, dict) and key.get("alg") == "RS256" and key.get("use") == "sig"
-    )
-    if not signing:
+    served: dict[str, tuple[str, ...]] = {}
+    for key in keys:
+        if not isinstance(key, dict) or key.get("alg") != "RS256" or key.get("use") != "sig":
+            # Encryption keys and other algorithms are published alongside and are not part
+            # of this comparison: the verifier will not accept a token signed with one, so
+            # their presence is not drift.
+            continue
+        kid = str(key.get("kid"))
+        material = key_material(key)
+        if kid in served and served[kid] != material:
+            return failed("one key id is published twice with different key material",
+                          duplicateKidSha256=sha256_text(kid))
+        served[kid] = material
+    if not served:
         return failed("no RS256 signing key is published", keyCount=len(keys))
-    trusted = set(config["trustedKids"])
-    if not trusted & set(signing):
-        # A provider serving keys the control plane does not trust means every token it
-        # issues will be refused: the pieces are lined up against each other.
+    trusted = config["trustedKeys"]
+    # An intersection was the old test, and an intersection is satisfied by a provider that
+    # serves one trusted key beside a rogue one: tokens minted with the rogue key are
+    # refused, but the provider can also mint accepted ones, so the smoke read PASS while
+    # an unaccounted-for signing key was live. The sets must be equal.
+    rogue = sorted(set(served) - set(trusted))
+    unserved = sorted(set(trusted) - set(served))
+    if rogue or unserved:
         return failed(
-            "no served signing key is in the control plane's trust bundle",
-            servedSigningKidSha256=[sha256_text(kid) for kid in signing],
-            trustedKidSha256=[sha256_text(kid) for kid in sorted(trusted)],
+            "the published signing keys are not exactly the keys the control plane trusts",
+            servedSigningKeyCount=len(served),
+            trustedKeyCount=len(trusted),
+            rogueKidSha256=[sha256_text(kid) for kid in rogue],
+            unservedTrustedKidSha256=[sha256_text(kid) for kid in unserved],
+        )
+    substituted = sorted(kid for kid, material in served.items() if material != trusted[kid])
+    if substituted:
+        return failed(
+            "a trusted key id is published with different key material",
+            substitutedKidSha256=[sha256_text(kid) for kid in substituted],
         )
     return passed(
         keyCount=len(keys),
-        signingKeyCount=len(signing),
-        trustedAndServedKidCount=len(trusted & set(signing)),
-        servedSigningKidSha256=[sha256_text(kid) for kid in signing],
+        signingKeyCount=len(served),
+        trustedKeyCount=len(trusted),
+        keySetsIdentical=True,
+        servedSigningKidSha256=[sha256_text(kid) for kid in sorted(served)],
     )
 
 
@@ -679,7 +808,8 @@ def observe_client_known(context, config, deadline):
     """`invalid_client` means the client id is not known, which is its own finding.
 
     Separating this from the grant checks is what stops a typo in the client id from
-    reading as two locked doors.
+    reading as two locked doors. The status is read with the error: only an answer from an
+    OAuth token endpoint says anything about what that endpoint knows.
     """
     try:
         status, error = post_token(context, config, deadline, {"grant_type": "client_credentials"})
@@ -688,9 +818,17 @@ def observe_client_known(context, config, deadline):
     except (ssl.SSLError, OSError, SmokeRefused) as failure:
         return failed("the token endpoint could not be reached",
                       readReason=type(failure).__name__)
+    if status not in TOKEN_REFUSAL_STATUSES | {200}:
+        return failed("the token endpoint did not answer as an OAuth token endpoint",
+                      httpStatus=status, oauthError=error or "unnamed")
     if error == UNKNOWN_CLIENT_ERROR:
         return failed("the configured client id is not known to the provider",
                       httpStatus=status, oauthError=error)
+    if status in TOKEN_REFUSAL_STATUSES and not error:
+        # A refusal with no OAuth error object is not the endpoint's own refusal, so it
+        # does not show the client id was recognised on the way to being refused.
+        return failed("the token endpoint refused without naming an OAuth error",
+                      httpStatus=status)
     return passed(httpStatus=status, oauthError=error or "none")
 
 
@@ -712,6 +850,11 @@ def observe_grant_refused(context, config, deadline, form, label):
                       readReason=type(failure).__name__)
     if status == 200:
         return failed(f"{label} was granted", httpStatus=200)
+    if status not in TOKEN_REFUSAL_STATUSES:
+        # (503, "unauthorized_client") used to pass here. A service that is down is not a
+        # grant that is off, and its body is not this provider's answer.
+        return failed(f"{label} was refused with a status no OAuth token endpoint uses",
+                      httpStatus=status, oauthError=error or "unnamed")
     if error in GRANT_DISABLED_ERRORS:
         return passed(httpStatus=status, oauthError=error)
     return failed(f"{label} was refused, but not as a disabled grant",
@@ -788,15 +931,92 @@ def observe_control_plane(url, deadline, *, authorization, label):
                   canonicalShape=True, probe=label)
 
 
-def observe_readyz(url, deadline):
-    """Recorded, not required: which process answered is worth knowing either way."""
+#: What the control plane would have to expose for the file this report hashes to be
+#: provably the file the listening process loaded. Recorded verbatim so the gap is named in
+#: the evidence instead of being implied away by a passing observation.
+CONFIGURATION_BINDING_GAP = (
+    "the control plane publishes no configuration digest or issuer on an unauthenticated "
+    "endpoint, inv.identity.verify collapses every rejection into one AUTH-0050 body, and "
+    "its WWW-Authenticate header carries no realm, so a trusted key id with a bad signature "
+    "and an unknown key id are indistinguishable from outside and a file digest cannot be "
+    "tied to the process that is listening"
+)
+
+
+def observe_configuration_bound(url, config, deadline):
+    """Hashing a file proves what the file says, not what the process loaded.
+
+    The earlier version returned MEASURED_PASS from the digest alone: a claim about a file
+    dressed as a claim about a deployment. This one refutes where it can and never
+    confirms, and it says which it did.
+
+    * unreachable, or ``/readyz`` not 200 -- ``app.py`` answers 503
+      ``identity-and-database-configuration-pending`` while ``tokens is None``, and
+      ``/readyz`` also loads the bundle through ``tokens._keys()``. Either way this process
+      is not serving the configuration under test, and ``/v1/session`` answering 401 does
+      not make it ready. MEASURED_FAIL.
+    * ready, but the configured bundle is one the verifier would refuse -- expired, or not
+      exactly ``{issuer, expiresAt, keys}``. A ready control plane cannot have loaded it, so
+      it is running some other file. MEASURED_FAIL, and this is the one positive
+      discrimination available.
+    * ready, bundle acceptable -- contract-valid trust is loaded, and which file it came
+      from is not observable. NOT_BOUND, RECORDED_ONLY, with the gap named.
+
+    This observation is required, so a NOT_BOUND run reports NOT_OBSERVED overall. That is
+    the honest state and it is meant to stay visible rather than be absorbed into a pass.
+    """
+    facts = {
+        "controlPlaneConfigSha256": config["configSha256"],
+        "trustBundleSha256": config["bundleSha256"],
+        "clientIdSha256": sha256_text(config["clientId"]),
+        "trustedKeyCount": len(config["trustedKeys"]),
+        "issuerIsCanonical": True,
+    }
     try:
-        status, _, _ = plain_request(url, "/readyz", deadline)
-    except Oversized:
-        return {"status": "RECORDED_ONLY", "readyz": "oversized"}
+        status, _, body = plain_request(url, "/readyz", deadline)
+    except Oversized as error:
+        return failed(str(error), **facts), {"readyz": "oversized"}
     except (OSError, SmokeRefused) as error:
-        return {"status": "RECORDED_ONLY", "readyz": type(error).__name__}
-    return {"status": "RECORDED_ONLY", "readyzHttpStatus": status}
+        return (
+            failed("the control plane did not answer", readReason=type(error).__name__, **facts),
+            {"readyz": type(error).__name__},
+        )
+    readyz = {"readyzHttpStatus": status}
+    if status != 200:
+        reason = ""
+        try:
+            reason = str(as_json(body).get("reason") or "")
+        except SmokeRefused:
+            pass
+        return (
+            failed(
+                "the control plane is not ready, so it is not serving this configuration",
+                httpStatus=status,
+                readyzReason=reason or "unnamed",
+                **facts,
+            ),
+            readyz,
+        )
+    if config["bundleDefects"]:
+        return (
+            failed(
+                "the control plane is ready while the configured trust bundle is one its "
+                "verifier would refuse, so it loaded some other bundle",
+                bundleDefects=sorted(config["bundleDefects"]),
+                **facts,
+            ),
+            readyz,
+        )
+    return (
+        {
+            "status": "RECORDED_ONLY",
+            "binding": "NOT_BOUND",
+            "identityTrustConfigured": True,
+            "bindingGap": CONFIGURATION_BINDING_GAP,
+            **facts,
+        },
+        readyz,
+    )
 
 
 # --- the report ------------------------------------------------------------------
@@ -856,6 +1076,9 @@ def render_markdown(evidence: dict[str, Any]) -> str:
         f"- approved anchors: {len(source['allowedRootSha256'])}",
         f"- control plane: `{source['controlPlaneHost']}:{source['controlPlanePort']}`"
         f" (readyz: {source.get('readyz', {}).get('readyzHttpStatus', 'not observed')})",
+        f"- configuration binding: **"
+        f"{evidence['observations']['controlPlaneConfigurationBound'].get('binding', 'refuted')}"
+        f"**",
         "",
         "| observation | status | detail |",
         "|---|---|---|",
@@ -925,10 +1148,8 @@ def run(args, deadline: Deadline, now: dt.datetime) -> tuple[dict[str, dict[str,
         if not SHA256_PATTERN.fullmatch(value):
             raise SmokeRefused("--allowed-root-sha256 takes 64-hex digests")
     context = trusted_context(pem, allowed)
-    observations["controlPlaneConfigurationBound"] = passed(
-        issuerIsCanonical=True,
-        clientIdSha256=sha256_text(config["clientId"]),
-        trustedKeyCount=len(config["trustedKids"]),
+    observations["controlPlaneConfigurationBound"], readyz = observe_configuration_bound(
+        args.control_plane_url, config, deadline
     )
 
     observations["idpNameResolves"], addresses = observe_name(config["host"])
@@ -984,7 +1205,7 @@ def run(args, deadline: Deadline, now: dt.datetime) -> tuple[dict[str, dict[str,
         "allowedRootSha256": sorted(allowed),
         "clientIdSha256": sha256_text(config["clientId"]),
         "keyLoggingDisabled": getattr(context, "keylog_filename", None) is None,
-        "readyz": observe_readyz(args.control_plane_url, deadline),
+        "readyz": readyz,
     }
     return observations, facts
 
@@ -1049,13 +1270,25 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     serialised = json.dumps(evidence, ensure_ascii=False, sort_keys=True)
     rendered = render_markdown(evidence)
-    summary = json.dumps({"verdict": verdict})
-    for text in (serialised, rendered, summary):
+    for text in (serialised, rendered):
         assert_publishable(text)
     json_path, markdown_path = write_evidence(
         evidence, args.out_dir, label, render_markdown=render_markdown
     )
-    print(json.dumps({"verdict": verdict, "json": str(json_path), "markdown": str(markdown_path)}))
+    # File names, not paths: --out-dir is the caller's own input, and an absolute path on
+    # this host carries an account name into stdout, which is pasted into PR comments. And
+    # the bytes printed are the bytes checked -- the earlier version checked
+    # {"verdict": ...} and then printed a larger object containing those paths, so the
+    # check did not cover the output at all.
+    stdout = {
+        "verdict": verdict,
+        "json": json_path.name,
+        "markdown": markdown_path.name,
+        "writtenUnder": "the --out-dir given on the command line",
+    }
+    printed = json.dumps(stdout, ensure_ascii=False, sort_keys=True)
+    assert_publishable(printed)
+    print(printed)
     return EXIT_BY_VERDICT[verdict]
 
 
