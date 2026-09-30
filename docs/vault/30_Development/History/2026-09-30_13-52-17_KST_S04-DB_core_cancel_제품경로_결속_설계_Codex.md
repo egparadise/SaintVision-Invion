@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-20260930-CARD160-S04-CANCEL-PRODUCT-BRIDGE-CODEX"
 title: "CARD-160 S04-DB core cancel 제품 경로 결속 설계"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-30T13:52:17+09:00"
+updated: "2026-09-30T14:11:22+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "c9c1d836ff8fcd606b5bca3862c6cd764eadf4fd"
@@ -47,3 +47,18 @@ normal·shard·replay 잠금 순서, privilege 최소화, downgrade, 부정 시�
 PG 판정은 [[S04-DB_core_cancel_제품경로_결속_설계]]에 고정했다. migration 번호가
 필요하므로 보안 설계 승인과 번호 배정 뒤 구현한다. 이 단계에서는 코드·migration·
 registry 상태를 바꾸지 않았고 S04-DB는 `review`를 유지한다.
+
+## Claude 조건부 승인 반영(v1.1)
+
+- bridge는 이 HTTP 요청이 kernel 상태를 실제 전이한 경우에만 호출한다. containment·
+  dispatch·shard 등으로 kernel이 먼저 cancelled인 경우에는 뒤늦은 사용자 actor와
+  `cancelled_by_user` audit를 만들지 않고 drift 관측으로 남긴다.
+- 함수 인자를 subject/project/run/event/trace로 닫고 user·actor·action·outcome·
+  target·reason은 함수 내부에서 결속·상수화했다. 같은 transaction의 kernel cancelled
+  상태와 project/workspace 결속, static SQL, trace 형식도 승인 조건이다.
+- owner 무-member 가드, table/column 최소 권한, owner 전용 RLS WITH CHECK,
+  `PUBLIC`·`inv_app` EXECUTE 회수, definer policy와 RLS evidence/baseline 갱신을
+  `0056_*` 구현 범위에 넣었다.
+- 같은 key/다른 key 동시성, `RES-0007` lock timeout, 교차 tenant·권한·형식·
+  kernel 선취소·audit partition 부재의 rollback 시험을 분리했다. kill-switch
+  containment를 운영 탈출구로 명시하고 S04-DB `review`·`RECORDED_ONLY`는 유지한다.

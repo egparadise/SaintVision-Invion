@@ -1,11 +1,11 @@
 ---
 doc_id: "DESIGN-S04-DB-CORE-CANCEL-PRODUCT-BRIDGE-001"
 title: "S04-DB core cancel 제품 경로 결속 설계"
-version: "1.0.0"
+version: "1.1.0"
 status: "proposed"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-30T13:52:17+09:00"
+updated: "2026-09-30T14:11:22+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "c9c1d836ff8fcd606b5bca3862c6cd764eadf4fd"
@@ -70,20 +70,40 @@ public 상태, audit, idempotency ledger가 모두 rollback돼야 한다.
 
 구현 seam은 다음 두 층으로 둔다.
 
-- kernel Python helper: mapping 유무를 확인하고, 인증된 principal의
-  `subject_id`를 `services/control-plane/src/inv/business_auth.py::permission`으로
-  현재 business `userId`에 결속한 뒤 DB primitive를 호출한다.
+- kernel Python helper: mapping 유무를 확인하고, **이 요청이 kernel 상태를
+  non-terminal에서 `cancelled`로 실제 전이한 경우에만** DB primitive를 호출한다.
+  이미 kernel이 cancelled인 replay/다른 key 요청은 public 상태를 보정하거나 audit를
+  새로 만들지 않고 drift 관측 대상으로 남긴다.
 - migration primitive: `PUBLIC` 실행권을 회수한 `SECURITY DEFINER` 함수 하나가
   `public.runs` 행을 잠그고 상태를 갱신하며 exact audit 한 행을 추가한다. 함수는
-  `pg_catalog` 고정 search path, named arguments, 현재 `inv.tenant_id`와 입력 tenant
-  일치, `inv.business_runs`/workload project 결속, actor/user membership 재검증을
-  강제한다.
+  `pg_catalog` 고정 search path와 정적 SQL만 사용한다. 인자는
+  `p_subject_id`, `p_project_id`, `p_run_id`, `p_event_id`, `p_trace_id` 다섯 개뿐이다.
+  현재 `inv.tenant_id`, 같은 transaction의 `inv.runs.state='cancelled'`,
+  `inv.runs.project_id`, `inv.business_runs`와 public workspace/workload project 결속을
+  재검증한다.
 
 전용 NOLOGIN·NOINHERIT·NOBYPASSRLS owner role에는 필요한 SELECT, `public.runs`의
 취소 관련 열 UPDATE, `public.audit_events` INSERT만 부여한다. `inv_kernel`에는 함수
 EXECUTE만 주며 테이블 직접 쓰기 권한은 주지 않는다. 함수 인자로 받는 event ID는
 kernel의 `services/control-plane/src/inv/ids.py::new_id('aud')`가 만들고 함수가
-`^aud_[0-9A-HJKMNP-TV-Z]{26}$`를 재검증한다.
+`^aud_[0-9A-HJKMNP-TV-Z]{26}$`를 재검증한다. trace는 `^[0-9a-f]{32}$`만 허용한다.
+
+함수 내부에서 `p_subject_id`를 enabled `inv.business_subjects` → active
+`public.users` → active business project → `project_members.role_code`의
+`owner|maintainer|operator` 순으로 다시 결속해 actor user를 파생한다. caller는
+user ID를 주지 않는다. `actor_type='user'`, `action='run.cancel.requested'`,
+`outcome='allow'`, `target_type='run'`, `detail={"reason":"cancelled_by_user"}`와
+`termination_reason='cancelled_by_user'`는 함수 상수다. trace는 correlation일 뿐
+인증 provenance가 아니다. DB는 OIDC subject 자체를 증명하지 못하므로 침해된 kernel이
+다른 적격 subject를 고르는 위험은 kernel/RLS 신뢰 경계에 남는다.
+
+owner 전용 RLS policy는 `public.runs`, `public.audit_events`, `public.users`,
+`public.project_members`, `public.projects`, `public.workspaces`, `public.workloads`와
+필요한 `inv` 결속 테이블에 명시한다. audit INSERT `WITH CHECK`는 tenant GUC와 위
+action/outcome/target 상수를 모두 강제한다. `public.runs` 권한은
+`state, termination_reason, ended_at, version` UPDATE와 필요한 SELECT 열로 제한한다.
+owner role은 NOLOGIN·NOINHERIT·NOBYPASSRLS이며 migration은 기존 member가 있으면
+fail-closed한다. `PUBLIC`과 `inv_app`의 EXECUTE는 명시적으로 회수한다.
 
 ### D3. actor와 오류 경계
 
@@ -93,7 +113,8 @@ kernel의 `services/control-plane/src/inv/ids.py::new_id('aud')`가 만들고 �
   `{"reason":"cancelled_by_user"}` 외 값을 넣지 않는다.
 - actor 입력을 외부에서 받지 않으므로 CARD-159 service의 `ValueError`가 HTTP로
   새어 나올 경로가 없다. bridge 구조 불일치나 privilege 오류는 성공으로 숨기지
-  않고 기존 `SYS-0001/503` 표면으로 전체 transaction을 실패시킨다.
+  않고 기존 `SYS-0001/503` 표면으로 전체 transaction을 실패시킨다. DB lock 대기는
+  `RES-0007/503/retryable=true`로 끝난다.
 - 접근권한 부족은 기존 `AUTH-0030/403`, version race는 `GRAPH-0003/409`, terminal
   kernel run은 `GRAPH-0002/409`를 유지한다. public 상태의 비정상 불일치는 상태를
   노출하는 새 오류가 아니라 fail-closed `SYS-0001/503`이다.
@@ -105,13 +126,17 @@ kernel의 `services/control-plane/src/inv/ids.py::new_id('aud')`가 만들고 �
 | mapping 없음 | 기존 취소 그대로 | public write/audit 0 |
 | 첫 non-terminal 취소 | `cancelled`, version 증가 | 잠근 public run도 `cancelled`, `cancelled_by_user`, 종료 시각·version 증가, audit 정확히 1 |
 | 같은 ledger replay | 저장 응답 반환 | bridge 재호출 0, audit 증가 0 |
-| 다른 key로 이미 cancelled | idempotent `cancelled` | public replay, audit 증가 0 |
+| 다른 key, kernel·public 모두 이미 cancelled | idempotent `cancelled` | bridge 재호출 0, audit 증가 0 |
+| containment/dispatch/shard 등이 kernel만 먼저 cancelled | idempotent `cancelled` | public write/audit 0, drift 관측 |
+| kernel은 이미 cancelled, public은 succeeded/failed | idempotent `cancelled` | public write/audit 0, terminal 상태 보존·drift 관측 |
 | public이 `succeeded`/`failed`인데 kernel은 non-terminal | 전체 실패 | 상태·audit 0, `SYS-0001/503` |
 | shard parent 취소 | 기존 원자적 member/parent 취소 | 같은 shard transaction에서 mapping된 run만 run-id 정렬 순서로 mirror; 보통 business parent 1개 |
 
-잠금 순서는 기존 kernel 순서를 보존한다: kernel run(들, run ID 정렬) → resource
-rows → business identity/membership → public run(들, 같은 run ID 정렬) → 상태/audit.
-bridge 실패 뒤 idempotency 응답을 저장하지 않는다.
+잠금 순서는 선행 idempotency ledger lock을 포함해 기존 kernel 순서를 보존한다.
+normal은 ledger → kernel run → resource rows → business identity/membership → public
+run → 상태/audit다. shard는 ledger → shard plan → member runs(run ID 정렬) → parent
+run → business identity/membership → public runs(run ID 정렬) → 상태/audit이며 resource
+lock은 없다. bridge 실패 뒤 idempotency 응답을 저장하지 않는다.
 
 ## 3. 기각한 선택지
 
@@ -127,8 +152,13 @@ bridge 실패 뒤 idempotency 응답을 저장하지 않는다.
 
 ## 4. 구현 변경 범위
 
-- migration 1개: 전용 role, RLS policy, SECURITY DEFINER 함수, EXECUTE grant,
-  reversible downgrade. 번호는 coordinator가 배정한 다음 migration을 사용한다.
+- alembic 단일 stream의 Python migration `0056_*` 1개(현재 head
+  `0055_adapter_conformance_records`): 전용 role, RLS policy, SECURITY DEFINER 함수,
+  EXECUTE grant, reversible downgrade.
+- `tools/definer-policy.json`에 정확한 signature·definition hash·
+  `executeRoles:["inv_kernel"]`·tenant-bound kind를 등록하고 revision을 `0056_*`로
+  올린다. `tools/collect_rls_evidence.py`와
+  `tools/rls-boundary-baseline.json`에는 새 owner를 포함한다.
 - `services/control-plane/src/inv/` helper와 `Control.cancel`,
   `ShardRuntime.cancel` 호출 결속.
 - 공개 JSON Schema와 생성 계약은 변경 0. 계약 fixture는 기존
@@ -143,8 +173,9 @@ bridge 실패 뒤 idempotency 응답을 저장하지 않는다.
 
 1. route가 request actor/reason을 읽지 않고 principal subject만 helper에 전달한다.
 2. public 계약 파일과 생성 타입 diff가 0이다.
-3. normal·shard 첫 취소에는 bridge가 있고 replay 분기에는 호출이 없다.
-4. DB 함수 owner/search_path/grant/RLS policy와 downgrade revoke/drop을 정적으로
+3. normal·shard의 실제 kernel 전이 분기에만 bridge가 있고 replay와 kernel 선취소
+   분기에는 호출이 없다.
+4. DB 함수 owner/search_path/static SQL/grant/RLS policy와 downgrade revoke를 정적으로
    고정한다.
 5. `ValueError`나 raw database message가 ProblemDetails detail에 노출되지 않는다.
 
@@ -152,26 +183,44 @@ bridge 실패 뒤 idempotency 응답을 저장하지 않는다.
 
 1. 실제 HTTP 첫 취소: inv/public run 모두 cancelled, public audit exact 1,
    actor는 subject mapping의 user, trace 일치.
-2. 같은 key replay와 다른 key cancelled replay: 응답은 200, audit 합계 1.
-3. 두 connection 동시 첫 취소: 두 응답의 최종 상태는 cancelled, audit 합계 1.
-4. 권한 철회·mapping disable·타 project/run: 403/404 정책을 유지하고 두 상태와
-   audit 모두 불변.
+2. 같은 key 동시 요청은 둘 다 200이고 audit 합계 1. 다른 key 동시 요청은 200과
+   `GRAPH-0003/409`이며 audit 합계 1.
+3. GUC 미설정·교차 tenant·kernel non-terminal 직접 함수 호출·mapping 없음·
+   project/workspace 불일치·disabled subject·inactive user·viewer/approver-only role·
+   event ID/trace 오류는 모두 거부되고 상태와 audit가 0이다.
+4. `inv_app`·PUBLIC 함수 실행과 owner `SET ROLE`은 거부된다. `inv_kernel`은 함수만
+   실행할 수 있고 public run/audit 직접 write는 거부된다.
 5. public terminal 불일치, audit INSERT 실패, bridge EXECUTE 회수: 503이며 kernel
    상태/outbox/resource/idempotency와 public 상태가 모두 rollback.
 6. mapping 없는 kernel run: 기존 동작과 응답이 동일하고 public audit 0.
 7. shard parent와 mapping된 member fixture: mapping된 각 run만 exact audit 1,
    전체 shard rollback 원자성 유지.
-8. role은 함수를 실행할 수 있지만 public run/audit 직접 write는 거부된다.
+8. 다른 transaction이 public run lock을 보유하면 `RES-0007/503/retryable=true`,
+   kernel/outbox/resource/ledger/public/audit 모두 미저장이고 같은 key 재시도는 성공해
+   audit가 정확히 1이다.
+9. containment가 먼저 kernel을 취소한 run에 사용자 취소를 보내면 public write와
+   audit는 0이다.
+10. audit 월 파티션이 없으면 503과 전체 rollback이다.
+11. `tools/check_definer_functions.py`는 `matches_reviewed_policy`, RLS collector는
+   E1~E6 PASS여야 한다.
 
-## 6. 롤백
+## 6. 운영 의존성과 탈출구
+
+`public.audit_events`는 월 파티션에 DEFAULT가 없다. 다음 달 파티션 선행 생성이
+끊기면 business-mapped 사용자 취소는 fail-closed 503이 된다. 이 실패는 숨기지 않고
+경보 대상이다. 그때 연산 정지의 탈출구는 사용자 cancel을 우회하는 tenant kill-switch
+`ContainmentReconciler`이며, 그 선행 kernel 취소를 뒤늦은 사용자 actor/audit로
+재분류하지 않는다. collector 관측 창은 migration 적용 시각 뒤에서 시작해야 한다.
+
+## 7. 롤백
 
 먼저 새 application 호출을 제거한 뒤 migration downgrade로 EXECUTE, 함수, policy,
-전용 role을 제거한다. downgrade는 `inv_kernel`에 public table 직접 권한을 남기지
-않아야 한다. 이미 생성된 audit는 append-only 기록이므로 삭제하지 않는다. 이
-순서를 지키지 않고 schema부터 내리면 취소 route는 성공으로 우회하지 않고
-`SYS-0001/503`으로 fail-closed해야 한다.
+owner의 권한을 회수한다. cluster 공유 가능성이 있는 전용 role 자체는 drop하지 않는다.
+downgrade는 `inv_kernel`에 public table 직접 권한을 남기지 않아야 한다. 이미 생성된
+audit는 append-only 기록이므로 삭제하지 않는다. 이 순서를 지키지 않고 schema부터
+내리면 취소 route는 성공으로 우회하지 않고 `SYS-0001/503`으로 fail-closed해야 한다.
 
-## 7. 승인 요청
+## 8. 승인 조건과 구현 진행
 
 Claude는 다음을 독립 검토한다.
 
@@ -181,4 +230,6 @@ Claude는 다음을 독립 검토한다.
 - normal/shard/replay의 잠금 순서와 원자성에 빈틈이 없는지
 - `RECORDED_ONLY`를 구현 존재만으로 승격하지 않는지
 
-승인 뒤 migration 번호를 배정받아 구현 카드로 이어간다.
+Claude의 2026-09-30 조건부 승인(M1~M4, L1~L5, R5~R8)을 이 v1.1에 반영했다.
+구현은 이 문서 commit 다음 별도 commit으로 이어가며, 공개 계약 변경 0과
+`RECORDED_ONLY`·S04-DB `review` 유지를 승인 조건으로 둔다.

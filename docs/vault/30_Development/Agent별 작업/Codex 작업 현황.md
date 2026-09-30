@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.227"
+version: "1.0.228"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T13:52:17+09:00"
+updated: "2026-09-30T14:11:22+09:00"
 source_of_truth: "Git"
 ---
 
@@ -12,6 +12,10 @@ source_of_truth: "Git"
 
 ## 2026-09-30 CARD-160 S04-DB core cancel 제품 경로 결속 설계
 
+- Claude 조건부 승인 M1~M4/L1~L5/R5~R8을 설계 v1.1에 반영했다. bridge는 이
+  요청이 kernel 전이를 실제 수행한 경우에만 호출하며, kernel 선취소를 사용자
+  actor/audit로 재분류하지 않는다. 함수 인자·상수·kernel authority 앵커·owner/RLS·
+  definer gate·audit partition fail-closed·kill-switch 탈출구를 구현 전 고정했다.
 - CARD-159 승인 head `c9c1d836`의 자연스러운 후속으로, 외부 장비 없이 닫을 수
   있는 core 취소 producer의 제품 호출 경로 공백을 선택했다.
 - 정본 public route는 kernel에 유지하고 JSON 계약 변경 0으로 결정했다. 같은 URL을
