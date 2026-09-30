@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PortalLoginJourneyEvidence",
+  "description": "Strict redacted observation evidence for S02-FE intranet portal login journey",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "timestamp",
+    "codeSha",
+    "targetUrl",
+    "overallStatus",
+    "blockingReason",
+    "steps",
+    "audit"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "enum": [
+        "1.0.0"
+      ]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "codeSha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8,40}$"
+    },
+    "targetUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "overallStatus": {
+      "type": "string",
+      "enum": [
+        "PASS",
+        "FAIL",
+        "BLOCKED_EXTERNAL"
+      ]
+    },
+    "blockingReason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "status",
+          "durationMs",
+          "detail",
+          "observations"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "portal_tls_reachability",
+              "login_initiation",
+              "pkce_callback",
+              "identity_session_display",
+              "logout"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PASS",
+              "FAIL",
+              "BLOCKED_EXTERNAL"
+            ]
+          },
+          "durationMs": {
+            "type": "number",
+            "minimum": 0
+          },
+          "detail": {
+            "type": "string"
+          },
+          "observations": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      }
+    },
+    "audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "redacted",
+        "tokenCount",
+        "ipCount",
+        "credentialCount",
+        "circumventionFlagsDetected",
+        "tlsValidationEnforced"
+      ],
+      "properties": {
+        "redacted": {
+          "type": "boolean",
+          "enum": [
+            true
+          ]
+        },
+        "tokenCount": {
+          "type": "integer",
+          "enum": [
+            0
+          ]
+        },
+        "ipCount": {
+          "type": "integer",
+          "enum": [
+            0
+          ]
+        },
+        "credentialCount": {
+          "type": "integer",
+          "enum": [
+            0
+          ]
+        },
+        "circumventionFlagsDetected": {
+          "type": "boolean",
+          "enum": [
+            false
+          ]
+        },
+        "tlsValidationEnforced": {
+          "type": "boolean",
+          "enum": [
+            true
+          ]
+        }
+      }
+    }
+  }
+}

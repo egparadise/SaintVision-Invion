@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.145"
+version: "1.0.146"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-30T08:44:00+09:00"
+updated: "2026-09-30T15:40:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -20,6 +20,21 @@ source_of_truth: "Git"
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
 - 확인 기준: 2026-09-30T08:44:00+09:00 (Card 153 Claude UI r3 R1 조건 및 R2·R3 권고 전수 반영 및 재검증 완료).
+
+## 2026-09-30 S02-FE 사내 포털 로그인 여정 관측 하네스 구축 및 증거 생성 (Card 162, `agent/gemini/c162-fe-login-journey-harness`)
+- **개요**: S02-FE 진척 재산정 지적(도메인 미해석으로 인한 여정 관측 부재)을 해소하기 위한 정규 관측 하네스 완비: (1) `apps/web`의 Playwright/브라우저 시험 방식을 따른 `https://portal.sv.lan` 대상의 5단계 로그인 여정 관측 도구(`tools/observe_portal_login_journey.py`), (2) 사전 DNS/TCP 검사를 통한 정직한 `BLOCKED_EXTERNAL` 기록(도메인 미해석 또는 포털 미기동 시 크래시나 우회 꼼수 없이 정직 표기), (3) 우회 플래그(`--host-resolver-rules`, `--ignore-certificate-errors`, `ignoreHTTPSErrors`) 전면 금지 및 감지 시 즉각 fail-closed 차단(`SecurityCircumventionError`, exit 2), (4) 엄격 비식별화(Redaction) 보증: 토큰 0건, IP 0건, 자격증명 0건 엄격 검증 및 스키마 enum `[0]` 강제, (5) 엄격 JSON 스키마(`tools/portal-login-journey-evidence.schema.json`) 및 자동화 단위 시험 스위트(`tests/test_portal_login_journey_harness.py`, 16 passed) 완비.
+- **담당 및 역할**: Gemini (Frontend / UI / 웹 배포 소유). Reviewer: Claude (UI·운영 축), Codex (계약·보안 축).
+- **관측 근거 (Evidence)**:
+  - 신규 로그인 여정 관측 시험: `tests/test_portal_login_journey_harness.py` (16 passed in 3.57s)
+  - 실제 포털 관측 증거: `docs/vault/30_Development/Evidence/s02_fe_login_journey_evidence.json` (정직한 `BLOCKED_EXTERNAL` 실측, 토큰 0건, IP 0건, 자격증명 0건)
+  - 화면-백엔드 라우트 커버리지: `pytest tests/test_route_coverage.py` (40 passed 100%)
+  - 프런트엔드 무결성 점검: `python -X utf8 tools/check_frontend_integrity.py` (92개 파일 스캔, 9대 규칙 위반 0건)
+  - 계약 바인딩 점검: `python tools/check_contract_bindings.py` (55개 픽스처 전수 커버리지, 14개 리플레이 가드 PASS)
+  - 문서 정합성 점검: `python tools/check_docs.py` (1036개 문서 PASS)
+  - 단일 출처 검사: `python tools/check_doc_single_source.py --ratchet` (19쌍 PASS)
+  - 인용 ratchet 점검: `python tools/check_doc_path_citations.py --ratchet --base-ref origin/integration/all-agents-unified` (290개 baseline PASS)
+  - Git 차분 포맷 점검: `git diff --check` (0 warnings, exit 0)
+- **전문 문서**: [[2026-09-30_15-40-00_KST_Card162_FE_Login_Journey_Harness_Gemini]]
 
 ## 2026-09-30 사내 IdP(Keycloak) 연동 FE 점검·수정 및 OIDC PKCE·토큰 만료·로그아웃 검증 (Card 153, `agent/gemini/card153-idp-login`, PR #247)
 - **개요**: 사내 IdP(Claude Card 152가 사내망에 프로비저닝하는 Keycloak) 연동을 위한 FE 점검 및 독립 검토 의견 전수 반영: (1) OIDC Authorization Code + PKCE(RFC 7636 S256 verifier/challenge, state, nonce, RFC 부록 B 벡터 100% 일치), (2) 동적 issuer 및 clientId 설정 해석 및 issuer origin/path 계층에 결속하여 authorize/token/logout cross-origin 및 경로 이탈 override 원천 차단(Codex 1, Claude L5), (3) dev IdP 가정 및 비암호화 원격 HTTP 전면 차단, (4) OIDC ID 토큰(id_token)의 nonce(트랜잭션 일치), aud(clientId 일치), 다중 aud 시 azp(clientId 일치 필수), iss(issuer 설정 시 일치; endpoint-pair 모드는 iss 미검사), 필수 정수 exp(120초 시계 오차 허용), iat(존재 시 정수) 클라이언트 fail-closed 검증 완비, 4대 변이(azp 누락 허용, 단일 aud 외국 azp, aud 배열 clientId 미포함, aud 비문자열/비배열) 사살 음성 시험 완비 및 id_token 클라이언트 검증 후 폐기, access token 서버 검증 정본 위임 명시(Claude R1~R3, Codex 2), (5) 제어 평면 서버 계약 준수 토큰 유효기간(0 < exp - iat <= 3600) fail-closed 검증 및 120초 시계 오차 허용(CLOCK_SKEW_SEC = 120, Claude M3, Codex 5, validateTokenExpiration 구조분해 기본값 requireJwt: true 완비), (6) `App.tsx:549` Header 로그아웃에 `performLogout({ redirectIdp: true, postLogoutRedirectUri: window.location.origin })` 실 배선 및 App 수준 통합 시험 완비(Claude M1, Codex 3), (7) `auth-config.js` 정본 계약(`https://idp.sv.lan/realms/saintvision`, `sv-portal`) 정합(Codex 4), (8) redirectUri 정규화, `/callback` strict path 검증 및 RFC 6749 §3.1.2 해시 차단(Claude L4).

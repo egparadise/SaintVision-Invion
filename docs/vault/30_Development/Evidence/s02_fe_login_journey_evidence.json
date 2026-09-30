@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "1.0.0",
+  "timestamp": "2026-09-30T06:36:07.733498+00:00",
+  "codeSha": "2f93cbba1f82d3dab4d9086d21570e14e31fa16b",
+  "targetUrl": "https://portal.sv.lan",
+  "overallStatus": "BLOCKED_EXTERNAL",
+  "blockingReason": "DNS resolution failed for portal.sv.lan ([Errno 11001] getaddrinfo failed)",
+  "steps": [
+    {
+      "id": "portal_tls_reachability",
+      "name": "Portal TLS Reachability & Certificate Check",
+      "status": "BLOCKED_EXTERNAL",
+      "durationMs": 1.0,
+      "detail": "External preflight blocked: DNS resolution failed for portal.sv.lan ([Errno 11001] getaddrinfo failed)",
+      "observations": {
+        "targetUrl": "https://portal.sv.lan",
+        "hostname": "portal.sv.lan",
+        "preflightPassed": false,
+        "blockingReason": "DNS resolution failed for portal.sv.lan ([Errno 11001] getaddrinfo failed)"
+      }
+    },
+    {
+      "id": "login_initiation",
+      "name": "OIDC PKCE Login Initiation",
+      "status": "BLOCKED_EXTERNAL",
+      "durationMs": 0.0,
+      "detail": "Blocked due to prerequisite step portal_tls_reachability (DNS resolution failed for portal.sv.lan ([Errno 11001] getaddrinfo failed))",
+      "observations": {
+        "status": "BLOCKED_EXTERNAL"
+      }
+    },
+    {
+      "id": "pkce_callback",
+      "name": "OIDC Authorization Code Exchange Callback",
+      "status": "BLOCKED_EXTERNAL",
+      "durationMs": 0.0,
+      "detail": "Blocked due to prerequisite step portal_tls_reachability (DNS resolution failed for portal.sv.lan ([Errno 11001] getaddrinfo failed))",
+      "observations": {
+        "status": "BLOCKED_EXTERNAL"
+      }
+    },
+    {
+      "id": "identity_session_display",
+      "name": "Identity and /v1/session Display",
+      "status": "BLOCKED_EXTERNAL",
+      "durationMs": 0.0,
+      "detail": "Blocked due to prerequisite step portal_tls_reachability (DNS resolution failed for portal.sv.lan ([Errno 11001] getaddrinfo failed))",
+      "observations": {
+        "status": "BLOCKED_EXTERNAL"
+      }
+    },
+    {
+      "id": "logout",
+      "name": "OIDC Session Logout and Cleanup",
+      "status": "BLOCKED_EXTERNAL",
+      "durationMs": 0.0,
+      "detail": "Blocked due to prerequisite step portal_tls_reachability (DNS resolution failed for portal.sv.lan ([Errno 11001] getaddrinfo failed))",
+      "observations": {
+        "status": "BLOCKED_EXTERNAL"
+      }
+    }
+  ],
+  "audit": {
+    "redacted": true,
+    "tokenCount": 0,
+    "ipCount": 0,
+    "credentialCount": 0,
+    "circumventionFlagsDetected": false,
+    "tlsValidationEnforced": true
+  }
+}
