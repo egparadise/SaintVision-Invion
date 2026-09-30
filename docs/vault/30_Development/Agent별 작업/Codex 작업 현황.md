@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.233"
+version: "1.0.234"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T09:01:42+09:00"
+updated: "2026-09-30T09:13:57+09:00"
 source_of_truth: "Git"
 active_card: "CARD-151 intranet ObjectStore and PITR rehearsal"
 active_card_status: "PR 248 review follow-up; Claude F1-F12 remediated, TLS operational U6 PASS, G-22 replication HBA blocked external"
@@ -15,6 +15,17 @@ active_card_next: "Claude re-review; continue Card 154 independent review and ca
 - PR #248에서 root·service·PITR 자격을 host argv와 Docker `Config.Env`에서 제거하고 단일 보호 파일 mount로 고정했다. PITR policy의 delete 권한을 제거하고 bucket versioning을 활성화했다.
 - bounded PITR rehearsal은 streaming receiver·source major·archive mode·retention tool hash를 확인하며, RTO를 download 시작부터 promotion까지 잰다. 지속 장애 시점이 없는 이 예행은 RPO를 측정하지 않아 `measuredRpoSeconds=null`로 남긴다.
 - 최신 TLS operational roundtrip은 6/6 PASS, 교차 bucket은 403/403이다. redacted evidence를 저장소에 고정했고 G-22는 replication HBA 미승인으로 계속 `BLOCKED_EXTERNAL`이다.
+## 2026-09-30 Card 156 지원 — portal.sv.lan TLS 인계
+
+- Card 150의 ECDSA P-256 HTTPS CA로 `portal.sv.lan` leaf를 발급해 object-store
+  provider인 node2의 신규 전용 디렉터리에 전달했다. directory `0700`, key
+  `0400`, owner·fingerprint·chain 일치와 staging 잔존 0을 확인했다.
+- 서비스·DNS·container는 변경하지 않아 상태는 `DELIVERED_NOT_ACTIVATED`다.
+  운영자 사본은 후속 leaf 활성화와 이전 leaf 폐기 완료까지 ignored private
+  저장소에 보관하며 CRL 파일 생성만으로 폐기 완료를 주장하지 않는다.
+- 기존 `cp.sv.lan` leaf는 CP 호스트가 정해질 때까지 전송하지 않는다. 선택한
+  주소가 현 SAN과 다르면 재발급한다. [[2026-09-30_09-13-57_KST_portal_sv_lan_TLS_인계_Codex]].
+
 ## 2026-09-30 Card 150 — 사내망 PKI·LAN pilot 재수립
 
 - 독립 검토 F1~F10과 worker 3건을 반영했다. HTTPS root/intermediate/leaf는
