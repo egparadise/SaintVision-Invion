@@ -342,19 +342,94 @@ def test_a_terminal_state_without_a_reason_is_rejected(app_sessionmaker, project
                     )
 
 
-def test_cancel_is_idempotent(app_sessionmaker, project):
+def test_cancel_is_idempotent_and_writes_one_canonical_audit(
+    app_sessionmaker, owner_engine, project
+):
     with app_sessionmaker() as session:
         with session.begin():
             with tenant_scope(session, project["tenant_a"]):
                 run = _new_run(session, project)
                 once = run_service.cancel_run(
-                    session, tenant_id=project["tenant_a"], run_id=run.run_id, now=NOW
+                    session,
+                    tenant_id=project["tenant_a"],
+                    run_id=run.run_id,
+                    now=NOW,
+                    actor_type="user",
+                    actor_id=project["user_id"],
+                    trace_id="1" * 32,
                 )
                 twice = run_service.cancel_run(
-                    session, tenant_id=project["tenant_a"], run_id=run.run_id, now=NOW
+                    session,
+                    tenant_id=project["tenant_a"],
+                    run_id=run.run_id,
+                    now=NOW,
+                    actor_type="user",
+                    actor_id=project["user_id"],
+                    trace_id="1" * 32,
                 )
+                run_id = run.run_id
     assert once.state == twice.state == "cancelled"
     assert once.termination_reason == "cancelled_by_user"
+    with owner_engine.connect() as connection:
+        audit = (
+            connection.execute(
+                text(
+                    "SELECT actor_type,actor_id,action,outcome,trace_id,target_type,target_id,detail "
+                    "FROM audit_events WHERE tenant_id=:tenant AND target_id=:run"
+                ),
+                {"tenant": project["tenant_a"], "run": run_id},
+            )
+            .mappings()
+            .one()
+        )
+    assert dict(audit) == {
+        "actor_type": "user",
+        "actor_id": project["user_id"],
+        "action": "run.cancel.requested",
+        "outcome": "allow",
+        "trace_id": "1" * 32,
+        "target_type": "run",
+        "target_id": run_id,
+        "detail": {"reason": "cancelled_by_user"},
+    }
+
+
+def test_cancel_state_rolls_back_when_the_audit_insert_fails(
+    app_sessionmaker, owner_engine, project, monkeypatch
+):
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, project["tenant_a"]):
+                run_id = _new_run(session, project).run_id
+
+    def fail_audit(*_args, **_kwargs):
+        raise RuntimeError("audit insert failed")
+
+    monkeypatch.setattr(run_service, "record_event", fail_audit)
+    with pytest.raises(RuntimeError, match="audit insert failed"):
+        with app_sessionmaker() as session:
+            with session.begin():
+                with tenant_scope(session, project["tenant_a"]):
+                    run_service.cancel_run(
+                        session,
+                        tenant_id=project["tenant_a"],
+                        run_id=run_id,
+                        now=NOW,
+                        actor_type="system",
+                        actor_id=None,
+                    )
+
+    with owner_engine.connect() as connection:
+        state = connection.execute(
+            text("SELECT state FROM runs WHERE tenant_id=:tenant AND run_id=:run"),
+            {"tenant": project["tenant_a"], "run": run_id},
+        ).scalar_one()
+        audit_count = connection.execute(
+            text("SELECT count(*) FROM audit_events WHERE tenant_id=:tenant AND target_id=:run"),
+            {"tenant": project["tenant_a"], "run": run_id},
+        ).scalar_one()
+    assert state == "draft"
+    assert audit_count == 0
 
 
 def test_cancelling_a_finished_run_is_refused(app_sessionmaker, project):
@@ -371,7 +446,12 @@ def test_cancelling_a_finished_run_is_refused(app_sessionmaker, project):
                 )
                 with pytest.raises(InvError):
                     run_service.cancel_run(
-                        session, tenant_id=project["tenant_a"], run_id=run.run_id, now=NOW
+                        session,
+                        tenant_id=project["tenant_a"],
+                        run_id=run.run_id,
+                        now=NOW,
+                        actor_type="user",
+                        actor_id=project["user_id"],
                     )
 
 

@@ -34,10 +34,15 @@ from ..errors import (
     InvError,
 )
 from ..ids import new_id
+from .audit import record_event
 from .tracking import enqueue_mirror, training_run_mirror_payload
 from ..runs.state import RunState, TerminationReason, assert_transition, is_terminal
 from .evidence import canonical_sha256, enqueue_event, record_evidence
 from .pagination import Page, build_page, clamp_limit, validate_cursor
+
+
+CANCEL_AUDIT_ACTION = "run.cancel.requested"
+_CANCEL_ACTOR_TYPES = frozenset({"user", "node", "agent", "system"})
 
 
 def create_run(
@@ -130,6 +135,9 @@ def cancel_run(
     tenant_id: uuid.UUID,
     run_id: str,
     now: dt.datetime,
+    actor_type: str,
+    actor_id: str | None,
+    trace_id: str | None = None,
     reason: TerminationReason | str = TerminationReason.CANCELLED_BY_USER,
 ) -> Run:
     """Cancel a Run, idempotently.
@@ -138,6 +146,11 @@ def cancel_run(
     failing: a user clicking twice is not an error, and a cancel that can fail
     is a cancel people stop trusting.
     """
+    if actor_type not in _CANCEL_ACTOR_TYPES:
+        raise ValueError(f"unsupported cancellation actor_type: {actor_type!r}")
+    if actor_type != "system" and not actor_id:
+        raise ValueError(f"{actor_type} cancellation requires actor_id")
+
     run = get_run(session, tenant_id=tenant_id, run_id=run_id)
     if run.state == RunState.CANCELLED.value:
         return run
@@ -147,10 +160,29 @@ def cancel_run(
             f"run already ended as {run.state}",
             cause_ref=run_id,
         )
-    return advance(
-        session, tenant_id=tenant_id, run_id=run_id, target=RunState.CANCELLED,
-        now=now, reason=reason,
+    cancelled = advance(
+        session,
+        tenant_id=tenant_id,
+        run_id=run_id,
+        target=RunState.CANCELLED,
+        now=now,
+        reason=reason,
     )
+    reason_value = reason.value if isinstance(reason, TerminationReason) else str(reason)
+    record_event(
+        session,
+        now=now,
+        actor_type=actor_type,
+        actor_id=actor_id,
+        action=CANCEL_AUDIT_ACTION,
+        outcome="allow",
+        tenant_id=tenant_id,
+        trace_id=trace_id,
+        target_type="run",
+        target_id=run_id,
+        detail={"reason": reason_value},
+    )
+    return cancelled
 
 
 def start_attempt(
@@ -336,8 +368,12 @@ def fail_run(
     successes would make the audit trail a highlight reel.
     """
     run = advance(
-        session, tenant_id=tenant_id, run_id=run_id, target=RunState.FAILED,
-        now=now, reason=reason,
+        session,
+        tenant_id=tenant_id,
+        run_id=run_id,
+        target=RunState.FAILED,
+        now=now,
+        reason=reason,
     )
     evidence_id = record_evidence(
         session,
@@ -441,7 +477,8 @@ def assert_approval_valid(
 
     if approval is None:
         raise InvError(
-            AUTH_APPROVAL_DIGEST_MISMATCH, "no approval recorded for this run",
+            AUTH_APPROVAL_DIGEST_MISMATCH,
+            "no approval recorded for this run",
             cause_ref=run_id,
         )
     if approval.expires_at <= now:
