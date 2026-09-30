@@ -47,6 +47,7 @@ import argparse
 import base64
 import datetime as dt
 import hashlib
+import contextlib
 import ipaddress
 import json
 import os
@@ -374,20 +375,55 @@ def product_verifier():
     return AccessTokens
 
 
-def seal_of(path: Path) -> tuple[str, int, int, int]:
-    """What the copy is, tightly enough that a replacement cannot look the same.
+#: The product function that reads the trust bundle from disk
+#: (``inv.identity._keys`` calls ``trusted_file(self.jwks_file)``). Named here because the
+#: pin below replaces it for the length of one call, and because if the product stops
+#: having it the pin must fail loudly rather than silently not apply.
+PRODUCT_READER = "trusted_file"
 
-    The bytes' digest is the substance. The inode catches a file swapped in under the same
-    name -- the case a digest alone would miss if the replacement were later swapped back --
-    and size and modification time in nanoseconds catch a rewrite in place.
+
+@contextlib.contextmanager
+def bundle_read_pinned(copy: Path, bundle_raw: bytes):
+    """Make the verifier's own read return the bytes that were already hashed.
+
+    Round 6 sealed the copy before and after the verifier ran and refused on a difference.
+    A review showed that is defeatable: rename the copy aside, put a different file in its
+    place, rename the original back -- the inode survives -- or rewrite in place and restore
+    the bytes and ``st_mtime_ns`` with ``os.utime``. Either gives a clean seal over a read
+    that saw other bytes, and the mirror manufactures a defect. **Detecting tampering in a
+    window is weaker than not having the window.**
+
+    So the window is removed. For the length of the verifier call this replaces the product's
+    own read function in process, returning ``bundle_raw`` for our copy and delegating every
+    other path untouched. The product source is not modified, nothing is written back, and
+    the original function is restored in ``finally``. After that there is no disk read
+    between the hash and the verdict, so there is nothing to race.
+
+    The call log is yielded so the caller can require the pin to have been used: if the
+    verifier never read through it, the verdict is not about these bytes and must not be
+    reported. A product that no longer has this function raises here rather than quietly
+    falling back to reading the disk.
     """
-    info = os.stat(path)
-    return (
-        hashlib.sha256(path.read_bytes()).hexdigest(),
-        info.st_ino,
-        info.st_size,
-        info.st_mtime_ns,
-    )
+    # Resolve through product_verifier() rather than assuming the module is already in
+    # sys.modules: it may not be when the caller passes its own verifier, and an assumption
+    # here made the pin depend on some earlier import having happened.
+    product_verifier()
+    module = sys.modules["inv.identity"]
+    original = getattr(module, PRODUCT_READER)
+    reads: list[str] = []
+
+    def pinned(target):
+        if Path(target) == copy:
+            reads.append(str(target))
+            return bundle_raw
+        # Any other path is the product's own business and is read as the product reads it.
+        return original(target)
+
+    setattr(module, PRODUCT_READER, pinned)
+    try:
+        yield reads
+    finally:
+        setattr(module, PRODUCT_READER, original)
 
 
 def verifier_refusal(verifier, identity: dict, bundle_raw: bytes, bundle_sha: str) -> list[str]:
@@ -399,17 +435,17 @@ def verifier_refusal(verifier, identity: dict, bundle_raw: bytes, bundle_sha: st
     reverse. The verifier is security-critical product code and is not changed for this
     check, so the bytes already read and hashed here are written once into a directory this
     run owns (0700) as a regular file (0600), and the verifier is pointed at that copy. The
-    copy is sealed before the verifier sees it **and the seal is checked again after the
-    verifier returns**, so what was judged is provably what this report hashes, and it is
-    removed afterwards whatever happens.
+    verifier reads those bytes **through a pinned reader rather than from the disk**, so
+    there is no window between the hash and the verdict at all. The copy is still removed
+    afterwards whatever happens.
 
-    Checking only before was not enough. Round 5 hashed the copy and then handed the path
-    over, which still leaves a window: the copy could be replaced between the hash and
-    ``_keys()``'s read, and a review reproduced a false clean that way. The window cannot be
-    removed while the verifier takes a path, so it is **closed by checking both ends** --
-    the file's identity (inode, size, modification time in nanoseconds) and its bytes must
-    be unchanged afterwards, or the run refuses. A swap inside the window has to alter one
-    of those to have had any effect.
+    Two earlier attempts are worth recording, because each was weaker than it read as.
+    Round 5 hashed the copy and handed the path over, which leaves the copy replaceable
+    before ``_keys()`` reads it. Round 6 sealed the copy before and after and refused on a
+    difference -- but a swap that is **put back** defeats that: rename the copy aside, drop
+    another file in, rename the original back and the inode survives; or rewrite in place and
+    restore the bytes and ``st_mtime_ns``. Detecting tampering inside a window is weaker than
+    not having the window, so the window is gone: see ``bundle_read_pinned``.
     """
     directory = Path(tempfile.mkdtemp(prefix="inv-smoke-bundle-"))
     try:
@@ -425,27 +461,26 @@ def verifier_refusal(verifier, identity: dict, bundle_raw: bytes, bundle_sha: st
             os.write(handle, bundle_raw)
         finally:
             os.close(handle)
-        sealed = seal_of(copy)
-        if sealed[0] != bundle_sha:
+        if hashlib.sha256(bundle_raw).hexdigest() != bundle_sha:
             raise SmokeRefused(
-                "the trust bundle copy does not hash to the bytes this report recorded"
+                "the trust bundle bytes do not hash to the digest this report recorded"
             )
         refused: list[str] = []
-        try:
-            verifier(**{**identity, "jwks_file": str(copy)})
-        except Exception as error:
-            # The authority, and it enforces more than the names below: key type,
-            # algorithm, use, absence of a private exponent, key-id uniqueness, RSA size.
-            refused = [f"the-verifier-that-loads-it-refuses-this-configuration-"
-                       f"{type(error).__name__}"]
-        # The other end of the window. A verdict about bytes that changed while being read
-        # is not a verdict about anything, so it is refused rather than reported -- in both
-        # directions, because a swap towards an acceptable bundle manufactures a pass just
-        # as a swap away from one manufactures a defect.
-        if seal_of(copy) != sealed:
-            raise SmokeRefused(
-                "the trust bundle copy changed while the verifier was reading it"
-            )
+        with bundle_read_pinned(copy, bundle_raw) as reads:
+            try:
+                verifier(**{**identity, "jwks_file": str(copy)})
+            except Exception as error:
+                # The authority, and it enforces more than the names below: key type,
+                # algorithm, use, absence of a private exponent, key-id uniqueness, RSA size.
+                refused = [f"the-verifier-that-loads-it-refuses-this-configuration-"
+                           f"{type(error).__name__}"]
+            # A verdict reached without reading the bundle is not a verdict about the
+            # bundle. This is the one thing the pin has to prove about itself.
+            if not reads:
+                raise SmokeRefused(
+                    "the verifier did not read the trust bundle through the pinned reader, "
+                    "so its verdict is not about the bytes this report hashed"
+                )
         return refused
     finally:
         try:

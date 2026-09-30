@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-INTRANET-E2E-SMOKE-2026-09-30"
-title: "사내망 종단 smoke v1.5 (카드 155) — 검토 두 축이 찾은 fail-open을 닫았다: 시험 대상 신원이 CLI 인자였기 때문에 foreign issuer로 PASS가 재현됐다. issuer·client·신뢰 키를 제어 평면 설정에서 읽고 TLS 대상을 그 issuer에서 유도해 SNI·Host·announced issuer가 한 문자열이 되게 했다. invalid_client를 grant-disabled PASS에서 제거하고, 제어 평면 401은 정본 ProblemDetails·AUTH-0050만 인정하며, 서명까지 도달하는 토큰으로 검증한다. 해석된 뒤의 연결 실패는 FAIL이다. 되살림 변이 12종 전부 죽는다. v1.2에서 검토 두 축의 11건을 더 닫았다 — 승인 root 옆에 CA:FALSE self-signed leaf를 끼우면 `get_ca_certs()`가 그것을 빼고 돌려주므로 basicConstraints·승인 목록 검사를 **전부 우회해 TLS가 통과했다**(실측), 설정 digest만으로 PASS를 주던 결속을 NOT_BOUND로 정직하게 바꿨고, JWKS는 교집합이 아니라 **정확히 같은 집합**을 요구하며 key material까지 비교한다, OAuth error는 token endpoint의 status와 함께만 증거가 된다. v1.3에서 여섯 건을 더 닫았다 — `unsupported_grant_type`은 **client 조회 전에** 나오므로 client id 오타 하나가 세 관측을 동시에 통과시켰고, bundle 판정이 제품 `AccessTokens._keys()`보다 약해 RSA-OAEP 키를 통과시켰다. v1.4에서 다섯 건을 더 닫았다 — 그 제품 verifier에게 **경로**를 넘겨 두 번째 read가 다른 bytes를 볼 수 있었고(TOCTOU), 401을 400과 똑같이 취급해 **client 인증 실패를 grant 증거로** 읽었다. v1.5에서 그 사본의 창을 양쪽에서 닫았다 — 사본을 해시한 뒤 verifier가 읽기 **전에** 사본 자체를 교체할 수 있었다"
-version: "1.5.0"
+title: "사내망 종단 smoke v1.6 (카드 155) — 검토 두 축이 찾은 fail-open을 닫았다: 시험 대상 신원이 CLI 인자였기 때문에 foreign issuer로 PASS가 재현됐다. issuer·client·신뢰 키를 제어 평면 설정에서 읽고 TLS 대상을 그 issuer에서 유도해 SNI·Host·announced issuer가 한 문자열이 되게 했다. invalid_client를 grant-disabled PASS에서 제거하고, 제어 평면 401은 정본 ProblemDetails·AUTH-0050만 인정하며, 서명까지 도달하는 토큰으로 검증한다. 해석된 뒤의 연결 실패는 FAIL이다. 되살림 변이 12종 전부 죽는다. v1.2에서 검토 두 축의 11건을 더 닫았다 — 승인 root 옆에 CA:FALSE self-signed leaf를 끼우면 `get_ca_certs()`가 그것을 빼고 돌려주므로 basicConstraints·승인 목록 검사를 **전부 우회해 TLS가 통과했다**(실측), 설정 digest만으로 PASS를 주던 결속을 NOT_BOUND로 정직하게 바꿨고, JWKS는 교집합이 아니라 **정확히 같은 집합**을 요구하며 key material까지 비교한다, OAuth error는 token endpoint의 status와 함께만 증거가 된다. v1.3에서 여섯 건을 더 닫았다 — `unsupported_grant_type`은 **client 조회 전에** 나오므로 client id 오타 하나가 세 관측을 동시에 통과시켰고, bundle 판정이 제품 `AccessTokens._keys()`보다 약해 RSA-OAEP 키를 통과시켰다. v1.4에서 다섯 건을 더 닫았다 — 그 제품 verifier에게 **경로**를 넘겨 두 번째 read가 다른 bytes를 볼 수 있었고(TOCTOU), 401을 400과 똑같이 취급해 **client 인증 실패를 grant 증거로** 읽었다. v1.5에서 그 사본의 창을 양쪽에서 닫았다 — 사본을 해시한 뒤 verifier가 읽기 **전에** 사본 자체를 교체할 수 있었다. v1.6에서 그 봉인이 **교체 후 원복에 뚫리는 것**이 드러나, 탐지를 버리고 **디스크 재읽기 자체를 없앴다**"
+version: "1.6.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 audience: "user"
-updated: "2026-09-30T13:54:05+09:00"
+updated: "2026-09-30T14:30:56+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "6fc0428b"
@@ -108,6 +108,25 @@ verifier가 경로를 받는 한 창 자체는 없앨 수 없다(그리고 제�
 **양방향 모두 거부한다.** 받아들일 수 없는 쪽으로 바꾸는 것만 문제가 아니다 — 받아들일 수 있는 쪽으로 바꾸면 **통과가 조작**되기 때문이다. 어느 쪽이든 **읽히는 동안 바뀐 bytes에 대한 판정은 판정이 아니다.**
 
 시험은 지시대로 양방향이고, 여기에 **같은 이름의 다른 파일**(unlink 후 재생성, 내용 동일) 사례를 더했다 — digest만 보는 봉인이라면 통과하는 경우다. 봉인을 digest 하나로 줄이는 변이가 그 시험에서 죽는다. 그리고 봉인 검사가 거부할 때도 **사본은 지워진다.**
+
+### 1-4. v1.6에서 바뀐 것 — 창 안의 탐지는 창이 없는 것보다 약하다
+
+v1.5는 사본을 **봉인하고 전후로 비교**해 닫았다고 적었다. **그 봉인은 뚫린다.** 검토가 두 경우를 보였다.
+
+| 경우 | 방법 | 봉인이 왜 통과하나 |
+|---|---|---|
+| **c** | 사본을 rename으로 치우고 다른 파일을 그 이름에 놓았다가, **원본을 다시 rename**해 되돌린다 | **inode가 유지된다.** bytes·크기·mtime도 원래대로다 |
+| **d** | 제자리에서 덮어쓰고, 원래 bytes로 되쓰고 `os.utime(ns)`로 시각까지 되돌린다 | 네 값이 모두 원래대로다 |
+
+두 경우 모두 **verifier가 읽는 순간에는 다른 bytes를 보고**, 봉인 검사 시점에는 아무 차이가 없다. 거짓 clean이다. 반대 방향은 거짓 defect가 된다.
+
+**교체를 탐지하려 한 것이 잘못된 층위였다.** 창 안에서 무엇이 일어났는지 확인하는 것보다 **창을 없애는 것**이 강하다. 그래서 verifier가 호출되는 동안에만 **제품이 쓰는 읽기 함수를 in-process로 대체**한다 — 우리 사본 경로에는 **이미 해시한 bytes를 그대로 반환**하고 다른 경로는 원래 함수에 위임하며, `finally`에서 되돌린다. **제품 소스는 변경 0**이고, 해시와 판정 사이에 **디스크 읽기가 존재하지 않으므로 경합할 대상이 없다.**
+
+대신 **pin이 실제로 쓰였는지**를 요구한다. verifier가 bundle을 한 번도 읽지 않았다면 그 판정은 이 bytes에 대한 판정이 아니므로 **거부**한다. 제품이 그 읽기 함수를 더 이상 갖지 않으면 조용히 디스크로 되돌아가지 않고 **그 자리에서 실패**한다.
+
+시험은 v1.5의 것을 **뒤집었다** — 경우 c·d·e가 이제 **무력**이어야 한다(판정이 해시한 bytes 기준이므로). 그리고 pin이 **필수임을 보이는 시험**을 따로 두었다: 디스크에 **유효한** bundle을 남긴 채(되돌리지 않고) 해시된 bytes가 enc 키면 판정은 **defect**여야 한다 — pin이 없으면 제품이 디스크를 읽어 defect가 사라진다. 경우 c·d는 bytes를 되돌리므로 **pin 없이도 결과가 같아** 그 필요성을 보이지 못한다는 것을 확인하고 이 시험을 추가했다.
+
+**구현 결함 하나를 이 과정에서 제 시험이 찾아 줬다.** `bundle_read_pinned`가 `sys.modules["inv.identity"]`가 이미 있다고 **가정**했는데, 호출자가 자기 verifier를 주는 경우 그 import가 아직 없을 수 있다. 앞선 focused 실행에서는 다른 시험이 먼저 import해 **순서에 따라 통과**했고 전체 실행에서 드러났다. `product_verifier()`를 먼저 불러 **import 규칙과 거부를 한 곳에서** 쓰도록 고쳤다.
 
 ## 2. 무엇이 나왔나
 

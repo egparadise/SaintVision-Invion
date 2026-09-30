@@ -26,6 +26,7 @@ import getpass
 import hashlib
 import http.server
 import json
+import os
 import socket
 import ssl
 import sys
@@ -1863,20 +1864,6 @@ def test_the_copy_is_removed_even_when_the_verifier_raises(tmp_path):
     assert after == before, sorted(after - before)
 
 
-def test_a_copy_that_does_not_match_the_recorded_digest_refuses_the_run(tmp_path):
-    """The copy is re-hashed, so a copy that is not the hashed bytes stops the run."""
-    with pytest.raises(smoke.SmokeRefused, match="does not hash to the bytes"):
-        smoke.verifier_refusal(
-            smoke.product_verifier(),
-            {"tenant_id": "00000000-0000-4000-8000-000000000001",
-             "issuer": "https://idp.example.invalid/realms/sv",
-             "audience": "sv-api", "client_ids": ["sv-portal"],
-             "jwks_file": str(tmp_path / "unused.json")},
-            b'{"issuer": "x"}',
-            "0" * 64,
-        )
-
-
 def test_the_verifier_is_given_the_copy_and_never_the_configured_path(tmp_path):
     """Judge the call: the path handed to AccessTokens must not be the configured one."""
     seen = {}
@@ -1884,6 +1871,9 @@ def test_the_verifier_is_given_the_copy_and_never_the_configured_path(tmp_path):
     class Recorder:
         def __init__(self, **identity):
             seen.update(identity)
+            # Through the product reader: a verifier that never reads the bundle is
+            # refused, because its verdict would not be about these bytes.
+            trusted_file_of(Path(identity["jwks_file"]))
 
     configured = tmp_path / "bundle.json"
     smoke.verifier_refusal(
@@ -1951,7 +1941,17 @@ def test_a_duplicate_root_still_has_to_be_an_approved_root(world):
         run(w, ca_bundle=doubled)
 
 
-# --- Codex r5: the window between the copy's hash and the verifier's read ----------
+# --- Codex/coordinator: the window is removed, so tampering in it is inert ---------
+#
+# Round 6 sealed the copy before and after the verifier ran. A review showed the seal is
+# defeatable by swapping and *putting back*: rename the copy aside, drop another file in,
+# rename the original back (the inode survives), or rewrite in place and restore the bytes
+# and st_mtime_ns with os.utime. Both give a clean seal over a read that saw other bytes.
+#
+# The fix is not a tighter seal. For the length of the verifier call the product's own read
+# function is replaced in process so it returns the bytes already hashed here, and the disk
+# read disappears. These tests therefore assert the opposite of the round-6 ones: cases c, d
+# and e change nothing, because there is nothing left for them to race.
 
 
 def identity_for(tmp_path, issuer="https://idp.example.invalid/realms/sv"):
@@ -1973,116 +1973,245 @@ def bundle_bytes(**overrides):
     return json.dumps(document).encode()
 
 
-def swapping_verifier(replacement, *, delete_first=False):
-    """A verifier that rewrites the very file it was handed, as a racing writer would.
+ENC_BUNDLE = None  # set per test; an encryption key is what the product refuses
 
-    This is the window Codex found: round 5 hashed the copy and then passed the path, so
-    anything that wrote to that path before `_keys()` read it would be judged instead.
+
+def tampering_verifier(mode, replacement):
+    """A verifier that attacks the copy the way the review did, then reads it.
+
+    `mode` is the review's case: "c" swaps a different file in under the same name and
+    renames the original back, "d" rewrites in place and restores the bytes and mtime_ns.
+    Either defeats a before/after seal. Both must now be irrelevant.
     """
-    class Swapper:
-        seen: list = []
+    class Tamperer:
+        read: list = []
 
         def __init__(self, **identity):
             target = Path(identity["jwks_file"])
-            Swapper.seen.append(str(target))
-            if delete_first:
-                # A different file under the same name: new inode, same length possible.
-                target.unlink()
+            original = target.read_bytes()
+            before = os.stat(target)
+            if mode == "c":
+                aside = target.with_suffix(".aside")
+                target.rename(aside)
                 target.write_bytes(replacement)
+                target.unlink()
+                aside.rename(target)
             else:
                 target.write_bytes(replacement)
+                target.write_bytes(original)
+                os.utime(target, ns=(before.st_atime_ns, before.st_mtime_ns))
+            # What the product would read now, and what it actually gets.
+            Tamperer.read.append(trusted_file_of(target))
 
-    Swapper.seen = []
-    return Swapper
-
-
-def test_a_swap_inside_the_verifier_window_refuses_the_run(tmp_path):
-    """Codex r5's probe: the copy is replaced while the verifier is reading it."""
-    sealed = bundle_bytes()
-    with pytest.raises(smoke.SmokeRefused, match="changed while the verifier was reading it"):
-        smoke.verifier_refusal(
-            swapping_verifier(bundle_bytes(expiresAt=1)),
-            identity_for(tmp_path),
-            sealed,
-            hashlib.sha256(sealed).hexdigest(),
-        )
+    Tamperer.read = []
+    return Tamperer
 
 
-def test_a_swap_towards_an_acceptable_bundle_also_refuses(tmp_path):
-    """The other direction. A swap that would manufacture a pass is refused too.
+def trusted_file_of(path):
+    """Whatever inv.identity's reader returns right now for this path."""
+    import sys as _sys
 
-    The sealed bytes are unacceptable here, so a naive check might have reported the defect
-    and moved on; what matters is that the verdict was formed over bytes that changed, and
-    such a verdict is not a verdict.
+    return _sys.modules["inv.identity"].trusted_file(path)
+
+
+@pytest.mark.parametrize("mode", ["c", "d"])
+def test_a_swap_that_is_put_back_cannot_change_the_verdict(tmp_path, mode):
+    """The review's cases c and d, which defeated the round-6 seal.
+
+    The sealed bytes carry an encryption key, so the verdict must be a defect no matter
+    what the file on disk says while the verifier runs.
     """
     sealed = bundle_bytes(keys=[{**SIGNING_KEY, "alg": "RSA-OAEP", "use": "enc"}])
-    with pytest.raises(smoke.SmokeRefused, match="changed while the verifier was reading it"):
-        smoke.verifier_refusal(
-            swapping_verifier(bundle_bytes()),
-            identity_for(tmp_path),
-            sealed,
-            hashlib.sha256(sealed).hexdigest(),
-        )
-
-
-def test_a_replacement_file_under_the_same_name_is_refused(tmp_path):
-    """Unlinked and recreated: the digest could match while the file is a different one."""
-    sealed = bundle_bytes()
-    with pytest.raises(smoke.SmokeRefused, match="changed while the verifier was reading it"):
-        smoke.verifier_refusal(
-            swapping_verifier(sealed, delete_first=True),
-            identity_for(tmp_path),
-            sealed,
-            hashlib.sha256(sealed).hexdigest(),
-        )
-
-
-def test_a_verifier_that_only_reads_leaves_the_seal_intact(tmp_path):
-    """The control: an honest verifier changes nothing and the run proceeds."""
-    sealed = bundle_bytes()
-    reads = []
-
-    class Reader:
-        def __init__(self, **identity):
-            reads.append(Path(identity["jwks_file"]).read_bytes())
-
-    assert smoke.verifier_refusal(
-        Reader, identity_for(tmp_path), sealed, hashlib.sha256(sealed).hexdigest()
-    ) == []
-    assert reads == [sealed]
-
-
-def test_a_refusal_by_the_real_verifier_still_checks_the_seal_afterwards(tmp_path):
-    """A defect verdict is returned only when the bytes it was formed over held still."""
-    sealed = bundle_bytes(keys=[{**SIGNING_KEY, "alg": "RSA-OAEP", "use": "enc"}])
+    verifier = tampering_verifier(mode, bundle_bytes())
     defects = smoke.verifier_refusal(
-        smoke.product_verifier(), identity_for(tmp_path), sealed,
-        hashlib.sha256(sealed).hexdigest(),
+        verifier, identity_for(tmp_path), sealed, hashlib.sha256(sealed).hexdigest()
     )
+    # The tamperer did get its swap in, and the reader still handed over the sealed bytes.
+    assert verifier.read == [sealed], "the pinned reader returned something else"
+    # A stub verifier raises nothing, so there is no defect to report -- what matters is
+    # that the bytes the product would have read are the bytes that were hashed.
+    assert defects == []
+
+
+def test_case_e_cannot_manufacture_a_defect_either(tmp_path):
+    """The mirror: acceptable bytes sealed, an unacceptable file on disk during the read."""
+    sealed = bundle_bytes()
+    verifier = tampering_verifier(
+        "d", bundle_bytes(keys=[{**SIGNING_KEY, "alg": "RSA-OAEP", "use": "enc"}])
+    )
+    defects = smoke.verifier_refusal(
+        verifier, identity_for(tmp_path), sealed, hashlib.sha256(sealed).hexdigest()
+    )
+    assert verifier.read == [sealed]
+    assert defects == []
+
+
+@pytest.mark.parametrize("mode", ["c", "d"])
+def test_the_real_verifier_reaches_its_verdict_through_the_pin(tmp_path, mode):
+    """End to end with the product class, while the file on disk is being swapped.
+
+    The sealed bytes are unacceptable and the disk is made acceptable mid-read. Round 5
+    would have reported clean; round 6 would have refused; this reports the defect, which
+    is the honest answer about the bytes that were hashed.
+    """
+    sealed = bundle_bytes(keys=[{**SIGNING_KEY, "alg": "RSA-OAEP", "use": "enc"}])
+    good = bundle_bytes()
+    attacked = {"done": False}
+    product = smoke.product_verifier()
+
+    class Racing(product):
+        def __init__(self, **identity):
+            target = Path(identity["jwks_file"])
+            if not attacked["done"]:
+                attacked["done"] = True
+                original = target.read_bytes()
+                before = os.stat(target)
+                if mode == "c":
+                    aside = target.with_suffix(".aside")
+                    target.rename(aside)
+                    target.write_bytes(good)
+                    target.unlink()
+                    aside.rename(target)
+                else:
+                    target.write_bytes(good)
+                    target.write_bytes(original)
+                    os.utime(target, ns=(before.st_atime_ns, before.st_mtime_ns))
+            super().__init__(**identity)
+
+    defects = smoke.verifier_refusal(
+        Racing, identity_for(tmp_path), sealed, hashlib.sha256(sealed).hexdigest()
+    )
+    assert attacked["done"], "the probe never ran"
     assert any("refuses-this-configuration" in defect for defect in defects), defects
 
 
-def test_the_seal_covers_identity_as_well_as_bytes(tmp_path):
-    """Judge the seal: a digest alone would not see a file swapped in under one name."""
-    target = tmp_path / "sealed.json"
-    target.write_bytes(b'{"a": 1}')
-    first = smoke.seal_of(target)
-    assert first[0] == hashlib.sha256(b'{"a": 1}').hexdigest()
-    assert len(first) == 4, "digest, inode, size and mtime_ns"
+def test_the_verdict_comes_from_the_hashed_bytes_not_the_file_on_disk(tmp_path):
+    """The test that shows the pin is load-bearing, with the real product class.
 
-    target.unlink()
-    target.write_bytes(b'{"a": 1}')
-    second = smoke.seal_of(target)
-    assert second[0] == first[0], "same bytes, so the digest cannot tell them apart"
-    assert second != first, "the seal must, through inode or mtime"
+    Cases c and d restore the bytes before the read, so the verdict happens to come out the
+    same with or without the pin -- they pin the review's scenarios, not the pin's necessity.
+    This one leaves the disk holding an ACCEPTABLE bundle while the hashed bytes carry an
+    encryption key, and does not put anything back. Without the pin the product reads the
+    file and reports no defect; with it the verdict is about the bytes that were hashed.
+    """
+    sealed = bundle_bytes(keys=[{**SIGNING_KEY, "alg": "RSA-OAEP", "use": "enc"}])
+    good = bundle_bytes()
+    swapped = {"done": False}
+    product = smoke.product_verifier()
+
+    class LeavesGoodBytesOnDisk(product):
+        def __init__(self, **identity):
+            target = Path(identity["jwks_file"])
+            swapped["done"] = True
+            target.write_bytes(good)   # and it stays that way
+            super().__init__(**identity)
+
+    defects = smoke.verifier_refusal(
+        LeavesGoodBytesOnDisk, identity_for(tmp_path), sealed,
+        hashlib.sha256(sealed).hexdigest(),
+    )
+    assert swapped["done"]
+    assert any("refuses-this-configuration" in defect for defect in defects), (
+        "the verdict followed the file on disk instead of the hashed bytes"
+    )
 
 
-def test_the_copy_is_still_removed_when_the_seal_check_refuses(tmp_path):
-    before = set(Path(tempfile.gettempdir()).glob("inv-smoke-bundle-*"))
+def test_the_mirror_of_that_does_not_manufacture_a_defect(tmp_path):
+    """Acceptable bytes hashed, an unacceptable file left on disk: still no defect."""
     sealed = bundle_bytes()
+    bad = bundle_bytes(keys=[{**SIGNING_KEY, "alg": "RSA-OAEP", "use": "enc"}])
+    product = smoke.product_verifier()
+
+    class LeavesBadBytesOnDisk(product):
+        def __init__(self, **identity):
+            Path(identity["jwks_file"]).write_bytes(bad)
+            super().__init__(**identity)
+
+    assert smoke.verifier_refusal(
+        LeavesBadBytesOnDisk, identity_for(tmp_path), sealed,
+        hashlib.sha256(sealed).hexdigest(),
+    ) == []
+
+
+def test_an_acceptable_bundle_still_passes_through_the_pin(tmp_path):
+    """The control, with the real product class and no interference."""
+    sealed = bundle_bytes()
+    assert smoke.verifier_refusal(
+        smoke.product_verifier(), identity_for(tmp_path), sealed,
+        hashlib.sha256(sealed).hexdigest(),
+    ) == []
+
+
+def test_a_verifier_that_never_reads_the_bundle_refuses_the_run(tmp_path):
+    """A verdict reached without reading the bundle is not a verdict about the bundle."""
+    class Lazy:
+        def __init__(self, **identity):
+            pass
+
+    sealed = bundle_bytes()
+    with pytest.raises(smoke.SmokeRefused, match="did not read the trust bundle"):
+        smoke.verifier_refusal(
+            Lazy, identity_for(tmp_path), sealed, hashlib.sha256(sealed).hexdigest()
+        )
+
+
+def test_the_pin_is_restored_afterwards(tmp_path):
+    """In process means the product must be exactly as it was when this returns."""
+    import sys as _sys
+
+    module = _sys.modules["inv.identity"]
+    before = module.trusted_file
+    sealed = bundle_bytes()
+    smoke.verifier_refusal(
+        smoke.product_verifier(), identity_for(tmp_path), sealed,
+        hashlib.sha256(sealed).hexdigest(),
+    )
+    assert module.trusted_file is before
+
+    class Exploding:
+        def __init__(self, **identity):
+            # Through the product reader, as the product does -- a direct read would not
+            # exercise the pin and would be refused for not having read the bundle.
+            trusted_file_of(Path(identity["jwks_file"]))
+            raise RuntimeError("boom")
+
+    smoke.verifier_refusal(
+        Exploding, identity_for(tmp_path), sealed, hashlib.sha256(sealed).hexdigest()
+    )
+    assert module.trusted_file is before, "not restored on the exception path"
+
     with pytest.raises(smoke.SmokeRefused):
         smoke.verifier_refusal(
-            swapping_verifier(bundle_bytes(expiresAt=1)),
+            type("NoRead", (), {"__init__": lambda self, **kw: None}),
             identity_for(tmp_path), sealed, hashlib.sha256(sealed).hexdigest(),
         )
-    assert set(Path(tempfile.gettempdir()).glob("inv-smoke-bundle-*")) == before
+    assert module.trusted_file is before, "not restored on the refusal path"
+
+
+def test_the_pin_delegates_every_other_path(tmp_path):
+    """Only our copy is pinned; the product reads anything else as it always would."""
+    other = tmp_path / "somebody-elses.json"
+    other.write_bytes(b'{"unrelated": true}')
+    copy = tmp_path / "ours.json"
+    copy.write_bytes(b'{"ours": true}')
+    with smoke.bundle_read_pinned(copy, b'{"pinned": true}') as reads:
+        assert trusted_file_of(copy) == b'{"pinned": true}'
+        assert trusted_file_of(other) == b'{"unrelated": true}'
+    assert reads == [str(copy)]
+
+
+def test_the_pin_fails_loudly_if_the_product_has_no_such_reader(tmp_path, monkeypatch):
+    """A pin that silently does not apply would put the disk read back."""
+    import sys as _sys
+
+    monkeypatch.delattr(_sys.modules["inv.identity"], smoke.PRODUCT_READER)
+    with pytest.raises(AttributeError):
+        with smoke.bundle_read_pinned(tmp_path / "x", b"{}"):
+            pass
+
+
+def test_bytes_that_do_not_match_the_recorded_digest_refuse_the_run(tmp_path):
+    with pytest.raises(smoke.SmokeRefused, match="do not hash to the digest"):
+        smoke.verifier_refusal(
+            smoke.product_verifier(), identity_for(tmp_path), b'{"issuer": "x"}', "0" * 64
+        )
