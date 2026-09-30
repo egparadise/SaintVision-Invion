@@ -4,7 +4,7 @@ title: "Codex 작업 현황"
 version: "1.0.234"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T09:13:57+09:00"
+updated: "2026-09-30T11:25:12+09:00"
 source_of_truth: "Git"
 active_card: "CARD-151 intranet ObjectStore and PITR rehearsal"
 active_card_status: "PR 248 review follow-up; Claude F1-F12 remediated, TLS operational U6 PASS, G-22 replication HBA blocked external"
@@ -85,6 +85,11 @@ active_card_next: "Claude re-review; continue Card 154 independent review and ca
 - reachable head `c075e669`에서 operational roundtrip 6/6와 cleanup PASS, 별도 attestation SHA·시각 결속을 확보했다. canonical S01은 storage check 1개만 PASS하고 operator/session token·CP DNS/HTTPS·inventory 사용자 값 부재로 FAIL 2/BLOCKED 6, `acceptanceAssessed=false`다.
 - TLS 전환에서 발견한 cert-dir/loopback CA/bootstrap process-argument 문제를 회귀시험과 bounded rollback으로 닫고, 진단 시 노출된 root 자격은 즉시 회전했다. G-22는 source physical replication HBA 미승인 때문에 source mutation 전 BLOCKED_EXTERNAL이며 RPO/RTO는 여전히 null이다. [[2026-09-30_00-19-37_KST_Card151_사내_Storage_PITR_Codex_구현]].
 - PR #248 보안 후속 head `0a768892`는 PITR 전송과 source PostgreSQL 자격을 각각 보호 파일 read-only mount와 컨테이너 내부 읽기로 바꿔 host argv·Docker `Config.Env` 비노출을 고정했다. PG-free 4 passed, local·remote shell syntax와 diff check는 exit 0이다.
+## 2026-09-30 Card 158 — S04-DB C1-K kernel 승인 결속 collector 검토 요청
+
+- 선행 착지 `6fc0428b`에서 S04-DB의 별도 kernel 경계 C1-K를 가장 앞의 외부 전제 없는 Codex 고난도 카드로 선택했다. 계약은 `8cf8c1ab`, collector·PG-free/실 PG 단일 파일은 `fc08a856`·`b0ff6b69`, evidence count 재계산 보강은 `26448c94`에 구현했다.
+- K1~K3는 approval→dispatch→claim→permit→execution attempt의 scope·digest·policy version·epoch·bound version·state event를 fail-closed로 대조한다. claim 직전 current policy decision ID, 실행 당시 epoch history K4, permit 공개키 provenance는 각각 독립 durable peer 부재·`NOT_REGISTERED`·`RECORDED_ONLY`로 남겨 거짓 합격을 막는다.
+- PG-free **25 passed**, Black·diff check exit 0. Claude 독립 검토 F1·F3~F8을 반영해 실 PG fixture 결속, timezone instant 비교, database-wide FORCE RLS visibility, RR/RO validator, 중복 event와 재승인 attempt 시험을 추가했고 criteria v1.0.2 `6d677d4e`에 고정했다. 공유 PG에서 전체 relation을 읽는 시험은 kernel evidence 대상 table을 명시적으로 비우는 local autouse fixture로 격리했다. 실 PG는 hosted Core exact-head 결과 대기이며 공개 계약·migration·registry status 변경 0, S04-DB `review` 유지다. [[2026-09-30_10-27-14_KST_S04-DB_C1-K_착수_Codex]], [[S04-DB_C1-K_kernel_승인_결속_Evidence_계약]].
 
 ## 2026-09-29 S05 Card114 c50 일반 suite 격리 — Claude 재확인 요청
 
