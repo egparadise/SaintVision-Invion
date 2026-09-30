@@ -319,15 +319,25 @@ run_staging_preflight() {
     # Trap cleanup on unexpected exit or interrupt during staging (R3-M3)
     trap staging_cleanup EXIT INT TERM
 
-    docker run -d         --name "$STAGING_NAME"         --label "${LABEL_SERVICE}"         --label "${LABEL_WORKLOAD}"         --label "${LABEL_NODE}"         --label "ai.saintvision.instance=preflight"         --read-only         --cap-drop ALL         --security-opt no-new-privileges         --user "${PORTAL_UID}:${PORTAL_GID}"         --tmpfs /tmp:rw,noexec,nosuid,size=64m         --tmpfs /var/cache/nginx:rw,noexec,nosuid,size=64m         --tmpfs /var/run:rw,noexec,nosuid,size=16m         --mount "type=bind,source=${CERT_FILE_ABS},target=/etc/nginx/certs/portal.crt,readonly"         --mount "type=bind,source=${KEY_FILE_ABS},target=/etc/nginx/certs/portal.key,readonly"         --mount "type=bind,source=${CA_BUNDLE_ABS},target=/etc/nginx/certs/ca-bundle.crt,readonly"         --mount "type=bind,source=${UPSTREAM_CONF_ABS},target=/etc/nginx/conf.d/upstream.conf,readonly"         "$TARGET_IMAGE"
-
-    echo "Running preflight 'nginx -t' in staging container..."
-    if ! docker exec "$STAGING_NAME" nginx -t >/dev/null 2>&1; then
-        echo "ERROR: Preflight 'nginx -t' failed in staging container. Existing container preserved; aborting." >&2
-        staging_cleanup
-        return 1
-    fi
-    echo "✔ Preflight 'nginx -t' passed."
+    docker run -d \
+        --name "$STAGING_NAME" \
+        --label "${LABEL_SERVICE}" \
+        --label "${LABEL_WORKLOAD}" \
+        --label "${LABEL_NODE}" \
+        --label "ai.saintvision.instance=preflight" \
+        --read-only \
+        --cap-drop ALL \
+        --cap-add NET_BIND_SERVICE \
+        --security-opt no-new-privileges \
+        --user "${PORTAL_UID}:${PORTAL_GID}" \
+        --tmpfs /tmp:rw,noexec,nosuid,size=64m \
+        --tmpfs /var/cache/nginx:rw,noexec,nosuid,size=64m \
+        --tmpfs /var/run:rw,noexec,nosuid,size=16m \
+        --mount "type=bind,source=${CERT_FILE_ABS},target=/etc/nginx/certs/portal.crt,readonly" \
+        --mount "type=bind,source=${KEY_FILE_ABS},target=/etc/nginx/certs/portal.key,readonly" \
+        --mount "type=bind,source=${CA_BUNDLE_ABS},target=/etc/nginx/certs/ca-bundle.crt,readonly" \
+        --mount "type=bind,source=${UPSTREAM_CONF_ABS},target=/etc/nginx/conf.d/upstream.conf,readonly" \
+        "$TARGET_IMAGE"
 
     local staging_running="false"
     for i in {1..10}; do
@@ -344,6 +354,17 @@ run_staging_preflight() {
         staging_cleanup
         return 1
     fi
+
+    echo "Running preflight 'nginx -t' in staging container..."
+    local nginx_t_out
+    if ! nginx_t_out="$(docker exec "$STAGING_NAME" nginx -t 2>&1)"; then
+        echo "ERROR: Preflight 'nginx -t' failed in staging container. Existing container preserved; aborting." >&2
+        echo "$nginx_t_out" >&2
+        docker logs "$STAGING_NAME" 2>&1 || true
+        staging_cleanup
+        return 1
+    fi
+    echo "✔ Preflight 'nginx -t' passed."
 
     # Preflight verified HTTPS probes with CA chain and hostname verification (R3-L1: strict TLS verification)
     echo "Running preflight verified HTTPS health check in staging container..."
@@ -397,8 +418,29 @@ swap_and_launch_production() {
         docker rm $stale_ids >/dev/null 2>&1 || true
     fi
 
-    echo "Launching SaintVision Intranet Portal container '$CONTAINER_NAME' ($TARGET_IMAGE)..."
-    docker run -d         --name "$CONTAINER_NAME"         --label "${LABEL_SERVICE}"         --label "${LABEL_WORKLOAD}"         --label "${LABEL_NODE}"         --label "${LABEL_INSTANCE}"         --label "ai.saintvision.role=web-portal"         --restart unless-stopped         --read-only         --cap-drop ALL         --security-opt no-new-privileges         --user "${PORTAL_UID}:${PORTAL_GID}"         --tmpfs /tmp:rw,noexec,nosuid,size=64m         --tmpfs /var/cache/nginx:rw,noexec,nosuid,size=64m         --tmpfs /var/run:rw,noexec,nosuid,size=16m         --publish "${HTTP_PORT}:80"         --publish "${HTTPS_PORT}:443"         --mount "type=bind,source=${CERT_FILE_ABS},target=/etc/nginx/certs/portal.crt,readonly"         --mount "type=bind,source=${KEY_FILE_ABS},target=/etc/nginx/certs/portal.key,readonly"         --mount "type=bind,source=${CA_BUNDLE_ABS},target=/etc/nginx/certs/ca-bundle.crt,readonly"         --mount "type=bind,source=${UPSTREAM_CONF_ABS},target=/etc/nginx/conf.d/upstream.conf,readonly"         "$TARGET_IMAGE"
+    docker run -d \
+        --name "$CONTAINER_NAME" \
+        --label "${LABEL_SERVICE}" \
+        --label "${LABEL_WORKLOAD}" \
+        --label "${LABEL_NODE}" \
+        --label "${LABEL_INSTANCE}" \
+        --label "ai.saintvision.role=web-portal" \
+        --restart unless-stopped \
+        --read-only \
+        --cap-drop ALL \
+        --cap-add NET_BIND_SERVICE \
+        --security-opt no-new-privileges \
+        --user "${PORTAL_UID}:${PORTAL_GID}" \
+        --tmpfs /tmp:rw,noexec,nosuid,size=64m \
+        --tmpfs /var/cache/nginx:rw,noexec,nosuid,size=64m \
+        --tmpfs /var/run:rw,noexec,nosuid,size=16m \
+        --publish "${HTTP_PORT}:80" \
+        --publish "${HTTPS_PORT}:443" \
+        --mount "type=bind,source=${CERT_FILE_ABS},target=/etc/nginx/certs/portal.crt,readonly" \
+        --mount "type=bind,source=${KEY_FILE_ABS},target=/etc/nginx/certs/portal.key,readonly" \
+        --mount "type=bind,source=${CA_BUNDLE_ABS},target=/etc/nginx/certs/ca-bundle.crt,readonly" \
+        --mount "type=bind,source=${UPSTREAM_CONF_ABS},target=/etc/nginx/conf.d/upstream.conf,readonly" \
+        "$TARGET_IMAGE"
 
     echo "Verifying production container status and stability..."
     local running="false"
