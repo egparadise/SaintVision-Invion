@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "0055_adapter_conformance_records",
+  "revision": "0056_kernel_cancel_audit_bridge",
   "referenceSource": "1e8baf045c5a554209aaef601ae4883b64da50a7",
   "scope": "Exact catalogue definitions and execute grants; runtime authorization tests remain required",
   "functions": {
@@ -74,6 +74,14 @@
         "inv_app"
       ],
       "kind": "tenant-bound"
+    },
+    "public.record_kernel_run_cancel(text, text, text, text, text)": {
+      "definitionSHA256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "executeRoles": [
+        "inv_kernel"
+      ],
+      "kind": "tenant-bound-cancel-audit",
+      "sourceMigrationSHA256": "d1b30a7219f151a000e83bc590d9512b0d6473797668770275faf74c22ed7e00"
     },
     "public.record_auth_denial(text, text, text, text, text, text, text, text, jsonb, text, text)": {
       "definitionSHA256": "397bfe6933220324c36678605f48e79bddb02eff0445177bb783707a60536a85",

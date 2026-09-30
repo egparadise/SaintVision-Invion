@@ -215,7 +215,14 @@ def rls_db():
 def test_real_pg_boundary_passes_and_records_kernel_denial(rls_db, tmp_path):
     observation = tool.collect(
         rls_db["owner"],
-        ("inv_app", "inv_kernel", "inv_runtime_dev", "inv_audit_writer", "inv_audit_reader"),
+        (
+            "inv_app",
+            "inv_kernel",
+            "inv_runtime_dev",
+            "inv_audit_writer",
+            "inv_audit_reader",
+            "inv_cancel_bridge_owner",
+        ),
         rls_db["tenant_a"],
     )
     violations, accepted = tool.apply_baseline(tool.evaluate(observation), tool.load_baseline())
