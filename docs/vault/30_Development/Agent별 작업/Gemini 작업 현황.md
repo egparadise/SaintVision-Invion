@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.149"
+version: "1.0.150"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-30T10:05:00+09:00"
+updated: "2026-09-30T10:30:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,9 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-30T10:05:00+09:00 (Card 156 사내망 portal 웹 배포 독립 검토 r2 Codex '수정 요청 유지' + Claude r2 '변경 요청' 전수 조치: 레지스트리 실재 Base Digest 고정(B1), 호스트 UID:GID 컨테이너 실행 방식 B 단일화 및 root:root 정적 자산 권한(B2), RFC2253 DN 정규화 self-signed 거부 및 CA:FALSE 필수(H1), 전용 0700 상태 디렉터리 원자적 격리 및 cp.sv.lan:443 엄격 fail-closed(M2), SSE/WS Host 전파 및 /v1/ keepalive(L1), ^~ /assets/ 접두사 캐시 우선순위(M1), 64-hex sha256 고유 Image ID 해석 및 실행 결속(M3), 엄격한 HTTPS 사전 프로브 및 1초 안정화 검증(M4), 변이 8종 전수 사살 33 passed 실측(H2), dev 인증서 기본 경로 일치(L3), 제어 평면 allowed_origins 인계 문서화).
+- 확인 기준: 2026-09-30T10:30:00+09:00 (Card 156 사내망 portal 웹 배포 독립 검토 r3 조치 전수 반영: PORTAL_ALLOWED_ROOT_FINGERPRINTS 필수화 및 CA 번들 분할 1-root 검증(R3-H1), PORTAL_IMAGE_DIGEST 필수화(R3-M1), PORTAL_UID=0 거부·USER 101 유지·키 소유 UID 검증(R3-M2), staging cleanup trap 및 smoke 격리(R3-M3), strict TLS curl 프로브(R3-L1), README WS 경로 정정(R3-L2), Git Bash OpenSSL 3.2.3 실제 PKI 행동 시험 12종 및 fake docker 시험 38 passed 실측(R3-H2), hosted portal-runtime-smoke CI 신설).
 
-## 2026-09-30 사내망 portal 웹 배포 비root read-only rootfs Nginx 및 동일 origin 리버스 프록시·안전 기동 검증 (Card 156, `agent/gemini/c156-intranet-portal-deploy`, PR #252)
+## 2026-09-30 사내망 portal 웹 배포 비root read-only rootfs Nginx 및 동일 origin 리버스 프록시·루트 allowlist·행동 검증 (Card 156, `agent/gemini/c156-intranet-portal-deploy`, PR #252)
 - **개요**: 사내망 포털 웹 애플리케이션(`apps/web`)을 노드2(object store 노드)에 안전하게 배포하기 위한 자산(`deploy/intranet/portal/`)에 대해 독립 검토 r2 및 코디네이터 지침을 전수 반영했다:
   1. `nginx.conf`: 동일 origin 리버스 프록시(`/v1/`, SSE `proxy_buffering off;`, 터미널 WebSocket을 업스트림 제어 평면으로 포워딩, Host `cp.sv.lan` 전파, `/v1/` keepalive 활성화), `proxy_ssl_verify on;`, `proxy_ssl_name cp.sv.lan;`, 읽기 전용 루트 파일시스템(`--read-only`), HTTPS 전용(포트 80 $\rightarrow$ 고정 도메인 `https://portal.sv.lan$request_uri` 301 리다이렉트, 포트 80 `/healthz` 로컬 평문 200 OK 예외), TLS 1.2+ 한정, HSTS(1년), 엄격한 CSP(`connect-src 'self' https://idp.sv.lan;`, `style-src 'self'`, `form-action 'self'`, script-src unsafe-inline 거부, frame-ancestors * 거부), SPA fallback, `/auth-config.js` 및 `/index.html` no-cache, `^~ /assets/` 접두사로 1년 immutable 우선 보장(M1), 확장자 누락 파일 404 응답, 로그 개인정보 보호(쿼리/리퍼러 제외, `/callback` access_log off), daemon off 중복 해소(H1).
   2. `security-headers.conf`: server 블록 및 `add_header`를 선언하는 모든 location 블록에 include하여 Nginx 1.27 헤더 상속 누락 원천 방지.
@@ -35,9 +35,9 @@ source_of_truth: "Git"
   10. **제어 평면 인계**: 제어 평면(`app.py:773-778`)의 `allowed_origins`에 `https://portal.sv.lan` 등록 필요성 문서화.
 - **담당 및 역할**: Gemini (Frontend / UI / 웹 배포 소유). Reviewer: Claude (UI·테스트 축), Codex (계약·보안 축).
 - **관측 근거 (Evidence)**:
-  - 배포 정적 및 변이 사살 시험: `pytest tests/test_intranet_portal_deploy.py` (33 passed 100%, 0.13s, H2 변이 8종 전수 사살 및 M4 주석 면역 검증 포함)
+  - 배포 통합 및 행동 검증 시험: `pytest tests/test_intranet_portal_deploy.py` (38 passed 100%, 30.61s, R3-H2 Git Bash OpenSSL 3.2.3 실제 PKI 행동 시험 12종, fake docker 비소유 보존/trap 정리, AST proxy_ssl_verify 구조적 검증 전원 통과)
   - 셸 스크립트 문법 점검: `bash -n` 4대 스크립트 오류 0건 (exit 0)
-  - 웹 빌드 및 TypeScript 점검: `npx tsc -b` (에러 0건), `npm run build` (성공, 7.82s)
+  - 웹 빌드 및 TypeScript 점검: `npx tsc -b` (에러 0건), `npm run build` (성공)
   - 프런트엔드 무결성 점검: `python tools/check_frontend_integrity.py` (92개 파일 스캔, 9대 규칙 위반 0건)
   - 계약 바인딩 점검: `python tools/check_contract_bindings.py` (55개 픽스처 전수 커버리지 PASS)
   - 라우트 커버리지 점검: `pytest tests/test_route_coverage.py` (40 passed 100%)

@@ -21,6 +21,9 @@ RUN npm run build
 # Stage 2: Hardened Non-Root Nginx Runtime
 FROM nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10 AS runner
 
+# Install curl and openssl for internal verified preflight probes (L1)
+RUN apk add --no-cache curl openssl
+
 # Configure non-root directories and temp paths for read-only rootfs compatibility
 RUN mkdir -p /tmp/client_temp \
              /tmp/proxy_temp_path \
@@ -59,6 +62,9 @@ LABEL ai.saintvision.role="web-portal"
 
 # Expose HTTP (80 -> redirect) and HTTPS (443)
 EXPOSE 80 443
+
+# Non-root default user (runtime --user overrides, M2)
+USER 101:101
 
 # Start Nginx in foreground (single source of daemon off)
 CMD ["nginx", "-g", "daemon off;"]

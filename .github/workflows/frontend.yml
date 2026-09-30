@@ -10,6 +10,8 @@ on:
       - 'apps/web/**'
       - 'contracts/**'
       - 'packages/contracts-ts/**'
+      - 'deploy/intranet/portal/**'
+      - 'tests/test_intranet_portal_deploy.py'
       - '.github/workflows/frontend.yml'
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -54,3 +56,179 @@ jobs:
           name: saintvision-web-dist
           path: apps/web/dist
           retention-days: 14
+
+  portal-runtime-smoke:
+    name: Portal Container Build & Hardened Runtime Smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build Portal Docker Image with BuildKit
+        run: |
+          DOCKER_BUILDKIT=1 docker build \
+            -f deploy/intranet/portal/Dockerfile \
+            -t saintvision-portal:test .
+
+      - name: Resolve Built Image Digest
+        id: image_info
+        run: |
+          IMAGE_ID=$(docker image inspect --format '{{.Id}}' saintvision-portal:test)
+          echo "IMAGE_ID=$IMAGE_ID" >> "$GITHUB_OUTPUT"
+          echo "Built Image ID: $IMAGE_ID"
+
+      - name: Setup Mock Upstream HTTPS Server and Test PKI
+        run: |
+          mkdir -p /tmp/portal-ci/certs /tmp/portal-ci/upstream-certs
+
+          # 1. Generate Root CA (Test Authority)
+          openssl ecparam -name prime256v1 -genkey -noout -out /tmp/portal-ci/certs/root.key
+          openssl req -new -x509 -sha256 -key /tmp/portal-ci/certs/root.key \
+            -out /tmp/portal-ci/certs/root.crt \
+            -subj "/CN=SaintVision Test Root CA" -days 7
+
+          ROOT_FP=$(openssl x509 -in /tmp/portal-ci/certs/root.crt -noout -fingerprint -sha256 | sed 's/.*=//' | tr -d ': ')
+          echo "ROOT_FP=$ROOT_FP" >> "$GITHUB_ENV"
+
+          # 2. Generate Intermediate CA
+          openssl ecparam -name prime256v1 -genkey -noout -out /tmp/portal-ci/certs/inter.key
+          openssl req -new -key /tmp/portal-ci/certs/inter.key \
+            -out /tmp/portal-ci/certs/inter.csr \
+            -subj "/CN=SaintVision Test Intermediate CA"
+          cat > /tmp/portal-ci/certs/inter.ext <<'EOF'
+          basicConstraints=critical,CA:TRUE,pathlen:0
+          keyUsage=critical,digitalSignature,keyCertSign,cRLSign
+          EOF
+          openssl x509 -req -in /tmp/portal-ci/certs/inter.csr \
+            -CA /tmp/portal-ci/certs/root.crt -CAkey /tmp/portal-ci/certs/root.key -CAcreateserial \
+            -out /tmp/portal-ci/certs/inter.crt -extfile /tmp/portal-ci/certs/inter.ext -days 7
+
+          # Bundle contains intermediate and root
+          cat /tmp/portal-ci/certs/inter.crt /tmp/portal-ci/certs/root.crt > /tmp/portal-ci/certs/ca-bundle.crt
+
+          # 3. Generate Leaf Certificate for portal.sv.lan
+          openssl ecparam -name prime256v1 -genkey -noout -out /tmp/portal-ci/certs/server-key.pem
+          chmod 0400 /tmp/portal-ci/certs/server-key.pem
+          openssl req -new -key /tmp/portal-ci/certs/server-key.pem \
+            -out /tmp/portal-ci/certs/leaf.csr \
+            -subj "/CN=portal.sv.lan"
+          cat > /tmp/portal-ci/certs/leaf.ext <<'EOF'
+          basicConstraints=critical,CA:FALSE
+          keyUsage=critical,digitalSignature,keyEncipherment
+          extendedKeyUsage=serverAuth
+          subjectAltName=DNS:portal.sv.lan
+          EOF
+          openssl x509 -req -in /tmp/portal-ci/certs/leaf.csr \
+            -CA /tmp/portal-ci/certs/inter.crt -CAkey /tmp/portal-ci/certs/inter.key -CAcreateserial \
+            -out /tmp/portal-ci/certs/leaf.crt -extfile /tmp/portal-ci/certs/leaf.ext -days 7
+
+          # Server chain contains leaf and intermediate
+          cat /tmp/portal-ci/certs/leaf.crt /tmp/portal-ci/certs/inter.crt > /tmp/portal-ci/certs/server-chain.pem
+          chmod 0600 /tmp/portal-ci/certs/server-chain.pem
+
+          # 4. Generate Upstream CP Mock Certificate for cp.sv.lan
+          openssl ecparam -name prime256v1 -genkey -noout -out /tmp/portal-ci/upstream-certs/cp.key
+          openssl req -new -key /tmp/portal-ci/upstream-certs/cp.key \
+            -out /tmp/portal-ci/upstream-certs/cp.csr \
+            -subj "/CN=cp.sv.lan"
+          cat > /tmp/portal-ci/upstream-certs/cp.ext <<'EOF'
+          basicConstraints=critical,CA:FALSE
+          keyUsage=critical,digitalSignature,keyEncipherment
+          extendedKeyUsage=serverAuth
+          subjectAltName=DNS:cp.sv.lan
+          EOF
+          openssl x509 -req -in /tmp/portal-ci/upstream-certs/cp.csr \
+            -CA /tmp/portal-ci/certs/inter.crt -CAkey /tmp/portal-ci/certs/inter.key -CAcreateserial \
+            -out /tmp/portal-ci/upstream-certs/cp.crt -extfile /tmp/portal-ci/upstream-certs/cp.ext -days 7
+
+          # 5. Start lightweight Python SSL upstream stub for cp.sv.lan
+          python3 - <<'EOF' > /tmp/portal-ci/mock_upstream.log 2>&1 &
+          import http.server, ssl, json
+
+          class Handler(http.server.BaseHTTPRequestHandler):
+              def do_GET(self):
+                  if self.path == "/v1/session":
+                      self.send_response(200)
+                      self.send_header("Content-Type", "application/json")
+                      self.end_headers()
+                      self.wfile.write(b'{"authenticated":true,"tenantId":"mock"}')
+                  else:
+                      self.send_response(200)
+                      self.end_headers()
+                      self.wfile.write(b"OK")
+              def log_message(self, format, *args):
+                  pass
+
+          httpd = http.server.HTTPServer(("127.0.0.1", 8443), Handler)
+          ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+          ctx.load_cert_chain("/tmp/portal-ci/upstream-certs/cp.crt", "/tmp/portal-ci/upstream-certs/cp.key")
+          httpd.socket = ctx.wrap_socket(httpd.socket, server_side=True)
+          httpd.serve_forever()
+          EOF
+
+          sleep 1
+
+      - name: Launch Portal Container via portal-up.sh
+        env:
+          PORTAL_IMAGE: saintvision-portal:test
+          PORTAL_IMAGE_DIGEST: ${{ steps.image_info.outputs.IMAGE_ID }}
+          PORTAL_ALLOWED_ROOT_FINGERPRINTS: ${{ env.ROOT_FP }}
+          PORTAL_CERTS_DIR: /tmp/portal-ci/certs
+          PORTAL_CERT_FILE: /tmp/portal-ci/certs/server-chain.pem
+          PORTAL_KEY_FILE: /tmp/portal-ci/certs/server-key.pem
+          PORTAL_CA_BUNDLE: /tmp/portal-ci/certs/ca-bundle.crt
+          PORTAL_UPSTREAM_CP_HOST: cp.sv.lan:443
+          PORTAL_HTTP_PORT: 8080
+          PORTAL_HTTPS_PORT: 8443
+        run: |
+          # Map cp.sv.lan to host loopback inside docker network / host
+          echo "127.0.0.1 cp.sv.lan" | sudo tee -a /etc/hosts
+          bash deploy/intranet/portal/portal-up.sh
+
+      - name: Execute Hardened Runtime Verification via curl
+        run: |
+          CA_FILE="/tmp/portal-ci/certs/ca-bundle.crt"
+
+          # 1. Plaintext HTTP port 8080 redirect to HTTPS
+          echo "Checking HTTP -> HTTPS redirect..."
+          REDIRECT_HEADER=$(curl -sI -o - http://127.0.0.1:8080/test-path | tr -d '\r')
+          echo "$REDIRECT_HEADER"
+          echo "$REDIRECT_HEADER" | grep -q "301 Moved Permanently"
+          echo "$REDIRECT_HEADER" | grep -q "Location: https://portal.sv.lan/test-path"
+
+          # 2. Plaintext HTTP port 8080 /healthz 200 OK
+          echo "Checking HTTP /healthz exception..."
+          HTTP_HEALTH=$(curl -s -o - http://127.0.0.1:8080/healthz)
+          [[ "$HTTP_HEALTH" == "OK" ]]
+
+          # 3. Verified HTTPS port 8443 /healthz with strict CA and hostname verification
+          echo "Checking HTTPS /healthz..."
+          HTTPS_HEALTH=$(curl -fsS --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/healthz)
+          [[ "$HTTPS_HEALTH" == "OK" ]]
+
+          # 4. Verified HTTPS Security Headers on /index.html
+          echo "Checking HTTPS security headers on /index.html..."
+          INDEX_HEADERS=$(curl -sI --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/index.html | tr -d '\r')
+          echo "$INDEX_HEADERS" | grep -iq "Strict-Transport-Security: max-age=31536000"
+          echo "$INDEX_HEADERS" | grep -iq "Content-Security-Policy:"
+          echo "$INDEX_HEADERS" | grep -iq "X-Content-Type-Options: nosniff"
+          echo "$INDEX_HEADERS" | grep -iq "X-Frame-Options: DENY"
+          echo "$INDEX_HEADERS" | grep -iq "Cache-Control: no-cache, no-store, must-revalidate"
+
+          # 5. Verified HTTPS /assets/ immutable caching header
+          echo "Checking HTTPS /assets/ immutable caching..."
+          ASSET_HEADERS=$(curl -sI --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/assets/test.js | tr -d '\r')
+          echo "$ASSET_HEADERS" | grep -iq "Cache-Control: public, immutable"
+
+          # 6. Container exec nginx -t verification
+          echo "Checking container nginx -t..."
+          docker exec saintvision-portal nginx -t
+
+          echo "✔ Hosted Portal Container Build & Hardened Runtime Smoke PASSED!"
+
+      - name: Teardown Portal Container via portal-down.sh
+        if: always()
+        run: |
+          bash deploy/intranet/portal/portal-down.sh || true
+

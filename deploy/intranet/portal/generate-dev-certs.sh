@@ -22,7 +22,7 @@ chmod 600 "$KEY_FILE"
 
 # Generate self-signed X.509 certificate with SAN DNS:portal.sv.lan
 openssl req -new -x509 -sha256 -key "$KEY_FILE" \
-    -subj "/C=KR/O=SaintVision/OU=IntranetPortal/CN=portal.sv.lan" \
+    -subj "//C=KR/O=SaintVision/OU=IntranetPortal/CN=portal.sv.lan" \
     -addext "subjectAltName=DNS:portal.sv.lan" \
     -days 30 \
     -out "$CERT_FILE"

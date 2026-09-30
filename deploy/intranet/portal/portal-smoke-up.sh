@@ -16,9 +16,9 @@ IMAGE_NAME="${PORTAL_IMAGE:-saintvision-portal:latest}"
 CONTAINER_NAME="saintvision-portal-smoke"
 HTTP_PORT="${PORTAL_HTTP_PORT:-8080}"
 HTTPS_PORT="${PORTAL_HTTPS_PORT:-8443}"
-PORTAL_UID="${PORTAL_UID:-101}"
-PORTAL_GID="${PORTAL_GID:-101}"
-UPSTREAM_CP_HOST="${PORTAL_UPSTREAM_CP_HOST:-127.0.0.1:8443}"
+PORTAL_UID="${PORTAL_UID:-$(id -u)}"
+PORTAL_GID="${PORTAL_GID:-$(id -g)}"
+UPSTREAM_CP_HOST="${PORTAL_UPSTREAM_CP_HOST:-cp.sv.lan:443}"
 
 # Smoke owner tuple
 LABEL_SERVICE="ai.saintvision.service=portal"
@@ -47,11 +47,16 @@ upstream control_plane {
 EOF
 chmod 644 "${UPSTREAM_CONF_DIR}/upstream.conf"
 
-# Remove existing smoke container if present
+# Remove existing smoke container if present (verifies full 4-tuple, R3-M3)
 if docker container inspect "$CONTAINER_NAME" >/dev/null 2>&1; then
+    existing_service=$(docker inspect --format '{{index .Config.Labels "ai.saintvision.service"}}' "$CONTAINER_NAME" 2>/dev/null || true)
+    existing_workload=$(docker inspect --format '{{index .Config.Labels "ai.saintvision.workload"}}' "$CONTAINER_NAME" 2>/dev/null || true)
+    existing_node=$(docker inspect --format '{{index .Config.Labels "ai.saintvision.node"}}' "$CONTAINER_NAME" 2>/dev/null || true)
     existing_instance=$(docker inspect --format '{{index .Config.Labels "ai.saintvision.instance"}}' "$CONTAINER_NAME" 2>/dev/null || true)
-    if [[ "$existing_instance" != "smoke" ]]; then
-        echo "ERROR: Container $CONTAINER_NAME exists but is not labeled instance=smoke. Aborting." >&2
+
+    if [[ "$existing_service" != "portal" || "$existing_workload" != "intranet-portal" || "$existing_node" != "node2" || "$existing_instance" != "smoke" ]]; then
+        echo "ERROR: Container '$CONTAINER_NAME' does NOT match smoke owner 4-tuple (service='$existing_service', workload='$existing_workload', node='$existing_node', instance='$existing_instance')." >&2
+        echo "Refusing to stop or remove non-matching container." >&2
         exit 1
     fi
     echo "Stopping existing smoke container..."
