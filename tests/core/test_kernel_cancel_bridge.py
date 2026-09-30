@@ -72,6 +72,17 @@ def test_real_pg_suite_registers_the_standalone_business_fixture_chain():
         assert fixture_import in source
 
 
+def test_public_terminal_mismatch_fixture_is_a_valid_terminal_database_row():
+    source = REAL_PG.read_text(encoding="utf-8")
+    terminal_test = source.split(
+        "def test_public_terminal_mismatch_rolls_back_kernel_and_ledger", 1
+    )[1].split("def test_execute_revoke", 1)[0]
+    assert "state='failed'" in terminal_test
+    assert "termination_reason='unrecoverable_error'" in terminal_test
+    assert "ended_at=clock_timestamp()" in terminal_test
+    assert 'public[0] == "failed"' in terminal_test
+
+
 def test_mapped_run_uses_the_closed_named_argument_surface(monkeypatch):
     monkeypatch.setattr("inv.business_cancel.new_id", lambda prefix: "aud_" + "A" * 26)
     conn = Connection([{"mapped": 1}, {"recorded": True}])

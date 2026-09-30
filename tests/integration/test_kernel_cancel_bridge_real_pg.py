@@ -355,7 +355,10 @@ def test_public_terminal_mismatch_rolls_back_kernel_and_ledger(business):
     a = business
     with psycopg.connect(a.e.owner) as conn:
         conn.execute(
-            "UPDATE public.runs SET state='succeeded' WHERE tenant_id=%s AND run_id=%s",
+            """UPDATE public.runs
+                  SET state='failed', termination_reason='unrecoverable_error',
+                      ended_at=clock_timestamp()
+                WHERE tenant_id=%s AND run_id=%s""",
             (a.e.tenant, a.run["runId"]),
         )
     response = a.http.post(
@@ -364,7 +367,7 @@ def test_public_terminal_mismatch_rolls_back_kernel_and_ledger(business):
     assert response.status_code == 503, response.text
     assert response.json()["code"] == "SYS-0001"
     kernel, public, audit, ledger = _facts(a)
-    assert kernel[0] != "cancelled" and public[0] == "succeeded"
+    assert kernel[0] != "cancelled" and public[0] == "failed"
     assert audit == [] and ledger == []
 
 
