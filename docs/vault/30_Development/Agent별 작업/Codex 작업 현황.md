@@ -1,14 +1,29 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.226"
+version: "1.0.227"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T12:56:39+09:00"
+updated: "2026-09-30T13:52:17+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-30 CARD-160 S04-DB core cancel 제품 경로 결속 설계
+
+- CARD-159 승인 head `c9c1d836`의 자연스러운 후속으로, 외부 장비 없이 닫을 수
+  있는 core 취소 producer의 제품 호출 경로 공백을 선택했다.
+- 정본 public route는 kernel에 유지하고 JSON 계약 변경 0으로 결정했다. 같은 URL을
+  business app에 중복 등록하거나 localhost HTTP/별도 transaction으로 core를
+  호출하는 방식은 resource·shard·audit 원자성을 깨므로 기각했다.
+- business-mapped run만 kernel transaction 안의 최소권한 SECURITY DEFINER
+  primitive로 public 상태와 exact audit를 함께 갱신한다. actor는 인증 subject의
+  현재 user mapping에서 파생하고, normal·shard·replay·rollback 시험을 승인 조건으로
+  고정했다. migration 번호 배정 전 docs-only이며 S04-DB `review`와
+  `RECORDED_ONLY`를 유지한다.
+  [[S04-DB_core_cancel_제품경로_결속_설계]],
+  [[2026-09-30_13-52-17_KST_S04-DB_core_cancel_제품경로_결속_설계_Codex]].
 
 ## 2026-09-30 CARD-159 S04-DB C1 core 취소 이력 producer — Claude 검토 요청
 
