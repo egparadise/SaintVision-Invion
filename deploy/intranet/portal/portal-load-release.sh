@@ -167,24 +167,30 @@ for k, val in data.items():
             if k == "schemaVersion":
                 sys.exit(f"ERROR: Unsupported schemaVersion: {val} (expected {prop['enum']})")
             sys.exit(f"ERROR: Unsupported {k}: '{val}' (expected one of {prop['enum']})")
-        if "pattern" in prop and not re.match(prop["pattern"], val):
+        if "pattern" in prop and not re.fullmatch(prop["pattern"], val):
             sys.exit(f"ERROR: Field '{k}' value '{val}' does not match schema pattern {prop['pattern']}")
         if prop.get("format") == "date-time":
             dt_re = r"^\d{4}-\d{2}-\d{2}[Tt]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:[Zz]|[+-]\d{2}:\d{2})$"
-            if not re.match(dt_re, val):
+            if not re.fullmatch(dt_re, val):
                 sys.exit(f"ERROR: Invalid date-time format for {k}: '{val}' (expected RFC 3339 / ISO 8601)")
             try:
                 iso_clean = val.replace("Z", "+00:00").replace("z", "+00:00")
                 datetime.fromisoformat(iso_clean)
             except Exception as e:
                 sys.exit(f"ERROR: Failed to parse date-time in {k}: '{val}' ({e})")
+        if any(c in val for c in ("\r", "\n", "\0")):
+            sys.exit(f"ERROR: Field '{k}' value contains forbidden newline or control character (fail-closed).")
 
-# Emit exactly 5 verified values line-by-line (NO SHELL CODE, NO EVAL!)
-print(data["imageId"])
-print(data["tarSha256"])
-print(data["codeSha"])
-print(data["buildRunId"])
-print(data["buildTimestamp"])
+# Emit exactly 5 verified values separated by NUL (\x00) bytes (NO NEWLINE AMBIGUITY, NO EVAL!)
+items = [
+    data["imageId"].encode("utf-8"),
+    data["tarSha256"].encode("utf-8"),
+    data["codeSha"].encode("utf-8"),
+    data["buildRunId"].encode("utf-8"),
+    data["buildTimestamp"].encode("utf-8"),
+    b"",
+]
+sys.stdout.buffer.write(b"\x00".join(items))
 PYEOF
 then
     echo "ERROR: Release evidence schema validation failed (fail-closed):" >&2
@@ -194,20 +200,18 @@ then
 fi
 
 {
-    read -r EXP_IMAGE_ID
-    read -r EXP_TAR_SHA256
-    read -r EXP_CODE_SHA
-    read -r EXP_BUILD_RUN_ID
-    read -r EXP_BUILD_TIMESTAMP
+    IFS= read -r -d '' EXP_IMAGE_ID
+    IFS= read -r -d '' EXP_TAR_SHA256
+    IFS= read -r -d '' EXP_CODE_SHA
+    IFS= read -r -d '' EXP_BUILD_RUN_ID
+    IFS= read -r -d '' EXP_BUILD_TIMESTAMP
 } < "$TMP_PARSED"
 rm -f "$TMP_PARSED"
 
-# Strip potential carriage returns from Windows environments
-EXP_IMAGE_ID="${EXP_IMAGE_ID%$'\r'}"
-EXP_TAR_SHA256="${EXP_TAR_SHA256%$'\r'}"
-EXP_CODE_SHA="${EXP_CODE_SHA%$'\r'}"
-EXP_BUILD_RUN_ID="${EXP_BUILD_RUN_ID%$'\r'}"
-EXP_BUILD_TIMESTAMP="${EXP_BUILD_TIMESTAMP%$'\r'}"
+if [[ -z "$EXP_IMAGE_ID" || -z "$EXP_TAR_SHA256" || -z "$EXP_CODE_SHA" || -z "$EXP_BUILD_RUN_ID" || -z "$EXP_BUILD_TIMESTAMP" ]]; then
+    echo "ERROR: Failed to extract all required fields from release evidence (fail-closed)." >&2
+    exit 1
+fi
 
 echo "✔ Release evidence schema validated successfully."
 echo "  Sealed Image ID:   $EXP_IMAGE_ID"

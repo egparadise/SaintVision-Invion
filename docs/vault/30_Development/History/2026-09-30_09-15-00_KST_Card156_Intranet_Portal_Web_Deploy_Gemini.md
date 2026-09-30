@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-GEMINI-CARD156-001"
 title: "History: Card 156 사내망 portal 웹 배포 자산 및 비root read-only rootfs Nginx·안전 기동 검증"
-version: "2.2.0"
+version: "2.3.0"
 status: "review"
 author: "Gemini"
-updated: "2026-09-30T14:26:00+09:00"
+updated: "2026-09-30T15:19:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -16,6 +16,20 @@ source_of_truth: "Git"
 - **작업 브랜치**: `agent/gemini/c156-intranet-portal-deploy` (Base: `origin/integration/all-agents-unified`, PR #247 최신 커밋 `2f93cbba` 병합)
 - **배치 대상 도메인**: `portal.sv.lan`
 - **배치 대상 노드**: 노드2 (object store 노드, Docker 지원)
+- **독립 검토 r8 조치 (Codex 보안·계약 축 + Claude UI·운영 축 '수정 요청' 및 권고 전수 반영)**:
+  1. **Codex r8 차단 F1 [고/보안] terminal newline 우회 원천 차단 및 NUL 구분 1:1 수신 구조화**:
+     - `portal-load-release.sh`: 모든 `pattern` 및 `date-time` 정규식 매칭을 `re.match`에서 `re.fullmatch`로 전면 교체하여 문자열 끝 개행(`\n`, `\r\n`) 통과 취약점 원천 해소.
+     - 모든 문자열 필드 대상 제어 문자 및 개행(`\r`, `\n`, `\0`) 존재 시 즉각 fail-closed 거부 가드 추가.
+     - Python $\rightarrow$ Bash 값 전달 방식을 개행 구분 대신 NUL(`\x00`) 바이트 스트림(`sys.stdout.buffer.write`) 및 `IFS= read -r -d ''`로 재작성하여 개행 삽입으로 인한 레코드 경계 오염 원천 배제.
+     - 필수 5대 필드 빈 값 검증 가드 추가.
+     - 행위 시험 2종 완비:
+       - `test_behavioral_load_release_rejects_terminal_newline_in_schema`: 올바른 tar digest 및 Docker stub이 주어지고 `--verify-only`가 지정되더라도 `buildRunId` 및 `buildTimestamp` 끝 `\n`/`\r\n` 주입 시 schema 단계에서 즉각 실패(exit 1) 및 `schema validated successfully` 미출력 실측.
+       - `test_behavioral_load_release_rejects_shell_injection_payloads`: 올바른 tar digest 결속 및 terminal newline(`safe\n`, `safe\r\n`, `\nsafe`) 추가, schema 거부 실패 메시지 단언.
+  2. **Claude r8 권고 R8-L1 [하/보존 정밀] Stale cleanup unanchored 백업 컨테이너 가지치기 실측**:
+     - `test_behavioral_stale_cleanup_retains_recent_backup_and_prunes_older`: `-backup-`을 포함하지만 anchored 정규식에 걸리지 않는 외래 컨테이너(`saintvision-portal-other-service-backup-999`)를 fixture에 추가하고 정상 가지치기(`Pruning stale container...`, `rm id_other_backup`) 실측.
+  3. **Claude r8 권고 R8-L2 [하/검증 정합] Injection 시험 스키마 실패 사유 단언**:
+     - `test_behavioral_load_release_rejects_shell_injection_payloads`에서 tar SHA 일치 fixture를 사용하여 후속 tar 단계가 아닌 schema 검증 단계에서 정확히 fail-closed 거부됨을 단언.
+
 - **독립 검토 r7 조치 (Codex 계약·보안 축 + Claude UI·운영 축 '변경 요청' 전수 반영)**:
   1. **Codex r7 차단 F1 [심각/보안] portal-load-release.sh eval 완전 제거 및 4대 셸 인젝션 페이로드 fail-closed 실측**:
      - `portal-load-release.sh`: `eval` 구문 전면 제거. 검증된 5대 필드(`imageId`, `tarSha256`, `codeSha`, `buildRunId`, `buildTimestamp`)를 Python이 개행 구분 라인 단위로 임시 파일에 출력하고, 셸 `read -r`로 안전하게 1:1 수신.

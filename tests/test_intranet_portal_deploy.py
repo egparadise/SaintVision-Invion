@@ -7,6 +7,7 @@ PKI / Fake Docker integration tests.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -2134,6 +2135,8 @@ elif [[ "$cmd" == "inspect" ]]; then
             echo "/saintvision-portal-backup-abcdef"
         elif [[ "$target" == "id_unrelated" ]]; then
             echo "/saintvision-portal-unrelated"
+        elif [[ "$target" == "id_other_backup" ]]; then
+            echo "/saintvision-portal-other-service-backup-999"
         else
             echo "/saintvision-portal-backup-123456"
         fi
@@ -2142,8 +2145,8 @@ elif [[ "$cmd" == "inspect" ]]; then
     fi
     exit 0
 elif [[ "$cmd" == "ps" && "$*" == *"-aq"* ]]; then
-    # Return 3 exited containers: active backup (id_active), older backup (id_older), unrelated (id_unrelated)
-    echo -e "id_active\\nid_older\\nid_unrelated"
+    # Return 4 exited containers: active backup (id_active), older backup (id_older), unrelated (id_unrelated), unanchored backup (id_other_backup)
+    echo -e "id_active\\nid_older\\nid_unrelated\\nid_other_backup"
     exit 0
 elif [[ "$cmd" == "exec" ]]; then
     exit 0
@@ -2172,10 +2175,12 @@ exit 0
     assert "Preserving recent backup container 'saintvision-portal-backup-" in res.stderr
     assert "Pruning stale container 'saintvision-portal-backup-abcdef' (id_older)..." in res.stderr
     assert "Pruning stale container 'saintvision-portal-unrelated' (id_unrelated)..." in res.stderr
+    assert "Pruning stale container 'saintvision-portal-other-service-backup-999' (id_other_backup)..." in res.stderr
 
     calls = calls_log.read_text(encoding="utf-8").splitlines()
     assert any("rm id_older" in c for c in calls)
     assert any("rm id_unrelated" in c for c in calls)
+    assert any("rm id_other_backup" in c for c in calls)
     # Active backup must NEVER be pruned (Claude r7 M1)
     assert not any("rm id_active" in c for c in calls)
     shutil.rmtree(temp_dir, ignore_errors=True)
@@ -2256,13 +2261,15 @@ exit 0
 
 
 def test_behavioral_load_release_rejects_shell_injection_payloads():
-    """(Codex r7 F1) Verify that quote, newline, command substitution, and semicolon payloads fail-closed with 0 side effects."""
+    """(Codex r7 F1 & Claude r8 L2) Verify that quote, newline, command substitution, and semicolon payloads fail-closed at schema validation with 0 side effects."""
     bash_path = get_git_bash()
     script_posix = to_posix_path(PORTAL_LOAD_RELEASE_SH)
     temp_dir = Path(tempfile.mkdtemp(prefix="sv_rel_inject_"))
     ev_file = temp_dir / "evidence.json"
     tar_file = temp_dir / "image.tar"
-    tar_file.write_bytes(b"dummy tar content")
+    tar_bytes = b"dummy tar content for injection test"
+    tar_file.write_bytes(tar_bytes)
+    actual_tar_sha256 = hashlib.sha256(tar_bytes).hexdigest()
     marker_file = temp_dir / "injected_marker.txt"
 
     payloads = [
@@ -2270,6 +2277,9 @@ def test_behavioral_load_release_rejects_shell_injection_payloads():
         "run123; touch " + to_posix_path(marker_file),
         "run$(touch " + to_posix_path(marker_file) + ")",
         "run123\ntouch " + to_posix_path(marker_file),
+        "safe\n",
+        "safe\r\n",
+        "\nsafe",
     ]
 
     for p in payloads:
@@ -2281,7 +2291,7 @@ def test_behavioral_load_release_rejects_shell_injection_payloads():
             "schemaVersion": "1.0.0",
             "codeSha": "a" * 40,
             "imageId": "sha256:" + "b" * 64,
-            "tarSha256": "c" * 64,
+            "tarSha256": actual_tar_sha256,
             "buildRunId": p,
             "buildTimestamp": "2026-09-30T04:00:00Z",
         }
@@ -2290,13 +2300,15 @@ def test_behavioral_load_release_rejects_shell_injection_payloads():
                              capture_output=True, text=True, encoding="utf-8")
         assert res.returncode == 1, f"Expected injection payload '{p}' to fail closed, got rc {res.returncode}"
         assert not marker_file.exists(), f"Security vulnerability: marker file created by injection payload: {p}"
+        assert "Release evidence schema validation failed (fail-closed):" in res.stderr
+        assert "schema validated successfully" not in res.stdout
 
         # 2. Inject into unknown field (such as removed imageTag)
         ev_data2 = {
             "schemaVersion": "1.0.0",
             "codeSha": "a" * 40,
             "imageId": "sha256:" + "b" * 64,
-            "tarSha256": "c" * 64,
+            "tarSha256": actual_tar_sha256,
             "buildRunId": "run123",
             "buildTimestamp": "2026-09-30T04:00:00Z",
             "imageTag": p,
@@ -2307,6 +2319,76 @@ def test_behavioral_load_release_rejects_shell_injection_payloads():
         assert res2.returncode == 1, f"Expected imageTag payload '{p}' to fail closed, got rc {res2.returncode}"
         assert not marker_file.exists(), f"Security vulnerability: marker file created by imageTag payload: {p}"
         assert "Unknown field(s) in Evidence JSON" in res2.stderr
+        assert "Release evidence schema validation failed (fail-closed):" in res2.stderr
+        assert "schema validated successfully" not in res2.stdout
+
+    shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_behavioral_load_release_rejects_terminal_newline_in_schema():
+    """(Codex r8 F1) Verify that terminal \\n and \\r\\n in buildRunId and buildTimestamp fail-closed at schema validation step, even with matching tar digest and stubbed docker."""
+    bash_path = get_git_bash()
+    script_posix = to_posix_path(PORTAL_LOAD_RELEASE_SH)
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_rel_newline_"))
+    bin_dir = temp_dir / "bin"
+    bin_dir.mkdir(parents=True, exist_ok=True)
+    ev_file = temp_dir / "evidence.json"
+    tar_file = temp_dir / "image.tar"
+
+    tar_bytes = b"sample valid tar content"
+    tar_file.write_bytes(tar_bytes)
+    actual_tar_sha256 = hashlib.sha256(tar_bytes).hexdigest()
+    expected_image_id = "sha256:" + "d" * 64
+
+    # Stub docker load & inspect that would succeed if schema was bypassed
+    docker_stub = f"""#!/usr/bin/env bash
+if [[ "$1" == "load" ]]; then
+    echo "Loaded image ID: {expected_image_id}"
+    exit 0
+elif [[ "$1" == "image" && "$2" == "inspect" ]]; then
+    echo "{expected_image_id}"
+    exit 0
+fi
+exit 0
+"""
+    (bin_dir / "docker").write_text(docker_stub.replace("\r\n", "\n"), encoding="utf-8")
+    os.chmod(bin_dir / "docker", 0o755)
+
+    newline_cases = [
+        ("buildRunId", "safe\n"),
+        ("buildRunId", "safe\r\n"),
+        ("buildRunId", "\nsafe"),
+        ("buildTimestamp", "2026-09-30T04:00:00Z\n"),
+        ("buildTimestamp", "2026-09-30T04:00:00Z\r\n"),
+        ("buildTimestamp", "\n2026-09-30T04:00:00Z"),
+    ]
+
+    for field_name, payload in newline_cases:
+        ev_data = {
+            "schemaVersion": "1.0.0",
+            "codeSha": "a" * 40,
+            "imageId": expected_image_id,
+            "tarSha256": actual_tar_sha256,
+            "buildRunId": "run123",
+            "buildTimestamp": "2026-09-30T04:00:00Z",
+        }
+        ev_data[field_name] = payload
+        ev_file.write_text(json.dumps(ev_data), encoding="utf-8")
+
+        test_sh = f"""
+        export PATH="{to_posix_path(bin_dir)}:$PATH"
+        if [[ "$(command -v docker)" != "{to_posix_path(bin_dir)}/docker" ]]; then
+            echo "ERROR: docker resolved to $(command -v docker) instead of stub" >&2
+            exit 99
+        fi
+        bash "{script_posix}" --evidence "{to_posix_path(ev_file)}" --tar "{to_posix_path(tar_file)}" --verify-only
+        """
+        res = subprocess.run([bash_path, "-c", test_sh], capture_output=True, text=True, encoding="utf-8")
+        assert res.returncode == 1, f"Expected terminal newline in {field_name} ('{repr(payload)}') to fail closed, got rc {res.returncode}"
+        assert "Release evidence schema validation failed (fail-closed):" in res.stderr
+        assert "schema validated successfully" not in res.stdout
+        assert "Release verification and image load succeeded" not in res.stdout
+        assert ("does not match schema pattern" in res.stderr or "contains forbidden newline" in res.stderr or "Invalid date-time format" in res.stderr)
 
     shutil.rmtree(temp_dir, ignore_errors=True)
 
