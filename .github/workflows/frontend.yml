@@ -301,15 +301,12 @@ jobs:
           echo "Verifying server rejection of legacy TLS 1.1 with SECLEVEL=0 client..."
           TLS11_OUT=$(echo "Q" | openssl s_client -connect 127.0.0.1:8443 -servername portal.sv.lan -CAfile "$CA_FILE" -tls1_1 -cipher 'DEFAULT:@SECLEVEL=0' 2>&1 || true)
           echo "$TLS11_OUT"
-          if echo "$TLS11_OUT" | grep -iq "CONNECTED" && echo "$TLS11_OUT" | grep -iq "Protocol  : TLSv1.1"; then
-              echo "ERROR: Server unexpectedly negotiated legacy TLS 1.1!" >&2
+          if echo "$TLS11_OUT" | grep -iq "Cipher is (NONE)" && echo "$TLS11_OUT" | grep -iqE "alert protocol version|alert number 70|handshake failure"; then
+              echo "✔ Server actively rejected legacy TLS 1.1 with protocol version alert (fail-closed)."
+          else
+              echo "ERROR: Server did not reject legacy TLS 1.1 with protocol version alert!" >&2
               exit 1
           fi
-          if ! echo "$TLS11_OUT" | grep -iqE "alert|handshake failure|protocol version|wrong version|error"; then
-              echo "ERROR: Expected server rejection alert or error for TLS 1.1, got: $TLS11_OUT" >&2
-              exit 1
-          fi
-          echo "✔ Server actively rejected legacy TLS 1.1 (fail-closed)."
 
           echo "✔ Hosted Portal Container Build & Hardened Runtime Smoke PASSED!"
 
