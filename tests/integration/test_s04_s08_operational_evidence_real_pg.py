@@ -81,7 +81,13 @@ def test_real_pg_c1_uses_attempt_time_latest_approval_digest_and_cancel_history(
             },
         )
 
-        def run_case(name: str, *, approval: str | None, cancel: bool = False, later_reject=False):
+        def run_case(
+            name: str,
+            *,
+            approval: str | None,
+            cancel_action: str | None = None,
+            later_reject=False,
+        ):
             run_id = new_id("run")
             connection.execute(
                 text(
@@ -135,11 +141,11 @@ def test_real_pg_c1_uses_attempt_time_latest_approval_digest_and_cancel_history(
                         "expires": now + dt.timedelta(minutes=5),
                     },
                 )
-            if cancel:
+            if cancel_action is not None:
                 connection.execute(
                     text(
                         "INSERT INTO audit_events(event_id,occurred_at,tenant_id,actor_type,actor_id,action,outcome,target_type,target_id,detail) "
-                        "VALUES (:event,:occurred,:tenant,'user',:user,'run.cancel.requested','allow','run',:run,'{}'::jsonb)"
+                        "VALUES (:event,:occurred,:tenant,'user',:user,:action,'allow','run',:run,'{}'::jsonb)"
                     ),
                     {
                         "event": new_id("audit_event"),
@@ -147,6 +153,7 @@ def test_real_pg_c1_uses_attempt_time_latest_approval_digest_and_cancel_history(
                         "tenant": tenant,
                         "user": user,
                         "run": run_id,
+                        "action": cancel_action,
                     },
                 )
             connection.execute(
@@ -167,12 +174,17 @@ def test_real_pg_c1_uses_attempt_time_latest_approval_digest_and_cancel_history(
         run_case("missing", approval=None)
         run_case("expired", approval="expired")
         run_case("mismatch", approval="mismatch")
-        run_case("cancelled", approval="valid", cancel=True)
+        run_case("cancelled", approval="valid", cancel_action="run.cancel.requested")
+        run_case(
+            "noncanonical-cancel-action",
+            approval="valid",
+            cancel_action="run.cancel.denied",
+        )
 
     measured = collector.collect_database(database_url)
     assert measured["c1"] == {
-        "attempt_count": 6,
-        "valid_count": 2,
+        "attempt_count": 7,
+        "valid_count": 3,
         "violation_count": 4,
         "no_approved_before_attempt": 1,
         "approval_expired": 1,

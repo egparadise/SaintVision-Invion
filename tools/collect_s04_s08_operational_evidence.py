@@ -53,9 +53,9 @@ from tools.operational_evidence import (  # noqa: E402
 from tools.operational_evidence import overall_verdict as _overall_verdict  # noqa: E402
 
 
-SCHEMA_VERSION = "s04-s08-operational-evidence:1"
-CRITERIA_VERSION = "1.1.1"
-CRITERIA_HEAD = "90a2051d450f5b52744129035bead25c50551217"
+SCHEMA_VERSION = "s04-s08-operational-evidence:1.1"
+CRITERIA_VERSION = "1.3.1"
+CRITERIA_HEAD = "1efda4ed328599b8ca4165c6f5aaf7fbe21ca303"
 CRITERIA_PATH = "docs/vault/30_Development/S04-DB_S08-DB_운영_판정_기준.md"
 DEFAULT_OUT_DIR = REPO_ROOT / "docs/vault/30_Development/Evidence/s04-s08-operational"
 
@@ -82,7 +82,9 @@ C1_REASONS = frozenset(
         "cancelled_before_attempt",
     }
 )
-CANCEL_HISTORY_SOURCE = "absent"
+CANCEL_HISTORY_ACTION = "run.cancel.requested"
+CANCEL_HISTORY_SOURCE = f"public.audit_events:{CANCEL_HISTORY_ACTION}"
+CANCEL_HISTORY_BINDING_STATUS = "RECORDED_ONLY"
 
 
 # C1 is intentionally public/core-only.  ``inv.approval_requests`` and every
@@ -103,7 +105,7 @@ WITH evaluated AS (
                   WHERE ae.tenant_id = ra.tenant_id
                     AND ae.target_type = 'run'
                     AND ae.target_id = ra.run_id
-                    AND ae.action LIKE 'run.cancel%'
+                    AND ae.action = 'run.cancel.requested'
                     AND ae.occurred_at <= ra.started_at
              ) THEN 'cancelled_before_attempt'
              ELSE NULL
@@ -170,6 +172,7 @@ def evaluate_c1_summary(summary: dict[str, int]) -> dict[str, Any]:
         "violationCount": violation_count,
         "violationsByReason": reasons,
         "cancelHistorySource": CANCEL_HISTORY_SOURCE,
+        "cancelHistoryBindingStatus": CANCEL_HISTORY_BINDING_STATUS,
     }
     if attempt_count == 0:
         return {
@@ -184,10 +187,10 @@ def evaluate_c1_summary(summary: dict[str, int]) -> dict[str, Any]:
             "metrics": metrics,
         }
     return {
-        "status": "NOT_OBSERVED",
+        "status": "RECORDED_ONLY",
         "reason": (
-            "approval and digest predicates were clean, but core has no canonical "
-            "cancel-history producer; complete C1 safety was not observed"
+            "approval, digest and exact cancel-audit predicates were clean, but the "
+            "producer deployment identity and observation window are not bound"
         ),
         "metrics": metrics,
     }
@@ -399,9 +402,11 @@ def validate_evidence(evidence: dict[str, Any]) -> None:
         raise ValueError("C1-K must remain explicitly excluded")
     o3 = (evidence.get("observations") or {}).get("O3") or {}
     if (o3.get("metrics") or {}).get("cancelHistorySource") != CANCEL_HISTORY_SOURCE:
-        raise ValueError("O3 must disclose the absent core cancel-history source")
+        raise ValueError("O3 must disclose the exact core cancel-history source")
+    if (o3.get("metrics") or {}).get("cancelHistoryBindingStatus") != CANCEL_HISTORY_BINDING_STATUS:
+        raise ValueError("O3 must disclose that the producer deployment is not bound")
     if o3.get("status") == "MEASURED_PASS":
-        raise ValueError("O3 cannot pass without a canonical core cancel-history producer")
+        raise ValueError("O3 cannot pass without producer deployment and window binding")
 
 
 def render_markdown(evidence: dict[str, Any]) -> str:
