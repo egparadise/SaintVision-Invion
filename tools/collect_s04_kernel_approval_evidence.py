@@ -43,9 +43,9 @@ from tools.operational_evidence import (  # noqa: E402
 from tools.operational_evidence import overall_verdict as _overall_verdict  # noqa: E402
 
 
-SCHEMA_VERSION = "s04-kernel-approval-evidence:1"
-CRITERIA_VERSION = "1.0.1"
-CRITERIA_HEAD = "8a506612826fe3a63a2e0c71a88bd3563b3f89c3"
+SCHEMA_VERSION = "s04-kernel-approval-evidence:1.1"
+CRITERIA_VERSION = "1.0.2"
+CRITERIA_HEAD = "6d677d4eb7d1bc166f1b94b7f390c93d0fbffe54"
 CRITERIA_PATH = "docs/vault/30_Development/S04-DB_C1-K_kernel_승인_결속_Evidence_계약.md"
 DEFAULT_OUT_DIR = REPO_ROOT / "docs/vault/30_Development/Evidence/s04-kernel-approval"
 REQUIRED_OBSERVATIONS = ("K1", "K2", "K3", "K4")
@@ -399,9 +399,19 @@ def _k2_reason(row: dict[str, Any]) -> str | None:
     if not isinstance(claim, dict) or set(claim) != CLAIM_KEYS:
         return "invalid_claim_shape"
     try:
-        if claim != _wire_claim(row):
+        expected_claim = _wire_claim(row)
+        claim_without_deadline = {key: value for key, value in claim.items() if key != "notAfter"}
+        expected_without_deadline = {
+            key: value for key, value in expected_claim.items() if key != "notAfter"
+        }
+        claim_not_after = parse_timestamp(claim.get("notAfter"))
+        expected_not_after = parse_timestamp(expected_claim["notAfter"])
+        if (
+            claim_without_deadline != expected_without_deadline
+            or claim_not_after != expected_not_after
+        ):
             return "claim_payload_mismatch"
-    except ValueError:
+    except (AttributeError, TypeError, ValueError):
         return "claim_payload_mismatch"
     try:
         issued = parse_timestamp(payload.get("issuedAt"))
@@ -515,9 +525,15 @@ def evaluate_k3(rows: list[dict[str, Any]]) -> dict[str, Any]:
                 (
                     "scheduled_event_mismatch",
                     lambda: type(bound) is not int
+                    or type(row.get("execution_attempt")) is not int
                     or not isinstance(events, list)
                     or sum(
-                        _event_matches(event, state="scheduled", version=bound + 1, attempt=0)
+                        _event_matches(
+                            event,
+                            state="scheduled",
+                            version=bound + 1,
+                            attempt=row["execution_attempt"] - 1,
+                        )
                         for event in events
                     )
                     != 1,
@@ -551,8 +567,29 @@ def collect_database(dsn: str) -> dict[str, Any]:
 
     with psycopg.connect(normalise_dsn(dsn), row_factory=dict_row) as conn:
         conn.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY")
+        # A tenant-filtered snapshot is not valid database-wide evidence.
+        # PostgreSQL raises here on FORCE RLS tables unless the observer can
+        # bypass every policy, so a partial/empty view cannot become evidence.
+        conn.execute("SET LOCAL row_security = off")
         conn.execute("SET LOCAL statement_timeout = '30s'")
         identity = _database_identity(conn)
+        observer = conn.execute(
+            """
+            SELECT current_setting('row_security') AS row_security,
+                   r.rolsuper,
+                   r.rolbypassrls
+              FROM pg_roles r
+             WHERE r.rolname = current_user
+            """
+        ).fetchone()
+        if (
+            not observer
+            or observer["row_security"] != "off"
+            or not (observer["rolsuper"] or observer["rolbypassrls"])
+        ):
+            raise PermissionError("observer cannot prove a complete FORCE RLS snapshot")
+        identity["rowSecurity"] = "off"
+        identity["observerCanBypassRls"] = True
         started_at = conn.execute("SELECT clock_timestamp() AS value").fetchone()["value"]
         k1_rows = [dict(row) for row in conn.execute(K1_SQL).fetchall()]
         k2_rows = [dict(row) for row in conn.execute(K2_SQL).fetchall()]
@@ -657,6 +694,13 @@ def validate_evidence(evidence: dict[str, Any]) -> None:
         "rawErrorsRecorded": False,
     }:
         raise ValueError("redaction declaration mismatch")
+    database = (evidence.get("source") or {}).get("database") or {}
+    if database.get("transactionIsolation") != "repeatable read":
+        raise ValueError("source transaction must be repeatable read")
+    if database.get("transactionReadOnly") != "on":
+        raise ValueError("source transaction must be read only")
+    if database.get("rowSecurity") != "off" or database.get("observerCanBypassRls") is not True:
+        raise ValueError("source observer must prove complete FORCE RLS visibility")
     for key, noun, reasons in (
         ("K1", "claim", K1_REASONS),
         ("K2", "delivery", K2_REASONS),
@@ -685,7 +729,7 @@ def validate_evidence(evidence: dict[str, Any]) -> None:
         if (
             any(type(value) is not int or value < 0 for value in counts)
             or not isinstance(by_reason, dict)
-            or tuple(by_reason) != reasons
+            or set(by_reason) != set(reasons)
             or any(type(value) is not int or value < 0 for value in by_reason.values())
         ):
             raise ValueError(f"{key} count shape mismatch")

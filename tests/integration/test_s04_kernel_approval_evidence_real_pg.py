@@ -8,6 +8,7 @@ import pytest
 from inv.dispatch import DeliveryQueue
 
 from tools import collect_s04_kernel_approval_evidence as collector
+from test_approvals import approval
 from test_dispatch_queue import queued
 from test_tool_admission import gateway
 

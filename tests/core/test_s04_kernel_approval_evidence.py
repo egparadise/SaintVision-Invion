@@ -114,6 +114,8 @@ def _database(k1=None, k2=None, k3=None):
             "migrationHead": "0055_example",
             "transactionIsolation": "repeatable read",
             "transactionReadOnly": "on",
+            "rowSecurity": "off",
+            "observerCanBypassRls": True,
             "snapshotSha256": "c" * 64,
             "observedAt": "2026-09-30T01:00:00Z",
         },
@@ -219,6 +221,14 @@ def test_k2_rejects_changed_claim_and_naive_or_late_issued_at():
     )
 
 
+def test_k2_compares_not_after_as_an_instant_across_timezones():
+    equivalent = _payload_mutation(
+        _k2_row(),
+        lambda value: value["claim"].update(notAfter="2026-09-30T10:02:00+09:00"),
+    )
+    assert collector.evaluate_k2([equivalent])["status"] == "MEASURED_PASS"
+
+
 @pytest.mark.parametrize(
     ("change", "reason"),
     [
@@ -241,6 +251,28 @@ def test_k3_rejects_each_execution_chain_mutation(change, reason):
     assert result["status"] == "MEASURED_FAIL"
     assert result["metrics"]["violationsByReason"][reason] == 1
     assert sum(result["metrics"]["violationsByReason"].values()) == 1
+
+
+@pytest.mark.parametrize("state", ["scheduled", "running"])
+def test_k3_rejects_duplicate_state_events(state):
+    row = _k3_row()
+    matching = next(event for event in row["state_events"] if event["state"] == state)
+    row["state_events"].append(deepcopy(matching))
+    result = collector.evaluate_k3([row])
+    assert result["status"] == "MEASURED_FAIL"
+    assert result["metrics"]["violationsByReason"][f"{state}_event_mismatch"] == 1
+
+
+def test_k3_scheduled_attempt_precedes_current_execution_attempt():
+    row = _k3_row(
+        execution_attempt=2,
+        run_attempt=2,
+        state_events=[
+            {"state": "scheduled", "version": 5, "attempt": 1},
+            {"state": "running", "version": 6, "attempt": 2},
+        ],
+    )
+    assert collector.evaluate_k3([row])["status"] == "MEASURED_PASS"
 
 
 def test_empty_rows_never_pass_and_sql_reads_only_registered_kernel_tables():
@@ -309,6 +341,77 @@ def test_clean_chain_is_measured_but_historical_epoch_never_false_passes():
     changed["observations"]["K3"]["metrics"]["violationsByReason"].pop("running_event_mismatch")
     with pytest.raises(ValueError, match="count shape"):
         collector.validate_evidence(changed)
+
+    changed = deepcopy(evidence)
+    changed["observations"]["K1"]["status"] = "NOT_OBSERVED"
+    with pytest.raises(ValueError, match="recomputed counts"):
+        collector.validate_evidence(changed)
+
+    changed = deepcopy(evidence)
+    changed["source"]["database"]["transactionIsolation"] = "read committed"
+    with pytest.raises(ValueError, match="repeatable read"):
+        collector.validate_evidence(changed)
+
+    changed = deepcopy(evidence)
+    changed["source"]["database"]["transactionReadOnly"] = "off"
+    with pytest.raises(ValueError, match="read only"):
+        collector.validate_evidence(changed)
+
+    changed = deepcopy(evidence)
+    changed["source"]["database"]["observerCanBypassRls"] = False
+    with pytest.raises(ValueError, match="FORCE RLS"):
+        collector.validate_evidence(changed)
+
+
+def test_database_collection_forces_complete_read_only_repeatable_read_snapshot(monkeypatch):
+    commands = []
+    observer_access = {"row_security": "off", "rolsuper": False, "rolbypassrls": True}
+
+    class Result:
+        def __init__(self, *, one=None, many=None):
+            self.one = one
+            self.many = [] if many is None else many
+
+        def fetchone(self):
+            return self.one
+
+        def fetchall(self):
+            return self.many
+
+    class Connection:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def execute(self, statement):
+            commands.append(statement)
+            if "FROM pg_roles" in statement:
+                return Result(one=dict(observer_access))
+            if "clock_timestamp()" in statement:
+                return Result(one={"value": NOW})
+            return Result(many=[])
+
+        def rollback(self):
+            commands.append("ROLLBACK")
+
+    import psycopg
+
+    monkeypatch.setattr(psycopg, "connect", lambda *_args, **_kwargs: Connection())
+    monkeypatch.setattr(collector, "_database_identity", lambda _conn: _database()["identity"])
+    result = collector.collect_database("postgresql://redacted")
+    assert commands[:3] == [
+        "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY",
+        "SET LOCAL row_security = off",
+        "SET LOCAL statement_timeout = '30s'",
+    ]
+    assert commands[-1] == "ROLLBACK"
+    assert result["k1"] == result["k2"] == result["k3"] == []
+
+    observer_access["rolbypassrls"] = False
+    with pytest.raises(PermissionError, match="FORCE RLS"):
+        collector.collect_database("postgresql://redacted")
 
 
 def test_evidence_excludes_identifiers_payload_and_secret(tmp_path, monkeypatch):
