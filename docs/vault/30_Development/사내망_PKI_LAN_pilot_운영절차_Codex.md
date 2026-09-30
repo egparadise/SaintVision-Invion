@@ -1,10 +1,10 @@
 ---
 doc_id: "OPS-INTRANET-PKI-LAN-001"
 title: "사내망 PKI와 LAN pilot 운영 절차"
-version: "1.1.2"
+version: "1.1.3"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T09:01:42+09:00"
+updated: "2026-09-30T09:23:57+09:00"
 source_of_truth: "Git"
 ---
 
@@ -22,6 +22,9 @@ Evidence의 Git blob 결속은 의도적인 fail-closed 규칙이다. 고정한 
 
 - 비밀번호·private key·token은 Git, 콘솔, PR, 공개 Evidence에 넣지 않는다.
   운영자 private material은 ignored `.work/intranet/` 아래에만 둔다.
+- 공개 HTTPS service leaf는 배포 대상의 공개 인증서와 인계 파일이 같은지
+  검증하는 카드별 Evidence에 SHA-256 fingerprint를 기록할 수 있다. Node 및
+  topology 공개 Evidence의 identity fingerprint 비공개 원칙은 그대로 유지한다.
 - HTTPS Web PKI와 Node mTLS PKI를 분리한다. 한쪽의 key·CRL·신뢰점을 다른
   용도로 재사용하지 않는다.
 - Node key는 `deploy/lan/prepare-worker.sh`가 각 Node에서 생성한다. CP로
