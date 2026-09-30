@@ -35,13 +35,12 @@
     },
     "buildRunId": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "pattern": "^[0-9A-Za-z._-]+$"
     },
     "buildTimestamp": {
-      "type": "string"
-    },
-    "imageTag": {
-      "type": "string"
+      "type": "string",
+      "format": "date-time"
     }
   }
 }

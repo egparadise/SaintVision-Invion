@@ -105,15 +105,25 @@ echo "Evidence File: $EVIDENCE_FILE"
 echo "Tarball File:  $TAR_FILE"
 echo "================================================================="
 
+SCHEMA_FILE="${PORTAL_RELEASE_SCHEMA:-${SCRIPT_DIR}/portal-release-evidence.schema.json}"
+if [[ ! -f "$SCHEMA_FILE" ]]; then
+    echo "ERROR: Release evidence schema not found at: $SCHEMA_FILE" >&2
+    exit 1
+fi
+
 # -----------------------------------------------------------------------------
-# 1. Strict Evidence Schema Validation (Fail-closed on unknown fields)
+# 1. Strict Evidence Schema Validation (Fail-closed on unknown fields and types)
 # -----------------------------------------------------------------------------
 echo "Validating release evidence schema (strict, fail-closed)..."
 
-VALIDATION_OUTPUT=$($PYTHON_BIN - <<'PYEOF' "$EVIDENCE_FILE"
+TMP_PARSED=$(mktemp "${TMPDIR:-/tmp}/portal-ev-parsed.XXXXXX")
+if ! "$PYTHON_BIN" - "$EVIDENCE_FILE" "$SCHEMA_FILE" > "$TMP_PARSED" 2>&1 <<'PYEOF'
 import sys, json, re
+from datetime import datetime
 
 evidence_path = sys.argv[1]
+schema_path = sys.argv[2]
+
 try:
     with open(evidence_path, "r", encoding="utf-8") as f:
         data = json.load(f)
@@ -123,60 +133,88 @@ except Exception as e:
 if not isinstance(data, dict):
     sys.exit("ERROR: Evidence root must be a JSON object.")
 
-allowed_keys = {
-    "$schema",
-    "schemaVersion",
-    "codeSha",
-    "imageId",
-    "tarSha256",
-    "buildRunId",
-    "buildTimestamp",
-    "imageTag",
-}
-unknown_keys = set(data.keys()) - allowed_keys
-if unknown_keys:
-    sys.exit(f"ERROR: Unknown field(s) in Evidence JSON (fail-closed): {sorted(unknown_keys)}")
+try:
+    with open(schema_path, "r", encoding="utf-8") as sf:
+        schema = json.load(sf)
+except Exception as e:
+    sys.exit(f"ERROR: Failed to load release evidence schema: {e}")
 
-required_keys = [
-    "schemaVersion",
-    "codeSha",
-    "imageId",
-    "tarSha256",
-    "buildRunId",
-    "buildTimestamp",
-]
+required_keys = schema.get("required", [])
+properties = schema.get("properties", {})
+additional_properties = schema.get("additionalProperties", False)
+
+# 1. Unknown fields check (additionalProperties: false)
+if not additional_properties:
+    unknown_keys = set(data.keys()) - set(properties.keys())
+    if unknown_keys:
+        sys.exit(f"ERROR: Unknown field(s) in Evidence JSON (fail-closed): {sorted(unknown_keys)}")
+
+# 2. Required fields check
 for k in required_keys:
-    if k not in data or data[k] is None or data[k] == "":
+    if k not in data or data[k] is None:
         sys.exit(f"ERROR: Missing required field in Evidence JSON: {k}")
 
-if data["schemaVersion"] != "1.0.0":
-    sys.exit(f"ERROR: Unsupported schemaVersion: {data['schemaVersion']} (expected '1.0.0')")
+# 3. Exact type, pattern, enum, and date-time validation for every field
+for k, val in data.items():
+    prop = properties.get(k, {})
+    expected_type = prop.get("type")
+    if expected_type == "string":
+        if not isinstance(val, str):
+            sys.exit(f"ERROR: Field '{k}' must be of type string, got {type(val).__name__} (fail-closed).")
+        if "minLength" in prop and len(val) < prop["minLength"]:
+            sys.exit(f"ERROR: Field '{k}' length must be >= {prop['minLength']}.")
+        if "enum" in prop and val not in prop["enum"]:
+            if k == "schemaVersion":
+                sys.exit(f"ERROR: Unsupported schemaVersion: {val} (expected {prop['enum']})")
+            sys.exit(f"ERROR: Unsupported {k}: '{val}' (expected one of {prop['enum']})")
+        if "pattern" in prop and not re.match(prop["pattern"], val):
+            sys.exit(f"ERROR: Field '{k}' value '{val}' does not match schema pattern {prop['pattern']}")
+        if prop.get("format") == "date-time":
+            dt_re = r"^\d{4}-\d{2}-\d{2}[Tt]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:[Zz]|[+-]\d{2}:\d{2})$"
+            if not re.match(dt_re, val):
+                sys.exit(f"ERROR: Invalid date-time format for {k}: '{val}' (expected RFC 3339 / ISO 8601)")
+            try:
+                iso_clean = val.replace("Z", "+00:00").replace("z", "+00:00")
+                datetime.fromisoformat(iso_clean)
+            except Exception as e:
+                sys.exit(f"ERROR: Failed to parse date-time in {k}: '{val}' ({e})")
 
-if not re.match(r"^[0-9a-f]{40}$", str(data["codeSha"])):
-    sys.exit(f"ERROR: Invalid codeSha format (expected 40-hex lowercase): {data['codeSha']}")
-
-if not re.match(r"^sha256:[0-9a-f]{64}$", str(data["imageId"])):
-    sys.exit(f"ERROR: Invalid imageId format (expected 'sha256:<64-hex>'): {data['imageId']}")
-
-if not re.match(r"^[0-9a-f]{64}$", str(data["tarSha256"])):
-    sys.exit(f"ERROR: Invalid tarSha256 format (expected 64-hex lowercase): {data['tarSha256']}")
-
-# Emit sanitized bash key-value pairs
-print(f"EXP_IMAGE_ID='{data['imageId']}'")
-print(f"EXP_TAR_SHA256='{data['tarSha256']}'")
-print(f"EXP_CODE_SHA='{data['codeSha']}'")
-print(f"EXP_IMAGE_TAG='{data.get('imageTag', '')}'")
+# Emit exactly 5 verified values line-by-line (NO SHELL CODE, NO EVAL!)
+print(data["imageId"])
+print(data["tarSha256"])
+print(data["codeSha"])
+print(data["buildRunId"])
+print(data["buildTimestamp"])
 PYEOF
-) || {
-    echo "$VALIDATION_OUTPUT" >&2
+then
+    echo "ERROR: Release evidence schema validation failed (fail-closed):" >&2
+    cat "$TMP_PARSED" >&2
+    rm -f "$TMP_PARSED"
     exit 1
-}
+fi
 
-eval "$VALIDATION_OUTPUT"
+{
+    read -r EXP_IMAGE_ID
+    read -r EXP_TAR_SHA256
+    read -r EXP_CODE_SHA
+    read -r EXP_BUILD_RUN_ID
+    read -r EXP_BUILD_TIMESTAMP
+} < "$TMP_PARSED"
+rm -f "$TMP_PARSED"
+
+# Strip potential carriage returns from Windows environments
+EXP_IMAGE_ID="${EXP_IMAGE_ID%$'\r'}"
+EXP_TAR_SHA256="${EXP_TAR_SHA256%$'\r'}"
+EXP_CODE_SHA="${EXP_CODE_SHA%$'\r'}"
+EXP_BUILD_RUN_ID="${EXP_BUILD_RUN_ID%$'\r'}"
+EXP_BUILD_TIMESTAMP="${EXP_BUILD_TIMESTAMP%$'\r'}"
+
 echo "✔ Release evidence schema validated successfully."
 echo "  Sealed Image ID:   $EXP_IMAGE_ID"
 echo "  Sealed Tar SHA256: $EXP_TAR_SHA256"
 echo "  Sealed Code SHA:   $EXP_CODE_SHA"
+echo "  Sealed Run ID:     $EXP_BUILD_RUN_ID"
+echo "  Sealed Build Time: $EXP_BUILD_TIMESTAMP"
 
 # -----------------------------------------------------------------------------
 # 2. Release Tarball SHA-256 Checksum Verification
@@ -192,6 +230,7 @@ with open(tar_path, "rb") as f:
 print(h.hexdigest())
 PYEOF
 )
+ACTUAL_TAR_SHA256="${ACTUAL_TAR_SHA256%$'\r'}"
 
 if [[ "$ACTUAL_TAR_SHA256" != "$EXP_TAR_SHA256" ]]; then
     echo "ERROR: Release tarball SHA-256 mismatch (fail-closed)!" >&2
@@ -224,8 +263,7 @@ echo "Verifying loaded image config .Id against evidence imageId..."
 LOADED_ID=""
 if docker image inspect "$EXP_IMAGE_ID" >/dev/null 2>&1; then
     LOADED_ID=$(docker image inspect --format '{{.Id}}' "$EXP_IMAGE_ID" 2>/dev/null || true)
-elif [[ -n "$EXP_IMAGE_TAG" ]] && docker image inspect "$EXP_IMAGE_TAG" >/dev/null 2>&1; then
-    LOADED_ID=$(docker image inspect --format '{{.Id}}' "$EXP_IMAGE_TAG" 2>/dev/null || true)
+    LOADED_ID="${LOADED_ID%$'\r'}"
 fi
 
 if [[ -z "$LOADED_ID" ]]; then

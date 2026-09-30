@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-GEMINI-CARD156-001"
 title: "History: Card 156 사내망 portal 웹 배포 자산 및 비root read-only rootfs Nginx·안전 기동 검증"
-version: "2.1.0"
+version: "2.2.0"
 status: "review"
 author: "Gemini"
-updated: "2026-09-30T13:45:00+09:00"
+updated: "2026-09-30T14:26:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -16,6 +16,20 @@ source_of_truth: "Git"
 - **작업 브랜치**: `agent/gemini/c156-intranet-portal-deploy` (Base: `origin/integration/all-agents-unified`, PR #247 최신 커밋 `2f93cbba` 병합)
 - **배치 대상 도메인**: `portal.sv.lan`
 - **배치 대상 노드**: 노드2 (object store 노드, Docker 지원)
+- **독립 검토 r7 조치 (Codex 계약·보안 축 + Claude UI·운영 축 '변경 요청' 전수 반영)**:
+  1. **Codex r7 차단 F1 [심각/보안] portal-load-release.sh eval 완전 제거 및 4대 셸 인젝션 페이로드 fail-closed 실측**:
+     - `portal-load-release.sh`: `eval` 구문 전면 제거. 검증된 5대 필드(`imageId`, `tarSha256`, `codeSha`, `buildRunId`, `buildTimestamp`)를 Python이 개행 구분 라인 단위로 임시 파일에 출력하고, 셸 `read -r`로 안전하게 1:1 수신.
+     - 릴리스 계약 및 스키마에서 `imageTag` 필드 전면 삭제 (Docker config image ID 단일 정본 결속).
+     - 행위 시험 4종 완비 (`test_behavioral_load_release_rejects_shell_injection_payloads`): 단일 따옴표(`'`), 세미콜론(`;`), 명령어 치환(`$()`), 개행(`\n`) 주입 시 터치 마커 생성 부작용 0건 및 exit 1 fail-closed 검증.
+  2. **Codex r7 차단 F2 [고/계약 정합] portal-release-evidence.schema.json 정본 결속 및 엄격 타입·날짜 검증**:
+     - `portal-release-evidence.schema.json`을 단일 정본으로 삼아 소비 스크립트가 직접 검증.
+     - 정수형 `buildRunId`, 딕셔너리형 `buildTimestamp`, 잘못된 RFC 3339 날짜-시각 형식, 정수형 `codeSha`, 미지 필드(`imageTag`) 주입 시 fail-closed 거부 행위 시험 완비 (`test_behavioral_load_release_rejects_schema_invalid_types`).
+  3. **Codex r7 게이트 [무결성] Git diff EOF 및 공백 검사 클린 통과**:
+     - `git diff --check` 에러 0건 (exit 0) 달성.
+  4. **Claude r7 R7-M1 [중-상/운영 안전] Stale cleanup 실제 프로덕션 swap 함수 직접 호출 검증**:
+     - `test_behavioral_stale_cleanup_retains_recent_backup_and_prunes_older`: 스크립트 내부 루프 복제를 전면 폐기하고 프로덕션 `swap_and_launch_production` 함수를 직접 호출.
+     - Stub docker가 3개 컨테이너(활성 백업 `id_active`, 과거 백업 `id_older`, 무관한 종료 컨테이너 `id_unrelated`)를 반환할 때 프로덕션 보존/가지치기 로그 출력, `rm id_older` 및 `rm id_unrelated` 호출, 활성 백업 `rm id_active` 미호출 불변식 실측.
+
 - **독립 검토 r6 조치 (Codex 계약·보안 축 + Claude UI·운영 축 '변경 요청' 전수 반영)**:
   1. **Codex r6 차단 1 [계약/보안] 릴리스 증거(Release Evidence) 계약 구현 및 소비자 검증 스크립트 완비**:
      - `deploy/intranet/portal/portal-release-evidence.schema.json`: `additionalProperties: false`가 적용된 엄격한 JSON 스키마 (`schemaVersion`, `codeSha`, `imageId`, `tarSha256`, `buildRunId`, `buildTimestamp`).

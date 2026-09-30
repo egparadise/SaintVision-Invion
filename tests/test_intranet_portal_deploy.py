@@ -7,6 +7,7 @@ PKI / Fake Docker integration tests.
 
 from __future__ import annotations
 
+import json
 import os
 import re
 import shutil
@@ -2093,7 +2094,7 @@ exit 0
 
 
 def test_behavioral_stale_cleanup_retains_recent_backup_and_prunes_older():
-    """(Claude r6 M2) Verify that stale cleanup retains at most 1 recent backup and prunes older backups/unrelated containers."""
+    """(Claude r6 M2 & r7 M1) Verify that production stale cleanup retains at most 1 recent backup and prunes older backups/unrelated containers."""
     bash_path = get_git_bash()
     temp_dir = Path(tempfile.mkdtemp(prefix="sv_stale_cleanup_test_"))
     bin_dir = temp_dir / "bin"
@@ -2104,22 +2105,47 @@ def test_behavioral_stale_cleanup_retains_recent_backup_and_prunes_older():
 cmd="$1"
 shift
 echo "docker $cmd $*" >> "{to_posix_path(calls_log)}"
-if [[ "$cmd" == "ps" && "$*" == *"-aq"* ]]; then
-    echo -e "id_recent\nid_older\nid_unrelated"
+if [[ "$cmd" == "container" && "$1" == "inspect" ]]; then
     exit 0
 elif [[ "$cmd" == "inspect" ]]; then
-    target="${{@: -1}}"
-    if [[ "$target" == "id_recent" ]]; then
-        echo "/saintvision-portal-backup-123456"
-    elif [[ "$target" == "id_older" ]]; then
-        echo "/saintvision-portal-backup-abcdef"
-    elif [[ "$target" == "id_unrelated" ]]; then
-        echo "/saintvision-portal-other-exit"
+    while [[ $# -gt 0 ]]; do
+        if [[ "$1" == "--format" ]]; then
+            fmt="$2"
+            shift 2
+        else
+            target="$1"
+            shift
+        fi
+    done
+    if [[ "$fmt" == *ai.saintvision.service* ]]; then
+        echo "portal"
+    elif [[ "$fmt" == *ai.saintvision.workload* ]]; then
+        echo "intranet-portal"
+    elif [[ "$fmt" == *ai.saintvision.node* ]]; then
+        echo "node2"
+    elif [[ "$fmt" == *ai.saintvision.instance* ]]; then
+        echo "main"
+    elif [[ "$fmt" == *State.Running* ]]; then
+        echo "true"
+    elif [[ "$fmt" == *RestartCount* ]]; then
+        echo "0"
+    elif [[ "$fmt" == *Name* ]]; then
+        if [[ "$target" == "id_older" ]]; then
+            echo "/saintvision-portal-backup-abcdef"
+        elif [[ "$target" == "id_unrelated" ]]; then
+            echo "/saintvision-portal-unrelated"
+        else
+            echo "/saintvision-portal-backup-123456"
+        fi
     else
-        echo "/$target"
+        echo "true"
     fi
     exit 0
-elif [[ "$cmd" == "rm" ]]; then
+elif [[ "$cmd" == "ps" && "$*" == *"-aq"* ]]; then
+    # Return 3 exited containers: active backup (id_active), older backup (id_older), unrelated (id_unrelated)
+    echo -e "id_active\\nid_older\\nid_unrelated"
+    exit 0
+elif [[ "$cmd" == "exec" ]]; then
     exit 0
 fi
 exit 0
@@ -2134,37 +2160,24 @@ exit 0
         exit 99
     fi
     source "{to_posix_path(PORTAL_UP_SH)}"
-    CONTAINER_NAME="saintvision-portal"
-    LABEL_SERVICE="ai.saintvision.service=portal"
-    LABEL_WORKLOAD="ai.saintvision.workload=intranet-portal"
-    LABEL_NODE="ai.saintvision.node=node2"
-    LABEL_INSTANCE="ai.saintvision.instance=main"
-
-    stale_ids=$(docker ps -aq --filter "status=exited")
-    backup_kept=0
-    for sid in $stale_ids; do
-        sname=$(docker inspect --format '{{{{.Name}}}}' "$sid" 2>/dev/null | sed -e 's|^/||' || true)
-        if [[ "$sname" =~ ^${{CONTAINER_NAME}}-backup-[0-9a-f]+$ ]]; then
-            if [[ "$backup_kept" -lt 1 ]]; then
-                echo "Preserving recent backup container '$sname'; skipping automated cleanup." >&2
-                backup_kept=$((backup_kept + 1))
-                continue
-            fi
-        fi
-        echo "Pruning stale container '$sname' ($sid)..." >&2
-        docker rm "$sid" >/dev/null 2>&1 || true
-    done
+    TARGET_IMAGE="sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    CERT_FILE_ABS="/tmp/cert"
+    KEY_FILE_ABS="/tmp/key"
+    CA_BUNDLE_ABS="/tmp/ca"
+    UPSTREAM_CONF_ABS="/tmp/up"
+    swap_and_launch_production
     """
     res = subprocess.run([bash_path, "-c", test_sh], capture_output=True, text=True, encoding="utf-8")
     assert res.returncode == 0
-    assert "Preserving recent backup container 'saintvision-portal-backup-123456'; skipping automated cleanup." in res.stderr
+    assert "Preserving recent backup container 'saintvision-portal-backup-" in res.stderr
     assert "Pruning stale container 'saintvision-portal-backup-abcdef' (id_older)..." in res.stderr
-    assert "Pruning stale container 'saintvision-portal-other-exit' (id_unrelated)..." in res.stderr
+    assert "Pruning stale container 'saintvision-portal-unrelated' (id_unrelated)..." in res.stderr
 
     calls = calls_log.read_text(encoding="utf-8").splitlines()
     assert any("rm id_older" in c for c in calls)
     assert any("rm id_unrelated" in c for c in calls)
-    assert not any("rm id_recent" in c for c in calls)
+    # Active backup must NEVER be pruned (Claude r7 M1)
+    assert not any("rm id_active" in c for c in calls)
     shutil.rmtree(temp_dir, ignore_errors=True)
 
 
@@ -2241,3 +2254,124 @@ exit 0
     assert "Rollback complete: previous production container restored and running." in res.stderr
     shutil.rmtree(temp_dir, ignore_errors=True)
 
+
+def test_behavioral_load_release_rejects_shell_injection_payloads():
+    """(Codex r7 F1) Verify that quote, newline, command substitution, and semicolon payloads fail-closed with 0 side effects."""
+    bash_path = get_git_bash()
+    script_posix = to_posix_path(PORTAL_LOAD_RELEASE_SH)
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_rel_inject_"))
+    ev_file = temp_dir / "evidence.json"
+    tar_file = temp_dir / "image.tar"
+    tar_file.write_bytes(b"dummy tar content")
+    marker_file = temp_dir / "injected_marker.txt"
+
+    payloads = [
+        "'; touch " + to_posix_path(marker_file) + "; #",
+        "run123; touch " + to_posix_path(marker_file),
+        "run$(touch " + to_posix_path(marker_file) + ")",
+        "run123\ntouch " + to_posix_path(marker_file),
+    ]
+
+    for p in payloads:
+        if marker_file.exists():
+            marker_file.unlink()
+
+        # 1. Inject into buildRunId
+        ev_data = {
+            "schemaVersion": "1.0.0",
+            "codeSha": "a" * 40,
+            "imageId": "sha256:" + "b" * 64,
+            "tarSha256": "c" * 64,
+            "buildRunId": p,
+            "buildTimestamp": "2026-09-30T04:00:00Z",
+        }
+        ev_file.write_text(json.dumps(ev_data), encoding="utf-8")
+        res = subprocess.run([bash_path, script_posix, "--evidence", to_posix_path(ev_file), "--tar", to_posix_path(tar_file)],
+                             capture_output=True, text=True, encoding="utf-8")
+        assert res.returncode == 1, f"Expected injection payload '{p}' to fail closed, got rc {res.returncode}"
+        assert not marker_file.exists(), f"Security vulnerability: marker file created by injection payload: {p}"
+
+        # 2. Inject into unknown field (such as removed imageTag)
+        ev_data2 = {
+            "schemaVersion": "1.0.0",
+            "codeSha": "a" * 40,
+            "imageId": "sha256:" + "b" * 64,
+            "tarSha256": "c" * 64,
+            "buildRunId": "run123",
+            "buildTimestamp": "2026-09-30T04:00:00Z",
+            "imageTag": p,
+        }
+        ev_file.write_text(json.dumps(ev_data2), encoding="utf-8")
+        res2 = subprocess.run([bash_path, script_posix, "--evidence", to_posix_path(ev_file), "--tar", to_posix_path(tar_file)],
+                              capture_output=True, text=True, encoding="utf-8")
+        assert res2.returncode == 1, f"Expected imageTag payload '{p}' to fail closed, got rc {res2.returncode}"
+        assert not marker_file.exists(), f"Security vulnerability: marker file created by imageTag payload: {p}"
+        assert "Unknown field(s) in Evidence JSON" in res2.stderr
+
+    shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_behavioral_load_release_rejects_schema_invalid_types():
+    """(Codex r7 F2) Verify that non-string types, malformed timestamps, and schema violations are rejected fail-closed."""
+    bash_path = get_git_bash()
+    script_posix = to_posix_path(PORTAL_LOAD_RELEASE_SH)
+    temp_dir = Path(tempfile.mkdtemp(prefix="sv_rel_schema_types_"))
+    ev_file = temp_dir / "evidence.json"
+    tar_file = temp_dir / "image.tar"
+    tar_file.write_bytes(b"dummy tar content")
+
+    valid_base = {
+        "schemaVersion": "1.0.0",
+        "codeSha": "a" * 40,
+        "imageId": "sha256:" + "b" * 64,
+        "tarSha256": "c" * 64,
+        "buildRunId": "12345",
+        "buildTimestamp": "2026-09-30T04:00:00Z",
+    }
+
+    # 1. Integer buildRunId
+    bad_data = dict(valid_base)
+    bad_data["buildRunId"] = 12345
+    ev_file.write_text(json.dumps(bad_data), encoding="utf-8")
+    res = subprocess.run([bash_path, script_posix, "--evidence", to_posix_path(ev_file), "--tar", to_posix_path(tar_file)],
+                         capture_output=True, text=True, encoding="utf-8")
+    assert res.returncode == 1
+    assert "Field 'buildRunId' must be of type string, got int" in res.stderr
+
+    # 2. Object buildTimestamp
+    bad_data = dict(valid_base)
+    bad_data["buildTimestamp"] = {"not": "a string"}
+    ev_file.write_text(json.dumps(bad_data), encoding="utf-8")
+    res = subprocess.run([bash_path, script_posix, "--evidence", to_posix_path(ev_file), "--tar", to_posix_path(tar_file)],
+                         capture_output=True, text=True, encoding="utf-8")
+    assert res.returncode == 1
+    assert "Field 'buildTimestamp' must be of type string, got dict" in res.stderr
+
+    # 3. Invalid date-time format for buildTimestamp
+    bad_data = dict(valid_base)
+    bad_data["buildTimestamp"] = "invalid-date-format"
+    ev_file.write_text(json.dumps(bad_data), encoding="utf-8")
+    res = subprocess.run([bash_path, script_posix, "--evidence", to_posix_path(ev_file), "--tar", to_posix_path(tar_file)],
+                         capture_output=True, text=True, encoding="utf-8")
+    assert res.returncode == 1
+    assert "Invalid date-time format for buildTimestamp" in res.stderr
+
+    # 4. Integer codeSha
+    bad_data = dict(valid_base)
+    bad_data["codeSha"] = 1234567890
+    ev_file.write_text(json.dumps(bad_data), encoding="utf-8")
+    res = subprocess.run([bash_path, script_posix, "--evidence", to_posix_path(ev_file), "--tar", to_posix_path(tar_file)],
+                         capture_output=True, text=True, encoding="utf-8")
+    assert res.returncode == 1
+    assert "Field 'codeSha' must be of type string, got int" in res.stderr
+
+    # 5. Unknown field imageTag rejected
+    bad_data = dict(valid_base)
+    bad_data["imageTag"] = "saintvision-portal:test"
+    ev_file.write_text(json.dumps(bad_data), encoding="utf-8")
+    res = subprocess.run([bash_path, script_posix, "--evidence", to_posix_path(ev_file), "--tar", to_posix_path(tar_file)],
+                         capture_output=True, text=True, encoding="utf-8")
+    assert res.returncode == 1
+    assert "Unknown field(s) in Evidence JSON (fail-closed)" in res.stderr
+
+    shutil.rmtree(temp_dir, ignore_errors=True)

@@ -105,8 +105,7 @@ jobs:
               "imageId": "$IMAGE_ID",
               "tarSha256": "$TAR_SHA256",
               "buildRunId": str("$RUN_ID"),
-              "buildTimestamp": "$BUILD_TIME",
-              "imageTag": "saintvision-portal:test"
+              "buildTimestamp": "$BUILD_TIME"
           }
           with open("$EVIDENCE_FILE", "w", encoding="utf-8") as f:
               json.dump(data, f, indent=2)
