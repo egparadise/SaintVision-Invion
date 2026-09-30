@@ -176,6 +176,12 @@ def test_function_authority_and_runtime_table_privileges_fail_closed(business):
             "SELECT has_function_privilege('inv_app',%s,'EXECUTE')", (SIGNATURE,)
         ).fetchone()[0]
         assert not conn.execute(
+            "SELECT has_column_privilege('inv_kernel','public.runs','state','UPDATE')"
+        ).fetchone()[0]
+        assert not conn.execute(
+            "SELECT has_table_privilege('inv_kernel','public.audit_events','INSERT')"
+        ).fetchone()[0]
+        assert not conn.execute(
             """SELECT EXISTS(
                  SELECT 1 FROM pg_auth_members m JOIN pg_roles r ON r.oid=m.roleid
                  WHERE r.rolname='inv_cancel_bridge_owner')"""
@@ -189,6 +195,10 @@ def test_function_authority_and_runtime_table_privileges_fail_closed(business):
             (SIGNATURE,),
         ).fetchall()
         assert grants == [("inv_kernel",)]
+
+    with psycopg.connect(a.e.runtime) as conn:
+        with pytest.raises(psycopg.errors.InsufficientPrivilege):
+            conn.execute("SET ROLE inv_cancel_bridge_owner")
 
     with psycopg.connect(a.e.runtime) as conn:
         conn.execute("SELECT set_config('inv.tenant_id',%s,true)", (a.e.tenant,))
