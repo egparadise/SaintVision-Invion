@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.152"
+version: "1.0.153"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-30T11:22:00+09:00"
+updated: "2026-09-30T11:51:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,7 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-30T11:22:00+09:00 (Card 156 사내망 portal 웹 배포 독립 검토 r4 조치 전수 반영: 0400 키 권한 엄격 강제·GID 0 거부(R4-H1), --cap-add NET_BIND_SERVICE 제거(R4-L2), 비파괴적 컨테이너 스왑 및 자동 롤백(R4-M1), 6대 생존 변이 전수 사살 행동 시험 48 passed(R4-H2), hosted CI REST/SSE/WS/TLS1.1 거부 실측(R4-L4): PORTAL_ALLOWED_ROOT_FINGERPRINTS 필수화 및 CA 번들 분할 1-root 검증(R3-H1), PORTAL_IMAGE_DIGEST 필수화(R3-M1), PORTAL_UID=0 거부·USER 101 유지·키 소유 UID 검증(R3-M2), staging cleanup trap 및 smoke 격리(R3-M3), strict TLS curl 프로브(R3-L1), README WS 경로 정정(R3-L2), Git Bash OpenSSL 3.2.3 실제 PKI 행동 시험 12종 및 fake docker 시험 38 passed 실측(R3-H2), hosted portal-runtime-smoke CI 신설).
+- 확인 기준: 2026-09-30T11:51:00+09:00 (Card 156 사내망 portal 웹 배포 독립 검토 r4 조치 전수 반영: 0400 키 권한 엄격 강제·GID 0 거부(R4-H1), --cap-add NET_BIND_SERVICE 제거(R4-L2), 비파괴적 컨테이너 스왑 및 자동 롤백(R4-M1), 6대 생존 변이 전수 사살 행동 시험 48 passed(R4-H2), Docker 라벨 인벤토리 검증 정합(test_cleanup_owned_docker_label_inventory: service/workload/role/instance를 NON_CLEANUP_LABELS로 분류), hosted CI REST/SSE/WS/TLS1.1 거부 실측(R4-L4): PORTAL_ALLOWED_ROOT_FINGERPRINTS 필수화 및 CA 번들 분할 1-root 검증(R3-H1), PORTAL_IMAGE_DIGEST 필수화(R3-M1), PORTAL_UID=0 거부·USER 101 유지·키 소유 UID 검증(R3-M2), staging cleanup trap 및 smoke 격리(R3-M3), strict TLS curl 프로브(R3-L1), README WS 경로 정정(R3-L2), Git Bash OpenSSL 3.2.3 실제 PKI 행동 시험 12종 및 fake docker 시험 38 passed 실측(R3-H2), hosted portal-runtime-smoke CI 신설).
 
 ## 2026-09-30 사내망 portal 웹 배포 비root read-only rootfs Nginx 및 동일 origin 리버스 프록시·루트 allowlist·행동 검증 (Card 156, `agent/gemini/c156-intranet-portal-deploy`, PR #252)
 - **개요**: 사내망 포털 웹 애플리케이션(`apps/web`)을 노드2(object store 노드)에 안전하게 배포하기 위한 자산(`deploy/intranet/portal/`)에 대해 독립 검토 r2 및 코디네이터 지침을 전수 반영했다:

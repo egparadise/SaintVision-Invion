@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-GEMINI-CARD156-001"
 title: "History: Card 156 사내망 portal 웹 배포 자산 및 비root read-only rootfs Nginx·안전 기동 검증"
-version: "1.6.0"
+version: "1.7.0"
 status: "review"
 author: "Gemini"
-updated: "2026-09-30T11:22:00+09:00"
+updated: "2026-09-30T11:51:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -148,6 +148,17 @@ deploy/intranet/portal/
     36. `test_behavioral_fake_docker_non_matching_owner_labels_preserved`: 비소유 라벨 컨테이너 미접촉 행동 검증.
     37. `test_behavioral_fake_docker_staging_trap_cleanup`: 스테이징 오류 시 trap rm -f 정리 행동 검증.
     38. `test_behavioral_fake_docker_smoke_non_matching_owner_labels_preserved`: smoke 비소유 라벨 컨테이너 미접촉 행동 검증.
+    39. `test_behavioral_environment_key_mode_fail_closed`: 비밀키 퍼미션 모드 0400 엄격 fail-closed 검증 (R4-H1).
+    40. `test_behavioral_environment_root_gid_rejected`: PORTAL_GID=0 기동 거부 검증 (R4-H1).
+    41. `test_behavioral_fake_docker_swap_https_probe_failure_triggers_rollback`: 컨테이너 swap 사후 HTTPS 프로브 실패 시 자동 롤백 및 이전 컨테이너 복원 실측 (R4-M1, R4-H2-u).
+    42. `test_behavioral_fake_docker_staging_index_html_probe_failure`: staging index.html 프로브 실패 시 cleanup trap 실측 (R4-H2-o).
+    43. `test_behavioral_environment_key_owner_mismatch_rejected`: 키 파일 소유자 UID 불일치 fail-closed 실측 (R4-H2-t).
+    44. `test_behavioral_pki_leaf_signed_by_different_ca_fails`: 외래 CA 서명 리프 체인 검증 거부 실측 (R4-H2-d).
+    45. `test_behavioral_fake_docker_instance_mismatch_preserved`: instance 불일치 컨테이너 미접촉 보존 실측 (R4-H2-e).
+    46. `test_behavioral_environment_upstream_mismatch_independent_fail`: upstream 불일치 독립 fail-closed 실측 (R4-H2-h).
+    47. `test_portal_up_sh_no_cap_add_net_bind_service`: portal-up.sh 내 NET_BIND_SERVICE 부재 단언 (R4-L2).
+    48. `test_portal_smoke_up_sh_no_cap_add_net_bind_service`: portal-smoke-up.sh 내 NET_BIND_SERVICE 부재 단언 (R4-L2).
+- **Docker 라벨 인벤토리 검증 점검**: `pytest tests/test_cleanup_owned_docker_label_inventory.py` 통과 (포털 서비스 메타데이터 라벨 `service`, `workload`, `role`, `instance` 4종을 `NON_CLEANUP_LABELS`로 정확히 분류, 1 passed exit 0).
 - **스크립트 구문 점검**: `bash -n` 4대 셸 스크립트 전원 문법 오류 0건 (exit 0).
 - **TypeScript 타입 점검**: `npx tsc -b` 에러 **0건**.
 - **프로덕션 번들 빌드**: `npm run build` 성공 (Vite bundle).
@@ -163,4 +174,4 @@ deploy/intranet/portal/
 - **노드2 배포 상태**:
   - Leaf 인증서: 노드2 전달 완료 (`DELIVERED_NOT_ACTIVATED`).
   - 활성화 조건: 제어 평면 `allowed_origins`에 `https://portal.sv.lan` 등록 후 `portal-up.sh` 기동.
-- **독립 검토 요청**: Claude (UI·테스트 축) 및 Codex (계약·보안 축) r3 재검토 요청.
+- **독립 검토 요청**: Claude (UI·운영 축) 및 Codex (계약·보안 축) r4 재검토 요청.
