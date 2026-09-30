@@ -81,7 +81,7 @@
         "inv_kernel"
       ],
       "kind": "tenant-bound-cancel-audit",
-      "sourceMigrationSHA256": "cb4369730ea0b186b4f8198845bfda9eb1e560e178477bddc77fb1122b75b8bc"
+      "sourceMigrationSHA256": "7506f18eba482daeada30c777b06c5071050462a91430b420eb5e6b16425a1b3"
     },
     "public.record_auth_denial(text, text, text, text, text, text, text, text, jsonb, text, text)": {
       "definitionSHA256": "397bfe6933220324c36678605f48e79bddb02eff0445177bb783707a60536a85",

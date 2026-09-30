@@ -133,6 +133,10 @@ def test_migration_closes_owner_function_policy_and_downgrade_boundaries():
     assert "outcome = 'allow'" in source
     assert "target_type = 'run'" in source
     assert "GRANT UPDATE (state,termination_reason,ended_at,version)" in source
+    assert "GRANT UPDATE (lock_sentinel)" in source
+    assert "GRANT UPDATE (kernel_lock_sentinel)" in source
+    assert "GRANT UPDATE (state)" not in source
+    assert "GRANT UPDATE (workspace_id)" not in source
     assert "DROP ROLE" not in source
 
 

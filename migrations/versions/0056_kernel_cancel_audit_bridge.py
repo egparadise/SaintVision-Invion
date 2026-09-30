@@ -60,10 +60,14 @@ def upgrade() -> None:
           ON inv.business_projects TO {OWNER};
         GRANT SELECT (tenant_id,subject_id,user_id,enabled)
           ON inv.business_subjects TO {OWNER};
+        GRANT UPDATE (lock_sentinel)
+          ON inv.business_projects, inv.business_subjects TO {OWNER};
         GRANT SELECT (tenant_id,project_id,status) ON public.projects TO {OWNER};
         GRANT SELECT (tenant_id,user_id,status) ON public.users TO {OWNER};
         GRANT SELECT (tenant_id,project_id,user_id,role_code)
           ON public.project_members TO {OWNER};
+        GRANT UPDATE (kernel_lock_sentinel)
+          ON public.projects, public.users, public.project_members TO {OWNER};
         GRANT SELECT (tenant_id,run_id,workspace_id,workload_id,state,version)
           ON public.runs TO {OWNER};
         GRANT UPDATE (state,termination_reason,ended_at,version)
@@ -271,12 +275,16 @@ def downgrade() -> None:
           ON public.workspaces FROM {OWNER};
         REVOKE SELECT (tenant_id,project_id,user_id,role_code)
           ON public.project_members FROM {OWNER};
+        REVOKE UPDATE (kernel_lock_sentinel)
+          ON public.projects, public.users, public.project_members FROM {OWNER};
         REVOKE SELECT (tenant_id,user_id,status) ON public.users FROM {OWNER};
         REVOKE SELECT (tenant_id,project_id,status) ON public.projects FROM {OWNER};
         REVOKE SELECT (tenant_id,subject_id,user_id,enabled)
           ON inv.business_subjects FROM {OWNER};
         REVOKE SELECT (tenant_id,project_id,enabled)
           ON inv.business_projects FROM {OWNER};
+        REVOKE UPDATE (lock_sentinel)
+          ON inv.business_projects, inv.business_subjects FROM {OWNER};
         REVOKE SELECT (tenant_id,project_id,run_id,workspace_id)
           ON inv.business_runs FROM {OWNER};
         REVOKE SELECT (tenant_id,project_id,run_id,state) ON inv.runs FROM {OWNER};
