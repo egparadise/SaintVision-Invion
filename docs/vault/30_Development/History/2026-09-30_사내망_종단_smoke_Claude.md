@@ -1,12 +1,12 @@
 ---
 doc_id: "HIST-INTRANET-E2E-SMOKE-2026-09-30"
-title: "사내망 종단 smoke v1.2 (카드 155) — 검토 두 축이 찾은 fail-open을 닫았다: 시험 대상 신원이 CLI 인자였기 때문에 foreign issuer로 PASS가 재현됐다. issuer·client·신뢰 키를 제어 평면 설정에서 읽고 TLS 대상을 그 issuer에서 유도해 SNI·Host·announced issuer가 한 문자열이 되게 했다. invalid_client를 grant-disabled PASS에서 제거하고, 제어 평면 401은 정본 ProblemDetails·AUTH-0050만 인정하며, 서명까지 도달하는 토큰으로 검증한다. 해석된 뒤의 연결 실패는 FAIL이다. 되살림 변이 12종 전부 죽는다. v1.2에서 검토 두 축의 11건을 더 닫았다 — 승인 root 옆에 CA:FALSE self-signed leaf를 끼우면 `get_ca_certs()`가 그것을 빼고 돌려주므로 basicConstraints·승인 목록 검사를 **전부 우회해 TLS가 통과했다**(실측), 설정 digest만으로 PASS를 주던 결속을 NOT_BOUND로 정직하게 바꿨고, JWKS는 교집합이 아니라 **정확히 같은 집합**을 요구하며 key material까지 비교한다, OAuth error는 token endpoint의 status와 함께만 증거가 된다"
-version: "1.2.0"
+title: "사내망 종단 smoke v1.3 (카드 155) — 검토 두 축이 찾은 fail-open을 닫았다: 시험 대상 신원이 CLI 인자였기 때문에 foreign issuer로 PASS가 재현됐다. issuer·client·신뢰 키를 제어 평면 설정에서 읽고 TLS 대상을 그 issuer에서 유도해 SNI·Host·announced issuer가 한 문자열이 되게 했다. invalid_client를 grant-disabled PASS에서 제거하고, 제어 평면 401은 정본 ProblemDetails·AUTH-0050만 인정하며, 서명까지 도달하는 토큰으로 검증한다. 해석된 뒤의 연결 실패는 FAIL이다. 되살림 변이 12종 전부 죽는다. v1.2에서 검토 두 축의 11건을 더 닫았다 — 승인 root 옆에 CA:FALSE self-signed leaf를 끼우면 `get_ca_certs()`가 그것을 빼고 돌려주므로 basicConstraints·승인 목록 검사를 **전부 우회해 TLS가 통과했다**(실측), 설정 digest만으로 PASS를 주던 결속을 NOT_BOUND로 정직하게 바꿨고, JWKS는 교집합이 아니라 **정확히 같은 집합**을 요구하며 key material까지 비교한다, OAuth error는 token endpoint의 status와 함께만 증거가 된다. v1.3에서 여섯 건을 더 닫았다 — `unsupported_grant_type`은 **client 조회 전에** 나오므로 client id 오타 하나가 세 관측을 동시에 통과시켰고, bundle 판정이 제품 `AccessTokens._keys()`보다 약해 RSA-OAEP 키를 통과시켰다"
+version: "1.3.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
 audience: "user"
-updated: "2026-09-30T10:54:43+09:00"
+updated: "2026-09-30T11:56:42+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "6fc0428b"
@@ -53,6 +53,33 @@ v1.1의 "leaf를 anchor로 넣으면 거부"라는 문장은 **leaf 하나만 �
 **본문 전체를 엄격히 파싱한다.** 첫 `{`부터 마지막 `}`까지 자르면 brace를 품은 **아무 문서에서나** JSON 객체를 읽어낸다. `--out-dir` 경로도 stdout에서 뺐다 — 검사한 bytes와 출력한 bytes가 달랐고, 절대 경로는 이 PC의 계정 이름을 PR 코멘트로 옮긴다.
 
 증거 schema를 `intranet-e2e-smoke:3`으로 올렸다. **`…-r1.json`(schema `:2`)의 `controlPlaneConfigurationBound: MEASURED_PASS`는 여기서 찾은 fail-open 그 자체이므로 인수 근거로 읽으면 안 된다** — 측정 기록이므로 지우지 않고 남기되 대체됐다고 적는다.
+
+### 1-1. v1.3에서 바뀐 것 — 증거가 아닌 것을 증거로 읽고 있었다
+
+검토 두 축이 여섯 건을 더 냈다. 두 건이 높음이었고 둘 다 **같은 형태**다 — 무언가를 증거로 읽고 있었는데 그것이 증거가 아니었다.
+
+**`unsupported_grant_type`은 이 client에 대한 답이 아니다.** `observe_client_known`이 400/401에서 `invalid_client`만 빼고 **모든** 오류를 "provider가 이 client를 안다"는 증거로 읽었다. 그런데 `unsupported_grant_type`은 grant-type dispatch에서, `invalid_request`는 그보다 앞에서 나온다 — **client를 조회하기 전이다.** 그래서 존재하지 않는 client id가 **알려진 client의 grant가 꺼져 있는 것과 똑같은 답**을 받는다. 그 오류가 `GRANT_DISABLED_ERRORS`에도 있었으므로, **client id 오타 하나로 `portalClientKnown`·`passwordGrantRefused`·`clientCredentialsRefused` 세 관측이 동시에 통과했다.**
+
+provider가 client를 **찾아야만** 낼 수 있는 답으로 좁혔다 — `unauthorized_client`("찾았고, 이 grant는 쓸 수 없다")와 `invalid_grant`("계정 확인까지 갔다" = 찾았다). 뒤의 것은 **client가 그 grant를 쓸 수 있다**는 뜻이므로 `GRANT_DISABLED_ERRORS`에는 넣지 않았다 — 그 경우 `passwordGrantRefused`는 FAIL이다. 200(발급됨)도 client가 알려져 있다는 뜻이지만 **그 자체가 다른 결함**이므로 `portalClientKnown`에서 FAIL로 적는다.
+
+**그리고 좁히는 것만으로는 부족했다 — 고치다가 새 결함을 만들 뻔했다.** probe가 `client_credentials`였는데, **public client는 그 endpoint에서 client 인증을 할 방법이 아예 없다.** 그래서 올바르게 설정된 portal client도 거기서 `invalid_client`를 받을 수 있고, 좁힌 검사는 그것을 **"client id가 알려져 있지 않다"로 보고**했을 것이다 — 정상 배포를 거짓 FAIL로 만드는 것이다. probe를 **password grant 요청**으로 옮겼다. Keycloak이 client를 **찾은 뒤** `unauthorized_client`("Client not allowed for direct access grants")로 거부하는 요청이 그것이다.
+
+`clientCredentialsRefused`는 `unauthorized_client`, 그리고 **`portalClientKnown`이 통과한 경우에만** `invalid_client`를 인정한다(public client에게 그 endpoint의 client 인증은 불가능하므로 그것이 거부의 모양이다). **에러 집합을 넓히지 않고 명시적 인자**로 했다 — 집합을 넓히면 오타 통과가 그대로 돌아온다. 그것을 시험으로 고정했다: client가 정말 없으면 `invalid_client`는 거부로 읽히지 않는다.
+
+**실측하지 못한 것을 적어 둔다**: Keycloak 26이 public client의 `client_credentials`에 `unauthorized_client`를 주는지 `invalid_client`를 주는지 확인하지 못했다(해석되는 IdP가 없다). 두 경우 모두 통과하도록 만들었고, 어느 쪽인지는 재실행 증거의 `oauthError`에 그대로 남는다.
+
+**bundle 판정이 제품보다 약했다.** 제 검사는 shape·창·개수를 봤고, `{"alg": "RSA-OAEP", "use": "enc"}` 키는 그 셋을 모두 통과한다 — 그런데 `inv.identity.AccessTokens._keys()`는 `alg`·`use`·`kty`·private `d`·`kid` 유일성·RSA 크기를 보고 **거부한다.** 즉 제어 평면이 적재할 수 없는 bundle을 "결함 없음"으로 보고했다.
+
+**"verifier가 이 bundle을 받아들일까?"를 두 번째 구현으로 답하는 것이 drift의 방법이다.** 그래서 `inv.identity.AccessTokens`를 **직접 import해서 그 클래스로 판정**한다(생성자가 `_keys()`를 돌린다). import되지 않으면 **더 약한 사본으로 내려가지 않고 run을 거부**한다 — fallback의 옷을 입은 같은 결함이 될 뿐이다. 읽기 좋은 이름(`bundle-has-expired` 등)은 남겼지만 **권위는 그 클래스**이고, 이름들은 그것이 강제하는 것의 부분집합이다.
+
+나머지 넷:
+
+- **`inputBindingSha256`에 제어 평면 포트가 없었다.** `loopback`만으로는 이 호스트의 **모든** 제어 평면이다. 포트가 어느 것이 답했는지를 말한다.
+- **`/readyz` 503의 `code`를 버리고 있었다.** 두 모양이 답한다 — `{"status", "reason"}`, 그리고 안에서 `DomainError`가 나면 `reason` 없는 정본 problem+json에 `SYS-0001` 같은 code다. `reason`만 읽어 후자를 `unnamed`로 적었다. 이제 `code`·`type`·`title`도 기록한다.
+- **제 시험에 결함 두 개가 있었다.** `assert ... or True`는 **절대 실패할 수 없고**, 금지 조각 목록에 **이 PC의 계정명이 하드코딩**돼 있었다 — 출력에서 계정명을 막으려는 검사가 **저장소에 계정명을 커밋했다.** 실제 단언으로 바꾸고 계정명은 `getpass`로 읽는다.
+- **같은 root를 두 번 넣으면 과잉 거부했다.** OpenSSL이 중복을 하나로 합치므로 `x509: 1` 대 파싱 2가 되어 "검사되지 않은 것이 적재됐다"로 읽혔다. 중복은 정돈 문제이고 미검사 인증서가 아니므로 **서로 다른 인증서 집합**으로 센다.
+
+보드 두 곳이 아직 v1.1의 "103 passed / 10 관측 전부 PASS"를 현재로 적고 있던 것도 정정했고, 대체된 증거 파일을 보드에도 적었다.
 
 ## 2. 무엇이 나왔나
 
@@ -138,7 +165,7 @@ ISO 시각도 콜론 때문에 IPv6로 읽히므로 검사 전에 제거한다. 
 
 | 확인 | 결과 |
 |---|---|
-| 단위·부정 시험 | `tests/core/test_intranet_e2e_smoke.py` **140 passed**(v1.1은 103) — 대부분 **실제 TLS 서버와 실제 socket**, 서로 다른 CA 두 개. 첫 판의 60건은 helper를 monkeypatch해 "helper가 시킨 값을 돌려준다"만 증명했고, 그래서 host↔issuer 불일치를 놓쳤다 |
+| 단위·부정 시험 | `tests/core/test_intranet_e2e_smoke.py` **171건 수집**(v1.2 140, v1.1 103). **전체 단일 파일 실행이 이 PC 메모리 부족으로 중단됐다** — 51 passed · 0 failed 지점에서 여유 671MB. 바꾼 경로는 focused 실행 두 번(**37 passed**, **22 passed**)으로 확인했고 **전체는 hosted CI 몫**이다. 측정하지 못한 것을 측정했다고 적지 않는다 — 대부분 **실제 TLS 서버와 실제 socket**, 서로 다른 CA 두 개. 첫 판의 60건은 helper를 monkeypatch해 "helper가 시킨 값을 돌려준다"만 증명했고, 그래서 host↔issuer 불일치를 놓쳤다 |
 | **되살림 변이** | 검토 12건을 **실제 도구에 하나씩 주입해 전부 죽는 것**을 확인했다(CLI issuer 복구·`invalid_client` 복귀·아무 401 수용·`cafile` 복귀·default context·해석 후 강등·IPv6 누락·`reason` 키워드·빈 집합 PASS·deadline 흡수·oversize 절단·`503` 수용) |
 | 전 경로 측정 | 시험 안에서 **내부 CA로 서명한 localhost leaf**를 쓰는 provider를 세워 **관측 가능한 9건 전부 `MEASURED_PASS`**, 결속 1건은 `NOT_BOUND`, 전체 `NOT_OBSERVED`를 확인했다. v1.1은 여기서 10/10 PASS를 주장했고 그 10번째가 파일 digest였다 |
 | 검증 무력화 수단 부재 | option 집합에 `--insecure`·`--no-verify`·`--skip-verify`·`-k`·`--allow-insecure` **없음**, `--ca-bundle`은 **필수** |
@@ -149,6 +176,8 @@ ISO 시각도 콜론 때문에 IPv6로 읽히므로 검사 전에 제거한다. 
 | 자격증명 차단 | URL userinfo·bearer·JWT·PEM·`Authorization:` 거부, JSON·Markdown·stdout **셋 다** 검사 |
 | CA 결속 | **PEM을 직접 전수 파싱**해 전부 CA임을 `basicConstraints`로 확인, 개수를 `cert_store_stats()['x509']`와 대조, store가 나열하는 CA가 검사한 bytes에 없으면 거부, 승인 목록과 대조, **한 번 읽은 bytes를 `cadata`로** 신뢰. **승인 root + CA:FALSE self-signed leaf**를 넣으면 거부(v1.1은 통과시켰다), leaf 단독도 거부, 승인 안 된 root가 섞이면 네트워크 전에 거부 |
 | 환경 독립 | `SSL_CERT_FILE`·`SSL_CERT_DIR`·`REQUESTS_CA_BUNDLE`·`PYTHONHTTPSVERIFY`·`CURL_CA_BUNDLE`을 세워도 anchor 불변, `SSLKEYLOGFILE`에도 `keylog_filename is None` |
+| **bundle 권위** | `named_bundle_defects`가 RSA-OAEP `use: enc` 키에 **아무 결함도 못 보는 것**을 시험으로 고정하고, 같은 bundle을 `AccessTokens`가 거부하는 것을 확인했다. enc 키·다른 alg·비-RSA·private `d`·9개·1024비트·8192비트·비-base64url modulus **각각 FAIL**, 0개·중복 `kid`·비-문자열 `kid`는 **run 거부**(probe 토큰이 지목할 `kid`가 없으므로 관측이 성립하지 않는다) |
+| **client 존재 증거** | `unsupported_grant_type`·`invalid_request`에서 세 관측이 **전부 FAIL**인 것, probe가 **실제로 password grant를 보내는 것**(서버가 받은 form을 검사), `invalid_grant`가 **client 확인 PASS + grant FAIL**로 갈리는 것, public client 모양(password→`unauthorized_client`, client_credentials→`invalid_client`)이 **세 관측 PASS**인 것, 그리고 client가 정말 없으면(`invalid_client` 양쪽) **두 관측 FAIL**인 것을 고정했다 |
 | **되살림 변이 (v1.2)** | 검토 11건을 **실제 도구에 하나씩 주입해 전부 죽는 것**을 확인했다 — 교집합 복귀 · key material 무시 · 결속 `MEASURED_PASS` 복귀 · status 무시 · brace slice 복귀 · stdout에 전체 경로 · `get_ca_certs()` 복귀 · `if statuses:` · readyz 무시 · bundle 창 무시 · 상대 `jwks_file` 허용. 주입 후 도구는 원본으로 복원했다(대조 확인) |
 | 실행 | clean tree에서 실행, 판정 **BLOCKED_EXTERNAL**, exit 3, 두 증거 파일에 **주소 형태 0건**. v1.2 코드로 새 증거는 **아직 쓰지 않았다** — `/readyz` 200을 요구하므로 신원과 **데이터베이스가 함께 준비된** 제어 평면이 필요하고, 이 PC의 메모리 제약 안에서 그것까지 띄우지 않았다. 측정하지 않은 것을 쓰지 않는다 |
 | 제어 평면 | **내가 설정한** 인스턴스가 잘못된 토큰·토큰 없음 모두 **401 `AUTH-0050`** |

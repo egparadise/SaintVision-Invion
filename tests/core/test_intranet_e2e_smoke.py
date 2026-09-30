@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import base64
 import datetime as dt
+import getpass
 import hashlib
 import http.server
 import json
@@ -29,6 +30,7 @@ import socket
 import ssl
 import threading
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import pytest
 
@@ -118,14 +120,23 @@ def make_leaf(ca: dict, host: str, directory: Path, stem: str) -> tuple[Path, Pa
 
 class Responder(http.server.BaseHTTPRequestHandler):
     routes: dict = {}
+    #: Every POST form this server was asked, so a test can pin which request a probe made
+    #: rather than trusting the observation's own account of it.
+    received: list
 
     def _answer(self):
         entry = self.routes.get(self.path.split("?")[0])
+        length = int(self.headers.get("Content-Length") or 0)
+        form = self.rfile.read(length).decode() if length else ""
+        if form:
+            getattr(type(self), "received", []).append(form)
         if entry is None:
             self.send_response(404)
             self.send_header("Content-Length", "0")
             self.end_headers()
             return
+        if callable(entry):
+            entry = entry(form)
         status, media, payload = entry
         body = payload if isinstance(payload, bytes) else json.dumps(payload).encode()
         self.send_response(status)
@@ -142,7 +153,7 @@ class Responder(http.server.BaseHTTPRequestHandler):
 
 
 def serve_tls(routes, cert_path, key_path):
-    handler = type("TlsHandler", (Responder,), {"routes": dict(routes)})
+    handler = type("TlsHandler", (Responder,), {"routes": dict(routes), "received": []})
     server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     context.load_cert_chain(str(cert_path), str(key_path))
@@ -152,22 +163,76 @@ def serve_tls(routes, cert_path, key_path):
 
 
 def serve_plain(routes):
-    handler = type("PlainHandler", (Responder,), {"routes": dict(routes)})
+    handler = type("PlainHandler", (Responder,), {"routes": dict(routes), "received": []})
     server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
     threading.Thread(target=server.serve_forever, daemon=True).start()
     return server
 
 
+def b64uint(value: int) -> str:
+    raw = value.to_bytes((value.bit_length() + 7) // 8, "big")
+    return base64.urlsafe_b64encode(raw).decode().rstrip("=")
+
+
+def rsa_jwk(kid: str = TRUSTED_KID, *, bits: int = 2048, **overrides) -> dict:
+    """A JWK `inv.identity.AccessTokens._keys()` accepts, unless an override breaks it.
+
+    The fixture used `"n": "x"`, which is not an RSA modulus. Every bundle in this file
+    was therefore one the product would refuse, and the tool's own weaker shape check was
+    the only thing judging it -- which is the finding this round closes. A real key is
+    generated once; the size-bound cases use a crafted odd modulus of the wrong length,
+    since generating an 8192-bit key to be rejected is a waste of a test's time.
+    """
+    key = {"kty": "RSA", "alg": "RS256", "use": "sig", "kid": kid,
+           "n": _MODULI[bits], "e": "AQAB"}
+    key.update(overrides)
+    return key
+
+
+def _generated_modulus() -> str:
+    from cryptography.hazmat.primitives.asymmetric import rsa
+
+    return b64uint(rsa.generate_private_key(public_exponent=65537,
+                                            key_size=2048).public_key().public_numbers().n)
+
+
+#: 2048 is real; the others are odd integers of the wrong bit length, which construct as
+#: RSA public keys and are refused by the product's 2048..4096 bound.
+_MODULI = {
+    2048: _generated_modulus(),
+    1024: b64uint((1 << 1023) | 1),
+    8192: b64uint((1 << 8191) | 1),
+}
+
 #: The modulus and exponent are compared, not only the key id, so the bundle and the
 #: published key set have to agree on the key itself.
-TRUSTED_MODULUS = "x"
-SIGNING_KEY = {"kty": "RSA", "alg": "RS256", "use": "sig", "kid": TRUSTED_KID,
-               "n": TRUSTED_MODULUS, "e": "AQAB"}
+SIGNING_KEY = rsa_jwk()
+TRUSTED_MODULUS = SIGNING_KEY["n"]
+
+
+def token_answer(by_grant, default_status, default_error, default_body):
+    """One token endpoint that answers by grant type.
+
+    The two probes ask different grants on purpose now, and a real provider answers them
+    differently: a public client is refused the password grant with `unauthorized_client`
+    after being found, and cannot authenticate as a client for client-credentials at all.
+    """
+    def answer(form):
+        from urllib.parse import parse_qs
+
+        grant = (parse_qs(form).get("grant_type") or [""])[0]
+        if grant in by_grant:
+            status, error = by_grant[grant]
+            return status, "application/json", {"error": error}
+        return (default_status, "application/json",
+                default_body if default_body is not None else {"error": default_error})
+
+    return answer
 
 
 def idp_routes(issuer: str, *, kid: str = TRUSTED_KID, token_error: str = "unauthorized_client",
                jwks_keys=None, token_status: int = 400, token_body=None,
-               discovery_issuer: str | None = None):
+               discovery_issuer: str | None = None, token_by_grant=None):
     base = "/realms/" + issuer.split("/realms/")[1]
     return {
         f"{base}/.well-known/openid-configuration": (
@@ -187,9 +252,13 @@ def idp_routes(issuer: str, *, kid: str = TRUSTED_KID, token_error: str = "unaut
             {"keys": jwks_keys if jwks_keys is not None else [{**SIGNING_KEY, "kid": kid}]},
         ),
         f"{base}/protocol/openid-connect/token": (
-            token_status,
-            "application/json",
-            token_body if token_body is not None else {"error": token_error},
+            token_answer(token_by_grant, token_status, token_error, token_body)
+            if token_by_grant
+            else (
+                token_status,
+                "application/json",
+                token_body if token_body is not None else {"error": token_error},
+            )
         ),
     }
 
@@ -213,7 +282,8 @@ def world(tmp_path):
     def start(*, routes=None, kid=TRUSTED_KID, token_error="unauthorized_client", cp_routes=None,
               bundle_keys=None, bundle_extra=None, bundle_expires_at=None,
               expires_in=3 * 86_400, jwks_keys=None,
-              token_status=400, token_body=None, discovery_issuer=None, relative_jwks=False):
+              token_status=400, token_body=None, discovery_issuer=None, relative_jwks=False,
+              token_by_grant=None, tenant_id="00000000-0000-4000-8000-000000000001"):
         server = serve_tls({}, cert, key)
         holder["servers"].append(server)
         port = server.server_address[1]
@@ -221,7 +291,7 @@ def world(tmp_path):
         table = routes(issuer) if callable(routes) else idp_routes(
             issuer, kid=kid, token_error=token_error, jwks_keys=jwks_keys,
             token_status=token_status, token_body=token_body,
-            discovery_issuer=discovery_issuer,
+            discovery_issuer=discovery_issuer, token_by_grant=token_by_grant,
         )
         server.RequestHandlerClass.routes = dict(table)
         control = serve_plain(cp_routes if cp_routes is not None else DEFAULT_CP_ROUTES)
@@ -238,7 +308,7 @@ def world(tmp_path):
         config = tmp_path / "api.json"
         config.write_text(
             json.dumps({"identity": {
-                "tenant_id": "00000000-0000-4000-8000-000000000001",
+                "tenant_id": tenant_id,
                 "issuer": issuer,
                 "audience": "sv-api",
                 "client_ids": ["sv-portal"],
@@ -1004,8 +1074,7 @@ def test_a_rogue_key_beside_a_trusted_one_fails(world):
     That provider can mint tokens the control plane accepts *and* tokens signed with an
     unaccounted-for key. The old check read the first fact and reported a pass.
     """
-    w = world(jwks_keys=[dict(SIGNING_KEY),
-                         {**SIGNING_KEY, "kid": "rogue-signing-kid", "n": "y"}])
+    w = world(jwks_keys=[dict(SIGNING_KEY), rsa_jwk("rogue-signing-kid")])
     observations, _ = run(w)
     observation = observations["idpJwksMatchesTrustBundle"]
     assert observation["status"] == "MEASURED_FAIL"
@@ -1016,7 +1085,7 @@ def test_a_rogue_key_beside_a_trusted_one_fails(world):
 
 def test_a_trusted_key_the_provider_no_longer_serves_fails(world):
     """Drift in the other direction: the bundle outlives the key it names."""
-    w = world(bundle_keys=[dict(SIGNING_KEY), {**SIGNING_KEY, "kid": "retired-kid", "n": "z"}])
+    w = world(bundle_keys=[dict(SIGNING_KEY), rsa_jwk("retired-kid")])
     observations, _ = run(w)
     observation = observations["idpJwksMatchesTrustBundle"]
     assert observation["status"] == "MEASURED_FAIL"
@@ -1025,7 +1094,7 @@ def test_a_trusted_key_the_provider_no_longer_serves_fails(world):
 
 def test_a_trusted_key_id_with_different_material_fails(world):
     """The substitution a trust bundle exists to prevent: right label, wrong key."""
-    w = world(jwks_keys=[{**SIGNING_KEY, "n": "substituted-modulus"}])
+    w = world(jwks_keys=[{**SIGNING_KEY, "n": b64uint((1 << 2047) | 3)}])
     observations, _ = run(w)
     observation = observations["idpJwksMatchesTrustBundle"]
     assert observation["status"] == "MEASURED_FAIL"
@@ -1034,7 +1103,7 @@ def test_a_trusted_key_id_with_different_material_fails(world):
 
 
 def test_one_key_id_published_twice_with_different_material_fails(world):
-    w = world(jwks_keys=[dict(SIGNING_KEY), {**SIGNING_KEY, "n": "second-modulus"}])
+    w = world(jwks_keys=[dict(SIGNING_KEY), {**SIGNING_KEY, "n": b64uint((1 << 2047) | 5)}])
     observations, _ = run(w)
     observation = observations["idpJwksMatchesTrustBundle"]
     assert observation["status"] == "MEASURED_FAIL"
@@ -1044,8 +1113,7 @@ def test_one_key_id_published_twice_with_different_material_fails(world):
 def test_keys_that_are_not_rs256_signing_keys_are_not_drift(world):
     """Encryption keys are published alongside and cannot sign an accepted token."""
     w = world(jwks_keys=[dict(SIGNING_KEY),
-                         {"kty": "RSA", "alg": "RSA-OAEP", "use": "enc",
-                          "kid": "enc-kid", "n": "e", "e": "AQAB"}])
+                         {**rsa_jwk("enc-kid"), "alg": "RSA-OAEP", "use": "enc"}])
     observations, _ = run(w)
     observation = observations["idpJwksMatchesTrustBundle"]
     assert observation["status"] == "MEASURED_PASS"
@@ -1076,7 +1144,43 @@ def test_a_control_plane_that_is_not_ready_is_not_serving_this_configuration(wor
     assert binding["readyzReason"] == "identity-and-database-configuration-pending"
     assert observations["controlPlaneRejectsBadToken"]["status"] == "MEASURED_PASS"
     assert smoke.smoke_verdict(observations) == "FAIL"
-    assert facts["readyz"] == {"readyzHttpStatus": 503}
+    assert facts["readyz"]["readyzHttpStatus"] == 503
+    assert facts["readyz"]["readyzReason"] == "identity-and-database-configuration-pending"
+
+
+def test_a_readiness_failure_with_a_problem_code_and_no_reason_records_the_code(world):
+    """A 503 raised inside /readyz answers problem+json with a code and no reason field.
+
+    Reading only `reason` recorded that as "unnamed", which drops the one field saying what
+    went wrong.
+    """
+    w = world(cp_routes={
+        "/v1/session": (401, "application/problem+json", CANONICAL_PROBLEM),
+        "/readyz": (503, "application/problem+json", {
+            "type": "about:blank", "title": "Configuration observation unavailable",
+            "status": 503, "code": "SYS-0001", "category": "SYS",
+            "detail": "Configuration observation unavailable", "retryable": True,
+            "traceId": "0" * 32, "causeRef": None, "evidenceId": None,
+        }),
+    })
+    observations, facts = run(w)
+    binding = observations["controlPlaneConfigurationBound"]
+    assert binding["status"] == "MEASURED_FAIL"
+    assert binding["readyzProblemCode"] == "SYS-0001"
+    assert binding["readyzProblemType"] == "about:blank"
+    assert binding.get("readyzReason") != "unnamed"
+    assert facts["readyz"]["readyzProblemCode"] == "SYS-0001"
+
+
+def test_a_readiness_body_that_names_nothing_is_recorded_as_unnamed(world):
+    w = world(cp_routes={
+        "/v1/session": (401, "application/problem+json", CANONICAL_PROBLEM),
+        "/readyz": (503, "text/plain", b"service unavailable"),
+    })
+    observations, _ = run(w)
+    binding = observations["controlPlaneConfigurationBound"]
+    assert binding["status"] == "MEASURED_FAIL"
+    assert binding["readyzReason"] == "unnamed"
 
 
 @pytest.mark.parametrize(
@@ -1102,7 +1206,9 @@ def test_a_ready_control_plane_with_an_unloadable_bundle_is_running_another_file
     observations, _ = run(w)
     binding = observations["controlPlaneConfigurationBound"]
     assert binding["status"] == "MEASURED_FAIL"
-    assert binding["bundleDefects"] == [defect]
+    # The readable name, and beside it the verdict of the class that loads the bundle.
+    assert defect in binding["bundleDefects"]
+    assert any("refuses-this-configuration" in entry for entry in binding["bundleDefects"])
     assert "loaded some other bundle" in binding["reason"]
     assert smoke.smoke_verdict(observations) == "FAIL"
 
@@ -1156,8 +1262,11 @@ def test_a_refusal_with_no_named_oauth_error_is_not_client_knowledge(world):
     """A 400 with no error object is not the token endpoint's own refusal."""
     w = world(token_status=400, token_body={})
     observations, _ = run(w)
-    assert observations["portalClientKnown"]["status"] == "MEASURED_FAIL"
-    assert "without naming an OAuth error" in observations["portalClientKnown"]["reason"]
+    known = observations["portalClientKnown"]
+    assert known["status"] == "MEASURED_FAIL"
+    assert "does not show it resolved the configured client" in known["reason"]
+    assert known["oauthError"] == "unnamed"
+    assert known["answeredBeforeClientLookup"] is False
 
 
 @pytest.mark.parametrize("status", [400, 401])
@@ -1283,7 +1392,344 @@ def test_stdout_carries_no_path_and_is_what_was_checked(world, capsys, monkeypat
     assert summary["verdict"] == "NOT_OBSERVED"
     assert summary["json"] == "smoke-stdout-probe.json"
     assert summary["markdown"] == "smoke-stdout-probe.md"
-    assert "/" not in printed.replace("\\/", "") or True
-    for fragment in (str(out), str(w["tmp"]), "Users", "inviz"):
-        assert fragment not in printed
+    # `or True` made this line unfailable, and the account name below was hard-coded,
+    # which committed this machine's account into the repository -- the very thing the
+    # check exists to keep out of the output. Both fixed: a real assertion, and the
+    # account read from the running environment.
+    assert not {"/", "\\"} & set(printed), "a separator in the output means a path"
+    account = getpass.getuser()
+    for fragment in (str(out), str(w["tmp"]), "Users", account, Path.home().name):
+        if fragment:
+            assert fragment not in printed
     smoke.assert_publishable(printed)
+
+
+# --- Codex r3 F1: an error answered before the client lookup proves nothing --------
+
+
+@pytest.mark.parametrize("error", sorted(smoke.CLIENT_BLIND_ERRORS))
+def test_an_error_answered_before_the_client_lookup_is_not_client_knowledge(world, error):
+    """One typo in the client id used to make all three observations pass.
+
+    `unsupported_grant_type` and `invalid_request` come out of grant-type and request
+    validation, before any client is resolved, so a client id that does not exist draws
+    exactly the same answer as a known client whose grant is off.
+    """
+    w = world(token_status=400, token_error=error)
+    observations, _ = run(w)
+    known = observations["portalClientKnown"]
+    assert known["status"] == "MEASURED_FAIL"
+    assert "does not show it resolved the configured client" in known["reason"]
+    assert known["answeredBeforeClientLookup"] is True
+    for name in ("passwordGrantRefused", "clientCredentialsRefused"):
+        assert observations[name]["status"] == "MEASURED_FAIL", name
+        assert "not as a disabled grant" in observations[name]["reason"]
+    assert smoke.smoke_verdict(observations) == "FAIL"
+
+
+def test_the_two_error_sets_are_pinned_and_say_different_things():
+    """Pinned as sets, because widening either again is a one-word edit.
+
+    `invalid_grant` shows the client was resolved -- the provider got as far as checking an
+    account -- but it means the client MAY use the grant, so it is not a locked door.
+    """
+    assert smoke.GRANT_DISABLED_ERRORS == frozenset({"unauthorized_client"})
+    assert smoke.CLIENT_RESOLVED_ERRORS == frozenset({"unauthorized_client", "invalid_grant"})
+    assert "unsupported_grant_type" not in smoke.GRANT_DISABLED_ERRORS
+    assert "unsupported_grant_type" not in smoke.CLIENT_RESOLVED_ERRORS
+    assert smoke.GRANT_DISABLED_ERRORS < smoke.CLIENT_RESOLVED_ERRORS
+    assert not smoke.CLIENT_BLIND_ERRORS & smoke.CLIENT_RESOLVED_ERRORS
+
+
+def test_the_client_known_probe_reports_a_granted_token_as_its_own_finding(world):
+    def routes(issuer):
+        table = dict(idp_routes(issuer))
+        base = "/realms/" + issuer.split("/realms/")[1]
+        table[f"{base}/protocol/openid-connect/token"] = (
+            200, "application/json", {"access_token": "x", "token_type": "Bearer"}
+        )
+        return table
+
+    w = world(routes=routes)
+    observations, _ = run(w)
+    assert observations["portalClientKnown"]["status"] == "MEASURED_FAIL"
+    assert "says nothing about the client id alone" in observations["portalClientKnown"]["reason"]
+    assert observations["clientCredentialsRefused"]["status"] == "MEASURED_FAIL"
+
+
+# --- Codex r3 F2: the bundle is judged by the class that loads it ------------------
+
+
+def configuration(tmp_path, *, keys=None, document=None, issuer=None, tenant_id=None):
+    """A control-plane configuration on disk, with no server involved."""
+    issuer = issuer or "https://idp.example.invalid/realms/sv"
+    bundle = tmp_path / "bundle.json"
+    now = int(dt.datetime.now(dt.timezone.utc).timestamp())
+    bundle.write_text(json.dumps(document if document is not None else {
+        "issuer": issuer,
+        "expiresAt": now + 3 * 86_400,
+        "keys": [dict(SIGNING_KEY)] if keys is None else keys,
+    }), encoding="utf-8")
+    config = tmp_path / "api.json"
+    config.write_text(json.dumps({"identity": {
+        "tenant_id": tenant_id or "00000000-0000-4000-8000-000000000001",
+        "issuer": issuer,
+        "audience": "sv-api",
+        "client_ids": ["sv-portal"],
+        "jwks_file": str(bundle),
+    }}), encoding="utf-8")
+    return config
+
+
+def test_the_shipped_bundle_shape_is_accepted_by_the_product(tmp_path):
+    """The baseline: what these tests call valid, AccessTokens also calls valid."""
+    config = smoke.read_control_plane_configuration(configuration(tmp_path))
+    assert config["bundleDefects"] == []
+
+
+@pytest.mark.parametrize(
+    ("label", "keys"),
+    [
+        ("an encryption key", [{**SIGNING_KEY, "alg": "RSA-OAEP", "use": "enc"}]),
+        ("a signing key with another algorithm", [{**SIGNING_KEY, "alg": "RS512"}]),
+        ("a key that is not RSA", [{**SIGNING_KEY, "kty": "EC"}]),
+        ("a private key", [{**SIGNING_KEY, "d": "c2VjcmV0"}]),
+        ("nine keys", [rsa_jwk(f"kid-{n}") for n in range(9)]),
+        ("an RSA key below 2048 bits", [rsa_jwk(bits=1024)]),
+        ("an RSA key above 4096 bits", [rsa_jwk(bits=8192)]),
+        ("a modulus that is not base64url", [{**SIGNING_KEY, "n": "!!! not base64 !!!"}]),
+    ],
+)
+def test_a_bundle_the_product_verifier_refuses_is_a_defect(tmp_path, label, keys):
+    """Each of these passed the tool's own shape check while AccessTokens refuses it.
+
+    The tool used to answer "would the verifier accept this?" with a second, weaker
+    implementation. Now it answers with the verifier.
+    """
+    config = smoke.read_control_plane_configuration(configuration(tmp_path, keys=keys))
+    assert config["bundleDefects"], label
+    assert any("refuses-this-configuration" in defect or defect.startswith("bundle-")
+               for defect in config["bundleDefects"]), config["bundleDefects"]
+
+
+@pytest.mark.parametrize(
+    ("label", "keys", "expected"),
+    [
+        ("no keys at all", [], "carries no keys"),
+        ("a repeated key id", [dict(SIGNING_KEY), dict(SIGNING_KEY)], "repeats a key id"),
+        ("a key id that is not a string", [{**SIGNING_KEY, "kid": 7}], "carries no keys"),
+    ],
+)
+def test_a_bundle_with_no_usable_key_id_refuses_the_run(tmp_path, label, keys, expected):
+    """These cannot become observations: the probe token needs a trusted key id to name.
+
+    So they refuse (exit 2) rather than reporting a measured failure. That is the honest
+    outcome -- the run never gets far enough to measure anything -- and the control plane
+    would refuse the same bundle at startup.
+    """
+    with pytest.raises(smoke.SmokeRefused, match=expected):
+        smoke.read_control_plane_configuration(configuration(tmp_path, keys=keys))
+
+
+def test_the_encryption_key_case_is_the_one_that_used_to_pass(tmp_path):
+    """Named on its own because it is the reported example.
+
+    `named_bundle_defects` sees nothing wrong with it: the shape is right, the window is
+    right, the count is right. Only the verifier refuses it.
+    """
+    keys = [{**SIGNING_KEY, "alg": "RSA-OAEP", "use": "enc"}]
+    document = {"issuer": "https://idp.example.invalid/realms/sv",
+                "expiresAt": int(dt.datetime.now(dt.timezone.utc).timestamp()) + 3 * 86_400,
+                "keys": keys}
+    assert smoke.named_bundle_defects(document) == []
+    config = smoke.read_control_plane_configuration(configuration(tmp_path, keys=keys))
+    assert any("refuses-this-configuration" in defect for defect in config["bundleDefects"])
+
+
+@pytest.mark.parametrize(
+    ("label", "document"),
+    [
+        ("an expired bundle", {"issuer": None, "expiresAt": 1, "keys": None}),
+        ("a window past seven days", {"issuer": None, "expiresAt": None, "keys": None}),
+        ("an extra top-level key", {"issuer": None, "expiresAt": None, "keys": None,
+                                    "note": "extra"}),
+    ],
+)
+def test_the_named_defects_and_the_verifier_agree(tmp_path, label, document):
+    """The readable names are a subset of what the verifier enforces, never a superset."""
+    issuer = "https://idp.example.invalid/realms/sv"
+    now = int(dt.datetime.now(dt.timezone.utc).timestamp())
+    filled = {key: value for key, value in document.items()}
+    filled["issuer"] = issuer
+    if filled["expiresAt"] is None:
+        filled["expiresAt"] = now + 8 * 86_400
+    if filled["keys"] is None:
+        filled["keys"] = [dict(SIGNING_KEY)]
+    config = smoke.read_control_plane_configuration(
+        configuration(tmp_path, document=filled, issuer=issuer)
+    )
+    assert config["bundleDefects"], label
+    # Whatever the readable name says, the verifier refuses it too.
+    assert any("refuses-this-configuration" in defect for defect in config["bundleDefects"])
+
+
+def test_a_bundle_the_verifier_refuses_makes_a_ready_control_plane_a_failure(world):
+    """End to end: the ready instance cannot have loaded a bundle its verifier refuses."""
+    w = world(bundle_keys=[{**SIGNING_KEY, "alg": "RSA-OAEP", "use": "enc"}])
+    observations, _ = run(w)
+    binding = observations["controlPlaneConfigurationBound"]
+    assert binding["status"] == "MEASURED_FAIL"
+    assert "loaded some other bundle" in binding["reason"]
+    assert any("refuses-this-configuration" in defect for defect in binding["bundleDefects"])
+    assert smoke.smoke_verdict(observations) == "FAIL"
+
+
+def test_an_unimportable_verifier_refuses_the_run_instead_of_weakening_the_check(
+    tmp_path, monkeypatch
+):
+    """No fallback. A weaker local copy is the defect this closed, wearing a disguise."""
+    def unavailable():
+        raise smoke.SmokeRefused("the control plane's own verifier could not be imported")
+
+    monkeypatch.setattr(smoke, "product_verifier", unavailable)
+    with pytest.raises(smoke.SmokeRefused, match="could not be imported"):
+        smoke.read_control_plane_configuration(configuration(tmp_path))
+
+
+def test_the_verifier_is_the_control_planes_own_class():
+    """Judge the import, not the prose: a local reimplementation would satisfy a name."""
+    import inspect
+
+    from inv.identity import AccessTokens
+
+    assert smoke.product_verifier() is AccessTokens
+    source = inspect.getsource(smoke.product_verifier)
+    assert "from inv.identity import AccessTokens" in source
+
+
+# --- Codex r3 F3: which control plane on this host --------------------------------
+
+
+def test_the_input_binding_names_the_control_plane_port(world, monkeypatch):
+    """"loopback" is every control plane on this host; the port is which one answered."""
+    w = world()
+    monkeypatch.setattr(
+        smoke, "collect_provenance_at_root",
+        lambda executor: {"commit_sha": "0" * 40, "branch": "test",
+                          "working_tree_clean_status": True, "content_clean_diff": True,
+                          "executor": executor},
+    )
+    port = urlsplit(w["cp_url"]).port
+    out = w["tmp"] / "evidence"
+    assert smoke.main([
+        "--control-plane-config", str(w["config"]),
+        "--ca-bundle", str(w["ca_bundle"]),
+        "--allowed-root-sha256", w["internal"]["sha256"],
+        "--control-plane-url", w["cp_url"],
+        "--run-environment", "operator-workstation",
+        "--out-dir", str(out),
+        "--label", "smoke-port-binding",
+    ]) == smoke.EXIT_BY_VERDICT["NOT_OBSERVED"]
+    source = json.loads((out / "smoke-port-binding.json").read_text(encoding="utf-8"))["source"]
+    assert source["controlPlanePort"] == port
+
+    def binding(at_port):
+        return smoke.input_binding_sha256({
+            "controlPlaneConfigSha256": source["controlPlaneConfigSha256"],
+            "trustBundleSha256": source["trustBundleSha256"],
+            "caBundleSha256": source["caBundleSha256"],
+            "allowedRootSha256": source["allowedRootSha256"],
+            "controlPlaneUrl": f"loopback:{at_port}",
+        })
+
+    # Recomputed from the report's own inputs: the digest it recorded is the one that
+    # includes this port, and a neighbouring port would have produced a different one.
+    assert source["inputBindingSha256"] == binding(port)
+    assert source["inputBindingSha256"] != binding(port + 1)
+
+
+# --- the probe has to be a request that reaches client resolution -----------------
+
+
+def test_the_client_known_probe_asks_the_grant_that_reaches_client_resolution(world):
+    """Judge the request, not the observation's account of it.
+
+    This asked with `client_credentials`, and a public client cannot authenticate as a
+    client on that endpoint at all -- so a correctly configured portal client can answer
+    `invalid_client` there and the narrowed check would have called it unknown.
+    """
+    w = world()
+    observations, _ = run(w)
+    assert observations["portalClientKnown"]["status"] == "MEASURED_PASS"
+    asked = w["server"].RequestHandlerClass.received
+    password_probes = [form for form in asked if "grant_type=password" in form]
+    assert len(password_probes) == 2, asked
+    assert all(f"username={smoke.SYNTHETIC_ACCOUNT}" in form for form in password_probes)
+
+
+def test_invalid_grant_shows_the_client_was_resolved_and_the_grant_is_live(world):
+    """Both facts from one answer, and they point opposite ways.
+
+    Reaching credential checking means the client was found, so the client id is confirmed.
+    It also means the client MAY use the password grant, which is the defect the card cares
+    about.
+    """
+    w = world(token_error="invalid_grant")
+    observations, _ = run(w)
+    known = observations["portalClientKnown"]
+    assert known["status"] == "MEASURED_PASS"
+    assert known["clientResolvedBy"] == "invalid_grant"
+    assert observations["passwordGrantRefused"]["status"] == "MEASURED_FAIL"
+    assert "not as a disabled grant" in observations["passwordGrantRefused"]["reason"]
+    assert smoke.smoke_verdict(observations) == "FAIL"
+
+
+def test_a_public_client_refused_client_authentication_is_still_a_refusal(world):
+    """The shape a real public portal client produces.
+
+    Password grant: found, not allowed -> unauthorized_client. Client-credentials: a public
+    client has no client authentication to offer -> invalid_client. The second is the
+    refusal, and it is only read that way because the first established the client exists.
+    """
+    w = world(token_by_grant={
+        "password": (400, "unauthorized_client"),
+        "client_credentials": (401, "invalid_client"),
+    })
+    observations, _ = run(w)
+    assert observations["portalClientKnown"]["status"] == "MEASURED_PASS"
+    assert observations["passwordGrantRefused"]["status"] == "MEASURED_PASS"
+    refused = observations["clientCredentialsRefused"]
+    assert refused["status"] == "MEASURED_PASS"
+    assert refused["refusedAs"] == "client-authentication-impossible-for-a-public-client"
+    assert refused["clientKnownIndependently"] is True
+    binding = observations.pop("controlPlaneConfigurationBound")
+    assert not [o for o in observations.values() if o["status"] != "MEASURED_PASS"]
+    observations["controlPlaneConfigurationBound"] = binding
+
+
+def test_invalid_client_everywhere_is_a_mistyped_client_id_not_two_locked_doors(world):
+    """The concession above must not become the pass it was made to avoid.
+
+    With the client genuinely unknown, `invalid_client` on client-credentials is not
+    permitted to read as a refusal, because portalClientKnown did not establish existence.
+    """
+    w = world(token_by_grant={
+        "password": (401, "invalid_client"),
+        "client_credentials": (401, "invalid_client"),
+    })
+    observations, _ = run(w)
+    known = observations["portalClientKnown"]
+    assert known["status"] == "MEASURED_FAIL"
+    assert "is not known to the provider" in known["reason"]
+    refused = observations["clientCredentialsRefused"]
+    assert refused["status"] == "MEASURED_FAIL"
+    assert "not as a disabled grant" in refused["reason"]
+    assert smoke.smoke_verdict(observations) == "FAIL"
+
+
+def test_the_concession_is_an_argument_and_not_a_broadened_error_set():
+    """Judge the code: `invalid_client` must not be in either set."""
+    assert smoke.UNKNOWN_CLIENT_ERROR not in smoke.GRANT_DISABLED_ERRORS
+    assert smoke.UNKNOWN_CLIENT_ERROR not in smoke.CLIENT_RESOLVED_ERRORS
+    observation = smoke.observe_grant_refused.__doc__ or ""
+    assert "invalid_client" in observation

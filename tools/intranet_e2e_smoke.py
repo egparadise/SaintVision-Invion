@@ -62,6 +62,9 @@ from urllib.parse import urlencode, urlsplit
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
+#: Where the control plane's own verifier lives. Imported, not reimplemented: see
+#: ``product_verifier``.
+CONTROL_PLANE_SRC = REPO_ROOT / "services/control-plane/src"
 
 from tools.operational_evidence import (  # noqa: E402
     COMMIT_PATTERN,
@@ -105,11 +108,28 @@ PROBLEM_MEDIA_TYPE = "application/problem+json"
 EXPECTED_PROBLEM_CODE = "AUTH-0050"
 EXPECTED_PROBLEM_CATEGORY = "AUTH"
 
-#: OAuth errors that mean "this client may not use this grant".
+#: The one OAuth error that means "I found this client and it may not use this grant".
+#:
 #: `invalid_client` is deliberately absent: it says the client is unknown, which is a
 #: different fact, and accepting it would let a mistyped client id pass as a refusal.
-GRANT_DISABLED_ERRORS = frozenset({"unauthorized_client", "unsupported_grant_type"})
+#:
+#: `unsupported_grant_type` was here and had to go. It is answered from grant-type
+#: dispatch, before any client is looked up -- so is `invalid_request` -- which means a
+#: client id that does not exist draws the same answer as a known client whose grant is
+#: off. With it accepted, a single typo in the configured client id made
+#: portalClientKnown, passwordGrantRefused and clientCredentialsRefused all pass at once.
+#: Only `unauthorized_client` requires the provider to have resolved the client to
+#: answer, so only it is evidence about this client.
+GRANT_DISABLED_ERRORS = frozenset({"unauthorized_client"})
+#: Errors the provider can only answer after resolving the client, which is what makes
+#: them evidence about *this* client. `unauthorized_client` means it found the client and
+#: will not let it use the grant; `invalid_grant` means it got as far as checking the
+#: account, so the client was found too -- that one is not in GRANT_DISABLED_ERRORS above
+#: because it means the client MAY use the grant, which is a defect, not a locked door.
+CLIENT_RESOLVED_ERRORS = frozenset({"unauthorized_client", "invalid_grant"})
 UNKNOWN_CLIENT_ERROR = "invalid_client"
+#: Answered before the client is resolved, so they say nothing about this client.
+CLIENT_BLIND_ERRORS = frozenset({"unsupported_grant_type", "invalid_request"})
 #: The only statuses an OAuth 2.0 token endpoint uses to refuse: 400 for a request or a
 #: grant it will not honour, 401 for a client it cannot authenticate (RFC 6749 section
 #: 5.2). A 404, 502 or 503 carrying `"error": "unauthorized_client"` came from something
@@ -125,6 +145,7 @@ TOKEN_REFUSAL_STATUSES = frozenset({400, 401})
 #: something that cannot be running.
 BUNDLE_KEYS = frozenset({"issuer", "expiresAt", "keys"})
 MAX_BUNDLE_TTL_SECONDS = 7 * 86_400
+MAX_BUNDLE_KEYS = 8
 #: A username that cannot exist. Used so a refusal can be observed without a key.
 SYNTHETIC_ACCOUNT = "smoke-nonexistent-account"
 
@@ -144,10 +165,11 @@ REQUIRED = (
 CRITERIA = {
     "controlPlaneConfigurationBound": (
         "the issuer, client id and trusted keys come from the control plane's own "
-        "configuration, whose bytes are hashed into this report, and the listening control "
-        "plane is not contradicting that configuration: refuted when it is not ready or "
-        "when it is ready despite a bundle its verifier would refuse, and reported "
-        "NOT_BOUND rather than passed while nothing it exposes can confirm it"
+        "configuration, whose bytes are hashed into this report and whose trust bundle is "
+        "judged by inv.identity.AccessTokens itself, and the listening control plane is "
+        "not contradicting that configuration: refuted when it is not ready or when it is "
+        "ready despite a bundle that verifier refuses, and reported NOT_BOUND rather than "
+        "passed while nothing it exposes can confirm it"
     ),
     "idpNameResolves": "the system resolver finds the issuer's host; no substitute is accepted",
     "idpHttpsVerified": (
@@ -155,7 +177,11 @@ CRITERIA = {
         "hostname checking on"
     ),
     "idpDiscoveryIssuer": "the announced issuer equals the configured issuer, on the same origin",
-    "portalClientKnown": "the configured client id is known to the provider",
+    "portalClientKnown": (
+        "asked with the request that reaches client resolution, the provider answered in a "
+        "way it could only produce after resolving the configured client id, which rules "
+        "out an error raised before any client lookup"
+    ),
     "idpJwksMatchesTrustBundle": (
         "the RS256 signing keys the provider serves are exactly the keys the control plane "
         "trusts, key material included: no rogue key beside them, none of them missing, and "
@@ -313,6 +339,57 @@ def same_origin(url: str, issuer: str) -> bool:
     return origin(url) == origin(issuer)
 
 
+def product_verifier():
+    """``inv.identity.AccessTokens`` -- the class the control plane loads its trust with.
+
+    A second implementation of "would the verifier accept this bundle?" is how the two
+    drift, and it had already drifted: an RSA-OAEP key with ``use: enc`` passed this tool's
+    shape check while ``AccessTokens._keys()`` refuses it outright, so a bundle the control
+    plane cannot load was reported as no defect at all. Constructing ``AccessTokens`` runs
+    ``_keys()``, so the check IS that class.
+
+    If it cannot be imported the run refuses. A local approximation used as a fallback
+    would be the same defect again wearing a fallback's clothes.
+    """
+    if str(CONTROL_PLANE_SRC) not in sys.path:
+        sys.path.insert(0, str(CONTROL_PLANE_SRC))
+    try:
+        from inv.identity import AccessTokens
+    except Exception as error:
+        raise SmokeRefused(
+            "the control plane's own verifier could not be imported "
+            f"({type(error).__name__}); this check will not fall back to a weaker copy. "
+            "Run this on the interpreter the control plane runs on, with "
+            "services/control-plane/src importable."
+        ) from None
+    return AccessTokens
+
+
+def named_bundle_defects(bundle: Any) -> list[str]:
+    """Readable names for the refusals a reader will want spelled out.
+
+    These are a subset of what the verifier enforces, kept because
+    "bundle-has-expired" reads better in evidence than an exception class. The verifier is
+    still the authority: anything it refuses is a defect whether or not it is named here.
+    """
+    defects = []
+    if not isinstance(bundle, dict) or set(bundle) != BUNDLE_KEYS:
+        return ["bundle-keys-are-not-exactly-issuer-expiresAt-keys"]
+    expires_at = bundle.get("expiresAt")
+    if type(expires_at) is not int:
+        defects.append("expiresAt-is-not-an-integer")
+    else:
+        remaining = expires_at - int(dt.datetime.now(dt.timezone.utc).timestamp())
+        if remaining <= 0:
+            defects.append("bundle-has-expired")
+        elif remaining > MAX_BUNDLE_TTL_SECONDS:
+            defects.append("bundle-window-exceeds-the-seven-day-ceiling")
+    keys = bundle.get("keys")
+    if not isinstance(keys, list) or not 1 <= len(keys) <= MAX_BUNDLE_KEYS:
+        defects.append("bundle-key-count-is-outside-one-to-eight")
+    return defects
+
+
 def key_material(key: dict[str, Any]) -> tuple[str, ...]:
     """What makes a key that key, not just what labels it.
 
@@ -374,19 +451,21 @@ def read_control_plane_configuration(path: Path) -> dict[str, Any]:
     # Whether this bundle is one the verifier that loads it would accept. Not a refusal:
     # an expired bundle is a live defect worth reporting with evidence, and combined with
     # a ready control plane it is proof the process is running some other file.
-    defects = []
-    if set(bundle) != BUNDLE_KEYS:
-        defects.append("bundle-keys-are-not-exactly-issuer-expiresAt-keys")
+    #
+    # Resolved before the try below so an unimportable verifier refuses the run instead of
+    # being swallowed as a defect in the bundle.
+    verifier = product_verifier()
+    defects = named_bundle_defects(bundle)
     expires_at = bundle.get("expiresAt")
-    remaining = None
-    if type(expires_at) is not int:
-        defects.append("expiresAt-is-not-an-integer")
-    else:
-        remaining = expires_at - int(dt.datetime.now(dt.timezone.utc).timestamp())
-        if remaining <= 0:
-            defects.append("bundle-has-expired")
-        elif remaining > MAX_BUNDLE_TTL_SECONDS:
-            defects.append("bundle-window-exceeds-the-seven-day-ceiling")
+    remaining = (expires_at - int(dt.datetime.now(dt.timezone.utc).timestamp())
+                 if type(expires_at) is int else None)
+    try:
+        verifier(**identity)
+    except Exception as error:
+        # The authority, and it enforces more than the names above: key type, algorithm,
+        # use, absence of a private exponent, key-id uniqueness and RSA size.
+        defects.append(f"the-verifier-that-loads-it-refuses-this-configuration-"
+                       f"{type(error).__name__}")
     return {
         "issuer": issuer,
         "host": host,
@@ -430,14 +509,20 @@ def certificate_authorities(context: ssl.SSLContext, pem: str) -> list[str]:
         raise SmokeRefused(
             f"the CA bundle is not readable PEM: {type(error).__name__}"
         ) from None
+    # By distinct certificate, not by PEM block: OpenSSL keeps one copy of a repeated
+    # certificate, so a bundle carrying the same root twice gives x509: 1 against two
+    # parsed blocks. Refusing that was over-strict -- a duplicate is a tidiness problem,
+    # not an unchecked certificate. Both sides are counted as sets of fingerprints.
+    distinct = {certificate.fingerprint(hashes.SHA256()): certificate
+                for certificate in parsed}
     loaded = context.cert_store_stats().get("x509")
-    if loaded != len(parsed):
+    if loaded != len(distinct):
         raise SmokeRefused(
             f"the trust store holds {loaded} certificate(s) but the bundle parsed as "
-            f"{len(parsed)}: something was loaded that was not checked"
+            f"{len(distinct)} distinct one(s): something was loaded that was not checked"
         )
     anchors = []
-    for certificate in parsed:
+    for certificate in distinct.values():
         try:
             basic = certificate.extensions.get_extension_for_class(x509.BasicConstraints).value
         except x509.ExtensionNotFound:
@@ -808,38 +893,61 @@ def observe_client_known(context, config, deadline):
     """`invalid_client` means the client id is not known, which is its own finding.
 
     Separating this from the grant checks is what stops a typo in the client id from
-    reading as two locked doors. The status is read with the error: only an answer from an
-    OAuth token endpoint says anything about what that endpoint knows.
+    reading as two locked doors. Two things make it evidence:
+
+    * the error has to be one the provider could only answer after resolving the client. An
+      earlier version accepted everything at 400/401 except `invalid_client`, so
+      `unsupported_grant_type` -- answered from grant-type dispatch, before any client
+      lookup -- made a nonexistent client read as a known one.
+    * the probe has to be a request that reaches client resolution. This asked with
+      `client_credentials`, and a **public** client cannot be authenticated as a client on
+      that endpoint at all, so a correctly configured portal client can draw
+      `invalid_client` there -- which the narrowed check would have reported as "the client
+      id is not known". The password-grant request is the one Keycloak refuses with
+      `unauthorized_client` ("Client not allowed for direct access grants") after finding
+      the client, so that is what is asked here.
     """
     try:
-        status, error = post_token(context, config, deadline, {"grant_type": "client_credentials"})
+        status, error = post_token(
+            context, config, deadline,
+            {"grant_type": "password", "username": SYNTHETIC_ACCOUNT,
+             "password": secrets.token_urlsafe(8), "scope": "openid"},
+        )
     except Oversized as oversized:
         return failed(str(oversized))
     except (ssl.SSLError, OSError, SmokeRefused) as failure:
         return failed("the token endpoint could not be reached",
                       readReason=type(failure).__name__)
-    if status not in TOKEN_REFUSAL_STATUSES | {200}:
+    if status == 200:
+        # The client is known, but a granted token is the finding here, not the client id.
+        return failed("the probe grant was granted, so this says nothing about the client "
+                      "id alone", httpStatus=200)
+    if status not in TOKEN_REFUSAL_STATUSES:
         return failed("the token endpoint did not answer as an OAuth token endpoint",
                       httpStatus=status, oauthError=error or "unnamed")
     if error == UNKNOWN_CLIENT_ERROR:
         return failed("the configured client id is not known to the provider",
                       httpStatus=status, oauthError=error)
-    if status in TOKEN_REFUSAL_STATUSES and not error:
-        # A refusal with no OAuth error object is not the endpoint's own refusal, so it
-        # does not show the client id was recognised on the way to being refused.
-        return failed("the token endpoint refused without naming an OAuth error",
-                      httpStatus=status)
-    return passed(httpStatus=status, oauthError=error or "none")
+    if error not in CLIENT_RESOLVED_ERRORS:
+        return failed(
+            "the provider's answer does not show it resolved the configured client",
+            httpStatus=status,
+            oauthError=error or "unnamed",
+            answeredBeforeClientLookup=error in CLIENT_BLIND_ERRORS,
+        )
+    return passed(httpStatus=status, oauthError=error, clientResolvedBy=error)
 
 
-def observe_grant_refused(context, config, deadline, form, label):
+def observe_grant_refused(context, config, deadline, form, label, *,
+                          client_is_known=False, allow_unauthenticated_client=False):
     """A refusal observed without holding a credential.
 
     The password grant is disabled on this client on purpose, so the way to confirm it
     is to ask with an account that cannot exist: a client that may not use the grant is
     refused on the grant, before any account is considered. `invalid_grant` would mean
     the client MAY use it, and `invalid_client` would mean the client is unknown --
-    neither is proof that a known client's grant is off.
+    neither is proof that a known client's grant is off. Nor is `unsupported_grant_type`,
+    which is answered before the client is resolved and so cannot be about this client.
     """
     try:
         status, error = post_token(context, config, deadline, form)
@@ -857,6 +965,20 @@ def observe_grant_refused(context, config, deadline, form, label):
                       httpStatus=status, oauthError=error or "unnamed")
     if error in GRANT_DISABLED_ERRORS:
         return passed(httpStatus=status, oauthError=error)
+    if (
+        allow_unauthenticated_client
+        and client_is_known
+        and error == UNKNOWN_CLIENT_ERROR
+    ):
+        # For a public client this endpoint requires client authentication that a public
+        # client has no way to perform, so `invalid_client` here is the refusal rather than
+        # a missing client. Accepting it is only sound because portalClientKnown established
+        # the client exists by a request that does reach client resolution -- without that,
+        # this would be the mistyped-client-id pass all over again, which is why it is an
+        # explicit argument and not a broadened error set.
+        return passed(httpStatus=status, oauthError=error,
+                      refusedAs="client-authentication-impossible-for-a-public-client",
+                      clientKnownIndependently=True)
     return failed(f"{label} was refused, but not as a disabled grant",
                   httpStatus=status, oauthError=error or "unnamed")
 
@@ -983,16 +1105,30 @@ def observe_configuration_bound(url, config, deadline):
         )
     readyz = {"readyzHttpStatus": status}
     if status != 200:
-        reason = ""
+        # Two shapes answer here. `/readyz` answers {"status", "reason"} while identity or
+        # the database is unconfigured; a DomainError raised inside it answers canonical
+        # problem+json with a code such as SYS-0001 and no reason field at all. Reading
+        # only `reason` recorded the second as "unnamed", which loses the one field that
+        # says what went wrong.
+        named = {}
         try:
-            reason = str(as_json(body).get("reason") or "")
+            document = as_json(body)
         except SmokeRefused:
-            pass
+            document = {}
+        for field, label in (("reason", "readyzReason"), ("code", "readyzProblemCode"),
+                             ("type", "readyzProblemType"), ("status", "readyzBodyStatus"),
+                             ("title", "readyzTitle")):
+            value = document.get(field)
+            if isinstance(value, (str, int)) and str(value).strip():
+                named[label] = value
+        if not named:
+            named = {"readyzReason": "unnamed"}
+        readyz.update(named)
         return (
             failed(
                 "the control plane is not ready, so it is not serving this configuration",
                 httpStatus=status,
-                readyzReason=reason or "unnamed",
+                **named,
                 **facts,
             ),
             readyz,
@@ -1186,6 +1322,10 @@ def run(args, deadline: Deadline, now: dt.datetime) -> tuple[dict[str, dict[str,
         observations["clientCredentialsRefused"] = observe_grant_refused(
             context, config, deadline, {"grant_type": "client_credentials", "scope": "openid"},
             "the client-credentials grant",
+            client_is_known=(
+                observations["portalClientKnown"]["status"] == "MEASURED_PASS"
+            ),
+            allow_unauthenticated_client=True,
         )
 
     observations["controlPlaneRejectsBadToken"] = observe_control_plane(
@@ -1254,7 +1394,12 @@ def main(argv: list[str] | None = None) -> int:
                     "trustBundleSha256": facts["trustBundleSha256"],
                     "caBundleSha256": facts["caBundleSha256"],
                     "allowedRootSha256": facts["allowedRootSha256"],
-                    "controlPlaneUrl": control_plane_label(args.control_plane_url),
+                    # The label alone is "loopback", which is every control plane on
+                    # this host. The port is what says which one answered.
+                    "controlPlaneUrl": (
+                        f"{control_plane_label(args.control_plane_url)}"
+                        f":{urlsplit(args.control_plane_url).port or 80}"
+                    ),
                 }
             ),
             **facts,
