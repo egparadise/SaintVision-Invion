@@ -319,6 +319,13 @@ run_staging_preflight() {
     # Trap cleanup on unexpected exit or interrupt during staging (R3-M3)
     trap staging_cleanup EXIT INT TERM
 
+    local add_host_args=()
+    if [[ -n "${PORTAL_ADD_HOSTS:-}" ]]; then
+        for entry in $PORTAL_ADD_HOSTS; do
+            add_host_args+=(--add-host "$entry")
+        done
+    fi
+
     docker run -d \
         --name "$STAGING_NAME" \
         --label "${LABEL_SERVICE}" \
@@ -333,6 +340,7 @@ run_staging_preflight() {
         --tmpfs /tmp:rw,noexec,nosuid,size=64m \
         --tmpfs /var/cache/nginx:rw,noexec,nosuid,size=64m \
         --tmpfs /var/run:rw,noexec,nosuid,size=16m \
+        "${add_host_args[@]}" \
         --mount "type=bind,source=${CERT_FILE_ABS},target=/etc/nginx/certs/portal.crt,readonly" \
         --mount "type=bind,source=${KEY_FILE_ABS},target=/etc/nginx/certs/portal.key,readonly" \
         --mount "type=bind,source=${CA_BUNDLE_ABS},target=/etc/nginx/certs/ca-bundle.crt,readonly" \
@@ -418,6 +426,13 @@ swap_and_launch_production() {
         docker rm $stale_ids >/dev/null 2>&1 || true
     fi
 
+    local add_host_args=()
+    if [[ -n "${PORTAL_ADD_HOSTS:-}" ]]; then
+        for entry in $PORTAL_ADD_HOSTS; do
+            add_host_args+=(--add-host "$entry")
+        done
+    fi
+
     docker run -d \
         --name "$CONTAINER_NAME" \
         --label "${LABEL_SERVICE}" \
@@ -434,6 +449,7 @@ swap_and_launch_production() {
         --tmpfs /tmp:rw,noexec,nosuid,size=64m \
         --tmpfs /var/cache/nginx:rw,noexec,nosuid,size=64m \
         --tmpfs /var/run:rw,noexec,nosuid,size=16m \
+        "${add_host_args[@]}" \
         --publish "${HTTP_PORT}:80" \
         --publish "${HTTPS_PORT}:443" \
         --mount "type=bind,source=${CERT_FILE_ABS},target=/etc/nginx/certs/portal.crt,readonly" \

@@ -142,8 +142,8 @@ jobs:
             -CA /tmp/portal-ci/certs/inter.crt -CAkey /tmp/portal-ci/certs/inter.key -CAcreateserial \
             -out /tmp/portal-ci/upstream-certs/cp.crt -extfile /tmp/portal-ci/upstream-certs/cp.ext -days 7
 
-          # 5. Start lightweight Python SSL upstream stub for cp.sv.lan
-          python3 - <<'EOF' > /tmp/portal-ci/mock_upstream.log 2>&1 &
+          # 5. Start lightweight Python SSL upstream stub for cp.sv.lan on port 443
+          sudo python3 - <<'EOF' > /tmp/portal-ci/mock_upstream.log 2>&1 &
           import http.server, ssl, json
 
           class Handler(http.server.BaseHTTPRequestHandler):
@@ -160,7 +160,7 @@ jobs:
               def log_message(self, format, *args):
                   pass
 
-          httpd = http.server.HTTPServer(("127.0.0.1", 8443), Handler)
+          httpd = http.server.HTTPServer(("0.0.0.0", 443), Handler)
           ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
           ctx.load_cert_chain("/tmp/portal-ci/upstream-certs/cp.crt", "/tmp/portal-ci/upstream-certs/cp.key")
           httpd.socket = ctx.wrap_socket(httpd.socket, server_side=True)
@@ -179,11 +179,10 @@ jobs:
           PORTAL_KEY_FILE: /tmp/portal-ci/certs/server-key.pem
           PORTAL_CA_BUNDLE: /tmp/portal-ci/certs/ca-bundle.crt
           PORTAL_UPSTREAM_CP_HOST: cp.sv.lan:443
+          PORTAL_ADD_HOSTS: "cp.sv.lan:host-gateway"
           PORTAL_HTTP_PORT: 8080
           PORTAL_HTTPS_PORT: 8443
         run: |
-          # Map cp.sv.lan to host loopback inside docker network / host
-          echo "127.0.0.1 cp.sv.lan" | sudo tee -a /etc/hosts
           bash deploy/intranet/portal/portal-up.sh
 
       - name: Execute Hardened Runtime Verification via curl
@@ -224,6 +223,12 @@ jobs:
           # 6. Container exec nginx -t verification
           echo "Checking container nginx -t..."
           docker exec saintvision-portal nginx -t
+
+          # 7. Reverse Proxy to Upstream Control Plane verification
+          echo "Checking reverse proxy /v1/session..."
+          V1_RESPONSE=$(curl -fsS --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/v1/session)
+          echo "$V1_RESPONSE"
+          echo "$V1_RESPONSE" | grep -q "authenticated"
 
           echo "✔ Hosted Portal Container Build & Hardened Runtime Smoke PASSED!"
 
