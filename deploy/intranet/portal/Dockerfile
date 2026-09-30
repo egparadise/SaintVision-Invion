@@ -9,6 +9,9 @@
 FROM node:22-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402 AS builder
 WORKDIR /workspace
 
+# Copy shared monorepo packages needed for type resolution
+COPY packages/contracts-ts/ ./packages/contracts-ts/
+
 # Install web dependencies
 COPY apps/web/package*.json ./apps/web/
 WORKDIR /workspace/apps/web
