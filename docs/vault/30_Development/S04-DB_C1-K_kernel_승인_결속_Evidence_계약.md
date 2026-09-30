@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-S04-C1K-EVIDENCE-CONTRACT-001"
 title: "S04-DB C1-K kernel 승인 결속 Evidence 계약"
-version: "1.0.1"
+version: "1.0.2"
 status: "proposed"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-30T10:55:00+09:00"
+updated: "2026-09-30T11:02:16+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S04-DB"]
@@ -35,8 +35,8 @@ collector는 REPEATABLE READ·READ ONLY snapshot 하나만 읽는다. 공개 계
 | ID | 관측 | `MEASURED_PASS` 조건 | 0행 또는 입력 공백 |
 |---|---|---|---|
 | K1 | approval→dispatch→claim 기록 결속 | claim이 1건 이상이고 모든 claim의 scope·command·action digest·policy version·recovery epoch가 연결 approval/dispatch와 일치하며, dispatch≤claim이고 claim 만료가 승인 만료를 넘지 않는다 | `NOT_OBSERVED` |
-| K2 | claim→delivery permit payload 결속 | delivery가 1건 이상이고 base64/JSON object payload가 해석되며 payload의 claim exact field set이 DB claim과 일치하고 issuedAt≤notAfter다 | `NOT_OBSERVED` |
-| K3 | approval→run version→execution attempt 결속 | execution attempt가 1건 이상이고 scheduled event version=`bound_run_version+1`, running event version=`bound_run_version+2`, running attempt와 run_attempt/execution_attempt가 일치하며 dispatch≤claim≤attempt다 | `NOT_OBSERVED` |
+| K2 | claim→delivery permit payload 결속 | delivery가 1건 이상이고 base64/JSON object payload가 해석되며 payload의 claim exact field set이 DB claim과 일치한다. `notAfter`는 문자열 표현이 아니라 offset을 포함한 동일 instant로 비교하고 issuedAt≤notAfter다 | `NOT_OBSERVED` |
+| K3 | approval→run version→execution attempt 결속 | execution attempt가 1건 이상이고 scheduled event version=`bound_run_version+1`·attempt=`execution_attempt-1`, running event version=`bound_run_version+2`·attempt=`execution_attempt`이며 run_attempt와 execution_attempt가 일치하고 dispatch≤claim≤attempt다 | `NOT_OBSERVED` |
 | K4 | 실행 당시 control epoch 독립 증명 | 실행 시각의 epoch history 또는 동등한 독립 producer가 있고 approval·claim·Node 실행 epoch가 모두 그 값과 일치한다 | producer 부재 시 `NOT_REGISTERED` |
 
 K1~K3 중 하나라도 불일치·파싱 실패·중복 state event·필수 연결 누락이 있으면 해당 관측은 `MEASURED_FAIL`이다. K4는 현재 `inv.control_epoch`의 단일 현재값만으로 과거 실행 당시 값을 재구성하지 않는다. 승인과 claim의 epoch가 서로 같은 것은 K1에서 측정하지만, 그것을 실행 당시 current epoch였다는 독립 증거로 바꾸지 않는다. 그러므로 현재 구현의 전체 verdict는 위반 발견 시 `FAIL`, 그 외에는 K4 때문에 `NOT_OBSERVED`이며 `acceptanceClaim`은 false다.
@@ -53,6 +53,7 @@ K1~K3 중 하나라도 불일치·파싱 실패·중복 state event·필수 연�
 4. payload는 object여야 하고 duplicate key·알 수 없는 claim key·필수 key 누락·잘못된 base64/UTF-8/JSON·naive timestamp를 모두 위반으로 센다.
 5. evidence의 verdict는 닫힌 observation status로 재계산하며 source commit, clean tree, collector hash, database identity, snapshot hash, DB 시작·종료 시각에 결속한다.
 6. database 예외는 클래스 이름만 stderr에 남기고 내용·DSN은 버린다.
+7. 모든 대상 relation이 `FORCE ROW LEVEL SECURITY`이므로 collector는 `row_security=off`와 실행 role의 `rolsuper` 또는 `rolbypassrls`를 함께 확인한다. 전체 relation 관측 권한을 증명하지 못하면 부분집합이나 빈 집합을 evidence로 쓰지 않고 실행을 거부한다.
 
 ## 4. 시험과 실행
 
