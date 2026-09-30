@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-GEMINI-CARD156-001"
 title: "History: Card 156 사내망 portal 웹 배포 자산 및 비root read-only rootfs Nginx·안전 기동 검증"
-version: "1.7.0"
+version: "1.8.0"
 status: "review"
 author: "Gemini"
-updated: "2026-09-30T11:51:00+09:00"
+updated: "2026-09-30T12:14:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -159,6 +159,7 @@ deploy/intranet/portal/
     47. `test_portal_up_sh_no_cap_add_net_bind_service`: portal-up.sh 내 NET_BIND_SERVICE 부재 단언 (R4-L2).
     48. `test_portal_smoke_up_sh_no_cap_add_net_bind_service`: portal-smoke-up.sh 내 NET_BIND_SERVICE 부재 단언 (R4-L2).
 - **Docker 라벨 인벤토리 검증 점검**: `pytest tests/test_cleanup_owned_docker_label_inventory.py` 통과 (포털 서비스 메타데이터 라벨 `service`, `workload`, `role`, `instance` 4종을 `NON_CLEANUP_LABELS`로 정확히 분류, 1 passed exit 0).
+- **Stub 실행 스크립트 실행 권한 보정**: `tests/test_intranet_portal_deploy.py` 내 임시 생성되는 stub 스크립트(`bin/stat`, `bin/docker`) 10곳에 대해 `os.chmod(..., 0o755)`를 명시적으로 부여하여 Linux CI 환경에서 비실행 파일 취급으로 인한 호스트 실제 바이너리(/usr/bin/docker, /usr/bin/stat) 폴스루 및 1001 runner UID 불일치 오류 원천 차단.
 - **스크립트 구문 점검**: `bash -n` 4대 셸 스크립트 전원 문법 오류 0건 (exit 0).
 - **TypeScript 타입 점검**: `npx tsc -b` 에러 **0건**.
 - **프로덕션 번들 빌드**: `npm run build` 성공 (Vite bundle).

@@ -650,6 +650,7 @@ elif [[ "$format" == "%a" ]]; then
 fi
 """
         (bin_dir / "stat").write_text(stat_stub.replace("\r\n", "\n"), encoding="utf-8")
+        os.chmod(bin_dir / "stat", 0o755)
 
         test_sh = f"""
         export PATH="{to_posix_path(bin_dir)}:$PATH"
@@ -727,6 +728,7 @@ elif [[ "$cmd" == "stop" || "$cmd" == "rm" ]]; then
 fi
 """
     (bin_dir / "docker").write_text(docker_stub.replace("\r\n", "\n"), encoding="utf-8")
+    os.chmod(bin_dir / "docker", 0o755)
 
     test_sh = f"""
     export PATH="{to_posix_path(bin_dir)}:$PATH"
@@ -804,6 +806,7 @@ elif [[ "$cmd" == "rm" || "$cmd" == "stop" ]]; then
 fi
 """
     (bin_dir / "docker").write_text(docker_stub.replace("\r\n", "\n"), encoding="utf-8")
+    os.chmod(bin_dir / "docker", 0o755)
 
     test_sh = f"""
     export PATH="{to_posix_path(bin_dir)}:$PATH"
@@ -854,6 +857,7 @@ elif [[ "$cmd" == "rm" || "$cmd" == "stop" ]]; then
 fi
 """
     (bin_dir / "docker").write_text(docker_stub.replace("\r\n", "\n"), encoding="utf-8")
+    os.chmod(bin_dir / "docker", 0o755)
 
     test_sh = f"""
     export PATH="{to_posix_path(bin_dir)}:$PATH"
@@ -921,6 +925,7 @@ elif [[ "$cmd" == "stop" || "$cmd" == "rm" ]]; then
 fi
 """
     (bin_dir / "docker").write_text(docker_stub.replace("\r\n", "\n"), encoding="utf-8")
+    os.chmod(bin_dir / "docker", 0o755)
 
     test_sh = f"""
     export PATH="{to_posix_path(bin_dir)}:$PATH"
@@ -993,6 +998,7 @@ elif [[ "$cmd" == "stop" || "$cmd" == "rm" || "$cmd" == "rename" ]]; then
 fi
 """
     (bin_dir / "docker").write_text(docker_stub.replace("\r\n", "\n"), encoding="utf-8")
+    os.chmod(bin_dir / "docker", 0o755)
 
     test_sh = f"""
     export PATH="{to_posix_path(bin_dir)}:$PATH"
@@ -1047,6 +1053,7 @@ elif [[ "$format" == "%a" ]]; then
 fi
 """
     (bin_dir / "stat").write_text(stat_stub.replace("\r\n", "\n"), encoding="utf-8")
+    os.chmod(bin_dir / "stat", 0o755)
 
     test_sh = f"""
     export PATH="{to_posix_path(bin_dir)}:$PATH"
@@ -1123,6 +1130,7 @@ elif [[ "$cmd" == "rm" || "$cmd" == "stop" ]]; then
 fi
 """
     (bin_dir / "docker").write_text(docker_stub.replace("\r\n", "\n"), encoding="utf-8")
+    os.chmod(bin_dir / "docker", 0o755)
 
     test_sh = f"""
     export PATH="{to_posix_path(bin_dir)}:$PATH"
@@ -1177,6 +1185,7 @@ elif [[ "$format" == "%a" ]]; then
 fi
 """
     (bin_dir / "stat").write_text(stat_stub.replace("\r\n", "\n"), encoding="utf-8")
+    os.chmod(bin_dir / "stat", 0o755)
 
     test_sh = f"""
     export PATH="{to_posix_path(bin_dir)}:$PATH"
@@ -1250,6 +1259,7 @@ elif [[ "$cmd" == "rename" || "$cmd" == "stop" || "$cmd" == "run" || "$cmd" == "
 fi
 """
     (bin_dir / "docker").write_text(docker_stub.replace("\r\n", "\n"), encoding="utf-8")
+    os.chmod(bin_dir / "docker", 0o755)
 
     test_sh = f"""
     export PATH="{to_posix_path(bin_dir)}:$PATH"
