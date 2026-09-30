@@ -1,16 +1,16 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.228"
+version: "1.0.230"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T14:11:22+09:00"
+updated: "2026-09-30T17:21:52+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
 
-## 2026-09-30 CARD-160 S04-DB core cancel 제품 경로 결속 설계
+## 2026-09-30 CARD-160 S04-DB core cancel 제품 경로 결속 설계·구현
 
 - Claude 조건부 승인 M1~M4/L1~L5/R5~R8을 설계 v1.1에 반영했다. bridge는 이
   요청이 kernel 전이를 실제 수행한 경우에만 호출하며, kernel 선취소를 사용자
@@ -24,7 +24,17 @@ source_of_truth: "Git"
 - business-mapped run만 kernel transaction 안의 최소권한 SECURITY DEFINER
   primitive로 public 상태와 exact audit를 함께 갱신한다. actor는 인증 subject의
   현재 user mapping에서 파생하고, normal·shard·replay·rollback 시험을 승인 조건으로
-  고정했다. migration 번호 배정 전 docs-only이며 S04-DB `review`와
+  고정했다. migration `0056`과 제품 결속을 구현했으며 실제 catalogue definition
+  SHA-256 `3ebb7553…32a0c1`을 definer policy와 AC-11 pin에 고정했다.
+- hosted Core 두 번의 fail-closed 503으로 kernel·mapping·authority 중복 잠금을
+  분리했다. 같은 transaction의 선행 권한 검사가 이미 잡은 lock을 재사용하도록 함수
+  중복 잠금을 제거했고 owner UPDATE 권한은 넓히지 않았다. route 403과 함수 내부
+  권한 재도출, rollback·event ID·terminal·shard 변이를 보강했으며 PG-free bridge
+  15건과 AC-11 집계 85건을 재통과했다. 이전 revision 회복 시 0056 policy가
+  중복되던 결함도 수렴 재적용으로 닫았고, 월 audit partition 부재의 503·전체
+  rollback·같은 key 복구 시험을 추가했다. exact-code `44556845`의 hosted
+  Backend 3.12/3.14와 Core가 모두 green이고, Core JUnit에서 bridge 실 PG 17건의
+  실행·성공을 확인했다. 운영 배포 관측은 아직 없으므로 S04-DB `review`와 clean C1
   `RECORDED_ONLY`를 유지한다.
   [[S04-DB_core_cancel_제품경로_결속_설계]],
   [[2026-09-30_13-52-17_KST_S04-DB_core_cancel_제품경로_결속_설계_Codex]].

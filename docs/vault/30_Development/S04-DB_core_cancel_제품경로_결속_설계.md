@@ -1,11 +1,11 @@
 ---
 doc_id: "DESIGN-S04-DB-CORE-CANCEL-PRODUCT-BRIDGE-001"
 title: "S04-DB core cancel 제품 경로 결속 설계"
-version: "1.1.0"
-status: "proposed"
+version: "1.2.0"
+status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-30T14:11:22+09:00"
+updated: "2026-09-30T17:21:52+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "c9c1d836ff8fcd606b5bca3862c6cd764eadf4fd"
@@ -233,3 +233,35 @@ Claude는 다음을 독립 검토한다.
 Claude의 2026-09-30 조건부 승인(M1~M4, L1~L5, R5~R8)을 이 v1.1에 반영했다.
 구현은 이 문서 commit 다음 별도 commit으로 이어가며, 공개 계약 변경 0과
 `RECORDED_ONLY`·S04-DB `review` 유지를 승인 조건으로 둔다.
+
+## 9. 구현 결과(v1.2)
+
+- migration `0056_kernel_cancel_audit_bridge`와 제품 helper를 구현했다. normal과
+  shard 취소는 이 요청이 kernel 상태를 실제로 전이한 분기에서만 bridge를 호출하며,
+  middleware trace를 그대로 전달한다. mapping 없는 run과 kernel 선취소 replay에는
+  public write와 audit가 없다.
+- 전용 `inv_cancel_bridge_owner`는 NOLOGIN·NOINHERIT·NOBYPASSRLS이고 member가 있으면
+  migration이 중단된다. 함수는 정적 SQL과 고정 search path를 사용하며 PUBLIC·
+  `inv_app` 실행권을 회수하고 `inv_kernel`에만 실행권을 준다. 실제 catalogue 정의
+  SHA-256은 `3ebb7553073497364f41fd4ede1b363b1db3b743d66b99beb475e8953a32a0c1`으로
+  `tools/definer-policy.json`과 AC-11 blob pin에 고정했다.
+- hosted에서 함수가 호출자에게 이미 잠긴 kernel·mapping·authority 행을 다시
+  `FOR SHARE` 하는 중복 잠금을 발견했다. `Control.grant`/`business_auth.permission`이
+  같은 transaction에서 이 행들을 먼저 잠그므로 함수의 중복 잠금을 모두 제거했다.
+  owner의 UPDATE 권한은 넓히지 않았고 public run의 최종 `FOR UPDATE`만 유지했다.
+- Alembic의 이전 revision 회복 시험은 catalogue를 보존한 채 version marker만
+  되돌린다. 0056은 같은 policy를 먼저 제거·정의하고 함수를 `CREATE OR REPLACE`해
+  재적용이 수렴한다. 이 규칙이 없던 head에서는 0053~0055 회복 뒤 0056의 policy
+  중복으로 Backend가 중단됐고, 후속 공유 DB 시험이 누락된 0054 열을 관측했다.
+- "실제 kernel 전이일 때만 bridge 호출" 규칙은 현재 Python normal/shard 호출부가
+  강제한다. DB 함수 자체는 같은 transaction의 `inv.runs.state='cancelled'`를
+  재검증하지만 누가 그 전이를 수행했는지는 증명하지 못한다. 따라서 새 호출부를
+  추가할 때는 동일 분기 guard를 되살림 시험과 함께 요구한다.
+- 구현·시험 존재만으로 운영 배포 SHA와 관측 창을 만들지는 않는다. 따라서 clean C1은
+  `RECORDED_ONLY`, S04-DB는 `review`를 유지한다. 월 audit partition이 없을 때의 503
+  fail-closed·전체 rollback·같은 key 재시도와 tenant kill-switch 탈출구도 그대로다.
+- exact-code `44556845448dea14813a9828c7817c8533a999ec`의 hosted Core
+  `36686184969`는 전체 **5949 passed / 22 skipped / 2 deselected**, 그 JUnit 안의
+  bridge real-PG **17/17 passed**였다. Backend `36686184974`도 Python 3.12·3.14가
+  각각 **5629 passed / 50 skipped / 2 deselected**였다. 이 수치는 운영 배포 관측이
+  아니라 제품 tree와 실 PostgreSQL 경계의 구현 검증이다.

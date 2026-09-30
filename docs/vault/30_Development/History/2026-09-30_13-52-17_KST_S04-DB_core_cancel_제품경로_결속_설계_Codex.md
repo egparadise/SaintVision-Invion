@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-20260930-CARD160-S04-CANCEL-PRODUCT-BRIDGE-CODEX"
 title: "CARD-160 S04-DB core cancel 제품 경로 결속 설계"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-30T14:11:22+09:00"
+updated: "2026-09-30T17:21:52+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "c9c1d836ff8fcd606b5bca3862c6cd764eadf4fd"
@@ -62,3 +62,62 @@ registry 상태를 바꾸지 않았고 S04-DB는 `review`를 유지한다.
 - 같은 key/다른 key 동시성, `RES-0007` lock timeout, 교차 tenant·권한·형식·
   kernel 선취소·audit partition 부재의 rollback 시험을 분리했다. kill-switch
   containment를 운영 탈출구로 명시하고 S04-DB `review`·`RECORDED_ONLY`는 유지한다.
+
+## 구현과 교정
+
+- `26f522eb`에서 제품 helper, normal·shard 결속, migration 0056, owner/RLS/definer
+  gate와 PG-free·실 PG 시험을 구현했다. 공개 route·JSON Schema·ProblemDetails의
+  새 code는 없으며 계약 표면 변경은 0이다.
+- hosted Core `36675282617`은 migration과 definer pin을 통과한 뒤 기존 business
+  handoff 취소에서 503을 재현했다. `846899fa`에서 호출자에게 이미 잠긴 kernel run과
+  불변 mapping의 중복 `FOR SHARE`를 제거했다. 다음 Core `36676509637`도 503을 재현해,
+  실제 authority 행의 `FOR SHARE`에 필요한 row-lock privilege가 빠졌음을 분리했다.
+  `58d08dbe`의 sentinel grant 시도는 Claude r2에서 더 좁은 해법이 확인돼 최종안에서
+  철회했다. `7168bc27`은 같은 transaction의 `Control.grant`/`business_auth.permission`이
+  이미 잡은 authority lock을 재사용하도록 중복 `FOR SHARE`를 없앴다. owner UPDATE
+  권한은 넓히지 않았고 이 경계를 PG-free 되살림 시험으로 고정했다.
+- hosted catalogue가 보고한 교정 함수 definition SHA-256
+  `3ebb7553073497364f41fd4ede1b363b1db3b743d66b99beb475e8953a32a0c1`을
+  `9961ac0c`에서 definer policy와 AC-11 blob pin에 고정했다.
+- route 전단의 비회원은 정본 `AUTH-0030/403`이고, 함수 내부 subject→user→role
+  재도출은 `inv_kernel` 직접 호출 부정 시험으로 분리했다. mapping 없음, 비활성
+  subject/user, approver-only role, event ID 재사용, public terminal 불일치, EXECUTE
+  회수 rollback과 shard parent 분기 변이를 추가했다. 실제 전이 분기 강제는 Python
+  호출부 불변식이라는 잔여 경계도 설계에 명시했다.
+- `9961ac0c` Backend run `36678328387`은 이전 migration 회복 시험이 version marker만
+  0052/0053으로 되돌린 뒤, 이미 남은 0056 policy를 다시 만들면서
+  `DuplicateObject`로 중단됐다. 그 결과 공유 DB가 0053에 남아 0054의
+  `verified_measurement_id` 누락 실패가 연쇄된 것이며 bridge 제품 동작 실패와는
+  구분된다. `fd565286`은 0056 policy/function 재적용을 수렴형으로 바꾸고 이를
+  되살림 시험으로 고정했다.
+- audit 월 partition을 일시 분리한 실 PG 시험도 추가했다. 취소는 `SYS-0001/503`,
+  kernel/public/audit/idempotency는 모두 rollback되고 partition 복구 후 같은 key가
+  audit 정확히 1건으로 성공해야 한다.
+
+## 검증
+
+- PG-free: `tests/core/test_kernel_cancel_bridge.py` **17 passed**,
+  `tests/test_migrations.py` **26 passed**,
+  `tests/test_ac11_migration_rehearsal.py` **21 passed**,
+  `tests/test_aggregate_ac11_evidence.py` **85 passed**,
+  `tests/test_collect_rls_evidence.py -m "not postgres"` **17 passed / 3 deselected**,
+  `tests/test_collect_s02_acceptance_evidence.py` **30 passed / 1 opt-in skipped**.
+- hosted 교정 run `36680958915`은 bridge 본체 시험 전 setup에서
+  `workspace_http` fixture 미등록 17건을 드러냈다(그 밖 **5930 passed / 22 skipped /
+  2 deselected**). fixture import를 명시한 `b9c86029`의 Core `36683585881`은 real-PG
+  17건을 모두 실행해 **16 passed / 1 failed**였고, 실패는 DB 제약상 유효하지 않은
+  public terminal fixture였다. fixture를 실제 `failed + termination_reason + ended_at`로
+  고친 최종 제품 code head는 `44556845448dea14813a9828c7817c8533a999ec`다.
+- 최종 code head의 Backend `36686184974`는 Python 3.12·3.14 각각 **5629 passed /
+  50 skipped / 2 deselected**로 성공했다. Core `36686184969`도 **5949 passed /
+  22 skipped / 2 deselected**로 성공했다. artifact `saintvision-core-evidence`
+  (`11084263352`)의 `core-tests.xml`을 다시 읽어
+  `tests.integration.test_kernel_cancel_bridge_real_pg` **17건 실행, 17 passed,
+  failure/error/skip 0**을 확인했다. 여기에는 route 403, 함수 내부 권한 재도출,
+  mapping·terminal·event ID 부정군, lock timeout, EXECUTE 회수, audit partition 부재,
+  shard·동시 취소와 catalogue digest 검증이 포함된다.
+- 계약·ontology·docs·path citation·migration graph·diff gate는 아래 문서 commit 전
+  최종 working tree에서 다시 실행한다.
+
+운영 배포 SHA·활성 시각·관측 창은 아직 없다. 따라서 이 구현은 C1의 제품 producer
+선행 조건을 닫지만 clean C1은 `RECORDED_ONLY`, S04-DB는 `review`다.
