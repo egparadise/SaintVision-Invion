@@ -132,6 +132,9 @@ def test_migration_closes_owner_function_policy_and_downgrade_boundaries():
     assert source.index("GRANT CREATE ON SCHEMA public") < source.index(
         "ALTER FUNCTION {SIGNATURE} OWNER"
     ) < source.index("REVOKE CREATE ON SCHEMA public")
+    assert source.index("GRANT {OWNER} TO CURRENT_USER") < source.index(
+        "CREATE OR REPLACE FUNCTION {FUNCTION}("
+    ) < source.index("REVOKE {OWNER} FROM CURRENT_USER")
     assert "CREATE POLICY cancel_bridge_audit_append" in source
     assert "CREATE POLICY cancel_bridge_audit_read" in source
     assert "action = 'run.cancel.requested'" in source
@@ -144,6 +147,26 @@ def test_migration_closes_owner_function_policy_and_downgrade_boundaries():
     assert "GRANT UPDATE (workspace_id)" not in source
     assert "GRANT SELECT (tenant_id,event_id) ON public.audit_events" in source
     assert "DROP ROLE" not in source
+
+
+def test_migration_reapplication_converges_after_an_older_revision_resume():
+    source = MIGRATION.read_text(encoding="utf-8")
+    for policy, table in (
+        ("cancel_bridge_projects_read", "public.projects"),
+        ("cancel_bridge_users_read", "public.users"),
+        ("cancel_bridge_project_members_read", "public.project_members"),
+        ("cancel_bridge_workspaces_read", "public.workspaces"),
+        ("cancel_bridge_workloads_read", "public.workloads"),
+        ("cancel_bridge_runs_read", "public.runs"),
+        ("cancel_bridge_runs_update", "public.runs"),
+        ("cancel_bridge_audit_append", "public.audit_events"),
+        ("cancel_bridge_audit_read", "public.audit_events"),
+    ):
+        drop = f"DROP POLICY IF EXISTS {policy} ON {table}"
+        create = f"CREATE POLICY {policy} ON {table}"
+        assert drop in source
+        assert source.index(drop) < source.index(create)
+    assert "CREATE OR REPLACE FUNCTION {FUNCTION}(" in source
 
 
 def test_definer_rechecks_kernel_authority_and_contains_no_dynamic_sql():

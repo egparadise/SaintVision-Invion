@@ -53,6 +53,11 @@ def upgrade() -> None:
         -- CREATE is needed only while transferring function ownership and is
         -- revoked before the migration transaction commits.
         GRANT CREATE ON SCHEMA public TO {OWNER};
+        -- The function may already be owned by this role when an older
+        -- revision's recovery fixture replays the later migration chain.
+        -- Temporary membership permits CREATE OR REPLACE without widening
+        -- the runtime roles; the grant is revoked in this transaction.
+        GRANT {OWNER} TO CURRENT_USER;
         GRANT SELECT (tenant_id,project_id,run_id,state) ON inv.runs TO {OWNER};
         GRANT SELECT (tenant_id,project_id,run_id,workspace_id)
           ON inv.business_runs TO {OWNER};
@@ -76,6 +81,20 @@ def upgrade() -> None:
           outcome,reason_code,trace_id,target_type,target_id,detail)
           ON public.audit_events TO {OWNER};
         GRANT SELECT (tenant_id,event_id) ON public.audit_events TO {OWNER};
+
+        -- Older-revision recovery tests deliberately move only the Alembic
+        -- version marker backwards while retaining later catalogue objects.
+        -- Re-applying 0056 must therefore converge instead of failing on a
+        -- same-named policy left by the already-applied bridge.
+        DROP POLICY IF EXISTS cancel_bridge_projects_read ON public.projects;
+        DROP POLICY IF EXISTS cancel_bridge_users_read ON public.users;
+        DROP POLICY IF EXISTS cancel_bridge_project_members_read ON public.project_members;
+        DROP POLICY IF EXISTS cancel_bridge_workspaces_read ON public.workspaces;
+        DROP POLICY IF EXISTS cancel_bridge_workloads_read ON public.workloads;
+        DROP POLICY IF EXISTS cancel_bridge_runs_read ON public.runs;
+        DROP POLICY IF EXISTS cancel_bridge_runs_update ON public.runs;
+        DROP POLICY IF EXISTS cancel_bridge_audit_append ON public.audit_events;
+        DROP POLICY IF EXISTS cancel_bridge_audit_read ON public.audit_events;
 
         CREATE POLICY cancel_bridge_projects_read ON public.projects
           FOR SELECT TO {OWNER}
@@ -123,7 +142,7 @@ def upgrade() -> None:
           USING (tenant_id = NULLIF(
             pg_catalog.current_setting('inv.tenant_id',true),'')::uuid);
 
-        CREATE FUNCTION {FUNCTION}(
+        CREATE OR REPLACE FUNCTION {FUNCTION}(
           p_subject_id text,
           p_project_id text,
           p_run_id text,
@@ -246,7 +265,6 @@ def upgrade() -> None:
         END
         $fn$;
 
-        GRANT {OWNER} TO CURRENT_USER;
         ALTER FUNCTION {SIGNATURE} OWNER TO {OWNER};
         REVOKE CREATE ON SCHEMA public FROM {OWNER};
         REVOKE {OWNER} FROM CURRENT_USER;

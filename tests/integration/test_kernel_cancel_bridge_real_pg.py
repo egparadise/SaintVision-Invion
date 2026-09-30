@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timezone
 import hashlib
 import json
 from pathlib import Path
 from uuid import uuid4
 
 import psycopg
+from psycopg import sql
 import pytest
 
 from inv.ids import new_id
@@ -380,6 +382,47 @@ def test_execute_revoke_fails_closed_and_same_key_retries_after_restore(business
             conn.execute(f"GRANT EXECUTE ON FUNCTION {SIGNATURE} TO inv_kernel")
     retry = a.http.post(
         _url(a), json=body, headers=a.headers(key="cancel-execute-revoked")
+    )
+    assert retry.status_code == 200, retry.text
+    assert len(_facts(a)[2]) == 1
+
+
+def test_missing_current_audit_partition_rolls_back_and_same_key_retries(business):
+    a = business
+    body = _body(a)
+    partition = "audit_events_p" + datetime.now(timezone.utc).strftime("%Y%m")
+    with psycopg.connect(a.e.owner) as conn:
+        bound = conn.execute(
+            "SELECT pg_get_expr(c.relpartbound,c.oid) FROM pg_class c "
+            "JOIN pg_namespace n ON n.oid=c.relnamespace "
+            "WHERE n.nspname='public' AND c.relname=%s",
+            (partition,),
+        ).fetchone()
+        assert bound and bound[0].startswith("FOR VALUES FROM")
+        conn.execute(
+            sql.SQL("ALTER TABLE public.audit_events DETACH PARTITION {}").format(
+                sql.Identifier("public", partition)
+            )
+        )
+    try:
+        denied = a.http.post(
+            _url(a), json=body, headers=a.headers(key="cancel-partition-missing")
+        )
+        assert denied.status_code == 503, denied.text
+        assert denied.json()["code"] == "SYS-0001"
+        kernel, public, audit, ledger = _facts(a)
+        assert kernel[0] != "cancelled" and public[0] != "cancelled"
+        assert audit == [] and ledger == []
+    finally:
+        with psycopg.connect(a.e.owner) as conn:
+            conn.execute(
+                sql.SQL("ALTER TABLE public.audit_events ATTACH PARTITION {} ").format(
+                    sql.Identifier("public", partition)
+                )
+                + sql.SQL(bound[0])
+            )
+    retry = a.http.post(
+        _url(a), json=body, headers=a.headers(key="cancel-partition-missing")
     )
     assert retry.status_code == 200, retry.text
     assert len(_facts(a)[2]) == 1
