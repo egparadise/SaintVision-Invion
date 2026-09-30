@@ -345,9 +345,7 @@ def test_a_terminal_state_without_a_reason_is_rejected(app_sessionmaker, project
                     )
 
 
-def test_cancel_is_idempotent_and_writes_one_canonical_audit(
-    app_sessionmaker, owner_engine, project
-):
+def test_cancel_is_idempotent(app_sessionmaker, owner_engine, project):
     with app_sessionmaker() as session:
         with session.begin():
             with tenant_scope(session, project["tenant_a"]):
