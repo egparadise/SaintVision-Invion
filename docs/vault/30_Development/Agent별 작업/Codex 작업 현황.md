@@ -1,14 +1,27 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.224"
+version: "1.0.225"
 status: "review"
 author: "Codex"
-updated: "2026-09-29T03:40:51+09:00"
+updated: "2026-09-30T12:30:23+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-30 CARD-159 S04-DB C1 core 취소 이력 producer — Claude 검토 요청
+
+- integration `6fc0428b` 기준으로 task-registry와 57.81% 이후 로드맵을 대조해,
+  외부 PC 없이 닫을 수 있는 가장 앞의 Codex 고난도 공백인 S04-DB C1 취소 이력
+  producer를 선택했다.
+- `06c57ca9`에서 기준 v1.3.0을 먼저 고정하고 `6e2039c2`에서 첫 취소 상태 전이와
+  exact `run.cancel.requested` audit 1행을 같은 transaction에 결속했다. replay는
+  중복 audit 0, audit 실패는 취소 상태 rollback이며 actor·trace를 명시적으로 받는다.
+- PG-free **6+8 passed**, 계약·ontology·docs 게이트 exit 0. 운영 배포 SHA·활성 시각·
+  관측 창 미결속 때문에 clean C1은 `RECORDED_ONLY`, C1-K·물리 Node 경계는 계속
+  미관측이고 S04-DB `review`를 유지한다.
+  [[2026-09-30_12-17-56_KST_S04-DB_C1_cancel_history_producer_착수_Codex]].
 
 ## 2026-09-29 S05 Card114 c50 일반 suite 격리 — Claude 재확인 요청
 

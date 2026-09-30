@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-20260930-CARD159-S04-C1-CANCEL-PRODUCER-CODEX"
 title: "Card 159 S04-DB C1 core 취소 이력 producer 착수"
-version: "1.0.0"
-status: "in_progress"
+version: "1.0.1"
+status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-30T12:17:56+09:00"
+updated: "2026-09-30T12:30:23+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "6fc0428b49f28379cb4da17830d92256b55c2eb2"
@@ -62,3 +62,35 @@ S04의 취소 상태 전이와 append-only audit 원장을 원자적으로 결�
   배포 결속 전 clean 결과는 `RECORDED_ONLY`로 제한한다.
 - 공개 HTTP/JSON 계약과 migration은 변경하지 않는다. S04-DB는 `review`를 유지한다.
 
+## 구현 결과
+
+- 기준 v1.3.0을 docs-only commit
+  `06c57ca9a2fadeaeee061744d8e5381a3194fa71`에 먼저 고정했다.
+- 구현 commit `6e2039c2ba8a18d4055b83e556bcc29d5c1403f0`에서
+  `cancel_run`이 actor·trace를 명시적으로 받고, 첫 취소 상태 전이 뒤 같은
+  `Session`에 exact `run.cancel.requested` audit를 기록하게 했다. anonymous·actor
+  없는 비-system 취소는 상태를 읽기 전에 거부한다.
+- 이미 취소된 replay는 audit를 추가하지 않으며, audit 오류는 삼키지 않는다.
+  hosted PostgreSQL 시험은 audit 오류 transaction 뒤 run이 `draft`, audit가 0행인지
+  확인하도록 작성했다.
+- collector schema는 `s04-s08-operational-evidence:1.1`, criteria는 v1.3.0으로
+  올렸다. SQL은 prefix가 아니라 exact action을 사용한다. clean C1은 운영 배포
+  결속 전 `RECORDED_ONLY`, 위반은 `MEASURED_FAIL`, row 0은 `NOT_OBSERVED`다.
+
+## 로컬 검증
+
+- `tests/core/test_run_cancel_audit.py`: **6 passed**.
+- `tests/core/test_s04_s08_operational_evidence.py`: **8 passed**.
+- 선택 파일 `py_compile`, Black check, `git diff --check`: exit 0.
+- `check_contract_bindings.py`, `check_ontology.py`, `check_docs.py`: exit 0.
+- doc path citation ratchet: 새 결함 0, baseline floor 불변.
+- 로컬 실 PostgreSQL·Docker·전체 suite는 메모리 제약 때문에 실행하지 않았다.
+  작성한 real-PG 원자성 시험의 실제 실행은 hosted Backend/Core 증거로 확인한다.
+
+## 남은 경계
+
+- producer의 코드·시험 green은 운영 배포 identity가 아니다. 운영 C1
+  `MEASURED_PASS`는 producer 배포 SHA·활성 시각·관측 창을 결속하는 후속 입력이
+  있어야 한다.
+- C1-K execution-time epoch history와 물리 Node 재전송은 이 카드 범위 밖이며
+  미관측 상태를 유지한다. S04-DB는 `review`이고 acceptance 승격은 없다.
