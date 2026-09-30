@@ -1,4 +1,4 @@
-﻿import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { generateCodeVerifier, generateCodeChallenge, generateState, generateNonce } from '../src/features/auth/pkce';
 
 describe('Auth & Security: RFC 7636 PKCE Cryptographic Protocol', () => {
@@ -42,5 +42,12 @@ describe('Auth & Security: RFC 7636 PKCE Cryptographic Protocol', () => {
     expect(nonce1).toBeDefined();
     expect(nonce1.length).toBe(32); // 16 bytes hex = 32 chars
     expect(nonce1).not.toBe(nonce2);
+  });
+
+  it('conforms exactly to RFC 7636 Appendix B test vector', async () => {
+    const rfcVerifier = 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk';
+    const rfcExpectedChallenge = 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM';
+    const computed = await generateCodeChallenge(rfcVerifier);
+    expect(computed).toBe(rfcExpectedChallenge);
   });
 });
