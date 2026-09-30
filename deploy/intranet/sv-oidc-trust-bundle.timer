@@ -1,0 +1,13 @@
+[Unit]
+Description=Daily reissue of the SaintVision OIDC trust bundle
+
+[Timer]
+# The bundle expires within seven days. Daily, not weekly: a weekly timer gives a
+# failed run no second chance before the control plane refuses to start.
+OnCalendar=daily
+RandomizedDelaySec=15m
+Persistent=true
+Unit=sv-oidc-trust-bundle.service
+
+[Install]
+WantedBy=timers.target

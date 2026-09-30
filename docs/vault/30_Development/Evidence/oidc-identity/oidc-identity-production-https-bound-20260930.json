@@ -1,0 +1,56 @@
+{
+  "acceptanceClaim": true,
+  "codeSha": "8cf656eab8799da7e9ad6b3c368394de2ba8d59b",
+  "collectorSha256": "558ad4b739215781f0e7e24d0fb0a4aac0b6e3fc8dd4edd20c26986f6b2a419b",
+  "criteria": {
+    "bundleAccepted": "inv.identity.AccessTokens._keys loads the bundle this repo built",
+    "liveTokenVerified": "a token the running provider issued passes AccessTokens.verify",
+    "tamperedTokenRefused": "the same verifier refuses a one-character payload edit"
+  },
+  "observations": {
+    "bundleAccepted": {
+      "loadedKeyCount": 1,
+      "status": "MEASURED_PASS"
+    },
+    "liveTokenVerified": {
+      "expiresAtInFuture": true,
+      "status": "MEASURED_PASS",
+      "subjectIsDerivedPseudonym": true,
+      "tokenTypeHeader": "at+jwt"
+    },
+    "tamperedTokenRefused": {
+      "code": "AUTH-0050",
+      "httpStatus": 401,
+      "status": "MEASURED_PASS"
+    }
+  },
+  "provenance": {
+    "branch": "agent/claude/card152-intranet-idp",
+    "contentClean": true,
+    "executor": "claude",
+    "workingTreeClean": true
+  },
+  "schemaVersion": "oidc-identity-evidence:2",
+  "source": {
+    "audienceSha256": "a7c0f1ec44785d07a39bae0b48f1d114c723931f9e3eb96bdeb8258b3c85da48",
+    "clientIdSha256": "13c95d85eba6d768927953300fc8136037048105df85461f86b76c87dd8ee17f",
+    "droppedNonSigningKeys": 1,
+    "inputBindingSha256": "84f8cbd0700f419f2e2018d34aeecf5140970e2206851e398e00566afd9ab9b8",
+    "issuerScheme": "https",
+    "issuerSha256": "ae8816d9369e5861cd6ac6b9a4269fae617855bb3adb4cb7088649ba5466bd93",
+    "jwksSha256": "0b875f3e05f58f0b65d832289830bd97e90edfdb59e46dbb9a2c1e7bfd704070",
+    "jwksTransport": "out-of-band-file",
+    "keyCount": 1,
+    "kidSha256": [
+      "98ed279bada9f26de359874566bf64175ac2cad0287f9e2430cbd46ae36bd6de"
+    ],
+    "observedAt": "2026-09-30T00:14:45Z",
+    "providerRole": "production",
+    "signedByKidSha256": "98ed279bada9f26de359874566bf64175ac2cad0287f9e2430cbd46ae36bd6de",
+    "sourceFinishedAt": "2026-09-30T00:14:47Z",
+    "sourceStartedAt": "2026-09-30T00:14:45Z",
+    "temporaryBundleRemoved": true,
+    "tokenLifetimeSeconds": 300
+  },
+  "verdict": "PASS"
+}
