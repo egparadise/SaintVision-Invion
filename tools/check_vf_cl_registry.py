@@ -38,6 +38,10 @@ Six rules:
    ``pr-<n>`` or ``#<n>`` claims to be waiting for it. If that PR is already merged in
    this history the blocker is misstated, which is how #126 slipped through. This is
    the rule that generalises the mistake.
+0. **The checkout must be able to answer.** Rules 2 and 4's ancestry read history, and a
+   shallow clone has none: the ancestry check fails for want of the commit and the
+   merged-pull-request scan sees only the tip. That is reported as itself rather than as
+   drift, and never passes quietly.
 3. **Every closed blocker must still be closed.** The manifest carries its checks and
    each is re-run against the tree. Prose in ``evidence`` is for people; the checks are
    what this tool believes. A blocker the manifest shows closed may not be listed open.
@@ -118,6 +122,21 @@ COUNT_FIELDS = ("acceptedCards", "acceptanceDenominator")
 
 class RegistryUnusable(ValueError):
     """The registry cannot be judged, which is not the same as it being wrong."""
+
+
+def shallow_repository(root: Path) -> bool:
+    """Whether this checkout has been truncated.
+
+    Two of the rules read history: the ancestry of ``verifiedAgainst.tree`` and which pull
+    requests merged. In a shallow clone the first fails for want of the commit -- which
+    read as "not an ancestor", a wrong reason -- and the second silently sees only the tip,
+    so a blocker naming a merged pull request goes unnoticed. Neither may pass quietly.
+    """
+    result = subprocess.run(
+        ["git", "rev-parse", "--is-shallow-repository"],
+        cwd=root, capture_output=True, text=True,
+    )
+    return result.returncode == 0 and result.stdout.strip() == "true"
 
 
 def merged_pull_requests(root: Path) -> set[int]:
@@ -231,11 +250,26 @@ def audit(registry: dict, root: Path, manifest_path: Path = DEFAULT_MANIFEST) ->
     identifiers = [card["id"] for card in registry["cards"]]
     manifest = load_manifest(manifest_path, identifiers)["cards"]
     findings: list[str] = []
-    merged = merged_pull_requests(root)
+    # Reported, not worked around: a truncated checkout cannot re-derive history, and
+    # saying so is the honest outcome. The hosted job that runs this check is configured
+    # with full history so the rules below actually run.
+    truncated = shallow_repository(root)
+    if truncated:
+        findings.append(
+            "this is a shallow checkout, so the two history rules could not be "
+            "re-derived: neither the ancestry of verifiedAgainst.tree nor which pull "
+            "requests merged is knowable here. Check out with full history "
+            "(actions/checkout fetch-depth: 0)."
+        )
+    merged = set() if truncated else merged_pull_requests(root)
 
     verified = registry.get("verifiedAgainst")
     if not isinstance(verified, dict) or not verified.get("tree"):
         findings.append("the registry does not say which tree it was verified against")
+    elif truncated:
+        # Already reported above. Adding "not an ancestor" here would name a wrong reason
+        # for a missing commit, which is what sent this check to CI as a false drift.
+        pass
     else:
         tree = str(verified["tree"])
         result = subprocess.run(

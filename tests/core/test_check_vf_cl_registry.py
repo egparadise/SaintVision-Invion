@@ -660,3 +660,106 @@ def test_the_shipped_registry_records_which_ids_its_local_gap_retired():
     replaced = four["localUnmeasured"][0]["blockerIdsThisReplaces"]
     assert RETIRED in replaced
     assert "restore-drill-19-setup-skips-in-hosted-core-until-pr-126" in replaced
+
+
+# --- the hosted failure: a shallow checkout cannot answer two of the rules ---------
+
+
+def shallow_clone(tmp_path, document):
+    """A real depth-1 clone whose registry names a commit the clone does not have.
+
+    This is the hosted backend shape: actions/checkout@v4 defaults to fetch-depth 1, so
+    `git merge-base --is-ancestor <tree> HEAD` failed for want of the commit and the
+    checker said "not an ancestor" -- a wrong reason for a truncated history.
+    """
+    source = tmp_path / "source"
+    source.mkdir()
+    (source / "src").mkdir()
+    (source / "src" / "route.py").write_text(
+        "from ..adapters.model_import import require_exact_declaration\n"
+        "require_exact_declaration(manifest, declared)\n",
+        encoding="utf-8",
+    )
+    (source / "src" / "mount.py").write_text("route.register(router)\n", encoding="utf-8")
+    git = ["git", "-c", "user.email=t@example.com", "-c", "user.name=t"]
+    subprocess.run(["git", "init", "-q", "-b", "main"], cwd=source, check=True)
+    subprocess.run(["git", "add", "-A"], cwd=source, check=True)
+    subprocess.run([*git, "commit", "-q", "-m", "first"], cwd=source, check=True)
+    first = subprocess.run(["git", "rev-parse", "HEAD"], cwd=source,
+                           capture_output=True, text=True, check=True).stdout.strip()
+    (source / "src" / "later.py").write_text("# a second commit\n", encoding="utf-8")
+    subprocess.run(["git", "add", "-A"], cwd=source, check=True)
+    subprocess.run([*git, "commit", "-q", "-m", "Merge PR #126 (abc) into merge train"],
+                   cwd=source, check=True)
+
+    clone = tmp_path / "shallow"
+    subprocess.run(
+        ["git", "clone", "-q", "--depth", "1", source.resolve().as_uri(), str(clone)],
+        check=True, capture_output=True,
+    )
+    is_shallow = subprocess.run(
+        ["git", "rev-parse", "--is-shallow-repository"], cwd=clone,
+        capture_output=True, text=True, check=True,
+    ).stdout.strip()
+    assert is_shallow == "true", f"the fixture clone is not shallow: {is_shallow}"
+    document["verifiedAgainst"] = {"tree": first}
+    return clone
+
+
+def test_a_shallow_checkout_is_reported_as_itself_not_as_drift(tmp_path):
+    """The exact hosted failure, reproduced and renamed.
+
+    Rule 2 is blinded too: `git log` in a shallow clone lists only the tip, so a blocker
+    naming a merged pull request would go unnoticed. Neither may pass quietly, so the
+    checker reports the truncation and fails.
+    """
+    document = registry(tmp_path)
+    clone = shallow_clone(tmp_path, document)
+    findings = checker.audit(document, clone, written(tmp_path, manifest()))
+    assert any("shallow checkout" in finding for finding in findings), findings
+    assert any("fetch-depth: 0" in finding for finding in findings), findings
+    # The wrong reason must not be given: the commit is missing, not un-ancestral.
+    assert not [finding for finding in findings if "is not an ancestor" in finding], findings
+
+
+def test_the_shallow_finding_replaces_the_merged_pull_request_scan(tmp_path):
+    """A blocker naming a merged PR is unverifiable in a shallow clone, not absolved."""
+    document = registry(tmp_path)
+    document["cards"][0]["blockers"] = ["until-pr-126"]
+    clone = shallow_clone(tmp_path, document)
+    findings = checker.audit(document, clone, written(tmp_path, manifest()))
+    assert any("shallow checkout" in finding for finding in findings), findings
+    # No claim is made about #126 either way; the truncation is the finding.
+    assert not [f for f in findings if "records as merged" in f], findings
+
+
+def test_a_full_clone_of_the_same_history_passes(tmp_path):
+    """The control: with the history present, the same registry and tree agree."""
+    document = registry(tmp_path)
+    shallow = shallow_clone(tmp_path, document)
+    full = tmp_path / "full"
+    subprocess.run(
+        ["git", "clone", "-q", (tmp_path / "source").resolve().as_uri(), str(full)],
+        check=True, capture_output=True,
+    )
+    assert subprocess.run(
+        ["git", "rev-parse", "--is-shallow-repository"], cwd=full,
+        capture_output=True, text=True, check=True,
+    ).stdout.strip() == "false"
+    assert checker.shallow_repository(shallow) is True
+    assert checker.shallow_repository(full) is False
+    assert checker.audit(document, full, written(tmp_path, manifest())) == []
+
+
+def test_the_backend_job_checks_out_the_history_this_check_needs():
+    """The rule above only runs in CI if that job has the history. Pinned here.
+
+    Judge the job, not the file: the backend job is the one that runs this checker.
+    """
+    workflow = (checker.REPO_ROOT / ".github/workflows/backend.yml").read_text(
+        encoding="utf-8"
+    )
+    backend = workflow[workflow.index("  backend:"):workflow.index("  mlflow-live:")]
+    checkout = backend.index("uses: actions/checkout@v4")
+    setup = backend.index("uses: actions/setup-python@v5")
+    assert "fetch-depth: 0" in backend[checkout:setup], backend[checkout:setup]
