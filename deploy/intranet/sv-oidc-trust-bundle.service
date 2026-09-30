@@ -1,0 +1,14 @@
+[Unit]
+Description=Reissue the SaintVision control-plane OIDC trust bundle
+Documentation=file:///opt/saintvision/deploy/intranet/reissue-oidc-trust-bundle.sh
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+# The bundle holds public keys only; it is written 0644 and read at startup.
+User=saintvision
+Environment=SV_REPO=/opt/saintvision
+Environment=SV_OIDC_ISSUER=https://idp.sv.lan/realms/saintvision
+Environment=SV_OIDC_BUNDLE=/etc/saintvision/oidc-trust-bundle.json
+ExecStart=/opt/saintvision/deploy/intranet/reissue-oidc-trust-bundle.sh
