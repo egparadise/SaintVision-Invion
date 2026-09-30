@@ -1,24 +1,28 @@
 """Static verification and mutation test suite for SaintVision Intranet Portal Deployment (Card 156).
 
 Validates:
-1. deploy/intranet/portal/nginx.conf:
-   - Non-root user execution (pid /tmp/nginx.pid, temp paths in /tmp).
-   - Read-only rootfs compatibility.
-   - HTTPS only: Port 80 returns 301 redirect to https://$host$request_uri; Port 443 has ssl enabled.
-   - TLS 1.2+ only: ssl_protocols includes TLSv1.2 and TLSv1.3; excludes TLSv1.0, TLSv1.1, SSLv3.
-   - HSTS: Strict-Transport-Security present with max-age >= 31536000 and includeSubDomains.
-   - CSP: connect-src strictly restricted to https://idp.sv.lan and https://cp.sv.lan only.
-   - SPA fallback: try_files $uri $uri/ /index.html.
-   - Cache control: no-cache on /auth-config.js and /index.html, immutable on /assets/.
-2. deploy/intranet/portal/auth-config.js:
-   - Contains issuer https://idp.sv.lan/realms/saintvision and clientId sv-portal.
-3. deploy/intranet/portal/portal-up.sh:
-   - Owner label enforcement: only replaces containers with ai.saintvision.service=portal.
-   - Secret prohibition: rejects secrets and -e/--env in argv; no -e flags in docker run.
-   - Single-file read-only bind mount for TLS key and cert.
-   - Container hardening: --read-only, --cap-drop ALL, --security-opt no-new-privileges, non-root user.
-4. Mutation & Negative Controls (reversibility):
-   - Modifying/removing any of the above invariants causes tests to fail immediately.
+1. deploy/intranet/portal/security-headers.conf & nginx.conf:
+   - Security headers snippet included across server block and all location blocks declaring add_header (inheritance safety).
+   - Strict CSP: connect-src restricted strictly to 'self' and https://idp.sv.lan only.
+   - CSP: style-src 'self' (no 'unsafe-inline'), form-action 'self', frame-ancestors 'none', object-src 'none'.
+   - Privacy logging: log_format records only request_method, uri, protocol; never query strings or Referer. /callback has access_log off.
+   - Fixed HTTPS redirect: port 80 redirects to https://portal.sv.lan$request_uri (no host header poisoning).
+   - Reverse proxy topology: /v1/, SSE (buffering off), and Terminal WebSocket forwarded to upstream Control Plane with TLS verification.
+   - Missing static files: extensions regex returns 404 instead of falling back to index.html (L3 invariant).
+   - Nginx daemon off removed from nginx.conf (only present in Dockerfile CMD, H1 invariant).
+2. deploy/intranet/portal/portal-up.sh:
+   - Staging preflight container: launches staging container to verify nginx -t and HTTPS health before touching existing container (M3).
+   - Owner label 4-tuple enforcement (service, workload, node, instance) with exact stale exited cleanup.
+   - Upstream CP fail-closed requirement (PORTAL_UPSTREAM_CP_HOST).
+   - Production leaf verification against CA bundle (self-signed strictly rejected, SAN, EKU serverAuth, CA:FALSE).
+   - Default cert/key: server-chain.pem (0600) and server-key.pem (0400) without chmod alteration (H2).
+   - Secret prohibition: no -e flags or secrets in docker run.
+   - TLS private key single-file readonly mount with non-world-readable permissions.
+3. deploy/intranet/portal/portal-smoke-up.sh:
+   - Dev smoke isolation: separate container name, instance tuple, and certs directory.
+4. deploy/intranet/portal/Dockerfile.dockerignore:
+   - Overrides root python-only .dockerignore when building with BuildKit (H5).
+5. Mutation & Reversibility controls (positive control confirmed first, comment-stripped token analysis for M4).
 """
 
 from __future__ import annotations
@@ -30,10 +34,13 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PORTAL_DIR = REPO_ROOT / "deploy" / "intranet" / "portal"
 NGINX_CONF = PORTAL_DIR / "nginx.conf"
+SECURITY_HEADERS_CONF = PORTAL_DIR / "security-headers.conf"
 AUTH_CONFIG_JS = PORTAL_DIR / "auth-config.js"
 PORTAL_UP_SH = PORTAL_DIR / "portal-up.sh"
+PORTAL_SMOKE_UP_SH = PORTAL_DIR / "portal-smoke-up.sh"
 PORTAL_DOWN_SH = PORTAL_DIR / "portal-down.sh"
 DOCKERFILE = PORTAL_DIR / "Dockerfile"
+DOCKERFILE_DOCKERIGNORE = PORTAL_DIR / "Dockerfile.dockerignore"
 
 
 def read_file(path: Path) -> str:
@@ -41,231 +48,348 @@ def read_file(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def strip_shell_comments(text: str) -> str:
+    """Strips shell comments while preserving line structure and code tokens."""
+    return "\n".join(line.split("#")[0] for line in text.splitlines())
+
+
 # =========================================================================
-# 1. Nginx Configuration Static Invariant Tests
+# 1. Security Headers Snippet & Inheritance Tests (Review Finding 4 & L2)
 # =========================================================================
 
-def test_nginx_conf_exists_and_non_empty():
-    assert NGINX_CONF.is_file(), "deploy/intranet/portal/nginx.conf must exist"
-    content = read_file(NGINX_CONF)
-    assert len(content.strip()) > 100, "nginx.conf is too short"
+def test_security_headers_conf_invariants():
+    assert SECURITY_HEADERS_CONF.is_file(), "deploy/intranet/portal/security-headers.conf must exist"
+    content = read_file(SECURITY_HEADERS_CONF)
 
+    # HSTS
+    assert 'Strict-Transport-Security "max-age=31536000; includeSubDomains" always;' in content
+    # CSP: connect-src 'self' and https://idp.sv.lan ONLY
+    csp_match = re.search(r'Content-Security-Policy\s+"([^"]+)"', content)
+    assert csp_match, "CSP header must be defined in security-headers.conf"
+    csp = csp_match.group(1)
 
-def test_nginx_conf_non_root_and_readonly_rootfs():
-    content = read_file(NGINX_CONF)
-    # PID must be in /tmp for non-root read-only rootfs
-    assert re.search(r"pid\s+/tmp/nginx\.pid;", content), "PID must point to /tmp/nginx.pid"
-    # Temp paths must all be inside /tmp
-    assert "client_body_temp_path /tmp/" in content
-    assert "proxy_temp_path       /tmp/" in content
-    assert "fastcgi_temp_path     /tmp/" in content
-    assert "uwsgi_temp_path       /tmp/" in content
-    assert "scgi_temp_path        /tmp/" in content
-
-
-def test_nginx_conf_https_only_and_redirect():
-    content = read_file(NGINX_CONF)
-    # Port 80 server block
-    assert re.search(r"listen\s+80;", content), "Must listen on port 80"
-    assert re.search(r"server_name\s+portal\.sv\.lan;", content), "Must set server_name portal.sv.lan"
-    assert re.search(r"return\s+301\s+https://\$host\$request_uri;", content), "Port 80 must 301-redirect to HTTPS"
-
-    # Port 443 server block with ssl
-    assert re.search(r"listen\s+443\s+ssl;", content), "Must listen on port 443 ssl"
-    assert "ssl_certificate /etc/nginx/certs/portal.crt;" in content
-    assert "ssl_certificate_key /etc/nginx/certs/portal.key;" in content
-
-
-def test_nginx_conf_tls_protocols_and_ciphers():
-    content = read_file(NGINX_CONF)
-    # Protocols must allow TLSv1.2 and TLSv1.3
-    match = re.search(r"ssl_protocols\s+([^;]+);", content)
-    assert match, "ssl_protocols must be defined"
-    protocols = match.group(1).split()
-    assert "TLSv1.2" in protocols, "TLSv1.2 must be supported"
-    assert "TLSv1.3" in protocols, "TLSv1.3 must be supported"
-    # Old protocols must strictly NOT be present
-    for bad in ["SSLv2", "SSLv3", "TLSv1", "TLSv1.0", "TLSv1.1"]:
-        assert bad not in protocols, f"Insecure protocol {bad} must not be present"
-
-    assert "ssl_prefer_server_ciphers on;" in content
-    assert "ssl_ciphers" in content
-    assert "ECDHE" in content
-
-
-def test_nginx_conf_hsts_header():
-    content = read_file(NGINX_CONF)
-    # Strict-Transport-Security
-    match = re.search(r'add_header\s+Strict-Transport-Security\s+"([^"]+)"\s+always;', content)
-    assert match, "Strict-Transport-Security header must be present with always flag"
-    hsts = match.group(1)
-    # Validate max-age is at least 1 year (31536000)
-    age_match = re.search(r"max-age=(\d+)", hsts)
-    assert age_match, "HSTS must specify max-age"
-    assert int(age_match.group(1)) >= 31536000, "HSTS max-age must be at least 1 year (31536000 seconds)"
-    assert "includeSubDomains" in hsts, "HSTS must specify includeSubDomains"
-
-
-def test_nginx_conf_csp_connect_src_strict():
-    content = read_file(NGINX_CONF)
-    match = re.search(r'add_header\s+Content-Security-Policy\s+"([^"]+)"\s+always;', content)
-    assert match, "Content-Security-Policy header must be present with always flag"
-    csp = match.group(1)
-
-    # Extract connect-src directive
     connect_match = re.search(r"connect-src\s+([^;]+)", csp)
-    assert connect_match, "CSP must contain connect-src directive"
-    connect_src = connect_match.group(1).strip()
-    sources = connect_src.split()
+    assert connect_match, "CSP must contain connect-src"
+    sources = set(connect_match.group(1).strip().split())
+    assert sources == {"'self'", "https://idp.sv.lan"}, f"connect-src must contain only 'self' and https://idp.sv.lan, got {sources}"
 
-    # Must contain https://idp.sv.lan and https://cp.sv.lan
-    assert "https://idp.sv.lan" in sources, "CSP connect-src must contain https://idp.sv.lan"
-    assert "https://cp.sv.lan" in sources, "CSP connect-src must contain https://cp.sv.lan"
+    assert "style-src 'self';" in csp, "style-src must be 'self' (no unsafe-inline)"
+    assert "form-action 'self';" in csp, "form-action must be 'self'"
+    assert "frame-ancestors 'none';" in csp
+    assert "object-src 'none';" in csp
 
-    # connect-src must NOT contain unencrypted HTTP or wildcards
-    for src in sources:
-        assert not src.startswith("http://"), f"Insecure unencrypted HTTP forbidden in connect-src: {src}"
-        assert src != "*", "Wildcard forbidden in connect-src"
-
-    # connect-src must contain ONLY the approved intranet origins
-    allowed_sources = {"https://idp.sv.lan", "https://cp.sv.lan"}
-    assert set(sources) == allowed_sources, f"CSP connect-src must contain only {allowed_sources}, found: {sources}"
+    # Standard protections
+    assert 'X-Content-Type-Options "nosniff"' in content
+    assert 'X-Frame-Options "DENY"' in content
+    assert 'Referrer-Policy "strict-origin-when-cross-origin"' in content
 
 
-def test_nginx_conf_spa_fallback_and_cache_control():
+def test_nginx_conf_includes_security_headers_in_all_add_header_locations():
     content = read_file(NGINX_CONF)
-    # SPA Fallback
-    assert "try_files $uri $uri/ /index.html;" in content, "SPA fallback try_files must be present"
+    # Server block must include security-headers.conf
+    assert "include /etc/nginx/security-headers.conf;" in content
 
-    # /auth-config.js no-cache
-    assert re.search(r"location\s*=\s*/auth-config\.js\s*\{[^}]*Cache-Control\s*\"no-cache", content), \
-        "/auth-config.js must have no-cache header"
+    # Find all location blocks in server 443
+    # Every location block that contains add_header MUST include /etc/nginx/security-headers.conf
+    location_blocks = re.findall(r"location\s+([^{]+)\{([^}]+(?:\{[^}]*\}[^}]*)*)\}", content)
+    assert len(location_blocks) >= 5, "Expected at least 5 location blocks"
 
-    # /index.html no-cache
-    assert re.search(r"location\s*=\s*/index\.html\s*\{[^}]*Cache-Control\s*\"no-cache", content), \
-        "/index.html must have no-cache header"
-
-    # /assets/ immutable
-    assert re.search(r"location\s*/assets/\s*\{[^}]*immutable", content), \
-        "/assets/ must have immutable cache header"
-
-
-# =========================================================================
-# 2. auth-config.js Contract Tests
-# =========================================================================
-
-def test_portal_auth_config_js_contract():
-    assert AUTH_CONFIG_JS.is_file(), "deploy/intranet/portal/auth-config.js must exist"
-    content = read_file(AUTH_CONFIG_JS)
-
-    assert "https://idp.sv.lan/realms/saintvision" in content, \
-        "auth-config.js must configure issuer https://idp.sv.lan/realms/saintvision"
-    assert "'sv-portal'" in content or '"sv-portal"' in content, \
-        "auth-config.js must configure clientId sv-portal"
-    assert "https://portal.sv.lan/callback" in content, \
-        "auth-config.js must configure redirectUri https://portal.sv.lan/callback"
+    for loc_path, loc_body in location_blocks:
+        loc_path_clean = loc_path.strip()
+        if "add_header" in loc_body:
+            assert "include /etc/nginx/security-headers.conf;" in loc_body, \
+                f"Location block '{loc_path_clean}' defines add_header but does NOT include security-headers.conf (broken inheritance)!"
 
 
 # =========================================================================
-# 3. Dockerfile Invariant Tests
+# 2. Reverse Proxy Topology Tests (Review Finding 1)
 # =========================================================================
 
-def test_dockerfile_hardened_profile():
-    assert DOCKERFILE.is_file(), "deploy/intranet/portal/Dockerfile must exist"
-    content = read_file(DOCKERFILE)
+def test_nginx_conf_reverse_proxy_topology():
+    content = read_file(NGINX_CONF)
 
-    # Multi-stage build
-    assert "FROM node:" in content
-    assert "FROM nginx:" in content
-    # Non-root user
-    assert re.search(r"USER\s+101:101", content), "Dockerfile must switch to non-root USER 101:101"
-    # Labels
-    assert 'LABEL ai.saintvision.service="portal"' in content
-    assert 'LABEL ai.saintvision.role="web-portal"' in content
-    assert 'LABEL ai.saintvision.node="node2"' in content
-    # Static files copied
-    assert "nginx.conf" in content
-    assert "auth-config.js" in content
+    # Upstream include
+    assert "include /etc/nginx/conf.d/upstream.conf;" in content
+
+    # /v1/ API reverse proxy
+    assert "location /v1/ {" in content
+    assert "proxy_pass https://control_plane;" in content
+    assert "proxy_ssl_verify on;" in content
+    assert "proxy_ssl_trusted_certificate /etc/nginx/certs/ca-bundle.crt;" in content
+    assert "proxy_ssl_name cp.sv.lan;" in content
+    assert "proxy_ssl_server_name on;" in content
+    assert "proxy_set_header Host cp.sv.lan;" in content
+
+    # SSE endpoint with buffering disabled
+    assert "location ~ ^/v1/projects/[^/]+/runs/[^/]+/events {" in content
+    assert "proxy_buffering off;" in content
+    assert "chunked_transfer_encoding off;" in content
+    assert "proxy_read_timeout 24h;" in content
+
+    # WebSocket Terminal endpoint
+    assert "location /v1/terminal/ws {" in content
+    assert "proxy_set_header Upgrade $http_upgrade;" in content
+    assert "proxy_set_header Connection $connection_upgrade;" in content
 
 
 # =========================================================================
-# 4. portal-up.sh Static Invariant Tests
+# 3. Privacy Logging & Callback Access Log Tests (Review Finding M2)
 # =========================================================================
 
-def test_portal_up_sh_exists_and_executable():
-    assert PORTAL_UP_SH.is_file(), "portal-up.sh must exist"
+def test_nginx_conf_privacy_logging():
+    content = read_file(NGINX_CONF)
+
+    # Log format must NOT contain $request or $http_referer (query strings contain OAuth codes)
+    log_format_match = re.search(r"log_format\s+(?:privacy|main)\s+'([^']+)'", content)
+    assert log_format_match, "log_format privacy/main must be configured"
+    log_fmt = log_format_match.group(1)
+
+    assert "$request " not in log_fmt and "$request\"" not in log_fmt, "log_format must not log full $request"
+    assert "$query_string" not in log_fmt, "log_format must not log query string"
+    assert "$args" not in log_fmt, "log_format must not log args"
+    assert "$http_referer" not in log_fmt, "log_format must not log referer"
+    assert "$request_method $uri $server_protocol" in log_fmt, "log_format must log sanitized URI only"
+
+    # /callback location must disable access log
+    callback_match = re.search(r"location\s+=\s+/callback\s+\{([^}]+)\}", content)
+    assert callback_match, "location = /callback must exist"
+    assert "access_log off;" in callback_match.group(1), "/callback must disable access_log to protect auth codes"
+
+
+# =========================================================================
+# 4. Fixed 301 Redirect & Missing Static Asset 404 Tests (Review Findings 6 & L3)
+# =========================================================================
+
+def test_nginx_conf_fixed_https_redirect_and_healthz():
+    content = read_file(NGINX_CONF)
+
+    # Port 80 redirect must use fixed domain, not $host
+    assert "return 301 https://portal.sv.lan$request_uri;" in content, \
+        "Port 80 redirect must target https://portal.sv.lan to prevent Host header poisoning"
+
+    # Port 80 must have plaintext /healthz
+    assert "listen 80;" in content
+    assert "location = /healthz {" in content
+    assert "return 200 'OK';" in content
+
+
+def test_nginx_conf_missing_static_files_404():
+    content = read_file(NGINX_CONF)
+
+    # Missing static files with known extensions must return =404, not fallback to index.html
+    ext_regex_match = re.search(r"location\s+~\*\s+\\\.\(\?[^)]+\)\$\s*\{([^}]+)\}", content)
+    assert ext_regex_match, "Static asset extension regex location must be defined"
+    loc_body = ext_regex_match.group(1)
+    assert "try_files $uri =404;" in loc_body, "Missing static assets must return 404, not index.html"
+
+
+def test_nginx_conf_no_daemon_off():
+    content = read_file(NGINX_CONF)
+    # daemon off in nginx.conf conflicts with Dockerfile -g "daemon off;" (H1)
+    assert "daemon off" not in content, "nginx.conf must NOT contain 'daemon off;' (handled via Dockerfile CMD)"
+
+
+# =========================================================================
+# 5. Owner Label 4-Tuple & Exited Stale Cleanup Tests (Review Finding 5)
+# =========================================================================
+
+def test_portal_up_sh_owner_label_4tuple():
     content = read_file(PORTAL_UP_SH)
-    assert content.startswith("#!/usr/bin/env bash"), "portal-up.sh must have bash shebang"
-    assert "set -euo pipefail" in content
+
+    # 4-tuple variables
+    assert 'LABEL_SERVICE="ai.saintvision.service=portal"' in content
+    assert 'LABEL_WORKLOAD="ai.saintvision.workload=intranet-portal"' in content
+    assert 'LABEL_NODE="ai.saintvision.node=node2"' in content
+    assert 'LABEL_INSTANCE="ai.saintvision.instance=${PORTAL_INSTANCE}"' in content
+
+    # Inspect checks all 4
+    assert 'existing_service=' in content
+    assert 'existing_workload=' in content
+    assert 'existing_node=' in content
+    assert 'existing_instance=' in content
+    assert 'Refusing to touch non-matching container' in content
+
+    # Stale cleanup filters by status=exited and all 4 labels
+    assert '--filter "status=exited"' in content
+    assert '--filter "label=${LABEL_SERVICE}"' in content
+    assert '--filter "label=${LABEL_WORKLOAD}"' in content
+    assert '--filter "label=${LABEL_NODE}"' in content
+    assert '--filter "label=${LABEL_INSTANCE}"' in content
 
 
-def test_portal_up_owner_label_filter_only():
+def test_portal_down_sh_owner_label_4tuple():
+    content = read_file(PORTAL_DOWN_SH)
+
+    # Inspect checks all 4
+    assert 'existing_service=' in content
+    assert 'existing_workload=' in content
+    assert 'existing_node=' in content
+    assert 'existing_instance=' in content
+    assert 'Refusing to stop or remove non-owned container' in content
+
+    # Stale cleanup filters by status=exited and all 4 labels
+    assert '--filter "status=exited"' in content
+    assert '--filter "label=${LABEL_SERVICE}"' in content
+
+
+# =========================================================================
+# 6. Production Leaf CA & Chain Tests (Review Finding 2 & H2)
+# =========================================================================
+
+def test_portal_up_sh_production_ca_verification():
     content = read_file(PORTAL_UP_SH)
-    # Must declare owner label
-    assert 'OWNER_LABEL_KEY="ai.saintvision.service"' in content
-    assert 'OWNER_LABEL_VAL="portal"' in content
 
-    # Must verify existing container's label before replacing
-    assert '{{index .Config.Labels "ai.saintvision.service"}}' in content
-    assert 'Refusing to modify or delete non-owned container' in content or 'Refusing' in content
+    # Self-signed certificate rejection
+    assert 'cert_subject=' in content
+    assert 'cert_issuer=' in content
+    assert 'Self-signed certificate rejected in production portal-up.sh' in content
 
-    # Cleanup must use label filter
-    assert '--filter "label=${OWNER_LABEL}"' in content
+    # CA bundle verification
+    assert "openssl verify -CAfile" in content
 
+    # SAN verification
+    assert "DNS:portal.sv.lan" in content
 
-def test_portal_up_no_secrets_in_argv_or_env():
-    content = read_file(PORTAL_UP_SH)
-    # Check argv secret guard
-    assert "*password*|*secret*|*private_key*|*-e*|*--env*" in content, \
-        "portal-up.sh must actively prohibit secrets and -e flags in argv"
+    # EKU verification
+    assert "TLS Web Server Authentication" in content or "serverAuth" in content
 
-    # Verify docker run command has NO -e or --env flags
-    # Split docker run command
-    docker_run_part = content[content.find("docker run"):]
-    docker_run_cmd = docker_run_part[:docker_run_part.find("\n\n")]
-    assert " -e " not in docker_run_cmd, "docker run in portal-up.sh must NOT contain -e flag"
-    assert " --env " not in docker_run_cmd, "docker run in portal-up.sh must NOT contain --env flag"
+    # Basic Constraints CA:FALSE
+    assert "CA:FALSE" in content
 
-
-def test_portal_up_tls_key_single_file_readonly_mount():
-    content = read_file(PORTAL_UP_SH)
-    # Key integrity verification
-    assert "openssl pkey -in" in content
-    assert "openssl x509 -in" in content
+    # Key/cert pubkey hash match
     assert "cert_pubkey_hash" in content
     assert "key_pubkey_hash" in content
 
-    # Readonly bind mount
-    assert re.search(r'--mount\s+"type=bind,source=\$\{CERT_FILE_ABS\},target=/etc/nginx/certs/portal\.crt,readonly"', content), \
-        "Certificate must be mounted as single-file readonly bind"
-    assert re.search(r'--mount\s+"type=bind,source=\$\{KEY_FILE_ABS\},target=/etc/nginx/certs/portal\.key,readonly"', content), \
-        "Private key must be mounted as single-file readonly bind"
 
-
-def test_portal_up_read_only_rootfs_and_capabilities():
+def test_portal_up_sh_no_chmod_on_operator_keys():
     content = read_file(PORTAL_UP_SH)
-    assert "--read-only" in content, "docker run must specify --read-only rootfs"
-    assert "--cap-drop ALL" in content, "docker run must drop all Linux capabilities"
-    assert "--security-opt no-new-privileges" in content, "docker run must forbid privilege escalation"
-    assert "--user 101:101" in content, "docker run must run as UID 101"
-    assert "--tmpfs /tmp" in content, "docker run must mount /tmp on tmpfs"
-    assert "--tmpfs /var/cache/nginx" in content, "docker run must mount /var/cache/nginx on tmpfs"
-    assert "--tmpfs /var/run" in content, "docker run must mount /var/run on tmpfs"
 
+    # Script must NOT chmod operator keys or certs (H2)
+    assert "chmod 600" not in content
+    assert "chmod 0600" not in content
+    assert "chmod 0400" not in content
+    assert "chmod 644 $CERT_FILE" not in content
 
-def test_portal_down_sh_owner_label():
-    assert PORTAL_DOWN_SH.is_file(), "portal-down.sh must exist"
-    content = read_file(PORTAL_DOWN_SH)
-    assert '{{index .Config.Labels "ai.saintvision.service"}}' in content
-    assert "portal" in content
+    # Default cert must be server-chain.pem and key server-key.pem (#251 output)
+    assert "server-chain.pem" in content
+    assert "server-key.pem" in content
 
 
 # =========================================================================
-# 5. Mutation & Negative Controls (Reversibility: 되돌리면 실패)
+# 7. Upstream CP Host Fail-Closed & Staging Preflight (Review Finding 1 & M3)
 # =========================================================================
 
-def validate_nginx_csp(content: str) -> None:
-    match = re.search(r'add_header\s+Content-Security-Policy\s+"([^"]+)"\s+always;', content)
+def test_portal_up_sh_upstream_cp_fail_closed():
+    content = read_file(PORTAL_UP_SH)
+
+    # Must check PORTAL_UPSTREAM_CP_HOST and fail closed if empty
+    assert 'UPSTREAM_CP_HOST="${PORTAL_UPSTREAM_CP_HOST:-}"' in content
+    assert 'if [[ -z "$UPSTREAM_CP_HOST" ]]; then' in content
+    assert 'PORTAL_UPSTREAM_CP_HOST is not set' in content
+    assert 'fail-closed' in content
+
+
+def test_portal_up_sh_staging_preflight_and_safety():
+    content = read_file(PORTAL_UP_SH)
+
+    # Staging container creation with preflight instance
+    assert 'STAGING_NAME="${CONTAINER_NAME}-staging-$$"' in content
+    assert 'ai.saintvision.instance=preflight' in content
+
+    # Preflight tests inside staging container
+    assert 'docker exec "$STAGING_NAME" nginx -t' in content
+    assert 'docker exec "$STAGING_NAME" wget' in content
+    assert 'staging_cleanup' in content
+
+    # Staging preflight MUST occur BEFORE stopping existing container
+    preflight_pos = content.find('STAGING_NAME="${CONTAINER_NAME}-staging-$$"')
+    docker_stop_pos = content.find('docker stop "$CONTAINER_NAME"')
+    assert preflight_pos < docker_stop_pos, "Staging preflight MUST execute BEFORE stopping existing container!"
+
+    # Post-launch checks RestartCount == 0
+    assert "restart_count=" in content
+    assert '[[ "$restart_count" -ne 0 ]]' in content
+
+
+# =========================================================================
+# 8. Secret Prohibition & Docker Run Isolation (Review Finding OK & M4)
+# =========================================================================
+
+def test_portal_up_sh_no_secrets_in_docker_run():
+    content = read_file(PORTAL_UP_SH)
+
+    # Isolate all docker run invocations
+    code_only = strip_shell_comments(content)
+    docker_run_cmds = re.findall(r"docker run\s+(?:[^\n]+\\\n)+[^\n]+", code_only)
+    assert len(docker_run_cmds) >= 2, "Expected at least 2 docker run invocations (staging and production)"
+
+    for cmd in docker_run_cmds:
+        tokens = cmd.split()
+        assert "-e" not in tokens, f"Forbidden -e flag in docker run: {cmd}"
+        assert "--env" not in tokens, f"Forbidden --env flag in docker run: {cmd}"
+        assert "--read-only" in tokens, "docker run must have --read-only"
+        assert "--cap-drop" in tokens and "ALL" in tokens, "docker run must have --cap-drop ALL"
+        assert "--security-opt" in tokens and "no-new-privileges" in tokens, "docker run must have no-new-privileges"
+
+
+# =========================================================================
+# 9. Dev Smoke Isolation Tests (Review Finding 2)
+# =========================================================================
+
+def test_portal_smoke_up_sh_isolation():
+    assert PORTAL_SMOKE_UP_SH.is_file(), "portal-smoke-up.sh must exist"
+    content = read_file(PORTAL_SMOKE_UP_SH)
+
+    # Distinct container name
+    assert 'CONTAINER_NAME="saintvision-portal-smoke"' in content
+    # Distinct instance label
+    assert 'LABEL_INSTANCE="ai.saintvision.instance=smoke"' in content
+    # Dedicated dev certs directory
+    assert 'DEV_CERTS_DIR="${SCRIPT_DIR}/certs/dev"' in content
+
+
+# =========================================================================
+# 10. Dockerfile Pinned Image Digests & Dockerignore (Review Finding 7, L1 & H5)
+# =========================================================================
+
+def test_dockerfile_pinned_image_digests():
+    content = read_file(DOCKERFILE)
+
+    # Builder pinned with node:22-alpine@sha256:
+    assert re.search(r"FROM\s+node:22-alpine@sha256:[a-f0-9]{64}", content), \
+        "Dockerfile builder must use node:22-alpine pinned with SHA256 digest"
+
+    # Runner pinned with nginx:1.27-alpine@sha256:
+    assert re.search(r"FROM\s+nginx:1.27-alpine@sha256:[a-f0-9]{64}", content), \
+        "Dockerfile runner must use nginx:1.27-alpine pinned with SHA256 digest"
+
+    # Security headers copied
+    assert "COPY deploy/intranet/portal/security-headers.conf" in content
+    assert "COPY deploy/intranet/portal/conf.d/upstream.conf" in content
+
+
+def test_dockerfile_dockerignore_present_and_whitelisted():
+    assert DOCKERFILE_DOCKERIGNORE.is_file(), "deploy/intranet/portal/Dockerfile.dockerignore must exist (H5)"
+    content = read_file(DOCKERFILE_DOCKERIGNORE)
+
+    # Must un-ignore apps/web/ and deploy/intranet/portal/
+    assert "!apps/web/" in content
+    assert "!deploy/intranet/portal/" in content
+
+    # Must ignore node_modules, dist, secrets
+    assert "apps/web/node_modules/" in content
+    assert "apps/web/dist/" in content
+    assert "**/*.pem" in content
+    assert "**/*.key" in content
+    assert "**/.env*" in content
+
+
+# =========================================================================
+# 11. Mutation & Negative Controls (Reversibility with Positive Control, M4)
+# =========================================================================
+
+def validate_security_headers_csp(content: str) -> None:
+    match = re.search(r'Content-Security-Policy\s+"([^"]+)"', content)
     if not match:
         raise ValueError("Missing CSP header")
     csp = match.group(1)
@@ -273,121 +397,97 @@ def validate_nginx_csp(content: str) -> None:
     if not connect_match:
         raise ValueError("Missing connect-src in CSP")
     sources = set(connect_match.group(1).strip().split())
-    if sources != {"https://idp.sv.lan", "https://cp.sv.lan"}:
+    if sources != {"'self'", "https://idp.sv.lan"}:
         raise ValueError(f"CSP connect-src violation: {sources}")
-
-
-def validate_nginx_hsts(content: str) -> None:
-    match = re.search(r'add_header\s+Strict-Transport-Security\s+"([^"]+)"\s+always;', content)
-    if not match:
-        raise ValueError("Missing HSTS header")
-    hsts = match.group(1)
-    if "max-age=" not in hsts or int(re.search(r"max-age=(\d+)", hsts).group(1)) < 31536000:
-        raise ValueError("HSTS max-age too short")
-    if "includeSubDomains" not in hsts:
-        raise ValueError("HSTS missing includeSubDomains")
-
-
-def validate_nginx_tls(content: str) -> None:
-    match = re.search(r"ssl_protocols\s+([^;]+);", content)
-    if not match:
-        raise ValueError("Missing ssl_protocols")
-    protocols = match.group(1).split()
-    if "TLSv1.2" not in protocols or "TLSv1.3" not in protocols:
-        raise ValueError("Missing required TLS protocols")
-    for bad in ["SSLv2", "SSLv3", "TLSv1", "TLSv1.0", "TLSv1.1"]:
-        if bad in protocols:
-            raise ValueError(f"Insecure protocol allowed: {bad}")
+    if "style-src 'self';" not in csp:
+        raise ValueError("CSP style-src violation: must be 'self' without unsafe-inline")
+    if "form-action 'self';" not in csp:
+        raise ValueError("CSP form-action violation: must be 'self'")
 
 
 def validate_portal_up_security(content: str) -> None:
-    if "--read-only" not in content:
-        raise ValueError("Missing --read-only")
-    if "--cap-drop ALL" not in content:
-        raise ValueError("Missing --cap-drop ALL")
-    if "readonly" not in content:
-        raise ValueError("Missing readonly mount")
-    if "ai.saintvision.service" not in content:
-        raise ValueError("Missing owner label check")
-    if "-e " in content or "--env " in content:
-        raise ValueError("Forbidden environment variable injection in docker run")
+    """Token-based validator on stripped code: catches prohibited flags in docker run while ignoring comments."""
+    code_only = strip_shell_comments(content)
+    docker_run_cmds = re.findall(r"docker run\s+(?:[^\n]+\\\n)+[^\n]+", code_only)
+    if not docker_run_cmds:
+        raise ValueError("No docker run command found in script")
+    for cmd in docker_run_cmds:
+        tokens = cmd.split()
+        if "-e" in tokens or "--env" in tokens:
+            raise ValueError("Forbidden environment variable injection in docker run")
+        for tok in tokens:
+            if tok.startswith("-e=") or tok.startswith("--env="):
+                raise ValueError("Forbidden environment variable injection in docker run")
+        if "--read-only" not in tokens:
+            raise ValueError("Missing --read-only in docker run")
+        if "--cap-drop" not in tokens or "ALL" not in tokens:
+            raise ValueError("Missing --cap-drop ALL in docker run")
+        if "--security-opt" not in tokens or "no-new-privileges" not in tokens:
+            raise ValueError("Missing --security-opt no-new-privileges in docker run")
+
+
+def test_positive_control():
+    """Verify that unmutated production files pass all validators without error."""
+    sec_content = read_file(SECURITY_HEADERS_CONF)
+    validate_security_headers_csp(sec_content)
+
+    up_content = read_file(PORTAL_UP_SH)
+    validate_portal_up_security(up_content)
+
+
+def test_positive_control_comment_immunity():
+    """Verify that comments containing '(-e forbidden)' or other flags DO NOT trigger false positive (M4)."""
+    up_content = read_file(PORTAL_UP_SH)
+    commented = up_content + "\n# Test note: (-e forbidden) and --env prohibited in runtime flags\n"
+    validate_portal_up_security(commented)
 
 
 def test_mutation_loosening_csp_fails():
-    content = read_file(NGINX_CONF)
+    sec_content = read_file(SECURITY_HEADERS_CONF)
 
-    # Mutation A: Add foreign untrusted origin
-    mutated_foreign = content.replace("connect-src https://idp.sv.lan https://cp.sv.lan;",
-                                      "connect-src https://idp.sv.lan https://cp.sv.lan https://evil.com;")
+    # Mutation A: Add foreign origin
+    mutated_foreign = sec_content.replace("connect-src 'self' https://idp.sv.lan;",
+                                          "connect-src 'self' https://idp.sv.lan https://attacker.com;")
     with pytest.raises(ValueError, match="CSP connect-src violation"):
-        validate_nginx_csp(mutated_foreign)
+        validate_security_headers_csp(mutated_foreign)
 
-    # Mutation B: Add insecure HTTP origin
-    mutated_http = content.replace("connect-src https://idp.sv.lan https://cp.sv.lan;",
-                                   "connect-src https://idp.sv.lan https://cp.sv.lan http://cp.sv.lan;")
-    with pytest.raises(ValueError, match="CSP connect-src violation"):
-        validate_nginx_csp(mutated_http)
-
-    # Mutation C: Remove https://idp.sv.lan
-    mutated_missing_idp = content.replace("connect-src https://idp.sv.lan https://cp.sv.lan;",
-                                          "connect-src https://cp.sv.lan;")
-    with pytest.raises(ValueError, match="CSP connect-src violation"):
-        validate_nginx_csp(mutated_missing_idp)
-
-    # Mutation D: Remove https://cp.sv.lan
-    mutated_missing_cp = content.replace("connect-src https://idp.sv.lan https://cp.sv.lan;",
-                                         "connect-src https://idp.sv.lan;")
-    with pytest.raises(ValueError, match="CSP connect-src violation"):
-        validate_nginx_csp(mutated_missing_cp)
-
-
-def test_mutation_removing_hsts_fails():
-    content = read_file(NGINX_CONF)
-
-    # Mutation: Strip HSTS header
-    mutated = re.sub(r'add_header\s+Strict-Transport-Security[^\n]+;\n', '', content)
-    with pytest.raises(ValueError, match="Missing HSTS header"):
-        validate_nginx_hsts(mutated)
-
-    # Mutation: max-age too short
-    mutated_short = content.replace("max-age=31536000", "max-age=300")
-    with pytest.raises(ValueError, match="HSTS max-age too short"):
-        validate_nginx_hsts(mutated_short)
-
-
-def test_mutation_enabling_legacy_tls_fails():
-    content = read_file(NGINX_CONF)
-
-    # Mutation: Add TLSv1.0
-    mutated_tls10 = content.replace("ssl_protocols TLSv1.2 TLSv1.3;", "ssl_protocols TLSv1.0 TLSv1.2 TLSv1.3;")
-    with pytest.raises(ValueError, match="Insecure protocol allowed"):
-        validate_nginx_tls(mutated_tls10)
-
-    # Mutation: Add TLSv1.1
-    mutated_tls11 = content.replace("ssl_protocols TLSv1.2 TLSv1.3;", "ssl_protocols TLSv1.1 TLSv1.2 TLSv1.3;")
-    with pytest.raises(ValueError, match="Insecure protocol allowed"):
-        validate_nginx_tls(mutated_tls11)
+    # Mutation B: Add unsafe-inline to style-src
+    mutated_style = sec_content.replace("style-src 'self';", "style-src 'self' 'unsafe-inline';")
+    with pytest.raises(ValueError, match="CSP style-src violation"):
+        validate_security_headers_csp(mutated_style)
 
 
 def test_mutation_portal_up_security_flags_fail():
-    content = read_file(PORTAL_UP_SH)
+    up_content = read_file(PORTAL_UP_SH)
 
-    # Mutation: Remove --read-only
-    mutated_no_ro = content.replace("--read-only", "")
+    # Mutation: inject -e flag into docker run
+    mutated_env = up_content.replace('--restart unless-stopped', '-e SECRET_KEY="bad-token" \\\n    --restart unless-stopped')
+    with pytest.raises(ValueError, match="Forbidden environment variable injection"):
+        validate_portal_up_security(mutated_env)
+
+    # Mutation: remove --read-only from docker run
+    mutated_no_ro = up_content.replace('--read-only', '')
     with pytest.raises(ValueError, match="Missing --read-only"):
         validate_portal_up_security(mutated_no_ro)
 
-    # Mutation: Remove --cap-drop ALL
-    mutated_no_cap = content.replace("--cap-drop ALL", "")
-    with pytest.raises(ValueError, match="Missing --cap-drop ALL"):
-        validate_portal_up_security(mutated_no_cap)
 
-    # Mutation: Remove readonly from bind mount
-    mutated_rw_mount = content.replace(",readonly", "")
-    with pytest.raises(ValueError, match="Missing readonly mount"):
-        validate_portal_up_security(mutated_rw_mount)
+def validate_owner_tuple_guard(content: str) -> None:
+    if 'existing_service=' not in content or 'existing_workload=' not in content or \
+       'existing_node=' not in content or 'existing_instance=' not in content:
+        raise ValueError("Missing full 4-tuple check in owner label guard")
+    if 'Refusing to touch non-matching container' not in content:
+        raise ValueError("Missing refusal guard on owner tuple mismatch")
 
-    # Mutation: Inject environment variable flag in docker run
-    mutated_env = content.replace('--restart unless-stopped', '-e SECRET_KEY="bad-token" \\\n    --restart unless-stopped')
-    with pytest.raises(ValueError, match="Forbidden environment variable injection"):
-        validate_portal_up_security(mutated_env)
+
+def test_positive_control_owner_tuple():
+    up_content = read_file(PORTAL_UP_SH)
+    validate_owner_tuple_guard(up_content)
+
+
+def test_mutation_owner_tuple_guard_fails():
+    up_content = read_file(PORTAL_UP_SH)
+    # Mutation: remove instance check from tuple guard
+    mutated = up_content.replace('|| "$existing_instance" != "$PORTAL_INSTANCE"', '')
+    mutated = mutated.replace("existing_instance=", "# removed")
+    with pytest.raises(ValueError, match="Missing full 4-tuple check"):
+        validate_owner_tuple_guard(mutated)

@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-GEMINI-CARD156-001"
 title: "History: Card 156 사내망 portal 웹 배포 자산 및 비root read-only rootfs Nginx·안전 기동 검증"
-version: "1.0.0"
+version: "1.2.0"
 status: "review"
 author: "Gemini"
-updated: "2026-09-30T09:15:00+09:00"
+updated: "2026-09-30T09:42:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -16,122 +16,106 @@ source_of_truth: "Git"
 - **작업 브랜치**: `agent/gemini/c156-intranet-portal-deploy` (Base: `origin/integration/all-agents-unified`, PR #247 최신 커밋 `2f93cbba` 병합)
 - **배치 대상 도메인**: `portal.sv.lan`
 - **배치 대상 노드**: 노드2 (object store 노드, Docker 지원)
-- **목적**:
-  1. `apps/web` 정적 빌드 산출물을 고신뢰·비root 환경에서 안전하게 서빙하는 배포 디렉터리(`deploy/intranet/portal/`) 구축.
-  2. Nginx 설정(`nginx.conf`): 비root 실행(UID:GID 101:101), 읽기 전용 루트 파일시스템(`--read-only`), HTTPS 전용(HTTP 80 $\rightarrow$ HTTPS 443 301 리다이렉트), TLS 1.2+ 한정, HSTS(1년), 엄격한 CSP(`connect-src`는 `https://idp.sv.lan`과 `https://cp.sv.lan`만 허용), SPA fallback, `/auth-config.js` 노캐시.
-  3. 런타임 OIDC 설정(`auth-config.js`): `https://idp.sv.lan/realms/saintvision` 및 `sv-portal` 클라이언트.
-  4. 다단계 빌드 컨테이너 명세(`Dockerfile`): 비root Nginx 이미지, 정적 자산 번들링, 파일 권한 최소화.
-  5. 컨테이너 수명 주기 스크립트(`portal-up.sh`, `portal-down.sh`):
-     - 소유자 라벨(`ai.saintvision.service=portal`) 일치 컨테이너만 안전하게 교체·정리 (타 서비스 보호).
-     - 비밀의 argv 및 환경변수(`-e`/`--env`) 주입 엄격 차단.
-     - TLS 인증서 및 비밀키를 단일 파일 읽기 전용 바인드 마운트(`readonly`)로 격리.
-     - 컨테이너 보안 강화: `--read-only`, `--cap-drop ALL`, `--security-opt no-new-privileges`, `--tmpfs`.
-  6. 정적 검증 및 변이(Reversibility) 시험 스위트(`tests/test_intranet_portal_deploy.py`, 19 passed) 신설.
-  7. **원격 물리 배포 상태**: Card 150(Codex)의 `portal.sv.lan` ECDSA P-256 정식 Leaf 인증서 발급·전달 대기로 원격 물리 배포는 `BLOCKED` 표기, 설정·컨테이너·시험·로컬 스모크 검증은 100% 완료.
+- **독립 검토 의견 전수 조치 (Codex r1 7건 + Claude UI·운영 10건)**:
+  1. **H1 (차단) `daemon off;` 중복 해소**:
+     - `nginx.conf` 상단의 `daemon off;`를 제거하여 `Dockerfile`의 `CMD ["nginx", "-g", "daemon off;"]`와의 충돌을 원천 방지.
+  2. **H5 (차단) 빌드 컨텍스트 `.dockerignore` 분리**:
+     - 루트 `.dockerignore`가 Python 중심(`**` ignore)으로 구성되어 웹 빌드 자산 복사가 차단되는 문제 해소.
+     - `deploy/intranet/portal/Dockerfile.dockerignore`를 추가하여 BuildKit 빌드 시 `apps/web/` 및 배포 설정이 온전히 포함되도록 화이트리스트 구성.
+     - README에 `DOCKER_BUILDKIT=1 docker build -f deploy/intranet/portal/Dockerfile -t saintvision-portal:latest .` 정식 명령 명시.
+  3. **H2 (인증서 기본 파일명 및 권한 보존)**:
+     - #251 PKI 산출물 명세에 맞추어 기본 인증서 경로를 `server-chain.pem`(0600, leaf+intermediate) 및 `server-key.pem`(0400)으로 일치.
+     - `portal-up.sh` 내부에서 운영자 파일 권한을 임의로 변경(`chmod`)하던 로직 완전 제거 (운영자 권한 0400/0600 엄격 보존).
+     - 비root 컨테이너 접근은 `--user` 매핑 또는 전용 그룹(0440)을 통해 안전하게 해결.
+  4. **M2 (로그 개인정보 및 토큰 보호)**:
+     - `apps/web/nginx.conf` 표준과 동일하게 로그 포맷 `privacy`에서 `$request` 쿼리스트링과 `$http_referer`를 완전 제외 (`$request_method $uri $server_protocol`).
+     - `/callback` 엔드포인트에 `access_log off;`를 지정하여 OAuth 일회용 인가 코드의 로그 누출을 원천 방지.
+  5. **M3 (스테이징 사전 검증 및 안전 교체 패턴)**:
+     - 기존 컨테이너를 먼저 삭제하지 않고, 임시 스테이징 컨테이너(`saintvision-portal-staging-$$`)를 먼저 백그라운드로 띄워 내부 `nginx -t` 및 HTTPS `/healthz` 프로브 통과를 확인.
+     - 스테이징 검증 실패 시 기존 운영 컨테이너는 일체 건드리지 않고 즉시 중단 및 보존.
+     - L4 이중 로드밸런서가 없는 단일 컨테이너 교체이므로 README의 '무중단' 서술을 '사전검증 안전 교체(near-zero downtime safe replacement)'로 정정.
+  6. **M4 (주석 제외 토큰 기반 보안 검증기 및 면역 시험)**:
+     - `tests/test_intranet_portal_deploy.py`의 `validate_portal_up_security` 검증기에 `strip_shell_comments`를 도입하여 스크립트 내 주석(`(-e forbidden)` 등)으로 인한 오탐을 원천 제거.
+     - 원본 통과(positive control), 주석 면역 통과, 실제 플래그 주입/제거 시 변이 사살을 모두 엄격하게 단언.
+  7. **M5 (스모크 완료 서술 정정)**:
+     - 호스트 환경의 메모리 제약으로 로컬 컨테이너 런타임 실행이 미수행된 상태에서 '로컬 스모크 100% 완료'로 기재되었던 서술을 삭제 및 정정.
+     - "정적 불변식 및 계약 변이 검증 100% 완료 (런타임 docker build/run/curl 검증은 노드2 실배포/CI 잡 단계에서 실측 예정)"로 정확히 명시.
+  8. **L1 (Node 버전 통일)**:
+     - `deploy/intranet/portal/Dockerfile` 빌더 스테이지에 `node:22-alpine` SHA256 digest를 고정하여 `apps/web/Dockerfile`과 일치.
+  9. **L2 (CSP 강화)**:
+     - `style-src`에서 `'unsafe-inline'`을 제거(`style-src 'self'`), `form-action 'self'` 추가.
+  10. **L3 (누락 정적 자산 404 분기)**:
+      - 알려진 정적 자산 확장자(`.js`, `.css`, `.png`, `.svg` 등)에 대한 정규식 location에 `try_files $uri =404;`를 적용하여 SPA fallback(`/index.html` 200 OK) 오동작 차단.
+  11. **동일 Origin 리버스 프록시 토폴로지 (코디네이터 결정)**:
+      - Nginx가 `/v1/`, SSE, 터미널 WebSocket을 업스트림 제어 평면(`https://control_plane`)으로 포워딩 (`proxy_ssl_verify on;`, `proxy_ssl_name cp.sv.lan;`).
+      - CSP `connect-src`는 `'self'` 및 `https://idp.sv.lan`으로 엄격 한정.
+      - `PORTAL_UPSTREAM_CP_HOST` 미설정 시 기동을 즉시 거부(fail-closed).
+  12. **헤더 상속 무결성**:
+      - [`security-headers.conf`](security-headers.conf) 스니펫을 선언하고 server 블록 및 모든 location 블록에 빠짐없이 include.
+  13. **소유자 라벨 4-튜플 완전 결속**:
+      - `service=portal`, `workload=intranet-portal`, `node=node2`, `instance=${PORTAL_INSTANCE:-main}`.
 
 ---
 
-## 2. 세부 구현 내역
+## 2. 세부 산출물 구조
 
-### 1) 보안 강화 Nginx 설정 (`deploy/intranet/portal/nginx.conf`)
-- **비root 및 Read-Only Rootfs 환경**:
-  - `pid /tmp/nginx.pid;`로 설정하여 비root 사용자가 `/var/run` 쓰기 권한 없이도 기동 가능.
-  - `client_body_temp_path`, `proxy_temp_path`, `fastcgi_temp_path`, `uwsgi_temp_path`, `scgi_temp_path`를 모두 `/tmp` 하위로 지정하여 컨테이너 루트 파일시스템이 읽기 전용(`--read-only`)이어도 문제없이 작동.
-- **HTTPS Only 및 HTTP 301 리다이렉트**:
-  - 포트 80 서버 블록에서 `server_name portal.sv.lan;` 명시 및 `return 301 https://$host$request_uri;` 강제.
-  - 포트 443 서버 블록에서 `listen 443 ssl;` 명시.
-- **TLS 1.2+ 한정 및 순방향 비밀성 암호군**:
-  - `ssl_protocols TLSv1.2 TLSv1.3;` (SSLv2, SSLv3, TLS 1.0, TLS 1.1 차단).
-  - `ssl_prefer_server_ciphers on;` 및 ECDHE 계열 최신 GCM/ChaCha20 암호군 한정.
-- **보안 헤더 및 엄격한 CSP**:
-  - HSTS: `Strict-Transport-Security "max-age=31536000; includeSubDomains" always;` (1년 보장).
-  - CSP: `connect-src https://idp.sv.lan https://cp.sv.lan;`로 한정하여 비암호화 HTTP 및 승인되지 않은 외부 출처 통신 차단.
-  - `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`.
-- **SPA Fallback 및 캐시 무결성**:
-  - `location / { try_files $uri $uri/ /index.html; }`
-  - `/auth-config.js` 및 `/index.html`: `Cache-Control "no-cache, no-store, must-revalidate"`로 설정하여 배포 변경 시 브라우저 캐시 오염 방지.
-  - `/assets/`: `Cache-Control "public, immutable"` 및 1년 캐싱 (Vite content-hash 자산).
-
-### 2) 런타임 OIDC 설정 (`deploy/intranet/portal/auth-config.js`)
-- `apps/web/public/auth-config.js` 계약에 맞추어 사내망 Keycloak IdP 연동:
-  - `issuer: 'https://idp.sv.lan/realms/saintvision'`
-  - `clientId: 'sv-portal'`
-  - `scope: 'openid inv.api'`
-  - `redirectUri: 'https://portal.sv.lan/callback'`
-
-### 3) Multi-stage 비root 컨테이너 명세 (`deploy/intranet/portal/Dockerfile`)
-- Stage 1 (`node:20-alpine`): `apps/web` 의존성 설치 및 프로덕션 번들 빌드 (`npm run build`).
-- Stage 2 (`nginx:1.27-alpine`):
-  - 비root 사용자(UID:GID `101:101`, `nginx:nginx`)로 전환.
-  - `/tmp`, `/var/cache/nginx`, `/var/run` 디렉터리 권한 사전 구성.
-  - 정적 자산 권한을 읽기 전용(`550`)으로 설정.
-  - 표준 소유자 라벨 부여:
-    - `LABEL ai.saintvision.service="portal"`
-    - `LABEL ai.saintvision.role="web-portal"`
-    - `LABEL ai.saintvision.node="node2"`
-    - `LABEL ai.saintvision.workload="intranet-portal"`
-
-### 4) 안전 기동 스크립트 (`deploy/intranet/portal/portal-up.sh`)
-- **소유자 라벨 격리**:
-  - `OWNER_LABEL="ai.saintvision.service=portal"`
-  - 대상 컨테이너가 존재할 경우 라벨을 검사하여 동일 소유자 라벨일 때만 안전하게 교체하고, 타 컨테이너는 절대 수정/삭제하지 않고 오류 종료.
-  - 노드 내 잔존하는 동일 라벨의 유휴 컨테이너만 필터링하여 정리.
-- **비밀 argv 및 환경변수 주입 차단**:
-  - 스크립트 실행 인자(`$@`)에 패스워드, 토큰, 비밀키 키워드 및 `-e`/`--env` 플래그 유입 시 즉각 거부.
-  - `docker run` 실행 시 `-e` 플래그 0건 보장.
-- **단일 파일 읽기 전용 TLS 마운트**:
-  - 인증서와 비밀키를 디렉터리가 아닌 단일 파일 바인드 마운트(`readonly`)로 격리:
-    - `--mount "type=bind,source=${CERT_FILE_ABS},target=/etc/nginx/certs/portal.crt,readonly"`
-    - `--mount "type=bind,source=${KEY_FILE_ABS},target=/etc/nginx/certs/portal.key,readonly"`
-  - 실행 전 인증서와 비밀키의 공개키 SHA-256 해시 일치성을 사전 검증.
-- **컨테이너 보안 프로파일**:
-  - `--read-only`, `--cap-drop ALL`, `--security-opt no-new-privileges`, `--user 101:101`, `--tmpfs` mounts.
-
-### 5) 안전 정지 스크립트 (`deploy/intranet/portal/portal-down.sh`)
-- `ai.saintvision.service=portal` 소유자 라벨을 검증한 뒤 포털 컨테이너를 안전하게 정지 및 삭제.
-
-### 6) 로컬 스모크 인증서 생성기 (`deploy/intranet/portal/generate-dev-certs.sh`)
-- 사내 PKI CA의 정식 인증서 전달 전 로컬 스모크 테스트 및 오프라인 검증을 위해 임시 ECDSA P-256 (`prime256v1`) 자체 서명 인증서(`SAN: DNS:portal.sv.lan`)를 생성.
-- `LOCAL SMOKE TEST ONLY` 명시.
+```
+deploy/intranet/portal/
+├── Dockerfile                  # Multi-stage 비root Nginx 이미지 (node:22/nginx:1.27 sha256 고정)
+├── Dockerfile.dockerignore      # 포털 빌드 전용 ignore (루트 python .dockerignore 오버라이드)
+├── nginx.conf                  # 동일 origin 리버스 프록시 및 정적 서빙 설정
+├── security-headers.conf       # HSTS/CSP/nosniff 공통 헤더 스니펫
+├── conf.d/
+│   └── upstream.conf           # 업스트림 제어 평면 정의 스니펫
+├── auth-config.js              # 사내망 Keycloak IdP 연동 런타임 설정 (sv-portal)
+├── portal-up.sh                # 운영 컨테이너 안전 기동/교체 스크립트 (스테이징 사전검증, 4-튜플 라벨, CA 검증)
+├── portal-smoke-up.sh          # 로컬 개발/스모크 전용 기동 스크립트 (격리된 smoke 튜플)
+├── portal-down.sh              # 운영 컨테이너 안전 정지 스크립트 (4-튜플 라벨 검증)
+├── generate-dev-certs.sh       # 로컬 스모크용 임시 ECDSA P-256 인증서 생성기
+└── README.md                   # 본 가이드
+```
 
 ---
 
-## 3. 검증 결과
+## 3. 정량 검증 결과
 
-### 1) 단위 및 정적 검증 시험 (`tests/test_intranet_portal_deploy.py`)
-- **19 passed (100%)**:
-  1. `test_nginx_conf_exists_and_non_empty`: 설정 파일 실재 및 크기 검증.
-  2. `test_nginx_conf_non_root_and_readonly_rootfs`: PID `/tmp/nginx.pid` 및 5대 temp 경로 `/tmp` 검증.
-  3. `test_nginx_conf_https_only_and_redirect`: 포트 80 $\rightarrow$ 443 301 리다이렉트 및 포트 443 ssl 검증.
-  4. `test_nginx_conf_tls_protocols_and_ciphers`: TLS 1.2/1.3 필수, SSLv2/SSLv3/TLS1.0/TLS1.1 차단, ECDHE 암호군 검증.
-  5. `test_nginx_conf_hsts_header`: HSTS 헤더 존재, max-age >= 31536000, includeSubDomains 검증.
-  6. `test_nginx_conf_csp_connect_src_strict`: CSP connect-src가 오직 `https://idp.sv.lan`과 `https://cp.sv.lan`만 허용함을 검증.
-  7. `test_nginx_conf_spa_fallback_and_cache_control`: SPA try_files, /auth-config.js 및 /index.html no-cache, /assets/ immutable 검증.
-  8. `test_portal_auth_config_js_contract`: OIDC issuer 및 clientId 계약 검증.
-  9. `test_dockerfile_hardened_profile`: multi-stage, USER 101:101, 소유자 라벨 3종 검증.
-  10. `test_portal_up_sh_exists_and_executable`: 실행 권한 및 strict bash 옵션 검증.
-  11. `test_portal_up_owner_label_filter_only`: 소유자 라벨 컨테이너 한정 교체 검증.
-  12. `test_portal_up_no_secrets_in_argv_or_env`: 비밀 argv 및 -e 플래그 부재 검증.
-  13. `test_portal_up_tls_key_single_file_readonly_mount`: 키/인증서 해시 검증 및 단일 파일 readonly 바인드 마운트 검증.
-  14. `test_portal_up_read_only_rootfs_and_capabilities`: --read-only, --cap-drop ALL, --security-opt, --tmpfs 검증.
-  15. `test_portal_down_sh_owner_label`: 소유자 라벨 기반 컨테이너 정지 검증.
-  16. `test_mutation_loosening_csp_fails`: CSP 완화(외부 도메인, HTTP, idp/cp 누락) 시 즉시 실패 (변이 사살).
-  17. `test_mutation_removing_hsts_fails`: HSTS 누락 및 유효기간 축소 시 즉시 실패 (변이 사살).
-  18. `test_mutation_enabling_legacy_tls_fails`: TLS 1.0/1.1 허용 시 즉시 실패 (변이 사살).
-  19. `test_mutation_portal_up_security_flags_fail`: 보안 플래그 제거 및 환경변수 주입 시 즉시 실패 (변이 사살).
-
-### 2) 웹 프런트엔드 빌드 및 무결성 검증
-- `apps/web` TypeScript 점검: `npx tsc -b` 타입 에러 **0건**.
-- `apps/web` 프로덕션 빌드: `npm run build` 성공 (Vite bundle 7.82s).
-- 프런트엔드 무결성 점검: `python tools/check_frontend_integrity.py` 92개 파일 스캔, 9대 규칙 위반 **0건 (exit 0)**.
-- 라우트 커버리지 점검: `pytest tests/test_route_coverage.py` **40 passed (exit 0)**.
+- **배포 정적 및 변이 사살 시험 (`pytest tests/test_intranet_portal_deploy.py`)**:
+  - **23 passed 100% (0.10s)**:
+    1. `test_security_headers_conf_invariants`: HSTS, strict CSP connect-src `'self'`/idp, style-src 'self' (no unsafe-inline), form-action 'self'.
+    2. `test_nginx_conf_includes_security_headers_in_all_add_header_locations`: 전 location 헤더 상속 검증.
+    3. `test_nginx_conf_reverse_proxy_topology`: /v1/, SSE buffering off, WS upgrade, upstream TLS 검증.
+    4. `test_nginx_conf_privacy_logging`: 로그 포맷 query/referer 제외, /callback access_log off 검증.
+    5. `test_nginx_conf_fixed_https_redirect_and_healthz`: 고정 domain 301 리다이렉트, /healthz 예외 검증.
+    6. `test_nginx_conf_missing_static_files_404`: 누락 확장자 404 응답 검증 (L3).
+    7. `test_nginx_conf_no_daemon_off`: nginx.conf 내 daemon off 부재 검증 (H1).
+    8. `test_portal_up_sh_owner_label_4tuple`: 4-튜플 라벨 및 exited 한정 정리 검증.
+    9. `test_portal_down_sh_owner_label_4tuple`: down 스크립트 4-튜플 검증.
+    10. `test_portal_up_sh_production_ca_verification`: CA 체인, self-signed 거부, SAN, EKU, CA:FALSE 검증.
+    11. `test_portal_up_sh_no_chmod_on_operator_keys`: operator 키 권한 chmod 부재 및 #251 기본 파일명 검증 (H2).
+    12. `test_portal_up_sh_upstream_cp_fail_closed`: 업스트림 미설정 시 fail-closed 검증.
+    13. `test_portal_up_sh_staging_preflight_and_safety`: 스테이징 컨테이너 기동, nginx -t 및 wget 프로브, 기존 컨테이너 중지 전 선행 검증 (M3).
+    14. `test_portal_up_sh_no_secrets_in_docker_run`: docker run 내부 -e/--env 부재 검증.
+    15. `test_portal_smoke_up_sh_isolation`: smoke 컨테이너/인스턴스/인증서 격리 검증.
+    16. `test_dockerfile_pinned_image_digests`: base image SHA256 고정 및 node:22 일치 검증 (L1).
+    17. `test_dockerfile_dockerignore_present_and_whitelisted`: Dockerfile.dockerignore 화이트리스트 검증 (H5).
+    18. `test_positive_control`: 미변이 원본 파일의 validator 전원 통과 검증 (positive control).
+    19. `test_positive_control_comment_immunity`: 주석 내 -e 키워드가 존재해도 검증기 통과 검증 (M4 면역).
+    20. `test_mutation_loosening_csp_fails`: CSP 완화 시 validator 실패 검증 (변이 사살).
+    21. `test_mutation_portal_up_security_flags_fail`: 보안 플래그 제거 및 환경변수 주입 시 validator 실패 검증 (변이 사살).
+    22. `test_positive_control_owner_tuple`: 원본 소유자 튜플 검증기 통과 검증.
+    23. `test_mutation_owner_tuple_guard_fails`: 소유자 튜플 검사 축소 시 validator 실패 검증 (변이 사살).
+- **스크립트 구문 점검**: `bash -n` 4대 셸 스크립트 전원 문법 오류 0건 (exit 0).
+- **TypeScript 타입 점검**: `npx tsc -b` 에러 **0건**.
+- **프로덕션 번들 빌드**: `npm run build` 성공 (Vite bundle 7.82s).
+- **프런트엔드 무결성 점검**: `python tools/check_frontend_integrity.py` 92개 파일 스캔, 9대 규칙 위반 **0건 (exit 0)**.
+- **라우트 커버리지 점검**: `pytest tests/test_route_coverage.py` **40 passed (exit 0)**.
+- **IP 주소 및 비밀 누출 점검**: 전 파일 대상 하드코딩 IP 주소 **0건**, 시크릿 유출 **0건**.
 
 ---
 
 ## 4. 인계 및 다음 단계
 
-- **원격 노드2 배포 상태**:
-  - Card 150(Codex tab)의 `portal.sv.lan` ECDSA P-256 Leaf 인증서 발급 대기로 인해 원격 물리 배포는 **`BLOCKED`**로 표기.
-  - 인증서 파일이 노드2에 배치되면 `portal-up.sh`를 즉시 실행하여 운영 개시 가능.
-- **독립 검토 요청**:
-  - Claude (UI·테스트 축) 및 Codex (계약·보안 축) 검토 요청.
+- **노드2 배포 상태**:
+  - Leaf 인증서: 노드2 전달 완료 (`DELIVERED_NOT_ACTIVATED`).
+  - 활성화 대기: `PORTAL_UPSTREAM_CP_HOST` 지정 후 `portal-up.sh` 기동 가능.
+- **독립 검토 요청**: Claude (UI·테스트 축) 및 Codex (계약·보안 축) 재검토 요청.
