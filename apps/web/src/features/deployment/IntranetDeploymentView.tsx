@@ -2,13 +2,28 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/shared/ui/Button';
 import { NodeItem } from '@/contracts/types';
 import { DeploymentManager } from './deploymentEngine';
+import {
+  fetchReleaseManifests,
+  fetchReleaseManifestDetail,
+  ReleaseManifestResponse,
+  ReleaseManifestDetailResponse,
+} from '@/shared/api/releaseObservation';
 
 export interface IntranetDeploymentViewProps {
   clusterNodes?: NodeItem[];
   currentUser?: { id: string; name: string; role: string } | null;
+  autoFetch?: boolean;
+  initialManifests?: ReleaseManifestResponse[];
+  initialDetail?: ReleaseManifestDetailResponse | null;
 }
 
-export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ clusterNodes, currentUser }) => {
+export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
+  clusterNodes,
+  currentUser,
+  autoFetch,
+  initialManifests,
+  initialDetail,
+}) => {
   const [manager] = useState<DeploymentManager>(() => new DeploymentManager());
   const [tls] = useState(manager.getTlsDetails());
   const [nginxRules] = useState(manager.getNginxRules());
@@ -20,6 +35,110 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
   const [trainingSteps, setTrainingSteps] = useState(manager.getTrainingSteps());
   const [operatorId, setOperatorId] = useState<string>(currentUser ? currentUser.id : '');
   const [actionNotice, setActionNotice] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Server Release Manifest Observation State (GET /v1/release-manifests, GET /v1/release-manifests/{release_id})
+  const [serverManifests, setServerManifests] = useState<ReleaseManifestResponse[]>(() => initialManifests ?? []);
+  const [selectedReleaseId, setSelectedReleaseId] = useState<string | null>(
+    () => initialDetail?.release?.releaseId ?? initialManifests?.[0]?.releaseId ?? null
+  );
+  const [serverManifestDetail, setServerManifestDetail] = useState<ReleaseManifestDetailResponse | null>(
+    () => initialDetail ?? null
+  );
+  const [isLoadingServerManifests, setIsLoadingServerManifests] = useState<boolean>(false);
+  const [serverManifestError, setServerManifestError] = useState<{
+    status: number;
+    code?: string;
+    message: string;
+  } | null>(null);
+  const [hasFetchedServerReleases, setHasFetchedServerReleases] = useState<boolean>(
+    () => Boolean(initialManifests || initialDetail)
+  );
+
+  useEffect(() => {
+    const shouldFetch = autoFetch ?? (typeof process !== 'undefined' && process.env?.NODE_ENV === 'test' ? false : true);
+    if (!shouldFetch) return;
+
+    let isMounted = true;
+    const controller = new AbortController();
+
+    async function loadServerReleases() {
+      setIsLoadingServerManifests(true);
+      setServerManifestError(null);
+      try {
+        const page = await fetchReleaseManifests({ signal: controller.signal });
+        if (!isMounted) return;
+        const items = page.items || [];
+        setServerManifests(items);
+        setHasFetchedServerReleases(true);
+
+        if (items.length > 0) {
+          const firstId = items[0].releaseId;
+          setSelectedReleaseId(firstId);
+          try {
+            const detail = await fetchReleaseManifestDetail(firstId, controller.signal);
+            if (!isMounted) return;
+            setServerManifestDetail(detail);
+          } catch (detailErr: any) {
+            if (!isMounted) return;
+            const prob = detailErr?.problem;
+            setServerManifestError({
+              status: prob?.status || detailErr.status || 500,
+              code: prob?.code || 'FETCH_DETAIL_ERROR',
+              message: prob?.detail || detailErr.message || '릴리스 상세 조회 실패',
+            });
+          }
+        } else {
+          setSelectedReleaseId(null);
+          setServerManifestDetail(null);
+        }
+      } catch (err: any) {
+        if (!isMounted) return;
+        if (err.name === 'AbortError') return;
+        setHasFetchedServerReleases(true);
+        const prob = err?.problem;
+        const status = prob?.status || err.status || 500;
+        setServerManifestError({
+          status,
+          code: prob?.code || (status === 403 ? 'AUTH-FORBIDDEN' : status === 404 ? 'RES-NOT-FOUND' : 'NET-ERROR'),
+          message: prob?.detail || err.message || '릴리스 선언서 목록 조회 실패',
+        });
+        setServerManifests([]);
+        setServerManifestDetail(null);
+      } finally {
+        if (isMounted) {
+          setIsLoadingServerManifests(false);
+        }
+      }
+    }
+
+    loadServerReleases();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, [autoFetch]);
+
+  const handleSelectServerRelease = async (releaseId: string) => {
+    setSelectedReleaseId(releaseId);
+    setIsLoadingServerManifests(true);
+    setServerManifestError(null);
+    try {
+      const detail = await fetchReleaseManifestDetail(releaseId);
+      setServerManifestDetail(detail);
+    } catch (err: any) {
+      const prob = err?.problem;
+      const status = prob?.status || err.status || 500;
+      setServerManifestError({
+        status,
+        code: prob?.code || (status === 403 ? 'AUTH-FORBIDDEN' : status === 404 ? 'RES-NOT-FOUND' : 'NET-ERROR'),
+        message: prob?.detail || err.message || '릴리스 상세 조회 실패',
+      });
+      setServerManifestDetail(null);
+    } finally {
+      setIsLoadingServerManifests(false);
+    }
+  };
 
   useEffect(() => {
     if (currentUser?.id) {
@@ -585,8 +704,371 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
         </table>
       </div>
 
-      {/* Section 3: Release Manifest & Operator Sign-off Workflow (AC-12) */}
+      {/* Section 3-A: Server Release Manifest & Operator Sign-off Observation (GET /v1/release-manifests) */}
       <div
+        data-testid="deployment-server-manifest-section"
+        style={{
+          backgroundColor: '#161b22',
+          border: '1px solid #30363d',
+          borderRadius: '8px',
+          padding: '20px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '16px',
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+          <div>
+            <h3 style={{ margin: 0, fontSize: '16px', color: '#f0f6fc' }}>
+              서버 릴리스 선언서 (Release Manifest) 및 운영자 인수 관측
+            </h3>
+            <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
+              공식 REST API (GET /v1/release-manifests, GET /v1/release-manifests/:release_id) 결속 및 수락 진위 관측
+            </p>
+          </div>
+
+          <div
+            data-testid="deployment-manifest-server-banner"
+            style={{
+              padding: '4px 10px',
+              backgroundColor: 'rgba(56, 139, 253, 0.15)',
+              borderRadius: '6px',
+              border: '1px solid #388bfd',
+              color: '#58a6ff',
+              fontSize: '11px',
+              fontWeight: 600,
+            }}
+          >
+            [서버 REST API 결속: GET /v1/release-manifests, GET /v1/release-manifests/:release_id]
+          </div>
+        </div>
+
+        {/* Loading State */}
+        {isLoadingServerManifests && (
+          <div
+            data-testid="deployment-manifest-loading"
+            role="status"
+            aria-live="polite"
+            style={{ padding: '16px', textAlign: 'center', color: '#8b949e', fontSize: '13px' }}
+          >
+            ⏳ 서버 릴리스 선언서 및 수락 기록 동기화 중...
+          </div>
+        )}
+
+        {/* Error States (403, 404, or Network/Server Error) */}
+        {!isLoadingServerManifests && serverManifestError && (
+          <div
+            data-testid={
+              serverManifestError.status === 403
+                ? 'deployment-manifest-error-403'
+                : serverManifestError.status === 404
+                ? 'deployment-manifest-error-404'
+                : 'deployment-manifest-error'
+            }
+            role="alert"
+            aria-live="assertive"
+            style={{
+              padding: '12px 16px',
+              backgroundColor: 'rgba(248, 81, 73, 0.15)',
+              border: '1px solid #f85149',
+              borderRadius: '6px',
+              color: '#f85149',
+              fontSize: '13px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '4px',
+            }}
+          >
+            <div style={{ fontWeight: 600 }}>
+              🛑 {serverManifestError.status === 403
+                ? '403 Forbidden: 접근 권한 없음'
+                : serverManifestError.status === 404
+                ? '404 Not Found: 릴리스 선언서 부재'
+                : `오류 (${serverManifestError.status})`}
+            </div>
+            <div style={{ fontSize: '12px', opacity: 0.9 }}>
+              {serverManifestError.message} (에러 코드: {serverManifestError.code || 'UNKNOWN'})
+            </div>
+          </div>
+        )}
+
+        {/* Empty State: Zero fabricated defaults */}
+        {!isLoadingServerManifests && !serverManifestError && hasFetchedServerReleases && serverManifests.length === 0 && (
+          <div
+            data-testid="deployment-manifest-empty-state"
+            style={{
+              padding: '24px',
+              backgroundColor: '#0d1117',
+              border: '1px dashed #30363d',
+              borderRadius: '6px',
+              textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px',
+            }}
+          >
+            <div style={{ fontSize: '14px', fontWeight: 600, color: '#f0f6fc' }}>
+              ℹ️ 기록 없음 (등록된 릴리스 선언서 부재)
+            </div>
+            <div style={{ fontSize: '12px', color: '#8b949e' }}>
+              현재 테넌트에 등록된 릴리스 선언서(Release Manifest)가 없습니다. (등록된 릴리스 0건)
+            </div>
+            <div style={{ fontSize: '11px', color: '#6e7681' }}>
+              서버 빈 목록 응답(items: []) 정상 수신 · 가짜 릴리스 기본값 표출을 엄격히 차단합니다.
+            </div>
+          </div>
+        )}
+
+        {/* Loaded Release Manifest Observation View */}
+        {!isLoadingServerManifests && !serverManifestError && serverManifestDetail && (
+          <div data-testid="deployment-server-manifest-detail" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            {serverManifests.length > 1 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <label htmlFor="deployment-release-selector" style={{ fontSize: '12px', color: '#8b949e' }}>
+                  관측 대상 릴리스 선택:
+                </label>
+                <select
+                  id="deployment-release-selector"
+                  data-testid="deployment-release-selector"
+                  value={selectedReleaseId || ''}
+                  onChange={(e) => handleSelectServerRelease(e.target.value)}
+                  style={{
+                    backgroundColor: '#0d1117',
+                    border: '1px solid #30363d',
+                    borderRadius: '6px',
+                    padding: '4px 8px',
+                    color: '#f0f6fc',
+                    fontSize: '12px',
+                  }}
+                >
+                  {serverManifests.map((item) => (
+                    <option key={item.releaseId} value={item.releaseId}>
+                      {item.version} ({item.releaseId}) - {item.operatorSignOff ? '서명됨' : '미서명'}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                gap: '12px',
+                backgroundColor: '#0d1117',
+                padding: '16px',
+                borderRadius: '6px',
+                border: '1px solid #30363d',
+                fontSize: '12px',
+              }}
+            >
+              <div>
+                <div style={{ color: '#8b949e' }}>Release Version</div>
+                <div data-testid="server-release-version" style={{ color: '#58a6ff', fontWeight: 600, marginTop: '2px' }}>
+                  {serverManifestDetail.release.version}
+                </div>
+              </div>
+
+              <div>
+                <div style={{ color: '#8b949e' }}>Release ID</div>
+                <div style={{ marginTop: '2px' }}>
+                  <code data-testid="server-release-id" style={{ color: '#f0f6fc', fontSize: '11px' }}>
+                    {serverManifestDetail.release.releaseId}
+                  </code>
+                </div>
+              </div>
+
+              <div>
+                <div style={{ color: '#8b949e' }}>Manifest SHA-256 (Pinned)</div>
+                <div style={{ marginTop: '2px' }}>
+                  <code
+                    data-testid="server-manifest-sha"
+                    style={{ color: '#f0f6fc', fontFamily: 'monospace', fontSize: '11px', wordBreak: 'break-all' }}
+                  >
+                    {serverManifestDetail.release.manifestSha256}
+                  </code>
+                </div>
+              </div>
+
+              <div>
+                <div style={{ color: '#8b949e' }}>컴포넌트 수</div>
+                <div data-testid="server-component-count" style={{ color: '#f0f6fc', fontWeight: 600, marginTop: '2px' }}>
+                  {serverManifestDetail.release.componentCount} 개
+                </div>
+              </div>
+
+              <div>
+                <div style={{ color: '#8b949e' }}>운영자 최종 서명 (Server operatorSignOff)</div>
+                <div data-testid="server-operator-signoff" style={{ marginTop: '2px' }}>
+                  {serverManifestDetail.release.operatorSignOff ? (
+                    <span style={{ color: '#3fb950', fontWeight: 600 }}>
+                      ✔ 서명 완료 (서버 검증됨: operatorSignOff=true)
+                    </span>
+                  ) : (
+                    <span style={{ color: '#d29922', fontWeight: 600 }}>
+                      미서명 (operatorSignOff: false)
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <div style={{ color: '#8b949e' }}>수락 결정 기록 (Acceptance Count)</div>
+                <div data-testid="server-acceptance-count" style={{ color: '#f0f6fc', fontWeight: 600, marginTop: '2px' }}>
+                  {serverManifestDetail.release.acceptanceCount} 건
+                </div>
+              </div>
+            </div>
+
+            {/* Acceptances Decision Log */}
+            <div data-testid="server-acceptances-section" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <h4 style={{ margin: 0, fontSize: '13px', color: '#f0f6fc' }}>
+                기록된 수락 결정 이력 (Server Acceptances):
+              </h4>
+              {serverManifestDetail.acceptances && serverManifestDetail.acceptances.length > 0 ? (
+                <div data-testid="server-acceptances-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {serverManifestDetail.acceptances.map((acc) => (
+                    <div
+                      key={acc.acceptanceId}
+                      data-testid={`server-acceptance-${acc.acceptanceId}`}
+                      style={{
+                        backgroundColor: '#0d1117',
+                        border: '1px solid #30363d',
+                        borderRadius: '6px',
+                        padding: '10px 14px',
+                        fontSize: '12px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '4px',
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                          <span style={{ color: '#8b949e' }}>결정 ID: </span>
+                          <code style={{ color: '#58a6ff' }}>{acc.acceptanceId}</code>
+                          <span style={{ color: '#8b949e', marginLeft: '8px' }}>기준 참조: </span>
+                          <code style={{ color: '#f0f6fc' }}>{acc.acceptanceIdRef}</code>
+                        </div>
+                        <div>
+                          <span
+                            style={{
+                              padding: '2px 8px',
+                              borderRadius: '4px',
+                              fontSize: '11px',
+                              fontWeight: 600,
+                              backgroundColor:
+                                acc.outcome === 'accepted'
+                                  ? 'rgba(63, 185, 80, 0.15)'
+                                  : acc.outcome === 'conditional'
+                                  ? 'rgba(210, 153, 34, 0.15)'
+                                  : 'rgba(248, 81, 73, 0.15)',
+                              color:
+                                acc.outcome === 'accepted'
+                                  ? '#3fb950'
+                                  : acc.outcome === 'conditional'
+                                  ? '#d29922'
+                                  : '#f85149',
+                            }}
+                          >
+                            결과: {acc.outcome}
+                          </span>
+                        </div>
+                      </div>
+                      <div style={{ color: '#8b949e', fontSize: '11px' }}>
+                        해시 일치 여부:{' '}
+                        <strong style={{ color: acc.manifestMatches ? '#3fb950' : '#f85149' }}>
+                          {acc.manifestMatches ? '일치 (Verified Match)' : '불일치 (Mismatch)'}
+                        </strong>
+                        {' · '}
+                        결정 시각: {acc.decidedAt}
+                      </div>
+                      {acc.knownLimitations && acc.knownLimitations.length > 0 && (
+                        <div style={{ marginTop: '4px' }}>
+                          <span style={{ color: '#8b949e', fontSize: '11px' }}>조건부 제한 사항:</span>
+                          <ul style={{ margin: '2px 0 0 0', paddingLeft: '18px', color: '#d29922', fontSize: '11px' }}>
+                            {acc.knownLimitations.map((lim, idx) => (
+                              <li key={idx}>{lim}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div
+                  data-testid="server-acceptances-empty"
+                  style={{
+                    fontSize: '12px',
+                    color: '#8b949e',
+                    padding: '10px 14px',
+                    backgroundColor: '#0d1117',
+                    borderRadius: '6px',
+                    border: '1px solid #30363d',
+                  }}
+                >
+                  기록된 수락 결정 없음 (미서명 사유: 아무도 승인 결정을 등록하지 않았거나 조건부/해시 불일치 상태입니다)
+                </div>
+              )}
+            </div>
+
+            {/* Components list */}
+            {serverManifestDetail.release.components && serverManifestDetail.release.components.length > 0 && (
+              <div data-testid="server-components-section" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <h4 style={{ margin: 0, fontSize: '13px', color: '#f0f6fc' }}>
+                  포함된 컴포넌트 목록 ({serverManifestDetail.release.components.length}개):
+                </h4>
+                <div
+                  data-testid="server-components-list"
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                    gap: '8px',
+                  }}
+                >
+                  {serverManifestDetail.release.components.map((comp, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        backgroundColor: '#0d1117',
+                        border: '1px solid #30363d',
+                        borderRadius: '6px',
+                        padding: '8px 12px',
+                        fontSize: '11px',
+                      }}
+                    >
+                      <div style={{ color: '#58a6ff', fontWeight: 600 }}>{comp.name}</div>
+                      <div style={{ color: '#8b949e', marginTop: '2px' }}>종류: {comp.kind}</div>
+                      <div style={{ color: '#f0f6fc', fontFamily: 'monospace', marginTop: '2px', wordBreak: 'break-all' }}>
+                        {comp.digest}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Write Boundary Notice: Strictly No Write UI */}
+            <div
+              data-testid="server-write-boundary-notice"
+              style={{
+                fontSize: '11px',
+                color: '#8b949e',
+                backgroundColor: 'rgba(110, 118, 129, 0.1)',
+                padding: '8px 12px',
+                borderRadius: '6px',
+                border: '1px solid #30363d',
+              }}
+            >
+              ℹ️ <strong>수락 및 서명 쓰기 경계</strong>: 릴리스 수락 등록은 테넌트 전역 보안 경계 작업으로, 인증된 사람의 서명 증거 및 감사 계약 수립 후 제공됩니다 (본 화면은 읽기 전용 관측 표출 전용이며 임의 쓰기 서명 UI는 엄격히 금지됩니다).
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Section 3-B: [로컬 모의 시뮬레이션] 파일럿 릴리스 선언서 및 운영자 사전 실습 */}
+      <div
+        data-testid="deployment-simulation-manifest-section"
         style={{
           backgroundColor: '#161b22',
           border: '1px solid #30363d',
@@ -603,7 +1085,7 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
               모의 릴리스 선언서 (Release Manifest Pilot RC) 및 운영자 인수 서명
             </h3>
             <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
-              품질 게이트 G0~G6 인수 및 배포용 아티팩트의 불변 다이제스트
+              품질 게이트 G0~G6 인수 및 배포용 아티팩트의 불변 다이제스트 (로컬 시뮬레이션 실습용)
             </p>
           </div>
 

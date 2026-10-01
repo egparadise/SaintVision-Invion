@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.162"
+version: "1.0.163"
 status: "approved"
 author: "Gemini"
-updated: "2026-10-01T17:19:00+09:00"
+updated: "2026-10-01T18:59:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,34 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-10-01T13:52:00+09:00 (Card 169 S08-FE 관리자 비상 정지 백엔드 실배선, PR #267 2차 독립 검토 전수 조치: Claude V1~V5 & Codex r2 strict-contract (a)~(d) 전수 반영, NodeId Crockford base32 규격 및 null 결속, 9007199254740991 상한, RFC 4122 UUID 검증, real fetch mock status 관측, vitest 16 passed, tsc -b/build/route_coverage 100%).
+- 확인 기준: 2026-10-01T18:59:00+09:00 (Card 183 S12-FE 릴리스 선언서 및 운영자 인수 서버 경로 결속: 계약 타입 5종 생성, GET /v1/release-manifests 및 /{release_id} 결속, 기록 없음 빈 상태, 미서명 operatorSignOff=false, 403/404 문제 상세 처리, localSimulationCompleted 로컬 분리 보존, 쓰기 UI 금지, Vitest 11 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 규칙 0 위반).
+
+## 2026-10-01 S12-FE 릴리스 선언서(Release Manifest) 및 운영자 인수 서버 경로 결속 (Card 183 2단계, `agent/gemini/c183-s12fe-release-binding`, base `3ff89b84` PR #280)
+- **개요**: Claude 카드 182(PR #280)에서 구축된 정본 계약 스키마 5종(`release-manifest-response`, `release-manifest-detail-response`, `release-manifest-page-response`, `release-acceptance-response`, `release-component-response`) 및 읽기 전용 REST 라우트(`GET /v1/release-manifests`, `GET /v1/release-manifests/{release_id}`)를 프런트엔드 `apps/web`에 온전히 결속:
+  1. **1단계 전수 분석 표 반영**: `ReleaseManifest`, `operatorSignOff`, `localSimulationCompleted`의 코드베이스 내 기원 전수 식별 및 정본 계약 기반 분리 완료.
+  2. **계약 생성 및 검증 자동화**: `apps/web/scripts/api-response-contracts.mjs`에 스키마 5종 등록, `contracts:generate` 및 `contracts:check` 40개 API 응답 TypeScript 타입 동기화 (exit 0).
+  3. **API 관측 계층 구현 (`apps/web/src/shared/api/releaseObservation.ts`)**:
+     - `fetchReleaseManifests`: `GET /v1/release-manifests` 목록 호출 및 런타임 shape 검증.
+     - `fetchReleaseManifestDetail`: `GET /v1/release-manifests/:id` 상세 및 수락 이력 호출.
+     - `isValidReleaseManifest`: sha256 64-hex, operatorSignOff boolean, componentCount 등 fail-closed 런타임 검증기.
+  4. **화면 결속 (`apps/web/src/features/deployment/IntranetDeploymentView.tsx`)**:
+     - **Section 3-A 실서버 관측**: 실서버 라우트 결속 배너, 테넌트 릴리스 0건 시 날조 기본값 없는 명시적 빈 상태(`기록 없음`), 수락 부재 시 `operatorSignOff: false (미서명)`, 403 Forbidden 및 404 Not Found 문제 상세 처리, 수락 결정 및 컴포넌트 목록 관측.
+     - **쓰기 UI 금지**: 임의 수락/서명 등록 쓰기 폼 원천 차단 및 읽기 전용 관측 표출 안내(`server-write-boundary-notice`).
+     - **Section 3-B 로컬 모의 시뮬레이션 분리 보존**: `localSimulationCompleted`를 브라우저 로컬 시뮬레이션 상태로 온전히 격리하고, 기존 DEF-S12 결함 수정 회귀 시험(23 passed) 및 배선 무결성 시험(4 passed) 100% 무파괴 통과.
+  5. **단위 및 변이 불변식 검증 (`apps/web/tests/s12-release-manifest-server-binding.test.tsx`)**:
+     - 11 passed (323ms). 계약 일치, 빈 상태, 미서명, 403/404 처리, 로컬/서버 분리, 쓰기 UI 금지, 고정 픽스처 회귀 실패(Revert-Fail) 변이 불변식 고정.
+- **담당 및 역할**: Gemini (Frontend / UI 소유). Reviewer: Claude (UI·테스트 축), Codex (계약·보안 축).
+- **관측 근거 (Evidence)**:
+  - Vitest: `s12-release-manifest-server-binding.test.tsx` 11 passed (323ms), `s12-defect-fixes.test.tsx` 23 passed, `deployment-release-integrity-wiring.test.tsx` 4 passed (전원 통과)
+  - TypeScript 정적 점검: `npx tsc -b` 타입 에러 0건 (exit 0)
+  - 프로덕션 번들 빌드: `npm run build` 성공 (Vite bundle 정상 생성, exit 0)
+  - 계약 동기화 점검: `npm run contracts:check` 40 types PASS (exit 0)
+  - 라우트 커버리지 점검: `pytest tests/test_route_coverage.py` 41 passed 100% (exit 0)
+  - 프런트엔드 무결성 점검: `python tools/check_frontend_integrity.py` 93개 파일 스캔, 9대 무결성 규칙 위반 0건 (exit 0)
+  - 계약 바인딩 점검: `python tools/check_contract_bindings.py` 55개 픽스처 + 20개 커널 응답 타입 앵커 통과 (exit 0)
+  - 문서 무결성 점검: `python tools/check_docs.py` PASS (exit 0)
+  - Git 공백 검사: `git diff --check` 클린 (exit 0)
+- **전문 문서**: [[2026-10-01_18-50-00_KST_Card183_S12-FE_Release_서버결속_Gemini]]
 
 ## 2026-10-01 관리자 보안 콘솔 비상 정지(Kill Switch) 백엔드 실배선 및 멱등/승인ID 제어 평면 연동 (Card 169, S08-FE, `agent/gemini/c169-s08fe-killswitch-real-wiring`, PR #267)
 - **개요**:
