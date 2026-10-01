@@ -246,9 +246,9 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({
                       padding: '2px 6px',
                       borderRadius: 'var(--radius-sm)',
                       fontWeight: 600,
-                      backgroundColor: res.measured ? 'rgba(46, 160, 67, 0.15)' : 'rgba(110, 118, 129, 0.2)',
-                      color: res.measured ? '#3fb950' : 'var(--color-text-muted)',
-                      border: `1px solid ${res.measured ? '#2ea043' : 'var(--color-border-subtle)'}`,
+                      backgroundColor: 'var(--color-bg-subtle)',
+                      color: res.measured ? 'var(--color-status-online)' : 'var(--color-text-muted)',
+                      border: `1px solid ${res.measured ? 'var(--color-status-online)' : 'var(--color-border-subtle)'}`,
                     }}
                   >
                     {res.measured ? '측정됨 (Measured)' : '미측정 (Unmeasured)'}
@@ -265,13 +265,19 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({
                   </div>
                   <div>
                     <span style={{ color: 'var(--color-text-muted)' }}>예약 할당 (Reserved):</span>{' '}
-                    <strong style={{ color: res.reserved !== null ? '#58a6ff' : 'var(--color-text-muted)' }}>
+                    <strong
+                      data-testid={`resource-reserved-val-${res.kind}`}
+                      style={{ color: res.reserved !== null ? 'var(--color-brand-primary)' : 'var(--color-text-muted)' }}
+                    >
                       {res.reserved !== null ? res.reserved.toLocaleString('ko-KR') : '미측정'}
                     </strong>
                   </div>
                   <div>
                     <span style={{ color: 'var(--color-text-muted)' }}>가용 잔여 (Spare):</span>{' '}
-                    <strong style={{ color: res.spare !== null ? '#3fb950' : 'var(--color-text-muted)' }}>
+                    <strong
+                      data-testid={`resource-spare-val-${res.kind}`}
+                      style={{ color: res.spare !== null ? 'var(--color-status-online)' : 'var(--color-text-muted)' }}
+                    >
                       {res.spare !== null ? res.spare.toLocaleString('ko-KR') : '미측정'}
                     </strong>
                   </div>
@@ -356,7 +362,10 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({
             </div>
             <div style={{ padding: '10px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)', fontSize: '0.75rem' }}>
               <div style={{ color: 'var(--color-text-muted)', marginBottom: '2px' }}>관측 사용량</div>
-              <div style={{ fontWeight: 700, fontSize: '0.875rem', color: '#58a6ff' }}>
+              <div
+                data-testid="node-detail-observed-usage-value"
+                style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--color-brand-primary)' }}
+              >
                 {hasTelemetry
                   ? `${node.cpuUsagePercent}% / ${(node.memoryUsedBytes / 1024 ** 3).toFixed(1)}GB`
                   : '미측정'}
@@ -364,7 +373,10 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({
             </div>
             <div style={{ padding: '10px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)', fontSize: '0.75rem' }}>
               <div style={{ color: 'var(--color-text-muted)', marginBottom: '2px' }}>관측 여유량 (Headroom)</div>
-              <div style={{ fontWeight: 700, fontSize: '0.875rem', color: '#3fb950' }}>
+              <div
+                data-testid="node-detail-observed-headroom-value"
+                style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--color-status-online)' }}
+              >
                 {hasTelemetry
                   ? `${(node.cpuCores * (1 - (node.cpuUsagePercent || 0) / 100)).toFixed(1)}C / ${(((node.memoryTotalBytes - (node.memoryUsedBytes || 0))) / 1024 ** 3).toFixed(1)}GB`
                   : '미측정'}
@@ -425,7 +437,7 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({
               <span
                 data-testid="node-detail-timeline-status"
                 style={{
-                color: node.status === 'online' ? '#3fb950' : node.status === 'active' ? 'var(--color-status-active)' : node.status === 'degraded' ? 'var(--color-status-degraded)' : node.status === 'unknown' ? 'var(--color-status-unknown)' : 'var(--color-status-lost)',
+                color: node.status === 'online' ? 'var(--color-status-online)' : node.status === 'active' ? 'var(--color-status-active)' : node.status === 'degraded' ? 'var(--color-status-degraded)' : node.status === 'unknown' ? 'var(--color-status-unknown)' : 'var(--color-status-lost)',
                 fontWeight: 600
               }}>
                 {node.status === 'online'
