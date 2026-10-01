@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-S12-BE-RELEASE-ACCEPTANCE-WRITE-20261001"
 title: "S12-BE release 수락·operator sign-off 쓰기 보안 계약 — 설계·strict schema"
-version: "1.2.1"
+version: "1.2.2"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-01T19:55:28+09:00"
+updated: "2026-10-01T20:07:30+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "3ff89b84"
@@ -99,6 +99,9 @@ validator에만 숨어 있지 않게 했다.
   인증된 route로 찾게 했다. canonical write는 SECURITY INVOKER·`inv_app` 전용이고 verified
   `SET LOCAL` identity를 읽는다. 만료/drift 409 receipt, 2인 bootstrap 경계도 고정했다.
 - Claude r2의 생존 변이였던 review response의 sign-off bool 완화를 별도 부정 시험으로 닫았다.
+- Claude r3의 선택 관찰도 닫았다. pending proposal page 상한을 설계와 같은 100으로 낮추고
+  Pydantic·생성 schema의 `maxItems=100`을 시험으로 고정했다. proposal digest 입력에는 release에
+  pin된 `policyVersion`과 `policyRegistrySha256`을 포함해 registry 바꿔치기를 digest drift로 만든다.
 
 ## 실제 검증
 

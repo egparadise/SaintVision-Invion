@@ -1,18 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.249"
+version: "1.0.250"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T19:55:28+09:00"
+updated: "2026-10-01T20:07:30+09:00"
 source_of_truth: "Git"
 active_card: "CARD-184 S12 release acceptance/operator sign-off write contract"
-active_card_status: "Coordinator N2 decision reflected: release confirmedOperatorCount is fresh human-attested distinct operators; proposal/decision use separate count and decisionSignOff fields"
+active_card_status: "Claude r3 conditional approval reflected: release/proposal semantics fixed; page max 100 and proposal digest policy pin added; exact-head Backend and #280 merge pending"
 active_card_next: "Exact-head Backend green and Claude final confirmation; implementation remains blocked until IdP step-up, migration, authoritative registries and read projection land together"
 ---
 
 ## 2026-10-01 Card 184 — S12 release 수락·operator sign-off 쓰기 계약
 
+- Claude r3에서 N1~N7 해소를 확인받았다. 선택 관찰 L1/L2도 닫아 proposal page 최대 100건을
+  모델·schema 시험으로 고정하고 proposal digest에 policy version/digest를 포함했다.
 - 코디네이터 N2 최종 결정을 v1.2.1에 반영했다. release `confirmedOperatorCount`는 fresh
   interactive human-attested distinct operator 수이고 구현 전 0이며, legacy raw count는
   `matchingAcceptedUserCount`다. proposal/decision 범위는 `proposalConfirmationCount`·

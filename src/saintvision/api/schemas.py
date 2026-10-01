@@ -1717,7 +1717,7 @@ class ReleaseAcceptanceProposalReviewResponse(Strict):
 class ReleaseAcceptanceProposalReviewPageResponse(Strict):
     """Pending proposals discoverable by an authorized second operator."""
 
-    items: list[ReleaseAcceptanceProposalReviewResponse] = Field(max_length=256)
+    items: list[ReleaseAcceptanceProposalReviewResponse] = Field(max_length=100)
     next_cursor: StrictStr | None = Field(default=None, alias="nextCursor", min_length=1, max_length=256)
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)

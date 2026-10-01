@@ -1,12 +1,12 @@
 ---
 doc_id: "DESIGN-S12-BE-RELEASE-ACCEPTANCE-WRITE-20261001"
 title: "S12-BE release 수락·operator sign-off 쓰기 보안 계약 설계"
-version: "1.2.1"
+version: "1.2.2"
 status: "proposed"
 author: "Codex"
 reviewer: "Claude"
 audience: "agent"
-updated: "2026-10-01T19:55:28+09:00"
+updated: "2026-10-01T20:07:30+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "3ff89b84"
@@ -172,7 +172,8 @@ credential은 digest에 들어가지 않는다.
 ### 3-2. proposal digest
 
 `proposalDigest`는 server-derived `(tenantId,releaseId,acceptanceIdRef,outcome,
-targetManifestSha256,reasonCode,targetRefs,measurementRefs,knownLimitations,expiresAt)`의
+targetManifestSha256,policyVersion,policyRegistrySha256,reasonCode,targetRefs,
+measurementRefs,knownLimitations,expiresAt)`의
 **parse 완료 모델** alias-key JSON으로만 계산한다. 모든 datetime은 UTC
 `YYYY-MM-DDTHH:MM:SS.ffffffZ` 6자리 소수초로 만들고 key sort·compact separators·UTF-8로
 canonicalize한 SHA-256이다. 배열 순서는 의미가 있으므로 서버가 정렬하지 않는다. digest는
@@ -355,6 +356,7 @@ token, OIDC claims, user display data, free text, target/measurement payload, kn
     `decisionSignOff=true` 변이는 Pydantic과 JSON Schema 양쪽에서 거부.
 11. policy registry 누락·빈 required set·unknown criterion·version/digest drift는 모두
     release sign-off false 또는 decision 409이며 빈 `all()` true는 금지.
+12. pending proposal page는 100건을 초과하면 Pydantic과 JSON Schema 양쪽에서 거부한다.
 
 ### hosted real PostgreSQL
 

@@ -183,6 +183,10 @@ def test_distinct_operator_can_read_the_exact_pending_content_without_identity_d
     assert page.items[0].proposal_id == "proposal_01"
     with pytest.raises(ValidationError):
         schemas.ReleaseAcceptanceProposalReviewPageResponse.model_validate(
+            {"items": [body] * 101, "nextCursor": None}
+        )
+    with pytest.raises(ValidationError):
+        schemas.ReleaseAcceptanceProposalReviewPageResponse.model_validate(
             {"items": [{**body, "decisionSignOff": True}]}
         )
 
@@ -316,6 +320,10 @@ def test_exported_json_schema_enforces_decision_and_quorum_semantics():
                 "decisionSignOff": False,
             }
         )
+    page_schema = json.loads(
+        (ROOT / "contracts/release-acceptance-proposal-review-page-response.schema.json").read_text()
+    )
+    assert page_schema["properties"]["items"]["maxItems"] == 100
 
 
 EXPECTED_REQUIRED = {

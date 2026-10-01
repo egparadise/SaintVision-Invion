@@ -182,7 +182,7 @@
       "items": {
         "$ref": "#/$defs/ReleaseAcceptanceProposalReviewResponse"
       },
-      "maxItems": 256,
+      "maxItems": 100,
       "title": "Items",
       "type": "array"
     },
