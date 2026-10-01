@@ -1,18 +1,22 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.250"
+version: "1.0.251"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T20:07:30+09:00"
+updated: "2026-10-01T20:13:44+09:00"
 source_of_truth: "Git"
 active_card: "CARD-184 S12 release acceptance/operator sign-off write contract"
-active_card_status: "Claude r3 conditional approval reflected: release/proposal semantics fixed; page max 100 and proposal digest policy pin added; exact-head Backend and #280 merge pending"
-active_card_next: "Exact-head Backend green and Claude final confirmation; implementation remains blocked until IdP step-up, migration, authoritative registries and read projection land together"
+active_card_status: "Claude r3 conditions reflected: #280 head 79fcb772 merged at fec2169c; read/write field semantics align; exact-head Backend pending"
+active_card_next: "Exact-head Backend 3.12/3.14 green and Claude final confirmation; implementation remains blocked until IdP step-up, migration and authoritative registries land together"
 ---
 
 ## 2026-10-01 Card 184 — S12 release 수락·operator sign-off 쓰기 계약
 
+- #280 최종 head `79fcb772`를 merge `fec2169c`로 따라갔다. 읽기 route는
+  `confirmedOperatorCount=0`, raw `matchingAcceptedUserCount`, implementation-unavailable blocker를
+  실제 계약·서비스·시험에 적용했고 #282의 proposal/decision 이름과 충돌하지 않는다. 합친 focused
+  시험은 **67 passed**, Pydantic 2.13.5 schema **93/93**이다.
 - Claude r3에서 N1~N7 해소를 확인받았다. 선택 관찰 L1/L2도 닫아 proposal page 최대 100건을
   모델·schema 시험으로 고정하고 proposal digest에 policy version/digest를 포함했다.
 - 코디네이터 N2 최종 결정을 v1.2.1에 반영했다. release `confirmedOperatorCount`는 fresh

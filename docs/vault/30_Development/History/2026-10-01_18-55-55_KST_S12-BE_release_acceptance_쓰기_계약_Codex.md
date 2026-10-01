@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-S12-BE-RELEASE-ACCEPTANCE-WRITE-20261001"
 title: "S12-BE release 수락·operator sign-off 쓰기 보안 계약 — 설계·strict schema"
-version: "1.2.2"
+version: "1.2.3"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-01T20:07:30+09:00"
+updated: "2026-10-01T20:13:44+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "3ff89b84"
@@ -72,7 +72,7 @@ validator에만 숨어 있지 않게 했다.
 - `operatorSignOff`는 required criterion 전부가 2인 accepted일 때만 true이고, legacy 1인
   `record_acceptance(accepted)`는 계수하지 않도록 고정했다. 철회 digest는 current manifest가
   아니라 철회 대상 final row의 `acceptedManifestSha256`이다.
-- #280 새 head `4114f8ba`의 fail-closed 읽기 의미와 맞췄다. 구현 전에는
+- #280 중간 head `4114f8ba`의 fail-closed 읽기 의미와 맞췄다. 구현 전에는
   `operatorSignOff=false`/`human-attestation-contract-absent`이고 distinct user 수는 관측값이다.
   vote에 fresh interactive human attestation을 immutable하게 저장·검증한 뒤에만 true 계약을 연다.
 - migration의 RLS/FORCE RLS, append-only grant, vote/withdrawal/slot unique, permission CHECK,
@@ -91,8 +91,9 @@ validator에만 숨어 있지 않게 했다.
 - 코디네이터의 N2 최종 결정에 따라 #282가 release 범위 의미를 소유한다.
   `confirmedOperatorCount`는 fresh interactive human attestation이 유효한 서로 다른 운영자 수이고,
   `operatorSignOff`는 비어 있지 않은 registry의 required criterion 전부가 유효한 경우에만 true다.
-  구현 전 #280은 이 값을 0과 `human-attestation-implementation-unavailable` blocker로 내며,
-  legacy raw count는 `matchingAcceptedUserCount`로 분리한다.
+  #280 최종 head `79fcb772`가 이 값을 0과 `human-attestation-implementation-unavailable`
+  blocker로 내고 legacy raw count를 `matchingAcceptedUserCount`로 분리했으며, merge
+  `fec2169c`에서 #282의 proposal/decision 계약과 함께 focused **67 passed**로 검증했다.
 - #282의 proposal/decision 응답은 `proposalConfirmationCount`·`decisionConfirmationCount`·
   `decisionSignOff`로 분리했다. withdrawal의 `operatorSignOff`만 철회 뒤 release 집계다.
 - pending proposal discovery 목록 contract를 추가해 confirmer가 proposal ID와 검토 내용을

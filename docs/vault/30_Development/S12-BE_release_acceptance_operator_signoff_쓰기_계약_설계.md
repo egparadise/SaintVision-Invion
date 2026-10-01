@@ -1,12 +1,12 @@
 ---
 doc_id: "DESIGN-S12-BE-RELEASE-ACCEPTANCE-WRITE-20261001"
 title: "S12-BE release 수락·operator sign-off 쓰기 보안 계약 설계"
-version: "1.2.2"
+version: "1.2.3"
 status: "proposed"
 author: "Codex"
 reviewer: "Claude"
 audience: "agent"
-updated: "2026-10-01T20:07:30+09:00"
+updated: "2026-10-01T20:13:44+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "3ff89b84"
@@ -43,10 +43,10 @@ release 범위 `confirmedOperatorCount`는 현재 manifest와 required criterion
 **fresh interactive human attestation이 검증된 서로 다른 운영자 수**이고, service/system/
 client-credentials 주체는 세지 않는다. `operatorSignOff`는 비어 있지 않은 policy registry의
 모든 required criterion이 유효한 `decisionSignOff=true`일 때만 true다. 이 정의의 owner는
-#282다. #280은 구현 전 `confirmedOperatorCount=0`,
+#282다. #280 head `79fcb772`는 attestation 구현 전 `confirmedOperatorCount=0`,
 `operatorSignOff=false`, `operatorSignOffBlockedBy=human-attestation-implementation-unavailable`
-로 내고, legacy accepted 행과 manifest hash만 맞는 raw 사용자 수는 별도
-`matchingAcceptedUserCount`로 표시해야 한다. 이 release 집계는 proposal 투표 수가 아니며
+로 내고, legacy accepted 행과 manifest hash만 맞는 raw 사용자 수를 별도
+`matchingAcceptedUserCount`로 표시한다. 이 release 집계는 proposal 투표 수가 아니며
 #282의 `proposalConfirmationCount`·`decisionConfirmationCount`·`decisionSignOff`와 이름과
 범위를 분리한다. 구현 카드는 아래 attestation·
 quorum·withdrawal projection이 한 transaction 경계로 모두 착지한 뒤에만 blocker literal을
