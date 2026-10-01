@@ -21,6 +21,7 @@ pytestmark = pytest.mark.postgres
 
 FK = "fk_eval_suites_tenant_id_project_id"
 INDEX = "ix_eval_suites_tenant_id_project_id"
+CURRENT_HEAD = "0058_release_acceptance_resolver"
 
 
 def _project(connection, *, tenant_id, now, label):
@@ -116,16 +117,23 @@ def test_a_run_interrupted_after_the_column_resumes_and_converges(owner_engine, 
         with monkeypatch.context() as patch:
             patch.setenv("INV_DATABASE_URL", database_url)
             patch.setenv("INV_MIGRATION_DSN", database_url)
-            command.upgrade(config, "head")
+            command.upgrade(config, "0053_eval_suite_project_scope")
+            with owner_engine.begin() as connection:
+                assert connection.execute(
+                    text("SELECT version_num FROM alembic_version")
+                ).scalar_one() == "0053_eval_suite_project_scope"
     finally:
         with owner_engine.begin() as connection:
-            connection.execute(text("UPDATE alembic_version SET version_num = '0053_eval_suite_project_scope'"))
+            connection.execute(
+                text("UPDATE alembic_version SET version_num = :head"),
+                {"head": CURRENT_HEAD},
+            )
 
     column, constraints, indexes = _catalogue(owner_engine)
     assert column == [("character", 30, "YES")] and FK in constraints and INDEX in indexes
     with owner_engine.begin() as connection:
         recorded = connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
-    assert recorded == "0053_eval_suite_project_scope"
+    assert recorded == CURRENT_HEAD
 
 
 def _rerun_from_0052(database_url, monkeypatch):
@@ -137,7 +145,7 @@ def _rerun_from_0052(database_url, monkeypatch):
     with monkeypatch.context() as patch:
         patch.setenv("INV_DATABASE_URL", database_url)
         patch.setenv("INV_MIGRATION_DSN", database_url)
-        command.upgrade(config, "head")
+        command.upgrade(config, "0053_eval_suite_project_scope")
 
 
 def test_a_foreign_key_of_that_name_that_cascades_is_refused_on_resume(owner_engine, database_url, migrated, clean_tables, monkeypatch):
@@ -160,7 +168,7 @@ def test_a_foreign_key_of_that_name_that_cascades_is_refused_on_resume(owner_eng
             connection.execute(text(f"ALTER TABLE eval_suites DROP CONSTRAINT IF EXISTS {FK}"))
             connection.execute(text(f"ALTER TABLE eval_suites ADD CONSTRAINT {FK} FOREIGN KEY (tenant_id, project_id) "
                                     "REFERENCES projects (tenant_id, project_id)"))
-            connection.execute(text("UPDATE alembic_version SET version_num = '0053_eval_suite_project_scope'"))
+            connection.execute(text("UPDATE alembic_version SET version_num = :head"), {"head": CURRENT_HEAD})
 
 
 def test_a_foreign_key_of_that_name_with_match_full_is_refused_on_resume(owner_engine, database_url, migrated, two_tenants, frozen_now, clean_tables, monkeypatch):
@@ -181,7 +189,7 @@ def test_a_foreign_key_of_that_name_with_match_full_is_refused_on_resume(owner_e
             connection.execute(text(f"ALTER TABLE eval_suites DROP CONSTRAINT IF EXISTS {FK}"))
             connection.execute(text(f"ALTER TABLE eval_suites ADD CONSTRAINT {FK} FOREIGN KEY (tenant_id, project_id) "
                                     "REFERENCES projects (tenant_id, project_id)"))
-            connection.execute(text("UPDATE alembic_version SET version_num = '0053_eval_suite_project_scope'"))
+            connection.execute(text("UPDATE alembic_version SET version_num = :head"), {"head": CURRENT_HEAD})
     # And the reason it matters, on the real key: an unscoped suite is admitted.
     tenant, _ = two_tenants
     with owner_engine.begin() as connection:
@@ -204,7 +212,7 @@ def test_an_index_of_that_name_with_the_columns_reversed_is_refused_on_resume(ow
         with owner_engine.begin() as connection:
             connection.execute(text(f"DROP INDEX IF EXISTS {INDEX}"))
             connection.execute(text(f"CREATE INDEX {INDEX} ON eval_suites (tenant_id, project_id)"))
-            connection.execute(text("UPDATE alembic_version SET version_num = '0053_eval_suite_project_scope'"))
+            connection.execute(text("UPDATE alembic_version SET version_num = :head"), {"head": CURRENT_HEAD})
 
 
 def test_the_catalogue_shape_the_migration_reads_matches_what_it_expects(owner_engine, migrated):
@@ -251,7 +259,7 @@ def test_a_resume_with_an_orphan_reference_is_refused_before_the_foreign_key(own
             patch.setenv("INV_DATABASE_URL", database_url)
             patch.setenv("INV_MIGRATION_DSN", database_url)
             with pytest.raises(RuntimeError) as raised:
-                command.upgrade(config, "head")
+                command.upgrade(config, "0053_eval_suite_project_scope")
         assert orphan in str(raised.value)
         _, constraints, _ = _catalogue(owner_engine)
         assert FK not in constraints
@@ -260,4 +268,4 @@ def test_a_resume_with_an_orphan_reference_is_refused_before_the_foreign_key(own
             connection.execute(text("DELETE FROM eval_suites WHERE suite_id = :s"), {"s": orphan})
             connection.execute(text(f"ALTER TABLE eval_suites ADD CONSTRAINT {FK} FOREIGN KEY (tenant_id, project_id) "
                                     "REFERENCES projects (tenant_id, project_id)"))
-            connection.execute(text("UPDATE alembic_version SET version_num = '0053_eval_suite_project_scope'"))
+            connection.execute(text("UPDATE alembic_version SET version_num = :head"), {"head": CURRENT_HEAD})
