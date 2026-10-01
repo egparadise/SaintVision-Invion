@@ -12,8 +12,9 @@ from inv.approvals import digest
 from inv.contracts import validate_contract
 from inv.db import Database
 from inv.errors import DomainError
+from inv.gpu import current_single_gpu_allocation
 from inv.ids import new_id
-from inv.leases import Allocation
+from inv.leases import Allocation, lock_resources
 from inv.node_execution import seal_permit
 from inv.node_transport import NodeDelivery
 from inv.policy import action_digest
@@ -210,6 +211,101 @@ def test_measured_single_gpu_allocation_is_bound_into_the_signed_plan(gpu_gatewa
     assert allocation["vramBytes"] == 24 * 1024**3
     assert allocation["exclusive"] is True
     assert result.claim["planDigest"] == digest(result.launch)
+
+
+def test_gpu_allocation_never_substitutes_a_second_resources_device(gpu_gateway):
+    a = gpu_gateway
+    other_resource = new_id("res")
+    with psycopg.connect(a.e.owner) as conn:
+        conn.execute(
+            "INSERT INTO inv.resources VALUES(%s,%s,%s,'gpu',1,1)",
+            (a.e.tenant, other_resource, a.e.node),
+        )
+        row = conn.execute(
+            "SELECT snapshot FROM inv.node_resource_snapshots WHERE node_id=%s",
+            (a.e.node,),
+        ).fetchone()
+        snapshot = row[0]
+        leased_device = snapshot["gpuDevices"][0]
+        other_device = {
+            **leased_device,
+            "resourceId": other_resource,
+            "deviceId": "GPU-synthetic-other",
+        }
+        other_device["observationDigest"] = action_digest(
+            {key: value for key, value in other_device.items() if key != "observationDigest"}
+        )
+        snapshot["gpuDevices"] = [other_device, leased_device]
+        conn.execute(
+            "UPDATE inv.node_resource_snapshots SET snapshot=%s WHERE node_id=%s",
+            (Jsonb(snapshot), a.e.node),
+        )
+
+    with a.e.db.transaction(a.e.tenant) as conn:
+        allocations = conn.execute(
+            "SELECT * FROM inv.resource_leases WHERE run_id=%s AND released_at IS NULL ORDER BY lease_id",
+            (a.run["runId"],),
+        ).fetchall()
+        resources = lock_resources(
+            conn,
+            [row["resource_id"] for row in allocations] + [other_resource],
+        )
+        now = conn.execute("SELECT clock_timestamp() AS now").fetchone()["now"]
+        allocation = current_single_gpu_allocation(
+            conn,
+            a.e.db,
+            node_id=a.e.node,
+            workload=a.workload,
+            allocations=allocations,
+            resources=resources,
+            profile_version=a.profile.version,
+            now=now,
+        )
+
+    assert allocation["resourceId"] == a.gpu_resource
+    assert allocation["deviceId"] == "GPU-synthetic-0"
+
+
+def test_gpu_allocation_rejects_two_devices_for_one_leased_resource(gpu_gateway, monkeypatch):
+    import inv.gpu as gpu_module
+
+    a = gpu_gateway
+    with a.e.db.transaction(a.e.tenant) as conn:
+        allocations = conn.execute(
+            "SELECT * FROM inv.resource_leases WHERE run_id=%s AND released_at IS NULL ORDER BY lease_id",
+            (a.run["runId"],),
+        ).fetchall()
+        resources = lock_resources(
+            conn,
+            [row["resource_id"] for row in allocations],
+        )
+        now = conn.execute("SELECT clock_timestamp() AS now").fetchone()["now"]
+        snapshot = conn.execute(
+            "SELECT snapshot FROM inv.node_resource_snapshots WHERE node_id=%s",
+            (a.e.node,),
+        ).fetchone()["snapshot"]
+        first = snapshot["gpuDevices"][0]
+        second = {**first, "deviceId": "GPU-synthetic-ambiguous"}
+        second["observationDigest"] = action_digest(
+            {key: value for key, value in second.items() if key != "observationDigest"}
+        )
+        monkeypatch.setattr(
+            gpu_module,
+            "verified_gpu_devices",
+            lambda *_args: {first["deviceId"]: first, second["deviceId"]: second},
+        )
+
+        with pytest.raises(DomainError, match="RES-0008"):
+            current_single_gpu_allocation(
+                conn,
+                a.e.db,
+                node_id=a.e.node,
+                workload=a.workload,
+                allocations=allocations,
+                resources=resources,
+                profile_version=a.profile.version,
+                now=now,
+            )
 
 
 def test_uncertain_gpu_cleanup_quarantines_node_and_retains_all_leases(gpu_gateway):

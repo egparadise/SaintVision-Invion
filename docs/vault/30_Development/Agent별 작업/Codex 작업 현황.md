@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.246"
+version: "1.0.247"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T17:30:19+09:00"
+updated: "2026-10-01T18:09:41+09:00"
 source_of_truth: "Git"
 active_card: "CARD-175 S08-BE measured single GPU"
-active_card_status: "fresh exact GPU observation/resource/lease/fence, one-device Docker request and uncertain-cleanup quarantine implemented; local focused 131 passed"
-active_card_next: "Claude review and exact-head run-core evidence; physical Linux GPU execution/detach/reallocation remains NOT_OBSERVED"
+active_card_status: "fresh exact GPU observation/resource/lease/fence, one-device Docker request and uncertain-cleanup quarantine implemented; Claude r1 second-device counterexample added"
+active_card_next: "exact-head run-core rerun and Claude condition recheck; physical Linux GPU execution/detach/reallocation remains NOT_OBSERVED"
 ---
 
 ## 2026-10-01 Card 175 — S08-BE measured single GPU
