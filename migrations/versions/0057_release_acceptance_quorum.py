@@ -759,10 +759,6 @@ def downgrade() -> None:
         "char(30),char(64),char(64),char(30),char(30),char(30),char(30),text,text,text,"
         "integer,char(64),timestamptz)"
     )
-    op.execute("DROP FUNCTION IF EXISTS public.release_acceptance_slot_forward()")
-    op.execute(
-        "DROP FUNCTION IF EXISTS public.release_acceptance_actor_is_live(uuid,text)"
-    )
 
     # The permission CHECK and the grants 0005 gave, as they were.
     op.execute(
@@ -801,3 +797,10 @@ def downgrade() -> None:
     op.drop_table("release_acceptance_withdrawals")
     op.drop_table("release_acceptance_votes")
     op.drop_table("release_acceptance_proposals")
+
+    # The two functions last, because the policies that call them live on those tables and
+    # go away with them. Dropping the actor function first failed with
+    # ``DependentObjectsStillExist`` naming all five policies -- the reversible-tail lane
+    # caught it, and my own upgrade/downgrade probe had run before the function existed.
+    op.execute("DROP FUNCTION IF EXISTS public.release_acceptance_slot_forward()")
+    op.execute("DROP FUNCTION IF EXISTS public.release_acceptance_actor_is_live(uuid,text)")
