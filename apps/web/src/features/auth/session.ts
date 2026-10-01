@@ -1,5 +1,6 @@
 import { generateCodeVerifier, generateCodeChallenge, generateState, generateNonce } from './pkce';
-import { clearAuthToken } from '@/shared/api/client';
+import { clearAuthToken, getAuthToken, setAuthToken } from '@/shared/api/client';
+import type { FreshAuthenticationStepUpRequest } from '@/contracts/fresh-authentication-step-up-request';
 
 export interface SessionUser {
   id: string;
@@ -35,6 +36,9 @@ export interface Transaction {
   createdAt: number;
   redirectUri: string;
   config: ResolvedOidcConfig;
+  isStepUp?: boolean;
+  previousToken?: string | null;
+  returnUrl?: string;
 }
 
 export interface JwtClaims {
@@ -335,135 +339,301 @@ export async function beginLogin(): Promise<string> {
   return url.href;
 }
 
+/**
+ * Validates FreshAuthenticationStepUpRequest strictly per schema:
+ * - prompt === 'login'
+ * - max_age === 300
+ * - additionalProperties: false (no extra keys allowed)
+ */
+export function validateStepUpRequest(req: unknown): asserts req is FreshAuthenticationStepUpRequest {
+  if (!req || typeof req !== 'object' || Array.isArray(req)) {
+    throw new Error('FreshAuthenticationStepUpRequest는 객체여야 합니다.');
+  }
+  const keys = Object.keys(req);
+  if (keys.length !== 2 || !keys.includes('prompt') || !keys.includes('max_age')) {
+    throw new Error('FreshAuthenticationStepUpRequest는 정확히 prompt와 max_age 두 필드만 허용하며 추가 필드는 금지됩니다.');
+  }
+  const obj = req as Record<string, unknown>;
+  if (obj.prompt !== 'login') {
+    throw new Error('prompt는 반드시 "login"이어야 합니다.');
+  }
+  if (obj.max_age !== 300) {
+    throw new Error('max_age는 반드시 300이어야 합니다.');
+  }
+}
+
+export interface StepUpOptions {
+  returnUrl?: string;
+  customParams?: Record<string, unknown>;
+}
+
+/**
+ * Initiates an OIDC step-up re-authentication flow (Card 192 / S12-BE Handoff).
+ * Generates fresh PKCE code_verifier, state, and nonce.
+ * Preserves the existing in-memory auth token in the transaction.
+ * Appends exact prompt=login&max_age=300 to authorize URL, rejecting additional parameters.
+ */
+export async function beginStepUp(options?: StepUpOptions): Promise<string> {
+  const config = authConfig();
+  const verifier = generateCodeVerifier();
+  const challenge = await generateCodeChallenge(verifier);
+  const isOpenId = config.scope.split(/\s+/).includes('openid');
+  const nonce = isOpenId ? generateNonce() : undefined;
+  const previousToken = getAuthToken();
+
+  // Validate step-up contract: prompt='login', max_age=300, reject additional properties
+  const stepUpParams: Record<string, unknown> = {
+    prompt: 'login',
+    max_age: 300,
+    ...(options?.customParams || {}),
+  };
+  validateStepUpRequest(stepUpParams);
+
+  const tx: Transaction = {
+    config,
+    verifier,
+    state: generateState(),
+    nonce,
+    createdAt: Date.now(),
+    redirectUri: config.redirectUri,
+    isStepUp: true,
+    previousToken: previousToken || null,
+    returnUrl: options?.returnUrl,
+  };
+
+  const url = new URL(config.idpAuthorizeUrl);
+  const params: Record<string, string> = {
+    response_type: 'code',
+    client_id: config.clientId,
+    redirect_uri: tx.redirectUri,
+    scope: config.scope,
+    state: tx.state,
+    code_challenge: challenge,
+    code_challenge_method: 'S256',
+    prompt: 'login',
+    max_age: '300',
+  };
+  if (tx.nonce) {
+    params.nonce = tx.nonce;
+  }
+
+  const allowedKeys = new Set([
+    'response_type',
+    'client_id',
+    'redirect_uri',
+    'scope',
+    'state',
+    'code_challenge',
+    'code_challenge_method',
+    'prompt',
+    'max_age',
+    ...(tx.nonce ? ['nonce'] : []),
+  ]);
+
+  for (const [key, value] of Object.entries(params)) {
+    if (!allowedKeys.has(key)) {
+      throw new Error(`허용되지 않은 인가 파라미터가 포함되었습니다: ${key}`);
+    }
+    url.searchParams.set(key, value);
+  }
+
+  sessionStorage.setItem(STORAGE_KEY, JSON.stringify(tx));
+  return url.href;
+}
+
 export function hasLoginCallback(): boolean {
   return window.location.pathname === '/callback';
 }
 
-export async function completeLogin(): Promise<{ token: string; user: SessionUser; expiresAt: number }> {
+export async function completeLogin(): Promise<{
+  token: string;
+  user: SessionUser;
+  expiresAt: number;
+  isStepUp?: boolean;
+  previousToken?: string | null;
+}> {
   const params = new URLSearchParams(window.location.search);
   const saved = sessionStorage.getItem(STORAGE_KEY);
   sessionStorage.removeItem(STORAGE_KEY);
-  window.history.replaceState({}, '', '/studio');
-  if (!saved) throw new Error('로그인 요청이 없거나 만료됐습니다. 다시 로그인하세요.');
-  const tx: Transaction = JSON.parse(saved);
-  const config = authConfig();
-  if (JSON.stringify(tx.config) !== JSON.stringify(config) ||
+  let tx: Transaction | null = null;
+  if (saved) {
+    try {
+      tx = JSON.parse(saved);
+    } catch {
+      tx = null;
+    }
+  }
+  window.history.replaceState({}, '', tx?.returnUrl || '/studio');
+  if (!saved || !tx) {
+    throw new Error('로그인 요청이 없거나 만료됐습니다. 다시 로그인하세요.');
+  }
+
+  // Rollback helper for step-up: upon any failure or cancellation, keep the previous token intact
+  const rollbackPreviousToken = () => {
+    if (tx?.isStepUp && tx.previousToken) {
+      setAuthToken(tx.previousToken);
+    }
+  };
+
+  try {
+    const config = authConfig();
+    if (
+      JSON.stringify(tx.config) !== JSON.stringify(config) ||
       tx.redirectUri !== config.redirectUri ||
-      typeof tx.state !== 'string' || !tx.state || params.getAll('state').length !== 1 || params.get('state') !== tx.state ||
-      !Number.isFinite(tx.createdAt) || Date.now() - tx.createdAt > 600000 || Date.now() < tx.createdAt ||
-      typeof tx.verifier !== 'string' || !/^[A-Za-z0-9_-]{43,128}$/.test(tx.verifier)) {
-    throw new Error('로그인 요청 검증에 실패했습니다. 다시 로그인하세요.');
-  }
-  if (params.has('error') || params.getAll('code').length !== 1 || !params.get('code')) {
-    throw new Error('인증 제공자가 로그인을 완료하지 못했습니다.');
-  }
-  // No resource token or tracing header may be sent to the IdP.
-  const response = await fetch(config.idpTokenUrl, {
-    method: 'POST',
-    credentials: 'omit',
-    redirect: 'error',
-    cache: 'no-store',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      grant_type: 'authorization_code',
-      code: params.get('code')!,
-      code_verifier: tx.verifier,
-      client_id: config.clientId,
-      redirect_uri: tx.redirectUri,
-    }),
-  });
-  if (!response.ok) throw new Error('인증 코드 교환에 실패했습니다. 다시 로그인하세요.');
-  const result = await response.json();
-  if (typeof result.access_token !== 'string' || !result.access_token ||
-      typeof result.token_type !== 'string' || result.token_type.toLowerCase() !== 'bearer') {
-    throw new Error('인증 토큰 응답이 올바르지 않습니다.');
-  }
+      typeof tx.state !== 'string' ||
+      !tx.state ||
+      params.getAll('state').length !== 1 ||
+      params.get('state') !== tx.state ||
+      !Number.isFinite(tx.createdAt) ||
+      Date.now() - tx.createdAt > 600000 ||
+      Date.now() < tx.createdAt ||
+      typeof tx.verifier !== 'string' ||
+      !/^[A-Za-z0-9_-]{43,128}$/.test(tx.verifier)
+    ) {
+      throw new Error('로그인 요청 검증에 실패했습니다. 다시 로그인하세요.');
+    }
+    if (params.has('error') || params.getAll('code').length !== 1 || !params.get('code')) {
+      throw new Error('인증 제공자가 로그인을 완료하지 못했습니다.');
+    }
+    // No resource token or tracing header may be sent to the IdP.
+    const response = await fetch(config.idpTokenUrl, {
+      method: 'POST',
+      credentials: 'omit',
+      redirect: 'error',
+      cache: 'no-store',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'authorization_code',
+        code: params.get('code')!,
+        code_verifier: tx.verifier,
+        client_id: config.clientId,
+        redirect_uri: tx.redirectUri,
+      }),
+    });
+    if (!response.ok) throw new Error('인증 코드 교환에 실패했습니다. 다시 로그인하세요.');
+    const result = await response.json();
+    if (
+      typeof result.access_token !== 'string' ||
+      !result.access_token ||
+      typeof result.token_type !== 'string' ||
+      result.token_type.toLowerCase() !== 'bearer'
+    ) {
+      throw new Error('인증 토큰 응답이 올바르지 않습니다.');
+    }
 
-  const nowSec = Math.floor(Date.now() / 1000);
+    const nowSec = Math.floor(Date.now() / 1000);
 
-  // OIDC ID token validation (when nonce was sent or id_token is provided)
-  // Per OIDC Core 1.0 §3.1.3.7 Rule 6: In issuer mode, direct TLS communication with the Token
-  // Endpoint allows TLS server validation to validate the issuer in place of checking the token signature.
-  // (In endpoint-pair mode, issuer is not configured, so iss is not validated).
-  // In the web client, id_token is validated solely as a client-side fail-closed gate and then discarded;
-  // it is never stored, displayed, or used in logout hints (buildLogoutUrl uses only clientId and postLogoutRedirectUri).
-  // The control-plane server (/v1/session) authoritatively validates the access_token with RS256, iss, and aud.
-  // The client fail-closed validates essential token claims:
-  // - nonce: matches transaction nonce exactly
-  // - iss: matches configured issuer (when issuer mode is configured; endpoint-pair mode does not validate iss)
-  // - aud & azp: single aud equals clientId; multi-aud includes clientId and azp equals clientId (Rules 3 & 4)
-  // - exp: required integer, not expired within CLOCK_SKEW_SEC (120s) leeway
-  // - iat: optional; integer when present
-  if (tx.nonce || result.id_token) {
-    if (typeof result.id_token !== 'string' || !result.id_token.trim()) {
-      throw new Error('OIDC 인증 응답에 ID 토큰(id_token)이 누락되었습니다.');
-    }
-    const idClaims = parseJwtPayload(result.id_token);
-    if (!idClaims) {
-      throw new Error('ID 토큰 페이로드가 올바르지 않습니다.');
-    }
-    if (tx.nonce && (typeof idClaims.nonce !== 'string' || idClaims.nonce !== tx.nonce)) {
-      throw new Error('ID 토큰의 nonce가 로그인 요청 트랜잭션과 일치하지 않습니다.');
-    }
-    if (config.issuer && (typeof idClaims.iss !== 'string' || idClaims.iss !== config.issuer)) {
-      throw new Error('ID 토큰의 발급자(iss)가 설정된 issuer와 일치하지 않습니다.');
-    }
-    if (typeof idClaims.aud === 'string') {
-      if (idClaims.aud !== config.clientId) {
-        throw new Error('ID 토큰의 대상(aud)이 클라이언트 ID와 일치하지 않습니다.');
+    // OIDC ID token validation (when nonce was sent or id_token is provided)
+    if (tx.nonce || result.id_token) {
+      if (typeof result.id_token !== 'string' || !result.id_token.trim()) {
+        throw new Error('OIDC 인증 응답에 ID 토큰(id_token)이 누락되었습니다.');
       }
-    } else if (Array.isArray(idClaims.aud)) {
-      if (!idClaims.aud.includes(config.clientId)) {
-        throw new Error('ID 토큰의 대상(aud) 목록에 클라이언트 ID가 포함되지 않았습니다.');
+      const idClaims = parseJwtPayload(result.id_token);
+      if (!idClaims) {
+        throw new Error('ID 토큰 페이로드가 올바르지 않습니다.');
       }
-      if (idClaims.aud.length > 1 && idClaims.azp !== config.clientId) {
-        throw new Error('다중 대상(aud) ID 토큰의 azp가 클라이언트 ID와 일치하지 않습니다.');
+      if (tx.nonce && (typeof idClaims.nonce !== 'string' || idClaims.nonce !== tx.nonce)) {
+        throw new Error('ID 토큰의 nonce가 로그인 요청 트랜잭션과 일치하지 않습니다.');
       }
-    } else {
-      throw new Error('ID 토큰의 대상(aud)이 올바르지 않습니다.');
+      if (config.issuer && (typeof idClaims.iss !== 'string' || idClaims.iss !== config.issuer)) {
+        throw new Error('ID 토큰의 발급자(iss)가 설정된 issuer와 일치하지 않습니다.');
+      }
+      if (typeof idClaims.aud === 'string') {
+        if (idClaims.aud !== config.clientId) {
+          throw new Error('ID 토큰의 대상(aud)이 클라이언트 ID와 일치하지 않습니다.');
+        }
+      } else if (Array.isArray(idClaims.aud)) {
+        if (!idClaims.aud.includes(config.clientId)) {
+          throw new Error('ID 토큰의 대상(aud) 목록에 클라이언트 ID가 포함되지 않았습니다.');
+        }
+        if (idClaims.aud.length > 1 && idClaims.azp !== config.clientId) {
+          throw new Error('다중 대상(aud) ID 토큰의 azp가 클라이언트 ID와 일치하지 않습니다.');
+        }
+      } else {
+        throw new Error('ID 토큰의 대상(aud)이 올바르지 않습니다.');
+      }
+      if (idClaims.azp !== undefined && idClaims.azp !== config.clientId) {
+        throw new Error('ID 토큰의 azp가 클라이언트 ID와 일치하지 않습니다.');
+      }
+      if (!Number.isInteger(idClaims.exp)) {
+        throw new Error('ID 토큰의 만료 시각(exp)이 정수가 아니거나 누락되었습니다.');
+      }
+      if (idClaims.exp! + CLOCK_SKEW_SEC <= nowSec) {
+        throw new Error('ID 토큰이 이미 만료되었습니다.');
+      }
+      if (idClaims.iat !== undefined && !Number.isInteger(idClaims.iat)) {
+        throw new Error('ID 토큰의 발급 시각(iat)이 정수가 아닙니다.');
+      }
     }
-    if (idClaims.azp !== undefined && idClaims.azp !== config.clientId) {
-      throw new Error('ID 토큰의 azp가 클라이언트 ID와 일치하지 않습니다.');
-    }
-    if (!Number.isInteger(idClaims.exp)) {
-      throw new Error('ID 토큰의 만료 시각(exp)이 정수가 아니거나 누락되었습니다.');
-    }
-    if (idClaims.exp! + CLOCK_SKEW_SEC <= nowSec) {
-      throw new Error('ID 토큰이 이미 만료되었습니다.');
-    }
-    if (idClaims.iat !== undefined && !Number.isInteger(idClaims.iat)) {
-      throw new Error('ID 토큰의 발급 시각(iat)이 정수가 아닙니다.');
-    }
-  }
 
-  // Client-side fail-closed token validity check against server contract (0 < exp - iat <= 3600)
-  validateTokenExpiration(result.access_token, nowSec, { requireJwt: false });
+    // Client-side fail-closed token validity check against server contract (0 < exp - iat <= 3600)
+    validateTokenExpiration(result.access_token, nowSec, { requireJwt: false });
 
-  const session = await fetch('/v1/session', {
-    credentials: 'omit',
-    redirect: 'error',
-    cache: 'no-store',
-    headers: { Authorization: `Bearer ${result.access_token}` },
-  });
-  if (!session.ok) throw new Error('서버가 인증 토큰을 허용하지 않았습니다.');
-  const identity = await session.json();
-  if (typeof identity.subjectId !== 'string' || !/^oidc:[0-9a-f]{64}$/.test(identity.subjectId) ||
-      typeof identity.tenantId !== 'string' || !identity.tenantId ||
-      !Number.isInteger(identity.expiresAt) || identity.expiresAt + CLOCK_SKEW_SEC <= nowSec) {
-    throw new Error('서버 사용자 응답이 올바르지 않습니다.');
-  }
-  if (identity.expiresAt - nowSec > 3600 + CLOCK_SKEW_SEC) {
-    throw new Error('서버 사용자 세션 유효 기간이 계약 허용치(최대 3600초)를 초과합니다.');
-  }
+    const session = await fetch('/v1/session', {
+      credentials: 'omit',
+      redirect: 'error',
+      cache: 'no-store',
+      headers: { Authorization: `Bearer ${result.access_token}` },
+    });
+    if (!session.ok) throw new Error('서버가 인증 토큰을 허용하지 않았습니다.');
+    const identity = await session.json();
+    if (
+      typeof identity.subjectId !== 'string' ||
+      !/^oidc:[0-9a-f]{64}$/.test(identity.subjectId) ||
+      typeof identity.tenantId !== 'string' ||
+      !identity.tenantId ||
+      !Number.isInteger(identity.expiresAt) ||
+      identity.expiresAt + CLOCK_SKEW_SEC <= nowSec
+    ) {
+      throw new Error('서버 사용자 응답이 올바르지 않습니다.');
+    }
+    if (identity.expiresAt - nowSec > 3600 + CLOCK_SKEW_SEC) {
+      throw new Error('서버 사용자 세션 유효 기간이 계약 허용치(최대 3600초)를 초과합니다.');
+    }
 
+    // Replace in-memory token with the newly verified fresh token
+    setAuthToken(result.access_token);
+    if (typeof identity.expiresAt === 'number') {
+      registerSessionExpiration(identity.expiresAt);
+    }
+
+    return {
+      token: result.access_token,
+      user: {
+        id: identity.subjectId,
+        name: identity.subjectId,
+        tenantId: identity.tenantId,
+        role: '프로젝트별 권한',
+      },
+      expiresAt: identity.expiresAt,
+      isStepUp: Boolean(tx.isStepUp),
+      previousToken: tx.previousToken || null,
+    };
+  } catch (err) {
+    rollbackPreviousToken();
+    throw err;
+  }
+}
+
+/**
+ * Completes an OIDC step-up re-authentication flow (Card 192).
+ * Verifies that the completed transaction is indeed a step-up transaction.
+ * If verification fails, the previous auth token is guaranteed to be preserved.
+ */
+export async function completeStepUp(): Promise<{
+  token: string;
+  user: SessionUser;
+  expiresAt: number;
+  previousToken: string | null;
+}> {
+  const res = await completeLogin();
+  if (!res.isStepUp) {
+    throw new Error('진행 중인 재인증(Step-Up) 트랜잭션이 아닙니다.');
+  }
   return {
-    token: result.access_token,
-    user: {
-      id: identity.subjectId,
-      name: identity.subjectId,
-      tenantId: identity.tenantId,
-      role: '프로젝트별 권한',
-    },
-    expiresAt: identity.expiresAt,
+    token: res.token,
+    user: res.user,
+    expiresAt: res.expiresAt,
+    previousToken: res.previousToken ?? null,
   };
 }

@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.168"
-status: "approved"
+version: "1.0.169"
+status: "proposed"
 author: "Gemini"
-updated: "2026-10-01T20:33:00+09:00"
+updated: "2026-10-01T22:45:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,35 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-10-01T20:33:00+09:00 (Card 183 S12-FE 릴리스 선언서 및 운영자 인수 서버 경로 결속 r2 조치 완료 및 #280 신규 head 79fcb772 머지 반영: Claude UI r2 및 Codex r2 피드백 전수 해소 — 404/403 fixture 코드를 canonical RES-0004 / AUTH-0030으로 정정하여 fixture-problem-codes-integrity 통과, ContractViolationError 및 deployment-manifest-error-contract 전용 계약 위반 상태 분리, 상단 KPI 카드 'SIGN-OFF 대기 (로컬 모의)' 문구 정비, 릴리스 선택기 변경 시 상세 재호출 및 화면 갱신 검증 시험 추가, canonical 5개 스키마 additionalProperties: false 및 허용 키셋 1:1 결속 시험 추가; #280 신규 계약 머지 — matchingAcceptedUserCount와 confirmedOperatorCount(Literal[0]) 분리 표출, operatorSignOffBlockedBy='human-attestation-implementation-unavailable' 동기화, components/knownLimitations/acceptances/nextCursor 필수화 계약 반영, Vitest 21 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 규칙 0 위반).
+- 확인 기준: 2026-10-01T22:45:00+09:00 (Card 192 S12-FE portal step-up 재로그인 진입점 및 OIDC PKCE 인증 흐름 결속 완료: Codex #285 인계 완결, FreshAuthenticationStepUpRequest 계약 동기화, exact prompt=login&max_age=300 인가 엔드포인트 파라미터 결속, 암호학적 verifier/state/nonce 신규 생성, completeLogin 실패 시 rollbackPreviousToken으로 이전 토큰 무파괴 보존, IntranetDeploymentView step-up 안내 및 로그인 유도 버튼 결속, 쓰기 UI 0건, Vitest 단위 시험 27 passed, tsc 0 error, build 성공, route coverage 41 passed, frontend integrity 0 violation, BLOCKED_EXTERNAL 경계 명시).
+
+## 2026-10-01 S12-FE Card 192: Portal Step-Up 재로그인 진입점 및 OIDC PKCE 인증 흐름 결속 (`agent/gemini/c192-portal-step-up`, base `6b2a3786` PR #285)
+- **개요**: PR #285 (Card 188, head `6b2a3786`)에서 Codex가 fresh-auth claim 공급원을 완성하고 인계한 portal step-up 재인증 진입점을 Gemini 프런트엔드 영역에서 결속:
+  1. **계약 생성 및 검증 자동화**: `apps/web/scripts/api-response-contracts.mjs`에 `fresh-authentication-step-up-request` 등록, `contracts:check` 41개 API 응답 TypeScript 타입 동기화 (exit 0).
+  2. **OIDC PKCE Step-Up 인증 세션 구현 (`apps/web/src/features/auth/session.ts`)**:
+     - `validateStepUpRequest`: `prompt === 'login'`, `max_age === 300`, `additionalProperties: false` fail-closed 런타임 검증기.
+     - `beginStepUp`: 기존 활성 토큰을 `previousToken`으로 포획, 신규 PKCE `code_verifier`, `code_challenge` (S256), `state`, `nonce` 생성, `prompt=login&max_age=300` 결속된 인가 URL 생성 및 트랜잭션 보존.
+     - `completeLogin` / `completeStepUp`: 실패·취소·state 불일치 시 `catch` 블록에서 `rollbackPreviousToken`으로 이전 토큰을 무조건 온전히 보존(불변식), 성공 시에만 신선 토큰으로 교체, 서명 합성 원천 차단.
+  3. **내부망 배포 화면 UI 결속 (`apps/web/src/features/deployment/IntranetDeploymentView.tsx`)**:
+     - `deployment-step-up-section`, `deployment-step-up-status-badge` (`재인증 필요 (Step-Up Required)`), `deployment-step-up-button` (`재인증 필요 (Step-Up 로그인)`, `size="sm"`).
+     - 안내 문구: `INV_RELEASE_ACCEPTANCE_WRITE_ENABLED=false` (설계 기본값 유지), `BLOCKED_EXTERNAL` (사내 hosts 미적용).
+     - 디자인 토큰(CSS variables) 100% 적용으로 신규 하드코딩 색상 리터럴 0건 유지.
+     - 쓰기 UI 0건: 수락/서명 등록 폼이나 엔드포인트 호출 코드 원천 배제.
+- **담당 및 역할**: Gemini (Frontend / UI / 인증 흐름 소유). Reviewer: Claude (UI/인증 흐름/테스트 축), Codex (보안 계약/토큰 보존/불변식 축).
+- **관측 근거 (Evidence)**:
+  - Vitest: `auth-step-up-contract.test.ts` 23 passed (22ms), `auth-step-up-ui.test.tsx` 4 passed (183ms) (전원 통과)
+  - 변이 검사: 8종 단일 변이 전원 사살 실측 (사살율 100%)
+  - TypeScript 정적 점검: `npx tsc -b` 타입 에러 0건 (exit 0)
+  - 프로덕션 번들 빌드: `npm run build` 성공 (Vite bundle 정상 생성, 8.50s, exit 0)
+  - 계약 동기화 점검: `npm run contracts:check` 41 types PASS (exit 0)
+  - 라우트 커버리지 점검: `pytest tests/test_route_coverage.py` 41 passed 100% (exit 0)
+  - 프런트엔드 무결성 점검: `python tools/check_frontend_integrity.py` 93개 파일 스캔, 9대 무결성 규칙 위반 0건 (exit 0)
+  - 계약 바인딩 점검: `python tools/check_contract_bindings.py` 55개 픽스처 + 20개 커널 응답 타입 앵커 통과 (exit 0)
+  - 문서 무결성 점검: `python tools/check_docs.py` PASS (exit 0)
+  - 문서 경로 인용 래칫: `python tools/check_doc_path_citations.py --ratchet --base-ref 6b2a3786` PASS (exit 0)
+  - Git 공백 검사: `git diff --check 6b2a3786` 클린 (exit 0)
+  - 봇 호출 태그 점검: 0건 준수
+- **전문 문서**: [[2026-10-01_22-45-00_KST_Card192_portal_step_up_Gemini]]
 
 ## 2026-10-01 S12-FE 릴리스 선언서(Release Manifest) 및 운영자 인수 서버 경로 결속 (Card 183 2단계, `agent/gemini/c183-s12fe-release-binding`, base `79fcb772` PR #280)
 - **개요**: Claude 카드 182(PR #280)에서 구축된 정본 계약 스키마 5종(`release-manifest-response`, `release-manifest-detail-response`, `release-manifest-page-response`, `release-acceptance-response`, `release-component-response`) 및 읽기 전용 REST 라우트(`GET /v1/release-manifests`, `GET /v1/release-manifests/{release_id}`)를 프런트엔드 `apps/web`에 온전히 결속:
