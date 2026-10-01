@@ -493,3 +493,28 @@ def test_a_hole_glued_to_the_end_is_a_suffix_splice_not_a_segment() -> None:
     assert got == {"/v1/storage/resolve"}
     got = client_paths("get(`/v1/projects/${encodeURIComponent(p)}/runs/${r}/attempts${cursor}`)")
     assert got == {"/v1/projects/{}/runs/{}/attempts"}
+
+
+def test_release_manifest_reader_routes_are_served_and_read_only() -> None:
+    """Card 182: the two readers DEF-S12 said were missing are on the surface.
+
+    The re-score kept ``S12-FE`` at 50 because no server route could answer
+    whether a release had been signed off, so the screen hard-coded
+    ``operatorSignOff=false``. These assertions are what stop the routes
+    disappearing again, and what stop a write slipping into a read surface:
+    creating an acceptance is a security boundary and is not served here.
+    """
+    root = Path(__file__).resolve().parents[1]
+    module = (root / "src/saintvision/api/v1/release_manifests.py").read_text("utf-8")
+    routes = served_routes(module)
+    assert "/v1/release-manifests" in routes
+    assert "/v1/release-manifests/{}" in routes
+    # Read only: no decorator in the module serves anything but GET.
+    assert "@router.post" not in module
+    assert "@router.put" not in module
+    assert "@router.patch" not in module
+    assert "@router.delete" not in module
+    # And the router is actually mounted, which a route file alone does not say.
+    app_source = (root / "src/saintvision/api/app.py").read_text("utf-8")
+    assert "release_manifests as release_manifests_router" in app_source
+    assert "include_router(release_manifests_router.router)" in app_source
