@@ -4,7 +4,7 @@ title: "Codex 작업 현황"
 version: "1.0.234"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T09:13:57+09:00"
+updated: "2026-10-01T09:40:00+09:00"
 source_of_truth: "Git"
 active_card: "CARD-151 intranet ObjectStore and PITR rehearsal"
 active_card_status: "PR 248 review follow-up; Claude F1-F12 remediated, TLS operational U6 PASS, G-22 replication HBA blocked external"
@@ -85,6 +85,13 @@ active_card_next: "Claude re-review; continue Card 154 independent review and ca
 - reachable head `c075e669`에서 operational roundtrip 6/6와 cleanup PASS, 별도 attestation SHA·시각 결속을 확보했다. canonical S01은 storage check 1개만 PASS하고 operator/session token·CP DNS/HTTPS·inventory 사용자 값 부재로 FAIL 2/BLOCKED 6, `acceptanceAssessed=false`다.
 - TLS 전환에서 발견한 cert-dir/loopback CA/bootstrap process-argument 문제를 회귀시험과 bounded rollback으로 닫고, 진단 시 노출된 root 자격은 즉시 회전했다. G-22는 source physical replication HBA 미승인 때문에 source mutation 전 BLOCKED_EXTERNAL이며 RPO/RTO는 여전히 null이다. [[2026-09-30_00-19-37_KST_Card151_사내_Storage_PITR_Codex_구현]].
 - PR #248 보안 후속 head `0a768892`는 PITR 전송과 source PostgreSQL 자격을 각각 보호 파일 read-only mount와 컨테이너 내부 읽기로 바꿔 host argv·Docker `Config.Env` 비노출을 고정했다. PG-free 4 passed, local·remote shell syntax와 diff check는 exit 0이다.
+## 2026-10-01 CARD-162 AC-11 security landing SHA 증거
+
+- #258 v1.6 §4-3-3이 다음 판정 조건으로 명시한 "integration 착지 SHA의 security-critical-high 실행 1건"을 선택했다. 외부 장비 없이 현 integration `6fc0428b`의 이미 승인된 producer·importer·opt-in workflow로 닫을 수 있기 때문이다.
+- exact integration workflow_dispatch `36794567345`는 artifact를 보존했지만 gate는 정직하게 실패했다. `pip-audit`가 runtime/scan pin PyJWT 2.13.0에서 allowlist 밖 HIGH 13건을 검출했고, Bandit HIGH는 0건이었다. 예외 allowlist를 늘리지 않고 두 정본 pin을 PyJWT 2.15.1로 함께 올리며, 되돌리면 실패하는 exact-pin 시험을 추가한다.
+- PR #260 exact head `d28a1e1d`의 opt-in run `36795087571`은 success였다. artifact `11133655643`(digest `73d0e566…112c0`)을 인증된 run/artifact metadata와 함께 importer로 검증해 exit 0, `MEASURED_PASS / NONE`, HIGH 0, CRITICAL 0을 확인했다. focused scanner 시험은 14 passed이며 로컬 Python 3.10의 `StrEnum` 부재로 collect되지 않은 identity 시험은 성공 수치에 포함하지 않았다.
+- 문서 head `3684fcc6` Backend `36795581647`은 10월 1일에 처음 노출된 test fixture의 9월 고정 clock partition 부재로 두 matrix가 함께 red였다(3.14: 5440 passed, 82 failed, 81 errors). 제품 partition 정책은 유지하고 disposable DB에만 고정 clock 월을 준비하며, 세 partitioned table을 단언하는 회귀 시험을 추가했다. 이는 PyJWT 호환성 실패가 아니다.
+- 이 카드의 성공 조건은 PR head security lane green만이 아니다. 수정이 integration에 착지한 뒤 그 착지 SHA로 workflow_dispatch를 다시 실행해야 #258의 조건이 닫힌다. 그 전에는 S11-BE 75, AC-11 전체 미완료를 유지한다. [[2026-10-01_09-10-32_KST_AC11_security_landing_SHA_Codex]].
 
 ## 2026-09-29 S05 Card114 c50 일반 suite 격리 — Claude 재확인 요청
 
