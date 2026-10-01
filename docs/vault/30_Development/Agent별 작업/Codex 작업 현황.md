@@ -1,15 +1,31 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.252"
+version: "1.0.255"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T20:30:20+09:00"
+updated: "2026-10-01T22:14:13+09:00"
 source_of_truth: "Git"
-active_card: "CARD-184 S12 release acceptance/operator sign-off write contract"
-active_card_status: "Card 187 implementation questions resolved and locally gated: focused 68 passed on Pydantic default/2.13.5; schema 93/93 and docs/bindings/citations exit 0"
-active_card_next: "Push exact head and confirm Backend 3.12/3.14 green; implementation remains disabled until fresh-auth and authoritative resolvers land"
+active_card: "CARD-190 S12 acceptance target/Evidence canonical resolver contract"
+active_card_status: "Claude r1 F1-F9 and r2 Low five resolved in design/contract v1.1.1; implementation remains NOT_OBSERVED"
+active_card_next: "Confirm exact-head Backend and Claude final review; implement reserved migration 0058 only in the next Claude card"
 ---
+
+## 2026-10-01 Card 190 — S12 수락 target·Evidence 정본 resolver 계약
+
+- #282 v1.3.0의 두 번째 write prerequisite를 선택했다. `input_sha256` fallback을 금지하고
+  target registry·Evidence envelope digest·release/project binding을 server-owned 경계로 설계했다.
+- AC-12 target registry는 정본 source commit/path/blob, 4 criteria, canonical target digest를
+  고정한다. strict 공개 계약 2개와 generated schema 2개를 추가했다.
+- Evidence digest는 `(evidence_id,recorded_at)`의 partition identity를 포함한 row 전체 의미이며,
+  예약 승인된 migration `0058`에서 inline trigger 계산·legacy NULL fail-closed·receipt backfill을 요구한다.
+- Claude r1에 따라 ledger/lock 순서, `RES-0007`, binder/discovery route, release·policy·registry pin DTO,
+  duplicate-key raw loader, merge-only source 도달성을 v1.1에 고정했다.
+- Claude r2의 Low 5건도 strict discovery page, trigger/helper digest equality, owner 독립 변이,
+  DTO criterion 정합, criterion coordination slot 용어로 닫았다.
+- PG-free resolver **33 passed**, write contract 포함 **61 passed**. resolver·migration·real-PG·write enable은 `NOT_OBSERVED`다.
+  [[S12-BE_release_acceptance_target_Evidence_resolver_설계]],
+  [[2026-10-01_21-35-49_KST_S12_acceptance_target_Evidence_resolver_Codex]].
 
 ## 2026-10-01 Card 184 — S12 release 수락·operator sign-off 쓰기 계약
 
@@ -50,6 +66,20 @@ active_card_next: "Push exact head and confirm Backend 3.12/3.14 green; implemen
 - route·migration·OIDC claim 전달·DB·실 PG는 미구현이며 Claude 독립 검토 뒤 다음 카드가
   구현한다. [[S12-BE_release_acceptance_operator_signoff_쓰기_계약_설계]],
   [[2026-10-01_18-55-55_KST_S12-BE_release_acceptance_쓰기_계약_Codex]].
+## 2026-10-01 Card 188 — S12 fresh-auth claim 공급원
+
+- train 9 base `89c8f366` 위에 Keycloak `AUTH_TIME`·AMR mapper와 password/OTP RFC 8176
+  reference를 고정하고, 서명 검증된 token에서만 Principal fresh-auth metadata가 생기도록
+  결속했다.
+- 정책은 300초 안의 `mfa` 또는 `pwd+(otp|hwk|swk)`만 허용한다. 누락·오래됨·미래·
+  `pwd` 단독·`webauthn`·unknown claim은 fail closed다.
+- portal 인계 계약은 exact `prompt=login&max_age=300`이다. FE 구현과 live Keycloak token
+  관측은 아직 없으므로 write route flag는 off이고 운영 인수는 `BLOCKED_EXTERNAL`이다.
+- Claude r1에 따라 static reference PASS와 실제 portal flow/OTP 등록을 분리했다. 두 운영자의
+  OTP 등록과 live `pwd+otp|mfa` token 관측 전에는 write-ready가 아니다. str/float auth_time,
+  변조 서명, AMR token target 변이 시험도 보강했다.
+- 근거: [[2026-10-01_21-10-00_KST_Card188_fresh_auth_claim_공급원_Codex]],
+  [[S12-BE_fresh_auth_claim_공급원_및_portal_step-up_인계]].
 
 ## 2026-10-01 Card 166 — shard parent/member cancel bridge 후속
 
@@ -83,6 +113,19 @@ active_card_next: "Push exact head and confirm Backend 3.12/3.14 green; implemen
   `sha256:77d30b61dfa0027a86b123be94e5cb5e545dd1110b9cc12c0b2f151d11797cbb`다.
   수동 사용자 인수 부재 1건 때문에 raw verdict는 사전 등록대로 `MEASURED_FAIL`이며
   AC-11 done·점수 승격은 하지 않는다.
+## 2026-10-01 Card 175 — S08-BE measured single GPU
+
+- #274 승인 head `3059c978` 위에 strict GPU observation/allocation 계약과 device별
+  placement·lease·fencing을 결속했다. provider 없음·stale·digest drift·GPU 2개·VRAM 부족은
+  tool claim 전에 닫히고, GPU 없는 CPU 경로는 기존 동작을 유지한다.
+- Node permit과 Docker read-back은 한 `nvidia` device ID만 허용한다. privileged·bind·all-device·
+  broad capability는 계속 금지한다. cleanup receipt 또는 lease release가 불명확하면 Node를
+  quarantine하고 모든 lease를 유지하며 redacted audit만 남긴다.
+- source `197caef5`, 로컬 PG-free focused **131 passed**, contract binding gate exit 0.
+  #274 권고 R2의 실 PG 동시 claim 시험도 추가했으며 hosted `run-core`에서 실행 여부와 JUnit을
+  확인한다. 실 GPU workload·detach·재할당은 `NOT_OBSERVED`이고 S08-BE 승격은 없다.
+- 근거: [[2026-10-01_17-30-19_KST_S08-BE_단일_GPU_결속_Codex]].
+
 ## 2026-10-01 Card 174 — S08-BE admitted Build adapter
 
 - PR #272 승인 head `7eb5e77e` 위에서 raw plan이 아닌 내부 admitted capability만

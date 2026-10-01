@@ -18,6 +18,7 @@ from .leases import lock_run, lock_resources, assert_fences, wire
 from .policy import action_digest, enforce_decision
 from .runs import event
 from .sandbox import SandboxProfile, RuntimeCapabilities, compile_launch
+from .gpu import current_single_gpu_allocation
 
 
 @dataclass(frozen=True)
@@ -298,7 +299,23 @@ class ToolGateway:
                     database=self.db,
                     requester=requester,
                 )
-            plan = compile_launch(workload, self.profile, workspace_input=workspace_input)
+            gpu_allocation = current_single_gpu_allocation(
+                conn,
+                self.db,
+                node_id=node.node_id,
+                workload=workload,
+                allocations=allocations,
+                resources=resources,
+                profile_version=self.profile.version,
+                now=now,
+            )
+            plan = compile_launch(
+                workload,
+                self.profile,
+                workspace_input=workspace_input,
+                gpu_allocation=gpu_allocation,
+                now=now,
+            )
             deadline = min(
                 approval["expires_at"],
                 expires,

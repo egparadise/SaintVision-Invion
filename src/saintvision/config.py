@@ -43,6 +43,18 @@ def _get(name: str, default: str | None = None) -> str:
     return value
 
 
+def _get_bool(name: str, default: bool) -> bool:
+    """An operator flag. Only the four spellings below are true; anything else is false.
+
+    Fail closed rather than truthy: ``INV_..._ENABLED=maybe`` is a typo, and reading it
+    as "enabled" would turn a mistake into a security decision.
+    """
+    raw = os.environ.get(name)
+    if raw is None:
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+
 def _get_int(name: str, default: int) -> int:
     raw = os.environ.get(name)
     return default if raw is None else int(raw)
@@ -117,6 +129,15 @@ class Settings:
     #: read back over HTTP (VF-CL-03). Absent is a valid deployment: a route
     #: that needs an observation then refuses with 503 rather than guessing a
     #: host, which is the same rule the rest of this module follows.
+    #: Whether the two-person release acceptance write surface is usable. **False by
+    #: default, and the default is the deployed state**: the routes are registered so
+    #: their contract can be exercised, and every request is refused with
+    #: ``SYS-0003``/503 until an operator turns this on *and* the prerequisites it
+    #: depends on exist -- an identity provider emitting ``auth_time``/``amr`` and
+    #: authoritative target/Evidence registries (design #282 §0-1.5). Turning it on
+    #: alone changes nothing, which is deliberate: a flag that could enable an
+    #: unprovable two-person rule would be the hole this contract exists to close.
+    release_acceptance_write_enabled: bool = False
     kernel_base_url: str | None = None
     #: The opaque identity of this control-plane host, under which conformance
     #: records are written and read (G-03 stage two, design #218 §2-9). Absent
@@ -183,6 +204,9 @@ class Settings:
                 if value.strip()
             ),
             oidc_jwks_file=os.environ.get("INV_OIDC_JWKS_FILE"),
+            release_acceptance_write_enabled=_get_bool(
+                "INV_RELEASE_ACCEPTANCE_WRITE_ENABLED", False
+            ),
             kernel_base_url=os.environ.get("INV_KERNEL_BASE_URL"),
             control_plane_host_id=_host_id_from_env(),
         )

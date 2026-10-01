@@ -652,7 +652,20 @@ def test_readiness_reports_a_drill_that_passed_but_missed_the_target(
     assert report["drillsMissingTargets"][0]["measuredRtoSeconds"] > TARGET_RTO_SECONDS
 
 
-def test_a_rejected_acceptance_blocks_readiness(app_sessionmaker, pilot):
+def test_a_rejected_acceptance_never_produces_sign_off(app_sessionmaker, pilot):
+    """A rejected decision is not an accepted one, and that needs no rule of its own.
+
+    This test used to assert the blocker string "a rejected acceptance stands against
+    this release", which ``pilot_readiness`` produced from its own rule. Design #282 §5
+    removed that rule: one projection answers whether a release is operator-signed, and
+    a rejected criterion fails it by not being accepted. A second rule saying the same
+    thing is a rule that can be changed in one place only, and the two could disagree
+    about the same release.
+
+    So the assertion moves to the thing that matters -- no sign-off -- and keeps the
+    distinction the old version blurred: the rejection is still *recorded*, so the
+    record catalogue is not missing anything, while the release is not signed off.
+    """
     with app_sessionmaker() as session:
         with session.begin():
             with tenant_scope(session, pilot["tenant_a"]):
@@ -669,7 +682,12 @@ def test_a_rejected_acceptance_blocks_readiness(app_sessionmaker, pilot):
                     session, tenant_id=pilot["tenant_a"],
                     release_id=release.release_id, now=NOW,
                 )
-    assert "a rejected acceptance stands against this release" in report["blockers"]
+    assert report["operatorSignOff"] is False
+    assert report["operatorSignOffBlockedBy"] == "release-acceptance-prerequisites-unavailable"
+    assert report["signOffUnmet"], "the projection must say which criterion is unmet"
+    # The record exists, so the catalogue is not what is missing here.
+    assert "no acceptance record for AC-12 in this release" not in report["blockers"]
+    assert [a["outcome"] for a in report["acceptances"]] == ["rejected"]
 
 
 # --------------------------------------------------------------------------
@@ -855,8 +873,16 @@ def test_an_acceptance_pinning_a_different_hash_is_not_sign_off(
     reads the hash from the release rather than taking it, so today the two
     always agree and ``manifestMatches`` is always true. The row stores its own
     copy anyway, and a reader that ignored it would call any future writer's
-    mismatch a sign-off -- so the comparison is defence, and this test creates
-    the state the only way it can be created: by writing the column directly.
+    mismatch a sign-off -- so the comparison is defence, and this test has to
+    create the state some other way.
+
+    It used to do that with ``UPDATE acceptance_records``. It cannot any more:
+    0057 revokes UPDATE and DELETE on that table from ``inv_app``, because a
+    recorded decision is withdrawn by appending a row and never edited (design
+    #282 §4-1). The construction is now an INSERT of a row that pins a different
+    composition, which is both a privilege the application legitimately holds and
+    a closer picture of the real thing -- a decision about a release as it stood,
+    kept after the release moved on.
     """
 
     other_hash = "b" * 64
@@ -867,26 +893,20 @@ def test_an_acceptance_pinning_a_different_hash_is_not_sign_off(
                     session, tenant_id=pilot["tenant_a"], user_id=pilot["user_id"]
                 )
                 assert release.manifest_sha256 != other_hash
-                acceptance = pilot_service.record_acceptance(
-                    session,
-                    tenant_id=pilot["tenant_a"],
-                    release_id=release.release_id,
-                    acceptance_criterion="AC-12",
-                    outcome="accepted",
-                    known_limitations=[],
-                    accepted_by_user_id=pilot["user_id"],
-                    now=NOW,
-                )
-                session.flush()
                 session.execute(
                     text(
-                        "UPDATE acceptance_records SET accepted_manifest_sha256=:h "
-                        "WHERE tenant_id=:t AND acceptance_id=:a"
+                        "INSERT INTO acceptance_records(acceptance_id,tenant_id,release_id,"
+                        "acceptance_id_ref,outcome,accepted_manifest_sha256,known_limitations,"
+                        "accepted_by_user_id,decided_at) "
+                        "VALUES(:a,:t,:r,'AC-12','accepted',:h,'[]'::jsonb,:u,:now)"
                     ),
                     {
-                        "h": other_hash,
+                        "a": new_id("acceptance"),
                         "t": pilot["tenant_a"],
-                        "a": acceptance.acceptance_id,
+                        "r": release.release_id,
+                        "h": other_hash,
+                        "u": pilot["user_id"],
+                        "now": NOW,
                     },
                 )
                 session.expire_all()

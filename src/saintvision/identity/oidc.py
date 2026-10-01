@@ -118,12 +118,40 @@ class OidcPrincipalVerifier:
             with session.begin():
                 with tenant_scope(session, tenant_id):
                     return principal_for_subject(
-                        session, tenant_id=tenant_id, subject=subject
+                        session,
+                        tenant_id=tenant_id,
+                        subject=subject,
+                        verified_fresh_auth_claims=True,
+                        auth_time=getattr(identity, "auth_time", None),
+                        amr=frozenset(getattr(identity, "amr", ())),
+                        # Handed over, never re-derived: these are the issuer and client
+                        # the signature was already checked against, and the token's own
+                        # expiry. Read with getattr so a verifier stub that predates them
+                        # yields None -- which the acceptance boundary refuses -- rather
+                        # than raising here and turning a refusal into a 500.
+                        verified_token_issuer=getattr(identity, "issuer", None),
+                        verified_token_client_id=getattr(identity, "client_id", None),
+                        verified_token_expires_at=getattr(identity, "expires_at", None),
                     )
 
 
+# ``_fresh_auth_from()`` lived here: a second parse and a second judgement of the same
+# claims. Codex's #286 decision removed it. Nothing in this module decides whether an
+# authentication was fresh -- ``saintvision.identity.principal.has_fresh_interactive_auth``
+# does, on the values ``inv.identity.AccessTokens.verify`` normalised.
+
+
 def principal_for_subject(
-    session: Session, *, tenant_id: uuid.UUID, subject: str
+    session: Session,
+    *,
+    tenant_id: uuid.UUID,
+    subject: str,
+    verified_fresh_auth_claims: bool = False,
+    auth_time: int | None = None,
+    amr: frozenset[str] = frozenset(),
+    verified_token_issuer: str | None = None,
+    verified_token_client_id: str | None = None,
+    verified_token_expires_at: int | None = None,
 ) -> Principal:
     """Find the person this verified subject belongs to.
 
@@ -184,4 +212,10 @@ def principal_for_subject(
         # request it was built for is handled.
         project_ids=frozenset(project_id for project_id, _ in memberships),
         roles=frozenset(role for _, role in memberships),
+        verified_fresh_auth_claims=verified_fresh_auth_claims,
+        auth_time=auth_time,
+        amr=amr,
+        verified_token_issuer=verified_token_issuer,
+        verified_token_client_id=verified_token_client_id,
+        verified_token_expires_at=verified_token_expires_at,
     )
