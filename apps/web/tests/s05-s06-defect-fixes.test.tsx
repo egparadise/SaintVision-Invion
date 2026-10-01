@@ -515,7 +515,7 @@ describe('S05-FE & S06-FE Product Defect Fixes Regression Suite', () => {
     });
 
     // 1) By default win_my_computer is open
-    const windowDialog = container.querySelector('div[role="dialog"]');
+    const windowDialog = container.querySelector('div[role="dialog"][aria-modal="false"]');
     expect(windowDialog).not.toBeNull();
 
     // 2) Open Start Menu
@@ -525,7 +525,7 @@ describe('S05-FE & S06-FE Product Defect Fixes Regression Suite', () => {
       startBtn?.click();
     });
 
-    const startMenu = container.querySelector('[role="menu"]');
+    const startMenu = container.querySelector('div[role="dialog"][aria-label="시작 메뉴"]');
     expect(startMenu).not.toBeNull();
     expect(startBtn?.getAttribute('aria-expanded')).toBe('true');
 
@@ -535,9 +535,9 @@ describe('S05-FE & S06-FE Product Defect Fixes Regression Suite', () => {
     });
 
     // Expect: Start Menu is closed, but Window remains open!
-    expect(container.querySelector('[role="menu"]')).toBeNull();
+    expect(container.querySelector('div[role="dialog"][aria-label="시작 메뉴"]')).toBeNull();
     expect(startBtn?.getAttribute('aria-expanded')).toBe('false');
-    expect(container.querySelector('div[role="dialog"]')).not.toBeNull();
+    expect(container.querySelector('div[role="dialog"][aria-modal="false"]')).not.toBeNull();
 
     // 4) Fire Escape again when Start Menu is closed
     await act(async () => {
@@ -545,6 +545,6 @@ describe('S05-FE & S06-FE Product Defect Fixes Regression Suite', () => {
     });
 
     // Now window closes
-    expect(container.querySelector('div[role="dialog"]')).toBeNull();
+    expect(container.querySelector('div[role="dialog"][aria-modal="false"]')).toBeNull();
   });
 });

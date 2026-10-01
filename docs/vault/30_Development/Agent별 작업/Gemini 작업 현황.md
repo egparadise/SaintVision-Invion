@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.158"
+version: "1.0.162"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-30T15:19:00+09:00"
+updated: "2026-10-01T15:50:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,44 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-30T15:19:00+09:00 (Card 156 사내망 portal 웹 배포 독립 검토 r8 조치 전수 반영: re.fullmatch 전면 적용, 제어문자/개행 차단, NUL 바이트 구분자 전달 및 IFS= read -r -d '' 수신, terminal newline schema 거부 실측, unanchored 백업 가지치기 실측, 71 passed 100%).
+- 확인 기준: 2026-10-01T15:50:00+09:00 (Card 174 S11-FE 접근성 결함 수정 및 트리거 포커스 복원: Claude r2 잔여 D1 시작 메뉴 role="menuitem" 9개 전수 부여 및 방향키 ↑↓ Home/End 탐색, D2 앱 실행 openApp 시 새 창/제목으로 포커스 이동 및 Escape/닫기에만 트리거 복원 한정, Vitest 11 passed, tsc 0 error, build 성공, route coverage 40 passed 100%).
+
+## 2026-10-01 S11-FE 접근성 결함 수정 및 대화상자·드로어 닫힘 트리거 포커스 복원 (Card 174, `agent/gemini/c174-s11fe-a11y-fixes`, PR #270)
+- **개요**: 실브라우저 인수 시험(`tools/run_real_browser_acceptance.py` Invariant 6)에서 PARTIAL로 기록되어 온 '트리거로 focus 복귀'(`focus_is_trigger`) 결함을 치유하고, 검토 의견(F2, F3, N1, D1, D2)을 반영하여 접근성 불변식을 완비하였다:
+  1. `DesktopShell.tsx` 오버레이 상호 배타(`activeOverlay`: `'none' | 'start' | 'notifications'`) 단일 활성 스코프 도입 (F2):
+     - 시작 메뉴와 알림 센터가 동시에 열려 포커스 트랩이 상호 간섭하거나 시작 메뉴 트랩이 알림 센터를 가로채던 결함을 원천 치유함.
+     - 오버레이 간 직접 전환(`start` $\leftrightarrow$ `notifications`) 시 이전 트리거로의 불필요한 포커스 복원을 억제하고 신규 활성화된 오버레이로 포커스를 매끄럽게 이양함.
+     - 오버레이가 완전히 닫힐 때(`none`)에만 해당 오버레이의 트리거 버튼으로 포커스를 정확히 복원함.
+  2. `DesktopShell.tsx` 알림 센터 포커스 트랩 (F3 & N1):
+     - 알림 센터 헤더의 동작 없는 모의 제어 버튼(`notif-clear-all-btn`)을 완전 제거하고, 닫기(`×`) 단일 대화상자 요소 환경에서 W3C WCAG 2.4.3 표준 Tab / Shift+Tab 순환 잠금(닫기 버튼 상주 및 외부 이탈 시 닫기 버튼으로 강제 포커스)을 실현하고 회귀 시험을 완비함.
+  3. `useModalA11y.ts` 초기 마운트 closed 상태(`isOpen=false`) 포커스 탈취 결함 치유 (F3):
+     - `wasOpenRef.current` 추적 가드를 도입하여 모달이 닫힌 상태로 초기 마운트될 때 `triggerRef`로 포커스를 강탈하던 문제를 원천 방지함.
+  4. WAI-ARIA 및 키보드 조작 규격 강화 (D1):
+     - 시작 메뉴 `aria-haspopup="menu"`, `role="menu"`, 자식 9개 버튼 `role="menuitem"` 전수 부여 및 방향키(↑↓ Home/End) 순환 탐색 완비.
+     - 알림 센터 `aria-haspopup="dialog"`, `aria-controls`, `role="dialog"`, `aria-modal="true"`, `aria-expanded` 완비.
+  5. 앱 실행(`openApp`) 포커스 이동 및 트리거 복원 한정 (D2):
+     - 시작 메뉴에서 앱 실행 시 포커스가 시작 메뉴 트리거로 되돌아가지 않고 새로 열린/활성화된 창(또는 그 제목)으로 정확히 이동하도록 `dismissReasonRef` 분기 및 `useEffect` 포커스 이양 구현. 트리거 복원은 Escape 및 명시적 닫기/토글에만 한정.
+  6. S11-FE 정본 ACC-01 ~ ACC-09 전수 정합: ACC-01(:focus-visible), ACC-02(WorkspaceList role="button", tabIndex=0), ACC-03(포커스 트랩), ACC-04(트리거 포커스 복원), ACC-05(Escape 격리), ACC-06(WAI-ARIA Tablist/Dialog), ACC-07(Live Region), ACC-08(Error role="alert"), ACC-09(다크 테마 텍스트 대비 6.70:1 / 4.83:1 및 경계선 6.41:1) 전수 상태 점검 및 보강 완료.
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성 소유). Reviewer: Claude (UI·테스트 축), Codex (계약·측정 축).
+- **관측 근거 (Evidence)**:
+  - 접근성 단위 및 상호작용 시험: `apps/web/tests/desktop-shell-a11y.test.tsx` (11 passed 100%, 465ms)
+    * Start Menu Escape 트리거 포커스 복원
+    * Notification Center Escape 트리거 포커스 복원
+    * Notification Center Close button(×) 트리거 포커스 복원
+    * Start Menu 내부 Tab/Shift+Tab Focus Trap 순환
+    * useModalA11y 명시적 triggerRef 복원
+    * (F3) Notification Center 내부 Tab/Shift+Tab Focus Trap 순환
+    * (F3) useModalA11y 초기 closed(isOpen=false) 포커스 탈취 방지
+    * (F2) Start $\rightarrow$ Notification 전환 상호 배타, 트랩 이양, Escape 알림 트리거 복원
+    * (F2) Notification $\rightarrow$ Start 전환 상호 배타, 트랩 이양, Escape 시작 트리거 복원
+    * (D1) Start Menu role="menu" 자식 9개 role="menuitem" 및 방향키(↑↓ Home/End) 순환 탐색
+    * (D2) Start Menu 앱 실행(openApp) 시 새 창/제목으로 포커스 이동 (트리거 복원 방지)
+  - TypeScript 정적 점검: `npx tsc -b` 타입 에러 0건 (exit 0)
+  - 프로덕션 번들 빌드: `npm run build` 성공 (Vite bundle 정상 생성, exit 0)
+  - 프런트엔드 무결성 점검: `python tools/check_frontend_integrity.py` 92개 파일 스캔, 9대 무결성 규칙 위반 0건 (exit 0)
+  - 계약 바인딩 및 라우트 커버리지 점검: `pytest tests/test_route_coverage.py` 40 passed 100% (exit 0)
+  - 문서 무결성 점검: `python tools/check_docs.py` PASS (exit 0)
+- **전문 문서**: [[2026-10-01_14-46-20_KST_Card174_S11-FE_접근성_트리거_포커스_복원_Gemini]]
 
 ## 2026-09-30 사내망 portal 웹 배포 비root read-only rootfs Nginx 및 동일 origin 리버스 프록시·루트 allowlist·행동 검증 (Card 156, `agent/gemini/c156-intranet-portal-deploy`, PR #252)
 - **개요**: 사내망 포털 웹 애플리케이션(`apps/web`)을 노드2(object store 노드)에 안전하게 배포하기 위한 자산(`deploy/intranet/portal/`)에 대해 독립 검토 r2 및 코디네이터 지침을 전수 반영했다:
