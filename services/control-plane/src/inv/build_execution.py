@@ -151,7 +151,7 @@ class BuildExecutionService:
 
     @staticmethod
     def _daemon_identity(document: Mapping[str, Any], label: str) -> dict:
-        daemon = document.get("daemon")
+        daemon = document.get("daemonIdentity")
         if not isinstance(daemon, dict):
             raise _refuse_product_dispatch(f"{label} records no daemon identity")
         identity = {}
@@ -376,7 +376,7 @@ class BuildExecutionService:
             raise DomainError("VERIFY-0002", "Build receipt names no session", 422)
 
         daemon_after = self._daemon_identity(
-            {"daemon": self._transport.daemon_identity()}, "post-dispatch observation"
+            {"daemonIdentity": self._transport.daemon_identity()}, "post-dispatch observation"
         )
         if any(daemon_after[field] != daemon_before[field] for field in DAEMON_IDENTITY_FIELDS):
             # A different daemon answered after the dispatch, so any side effect this

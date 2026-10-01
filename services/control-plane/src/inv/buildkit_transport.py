@@ -806,7 +806,11 @@ class NodeAgentReceipts:
         self._directory = Path(directory)
 
     def collect_product_health(self) -> dict:
-        return _protected_json(self._directory / PRODUCT_HEALTH_RECEIPT)
+        receipt = _protected_json(self._directory / PRODUCT_HEALTH_RECEIPT)
+        # Low-level validation is this seam's job, and the contract is what "low-level"
+        # means now that card 214's contract PR fixed the strict shape.
+        validate_contract("BuildProviderHealthReceipt", receipt)
+        return receipt
 
     def collect_cleanup_receipt(self, build_session_id: str) -> dict:
         if not isinstance(build_session_id, str) or not _SESSION_ID.fullmatch(build_session_id):
@@ -814,13 +818,15 @@ class NodeAgentReceipts:
                 "VERIFY-0022", "Build cleanup receipt was asked for under an invalid session", 409
             )
         name = f"{PRODUCT_CLEANUP_RECEIPT_PREFIX}{build_session_id}.json"
-        return _protected_json(self._directory / name)
+        receipt = _protected_json(self._directory / name)
+        validate_contract("BuildPhysicalCleanupReceipt", receipt)
+        return receipt
 
     def daemon_identity(self) -> dict:
         """The daemon identity as the node agent currently reports it."""
 
-        receipt = _protected_json(self._directory / PRODUCT_HEALTH_RECEIPT)
-        daemon = receipt.get("daemon")
+        receipt = self.collect_product_health()
+        daemon = receipt.get("daemonIdentity")
         if not isinstance(daemon, dict):
             raise DomainError(
                 "RES-0006", "Node agent health receipt records no daemon", 503, retryable=True

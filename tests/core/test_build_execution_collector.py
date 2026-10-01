@@ -1,0 +1,135 @@
+"""The node-agent receipt collector against the card 214 contract (consumer side).
+
+These tests are about the seam, not the orchestration: the collector reads a file the
+node agent wrote and holds it to the strict contract.  They also record one conflict the
+contract and the implementation do not yet agree on -- see the last test.
+"""
+
+import json
+
+import pytest
+
+from inv.build_execution import BuildExecutionService, PRODUCT_ENABLE_SETTING
+from inv.buildkit_transport import NodeAgentReceipts, PRODUCT_HEALTH_RECEIPT
+from inv.errors import DomainError
+
+NODE = "nod_01M3PTP800EEMWMDYKEZZ3CWNP"
+RESOURCE = "res_01M3PTP800EEMWMDYKEZZ3CWNQ"
+LEASE = "lse_01M3PTP800EEMWMDYKEZZ3CWNR"
+DAEMON = {"pid": 42, "processUid": 1000, "processStartTicks": 28815, "comm": "buildkitd"}
+FIELD_SOURCES = {
+    "daemonIdentity": "node-proc-buildkitd",
+    "runtimeIdentity": "node-buildkitd-binary-sha256",
+    "rootless": "node-proc-user-namespace",
+    "privileged": "node-runtime-security-readback",
+    "hostAccess": "node-runtime-security-readback",
+    "entitlements": "node-runtime-security-readback",
+    "devices": "node-runtime-security-readback",
+    "binds": "node-runtime-security-readback",
+    "userNamespace": "node-proc-user-namespace",
+    "seccompMode": "node-host-security-readback",
+    "lsm": "node-host-security-readback",
+    "noNewPrivileges": "node-host-security-readback",
+    "cgroupMode": "node-host-security-readback",
+}
+
+
+def conforming_health(**overrides):
+    document = {
+        "schemaVersion": "build-provider-health-receipt:1",
+        "writerKind": "node-agent",
+        "nodeId": NODE,
+        "builderInstanceId": "builder-c214",
+        "builderProfileId": "rootless-product-v1",
+        "recoveryEpoch": 7,
+        "observedAt": "2026-10-02T08:00:00Z",
+        "runtimeIdentity": "sha256:" + "a" * 64,
+        "daemonIdentity": dict(DAEMON),
+        "rootless": True,
+        "privileged": False,
+        "hostAccess": False,
+        "entitlements": [],
+        "devices": [],
+        "binds": [],
+        "buildkitVersion": "v0.20.2",
+        "rootlesskitVersion": "v2.3.4",
+        "isolation": {
+            "userNamespace": True,
+            "seccompMode": "filter",
+            "lsm": "apparmor",
+            "noNewPrivileges": True,
+            "cgroupMode": "v2",
+        },
+        "fieldSources": dict(FIELD_SOURCES),
+    }
+    document.update(overrides)
+    return document
+
+
+def write_health(directory, document):
+    path = directory / PRODUCT_HEALTH_RECEIPT
+    path.write_text(json.dumps(document) + "\n", encoding="utf-8")
+    return path
+
+
+def test_the_collector_accepts_a_conforming_node_agent_receipt(tmp_path):
+    write_health(tmp_path, conforming_health())
+    receipt = NodeAgentReceipts(tmp_path).collect_product_health()
+    assert receipt["writerKind"] == "node-agent"
+    assert receipt["daemonIdentity"]["comm"] == "buildkitd"
+
+
+@pytest.mark.parametrize(
+    "override",
+    [
+        {"writerKind": "control-plane"},
+        {"rootless": False},
+        {"privileged": True},
+        {"hostAccess": True},
+        {"schemaVersion": "build-provider-health-receipt:0"},
+        {"daemonIdentity": {**DAEMON, "comm": "rootlesskit"}},
+        {"isolation": {"userNamespace": True, "seccompMode": "unconfined-ci-reference",
+                       "lsm": "apparmor", "noNewPrivileges": True, "cgroupMode": "v2"}},
+        {"extra": 1},
+    ],
+    ids=["writer", "rootless", "privileged", "host-access", "schema", "comm",
+         "ci-reference-seccomp", "extra-key"],
+)
+def test_the_collector_refuses_a_receipt_the_contract_does_not_allow(tmp_path, override):
+    write_health(tmp_path, conforming_health(**override))
+    with pytest.raises(DomainError) as refused:
+        NodeAgentReceipts(tmp_path).collect_product_health()
+    assert refused.value.code in {"VAL-0002", "RES-0006"}
+
+
+def test_a_missing_receipt_is_a_refusal_not_an_empty_reading(tmp_path):
+    with pytest.raises(DomainError) as refused:
+        NodeAgentReceipts(tmp_path).collect_product_health()
+    assert refused.value.code == "RES-0006"
+
+
+def test_the_contract_epoch_type_does_not_yet_satisfy_the_three_way_agreement(tmp_path):
+    """Recorded conflict, not a desired behaviour (reported on PR #311).
+
+    The decision requires ``recoveryEpoch == <system epoch> == lease.recovery_epoch``.
+    The contract types ``recoveryEpoch`` as ``integer >= 1``, while this tree's recovery
+    epoch is a UUID string on the database handle and on both ``inv.nodes`` and
+    ``inv.resource_leases``.  So a schema-conforming receipt can never agree with the
+    system epoch, and this test fails the moment either side is changed -- which is the
+    point: whoever resolves #311 must come back here.
+    """
+
+    class _Database:
+        recovery_epoch = "223e4567-e89b-12d3-a456-426614174000"
+
+        def transaction(self, tenant_id):  # pragma: no cover - never reached
+            raise AssertionError("the epoch comparison refuses before any statement")
+
+    service = BuildExecutionService(
+        _Database(), object(), object(), environment={PRODUCT_ENABLE_SETTING: "1"}
+    )
+    with pytest.raises(DomainError) as refused:
+        service._health_authority(
+            conforming_health(), leased_node_id=NODE, lease_epoch=_Database.recovery_epoch
+        )
+    assert "recovery epoch" in str(refused.value)

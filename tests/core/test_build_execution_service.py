@@ -46,7 +46,7 @@ def health(**overrides):
         "recoveryEpoch": EPOCH,
         "observedAt": "2026-10-02T08:00:00Z",
         "runtimeIdentity": "sha256:" + "a" * 64,
-        "daemon": dict(DAEMON),
+        "daemonIdentity": dict(DAEMON),
         "isolation": {
             "userNamespace": True,
             "seccompMode": "filter",
@@ -68,7 +68,7 @@ def cleanup(**overrides):
         "resourceId": RESOURCE,
         "leaseId": LEASE,
         "recoveryEpoch": EPOCH,
-        "daemon": dict(DAEMON),
+        "daemonIdentity": dict(DAEMON),
         "stopResult": "stopped",
         "partialExportDisposition": "purged",
         "cacheDisposition": "retained",
@@ -354,7 +354,7 @@ def test_a_daemon_that_changed_across_the_dispatch_goes_to_cleanup(after, code):
         ({"builderClaimReleased": False}, "builder claim"),
         ({"cgroupRemoved": False}, "cgroup"),
         ({"verifiedAt": ""}, "no verification time"),
-        ({"daemon": {**DAEMON, "pid": 77}}, "different daemon"),
+        ({"daemonIdentity": {**DAEMON, "pid": 77}}, "different daemon"),
     ],
 )
 def test_every_required_cleanup_observation_must_agree_or_nothing_is_released(override, fragment):
