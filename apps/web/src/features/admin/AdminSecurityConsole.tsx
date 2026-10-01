@@ -9,13 +9,13 @@ export const RFC4122_UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export function isValidUuid(id: unknown): id is string {
-  return typeof id === 'string' && RFC4122_UUID_REGEX.test(id.trim());
+  return typeof id === 'string' && RFC4122_UUID_REGEX.test(id);
 }
 
 export const NODE_ID_REGEX = /^nod_[0-9A-HJKMNP-TV-Z]{26}$/;
 
 export function isValidNodeId(id: unknown): id is string {
-  return typeof id === 'string' && NODE_ID_REGEX.test(id.trim());
+  return typeof id === 'string' && NODE_ID_REGEX.test(id);
 }
 
 export const MAX_SAFE_CONTRACT_INTEGER = 9007199254740991; // 2^53 - 1 (core.schema.json maximum)
@@ -98,7 +98,7 @@ export function isValidContainmentResult(
   if (!isValidUuid(res.requestId)) return false;
   if (res.operation !== expectedOperation) return false;
   if (!isValidUuid(res.approvalId)) return false;
-  if (res.approvalId.trim().toLowerCase() !== expectedApprovalId.trim().toLowerCase()) return false;
+  if (res.approvalId.toLowerCase() !== expectedApprovalId.toLowerCase()) return false;
 
   if (!isValidContainmentView(res.control)) return false;
 
@@ -228,7 +228,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       : (nodeControlStatuses[nodeId]?.nodeStatus === 'draining' || nodeControlStatuses[nodeId]?.nodeStatus === 'quarantined' || secManager.isNodeDrained(nodeId));
     const targetAction: 'drain' | 'resume' = isNodeCurrentlyDrained ? 'resume' : 'drain';
 
-    const opKey = `${nodeId}:${targetAction}:${drainReasonCode}:${drainApprovalId.trim()}`;
+    const opKey = `${nodeId}:${targetAction}:${drainReasonCode}:${drainApprovalId}`;
     let idempotencyKey: string;
     let payload: ContainmentInput;
 
@@ -245,11 +245,11 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
         const ctrl = await apiClient<ContainmentView>(`/v1/nodes/${encodeURIComponent(nodeId)}/control`, {
           expectedStatus: 200,
         });
-        if (isValidContainmentView(ctrl)) {
+        if (isValidContainmentView(ctrl) && ctrl.nodeId === nodeId) {
           expectedVersion = ctrl.version;
           serverNodeStatus = ctrl.nodeStatus;
         } else {
-          setDrainError('노드 제어 버전(expectedVersion) 응답 형식 불일치로 작업을 중단했습니다 (fail-closed).');
+          setDrainError('노드 제어 버전(expectedVersion) 응답 형식 또는 nodeId 불일치로 작업을 중단했습니다 (fail-closed).');
           return;
         }
 
@@ -279,7 +279,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       payload = {
         expectedVersion,
         reasonCode: drainReasonCode,
-        approvalId: drainApprovalId.trim(),
+        approvalId: drainApprovalId,
       };
 
       // Cache for retry idempotency
@@ -297,11 +297,12 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
         method: 'POST',
         idempotencyKey,
         body: JSON.stringify(payload),
+        expectedStatus: 200,
       });
 
-      // Invariant: Successful response MUST contain canonical control field. Do NOT synthesize!
-      if (!result?.control || typeof result.control.nodeStatus !== 'string' || typeof result.control.version !== 'number') {
-        setDrainError('응답 오류: 서버 응답에 canonical control 필드가 누락되었거나 형식이 올바르지 않습니다.');
+      // Invariant: Successful response MUST be validated by strict isValidContainmentResult. Do NOT trust blindly or synthesize!
+      if (!isValidContainmentResult(result, targetAction, drainApprovalId, nodeId)) {
+        setDrainError('응답 오류: 서버 응답에 canonical control 필드가 누락되었거나 ContainmentResult 규격 불일치(requestId/approvalId/operation/nodeId/control 불일치 또는 위장)로 작업을 중단했습니다 (fail-closed).');
         return;
       }
 
@@ -317,7 +318,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       }));
 
       if (canonicalStatus === 'draining' || canonicalStatus === 'quarantined') {
-        secManager.drainNode(nodeId, actor, `[${drainReasonCode}] approval: ${drainApprovalId.trim()}`);
+        secManager.drainNode(nodeId, actor, `[${drainReasonCode}] approval: ${drainApprovalId}`);
       } else {
         secManager.undrainNode(nodeId, actor);
       }
@@ -524,7 +525,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
     actor &&
     !killSwitchLoading &&
     isKillSwitchReady &&
-    isValidUuid(killSwitchApprovalId.trim())
+    isValidUuid(killSwitchApprovalId)
   );
 
   // 5. Toggle Emergency Kill Switch via Real Backend API
@@ -541,9 +542,8 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       setKillSwitchError('백엔드 제어 평면 버전 정보가 유효하지 않아 비상 정지 변경을 수행할 수 없습니다.');
       return;
     }
-    const trimmedApprovalId = killSwitchApprovalId.trim();
-    if (!isValidUuid(trimmedApprovalId)) {
-      setKillSwitchError('유효한 Containment 승인 UUID(approvalId)가 필요합니다. 표준 UUIDv4 형식을 입력하십시오.');
+    if (!isValidUuid(killSwitchApprovalId)) {
+      setKillSwitchError('유효한 Containment 승인 UUID(approvalId)가 필요합니다. 표준 UUIDv4 형식을 입력하십시오 (공백 불가).');
       return;
     }
 
@@ -556,7 +556,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
     const payload: ContainmentInput = {
       expectedVersion: currentVersion,
       reasonCode: killSwitchReasonCode,
-      approvalId: trimmedApprovalId,
+      approvalId: killSwitchApprovalId,
     };
 
     setKillSwitchLoading(true);
@@ -572,7 +572,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
         expectedStatus,
       });
 
-      if (!isValidContainmentResult(result, targetAction, trimmedApprovalId)) {
+      if (!isValidContainmentResult(result, targetAction, killSwitchApprovalId)) {
         setKillSwitchError('백엔드 제어 평면 응답 형식 또는 제어 상태 불일치 [CONTRACT-MISMATCH]');
         await fetchBackendKillSwitch();
         return;
@@ -589,7 +589,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       if (nextActive !== status.emergencyKillSwitchActive) {
         secManager.toggleEmergencyKillSwitch(
           actor,
-          `Backend ${result.operation} via ${trimmedApprovalId}`
+          `Backend ${result.operation} via ${killSwitchApprovalId}`
         );
       }
 

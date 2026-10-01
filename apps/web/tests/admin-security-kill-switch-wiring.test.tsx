@@ -8,12 +8,14 @@ import {
   AdminSecurityConsole,
   isValidContainmentView,
   isValidContainmentResult,
+  isValidUuid,
+  isValidNodeId,
 } from '../src/features/admin/AdminSecurityConsole';
 import type { NodeItem, ContainmentView, ContainmentResult } from '../src/contracts/types';
 
 const MOCK_NODES: NodeItem[] = [
   {
-    id: 'nod_sec_01',
+    id: 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAV',
     hostname: 'node-gpu-01',
     os: 'linux',
     cpuCores: 32,
@@ -213,8 +215,48 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
       expect(isValidContainmentResult(validDrainResult, 'drain', '550e8400-e29b-41d4-a716-446655440000', 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAV')).toBe(true);
       expect(isValidContainmentResult(validDrainResult, 'drain', '550e8400-e29b-41d4-a716-446655440000', 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAW')).toBe(false);
 
+      // (d) 공백 포함 approvalId 거부 (whitespace rejection)
+      expect(
+        isValidContainmentResult(
+          { ...validResult, approvalId: ' 550e8400-e29b-41d4-a716-446655440000 ' },
+          'kill',
+          '550e8400-e29b-41d4-a716-446655440000'
+        )
+      ).toBe(false);
+
+      // (d) 공백 포함 requestId 거부
+      expect(
+        isValidContainmentResult(
+          { ...validResult, requestId: ' c0000000-0000-4000-8000-000000000001 ' },
+          'kill',
+          '550e8400-e29b-41d4-a716-446655440000'
+        )
+      ).toBe(false);
+
       // (a) additionalProperties: false 위반
       expect(isValidContainmentResult({ ...validResult, extraField: 'bad' }, 'kill', '550e8400-e29b-41d4-a716-446655440000')).toBe(false);
+    });
+  });
+
+  describe('isValidUuid & isValidNodeId pure strict format tests', () => {
+    it('공백이 포함된 UUID는 원천 거부한다 (leading/trailing whitespace rejection)', () => {
+      expect(isValidUuid('550e8400-e29b-41d4-a716-446655440000')).toBe(true);
+      expect(isValidUuid(' 550e8400-e29b-41d4-a716-446655440000')).toBe(false);
+      expect(isValidUuid('550e8400-e29b-41d4-a716-446655440000 ')).toBe(false);
+      expect(isValidUuid('550e8400-e29b-41d4-a716-446655440000\n')).toBe(false);
+      expect(isValidUuid('\t550e8400-e29b-41d4-a716-446655440000')).toBe(false);
+      expect(isValidUuid('')).toBe(false);
+      expect(isValidUuid(null)).toBe(false);
+    });
+
+    it('공백이 포함된 NodeId는 원천 거부한다 (leading/trailing whitespace rejection)', () => {
+      expect(isValidNodeId('nod_01ARZ3NDEKTSV4RRFFQ69G5FAV')).toBe(true);
+      expect(isValidNodeId(' nod_01ARZ3NDEKTSV4RRFFQ69G5FAV')).toBe(false);
+      expect(isValidNodeId('nod_01ARZ3NDEKTSV4RRFFQ69G5FAV ')).toBe(false);
+      expect(isValidNodeId('nod_01ARZ3NDEKTSV4RRFFQ69G5FAV\n')).toBe(false);
+      expect(isValidNodeId('\tnod_01ARZ3NDEKTSV4RRFFQ69G5FAV')).toBe(false);
+      expect(isValidNodeId('')).toBe(false);
+      expect(isValidNodeId(null)).toBe(false);
     });
   });
 
@@ -946,7 +988,200 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
     // V1 fail-closed 단언: 에러 배너 표출 및 drain POST 0회 호출
     const banner = container.querySelector('[data-testid="admin-drain-error-banner"]');
     expect(banner).not.toBeNull();
-    expect(banner?.textContent).toContain('응답 형식 불일치로 작업을 중단했습니다 (fail-closed)');
+    expect(banner?.textContent).toContain('응답 형식 또는 nodeId 불일치로 작업을 중단했습니다 (fail-closed)');
     expect(drainPostCallCount).toBe(0);
+  });
+
+  // =========================================================================
+  // Codex r3 Negative Tests (Mismatched Node, Whitespace UUID, Strict ContainmentResult)
+  // =========================================================================
+  it('Codex r3: /control 사전 조회 시 ctrl.nodeId가 대상 노드와 불일치하면 fail-closed 중단하고 POST를 0회로 차단한다', async () => {
+    let drainPostCallCount = 0;
+    mockFetch((url) => {
+      if (url === '/v1/operations/kill-switch') {
+        return { status: 200, body: VALID_INACTIVE_VIEW };
+      }
+      if (url.includes('/control')) {
+        return {
+          status: 200,
+          body: {
+            ...VALID_INACTIVE_VIEW,
+            nodeId: 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAW', // 다른 노드 ID 반환 (위장/오류)!
+            nodeStatus: 'online',
+          },
+        };
+      }
+      if (url.includes('/drain')) {
+        drainPostCallCount++;
+        return { status: 200, body: {} };
+      }
+      return { status: 404, body: {} };
+    });
+
+    await act(async () => {
+      root.render(
+        <AdminSecurityConsole
+          nodes={MOCK_NODES}
+          currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+        />
+      );
+    });
+
+    const drainTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('노드 Drain 통제')
+    );
+    await act(async () => {
+      drainTabBtn?.click();
+    });
+
+    const drainApprovalInput = container.querySelector('[data-testid="drain-approval-id-input"]') as HTMLInputElement;
+    await act(async () => {
+      const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+      nativeSetter?.call(drainApprovalInput, '550e8400-e29b-41d4-a716-446655440000');
+      drainApprovalInput.dispatchEvent(new Event('input', { bubbles: true }));
+      drainApprovalInput.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    const drainBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('Node Drain')
+    ) as HTMLButtonElement;
+
+    await act(async () => {
+      drainBtn.click();
+    });
+
+    const banner = container.querySelector('[data-testid="admin-drain-error-banner"]');
+    expect(banner).not.toBeNull();
+    expect(banner?.textContent).toContain('nodeId 불일치로 작업을 중단했습니다 (fail-closed)');
+    expect(drainPostCallCount).toBe(0);
+  });
+
+  it('Codex r3: drain POST 응답이 다른 노드(mismatched nodeId)의 control을 포함하거나 규격 불일치 시 fail-closed 중단하고 로컬 상태를 변경하지 않는다', async () => {
+    mockFetch((url) => {
+      if (url === '/v1/operations/kill-switch') {
+        return { status: 200, body: VALID_INACTIVE_VIEW };
+      }
+      if (url.includes('/control')) {
+        return {
+          status: 200,
+          body: {
+            ...VALID_INACTIVE_VIEW,
+            nodeId: 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAV', // 정상 대상 노드
+            nodeStatus: 'online',
+          },
+        };
+      }
+      if (url.includes('/drain')) {
+        // 위장 응답: 다른 노드의 control 객체 포함
+        return {
+          status: 200,
+          body: {
+            requestId: 'c0000000-0000-4000-8000-000000000001',
+            operation: 'drain',
+            approvalId: '550e8400-e29b-41d4-a716-446655440000',
+            control: {
+              ...VALID_INACTIVE_VIEW,
+              nodeId: 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAW', // 다른 노드!
+              nodeStatus: 'draining',
+            },
+          },
+        };
+      }
+      return { status: 404, body: {} };
+    });
+
+    await act(async () => {
+      root.render(
+        <AdminSecurityConsole
+          nodes={MOCK_NODES}
+          currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+        />
+      );
+    });
+
+    const drainTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('노드 Drain 통제')
+    );
+    await act(async () => {
+      drainTabBtn?.click();
+    });
+
+    const drainApprovalInput = container.querySelector('[data-testid="drain-approval-id-input"]') as HTMLInputElement;
+    await act(async () => {
+      const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+      nativeSetter?.call(drainApprovalInput, '550e8400-e29b-41d4-a716-446655440000');
+      drainApprovalInput.dispatchEvent(new Event('input', { bubbles: true }));
+      drainApprovalInput.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    const drainBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('Node Drain')
+    ) as HTMLButtonElement;
+
+    await act(async () => {
+      drainBtn.click();
+    });
+
+    const banner = container.querySelector('[data-testid="admin-drain-error-banner"]');
+    expect(banner).not.toBeNull();
+    expect(banner?.textContent).toContain('ContainmentResult 규격 불일치');
+
+    // 로컬 상태가 변경되지 않았음을 단언 (버튼 텍스트가 Resume으로 바뀌지 않고 여전히 Drain이어야 함)
+    const drainBtnAfter = Array.from(container.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('Node Drain')
+    );
+    expect(drainBtnAfter).not.toBeNull();
+  });
+
+  it('Codex r3: 공백이 포함된 drain approvalId 입력 시 유효성 검증 실패로 사전 조회 및 POST를 0회로 차단한다', async () => {
+    let fetchCallCount = 0;
+    mockFetch((url) => {
+      if (url === '/v1/operations/kill-switch') {
+        return { status: 200, body: VALID_INACTIVE_VIEW };
+      }
+      fetchCallCount++;
+      return { status: 200, body: {} };
+    });
+
+    await act(async () => {
+      root.render(
+        <AdminSecurityConsole
+          nodes={MOCK_NODES}
+          currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+        />
+      );
+    });
+
+    const drainTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('노드 Drain 통제')
+    );
+    await act(async () => {
+      drainTabBtn?.click();
+    });
+
+    // 공백 포함 approvalId 주입
+    const drainApprovalInput = container.querySelector('[data-testid="drain-approval-id-input"]') as HTMLInputElement;
+    await act(async () => {
+      const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+      nativeSetter?.call(drainApprovalInput, ' 550e8400-e29b-41d4-a716-446655440000 ');
+      drainApprovalInput.dispatchEvent(new Event('input', { bubbles: true }));
+      drainApprovalInput.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    const drainNotice = container.querySelector('[data-testid="drain-approval-required-notice"]');
+    expect(drainNotice).not.toBeNull();
+    expect(drainNotice?.textContent).toContain('유효한 Containment 승인 UUID(UUIDv4) 입력이 필수입니다');
+
+    const drainBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('Node Drain')
+    ) as HTMLButtonElement;
+    expect(drainBtn).not.toBeNull();
+    expect(drainBtn.disabled).toBe(true);
+
+    await act(async () => {
+      drainBtn.click();
+    });
+
+    expect(fetchCallCount).toBe(0);
   });
 });

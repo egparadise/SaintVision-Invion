@@ -26,6 +26,13 @@ const MOCK_NODES: NodeItem[] = [
   },
 ];
 
+const MOCK_ADMIN_NODES: NodeItem[] = [
+  {
+    ...MOCK_NODES[0],
+    id: 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAV',
+  },
+];
+
 describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 콘솔 행위자 실배선, Priority 5: 분산 복구 모의 고지, Priority 6: 에디터 저장 샌드박스 고지)', () => {
   let container: HTMLDivElement;
   let root: Root;
@@ -46,7 +53,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
   });
 
   const CANONICAL_CONTROL_BASE = {
-    nodeId: null,
+    nodeId: 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAV',
     activeLeases: 0,
     pendingDeliveries: 0,
     unsettledRuns: 0,
@@ -68,7 +75,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       await act(async () => {
         root.render(
           <AdminSecurityConsole
-            nodes={MOCK_NODES}
+            nodes={MOCK_ADMIN_NODES}
             currentUser={{ id: 'usr_actual_admin_77', name: 'Actual Admin', role: 'admin' }}
           />
         );
@@ -142,7 +149,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       await act(async () => {
         root.render(
           <AdminSecurityConsole
-            nodes={MOCK_NODES}
+            nodes={MOCK_ADMIN_NODES}
             currentUser={null}
           />
         );
@@ -205,7 +212,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       await act(async () => {
         root.render(
           <AdminSecurityConsole
-            nodes={MOCK_NODES}
+            nodes={MOCK_ADMIN_NODES}
             currentUser={{ id: 'usr_admin', name: 'Admin', role: 'admin' }}
           />
         );
@@ -265,7 +272,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       await act(async () => {
         root.render(
           <AdminSecurityConsole
-            nodes={MOCK_NODES}
+            nodes={MOCK_ADMIN_NODES}
             currentUser={{ id: 'usr_actual_admin_77', name: 'Actual Admin', role: 'admin' }}
           />
         );
@@ -316,8 +323,13 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
         }
         if (endpoint.includes('/drain')) {
           return {
+            requestId: 'c0000000-0000-4000-8000-000000000001',
+            operation: 'drain',
+            approvalId: '11111111-2222-4333-8444-555555555555',
             control: {
+              ...CANONICAL_CONTROL_BASE,
               nodeStatus: 'draining',
+              killSwitchActive: false,
               version: 6,
             },
           } as any;
@@ -359,7 +371,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       await act(async () => {
         root.render(
           <AdminSecurityConsole
-            nodes={MOCK_NODES}
+            nodes={MOCK_ADMIN_NODES}
             currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
           />
         );
@@ -455,9 +467,14 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
             throw new client.ApiError(problem as any);
           }
           return {
-            requestId: 'req_drain_retry_success',
+            requestId: 'c0000000-0000-4000-8000-000000000001',
             operation: 'drain',
-            control: { nodeStatus: 'draining', version: 8 },
+            control: {
+              ...CANONICAL_CONTROL_BASE,
+              nodeStatus: 'draining',
+              killSwitchActive: false,
+              version: 8,
+            },
             approvalId: '550e8400-e29b-41d4-a716-446655440000',
           } as any;
         }
@@ -467,7 +484,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       await act(async () => {
         root.render(
           <AdminSecurityConsole
-            nodes={MOCK_NODES}
+            nodes={MOCK_ADMIN_NODES}
             currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
           />
         );
@@ -559,9 +576,14 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
           }
           // Second call succeeds with updated version 8
           return {
-            requestId: 'req_drain_recovered_after_409',
+            requestId: 'c0000000-0000-4000-8000-000000000001',
             operation: 'drain',
-            control: { nodeStatus: 'draining', version: 9 },
+            control: {
+              ...CANONICAL_CONTROL_BASE,
+              nodeStatus: 'draining',
+              killSwitchActive: false,
+              version: 9,
+            },
             approvalId: '550e8400-e29b-41d4-a716-446655440000',
           } as any;
         }
@@ -571,7 +593,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       await act(async () => {
         root.render(
           <AdminSecurityConsole
-            nodes={MOCK_NODES}
+            nodes={MOCK_ADMIN_NODES}
             currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
           />
         );
@@ -654,7 +676,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       await act(async () => {
         root.render(
           <AdminSecurityConsole
-            nodes={MOCK_NODES}
+            nodes={MOCK_ADMIN_NODES}
             currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
           />
         );
@@ -705,8 +727,9 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
         if (endpoint.includes('/drain')) {
           // Success status 200 but control field is missing!
           return {
-            requestId: 'req_missing_control',
+            requestId: 'c0000000-0000-4000-8000-000000000001',
             operation: 'drain',
+            approvalId: '550e8400-e29b-41d4-a716-446655440000',
             // No control field!
           } as any;
         }
@@ -716,7 +739,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       await act(async () => {
         root.render(
           <AdminSecurityConsole
-            nodes={MOCK_NODES}
+            nodes={MOCK_ADMIN_NODES}
             currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
           />
         );
@@ -771,7 +794,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       await act(async () => {
         root.render(
           <AdminSecurityConsole
-            nodes={MOCK_NODES}
+            nodes={MOCK_ADMIN_NODES}
             currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
           />
         );
@@ -841,7 +864,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       await act(async () => {
         root.render(
           <AdminSecurityConsole
-            nodes={MOCK_NODES}
+            nodes={MOCK_ADMIN_NODES}
             currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
           />
         );
@@ -890,7 +913,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       await act(async () => {
         root.render(
           <AdminSecurityConsole
-            nodes={MOCK_NODES}
+            nodes={MOCK_ADMIN_NODES}
             currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
           />
         );
@@ -912,7 +935,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       await act(async () => {
         root.render(
           <AdminSecurityConsole
-            nodes={MOCK_NODES}
+            nodes={MOCK_ADMIN_NODES}
             currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
           />
         );
@@ -935,7 +958,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       await act(async () => {
         root.render(
           <AdminSecurityConsole
-            nodes={MOCK_NODES}
+            nodes={MOCK_ADMIN_NODES}
             currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
           />
         );
@@ -960,7 +983,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       await act(async () => {
         root.render(
           <AdminSecurityConsole
-            nodes={MOCK_NODES}
+            nodes={MOCK_ADMIN_NODES}
             currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
           />
         );
@@ -976,7 +999,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       await act(async () => {
         root.render(
           <AdminSecurityConsole
-            nodes={MOCK_NODES}
+            nodes={MOCK_ADMIN_NODES}
             currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
           />
         );
@@ -1011,7 +1034,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       await act(async () => {
         root.render(
           <AdminSecurityConsole
-            nodes={MOCK_NODES}
+            nodes={MOCK_ADMIN_NODES}
             currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
           />
         );
