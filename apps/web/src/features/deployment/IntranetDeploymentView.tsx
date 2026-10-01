@@ -953,7 +953,7 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
                     data-testid="server-operator-signoff-blocked-by"
                     style={{ fontSize: '11px', color: '#8b949e', marginTop: '2px' }}
                   >
-                    미서명 — 사람 확인 계약 미구현 (<code>{serverManifestDetail.release.operatorSignOffBlockedBy}</code>)
+                    미서명 — 릴리스 수락 전제 조건 미충족 (<code>{serverManifestDetail.release.operatorSignOffBlockedBy}</code>)
                   </div>
                 </div>
               </div>

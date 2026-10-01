@@ -110,7 +110,7 @@ export function isValidReleaseManifest(val: unknown): val is ReleaseManifestResp
     !Number.isInteger(m.componentCount) ||
     m.componentCount < 1 ||
     m.operatorSignOff !== false ||
-    m.operatorSignOffBlockedBy !== 'human-attestation-implementation-unavailable' ||
+    m.operatorSignOffBlockedBy !== 'release-acceptance-prerequisites-unavailable' ||
     m.requiredDistinctOperatorCount !== 2 ||
     m.confirmedOperatorCount !== 0 ||
     typeof m.matchingAcceptedUserCount !== 'number' ||

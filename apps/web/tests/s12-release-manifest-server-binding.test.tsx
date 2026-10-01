@@ -55,7 +55,7 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
     manifestSha256: sampleManifestSha,
     createdAt: '2026-10-01T10:00:00Z',
     operatorSignOff: false,
-    operatorSignOffBlockedBy: 'human-attestation-implementation-unavailable',
+    operatorSignOffBlockedBy: 'release-acceptance-prerequisites-unavailable',
     requiredDistinctOperatorCount: 2,
     confirmedOperatorCount: 0,
     matchingAcceptedUserCount: 1,
@@ -73,7 +73,7 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
     manifestSha256: sampleManifestSha,
     createdAt: '2026-10-01T11:00:00Z',
     operatorSignOff: false,
-    operatorSignOffBlockedBy: 'human-attestation-implementation-unavailable',
+    operatorSignOffBlockedBy: 'release-acceptance-prerequisites-unavailable',
     requiredDistinctOperatorCount: 2,
     confirmedOperatorCount: 0,
     matchingAcceptedUserCount: 0,
@@ -292,8 +292,8 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
       // Verify honest unsigned state with blockedBy reason
       const signoffEl = container.querySelector('[data-testid="server-operator-signoff"]');
       expect(signoffEl?.textContent).toContain('미서명 (operatorSignOff: false)');
-      expect(signoffEl?.textContent).toContain('미서명 — 사람 확인 계약 미구현');
-      expect(signoffEl?.textContent).toContain('human-attestation-implementation-unavailable');
+      expect(signoffEl?.textContent).toContain('미서명 — 릴리스 수락 전제 조건 미충족');
+      expect(signoffEl?.textContent).toContain('release-acceptance-prerequisites-unavailable');
 
       // Verify operator quorum count
       const quorumEl = container.querySelector('[data-testid="server-operator-quorum"]');
@@ -472,6 +472,30 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
       expect(errEl?.textContent).toContain('계약 위반 응답: 잘못된 서버 응답 규격');
       expect(errEl?.textContent).toContain('CONTRACT-VIOLATION');
       expect(errEl?.textContent).not.toContain('네트워크 통신 오류');
+    });
+
+    it('displays dedicated contract violation error when server returns legacy operatorSignOffBlockedBy="human-attestation-implementation-unavailable"', async () => {
+      // Server returns legacy blockedBy value, breaching the updated contract
+      vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: new Headers({ 'Content-Type': 'application/json' }),
+        json: async () => ({
+          items: [{ ...mockReleaseItem, operatorSignOffBlockedBy: 'human-attestation-implementation-unavailable' as any }],
+          nextCursor: null,
+        }),
+      } as Response);
+
+      await act(async () => {
+        root.render(<IntranetDeploymentView currentUser={{ id: 'usr_lead', name: 'Lead', role: 'operator' }} />);
+      });
+
+      // Contract violation must be rendered as a dedicated alert, NOT generic error
+      const errEl = container.querySelector('[data-testid="deployment-manifest-error-contract"]');
+      expect(errEl).not.toBeNull();
+      expect(errEl?.getAttribute('role')).toBe('alert');
+      expect(errEl?.textContent).toContain('계약 위반 응답: 잘못된 서버 응답 규격');
+      expect(errEl?.textContent).toContain('CONTRACT-VIOLATION');
     });
 
     it('displays dedicated contract violation error when detail query returns invalid schema (kills R2-2 detail)', async () => {
