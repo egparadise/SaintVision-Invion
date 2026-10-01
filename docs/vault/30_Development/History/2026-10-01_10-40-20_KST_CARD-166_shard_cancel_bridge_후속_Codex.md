@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-20261001-CARD166-S04-SHARD-CANCEL-BRIDGE-CODEX"
 title: "CARD-166 S04 shard parent/member cancel bridge 후속"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-01T10:40:20+09:00"
+updated: "2026-10-01T11:19:34+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "73fa1274ce23e050bae60e4ee8228484b6316647"
@@ -39,7 +39,10 @@ shard parent/member 경로는 PG-free 호출부 guard만 있고 real-PG fixture�
    audit 0을 요구한다.
 4. 중복 잠금 guard는 `FOR SHARE` 한 문자열 대신 PostgreSQL row-lock 네 형태
    `KEY SHARE|SHARE|NO KEY UPDATE|UPDATE`를 정규식으로 검출한다. 의도된 public run
-   최종 lock은 유지한다.
+   최종 `FOR UPDATE OF r` 한 건만 본문 전체에서 허용한다. shard member bridge도
+   AST로 실제 non-terminal 분기 안 한 건만 허용한다.
+5. 실제 부모/멤버 취소 요청의 동시 경쟁과 bridge 실패 주입 whole-shard rollback은
+   이번 fixture가 측정하지 않는다. 이 둘은 후속 **NOT_RUN**으로 남긴다.
 
 ## 검증 상태
 

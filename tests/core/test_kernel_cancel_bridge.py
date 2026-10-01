@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 import hashlib
 import importlib.util
 import json
@@ -20,7 +21,8 @@ ROOT = Path(__file__).resolve().parents[2]
 MIGRATION = ROOT / "migrations/versions/0056_kernel_cancel_audit_bridge.py"
 REAL_PG = ROOT / "tests/integration/test_kernel_cancel_bridge_real_pg.py"
 ROW_LOCK = re.compile(
-    r"\bFOR\s+(?:KEY\s+SHARE|SHARE|NO\s+KEY\s+UPDATE|UPDATE)\b",
+    r"\bFOR\s+(?:KEY\s+SHARE|SHARE|NO\s+KEY\s+UPDATE|UPDATE)\b"
+    r"(?:\s+OF\s+[A-Za-z_][A-Za-z0-9_]*)?",
     re.IGNORECASE,
 )
 
@@ -149,6 +151,36 @@ def test_route_passes_boundary_trace_and_only_real_transitions_call_bridge():
         "record_user_cancel("
     ) < parent_branch.index("else:")
 
+    tree = ast.parse(shards)
+    cancel = next(
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name == "cancel"
+    )
+    member_loop = next(
+        node
+        for node in ast.walk(cancel)
+        if isinstance(node, ast.For)
+        and isinstance(node.target, ast.Tuple)
+        and [item.id for item in node.target.elts if isinstance(item, ast.Name)]
+        == ["member", "run"]
+    )
+    transition_guard = next(node for node in member_loop.body if isinstance(node, ast.If))
+
+    def bridge_calls(node):
+        return [
+            call
+            for call in ast.walk(node)
+            if isinstance(call, ast.Call)
+            and isinstance(call.func, ast.Name)
+            and call.func.id == "record_user_cancel"
+        ]
+
+    member_calls = bridge_calls(member_loop)
+    guarded_calls = bridge_calls(transition_guard)
+    assert len(member_calls) == len(guarded_calls) == 1
+    assert member_calls[0] is guarded_calls[0]
+
 
 def test_migration_closes_owner_function_policy_and_downgrade_boundaries():
     source = MIGRATION.read_text(encoding="utf-8")
@@ -237,6 +269,7 @@ def test_definer_reuses_control_grant_authority_locks_without_extra_row_locks():
         "IF v_user_id", 1
     )[0]
     assert ROW_LOCK.search(authority_check) is None
+    assert [clause.upper() for clause in ROW_LOCK.findall(body)] == ["FOR UPDATE OF R"]
 
 
 @pytest.mark.parametrize("clause", ["KEY SHARE", "SHARE", "NO KEY UPDATE", "UPDATE"])

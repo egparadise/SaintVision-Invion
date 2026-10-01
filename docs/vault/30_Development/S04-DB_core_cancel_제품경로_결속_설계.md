@@ -1,11 +1,11 @@
 ---
 doc_id: "DESIGN-S04-DB-CORE-CANCEL-PRODUCT-BRIDGE-001"
 title: "S04-DB core cancel 제품 경로 결속 설계"
-version: "1.2.2"
+version: "1.2.3"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-01T10:40:20+09:00"
+updated: "2026-10-01T11:19:34+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "c9c1d836ff8fcd606b5bca3862c6cd764eadf4fd"
@@ -198,7 +198,9 @@ lock은 없다. bridge 실패 뒤 idempotency 응답을 저장하지 않는다.
    kernel-cancelled 된 mapped member는 public draft·audit 0으로 남기고, 실제 전이한
    다른 member와 parent만 `cancelled_by_user`·audit 각 1건으로 결속하는 real-PG
    fixture를 추가했다. 구현은 완료됐지만 hosted Core JUnit 전에는 **NOT_RUN**이며,
-   실행 결과는 PR의 exact-head evidence에서만 판정한다.
+   실행 결과는 PR의 exact-head evidence에서만 판정한다. 실제 부모/멤버 취소 요청의
+   동시 경쟁과 bridge 실패를 주입한 whole-shard rollback은 이 fixture의 측정 범위가
+   아니며 후속 상태를 **NOT_RUN**으로 유지한다.
 8. 다른 transaction이 public run lock을 보유하면 `RES-0007/503/retryable=true`,
    kernel/outbox/resource/ledger/public/audit 모두 미저장이고 같은 key 재시도는 성공해
    audit가 정확히 1이다.
@@ -283,7 +285,12 @@ Claude의 2026-09-30 조건부 승인(M1~M4, L1~L5, R5~R8)을 이 v1.1에 반영
   business authority를 재도출하지 못하므로 `42501`, public draft, audit 0이어야 한다.
 - H1 PG-free guard는 특정 `FOR SHARE` 문자열 하나가 아니라
   `FOR (KEY SHARE|SHARE|NO KEY UPDATE|UPDATE)` 전체를 정규식으로 잡는다. public run의
-  의도된 최종 `FOR UPDATE OF r`은 허용하고, 그 전에 kernel·mapping·authority 행을
-  다시 잠그는 변형만 거부한다.
+  의도된 최종 `FOR UPDATE OF r` 한 건만 함수 본문 전체에 허용하고, 그 전에
+  kernel·mapping·authority 행을 다시 잠그는 변형은 모두 거부한다. shard member의
+  bridge 호출도 AST guard로 실제 `run["state"] not in TERMINAL` 분기 안 한 건만
+  허용해 분기 밖 호출 변이를 거부한다.
+- 실제 부모/멤버 취소의 동시 경쟁과 bridge 실패 주입 whole-shard rollback은 이번
+  fixture가 측정하지 않았다. 이 두 항목은 **NOT_RUN**이며 구현 존재만으로 통과로
+  세지 않는다.
 - 로컬 PG-free 단일 파일은 21 passed다. real-PG 판정은 `run-core` exact-head JUnit
   전까지 `NOT_RUN`이며, 공개 계약·migration·제품 코드는 변경하지 않았다.

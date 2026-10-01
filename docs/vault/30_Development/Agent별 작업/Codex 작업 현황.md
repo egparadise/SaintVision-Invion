@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.235"
+version: "1.0.236"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T10:40:20+09:00"
+updated: "2026-10-01T11:19:34+09:00"
 source_of_truth: "Git"
 active_card: "CARD-166 S04 kernel cancel shard bridge evidence"
 active_card_status: "PG-free 21 passed; shard parent/member real-PG fixture and authority negatives implemented; hosted Core pending"
@@ -21,6 +21,8 @@ active_card_next: "push PR, add run-core, verify exact-head Core JUnit and reque
   clause를 모두 잡는 정규식으로 넓혔다.
 - PG-free 21 passed. 제품·계약·migration 변경은 0이며 real-PG는 exact-head
   `run-core` JUnit 전까지 `NOT_RUN`이다.
+- 부모/멤버 동시 경쟁과 bridge 실패 주입 whole-shard rollback은 이번 범위에서
+  측정하지 않아 후속 `NOT_RUN`으로 유지한다.
 
 ## 2026-09-30 Card151 Claude F1-F12 보안·측정 경계 후속
 - PR #248에서 root·service·PITR 자격을 host argv와 Docker `Config.Env`에서 제거하고 단일 보호 파일 mount로 고정했다. PITR policy의 delete 권한을 제거하고 bucket versioning을 활성화했다.
