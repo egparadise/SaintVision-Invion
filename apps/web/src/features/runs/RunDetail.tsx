@@ -371,10 +371,10 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           style={{
             padding: '12px 16px',
             marginBottom: '16px',
-            backgroundColor: actionNotice.type === 'error' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(59, 130, 246, 0.1)',
-            border: `1px solid ${actionNotice.type === 'error' ? '#ef4444' : '#3b82f6'}`,
+            backgroundColor: 'var(--color-bg-subtle)',
+            border: `1px solid ${actionNotice.type === 'error' ? 'var(--color-status-offline)' : 'var(--color-brand-hover)'}`,
             borderRadius: 'var(--radius-md)',
-            color: actionNotice.type === 'error' ? '#fca5a5' : '#93c5fd',
+            color: actionNotice.type === 'error' ? 'var(--color-status-offline)' : 'var(--color-brand-hover)',
             fontSize: '0.875rem',
             display: 'flex',
             justifyContent: 'space-between',
@@ -401,10 +401,10 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           style={{
             padding: '12px 16px',
             marginBottom: '16px',
-            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-            border: '1px solid #ef4444',
+            backgroundColor: 'var(--color-bg-subtle)',
+            border: '1px solid var(--color-status-offline)',
             borderRadius: 'var(--radius-md)',
-            color: '#fca5a5',
+            color: 'var(--color-status-offline)',
             fontSize: '0.875rem',
             display: 'flex',
             justifyContent: 'space-between',
@@ -431,15 +431,15 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           style={{
             padding: '16px 20px',
             marginBottom: '20px',
-            backgroundColor: 'rgba(34, 197, 94, 0.08)',
-            border: '1px solid #22c55e',
+            backgroundColor: 'var(--color-bg-subtle)',
+            border: '1px solid var(--color-status-online)',
             borderRadius: 'var(--radius-md)',
-            color: '#e2e8f0',
+            color: 'var(--color-text-secondary)',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
-              <h4 style={{ margin: '0 0 8px 0', color: '#4ade80', fontSize: '1rem', fontWeight: 600 }}>
+              <h4 style={{ margin: '0 0 8px 0', color: 'var(--color-status-online)', fontSize: '1rem', fontWeight: 600 }}>
                 ✓ Model Retry 배치 예약 준비 완료 (세대: Generation {retryResult.generation})
               </h4>
               <p style={{ margin: '0 0 8px 0', fontSize: '0.875rem', lineHeight: 1.5 }}>
@@ -448,11 +448,11 @@ export const RunDetail: React.FC<RunDetailProps> = ({
               <div
                 style={{
                   padding: '8px 12px',
-                  backgroundColor: 'rgba(234, 179, 8, 0.12)',
-                  borderLeft: '3px solid #eab308',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  borderLeft: '3px solid var(--color-status-degraded)',
                   borderRadius: '4px',
                   fontSize: '0.8125rem',
-                  color: '#fef08a',
+                  color: 'var(--color-status-degraded)',
                   marginBottom: '12px',
                 }}
               >
@@ -463,7 +463,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
               type="button"
               data-testid="close-retry-success-btn"
               onClick={() => setRetryResult(null)}
-              style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '1.25rem', marginLeft: '12px' }}
+              style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', fontSize: '1.25rem', marginLeft: '12px' }}
             >
               ×
             </button>
@@ -510,33 +510,49 @@ export const RunDetail: React.FC<RunDetailProps> = ({
                   padding: '2px 8px',
                   borderRadius: '12px',
                   fontWeight: 600,
-                  backgroundColor: 'rgba(56, 139, 253, 0.15)',
-                  color: '#58a6ff',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-brand-hover)',
+                  color: 'var(--color-brand-hover)',
                 }}
               >
                 Attempt #{run.attempt ?? 1} / {run.maxAttempts ?? 3}
               </span>
               <span
+                data-testid="run-detail-status-badge"
                 style={{
                   fontSize: '0.75rem',
                   padding: '2px 8px',
                   borderRadius: '12px',
                   fontWeight: 600,
-                  backgroundColor:
-                    run.state === 'running'
-                      ? 'rgba(46, 160, 67, 0.2)'
-                      : run.state === 'recovering'
-                      ? 'rgba(217, 119, 6, 0.2)'
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: `1px solid ${
+                    run.state === 'succeeded'
+                      ? 'var(--color-status-online)'
+                      : run.state === 'running'
+                      ? 'var(--color-brand-hover)'
                       : run.state === 'awaiting_approval'
-                      ? 'rgba(218, 54, 51, 0.2)'
-                      : 'rgba(110, 118, 129, 0.2)',
+                      ? 'var(--color-status-degraded)'
+                      : run.state === 'recovering'
+                      ? 'var(--color-status-active)'
+                      : run.state === 'cancelled'
+                      ? 'var(--color-border-strong)'
+                      : run.state === 'failed'
+                      ? 'var(--color-status-offline)'
+                      : 'var(--color-border-subtle)'
+                  }`,
                   color:
-                    run.state === 'running'
-                      ? '#3fb950'
-                      : run.state === 'recovering'
-                      ? '#d97706'
+                    run.state === 'succeeded'
+                      ? 'var(--color-status-online)'
+                      : run.state === 'running'
+                      ? 'var(--color-brand-hover)'
                       : run.state === 'awaiting_approval'
-                      ? '#f85149'
+                      ? 'var(--color-status-degraded)'
+                      : run.state === 'recovering'
+                      ? 'var(--color-status-active)'
+                      : run.state === 'cancelled'
+                      ? 'var(--color-status-neutral)'
+                      : run.state === 'failed'
+                      ? 'var(--color-status-offline)'
                       : 'var(--color-text-secondary)',
                 }}
               >
@@ -546,31 +562,31 @@ export const RunDetail: React.FC<RunDetailProps> = ({
             <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
               {run.objective ?? '작업 목적 미관측'}
               {run.frozenInputHash && (
-                <span style={{ marginLeft: '12px', color: '#58a6ff', fontFamily: 'monospace' }}>
+                <span style={{ marginLeft: '12px', color: 'var(--color-brand-hover)', fontFamily: 'monospace' }}>
                   🔒 Frozen: {run.frozenInputHash.slice(0, 18)}... ({run.frozenInputSizeBytes ?? 0} B)
                 </span>
               )}
             </p>
-            <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '4px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '4px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
               <span data-testid="run-detail-created-at">
                 생성: {run.createdAt ? new Date(run.createdAt).toLocaleString('ko-KR') : '미관측 (CreatedAt Absent)'}
               </span>
               {(run.stateUpdatedAt || runResult?.stateUpdatedAt || run.updatedAt) && (
-                <span data-testid="run-state-updated-at" style={{ color: '#60a5fa' }}>
+                <span data-testid="run-state-updated-at" style={{ color: 'var(--color-brand-hover)' }}>
                   실행 상태 갱신: {new Date(run.stateUpdatedAt || runResult?.stateUpdatedAt || run.updatedAt!).toLocaleString('ko-KR')}
                 </span>
               )}
               {(runResult?.completedAt || run.completedAt) ? (
-                <span data-testid="run-detail-completed-at" style={{ color: run.state === 'succeeded' ? '#34d399' : '#f87171' }}>
+                <span data-testid="run-detail-completed-at" style={{ color: run.state === 'succeeded' ? 'var(--color-status-online)' : 'var(--color-status-offline)' }}>
                   실행 완료 시각: {new Date(runResult?.completedAt || run.completedAt!).toLocaleString('ko-KR')}
                 </span>
               ) : (run.state === 'succeeded' || run.state === 'failed') && (
-                <span data-testid="run-detail-completed-at" style={{ color: run.state === 'succeeded' ? '#34d399' : '#f87171' }}>
+                <span data-testid="run-detail-completed-at" style={{ color: run.state === 'succeeded' ? 'var(--color-status-online)' : 'var(--color-status-offline)' }}>
                   종료: {run.updatedAt ? new Date(run.updatedAt).toLocaleString('ko-KR') : '미관측 (UpdatedAt Absent)'}
                 </span>
               )}
               {retryResult && (
-                <div data-testid="retry-child-lineage-section" style={{ width: '100%', marginTop: '8px', fontSize: '0.8125rem', color: '#38bdf8' }}>
+                <div data-testid="retry-child-lineage-section" style={{ width: '100%', marginTop: '8px', fontSize: '0.8125rem', color: 'var(--color-brand-hover)' }}>
                   <span>루트: <code>{retryResult.rootRunId}</code></span>
                   <span style={{ margin: '0 8px' }}>•</span>
                   <span>부모: <code>{retryResult.parentRunId}</code></span>
@@ -654,7 +670,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.65)',
+            backgroundColor: 'var(--color-bg-backdrop)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -673,7 +689,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
               boxShadow: 'var(--shadow-md)',
             }}
           >
-            <h3 id="run-cancel-modal-title" style={{ fontSize: '1.125rem', fontWeight: 600, color: 'var(--color-brand-danger)' }}>
+            <h3 id="run-cancel-modal-title" style={{ fontSize: '1.125rem', fontWeight: 600, color: 'var(--color-status-offline)' }}>
               Run 실행 취소 확인 (AC-04)
             </h3>
             <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginTop: '8px' }}>
@@ -710,10 +726,10 @@ export const RunDetail: React.FC<RunDetailProps> = ({
                 data-testid="cancel-modal-error"
                 style={{
                   padding: '8px 12px',
-                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                  border: '1px solid #ef4444',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-status-offline)',
                   borderRadius: 'var(--radius-sm)',
-                  color: '#fca5a5',
+                  color: 'var(--color-status-offline)',
                   fontSize: '0.8125rem',
                   marginTop: '12px',
                 }}
@@ -750,7 +766,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.65)',
+            backgroundColor: 'var(--color-bg-backdrop)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -790,13 +806,13 @@ export const RunDetail: React.FC<RunDetailProps> = ({
               style={{
                 padding: '12px 14px',
                 borderRadius: 'var(--radius-md)',
-                backgroundColor: selectedReceipt.verified ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                border: `1px solid ${selectedReceipt.verified ? '#10b981' : '#ef4444'}`,
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: `1px solid ${selectedReceipt.verified ? 'var(--color-status-online)' : 'var(--color-status-offline)'}`,
                 marginBottom: '16px',
                 fontSize: '0.8125rem',
               }}
             >
-              <div style={{ fontWeight: 600, color: selectedReceipt.verified ? '#10b981' : '#ef4444', marginBottom: '4px' }}>
+              <div style={{ fontWeight: 600, color: selectedReceipt.verified ? 'var(--color-status-online)' : 'var(--color-status-offline)', marginBottom: '4px' }}>
                 {selectedReceipt.verified
                   ? '✓ 물리 정지 영수증 수신 및 비즈니스 결과 검증(verified) 동시 합격'
                   : '⚠️ 물리 정지(exitCode 0) 확인됨 / 그러나 애플리케이션 결과 검증(verified) 미합격'}
@@ -827,19 +843,19 @@ export const RunDetail: React.FC<RunDetailProps> = ({
               </div>
               <div style={{ padding: '10px 12px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)' }}>
                 <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>프로세스 Exit Code</div>
-                <div style={{ fontSize: '0.875rem', fontWeight: 700, fontFamily: 'monospace', color: selectedReceipt.exitCode === 0 ? '#10b981' : '#ef4444' }}>
+                <div style={{ fontSize: '0.875rem', fontWeight: 700, fontFamily: 'monospace', color: selectedReceipt.exitCode === 0 ? 'var(--color-status-online)' : 'var(--color-status-offline)' }}>
                   {selectedReceipt.exitCode} ({selectedReceipt.exitCode === 0 ? '정상 프로세스 종료' : '오류 종료'})
                 </div>
               </div>
               <div style={{ padding: '10px 12px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)' }}>
                 <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>물리 정지 상태 (Physically Stopped)</div>
-                <div style={{ fontSize: '0.875rem', fontWeight: 600, color: selectedReceipt.physicallyStopped ? '#10b981' : '#f59e0b' }}>
+                <div style={{ fontSize: '0.875rem', fontWeight: 600, color: selectedReceipt.physicallyStopped ? 'var(--color-status-online)' : 'var(--color-status-degraded)' }}>
                   {selectedReceipt.physicallyStopped ? '✓ 물리 정지 영수증 확정' : '동작 중'}
                 </div>
               </div>
               <div style={{ padding: '10px 12px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)' }}>
                 <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>자원 반환 (Resource Reclaimed)</div>
-                <div style={{ fontSize: '0.875rem', fontWeight: 600, color: selectedReceipt.resourceReclaimed ? '#10b981' : '#f59e0b' }}>
+                <div style={{ fontSize: '0.875rem', fontWeight: 600, color: selectedReceipt.resourceReclaimed ? 'var(--color-status-online)' : 'var(--color-status-degraded)' }}>
                   {selectedReceipt.resourceReclaimed ? '✓ 자원 반환 완료' : '반환 대기 중 (Release Pending)'}
                 </div>
               </div>
@@ -861,7 +877,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
                 출력 다이제스트 & 페이로드 (SHA-256 / Size: {selectedReceipt.output?.sizeBytes} bytes)
               </div>
               <div style={{ padding: '10px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)', fontFamily: 'monospace', fontSize: '0.75rem' }}>
-                <div style={{ color: '#58a6ff', marginBottom: '4px' }}>{selectedReceipt.output?.sha256}</div>
+                <div style={{ color: 'var(--color-brand-hover)', marginBottom: '4px' }}>{selectedReceipt.output?.sha256}</div>
                 <div style={{ color: 'var(--color-text-muted)', wordBreak: 'break-all' }}>{selectedReceipt.output?.data}</div>
               </div>
             </div>
@@ -880,8 +896,8 @@ export const RunDetail: React.FC<RunDetailProps> = ({
         <div
           style={{
             padding: '14px 18px',
-            backgroundColor: 'rgba(245, 158, 11, 0.12)',
-            border: '1px solid #f59e0b',
+            backgroundColor: 'var(--color-bg-subtle)',
+            border: '1px solid var(--color-status-degraded)',
             borderRadius: 'var(--radius-md)',
             marginBottom: '16px',
             display: 'flex',
@@ -890,7 +906,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           }}
         >
           <div>
-            <div style={{ fontWeight: 600, color: '#b45309', fontSize: '0.875rem' }}>
+            <div style={{ fontWeight: 600, color: 'var(--color-status-degraded)', fontSize: '0.875rem' }}>
               🔄 워크스페이스 장애 복구 대기 (Workspace Recovering - ADR-044 / ADR-045)
             </div>
             <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
@@ -909,9 +925,9 @@ export const RunDetail: React.FC<RunDetailProps> = ({
         <div
           style={{
             padding: '12px 18px',
-            backgroundColor: 'rgba(16, 185, 129, 0.12)',
-            border: '1px solid #10b981',
-            color: '#047857',
+            backgroundColor: 'var(--color-bg-subtle)',
+            border: '1px solid var(--color-status-online)',
+            color: 'var(--color-status-online)',
             borderRadius: 'var(--radius-md)',
             marginBottom: '16px',
             fontSize: '0.875rem',
@@ -935,8 +951,8 @@ export const RunDetail: React.FC<RunDetailProps> = ({
         <div
           style={{
             padding: '12px 18px',
-            backgroundColor: 'rgba(59, 130, 246, 0.08)',
-            border: '1px solid rgba(59, 130, 246, 0.3)',
+            backgroundColor: 'var(--color-bg-subtle)',
+            border: '1px solid var(--color-brand-hover)',
             borderRadius: 'var(--radius-md)',
             marginBottom: '16px',
             display: 'flex',
@@ -944,7 +960,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
             alignItems: 'center',
           }}
         >
-          <div style={{ fontSize: '0.875rem', color: '#1d4ed8' }}>
+          <div style={{ fontSize: '0.875rem', color: 'var(--color-brand-hover)' }}>
             <strong>↳ 하위 분산 샤드:</strong> 이 작업은 상위 분산 계획 <code>{run.parentId}</code>의 샤드 #{((run.shardIndex ?? 0) + 1)}입니다.
           </div>
           {onNavigateRun && (
@@ -960,8 +976,8 @@ export const RunDetail: React.FC<RunDetailProps> = ({
         <div
           style={{
             padding: '14px 18px',
-            backgroundColor: 'rgba(217, 119, 6, 0.12)',
-            border: '1px solid #d97706',
+            backgroundColor: 'var(--color-bg-subtle)',
+            border: '1px solid var(--color-status-degraded)',
             borderRadius: 'var(--radius-md)',
             marginBottom: '16px',
             display: 'flex',
@@ -970,7 +986,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           }}
         >
           <div>
-            <div style={{ fontWeight: 600, color: '#d97706', fontSize: '0.875rem' }}>
+            <div style={{ fontWeight: 600, color: 'var(--color-status-degraded)', fontSize: '0.875rem' }}>
               ⏳ 자원 반환 대기 중 (Resource Release Pending - ADR-040/042)
             </div>
             <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
@@ -988,9 +1004,9 @@ export const RunDetail: React.FC<RunDetailProps> = ({
         <div
           style={{
             padding: '12px 18px',
-            backgroundColor: 'rgba(16, 185, 129, 0.12)',
-            border: '1px solid #10b981',
-            color: '#047857',
+            backgroundColor: 'var(--color-bg-subtle)',
+            border: '1px solid var(--color-status-online)',
+            color: 'var(--color-status-online)',
             borderRadius: 'var(--radius-md)',
             marginBottom: '16px',
             fontSize: '0.875rem',
@@ -1081,11 +1097,10 @@ export const RunDetail: React.FC<RunDetailProps> = ({
                           ? 'var(--color-status-online)'
                           : 'var(--color-bg-subtle)',
                         color: isCurrent
-                          ? '#ffffff'
+                          ? 'var(--color-brand-primary-fg)'
                           : isPassed
                           ? 'var(--color-text-inverse)'
                           : 'var(--color-text-muted)',
-                        border: isCurrent ? '3px solid var(--color-brand-subtle)' : 'none',
                       }}
                     >
                       {isPassed && !isCurrent ? '✓' : idx + 1}
@@ -1116,10 +1131,10 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           data-testid="run-detail-logs-panel"
           style={{
             padding: '20px',
-            backgroundColor: '#0d1117',
-            color: '#c9d1d9',
+            backgroundColor: 'var(--color-bg-canvas)',
+            color: 'var(--color-text-secondary)',
             borderRadius: 'var(--radius-lg)',
-            border: '1px solid #30363d',
+            border: '1px solid var(--color-border-subtle)',
             fontFamily: 'monospace',
             fontSize: '0.8125rem',
             lineHeight: 1.6,
@@ -1133,11 +1148,11 @@ export const RunDetail: React.FC<RunDetailProps> = ({
               data-testid="logs-freshness-banner"
               style={{
                 padding: '6px 12px',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                border: '1px solid rgba(59, 130, 246, 0.25)',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-brand-hover)',
                 borderRadius: '4px',
                 fontSize: '0.75rem',
-                color: '#93c5fd',
+                color: 'var(--color-brand-hover)',
                 marginBottom: '10px',
               }}
             >
@@ -1149,11 +1164,11 @@ export const RunDetail: React.FC<RunDetailProps> = ({
               data-testid="logs-query-time-notice"
               style={{
                 padding: '6px 12px',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                border: '1px solid rgba(59, 130, 246, 0.25)',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-brand-hover)',
                 borderRadius: '4px',
                 fontSize: '0.75rem',
-                color: '#93c5fd',
+                color: 'var(--color-brand-hover)',
                 marginBottom: '10px',
               }}
             >
@@ -1161,15 +1176,15 @@ export const RunDetail: React.FC<RunDetailProps> = ({
             </div>
           )}
 
-          <div style={{ color: '#8b949e', borderBottom: '1px solid #21262d', paddingBottom: '8px', marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ color: 'var(--color-text-muted)', borderBottom: '1px solid var(--color-border-subtle)', paddingBottom: '8px', marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span>[Run Kernel Logs: /v1/projects/{run.projectId || '(none)'}/runs/{run.id}/logs]</span>
             {logView && (
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                <span data-testid="run-logs-source-badge" style={{ fontSize: '0.75rem', color: '#58a6ff' }}>
+                <span data-testid="run-logs-source-badge" style={{ fontSize: '0.75rem', color: 'var(--color-brand-hover)' }}>
                   출처: {logView.source}
                 </span>
                 {logView.completedAt && (
-                  <span data-testid="log-completed-at-badge" style={{ fontSize: '0.75rem', color: '#38bdf8' }}>
+                  <span data-testid="log-completed-at-badge" style={{ fontSize: '0.75rem', color: 'var(--color-brand-hover)' }}>
                     완료 커밋: {new Date(logView.completedAt).toLocaleString('ko-KR')}
                   </span>
                 )}
@@ -1184,7 +1199,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           )}
 
           {logError && (
-            <div role="alert" data-testid="run-logs-error" style={{ color: '#f85149', padding: '8px', backgroundColor: 'rgba(248, 81, 73, 0.1)', borderRadius: '4px', marginBottom: '12px' }}>
+            <div role="alert" data-testid="run-logs-error" style={{ color: 'var(--color-status-offline)', padding: '8px', backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-status-offline)', borderRadius: '4px', marginBottom: '12px' }}>
               ⚠️ 로그 조회 실패: {logError}
             </div>
           )}
@@ -1193,19 +1208,19 @@ export const RunDetail: React.FC<RunDetailProps> = ({
             <div>
               <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
                 {logView.redacted && (
-                  <span data-testid="run-logs-redacted-badge" style={{ backgroundColor: 'rgba(217, 119, 6, 0.2)', color: '#d97706', padding: '2px 6px', borderRadius: '4px', fontSize: '0.75rem' }}>
+                  <span data-testid="run-logs-redacted-badge" style={{ backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-status-degraded)', color: 'var(--color-status-degraded)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.75rem' }}>
                     🔒 민감정보 마스킹됨 (Redacted)
                   </span>
                 )}
                 {logView.truncated && (
-                  <span data-testid="run-logs-truncated-badge" style={{ backgroundColor: 'rgba(218, 54, 51, 0.2)', color: '#f85149', padding: '2px 6px', borderRadius: '4px', fontSize: '0.75rem' }}>
+                  <span data-testid="run-logs-truncated-badge" style={{ backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-status-offline)', color: 'var(--color-status-offline)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.75rem' }}>
                     ✂️ 로그 잘림 (Truncated)
                   </span>
                 )}
               </div>
 
               {logView.absentReason ? (
-                <div data-testid="run-logs-absent" style={{ color: '#8b949e', padding: '8px 0' }}>
+                <div data-testid="run-logs-absent" style={{ color: 'var(--color-text-muted)', padding: '8px 0' }}>
                   ℹ️ {logView.absentReason}
                 </div>
               ) : (
@@ -1216,12 +1231,12 @@ export const RunDetail: React.FC<RunDetailProps> = ({
                     </div>
                   )}
                   {logView.stderr && (
-                    <div data-testid="run-log-stderr" style={{ whiteSpace: 'pre-wrap', color: '#f85149', marginBottom: '8px' }}>
+                    <div data-testid="run-log-stderr" style={{ whiteSpace: 'pre-wrap', color: 'var(--color-status-offline)', marginBottom: '8px' }}>
                       {logView.stderr}
                     </div>
                   )}
                   {!logView.stdout && !logView.stderr && (
-                    <div data-testid="run-log-empty" style={{ color: '#8b949e' }}>
+                    <div data-testid="run-log-empty" style={{ color: 'var(--color-text-muted)' }}>
                       (출력된 표준 출력 및 에러 로그가 없습니다.)
                     </div>
                   )}
@@ -1231,7 +1246,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           )}
 
           {!isLoadingLogs && !logError && !logView && (
-            <div data-testid="run-logs-none" style={{ color: '#8b949e', padding: '16px 0', textAlign: 'center' }}>
+            <div data-testid="run-logs-none" style={{ color: 'var(--color-text-muted)', padding: '16px 0', textAlign: 'center' }}>
               기록된 실행 로그가 없습니다. (서버 응답 없음)
             </div>
           )}
@@ -1255,11 +1270,11 @@ export const RunDetail: React.FC<RunDetailProps> = ({
               data-testid="artifacts-freshness-banner"
               style={{
                 padding: '8px 12px',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                border: '1px solid rgba(59, 130, 246, 0.25)',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-brand-hover)',
                 borderRadius: '6px',
                 fontSize: '0.75rem',
-                color: '#93c5fd',
+                color: 'var(--color-brand-hover)',
                 marginBottom: '14px',
               }}
             >
@@ -1271,11 +1286,11 @@ export const RunDetail: React.FC<RunDetailProps> = ({
               data-testid="artifacts-query-time-notice"
               style={{
                 padding: '8px 12px',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                border: '1px solid rgba(59, 130, 246, 0.25)',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-brand-hover)',
                 borderRadius: '6px',
                 fontSize: '0.75rem',
-                color: '#93c5fd',
+                color: 'var(--color-brand-hover)',
                 marginBottom: '14px',
               }}
             >
@@ -1286,7 +1301,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
             <h3 style={{ fontSize: '1.0625rem', fontWeight: 600, margin: 0 }}>생성된 아티팩트 목록</h3>
             {artifactList && (
-              <span data-testid="run-artifacts-source-badge" style={{ fontSize: '0.75rem', color: '#58a6ff' }}>
+              <span data-testid="run-artifacts-source-badge" style={{ fontSize: '0.75rem', color: 'var(--color-brand-hover)' }}>
                 출처: {artifactList.source} (총 {artifactList.count}건 / 검증: {artifactList.verifiedCount}건)
               </span>
             )}
@@ -1299,7 +1314,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           )}
 
           {artifactError && !((run as any).artifacts) && (
-            <div role="alert" data-testid="artifacts-error" style={{ color: '#f85149', padding: '8px 12px', backgroundColor: 'rgba(248, 81, 73, 0.1)', borderRadius: '4px', marginBottom: '12px' }}>
+            <div role="alert" data-testid="artifacts-error" style={{ color: 'var(--color-status-offline)', padding: '8px 12px', backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-status-offline)', borderRadius: '4px', marginBottom: '12px' }}>
               ⚠️ 산출물 목록 조회 실패: {artifactError}
             </div>
           )}
@@ -1455,11 +1470,11 @@ export const RunDetail: React.FC<RunDetailProps> = ({
               data-testid="shards-freshness-banner"
               style={{
                 padding: '8px 12px',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                border: '1px solid rgba(59, 130, 246, 0.25)',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-brand-hover)',
                 borderRadius: '6px',
                 fontSize: '0.75rem',
-                color: '#93c5fd',
+                color: 'var(--color-brand-hover)',
                 marginBottom: '16px',
               }}
             >
@@ -1471,11 +1486,11 @@ export const RunDetail: React.FC<RunDetailProps> = ({
               data-testid="shards-query-time-notice"
               style={{
                 padding: '8px 12px',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                border: '1px solid rgba(59, 130, 246, 0.25)',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-brand-hover)',
                 borderRadius: '6px',
                 fontSize: '0.75rem',
-                color: '#93c5fd',
+                color: 'var(--color-brand-hover)',
                 marginBottom: '16px',
               }}
             >
@@ -1510,12 +1525,12 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           <div
             style={{
               padding: '12px 16px',
-              backgroundColor: 'rgba(234, 179, 8, 0.1)',
-              border: '1px solid rgba(234, 179, 8, 0.3)',
+              backgroundColor: 'var(--color-bg-subtle)',
+              border: '1px solid var(--color-status-degraded)',
               borderRadius: 'var(--radius-md)',
               marginBottom: '16px',
               fontSize: '0.8125rem',
-              color: '#eab308',
+              color: 'var(--color-status-degraded)',
               display: 'flex',
               alignItems: 'center',
               gap: '10px',
@@ -1582,7 +1597,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
                 {run.allPhysicallyStopped ? (
                   <span style={{ color: 'var(--color-status-online)' }}>✓ 전원 정지 영수증 수신</span>
                 ) : (
-                  <span style={{ color: '#d97706' }}>대기 중 (동작 중인 샤드 존재)</span>
+                  <span style={{ color: 'var(--color-status-degraded)' }}>대기 중 (동작 중인 샤드 존재)</span>
                 )}
               </div>
             </div>
@@ -1647,18 +1662,19 @@ export const RunDetail: React.FC<RunDetailProps> = ({
                             borderRadius: 'var(--radius-sm)',
                             fontSize: '0.75rem',
                             fontWeight: 600,
-                            backgroundColor:
+                            backgroundColor: 'var(--color-bg-subtle)',
+                            border:
                               s.executionState === 'running'
-                                ? 'rgba(59, 130, 246, 0.15)'
+                                ? '1px solid var(--color-brand-hover)'
                                 : s.executionState === 'succeeded'
-                                ? 'rgba(16, 185, 129, 0.15)'
-                                : 'rgba(239, 68, 68, 0.15)',
+                                ? '1px solid var(--color-status-online)'
+                                : '1px solid var(--color-status-offline)',
                             color:
                               s.executionState === 'running'
-                                ? '#3b82f6'
+                                ? 'var(--color-brand-hover)'
                                 : s.executionState === 'succeeded'
-                                ? '#10b981'
-                                : '#ef4444',
+                                ? 'var(--color-status-online)'
+                                : 'var(--color-status-offline)',
                           }}
                         >
                           {s.executionState}
@@ -1671,7 +1687,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
                               ✓ 수신 완료
                             </span>
                           ) : (
-                            <span style={{ color: '#d97706', fontSize: '0.8125rem' }}>
+                            <span style={{ color: 'var(--color-status-degraded)', fontSize: '0.8125rem' }}>
                               ⏳ fsync 대기
                             </span>
                           )}
@@ -1736,7 +1752,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
               실행 시도 이력 (Kernel Run Attempts)
             </h3>
             {attemptList && (
-              <span data-testid="run-attempts-source-badge" style={{ fontSize: '0.75rem', color: '#58a6ff' }}>
+              <span data-testid="run-attempts-source-badge" style={{ fontSize: '0.75rem', color: 'var(--color-brand-hover)' }}>
                 출처: {attemptList.source} (총 {attemptList.count}건)
               </span>
             )}
@@ -1749,7 +1765,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           )}
 
           {attemptError && (
-            <div role="alert" data-testid="run-attempts-error" style={{ color: '#f85149', padding: '12px', backgroundColor: 'rgba(248, 81, 73, 0.1)', borderRadius: '4px', marginBottom: '16px' }}>
+            <div role="alert" data-testid="run-attempts-error" style={{ color: 'var(--color-status-offline)', padding: '12px', backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-status-offline)', borderRadius: '4px', marginBottom: '16px' }}>
               ⚠️ 시도 이력 조회 실패: {attemptError}
             </div>
           )}
@@ -1804,7 +1820,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
                             {att.exitCode !== null ? (
                               <span
                                 data-testid={`run-attempt-exit-${att.attemptNumber}`}
-                                style={{ color: att.exitCode === 0 ? '#10b981' : '#f85149' }}
+                                style={{ color: att.exitCode === 0 ? 'var(--color-status-online)' : 'var(--color-status-offline)' }}
                               >
                                 {att.exitCode}
                               </span>

@@ -257,7 +257,7 @@ describe('SealRecordPanel Component (G-04 R1·R2·R3)', () => {
     const successBadge = container.querySelector(`[data-testid="seal-artifact-verify-status-${ART_ID_1}"]`) as HTMLElement;
     expect(successBadge?.textContent).toContain('✔ 일치 (Verified)');
     expect(successBadge.getAttribute('data-tone')).toBe('match');
-    expect(['rgb(63, 185, 80)', '#3fb950']).toContain(successBadge.style.color);
+    expect(['var(--color-status-online)', 'rgb(63, 185, 80)', '#3fb950']).toContain(successBadge.style.color);
 
     verifyResponse = {
       runId: sampleRun.id,
@@ -275,7 +275,8 @@ describe('SealRecordPanel Component (G-04 R1·R2·R3)', () => {
     const mismatchBadge = container.querySelector(`[data-testid="seal-artifact-verify-status-${ART_ID_2}"]`) as HTMLElement;
     expect(mismatchBadge?.textContent).toContain('⚠️ 불일치 (봉인 다이제스트와 다름·대상 없음)');
     expect(mismatchBadge.getAttribute('data-tone')).toBe('mismatch');
-    expect(['rgb(255, 123, 114)', '#ff7b72']).toContain(mismatchBadge.style.color);
+    expect(['var(--color-status-offline)', 'rgb(255, 123, 114)', '#ff7b72']).toContain(mismatchBadge.style.color);
+    expect(mismatchBadge.style.color).not.toBe('var(--color-status-online)');
     expect(mismatchBadge.style.color).not.toBe('rgb(63, 185, 80)');
   });
 
@@ -300,7 +301,8 @@ describe('SealRecordPanel Component (G-04 R1·R2·R3)', () => {
     expect(bundleHashStatus).not.toBeNull();
     expect(bundleHashStatus.textContent).toContain('⚠️ 해시 불일치 (Hash Mismatch)');
     expect(bundleHashStatus.getAttribute('data-tone')).toBe('mismatch');
-    expect(['rgb(255, 123, 114)', '#ff7b72']).toContain(bundleHashStatus.style.color);
+    expect(['var(--color-status-offline)', 'rgb(255, 123, 114)', '#ff7b72']).toContain(bundleHashStatus.style.color);
+    expect(bundleHashStatus.style.color).not.toBe('var(--color-status-online)');
     expect(bundleHashStatus.style.color).not.toBe('rgb(63, 185, 80)');
     expect(bundleHashStatus.textContent).not.toMatch(/✔|해시 일치 \(/);
   });
