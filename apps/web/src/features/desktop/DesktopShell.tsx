@@ -189,8 +189,12 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
   const notifTriggerRef = useRef<HTMLButtonElement>(null);
   const notifContainerRef = useRef<HTMLDivElement>(null);
 
+  // Track reason for dismissing an overlay (DEF-S11-03, ACC-04, Claude D2)
+  const dismissReasonRef = useRef<'escape' | 'dismiss' | 'open_app' | null>(null);
+
   // Restore focus to trigger button post-dismissal:
-  // When closing an overlay to 'none', restore focus to the trigger button of the dismissed overlay.
+  // When closing an overlay to 'none', restore focus to the trigger button of the dismissed overlay
+  // ONLY if dismissed via Escape, close button, or canvas click (NOT when an app was opened, Claude D2).
   // When switching directly between overlays ('start' <-> 'notifications'), do NOT restore focus to previous trigger,
   // allowing the newly active overlay's auto-focus to take effect cleanly (F2).
   const prevActiveOverlayRef = useRef<ActiveOverlay>('none');
@@ -199,13 +203,31 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
     prevActiveOverlayRef.current = activeOverlay;
 
     if (activeOverlay === 'none') {
-      if (prev === 'start') {
-        startMenuTriggerRef.current?.focus();
-      } else if (prev === 'notifications') {
-        notifTriggerRef.current?.focus();
+      const reason = dismissReasonRef.current;
+      if (reason !== 'open_app') {
+        dismissReasonRef.current = null;
+        if (prev === 'start') {
+          startMenuTriggerRef.current?.focus();
+        } else if (prev === 'notifications') {
+          notifTriggerRef.current?.focus();
+        }
       }
     }
   }, [activeOverlay]);
+
+  // Focus newly opened or activated window title after DOM mount (Claude D2)
+  useEffect(() => {
+    if (dismissReasonRef.current === 'open_app' && activeWindowId) {
+      dismissReasonRef.current = null;
+      const titleEl = document.getElementById(`window-title-${activeWindowId}`);
+      if (titleEl) {
+        titleEl.focus();
+      } else {
+        const winDialog = document.querySelector<HTMLElement>(`[aria-labelledby="window-title-${activeWindowId}"]`);
+        winDialog?.focus();
+      }
+    }
+  }, [activeWindowId, windows]);
 
   // Auto-focus first interactive element when Start Menu or Notification drawer opens
   useEffect(() => {
@@ -265,6 +287,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
         if (activeOverlay === 'start') {
           e.preventDefault();
           e.stopPropagation();
+          dismissReasonRef.current = 'escape';
           setActiveOverlay('none');
           startMenuTriggerRef.current?.focus();
           return;
@@ -272,8 +295,35 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
         if (activeOverlay === 'notifications') {
           e.preventDefault();
           e.stopPropagation();
+          dismissReasonRef.current = 'escape';
           setActiveOverlay('none');
           notifTriggerRef.current?.focus();
+          return;
+        }
+      }
+
+      // Arrow navigation for Start Menu (WCAG role="menu" pattern: ArrowDown, ArrowUp, Home, End - Claude D1)
+      if (activeOverlay === 'start') {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Home' || e.key === 'End') {
+          const container = startMenuContainerRef.current;
+          if (container) {
+            const menuItems = Array.from(container.querySelectorAll<HTMLElement>('[role="menuitem"]'));
+            if (menuItems.length > 0) {
+              e.preventDefault();
+              const currentIndex = menuItems.indexOf(document.activeElement as HTMLElement);
+              if (e.key === 'Home') {
+                menuItems[0].focus();
+              } else if (e.key === 'End') {
+                menuItems[menuItems.length - 1].focus();
+              } else if (e.key === 'ArrowDown') {
+                const nextIndex = currentIndex === -1 || currentIndex === menuItems.length - 1 ? 0 : currentIndex + 1;
+                menuItems[nextIndex].focus();
+              } else if (e.key === 'ArrowUp') {
+                const prevIndex = currentIndex <= 0 ? menuItems.length - 1 : currentIndex - 1;
+                menuItems[prevIndex].focus();
+              }
+            }
+          }
           return;
         }
       }
@@ -368,6 +418,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
       if (win) {
         setActiveWindowId(win.id);
       }
+      dismissReasonRef.current = 'open_app';
       setActiveOverlay('none');
     },
     [windows]
@@ -602,6 +653,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
               <button
                 key={app.appId}
                 type="button"
+                role="menuitem"
                 onClick={() => openApp(app.appId)}
                 style={{
                   display: 'flex',
@@ -627,6 +679,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', marginTop: '8px', paddingTop: '8px' }}>
             <button
               type="button"
+              role="menuitem"
               onClick={onSwitchToPortalView}
               style={{
                 width: '100%',

@@ -181,6 +181,7 @@ export const DesktopWindowComponent: React.FC<DesktopWindowProps> = ({
         {/* Center: Title & Icon */}
         <div
           id={`window-title-${window.id}`}
+          tabIndex={-1}
           style={{
             display: 'flex',
             alignItems: 'center',

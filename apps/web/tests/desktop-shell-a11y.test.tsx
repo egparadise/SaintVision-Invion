@@ -488,4 +488,116 @@ describe('DesktopShell & useModalA11y Accessibility (ACC-03, ACC-04, focus_is_tr
     expect(container.querySelector('#desktop-start-menu-dropdown')).toBeNull();
     expect(document.activeElement).toBe(startBtn);
   });
+
+  it('D1: Start Menu role="menu" has 9 role="menuitem" buttons with Arrow key (ArrowDown/Up/Home/End) navigation', async () => {
+    await act(async () => {
+      root.render(<DesktopShell {...MOCK_PROPS} />);
+    });
+
+    const startBtn = container.querySelector('button[aria-label="SaintVision 시작 메뉴"]') as HTMLButtonElement;
+    await act(async () => {
+      startBtn.click();
+      vi.advanceTimersByTime(50);
+    });
+
+    const startMenu = container.querySelector('#desktop-start-menu-dropdown') as HTMLDivElement;
+    expect(startMenu).not.toBeNull();
+    expect(startMenu.getAttribute('role')).toBe('menu');
+
+    // D1: Verify probe buttons=9 and menuitem-role=9
+    const allButtons = startMenu.querySelectorAll('button');
+    const menuItems = startMenu.querySelectorAll<HTMLElement>('[role="menuitem"]');
+    expect(allButtons.length).toBe(9);
+    expect(menuItems.length).toBe(9);
+
+    // Initial focus on first menuitem
+    menuItems[0].focus();
+    expect(document.activeElement).toBe(menuItems[0]);
+
+    // ArrowDown moves to next item
+    await act(async () => {
+      const downEvent = new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true });
+      window.dispatchEvent(downEvent);
+      expect(downEvent.defaultPrevented).toBe(true);
+    });
+    expect(document.activeElement).toBe(menuItems[1]);
+
+    // ArrowUp moves to previous item
+    await act(async () => {
+      const upEvent = new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true });
+      window.dispatchEvent(upEvent);
+      expect(upEvent.defaultPrevented).toBe(true);
+    });
+    expect(document.activeElement).toBe(menuItems[0]);
+
+    // ArrowUp on first item wraps to last item
+    await act(async () => {
+      const wrapUpEvent = new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true });
+      window.dispatchEvent(wrapUpEvent);
+      expect(wrapUpEvent.defaultPrevented).toBe(true);
+    });
+    expect(document.activeElement).toBe(menuItems[menuItems.length - 1]);
+
+    // ArrowDown on last item wraps to first item
+    await act(async () => {
+      const wrapDownEvent = new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true });
+      window.dispatchEvent(wrapDownEvent);
+      expect(wrapDownEvent.defaultPrevented).toBe(true);
+    });
+    expect(document.activeElement).toBe(menuItems[0]);
+
+    // Home key jumps to first item
+    menuItems[4].focus();
+    await act(async () => {
+      const homeEvent = new KeyboardEvent('keydown', { key: 'Home', bubbles: true, cancelable: true });
+      window.dispatchEvent(homeEvent);
+      expect(homeEvent.defaultPrevented).toBe(true);
+    });
+    expect(document.activeElement).toBe(menuItems[0]);
+
+    // End key jumps to last item
+    await act(async () => {
+      const endEvent = new KeyboardEvent('keydown', { key: 'End', bubbles: true, cancelable: true });
+      window.dispatchEvent(endEvent);
+      expect(endEvent.defaultPrevented).toBe(true);
+    });
+    expect(document.activeElement).toBe(menuItems[menuItems.length - 1]);
+  });
+
+  it('D2: Launching app from Start Menu (openApp) moves focus to newly opened window/title, NOT Start Menu trigger', async () => {
+    await act(async () => {
+      root.render(<DesktopShell {...MOCK_PROPS} />);
+    });
+
+    const startBtn = container.querySelector('button[aria-label="SaintVision 시작 메뉴"]') as HTMLButtonElement;
+
+    // 1. Open Start Menu
+    await act(async () => {
+      startBtn.click();
+      vi.advanceTimersByTime(50);
+    });
+    expect(container.querySelector('#desktop-start-menu-dropdown')).not.toBeNull();
+
+    // 2. Click an app shortcut inside Start Menu (e.g. inv:// 파일)
+    const fileExplorerBtn = Array.from(container.querySelectorAll<HTMLButtonElement>('#desktop-start-menu-dropdown button')).find(
+      (b) => b.textContent?.includes('inv:// 파일')
+    );
+    expect(fileExplorerBtn).toBeDefined();
+
+    await act(async () => {
+      fileExplorerBtn?.click();
+      vi.advanceTimersByTime(50);
+    });
+
+    // 3. Start Menu is dismissed
+    expect(container.querySelector('#desktop-start-menu-dropdown')).toBeNull();
+
+    // 4. Focus MUST NOT be pulled back to Start Menu trigger button!
+    expect(document.activeElement).not.toBe(startBtn);
+
+    // 5. Focus is placed on the newly opened window or its title
+    const expectedTitleEl = container.querySelector('#window-title-win_file_explorer');
+    expect(expectedTitleEl).not.toBeNull();
+    expect(document.activeElement).toBe(expectedTitleEl);
+  });
 });
