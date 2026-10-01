@@ -97,11 +97,12 @@ def _container_inspect():
                 "SecurityOpt": [
                     "seccomp=unconfined",
                     "apparmor=unconfined",
-                    "systempaths=unconfined",
                 ],
                 "Binds": None,
                 "Devices": [],
                 "CapAdd": None,
+                "MaskedPaths": [],
+                "ReadonlyPaths": [],
             },
             "NetworkSettings": {
                 "Ports": {"1234/tcp": [{"HostIp": "127.0.0.1", "HostPort": "1234"}]}
@@ -125,6 +126,8 @@ def _container_inspect():
         lambda value: value[0]["HostConfig"].__setitem__("Binds", ["/var/run/docker.sock:/x"]),
         lambda value: value[0]["HostConfig"].__setitem__("Devices", [{"PathOnHost": "/dev/kvm"}]),
         lambda value: value[0]["HostConfig"].__setitem__("CapAdd", ["SYS_ADMIN"]),
+        lambda value: value[0]["HostConfig"].__setitem__("MaskedPaths", ["/proc/kcore"]),
+        lambda value: value[0]["HostConfig"].__setitem__("ReadonlyPaths", ["/proc/sys"]),
         lambda value: value[0]["Config"].__setitem__("User", "root"),
         lambda value: value[0]["NetworkSettings"]["Ports"]["1234/tcp"][0].__setitem__(
             "HostIp", "0.0.0.0"

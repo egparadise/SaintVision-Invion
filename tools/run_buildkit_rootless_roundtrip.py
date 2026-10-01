@@ -191,7 +191,6 @@ def _validated_container_inspect(values: object) -> dict:
     if set(host.get("SecurityOpt") or []) != {
         "seccomp=unconfined",
         "apparmor=unconfined",
-        "systempaths=unconfined",
     }:
         observed_options = ",".join(sorted(host.get("SecurityOpt") or []))
         raise RuntimeError(
@@ -205,6 +204,10 @@ def _validated_container_inspect(values: object) -> dict:
     if host.get("CapAdd") not in (None, []):
         raise RuntimeError(
             "rootless BuildKit container boundary is broader than declared: capability"
+        )
+    if host.get("MaskedPaths") not in (None, []) or host.get("ReadonlyPaths") not in (None, []):
+        raise RuntimeError(
+            "rootless BuildKit container boundary is broader than declared: system-path"
         )
     if any(
         mount.get("Type") != "tmpfs"
