@@ -1,0 +1,160 @@
+name: AC-11 Accessibility E2E Evidence
+run-name: ${{ inputs.correlation_id || github.workflow }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      correlation_id:
+        description: 'Opaque id used only to bind this exact dispatch'
+        required: false
+        default: ''
+  pull_request:
+    types: [labeled, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  accessibility-e2e:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.pull_request.labels.*.name, 'run-ac11-accessibility')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      group: ac11-accessibility-${{ github.event.pull_request.head.sha || github.sha }}
+      cancel-in-progress: false
+    env:
+      SOURCE_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      RAW_DIR: .work/ac11-accessibility
+      REPORT: evidence/s11-ac11-accessibility-e2e.json
+      JUNIT: evidence/s11-ac11-accessibility-e2e.xml
+    steps:
+      - name: Checkout exact source head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SOURCE_HEAD_SHA }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install browser lane dependencies
+        run: |
+          python -m pip install -r requirements-backend.txt playwright==1.62.0
+          python -m playwright install --with-deps chromium
+          npm ci --ignore-scripts --prefix apps/web
+
+      - name: Build exact frontend candidate image
+        shell: bash
+        run: |
+          npm run build --prefix apps/web
+          mkdir -p .work/web-container-image/dist
+          cp -R apps/web/dist/. .work/web-container-image/dist/
+          cp apps/web/nginx.conf .work/web-container-image/nginx.conf
+          cp apps/web/security-headers.conf .work/web-container-image/security-headers.conf
+          cat > .work/web-container-image/Dockerfile <<'EOF'
+          FROM nginx:1.27-alpine
+          COPY dist/ /usr/share/nginx/html/
+          COPY nginx.conf /etc/nginx/nginx.conf
+          COPY security-headers.conf /etc/nginx/security-headers.conf
+          HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+            CMD wget -qO- http://127.0.0.1/healthz || exit 1
+          EOF
+          docker build --pull -t "inv-web-test:${SOURCE_HEAD_SHA}" .work/web-container-image
+          echo "INV_WEB_IMAGE=$(docker image inspect --format '{{.Id}}' "inv-web-test:${SOURCE_HEAD_SHA}")" >> "$GITHUB_ENV"
+
+      - name: Run canonical five real-browser journeys
+        id: journeys
+        continue-on-error: true
+        env:
+          VF_BROWSER_TEST: '1'
+          VF_EVIDENCE_PREFIX: ac11-accessibility-browser
+        shell: bash
+        run: |
+          echo "started_at=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
+          python tools/run_vf_security_tests.py \
+            tests/integration/test_desktop_browser.py \
+            tests/integration/test_approval_browser.py \
+            tests/integration/test_studio_browser.py
+
+      - name: Run desktop accessibility invariants in real Chrome
+        shell: bash
+        run: |
+          mkdir -p "$RAW_DIR"
+          npm run dev --prefix apps/web -- --host 127.0.0.1 --port 3005 > "$RAW_DIR/vite-private.log" 2>&1 &
+          vite_pid=$!
+          cleanup() { kill "$vite_pid" 2>/dev/null || true; wait "$vite_pid" 2>/dev/null || true; }
+          trap cleanup EXIT
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3005/ >/dev/null; then break; fi
+            if [ "$attempt" = 60 ]; then echo 'Vite did not become ready' >&2; exit 1; fi
+            sleep 1
+          done
+          python tools/run_real_browser_acceptance.py \
+            --scenario desktop-ui-invariants \
+            --output-dir "$RAW_DIR"
+
+      - name: Normalize fail-closed AC-11 evidence
+        shell: bash
+        run: |
+          browser_proof=.work/ac11-accessibility-browser.json
+          identities=$(python - <<'PY'
+          import json
+          from pathlib import Path
+          proof = json.loads(Path('.work/ac11-accessibility-browser.json').read_text(encoding='utf-8'))
+          print(Path(proof['xmlPath']).with_name('case-identities-private.json'))
+          PY
+          )
+          python tools/collect_ac11_accessibility_e2e.py \
+            --source-run-id "$GITHUB_RUN_ID" \
+            --source-head-sha "$SOURCE_HEAD_SHA" \
+            --runner-image "${RUNNER_OS}-${RUNNER_ARCH}" \
+            --browser-proof "$browser_proof" \
+            --case-identities "$identities" \
+            --desktop-invariants "$RAW_DIR/desktop_ui_invariants.json" \
+            --started-at "${{ steps.journeys.outputs.started_at }}" \
+            --report "$REPORT" \
+            --junit "$JUNIT"
+
+      - name: Validate redacted evidence shape
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+          report = json.loads(Path(os.environ['REPORT']).read_text(encoding='utf-8'))
+          assert report['sourceHeadSha'] == os.environ['SOURCE_HEAD_SHA']
+          assert report['cleanCheckout'] is True
+          assert report['acceptanceClaim'] is False
+          assert report['verdict'] in {'MEASURED_PASS', 'MEASURED_FAIL'}
+          assert report['environment']['credentialsRequired'] is False
+          assert report['environment']['physicalFiveNodeComparable'] is False
+          assert len(report['payload']['journeyIds']) == 5
+          assert len(report['payload']['invariantIds']) == 9
+          assert {row['metric'] for row in report['payload']['observations']} == set(report['targetRef']['criteria'])
+          root = ET.parse(os.environ['JUNIT']).getroot()
+          assert root.attrib['tests'] == '5'
+          PY
+
+      - name: Upload accessibility E2E evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: s11-ac11-accessibility-${{ env.SOURCE_HEAD_SHA }}
+          path: |
+            evidence/s11-ac11-accessibility-e2e.json
+            evidence/s11-ac11-accessibility-e2e.xml
+          if-no-files-found: error
+          retention-days: 30

@@ -1,15 +1,26 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.234"
+version: "1.0.235"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T09:40:00+09:00"
+updated: "2026-10-01T12:52:17+09:00"
 source_of_truth: "Git"
-active_card: "CARD-151 intranet ObjectStore and PITR rehearsal"
-active_card_status: "PR 248 review follow-up; Claude F1-F12 remediated, TLS operational U6 PASS, G-22 replication HBA blocked external"
-active_card_next: "Claude re-review; continue Card 154 independent review and canonical preflight when corrected inputs land"
+active_card: "CARD-171 AC-11 accessibility-e2e hosted measurement"
+active_card_status: "Target preregistered; fail-closed collector, opt-in workflow and 11 PG-free tests implemented"
+active_card_next: "Run repository gates, push PR, execute hosted label lane and record run/artifact verdict"
 ---
+
+## 2026-10-01 Card 171 — AC-11 accessibility-e2e hosted 측정 수단
+
+- AC-11 8축을 대조해 이미 측정 수단이 있는 migration/security와 외부 전제가 필요한
+  PITR·물리 5노드·long-soak를 제외하고 accessibility-e2e를 첫 공백으로 선택했다.
+- [[S11_AC11_accessibility_e2e_hosted_target_v0]]을 결과보다 먼저 commit/blob으로
+  고정하고, 정본 browser journey 5개·invariant 9개·contrast 3개·keyboard/focus 2개를
+  재계산하는 collector와 opt-in workflow를 구현했다.
+- 같은 SHA의 수동 사용자 인수 부재는 `manualAcceptanceMissingCount=1`로 보존한다.
+  따라서 hosted 자동 결과를 AC-11 done이나 점수 승격으로 부풀리지 않는다. PG-free
+  단일 시험은 11 passed이며 hosted run은 PR label에서 후속 실행한다.
 
 ## 2026-09-30 Card151 Claude F1-F12 보안·측정 경계 후속
 - PR #248에서 root·service·PITR 자격을 host argv와 Docker `Config.Env`에서 제거하고 단일 보호 파일 mount로 고정했다. PITR policy의 delete 권한을 제거하고 bucket versioning을 활성화했다.
