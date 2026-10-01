@@ -276,6 +276,20 @@ def test_container_snapshot_rejects_rootlesskit_pid_instead_of_buildkitd(monkeyp
         module._container_buildkitd_snapshot("rootless-builder")
 
 
+def test_process_snapshot_rejects_non_buildkitd_comm(monkeypatch):
+    module = _module()
+    original_read_text = Path.read_text
+
+    def read_text(path, *args, **kwargs):
+        if path.name == "comm" and path.parent.name == "32":
+            return "rootlesskit\n"
+        return original_read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", read_text)
+    with pytest.raises(RuntimeError, match="not buildkitd"):
+        module._process_buildkitd_snapshot(32)
+
+
 def test_live_buildkitd_binds_exact_pid_uid_start_ticks_and_rootless_state(monkeypatch):
     module = _module()
     args = SimpleNamespace(container_name="rootless-builder", daemon_pid=None)

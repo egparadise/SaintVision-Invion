@@ -15,6 +15,7 @@ from inv.buildkit_transport import (
     BuildkitTransportConfiguration,
     RootlessBuildkitTransport,
     _normalized_platforms,
+    _verify_oci_archive,
 )
 from inv.errors import DomainError
 
@@ -102,7 +103,16 @@ def _digest(raw: bytes) -> str:
     return "sha256:" + hashlib.sha256(raw).hexdigest()
 
 
-def _write_oci_archive(path: Path, *, omit_layer: bool = False) -> tuple[str, str]:
+def _write_oci_archive(
+    path: Path,
+    *,
+    omit_layer: bool = False,
+    corrupt_layer: bool = False,
+    wrong_layer_size: bool = False,
+    extra_blob: bool = False,
+    multiple_manifests: bool = False,
+    symlink_member: bool = False,
+) -> tuple[str, str]:
     config = _json_bytes(
         {
             "architecture": "amd64",
@@ -126,7 +136,7 @@ def _write_oci_archive(path: Path, *, omit_layer: bool = False) -> tuple[str, st
                 {
                     "mediaType": "application/vnd.oci.image.layer.v1.tar",
                     "digest": layer_digest,
-                    "size": len(layer),
+                    "size": len(layer) + (1 if wrong_layer_size else 0),
                 }
             ],
         }
@@ -141,7 +151,7 @@ def _write_oci_archive(path: Path, *, omit_layer: bool = False) -> tuple[str, st
                     "digest": manifest_digest,
                     "size": len(manifest),
                 }
-            ],
+            ] * (2 if multiple_manifests else 1),
         }
     )
     files = {
@@ -151,13 +161,22 @@ def _write_oci_archive(path: Path, *, omit_layer: bool = False) -> tuple[str, st
         f"blobs/sha256/{config_digest.removeprefix('sha256:')}": config,
     }
     if not omit_layer:
-        files[f"blobs/sha256/{layer_digest.removeprefix('sha256:')}"] = layer
+        files[f"blobs/sha256/{layer_digest.removeprefix('sha256:')}"] = (
+            layer[:-1] + bytes([layer[-1] ^ 1]) if corrupt_layer else layer
+        )
+    if extra_blob:
+        files["blobs/sha256/" + "f" * 64] = b"unreferenced"
     with tarfile.open(path, mode="w") as archive:
         for name, raw in files.items():
             member = tarfile.TarInfo(name)
             member.size = len(raw)
             member.mtime = 0
             archive.addfile(member, BytesIO(raw))
+        if symlink_member:
+            member = tarfile.TarInfo("unreferenced-link")
+            member.type = tarfile.SYMTYPE
+            member.linkname = "index.json"
+            archive.addfile(member)
     return manifest_digest, config_digest
 
 
@@ -546,4 +565,26 @@ def test_reference_roundtrip_rejects_missing_referenced_oci_layer(boundary, tmp_
     with pytest.raises(DomainError, match="VERIFY-0002"):
         transport.reference_roundtrip(
             _request(), _plan(measured.provider.observation_digest), tmp_path / "missing-layer"
+        )
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "corrupt_layer",
+        "wrong_layer_size",
+        "extra_blob",
+        "multiple_manifests",
+        "symlink_member",
+    ],
+)
+def test_oci_verifier_rejects_each_independent_archive_mutation(tmp_path, mutation):
+    archive = tmp_path / f"{mutation}.oci.tar"
+    image_digest, config_digest = _write_oci_archive(archive, **{mutation: True})
+
+    with pytest.raises(DomainError, match="VERIFY-0002"):
+        _verify_oci_archive(
+            archive,
+            image_digest=image_digest,
+            config_digest=config_digest,
         )

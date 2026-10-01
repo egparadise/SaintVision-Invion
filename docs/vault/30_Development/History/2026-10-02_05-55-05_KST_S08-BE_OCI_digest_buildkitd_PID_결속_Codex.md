@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-S08-BE-OCI-DIGEST-BUILDKITD-PID-BINDING-20261002"
 title: "S08-BE OCI digest와 live buildkitd PID 결속"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T06:29:43+09:00"
+updated: "2026-10-02T06:41:34+09:00"
 source_of_truth: "Git"
 ---
 
@@ -47,6 +47,10 @@ source_of_truth: "Git"
 - 실제 daemon은 PID 32, UID 1000, start ticks 28815, process name `buildkitd`였고 왕복 전·후
   생존·identity가 일치했다. 이는 hosted CI reference 측정이며 LAN builder 운영 인수는 계속
   `BLOCKED_EXTERNAL`, 제품 consumer·lease release·durable Evidence는 계속 미결속이다.
+- 문서까지 포함한 exact head `6292ea3722b29b65df475a5e537229df7b1fd186`의 run
+  `36929190888`도 실제 rootless BuildKit OCI 왕복과 measured-reference gate를 통과했다.
+- PID 생존 재검증은 `tools/run_buildkit_rootless_roundtrip.py`의 CI evidence 도구 경계에만 있다.
+  제품 transport 조건으로 아직 연결되지 않았으므로 제품 daemon liveness 합격을 주장하지 않는다.
 
 ## 되살림 방지
 
@@ -54,3 +58,5 @@ source_of_truth: "Git"
   재계산값 불일치로 실패한다.
 - 참조 layer blob 누락, receipt 이후 start ticks 변경, rootlesskit 프로세스를 buildkitd로
   대체하는 변이는 각각 focused 부정 시험으로 실패한다.
+- 같은 크기의 layer byte 변조, descriptor size 변조, 미참조 blob, 복수 manifest, symlink member,
+  process-mode의 non-buildkitd `comm`을 각자 독립 fixture로 거부한다. focused 결과는 **78 passed**다.
