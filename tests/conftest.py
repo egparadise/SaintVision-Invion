@@ -24,6 +24,7 @@ from db_login import application_test_engine
 TEST_DB_ENV = "INV_TEST_DATABASE_URL"
 #: Migration-owned permission group; tests never change its login or password.
 APP_ROLE = "inv_app"
+FROZEN_NOW = dt.datetime(2026, 9, 9, 7, 0, 0, tzinfo=dt.timezone.utc)
 
 
 def pytest_configure(config):
@@ -125,6 +126,15 @@ def migrated(owner_engine, database_url):
         patch.setenv("INV_DATABASE_URL", database_url)
         patch.setenv("INV_MIGRATION_DSN", database_url)
         command.upgrade(config, "head")
+
+    # The product migration intentionally provisions partitions from the wall-clock
+    # month forward. This disposable test database also uses a fixed historical
+    # clock so assertions stay deterministic; once the calendar advances, that
+    # month must be provisioned explicitly or unrelated writes fail at routing.
+    from saintvision.db.partitions import ensure_partitions
+
+    with owner_engine.begin() as connection:
+        ensure_partitions(connection, now=FROZEN_NOW, lead_months=0)
     return True
 
 
@@ -185,4 +195,4 @@ def two_tenants(owner_engine, clean_tables):
 @pytest.fixture
 def frozen_now() -> dt.datetime:
     """A fixed instant, so ordering assertions do not depend on wall clock."""
-    return dt.datetime(2026, 9, 9, 7, 0, 0, tzinfo=dt.timezone.utc)
+    return FROZEN_NOW
