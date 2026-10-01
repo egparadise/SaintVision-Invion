@@ -1,15 +1,30 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.245"
+version: "1.0.246"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T16:30:21+09:00"
+updated: "2026-10-01T18:55:55+09:00"
 source_of_truth: "Git"
-active_card: "CARD-174 S08-BE admitted Build adapter"
-active_card_status: "decision-scoped one-shot claim, terminal run rejection, leased-node revalidation and redacted claim/quarantine audit implemented; focused 141 passed"
-active_card_next: "Claude re-review and exact-head CI; measured builder location/health, denial Evidence, physical cleanup and lease release remain NOT_OBSERVED"
+active_card: "CARD-184 S12 release acceptance/operator sign-off write contract"
+active_card_status: "fresh human auth, accepted two-person quorum, manifest digest binding, idempotency/concurrency, append-only withdrawal and strict public schemas designed; PG-free 22 passed"
+active_card_next: "Claude independent design review; implementation card owns OIDC auth metadata, migration, route/service/audit and hosted real-PG contention tests"
 ---
+
+## 2026-10-01 Card 184 — S12 release 수락·operator sign-off 쓰기 계약
+
+- PR #280 head `3ff89b84` 위에서 읽기 메모가 요청한 보안 결정을 계약으로 고정했다. 모든
+  결정은 server-derived active human + 5분 fresh interactive auth + live tenant permission이고,
+  accepted만 서로 다른 두 사람을 요구한다.
+- target과 measurement를 strict reference로 분리하고 manifest·proposal digest를 고정한다.
+  append-only withdrawal, exact idempotency replay, 경합 lock 순서, canonical ProblemDetails와
+  redacted audit closed set을 구현 전 정의했다.
+- Pydantic source에서 공개 JSON Schema 6개를 생성했다. 사람 ID·token·reauth proof·notes는
+  body에 없고 conditional limitation·accepted quorum은 generated schema에도 반영된다.
+  PG-free **22 passed**, export check **91 schemas match**다.
+- route·migration·OIDC claim 전달·DB·실 PG는 미구현이며 Claude 독립 검토 뒤 다음 카드가
+  구현한다. [[S12-BE_release_acceptance_operator_signoff_쓰기_계약_설계]],
+  [[2026-10-01_18-55-55_KST_S12-BE_release_acceptance_쓰기_계약_Codex]].
 
 ## 2026-10-01 Card 166 — shard parent/member cancel bridge 후속
 

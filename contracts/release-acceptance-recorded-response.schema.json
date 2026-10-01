@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "else": {
+        "properties": {
+          "confirmedOperatorCount": {
+            "const": 1
+          },
+          "operatorSignOff": {
+            "const": false
+          }
+        }
+      },
+      "if": {
+        "properties": {
+          "outcome": {
+            "const": "accepted"
+          }
+        },
+        "required": [
+          "outcome"
+        ]
+      },
+      "then": {
+        "properties": {
+          "confirmedOperatorCount": {
+            "const": 2
+          },
+          "operatorSignOff": {
+            "const": true
+          }
+        }
+      }
+    }
+  ],
+  "description": "A final decision; only two-person ``accepted`` may set sign-off true.",
+  "properties": {
+    "acceptanceId": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Acceptanceid",
+      "type": "string"
+    },
+    "acceptanceIdRef": {
+      "pattern": "^[A-Z][A-Z0-9-]{1,15}$",
+      "title": "Acceptanceidref",
+      "type": "string"
+    },
+    "acceptedManifestSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Acceptedmanifestsha256",
+      "type": "string"
+    },
+    "confirmedOperatorCount": {
+      "maximum": 2,
+      "minimum": 1,
+      "title": "Confirmedoperatorcount",
+      "type": "integer"
+    },
+    "decidedAt": {
+      "format": "date-time",
+      "title": "Decidedat",
+      "type": "string"
+    },
+    "manifestMatches": {
+      "const": true,
+      "title": "Manifestmatches",
+      "type": "boolean"
+    },
+    "operatorSignOff": {
+      "title": "Operatorsignoff",
+      "type": "boolean"
+    },
+    "outcome": {
+      "enum": [
+        "accepted",
+        "conditional",
+        "rejected"
+      ],
+      "title": "Outcome",
+      "type": "string"
+    },
+    "releaseId": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Releaseid",
+      "type": "string"
+    },
+    "replayed": {
+      "title": "Replayed",
+      "type": "boolean"
+    },
+    "state": {
+      "const": "recorded",
+      "title": "State",
+      "type": "string"
+    }
+  },
+  "required": [
+    "acceptanceId",
+    "releaseId",
+    "acceptanceIdRef",
+    "outcome",
+    "state",
+    "acceptedManifestSha256",
+    "manifestMatches",
+    "operatorSignOff",
+    "confirmedOperatorCount",
+    "decidedAt",
+    "replayed"
+  ],
+  "title": "ReleaseAcceptanceRecordedResponse",
+  "type": "object"
+}

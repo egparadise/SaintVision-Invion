@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Withdraw a final decision without deleting or rewriting its history.",
+  "properties": {
+    "reasonCode": {
+      "enum": [
+        "manifest-superseded",
+        "acceptance-error",
+        "security-concern",
+        "operator-request"
+      ],
+      "title": "Reasoncode",
+      "type": "string"
+    },
+    "targetManifestSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Targetmanifestsha256",
+      "type": "string"
+    }
+  },
+  "required": [
+    "targetManifestSha256",
+    "reasonCode"
+  ],
+  "title": "ReleaseAcceptanceWithdrawalRequest",
+  "type": "object"
+}

@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "An append-only withdrawal receipt; the withdrawn row cannot sign.",
+  "properties": {
+    "acceptanceId": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Acceptanceid",
+      "type": "string"
+    },
+    "operatorSignOff": {
+      "title": "Operatorsignoff",
+      "type": "boolean"
+    },
+    "reasonCode": {
+      "enum": [
+        "manifest-superseded",
+        "acceptance-error",
+        "security-concern",
+        "operator-request"
+      ],
+      "title": "Reasoncode",
+      "type": "string"
+    },
+    "releaseId": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Releaseid",
+      "type": "string"
+    },
+    "replayed": {
+      "title": "Replayed",
+      "type": "boolean"
+    },
+    "state": {
+      "const": "withdrawn",
+      "title": "State",
+      "type": "string"
+    },
+    "targetManifestSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Targetmanifestsha256",
+      "type": "string"
+    },
+    "withdrawalId": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Withdrawalid",
+      "type": "string"
+    },
+    "withdrawnAcceptanceCountsTowardSignOff": {
+      "const": false,
+      "title": "Withdrawnacceptancecountstowardsignoff",
+      "type": "boolean"
+    },
+    "withdrawnAt": {
+      "format": "date-time",
+      "title": "Withdrawnat",
+      "type": "string"
+    }
+  },
+  "required": [
+    "withdrawalId",
+    "acceptanceId",
+    "releaseId",
+    "state",
+    "targetManifestSha256",
+    "withdrawnAcceptanceCountsTowardSignOff",
+    "operatorSignOff",
+    "reasonCode",
+    "withdrawnAt",
+    "replayed"
+  ],
+  "title": "ReleaseAcceptanceWithdrawalResponse",
+  "type": "object"
+}

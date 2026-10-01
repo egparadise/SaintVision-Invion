@@ -1563,6 +1563,208 @@ class ReleaseAcceptanceResponse(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+ReleaseAcceptanceOutcome = Literal["accepted", "conditional", "rejected"]
+ReleaseAcceptanceReasonCode = Annotated[StrictStr, Field(pattern="^[A-Z][A-Z0-9_]{2,63}$")]
+ReleaseAcceptanceLimitation = Annotated[StrictStr, Field(min_length=1, max_length=300)]
+
+
+class ReleaseAcceptanceTargetRef(Strict):
+    """A desired acceptance target, not evidence that it was measured."""
+
+    target_id: StrictStr = Field(alias="targetId", pattern="^[A-Za-z][A-Za-z0-9_.:/-]{0,127}$")
+    target_sha256: StrictStr = Field(alias="targetSha256", pattern="^[0-9a-f]{64}$")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceMeasurementRef(Strict):
+    """One observed Evidence object, kept distinct from a target declaration."""
+
+    evidence_id: StrictStr = Field(alias="evidenceId", pattern="^[A-Za-z][A-Za-z0-9_.:/-]{0,127}$")
+    evidence_sha256: StrictStr = Field(alias="evidenceSha256", pattern="^[0-9a-f]{64}$")
+    observed_at: AwareDatetime = Field(alias="observedAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceDecisionRequest(Strict):
+    """The bounded, non-secret content an operator decides on.
+
+    Identity and fresh-authentication proof are deliberately absent: the server
+    derives both from the verified access token.  Targets say what was required;
+    measurements say what was observed.  Neither may be replaced by free text.
+    """
+
+    acceptance_id_ref: StrictStr = Field(alias="acceptanceIdRef", pattern="^[A-Z][A-Z0-9-]{1,15}$")
+    outcome: ReleaseAcceptanceOutcome
+    target_manifest_sha256: StrictStr = Field(
+        alias="targetManifestSha256", pattern="^[0-9a-f]{64}$"
+    )
+    reason_code: ReleaseAcceptanceReasonCode = Field(alias="reasonCode")
+    target_refs: list[ReleaseAcceptanceTargetRef] = Field(
+        alias="targetRefs", min_length=1, max_length=64
+    )
+    measurement_refs: list[ReleaseAcceptanceMeasurementRef] = Field(
+        alias="measurementRefs", min_length=1, max_length=64
+    )
+    known_limitations: list[ReleaseAcceptanceLimitation] = Field(
+        alias="knownLimitations", max_length=64
+    )
+
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+        json_schema_extra={
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {"outcome": {"const": "conditional"}},
+                        "required": ["outcome"],
+                    },
+                    "then": {"properties": {"knownLimitations": {"minItems": 1}}},
+                    "else": {"properties": {"knownLimitations": {"maxItems": 0}}},
+                }
+            ]
+        },
+    )
+
+    @model_validator(mode="after")
+    def _decision_is_bounded_and_unambiguous(self) -> "ReleaseAcceptanceDecisionRequest":
+        if self.outcome == "conditional" and not self.known_limitations:
+            raise ValueError("conditional acceptance requires knownLimitations")
+        if self.outcome != "conditional" and self.known_limitations:
+            raise ValueError("knownLimitations are allowed only for a conditional decision")
+        target_ids = [item.target_id for item in self.target_refs]
+        if len(set(target_ids)) != len(target_ids):
+            raise ValueError("targetRefs must have unique targetId values")
+        evidence_ids = [item.evidence_id for item in self.measurement_refs]
+        if len(set(evidence_ids)) != len(evidence_ids):
+            raise ValueError("measurementRefs must have unique evidenceId values")
+        return self
+
+
+class ReleaseAcceptanceConfirmationRequest(Strict):
+    """A second operator confirms one exact accepted proposal and manifest."""
+
+    proposal_digest: StrictStr = Field(alias="proposalDigest", pattern="^[0-9a-f]{64}$")
+    target_manifest_sha256: StrictStr = Field(
+        alias="targetManifestSha256", pattern="^[0-9a-f]{64}$"
+    )
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceProposalResponse(Strict):
+    """An accepted decision awaiting a distinct second human operator."""
+
+    proposal_id: StrictStr = Field(alias="proposalId", min_length=1, max_length=64)
+    release_id: StrictStr = Field(alias="releaseId", min_length=1, max_length=64)
+    acceptance_id_ref: StrictStr = Field(alias="acceptanceIdRef", pattern="^[A-Z][A-Z0-9-]{1,15}$")
+    outcome: Literal["accepted"]
+    state: Literal["pending_second_operator"]
+    target_manifest_sha256: StrictStr = Field(
+        alias="targetManifestSha256", pattern="^[0-9a-f]{64}$"
+    )
+    proposal_digest: StrictStr = Field(alias="proposalDigest", pattern="^[0-9a-f]{64}$")
+    required_distinct_operator_count: Literal[2] = Field(alias="requiredDistinctOperatorCount")
+    confirmed_operator_count: Literal[1] = Field(alias="confirmedOperatorCount")
+    operator_sign_off: Literal[False] = Field(alias="operatorSignOff")
+    expires_at: AwareDatetime = Field(alias="expiresAt")
+    replayed: StrictBool
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceRecordedResponse(Strict):
+    """A final decision; only two-person ``accepted`` may set sign-off true."""
+
+    acceptance_id: StrictStr = Field(alias="acceptanceId", min_length=1, max_length=64)
+    release_id: StrictStr = Field(alias="releaseId", min_length=1, max_length=64)
+    acceptance_id_ref: StrictStr = Field(alias="acceptanceIdRef", pattern="^[A-Z][A-Z0-9-]{1,15}$")
+    outcome: ReleaseAcceptanceOutcome
+    state: Literal["recorded"]
+    accepted_manifest_sha256: StrictStr = Field(
+        alias="acceptedManifestSha256", pattern="^[0-9a-f]{64}$"
+    )
+    manifest_matches: Literal[True] = Field(alias="manifestMatches")
+    operator_sign_off: StrictBool = Field(alias="operatorSignOff")
+    confirmed_operator_count: StrictInt = Field(alias="confirmedOperatorCount", ge=1, le=2)
+    decided_at: AwareDatetime = Field(alias="decidedAt")
+    replayed: StrictBool
+
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+        json_schema_extra={
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {"outcome": {"const": "accepted"}},
+                        "required": ["outcome"],
+                    },
+                    "then": {
+                        "properties": {
+                            "confirmedOperatorCount": {"const": 2},
+                            "operatorSignOff": {"const": True},
+                        }
+                    },
+                    "else": {
+                        "properties": {
+                            "confirmedOperatorCount": {"const": 1},
+                            "operatorSignOff": {"const": False},
+                        }
+                    },
+                }
+            ]
+        },
+    )
+
+    @model_validator(mode="after")
+    def _quorum_controls_sign_off(self) -> "ReleaseAcceptanceRecordedResponse":
+        if self.outcome == "accepted":
+            if not self.operator_sign_off or self.confirmed_operator_count != 2:
+                raise ValueError("accepted requires two operators and operatorSignOff=true")
+        elif self.operator_sign_off or self.confirmed_operator_count != 1:
+            raise ValueError("conditional and rejected decisions never create operator sign-off")
+        return self
+
+
+class ReleaseAcceptanceWithdrawalRequest(Strict):
+    """Withdraw a final decision without deleting or rewriting its history."""
+
+    target_manifest_sha256: StrictStr = Field(
+        alias="targetManifestSha256", pattern="^[0-9a-f]{64}$"
+    )
+    reason_code: Literal[
+        "manifest-superseded", "acceptance-error", "security-concern", "operator-request"
+    ] = Field(alias="reasonCode")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceWithdrawalResponse(Strict):
+    """An append-only withdrawal receipt; the withdrawn row cannot sign."""
+
+    withdrawal_id: StrictStr = Field(alias="withdrawalId", min_length=1, max_length=64)
+    acceptance_id: StrictStr = Field(alias="acceptanceId", min_length=1, max_length=64)
+    release_id: StrictStr = Field(alias="releaseId", min_length=1, max_length=64)
+    state: Literal["withdrawn"]
+    target_manifest_sha256: StrictStr = Field(
+        alias="targetManifestSha256", pattern="^[0-9a-f]{64}$"
+    )
+    withdrawn_acceptance_counts_toward_sign_off: Literal[False] = Field(
+        alias="withdrawnAcceptanceCountsTowardSignOff"
+    )
+    operator_sign_off: StrictBool = Field(alias="operatorSignOff")
+    reason_code: Literal[
+        "manifest-superseded", "acceptance-error", "security-concern", "operator-request"
+    ] = Field(alias="reasonCode")
+    withdrawn_at: AwareDatetime = Field(alias="withdrawnAt")
+    replayed: StrictBool
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
 class ReleaseManifestResponse(Strict):
     """A recorded release, and whether a person has signed it off.
 
