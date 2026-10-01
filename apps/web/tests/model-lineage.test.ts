@@ -1452,7 +1452,38 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
             return (lighter + 0.05) / (darker + 0.05);
           };
 
+          const darkTokenMap: Record<string, string> = {
+            '--color-bg-canvas': '#090d16',
+            '--color-bg-surface': '#111827',
+            '--color-bg-subtle': '#1f2937',
+            '--color-border-subtle': '#64748b',
+            '--color-border-strong': '#9ca3af',
+            '--color-text-primary': '#f9fafb',
+            '--color-text-secondary': '#e5e7eb',
+            '--color-text-muted': '#9ca3af',
+            '--color-text-inverse': '#0f172a',
+            '--color-brand-primary': '#60a5fa',
+            '--color-brand-primary-bg': '#1d4ed8',
+            '--color-brand-primary-fg': '#ffffff',
+            '--color-brand-hover': '#93c5fd',
+            '--color-brand-subtle': '#1e293b',
+            '--color-status-online': '#22c55e',
+            '--color-status-degraded': '#f59e0b',
+            '--color-status-offline': '#f87171',
+            '--color-status-offline-bg': '#dc2626',
+            '--color-status-neutral': '#9ca3af',
+            '--color-status-active': '#38bdf8',
+            '--color-status-lost': '#f87171',
+            '--color-status-unknown': '#d29922',
+          };
+
           const parseRgba = (colorStr: string): [number, number, number, number] => {
+            if (colorStr.startsWith('var(')) {
+              const varName = colorStr.replace(/var\(|\)/g, '').trim();
+              if (darkTokenMap[varName]) {
+                colorStr = darkTokenMap[varName];
+              }
+            }
             if (colorStr.startsWith('#')) {
               const clean = colorStr.replace('#', '');
               return [

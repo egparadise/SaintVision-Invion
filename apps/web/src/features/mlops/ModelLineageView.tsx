@@ -1017,8 +1017,8 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       <div
         data-testid="model-registry-control-panel"
         style={{
-          backgroundColor: '#161b22',
-          border: '1px solid #30363d',
+          backgroundColor: 'var(--color-bg-surface)',
+          border: '1px solid var(--color-border-subtle)',
           borderRadius: '8px',
           padding: '20px',
           display: 'flex',
@@ -1028,10 +1028,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
           <div>
-            <h2 style={{ margin: 0, fontSize: '18px', color: '#f0f6fc', fontWeight: 600 }}>
+            <h2 style={{ margin: 0, fontSize: '18px', color: 'var(--color-text-primary)', fontWeight: 600 }}>
               Model Registry & Lineage Business Control (G-05)
             </h2>
-            <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
+            <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: 'var(--color-text-muted)' }}>
               서버 정본 비즈니스 경로(Lineage 조회 · W2 등록 · W4 보존 연장 · 릴리스)와 1:1 결합된 엔터프라이즈 레지스트리
             </p>
           </div>
@@ -1051,8 +1051,8 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 verifyTarget.version === version.trim() &&
                 verifyResult.modelId === modelId.trim() &&
                 verifyResult.version === version.trim()
-                  ? '#1f6feb'
-                  : '#21262d',
+                  ? 'var(--color-brand-primary-bg)'
+                  : 'var(--color-bg-subtle)',
               border:
                 verifyResult &&
                 verifyTarget &&
@@ -1061,8 +1061,8 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 verifyTarget.version === version.trim() &&
                 verifyResult.modelId === modelId.trim() &&
                 verifyResult.version === version.trim()
-                  ? '1px solid #388bfd'
-                  : '1px solid #30363d',
+                  ? '1px solid var(--color-brand-primary)'
+                  : '1px solid var(--color-border-subtle)',
               color:
                 verifyResult &&
                 verifyTarget &&
@@ -1071,8 +1071,8 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 verifyTarget.version === version.trim() &&
                 verifyResult.modelId === modelId.trim() &&
                 verifyResult.version === version.trim()
-                  ? '#ffffff'
-                  : '#8b949e',
+                  ? 'var(--color-brand-primary-fg)'
+                  : 'var(--color-text-muted)',
             }}
           >
             {verifyResult &&
@@ -1089,7 +1089,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
         {/* Global Resource Binding Inputs */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
           <div>
-            <label htmlFor="reg-project-id" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
+            <label htmlFor="reg-project-id" style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
               Project ID
             </label>
             <input
@@ -1102,10 +1102,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               style={{
                 width: '100%',
                 padding: '6px 10px',
-                backgroundColor: '#0d1117',
-                border: '1px solid #30363d',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-border-subtle)',
                 borderRadius: '6px',
-                color: '#f0f6fc',
+                color: 'var(--color-text-primary)',
                 fontSize: '12px',
                 fontFamily: 'var(--font-mono, monospace)',
                 boxSizing: 'border-box',
@@ -1113,7 +1113,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             />
           </div>
           <div>
-            <label htmlFor="reg-model-id" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
+            <label htmlFor="reg-model-id" style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
               Model ID
             </label>
             <input
@@ -1126,10 +1126,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               style={{
                 width: '100%',
                 padding: '6px 10px',
-                backgroundColor: '#0d1117',
-                border: '1px solid #30363d',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-border-subtle)',
                 borderRadius: '6px',
-                color: '#f0f6fc',
+                color: 'var(--color-text-primary)',
                 fontSize: '12px',
                 fontFamily: 'var(--font-mono, monospace)',
                 boxSizing: 'border-box',
@@ -1137,7 +1137,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             />
           </div>
           <div>
-            <label htmlFor="reg-version" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
+            <label htmlFor="reg-version" style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
               Version
             </label>
             <input
@@ -1150,10 +1150,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               style={{
                 width: '100%',
                 padding: '6px 10px',
-                backgroundColor: '#0d1117',
-                border: '1px solid #30363d',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-border-subtle)',
                 borderRadius: '6px',
-                color: '#f0f6fc',
+                color: 'var(--color-text-primary)',
                 fontSize: '12px',
                 fontFamily: 'var(--font-mono, monospace)',
                 boxSizing: 'border-box',
@@ -1166,27 +1166,28 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             data-testid="banner-no-approve-permission"
             style={{
               fontSize: '12px',
-              color: '#f85149',
-              backgroundColor: '#3d1214',
+              color: 'var(--color-status-offline)',
+              backgroundColor: 'var(--color-bg-subtle)',
               padding: '8px 12px',
               borderRadius: '6px',
-              border: '1px solid #f85149',
+              border: '1px solid var(--color-status-offline)',
             }}
           >
             ⚠️ 거버넌스 승인 권한(canApprove)이 없어 조회만 가능합니다. (상태 변경 작업 비활성화)
           </div>
         )}
         {/* Action Tabs Navigation */}
-        <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid #30363d', paddingBottom: '10px' }}>
+        <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--color-border-subtle)', paddingBottom: '10px' }}>
           <button
             type="button"
+            data-testid="tab-trace"
             onClick={() => setActiveTab('trace')}
             style={{
               padding: '6px 14px',
               borderRadius: '6px',
-              border: activeTab === 'trace' ? '1px solid #58a6ff' : '1px solid transparent',
-              backgroundColor: activeTab === 'trace' ? '#1f242c' : 'transparent',
-              color: activeTab === 'trace' ? '#58a6ff' : '#8b949e',
+              border: activeTab === 'trace' ? '1px solid var(--color-brand-primary)' : '1px solid transparent',
+              backgroundColor: activeTab === 'trace' ? 'var(--color-bg-subtle)' : 'transparent',
+              color: activeTab === 'trace' ? 'var(--color-brand-primary)' : 'var(--color-text-muted)',
               cursor: 'pointer',
               fontSize: '12px',
               fontWeight: 600,
@@ -1196,13 +1197,14 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           </button>
           <button
             type="button"
+            data-testid="tab-register"
             onClick={() => setActiveTab('register')}
             style={{
               padding: '6px 14px',
               borderRadius: '6px',
-              border: activeTab === 'register' ? '1px solid #58a6ff' : '1px solid transparent',
-              backgroundColor: activeTab === 'register' ? '#1f242c' : 'transparent',
-              color: activeTab === 'register' ? '#58a6ff' : '#8b949e',
+              border: activeTab === 'register' ? '1px solid var(--color-brand-primary)' : '1px solid transparent',
+              backgroundColor: activeTab === 'register' ? 'var(--color-bg-subtle)' : 'transparent',
+              color: activeTab === 'register' ? 'var(--color-brand-primary)' : 'var(--color-text-muted)',
               cursor: 'pointer',
               fontSize: '12px',
               fontWeight: 600,
@@ -1212,13 +1214,14 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           </button>
           <button
             type="button"
+            data-testid="tab-pin"
             onClick={() => setActiveTab('pin')}
             style={{
               padding: '6px 14px',
               borderRadius: '6px',
-              border: activeTab === 'pin' ? '1px solid #58a6ff' : '1px solid transparent',
-              backgroundColor: activeTab === 'pin' ? '#1f242c' : 'transparent',
-              color: activeTab === 'pin' ? '#58a6ff' : '#8b949e',
+              border: activeTab === 'pin' ? '1px solid var(--color-brand-primary)' : '1px solid transparent',
+              backgroundColor: activeTab === 'pin' ? 'var(--color-bg-subtle)' : 'transparent',
+              color: activeTab === 'pin' ? 'var(--color-brand-primary)' : 'var(--color-text-muted)',
               cursor: 'pointer',
               fontSize: '12px',
               fontWeight: 600,
@@ -1228,13 +1231,14 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           </button>
           <button
             type="button"
+            data-testid="tab-release"
             onClick={() => setActiveTab('release')}
             style={{
               padding: '6px 14px',
               borderRadius: '6px',
-              border: activeTab === 'release' ? '1px solid #58a6ff' : '1px solid transparent',
-              backgroundColor: activeTab === 'release' ? '#1f242c' : 'transparent',
-              color: activeTab === 'release' ? '#58a6ff' : '#8b949e',
+              border: activeTab === 'release' ? '1px solid var(--color-brand-primary)' : '1px solid transparent',
+              backgroundColor: activeTab === 'release' ? 'var(--color-bg-subtle)' : 'transparent',
+              color: activeTab === 'release' ? 'var(--color-brand-primary)' : 'var(--color-text-muted)',
               cursor: 'pointer',
               fontSize: '12px',
               fontWeight: 600,
@@ -1249,9 +1253,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             style={{
               padding: '6px 14px',
               borderRadius: '6px',
-              border: activeTab === 'verify' ? '1px solid #58a6ff' : '1px solid transparent',
-              backgroundColor: activeTab === 'verify' ? '#1f242c' : 'transparent',
-              color: activeTab === 'verify' ? '#58a6ff' : '#8b949e',
+              border: activeTab === 'verify' ? '1px solid var(--color-brand-primary)' : '1px solid transparent',
+              backgroundColor: activeTab === 'verify' ? 'var(--color-bg-subtle)' : 'transparent',
+              color: activeTab === 'verify' ? 'var(--color-brand-primary)' : 'var(--color-text-muted)',
               cursor: 'pointer',
               fontSize: '12px',
               fontWeight: 600,
@@ -1266,9 +1270,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             style={{
               padding: '6px 14px',
               borderRadius: '6px',
-              border: activeTab === 'eval-run' ? '1px solid #58a6ff' : '1px solid transparent',
-              backgroundColor: activeTab === 'eval-run' ? '#1f242c' : 'transparent',
-              color: activeTab === 'eval-run' ? '#58a6ff' : '#8b949e',
+              border: activeTab === 'eval-run' ? '1px solid var(--color-brand-primary)' : '1px solid transparent',
+              backgroundColor: activeTab === 'eval-run' ? 'var(--color-bg-subtle)' : 'transparent',
+              color: activeTab === 'eval-run' ? 'var(--color-brand-primary)' : 'var(--color-text-muted)',
               cursor: 'pointer',
               fontSize: '12px',
               fontWeight: 600,
@@ -1290,7 +1294,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             >
               {queryLoading ? '계보 조회 중...' : '계보 조회 실행 (GET /lineage)'}
             </Button>
-            <span style={{ fontSize: '11px', color: '#8b949e' }}>
+            <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
               Path: <code>/v1/projects/{projectId || '{project_id}'}/models/{modelId || '{model_id}'}/versions/{version || '{version}'}/lineage</code>
             </span>
           </div>
@@ -1300,7 +1304,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           <form noValidate onSubmit={handleRegisterVersion} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
               <div>
-                <label htmlFor="input-register-version" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
+                <label htmlFor="input-register-version" style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
                   등록할 버전 명칭 *
                 </label>
                 <input
@@ -1313,10 +1317,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                   style={{
                     width: '100%',
                     padding: '6px 10px',
-                    backgroundColor: '#0d1117',
-                    border: '1px solid #30363d',
+                    backgroundColor: 'var(--color-bg-subtle)',
+                    border: '1px solid var(--color-border-subtle)',
                     borderRadius: '4px',
-                    color: '#c9d1d9',
+                    color: 'var(--color-text-secondary)',
                     fontSize: '12px',
                     fontFamily: 'var(--font-mono, monospace)',
                     boxSizing: 'border-box',
@@ -1324,7 +1328,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 />
               </div>
               <div>
-                <label htmlFor="input-register-sha256" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
+                <label htmlFor="input-register-sha256" style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
                   Content SHA-256 (64 hex) *
                 </label>
                 <input
@@ -1337,10 +1341,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                   style={{
                     width: '100%',
                     padding: '6px 10px',
-                    backgroundColor: '#0d1117',
-                    border: '1px solid #30363d',
+                    backgroundColor: 'var(--color-bg-subtle)',
+                    border: '1px solid var(--color-border-subtle)',
                     borderRadius: '4px',
-                    color: '#c9d1d9',
+                    color: 'var(--color-text-secondary)',
                     fontSize: '12px',
                     fontFamily: 'var(--font-mono, monospace)',
                     boxSizing: 'border-box',
@@ -1348,7 +1352,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 />
               </div>
               <div>
-                <label htmlFor="input-register-bytesize" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
+                <label htmlFor="input-register-bytesize" style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
                   Byte Size
                 </label>
                 <input
@@ -1361,10 +1365,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                   style={{
                     width: '100%',
                     padding: '6px 10px',
-                    backgroundColor: '#0d1117',
-                    border: '1px solid #30363d',
+                    backgroundColor: 'var(--color-bg-subtle)',
+                    border: '1px solid var(--color-border-subtle)',
                     borderRadius: '4px',
-                    color: '#c9d1d9',
+                    color: 'var(--color-text-secondary)',
                     fontSize: '12px',
                     fontFamily: 'var(--font-mono, monospace)',
                     boxSizing: 'border-box',
@@ -1384,7 +1388,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 {regLoading ? '등록 중...' : '모델 버전 등록 (POST /versions)'}
               </Button>
               {!canApprove && (
-                <span style={{ fontSize: '11px', color: '#fed7aa' }}>
+                <span style={{ fontSize: '11px', color: 'var(--color-status-degraded)' }}>
                   ⚠️ 승인 권한(canApprove)이 필요한 작업입니다.
                 </span>
               )}
@@ -1395,7 +1399,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
         {activeTab === 'pin' && (
           <form noValidate onSubmit={handleExtendPin} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div>
-              <label htmlFor="input-pin-until" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
+              <label htmlFor="input-pin-until" style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
                 보존 만료 시각 (ISO 8601 with Offset) *
               </label>
               <input
@@ -1408,10 +1412,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 style={{
                   width: '320px',
                   padding: '6px 10px',
-                  backgroundColor: '#0d1117',
-                  border: '1px solid #30363d',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-border-subtle)',
                   borderRadius: '4px',
-                  color: '#c9d1d9',
+                  color: 'var(--color-text-secondary)',
                   fontSize: '12px',
                   fontFamily: 'var(--font-mono, monospace)',
                   boxSizing: 'border-box',
@@ -1430,7 +1434,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 {pinLoading ? '연장 중...' : '보존 고정 연장 (POST /retention-pin)'}
               </Button>
               {!canApprove && (
-                <span style={{ fontSize: '11px', color: '#fed7aa' }}>
+                <span style={{ fontSize: '11px', color: 'var(--color-status-degraded)' }}>
                   ⚠️ 승인 권한(canApprove)이 필요한 작업입니다.
                 </span>
               )}
@@ -1442,7 +1446,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           <form noValidate onSubmit={handleReleaseModel} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' }}>
               <div>
-                <label htmlFor="input-release-license" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
+                <label htmlFor="input-release-license" style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
                   라이선스 정책 (licensePolicy) *
                 </label>
                 <input
@@ -1455,17 +1459,17 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                   style={{
                     width: '100%',
                     padding: '6px 10px',
-                    backgroundColor: '#0d1117',
-                    border: '1px solid #30363d',
+                    backgroundColor: 'var(--color-bg-subtle)',
+                    border: '1px solid var(--color-border-subtle)',
                     borderRadius: '4px',
-                    color: '#c9d1d9',
+                    color: 'var(--color-text-secondary)',
                     fontSize: '12px',
                     boxSizing: 'border-box',
                   }}
                 />
               </div>
               <div>
-                <label htmlFor="select-release-classification" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
+                <label htmlFor="select-release-classification" style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
                   배포 분류 (classification) *
                 </label>
                 <select
@@ -1476,10 +1480,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                   style={{
                     width: '100%',
                     padding: '6px 10px',
-                    backgroundColor: '#0d1117',
-                    border: '1px solid #30363d',
+                    backgroundColor: 'var(--color-bg-subtle)',
+                    border: '1px solid var(--color-border-subtle)',
                     borderRadius: '4px',
-                    color: '#c9d1d9',
+                    color: 'var(--color-text-secondary)',
                     fontSize: '12px',
                     boxSizing: 'border-box',
                   }}
@@ -1502,7 +1506,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 {relLoading ? '릴리스 중...' : '모델 릴리스 (POST /release)'}
               </Button>
               {!canApprove && (
-                <span style={{ fontSize: '11px', color: '#fed7aa' }}>
+                <span style={{ fontSize: '11px', color: 'var(--color-status-degraded)' }}>
                   ⚠️ 승인 권한(canApprove)이 필요한 작업입니다.
                 </span>
               )}
@@ -1512,11 +1516,11 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
         {/* Tab Content: 5. W3 Verify */}
         {activeTab === 'verify' && (
           <form noValidate onSubmit={handleVerifyVersion} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div style={{ fontSize: '12px', color: '#8b949e' }}>
+            <div style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
               ℹ️ W3 커널 측정 검증: 서버 신뢰 워커(trusted-worker)의 계측 기록(measurementId)을 모델 버전에 결속합니다. 측정값(digest, size 등)은 화면이 조작/생성할 수 없으며 오직 커널 기록된 측정 ID만 전송합니다 (정직성 원칙).
             </div>
             <div>
-              <label htmlFor="mvm-measurement-id" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
+              <label htmlFor="mvm-measurement-id" style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
                 커널 측정 ID (measurementId - mvm_ + 26자리 Crockford Base32) *
               </label>
               <input
@@ -1529,10 +1533,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 style={{
                   width: '100%',
                   padding: '6px 10px',
-                  backgroundColor: '#0d1117',
-                  border: '1px solid #30363d',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-border-subtle)',
                   borderRadius: '4px',
-                  color: '#c9d1d9',
+                  color: 'var(--color-text-secondary)',
                   fontSize: '12px',
                   boxSizing: 'border-box',
                 }}
@@ -1550,7 +1554,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 {verifyLoading ? '검증 처리 중...' : 'W3 커널 측정 검증 제출 (POST /models/.../verify)'}
               </Button>
               {!canApprove && (
-                <span style={{ fontSize: '11px', color: '#fed7aa' }}>
+                <span style={{ fontSize: '11px', color: 'var(--color-status-degraded)' }}>
                   ⚠️ 승인 권한(canApprove)이 필요한 작업입니다.
                 </span>
               )}
@@ -1562,7 +1566,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           <form noValidate onSubmit={handleStartEvalRun} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' }}>
               <div>
-                <label htmlFor="eval-suite-id" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
+                <label htmlFor="eval-suite-id" style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
                   평가 스위트 ID (suiteId) *
                 </label>
                 <input
@@ -1575,17 +1579,17 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                   style={{
                     width: '100%',
                     padding: '6px 10px',
-                    backgroundColor: '#0d1117',
-                    border: '1px solid #30363d',
+                    backgroundColor: 'var(--color-bg-subtle)',
+                    border: '1px solid var(--color-border-subtle)',
                     borderRadius: '4px',
-                    color: '#c9d1d9',
+                    color: 'var(--color-text-secondary)',
                     fontSize: '12px',
                     boxSizing: 'border-box',
                   }}
                 />
               </div>
               <div>
-                <label htmlFor="eval-adapter" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
+                <label htmlFor="eval-adapter" style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
                   어댑터 식별자 (adapter - codex-cli | claude-code | gemini-cli | antigravity) *
                 </label>
                 <select
@@ -1596,10 +1600,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                   style={{
                     width: '100%',
                     padding: '6px 10px',
-                    backgroundColor: '#0d1117',
-                    border: '1px solid #30363d',
+                    backgroundColor: 'var(--color-bg-subtle)',
+                    border: '1px solid var(--color-border-subtle)',
                     borderRadius: '4px',
-                    color: '#c9d1d9',
+                    color: 'var(--color-text-secondary)',
                     fontSize: '12px',
                     boxSizing: 'border-box',
                   }}
@@ -1614,7 +1618,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' }}>
               <div>
-                <label htmlFor="eval-prompt-ver" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
+                <label htmlFor="eval-prompt-ver" style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
                   프롬프트 버전 (promptVersion - 선택)
                 </label>
                 <input
@@ -1627,17 +1631,17 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                   style={{
                     width: '100%',
                     padding: '6px 10px',
-                    backgroundColor: '#0d1117',
-                    border: '1px solid #30363d',
+                    backgroundColor: 'var(--color-bg-subtle)',
+                    border: '1px solid var(--color-border-subtle)',
                     borderRadius: '4px',
-                    color: '#c9d1d9',
+                    color: 'var(--color-text-secondary)',
                     fontSize: '12px',
                     boxSizing: 'border-box',
                   }}
                 />
               </div>
               <div>
-                <label htmlFor="eval-ctx-ver" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
+                <label htmlFor="eval-ctx-ver" style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
                   컨텍스트 버전 (contextVersion - 선택)
                 </label>
                 <input
@@ -1650,10 +1654,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                   style={{
                     width: '100%',
                     padding: '6px 10px',
-                    backgroundColor: '#0d1117',
-                    border: '1px solid #30363d',
+                    backgroundColor: 'var(--color-bg-subtle)',
+                    border: '1px solid var(--color-border-subtle)',
                     borderRadius: '4px',
-                    color: '#c9d1d9',
+                    color: 'var(--color-text-secondary)',
                     fontSize: '12px',
                     boxSizing: 'border-box',
                   }}
@@ -1669,12 +1673,12 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 checked={evalRequirePinning}
                 onChange={(e) => handleEvalRequirePinningChange(e.target.checked)}
               />
-              <label htmlFor="eval-pinning" style={{ fontSize: '12px', color: '#c9d1d9' }}>
+              <label htmlFor="eval-pinning" style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
                 모델 고정 필수 요구 (requireModelPinning — 재현 불가능한 빌드 차단)
               </label>
             </div>
 
-            <div style={{ fontSize: '11px', color: '#8b949e', backgroundColor: '#161b22', padding: '8px', borderRadius: '4px' }}>
+            <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', backgroundColor: 'var(--color-bg-surface)', padding: '8px', borderRadius: '4px' }}>
               ℹ️ W5 평가는 지정된 어댑터 CLI를 통해 테스트 스위트를 실행하고 엄격한 게이트 판정 결과를 반환합니다.
             </div>
 
@@ -1690,7 +1694,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 {evalLoading ? '평가 실행 중...' : 'W5 평가 실행 시작 (POST /eval/suites/.../runs)'}
               </Button>
               {!canApprove && (
-                <span style={{ fontSize: '11px', color: '#fed7aa' }}>
+                <span style={{ fontSize: '11px', color: 'var(--color-status-degraded)' }}>
                   ⚠️ 승인 권한(canApprove)이 필요한 작업입니다.
                 </span>
               )}
@@ -1706,9 +1710,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           style={{
             padding: '14px 18px',
             borderRadius: '8px',
-            backgroundColor: 'rgba(248, 81, 73, 0.12)',
-            border: '1px solid #f85149',
-            color: '#f85149',
+            backgroundColor: 'var(--color-bg-subtle)',
+            border: '1px solid var(--color-status-offline)',
+            color: 'var(--color-status-offline)',
             fontSize: '13px',
             lineHeight: 1.5,
           }}
@@ -1721,7 +1725,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               data-testid="problem-code"
               style={{
                 fontFamily: 'var(--font-mono, monospace)',
-                backgroundColor: 'rgba(248, 81, 73, 0.2)',
+                backgroundColor: 'var(--color-bg-subtle)',
                 padding: '2px 8px',
                 borderRadius: '4px',
                 fontSize: '11px',
@@ -1731,10 +1735,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               {problemDetails.code}
             </span>
           </div>
-          <div data-testid="problem-detail" style={{ marginTop: '6px', color: '#ffb4a9' }}>
+          <div data-testid="problem-detail" style={{ marginTop: '6px', color: 'var(--color-status-offline)' }}>
             {problemDetails.detail}
           </div>
-          <div style={{ marginTop: '4px', fontSize: '11px', color: '#8b949e', fontFamily: 'var(--font-mono, monospace)' }}>
+          <div style={{ marginTop: '4px', fontSize: '11px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono, monospace)' }}>
             Trace ID: <span data-testid="problem-trace-id">{problemDetails.traceId}</span>
             {problemDetails.causeRef && ` • Cause: ${problemDetails.causeRef}`}
           </div>
@@ -1748,9 +1752,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           style={{
             padding: '12px 18px',
             borderRadius: '6px',
-            backgroundColor: 'rgba(248, 81, 73, 0.12)',
-            border: '1px solid #f85149',
-            color: '#f85149',
+            backgroundColor: 'var(--color-bg-subtle)',
+            border: '1px solid var(--color-status-offline)',
+            color: 'var(--color-status-offline)',
             fontSize: '13px',
           }}
         >
@@ -1772,16 +1776,16 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           style={{
             padding: '14px 18px',
             borderRadius: '8px',
-            backgroundColor: 'rgba(46, 160, 67, 0.12)',
-            border: '1px solid #3fb950',
-            color: '#3fb950',
+            backgroundColor: 'var(--color-bg-subtle)',
+            border: '1px solid var(--color-status-online)',
+            color: 'var(--color-status-online)',
             fontSize: '13px',
           }}
         >
           <div style={{ fontWeight: 600 }}>
             ✔ 모델 무결성 검증 완료 (200 OK) — {verifyResult.newlyVerified ? '새로 검증됨' : '이미 검증됨'}
           </div>
-          <div style={{ marginTop: '6px', fontSize: '12px', color: '#c9d1d9', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px' }}>
+          <div style={{ marginTop: '6px', fontSize: '12px', color: 'var(--color-text-secondary)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px' }}>
             <div>Version ID: <code>{verifyResult.modelVersionId}</code></div>
             <div>Version: <strong>{verifyResult.version}</strong> (Stage: {verifyResult.stage})</div>
             <div>Content Digest: <code>{verifyResult.contentSha256.slice(0, 16)}...</code></div>
@@ -1803,9 +1807,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           style={{
             padding: '14px 18px',
             borderRadius: '8px',
-            backgroundColor: evalResult.passedGate ? 'rgba(46, 160, 67, 0.12)' : 'rgba(248, 81, 73, 0.12)',
-            border: evalResult.passedGate ? '1px solid #3fb950' : '1px solid #f85149',
-            color: evalResult.passedGate ? '#3fb950' : '#f85149',
+            backgroundColor: evalResult.passedGate ? 'var(--color-bg-subtle)' : 'var(--color-bg-subtle)',
+            border: evalResult.passedGate ? '1px solid var(--color-status-online)' : '1px solid var(--color-status-offline)',
+            color: evalResult.passedGate ? 'var(--color-status-online)' : 'var(--color-status-offline)',
             fontSize: '13px',
           }}
         >
@@ -1824,14 +1828,14 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 borderRadius: '4px',
                 fontSize: '11px',
                 fontWeight: 700,
-                backgroundColor: evalResult.passedGate ? '#1a7f37' : '#cf222e',
-                color: '#ffffff',
+                backgroundColor: evalResult.passedGate ? 'var(--color-status-online)' : 'var(--color-status-offline)',
+                color: 'var(--color-brand-primary-fg)',
               }}
             >
               {evalResult.passedGate ? 'GATE PASS' : 'GATE FAIL'}
             </span>
           </div>
-          <div style={{ marginTop: '6px', fontSize: '12px', color: '#c9d1d9' }}>
+          <div style={{ marginTop: '6px', fontSize: '12px', color: 'var(--color-text-secondary)' }}>
             <div>통과: {evalResult.passedCases} / {evalResult.totalCases} 케이스 (위반 {evalResult.violations}건)</div>
             <div style={{ marginTop: '4px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px' }}>
               <div>Run ID: <code>{evalResult.evalRunId}</code></div>
@@ -1840,7 +1844,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               <div>Ended: <span data-testid="eval-ended-at">{evalResult.endedAt ? evalResult.endedAt : 'NOT_OBSERVED'}</span></div>
             </div>
             {evalResult.componentVersions && Object.keys(evalResult.componentVersions).length > 0 && (
-              <div style={{ marginTop: '6px', fontSize: '11px', color: '#8b949e' }}>
+              <div style={{ marginTop: '6px', fontSize: '11px', color: 'var(--color-text-muted)' }}>
                 <span style={{ fontWeight: 600 }}>구성요소 버전 (componentVersions): </span>
                 <span data-testid="eval-component-versions">
                   {Object.entries(evalResult.componentVersions)
@@ -1859,14 +1863,14 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           style={{
             padding: '14px 18px',
             borderRadius: '8px',
-            backgroundColor: 'rgba(46, 160, 67, 0.12)',
-            border: '1px solid #3fb950',
-            color: '#3fb950',
+            backgroundColor: 'var(--color-bg-subtle)',
+            border: '1px solid var(--color-status-online)',
+            color: 'var(--color-status-online)',
             fontSize: '13px',
           }}
         >
           <div style={{ fontWeight: 600 }}>✔ 모델 버전 등록 완료 (201 Created)</div>
-          <div style={{ marginTop: '6px', fontSize: '12px', color: '#c9d1d9', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px' }}>
+          <div style={{ marginTop: '6px', fontSize: '12px', color: 'var(--color-text-secondary)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px' }}>
             <div>Version ID: <code>{regResult.modelVersionId}</code></div>
             <div>Version: <strong>{regResult.version}</strong> (Stage: {regResult.stage})</div>
             <div>Content Digest: <code>{regResult.contentSha256.slice(0, 16)}...</code></div>
@@ -1883,16 +1887,16 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           style={{
             padding: '14px 18px',
             borderRadius: '8px',
-            backgroundColor: 'rgba(46, 160, 67, 0.12)',
-            border: '1px solid #3fb950',
-            color: '#3fb950',
+            backgroundColor: 'var(--color-bg-subtle)',
+            border: '1px solid var(--color-status-online)',
+            color: 'var(--color-status-online)',
             fontSize: '13px',
           }}
         >
           <div style={{ fontWeight: 600 }}>
             ✔ 보존 고정 판정 완료 (200 OK) — {pinResult.extended ? '고정 연장됨 (Extended)' : '기존 고정 유지 (연장 없음)'}
           </div>
-          <div style={{ marginTop: '6px', fontSize: '12px', color: '#c9d1d9', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px' }}>
+          <div style={{ marginTop: '6px', fontSize: '12px', color: 'var(--color-text-secondary)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px' }}>
             <div>Version ID: <code>{pinResult.modelVersionId}</code></div>
             <div>Version: <strong>{pinResult.version}</strong> (Stage: {pinResult.stage})</div>
             <div>Pinned Until: <strong>{pinResult.retentionPinnedUntil}</strong></div>
@@ -1907,9 +1911,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           style={{
             padding: '14px 18px',
             borderRadius: '8px',
-            backgroundColor: relIsReplay ? 'rgba(56, 139, 253, 0.12)' : 'rgba(46, 160, 67, 0.12)',
-            border: `1px solid ${relIsReplay ? '#388bfd' : '#3fb950'}`,
-            color: relIsReplay ? '#58a6ff' : '#3fb950',
+            backgroundColor: relIsReplay ? 'var(--color-brand-subtle)' : 'var(--color-bg-subtle)',
+            border: `1px solid ${relIsReplay ? 'var(--color-brand-primary)' : 'var(--color-status-online)'}`,
+            color: relIsReplay ? 'var(--color-brand-primary)' : 'var(--color-status-online)',
             fontSize: '13px',
           }}
         >
@@ -1918,17 +1922,17 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               ? 'ℹ️ 모델 릴리스 확인 완료 (재시도 응답 — 서버 원장 결과, 200 OK)'
               : '✔ 모델 릴리스 완료 (200 OK)'}
           </div>
-          <div style={{ marginTop: '4px', fontSize: '11px', color: '#8b949e' }}>
+          <div style={{ marginTop: '4px', fontSize: '11px', color: 'var(--color-text-muted)' }}>
             <span data-testid="release-replay-indicator">
               {relIsReplay
                 ? '재시도 응답 — 서버 원장 결과 (저장된 응답일 수 있음)'
                 : '신규 릴리스 완료 (Fresh)'}
             </span>
           </div>
-          <div style={{ marginTop: '6px', fontSize: '12px', color: '#c9d1d9', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px' }}>
+          <div style={{ marginTop: '6px', fontSize: '12px', color: 'var(--color-text-secondary)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px' }}>
             <div>Version ID: <code>{relResult.modelVersionId}</code></div>
             <div>Version: <strong>{relResult.version}</strong></div>
-            <div>Stage: <strong style={{ color: '#58a6ff' }}>{relResult.stage}</strong></div>
+            <div>Stage: <strong style={{ color: 'var(--color-brand-primary)' }}>{relResult.stage}</strong></div>
             <div>Content Digest: <code>{relResult.contentSha256.slice(0, 16)}...</code></div>
           </div>
         </div>
@@ -1938,8 +1942,8 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
         <div
           data-testid="real-lineage-container"
           style={{
-            backgroundColor: '#161b22',
-            border: '1px solid #30363d',
+            backgroundColor: 'var(--color-bg-surface)',
+            border: '1px solid var(--color-border-subtle)',
             borderRadius: '8px',
             padding: '24px',
             display: 'flex',
@@ -1950,11 +1954,11 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           {/* Header & Truth Badges */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
             <div>
-              <h3 style={{ margin: 0, fontSize: '16px', color: '#f0f6fc' }}>
+              <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--color-text-primary)' }}>
                 [{realTrace.version}] 실서버 계보 추적 결과 (ModelLineageTraceResponse)
               </h3>
-              <span style={{ fontSize: '12px', color: '#8b949e' }}>
-                Model Version ID: <code>{realTrace.modelVersionId}</code> • Stage: <strong style={{ color: '#58a6ff' }}>{realTrace.stage.toUpperCase()}</strong>
+              <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                Model Version ID: <code>{realTrace.modelVersionId}</code> • Stage: <strong style={{ color: 'var(--color-brand-primary)' }}>{realTrace.stage.toUpperCase()}</strong>
                 {realTrace.producedByRunId && <> • Produced By Run: <code>{realTrace.producedByRunId}</code></>}
               </span>
             </div>
@@ -1966,9 +1970,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                   borderRadius: '4px',
                   fontSize: '11px',
                   fontWeight: 700,
-                  backgroundColor: realTrace.fullyTraceable ? 'rgba(46, 160, 67, 0.2)' : 'rgba(210, 153, 34, 0.2)',
-                  color: realTrace.fullyTraceable ? '#3fb950' : '#d29922',
-                  border: `1px solid ${realTrace.fullyTraceable ? '#3fb950' : '#d29922'}`,
+                  backgroundColor: realTrace.fullyTraceable ? 'var(--color-bg-subtle)' : 'var(--color-bg-subtle)',
+                  color: realTrace.fullyTraceable ? 'var(--color-status-online)' : 'var(--color-status-degraded)',
+                  border: `1px solid ${realTrace.fullyTraceable ? 'var(--color-status-online)' : 'var(--color-status-degraded)'}`,
                 }}
               >
                 {realTrace.fullyTraceable ? '완전 추적 가능 (Fully Traceable)' : '불완전 추적 (Incomplete Trace)'}
@@ -1981,9 +1985,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                     borderRadius: '4px',
                     fontSize: '11px',
                     fontWeight: 700,
-                    backgroundColor: 'rgba(56, 139, 253, 0.2)',
-                    color: '#58a6ff',
-                    border: '1px solid #58a6ff',
+                    backgroundColor: 'var(--color-brand-subtle)',
+                    color: 'var(--color-brand-primary)',
+                    border: '1px solid var(--color-brand-primary)',
                   }}
                 >
                   프로젝트 범위 제한 적용
@@ -2008,22 +2012,22 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                   key={kind}
                   data-testid={`trace-${kind}-unobserved`}
                   style={{
-                    backgroundColor: '#0d1117',
-                    border: '1px solid #30363d',
+                    backgroundColor: 'var(--color-bg-subtle)',
+                    border: '1px solid var(--color-border-subtle)',
                     borderRadius: '6px',
                     padding: '12px',
                   }}
                 >
-                  <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>{label}</div>
-                  <div style={{ fontSize: '14px', fontWeight: 700, color: unresolvedItem ? '#58a6ff' : '#8b949e', marginTop: '4px' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>{label}</div>
+                  <div style={{ fontSize: '14px', fontWeight: 700, color: unresolvedItem ? 'var(--color-brand-primary)' : 'var(--color-text-muted)', marginTop: '4px' }}>
                     {unresolvedItem ? `상세 범위 외 (${unresolvedItem.count}건 관측)` : '관측된 항목 없음 (0건)'}
                   </div>
                   {isEval && (
-                    <div style={{ fontSize: '12px', fontWeight: 600, color: '#d29922', marginTop: '4px' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-status-degraded)', marginTop: '4px' }}>
                       정량 평가 점수: NOT_OBSERVED (미관측)
                     </div>
                   )}
-                  <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '2px' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>
                     {isEval
                       ? '응답 스키마에 미포함되어 가짜 점수 합성을 차단합니다.'
                       : '프로젝트 멤버 조회 경계 밖으로 서버에서 미제공됩니다.'}
@@ -2034,17 +2038,17 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           </div>
           {/* Datasets Table */}
           <div data-testid="real-lineage-datasets">
-            <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#f0f6fc' }}>
+            <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', color: 'var(--color-text-primary)' }}>
               연결된 데이터셋 버전 ({realTrace.datasets.length}건)
             </h4>
             {realTrace.datasets.length === 0 ? (
-              <div style={{ fontSize: '12px', color: '#8b949e', padding: '12px', backgroundColor: '#0d1117', borderRadius: '6px' }}>
+              <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', padding: '12px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: '6px' }}>
                 연결된 데이터셋이 없습니다.
               </div>
             ) : (
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', color: '#c9d1d9' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', color: 'var(--color-text-secondary)' }}>
                 <thead>
-                  <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
+                  <tr style={{ borderBottom: '1px solid var(--color-border-subtle)', textAlign: 'left', color: 'var(--color-text-muted)' }}>
                     <th style={{ padding: '6px' }}>Dataset Version ID</th>
                     <th style={{ padding: '6px' }}>Version</th>
                     <th style={{ padding: '6px' }}>Content SHA-256</th>
@@ -2053,11 +2057,11 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 </thead>
                 <tbody>
                   {realTrace.datasets.map((d) => (
-                    <tr key={d.datasetVersionId} style={{ borderBottom: '1px solid #21262d' }}>
+                    <tr key={d.datasetVersionId} style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
                       <td style={{ padding: '8px 6px', fontFamily: 'var(--font-mono, monospace)' }}>{d.datasetVersionId}</td>
                       <td style={{ padding: '8px 6px', fontWeight: 600 }}>{d.version}</td>
                       <td style={{ padding: '8px 6px', fontFamily: 'var(--font-mono, monospace)' }}>{d.contentSha256.slice(0, 16)}...</td>
-                      <td style={{ padding: '8px 6px', color: '#58a6ff' }}>{d.uri}</td>
+                      <td style={{ padding: '8px 6px', color: 'var(--color-brand-primary)' }}>{d.uri}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -2066,17 +2070,17 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           </div>
           {/* Deployments Table */}
           <div data-testid="real-lineage-deployments">
-            <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#f0f6fc' }}>
+            <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', color: 'var(--color-text-primary)' }}>
               배포 기록 ({realTrace.deployments.length}건)
             </h4>
             {realTrace.deployments.length === 0 ? (
-              <div style={{ fontSize: '12px', color: '#8b949e', padding: '12px', backgroundColor: '#0d1117', borderRadius: '6px' }}>
+              <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', padding: '12px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: '6px' }}>
                 배포 내역이 없습니다 (deployments: []).
               </div>
             ) : (
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', color: '#c9d1d9' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', color: 'var(--color-text-secondary)' }}>
                 <thead>
-                  <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
+                  <tr style={{ borderBottom: '1px solid var(--color-border-subtle)', textAlign: 'left', color: 'var(--color-text-muted)' }}>
                     <th style={{ padding: '6px' }}>Deployment ID</th>
                     <th style={{ padding: '6px' }}>Environment</th>
                     <th style={{ padding: '6px' }}>Status</th>
@@ -2087,10 +2091,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 </thead>
                 <tbody>
                   {realTrace.deployments.map((dep) => (
-                    <tr key={dep.deploymentId} style={{ borderBottom: '1px solid #21262d' }}>
+                    <tr key={dep.deploymentId} style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
                       <td style={{ padding: '8px 6px', fontFamily: 'var(--font-mono, monospace)' }}>{dep.deploymentId}</td>
                       <td style={{ padding: '8px 6px' }}>
-                        <span style={{ textTransform: 'uppercase', fontWeight: 600, color: dep.environment === 'pilot' ? '#3fb950' : '#58a6ff' }}>
+                        <span style={{ textTransform: 'uppercase', fontWeight: 600, color: dep.environment === 'pilot' ? 'var(--color-status-online)' : 'var(--color-brand-primary)' }}>
                           {dep.environment}
                         </span>
                       </td>
@@ -2107,13 +2111,13 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           {/* Missing & Unresolved */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
             <div data-testid="real-lineage-missing">
-              <h4 style={{ margin: '0 0 6px 0', fontSize: '13px', color: '#f0f6fc' }}>
+              <h4 style={{ margin: '0 0 6px 0', fontSize: '13px', color: 'var(--color-text-primary)' }}>
                 누락된 주체 (Missing: {realTrace.missing.length}건)
               </h4>
               {realTrace.missing.length === 0 ? (
-                <div style={{ fontSize: '12px', color: '#3fb950' }}>누락된 항목이 없습니다.</div>
+                <div style={{ fontSize: '12px', color: 'var(--color-status-online)' }}>누락된 항목이 없습니다.</div>
               ) : (
-                <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12px', color: '#f85149' }}>
+                <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12px', color: 'var(--color-status-offline)' }}>
                   {realTrace.missing.map((m, idx) => (
                     <li key={idx} data-testid="missing-item">{m}</li>
                   ))}
@@ -2121,13 +2125,13 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               )}
             </div>
             <div data-testid="real-lineage-unresolved">
-              <h4 style={{ margin: '0 0 6px 0', fontSize: '13px', color: '#f0f6fc' }}>
+              <h4 style={{ margin: '0 0 6px 0', fontSize: '13px', color: 'var(--color-text-primary)' }}>
                 범위 외 미해결 주체 (Unresolved: {realTrace.unresolved.length}건)
               </h4>
               {realTrace.unresolved.length === 0 ? (
-                <div style={{ fontSize: '12px', color: '#8b949e' }}>미해결 항목이 없습니다.</div>
+                <div style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>미해결 항목이 없습니다.</div>
               ) : (
-                <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12px', color: '#d29922' }}>
+                <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12px', color: 'var(--color-status-degraded)' }}>
                   {realTrace.unresolved.map((u, idx) => (
                     <li key={idx}>
                       <strong>{u.kind}</strong>: {u.count}건
@@ -2147,9 +2151,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
         style={{
           padding: '14px 18px',
           borderRadius: '8px',
-          backgroundColor: 'rgba(234, 179, 8, 0.12)',
-          border: '1px solid #eab308',
-          color: '#fde047',
+          backgroundColor: 'var(--color-bg-subtle)',
+          border: '1px solid var(--color-status-degraded)',
+          color: 'var(--color-status-degraded)',
           fontSize: '0.8125rem',
           lineHeight: 1.5,
         }}
@@ -2157,7 +2161,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
         <div>
           <strong>⚠️ 모델 계보 및 평가 점수 미노출 (백엔드 HTTP API 부재) ℹ️ [제품 기능 미제공]:</strong> 실제 계보 데이터는 saintvision 내부 서비스(services/lineage.py)에만 존재하며 외부 HTTP 서빙 엔드포인트가 제공되지 않습니다.
         </div>
-        <div style={{ marginTop: '4px', fontSize: '0.75rem', color: '#fed7aa' }}>
+        <div style={{ marginTop: '4px', fontSize: '0.75rem', color: 'var(--color-status-degraded)' }}>
           의사결정 왜곡을 방지하기 위해 가짜 계보 및 평가 점수(Accuracy/F1)의 합성을 전면 차단하고 미노출 상태를 유지합니다. (엔드포인트 신설: Codex 레인 인계)
         </div>
       </div>
@@ -2169,20 +2173,20 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           gap: '16px',
         }}
       >
-        <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
-          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>Provider 계약 동일성 (AC-10 / G-03)</div>
+        <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '8px', padding: '16px 20px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Provider 계약 동일성 (AC-10 / G-03)</div>
           <div
             data-testid="conformance-top-status"
             style={{
               fontSize: '18px',
               fontWeight: 700,
               color: conformanceError
-                ? '#ff7b72'
+                ? 'var(--color-status-offline)'
                 : conformanceData
                 ? conformanceData.status === 'RECORDED'
-                  ? '#58a6ff'
-                  : '#f0883e'
-                : '#8b949e',
+                  ? 'var(--color-brand-primary)'
+                  : 'var(--color-status-degraded)'
+                : 'var(--color-text-muted)',
               marginTop: '4px',
             }}
           >
@@ -2194,7 +2198,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 : `미측정 (${conformanceData.status})`
               : '미측정 (미조회)'}
           </div>
-          <div data-testid="conformance-top-subtext" style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
+          <div data-testid="conformance-top-subtext" style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '4px' }}>
             {conformanceError
               ? '어댑터 conformance 조회 실패'
               : conformanceData
@@ -2204,30 +2208,30 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               : '실제 conformance API (G-03 1단계) 연동 대기'}
           </div>
         </div>
-        <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
-          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>End-to-End 모델 계보 역추적</div>
-          <div style={{ fontSize: '20px', fontWeight: 700, color: lineages.length > 0 ? '#3fb950' : '#f59e0b', marginTop: '4px' }}>
+        <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '8px', padding: '16px 20px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', fontWeight: 600 }}>End-to-End 모델 계보 역추적</div>
+          <div style={{ fontSize: '20px', fontWeight: 700, color: lineages.length > 0 ? 'var(--color-status-online)' : 'var(--color-status-degraded)', marginTop: '4px' }}>
             {lineages.length > 0 ? '추적 가능' : '미노출 (API 부재)'}
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '4px' }}>
             {lineages.length > 0 ? 'Dataset → Commit → Run → Eval → Approval' : '서버 계보 앵커 부재 · 신설 대기'}
           </div>
         </div>
-        <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
-          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>프로덕션 배포 게이트 기준</div>
-          <div style={{ fontSize: '20px', fontWeight: 700, color: '#58a6ff', marginTop: '4px' }}>
+        <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '8px', padding: '16px 20px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', fontWeight: 600 }}>프로덕션 배포 게이트 기준</div>
+          <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--color-brand-primary)', marginTop: '4px' }}>
             Accuracy ≥ 85.0%
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '4px' }}>
             {lineages.length > 0 ? '2인 승인 ID 필수 충족 (모의 게이트)' : '평가 점수 부재로 게이트 대기'}
           </div>
         </div>
-        <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
-          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>등록 모델 수</div>
-          <div style={{ fontSize: '24px', fontWeight: 700, color: '#f0f6fc', marginTop: '4px' }}>
-            {lineages.length} 개 모델 {lineages.length === 0 && <span style={{ fontSize: '14px', color: '#f59e0b' }}>(미노출)</span>}
+        <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '8px', padding: '16px 20px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', fontWeight: 600 }}>등록 모델 수</div>
+          <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--color-text-primary)', marginTop: '4px' }}>
+            {lineages.length} 개 모델 {lineages.length === 0 && <span style={{ fontSize: '14px', color: 'var(--color-status-degraded)' }}>(미노출)</span>}
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '4px' }}>
             {lineages.filter((m) => m.status === 'deployed').length}개 Deployed, {lineages.filter((m) => m.status === 'staging').length}개 Staging
           </div>
         </div>
@@ -2242,9 +2246,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             borderRadius: '6px',
             fontSize: '13px',
             fontWeight: 500,
-            backgroundColor: actionNotice.type === 'error' ? 'rgba(248, 81, 73, 0.15)' : 'rgba(46, 160, 67, 0.15)',
-            border: `1px solid ${actionNotice.type === 'error' ? '#f85149' : '#3fb950'}`,
-            color: actionNotice.type === 'error' ? '#f85149' : '#3fb950',
+            backgroundColor: actionNotice.type === 'error' ? 'var(--color-bg-subtle)' : 'var(--color-bg-subtle)',
+            border: `1px solid ${actionNotice.type === 'error' ? 'var(--color-status-offline)' : 'var(--color-status-online)'}`,
+            color: actionNotice.type === 'error' ? 'var(--color-status-offline)' : 'var(--color-status-online)',
           }}
         >
           {actionNotice.text}
@@ -2253,8 +2257,8 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       {/* Reverse Lineage Query Search Bar */}
       <div
         style={{
-          backgroundColor: '#161b22',
-          border: '1px solid #30363d',
+          backgroundColor: 'var(--color-bg-surface)',
+          border: '1px solid var(--color-border-subtle)',
           borderRadius: '8px',
           padding: '16px 20px',
           display: 'flex',
@@ -2263,10 +2267,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
         }}
       >
         <div>
-          <h3 style={{ margin: 0, fontSize: '15px', color: '#f0f6fc' }}>
+          <h3 style={{ margin: 0, fontSize: '15px', color: 'var(--color-text-primary)' }}>
             계보 역추적 검색 (Reverse Lineage Query — AC-10)
           </h3>
-          <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
+          <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: 'var(--color-text-muted)' }}>
             배포 다이제스트(sha256:...), Git 커밋 SHA, 데이터셋 해시(dset_sha256...)로 역추적하여 픽스처 계보를 검색합니다.
           </p>
         </div>
@@ -2280,10 +2284,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             style={{
               flex: 1,
               padding: '8px 12px',
-              backgroundColor: '#0d1117',
-              border: '1px solid #30363d',
+              backgroundColor: 'var(--color-bg-subtle)',
+              border: '1px solid var(--color-border-subtle)',
               borderRadius: '6px',
-              color: '#c9d1d9',
+              color: 'var(--color-text-secondary)',
               fontSize: '13px',
               fontFamily: 'var(--font-mono, monospace)',
             }}
@@ -2299,19 +2303,19 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           data-testid="lineage-empty-state"
           role="status"
           style={{
-            backgroundColor: '#161b22',
-            border: '1px solid #30363d',
+            backgroundColor: 'var(--color-bg-surface)',
+            border: '1px solid var(--color-border-subtle)',
             borderRadius: '8px',
             padding: '48px 24px',
             textAlign: 'center',
-            color: '#94a3b8',
+            color: 'var(--color-text-muted)',
           }}
         >
           <div style={{ fontSize: '2rem', marginBottom: '12px' }}>📊</div>
-          <h3 style={{ margin: '0 0 8px 0', fontSize: '1rem', color: '#f0f6fc' }}>
+          <h3 style={{ margin: '0 0 8px 0', fontSize: '1rem', color: 'var(--color-text-primary)' }}>
             등록된 모델 계보 및 평가 점수 데이터가 없습니다.
           </h3>
-          <p style={{ margin: 0, fontSize: '0.8125rem', color: '#8b949e', maxWidth: '600px', display: 'inline-block' }}>
+          <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--color-text-muted)', maxWidth: '600px', display: 'inline-block' }}>
             현재 백엔드(saintvision)의 모델 계보 데이터는 내부 서비스에만 위치하며 클라이언트 조회용 HTTP 엔드포인트가 부재합니다. 신뢰할 수 없는 가짜 평가 점수(Accuracy/F1)의 임의 합성을 차단하기 위해 미노출로 표시합니다.
           </p>
         </div>
@@ -2329,9 +2333,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                   style={{
                     padding: '8px 16px',
                     borderRadius: '6px',
-                    border: isSelected ? '1px solid #58a6ff' : '1px solid #30363d',
-                    backgroundColor: isSelected ? '#1f242c' : '#161b22',
-                    color: isSelected ? '#58a6ff' : '#c9d1d9',
+                    border: isSelected ? '1px solid var(--color-brand-primary)' : '1px solid var(--color-border-subtle)',
+                    backgroundColor: isSelected ? 'var(--color-bg-subtle)' : 'var(--color-bg-surface)',
+                    color: isSelected ? 'var(--color-brand-primary)' : 'var(--color-text-secondary)',
                     cursor: 'pointer',
                     fontWeight: isSelected ? 600 : 400,
                     fontSize: '13px',
@@ -2346,8 +2350,8 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           {selectedModel && (
             <div
               style={{
-                backgroundColor: '#161b22',
-                border: '1px solid #30363d',
+                backgroundColor: 'var(--color-bg-surface)',
+                border: '1px solid var(--color-border-subtle)',
                 borderRadius: '8px',
                 padding: '24px',
                 display: 'flex',
@@ -2357,10 +2361,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: '16px', color: '#f0f6fc' }}>
+                  <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--color-text-primary)' }}>
                     [{selectedModel.modelName}] End-to-End 계보 추적 그래프
                   </h3>
-                  <span style={{ fontSize: '12px', color: '#8b949e' }}>
+                  <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
                     Model ID: <code>{selectedModel.modelId}</code> • Status: <strong>{selectedModel.status.toUpperCase()}</strong>
                   </span>
                 </div>
@@ -2374,10 +2378,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                       placeholder="승인 식별자 입력 (apr_...)"
                       style={{
                         padding: '6px 10px',
-                        backgroundColor: '#0d1117',
-                        border: '1px solid #30363d',
+                        backgroundColor: 'var(--color-bg-subtle)',
+                        border: '1px solid var(--color-border-subtle)',
                         borderRadius: '4px',
-                        color: '#c9d1d9',
+                        color: 'var(--color-text-secondary)',
                         fontSize: '12px',
                         fontFamily: 'var(--font-mono, monospace)',
                       }}
@@ -2399,7 +2403,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                         id="approval-input-user-action-notice"
                         role="alert"
                         data-testid="approval-input-user-action-notice"
-                        style={{ fontSize: '11px', color: '#fed7aa', marginLeft: '4px' }}
+                        style={{ fontSize: '11px', color: 'var(--color-status-degraded)', marginLeft: '4px' }}
                       >
                         👉 <strong>[사용자 조치 필요]</strong>: 승인 번호(apr_...)를 입력해야 배포 시도가 활성화됩니다.
                       </span>
@@ -2416,58 +2420,58 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 }}
               >
                 {/* Node 1: Dataset Digest */}
-                <div style={{ backgroundColor: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', padding: '12px' }}>
-                  <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>1. DATASET DIGEST</div>
-                  <div style={{ fontSize: '12px', color: '#58a6ff', fontFamily: 'var(--font-mono, monospace)', marginTop: '6px' }}>
+                <div style={{ backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-border-subtle)', borderRadius: '6px', padding: '12px' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>1. DATASET DIGEST</div>
+                  <div style={{ fontSize: '12px', color: 'var(--color-brand-primary)', fontFamily: 'var(--font-mono, monospace)', marginTop: '6px' }}>
                     {selectedModel.datasetDigest ? selectedModel.datasetDigest.slice(0, 16) + '...' : '미지정'}
                   </div>
-                  <div style={{ fontSize: '11px', color: selectedModel.datasetDigest ? '#3fb950' : '#8b949e', marginTop: '4px' }}>
+                  <div style={{ fontSize: '11px', color: selectedModel.datasetDigest ? 'var(--color-status-online)' : 'var(--color-text-muted)', marginTop: '4px' }}>
                     {selectedModel.datasetDigest ? 'SHA-256 (모의 표기)' : '미검증'}
                   </div>
                 </div>
                 {/* Node 2: Source Git Commit */}
-                <div style={{ backgroundColor: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', padding: '12px' }}>
-                  <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>2. SOURCE COMMIT</div>
-                  <div style={{ fontSize: '12px', color: '#58a6ff', fontFamily: 'var(--font-mono, monospace)', marginTop: '6px' }}>
+                <div style={{ backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-border-subtle)', borderRadius: '6px', padding: '12px' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>2. SOURCE COMMIT</div>
+                  <div style={{ fontSize: '12px', color: 'var(--color-brand-primary)', fontFamily: 'var(--font-mono, monospace)', marginTop: '6px' }}>
                     {selectedModel.sourceCommitSha ? selectedModel.sourceCommitSha.slice(0, 12) : '미지정'}
                   </div>
-                  <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '4px' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '4px' }}>
                     {selectedModel.sourceCommitSha ? 'Git Signed SHA (모의 표기)' : '커밋 없음'}
                   </div>
                 </div>
                 {/* Node 3: Training Run ID */}
-                <div style={{ backgroundColor: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', padding: '12px' }}>
-                  <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>3. TRAINING RUN</div>
-                  <div style={{ fontSize: '12px', color: '#f0f6fc', fontFamily: 'var(--font-mono, monospace)', marginTop: '6px' }}>
+                <div style={{ backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-border-subtle)', borderRadius: '6px', padding: '12px' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>3. TRAINING RUN</div>
+                  <div style={{ fontSize: '12px', color: 'var(--color-text-primary)', fontFamily: 'var(--font-mono, monospace)', marginTop: '6px' }}>
                     {selectedModel.trainingRunId || '미실행'}
                   </div>
-                  <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '4px' }}>Isolated Runtime (모의)</div>
+                  <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '4px' }}>Isolated Runtime (모의)</div>
                 </div>
                 {/* Node 4: Evaluation Score */}
-                <div style={{ backgroundColor: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', padding: '12px' }}>
-                  <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>4. EVALUATION (모의 점수)</div>
-                  <div style={{ fontSize: '14px', color: selectedModel.evalAccuracy !== undefined && selectedModel.evalAccuracy >= 0.85 ? '#3fb950' : '#f85149', fontWeight: 700, marginTop: '4px' }}>
+                <div style={{ backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-border-subtle)', borderRadius: '6px', padding: '12px' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>4. EVALUATION (모의 점수)</div>
+                  <div style={{ fontSize: '14px', color: selectedModel.evalAccuracy !== undefined && selectedModel.evalAccuracy >= 0.85 ? 'var(--color-status-online)' : 'var(--color-status-offline)', fontWeight: 700, marginTop: '4px' }}>
                     Acc: {selectedModel.evalAccuracy !== undefined ? (selectedModel.evalAccuracy * 100).toFixed(1) + '%' : '미평가'}
                   </div>
-                  <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '2px' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>
                     F1 Score: {selectedModel.evalF1Score !== undefined ? selectedModel.evalF1Score.toFixed(3) : 'N/A'}
                   </div>
                 </div>
                 {/* Node 5: Governance Approval */}
-                <div style={{ backgroundColor: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', padding: '12px' }}>
-                  <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>5. APPROVAL</div>
-                  <div style={{ fontSize: '12px', color: selectedModel.approvalId ? '#3fb950' : '#8b949e', fontFamily: 'var(--font-mono, monospace)', marginTop: '6px' }}>
+                <div style={{ backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-border-subtle)', borderRadius: '6px', padding: '12px' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>5. APPROVAL</div>
+                  <div style={{ fontSize: '12px', color: selectedModel.approvalId ? 'var(--color-status-online)' : 'var(--color-text-muted)', fontFamily: 'var(--font-mono, monospace)', marginTop: '6px' }}>
                     {selectedModel.approvalId ? selectedModel.approvalId : 'None (Pending)'}
                   </div>
-                  <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '4px' }}>Two-Person Rule (모의)</div>
+                  <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '4px' }}>Two-Person Rule (모의)</div>
                 </div>
                 {/* Node 6: Deployment Digest (Simulated) */}
-                <div style={{ backgroundColor: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', padding: '12px' }}>
-                  <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>6. DEPLOYMENT DIGEST (모의 시뮬레이션)</div>
-                  <div style={{ fontSize: '12px', color: selectedModel.deploymentDigest ? '#58a6ff' : '#8b949e', fontFamily: 'var(--font-mono, monospace)', marginTop: '6px' }}>
+                <div style={{ backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-border-subtle)', borderRadius: '6px', padding: '12px' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }}>6. DEPLOYMENT DIGEST (모의 시뮬레이션)</div>
+                  <div style={{ fontSize: '12px', color: selectedModel.deploymentDigest ? 'var(--color-brand-primary)' : 'var(--color-text-muted)', fontFamily: 'var(--font-mono, monospace)', marginTop: '6px' }}>
                     {selectedModel.deploymentDigest ? selectedModel.deploymentDigest.slice(0, 16) + '...' : 'Not deployed'}
                   </div>
-                  <div style={{ fontSize: '11px', color: selectedModel.deploymentDigest ? '#e3b341' : '#8b949e', marginTop: '4px' }}>
+                  <div style={{ fontSize: '11px', color: selectedModel.deploymentDigest ? 'var(--color-status-degraded)' : 'var(--color-text-muted)', marginTop: '4px' }}>
                     {selectedModel.deploymentDigest ? '모의 배포 완료 (백엔드 digest 고정과 무관 · 실 환경 미배포)' : 'Pending Gate'}
                   </div>
                 </div>
@@ -2483,19 +2487,19 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       <div
         data-testid="adapter-conformance-panel"
         style={{
-          backgroundColor: '#161b22',
-          border: '1px solid #30363d',
+          backgroundColor: 'var(--color-bg-surface)',
+          border: '1px solid var(--color-border-subtle)',
           borderRadius: '8px',
           padding: '20px',
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
           <div>
-            <h4 style={{ margin: 0, fontSize: '15px', color: '#f0f6fc' }}>
+            <h4 style={{ margin: 0, fontSize: '15px', color: 'var(--color-text-primary)' }}>
               Multi-LLM Provider Adapter Conformance (G-03 2단계 API 연동)
             </h4>
-            <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
-              컨트롤 플레인 호스트의 실제 어댑터 적합성 상태를 조회합니다. 저장된 기록이 없으면 정직하게 <code style={{ color: '#e3b341' }}>NOT_OBSERVED</code>(미측정)와 정본 체크리스트 규격을, 기록이 있으면 <code style={{ color: '#e3b341' }}>RECORDED</code>와 어댑터별 기록을 반환합니다. 기록의 측정 대상은 설치된 CLI가 아니라 제품 fixture adapter입니다(<code>subject: fixture-adapter</code>).
+            <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: 'var(--color-text-muted)' }}>
+              컨트롤 플레인 호스트의 실제 어댑터 적합성 상태를 조회합니다. 저장된 기록이 없으면 정직하게 <code style={{ color: 'var(--color-status-degraded)' }}>NOT_OBSERVED</code>(미측정)와 정본 체크리스트 규격을, 기록이 있으면 <code style={{ color: 'var(--color-status-degraded)' }}>RECORDED</code>와 어댑터별 기록을 반환합니다. 기록의 측정 대상은 설치된 CLI가 아니라 제품 fixture adapter입니다(<code>subject: fixture-adapter</code>).
             </p>
           </div>
         </div>
@@ -2521,10 +2525,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             }}
             style={{
               padding: '6px 10px',
-              backgroundColor: '#0d1117',
-              border: '1px solid #30363d',
+              backgroundColor: 'var(--color-bg-subtle)',
+              border: '1px solid var(--color-border-subtle)',
               borderRadius: '6px',
-              color: '#c9d1d9',
+              color: 'var(--color-text-secondary)',
               fontSize: '13px',
               fontFamily: 'var(--font-mono, monospace)',
               minWidth: '220px',
@@ -2554,22 +2558,22 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                   fontWeight: 500,
                   marginBottom: '14px',
                   backgroundColor: conformanceLoading
-                    ? 'rgba(56, 139, 253, 0.15)'
+                    ? 'var(--color-brand-subtle)'
                     : conformanceError
-                    ? 'rgba(248, 81, 73, 0.15)'
-                    : 'rgba(240, 136, 62, 0.15)',
+                    ? 'var(--color-bg-subtle)'
+                    : 'var(--color-bg-subtle)',
                   border: `1px solid ${
                     conformanceLoading
-                      ? '#58a6ff'
+                      ? 'var(--color-brand-primary)'
                       : conformanceError
-                      ? '#ff7b72'
-                      : '#f0883e'
+                      ? 'var(--color-status-offline)'
+                      : 'var(--color-status-degraded)'
                   }`,
                   color: conformanceLoading
-                    ? '#58a6ff'
+                    ? 'var(--color-brand-primary)'
                     : conformanceError
-                    ? '#ff7b72'
-                    : '#f0883e',
+                    ? 'var(--color-status-offline)'
+                    : 'var(--color-status-degraded)',
                 }
               : undefined
           }
@@ -2592,9 +2596,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               padding: '10px 14px',
               borderRadius: '6px',
               fontSize: '13px',
-              backgroundColor: 'rgba(248, 81, 73, 0.15)',
-              border: '1px solid #ff7b72',
-              color: '#ff7b72',
+              backgroundColor: 'var(--color-bg-subtle)',
+              border: '1px solid var(--color-status-offline)',
+              color: 'var(--color-status-offline)',
               marginBottom: '14px',
             }}
           >
@@ -2608,14 +2612,14 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             style={{
               padding: '12px 14px',
               borderRadius: '6px',
-              backgroundColor: '#0d1117',
-              border: '1px solid #30363d',
-              color: '#8b949e',
+              backgroundColor: 'var(--color-bg-subtle)',
+              border: '1px solid var(--color-border-subtle)',
+              color: 'var(--color-text-muted)',
               fontSize: '13px',
               lineHeight: '1.5',
             }}
           >
-            ℹ️ <strong style={{ color: '#f0883e' }}>미측정 (미조회)</strong>: 실제 컨트롤 플레인 HTTP 엔드포인트(<code>GET /v1/projects/:projectId/adapters/conformance</code>)를 호출하여 정본 체크리스트 규격 상태를 조회합니다. 프로젝트 ID를 입력하고 조회 버튼을 누르십시오.
+            ℹ️ <strong style={{ color: 'var(--color-status-degraded)' }}>미측정 (미조회)</strong>: 실제 컨트롤 플레인 HTTP 엔드포인트(<code>GET /v1/projects/:projectId/adapters/conformance</code>)를 호출하여 정본 체크리스트 규격 상태를 조회합니다. 프로젝트 ID를 입력하고 조회 버튼을 누르십시오.
           </div>
         )}
         {/* Conformance Observation Results Container */}
@@ -2631,8 +2635,8 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             {/* Metadata Summary Grid */}
             <div
               style={{
-                backgroundColor: '#0d1117',
-                border: '1px solid #30363d',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-border-subtle)',
                 borderRadius: '6px',
                 padding: '16px',
                 display: 'grid',
@@ -2642,7 +2646,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               }}
             >
               <div>
-                <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>CONFORMANCE STATUS</span>
+                <span style={{ color: 'var(--color-text-muted)', fontSize: '11px', display: 'block' }}>CONFORMANCE STATUS</span>
                 <span
                   data-testid="conformance-status-badge"
                   style={{
@@ -2652,50 +2656,50 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                     borderRadius: '4px',
                     fontSize: '11px',
                     fontWeight: 700,
-                    backgroundColor: conformanceData.status === 'RECORDED' ? 'rgba(56, 139, 253, 0.15)' : 'rgba(240, 136, 62, 0.15)',
-                    color: conformanceData.status === 'RECORDED' ? '#58a6ff' : '#f0883e',
+                    backgroundColor: conformanceData.status === 'RECORDED' ? 'var(--color-brand-subtle)' : 'var(--color-bg-subtle)',
+                    color: conformanceData.status === 'RECORDED' ? 'var(--color-brand-primary)' : 'var(--color-status-degraded)',
                   }}
                 >
                   {conformanceData.status === 'RECORDED' ? '기록됨 (RECORDED)' : `미측정 (${conformanceData.status})`}
                 </span>
               </div>
               <div>
-                <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>SCOPE</span>
-                <code data-testid="conformance-scope" style={{ color: '#58a6ff' }}>
+                <span style={{ color: 'var(--color-text-muted)', fontSize: '11px', display: 'block' }}>SCOPE</span>
+                <code data-testid="conformance-scope" style={{ color: 'var(--color-brand-primary)' }}>
                   {conformanceData.scope}
                 </code>
               </div>
               <div>
-                <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>CONTRACT VERSION</span>
-                <span data-testid="conformance-contract-version" style={{ color: '#c9d1d9', fontFamily: 'var(--font-mono, monospace)' }}>
+                <span style={{ color: 'var(--color-text-muted)', fontSize: '11px', display: 'block' }}>CONTRACT VERSION</span>
+                <span data-testid="conformance-contract-version" style={{ color: 'var(--color-text-secondary)', fontFamily: 'var(--font-mono, monospace)' }}>
                   {conformanceData.contractVersion}
                 </span>
               </div>
               <div>
-                <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>TARGET ADAPTERS</span>
-                <span data-testid="conformance-adapters" style={{ color: '#f0f6fc' }}>
+                <span style={{ color: 'var(--color-text-muted)', fontSize: '11px', display: 'block' }}>TARGET ADAPTERS</span>
+                <span data-testid="conformance-adapters" style={{ color: 'var(--color-text-primary)' }}>
                   {conformanceData.adapters.join(', ')}
                 </span>
               </div>
               <div>
-                <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>
+                <span style={{ color: 'var(--color-text-muted)', fontSize: '11px', display: 'block' }}>
                   {conformanceData.status === 'RECORDED' ? 'LATEST RECORDED AT' : 'RECORDED AT'}
                 </span>
-                <span data-testid="conformance-recorded-at" style={{ color: '#8b949e' }}>
+                <span data-testid="conformance-recorded-at" style={{ color: 'var(--color-text-muted)' }}>
                   {conformanceData.status === 'RECORDED' ? conformanceData.latestRecordedAt : 'null (미측정)'}
                 </span>
               </div>
               {conformanceData.status === 'NOT_OBSERVED' ? (
                 <div style={{ gridColumn: '1 / -1' }}>
-                  <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>REASON</span>
-                  <span data-testid="conformance-reason" style={{ color: '#c9d1d9' }}>
+                  <span style={{ color: 'var(--color-text-muted)', fontSize: '11px', display: 'block' }}>REASON</span>
+                  <span data-testid="conformance-reason" style={{ color: 'var(--color-text-secondary)' }}>
                     {conformanceData.reason}
                   </span>
                 </div>
               ) : (
                 <div style={{ gridColumn: '1 / -1' }}>
-                  <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>SUBJECT</span>
-                  <span data-testid="conformance-subject-note" style={{ color: '#c9d1d9' }}>
+                  <span style={{ color: 'var(--color-text-muted)', fontSize: '11px', display: 'block' }}>SUBJECT</span>
+                  <span data-testid="conformance-subject-note" style={{ color: 'var(--color-text-secondary)' }}>
                     fixture-adapter · in-server — 제품 fixture adapter에 대한 suite 실행 기록이며 설치된 CLI의 적합성이 아닙니다. 기록이 없는 어댑터는 목록에 없습니다(미측정).
                   </span>
                 </div>
@@ -2705,18 +2709,18 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             {/* Records per adapter (RECORDED branch, design #218 v1.2 §4-1) */}
             {conformanceData.status === 'RECORDED' && (
               <div style={{ overflowX: 'auto' }}>
-                <div style={{ fontSize: '13px', fontWeight: 600, color: '#f0f6fc', marginBottom: '8px' }}>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '8px' }}>
                   어댑터별 기록 ({conformanceData.records.length}개 · 서버 응답 동적 렌더링)
                 </div>
                 <table
                   data-testid="conformance-records-table"
-                  style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}
+                  style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: 'var(--color-text-secondary)' }}
                 >
-                  <caption style={{ textAlign: 'left', fontSize: '12px', color: '#8b949e', marginBottom: '8px' }}>
+                  <caption style={{ textAlign: 'left', fontSize: '12px', color: 'var(--color-text-muted)', marginBottom: '8px' }}>
                     컨트롤 플레인 호스트의 어댑터별 최신 conformance 기록
                   </caption>
                   <thead>
-                    <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
+                    <tr style={{ borderBottom: '1px solid var(--color-border-subtle)', textAlign: 'left', color: 'var(--color-text-muted)' }}>
                       <th scope="col" style={{ padding: '8px' }}>Adapter</th>
                       <th scope="col" style={{ padding: '8px' }}>Subject / Provenance</th>
                       <th scope="col" style={{ padding: '8px' }}>Contract / Suite</th>
@@ -2730,9 +2734,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                       <tr
                         key={`${idx}-${record.adapter}`}
                         data-testid={`conformance-record-row-${idx}`}
-                        style={{ borderBottom: '1px solid #21262d' }}
+                        style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
                       >
-                        <td style={{ padding: '8px', fontWeight: 600, color: '#f0f6fc', fontFamily: 'var(--font-mono, monospace)' }}>
+                        <td style={{ padding: '8px', fontWeight: 600, color: 'var(--color-text-primary)', fontFamily: 'var(--font-mono, monospace)' }}>
                           <span data-testid={`conformance-record-adapter-${idx}`}>{record.adapter}</span>
                         </td>
                         <td style={{ padding: '8px' }}>
@@ -2748,7 +2752,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                             {`전체 ${record.total} · 통과 ${record.passed} · 실패 ${record.failed} · 건너뜀 ${record.skipped}`}
                           </span>
                         </td>
-                        <td style={{ padding: '8px', color: '#8b949e' }}>
+                        <td style={{ padding: '8px', color: 'var(--color-text-muted)' }}>
                           <span data-testid={`conformance-record-recorded-at-${idx}`}>{record.recordedAt}</span>
                         </td>
                         <td style={{ padding: '8px' }}>
@@ -2774,18 +2778,18 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
 
             {/* Dynamic Checklist Table from API Response (FE Hardcoding Prohibited) */}
             <div style={{ overflowX: 'auto' }}>
-              <div style={{ fontSize: '13px', fontWeight: 600, color: '#f0f6fc', marginBottom: '8px' }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '8px' }}>
                 정본 Conformance Checklist ({conformanceData.checks.length}개 항목 · 서버 응답 동적 렌더링)
               </div>
               <table
                 data-testid="conformance-checks-table"
-                style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}
+                style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: 'var(--color-text-secondary)' }}
               >
-                <caption style={{ textAlign: 'left', fontSize: '12px', color: '#8b949e', marginBottom: '8px' }}>
+                <caption style={{ textAlign: 'left', fontSize: '12px', color: 'var(--color-text-muted)', marginBottom: '8px' }}>
                   컨트롤 플레인 호스트 어댑터 Conformance 체크리스트
                 </caption>
                 <thead>
-                  <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
+                  <tr style={{ borderBottom: '1px solid var(--color-border-subtle)', textAlign: 'left', color: 'var(--color-text-muted)' }}>
                     <th scope="col" style={{ padding: '8px' }}>#</th>
                     <th scope="col" style={{ padding: '8px' }}>Check Name (CHECKLIST 정본)</th>
                     <th scope="col" style={{ padding: '8px' }}>Capability Gated</th>
@@ -2797,10 +2801,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                     <tr
                       key={`${idx}-${check.name}`}
                       data-testid={`conformance-check-row-${idx}`}
-                      style={{ borderBottom: '1px solid #21262d' }}
+                      style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
                     >
-                      <td style={{ padding: '8px', color: '#8b949e' }}>{idx + 1}</td>
-                      <td style={{ padding: '8px', fontWeight: 600, color: '#f0f6fc', fontFamily: 'var(--font-mono, monospace)' }}>
+                      <td style={{ padding: '8px', color: 'var(--color-text-muted)' }}>{idx + 1}</td>
+                      <td style={{ padding: '8px', fontWeight: 600, color: 'var(--color-text-primary)', fontFamily: 'var(--font-mono, monospace)' }}>
                         <span data-testid={`conformance-check-name-${idx}`}>{check.name}</span>
                       </td>
                       <td style={{ padding: '8px' }}>
@@ -2811,8 +2815,8 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                             borderRadius: '4px',
                             fontSize: '11px',
                             fontWeight: 600,
-                            backgroundColor: check.capabilityGated ? 'rgba(56, 139, 253, 0.15)' : 'rgba(160, 168, 178, 0.15)',
-                            color: check.capabilityGated ? '#58a6ff' : '#a0a8b2',
+                            backgroundColor: check.capabilityGated ? 'var(--color-brand-subtle)' : 'var(--color-bg-subtle)',
+                            color: check.capabilityGated ? 'var(--color-brand-primary)' : 'var(--color-text-muted)',
                           }}
                         >
                           {check.capabilityGated ? 'Capability Gated' : 'Standard'}
@@ -2826,8 +2830,8 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                             borderRadius: '4px',
                             fontSize: '11px',
                             fontWeight: 600,
-                            backgroundColor: conformanceData.status === 'RECORDED' ? 'rgba(56, 139, 253, 0.15)' : 'rgba(240, 136, 62, 0.15)',
-                            color: conformanceData.status === 'RECORDED' ? '#58a6ff' : '#f0883e',
+                            backgroundColor: conformanceData.status === 'RECORDED' ? 'var(--color-brand-subtle)' : 'var(--color-bg-subtle)',
+                            color: conformanceData.status === 'RECORDED' ? 'var(--color-brand-primary)' : 'var(--color-status-degraded)',
                           }}
                         >
                           {conformanceData.status === 'RECORDED'
@@ -2849,17 +2853,17 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           style={{
             marginTop: '24px',
             paddingTop: '20px',
-            borderTop: '1px solid #30363d',
+            borderTop: '1px solid var(--color-border-subtle)',
             display: 'flex',
             flexDirection: 'column',
             gap: '14px',
           }}
         >
           <div>
-            <h5 style={{ margin: 0, fontSize: '14px', color: '#f0f6fc' }}>
+            <h5 style={{ margin: 0, fontSize: '14px', color: 'var(--color-text-primary)' }}>
               단건 어댑터 Conformance 조회 (Single Route)
             </h5>
-            <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
+            <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: 'var(--color-text-muted)' }}>
               엔드포인트 <code>GET /v1/projects/:projectId/adapters/:name/conformance</code>를 통해 개별 어댑터의 정본 체크리스트 규격 또는 상세 테스트 결과를 조회합니다.
             </p>
           </div>
@@ -2884,10 +2888,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               }}
               style={{
                 padding: '6px 10px',
-                backgroundColor: '#0d1117',
-                border: '1px solid #30363d',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-border-subtle)',
                 borderRadius: '6px',
-                color: '#c9d1d9',
+                color: 'var(--color-text-secondary)',
                 fontSize: '13px',
                 fontFamily: 'var(--font-mono, monospace)',
                 minWidth: '200px',
@@ -2917,22 +2921,22 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                     fontSize: '12px',
                     fontWeight: 500,
                     backgroundColor: singleConformanceLoading
-                      ? 'rgba(56, 139, 253, 0.15)'
+                      ? 'var(--color-brand-subtle)'
                       : singleConformanceError
-                      ? 'rgba(248, 81, 73, 0.15)'
-                      : 'rgba(240, 136, 62, 0.15)',
+                      ? 'var(--color-bg-subtle)'
+                      : 'var(--color-bg-subtle)',
                     border: `1px solid ${
                       singleConformanceLoading
-                        ? '#58a6ff'
+                        ? 'var(--color-brand-primary)'
                         : singleConformanceError
-                        ? '#ff7b72'
-                        : '#f0883e'
+                        ? 'var(--color-status-offline)'
+                        : 'var(--color-status-degraded)'
                     }`,
                     color: singleConformanceLoading
-                      ? '#58a6ff'
+                      ? 'var(--color-brand-primary)'
                       : singleConformanceError
-                      ? '#ff7b72'
-                      : '#f0883e',
+                      ? 'var(--color-status-offline)'
+                      : 'var(--color-status-degraded)',
                   }
                 : undefined
             }
@@ -2956,9 +2960,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 padding: '10px 14px',
                 borderRadius: '6px',
                 fontSize: '13px',
-                backgroundColor: 'rgba(248, 81, 73, 0.15)',
-                border: '1px solid #ff7b72',
-                color: '#ff7b72',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-status-offline)',
+                color: 'var(--color-status-offline)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -2972,7 +2976,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                   : ''}
                 {singleConformanceError.detail}
                 {singleConformanceError.retryable === false && (
-                  <span style={{ marginLeft: '8px', fontSize: '11px', color: '#8b949e' }}>
+                  <span style={{ marginLeft: '8px', fontSize: '11px', color: 'var(--color-text-muted)' }}>
                     (재시도 불가)
                   </span>
                 )}
@@ -3003,8 +3007,8 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               {/* Metadata Grid */}
               <div
                 style={{
-                  backgroundColor: '#0d1117',
-                  border: '1px solid #30363d',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-border-subtle)',
                   borderRadius: '6px',
                   padding: '14px',
                   display: 'grid',
@@ -3014,7 +3018,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 }}
               >
                 <div>
-                  <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>CONFORMANCE STATUS</span>
+                  <span style={{ color: 'var(--color-text-muted)', fontSize: '11px', display: 'block' }}>CONFORMANCE STATUS</span>
                   <span
                     data-testid="single-conformance-status-badge"
                     style={{
@@ -3026,29 +3030,29 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                       fontWeight: 700,
                       backgroundColor:
                         singleConformanceData.status === 'RECORDED'
-                          ? 'rgba(56, 139, 253, 0.15)'
-                          : 'rgba(240, 136, 62, 0.15)',
-                      color: singleConformanceData.status === 'RECORDED' ? '#58a6ff' : '#f0883e',
+                          ? 'var(--color-brand-subtle)'
+                          : 'var(--color-bg-subtle)',
+                      color: singleConformanceData.status === 'RECORDED' ? 'var(--color-brand-primary)' : 'var(--color-status-degraded)',
                     }}
                   >
                     {singleConformanceData.status === 'RECORDED' ? '기록됨 (RECORDED)' : `미측정 (${singleConformanceData.status})`}
                   </span>
                 </div>
                 <div>
-                  <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>ADAPTER</span>
-                  <code data-testid="single-conformance-adapter" style={{ color: '#f0f6fc', fontWeight: 600 }}>
+                  <span style={{ color: 'var(--color-text-muted)', fontSize: '11px', display: 'block' }}>ADAPTER</span>
+                  <code data-testid="single-conformance-adapter" style={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                     {singleConformanceData.adapter}
                   </code>
                 </div>
                 <div>
-                  <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>SCOPE</span>
-                  <code data-testid="single-conformance-scope" style={{ color: '#58a6ff' }}>
+                  <span style={{ color: 'var(--color-text-muted)', fontSize: '11px', display: 'block' }}>SCOPE</span>
+                  <code data-testid="single-conformance-scope" style={{ color: 'var(--color-brand-primary)' }}>
                     {singleConformanceData.scope}
                   </code>
                 </div>
                 <div>
-                  <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>CONTRACT VERSION</span>
-                  <span data-testid="single-conformance-contract-version" style={{ color: '#c9d1d9', fontFamily: 'var(--font-mono, monospace)' }}>
+                  <span style={{ color: 'var(--color-text-muted)', fontSize: '11px', display: 'block' }}>CONTRACT VERSION</span>
+                  <span data-testid="single-conformance-contract-version" style={{ color: 'var(--color-text-secondary)', fontFamily: 'var(--font-mono, monospace)' }}>
                     {singleConformanceData.contractVersion}
                   </span>
                 </div>
@@ -3056,14 +3060,14 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 {singleConformanceData.status === 'NOT_OBSERVED' ? (
                   <>
                     <div>
-                      <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>RECORDED AT</span>
-                      <span data-testid="single-conformance-recorded-at" style={{ color: '#8b949e' }}>
+                      <span style={{ color: 'var(--color-text-muted)', fontSize: '11px', display: 'block' }}>RECORDED AT</span>
+                      <span data-testid="single-conformance-recorded-at" style={{ color: 'var(--color-text-muted)' }}>
                         null (미측정)
                       </span>
                     </div>
                     <div style={{ gridColumn: '1 / -1' }}>
-                      <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>REASON</span>
-                      <span data-testid="single-conformance-reason" style={{ color: '#c9d1d9' }}>
+                      <span style={{ color: 'var(--color-text-muted)', fontSize: '11px', display: 'block' }}>REASON</span>
+                      <span data-testid="single-conformance-reason" style={{ color: 'var(--color-text-secondary)' }}>
                         {singleConformanceData.reason}
                       </span>
                     </div>
@@ -3071,32 +3075,32 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 ) : (
                   <>
                     <div>
-                      <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>SUBJECT / PROVENANCE</span>
-                      <span data-testid="single-conformance-subject" style={{ color: '#c9d1d9' }}>
+                      <span style={{ color: 'var(--color-text-muted)', fontSize: '11px', display: 'block' }}>SUBJECT / PROVENANCE</span>
+                      <span data-testid="single-conformance-subject" style={{ color: 'var(--color-text-secondary)' }}>
                         {singleConformanceData.subject} / {singleConformanceData.provenance}
                       </span>
                     </div>
                     <div>
-                      <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>SUITE CONTRACT VERSION</span>
-                      <span data-testid="single-conformance-suite-contract-version" style={{ color: '#c9d1d9', fontFamily: 'var(--font-mono, monospace)' }}>
+                      <span style={{ color: 'var(--color-text-muted)', fontSize: '11px', display: 'block' }}>SUITE CONTRACT VERSION</span>
+                      <span data-testid="single-conformance-suite-contract-version" style={{ color: 'var(--color-text-secondary)', fontFamily: 'var(--font-mono, monospace)' }}>
                         {singleConformanceData.suiteContractVersion}
                       </span>
                     </div>
                     <div>
-                      <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>RESULTS</span>
-                      <span data-testid="single-conformance-counts" style={{ color: '#f0f6fc', fontWeight: 600 }}>
+                      <span style={{ color: 'var(--color-text-muted)', fontSize: '11px', display: 'block' }}>RESULTS</span>
+                      <span data-testid="single-conformance-counts" style={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                         {`전체 ${singleConformanceData.total} · 통과 ${singleConformanceData.passed} · 실패 ${singleConformanceData.failed} · 건너뜀 ${singleConformanceData.skipped}`}
                       </span>
                     </div>
                     <div>
-                      <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>RECORDED AT</span>
-                      <span data-testid="single-conformance-recorded-at" style={{ color: '#8b949e' }}>
+                      <span style={{ color: 'var(--color-text-muted)', fontSize: '11px', display: 'block' }}>RECORDED AT</span>
+                      <span data-testid="single-conformance-recorded-at" style={{ color: 'var(--color-text-muted)' }}>
                         {singleConformanceData.recordedAt}
                       </span>
                     </div>
                     <div style={{ gridColumn: '1 / -1' }}>
-                      <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>SUBJECT NOTE</span>
-                      <span data-testid="single-conformance-subject-note" style={{ color: '#c9d1d9' }}>
+                      <span style={{ color: 'var(--color-text-muted)', fontSize: '11px', display: 'block' }}>SUBJECT NOTE</span>
+                      <span data-testid="single-conformance-subject-note" style={{ color: 'var(--color-text-secondary)' }}>
                         fixture-adapter · in-server — 제품 fixture adapter에 대한 suite 실행 기록이며 설치된 CLI의 적합성이 아닙니다.
                       </span>
                     </div>
@@ -3107,15 +3111,15 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               {/* When NOT_OBSERVED: Render Checks Descriptors */}
               {singleConformanceData.status === 'NOT_OBSERVED' && (
                 <div style={{ overflowX: 'auto' }}>
-                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#f0f6fc', marginBottom: '8px' }}>
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '8px' }}>
                     정본 Conformance Checklist ({singleConformanceData.checks.length}개 항목)
                   </div>
                   <table
                     data-testid="single-conformance-checks-table"
-                    style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}
+                    style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: 'var(--color-text-secondary)' }}
                   >
                     <thead>
-                      <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
+                      <tr style={{ borderBottom: '1px solid var(--color-border-subtle)', textAlign: 'left', color: 'var(--color-text-muted)' }}>
                         <th scope="col" style={{ padding: '8px' }}>#</th>
                         <th scope="col" style={{ padding: '8px' }}>Check Name</th>
                         <th scope="col" style={{ padding: '8px' }}>Capability Gated</th>
@@ -3126,10 +3130,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                         <tr
                           key={`${idx}-${check.name}`}
                           data-testid={`single-conformance-check-row-${idx}`}
-                          style={{ borderBottom: '1px solid #21262d' }}
+                          style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
                         >
-                          <td style={{ padding: '8px', color: '#8b949e' }}>{idx + 1}</td>
-                          <td style={{ padding: '8px', fontWeight: 600, color: '#f0f6fc', fontFamily: 'var(--font-mono, monospace)' }}>
+                          <td style={{ padding: '8px', color: 'var(--color-text-muted)' }}>{idx + 1}</td>
+                          <td style={{ padding: '8px', fontWeight: 600, color: 'var(--color-text-primary)', fontFamily: 'var(--font-mono, monospace)' }}>
                             <span data-testid={`single-conformance-check-name-${idx}`}>{check.name}</span>
                           </td>
                           <td style={{ padding: '8px' }}>
@@ -3140,8 +3144,8 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                                 borderRadius: '4px',
                                 fontSize: '11px',
                                 fontWeight: 600,
-                                backgroundColor: check.capabilityGated ? 'rgba(56, 139, 253, 0.15)' : 'rgba(160, 168, 178, 0.15)',
-                                color: check.capabilityGated ? '#58a6ff' : '#a0a8b2',
+                                backgroundColor: check.capabilityGated ? 'var(--color-brand-subtle)' : 'var(--color-bg-subtle)',
+                                color: check.capabilityGated ? 'var(--color-brand-primary)' : 'var(--color-text-muted)',
                               }}
                             >
                               {check.capabilityGated ? 'Capability Gated' : 'Standard'}
@@ -3157,15 +3161,15 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               {/* When RECORDED: Render Detailed Outcomes */}
               {singleConformanceData.status === 'RECORDED' && (
                 <div style={{ overflowX: 'auto' }}>
-                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#f0f6fc', marginBottom: '8px' }}>
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '8px' }}>
                     상세 체크 결과 ({singleConformanceData.outcomes.length}개 항목)
                   </div>
                   <table
                     data-testid="single-conformance-outcomes-table"
-                    style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}
+                    style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: 'var(--color-text-secondary)' }}
                   >
                     <thead>
-                      <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
+                      <tr style={{ borderBottom: '1px solid var(--color-border-subtle)', textAlign: 'left', color: 'var(--color-text-muted)' }}>
                         <th scope="col" style={{ padding: '8px' }}>#</th>
                         <th scope="col" style={{ padding: '8px' }}>Check Name</th>
                         <th scope="col" style={{ padding: '8px' }}>Status</th>
@@ -3176,10 +3180,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                         <tr
                           key={`${idx}-${outcome.name}`}
                           data-testid={`single-conformance-outcome-row-${idx}`}
-                          style={{ borderBottom: '1px solid #21262d' }}
+                          style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
                         >
-                          <td style={{ padding: '8px', color: '#8b949e' }}>{idx + 1}</td>
-                          <td style={{ padding: '8px', fontWeight: 600, color: '#f0f6fc', fontFamily: 'var(--font-mono, monospace)' }}>
+                          <td style={{ padding: '8px', color: 'var(--color-text-muted)' }}>{idx + 1}</td>
+                          <td style={{ padding: '8px', fontWeight: 600, color: 'var(--color-text-primary)', fontFamily: 'var(--font-mono, monospace)' }}>
                             <span data-testid={`single-conformance-outcome-name-${idx}`}>{outcome.name}</span>
                           </td>
                           <td style={{ padding: '8px' }}>
@@ -3191,11 +3195,11 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                                 fontSize: '11px',
                                 fontWeight: 600,
                                 backgroundColor: outcome.skipped
-                                  ? 'rgba(139, 148, 158, 0.15)'
+                                  ? 'var(--color-bg-subtle)'
                                   : outcome.passed
-                                  ? 'rgba(56, 139, 253, 0.15)'
-                                  : 'rgba(248, 81, 73, 0.15)',
-                                color: outcome.skipped ? '#8b949e' : outcome.passed ? '#58a6ff' : '#ff7b72',
+                                  ? 'var(--color-brand-subtle)'
+                                  : 'var(--color-bg-subtle)',
+                                color: outcome.skipped ? 'var(--color-text-muted)' : outcome.passed ? 'var(--color-brand-primary)' : 'var(--color-status-offline)',
                               }}
                             >
                               {outcome.skipped ? '건너뜀 (Skipped)' : outcome.passed ? '통과 (Passed)' : '실패 (Failed)'}
@@ -3215,8 +3219,8 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       <div
         data-testid="model-commitment-panel"
         style={{
-          backgroundColor: '#161b22',
-          border: '1px solid #30363d',
+          backgroundColor: 'var(--color-bg-surface)',
+          border: '1px solid var(--color-border-subtle)',
           borderRadius: '8px',
           padding: '20px',
           display: 'flex',
@@ -3225,10 +3229,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
         }}
       >
         <div>
-          <h4 style={{ margin: 0, fontSize: '15px', color: '#f0f6fc' }}>
+          <h4 style={{ margin: 0, fontSize: '15px', color: 'var(--color-text-primary)' }}>
             실제 모델 Commitment 조회 (Control-Plane HTTP API)
           </h4>
-          <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
+          <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: 'var(--color-text-muted)' }}>
             백엔드 엔드포인트 <code>GET /v1/projects/:project/models/:model_id/versions/:version/commitment</code>로부터 정본 manifestHash와 sourceRunId를 조회합니다.
           </p>
         </div>
@@ -3241,10 +3245,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             onChange={(e) => setCommitmentProject(e.target.value)}
             style={{
               padding: '6px 10px',
-              backgroundColor: '#0d1117',
-              border: '1px solid #30363d',
+              backgroundColor: 'var(--color-bg-subtle)',
+              border: '1px solid var(--color-border-subtle)',
               borderRadius: '6px',
-              color: '#c9d1d9',
+              color: 'var(--color-text-secondary)',
               fontSize: '13px',
               fontFamily: 'var(--font-mono, monospace)',
               minWidth: '180px',
@@ -3258,10 +3262,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             onChange={(e) => setCommitmentModelId(e.target.value)}
             style={{
               padding: '6px 10px',
-              backgroundColor: '#0d1117',
-              border: '1px solid #30363d',
+              backgroundColor: 'var(--color-bg-subtle)',
+              border: '1px solid var(--color-border-subtle)',
               borderRadius: '6px',
-              color: '#c9d1d9',
+              color: 'var(--color-text-secondary)',
               fontSize: '13px',
               fontFamily: 'var(--font-mono, monospace)',
               minWidth: '180px',
@@ -3275,10 +3279,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             onChange={(e) => setCommitmentVersion(e.target.value)}
             style={{
               padding: '6px 10px',
-              backgroundColor: '#0d1117',
-              border: '1px solid #30363d',
+              backgroundColor: 'var(--color-bg-subtle)',
+              border: '1px solid var(--color-border-subtle)',
               borderRadius: '6px',
-              color: '#c9d1d9',
+              color: 'var(--color-text-secondary)',
               fontSize: '13px',
               fontFamily: 'var(--font-mono, monospace)',
               minWidth: '120px',
@@ -3302,9 +3306,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               padding: '10px 14px',
               borderRadius: '6px',
               fontSize: '13px',
-              backgroundColor: 'rgba(248, 81, 73, 0.15)',
-              border: '1px solid #f85149',
-              color: '#f85149',
+              backgroundColor: 'var(--color-bg-subtle)',
+              border: '1px solid var(--color-status-offline)',
+              color: 'var(--color-status-offline)',
             }}
           >
             ❌ {commitmentError.code && commitmentError.status ? `[${commitmentError.code}] (${commitmentError.status}) ${commitmentError.title ? `${commitmentError.title}: ` : ''}` : ''}{commitmentError.detail}
@@ -3314,8 +3318,8 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           <div
             data-testid="commitment-result-container"
             style={{
-              backgroundColor: '#0d1117',
-              border: '1px solid #30363d',
+              backgroundColor: 'var(--color-bg-subtle)',
+              border: '1px solid var(--color-border-subtle)',
               borderRadius: '6px',
               padding: '16px',
               display: 'grid',
@@ -3325,50 +3329,50 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             }}
           >
             <div>
-              <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>MANIFEST HASH</span>
-              <code data-testid="commitment-manifest-hash" style={{ color: '#58a6ff', wordBreak: 'break-all' }}>
+              <span style={{ color: 'var(--color-text-muted)', fontSize: '11px', display: 'block' }}>MANIFEST HASH</span>
+              <code data-testid="commitment-manifest-hash" style={{ color: 'var(--color-brand-primary)', wordBreak: 'break-all' }}>
                 {commitmentData.manifestHash}
               </code>
             </div>
             <div>
-              <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>SOURCE RUN ID</span>
-              <code data-testid="commitment-source-run-id" style={{ color: '#f0f6fc', wordBreak: 'break-all' }}>
+              <span style={{ color: 'var(--color-text-muted)', fontSize: '11px', display: 'block' }}>SOURCE RUN ID</span>
+              <code data-testid="commitment-source-run-id" style={{ color: 'var(--color-text-primary)', wordBreak: 'break-all' }}>
                 {commitmentData.sourceRunId}
               </code>
             </div>
             <div>
-              <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>COMMITTED AT</span>
-              <span data-testid="commitment-committed-at" style={{ color: '#c9d1d9' }}>
+              <span style={{ color: 'var(--color-text-muted)', fontSize: '11px', display: 'block' }}>COMMITTED AT</span>
+              <span data-testid="commitment-committed-at" style={{ color: 'var(--color-text-secondary)' }}>
                 {commitmentData.committedAt}
               </span>
             </div>
             <div>
-              <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>RECOVERY EPOCH</span>
-              <span data-testid="commitment-recovery-epoch" style={{ color: '#c9d1d9' }}>
+              <span style={{ color: 'var(--color-text-muted)', fontSize: '11px', display: 'block' }}>RECOVERY EPOCH</span>
+              <span data-testid="commitment-recovery-epoch" style={{ color: 'var(--color-text-secondary)' }}>
                 {commitmentData.commitRecoveryEpoch}
               </span>
             </div>
             <div>
-              <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>CURRENT AVAILABILITY</span>
-              <code data-testid="commitment-availability" style={{ color: '#f59e0b' }}>
+              <span style={{ color: 'var(--color-text-muted)', fontSize: '11px', display: 'block' }}>CURRENT AVAILABILITY</span>
+              <code data-testid="commitment-availability" style={{ color: 'var(--color-status-degraded)' }}>
                 {commitmentData.currentAvailability}
               </code>
             </div>
             <div>
-              <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>EXECUTION REVALIDATION</span>
-              <span data-testid="commitment-revalidation" style={{ color: '#f0f6fc' }}>
+              <span style={{ color: 'var(--color-text-muted)', fontSize: '11px', display: 'block' }}>EXECUTION REVALIDATION</span>
+              <span data-testid="commitment-revalidation" style={{ color: 'var(--color-text-primary)' }}>
                 {commitmentData.requiresExecutionRevalidation ? 'Required (true)' : 'False'}
               </span>
             </div>
             <div>
-              <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>FORMAT / TOTAL BYTES</span>
-              <span data-testid="commitment-format-bytes" style={{ color: '#c9d1d9' }}>
+              <span style={{ color: 'var(--color-text-muted)', fontSize: '11px', display: 'block' }}>FORMAT / TOTAL BYTES</span>
+              <span data-testid="commitment-format-bytes" style={{ color: 'var(--color-text-secondary)' }}>
                 {commitmentData.format} ({commitmentData.totalBytes.toLocaleString()} bytes)
               </span>
             </div>
             <div>
-              <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>SHARD COUNT</span>
-              <span data-testid="commitment-shard-count" style={{ color: '#c9d1d9' }}>
+              <span style={{ color: 'var(--color-text-muted)', fontSize: '11px', display: 'block' }}>SHARD COUNT</span>
+              <span data-testid="commitment-shard-count" style={{ color: 'var(--color-text-secondary)' }}>
                 {commitmentData.shardCount} shard(s)
               </span>
             </div>
