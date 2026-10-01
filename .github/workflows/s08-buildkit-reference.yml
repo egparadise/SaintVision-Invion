@@ -67,6 +67,7 @@ jobs:
           }
           EOF
           sudo apparmor_parser --replace /etc/apparmor.d/usr.bin.rootlesskit
+          sudo systemctl restart apparmor.service
       - name: Execute actual rootless BuildKit OCI roundtrip
         env:
           SV_BUILDKIT_BIN_DIR: ${{ runner.temp }}/s08-bin/buildkit
