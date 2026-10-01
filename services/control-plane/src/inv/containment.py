@@ -7,9 +7,9 @@ Worker cleanup retains claims until a real receipt arrives and never re-executes
 
 from uuid import uuid4
 from psycopg.types.json import Jsonb
-from .approvals import digest
 from .contracts import validate_contract
 from .errors import DomainError
+from .policy import action_digest as digest
 
 
 def require_execution(conn):

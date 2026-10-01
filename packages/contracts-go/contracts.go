@@ -152,6 +152,7 @@ type BuildPlan struct {
     PolicyExpiresAt Timestamp `json:"policyExpiresAt"`
     BuilderInstanceId string `json:"builderInstanceId"`
     BuilderProfileId string `json:"builderProfileId"`
+    BuilderObservationDigest string `json:"builderObservationDigest"`
     RecoveryEpoch int64 `json:"recoveryEpoch"`
     Rootless bool `json:"rootless"`
     Privileged bool `json:"privileged"`
