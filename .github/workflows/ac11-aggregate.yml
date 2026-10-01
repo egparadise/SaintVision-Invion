@@ -177,6 +177,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          echo "Candidate SHA $SOURCE_SHA. A pre-landing aggregation describes that SHA only;"
-          echo "after landing, re-run it at the landed SHA (train 3~11 runbook §1)."
+          echo "Candidate SHA $SOURCE_SHA. A pre-landing aggregation describes that SHA only."
+          echo "After landing, finish the landing runbook's lane binding first -- this lane"
+          echo "reads the other lanes' artifacts -- then dispatch this one at the landed tip:"
+          echo "  LAND=\$(git ls-remote origin refs/heads/integration/all-agents-unified | cut -f1)"
+          echo "  gh workflow run ac11-aggregate.yml --ref integration/all-agents-unified -f source_sha=\$LAND"
+          echo "The procedure of record is the card 203 History §5-4."
           echo "aggregator exit ${{ steps.aggregate.outputs.exit_code }}"

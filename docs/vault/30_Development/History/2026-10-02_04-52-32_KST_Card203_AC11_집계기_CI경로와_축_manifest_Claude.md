@@ -1,12 +1,12 @@
 ---
 doc_id: "HISTORY-CARD203-AC11-AGGREGATE-LANE-20261002"
 title: "카드 203 — AC-11 집계기를 부르는 CI 경로와 축 manifest: 0/8은 축이 실패한 수가 아니라 아무도 부르지 않은 수였다 (카드 201 측정 포함)"
-version: "1.0.0"
+version: "1.1.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-02T04:54:23+09:00"
+updated: "2026-10-02T05:22:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "aaa0b083"
@@ -91,3 +91,70 @@ importer의 zip flag(`--artifact-zip` vs `--archive`)도 manifest가 든다. 처
 1. **Codex**: 이 변경 검토. 특히 (a) 축 manifest가 축 정의를 **기술**만 하고 바꾸지 않는지, (b) `incomplete` 두 축(accessibility importer·long-soak workflow)을 별도 카드로 두는 판단, (c) dispatch 전용이 역래칫에 대해 옳은 선택인지.
 2. **코디네이터**: 이 lane을 train 12 후보 SHA에서 한 번 dispatch할지. 결과는 `INVALID_RUN`일 것이고 그것이 **0/8이 왜 0/8인지를 도구가 말한 첫 기록**이 된다.
 3. **Claude**: accessibility importer 카드(그 축만 complete로 바뀐다).
+
+## 5. r1 — AC-11 owner 검토가 셋을 막았고, 하나는 제 분류가 틀린 것이었다
+
+### 5-1. (1) migration 두 축이 **실제 lane에서 유실**됐다
+
+`import_ac11_migration_rehearsal.py`는 `runPurpose: "ac11-migration-rehearsal-import"` 하나에 **`axes` 배열**을 담아 쓴다(그 배열의 각 행은 `runPurpose: "ac11-axis-evidence"`를 갖춘 제대로 된 envelope다). 내 `read_envelopes()`는 **단일 envelope만** 읽고 나머지는 `continue`로 넘겼다 — 즉 **artifact가 있어도 두 축이 조용히 사라졌다.** 이 모듈의 docstring이 "조용히 빼지 않는다"고 적은 바로 그 실패다.
+
+고친 것 둘:
+- **bundle 모양을 읽는다.** `BUNDLE_PURPOSES`에 속하면 `axes` 행을 꺼내 각각 기록하고, 행의 `runPurpose`가 axis envelope이 아니면 **거부**한다.
+- **모르는 `runPurpose`는 무시하지 않고 거부한다.** 무시가 바로 이 유실을 숨긴 동작이었다. 시험 `test_a_file_this_tool_cannot_read_is_refused_rather_than_ignored`가 그 변경 자체를 적는다.
+
+### 5-2. 그러면서 **security 분류가 틀린 것을 찾았다**
+
+`import_ac11_security_scan.py`는 producer의 report를 그대로 돌려준다 — `runPurpose: "s11-ac11-security-scan"`이고 **`axis` field가 없다.** 집계기는 `runPurpose == "ac11-axis-evidence"`와 `REQUIRED_AXES`의 `axis`를 요구한다. 그래서 이 축은 **importer가 있는데도 받아들일 수 있는 envelope이 없다.**
+
+`complete`로 적은 근거가 "producer·workflow·importer가 다 있다"였고, **"importer가 있다"는 "importer가 axis envelope을 낸다"와 다르다.** `security-critical-high-zero`를 **`incomplete`로 정정**하고 사유에 그 측정을 적었다. 그 report를 axis envelope으로 바꾸는 adapter가 필요하고, 그것은 후속 카드다.
+
+그래서 **complete는 3축이 아니라 2축**이다. 그 수를 시험이 들고 있다.
+
+### 5-3. (2) 축 manifest를 strict로
+
+| 변이 | r1 전 | r1 후 |
+|---|---|---|
+| unknown top-level key | **통과** | `top-level key set is not exact; unexpected ['unexpected']` |
+| `repository: "attacker/repo"` | **통과** | `the axis sources name repository 'attacker/repo'` |
+| `importerEmitsAxes: ["invented-axis"]` | **통과** | `names something that is not an axis` |
+| `envelopeMember: "does-not-exist.json"` | **통과** | `<workflow> does not name 'does-not-exist.json'` |
+| `envelopeShape` 발명 | — | `envelopeShape is 'whatever'` |
+| `importerEmitsAxes`가 자기 축을 뺌 | — | `does not include this axis` |
+| `purpose` 공백 | — | `must be a non-empty string` |
+| complete인데 shape이 받아들일 수 없음 | — | `needs an admissible envelopeShape` |
+
+**`importerEmitsAxes`를 importer 자신의 source에 결속했다** — 거기 적힌 축 이름이 importer(또는 producer)가 실제로 쓰는 이름이어야 한다. 그 검사가 security의 오분류를 **자동으로** 잡는다(그 importer는 어떤 축 이름도 쓰지 않는다). **`envelopeMember`는 zip 안의 member라 tree에 없지만**, 그것을 올리는 workflow가 이름을 적으므로 거기서 확인한다. `repository`는 고정한다 — 다른 저장소를 적을 수 있는 축 manifest는 lane을 남의 run으로 보낼 수 있다.
+
+### 5-4. (3) 착지 후 재실행 절차와 lane 판단
+
+**`#294` runbook을 건드리지 않았다**(승인됐고 train 12에 들어 있다). 대신 두 가지를 이 PR에 둔다.
+
+**`post_landing_verify`에 lane을 추가하지 않는다.** 이유 둘: (가) 그 도구의 역래칫은 **push로 integration에 닿는** workflow만 다루고 이 lane은 dispatch 전용이라 `LANES`에 들어가지 않는다 — 넣으면 역래칫의 양방향 동치가 깨진다. (나) 이 lane은 **다른 lane의 artifact를 읽으므로** 그들이 끝나기 전에는 할 말이 없다. 착지 증명에 넣으면 착지 판정이 "아직 모른다"를 기다리게 된다.
+
+**착지 후 절차**(이 문서가 정본이고 lane의 마지막 step이 같은 문장을 출력한다):
+
+```bash
+set -euo pipefail
+cd /d/Project/SaintVisionI-Invion
+LAND=$(git ls-remote origin refs/heads/integration/all-agents-unified | cut -f1)
+printf '%s' "$LAND" | grep -Eq '^[0-9a-f]{40}$' || { echo "tip을 읽지 못했다" >&2; exit 1; }
+# 1) #294 runbook §1을 먼저 끝낸다 -- 여덟 lane이 그 SHA에서 녹색이어야 이 lane이 읽을 artifact가 있다.
+# 2) 그 뒤 이 lane을 그 SHA에서 dispatch한다.
+gh workflow run ac11-aggregate.yml --ref integration/all-agents-unified -f source_sha="$LAND"
+gh run list --workflow ac11-aggregate.yml --limit 5   --json databaseId,headSha,status,conclusion
+```
+
+착지 **전** 후보 SHA에서 돌린 결과는 **그 SHA 한정**이다. 착지 뒤 같은 명령을 landed SHA로 다시 돌린다.
+
+### 5-5. 실측 — 새 lane을 exact head에서 한 번 dispatch했다
+
+@@DISPATCH@@
+
+### 5-6. 검증
+
+| 항목 | 결과 |
+|---|---|
+| `tests/core/test_assemble_ac11_manifest.py` | 32 → **43 passed** |
+| `tests/core/test_post_landing_verify.py` | **97 passed**(역래칫 무변경) |
+| 변이 | 축 manifest 8종 전부 사망(위 표), bundle 3종(행의 runPurpose·빈 axes·모르는 purpose) |
+| 조립기 | bundle 하나로 **두 축**이 manifest에 들어가는 것을 시험이 단언한다 |

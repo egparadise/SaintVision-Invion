@@ -64,7 +64,21 @@ CHAINS = ("complete", "incomplete", "absent")
 #: coverage; an unexpected one is a field nobody validates.
 SOURCE_KEYS = frozenset({
     "axis", "chain", "workflow", "producer", "importer", "importerArchiveFlag",
-    "artifactNamePrefix", "envelopeMember", "importerEmitsAxes", "reason",
+    "artifactNamePrefix", "envelopeMember", "importerEmitsAxes", "envelopeShape", "reason",
+})
+#: The top-level keys of the axis map, exactly. An unknown one is a field nobody validates,
+#: and ``repository`` was readable as anything at all before this (#299 r1).
+SOURCES_TOP_KEYS = frozenset({"schemaVersion", "purpose", "note", "repository", "axes"})
+#: What an importer writes. ``axis-evidence`` is one envelope; ``axes-bundle`` is a wrapper
+#: whose ``axes`` array holds them; ``not-an-axis-envelope`` says the output cannot be
+#: aggregated at all, which is a reason for ``incomplete`` rather than a shape to read.
+ENVELOPE_SHAPES = ("axis-evidence", "axes-bundle", "not-an-axis-envelope")
+#: The one repository this chain's artifacts come from. Pinned, because an axis map that can
+#: name another repository can point a lane at someone else's runs.
+REPOSITORY = "egparadise/SaintVision-Invion"
+#: ``runPurpose`` of a bundle that carries axis envelopes inside it.
+BUNDLE_PURPOSES = frozenset({
+    "ac11-migration-rehearsal-import",
 })
 
 
@@ -103,6 +117,19 @@ def load_sources(path: Path) -> list[dict[str, Any]]:
     document = read_json(path, "the axis sources")
     if document.get("schemaVersion") != SOURCES_SCHEMA:
         raise Refused(f"the axis sources must declare schemaVersion {SOURCES_SCHEMA}")
+    if set(document) != SOURCES_TOP_KEYS:
+        unexpected = sorted(set(document) - SOURCES_TOP_KEYS)
+        missing = sorted(SOURCES_TOP_KEYS - set(document))
+        raise Refused(
+            "the axis sources' top-level key set is not exact"
+            + (f"; unexpected {unexpected}" if unexpected else "")
+            + (f"; missing {missing}" if missing else "")
+        )
+    if document["repository"] != REPOSITORY:
+        raise Refused(f"the axis sources name repository {document['repository']!r}")
+    for field in ("purpose", "note"):
+        if not isinstance(document[field], str) or not document[field].strip():
+            raise Refused(f"the axis sources' {field} must be a non-empty string")
     axes = document.get("axes")
     if not isinstance(axes, list) or not axes:
         raise Refused("the axis sources must carry a non-empty axes list")
@@ -126,6 +153,44 @@ def load_sources(path: Path) -> list[dict[str, Any]]:
         seen.add(axis)
         if entry["chain"] not in CHAINS:
             raise Refused(f"{axis}: chain is {entry['chain']!r}")
+        if entry["envelopeShape"] is not None and entry["envelopeShape"] not in ENVELOPE_SHAPES:
+            raise Refused(f"{axis}: envelopeShape is {entry['envelopeShape']!r}")
+        emits = entry["importerEmitsAxes"]
+        if not isinstance(emits, list) or not all(
+            isinstance(value, str) and value in REQUIRED_AXES for value in emits
+        ):
+            raise Refused(f"{axis}: importerEmitsAxes names something that is not an axis")
+        if emits and axis not in emits:
+            raise Refused(f"{axis}: importerEmitsAxes does not include this axis")
+        for field in ("workflow", "producer", "importer"):
+            value = entry[field]
+            if value is not None and not (REPO_ROOT / value).is_file():
+                raise Refused(f"{axis}: {field} {value} is not in the tree")
+        if entry["importer"]:
+            # Bound to the importer's own source: the names it writes have to be the names
+            # claimed here. The security importer names no axis at all, which is exactly how
+            # its chain was mis-classified as complete (#299 r1).
+            source = (REPO_ROOT / entry["importer"]).read_text(encoding="utf-8")
+            producer_source = (
+                (REPO_ROOT / entry["producer"]).read_text(encoding="utf-8")
+                if entry["producer"] else ""
+            )
+            for named in emits:
+                if f'"{named}"' not in source and f'"{named}"' not in producer_source:
+                    raise Refused(
+                        f"{axis}: importerEmitsAxes claims {named!r} but neither "
+                        f"{entry['importer']} nor the producer names it"
+                    )
+        if entry["envelopeMember"]:
+            # The member lives inside the artifact zip, so the tree cannot hold it -- but the
+            # workflow that uploads it names it, and that is checkable here.
+            if not entry["workflow"]:
+                raise Refused(f"{axis}: envelopeMember without a workflow that writes it")
+            workflow_text = (REPO_ROOT / entry["workflow"]).read_text(encoding="utf-8")
+            if entry["envelopeMember"] not in workflow_text:
+                raise Refused(
+                    f"{axis}: {entry['workflow']} does not name {entry['envelopeMember']!r}"
+                )
         if entry["chain"] == "complete":
             for field in ("workflow", "producer", "importer", "importerArchiveFlag",
                           "artifactNamePrefix", "envelopeMember"):
@@ -142,6 +207,12 @@ def load_sources(path: Path) -> list[dict[str, Any]]:
             if entry["importerArchiveFlag"] not in ("--artifact-zip", "--archive"):
                 raise Refused(
                     f"{axis}: importerArchiveFlag is {entry['importerArchiveFlag']!r}"
+                )
+            if entry["envelopeShape"] not in ("axis-evidence", "axes-bundle"):
+                # A chain is not complete when its importer's output cannot be aggregated.
+                raise Refused(
+                    f"{axis}: a complete chain needs an admissible envelopeShape, not "
+                    f"{entry['envelopeShape']!r}"
                 )
         elif not str(entry.get("reason") or "").strip():
             # An axis that cannot be collected has to say why here, or the aggregator's
@@ -160,15 +231,47 @@ def read_envelopes(directory: Path) -> dict[str, tuple[Path, dict[str, Any]]]:
     found: dict[str, tuple[Path, dict[str, Any]]] = {}
     for path in sorted(directory.glob("*.json")):
         document = read_json(path, f"the envelope {path.name}")
-        axis = str(document.get("axis") or "")
-        if document.get("runPurpose") != AXIS_PURPOSE:
-            continue                      # not an axis envelope; the directory may hold more
-        if axis not in REQUIRED_AXES:
-            raise Refused(f"{path.name} claims axis {axis!r}, which AC-11 does not have")
-        if axis in found:
-            raise Refused(f"two envelopes claim axis {axis!r}: {found[axis][0].name}, {path.name}")
-        found[axis] = (path, document)
+        purpose = document.get("runPurpose")
+        if purpose in BUNDLE_PURPOSES:
+            # A bundle: the importer wrapped its axis envelopes in an ``axes`` array. The
+            # first version read only single envelopes and skipped these with ``continue``,
+            # so the migration rehearsal's two axes were silently dropped even when the
+            # artifact was there (#299 r1) -- the exact failure this module's docstring says
+            # it must not have.
+            rows = document.get("axes")
+            if not isinstance(rows, list) or not rows:
+                raise Refused(f"{path.name} is a {purpose} bundle with no axes array")
+            for row in rows:
+                if not isinstance(row, dict):
+                    raise Refused(f"{path.name} has an axes entry that is not an object")
+                if row.get("runPurpose") != AXIS_PURPOSE:
+                    raise Refused(
+                        f"{path.name} carries an axes entry whose runPurpose is "
+                        f"{row.get('runPurpose')!r}"
+                    )
+                _record(found, path, row)
+            continue
+        if purpose != AXIS_PURPOSE:
+            # Not an axis envelope and not a bundle. Reported rather than skipped: a file
+            # the operator downloaded and this tool ignored is how an axis goes missing
+            # while the artifact is right there.
+            raise Refused(
+                f"{path.name} has runPurpose {purpose!r}, which is neither an axis envelope "
+                f"nor a bundle this tool can read"
+            )
+        _record(found, path, document)
     return found
+
+
+def _record(
+    found: dict[str, tuple[Path, dict[str, Any]]], path: Path, envelope: dict[str, Any]
+) -> None:
+    axis = str(envelope.get("axis") or "")
+    if axis not in REQUIRED_AXES:
+        raise Refused(f"{path.name} claims axis {axis!r}, which AC-11 does not have")
+    if axis in found:
+        raise Refused(f"two envelopes claim axis {axis!r}: {found[axis][0].name}, {path.name}")
+    found[axis] = (path, envelope)
 
 
 def check_envelope(axis: str, envelope: dict[str, Any], release_sha: str, now: dt.datetime) -> None:

@@ -1,7 +1,7 @@
 {
  "schemaVersion": "ac11-axis-sources:1",
  "purpose": "Where each AC-11 axis envelope comes from, so a CI lane can assemble the aggregator's manifest instead of a person assembling it by hand. tools/aggregate_ac11_evidence.py has never been run by CI (48-task rescore v1.8 §4-5-3), which is why its recomputed PASS count is 0/8 -- not because the axes fail, but because nothing calls it. This file is the input that makes calling it possible, and it is deliberately honest about the axes that have no measurement means yet: naming them here with the reason is what keeps the aggregator's INVALID_RUN legible instead of mysterious.",
- "note": "chain is the measured state of the producer -> workflow -> importer path, read from the tree rather than asserted. 'complete' means all three exist and a dispatched run can be turned into an envelope. 'incomplete' names the missing link. 'absent' means no producer exists at all. The aggregator requires all eight envelopes and refuses the aggregation otherwise, so an incomplete or absent axis makes the run INVALID_RUN by design -- that is the fail-closed answer, and the reason text is what tells the reader which external thing is in the way.",
+ "note": "chain is the measured state of the producer -> workflow -> importer path, read from the tree rather than asserted -- and 'the importer exists' is not the same as 'the importer emits an axis envelope', which is the mistake r1 caught. envelopeShape records what the importer actually writes: 'axis-evidence' is one envelope, 'axes-bundle' is a wrapper whose axes array holds them, and 'not-an-axis-envelope' means the importer's output cannot go into the aggregator at all. 'complete' therefore requires producer, workflow, importer AND an admissible shape. The aggregator requires all eight envelopes and refuses otherwise, so an incomplete or absent axis makes the run INVALID_RUN by design -- that is the fail-closed answer, and the reason text is what tells the reader what is in the way.",
  "repository": "egparadise/SaintVision-Invion",
  "axes": [
   {
@@ -13,8 +13,12 @@
    "importerArchiveFlag": "--artifact-zip",
    "artifactNamePrefix": "s11-ac11-migration-",
    "envelopeMember": "s11-ac11-migration-rehearsal.json",
-   "importerEmitsAxes": ["migration-reversible-segment", "irreversible-restore-forward"],
-   "reason": null
+   "importerEmitsAxes": [
+    "migration-reversible-segment",
+    "irreversible-restore-forward"
+   ],
+   "reason": null,
+   "envelopeShape": "axes-bundle"
   },
   {
    "axis": "irreversible-restore-forward",
@@ -25,20 +29,25 @@
    "importerArchiveFlag": "--artifact-zip",
    "artifactNamePrefix": "s11-ac11-migration-",
    "envelopeMember": "s11-ac11-migration-rehearsal.json",
-   "importerEmitsAxes": ["migration-reversible-segment", "irreversible-restore-forward"],
-   "reason": null
+   "importerEmitsAxes": [
+    "migration-reversible-segment",
+    "irreversible-restore-forward"
+   ],
+   "reason": null,
+   "envelopeShape": "axes-bundle"
   },
   {
    "axis": "security-critical-high-zero",
-   "chain": "complete",
+   "chain": "incomplete",
    "workflow": ".github/workflows/ac11-security-scan.yml",
    "producer": "tools/run_ac11_security_scan.py",
    "importer": "tools/import_ac11_security_scan.py",
    "importerArchiveFlag": "--archive",
    "artifactNamePrefix": "s11-ac11-security-",
    "envelopeMember": "s11-ac11-security-scan.json",
-   "importerEmitsAxes": ["security-critical-high-zero"],
-   "reason": null
+   "importerEmitsAxes": [],
+   "reason": "Producer, workflow and importer all exist and the chain was classified complete on that basis -- which was wrong (#299 r1). The importer returns the producer's report with runPurpose 's11-ac11-security-scan' and no axis field, while the aggregator requires runPurpose 'ac11-axis-evidence' and an axis in REQUIRED_AXES. So this axis has an importer and still has no admissible envelope: something has to adapt that report into an axis envelope, and nothing does. That adapter is a follow-up card and not a judgement about the axis definition.",
+   "envelopeShape": "not-an-axis-envelope"
   },
   {
    "axis": "accessibility-e2e",
@@ -50,7 +59,8 @@
    "artifactNamePrefix": "s11-ac11-accessibility-",
    "envelopeMember": "s11-ac11-accessibility-e2e.json",
    "importerEmitsAxes": [],
-   "reason": "The producer and the workflow exist and a run uploads the envelope, but no importer binds that envelope to its GitHub run and artifact digest -- and the aggregator requires artifactSha256, artifactObservedSha256, artifactAvailable and artifactExpiresAt, which a producer cannot put inside the artifact whose digest they describe. So this axis has evidence and no admissible envelope. Writing an importer for it is a follow-up card; it is not a judgement about the axis definition."
+   "reason": "The producer and the workflow exist and a run uploads the envelope, but no importer binds that envelope to its GitHub run and artifact digest -- and the aggregator requires artifactSha256, artifactObservedSha256, artifactAvailable and artifactExpiresAt, which a producer cannot put inside the artifact whose digest they describe. So this axis has evidence and no admissible envelope. Writing an importer for it is a follow-up card; it is not a judgement about the axis definition.",
+   "envelopeShape": null
   },
   {
    "axis": "long-soak",
@@ -61,8 +71,11 @@
    "importerArchiveFlag": "--archive",
    "artifactNamePrefix": null,
    "envelopeMember": null,
-   "importerEmitsAxes": ["long-soak"],
-   "reason": "Producer and importer both exist; no workflow runs the producer, so there is no hosted run to import from. The 48-task rescore records this axis as NOT_REGISTERED at the landed tree for that reason."
+   "importerEmitsAxes": [
+    "long-soak"
+   ],
+   "reason": "Producer and importer both exist; no workflow runs the producer, so there is no hosted run to import from. The 48-task rescore records this axis as NOT_REGISTERED at the landed tree for that reason.",
+   "envelopeShape": "axis-evidence"
   },
   {
    "axis": "actual-pitr-rpo-rto-retention",
@@ -74,7 +87,8 @@
    "artifactNamePrefix": null,
    "envelopeMember": null,
    "importerEmitsAxes": [],
-   "reason": "Blocked on G-22: a real PITR restore on real hardware. The pilot rehearsal records pitrPreflight.status BLOCKED_EXTERNAL, restoreAttempted false and null RPO/RTO, so there is nothing to import. External, and not closable by code in this repository."
+   "reason": "Blocked on G-22: a real PITR restore on real hardware. The pilot rehearsal records pitrPreflight.status BLOCKED_EXTERNAL, restoreAttempted false and null RPO/RTO, so there is nothing to import. External, and not closable by code in this repository.",
+   "envelopeShape": null
   },
   {
    "axis": "physical-five-node-ac05-placement-load",
@@ -86,7 +100,8 @@
    "artifactNamePrefix": null,
    "envelopeMember": null,
    "importerEmitsAxes": [],
-   "reason": "Blocked on G-19 and G-24: five physical nodes under load. Synthetic node rows measured on one host are not this axis, which is why no producer pretends to supply it."
+   "reason": "Blocked on G-19 and G-24: five physical nodes under load. Synthetic node rows measured on one host are not this axis, which is why no producer pretends to supply it.",
+   "envelopeShape": null
   },
   {
    "axis": "physical-five-node-failure-recovery",
@@ -98,7 +113,8 @@
    "artifactNamePrefix": null,
    "envelopeMember": null,
    "importerEmitsAxes": [],
-   "reason": "Blocked on G-21 and G-24: a separate failure domain. The rehearsal script states that its restore cluster is the same host, so it cannot stand in for this axis."
+   "reason": "Blocked on G-21 and G-24: a separate failure domain. The rehearsal script states that its restore cluster is the same host, so it cannot stand in for this axis.",
+   "envelopeShape": null
   }
  ]
 }

@@ -57,20 +57,29 @@ def sources(**overrides):
     """A minimal valid axis map: one complete chain, the rest absent with reasons."""
     axes = []
     for index, axis in enumerate(REQUIRED_AXES):
-        complete = index == 0
+        # The complete chain is the migration rehearsal: its importer really does name its
+        # axes, which the strict map now requires (#299 r1).
+        complete = axis == "migration-reversible-segment"
         axes.append({
             "axis": axis,
             "chain": "complete" if complete else "absent",
-            "workflow": ".github/workflows/ac11-security-scan.yml" if complete else None,
-            "producer": "tools/run_ac11_security_scan.py" if complete else None,
-            "importer": "tools/import_ac11_security_scan.py" if complete else None,
-            "importerArchiveFlag": "--archive" if complete else None,
-            "artifactNamePrefix": "s11-ac11-security-" if complete else None,
-            "envelopeMember": "s11-ac11-security-scan.json" if complete else None,
+            "workflow": ".github/workflows/ac11-migration-rehearsal.yml" if complete else None,
+            "producer": "tools/run_ac11_migration_rehearsal.py" if complete else None,
+            "importer": "tools/import_ac11_migration_rehearsal.py" if complete else None,
+            "importerArchiveFlag": "--artifact-zip" if complete else None,
+            "artifactNamePrefix": "s11-ac11-migration-" if complete else None,
+            "envelopeMember": "s11-ac11-migration-rehearsal.json" if complete else None,
             "importerEmitsAxes": [axis] if complete else [],
+            "envelopeShape": "axis-evidence" if complete else None,
             "reason": None if complete else "no producer exists",
         })
-    document = {"schemaVersion": assembler.SOURCES_SCHEMA, "axes": axes}
+    document = {
+        "schemaVersion": assembler.SOURCES_SCHEMA,
+        "purpose": "a fixture axis map",
+        "note": "one complete chain, the rest absent with reasons",
+        "repository": assembler.REPOSITORY,
+        "axes": axes,
+    }
     document.update(overrides)
     return document
 
@@ -118,7 +127,7 @@ def test_a_complete_chain_with_no_envelope_says_what_to_dispatch(tmp_path):
     """An instruction, not a blocker: the lane simply has not collected it yet."""
     _manifest, absent = assemble(tmp_path)
     first = next(line for line in absent if line.startswith(REQUIRED_AXES[0]))
-    assert "dispatch" in first and "ac11-security-scan.yml" in first
+    assert "dispatch" in first and "ac11-migration-rehearsal.yml" in first
 
 
 # --- what it refuses --------------------------------------------------------------------
@@ -167,13 +176,58 @@ def test_an_envelope_for_an_unknown_axis_is_refused(tmp_path):
     assert "which AC-11 does not have" in str(refused.value)
 
 
-def test_a_file_that_is_not_an_axis_envelope_is_ignored(tmp_path):
-    """The directory can hold the producer's own report beside the importer's output."""
-    manifest, _absent = assemble(tmp_path, envelopes={
-        "report.json": {"runPurpose": "something-else", "axis": None},
-        "one.json": envelope(REQUIRED_AXES[0]),
-    })
-    assert [row["axis"] for row in manifest["axes"]] == [REQUIRED_AXES[0]]
+def test_a_file_this_tool_cannot_read_is_refused_rather_than_ignored(tmp_path):
+    """Changed in r1, and the change is the finding.
+
+    The first version skipped any document whose ``runPurpose`` it did not recognise. That is
+    how the migration rehearsal's two axes went missing while its artifact sat in the
+    directory: its importer writes a *bundle*, not a single envelope. Ignoring what it cannot
+    read is the behaviour that hid it, so an unknown purpose is now a refusal.
+    """
+    with pytest.raises(assembler.Refused) as refused:
+        assemble(tmp_path, envelopes={
+            "report.json": {"runPurpose": "something-else", "axis": None},
+            "one.json": envelope(REQUIRED_AXES[0]),
+        })
+    assert "neither an axis envelope nor a bundle" in str(refused.value)
+
+
+def test_a_bundle_of_axis_envelopes_is_read(tmp_path):
+    """The real shape ``tools/import_ac11_migration_rehearsal.py`` writes (#299 r1).
+
+    Its output is one document with ``runPurpose: ac11-migration-rehearsal-import`` and an
+    ``axes`` array whose rows are proper axis envelopes. The first version read only single
+    envelopes, so an artifact that was present and correct produced nothing.
+    """
+    bundle = {
+        "schemaVersion": "1.0.0",
+        "runPurpose": "ac11-migration-rehearsal-import",
+        "axes": [envelope("migration-reversible-segment"),
+                 envelope("irreversible-restore-forward")],
+    }
+    manifest, absent = assemble(tmp_path, envelopes={"migration.json": bundle})
+    assert sorted(row["axis"] for row in manifest["axes"]) == [
+        "irreversible-restore-forward", "migration-reversible-segment",
+    ]
+    assert len(absent) == len(REQUIRED_AXES) - 2
+
+
+def test_a_bundle_whose_rows_are_not_axis_envelopes_is_refused(tmp_path):
+    bundle = {
+        "runPurpose": "ac11-migration-rehearsal-import",
+        "axes": [{**envelope(REQUIRED_AXES[0]), "runPurpose": "something-else"}],
+    }
+    with pytest.raises(assembler.Refused) as refused:
+        assemble(tmp_path, envelopes={"migration.json": bundle})
+    assert "carries an axes entry whose runPurpose" in str(refused.value)
+
+
+def test_a_bundle_with_no_axes_array_is_refused(tmp_path):
+    with pytest.raises(assembler.Refused) as refused:
+        assemble(tmp_path, envelopes={
+            "migration.json": {"runPurpose": "ac11-migration-rehearsal-import", "axes": []}
+        })
+    assert "bundle with no axes array" in str(refused.value)
 
 
 def test_a_duplicate_json_key_is_refused(tmp_path):
@@ -210,6 +264,20 @@ def test_a_release_sha_that_is_not_a_commit_is_refused(tmp_path):
         (lambda d: d["axes"][0].__setitem__("artifactNamePrefix", ""), "needs artifactNamePrefix"),
         (lambda d: d.__setitem__("axes", []), "non-empty axes list"),
         (lambda d: d["axes"].pop(0), "do not cover"),
+        # The four #299 r1 named, each of which passed before.
+        (lambda d: d.__setitem__("unexpected", 1), "top-level key set is not exact"),
+        (lambda d: d.__setitem__("repository", "attacker/repo"), "name repository"),
+        (lambda d: d["axes"][0].__setitem__("importerEmitsAxes", ["invented-axis"]),
+         "names something that is not an axis"),
+        (lambda d: d["axes"][0].__setitem__("envelopeMember", "does-not-exist.json"),
+         "does not name"),
+        # And four more of the same shape.
+        (lambda d: d["axes"][0].__setitem__("envelopeShape", "whatever"), "envelopeShape is"),
+        (lambda d: d["axes"][0].__setitem__("importerEmitsAxes", ["long-soak"]),
+         "does not include this axis"),
+        (lambda d: d.__setitem__("purpose", "  "), "must be a non-empty string"),
+        (lambda d: d["axes"][0].__setitem__("envelopeShape", "not-an-axis-envelope"),
+         "needs an admissible envelopeShape"),
     ],
 )
 def test_an_axis_map_that_cannot_be_trusted_is_refused(tmp_path, mutate, expected):
@@ -246,11 +314,17 @@ def test_the_shipped_axis_map_is_honest_about_what_cannot_be_collected():
     """
     axes = {entry["axis"]: entry for entry in assembler.load_sources(assembler.DEFAULT_SOURCES)}
     complete = {axis for axis, entry in axes.items() if entry["chain"] == "complete"}
-    assert complete == {
-        "migration-reversible-segment",
-        "irreversible-restore-forward",
-        "security-critical-high-zero",
-    }
+    # Two, not three. The security chain was classified complete because producer, workflow
+    # and importer all exist -- and its importer returns the producer's report with
+    # runPurpose "s11-ac11-security-scan" and no axis field, so there is no admissible
+    # envelope (#299 r1). "The importer exists" is not "the importer emits an axis envelope".
+    assert complete == {"migration-reversible-segment", "irreversible-restore-forward"}
+    assert all(axes[axis]["envelopeShape"] == "axes-bundle" for axis in complete)
+    security = axes["security-critical-high-zero"]
+    assert security["chain"] == "incomplete"
+    assert security["envelopeShape"] == "not-an-axis-envelope"
+    assert security["importerEmitsAxes"] == []
+    assert "no axis field" in security["reason"]
     assert axes["accessibility-e2e"]["chain"] == "incomplete"
     assert axes["accessibility-e2e"]["importer"] is None
     assert axes["long-soak"]["chain"] == "incomplete"
