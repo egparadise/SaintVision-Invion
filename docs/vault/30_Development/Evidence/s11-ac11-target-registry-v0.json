@@ -178,9 +178,9 @@
       "targetId": "s11-accessibility-user-device-v1",
       "axis": "accessibility-e2e",
       "sourceDocument": {
-        "commit": "db8c8a785a8c7f78a4d252cf5205e0417f1cc6fe",
+        "commit": "505a5f4b040badfbe1e703d5cac091ddf1db9620",
         "path": "docs/vault/30_Development/S11_AC11_accessibility_user_device_target_v1.md",
-        "blob": "bd878c30cc74e235b63e4105b4226e76cfb60a54"
+        "blob": "737853bbde0bc3da077c37acea132552e55f8eb9"
       },
       "criteria": {
         "canonicalJourneyFailureCount": {"operator": "eq", "value": 0},
