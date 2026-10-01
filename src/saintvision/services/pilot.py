@@ -40,6 +40,7 @@ from ..db.models import (
 from ..errors import RES_ARTIFACT_NOT_FOUND, RES_RELEASE_NOT_FOUND, VAL_SCHEMA, InvError
 from ..ids import new_id
 from . import release_sign_off
+from . import release_acceptance_resolver
 
 BACKUP_KINDS = ("base", "wal", "logical")
 DRILL_SCOPES = ("database", "workspace", "artifact", "node")
@@ -379,6 +380,7 @@ def create_release_manifest(
         {"name": c.name, "kind": c.kind, "digest": c.digest}
         for c in sorted(components, key=lambda c: (c.kind, c.name))
     ]
+    target_registry = release_acceptance_resolver.load_target_registry()
     row = ReleaseManifest(
         release_id=new_id("release"),
         tenant_id=tenant_id,
@@ -388,6 +390,9 @@ def create_release_manifest(
         manifest_sha256=canonical_digest(payload),
         created_by_user_id=created_by_user_id,
         created_at=now,
+        target_registry_version=target_registry.document.registry_version,
+        target_registry_git_blob_sha=target_registry.git_blob_sha,
+        target_registry_file_sha256=target_registry.file_sha256,
     )
     session.add(row)
     session.flush()

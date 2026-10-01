@@ -92,6 +92,7 @@ JSON_MEDIA_TYPE = "application/json"
 VAL_REQUEST = "VAL-0003"
 AUTH_PROJECT = "AUTH-0030"
 RES_NOT_FOUND = "RES-0004"
+RES_RETRYABLE = "RES-0007"
 GRAPH_PRECONDITION = "GRAPH-0002"
 #: State the caller described has moved: a digest, an expiry, a slot or a reference
 #: binding is no longer what the request was built against. 409 and not retryable --
