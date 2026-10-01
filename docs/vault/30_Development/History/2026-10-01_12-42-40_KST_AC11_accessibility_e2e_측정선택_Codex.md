@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-20261001-CARD171-AC11-ACCESSIBILITY-CODEX"
 title: "CARD-171 AC-11 accessibility-e2e hosted 측정 선택"
-version: "1.2.1"
+version: "1.3.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-01T13:20:18+09:00"
+updated: "2026-10-01T13:24:15+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "7851412db792b4ef6c53cb92944be530d77eb2de"
@@ -79,3 +79,10 @@ producer다. 최초 hosted run ID와 artifact digest는 PR에서 실행한 뒤 �
 - producer가 focus 복원, 대비, capacity 값을 상수로 덮어쓰거나 assert로 report 생성을 중단하지 않도록 실제 DOM 관측값으로 summary를 계산한다. 브라우저 node fixture는 Playwright network boundary에서 명시하고 evidence에 `vite-dev-server-with-browser-node-fixture`로 정직하게 기록한다.
 - 자동 범위는 대비 3건과 keyboard/focus 2건이며 ACC-01~09 전체·화면낭독기·사용자 장비 인수는 미측정이다. raw producer artifact는 upload 전이므로 `artifactSha256=null`, `artifactStatus=PENDING_UPLOAD`로 두며 AC-11 aggregator 소비 가능 봉투라고 과장하지 않는다.
 - hosted run `36814431211`은 물리 browser case 6건을 모두 통과한 뒤 Playwright route handler가 두 번째 positional `Request`를 JSON body로 잘못 받아 invariant 시작 전에 실패했다. 제품·접근성 판정에 도달하지 않은 callback 결함이므로 `NOT_OBSERVED`이며 one-argument handler와 source regression assertion으로 교정했다.
+
+## 정본 hosted 측정
+
+- exact-head `21591430bc4383d7617ede654ee318223958633a`, run `36814708026`의 모든 workflow step이 성공했다. GitHub artifact `11140119083`의 digest는 `sha256:77d30b61dfa0027a86b123be94e5cb5e545dd1110b9cc12c0b2f151d11797cbb`, 만료 시각은 `2026-10-31T04:23:23Z`다.
+- 브라우저는 `Google Chrome 153.0.8010.52`, 실행 표면은 `vite-dev-server-with-browser-node-fixture`로 기록됐다. 물리 case 6건은 논리 journey 5건으로 묶였고 journey failure 0, desktop invariant 0/9, contrast 0/3, keyboard/focus 0/2였다.
+- 수동 사용자 장비·화면낭독기 인수 producer는 여전히 없으므로 `manualAcceptanceMissingCount=1`, 최종 raw verdict는 의도대로 `MEASURED_FAIL`이다. 이는 자동 접근성 결함이 아니라 사전 등록한 completeness failure이며 AC-11 done 또는 점수 승격을 뜻하지 않는다.
+- raw report의 `artifactSha256=null`, `artifactStatus=PENDING_UPLOAD`는 upload 전 producer 경계를 나타낸다. 위 GitHub artifact metadata는 History와 PR 검토에 별도로 결속하며, importer가 생기기 전에는 aggregator-consumable Evidence라고 주장하지 않는다.

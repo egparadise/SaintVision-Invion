@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.239"
+version: "1.0.240"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T13:20:18+09:00"
+updated: "2026-10-01T13:24:15+09:00"
 source_of_truth: "Git"
 active_card: "CARD-171 AC-11 accessibility-e2e hosted measurement"
-active_card_status: "Hosted 36814431211 passed all six browser cases; Playwright fixture callback drift was NOT_OBSERVED and is corrected"
-active_card_next: "Rerun exact-head hosted lane and obtain JSON/JUnit evidence"
+active_card_status: "Hosted run 36814708026 green; automatic journey/invariant/contrast/keyboard failures are zero and manual acceptance remains missing"
+active_card_next: "Claude re-review of PR #266; then start Card172 BuildKit boundary implementation"
 ---
 
 ## 2026-10-01 Card 171 — AC-11 accessibility-e2e hosted 측정 수단
@@ -25,6 +25,11 @@ active_card_next: "Rerun exact-head hosted lane and obtain JSON/JUnit evidence"
   invariant 9의 node route drift로 Evidence 생성 전 중단되어 `NOT_OBSERVED`다. collector는
   JUnit·identity digest와 parameter multiplicity를 검증하고 producer는 focus·대비·capacity
   실측값을 그대로 기록하도록 보강했으며 PG-free 단일 시험은 16 passed다.
+- 정본 hosted run `36814708026`은 물리 case 6/논리 journey 5, invariant 9, contrast 3,
+  keyboard/focus 2를 모두 자동 failure 0으로 측정했다. artifact `11140119083` digest는
+  `sha256:77d30b61dfa0027a86b123be94e5cb5e545dd1110b9cc12c0b2f151d11797cbb`다.
+  수동 사용자 인수 부재 1건 때문에 raw verdict는 사전 등록대로 `MEASURED_FAIL`이며
+  AC-11 done·점수 승격은 하지 않는다.
 
 ## 2026-09-30 Card151 Claude F1-F12 보안·측정 경계 후속
 - PR #248에서 root·service·PITR 자격을 host argv와 Docker `Config.Env`에서 제거하고 단일 보호 파일 mount로 고정했다. PITR policy의 delete 권한을 제거하고 bucket versioning을 활성화했다.
