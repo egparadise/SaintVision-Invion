@@ -366,7 +366,7 @@ def test_the_aggregation_of_this_tree_cannot_be_valid_yet(tmp_path):
 # --- the lane, and why it owes no landing lane ------------------------------------------
 
 
-def test_the_aggregate_workflow_is_dispatch_only_and_so_owes_no_landing_lane():
+def test_the_aggregate_workflow_is_not_reachable_by_a_push_and_so_owes_no_landing_lane():
     """The reverse ratchet in ``test_post_landing_verify.py`` makes this a real question.
 
     Every workflow that can be reached by a push to the integration ref must have a lane in
@@ -386,9 +386,18 @@ def test_the_aggregate_workflow_is_dispatch_only_and_so_owes_no_landing_lane():
     )
     # YAML 1.1 turns the key `on` into True, which is why this reads it by that key.
     triggers = document[True]
-    assert set(triggers) == {"workflow_dispatch"}
+    # No `push`: that is what the reverse ratchet cares about, and it is why this lane owes
+    # no entry in LANES. The label-gated `pull_request` trigger exists because a
+    # dispatch-only workflow that has never run is not in GitHub's workflow index and cannot
+    # be dispatched at all -- measured as `HTTP 404: ... not found on the default branch`
+    # (#299 r1). It stays opt-in, so no ordinary pull request spends a runner on it.
+    assert set(triggers) == {"workflow_dispatch", "pull_request"}
+    assert "push" not in triggers
+    assert set(triggers["pull_request"]["types"]) == {"labeled", "synchronize", "reopened"}
     assert set(triggers["workflow_dispatch"]["inputs"]) == {"source_sha", "correlation_id"}
     assert triggers["workflow_dispatch"]["inputs"]["source_sha"]["required"] is True
+    job = document["jobs"]["ac11-aggregate"]
+    assert "run-ac11-aggregate" in job["if"], "the pull-request path must stay label-gated"
     # Least privilege, and `actions: read` is the whole reason it is a separate lane.
     assert document["permissions"] == {"contents": "read", "actions": "read"}
 

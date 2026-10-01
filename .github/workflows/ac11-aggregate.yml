@@ -21,6 +21,16 @@ on:
         description: 'Opaque id for a tool to bind this exact run; leave empty for a normal manual run'
         required: false
         default: ''
+  # Opt-in on pull requests, by label, exactly like ac11-security-scan.yml.
+  #
+  # Not decoration: a `workflow_dispatch`-only workflow that has never run is not in
+  # GitHub's workflow index, and dispatching it answers
+  # `HTTP 404: workflow ac11-aggregate.yml not found on the default branch` -- measured on
+  # this branch (#299 r1). So a lane like this cannot be exercised before it lands unless
+  # some other event registers it. The label is that event, and it stays opt-in so no
+  # ordinary pull request spends a runner on it.
+  pull_request:
+    types: [labeled, synchronize, reopened]
 
 # `actions: read` is the whole reason this is a separate lane: it reads other runs'
 # artifacts, which `contents: read` cannot do. Nothing here writes to the repository.
@@ -30,13 +40,18 @@ permissions:
 
 jobs:
   ac11-aggregate:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.pull_request.labels.*.name, 'run-ac11-aggregate')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     concurrency:
-      group: ac11-aggregate-${{ inputs.source_sha }}
+      group: ac11-aggregate-${{ inputs.source_sha || github.event.pull_request.head.sha }}
       cancel-in-progress: false
     env:
-      SOURCE_SHA: ${{ inputs.source_sha }}
+      # On a dispatch the operator names the SHA; on a labelled pull request it is that
+      # pull request's head, because any other SHA would describe a tree nobody asked about.
+      SOURCE_SHA: ${{ inputs.source_sha || github.event.pull_request.head.sha }}
       REPO: ${{ github.repository }}
       ENVELOPES: evidence/ac11-axes
       MANIFEST: evidence/ac11-aggregate-manifest.json
@@ -168,7 +183,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: s11-ac11-aggregate-${{ inputs.source_sha }}
+          name: s11-ac11-aggregate-${{ inputs.source_sha || github.event.pull_request.head.sha }}
           path: evidence/
           if-no-files-found: error
           retention-days: 90
