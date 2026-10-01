@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.161"
+version: "1.0.162"
 status: "approved"
 author: "Gemini"
-updated: "2026-10-01T13:52:00+09:00"
+updated: "2026-10-01T17:28:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,37 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-10-01T13:52:00+09:00 (Card 169 S08-FE 관리자 비상 정지 백엔드 실배선, PR #267 2차 독립 검토 전수 조치: Claude V1~V5 & Codex r2 strict-contract (a)~(d) 전수 반영, NodeId Crockford base32 규격 및 null 결속, 9007199254740991 상한, RFC 4122 UUID 검증, real fetch mock status 관측, vitest 16 passed, tsc -b/build/route_coverage 100%).
+- 확인 기준: 2026-10-01T17:28:00+09:00 (Card 180 S11-FE ACC-09 디자인 토큰 명도 대비 전수 적합화: 143곳 저대비 토큰 및 DEF-S11-10 입력창 경계선 1.94:1 부류 index.css 토큰 보정으로 일괄 해소, 다크/라이트 3대 배경 전수 계산 단위 시험 acc09-contrast-tokens.test.tsx 6 passed, revert-fail 불변식 증명, tsc -b/build/route_coverage 100% 클린).
+
+## 2026-10-01 S11-FE ACC-09 디자인 토큰 명도 대비 전수 적합화 및 수학적 계산 단위 시험 (Card 180, `agent/gemini/c180-s11fe-contrast-fixes`, base `coord/train7-ci-1641`)
+- **개요**: S11-FE ACC-09 접근성 기준(WCAG 2.2 AA 본문 텍스트 >= 4.5:1, UI 경계 >= 3.0:1)을 충족하기 위해 `apps/web/src/index.css`의 디자인 토큰을 전수 분석 및 일괄 보정:
+  1. **토큰 전수 식별 및 보정**:
+     - Dark `--color-border-subtle`: `#374151` $\rightarrow$ `#64748b` (대비 1.42:1 $\rightarrow$ 3.08:1 ~ 3.73:1, $\ge 3.0:1$ 달성).
+     - Light `--color-border-subtle`: `#e2e8f0` $\rightarrow$ `#7b8b9e` (대비 1.13:1 $\rightarrow$ 3.18:1 ~ 3.48:1, $\ge 3.0:1$ 달성).
+     - Light `--color-border-strong`: `#64748b` $\rightarrow$ `#475569` (대비 4.34:1 $\rightarrow$ 6.92:1 ~ 7.58:1, $\ge 3.0:1$ 달성 및 strong > subtle 계층 구조 유지).
+     - Light `--color-text-muted` & `--color-status-neutral`: `#64748b` $\rightarrow$ `#59677b` (대비 4.34:1 $\rightarrow$ 5.25:1 ~ 5.75:1, $\ge 4.5:1$ 달성).
+     - Light `--color-status-online`: `#16a34a` $\rightarrow$ `#15803d` (대비 3.01:1 $\rightarrow$ 4.58:1 ~ 5.02:1, $\ge 4.5:1$ 달성).
+     - Light `--color-status-degraded` & `--color-risk-l2`: `#d97706` $\rightarrow$ `#b45309` (대비 2.91:1 $\rightarrow$ 4.58:1 ~ 5.02:1, $\ge 4.5:1$ 달성).
+     - Light `--color-status-offline` & `--color-risk-l3`: `#dc2626` $\rightarrow$ `#b91c1c` (대비 4.41:1 $\rightarrow$ 5.91:1 ~ 6.47:1, $\ge 4.5:1$ 달성).
+     - Light `--color-risk-l0`: `#059669` $\rightarrow$ `#047857` (대비 3.44:1 $\rightarrow$ 5.01:1 ~ 5.48:1, $\ge 4.5:1$ 달성).
+  2. **143곳 토큰 일괄 해소 및 DEF-S11-10 결함 원천 해결**:
+     - 컴포넌트 143곳의 개별 하드코딩 없이 `index.css` 디자인 토큰 자체를 수정하여 `NodeList` 신규 노드 선택 버튼 테두리, 카드 외곽선, 테이블 행 구분선, `WorkspaceCreateModal` 입력창 경계선(이전 Dark 1.94:1 / Light 1.36:1 $\rightarrow$ 3.08:1 / 3.18:1)을 한 번에 해소.
+  3. **수학적 대비 계산 단위 시험 (`acc09-contrast-tokens.test.tsx`)**:
+     - `index.css`를 직접 읽어 상대 휘도 $L = 0.2126R + 0.7152G + 0.0722B$ 및 대비율을 계산.
+     - 양 테마 12개 텍스트 토큰의 3대 배경 대비 $\ge 4.5:1$, 2개 테두리 토큰 $\ge 3.0:1$, 버튼 배경 $\ge 4.5:1$ 엄격 단언.
+     - 레거시 저대비 값 대입 시 즉각 실패하는 Revert-Fail 불변식 5종 영구 검증.
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성 소유). Reviewer: Claude (UI/접근성/테스트), Codex (무결성/계약/디자인토큰).
+- **관측 근거 (Evidence)**:
+  - 단위 시험: `npm run test -- acc09-contrast-tokens.test.tsx` (6 passed 100%, 5ms)
+  - 기존 스위트: `npm run test -- s11-defect-fixes.test.tsx` (16 passed 100%)
+  - 타입 검사: `npx tsc -b` (에러 0건, 클린 통과)
+  - 프로덕션 번들: `npm run build` (빌드 완료, 5.53s)
+  - 라우트 커버리지: `pytest tests/test_route_coverage.py` (40 passed 100%)
+  - 프런트 무결성: `python tools/check_frontend_integrity.py` (92개 파일 스캔, 9대 규칙 위반 0건)
+  - 계약 바인딩: `python tools/check_contract_bindings.py` (55 fixtures PASS)
+  - 문서 정합성: `python tools/check_docs.py` (PASS, exit 0)
+  - 봇 호출 방지 검사: 금지 봇 호출 태그 0건 검출 확인
+- **전문 문서**: [[2026-10-01_17-25-00_KST_Card180_S11-FE_ACC-09_디자인토큰_대비개선_및_단위시험_Gemini]]
 
 ## 2026-10-01 관리자 보안 콘솔 비상 정지(Kill Switch) 백엔드 실배선 및 멱등/승인ID 제어 평면 연동 (Card 169, S08-FE, `agent/gemini/c169-s08fe-killswitch-real-wiring`, PR #267)
 - **개요**:
