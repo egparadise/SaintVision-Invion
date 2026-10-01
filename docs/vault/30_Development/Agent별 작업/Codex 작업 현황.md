@@ -1,15 +1,69 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.252"
+version: "1.0.260"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T20:30:20+09:00"
+updated: "2026-10-02T04:12:15+09:00"
 source_of_truth: "Git"
-active_card: "CARD-184 S12 release acceptance/operator sign-off write contract"
-active_card_status: "Card 187 implementation questions resolved and locally gated: focused 68 passed on Pydantic default/2.13.5; schema 93/93 and docs/bindings/citations exit 0"
-active_card_next: "Push exact head and confirm Backend 3.12/3.14 green; implementation remains disabled until fresh-auth and authoritative resolvers land"
+active_card: "CARD-200 S08-BE concrete rootless BuildKit transport stage 1"
+active_card_status: "Hosted ci-reference OCI roundtrip MEASURED_PASS at run 36912381153; product dispatch remains disabled"
+active_card_next: "Claude r2 review; later bind operational builder, cleanup, lease release, and durable Evidence"
 ---
+
+## 2026-10-01 Card 194 — S12 acceptance target·Evidence resolver 구현
+
+- coordinator 정정에 따라 #286 head `faba659d`를 merge commit `e19aff84`로 적층한 뒤, 최신
+  #286 head `795db3c2`도 merge commit `fe066c06`으로 따라갔고,
+  `0058_release_acceptance_resolver`의 부모를 반드시 `0057_release_acceptance_quorum`으로 고정했다.
+  `tools/migration_graph.py --head`는 단일 head `0058_release_acceptance_resolver`를 보고한다.
+- Evidence 전체 stored field의 PostgreSQL 16 canonical digest, caller digest overwrite, release별 target registry pin,
+  append-only tenant RLS binding, Evidence→Run→Workload project 재도출을 migration과 모델에 결속했다.
+- server-owned exact resolver와 내부 binder, fresh human + live `releases.accept`를 다시 확인하는 read-only discovery GET을 구현했다.
+  caller project·telemetry·actor는 응답에 없고 404/409/503 경계를 redacted ProblemDetails로 고정했다.
+- `INV_RELEASE_ACCEPTANCE_WRITE_ENABLED` 기본값과 `AUTHORITATIVE_REFS_BOUND`는 의도적으로 false다. 기존 sign-off
+  projection은 실제 ref 재해석 결과를 받지 않으므로 상수만 true로 바꾸면 허위 합격이 된다.
+- PG-free focused **31 passed**, schema export **97/97**, contract bindings, docs, ontology는 exit 0이다.
+  로컬은 지원 Python 3.12/3.14 test env와 `INV_TEST_ADMIN_DSN`이 없어 real-PG를 실행하지 않았으며, hosted Core
+  실행 전에는 migration·trigger·RLS 결과를 `NOT_OBSERVED`로 유지한다.
+- 첫 hosted Core run `36879319911`은 0058 뒤에도 definer policy revision이 0057이어서 migration upgrade
+  gate가 fail closed했다. function allowlist는 유지하고 revision을 0058로 동기화했으며 재실행 대기 중이다.
+- Claude r1의 3개 결함과 Low 회귀를 `e0505648`·`be1bb8d7`에서 닫았고 r2는 코드·시험을 조건부
+  승인했다. 이후 기존 resume probe의 head/pin·공유 DB 오염을 `93a42a26`·`09fd39a3`에서 교정했다.
+- #286 최신 `37db674f`는 merge `f2b589d1`으로 따라갔다. 0057 manifest·policy pin trigger와 0058
+  target-registry pin trigger는 독립이며 API 충돌은 resolver와 denial audit를 모두 보존했다.
+- `596def53` Backend 3.12는 7018 passed·51 skipped 뒤 결합 시험 2건이 실패했다. 승인된 #286의
+  커밋형 409 감사 예외를 기존 전역 금지 시험이 몰랐고, 0054 downgrade 시험이 현재 0058 head 대신
+  과거 revision을 전제했다. `ed46b2b9`에서 예외를 정확히 1곳으로 고정하고 downgrade 실패 뒤 현재
+  head 보존을 단언했다. 최종 exact-head green 전에는 hosted real-PG를 `NOT_OBSERVED`로 유지한다.
+- 근거: [[S12-BE_release_acceptance_target_Evidence_resolver_설계]],
+  [[2026-10-01_23-43-41_KST_Card194_S12-BE_target_Evidence_resolver_구현_Codex]].
+## 2026-10-02 Card 200 — S08-BE concrete rootless BuildKit transport Stage 1
+
+- base `25f43a25` 위에서 disabled-by-default concrete transport, strict health/worker 측정,
+  fail-closed product methods, opt-in hosted lane을 구현했다.
+- hosted run `36912381153`은 exact code `c4130ae4`, BuildKit v0.20.2·RootlessKit v2.3.4에서
+  OCI reference 왕복 1/1을 통과했다. 실제 daemon PID/UID/userns와 Docker privilege 경계,
+  pulled image digest를 측정·대조했다.
+- 결과는 `ci-reference`이며 제품 caller·cleanup·lease release·Evidence persistence는 미결속,
+  LAN builder는 `BLOCKED_EXTERNAL`, S08-BE 상태·점수는 유지한다.
+- [[2026-10-02_04-12-15_KST_S08-BE_rootless_BuildKit_transport_Codex]] · PR #297.
+
+## 2026-10-01 Card 190 — S12 수락 target·Evidence 정본 resolver 계약
+
+- #282 v1.3.0의 두 번째 write prerequisite를 선택했다. `input_sha256` fallback을 금지하고
+  target registry·Evidence envelope digest·release/project binding을 server-owned 경계로 설계했다.
+- AC-12 target registry는 정본 source commit/path/blob, 4 criteria, canonical target digest를
+  고정한다. strict 공개 계약 2개와 generated schema 2개를 추가했다.
+- Evidence digest는 `(evidence_id,recorded_at)`의 partition identity를 포함한 row 전체 의미이며,
+  예약 승인된 migration `0058`에서 inline trigger 계산·legacy NULL fail-closed·receipt backfill을 요구한다.
+- Claude r1에 따라 ledger/lock 순서, `RES-0007`, binder/discovery route, release·policy·registry pin DTO,
+  duplicate-key raw loader, merge-only source 도달성을 v1.1에 고정했다.
+- Claude r2의 Low 5건도 strict discovery page, trigger/helper digest equality, owner 독립 변이,
+  DTO criterion 정합, criterion coordination slot 용어로 닫았다.
+- PG-free resolver **33 passed**, write contract 포함 **61 passed**. resolver·migration·real-PG·write enable은 `NOT_OBSERVED`다.
+  [[S12-BE_release_acceptance_target_Evidence_resolver_설계]],
+  [[2026-10-01_21-35-49_KST_S12_acceptance_target_Evidence_resolver_Codex]].
 
 ## 2026-10-01 Card 184 — S12 release 수락·operator sign-off 쓰기 계약
 
@@ -50,6 +104,20 @@ active_card_next: "Push exact head and confirm Backend 3.12/3.14 green; implemen
 - route·migration·OIDC claim 전달·DB·실 PG는 미구현이며 Claude 독립 검토 뒤 다음 카드가
   구현한다. [[S12-BE_release_acceptance_operator_signoff_쓰기_계약_설계]],
   [[2026-10-01_18-55-55_KST_S12-BE_release_acceptance_쓰기_계약_Codex]].
+## 2026-10-01 Card 188 — S12 fresh-auth claim 공급원
+
+- train 9 base `89c8f366` 위에 Keycloak `AUTH_TIME`·AMR mapper와 password/OTP RFC 8176
+  reference를 고정하고, 서명 검증된 token에서만 Principal fresh-auth metadata가 생기도록
+  결속했다.
+- 정책은 300초 안의 `mfa` 또는 `pwd+(otp|hwk|swk)`만 허용한다. 누락·오래됨·미래·
+  `pwd` 단독·`webauthn`·unknown claim은 fail closed다.
+- portal 인계 계약은 exact `prompt=login&max_age=300`이다. FE 구현과 live Keycloak token
+  관측은 아직 없으므로 write route flag는 off이고 운영 인수는 `BLOCKED_EXTERNAL`이다.
+- Claude r1에 따라 static reference PASS와 실제 portal flow/OTP 등록을 분리했다. 두 운영자의
+  OTP 등록과 live `pwd+otp|mfa` token 관측 전에는 write-ready가 아니다. str/float auth_time,
+  변조 서명, AMR token target 변이 시험도 보강했다.
+- 근거: [[2026-10-01_21-10-00_KST_Card188_fresh_auth_claim_공급원_Codex]],
+  [[S12-BE_fresh_auth_claim_공급원_및_portal_step-up_인계]].
 
 ## 2026-10-01 Card 166 — shard parent/member cancel bridge 후속
 

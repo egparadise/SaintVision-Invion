@@ -89,6 +89,10 @@ class EvidenceEnvelope(Base):
     component_versions: Mapped[dict] = mapped_column(
         JSONB, server_default=text("'{}'::jsonb")
     )
+    #: SHA-256 of the complete stored envelope under
+    #: ``evidence-envelope-digest:1``. NULL classifies pre-0058 rows until a reviewed
+    #: backfill receipt exists; it is never substituted with ``input_sha256``.
+    envelope_sha256: Mapped[Sha256 | None] = mapped_column(nullable=True)
 
 
 class OutboxEvent(Base):

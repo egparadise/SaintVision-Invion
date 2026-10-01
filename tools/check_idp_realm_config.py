@@ -20,6 +20,11 @@ without it, or because a browser client without it is exploitable:
   list and ``verify`` uses ``strict_aud``, which forbids lists;
 * an audience mapper naming the API client, and a ``client_id`` claim, which Keycloak
   does not emit on its own -- it emits ``azp``;
+* ``auth_time`` from the server-side ``AUTH_TIME`` user-session note and the built-in
+  AMR mapper, both access-token only. The client-local auth-time mapper intentionally
+  pins the same value Keycloak 26's realm-wide ``basic`` scope may also emit;
+* RFC 8176 execution references ``pwd`` and ``otp`` with a 300-second max age, so
+  the AMR claim describes completed authenticators rather than a caller assertion;
 * the ``inv.api`` scope, assigned AND with ``include.in.token.scope`` true. The
   assignment alone puts nothing in the token: with the attribute false the scope is
   listed on the client, the token has no ``inv.api``, the product answers 401, and a
@@ -54,6 +59,7 @@ PKCE_ATTRIBUTE = "pkce.code.challenge.method"
 SCOPE_IN_TOKEN_ATTRIBUTE = "include.in.token.scope"
 ALLOWED_SSL_REQUIRED = ("external", "all")
 FORBIDDEN_SCOPES = ("roles",)  # its audience-resolve mapper makes aud a list
+FRESH_AUTH_REFERENCE_MAX_AGE = "300"
 LOGIN_FLAGS = (
     "standardFlowEnabled",
     "directAccessGrantsEnabled",
@@ -222,6 +228,54 @@ def drift(config: Any, *, realm: str, api_client: str, portal_client: str, scope
             findings.append(f"the client_id claim is not {portal_client}")
         if str(mapper_config.get("access.token.claim")).lower() != "true":
             findings.append("the client_id mapper does not write to the access token")
+
+    auth_time = mappers.get("fresh-auth-time")
+    if auth_time is None or auth_time.get("protocolMapper") != "oidc-usersessionmodel-note-mapper":
+        findings.append("no fresh-auth-time user-session-note mapper is configured")
+    else:
+        mapper_config = auth_time.get("config") or {}
+        expected = {
+            "user.session.note": "AUTH_TIME",
+            "claim.name": "auth_time",
+            "jsonType.label": "long",
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "userinfo.token.claim": "false",
+        }
+        if any(str(mapper_config.get(key)).lower() != value.lower() for key, value in expected.items()):
+            findings.append("the fresh-auth-time mapper does not exactly bind AUTH_TIME to access-token auth_time")
+
+    amr = mappers.get("fresh-auth-amr")
+    if amr is None or amr.get("protocolMapper") != "oidc-amr-mapper":
+        findings.append("no fresh-auth-amr mapper is configured")
+    else:
+        mapper_config = amr.get("config") or {}
+        if (
+            str(mapper_config.get("access.token.claim")).lower() != "true"
+            or str(mapper_config.get("id.token.claim")).lower() != "false"
+            or str(mapper_config.get("lightweight.claim")).lower() != "false"
+        ):
+            findings.append("the fresh-auth-amr mapper is not access-token-only")
+
+    references = config.get("authenticatorReferences")
+    if not isinstance(references, dict):
+        raise ConfigUnusable("config.authenticatorReferences must be an object")
+    for provider, value in (
+        ("auth-username-password-form", "pwd"),
+        ("auth-otp-form", "otp"),
+    ):
+        reference = references.get(provider)
+        if not isinstance(reference, dict):
+            findings.append(f"{provider} has no authenticator reference configuration")
+            continue
+        reference_config = reference.get("config")
+        if not isinstance(reference_config, dict):
+            findings.append(f"{provider} authenticator reference has no config")
+            continue
+        if reference_config.get("default.reference.value") != value:
+            findings.append(f"{provider} reference is not RFC 8176 {value}")
+        if reference_config.get("default.reference.maxAge") != FRESH_AUTH_REFERENCE_MAX_AGE:
+            findings.append(f"{provider} reference max age is not 300 seconds")
 
     for field in ("redirectUris", "webOrigins"):
         values = portal.get(field)

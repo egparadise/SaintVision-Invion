@@ -26,6 +26,19 @@ bundle을 만드는 쪽은 `tools/make_oidc_trust_bundle.py`이고, 받아들이
 미관측이 PASS로 가지 못한다는 것은 `tests/core/test_collect_oidc_identity_evidence.py`가
 붙들고 있다.
 
+## fresh-auth 공급원
+
+`idp-realm.sh`는 release acceptance step-up에 필요한 `auth_time`과 `amr`을 portal
+access token에 넣는다. `auth_time`은 Keycloak 서버의 `AUTH_TIME` user-session note에서만
+오고, AMR은 browser flow에서 실제 완료된 password/OTP execution의 RFC 8176 reference만
+쓴다. 두 execution reference의 max age는 300초다. `tools/check_idp_realm_config.py`가 이
+mapper와 reference를 live snapshot에서 exact 비교한다.
+
+이는 write route enable 증거가 아니다. hosts 적용 뒤 실제 token 관측과 portal의
+`prompt=login&max_age=300` 재로그인 흐름이 각각 완료될 때까지 release acceptance write
+flag는 off로 유지한다. 상세 경계는
+`docs/vault/30_Development/S12-BE_fresh_auth_claim_공급원_및_portal_step-up_인계.md`에 있다.
+
 ## 노출 경계
 
 인증서를 주면(`SV_IDP_CERT_DIR`) **https만 LAN에 열린다**. 평문 listener는 container

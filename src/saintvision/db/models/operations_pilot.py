@@ -246,6 +246,18 @@ class ReleaseManifest(Base):
     manifest_sha256: Mapped[Sha256] = mapped_column()
     created_by_user_id: Mapped[InvId] = mapped_column()
     created_at: Mapped[Utc] = mapped_column(server_default=text("now()"))
+    #: The required-criteria policy this release was accepted against, pinned at
+    #: deployment (design #282 §5-1). NULL on every release recorded before the pin
+    #: existed, and the sign-off projection refuses those rather than reading
+    #: today's registry as their policy.
+    policy_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    policy_registry_sha256: Mapped[Sha256 | None] = mapped_column(nullable=True)
+    #: Exact Git-owned target registry deployed for this release. The three values
+    #: are nullable only as a unit; legacy rows therefore remain unresolved rather
+    #: than silently adopting today's registry.
+    target_registry_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    target_registry_git_blob_sha: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    target_registry_file_sha256: Mapped[Sha256 | None] = mapped_column(nullable=True)
 
 
 class AcceptanceRecord(Base):
@@ -255,8 +267,14 @@ class AcceptanceRecord(Base):
     A conditional acceptance with an empty limitation list is a plain
     acceptance wearing a hedge, so the constraint refuses it.
 
-    ``accepted_by_user_id`` is a foreign key to a real user: the system cannot
-    sign its own acceptance.
+    ``accepted_by_user_id`` is a foreign key to a real user. That proves the
+    referenced row exists and **nothing about who it is**: ``users`` draws no line
+    between a person and a service, so a principal whose subject was
+    ``svc:release-bot`` wrote an ``accepted`` row through this column. This
+    docstring claimed the opposite -- "the system cannot sign its own acceptance"
+    -- until Codex measured it. What a decision rests on is
+    ``attestation_version`` and the two attested votes behind the proposal it
+    names (design #282 §4-1), not this key.
     """
 
     __tablename__ = "acceptance_records"
@@ -302,6 +320,17 @@ class AcceptanceRecord(Base):
     accepted_by_user_id: Mapped[InvId] = mapped_column()
     decided_at: Mapped[Utc] = mapped_column(server_default=text("now()"))
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    #: Which rule admitted this row. ``legacy-unverified`` on everything written by
+    #: the one-person path -- classified rather than judged, and not counted toward
+    #: sign-off; ``fresh-interactive-v1`` only on rows the canonical function
+    #: inserted after two attested operators voted (0057).
+    attestation_version: Mapped[str] = mapped_column(
+        String(32), server_default=text("'legacy-unverified'")
+    )
+    #: The proposal whose two votes admitted this decision. NULL for legacy rows and
+    #: for ``conditional``/``rejected``, which are one person's final record; a CHECK
+    #: refuses an attested ``accepted`` row that names none.
+    proposal_id: Mapped[InvId | None] = mapped_column(nullable=True)
 
 
 class PermissionSnapshot(Base):

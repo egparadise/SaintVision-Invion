@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "release-acceptance-policy-registry:1",
+  "policyVersion": 1,
+  "owner": "S12-BE",
+  "note": "Required acceptance criteria for release operator sign-off. Git is the source of truth; a deployment pins this file's sha256 and policyVersion into the release manifest, and both the read projection and the proposal digest bind to the pinned pair. Shrinking requiredCriteria or emptying it is a reviewed contract change, never an operational override (design #282 5-1). The two registry refs below name authoritative stores that do not exist yet: the target registry and the Evidence canonical-digest resolver are separate contract cards (#282 0-1.2 and 0-1.4), and until both are bound every decision write is refused rather than resolved against the caller's own values.",
+  "requiredCriteria": [
+    {
+      "acceptanceIdRef": "AC-12",
+      "targetRegistryRef": "release-acceptance-targets-v1",
+      "measurementRegistryRef": "evidence-canonical-digest-v1"
+    }
+  ]
+}
