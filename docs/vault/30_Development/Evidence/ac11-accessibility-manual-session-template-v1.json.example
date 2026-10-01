@@ -23,16 +23,16 @@
     }
   ],
   "scenarios": [
-    {"scenarioId": "ACC-MANUAL-KEYBOARD-JOURNEY", "result": "PASS"},
-    {"scenarioId": "ACC-MANUAL-SCREEN-READER-NAVIGATION", "result": "PASS"},
-    {"scenarioId": "ACC-MANUAL-SCREEN-READER-ERRORS", "result": "PASS"},
-    {"scenarioId": "ACC-MANUAL-FOCUS-ORDER", "result": "PASS"},
-    {"scenarioId": "ACC-MANUAL-ZOOM-REFLOW", "result": "PASS"},
-    {"scenarioId": "ACC-MANUAL-COGNITIVE-ERROR-RECOVERY", "result": "PASS"}
+    {"scenarioId": "ACC-MANUAL-KEYBOARD-JOURNEY", "result": "NOT_RUN"},
+    {"scenarioId": "ACC-MANUAL-SCREEN-READER-NAVIGATION", "result": "NOT_RUN"},
+    {"scenarioId": "ACC-MANUAL-SCREEN-READER-ERRORS", "result": "NOT_RUN"},
+    {"scenarioId": "ACC-MANUAL-FOCUS-ORDER", "result": "NOT_RUN"},
+    {"scenarioId": "ACC-MANUAL-ZOOM-REFLOW", "result": "NOT_RUN"},
+    {"scenarioId": "ACC-MANUAL-COGNITIVE-ERROR-RECOVERY", "result": "NOT_RUN"}
   ],
-  "overallResult": "PASS",
+  "overallResult": "NOT_RUN",
   "performedBy": {
     "kind": "human",
-    "binding": "verified-fresh-auth-at-import"
+    "binding": "self-attested-session"
   }
 }
