@@ -114,11 +114,11 @@ def test_target_registry_shape_mutations_are_rejected(mutate):
 def test_target_digest_mutation_is_detected_even_when_shape_remains_valid():
     document = _registry()
     document["targets"][0]["criteria"][0]["statement"] += " altered"
-    parsed = ReleaseAcceptanceTargetRegistryResponse.model_validate(document)
-    assert parsed.targets
     assert document["targets"][0]["targetSha256"] != _canonical_target_sha256(
         document["targets"][0]
     )
+    with pytest.raises(ValidationError, match="targetSha256"):
+        ReleaseAcceptanceTargetRegistryResponse.model_validate(document)
 
 
 def test_reference_resolution_contract_is_all_or_nothing():

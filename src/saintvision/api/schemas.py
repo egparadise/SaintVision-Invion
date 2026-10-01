@@ -12,6 +12,9 @@ default (공통 계약 §3).
 from __future__ import annotations
 
 import datetime as dt
+import hashlib
+import json
+import unicodedata
 import uuid
 from typing import Annotated, Any, Literal, Union
 
@@ -1610,6 +1613,38 @@ ReleaseAcceptanceGitSha = Annotated[
 ]
 
 
+def _release_acceptance_canonical_json(value: Any) -> bytes:
+    """Encode the deliberately small target-registry JSON subset."""
+
+    def validate(item: Any) -> None:
+        if isinstance(item, str):
+            if unicodedata.normalize("NFC", item) != item:
+                raise ValueError("target registry strings must be NFC-normalized")
+            return
+        if item is None or type(item) in (bool, int):
+            return
+        if isinstance(item, list):
+            for child in item:
+                validate(child)
+            return
+        if isinstance(item, dict):
+            for key, child in item.items():
+                if not isinstance(key, str):
+                    raise ValueError("target registry object keys must be strings")
+                validate(key)
+                validate(child)
+            return
+        raise ValueError("target registry canonical JSON forbids floats and non-JSON values")
+
+    validate(value)
+    return json.dumps(
+        value,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+
+
 class ReleaseAcceptanceTargetSource(Strict):
     """The immutable Git source from which one target declaration was derived."""
 
@@ -1654,6 +1689,10 @@ class ReleaseAcceptanceTargetDefinition(Strict):
         identities = [criterion.criterion_id for criterion in self.criteria]
         if len(set(identities)) != len(identities):
             raise ValueError("criteria must have unique criterionId values")
+        payload = self.model_dump(by_alias=True, exclude={"target_sha256"})
+        observed = hashlib.sha256(_release_acceptance_canonical_json(payload)).hexdigest()
+        if observed != self.target_sha256:
+            raise ValueError("targetSha256 does not match the canonical target payload")
         return self
 
 
