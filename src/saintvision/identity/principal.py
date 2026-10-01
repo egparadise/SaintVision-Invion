@@ -24,6 +24,7 @@ isolation, but every user in a tenant passes RLS, so "another project's data"
 
 from __future__ import annotations
 
+import datetime as dt
 import os
 import uuid
 from dataclasses import dataclass, field
@@ -50,6 +51,12 @@ class Principal:
     #: the row the execution kernel reads.
     project_ids: frozenset[str] = field(default_factory=frozenset)
     roles: frozenset[str] = field(default_factory=frozenset)
+    # Only OidcPrincipalVerifier sets this flag.  Hand-built principals used by
+    # development/test verifiers cannot claim fresh authentication merely by
+    # filling the two fields below.
+    verified_fresh_auth_claims: bool = False
+    auth_time: int | None = None
+    amr: frozenset[str] = field(default_factory=frozenset)
 
     def require_project(self, project_id: str) -> None:
         if project_id not in self.project_ids:
@@ -64,6 +71,42 @@ class Principal:
 
     def has_role(self, code: str) -> bool:
         return code in self.roles
+
+
+FRESH_AUTH_MAX_AGE_SECONDS = 300
+FRESH_AUTH_AMR_VALUES = frozenset({"mfa", "pwd", "otp", "hwk", "swk"})
+FRESH_AUTH_SECOND_FACTORS = frozenset({"otp", "hwk", "swk"})
+
+
+def has_fresh_interactive_auth(
+    principal: Principal,
+    *,
+    now: dt.datetime,
+    max_age_seconds: int = FRESH_AUTH_MAX_AGE_SECONDS,
+) -> bool:
+    """Return whether a verified principal carries the S12 fresh-auth proof.
+
+    This is deliberately a predicate rather than an authentication exception:
+    read-only routes can keep accepting a valid older token, while the release
+    acceptance write boundary can return its canonical AUTH-0030 response.
+    """
+
+    if now.tzinfo is None or now.utcoffset() is None:
+        raise ValueError("now must be timezone-aware")
+    if type(max_age_seconds) is not int or not 1 <= max_age_seconds <= 300:
+        raise ValueError("fresh-auth max age must be an integer in 1..300")
+    if not principal.verified_fresh_auth_claims or type(principal.auth_time) is not int:
+        return False
+    if not principal.amr or not principal.amr.issubset(FRESH_AUTH_AMR_VALUES):
+        return False
+
+    current = int(now.timestamp())
+    age = current - principal.auth_time
+    if age < 0 or age > max_age_seconds:
+        return False
+    return "mfa" in principal.amr or (
+        "pwd" in principal.amr and bool(principal.amr & FRESH_AUTH_SECOND_FACTORS)
+    )
 
 
 class PrincipalVerifier(Protocol):

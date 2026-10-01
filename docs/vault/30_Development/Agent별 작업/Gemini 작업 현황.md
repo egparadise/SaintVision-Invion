@@ -21,6 +21,50 @@ source_of_truth: "Git"
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
 - 확인 기준: 2026-10-01T21:30:00+09:00 (Card 183 S12-FE 릴리스 선언서 및 운영자 인수 서버 경로 결속 #282 최종 계약 머지 및 Train 9 착지 차단 해제: origin/agent/codex/c184-s12-acceptance-contract b96068b6 머지 완료, operatorSignOffBlockedBy='release-acceptance-prerequisites-unavailable' 동기화, api-response-contracts.mjs 40 types PASS, strict guard 갱신 및 legacy blockedBy 유입 시 ContractViolationError 사살 시험 추가, UI 사유 문구 갱신, Vitest 22 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 프런트 무결성 규칙 0 위반).
 - 확인 기준: 2026-10-01T20:33:00+09:00 (Card 183 S12-FE 릴리스 선언서 및 운영자 인수 서버 경로 결속 r2 조치 완료 및 #280 신규 head 79fcb772 머지 반영: Claude UI r2 및 Codex r2 피드백 전수 해소 — 404/403 fixture 코드를 canonical RES-0004 / AUTH-0030으로 정정하여 fixture-problem-codes-integrity 통과, ContractViolationError 및 deployment-manifest-error-contract 전용 계약 위반 상태 분리, 상단 KPI 카드 'SIGN-OFF 대기 (로컬 모의)' 문구 정비, 릴리스 선택기 변경 시 상세 재호출 및 화면 갱신 검증 시험 추가, canonical 5개 스키마 additionalProperties: false 및 허용 키셋 1:1 결속 시험 추가; #280 신규 계약 머지 — matchingAcceptedUserCount와 confirmedOperatorCount(Literal[0]) 분리 표출, operatorSignOffBlockedBy='human-attestation-implementation-unavailable' 동기화, components/knownLimitations/acceptances/nextCursor 필수화 계약 반영, Vitest 21 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 규칙 0 위반).
+- 확인 기준: 2026-10-01T20:33:00+09:00 (Card 183 S12-FE 릴리스 선언서 및 운영자 인수 서버 경로 결속 r2 조치 완료 및 #280 신규 head 79fcb772 머지 반영: Claude UI r2 및 Codex r2 피드백 전수 해소 — 404/403 fixture 코드를 canonical RES-0004 / AUTH-0030으로 정정하여 fixture-problem-codes-integrity 통과, ContractViolationError 및 deployment-manifest-error-contract 전용 계약 위반 상태 분리, 상단 KPI 카드 'SIGN-OFF 대기 (로컬 모의)' 문구 정비, 릴리스 선택기 변경 시 상세 재호출 및 화면 갱신 검증 시험 추가, canonical 5개 스키마 additionalProperties: false 및 허용 키셋 1:1 결속 시험 추가; #280 신규 계약 머지 — matchingAcceptedUserCount와 confirmedOperatorCount(Literal[0]) 분리 표출, operatorSignOffBlockedBy='human-attestation-implementation-unavailable' 동기화, components/knownLimitations/acceptances/nextCursor 필수화 계약 반영, Vitest 21 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 규칙 0 위반).
+
+## 2026-10-01 S12-FE 릴리스 선언서(Release Manifest) 및 운영자 인수 서버 경로 결속 (Card 183 2단계, `agent/gemini/c183-s12fe-release-binding`, base `79fcb772` PR #280)
+- **개요**: Claude 카드 182(PR #280)에서 구축된 정본 계약 스키마 5종(`release-manifest-response`, `release-manifest-detail-response`, `release-manifest-page-response`, `release-acceptance-response`, `release-component-response`) 및 읽기 전용 REST 라우트(`GET /v1/release-manifests`, `GET /v1/release-manifests/{release_id}`)를 프런트엔드 `apps/web`에 온전히 결속:
+  1. **1단계 전수 분석 표 반영**: `ReleaseManifest`, `operatorSignOff`, `localSimulationCompleted`의 코드베이스 내 기원 전수 식별 및 정본 계약 기반 분리 완료.
+  2. **계약 생성 및 검증 자동화**: `apps/web/scripts/api-response-contracts.mjs`에 스키마 5종 등록, `contracts:generate` 및 `contracts:check` 40개 API 응답 TypeScript 타입 동기화 (exit 0).
+  3. **API 관측 계층 구현 (`apps/web/src/shared/api/releaseObservation.ts`)**:
+     - `fetchReleaseManifests`: `GET /v1/release-manifests` 목록 호출 및 런타임 shape 검증.
+     - `fetchReleaseManifestDetail`: `GET /v1/release-manifests/:id` 상세 및 수락 이력 호출.
+     - `isValidReleaseManifest`: sha256 64-hex, operatorSignOff boolean, componentCount 등 fail-closed 런타임 검증기.
+  4. **화면 결속 (`apps/web/src/features/deployment/IntranetDeploymentView.tsx`)**:
+     - **Section 3-A 실서버 관측**: 실서버 라우트 결속 배너, 테넌트 릴리스 0건 시 날조 기본값 없는 명시적 빈 상태(`기록 없음`), 수락 부재 시 `operatorSignOff: false (미서명)`, 403 Forbidden 및 404 Not Found 문제 상세 처리, 수락 결정 및 컴포넌트 목록 관측.
+     - **쓰기 UI 금지**: 임의 수락/서명 등록 쓰기 폼 원천 차단 및 읽기 전용 관측 표출 안내(`server-write-boundary-notice`).
+     - **Section 3-B 로컬 모의 시뮬레이션 분리 보존**: `localSimulationCompleted`를 브라우저 로컬 시뮬레이션 상태로 온전히 격리하고, 기존 DEF-S12 결함 수정 회귀 시험(23 passed) 및 배선 무결성 시험(4 passed) 100% 무파괴 통과.
+  5. **Claude UI r1 및 Codex r1 독립 검토 피드백 전수 조치 (r1 완결)**:
+     - **F1 & Codex 차단 4**: History 문서 내 미존재 경로 4건을 `apps/web/src/contracts/...`로 수정하여 `check_doc_path_citations.py --ratchet` 통과 (0 new broken citations).
+     - **F2**: 상단 KPI 카드를 `[로컬 모의] 운영자 인수 서명 (Sign-Off)`으로 명확히 표기하여 실서버 3-A 섹션과의 혼동 해소 및 기존 회귀 시험(`s12-defect-fixes.test.tsx` 23 passed) 100% 보존.
+     - **F3~F5 & Codex 차단 2**: 제품 코드 내 `NODE_ENV === 'test'` 분기 제거 및 `autoFetch ?? true` 정규화, 단위 시험에서 props 주입 대신 `fetch` 경계 모의, exact URL/query/method 단언으로 경로 변이 M2, M3 완전 사살.
+     - **F6**: 네트워크 연결 오류 시 status 500 날조 없이 status 0 / `네트워크 통신 오류` 표출 (M6 사살).
+     - **F7**: 상세 조회 실패 시에도 릴리스 선택기(`deployment-release-selector`) 보존 표출 (M7 사살).
+     - **F8**: `nextCursor` 상태 수신 및 다음 페이지 커서 표출.
+     - **F9 & Codex 차단 1**: 5개 계약 스키마 strict 런타임 검증기(`releaseObservation.ts`) 구축 (`componentCount >= 1`, `additionalProperties: false`, items 누락 합성 거절, acceptances 검증; M10 사살 및 Codex probe 3종 fail-closed 확인).
+     - **F10**: 빈 상태(`deployment-manifest-empty-state`)에 `role="status"` 및 `aria-live="polite"` 추가.
+  6. **Claude UI r2 및 Codex r2 조치 + #280 신규 head(79fcb772) 계약 머지 완료**:
+     - **404/403 Fixture 정본 코드 정합**: 시험 내 임의 코드(`RES-RELEASE-NOT-FOUND`)를 정본 `RES-0004` 및 `AUTH-0030`으로 정정, `fixture-problem-codes-integrity.test.ts` 통과.
+     - **계약 위반 전용 상태 표출**: `ContractViolationError` 및 `deployment-manifest-error-contract` 경고로 통신 오류와 계약 위반 명확히 분리.
+     - **상단 KPI 문구 정비**: `SIGN-OFF 대기 (로컬 모의)`로 표기하여 실서버 3-A 섹션과의 혼동 원천 해소.
+     - **선택기 상호작용 시험**: 릴리스 선택 시 상세 재호출 및 UI 갱신 동작 E2E 검증 추가.
+     - **계약 스키마 1:1 결속 시험**: 정본 5개 스키마의 `additionalProperties: false` 및 required 키셋과 런타임 검증기 1:1 일치 단언 추가.
+     - **#280 신규 계약 동기화**: `matchingAcceptedUserCount`와 `confirmedOperatorCount: 0` 분리 표출, `human-attestation-implementation-unavailable` 정합, 목록 필드 필수화 반영.
+- **담당 및 역할**: Gemini (Frontend / UI 소유). Reviewer: Claude (UI·테스트 축), Codex (계약·보안 축).
+- **관측 근거 (Evidence)**:
+  - Vitest: `s12-release-manifest-server-binding.test.tsx` 21 passed (520ms), `s12-defect-fixes.test.tsx` 23 passed, `deployment-release-integrity-wiring.test.tsx` 4 passed, `fixture-problem-codes-integrity.test.ts` 1 passed (전원 통과)
+  - 변이 검사: 14종 단일 변이 전원 사살 실측 (사살율 100%)
+  - TypeScript 정적 점검: `npx tsc -b` 타입 에러 0건 (exit 0)
+  - 프로덕션 번들 빌드: `npm run build` 성공 (Vite bundle 정상 생성, 9.25s, exit 0)
+  - 계약 동기화 점검: `npm run contracts:check` 40 types PASS (exit 0)
+  - 라우트 커버리지 점검: `pytest tests/test_route_coverage.py` 41 passed 100% (exit 0)
+  - 프런트엔드 무결성 점검: `python tools/check_frontend_integrity.py` 93개 파일 스캔, 9대 무결성 규칙 위반 0건 (exit 0)
+  - 계약 바인딩 점검: `python tools/check_contract_bindings.py` 55개 픽스처 + 20개 커널 응답 타입 앵커 통과 (exit 0)
+  - 문서 무결성 점검: `python tools/check_docs.py` PASS (exit 0)
+  - 문서 경로 인용 래칫: `python tools/check_doc_path_citations.py --ratchet --base-ref origin/agent/claude/c182-s12-manifest-routes` PASS (exit 0)
+  - Git 공백 검사: `git diff --check` 클린 (exit 0)
+- **전문 문서**: [[2026-10-01_18-50-00_KST_Card183_S12-FE_Release_서버결속_Gemini]]
 - 확인 기준: 2026-10-01T19:12:00+09:00 (Card 180 S11-FE ACC-09 디자인 토큰 명도 대비 전수 적합화, 독립 검토 r3 F1/F2 조치, Claude UI r1 조건부 승인 피드백 반영: NodeList 라이트 상태 배지 실측치 백로그 이월, 상태색 구별도·미사용 토큰 관측, 산문 수치 정정 완료, 코드 수정 없이 불변식 보존, acc09-contrast-tokens.test.tsx 9 passed, 8종 변이 100% 사살 실측, tsc -b/build/route_coverage 100% 클린).
 
 ## 2026-10-01 S12-FE 릴리스 선언서(Release Manifest) 및 운영자 인수 서버 경로 결속 (Card 183 2단계, `agent/gemini/c183-s12fe-release-binding`, base `79fcb772` PR #280)

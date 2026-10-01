@@ -39,6 +39,7 @@ SECRETS_IN_CONTAINER="${SV_IDP_CONTAINER_SECRETS:-/run/secrets/keycloak.env}"
 PORTAL_ORIGINS="${SV_IDP_PORTAL_ORIGINS:-https://portal.sv.lan http://localhost:3005}"
 EMAIL_DOMAIN="${SV_IDP_EMAIL_DOMAIN:-sv.lan}"
 TOKEN_LIFESPAN="${SV_IDP_TOKEN_LIFESPAN:-300}"
+BROWSER_FLOW="${SV_IDP_BROWSER_FLOW:-browser}"
 # "external" rather than "all": the plaintext listener is not published, so the only
 # http reachability is inside the container, which is where kcadm runs. "all" would
 # reject that path and buy nothing, because no network client can reach http at all.
@@ -163,6 +164,97 @@ kc_in update "clients/$PORTAL_ID/protocol-mappers/models/$CLIENT_ID_MAPPER_ID" -
             "access.token.claim": "true", "id.token.claim": "false"}}
 JSON
 
+# The release-acceptance boundary never decodes an unverified token to recover
+# these values.  auth_time comes from Keycloak's server-side user-session note;
+# AMR comes from the completed authenticator execution references configured
+# below.  Both mappers write access tokens only.  Keycloak 26 also assigns a
+# realm-wide "basic" scope with an auth_time mapper.  This client-local mapper
+# deliberately pins the same AUTH_TIME source, so the contract does not depend
+# on realm-default-scope membership; both writers produce the same scalar.
+if [ -z "$(mapper_id "fresh-auth-time")" ]; then
+  kc_in create "clients/$PORTAL_ID/protocol-mappers/models" -r "$REALM" -f - <<JSON
+{"name": "fresh-auth-time", "protocol": "openid-connect",
+ "protocolMapper": "oidc-usersessionmodel-note-mapper",
+ "config": {"user.session.note": "AUTH_TIME", "claim.name": "auth_time",
+            "jsonType.label": "long", "access.token.claim": "true",
+            "id.token.claim": "false", "userinfo.token.claim": "false"}}
+JSON
+fi
+AUTH_TIME_MAPPER_ID="$(mapper_id "fresh-auth-time")"
+kc_in update "clients/$PORTAL_ID/protocol-mappers/models/$AUTH_TIME_MAPPER_ID" -r "$REALM" -f - <<JSON
+{"id": "$AUTH_TIME_MAPPER_ID", "name": "fresh-auth-time", "protocol": "openid-connect",
+ "protocolMapper": "oidc-usersessionmodel-note-mapper",
+ "config": {"user.session.note": "AUTH_TIME", "claim.name": "auth_time",
+            "jsonType.label": "long", "access.token.claim": "true",
+            "id.token.claim": "false", "userinfo.token.claim": "false"}}
+JSON
+
+if [ -z "$(mapper_id "fresh-auth-amr")" ]; then
+  kc_in create "clients/$PORTAL_ID/protocol-mappers/models" -r "$REALM" -f - <<JSON
+{"name": "fresh-auth-amr", "protocol": "openid-connect",
+ "protocolMapper": "oidc-amr-mapper",
+ "config": {"access.token.claim": "true", "id.token.claim": "false",
+            "lightweight.claim": "false"}}
+JSON
+fi
+AMR_MAPPER_ID="$(mapper_id "fresh-auth-amr")"
+kc_in update "clients/$PORTAL_ID/protocol-mappers/models/$AMR_MAPPER_ID" -r "$REALM" -f - <<JSON
+{"id": "$AMR_MAPPER_ID", "name": "fresh-auth-amr", "protocol": "openid-connect",
+ "protocolMapper": "oidc-amr-mapper",
+ "config": {"access.token.claim": "true", "id.token.claim": "false",
+            "lightweight.claim": "false"}}
+JSON
+
+# Keycloak's AMR mapper reports only completed executions that have an explicit
+# RFC 8176 reference.  The default browser flow has password and conditional OTP
+# executions; pin both to the 300-second step-up window.  Hardware/software key
+# values remain supported by the server policy, but are not claimed here because
+# this realm does not yet configure such an execution.
+BROWSER_EXECUTIONS="$(kc get "authentication/flows/$BROWSER_FLOW/executions" -r "$REALM")"
+execution_info() {
+  printf '%s' "$BROWSER_EXECUTIONS" | python3 -c '
+import json, sys
+provider = sys.argv[1]
+matches = [item for item in json.load(sys.stdin) if item.get("providerId") == provider]
+if len(matches) != 1:
+    raise SystemExit(f"expected one {provider} execution, found {len(matches)}")
+item = matches[0]
+print(item.get("id", "") + "\t" + (item.get("authenticationConfig") or ""))
+' "$1"
+}
+
+ensure_execution_reference() {
+  provider="$1"; reference="$2"; alias="$3"
+  info="$(execution_info "$provider")"
+  execution_id="${info%%$'\t'*}"
+  config_id="${info#*$'\t'}"
+  if [ -z "$execution_id" ]; then
+    echo "refusing to report success: $provider execution has no id" >&2
+    exit 2
+  fi
+  if [ -z "$config_id" ]; then
+    kc_in create "authentication/executions/$execution_id/config" -r "$REALM" -f - >/dev/null <<JSON
+{"alias": "$alias", "config": {"default.reference.value": "$reference",
+ "default.reference.maxAge": "300"}}
+JSON
+    BROWSER_EXECUTIONS="$(kc get "authentication/flows/$BROWSER_FLOW/executions" -r "$REALM")"
+    info="$(execution_info "$provider")"
+    config_id="${info#*$'\t'}"
+  fi
+  if [ -z "$config_id" ]; then
+    echo "refusing to report success: $provider reference config was not created" >&2
+    exit 2
+  fi
+  kc_in update "authentication/config/$config_id" -r "$REALM" -f - >/dev/null <<JSON
+{"id": "$config_id", "alias": "$alias",
+ "config": {"default.reference.value": "$reference", "default.reference.maxAge": "300"}}
+JSON
+  printf '%s' "$config_id"
+}
+
+PWD_REFERENCE_CONFIG_ID="$(ensure_execution_reference "auth-username-password-form" "pwd" "sv-amr-pwd")"
+OTP_REFERENCE_CONFIG_ID="$(ensure_execution_reference "auth-otp-form" "otp" "sv-amr-otp")"
+
 # strict_aud forbids an audience list, and the built-in "roles" scope adds
 # "account" through its audience-resolve mapper. Drop the scope, not the mapper:
 # the mapper lives in a realm-wide scope other clients may still want.
@@ -237,6 +329,8 @@ SNAPSHOT="$(
     kc get "clients/$PORTAL_ID" -r "$REALM"
     kc get "clients/$PORTAL_ID/default-client-scopes" -r "$REALM"
     kc get "client-scopes/$SCOPE_ID" -r "$REALM"
+    kc get "authentication/config/$PWD_REFERENCE_CONFIG_ID" -r "$REALM"
+    kc get "authentication/config/$OTP_REFERENCE_CONFIG_ID" -r "$REALM"
   } | python3 -c '
 import json, sys
 # kcadm prints one JSON document per call; read them in order.
@@ -248,11 +342,14 @@ while at < len(text):
         break
     value, at = decoder.raw_decode(text, at)
     documents.append(value)
-realm, api, portal, scopes, scope = documents
+realm, api, portal, scopes, scope, password_ref, otp_ref = documents
 portal["defaultClientScopes"] = [s.get("name") for s in scopes]
 print(json.dumps({"realm": realm,
                   "clients": {api["clientId"]: api, portal["clientId"]: portal},
-                  "clientScopes": {scope["name"]: scope}}))
+                  "clientScopes": {scope["name"]: scope},
+                  "authenticatorReferences": {
+                      "auth-username-password-form": password_ref,
+                      "auth-otp-form": otp_ref}}))
 '
 )"
 
