@@ -6,9 +6,9 @@ status: "review"
 author: "Codex"
 updated: "2026-10-01T15:18:53+09:00"
 source_of_truth: "Git"
-active_card: "CARD-166 S04 kernel cancel shard bridge evidence"
-active_card_status: "PG-free 21 passed; Core 36805349620 6508 passed; bridge real-PG 21/21 passed"
-active_card_next: "Claude re-review; concurrent parent/member race and injected whole-shard rollback remain NOT_RUN"
+active_card: "CARD-173 S08-BE Build path ROOF binding"
+active_card_status: "pre-dispatch/final live policy, containment, provider, declared lease/fencing and receipt/evidence binding implemented; focused 103 passed"
+active_card_next: "contract/docs gates, stacked PR and Claude review; daemon adapter and GPU remain separate cards"
 ---
 
 ## 2026-10-01 Card 166 — shard parent/member cancel bridge 후속
@@ -24,16 +24,6 @@ active_card_next: "Claude re-review; concurrent parent/member race and injected 
   제품·계약·migration 변경은 0이다.
 - 부모/멤버 동시 경쟁과 bridge 실패 주입 whole-shard rollback은 이번 범위에서
   측정하지 않아 후속 `NOT_RUN`으로 유지한다.
-version: "1.0.240"
-status: "review"
-author: "Codex"
-updated: "2026-10-01T13:24:15+09:00"
-source_of_truth: "Git"
-active_card: "CARD-171 AC-11 accessibility-e2e hosted measurement"
-active_card_status: "Hosted run 36814708026 green; automatic journey/invariant/contrast/keyboard failures are zero and manual acceptance remains missing"
-active_card_next: "Claude re-review of PR #266; then start Card172 BuildKit boundary implementation"
----
-
 ## 2026-10-01 Card 171 — AC-11 accessibility-e2e hosted 측정 수단
 
 - AC-11 8축을 대조해 이미 측정 수단이 있는 migration/security와 외부 전제가 필요한
@@ -53,16 +43,6 @@ active_card_next: "Claude re-review of PR #266; then start Card172 BuildKit boun
   `sha256:77d30b61dfa0027a86b123be94e5cb5e545dd1110b9cc12c0b2f151d11797cbb`다.
   수동 사용자 인수 부재 1건 때문에 raw verdict는 사전 등록대로 `MEASURED_FAIL`이며
   AC-11 done·점수 승격은 하지 않는다.
-version: "1.0.237"
-status: "review"
-author: "Codex"
-updated: "2026-10-01T15:18:53+09:00"
-source_of_truth: "Git"
-active_card: "CARD-173 S08-BE Build path ROOF binding"
-active_card_status: "pre-dispatch/final live policy, containment, provider, declared lease/fencing and receipt/evidence binding implemented; focused 103 passed"
-active_card_next: "contract/docs gates, stacked PR and Claude review; daemon adapter and GPU remain separate cards"
----
-
 ## 2026-10-01 Card 173 — S08-BE Build 경로 ROOF 결속
 
 - #269의 strict Build 계약 위에 live project authority·kill switch·PolicyDecision·fresh
