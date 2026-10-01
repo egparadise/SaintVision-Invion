@@ -902,8 +902,12 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                       justifyContent: 'center',
                       fontSize: '0.75rem',
                       fontWeight: 700,
-                      backgroundColor: isActive ? 'var(--color-brand-primary-bg)' : isPassed ? '#2ea043' : 'var(--color-border-strong)',
-                      color: '#ffffff',
+                      backgroundColor: isActive
+                        ? 'var(--color-brand-primary-bg)'
+                        : isPassed
+                        ? 'var(--color-status-online)'
+                        : 'var(--color-border-strong)',
+                      color: isActive ? '#ffffff' : 'var(--color-text-inverse)',
                     }}
                   >
                     {isPassed ? '✓' : s.num}
@@ -912,7 +916,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                     style={{
                       fontSize: '0.875rem',
                       fontWeight: isActive ? 700 : 600,
-                      color: isActive ? 'var(--color-brand-primary)' : isPassed ? '#3fb950' : 'var(--color-text-secondary)',
+                      color: isActive ? 'var(--color-brand-primary)' : isPassed ? 'var(--color-status-online)' : 'var(--color-text-secondary)',
                     }}
                   >
                     {s.label}
