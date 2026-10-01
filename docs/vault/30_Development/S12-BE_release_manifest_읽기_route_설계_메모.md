@@ -1,12 +1,12 @@
 ---
 doc_id: "DESIGN-S12-BE-RELEASE-MANIFEST-READ-20261001"
-title: "S12-BE release manifest 읽기 route와 서명·수락 쓰기 경계 — operatorSignOff는 외래키로 증명되지 않아 계약에서 false로 고정했다(독립 검토 F1 정정), 쓰기는 Codex 계약 요청 (카드 182, r2)"
-version: "1.1.0"
+title: "S12-BE release manifest 읽기 route와 서명·수락 쓰기 경계 — operatorSignOff는 외래키로 증명되지 않아 계약에서 false로 고정하고, 사람 확인 수와 원시 수락 수를 두 필드로 분리했다(코디네이터 결정), 쓰기는 Codex 계약 요청 (카드 182, r3)"
+version: "1.2.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-01T19:22:31+09:00"
+updated: "2026-10-01T20:08:58+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "7e670d77"
@@ -29,7 +29,7 @@ tags: ["s12", "release-manifest", "acceptance", "route", "read-only", "security-
 | `GET /v1/release-manifests` | `ReleaseManifestPageResponse` | tenant의 release 목록, `release_id` 역순, 기본 50·상한 200 |
 | `GET /v1/release-manifests/{release_id}` | `ReleaseManifestDetailResponse` | 그 release와 **기록된 수락 전부** |
 
-### 1-1. `operatorSignOff`는 **계약에서 `false`로 고정**된다 (r2 정정)
+### 1-1. `operatorSignOff`는 **계약에서 `false`로 고정**된다 (r2 정정, r3 이름 결정)
 
 **v1.0의 이 절은 틀렸다.** 그때는 `operatorSignOff`를 수락 행에서 계산하고 `outcome='accepted'`에 해시가 맞으면 **참**으로 냈다. 근거로 "`accepted_by_user_id`가 `users`로 가는 실제 외래키이므로 시스템은 스스로 서명할 수 없다"를 적었다.
 
@@ -40,19 +40,28 @@ tags: ["s12", "release-manifest", "acceptance", "route", "read-only", "security-
 | 필드 | 값 | 뜻 |
 |---|---|---|
 | `operatorSignOff` | **`Literal[False]`** | 이 읽기 표면은 참을 **낼 수 없다**. docstring의 약속이 아니라 **계약**이 거부한다 |
-| `operatorSignOffBlockedBy` | `"human-attestation-contract-absent"` | 왜 거짓인지 — "아무도 서명 안 함"과 "이 표면은 알 수 없음"을 읽는 사람이 구별할 수 있게 |
+| `operatorSignOffBlockedBy` | `"human-attestation-implementation-unavailable"` | 왜 거짓인지. **`#282`로 계약은 존재하므로** 없는 것은 그 계약의 **구현**이고, 값이 둘 중 어느 쪽인지 말한다 |
 | `requiredDistinctOperatorCount` | **`Literal[2]`** | 쓰기 계약(`#282`, 카드 184)의 정족수 |
-| `confirmedOperatorCount` | 정수 | 해시가 맞는 `accepted` 행의 **서로 다른 사용자 수**. 기록된 사실이고 서명이 아니다 — 서비스 주체도 이 수에 들어갈 수 있고, **그래서** 서명이 아니다 |
+| `confirmedOperatorCount` | **`Literal[0]`** | **사람 확인(`#282`의 human attestation)된 서로 다른 운영자 수.** 그 구현이 없으므로 이 표면에서는 0 고정이다. "수락이 없다"가 아니라 "여기 어떤 결정도 사람에게 귀속되지 않았다"는 뜻이다 |
+| `matchingAcceptedUserCount` | 정수(≥0) | **원시 기록**: 해시가 맞는 `accepted` 행의 서로 다른 사용자 id 수. 서비스 주체가 그중 하나일 수 있고, **그래서 이름이 다른 필드**다 |
 
-필드 이름은 `#282`가 쓰는 이름을 그대로 쓴다(`operatorSignOff`·`requiredDistinctOperatorCount`·`confirmedOperatorCount`). `#282`의 base가 `#280`이므로 이름을 새로 만들면 두 PR이 다른 말을 하게 된다.
+**이름은 코디네이터가 2026-10-01에 정했다**(`#282`에도 같은 결정이 전달됐다). r2에서 나는 원시 수를 `confirmedOperatorCount`에 담았고, 그러면 **서비스 계정이 올릴 수 있는 수에 "confirmed"라는 말이 붙는다** — F1에서 고친 것과 같은 종류의 과잉 주장이다. 이제 `confirmedOperatorCount`는 사람 확인의 자리로 비워 두고(0 고정), 기록된 사실은 아무 주장도 하지 않는 이름으로 나간다.
 
-`confirmedOperatorCount`가 `0`으로 남는 세 경우는 그대로 각각 다른 사실이다.
+`matchingAcceptedUserCount`가 `0`으로 남는 세 경우는 그대로 각각 다른 사실이다.
 
 1. **수락 행이 없다** — 아무도 보지 않았다.
 2. **`conditional` 또는 `rejected`** — 누군가 보았고 승인하지 않았다. 표가 이미 "조건부인데 제약 목록이 비면" 거절하므로(`conditional_requires_limitations`), 읽기가 조건부를 승인으로 읽으면 그 제약이 지키려던 구별을 버리는 것이 된다.
 3. **`accepted`인데 해시가 다르다** — 같은 이름의 **다르게 구성된** release를 승인했다. 해시를 고정하는 이유가 바로 그것이고, 응답의 `manifestMatches`가 그것을 말한다.
 
-**이 route는 `operatorSignOff`를 참으로 만들 수 없다** — 이제는 계약이 그것을 거부하기 때문이고, 외래키 때문이 아니다. 시험이 **서비스 주체로 `accepted` 행을 써도 거짓**임을 고정한다(`test_a_service_principal_cannot_produce_operator_sign_off`).
+**이 route는 `operatorSignOff`를 참으로, `confirmedOperatorCount`를 0 이상으로 만들 수 없다** — 이제는 계약이 둘 다 거부하기 때문이고, 외래키 때문이 아니다. 실 PG 시험이 **서비스 주체로 `accepted` 행을 써도 `operatorSignOff` 거짓 · `confirmedOperatorCount` 0 · `matchingAcceptedUserCount` 1**임을 고정한다(`test_a_service_principal_cannot_produce_operator_sign_off`). **이 시험이 두 수를 같은 수의 두 이름이 아니게 만드는 자리다.**
+
+### 1-1-bis. 목록이 **없는 것**은 빈 목록이 아니다 (Codex `#281` 계약 r2)
+
+`ReleaseManifestPageResponse.items`가 `default_factory=list`였다. 그래서 **공개 schema에 `required`가 하나도 없었고**, 거기서 생성한 TypeScript가 `items?:`가 되었다 — FE의 strict guard는 키 누락을 거부하므로 **계약이 클라이언트가 거부할 payload를 허용**하고 있었다(서버는 그런 payload를 보낸 적이 없다).
+
+이 응답들의 목록 네 개(`components`·`knownLimitations`·`acceptances`·`items`)는 **서비스가 항상 보낸다.** 그러므로 전부 **required**로 바꿨다 — 빈 페이지는 `items: []`이고, `items`가 없는 것은 **깨진 응답**이며 양쪽이 그렇게 말해야 한다. `nextCursor`도 같은 이유로 required nullable이다: `null`("마지막 페이지")과 키 부재("이 응답은 그 말을 하지 않는다")는 다른 진술이다.
+
+시험이 다섯 모델의 **required 집합을 통째로** 적어 두고(선택 필드 0개), **생성된 contract 파일**도 같은 집합을 요구하는지 따로 읽는다. 전자는 source를, 후자는 FE가 실제로 읽는 파일을 잡는다.
 
 ### 1-2. tenant scope이고 project scope이 아니다
 

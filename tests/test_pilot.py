@@ -787,14 +787,15 @@ def test_a_release_without_any_acceptance_keeps_operator_sign_off_false(
                 )
     assert detail["acceptances"] == []
     assert detail["release"]["operatorSignOff"] is False
-    assert detail["release"]["operatorSignOffBlockedBy"] == "human-attestation-contract-absent"
+    assert detail["release"]["operatorSignOffBlockedBy"] == "human-attestation-implementation-unavailable"
     assert detail["release"]["confirmedOperatorCount"] == 0
+    assert detail["release"]["matchingAcceptedUserCount"] == 0
     assert detail["release"]["acceptanceCount"] == 0
     assert detail["release"]["componentCount"] == len(_components())
 
 
 @pytest.mark.parametrize(
-    "outcome,limitations,confirmed",
+    "outcome,limitations,matching",
     [
         ("accepted", [], 1),
         ("conditional", ["browser acceptance not observed"], 0),
@@ -802,15 +803,17 @@ def test_a_release_without_any_acceptance_keeps_operator_sign_off_false(
     ],
 )
 def test_only_an_accepted_decision_is_counted_and_none_of_them_sign_off(
-    app_sessionmaker, pilot, outcome, limitations, confirmed
+    app_sessionmaker, pilot, outcome, limitations, matching
 ):
-    """``conditional`` is not counted, and ``accepted`` is counted but is not sign-off.
+    """``conditional`` is not counted, ``accepted`` is, and neither is a signature.
 
     The table already refuses a conditional acceptance with an empty limitation
     list -- a hedge has to say what it is hedging -- so the reader counts only
-    ``accepted``. What it does **not** do is call that count a signature: this
+    ``accepted``. What it does **not** do is call that count a confirmation: this
     test asserted ``operatorSignOff is True`` for the accepted case until Codex
-    showed a service principal could produce it.
+    showed a service principal could produce it, and the count it then asserted
+    was called ``confirmedOperatorCount`` until that name was reserved for
+    operators a person is attested to be.
     """
 
     with app_sessionmaker() as session:
@@ -835,7 +838,8 @@ def test_only_an_accepted_decision_is_counted_and_none_of_them_sign_off(
                     release_id=release.release_id,
                 )
     assert detail["release"]["operatorSignOff"] is False
-    assert detail["release"]["confirmedOperatorCount"] == confirmed
+    assert detail["release"]["confirmedOperatorCount"] == 0
+    assert detail["release"]["matchingAcceptedUserCount"] == matching
     assert detail["release"]["requiredDistinctOperatorCount"] == 2
     assert detail["release"]["acceptanceCount"] == 1
     assert detail["acceptances"][0]["outcome"] == outcome
@@ -893,6 +897,7 @@ def test_an_acceptance_pinning_a_different_hash_is_not_sign_off(
                 )
     assert detail["release"]["operatorSignOff"] is False
     assert detail["release"]["confirmedOperatorCount"] == 0
+    assert detail["release"]["matchingAcceptedUserCount"] == 0
     assert detail["acceptances"][0]["manifestMatches"] is False
 
 
@@ -949,6 +954,7 @@ def test_the_reader_never_returns_the_accepting_person_or_the_notes(
         "operatorSignOffBlockedBy",
         "requiredDistinctOperatorCount",
         "confirmedOperatorCount",
+        "matchingAcceptedUserCount",
         "acceptanceCount",
     }
 
@@ -1027,8 +1033,10 @@ def test_a_service_principal_cannot_produce_operator_sign_off(app_sessionmaker, 
     the reader must still answer false, because it cannot tell that decision from
     a person's.
 
-    What it may report is the count, which is the recorded fact. One is not two,
-    and the quorum is in the response beside it.
+    This is the test that makes the two counts different things rather than two
+    names for one number: the service account's row raises
+    ``matchingAcceptedUserCount`` to one and leaves ``confirmedOperatorCount`` at
+    zero, because nothing attests that a person decided.
     """
 
     service_user = new_id("user")
@@ -1068,17 +1076,19 @@ def test_a_service_principal_cannot_produce_operator_sign_off(app_sessionmaker, 
                     release_id=release.release_id,
                 )
     assert detail["release"]["operatorSignOff"] is False
-    assert detail["release"]["operatorSignOffBlockedBy"] == "human-attestation-contract-absent"
-    assert detail["release"]["confirmedOperatorCount"] == 1
+    assert detail["release"]["operatorSignOffBlockedBy"] == "human-attestation-implementation-unavailable"
+    assert detail["release"]["confirmedOperatorCount"] == 0
+    assert detail["release"]["matchingAcceptedUserCount"] == 1
     assert detail["release"]["requiredDistinctOperatorCount"] == 2
 
 
-def test_one_operator_deciding_twice_is_one_operator(app_sessionmaker, pilot):
-    """The count is of distinct users, because the quorum is two *operators*.
+def test_one_user_deciding_twice_is_one_user(app_sessionmaker, pilot):
+    """The count is of distinct user ids, not of rows.
 
     Two rows are possible under different criteria -- the unique constraint is on
-    (release, criterion) -- so counting rows would let one account reach the
-    quorum by itself.
+    (release, criterion) -- so counting rows would let one account look like a
+    quorum. The quorum itself is about attested operators, which is a different
+    field and still zero here.
     """
 
     with app_sessionmaker() as session:
@@ -1104,5 +1114,6 @@ def test_one_operator_deciding_twice_is_one_operator(app_sessionmaker, pilot):
                     release_id=release.release_id,
                 )
     assert detail["release"]["acceptanceCount"] == 2
-    assert detail["release"]["confirmedOperatorCount"] == 1
+    assert detail["release"]["matchingAcceptedUserCount"] == 1
+    assert detail["release"]["confirmedOperatorCount"] == 0
     assert detail["release"]["operatorSignOff"] is False

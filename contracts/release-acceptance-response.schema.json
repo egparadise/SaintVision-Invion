@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
-  "description": "One recorded acceptance decision, without the person who made it.\n\nThe accepting user is deliberately absent. ``accepted_by_user_id`` is a real\nforeign key precisely so the system cannot sign its own acceptance, but a\nread surface that names people turns an audit column into a directory;\n``RunRecordResponse`` set that rule first and this follows it. ``notes`` is\nfree text and is absent for the same reason.\n\n``manifestMatches`` is computed, not stored: an acceptance pins the manifest\nhash as it stood when it was granted, and accepting one composition while\nshipping another is the failure that pinning exists to catch. A reader that\nonly saw ``outcome`` could not tell the two apart.",
+  "description": "One recorded acceptance decision, without the person who made it.\n\nThe accepting user is deliberately absent: a read surface that names people\nturns an audit column into a directory, and ``RunRecordResponse`` set that\nrule first. ``notes`` is free text and is absent for the same reason.\n\nThis docstring used to add that ``accepted_by_user_id`` is a foreign key\n\"precisely so the system cannot sign its own acceptance\". **That is false**,\nand Codex measured it: ``users`` does not distinguish a person from a service,\nso a principal whose subject was ``svc:release-bot`` wrote an ``accepted`` row\nthrough this very column. The key constrains the row to name a user that\nexists and says nothing about who that user is -- which is why\n``operatorSignOff`` is pinned false in ``ReleaseManifestResponse`` rather than\ncomputed from these records.\n\n``manifestMatches`` is computed, not stored: an acceptance pins the manifest\nhash as it stood when it was granted, and accepting one composition while\nshipping another is the failure that pinning exists to catch. A reader that\nonly saw ``outcome`` could not tell the two apart.",
   "properties": {
     "acceptanceId": {
       "maxLength": 64,
@@ -53,6 +53,7 @@
     "outcome",
     "acceptedManifestSha256",
     "manifestMatches",
+    "knownLimitations",
     "decidedAt"
   ],
   "title": "ReleaseAcceptanceResponse",
