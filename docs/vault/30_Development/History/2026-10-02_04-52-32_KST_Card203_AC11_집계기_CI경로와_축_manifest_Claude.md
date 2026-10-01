@@ -1,12 +1,12 @@
 ---
 doc_id: "HISTORY-CARD203-AC11-AGGREGATE-LANE-20261002"
 title: "카드 203 — AC-11 집계기를 부르는 CI 경로와 축 manifest: 0/8은 축이 실패한 수가 아니라 아무도 부르지 않은 수였다 (카드 201 측정 포함)"
-version: "1.1.0"
+version: "1.2.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-02T05:22:00+09:00"
+updated: "2026-10-02T06:02:42+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "aaa0b083"
@@ -140,13 +140,22 @@ LAND=$(git ls-remote origin refs/heads/integration/all-agents-unified | cut -f1)
 printf '%s' "$LAND" | grep -Eq '^[0-9a-f]{40}$' || { echo "tip을 읽지 못했다" >&2; exit 1; }
 # 1) #294 runbook §1을 먼저 끝낸다 -- 여덟 lane이 그 SHA에서 녹색이어야 이 lane이 읽을 artifact가 있다.
 # 2) 그 뒤 이 lane을 그 SHA에서 dispatch한다.
-gh workflow run ac11-aggregate.yml --ref integration/all-agents-unified -f source_sha="$LAND"
+# correlation_id는 이 한 번의 실행을 사후에 지목하기 위한 것이다. lane이 그것을
+# artifact의 ac11-checkout.json에 적으므로, 로그가 만료된 뒤에도 어느 run이 어느
+# tree를 읽었는지 확인할 수 있다 (#299 r2).
+CID="ac11-aggregate-$LAND-$(date -u +%Y%m%dT%H%M%SZ)"
+gh workflow run ac11-aggregate.yml --ref integration/all-agents-unified \
+  -f source_sha="$LAND" -f correlation_id="$CID"
 gh run list --workflow ac11-aggregate.yml --limit 5   --json databaseId,headSha,status,conclusion
 ```
 
+그리고 **그 run이 정말 그 tree를 읽었는지**를 artifact로 확인한다 — `ac11-checkout.json`의 `sourceSha`·`checkoutSha`가 둘 다 `$LAND`이고 `correlationId`가 위에서 만든 값이어야 한다. lane 안에서도 같은 단언이 돌아가므로 다르면 run 자체가 멈춘다.
+
 착지 **전** 후보 SHA에서 돌린 결과는 **그 SHA 한정**이다. 착지 뒤 같은 명령을 landed SHA로 다시 돌린다.
 
-### 5-5. 실측 — 새 lane을 exact head에서 한 번 dispatch했다
+### 5-5. 실측 — label PR event로 lane을 **처음 돌렸다**(`workflow_dispatch` 실측은 §6-2)
+
+**이 절의 제목은 r1에서 "exact head에서 dispatch했다"였고 틀렸다**(#299 r2가 지적했다). 아래 run의 `event`는 `pull_request`다 — dispatch는 §6-2에서 실제로 했다. 더 나쁜 것은 그 PR event의 checkout이 head가 아니었다는 것이고, 그것이 §6-1이다.
 
 **먼저 측정된 것은 실패였다.** `workflow_dispatch` 전용이고 한 번도 돈 적 없는 workflow는 GitHub의 workflow index에 없어서
 
@@ -178,3 +187,75 @@ lane이 **success**인 것은 의도된 것이다 — 집계기의 exit 0·1·2�
 | `tests/core/test_post_landing_verify.py` | **97 passed**(역래칫 무변경) |
 | 변이 | 축 manifest 8종 전부 사망(위 표), bundle 3종(행의 runPurpose·빈 axes·모르는 purpose) |
 | 조립기 | bundle 하나로 **두 축**이 manifest에 들어가는 것을 시험이 단언한다 |
+
+## 6. r2 — lane이 읽은 tree가 lane이 말한 tree가 아니었다
+
+### 6-1. (1) `pull_request`에서 checkout이 **ephemeral merge commit**이었다
+
+`ref: ${{ inputs.source_sha }}`는 **dispatch에서만** 값이 있다. `pull_request` event에서는 input이 없어 `ref: ''`가 되고, `actions/checkout`은 그때 event 기본값인 `refs/pull/<n>/merge`를 가져간다. run `36921695718`의 로그가 그대로 적는다:
+
+```
+HEAD is now at 030e6283 Merge 77456da49702fe26fb9d385ebf51c0f209e6d996 into aaa0b083e60c4447a97be5e05a2c7a1ada82a607
+```
+
+그래서 lane은 **저장소에 없는 tree**(`030e6283`, GitHub가 그 순간 만든 merge commit)에서 `docs/ac11-axis-sources.json`과 importer를 읽으면서, artifact 조회·envelope SHA 비교는 `SOURCE_SHA = 77456da4`에 묶고 있었다. **code SHA와 envelope SHA가 다른 run** — 이 chain 전체가 존재하는 이유가 바로 그것을 거부하는 것이다. r1의 두 run(`36921447095`·`36921695718`)의 결론은 그래서 **그 SHA에 대한 진술로 읽을 수 없다.**
+
+조치 둘:
+
+1. `ref: ${{ env.SOURCE_SHA }}` — checkout이 다른 모든 step과 **같은 한 값**을 쓴다. artifact 이름도 같은 값으로 통일했다. job 수준 `concurrency`·`if`에는 `env` context가 없어서 그 둘만 긴 형태를 유지하고 이유를 주석에 적었다.
+2. **checkout 직후 단언 step**: `git rev-parse HEAD`가 `SOURCE_SHA`와 다르면 lane이 멈춘다. 같으면 `evidence/ac11-checkout.json`에 `sourceSha`·`checkoutSha`·`event`·`runId`·`correlationId`를 적어 **artifact에 남긴다** — 로그는 만료되고 artifact는 남으므로, 사후에 "그 run이 그 tree를 읽었다"를 확인할 수 있는 것은 후자뿐이다. 그 step은 `setup-python`보다 **앞**에 둔다(틀린 tree면 설치 전에 멈춰야 한다), 그래서 image가 보장하는 `python3`만 쓴다.
+
+### 6-2. (2) `workflow_dispatch` 실측 — 이제 있다
+
+`gh workflow run`으로 **실제로** 한 번 돌렸다. r1의 404는 **등록 문제**였고(dispatch 전용이면서 한 번도 돈 적 없는 workflow는 index에 없다), label PR run이 그것을 등록했으므로 이제 dispatch가 받아들여진다 — 그 인과도 이번에 측정됐다.
+
+```
+gh workflow run ac11-aggregate.yml --ref feat/claude/c203-ac11-aggregate-lane \
+  -f source_sha=6d2c8f16622279a7a96274b09a43b23899fb2ee1 \
+  -f correlation_id=c203-r2-dispatch-6d2c8f16-20261002T060013+0900
+```
+
+| | |
+|---|---|
+| run | **[36925665586](https://github.com/egparadise/SaintVision-Invion/actions/runs/36925665586)** |
+| event | **`workflow_dispatch`** (branch `feat/claude/c203-ac11-aggregate-lane`) |
+| `source_sha` 입력 | `6d2c8f16622279a7a96274b09a43b23899fb2ee1` |
+| **실제 checkout SHA** | **`6d2c8f16622279a7a96274b09a43b23899fb2ee1`** — 단언 step이 artifact에 적었다(`ac11-checkout.json`) |
+| `correlationId` | `c203-r2-dispatch-6d2c8f16-20261002T060013+0900` |
+| lane 결과 | **success**(27초) |
+| 집계기 | **exit 2**, `verdict: INVALID_RUN`, `done: False` |
+| 조립 보고 | `assembledAxes: []`, `aggregationWillBeInvalid: true`, **8축 전부 사유와 함께** |
+| artifact | `s11-ac11-aggregate-6d2c8f16622279a7a96274b09a43b23899fb2ee1` (manifest·조립 보고·집계 결과·**checkout 영수증**) |
+
+받은 영수증 그대로:
+
+```json
+{"checkoutSha": "6d2c8f16622279a7a96274b09a43b23899fb2ee1",
+ "correlationId": "c203-r2-dispatch-6d2c8f16-20261002T060013+0900",
+ "event": "workflow_dispatch", "runId": "36925665586",
+ "schemaVersion": "ac11-aggregate-checkout:1",
+ "sourceSha": "6d2c8f16622279a7a96274b09a43b23899fb2ee1"}
+```
+
+**이것이 exact head에 대한 첫 dispatch 기록이다.** 그리고 §5-5의 두 run과 달리 **읽은 tree가 말한 tree와 같다는 증거를 자기 artifact에 들고 있다.**
+
+### 6-3. (3) `importerEmitsAxes`를 **exact set**으로
+
+r1은 "주장한 이름이 importer 소스에 **나타나는지**"만 봤다. 그래서 migration row에서 두 축 중 하나를 지운 변이가 **참인 문장으로 chain의 절반만 기술**하며 통과했다 — 그리고 그 chain의 importer는 **한 bundle에 두 축을 담으므로**, 절반만 주장된 행은 bundle 하나를 온전한 하나처럼 읽게 만든다.
+
+이제 `emitted_axes(importer)`가 **importer 파일에서 읽은 집합**과 주장이 **정확히 같은지**를 본다. **importer가 없는 row는 빈 집합**이다 — producer가 축 이름을 적더라도(accessibility의 `collect_ac11_accessibility_e2e.py`가 그렇다) 그것을 envelope으로 바꾸는 것이 없으면 집계기에 들어가는 것은 없다. `importerEmitsAxes`가 답하는 질문은 "이 chain에서 집계기로 **무엇이 들어가는가**"이기 때문이다.
+
+측정해 시험으로 박은 사실: migration importer는 **두 축**을 쓰고, security importer는 **0개**, long-soak importer는 **1개**, 없는 importer는 **0개**. 그리고 **배포된 map의 여덟 행 전부**가 자기 importer가 쓰는 집합과 같다는 일관성 시험을 더했다.
+
+변이 4건이 새로 죽는다 — 한 축만 남긴 둘(각각 `writes ['irreversible-restore-forward', 'migration-reversible-segment']`와 `does not include this axis`로), 길이 비교를 속일 **중복**, importer 없는 row가 자기 축을 주장하는 경우. fixture 자신도 그 변이였다: `importerEmitsAxes: [axis]`로 한 축만 적고 있었고, 이제 `MIGRATION_AXES` 상수로 실제 쌍을 박아 **importer가 바뀌면 fixture가 먼저 깨진다.**
+
+### 6-4. 검증
+
+| 항목 | 결과 |
+|---|---|
+| `tests/core/test_assemble_ac11_manifest.py` | 43 → **49 passed** |
+| `tests/core/test_post_landing_verify.py` | **97 passed**(trigger 집합 무변경이므로 역래칫 판단도 그대로) |
+| `tests/test_aggregate_ac11_evidence.py` | **85 passed**(무변경 확인) |
+| workflow | `yaml.safe_load` 통과, bash step **6개 전부 `bash -n` exit 0**, 내장 python **3개 전부 `ast.parse` 통과** |
+| 실측 | dispatch run **36925665586** — event·checkout SHA·correlation id가 artifact에 남았다 |
+| 문서 gate | `check_docs`·citation ratchet·`git diff --check` exit 0 |
