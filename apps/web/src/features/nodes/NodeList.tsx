@@ -282,6 +282,7 @@ export const NodeList: React.FC<NodeListProps> = ({
           return (
             <div
               key={node.id}
+              role={node.status === 'unknown' ? 'status' : undefined}
               data-testid={`node-card-${node.id}`}
               onClick={() => onSelectNode?.(node.id)}
               style={{
@@ -363,6 +364,7 @@ export const NodeList: React.FC<NodeListProps> = ({
               {/* Observation-Only and Schedulable Capacity */}
               {node.observationOnly && (
                 <div
+                  data-testid={`node-observation-banner-${node.id}`}
                   style={{
                     marginTop: '8px',
                     padding: '4px 8px',
@@ -412,7 +414,10 @@ export const NodeList: React.FC<NodeListProps> = ({
                   <span style={{ color: 'var(--color-text-muted)' }}>
                     관측여유: {(node.cpuCores * (1 - node.cpuUsagePercent / 100)).toFixed(1)}C · {((node.memoryTotalBytes - node.memoryUsedBytes) / 1024 ** 3).toFixed(1)}G
                   </span>
-                  <span style={{ fontWeight: 700, color: node.observationOnly ? 'var(--color-status-unknown)' : (node.allocatableCores !== undefined ? '#3fb950' : 'var(--color-text-muted)') }}>
+                  <span
+                    data-testid={`node-schedulable-${node.id}`}
+                    style={{ fontWeight: 700, color: node.observationOnly ? 'var(--color-status-unknown)' : (node.allocatableCores !== undefined ? '#3fb950' : 'var(--color-text-muted)') }}
+                  >
                     예약가능: {node.observationOnly ? '0C (차단)' : (node.allocatableCores !== undefined ? `${node.allocatableCores}C` : '미확인 (선택 불가)')}
                   </span>
                 </div>

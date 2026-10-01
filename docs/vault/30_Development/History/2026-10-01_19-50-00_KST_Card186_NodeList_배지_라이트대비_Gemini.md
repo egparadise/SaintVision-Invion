@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-20261001-C186-ACC09-001"
 title: "Card 186 (ACC-09 남은 영역) NodeList 상태 배지 라이트 테마 대비 보정 및 디자인 토큰화"
-version: "1.0.0"
+version: "1.0.1"
 status: "proposed"
 author: "Gemini"
 created: "2026-10-01T19:50:00+09:00"
-updated: "2026-10-01T19:58:00+09:00"
+updated: "2026-10-01T20:45:00+09:00"
 source_of_truth: "Git"
 base_sha: "2d2e0021"
 task_ids: ["ACC-09", "S11-FE"]
@@ -25,8 +25,13 @@ PR #277(승인 커밋 `2d2e0021`)에서 카드 180 디자인 토큰 기반 대�
 | 상태 구분 | 기존 구현 (하드코딩 리터럴) | 신규 디자인 토큰 | 라이트 표면 (`#ffffff`) 실측 대비율 | 다크 표면 (`#111827`) 실측 대비율 | WCAG 2.2 AA ($\ge 4.5:1$) 판정 | 상태 구별 수단 (색상 외 동반) |
 |---|---|---|---|---|---|---|
 | **active** (활성 · 헬스 미결정) | `#38bdf8` (2.14:1) | `--color-status-active`<br>(Light: `#0369a1` / Dark: `#38bdf8`) | **5.93:1** (▲ 3.79) | **8.28:1** (유지) | **합격 (PASS)** | • 텍스트: `ACTIVE (활성 · 헬스 미결정)`<br>• 안내 배너: `ℹ️ 계약 상태: active...`<br>• 6px 상태 인디케이터 도트 |
-| **lost** (통신 단절 / 유실) | `#f85149` (3.35:1) | `--color-status-lost`<br>(Light: `#b91c1c` / Dark: `#f87171`) | **6.47:1** (▲ 3.12) | **6.41:1** (▲ 1.12 on subtle) | **합격 (PASS)** | • 텍스트: `LOST (단절)`<br>• 알림 문구: `🔴 노드와의 통신이 두절되어...`<br>• 시맨틱: `role="alert"`<br>• 6px 상태 도트 |
+| **lost** (통신 단절 / 유실) | `#f85149` (3.35:1) | `--color-status-lost`<br>(Light: `#b91c1c` / Dark: `#f87171`) | **6.47:1** (▲ 3.12) | **6.41:1** (▲ 1.12 on surface / ▲ 0.93 on subtle) | **합격 (PASS)** | • 텍스트: `LOST (단절)`<br>• 알림 문구: `🔴 노드와의 통신이 두절되어...`<br>• 시맨틱: `role="alert"`<br>• 6px 상태 도트 |
 | **unknown** (미확인 / 미해석) | `#d29922` (2.52:1) | `--color-status-unknown`<br>(Light: `#92400e` / Dark: `#d29922`) | **7.09:1** (▲ 4.57) | **7.03:1** (유지) | **합격 (PASS)** | • 텍스트: `UNKNOWN (미확인)`<br>• 알림 문구: `⚠️ 서버에서 관측된 노드 상태...`<br>• 관측 배너: `⚠️ 관측 전용...`<br>• 시맨틱: `role="status"`<br>• 6px 상태 도트 |
+
+> [!NOTE]
+> **다크 테마 lost 토큰값 보정 배경 (Claude m2)**: 다크 테마에서 기존 `#f85149`는 다크 subtle(`--color-bg-subtle: #1f2937`) 위에서 4.38:1로 WCAG AA 4.5:1에 미달하였습니다. 이를 `#f87171`로 보정하여 subtle 위 5.31:1(▲0.93) 및 surface 위 6.41:1(▲1.12)로 향상되어 양쪽 배경 모두 4.5:1 이상을 충족하는 의도된 개선입니다.
+> 
+> **상태색 공유 및 비색상 의미 식별 (Claude m4)**: `--color-status-lost`와 `--color-status-offline`은 두 테마 모두 동일한 빨간색 토큰(Light: `#b91c1c`, Dark: `#f87171`, $\Delta E_{00} = 0.0$)을 사용합니다. 이는 통신 단절 및 오프라인이라는 동일 심각도 범주의 색채 일관성을 위한 것이며, 상태의 고유 식별은 텍스트 라벨(`LOST (단절)` vs `OFFLINE`), 아이콘(🔴 경고 vs 일반), ARIA 속성(`role="alert"`)을 동반하여 WCAG 1.4.1(Use of Color) 지침을 온전히 충족합니다.
 
 ---
 
@@ -73,10 +78,15 @@ PR #277(승인 커밋 `2d2e0021`)에서 카드 180 디자인 토큰 기반 대�
   - 리터럴 총개수 16건 감소 (감소 래칫 고정, 신규 리터럴 유입 시 즉각 fail-closed 사살).
 - **상태 토큰 자동 검증 스위트 연동**:
   - `statusTokenList`에 3개 토큰 등록 $\rightarrow$ 캔버스/서피스/서브틀 배경 전수 $\ge 4.5:1$ 자동 검증.
-- **신규 DOM 렌더링 및 결속 검증 (Test 8)**:
-  - `NodeList` 컴포넌트 실렌더링 후 `active`, `lost`, `unknown` 배지의 `style.borderColor`, `style.color`, dot `style.backgroundColor`가 각각 `var(--color-status-active)`, `var(--color-status-lost)`, `var(--color-status-unknown)`에 결속됨을 단언.
-  - 비색상 의미 구별(텍스트, 이모지, ARIA role) 단언.
-  - 라이트/다크 전수 대비율 $\ge 4.5:1$ 계산 단언.
+- **CSS 주석 Decoy 및 중복 선언 방지 검증 (Codex F2)**:
+  - `extractTokens`에서 `/\*[\s\S]*?\*/` 주석을 완전히 제거한 후 실제 선언만 파싱하고 블록별 중복 선언 검출 시 즉각 예외 발생.
+  - `:root` 및 `[data-theme='dark']` 블록에서 상태 토큰 3종이 각각 정확히 1회씩 선언됨을 단언.
+- **신규 DOM 렌더링 및 결속 검증 (Test 8, Codex F1/F3, Claude m3)**:
+  - 표준 카드 및 텔레메트리 미수신 카드 6개 분기 전수 렌더링.
+  - 렌더된 배지의 `style.backgroundColor`가 `var(--color-bg-subtle)`임을 단언하고, DOM 요소의 인라인 스타일에서 추출한 foreground/background 토큰 쌍으로 라이트/다크 대비율 $\ge 4.5:1$ 동적 계산 단언 (Codex F1 해소).
+  - 관측 전용 배너(`style.color`, `style.borderColor`), 예약가능 용량 라벨(`style.color`) 토큰 결속 단언 (Claude MD/m3 해소).
+  - unknown 상태의 `role="status"` 및 `⚠️` 비색상 기호 단언 (Codex F3 해소).
+  - 배너 alpha 합성 배경에 대한 명도 대비율 $\ge 4.5:1$ 계산 단언 (Claude m3 해소).
 - **Revert-Fail 프로브 추가 (Test 9)**:
   - Probe 7: `#38bdf8` on light surface $\rightarrow$ 2.14:1 (< 4.5:1 실패)
   - Probe 8: `#f85149` on light surface $\rightarrow$ 3.35:1 (< 4.5:1 실패)
@@ -84,18 +94,21 @@ PR #277(승인 커밋 `2d2e0021`)에서 카드 180 디자인 토큰 기반 대�
 
 ---
 
-## 3. 변이 검사 실측 결과 (6종 변이 100% 사살)
+## 3. 변이 검사 실측 결과 (9종 변이 100% 사살)
 
 | 변이 ID | 변이 내용 | 검증 가드 및 단언 | 결과 |
 |---|---|---|---|
-| **M1** | `NodeList.tsx` active 상태를 구 하드코딩 `#38bdf8`로 되돌림 | Test 8 DOM 결속 단언 & Test 10 멀티셋 인벤토리 래칫 | **KILLED** |
-| **M2** | `NodeList.tsx` lost 상태를 구 하드코딩 `#f85149`로 되돌림 | Test 8 DOM 결속 단언 & Test 10 멀티셋 인벤토리 래칫 | **KILLED** |
-| **M3** | `NodeList.tsx` unknown 상태를 구 하드코딩 `#d29922`로 되돌림 | Test 8 DOM 결속 단언 & Test 10 멀티셋 인벤토리 래칫 | **KILLED** |
-| **M4** | `index.css` 라이트 `--color-status-active`를 `#38bdf8`로 되돌림 | Test 3 Status text colors $\ge 4.5:1$ 단언 | **KILLED** |
-| **M5** | `index.css` 라이트 `--color-status-lost`를 `#f85149`로 되돌림 | Test 3 Status text colors $\ge 4.5:1$ 단언 | **KILLED** |
-| **M6** | `index.css` 라이트 `--color-status-unknown`를 `#d29922`로 되돌림 | Test 3 Status text colors $\ge 4.5:1$ 단언 | **KILLED** |
+| **M1** | `NodeList.tsx` 표준 배지 `backgroundColor`를 `var(--color-status-active)`로 변조 (Codex F1) | Test 8 렌더 배경 단언 및 DOM 추출 토큰 쌍 동적 대비 단언 (1.0:1 < 4.5:1) | **KILLED** |
+| **M2** | `index.css` 라이트 active 복귀 후 주석 decoy 추가 (Codex F2) | `extractTokens` 주석 스트립 및 F2 단일 선언 단언 | **KILLED** |
+| **M3** | `index.css` 라이트 lost 복귀 후 주석 decoy 추가 (Codex F2) | `extractTokens` 주석 스트립 및 F2 단일 선언 단언 | **KILLED** |
+| **M4** | `index.css` 라이트 unknown 복귀 후 주석 decoy 추가 (Codex F2) | `extractTokens` 주석 스트립 및 F2 단일 선언 단언 | **KILLED** |
+| **M5** | `NodeList.tsx` 관측 전용 배너 color를 `var(--color-status-degraded)`로 변조 (Claude MD) | Test 8 `obsBanner.style.color` 단언 | **KILLED** |
+| **M6** | `NodeList.tsx` 표준 lost 분기에 리터럴+주석 decoy 복귀 (Claude MC) | Test 8 DOM 결속 단언 & Test 10 멀티셋 인벤토리 래칫 | **KILLED** |
+| **M7** | `NodeList.tsx` 텔레메트리 unknown 카드의 `role="status"` 제거 (Codex F3) | Test 8 `telemUnknownCard.role` 단언 | **KILLED** |
+| **M8** | `NodeList.tsx` 표준 unknown 카드의 `role="status"` 제거 (Codex F3) | Test 8 `stdUnknownCard.role` 단언 | **KILLED** |
+| **M9** | `NodeList.tsx` 예약가능 용량 color를 `var(--color-status-degraded)`로 변조 (Claude m3) | Test 8 `schedLabel.style.color` 단언 | **KILLED** |
 
-> **실측 판정**: 6종 변이 중 **6종 전원 사망 (Killed: 6, Survived: 0, 사살율 100%)**.
+> **실측 판정**: 9종 변이 중 **9종 전원 사망 (Killed: 9, Survived: 0, 사살율 100%)**.
 
 ---
 
@@ -103,7 +116,7 @@ PR #277(승인 커밋 `2d2e0021`)에서 카드 180 디자인 토큰 기반 대�
 
 | 검증 항목 / 도구 | 명령 및 실행 환경 | 실측 결과 | 상세 내용 |
 |---|---|---|---|
-| **신규/확장 단위 테스트** | `npm run test -- acc09-contrast-tokens.test.tsx` | **PASS (10 passed, 131ms)** | 10개 시험 전원 통과, 변이 6종 100% 사살 |
+| **신규/확장 단위 테스트** | `npm run test -- acc09-contrast-tokens.test.tsx` | **PASS (11 passed, 170ms)** | 11개 시험 전원 통과, 변이 9종 100% 사살 |
 | **NodeList 관련 회귀 테스트** | `npm run test -- node-status-lost-unknown-guard.test.tsx node-resource-usage-contract.test.tsx` | **PASS (전원 통과)** | 노드 상태 표출 및 자원 계약 무파괴 통과 |
 | **TypeScript 컴파일** | `npx tsc -b` (apps/web) | **PASS (에러 0건)** | 타입 체커 통과 |
 | **프로덕션 번들 빌드** | `npm run build` (apps/web) | **PASS (exit 0)** | Vite production bundle 정상 생성 |
@@ -122,5 +135,5 @@ PR #277(승인 커밋 `2d2e0021`)에서 카드 180 디자인 토큰 기반 대�
 - **Base 브랜치**: `agent/gemini/c180-s11fe-contrast-fixes` (head `2d2e0021`, PR #277)
 - **작업 브랜치**: `agent/gemini/c186-nodelist-badge-contrast`
 - **검토 요청**:
-  - Claude: UI/접근성/스타일링 축 — 상태 배지 라이트 테마 시각적 대비, 비색상 의미 구별(아이콘/텍스트/ARIA) 및 단위 시험 10 passed 검토 요청.
-  - Codex: 무결성/래칫 축 — `COLOR_LITERAL_MULTISET_BASELINE` 순수 감소, 6종 변이 100% 사살 불변식 검토 요청.
+  - Claude: UI/접근성/스타일링 축 — 상태 배지 라이트 테마 시각적 대비, 비색상 의미 구별(아이콘/텍스트/ARIA) 및 단위 시험 11 passed 검토 요청.
+  - Codex: 무결성/래칫 축 — `COLOR_LITERAL_MULTISET_BASELINE` 순수 감소, 9종 변이 100% 사살 불변식 검토 요청.

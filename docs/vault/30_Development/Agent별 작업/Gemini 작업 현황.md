@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.165"
+version: "1.0.166"
 status: "approved"
 author: "Gemini"
-updated: "2026-10-01T19:58:00+09:00"
+updated: "2026-10-01T20:45:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,7 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-10-01T19:12:00+09:00 (Card 180 S11-FE ACC-09 디자인 토큰 명도 대비 전수 적합화, 독립 검토 r3 F1/F2 조치, Claude UI r1 조건부 승인 피드백 반영: NodeList 라이트 상태 배지 실측치 백로그 이월, 상태색 구별도·미사용 토큰 관측, 산문 수치 정정 완료, 코드 수정 없이 불변식 보존, acc09-contrast-tokens.test.tsx 9 passed, 8종 변이 100% 사살 실측, tsc -b/build/route_coverage 100% 클린).
+- 확인 기준: 2026-10-01T20:45:00+09:00 (Card 186 NodeList 상태 배지 라이트 테마 대비 보정 및 디자인 토큰화 r1 피드백 전수 조치: Claude UI r1 조건부 승인 조건 m1 CR 바이트 4건 정정, m2 History §1 표 subtle/surface 수치 정정, m3/Codex F1~F3 실제 DOM 렌더링 배경 결속 및 동적 대비 계산 단언, CSS 주석 decoy 제거 및 상태 토큰 블록별 고유 선언 단언, unknown role=status/⚠️ 및 관측 전용 배너/예약가능 라벨 단언, 9종 변이 100% 사살 실측, Vitest 11 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 규칙 0 위반).
 
 ## 2026-10-01 NodeList 상태 배지 라이트 테마 대비 보정 및 디자인 토큰화 (Card 186, ACC-09 남은 영역, `agent/gemini/c186-nodelist-badge-contrast`, base `2d2e0021` PR #277)
 - **개요**: PR #277(승인 커밋 `2d2e0021`)에서 History 및 Claude UI r1 피드백으로 백로그 이월되었던 `NodeList.tsx` 상태 배지 라이트 테마 하드코딩 리터럴 3종(`#38bdf8` 2.14:1, `#f85149` 3.35:1, `#d29922` 2.52:1 on `#ffffff`)의 저대비 결함을 전수 해소:
@@ -29,23 +29,24 @@ source_of_truth: "Git"
      - `--color-status-unknown`: Light `#92400e` (7.09:1 on surface, 6.47:1 on subtle) / Dark `#d29922` (7.03:1 on surface, 5.82:1 on subtle) $\ge 4.5:1$.
   2. **화면 토큰 결속 및 리터럴 전수 제거 (`apps/web/src/features/nodes/NodeList.tsx`)**:
      - `telemetryUnavailable` 배지, 일반 카드 배지(`statusColor`), 관측 전용 배너/예약가능 라벨, 활성 상태 고지 배너 전수를 디자인 토큰에 100% 결속.
-     - `NodeList.tsx` 내 `#38bdf8` 5건 $ightarrow$ 0건, `#f85149` 4건 $ightarrow$ 0건, `#d29922` 7건 $ightarrow$ 0건 전수 제거 (신규 리터럴 유입 0건, 순수 감소).
+     - `NodeList.tsx` 내 `#38bdf8` 5건 $\rightarrow$ 0건, `#f85149` 4건 $\rightarrow$ 0건, `#d29922` 7건 $\rightarrow$ 0건 전수 제거 (신규 리터럴 유입 0건, 순수 감소).
   3. **비색상 의미적 구별 유지 (WCAG 1.4.1 Use of Color 충족)**:
      - 텍스트 라벨: `ACTIVE (활성 · 헬스 미결정)`, `LOST (단절)`, `UNKNOWN (미확인)`
      - 시각 기호/아이콘: `ℹ️`, `🔴`, `⚠️` 및 6px 상태 인디케이터 도트 유지
      - ARIA 시맨틱: `role="alert"` (lost), `role="status"` (unknown/active)
   4. **단위/변이 및 래칫 검증 스위트 (`apps/web/tests/acc09-contrast-tokens.test.tsx`)**:
      - `COLOR_LITERAL_MULTISET_BASELINE`: `NodeList.tsx` 항목에서 3개 리터럴 키 완전 삭제 (순수 감소 래칫 고정).
-     - `statusTokenList`: 신규 3개 토큰 등록 $ightarrow$ 캔버스/서피스/서브틀 배경 전수 $\ge 4.5:1$ 자동 검증.
-     - Test 8 (신규): `NodeList` DOM 렌더링 후 `style.borderColor`, `style.color`, dot `style.backgroundColor` 결속 단언, 비색상 의미 구별 단언, 라이트/다크 전수 $\ge 4.5:1$ 계산 단언.
+     - `statusTokenList`: 신규 3개 토큰 등록 $\rightarrow$ 캔버스/서피스/서브틀 배경 전수 $\ge 4.5:1$ 자동 검증.
+     - `extractTokens`: CSS 주석 완전 제거 후 토큰 파싱 및 블록별 중복 선언 fail-closed 검증기 도입 (Codex F2 해소).
+     - Test 8 (신규): `NodeList` DOM 렌더링 후 표준/텔레메트리 6개 분기 전수 결속 단언, 렌더된 DOM 배경(`var(--color-bg-subtle)`) 및 DOM 토큰 쌍 기반 동적 대비 계산 단언 (Codex F1 해소), 관측 전용 배너/예약가능 라벨 단언 (Claude MD/m3 해소), unknown `role="status"` 및 ⚠️ 단언 (Codex F3 해소).
      - Test 9 (Revert-Fail Probes): 이전 하드코딩 리터럴(2.14:1, 3.35:1, 2.52:1) 결함 증명 프로브 7, 8, 9 추가.
-     - 6종 변이(M1~M6) 전원 사살 실측 (사살율 100%).
+     - 9종 변이 전원 사살 실측 (사살율 100%).
 - **담당 및 역할**: Gemini (Frontend / 접근성 소유). Reviewer: Claude (UI/접근성/스타일링 축), Codex (무결성/래칫 축).
 - **관측 근거 (Evidence)**:
-  - Vitest: `acc09-contrast-tokens.test.tsx` 10 passed (131ms), `node-status-lost-unknown-guard.test.tsx` passed, `node-resource-usage-contract.test.tsx` passed
-  - 변이 검사: 6종 변이 전원 사살 실측 (사살율 100%)
+  - Vitest: `acc09-contrast-tokens.test.tsx` 11 passed (170ms), `node-status-lost-unknown-guard.test.tsx` passed, `node-resource-usage-contract.test.tsx` passed
+  - 변이 검사: 9종 변이 전원 사살 실측 (사살율 100%)
   - TypeScript 정적 점검: `npx tsc -b` 타입 에러 0건 (exit 0)
-  - 프로덕션 번들 빌드: `npm run build` 성공 (Vite bundle 정상 생성, 11.15s, exit 0)
+  - 프로덕션 번들 빌드: `npm run build` 성공 (Vite bundle 정상 생성, exit 0)
   - 라우트 커버리지 점검: `pytest tests/test_route_coverage.py` 41 passed 100% (exit 0)
   - 프런트엔드 무결성 점검: `python tools/check_frontend_integrity.py` 93개 파일 스캔, 9대 무결성 규칙 위반 0건 (exit 0)
   - 계약 바인딩 점검: `python tools/check_contract_bindings.py` 55개 픽스처 + 20개 커널 응답 타입 앵커 통과 (exit 0)

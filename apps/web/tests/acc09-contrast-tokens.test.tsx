@@ -52,13 +52,22 @@ function blendRgba(tintRgb: [number, number, number], alpha: number, underlayHex
 }
 
 function extractTokens(block: string): Record<string, string> {
+  const cleanBlock = block.replace(/\/\*[\s\S]*?\*\//g, '');
   const tokens: Record<string, string> = {};
+  const occurrences: Record<string, number> = {};
   const regex = /(--color-[a-z0-9-]+)\s*:\s*([^;]+);/g;
   let match;
-  while ((match = regex.exec(block)) !== null) {
-    const val = match[2].split('/*')[0].trim();
+  while ((match = regex.exec(cleanBlock)) !== null) {
+    const name = match[1].trim();
+    const val = match[2].trim();
+    occurrences[name] = (occurrences[name] || 0) + 1;
     if (val.startsWith('#')) {
-      tokens[match[1].trim()] = val;
+      tokens[name] = val;
+    }
+  }
+  for (const [name, count] of Object.entries(occurrences)) {
+    if (count > 1) {
+      throw new Error(`Duplicate CSS variable declaration detected: ${name} is declared ${count} times in the same CSS block`);
     }
   }
   return tokens;
@@ -135,6 +144,29 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
 
   const lightTokens = extractTokens(lightBlockMatch[1]);
   const darkTokens = extractTokens(darkBlockMatch[1]);
+
+  // Codex F2: Status tokens must be declared exactly once per theme block without comment decoys
+  it('ACC-09 / Codex F2: Status tokens are declared exactly once per theme block without comment decoys', () => {
+    const statusTokens = ['--color-status-active', '--color-status-lost', '--color-status-unknown'];
+
+    // Check root (light)
+    const lightClean = lightBlockMatch[1].replace(/\/\*[\s\S]*?\*\//g, '');
+    for (const token of statusTokens) {
+      const regex = new RegExp(`(?<![\\w-])${token}\\s*:`, 'g');
+      const matches = lightClean.match(regex);
+      expect(matches, `Light theme block must declare ${token} exactly once`).toHaveLength(1);
+      expect(lightTokens[token], `Light theme ${token} value must be parsed`).toBeDefined();
+    }
+
+    // Check dark
+    const darkClean = darkBlockMatch[1].replace(/\/\*[\s\S]*?\*\//g, '');
+    for (const token of statusTokens) {
+      const regex = new RegExp(`(?<![\\w-])${token}\\s*:`, 'g');
+      const matches = darkClean.match(regex);
+      expect(matches, `Dark theme block must declare ${token} exactly once`).toHaveLength(1);
+      expect(darkTokens[token], `Dark theme ${token} value must be parsed`).toBeDefined();
+    }
+  });
 
   // 1. Text Tokens on Canvas & Surface (>= 4.5:1 for regular text)
   it('ACC-09: Text tokens achieve >= 4.5:1 against canvas and surface in both themes', () => {
@@ -446,16 +478,23 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
   });
 
   // 8. [Card 186 / ACC-09] Component DOM Rendering & Binding Verification: NodeList Status Badges (active, lost, unknown)
-  it('ACC-09 / Card 186: NodeList Status Badges bind to design tokens and maintain non-color semantic distinction', async () => {
+  it('ACC-09 / Card 186: NodeList Status Badges bind to design tokens and maintain non-color semantic distinction across standard and telemetry branches', async () => {
     const container = document.createElement('div');
     container.setAttribute('data-theme', 'light');
     document.body.appendChild(container);
     const root = createRoot(container);
 
+    const helperExtractVar = (val: string) => {
+      const m = val.match(/var\((--[a-z0-9-]+)\)/);
+      if (!m) throw new Error(`Expected CSS variable in value: "${val}"`);
+      return m[1];
+    };
+
     const testNodes = [
+      // Standard Cards (telemetryUnavailable: false / undefined)
       {
-        id: 'nod_active_01',
-        hostname: 'node-active-prod',
+        id: 'nod_std_active',
+        hostname: 'node-std-active',
         status: 'active',
         os: 'linux',
         cpuCores: 16,
@@ -468,11 +507,10 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
         heartbeatAt: '2026-10-01T10:00:00Z',
       },
       {
-        id: 'nod_lost_01',
-        hostname: 'node-lost-dc2',
+        id: 'nod_std_lost',
+        hostname: 'node-std-lost',
         status: 'lost',
         os: 'linux',
-        telemetryUnavailable: true,
         cpuCores: 8,
         cpuUsagePercent: 0,
         memoryTotalBytes: 32 * 1024 ** 3,
@@ -483,8 +521,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
         heartbeatAt: '2026-10-01T09:00:00Z',
       },
       {
-        id: 'nod_unknown_01',
-        hostname: 'node-unknown-edge',
+        id: 'nod_std_unknown',
+        hostname: 'node-std-unknown',
         status: 'unknown',
         os: 'linux',
         observationOnly: true,
@@ -497,6 +535,52 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
         gpuCount: 0,
         heartbeatAt: '2026-10-01T10:00:00Z',
       },
+      // Telemetry Unavailable Cards (telemetryUnavailable: true)
+      {
+        id: 'nod_telem_active',
+        hostname: 'node-telem-active',
+        status: 'active',
+        telemetryUnavailable: true,
+        os: 'linux',
+        cpuCores: 16,
+        cpuUsagePercent: 0,
+        memoryTotalBytes: 64 * 1024 ** 3,
+        memoryUsedBytes: 0,
+        storageTotalBytes: 1000 * 1024 ** 3,
+        storageUsedBytes: 0,
+        gpuCount: 0,
+        heartbeatAt: '2026-10-01T10:00:00Z',
+      },
+      {
+        id: 'nod_telem_lost',
+        hostname: 'node-telem-lost',
+        status: 'lost',
+        telemetryUnavailable: true,
+        os: 'linux',
+        cpuCores: 8,
+        cpuUsagePercent: 0,
+        memoryTotalBytes: 32 * 1024 ** 3,
+        memoryUsedBytes: 0,
+        storageTotalBytes: 500 * 1024 ** 3,
+        storageUsedBytes: 0,
+        gpuCount: 0,
+        heartbeatAt: '2026-10-01T09:00:00Z',
+      },
+      {
+        id: 'nod_telem_unknown',
+        hostname: 'node-telem-unknown',
+        status: 'unknown',
+        telemetryUnavailable: true,
+        os: 'linux',
+        cpuCores: 4,
+        cpuUsagePercent: 0,
+        memoryTotalBytes: 16 * 1024 ** 3,
+        memoryUsedBytes: 0,
+        storageTotalBytes: 250 * 1024 ** 3,
+        storageUsedBytes: 0,
+        gpuCount: 0,
+        heartbeatAt: '2026-10-01T10:00:00Z',
+      },
     ];
 
     try {
@@ -504,62 +588,89 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
         root.render(<NodeList nodes={testNodes as any} onSelectNode={() => {}} />);
       });
 
-      // 1) Active Node Badge & Notice Binding
-      const activeBadge = container.querySelector('[data-testid="node-status-badge-nod_active_01"]') as HTMLElement;
-      expect(activeBadge, 'Active node badge must render').not.toBeNull();
-      expect(activeBadge.style.color, 'Active badge text color must bind to var(--color-status-active)').toBe('var(--color-status-active)');
-      expect(activeBadge.style.borderColor, 'Active badge border must bind to var(--color-status-active)').toBe('var(--color-status-active)');
-      const activeDot = activeBadge.querySelector('span') as HTMLElement;
-      expect(activeDot.style.backgroundColor, 'Active badge dot must bind to var(--color-status-active)').toBe('var(--color-status-active)');
+      // Assert each of the 6 badges across both standard and telemetry branches
+      const badgeConfigs = [
+        { id: 'nod_std_active', expectedStatus: 'active', expectedToken: '--color-status-active', expectedLabel: 'ACTIVE' },
+        { id: 'nod_std_lost', expectedStatus: 'lost', expectedToken: '--color-status-lost', expectedLabel: 'LOST' },
+        { id: 'nod_std_unknown', expectedStatus: 'unknown', expectedToken: '--color-status-unknown', expectedLabel: 'UNKNOWN' },
+        { id: 'nod_telem_active', expectedStatus: 'active', expectedToken: '--color-status-active', expectedLabel: 'ACTIVE' },
+        { id: 'nod_telem_lost', expectedStatus: 'lost', expectedToken: '--color-status-lost', expectedLabel: 'LOST' },
+        { id: 'nod_telem_unknown', expectedStatus: 'unknown', expectedToken: '--color-status-unknown', expectedLabel: 'UNKNOWN' },
+      ];
 
-      const activeNotice = container.querySelector('[data-testid="node-active-status-notice-nod_active_01"]') as HTMLElement;
-      expect(activeNotice, 'Active status notice banner must render').not.toBeNull();
-      expect(activeNotice.style.color, 'Active notice banner color must bind to var(--color-status-active)').toBe('var(--color-status-active)');
+      for (const cfg of badgeConfigs) {
+        const badge = container.querySelector(`[data-testid="node-status-badge-${cfg.id}"]`) as HTMLElement;
+        expect(badge, `Badge for ${cfg.id} must render`).not.toBeNull();
+        expect(badge.style.color, `${cfg.id} text color must bind to ${cfg.expectedToken}`).toBe(`var(${cfg.expectedToken})`);
+        expect(badge.style.borderColor, `${cfg.id} border must bind to ${cfg.expectedToken}`).toBe(`var(${cfg.expectedToken})`);
+        expect(badge.style.backgroundColor, `${cfg.id} background must be var(--color-bg-subtle)`).toBe('var(--color-bg-subtle)');
 
-      // Non-color semantic distinction
-      expect(activeBadge.textContent).toContain('ACTIVE');
-      expect(activeNotice.textContent).toContain('ℹ️');
+        const dot = badge.querySelector('span') as HTMLElement;
+        expect(dot.style.backgroundColor, `${cfg.id} dot must bind to ${cfg.expectedToken}`).toBe(`var(${cfg.expectedToken})`);
+        expect(badge.textContent).toContain(cfg.expectedLabel);
 
-      // 2) Lost Node Badge (telemetryUnavailable branch) Binding
-      const lostBadge = container.querySelector('[data-testid="node-status-badge-nod_lost_01"]') as HTMLElement;
-      expect(lostBadge, 'Lost node badge must render').not.toBeNull();
-      expect(lostBadge.style.color, 'Lost badge text color must bind to var(--color-status-lost)').toBe('var(--color-status-lost)');
-      expect(lostBadge.style.borderColor, 'Lost badge border must bind to var(--color-status-lost)').toBe('var(--color-status-lost)');
-      const lostDot = lostBadge.querySelector('span') as HTMLElement;
-      expect(lostDot.style.backgroundColor, 'Lost badge dot must bind to var(--color-status-lost)').toBe('var(--color-status-lost)');
+        // Codex F1: Dynamically extract fg and bg tokens directly from the rendered DOM element and calculate contrast!
+        const fgVar = helperExtractVar(badge.style.color);
+        const bgVar = helperExtractVar(badge.style.backgroundColor);
 
-      // Non-color semantic distinction
-      const lostCard = container.querySelector('[data-testid="node-card-nod_lost_01"]');
-      expect(lostCard?.getAttribute('role'), 'Lost node card must have alert role').toBe('alert');
-      expect(lostBadge.textContent).toContain('LOST');
-      expect(lostCard?.textContent).toContain('🔴');
+        // Light theme contrast
+        const crLight = getContrast(lightTokens[fgVar], lightTokens[bgVar]);
+        expect(crLight, `Light theme contrast for ${cfg.id} (${fgVar} on ${bgVar}) must be >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
 
-      // 3) Unknown Node Badge & Observation-only Banner Binding
-      const unknownBadge = container.querySelector('[data-testid="node-status-badge-nod_unknown_01"]') as HTMLElement;
-      expect(unknownBadge, 'Unknown node badge must render').not.toBeNull();
-      expect(unknownBadge.style.color, 'Unknown badge text color must bind to var(--color-status-unknown)').toBe('var(--color-status-unknown)');
-      expect(unknownBadge.style.borderColor, 'Unknown badge border must bind to var(--color-status-unknown)').toBe('var(--color-status-unknown)');
-      const unknownDot = unknownBadge.querySelector('span') as HTMLElement;
-      expect(unknownDot.style.backgroundColor, 'Unknown badge dot must bind to var(--color-status-unknown)').toBe('var(--color-status-unknown)');
+        // Dark theme contrast
+        const crDark = getContrast(darkTokens[fgVar], darkTokens[bgVar]);
+        expect(crDark, `Dark theme contrast for ${cfg.id} (${fgVar} on ${bgVar}) must be >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
+      }
 
-      const unknownCard = container.querySelector('[data-testid="node-card-nod_unknown_01"]');
-      expect(unknownBadge.textContent).toContain('UNKNOWN');
+      // Semantic distinctions & banner bindings in Standard Cards
+      // 1) Standard Active: notice banner
+      const stdActiveNotice = container.querySelector('[data-testid="node-active-status-notice-nod_std_active"]') as HTMLElement;
+      expect(stdActiveNotice, 'Standard active notice banner must render').not.toBeNull();
+      expect(stdActiveNotice.style.color, 'Standard active notice color must bind to var(--color-status-active)').toBe('var(--color-status-active)');
+      expect(stdActiveNotice.textContent).toContain('ℹ️');
+      // Banner alpha contrast
+      const activeBannerLightBg = blendRgba([56, 189, 248], 0.12, lightTokens['--color-bg-surface']);
+      expect(getContrast(lightTokens['--color-status-active'], activeBannerLightBg), 'Active banner light alpha contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      const activeBannerDarkBg = blendRgba([56, 189, 248], 0.12, darkTokens['--color-bg-surface']);
+      expect(getContrast(darkTokens['--color-status-active'], activeBannerDarkBg), 'Active banner dark alpha contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
 
-      // 4) Contrast Verifications in Light Theme
-      const lightActiveCr = getContrast(lightTokens['--color-status-active'], lightTokens['--color-bg-surface']);
-      expect(lightActiveCr, 'Light --color-status-active on surface must be >= 4.5:1').toBeGreaterThanOrEqual(4.5);
-      const lightLostCr = getContrast(lightTokens['--color-status-lost'], lightTokens['--color-bg-surface']);
-      expect(lightLostCr, 'Light --color-status-lost on surface must be >= 4.5:1').toBeGreaterThanOrEqual(4.5);
-      const lightUnknownCr = getContrast(lightTokens['--color-status-unknown'], lightTokens['--color-bg-surface']);
-      expect(lightUnknownCr, 'Light --color-status-unknown on surface must be >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      // 2) Standard Unknown (observationOnly): observation banner and schedulable capacity label
+      const stdUnknownCard = container.querySelector('[data-testid="node-card-nod_std_unknown"]') as HTMLElement;
+      expect(stdUnknownCard?.getAttribute('role'), 'Standard unknown card must have status role').toBe('status');
 
-      // 5) Contrast Verifications in Dark Theme
-      const darkActiveCr = getContrast(darkTokens['--color-status-active'], darkTokens['--color-bg-surface']);
-      expect(darkActiveCr, 'Dark --color-status-active on surface must be >= 4.5:1').toBeGreaterThanOrEqual(4.5);
-      const darkLostCr = getContrast(darkTokens['--color-status-lost'], darkTokens['--color-bg-surface']);
-      expect(darkLostCr, 'Dark --color-status-lost on surface must be >= 4.5:1').toBeGreaterThanOrEqual(4.5);
-      const darkUnknownCr = getContrast(darkTokens['--color-status-unknown'], darkTokens['--color-bg-surface']);
-      expect(darkUnknownCr, 'Dark --color-status-unknown on surface must be >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      const obsBanner = container.querySelector('[data-testid="node-observation-banner-nod_std_unknown"]') as HTMLElement;
+      expect(obsBanner, 'Observation-only banner must render').not.toBeNull();
+      expect(obsBanner.style.color, 'Observation banner color must bind to var(--color-status-unknown)').toBe('var(--color-status-unknown)');
+      expect(obsBanner.style.borderColor, 'Observation banner border must bind to var(--color-status-unknown)').toBe('var(--color-status-unknown)');
+      expect(obsBanner.textContent).toContain('⚠️');
+      expect(obsBanner.textContent).toContain('관측 전용');
+      // Observation banner alpha contrast
+      const obsBannerLightBg = blendRgba([210, 153, 34], 0.15, lightTokens['--color-bg-surface']);
+      expect(getContrast(lightTokens['--color-status-unknown'], obsBannerLightBg), 'Observation banner light alpha contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      const obsBannerDarkBg = blendRgba([210, 153, 34], 0.15, darkTokens['--color-bg-surface']);
+      expect(getContrast(darkTokens['--color-status-unknown'], obsBannerDarkBg), 'Observation banner dark alpha contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      // Schedulable capacity label (:415)
+      const schedLabel = container.querySelector('[data-testid="node-schedulable-nod_std_unknown"]') as HTMLElement;
+      expect(schedLabel, 'Schedulable capacity label must render').not.toBeNull();
+      expect(schedLabel.style.color, 'Schedulable label color must bind to var(--color-status-unknown)').toBe('var(--color-status-unknown)');
+      expect(schedLabel.textContent).toContain('0C (차단)');
+
+      // Semantic distinctions in Telemetry Cards
+      // 3) Telemetry Lost: role="alert" and 🔴
+      const telemLostCard = container.querySelector('[data-testid="node-card-nod_telem_lost"]') as HTMLElement;
+      expect(telemLostCard?.getAttribute('role'), 'Telemetry lost card must have alert role').toBe('alert');
+      expect(telemLostCard.textContent).toContain('🔴');
+
+      // 4) Telemetry Unknown: role="status" and ⚠️ (Codex F3)
+      const telemUnknownCard = container.querySelector('[data-testid="node-card-nod_telem_unknown"]') as HTMLElement;
+      expect(telemUnknownCard?.getAttribute('role'), 'Telemetry unknown card must have status role').toBe('status');
+      expect(telemUnknownCard.textContent).toContain('⚠️');
+
+      // 5) Telemetry Active: role="status" and ℹ️
+      const telemActiveCard = container.querySelector('[data-testid="node-card-nod_telem_active"]') as HTMLElement;
+      expect(telemActiveCard?.getAttribute('role'), 'Telemetry active card must have status role').toBe('status');
+      expect(telemActiveCard.textContent).toContain('ℹ️');
     } finally {
       act(() => {
         root.unmount();
