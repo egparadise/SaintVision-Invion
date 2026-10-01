@@ -271,15 +271,30 @@ Claude UI·테스트 축 3차 검토 및 코디네이터 결정에 따라 마지
 
 ---
 
-## 8. 최종 검증 결과 요약 (2026-10-01)
+## 9. Codex 계약·보안 축 6차 검토(F1) 조치 상세 (2026-10-01)
 
-- **로그인 여정 하네스 스위트**: `pytest tests/test_portal_login_journey_harness.py` -> **68 passed in 24.30s (100% PASS, 0 failed, 0 skipped)**
+### 1) F1 [High] NSS import 실패 시 즉시 FAIL 및 caBundleAppliedToBrowser 결속
+- **문제점**: `configure_isolated_browser_profile()`이 `setup_isolated_nssdb()` 실패 시에도 `(True, error, {nssConfigured: False})`를 반환하고, 호출부가 `caBundleAppliedToBrowser = bool(self.ca_bundle)`로 무조건 `true`를 기록하여, certutil 부재 등 NSS 주입 실패 상황에서도 브라우저 TLS가 우연히 통과하면 잘못된 acceptance 증거가 생성될 수 있었던 결함.
+- **조치**:
+  1. **프로필 설정 실패 전파**: `configure_isolated_browser_profile()`에서 `ca_bundle_path`가 제공되었으나 파일이 부재하거나 `setup_isolated_nssdb()`가 실패한 경우, 즉시 `configured = False`와 오류 메시지, `nssConfigured: False`를 반환.
+  2. **하네스 실행 fail-closed 강제**: `_execute_live_browser()`에서 `self.ca_bundle`이 제공되었으나 `not (profile_ok and nss_configured)`인 경우, 브라우저를 기동하지 않고 1단계 `portal_tls_reachability`를 즉시 `FAIL`로 기록, 후속 단계(2~5)는 `NOT_OBSERVED`로 처리하며 `acceptanceClaim = False` 및 `caBundleAppliedToBrowser = False`를 결속.
+  3. **증거 감사 속성 결속**: `caBundleAppliedToBrowser` 속성은 `self.ca_bundle and profile_ok and nss_configured`가 모두 참일 때만 `True`로 기록되도록 수정.
+  4. **회귀 시험 3종 완비 (총 71개 시험)**:
+     - `test_configure_isolated_browser_profile_fails_when_ca_bundle_fails_nss`: NSS 설정 실패 시 `configure_isolated_browser_profile`이 `False` 반환 및 `nssConfigured: False` 검증.
+     - `test_configure_isolated_browser_profile_fails_when_ca_bundle_missing`: CA 파일 부재 시 `False` 반환 검증.
+     - `test_live_browser_fails_and_revokes_acceptance_when_nssdb_setup_fails`: NSS 주입 실패 시 가상 브라우저가 성공하더라도 1단계 `FAIL`, 후속 `NOT_OBSERVED`, `acceptanceClaim=False`, `caBundleAppliedToBrowser=False` 강제 실측.
+
+---
+
+## 10. 최종 검증 결과 요약 (2026-10-01)
+
+- **로그인 여정 하네스 스위트**: `pytest tests/test_portal_login_journey_harness.py` -> **71 passed in 23.78s (100% PASS, 0 failed, 0 skipped)**
 - **웹 클라이언트 타입 검사**: `cd apps/web && npx tsc -b` -> **타입 에러 0건 (PASS)**
 - **웹 클라이언트 프로덕션 빌드**: `cd apps/web && npm run build` -> **Vite 프로덕션 번들 정상 생성 (PASS, 7.78s)**
 - **라우트 커버리지 검증**: `pytest tests/test_route_coverage.py` -> **40 passed (100% PASS)**
 - **프런트엔드 무결성 점검**: `python -X utf8 tools/check_frontend_integrity.py` -> **9대 무결성 규칙 위반 0건 (PASS)**
 - **계약 바인딩 점검**: `python -X utf8 tools/check_contract_bindings.py` -> **55개 픽스처 전수 커버리지, 14개 리플레이 가드 PASS**
-- **문서 무결성 점검**: `python tools/check_docs.py` -> **PASS: 1037 versioned documents**
+- **문서 무결성 점검**: `python tools/check_docs.py` -> **PASS: 1038 versioned documents**
 - **문서 경로 인용 검사**: `python tools/check_doc_path_citations.py --ratchet` -> **PASS: 290 broken citation(s), all in baseline, none stale**
 - **단일 출처 검사**: `python tools/check_doc_single_source.py --ratchet` -> **19 pairs PASS**
 - **Git diff whitespace**: `git diff --check` -> **0 warnings (PASS)**

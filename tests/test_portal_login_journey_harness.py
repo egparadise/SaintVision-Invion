@@ -59,8 +59,9 @@ sys.path.insert(0, str(REPO_ROOT / "tools"))
 
 @pytest.fixture(autouse=True)
 def _default_platform_support(monkeypatch):
-    # Default to supported platform for unit/fake-browser tests, except when specifically testing unsupported platform
+    # Default to supported platform and successful NSS setup for unit/fake-browser tests, except when specifically testing failures
     monkeypatch.setattr("tools.observe_portal_login_journey.check_supported_platform", lambda: (True, None))
+    monkeypatch.setattr("tools.observe_portal_login_journey.setup_isolated_nssdb", lambda isolated_home, ca_bundle_path=None: (True, None))
 
 from tools.observe_portal_login_journey import (
     CANONICAL_IDP_HOST,
@@ -2158,3 +2159,103 @@ def test_live_chromium_nssdb_intranet_ca_trust(tmp_path):
     finally:
         server.shutdown()
         server.server_close()
+
+
+def test_configure_isolated_browser_profile_fails_when_ca_bundle_fails_nss(tmp_path, monkeypatch):
+    """Codex r6 F1: configure_isolated_browser_profile returns False when setup_isolated_nssdb fails."""
+    profile_dir = tmp_path / "browser-profile"
+    ca_bundle = tmp_path / "ca.pem"
+    ca_bundle.write_text("dummy ca", encoding="utf-8")
+    monkeypatch.setattr("tools.observe_portal_login_journey.setup_isolated_nssdb", lambda h, c: (False, "certutil failed to initialize DB"))
+    ok, err, info = configure_isolated_browser_profile(profile_dir, ca_bundle)
+    assert ok is False
+    assert "certutil failed to initialize DB" in err
+    assert info["nssConfigured"] is False
+
+
+def test_configure_isolated_browser_profile_fails_when_ca_bundle_missing(tmp_path):
+    """Codex r6 F1: configure_isolated_browser_profile returns False when ca_bundle_path does not exist."""
+    profile_dir = tmp_path / "browser-profile"
+    missing_ca = tmp_path / "nonexistent_ca.pem"
+    ok, err, info = configure_isolated_browser_profile(profile_dir, missing_ca)
+    assert ok is False
+    assert "not found" in err
+    assert info["nssConfigured"] is False
+
+
+def test_live_browser_fails_and_revokes_acceptance_when_nssdb_setup_fails(monkeypatch, tmp_path):
+    """Codex r6 F1: When CA bundle provided but NSS DB setup fails, journey must FAIL and revoke acceptance even if fake browser succeeds."""
+    from unittest.mock import MagicMock
+
+    ca_key, ca_cert, ca_pem, ca_fp = _generate_test_ca("SaintVision Test CA")
+    ca_bundle = tmp_path / "ca-bundle.crt"
+    ca_bundle.write_bytes(ca_pem)
+
+    monkeypatch.setattr("tools.observe_portal_login_journey.check_domain_resolution", lambda h: (True, None))
+    monkeypatch.setattr("tools.observe_portal_login_journey.check_tcp_connection", lambda h, p, timeout_sec=2.0: (True, None))
+    monkeypatch.setattr("tools.observe_portal_login_journey.setup_isolated_nssdb", lambda h, c: (False, "certutil binary not found on host"))
+
+    # Provide a fake browser that would otherwise succeed
+    class FakePage:
+        def goto(self, url, **kwargs):
+            return MagicMock(status=200)
+        def wait_for_load_state(self, *args, **kwargs):
+            pass
+        def locator(self, *args, **kwargs):
+            m = MagicMock()
+            m.first = m
+            return m
+        def evaluate(self, script, *args):
+            return {
+                "txCleared": True,
+                "storagePurged": True,
+                "inMemorySeamPresent": True,
+                "inMemoryTokenPurged": True,
+            }
+        def on(self, event, handler):
+            pass
+
+    class FakeBrowser:
+        def new_context(self, **kwargs):
+            return FakeBrowserContext()
+        def close(self):
+            pass
+
+    class FakeBrowserContext:
+        def new_page(self):
+            return FakePage()
+        def close(self):
+            pass
+
+    class FakePlaywright:
+        @property
+        def chromium(self):
+            m = MagicMock()
+            m.launch.return_value = FakeBrowser()
+            return m
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            pass
+
+    monkeypatch.setattr("playwright.sync_api.sync_playwright", lambda: FakePlaywright())
+    monkeypatch.setattr("tools.observe_portal_login_journey.get_git_sha", lambda **kwargs: "a" * 40)
+
+    observer = PortalLoginJourneyObserver(
+        target_url="https://portal.sv.lan",
+        ca_bundle=str(ca_bundle),
+        allowed_root_fingerprints=[ca_fp],
+        mock_mode=False,
+    )
+    evidence = observer.execute_journey(require_clean=True, require_remote_containment=True)
+
+    assert evidence["overallStatus"] == "FAIL"
+    assert evidence["acceptanceClaim"] is False
+    assert evidence["audit"]["caBundleAppliedToBrowser"] is False
+    assert evidence["steps"][0]["id"] == "portal_tls_reachability"
+    assert evidence["steps"][0]["status"] == "FAIL"
+    assert "NSS DB trust profile configuration failed" in evidence["steps"][0]["detail"]
+    assert evidence["steps"][1]["status"] == "NOT_OBSERVED"
+    assert evidence["steps"][2]["status"] == "NOT_OBSERVED"
+    assert evidence["steps"][3]["status"] == "NOT_OBSERVED"
+    assert evidence["steps"][4]["status"] == "NOT_OBSERVED"

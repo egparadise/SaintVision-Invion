@@ -245,11 +245,29 @@ def configure_isolated_browser_profile(
     }
     policy_file.write_text(json.dumps(policy_data, indent=2), encoding="utf-8")
     policy_configured = True
+    if ca_bundle_path and not ca_bundle_path.exists():
+        profile_info = {
+            "profileDir": str(profile_dir),
+            "isolatedHome": str(isolated_home),
+            "policyConfigured": policy_configured,
+            "nssConfigured": False,
+            "isolated": True,
+        }
+        return False, f"CA bundle file not found: {ca_bundle_path}", profile_info
 
     nss_configured = False
     nss_err = None
-    if ca_bundle_path and ca_bundle_path.exists():
+    if ca_bundle_path:
         nss_configured, nss_err = setup_isolated_nssdb(isolated_home, ca_bundle_path)
+        if not nss_configured:
+            profile_info = {
+                "profileDir": str(profile_dir),
+                "isolatedHome": str(isolated_home),
+                "policyConfigured": policy_configured,
+                "nssConfigured": False,
+                "isolated": True,
+            }
+            return False, nss_err or "NSS DB setup failed", profile_info
 
     profile_info = {
         "profileDir": str(profile_dir),
@@ -985,7 +1003,7 @@ class PortalLoginJourneyObserver:
         ca_digest: Optional[Dict[str, Any]] = None
         tls_validation_enforced = False
         user_data_dir_isolated = True
-        ca_bundle_applied_to_browser = bool(self.ca_bundle)
+        ca_bundle_applied_to_browser = False
         trust_store_mode = "ISOLATED_PROFILE"
 
         # 0. Platform check: Linux required for Chromium NSS DB profile isolation
@@ -1031,8 +1049,54 @@ class PortalLoginJourneyObserver:
 
         profile_path = Path(self.user_data_dir).resolve()
         ca_path = Path(self.ca_bundle).resolve() if self.ca_bundle else None
-        _, _, profile_info = configure_isolated_browser_profile(profile_path, ca_path)
+        profile_ok, profile_err, profile_info = configure_isolated_browser_profile(profile_path, ca_path)
         isolated_home = profile_info["isolatedHome"]
+        nss_configured = bool(profile_info.get("nssConfigured", False))
+        ca_bundle_applied_to_browser = bool(self.ca_bundle and profile_ok and nss_configured)
+
+        if self.ca_bundle and not (profile_ok and nss_configured):
+            fail_detail = f"Intranet CA bundle provided but browser NSS DB trust profile configuration failed: {profile_err or 'nssConfigured is False'}"
+            steps.append(
+                StepResult(
+                    id="portal_tls_reachability",
+                    name="Portal TLS Reachability & Certificate Check",
+                    status="FAIL",
+                    duration_ms=1.0,
+                    detail=fail_detail,
+                    observations={
+                        "caBundleApplied": False,
+                        "nssConfigured": False,
+                        "error": profile_err,
+                    },
+                )
+            )
+            for sid, sname in STEP_METADATA[1:]:
+                steps.append(
+                    StepResult(
+                        id=sid,
+                        name=sname,
+                        status="NOT_OBSERVED",
+                        duration_ms=0.0,
+                        detail=f"Not observed: prerequisite step portal_tls_reachability failed ({fail_detail})",
+                    )
+                )
+            return self._build_evidence(
+                start_time=start_time,
+                code_sha=code_sha,
+                measurement_kind="LIVE_BROWSER",
+                reference_only=False,
+                acceptance_claim=False,
+                overall_status="FAIL",
+                blocking_reason=fail_detail,
+                ca_digest=ca_digest,
+                steps=steps,
+                tls_validation_enforced=False,
+                clean_worktree_verified=clean_worktree_verified,
+                remote_containment_verified=remote_containment_verified,
+                trust_store_mode="ISOLATED_PROFILE",
+                user_data_dir_isolated=True,
+                ca_bundle_applied_to_browser=False,
+            )
 
         # --- Stage A: Preflight Checks ---
         # 1. DNS check (domain resolution)

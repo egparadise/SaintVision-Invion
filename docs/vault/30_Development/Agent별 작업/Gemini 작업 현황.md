@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.150"
+version: "1.0.151"
 status: "approved"
 author: "Gemini"
-updated: "2026-10-01T11:20:00+09:00"
+updated: "2026-10-01T12:00:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,24 +19,29 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-10-01T11:20:00+09:00 (Card 162 Claude r3(H1, H4) 및 Codex r4 전수 조치 완결, 전용 CI 워크플로 신설 및 68개 시험 100% PASS).
+- 확인 기준: 2026-10-01T12:00:00+09:00 (Card 162 Codex r6 F1 NSS 주입 실패 fail-closed 조치 완결, Claude r3(H1, H4) 및 71개 시험 100% PASS).
 
-## 2026-10-01 S02-FE 사내 포털 로그인 여정 관측 하네스 구축 및 Claude r3(H1, H4) / Codex 1~4차 전수 조치 (Card 162, `agent/gemini/c162-fe-login-journey-harness`)
-- **개요**: S02-FE 진척 재산정 지적 해소 및 Claude UI·테스트 축 r3(H1, H4)과 Codex 계약·보안 축 1~4차 검토(PR #259) 지적 전수 조치 완결:
-  1. **H1 [High] Linux Chromium 격리 NSS DB 사내 CA 신뢰 주입 아키텍처 및 플랫폼 판정**:
+## 2026-10-01 S02-FE 사내 포털 로그인 여정 관측 하네스 구축 및 Claude r3(H1, H4) / Codex 1~6차 전수 조치 (Card 162, `agent/gemini/c162-fe-login-journey-harness`)
+- **개요**: S02-FE 진척 재산정 지적 해소 및 Claude UI·테스트 축 r3(H1, H4)과 Codex 계약·보안 축 1~6차 검토(PR #259) 지적 전수 조치 완결:
+  1. **Codex r6 F1 [High] NSS import 실패 시 즉시 FAIL 및 caBundleAppliedToBrowser 결속**:
+     - `configure_isolated_browser_profile()`에서 `ca_bundle_path` 제공 시 파일 부재 또는 `setup_isolated_nssdb()` 실패 시 즉시 `configured = False`와 오류 메시지 반환.
+     - `_execute_live_browser()`에서 `self.ca_bundle`이 제공되었으나 `not (profile_ok and nss_configured)`인 경우, 브라우저를 기동하지 않고 1단계 `portal_tls_reachability`를 즉시 `FAIL`로 기록, 후속 단계(2~5)는 `NOT_OBSERVED`로 처리하며 `acceptanceClaim = False` 및 `caBundleAppliedToBrowser = False`를 결속.
+     - `caBundleAppliedToBrowser` 속성은 `self.ca_bundle and profile_ok and nss_configured`가 모두 참일 때만 `True`로 기록되도록 수정.
+     - NSS DB 실패 시 fail-closed 및 acceptance 취소 회귀 시험 3종 완비 (총 71개 시험 100% PASS).
+  2. **H1 [High] Linux Chromium 격리 NSS DB 사내 CA 신뢰 주입 아키텍처 및 플랫폼 판정**:
      - Linux 실행 시 격리 임시 홈 디렉터리(`isolated_home = profile_dir / "home"`) 하위 `$HOME/.pki/nssdb`를 `certutil -N`로 생성하고 사내 루트 CA를 `certutil -A -t "C,,"`로 등록.
      - Playwright Chromium 실행 시 `env={"HOME": str(isolated_home)}`을 주입하여 격리된 NSS DB만 신뢰하도록 결속(인증서 무시 플래그 0건 엄격 유지).
      - 운영자 전제: Windows/macOS 실행 시 NSS DB 격리 프로필 미지원으로 정직하게 `BLOCKED_EXTERNAL` 판정(`check_supported_platform`).
      - 로컬 TLS 서버 기반 실측 시험 완비: 잘못된 루트 등록 시 `ERR_CERT_AUTHORITY_INVALID` 실패(음성 시험), 올바른 루트 등록 시 HTTP 200 성공(양성 시험) 실측.
-  2. **H4 [High] 전용 CI 워크플로 신설 및 100% 실행·0건 skip 단언**:
+  3. **H4 [High] 전용 CI 워크플로 신설 및 100% 실행·0건 skip 단언**:
      - `.github/workflows/portal-login-harness.yml` 신설: `portal-login-harness` Job에서 `libnss3-tools`(certutil), `playwright==1.62.0`, `playwright install --with-deps chromium` 설치 후 전체 실행.
      - XML 결과에서 `skipped` 0건(`assert len(skips) == 0`), 실패 0건, 100% 통과 엄격 단언.
      - 단위/가상 브라우저 테스트 환경 Playwright 모듈 안전 폴백 스텁 완비 및 순수 단위 시험 12대 변이 사살 커버리지 완비.
-  3. **Codex r4 (1)~(3) 기존 조치 유지**: in-memory seam 부재 fail-closed(`inMemorySeamPresent`), CLI provenance 우회 옵션 제거 및 acceptanceClaim 결속, core schema 인용 정정.
-  4. **N1~N4 / F1~F6 기존 조치 유지**: lookalike token/session origin 차단, 정본 `SessionView` strict 스키마 검증, Chromium launch args 인증서 무시 인자 0건 단언, `globalThis.__sv_has_auth_token` boolean seam 탑재, 5단계 여정 실측, 사내 CA 번들 및 allowlist fail-closed.
+  4. **Codex r4 (1)~(3) 기존 조치 유지**: in-memory seam 부재 fail-closed(`inMemorySeamPresent`), CLI provenance 우회 옵션 제거 및 acceptanceClaim 결속, core schema 인용 정정.
+  5. **N1~N4 / F1~F6 기존 조치 유지**: lookalike token/session origin 차단, 정본 `SessionView` strict 스키마 검증, Chromium launch args 인증서 무시 인자 0건 단언, `globalThis.__sv_has_auth_token` boolean seam 탑재, 5단계 여정 실측, 사내 CA 번들 및 allowlist fail-closed.
 - **담당 및 역할**: Gemini (Frontend / UI / 웹 배포 소유). Reviewer: Claude (UI·운영 축), Codex (계약·보안 축).
 - **관측 근거 (Evidence)**:
-  - 로그인 여정 관측 및 변이 사살 시험: `tests/test_portal_login_journey_harness.py` (68 passed 100%, 24.30s, 0 failed, 0 skipped)
+  - 로그인 여정 관측 및 변이 사살 시험: `tests/test_portal_login_journey_harness.py` (71 passed 100%, 23.78s, 0 failed, 0 skipped)
   - 갱신된 실측 증거: `docs/vault/30_Development/Evidence/s02_fe_login_journey_evidence.json` (정직한 `BLOCKED_EXTERNAL` 실측, leak count 전수 0)
   - 웹 클라이언트 타입 검사: `cd apps/web && npx tsc -b` (타입 오류 0건, PASS)
   - 웹 클라이언트 프로덕션 빌드: `cd apps/web && npm run build` (Vite 번들 정상 생성, 7.78s, PASS)
