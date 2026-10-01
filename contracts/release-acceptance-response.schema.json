@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One recorded acceptance decision, without the person who made it.\n\nThe accepting user is deliberately absent: a read surface that names people\nturns an audit column into a directory, and ``RunRecordResponse`` set that\nrule first. ``notes`` is free text and is absent for the same reason.\n\nThis docstring used to add that ``accepted_by_user_id`` is a foreign key\n\"precisely so the system cannot sign its own acceptance\". **That is false**,\nand Codex measured it: ``users`` does not distinguish a person from a service,\nso a principal whose subject was ``svc:release-bot`` wrote an ``accepted`` row\nthrough this very column. The key constrains the row to name a user that\nexists and says nothing about who that user is -- which is why\n``operatorSignOff`` is pinned false in ``ReleaseManifestResponse`` rather than\ncomputed from these records.\n\n``manifestMatches`` is computed, not stored: an acceptance pins the manifest\nhash as it stood when it was granted, and accepting one composition while\nshipping another is the failure that pinning exists to catch. A reader that\nonly saw ``outcome`` could not tell the two apart.",
+  "properties": {
+    "acceptanceId": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Acceptanceid",
+      "type": "string"
+    },
+    "acceptanceIdRef": {
+      "maxLength": 16,
+      "minLength": 1,
+      "title": "Acceptanceidref",
+      "type": "string"
+    },
+    "acceptedManifestSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Acceptedmanifestsha256",
+      "type": "string"
+    },
+    "decidedAt": {
+      "format": "date-time",
+      "title": "Decidedat",
+      "type": "string"
+    },
+    "knownLimitations": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 64,
+      "title": "Knownlimitations",
+      "type": "array"
+    },
+    "manifestMatches": {
+      "title": "Manifestmatches",
+      "type": "boolean"
+    },
+    "outcome": {
+      "enum": [
+        "accepted",
+        "conditional",
+        "rejected"
+      ],
+      "title": "Outcome",
+      "type": "string"
+    }
+  },
+  "required": [
+    "acceptanceId",
+    "acceptanceIdRef",
+    "outcome",
+    "acceptedManifestSha256",
+    "manifestMatches",
+    "knownLimitations",
+    "decidedAt"
+  ],
+  "title": "ReleaseAcceptanceResponse",
+  "type": "object"
+}
