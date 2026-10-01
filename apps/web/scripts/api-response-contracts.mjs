@@ -65,6 +65,11 @@ const contracts = [
   { schema: 'model-verify-response', output: 'model-verify-response' },
   { schema: 'eval-run-start-request', output: 'eval-run-start-request' },
   { schema: 'eval-run-response', output: 'eval-run-response' },
+  { schema: 'release-manifest-response', output: 'release-manifest-response' },
+  { schema: 'release-manifest-detail-response', output: 'release-manifest-detail-response' },
+  { schema: 'release-manifest-page-response', output: 'release-manifest-page-response' },
+  { schema: 'release-acceptance-response', output: 'release-acceptance-response' },
+  { schema: 'release-component-response', output: 'release-component-response' },
 ];
 const mode = process.argv[2];
 
