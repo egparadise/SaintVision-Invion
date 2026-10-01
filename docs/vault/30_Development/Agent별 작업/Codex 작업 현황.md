@@ -97,6 +97,22 @@ active_card_next: "Claude re-review; continue Card 154 independent review and ca
 - 선행 착지 `6fc0428b`에서 S04-DB의 별도 kernel 경계 C1-K를 가장 앞의 외부 전제 없는 Codex 고난도 카드로 선택했다. 계약은 `8cf8c1ab`, collector·PG-free/실 PG 단일 파일은 `fc08a856`·`b0ff6b69`, evidence count 재계산 보강은 `26448c94`에 구현했다.
 - K1~K3는 approval→dispatch→claim→permit→execution attempt의 scope·digest·policy version·epoch·bound version·state event를 fail-closed로 대조한다. claim 직전 current policy decision ID, 실행 당시 epoch history K4, permit 공개키 provenance는 각각 독립 durable peer 부재·`NOT_REGISTERED`·`RECORDED_ONLY`로 남겨 거짓 합격을 막는다.
 - PG-free **25 passed**, Black·diff check exit 0. Claude 독립 검토 F1·F3~F8을 반영해 실 PG fixture 결속, timezone instant 비교, database-wide FORCE RLS visibility, RR/RO validator, 중복 event와 재승인 attempt 시험을 추가했고 criteria v1.0.2 `6d677d4e`에 고정했다. 공유 PG에서 전체 relation을 읽는 시험은 kernel evidence 대상 table을 명시적으로 비우는 local autouse fixture로 격리했다. 실 PG는 hosted Core exact-head 결과 대기이며 공개 계약·migration·registry status 변경 0, S04-DB `review` 유지다. [[2026-09-30_10-27-14_KST_S04-DB_C1-K_착수_Codex]], [[S04-DB_C1-K_kernel_승인_결속_Evidence_계약]].
+## 2026-09-30 CARD-159 S04-DB C1 core 취소 이력 producer — Claude 검토 요청
+
+- integration `6fc0428b` 기준으로 task-registry와 57.81% 이후 로드맵을 대조해,
+  외부 PC 없이 닫을 수 있는 가장 앞의 Codex 고난도 공백인 S04-DB C1 취소 이력
+  producer를 선택했다.
+- `06c57ca9`에서 기준 v1.3.0을 먼저 고정하고 `6e2039c2`에서 첫 취소 상태 전이와
+  exact `run.cancel.requested` audit 1행을 같은 transaction에 결속했다. replay는
+  중복 audit 0, audit 실패는 취소 상태 rollback이며 actor·trace를 명시적으로 받는다.
+- Claude 조건 C-1~C-3을 반영해 기준 v1.3.1에서 run 행 `FOR UPDATE` 직렬화와
+  두 connection 실 PG 경쟁 시험을 추가했다. actor ID가 있는 anonymous와 비정본
+  `run.cancel.denied` fixture도 fail-closed로 고정했다. 제품 HTTP·worker 호출자는
+  아직 0이므로 호출 경로 존재를 운영 PASS의 추가 선행 조건으로 기록했다.
+- PG-free **7+8 passed**, 계약·ontology·docs 게이트 exit 0. 운영 배포 SHA·활성 시각·
+  관측 창 미결속 때문에 clean C1은 `RECORDED_ONLY`, C1-K·물리 Node 경계는 계속
+  미관측이고 S04-DB `review`를 유지한다.
+  [[2026-09-30_12-17-56_KST_S04-DB_C1_cancel_history_producer_착수_Codex]].
 
 ## 2026-09-29 S05 Card114 c50 일반 suite 격리 — Claude 재확인 요청
 
