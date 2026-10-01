@@ -23,10 +23,13 @@ export type Name = string;
  * @maxItems 512
  */
 export type Components = ReleaseComponentResponse[];
+export type Confirmedoperatorcount = number;
 export type Createdat = string;
 export type Manifestsha256 = string;
-export type Operatorsignoff = boolean;
+export type Operatorsignoff = false;
+export type Operatorsignoffblockedby = 'human-attestation-contract-absent';
 export type Releaseid = string;
+export type Requireddistinctoperatorcount = 2;
 export type Version = string;
 
 /**
@@ -60,25 +63,39 @@ export interface ReleaseAcceptanceResponse {
   outcome: Outcome;
 }
 /**
- * A recorded release, and whether a person has signed it off.
+ * A recorded release, and what is recorded about accepting it.
  *
- * ``operatorSignOff`` is **computed from the acceptance rows**, never stored
- * and never supplied by a caller. It is true only when an ``accepted``
- * decision exists whose pinned hash equals this manifest's hash. A
- * ``conditional`` decision, a ``rejected`` one, and an acceptance of a
- * different composition all leave it false, which is the whole point: DEF-S12
- * recorded ``operatorSignOff=false`` because no server route existed to answer
- * the question, and a route that answered ``true`` from anything less than a
- * person's matching acceptance would be worse than no route at all.
+ * ``operatorSignOff`` is **``Literal[False]``**: this reader cannot emit true,
+ * and the contract says so rather than the docstring promising it.
+ *
+ * The first version of this model computed it from the acceptance rows and
+ * called an ``accepted`` row with a matching hash a sign-off, on the reasoning
+ * that ``acceptance_records.accepted_by_user_id`` is a foreign key to ``users``
+ * so "the system cannot sign its own acceptance". **That reasoning was wrong,
+ * and Codex measured it**: ``users`` draws no line between a person and a
+ * service -- ``identity.py`` builds a Principal from any ``external_subject``
+ * -- and the foreign key proves only that the row names a user that exists. A
+ * principal whose subject was ``svc:release-bot`` wrote an ``accepted`` row and
+ * the field read true. A key that proves existence was read as proof of
+ * humanity.
+ *
+ * So the field is pinned false until there is a contract for attesting that a
+ * person decided. ``requiredDistinctOperatorCount`` and
+ * ``confirmedOperatorCount`` carry the recorded fact in the meantime, named as
+ * the write contract (``#282``, card 184) names them: two distinct operators
+ * are required, and a count below that is not sign-off however it was written.
  */
 export interface ReleaseManifestResponse {
   acceptanceCount: Acceptancecount;
   componentCount: Componentcount;
   components?: Components;
+  confirmedOperatorCount: Confirmedoperatorcount;
   createdAt: Createdat;
   manifestSha256: Manifestsha256;
   operatorSignOff: Operatorsignoff;
+  operatorSignOffBlockedBy: Operatorsignoffblockedby;
   releaseId: Releaseid;
+  requiredDistinctOperatorCount: Requireddistinctoperatorcount;
   version: Version;
 }
 /**

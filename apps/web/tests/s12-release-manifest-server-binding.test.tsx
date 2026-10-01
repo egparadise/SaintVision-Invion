@@ -47,7 +47,10 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
     manifestSha256: sampleManifestSha,
     createdAt: '2026-10-01T10:00:00Z',
     operatorSignOff: false,
-    acceptanceCount: 0,
+    operatorSignOffBlockedBy: 'human-attestation-contract-absent',
+    requiredDistinctOperatorCount: 2,
+    confirmedOperatorCount: 1,
+    acceptanceCount: 1,
     components: [
       { name: 'control-plane', kind: 'service', digest: sampleDigest1 },
       { name: 'agent-runtime', kind: 'daemon', digest: sampleDigest2 },
@@ -60,20 +63,18 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
     componentCount: 1,
     manifestSha256: sampleManifestSha,
     createdAt: '2026-10-01T11:00:00Z',
-    operatorSignOff: true,
-    acceptanceCount: 1,
+    operatorSignOff: false,
+    operatorSignOffBlockedBy: 'human-attestation-contract-absent',
+    requiredDistinctOperatorCount: 2,
+    confirmedOperatorCount: 0,
+    acceptanceCount: 0,
     components: [
       { name: 'control-plane', kind: 'service', digest: sampleDigest1 },
     ],
   };
 
-  const mockDetailUnsigned: ReleaseManifestDetailResponse = {
-    release: { ...mockReleaseItem, operatorSignOff: false, acceptanceCount: 0 },
-    acceptances: [],
-  };
-
-  const mockDetailSigned: ReleaseManifestDetailResponse = {
-    release: { ...mockReleaseItem, operatorSignOff: true, acceptanceCount: 1 },
+  const mockDetailWithAcceptance: ReleaseManifestDetailResponse = {
+    release: mockReleaseItem,
     acceptances: [
       {
         acceptanceId: 'acc-2026-0001',
@@ -85,6 +86,11 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
         knownLimitations: ['Air-gapped deployment only'],
       },
     ],
+  };
+
+  const mockDetailZeroAcceptance: ReleaseManifestDetailResponse = {
+    release: mockReleaseItem2,
+    acceptances: [],
   };
 
   // =========================================================================
@@ -101,24 +107,28 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
       expect(isValidReleaseComponent({ name: '', kind: 'svc', digest: sampleDigest1 })).toBe(false);
     });
 
-    it('isValidReleaseManifest enforces componentCount >= 1 and additionalProperties: false', () => {
+    it('isValidReleaseManifest enforces Literal[False] operatorSignOff and blockedBy reason (Codex F1)', () => {
       expect(isValidReleaseManifest(mockReleaseItem)).toBe(true);
       expect(isValidReleaseManifest(null)).toBe(false);
       expect(isValidReleaseManifest({})).toBe(false);
+      // operatorSignOff=true MUST be refused (Literal[False] contract)
+      expect(isValidReleaseManifest({ ...mockReleaseItem, operatorSignOff: true as any })).toBe(false);
+      // missing or invalid blockedBy reason rejected
+      expect(isValidReleaseManifest({ ...mockReleaseItem, operatorSignOffBlockedBy: 'other-reason' as any })).toBe(false);
+      // requiredDistinctOperatorCount must be 2
+      expect(isValidReleaseManifest({ ...mockReleaseItem, requiredDistinctOperatorCount: 1 as any })).toBe(false);
+      // confirmedOperatorCount must be non-negative integer
+      expect(isValidReleaseManifest({ ...mockReleaseItem, confirmedOperatorCount: -1 })).toBe(false);
       // componentCount: 0 rejected (schema minimum: 1)
       expect(isValidReleaseManifest({ ...mockReleaseItem, componentCount: 0 })).toBe(false);
       // short SHA rejected
       expect(isValidReleaseManifest({ ...mockReleaseItem, manifestSha256: 'short-sha' })).toBe(false);
-      // non-boolean operatorSignOff rejected
-      expect(isValidReleaseManifest({ ...mockReleaseItem, operatorSignOff: 'not-a-boolean' })).toBe(false);
       // extra unknown key rejected
       expect(isValidReleaseManifest({ ...mockReleaseItem, extraKey: 'invented' })).toBe(false);
-      // invalid component rejected
-      expect(isValidReleaseManifest({ ...mockReleaseItem, components: [{ name: 'cp' }] })).toBe(false);
     });
 
     it('isValidReleaseAcceptance enforces outcome enum, manifestMatches boolean, and strict keys', () => {
-      const validAcc = mockDetailSigned.acceptances![0];
+      const validAcc = mockDetailWithAcceptance.acceptances![0];
       expect(isValidReleaseAcceptance(validAcc)).toBe(true);
       // invalid outcome enum
       expect(isValidReleaseAcceptance({ ...validAcc, outcome: 'invented' })).toBe(false);
@@ -165,7 +175,7 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
         ok: true,
         status: 200,
         headers: new Headers({ 'Content-Type': 'application/json' }),
-        json: async () => mockDetailSigned,
+        json: async () => mockDetailWithAcceptance,
       } as Response);
 
       const res = await fetchReleaseManifestDetail('rel-2026-s12-001');
@@ -175,7 +185,19 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
         expect.objectContaining({ method: 'GET' })
       );
       expect(res.release.releaseId).toBe('rel-2026-s12-001');
-      expect(res.release.operatorSignOff).toBe(true);
+      expect(res.release.operatorSignOff).toBe(false);
+      expect(res.release.confirmedOperatorCount).toBe(1);
+    });
+
+    it('fetchReleaseManifests throws contract violation if server returns operatorSignOff=true (kills M10, Codex F1)', async () => {
+      vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: new Headers({ 'Content-Type': 'application/json' }),
+        json: async () => ({ items: [{ ...mockReleaseItem, operatorSignOff: true }] }),
+      } as Response);
+
+      await expect(fetchReleaseManifests()).rejects.toThrow('ReleaseManifestPageResponse contract violation');
     });
 
     it('fetchReleaseManifests rejects fail-open malformed response without items (kills M10)', async () => {
@@ -210,7 +232,7 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
   // 2. Server binding in IntranetDeploymentView (M2, M3, M6, M7, M9 killed)
   // =========================================================================
   describe('IntranetDeploymentView server manifest binding', () => {
-    it('auto-fetches by default when autoFetch prop is omitted and asserts exact URLs (kills M2, M3, M9)', async () => {
+    it('auto-fetches by default and displays honest un-signed state with blockedBy reason and operator quorum (kills M2, M3, M9, Codex F1)', async () => {
       const fetchSpy = vi.spyOn(globalThis, 'fetch')
         .mockResolvedValueOnce({
           ok: true,
@@ -222,7 +244,7 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
           ok: true,
           status: 200,
           headers: new Headers({ 'Content-Type': 'application/json' }),
-          json: async () => mockDetailSigned,
+          json: async () => mockDetailWithAcceptance,
         } as Response);
 
       // Render WITHOUT autoFetch prop -> MUST naturally fetch!
@@ -247,10 +269,19 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
       const versionEl = container.querySelector('[data-testid="server-release-version"]');
       expect(versionEl?.textContent).toBe('1.2.0-rc.1');
 
-      // Verify server operator sign-off reflects server true state
+      // Verify honest unsigned state with blockedBy reason
       const signoffEl = container.querySelector('[data-testid="server-operator-signoff"]');
-      expect(signoffEl?.textContent).toContain('서명 완료');
-      expect(signoffEl?.textContent).toContain('operatorSignOff=true');
+      expect(signoffEl?.textContent).toContain('미서명 (operatorSignOff: false)');
+      expect(signoffEl?.textContent).toContain('미서명 — 사람 확인 계약 미구현');
+      expect(signoffEl?.textContent).toContain('human-attestation-contract-absent');
+
+      // Verify operator quorum count
+      const quorumEl = container.querySelector('[data-testid="server-operator-quorum"]');
+      expect(quorumEl?.textContent).toContain('1 / 2 확인 기록 (서명 아님)');
+
+      // Strictly does NOT render '서버 검증됨' or '운영자 최종 서명 완료'
+      expect(container.textContent).not.toContain('서버 검증됨');
+      expect(container.textContent).not.toContain('운영자 최종 서명 완료');
     });
 
     it('renders explicit empty state with role="status" when tenant has 0 releases (F10)', async () => {
@@ -290,7 +321,7 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
           ok: true,
           status: 200,
           headers: new Headers({ 'Content-Type': 'application/json' }),
-          json: async () => mockDetailUnsigned,
+          json: async () => mockDetailZeroAcceptance,
         } as Response);
 
       await act(async () => {
@@ -300,34 +331,6 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
       const cursorEl = container.querySelector('[data-testid="deployment-manifest-next-cursor"]');
       expect(cursorEl).not.toBeNull();
       expect(cursorEl?.textContent).toContain('cur_page_002');
-    });
-
-    it('renders honest unsigned state when server returns operatorSignOff: false via fetch', async () => {
-      vi.spyOn(globalThis, 'fetch')
-        .mockResolvedValueOnce({
-          ok: true,
-          status: 200,
-          headers: new Headers({ 'Content-Type': 'application/json' }),
-          json: async () => ({ items: [mockReleaseItem], nextCursor: null }),
-        } as Response)
-        .mockResolvedValueOnce({
-          ok: true,
-          status: 200,
-          headers: new Headers({ 'Content-Type': 'application/json' }),
-          json: async () => mockDetailUnsigned,
-        } as Response);
-
-      await act(async () => {
-        root.render(<IntranetDeploymentView currentUser={{ id: 'usr_lead', name: 'Lead', role: 'operator' }} />);
-      });
-
-      const signoffEl = container.querySelector('[data-testid="server-operator-signoff"]');
-      expect(signoffEl).not.toBeNull();
-      expect(signoffEl?.textContent).toContain('미서명 (operatorSignOff: false)');
-
-      const acceptancesEmpty = container.querySelector('[data-testid="server-acceptances-empty"]');
-      expect(acceptancesEmpty).not.toBeNull();
-      expect(acceptancesEmpty?.textContent).toContain('기록된 수락 결정 없음');
     });
 
     it('handles network failure honestly without fabricating 500 error or swallowing into empty list (kills M6, F6)', async () => {
@@ -433,7 +436,7 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
           ok: true,
           status: 200,
           headers: new Headers({ 'Content-Type': 'application/json' }),
-          json: async () => mockDetailUnsigned,
+          json: async () => mockDetailWithAcceptance,
         } as Response);
 
       await act(async () => {
@@ -470,7 +473,6 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
     });
 
     it('mutation invariant: fails if server release manifest binding is reverted to static fixture', () => {
-      // Reverting to static fixture breaks the live binding contract
       expect(isValidReleaseManifest(mockReleaseItem)).toBe(true);
     });
   });

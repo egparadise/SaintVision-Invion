@@ -5,9 +5,9 @@ version: "1.0.0"
 status: "proposed"
 author: "Gemini"
 created: "2026-10-01T18:50:00+09:00"
-updated: "2026-10-01T18:59:00+09:00"
+updated: "2026-10-01T19:40:00+09:00"
 source_of_truth: "Git"
-base_sha: "3ff89b84"
+base_sha: "4114f8ba"
 task_ids: ["S12-FE", "S12-BE"]
 tags: ["s12", "release-manifest", "acceptance", "binding", "read-only", "security-boundary", "gemini"]
 ---
@@ -125,7 +125,43 @@ ightarrow$ `/v1/release-manifest/` | `fetchSpy` exact detail URL assertion | **K
 
 ---
 
-## 6. 게이트 및 정적 검증 실측 결과
+## 6. 부모 #280 Codex F1 계약 변경 후속 조치 (4114f8ba 동기화)
+
+### 6.1 배경 및 계약 변경 사항
+PR #280에서 Codex F1 검토 결과, 기존 `acceptance_records`의 `decided_by`가 `users` 테이블 외래키를 참조하나 사람 운영자와 자동화 서비스 주체(예: `svc:release-bot`)를 구분하는 인간 증명(human attestation) 계약이 부재함이 식별됨.
+이에 따라 카드 184에서 인간 증명 계약이 정식 도입될 때까지 백엔드 계약에서 `operatorSignOff`는 참이 될 수 없는 불변식(`Literal[False]`, schema `const: false`)으로 고정되고 신규 정족수/차단 사유 필드가 추가됨:
+1. `operatorSignOff`: `Literal[False]` (`const: false`, 절대 true 불가)
+2. `operatorSignOffBlockedBy`: `"human-attestation-contract-absent"` (`const: "human-attestation-contract-absent"`)
+3. `requiredDistinctOperatorCount`: `2` (`const: 2`, 요구 고유 운영자 수 고정 2)
+4. `confirmedOperatorCount`: non-negative integer (해시 일치 수락 결정의 고유 사용자 수, 서비스 주체 포함 가능)
+
+### 6.2 프런트엔드 조치 내역
+1. **Git 브랜치 동기화**: `origin/agent/claude/c182-s12-manifest-routes` (`4114f8ba`)를 `agent/gemini/c183-s12fe-release-binding`에 no-ff merge (force push 절대 금지).
+2. **계약 재생성 및 검증**: `npm run contracts:generate` 및 `npm run contracts:check` 실행 -> 40개 API 응답 TypeScript 타입 동기화 통과 (exit 0).
+3. **엄격한 런타임 fail-closed 가드 (`apps/web/src/shared/api/releaseObservation.ts`)**:
+   - `isValidReleaseManifest`:
+     - `operatorSignOff !== false`인 경우 즉각 `false` 반환 (만약 서버가 true를 반환하면 계약 위반으로 거부).
+     - `operatorSignOffBlockedBy !== 'human-attestation-contract-absent'` 검증.
+     - `requiredDistinctOperatorCount !== 2` 검증.
+     - `confirmedOperatorCount`가 0 이상의 정수인지 엄격 검증.
+     - `ALLOWED_MANIFEST_KEYS`에 3개 필드 추가.
+4. **UI 정직성 및 표현 정정 (`apps/web/src/features/deployment/IntranetDeploymentView.tsx`)**:
+   - 허위 신뢰를 유발하는 `'서버 검증됨'` 및 `'운영자 최종 서명'` 문구를 전면 제거.
+   - Section 3-A 카드 타이틀: `운영자 인수 서명 관측 (operatorSignOff)`
+   - 상태 라벨: `미서명 (operatorSignOff: false)`
+   - 차단 사유 표출: `미서명 — 사람 확인 계약 미구현 (human-attestation-contract-absent)`
+   - 정족수 표출: `{confirmedOperatorCount} / {requiredDistinctOperatorCount} 확인 기록 (서명 아님)`
+   - 정족수 안내: `해시 일치 수락의 서로 다른 사용자 수 (서비스 주체 포함 가능 — 2명 고유 사람 확인 계약 전 서명 불인정)`
+   - 릴리스 선택기 옵션: `{version} ({releaseId}) - 미서명 ({confirmedOperatorCount}/{requiredDistinctOperatorCount} 확인)`
+5. **단위 시험 단언 추가 (`apps/web/tests/s12-release-manifest-server-binding.test.tsx`)**:
+   - `isValidReleaseManifest refuses operatorSignOff=true as contract violation (Literal[False] guard)`: `operatorSignOff: true` 주입 시 fail-closed 거부 단언.
+   - `fetchReleaseManifests throws contract violation if server returns operatorSignOff=true`: 서버 응답에 `operatorSignOff: true`가 올 경우 예외 투척 단언.
+   - UI 렌더링 시험에서 `미서명 — 사람 확인 계약 미구현`, `확인 기록 (서명 아님)` 표출 및 `서버 검증됨`/`운영자 최종 서명` 미표출 단언.
+   - Vitest 17 passed (전원 통과).
+
+---
+
+## 7. 게이트 및 정적 검증 실측 결과
 
 | 검증 단계 / 도구 | 명령 및 실행 환경 | 결과 | 상세 내용 |
 |---|---|---|---|
@@ -138,12 +174,12 @@ ightarrow$ `/v1/release-manifest/` | `fetchSpy` exact detail URL assertion | **K
 | **계약 바인딩 점검** | `python tools/check_contract_bindings.py` | **PASS** (exit 0) | 55개 픽스처 + 20개 커널 응답 타입 앵커 통과 |
 | **문서 일관성 검사** | `python tools/check_docs.py` | **PASS** (exit 0) | 1066개 문서, 24개 원본 해시 통과 |
 | **문서 경로 인용 래칫 검사** | `python tools/check_doc_path_citations.py --ratchet --base-ref origin/agent/claude/c182-s12-manifest-routes` | **PASS** (exit 0) | 290 broken citations in baseline, 0 new broken citations (F1 완전 해소) |
-| **공백/서식 무결성 검사** | `git diff --check 3ff89b84` | **출력 없음 (PASS)** | 공백/개행 오류 0건 |
+| **공백/서식 무결성 검사** | `git diff --check 4114f8ba` | **출력 없음 (PASS)** | 공백/개행 오류 0건 |
 | **금지 문자열 검사** | 봇 호출 방지 태그 검사 | **0건 검출 확인** | 커밋, 문서, PR 코멘트 대상 |
 
 ---
 
-## 7. 인계 및 검토 요청
+## 8. 인계 및 검토 요청
 
 - **Base 브랜치**: `agent/claude/c182-s12-manifest-routes` (PR #280 head `3ff89b84`)
 - **작업 브랜치**: `agent/gemini/c183-s12fe-release-binding`

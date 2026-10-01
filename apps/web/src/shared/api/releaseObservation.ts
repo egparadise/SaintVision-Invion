@@ -25,6 +25,9 @@ const ALLOWED_MANIFEST_KEYS = new Set([
   'manifestSha256',
   'createdAt',
   'operatorSignOff',
+  'operatorSignOffBlockedBy',
+  'requiredDistinctOperatorCount',
+  'confirmedOperatorCount',
   'acceptanceCount',
   'components',
 ]);
@@ -95,7 +98,12 @@ export function isValidReleaseManifest(val: unknown): val is ReleaseManifestResp
     typeof m.componentCount !== 'number' ||
     !Number.isInteger(m.componentCount) ||
     m.componentCount < 1 ||
-    typeof m.operatorSignOff !== 'boolean' ||
+    m.operatorSignOff !== false ||
+    m.operatorSignOffBlockedBy !== 'human-attestation-contract-absent' ||
+    m.requiredDistinctOperatorCount !== 2 ||
+    typeof m.confirmedOperatorCount !== 'number' ||
+    !Number.isInteger(m.confirmedOperatorCount) ||
+    m.confirmedOperatorCount < 0 ||
     typeof m.acceptanceCount !== 'number' ||
     !Number.isInteger(m.acceptanceCount) ||
     m.acceptanceCount < 0 ||

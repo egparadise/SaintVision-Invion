@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.165"
+version: "1.0.166"
 status: "approved"
 author: "Gemini"
-updated: "2026-10-01T19:30:00+09:00"
+updated: "2026-10-01T19:40:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -21,7 +21,7 @@ source_of_truth: "Git"
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
 - 확인 기준: 2026-10-01T19:30:00+09:00 (Card 183 S12-FE 릴리스 선언서 및 운영자 인수 서버 경로 결속 r1 조치 완료: Claude UI r1 F1~F10 및 Codex r1 차단 사항 전수 해소, 5개 계약 strict JSON Schema 런타임 검증기 구축, 엔드포인트 URL/쿼리 직접 단언으로 경로 변이 사살, 네트워크 오류 날조 500 방지, 상세 오류 시 selector 보존, nextCursor 표출, 빈 상태 role="status", History 경로 인용 4건 수정으로 check_doc_path_citations ratchet 통과, Vitest 17 passed, 변이 14종 100% 사살, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 규칙 0 위반).
 
-## 2026-10-01 S12-FE 릴리스 선언서(Release Manifest) 및 운영자 인수 서버 경로 결속 (Card 183 2단계, `agent/gemini/c183-s12fe-release-binding`, base `3ff89b84` PR #280)
+## 2026-10-01 S12-FE 릴리스 선언서(Release Manifest) 및 운영자 인수 서버 경로 결속 (Card 183 2단계, `agent/gemini/c183-s12fe-release-binding`, base `4114f8ba` PR #280)
 - **개요**: Claude 카드 182(PR #280)에서 구축된 정본 계약 스키마 5종(`release-manifest-response`, `release-manifest-detail-response`, `release-manifest-page-response`, `release-acceptance-response`, `release-component-response`) 및 읽기 전용 REST 라우트(`GET /v1/release-manifests`, `GET /v1/release-manifests/{release_id}`)를 프런트엔드 `apps/web`에 온전히 결속:
   1. **1단계 전수 분석 표 반영**: `ReleaseManifest`, `operatorSignOff`, `localSimulationCompleted`의 코드베이스 내 기원 전수 식별 및 정본 계약 기반 분리 완료.
   2. **계약 생성 및 검증 자동화**: `apps/web/scripts/api-response-contracts.mjs`에 스키마 5종 등록, `contracts:generate` 및 `contracts:check` 40개 API 응답 TypeScript 타입 동기화 (exit 0).
@@ -56,7 +56,7 @@ source_of_truth: "Git"
   - 계약 바인딩 점검: `python tools/check_contract_bindings.py` 55개 픽스처 + 20개 커널 응답 타입 앵커 통과 (exit 0)
   - 문서 무결성 점검: `python tools/check_docs.py` PASS (exit 0)
   - 문서 경로 인용 래칫: `python tools/check_doc_path_citations.py --ratchet --base-ref origin/agent/claude/c182-s12-manifest-routes` PASS (exit 0)
-  - Git 공백 검사: `git diff --check 3ff89b84` 클린 (exit 0)
+  - Git 공백 검사: `git diff --check 4114f8ba` 클린 (exit 0)
 - **전문 문서**: [[2026-10-01_18-50-00_KST_Card183_S12-FE_Release_서버결속_Gemini]]
 
 ## 2026-10-01 관리자 보안 콘솔 비상 정지(Kill Switch) 백엔드 실배선 및 멱등/승인ID 제어 평면 연동 (Card 169, S08-FE, `agent/gemini/c169-s08fe-killswitch-real-wiring`, PR #267)
