@@ -187,7 +187,7 @@ export const NodeList: React.FC<NodeListProps> = ({
                 padding: '20px',
                 backgroundColor: 'var(--color-bg-surface)',
                 borderRadius: 'var(--radius-lg)',
-                border: `1px solid ${node.status === 'lost' ? '#ef4444' : node.status === 'unknown' ? '#f59e0b' : 'var(--color-border-subtle)'}`,
+                border: `1px solid ${node.status === 'lost' ? 'var(--color-status-lost)' : node.status === 'unknown' ? 'var(--color-status-unknown)' : 'var(--color-border-subtle)'}`,
                 boxShadow: 'var(--shadow-sm)',
                 cursor: onSelectNode ? 'pointer' : 'default',
               }}
@@ -224,8 +224,8 @@ export const NodeList: React.FC<NodeListProps> = ({
                 </span>
               </div>
               <p
-                data-testid={node.status === 'active' ? `node-active-status-notice-${node.id}` : undefined}
-                style={{ margin: 0, fontSize: '0.8125rem', color: node.status === 'lost' ? '#fca5a5' : node.status === 'unknown' ? '#fde68a' : node.status === 'active' ? '#7dd3fc' : 'var(--color-text-muted)', lineHeight: 1.4 }}
+                data-testid={node.status === 'active' ? `node-active-status-notice-${node.id}` : `node-telemetry-notice-${node.id}`}
+                style={{ margin: 0, fontSize: '0.8125rem', color: node.status === 'lost' ? 'var(--color-status-lost)' : node.status === 'unknown' ? 'var(--color-status-unknown)' : node.status === 'active' ? 'var(--color-status-active)' : 'var(--color-text-muted)', lineHeight: 1.4 }}
               >
                 {node.status === 'lost'
                   ? '🔴 노드와의 통신이 두절되어 상태가 유실(Lost)되었습니다. 제어 평면 연결이 끊어졌으므로 즉시 인프라 점검이 필요합니다.'
@@ -417,7 +417,7 @@ export const NodeList: React.FC<NodeListProps> = ({
                   </span>
                   <span
                     data-testid={`node-schedulable-${node.id}`}
-                    style={{ fontWeight: 700, color: node.observationOnly ? 'var(--color-status-unknown)' : (node.allocatableCores !== undefined ? '#3fb950' : 'var(--color-text-muted)') }}
+                    style={{ fontWeight: 700, color: node.observationOnly ? 'var(--color-status-unknown)' : (node.allocatableCores !== undefined ? 'var(--color-status-online)' : 'var(--color-text-muted)') }}
                   >
                     예약가능: {node.observationOnly ? '0C (차단)' : (node.allocatableCores !== undefined ? `${node.allocatableCores}C` : '미확인 (선택 불가)')}
                   </span>
