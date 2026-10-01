@@ -9,8 +9,11 @@ import { RunDetail } from '../src/features/runs/RunDetail';
 import { NodeList } from '../src/features/nodes/NodeList';
 import { NodeDetail } from '../src/features/nodes/NodeDetail';
 import { DeveloperStudio } from '../src/features/studio/DeveloperStudio';
+import { ResourceExplorer } from '../src/features/desktop/ResourceExplorer';
+import { InvFileExplorer } from '../src/features/desktop/InvFileExplorer';
 import * as client from '../src/shared/api/client';
 import * as projectObservation from '../src/shared/api/projectObservation';
+import { fabricObservation } from '../src/shared/api/fabricObservation';
 
 (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -197,9 +200,9 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/deployment/IntranetDeploymentView.tsx": {"#0d1117": 11, "#161b22": 10, "#21262d": 4, "#238636": 1, "#30363d": 26, "#388bfd": 1, "#3fb950": 17, "#58a6ff": 13, "#6e7681": 1, "#8b949e": 65, "#a371f7": 1, "#c9d1d9": 2, "#d29922": 6, "#f0883e": 1, "#f0f6fc": 27, "#f85149": 12, "#ffffff": 1, "rgba(110,118,129,0.1)": 1, "rgba(139,148,158,0.2)": 4, "rgba(163,113,247,0.2)": 1, "rgba(210,153,34,0.15)": 1, "rgba(210,153,34,0.2)": 1, "rgba(219,109,40,0.2)": 1, "rgba(248,81,73,0.15)": 5, "rgba(248,81,73,0.2)": 2, "rgba(46,160,67,0.15)": 1, "rgba(46,160,67,0.2)": 5, "rgba(56,139,253,0.12)": 1, "rgba(56,139,253,0.15)": 1, "rgba(56,139,253,0.2)": 2, "rgba(63,185,80,0.15)": 1},
   "features/desktop/DesktopShell.tsx": {"#030712": 1, "#090d16": 1, "#0f172a": 1, "#1e3a8a": 1, "#34d399": 2, "#38bdf8": 3, "#60a5fa": 2, "#94a3b8": 5, "#ef4444": 1, "#f8fafc": 5, "#ffffff": 1, "rgba(0,0,0,0.3)": 1, "rgba(0,0,0,0.5)": 1, "rgba(0,0,0,0.6)": 2, "rgba(0,0,0,0.8)": 1, "rgba(15,23,42,0.75)": 1, "rgba(15,23,42,0.85)": 1, "rgba(15,23,42,0.95)": 2, "rgba(255,255,255,0.05)": 1, "rgba(255,255,255,0.08)": 2, "rgba(255,255,255,0.1)": 5, "rgba(255,255,255,0.15)": 4, "rgba(255,255,255,0.5)": 1, "rgba(59,130,246,0.2)": 1, "rgba(59,130,246,0.3)": 1, "rgba(59,130,246,0.4)": 1, "rgba(59,130,246,0.5)": 1},
   "features/desktop/DesktopWindow.tsx": {"#0f172a": 1, "#10b981": 1, "#1e293b": 1, "#333": 1, "#334155": 1, "#64748b": 1, "#94a3b8": 1, "#ef4444": 1, "#f59e0b": 1, "#f8fafc": 1, "rgba(0,0,0,0.25)": 1, "rgba(0,0,0,0.3)": 4, "rgba(0,0,0,0.45)": 1, "rgba(0,0,0,0.5)": 1},
-  "features/desktop/InvFileExplorer.tsx": {"#0f172a": 5, "#10b981": 2, "#1e293b": 10, "#2563eb": 1, "#334155": 17, "#34d399": 7, "#38bdf8": 3, "#3b82f6": 5, "#475569": 1, "#60a5fa": 1, "#64748b": 2, "#93c5fd": 1, "#94a3b8": 10, "#eab308": 1, "#ef4444": 4, "#f87171": 7, "#f8fafc": 6, "#fbbf24": 3, "#fca5a5": 5, "#fde047": 1, "#fecaca": 1, "#fed7aa": 2, "#ffffff": 4, "rgba(16,185,129,0.15)": 1, "rgba(16,185,129,0.2)": 4, "rgba(16,185,129,0.4)": 2, "rgba(234,179,8,0.2)": 2, "rgba(234,179,8,0.4)": 1, "rgba(239,68,68,0.15)": 3, "rgba(239,68,68,0.2)": 6, "rgba(239,68,68,0.3)": 1, "rgba(239,68,68,0.4)": 2, "rgba(59,130,246,0.15)": 1, "rgba(59,130,246,0.2)": 2},
+  "features/desktop/InvFileExplorer.tsx": {},
   "features/desktop/ModelStudioView.tsx": {"#0f172a": 4, "#10b981": 3, "#1e293b": 5, "#334155": 7, "#38bdf8": 1, "#3b82f6": 1, "#475569": 5, "#64748b": 1, "#6ee7b7": 3, "#93c5fd": 1, "#94a3b8": 9, "#cbd5e1": 4, "#d97706": 1, "#ef4444": 2, "#f59e0b": 4, "#f87171": 2, "#f8fafc": 4, "#fca5a5": 5, "#fde68a": 3, "#fff": 2, "rgba(16,185,129,0.15)": 1, "rgba(16,185,129,0.2)": 2, "rgba(239,68,68,0.15)": 2, "rgba(239,68,68,0.2)": 3, "rgba(245,158,11,0.15)": 2, "rgba(245,158,11,0.2)": 1},
-  "features/desktop/ResourceExplorer.tsx": {"#0f172a": 22, "#10b981": 6, "#123": 1, "#125": 1, "#1e293b": 29, "#334155": 55, "#34d399": 12, "#38bdf8": 3, "#3b82f6": 7, "#475569": 6, "#60a5fa": 5, "#64748b": 8, "#8b5cf6": 1, "#93c5fd": 7, "#94a3b8": 52, "#c084fc": 2, "#cbd5e1": 2, "#d8b4fe": 1, "#e2e8f0": 2, "#ef4444": 7, "#f59e0b": 3, "#f87171": 13, "#f8fafc": 12, "#fbbf24": 7, "#fca5a5": 14, "#fde047": 1, "#fed7aa": 3, "#fff": 17, "#ffffff": 3, "rgba(0,0,0,0.2)": 6, "rgba(0,0,0,0.3)": 1, "rgba(148,163,184,0.2)": 1, "rgba(16,185,129,0.15)": 4, "rgba(16,185,129,0.2)": 5, "rgba(16,185,129,0.3)": 4, "rgba(168,85,247,0.08)": 1, "rgba(168,85,247,0.2)": 1, "rgba(168,85,247,0.25)": 1, "rgba(168,85,247,0.3)": 1, "rgba(234,179,8,0.1)": 2, "rgba(234,179,8,0.15)": 1, "rgba(234,179,8,0.2)": 3, "rgba(234,179,8,0.25)": 1, "rgba(234,179,8,0.3)": 1, "rgba(234,179,8,0.4)": 1, "rgba(239,68,68,0.1)": 5, "rgba(239,68,68,0.15)": 6, "rgba(239,68,68,0.2)": 9, "rgba(239,68,68,0.3)": 4, "rgba(239,68,68,0.4)": 6, "rgba(245,158,11,0.2)": 1, "rgba(245,158,11,0.3)": 1, "rgba(255,255,255,0.03)": 2, "rgba(255,255,255,0.05)": 1, "rgba(51,65,85,0.5)": 1, "rgba(59,130,246,0.08)": 1, "rgba(59,130,246,0.1)": 3, "rgba(59,130,246,0.15)": 2, "rgba(59,130,246,0.2)": 6, "rgba(59,130,246,0.25)": 1, "rgba(59,130,246,0.3)": 5},
+  "features/desktop/ResourceExplorer.tsx": {},
   "features/desktop/TerminalSessionView.tsx": {"#0f172a": 6, "#1e293b": 2, "#334155": 6, "#38bdf8": 1, "#3b82f6": 1, "#475569": 1, "#4ade80": 1, "#60a5fa": 1, "#7f1d1d": 1, "#94a3b8": 4, "#ef4444": 1, "#f8fafc": 5, "#fbbf24": 1, "#fecaca": 2, "#fed7aa": 1, "rgba(0,0,0,0.2)": 1, "rgba(59,130,246,0.15)": 1, "rgba(59,130,246,0.3)": 1},
   "features/editor/ConflictResolutionModal.tsx": {"#0d1117": 1, "#161b22": 1, "#30363d": 2, "#58a6ff": 1, "#8b949e": 2, "#f85149": 5, "#fff": 1, "rgba(0,0,0,0.5)": 1, "rgba(0,0,0,0.75)": 1, "rgba(248,81,73,0.1)": 1},
   "features/editor/DiffViewer.tsx": {"#0d1117": 1, "#161b22": 1, "#30363d": 2, "#3fb950": 3, "#484f58": 2, "#8b949e": 1, "#c9d1d9": 2, "#f0f6fc": 1, "#f85149": 3, "rgba(248,81,73,0.15)": 1, "rgba(46,160,67,0.15)": 1},
@@ -1157,6 +1160,275 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
   });
 
+  // 9c. [Card 195 / ACC-09] Component DOM Rendering & Binding Verification: Desktop Explorers (ResourceExplorer & InvFileExplorer)
+  it('ACC-09 / Card 195: Desktop Explorers (ResourceExplorer & InvFileExplorer) DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification', async () => {
+    const container = document.createElement('div');
+    container.setAttribute('data-theme', 'light');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    const testNodes: any[] = [
+      {
+        id: 'nod_01JABCDEF01',
+        hostname: 'Node-01-WinMain',
+        status: 'online',
+        os: 'windows',
+        cpuCores: 16,
+        cpuUsagePercent: 20,
+        memoryTotalBytes: 64 * 1024 ** 3,
+        memoryUsedBytes: 20 * 1024 ** 3,
+        allocatableCores: 12,
+        allocatableMemoryBytes: 36 * 1024 ** 3,
+        gpuCount: 1,
+        gpuName: 'NVIDIA RTX 4090',
+        gpuVramTotalBytes: 24 * 1024 ** 3,
+        gpuVramUsedBytes: 6 * 1024 ** 3,
+        storageTotalBytes: 2000 * 1024 ** 3,
+        storageUsedBytes: 500 * 1024 ** 3,
+        heartbeatAt: '2026-10-01T12:00:00Z',
+      },
+      {
+        id: 'nod_01JABCDEF02',
+        hostname: 'Node-02-WinWork',
+        status: 'online',
+        os: 'windows',
+        cpuCores: 8,
+        cpuUsagePercent: 10,
+        memoryTotalBytes: 32 * 1024 ** 3,
+        memoryUsedBytes: 8 * 1024 ** 3,
+        allocatableCores: 6,
+        allocatableMemoryBytes: 20 * 1024 ** 3,
+        gpuCount: 0,
+        storageTotalBytes: 1000 * 1024 ** 3,
+        storageUsedBytes: 200 * 1024 ** 3,
+        heartbeatAt: '2026-10-01T12:00:00Z',
+      },
+    ];
+
+    const testFiles: any[] = [
+      {
+        uri: 'inv://models/weights.safetensors',
+        namespace: 'models',
+        relativePath: 'weights.safetensors',
+        name: 'weights.safetensors',
+        type: 'file',
+        sizeBytes: 1024 * 1024 * 50,
+        version: '2.0.0',
+        contentHash: 'abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789',
+        contentType: 'application/octet-stream',
+        replicas: [
+          {
+            nodeId: 'nod_01JABCDEF01',
+            nodeHostname: 'Node-01-WinMain',
+            status: 'healthy',
+            localPath: 'C:\\Storage\\weights.safetensors',
+            updatedAt: '2026-10-01T12:00:00Z',
+          },
+        ],
+        requiredReplicas: 1,
+        isPinned: true,
+        classification: 'confidential',
+        updatedAt: '2026-10-01T12:00:00Z',
+      },
+    ];
+
+    try {
+      // 1) Render ResourceExplorer (overview mode)
+      await act(async () => {
+        root.render(
+          <ResourceExplorer
+            nodes={testNodes}
+            nodesState="success"
+            lastFetchedAt={new Date('2026-10-01T12:00:00Z')}
+          />
+        );
+      });
+
+      // 1.a) Freshness notice: dynamically extract foreground, background, and border
+      const freshnessNotice = container.querySelector('[data-testid="node-freshness-notice"]') as HTMLElement;
+      expect(freshnessNotice, 'Node freshness notice must render').not.toBeNull();
+      expect(freshnessNotice.style.color, 'Freshness notice color must bind to var(--color-brand-primary)').toBe('var(--color-brand-primary)');
+      expect(freshnessNotice.style.backgroundColor, 'Freshness notice background must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(freshnessNotice.style.borderColor, 'Freshness notice border must bind to var(--color-brand-primary)').toBe('var(--color-brand-primary)');
+
+      const freshFgVar = helperExtractVar(freshnessNotice.style.color);
+      const freshBgVar = helperExtractVar(freshnessNotice.style.backgroundColor);
+      const freshBorderVar = helperExtractVar(freshnessNotice.style.borderColor);
+
+      expect(getContrast(lightTokens[freshFgVar], lightTokens[freshBgVar]), 'Freshness notice light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[freshFgVar], darkTokens[freshBgVar]), 'Freshness notice dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[freshBorderVar], lightTokens[freshBgVar]), 'Freshness notice light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[freshBorderVar], darkTokens[freshBgVar]), 'Freshness notice dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 1.b) Liveness sweep button (action): bg var(--color-bg-subtle), text/border var(--color-status-offline)
+      const livenessBtn = container.querySelector('[data-testid="liveness-sweep-btn"]') as HTMLElement;
+      expect(livenessBtn, 'Liveness sweep button must render').not.toBeNull();
+      expect(livenessBtn.style.backgroundColor, 'Liveness btn background must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(livenessBtn.style.color, 'Liveness btn text must bind to var(--color-status-offline)').toBe('var(--color-status-offline)');
+      expect(livenessBtn.style.borderColor, 'Liveness btn border must bind to var(--color-status-offline)').toBe('var(--color-status-offline)');
+
+      const liveBtnBgVar = helperExtractVar(livenessBtn.style.backgroundColor);
+      const liveBtnFgVar = helperExtractVar(livenessBtn.style.color);
+      const liveBtnBorderVar = helperExtractVar(livenessBtn.style.borderColor);
+      expect(getContrast(lightTokens[liveBtnFgVar], lightTokens[liveBtnBgVar]), 'Liveness btn light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[liveBtnFgVar], darkTokens[liveBtnBgVar]), 'Liveness btn dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[liveBtnBorderVar], lightTokens[liveBtnBgVar]), 'Liveness btn light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[liveBtnBorderVar], darkTokens[liveBtnBgVar]), 'Liveness btn dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 1.c) Capacity card: logical vCPU card
+      const vcpuCard = container.querySelector('[data-testid="logical-vcpu-card"]') as HTMLElement;
+      expect(vcpuCard, 'Logical vcpu card must render').not.toBeNull();
+      expect(vcpuCard.style.backgroundColor, 'Capacity card bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(vcpuCard.style.borderColor, 'Capacity card border must bind to var(--color-border-subtle)').toBe('var(--color-border-subtle)');
+      const vcpuCardBgVar = helperExtractVar(vcpuCard.style.backgroundColor);
+      const vcpuCardBorderVar = helperExtractVar(vcpuCard.style.borderColor);
+      expect(getContrast(lightTokens[vcpuCardBorderVar], lightTokens[vcpuCardBgVar]), 'Capacity card border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[vcpuCardBorderVar], darkTokens[vcpuCardBgVar]), 'Capacity card border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 1.d) Filter button (all filter is active)
+      const filterAllBtn = container.querySelector('[data-testid="filter-all-btn"]') as HTMLElement;
+      expect(filterAllBtn, 'Filter all button must render').not.toBeNull();
+      expect(filterAllBtn.style.backgroundColor, 'Active filter btn bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(filterAllBtn.style.color, 'Active filter btn text must bind to var(--color-brand-primary)').toBe('var(--color-brand-primary)');
+      expect(filterAllBtn.style.borderColor, 'Active filter btn border must bind to var(--color-brand-primary)').toBe('var(--color-brand-primary)');
+      const fAllBgVar = helperExtractVar(filterAllBtn.style.backgroundColor);
+      const fAllFgVar = helperExtractVar(filterAllBtn.style.color);
+      const fAllBorderVar = helperExtractVar(filterAllBtn.style.borderColor);
+      expect(getContrast(lightTokens[fAllFgVar], lightTokens[fAllBgVar]), 'Active filter btn light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[fAllFgVar], darkTokens[fAllBgVar]), 'Active filter btn dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[fAllBorderVar], lightTokens[fAllBgVar]), 'Active filter btn light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[fAllBorderVar], darkTokens[fAllBgVar]), 'Active filter btn dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 1.e) Node card container (both selected on subtle and unselected on surface) and heartbeat status
+      const selectedNodeCard = container.querySelector('[data-testid="node-card-nod_01JABCDEF01"]') as HTMLElement;
+      expect(selectedNodeCard, 'Selected node card must render').not.toBeNull();
+      expect(selectedNodeCard.style.backgroundColor, 'Selected node card bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(selectedNodeCard.style.borderColor, 'Selected node card border must bind to var(--color-brand-primary)').toBe('var(--color-brand-primary)');
+      const selCardBgVar = helperExtractVar(selectedNodeCard.style.backgroundColor);
+      const selCardBorderVar = helperExtractVar(selectedNodeCard.style.borderColor);
+      expect(getContrast(lightTokens[selCardBorderVar], lightTokens[selCardBgVar]), 'Selected node card border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[selCardBorderVar], darkTokens[selCardBgVar]), 'Selected node card border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      const unselectedNodeCard = container.querySelector('[data-testid="node-card-nod_01JABCDEF02"]') as HTMLElement;
+      expect(unselectedNodeCard, 'Unselected node card must render').not.toBeNull();
+      expect(unselectedNodeCard.style.backgroundColor, 'Unselected node card bg must bind to var(--color-bg-surface)').toBe('var(--color-bg-surface)');
+      expect(unselectedNodeCard.style.borderColor, 'Unselected node card border must bind to var(--color-border-subtle)').toBe('var(--color-border-subtle)');
+      const unselCardBgVar = helperExtractVar(unselectedNodeCard.style.backgroundColor);
+      const unselCardBorderVar = helperExtractVar(unselectedNodeCard.style.borderColor);
+      expect(getContrast(lightTokens[unselCardBorderVar], lightTokens[unselCardBgVar]), 'Unselected node card border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[unselCardBorderVar], darkTokens[unselCardBgVar]), 'Unselected node card border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      const nodeHeartbeat = container.querySelector('[data-testid="node-card-heartbeat-nod_01JABCDEF02"]') as HTMLElement;
+      expect(nodeHeartbeat, 'Node heartbeat must render').not.toBeNull();
+      expect(nodeHeartbeat.style.color, 'Node heartbeat color must bind to var(--color-text-muted)').toBe('var(--color-text-muted)');
+      const nodeHbVar = helperExtractVar(nodeHeartbeat.style.color);
+      expect(getContrast(lightTokens[nodeHbVar], lightTokens[unselCardBgVar]), 'Node heartbeat light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[nodeHbVar], darkTokens[unselCardBgVar]), 'Node heartbeat dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      // 1.f) Node error banner
+      await act(async () => {
+        root.render(
+          <ResourceExplorer
+            nodes={[]}
+            nodesState="error"
+            nodesError="통신 장애 발생"
+          />
+        );
+      });
+      const errorBanner = container.querySelector('[data-testid="nodes-fetch-error-banner"]') as HTMLElement;
+      expect(errorBanner, 'Nodes fetch error banner must render').not.toBeNull();
+      expect(errorBanner.style.backgroundColor, 'Error banner bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(errorBanner.style.borderColor, 'Error banner border must bind to var(--color-status-offline)').toBe('var(--color-status-offline)');
+      expect(errorBanner.style.color, 'Error banner text must bind to var(--color-status-offline)').toBe('var(--color-status-offline)');
+      const errBannerBgVar = helperExtractVar(errorBanner.style.backgroundColor);
+      const errBannerBorderVar = helperExtractVar(errorBanner.style.borderColor);
+      const errBannerTextVar = helperExtractVar(errorBanner.style.color);
+      expect(getContrast(lightTokens[errBannerTextVar], lightTokens[errBannerBgVar]), 'Error banner light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[errBannerTextVar], darkTokens[errBannerBgVar]), 'Error banner dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[errBannerBorderVar], lightTokens[errBannerBgVar]), 'Error banner light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[errBannerBorderVar], darkTokens[errBannerBgVar]), 'Error banner dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 2) Render InvFileExplorer
+      const locationsSpy = vi.spyOn(fabricObservation, 'locations').mockResolvedValue({ items: [], nextCursor: null });
+      await act(async () => {
+        root.render(
+          <InvFileExplorer
+            initialFiles={testFiles}
+            initialNamespace="models"
+            initialUri="inv://models"
+          />
+        );
+      });
+
+      // 2.a) Address bar input & navigation button
+      const addressBar = container.querySelector('[data-testid="inv-address-bar"]') as HTMLInputElement;
+      expect(addressBar, 'Inv address bar must render').not.toBeNull();
+      expect(addressBar.style.backgroundColor, 'Address bar bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(addressBar.style.color, 'Address bar text must bind to var(--color-text-primary)').toBe('var(--color-text-primary)');
+      expect(addressBar.style.borderColor, 'Address bar border must bind to var(--color-border-subtle)').toBe('var(--color-border-subtle)');
+      const addrBgVar = helperExtractVar(addressBar.style.backgroundColor);
+      const addrFgVar = helperExtractVar(addressBar.style.color);
+      const addrBorderVar = helperExtractVar(addressBar.style.borderColor);
+      expect(getContrast(lightTokens[addrFgVar], lightTokens[addrBgVar]), 'Address bar light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[addrFgVar], darkTokens[addrBgVar]), 'Address bar dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[addrBorderVar], lightTokens[addrBgVar]), 'Address bar light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[addrBorderVar], darkTokens[addrBgVar]), 'Address bar dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      const navBtn = container.querySelector('[data-testid="inv-navigate-btn"]') as HTMLElement;
+      expect(navBtn, 'Navigate btn must render').not.toBeNull();
+      expect(navBtn.style.backgroundColor, 'Navigate btn bg must bind to var(--color-brand-primary)').toBe('var(--color-brand-primary)');
+      expect(navBtn.style.color, 'Navigate btn text must bind to var(--color-text-inverse)').toBe('var(--color-text-inverse)');
+      const navBtnBgVar = helperExtractVar(navBtn.style.backgroundColor);
+      const navBtnFgVar = helperExtractVar(navBtn.style.color);
+      expect(getContrast(lightTokens[navBtnFgVar], lightTokens[navBtnBgVar]), 'Navigate btn light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[navBtnFgVar], darkTokens[navBtnBgVar]), 'Navigate btn dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      // 2.b) File row and selection styling
+      const fileRow = container.querySelector('[data-testid="file-row-inv://models/weights.safetensors"]') as HTMLElement;
+      expect(fileRow, 'File row must render').not.toBeNull();
+      expect(fileRow.style.backgroundColor, 'Selected file row bg must bind to var(--color-brand-subtle)').toBe('var(--color-brand-subtle)');
+      expect(fileRow.style.borderColor, 'Selected file row border must bind to var(--color-brand-primary)').toBe('var(--color-brand-primary)');
+      const fileRowBgVar = helperExtractVar(fileRow.style.backgroundColor);
+      const fileRowBorderVar = helperExtractVar(fileRow.style.borderColor);
+      expect(getContrast(lightTokens[fileRowBorderVar], lightTokens[fileRowBgVar]), 'Selected file row border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[fileRowBorderVar], darkTokens[fileRowBgVar]), 'Selected file row border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 2.c) Integrity badge (idle / unverified)
+      const integrityBadge = container.querySelector('[data-testid="integrity-badge"]') as HTMLElement;
+      expect(integrityBadge, 'Integrity badge must render').not.toBeNull();
+      expect(integrityBadge.style.backgroundColor, 'Integrity badge bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(integrityBadge.style.color, 'Integrity badge text must bind to var(--color-status-degraded)').toBe('var(--color-status-degraded)');
+      expect(integrityBadge.style.borderColor, 'Integrity badge border must bind to var(--color-status-degraded)').toBe('var(--color-status-degraded)');
+      const intBadgeBgVar = helperExtractVar(integrityBadge.style.backgroundColor);
+      const intBadgeFgVar = helperExtractVar(integrityBadge.style.color);
+      const intBadgeBorderVar = helperExtractVar(integrityBadge.style.borderColor);
+      expect(getContrast(lightTokens[intBadgeFgVar], lightTokens[intBadgeBgVar]), 'Integrity badge light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[intBadgeFgVar], darkTokens[intBadgeBgVar]), 'Integrity badge dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[intBadgeBorderVar], lightTokens[intBadgeBgVar]), 'Integrity badge light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[intBadgeBorderVar], darkTokens[intBadgeBgVar]), 'Integrity badge dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 2.d) Replica healthy badge
+      const replicaHealthyBadge = container.querySelector('[data-testid="replica-healthy-badge"]') as HTMLElement;
+      expect(replicaHealthyBadge, 'Replica healthy badge must render').not.toBeNull();
+      expect(replicaHealthyBadge.style.backgroundColor, 'Replica healthy badge bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(replicaHealthyBadge.style.color, 'Replica healthy badge text must bind to var(--color-status-online)').toBe('var(--color-status-online)');
+      expect(replicaHealthyBadge.style.borderColor, 'Replica healthy badge border must bind to var(--color-status-online)').toBe('var(--color-status-online)');
+      const repBadgeBgVar = helperExtractVar(replicaHealthyBadge.style.backgroundColor);
+      const repBadgeFgVar = helperExtractVar(replicaHealthyBadge.style.color);
+      const repBadgeBorderVar = helperExtractVar(replicaHealthyBadge.style.borderColor);
+      expect(getContrast(lightTokens[repBadgeFgVar], lightTokens[repBadgeBgVar]), 'Replica healthy badge light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[repBadgeFgVar], darkTokens[repBadgeBgVar]), 'Replica healthy badge dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[repBadgeBorderVar], lightTokens[repBadgeBgVar]), 'Replica healthy badge light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[repBadgeBorderVar], darkTokens[repBadgeBgVar]), 'Replica healthy badge dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    } finally {
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+      vi.restoreAllMocks();
+    }
+  });
+
   // 9. [F1 & Card 186 Revert-Fail Probes] Mutating fixes back to defective combinations strictly fails
   it('ACC-09 Revert-Fail Probes: Defective color combinations strictly fail WCAG AA criteria', () => {
     // Probe 1: RiskBadge light L1 with former #2563eb on 15% tint over light surface
@@ -1278,6 +1550,22 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     const defectiveGreenTintBadge = blendRgba([46, 160, 67], 0.15, lightTokens['--color-bg-subtle']);
     expect(getContrast('#3fb950', defectiveGreenTintBadge), 'Defective #3fb950 on green tint over subtle must fail 4.5:1').toBeLessThan(4.5);
 
+    // Probe 24 [Card 195]: Desktop Explorers former muted text literal #94a3b8 on light surface (#ffffff) (2.56:1) strictly fails 4.5:1
+    expect(getContrast('#94a3b8', lightTokens['--color-bg-surface']), 'Defective #94a3b8 on light surface must fail 4.5:1').toBeLessThan(4.5);
+    expect(getContrast('#94a3b8', lightTokens['--color-bg-subtle']), 'Defective #94a3b8 on light subtle must fail 4.5:1').toBeLessThan(4.5);
+
+    // Probe 25 [Card 195]: Desktop Explorers former online/healthy literal #34d399 on light surface (#ffffff) (1.92:1) strictly fails 4.5:1
+    expect(getContrast('#34d399', lightTokens['--color-bg-surface']), 'Defective #34d399 on light surface must fail 4.5:1').toBeLessThan(4.5);
+    expect(getContrast('#34d399', lightTokens['--color-bg-subtle']), 'Defective #34d399 on light subtle must fail 4.5:1').toBeLessThan(4.5);
+
+    // Probe 26 [Card 195]: Desktop Explorers former lost/error literal #f87171 on light surface (#ffffff) (3.44:1) strictly fails 4.5:1
+    expect(getContrast('#f87171', lightTokens['--color-bg-surface']), 'Defective #f87171 on light surface must fail 4.5:1').toBeLessThan(4.5);
+    expect(getContrast('#f87171', lightTokens['--color-bg-subtle']), 'Defective #f87171 on light subtle must fail 4.5:1').toBeLessThan(4.5);
+
+    // Probe 27 [Card 195]: Desktop Explorers former primary/accent literal #60a5fa on light surface (#ffffff) (2.53:1) strictly fails 4.5:1
+    expect(getContrast('#60a5fa', lightTokens['--color-bg-surface']), 'Defective #60a5fa on light surface must fail 4.5:1').toBeLessThan(4.5);
+    expect(getContrast('#60a5fa', lightTokens['--color-bg-subtle']), 'Defective #60a5fa on light subtle must fail 4.5:1').toBeLessThan(4.5);
+
     // Legacy Token Reverts:
     // Legacy Dark --color-border-subtle: #374151
     expect(getContrast('#374151', darkTokens['--color-bg-surface'])).toBeLessThan(3.0); // 1.72:1
@@ -1372,8 +1660,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
 
     // Exact count verification for var(--color-border-subtle)
-    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 141').toBe(141);
-    expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 21').toBe(21);
+    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 232').toBe(232);
+    expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 22').toBe(22);
 
     // Fail-closed check 3: Total files with color literals must not exceed baseline file count
     const baselineFileCount = Object.keys(COLOR_LITERAL_MULTISET_BASELINE).length;

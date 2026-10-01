@@ -557,8 +557,8 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
     <div
       style={{
         padding: '20px 24px',
-        backgroundColor: 'var(--color-bg-surface, #0f172a)',
-        color: 'var(--color-text-primary, #f8fafc)',
+        backgroundColor: 'var(--color-bg-surface)',
+        color: 'var(--color-text-primary)',
         display: 'flex',
         flexDirection: 'column',
         gap: '20px',
@@ -571,7 +571,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          borderBottom: '1px solid var(--color-border-subtle, #334155)',
+          borderBottom: '1px solid var(--color-border-subtle)',
           paddingBottom: '16px',
         }}
       >
@@ -581,12 +581,12 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               width: '44px',
               height: '44px',
               borderRadius: '12px',
-              backgroundColor: 'rgba(59, 130, 246, 0.15)',
+              backgroundColor: 'var(--color-bg-subtle)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: '1.5rem',
-              border: '1px solid rgba(59, 130, 246, 0.3)',
+              border: '1px solid var(--color-border-subtle)',
             }}
           >
             💻
@@ -598,7 +598,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             <p
               style={{
                 fontSize: '0.8125rem',
-                color: 'var(--color-text-muted, #94a3b8)',
+                color: 'var(--color-text-muted)',
                 margin: '3px 0 0 0',
               }}
             >
@@ -615,10 +615,10 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             style={{
               padding: '6px 12px',
               borderRadius: '6px',
-              backgroundColor: 'rgba(59, 130, 246, 0.1)',
-              border: '1px solid rgba(59, 130, 246, 0.25)',
+              backgroundColor: 'var(--color-bg-subtle)',
+              border: '1px solid var(--color-brand-primary)',
               fontSize: '0.75rem',
-              color: '#93c5fd',
+              color: 'var(--color-brand-primary)',
             }}
           >
             🔄 <strong>클러스터 노드 동기화 (5초 주기)</strong>
@@ -634,9 +634,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               fontSize: '0.75rem',
               fontWeight: 600,
               borderRadius: '6px',
-              backgroundColor: 'rgba(239, 68, 68, 0.15)',
-              color: '#f87171',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
+              backgroundColor: 'var(--color-bg-subtle)',
+              color: 'var(--color-status-offline)',
+              border: '1px solid var(--color-status-offline)',
               cursor: 'pointer',
             }}
           >
@@ -648,9 +648,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               fontWeight: 600,
               padding: '4px 10px',
               borderRadius: '999px',
-              backgroundColor: 'rgba(16, 185, 129, 0.15)',
-              color: 'var(--color-brand-success, #10b981)',
-              border: '1px solid rgba(16, 185, 129, 0.3)',
+              backgroundColor: 'var(--color-bg-subtle)',
+              color: 'var(--color-status-online)',
+              border: '1px solid var(--color-status-online)',
             }}
           >
             ● 온라인: {logicalSummary.onlineNodeCount} / {logicalSummary.totalNodeCount} Nodes
@@ -665,7 +665,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
         style={{
           display: 'flex',
           gap: '8px',
-          borderBottom: '1px solid var(--color-border-subtle, #334155)',
+          borderBottom: '1px solid var(--color-border-subtle)',
           paddingBottom: '10px',
           overflowX: 'auto',
         }}
@@ -718,9 +718,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 fontWeight: active ? 700 : 500,
                 borderRadius: '8px',
                 border: '1px solid',
-                borderColor: active ? '#3b82f6' : 'transparent',
-                backgroundColor: active ? 'rgba(59, 130, 246, 0.2)' : 'rgba(255, 255, 255, 0.03)',
-                color: active ? '#60a5fa' : '#94a3b8',
+                borderColor: active ? 'var(--color-brand-primary)' : 'transparent',
+                backgroundColor: active ? 'var(--color-bg-subtle)' : 'transparent',
+                color: active ? 'var(--color-brand-primary)' : 'var(--color-text-muted)',
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
               }}
@@ -739,9 +739,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
           style={{
             padding: '8px 12px',
             borderRadius: '6px',
-            backgroundColor: storageMessage.startsWith('❌') ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)',
-            color: storageMessage.startsWith('❌') ? '#fca5a5' : '#34d399',
-            border: storageMessage.startsWith('❌') ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(16, 185, 129, 0.3)',
+            backgroundColor: 'var(--color-bg-subtle)',
+            color: storageMessage.startsWith('❌') ? 'var(--color-status-offline)' : 'var(--color-status-online)',
+            border: storageMessage.startsWith('❌') ? '1px solid var(--color-status-offline)' : '1px solid var(--color-status-online)',
             fontSize: '0.75rem',
           }}
         >
@@ -755,9 +755,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
           style={{
             padding: '8px 12px',
             borderRadius: '6px',
-            backgroundColor: poolMessage.startsWith('❌') ? 'rgba(239, 68, 68, 0.2)' : 'rgba(59, 130, 246, 0.2)',
-            color: poolMessage.startsWith('❌') ? '#fca5a5' : '#93c5fd',
-            border: poolMessage.startsWith('❌') ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(59, 130, 246, 0.3)',
+            backgroundColor: 'var(--color-bg-subtle)',
+            color: poolMessage.startsWith('❌') ? 'var(--color-status-offline)' : 'var(--color-brand-primary)',
+            border: poolMessage.startsWith('❌') ? '1px solid var(--color-status-offline)' : '1px solid var(--color-brand-primary)',
             fontSize: '0.75rem',
           }}
         >
@@ -771,9 +771,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
           style={{
             padding: '8px 12px',
             borderRadius: '6px',
-            backgroundColor: livenessMessage.startsWith('❌') ? 'rgba(239, 68, 68, 0.2)' : 'rgba(245, 158, 11, 0.2)',
-            color: livenessMessage.startsWith('❌') ? '#fca5a5' : '#fbbf24',
-            border: livenessMessage.startsWith('❌') ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(245, 158, 11, 0.3)',
+            backgroundColor: 'var(--color-bg-subtle)',
+            color: livenessMessage.startsWith('❌') ? 'var(--color-status-offline)' : 'var(--color-status-degraded)',
+            border: livenessMessage.startsWith('❌') ? '1px solid var(--color-status-offline)' : '1px solid var(--color-status-degraded)',
             fontSize: '0.75rem',
           }}
         >
@@ -787,9 +787,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
           style={{
             padding: '8px 12px',
             borderRadius: '6px',
-            backgroundColor: discoveryMessage.startsWith('❌') || discoveryMessage.startsWith('⚠️') ? 'rgba(239, 68, 68, 0.2)' : 'rgba(168, 85, 247, 0.2)',
-            color: discoveryMessage.startsWith('❌') || discoveryMessage.startsWith('⚠️') ? '#fca5a5' : '#c084fc',
-            border: discoveryMessage.startsWith('❌') || discoveryMessage.startsWith('⚠️') ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(168, 85, 247, 0.3)',
+            backgroundColor: 'var(--color-bg-subtle)',
+            color: discoveryMessage.startsWith('❌') || discoveryMessage.startsWith('⚠️') ? 'var(--color-status-offline)' : 'var(--color-brand-primary)',
+            border: discoveryMessage.startsWith('❌') || discoveryMessage.startsWith('⚠️') ? '1px solid var(--color-status-offline)' : '1px solid var(--color-brand-primary)',
             fontSize: '0.75rem',
           }}
         >
@@ -815,8 +815,8 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             style={{
               padding: '12px 16px',
               borderRadius: '8px',
-              backgroundColor: 'rgba(234, 179, 8, 0.1)',
-              border: '1px solid rgba(234, 179, 8, 0.3)',
+              backgroundColor: 'var(--color-bg-subtle)',
+              border: '1px solid var(--color-status-degraded)',
               display: 'flex',
               gap: '12px',
               alignItems: 'flex-start',
@@ -824,7 +824,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
           >
             <span style={{ fontSize: '1.25rem' }}>🛡️</span>
             <div style={{ fontSize: '0.8125rem', lineHeight: 1.5 }}>
-              <strong style={{ color: 'var(--color-brand-warning, #f59e0b)' }}>
+              <strong style={{ color: 'var(--color-status-degraded)' }}>
                 물리 자원 분산 보존 원칙 (ADR-028 / ARCH-WEB-FABRIC-001):
               </strong>{' '}
               {logicalSummary.disclaimer}
@@ -841,76 +841,76 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
           >
             <div
               data-testid="logical-vcpu-card"
-              style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '10px', border: '1px solid #334155' }}
+              style={{ padding: '16px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: '10px', border: '1px solid var(--color-border-subtle)' }}
             >
-              <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>논리 vCPU 풀</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>논리 vCPU 풀</div>
               <div style={{ fontSize: '1.5rem', fontWeight: 700, marginTop: '6px' }}>
                 {nodesError ? (
-                  <span style={{ fontSize: '1.125rem', color: '#f87171' }}>조회 실패</span>
+                  <span style={{ fontSize: '1.125rem', color: 'var(--color-status-offline)' }}>조회 실패</span>
                 ) : logicalSummary.totalCores > 0 ? (
                   <>{logicalSummary.totalCores} <span style={{ fontSize: '0.875rem', fontWeight: 400 }}>Cores</span></>
                 ) : (
                   '용량 미확인'
                 )}
               </div>
-              <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '4px' }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
                 스케줄 가용: <strong>{logicalSummary.allocatableCores > 0 ? `${logicalSummary.allocatableCores} Cores` : '0 Cores'}</strong> · 실시간 점유: <span data-testid="logical-vcpu-used">{logicalSummary.usedCores !== null ? `${logicalSummary.usedCores} Cores` : '미제공 (API 미노출)'}</span>
               </div>
             </div>
 
             <div
               data-testid="logical-ram-card"
-              style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '10px', border: '1px solid #334155' }}
+              style={{ padding: '16px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: '10px', border: '1px solid var(--color-border-subtle)' }}
             >
-              <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>논리 통합 RAM 풀</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>논리 통합 RAM 풀</div>
               <div style={{ fontSize: '1.5rem', fontWeight: 700, marginTop: '6px' }}>
                 {nodesError ? (
-                  <span style={{ fontSize: '1.125rem', color: '#f87171' }}>조회 실패</span>
+                  <span style={{ fontSize: '1.125rem', color: 'var(--color-status-offline)' }}>조회 실패</span>
                 ) : logicalSummary.totalMemoryBytes > 0 ? (
                   formatBytes(logicalSummary.totalMemoryBytes)
                 ) : (
                   '용량 미확인'
                 )}
               </div>
-              <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '4px' }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
                 스케줄 가용: <strong>{formatBytes(logicalSummary.allocatableMemoryBytes)}</strong> · 점유: <span data-testid="logical-ram-used">{logicalSummary.usedMemoryBytes !== null ? formatBytes(logicalSummary.usedMemoryBytes) : '미제공 (API 미노출)'}</span>
               </div>
             </div>
 
             <div
               data-testid="logical-gpu-card"
-              style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '10px', border: '1px solid #334155' }}
+              style={{ padding: '16px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: '10px', border: '1px solid var(--color-border-subtle)' }}
             >
-              <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>논리 가속기 풀 (GPU)</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>논리 가속기 풀 (GPU)</div>
               <div style={{ fontSize: '1.5rem', fontWeight: 700, marginTop: '6px' }}>
                 {nodesError ? (
-                  <span style={{ fontSize: '1.125rem', color: '#f87171' }}>조회 실패</span>
+                  <span style={{ fontSize: '1.125rem', color: 'var(--color-status-offline)' }}>조회 실패</span>
                 ) : logicalSummary.totalGpuCount > 0 ? (
                   <>{logicalSummary.totalGpuCount} <span style={{ fontSize: '0.875rem', fontWeight: 400 }}>장 (독립)</span></>
                 ) : (
                   '없음 (0장)'
                 )}
               </div>
-              <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '4px' }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
                 총 VRAM: <strong>{formatBytes(logicalSummary.totalGpuVramBytes)}</strong>
               </div>
             </div>
 
             <div
               data-testid="logical-storage-card"
-              style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '10px', border: '1px solid #334155' }}
+              style={{ padding: '16px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: '10px', border: '1px solid var(--color-border-subtle)' }}
             >
-              <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>분산 패브릭 스토리지 (inv://)</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>분산 패브릭 스토리지 (inv://)</div>
               <div style={{ fontSize: '1.5rem', fontWeight: 700, marginTop: '6px' }}>
                 {nodesError ? (
-                  <span style={{ fontSize: '1.125rem', color: '#f87171' }}>조회 실패</span>
+                  <span style={{ fontSize: '1.125rem', color: 'var(--color-status-offline)' }}>조회 실패</span>
                 ) : logicalSummary.totalStorageBytes > 0 ? (
                   formatBytes(logicalSummary.totalStorageBytes)
                 ) : (
                   '용량 미확인'
                 )}
               </div>
-              <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '4px' }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
                 점유: <span data-testid="logical-storage-used">{logicalSummary.usedStorageBytes !== null ? formatBytes(logicalSummary.usedStorageBytes) : '미제공 (API 미노출)'}</span>
               </div>
             </div>
@@ -944,9 +944,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                         fontWeight: active ? 600 : 500,
                         borderRadius: '6px',
                         border: '1px solid',
-                        borderColor: active ? '#3b82f6' : '#334155',
-                        backgroundColor: active ? 'rgba(59, 130, 246, 0.2)' : 'transparent',
-                        color: active ? '#93c5fd' : '#94a3b8',
+                        borderColor: active ? 'var(--color-brand-primary)' : 'var(--color-border-subtle)',
+                        backgroundColor: active ? 'var(--color-bg-subtle)' : 'transparent',
+                        color: active ? 'var(--color-brand-primary)' : 'var(--color-text-muted)',
                         cursor: 'pointer',
                       }}
                     >
@@ -963,10 +963,10 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 data-testid="nodes-fetch-error-banner"
                 style={{
                   padding: '16px',
-                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                  border: '1px solid #ef4444',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-status-offline)',
                   borderRadius: '8px',
-                  color: '#fca5a5',
+                  color: 'var(--color-status-offline)',
                   marginBottom: '16px',
                 }}
               >
@@ -976,7 +976,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 <div style={{ fontSize: '0.75rem', marginTop: '4px' }}>
                   {nodesError}
                 </div>
-                <div style={{ fontSize: '0.75rem', color: '#fca5a5', marginTop: '4px' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--color-status-offline)', marginTop: '4px' }}>
                   ⚠️ 주의: 노드 목록이 비어 있는 것은 클러스터 노드가 제거된 것이 아니라, 제어 평면 API 조회가 실패한 것입니다. 섣부른 노드 재등록이나 장애 조치를 수행하지 마십시오.
                 </div>
                 {onRetryNodes && (
@@ -988,9 +988,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                       marginTop: '10px',
                       padding: '6px 12px',
                       fontSize: '0.75rem',
-                      backgroundColor: '#334155',
-                      color: '#f8fafc',
-                      border: '1px solid #475569',
+                      backgroundColor: 'var(--color-bg-subtle)',
+                      color: 'var(--color-text-primary)',
+                      border: '1px solid var(--color-border-subtle)',
                       borderRadius: '4px',
                       cursor: 'pointer',
                     }}
@@ -1007,10 +1007,10 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 style={{
                   padding: '24px',
                   textAlign: 'center',
-                  color: '#94a3b8',
-                  backgroundColor: '#1e293b',
+                  color: 'var(--color-text-muted)',
+                  backgroundColor: 'var(--color-bg-subtle)',
                   borderRadius: '8px',
-                  border: '1px solid #334155',
+                  border: '1px solid var(--color-border-subtle)',
                 }}
               >
                 물리 노드 목록을 조회하는 중입니다...
@@ -1023,9 +1023,10 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 style={{
                   padding: '24px',
                   textAlign: 'center',
-                  color: '#64748b',
-                  backgroundColor: '#1e293b',
+                  color: 'var(--color-text-muted)',
+                  backgroundColor: 'var(--color-bg-subtle)',
                   borderRadius: '8px',
+                  border: '1px solid var(--color-border-subtle)',
                 }}
               >
                 노드 조회가 대기 상태입니다.
@@ -1039,16 +1040,16 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 aria-live="polite"
                 style={{
                   padding: '24px',
-                  backgroundColor: '#1e293b',
+                  backgroundColor: 'var(--color-bg-subtle)',
                   borderRadius: '8px',
-                  border: '1px dashed #334155',
+                  border: '1px dashed var(--color-border-subtle)',
                   textAlign: 'center',
                 }}
               >
-                <div style={{ fontWeight: 600, fontSize: '0.875rem', color: '#94a3b8' }}>
+                <div style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--color-text-primary)' }}>
                   ℹ️ 등록된 물리 노드가 없습니다 (정상 조회 결과: 0대).
                 </div>
-                <div style={{ fontSize: '0.75rem', color: '#cbd5e1', marginTop: '6px' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '6px' }}>
                   클러스터에 등록된 활성 노드가 존재하지 않거나 현재 선택된 필터 조건에 부합하는 노드가 없습니다.
                 </div>
               </div>
@@ -1068,16 +1069,16 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                       }}
                       style={{
                         padding: '14px',
-                        backgroundColor: isSelected ? '#1e293b' : '#0f172a',
+                        backgroundColor: isSelected ? 'var(--color-bg-subtle)' : 'var(--color-bg-surface)',
                         borderRadius: '8px',
-                        border: isSelected ? '1.5px solid #3b82f6' : '1px solid #334155',
+                        border: isSelected ? '1.5px solid var(--color-brand-primary)' : '1px solid var(--color-border-subtle)',
                         cursor: 'pointer',
                       }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
                           <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{node.hostname}</div>
-                          <div style={{ fontSize: '0.6875rem', color: '#64748b' }}>
+                          <div style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)' }}>
                             {node.id} {node.ipAddress ? `· ${node.ipAddress}` : ''}
                           </div>
                         </div>
@@ -1090,9 +1091,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                                 fontWeight: 600,
                                 padding: '2px 6px',
                                 borderRadius: '4px',
-                                backgroundColor: 'rgba(234, 179, 8, 0.2)',
-                                color: '#fbbf24',
-                                border: '1px solid rgba(234, 179, 8, 0.4)',
+                                backgroundColor: 'var(--color-bg-subtle)',
+                                color: 'var(--color-status-degraded)',
+                                border: '1px solid var(--color-status-degraded)',
                               }}
                             >
                               관측 전용
@@ -1106,9 +1107,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                                 fontWeight: 600,
                                 padding: '2px 6px',
                                 borderRadius: '4px',
-                                backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                                color: '#f87171',
-                                border: '1px solid rgba(239, 68, 68, 0.3)',
+                                backgroundColor: 'var(--color-bg-subtle)',
+                                color: 'var(--color-status-offline)',
+                                border: '1px solid var(--color-status-offline)',
                               }}
                             >
                               스케줄 불가
@@ -1120,18 +1121,20 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                               fontWeight: 600,
                               padding: '2px 6px',
                               borderRadius: '4px',
-                              backgroundColor:
+                              backgroundColor: 'var(--color-bg-subtle)',
+                              border: '1px solid',
+                              borderColor:
                                 node.status === 'online'
-                                  ? 'rgba(16, 185, 129, 0.15)'
+                                  ? 'var(--color-status-online)'
                                   : node.status === 'unknown'
-                                  ? 'rgba(234, 179, 8, 0.15)'
-                                  : 'rgba(239, 68, 68, 0.15)',
+                                  ? 'var(--color-status-unknown)'
+                                  : 'var(--color-status-offline)',
                               color:
                                 node.status === 'online'
-                                  ? '#34d399'
+                                  ? 'var(--color-status-online)'
                                   : node.status === 'unknown'
-                                  ? '#fbbf24'
-                                  : '#f87171',
+                                  ? 'var(--color-status-unknown)'
+                                  : 'var(--color-status-offline)',
                             }}
                           >
                             {node.status === 'lost' ? 'LOST (단절)' : node.status === 'unknown' ? 'UNKNOWN (미확인)' : node.status.toUpperCase()}
@@ -1139,14 +1142,14 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                         </div>
                       </div>
 
-                      <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '8px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '8px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
                         <div data-testid={`node-cpu-${node.id}`}>CPU: {typeof node.cpuCores === 'number' && Number.isFinite(node.cpuCores) ? `${node.cpuCores}C` : '용량 미확인'} ({typeof node.allocatableCores === 'number' && Number.isFinite(node.allocatableCores) ? `${node.allocatableCores} 가용` : '0 가용'})</div>
                         <div data-testid={`node-ram-${node.id}`}>RAM: {formatBytes(node.memoryTotalBytes)}</div>
                         <div data-testid={`node-gpu-${node.id}`}>GPU: {typeof node.gpuCount === 'number' && Number.isFinite(node.gpuCount) ? (node.gpuCount === 0 ? '없음 (0대)' : `${node.gpuName || 'GPU'} (${node.gpuCount}대)`) : '장치 미확인'}</div>
                         <div data-testid={`node-storage-${node.id}`}>스토리지: {formatBytes(node.storageTotalBytes)}</div>
                       </div>
 
-                      <div data-testid={`node-card-heartbeat-${node.id}`} style={{ fontSize: '0.6875rem', color: '#64748b', marginTop: '4px' }}>
+                      <div data-testid={`node-card-heartbeat-${node.id}`} style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
                         마지막 하트비트: {node.heartbeatAt ? new Date(node.heartbeatAt).toLocaleTimeString('ko-KR') : '미관측 (Heartbeat Absent)'}
                       </div>
 
@@ -1157,10 +1160,10 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                           marginTop: '8px',
                           padding: '4px 8px',
                           borderRadius: '4px',
-                          backgroundColor: 'rgba(51, 65, 85, 0.5)',
-                          border: '1px solid #334155',
+                          backgroundColor: 'var(--color-bg-subtle)',
+                          border: '1px solid var(--color-border-subtle)',
                           fontSize: '0.6875rem',
-                          color: '#94a3b8',
+                          color: 'var(--color-text-muted)',
                         }}
                       >
                         📊 자원 사용률: {node.telemetryUnavailable ? '미제공 (HTTP 읽기 경로 부재)' : `CPU ${node.cpuUsagePercent ?? 0}% · RAM ${formatBytes(node.memoryUsedBytes)}`}
@@ -1177,9 +1180,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                           style={{
                             padding: '4px 8px',
                             fontSize: '0.6875rem',
-                            backgroundColor: 'rgba(59, 130, 246, 0.15)',
-                            color: '#60a5fa',
-                            border: '1px solid rgba(59, 130, 246, 0.3)',
+                            backgroundColor: 'var(--color-bg-subtle)',
+                            color: 'var(--color-brand-primary)',
+                            border: '1px solid var(--color-brand-primary)',
                             borderRadius: '4px',
                             cursor: 'pointer',
                           }}
@@ -1196,9 +1199,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                             style={{
                               padding: '4px 8px',
                               fontSize: '0.6875rem',
-                              backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                              color: '#e2e8f0',
-                              border: '1px solid #334155',
+                              backgroundColor: 'var(--color-bg-subtle)',
+                              color: 'var(--color-text-primary)',
+                              border: '1px solid var(--color-border-subtle)',
                               borderRadius: '4px',
                               cursor: 'pointer',
                             }}
@@ -1228,13 +1231,13 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
           style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
         >
           {/* New Contribution Form */}
-          <div style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155' }}>
+          <div style={{ padding: '16px', backgroundColor: 'var(--color-bg-surface)', borderRadius: '8px', border: '1px solid var(--color-border-subtle)' }}>
             <h3 style={{ fontSize: '0.875rem', fontWeight: 600, margin: '0 0 12px 0' }}>
               ➕ 새 스토리지 폴더 기여 등록 (POST /v1/storage/contributions)
             </h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
               <div>
-                <label style={{ fontSize: '0.6875rem', color: '#94a3b8' }}>대상 물리 노드</label>
+                <label style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)' }}>대상 물리 노드</label>
                 <select
                   value={newContribNode}
                   data-testid="storage-node-select"
@@ -1242,7 +1245,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                     contribIdempotencyKeyRef.current = null;
                     setNewContribNode(e.target.value);
                   }}
-                  style={{ width: '100%', padding: '6px', borderRadius: '4px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#f8fafc', fontSize: '0.75rem' }}
+                  style={{ width: '100%', padding: '6px', borderRadius: '4px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', color: 'var(--color-text-primary)', fontSize: '0.75rem' }}
                 >
                   {nodes.map((n) => (
                     <option key={n.id} value={n.id}>
@@ -1253,7 +1256,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               </div>
 
               <div>
-                <label style={{ fontSize: '0.6875rem', color: '#94a3b8' }}>기여 경로 (Declared Path)</label>
+                <label style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)' }}>기여 경로 (Declared Path)</label>
                 <input
                   type="text"
                   value={newContribPath}
@@ -1262,19 +1265,19 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                     contribIdempotencyKeyRef.current = null;
                     setNewContribPath(e.target.value);
                   }}
-                  style={{ width: '100%', padding: '6px', borderRadius: '4px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#f8fafc', fontSize: '0.75rem' }}
+                  style={{ width: '100%', padding: '6px', borderRadius: '4px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', color: 'var(--color-text-primary)', fontSize: '0.75rem' }}
                 />
               </div>
 
               <div>
-                <label style={{ fontSize: '0.6875rem', color: '#94a3b8' }}>접근 모드</label>
+                <label style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)' }}>접근 모드</label>
                 <select
                   value={newContribMode}
                   onChange={(e) => {
                     contribIdempotencyKeyRef.current = null;
                     setNewContribMode(e.target.value as any);
                   }}
-                  style={{ width: '100%', padding: '6px', borderRadius: '4px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#f8fafc', fontSize: '0.75rem' }}
+                  style={{ width: '100%', padding: '6px', borderRadius: '4px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', color: 'var(--color-text-primary)', fontSize: '0.75rem' }}
                 >
                   <option value="read_write">읽기/쓰기 (Read/Write)</option>
                   <option value="read_only">읽기 전용 (Read Only)</option>
@@ -1282,7 +1285,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               </div>
 
               <div>
-                <label style={{ fontSize: '0.6875rem', color: '#94a3b8' }}>용량 (GB)</label>
+                <label style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)' }}>용량 (GB)</label>
                 <input
                   type="number"
                   data-testid="storage-capacity-input"
@@ -1291,7 +1294,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                     contribIdempotencyKeyRef.current = null;
                     setNewContribCapacityGB(Number(e.target.value));
                   }}
-                  style={{ width: '100%', padding: '6px', borderRadius: '4px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#f8fafc', fontSize: '0.75rem' }}
+                  style={{ width: '100%', padding: '6px', borderRadius: '4px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', color: 'var(--color-text-primary)', fontSize: '0.75rem' }}
                 />
               </div>
             </div>
@@ -1310,9 +1313,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 fontSize: '0.75rem',
                 fontWeight: 600,
                 borderRadius: '6px',
-                backgroundColor: nodes.length > 0 ? '#3b82f6' : '#475569',
-                color: '#ffffff',
-                border: 'none',
+                backgroundColor: nodes.length > 0 ? 'var(--color-brand-primary)' : 'var(--color-bg-subtle)',
+                color: nodes.length > 0 ? 'var(--color-text-inverse)' : 'var(--color-text-muted)',
+                border: nodes.length > 0 ? 'none' : '1px solid var(--color-border-subtle)',
                 cursor: nodes.length > 0 ? 'pointer' : 'not-allowed',
               }}
             >
@@ -1323,7 +1326,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 id="storage-no-nodes-notice"
                 role="alert"
                 data-testid="storage-no-nodes-notice"
-                style={{ marginTop: '8px', fontSize: '0.75rem', color: '#f87171' }}
+                style={{ marginTop: '8px', fontSize: '0.75rem', color: 'var(--color-status-offline)' }}
               >
                 🛠️ <strong>[운영자 조치 필요]</strong>: 클러스터에 등록된 온라인 노드가 없습니다. 인프라 운영자에게 신규 노드 편입(Node 온보딩)을 요청하십시오.
               </div>
@@ -1334,12 +1337,12 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
               <h3 style={{ fontSize: '0.875rem', fontWeight: 600, margin: 0 }}>
-                📂 등록된 스토리지 기여 목록 (GET /v1/storage/contributions) {isLoadingStorage && <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 400 }}>(조회 중...)</span>}
+                📂 등록된 스토리지 기여 목록 (GET /v1/storage/contributions) {isLoadingStorage && <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontWeight: 400 }}>(조회 중...)</span>}
               </h3>
               <button
                 type="button"
                 onClick={loadStorage}
-                style={{ padding: '3px 8px', fontSize: '0.6875rem', backgroundColor: 'transparent', border: '1px solid #334155', color: '#94a3b8', borderRadius: '4px', cursor: 'pointer' }}
+                style={{ padding: '3px 8px', fontSize: '0.6875rem', backgroundColor: 'transparent', border: '1px solid var(--color-border-subtle)', color: 'var(--color-text-muted)', borderRadius: '4px', cursor: 'pointer' }}
               >
                 새로고침
               </button>
@@ -1351,10 +1354,10 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 data-testid="storage-error-banner"
                 style={{
                   padding: '12px 14px',
-                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                  border: '1px solid #ef4444',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-status-offline)',
                   borderRadius: '6px',
-                  color: '#fca5a5',
+                  color: 'var(--color-status-offline)',
                   marginBottom: '10px',
                   fontSize: '0.75rem',
                 }}
@@ -1365,7 +1368,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                   type="button"
                   data-testid="storage-retry-btn"
                   onClick={loadStorage}
-                  style={{ marginTop: '6px', padding: '3px 8px', fontSize: '0.6875rem', backgroundColor: '#334155', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                  style={{ marginTop: '6px', padding: '3px 8px', fontSize: '0.6875rem', backgroundColor: 'var(--color-bg-subtle)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border-subtle)', borderRadius: '4px', cursor: 'pointer' }}
                 >
                   재시도 (Retry)
                 </button>
@@ -1373,15 +1376,15 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             )}
 
             {!storageError && !isLoadingStorage && contributions.length === 0 && (
-              <div data-testid="storage-empty-state" style={{ padding: '16px', textAlign: 'center', backgroundColor: '#1e293b', borderRadius: '8px', color: '#94a3b8', fontSize: '0.75rem' }}>
+              <div data-testid="storage-empty-state" style={{ padding: '16px', textAlign: 'center', backgroundColor: 'var(--color-bg-subtle)', borderRadius: '8px', color: 'var(--color-text-muted)', fontSize: '0.75rem', border: '1px solid var(--color-border-subtle)' }}>
                 등록된 스토리지 기여가 없습니다. 상단 폼에서 폴더를 기여하세요.
               </div>
             )}
 
             {!storageError && contributions.length > 0 && (
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.75rem', backgroundColor: '#1e293b', borderRadius: '8px', overflow: 'hidden' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.75rem', backgroundColor: 'var(--color-bg-surface)', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--color-border-subtle)' }}>
                 <thead>
-                  <tr style={{ backgroundColor: 'rgba(0,0,0,0.3)', textAlign: 'left', color: '#94a3b8' }}>
+                  <tr style={{ backgroundColor: 'var(--color-bg-subtle)', textAlign: 'left', color: 'var(--color-text-muted)' }}>
                     <th style={{ padding: '8px 12px' }}>기여 ID</th>
                     <th style={{ padding: '8px 12px' }}>노드</th>
                     <th style={{ padding: '8px 12px' }}>경로</th>
@@ -1393,17 +1396,17 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 </thead>
                 <tbody>
                   {contributions.map((c) => (
-                    <tr key={c.contributionId} style={{ borderBottom: '1px solid #334155' }}>
+                    <tr key={c.contributionId} style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
                       <td style={{ padding: '8px 12px', fontFamily: 'monospace' }}>{c.contributionId}</td>
                       <td style={{ padding: '8px 12px' }}>{c.nodeId}</td>
                       <td style={{ padding: '8px 12px' }}>{c.declaredPath}</td>
                       <td style={{ padding: '8px 12px' }}>
-                        <span style={{ padding: '2px 5px', borderRadius: '3px', backgroundColor: c.mode === 'read_write' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(148, 163, 184, 0.2)', color: c.mode === 'read_write' ? '#60a5fa' : '#94a3b8' }}>
+                        <span style={{ padding: '2px 5px', borderRadius: '3px', backgroundColor: 'var(--color-bg-subtle)', color: c.mode === 'read_write' ? 'var(--color-brand-primary)' : 'var(--color-text-muted)', border: '1px solid var(--color-border-subtle)' }}>
                           {c.mode}
                         </span>
                       </td>
                       <td style={{ padding: '8px 12px' }}>
-                        <span style={{ padding: '2px 5px', borderRadius: '3px', backgroundColor: c.status === 'active' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)', color: c.status === 'active' ? '#34d399' : '#f87171' }}>
+                        <span style={{ padding: '2px 5px', borderRadius: '3px', backgroundColor: 'var(--color-bg-subtle)', color: c.status === 'active' ? 'var(--color-status-online)' : 'var(--color-status-offline)', border: c.status === 'active' ? '1px solid var(--color-status-online)' : '1px solid var(--color-status-offline)' }}>
                           {c.status}
                         </span>
                       </td>
@@ -1413,7 +1416,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                           <button
                             type="button"
                             onClick={() => handleRevokeContribution(c.contributionId)}
-                            style={{ padding: '2px 6px', fontSize: '0.6875rem', backgroundColor: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '4px', cursor: 'pointer' }}
+                            style={{ padding: '2px 6px', fontSize: '0.6875rem', backgroundColor: 'var(--color-bg-subtle)', color: 'var(--color-status-offline)', border: '1px solid var(--color-status-offline)', borderRadius: '4px', cursor: 'pointer' }}
                           >
                             해제 (Revoke)
                           </button>
@@ -1421,7 +1424,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                           <button
                             type="button"
                             onClick={() => handleActivateContribution(c.contributionId)}
-                            style={{ padding: '2px 6px', fontSize: '0.6875rem', backgroundColor: 'rgba(16, 185, 129, 0.15)', color: '#34d399', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '4px', cursor: 'pointer' }}
+                            style={{ padding: '2px 6px', fontSize: '0.6875rem', backgroundColor: 'var(--color-bg-subtle)', color: 'var(--color-status-online)', border: '1px solid var(--color-status-online)', borderRadius: '4px', cursor: 'pointer' }}
                           >
                             활성화 (Activate)
                           </button>
@@ -1440,16 +1443,16 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               📍 데이터 위치 원장 (GET /v1/storage/locations)
             </h3>
             {locations.length === 0 ? (
-              <div style={{ padding: '16px', textAlign: 'center', backgroundColor: '#1e293b', borderRadius: '8px', color: '#94a3b8', fontSize: '0.75rem' }}>
+              <div style={{ padding: '16px', textAlign: 'center', backgroundColor: 'var(--color-bg-subtle)', borderRadius: '8px', color: 'var(--color-text-muted)', fontSize: '0.75rem', border: '1px solid var(--color-border-subtle)' }}>
                 확인된 데이터 위치 항목이 없습니다.
               </div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '10px' }}>
                 {locations.map((loc) => (
-                  <div key={loc.locationId} style={{ padding: '10px', backgroundColor: '#1e293b', borderRadius: '6px', border: '1px solid #334155', fontSize: '0.75rem' }}>
-                    <div style={{ fontWeight: 600, color: '#38bdf8', wordBreak: 'break-all' }}>{loc.uri}</div>
-                    <div style={{ color: '#94a3b8', marginTop: '4px' }}>크기: {formatBytes(loc.byteSize)} · 종류: {loc.kind}</div>
-                    <div style={{ color: '#64748b', fontSize: '0.6875rem', marginTop: '2px', fontFamily: 'monospace' }}>SHA: {loc.checksumSha256 || '미생성'}</div>
+                  <div key={loc.locationId} style={{ padding: '10px', backgroundColor: 'var(--color-bg-surface)', borderRadius: '6px', border: '1px solid var(--color-border-subtle)', fontSize: '0.75rem' }}>
+                    <div style={{ fontWeight: 600, color: 'var(--color-brand-primary)', wordBreak: 'break-all' }}>{loc.uri}</div>
+                    <div style={{ color: 'var(--color-text-muted)', marginTop: '4px' }}>크기: {formatBytes(loc.byteSize)} · 종류: {loc.kind}</div>
+                    <div style={{ color: 'var(--color-text-muted)', fontSize: '0.6875rem', marginTop: '2px', fontFamily: 'monospace' }}>SHA: {loc.checksumSha256 || '미생성'}</div>
                   </div>
                 ))}
               </div>
@@ -1459,12 +1462,12 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
           {/* Storage Observation Section (StorageObservationView) */}
           <div
             data-testid="storage-observation-section"
-            style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155' }}
+            style={{ padding: '16px', backgroundColor: 'var(--color-bg-surface)', borderRadius: '8px', border: '1px solid var(--color-border-subtle)' }}
           >
             <h3 style={{ fontSize: '0.875rem', fontWeight: 600, margin: '0 0 8px 0' }}>
               🔬 스토리지 샘플 무결성 관측 (StorageObservationView)
             </h3>
-            <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '0 0 12px 0' }}>
+            <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', margin: '0 0 12px 0' }}>
               노드 에이전트가 기록한 스토리지 점유 증명(verify_sample) 관측 결과를 대조합니다. currentHealth는 서버 정의에 따라 "unknown"으로 보존되며, 임의의 "healthy" 상태를 합성하지 않습니다.
             </p>
 
@@ -1479,9 +1482,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                   flex: 1,
                   padding: '6px 10px',
                   borderRadius: '4px',
-                  backgroundColor: '#0f172a',
-                  border: '1px solid #334155',
-                  color: '#f8fafc',
+                  backgroundColor: 'var(--color-bg-surface)',
+                  border: '1px solid var(--color-border-subtle)',
+                  color: 'var(--color-text-primary)',
                   fontSize: '0.75rem',
                   fontFamily: 'monospace',
                 }}
@@ -1499,9 +1502,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                   fontSize: '0.75rem',
                   fontWeight: 600,
                   borderRadius: '4px',
-                  backgroundColor: (!projectId?.trim() || !runId?.trim() || !sampleRequestId.trim()) ? '#475569' : '#3b82f6',
-                  color: '#ffffff',
-                  border: 'none',
+                  backgroundColor: (!projectId?.trim() || !runId?.trim() || !sampleRequestId.trim()) ? 'var(--color-bg-subtle)' : 'var(--color-brand-primary)',
+                  color: (!projectId?.trim() || !runId?.trim() || !sampleRequestId.trim()) ? 'var(--color-text-muted)' : 'var(--color-text-inverse)',
+                  border: (!projectId?.trim() || !runId?.trim() || !sampleRequestId.trim()) ? '1px solid var(--color-border-subtle)' : 'none',
                   cursor: (!projectId?.trim() || !runId?.trim() || !sampleRequestId.trim()) ? 'not-allowed' : 'pointer',
                 }}
               >
@@ -1514,10 +1517,10 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 id="storage-observation-context-warning"
                 role="alert"
                 data-testid="storage-observation-context-warning"
-                style={{ fontSize: '0.6875rem', color: '#fbbf24', marginBottom: '8px', lineHeight: '1.4' }}
+                style={{ fontSize: '0.6875rem', color: 'var(--color-status-degraded)', marginBottom: '8px', lineHeight: '1.4' }}
               >
                 <div>⚠️ 활성 프로젝트/실행(Run) 컨텍스트가 없어 스토리지 샘플 조회가 비활성화되었습니다 (근거 없는 호출 방지).</div>
-                <div style={{ marginTop: '2px', color: '#fed7aa' }}>
+                <div style={{ marginTop: '2px', color: 'var(--color-status-degraded)' }}>
                   👉 <strong>[사용자 조치 필요]</strong>: 상단 탐색기 또는 작업 공간(Workspace)에서 프로젝트 및 실행(Run)을 선택하여 컨텍스트를 활성화하십시오.
                 </div>
               </div>
@@ -1530,9 +1533,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 style={{
                   padding: '8px 12px',
                   borderRadius: '6px',
-                  backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                  border: '1px solid #ef4444',
-                  color: '#fca5a5',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-status-offline)',
+                  color: 'var(--color-status-offline)',
                   fontSize: '0.75rem',
                   marginBottom: '10px',
                 }}
@@ -1547,8 +1550,8 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 style={{
                   padding: '12px',
                   borderRadius: '6px',
-                  backgroundColor: '#0f172a',
-                  border: '1px solid #334155',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-border-subtle)',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '8px',
@@ -1556,15 +1559,16 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span>요청 ID: <code data-testid="storage-observation-req-id" style={{ color: '#38bdf8' }}>{storageObservation.requestId}</code></span>
+                  <span>요청 ID: <code data-testid="storage-observation-req-id" style={{ color: 'var(--color-brand-primary)' }}>{storageObservation.requestId}</code></span>
                   <span
                     data-testid="storage-observation-status"
                     style={{
                       fontWeight: 600,
                       padding: '2px 6px',
                       borderRadius: '4px',
-                      backgroundColor: storageObservation.status === 'recorded' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(234, 179, 8, 0.2)',
-                      color: storageObservation.status === 'recorded' ? '#34d399' : '#fbbf24',
+                      backgroundColor: 'var(--color-bg-subtle)',
+                      border: storageObservation.status === 'recorded' ? '1px solid var(--color-status-online)' : '1px solid var(--color-status-degraded)',
+                      color: storageObservation.status === 'recorded' ? 'var(--color-status-online)' : 'var(--color-status-degraded)',
                     }}
                   >
                     상태: {storageObservation.status}
@@ -1574,20 +1578,20 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '8px' }}>
                   <div>
                     현재 건전성:{' '}
-                    <strong data-testid="storage-observation-health" style={{ color: '#94a3b8' }}>
+                    <strong data-testid="storage-observation-health" style={{ color: 'var(--color-text-muted)' }}>
                       {storageObservation.currentHealth}
                     </strong>
-                    <span style={{ fontSize: '0.6875rem', color: '#64748b', marginLeft: '4px' }}>(불변 unknown)</span>
+                    <span style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', marginLeft: '4px' }}>(불변 unknown)</span>
                   </div>
                   <div>
                     운영 인수 평가:{' '}
-                    <strong data-testid="storage-observation-acceptance" style={{ color: '#94a3b8' }}>
+                    <strong data-testid="storage-observation-acceptance" style={{ color: 'var(--color-text-muted)' }}>
                       {storageObservation.operationalAcceptanceAssessed ? 'true' : 'false (미평가)'}
                     </strong>
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px', fontSize: '0.6875rem', color: '#94a3b8' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px', fontSize: '0.6875rem', color: 'var(--color-text-muted)' }}>
                   <div data-testid="storage-observation-created-at">
                     요청 생성 시각: <strong>{storageObservation.createdAt}</strong>
                   </div>
@@ -1604,9 +1608,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                   style={{
                     padding: '8px 12px',
                     borderRadius: '4px',
-                    backgroundColor: 'rgba(234, 179, 8, 0.1)',
-                    border: '1px solid rgba(234, 179, 8, 0.25)',
-                    color: '#fde047',
+                    backgroundColor: 'var(--color-bg-subtle)',
+                    border: '1px solid var(--color-status-degraded)',
+                    color: 'var(--color-status-degraded)',
                     fontSize: '0.6875rem',
                     lineHeight: '1.4',
                   }}
@@ -1621,7 +1625,8 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                       marginTop: '6px',
                       padding: '8px',
                       borderRadius: '4px',
-                      backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                      backgroundColor: 'var(--color-bg-surface)',
+                      border: '1px solid var(--color-border-subtle)',
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '4px',
@@ -1630,7 +1635,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span>
                         무결성 증명:{' '}
-                        <strong data-testid="storage-observation-integrity" style={{ color: '#34d399' }}>
+                        <strong data-testid="storage-observation-integrity" style={{ color: 'var(--color-status-online)' }}>
                           {storageObservation.observation.integrityVerified ? '무결성 확인됨 (VERIFIED)' : '미확인'}
                         </strong>
                       </span>
@@ -1638,12 +1643,12 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                         증거 ID: <code data-testid="storage-observation-evidence">{storageObservation.observation.evidenceId}</code>
                       </span>
                     </div>
-                    <div data-testid="storage-observation-counts" style={{ color: '#94a3b8' }}>
+                    <div data-testid="storage-observation-counts" style={{ color: 'var(--color-text-muted)' }}>
                       표본수: {storageObservation.observation.sampled} · 검사: {storageObservation.observation.examined} · 불일치: {storageObservation.observation.mismatches} · 검증불가: {storageObservation.observation.unverifiable} · 미표본: {storageObservation.observation.unsampled}
                     </div>
                   </div>
                 ) : (
-                  <div data-testid="storage-observation-empty" style={{ color: '#94a3b8', fontStyle: 'italic' }}>
+                  <div data-testid="storage-observation-empty" style={{ color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
                     관측 결과 없음 (status: {storageObservation.status})
                   </div>
                 )}
@@ -1671,9 +1676,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             style={{
               padding: '10px 14px',
               borderRadius: '6px',
-              backgroundColor: 'rgba(59, 130, 246, 0.08)',
-              border: '1px solid rgba(59, 130, 246, 0.2)',
-              color: '#93c5fd',
+              backgroundColor: 'var(--color-bg-subtle)',
+              border: '1px solid var(--color-brand-primary)',
+              color: 'var(--color-brand-primary)',
               fontSize: '0.75rem',
               display: 'flex',
               justifyContent: 'space-between',
@@ -1685,19 +1690,19 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               type="button"
               data-testid="pool-manual-refresh-btn"
               onClick={() => loadPoolData(selectedPoolId)}
-              style={{ padding: '3px 8px', fontSize: '0.6875rem', backgroundColor: '#1e293b', border: '1px solid #334155', color: '#f8fafc', borderRadius: '4px', cursor: 'pointer' }}
+              style={{ padding: '3px 8px', fontSize: '0.6875rem', backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-border-subtle)', color: 'var(--color-text-primary)', borderRadius: '4px', cursor: 'pointer' }}
             >
               🔄 풀 새로고침
             </button>
           </div>
 
           {/* Pool Capacity Card */}
-          <div style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155' }}>
+          <div style={{ padding: '16px', backgroundColor: 'var(--color-bg-surface)', borderRadius: '8px', border: '1px solid var(--color-border-subtle)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
               <h3 style={{ fontSize: '0.875rem', fontWeight: 600, margin: 0 }}>
                 🏊 풀 집계 용량 (GET /v1/pools/{selectedPoolId}/capacity)
               </h3>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: '#94a3b8' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
                 <span>풀 ID:</span>
                 <input
                   type="text"
@@ -1706,26 +1711,26 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                     setSelectedPoolId(e.target.value);
                     loadPoolData(e.target.value);
                   }}
-                  style={{ padding: '2px 6px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#fff', borderRadius: '4px', fontSize: '0.75rem', width: '120px' }}
+                  style={{ padding: '2px 6px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', color: 'var(--color-text-primary)', borderRadius: '4px', fontSize: '0.75rem', width: '120px' }}
                 />
               </div>
             </div>
 
             {poolCapacityState === 'loading' && (
-              <div data-testid="pool-capacity-loading" style={{ padding: '16px', textAlign: 'center', color: '#94a3b8', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: '6px' }}>
+              <div data-testid="pool-capacity-loading" style={{ padding: '16px', textAlign: 'center', color: 'var(--color-text-muted)', backgroundColor: 'var(--color-bg-subtle)', borderRadius: '6px', border: '1px solid var(--color-border-subtle)' }}>
                 자원 풀 용량 정보를 조회 중입니다...
               </div>
             )}
 
             {poolCapacityState === 'error' && (
-              <div role="alert" data-testid="pool-capacity-error" style={{ padding: '14px', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', borderRadius: '6px', color: '#fca5a5' }}>
+              <div role="alert" data-testid="pool-capacity-error" style={{ padding: '14px', backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-status-offline)', borderRadius: '6px', color: 'var(--color-status-offline)' }}>
                 <div style={{ fontWeight: 600, fontSize: '0.8125rem' }}>⚠️ 자원 풀 용량 조회 실패</div>
                 <div style={{ fontSize: '0.75rem', marginTop: '2px' }}>{poolCapacityError}</div>
                 <button
                   type="button"
                   data-testid="pool-capacity-retry"
                   onClick={() => loadPoolData(selectedPoolId)}
-                  style={{ marginTop: '8px', padding: '4px 10px', fontSize: '0.6875rem', backgroundColor: '#334155', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                  style={{ marginTop: '8px', padding: '4px 10px', fontSize: '0.6875rem', backgroundColor: 'var(--color-bg-subtle)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border-subtle)', borderRadius: '4px', cursor: 'pointer' }}
                 >
                   재시도 (Retry)
                 </button>
@@ -1734,23 +1739,23 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
 
             {poolCapacity && poolCapacityState !== 'error' && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
-                <div style={{ padding: '10px', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: '6px' }}>
-                  <div style={{ fontSize: '0.6875rem', color: '#94a3b8' }}>총 제공량 (Total Offered)</div>
-                  <div style={{ fontSize: '1.125rem', fontWeight: 700, color: '#60a5fa', marginTop: '4px' }}>
+                <div style={{ padding: '10px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: '6px', border: '1px solid var(--color-border-subtle)' }}>
+                  <div style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)' }}>총 제공량 (Total Offered)</div>
+                  <div style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--color-brand-primary)', marginTop: '4px' }}>
                     {poolCapacity.totalOffered.cpuMillicores / 1000}C · {formatBytes(poolCapacity.totalOffered.ramBytes)} · {poolCapacity.totalOffered.gpuDevices} GPU
                   </div>
                 </div>
 
-                <div style={{ padding: '10px', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: '6px' }}>
-                  <div style={{ fontSize: '0.6875rem', color: '#f59e0b' }}>단일 노드 최대 한도 (Largest Single)</div>
-                  <div style={{ fontSize: '1.125rem', fontWeight: 700, color: '#fbbf24', marginTop: '4px' }}>
+                <div style={{ padding: '10px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: '6px', border: '1px solid var(--color-border-subtle)' }}>
+                  <div style={{ fontSize: '0.6875rem', color: 'var(--color-status-degraded)' }}>단일 노드 최대 한도 (Largest Single)</div>
+                  <div style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--color-status-degraded)', marginTop: '4px' }}>
                     {poolCapacity.largestSingleNode.cpuMillicores / 1000}C · {formatBytes(poolCapacity.largestSingleNode.ramBytes)} · {poolCapacity.largestSingleNode.gpuDevices} GPU
                   </div>
                 </div>
 
-                <div style={{ padding: '10px', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: '6px' }}>
-                  <div style={{ fontSize: '0.6875rem', color: '#10b981' }}>현재 유휴 여유량 (Spare Now)</div>
-                  <div style={{ fontSize: '1.125rem', fontWeight: 700, color: '#34d399', marginTop: '4px' }}>
+                <div style={{ padding: '10px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: '6px', border: '1px solid var(--color-border-subtle)' }}>
+                  <div style={{ fontSize: '0.6875rem', color: 'var(--color-status-online)' }}>현재 유휴 여유량 (Spare Now)</div>
+                  <div style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--color-status-online)', marginTop: '4px' }}>
                     {poolCapacity.spareNow.cpuMillicores / 1000}C · {formatBytes(poolCapacity.spareNow.ramBytes)} · {poolCapacity.spareNow.gpuDevices} GPU
                   </div>
                 </div>
@@ -1766,9 +1771,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               style={{
                 padding: '10px 14px',
                 borderRadius: '6px',
-                backgroundColor: poolMessage.startsWith('❌') ? 'rgba(239, 68, 68, 0.2)' : 'rgba(59, 130, 246, 0.2)',
-                color: poolMessage.startsWith('❌') ? '#fca5a5' : '#93c5fd',
-                border: poolMessage.startsWith('❌') ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(59, 130, 246, 0.3)',
+                backgroundColor: 'var(--color-bg-subtle)',
+                color: poolMessage.startsWith('❌') ? 'var(--color-status-offline)' : 'var(--color-brand-primary)',
+                border: poolMessage.startsWith('❌') ? '1px solid var(--color-status-offline)' : '1px solid var(--color-brand-primary)',
                 fontSize: '0.8125rem',
               }}
             >
@@ -1777,16 +1782,16 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
           )}
 
           {/* Pool Member Management */}
-          <div style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155' }}>
+          <div style={{ padding: '16px', backgroundColor: 'var(--color-bg-surface)', borderRadius: '8px', border: '1px solid var(--color-border-subtle)' }}>
             <h3 style={{ fontSize: '0.875rem', fontWeight: 600, margin: '0 0 10px 0' }}>
-              👥 풀 멤버 노드 관리 (PUT/DELETE /v1/pools/{selectedPoolId}/members/&#123;node_id&#125;)
+              👥 풀 멤버 노드 관리 (PUT/DELETE /v1/pools/{selectedPoolId}/members/{'{node_id}'})
             </h3>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '12px' }}>
               <select
                 value={memberNodeToAdd}
                 data-testid="pool-member-select"
                 onChange={(e) => setMemberNodeToAdd(e.target.value)}
-                style={{ padding: '6px', borderRadius: '4px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#f8fafc', fontSize: '0.75rem' }}
+                style={{ padding: '6px', borderRadius: '4px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', color: 'var(--color-text-primary)', fontSize: '0.75rem' }}
               >
                 {nodes.map((n) => (
                   <option
@@ -1802,7 +1807,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 type="button"
                 data-testid="add-pool-member-btn"
                 onClick={handleAddMember}
-                style={{ padding: '6px 12px', fontSize: '0.75rem', backgroundColor: '#3b82f6', color: '#ffffff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+                style={{ padding: '6px 12px', fontSize: '0.75rem', backgroundColor: 'var(--color-brand-primary)', color: 'var(--color-text-inverse)', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
               >
                 멤버 추가
               </button>
@@ -1810,12 +1815,12 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
               {poolMembers.map((mId) => (
-                <div key={mId} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: '6px', fontSize: '0.75rem' }}>
+                <div key={mId} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-border-subtle)', borderRadius: '6px', fontSize: '0.75rem' }}>
                   <span>🖥️ {mId}</span>
                   <button
                     type="button"
                     onClick={() => handleRemoveMember(mId)}
-                    style={{ background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', fontWeight: 700 }}
+                    style={{ background: 'none', border: 'none', color: 'var(--color-status-offline)', cursor: 'pointer', fontWeight: 700 }}
                   >
                     ×
                   </button>
@@ -1827,36 +1832,36 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
           {/* Placement Preview & Distributed Planning */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '14px' }}>
             {/* Preview Box */}
-            <div style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155' }}>
+            <div style={{ padding: '16px', backgroundColor: 'var(--color-bg-surface)', borderRadius: '8px', border: '1px solid var(--color-border-subtle)' }}>
               <h3 style={{ fontSize: '0.875rem', fontWeight: 600, margin: '0 0 10px 0' }}>
                 🔍 배치 미리보기 (GET /v1/pools/{selectedPoolId}/placement-preview)
               </h3>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', fontSize: '0.75rem' }}>
                 <div>
-                  <label style={{ color: '#94a3b8' }}>CPU (mC)</label>
+                  <label style={{ color: 'var(--color-text-muted)' }}>CPU (mC)</label>
                   <input
                     type="number"
                     value={placementReq.cpuMillicores}
                     onChange={(e) => setPlacementReq((p) => ({ ...p, cpuMillicores: Number(e.target.value) }))}
-                    style={{ width: '100%', padding: '4px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#fff', borderRadius: '4px' }}
+                    style={{ width: '100%', padding: '4px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', color: 'var(--color-text-primary)', borderRadius: '4px' }}
                   />
                 </div>
                 <div>
-                  <label style={{ color: '#94a3b8' }}>RAM (GB)</label>
+                  <label style={{ color: 'var(--color-text-muted)' }}>RAM (GB)</label>
                   <input
                     type="number"
                     value={placementReq.ramBytes / 1024 ** 3}
                     onChange={(e) => setPlacementReq((p) => ({ ...p, ramBytes: Number(e.target.value) * 1024 ** 3 }))}
-                    style={{ width: '100%', padding: '4px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#fff', borderRadius: '4px' }}
+                    style={{ width: '100%', padding: '4px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', color: 'var(--color-text-primary)', borderRadius: '4px' }}
                   />
                 </div>
                 <div>
-                  <label style={{ color: '#94a3b8' }}>GPU 장수</label>
+                  <label style={{ color: 'var(--color-text-muted)' }}>GPU 장수</label>
                   <input
                     type="number"
                     value={placementReq.gpuDevices}
                     onChange={(e) => setPlacementReq((p) => ({ ...p, gpuDevices: Number(e.target.value) }))}
-                    style={{ width: '100%', padding: '4px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#fff', borderRadius: '4px' }}
+                    style={{ width: '100%', padding: '4px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', color: 'var(--color-text-primary)', borderRadius: '4px' }}
                   />
                 </div>
               </div>
@@ -1864,23 +1869,23 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               <button
                 type="button"
                 onClick={handlePlacementPreview}
-                style={{ marginTop: '10px', padding: '6px 12px', fontSize: '0.75rem', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+                style={{ marginTop: '10px', padding: '6px 12px', fontSize: '0.75rem', backgroundColor: 'var(--color-bg-subtle)', color: 'var(--color-status-online)', border: '1px solid var(--color-status-online)', borderRadius: '6px', cursor: 'pointer', fontWeight: 600 }}
               >
                 적격 노드 순위 조회
               </button>
 
               {placementPreview && (
                 <div data-testid="placement-preview-results" style={{ marginTop: '10px', fontSize: '0.75rem' }}>
-                  <div style={{ fontWeight: 600, color: '#34d399', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <div style={{ fontWeight: 600, color: 'var(--color-status-online)', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span>유휴 우선 추천 노드:</span>
-                    <span style={{ fontSize: '0.6875rem', color: '#94a3b8', fontWeight: 400 }}>[서버 유휴 우선 후보 순위 · 샤드 미할당]</span>
+                    <span style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', fontWeight: 400 }}>[서버 유휴 우선 후보 순위 · 샤드 미할당]</span>
                   </div>
                   {placementPreview.candidates.map((c, idx) => {
                     const cpuCores = c.availableCpuMillicores / 1000;
                     const gpuDevices = c.availableGpuDevices;
                     const name = c.hostname || c.nodeId;
                     return (
-                      <div key={c.nodeId} style={{ padding: '4px 6px', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: '4px', marginBottom: '4px' }}>
+                      <div key={c.nodeId} style={{ padding: '4px 6px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: '4px', border: '1px solid var(--color-border-subtle)', marginBottom: '4px' }}>
                         {idx + 1}. <strong>{name}</strong> ({`${cpuCores}C 가용`}, {gpuDevices > 0 ? `${gpuDevices} GPU` : '0 GPU'})
                       </div>
                     );
@@ -1890,28 +1895,28 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             </div>
 
             {/* Plan Box */}
-            <div style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155' }}>
+            <div style={{ padding: '16px', backgroundColor: 'var(--color-bg-surface)', borderRadius: '8px', border: '1px solid var(--color-border-subtle)' }}>
               <h3 style={{ fontSize: '0.875rem', fontWeight: 600, margin: '0 0 10px 0' }}>
                 🗺️ 분산 배치 계획 수립 (POST /v1/pools/{selectedPoolId}/plans)
               </h3>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '6px', fontSize: '0.75rem' }}>
                 <div>
-                  <label style={{ color: '#94a3b8' }}>Run ID</label>
+                  <label style={{ color: 'var(--color-text-muted)' }}>Run ID</label>
                   <input
                     type="text"
                     data-testid="plan-run-id-input"
                     value={planRunId}
                     onChange={(e) => setPlanRunId(e.target.value)}
                     placeholder="승인 Run ID 입력..."
-                    style={{ width: '100%', padding: '4px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#fff', borderRadius: '4px' }}
+                    style={{ width: '100%', padding: '4px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', color: 'var(--color-text-primary)', borderRadius: '4px' }}
                   />
                 </div>
                 <div>
-                  <label style={{ color: '#94a3b8' }}>전략</label>
+                  <label style={{ color: 'var(--color-text-muted)' }}>전략</label>
                   <select
                     value={planStrategy}
                     onChange={(e) => setPlanStrategy(e.target.value as any)}
-                    style={{ width: '100%', padding: '4px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#fff', borderRadius: '4px' }}
+                    style={{ width: '100%', padding: '4px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', color: 'var(--color-text-primary)', borderRadius: '4px' }}
                   >
                     <option value="sharded">분산 샤딩 (sharded - 권장)</option>
                     <option value="data_parallel">데이터 병렬 (data_parallel)</option>
@@ -1919,12 +1924,12 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                   </select>
                 </div>
                 <div>
-                  <label style={{ color: '#94a3b8' }}>샤드 수 (Shards)</label>
+                  <label style={{ color: 'var(--color-text-muted)' }}>샤드 수 (Shards)</label>
                   <input
                     type="number"
                     value={planShardCount}
                     onChange={(e) => setPlanShardCount(Number(e.target.value))}
-                    style={{ width: '100%', padding: '4px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#fff', borderRadius: '4px' }}
+                    style={{ width: '100%', padding: '4px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', color: 'var(--color-text-primary)', borderRadius: '4px' }}
                   />
                 </div>
               </div>
@@ -1941,9 +1946,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                   marginTop: '10px',
                   padding: '6px 12px',
                   fontSize: '0.75rem',
-                  backgroundColor: planRunId.trim() ? '#8b5cf6' : '#475569',
-                  color: '#fff',
-                  border: 'none',
+                  backgroundColor: planRunId.trim() ? 'var(--color-brand-primary)' : 'var(--color-bg-subtle)',
+                  color: planRunId.trim() ? 'var(--color-text-inverse)' : 'var(--color-text-muted)',
+                  border: planRunId.trim() ? 'none' : '1px solid var(--color-border-subtle)',
                   borderRadius: '6px',
                   cursor: planRunId.trim() ? 'pointer' : 'not-allowed',
                 }}
@@ -1956,7 +1961,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                   id="plan-run-id-user-action-notice"
                   role="alert"
                   data-testid="plan-run-id-user-action-notice"
-                  style={{ marginTop: '6px', fontSize: '0.6875rem', color: '#fed7aa' }}
+                  style={{ marginTop: '6px', fontSize: '0.6875rem', color: 'var(--color-status-degraded)' }}
                 >
                   👉 <strong>[사용자 조치 필요]</strong>: 승인된 분산 실행 Run ID(예: run_...)를 입력창에 입력하면 배치 계획 생성이 활성화됩니다.
                 </div>
@@ -1964,9 +1969,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
 
               {planResult && (
                 <div style={{ marginTop: '10px', fontSize: '0.75rem' }}>
-                  <div style={{ fontWeight: 600, color: '#c084fc' }}>생성된 계획: {planResult.planId}</div>
+                  <div style={{ fontWeight: 600, color: 'var(--color-brand-primary)' }}>생성된 계획: {planResult.planId}</div>
                   {planResult.placements.map((p) => (
-                    <div key={p.shardIndex} style={{ padding: '3px 6px', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: '4px', marginTop: '2px' }}>
+                    <div key={p.shardIndex} style={{ padding: '3px 6px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: '4px', border: '1px solid var(--color-border-subtle)', marginTop: '2px' }}>
                       샤드 #{p.shardIndex} ➔ 노드 {p.nodeId}
                     </div>
                   ))}
@@ -1989,14 +1994,14 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
           style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
         >
           {/* Node Selector & Actions */}
-          <div style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ padding: '16px', backgroundColor: 'var(--color-bg-surface)', borderRadius: '8px', border: '1px solid var(--color-border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-              <label style={{ fontSize: '0.75rem', color: '#94a3b8' }}>검사 노드:</label>
+              <label style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>검사 노드:</label>
               <select
                 value={selectedNodeId || ''}
                 data-testid="node-selector"
                 onChange={(e) => setSelectedNodeId(e.target.value)}
-                style={{ padding: '6px', borderRadius: '4px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#f8fafc', fontSize: '0.75rem' }}
+                style={{ padding: '6px', borderRadius: '4px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', color: 'var(--color-text-primary)', fontSize: '0.75rem' }}
               >
                 {nodes.map((n) => (
                   <option key={n.id} value={n.id}>
@@ -2011,7 +2016,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 type="button"
                 data-testid="send-heartbeat-btn"
                 onClick={handleSendHeartbeat}
-                style={{ padding: '6px 12px', fontSize: '0.75rem', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+                style={{ padding: '6px 12px', fontSize: '0.75rem', backgroundColor: 'var(--color-bg-subtle)', color: 'var(--color-status-online)', border: '1px solid var(--color-status-online)', borderRadius: '6px', cursor: 'pointer', fontWeight: 600 }}
               >
                 💓 하트비트 시퀀스 전송 (POST /v1/nodes/{selectedNodeId}/heartbeats)
               </button>
@@ -2020,13 +2025,13 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
 
           {/* Detailed Hardware Capabilities */}
           {isLoadingNodeDetail && (
-            <div data-testid="node-detail-loading" style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155', color: '#94a3b8', textAlign: 'center' }}>
+            <div data-testid="node-detail-loading" style={{ padding: '16px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: '8px', border: '1px solid var(--color-border-subtle)', color: 'var(--color-text-muted)', textAlign: 'center' }}>
               노드 상세 정보를 조회 중입니다...
             </div>
           )}
 
           {nodeDetailError && !isLoadingNodeDetail && (
-            <div role="alert" data-testid="node-detail-error" style={{ padding: '14px', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', borderRadius: '8px', color: '#fca5a5' }}>
+            <div role="alert" data-testid="node-detail-error" style={{ padding: '14px', backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-status-offline)', borderRadius: '8px', color: 'var(--color-status-offline)' }}>
               <div style={{ fontWeight: 600, fontSize: '0.8125rem' }}>⚠️ 노드 상세 정보 조회 실패</div>
               <div style={{ fontSize: '0.75rem', marginTop: '2px' }}>{nodeDetailError}</div>
               {selectedNodeId && (
@@ -2034,7 +2039,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                   type="button"
                   data-testid="node-detail-retry"
                   onClick={() => loadNodeDetailData(selectedNodeId)}
-                  style={{ marginTop: '8px', padding: '4px 10px', fontSize: '0.6875rem', backgroundColor: '#334155', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                  style={{ marginTop: '8px', padding: '4px 10px', fontSize: '0.6875rem', backgroundColor: 'var(--color-bg-subtle)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border-subtle)', borderRadius: '4px', cursor: 'pointer' }}
                 >
                   재시도 (Retry)
                 </button>
@@ -2043,17 +2048,17 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
           )}
 
           {nodeDetail && !nodeDetailError && (
-            <div style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155' }}>
+            <div style={{ padding: '16px', backgroundColor: 'var(--color-bg-surface)', borderRadius: '8px', border: '1px solid var(--color-border-subtle)' }}>
               <h3 style={{ fontSize: '0.875rem', fontWeight: 600, margin: '0 0 10px 0' }}>
-                🔍 노드 상세 및 자원 역량 (GET /v1/nodes/{nodeDetail.node.nodeId}) {isLoadingNodeDetail && <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 400 }}>(조회 중...)</span>}
+                🔍 노드 상세 및 자원 역량 (GET /v1/nodes/{nodeDetail.node.nodeId}) {isLoadingNodeDetail && <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontWeight: 400 }}>(조회 중...)</span>}
               </h3>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px', fontSize: '0.75rem', marginBottom: '14px' }}>
                 <div>호스트: <strong>{nodeDetail.node.hostname}</strong></div>
                 <div>OS: <strong>{nodeDetail.node.osType}</strong></div>
                 <div>하트비트 시퀀스: <strong>#{nodeDetail.node.heartbeatSequence}</strong></div>
-                <div>상태: <strong style={{ color: '#34d399' }}>{nodeDetail.node.status}</strong></div>
+                <div>상태: <strong style={{ color: 'var(--color-status-online)' }}>{nodeDetail.node.status}</strong></div>
                 <div data-testid="node-detail-last-heartbeat">
-                  마지막 하트비트: <strong style={{ color: '#60a5fa' }}>{nodeDetail.node.lastHeartbeatAt ? new Date(nodeDetail.node.lastHeartbeatAt).toLocaleTimeString('ko-KR') : '미관측 (Heartbeat Absent)'}</strong>
+                  마지막 하트비트: <strong style={{ color: 'var(--color-brand-primary)' }}>{nodeDetail.node.lastHeartbeatAt ? new Date(nodeDetail.node.lastHeartbeatAt).toLocaleTimeString('ko-KR') : '미관측 (Heartbeat Absent)'}</strong>
                 </div>
               </div>
 
@@ -2064,9 +2069,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                   padding: '8px 12px',
                   marginBottom: '12px',
                   borderRadius: '6px',
-                  backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                  border: '1px solid rgba(59, 130, 246, 0.3)',
-                  color: '#93c5fd',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-brand-primary)',
+                  color: 'var(--color-brand-primary)',
                   fontSize: '0.75rem',
                   lineHeight: '1.4',
                 }}
@@ -2074,10 +2079,10 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 ℹ️ <strong>정적 용량과 사용률 구별 고지</strong>: 아래 원장의 수량은 노드가 등록(Enrollment) 시점에 신고한 <strong>정적 하드웨어 총용량(Total Capacity)</strong>입니다. 실시간 동적 사용량(Used Quantity)은 백엔드 내부에서만 수집되며 현재 외부에 노출되는 HTTP 읽기 라우트가 부재(미제공)하여 표시되지 않습니다.
               </div>
 
-              <div style={{ fontWeight: 600, fontSize: '0.75rem', marginBottom: '6px', color: '#94a3b8' }}>하드웨어 Capabilities 원장:</div>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.75rem', backgroundColor: '#0f172a', borderRadius: '6px', overflow: 'hidden' }}>
+              <div style={{ fontWeight: 600, fontSize: '0.75rem', marginBottom: '6px', color: 'var(--color-text-muted)' }}>하드웨어 Capabilities 원장:</div>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.75rem', backgroundColor: 'var(--color-bg-surface)', borderRadius: '6px', overflow: 'hidden', border: '1px solid var(--color-border-subtle)' }}>
                 <thead>
-                  <tr style={{ textAlign: 'left', color: '#94a3b8', borderBottom: '1px solid #334155' }}>
+                  <tr style={{ textAlign: 'left', color: 'var(--color-text-muted)', backgroundColor: 'var(--color-bg-subtle)', borderBottom: '1px solid var(--color-border-subtle)' }}>
                     <th style={{ padding: '6px 10px' }}>종류 (Kind)</th>
                     <th style={{ padding: '6px 10px' }}>벤더 / 모델</th>
                     <th style={{ padding: '6px 10px' }}>수량</th>
@@ -2087,7 +2092,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 </thead>
                 <tbody>
                   {nodeDetail.capabilities.map((c) => (
-                    <tr key={c.capabilityId} style={{ borderBottom: '1px solid #1e293b' }}>
+                    <tr key={c.capabilityId} style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
                       <td style={{ padding: '6px 10px', fontWeight: 600 }}>{c.kind}</td>
                       <td style={{ padding: '6px 10px' }}>{c.vendor || '-'} {c.model || ''}</td>
                       <td style={{ padding: '6px 10px' }}>{c.totalQuantity}</td>
@@ -2120,9 +2125,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             style={{
               padding: '10px 14px',
               borderRadius: '6px',
-              backgroundColor: 'rgba(168, 85, 247, 0.08)',
-              border: '1px solid rgba(168, 85, 247, 0.25)',
-              color: '#d8b4fe',
+              backgroundColor: 'var(--color-bg-subtle)',
+              border: '1px solid var(--color-brand-primary)',
+              color: 'var(--color-brand-primary)',
               fontSize: '0.75rem',
               display: 'flex',
               justifyContent: 'space-between',
@@ -2134,14 +2139,14 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               type="button"
               data-testid="discovery-tab-top-refresh-btn"
               onClick={loadDiscoveryCandidates}
-              style={{ padding: '3px 8px', fontSize: '0.6875rem', backgroundColor: '#1e293b', border: '1px solid #334155', color: '#f8fafc', borderRadius: '4px', cursor: 'pointer' }}
+              style={{ padding: '3px 8px', fontSize: '0.6875rem', backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-border-subtle)', color: 'var(--color-text-primary)', borderRadius: '4px', cursor: 'pointer' }}
             >
               🔄 후보 새로고침
             </button>
           </div>
 
           {/* Announcement Broadcast Form */}
-          <div style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155' }}>
+          <div style={{ padding: '16px', backgroundColor: 'var(--color-bg-surface)', borderRadius: '8px', border: '1px solid var(--color-border-subtle)' }}>
             <h3 style={{ fontSize: '0.875rem', fontWeight: 600, margin: '0 0 10px 0' }}>
               📡 미등록 머신 안내 방송 전송 (POST /v1/discovery/announcements)
             </h3>
@@ -2155,15 +2160,15 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                   padding: '8px 12px',
                   marginBottom: '12px',
                   borderRadius: '6px',
-                  backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                  border: '1px solid #ef4444',
-                  color: '#fca5a5',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-status-offline)',
+                  color: 'var(--color-status-offline)',
                   fontSize: '0.75rem',
                   lineHeight: '1.4',
                 }}
               >
                 <div>⚠️ [테넌트 격리 차단]: 인증된 세션 테넌트 식별자(tenantId)가 없어 안내 방송 전송이 비활성화되었습니다. (위조 테넌트 합성 및 후보 한도 소진 방지)</div>
-                <div style={{ marginTop: '4px', fontSize: '0.6875rem', color: '#fed7aa' }}>
+                <div style={{ marginTop: '4px', fontSize: '0.6875rem', color: 'var(--color-status-degraded)' }}>
                   👉 <strong>[사용자 조치 필요]</strong>: 상단 프로필/인증 설정에서 테넌트가 할당된 계정으로 로그인하거나 활성 테넌트를 선택하면 안내 방송 전송이 활성화됩니다.
                 </div>
               </div>
@@ -2174,12 +2179,12 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 value={announcementHostname}
                 onChange={(e) => setAnnouncementHostname(e.target.value)}
                 placeholder="호스트 이름"
-                style={{ padding: '6px', borderRadius: '4px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#fff', fontSize: '0.75rem' }}
+                style={{ padding: '6px', borderRadius: '4px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', color: 'var(--color-text-primary)', fontSize: '0.75rem' }}
               />
               <select
                 value={announcementOs}
                 onChange={(e) => setAnnouncementOs(e.target.value as any)}
-                style={{ padding: '6px', borderRadius: '4px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#fff', fontSize: '0.75rem' }}
+                style={{ padding: '6px', borderRadius: '4px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', color: 'var(--color-text-primary)', fontSize: '0.75rem' }}
               >
                 <option value="windows">Windows</option>
                 <option value="linux">Linux</option>
@@ -2195,9 +2200,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 style={{
                   padding: '6px 12px',
                   fontSize: '0.75rem',
-                  backgroundColor: tenantId && tenantId.trim() ? '#3b82f6' : '#475569',
-                  color: '#fff',
-                  border: 'none',
+                  backgroundColor: tenantId && tenantId.trim() ? 'var(--color-brand-primary)' : 'var(--color-bg-subtle)',
+                  color: tenantId && tenantId.trim() ? 'var(--color-text-inverse)' : 'var(--color-text-muted)',
+                  border: tenantId && tenantId.trim() ? 'none' : '1px solid var(--color-border-subtle)',
                   borderRadius: '6px',
                   cursor: tenantId && tenantId.trim() ? 'pointer' : 'not-allowed',
                 }}
@@ -2215,9 +2220,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               style={{
                 padding: '10px 14px',
                 borderRadius: '6px',
-                backgroundColor: discoveryMessage.startsWith('❌') || discoveryMessage.startsWith('⚠️') ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)',
-                color: discoveryMessage.startsWith('❌') || discoveryMessage.startsWith('⚠️') ? '#fca5a5' : '#34d399',
-                border: discoveryMessage.startsWith('❌') || discoveryMessage.startsWith('⚠️') ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(16, 185, 129, 0.3)',
+                backgroundColor: 'var(--color-bg-subtle)',
+                color: discoveryMessage.startsWith('❌') || discoveryMessage.startsWith('⚠️') ? 'var(--color-status-offline)' : 'var(--color-status-online)',
+                border: discoveryMessage.startsWith('❌') || discoveryMessage.startsWith('⚠️') ? '1px solid var(--color-status-offline)' : '1px solid var(--color-status-online)',
                 fontSize: '0.8125rem',
               }}
             >
@@ -2230,18 +2235,18 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             <div
               role="status"
               data-testid="admission-result-modal"
-              style={{ padding: '14px', borderRadius: '8px', backgroundColor: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981' }}
+              style={{ padding: '14px', borderRadius: '8px', backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-status-online)' }}
             >
-              <div style={{ fontWeight: 700, fontSize: '0.875rem', color: '#34d399' }}>
+              <div style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--color-status-online)' }}>
                 🎉 일회용 부트스트랩 토큰 발급 완료 (Bootstrap Token Minted)
               </div>
-              <p style={{ fontSize: '0.75rem', color: '#e2e8f0', margin: '4px 0' }}>
+              <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', margin: '4px 0' }}>
                 이 토큰은 평문으로 단 1회만 반환되며 이후 안전하게 암호화 해시 처리됩니다.
               </p>
-              <div style={{ padding: '8px 12px', backgroundColor: '#0f172a', borderRadius: '4px', fontFamily: 'monospace', fontSize: '0.8125rem', color: '#38bdf8', marginTop: '6px' }}>
+              <div style={{ padding: '8px 12px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '4px', fontFamily: 'monospace', fontSize: '0.8125rem', color: 'var(--color-brand-primary)', marginTop: '6px' }}>
                 {admissionResult.bootstrapToken}
               </div>
-              <div style={{ fontSize: '0.6875rem', color: '#94a3b8', marginTop: '4px' }}>
+              <div style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
                 만료 시각: {new Date(admissionResult.expiresAt).toLocaleString()} · 다음 단계: {admissionResult.next}
               </div>
             </div>
@@ -2257,30 +2262,30 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 type="button"
                 data-testid="discovery-refresh-btn"
                 onClick={loadDiscoveryCandidates}
-                style={{ padding: '3px 8px', fontSize: '0.6875rem', backgroundColor: 'transparent', border: '1px solid #334155', color: '#94a3b8', borderRadius: '4px', cursor: 'pointer' }}
+                style={{ padding: '3px 8px', fontSize: '0.6875rem', backgroundColor: 'transparent', border: '1px solid var(--color-border-subtle)', color: 'var(--color-text-muted)', borderRadius: '4px', cursor: 'pointer' }}
               >
                 🔄 새로고침
               </button>
             </div>
-            <div style={{ fontSize: '0.75rem', color: '#f59e0b', marginBottom: '8px' }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--color-status-degraded)', marginBottom: '8px' }}>
               * 모든 claimed* 수치는 머신 자체 보고값이며 미검증 상태(verified: false)입니다.
             </div>
 
             {candidatesState === 'loading' && (
-              <div data-testid="discovery-loading" style={{ padding: '20px', textAlign: 'center', color: '#94a3b8', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155' }}>
+              <div data-testid="discovery-loading" style={{ padding: '20px', textAlign: 'center', color: 'var(--color-text-muted)', backgroundColor: 'var(--color-bg-subtle)', borderRadius: '8px', border: '1px solid var(--color-border-subtle)' }}>
                 디스커버리 후보 목록을 조회하는 중입니다...
               </div>
             )}
 
             {candidatesState === 'error' && (
-              <div role="alert" data-testid="discovery-error-banner" style={{ padding: '16px', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', borderRadius: '8px', color: '#fca5a5' }}>
+              <div role="alert" data-testid="discovery-error-banner" style={{ padding: '16px', backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-status-offline)', borderRadius: '8px', color: 'var(--color-status-offline)' }}>
                 <div style={{ fontWeight: 600, fontSize: '0.8125rem' }}>⚠️ 디스커버리 서비스 연결 오류</div>
                 <div style={{ fontSize: '0.75rem', marginTop: '2px' }}>{candidatesError}</div>
                 <button
                   type="button"
                   data-testid="discovery-retry-btn"
                   onClick={loadDiscoveryCandidates}
-                  style={{ marginTop: '10px', padding: '6px 12px', fontSize: '0.75rem', backgroundColor: '#334155', color: '#f8fafc', border: '1px solid #475569', borderRadius: '4px', cursor: 'pointer' }}
+                  style={{ marginTop: '10px', padding: '6px 12px', fontSize: '0.75rem', backgroundColor: 'var(--color-bg-subtle)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border-subtle)', borderRadius: '4px', cursor: 'pointer' }}
                 >
                   재시도 (Retry)
                 </button>
@@ -2288,7 +2293,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             )}
 
             {candidatesState === 'idle' && (
-              <div data-testid="discovery-idle-state" style={{ padding: '20px', textAlign: 'center', color: '#64748b', backgroundColor: '#1e293b', borderRadius: '8px' }}>
+              <div data-testid="discovery-idle-state" style={{ padding: '20px', textAlign: 'center', color: 'var(--color-text-muted)', backgroundColor: 'var(--color-bg-subtle)', borderRadius: '8px', border: '1px solid var(--color-border-subtle)' }}>
                 디스커버리 후보 조회가 대기 상태입니다.
               </div>
             )}
@@ -2300,26 +2305,26 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 aria-live="polite"
                 style={{
                   padding: '24px',
-                  backgroundColor: '#1e293b',
+                  backgroundColor: 'var(--color-bg-subtle)',
                   borderRadius: '8px',
-                  border: '1px dashed #334155',
+                  border: '1px dashed var(--color-border-subtle)',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '10px',
                   textAlign: 'center',
                 }}
               >
-                <div style={{ fontWeight: 600, fontSize: '0.875rem', color: '#94a3b8' }}>
+                <div style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--color-text-primary)' }}>
                   ℹ️ 승인 대기 중인 디스커버리 후보가 없습니다. (0 Candidates Pending)
                 </div>
-                <div style={{ fontSize: '0.75rem', color: '#cbd5e1', lineHeight: '1.5', maxWidth: '680px', margin: '0 auto' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', lineHeight: '1.5', maxWidth: '680px', margin: '0 auto' }}>
                   <strong>후보 목록이 비어 있는 이유 (시스템 아키텍처 규칙):</strong><br />
                   테넌트 격리 및 무단 노드 오염 방지 정책에 따라, 운영자 CLI(<code>saint operator issue-grant</code>)를 통해 일회용 자격증명을 부여받은 노드만 디스커버리 안내 방송이 승인되어 목록에 나타납니다.
                 </div>
-                <div style={{ fontSize: '0.75rem', color: '#93c5fd', backgroundColor: 'rgba(59, 130, 246, 0.1)', padding: '6px 12px', borderRadius: '4px', maxWidth: '680px', margin: '0 auto' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--color-brand-primary)', backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-brand-primary)', padding: '6px 12px', borderRadius: '4px', maxWidth: '680px', margin: '0 auto' }}>
                   🛠️ <strong>[운영자 조치 필요]</strong>: 일반 사용자는 노드 자격증명을 직접 발급할 수 없습니다. 클러스터 인프라 운영자에게 머신 등록을 요청하십시오 (운영자 절차: Node 운영 런북 <code>docs/vault/20_Operations/노드 운영 런북.md</code>의 <code>saint operator issue-grant</code> 발급 절차 참조). 자격증명이 주입된 노드가 부트스트랩되면 목록에 자동 표출됩니다.
                 </div>
-                <div style={{ fontSize: '0.6875rem', color: '#64748b' }}>
+                <div style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)' }}>
                   신규 머신 부트스트랩 및 안내 방송 수신 대기 중 · 상단 '새로고침' 버튼으로 갱신 가능
                 </div>
               </div>
@@ -2328,11 +2333,11 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             {candidatesState !== 'error' && candidates.length > 0 && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '12px' }}>
                 {candidates.map((cand) => (
-                <div key={cand.announcementId} style={{ padding: '14px', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155' }}>
+                <div key={cand.announcementId} style={{ padding: '14px', backgroundColor: 'var(--color-bg-surface)', borderRadius: '8px', border: '1px solid var(--color-border-subtle)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div>
                       <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{cand.claimedHostname}</div>
-                      <div style={{ fontSize: '0.6875rem', color: '#64748b' }}>IP: {cand.sourceIp} · ID: {cand.announcementId}</div>
+                      <div style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)' }}>IP: {cand.sourceIp} · ID: {cand.announcementId}</div>
                     </div>
                     <span
                       style={{
@@ -2340,25 +2345,27 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                         fontWeight: 600,
                         padding: '2px 6px',
                         borderRadius: '4px',
-                        backgroundColor:
+                        backgroundColor: 'var(--color-bg-subtle)',
+                        border: '1px solid',
+                        borderColor:
                           cand.state === 'admitted'
-                            ? 'rgba(16, 185, 129, 0.2)'
+                            ? 'var(--color-status-online)'
                             : cand.state === 'declined'
-                            ? 'rgba(239, 68, 68, 0.2)'
-                            : 'rgba(234, 179, 8, 0.2)',
+                            ? 'var(--color-status-offline)'
+                            : 'var(--color-status-degraded)',
                         color:
                           cand.state === 'admitted'
-                            ? '#34d399'
+                            ? 'var(--color-status-online)'
                             : cand.state === 'declined'
-                            ? '#f87171'
-                            : '#fbbf24',
+                            ? 'var(--color-status-offline)'
+                            : 'var(--color-status-degraded)',
                       }}
                     >
                       {cand.state.toUpperCase()}
                     </span>
                   </div>
 
-                  <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '8px' }}>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '8px' }}>
                     자체 보고: {cand.claimedOsType} · {cand.claimedCpuCores}C · {formatBytes(cand.claimedRamBytes)} · {cand.claimedGpuCount} GPU
                   </div>
 
@@ -2368,7 +2375,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                         type="button"
                         data-testid="decline-candidate-btn"
                         onClick={() => handleDeclineCandidate(cand.announcementId)}
-                        style={{ padding: '4px 8px', fontSize: '0.6875rem', backgroundColor: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '4px', cursor: 'pointer' }}
+                        style={{ padding: '4px 8px', fontSize: '0.6875rem', backgroundColor: 'var(--color-bg-subtle)', color: 'var(--color-status-offline)', border: '1px solid var(--color-status-offline)', borderRadius: '4px', cursor: 'pointer' }}
                       >
                         거부 (DELETE /candidates/{cand.announcementId})
                       </button>
@@ -2376,7 +2383,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                         type="button"
                         data-testid="admit-candidate-btn"
                         onClick={() => handleAdmitCandidate(cand.announcementId)}
-                        style={{ padding: '4px 10px', fontSize: '0.6875rem', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 600 }}
+                        style={{ padding: '4px 10px', fontSize: '0.6875rem', backgroundColor: 'var(--color-bg-subtle)', color: 'var(--color-status-online)', border: '1px solid var(--color-status-online)', borderRadius: '4px', cursor: 'pointer', fontWeight: 600 }}
                       >
                         승인 & 토큰 발급 (POST /candidates/{cand.announcementId}/admission)
                       </button>

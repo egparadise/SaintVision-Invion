@@ -455,8 +455,8 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
     <section
       style={{
         padding: '20px 24px',
-        backgroundColor: 'var(--color-bg-surface, #0f172a)',
-        color: 'var(--color-text-primary, #f8fafc)',
+        backgroundColor: 'var(--color-bg-surface)',
+        color: 'var(--color-text-primary)',
         display: 'flex',
         flexDirection: 'column',
         gap: '16px',
@@ -469,7 +469,7 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>내 저장소</h2>
-          <p style={{ fontSize: '0.8125rem', color: '#94a3b8', margin: '2px 0 0 0' }}>
+          <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', margin: '2px 0 0 0' }}>
             내가 등록한 활성 저장소의 파일 목록입니다. 현재 접근 가능 여부는 별도 확인이 필요합니다.
           </p>
         </div>
@@ -480,9 +480,9 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
             padding: '6px 12px',
             fontSize: '0.75rem',
             borderRadius: '6px',
-            border: '1px solid #334155',
-            backgroundColor: '#1e293b',
-            color: '#94a3b8',
+            border: '1px solid var(--color-border-subtle)',
+            backgroundColor: 'var(--color-bg-subtle)',
+            color: 'var(--color-text-muted)',
             cursor: 'pointer',
           }}
         >
@@ -514,9 +514,9 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
               padding: '6px 10px',
               fontSize: '0.8125rem',
               borderRadius: '6px',
-              border: '1px solid #334155',
-              backgroundColor: '#1e293b',
-              color: '#f8fafc',
+              border: '1px solid var(--color-border-subtle)',
+              backgroundColor: 'var(--color-bg-subtle)',
+              color: 'var(--color-text-primary)',
             }}
           />
         </label>
@@ -528,8 +528,8 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
             fontSize: '0.8125rem',
             borderRadius: '6px',
             border: 'none',
-            backgroundColor: !uri || loading ? '#334155' : '#2563eb',
-            color: '#f8fafc',
+            backgroundColor: !uri || loading ? 'var(--color-border-subtle)' : 'var(--color-brand-primary)',
+            color: 'var(--color-text-inverse)',
             cursor: !uri || loading ? 'not-allowed' : 'pointer',
           }}
         >
@@ -550,7 +550,7 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#38bdf8',
+                  color: 'var(--color-status-active)',
                   cursor: 'pointer',
                   padding: 0,
                   fontSize: '0.8125rem',
@@ -574,9 +574,9 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
             padding: '4px 8px',
             fontSize: '0.75rem',
             borderRadius: '4px',
-            border: '1px solid #334155',
-            backgroundColor: '#1e293b',
-            color: '#94a3b8',
+            border: '1px solid var(--color-border-subtle)',
+            backgroundColor: 'var(--color-bg-subtle)',
+            color: 'var(--color-text-muted)',
             cursor: 'pointer',
           }}
         >
@@ -588,8 +588,8 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
           style={{
             padding: '12px 16px',
             borderRadius: '8px',
-            border: '1px solid #334155',
-            backgroundColor: '#1e293b',
+            border: '1px solid var(--color-border-subtle)',
+            backgroundColor: 'var(--color-bg-subtle)',
             fontSize: '0.8125rem',
           }}
         >
@@ -625,9 +625,9 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
               flex: 1,
               padding: '8px 12px',
               borderRadius: '6px',
-              backgroundColor: '#1e293b',
-              border: '1px solid #334155',
-              color: '#f8fafc',
+              backgroundColor: 'var(--color-bg-subtle)',
+              border: '1px solid var(--color-border-subtle)',
+              color: 'var(--color-text-primary)',
               fontSize: '0.8125rem',
               fontFamily: 'monospace',
             }}
@@ -639,8 +639,8 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
               padding: '8px 16px',
               fontSize: '0.8125rem',
               fontWeight: 600,
-              backgroundColor: '#3b82f6',
-              color: '#ffffff',
+              backgroundColor: 'var(--color-brand-primary)',
+              color: 'var(--color-text-inverse)',
               border: 'none',
               borderRadius: '6px',
               cursor: 'pointer',
@@ -665,9 +665,9 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                   fontWeight: active ? 700 : 500,
                   borderRadius: '6px',
                   border: '1px solid',
-                  borderColor: active ? '#3b82f6' : '#334155',
-                  backgroundColor: active ? 'rgba(59, 130, 246, 0.2)' : 'transparent',
-                  color: active ? '#93c5fd' : '#94a3b8',
+                  borderColor: active ? 'var(--color-brand-primary)' : 'var(--color-border-subtle)',
+                  backgroundColor: active ? 'var(--color-brand-subtle)' : 'transparent',
+                  color: active ? 'var(--color-brand-primary)' : 'var(--color-text-muted)',
                   cursor: 'pointer',
                 }}
               >
@@ -685,12 +685,12 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
               gap: '8px',
               alignItems: 'center',
               padding: '8px 12px',
-              backgroundColor: '#1e293b',
+              backgroundColor: 'var(--color-bg-subtle)',
               borderRadius: '6px',
-              border: '1px solid #334155',
+              border: '1px solid var(--color-border-subtle)',
             }}
           >
-            <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>커널 체크아웃:</span>
+            <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>커널 체크아웃:</span>
             <input
               type="text"
               data-testid="checkout-id-input"
@@ -701,9 +701,9 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                 flex: 1,
                 padding: '4px 8px',
                 borderRadius: '4px',
-                backgroundColor: '#0f172a',
-                border: '1px solid #334155',
-                color: '#f8fafc',
+                backgroundColor: 'var(--color-bg-surface)',
+                border: '1px solid var(--color-border-subtle)',
+                color: 'var(--color-text-primary)',
                 fontSize: '0.75rem',
                 fontFamily: 'monospace',
               }}
@@ -729,8 +729,8 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                 fontSize: '0.75rem',
                 fontWeight: 600,
                 borderRadius: '4px',
-                backgroundColor: (!projectId?.trim() || !runId?.trim() || !inputCheckoutId.trim()) ? '#475569' : '#3b82f6',
-                color: '#ffffff',
+                backgroundColor: (!projectId?.trim() || !runId?.trim() || !inputCheckoutId.trim()) ? 'var(--color-border-strong)' : 'var(--color-brand-primary)',
+                color: 'var(--color-text-inverse)',
                 border: 'none',
                 cursor: (!projectId?.trim() || !runId?.trim() || !inputCheckoutId.trim()) ? 'not-allowed' : 'pointer',
               }}
@@ -744,10 +744,10 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
             id="checkout-context-warning"
             role="alert"
             data-testid="checkout-context-warning"
-            style={{ fontSize: '0.6875rem', color: '#fbbf24', padding: '0 4px', lineHeight: '1.4' }}
+            style={{ fontSize: '0.6875rem', color: 'var(--color-status-degraded)', padding: '0 4px', lineHeight: '1.4' }}
           >
             <div>⚠️ 활성 프로젝트/실행(Run) 정보가 없어 커널 체크아웃 조회가 제한됩니다 (근거 없는 호출 방지).</div>
-            <div style={{ color: '#fed7aa', marginTop: '2px' }}>
+            <div style={{ color: 'var(--color-text-muted)', marginTop: '2px' }}>
               👉 <strong>[사용자 조치 필요]</strong>: 상단 메뉴에서 프로젝트 및 실행(Run)을 선택하면 커널 체크아웃 조회가 활성화됩니다.
             </div>
           </div>
@@ -755,12 +755,12 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
       </div>
 
       {checkoutLoading && (
-        <div data-testid="checkout-loading" style={{ padding: '6px 12px', fontSize: '0.75rem', color: '#38bdf8' }}>
+        <div data-testid="checkout-loading" style={{ padding: '6px 12px', fontSize: '0.75rem', color: 'var(--color-status-active)' }}>
           ⏳ 커널 체크아웃 파일(WorkspaceEditView) 불러오는 중...
         </div>
       )}
       {checkoutError && (
-        <div role="alert" data-testid="checkout-error" style={{ padding: '6px 12px', fontSize: '0.75rem', color: '#f87171' }}>
+        <div role="alert" data-testid="checkout-error" style={{ padding: '6px 12px', fontSize: '0.75rem', color: 'var(--color-status-offline)' }}>
           ⚠️ 체크아웃 파일 로드 오류: {checkoutError}
         </div>
       )}
@@ -768,13 +768,13 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
       {/* 3. Main Split View: File List on Left, Detail & Integrity & Replicas on Right */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', flex: 1 }}>
         {/* Left: Files Explorer */}
-        <div style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155' }}>
+        <div style={{ padding: '16px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: '8px', border: '1px solid var(--color-border-subtle)' }}>
           <h3 style={{ fontSize: '0.875rem', fontWeight: 600, margin: '0 0 10px 0' }}>
             파일 목록 ({filteredFiles.length}개)
           </h3>
 
           {filteredFiles.length === 0 ? (
-            <p data-testid="inv-empty-state" style={{ color: '#94a3b8', fontSize: '0.8125rem' }}>
+            <p data-testid="inv-empty-state" style={{ color: 'var(--color-text-muted)', fontSize: '0.8125rem' }}>
               네임스페이스에 등록된 파일이 없습니다.
             </p>
           ) : (
@@ -791,9 +791,9 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                     onDoubleClick={() => onOpenFile?.(file)}
                     style={{
                       padding: '10px 12px',
-                      backgroundColor: isSelected ? 'rgba(59, 130, 246, 0.15)' : '#0f172a',
+                      backgroundColor: isSelected ? 'var(--color-brand-subtle)' : 'var(--color-bg-surface)',
                       borderRadius: '6px',
-                      border: isSelected ? '1px solid #3b82f6' : '1px solid #334155',
+                      border: isSelected ? '1px solid var(--color-brand-primary)' : '1px solid var(--color-border-subtle)',
                       cursor: 'pointer',
                       display: 'flex',
                       justifyContent: 'space-between',
@@ -802,12 +802,12 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                   >
                     <div>
                       <div style={{ fontWeight: 600, fontSize: '0.8125rem' }}>{file.name}</div>
-                      <div style={{ fontSize: '0.6875rem', color: '#64748b', fontFamily: 'monospace' }}>
+                      <div style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', fontFamily: 'monospace' }}>
                         {file.uri}
                       </div>
                     </div>
                     <div style={{ textAlign: 'right', fontSize: '0.75rem' }}>
-                      <div style={{ color: '#94a3b8' }}>{formatBytes(file.sizeBytes)}</div>
+                      <div style={{ color: 'var(--color-text-muted)' }}>{formatBytes(file.sizeBytes)}</div>
                       <span
                         aria-label={`복제본 상태: ${file.requiredReplicas}개 중 ${healthy}개 가용 (${degraded ? '저하' : '정상'})`}
                         style={{
@@ -815,8 +815,8 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                           fontWeight: 600,
                           padding: '2px 6px',
                           borderRadius: '4px',
-                          backgroundColor: degraded ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)',
-                          color: degraded ? '#f87171' : '#34d399',
+                          backgroundColor: 'var(--color-bg-subtle)',
+                          color: degraded ? 'var(--color-status-offline)' : 'var(--color-status-online)',
                         }}
                       >
                         {healthy}/{file.requiredReplicas} 복제본 ({degraded ? '저하' : '정상'})
@@ -836,7 +836,7 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
             style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}
           >
             {/* File Metadata Card */}
-            <div style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155' }}>
+            <div style={{ padding: '16px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: '8px', border: '1px solid var(--color-border-subtle)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <h3 style={{ fontSize: '0.9375rem', fontWeight: 600, margin: 0 }}>{selectedFile.name}</h3>
                 <span
@@ -845,17 +845,17 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                     fontWeight: 600,
                     padding: '2px 6px',
                     borderRadius: '4px',
-                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                    color: '#60a5fa',
+                    backgroundColor: 'var(--color-brand-subtle)',
+                    color: 'var(--color-brand-primary)',
                   }}
                 >
                   v{selectedFile.version} · {selectedFile.classification}
                 </span>
               </div>
-              <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '4px 0 0 0', fontFamily: 'monospace' }}>
+              <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', margin: '4px 0 0 0', fontFamily: 'monospace' }}>
                 {selectedFile.uri}
               </p>
-              <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '6px' }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '6px' }}>
                 크기: <strong>{formatBytes(selectedFile.sizeBytes)}</strong> · 유형: {selectedFile.contentType} ·{' '}
                 {selectedFile.isPinned ? '📌 고정(Pinned - GC 면제)' : '임시 저장'}
               </div>
@@ -869,9 +869,9 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                 style={{
                   padding: '12px 16px',
                   borderRadius: '6px',
-                  backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                  border: '1px solid #ef4444',
-                  color: '#fca5a5',
+                  backgroundColor: 'var(--color-bg-surface)',
+                  border: '1px solid var(--color-status-lost)',
+                  color: 'var(--color-status-lost)',
                   fontSize: '0.75rem',
                   lineHeight: '1.5',
                 }}
@@ -879,10 +879,10 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                 <div>
                   <strong>⚠️ 파일 본문 디코딩 실패 (Base64 손상 또는 미지원 형식)</strong>
                 </div>
-                <div style={{ marginTop: '4px', color: '#fecaca' }}>
+                <div style={{ marginTop: '4px', color: 'var(--color-status-lost)' }}>
                   {selectedFile.decodeError}
                 </div>
-                <div style={{ marginTop: '6px', fontSize: '0.6875rem', color: '#fed7aa' }}>
+                <div style={{ marginTop: '6px', fontSize: '0.6875rem', color: 'var(--color-text-muted)' }}>
                   👉 <strong>[사용자 조치 필요]</strong>: 원본 데이터가 손상되었거나 텍스트 디코딩이 불가능한 바이너리 파일입니다. 체크아웃을 다시 시도하거나 원본 바이너리 다운로드 경로를 사용하십시오.
                 </div>
               </div>
@@ -891,7 +891,7 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
             {/* Integrity Verification Card (Requirement 1 & 2) */}
             <div
               data-testid="integrity-verification-section"
-              style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155' }}
+              style={{ padding: '16px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: '8px', border: '1px solid var(--color-border-subtle)' }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                 <h4 style={{ fontSize: '0.8125rem', fontWeight: 600, margin: 0 }}>
@@ -915,25 +915,20 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                     fontWeight: 700,
                     padding: '3px 8px',
                     borderRadius: '4px',
-                    backgroundColor:
-                      integrityState.status === 'verified'
-                        ? 'rgba(16, 185, 129, 0.2)'
-                        : integrityState.status === 'mismatch' || integrityState.status === 'error'
-                        ? 'rgba(239, 68, 68, 0.2)'
-                        : 'rgba(234, 179, 8, 0.2)',
+                    backgroundColor: 'var(--color-bg-subtle)',
                     color:
                       integrityState.status === 'verified'
-                        ? '#34d399'
+                        ? 'var(--color-status-online)'
                         : integrityState.status === 'mismatch' || integrityState.status === 'error'
-                        ? '#f87171'
-                        : '#fbbf24',
+                        ? 'var(--color-status-offline)'
+                        : 'var(--color-status-degraded)',
                     border: '1px solid',
                     borderColor:
                       integrityState.status === 'verified'
-                        ? 'rgba(16, 185, 129, 0.4)'
+                        ? 'var(--color-status-online)'
                         : integrityState.status === 'mismatch' || integrityState.status === 'error'
-                        ? 'rgba(239, 68, 68, 0.4)'
-                        : 'rgba(234, 179, 8, 0.4)',
+                        ? 'var(--color-status-offline)'
+                        : 'var(--color-status-degraded)',
                   }}
                 >
                   <span data-testid={`integrity-status-${integrityState.status}`} style={{ display: 'none' }} />
@@ -945,13 +940,13 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                 </span>
               </div>
 
-              <div style={{ fontSize: '0.75rem', color: '#94a3b8', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <div>
                   파일 출처:{' '}
                   <span
                     data-testid="file-source-badge"
                     style={{
-                      color: selectedFile.source === 'kernel-checkout' ? '#34d399' : '#fbbf24',
+                      color: selectedFile.source === 'kernel-checkout' ? 'var(--color-status-online)' : 'var(--color-status-degraded)',
                       fontWeight: 600,
                     }}
                   >
@@ -961,11 +956,11 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                   </span>
                 </div>
                 <div>
-                  카탈로그 기대 해시: <code data-testid="expected-hash" style={{ color: '#38bdf8' }}>{selectedFile.contentHash || '미등록'}</code>
+                  카탈로그 기대 해시: <code data-testid="expected-hash" style={{ color: 'var(--color-status-active)' }}>{selectedFile.contentHash || '미등록'}</code>
                 </div>
                 <div>
                   클라이언트 계산 해시:{' '}
-                  <code data-testid="calculated-hash" style={{ color: integrityState.status === 'verified' ? '#34d399' : '#f87171' }}>
+                  <code data-testid="calculated-hash" style={{ color: integrityState.status === 'verified' ? 'var(--color-status-online)' : 'var(--color-status-offline)' }}>
                     {integrityState.calculatedHash || '미계산'}
                   </code>
                 </div>
@@ -980,9 +975,9 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                     marginTop: '10px',
                     padding: '8px 12px',
                     borderRadius: '6px',
-                    backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                    border: '1px solid #ef4444',
-                    color: '#fca5a5',
+                    backgroundColor: 'var(--color-bg-surface)',
+                    border: '1px solid var(--color-status-lost)',
+                    color: 'var(--color-status-lost)',
                     fontSize: '0.75rem',
                   }}
                 >
@@ -999,9 +994,9 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                     marginTop: '10px',
                     padding: '8px 12px',
                     borderRadius: '6px',
-                    backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                    border: '1px solid #ef4444',
-                    color: '#fca5a5',
+                    backgroundColor: 'var(--color-bg-surface)',
+                    border: '1px solid var(--color-status-lost)',
+                    color: 'var(--color-status-lost)',
                     fontSize: '0.75rem',
                   }}
                 >
@@ -1022,8 +1017,8 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                   fontSize: '0.75rem',
                   fontWeight: 600,
                   borderRadius: '6px',
-                  backgroundColor: '#3b82f6',
-                  color: '#ffffff',
+                  backgroundColor: 'var(--color-brand-primary)',
+                  color: 'var(--color-text-inverse)',
                   border: 'none',
                   cursor: 'pointer',
                 }}
@@ -1035,7 +1030,7 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
             {/* Replicas & Repair Card (Requirement 4) */}
             <div
               data-testid="replica-pane"
-              style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155' }}
+              style={{ padding: '16px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: '8px', border: '1px solid var(--color-border-subtle)' }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                 <h4 style={{ fontSize: '0.8125rem', fontWeight: 600, margin: 0 }}>
@@ -1050,9 +1045,9 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                       fontWeight: 700,
                       padding: '2px 8px',
                       borderRadius: '4px',
-                      backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                      color: '#f87171',
-                      border: '1px solid rgba(239, 68, 68, 0.4)',
+                      backgroundColor: 'var(--color-bg-surface)',
+                      color: 'var(--color-status-offline)',
+                      border: '1px solid var(--color-status-lost)',
                     }}
                   >
                     ⚠️ {healthyReplicasCount}/{selectedFile.requiredReplicas} Replicas Available (Degraded)
@@ -1065,9 +1060,9 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                       fontWeight: 700,
                       padding: '2px 8px',
                       borderRadius: '4px',
-                      backgroundColor: 'rgba(16, 185, 129, 0.2)',
-                      color: '#34d399',
-                      border: '1px solid rgba(16, 185, 129, 0.4)',
+                      backgroundColor: 'var(--color-bg-subtle)',
+                      color: 'var(--color-status-online)',
+                      border: '1px solid var(--color-status-online)',
                     }}
                   >
                     ✔ {healthyReplicasCount}/{selectedFile.requiredReplicas} Replicas Healthy
@@ -1083,9 +1078,9 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                     data-testid={`replica-item-${rep.nodeId}`}
                     style={{
                       padding: '8px 10px',
-                      backgroundColor: '#0f172a',
+                      backgroundColor: 'var(--color-bg-surface)',
                       borderRadius: '4px',
-                      border: '1px solid #334155',
+                      border: '1px solid var(--color-border-subtle)',
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
@@ -1094,7 +1089,7 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                   >
                     <div>
                       <strong>{rep.nodeHostname}</strong> ({rep.nodeId})
-                      <div style={{ color: '#64748b', fontSize: '0.6875rem' }}>{rep.localPath}</div>
+                      <div style={{ color: 'var(--color-text-muted)', fontSize: '0.6875rem' }}>{rep.localPath}</div>
                     </div>
                     <span
                       style={{
@@ -1102,8 +1097,8 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                         borderRadius: '4px',
                         fontSize: '0.6875rem',
                         fontWeight: 600,
-                        backgroundColor: rep.status === 'healthy' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-                        color: rep.status === 'healthy' ? '#34d399' : '#f87171',
+                        backgroundColor: 'var(--color-bg-subtle)',
+                        color: rep.status === 'healthy' ? 'var(--color-status-online)' : 'var(--color-status-offline)',
                       }}
                     >
                       {rep.status.toUpperCase()}
@@ -1120,9 +1115,9 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                   style={{
                     padding: '8px 12px',
                     borderRadius: '6px',
-                    backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                    border: '1px solid #ef4444',
-                    color: '#fca5a5',
+                    backgroundColor: 'var(--color-bg-surface)',
+                    border: '1px solid var(--color-status-lost)',
+                    color: 'var(--color-status-lost)',
                     fontSize: '0.75rem',
                     marginBottom: '8px',
                   }}
@@ -1141,11 +1136,9 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                   style={{
                     padding: '8px 12px',
                     borderRadius: '6px',
-                    backgroundColor: repairState.repairMessage.startsWith('⚠️')
-                      ? 'rgba(234, 179, 8, 0.2)'
-                      : 'rgba(16, 185, 129, 0.2)',
-                    border: repairState.repairMessage.startsWith('⚠️') ? '1px solid #eab308' : '1px solid #10b981',
-                    color: repairState.repairMessage.startsWith('⚠️') ? '#fde047' : '#34d399',
+                    backgroundColor: 'var(--color-bg-subtle)',
+                    border: repairState.repairMessage.startsWith('⚠️') ? '1px solid var(--color-status-degraded)' : '1px solid var(--color-status-online)',
+                    color: repairState.repairMessage.startsWith('⚠️') ? 'var(--color-status-degraded)' : 'var(--color-status-online)',
                     fontSize: '0.75rem',
                     marginBottom: '8px',
                   }}
@@ -1162,15 +1155,15 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                   style={{
                     padding: '8px 12px',
                     borderRadius: '6px',
-                    backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                    border: '1px solid rgba(239, 68, 68, 0.3)',
-                    color: '#f87171',
+                    backgroundColor: 'var(--color-bg-surface)',
+                    border: '1px solid var(--color-status-lost)',
+                    color: 'var(--color-status-offline)',
                     fontSize: '0.75rem',
                     lineHeight: '1.4',
                   }}
                 >
                   <div>⚠️ 생존 노드 없음 (복구 불가 - 복제본을 수용할 가용 노드가 없습니다)</div>
-                  <div style={{ marginTop: '4px', fontSize: '0.6875rem', color: '#fca5a5' }}>
+                  <div style={{ marginTop: '4px', fontSize: '0.6875rem', color: 'var(--color-status-lost)' }}>
                     🛠️ <strong>[운영자 조치 필요]</strong>: 복제본을 배치할 수 있는 정상 스케줄링 가능 노드가 없습니다. 인프라 운영자에게 추가 노드 투입 또는 오프라인 노드 복구를 요청하십시오.
                   </div>
                 </div>
@@ -1184,9 +1177,9 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                     style={{
                       padding: '6px',
                       borderRadius: '4px',
-                      backgroundColor: '#0f172a',
-                      border: '1px solid #334155',
-                      color: '#f8fafc',
+                      backgroundColor: 'var(--color-bg-surface)',
+                      border: '1px solid var(--color-border-subtle)',
+                      color: 'var(--color-text-primary)',
                       fontSize: '0.75rem',
                     }}
                   >
@@ -1206,8 +1199,8 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                       fontSize: '0.75rem',
                       fontWeight: 600,
                       borderRadius: '6px',
-                      backgroundColor: isDegraded ? '#10b981' : '#334155',
-                      color: '#ffffff',
+                      backgroundColor: isDegraded ? 'var(--color-status-online)' : 'var(--color-border-subtle)',
+                      color: 'var(--color-text-inverse)',
                       border: 'none',
                       cursor: isDegraded ? 'pointer' : 'not-allowed',
                     }}

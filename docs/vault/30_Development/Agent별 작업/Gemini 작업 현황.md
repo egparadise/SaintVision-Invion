@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.172"
+version: "1.0.173"
 status: "proposed"
 author: "Gemini"
-updated: "2026-10-01T23:55:00+09:00"
+updated: "2026-10-02T01:20:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,36 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
+- 확인 기준: 2026-10-02T01:20:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer Light/Dark 명도 대비 전수 감사 및 디자인 토큰 승격: base db37dbc5 위 작업, ResourceExplorer 390건 -> 0건, InvFileExplorer 124건 -> 0건 100% 해소, COLOR_LITERAL_MULTISET_BASELINE 양 파일 {} 래칫, border-subtle 232건/22개 파일 래칫, DOM 실제 렌더링 동적 대비 단언 신설, 변이 M1~M4 100% 사살 실측, Vitest 9개 스위트 139 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-01T23:55:00+09:00 (Card 193 NodeDetail 잔여 리터럴 9건 r1 조치: Claude UI r1 및 Codex r1 피드백 반영, data-testid를 통한 상위 컨테이너(resource-usage-card-cpu subtle, node-detail-observed-usage-box subtle, node-detail-observed-headroom-box subtle, node-detail-lease-panel surface) 배경 DOM 직접 추출 및 동적 대비율 단언, Z1~Z5 5종 변이 100% 사살 실측, History §2 표 및 §3-2 대비 수치·배경 수학적 정밀 수치 정정, Probe 19~23 주석 수치 및 subtle 베이스 정정, Vitest 13 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
+
+## 2026-10-02 데스크톱 탐색기 (ResourceExplorer & InvFileExplorer) Light/Dark 대비 전수 감사 및 디자인 토큰 승격 (Card 195, `agent/gemini/c195-desktop-explorer-contrast`, base `db37dbc5` PR #290)
+- **개요**: ACC-09 다음 영역인 데스크톱 양대 탐색기(`ResourceExplorer.tsx`, `InvFileExplorer.tsx`)의 색상 리터럴을 전수 감사하고 디자인 토큰으로 승격:
+  1. **색상 리터럴 100% 전수 해소**:
+     - `ResourceExplorer.tsx`: 기존 390건 $\rightarrow$ **0건** (전수 제거).
+     - `InvFileExplorer.tsx`: 기존 124건 $\rightarrow$ **0건** (전수 제거).
+     - 두 파일 모두 잔여 하드코딩 리터럴 결함 백로그 0건 달성.
+  2. **Fail-Closed Multiset Baseline 래칫 강제**:
+     - `acc09-contrast-tokens.test.tsx`의 `COLOR_LITERAL_MULTISET_BASELINE`에서 양 파일 허용 인벤토리를 `{}` (0건)으로 전면 갱신.
+     - `var(--color-border-subtle)` 사용 횟수 141건 $\rightarrow$ **232건**(+91건), 파일 수 21개 $\rightarrow$ **22개**로 fail-closed 단언 갱신.
+  3. **실제 렌더링 DOM 기반 동적 대비 단언 및 변이 100% 사살**:
+     - Test 9c 신설: `ResourceExplorer` (신선도 고지, 스윕 버튼, 용량 카드 4종, 필터 버튼, 노드 카드 선택/비선택, 에러 배너) 및 `InvFileExplorer` (주소창, 이동 버튼, 선택 파일 행, 무결성 배지, 복제본 정상 배지) DOM 렌더링 및 동적 대비율(텍스트 >= 4.5:1, UI 경계 >= 3.0:1) 단언.
+     - 변이 M1~M4 (배경 바꿔치기, 토큰 되돌림 등) 전원 사살 실측 (4/4 = 100% killed).
+  4. **잔여 백로그 현황**:
+     - 양대 탐색기 화면 잔여 색상 리터럴: **0건**.
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성 소유). Reviewer: Claude (UI/접근성/테스트), Codex (디자인 토큰/무결성/불변식).
+- **관측 근거 (Evidence)**:
+  - 단위 시험: `npm test -- tests/acc09-contrast-tokens.test.tsx` (14 passed 100%, exit 0)
+  - 관련 스위트 전체: 9개 테스트 파일, 139 passed 100% (exit 0)
+  - 변이 불변식 실측: `python test_c195_mutations.py` (4 / 4 killed 100%)
+  - 타입 검사: `cd apps/web && npx tsc -b` (에러 0건, 클린 통과)
+  - 프로덕션 빌드: `cd apps/web && npm run build` (built in 7.59s, exit 0)
+  - 라우트 커버리지: `pytest tests/test_route_coverage.py` (41 passed 100%, exit 0)
+  - 프런트엔드 무결성: `python tools/check_frontend_integrity.py` (93 files scanned, 0 violations, exit 0)
+  - 계약 바인딩: `python tools/check_contract_bindings.py` (55 fixtures, 20 bound types, exit 0)
+  - 문서 일관성: `python tools/check_docs.py` (PASS, exit 0)
+  - 문서 경로 인용 래칫: `python tools/check_doc_path_citations.py --ratchet --base-ref c41fe2da` (PASS, exit 0)
+  - Git 공백/충돌 검사: `git diff --check` (Clean, exit 0)
 - 확인 기준: 2026-10-01T23:00:00+09:00 (Card 193 NodeDetail 잔여 리터럴 9건 전수 해소 및 대비 래칫 강화: base 3e19b682 위 작업, #3fb950 4건·#2ea043 1건·#58a6ff 2건·rgba 2건 전수 제거, 배지 및 4-Tier 수치, online 타임라인을 var(--color-status-online), var(--color-brand-primary), var(--color-bg-subtle)로 결속하여 라이트/다크 모두 4.5:1(텍스트)/3.0:1(UI경계) 충족, COLOR_LITERAL_MULTISET_BASELINE 순수 감소 래칫, 11종 변이 100% 사살 실측, 잔여 저대비 리터럴 결함 백로그 0건, Vitest 13 passed, node 스위트 40 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-01T22:15:00+09:00 (Card 189 NodeList 및 NodeDetail 잔여 저대비 리터럴 토큰화 Claude UI r1 및 Codex r1 조치: base ec75b4f0 위 작업, DOM style.backgroundColor 실제 배경 직접 추출 및 canvas/surface 위 동적 합성 resolveDomColor 적용, 1:1 배경교체 B1·alpha변조 B2·정상분기복귀 B3·degraded병합 B4 4종 단독 변이 및 M1~M9 총 13종 변이 100% 사살 실측, NodeDetail 저대비 리터럴 14건 순수 감소 래칫, 잔여 9건 정직한 백로그 목록화, status: proposed 준수, reviewer 사전 기재 제거, raw CR 0건, Vitest 12 passed, tsc 0 error, build 성공, route coverage 40 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-01T21:30:00+09:00 (Card 183 S12-FE 릴리스 선언서 및 운영자 인수 서버 경로 결속 #282 최종 계약 머지 및 Train 9 착지 차단 해제: origin/agent/codex/c184-s12-acceptance-contract b96068b6 머지 완료, operatorSignOffBlockedBy='release-acceptance-prerequisites-unavailable' 동기화, api-response-contracts.mjs 40 types PASS, strict guard 갱신 및 legacy blockedBy 유입 시 ContractViolationError 사살 시험 추가, UI 사유 문구 갱신, Vitest 22 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 프런트 무결성 규칙 0 위반).
