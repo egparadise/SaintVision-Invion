@@ -851,8 +851,11 @@ def test_live_browser_without_ca_bundle_sets_acceptance_claim_false(monkeypatch)
 
     class FakePage:
         url = "https://portal.sv.lan/studio"
+        def __init__(self):
+            self._callbacks = []
         def on(self, event, handler):
-            pass
+            if event == "response":
+                self._callbacks.append(handler)
         def goto(self, url, timeout=10000, wait_until="domcontentloaded"):
             return MagicMock(status=200)
         def locator(self, selector):
@@ -863,6 +866,15 @@ def test_live_browser_without_ca_bundle_sets_acceptance_claim_false(monkeypatch)
             loc.is_visible.return_value = False
             return loc
         def wait_for_url(self, pred, timeout=10000):
+            for cb in self._callbacks:
+                cb(MagicMock(url="https://idp.sv.lan/protocol/openid-connect/token", status=200))
+                session_resp = MagicMock(url="https://portal.sv.lan/v1/session", status=200)
+                session_resp.json.return_value = {
+                    "subjectId": "oidc:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                    "tenantId": "c9a0b1c2-d3e4-4f5a-8b9c-0d1e2f3a4b5c",
+                    "expiresAt": int(time.time()) + 7200,
+                }
+                cb(session_resp)
             return None
         def wait_for_timeout(self, ms):
             pass
@@ -897,9 +909,16 @@ def test_live_browser_without_ca_bundle_sets_acceptance_claim_false(monkeypatch)
     observer = PortalLoginJourneyObserver(target_url="https://portal.sv.lan", ca_bundle=None, mock_mode=False)
     evidence = observer.execute_journey(require_clean=False, require_remote_containment=False)
 
-    # Without CA bundle, acceptanceClaim must be False!
+    # Without CA bundle, all 5 steps pass on wire, but acceptanceClaim must strictly be False!
+    assert evidence["overallStatus"] == "PASS"
+    assert len(evidence["steps"]) == 5
+    for s in evidence["steps"]:
+        assert s["status"] == "PASS"
     assert evidence["acceptanceClaim"] is False
     assert evidence["audit"]["tlsValidationEnforced"] is False
+    assert evidence["audit"]["caBundleAppliedToBrowser"] is False
+    assert evidence["caDigest"] is None
+    validate_evidence(evidence)
 
 
 def test_live_browser_fails_when_network_token_or_session_not_observed(monkeypatch, tmp_path):
@@ -2089,7 +2108,7 @@ def test_live_chromium_nssdb_intranet_ca_trust(tmp_path):
 
     if sys.platform != "linux" or not shutil.which("certutil") or not callable(sync_playwright):
         # Operator premise: Intranet CA NSS DB trust profile executes on Linux in an environment with certutil (libnss3-tools) and Playwright
-        return
+        pytest.skip("Intranet CA NSS DB live browser test requires Linux, certutil (libnss3-tools), and Playwright")
 
     # 1. Generate root CA and server cert
     ca_key, ca_cert, root_ca_pem, ca_fp = _generate_test_ca("SaintVision Intranet Root CA")

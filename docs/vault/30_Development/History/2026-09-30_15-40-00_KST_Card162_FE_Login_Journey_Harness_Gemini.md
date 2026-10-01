@@ -286,11 +286,28 @@ Claude UI·테스트 축 3차 검토 및 코디네이터 결정에 따라 마지
 
 ---
 
-## 10. 최종 검증 결과 요약 (2026-10-01)
+## 10. Claude UI·테스트 축 4차 검토(N1, N2, N3) 조치 상세 (2026-10-01)
 
-- **로그인 여정 하네스 스위트**: `pytest tests/test_portal_login_journey_harness.py` -> **71 passed in 23.78s (100% PASS, 0 failed, 0 skipped)**
+### 1) N1 [Med] NSS import 실패 시 즉시 FAIL 및 audit 결속
+- **내용**: Codex r6 F1과 동일한 내용으로, `configure_isolated_browser_profile`이 실패를 정직하게 전파하고 `_execute_live_browser`가 1단계 FAIL 및 후속 NOT_OBSERVED, acceptanceClaim=False, caBundleAppliedToBrowser=False로 fail-closed 결속.
+
+### 2) N2 [Med] `test_live_chromium_nssdb_intranet_ca_trust`의 정직한 `pytest.skip` 전환 및 `backend.yml` skip 선언
+- **문제점**: Linux 또는 certutil 부재 시 맨 `return`으로 조용히 통과하여 `portal-login-harness`의 `len(skips) == 0` 게이트가 환경 누락을 감지하지 못하던 결함.
+- **조치**:
+  1. `test_live_chromium_nssdb_intranet_ca_trust`에서 `return` 대신 `pytest.skip("Intranet CA NSS DB live browser test requires Linux, certutil (libnss3-tools), and Playwright")`를 호출.
+  2. `.github/workflows/backend.yml`의 `expected_skips`에 해당 사유(count: 1)를 정식 등록하여 백엔드 skip 드리프트 게이트를 100% 통과시키면서도, 전용 `portal-login-harness` Job에서는 skip 0건 게이트(`assert len(skips) == 0`)로 live Chromium 실측을 강제.
+
+### 3) N3 [Low~Med] `test_live_browser_without_ca_bundle_sets_acceptance_claim_false` 시험 강화
+- **문제점**: 기존 시험의 `FakePage.on()`이 no-op이라 3단계(네트워크 토큰 교환 미관측)에서 먼저 FAIL이 발생하여, CA 조건에 도달하기 전에 실패함으로써 "통과하지만 CA 조건 검증 때문이 아님" 상태(N3 변이 생존)였던 결함.
+- **조치**: 가상 브라우저가 토큰 및 세션 응답을 정상 유입하여 1~5단계 전체가 `PASS` 상태에 도달하도록 모의하고, 그럼에도 불구하고 `--ca-bundle` 부재로 인해 `acceptanceClaim`이 엄격히 `False`로 거부됨을 증명(N3 변이 사살).
+
+---
+
+## 11. 최종 검증 결과 요약 (2026-10-01)
+
+- **로그인 여정 하네스 스위트**: `pytest tests/test_portal_login_journey_harness.py` -> **71개 시험 완비: 전용 Linux CI 러너에서 71 passed 100%, 0 skipped; 로컬 Windows 환경에서 70 passed, 1 skipped**
 - **웹 클라이언트 타입 검사**: `cd apps/web && npx tsc -b` -> **타입 에러 0건 (PASS)**
-- **웹 클라이언트 프로덕션 빌드**: `cd apps/web && npm run build` -> **Vite 프로덕션 번들 정상 생성 (PASS, 7.78s)**
+- **웹 클라이언트 프로덕션 빌드**: `cd apps/web && npm run build` -> **Vite 프로덕션 번들 정상 생성 (PASS, 9.38s)**
 - **라우트 커버리지 검증**: `pytest tests/test_route_coverage.py` -> **40 passed (100% PASS)**
 - **프런트엔드 무결성 점검**: `python -X utf8 tools/check_frontend_integrity.py` -> **9대 무결성 규칙 위반 0건 (PASS)**
 - **계약 바인딩 점검**: `python -X utf8 tools/check_contract_bindings.py` -> **55개 픽스처 전수 커버리지, 14개 리플레이 가드 PASS**
