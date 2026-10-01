@@ -1,5 +1,5 @@
 import { restoreDesktopLayout } from './desktopLayout';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   AppId,
   DesktopWindow as IDesktopWindow,
@@ -173,9 +173,80 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
 
   const [activeWindowId, setActiveWindowId] = useState<string | null>('win_my_computer');
   const [currentTime, setCurrentTime] = useState<string>('');
-  const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
   const [notifications] = useState<DesktopNotification[]>([]);
-  const [isNotifOpen, setIsNotifOpen] = useState(false);
+
+  // Overlays mutual exclusion: only one of 'none', 'start', 'notifications' can be active at a time (F2)
+  type ActiveOverlay = 'none' | 'start' | 'notifications';
+  const [activeOverlay, setActiveOverlay] = useState<ActiveOverlay>('none');
+  const isStartMenuOpen = activeOverlay === 'start';
+  const isNotifOpen = activeOverlay === 'notifications';
+
+
+
+  // A11y trigger & container refs for focus trapping and trigger focus return (DEF-S11-03, DEF-S11-04, ACC-03, ACC-04)
+  const startMenuTriggerRef = useRef<HTMLButtonElement>(null);
+  const startMenuContainerRef = useRef<HTMLDivElement>(null);
+  const notifTriggerRef = useRef<HTMLButtonElement>(null);
+  const notifContainerRef = useRef<HTMLDivElement>(null);
+
+  // Track reason for dismissing an overlay (DEF-S11-03, ACC-04, Claude D2)
+  const dismissReasonRef = useRef<'escape' | 'dismiss' | 'open_app' | null>(null);
+
+  // Restore focus to trigger button post-dismissal:
+  // When closing an overlay to 'none', restore focus to the trigger button of the dismissed overlay
+  // ONLY if dismissed via Escape, close button, or canvas click (NOT when an app was opened, Claude D2).
+  // When switching directly between overlays ('start' <-> 'notifications'), do NOT restore focus to previous trigger,
+  // allowing the newly active overlay's auto-focus to take effect cleanly (F2).
+  const prevActiveOverlayRef = useRef<ActiveOverlay>('none');
+  useEffect(() => {
+    const prev = prevActiveOverlayRef.current;
+    prevActiveOverlayRef.current = activeOverlay;
+
+    if (activeOverlay === 'none') {
+      const reason = dismissReasonRef.current;
+      if (reason !== 'open_app') {
+        dismissReasonRef.current = null;
+        if (prev === 'start') {
+          startMenuTriggerRef.current?.focus();
+        } else if (prev === 'notifications') {
+          notifTriggerRef.current?.focus();
+        }
+      }
+    }
+  }, [activeOverlay]);
+
+  // Focus newly opened or activated window title after DOM mount (Claude D2)
+  useEffect(() => {
+    if (dismissReasonRef.current === 'open_app' && activeWindowId) {
+      dismissReasonRef.current = null;
+      const titleEl = document.getElementById(`window-title-${activeWindowId}`);
+      if (titleEl) {
+        titleEl.focus();
+      } else {
+        const winDialog = document.querySelector<HTMLElement>(`[aria-labelledby="window-title-${activeWindowId}"]`);
+        winDialog?.focus();
+      }
+    }
+  }, [activeWindowId, windows]);
+
+  // Auto-focus first interactive element when Start Menu or Notification drawer opens
+  useEffect(() => {
+    if (activeOverlay === 'start') {
+      const firstBtn = startMenuContainerRef.current?.querySelector<HTMLElement>(
+        'button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      firstBtn?.focus();
+    }
+  }, [activeOverlay]);
+
+  useEffect(() => {
+    if (activeOverlay === 'notifications') {
+      const firstBtn = notifContainerRef.current?.querySelector<HTMLElement>(
+        'button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      firstBtn?.focus();
+    }
+  }, [activeOverlay]);
 
   // Clock timer
   useEffect(() => {
@@ -208,20 +279,107 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
     });
   }, []);
 
-  // Global Keyboard Shortcuts (Alt+Tab window cycling, Escape to close modals, Win/Meta to toggle Start menu)
+  // Global Keyboard Shortcuts (Alt+Tab window cycling, Escape to close overlays with focus return, Win/Meta to toggle Start menu)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Escape: Close Start Menu or Notifications first (overlays)
+      // Escape: Close Start Menu or Notifications first (overlays) and restore focus to trigger button
       if (e.key === 'Escape') {
-        if (isStartMenuOpen) {
-          setIsStartMenuOpen(false);
+        if (activeOverlay === 'start') {
+          e.preventDefault();
+          e.stopPropagation();
+          dismissReasonRef.current = 'escape';
+          setActiveOverlay('none');
+          startMenuTriggerRef.current?.focus();
           return;
         }
-        if (isNotifOpen) {
-          setIsNotifOpen(false);
+        if (activeOverlay === 'notifications') {
+          e.preventDefault();
+          e.stopPropagation();
+          dismissReasonRef.current = 'escape';
+          setActiveOverlay('none');
+          notifTriggerRef.current?.focus();
           return;
         }
       }
+
+      // Arrow navigation for Start Menu (보조 기능: ArrowDown, ArrowUp, Home, End - WAI-ARIA dialog 보조)
+      if (activeOverlay === 'start') {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Home' || e.key === 'End') {
+          const container = startMenuContainerRef.current;
+          if (container) {
+            const menuButtons = Array.from(container.querySelectorAll<HTMLButtonElement>('button:not([disabled])'));
+            if (menuButtons.length > 0) {
+              e.preventDefault();
+              const currentIndex = menuButtons.indexOf(document.activeElement as HTMLButtonElement);
+              if (e.key === 'Home') {
+                menuButtons[0].focus();
+              } else if (e.key === 'End') {
+                menuButtons[menuButtons.length - 1].focus();
+              } else if (e.key === 'ArrowDown') {
+                const nextIndex = currentIndex === -1 || currentIndex === menuButtons.length - 1 ? 0 : currentIndex + 1;
+                menuButtons[nextIndex].focus();
+              } else if (e.key === 'ArrowUp') {
+                const prevIndex = currentIndex <= 0 ? menuButtons.length - 1 : currentIndex - 1;
+                menuButtons[prevIndex].focus();
+              }
+            }
+          }
+          return;
+        }
+      }
+
+      // Tab trapping for Start Menu (WCAG 2.4.3 Focus Trap)
+      if (activeOverlay === 'start' && e.key === 'Tab') {
+        const container = startMenuContainerRef.current;
+        if (container) {
+          const focusable = container.querySelectorAll<HTMLElement>(
+            'button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          );
+          if (focusable.length > 0) {
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (e.shiftKey) {
+              if (document.activeElement === first || !container.contains(document.activeElement)) {
+                e.preventDefault();
+                last.focus();
+              }
+            } else {
+              if (document.activeElement === last || !container.contains(document.activeElement)) {
+                e.preventDefault();
+                first.focus();
+              }
+            }
+          }
+        }
+        return;
+      }
+
+      // Tab trapping for Notification Center Drawer (WCAG 2.4.3 Focus Trap)
+      if (activeOverlay === 'notifications' && e.key === 'Tab') {
+        const container = notifContainerRef.current;
+        if (container) {
+          const focusable = container.querySelectorAll<HTMLElement>(
+            'button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          );
+          if (focusable.length > 0) {
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (e.shiftKey) {
+              if (document.activeElement === first || !container.contains(document.activeElement)) {
+                e.preventDefault();
+                last.focus();
+              }
+            } else {
+              if (document.activeElement === last || !container.contains(document.activeElement)) {
+                e.preventDefault();
+                first.focus();
+              }
+            }
+          }
+        }
+        return;
+      }
+
       // Alt + Tab: Cycle through open windows
       if (e.altKey && (e.key === 'Tab' || e.code === 'Tab')) {
         e.preventDefault();
@@ -234,13 +392,19 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
       }
       // Meta / Win Key: Toggle Start Menu
       if (e.key === 'Meta') {
-        setIsStartMenuOpen((prev) => !prev);
+        if (activeOverlay === 'start') {
+          dismissReasonRef.current = 'dismiss';
+          setActiveOverlay('none');
+          startMenuTriggerRef.current?.focus();
+        } else {
+          setActiveOverlay('start');
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isStartMenuOpen, isNotifOpen, windows, activeWindowId, focusWindow]);
+  }, [activeOverlay, windows, activeWindowId, focusWindow]);
 
   const openApp = useCallback(
     (appId: AppId) => {
@@ -260,7 +424,8 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
       if (win) {
         setActiveWindowId(win.id);
       }
-      setIsStartMenuOpen(false);
+      dismissReasonRef.current = 'open_app';
+      setActiveOverlay('none');
     },
     [windows]
   );
@@ -331,9 +496,13 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
         {/* Left: Brand / Apple Logo / Start Menu / Active Window Title */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <button
+            ref={startMenuTriggerRef}
             type="button"
-            onClick={() => setIsStartMenuOpen(!isStartMenuOpen)}
+            id="desktop-start-menu-trigger"
+            onClick={() => setActiveOverlay((prev) => (prev === 'start' ? 'none' : 'start'))}
             aria-expanded={isStartMenuOpen}
+            aria-haspopup="dialog"
+            aria-controls="desktop-start-menu-dropdown"
             aria-label="SaintVision 시작 메뉴"
             style={{
               display: 'flex',
@@ -415,8 +584,14 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
 
           {/* Notifications */}
           <button
+            ref={notifTriggerRef}
             type="button"
-            onClick={() => setIsNotifOpen(!isNotifOpen)}
+            id="desktop-notification-trigger"
+            onClick={() => setActiveOverlay((prev) => (prev === 'notifications' ? 'none' : 'notifications'))}
+            aria-expanded={isNotifOpen}
+            aria-haspopup="dialog"
+            aria-controls="desktop-notification-drawer"
+            aria-label="알림 센터"
             style={{
               background: 'none',
               border: 'none',
@@ -453,7 +628,12 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
       {/* 2. Start Menu Dropdown */}
       {isStartMenuOpen && (
         <div
-          role="menu"
+          ref={startMenuContainerRef}
+          id="desktop-start-menu-dropdown"
+          role="dialog"
+          aria-label="시작 메뉴"
+          aria-modal={true}
+          tabIndex={-1}
           style={{
             position: 'absolute',
             top: '40px',
@@ -530,8 +710,13 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
       {/* 3. Notification Center Drawer */}
       {isNotifOpen && (
         <div
-          role="region"
+          ref={notifContainerRef}
+          id="desktop-notification-drawer"
+          role="dialog"
+          aria-modal="true"
           aria-label="알림 센터"
+          aria-labelledby="desktop-notification-trigger"
+          tabIndex={-1}
           style={{
             position: 'absolute',
             top: '40px',
@@ -551,7 +736,11 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
             <span style={{ fontWeight: 700, fontSize: '0.875rem' }}>알림 센터</span>
             <button
               type="button"
-              onClick={() => setIsNotifOpen(false)}
+              onClick={() => {
+                setActiveOverlay('none');
+                notifTriggerRef.current?.focus();
+              }}
+              aria-label="알림 센터 닫기"
               style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
             >
               ×
@@ -586,8 +775,13 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
           padding: '24px',
         }}
         onClick={() => {
-          setIsStartMenuOpen(false);
-          setIsNotifOpen(false);
+          if (activeOverlay === 'start') {
+            setActiveOverlay('none');
+            startMenuTriggerRef.current?.focus();
+          } else if (activeOverlay === 'notifications') {
+            setActiveOverlay('none');
+            notifTriggerRef.current?.focus();
+          }
         }}
       >
         {/* Desktop Icons */}

@@ -1153,7 +1153,7 @@ def run_scenario(
                 btn_start = page.locator('button[aria-label="SaintVision 시작 메뉴"]')
                 btn_start.click()
                 page.wait_for_timeout(500)
-                start_menu = page.locator('div[role="menu"]')
+                start_menu = page.locator('#desktop-start-menu-dropdown')
                 start_menu.wait_for(state="visible", timeout=10000)
                 assert start_menu.is_visible(), "Start menu must open"
                 screenshot_start_open = os.path.join(output_dir, "real_chrome_desktop_03_start_menu_open.png")

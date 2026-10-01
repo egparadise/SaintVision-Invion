@@ -660,6 +660,8 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
 
       {/* 2. Top-Level Operational Navigation Tabs */}
       <div
+        role="tablist"
+        aria-label="자원 탐색기 탭 목록"
         style={{
           display: 'flex',
           gap: '8px',
@@ -676,13 +678,40 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             { id: 'nodes', label: '⚙️ 노드 상세 & 라이브니스' },
             { id: 'discovery', label: '📡 디스커버리 & 후보 승인' },
           ] as const
-        ).map((t) => {
+        ).map((t, idx, arr) => {
           const active = activeTab === t.id;
           return (
             <button
               key={t.id}
+              id={`tab-${t.id}`}
               type="button"
+              role="tab"
+              aria-selected={active}
+              aria-controls={`tabpanel-${t.id}`}
+              tabIndex={active ? 0 : -1}
               onClick={() => setActiveTab(t.id)}
+              onKeyDown={(e) => {
+                let nextIdx = -1;
+                if (e.key === 'ArrowRight') {
+                  e.preventDefault();
+                  nextIdx = (idx + 1) % arr.length;
+                } else if (e.key === 'ArrowLeft') {
+                  e.preventDefault();
+                  nextIdx = (idx - 1 + arr.length) % arr.length;
+                } else if (e.key === 'Home') {
+                  e.preventDefault();
+                  nextIdx = 0;
+                } else if (e.key === 'End') {
+                  e.preventDefault();
+                  nextIdx = arr.length - 1;
+                }
+                if (nextIdx >= 0) {
+                  const targetTab = arr[nextIdx];
+                  setActiveTab(targetTab.id);
+                  const nextEl = document.getElementById(`tab-${targetTab.id}`);
+                  nextEl?.focus();
+                }
+              }}
               style={{
                 padding: '8px 16px',
                 fontSize: '0.8125rem',
@@ -772,7 +801,13 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
       {/* TAB 1: 패브릭 및 토폴로지 개요 (Overview)                               */}
       {/* ======================================================================= */}
       {activeTab === 'overview' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div
+          role="tabpanel"
+          id="tabpanel-overview"
+          aria-labelledby="tab-overview"
+          tabIndex={0}
+          style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
+        >
           {/* Architecture Disclaimer */}
           <div
             role="alert"
@@ -1185,7 +1220,13 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
       {/* TAB 2: 스토리지 기여 원장 (Storage Contributions & Locations)            */}
       {/* ======================================================================= */}
       {activeTab === 'storage' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div
+          role="tabpanel"
+          id="tabpanel-storage"
+          aria-labelledby="tab-storage"
+          tabIndex={0}
+          style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
+        >
           {/* New Contribution Form */}
           <div style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155' }}>
             <h3 style={{ fontSize: '0.875rem', fontWeight: 600, margin: '0 0 12px 0' }}>
@@ -1616,7 +1657,13 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
       {/* TAB 3: 자원 풀 및 분산 배치 계획 (Pools & Placement Plans)              */}
       {/* ======================================================================= */}
       {activeTab === 'pools' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div
+          role="tabpanel"
+          id="tabpanel-pools"
+          aria-labelledby="tab-pools"
+          tabIndex={0}
+          style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
+        >
           {/* Manual Refresh & Snapshot Notice */}
           <div
             role="status"
@@ -1934,7 +1981,13 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
       {/* TAB 4: 노드 상세 & 라이브니스 통제 (Node Inspector & Liveness)         */}
       {/* ======================================================================= */}
       {activeTab === 'nodes' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div
+          role="tabpanel"
+          id="tabpanel-nodes"
+          aria-labelledby="tab-nodes"
+          tabIndex={0}
+          style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
+        >
           {/* Node Selector & Actions */}
           <div style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
@@ -2053,7 +2106,13 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
       {/* TAB 5: 디스커버리 & 노드 승인 (Discovery & Candidate Admission)          */}
       {/* ======================================================================= */}
       {activeTab === 'discovery' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div
+          role="tabpanel"
+          id="tabpanel-discovery"
+          aria-labelledby="tab-discovery"
+          tabIndex={0}
+          style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
+        >
           {/* Manual Refresh & Snapshot Notice */}
           <div
             role="status"

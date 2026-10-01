@@ -14,6 +14,7 @@ from inv.leases import Allocation
 from inv.node_channels import revoke_channel
 from inv.observation import NodeObservation
 from inv.placement import PlacementStore
+from inv.policy import action_digest
 from inv.scheduler import Request
 from test_approvals import approval
 from test_node_runtime import node_runtime
@@ -76,8 +77,7 @@ def test_observation_to_explain_and_fenced_reservation_is_idempotent(placement):
     first = reserve(a)
     assert first == reserve(a)
     assert (
-        first["placement"]["nodeId"] == a.e.node
-        and first["placement"]["weightsVersion"] == "1.0.0"
+        first["placement"]["nodeId"] == a.e.node and first["placement"]["weightsVersion"] == "1.0.0"
     )
     assert sorted(l["amount"] for l in first["leases"]) == [500, 67108864]
     assert all(l["fencingToken"].startswith(a.e.epoch + ":") for l in first["leases"])
@@ -85,9 +85,7 @@ def test_observation_to_explain_and_fenced_reservation_is_idempotent(placement):
         reserve(a, request=replace(a.request, cpu_millis=501))
 
 
-@pytest.mark.parametrize(
-    "invalid", ["future", "stale", "missing", "revoked", "membership"]
-)
+@pytest.mark.parametrize("invalid", ["future", "stale", "missing", "revoked", "membership"])
 def test_invalid_current_observation_never_reserves(placement, invalid):
     a = placement
     with psycopg.connect(a.e.owner) as conn:
@@ -125,12 +123,10 @@ def test_pool_filter_cannot_expand_scope_and_unmeasured_workloads_fail_closed(
     a = placement
     with pytest.raises(DomainError, match="AUTH-0030"):
         reserve(a, node_ids=[new_id("nod")])
-    for request in [
-        replace(a.request, gpu_count=1),
-        replace(a.request, required_bytes=1),
-    ]:
-        with pytest.raises(DomainError, match="RES-0008"):
-            reserve(a, request=request)
+    with pytest.raises(DomainError, match="RES-0003"):
+        reserve(a, request=replace(a.request, gpu_count=1, min_vram_bytes=1))
+    with pytest.raises(DomainError, match="RES-0008"):
+        reserve(a, request=replace(a.request, required_bytes=1))
     with pytest.raises(DomainError, match="AUTH-0030"):
         a.placement.reserve(
             Principal(a.e.tenant, "outsider"),
@@ -139,6 +135,62 @@ def test_pool_filter_cannot_expand_scope_and_unmeasured_workloads_fail_closed(
             a.request,
             key="unauthorized",
             policy_version="roof:test:1",
+        )
+
+
+def test_one_fresh_measured_gpu_device_gets_one_exact_exclusive_lease(placement):
+    a = placement
+    gpu_resource = new_id("res")
+    device = {
+        "resourceId": gpu_resource,
+        "deviceId": "GPU-synthetic-0",
+        "vendor": "synthetic",
+        "model": "single-device",
+        "totalVramBytes": 24 * 1024**3,
+        "computeCapability": "8.0",
+        "driverVersion": "synthetic-driver:1",
+        "runtimeVersion": "synthetic-runtime:1",
+        "providerVersion": "synthetic-provider:1",
+        "healthy": True,
+        "exclusive": True,
+        "runtimeCompatible": True,
+        "deviceRequestDriver": "nvidia",
+    }
+    device["observationDigest"] = action_digest(device)
+    with psycopg.connect(a.e.owner) as conn:
+        conn.execute(
+            "INSERT INTO inv.resources VALUES(%s,%s,%s,'gpu',1,1)",
+            (a.e.tenant, gpu_resource, a.e.node),
+        )
+        row = conn.execute(
+            "SELECT snapshot FROM inv.node_resource_snapshots WHERE tenant_id=%s AND node_id=%s",
+            (a.e.tenant, a.e.node),
+        ).fetchone()
+        conn.execute(
+            "UPDATE inv.node_resource_snapshots SET snapshot=%s WHERE tenant_id=%s AND node_id=%s",
+            (
+                Jsonb({**row[0], "gpuDevices": [device]}),
+                a.e.tenant,
+                a.e.node,
+            ),
+        )
+
+    result = reserve(
+        a,
+        key="single-gpu",
+        request=replace(a.request, gpu_count=1, min_vram_bytes=1024),
+    )
+    assert result["placement"]["gpuDeviceIds"] == ["GPU-synthetic-0"]
+    gpu_leases = [lease for lease in result["leases"] if lease["resourceId"] == gpu_resource]
+    assert len(gpu_leases) == 1 and gpu_leases[0]["amount"] == 1
+
+    other_run = planned(a.e)
+    with pytest.raises(DomainError, match="RES-0003"):
+        reserve(
+            a,
+            run=other_run,
+            key="single-gpu-conflict",
+            request=replace(a.request, gpu_count=1, min_vram_bytes=1024),
         )
 
 
@@ -197,9 +249,7 @@ def test_project_lock_timeout_is_retryable_res_0007_problem(placement_benchmark_
             (a.e.project,),
         ).fetchone()
         with ThreadPoolExecutor(max_workers=1) as pool:
-            sleeping = pool.submit(
-                lambda: holder.execute("SELECT pg_sleep(1.2)").fetchone()
-            )
+            sleeping = pool.submit(lambda: holder.execute("SELECT pg_sleep(1.2)").fetchone())
             started = perf_counter()
             with pytest.raises(DomainError) as caught:
                 a.placement.reserve(

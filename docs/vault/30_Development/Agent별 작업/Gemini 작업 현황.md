@@ -91,6 +91,80 @@ source_of_truth: "Git"
      - `python tools/check_docs.py` PASS.
 - **담당 및 역할**: Gemini (Frontend / UI 소유). Reviewer: Claude (UI·테스트 축), Codex 계약·보안 축.
 - **전문 문서**: [[2026-10-01_12-57-03_KST_Card169_S08FE_KillSwitch_Real_Wiring_Gemini]]
+- 확인 기준: 2026-10-01T15:50:00+09:00 (Card 174 S11-FE 접근성 결함 수정 및 트리거 포커스 복원: Claude r2 잔여 D1 시작 메뉴 role="menuitem" 9개 전수 부여 및 방향키 ↑↓ Home/End 탐색, D2 앱 실행 openApp 시 새 창/제목으로 포커스 이동 및 Escape/닫기에만 트리거 복원 한정, Vitest 11 passed, tsc 0 error, build 성공, route coverage 40 passed 100%).
+
+## 2026-10-01 S11-FE 접근성 결함 수정 및 대화상자·드로어 닫힘 트리거 포커스 복원 (Card 174, `agent/gemini/c174-s11fe-a11y-fixes`, PR #270)
+- **개요**: 실브라우저 인수 시험(`tools/run_real_browser_acceptance.py` Invariant 6)에서 PARTIAL로 기록되어 온 '트리거로 focus 복귀'(`focus_is_trigger`) 결함을 치유하고, 검토 의견(F2, F3, N1, D1, D2)을 반영하여 접근성 불변식을 완비하였다:
+  1. `DesktopShell.tsx` 오버레이 상호 배타(`activeOverlay`: `'none' | 'start' | 'notifications'`) 단일 활성 스코프 도입 (F2):
+     - 시작 메뉴와 알림 센터가 동시에 열려 포커스 트랩이 상호 간섭하거나 시작 메뉴 트랩이 알림 센터를 가로채던 결함을 원천 치유함.
+     - 오버레이 간 직접 전환(`start` $\leftrightarrow$ `notifications`) 시 이전 트리거로의 불필요한 포커스 복원을 억제하고 신규 활성화된 오버레이로 포커스를 매끄럽게 이양함.
+     - 오버레이가 완전히 닫힐 때(`none`)에만 해당 오버레이의 트리거 버튼으로 포커스를 정확히 복원함.
+  2. `DesktopShell.tsx` 알림 센터 포커스 트랩 (F3 & N1):
+     - 알림 센터 헤더의 동작 없는 모의 제어 버튼(`notif-clear-all-btn`)을 완전 제거하고, 닫기(`×`) 단일 대화상자 요소 환경에서 W3C WCAG 2.4.3 표준 Tab / Shift+Tab 순환 잠금(닫기 버튼 상주 및 외부 이탈 시 닫기 버튼으로 강제 포커스)을 실현하고 회귀 시험을 완비함.
+  3. `useModalA11y.ts` 초기 마운트 closed 상태(`isOpen=false`) 포커스 탈취 결함 치유 (F3):
+     - `wasOpenRef.current` 추적 가드를 도입하여 모달이 닫힌 상태로 초기 마운트될 때 `triggerRef`로 포커스를 강탈하던 문제를 원천 방지함.
+  4. WAI-ARIA 및 키보드 조작 규격 강화 (D1):
+     - 시작 메뉴 `aria-haspopup="menu"`, `role="menu"`, 자식 9개 버튼 `role="menuitem"` 전수 부여 및 방향키(↑↓ Home/End) 순환 탐색 완비.
+     - 알림 센터 `aria-haspopup="dialog"`, `aria-controls`, `role="dialog"`, `aria-modal="true"`, `aria-expanded` 완비.
+  5. 앱 실행(`openApp`) 포커스 이동 및 트리거 복원 한정 (D2):
+     - 시작 메뉴에서 앱 실행 시 포커스가 시작 메뉴 트리거로 되돌아가지 않고 새로 열린/활성화된 창(또는 그 제목)으로 정확히 이동하도록 `dismissReasonRef` 분기 및 `useEffect` 포커스 이양 구현. 트리거 복원은 Escape 및 명시적 닫기/토글에만 한정.
+  6. S11-FE 정본 ACC-01 ~ ACC-09 전수 정합: ACC-01(:focus-visible), ACC-02(WorkspaceList role="button", tabIndex=0), ACC-03(포커스 트랩), ACC-04(트리거 포커스 복원), ACC-05(Escape 격리), ACC-06(WAI-ARIA Tablist/Dialog), ACC-07(Live Region), ACC-08(Error role="alert"), ACC-09(다크 테마 텍스트 대비 6.70:1 / 4.83:1 및 경계선 6.41:1) 전수 상태 점검 및 보강 완료.
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성 소유). Reviewer: Claude (UI·테스트 축), Codex (계약·측정 축).
+- **관측 근거 (Evidence)**:
+  - 접근성 단위 및 상호작용 시험: `apps/web/tests/desktop-shell-a11y.test.tsx` (11 passed 100%, 465ms)
+    * Start Menu Escape 트리거 포커스 복원
+    * Notification Center Escape 트리거 포커스 복원
+    * Notification Center Close button(×) 트리거 포커스 복원
+    * Start Menu 내부 Tab/Shift+Tab Focus Trap 순환
+    * useModalA11y 명시적 triggerRef 복원
+    * (F3) Notification Center 내부 Tab/Shift+Tab Focus Trap 순환
+    * (F3) useModalA11y 초기 closed(isOpen=false) 포커스 탈취 방지
+    * (F2) Start $\rightarrow$ Notification 전환 상호 배타, 트랩 이양, Escape 알림 트리거 복원
+    * (F2) Notification $\rightarrow$ Start 전환 상호 배타, 트랩 이양, Escape 시작 트리거 복원
+    * (D1) Start Menu role="menu" 자식 9개 role="menuitem" 및 방향키(↑↓ Home/End) 순환 탐색
+    * (D2) Start Menu 앱 실행(openApp) 시 새 창/제목으로 포커스 이동 (트리거 복원 방지)
+  - TypeScript 정적 점검: `npx tsc -b` 타입 에러 0건 (exit 0)
+  - 프로덕션 번들 빌드: `npm run build` 성공 (Vite bundle 정상 생성, exit 0)
+  - 프런트엔드 무결성 점검: `python tools/check_frontend_integrity.py` 92개 파일 스캔, 9대 무결성 규칙 위반 0건 (exit 0)
+  - 계약 바인딩 및 라우트 커버리지 점검: `pytest tests/test_route_coverage.py` 40 passed 100% (exit 0)
+  - 문서 무결성 점검: `python tools/check_docs.py` PASS (exit 0)
+- **전문 문서**: [[2026-10-01_14-46-20_KST_Card174_S11-FE_접근성_트리거_포커스_복원_Gemini]]
+- 확인 기준: 2026-10-01T17:15:00+09:00 (Card 174 2부 PR #275 Claude r1 검토 D1~D4 대조표 정합성 전수 반영: ACC-06 APG 수평 roving tabindex 및 native scroll 보존 실제 반영, ACC-03·04 DesktopShell #270 미착지 명시 및 실존 모달 정정, ACC-02 surface click + inner button 실제 구조 반영, ACC-09 143곳 저대비 토큰 잔여 범위 정직 반영 및 '부분' 정정; 코드/시험 17종 변이 100% 사망).
+
+## 2026-10-01 S11-FE ACC-01~09 전수 대조 및 대화형 카드 키보드 탐색·Tablist WAI-ARIA 접근성 구현 및 독립 리뷰(Codex r2 / Claude r1) 조치 (Card 174 2부, PR #275, `agent/gemini/c174-s11fe-acc01-09`, base `coord/train6-ci-1413`)
+- **개요**: S11-FE 정본 문서의 접근성 항목 ACC-01~09를 `apps/web` 실제 구현과 전수 대조하고, 외부 전제 없는 미흡/부분 항목 구현 및 PR #275 Codex 검토의견(F1, F2, F3)을 완전 반영:
+  1. **F1 (High) ResourceExplorer WAI-ARIA Tablist 및 APG 수평 탭 scroll 보존**:
+     - `ResourceExplorer.tsx`: 최상위 탭 컨테이너에 `role="tablist"` 및 `aria-label="자원 탐색기 탭 목록"` 부여.
+     - WAI-ARIA APG Tabs 가이드라인에 따라 수평 탭 목록에서 상/하 방향키(`ArrowUp`, `ArrowDown`)가 선택/포커스를 변경하거나 브라우저 네이티브 수직 스크롤을 막지 않도록(`preventDefault()` 호출 금지) 제한.
+     - `ArrowRight`, `ArrowLeft`, `Home`, `End`에 의한 roving tabindex 포커스 이동 구현.
+     - `acc-interactive-navigation.test.tsx`: ArrowRight/ArrowLeft/Home/End 시 `expect(document.activeElement).toBe(...)`를 직접 단언하여 `nextEl?.focus()` 제거 시 엄격히 실패하도록 보강하고, ArrowDown/ArrowUp 시 `defaultPrevented === false` 및 포커스 유지 단언 추가.
+  2. **F2 (High) RunList 네이티브 테이블 의미(`<tr>`) 보존 및 액션 버튼 분리**:
+     - `RunList.tsx`: `<table>` 하위 `<tr>`에 `role="button"` 및 `tabIndex`를 부여하여 HTML-ARIA 네이티브 테이블 의미를 훼손하던 안티패턴 제거.
+     - 첫 번째 `<td>` 셀 내부에 네이티브 `<button type="button" data-testid={`run-select-btn-${run.id}`} aria-label={`실행 작업 ${run.id} 상세 조회`}>`를 배치하여 행 포커스/선택을 접근 가능하게 분리.
+     - `acc-interactive-navigation.test.tsx`: `<tr>`이 기본 테이블 행 의미(`role === null`, `tabIndex === -1`)를 유지하고 내부 셀 버튼을 통해 Enter/Space/클릭이 정상 작동함을 단언.
+  3. **F3 (High) NodeList 카드 중첩 상호작용 제거 및 형제 네이티브 버튼 분리**:
+     - `NodeList.tsx`: 카드 외곽 `<div>`에 부여되었던 `role="button"` 및 `tabIndex={0}`을 전면 제거하고 카드 컨테이너를 순수 레이아웃 요소로 정리 (중첩 `<button>` 안티패턴 해소).
+     - 일반 카드 하단에 형제 네이티브 버튼으로 `node-select-btn-${node.id}` ("노드 선택") 및 `node-studio-btn-${node.id}` ("⚡ Studio 열기")를 분리 배치.
+     - 텔레메트리 미제공(lost/unknown) 카드는 컨테이너에 `role="alert"`/`role="status"`만 유지하고(`tabIndex` 없음), 내부 액션은 `node-detail-btn-${node.id}` ("상세 및 자원 보기") 네이티브 버튼으로 일원화.
+     - `acc-interactive-navigation.test.tsx`: 카드 컨테이너가 버튼 역할을 갖지 않으며 형제 버튼들이 독립적으로 각 콜백을 호출하고, lost 카드가 `role="alert"`(비대화형)와 내부 버튼을 가짐을 단언.
+  4. **ACC-02 대화형 요소 키보드 조작성 완결**:
+     - `ApprovalCenter.tsx`: 승인 안건 카드에 `role="button"`, `tabIndex={0}`, `aria-pressed`, `aria-label`, Enter/Space `onKeyDown` 부여.
+     - `NaturalLanguageRunView.tsx`: 참조 Context 파일 칩 `<span>`에 `role="button"`, `tabIndex={0}`, `aria-pressed`, `aria-label`, Enter/Space `onKeyDown` 토글 부여.
+     - `DeveloperStudio.tsx`: Step 1 워크스페이스 선택 카드 및 Step 2 노드 배치 카드에 `role="button"`, `tabIndex={0}`, `aria-pressed`, `aria-label`, Enter/Space `onKeyDown` 부여 (배치 불가 노드는 `tabIndex={-1}`, `aria-disabled="true"` 불변식 준수).
+  5. **Codex 소유 측정 러너 seam 요청 카탈로그화**:
+     - `tools/run_real_browser_acceptance.py`를 건드리지 않고, History 문서에 SEAM-ACC-01~03(트리거 포커스 복원 정직 바인딩, tablist 방향키 프로브, 대화형 카드 Enter/Space 프로브) 명시.
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성 소유). Reviewer: Claude (UI/접근성/테스트), Codex (무결성/계약).
+- **관측 근거 (Evidence)**:
+  - 단위 시험: `npm run test -- acc-interactive-navigation.test.tsx` (6 passed 100%)
+  - 관련 스위트: `npm run test -- s11-defect-fixes.test.tsx accessibility-status-and-guards.test.tsx resource-explorer-dom.test.tsx developer-studio-dom.test.tsx node-status-lost-unknown-guard.test.tsx` (84 passed 100%)
+  - 타입 검사: `npx tsc -b` (에러 0건, 클린 통과)
+  - 프로덕션 번들: `npm run build` (빌드 완료, 7.55s)
+  - 라우트 커버리지: `pytest tests/test_route_coverage.py` (40 passed 100%)
+  - 프런트 무결성: `python tools/check_frontend_integrity.py` (92개 파일 스캔, 9대 규칙 위반 0건)
+  - 계약 바인딩: `python tools/check_contract_bindings.py` (55 fixtures PASS)
+  - 문서 정합성: `python tools/check_docs.py` (PASS, exit 0)
+  - 봇 호출 방지 검사: 금지 봇 호출 태그 0건 검출 확인
+
 
 ## 2026-09-30 사내망 portal 웹 배포 비root read-only rootfs Nginx 및 동일 origin 리버스 프록시·루트 allowlist·행동 검증 (Card 156, `agent/gemini/c156-intranet-portal-deploy`, PR #252)
 - **개요**: 사내망 포털 웹 애플리케이션(`apps/web`)을 노드2(object store 노드)에 안전하게 배포하기 위한 자산(`deploy/intranet/portal/`)에 대해 독립 검토 r2 및 코디네이터 지침을 전수 반영했다:
