@@ -560,6 +560,7 @@ def create_app(
             run_id,
             data["expectedVersion"],
             key(request),
+            trace_id=request.state.trace_id,
         )
 
     @api.post("/v1/projects/{project}/runs/{parent}/model-retries", status_code=201)

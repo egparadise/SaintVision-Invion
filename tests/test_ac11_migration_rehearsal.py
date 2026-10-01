@@ -38,12 +38,13 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
     assert set(mapping) == {revision.revision for revision in chain() if not revision.irreversible}
     assert {key for key, value in mapping.items() if value == "DECLARED_LOSS_REQUIRES_RESTORE"} == runner.EXPECTED_LOSSY
     assert len(runner.EXPECTED_LOSSY) == 10
-    assert {key for key in mapping if key.startswith(("0047_", "0050_", "0053_", "0054_", "0055_"))} == {
+    assert {key for key in mapping if key.startswith(("0047_", "0050_", "0053_", "0054_", "0055_", "0056_"))} == {
         "0047_audit_events_isolation",
         "0050_dataset_digest_lookup",
         "0053_eval_suite_project_scope",
         "0054_model_version_measurements",
         "0055_adapter_conformance_records",
+        "0056_kernel_cancel_audit_bridge",
     }
     # 0054 (W3 seam, #213): the downgrade refuses while any version is bound to
     # a measurement or any measurement row exists, and otherwise drops only
@@ -56,6 +57,7 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
         "0053_eval_suite_project_scope",
         "0054_model_version_measurements",
         "0055_adapter_conformance_records",
+        "0056_kernel_cancel_audit_bridge",
     ))
     ordered = chain()
     last_irreversible = max(index for index, item in enumerate(ordered) if item.irreversible)
@@ -63,6 +65,7 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
         "0053_eval_suite_project_scope",
         "0054_model_version_measurements",
         "0055_adapter_conformance_records",
+        "0056_kernel_cancel_audit_bridge",
     ]
 
 
