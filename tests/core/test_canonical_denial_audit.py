@@ -203,15 +203,13 @@ def test_is_audited_denial_is_the_category_and_status_rule():
     assert not is_audited_denial(CanonicalProblem(GRAPH_PRECONDITION, 403, "x"))
 
 
-def test_only_a_committed_release_acceptance_transition_records_in_its_route():
-    """Only the one response-returning transition may record in a route.
+def test_no_route_records_a_denial_itself():
+    """Routes never write denial rows outside their business transaction.
 
-    Ordinary refusals raise and are recorded by the canonical boundary after
-    their business transaction rolls back.  Release-acceptance expiry and
-    manifest-drift are different: the route deliberately returns a 409 so the
-    invalidation and idempotency receipt commit.  That response never reaches
-    the exception boundary, so its transitioned refusal has one explicit,
-    out-of-band audit write.  Keep that exception singular and conditional.
+    Ordinary AUTH/SEC refusals reach the canonical boundary.  The committed
+    release-acceptance GRAPH refusal is instead recorded by the service in the
+    same transaction that closes its proposal.  Neither case permits a route
+    module to call the out-of-band recorder directly.
     """
     import pathlib
 
@@ -222,10 +220,7 @@ def test_only_a_committed_release_acceptance_transition_records_in_its_route():
         if "record_denial_out_of_band" in source:
             direct_recorders.append(path)
 
-    assert [path.name for path in direct_recorders] == ["release_acceptance.py"]
-    source = direct_recorders[0].read_text(encoding="utf-8")
-    assert source.count("record_denial_out_of_band(") == 1
-    assert "if refused.transitioned:" in source
+    assert direct_recorders == []
 
 
 # ---------------------------------------------------------------- action regression on the real routes
