@@ -48,6 +48,8 @@ def test_lane_is_opt_in_pinned_and_never_uses_privileged_or_host_socket():
     assert "docker run" in text
     assert "--security-opt seccomp=unconfined" in text
     assert "--publish 127.0.0.1:1234:1234" in text
+    assert "/etc/apparmor.d/usr.bin.rootlesskit" in text
+    assert "kernel.apparmor_restrict_unprivileged_userns=0" not in text
     checkout = next(step for step in job["steps"] if step.get("uses") == "actions/checkout@v4")
     assert checkout["with"]["persist-credentials"] is False
 

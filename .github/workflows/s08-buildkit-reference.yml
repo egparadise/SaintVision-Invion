@@ -55,6 +55,18 @@ jobs:
           echo "$BUILDKIT_ARCHIVE_SHA256  $RUNNER_TEMP/s08-download/buildkit.tar.gz" | sha256sum --check
           tar -xzf "$RUNNER_TEMP/s08-download/buildkit.tar.gz" -C "$RUNNER_TEMP/s08-bin/buildkit" --strip-components=1
           "$RUNNER_TEMP/s08-bin/buildkit/buildkitd" --version | tee dist/s08-buildkit-reference/buildkit-version.txt
+      - name: Allow only the rootlesskit executable to create a user namespace
+        run: |
+          cat <<'EOF' | sudo tee /etc/apparmor.d/usr.bin.rootlesskit >/dev/null
+          abi <abi/4.0>,
+          include <tunables/global>
+
+          /usr/bin/rootlesskit flags=(unconfined) {
+            userns,
+            include if exists <local/usr.bin.rootlesskit>
+          }
+          EOF
+          sudo apparmor_parser --replace /etc/apparmor.d/usr.bin.rootlesskit
       - name: Execute actual rootless BuildKit OCI roundtrip
         env:
           SV_BUILDKIT_BIN_DIR: ${{ runner.temp }}/s08-bin/buildkit
@@ -84,6 +96,7 @@ jobs:
               'lease-release-not-bound',
               'evidence-persistence-not-bound',
               'lan-builder-acceptance-blocked-external',
+              'host-apparmor-rootlesskit-profile-relaxed',
           ]
           junit = ET.parse(root / 'rootless-buildkit-reference.xml').getroot()
           assert len(junit.findall('.//testcase')) == 1
