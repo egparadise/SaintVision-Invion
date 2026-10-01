@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "1.1.0",
+  "timestamp": "2026-10-01T00:59:06.440901+00:00",
+  "codeSha": "917dad7fe129cbbd678622203333754d082a309a",
+  "measurementKind": "LIVE_BROWSER",
+  "referenceOnly": false,
+  "acceptanceClaim": false,
+  "targetUrl": "https://portal.sv.lan",
+  "overallStatus": "BLOCKED_EXTERNAL",
+  "blockingReason": "DNS resolution failed for portal.sv.lan ([Errno 11001] getaddrinfo failed)",
+  "caDigest": null,
+  "steps": [
+    {
+      "id": "portal_tls_reachability",
+      "name": "Portal TLS Reachability & Certificate Check",
+      "status": "BLOCKED_EXTERNAL",
+      "durationMs": 1.0,
+      "detail": "External preflight blocked: DNS resolution failed for portal.sv.lan ([Errno 11001] getaddrinfo failed)",
+      "observations": {
+        "hostname": "portal.sv.lan",
+        "dnsResolved": false
+      }
+    },
+    {
+      "id": "login_initiation",
+      "name": "OIDC PKCE Login Initiation",
+      "status": "NOT_OBSERVED",
+      "durationMs": 0.0,
+      "detail": "Not observed: prerequisite step portal_tls_reachability blocked",
+      "observations": {}
+    },
+    {
+      "id": "pkce_callback",
+      "name": "OIDC Authorization Code Exchange Callback",
+      "status": "NOT_OBSERVED",
+      "durationMs": 0.0,
+      "detail": "Not observed: prerequisite step portal_tls_reachability blocked",
+      "observations": {}
+    },
+    {
+      "id": "identity_session_display",
+      "name": "Identity and /v1/session Display",
+      "status": "NOT_OBSERVED",
+      "durationMs": 0.0,
+      "detail": "Not observed: prerequisite step portal_tls_reachability blocked",
+      "observations": {}
+    },
+    {
+      "id": "logout",
+      "name": "OIDC Session Logout and Cleanup",
+      "status": "NOT_OBSERVED",
+      "durationMs": 0.0,
+      "detail": "Not observed: prerequisite step portal_tls_reachability blocked",
+      "observations": {}
+    }
+  ],
+  "audit": {
+    "redacted": true,
+    "tokenCount": 0,
+    "ipCount": 0,
+    "credentialCount": 0,
+    "accountCount": 0,
+    "oidcParamCount": 0,
+    "circumventionFlagsDetected": false,
+    "tlsValidationEnforced": false
+  }
+}

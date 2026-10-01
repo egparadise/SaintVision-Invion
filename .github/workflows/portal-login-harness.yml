@@ -1,0 +1,46 @@
+name: Portal Login Journey Harness
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - integration/all-agents-unified
+      - 'agent/**'
+  pull_request:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/integration/all-agents-unified' }}
+permissions:
+  contents: read
+jobs:
+  portal-login-harness:
+    name: portal-login-harness
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install system dependencies (certutil)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libnss3-tools
+      - name: Install Python dependencies
+        run: |
+          python -m pip install -r requirements-backend.txt playwright==1.62.0
+          python -m playwright install --with-deps chromium
+      - name: Run Portal Login Journey Harness test suite
+        run: python -m pytest -v --strict-markers --junitxml=.work/harness-tests.xml tests/test_portal_login_journey_harness.py
+      - name: Assert 0 skipped tests and 100% pass rate
+        run: |
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          root = ET.parse('.work/harness-tests.xml').getroot()
+          testcases = root.findall('.//testcase')
+          assert testcases, 'No harness test cases found in junit XML'
+          assert not any(root.findall('.//' + tag) for tag in ('failure', 'error')), 'All harness tests must pass'
+          skips = root.findall('.//skipped')
+          assert len(skips) == 0, f'Zero tests may be skipped: found {len(skips)} skipped tests'
+          print(f'Verified all {len(testcases)} tests passed with 0 failures, 0 errors, 0 skips.')
+          PY
