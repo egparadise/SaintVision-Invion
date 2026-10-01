@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.160"
+version: "1.0.161"
 status: "approved"
 author: "Gemini"
-updated: "2026-10-01T16:30:00+09:00"
+updated: "2026-10-01T17:15:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,9 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-10-01T16:30:00+09:00 (Card 174 2부 PR #275 Codex 수정요청 F1·F2·F3 조치 완결: APG 수평 tablist scroll 보존 및 activeElement 엄격 단언, native tr 의미 보존 및 td 셀 버튼 분리, 노드 카드 비대화형 컨테이너화 및 형제 네이티브 버튼 분리, 6개 신규 시험 및 84개 관련 스위트 100% 통과, tsc/build/integrity/route_coverage 100% 클린).
+- 확인 기준: 2026-10-01T17:15:00+09:00 (Card 174 2부 PR #275 Claude r1 검토 D1~D4 대조표 정합성 전수 반영: ACC-06 APG 수평 roving tabindex 및 native scroll 보존 실제 반영, ACC-03·04 DesktopShell #270 미착지 명시 및 실존 모달 정정, ACC-02 surface click + inner button 실제 구조 반영, ACC-09 143곳 저대비 토큰 잔여 범위 정직 반영 및 '부분' 정정; 코드/시험 17종 변이 100% 사망).
 
-## 2026-10-01 S11-FE ACC-01~09 전수 대조 및 대화형 카드 키보드 탐색·Tablist WAI-ARIA 접근성 구현 및 Codex 리뷰 조치 (Card 174 2부, PR #275, `agent/gemini/c174-s11fe-acc01-09`, base `coord/train6-ci-1413`)
+## 2026-10-01 S11-FE ACC-01~09 전수 대조 및 대화형 카드 키보드 탐색·Tablist WAI-ARIA 접근성 구현 및 독립 리뷰(Codex r2 / Claude r1) 조치 (Card 174 2부, PR #275, `agent/gemini/c174-s11fe-acc01-09`, base `coord/train6-ci-1413`)
 - **개요**: S11-FE 정본 문서의 접근성 항목 ACC-01~09를 `apps/web` 실제 구현과 전수 대조하고, 외부 전제 없는 미흡/부분 항목 구현 및 PR #275 Codex 검토의견(F1, F2, F3)을 완전 반영:
   1. **F1 (High) ResourceExplorer WAI-ARIA Tablist 및 APG 수평 탭 scroll 보존**:
      - `ResourceExplorer.tsx`: 최상위 탭 컨테이너에 `role="tablist"` 및 `aria-label="자원 탐색기 탭 목록"` 부여.
