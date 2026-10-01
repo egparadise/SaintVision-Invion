@@ -4,7 +4,7 @@ title: "Codex 작업 현황"
 version: "1.0.240"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T13:24:15+09:00"
+updated: "2026-10-01T14:19:55+09:00"
 source_of_truth: "Git"
 active_card: "CARD-166 S04 kernel cancel shard bridge evidence"
 active_card_status: "PG-free 21 passed; Core 36805349620 6508 passed; bridge real-PG 21/21 passed"
@@ -53,6 +53,30 @@ active_card_next: "Claude re-review of PR #266; then start Card172 BuildKit boun
   `sha256:77d30b61dfa0027a86b123be94e5cb5e545dd1110b9cc12c0b2f151d11797cbb`다.
   수동 사용자 인수 부재 1건 때문에 raw verdict는 사전 등록대로 `MEASURED_FAIL`이며
   AC-11 done·점수 승격은 하지 않는다.
+version: "1.0.237"
+status: "review"
+author: "Codex"
+updated: "2026-10-01T14:19:55+09:00"
+source_of_truth: "Git"
+active_card: "CARD-172 S08-BE BuildKit contract boundary"
+active_card_status: "Claude r3 W2 exact enum vocabularies pinned in addition to negative controls; focused PG-free 55 passed"
+active_card_next: "exact-head hosted Core/Backend and Claude re-review; adapter/ROOF/GPU remain separate cards"
+---
+
+## 2026-10-01 Card 172 — S08-BE BuildKit 계약 경계
+
+- 승인된 PR #265 설계 v1.1.0과 기준 SHA `8e6c68c64`에 따라 첫 구현 범위를
+  공개 route·daemon 없는 strict 계약 카드로 제한했다.
+- `BuildPlan`의 rootless/privileged/hostAccess/devices/binds를 literal로 고정하고,
+  network policy, resource budget, lease/fencing, cache·secret reference digest,
+  immutable base digest를 필수화했다. `WorkloadSpec`과 build 계약은 섞이지 않는다.
+- focused PG-free 계약 시험은 55 passed다. 첫 Core에서 Go RE2 비호환 pattern을 잡아
+  공통 정규식으로 교정했으며 재발 방지 source guard를 추가했다.
+  Claude r2 W1의 enum 4종·pattern 4종·unknown-key 변이는 각각 독립 부정
+  대조군으로 고정했다. r3 W2의 네 enum 정확 집합도 리터럴 단언으로 닫았다.
+  rootless daemon과 실제 격리·감사 실행은
+  아직 `NOT_OBSERVED`이며 Claude 계약 검토 뒤 별도 adapter 카드로 진행한다.
+- 근거: [[2026-10-01_13-40-45_KST_S08-BE_BuildKit_계약경계_Codex]].
 
 ## 2026-09-30 Card151 Claude F1-F12 보안·측정 경계 후속
 - PR #248에서 root·service·PITR 자격을 host argv와 Docker `Config.Env`에서 제거하고 단일 보호 파일 mount로 고정했다. PITR policy의 delete 권한을 제거하고 bucket versioning을 활성화했다.
