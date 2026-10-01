@@ -25,6 +25,7 @@ export function useModalA11y<T extends HTMLElement = HTMLDivElement>({
   const triggerRef = useRef<HTMLElement | null>(null);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
+  const wasOpenRef = useRef(false);
 
   const restoreFocus = useCallback(() => {
     const target = explicitTriggerRef?.current || triggerRef.current;
@@ -46,9 +47,14 @@ export function useModalA11y<T extends HTMLElement = HTMLDivElement>({
 
   useEffect(() => {
     if (!isOpen) {
-      restoreFocus();
+      if (wasOpenRef.current) {
+        restoreFocus();
+      }
+      wasOpenRef.current = false;
       return;
     }
+
+    wasOpenRef.current = true;
 
     if (autoFocusFirst) {
       if (initialFocusRef?.current) {
@@ -67,7 +73,9 @@ export function useModalA11y<T extends HTMLElement = HTMLDivElement>({
 
     return () => {
       // Restore focus to the trigger element when the modal is closed / unmounted
-      restoreFocus();
+      if (wasOpenRef.current) {
+        restoreFocus();
+      }
     };
   }, [isOpen, autoFocusFirst, initialFocusRef, restoreFocus]);
 
