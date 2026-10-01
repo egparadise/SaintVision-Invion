@@ -199,6 +199,9 @@
               "storagePurged": {
                 "type": "boolean"
               },
+              "inMemorySeamPresent": {
+                "type": "boolean"
+              },
               "inMemoryTokenPurged": {
                 "type": "boolean"
               }
@@ -218,7 +221,9 @@
         "accountCount",
         "oidcParamCount",
         "circumventionFlagsDetected",
-        "tlsValidationEnforced"
+        "tlsValidationEnforced",
+        "cleanWorktreeVerified",
+        "remoteContainmentVerified"
       ],
       "properties": {
         "redacted": {
@@ -264,6 +269,12 @@
           ]
         },
         "tlsValidationEnforced": {
+          "type": "boolean"
+        },
+        "cleanWorktreeVerified": {
+          "type": "boolean"
+        },
+        "remoteContainmentVerified": {
           "type": "boolean"
         }
       }

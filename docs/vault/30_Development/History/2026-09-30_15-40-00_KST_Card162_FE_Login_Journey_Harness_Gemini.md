@@ -216,14 +216,41 @@ Codex 계약·보안 축 2차 검토(09:40)에서 제기된 지적사항 5건(F1
 
 ---
 
-## 5. 최종 검증 결과 요약 (2026-10-01)
+## 5. Codex 4차 검토((1)~(3)) 조치 상세 (2026-10-01)
 
-- **로그인 여정 하네스 스위트**: `pytest tests/test_portal_login_journey_harness.py` -> **52 passed in 21.96s (100% PASS)**
+### 1) (1) [High] in-memory seam 부재 시 fail-closed 강제 및 inMemorySeamPresent 검증
+- **문제**: 하네스 브라우저 evaluate 스크립트에서 seam이 없을 때 `inMemoryTokenPresent=false`로 흘러 `inMemoryTokenPurged=true`가 산출되고, Python 측도 `storage_state.get("inMemoryTokenPurged", True)`로 기본 통과하여 seam 부재 변이가 생존하던 결함.
+- **조치**:
+  1. JS evaluate에서 `inMemoryTokenPurged = inMemorySeam && !window.__sv_has_auth_token()`로 엄격 계산하고, `inMemorySeamPresent: inMemorySeam`을 필수 반환.
+  2. Python 하네스에서 `storage_state.get("inMemorySeamPresent")` 부재/False 시 즉시 `RuntimeError`로 fail-closed 처리.
+  3. 스키마(`portal-login-journey-evidence.schema.json`)의 `observations`에 `inMemorySeamPresent: {"type": "boolean"}` 속성 추가.
+  4. `validate_evidence`에서 `acceptanceClaim=True` 시 `inMemorySeamPresent=True` 불변식 강제.
+  5. seam 누락 변이 사살 시험 2종(`test_live_browser_fails_when_in_memory_seam_missing`, `test_validate_evidence_requires_in_memory_seam_present`) 구축.
+
+### 2) (2) [High] CLI provenance 우회 옵션 제거 및 acceptanceClaim 결속
+- **문제**: `argparse.BooleanOptionalAction`으로 인해 CLI에 `--no-require-clean`, `--no-require-remote-containment` 우회 옵션이 노출되고, 해당 옵션 해제 시에도 acceptanceClaim=true가 가능했던 결함.
+- **조치**:
+  1. CLI `main()`의 `argparse`에서 `--require-clean`, `--require-remote-containment` 및 그 부정형 플래그 완전 제거.
+  2. `PROHIBITED_FLAGS`에 `--no-require-clean`, `--no-require-remote-containment`를 추가하여 CLI 및 observer로 전달되는 임의의 우회 플래그를 `SecurityCircumventionError`로 즉시 거부.
+  3. `execute_journey`에서 `require_clean` 또는 `require_remote_containment`가 비활성화된 경우 `acceptanceClaim = False`로 강제 결속.
+  4. 스키마 `audit`에 `cleanWorktreeVerified`, `remoteContainmentVerified` 속성을 필수로 정의하고, `validate_evidence`에서 `acceptanceClaim=True` 시 두 속성이 모두 `True`임을 검증.
+  5. 우회 시도 차단 및 증거 결속 시험 4종(`test_live_provenance_bypass_revokes_acceptance_claim`, `test_validate_evidence_requires_clean_and_remote_containment`, `test_cli_prohibits_provenance_bypass_flags`, `test_cli_parser_does_not_expose_bypass_flags`) 완비.
+
+### 3) (3) [Gate] History 문서 인용 정정 (Docs run 36801495874 해소)
+- **문제**: History 문서 내 `contracts/v1alpha1/core.schema.json#/definitions/SessionView` 인용에서 JSON pointer fragment(`#/definitions/SessionView`)가 파일 경로 검사기(`check_doc_path_citations.py`)에 의해 존재하지 않는 파일로 판정되어 Docs CI 실패.
+- **조치**: JSON pointer fragment를 제거하고 실재 정본 파일 경로인 `contracts/v1alpha1/core.schema.json` 및 본문 설명으로 정정하여 ratchet baseline 증가 없이 Docs green(21s) 확보.
+
+---
+
+## 6. 최종 검증 결과 요약 (2026-10-01)
+
+- **로그인 여정 하네스 스위트**: `pytest tests/test_portal_login_journey_harness.py` -> **58 passed in 22.33s (100% PASS)**
 - **웹 클라이언트 타입 검사**: `cd apps/web && npx tsc -b` -> **타입 에러 0건 (PASS)**
-- **웹 클라이언트 프로덕션 빌드**: `cd apps/web && npm run build` -> **Vite 프로덕션 번들 정상 생성 (PASS, 8.09s)**
+- **웹 클라이언트 프로덕션 빌드**: `cd apps/web && npm run build` -> **Vite 프로덕션 번들 정상 생성 (PASS, 7.78s)**
 - **라우트 커버리지 검증**: `pytest tests/test_route_coverage.py` -> **40 passed (100% PASS)**
-- **프런트엔드 무결성 점검**: `python tools/check_frontend_integrity.py` -> **9대 무결성 규칙 위반 0건 (PASS)**
-- **계약 바인딩 점검**: `python tools/check_contract_bindings.py` -> **55개 픽스처 전수 커버리지, 14개 리플레이 가드 PASS**
+- **프런트엔드 무결성 점검**: `python -X utf8 tools/check_frontend_integrity.py` -> **9대 무결성 규칙 위반 0건 (PASS)**
+- **계약 바인딩 점검**: `python -X utf8 tools/check_contract_bindings.py` -> **55개 픽스처 전수 커버리지, 14개 리플레이 가드 PASS**
 - **문서 무결성 점검**: `python tools/check_docs.py` -> **PASS: 1037 versioned documents**
+- **문서 경로 인용 검사**: `python tools/check_doc_path_citations.py --ratchet` -> **PASS: 290 broken citation(s), all in baseline, none stale**
 - **단일 출처 검사**: `python tools/check_doc_single_source.py --ratchet` -> **19 pairs PASS**
 - **Git diff whitespace**: `git diff --check` -> **0 warnings (PASS)**

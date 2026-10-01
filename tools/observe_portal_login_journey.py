@@ -62,6 +62,8 @@ PROHIBITED_FLAGS = [
     "--ignore-certificate-errors-spki-list",
     "--disable-web-security",
     "--allow-running-insecure-content",
+    "--no-require-clean",
+    "--no-require-remote-containment",
     "ignoreHTTPSErrors",
     "ignore_https_errors",
     "ignore-certificate",
@@ -690,18 +692,41 @@ class PortalLoginJourneyObserver:
         if require_remote_containment is None:
             require_remote_containment = not self.mock_mode
 
+        clean_worktree_verified = False
+        remote_containment_verified = False
+
         start_time = dt.datetime.now(dt.timezone.utc).isoformat()
         code_sha = get_git_sha(
             require_clean=require_clean,
             require_remote_containment=require_remote_containment,
         )
+        if require_clean:
+            clean_worktree_verified = True
+        if require_remote_containment:
+            remote_containment_verified = True
 
         if self.mock_mode:
-            return self._execute_mock_mode(start_time, code_sha)
+            return self._execute_mock_mode(
+                start_time,
+                code_sha,
+                clean_worktree_verified=clean_worktree_verified,
+                remote_containment_verified=remote_containment_verified,
+            )
         else:
-            return self._execute_live_browser(start_time, code_sha)
+            return self._execute_live_browser(
+                start_time,
+                code_sha,
+                clean_worktree_verified=clean_worktree_verified,
+                remote_containment_verified=remote_containment_verified,
+            )
 
-    def _execute_mock_mode(self, start_time: str, code_sha: str) -> Dict[str, Any]:
+    def _execute_mock_mode(
+        self,
+        start_time: str,
+        code_sha: str,
+        clean_worktree_verified: bool = False,
+        remote_containment_verified: bool = False,
+    ) -> Dict[str, Any]:
         steps: List[StepResult] = []
 
         # Step 1: Reachability
@@ -786,6 +811,7 @@ class PortalLoginJourneyObserver:
                     "loginScreenRestored": True,
                     "transactionCleared": True,
                     "storagePurged": True,
+                    "inMemorySeamPresent": True,
                     "inMemoryTokenPurged": True,
                 },
             )
@@ -802,9 +828,17 @@ class PortalLoginJourneyObserver:
             ca_digest=None,
             steps=steps,
             tls_validation_enforced=False,
+            clean_worktree_verified=clean_worktree_verified,
+            remote_containment_verified=remote_containment_verified,
         )
 
-    def _execute_live_browser(self, start_time: str, code_sha: str) -> Dict[str, Any]:
+    def _execute_live_browser(
+        self,
+        start_time: str,
+        code_sha: str,
+        clean_worktree_verified: bool = True,
+        remote_containment_verified: bool = True,
+    ) -> Dict[str, Any]:
         from playwright.sync_api import sync_playwright
 
         steps: List[StepResult] = []
@@ -1357,13 +1391,13 @@ class PortalLoginJourneyObserver:
 
                         // Check in-memory token state seam if present
                         const inMemorySeam = typeof window.__sv_has_auth_token === 'function';
-                        const inMemoryTokenPresent = inMemorySeam ? window.__sv_has_auth_token() : false;
+                        const inMemoryTokenPurged = inMemorySeam && !window.__sv_has_auth_token();
 
                         return {
                             txCleared: tx === null,
                             storagePurged: noAuthInStorage,
                             inMemorySeamPresent: inMemorySeam,
-                            inMemoryTokenPurged: !inMemoryTokenPresent
+                            inMemoryTokenPurged: inMemoryTokenPurged
                         };
                     }""")
 
@@ -1371,7 +1405,9 @@ class PortalLoginJourneyObserver:
                         raise RuntimeError("OAuth transaction was not purged from sessionStorage upon logout")
                     if not storage_state.get("storagePurged"):
                         raise RuntimeError("Residual auth tokens or credentials detected in browser storage after logout")
-                    if not storage_state.get("inMemoryTokenPurged", True):
+                    if not storage_state.get("inMemorySeamPresent"):
+                        raise RuntimeError("In-memory auth token inspection seam (__sv_has_auth_token) is missing or unobservable in browser context")
+                    if not storage_state.get("inMemoryTokenPurged"):
                         raise RuntimeError("In-memory access token was not cleared after logout")
 
                     steps.append(
@@ -1385,6 +1421,7 @@ class PortalLoginJourneyObserver:
                                 "loginScreenRestored": True,
                                 "transactionCleared": True,
                                 "storagePurged": True,
+                                "inMemorySeamPresent": True,
                                 "inMemoryTokenPurged": True,
                             },
                         )
@@ -1410,6 +1447,8 @@ class PortalLoginJourneyObserver:
                         ca_digest=ca_digest,
                         steps=steps,
                         tls_validation_enforced=tls_validation_enforced,
+                        clean_worktree_verified=clean_worktree_verified,
+                        remote_containment_verified=remote_containment_verified,
                     )
 
             finally:
@@ -1422,6 +1461,8 @@ class PortalLoginJourneyObserver:
             and tls_validation_enforced is True
             and ca_digest is not None
             and ca_digest.get("fingerprintVerified") is True
+            and clean_worktree_verified is True
+            and remote_containment_verified is True
         )
 
         return self._build_evidence(
@@ -1435,6 +1476,8 @@ class PortalLoginJourneyObserver:
             ca_digest=ca_digest,
             steps=steps,
             tls_validation_enforced=tls_validation_enforced,
+            clean_worktree_verified=clean_worktree_verified,
+            remote_containment_verified=remote_containment_verified,
         )
 
     def _build_evidence(
@@ -1449,6 +1492,8 @@ class PortalLoginJourneyObserver:
         ca_digest: Optional[Dict[str, Any]],
         steps: List[StepResult],
         tls_validation_enforced: bool,
+        clean_worktree_verified: bool = False,
+        remote_containment_verified: bool = False,
     ) -> Dict[str, Any]:
         raw_steps = [s.to_dict() for s in steps]
 
@@ -1477,6 +1522,8 @@ class PortalLoginJourneyObserver:
                 "oidcParamCount": 0,
                 "circumventionFlagsDetected": False,
                 "tlsValidationEnforced": tls_validation_enforced,
+                "cleanWorktreeVerified": clean_worktree_verified,
+                "remoteContainmentVerified": remote_containment_verified,
             },
         }
 
@@ -1558,6 +1605,14 @@ def validate_evidence(evidence: Dict[str, Any]) -> None:
             raise jsonschema.ValidationError(
                 "Contradiction: acceptanceClaim requires audit.tlsValidationEnforced == True"
             )
+        if evidence.get("audit", {}).get("cleanWorktreeVerified") is not True:
+            raise jsonschema.ValidationError(
+                "Contradiction: acceptanceClaim requires audit.cleanWorktreeVerified == True"
+            )
+        if evidence.get("audit", {}).get("remoteContainmentVerified") is not True:
+            raise jsonschema.ValidationError(
+                "Contradiction: acceptanceClaim requires audit.remoteContainmentVerified == True"
+            )
         ca_d = evidence.get("caDigest")
         if not ca_d or not ca_d.get("fingerprintVerified"):
             raise jsonschema.ValidationError(
@@ -1582,10 +1637,11 @@ def validate_evidence(evidence: Dict[str, Any]) -> None:
             not s5
             or not s5.get("observations", {}).get("transactionCleared")
             or not s5.get("observations", {}).get("storagePurged")
+            or not s5.get("observations", {}).get("inMemorySeamPresent")
             or not s5.get("observations", {}).get("inMemoryTokenPurged")
         ):
             raise jsonschema.ValidationError(
-                "Contradiction: acceptanceClaim requires verified transactionCleared=true, storagePurged=true, and inMemoryTokenPurged=true in logout"
+                "Contradiction: acceptanceClaim requires verified transactionCleared=true, storagePurged=true, inMemorySeamPresent=true, and inMemoryTokenPurged=true in logout"
             )
 
     # 4. Semantic invariant: TLS validation enforced implies caDigest verified
@@ -1611,18 +1667,6 @@ def main() -> int:
     parser.add_argument("--output-evidence", default=None, help="Output evidence JSON path")
     parser.add_argument("--mock-mode", action="store_true", help="Run in mock/simulation mode for local validation")
     parser.add_argument("--timeout", type=float, default=10.0, help="Per-step timeout in seconds")
-    parser.add_argument(
-        "--require-clean",
-        action=argparse.BooleanOptionalAction,
-        default=None,
-        help="Require clean git worktree (default: True for live, False for mock)",
-    )
-    parser.add_argument(
-        "--require-remote-containment",
-        action=argparse.BooleanOptionalAction,
-        default=None,
-        help="Require HEAD commit contained in remote tracking branch (default: True for live, False for mock)",
-    )
 
     args, unknown = parser.parse_known_args()
 
@@ -1647,10 +1691,7 @@ def main() -> int:
         print(f"[CONFIGURATION ERROR] {e}", file=sys.stderr)
         return 2
 
-    evidence = observer.execute_journey(
-        require_clean=args.require_clean,
-        require_remote_containment=args.require_remote_containment,
-    )
+    evidence = observer.execute_journey()
 
     try:
         validate_evidence(evidence)

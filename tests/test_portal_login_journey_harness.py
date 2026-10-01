@@ -783,6 +783,7 @@ def test_live_browser_all_5_steps_success_sets_acceptance_claim(monkeypatch, tmp
             pass
 
     monkeypatch.setattr("playwright.sync_api.sync_playwright", lambda: FakePlaywright())
+    monkeypatch.setattr("tools.observe_portal_login_journey.get_git_sha", lambda **kwargs: "a" * 40)
 
     observer = PortalLoginJourneyObserver(
         target_url="https://portal.sv.lan",
@@ -790,17 +791,21 @@ def test_live_browser_all_5_steps_success_sets_acceptance_claim(monkeypatch, tmp
         allowed_root_fingerprints=[ca_fp],
         mock_mode=False,
     )
-    evidence = observer.execute_journey(require_clean=False, require_remote_containment=False)
+    evidence = observer.execute_journey(require_clean=True, require_remote_containment=True)
 
     assert evidence["overallStatus"] == "PASS"
     assert evidence["measurementKind"] == "LIVE_BROWSER"
     assert evidence["referenceOnly"] is False
     assert evidence["acceptanceClaim"] is True
     assert evidence["audit"]["tlsValidationEnforced"] is True
+    assert evidence["audit"]["cleanWorktreeVerified"] is True
+    assert evidence["audit"]["remoteContainmentVerified"] is True
     assert evidence["caDigest"]["fingerprintVerified"] is True
     assert len(evidence["steps"]) == 5
     for s in evidence["steps"]:
         assert s["status"] == "PASS"
+    assert evidence["steps"][4]["observations"]["inMemorySeamPresent"] is True
+    assert evidence["steps"][4]["observations"]["inMemoryTokenPurged"] is True
 
     validate_evidence(evidence)
 
@@ -1514,19 +1519,289 @@ def test_validate_evidence_requires_in_memory_token_purged():
     evidence["acceptanceClaim"] = True
     evidence["measurementKind"] = "LIVE_BROWSER"
     evidence["audit"]["tlsValidationEnforced"] = True
+    evidence["audit"]["cleanWorktreeVerified"] = True
+    evidence["audit"]["remoteContainmentVerified"] = True
     evidence["caDigest"] = {
         "caBundleSha256": "a" * 64,
         "rootFingerprint": "b" * 64,
         "fingerprintVerified": True,
     }
-    # Step 5 without inMemoryTokenPurged
+    # Step 5 with seam present but token not purged
     evidence["steps"][4]["observations"] = {
         "loginScreenRestored": True,
         "transactionCleared": True,
         "storagePurged": True,
+        "inMemorySeamPresent": True,
         "inMemoryTokenPurged": False,
     }
 
     with pytest.raises(jsonschema.ValidationError) as exc:
         validate_evidence(evidence)
     assert "inMemoryTokenPurged=true in logout" in str(exc.value)
+
+
+def test_live_browser_fails_when_in_memory_seam_missing(monkeypatch, tmp_path):
+    """N4: If __sv_has_auth_token inspection seam is missing in browser context, logout fails fail-closed."""
+    from unittest.mock import MagicMock
+
+    _, _, ca_pem, ca_fp = _generate_test_ca("SaintVision Intranet Root CA")
+    ca_bundle = tmp_path / "ca_bundle.pem"
+    ca_bundle.write_bytes(ca_pem)
+
+    monkeypatch.setattr("tools.observe_portal_login_journey.check_domain_resolution", lambda h: (True, None))
+    monkeypatch.setattr("tools.observe_portal_login_journey.check_tcp_connection", lambda h, p, timeout_sec=2.0: (True, None))
+    monkeypatch.setattr("tools.observe_portal_login_journey.verify_tls_socket_handshake", lambda h, p, c, timeout_sec=2.0: (True, None))
+
+    class FakePage:
+        url = "https://portal.sv.lan/studio"
+        def __init__(self):
+            self._callbacks = []
+        def on(self, event, handler):
+            if event == "response":
+                self._callbacks.append(handler)
+        def goto(self, url, timeout=10000, wait_until="domcontentloaded"):
+            return MagicMock(status=200)
+        def locator(self, selector):
+            loc = MagicMock()
+            loc.first = loc
+            loc.wait_for.return_value = None
+            loc.click.return_value = None
+            loc.is_visible.return_value = False
+            return loc
+        def wait_for_url(self, pred, timeout=10000):
+            for cb in self._callbacks:
+                cb(MagicMock(url="https://idp.sv.lan/protocol/openid-connect/token", status=200))
+                session_resp = MagicMock(url="https://portal.sv.lan/v1/session", status=200)
+                session_resp.json.return_value = {
+                    "subjectId": "oidc:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                    "tenantId": "c9a0b1c2-d3e4-4f5a-8b9c-0d1e2f3a4b5c",
+                    "expiresAt": int(time.time()) + 7200,
+                }
+                cb(session_resp)
+            return None
+        def wait_for_timeout(self, ms):
+            pass
+        def evaluate(self, script):
+            # Simulates missing __sv_has_auth_token seam (inMemorySeamPresent = False)
+            return {
+                "txCleared": True,
+                "storagePurged": True,
+                "inMemorySeamPresent": False,
+                "inMemoryTokenPurged": False,
+            }
+
+    class FakeContext:
+        def new_page(self):
+            return FakePage()
+        def close(self):
+            pass
+
+    class FakeBrowser:
+        def new_context(self, **kwargs):
+            return FakeContext()
+        def close(self):
+            pass
+
+    class FakePlaywright:
+        @property
+        def chromium(self):
+            m = MagicMock()
+            m.launch.return_value = FakeBrowser()
+            return m
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            pass
+
+    monkeypatch.setattr("playwright.sync_api.sync_playwright", lambda: FakePlaywright())
+
+    observer = PortalLoginJourneyObserver(
+        target_url="https://portal.sv.lan",
+        ca_bundle=str(ca_bundle),
+        allowed_root_fingerprints=[ca_fp],
+        mock_mode=False,
+    )
+    evidence = observer.execute_journey(require_clean=False, require_remote_containment=False)
+
+    assert evidence["overallStatus"] == "FAIL"
+    assert evidence["steps"][4]["id"] == "logout"
+    assert evidence["steps"][4]["status"] == "FAIL"
+    assert "In-memory auth token inspection seam (__sv_has_auth_token) is missing or unobservable in browser context" in evidence["steps"][4]["detail"]
+    assert evidence["acceptanceClaim"] is False
+
+
+def test_validate_evidence_requires_in_memory_seam_present():
+    """N4: Evidence with acceptanceClaim=True without inMemorySeamPresent=True is rejected."""
+    observer = PortalLoginJourneyObserver(mock_mode=True)
+    evidence = observer.execute_journey()
+
+    evidence["referenceOnly"] = False
+    evidence["acceptanceClaim"] = True
+    evidence["measurementKind"] = "LIVE_BROWSER"
+    evidence["audit"]["tlsValidationEnforced"] = True
+    evidence["audit"]["cleanWorktreeVerified"] = True
+    evidence["audit"]["remoteContainmentVerified"] = True
+    evidence["caDigest"] = {
+        "caBundleSha256": "a" * 64,
+        "rootFingerprint": "b" * 64,
+        "fingerprintVerified": True,
+    }
+    # Step 5 with inMemorySeamPresent = False
+    evidence["steps"][4]["observations"] = {
+        "loginScreenRestored": True,
+        "transactionCleared": True,
+        "storagePurged": True,
+        "inMemorySeamPresent": False,
+        "inMemoryTokenPurged": True,
+    }
+
+    with pytest.raises(jsonschema.ValidationError) as exc:
+        validate_evidence(evidence)
+    assert "inMemorySeamPresent=true" in str(exc.value)
+
+
+def test_live_provenance_bypass_revokes_acceptance_claim(monkeypatch, tmp_path):
+    """N3: Bypassing clean worktree or remote containment revokes acceptanceClaim."""
+    from unittest.mock import MagicMock
+
+    _, _, ca_pem, ca_fp = _generate_test_ca("SaintVision Intranet Root CA")
+    ca_bundle = tmp_path / "ca_bundle.pem"
+    ca_bundle.write_bytes(ca_pem)
+
+    monkeypatch.setattr("tools.observe_portal_login_journey.check_domain_resolution", lambda h: (True, None))
+    monkeypatch.setattr("tools.observe_portal_login_journey.check_tcp_connection", lambda h, p, timeout_sec=2.0: (True, None))
+    monkeypatch.setattr("tools.observe_portal_login_journey.verify_tls_socket_handshake", lambda h, p, c, timeout_sec=2.0: (True, None))
+    monkeypatch.setattr("tools.observe_portal_login_journey.get_git_sha", lambda **kwargs: "b" * 40)
+
+    class FakePage:
+        url = "https://portal.sv.lan/studio"
+        def __init__(self):
+            self._callbacks = []
+        def on(self, event, handler):
+            if event == "response":
+                self._callbacks.append(handler)
+        def goto(self, url, timeout=10000, wait_until="domcontentloaded"):
+            return MagicMock(status=200)
+        def locator(self, selector):
+            loc = MagicMock()
+            loc.first = loc
+            loc.wait_for.return_value = None
+            loc.click.return_value = None
+            loc.is_visible.return_value = False
+            return loc
+        def wait_for_url(self, pred, timeout=10000):
+            for cb in self._callbacks:
+                cb(MagicMock(url="https://idp.sv.lan/protocol/openid-connect/token", status=200))
+                session_resp = MagicMock(url="https://portal.sv.lan/v1/session", status=200)
+                session_resp.json.return_value = {
+                    "subjectId": "oidc:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                    "tenantId": "c9a0b1c2-d3e4-4f5a-8b9c-0d1e2f3a4b5c",
+                    "expiresAt": int(time.time()) + 7200,
+                }
+                cb(session_resp)
+            return None
+        def wait_for_timeout(self, ms):
+            pass
+        def evaluate(self, script):
+            return {
+                "txCleared": True,
+                "storagePurged": True,
+                "inMemorySeamPresent": True,
+                "inMemoryTokenPurged": True,
+            }
+
+    class FakeContext:
+        def new_page(self):
+            return FakePage()
+        def close(self):
+            pass
+
+    class FakeBrowser:
+        def new_context(self, **kwargs):
+            return FakeContext()
+        def close(self):
+            pass
+
+    class FakePlaywright:
+        @property
+        def chromium(self):
+            m = MagicMock()
+            m.launch.return_value = FakeBrowser()
+            return m
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            pass
+
+    monkeypatch.setattr("playwright.sync_api.sync_playwright", lambda: FakePlaywright())
+
+    observer = PortalLoginJourneyObserver(
+        target_url="https://portal.sv.lan",
+        ca_bundle=str(ca_bundle),
+        allowed_root_fingerprints=[ca_fp],
+        mock_mode=False,
+    )
+
+    # 1. require_clean=False -> acceptanceClaim is False, cleanWorktreeVerified is False
+    ev_unclean = observer.execute_journey(require_clean=False, require_remote_containment=True)
+    assert ev_unclean["overallStatus"] == "PASS"
+    assert ev_unclean["acceptanceClaim"] is False
+    assert ev_unclean["audit"]["cleanWorktreeVerified"] is False
+    assert ev_unclean["audit"]["remoteContainmentVerified"] is True
+
+    # 2. require_remote_containment=False -> acceptanceClaim is False, remoteContainmentVerified is False
+    ev_uncontained = observer.execute_journey(require_clean=True, require_remote_containment=False)
+    assert ev_uncontained["overallStatus"] == "PASS"
+    assert ev_uncontained["acceptanceClaim"] is False
+    assert ev_uncontained["audit"]["cleanWorktreeVerified"] is True
+    assert ev_uncontained["audit"]["remoteContainmentVerified"] is False
+
+
+def test_validate_evidence_requires_clean_and_remote_containment():
+    """N3: validate_evidence rejects acceptanceClaim=True if cleanWorktreeVerified or remoteContainmentVerified is False."""
+    observer = PortalLoginJourneyObserver(mock_mode=True)
+    evidence = observer.execute_journey()
+
+    evidence["referenceOnly"] = False
+    evidence["acceptanceClaim"] = True
+    evidence["measurementKind"] = "LIVE_BROWSER"
+    evidence["audit"]["tlsValidationEnforced"] = True
+    evidence["audit"]["cleanWorktreeVerified"] = False
+    evidence["audit"]["remoteContainmentVerified"] = True
+    evidence["caDigest"] = {
+        "caBundleSha256": "a" * 64,
+        "rootFingerprint": "b" * 64,
+        "fingerprintVerified": True,
+    }
+
+    with pytest.raises(jsonschema.ValidationError) as exc:
+        validate_evidence(evidence)
+    assert "audit.cleanWorktreeVerified == True" in str(exc.value)
+
+    evidence["audit"]["cleanWorktreeVerified"] = True
+    evidence["audit"]["remoteContainmentVerified"] = False
+    with pytest.raises(jsonschema.ValidationError) as exc:
+        validate_evidence(evidence)
+    assert "audit.remoteContainmentVerified == True" in str(exc.value)
+
+
+def test_cli_prohibits_provenance_bypass_flags():
+    """N3: Prohibits --no-require-clean and --no-require-remote-containment in arguments."""
+    with pytest.raises(SecurityCircumventionError) as exc:
+        check_circumvention_flags(["--no-require-clean"])
+    assert "detected prohibited flag '--no-require-clean'" in str(exc.value)
+
+    with pytest.raises(SecurityCircumventionError) as exc:
+        check_circumvention_flags(["--no-require-remote-containment"])
+    assert "detected prohibited flag '--no-require-remote-containment'" in str(exc.value)
+
+
+def test_cli_parser_does_not_expose_bypass_flags():
+    """N3: CLI argument parser does not expose bypass options."""
+    import subprocess
+    cmd = [sys.executable, str(REPO_ROOT / "tools/observe_portal_login_journey.py"), "--help"]
+    res = subprocess.run(cmd, capture_output=True, text=True, check=True)
+    assert "--no-require-clean" not in res.stdout
+    assert "--no-require-remote-containment" not in res.stdout
+    assert "--require-clean" not in res.stdout
+    assert "--require-remote-containment" not in res.stdout
