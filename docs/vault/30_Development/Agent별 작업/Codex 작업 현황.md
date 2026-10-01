@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.256"
+version: "1.0.257"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T23:43:41+09:00"
+updated: "2026-10-01T23:47:13+09:00"
 source_of_truth: "Git"
 active_card: "CARD-194 S12 acceptance target/Evidence canonical resolver implementation"
 active_card_status: "0058 digest/binding, exact resolver and discovery implemented on #286 0057; hosted real-PG and Claude review pending"
@@ -13,7 +13,8 @@ active_card_next: "Push stacked PR against #286, run exact-head Core, then addre
 
 ## 2026-10-01 Card 194 — S12 acceptance target·Evidence resolver 구현
 
-- coordinator 정정에 따라 #286 head `faba659d`를 merge commit `e19aff84`로 적층했고,
+- coordinator 정정에 따라 #286 head `faba659d`를 merge commit `e19aff84`로 적층한 뒤, 최신
+  #286 head `795db3c2`도 merge commit `fe066c06`으로 따라갔고,
   `0058_release_acceptance_resolver`의 부모를 반드시 `0057_release_acceptance_quorum`으로 고정했다.
   `tools/migration_graph.py --head`는 단일 head `0058_release_acceptance_resolver`를 보고한다.
 - Evidence 전체 stored field의 PostgreSQL 16 canonical digest, caller digest overwrite, release별 target registry pin,

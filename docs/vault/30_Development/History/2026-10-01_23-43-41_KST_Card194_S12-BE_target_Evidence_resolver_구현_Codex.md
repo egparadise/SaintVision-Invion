@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD194-S12-ACCEPTANCE-RESOLVER-20261001"
 title: "Card 194 S12-BE target·Evidence resolver 구현"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T23:43:41+09:00"
+updated: "2026-10-01T23:47:13+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["History", "S12-BE", "acceptance", "evidence", "resolver", "migration-0058"]
@@ -19,6 +19,8 @@ tags: ["History", "S12-BE", "acceptance", "evidence", "resolver", "migration-005
   `faba659d`를 merge commit `e19aff84`로 먼저 적층했다. 0057도 0056의 자식이므로 0058을 0056에
   직접 연결하면 두 head가 생긴다. `0058_release_acceptance_resolver`의 `down_revision`은
   `0057_release_acceptance_quorum`이다.
+- 구현 commit `2a77130b` 뒤 #286이 `795db3c2`로 이동해 이를 merge commit `fe066c06`으로 다시
+  따라갔다. 후속 delta는 0057 downgrade 순서 교정 한 파일이며 0058 head와 구현 파일에는 충돌이 없다.
 - 원래 구현 owner는 Claude였지만 카드 187 P0 대응과 DB trigger·digest·RLS 경계 분리를 위해 coordinator가
   설계 owner Codex에게 구현을 교차 배정했다. reviewer는 Claude다.
 
