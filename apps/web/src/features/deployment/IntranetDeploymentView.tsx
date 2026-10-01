@@ -45,6 +45,8 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
     () => initialDetail ?? null
   );
   const [isLoadingServerManifests, setIsLoadingServerManifests] = useState<boolean>(false);
+  const [isLoadingDetail, setIsLoadingDetail] = useState<boolean>(false);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [serverManifestError, setServerManifestError] = useState<{
     status: number;
     code?: string;
@@ -55,7 +57,7 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
   );
 
   useEffect(() => {
-    const shouldFetch = autoFetch ?? (typeof process !== 'undefined' && process.env?.NODE_ENV === 'test' ? false : true);
+    const shouldFetch = autoFetch ?? true;
     if (!shouldFetch) return;
 
     let isMounted = true;
@@ -69,11 +71,13 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
         if (!isMounted) return;
         const items = page.items || [];
         setServerManifests(items);
+        setNextCursor(page.nextCursor ?? null);
         setHasFetchedServerReleases(true);
 
         if (items.length > 0) {
           const firstId = items[0].releaseId;
           setSelectedReleaseId(firstId);
+          setIsLoadingDetail(true);
           try {
             const detail = await fetchReleaseManifestDetail(firstId, controller.signal);
             if (!isMounted) return;
@@ -81,11 +85,17 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
           } catch (detailErr: any) {
             if (!isMounted) return;
             const prob = detailErr?.problem;
+            const status = prob?.status || detailErr.status || 0;
             setServerManifestError({
-              status: prob?.status || detailErr.status || 500,
-              code: prob?.code || 'FETCH_DETAIL_ERROR',
+              status,
+              code: prob?.code || (status === 404 ? 'RES-RELEASE-NOT-FOUND' : 'FETCH_DETAIL_ERROR'),
               message: prob?.detail || detailErr.message || '릴리스 상세 조회 실패',
             });
+            setServerManifestDetail(null);
+          } finally {
+            if (isMounted) {
+              setIsLoadingDetail(false);
+            }
           }
         } else {
           setSelectedReleaseId(null);
@@ -96,7 +106,7 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
         if (err.name === 'AbortError') return;
         setHasFetchedServerReleases(true);
         const prob = err?.problem;
-        const status = prob?.status || err.status || 500;
+        const status = prob?.status || err.status || 0;
         setServerManifestError({
           status,
           code: prob?.code || (status === 403 ? 'AUTH-FORBIDDEN' : status === 404 ? 'RES-NOT-FOUND' : 'NET-ERROR'),
@@ -121,22 +131,22 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
 
   const handleSelectServerRelease = async (releaseId: string) => {
     setSelectedReleaseId(releaseId);
-    setIsLoadingServerManifests(true);
+    setIsLoadingDetail(true);
     setServerManifestError(null);
     try {
       const detail = await fetchReleaseManifestDetail(releaseId);
       setServerManifestDetail(detail);
     } catch (err: any) {
       const prob = err?.problem;
-      const status = prob?.status || err.status || 500;
+      const status = prob?.status || err.status || 0;
       setServerManifestError({
         status,
-        code: prob?.code || (status === 403 ? 'AUTH-FORBIDDEN' : status === 404 ? 'RES-NOT-FOUND' : 'NET-ERROR'),
+        code: prob?.code || (status === 403 ? 'AUTH-FORBIDDEN' : status === 404 ? 'RES-RELEASE-NOT-FOUND' : 'NET-ERROR'),
         message: prob?.detail || err.message || '릴리스 상세 조회 실패',
       });
       setServerManifestDetail(null);
     } finally {
-      setIsLoadingServerManifests(false);
+      setIsLoadingDetail(false);
     }
   };
 
@@ -296,7 +306,7 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
         </div>
 
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
-          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>운영자 최종 인수 서명 (Sign-Off)</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>[로컬 모의] 운영자 인수 서명 (Sign-Off)</div>
           <div
             style={{
               fontSize: '24px',
@@ -308,7 +318,9 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
             {localSimulationCompleted ? '모의 서명 완료 ✔' : 'SIGN-OFF 대기 (백엔드 미연결)'}
           </div>
           <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
-            {localSimulationCompleted ? `모의 서명자: ${signedOperatorId || currentUser?.id || '미확인'}` : '운영자 확인 대기 중'}
+            {localSimulationCompleted
+              ? `모의 서명자: ${signedOperatorId || currentUser?.id || '미확인'} (실서버 서명은 3-A 섹션 관측)`
+              : '운영자 확인 대기 중 [로컬 시뮬레이션 전용 — 실서버 연동은 3-A]'}
           </div>
         </div>
       </div>
@@ -743,7 +755,7 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
           </div>
         </div>
 
-        {/* Loading State */}
+        {/* Loading State for List */}
         {isLoadingServerManifests && (
           <div
             data-testid="deployment-manifest-loading"
@@ -751,51 +763,16 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
             aria-live="polite"
             style={{ padding: '16px', textAlign: 'center', color: '#8b949e', fontSize: '13px' }}
           >
-            ⏳ 서버 릴리스 선언서 및 수락 기록 동기화 중...
+            ⏳ 서버 릴리스 선언서 목록 동기화 중...
           </div>
         )}
 
-        {/* Error States (403, 404, or Network/Server Error) */}
-        {!isLoadingServerManifests && serverManifestError && (
-          <div
-            data-testid={
-              serverManifestError.status === 403
-                ? 'deployment-manifest-error-403'
-                : serverManifestError.status === 404
-                ? 'deployment-manifest-error-404'
-                : 'deployment-manifest-error'
-            }
-            role="alert"
-            aria-live="assertive"
-            style={{
-              padding: '12px 16px',
-              backgroundColor: 'rgba(248, 81, 73, 0.15)',
-              border: '1px solid #f85149',
-              borderRadius: '6px',
-              color: '#f85149',
-              fontSize: '13px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '4px',
-            }}
-          >
-            <div style={{ fontWeight: 600 }}>
-              🛑 {serverManifestError.status === 403
-                ? '403 Forbidden: 접근 권한 없음'
-                : serverManifestError.status === 404
-                ? '404 Not Found: 릴리스 선언서 부재'
-                : `오류 (${serverManifestError.status})`}
-            </div>
-            <div style={{ fontSize: '12px', opacity: 0.9 }}>
-              {serverManifestError.message} (에러 코드: {serverManifestError.code || 'UNKNOWN'})
-            </div>
-          </div>
-        )}
-
-        {/* Empty State: Zero fabricated defaults */}
+        {/* Empty State: Zero fabricated defaults (F10: role="status" aria-live="polite") */}
         {!isLoadingServerManifests && !serverManifestError && hasFetchedServerReleases && serverManifests.length === 0 && (
           <div
             data-testid="deployment-manifest-empty-state"
+            role="status"
+            aria-live="polite"
             style={{
               padding: '24px',
               backgroundColor: '#0d1117',
@@ -819,9 +796,9 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
           </div>
         )}
 
-        {/* Loaded Release Manifest Observation View */}
-        {!isLoadingServerManifests && !serverManifestError && serverManifestDetail && (
-          <div data-testid="deployment-server-manifest-detail" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        {/* When items exist, render Selector and Detail/Error Area (F7: selector preserved on detail error) */}
+        {!isLoadingServerManifests && serverManifests.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {serverManifests.length > 1 && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <label htmlFor="deployment-release-selector" style={{ fontSize: '12px', color: '#8b949e' }}>
@@ -849,6 +826,68 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
                 </select>
               </div>
             )}
+
+            {/* Next cursor indicator if present (F8) */}
+            {nextCursor && (
+              <div data-testid="deployment-manifest-next-cursor" style={{ fontSize: '11px', color: '#8b949e' }}>
+                다음 페이지 커서: <code>{nextCursor}</code>
+              </div>
+            )}
+
+            {/* Detail Loading State */}
+            {isLoadingDetail && (
+              <div
+                data-testid="deployment-manifest-detail-loading"
+                role="status"
+                aria-live="polite"
+                style={{ padding: '16px', textAlign: 'center', color: '#8b949e', fontSize: '13px' }}
+              >
+                ⏳ 릴리스 상세 정보 조회 중...
+              </div>
+            )}
+
+            {/* Detail Error State (F6: no fabricated 500 on network failure) */}
+            {!isLoadingDetail && serverManifestError && (
+              <div
+                data-testid={
+                  serverManifestError.status === 403
+                    ? 'deployment-manifest-error-403'
+                    : serverManifestError.status === 404
+                    ? 'deployment-manifest-error-404'
+                    : 'deployment-manifest-error'
+                }
+                role="alert"
+                aria-live="assertive"
+                style={{
+                  padding: '12px 16px',
+                  backgroundColor: 'rgba(248, 81, 73, 0.15)',
+                  border: '1px solid #f85149',
+                  borderRadius: '6px',
+                  color: '#f85149',
+                  fontSize: '13px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px',
+                }}
+              >
+                <div style={{ fontWeight: 600 }}>
+                  🛑 {serverManifestError.status === 403
+                    ? '403 Forbidden: 접근 권한 없음'
+                    : serverManifestError.status === 404
+                    ? '404 Not Found: 릴리스 선언서 부재'
+                    : serverManifestError.status
+                    ? `HTTP 오류 (${serverManifestError.status})`
+                    : '네트워크 통신 오류'}
+                </div>
+                <div style={{ fontSize: '12px', opacity: 0.9 }}>
+                  {serverManifestError.message} (에러 코드: {serverManifestError.code || 'UNKNOWN'})
+                </div>
+              </div>
+            )}
+
+            {/* Loaded Release Manifest Observation View */}
+            {!isLoadingDetail && !serverManifestError && serverManifestDetail && (
+              <div data-testid="deployment-server-manifest-detail" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
 
             <div
               style={{
@@ -1061,6 +1100,47 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
               }}
             >
               ℹ️ <strong>수락 및 서명 쓰기 경계</strong>: 릴리스 수락 등록은 테넌트 전역 보안 경계 작업으로, 인증된 사람의 서명 증거 및 감사 계약 수립 후 제공됩니다 (본 화면은 읽기 전용 관측 표출 전용이며 임의 쓰기 서명 UI는 엄격히 금지됩니다).
+            </div>
+            </div>
+          )}
+          </div>
+        )}
+
+        {/* Error when list fetch failed (items: 0) */}
+        {!isLoadingServerManifests && serverManifests.length === 0 && serverManifestError && (
+          <div
+            data-testid={
+              serverManifestError.status === 403
+                ? 'deployment-manifest-error-403'
+                : serverManifestError.status === 404
+                ? 'deployment-manifest-error-404'
+                : 'deployment-manifest-error'
+            }
+            role="alert"
+            aria-live="assertive"
+            style={{
+              padding: '12px 16px',
+              backgroundColor: 'rgba(248, 81, 73, 0.15)',
+              border: '1px solid #f85149',
+              borderRadius: '6px',
+              color: '#f85149',
+              fontSize: '13px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '4px',
+            }}
+          >
+            <div style={{ fontWeight: 600 }}>
+              🛑 {serverManifestError.status === 403
+                ? '403 Forbidden: 접근 권한 없음'
+                : serverManifestError.status === 404
+                ? '404 Not Found: 릴리스 선언서 부재'
+                : serverManifestError.status
+                ? `HTTP 오류 (${serverManifestError.status})`
+                : '네트워크 통신 오류'}
+            </div>
+            <div style={{ fontSize: '12px', opacity: 0.9 }}>
+              {serverManifestError.message} (에러 코드: {serverManifestError.code || 'UNKNOWN'})
             </div>
           </div>
         )}

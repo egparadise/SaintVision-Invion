@@ -17,27 +17,171 @@ export interface FetchReleaseManifestsOptions {
   signal?: AbortSignal;
 }
 
+const ALLOWED_COMPONENT_KEYS = new Set(['name', 'kind', 'digest']);
+const ALLOWED_MANIFEST_KEYS = new Set([
+  'releaseId',
+  'version',
+  'componentCount',
+  'manifestSha256',
+  'createdAt',
+  'operatorSignOff',
+  'acceptanceCount',
+  'components',
+]);
+const ALLOWED_ACCEPTANCE_KEYS = new Set([
+  'acceptanceId',
+  'acceptanceIdRef',
+  'outcome',
+  'acceptedManifestSha256',
+  'manifestMatches',
+  'decidedAt',
+  'knownLimitations',
+]);
+const ALLOWED_PAGE_KEYS = new Set(['items', 'nextCursor']);
+const ALLOWED_DETAIL_KEYS = new Set(['release', 'acceptances']);
+
+const VALID_OUTCOMES = new Set(['accepted', 'conditional', 'rejected']);
+
+function hasOnlyAllowedKeys(obj: Record<string, unknown>, allowed: Set<string>): boolean {
+  return Object.keys(obj).every((key) => allowed.has(key));
+}
+
+function isValidIsoDateTime(val: unknown): boolean {
+  if (typeof val !== 'string' || val.length === 0) return false;
+  const time = Date.parse(val);
+  return !Number.isNaN(time);
+}
+
+/**
+ * Validates a single ReleaseComponentResponse against the canonical contract.
+ * JSON schema: additionalProperties: false, required: [name, kind, digest]
+ */
+export function isValidReleaseComponent(val: unknown): val is ReleaseComponentResponse {
+  if (!val || typeof val !== 'object' || Array.isArray(val)) return false;
+  const c = val as Record<string, unknown>;
+  if (!hasOnlyAllowedKeys(c, ALLOWED_COMPONENT_KEYS)) return false;
+
+  return (
+    typeof c.name === 'string' &&
+    c.name.length >= 1 &&
+    c.name.length <= 200 &&
+    typeof c.kind === 'string' &&
+    c.kind.length >= 1 &&
+    c.kind.length <= 64 &&
+    typeof c.digest === 'string' &&
+    c.digest.length >= 1 &&
+    c.digest.length <= 200
+  );
+}
+
 /**
  * Validates a single ReleaseManifestResponse against the canonical contract.
+ * JSON schema: additionalProperties: false, componentCount >= 1, manifestSha256 64-hex, etc.
  */
 export function isValidReleaseManifest(val: unknown): val is ReleaseManifestResponse {
   if (!val || typeof val !== 'object' || Array.isArray(val)) return false;
   const m = val as Record<string, unknown>;
-  return (
-    typeof m.releaseId === 'string' &&
-    m.releaseId.length > 0 &&
-    typeof m.version === 'string' &&
-    m.version.length > 0 &&
-    typeof m.manifestSha256 === 'string' &&
-    /^[0-9a-f]{64}$/.test(m.manifestSha256) &&
-    typeof m.componentCount === 'number' &&
-    m.componentCount >= 0 &&
-    typeof m.operatorSignOff === 'boolean' &&
-    typeof m.acceptanceCount === 'number' &&
-    m.acceptanceCount >= 0 &&
-    typeof m.createdAt === 'string' &&
-    (m.components === undefined || Array.isArray(m.components))
-  );
+  if (!hasOnlyAllowedKeys(m, ALLOWED_MANIFEST_KEYS)) return false;
+
+  if (
+    typeof m.releaseId !== 'string' ||
+    m.releaseId.length < 1 ||
+    m.releaseId.length > 64 ||
+    typeof m.version !== 'string' ||
+    m.version.length < 1 ||
+    m.version.length > 64 ||
+    typeof m.manifestSha256 !== 'string' ||
+    !/^[0-9a-f]{64}$/.test(m.manifestSha256) ||
+    typeof m.componentCount !== 'number' ||
+    !Number.isInteger(m.componentCount) ||
+    m.componentCount < 1 ||
+    typeof m.operatorSignOff !== 'boolean' ||
+    typeof m.acceptanceCount !== 'number' ||
+    !Number.isInteger(m.acceptanceCount) ||
+    m.acceptanceCount < 0 ||
+    !isValidIsoDateTime(m.createdAt)
+  ) {
+    return false;
+  }
+
+  if (m.components !== undefined) {
+    if (!Array.isArray(m.components) || m.components.length > 512) return false;
+    if (!m.components.every(isValidReleaseComponent)) return false;
+  }
+
+  return true;
+}
+
+/**
+ * Validates a single ReleaseAcceptanceResponse against the canonical contract.
+ * JSON schema: additionalProperties: false, outcome enum, manifestMatches boolean, etc.
+ */
+export function isValidReleaseAcceptance(val: unknown): val is ReleaseAcceptanceResponse {
+  if (!val || typeof val !== 'object' || Array.isArray(val)) return false;
+  const a = val as Record<string, unknown>;
+  if (!hasOnlyAllowedKeys(a, ALLOWED_ACCEPTANCE_KEYS)) return false;
+
+  if (
+    typeof a.acceptanceId !== 'string' ||
+    a.acceptanceId.length < 1 ||
+    a.acceptanceId.length > 64 ||
+    typeof a.acceptanceIdRef !== 'string' ||
+    a.acceptanceIdRef.length < 1 ||
+    a.acceptanceIdRef.length > 16 ||
+    typeof a.outcome !== 'string' ||
+    !VALID_OUTCOMES.has(a.outcome) ||
+    typeof a.acceptedManifestSha256 !== 'string' ||
+    !/^[0-9a-f]{64}$/.test(a.acceptedManifestSha256) ||
+    typeof a.manifestMatches !== 'boolean' ||
+    !isValidIsoDateTime(a.decidedAt)
+  ) {
+    return false;
+  }
+
+  if (a.knownLimitations !== undefined) {
+    if (!Array.isArray(a.knownLimitations) || a.knownLimitations.length > 64) return false;
+    if (!a.knownLimitations.every((item) => typeof item === 'string')) return false;
+  }
+
+  return true;
+}
+
+/**
+ * Validates a ReleaseManifestPageResponse against the canonical contract.
+ * JSON schema: additionalProperties: false, items array (max 200), optional nextCursor.
+ */
+export function isValidReleaseManifestPage(val: unknown): val is ReleaseManifestPageResponse {
+  if (!val || typeof val !== 'object' || Array.isArray(val)) return false;
+  const p = val as Record<string, unknown>;
+  if (!hasOnlyAllowedKeys(p, ALLOWED_PAGE_KEYS)) return false;
+
+  if (!Array.isArray(p.items) || p.items.length > 200) return false;
+  if (!p.items.every(isValidReleaseManifest)) return false;
+
+  if (p.nextCursor !== undefined && p.nextCursor !== null && typeof p.nextCursor !== 'string') {
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * Validates a ReleaseManifestDetailResponse against the canonical contract.
+ * JSON schema: additionalProperties: false, release required, optional acceptances array.
+ */
+export function isValidReleaseManifestDetail(val: unknown): val is ReleaseManifestDetailResponse {
+  if (!val || typeof val !== 'object' || Array.isArray(val)) return false;
+  const d = val as Record<string, unknown>;
+  if (!hasOnlyAllowedKeys(d, ALLOWED_DETAIL_KEYS)) return false;
+
+  if (!isValidReleaseManifest(d.release)) return false;
+
+  if (d.acceptances !== undefined) {
+    if (!Array.isArray(d.acceptances) || d.acceptances.length > 256) return false;
+    if (!d.acceptances.every(isValidReleaseAcceptance)) return false;
+  }
+
+  return true;
 }
 
 /**
@@ -59,23 +203,16 @@ export async function fetchReleaseManifests(
   const queryString = query.toString();
   const endpoint = queryString ? `/v1/release-manifests?${queryString}` : '/v1/release-manifests';
 
-  const res = await apiClient<ReleaseManifestPageResponse>(endpoint, {
+  const res = await apiClient<unknown>(endpoint, {
     method: 'GET',
     signal: options.signal,
   });
 
-  if (!res || typeof res !== 'object' || (res.items !== undefined && !Array.isArray(res.items))) {
-    throw new Error('ReleaseManifestPageResponse contract violation: items must be an array');
+  if (!isValidReleaseManifestPage(res)) {
+    throw new Error('ReleaseManifestPageResponse contract violation: invalid page shape or items');
   }
 
-  if (res.items && !res.items.every(isValidReleaseManifest)) {
-    throw new Error('ReleaseManifestPageResponse contract violation: invalid item in items array');
-  }
-
-  return {
-    items: res.items || [],
-    nextCursor: res.nextCursor ?? null,
-  };
+  return res;
 }
 
 /**
@@ -92,17 +229,13 @@ export async function fetchReleaseManifestDetail(
   }
 
   const endpoint = `/v1/release-manifests/${encodeURIComponent(releaseId.trim())}`;
-  const res = await apiClient<ReleaseManifestDetailResponse>(endpoint, {
+  const res = await apiClient<unknown>(endpoint, {
     method: 'GET',
     signal,
   });
 
-  if (!res || typeof res !== 'object' || !isValidReleaseManifest(res.release)) {
-    throw new Error('ReleaseManifestDetailResponse contract violation: missing or invalid release field');
-  }
-
-  if (res.acceptances !== undefined && !Array.isArray(res.acceptances)) {
-    throw new Error('ReleaseManifestDetailResponse contract violation: acceptances must be an array');
+  if (!isValidReleaseManifestDetail(res)) {
+    throw new Error('ReleaseManifestDetailResponse contract violation: invalid detail shape or acceptances');
   }
 
   return res;

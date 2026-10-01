@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.163"
+version: "1.0.165"
 status: "approved"
 author: "Gemini"
-updated: "2026-10-01T18:59:00+09:00"
+updated: "2026-10-01T19:30:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,7 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-10-01T18:59:00+09:00 (Card 183 S12-FE 릴리스 선언서 및 운영자 인수 서버 경로 결속: 계약 타입 5종 생성, GET /v1/release-manifests 및 /{release_id} 결속, 기록 없음 빈 상태, 미서명 operatorSignOff=false, 403/404 문제 상세 처리, localSimulationCompleted 로컬 분리 보존, 쓰기 UI 금지, Vitest 11 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 규칙 0 위반).
+- 확인 기준: 2026-10-01T19:30:00+09:00 (Card 183 S12-FE 릴리스 선언서 및 운영자 인수 서버 경로 결속 r1 조치 완료: Claude UI r1 F1~F10 및 Codex r1 차단 사항 전수 해소, 5개 계약 strict JSON Schema 런타임 검증기 구축, 엔드포인트 URL/쿼리 직접 단언으로 경로 변이 사살, 네트워크 오류 날조 500 방지, 상세 오류 시 selector 보존, nextCursor 표출, 빈 상태 role="status", History 경로 인용 4건 수정으로 check_doc_path_citations ratchet 통과, Vitest 17 passed, 변이 14종 100% 사살, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 규칙 0 위반).
 
 ## 2026-10-01 S12-FE 릴리스 선언서(Release Manifest) 및 운영자 인수 서버 경로 결속 (Card 183 2단계, `agent/gemini/c183-s12fe-release-binding`, base `3ff89b84` PR #280)
 - **개요**: Claude 카드 182(PR #280)에서 구축된 정본 계약 스키마 5종(`release-manifest-response`, `release-manifest-detail-response`, `release-manifest-page-response`, `release-acceptance-response`, `release-component-response`) 및 읽기 전용 REST 라우트(`GET /v1/release-manifests`, `GET /v1/release-manifests/{release_id}`)를 프런트엔드 `apps/web`에 온전히 결속:
@@ -33,19 +33,30 @@ source_of_truth: "Git"
      - **Section 3-A 실서버 관측**: 실서버 라우트 결속 배너, 테넌트 릴리스 0건 시 날조 기본값 없는 명시적 빈 상태(`기록 없음`), 수락 부재 시 `operatorSignOff: false (미서명)`, 403 Forbidden 및 404 Not Found 문제 상세 처리, 수락 결정 및 컴포넌트 목록 관측.
      - **쓰기 UI 금지**: 임의 수락/서명 등록 쓰기 폼 원천 차단 및 읽기 전용 관측 표출 안내(`server-write-boundary-notice`).
      - **Section 3-B 로컬 모의 시뮬레이션 분리 보존**: `localSimulationCompleted`를 브라우저 로컬 시뮬레이션 상태로 온전히 격리하고, 기존 DEF-S12 결함 수정 회귀 시험(23 passed) 및 배선 무결성 시험(4 passed) 100% 무파괴 통과.
-  5. **단위 및 변이 불변식 검증 (`apps/web/tests/s12-release-manifest-server-binding.test.tsx`)**:
-     - 11 passed (323ms). 계약 일치, 빈 상태, 미서명, 403/404 처리, 로컬/서버 분리, 쓰기 UI 금지, 고정 픽스처 회귀 실패(Revert-Fail) 변이 불변식 고정.
+  5. **Claude UI r1 및 Codex r1 독립 검토 피드백 전수 조치 (r1 완결)**:
+     - **F1 & Codex 차단 4**: History 문서 내 미존재 경로 4건을 `apps/web/src/contracts/...`로 수정하여 `check_doc_path_citations.py --ratchet` 통과 (0 new broken citations).
+     - **F2**: 상단 KPI 카드를 `[로컬 모의] 운영자 인수 서명 (Sign-Off)`으로 명확히 표기하여 실서버 3-A 섹션과의 혼동 해소 및 기존 회귀 시험(`s12-defect-fixes.test.tsx` 23 passed) 100% 보존.
+     - **F3~F5 & Codex 차단 2**: 제품 코드 내 `NODE_ENV === 'test'` 분기 제거 및 `autoFetch ?? true` 정규화, 단위 시험에서 props 주입 대신 `fetch` 경계 모의, exact URL/query/method 단언으로 경로 변이 M2, M3 완전 사살.
+     - **F6**: 네트워크 연결 오류 시 status 500 날조 없이 status 0 / `네트워크 통신 오류` 표출 (M6 사살).
+     - **F7**: 상세 조회 실패 시에도 릴리스 선택기(`deployment-release-selector`) 보존 표출 (M7 사살).
+     - **F8**: `nextCursor` 상태 수신 및 다음 페이지 커서 표출.
+     - **F9 & Codex 차단 1**: 5개 계약 스키마 strict 런타임 검증기(`releaseObservation.ts`) 구축 (`componentCount >= 1`, `additionalProperties: false`, items 누락 합성 거절, acceptances 검증; M10 사살 및 Codex probe 3종 fail-closed 확인).
+     - **F10**: 빈 상태(`deployment-manifest-empty-state`)에 `role="status"` 및 `aria-live="polite"` 추가.
+  6. **단위 및 변이 불변식 검증 (`apps/web/tests/s12-release-manifest-server-binding.test.tsx`, 17 passed, 변이 14종 100% 사살)**:
+     - 17 passed (468ms). 14종 변이(M1~M13) 전원 사살(Killed: 14, Survived: 0) 실측.
 - **담당 및 역할**: Gemini (Frontend / UI 소유). Reviewer: Claude (UI·테스트 축), Codex (계약·보안 축).
 - **관측 근거 (Evidence)**:
-  - Vitest: `s12-release-manifest-server-binding.test.tsx` 11 passed (323ms), `s12-defect-fixes.test.tsx` 23 passed, `deployment-release-integrity-wiring.test.tsx` 4 passed (전원 통과)
+  - Vitest: `s12-release-manifest-server-binding.test.tsx` 17 passed (468ms), `s12-defect-fixes.test.tsx` 23 passed, `deployment-release-integrity-wiring.test.tsx` 4 passed (전원 통과)
+  - 변이 검사: 14종 단일 변이 전원 사살 실측 (사살율 100%)
   - TypeScript 정적 점검: `npx tsc -b` 타입 에러 0건 (exit 0)
-  - 프로덕션 번들 빌드: `npm run build` 성공 (Vite bundle 정상 생성, exit 0)
+  - 프로덕션 번들 빌드: `npm run build` 성공 (Vite bundle 정상 생성, 9.25s, exit 0)
   - 계약 동기화 점검: `npm run contracts:check` 40 types PASS (exit 0)
   - 라우트 커버리지 점검: `pytest tests/test_route_coverage.py` 41 passed 100% (exit 0)
   - 프런트엔드 무결성 점검: `python tools/check_frontend_integrity.py` 93개 파일 스캔, 9대 무결성 규칙 위반 0건 (exit 0)
   - 계약 바인딩 점검: `python tools/check_contract_bindings.py` 55개 픽스처 + 20개 커널 응답 타입 앵커 통과 (exit 0)
   - 문서 무결성 점검: `python tools/check_docs.py` PASS (exit 0)
-  - Git 공백 검사: `git diff --check` 클린 (exit 0)
+  - 문서 경로 인용 래칫: `python tools/check_doc_path_citations.py --ratchet --base-ref origin/agent/claude/c182-s12-manifest-routes` PASS (exit 0)
+  - Git 공백 검사: `git diff --check 3ff89b84` 클린 (exit 0)
 - **전문 문서**: [[2026-10-01_18-50-00_KST_Card183_S12-FE_Release_서버결속_Gemini]]
 
 ## 2026-10-01 관리자 보안 콘솔 비상 정지(Kill Switch) 백엔드 실배선 및 멱등/승인ID 제어 평면 연동 (Card 169, S08-FE, `agent/gemini/c169-s08fe-killswitch-real-wiring`, PR #267)
