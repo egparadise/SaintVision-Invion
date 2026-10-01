@@ -24,6 +24,7 @@ from .build_governance import (
 from .contracts import validate_contract
 from .errors import DomainError
 from .leases import fence, lock_resources, lock_run
+from .policy import action_digest
 
 
 NODE_FRESHNESS_SECONDS = 15
@@ -40,6 +41,8 @@ class _AdmittedBuild:
     run_id: str
     evidence_id: str
     actor_id: str
+    builder_node_id: str
+    roof_binding_digest: str
     binding_digest: str
 
 
@@ -77,7 +80,7 @@ def _lock_live_build_authority(
     *,
     database_recovery_epoch: str,
     now: datetime,
-) -> None:
+) -> str:
     """Lock Run -> Node -> Resource -> lease and reject stale dispatch authority."""
 
     lock_run(conn, run_id, request["projectId"])
@@ -120,6 +123,7 @@ def _lock_live_build_authority(
         or abs(node["clock_skew_seconds"]) > 5
     ):
         raise DomainError("RES-0003", "Build node observation is stale", 409)
+    return str(resource["node_id"])
 
 
 def _reason_code(error: Exception) -> str:
@@ -167,7 +171,7 @@ class BuildExecutionAdapter:
                 provider=provider,
                 now=now,
             )
-            _lock_live_build_authority(
+            builder_node_id = _lock_live_build_authority(
                 conn,
                 frozen_request,
                 frozen_plan,
@@ -175,6 +179,15 @@ class BuildExecutionAdapter:
                 database_recovery_epoch=self.db.recovery_epoch,
                 now=now,
             )
+
+        dispatch_binding = {
+            "roofBindingDigest": binding["bindingDigest"],
+            "runId": run_id,
+            "builderNodeId": builder_node_id,
+            "leaseId": frozen_plan["lease"]["leaseId"],
+            "resourceId": frozen_plan["lease"]["resourceId"],
+            "fencingToken": frozen_plan["lease"]["fencingToken"],
+        }
 
         admitted = _AdmittedBuild(
             request=deepcopy(frozen_request),
@@ -184,7 +197,9 @@ class BuildExecutionAdapter:
             run_id=run_id,
             evidence_id=evidence_id,
             actor_id=actor_id,
-            binding_digest=binding["bindingDigest"],
+            builder_node_id=builder_node_id,
+            roof_binding_digest=binding["bindingDigest"],
+            binding_digest=action_digest(dispatch_binding),
         )
 
         attempted = False
@@ -194,7 +209,7 @@ class BuildExecutionAdapter:
             final_provider = self._transport.observe(deepcopy(frozen_plan))
             with self.db.transaction(frozen_request["tenantId"]) as conn:
                 now = _database_now(conn)
-                _lock_live_build_authority(
+                final_builder_node_id = _lock_live_build_authority(
                     conn,
                     frozen_request,
                     frozen_plan,
@@ -202,6 +217,8 @@ class BuildExecutionAdapter:
                     database_recovery_epoch=self.db.recovery_epoch,
                     now=now,
                 )
+                if final_builder_node_id != admitted.builder_node_id:
+                    raise DomainError("NODE-0033", "Build node authority changed", 409)
                 evidence = finalize_build(
                     conn,
                     principal,
@@ -212,7 +229,7 @@ class BuildExecutionAdapter:
                     policy_version=policy_version,
                     provider=final_provider,
                     now=now,
-                    admitted_binding_digest=admitted.binding_digest,
+                    admitted_binding_digest=admitted.roof_binding_digest,
                     run_id=run_id,
                     evidence_id=evidence_id,
                     actor_id=actor_id,

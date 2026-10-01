@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-S08-BE-BUILD-ADAPTER-20261001"
 title: "S08-BE Build adapter 결속"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-01T15:58:25+09:00"
+updated: "2026-10-01T16:04:35+09:00"
 source_of_truth: "Git"
 ---
 
@@ -29,6 +29,9 @@ source_of_truth: "Git"
 
 - transport가 raw `BuildPlan`을 직접 받지 않고, 첫 번째 짧은 DB transaction에서 ROOF
   승인과 live Run/Node/Resource/lease를 확인한 뒤 만들어진 내부 `_AdmittedBuild`만 받는다.
+- capability digest는 ROOF binding뿐 아니라 run, leased resource에서 잠근 builder Node,
+  lease ID, resource ID와 full fencing token을 함께 묶는다. final transaction의 Node가
+  달라지면 dispatch 결과를 받아들이지 않고 cancel+quarantine한다.
 - 외부 builder 관측·dispatch·cancel은 business transaction 밖에서만 수행한다.
 - 완료 뒤 새 transaction에서 live lease/fencing, Node online·freshness·clock skew,
   project 권한·kill switch·정책·provider binding을 반복 검증한다.
@@ -55,6 +58,7 @@ source_of_truth: "Git"
 | 2026-10-01 15:58 | `python tools/check_contract_bindings.py` | exit 0 |
 | 2026-10-01 15:58 | `python tools/check_doc_path_citations.py --ratchet --base-ref agent/codex/s08-be-roof-binding` | exit 0, 새 결함 0 |
 | 2026-10-01 15:58 | `git diff --check` | exit 0 |
+| 2026-10-01 16:04 | Node identity를 포함한 dispatch binding 보강 뒤 focused 3파일 재실행 | exit 0, 116 passed |
 
 stacked PR을 열고 Claude에게 독립 검토를 요청한다. exact-head hosted CI 전에는 실제
 daemon 실행이나 제품 인수를 주장하지 않는다.

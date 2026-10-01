@@ -15,6 +15,7 @@ from inv.build_adapter import (
 )
 from inv.build_governance import BuildProviderObservation
 from inv.errors import DomainError
+from inv.policy import action_digest
 
 
 TENANT = "123e4567-e89b-12d3-a456-426614174000"
@@ -72,7 +73,20 @@ class _Transport:
     def dispatch(self, admitted):
         assert self.database.active_transactions == 0
         assert isinstance(admitted, _AdmittedBuild)
-        assert admitted.binding_digest == "b" * 64
+        assert len(admitted.binding_digest) == 64
+        assert admitted.binding_digest != admitted.roof_binding_digest
+        assert admitted.roof_binding_digest == "b" * 64
+        assert admitted.builder_node_id == "node-1"
+        assert admitted.binding_digest == action_digest(
+            {
+                "roofBindingDigest": admitted.roof_binding_digest,
+                "runId": admitted.run_id,
+                "builderNodeId": admitted.builder_node_id,
+                "leaseId": admitted.plan["lease"]["leaseId"],
+                "resourceId": admitted.plan["lease"]["resourceId"],
+                "fencingToken": admitted.plan["lease"]["fencingToken"],
+            }
+        )
         self.calls.append("dispatch")
         self.admitted = admitted
         admitted.plan["transportMutation"] = True
@@ -92,7 +106,13 @@ def _inputs():
     return (
         object(),
         {"tenantId": TENANT, "projectId": "project-1"},
-        {"lease": {"resourceId": "resource-1"}},
+        {
+            "lease": {
+                "leaseId": "lease-1",
+                "resourceId": "resource-1",
+                "fencingToken": f"{EPOCH}:7",
+            }
+        },
         {"decisionId": "decision-1"},
     )
 
@@ -109,6 +129,7 @@ def _patch_boundary(monkeypatch, *, authorize_error=None, finalize_error=None):
 
     def live(_conn, request, plan, run_id, **_kwargs):
         calls.append(("live", deepcopy(request), deepcopy(plan), run_id))
+        return "node-1"
 
     def finalize(_conn, _principal, request, plan, _decision, receipt, **_kwargs):
         calls.append(("finalize", deepcopy(request), deepcopy(plan), deepcopy(receipt)))
@@ -181,6 +202,28 @@ def test_final_authority_drift_cancels_and_quarantines(monkeypatch):
         "dispatch",
         "observe",
         ("cancel", "LEASE-0002"),
+    ]
+
+
+def test_final_builder_node_drift_cancels_and_quarantines(monkeypatch):
+    _patch_boundary(monkeypatch)
+    nodes = iter(("node-1", "node-2"))
+    monkeypatch.setattr(
+        adapter_module,
+        "_lock_live_build_authority",
+        lambda *_args, **_kwargs: next(nodes),
+    )
+    database = _Database()
+    transport = _Transport(database)
+
+    with pytest.raises(DomainError, match="NODE-0033"):
+        _execute(BuildExecutionAdapter(database, transport))
+
+    assert transport.calls == [
+        "observe",
+        "dispatch",
+        "observe",
+        ("cancel", "NODE-0033"),
     ]
 
 
@@ -275,13 +318,16 @@ def _patch_locks(monkeypatch):
 def test_live_build_authority_accepts_exact_fresh_online_lease(monkeypatch):
     _patch_locks(monkeypatch)
     lease, node, request, plan = _live_rows()
-    _lock_live_build_authority(
-        _LeaseConnection(lease, node),
-        request,
-        plan,
-        "run-1",
-        database_recovery_epoch=EPOCH,
-        now=NOW,
+    assert (
+        _lock_live_build_authority(
+            _LeaseConnection(lease, node),
+            request,
+            plan,
+            "run-1",
+            database_recovery_epoch=EPOCH,
+            now=NOW,
+        )
+        == "node-1"
     )
 
 
