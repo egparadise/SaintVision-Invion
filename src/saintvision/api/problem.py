@@ -93,6 +93,10 @@ VAL_REQUEST = "VAL-0003"
 AUTH_PROJECT = "AUTH-0030"
 RES_NOT_FOUND = "RES-0004"
 GRAPH_PRECONDITION = "GRAPH-0002"
+#: State the caller described has moved: a digest, an expiry, a slot or a reference
+#: binding is no longer what the request was built against. 409 and not retryable --
+#: the same request cannot succeed, because what it refers to has changed (#282 §7).
+GRAPH_STATE_DRIFT = "GRAPH-0003"
 SYS_UPSTREAM_UNAVAILABLE = "SYS-0001"
 SYS_UNMAPPED = "SYS-0002"
 #: A deployed feature is registered but its operator-controlled prerequisites

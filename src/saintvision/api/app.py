@@ -29,6 +29,7 @@ from .v1 import nodes as nodes_router
 from .v1 import pools as pools_router
 from .v1 import projects as projects_router
 from .v1 import readiness as readiness_router
+from .v1 import release_acceptance as release_acceptance_router
 from .v1 import release_manifests as release_manifests_router
 from .v1 import settings as settings_router
 from .v1 import storage as storage_router
@@ -221,4 +222,7 @@ def create_app(
     app.include_router(projects_router.router)
     app.include_router(readiness_router.router)
     app.include_router(release_manifests_router.router)
+    # Registered so its contract can be exercised, and refused at the door until an
+    # operator enables it and the prerequisites exist (design #282 §0-1.5).
+    app.include_router(release_acceptance_router.router)
     return app
