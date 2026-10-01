@@ -24,6 +24,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from tools.post_landing_verify import (  # noqa: E402
+    DEFAULT_REF,
     DISPATCH_EVENT,
     LANES,
     PRE_FLIGHT,
@@ -988,3 +989,81 @@ def test_the_run_name_keeps_the_workflow_name_when_no_id_is_given():
     """
     for lane in LANES:
         assert "|| github.workflow }}" in workflow_text(lane), lane["workflow"]
+#: Lanes whose workflow does not run on the landing push and is therefore always
+#: dispatched by the tool. Adding one here is a deliberate statement that the landing
+#: push produces no run for it.
+DISPATCH_ONLY_WORKFLOWS = {"ac11-security-scan.yml"}
+
+
+def push_triggered_workflows(ref: str) -> set[str]:
+    """Every workflow file whose `push` trigger lists `ref`.
+
+    `yaml.BaseLoader` is deliberate: under YAML 1.1 a plain loader turns the key `on`
+    into the boolean `True`, so the trigger block would be unreachable by name.
+    """
+    import yaml
+
+    found = set()
+    for path in sorted(WORKFLOW_DIR.glob("*.yml")):
+        document = yaml.load(path.read_text(encoding="utf-8"), Loader=yaml.BaseLoader)
+        triggers = document.get("on") if isinstance(document, dict) else None
+        push = triggers.get("push") if isinstance(triggers, dict) else None
+        branches = push.get("branches") if isinstance(push, dict) else None
+        if isinstance(branches, list) and ref in branches:
+            found.add(path.name)
+    return found
+
+
+def test_every_push_triggered_workflow_has_a_lane():
+    """A workflow added to the repository must not quietly leave the landing proof.
+
+    The landing push creates one run per workflow that triggers on `DEFAULT_REF`. If the
+    lane list misses one, the evidence reports every lane green while that run was never
+    read -- a red lane lands silently. The tool itself cannot notice: it only walks
+    `LANES` and never looks at `.github/workflows`. So the comparison lives here.
+
+    This is the test that was missing when `portal-login-harness.yml` arrived with
+    `#259`: nothing in 77 cases could fail, because every one of them iterated `LANES`.
+    """
+    expected = push_triggered_workflows(DEFAULT_REF)
+    covered = {lane["workflow"] for lane in LANES} - DISPATCH_ONLY_WORKFLOWS
+    missing = expected - covered
+    assert not missing, (
+        f"these workflows run on the landing push to {DEFAULT_REF} but have no lane: "
+        f"{sorted(missing)}"
+    )
+    stale = covered - expected
+    assert not stale, (
+        f"these lanes name a workflow that no longer runs on the landing push: "
+        f"{sorted(stale)} -- either restore the push trigger or move the workflow into "
+        f"DISPATCH_ONLY_WORKFLOWS"
+    )
+
+
+def test_the_dispatch_only_lane_really_does_not_run_on_the_landing_push():
+    """The exception list is not a place to park a workflow that does trigger on push."""
+    on_push = push_triggered_workflows(DEFAULT_REF)
+    for workflow in DISPATCH_ONLY_WORKFLOWS:
+        assert workflow not in on_push, (
+            f"{workflow} triggers on the landing push, so it does not belong in "
+            f"DISPATCH_ONLY_WORKFLOWS"
+        )
+        assert workflow in {lane["workflow"] for lane in LANES}, workflow
+
+
+def test_the_portal_login_harness_lane_names_the_job_the_workflow_defines():
+    """The lane added for `#259`'s workflow, pinned to that file rather than to prose."""
+    import yaml
+
+    document = yaml.load(
+        (WORKFLOW_DIR / "portal-login-harness.yml").read_text(encoding="utf-8"),
+        Loader=yaml.BaseLoader,
+    )
+    lane = next(item for item in LANES if item["workflow"] == "portal-login-harness.yml")
+    assert set(lane["jobs"]) <= set(document["jobs"]), lane["jobs"]
+    assert lane["jobs"] == {"portal-login-harness": 1}
+    assert document["on"]["push"]["branches"] == [
+        "main",
+        "integration/all-agents-unified",
+        "agent/**",
+    ]
