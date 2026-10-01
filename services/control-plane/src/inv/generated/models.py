@@ -198,17 +198,9 @@ class BuildSecretRefId(RootModel[constr(pattern=r'^sec_[0-9A-HJKMNP-TV-Z]{26}$')
     root: constr(pattern=r'^sec_[0-9A-HJKMNP-TV-Z]{26}$')
 
 
-class BuildCanonicalRelativePath(RootModel[str]):
+class BuildCanonicalRelativePath(BaseModel):
     model_config = ConfigDict(
-        regex_engine="python-re",
-    )
-    root: constr(
-        pattern=r'^(?!/)(?!.*(?:^|/)\.\.?(/|$))(?!.*\\)(?!.*//)[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*$',
-        min_length=1,
-        max_length=1024,
-    ) = Field(
-        ...,
-        description='Canonical repository-relative path; absolute, parent, current-directory, duplicate-separator, and backslash forms are forbidden.',
+        extra='forbid',
     )
 
 
@@ -253,7 +245,7 @@ class BuildRequest(BaseModel):
     dockerfilePath: BuildCanonicalRelativePath
     targetPlatform: TargetPlatform
     targetStage: constr(pattern=r'^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$')
-    networkPolicyId: constr(pattern=r'^(?:none|netpol_[a-z0-9][a-z0-9._-]{0,62})$')
+    networkPolicyId: constr(pattern=r'^(none|netpol_[a-z0-9][a-z0-9._-]{0,62})$')
     cachePolicyId: constr(pattern=r'^cachepol_[a-z0-9][a-z0-9._-]{0,62}$')
     secretRefIds: list[BuildSecretRefId] = Field(..., max_length=32)
     timeoutSeconds: conint(ge=1, le=3600)
@@ -290,7 +282,7 @@ class BuildPlan(BaseModel):
     privileged: Literal[False]
     hostAccess: Literal[False]
     networkMode: NetworkMode
-    networkPolicyId: constr(pattern=r'^(?:none|netpol_[a-z0-9][a-z0-9._-]{0,62})$')
+    networkPolicyId: constr(pattern=r'^(none|netpol_[a-z0-9][a-z0-9._-]{0,62})$')
     egressAllowlistDigest: constr(pattern=r'^[0-9a-f]{64}$')
     devices: list[str] = Field(..., max_length=0)
     binds: list[str] = Field(..., max_length=0)

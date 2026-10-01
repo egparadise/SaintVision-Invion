@@ -5,6 +5,8 @@ unsafe choices that must remain compiler-owned before an adapter is allowed to e
 """
 
 from copy import deepcopy
+import json
+from pathlib import Path
 
 import pytest
 
@@ -17,6 +19,7 @@ TENANT = "123e4567-e89b-12d3-a456-426614174000"
 SHA1 = "a" * 40
 DIGEST = "b" * 64
 TRACE = "c" * 32
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def _request() -> dict:
@@ -124,6 +127,26 @@ def _receipt() -> dict:
 def _rejected(contract: str, value: dict) -> None:
     with pytest.raises(DomainError, match="VAL-0002"):
         validate_contract(contract, value)
+
+
+def test_build_contract_patterns_stay_go_re2_compatible():
+    schema = json.loads(
+        (ROOT / "contracts" / "v1alpha1" / "core.schema.json").read_text(encoding="utf-8")
+    )
+
+    def patterns(value):
+        if isinstance(value, dict):
+            if "pattern" in value:
+                yield value["pattern"]
+            for nested in value.values():
+                yield from patterns(nested)
+        elif isinstance(value, list):
+            for nested in value:
+                yield from patterns(nested)
+
+    build_defs = {name: value for name, value in schema["$defs"].items() if name.startswith("Build")}
+    assert build_defs
+    assert all("(?" not in pattern for pattern in patterns(build_defs))
 
 
 @pytest.mark.parametrize("contract,factory", [("BuildRequest", _request), ("BuildPlan", _plan), ("BuildReceipt", _receipt)])

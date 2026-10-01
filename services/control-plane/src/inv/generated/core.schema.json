@@ -478,7 +478,14 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 1024,
-      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.?(/|$))(?!.*\\\\)(?!.*//)[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*$"
+      "pattern": "^[A-Za-z0-9._-]+(/[A-Za-z0-9._-]+)*$",
+      "allOf": [
+        {
+          "not": {
+            "pattern": "(^|/)\\.{1,2}(/|$)"
+          }
+        }
+      ]
     },
     "BuildResourceBudget": {
       "type": "object",
@@ -579,7 +586,7 @@
         },
         "networkPolicyId": {
           "type": "string",
-          "pattern": "^(?:none|netpol_[a-z0-9][a-z0-9._-]{0,62})$"
+          "pattern": "^(none|netpol_[a-z0-9][a-z0-9._-]{0,62})$"
         },
         "cachePolicyId": {
           "type": "string",
@@ -699,7 +706,7 @@
         },
         "networkPolicyId": {
           "type": "string",
-          "pattern": "^(?:none|netpol_[a-z0-9][a-z0-9._-]{0,62})$"
+          "pattern": "^(none|netpol_[a-z0-9][a-z0-9._-]{0,62})$"
         },
         "egressAllowlistDigest": {
           "type": "string",
