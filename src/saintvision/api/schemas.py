@@ -15,7 +15,7 @@ import datetime as dt
 import uuid
 from typing import Annotated, Any, Literal, Union
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr, field_validator, model_validator
+from pydantic import AwareDatetime, BaseModel, BeforeValidator, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr, field_validator, model_validator
 
 
 class Strict(BaseModel):
@@ -1516,3 +1516,409 @@ AdapterConformanceUnion = Annotated[
     Union[AdapterConformanceNotObservedResponse, AdapterConformanceRecordedResponse],
     Field(discriminator="status"),
 ]
+
+
+class ReleaseComponentResponse(Strict):
+    """One pinned component of a release.
+
+    Every entry carries a digest because the manifest hash covers the list: a
+    name is not an identity, so "we shipped R4" has to be checkable rather than
+    asserted (``operations_pilot.ReleaseManifest``).
+    """
+
+    name: StrictStr = Field(min_length=1, max_length=200)
+    kind: StrictStr = Field(min_length=1, max_length=64)
+    digest: StrictStr = Field(min_length=1, max_length=200)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceResponse(Strict):
+    """One recorded acceptance decision, without the person who made it.
+
+    The accepting user is deliberately absent: a read surface that names people
+    turns an audit column into a directory, and ``RunRecordResponse`` set that
+    rule first. ``notes`` is free text and is absent for the same reason.
+
+    This docstring used to add that ``accepted_by_user_id`` is a foreign key
+    "precisely so the system cannot sign its own acceptance". **That is false**,
+    and Codex measured it: ``users`` does not distinguish a person from a service,
+    so a principal whose subject was ``svc:release-bot`` wrote an ``accepted`` row
+    through this very column. The key constrains the row to name a user that
+    exists and says nothing about who that user is -- which is why
+    ``operatorSignOff`` is pinned false in ``ReleaseManifestResponse`` rather than
+    computed from these records.
+
+    ``manifestMatches`` is computed, not stored: an acceptance pins the manifest
+    hash as it stood when it was granted, and accepting one composition while
+    shipping another is the failure that pinning exists to catch. A reader that
+    only saw ``outcome`` could not tell the two apart.
+    """
+
+    acceptance_id: StrictStr = Field(alias="acceptanceId", min_length=1, max_length=64)
+    acceptance_id_ref: StrictStr = Field(alias="acceptanceIdRef", min_length=1, max_length=16)
+    outcome: Literal["accepted", "conditional", "rejected"]
+    accepted_manifest_sha256: StrictStr = Field(
+        alias="acceptedManifestSha256", pattern="^[0-9a-f]{64}$"
+    )
+    manifest_matches: StrictBool = Field(alias="manifestMatches")
+    #: Required, not defaulted. The service always sends this key, so an absent one
+    #: is a bug rather than "no limitations" -- and a reader cannot tell the two
+    #: apart after the fact. Pydantic's default would also publish the field as
+    #: optional, which generates ``knownLimitations?:`` and makes a strict
+    #: front-end guard refuse the payload the server actually sends.
+    known_limitations: list[StrictStr] = Field(alias="knownLimitations", max_length=64)
+    decided_at: AwareDatetime = Field(alias="decidedAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+ReleaseAcceptanceOutcome = Literal["accepted", "conditional", "rejected"]
+ReleaseAcceptanceReasonCode = Annotated[StrictStr, Field(pattern="^[A-Z][A-Z0-9_]{2,63}$")]
+ReleaseAcceptanceLimitation = Annotated[StrictStr, Field(min_length=1, max_length=300)]
+
+
+def _exact_lower_hex_sha256(value: Any) -> Any:
+    """Reject input that would only match after ``Strict`` whitespace stripping."""
+
+    if not isinstance(value, str) or len(value) != 64 or any(
+        char not in "0123456789abcdef" for char in value
+    ):
+        raise ValueError("must be exactly 64 lowercase hexadecimal characters")
+    return value
+
+
+ReleaseAcceptanceSha256 = Annotated[
+    StrictStr,
+    Field(min_length=64, max_length=64, pattern="^[0-9a-f]{64}$"),
+    BeforeValidator(_exact_lower_hex_sha256),
+]
+
+
+class ReleaseAcceptanceTargetRef(Strict):
+    """A desired acceptance target, not evidence that it was measured."""
+
+    target_id: StrictStr = Field(alias="targetId", pattern="^[A-Za-z][A-Za-z0-9_.:/-]{0,127}$")
+    target_sha256: ReleaseAcceptanceSha256 = Field(alias="targetSha256")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceMeasurementRef(Strict):
+    """One observed Evidence object, kept distinct from a target declaration."""
+
+    evidence_id: StrictStr = Field(alias="evidenceId", pattern="^[A-Za-z][A-Za-z0-9_.:/-]{0,127}$")
+    evidence_sha256: ReleaseAcceptanceSha256 = Field(alias="evidenceSha256")
+    observed_at: AwareDatetime = Field(alias="observedAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceDecisionRequest(Strict):
+    """The bounded, non-secret content an operator decides on.
+
+    Identity and fresh-authentication proof are deliberately absent: the server
+    derives both from the verified access token.  Targets say what was required;
+    measurements say what was observed.  Neither may be replaced by free text.
+    """
+
+    acceptance_id_ref: StrictStr = Field(alias="acceptanceIdRef", pattern="^[A-Z][A-Z0-9-]{1,15}$")
+    outcome: ReleaseAcceptanceOutcome
+    target_manifest_sha256: ReleaseAcceptanceSha256 = Field(alias="targetManifestSha256")
+    reason_code: ReleaseAcceptanceReasonCode = Field(alias="reasonCode")
+    target_refs: list[ReleaseAcceptanceTargetRef] = Field(
+        alias="targetRefs", min_length=1, max_length=64
+    )
+    measurement_refs: list[ReleaseAcceptanceMeasurementRef] = Field(
+        alias="measurementRefs", min_length=1, max_length=64
+    )
+    known_limitations: list[ReleaseAcceptanceLimitation] = Field(
+        alias="knownLimitations", max_length=64
+    )
+
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+        json_schema_extra={
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {"outcome": {"const": "conditional"}},
+                        "required": ["outcome"],
+                    },
+                    "then": {"properties": {"knownLimitations": {"minItems": 1}}},
+                    "else": {"properties": {"knownLimitations": {"maxItems": 0}}},
+                }
+            ]
+        },
+    )
+
+    @model_validator(mode="after")
+    def _decision_is_bounded_and_unambiguous(self) -> "ReleaseAcceptanceDecisionRequest":
+        if self.outcome == "conditional" and not self.known_limitations:
+            raise ValueError("conditional acceptance requires knownLimitations")
+        if self.outcome != "conditional" and self.known_limitations:
+            raise ValueError("knownLimitations are allowed only for a conditional decision")
+        target_ids = [item.target_id for item in self.target_refs]
+        if len(set(target_ids)) != len(target_ids):
+            raise ValueError("targetRefs must have unique targetId values")
+        evidence_ids = [item.evidence_id for item in self.measurement_refs]
+        if len(set(evidence_ids)) != len(evidence_ids):
+            raise ValueError("measurementRefs must have unique evidenceId values")
+        return self
+
+
+class ReleaseAcceptanceConfirmationRequest(Strict):
+    """A second operator confirms one exact accepted proposal and manifest."""
+
+    proposal_digest: ReleaseAcceptanceSha256 = Field(alias="proposalDigest")
+    target_manifest_sha256: ReleaseAcceptanceSha256 = Field(alias="targetManifestSha256")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceProposalResponse(Strict):
+    """An accepted decision awaiting a distinct second human operator."""
+
+    proposal_id: StrictStr = Field(alias="proposalId", min_length=1, max_length=64)
+    release_id: StrictStr = Field(alias="releaseId", min_length=1, max_length=64)
+    acceptance_id_ref: StrictStr = Field(alias="acceptanceIdRef", pattern="^[A-Z][A-Z0-9-]{1,15}$")
+    outcome: Literal["accepted"]
+    state: Literal["pending_second_operator"]
+    target_manifest_sha256: ReleaseAcceptanceSha256 = Field(alias="targetManifestSha256")
+    proposal_digest: ReleaseAcceptanceSha256 = Field(alias="proposalDigest")
+    required_distinct_operator_count: Literal[2] = Field(alias="requiredDistinctOperatorCount")
+    proposal_confirmation_count: Literal[1] = Field(alias="proposalConfirmationCount")
+    decision_sign_off: Literal[False] = Field(alias="decisionSignOff")
+    expires_at: AwareDatetime = Field(alias="expiresAt")
+    replayed: StrictBool
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceProposalReviewResponse(Strict):
+    """The exact pending content a distinct confirmer must review before voting."""
+
+    proposal_id: StrictStr = Field(alias="proposalId", min_length=1, max_length=64)
+    release_id: StrictStr = Field(alias="releaseId", min_length=1, max_length=64)
+    acceptance_id_ref: StrictStr = Field(alias="acceptanceIdRef", pattern="^[A-Z][A-Z0-9-]{1,15}$")
+    outcome: Literal["accepted"]
+    state: Literal["pending_second_operator"]
+    target_manifest_sha256: ReleaseAcceptanceSha256 = Field(alias="targetManifestSha256")
+    proposal_digest: ReleaseAcceptanceSha256 = Field(alias="proposalDigest")
+    reason_code: ReleaseAcceptanceReasonCode = Field(alias="reasonCode")
+    target_refs: list[ReleaseAcceptanceTargetRef] = Field(
+        alias="targetRefs", min_length=1, max_length=64
+    )
+    measurement_refs: list[ReleaseAcceptanceMeasurementRef] = Field(
+        alias="measurementRefs", min_length=1, max_length=64
+    )
+    known_limitations: list[ReleaseAcceptanceLimitation] = Field(
+        alias="knownLimitations", max_length=0
+    )
+    required_distinct_operator_count: Literal[2] = Field(alias="requiredDistinctOperatorCount")
+    proposal_confirmation_count: Literal[1] = Field(alias="proposalConfirmationCount")
+    decision_sign_off: Literal[False] = Field(alias="decisionSignOff")
+    expires_at: AwareDatetime = Field(alias="expiresAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceProposalReviewPageResponse(Strict):
+    """Pending proposals discoverable by an authorized second operator."""
+
+    items: list[ReleaseAcceptanceProposalReviewResponse] = Field(max_length=100)
+    next_cursor: StrictStr | None = Field(default=None, alias="nextCursor", min_length=1, max_length=256)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceRecordedResponse(Strict):
+    """A final decision; only two-person ``accepted`` has decision sign-off."""
+
+    acceptance_id: StrictStr = Field(alias="acceptanceId", min_length=1, max_length=64)
+    release_id: StrictStr = Field(alias="releaseId", min_length=1, max_length=64)
+    acceptance_id_ref: StrictStr = Field(alias="acceptanceIdRef", pattern="^[A-Z][A-Z0-9-]{1,15}$")
+    outcome: ReleaseAcceptanceOutcome
+    state: Literal["recorded"]
+    accepted_manifest_sha256: ReleaseAcceptanceSha256 = Field(alias="acceptedManifestSha256")
+    manifest_matches: Literal[True] = Field(alias="manifestMatches")
+    decision_sign_off: StrictBool = Field(alias="decisionSignOff")
+    decision_confirmation_count: StrictInt = Field(alias="decisionConfirmationCount", ge=1, le=2)
+    decided_at: AwareDatetime = Field(alias="decidedAt")
+    replayed: StrictBool
+
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+        json_schema_extra={
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {"outcome": {"const": "accepted"}},
+                        "required": ["outcome"],
+                    },
+                    "then": {
+                        "properties": {
+                            "decisionConfirmationCount": {"const": 2},
+                            "decisionSignOff": {"const": True},
+                        }
+                    },
+                    "else": {
+                        "properties": {
+                            "decisionConfirmationCount": {"const": 1},
+                            "decisionSignOff": {"const": False},
+                        }
+                    },
+                }
+            ]
+        },
+    )
+
+    @model_validator(mode="after")
+    def _quorum_controls_sign_off(self) -> "ReleaseAcceptanceRecordedResponse":
+        if self.outcome == "accepted":
+            if not self.decision_sign_off or self.decision_confirmation_count != 2:
+                raise ValueError("accepted requires two confirmations and decisionSignOff=true")
+        elif self.decision_sign_off or self.decision_confirmation_count != 1:
+            raise ValueError("conditional and rejected decisions never have decision sign-off")
+        return self
+
+
+class ReleaseAcceptanceWithdrawalRequest(Strict):
+    """Withdraw a final decision without deleting or rewriting its history."""
+
+    accepted_manifest_sha256: ReleaseAcceptanceSha256 = Field(alias="acceptedManifestSha256")
+    reason_code: Literal[
+        "manifest-superseded", "acceptance-error", "security-concern", "operator-request"
+    ] = Field(alias="reasonCode")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceWithdrawalResponse(Strict):
+    """An append-only withdrawal receipt with release-scope aggregate sign-off."""
+
+    withdrawal_id: StrictStr = Field(alias="withdrawalId", min_length=1, max_length=64)
+    acceptance_id: StrictStr = Field(alias="acceptanceId", min_length=1, max_length=64)
+    release_id: StrictStr = Field(alias="releaseId", min_length=1, max_length=64)
+    state: Literal["withdrawn"]
+    accepted_manifest_sha256: ReleaseAcceptanceSha256 = Field(alias="acceptedManifestSha256")
+    withdrawn_acceptance_counts_toward_sign_off: Literal[False] = Field(
+        alias="withdrawnAcceptanceCountsTowardSignOff"
+    )
+    operator_sign_off: StrictBool = Field(alias="operatorSignOff")
+    reason_code: Literal[
+        "manifest-superseded", "acceptance-error", "security-concern", "operator-request"
+    ] = Field(alias="reasonCode")
+    withdrawn_at: AwareDatetime = Field(alias="withdrawnAt")
+    replayed: StrictBool
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseManifestResponse(Strict):
+    """A recorded release, and what is recorded about accepting it.
+
+    ``operatorSignOff`` is **``Literal[False]``**: this reader cannot emit true,
+    and the contract says so rather than the docstring promising it.
+
+    The first version of this model computed it from the acceptance rows and
+    called an ``accepted`` row with a matching hash a sign-off, on the reasoning
+    that ``acceptance_records.accepted_by_user_id`` is a foreign key to ``users``
+    so "the system cannot sign its own acceptance". **That reasoning was wrong,
+    and Codex measured it**: ``users`` draws no line between a person and a
+    service -- ``identity.py`` builds a Principal from any ``external_subject``
+    -- and the foreign key proves only that the row names a user that exists. A
+    principal whose subject was ``svc:release-bot`` wrote an ``accepted`` row and
+    the field read true. A key that proves existence was read as proof of
+    humanity.
+
+    So the field is pinned false, and the two counts beside it say different
+    things on purpose, by the coordinator's decision of 2026-10-01:
+
+    * ``confirmedOperatorCount`` is **distinct operators whose decision a person
+      is attested to have made**, as the write contract (``#282``, card 184)
+      defines attestation. That implementation does not exist yet, so on this
+      read surface the field is ``Literal[0]``. It is not "no acceptances"; it is
+      "no decision here has been attested to a person";
+    * ``matchingAcceptedUserCount`` is the **raw recorded fact**: distinct user
+      ids with an ``accepted`` row pinning this manifest's hash. A service
+      principal can be one of them, which is precisely why it is a different
+      field with a different name. The first version of this model called this
+      count ``confirmedOperatorCount``, which read as though a person had been
+      confirmed.
+
+    ``requiredDistinctOperatorCount`` is the quorum, so a reader sees "0 of 2"
+    and can tell it apart from "1 of 2".
+    """
+
+    release_id: StrictStr = Field(alias="releaseId", min_length=1, max_length=64)
+    version: StrictStr = Field(min_length=1, max_length=64)
+    component_count: StrictInt = Field(alias="componentCount", ge=1)
+    manifest_sha256: StrictStr = Field(alias="manifestSha256", pattern="^[0-9a-f]{64}$")
+    #: Required for the same reason as every other list here: the manifest hash
+    #: covers this list, so "the key was missing" and "the release pins nothing"
+    #: are different facts and only one of them is a release.
+    components: list[ReleaseComponentResponse] = Field(max_length=512)
+    created_at: AwareDatetime = Field(alias="createdAt")
+    #: Pinned false. Only the write contract may ever make this true, and only
+    #: with an attestation that a person decided -- which does not exist yet.
+    operator_sign_off: Literal[False] = Field(alias="operatorSignOff")
+    #: Why it is false, in the response, so a reader is not left to guess whether
+    #: the answer is "nobody signed" or "this surface cannot tell". The contract
+    #: for human attestation now exists (``#282``), but the verified fresh-auth
+    #: supply and authoritative target/Evidence resolvers do not.  The literal
+    #: names that wider prerequisite boundary rather than claiming that code
+    #: alone can make this release operator-signed.
+    operator_sign_off_blocked_by: Literal["release-acceptance-prerequisites-unavailable"] = Field(
+        alias="operatorSignOffBlockedBy"
+    )
+    #: The quorum the write contract requires. A constant here so a reader sees
+    #: "0 of 2" rather than a bare count whose target lives in another document.
+    required_distinct_operator_count: Literal[2] = Field(alias="requiredDistinctOperatorCount")
+    #: Distinct **human-attested** operators. Pinned to zero on this surface: the
+    #: attestation the count is about is ``#282``'s, and nothing implements it
+    #: yet, so no number other than zero can be honest here.
+    confirmed_operator_count: Literal[0] = Field(alias="confirmedOperatorCount")
+    #: Distinct user ids with an `accepted` row whose pinned hash matches this
+    #: manifest. The recorded fact, and deliberately not called confirmation: a
+    #: service principal can be one of these users.
+    matching_accepted_user_count: StrictInt = Field(alias="matchingAcceptedUserCount", ge=0)
+    acceptance_count: StrictInt = Field(alias="acceptanceCount", ge=0)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseManifestDetailResponse(Strict):
+    """One release with every acceptance decision recorded against it."""
+
+    release: ReleaseManifestResponse
+    #: Required: an absent list would read as "nobody has decided", which is a
+    #: claim about the release rather than about the response.
+    acceptances: list[ReleaseAcceptanceResponse] = Field(max_length=256)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseManifestPageResponse(Strict):
+    """A page of releases. An empty tenant is an empty list, not a 404.
+
+    Both fields are **required**, and that is the fix for a contract mismatch
+    Codex found while reviewing ``#281``: ``items`` carried
+    ``default_factory=list``, so the published schema listed no required
+    properties at all and the generated TypeScript said ``items?:``. The
+    front-end guard is strict and refuses a missing key -- so the contract
+    permitted a payload the client would reject, while the server never sent one.
+    An empty page is ``items: []``; an absent ``items`` is a broken response and
+    both ends should say so.
+
+    ``nextCursor`` is required and nullable for the same reason: the service
+    always sends the key, and ``null`` ("this is the last page") is a different
+    statement from the key being absent ("this response does not say").
+    """
+
+    items: list[ReleaseManifestResponse] = Field(max_length=200)
+    next_cursor: str | None = Field(alias="nextCursor")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)

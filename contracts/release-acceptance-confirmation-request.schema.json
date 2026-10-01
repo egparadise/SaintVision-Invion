@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "A second operator confirms one exact accepted proposal and manifest.",
+  "properties": {
+    "proposalDigest": {
+      "maxLength": 64,
+      "minLength": 64,
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Proposaldigest",
+      "type": "string"
+    },
+    "targetManifestSha256": {
+      "maxLength": 64,
+      "minLength": 64,
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Targetmanifestsha256",
+      "type": "string"
+    }
+  },
+  "required": [
+    "proposalDigest",
+    "targetManifestSha256"
+  ],
+  "title": "ReleaseAcceptanceConfirmationRequest",
+  "type": "object"
+}
