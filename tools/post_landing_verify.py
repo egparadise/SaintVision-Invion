@@ -27,8 +27,15 @@ Four things it refuses to do, because each would make the record untrue:
   stale and may agree with the landed SHA by being old.
 * **It will not accept a run whose `headSha` differs from the landed SHA**, even one it
   dispatched itself -- the ref can move between the dispatch and the run being created.
-  Dispatched runs are additionally identified by a `databaseId` greater than the newest id
-  seen before the dispatch, which run ids being monotonic makes exact.
+* **It identifies a run it dispatched by a correlation id, not by watching the list.** Each
+  dispatch passes a fresh uuid as the `correlation_id` input, the six workflows echo that
+  input into `run-name`, and only a run whose name equals that uuid is bound. Watching the
+  list cannot do this job: GitHub returns no link between a dispatch and the run it creates,
+  so "the newest candidate at this SHA" binds whichever dispatch GitHub happened to register
+  first -- someone else's, if they dispatched a moment before us. Narrowing to "exactly one
+  candidate in this poll" does not help either, because their run can be alone in the first
+  poll and ours arrive in the next. The id is read nowhere but `run-name`, so no job
+  behaviour depends on it, and a dispatch that passes no id leaves every run name unchanged.
 * **It will not count a skipped job as a pass.** A workflow whose job was skipped still
   concludes `success`; that is the shape that let an earlier "rollback verified" step pass
   without a rollback. Every job of every lane is gated on `github.event_name !=
@@ -55,6 +62,7 @@ from pathlib import Path
 import subprocess
 import sys
 import time
+import uuid
 from typing import Any, Callable, Sequence
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -277,7 +285,8 @@ def runs_for(runner, workflow: str, ref: str, limit: int = 30) -> list[dict[str,
             "--workflow", workflow,
             "--branch", ref,
             "--limit", str(limit),
-            "--json", "databaseId,headSha,headBranch,status,conclusion,event,createdAt",
+            "--json",
+            "databaseId,headSha,headBranch,displayTitle,status,conclusion,event,createdAt",
         ],
         [],
     )
@@ -318,6 +327,32 @@ def candidates_at_sha(rows: list[dict[str, Any]], landed: str, ref: str, *,
     return sorted(found, key=lambda row: row["databaseId"], reverse=True)
 
 
+def dispatch_named(rows: list[dict[str, Any]], landed: str, ref: str,
+                   correlation_id: str) -> list[dict[str, Any]]:
+    """The dispatched runs that carry our correlation id, newest id first.
+
+    The name is the only channel GitHub gives us: a dispatch returns nothing that names the
+    run it created, and the run carries no record of the inputs it was given. So the id goes
+    in through `correlation_id` and comes back out through `run-name`. Everything else here
+    is still checked, because a name is a claim and the SHA, branch and event are what make
+    the run the one this evidence is about.
+    """
+    found = [
+        row for row in rows
+        if str(row.get("displayTitle", "")) == correlation_id
+        and str(row.get("headSha", "")).lower() == landed
+        and str(row.get("headBranch", "")) == ref
+        and str(row.get("event", "")) == DISPATCH_EVENT
+        and isinstance(row.get("databaseId"), int)
+    ]
+    return sorted(found, key=lambda row: row["databaseId"], reverse=True)
+
+
+def new_correlation_id() -> str:
+    """Opaque, and distinct per lane so one lane's run cannot be read as another's."""
+    return f"post-landing-verify/{uuid.uuid4().hex}"
+
+
 def highest_id(rows: list[dict[str, Any]]) -> int:
     return max(
         (row["databaseId"] for row in rows if isinstance(row.get("databaseId"), int)),
@@ -325,8 +360,12 @@ def highest_id(rows: list[dict[str, Any]]) -> int:
     )
 
 
-def dispatch(runner, workflow: str, ref: str) -> bool:
-    code, _ = runner(["gh", "workflow", "run", workflow, "--ref", ref])
+def dispatch(runner, workflow: str, ref: str, correlation_id: str) -> bool:
+    code, _ = runner([
+        "gh", "workflow", "run", workflow,
+        "--ref", ref,
+        "-f", f"correlation_id={correlation_id}",
+    ])
     return code == 0
 
 
@@ -431,7 +470,8 @@ def bind_runs(runner, ref: str, landed: str, *, always_dispatch: bool):
             }
             continue
         baseline = highest_id(rows)
-        if not dispatch(runner, lane["workflow"], ref):
+        correlation_id = new_correlation_id()
+        if not dispatch(runner, lane["workflow"], ref, correlation_id):
             problems[lane["key"]] = failed(
                 "the workflow could not be dispatched", workflow=lane["workflow"]
             )
@@ -442,6 +482,7 @@ def bind_runs(runner, ref: str, landed: str, *, always_dispatch: bool):
             "event": DISPATCH_EVENT,
             "headBranch": ref,
             "dispatched": True,
+            "correlationId": correlation_id,
             "baselineRunId": baseline,
         }
     return bound, problems
@@ -463,18 +504,18 @@ def wait_for(runner, bound: dict[str, dict[str, Any]], landed: str, ref: str, *,
     while waiting:
         for key, entry in list(waiting.items()):
             if entry["runId"] is None:
-                # A dispatched run may not exist yet, and there may be more than one --
-                # anyone can dispatch the same workflow on the same ref at the same SHA.
-                # Nothing in the API ties a dispatch to the run it created, so when two
-                # are candidates this tool refuses to choose.
-                fresh = candidates_at_sha(
+                # The run we dispatched may not exist yet, and other people's dispatches of
+                # the same workflow may appear before it. Only the correlation id decides;
+                # the list is re-read every poll until a run carries ours, and a run that
+                # is not ours is simply not a candidate, however early it shows up.
+                fresh = dispatch_named(
                     runs_for(runner, entry["workflow"], ref), landed, ref,
-                    events=frozenset({DISPATCH_EVENT}),
-                    above=entry.get("baselineRunId", 0),
+                    entry["correlationId"],
                 )
                 if not fresh:
                     continue
                 if len(fresh) > 1:
+                    # One id cannot name two runs unless something re-used it.
                     entry["ambiguous"] = sorted(row["databaseId"] for row in fresh)
                     results[key] = {**entry, "view": None}
                     waiting.pop(key)
@@ -631,22 +672,28 @@ def run(args, runner, *, sleep=time.sleep, now=time.monotonic):
     for key, entry in results.items():
         if entry.get("ambiguous"):
             observations[key] = unmeasured(
-                "more than one dispatch of this workflow is a candidate at the landed SHA, "
-                "and nothing ties a dispatch to the run it created, so this tool will not "
-                "choose between them",
+                "two runs carry this dispatch's correlation id, so which one it created "
+                "cannot be said",
                 workflow=entry["workflow"], candidateRunIds=entry["ambiguous"],
+                correlationId=entry.get("correlationId"),
             )
             continue
         if entry["view"] is None:
             observations[key] = unmeasured(
-                "the run did not complete within the deadline",
+                "no run carrying this dispatch's correlation id completed within the "
+                "deadline" if entry["dispatched"]
+                else "the run did not complete within the deadline",
                 workflow=entry["workflow"], runId=entry["runId"],
+                correlationId=entry.get("correlationId"),
             )
             continue
-        observations[key] = judge_lane(
+        judged = judge_lane(
             by_key[key], entry["runId"], entry["view"], landed, args.ref,
             event=entry.get("event"),
         )
+        if entry.get("correlationId"):
+            judged["correlationId"] = entry["correlationId"]
+        observations[key] = judged
     for lane in LANES:
         observations.setdefault(
             lane["key"],
@@ -704,6 +751,7 @@ def main(argv: list[str] | None = None, runner=real_runner) -> int:
             "lanes": {lane["key"]: lane["workflow"] for lane in LANES},
             "requiredJobs": {lane["key"]: lane["jobs"] for lane in LANES},
             "alwaysDispatch": bool(args.always_dispatch),
+            "dispatchInput": "correlation_id=<fresh uuid per lane, matched against run-name>",
             "pollSeconds": args.poll_seconds,
             "dispatched": False,
         }, indent=2, sort_keys=True))

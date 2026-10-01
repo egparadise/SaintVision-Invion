@@ -31,11 +31,13 @@ from tools.post_landing_verify import (  # noqa: E402
     VerifyRefused,
     REF_EVENTS,
     build_evidence,
+    dispatch_named,
     candidates_at_sha,
     commit_sha,
     judge_lane,
     main,
     matrix_matches,
+    new_correlation_id,
     parser,
     remote_tip,
     render_markdown,
@@ -70,7 +72,7 @@ class FakeRunner:
 
     def __init__(self, *, tip=LANDED, ancestor=True, known=(LANDED, PREVIOUS),
                  runs=None, views=None, dispatch_fails=(), ls_remote_fails=False,
-                 dispatch_delay=0, rival_dispatch=()):
+                 dispatch_delay=0, rival_dispatch=(), rival_first=()):
         self.tip = tip
         self.ancestor = ancestor
         self.known = set(known)
@@ -83,6 +85,11 @@ class FakeRunner:
         self.dispatch_delay = dispatch_delay
         #: Workflows where somebody else's dispatch lands at the same SHA alongside ours.
         self.rival_dispatch = set(rival_dispatch)
+        #: Workflows where somebody else's dispatch run becomes visible *before* ours. This
+        #: is the shape that defeats any rule based on watching the list.
+        self.rival_first = set(rival_first)
+        #: correlation ids this fake was dispatched with, per workflow.
+        self.correlation_ids: dict[str, list[str]] = {}
         self._pending: dict[str, list] = {}
         self.commands: list[list[str]] = []
         self._next_id = 9_000
@@ -120,15 +127,39 @@ class FakeRunner:
             workflow = args[3]
             if workflow in self.dispatch_fails:
                 return 1, ""
+            given = [a for a in args if a.startswith("correlation_id=")]
+            assert len(given) == 1, f"no correlation id was passed: {args}"
+            correlation_id = given[0].split("=", 1)[1]
+            assert correlation_id, "the correlation id was empty"
+            self.correlation_ids.setdefault(workflow, []).append(correlation_id)
+            if workflow in self.rival_first:
+                # Somebody else's dispatch is registered first and is visible immediately;
+                # ours follows a poll later. Any rule that binds "the candidate in this
+                # poll" takes theirs.
+                self._next_id += 1
+                theirs = {
+                    "databaseId": self._next_id, "headSha": self.tip, "headBranch": REF,
+                    "displayTitle": "someone-elses-dispatch", "status": "completed",
+                    "conclusion": "failure", "event": "workflow_dispatch",
+                    "createdAt": "2026-10-01T01:59:00Z",
+                }
+                self.runs.setdefault(workflow, []).insert(0, theirs)
+                self.views[theirs["databaseId"]] = {
+                    "status": "completed", "conclusion": "failure", "headSha": self.tip,
+                    "headBranch": REF, "event": "workflow_dispatch",
+                    "displayTitle": "someone-elses-dispatch",
+                    "jobs": jobs_of(next(i for i in LANES if i["workflow"] == workflow),
+                                    "failure"),
+                }
             self._next_id += 1
             row = {
                 "databaseId": self._next_id, "headSha": self.tip,
-                "headBranch": REF, "status": "completed", "conclusion": "success",
+                "headBranch": REF, "displayTitle": correlation_id,
+                "status": "completed", "conclusion": "success",
                 "event": "workflow_dispatch", "createdAt": "2026-10-01T02:00:00Z",
             }
             if workflow in self.rival_dispatch:
-                # Somebody else dispatched the same workflow on the same ref, and the API
-                # gives us nothing that says which run came from which dispatch.
+                # A second run carrying *our own* id -- only possible if an id were reused.
                 self._next_id += 1
                 rival = dict(row, databaseId=self._next_id)
                 self.runs.setdefault(workflow, []).insert(0, rival)
@@ -147,7 +178,8 @@ class FakeRunner:
             lane = next(item for item in LANES if item["workflow"] == workflow)
             self.views[row["databaseId"]] = {
                 "status": "completed", "conclusion": "success", "headSha": self.tip,
-                "headBranch": REF, "event": "workflow_dispatch", "jobs": jobs_of(lane),
+                "headBranch": REF, "event": "workflow_dispatch",
+                "displayTitle": correlation_id, "jobs": jobs_of(lane),
             }
             return 0, ""
         if args[1:3] == ["run", "list"]:
@@ -184,6 +216,7 @@ def push_world(sha=LANDED, conclusion="success", *, skip=None, omit=None,
         identifier += 1
         runs[lane["workflow"]] = [{
             "databaseId": identifier, "headSha": sha, "headBranch": branch,
+            "displayTitle": "Merge PR into merge train",
             "status": "completed", "conclusion": "success", "event": event,
             "createdAt": "2026-10-01T01:00:00Z",
         }]
@@ -706,26 +739,6 @@ def test_candidates_come_back_newest_first():
 # --- two rival dispatches: say so rather than choose -------------------------------
 
 
-def test_two_candidate_dispatches_are_not_observed_rather_than_guessed():
-    """Nothing in the API ties a dispatch to the run it created.
-
-    Anyone can dispatch the same workflow on the same ref at the same SHA, and then "the
-    newest post-baseline run at this SHA" is as likely to be theirs as ours. One of them
-    here concluded failure, so picking by id would be reporting a coin toss.
-    """
-    runs, views = push_world(sha=OTHER)
-    runner = FakeRunner(
-        runs=runs, views=views, rival_dispatch={"docs.yml", "core.yml"}
-    )
-    observations, _ = go(runner)
-    for key in ("docs", "core"):
-        item = observations[key]
-        assert item["status"] == "NOT_OBSERVED", f"{key} chose between rival dispatches"
-        assert len(item["candidateRunIds"]) == 2
-        assert "will not choose" in item["reason"]
-    assert observations["frontend"]["status"] == "MEASURED_PASS", "one lane spoiled another"
-
-
 def test_a_rival_dispatch_before_the_baseline_does_not_make_it_ambiguous():
     """The id floor still does its work: an earlier dispatch is not a candidate."""
     runs, views = push_world()
@@ -733,6 +746,7 @@ def test_a_rival_dispatch_before_the_baseline_does_not_make_it_ambiguous():
     for lane in LANES:
         runs[lane["workflow"]].append({
             "databaseId": 900, "headSha": LANDED, "headBranch": REF,
+            "displayTitle": "an-earlier-dispatch",
             "event": "workflow_dispatch", "status": "completed", "conclusion": "failure",
             "createdAt": "2026-09-30T23:00:00Z",
         })
@@ -792,3 +806,185 @@ def test_the_dispatch_event_name_is_the_one_github_uses():
     assert DISPATCH_EVENT == "workflow_dispatch"
     assert DISPATCH_EVENT in REF_EVENTS and "push" in REF_EVENTS
     assert "pull_request" not in REF_EVENTS
+
+
+# --- the correlation id: the probe that defeated watching the list -----------------
+
+
+def test_a_rival_dispatch_visible_first_is_not_bound():
+    """The regression probe for the finding this mechanism exists for.
+
+    Another operator dispatches the same workflow on the same ref at the same commit a
+    moment before us, and *their* run is the only candidate in the first poll; ours appears
+    in the next. Every rule built on watching the list binds theirs -- "newest at this SHA"
+    does, and so does "exactly one candidate in this poll", because in that poll there is
+    exactly one and it is not ours. Only the name decides.
+    """
+    runs, views = push_world(sha=OTHER)
+    runner = FakeRunner(
+        runs=runs, views=views,
+        rival_first={"docs.yml", "ac11-security-scan.yml"},
+        dispatch_delay=2,
+    )
+    observations, _ = go(runner)
+    for key, workflow in (("docs", "docs.yml"), ("securityCriticalHigh", "ac11-security-scan.yml")):
+        item = observations[key]
+        assert item["status"] == "MEASURED_PASS", (
+            f"{key} bound somebody else's run: {item.get('reason')}"
+        )
+        ours = runner.correlation_ids[workflow][0]
+        assert item["correlationId"] == ours
+        bound = item["runId"]
+        theirs = [
+            row["databaseId"] for row in runner.runs[workflow]
+            if row.get("displayTitle") == "someone-elses-dispatch"
+        ]
+        assert theirs, "the probe did not create a rival run"
+        assert bound not in theirs, "the rival run was bound"
+
+
+def test_the_correlation_id_is_passed_on_every_dispatch():
+    runs, views = push_world(sha=OTHER)
+    runner = FakeRunner(runs=runs, views=views)
+    go(runner)
+    sent = [c for c in runner.commands if c[:3] == ["gh", "workflow", "run"]]
+    assert len(sent) == len(LANES)
+    seen = set()
+    for command in sent:
+        assert "-f" in command
+        value = command[command.index("-f") + 1]
+        assert value.startswith("correlation_id=post-landing-verify/")
+        seen.add(value)
+    assert len(seen) == len(LANES), "two lanes shared one correlation id"
+
+
+def test_a_correlation_id_is_opaque_and_fresh():
+    first, second = new_correlation_id(), new_correlation_id()
+    assert first != second
+    assert first.startswith("post-landing-verify/") and len(first) > 30
+    # Nothing about the host, the user or the repository goes into it.
+    assert first.split("/", 1)[1].isalnum()
+
+
+def test_the_list_is_re_read_until_our_run_appears():
+    """Binding happens on a later poll, so the listing cannot be a one-shot read."""
+    runs, views = push_world(sha=OTHER)
+    runner = FakeRunner(runs=runs, views=views, dispatch_delay=3)
+    observations, _ = go(runner)
+    assert all(observations[lane["key"]]["status"] == "MEASURED_PASS" for lane in LANES)
+    for lane in LANES:
+        listings = [
+            c for c in runner.ran("gh", "run", "list")
+            if lane["workflow"] in c
+        ]
+        assert len(listings) > 1, f"{lane['key']} was listed once and never again"
+
+
+@pytest.mark.parametrize("field,value", [
+    ("displayTitle", "someone-elses-dispatch"),
+    ("headSha", OTHER),
+    ("headBranch", "main"),
+    ("event", "push"),
+])
+def test_a_named_dispatch_still_has_to_agree_on_everything_else(field, value):
+    """A name is a claim; the SHA, branch and event are what make the run ours."""
+    row = {
+        "databaseId": 10, "headSha": LANDED, "headBranch": REF,
+        "displayTitle": "post-landing-verify/abc", "event": "workflow_dispatch",
+    }
+    assert dispatch_named([row], LANDED, REF, "post-landing-verify/abc")
+    assert not dispatch_named([dict(row, **{field: value})], LANDED, REF,
+                              "post-landing-verify/abc")
+
+
+def test_a_run_never_carrying_our_id_is_not_observed():
+    """The deadline, and a reason that says what was looked for."""
+    runs, views = push_world(sha=OTHER)
+    runner = FakeRunner(runs=runs, views=views, dispatch_delay=10_000)
+    observations, _ = go(runner, deadline_seconds=3)
+    for lane in LANES:
+        item = observations[lane["key"]]
+        assert item["status"] == "NOT_OBSERVED"
+        assert "correlation id" in item["reason"]
+        assert item["correlationId"]
+
+
+def test_two_runs_carrying_one_id_are_not_observed():
+    """One id cannot name two runs unless something re-used it; say so rather than pick."""
+    runs, views = push_world(sha=OTHER)
+    runner = FakeRunner(runs=runs, views=views, rival_dispatch={"docs.yml"})
+    observations, _ = go(runner)
+    item = observations["docs"]
+    assert item["status"] == "NOT_OBSERVED"
+    assert len(item["candidateRunIds"]) == 2
+    assert "correlation id" in item["reason"]
+
+
+def test_the_run_listing_asks_for_the_display_title():
+    runs, views = push_world()
+    runner = FakeRunner(runs=runs, views=views)
+    go(runner)
+    for command in runner.ran("gh", "run", "list"):
+        assert "displayTitle" in command[command.index("--json") + 1]
+
+
+# --- the workflow change touches only the run name ---------------------------------
+
+
+WORKFLOW_DIR = ROOT / ".github/workflows"
+NL = chr(10)
+RUN_NAME = "run-name: ${{ inputs.correlation_id || github.workflow }}"
+
+
+def workflow_text(lane):
+    return (WORKFLOW_DIR / lane["workflow"]).read_text(encoding="utf-8")
+
+
+def test_every_lane_accepts_the_correlation_id_input():
+    """`gh workflow run -f correlation_id=...` fails outright if the input is undeclared."""
+    for lane in LANES:
+        text = workflow_text(lane)
+        assert "      correlation_id:" in text, lane["workflow"]
+        assert RUN_NAME in text, lane["workflow"]
+
+
+def test_the_input_is_read_nowhere_but_the_run_name():
+    """This is what "no behaviour change outside the dispatch path" means, mechanically.
+
+    A value that appears only in `run-name` cannot reach a job, a step, an `if:` or an env
+    var, so no workflow can behave differently because of it. Checking that is stronger than
+    asserting the diff was small.
+    """
+    for lane in LANES:
+        lines = [
+            line for line in workflow_text(lane).splitlines()
+            if "correlation_id" in line and not line.lstrip().startswith("#")
+        ]
+        assert lines, lane["workflow"]
+        for line in lines:
+            assert (
+                line == RUN_NAME
+                or line.strip() == "correlation_id:"
+            ), f"{lane['workflow']} reads correlation_id outside run-name: {line!r}"
+
+
+def test_the_input_is_optional_so_a_manual_run_needs_nothing():
+    for lane in LANES:
+        text = workflow_text(lane)
+        after = text.split("      correlation_id:", 1)[1].splitlines()
+        block = NL.join(
+            line for line in after
+            if line.startswith("        ") or not line.strip()
+        )
+        assert "required: false" in block, lane["workflow"]
+        assert "default: ''" in block, lane["workflow"]
+
+
+def test_the_run_name_keeps_the_workflow_name_when_no_id_is_given():
+    """Every event other than a dispatch-with-id shows the workflow name, not an empty one.
+
+    The fallback is written out rather than relying on an empty `run-name` expression
+    reverting to GitHub's default, which cannot be verified without a real dispatch.
+    """
+    for lane in LANES:
+        assert "|| github.workflow }}" in workflow_text(lane), lane["workflow"]
