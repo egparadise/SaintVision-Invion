@@ -1,16 +1,71 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.249"
+version: "1.0.255"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T21:39:29+09:00"
+updated: "2026-10-01T22:14:13+09:00"
 source_of_truth: "Git"
-active_card: "CARD-188 S12 fresh-auth claim source"
-active_card_status: "Claude r1 condition addressed: flow/OTP operational prerequisite documented and six surviving claim/mapper mutations covered"
-active_card_next: "Run focused gates, push follow-up commit and request Claude final confirmation; live token and portal step-up remain BLOCKED_EXTERNAL"
+active_card: "CARD-190 S12 acceptance target/Evidence canonical resolver contract"
+active_card_status: "Claude r1 F1-F9 and r2 Low five resolved in design/contract v1.1.1; implementation remains NOT_OBSERVED"
+active_card_next: "Confirm exact-head Backend and Claude final review; implement reserved migration 0058 only in the next Claude card"
 ---
 
+## 2026-10-01 Card 190 — S12 수락 target·Evidence 정본 resolver 계약
+
+- #282 v1.3.0의 두 번째 write prerequisite를 선택했다. `input_sha256` fallback을 금지하고
+  target registry·Evidence envelope digest·release/project binding을 server-owned 경계로 설계했다.
+- AC-12 target registry는 정본 source commit/path/blob, 4 criteria, canonical target digest를
+  고정한다. strict 공개 계약 2개와 generated schema 2개를 추가했다.
+- Evidence digest는 `(evidence_id,recorded_at)`의 partition identity를 포함한 row 전체 의미이며,
+  예약 승인된 migration `0058`에서 inline trigger 계산·legacy NULL fail-closed·receipt backfill을 요구한다.
+- Claude r1에 따라 ledger/lock 순서, `RES-0007`, binder/discovery route, release·policy·registry pin DTO,
+  duplicate-key raw loader, merge-only source 도달성을 v1.1에 고정했다.
+- Claude r2의 Low 5건도 strict discovery page, trigger/helper digest equality, owner 독립 변이,
+  DTO criterion 정합, criterion coordination slot 용어로 닫았다.
+- PG-free resolver **33 passed**, write contract 포함 **61 passed**. resolver·migration·real-PG·write enable은 `NOT_OBSERVED`다.
+  [[S12-BE_release_acceptance_target_Evidence_resolver_설계]],
+  [[2026-10-01_21-35-49_KST_S12_acceptance_target_Evidence_resolver_Codex]].
+
+## 2026-10-01 Card 184 — S12 release 수락·operator sign-off 쓰기 계약
+
+- 카드 187의 구현 질문 5건을 설계 v1.3으로 판정했다. blocker는
+  `release-acceptance-prerequisites-unavailable`, Evidence `input_sha256` fallback은 금지,
+  permission은 `releases.accept` 하나, target/Evidence resolver는 별도 카드, route는 기본 off와
+  `SYS-0003/503/retryable=false`로 고정했다. 승인 migration 번호는 `0057`이다.
+- #280 최종 head `79fcb772`를 merge `fec2169c`로 따라갔다. 읽기 route는
+  `confirmedOperatorCount=0`, raw `matchingAcceptedUserCount`, implementation-unavailable blocker를
+  실제 계약·서비스·시험에 적용했고 #282의 proposal/decision 이름과 충돌하지 않는다. 합친 focused
+  시험은 **67 passed**, Pydantic 2.13.5 schema **93/93**이다.
+- Claude r3에서 N1~N7 해소를 확인받았다. 선택 관찰 L1/L2도 닫아 proposal page 최대 100건을
+  모델·schema 시험으로 고정하고 proposal digest에 policy version/digest를 포함했다.
+- 코디네이터 N2 최종 결정을 v1.2.1에 반영했다. release `confirmedOperatorCount`는 fresh
+  interactive human-attested distinct operator 수이고 구현 전 0이며, legacy raw count는
+  `matchingAcceptedUserCount`다. proposal/decision 범위는 `proposalConfirmationCount`·
+  `decisionConfirmationCount`·`decisionSignOff`로 분리했다.
+- Claude r2 N1/N2를 설계 v1.2와 계약에 반영했다. required criterion registry는 S12-BE 소유의
+  versioned Git 정본으로 정의하고 누락·빈 집합·digest/version drift를 release sign-off false로
+  고정했다. #280 release 집계와 proposal/decision 범위를 서로 다른 이름으로 분리했다.
+  인증된 pending proposal 목록을 포함해 strict contract는 8개이며 PG-free 27 passed, schema
+  93/93이다.
+- Claude r1의 2인 확인 내용 미노출, path ID 없는 replay, proposal 만료 rollback 모순,
+  read/sign-off·legacy 1인 경로, DB 불변식, IdP AMR 공백을 설계 v1.1과 공개 계약으로 닫았다.
+  pending proposal review GET과 7번째 strict response를 추가했고 withdrawal digest를 대상 final
+  row에 결속했다. digest required/pattern 변이 시험을 보강해 PG-free **27 passed**, schema
+  **92/92**다.
+
+- PR #280 head `3ff89b84` 위에서 읽기 메모가 요청한 보안 결정을 계약으로 고정했다. 모든
+  결정은 server-derived active human + 5분 fresh interactive auth + live tenant permission이고,
+  accepted만 서로 다른 두 사람을 요구한다.
+- target과 measurement를 strict reference로 분리하고 manifest·proposal digest를 고정한다.
+  append-only withdrawal, exact idempotency replay, 경합 lock 순서, canonical ProblemDetails와
+  redacted audit closed set을 구현 전 정의했다.
+- Pydantic source에서 공개 JSON Schema 6개를 생성했다. 사람 ID·token·reauth proof·notes는
+  body에 없고 conditional limitation·accepted quorum은 generated schema에도 반영된다.
+  PG-free **22 passed**, export check **91 schemas match**다.
+- route·migration·OIDC claim 전달·DB·실 PG는 미구현이며 Claude 독립 검토 뒤 다음 카드가
+  구현한다. [[S12-BE_release_acceptance_operator_signoff_쓰기_계약_설계]],
+  [[2026-10-01_18-55-55_KST_S12-BE_release_acceptance_쓰기_계약_Codex]].
 ## 2026-10-01 Card 188 — S12 fresh-auth claim 공급원
 
 - train 9 base `89c8f366` 위에 Keycloak `AUTH_TIME`·AMR mapper와 password/OTP RFC 8176

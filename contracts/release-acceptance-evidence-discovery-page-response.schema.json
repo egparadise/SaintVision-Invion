@@ -1,0 +1,173 @@
+{
+  "$defs": {
+    "ReleaseAcceptanceResolvedMeasurement": {
+      "additionalProperties": false,
+      "description": "Server-owned Evidence identity; ``observedAt`` is its partition key.",
+      "properties": {
+        "evidenceId": {
+          "pattern": "^[A-Za-z][A-Za-z0-9_.:/-]{0,127}$",
+          "title": "Evidenceid",
+          "type": "string"
+        },
+        "evidenceSha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Evidencesha256",
+          "type": "string"
+        },
+        "observedAt": {
+          "format": "date-time",
+          "title": "Observedat",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidenceId",
+        "evidenceSha256",
+        "observedAt"
+      ],
+      "title": "ReleaseAcceptanceResolvedMeasurement",
+      "type": "object"
+    },
+    "ReleaseAcceptanceResolvedTarget": {
+      "additionalProperties": false,
+      "properties": {
+        "acceptanceIdRef": {
+          "pattern": "^[A-Z][A-Z0-9-]{1,15}$",
+          "title": "Acceptanceidref",
+          "type": "string"
+        },
+        "targetId": {
+          "pattern": "^[A-Za-z][A-Za-z0-9_.:/-]{0,127}$",
+          "title": "Targetid",
+          "type": "string"
+        },
+        "targetSha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Targetsha256",
+          "type": "string"
+        },
+        "targetVersion": {
+          "minimum": 1,
+          "title": "Targetversion",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "targetId",
+        "targetVersion",
+        "acceptanceIdRef",
+        "targetSha256"
+      ],
+      "title": "ReleaseAcceptanceResolvedTarget",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Authorized, bounded discovery of server-bound acceptance evidence.\n\nThe route returns only immutable reference identities.  It does not expose\nEvidence telemetry, actors, projects, or an operator-selected scope.",
+  "properties": {
+    "acceptanceIdRef": {
+      "pattern": "^[A-Z][A-Z0-9-]{1,15}$",
+      "title": "Acceptanceidref",
+      "type": "string"
+    },
+    "items": {
+      "items": {
+        "$ref": "#/$defs/ReleaseAcceptanceResolvedMeasurement"
+      },
+      "maxItems": 100,
+      "minItems": 1,
+      "title": "Items",
+      "type": "array"
+    },
+    "nextCursor": {
+      "anyOf": [
+        {
+          "maxLength": 256,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Nextcursor"
+    },
+    "policyRegistrySha256": {
+      "maxLength": 64,
+      "minLength": 64,
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Policyregistrysha256",
+      "type": "string"
+    },
+    "policyRegistryVersion": {
+      "const": 1,
+      "title": "Policyregistryversion",
+      "type": "integer"
+    },
+    "releaseId": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Releaseid",
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": "release-acceptance-evidence-discovery-page:1",
+      "title": "Schemaversion",
+      "type": "string"
+    },
+    "scopeVerified": {
+      "const": true,
+      "title": "Scopeverified",
+      "type": "boolean"
+    },
+    "targetRegistryFileSha256": {
+      "maxLength": 64,
+      "minLength": 64,
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Targetregistryfilesha256",
+      "type": "string"
+    },
+    "targetRegistryGitBlobSha": {
+      "maxLength": 40,
+      "minLength": 40,
+      "pattern": "^[0-9a-f]{40}$",
+      "title": "Targetregistrygitblobsha",
+      "type": "string"
+    },
+    "targetRegistryVersion": {
+      "const": 1,
+      "title": "Targetregistryversion",
+      "type": "integer"
+    },
+    "targets": {
+      "items": {
+        "$ref": "#/$defs/ReleaseAcceptanceResolvedTarget"
+      },
+      "maxItems": 64,
+      "minItems": 1,
+      "title": "Targets",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "releaseId",
+    "acceptanceIdRef",
+    "policyRegistryVersion",
+    "policyRegistrySha256",
+    "targetRegistryVersion",
+    "targetRegistryGitBlobSha",
+    "targetRegistryFileSha256",
+    "targets",
+    "items",
+    "scopeVerified"
+  ],
+  "title": "ReleaseAcceptanceEvidenceDiscoveryPageResponse",
+  "type": "object"
+}

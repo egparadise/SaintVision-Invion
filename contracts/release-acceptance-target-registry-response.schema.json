@@ -1,0 +1,171 @@
+{
+  "$defs": {
+    "ReleaseAcceptanceTargetCriterion": {
+      "additionalProperties": false,
+      "description": "One stable, named part of an acceptance target declaration.",
+      "properties": {
+        "criterionId": {
+          "pattern": "^[a-z][a-z0-9-]{0,63}$",
+          "title": "Criterionid",
+          "type": "string"
+        },
+        "statement": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        }
+      },
+      "required": [
+        "criterionId",
+        "statement"
+      ],
+      "title": "ReleaseAcceptanceTargetCriterion",
+      "type": "object"
+    },
+    "ReleaseAcceptanceTargetDefinition": {
+      "additionalProperties": false,
+      "description": "A versioned target whose digest excludes only ``targetSha256`` itself.",
+      "properties": {
+        "acceptanceIdRef": {
+          "pattern": "^[A-Z][A-Z0-9-]{1,15}$",
+          "title": "Acceptanceidref",
+          "type": "string"
+        },
+        "criteria": {
+          "items": {
+            "$ref": "#/$defs/ReleaseAcceptanceTargetCriterion"
+          },
+          "maxItems": 64,
+          "minItems": 1,
+          "title": "Criteria",
+          "type": "array"
+        },
+        "owner": {
+          "const": "S12-BE",
+          "title": "Owner",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/ReleaseAcceptanceTargetSource"
+        },
+        "targetId": {
+          "pattern": "^[A-Za-z][A-Za-z0-9_.:/-]{0,127}$",
+          "title": "Targetid",
+          "type": "string"
+        },
+        "targetSha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Targetsha256",
+          "type": "string"
+        },
+        "targetVersion": {
+          "minimum": 1,
+          "title": "Targetversion",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "targetId",
+        "targetVersion",
+        "acceptanceIdRef",
+        "owner",
+        "source",
+        "criteria",
+        "targetSha256"
+      ],
+      "title": "ReleaseAcceptanceTargetDefinition",
+      "type": "object"
+    },
+    "ReleaseAcceptanceTargetSource": {
+      "additionalProperties": false,
+      "description": "The immutable Git source from which one target declaration was derived.",
+      "properties": {
+        "blobSha": {
+          "maxLength": 40,
+          "minLength": 40,
+          "pattern": "^[0-9a-f]{40}$",
+          "title": "Blobsha",
+          "type": "string"
+        },
+        "commitSha": {
+          "maxLength": 40,
+          "minLength": 40,
+          "pattern": "^[0-9a-f]{40}$",
+          "title": "Commitsha",
+          "type": "string"
+        },
+        "path": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "repository": {
+          "const": "egparadise/SaintVision-Invion",
+          "title": "Repository",
+          "type": "string"
+        }
+      },
+      "required": [
+        "repository",
+        "commitSha",
+        "path",
+        "blobSha"
+      ],
+      "title": "ReleaseAcceptanceTargetSource",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The Git-owned target registry consumed by release acceptance resolution.\n\nThis is a public data contract, not an HTTP route.  A deployment pins the\nregistry blob separately; an empty or absent registry is never equivalent\nto an acceptance target with no criteria.",
+  "properties": {
+    "canonicalization": {
+      "const": "saintvision-canonical-json-v1",
+      "title": "Canonicalization",
+      "type": "string"
+    },
+    "owner": {
+      "const": "S12-BE",
+      "title": "Owner",
+      "type": "string"
+    },
+    "registryId": {
+      "const": "release-acceptance-targets-v1",
+      "title": "Registryid",
+      "type": "string"
+    },
+    "registryVersion": {
+      "const": 1,
+      "title": "Registryversion",
+      "type": "integer"
+    },
+    "schemaVersion": {
+      "const": "release-acceptance-target-registry:1",
+      "title": "Schemaversion",
+      "type": "string"
+    },
+    "targets": {
+      "items": {
+        "$ref": "#/$defs/ReleaseAcceptanceTargetDefinition"
+      },
+      "maxItems": 64,
+      "minItems": 1,
+      "title": "Targets",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "registryId",
+    "registryVersion",
+    "owner",
+    "canonicalization",
+    "targets"
+  ],
+  "title": "ReleaseAcceptanceTargetRegistryResponse",
+  "type": "object"
+}

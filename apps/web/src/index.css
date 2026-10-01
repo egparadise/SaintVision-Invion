@@ -27,6 +27,9 @@
     --color-status-offline-bg: #dc2626;
     --color-status-offline-hover-bg: #b91c1c;
     --color-status-neutral: #59677b;
+    --color-status-active: #0369a1;
+    --color-status-lost: #b91c1c;
+    --color-status-unknown: #92400e;
 
     /* Risk Grades (L0~L3) */
     --color-risk-l0: #065f46; /* 조회·읽기 전용 */
@@ -72,6 +75,9 @@
     --color-status-offline: #f87171;
     --color-status-offline-bg: #dc2626;
     --color-status-neutral: #9ca3af;
+    --color-status-active: #38bdf8;
+    --color-status-lost: #f87171;
+    --color-status-unknown: #d29922;
 
     --color-risk-l0: #34d399;
     --color-risk-l1: #60a5fa;

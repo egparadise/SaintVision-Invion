@@ -12,10 +12,13 @@ default (공통 계약 §3).
 from __future__ import annotations
 
 import datetime as dt
+import hashlib
+import json
+import unicodedata
 import uuid
 from typing import Annotated, Any, Literal, Union
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr, field_validator, model_validator
+from pydantic import AwareDatetime, BaseModel, BeforeValidator, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr, field_validator, model_validator
 
 
 class Strict(BaseModel):
@@ -1587,6 +1590,535 @@ class ReleaseAcceptanceResponse(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+ReleaseAcceptanceOutcome = Literal["accepted", "conditional", "rejected"]
+ReleaseAcceptanceReasonCode = Annotated[StrictStr, Field(pattern="^[A-Z][A-Z0-9_]{2,63}$")]
+ReleaseAcceptanceLimitation = Annotated[StrictStr, Field(min_length=1, max_length=300)]
+
+
+def _exact_lower_hex_sha256(value: Any) -> Any:
+    """Reject input that would only match after ``Strict`` whitespace stripping."""
+
+    if not isinstance(value, str) or len(value) != 64 or any(
+        char not in "0123456789abcdef" for char in value
+    ):
+        raise ValueError("must be exactly 64 lowercase hexadecimal characters")
+    return value
+
+
+ReleaseAcceptanceSha256 = Annotated[
+    StrictStr,
+    Field(min_length=64, max_length=64, pattern="^[0-9a-f]{64}$"),
+    BeforeValidator(_exact_lower_hex_sha256),
+]
+
+
+def _exact_lower_hex_git_sha(value: Any) -> Any:
+    if not isinstance(value, str) or len(value) != 40 or any(
+        char not in "0123456789abcdef" for char in value
+    ):
+        raise ValueError("must be exactly 40 lowercase hexadecimal characters")
+    return value
+
+
+ReleaseAcceptanceGitSha = Annotated[
+    StrictStr,
+    Field(min_length=40, max_length=40, pattern="^[0-9a-f]{40}$"),
+    BeforeValidator(_exact_lower_hex_git_sha),
+]
+
+
+def _release_acceptance_canonical_json(value: Any) -> bytes:
+    """Encode the deliberately small target-registry JSON subset."""
+
+    def validate(item: Any) -> None:
+        if isinstance(item, str):
+            if unicodedata.normalize("NFC", item) != item:
+                raise ValueError("target registry strings must be NFC-normalized")
+            return
+        if item is None or type(item) in (bool, int):
+            return
+        if isinstance(item, list):
+            for child in item:
+                validate(child)
+            return
+        if isinstance(item, dict):
+            for key, child in item.items():
+                if not isinstance(key, str):
+                    raise ValueError("target registry object keys must be strings")
+                validate(key)
+                validate(child)
+            return
+        raise ValueError("target registry canonical JSON forbids floats and non-JSON values")
+
+    validate(value)
+    return json.dumps(
+        value,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+
+
+class ReleaseAcceptanceTargetSource(Strict):
+    """The immutable Git source from which one target declaration was derived."""
+
+    repository: Literal["egparadise/SaintVision-Invion"]
+    commit_sha: ReleaseAcceptanceGitSha = Field(alias="commitSha")
+    path: StrictStr = Field(min_length=1, max_length=512)
+    blob_sha: ReleaseAcceptanceGitSha = Field(alias="blobSha")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceTargetCriterion(Strict):
+    """One stable, named part of an acceptance target declaration."""
+
+    criterion_id: StrictStr = Field(
+        alias="criterionId", pattern="^[a-z][a-z0-9-]{0,63}$"
+    )
+    statement: StrictStr = Field(min_length=1, max_length=512)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceTargetDefinition(Strict):
+    """A versioned target whose digest excludes only ``targetSha256`` itself."""
+
+    target_id: StrictStr = Field(
+        alias="targetId", pattern="^[A-Za-z][A-Za-z0-9_.:/-]{0,127}$"
+    )
+    target_version: StrictInt = Field(alias="targetVersion", ge=1)
+    acceptance_id_ref: StrictStr = Field(
+        alias="acceptanceIdRef", pattern="^[A-Z][A-Z0-9-]{1,15}$"
+    )
+    owner: Literal["S12-BE"]
+    source: ReleaseAcceptanceTargetSource
+    criteria: list[ReleaseAcceptanceTargetCriterion] = Field(min_length=1, max_length=64)
+    target_sha256: ReleaseAcceptanceSha256 = Field(alias="targetSha256")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    @model_validator(mode="after")
+    def _criteria_are_unique(self) -> "ReleaseAcceptanceTargetDefinition":
+        identities = [criterion.criterion_id for criterion in self.criteria]
+        if len(set(identities)) != len(identities):
+            raise ValueError("criteria must have unique criterionId values")
+        payload = self.model_dump(by_alias=True, exclude={"target_sha256"})
+        observed = hashlib.sha256(_release_acceptance_canonical_json(payload)).hexdigest()
+        if observed != self.target_sha256:
+            raise ValueError("targetSha256 does not match the canonical target payload")
+        return self
+
+
+class ReleaseAcceptanceTargetRegistryResponse(Strict):
+    """The Git-owned target registry consumed by release acceptance resolution.
+
+    This is a public data contract, not an HTTP route.  A deployment pins the
+    registry blob separately; an empty or absent registry is never equivalent
+    to an acceptance target with no criteria.
+    """
+
+    schema_version: Literal["release-acceptance-target-registry:1"] = Field(
+        alias="schemaVersion"
+    )
+    registry_id: Literal["release-acceptance-targets-v1"] = Field(alias="registryId")
+    registry_version: Literal[1] = Field(alias="registryVersion")
+    owner: Literal["S12-BE"]
+    canonicalization: Literal["saintvision-canonical-json-v1"]
+    targets: list[ReleaseAcceptanceTargetDefinition] = Field(min_length=1, max_length=64)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    @model_validator(mode="after")
+    def _target_versions_are_unique(self) -> "ReleaseAcceptanceTargetRegistryResponse":
+        identities = [(target.target_id, target.target_version) for target in self.targets]
+        if len(set(identities)) != len(identities):
+            raise ValueError("targets must have unique (targetId, targetVersion) values")
+        return self
+
+
+def load_release_acceptance_target_registry_json(
+    raw: str | bytes,
+) -> ReleaseAcceptanceTargetRegistryResponse:
+    """Parse the Git-owned registry without normalizing attacker-controlled JSON.
+
+    ``BaseModel.model_validate_json`` cannot report duplicate object keys, and
+    ``Strict`` normally strips surrounding whitespace.  Neither behaviour is
+    acceptable for a byte-pinned registry whose digest is meant to identify the
+    exact declared strings, so the registry loader rejects both before use.
+    """
+
+    if isinstance(raw, bytes):
+        raw = raw.decode("utf-8")
+
+    def unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        result: dict[str, Any] = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError(f"duplicate target registry key: {key}")
+            result[key] = value
+        return result
+
+    def reject_constant(value: str) -> None:
+        raise ValueError(f"target registry forbids JSON constant: {value}")
+
+    document = json.loads(
+        raw,
+        object_pairs_hook=unique_object,
+        parse_constant=reject_constant,
+    )
+    parsed = ReleaseAcceptanceTargetRegistryResponse.model_validate(document)
+    if document != parsed.model_dump(by_alias=True, mode="json"):
+        raise ValueError("target registry strings must already be exact and untrimmed")
+    return parsed
+
+
+class ReleaseAcceptanceResolvedTarget(Strict):
+    target_id: StrictStr = Field(
+        alias="targetId", pattern="^[A-Za-z][A-Za-z0-9_.:/-]{0,127}$"
+    )
+    target_version: StrictInt = Field(alias="targetVersion", ge=1)
+    acceptance_id_ref: StrictStr = Field(
+        alias="acceptanceIdRef", pattern="^[A-Z][A-Z0-9-]{1,15}$"
+    )
+    target_sha256: ReleaseAcceptanceSha256 = Field(alias="targetSha256")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceResolvedMeasurement(Strict):
+    """Server-owned Evidence identity; ``observedAt`` is its partition key."""
+
+    evidence_id: StrictStr = Field(
+        alias="evidenceId", pattern="^[A-Za-z][A-Za-z0-9_.:/-]{0,127}$"
+    )
+    evidence_sha256: ReleaseAcceptanceSha256 = Field(alias="evidenceSha256")
+    observed_at: AwareDatetime = Field(alias="observedAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceReferenceResolutionResponse(Strict):
+    """All-or-nothing result passed to the decision writer inside the server.
+
+    The resolver never returns a partial list and this contract does not expose
+    raw Evidence telemetry, actor identifiers, or caller-supplied fallback data.
+    """
+
+    schema_version: Literal["release-acceptance-reference-resolution:1"] = Field(
+        alias="schemaVersion"
+    )
+    release_id: StrictStr = Field(alias="releaseId", min_length=1, max_length=64)
+    acceptance_id_ref: StrictStr = Field(
+        alias="acceptanceIdRef", pattern="^[A-Z][A-Z0-9-]{1,15}$"
+    )
+    policy_registry_version: Literal[1] = Field(alias="policyRegistryVersion")
+    policy_registry_sha256: ReleaseAcceptanceSha256 = Field(alias="policyRegistrySha256")
+    target_registry_id: Literal["release-acceptance-targets-v1"] = Field(
+        alias="targetRegistryId"
+    )
+    target_registry_version: Literal[1] = Field(alias="targetRegistryVersion")
+    target_registry_git_blob_sha: ReleaseAcceptanceGitSha = Field(
+        alias="targetRegistryGitBlobSha"
+    )
+    target_registry_file_sha256: ReleaseAcceptanceSha256 = Field(
+        alias="targetRegistryFileSha256"
+    )
+    targets: list[ReleaseAcceptanceResolvedTarget] = Field(min_length=1, max_length=64)
+    measurements: list[ReleaseAcceptanceResolvedMeasurement] = Field(
+        min_length=1, max_length=64
+    )
+    scope_verified: Literal[True] = Field(alias="scopeVerified")
+    all_resolved: Literal[True] = Field(alias="allResolved")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    @model_validator(mode="after")
+    def _resolved_references_are_unique(self) -> "ReleaseAcceptanceReferenceResolutionResponse":
+        target_ids = [target.target_id for target in self.targets]
+        evidence_ids = [measurement.evidence_id for measurement in self.measurements]
+        if len(set(target_ids)) != len(target_ids):
+            raise ValueError("resolved targets must have unique targetId values")
+        if any(
+            target.acceptance_id_ref != self.acceptance_id_ref
+            for target in self.targets
+        ):
+            raise ValueError("resolved targets must match the top-level acceptanceIdRef")
+        if len(set(evidence_ids)) != len(evidence_ids):
+            raise ValueError("resolved measurements must have unique evidenceId values")
+        return self
+
+
+class ReleaseAcceptanceEvidenceDiscoveryPageResponse(Strict):
+    """Authorized, bounded discovery of server-bound acceptance evidence.
+
+    The route returns only immutable reference identities.  It does not expose
+    Evidence telemetry, actors, projects, or an operator-selected scope.
+    """
+
+    schema_version: Literal["release-acceptance-evidence-discovery-page:1"] = Field(
+        alias="schemaVersion"
+    )
+    release_id: StrictStr = Field(alias="releaseId", min_length=1, max_length=64)
+    acceptance_id_ref: StrictStr = Field(
+        alias="acceptanceIdRef", pattern="^[A-Z][A-Z0-9-]{1,15}$"
+    )
+    policy_registry_version: Literal[1] = Field(alias="policyRegistryVersion")
+    policy_registry_sha256: ReleaseAcceptanceSha256 = Field(alias="policyRegistrySha256")
+    target_registry_version: Literal[1] = Field(alias="targetRegistryVersion")
+    target_registry_git_blob_sha: ReleaseAcceptanceGitSha = Field(
+        alias="targetRegistryGitBlobSha"
+    )
+    target_registry_file_sha256: ReleaseAcceptanceSha256 = Field(
+        alias="targetRegistryFileSha256"
+    )
+    targets: list[ReleaseAcceptanceResolvedTarget] = Field(min_length=1, max_length=64)
+    items: list[ReleaseAcceptanceResolvedMeasurement] = Field(min_length=1, max_length=100)
+    next_cursor: StrictStr | None = Field(
+        default=None, alias="nextCursor", min_length=1, max_length=256
+    )
+    scope_verified: Literal[True] = Field(alias="scopeVerified")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    @model_validator(mode="after")
+    def _discovered_references_are_consistent(
+        self,
+    ) -> "ReleaseAcceptanceEvidenceDiscoveryPageResponse":
+        if any(
+            target.acceptance_id_ref != self.acceptance_id_ref
+            for target in self.targets
+        ):
+            raise ValueError("discovered targets must match the top-level acceptanceIdRef")
+        if len({target.target_id for target in self.targets}) != len(self.targets):
+            raise ValueError("discovered targets must have unique targetId values")
+        if len({item.evidence_id for item in self.items}) != len(self.items):
+            raise ValueError("discovered evidence must have unique evidenceId values per page")
+        return self
+
+
+class ReleaseAcceptanceTargetRef(Strict):
+    """A desired acceptance target, not evidence that it was measured."""
+
+    target_id: StrictStr = Field(alias="targetId", pattern="^[A-Za-z][A-Za-z0-9_.:/-]{0,127}$")
+    target_sha256: ReleaseAcceptanceSha256 = Field(alias="targetSha256")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceMeasurementRef(Strict):
+    """One observed Evidence object, kept distinct from a target declaration."""
+
+    evidence_id: StrictStr = Field(alias="evidenceId", pattern="^[A-Za-z][A-Za-z0-9_.:/-]{0,127}$")
+    evidence_sha256: ReleaseAcceptanceSha256 = Field(alias="evidenceSha256")
+    observed_at: AwareDatetime = Field(alias="observedAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceDecisionRequest(Strict):
+    """The bounded, non-secret content an operator decides on.
+
+    Identity and fresh-authentication proof are deliberately absent: the server
+    derives both from the verified access token.  Targets say what was required;
+    measurements say what was observed.  Neither may be replaced by free text.
+    """
+
+    acceptance_id_ref: StrictStr = Field(alias="acceptanceIdRef", pattern="^[A-Z][A-Z0-9-]{1,15}$")
+    outcome: ReleaseAcceptanceOutcome
+    target_manifest_sha256: ReleaseAcceptanceSha256 = Field(alias="targetManifestSha256")
+    reason_code: ReleaseAcceptanceReasonCode = Field(alias="reasonCode")
+    target_refs: list[ReleaseAcceptanceTargetRef] = Field(
+        alias="targetRefs", min_length=1, max_length=64
+    )
+    measurement_refs: list[ReleaseAcceptanceMeasurementRef] = Field(
+        alias="measurementRefs", min_length=1, max_length=64
+    )
+    known_limitations: list[ReleaseAcceptanceLimitation] = Field(
+        alias="knownLimitations", max_length=64
+    )
+
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+        json_schema_extra={
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {"outcome": {"const": "conditional"}},
+                        "required": ["outcome"],
+                    },
+                    "then": {"properties": {"knownLimitations": {"minItems": 1}}},
+                    "else": {"properties": {"knownLimitations": {"maxItems": 0}}},
+                }
+            ]
+        },
+    )
+
+    @model_validator(mode="after")
+    def _decision_is_bounded_and_unambiguous(self) -> "ReleaseAcceptanceDecisionRequest":
+        if self.outcome == "conditional" and not self.known_limitations:
+            raise ValueError("conditional acceptance requires knownLimitations")
+        if self.outcome != "conditional" and self.known_limitations:
+            raise ValueError("knownLimitations are allowed only for a conditional decision")
+        target_ids = [item.target_id for item in self.target_refs]
+        if len(set(target_ids)) != len(target_ids):
+            raise ValueError("targetRefs must have unique targetId values")
+        evidence_ids = [item.evidence_id for item in self.measurement_refs]
+        if len(set(evidence_ids)) != len(evidence_ids):
+            raise ValueError("measurementRefs must have unique evidenceId values")
+        return self
+
+
+class ReleaseAcceptanceConfirmationRequest(Strict):
+    """A second operator confirms one exact accepted proposal and manifest."""
+
+    proposal_digest: ReleaseAcceptanceSha256 = Field(alias="proposalDigest")
+    target_manifest_sha256: ReleaseAcceptanceSha256 = Field(alias="targetManifestSha256")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceProposalResponse(Strict):
+    """An accepted decision awaiting a distinct second human operator."""
+
+    proposal_id: StrictStr = Field(alias="proposalId", min_length=1, max_length=64)
+    release_id: StrictStr = Field(alias="releaseId", min_length=1, max_length=64)
+    acceptance_id_ref: StrictStr = Field(alias="acceptanceIdRef", pattern="^[A-Z][A-Z0-9-]{1,15}$")
+    outcome: Literal["accepted"]
+    state: Literal["pending_second_operator"]
+    target_manifest_sha256: ReleaseAcceptanceSha256 = Field(alias="targetManifestSha256")
+    proposal_digest: ReleaseAcceptanceSha256 = Field(alias="proposalDigest")
+    required_distinct_operator_count: Literal[2] = Field(alias="requiredDistinctOperatorCount")
+    proposal_confirmation_count: Literal[1] = Field(alias="proposalConfirmationCount")
+    decision_sign_off: Literal[False] = Field(alias="decisionSignOff")
+    expires_at: AwareDatetime = Field(alias="expiresAt")
+    replayed: StrictBool
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceProposalReviewResponse(Strict):
+    """The exact pending content a distinct confirmer must review before voting."""
+
+    proposal_id: StrictStr = Field(alias="proposalId", min_length=1, max_length=64)
+    release_id: StrictStr = Field(alias="releaseId", min_length=1, max_length=64)
+    acceptance_id_ref: StrictStr = Field(alias="acceptanceIdRef", pattern="^[A-Z][A-Z0-9-]{1,15}$")
+    outcome: Literal["accepted"]
+    state: Literal["pending_second_operator"]
+    target_manifest_sha256: ReleaseAcceptanceSha256 = Field(alias="targetManifestSha256")
+    proposal_digest: ReleaseAcceptanceSha256 = Field(alias="proposalDigest")
+    reason_code: ReleaseAcceptanceReasonCode = Field(alias="reasonCode")
+    target_refs: list[ReleaseAcceptanceTargetRef] = Field(
+        alias="targetRefs", min_length=1, max_length=64
+    )
+    measurement_refs: list[ReleaseAcceptanceMeasurementRef] = Field(
+        alias="measurementRefs", min_length=1, max_length=64
+    )
+    known_limitations: list[ReleaseAcceptanceLimitation] = Field(
+        alias="knownLimitations", max_length=0
+    )
+    required_distinct_operator_count: Literal[2] = Field(alias="requiredDistinctOperatorCount")
+    proposal_confirmation_count: Literal[1] = Field(alias="proposalConfirmationCount")
+    decision_sign_off: Literal[False] = Field(alias="decisionSignOff")
+    expires_at: AwareDatetime = Field(alias="expiresAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceProposalReviewPageResponse(Strict):
+    """Pending proposals discoverable by an authorized second operator."""
+
+    items: list[ReleaseAcceptanceProposalReviewResponse] = Field(max_length=100)
+    next_cursor: StrictStr | None = Field(default=None, alias="nextCursor", min_length=1, max_length=256)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceRecordedResponse(Strict):
+    """A final decision; only two-person ``accepted`` has decision sign-off."""
+
+    acceptance_id: StrictStr = Field(alias="acceptanceId", min_length=1, max_length=64)
+    release_id: StrictStr = Field(alias="releaseId", min_length=1, max_length=64)
+    acceptance_id_ref: StrictStr = Field(alias="acceptanceIdRef", pattern="^[A-Z][A-Z0-9-]{1,15}$")
+    outcome: ReleaseAcceptanceOutcome
+    state: Literal["recorded"]
+    accepted_manifest_sha256: ReleaseAcceptanceSha256 = Field(alias="acceptedManifestSha256")
+    manifest_matches: Literal[True] = Field(alias="manifestMatches")
+    decision_sign_off: StrictBool = Field(alias="decisionSignOff")
+    decision_confirmation_count: StrictInt = Field(alias="decisionConfirmationCount", ge=1, le=2)
+    decided_at: AwareDatetime = Field(alias="decidedAt")
+    replayed: StrictBool
+
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+        json_schema_extra={
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {"outcome": {"const": "accepted"}},
+                        "required": ["outcome"],
+                    },
+                    "then": {
+                        "properties": {
+                            "decisionConfirmationCount": {"const": 2},
+                            "decisionSignOff": {"const": True},
+                        }
+                    },
+                    "else": {
+                        "properties": {
+                            "decisionConfirmationCount": {"const": 1},
+                            "decisionSignOff": {"const": False},
+                        }
+                    },
+                }
+            ]
+        },
+    )
+
+    @model_validator(mode="after")
+    def _quorum_controls_sign_off(self) -> "ReleaseAcceptanceRecordedResponse":
+        if self.outcome == "accepted":
+            if not self.decision_sign_off or self.decision_confirmation_count != 2:
+                raise ValueError("accepted requires two confirmations and decisionSignOff=true")
+        elif self.decision_sign_off or self.decision_confirmation_count != 1:
+            raise ValueError("conditional and rejected decisions never have decision sign-off")
+        return self
+
+
+class ReleaseAcceptanceWithdrawalRequest(Strict):
+    """Withdraw a final decision without deleting or rewriting its history."""
+
+    accepted_manifest_sha256: ReleaseAcceptanceSha256 = Field(alias="acceptedManifestSha256")
+    reason_code: Literal[
+        "manifest-superseded", "acceptance-error", "security-concern", "operator-request"
+    ] = Field(alias="reasonCode")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceWithdrawalResponse(Strict):
+    """An append-only withdrawal receipt with release-scope aggregate sign-off."""
+
+    withdrawal_id: StrictStr = Field(alias="withdrawalId", min_length=1, max_length=64)
+    acceptance_id: StrictStr = Field(alias="acceptanceId", min_length=1, max_length=64)
+    release_id: StrictStr = Field(alias="releaseId", min_length=1, max_length=64)
+    state: Literal["withdrawn"]
+    accepted_manifest_sha256: ReleaseAcceptanceSha256 = Field(alias="acceptedManifestSha256")
+    withdrawn_acceptance_counts_toward_sign_off: Literal[False] = Field(
+        alias="withdrawnAcceptanceCountsTowardSignOff"
+    )
+    operator_sign_off: StrictBool = Field(alias="operatorSignOff")
+    reason_code: Literal[
+        "manifest-superseded", "acceptance-error", "security-concern", "operator-request"
+    ] = Field(alias="reasonCode")
+    withdrawn_at: AwareDatetime = Field(alias="withdrawnAt")
+    replayed: StrictBool
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
 class ReleaseManifestResponse(Strict):
     """A recorded release, and what is recorded about accepting it.
 
@@ -1637,9 +2169,11 @@ class ReleaseManifestResponse(Strict):
     operator_sign_off: Literal[False] = Field(alias="operatorSignOff")
     #: Why it is false, in the response, so a reader is not left to guess whether
     #: the answer is "nobody signed" or "this surface cannot tell". The contract
-    #: for human attestation now exists (``#282``); what is missing is its
-    #: implementation, and the value says which of the two it is.
-    operator_sign_off_blocked_by: Literal["human-attestation-implementation-unavailable"] = Field(
+    #: for human attestation now exists (``#282``), but the verified fresh-auth
+    #: supply and authoritative target/Evidence resolvers do not.  The literal
+    #: names that wider prerequisite boundary rather than claiming that code
+    #: alone can make this release operator-signed.
+    operator_sign_off_blocked_by: Literal["release-acceptance-prerequisites-unavailable"] = Field(
         alias="operatorSignOffBlockedBy"
     )
     #: The quorum the write contract requires. A constant here so a reader sees
