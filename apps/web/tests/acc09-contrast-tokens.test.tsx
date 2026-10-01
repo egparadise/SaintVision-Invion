@@ -21,6 +21,51 @@ import type {
 import * as client from '../src/shared/api/client';
 import * as projectObservation from '../src/shared/api/projectObservation';
 import { fabricObservation } from '../src/shared/api/fabricObservation';
+import type { ProjectItem, NodeItem, RunItem } from '../src/contracts/types';
+
+vi.mock('@/shared/api/client', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../src/shared/api/client')>();
+  return {
+    ...actual,
+    apiClient: vi.fn().mockImplementation(async (endpoint: string) => {
+      if (typeof endpoint === 'string' && endpoint.includes('/execution-readiness')) {
+        return {
+          admissionRequired: true,
+          blockedBy: [],
+          checks: [],
+          executable: true,
+          nodeReadiness: 'unknown',
+          projectId: 'prj_studio_test',
+          scope: 'workspace-preconditions-not-execution-admission',
+          summary: 'Ready for execution',
+          workspaceId: 'wsp_studio_01',
+        };
+      }
+      if (typeof endpoint === 'string' && endpoint.includes('/runs/')) {
+        const m = endpoint.match(/\/runs\/([^/]+)/);
+        const runId = m ? m[1] : 'run_studio_001';
+        let state = 'running';
+        if (runId.includes('succeeded')) state = 'succeeded';
+        else if (runId.includes('failed')) state = 'failed';
+        else if (runId.includes('approval')) state = 'awaiting_approval';
+        return {
+          id: runId,
+          runId,
+          projectId: 'prj_studio_test',
+          status: state,
+          state,
+          nodeId: 'nod_studio_01',
+          objective: 'PACS Inference Execution Test',
+          output: { sha256: 'a'.repeat(64), sizeBytes: 1024 },
+          evidence: { evidenceId: 'ev_001' },
+          stopReceipt: { exitCode: 0, physicallyStopped: true, resourceReclaimed: true, verified: true },
+          completedAt: state === 'succeeded' ? '2026-09-22T10:10:00Z' : undefined,
+        };
+      }
+      return { items: [], nextCursor: null };
+    }),
+  };
+});
 
 (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -241,7 +286,7 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/runs/RunDetail.tsx": {"#047857": 2, "#0d1117": 1, "#10b981": 9, "#1d4ed8": 1, "#21262d": 1, "#22c55e": 1, "#30363d": 1, "#34d399": 2, "#38bdf8": 2, "#3b82f6": 2, "#3fb950": 1, "#4ade80": 1, "#58a6ff": 6, "#60a5fa": 1, "#8b949e": 4, "#93c5fd": 7, "#94a3b8": 2, "#b45309": 1, "#c9d1d9": 1, "#d97706": 6, "#e2e8f0": 1, "#eab308": 2, "#ef4444": 7, "#f59e0b": 3, "#f85149": 7, "#f87171": 2, "#fca5a5": 3, "#fef08a": 1, "#ffffff": 1, "rgba(0,0,0,0.65)": 2, "rgba(110,118,129,0.2)": 1, "rgba(16,185,129,0.1)": 1, "rgba(16,185,129,0.12)": 2, "rgba(16,185,129,0.15)": 1, "rgba(217,119,6,0.12)": 1, "rgba(217,119,6,0.2)": 2, "rgba(218,54,51,0.2)": 2, "rgba(234,179,8,0.1)": 1, "rgba(234,179,8,0.12)": 1, "rgba(234,179,8,0.3)": 1, "rgba(239,68,68,0.1)": 4, "rgba(239,68,68,0.15)": 1, "rgba(245,158,11,0.12)": 1, "rgba(248,81,73,0.1)": 3, "rgba(34,197,94,0.08)": 1, "rgba(46,160,67,0.2)": 1, "rgba(56,139,253,0.15)": 1, "rgba(59,130,246,0.08)": 1, "rgba(59,130,246,0.1)": 7, "rgba(59,130,246,0.15)": 1, "rgba(59,130,246,0.25)": 6, "rgba(59,130,246,0.3)": 1},
   "features/runs/RunList.tsx": {"#0284c7": 1, "#06b6d4": 1, "#10b981": 3, "#3b82f6": 3, "#58a6ff": 1, "#60a5fa": 1, "#64748b": 1, "#6b7280": 1, "#8b5cf6": 2, "#d97706": 2, "#ef4444": 4, "#f59e0b": 1, "#f85149": 2, "#f97316": 1, "#fca5a5": 2, "#fff": 1, "#ffffff": 1, "rgba(100,116,139,0.15)": 1, "rgba(107,114,128,0.15)": 1, "rgba(139,92,246,0.1)": 1, "rgba(139,92,246,0.15)": 1, "rgba(139,92,246,0.3)": 1, "rgba(16,185,129,0.15)": 1, "rgba(2,132,199,0.15)": 1, "rgba(217,119,6,0.15)": 1, "rgba(239,68,68,0.08)": 1, "rgba(239,68,68,0.1)": 1, "rgba(239,68,68,0.15)": 1, "rgba(245,158,11,0.15)": 1, "rgba(249,115,22,0.15)": 1, "rgba(59,130,246,0.1)": 1, "rgba(59,130,246,0.15)": 1, "rgba(59,130,246,0.2)": 1, "rgba(59,130,246,0.3)": 1, "rgba(6,182,212,0.15)": 1},
   "features/runs/SealRecordPanel.tsx": {"#0d1117": 4, "#161b22": 13, "#21262d": 2, "#30363d": 8, "#3fb950": 4, "#58a6ff": 8, "#8b949e": 30, "#a0a8b2": 2, "#c9d1d9": 9, "#d29922": 2, "#e3b341": 3, "#f0f6fc": 14, "#f85149": 4, "#ff7b72": 7, "rgba(160,168,178,0.15)": 1, "rgba(210,153,34,0.1)": 1, "rgba(210,153,34,0.15)": 2, "rgba(210,153,34,0.2)": 1, "rgba(210,153,34,0.4)": 2, "rgba(248,81,73,0.15)": 6, "rgba(248,81,73,0.4)": 2, "rgba(46,160,67,0.15)": 4, "rgba(46,160,67,0.4)": 4, "rgba(56,139,253,0.15)": 1, "rgba(56,139,253,0.3)": 1},
-  "features/studio/DeveloperStudio.tsx": {"#0d1117": 2, "#161b22": 1, "#22c55e": 1, "#2ea043": 5, "#30363d": 2, "#304": 2, "#388bfd": 1, "#3b82f6": 1, "#3fb950": 25, "#58a6ff": 14, "#86efac": 1, "#8b949e": 4, "#93c5fd": 1, "#bc8cff": 1, "#c9d1d9": 1, "#d29922": 22, "#e6edf3": 2, "#ef4444": 2, "#f85149": 15, "#fbbf24": 1, "#fca5a5": 2, "#ffffff": 2, "rgba(0,0,0,0.2)": 1, "rgba(0,0,0,0.6)": 2, "rgba(139,148,158,0.2)": 1, "rgba(139,148,158,0.3)": 1, "rgba(163,113,247,0.2)": 1, "rgba(210,153,34,0.08)": 3, "rgba(210,153,34,0.12)": 3, "rgba(210,153,34,0.15)": 1, "rgba(210,153,34,0.2)": 5, "rgba(210,153,34,0.25)": 1, "rgba(210,153,34,0.35)": 1, "rgba(210,153,34,0.4)": 3, "rgba(234,179,8,0.15)": 1, "rgba(234,179,8,0.3)": 1, "rgba(239,68,68,0.1)": 1, "rgba(239,68,68,0.15)": 1, "rgba(248,81,73,0.08)": 1, "rgba(248,81,73,0.12)": 1, "rgba(248,81,73,0.15)": 1, "rgba(248,81,73,0.2)": 4, "rgba(248,81,73,0.4)": 2, "rgba(34,197,94,0.15)": 1, "rgba(46,160,67,0.04)": 1, "rgba(46,160,67,0.05)": 3, "rgba(46,160,67,0.15)": 2, "rgba(46,160,67,0.2)": 7, "rgba(46,160,67,0.3)": 3, "rgba(46,160,67,0.4)": 1, "rgba(56,139,253,0.05)": 2, "rgba(56,139,253,0.08)": 5, "rgba(56,139,253,0.15)": 1, "rgba(56,139,253,0.2)": 2, "rgba(56,139,253,0.25)": 1, "rgba(56,139,253,0.3)": 2, "rgba(59,130,246,0.15)": 1},
+  "features/studio/DeveloperStudio.tsx": {},
   "features/terminal/WebTerminal.tsx": {"#090d16": 1, "#0d1117": 1, "#161b22": 1, "#1c1917": 1, "#238636": 1, "#30363d": 2, "#451a03": 1, "#58a6ff": 1, "#6b7280": 1, "#7f1d1d": 1, "#8b949e": 5, "#c9d1d9": 2, "#d29922": 1, "#d97706": 1, "#ea580c": 1, "#ef4444": 2, "#f0f6fc": 2, "#f85149": 1, "#fb923c": 1, "#fde68a": 2, "#fecaca": 1, "#fed7aa": 1, "#fff": 1},
   "features/workspaces/ExecutionResultView.tsx": {"rgba(16,185,129,0.15)": 1},
   "features/workspaces/WorkspaceCreateModal.tsx": {"rgba(0,0,0,0.65)": 1},
@@ -264,14 +309,23 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
   const darkTokens = extractTokens(darkBlockMatch[1]);
 
   let originalGlobalFetch: typeof globalThis.fetch;
+  let originalWindowFetch: any;
   beforeAll(() => {
     originalGlobalFetch = globalThis.fetch;
-    globalThis.fetch = vi.fn().mockImplementation(() =>
+    originalWindowFetch = typeof window !== 'undefined' ? (window as any).fetch : undefined;
+    const mocked = vi.fn().mockImplementation(() =>
       Promise.resolve(new Response(JSON.stringify({}), { status: 200, headers: { 'Content-Type': 'application/json' } }))
     );
+    globalThis.fetch = mocked;
+    if (typeof window !== 'undefined') {
+      (window as any).fetch = mocked;
+    }
   });
   afterAll(() => {
     globalThis.fetch = originalGlobalFetch;
+    if (typeof window !== 'undefined' && originalWindowFetch) {
+      (window as any).fetch = originalWindowFetch;
+    }
   });
 
   // Codex F2: Status tokens must be declared exactly once per theme block without comment decoys
@@ -2772,6 +2826,535 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(violations, `Expected 0 style-pair contrast/collision violations in IntranetDeploymentView, got:\n${violations.join('\n')}`).toEqual([]);
   });
 
+  // 9g. [Card 206 / ACC-09] Component DOM Rendering Verification: DeveloperStudio binds foregrounds and container backgrounds to design tokens with dynamic contrast verification
+  it('ACC-09 / Card 206: DeveloperStudio component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification', async () => {
+    const container = document.createElement('div');
+    container.setAttribute('data-theme', 'dark');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    const originalGlobalFetch = globalThis.fetch;
+    const originalWindowFetch = typeof window !== 'undefined' ? (window as any).fetch : undefined;
+    const mockFetch = vi.fn().mockImplementation(() =>
+      Promise.resolve({
+        ok: true,
+        status: 200,
+        headers: new Headers({ 'Content-Type': 'application/json' }),
+        json: async () => ({
+          items: [],
+          nextCursor: null,
+          runId: 'run_studio_001',
+          output: { sha256: 'a'.repeat(64), sizeBytes: 1024 },
+          evidence: { evidenceId: 'ev_001' },
+          stopReceipt: { exitCode: 0, physicallyStopped: true, resourceReclaimed: true, verified: true },
+        }),
+        text: async () => JSON.stringify({ items: [] }),
+      } as Response)
+    );
+    vi.stubGlobal('fetch', mockFetch);
+    if (typeof window !== 'undefined') {
+      (window as any).fetch = mockFetch;
+    }
+
+    vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
+      if (endpoint.includes('/runs/')) {
+        return {
+          id: 'run_studio_001',
+          runId: 'run_studio_001',
+          projectId: 'prj_studio_test',
+          status: 'running',
+          state: 'running',
+          nodeId: 'nod_studio_01',
+          objective: 'PACS Inference Execution Test',
+          output: { sha256: 'a'.repeat(64), sizeBytes: 1024 },
+          evidence: { evidenceId: 'ev_001' },
+          stopReceipt: { exitCode: 0, physicallyStopped: true, resourceReclaimed: true, verified: true },
+        } as any;
+      }
+      return {
+        items: [],
+        nextCursor: null,
+      } as any;
+    });
+    vi.spyOn(projectObservation, 'fetchProjectWorkspaces').mockResolvedValue([]);
+
+    const sampleProject: ProjectItem = {
+      id: 'prj_studio_test',
+      name: 'PACS Inference Studio',
+      createdAt: '2026-09-22T00:00:00Z',
+    };
+
+    const sampleNode: NodeItem = {
+      id: 'nod_studio_01',
+      hostname: 'gpu-worker-01.saintvision.internal',
+      status: 'online',
+      os: 'linux',
+      cpuCores: 16,
+      cpuUsagePercent: 25,
+      memoryTotalBytes: 68719476736,
+      memoryUsedBytes: 17179869184,
+      gpuCount: 1,
+      storageTotalBytes: 1000000000000,
+      storageUsedBytes: 250000000000,
+      heartbeatAt: '2026-09-22T10:00:00Z',
+      schedulable: true,
+    };
+
+    const baseSampleRun: RunItem = {
+      id: 'run_studio_001',
+      projectId: 'prj_studio_test',
+      status: 'running',
+      state: 'running',
+      nodeId: 'nod_studio_01',
+      objective: 'PACS Inference Execution Test',
+      attempt: 1,
+      version: 1,
+      createdAt: '2026-09-22T10:00:00Z',
+      stateUpdatedAt: '2026-09-22T10:05:00Z',
+    };
+
+    try {
+      // 1. Initial Render in Step 1 (Project & Workspace)
+      await act(async () => {
+        root.render(
+          <DeveloperStudio
+            key="studio-step1"
+            project={sampleProject}
+            nodes={[sampleNode]}
+            runs={[baseSampleRun]}
+            initialStep={1}
+            initialNodeId={null}
+            initialWorkspaceId={null}
+          />
+        );
+      });
+
+      // 1-a. Stepper Step 1 (Active)
+      const step1 = container.querySelector('[data-testid="studio-stepper-step-1"]') as HTMLElement;
+      expect(step1, 'Stepper step 1 must render').not.toBeNull();
+      expect(step1.getAttribute('aria-selected')).toBe('true');
+      expect(step1.style.backgroundColor, 'Step 1 bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(step1.style.borderColor, 'Step 1 active border must bind to var(--color-brand-primary)').toBe('var(--color-brand-primary)');
+      const s1Border = helperExtractVar(step1.style.borderColor);
+      expect(getContrast(lightTokens[s1Border], lightTokens['--color-bg-subtle']), 'Step 1 light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[s1Border], darkTokens['--color-bg-subtle']), 'Step 1 dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 1-b. Render with bound Node & Workspace Chips
+      await act(async () => {
+        root.render(
+          <DeveloperStudio
+            key="studio-step2"
+            project={sampleProject}
+            nodes={[sampleNode]}
+            runs={[baseSampleRun]}
+            initialStep={2}
+            initialNodeId="nod_studio_01"
+            initialWorkspaceId="wsp_studio_01"
+          />
+        );
+      });
+
+      // Node Chip
+      const nodeChip = container.querySelector('[data-testid="studio-node-chip"]') as HTMLElement;
+      expect(nodeChip, 'Studio node chip must render').not.toBeNull();
+      expect(nodeChip.style.backgroundColor, 'Node chip bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(nodeChip.style.color, 'Node chip text must bind to var(--color-brand-hover)').toBe('var(--color-brand-hover)');
+      expect(nodeChip.style.borderColor, 'Node chip border must bind to var(--color-border-subtle)').toBe('var(--color-border-subtle)');
+      const ncBg = helperExtractVar(nodeChip.style.backgroundColor);
+      const ncFg = helperExtractVar(nodeChip.style.color);
+      const ncBorder = helperExtractVar(nodeChip.style.borderColor);
+      expect(getContrast(lightTokens[ncFg], lightTokens[ncBg]), 'Node chip light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[ncFg], darkTokens[ncBg]), 'Node chip dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[ncBorder], lightTokens[ncBg]), 'Node chip light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[ncBorder], darkTokens[ncBg]), 'Node chip dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // Workspace Chip
+      const wspChip = container.querySelector('[data-testid="studio-workspace-chip"]') as HTMLElement;
+      expect(wspChip, 'Studio workspace chip must render').not.toBeNull();
+      expect(wspChip.style.backgroundColor, 'Workspace chip bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(wspChip.style.color, 'Workspace chip text must bind to var(--color-status-online)').toBe('var(--color-status-online)');
+      expect(wspChip.style.borderColor, 'Workspace chip border must bind to var(--color-border-subtle)').toBe('var(--color-border-subtle)');
+      const wcBg = helperExtractVar(wspChip.style.backgroundColor);
+      const wcFg = helperExtractVar(wspChip.style.color);
+      const wcBorder = helperExtractVar(wspChip.style.borderColor);
+      expect(getContrast(lightTokens[wcFg], lightTokens[wcBg]), 'Workspace chip light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[wcFg], darkTokens[wcBg]), 'Workspace chip dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[wcBorder], lightTokens[wcBg]), 'Workspace chip light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[wcBorder], darkTokens[wcBg]), 'Workspace chip dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 2. Step 4 Execution Status Badge: State Transitions (Running, Succeeded, Failed, Awaiting Approval)
+      // 2-a. RUNNING state
+      await act(async () => {
+        root.render(
+          <DeveloperStudio
+            key="studio-run-running"
+            project={sampleProject}
+            nodes={[sampleNode]}
+            runs={[{ ...baseSampleRun, id: 'run_studio_running', state: 'running' }]}
+            initialStep={4}
+            initialRunId="run_studio_running"
+          />
+        );
+      });
+      const badgeRunning = container.querySelector('[data-testid="studio-execution-status-badge"]') as HTMLElement;
+      expect(badgeRunning, 'Status badge (running) must render').not.toBeNull();
+      expect(badgeRunning.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(badgeRunning.style.color, 'Running status text must bind to var(--color-brand-hover)').toBe('var(--color-brand-hover)');
+      expect(badgeRunning.style.borderColor, 'Running status border must bind to var(--color-brand-hover)').toBe('var(--color-brand-hover)');
+      expect(badgeRunning.textContent).toContain('RUNNING');
+      const rBg = helperExtractVar(badgeRunning.style.backgroundColor);
+      const rFg = helperExtractVar(badgeRunning.style.color);
+      const rBorder = helperExtractVar(badgeRunning.style.borderColor);
+      expect(getContrast(lightTokens[rFg], lightTokens[rBg]), 'Running light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[rFg], darkTokens[rBg]), 'Running dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[rBorder], lightTokens[rBg]), 'Running light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[rBorder], darkTokens[rBg]), 'Running dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 2-b. SUCCEEDED state
+      await act(async () => {
+        root.render(
+          <DeveloperStudio
+            key="studio-run-succeeded"
+            project={sampleProject}
+            nodes={[sampleNode]}
+            runs={[{ ...baseSampleRun, id: 'run_studio_succeeded', state: 'succeeded', completedAt: '2026-09-22T10:10:00Z' }]}
+            initialStep={4}
+            initialRunId="run_studio_succeeded"
+          />
+        );
+      });
+      const badgeSucceeded = container.querySelector('[data-testid="studio-execution-status-badge"]') as HTMLElement;
+      expect(badgeSucceeded, 'Status badge (succeeded) must render').not.toBeNull();
+      expect(badgeSucceeded.style.color, 'Succeeded status text must bind to var(--color-status-online)').toBe('var(--color-status-online)');
+      expect(badgeSucceeded.style.borderColor, 'Succeeded status border must bind to var(--color-status-online)').toBe('var(--color-status-online)');
+      expect(badgeSucceeded.textContent).toContain('SUCCEEDED');
+      const sFg = helperExtractVar(badgeSucceeded.style.color);
+      const sBorder = helperExtractVar(badgeSucceeded.style.borderColor);
+      expect(getContrast(lightTokens[sFg], lightTokens[rBg]), 'Succeeded light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[sFg], darkTokens[rBg]), 'Succeeded dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[sBorder], lightTokens[rBg]), 'Succeeded light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[sBorder], darkTokens[rBg]), 'Succeeded dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // CompletedAt timestamp badge
+      const completedAtBadge = container.querySelector('[data-testid="studio-run-completed-at"]') as HTMLElement;
+      expect(completedAtBadge, 'CompletedAt badge must render').not.toBeNull();
+      expect(completedAtBadge.style.color).toBe('var(--color-status-online)');
+      const caFg = helperExtractVar(completedAtBadge.style.color);
+      expect(getContrast(lightTokens[caFg], lightTokens['--color-bg-subtle']), 'CompletedAt light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[caFg], darkTokens['--color-bg-subtle']), 'CompletedAt dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      // 2-c. FAILED state
+      await act(async () => {
+        root.render(
+          <DeveloperStudio
+            key="studio-run-failed"
+            project={sampleProject}
+            nodes={[sampleNode]}
+            runs={[{ ...baseSampleRun, id: 'run_studio_failed', state: 'failed' }]}
+            initialStep={4}
+            initialRunId="run_studio_failed"
+          />
+        );
+      });
+      const badgeFailed = container.querySelector('[data-testid="studio-execution-status-badge"]') as HTMLElement;
+      expect(badgeFailed, 'Status badge (failed) must render').not.toBeNull();
+      expect(badgeFailed.style.color, 'Failed status text must bind to var(--color-status-offline)').toBe('var(--color-status-offline)');
+      expect(badgeFailed.style.borderColor, 'Failed status border must bind to var(--color-status-offline)').toBe('var(--color-status-offline)');
+      expect(badgeFailed.textContent).toContain('FAILED');
+      const fFg = helperExtractVar(badgeFailed.style.color);
+      const fBorder = helperExtractVar(badgeFailed.style.borderColor);
+      expect(getContrast(lightTokens[fFg], lightTokens[rBg]), 'Failed light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[fFg], darkTokens[rBg]), 'Failed dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[fBorder], lightTokens[rBg]), 'Failed light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[fBorder], darkTokens[rBg]), 'Failed dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 2-d. AWAITING_APPROVAL state
+      await act(async () => {
+        root.render(
+          <DeveloperStudio
+            key="studio-run-approval"
+            project={sampleProject}
+            nodes={[sampleNode]}
+            runs={[{ ...baseSampleRun, id: 'run_studio_approval', state: 'awaiting_approval' }]}
+            initialStep={4}
+            initialRunId="run_studio_approval"
+          />
+        );
+      });
+      const badgeApproval = container.querySelector('[data-testid="studio-execution-status-badge"]') as HTMLElement;
+      expect(badgeApproval, 'Status badge (awaiting_approval) must render').not.toBeNull();
+      expect(badgeApproval.style.color, 'Awaiting approval text must bind to var(--color-status-degraded)').toBe('var(--color-status-degraded)');
+      expect(badgeApproval.style.borderColor, 'Awaiting approval border must bind to var(--color-status-degraded)').toBe('var(--color-status-degraded)');
+      expect(badgeApproval.textContent).toContain('AWAITING_APPROVAL');
+      const aFg = helperExtractVar(badgeApproval.style.color);
+      const aBorder = helperExtractVar(badgeApproval.style.borderColor);
+      expect(getContrast(lightTokens[aFg], lightTokens[rBg]), 'Awaiting approval light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[aFg], darkTokens[rBg]), 'Awaiting approval dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[aBorder], lightTokens[rBg]), 'Awaiting approval light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[aBorder], darkTokens[rBg]), 'Awaiting approval dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    } finally {
+      vi.unstubAllGlobals();
+      if (typeof window !== 'undefined' && originalWindowFetch) {
+        Object.defineProperty(window, 'fetch', { value: originalWindowFetch, writable: true, configurable: true });
+      }
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    }
+  }, 15000);
+
+  // 9g-2. [Card 206 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: DeveloperStudio
+  it('ACC-09 / Card 206: DeveloperStudio style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
+    const filePath = path.resolve(__dirname, '../src/features/studio/DeveloperStudio.tsx');
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const sf = ts.createSourceFile('DeveloperStudio.tsx', content, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+
+    interface Branch {
+      cond: string;
+      token: string;
+    }
+
+    function extractBranches(node: ts.Node): Branch[] {
+      const branches: Branch[] = [];
+      function collect(n: ts.Node, condPath: string) {
+        if (ts.isConditionalExpression(n)) {
+          const condText = n.condition.getText(sf).replace(/\s+/g, ' ');
+          collect(n.whenTrue, condPath ? `${condPath} && ${condText}` : condText);
+          collect(n.whenFalse, condPath ? `${condPath} && !(${condText})` : `!(${condText})`);
+        } else if (ts.isTemplateExpression(n)) {
+          for (const span of n.templateSpans) {
+            collect(span.expression, condPath);
+          }
+        } else {
+          const text = n.getText(sf);
+          const m = text.match(/var\((--color-[a-z0-9-]+)\)/);
+          if (m) {
+            branches.push({ cond: condPath, token: m[1] });
+          }
+        }
+      }
+      collect(node, '');
+      return branches;
+    }
+
+    function extractOpacity(node: ts.Node): number | null {
+      if (ts.isNumericLiteral(node)) return parseFloat(node.text);
+      if (ts.isConditionalExpression(node)) {
+        const trueOp = extractOpacity(node.whenTrue);
+        const falseOp = extractOpacity(node.whenFalse);
+        if (trueOp !== null && falseOp !== null) return Math.min(trueOp, falseOp);
+        return trueOp ?? falseOp;
+      }
+      return null;
+    }
+
+    let checkedPairs = 0;
+    let checkedObjects = 0;
+    let totalStyleAttrs = 0;
+    let unboundColorObjects = 0;
+    let checkedBorderObjects = 0;
+    let checkedBorderPairs = 0;
+    const violations: string[] = [];
+    const containerBgs = ['--color-bg-surface', '--color-bg-subtle', '--color-bg-canvas'];
+
+    function checkPair(bgToken: string, fgToken: string, pos: number, opacity: number = 1.0) {
+      checkedPairs++;
+      const { line } = sf.getLineAndCharacterOfPosition(pos);
+      const lightBg = resolveTokenHex(bgToken, lightTokens);
+      const lightFg = resolveTokenHex(fgToken, lightTokens);
+      const darkBg = resolveTokenHex(bgToken, darkTokens);
+      const darkFg = resolveTokenHex(fgToken, darkTokens);
+
+      if (bgToken === fgToken && opacity >= 1.0) {
+        violations.push(`L${line + 1}: 1:1 token collision between background and foreground (${bgToken})`);
+        return;
+      }
+
+      if (bgToken.startsWith('--color-text-')) {
+        violations.push(`L${line + 1}: Illegitimate background token derived from text token: ${bgToken}`);
+        return;
+      }
+
+      const effectiveLFg = opacity < 1.0 && lightBg && lightFg ? blendRgba(parseHex(lightFg), opacity, lightBg) : lightFg;
+      const effectiveDFg = opacity < 1.0 && darkBg && darkFg ? blendRgba(parseHex(darkFg), opacity, darkBg) : darkFg;
+
+      if (lightBg && effectiveLFg) {
+        const cr = getContrast(effectiveLFg, lightBg);
+        if (cr < 4.5) {
+          violations.push(`L${line + 1}: Light text contrast ${cr.toFixed(2)}:1 < 4.5:1 (${fgToken} on ${bgToken}${opacity < 1.0 ? ` opacity ${opacity.toFixed(2)}` : ''})`);
+        }
+      }
+      if (darkBg && effectiveDFg) {
+        const cr = getContrast(effectiveDFg, darkBg);
+        if (cr < 4.5) {
+          violations.push(`L${line + 1}: Dark text contrast ${cr.toFixed(2)}:1 < 4.5:1 (${fgToken} on ${bgToken}${opacity < 1.0 ? ` opacity ${opacity.toFixed(2)}` : ''})`);
+        }
+      }
+    }
+
+    function checkBorderPair(bgToken: string, borderToken: string, pos: number, opacity: number = 1.0) {
+      checkedBorderPairs++;
+      const { line } = sf.getLineAndCharacterOfPosition(pos);
+      const lBg = resolveTokenHex(bgToken, lightTokens);
+      const dBg = resolveTokenHex(bgToken, darkTokens);
+      const lBorder = resolveTokenHex(borderToken, lightTokens);
+      const dBorder = resolveTokenHex(borderToken, darkTokens);
+
+      if (bgToken === borderToken && opacity >= 1.0) {
+        violations.push(`L${line + 1}: Identical border-background token collision (1:1 contrast) detected: ${borderToken} on ${bgToken}`);
+        return;
+      }
+
+      if (bgToken.startsWith('--color-text-')) {
+        violations.push(`L${line + 1}: Illegitimate background token derived from text token: ${bgToken}`);
+        return;
+      }
+
+      const effectiveLBorder = opacity < 1.0 && lBg && lBorder ? blendRgba(parseHex(lBorder), opacity, lBg) : lBorder;
+      const effectiveDBorder = opacity < 1.0 && dBg && dBorder ? blendRgba(parseHex(dBorder), opacity, dBg) : dBorder;
+
+      if (lBg && effectiveLBorder) {
+        const cr = getContrast(effectiveLBorder, lBg);
+        if (cr < 3.0) {
+          violations.push(`L${line + 1}: Light border contrast ${cr.toFixed(2)}:1 < 3.0:1 (${borderToken} on ${bgToken}${opacity < 1.0 ? ` opacity ${opacity.toFixed(2)}` : ''})`);
+        }
+      }
+      if (dBg && effectiveDBorder) {
+        const cr = getContrast(effectiveDBorder, dBg);
+        if (cr < 3.0) {
+          violations.push(`L${line + 1}: Dark border contrast ${cr.toFixed(2)}:1 < 3.0:1 (${borderToken} on ${bgToken}${opacity < 1.0 ? ` opacity ${opacity.toFixed(2)}` : ''})`);
+        }
+      }
+    }
+
+    function traverseJsx(node: ts.Node, ancestorBgTokens: string[], ancestorFgTokens: string[], ancestorOpacity: number) {
+      let currentBgTokens = ancestorBgTokens;
+      let currentFgTokens = ancestorFgTokens;
+      let currentOpacity = ancestorOpacity;
+
+      if (ts.isJsxElement(node) || ts.isJsxSelfClosingElement(node)) {
+        const opening = ts.isJsxElement(node) ? node.openingElement : node;
+        const attrs = opening.attributes?.properties || [];
+        let styleObj: ts.ObjectLiteralExpression | null = null;
+
+        for (const attr of attrs) {
+          if (ts.isJsxAttribute(attr) && attr.name.text === 'style') {
+            totalStyleAttrs++;
+            if (attr.initializer && ts.isJsxExpression(attr.initializer) && attr.initializer.expression && ts.isObjectLiteralExpression(attr.initializer.expression)) {
+              styleObj = attr.initializer.expression;
+            }
+          }
+        }
+
+        if (styleObj) {
+          let bgNode: ts.Expression | null = null;
+          let fgNode: ts.Expression | null = null;
+          let borderNode: ts.Expression | null = null;
+          let opacityNode: ts.Expression | null = null;
+
+          for (const p of styleObj.properties) {
+            if (ts.isPropertyAssignment(p)) {
+              const name = p.name.getText(sf);
+              if (name === 'backgroundColor' || name === 'background') bgNode = p.initializer;
+              if (name === 'color') fgNode = p.initializer;
+              if (['border', 'borderColor', 'borderTop', 'borderBottom', 'borderLeft', 'borderRight'].includes(name)) {
+                borderNode = p.initializer;
+              }
+              if (name === 'opacity') opacityNode = p.initializer;
+            }
+          }
+
+          if (opacityNode) {
+            const elemOp = extractOpacity(opacityNode);
+            if (elemOp !== null) currentOpacity = ancestorOpacity * elemOp;
+          }
+
+          const bgBranches = bgNode ? extractBranches(bgNode) : [];
+          if (bgBranches.length > 0) {
+            currentBgTokens = bgBranches.map(b => b.token);
+            for (const b of bgBranches) {
+              if (b.token.startsWith('--color-text-')) {
+                const { line } = sf.getLineAndCharacterOfPosition(bgNode!.getStart(sf));
+                violations.push(`L${line + 1}: Illegitimate background token derived from text token: ${b.token}`);
+              }
+            }
+          }
+
+          const fgBranches = fgNode ? extractBranches(fgNode) : [];
+          if (fgBranches.length > 0) {
+            currentFgTokens = fgBranches.map(b => b.token);
+          }
+
+          if (bgNode && fgNode) {
+            checkedObjects++;
+            for (const bgB of bgBranches) {
+              for (const fgB of fgBranches) {
+                if (!bgB.cond || !fgB.cond || bgB.cond === fgB.cond) {
+                  checkPair(bgB.token, fgB.token, styleObj.getStart(sf), currentOpacity);
+                }
+              }
+            }
+          } else if (!bgNode && fgNode) {
+            unboundColorObjects++;
+            const effectiveBgs = ancestorBgTokens.length > 0 ? ancestorBgTokens : containerBgs;
+            for (const fgB of fgBranches) {
+              for (const cBg of effectiveBgs) {
+                checkPair(cBg, fgB.token, styleObj.getStart(sf), currentOpacity);
+              }
+            }
+          } else if (opacityNode && !fgNode && currentFgTokens.length > 0) {
+            unboundColorObjects++;
+            const effectiveBgs = currentBgTokens.length > 0 ? currentBgTokens : (ancestorBgTokens.length > 0 ? ancestorBgTokens : containerBgs);
+            for (const fgT of currentFgTokens) {
+              for (const cBg of effectiveBgs) {
+                checkPair(cBg, fgT, styleObj.getStart(sf), currentOpacity);
+              }
+            }
+          }
+
+          if (borderNode) {
+            const borderBranches = extractBranches(borderNode);
+            if (borderBranches.length > 0) {
+              checkedBorderObjects++;
+              if (bgNode) {
+                for (const bB of borderBranches) {
+                  for (const bgB of bgBranches) {
+                    if (!bB.cond || !bgB.cond || bB.cond === bgB.cond) {
+                      checkBorderPair(bgB.token, bB.token, styleObj.getStart(sf), currentOpacity);
+                    }
+                  }
+                }
+              } else {
+                const effectiveBgs = ancestorBgTokens.length > 0 ? ancestorBgTokens : containerBgs;
+                for (const bB of borderBranches) {
+                  for (const cBg of effectiveBgs) {
+                    checkBorderPair(cBg, bB.token, styleObj.getStart(sf), currentOpacity);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      ts.forEachChild(node, child => traverseJsx(child, currentBgTokens, currentFgTokens, currentOpacity));
+    }
+
+    traverseJsx(sf, [], [], 1.0);
+
+    // Exact ratchet assertions covering 100% of DeveloperStudio style declarations
+    expect(totalStyleAttrs, 'Total style attributes in DeveloperStudio must be exactly 252').toBe(252);
+    expect(checkedObjects, 'Style objects with explicit background and foreground must be exactly 36').toBe(36);
+    expect(checkedPairs, 'Evaluated foreground-background pairs across conditional branches must be exactly 156').toBe(156);
+    expect(unboundColorObjects, 'Elements with foreground color inheriting container background must be exactly 92').toBe(92);
+    expect(checkedObjects + unboundColorObjects, 'Total covered color style objects must be exactly 128').toBe(128);
+    expect(checkedBorderObjects, 'Style objects with explicit border token declarations must be exactly 68').toBe(68);
+    expect(checkedBorderPairs, 'Evaluated border-background pairs across conditional and container branches must be exactly 92').toBe(92);
+    expect(violations, `Expected 0 style-pair contrast/collision violations in DeveloperStudio, got:\n${violations.join('\n')}`).toEqual([]);
+  });
+
+
   // 9. [F1 & Card 186 Revert-Fail Probes] Mutating fixes back to defective combinations strictly fails
   it('ACC-09 Revert-Fail Probes: Defective color combinations strictly fail WCAG AA criteria', () => {
     // Probe 1: RiskBadge light L1 with former #2563eb on 15% tint over light surface
@@ -3048,6 +3631,20 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(probe57DarkCr, 'Defective 0.5 opacity text on dark subtle fails 4.5:1').toBeLessThan(4.5);
     expect(probe57DarkCr).toBeCloseTo(2.31, 2);
 
+    // Probe 58 [Card 206]: DeveloperStudio former hardcoded #d29922 on light subtle fails 4.5:1
+    expect(getContrast('#d29922', lightTokens['--color-bg-subtle']), 'DeveloperStudio former #d29922 on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(getContrast('#d29922', lightTokens['--color-bg-subtle'])).toBeCloseTo(2.304, 2);
+
+    // Probe 59 [Card 206]: DeveloperStudio non-schedulable node card opacity 0.75 degrades muted text on subtle below 4.5:1
+    const defectiveMutedOp075Dark = blendRgba(parseHex(darkTokens['--color-text-muted']), 0.75, darkTokens['--color-bg-subtle']);
+    const probe59DarkCr = getContrast(defectiveMutedOp075Dark, darkTokens['--color-bg-subtle']);
+    expect(probe59DarkCr, 'Non-schedulable card opacity 0.75 degrades muted text below 4.5:1 in dark mode').toBeLessThan(4.5);
+    expect(probe59DarkCr).toBeCloseTo(3.94, 2);
+
+    // Probe 60 [Card 206]: DeveloperStudio active tab borderBottom 1:1 collision with surface background strictly fails 3.0:1
+    expect(getContrast(lightTokens['--color-bg-surface'], lightTokens['--color-bg-surface']), 'Active tab border 1:1 collision in light fails 3.0:1').toBe(1.0);
+    expect(getContrast(darkTokens['--color-bg-surface'], darkTokens['--color-bg-surface']), 'Active tab border 1:1 collision in dark fails 3.0:1').toBe(1.0);
+
     // Legacy Token Reverts:
     // Legacy Dark --color-border-subtle: #374151
     expect(getContrast('#374151', darkTokens['--color-bg-surface'])).toBeLessThan(3.0); // 1.72:1
@@ -3059,8 +3656,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(getContrast('#64748b', lightTokens['--color-bg-subtle'])).toBeLessThan(4.5); // 4.34:1
   });
 
-  // 10. [F2 Fail-Closed Multiset Inventory & Ratchet] var(--color-border-subtle) exact 346/25 and exact per-file literal multisets strictly bounded
-  it('ACC-09 / F2 Fail-Closed Multiset Inventory & Ratchet: var(--color-border-subtle) exact 346/25 and exact per-file literal multisets strictly bounded', () => {
+  // 10. [F2 Fail-Closed Multiset Inventory & Ratchet] var(--color-border-subtle) exact 356/25 and exact per-file literal multisets strictly bounded
+  it('ACC-09 / F2 Fail-Closed Multiset Inventory & Ratchet: var(--color-border-subtle) exact 356/25 and exact per-file literal multisets strictly bounded', () => {
     const srcDir = path.resolve(__dirname, '../src');
     const allFiles = getAllSourceFiles(srcDir);
 
@@ -3142,7 +3739,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
 
     // Exact count verification for var(--color-border-subtle)
-    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 346').toBe(346);
+    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 356').toBe(356);
     expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 25').toBe(25);
 
     // Fail-closed check 3: Total files with color literals must not exceed baseline file count
@@ -3162,8 +3759,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(legacyCounts['#dc2626'], 'Legacy #dc2626 literal count must not exceed 1').toBeLessThanOrEqual(1);
     expect(legacyFiles['#dc2626'].size, 'Legacy #dc2626 file count must not exceed 1').toBeLessThanOrEqual(1);
 
-    expect(legacyCounts['#30363d'], 'Legacy #30363d literal count must not exceed 66').toBeLessThanOrEqual(66);
-    expect(legacyFiles['#30363d'].size, 'Legacy #30363d file count must not exceed 12').toBeLessThanOrEqual(12);
+    expect(legacyCounts['#30363d'], 'Legacy #30363d literal count must not exceed 64').toBeLessThanOrEqual(64);
+    expect(legacyFiles['#30363d'].size, 'Legacy #30363d file count must not exceed 11').toBeLessThanOrEqual(11);
   });
 
   // 11. Comment-trivia exclusion: comments are never colours, but real string/template/JSX values still count
