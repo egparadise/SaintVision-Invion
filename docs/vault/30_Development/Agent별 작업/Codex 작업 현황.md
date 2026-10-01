@@ -1,15 +1,40 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.263"
+version: "1.0.264"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T06:41:34+09:00"
+updated: "2026-10-02T07:41:29+09:00"
 source_of_truth: "Git"
-active_card: "CARD-207 S08-BE OCI digest and live buildkitd PID binding"
-active_card_status: "Exact-head hosted rootless BuildKit measured pass; independent archive mutation and process identity tests added"
-active_card_next: "Claude condition recheck; product liveness binding remains a later card"
+active_card: "CARD-205 AC-11 accessibility user-device manual acceptance importer"
+active_card_status: "Canonical AC-11 accessibility row now complete and assembler-to-aggregator consumption regression passes"
+active_card_next: "Push the #302 repair head, confirm exact-head Backend and Frontend, and post the UTF-8 remediation table"
 ---
+
+## 2026-10-02 Card 205 — AC-11 사용자 기기 접근성 수동 인수 importer
+
+- train 13 후보 `9d9389a1`에서 #300이 확인한 `manualAcceptanceMissingCount=1` 상수와
+  same-SHA importer 부재를 외부 장비 없이 닫을 수 있는 AC-11 선행 카드로 선택했다.
+- Claude r1/r2 뒤 정직한 proof scope·strict session schema·6개 수행 단계·v1.1.1 target을 `505a5f4b`에 고정하고,
+  canonical registry에 `s11-accessibility-user-device-v1`을 등록했다. 기존 hosted-only target을
+  소급 변경하지 않는다.
+- importer는 GitHub run/head/artifact digest·만료·exact ZIP member를 검증한다. 수동 기록이
+  있으면 token을 stdin에서만 읽고 `inv.identity.AccessTokens`와 canonical
+  `has_fresh_interactive_auth`로 import 승인 운영자·300초 freshness·AMR를 확인한 뒤 token 없이
+  해시 receipt만 Evidence에 남긴다. 실제 시나리오 수행자는 self-attested이며 token이 수행자·기기
+  소유를 증명한다는 주장은 철회했다. 손으로 쓴 receipt·서비스 계정·pwd 단독·다른 SHA는 fail closed다.
+- 수동 기록 부재·시나리오 FAIL은 계속 `manualAcceptanceMissingCount=1`; exact SHA·exact six·
+  all PASS·fresh human 결속에서만 0이다. 이 축은 사용자 전체 인수·AC-11 done·점수 승격을
+  주장하지 않는다.
+- train 15 후보 `7dd9f9ca`로 #299를 merge한 뒤 `docs/ac11-axis-sources.json`의 canonical
+  `accessibility-e2e` 행에 importer와 exact `EMITTED_AXES`를 직접 결속했다. 임시 replacement patch는
+  제거했고 assembler→aggregator 소비 회귀를 추가했다. 사용자 실행 절차는
+  [[AC-11_사용자_기기_접근성_수동_인수_절차]]다.
+- PG-free focused **178 passed**. Windows-safe downloader는 실제 GitHub artifact에서 no-BOM JSON과
+  정상 ZIP을 확인했다. `py_compile`·CLI help·`check_docs`·citation ratchet(새 결함 0)·
+  contract bindings는 모두 exit 0이다.
+- train 15 결속 후 assembler+accessibility importer focused **94 passed**. 유효 envelope이 canonical row를
+  거쳐 aggregator에서 `MEASURED_PASS`로 재계산되며 나머지 7축 부재는 전체 `INVALID_RUN`으로 남는다.
 
 ## 2026-10-02 Card 207 — OCI digest·live buildkitd PID 결속
 
@@ -51,6 +76,7 @@ active_card_next: "Claude condition recheck; product liveness binding remains a 
   head 보존을 단언했다. 최종 exact-head green 전에는 hosted real-PG를 `NOT_OBSERVED`로 유지한다.
 - 근거: [[S12-BE_release_acceptance_target_Evidence_resolver_설계]],
   [[2026-10-01_23-43-41_KST_Card194_S12-BE_target_Evidence_resolver_구현_Codex]].
+
 ## 2026-10-02 Card 200 — S08-BE concrete rootless BuildKit transport Stage 1
 
 - base `25f43a25` 위에서 disabled-by-default concrete transport, strict health/worker 측정,

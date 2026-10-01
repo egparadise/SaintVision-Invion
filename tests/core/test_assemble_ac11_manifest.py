@@ -416,12 +416,10 @@ def test_the_shipped_axis_map_covers_every_axis_and_loads():
 
 
 def test_the_shipped_axis_map_is_honest_about_what_cannot_be_collected():
-    """Measured from the tree, not asserted: three chains are complete today.
+    """Measured from the tree, not asserted: three axes have complete chains today.
 
-    The security scan and the migration rehearsal have producer, workflow and importer.
-    Accessibility has a producer and a workflow but no importer, so its envelope cannot
-    carry the artifact binding the aggregator requires. Long-soak has producer and importer
-    and no workflow. The remaining three are external.
+    Migration and accessibility have admissible importers. Security has an importer whose
+    output is not an axis envelope, long-soak has no workflow, and three axes are external.
     """
     axes = {entry["axis"]: entry for entry in assembler.load_sources(assembler.DEFAULT_SOURCES)}
     complete = {axis for axis, entry in axes.items() if entry["chain"] == "complete"}
@@ -429,15 +427,22 @@ def test_the_shipped_axis_map_is_honest_about_what_cannot_be_collected():
     # and importer all exist -- and its importer returns the producer's report with
     # runPurpose "s11-ac11-security-scan" and no axis field, so there is no admissible
     # envelope (#299 r1). "The importer exists" is not "the importer emits an axis envelope".
-    assert complete == {"migration-reversible-segment", "irreversible-restore-forward"}
-    assert all(axes[axis]["envelopeShape"] == "axes-bundle" for axis in complete)
+    assert complete == {
+        "migration-reversible-segment", "irreversible-restore-forward", "accessibility-e2e"
+    }
+    assert all(
+        axes[axis]["envelopeShape"] == "axes-bundle"
+        for axis in {"migration-reversible-segment", "irreversible-restore-forward"}
+    )
+    accessibility = axes["accessibility-e2e"]
+    assert accessibility["envelopeShape"] == "axis-evidence"
+    assert accessibility["importer"] == "tools/import_ac11_accessibility_evidence.py"
+    assert accessibility["importerEmitsAxes"] == ["accessibility-e2e"]
     security = axes["security-critical-high-zero"]
     assert security["chain"] == "incomplete"
     assert security["envelopeShape"] == "not-an-axis-envelope"
     assert security["importerEmitsAxes"] == []
     assert "no axis field" in security["reason"]
-    assert axes["accessibility-e2e"]["chain"] == "incomplete"
-    assert axes["accessibility-e2e"]["importer"] is None
     assert axes["long-soak"]["chain"] == "incomplete"
     assert axes["long-soak"]["workflow"] is None
     for axis in ("actual-pitr-rpo-rto-retention", "physical-five-node-ac05-placement-load",
