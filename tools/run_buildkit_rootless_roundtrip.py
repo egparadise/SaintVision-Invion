@@ -168,7 +168,7 @@ def _validated_container_inspect(values: object) -> dict:
     """Reject any runtime boundary wider than the declared CI reference."""
 
     if not isinstance(values, list) or len(values) != 1 or not isinstance(values[0], dict):
-        raise RuntimeError("rootless BuildKit container inspection is invalid")
+        raise RuntimeError("rootless BuildKit container boundary is broader than declared: shape")
     value = values[0]
     state, config, host = value["State"], value["Config"], value["HostConfig"]
     ports = value.get("NetworkSettings", {}).get("Ports", {}).get("1234/tcp")
@@ -180,27 +180,42 @@ def _validated_container_inspect(values: object) -> dict:
         or state["Pid"] <= 1
         or not isinstance(user, str)
         or user in {"", "0", "root", "0:0", "root:root"}
-        or host.get("Privileged") is not False
+    ):
+        raise RuntimeError(
+            "rootless BuildKit container boundary is broader than declared: identity"
+        )
+    if (
+        host.get("Privileged") is not False
         or set(host.get("SecurityOpt") or [])
         != {"seccomp=unconfined", "apparmor=unconfined", "systempaths=unconfined"}
         or host.get("Binds") not in (None, [])
         or host.get("Devices") not in (None, [])
         or host.get("CapAdd") not in (None, [])
-        or any(
-            mount.get("Type") != "tmpfs"
-            or mount.get("Destination") != "/home/user/.local/share/buildkit"
-            or mount.get("RW") is not True
-            or mount.get("Source") not in (None, "")
-            for mount in mounts
+    ):
+        raise RuntimeError(
+            "rootless BuildKit container boundary is broader than declared: privilege"
         )
-        or not isinstance(ports, list)
+    if any(
+        mount.get("Type") != "tmpfs"
+        or mount.get("Destination") != "/home/user/.local/share/buildkit"
+        or mount.get("RW") is not True
+        or mount.get("Source") not in (None, "")
+        for mount in mounts
+    ):
+        raise RuntimeError("rootless BuildKit container boundary is broader than declared: mount")
+    if (
+        not isinstance(ports, list)
         or len(ports) != 1
         or ports[0].get("HostIp") != "127.0.0.1"
         or ports[0].get("HostPort") != "1234"
-        or config.get("Labels", {}).get("ai.saintvision.s08-buildkit-reference")
-        != os.environ.get("GITHUB_RUN_ID")
     ):
-        raise RuntimeError("rootless BuildKit container boundary is broader than declared")
+        raise RuntimeError("rootless BuildKit container boundary is broader than declared: network")
+    if config.get("Labels", {}).get("ai.saintvision.s08-buildkit-reference") != os.environ.get(
+        "GITHUB_RUN_ID"
+    ):
+        raise RuntimeError(
+            "rootless BuildKit container boundary is broader than declared: ownership"
+        )
     return value
 
 
@@ -383,6 +398,8 @@ def main(argv=None) -> int:
             "failureClass": type(error).__name__,
             "failureStage": failure_stage,
         }
+        if str(error).startswith("rootless BuildKit container boundary is broader than declared:"):
+            failure["failureDetail"] = str(error)
         (args.output_dir / "rootless-buildkit-reference.json").write_text(
             json.dumps(failure, indent=2, sort_keys=True) + "\n", encoding="utf-8"
         )
