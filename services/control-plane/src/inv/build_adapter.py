@@ -168,20 +168,17 @@ def _claim_build_dispatch(
     run_id: str,
     binding_digest: str,
 ) -> None:
-    """Atomically consume one decision/lease dispatch identity.
+    """Atomically consume one policy decision for exactly one dispatch.
 
-    A committed claim is never replayed, even when its digest is identical.
-    That makes an ambiguous crash fail closed until an operator reconciles the
-    external builder state.
+    The key is derived from ``decisionId`` alone because PolicyDecision has no
+    Run identity.  Run, lease, Node, and fence remain in ``binding_digest`` so
+    any attempted cross-run or next-lease reuse conflicts with different
+    content.  A committed claim is never replayed, even when its digest is
+    identical.  That makes an ambiguous crash fail closed until an operator
+    reconciles the external builder state.
     """
 
-    claim_key = action_digest(
-        {
-            "decisionId": decision["decisionId"],
-            "runId": run_id,
-            "leaseId": plan["lease"]["leaseId"],
-        }
-    )
+    claim_key = action_digest({"decisionId": decision["decisionId"]})
     inserted = conn.execute(
         """INSERT INTO inv.idempotency(
         tenant_id,project_id,operation,key,request_hash,response

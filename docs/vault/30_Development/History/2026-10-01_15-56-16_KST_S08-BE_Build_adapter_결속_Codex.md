@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-S08-BE-BUILD-ADAPTER-20261001"
 title: "S08-BE Build adapter 결속"
-version: "1.1.0"
+version: "1.1.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-01T16:18:16+09:00"
+updated: "2026-10-01T16:30:21+09:00"
 source_of_truth: "Git"
 ---
 
@@ -32,9 +32,11 @@ source_of_truth: "Git"
 - capability digest는 ROOF binding뿐 아니라 run, 잠근 leased resource Node,
   lease ID, resource ID와 full fencing token을 함께 묶는다. final transaction의 Node가
   달라지면 dispatch 결과를 받아들이지 않고 cancel+quarantine한다.
-- 첫 transaction은 `decisionId + runId + leaseId` identity를 `inv.idempotency`의
-  `build.dispatch` claim으로 원자 소비한다. 동일 payload 재생도 `IDEM-0001`이며, claim
-  commit 뒤 process crash는 자동 재실행하지 않고 운영자 reconciliation을 요구한다.
+- 첫 transaction은 `decisionId` identity를 `inv.idempotency`의 `build.dispatch` claim으로
+  원자 소비한다. PolicyDecision에는 Run identity가 없으므로 같은 결정을 다른 Run이나 다음
+  lease 세대에도 재사용할 수 없다. run·lease·Node·fence는 request hash인 dispatch binding에
+  남아 바꿔치기를 구분한다. 동일 payload 재생도 `IDEM-0001`이며, claim commit 뒤 process
+  crash는 자동 재실행하지 않고 운영자 reconciliation을 요구한다.
 - Run은 `scheduled`·`running`·`verifying`만 허용한다. cancelled·failed·succeeded·recovering
   등 비실행 상태는 live lease가 남아 있어도 dispatch 전에 `RES-0005`로 거부한다.
 - 외부 builder 관측·dispatch·cancel은 business transaction 밖에서만 수행한다.
@@ -75,6 +77,7 @@ source_of_truth: "Git"
 | 2026-10-01 16:09 | 실제 helper SQL 순서와 live authority 부정 행렬 보강 뒤 focused 3파일 재실행 | exit 0, 124 passed |
 | 2026-10-01 16:18 | Claude 검토 H1·M1~M3·L1~L3 조치 뒤 `test_build_adapter.py` | exit 0, 37 passed |
 | 2026-10-01 16:18 | 조치 뒤 focused 3파일 재실행 | exit 0, 140 passed |
+| 2026-10-01 16:30 | Claude r2 R1: decision 단독 one-shot key와 cross-run/lease 회귀 시험, focused 3파일 | exit 0, 141 passed |
 
 실제 `lock_run`·`lock_resources` helper를 통과하는 시험은 Run → Node → Resource → lease
 `FOR UPDATE` 순서를 고정한다. tenant/project/released/expiry/recovery epoch/fence와 plan expiry,

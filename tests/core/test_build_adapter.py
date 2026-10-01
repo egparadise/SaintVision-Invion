@@ -133,7 +133,7 @@ def _patch_boundary(monkeypatch, *, authorize_error=None, finalize_error=None):
         return "node-1"
 
     def claim(_conn, request, plan, decision, run_id, binding_digest):
-        identity = (decision["decisionId"], run_id, plan["lease"]["leaseId"])
+        identity = decision["decisionId"]
         calls.append(("claim", identity, binding_digest))
         if identity in claims:
             raise DomainError("IDEM-0001", "Build dispatch identity is already consumed", 409)
@@ -277,6 +277,21 @@ def test_atomic_claim_uses_unique_ledger_and_redacted_audit(monkeypatch):
             },
         )
     ]
+
+
+def test_atomic_claim_identity_is_policy_decision_only(monkeypatch):
+    monkeypatch.setattr(adapter_module, "_audit_event", lambda *_args, **_kwargs: None)
+    _, request, plan, decision = _inputs()
+    first = _ClaimConnection(inserted=True)
+    second = _ClaimConnection(inserted=True)
+    second_plan = deepcopy(plan)
+    second_plan["lease"]["leaseId"] = "lease-2"
+
+    adapter_module._claim_build_dispatch(first, request, plan, decision, "run-1", "c" * 64)
+    adapter_module._claim_build_dispatch(second, request, second_plan, decision, "run-2", "d" * 64)
+
+    assert first.statements[0][1][2] == second.statements[0][1][2]
+    assert first.statements[0][1][2] == action_digest({"decisionId": decision["decisionId"]})
 
 
 @pytest.mark.parametrize("prior_hash", ["c" * 64, "d" * 64])
