@@ -20,9 +20,11 @@ import hashlib
 import json
 import os
 from pathlib import Path
+from pathlib import PurePosixPath
 import re
 import stat
 import subprocess
+import tarfile
 from typing import Mapping, Protocol, Sequence
 
 from .build_governance import BuildProviderObservation
@@ -36,6 +38,16 @@ _HEX_40 = re.compile(r"[0-9a-f]{40}")
 _HEX_64 = re.compile(r"[0-9a-f]{64}")
 _IMAGE_DIGEST = re.compile(r"sha256:[0-9a-f]{64}")
 _PLATFORM_COMPONENT = re.compile(r"[a-z0-9][a-z0-9_.-]{0,63}")
+_OCI_MANIFEST_MEDIA_TYPE = "application/vnd.oci.image.manifest.v1+json"
+_OCI_CONFIG_MEDIA_TYPE = "application/vnd.oci.image.config.v1+json"
+_OCI_LAYER_MEDIA_TYPES = frozenset(
+    {
+        "application/vnd.oci.image.layer.v1.tar",
+        "application/vnd.oci.image.layer.v1.tar+gzip",
+        "application/vnd.oci.image.layer.v1.tar+zstd",
+    }
+)
+_MAX_OCI_ARCHIVE_BYTES = 512 * 1024 * 1024
 _HEALTH_KEYS = frozenset(
     {
         "schemaVersion",
@@ -83,8 +95,8 @@ _CONTAINER_FIELD_SOURCES = {
     "lsm": "docker-inspect-unconfined",
 }
 _PROCESS_FIELD_SOURCES = {
-    "pid": "caller-passed-rootlesskit-process",
-    "processStartTicks": "proc-rootlesskit-process",
+    "pid": "caller-passed-buildkitd-process",
+    "processStartTicks": "proc-buildkitd-process",
     "rootless": "proc-uid-map",
     "privileged": "caller-asserted-reference-boundary",
     "hostAccess": "caller-asserted-reference-boundary",
@@ -153,6 +165,166 @@ def _canonical_digest(value: object) -> str:
     return hashlib.sha256(
         json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("utf-8")
     ).hexdigest()
+
+
+def _strict_json_document(raw: bytes, label: str) -> dict:
+    """Decode an OCI JSON document without duplicate keys or non-finite values."""
+
+    def pairs(values):
+        result = {}
+        for key, value in values:
+            if key in result:
+                raise ValueError(f"duplicate key in {label}")
+            result[key] = value
+        return result
+
+    try:
+        value = json.loads(
+            raw.decode("utf-8"),
+            object_pairs_hook=pairs,
+            parse_constant=lambda _value: (_ for _ in ()).throw(ValueError(label)),
+        )
+    except (UnicodeDecodeError, ValueError, TypeError, json.JSONDecodeError):
+        raise DomainError("VERIFY-0002", "BuildKit OCI archive is invalid", 422) from None
+    if not isinstance(value, dict):
+        raise DomainError("VERIFY-0002", "BuildKit OCI archive is invalid", 422)
+    return value
+
+
+def _oci_descriptor(value: object, *, label: str, media_types: frozenset[str]) -> tuple[str, int]:
+    if not isinstance(value, dict):
+        raise DomainError("VERIFY-0002", "BuildKit OCI archive is invalid", 422)
+    digest = value.get("digest")
+    size = value.get("size")
+    if (
+        value.get("mediaType") not in media_types
+        or not isinstance(digest, str)
+        or not _IMAGE_DIGEST.fullmatch(digest)
+        or type(size) is not int
+        or size < 0
+        or size > _MAX_OCI_ARCHIVE_BYTES
+    ):
+        raise DomainError("VERIFY-0002", f"BuildKit OCI {label} descriptor is invalid", 422)
+    return digest, size
+
+
+def _verify_oci_archive(path: Path, *, image_digest: str, config_digest: str) -> dict:
+    """Recompute every referenced OCI blob digest and bind metadata to the archive."""
+
+    try:
+        observed = path.stat()
+        if (
+            not stat.S_ISREG(observed.st_mode)
+            or observed.st_nlink != 1
+            or observed.st_size <= 0
+            or observed.st_size > _MAX_OCI_ARCHIVE_BYTES
+        ):
+            raise ValueError()
+        files: dict[str, bytes] = {}
+        total_bytes = 0
+        with tarfile.open(path, mode="r:*") as archive:
+            for member in archive.getmembers():
+                pure = PurePosixPath(member.name)
+                if (
+                    member.name.startswith("/")
+                    or "\\" in member.name
+                    or ".." in pure.parts
+                    or member.issym()
+                    or member.islnk()
+                    or not (member.isdir() or member.isfile())
+                ):
+                    raise ValueError()
+                normalized = str(pure)
+                if member.isdir():
+                    continue
+                if normalized in files or member.size < 0 or member.size > _MAX_OCI_ARCHIVE_BYTES:
+                    raise ValueError()
+                total_bytes += member.size
+                if total_bytes > _MAX_OCI_ARCHIVE_BYTES:
+                    raise ValueError()
+                stream = archive.extractfile(member)
+                if stream is None:
+                    raise ValueError()
+                raw = stream.read(member.size + 1)
+                if len(raw) != member.size:
+                    raise ValueError()
+                files[normalized] = raw
+    except (OSError, tarfile.TarError, ValueError):
+        raise DomainError("VERIFY-0002", "BuildKit OCI archive is invalid", 422) from None
+
+    layout = _strict_json_document(files.get("oci-layout", b""), "oci-layout")
+    index = _strict_json_document(files.get("index.json", b""), "index")
+    manifests = index.get("manifests")
+    if (
+        layout != {"imageLayoutVersion": "1.0.0"}
+        or index.get("schemaVersion") != 2
+        or not isinstance(manifests, list)
+        or len(manifests) != 1
+    ):
+        raise DomainError("VERIFY-0002", "BuildKit OCI archive is invalid", 422)
+
+    manifest_digest, manifest_size = _oci_descriptor(
+        manifests[0], label="manifest", media_types=frozenset({_OCI_MANIFEST_MEDIA_TYPE})
+    )
+    if manifest_digest != image_digest:
+        raise DomainError("VERIFY-0002", "BuildKit OCI manifest digest differs", 422)
+
+    def verified_blob(digest: str, expected_size: int) -> bytes:
+        path_name = f"blobs/sha256/{digest.removeprefix('sha256:')}"
+        raw = files.get(path_name)
+        if (
+            raw is None
+            or len(raw) != expected_size
+            or "sha256:" + hashlib.sha256(raw).hexdigest() != digest
+        ):
+            raise DomainError("VERIFY-0002", "BuildKit OCI blob digest differs", 422)
+        return raw
+
+    manifest_raw = verified_blob(manifest_digest, manifest_size)
+    manifest = _strict_json_document(manifest_raw, "manifest")
+    if manifest.get("schemaVersion") != 2 or manifest.get("mediaType") not in {
+        None,
+        _OCI_MANIFEST_MEDIA_TYPE,
+    }:
+        raise DomainError("VERIFY-0002", "BuildKit OCI manifest is invalid", 422)
+
+    manifest_config_digest, manifest_config_size = _oci_descriptor(
+        manifest.get("config"), label="config", media_types=frozenset({_OCI_CONFIG_MEDIA_TYPE})
+    )
+    if manifest_config_digest != config_digest:
+        raise DomainError("VERIFY-0002", "BuildKit OCI config digest differs", 422)
+    config_raw = verified_blob(manifest_config_digest, manifest_config_size)
+    _strict_json_document(config_raw, "config")
+
+    layers = manifest.get("layers")
+    if not isinstance(layers, list) or not layers:
+        raise DomainError("VERIFY-0002", "BuildKit OCI layers are invalid", 422)
+    layer_digests = []
+    referenced = {manifest_digest, manifest_config_digest}
+    for index_value, layer in enumerate(layers):
+        layer_digest, layer_size = _oci_descriptor(
+            layer, label=f"layer {index_value}", media_types=_OCI_LAYER_MEDIA_TYPES
+        )
+        if layer_digest in referenced:
+            raise DomainError("VERIFY-0002", "BuildKit OCI layer digest is duplicated", 422)
+        verified_blob(layer_digest, layer_size)
+        referenced.add(layer_digest)
+        layer_digests.append(layer_digest)
+
+    archived_blobs = {
+        "sha256:" + name.removeprefix("blobs/sha256/")
+        for name in files
+        if name.startswith("blobs/sha256/")
+    }
+    if referenced != archived_blobs:
+        raise DomainError("VERIFY-0002", "BuildKit OCI blob set differs", 422)
+    return {
+        "layoutVersion": "1.0.0",
+        "manifestDigest": manifest_digest,
+        "configDigest": manifest_config_digest,
+        "layerDigests": layer_digests,
+        "verifiedBlobCount": len(referenced),
+    }
 
 
 def _parse_timestamp(value: object) -> datetime:
@@ -569,6 +741,11 @@ class RootlessBuildkitTransport:
             or not _HEX_64.fullmatch(archive_sha256)
         ):
             raise DomainError("VERIFY-0002", "BuildKit output metadata is incomplete", 422)
+        oci_verification = _verify_oci_archive(
+            archive,
+            image_digest=image_digest,
+            config_digest=config_digest,
+        )
 
         value = {
             "schemaVersion": 1,
@@ -590,6 +767,7 @@ class RootlessBuildkitTransport:
             "imageDigest": image_digest,
             "configDigest": config_digest,
             "ociArchiveSha256": archive_sha256,
+            "ociVerification": oci_verification,
             "commandArgumentsSha256": _canonical_digest(list(arguments)),
             "startedAt": started_at.isoformat(),
             "finishedAt": finished_at.isoformat(),
