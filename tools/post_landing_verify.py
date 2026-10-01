@@ -255,14 +255,29 @@ def check_ref_tip(runner, ref: str, landed: str) -> dict[str, Any]:
 # --- find or start a run, then wait for it -----------------------------------------
 
 
-def runs_for(runner, workflow: str, limit: int = 30) -> list[dict[str, Any]]:
+#: Events whose run is about the ref itself. A `pull_request` run is excluded: for a pull
+#: request GitHub reports the PR head as `headSha`, so a branch that was just fast-forwarded
+#: has PR runs carrying the landed SHA while describing a merge of someone's branch, not the
+#: integration ref. The branch check below excludes them too; both are kept because either
+#: alone would be a single point of failure.
+REF_EVENTS = frozenset({"push", "workflow_dispatch"})
+DISPATCH_EVENT = "workflow_dispatch"
+
+
+def runs_for(runner, workflow: str, ref: str, limit: int = 30) -> list[dict[str, Any]]:
+    """Runs of this workflow on this branch.
+
+    `--branch` is passed so the listing is already narrowed, and `headBranch` is checked
+    again in `candidates_at_sha`: a filter we asked a tool for is not a fact we observed.
+    """
     rows = json_out(
         runner,
         [
             "gh", "run", "list",
             "--workflow", workflow,
+            "--branch", ref,
             "--limit", str(limit),
-            "--json", "databaseId,headSha,status,conclusion,event,createdAt",
+            "--json", "databaseId,headSha,headBranch,status,conclusion,event,createdAt",
         ],
         [],
     )
@@ -271,22 +286,36 @@ def runs_for(runner, workflow: str, limit: int = 30) -> list[dict[str, Any]]:
     return [row for row in rows if isinstance(row, dict)]
 
 
-def newest_at_sha(rows: list[dict[str, Any]], landed: str, *, above: int = 0):
-    """The newest run at the landed SHA, optionally above a known id.
+def candidates_at_sha(rows: list[dict[str, Any]], landed: str, ref: str, *,
+                      events: frozenset[str], above: int = 0) -> list[dict[str, Any]]:
+    """Every run that could be the one we mean, newest id first.
 
-    `above` is how a dispatched run is told apart from one that was already there: run ids
-    increase, so an id greater than the newest one seen before the dispatch is ours.
+    Four things have to agree, and each excludes a real way of being wrong:
+
+    * `headSha` -- otherwise the run is about another tree;
+    * `headBranch` -- otherwise a pull-request run at the same commit, or a run on another
+      branch that happens to point here, is read as the landing's own run;
+    * `event` -- otherwise the same confusion arrives by a different door;
+    * `databaseId > above` -- otherwise a run that was already there is read as the one we
+      just started.
+
+    The list is returned rather than a single row, because *more than one* candidate is
+    itself an answer: when two dispatches of the same workflow are in flight at the same
+    SHA, this tool cannot tell which is its own, and saying so is better than picking.
     """
-    best = None
+    found = []
     for row in rows:
         if str(row.get("headSha", "")).lower() != landed:
+            continue
+        if str(row.get("headBranch", "")) != ref:
+            continue
+        if str(row.get("event", "")) not in events:
             continue
         identifier = row.get("databaseId")
         if not isinstance(identifier, int) or identifier <= above:
             continue
-        if best is None or identifier > best["databaseId"]:
-            best = row
-    return best
+        found.append(row)
+    return sorted(found, key=lambda row: row["databaseId"], reverse=True)
 
 
 def highest_id(rows: list[dict[str, Any]]) -> int:
@@ -304,7 +333,10 @@ def dispatch(runner, workflow: str, ref: str) -> bool:
 def view_run(runner, run_id: int) -> dict[str, Any]:
     document = json_out(
         runner,
-        ["gh", "run", "view", str(run_id), "--json", "status,conclusion,headSha,event,jobs"],
+        [
+            "gh", "run", "view", str(run_id),
+            "--json", "status,conclusion,headSha,headBranch,event,jobs",
+        ],
         {},
     )
     return document if isinstance(document, dict) else {}
@@ -316,13 +348,30 @@ def matrix_matches(names, job_id: str) -> list[str]:
 
 
 def judge_lane(lane: dict[str, Any], run_id: int, view: dict[str, Any],
-               landed: str, *, event: str | None) -> dict[str, Any]:
-    """A lane passes when a run at the landed SHA has every job concluded `success`."""
+               landed: str, ref: str, *, event: str | None) -> dict[str, Any]:
+    """A lane passes when a run of this ref at the landed SHA has every job `success`.
+
+    The SHA, the branch and the event are re-read from the run itself rather than trusted
+    from the listing that selected it: the listing is how we found the run, and this is what
+    the run says it is.
+    """
     head = str(view.get("headSha", "")).lower()
     if head != landed:
         return failed(
             "the run's headSha is not the landed SHA",
             workflow=lane["workflow"], runId=run_id, headSha=head,
+        )
+    branch = str(view.get("headBranch", ""))
+    if branch != ref:
+        return failed(
+            "the run is not a run of the integration ref",
+            workflow=lane["workflow"], runId=run_id, headBranch=branch,
+        )
+    seen = str(view.get("event", ""))
+    if seen not in REF_EVENTS:
+        return failed(
+            "the run was triggered by an event that does not describe the ref",
+            workflow=lane["workflow"], runId=run_id, event=seen,
         )
     jobs = [job for job in (view.get("jobs") or []) if isinstance(job, dict)]
     if not jobs:
@@ -354,9 +403,9 @@ def judge_lane(lane: dict[str, Any], run_id: int, view: dict[str, Any],
             skippedJobs=sorted(n for n, c in unpassed.items() if c == "skipped"),
         )
     return passed(
-        workflow=lane["workflow"], runId=run_id, headSha=head, event=event,
-        runConclusion=view.get("conclusion"), jobCount=len(conclusions),
-        jobConclusions=conclusions,
+        workflow=lane["workflow"], runId=run_id, headSha=head, headBranch=branch,
+        event=seen or event, runConclusion=view.get("conclusion"),
+        jobCount=len(conclusions), jobConclusions=conclusions,
     )
 
 
@@ -365,13 +414,19 @@ def bind_runs(runner, ref: str, landed: str, *, always_dispatch: bool):
     bound: dict[str, dict[str, Any]] = {}
     problems: dict[str, dict[str, Any]] = {}
     for lane in LANES:
-        rows = runs_for(runner, lane["workflow"])
-        existing = None if always_dispatch else newest_at_sha(rows, landed)
+        rows = runs_for(runner, lane["workflow"], ref)
+        existing = None
+        if not always_dispatch:
+            # Adopting the newest is right here: several runs of the same workflow on the
+            # same ref at the same SHA are re-runs of one question, not rival answers.
+            found = candidates_at_sha(rows, landed, ref, events=REF_EVENTS)
+            existing = found[0] if found else None
         if existing is not None:
             bound[lane["key"]] = {
                 "workflow": lane["workflow"],
                 "runId": existing["databaseId"],
                 "event": existing.get("event"),
+                "headBranch": existing.get("headBranch"),
                 "dispatched": False,
             }
             continue
@@ -384,21 +439,23 @@ def bind_runs(runner, ref: str, landed: str, *, always_dispatch: bool):
         bound[lane["key"]] = {
             "workflow": lane["workflow"],
             "runId": None,
-            "event": "workflow_dispatch",
+            "event": DISPATCH_EVENT,
+            "headBranch": ref,
             "dispatched": True,
             "baselineRunId": baseline,
         }
     return bound, problems
 
 
-def wait_for(runner, bound: dict[str, dict[str, Any]], landed: str, *,
+def wait_for(runner, bound: dict[str, dict[str, Any]], landed: str, ref: str, *,
              poll_seconds: int, deadline_seconds: int,
              sleep: Callable[[float], None] = time.sleep,
              now: Callable[[], float] = time.monotonic) -> dict[str, dict[str, Any]]:
     """Poll until every bound run is completed, or the deadline passes.
 
-    A lane whose run never appears or never finishes is NOT_OBSERVED rather than a failure:
-    the lane did not fail, we failed to watch it, and those are different facts.
+    A lane whose run never appears, never finishes, or cannot be told apart from somebody
+    else's dispatch is NOT_OBSERVED rather than a failure: the lane did not fail, we failed
+    to watch it, and those are different facts.
     """
     started = now()
     results: dict[str, dict[str, Any]] = {}
@@ -406,15 +463,25 @@ def wait_for(runner, bound: dict[str, dict[str, Any]], landed: str, *,
     while waiting:
         for key, entry in list(waiting.items()):
             if entry["runId"] is None:
-                # A dispatched run may not exist yet.
-                fresh = newest_at_sha(
-                    runs_for(runner, entry["workflow"]), landed,
+                # A dispatched run may not exist yet, and there may be more than one --
+                # anyone can dispatch the same workflow on the same ref at the same SHA.
+                # Nothing in the API ties a dispatch to the run it created, so when two
+                # are candidates this tool refuses to choose.
+                fresh = candidates_at_sha(
+                    runs_for(runner, entry["workflow"], ref), landed, ref,
+                    events=frozenset({DISPATCH_EVENT}),
                     above=entry.get("baselineRunId", 0),
                 )
-                if fresh is None:
+                if not fresh:
                     continue
-                entry["runId"] = fresh["databaseId"]
-                entry["event"] = fresh.get("event")
+                if len(fresh) > 1:
+                    entry["ambiguous"] = sorted(row["databaseId"] for row in fresh)
+                    results[key] = {**entry, "view": None}
+                    waiting.pop(key)
+                    continue
+                entry["runId"] = fresh[0]["databaseId"]
+                entry["event"] = fresh[0].get("event")
+                entry["headBranch"] = fresh[0].get("headBranch")
             view = view_run(runner, entry["runId"])
             if str(view.get("status")) == "completed":
                 results[key] = {**entry, "view": view}
@@ -556,12 +623,20 @@ def run(args, runner, *, sleep=time.sleep, now=time.monotonic):
     bound, problems = bind_runs(runner, args.ref, landed, always_dispatch=args.always_dispatch)
     observations.update(problems)
     results = wait_for(
-        runner, bound, landed,
+        runner, bound, landed, args.ref,
         poll_seconds=args.poll_seconds, deadline_seconds=args.deadline_seconds,
         sleep=sleep, now=now,
     )
     by_key = {lane["key"]: lane for lane in LANES}
     for key, entry in results.items():
+        if entry.get("ambiguous"):
+            observations[key] = unmeasured(
+                "more than one dispatch of this workflow is a candidate at the landed SHA, "
+                "and nothing ties a dispatch to the run it created, so this tool will not "
+                "choose between them",
+                workflow=entry["workflow"], candidateRunIds=entry["ambiguous"],
+            )
+            continue
         if entry["view"] is None:
             observations[key] = unmeasured(
                 "the run did not complete within the deadline",
@@ -569,7 +644,8 @@ def run(args, runner, *, sleep=time.sleep, now=time.monotonic):
             )
             continue
         observations[key] = judge_lane(
-            by_key[key], entry["runId"], entry["view"], landed, event=entry.get("event")
+            by_key[key], entry["runId"], entry["view"], landed, args.ref,
+            event=entry.get("event"),
         )
     for lane in LANES:
         observations.setdefault(

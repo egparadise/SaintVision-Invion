@@ -24,11 +24,14 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from tools.post_landing_verify import (  # noqa: E402
+    DISPATCH_EVENT,
     LANES,
     PRE_FLIGHT,
     REQUIRED,
     VerifyRefused,
+    REF_EVENTS,
     build_evidence,
+    candidates_at_sha,
     commit_sha,
     judge_lane,
     main,
@@ -67,7 +70,7 @@ class FakeRunner:
 
     def __init__(self, *, tip=LANDED, ancestor=True, known=(LANDED, PREVIOUS),
                  runs=None, views=None, dispatch_fails=(), ls_remote_fails=False,
-                 dispatch_delay=0):
+                 dispatch_delay=0, rival_dispatch=()):
         self.tip = tip
         self.ancestor = ancestor
         self.known = set(known)
@@ -75,7 +78,11 @@ class FakeRunner:
         self.views = dict(views or {})
         self.dispatch_fails = set(dispatch_fails)
         self.ls_remote_fails = ls_remote_fails
+        #: When true the fake ignores `--branch`, so the tool's own check filters.
+        self.unfiltered = False
         self.dispatch_delay = dispatch_delay
+        #: Workflows where somebody else's dispatch lands at the same SHA alongside ours.
+        self.rival_dispatch = set(rival_dispatch)
         self._pending: dict[str, list] = {}
         self.commands: list[list[str]] = []
         self._next_id = 9_000
@@ -116,9 +123,21 @@ class FakeRunner:
             self._next_id += 1
             row = {
                 "databaseId": self._next_id, "headSha": self.tip,
-                "status": "completed", "conclusion": "success",
+                "headBranch": REF, "status": "completed", "conclusion": "success",
                 "event": "workflow_dispatch", "createdAt": "2026-10-01T02:00:00Z",
             }
+            if workflow in self.rival_dispatch:
+                # Somebody else dispatched the same workflow on the same ref, and the API
+                # gives us nothing that says which run came from which dispatch.
+                self._next_id += 1
+                rival = dict(row, databaseId=self._next_id)
+                self.runs.setdefault(workflow, []).insert(0, rival)
+                self.views[rival["databaseId"]] = {
+                    "status": "completed", "conclusion": "failure", "headSha": self.tip,
+                    "headBranch": REF, "event": "workflow_dispatch",
+                    "jobs": jobs_of(next(i for i in LANES if i["workflow"] == workflow),
+                                    "failure"),
+                }
             if self.dispatch_delay:
                 # GitHub creates the run a moment later, so the first listing does
                 # not show it.
@@ -126,9 +145,9 @@ class FakeRunner:
             else:
                 self.runs.setdefault(workflow, []).insert(0, row)
             lane = next(item for item in LANES if item["workflow"] == workflow)
-            self.views[self._next_id] = {
+            self.views[row["databaseId"]] = {
                 "status": "completed", "conclusion": "success", "headSha": self.tip,
-                "event": "workflow_dispatch", "jobs": jobs_of(lane),
+                "headBranch": REF, "event": "workflow_dispatch", "jobs": jobs_of(lane),
             }
             return 0, ""
         if args[1:3] == ["run", "list"]:
@@ -139,24 +158,33 @@ class FakeRunner:
                 if waiting[0] <= 0:
                     self.runs.setdefault(workflow, []).insert(0, waiting[1])
                     self._pending.pop(workflow)
-            return 0, json.dumps(self.runs.get(workflow, []))
+            # `gh run list --branch` filters server side. The tool checks `headBranch`
+            # again anyway, and `test_the_branch_is_checked_in_code_too` relies on this
+            # fake NOT filtering when asked for one branch while rows name another.
+            branch = args[args.index("--branch") + 1] if "--branch" in args else None
+            rows = self.runs.get(workflow, [])
+            if branch is not None and not self.unfiltered:
+                rows = [r for r in rows if r.get("headBranch") == branch]
+            return 0, json.dumps(rows)
         if args[1:3] == ["run", "view"]:
             return 0, json.dumps(self.views.get(int(args[3]), {}))
         raise AssertionError(f"unexpected gh: {args}")
 
 
-def push_world(sha=LANDED, conclusion="success", *, skip=None, omit=None):
-    """Every lane with a completed push run at `sha`, as a landing leaves things.
+def push_world(sha=LANDED, conclusion="success", *, skip=None, omit=None,
+               branch=REF, event="push"):
+    """Every lane with a completed run at `sha`, as a landing leaves things.
 
     `skip` names a lane whose jobs are reported `skipped`; `omit` names one whose required
-    job is missing from the run altogether.
+    job is missing from the run altogether. `branch` and `event` are what make a run a run
+    *of the ref*, so the cases below vary them.
     """
     runs, views, identifier = {}, {}, 1_000
     for lane in LANES:
         identifier += 1
         runs[lane["workflow"]] = [{
-            "databaseId": identifier, "headSha": sha, "status": "completed",
-            "conclusion": "success", "event": "push",
+            "databaseId": identifier, "headSha": sha, "headBranch": branch,
+            "status": "completed", "conclusion": "success", "event": event,
             "createdAt": "2026-10-01T01:00:00Z",
         }]
         listed = jobs_of(lane, "skipped" if skip == lane["key"] else conclusion)
@@ -164,7 +192,7 @@ def push_world(sha=LANDED, conclusion="success", *, skip=None, omit=None):
             listed = listed[1:] or [{"name": "unrelated", "conclusion": "success"}]
         views[identifier] = {
             "status": "completed", "conclusion": "success", "headSha": sha,
-            "event": "push", "jobs": listed,
+            "headBranch": branch, "event": event, "jobs": listed,
         }
     return runs, views
 
@@ -179,7 +207,17 @@ def options(**overrides):
 
 
 def go(runner, **overrides):
-    return run(options(**overrides), runner, sleep=lambda _s: None, now=lambda: 0.0)
+    """A clock that advances one second per read.
+
+    A frozen clock cannot reach a deadline, so `wait_for` would spin forever on a lane whose
+    run never appears -- which is how this harness first hung.
+    """
+    ticks = iter(range(10_000))
+
+    return run(
+        options(**overrides), runner,
+        sleep=lambda _s: None, now=lambda: float(next(ticks)),
+    )
 
 
 # --- the pass, and the dispatch that does not happen ------------------------------
@@ -357,7 +395,7 @@ def test_a_dispatched_run_at_a_moved_sha_is_refused():
         lane, 123,
         {"status": "completed", "conclusion": "success", "headSha": OTHER,
          "jobs": jobs_of(lane)},
-        LANDED, event="workflow_dispatch",
+        LANDED, REF, event="workflow_dispatch",
     )
     assert item["status"] == "MEASURED_FAIL"
     assert item["headSha"] == OTHER
@@ -417,8 +455,13 @@ def test_a_run_that_never_completes_is_not_observed():
 def test_a_run_reporting_no_jobs_is_not_observed():
     lane = LANES[0]
     item = judge_lane(
-        lane, 7, {"status": "completed", "headSha": LANDED, "jobs": []},
-        LANDED, event="push",
+        lane,
+        7,
+        {"status": "completed", "headSha": LANDED, "headBranch": REF,
+         "event": "push", "jobs": []},
+        LANDED,
+        REF,
+        event="push",
     )
     assert item["status"] == "NOT_OBSERVED"
 
@@ -579,3 +622,173 @@ def test_the_defaults_are_the_integration_ref_and_a_long_interval():
     assert args.ref == REF
     assert args.poll_seconds >= 60, "a short interval spends API quota for nothing"
     assert args.always_dispatch is False
+
+
+# --- a run has to be a run *of the ref* -------------------------------------------
+
+
+def test_a_pull_request_run_at_the_landed_sha_is_not_adopted():
+    """A fast-forward landing leaves pull-request runs carrying the landed SHA.
+
+    For a pull request GitHub reports the PR head as `headSha`. When the branch that landed
+    was the PR's own branch, its PR runs name this very commit while describing a merge of
+    somebody's branch -- not the integration ref. Adopting one would report a different
+    question's answer.
+    """
+    runs, views = push_world(branch="agent/someone/feature", event="pull_request")
+    runner = FakeRunner(runs=runs, views=views)
+    observations, facts = go(runner)
+    assert sorted(runner.dispatches()) == sorted(lane["workflow"] for lane in LANES), (
+        "a pull-request run was adopted instead of dispatching"
+    )
+    assert facts["adoptedWorkflows"] == []
+    for lane in LANES:
+        assert observations[lane["key"]]["runId"] > 9_000
+
+
+def test_a_push_run_of_another_branch_at_the_same_sha_is_not_adopted():
+    """Two branches can point at one commit; only one of them is the ref we mean."""
+    runs, views = push_world(branch="main", event="push")
+    runner = FakeRunner(runs=runs, views=views)
+    observations, facts = go(runner)
+    assert facts["adoptedWorkflows"] == []
+    assert sorted(runner.dispatches()) == sorted(lane["workflow"] for lane in LANES)
+
+
+def test_the_listing_is_narrowed_by_branch():
+    runs, views = push_world()
+    runner = FakeRunner(runs=runs, views=views)
+    go(runner)
+    listings = runner.ran("gh", "run", "list")
+    assert listings, "no run listing was made"
+    for command in listings:
+        assert "--branch" in command and command[command.index("--branch") + 1] == REF
+
+
+def test_the_branch_is_checked_in_code_too():
+    """A filter we asked a tool for is not a fact we observed.
+
+    With the fake ignoring `--branch`, the only thing standing between a foreign run and
+    adoption is the tool's own `headBranch` comparison.
+    """
+    runs, views = push_world(branch="main", event="push")
+    runner = FakeRunner(runs=runs, views=views)
+    runner.unfiltered = True
+    _, facts = go(runner)
+    assert facts["adoptedWorkflows"] == [], "the server-side filter was the only check"
+
+
+@pytest.mark.parametrize("branch,event,expected", [
+    (REF, "push", True),
+    (REF, "workflow_dispatch", True),
+    (REF, "pull_request", False),
+    ("main", "push", False),
+    ("agent/x/y", "workflow_dispatch", False),
+])
+def test_candidates_require_the_sha_the_branch_and_the_event(branch, event, expected):
+    rows = [{
+        "databaseId": 5, "headSha": LANDED, "headBranch": branch, "event": event,
+        "status": "completed", "conclusion": "success",
+    }]
+    found = candidates_at_sha(rows, LANDED, REF, events=REF_EVENTS)
+    assert bool(found) is expected
+
+
+def test_candidates_come_back_newest_first():
+    rows = [
+        {"databaseId": n, "headSha": LANDED, "headBranch": REF, "event": "push"}
+        for n in (3, 11, 7)
+    ]
+    assert [row["databaseId"] for row in candidates_at_sha(rows, LANDED, REF,
+                                                           events=REF_EVENTS)] == [11, 7, 3]
+
+
+# --- two rival dispatches: say so rather than choose -------------------------------
+
+
+def test_two_candidate_dispatches_are_not_observed_rather_than_guessed():
+    """Nothing in the API ties a dispatch to the run it created.
+
+    Anyone can dispatch the same workflow on the same ref at the same SHA, and then "the
+    newest post-baseline run at this SHA" is as likely to be theirs as ours. One of them
+    here concluded failure, so picking by id would be reporting a coin toss.
+    """
+    runs, views = push_world(sha=OTHER)
+    runner = FakeRunner(
+        runs=runs, views=views, rival_dispatch={"docs.yml", "core.yml"}
+    )
+    observations, _ = go(runner)
+    for key in ("docs", "core"):
+        item = observations[key]
+        assert item["status"] == "NOT_OBSERVED", f"{key} chose between rival dispatches"
+        assert len(item["candidateRunIds"]) == 2
+        assert "will not choose" in item["reason"]
+    assert observations["frontend"]["status"] == "MEASURED_PASS", "one lane spoiled another"
+
+
+def test_a_rival_dispatch_before_the_baseline_does_not_make_it_ambiguous():
+    """The id floor still does its work: an earlier dispatch is not a candidate."""
+    runs, views = push_world()
+    # An older dispatch of every lane, at the landed SHA, that is not ours.
+    for lane in LANES:
+        runs[lane["workflow"]].append({
+            "databaseId": 900, "headSha": LANDED, "headBranch": REF,
+            "event": "workflow_dispatch", "status": "completed", "conclusion": "failure",
+            "createdAt": "2026-09-30T23:00:00Z",
+        })
+    views[900] = {
+        "status": "completed", "conclusion": "failure", "headSha": LANDED,
+        "headBranch": REF, "event": "workflow_dispatch",
+        "jobs": [{"name": "x", "conclusion": "failure"}],
+    }
+    runner = FakeRunner(runs=runs, views=views, dispatch_delay=2)
+    observations, _ = go(runner, always_dispatch=True)
+    for lane in LANES:
+        item = observations[lane["key"]]
+        assert item["status"] == "MEASURED_PASS", item.get("reason")
+        assert item["runId"] > 9_000
+
+
+# --- judge_lane re-reads what the run says about itself ----------------------------
+
+
+@pytest.mark.parametrize("field,value,fragment", [
+    ("headSha", OTHER, "headSha is not the landed SHA"),
+    ("headBranch", "main", "not a run of the integration ref"),
+    ("event", "pull_request", "event that does not describe the ref"),
+])
+def test_a_run_that_describes_something_else_is_refused(field, value, fragment):
+    lane = LANES[0]
+    view = {
+        "status": "completed", "conclusion": "success", "headSha": LANDED,
+        "headBranch": REF, "event": "push", "jobs": jobs_of(lane),
+    }
+    view[field] = value
+    item = judge_lane(lane, 123, view, LANDED, REF, event="push")
+    assert item["status"] == "MEASURED_FAIL"
+    assert fragment in item["reason"]
+
+
+def test_the_run_view_asks_for_the_branch_and_the_event():
+    runs, views = push_world()
+    runner = FakeRunner(runs=runs, views=views)
+    go(runner)
+    for command in runner.ran("gh", "run", "view"):
+        fields = command[command.index("--json") + 1]
+        assert "headBranch" in fields and "event" in fields
+
+
+def test_a_passing_lane_records_the_branch_and_the_event():
+    runs, views = push_world()
+    runner = FakeRunner(runs=runs, views=views)
+    observations, _ = go(runner)
+    for lane in LANES:
+        item = observations[lane["key"]]
+        assert item["headBranch"] == REF
+        assert item["event"] in REF_EVENTS
+
+
+def test_the_dispatch_event_name_is_the_one_github_uses():
+    assert DISPATCH_EVENT == "workflow_dispatch"
+    assert DISPATCH_EVENT in REF_EVENTS and "push" in REF_EVENTS
+    assert "pull_request" not in REF_EVENTS
