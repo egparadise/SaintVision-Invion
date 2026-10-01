@@ -28,6 +28,7 @@ from inv.buildkit_transport import (  # noqa: E402
     BuildkitTransportConfiguration,
     RootlessBuildkitTransport,
 )
+from inv.errors import DomainError  # noqa: E402
 from inv.policy import action_digest  # noqa: E402
 
 
@@ -414,6 +415,9 @@ def main(argv=None) -> int:
         }
         if str(error).startswith("rootless BuildKit container boundary is broader than declared:"):
             failure["failureDetail"] = str(error)
+        elif isinstance(error, DomainError):
+            failure["failureCode"] = error.code
+            failure["failureDetail"] = error.detail
         (args.output_dir / "rootless-buildkit-reference.json").write_text(
             json.dumps(failure, indent=2, sort_keys=True) + "\n", encoding="utf-8"
         )
