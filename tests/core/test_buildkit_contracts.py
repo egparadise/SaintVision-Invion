@@ -470,6 +470,18 @@ def test_success_receipt_requires_no_partial_export_and_a_canonical_physical_dig
     _rejected("BuildReceipt", changed)
 
 
+def test_legacy_cleanup_remains_compatible_but_a_partial_physical_pair_is_rejected():
+    legacy = _receipt()
+    del legacy["cleanup"]["physicalReceipt"]
+    del legacy["cleanup"]["physicalReceiptDigest"]
+    validate_contract("BuildReceipt", legacy)
+
+    for missing in ("physicalReceipt", "physicalReceiptDigest"):
+        partial = _receipt()
+        del partial["cleanup"][missing]
+        _rejected("BuildReceipt", partial)
+
+
 def test_dispatch_completed_is_a_closed_audit_event_value():
     changed = _receipt()
     changed["auditEvents"][0]["event"] = "dispatch_completed"

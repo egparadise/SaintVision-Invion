@@ -1203,10 +1203,16 @@
         "builderClaimReleased",
         "cgroupRemoved",
         "cacheDisposition",
-        "verifiedAt",
-        "physicalReceipt",
-        "physicalReceiptDigest"
+        "verifiedAt"
       ],
+      "dependentRequired": {
+        "physicalReceipt": [
+          "physicalReceiptDigest"
+        ],
+        "physicalReceiptDigest": [
+          "physicalReceipt"
+        ]
+      },
       "additionalProperties": false
     },
     "BuildDispatchCompletedPayload": {

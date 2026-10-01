@@ -243,8 +243,8 @@ export interface BuildCleanupReceipt {
   cgroupRemoved: boolean;
   cacheDisposition: "retained" | "quarantined" | "purged";
   verifiedAt: Timestamp;
-  physicalReceipt: BuildPhysicalCleanupReceipt;
-  physicalReceiptDigest: string;
+  physicalReceipt?: BuildPhysicalCleanupReceipt;
+  physicalReceiptDigest?: string;
 }
 
 export interface BuildDispatchCompletedPayload {

@@ -26,7 +26,10 @@ PR #306 카드 214 착수 전 질문에서 health receipt, physical cleanup rece
 
 - strict `BuildProviderHealthReceipt`, `BuildPhysicalCleanupReceipt`와 그 중첩 daemon/isolation/
   field-source 타입을 추가했다.
-- 기존 `BuildCleanupReceipt`에 physical receipt와 canonical digest를 필수화했다.
+- 기존 `BuildCleanupReceipt`에는 physical receipt와 canonical digest를 한 쌍으로 추가했다.
+  선행 계약만으로 활성 legacy receipt를 깨뜨리지 않도록 둘 다 없는 입력은 호환하되, 하나만
+  있는 입력은 거부한다. concrete transport를 enable하는 카드 214 제품 검증이 두 필드를
+  필수화하며, 그 전까지 transport 기본값은 disabled다.
 - `BuildAuditEvent.event=dispatch_completed`와 redacted `BuildDispatchCompletedPayload`를 추가했다.
 - DB migration, 제품 flag, caller, route, transport dispatch는 변경하지 않았다. 영속은 기존
   `inv.evidence`와 `inv.outbox`를 재사용하는 계약이다.

@@ -429,8 +429,8 @@ class BuildCleanupReceipt(BaseModel):
     cgroupRemoved: bool
     cacheDisposition: CacheDisposition
     verifiedAt: Timestamp
-    physicalReceipt: BuildPhysicalCleanupReceipt
-    physicalReceiptDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    physicalReceipt: BuildPhysicalCleanupReceipt | None = None
+    physicalReceiptDigest: constr(pattern=r'^[0-9a-f]{64}$') | None = None
 
 
 class BuildDispatchCompletedPayload(BaseModel):

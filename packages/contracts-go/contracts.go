@@ -245,8 +245,8 @@ type BuildCleanupReceipt struct {
     CgroupRemoved bool `json:"cgroupRemoved"`
     CacheDisposition string `json:"cacheDisposition"`
     VerifiedAt Timestamp `json:"verifiedAt"`
-    PhysicalReceipt BuildPhysicalCleanupReceipt `json:"physicalReceipt"`
-    PhysicalReceiptDigest string `json:"physicalReceiptDigest"`
+    PhysicalReceipt *BuildPhysicalCleanupReceipt `json:"physicalReceipt,omitempty"`
+    PhysicalReceiptDigest *string `json:"physicalReceiptDigest,omitempty"`
 }
 
 type BuildDispatchCompletedPayload struct {

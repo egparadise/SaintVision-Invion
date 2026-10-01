@@ -54,7 +54,12 @@ identity/epoch/격리 불일치는 `RES-0006/503/retryable=true`, stale `observe
 disposition, builder claim/cgroup release와 `verifiedAt`이다. `null`은 partial export가 애초에
 없었다는 뜻이고, 관측하지 않았다는 뜻으로 쓰지 않는다.
 
-기존 `BuildCleanupReceipt`는 strict physical receipt와 `physicalReceiptDigest`를 필수로 가진다.
+기존 활성 제품 경로의 호환성을 위해 선행 계약 단계에서는 `BuildCleanupReceipt`의
+`physicalReceipt`와 `physicalReceiptDigest`를 함께 있을 때만 허용한다(둘 중 하나만 있는 상태는
+계약 위반). 두 필드가 없는 legacy receipt는 이 계약 PR에서만 계속 유효하다. 카드 214 구현은
+concrete BuildKit transport를 enable하기 전에 두 필드를 제품 검증에서 반드시 요구하며, 그
+전까지 transport 기본값은 disabled다. 별도 `BuildPhysicalCleanupReceipt` 자체의 모든 필드는
+항상 필수다.
 digest는 digest 필드를 포함하지 않는 physical receipt를 UTF-8 JSON
 (`sort_keys=true`, separators `(',', ':')`, `ensure_ascii=false`)으로 직렬화한 SHA-256의
 소문자 64-hex다. 구현은 중복된 cache/claim/cgroup/verified 값의 exact 일치도 검사한다.
