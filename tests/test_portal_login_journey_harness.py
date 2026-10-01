@@ -2091,7 +2091,7 @@ def test_live_chromium_nssdb_intranet_ca_trust(tmp_path):
     from playwright.sync_api import sync_playwright
 
     # 1. Generate root CA and server cert
-    ca_key, ca_cert, ca_pem, ca_fp = _generate_test_ca("SaintVision Intranet Root CA")
+    ca_key, ca_cert, root_ca_pem, ca_fp = _generate_test_ca("SaintVision Intranet Root CA")
     _, server_pem, server_key_pem = _generate_server_cert(ca_key, ca_cert, "127.0.0.1")
 
     # 2. Generate unrelated rogue CA
