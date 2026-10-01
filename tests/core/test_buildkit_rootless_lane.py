@@ -53,6 +53,9 @@ def test_lane_is_opt_in_pinned_and_never_mounts_host_socket_or_uses_privileged()
     assert '"$SV_BUILDKIT_RUNTIME_IMAGE" \\\n  --addr tcp://0.0.0.0:1234' in text
     assert "kernel.apparmor_restrict_unprivileged_userns=0" in text
     assert "pip install --disable-pip-version-check -e services/control-plane" in text
+    assert "ociVerification" in text
+    assert "processLiveness" in text
+    assert "rootless-buildkit-roundtrip.oci.tar" in text
     checkout = next(step for step in job["steps"] if step.get("uses") == "actions/checkout@v4")
     assert checkout["with"]["persist-credentials"] is False
 
@@ -230,6 +233,8 @@ def test_container_health_rejects_daemon_in_host_user_namespace(monkeypatch):
         joined = " ".join(str(value) for value in arguments)
         if arguments[:2] == ("docker", "inspect"):
             return json.dumps(_container_inspect())
+        if joined.endswith("/proc/32/comm"):
+            return "buildkitd"
         if joined.endswith("/proc/32/status"):
             return "Uid:\t1000\t1000\t1000\t1000\nNoNewPrivs:\t0"
         if joined.endswith("/proc/32/stat"):
@@ -248,6 +253,63 @@ def test_container_health_rejects_daemon_in_host_user_namespace(monkeypatch):
         module._container_health_receipt(
             args, datetime(2026, 10, 2, 0, 0, tzinfo=timezone.utc)
         )
+
+
+def test_container_snapshot_rejects_rootlesskit_pid_instead_of_buildkitd(monkeypatch):
+    module = _module()
+    monkeypatch.setattr(module, "_container_buildkitd_pid", lambda _name: 32)
+
+    def command(*arguments):
+        joined = " ".join(str(value) for value in arguments)
+        if joined.endswith("/proc/32/comm"):
+            return "rootlesskit"
+        if joined.endswith("/proc/32/status"):
+            return "Uid:\t1000\t1000\t1000\t1000\nNoNewPrivs:\t0"
+        if joined.endswith("/proc/32/stat"):
+            return " ".join(["0"] * 22)
+        if "%i" in arguments:
+            return "4242\n5252"
+        raise AssertionError(f"unexpected command: {arguments!r}")
+
+    monkeypatch.setattr(module, "_command", command)
+    with pytest.raises(RuntimeError, match="process identity"):
+        module._container_buildkitd_snapshot("rootless-builder")
+
+
+def test_process_snapshot_rejects_non_buildkitd_comm(monkeypatch):
+    module = _module()
+    original_read_text = Path.read_text
+
+    def read_text(path, *args, **kwargs):
+        if path.name == "comm" and path.parent.name == "32":
+            return "rootlesskit\n"
+        return original_read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", read_text)
+    with pytest.raises(RuntimeError, match="not buildkitd"):
+        module._process_buildkitd_snapshot(32)
+
+
+def test_live_buildkitd_binds_exact_pid_uid_start_ticks_and_rootless_state(monkeypatch):
+    module = _module()
+    args = SimpleNamespace(container_name="rootless-builder", daemon_pid=None)
+    receipt = {
+        "pid": 32,
+        "processUid": 1000,
+        "processStartTicks": 9876,
+        "rootless": True,
+    }
+    snapshot = dict(receipt)
+    monkeypatch.setattr(module, "_container_buildkitd_snapshot", lambda _name: dict(snapshot))
+    observed = module._live_buildkitd(args, receipt)
+    assert observed["processName"] == "buildkitd"
+    assert observed["alive"] is True
+    assert observed["pid"] == 32
+    assert observed["processStartTicks"] == 9876
+
+    snapshot["processStartTicks"] += 1
+    with pytest.raises(RuntimeError, match="identity changed"):
+        module._live_buildkitd(args, receipt)
 
 
 def test_container_mode_derives_pid_from_inspect_instead_of_cli(monkeypatch, tmp_path):
@@ -303,6 +365,20 @@ def test_main_emits_reference_only_evidence_and_exact_junit(monkeypatch, tmp_pat
         bins.append(path)
     monkeypatch.setenv("INV_EVIDENCE_CODE_SHA", HEAD)
     monkeypatch.setattr(module, "_health_receipt", lambda *_args: {"redacted": True})
+    liveness_calls = []
+
+    def live(_args, _receipt):
+        liveness_calls.append(len(liveness_calls) + 1)
+        return {
+            "pid": 999,
+            "processStartTicks": 777,
+            "processName": "buildkitd",
+            "alive": True,
+            "verifiedAt": f"2026-10-02T00:00:0{len(liveness_calls)}+00:00",
+            "source": "host-proc-buildkitd",
+        }
+
+    monkeypatch.setattr(module, "_live_buildkitd", live)
     monkeypatch.setattr(
         module,
         "_command",
@@ -356,6 +432,16 @@ def test_main_emits_reference_only_evidence_and_exact_junit(monkeypatch, tmp_pat
     assert report["cleanCheckout"] is True
     assert report["operationalAcceptanceAssessed"] is False
     assert report["productDispatchEnabled"] is False
+    assert report["processLiveness"] == {
+        "pid": 999,
+        "processStartTicks": 777,
+        "processName": "buildkitd",
+        "aliveBeforeRoundtrip": True,
+        "aliveAfterRoundtrip": True,
+        "verifiedBeforeRoundtripAt": "2026-10-02T00:00:01+00:00",
+        "verifiedAfterRoundtripAt": "2026-10-02T00:00:02+00:00",
+        "source": "host-proc-buildkitd",
+    }
     assert (
         '<testsuite name="s08-rootless-buildkit-reference" tests="1" failures="0"'
         in junit.read_text(encoding="utf-8")
