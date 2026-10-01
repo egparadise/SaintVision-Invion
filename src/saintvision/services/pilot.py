@@ -648,10 +648,11 @@ def _release_components(manifest: ReleaseManifest) -> list[dict]:
 REQUIRED_DISTINCT_OPERATOR_COUNT = 2
 
 #: Why ``operatorSignOff`` is false on every row this module produces. The write
-#: contract for human attestation exists (``#282``, card 184); what is absent is an
-#: implementation of it, and the value names that rather than leaving a reader to
-#: decide whether "false" means nobody signed or this surface cannot tell.
-OPERATOR_SIGN_OFF_BLOCKED_BY = "human-attestation-implementation-unavailable"
+#: The contract for human attestation exists (``#282``, card 184), but verified
+#: fresh-auth supply and authoritative target/Evidence resolvers are still absent.
+#: The value names the complete prerequisite boundary rather than leaving a reader
+#: to decide whether "false" means nobody signed or this surface cannot tell.
+OPERATOR_SIGN_OFF_BLOCKED_BY = "release-acceptance-prerequisites-unavailable"
 
 #: Distinct operators whose decision is attested to a person. Zero, as a constant,
 #: because the attestation this counts is ``#282``'s and nothing implements it yet.
