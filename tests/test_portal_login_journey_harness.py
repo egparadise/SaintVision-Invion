@@ -2082,14 +2082,14 @@ def test_non_linux_platform_reports_blocked_external(monkeypatch):
 def test_live_chromium_nssdb_intranet_ca_trust(tmp_path):
     """H1: Live Chromium HTTPS handshake with isolated NSS DB: wrong root fails, correct root succeeds."""
     import shutil
-    if sys.platform != "linux" or not shutil.which("certutil"):
-        # Operator premise: Intranet CA NSS DB trust profile executes on Linux in an environment with certutil (libnss3-tools)
-        return
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        sync_playwright = None
 
-    from http.server import HTTPServer, SimpleHTTPRequestHandler
-    import threading
-    import ssl
-    from playwright.sync_api import sync_playwright
+    if sys.platform != "linux" or not shutil.which("certutil") or not callable(sync_playwright):
+        # Operator premise: Intranet CA NSS DB trust profile executes on Linux in an environment with certutil (libnss3-tools) and Playwright
+        return
 
     # 1. Generate root CA and server cert
     ca_key, ca_cert, root_ca_pem, ca_fp = _generate_test_ca("SaintVision Intranet Root CA")
