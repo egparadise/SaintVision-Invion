@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.162"
+version: "1.0.163"
 status: "approved"
 author: "Gemini"
-updated: "2026-10-01T18:07:00+09:00"
+updated: "2026-10-01T18:33:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,10 +19,10 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-10-01T18:07:00+09:00 (Card 180 S11-FE ACC-09 디자인 토큰 명도 대비 전수 적합화 및 독립 검토 r2 F1 소스 결속 단언/F2 fail-closed 리터럴 인벤토리 래칫 조치: RunDetail/NodeList/Studio 소스 결속 단언으로 되살림 변이 3종 전원 사살, COLOR_LITERAL_BASELINE 42개 파일 인벤토리 및 #30363d 161/15 정정 래칫으로 신규 hex/rgb 유입 변이 3종 전원 사살, 6종 변이 100% 사살 실측, acc09-contrast-tokens.test.tsx 9 passed, tsc -b/build/route_coverage 100% 클린).
+- 확인 기준: 2026-10-01T18:33:00+09:00 (Card 180 S11-FE ACC-09 디자인 토큰 명도 대비 전수 적합화 및 독립 검토 r3 F1 React DOM 렌더링 style.color 단언/F2 multiset 인벤토리 래칫 조치: RunDetail/NodeList/DeveloperStudio 실제 렌더링 style.color 단언으로 주석 decoy 변이 3종 전원 사살, COLOR_LITERAL_MULTISET_BASELINE 42개 파일 multiset 인벤토리로 동일 개수 신규 색상 치환(#d97706 -> #abcdef) 및 상한 초과 변이 등 5종 전원 사살, 8종 변이 100% 사살 실측, acc09-contrast-tokens.test.tsx 9 passed, tsc -b/build/route_coverage 100% 클린).
 
 ## 2026-10-01 S11-FE ACC-09 디자인 토큰 명도 대비 전수 적합화 및 수학적 계산 단위 시험 (Card 180, `agent/gemini/c180-s11fe-contrast-fixes`, base `coord/train7-ci-1641`)
-- **개요**: S11-FE ACC-09 접근성 기준(WCAG 2.2 AA 본문 텍스트 >= 4.5:1, UI 경계 >= 3.0:1)을 충족하기 위해 `apps/web/src/index.css` 디자인 토큰 및 제품 코드 실제 조합 보정, 독립 검토 r2(F1, F2) 피드백 전수 조치:
+- **개요**: S11-FE ACC-09 접근성 기준(WCAG 2.2 AA 본문 텍스트 >= 4.5:1, UI 경계 >= 3.0:1)을 충족하기 위해 `apps/web/src/index.css` 디자인 토큰 및 제품 코드 실제 조합 보정, 독립 검토 r3(F1 실제 DOM 렌더링 단언, F2 파일별 multiset 인벤토리) 피드백 전수 조치:
   1. **토큰 전수 식별 및 보정**:
      - Dark `--color-border-subtle`: `#374151` $\rightarrow$ `#64748b` (대비 1.42:1 $\rightarrow$ 3.08:1 ~ 3.73:1, $\ge 3.0:1$ 달성).
      - Dark `--color-risk-l0`: `#10b981` $\rightarrow$ `#34d399` (15% tint 합성 대비 4.49:1 $\rightarrow$ 5.93:1, $\ge 4.5:1$ 달성).
@@ -35,33 +35,28 @@ source_of_truth: "Git"
      - Light `--color-risk-l0`: `#059669` $\rightarrow$ `#065f46` (15% tint 합성 대비 4.39:1 $\rightarrow$ 6.15:1, $\ge 4.5:1$ 달성).
      - Light `--color-risk-l1`: `#2563eb` $\rightarrow$ `#1d4ed8` (15% tint 합성 대비 4.02:1 $\rightarrow$ 5.21:1, $\ge 4.5:1$ 달성).
      - Light `--color-risk-l2`: `#d97706` $\rightarrow$ `#92400e` (15% tint 합성 대비 4.13:1 $\rightarrow$ 5.83:1, $\ge 4.5:1$ 달성).
-  2. **140곳 토큰 일괄 해소 및 Fail-Closed 전체 리터럴 인벤토리 래칫 (F2 조치)**:
+  2. **140곳 토큰 일괄 해소 및 Fail-Closed 파일별 Multiset 리터럴 인벤토리 래칫 (F2 조치)**:
      - 컴포넌트 140곳의 개별 하드코딩 없이 `index.css` 디자인 토큰 자체를 수정하여 `NodeList` 신규 노드 선택 버튼 테두리, 카드 외곽선, 테이블 행 구분선, `WorkspaceCreateModal` 입력창 경계선(이전 Dark 1.94:1 / Light 1.36:1 $\rightarrow$ 3.08:1 / 3.18:1)을 일괄 해소.
      - `var(--color-border-subtle)` 사용처를 실측치인 **140 occurrences / 21 source files**로 단언.
-     - `COLOR_LITERAL_BASELINE` 42개 파일 인벤토리를 기반으로 미등록 파일 및 상한 초과 리터럴 유입을 fail-closed로 전면 차단. `#30363d` 실측치를 **161건 / 15개 파일**로 정정하고 래칫에 포함.
-  3. **실제 렌더링 조합 3부류 해소 및 컴포넌트 소스 결속 단언 (F1 조치)**:
+     - `COLOR_LITERAL_MULTISET_BASELINE` 42개 파일별 (리터럴 $\rightarrow$ 허용 개수) multiset 인벤토리를 기반으로 미등록 파일 유입뿐만 아니라 동일 파일 내 동일 개수 치환(`EvidenceViewer.tsx` `#d97706` $\rightarrow$ `#abcdef`)을 fail-closed로 전면 차단. `#30363d` 실측치를 **161건 / 15개 파일**로 정정 유지.
+  3. **실제 렌더링 조합 3부류 해소 및 실제 React DOM 렌더링 style.color 단언 (F1 조치)**:
      - `RiskBadge.tsx`: 15% RGBA tint 합성 배경 위 전경 대비율을 24개 조합 전수 $\ge 4.5:1$로 완결 (F1.a).
-     - `RunDetail.tsx:1083`: isPassed 배경 위 텍스트를 `var(--color-text-inverse)`로 교체 (Dark: 2.279:1 $\rightarrow$ **7.83:1**, Light: **4.77:1**). 소스 결속 단언 추가.
-     - `NodeList.tsx:431-432`, `DeveloperStudio.tsx:905-906`: border-strong 배경 위 텍스트를 `var(--color-text-inverse)`로 교체 (Dark: 2.539:1 $\rightarrow$ **6.68:1**, Light: **6.92:1**). 소스 결속 단언 추가.
-  4. **수학적 대비 계산 단위 시험 (`acc09-contrast-tokens.test.tsx`, 9 tests, 6종 변이 전원 사살)**:
-     - `index.css` 및 실사용 페어 직접 검증, 6대 Revert-Fail 프로브 영구 검증, F2 인벤토리 래칫 검증.
-     - 6종 단일 변이(컴포넌트 3종 되살림, 신규 파일 hex/rgb 유입 2종, #30363d 상한 초과 1종) 전원 사살(Killed: 6, Survived: 0) 실측.
+     - `RunDetail.tsx:1083`: isPassed 배경 위 텍스트를 `var(--color-text-inverse)`로 교체 (Dark: 2.279:1 $\rightarrow$ **7.83:1**, Light: **4.77:1**). 실제 DOM 렌더링(`data-theme="dark"`) 후 `style.color`가 `var(--color-text-inverse)`임을 직접 단언하여 주석 decoy 변이 사살.
+     - `NodeList.tsx:431-432`, `DeveloperStudio.tsx:905-906`: border-strong 배경 위 텍스트를 `var(--color-text-inverse)`로 교체 (Dark: 2.539:1 $\rightarrow$ **6.68:1**, Light: **6.92:1**). 실제 DOM 렌더링 후 `style.color` 단언으로 주석 decoy 변이 사살.
+  4. **수학적 대비 계산 단위 시험 (`acc09-contrast-tokens.test.tsx`, 9 tests, 8종 변이 전원 사살)**:
+     - `index.css` 및 실사용 페어 직접 검증, 6대 Revert-Fail 프로브 영구 검증, F2 Multiset 인벤토리 래칫 검증.
+     - 8종 단일 변이(컴포넌트 3종 주석 decoy 되살림, 동일 개수 신규 치환 1종, 기존 리터럴 팽창 치환 1종, 신규 파일 hex/rgb 유입 2종, #30363d 상한 초과 1종) 전원 사살(Killed: 8, Survived: 0) 실측.
 - **담당 및 역할**: Gemini (Frontend / UI / 접근성 소유). Reviewer: Claude (UI/접근성/테스트), Codex (무결성/계약/디자인토큰).
 - **관측 근거 (Evidence)**:
-  - 단위 시험: `npm run test -- acc09-contrast-tokens.test.tsx` (9 passed 100%, 44ms, 6종 변이 전원 사살)
+  - 단위 시험: `npm run test -- acc09-contrast-tokens.test.tsx` (9 passed 100%, 788ms, 8종 변이 전원 사살)
   - 기존 스위트: `npm run test -- s11-defect-fixes.test.tsx` (16 passed 100%)
   - 타입 검사: `npx tsc -b` (에러 0건, 클린 통과)
-     - `index.css` 및 실사용 페어 직접 검증, 6대 Revert-Fail 프로브 영구 검증, F2 인벤토리 래칫 검증.
-- **담당 및 역할**: Gemini (Frontend / UI / 접근성 소유). Reviewer: Claude (UI/접근성/테스트), Codex (무결성/계약/디자인토큰).
-- **관측 근거 (Evidence)**:
-  - 단위 시험: `npm run test -- acc09-contrast-tokens.test.tsx` (9 passed 100%, 35ms)
-  - 기존 스위트: `npm run test -- s11-defect-fixes.test.tsx` (16 passed 100%)
-  - 타입 검사: `npx tsc -b` (에러 0건, 클린 통과)
-  - 프로덕션 번들: `npm run build` (빌드 완료, 5.53s)
+  - 프로덕션 번들: `npm run build` (빌드 완료, 8.89s, dist 정상 생성)
   - 라우트 커버리지: `pytest tests/test_route_coverage.py` (40 passed 100%)
   - 프런트 무결성: `python tools/check_frontend_integrity.py` (92개 파일 스캔, 9대 규칙 위반 0건)
   - 계약 바인딩: `python tools/check_contract_bindings.py` (55 fixtures PASS)
   - 문서 정합성: `python tools/check_docs.py` (PASS, exit 0)
+  - 공백/서식 검사: `git diff --check origin/coord/train7-ci-1641` (공백 오류 0건)
   - 봇 호출 방지 검사: 금지 봇 호출 태그 0건 검출 확인
 - **전문 문서**: [[2026-10-01_17-25-00_KST_Card180_S11-FE_ACC-09_디자인토큰_대비개선_및_단위시험_Gemini]]
 
