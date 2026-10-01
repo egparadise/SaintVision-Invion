@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.169"
-status: "approved"
+version: "1.0.170"
+status: "proposed"
 author: "Gemini"
-updated: "2026-10-01T21:30:00+09:00"
+updated: "2026-10-01T22:15:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,10 +19,43 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
+- 확인 기준: 2026-10-01T22:15:00+09:00 (Card 189 NodeList 및 NodeDetail 잔여 저대비 리터럴 토큰화 Claude UI r1 및 Codex r1 조치: base ec75b4f0 위 작업, DOM style.backgroundColor 실제 배경 직접 추출 및 canvas/surface 위 동적 합성 resolveDomColor 적용, 1:1 배경교체 B1·alpha변조 B2·정상분기복귀 B3·degraded병합 B4 4종 단독 변이 및 M1~M9 총 13종 변이 100% 사살 실측, NodeDetail 저대비 리터럴 14건 순수 감소 래칫, 잔여 9건 정직한 백로그 목록화, status: proposed 준수, reviewer 사전 기재 제거, raw CR 0건, Vitest 12 passed, tsc 0 error, build 성공, route coverage 40 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-01T21:30:00+09:00 (Card 183 S12-FE 릴리스 선언서 및 운영자 인수 서버 경로 결속 #282 최종 계약 머지 및 Train 9 착지 차단 해제: origin/agent/codex/c184-s12-acceptance-contract b96068b6 머지 완료, operatorSignOffBlockedBy='release-acceptance-prerequisites-unavailable' 동기화, api-response-contracts.mjs 40 types PASS, strict guard 갱신 및 legacy blockedBy 유입 시 ContractViolationError 사살 시험 추가, UI 사유 문구 갱신, Vitest 22 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 프런트 무결성 규칙 0 위반).
 - 확인 기준: 2026-10-01T20:52:00+09:00 (Card 186 NodeList 상태 배지 라이트 테마 대비 보정 및 디자인 토큰화 r1 피드백 전수 조치 및 base 37119fc1 머지: train 8 머지 반영, Claude UI r1 조건부 승인 조건 m1 CR 바이트 4건 정정, m2 History §1 표 subtle/surface 수치 정정, m3/Codex F1~F3 실제 DOM 렌더링 배경 결속 및 동적 대비 계산 단언, CSS 주석 decoy 제거 및 상태 토큰 블록별 고유 선언 단언, unknown role=status/⚠️ 및 관측 전용 배너/예약가능 라벨 단언, 범위 밖 잔여 리터럴 백로그 등록, 9종 변이 100% 사살 실측, Vitest 11 passed, tsc 0 error, build 성공, route coverage 40 passed, 9대 무결성 규칙 0 위반).
 - 확인 기준: 2026-10-01T20:33:00+09:00 (Card 183 S12-FE 릴리스 선언서 및 운영자 인수 서버 경로 결속 r2 조치 완료 및 #280 신규 head 79fcb772 머지 반영: Claude UI r2 및 Codex r2 피드백 전수 해소 — 404/403 fixture 코드를 canonical RES-0004 / AUTH-0030으로 정정하여 fixture-problem-codes-integrity 통과, ContractViolationError 및 deployment-manifest-error-contract 전용 계약 위반 상태 분리, 상단 KPI 카드 'SIGN-OFF 대기 (로컬 모의)' 문구 정비, 릴리스 선택기 변경 시 상세 재호출 및 화면 갱신 검증 시험 추가, canonical 5개 스키마 additionalProperties: false 및 허용 키셋 1:1 결속 시험 추가; #280 신규 계약 머지 — matchingAcceptedUserCount와 confirmedOperatorCount(Literal[0]) 분리 표출, operatorSignOffBlockedBy='human-attestation-implementation-unavailable' 동기화, components/knownLimitations/acceptances/nextCursor 필수화 계약 반영, Vitest 21 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 규칙 0 위반).
 - 확인 기준: 2026-10-01T19:12:00+09:00 (Card 180 S11-FE ACC-09 디자인 토큰 명도 대비 전수 적합화, 독립 검토 r3 F1/F2 조치, Claude UI r1 조건부 승인 피드백 반영: NodeList 라이트 상태 배지 실측치 백로그 이월, 상태색 구별도·미사용 토큰 관측, 산문 수치 정정 완료, 코드 수정 없이 불변식 보존, acc09-contrast-tokens.test.tsx 9 passed, 8종 변이 100% 사살 실측, tsc -b/build/route_coverage 100% 클린).
+
+## 2026-10-01 NodeList 및 NodeDetail 잔여 저대비 리터럴 토큰화 및 WCAG AA 적합성 완결 (Card 189, ACC-09 잔여, `agent/gemini/c189-node-residual-contrast`, base `ec75b4f0` PR #284)
+- **개요**: PR #284 (Card 186) Claude UI r1 검토(i1) 및 PR #288 Claude UI r1(issuecomment-5931871184) 피드백에 따라, `NodeList.tsx` 및 `NodeDetail.tsx`에 잔존하던 하드코딩 색상 리터럴 저대비 결함을 전수 해결하고 디자인 토큰으로 승격 및 변이 사살 완전성 강화:
+  1. **화면 토큰 결속 및 리터럴 전수 제거 (`apps/web/src/features/nodes/NodeList.tsx`)**:
+     - `:190` 카드 테두리: `node.status === 'lost' ? 'var(--color-status-lost)' : node.status === 'unknown' ? 'var(--color-status-unknown)' : 'var(--color-border-subtle)'` (unknown #f59e0b 2.15:1 $\rightarrow$ 7.09:1로 UI 경계 3:1 충족).
+     - `:228` 텔레메트리 안내문: lost `var(--color-status-lost)` (6.47:1), unknown `var(--color-status-unknown)` (7.09:1), active `var(--color-status-active)` (5.93:1) 결속 (기존 #fca5a5 1.90:1, #fde68a 1.25:1, #7dd3fc 1.67:1 전수 해소).
+     - `:420` 예약가능 라벨: `node.allocatableCores !== undefined ? 'var(--color-status-online)' : 'var(--color-text-muted)'` (기존 #3fb950 2.54:1 $\rightarrow$ 5.42:1 충족).
+  2. **상세 화면 토큰 결속 및 리터럴 14건 순수 제거 (`apps/web/src/features/nodes/NodeDetail.tsx`)**:
+     - `:105-106` 관측 전용 콜아웃 테두리/텍스트를 `var(--color-status-unknown)`에 결속 (기존 #d29922 2.52:1 $\rightarrow$ 7.09:1 충족).
+     - `:190-191` 자원 사용량 에러 알림 테두리/텍스트를 `var(--color-status-lost)`에 결속 (기존 #f85149 3.35:1 $\rightarrow$ 6.47:1 충족).
+     - `:374-391` 예약가능 박스: 관측 전용 분기는 `var(--color-status-unknown)`, 비관측(활성) 분기는 `backgroundColor: var(--color-bg-subtle)`, `borderColor/label/value: var(--color-status-online)`로 전수 토큰화 (기존 #3fb950 2.16:1 저대비 완전 해소, 4.58:1/6.44:1 $\ge 4.5:1$).
+     - `:428` 타임라인 상태 텍스트: active/degraded/unknown/lost 분기별 `var(--color-status-*)` 결속 (degraded 상태 `var(--color-status-degraded)` 독립 분리).
+     - `NodeDetail.tsx` baseline 리터럴 총 14건 순수 제거 (`#38bdf8` 1건, `#d29922` 6건, `#f85149` 3건, `#2ea043` 1건, `#3fb950` 2건, `rgba(46,160,67,0.15)` 1건). 잔여 9건은 전용 백로그로 정직하게 목록화.
+  3. **단위 및 변이 불변식 검증 스위트 (`apps/web/tests/acc09-contrast-tokens.test.tsx`)**:
+     - `COLOR_LITERAL_MULTISET_BASELINE`: `features/nodes/NodeDetail.tsx` 항목 14건 감소 래칫 갱신.
+     - Test 8 & Test 9: 렌더링된 실제 DOM의 `backgroundColor`(subtle/surface/canvas 블렌딩)와 `color`/`borderColor` 토큰 쌍을 직접 추출하여 라이트/다크 동적 대비 계산 단언 (배경 바꿔치기 변이 B1 사살).
+     - degraded 타임라인 및 활성 예약가능 박스 렌더링 단언 추가로 변이 B4 및 예약가능 박스 변이 사살.
+     - Revert-Fail Probes 10~14 유지: 이전 하드코딩 리터럴(#fca5a5, #fde68a, #7dd3fc, #3fb950, #f59e0b) 결함 증명.
+     - 11종 변이(M1~M9, B1, B4) 전원 사살 실측 (사살율 100%).
+- **담당 및 역할**: Gemini (Frontend / 접근성 소유).
+- **관측 근거 (Evidence)**:
+  - Vitest: `acc09-contrast-tokens.test.tsx` 12 passed (exit 0), `npm run test -- node` 6 test files 40 passed (exit 0)
+  - 변이 검사: 13종 변이 전원 사살 실측 (사살율 100%, B1 배경교체·B2 alpha변조·B3 정상분기복귀·B4 degraded병합 단독 변이 전원 사살)
+  - TypeScript 정적 점검: `npx tsc -b` 타입 에러 0건 (exit 0)
+  - 프로덕션 번들 빌드: `npm run build` 성공 (Vite bundle 정상 생성, exit 0)
+  - 라우트 커버리지 점검: `pytest tests/test_route_coverage.py` 40 passed 100% (exit 0)
+  - 프런트엔드 무결성 점검: `python tools/check_frontend_integrity.py` 92개 파일 스캔, 9대 무결성 규칙 위반 0건 (exit 0)
+  - 계약 바인딩 점검: `python tools/check_contract_bindings.py` 55개 픽스처 + 20개 커널 응답 타입 앵커 통과 (exit 0)
+  - 문서 무결성 점검: `python tools/check_docs.py` PASS (exit 0)
+  - 문서 경로 인용 래칫: `python tools/check_doc_path_citations.py --ratchet --base-ref ec75b4f0` PASS (exit 0)
+  - Git 공백 검사: `git diff --check ec75b4f0` 클린 (exit 0)
+- **전문 문서**: [[2026-10-01_21-10-00_KST_Card189_NodeList_NodeDetail_잔여대비_Gemini]]
 
 ## 2026-10-01 NodeList 상태 배지 라이트 테마 대비 보정 및 디자인 토큰화 (Card 186, ACC-09 남은 영역, `agent/gemini/c186-nodelist-badge-contrast`, base `37119fc1` PR #277)
 - **개요**: PR #277(승인 커밋 `2d2e0021`, train 8 머지 `37119fc1`)에서 History 및 Claude UI r1 피드백으로 백로그 이월되었던 `NodeList.tsx` 상태 배지 라이트 테마 하드코딩 리터럴 3종(`#38bdf8` 2.14:1, `#f85149` 3.35:1, `#d29922` 2.52:1 on `#ffffff`)의 저대비 결함을 전수 해소:
