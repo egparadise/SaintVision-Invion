@@ -1,15 +1,27 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.240"
+version: "1.0.241"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T15:18:53+09:00"
+updated: "2026-10-01T15:58:25+09:00"
 source_of_truth: "Git"
-active_card: "CARD-173 S08-BE Build path ROOF binding"
-active_card_status: "pre-dispatch/final live policy, containment, provider, declared lease/fencing and receipt/evidence binding implemented; focused 103 passed"
-active_card_next: "contract/docs gates, stacked PR and Claude review; daemon adapter and GPU remain separate cards"
+active_card: "CARD-174 S08-BE admitted Build adapter"
+active_card_status: "binding-only dispatch, live lease/node/fence revalidation and cancel+quarantine boundary implemented; focused 115 passed and gates green"
+active_card_next: "stacked PR and Claude review; physical BuildKit and authenticated cleanup persistence remain NOT_OBSERVED"
 ---
+
+## 2026-10-01 Card 174 — S08-BE admitted Build adapter
+
+- PR #272 승인 head `7eb5e77e` 위에서 raw plan이 아닌 내부 admitted capability만
+  transport로 전달하는 adapter 경계를 구현 중이다. 외부 호출 양쪽에 짧은 DB transaction을
+  두고 live lease/fencing, Node online/drain·heartbeat·clock skew와 ROOF authority를
+  반복 검증한다.
+- dispatch 시도 뒤 오류·final drift는 cancel+quarantine으로 수렴하며, 정리 자체가
+  확인되지 않으면 `VERIFY-0022`로 실패한다. 관련 focused PG-free **115 passed**다.
+- 실제 rootless daemon, 인증된 물리 cleanup receipt, kernel lease release와 Evidence DB
+  원자 저장은 합성하지 않고 `NOT_OBSERVED`로 유지한다.
+- 근거: [[2026-10-01_15-56-16_KST_S08-BE_Build_adapter_결속_Codex]].
 
 ## 2026-10-01 Card 173 — S08-BE Build 경로 ROOF 결속
 
