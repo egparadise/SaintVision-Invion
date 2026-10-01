@@ -1051,7 +1051,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 verifyTarget.version === version.trim() &&
                 verifyResult.modelId === modelId.trim() &&
                 verifyResult.version === version.trim()
-                  ? 'var(--color-brand-primary-bg)'
+                  ? 'var(--color-brand-subtle)'
                   : 'var(--color-bg-subtle)',
               border:
                 verifyResult &&
@@ -1061,7 +1061,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 verifyTarget.version === version.trim() &&
                 verifyResult.modelId === modelId.trim() &&
                 verifyResult.version === version.trim()
-                  ? '1px solid var(--color-brand-primary)'
+                  ? '1px solid var(--color-brand-hover)'
                   : '1px solid var(--color-border-subtle)',
               color:
                 verifyResult &&
@@ -1071,7 +1071,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 verifyTarget.version === version.trim() &&
                 verifyResult.modelId === modelId.trim() &&
                 verifyResult.version === version.trim()
-                  ? 'var(--color-brand-primary-fg)'
+                  ? 'var(--color-brand-hover)'
                   : 'var(--color-text-muted)',
             }}
           >

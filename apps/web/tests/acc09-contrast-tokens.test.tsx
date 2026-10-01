@@ -1715,6 +1715,10 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
           const condText = n.condition.getText(sf).replace(/\s+/g, ' ');
           collect(n.whenTrue, condPath ? `${condPath} && ${condText}` : condText);
           collect(n.whenFalse, condPath ? `${condPath} && !(${condText})` : `!(${condText})`);
+        } else if (ts.isTemplateExpression(n)) {
+          for (const span of n.templateSpans) {
+            collect(span.expression, condPath);
+          }
         } else {
           const text = n.getText(sf);
           const m = text.match(/var\((--color-[a-z0-9-]+)\)/);
@@ -1731,6 +1735,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     let checkedObjects = 0;
     let totalStyleAttrs = 0;
     let unboundColorObjects = 0;
+    let checkedBorderObjects = 0;
+    let checkedBorderPairs = 0;
     const violations: string[] = [];
     const containerBgs = ['--color-bg-surface', '--color-bg-subtle', '--color-bg-canvas'];
 
@@ -1785,6 +1791,39 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       }
     }
 
+    function checkBorderPair(bgToken: string, borderToken: string, pos: number) {
+      checkedBorderPairs++;
+      const { line } = sf.getLineAndCharacterOfPosition(pos);
+      const lBg = lightTokens[bgToken];
+      const dBg = darkTokens[bgToken];
+      const lBorder = lightTokens[borderToken];
+      const dBorder = darkTokens[borderToken];
+
+      if (bgToken === borderToken) {
+        violations.push(`L${line + 1}: Identical border-background token collision (1:1 contrast) detected: ${borderToken} on ${bgToken}`);
+        return;
+      }
+
+      if (lBg && lBorder) {
+        const cr = getContrast(lBorder, lBg);
+        if (cr < 3.0) {
+          violations.push(`L${line + 1}: Light border contrast ${cr.toFixed(2)}:1 < 3.0:1 (${borderToken} on ${bgToken})`);
+        }
+      }
+      if (dBg && dBorder) {
+        const cr = getContrast(dBorder, dBg);
+        if (cr < 3.0) {
+          violations.push(`L${line + 1}: Dark border contrast ${cr.toFixed(2)}:1 < 3.0:1 (${borderToken} on ${bgToken})`);
+        }
+      }
+    }
+
+    function checkInheritedBorder(borderToken: string, pos: number) {
+      for (const bgToken of containerBgs) {
+        checkBorderPair(bgToken, borderToken, pos);
+      }
+    }
+
     function visit(node: ts.Node) {
       if (ts.isJsxAttribute(node) && node.name.text === 'style') {
         totalStyleAttrs++;
@@ -1792,11 +1831,15 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
           if (ts.isObjectLiteralExpression(n)) {
             let bgNode: ts.Expression | null = null;
             let fgNode: ts.Expression | null = null;
+            let borderNode: ts.Expression | null = null;
             for (const p of n.properties) {
               if (ts.isPropertyAssignment(p)) {
                 const name = p.name.getText(sf);
                 if (name === 'backgroundColor' || name === 'background') bgNode = p.initializer;
                 if (name === 'color') fgNode = p.initializer;
+                if (['border', 'borderColor', 'borderTop', 'borderBottom', 'borderLeft', 'borderRight'].includes(name)) {
+                  borderNode = p.initializer;
+                }
               }
             }
             if (bgNode && fgNode) {
@@ -1818,6 +1861,27 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
                 checkInheritedColor(fgB.token, n.getStart(sf));
               }
             }
+
+            if (borderNode) {
+              const borderBranches = extractBranches(borderNode);
+              if (borderBranches.length > 0) {
+                checkedBorderObjects++;
+                if (bgNode) {
+                  const bgBranches = extractBranches(bgNode);
+                  for (const bB of borderBranches) {
+                    for (const bgB of bgBranches) {
+                      if (!bB.cond || !bgB.cond || bB.cond === bgB.cond) {
+                        checkBorderPair(bgB.token, bB.token, n.getStart(sf));
+                      }
+                    }
+                  }
+                } else {
+                  for (const bB of borderBranches) {
+                    checkInheritedBorder(bB.token, n.getStart(sf));
+                  }
+                }
+              }
+            }
           }
           ts.forEachChild(n, findObjects);
         }
@@ -1833,6 +1897,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(checkedPairs, 'Evaluated foreground-background pairs across conditional branches must be exactly 76').toBe(76);
     expect(unboundColorObjects, 'Elements with foreground color inheriting container background must be exactly 176').toBe(176);
     expect(checkedObjects + unboundColorObjects, 'Total covered color style objects must be exactly 234').toBe(234);
+    expect(checkedBorderObjects, 'Style objects with explicit border token declarations must be exactly 83').toBe(83);
+    expect(checkedBorderPairs, 'Evaluated border-background pairs across conditional and container branches must be exactly 122').toBe(122);
     expect(violations, `Expected 0 style-pair contrast/collision violations in ModelLineageView, got:\n${violations.join('\n')}`).toEqual([]);
   });
 
@@ -2029,6 +2095,10 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     const probe42Cr = getContrast(lightTokens['--color-brand-primary-fg'], lightTokens['--color-brand-subtle']);
     expect(probe42Cr, 'Defective brand-primary-fg on brand-subtle in light must fail 4.5:1').toBeLessThan(4.5);
     expect(probe42Cr).toBeCloseTo(1.22, 2);
+
+    // Probe 43 [Card 197 r3 / Claude r3 W1]: Swapping badge border to same as badge background (1:1 border collision) strictly fails 3.0:1
+    expect(getContrast(lightTokens['--color-brand-subtle'], lightTokens['--color-brand-subtle']), 'Defective badge border on subtle background in light fails 3.0:1').toBe(1.0);
+    expect(getContrast(darkTokens['--color-brand-subtle'], darkTokens['--color-brand-subtle']), 'Defective badge border on subtle background in dark fails 3.0:1').toBe(1.0);
 
     // Legacy Token Reverts:
     // Legacy Dark --color-border-subtle: #374151
