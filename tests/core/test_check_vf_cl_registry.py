@@ -18,6 +18,7 @@ below as a probe.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import subprocess
 
@@ -805,64 +806,133 @@ def test_every_job_that_collects_this_check_has_the_history_it_needs(workflow, j
     assert "fetch-depth: 0" in section[checkout:setup], section[checkout:setup]
 
 
-# --- rule 7: the tree decides ciVerified too ------------------------------------------
+# --- rule 7: the tree decides ciVerified, and the claim is bound to a receipt ----------
+#
+# The first version of this block tested the *shape* of the registry's run record, and
+# Codex showed what that was worth: an invented run id, a different 40-hex head, a
+# workflow nobody runs, invented steps, and all four at once -- five fabrications, zero
+# findings. Every one of them is a case below, and each now has to die.
 
 
-def ci_asserting(manifest_document, implies=True):
-    """The fixture manifest, asserting ciVerified over a file the tiny tree has."""
+def receipt(tmp_path, **overrides):
+    """A receipt as ``tools/record_vf_cl_ci_receipt.py`` writes one, sealed."""
+    head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=tmp_path,
+                          capture_output=True, text=True, check=True).stdout.strip()
+    document = {
+        "schemaVersion": checker.RECEIPT_SCHEMA,
+        "card": "VF-CL-0X",
+        "repository": checker.RECEIPT_REPOSITORY,
+        "workflowPath": ".github/workflows/fixture.yml",
+        "runId": "36851875128",
+        "event": "workflow_dispatch",
+        "conclusion": "success",
+        "headSha": head,
+        "headBranch": "agent/claude/fixture",
+        "claimedTree": head,
+        "headRelationToClaimedTree": "same",
+        "requiredSteps": ["Derive the thing", "Hold it to its shape"],
+        "artifact": {
+            "id": "11155274241",
+            "name": f"fixture-{head}",
+            "digest": "sha256:" + "1d" * 32,
+            "expiresAt": "2099-12-30T10:52:59Z",
+        },
+        "inputDigests": {
+            "artifactMetadataSha256": "a" * 64,
+            "jobsMetadataSha256": "b" * 64,
+            "runMetadataSha256": "c" * 64,
+        },
+        "recordedAt": "2026-10-02T00:00:00Z",
+    }
+    document.update(overrides)
+    return seal(document)
+
+
+def seal(document):
+    body = {key: value for key, value in document.items()
+            if key not in ("receiptSha256", "recordedAt")}
+    document["receiptSha256"] = hashlib.sha256(
+        json.dumps(body, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+        .encode("utf-8")
+    ).hexdigest()
+    return document
+
+
+def with_receipt(tmp_path, document=None, path="docs/vf-cl-ci-receipts/VF-CL-0X.json"):
+    target = tmp_path / path
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(json.dumps(document if document is not None else receipt(tmp_path)),
+                      encoding="utf-8")
+    return path
+
+
+def ci_asserting(manifest_document, implies=True, path="docs/vf-cl-ci-receipts/VF-CL-0X.json"):
     entry = manifest_document["cards"]["VF-CL-0X"]
     entry["impliesCiVerified"] = implies
     entry["ciVerifiedChecks"] = [{"kind": "path-exists", "path": "src/route.py"}]
     entry.pop("whyCiVerified", None)
+    if implies is True:
+        entry["ciVerifiedReceipt"] = {
+            "path": path,
+            "workflowPath": ".github/workflows/fixture.yml",
+            "requiredSteps": ["Derive the thing", "Hold it to its shape"],
+            "artifactNamePrefix": "fixture-",
+        }
     return manifest_document
 
 
-def ci_run(**overrides):
-    run = {
+def run_block(tmp_path, **overrides):
+    """The registry's own block, agreeing with the fixture receipt."""
+    head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=tmp_path,
+                          capture_output=True, text=True, check=True).stdout.strip()
+    block = {
         "runId": "36851875128",
-        "workflow": "S12 Acceptance Evidence",
-        "headSha": "40b3ec78ba63731dd94dcfdeb2d757381aee8a3b",
+        "workflowPath": ".github/workflows/fixture.yml",
+        "headSha": head,
         "conclusion": "success",
-        "steps": ["Derive the AC-12 acceptance items: success"],
+        "requiredSteps": ["Derive the thing", "Hold it to its shape"],
+        "artifact": {"id": "11155274241", "digest": "sha256:" + "1d" * 32},
+        "receipt": "docs/vf-cl-ci-receipts/VF-CL-0X.json",
     }
-    run.update(overrides)
-    return run
+    block.update(overrides)
+    return block
+
+
+def bound(tmp_path, block_overrides=None, receipt_overrides=None):
+    """A registry and manifest whose ciVerified claim is backed by a receipt."""
+    document = registry(tmp_path)
+    with_receipt(tmp_path, receipt(tmp_path, **(receipt_overrides or {})))
+    document["cards"][0]["ciVerifiedRun"] = run_block(tmp_path, **(block_overrides or {}))
+    return document, ci_asserting(manifest())
+
+
+def test_a_receipt_backed_claim_is_accepted(tmp_path):
+    document, manifest_document = bound(tmp_path)
+    assert audit(document, tmp_path, manifest_document) == []
 
 
 def test_a_ci_verified_claim_the_tree_contradicts_is_reported(tmp_path):
-    """The drift this rule exists for, in the direction it actually happened.
+    """The drift this rule exists for, in the direction it happened.
 
     ``VF-CL-04`` said ``ciVerified: false`` with a note whose reason -- no workflow runs
-    the collector -- had stopped being true. Nothing in the file could fault it, because
-    nothing compared that field to anything.
+    the collector -- had stopped being true, and nothing compared that field to anything.
     """
-    document = registry(tmp_path)
+    document, manifest_document = bound(tmp_path)
     document["cards"][0]["ciVerified"] = False
-    document["cards"][0]["ciVerifiedRun"] = ci_run()
-    findings = audit(document, tmp_path, ci_asserting(manifest()))
+    findings = audit(document, tmp_path, manifest_document)
     assert any("the tree shows ciVerified=True but the registry says False" in finding
                for finding in findings), findings
 
 
-def test_a_ci_verified_claim_the_tree_supports_is_accepted(tmp_path):
-    document = registry(tmp_path)
-    document["cards"][0]["ciVerifiedRun"] = ci_run()
-    assert audit(document, tmp_path, ci_asserting(manifest())) == []
-
-
 def test_a_premature_ci_verified_is_reported(tmp_path):
-    """The other direction: the flag up while the tree shows the lane is not there."""
     document = registry(tmp_path)
-    manifest_document = ci_asserting(manifest(), implies=False)
-    findings = audit(document, tmp_path, manifest_document)
+    findings = audit(document, tmp_path, ci_asserting(manifest(), implies=False))
     assert any("the tree shows ciVerified=False but the registry says True" in finding
                for finding in findings), findings
 
 
 def test_a_ci_verified_assertion_that_stopped_holding_is_reported(tmp_path):
-    document = registry(tmp_path)
-    document["cards"][0]["ciVerifiedRun"] = ci_run()
-    manifest_document = ci_asserting(manifest())
+    document, manifest_document = bound(tmp_path)
     manifest_document["cards"]["VF-CL-0X"]["ciVerifiedChecks"] = [
         {"kind": "path-exists", "path": "src/workflow-that-went-away.yml"}
     ]
@@ -871,41 +941,143 @@ def test_a_ci_verified_assertion_that_stopped_holding_is_reported(tmp_path):
                for finding in findings), findings
 
 
-def test_a_derived_ci_verified_must_name_the_run_that_showed_it(tmp_path):
-    """This registry's own lesson as a rule: the flag does not go up before the evidence."""
-    document = registry(tmp_path)
-    findings = audit(document, tmp_path, ci_asserting(manifest()))
-    assert any("names no ciVerifiedRun" in finding for finding in findings), findings
+# --- the five fabrications Codex got past the first version ---------------------------
 
 
 @pytest.mark.parametrize(
-    ("overrides", "expected"),
+    ("label", "overrides", "expected"),
     [
-        ({"conclusion": "failure"}, "so it shows nothing"),
-        ({"conclusion": None}, "so it shows nothing"),
-        ({"runId": "pending"}, "which is not a run id"),
-        ({"runId": 36851875128}, None),           # an int is read as its digits
-        ({"steps": []}, "names no steps"),
-        ({"steps": ["  "]}, "names no steps"),
-        ({"steps": "one step"}, "names no steps"),
-        ({"headSha": "not-a-sha"}, "ciVerifiedRun.headSha"),
+        ("an invented run id", {"runId": "99999999999"}, "runId is '99999999999'"),
+        ("another 40-hex head", {"headSha": "0" * 40}, "headSha is"),
+        ("a workflow nobody runs", {"workflowPath": ".github/workflows/nope.yml"},
+         "workflowPath is"),
+        ("invented steps", {"requiredSteps": ["Everything"]}, "requiredSteps differs"),
+        ("a fabricated artifact digest",
+         {"artifact": {"id": "11155274241", "digest": "sha256:" + "0" * 64}},
+         "artifact.digest differs"),
+        ("no receipt named", {"receipt": None}, "receipt is None"),
     ],
 )
-def test_a_named_run_that_shows_nothing_is_reported(tmp_path, overrides, expected):
-    document = registry(tmp_path)
-    document["cards"][0]["ciVerifiedRun"] = ci_run(**overrides)
-    findings = audit(document, tmp_path, ci_asserting(manifest()))
-    if expected is None:
-        assert findings == [], findings
-    else:
-        assert any(expected in finding for finding in findings), findings
+def test_a_fabricated_run_record_no_longer_passes(tmp_path, label, overrides, expected):
+    document, manifest_document = bound(tmp_path, block_overrides=overrides)
+    findings = audit(document, tmp_path, manifest_document)
+    assert any(expected in finding for finding in findings), (label, findings)
 
 
-def test_a_null_ci_verified_assertion_does_not_require_a_run(tmp_path):
-    """Asserting nothing must not become a back door for requiring nothing *and* saying
-    nothing: the manifest has to say why, which the next test pins."""
-    document = registry(tmp_path)
-    assert audit(document, tmp_path) == []
+def test_all_four_fabrications_at_once_are_each_reported(tmp_path):
+    document, manifest_document = bound(tmp_path, block_overrides={
+        "runId": "1", "headSha": "f" * 40,
+        "workflowPath": "x", "requiredSteps": ["y"],
+    })
+    findings = audit(document, tmp_path, manifest_document)
+    assert len(findings) >= 4, findings
+
+
+# --- the receipt itself ---------------------------------------------------------------
+
+
+def test_a_missing_receipt_is_reported(tmp_path):
+    document, manifest_document = bound(tmp_path)
+    (tmp_path / "docs/vf-cl-ci-receipts/VF-CL-0X.json").unlink()
+    findings = audit(document, tmp_path, manifest_document)
+    assert any("is unusable: FileNotFoundError" in finding for finding in findings), findings
+
+
+def test_a_receipt_edited_after_it_was_built_is_reported(tmp_path):
+    """The digest is not a signature -- anybody who can edit can reseal. What it closes is
+    the *silent* edit, a value changed in one place and not the other."""
+    document, manifest_document = bound(tmp_path)
+    target = tmp_path / "docs/vf-cl-ci-receipts/VF-CL-0X.json"
+    edited = json.loads(target.read_text(encoding="utf-8"))
+    edited["runId"] = "99999999999"
+    target.write_text(json.dumps(edited), encoding="utf-8")
+    findings = audit(document, tmp_path, manifest_document)
+    assert any("edited after it was built" in finding for finding in findings), findings
+
+
+def test_a_resealed_receipt_still_cannot_move_the_head(tmp_path):
+    """Resealing does not help: the artifact name is bound to the head, and the ancestry is
+    re-measured here rather than read from the file."""
+    head = "0" * 40
+    document, manifest_document = bound(
+        tmp_path,
+        block_overrides={"headSha": head},
+        receipt_overrides={"headSha": head, "claimedTree": head},
+    )
+    findings = audit(document, tmp_path, manifest_document)
+    assert any("is not fixture-<the run's head>" in finding or
+               "cannot tell whether the run's head is in the claimed tree" in finding
+               for finding in findings), findings
+
+
+def test_a_receipt_for_another_card_is_reported(tmp_path):
+    document, manifest_document = bound(tmp_path, receipt_overrides={"card": "VF-CL-99"})
+    findings = audit(document, tmp_path, manifest_document)
+    assert any("the receipt is for 'VF-CL-99'" in finding for finding in findings), findings
+
+
+def test_an_expired_artifact_is_reported(tmp_path):
+    """A claim whose evidence can no longer be fetched has stopped being re-checkable --
+    the standard ``aggregate_ac11_evidence.py`` applies with its freshness window."""
+    document, manifest_document = bound(
+        tmp_path,
+        receipt_overrides={"artifact": {
+            "id": "11155274241", "name": "fixture-x", "digest": "sha256:" + "1d" * 32,
+            "expiresAt": "2020-01-01T00:00:00Z",
+        }},
+    )
+    findings = audit(document, tmp_path, manifest_document)
+    assert any("is no longer re-checkable" in finding for finding in findings), findings
+
+
+@pytest.mark.parametrize("field", ["schemaVersion", "repository", "conclusion"])
+def test_a_receipt_that_does_not_declare_itself_is_reported(tmp_path, field):
+    document, manifest_document = bound(tmp_path, receipt_overrides={field: "something else"})
+    findings = audit(document, tmp_path, manifest_document)
+    assert findings, field
+
+
+def test_a_receipt_of_a_different_workflow_is_reported(tmp_path):
+    document, manifest_document = bound(
+        tmp_path, receipt_overrides={"workflowPath": ".github/workflows/other.yml"})
+    findings = audit(document, tmp_path, manifest_document)
+    assert any("is a run of" in finding for finding in findings), findings
+
+
+# --- the manifest holds the standard --------------------------------------------------
+
+
+def test_a_derived_true_with_no_receipt_expectation_is_unusable(tmp_path):
+    manifest_document = manifest()
+    entry = manifest_document["cards"]["VF-CL-0X"]
+    entry["impliesCiVerified"] = True
+    entry["ciVerifiedChecks"] = [{"kind": "path-exists", "path": "src/route.py"}]
+    entry.pop("whyCiVerified", None)
+    with pytest.raises(checker.RegistryUnusable) as unusable:
+        audit(registry(tmp_path), tmp_path, manifest_document)
+    assert "no ciVerifiedReceipt expectation" in str(unusable.value)
+
+
+@pytest.mark.parametrize("field", ["path", "workflowPath", "artifactNamePrefix"])
+def test_a_receipt_expectation_missing_a_field_is_unusable(tmp_path, field):
+    manifest_document = ci_asserting(manifest())
+    manifest_document["cards"]["VF-CL-0X"]["ciVerifiedReceipt"].pop(field)
+    with pytest.raises(checker.RegistryUnusable) as unusable:
+        audit(registry(tmp_path), tmp_path, manifest_document)
+    assert field in str(unusable.value)
+
+
+@pytest.mark.parametrize("value", [[], "Derive the thing", [""], [3]])
+def test_a_receipt_expectation_without_steps_is_unusable(tmp_path, value):
+    manifest_document = ci_asserting(manifest())
+    manifest_document["cards"]["VF-CL-0X"]["ciVerifiedReceipt"]["requiredSteps"] = value
+    with pytest.raises(checker.RegistryUnusable) as unusable:
+        audit(registry(tmp_path), tmp_path, manifest_document)
+    assert "requiredSteps must name at least one step" in str(unusable.value)
+
+
+def test_a_null_ci_verified_assertion_does_not_require_a_receipt(tmp_path):
+    assert audit(registry(tmp_path), tmp_path) == []
 
 
 def test_a_manifest_that_asserts_nothing_about_ci_verified_has_to_say_why(tmp_path):
@@ -917,7 +1089,6 @@ def test_a_manifest_that_asserts_nothing_about_ci_verified_has_to_say_why(tmp_pa
 
 
 def test_a_manifest_that_omits_the_ci_verified_field_entirely_is_unusable(tmp_path):
-    """Deleting an entry is a failure, not a silence -- the same rule as the rest."""
     manifest_document = manifest()
     manifest_document["cards"]["VF-CL-0X"].pop("impliesCiVerified")
     with pytest.raises(checker.RegistryUnusable) as unusable:
@@ -927,8 +1098,6 @@ def test_a_manifest_that_omits_the_ci_verified_field_entirely_is_unusable(tmp_pa
 
 @pytest.mark.parametrize("value", ["partial", "true", 1, 0])
 def test_an_implies_ci_verified_outside_the_three_is_unusable(tmp_path, value):
-    """``implemented`` has a third value; this field does not. ``1`` is not ``True`` by
-    identity, and that is how a count read as a boolean once already."""
     manifest_document = manifest()
     manifest_document["cards"]["VF-CL-0X"]["impliesCiVerified"] = value
     with pytest.raises(checker.RegistryUnusable) as unusable:
@@ -950,6 +1119,71 @@ def test_a_ci_verified_checks_value_that_is_not_a_list_is_unusable(tmp_path):
     with pytest.raises(checker.RegistryUnusable) as unusable:
         audit(registry(tmp_path), tmp_path, manifest_document)
     assert "ciVerifiedChecks array" in str(unusable.value)
+
+
+# --- rule 8: a candidate tree does not inherit its verification ----------------------
+
+
+def landed_candidate(tmp_path):
+    """A registry whose candidate tree is reachable from a remote ref this clone knows."""
+    document = registry(tmp_path)
+    head = document["verifiedAgainst"]["tree"]
+    subprocess.run(["git", "update-ref", "refs/remotes/origin/integration/all-agents-unified",
+                    head], cwd=tmp_path, check=True)
+    document["verifiedAgainst"]["candidate"] = True
+    document["verifiedAgainst"]["reverifyAt"] = "integration/all-agents-unified"
+    return document
+
+
+def test_a_candidate_that_has_landed_must_be_re_verified(tmp_path):
+    findings = audit(landed_candidate(tmp_path), tmp_path)
+    assert any("is no longer a candidate: re-verify at the landed SHA" in finding
+               for finding in findings), findings
+
+
+def test_a_candidate_that_has_not_landed_is_left_alone(tmp_path):
+    document = registry(tmp_path)
+    subprocess.run(
+        ["git", "-c", "user.email=t@example.com", "-c", "user.name=t",
+         "commit", "-q", "--allow-empty", "-m", "a later commit"],
+        cwd=tmp_path, check=True,
+    )
+    later = subprocess.run(["git", "rev-parse", "HEAD"], cwd=tmp_path,
+                           capture_output=True, text=True, check=True).stdout.strip()
+    # The remote ref is BEHIND the candidate: the candidate has not landed.
+    subprocess.run(["git", "update-ref", "refs/remotes/origin/integration/all-agents-unified",
+                    document["verifiedAgainst"]["tree"]], cwd=tmp_path, check=True)
+    document["verifiedAgainst"]["tree"] = later
+    document["verifiedAgainst"]["candidate"] = True
+    document["verifiedAgainst"]["reverifyAt"] = "integration/all-agents-unified"
+    assert [f for f in audit(document, tmp_path) if "candidate" in f] == []
+
+
+def test_a_candidate_without_a_reverify_target_is_reported(tmp_path):
+    document = landed_candidate(tmp_path)
+    document["verifiedAgainst"].pop("reverifyAt")
+    findings = audit(document, tmp_path)
+    assert any("does not say reverifyAt" in finding for finding in findings), findings
+
+
+@pytest.mark.parametrize("value", ["yes", 1, 0, "true"])
+def test_a_candidate_flag_that_is_not_a_boolean_is_reported(tmp_path, value):
+    document = landed_candidate(tmp_path)
+    document["verifiedAgainst"]["candidate"] = value
+    findings = audit(document, tmp_path)
+    assert any("which is not true or absent" in finding for finding in findings), findings
+
+
+def test_a_reverify_target_this_clone_does_not_know_is_reported_as_itself(tmp_path):
+    """Not knowing is not "has not landed". The shallow rule exists for the same reason."""
+    document = landed_candidate(tmp_path)
+    document["verifiedAgainst"]["reverifyAt"] = "no/such/ref"
+    findings = audit(document, tmp_path)
+    assert any("cannot be judged: this clone does not know origin/no/such/ref" in finding
+               for finding in findings), findings
+
+
+# --- the shipped pair ----------------------------------------------------------------
 
 
 def test_the_shipped_pair_derives_the_card_whose_workflow_names_its_own_tools():
@@ -982,3 +1216,32 @@ def test_the_shipped_pair_derives_the_card_whose_workflow_names_its_own_tools():
     # state it as the present, and it has to name the workflow that changed the answer.
     assert "s12-acceptance-evidence.yml" in four["ciVerifiedNote"]
     assert "stays false" not in four["ciVerifiedNote"]
+
+
+def test_the_shipped_receipt_is_the_one_the_manifest_expects():
+    """The receipt is a committed file, so its agreement with the pair is checkable here."""
+    manifest_document = json.loads(checker.DEFAULT_MANIFEST.read_text(encoding="utf-8"))
+    expectation = manifest_document["cards"]["VF-CL-04"]["ciVerifiedReceipt"]
+    shipped = json.loads(
+        (checker.REPO_ROOT / expectation["path"]).read_text(encoding="utf-8")
+    )
+    assert shipped["schemaVersion"] == checker.RECEIPT_SCHEMA
+    assert shipped["card"] == "VF-CL-04"
+    assert shipped["workflowPath"] == expectation["workflowPath"]
+    assert sorted(shipped["requiredSteps"]) == sorted(expectation["requiredSteps"])
+    assert shipped["artifact"]["name"] == expectation["artifactNamePrefix"] + shipped["headSha"]
+    body = {key: value for key, value in shipped.items()
+            if key not in ("receiptSha256", "recordedAt")}
+    assert shipped["receiptSha256"] == hashlib.sha256(
+        json.dumps(body, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+        .encode("utf-8")
+    ).hexdigest()
+
+
+def test_the_shipped_registry_marks_its_tree_as_a_pre_landing_candidate():
+    """Rule 8's half of the shipped pair: the tree is a train candidate, and says so."""
+    registry_document = json.loads(checker.DEFAULT_REGISTRY.read_text(encoding="utf-8"))
+    verified = registry_document["verifiedAgainst"]
+    assert verified["candidate"] is True
+    assert verified["reverifyAt"] == "integration/all-agents-unified"
+    assert verified["ref"].startswith("coord/")

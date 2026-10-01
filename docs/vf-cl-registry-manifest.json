@@ -113,6 +113,17 @@
   "VF-CL-04": {
    "impliesImplemented": true,
    "impliesCiVerified": true,
+   "ciVerifiedReceipt": {
+    "path": "docs/vf-cl-ci-receipts/VF-CL-04.json",
+    "workflowPath": ".github/workflows/s12-acceptance-evidence.yml",
+    "requiredSteps": [
+     "Derive the AC-12 acceptance items",
+     "Hold the bundle to its shape and to this head",
+     "Record that the two named observations were derived here",
+     "Upload the acceptance evidence"
+    ],
+    "artifactNamePrefix": "s12-acceptance-"
+   },
    "whyCiVerified": "This card is the one with a workflow of its own, so the tree can say it: s12-acceptance-evidence.yml runs this card's collector and then the shape gate over what it produced, and the collector is where the two named acceptance observations come from. That is a chain of literals, not a lane that happens to include a directory.",
    "ciVerifiedChecks": [
     {

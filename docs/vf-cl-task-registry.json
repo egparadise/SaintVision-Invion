@@ -1,5 +1,5 @@
 {
- "version": "1.4.0",
+ "version": "1.5.0",
  "source": "ROADMAP-VIRTUAL-COMPUTER-001@1.0.0",
  "track": "VF-CL",
  "owner": "Claude",
@@ -136,15 +136,21 @@
    "ciVerifiedRun": {
     "runId": "36851875128",
     "workflow": "S12 Acceptance Evidence",
+    "workflowPath": ".github/workflows/s12-acceptance-evidence.yml",
     "headSha": "40b3ec78ba63731dd94dcfdeb2d757381aee8a3b",
     "conclusion": "success",
-    "steps": [
-     "Derive the AC-12 acceptance items: success",
-     "Hold the bundle to its shape and to this head: success",
-     "Record that the two named observations were derived here: success",
-     "Upload the acceptance evidence: success"
+    "requiredSteps": [
+     "Derive the AC-12 acceptance items",
+     "Hold the bundle to its shape and to this head",
+     "Record that the two named observations were derived here",
+     "Upload the acceptance evidence"
     ],
-    "why": "The dispatch at #283's final head, which is an ancestor of this registry's verifiedAgainst.tree. The gate step is what makes it evidence rather than a green tick: check_s12_acceptance_shape.py re-derives the verdict and the seventeen item sources from the collector and refuses a bundle whose codeSha is not the head the run checked out, so a fabricated PASS cannot pass it."
+    "artifact": {
+     "id": "11155274241",
+     "digest": "sha256:1d8e0acdcb49dc42a7a2888dd8484fe879280a0d9fb27a49ee93389981fba131"
+    },
+    "receipt": "docs/vf-cl-ci-receipts/VF-CL-04.json",
+    "why": "The dispatch at #283's final head, which is an ancestor of this registry's verifiedAgainst.tree. The gate step is what makes it evidence rather than a green tick: check_s12_acceptance_shape.py re-derives the verdict and the seventeen item sources from the collector and refuses a bundle whose codeSha is not the head the run checked out, so a fabricated PASS cannot pass it. Every field here is bound to the receipt, which was built by tools/record_vf_cl_ci_receipt.py from three gh api documents and carries their digests -- the first version of this block was prose a checker read for shape, and five fabrications passed it."
    }
   },
   {
@@ -168,6 +174,9 @@
  "verifiedAgainst": {
   "tree": "25f43a25",
   "ref": "coord/train11-ci-0047",
+  "candidate": true,
+  "reverifyAt": "integration/all-agents-unified",
+  "candidateNote": "coord/train11-ci-0047 is the train 11 landing CANDIDATE, not integration. Every claim re-derived here is about that candidate tree. When it reaches integration/all-agents-unified the claims must be re-verified and re-recorded at the landed SHA -- rule 8 reports until they are, because an ancestry relation is not a licence to carry a candidate's evidence forward.",
   "note": "Implementation-side claims re-verified by reading the landed tree; review-side booleans and their blockers are the reviewer's and were not touched. The tree moved from 6fc0428b to the train 11 candidate 25f43a25, and the hosted run moved with it: a claim about a tree has to be shown at that tree.",
   "hostedRun": {
    "runId": "36886647197",

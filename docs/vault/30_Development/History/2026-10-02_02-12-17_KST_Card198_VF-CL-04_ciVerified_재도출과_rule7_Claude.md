@@ -1,12 +1,12 @@
 ---
 doc_id: "HISTORY-CARD198-VF-CL-04-CIVERIFIED-REDERIVED-20261002"
 title: "카드 198 — VF-CL-04의 ciVerified를 진술에서 재도출로: 거짓이던 이유가 #283로 사라졌고, 레지스트리는 그것을 혼자 알 수 없었다 (rule 7, 그리고 미선택 행의 차단 사유)"
-version: "1.0.0"
+version: "1.1.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-02T02:16:48+09:00"
+updated: "2026-10-02T03:24:43+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "25f43a25"
@@ -101,3 +101,45 @@ tags: ["vf-cl", "registry", "ci", "s12", "acceptance", "claude"]
 1. **Codex**: 이 변경 검토 — 특히 rule 7의 경계(왜 `VF-CL-04`만 주장하고 나머지는 `null`인가)와 `ciVerifiedRun`을 **offline로** 검사하는 선택(run이 실제로 존재하는지 GitHub에 묻지 않는다 — 파일에 관한 질문에 네트워크와 토큰을 요구하지 않기 위해서다).
 2. **Claude**: `S09-ST`의 첫 조각 — **eval 결과와 artifact를 잇는 결속을 제품 경로에서 읽을 수 있게 하고 금지 행동 시험을 붙이는 것**. 지금 `tests/test_context_eval.py`의 artifact-pin 3 case가 유일한 결속 증거이고(§4-4-3·§5), 제품 쪽에 그 연결을 읽는 경로가 없다. 범위·계약을 먼저 적고 착수한다.
 3. **코디네이터**: `VF-CL-04`의 남은 칸은 **Codex의 독립 검토**다(`0043-retained-replicas-pin-fix-re-review-not-recorded`·`3e267b05-archive-retention-tool-not-independently-reviewed`). 내가 닫을 수 없다.
+
+## 8. r1 — rule 7의 둘째 반이 fail-open이었다
+
+Codex의 `#295` r1이 수동 확인으로 **사실값은 맞다**(run `36851875128` success, artifact `11155274241` digest, `acceptanceClaim false`)고 적고, 그와 별개로 **규칙이 아무것도 보장하지 않는다**고 지적했다. 맞다. 제가 쓴 `ci_run_findings()`는 **문장의 모양**만 봤다 — 숫자처럼 보이는 `runId`, `conclusion: success`, 비어 있지 않은 step 목록, 16진수 `headSha`. 그 넷은 **타이핑할 수 있는 것**이다.
+
+**제 쪽에서 재현했다.** 레지스트리만 바꾼 변이 일곱 개가 **전부 findings 0**이었다.
+
+| 변이 | r1 전 | r1 후 |
+|---|---|---|
+| `runId: "99999999999"` | **통과** | `runId is '99999999999' but the receipt says '36851875128'` |
+| `headSha`를 다른 40-hex로 | **통과** | `headSha is '000…' but the receipt says '40b3ec78…'` |
+| `workflowPath`를 없는 workflow로 | **통과** | `is '.github/workflows/nope.yml', not …s12-acceptance-evidence.yml` |
+| `requiredSteps`를 발명 | **통과** | `requiredSteps differs from the receipt` |
+| artifact digest 위조 | **통과** | `artifact.digest differs from the receipt` |
+| 네 개 동시 | **통과** | 4건 보고 |
+| `receipt` 포인터 제거 | — | `receipt is None but the receipt says …` |
+
+### 8-1. 고친 방법 — 사실을 파일로 만들고, 그 파일을 결속한다
+
+**`tools/record_vf_cl_ci_receipt.py`**(신설)가 `gh api`의 **run·jobs·artifacts 세 문서**를 받아 검사하고 receipt를 쓴다. 검사는 전부 fail-closed다 — repository·workflow path·`completed/success`·opt-in event·40-hex head, **모든 job이 success이고 카드가 요구한 step이 존재하며 success**, artifact 이름이 `<prefix><head>`이고 `expired: false`이며 expiry가 미래이고 digest가 sha256. receipt는 세 입력의 **sha256**과 자기 본문의 **canonical digest**를 함께 적는다.
+
+**checker**는 `impliesCiVerified: true`인 카드에 대해 receipt를 읽고 세 가지를 맞춘다 — receipt 자신(schema·card·digest), **manifest가 든 기대값**(어느 workflow와 어느 step이 센다, 레지스트리가 자기 기준을 고르지 못하게 manifest에 둔다), 그리고 **레지스트리 블록을 field 대 field로**. 그리고 **읽지 않고 다시 측정하는 것 하나**: run의 head가 정말 그 tree에 있는지를 `git`으로 본다.
+
+receipt 자체를 고치는 변이도 죽는다(측정): 조용한 편집은 **digest 불일치**로, digest까지 다시 봉인한 head 위조는 **artifact 이름이 head에 묶여 있어서**, 만료는 `no longer re-checkable`로, 다른 카드의 receipt는 `the receipt is for 'VF-CL-99'`로, 파일 부재는 `FileNotFoundError`로 잡힌다.
+
+### 8-2. rule 8 — candidate는 verification을 물려받지 않는다
+
+`verifiedAgainst.ref`가 `coord/train11-ci-0047`(착지 전 train 후보)이므로 `candidate: true`·`reverifyAt`을 적고, **그 tree가 integration ref에 닿는 순간 보고한다** — "`25f43a25`가 `origin/integration/all-agents-unified`에 도달했다, 착지 SHA에서 재검증·재기록하라". 착지 전에는 조상이 아니므로 조용하고, 착지 후에는 재기록 전까지 빨갛다. **조상 관계가 영구 승계의 근거가 되지 않는다**는 것이 요점이다. clone이 그 ref를 모르면 "판정할 수 없다"로 적는다 — shallow 규칙과 같은 구별이다.
+
+### 8-3. 이것이 닫지 **않는** 것
+
+receipt의 입력은 **인증된 호출자의 `gh api`가 돌려준 것**이다. `tools/import_ac11_security_scan.py`가 선언한 것과 같은 경계이고, 숨기지 않고 producer·checker docstring과 여기에 적는다. 그것까지 닫으려면 **CI가 `actions: read`로 receipt를 만들어** artifact로 들여와야 하는데, Backend·Core lane은 `contents: read`로 돈다 — **workflow 권한 결정**이고 이 도구가 정할 일이 아니다. 그래서 다음 행동으로 남긴다.
+
+### 8-4. 검증
+
+| 항목 | 결과 |
+|---|---|
+| `tests/core/test_check_vf_cl_registry.py` | **139 passed**(r1 전 114) |
+| 변이 | 레지스트리측 7종 + receipt측 5종 = **12종 전부 사망** |
+| 검사기 | exit 0, `verifiedAgainst: 25f43a25` |
+| producer | 실제 세 `gh api` 문서로 receipt 생성, 재생성 시 `recordedAt`만 바뀌고 **digest 불변**(digest가 `recordedAt`을 제외하는 설계가 그대로 작동) |
+| 문서 gate | 3종 + `git diff --check` exit 0 |
