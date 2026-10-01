@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.257"
+version: "1.0.258"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T23:47:13+09:00"
+updated: "2026-10-01T23:50:30+09:00"
 source_of_truth: "Git"
 active_card: "CARD-194 S12 acceptance target/Evidence canonical resolver implementation"
 active_card_status: "0058 digest/binding, exact resolver and discovery implemented on #286 0057; hosted real-PG and Claude review pending"
@@ -26,6 +26,8 @@ active_card_next: "Push stacked PR against #286, run exact-head Core, then addre
 - PG-free focused **31 passed**, schema export **97/97**, contract bindings, docs, ontology는 exit 0이다.
   로컬은 지원 Python 3.12/3.14 test env와 `INV_TEST_ADMIN_DSN`이 없어 real-PG를 실행하지 않았으며, hosted Core
   실행 전에는 migration·trigger·RLS 결과를 `NOT_OBSERVED`로 유지한다.
+- 첫 hosted Core run `36879319911`은 0058 뒤에도 definer policy revision이 0057이어서 migration upgrade
+  gate가 fail closed했다. function allowlist는 유지하고 revision을 0058로 동기화했으며 재실행 대기 중이다.
 - 근거: [[S12-BE_release_acceptance_target_Evidence_resolver_설계]],
   [[2026-10-01_23-43-41_KST_Card194_S12-BE_target_Evidence_resolver_구현_Codex]].
 

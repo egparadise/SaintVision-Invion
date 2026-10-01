@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD194-S12-ACCEPTANCE-RESOLVER-20261001"
 title: "Card 194 S12-BE target·Evidence resolver 구현"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T23:47:13+09:00"
+updated: "2026-10-01T23:50:30+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["History", "S12-BE", "acceptance", "evidence", "resolver", "migration-0058"]
@@ -61,6 +61,11 @@ tags: ["History", "S12-BE", "acceptance", "evidence", "resolver", "migration-005
 | `python tools/check_docs.py` | 1077 versioned docs, exit 0 |
 | `python tools/check_ontology.py` | exit 0 |
 | `git diff --check` | exit 0 |
+
+첫 exact-head Core run `36879319911`은 migration upgrade 단계에서
+`migration_revision_mismatch`로 실패했다. 0058은 SECURITY DEFINER를 추가하지 않지만
+`tools/definer-policy.json`의 graph revision도 새 head를 가리켜야 한다. policy function 집합은 바꾸지 않고
+revision만 0058로 올렸으며, INVOKER Evidence 함수가 policy에 잘못 등록되지 않는 회귀 시험을 추가했다.
 
 로컬 기본 Python은 3.10이고 control-plane은 `StrEnum`을 쓰므로 3.12/3.14 전용 route 시험을 로컬에서
 합격했다고 기록하지 않는다. 또한 `INV_TEST_ADMIN_DSN`이 없어 real-PG 파일을 실행하지 않았다. 다음 단계는

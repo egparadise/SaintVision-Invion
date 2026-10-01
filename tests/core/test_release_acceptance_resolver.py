@@ -14,6 +14,7 @@ from saintvision.services import release_acceptance_resolver as resolver
 
 ROOT = Path(__file__).resolve().parents[2]
 MIGRATION = ROOT / "migrations/versions/0058_release_acceptance_resolver.py"
+DEFINER_POLICY = ROOT / "tools/definer-policy.json"
 UTC = dt.timezone.utc
 
 
@@ -85,6 +86,12 @@ def test_migration_is_linear_invoker_only_and_caller_values_are_not_preserved():
     assert "binding_digest_is_server_derived" in source
     assert "SET search_path = pg_catalog" in source
     assert "dynamic SQL" not in source
+
+
+def test_definer_policy_tracks_the_new_head_without_claiming_invoker_functions():
+    policy = json.loads(DEFINER_POLICY.read_text(encoding="utf-8"))
+    assert policy["revision"] == "0058_release_acceptance_resolver"
+    assert all("evidence_envelope" not in signature for signature in policy["functions"])
 
 
 def test_binding_is_tenant_scoped_and_append_only_in_the_declarative_inventory():
