@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-20261001-CARD166-S04-SHARD-CANCEL-BRIDGE-CODEX"
 title: "CARD-166 S04 shard parent/member cancel bridge 후속"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-01T11:19:34+09:00"
+updated: "2026-10-01T11:48:07+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "73fa1274ce23e050bae60e4ee8228484b6316647"
@@ -57,3 +57,7 @@ shard parent/member 경로는 PG-free 호출부 guard만 있고 real-PG fixture�
   business row의 JWT subject와 재사용 admission helper의 평문 subject가 달라
   `AUTH-0030`으로 차단됐다. 이는 제품 회귀로 세지 않고, shard 준비 복제본의
   principal만 JWT subject로 정렬한 exact-head 후속 run에서 다시 판정한다.
+- exact-code `9f2ba233beb3f03eed1dc5c179bee33ef6dedee7`의 후속 Core run
+  `36805349620`은 **6508 passed / 22 skipped / 2 deselected**로 성공했다.
+  artifact `11137199312` JUnit에서 bridge real-PG 모듈은 **21/21 passed**, 실패·
+  skip 0이며 shard parent/member testcase도 정확히 1건 수집되어 passed였다.

@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.236"
+version: "1.0.237"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T11:19:34+09:00"
+updated: "2026-10-01T11:48:07+09:00"
 source_of_truth: "Git"
 active_card: "CARD-166 S04 kernel cancel shard bridge evidence"
-active_card_status: "PG-free 21 passed; shard parent/member real-PG fixture and authority negatives implemented; hosted Core pending"
-active_card_next: "push PR, add run-core, verify exact-head Core JUnit and request Claude review"
+active_card_status: "PG-free 21 passed; Core 36805349620 6508 passed; bridge real-PG 21/21 passed"
+active_card_next: "Claude re-review; concurrent parent/member race and injected whole-shard rollback remain NOT_RUN"
 ---
 
 ## 2026-10-01 Card 166 — shard parent/member cancel bridge 후속
@@ -19,8 +19,9 @@ active_card_next: "push PR, add run-core, verify exact-head Core JUnit and reque
 - `viewer`, archived project, disabled business project 직접 함수 호출은 `42501`로
   거부하고 public draft·audit 0을 유지한다. H1 guard는 네 PostgreSQL row-lock
   clause를 모두 잡는 정규식으로 넓혔다.
-- PG-free 21 passed. 제품·계약·migration 변경은 0이며 real-PG는 exact-head
-  `run-core` JUnit 전까지 `NOT_RUN`이다.
+- PG-free 21 passed. exact-code `9f2ba233`의 Core run `36805349620`은 전체
+  6508 passed / 22 skipped / 2 deselected, bridge real-PG 21/21 passed다.
+  제품·계약·migration 변경은 0이다.
 - 부모/멤버 동시 경쟁과 bridge 실패 주입 whole-shard rollback은 이번 범위에서
   측정하지 않아 후속 `NOT_RUN`으로 유지한다.
 

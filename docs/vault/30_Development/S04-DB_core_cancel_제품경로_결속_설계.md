@@ -1,11 +1,11 @@
 ---
 doc_id: "DESIGN-S04-DB-CORE-CANCEL-PRODUCT-BRIDGE-001"
 title: "S04-DB core cancel 제품 경로 결속 설계"
-version: "1.2.3"
+version: "1.2.4"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-01T11:19:34+09:00"
+updated: "2026-10-01T11:48:07+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "c9c1d836ff8fcd606b5bca3862c6cd764eadf4fd"
@@ -292,5 +292,8 @@ Claude의 2026-09-30 조건부 승인(M1~M4, L1~L5, R5~R8)을 이 v1.1에 반영
 - 실제 부모/멤버 취소의 동시 경쟁과 bridge 실패 주입 whole-shard rollback은 이번
   fixture가 측정하지 않았다. 이 두 항목은 **NOT_RUN**이며 구현 존재만으로 통과로
   세지 않는다.
-- 로컬 PG-free 단일 파일은 21 passed다. real-PG 판정은 `run-core` exact-head JUnit
-  전까지 `NOT_RUN`이며, 공개 계약·migration·제품 코드는 변경하지 않았다.
+- 로컬 PG-free 단일 파일은 21 passed다. exact-code `9f2ba233beb3f03eed1dc5c179bee33ef6dedee7`
+  Core run `36805349620`은 전체 **6508 passed / 22 skipped / 2 deselected**였고,
+  JUnit의 bridge real-PG 모듈 **21/21 passed**에 새 shard fixture와 viewer·archived
+  project·disabled business project 부정군이 모두 실제 실행됐다. 공개 계약·
+  migration·제품 코드는 변경하지 않았다.
