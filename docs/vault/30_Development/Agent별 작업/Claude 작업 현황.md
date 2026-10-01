@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.47"
+version: "1.2.64"
 status: "review"
 author: "Claude"
-updated: "2026-09-29T12:19:52+09:00"
+updated: "2026-10-01T09:53:52+09:00"
 
 
 
@@ -14,6 +14,8 @@ source_of_truth: "Git"
 ---
 
 # Claude 작업 현황
+
+시험이 없어 50인 행의 75 근거 (Claude, 2026-10-01, 카드 163, branch `agent/claude/c163-missing-task-tests`): v1.6이 "task 고유 시험 없음"으로 50에 둔 세 행을 다시 봤다. **셋 중 둘은 시험이 없던 것이 아니라 제가 찾지 못한 것이었다.** v1.6의 검색이 `git ls-tree --name-only`였고 그것은 **파일 이름만** 돌려준다 — `storage-contributions-response.json`을 내용으로 다루는 `tests/core/test_storage_list_response_contract.py`가 이름에 `contribution`이 없어 걸리지 않았다. **v1.2가 고친 것과 같은 실수**다(그때는 markdown만 검색해 baseline이 Evidence JSON에 있는 것을 놓쳤다). **S02-ST**는 그 파일이 `ContributionPageResponse`·`DataLocationPageResponse`를 정본 fixture와 왕복 동일로 고정하고 **네 drift 변이를 두 모델 각각** 거부하며 실제 route 직렬화까지 보므로 **이미 75 근거가 있다**. **S09-ST**는 `tests/test_context_eval.py`(27건)가 실 PostgreSQL에서 "bundle이 모델이 본 것을 재현 · 봉인 기록 재작성 불가 · 고정 digest가 덮어쓰기 탐지 · **금지 행동 위반이 평균으로 지워지지 않음**"을 고정하므로 역시 **이미 있다**. 둘 다 재채점 문서에서 **인용 0회**라 중복 funding이 아니다(한 시험이 두 행을 funding하지 않는 규칙 확인). **S08-BE만 새 시험이 필요했다** — 내용 검색에서 나온 `test_containment.py`는 이미 S07-BE 근거이고 `test_workspace_api.py`는 S06 영역이다. **GPU는 단위 시험에 대여할 수 없으므로** 이 행의 75를 **설계가 의지하는 거부**로 정의했다: 제어 행이 **없는** tenant는 정지(fail-closed) · gate가 `inv.tenant_controls.kill_switch`를 읽음 · 모르는 operation은 **모르는 operation으로서** 거부 · tenant 전역(kill·clear)과 Node 단위(drain·resume)의 범위 · idempotency key가 작업 전에 · `ContainmentInput` 계약 · **운영자 profile이 임의의 OS/GPU/BuildKit capability를 증명하지 않음**(`gpu`·`buildkit` 할당 밀반입 거부) · cpu≠memory. `tests/core/test_s08_be_kill_switch_buildkit_gpu_refusals.py` **48 passed**, PG·Docker·GPU **전부 불필요**, **변이 7종 전부 죽는다**. **그중 하나는 처음에 생존했고 제 시험의 결함이었다** — operation guard를 지우면 범위 guard가 **같은 `VAL-0003`/422**로 대신 거부해 틀린 이유로 통과했고, `detail`까지 단언하자 죽었다. 파일 이름에 `kill_switch`·`buildkit`·`gpu`를 넣어 **파일명 검색으로도 찾히게** 했다. **점수는 올리지 않았다** — 재채점 문서가 #258에서 검토 중이라 두 branch 충돌을 피했고, 착지 뒤 v1.7에서 세 행을 50→75로 옮기도록 행·근거·인용 0회 확인을 문서에 전부 적어 뒀다. 남는 50점 행(S03-ST·S05-ST·S07-ST·S08-ST·S12-*)은 물리 장비·off-site backup·운영 PITR을 기다리므로 **같은 작업을 하지 않는 것이 맞다**고 적었다. 제품 코드·migration 변경 0, 문서 gate 3종 exit 0. 전문 [[2026-10-01 시험이 없어 50인 행의 75 근거]]. 다음 첫 행동: Codex 검토.
 
 [[전체 개발 진행 현황]] → 이 페이지 → [[Agent 지속 개발 운영 규칙]] 순서로 확인한다. 이 페이지는 현재 후속 카드 목록이며 이전 장문 보고서는 SHA별 근거다.
 
