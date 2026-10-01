@@ -245,17 +245,44 @@ export const RunList: React.FC<RunListProps> = ({
               return (
                 <tr
                   key={run.id}
-                  onClick={() => onSelectRun?.(run.id)}
+                  onClick={onSelectRun ? () => onSelectRun(run.id) : undefined}
                   style={{
                     borderBottom: '1px solid var(--color-border-subtle)',
-                    cursor: 'pointer',
                     transition: 'background-color 0.15s',
+                    cursor: onSelectRun ? 'pointer' : 'default',
                   }}
                   onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-bg-subtle)')}
                   onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
                 >
                   <td style={{ padding: '12px 16px', fontFamily: 'monospace', fontWeight: 600 }}>
-                    <div>{run.id}</div>
+                    {onSelectRun ? (
+                      <button
+                        type="button"
+                        data-testid={`run-select-btn-${run.id}`}
+                        aria-label={`실행 작업 ${run.id} 상세 조회`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelectRun(run.id);
+                        }}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          padding: 0,
+                          margin: 0,
+                          fontFamily: 'monospace',
+                          fontWeight: 600,
+                          fontSize: 'inherit',
+                          color: '#58a6ff',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          textDecoration: 'underline',
+                        }}
+                      >
+                        {run.id}
+                      </button>
+                    ) : (
+                      <div>{run.id}</div>
+                    )}
                     {run.parentId && (
                       <span
                         style={{

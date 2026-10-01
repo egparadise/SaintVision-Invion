@@ -255,7 +255,18 @@ export const ApprovalCenter: React.FC<ApprovalCenterProps> = ({
               return (
                 <div
                   key={item.id}
+                  role="button"
+                  tabIndex={0}
+                  data-testid={`approval-item-${item.id}`}
+                  aria-label={`승인 안건 ${item.id} 선택`}
+                  aria-pressed={isSelected}
                   onClick={() => setSelectedApprovalId(item.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setSelectedApprovalId(item.id);
+                    }
+                  }}
                   style={{
                     padding: '14px 16px',
                     borderBottom: '1px solid var(--color-border-subtle)',

@@ -4,7 +4,7 @@ title: "Gemini 작업 현황"
 version: "1.0.162"
 status: "approved"
 author: "Gemini"
-updated: "2026-10-01T15:50:00+09:00"
+updated: "2026-10-01T17:19:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -87,6 +87,42 @@ source_of_truth: "Git"
   - 계약 바인딩 및 라우트 커버리지 점검: `pytest tests/test_route_coverage.py` 40 passed 100% (exit 0)
   - 문서 무결성 점검: `python tools/check_docs.py` PASS (exit 0)
 - **전문 문서**: [[2026-10-01_14-46-20_KST_Card174_S11-FE_접근성_트리거_포커스_복원_Gemini]]
+- 확인 기준: 2026-10-01T17:15:00+09:00 (Card 174 2부 PR #275 Claude r1 검토 D1~D4 대조표 정합성 전수 반영: ACC-06 APG 수평 roving tabindex 및 native scroll 보존 실제 반영, ACC-03·04 DesktopShell #270 미착지 명시 및 실존 모달 정정, ACC-02 surface click + inner button 실제 구조 반영, ACC-09 143곳 저대비 토큰 잔여 범위 정직 반영 및 '부분' 정정; 코드/시험 17종 변이 100% 사망).
+
+## 2026-10-01 S11-FE ACC-01~09 전수 대조 및 대화형 카드 키보드 탐색·Tablist WAI-ARIA 접근성 구현 및 독립 리뷰(Codex r2 / Claude r1) 조치 (Card 174 2부, PR #275, `agent/gemini/c174-s11fe-acc01-09`, base `coord/train6-ci-1413`)
+- **개요**: S11-FE 정본 문서의 접근성 항목 ACC-01~09를 `apps/web` 실제 구현과 전수 대조하고, 외부 전제 없는 미흡/부분 항목 구현 및 PR #275 Codex 검토의견(F1, F2, F3)을 완전 반영:
+  1. **F1 (High) ResourceExplorer WAI-ARIA Tablist 및 APG 수평 탭 scroll 보존**:
+     - `ResourceExplorer.tsx`: 최상위 탭 컨테이너에 `role="tablist"` 및 `aria-label="자원 탐색기 탭 목록"` 부여.
+     - WAI-ARIA APG Tabs 가이드라인에 따라 수평 탭 목록에서 상/하 방향키(`ArrowUp`, `ArrowDown`)가 선택/포커스를 변경하거나 브라우저 네이티브 수직 스크롤을 막지 않도록(`preventDefault()` 호출 금지) 제한.
+     - `ArrowRight`, `ArrowLeft`, `Home`, `End`에 의한 roving tabindex 포커스 이동 구현.
+     - `acc-interactive-navigation.test.tsx`: ArrowRight/ArrowLeft/Home/End 시 `expect(document.activeElement).toBe(...)`를 직접 단언하여 `nextEl?.focus()` 제거 시 엄격히 실패하도록 보강하고, ArrowDown/ArrowUp 시 `defaultPrevented === false` 및 포커스 유지 단언 추가.
+  2. **F2 (High) RunList 네이티브 테이블 의미(`<tr>`) 보존 및 액션 버튼 분리**:
+     - `RunList.tsx`: `<table>` 하위 `<tr>`에 `role="button"` 및 `tabIndex`를 부여하여 HTML-ARIA 네이티브 테이블 의미를 훼손하던 안티패턴 제거.
+     - 첫 번째 `<td>` 셀 내부에 네이티브 `<button type="button" data-testid={`run-select-btn-${run.id}`} aria-label={`실행 작업 ${run.id} 상세 조회`}>`를 배치하여 행 포커스/선택을 접근 가능하게 분리.
+     - `acc-interactive-navigation.test.tsx`: `<tr>`이 기본 테이블 행 의미(`role === null`, `tabIndex === -1`)를 유지하고 내부 셀 버튼을 통해 Enter/Space/클릭이 정상 작동함을 단언.
+  3. **F3 (High) NodeList 카드 중첩 상호작용 제거 및 형제 네이티브 버튼 분리**:
+     - `NodeList.tsx`: 카드 외곽 `<div>`에 부여되었던 `role="button"` 및 `tabIndex={0}`을 전면 제거하고 카드 컨테이너를 순수 레이아웃 요소로 정리 (중첩 `<button>` 안티패턴 해소).
+     - 일반 카드 하단에 형제 네이티브 버튼으로 `node-select-btn-${node.id}` ("노드 선택") 및 `node-studio-btn-${node.id}` ("⚡ Studio 열기")를 분리 배치.
+     - 텔레메트리 미제공(lost/unknown) 카드는 컨테이너에 `role="alert"`/`role="status"`만 유지하고(`tabIndex` 없음), 내부 액션은 `node-detail-btn-${node.id}` ("상세 및 자원 보기") 네이티브 버튼으로 일원화.
+     - `acc-interactive-navigation.test.tsx`: 카드 컨테이너가 버튼 역할을 갖지 않으며 형제 버튼들이 독립적으로 각 콜백을 호출하고, lost 카드가 `role="alert"`(비대화형)와 내부 버튼을 가짐을 단언.
+  4. **ACC-02 대화형 요소 키보드 조작성 완결**:
+     - `ApprovalCenter.tsx`: 승인 안건 카드에 `role="button"`, `tabIndex={0}`, `aria-pressed`, `aria-label`, Enter/Space `onKeyDown` 부여.
+     - `NaturalLanguageRunView.tsx`: 참조 Context 파일 칩 `<span>`에 `role="button"`, `tabIndex={0}`, `aria-pressed`, `aria-label`, Enter/Space `onKeyDown` 토글 부여.
+     - `DeveloperStudio.tsx`: Step 1 워크스페이스 선택 카드 및 Step 2 노드 배치 카드에 `role="button"`, `tabIndex={0}`, `aria-pressed`, `aria-label`, Enter/Space `onKeyDown` 부여 (배치 불가 노드는 `tabIndex={-1}`, `aria-disabled="true"` 불변식 준수).
+  5. **Codex 소유 측정 러너 seam 요청 카탈로그화**:
+     - `tools/run_real_browser_acceptance.py`를 건드리지 않고, History 문서에 SEAM-ACC-01~03(트리거 포커스 복원 정직 바인딩, tablist 방향키 프로브, 대화형 카드 Enter/Space 프로브) 명시.
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성 소유). Reviewer: Claude (UI/접근성/테스트), Codex (무결성/계약).
+- **관측 근거 (Evidence)**:
+  - 단위 시험: `npm run test -- acc-interactive-navigation.test.tsx` (6 passed 100%)
+  - 관련 스위트: `npm run test -- s11-defect-fixes.test.tsx accessibility-status-and-guards.test.tsx resource-explorer-dom.test.tsx developer-studio-dom.test.tsx node-status-lost-unknown-guard.test.tsx` (84 passed 100%)
+  - 타입 검사: `npx tsc -b` (에러 0건, 클린 통과)
+  - 프로덕션 번들: `npm run build` (빌드 완료, 7.55s)
+  - 라우트 커버리지: `pytest tests/test_route_coverage.py` (40 passed 100%)
+  - 프런트 무결성: `python tools/check_frontend_integrity.py` (92개 파일 스캔, 9대 규칙 위반 0건)
+  - 계약 바인딩: `python tools/check_contract_bindings.py` (55 fixtures PASS)
+  - 문서 정합성: `python tools/check_docs.py` (PASS, exit 0)
+  - 봇 호출 방지 검사: 금지 봇 호출 태그 0건 검출 확인
+
 
 ## 2026-09-30 사내망 portal 웹 배포 비root read-only rootfs Nginx 및 동일 origin 리버스 프록시·루트 allowlist·행동 검증 (Card 156, `agent/gemini/c156-intranet-portal-deploy`, PR #252)
 - **개요**: 사내망 포털 웹 애플리케이션(`apps/web`)을 노드2(object store 노드)에 안전하게 배포하기 위한 자산(`deploy/intranet/portal/`)에 대해 독립 검토 r2 및 코디네이터 지침을 전수 반영했다:

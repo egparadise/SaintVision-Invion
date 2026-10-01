@@ -1092,7 +1092,17 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 return (
                   <div
                     key={wsp.workspaceId}
+                    role="button"
+                    tabIndex={0}
+                    aria-pressed={isWspSelected}
+                    aria-label={`워크스페이스 ${wsp.name} 선택`}
                     onClick={() => setSelectedWorkspaceId(wsp.workspaceId)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setSelectedWorkspaceId(wsp.workspaceId);
+                      }
+                    }}
                     style={{
                       padding: '14px 16px',
                       borderRadius: 'var(--radius-md)',
@@ -1443,8 +1453,19 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
               return (
                 <div
                   key={node.id}
+                  role="button"
+                  tabIndex={isNodeSchedulable ? 0 : -1}
+                  aria-pressed={isSelected}
+                  aria-disabled={!isNodeSchedulable}
+                  aria-label={`노드 ${node.hostname} 배치 선택 ${isNodeSchedulable ? '' : '(배치 불가)'}`}
                   onClick={() => {
                     if (isNodeSchedulable) setSelectedNodeId(node.id);
+                  }}
+                  onKeyDown={(e) => {
+                    if (isNodeSchedulable && (e.key === 'Enter' || e.key === ' ')) {
+                      e.preventDefault();
+                      setSelectedNodeId(node.id);
+                    }
                   }}
                   style={{
                     padding: '20px',
