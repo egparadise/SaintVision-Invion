@@ -2844,6 +2844,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
           items: [],
           nextCursor: null,
           runId: 'run_studio_001',
+          completedAt: '2026-09-22T10:10:00Z',
           output: { sha256: 'a'.repeat(64), sizeBytes: 1024 },
           evidence: { evidenceId: 'ev_001' },
           stopReceipt: { exitCode: 0, physicallyStopped: true, resourceReclaimed: true, verified: true },
@@ -2866,6 +2867,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
           state: 'running',
           nodeId: 'nod_studio_01',
           objective: 'PACS Inference Execution Test',
+          completedAt: '2026-09-22T10:10:00Z',
           output: { sha256: 'a'.repeat(64), sizeBytes: 1024 },
           evidence: { evidenceId: 'ev_001' },
           stopReceipt: { exitCode: 0, physicallyStopped: true, resourceReclaimed: true, verified: true },
@@ -3023,6 +3025,10 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
           />
         );
       });
+      await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+      });
       const badgeSucceeded = container.querySelector('[data-testid="studio-execution-status-badge"]') as HTMLElement;
       expect(badgeSucceeded, 'Status badge (succeeded) must render').not.toBeNull();
       expect(badgeSucceeded.style.color, 'Succeeded status text must bind to var(--color-status-online)').toBe('var(--color-status-online)');
@@ -3092,6 +3098,56 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(getContrast(darkTokens[aFg], darkTokens[rBg]), 'Awaiting approval dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
       expect(getContrast(lightTokens[aBorder], lightTokens[rBg]), 'Awaiting approval light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
       expect(getContrast(darkTokens[aBorder], darkTokens[rBg]), 'Awaiting approval dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 2-e. CANCELLED state (F4 differentiation & DOM verification)
+      await act(async () => {
+        root.render(
+          <DeveloperStudio
+            key="studio-run-cancelled"
+            project={sampleProject}
+            nodes={[sampleNode]}
+            runs={[{ ...baseSampleRun, id: 'run_studio_cancelled', state: 'cancelled' }]}
+            initialStep={4}
+            initialRunId="run_studio_cancelled"
+          />
+        );
+      });
+      const badgeCancelled = container.querySelector('[data-testid="studio-execution-status-badge"]') as HTMLElement;
+      expect(badgeCancelled, 'Status badge (cancelled) must render').not.toBeNull();
+      expect(badgeCancelled.style.color, 'Cancelled status text must bind to var(--color-status-neutral)').toBe('var(--color-status-neutral)');
+      expect(badgeCancelled.style.borderColor, 'Cancelled status border must bind to var(--color-border-strong)').toBe('var(--color-border-strong)');
+      expect(badgeCancelled.textContent).toContain('CANCELLED');
+      const cFg = helperExtractVar(badgeCancelled.style.color);
+      const cBorder = helperExtractVar(badgeCancelled.style.borderColor);
+      expect(getContrast(lightTokens[cFg], lightTokens[rBg]), 'Cancelled light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[cFg], darkTokens[rBg]), 'Cancelled dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[cBorder], lightTokens[rBg]), 'Cancelled light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[cBorder], darkTokens[rBg]), 'Cancelled dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 2-f. RECOVERING state (F4 differentiation & DOM verification)
+      await act(async () => {
+        root.render(
+          <DeveloperStudio
+            key="studio-run-recovering"
+            project={sampleProject}
+            nodes={[sampleNode]}
+            runs={[{ ...baseSampleRun, id: 'run_studio_recovering', state: 'recovering' }]}
+            initialStep={4}
+            initialRunId="run_studio_recovering"
+          />
+        );
+      });
+      const badgeRecovering = container.querySelector('[data-testid="studio-execution-status-badge"]') as HTMLElement;
+      expect(badgeRecovering, 'Status badge (recovering) must render').not.toBeNull();
+      expect(badgeRecovering.style.color, 'Recovering status text must bind to var(--color-status-active)').toBe('var(--color-status-active)');
+      expect(badgeRecovering.style.borderColor, 'Recovering status border must bind to var(--color-status-active)').toBe('var(--color-status-active)');
+      expect(badgeRecovering.textContent).toContain('RECOVERING');
+      const recFg = helperExtractVar(badgeRecovering.style.color);
+      const recBorder = helperExtractVar(badgeRecovering.style.borderColor);
+      expect(getContrast(lightTokens[recFg], lightTokens[rBg]), 'Recovering light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[recFg], darkTokens[rBg]), 'Recovering dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[recBorder], lightTokens[rBg]), 'Recovering light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[recBorder], darkTokens[rBg]), 'Recovering dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
     } finally {
       vi.unstubAllGlobals();
       if (typeof window !== 'undefined' && originalWindowFetch) {
@@ -3346,11 +3402,11 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     // Exact ratchet assertions covering 100% of DeveloperStudio style declarations
     expect(totalStyleAttrs, 'Total style attributes in DeveloperStudio must be exactly 252').toBe(252);
     expect(checkedObjects, 'Style objects with explicit background and foreground must be exactly 36').toBe(36);
-    expect(checkedPairs, 'Evaluated foreground-background pairs across conditional branches must be exactly 156').toBe(156);
+    expect(checkedPairs, 'Evaluated foreground-background pairs across conditional branches must be exactly 157').toBe(157);
     expect(unboundColorObjects, 'Elements with foreground color inheriting container background must be exactly 92').toBe(92);
     expect(checkedObjects + unboundColorObjects, 'Total covered color style objects must be exactly 128').toBe(128);
     expect(checkedBorderObjects, 'Style objects with explicit border token declarations must be exactly 68').toBe(68);
-    expect(checkedBorderPairs, 'Evaluated border-background pairs across conditional and container branches must be exactly 92').toBe(92);
+    expect(checkedBorderPairs, 'Evaluated border-background pairs across conditional and container branches must be exactly 93').toBe(93);
     expect(violations, `Expected 0 style-pair contrast/collision violations in DeveloperStudio, got:\n${violations.join('\n')}`).toEqual([]);
   });
 

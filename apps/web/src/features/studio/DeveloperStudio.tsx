@@ -232,19 +232,6 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     }
   }, [initialNodeId]);
 
-  // Update selected workspace if initialWorkspaceId changes
-  useEffect(() => {
-    if (initialWorkspaceId) {
-      setSelectedWorkspaceId(initialWorkspaceId);
-    }
-  }, [initialWorkspaceId]);
-
-  // Update step if initialStep changes
-  useEffect(() => {
-    if (initialStep) {
-      setCurrentStep(initialStep);
-    }
-  }, [initialStep]);
 
   // Scroll logs to bottom
   useEffect(() => {
@@ -1148,7 +1135,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                               ? 'var(--color-status-degraded)'
                               : wsp.status === 'deleting'
                               ? 'var(--color-status-offline)'
-                              : 'var(--color-text-secondary)',
+                              : 'var(--color-text-muted)',
                         }}
                       >
                         {wsp.status}
@@ -2046,7 +2033,9 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                           : currentRun?.state === 'awaiting_approval'
                           ? 'var(--color-status-degraded)'
                           : currentRun?.state === 'recovering'
-                          ? 'var(--color-brand-hover)'
+                          ? 'var(--color-status-active)'
+                          : currentRun?.state === 'cancelled'
+                          ? 'var(--color-border-strong)'
                           : 'var(--color-status-offline)'
                       }`,
                       color:
@@ -2057,7 +2046,9 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                           : currentRun?.state === 'awaiting_approval'
                           ? 'var(--color-status-degraded)'
                           : currentRun?.state === 'recovering'
-                          ? 'var(--color-brand-hover)'
+                          ? 'var(--color-status-active)'
+                          : currentRun?.state === 'cancelled'
+                          ? 'var(--color-status-neutral)'
                           : 'var(--color-status-offline)',
                     }}
                   >
@@ -2095,9 +2086,9 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                       실행 상태 갱신: {new Date(currentRun?.stateUpdatedAt || artifactData?.stateUpdatedAt!).toLocaleString('ko-KR')}
                     </span>
                   )}
-                  {(artifactData?.completedAt || currentRun?.completedAt) && (
+                  {artifactData?.completedAt && (
                     <span data-testid="studio-run-completed-at" style={{ color: 'var(--color-status-online)' }}>
-                      실행 완료 시각: {new Date(artifactData?.completedAt || currentRun?.completedAt!).toLocaleString('ko-KR')}
+                      실행 완료 시각: {new Date(artifactData.completedAt).toLocaleString('ko-KR')}
                     </span>
                   )}
                   <span style={{ color: boundNode?.observationOnly ? 'var(--color-status-degraded)' : (boundNode?.allocatableCores !== undefined ? 'var(--color-status-online)' : 'var(--color-text-muted)'), fontWeight: 600 }}>
