@@ -306,6 +306,8 @@ def test_real_browser_bootstrap_uses_the_current_resolved_oidc_config_shape():
     assert '"keyboardNavigationPass": focus_is_trigger' in source
     assert '"pass": contrast_pass' in source
     assert '"pass": capacity_pass' in source
+    assert "page.route(route_glob, fulfill_node_page)" in source
+    assert "lambda route, body=" not in source
     assert '"passedChecks": 8' not in source
     assert '"keyboardNavigationPass": True' not in source
 

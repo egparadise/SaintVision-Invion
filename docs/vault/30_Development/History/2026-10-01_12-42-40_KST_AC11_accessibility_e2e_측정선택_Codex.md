@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-20261001-CARD171-AC11-ACCESSIBILITY-CODEX"
 title: "CARD-171 AC-11 accessibility-e2e hosted 측정 선택"
-version: "1.2.0"
+version: "1.2.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-01T13:14:36+09:00"
+updated: "2026-10-01T13:20:18+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "7851412db792b4ef6c53cb92944be530d77eb2de"
@@ -78,3 +78,4 @@ producer다. 최초 hosted run ID와 artifact digest는 PR에서 실행한 뒤 �
 - hosted run `36813368397`은 OIDC bootstrap을 통과해 invariant 1~8까지 실행했으나 Resource Explorer의 canonical database route가 harness fallback보다 먼저 매칭되어 노드 목록이 503이었고 invariant 9의 capacity 값이 비어 report가 생성되지 않았다. 제품 접근성 판정 전의 harness route drift이므로 이 run도 `NOT_OBSERVED`이며 수치로 사용하지 않는다.
 - producer가 focus 복원, 대비, capacity 값을 상수로 덮어쓰거나 assert로 report 생성을 중단하지 않도록 실제 DOM 관측값으로 summary를 계산한다. 브라우저 node fixture는 Playwright network boundary에서 명시하고 evidence에 `vite-dev-server-with-browser-node-fixture`로 정직하게 기록한다.
 - 자동 범위는 대비 3건과 keyboard/focus 2건이며 ACC-01~09 전체·화면낭독기·사용자 장비 인수는 미측정이다. raw producer artifact는 upload 전이므로 `artifactSha256=null`, `artifactStatus=PENDING_UPLOAD`로 두며 AC-11 aggregator 소비 가능 봉투라고 과장하지 않는다.
+- hosted run `36814431211`은 물리 browser case 6건을 모두 통과한 뒤 Playwright route handler가 두 번째 positional `Request`를 JSON body로 잘못 받아 invariant 시작 전에 실패했다. 제품·접근성 판정에 도달하지 않은 callback 결함이므로 `NOT_OBSERVED`이며 one-argument handler와 source regression assertion으로 교정했다.

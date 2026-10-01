@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.238"
+version: "1.0.239"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T13:14:36+09:00"
+updated: "2026-10-01T13:20:18+09:00"
 source_of_truth: "Git"
 active_card: "CARD-171 AC-11 accessibility-e2e hosted measurement"
-active_card_status: "Claude findings addressed in progress: physical 6/logical 5 case binding, measured invariant values, and hosted node fixture"
-active_card_next: "Run focused gates, push exact head, and obtain JSON/JUnit hosted evidence"
+active_card_status: "Hosted 36814431211 passed all six browser cases; Playwright fixture callback drift was NOT_OBSERVED and is corrected"
+active_card_next: "Rerun exact-head hosted lane and obtain JSON/JUnit evidence"
 ---
 
 ## 2026-10-01 Card 171 — AC-11 accessibility-e2e hosted 측정 수단

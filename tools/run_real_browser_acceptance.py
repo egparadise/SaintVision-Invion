@@ -566,15 +566,16 @@ def run_scenario(
             # claim a backend node-registry E2E result.
             if scenario == "desktop-ui-invariants":
                 node_page = json.dumps({"items": [SAMPLE_NODE], "count": 1})
-                for route_glob in ("**/v1/projects/*/nodes", "**/v1/nodes"):
-                    page.route(
-                        route_glob,
-                        lambda route, body=node_page: route.fulfill(
-                            status=200,
-                            content_type="application/json",
-                            body=body,
-                        ),
+
+                def fulfill_node_page(route):
+                    route.fulfill(
+                        status=200,
+                        content_type="application/json",
+                        body=node_page,
                     )
+
+                for route_glob in ("**/v1/projects/*/nodes", "**/v1/nodes"):
+                    page.route(route_glob, fulfill_node_page)
 
             # Setup OAuth transaction with protected test configuration
             page.add_init_script(f"""
