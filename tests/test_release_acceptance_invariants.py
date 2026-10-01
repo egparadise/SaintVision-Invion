@@ -1194,3 +1194,88 @@ def test_a_cursor_that_was_not_issued_here_is_refused(app_sessionmaker, two_oper
                             session, tenant_id=tenant, release_id=release.release_id,
                             limit=10, cursor=bad,
                         )
+
+
+# ------------------------------------------------------------------ the pin cannot be rewritten
+
+
+def test_a_release_manifest_digest_cannot_be_rewritten(app_sessionmaker, two_operators):
+    """The release's identity. A decision pins it, and the projection compares against it.
+
+    0005 gave the application blanket UPDATE on this table. Whoever can rewrite this column
+    can make an accepted decision describe a composition it never saw, without touching an
+    acceptance row -- so the rule lives where every writer meets it (#291 r2 Low).
+    """
+    tenant = two_operators["tenant_a"]
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, tenant):
+                release = pilot_service.create_release_manifest(
+                    session, tenant_id=tenant, version="R4", components=_components(),
+                    created_by_user_id=two_operators["one"], now=NOW,
+                )
+                session.flush()
+                with pytest.raises(DBAPIError) as refused:
+                    session.execute(
+                        text(
+                            "UPDATE release_manifests SET manifest_sha256=:m "
+                            "WHERE tenant_id=:t AND release_id=:r"
+                        ),
+                        {"m": "9" * 64, "t": tenant, "r": release.release_id},
+                    )
+    assert "identity" in str(refused.value)
+
+
+def test_a_policy_pin_is_write_once(app_sessionmaker, two_operators):
+    """Setting it is pinning; changing it is re-scoping, and nothing above can tell those apart.
+
+    Write-once rather than frozen, because every release recorded before the pin existed has
+    NULL and a deployment has to be able to set it.
+    """
+    tenant = two_operators["tenant_a"]
+    version, digest = 1, "b" * 64
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, tenant):
+                release = pilot_service.create_release_manifest(
+                    session, tenant_id=tenant, version="R4", components=_components(),
+                    created_by_user_id=two_operators["one"], now=NOW,
+                )
+                session.flush()
+                # NULL -> value: the pinning, allowed once.
+                session.execute(
+                    text(
+                        "UPDATE release_manifests SET policy_version=:v, "
+                        "policy_registry_sha256=:d WHERE tenant_id=:t AND release_id=:r"
+                    ),
+                    {"v": version, "d": digest, "t": tenant, "r": release.release_id},
+                )
+                session.flush()
+                release_id = release.release_id
+    # Each repin attempt in its own transaction: a refused statement aborts the one it is
+    # in, so asking twice inside a single block asks a closed transaction.
+    for column, value in (("policy_version", 2), ("policy_registry_sha256", "c" * 64)):
+        with app_sessionmaker() as attempt:
+            with attempt.begin():
+                with tenant_scope(attempt, tenant):
+                    with pytest.raises(DBAPIError) as refused:
+                        attempt.execute(
+                            text(
+                                f"UPDATE release_manifests SET {column}=:v "
+                                "WHERE tenant_id=:t AND release_id=:r"
+                            ),
+                            {"v": value, "t": tenant, "r": release_id},
+                        )
+        assert "repinned" in str(refused.value)
+
+
+def test_the_pin_trigger_carries_no_privileges_of_its_own(app_sessionmaker, owner_engine):
+    """SECURITY INVOKER, like every function this revision adds (§4-1)."""
+    with owner_engine.begin() as c:
+        definer = c.execute(
+            text(
+                "SELECT prosecdef FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace "
+                "WHERE n.nspname='public' AND p.proname='release_manifest_pin_is_final'"
+            )
+        ).scalar_one()
+    assert definer is False
