@@ -64,9 +64,9 @@
       "title": "Acceptanceidref",
       "type": "string"
     },
-    "countsTowardReleaseSignOff": {
+    "decisionSignOff": {
       "const": false,
-      "title": "Countstowardreleasesignoff",
+      "title": "Decisionsignoff",
       "type": "boolean"
     },
     "expiresAt": {
@@ -168,7 +168,7 @@
     "knownLimitations",
     "requiredDistinctOperatorCount",
     "proposalConfirmationCount",
-    "countsTowardReleaseSignOff",
+    "decisionSignOff",
     "expiresAt"
   ],
   "title": "ReleaseAcceptanceProposalReviewResponse",

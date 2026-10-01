@@ -120,7 +120,7 @@ def test_second_operator_confirms_the_exact_proposal_and_manifest_only():
         )
 
 
-def test_pending_proposal_can_never_count_toward_release_sign_off():
+def test_pending_proposal_can_never_have_decision_sign_off():
     body = {
         "proposalId": "proposal_01",
         "releaseId": "release_01",
@@ -131,14 +131,14 @@ def test_pending_proposal_can_never_count_toward_release_sign_off():
         "proposalDigest": "d" * 64,
         "requiredDistinctOperatorCount": 2,
         "proposalConfirmationCount": 1,
-        "countsTowardReleaseSignOff": False,
+        "decisionSignOff": False,
         "expiresAt": (NOW + dt.timedelta(minutes=15)).isoformat(),
         "replayed": False,
     }
     schemas.ReleaseAcceptanceProposalResponse.model_validate(body)
     with pytest.raises(ValidationError):
         schemas.ReleaseAcceptanceProposalResponse.model_validate(
-            {**body, "countsTowardReleaseSignOff": True}
+            {**body, "decisionSignOff": True}
         )
 
 
@@ -157,7 +157,7 @@ def test_distinct_operator_can_read_the_exact_pending_content_without_identity_d
         "knownLimitations": [],
         "requiredDistinctOperatorCount": 2,
         "proposalConfirmationCount": 1,
-        "countsTowardReleaseSignOff": False,
+        "decisionSignOff": False,
         "expiresAt": (NOW + dt.timedelta(minutes=5)).isoformat(),
     }
     parsed = schemas.ReleaseAcceptanceProposalReviewResponse.model_validate(body)
@@ -175,7 +175,7 @@ def test_distinct_operator_can_read_the_exact_pending_content_without_identity_d
         )
     with pytest.raises(ValidationError):
         schemas.ReleaseAcceptanceProposalReviewResponse.model_validate(
-            {**body, "countsTowardReleaseSignOff": True}
+            {**body, "decisionSignOff": True}
         )
     page = schemas.ReleaseAcceptanceProposalReviewPageResponse.model_validate(
         {"items": [body], "nextCursor": None}
@@ -183,7 +183,7 @@ def test_distinct_operator_can_read_the_exact_pending_content_without_identity_d
     assert page.items[0].proposal_id == "proposal_01"
     with pytest.raises(ValidationError):
         schemas.ReleaseAcceptanceProposalReviewPageResponse.model_validate(
-            {"items": [{**body, "countsTowardReleaseSignOff": True}]}
+            {"items": [{**body, "decisionSignOff": True}]}
         )
 
 
@@ -198,7 +198,7 @@ def test_distinct_operator_can_read_the_exact_pending_content_without_identity_d
         ("rejected", 1, False, True),
     ],
 )
-def test_only_a_two_person_accepted_record_counts_toward_release_sign_off(
+def test_only_a_two_person_accepted_record_has_decision_sign_off(
     outcome, count, sign_off, valid
 ):
     body = {
@@ -209,7 +209,7 @@ def test_only_a_two_person_accepted_record_counts_toward_release_sign_off(
         "state": "recorded",
         "acceptedManifestSha256": HASH,
         "manifestMatches": True,
-        "countsTowardReleaseSignOff": sign_off,
+        "decisionSignOff": sign_off,
         "decisionConfirmationCount": count,
         "decidedAt": NOW.isoformat(),
         "replayed": False,
@@ -302,7 +302,7 @@ def test_exported_json_schema_enforces_decision_and_quorum_semantics():
         "state": "recorded",
         "acceptedManifestSha256": HASH,
         "manifestMatches": True,
-        "countsTowardReleaseSignOff": True,
+        "decisionSignOff": True,
         "decisionConfirmationCount": 2,
         "decidedAt": NOW.isoformat(),
         "replayed": False,
@@ -313,7 +313,7 @@ def test_exported_json_schema_enforces_decision_and_quorum_semantics():
             {
                 **valid,
                 "decisionConfirmationCount": 1,
-                "countsTowardReleaseSignOff": False,
+                "decisionSignOff": False,
             }
         )
 
@@ -329,18 +329,18 @@ EXPECTED_REQUIRED = {
     "release-acceptance-proposal-response": {
         "proposalId", "releaseId", "acceptanceIdRef", "outcome", "state",
         "targetManifestSha256", "proposalDigest", "requiredDistinctOperatorCount",
-        "proposalConfirmationCount", "countsTowardReleaseSignOff", "expiresAt", "replayed",
+        "proposalConfirmationCount", "decisionSignOff", "expiresAt", "replayed",
     },
     "release-acceptance-proposal-review-response": {
         "proposalId", "releaseId", "acceptanceIdRef", "outcome", "state",
         "targetManifestSha256", "proposalDigest", "reasonCode", "targetRefs",
         "measurementRefs", "knownLimitations", "requiredDistinctOperatorCount",
-        "proposalConfirmationCount", "countsTowardReleaseSignOff", "expiresAt",
+        "proposalConfirmationCount", "decisionSignOff", "expiresAt",
     },
     "release-acceptance-proposal-review-page-response": {"items"},
     "release-acceptance-recorded-response": {
         "acceptanceId", "releaseId", "acceptanceIdRef", "outcome", "state",
-        "acceptedManifestSha256", "manifestMatches", "countsTowardReleaseSignOff",
+        "acceptedManifestSha256", "manifestMatches", "decisionSignOff",
         "decisionConfirmationCount", "decidedAt", "replayed",
     },
     "release-acceptance-withdrawal-request": {
@@ -385,7 +385,7 @@ def test_digests_are_exact_lowercase_hex_before_whitespace_normalisation(bad):
         "knownLimitations": [],
         "requiredDistinctOperatorCount": 2,
         "proposalConfirmationCount": 1,
-        "countsTowardReleaseSignOff": False,
+        "decisionSignOff": False,
         "expiresAt": (NOW + dt.timedelta(minutes=5)).isoformat(),
     }
     recorded = {
@@ -396,7 +396,7 @@ def test_digests_are_exact_lowercase_hex_before_whitespace_normalisation(bad):
         "state": "recorded",
         "acceptedManifestSha256": bad,
         "manifestMatches": True,
-        "countsTowardReleaseSignOff": True,
+        "decisionSignOff": True,
         "decisionConfirmationCount": 2,
         "decidedAt": NOW.isoformat(),
         "replayed": False,

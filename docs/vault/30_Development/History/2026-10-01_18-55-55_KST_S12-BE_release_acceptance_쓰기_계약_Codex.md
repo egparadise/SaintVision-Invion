@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-S12-BE-RELEASE-ACCEPTANCE-WRITE-20261001"
 title: "S12-BE release 수락·operator sign-off 쓰기 보안 계약 — 설계·strict schema"
-version: "1.2.0"
+version: "1.2.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-01T19:43:04+09:00"
+updated: "2026-10-01T19:55:28+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "3ff89b84"
@@ -27,8 +27,8 @@ body를 먼저 고정했다. 이 PR은 설계·계약만이며 route·DB·migrat
 - 모든 결정과 철회는 5분 이내 신선한 interactive OIDC 인증과 live
   `releases.accept` permission을 요구한다. 사람 ID·token·재인증 proof는 body에서 받지 않고
   server-derived active user만 쓴다.
-- `accepted`는 서로 다른 두 사람의 같은 proposal digest 확인이 있어야만 그 decision이
-  `countsTowardReleaseSignOff=true`다. release 전체 `operatorSignOff`는 required criterion 전부를
+- `accepted`는 서로 다른 두 사람의 같은 proposal digest 확인이 있어야만 그 decision의
+  `decisionSignOff=true`다. release 전체 `operatorSignOff`는 required criterion 전부를
   집계한 읽기 projection만 계산한다.
 - caller의 `targetManifestSha256`은 optimistic target일 뿐이다. 잠근 release의 server digest와
   일치할 때만 server 값을 final row에 쓴다.
@@ -88,9 +88,13 @@ validator에만 숨어 있지 않게 했다.
   누락·parse 실패·빈 required set·중복·digest/version drift는
   반드시 release sign-off false이고, registry 밖 criterion decision은 409다. 빈 `all()` true를
   허용하지 않는다.
-- #280의 release 범위 `confirmedOperatorCount`·`operatorSignOff`는 유지하되, #282의 proposal/
-  decision 응답은 `proposalConfirmationCount`·`decisionConfirmationCount`·
-  `countsTowardReleaseSignOff`로 분리했다. withdrawal의 `operatorSignOff`만 철회 뒤 release 집계다.
+- 코디네이터의 N2 최종 결정에 따라 #282가 release 범위 의미를 소유한다.
+  `confirmedOperatorCount`는 fresh interactive human attestation이 유효한 서로 다른 운영자 수이고,
+  `operatorSignOff`는 비어 있지 않은 registry의 required criterion 전부가 유효한 경우에만 true다.
+  구현 전 #280은 이 값을 0과 `human-attestation-implementation-unavailable` blocker로 내며,
+  legacy raw count는 `matchingAcceptedUserCount`로 분리한다.
+- #282의 proposal/decision 응답은 `proposalConfirmationCount`·`decisionConfirmationCount`·
+  `decisionSignOff`로 분리했다. withdrawal의 `operatorSignOff`만 철회 뒤 release 집계다.
 - pending proposal discovery 목록 contract를 추가해 confirmer가 proposal ID와 검토 내용을
   인증된 route로 찾게 했다. canonical write는 SECURITY INVOKER·`inv_app` 전용이고 verified
   `SET LOCAL` identity를 읽는다. 만료/drift 409 receipt, 2인 bootstrap 경계도 고정했다.

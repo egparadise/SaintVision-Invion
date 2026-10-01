@@ -5,11 +5,11 @@
     {
       "else": {
         "properties": {
-          "countsTowardReleaseSignOff": {
-            "const": false
-          },
           "decisionConfirmationCount": {
             "const": 1
+          },
+          "decisionSignOff": {
+            "const": false
           }
         }
       },
@@ -25,17 +25,17 @@
       },
       "then": {
         "properties": {
-          "countsTowardReleaseSignOff": {
-            "const": true
-          },
           "decisionConfirmationCount": {
             "const": 2
+          },
+          "decisionSignOff": {
+            "const": true
           }
         }
       }
     }
   ],
-  "description": "A final decision; only two-person ``accepted`` counts toward release sign-off.",
+  "description": "A final decision; only two-person ``accepted`` has decision sign-off.",
   "properties": {
     "acceptanceId": {
       "maxLength": 64,
@@ -55,10 +55,6 @@
       "title": "Acceptedmanifestsha256",
       "type": "string"
     },
-    "countsTowardReleaseSignOff": {
-      "title": "Countstowardreleasesignoff",
-      "type": "boolean"
-    },
     "decidedAt": {
       "format": "date-time",
       "title": "Decidedat",
@@ -69,6 +65,10 @@
       "minimum": 1,
       "title": "Decisionconfirmationcount",
       "type": "integer"
+    },
+    "decisionSignOff": {
+      "title": "Decisionsignoff",
+      "type": "boolean"
     },
     "manifestMatches": {
       "const": true,
@@ -108,7 +108,7 @@
     "state",
     "acceptedManifestSha256",
     "manifestMatches",
-    "countsTowardReleaseSignOff",
+    "decisionSignOff",
     "decisionConfirmationCount",
     "decidedAt",
     "replayed"

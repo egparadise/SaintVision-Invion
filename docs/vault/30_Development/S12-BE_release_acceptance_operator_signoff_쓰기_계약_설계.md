@@ -1,12 +1,12 @@
 ---
 doc_id: "DESIGN-S12-BE-RELEASE-ACCEPTANCE-WRITE-20261001"
 title: "S12-BE release 수락·operator sign-off 쓰기 보안 계약 설계"
-version: "1.2.0"
+version: "1.2.1"
 status: "proposed"
 author: "Codex"
 reviewer: "Claude"
 audience: "agent"
-updated: "2026-10-01T19:43:04+09:00"
+updated: "2026-10-01T19:55:28+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "3ff89b84"
@@ -24,8 +24,8 @@ tags: ["s12", "release-manifest", "acceptance", "operator-sign-off", "security",
 1. **모든 결정은 신선한 대화형 인증을 마친 활성 사람**만 쓸 수 있다. 요청 본문은
    `acceptedByUserId`, bearer token, 재인증 증거를 받지 않는다. 서버가 검증된 OIDC
    subject에서 `public.users`의 활성 사용자를 다시 도출한다.
-2. `accepted`만 **서로 다른 두 사람**이 같은 proposal digest를 확인해야 그 decision이
-   `countsTowardReleaseSignOff=true`가 된다. release 전체의 `operatorSignOff`는 그 뒤 §5의
+2. `accepted`만 **서로 다른 두 사람**이 같은 proposal digest를 확인해야 그 decision의
+   `decisionSignOff=true`가 된다. release 전체의 `operatorSignOff`는 그 뒤 §5의
    required criterion 전부를 집계한 읽기 projection만 계산한다. `conditional`과 `rejected`는
    한 사람의 최종 기록이지만 sign-off에 세지 않는다.
 3. 클라이언트는 승인하려는 `targetManifestSha256`을 보낸다. 서버는 잠근 manifest에서
@@ -38,11 +38,17 @@ tags: ["s12", "release-manifest", "acceptance", "operator-sign-off", "security",
 
 이 PR은 설계와 공개 JSON Schema만 낸다. route, 서비스, DB migration, OIDC claim 보존,
 감사 기록 구현은 Claude의 다음 카드다. 구현 전까지 기존 읽기 route는 계속 read-only이고
-`operatorSignOff`를 새로 true로 만들 수 없다. #280 head `4114f8ba`가 고정한 현재 읽기 계약은
-`operatorSignOff=false`, `operatorSignOffBlockedBy=human-attestation-contract-absent`,
-`requiredDistinctOperatorCount=2`와 release 전체의 관측용 `confirmedOperatorCount`다. 이 값은
-proposal 투표 수가 아니며 #282의 `proposalConfirmationCount`·`decisionConfirmationCount`와
-이름과 범위를 분리한다. 구현 카드는 아래 attestation·
+`operatorSignOff`를 새로 true로 만들 수 없다. 코디네이터의 2026-10-01 N2 최종 결정에 따라
+release 범위 `confirmedOperatorCount`는 현재 manifest와 required criterion 전부에 대해
+**fresh interactive human attestation이 검증된 서로 다른 운영자 수**이고, service/system/
+client-credentials 주체는 세지 않는다. `operatorSignOff`는 비어 있지 않은 policy registry의
+모든 required criterion이 유효한 `decisionSignOff=true`일 때만 true다. 이 정의의 owner는
+#282다. #280은 구현 전 `confirmedOperatorCount=0`,
+`operatorSignOff=false`, `operatorSignOffBlockedBy=human-attestation-implementation-unavailable`
+로 내고, legacy accepted 행과 manifest hash만 맞는 raw 사용자 수는 별도
+`matchingAcceptedUserCount`로 표시해야 한다. 이 release 집계는 proposal 투표 수가 아니며
+#282의 `proposalConfirmationCount`·`decisionConfirmationCount`·`decisionSignOff`와 이름과
+범위를 분리한다. 구현 카드는 아래 attestation·
 quorum·withdrawal projection이 한 transaction 경계로 모두 착지한 뒤에만 blocker literal을
 제거하고 true variant를 공개한다.
 
@@ -82,7 +88,8 @@ context로 전달한다.
 - vote에는 raw token/subject 대신 `human_attestation_version`, verified issuer/client identity,
   `auth_time`, 정규화된 AMR 집합의 digest와 identity verification event ID를 immutable하게
   남긴다. 단순 `accepted_by_user_id` FK나 distinct user count는 사람 attestation이 아니며
-  #280의 `confirmedOperatorCount`는 구현 전까지 관측값일 뿐 sign-off 근거가 아니다.
+  legacy accepted 행에서 센 `matchingAcceptedUserCount`는 관측값일 뿐 sign-off 근거가 아니다.
+  attestation 구현 전 release 범위 `confirmedOperatorCount`는 0이다.
 
 인증 부재·무효는 `AUTH-0050/401`; 유효하지만 fresh interactive proof가 없거나 권한이
 없으면 `AUTH-0030/403`이다. 오류에는 subject, user ID, claim 값, token을 넣지 않는다.
@@ -132,8 +139,8 @@ outcome·reasonCode·manifest/proposal digest·targetRefs·measurementRefs·know
 최대 100건만 반환한다. 따라서 confirmer가 proposal ID를 out-of-band로 전달받을 필요가 없다.
 
 proposal 범위 공개 필드는 `proposalConfirmationCount`와
-`countsTowardReleaseSignOff=false`, final decision 범위는 `decisionConfirmationCount`와
-`countsTowardReleaseSignOff`다. #280 읽기의 `confirmedOperatorCount`·`operatorSignOff`는 release
+`decisionSignOff=false`, final decision 범위는 `decisionConfirmationCount`와
+`decisionSignOff`다. #280 읽기의 `confirmedOperatorCount`·`operatorSignOff`는 release
 전체 집계 범위이므로 write 응답에서 재사용하지 않는다. withdrawal 응답의 `operatorSignOff`만
 철회 commit 뒤의 release 집계값이라는 같은 의미로 유지한다.
 
@@ -248,6 +255,10 @@ accepted를 받으면 fail closed한다. conditional/rejected도 새 canonical s
   accepted digest == current manifest digest, target/Evidence binding valid일 때만 true다. required
   criterion 하나라도 missing·conditional·rejected·withdrawn이면 false다. `pilot_readiness()`도
   이 단일 함수를 사용하고 별도 rejected 규칙을 만들지 않는다.
+- release 범위 `confirmedOperatorCount`는 위 aggregate에 기여하는 decision의 proposer와
+  confirmer 중 fresh interactive human attestation이 유효한 서로 다른 운영자 수다. raw legacy
+  accepted user, service/system/client-credentials 주체, 만료·철회·manifest drift decision은 세지
+  않는다. attestation projection이 구현되기 전에는 0이며 blocker를 함께 반환한다.
 - manifest가 바뀌면 기존 행을 수정하지 않아도 즉시 false다. 같은 이름의 새 composition은
   새 proposal과 두 fresh operators가 필요하다.
 
@@ -331,8 +342,8 @@ token, OIDC claims, user display data, free text, target/measurement payload, kn
 2. body의 `acceptedByUserId`·token·reauth proof·notes 거부.
 3. conditional limitation 규칙과 target/measurement 최소 1·중복 ID 거부.
 4. service token, missing/future/stale `auth_time`, non-interactive/malformed `amr` 거부.
-5. pending proposal은 `proposalConfirmationCount=1`·`countsTowardReleaseSignOff=false`,
-   accepted final은 `decisionConfirmationCount=2`·counts true, nonaccepted는 count 1·false.
+5. pending proposal은 `proposalConfirmationCount=1`·`decisionSignOff=false`, accepted final은
+   `decisionConfirmationCount=2`·`decisionSignOff=true`, nonaccepted는 count 1·false.
 6. same key same body replay; 같은 key를 다른 release/proposal/acceptance path에 재사용 거부;
    replay 전 auth·fresh-auth·permission 재확인; same proposal 다른 key 수렴.
 7. same actor confirm 거부, proposal expiry, manifest/evidence/permission drift.
@@ -341,7 +352,7 @@ token, OIDC claims, user display data, free text, target/measurement payload, kn
    double withdrawal·required criterion 미충족 계산.
 9. 오류 10-key exact·no-store·identifier/non-secret leakage 0, audit payload closed set.
 10. 생성된 `contracts/*.schema.json`과 Pydantic source 일치. pending review의
-    `countsTowardReleaseSignOff=true` 변이는 Pydantic과 JSON Schema 양쪽에서 거부.
+    `decisionSignOff=true` 변이는 Pydantic과 JSON Schema 양쪽에서 거부.
 11. policy registry 누락·빈 required set·unknown criterion·version/digest drift는 모두
     release sign-off false 또는 decision 409이며 빈 `all()` true는 금지.
 
@@ -372,8 +383,10 @@ nonaccepted sign-off true를 각각 독립 시험이 죽여야 한다.
   검증되기 전에는 모든 write route를 enable하지 않는다.
 - 기존 #280 read route는 withdrawal/quorum/required-criterion-aware projection으로 교체하고
   `operator_sign_off()`와 `pilot_readiness()`가 같은 함수를 쓰기 전에는 이 계약과 결속됐다고
-  주장하지 않는다. 그 release 범위의 `confirmedOperatorCount` 이름은 유지하되 criterion별
-  quorum 표현으로 교체하고, proposal/decision 범위 count 이름과 혼용하지 않는다.
+  주장하지 않는다. release 범위 `confirmedOperatorCount`는 human-attested distinct operator
+  수로만 쓰고 구현 전에는 0으로 고정한다. raw legacy row 수는 `matchingAcceptedUserCount`,
+  proposal/decision 범위는 `proposalConfirmationCount`·`decisionConfirmationCount`·
+  `decisionSignOff`로 분리한다.
 - physical 5-node acceptance, operator training, PITR 복구, browser sign-off는 이 계약의
   `measurementRefs` 입력일 뿐 이 PR이 측정한 결과가 아니다.
 - 구현 owner는 Claude, 계약·보안 reviewer는 Codex다. migration이 필요하므로 구현자는

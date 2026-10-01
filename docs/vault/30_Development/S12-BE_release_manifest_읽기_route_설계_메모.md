@@ -1,12 +1,12 @@
 ---
 doc_id: "DESIGN-S12-BE-RELEASE-MANIFEST-READ-20261001"
 title: "S12-BE release manifest 읽기 route와 서명·수락 쓰기 경계 — operatorSignOff는 외래키로 증명되지 않아 계약에서 false로 고정했다(독립 검토 F1 정정), 쓰기는 Codex 계약 요청 (카드 182, r2)"
-version: "1.1.1"
+version: "1.1.2"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-01T19:43:04+09:00"
+updated: "2026-10-01T19:55:28+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "7e670d77"
@@ -42,14 +42,16 @@ tags: ["s12", "release-manifest", "acceptance", "route", "read-only", "security-
 | `operatorSignOff` | **`Literal[False]`** | 이 읽기 표면은 참을 **낼 수 없다**. docstring의 약속이 아니라 **계약**이 거부한다 |
 | `operatorSignOffBlockedBy` | `"human-attestation-contract-absent"` | 왜 거짓인지 — "아무도 서명 안 함"과 "이 표면은 알 수 없음"을 읽는 사람이 구별할 수 있게 |
 | `requiredDistinctOperatorCount` | **`Literal[2]`** | 쓰기 계약(`#282`, 카드 184)의 정족수 |
-| `confirmedOperatorCount` | 정수 | 해시가 맞는 `accepted` 행의 **서로 다른 사용자 수**. 기록된 사실이고 서명이 아니다 — 서비스 주체도 이 수에 들어갈 수 있고, **그래서** 서명이 아니다 |
+| `confirmedOperatorCount` | 정수 | #282가 소유하는 release 범위의 **fresh human-attested 서로 다른 운영자 수**. 구현 전에는 0이며 서비스·system·client-credentials 주체는 세지 않는다 |
+| `matchingAcceptedUserCount` | 정수 | 해시가 맞는 legacy `accepted` 행의 raw 서로 다른 사용자 수. 서비스 주체도 들어갈 수 있어 sign-off가 아니며 #280 후속 head에서 별도 필드로 분리한다 |
 
-이 세 필드는 **release 전체 읽기 범위**다. `#282`의 proposal/decision 응답은 r2 N2 뒤
-`proposalConfirmationCount`·`decisionConfirmationCount`·`countsTowardReleaseSignOff`로 이름을
+이 필드들은 **release 전체 읽기 범위**다. `#282`의 proposal/decision 응답은 코디네이터 N2
+최종 결정 뒤 `proposalConfirmationCount`·`decisionConfirmationCount`·`decisionSignOff`로 이름을
 분리했다. 따라서 여기의 `confirmedOperatorCount`를 proposal 투표 수로 읽거나, 여기의
 `operatorSignOff`를 개별 criterion decision의 quorum 값으로 읽어서는 안 된다.
 
-`confirmedOperatorCount`가 `0`으로 남는 세 경우는 그대로 각각 다른 사실이다.
+현재 구현의 raw count는 #280 후속에서 `matchingAcceptedUserCount`로 이동한다. 그 값이 `0`인
+세 경우는 그대로 각각 다른 사실이다.
 
 1. **수락 행이 없다** — 아무도 보지 않았다.
 2. **`conditional` 또는 `rejected`** — 누군가 보았고 승인하지 않았다. 표가 이미 "조건부인데 제약 목록이 비면" 거절하므로(`conditional_requires_limitations`), 읽기가 조건부를 승인으로 읽으면 그 제약이 지키려던 구별을 버리는 것이 된다.

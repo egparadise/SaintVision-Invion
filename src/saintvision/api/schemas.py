@@ -1679,9 +1679,7 @@ class ReleaseAcceptanceProposalResponse(Strict):
     proposal_digest: ReleaseAcceptanceSha256 = Field(alias="proposalDigest")
     required_distinct_operator_count: Literal[2] = Field(alias="requiredDistinctOperatorCount")
     proposal_confirmation_count: Literal[1] = Field(alias="proposalConfirmationCount")
-    counts_toward_release_sign_off: Literal[False] = Field(
-        alias="countsTowardReleaseSignOff"
-    )
+    decision_sign_off: Literal[False] = Field(alias="decisionSignOff")
     expires_at: AwareDatetime = Field(alias="expiresAt")
     replayed: StrictBool
 
@@ -1710,9 +1708,7 @@ class ReleaseAcceptanceProposalReviewResponse(Strict):
     )
     required_distinct_operator_count: Literal[2] = Field(alias="requiredDistinctOperatorCount")
     proposal_confirmation_count: Literal[1] = Field(alias="proposalConfirmationCount")
-    counts_toward_release_sign_off: Literal[False] = Field(
-        alias="countsTowardReleaseSignOff"
-    )
+    decision_sign_off: Literal[False] = Field(alias="decisionSignOff")
     expires_at: AwareDatetime = Field(alias="expiresAt")
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
@@ -1728,7 +1724,7 @@ class ReleaseAcceptanceProposalReviewPageResponse(Strict):
 
 
 class ReleaseAcceptanceRecordedResponse(Strict):
-    """A final decision; only two-person ``accepted`` counts toward release sign-off."""
+    """A final decision; only two-person ``accepted`` has decision sign-off."""
 
     acceptance_id: StrictStr = Field(alias="acceptanceId", min_length=1, max_length=64)
     release_id: StrictStr = Field(alias="releaseId", min_length=1, max_length=64)
@@ -1737,7 +1733,7 @@ class ReleaseAcceptanceRecordedResponse(Strict):
     state: Literal["recorded"]
     accepted_manifest_sha256: ReleaseAcceptanceSha256 = Field(alias="acceptedManifestSha256")
     manifest_matches: Literal[True] = Field(alias="manifestMatches")
-    counts_toward_release_sign_off: StrictBool = Field(alias="countsTowardReleaseSignOff")
+    decision_sign_off: StrictBool = Field(alias="decisionSignOff")
     decision_confirmation_count: StrictInt = Field(alias="decisionConfirmationCount", ge=1, le=2)
     decided_at: AwareDatetime = Field(alias="decidedAt")
     replayed: StrictBool
@@ -1755,13 +1751,13 @@ class ReleaseAcceptanceRecordedResponse(Strict):
                     "then": {
                         "properties": {
                             "decisionConfirmationCount": {"const": 2},
-                            "countsTowardReleaseSignOff": {"const": True},
+                            "decisionSignOff": {"const": True},
                         }
                     },
                     "else": {
                         "properties": {
                             "decisionConfirmationCount": {"const": 1},
-                            "countsTowardReleaseSignOff": {"const": False},
+                            "decisionSignOff": {"const": False},
                         }
                     },
                 }
@@ -1772,12 +1768,10 @@ class ReleaseAcceptanceRecordedResponse(Strict):
     @model_validator(mode="after")
     def _quorum_controls_sign_off(self) -> "ReleaseAcceptanceRecordedResponse":
         if self.outcome == "accepted":
-            if not self.counts_toward_release_sign_off or self.decision_confirmation_count != 2:
-                raise ValueError(
-                    "accepted requires two confirmations and countsTowardReleaseSignOff=true"
-                )
-        elif self.counts_toward_release_sign_off or self.decision_confirmation_count != 1:
-            raise ValueError("conditional and rejected decisions never count toward release sign-off")
+            if not self.decision_sign_off or self.decision_confirmation_count != 2:
+                raise ValueError("accepted requires two confirmations and decisionSignOff=true")
+        elif self.decision_sign_off or self.decision_confirmation_count != 1:
+            raise ValueError("conditional and rejected decisions never have decision sign-off")
         return self
 
 
