@@ -1,0 +1,120 @@
+name: S12 Acceptance Evidence
+# Only a dispatch that passes `correlation_id` changes this; every other event keeps the
+# workflow name. The value is used for the run's display name only.
+run-name: ${{ inputs.correlation_id || github.workflow }}
+
+# `workflow_dispatch` and a labelled pull request, and deliberately **no push trigger**.
+# A workflow that triggered on a push to integration/all-agents-unified would owe a lane in
+# tools/post_landing_verify.py -- the reverse ratchet in tests/core/test_post_landing_verify.py
+# asserts exactly that -- and this bundle is not a landing gate. It is the collector being
+# run by CI instead of by a person, which is a thing to do on request, not on every landing.
+on:
+  workflow_dispatch:
+    inputs:
+      correlation_id:
+        description: 'Opaque id for a tool to bind this exact run; leave empty for a normal manual run'
+        required: false
+        default: ''
+  pull_request:
+    types: [opened, labeled, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  s12-acceptance-evidence:
+    # Opt-in on pull requests: this spends a PostgreSQL service and a runner, and the answer
+    # only moves when the acceptance tools or their inputs change.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.pull_request.labels.*.name, 'run-s12-acceptance')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: s12-acceptance-${{ github.event.pull_request.head.sha || github.sha }}
+      cancel-in-progress: false
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: invowner
+          POSTGRES_PASSWORD: ci_local_only
+          POSTGRES_DB: invdev
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U invowner -d invdev"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      SOURCE_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      # One DSN, three names: the collector reads the readiness and PITR DSNs from the
+      # environment by name and never emits them, and the migration env reads its own.
+      INV_MIGRATION_DSN: postgresql://invowner:ci_local_only@localhost:5432/invdev
+      INV_READINESS_DSN: postgresql://invowner:ci_local_only@localhost:5432/invdev
+      INV_PITR_DSN: postgresql://invowner:ci_local_only@localhost:5432/invdev
+      OUT_DIR: evidence/s12-acceptance
+    steps:
+      - name: Checkout the exact source head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          # The collector refuses a head no remote ref contains unless told otherwise, and
+          # it reads provenance from history, so a shallow checkout would make it refuse
+          # for the wrong reason.
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-test.txt
+      - run: python -m pip install -r requirements-test.txt
+      - name: Apply the published migrations
+        # Without this the readiness tool reads an empty catalogue and every database item
+        # becomes the same FAIL for the same uninformative reason. With it, the items that
+        # fail do so because an operational input is genuinely absent.
+        run: python -m alembic upgrade head
+      - name: Create the read-only PITR observation inputs
+        # Two empty directories. The rehearsal is a read-only observation, so an empty
+        # archive and an empty backup set are a real state to observe -- "no base backup" is
+        # the answer, and inventing one would be the failure this collector exists to avoid.
+        run: |
+          mkdir -p .work/s12/archive .work/s12/backups "$OUT_DIR"
+      - name: Derive the AC-12 acceptance items
+        # The exit status is not the gate: FAIL is the honest verdict until the external
+        # waits clear, and the collector exits 0 having recorded it. The gate is the next
+        # step, which checks the bundle's shape.
+        run: |
+          python tools/collect_s12_acceptance_evidence.py \
+            --tenant 00000000-0000-4000-8000-000000000001 \
+            --pitr-archive .work/s12/archive \
+            --pitr-backups .work/s12/backups \
+            --out-dir "$OUT_DIR" \
+            --executor github-actions \
+            --reachable-ref "origin/${{ github.event.pull_request.base.ref || github.ref_name }}" \
+            --note "derived by CI at $SOURCE_HEAD_SHA; promotes no score and claims no acceptance"
+      - name: Hold the bundle to its shape
+        run: |
+          bundle="$(ls "$OUT_DIR"/*.json | head -1)"
+          test -n "$bundle"
+          python tools/check_s12_acceptance_shape.py "$bundle"
+      - name: Record that the two named observations were derived here
+        # The VF-CL registry's `ciVerifiedNote` said these two were produced by hand and
+        # that CI never re-derived them. This step is the line a reader can point at.
+        run: |
+          bundle="$(ls "$OUT_DIR"/*.json | head -1)"
+          python - "$bundle" <<'PY'
+          import json, sys
+          items = json.load(open(sys.argv[1], encoding="utf-8"))["items"]
+          for name in ("pitr-configuration-possible", "pitr-rehearsal-dry-run-observed"):
+              item = items[name]
+              print(f"{name}: {item['status']} (source {item.get('source')})")
+          PY
+      - name: Upload the acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: s12-acceptance-${{ github.event.pull_request.head.sha || github.sha }}
+          path: ${{ env.OUT_DIR }}
+          if-no-files-found: error
