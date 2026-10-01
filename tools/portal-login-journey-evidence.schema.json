@@ -198,6 +198,9 @@
               },
               "storagePurged": {
                 "type": "boolean"
+              },
+              "inMemoryTokenPurged": {
+                "type": "boolean"
               }
             }
           }

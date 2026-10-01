@@ -180,3 +180,50 @@ Codex 계약·보안 축 2차 검토(09:40)에서 제기된 지적사항 5건(F1
 ### 5) F6 [Medium] X.509 인증서 확장 필드 보강 및 변이 사살 시험
 - **조치**: Windows/OpenSSL 3.x 환경에서 발생하는 `Missing Authority Key Identifier` 오류를 방지하기 위해 테스트 CA 및 서버 인증서에 `SubjectKeyIdentifier` 및 `AuthorityKeyIdentifier`를 완비. 소스 코드 수준에서 `ignore_https_errors=False` 불변식 강제 검증.
 - **결과**: `tests/test_portal_login_journey_harness.py` 43개 자동화 시험 100% PASS.
+
+---
+
+## 4. Codex 3차 검토(N1~N4) 조치 상세 (2026-10-01)
+
+### 1) N1 [High] lookalike origin 차단 및 정본 SessionView 스키마 검증 완비
+- **문제**: URL 부분 문자열 검사(`/protocol/openid-connect/token` in url, `self.hostname` in url)로 인해 `https://idp.sv.lan.attacker.invalid/...`, `https://portal.sv.lan.attacker.invalid/v1/session` 등 유사 호스트 주입 시 통과하고, 세션 응답 바디 검증이 미약하여 계약상 무효인 세션(`{"subjectId":"oidc:x","tenantId":"not-a-uuid","expiresAt":-1}`)으로도 acceptanceClaim=true가 가능했던 결함.
+- **조치**:
+  1. `urlsplit(resp.url)`을 사용하여 토큰 및 세션 엔드포인트의 scheme, hostname, port, canonical path(`idp.sv.lan`, `portal.sv.lan/v1/session`)를 완전 일치(`==`)로 엄격히 결속.
+  2. `validate_session_view(data, now_ts)`를 구축하여 정본 `contracts/v1alpha1/core.schema.json#/definitions/SessionView`(`subjectId = ^oidc:[0-9a-f]{64}$`, `tenantId = UUID`, `expiresAt >= 1`, 추가 필드 거부) 및 프런트 제품 경계(`expiresAt > now`)를 엄격히 강제.
+  3. lookalike host, 잘못된 UUID, 잘못된 subject, 만료 세션 각각에 대한 독립 음성 시험 5종 완비.
+
+### 2) N2 [High] 인증서 우회 플래그 전면 제거 및 Chromium launch args 0건 단언
+- **문제**: 코드 머리에서 금지한 `--ignore-certificate-errors-spki-list`를 내부 생성하여 Chromium 실행 인수에 주입하던 결함.
+- **조치**:
+  1. `--ignore-certificate-errors-spki-list` 동적 생성 로직 전면 제거.
+  2. `PROHIBITED_FLAGS`에 `--ignore-certificate-errors-spki-list` 및 `ignore-certificate` 계열 패턴을 추가하여 CLI 및 observer에 전달되는 임의의 우회 플래그를 `SecurityCircumventionError`로 즉시 fail-closed 차단.
+  3. Chromium 실행 인수(launch args)에 인증서 무시 계열 플래그가 0건임을 단언하는 시험(`test_browser_launch_strictly_zero_certificate_ignore_flags`) 완비.
+
+### 3) N3 [High] LIVE 실행 clean/reachable provenance 기본 강제 및 중복 호출 제거
+- **문제**: `execute_journey` 및 CLI 기본값이 `require_clean=False`, `require_remote_containment=False`였고, `code_sha = get_git_sha()` 중복 호출로 이전 검증이 덮어써지던 결함.
+- **조치**:
+  1. `execute_journey`의 기본값을 live 모드 시 `require_clean=True`, `require_remote_containment=True`로 고정하고, 중복 `get_git_sha()` 호출 제거.
+  2. CLI `main()`에 `--require-clean`, `--require-remote-containment` 플래그를 지원하되 기본값은 `execute_journey`의 live 기본 동작에 위임.
+  3. live 실행 기본 경로에서 오염되거나 원격 미추적 커밋 감지 시 거부됨을 증명하는 회귀 시험 완비.
+
+### 4) N4 [Medium-High] 로그아웃 후 in-memory token 부재 검증
+- **문제**: 로그아웃 시 스토리지 키 이름만 검사하고 `apps/web/src/shared/api/client.ts`의 module-level `inMemoryAuthToken` 부재를 확인하지 않던 결함.
+- **조치**:
+  1. `apps/web/src/shared/api/client.ts`에 비밀 비노출 boolean seam인 `globalThis.__sv_has_auth_token`을 탑재하여 `inMemoryAuthToken !== null` 여부를 안전하게 조회 가능하도록 확장.
+  2. 하네스 로그아웃 단계에서 스토리지뿐 아니라 `inMemoryTokenPurged`를 실측하고, 미정리 시 `RuntimeError` 발생.
+  3. 증거 스키마(`portal-login-journey-evidence.schema.json`)에 `inMemoryTokenPurged` 속성을 추가하고, `validate_evidence`에서 `acceptanceClaim=True` 시 `inMemoryTokenPurged=True`를 필수 불변식으로 강제.
+  4. 로그아웃 후 in-memory token 잔류 시 fail-closed 차단 시험 2종 완비.
+
+---
+
+## 5. 최종 검증 결과 요약 (2026-10-01)
+
+- **로그인 여정 하네스 스위트**: `pytest tests/test_portal_login_journey_harness.py` -> **52 passed in 21.96s (100% PASS)**
+- **웹 클라이언트 타입 검사**: `cd apps/web && npx tsc -b` -> **타입 에러 0건 (PASS)**
+- **웹 클라이언트 프로덕션 빌드**: `cd apps/web && npm run build` -> **Vite 프로덕션 번들 정상 생성 (PASS, 8.09s)**
+- **라우트 커버리지 검증**: `pytest tests/test_route_coverage.py` -> **40 passed (100% PASS)**
+- **프런트엔드 무결성 점검**: `python tools/check_frontend_integrity.py` -> **9대 무결성 규칙 위반 0건 (PASS)**
+- **계약 바인딩 점검**: `python tools/check_contract_bindings.py` -> **55개 픽스처 전수 커버리지, 14개 리플레이 가드 PASS**
+- **문서 무결성 점검**: `python tools/check_docs.py` -> **PASS: 1037 versioned documents**
+- **단일 출처 검사**: `python tools/check_doc_single_source.py --ratchet` -> **19 pairs PASS**
+- **Git diff whitespace**: `git diff --check` -> **0 warnings (PASS)**

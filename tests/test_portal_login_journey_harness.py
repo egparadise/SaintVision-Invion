@@ -27,6 +27,7 @@ import ssl
 import subprocess
 import sys
 import threading
+import time
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 from typing import Any, Dict
@@ -197,7 +198,7 @@ def test_unresolved_domain_honestly_reports_blocked_external():
     unresolved_url = "https://portal.sv.lan"
     observer = PortalLoginJourneyObserver(target_url=unresolved_url, mock_mode=False)
 
-    evidence = observer.execute_journey()
+    evidence = observer.execute_journey(require_clean=False, require_remote_containment=False)
 
     assert evidence["overallStatus"] == "BLOCKED_EXTERNAL"
     assert evidence["blockingReason"] is not None
@@ -245,7 +246,7 @@ def test_closed_tcp_port_honestly_reports_fail(monkeypatch):
         mock_mode=False,
     )
 
-    evidence = observer.execute_journey()
+    evidence = observer.execute_journey(require_clean=False, require_remote_containment=False)
 
     # Must be FAIL (service down), NOT BLOCKED_EXTERNAL!
     assert evidence["overallStatus"] == "FAIL"
@@ -683,7 +684,7 @@ def test_live_browser_step2_failure_marks_downstream_not_observed(monkeypatch):
     monkeypatch.setattr("playwright.sync_api.sync_playwright", lambda: FakePlaywright())
 
     observer = PortalLoginJourneyObserver(target_url="https://portal.sv.lan", mock_mode=False)
-    evidence = observer.execute_journey()
+    evidence = observer.execute_journey(require_clean=False, require_remote_containment=False)
 
     assert evidence["overallStatus"] == "FAIL"
     assert evidence["steps"][0]["id"] == "portal_tls_reachability"
@@ -736,8 +737,8 @@ def test_live_browser_all_5_steps_success_sets_acceptance_claim(monkeypatch, tmp
                 session_resp = MagicMock(url="https://portal.sv.lan/v1/session", status=200)
                 session_resp.json.return_value = {
                     "subjectId": "oidc:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-                    "tenantId": "test-tenant",
-                    "expiresAt": 1900000000,
+                    "tenantId": "c9a0b1c2-d3e4-4f5a-8b9c-0d1e2f3a4b5c",
+                    "expiresAt": int(time.time()) + 7200,
                 }
                 cb(session_resp)
             return None
@@ -746,7 +747,12 @@ def test_live_browser_all_5_steps_success_sets_acceptance_claim(monkeypatch, tmp
             pass
 
         def evaluate(self, script):
-            return {"txCleared": True, "storagePurged": True}
+            return {
+                "txCleared": True,
+                "storagePurged": True,
+                "inMemorySeamPresent": True,
+                "inMemoryTokenPurged": True,
+            }
 
     class FakeContext:
         def new_page(self):
@@ -765,7 +771,11 @@ def test_live_browser_all_5_steps_success_sets_acceptance_claim(monkeypatch, tmp
         @property
         def chromium(self):
             m = MagicMock()
-            m.launch.return_value = FakeBrowser()
+            def launch(headless=True, args=None):
+                args_list = args or []
+                assert all("ignore-cert" not in a.lower() for a in args_list), f"Certificate ignore flag found in {args_list}"
+                return FakeBrowser()
+            m.launch.side_effect = launch
             return m
         def __enter__(self):
             return self
@@ -780,7 +790,7 @@ def test_live_browser_all_5_steps_success_sets_acceptance_claim(monkeypatch, tmp
         allowed_root_fingerprints=[ca_fp],
         mock_mode=False,
     )
-    evidence = observer.execute_journey()
+    evidence = observer.execute_journey(require_clean=False, require_remote_containment=False)
 
     assert evidence["overallStatus"] == "PASS"
     assert evidence["measurementKind"] == "LIVE_BROWSER"
@@ -820,7 +830,7 @@ def test_live_browser_without_ca_bundle_sets_acceptance_claim_false(monkeypatch)
         def wait_for_timeout(self, ms):
             pass
         def evaluate(self, script):
-            return {"txCleared": True, "storagePurged": True}
+            return {"txCleared": True, "storagePurged": True, "inMemorySeamPresent": True, "inMemoryTokenPurged": True}
 
     class FakeContext:
         def new_page(self):
@@ -848,7 +858,7 @@ def test_live_browser_without_ca_bundle_sets_acceptance_claim_false(monkeypatch)
     monkeypatch.setattr("playwright.sync_api.sync_playwright", lambda: FakePlaywright())
 
     observer = PortalLoginJourneyObserver(target_url="https://portal.sv.lan", ca_bundle=None, mock_mode=False)
-    evidence = observer.execute_journey()
+    evidence = observer.execute_journey(require_clean=False, require_remote_containment=False)
 
     # Without CA bundle, acceptanceClaim must be False!
     assert evidence["acceptanceClaim"] is False
@@ -885,7 +895,7 @@ def test_live_browser_fails_when_network_token_or_session_not_observed(monkeypat
         def wait_for_timeout(self, ms):
             pass
         def evaluate(self, script):
-            return {"txCleared": True, "storagePurged": True}
+            return {"txCleared": True, "storagePurged": True, "inMemorySeamPresent": True, "inMemoryTokenPurged": True}
 
     class FakeContext:
         def new_page(self):
@@ -918,7 +928,7 @@ def test_live_browser_fails_when_network_token_or_session_not_observed(monkeypat
         allowed_root_fingerprints=[ca_fp],
         mock_mode=False,
     )
-    evidence = observer.execute_journey()
+    evidence = observer.execute_journey(require_clean=False, require_remote_containment=False)
 
     # Step 3 must FAIL because token endpoint was not observed on network
     assert evidence["overallStatus"] == "FAIL"
@@ -927,3 +937,596 @@ def test_live_browser_fails_when_network_token_or_session_not_observed(monkeypat
     assert "Token endpoint exchange request was not observed" in evidence["steps"][2]["detail"]
     assert evidence["acceptanceClaim"] is False
     validate_evidence(evidence)
+
+
+# =========================================================================
+# 9. Review Remediations (N1, N2, N3, N4)
+# =========================================================================
+
+# --- N1: Lookalike Origin and Canonical SessionView Schema Tests ---
+
+def test_live_browser_rejects_lookalike_token_origin(monkeypatch, tmp_path):
+    """N1: Token endpoint on lookalike domain (e.g. idp.sv.lan.attacker.invalid) MUST NOT be accepted."""
+    from unittest.mock import MagicMock
+
+    _, _, ca_pem, ca_fp = _generate_test_ca("SaintVision Intranet Root CA")
+    ca_bundle = tmp_path / "ca_bundle.pem"
+    ca_bundle.write_bytes(ca_pem)
+
+    monkeypatch.setattr("tools.observe_portal_login_journey.check_domain_resolution", lambda h: (True, None))
+    monkeypatch.setattr("tools.observe_portal_login_journey.check_tcp_connection", lambda h, p, timeout_sec=2.0: (True, None))
+    monkeypatch.setattr("tools.observe_portal_login_journey.verify_tls_socket_handshake", lambda h, p, c, timeout_sec=2.0: (True, None))
+
+    class FakePage:
+        url = "https://portal.sv.lan/studio"
+        def __init__(self):
+            self._callbacks = []
+        def on(self, event, handler):
+            if event == "response":
+                self._callbacks.append(handler)
+        def goto(self, url, timeout=10000, wait_until="domcontentloaded"):
+            return MagicMock(status=200)
+        def locator(self, selector):
+            loc = MagicMock()
+            loc.first = loc
+            loc.wait_for.return_value = None
+            loc.click.return_value = None
+            loc.is_visible.return_value = False
+            return loc
+        def wait_for_url(self, pred, timeout=10000):
+            for cb in self._callbacks:
+                # Injects token on attacker lookalike domain!
+                cb(MagicMock(url="https://idp.sv.lan.attacker.invalid/protocol/openid-connect/token", status=200))
+                session_resp = MagicMock(url="https://portal.sv.lan/v1/session", status=200)
+                session_resp.json.return_value = {
+                    "subjectId": "oidc:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                    "tenantId": "c9a0b1c2-d3e4-4f5a-8b9c-0d1e2f3a4b5c",
+                    "expiresAt": int(time.time()) + 7200,
+                }
+                cb(session_resp)
+            return None
+        def wait_for_timeout(self, ms):
+            pass
+        def evaluate(self, script):
+            return {"txCleared": True, "storagePurged": True, "inMemorySeamPresent": True, "inMemoryTokenPurged": True}
+
+    class FakeContext:
+        def new_page(self):
+            return FakePage()
+        def close(self):
+            pass
+
+    class FakeBrowser:
+        def new_context(self, **kwargs):
+            return FakeContext()
+        def close(self):
+            pass
+
+    class FakePlaywright:
+        @property
+        def chromium(self):
+            m = MagicMock()
+            m.launch.return_value = FakeBrowser()
+            return m
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            pass
+
+    monkeypatch.setattr("playwright.sync_api.sync_playwright", lambda: FakePlaywright())
+
+    observer = PortalLoginJourneyObserver(
+        target_url="https://portal.sv.lan",
+        ca_bundle=str(ca_bundle),
+        allowed_root_fingerprints=[ca_fp],
+        mock_mode=False,
+    )
+    evidence = observer.execute_journey(require_clean=False, require_remote_containment=False)
+
+    assert evidence["overallStatus"] == "FAIL"
+    assert evidence["steps"][2]["id"] == "pkce_callback"
+    assert evidence["steps"][2]["status"] == "FAIL"
+    assert "Token endpoint exchange request was not observed" in evidence["steps"][2]["detail"]
+    assert evidence["acceptanceClaim"] is False
+
+
+def test_live_browser_rejects_lookalike_portal_origin(monkeypatch, tmp_path):
+    """N1: Session endpoint on lookalike domain (e.g. portal.sv.lan.attacker.invalid) MUST NOT be accepted."""
+    from unittest.mock import MagicMock
+
+    _, _, ca_pem, ca_fp = _generate_test_ca("SaintVision Intranet Root CA")
+    ca_bundle = tmp_path / "ca_bundle.pem"
+    ca_bundle.write_bytes(ca_pem)
+
+    monkeypatch.setattr("tools.observe_portal_login_journey.check_domain_resolution", lambda h: (True, None))
+    monkeypatch.setattr("tools.observe_portal_login_journey.check_tcp_connection", lambda h, p, timeout_sec=2.0: (True, None))
+    monkeypatch.setattr("tools.observe_portal_login_journey.verify_tls_socket_handshake", lambda h, p, c, timeout_sec=2.0: (True, None))
+
+    class FakePage:
+        url = "https://portal.sv.lan/studio"
+        def __init__(self):
+            self._callbacks = []
+        def on(self, event, handler):
+            if event == "response":
+                self._callbacks.append(handler)
+        def goto(self, url, timeout=10000, wait_until="domcontentloaded"):
+            return MagicMock(status=200)
+        def locator(self, selector):
+            loc = MagicMock()
+            loc.first = loc
+            loc.wait_for.return_value = None
+            loc.click.return_value = None
+            loc.is_visible.return_value = False
+            return loc
+        def wait_for_url(self, pred, timeout=10000):
+            for cb in self._callbacks:
+                cb(MagicMock(url="https://idp.sv.lan/protocol/openid-connect/token", status=200))
+                # Session on lookalike domain!
+                session_resp = MagicMock(url="https://portal.sv.lan.attacker.invalid/v1/session", status=200)
+                session_resp.json.return_value = {
+                    "subjectId": "oidc:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                    "tenantId": "c9a0b1c2-d3e4-4f5a-8b9c-0d1e2f3a4b5c",
+                    "expiresAt": int(time.time()) + 7200,
+                }
+                cb(session_resp)
+            return None
+        def wait_for_timeout(self, ms):
+            pass
+        def evaluate(self, script):
+            return {"txCleared": True, "storagePurged": True, "inMemorySeamPresent": True, "inMemoryTokenPurged": True}
+
+    class FakeContext:
+        def new_page(self):
+            return FakePage()
+        def close(self):
+            pass
+
+    class FakeBrowser:
+        def new_context(self, **kwargs):
+            return FakeContext()
+        def close(self):
+            pass
+
+    class FakePlaywright:
+        @property
+        def chromium(self):
+            m = MagicMock()
+            m.launch.return_value = FakeBrowser()
+            return m
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            pass
+
+    monkeypatch.setattr("playwright.sync_api.sync_playwright", lambda: FakePlaywright())
+
+    observer = PortalLoginJourneyObserver(
+        target_url="https://portal.sv.lan",
+        ca_bundle=str(ca_bundle),
+        allowed_root_fingerprints=[ca_fp],
+        mock_mode=False,
+    )
+    evidence = observer.execute_journey(require_clean=False, require_remote_containment=False)
+
+    assert evidence["overallStatus"] == "FAIL"
+    assert evidence["steps"][3]["id"] == "identity_session_display"
+    assert evidence["steps"][3]["status"] == "FAIL"
+    assert "/v1/session endpoint request was not observed" in evidence["steps"][3]["detail"]
+    assert evidence["acceptanceClaim"] is False
+
+
+def test_live_browser_rejects_invalid_session_subject(monkeypatch, tmp_path):
+    """N1: Response with invalid subjectId (e.g. oidc:x) fails canonical SessionView validation."""
+    from unittest.mock import MagicMock
+
+    _, _, ca_pem, ca_fp = _generate_test_ca("SaintVision Intranet Root CA")
+    ca_bundle = tmp_path / "ca_bundle.pem"
+    ca_bundle.write_bytes(ca_pem)
+
+    monkeypatch.setattr("tools.observe_portal_login_journey.check_domain_resolution", lambda h: (True, None))
+    monkeypatch.setattr("tools.observe_portal_login_journey.check_tcp_connection", lambda h, p, timeout_sec=2.0: (True, None))
+    monkeypatch.setattr("tools.observe_portal_login_journey.verify_tls_socket_handshake", lambda h, p, c, timeout_sec=2.0: (True, None))
+
+    class FakePage:
+        url = "https://portal.sv.lan/studio"
+        def __init__(self):
+            self._callbacks = []
+        def on(self, event, handler):
+            if event == "response":
+                self._callbacks.append(handler)
+        def goto(self, url, timeout=10000, wait_until="domcontentloaded"):
+            return MagicMock(status=200)
+        def locator(self, selector):
+            loc = MagicMock()
+            loc.first = loc
+            loc.wait_for.return_value = None
+            loc.click.return_value = None
+            loc.is_visible.return_value = False
+            return loc
+        def wait_for_url(self, pred, timeout=10000):
+            for cb in self._callbacks:
+                cb(MagicMock(url="https://idp.sv.lan/protocol/openid-connect/token", status=200))
+                session_resp = MagicMock(url="https://portal.sv.lan/v1/session", status=200)
+                # Invalid subjectId "oidc:x"
+                session_resp.json.return_value = {
+                    "subjectId": "oidc:x",
+                    "tenantId": "c9a0b1c2-d3e4-4f5a-8b9c-0d1e2f3a4b5c",
+                    "expiresAt": int(time.time()) + 7200,
+                }
+                cb(session_resp)
+            return None
+        def wait_for_timeout(self, ms):
+            pass
+        def evaluate(self, script):
+            return {"txCleared": True, "storagePurged": True, "inMemorySeamPresent": True, "inMemoryTokenPurged": True}
+
+    class FakeContext:
+        def new_page(self):
+            return FakePage()
+        def close(self):
+            pass
+
+    class FakeBrowser:
+        def new_context(self, **kwargs):
+            return FakeContext()
+        def close(self):
+            pass
+
+    class FakePlaywright:
+        @property
+        def chromium(self):
+            m = MagicMock()
+            m.launch.return_value = FakeBrowser()
+            return m
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            pass
+
+    monkeypatch.setattr("playwright.sync_api.sync_playwright", lambda: FakePlaywright())
+
+    observer = PortalLoginJourneyObserver(
+        target_url="https://portal.sv.lan",
+        ca_bundle=str(ca_bundle),
+        allowed_root_fingerprints=[ca_fp],
+        mock_mode=False,
+    )
+    evidence = observer.execute_journey(require_clean=False, require_remote_containment=False)
+
+    assert evidence["overallStatus"] == "FAIL"
+    assert evidence["steps"][3]["id"] == "identity_session_display"
+    assert evidence["steps"][3]["status"] == "FAIL"
+    assert "did not match canonical session schema" in evidence["steps"][3]["detail"]
+    assert evidence["acceptanceClaim"] is False
+
+
+def test_live_browser_rejects_invalid_session_uuid(monkeypatch, tmp_path):
+    """N1: Response with non-UUID tenantId (e.g. 'not-a-uuid') fails canonical SessionView validation."""
+    from unittest.mock import MagicMock
+
+    _, _, ca_pem, ca_fp = _generate_test_ca("SaintVision Intranet Root CA")
+    ca_bundle = tmp_path / "ca_bundle.pem"
+    ca_bundle.write_bytes(ca_pem)
+
+    monkeypatch.setattr("tools.observe_portal_login_journey.check_domain_resolution", lambda h: (True, None))
+    monkeypatch.setattr("tools.observe_portal_login_journey.check_tcp_connection", lambda h, p, timeout_sec=2.0: (True, None))
+    monkeypatch.setattr("tools.observe_portal_login_journey.verify_tls_socket_handshake", lambda h, p, c, timeout_sec=2.0: (True, None))
+
+    class FakePage:
+        url = "https://portal.sv.lan/studio"
+        def __init__(self):
+            self._callbacks = []
+        def on(self, event, handler):
+            if event == "response":
+                self._callbacks.append(handler)
+        def goto(self, url, timeout=10000, wait_until="domcontentloaded"):
+            return MagicMock(status=200)
+        def locator(self, selector):
+            loc = MagicMock()
+            loc.first = loc
+            loc.wait_for.return_value = None
+            loc.click.return_value = None
+            loc.is_visible.return_value = False
+            return loc
+        def wait_for_url(self, pred, timeout=10000):
+            for cb in self._callbacks:
+                cb(MagicMock(url="https://idp.sv.lan/protocol/openid-connect/token", status=200))
+                session_resp = MagicMock(url="https://portal.sv.lan/v1/session", status=200)
+                # Invalid tenantId "not-a-uuid"
+                session_resp.json.return_value = {
+                    "subjectId": "oidc:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                    "tenantId": "not-a-uuid",
+                    "expiresAt": int(time.time()) + 7200,
+                }
+                cb(session_resp)
+            return None
+        def wait_for_timeout(self, ms):
+            pass
+        def evaluate(self, script):
+            return {"txCleared": True, "storagePurged": True, "inMemorySeamPresent": True, "inMemoryTokenPurged": True}
+
+    class FakeContext:
+        def new_page(self):
+            return FakePage()
+        def close(self):
+            pass
+
+    class FakeBrowser:
+        def new_context(self, **kwargs):
+            return FakeContext()
+        def close(self):
+            pass
+
+    class FakePlaywright:
+        @property
+        def chromium(self):
+            m = MagicMock()
+            m.launch.return_value = FakeBrowser()
+            return m
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            pass
+
+    monkeypatch.setattr("playwright.sync_api.sync_playwright", lambda: FakePlaywright())
+
+    observer = PortalLoginJourneyObserver(
+        target_url="https://portal.sv.lan",
+        ca_bundle=str(ca_bundle),
+        allowed_root_fingerprints=[ca_fp],
+        mock_mode=False,
+    )
+    evidence = observer.execute_journey(require_clean=False, require_remote_containment=False)
+
+    assert evidence["overallStatus"] == "FAIL"
+    assert evidence["steps"][3]["id"] == "identity_session_display"
+    assert evidence["steps"][3]["status"] == "FAIL"
+    assert "did not match canonical session schema" in evidence["steps"][3]["detail"]
+    assert evidence["acceptanceClaim"] is False
+
+
+def test_live_browser_rejects_expired_session(monkeypatch, tmp_path):
+    """N1: Response with expiresAt <= now (e.g. -1 or past) fails canonical SessionView validation."""
+    from unittest.mock import MagicMock
+
+    _, _, ca_pem, ca_fp = _generate_test_ca("SaintVision Intranet Root CA")
+    ca_bundle = tmp_path / "ca_bundle.pem"
+    ca_bundle.write_bytes(ca_pem)
+
+    monkeypatch.setattr("tools.observe_portal_login_journey.check_domain_resolution", lambda h: (True, None))
+    monkeypatch.setattr("tools.observe_portal_login_journey.check_tcp_connection", lambda h, p, timeout_sec=2.0: (True, None))
+    monkeypatch.setattr("tools.observe_portal_login_journey.verify_tls_socket_handshake", lambda h, p, c, timeout_sec=2.0: (True, None))
+
+    class FakePage:
+        url = "https://portal.sv.lan/studio"
+        def __init__(self):
+            self._callbacks = []
+        def on(self, event, handler):
+            if event == "response":
+                self._callbacks.append(handler)
+        def goto(self, url, timeout=10000, wait_until="domcontentloaded"):
+            return MagicMock(status=200)
+        def locator(self, selector):
+            loc = MagicMock()
+            loc.first = loc
+            loc.wait_for.return_value = None
+            loc.click.return_value = None
+            loc.is_visible.return_value = False
+            return loc
+        def wait_for_url(self, pred, timeout=10000):
+            for cb in self._callbacks:
+                cb(MagicMock(url="https://idp.sv.lan/protocol/openid-connect/token", status=200))
+                session_resp = MagicMock(url="https://portal.sv.lan/v1/session", status=200)
+                # Expired session: expiresAt = -1
+                session_resp.json.return_value = {
+                    "subjectId": "oidc:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                    "tenantId": "c9a0b1c2-d3e4-4f5a-8b9c-0d1e2f3a4b5c",
+                    "expiresAt": -1,
+                }
+                cb(session_resp)
+            return None
+        def wait_for_timeout(self, ms):
+            pass
+        def evaluate(self, script):
+            return {"txCleared": True, "storagePurged": True, "inMemorySeamPresent": True, "inMemoryTokenPurged": True}
+
+    class FakeContext:
+        def new_page(self):
+            return FakePage()
+        def close(self):
+            pass
+
+    class FakeBrowser:
+        def new_context(self, **kwargs):
+            return FakeContext()
+        def close(self):
+            pass
+
+    class FakePlaywright:
+        @property
+        def chromium(self):
+            m = MagicMock()
+            m.launch.return_value = FakeBrowser()
+            return m
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            pass
+
+    monkeypatch.setattr("playwright.sync_api.sync_playwright", lambda: FakePlaywright())
+
+    observer = PortalLoginJourneyObserver(
+        target_url="https://portal.sv.lan",
+        ca_bundle=str(ca_bundle),
+        allowed_root_fingerprints=[ca_fp],
+        mock_mode=False,
+    )
+    evidence = observer.execute_journey(require_clean=False, require_remote_containment=False)
+
+    assert evidence["overallStatus"] == "FAIL"
+    assert evidence["steps"][3]["id"] == "identity_session_display"
+    assert evidence["steps"][3]["status"] == "FAIL"
+    assert "did not match canonical session schema" in evidence["steps"][3]["detail"]
+    assert evidence["acceptanceClaim"] is False
+
+
+# --- N2: Certificate-Error Bypass Flags Prohibition Tests ---
+
+def test_browser_launch_strictly_zero_certificate_ignore_flags():
+    """N2: Prohibits any certificate ignore flags in launch arguments and extra args."""
+    with pytest.raises(SecurityCircumventionError) as exc:
+        PortalLoginJourneyObserver(
+            target_url="https://portal.sv.lan",
+            mock_mode=False,
+            extra_args=["--ignore-certificate-errors-spki-list=abc"],
+        )
+    assert "detected prohibited flag" in str(exc.value)
+
+    with pytest.raises(SecurityCircumventionError):
+        check_circumvention_flags(["--ignore-certificate-errors"])
+    with pytest.raises(SecurityCircumventionError):
+        check_circumvention_flags(["--ignore-certificate-errors-spki-list=xyz"])
+    with pytest.raises(SecurityCircumventionError):
+        check_circumvention_flags(["ignoreHTTPSErrors"])
+
+
+# --- N3: Clean and Reachable Provenance Tests ---
+
+def test_execute_journey_defaults_provenance_for_live_mode(monkeypatch):
+    """N3: LIVE execution defaults to require_clean=True and require_remote_containment=True."""
+    called_clean = None
+    called_remote = None
+
+    def fake_get_git_sha(repo_path=None, require_clean=False, require_remote_containment=False, allowed_remotes=("origin/",)):
+        nonlocal called_clean, called_remote
+        called_clean = require_clean
+        called_remote = require_remote_containment
+        return "e4f5835b4eefb41d490cc33c41258d8f6dd1786a"
+
+    monkeypatch.setattr("tools.observe_portal_login_journey.get_git_sha", fake_get_git_sha)
+    monkeypatch.setattr("tools.observe_portal_login_journey.check_domain_resolution", lambda h: (False, "DNS unresolvable"))
+
+    observer = PortalLoginJourneyObserver(target_url="https://portal.sv.lan", mock_mode=False)
+    observer.execute_journey()
+
+    assert called_clean is True
+    assert called_remote is True
+
+
+# --- N4: In-Memory Token Purge and Logout Tests ---
+
+def test_live_browser_fails_when_in_memory_token_not_purged(monkeypatch, tmp_path):
+    """N4: If in-memory access token is not purged after logout, Step 5 fails."""
+    from unittest.mock import MagicMock
+
+    _, _, ca_pem, ca_fp = _generate_test_ca("SaintVision Intranet Root CA")
+    ca_bundle = tmp_path / "ca_bundle.pem"
+    ca_bundle.write_bytes(ca_pem)
+
+    monkeypatch.setattr("tools.observe_portal_login_journey.check_domain_resolution", lambda h: (True, None))
+    monkeypatch.setattr("tools.observe_portal_login_journey.check_tcp_connection", lambda h, p, timeout_sec=2.0: (True, None))
+    monkeypatch.setattr("tools.observe_portal_login_journey.verify_tls_socket_handshake", lambda h, p, c, timeout_sec=2.0: (True, None))
+
+    class FakePage:
+        url = "https://portal.sv.lan/studio"
+        def __init__(self):
+            self._callbacks = []
+        def on(self, event, handler):
+            if event == "response":
+                self._callbacks.append(handler)
+        def goto(self, url, timeout=10000, wait_until="domcontentloaded"):
+            return MagicMock(status=200)
+        def locator(self, selector):
+            loc = MagicMock()
+            loc.first = loc
+            loc.wait_for.return_value = None
+            loc.click.return_value = None
+            loc.is_visible.return_value = False
+            return loc
+        def wait_for_url(self, pred, timeout=10000):
+            for cb in self._callbacks:
+                cb(MagicMock(url="https://idp.sv.lan/protocol/openid-connect/token", status=200))
+                session_resp = MagicMock(url="https://portal.sv.lan/v1/session", status=200)
+                session_resp.json.return_value = {
+                    "subjectId": "oidc:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                    "tenantId": "c9a0b1c2-d3e4-4f5a-8b9c-0d1e2f3a4b5c",
+                    "expiresAt": int(time.time()) + 7200,
+                }
+                cb(session_resp)
+            return None
+        def wait_for_timeout(self, ms):
+            pass
+        def evaluate(self, script):
+            # Simulates inMemoryTokenPurged = False (in-memory token leaked / not cleared)
+            return {
+                "txCleared": True,
+                "storagePurged": True,
+                "inMemorySeamPresent": True,
+                "inMemoryTokenPurged": False,
+            }
+
+    class FakeContext:
+        def new_page(self):
+            return FakePage()
+        def close(self):
+            pass
+
+    class FakeBrowser:
+        def new_context(self, **kwargs):
+            return FakeContext()
+        def close(self):
+            pass
+
+    class FakePlaywright:
+        @property
+        def chromium(self):
+            m = MagicMock()
+            m.launch.return_value = FakeBrowser()
+            return m
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            pass
+
+    monkeypatch.setattr("playwright.sync_api.sync_playwright", lambda: FakePlaywright())
+
+    observer = PortalLoginJourneyObserver(
+        target_url="https://portal.sv.lan",
+        ca_bundle=str(ca_bundle),
+        allowed_root_fingerprints=[ca_fp],
+        mock_mode=False,
+    )
+    evidence = observer.execute_journey(require_clean=False, require_remote_containment=False)
+
+    assert evidence["overallStatus"] == "FAIL"
+    assert evidence["steps"][4]["id"] == "logout"
+    assert evidence["steps"][4]["status"] == "FAIL"
+    assert "In-memory access token was not cleared after logout" in evidence["steps"][4]["detail"]
+    assert evidence["acceptanceClaim"] is False
+
+
+def test_validate_evidence_requires_in_memory_token_purged():
+    """N4: Evidence with acceptanceClaim=True without inMemoryTokenPurged=True is rejected."""
+    observer = PortalLoginJourneyObserver(mock_mode=True)
+    evidence = observer.execute_journey()
+
+    evidence["referenceOnly"] = False
+    evidence["acceptanceClaim"] = True
+    evidence["measurementKind"] = "LIVE_BROWSER"
+    evidence["audit"]["tlsValidationEnforced"] = True
+    evidence["caDigest"] = {
+        "caBundleSha256": "a" * 64,
+        "rootFingerprint": "b" * 64,
+        "fingerprintVerified": True,
+    }
+    # Step 5 without inMemoryTokenPurged
+    evidence["steps"][4]["observations"] = {
+        "loginScreenRestored": True,
+        "transactionCleared": True,
+        "storagePurged": True,
+        "inMemoryTokenPurged": False,
+    }
+
+    with pytest.raises(jsonschema.ValidationError) as exc:
+        validate_evidence(evidence)
+    assert "inMemoryTokenPurged=true in logout" in str(exc.value)

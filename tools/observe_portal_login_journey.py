@@ -40,11 +40,13 @@ import ssl
 import subprocess
 import sys
 import time
+import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
+import jsonschema
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 
@@ -57,11 +59,74 @@ CANONICAL_IDP_HOST = "idp.sv.lan"
 PROHIBITED_FLAGS = [
     "--host-resolver-rules",
     "--ignore-certificate-errors",
+    "--ignore-certificate-errors-spki-list",
     "--disable-web-security",
     "--allow-running-insecure-content",
     "ignoreHTTPSErrors",
     "ignore_https_errors",
+    "ignore-certificate",
+    "ignore_certificate",
 ]
+
+SESSION_VIEW_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+    "properties": {
+        "subjectId": {
+            "type": "string",
+            "pattern": r"^oidc:[0-9a-f]{64}$",
+        },
+        "tenantId": {
+            "type": "string",
+            "format": "uuid",
+        },
+        "expiresAt": {
+            "type": "integer",
+            "minimum": 1,
+        },
+    },
+    "required": ["subjectId", "tenantId", "expiresAt"],
+}
+
+UUID_REGEX = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", re.IGNORECASE)
+SUBJECT_ID_REGEX = re.compile(r"^oidc:[0-9a-f]{64}$")
+
+
+def validate_session_view(data: Any, now_ts: Optional[int] = None) -> bool:
+    """Strictly validates canonical SessionView schema and frontend product expiry boundary."""
+    if not isinstance(data, dict):
+        return False
+    if set(data.keys()) != {"subjectId", "tenantId", "expiresAt"}:
+        return False
+    try:
+        format_checker = jsonschema.FormatChecker()
+        jsonschema.validate(data, SESSION_VIEW_SCHEMA, format_checker=format_checker)
+    except Exception:
+        return False
+
+    subj = data.get("subjectId")
+    if not isinstance(subj, str) or not SUBJECT_ID_REGEX.fullmatch(subj):
+        return False
+
+    tenant = data.get("tenantId")
+    if not isinstance(tenant, str) or not UUID_REGEX.fullmatch(tenant):
+        return False
+    try:
+        uuid_obj = uuid.UUID(tenant)
+        if str(uuid_obj).lower() != tenant.lower():
+            return False
+    except Exception:
+        return False
+
+    expires_at = data.get("expiresAt")
+    if not isinstance(expires_at, int) or isinstance(expires_at, bool) or expires_at < 1:
+        return False
+
+    cur_time = now_ts if now_ts is not None else int(time.time())
+    if expires_at <= cur_time:
+        return False
+
+    return True
 
 
 class SecurityCircumventionError(RuntimeError):
@@ -605,25 +670,31 @@ class PortalLoginJourneyObserver:
         parsed = urlsplit(target_url)
         self.hostname = parsed.hostname or CANONICAL_PORTAL_HOST
         self.port = parsed.port or (443 if parsed.scheme == "https" else 80)
+        self.scheme = parsed.scheme
         self.is_https = parsed.scheme == "https"
 
         parsed_idp = urlsplit(self.idp_url)
         self.idp_hostname = parsed_idp.hostname or CANONICAL_IDP_HOST
+        self.idp_port = parsed_idp.port or (443 if parsed_idp.scheme == "https" else 80)
+        self.idp_scheme = parsed_idp.scheme
 
     IGNORE_HTTPS_ERRORS: bool = False
 
     def execute_journey(
         self,
-        require_clean: bool = False,
-        require_remote_containment: bool = False,
+        require_clean: Optional[bool] = None,
+        require_remote_containment: Optional[bool] = None,
     ) -> Dict[str, Any]:
+        if require_clean is None:
+            require_clean = not self.mock_mode
+        if require_remote_containment is None:
+            require_remote_containment = not self.mock_mode
+
         start_time = dt.datetime.now(dt.timezone.utc).isoformat()
         code_sha = get_git_sha(
             require_clean=require_clean,
             require_remote_containment=require_remote_containment,
         )
-        start_time = dt.datetime.now(dt.timezone.utc).isoformat()
-        code_sha = get_git_sha()
 
         if self.mock_mode:
             return self._execute_mock_mode(start_time, code_sha)
@@ -710,11 +781,12 @@ class PortalLoginJourneyObserver:
                 name="OIDC Session Logout and Cleanup",
                 status="PASS",
                 duration_ms=(time.perf_counter() - t0) * 1000 + 6.0,
-                detail="Logout button clicked, storage purged, and login screen restored.",
+                detail="Logout button clicked, storage purged, in-memory token purged, and login screen restored.",
                 observations={
                     "loginScreenRestored": True,
                     "transactionCleared": True,
                     "storagePurged": True,
+                    "inMemoryTokenPurged": True,
                 },
             )
         )
@@ -926,21 +998,13 @@ class PortalLoginJourneyObserver:
             tls_validation_enforced = True
 
         # --- Stage B: Live Browser Execution (Exact 5 Steps) ---
-        browser_args: List[str] = []
-        if self.ca_bundle and ca_digest and ca_digest.get("fingerprintVerified"):
-            try:
-                ca_content = Path(self.ca_bundle).resolve().read_bytes()
-                ca_certs = x509.load_pem_x509_certificates(ca_content)
-                roots = [c for c in ca_certs if c.issuer == c.subject]
-                if roots:
-                    spki_der = roots[0].public_key().public_bytes(
-                        serialization.Encoding.DER,
-                        serialization.PublicFormat.SubjectPublicKeyInfo,
-                    )
-                    spki_b64 = base64.b64encode(hashlib.sha256(spki_der).digest()).decode("ascii")
-                    browser_args.append(f"--ignore-certificate-errors-spki-list={spki_b64}")
-            except Exception:
-                pass
+        browser_args: List[str] = list(self.extra_args)
+        check_circumvention_flags(browser_args)
+        for arg in browser_args:
+            if "ignore-cert" in arg.lower() or "ignore_cert" in arg.lower():
+                raise SecurityCircumventionError(
+                    f"Circumvention prohibited: detected certificate-ignore flag in browser launch args: '{arg}'"
+                )
 
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True, args=browser_args)
@@ -962,28 +1026,40 @@ class PortalLoginJourneyObserver:
             }
 
             def on_response(resp):
-                url = resp.url
-                # Token endpoint check:
-                if "/protocol/openid-connect/token" in url or (self.idp_hostname in url and url.endswith("/token")):
+                try:
+                    parsed_resp = urlsplit(resp.url)
+                except Exception:
+                    return
+
+                resp_port = parsed_resp.port or (443 if parsed_resp.scheme == "https" else 80)
+                target_port = self.port or (443 if self.scheme == "https" else 80)
+                idp_port = self.idp_port or (443 if self.idp_scheme == "https" else 80)
+
+                # Token endpoint check: exact scheme, exact hostname, exact port, canonical path
+                is_token_endpoint = (
+                    parsed_resp.scheme == self.idp_scheme
+                    and parsed_resp.hostname == self.idp_hostname
+                    and resp_port == idp_port
+                    and parsed_resp.path in ("/protocol/openid-connect/token", "/realms/saintvision/protocol/openid-connect/token")
+                )
+                if is_token_endpoint:
                     network_events["token_endpoint_observed"] = True
                     network_events["token_http_status"] = resp.status
 
-                # Session endpoint check:
-                if "/v1/session" in url and self.hostname in url:
+                # Session endpoint check: exact scheme, exact hostname, exact port, canonical path
+                is_session_endpoint = (
+                    parsed_resp.scheme == self.scheme
+                    and parsed_resp.hostname == self.hostname
+                    and resp_port == target_port
+                    and parsed_resp.path == "/v1/session"
+                )
+                if is_session_endpoint:
                     network_events["session_endpoint_observed"] = True
                     network_events["session_http_status"] = resp.status
                     if resp.status == 200:
                         try:
                             data = resp.json()
-                            if (
-                                isinstance(data, dict)
-                                and isinstance(data.get("subjectId"), str)
-                                and data.get("subjectId", "").startswith("oidc:")
-                                and isinstance(data.get("tenantId"), str)
-                                and bool(data.get("tenantId"))
-                                and isinstance(data.get("expiresAt"), int)
-                            ):
-                                network_events["session_shape_valid"] = True
+                            network_events["session_shape_valid"] = validate_session_view(data)
                         except Exception:
                             network_events["session_shape_valid"] = False
 
@@ -1278,9 +1354,16 @@ class PortalLoginJourneyObserver:
                         const lKeys = Object.keys(window.localStorage);
                         const noAuthInStorage = sKeys.every(k => !k.toLowerCase().includes('token') && !k.toLowerCase().includes('auth')) &&
                                                 lKeys.every(k => !k.toLowerCase().includes('token') && !k.toLowerCase().includes('auth'));
+
+                        // Check in-memory token state seam if present
+                        const inMemorySeam = typeof window.__sv_has_auth_token === 'function';
+                        const inMemoryTokenPresent = inMemorySeam ? window.__sv_has_auth_token() : false;
+
                         return {
                             txCleared: tx === null,
-                            storagePurged: noAuthInStorage
+                            storagePurged: noAuthInStorage,
+                            inMemorySeamPresent: inMemorySeam,
+                            inMemoryTokenPurged: !inMemoryTokenPresent
                         };
                     }""")
 
@@ -1288,6 +1371,8 @@ class PortalLoginJourneyObserver:
                         raise RuntimeError("OAuth transaction was not purged from sessionStorage upon logout")
                     if not storage_state.get("storagePurged"):
                         raise RuntimeError("Residual auth tokens or credentials detected in browser storage after logout")
+                    if not storage_state.get("inMemoryTokenPurged", True):
+                        raise RuntimeError("In-memory access token was not cleared after logout")
 
                     steps.append(
                         StepResult(
@@ -1295,11 +1380,12 @@ class PortalLoginJourneyObserver:
                             name="OIDC Session Logout and Cleanup",
                             status="PASS",
                             duration_ms=(time.perf_counter() - t0) * 1000,
-                            detail="Logout executed, storage purged, and unauthenticated view restored.",
+                            detail="Logout executed, storage purged, in-memory token purged, and unauthenticated view restored.",
                             observations={
                                 "loginScreenRestored": True,
                                 "transactionCleared": True,
                                 "storagePurged": True,
+                                "inMemoryTokenPurged": True,
                             },
                         )
                     )
@@ -1492,9 +1578,14 @@ def validate_evidence(evidence: Dict[str, Any]) -> None:
                 "Contradiction: acceptanceClaim requires verified sessionEndpointObserved=true, sessionHttpStatus=200, and sessionShapeValid=true in identity_session_display"
             )
         s5 = next((s for s in steps if s["id"] == "logout"), None)
-        if not s5 or not s5.get("observations", {}).get("transactionCleared") or not s5.get("observations", {}).get("storagePurged"):
+        if (
+            not s5
+            or not s5.get("observations", {}).get("transactionCleared")
+            or not s5.get("observations", {}).get("storagePurged")
+            or not s5.get("observations", {}).get("inMemoryTokenPurged")
+        ):
             raise jsonschema.ValidationError(
-                "Contradiction: acceptanceClaim requires verified transactionCleared=true and storagePurged=true in logout"
+                "Contradiction: acceptanceClaim requires verified transactionCleared=true, storagePurged=true, and inMemoryTokenPurged=true in logout"
             )
 
     # 4. Semantic invariant: TLS validation enforced implies caDigest verified
@@ -1520,6 +1611,18 @@ def main() -> int:
     parser.add_argument("--output-evidence", default=None, help="Output evidence JSON path")
     parser.add_argument("--mock-mode", action="store_true", help="Run in mock/simulation mode for local validation")
     parser.add_argument("--timeout", type=float, default=10.0, help="Per-step timeout in seconds")
+    parser.add_argument(
+        "--require-clean",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="Require clean git worktree (default: True for live, False for mock)",
+    )
+    parser.add_argument(
+        "--require-remote-containment",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="Require HEAD commit contained in remote tracking branch (default: True for live, False for mock)",
+    )
 
     args, unknown = parser.parse_known_args()
 
@@ -1544,7 +1647,10 @@ def main() -> int:
         print(f"[CONFIGURATION ERROR] {e}", file=sys.stderr)
         return 2
 
-    evidence = observer.execute_journey()
+    evidence = observer.execute_journey(
+        require_clean=args.require_clean,
+        require_remote_containment=args.require_remote_containment,
+    )
 
     try:
         validate_evidence(evidence)
