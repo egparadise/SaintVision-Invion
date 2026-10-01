@@ -12,6 +12,7 @@ import { DeveloperStudio } from '../src/features/studio/DeveloperStudio';
 import { ResourceExplorer } from '../src/features/desktop/ResourceExplorer';
 import { InvFileExplorer } from '../src/features/desktop/InvFileExplorer';
 import { ModelLineageView } from '../src/features/mlops/ModelLineageView';
+import { AdminSecurityConsole } from '../src/features/admin/AdminSecurityConsole';
 import * as client from '../src/shared/api/client';
 import * as projectObservation from '../src/shared/api/projectObservation';
 import { fabricObservation } from '../src/shared/api/fabricObservation';
@@ -108,7 +109,7 @@ function extractTokens(block: string): Record<string, string> {
     const name = match[1].trim();
     const val = match[2].trim();
     occurrences[name] = (occurrences[name] || 0) + 1;
-    if (val.startsWith('#')) {
+    if (val.startsWith('#') || val.startsWith('rgba(')) {
       tokens[name] = val;
     }
   }
@@ -118,6 +119,19 @@ function extractTokens(block: string): Record<string, string> {
     }
   }
   return tokens;
+}
+
+function resolveTokenHex(tokenName: string, tokens: Record<string, string>): string {
+  const val = tokens[tokenName];
+  if (!val) throw new Error(`Token ${tokenName} not found in theme tokens`);
+  if (val.startsWith('#')) return val;
+  if (val.startsWith('rgba(')) {
+    const parsed = parseRgba(val);
+    if (!parsed) throw new Error(`Failed to parse rgba token: ${val}`);
+    const canvas = tokens['--color-bg-canvas'];
+    return blendRgba(parsed.rgb, parsed.a, canvas);
+  }
+  throw new Error(`Unsupported token format: ${val}`);
 }
 
 function getAllSourceFiles(dir: string): string[] {
@@ -193,7 +207,7 @@ function scanColorLiterals(text: string): Record<string, number> {
 // Fail-closed multiset inventory of registered files and their exact color literal counts (literal -> max allowed occurrences)
 const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = {
   "app/App.tsx": {"#991b1b": 2, "#dc2626": 1, "#ef4444": 1, "#f87171": 1, "#fca5a5": 1, "#fed7aa": 1, "#fee2e2": 1, "#ffffff": 2, "rgba(239,68,68,0.1)": 1},
-  "features/admin/AdminSecurityConsole.tsx": {"#0d1117": 12, "#161b22": 14, "#21262d": 1, "#30363d": 24, "#3fb950": 16, "#58a6ff": 6, "#8b949e": 40, "#c9d1d9": 12, "#d29922": 1, "#eab308": 1, "#ef4444": 1, "#f0f6fc": 10, "#f85149": 24, "#fca5a5": 1, "#fde047": 1, "#ff7b72": 3, "rgba(0,0,0,0.75)": 1, "rgba(210,153,34,0.2)": 1, "rgba(234,179,8,0.15)": 1, "rgba(239,68,68,0.15)": 1, "rgba(248,81,73,0.15)": 8, "rgba(248,81,73,0.2)": 3, "rgba(46,160,67,0.15)": 2, "rgba(46,160,67,0.2)": 1, "rgba(63,185,80,0.2)": 1},
+  "features/admin/AdminSecurityConsole.tsx": {},
   "features/agent/NaturalLanguageRunView.tsx": {"#0d1117": 6, "#161b22": 7, "#30363d": 12, "#3fb950": 7, "#58a6ff": 8, "#8b949e": 16, "#93c5fd": 1, "#94a3b8": 1, "#c9d1d9": 2, "#cbd5e1": 1, "#f0f6fc": 3, "#f85149": 7, "#ff7b72": 1, "rgba(248,81,73,0.15)": 2, "rgba(46,160,67,0.15)": 1, "rgba(46,160,67,0.2)": 1, "rgba(56,139,253,0.15)": 2, "rgba(56,139,253,0.2)": 1},
   "features/approvals/ApprovalCenter.tsx": {"#1e293b": 1, "#334155": 1, "#3b82f6": 1, "#93c5fd": 1, "#ef4444": 2, "#f8fafc": 1, "#fca5a5": 2, "#fed7aa": 1, "#fff": 1, "rgba(16,185,129,0.15)": 1, "rgba(234,179,8,0.15)": 1, "rgba(239,68,68,0.15)": 2, "rgba(59,130,246,0.1)": 1, "rgba(59,130,246,0.25)": 1},
   "features/approvals/ApprovalDetail.tsx": {"#0d1117": 1, "#30363d": 1, "#58a6ff": 1, "#c9d1d9": 1, "rgba(0,0,0,0.5)": 1, "rgba(220,38,38,0.1)": 1, "rgba(56,139,253,0.15)": 1},
@@ -1902,6 +1916,394 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(violations, `Expected 0 style-pair contrast/collision violations in ModelLineageView, got:\n${violations.join('\n')}`).toEqual([]);
   });
 
+  // 9e. [Card 199 / ACC-09] Component DOM Rendering & Binding Verification: AdminSecurityConsole
+  it('ACC-09 / Card 199: AdminSecurityConsole DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification', async () => {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = vi.fn().mockImplementation((url: string) => {
+      if (url.includes('/v1/operations/kill-switch')) {
+        return Promise.resolve(new Response(JSON.stringify({
+          nodeId: null,
+          version: 5,
+          killSwitchActive: false,
+          nodeStatus: 'online',
+          activeLeases: 0,
+          pendingDeliveries: 0,
+          unsettledRuns: 0,
+          settled: true,
+        }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+      }
+      return Promise.resolve(new Response(JSON.stringify({}), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+    });
+
+    const container = document.createElement('div');
+    container.setAttribute('data-theme', 'light');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    try {
+      await act(async () => {
+        root.render(
+          <AdminSecurityConsole
+            nodes={[
+              {
+                id: 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAV',
+                hostname: 'node-gpu-01',
+                os: 'linux',
+                cpuCores: 32,
+                cpuUsagePercent: 15,
+                memoryTotalBytes: 128 * 1024 ** 3,
+                memoryUsagePercent: 25,
+                gpuName: 'NVIDIA RTX 4090',
+                gpuCount: 2,
+                status: 'online',
+                labels: { tier: 'gpu' },
+              },
+            ]}
+            currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+          />
+        );
+      });
+
+      // 1. Backend kill switch status label
+      const backendStatus = container.querySelector('[data-testid="backend-kill-switch-status"]') as HTMLElement;
+      expect(backendStatus, 'Backend kill switch status must render').not.toBeNull();
+      expect(backendStatus.style.color, 'Backend status color must bind to var(--color-text-secondary)').toBe('var(--color-text-secondary)');
+      const bsFg = helperExtractVar(backendStatus.style.color);
+      expect(getContrast(lightTokens[bsFg], lightTokens['--color-bg-surface']), 'Backend status light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[bsFg], darkTokens['--color-bg-surface']), 'Backend status dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      // 2. Kill switch approval ID input
+      const approvalInput = container.querySelector('[data-testid="input-kill-switch-approval-id"]') as HTMLInputElement;
+      expect(approvalInput, 'Approval input must render').not.toBeNull();
+      expect(approvalInput.style.backgroundColor, 'Approval input bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(approvalInput.style.color, 'Approval input text must bind to var(--color-text-primary)').toBe('var(--color-text-primary)');
+      expect(approvalInput.style.borderColor, 'Approval input border must bind to var(--color-border-subtle)').toBe('var(--color-border-subtle)');
+      const appInBg = helperExtractVar(approvalInput.style.backgroundColor);
+      const appInFg = helperExtractVar(approvalInput.style.color);
+      const appInBorder = helperExtractVar(approvalInput.style.borderColor);
+      expect(getContrast(lightTokens[appInFg], lightTokens[appInBg]), 'Approval input light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[appInFg], darkTokens[appInBg]), 'Approval input dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[appInBorder], lightTokens[appInBg]), 'Approval input light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[appInBorder], darkTokens[appInBg]), 'Approval input dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 3. Open Kill Switch Modal
+      const toggleBtn = container.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLButtonElement;
+      expect(toggleBtn, 'Emergency toggle button must render').not.toBeNull();
+      await act(async () => {
+        toggleBtn.click();
+      });
+
+      const modal = container.querySelector('[data-testid="kill-switch-modal"]') as HTMLElement;
+      expect(modal, 'Kill switch modal overlay must render').not.toBeNull();
+      expect(modal.style.backgroundColor, 'Modal backdrop must bind to var(--color-bg-backdrop)').toBe('var(--color-bg-backdrop)');
+
+      // T2 Scrim Alpha & Surface Boundary Contrast Invariants
+      const lightBackdropVal = lightTokens['--color-bg-backdrop'];
+      const darkBackdropVal = darkTokens['--color-bg-backdrop'];
+      const lightBackdropParsed = parseRgba(lightBackdropVal);
+      const darkBackdropParsed = parseRgba(darkBackdropVal);
+      expect(lightBackdropParsed, 'Light backdrop must be rgba format').not.toBeNull();
+      expect(darkBackdropParsed, 'Dark backdrop must be rgba format').not.toBeNull();
+      expect(lightBackdropParsed!.a, 'Light backdrop alpha must be at least 0.50 (rejecting washed-out scrim)').toBeGreaterThanOrEqual(0.5);
+      expect(darkBackdropParsed!.a, 'Dark backdrop alpha must be at least 0.50 (rejecting washed-out scrim)').toBeGreaterThanOrEqual(0.5);
+
+      // Scrim composite contrast: Modal card surface on composite scrim backdrop must maintain >= 3.0:1 UI boundary contrast
+      const lightScrimComposite = blendRgba(lightBackdropParsed!.rgb, lightBackdropParsed!.a, lightTokens['--color-bg-canvas']);
+      const modalSurfaceLightCr = getContrast(lightTokens['--color-bg-surface'], lightScrimComposite);
+      expect(modalSurfaceLightCr, 'Modal card surface on light scrim backdrop must maintain >= 3.0:1 boundary contrast').toBeGreaterThanOrEqual(3.0);
+
+      const modalTitle = container.querySelector('#kill-switch-modal-title') as HTMLElement;
+      expect(modalTitle, 'Modal title must render').not.toBeNull();
+      expect(modalTitle.style.color, 'Modal title color must bind to var(--color-status-offline)').toBe('var(--color-status-offline)');
+      const mtFg = helperExtractVar(modalTitle.style.color);
+      expect(getContrast(lightTokens[mtFg], lightTokens['--color-bg-surface']), 'Modal title light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[mtFg], darkTokens['--color-bg-surface']), 'Modal title dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      // 4. Kill switch approval required notice
+      const appNotice = container.querySelector('[data-testid="kill-switch-approval-required-notice"]') as HTMLElement;
+      expect(appNotice, 'Approval required notice must render').not.toBeNull();
+      expect(appNotice.style.backgroundColor, 'Notice bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(appNotice.style.color, 'Notice text must bind to var(--color-status-offline)').toBe('var(--color-status-offline)');
+      expect(appNotice.style.borderColor, 'Notice border must bind to var(--color-status-offline)').toBe('var(--color-status-offline)');
+      const anBg = helperExtractVar(appNotice.style.backgroundColor);
+      const anFg = helperExtractVar(appNotice.style.color);
+      const anBorder = helperExtractVar(appNotice.style.borderColor);
+      expect(getContrast(lightTokens[anFg], lightTokens[anBg]), 'Notice light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[anFg], darkTokens[anBg]), 'Notice dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[anBorder], lightTokens[anBg]), 'Notice light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[anBorder], darkTokens[anBg]), 'Notice dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 5. Kill switch mock notice
+      const mockNotice = container.querySelector('[data-testid="kill-switch-mock-notice"]') as HTMLElement;
+      expect(mockNotice, 'Mock notice must render').not.toBeNull();
+      expect(mockNotice.style.backgroundColor, 'Mock notice bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(mockNotice.style.color, 'Mock notice text must bind to var(--color-status-degraded)').toBe('var(--color-status-degraded)');
+      expect(mockNotice.style.borderColor, 'Mock notice border must bind to var(--color-status-degraded)').toBe('var(--color-status-degraded)');
+      const mnBg = helperExtractVar(mockNotice.style.backgroundColor);
+      const mnFg = helperExtractVar(mockNotice.style.color);
+      const mnBorder = helperExtractVar(mockNotice.style.borderColor);
+      expect(getContrast(lightTokens[mnFg], lightTokens[mnBg]), 'Mock notice light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[mnFg], darkTokens[mnBg]), 'Mock notice dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[mnBorder], lightTokens[mnBg]), 'Mock notice light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[mnBorder], darkTokens[mnBg]), 'Mock notice dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 6. Kill switch params summary
+      const paramsSummary = container.querySelector('[data-testid="kill-switch-params-summary"]') as HTMLElement;
+      expect(paramsSummary, 'Params summary must render').not.toBeNull();
+      expect(paramsSummary.style.backgroundColor, 'Params summary bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(paramsSummary.style.borderColor, 'Params summary border must bind to var(--color-border-subtle)').toBe('var(--color-border-subtle)');
+      const psBg = helperExtractVar(paramsSummary.style.backgroundColor);
+      const psBorder = helperExtractVar(paramsSummary.style.borderColor);
+      expect(getContrast(lightTokens[psBorder], lightTokens[psBg]), 'Params summary light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[psBorder], darkTokens[psBg]), 'Params summary dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 6b. Admin Audit Sub-tab Container (T1 ancestor container background & border binding)
+      const auditContainer = container.querySelector('[data-testid="admin-audit-subtab-container"]') as HTMLElement;
+      expect(auditContainer, 'Audit container must render in default audit sub-tab').not.toBeNull();
+      expect(auditContainer.style.backgroundColor, 'Audit container bg must bind to var(--color-bg-surface)').toBe('var(--color-bg-surface)');
+      expect(auditContainer.style.borderColor, 'Audit container border must bind to var(--color-border-subtle)').toBe('var(--color-border-subtle)');
+      const acBg = helperExtractVar(auditContainer.style.backgroundColor);
+      const acBorder = helperExtractVar(auditContainer.style.borderColor);
+      expect(getContrast(lightTokens[acBorder], lightTokens[acBg]), 'Audit container light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[acBorder], darkTokens[acBg]), 'Audit container dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 7. Unauthenticated Admin Notice (render with currentUser=null)
+      await act(async () => {
+        root.render(<AdminSecurityConsole nodes={[]} currentUser={null} />);
+      });
+      const authNotice = container.querySelector('[data-testid="admin-auth-required-notice"]') as HTMLElement;
+      expect(authNotice, 'Admin auth required notice must render').not.toBeNull();
+      expect(authNotice.style.backgroundColor, 'Auth notice bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(authNotice.style.color, 'Auth notice text must bind to var(--color-status-offline)').toBe('var(--color-status-offline)');
+      expect(authNotice.style.borderColor, 'Auth notice border must bind to var(--color-status-offline)').toBe('var(--color-status-offline)');
+      const aunBg = helperExtractVar(authNotice.style.backgroundColor);
+      const aunFg = helperExtractVar(authNotice.style.color);
+      const aunBorder = helperExtractVar(authNotice.style.borderColor);
+      expect(getContrast(lightTokens[aunFg], lightTokens[aunBg]), 'Auth notice light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[aunFg], darkTokens[aunBg]), 'Auth notice dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[aunBorder], lightTokens[aunBg]), 'Auth notice light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[aunBorder], darkTokens[aunBg]), 'Auth notice dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    } finally {
+      globalThis.fetch = originalFetch;
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    }
+  });
+
+  // 9e-2. [Card 199 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: AdminSecurityConsole
+  it('ACC-09 / Card 199: AdminSecurityConsole style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
+    const filePath = path.resolve(__dirname, '../src/features/admin/AdminSecurityConsole.tsx');
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const sf = ts.createSourceFile('AdminSecurityConsole.tsx', content, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+
+    interface Branch {
+      cond: string;
+      token: string;
+    }
+
+    function extractBranches(node: ts.Node): Branch[] {
+      const branches: Branch[] = [];
+      function collect(n: ts.Node, condPath: string) {
+        if (ts.isConditionalExpression(n)) {
+          const condText = n.condition.getText(sf).replace(/\s+/g, ' ');
+          collect(n.whenTrue, condPath ? `${condPath} && ${condText}` : condText);
+          collect(n.whenFalse, condPath ? `${condPath} && !(${condText})` : `!(${condText})`);
+        } else if (ts.isTemplateExpression(n)) {
+          for (const span of n.templateSpans) {
+            collect(span.expression, condPath);
+          }
+        } else {
+          const text = n.getText(sf);
+          const m = text.match(/var\((--color-[a-z0-9-]+)\)/);
+          if (m) {
+            branches.push({ cond: condPath, token: m[1] });
+          }
+        }
+      }
+      collect(node, '');
+      return branches;
+    }
+
+    let checkedPairs = 0;
+    let checkedObjects = 0;
+    let totalStyleAttrs = 0;
+    let unboundColorObjects = 0;
+    let checkedBorderObjects = 0;
+    let checkedBorderPairs = 0;
+    const violations: string[] = [];
+    const containerBgs = ['--color-bg-surface', '--color-bg-subtle', '--color-bg-canvas'];
+
+    function checkPair(bgToken: string, fgToken: string, pos: number) {
+      checkedPairs++;
+      const { line } = sf.getLineAndCharacterOfPosition(pos);
+      const lightBg = resolveTokenHex(bgToken, lightTokens);
+      const lightFg = resolveTokenHex(fgToken, lightTokens);
+      const darkBg = resolveTokenHex(bgToken, darkTokens);
+      const darkFg = resolveTokenHex(fgToken, darkTokens);
+
+      if (bgToken === fgToken) {
+        violations.push(`L${line + 1}: 1:1 token collision between background and foreground (${bgToken})`);
+        return;
+      }
+
+      if (bgToken.startsWith('--color-text-')) {
+        violations.push(`L${line + 1}: Illegitimate background token derived from text token: ${bgToken}`);
+        return;
+      }
+
+      if (lightBg && lightFg) {
+        const cr = getContrast(lightFg, lightBg);
+        if (cr < 4.5) {
+          violations.push(`L${line + 1}: Light text contrast ${cr.toFixed(2)}:1 < 4.5:1 (${fgToken} on ${bgToken})`);
+        }
+      }
+      if (darkBg && darkFg) {
+        const cr = getContrast(darkFg, darkBg);
+        if (cr < 4.5) {
+          violations.push(`L${line + 1}: Dark text contrast ${cr.toFixed(2)}:1 < 4.5:1 (${fgToken} on ${bgToken})`);
+        }
+      }
+    }
+
+    function checkBorderPair(bgToken: string, borderToken: string, pos: number) {
+      checkedBorderPairs++;
+      const { line } = sf.getLineAndCharacterOfPosition(pos);
+      const lBg = resolveTokenHex(bgToken, lightTokens);
+      const dBg = resolveTokenHex(bgToken, darkTokens);
+      const lBorder = resolveTokenHex(borderToken, lightTokens);
+      const dBorder = resolveTokenHex(borderToken, darkTokens);
+
+      if (bgToken === borderToken) {
+        violations.push(`L${line + 1}: Identical border-background token collision (1:1 contrast) detected: ${borderToken} on ${bgToken}`);
+        return;
+      }
+
+      if (bgToken.startsWith('--color-text-')) {
+        violations.push(`L${line + 1}: Illegitimate background token derived from text token: ${bgToken}`);
+        return;
+      }
+
+      if (lBg && lBorder) {
+        const cr = getContrast(lBorder, lBg);
+        if (cr < 3.0) {
+          violations.push(`L${line + 1}: Light border contrast ${cr.toFixed(2)}:1 < 3.0:1 (${borderToken} on ${bgToken})`);
+        }
+      }
+      if (dBg && dBorder) {
+        const cr = getContrast(dBorder, dBg);
+        if (cr < 3.0) {
+          violations.push(`L${line + 1}: Dark border contrast ${cr.toFixed(2)}:1 < 3.0:1 (${borderToken} on ${bgToken})`);
+        }
+      }
+    }
+
+    function traverseJsx(node: ts.Node, ancestorBgTokens: string[]) {
+      let currentBgTokens = ancestorBgTokens;
+
+      if (ts.isJsxElement(node) || ts.isJsxSelfClosingElement(node)) {
+        const opening = ts.isJsxElement(node) ? node.openingElement : node;
+        const attrs = opening.attributes?.properties || [];
+        let styleObj: ts.ObjectLiteralExpression | null = null;
+
+        for (const attr of attrs) {
+          if (ts.isJsxAttribute(attr) && attr.name.text === 'style') {
+            totalStyleAttrs++;
+            if (attr.initializer && ts.isJsxExpression(attr.initializer) && attr.initializer.expression && ts.isObjectLiteralExpression(attr.initializer.expression)) {
+              styleObj = attr.initializer.expression;
+            }
+          }
+        }
+
+        if (styleObj) {
+          let bgNode: ts.Expression | null = null;
+          let fgNode: ts.Expression | null = null;
+          let borderNode: ts.Expression | null = null;
+          for (const p of styleObj.properties) {
+            if (ts.isPropertyAssignment(p)) {
+              const name = p.name.getText(sf);
+              if (name === 'backgroundColor' || name === 'background') bgNode = p.initializer;
+              if (name === 'color') fgNode = p.initializer;
+              if (['border', 'borderColor', 'borderTop', 'borderBottom', 'borderLeft', 'borderRight'].includes(name)) {
+                borderNode = p.initializer;
+              }
+            }
+          }
+
+          const bgBranches = bgNode ? extractBranches(bgNode) : [];
+          if (bgBranches.length > 0) {
+            currentBgTokens = bgBranches.map(b => b.token);
+            for (const b of bgBranches) {
+              if (b.token.startsWith('--color-text-')) {
+                const { line } = sf.getLineAndCharacterOfPosition(bgNode!.getStart(sf));
+                violations.push(`L${line + 1}: Illegitimate background token derived from text token: ${b.token}`);
+              }
+            }
+          }
+
+          if (bgNode && fgNode) {
+            checkedObjects++;
+            const fgBranches = extractBranches(fgNode);
+            for (const bgB of bgBranches) {
+              for (const fgB of fgBranches) {
+                if (!bgB.cond || !fgB.cond || bgB.cond === fgB.cond) {
+                  checkPair(bgB.token, fgB.token, styleObj.getStart(sf));
+                }
+              }
+            }
+          } else if (!bgNode && fgNode) {
+            unboundColorObjects++;
+            const fgBranches = extractBranches(fgNode);
+            const effectiveBgs = ancestorBgTokens.length > 0 ? ancestorBgTokens : containerBgs;
+            for (const fgB of fgBranches) {
+              for (const cBg of effectiveBgs) {
+                checkPair(cBg, fgB.token, styleObj.getStart(sf));
+              }
+            }
+          }
+
+          if (borderNode) {
+            const borderBranches = extractBranches(borderNode);
+            if (borderBranches.length > 0) {
+              checkedBorderObjects++;
+              if (bgNode) {
+                for (const bB of borderBranches) {
+                  for (const bgB of bgBranches) {
+                    if (!bB.cond || !bgB.cond || bB.cond === bgB.cond) {
+                      checkBorderPair(bgB.token, bB.token, styleObj.getStart(sf));
+                    }
+                  }
+                }
+              } else {
+                const effectiveBgs = ancestorBgTokens.length > 0 ? ancestorBgTokens : containerBgs;
+                for (const bB of borderBranches) {
+                  for (const cBg of effectiveBgs) {
+                    checkBorderPair(cBg, bB.token, styleObj.getStart(sf));
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      ts.forEachChild(node, child => traverseJsx(child, currentBgTokens));
+    }
+
+    traverseJsx(sf, []);
+
+    // Exact ratchet assertions covering 100% of AdminSecurityConsole style declarations
+    expect(totalStyleAttrs, 'Total style attributes in AdminSecurityConsole must be exactly 142').toBe(142);
+    expect(checkedObjects, 'Style objects with explicit background and foreground must be exactly 21').toBe(21);
+    expect(checkedPairs, 'Evaluated foreground-background pairs across conditional branches must be exactly 98').toBe(98);
+    expect(unboundColorObjects, 'Elements with foreground color inheriting container background must be exactly 71').toBe(71);
+    expect(checkedObjects + unboundColorObjects, 'Total covered color style objects must be exactly 92').toBe(92);
+    expect(checkedBorderObjects, 'Style objects with explicit border token declarations must be exactly 42').toBe(42);
+    expect(checkedBorderPairs, 'Evaluated border-background pairs across conditional and container branches must be exactly 48').toBe(48);
+    expect(violations, `Expected 0 style-pair contrast/collision violations in AdminSecurityConsole, got:\n${violations.join('\n')}`).toEqual([]);
+  });
+
   // 9. [F1 & Card 186 Revert-Fail Probes] Mutating fixes back to defective combinations strictly fails
   it('ACC-09 Revert-Fail Probes: Defective color combinations strictly fail WCAG AA criteria', () => {
     // Probe 1: RiskBadge light L1 with former #2563eb on 15% tint over light surface
@@ -2100,6 +2502,44 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(getContrast(lightTokens['--color-brand-subtle'], lightTokens['--color-brand-subtle']), 'Defective badge border on subtle background in light fails 3.0:1').toBe(1.0);
     expect(getContrast(darkTokens['--color-brand-subtle'], darkTokens['--color-brand-subtle']), 'Defective badge border on subtle background in dark fails 3.0:1').toBe(1.0);
 
+    // Probe 44 [Card 199]: AdminSecurityConsole former hardcoded #58a6ff on light surface/subtle strictly fails 4.5:1
+    expect(getContrast('#58a6ff', lightTokens['--color-bg-surface']), 'Former #58a6ff on light surface fails 4.5:1').toBeLessThan(4.5);
+    expect(getContrast('#58a6ff', lightTokens['--color-bg-surface'])).toBeCloseTo(2.526, 2);
+    expect(getContrast('#58a6ff', lightTokens['--color-bg-subtle']), 'Former #58a6ff on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(getContrast('#58a6ff', lightTokens['--color-bg-subtle'])).toBeCloseTo(2.306, 2);
+
+    // Probe 45 [Card 199]: AdminSecurityConsole former hardcoded #8b949e on light surface/subtle strictly fails 4.5:1
+    expect(getContrast('#8b949e', lightTokens['--color-bg-surface']), 'Former #8b949e on light surface fails 4.5:1').toBeLessThan(4.5);
+    expect(getContrast('#8b949e', lightTokens['--color-bg-surface'])).toBeCloseTo(3.076, 2);
+    expect(getContrast('#8b949e', lightTokens['--color-bg-subtle']), 'Former #8b949e on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(getContrast('#8b949e', lightTokens['--color-bg-subtle'])).toBeCloseTo(2.808, 2);
+
+    // Probe 46 [Card 199]: AdminSecurityConsole former hardcoded #f85149 on light surface/subtle strictly fails 4.5:1
+    expect(getContrast('#f85149', lightTokens['--color-bg-surface']), 'Former #f85149 on light surface fails 4.5:1').toBeLessThan(4.5);
+    expect(getContrast('#f85149', lightTokens['--color-bg-surface'])).toBeCloseTo(3.352, 2);
+    expect(getContrast('#f85149', lightTokens['--color-bg-subtle']), 'Former #f85149 on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(getContrast('#f85149', lightTokens['--color-bg-subtle'])).toBeCloseTo(3.060, 2);
+
+    // Probe 47 [Card 199]: AdminSecurityConsole 1:1 color collision (swapping modal title to surface background) strictly fails 4.5:1
+    expect(getContrast(lightTokens['--color-bg-surface'], lightTokens['--color-bg-surface']), 'Defective modal title 1:1 collision in light fails 4.5:1').toBe(1.0);
+    expect(getContrast(darkTokens['--color-bg-surface'], darkTokens['--color-bg-surface']), 'Defective modal title 1:1 collision in dark fails 4.5:1').toBe(1.0);
+
+    // Probe 48 [Card 199]: AdminSecurityConsole 1:1 border collision (swapping notice border to subtle background) strictly fails 3.0:1
+    expect(getContrast(lightTokens['--color-bg-subtle'], lightTokens['--color-bg-subtle']), 'Defective notice border 1:1 collision in light fails 3.0:1').toBe(1.0);
+    expect(getContrast(darkTokens['--color-bg-subtle'], darkTokens['--color-bg-subtle']), 'Defective notice border 1:1 collision in dark fails 3.0:1').toBe(1.0);
+
+    // Probe 49 [Card 199 r1 / T1 / Claude r1 A1]: Container background mutated to text-primary behind text strictly fails 4.5:1
+    expect(getContrast(lightTokens['--color-text-primary'], lightTokens['--color-text-primary']), 'Defective text-primary on text-primary 1:1 collision fails 4.5:1').toBe(1.0);
+    const probe49BrandCr = getContrast(lightTokens['--color-brand-hover'], lightTokens['--color-text-primary']);
+    expect(probe49BrandCr, 'Defective brand-hover on text-primary container background fails 4.5:1').toBeLessThan(4.5);
+    expect(probe49BrandCr).toBeCloseTo(2.66, 2);
+
+    // Probe 50 [Card 199 r1 / T2 / Claude r1 A6]: Modal backdrop scrim alpha mutated to 0.05 yields 1.16:1 boundary contrast, failing 3.0:1
+    const defectiveScrim05 = blendRgba([0, 0, 0], 0.05, lightTokens['--color-bg-canvas']);
+    const probe50Cr = getContrast(lightTokens['--color-bg-surface'], defectiveScrim05);
+    expect(probe50Cr, 'Defective 0.05 alpha scrim on light canvas fails 3.0:1 modal surface boundary').toBeLessThan(3.0);
+    expect(probe50Cr).toBeCloseTo(1.16, 2);
+
     // Legacy Token Reverts:
     // Legacy Dark --color-border-subtle: #374151
     expect(getContrast('#374151', darkTokens['--color-bg-surface'])).toBeLessThan(3.0); // 1.72:1
@@ -2111,8 +2551,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(getContrast('#64748b', lightTokens['--color-bg-subtle'])).toBeLessThan(4.5); // 4.34:1
   });
 
-  // 10. [F2 Fail-Closed Multiset Inventory & Ratchet] var(--color-border-subtle) exact 292/23 and exact per-file literal multisets strictly bounded
-  it('ACC-09 / F2 Fail-Closed Multiset Inventory & Ratchet: var(--color-border-subtle) exact 292/23 and exact per-file literal multisets strictly bounded', () => {
+  // 10. [F2 Fail-Closed Multiset Inventory & Ratchet] var(--color-border-subtle) exact 317/24 and exact per-file literal multisets strictly bounded
+  it('ACC-09 / F2 Fail-Closed Multiset Inventory & Ratchet: var(--color-border-subtle) exact 317/24 and exact per-file literal multisets strictly bounded', () => {
     const srcDir = path.resolve(__dirname, '../src');
     const allFiles = getAllSourceFiles(srcDir);
 
@@ -2194,8 +2634,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
 
     // Exact count verification for var(--color-border-subtle)
-    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 292').toBe(292);
-    expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 23').toBe(23);
+    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 317').toBe(317);
+    expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 24').toBe(24);
 
     // Fail-closed check 3: Total files with color literals must not exceed baseline file count
     const baselineFileCount = Object.keys(COLOR_LITERAL_MULTISET_BASELINE).length;
@@ -2214,8 +2654,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(legacyCounts['#dc2626'], 'Legacy #dc2626 literal count must not exceed 1').toBeLessThanOrEqual(1);
     expect(legacyFiles['#dc2626'].size, 'Legacy #dc2626 file count must not exceed 1').toBeLessThanOrEqual(1);
 
-    expect(legacyCounts['#30363d'], 'Legacy #30363d literal count must not exceed 116').toBeLessThanOrEqual(116);
-    expect(legacyFiles['#30363d'].size, 'Legacy #30363d file count must not exceed 14').toBeLessThanOrEqual(14);
+    expect(legacyCounts['#30363d'], 'Legacy #30363d literal count must not exceed 92').toBeLessThanOrEqual(92);
+    expect(legacyFiles['#30363d'].size, 'Legacy #30363d file count must not exceed 13').toBeLessThanOrEqual(13);
   });
 
   // 11. Comment-trivia exclusion: comments are never colours, but real string/template/JSX values still count
