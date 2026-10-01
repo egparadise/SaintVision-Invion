@@ -33,13 +33,14 @@ export const ALLOWED_MANIFEST_KEYS = new Set([
   'version',
   'componentCount',
   'manifestSha256',
+  'components',
   'createdAt',
   'operatorSignOff',
   'operatorSignOffBlockedBy',
   'requiredDistinctOperatorCount',
   'confirmedOperatorCount',
+  'matchingAcceptedUserCount',
   'acceptanceCount',
-  'components',
 ]);
 export const ALLOWED_ACCEPTANCE_KEYS = new Set([
   'acceptanceId',
@@ -109,11 +110,12 @@ export function isValidReleaseManifest(val: unknown): val is ReleaseManifestResp
     !Number.isInteger(m.componentCount) ||
     m.componentCount < 1 ||
     m.operatorSignOff !== false ||
-    m.operatorSignOffBlockedBy !== 'human-attestation-contract-absent' ||
+    m.operatorSignOffBlockedBy !== 'human-attestation-implementation-unavailable' ||
     m.requiredDistinctOperatorCount !== 2 ||
-    typeof m.confirmedOperatorCount !== 'number' ||
-    !Number.isInteger(m.confirmedOperatorCount) ||
-    m.confirmedOperatorCount < 0 ||
+    m.confirmedOperatorCount !== 0 ||
+    typeof m.matchingAcceptedUserCount !== 'number' ||
+    !Number.isInteger(m.matchingAcceptedUserCount) ||
+    m.matchingAcceptedUserCount < 0 ||
     typeof m.acceptanceCount !== 'number' ||
     !Number.isInteger(m.acceptanceCount) ||
     m.acceptanceCount < 0 ||
@@ -122,9 +124,8 @@ export function isValidReleaseManifest(val: unknown): val is ReleaseManifestResp
     return false;
   }
 
-  if (m.components !== undefined) {
-    if (!Array.isArray(m.components) || m.components.length > 512) return false;
-    if (!m.components.every(isValidReleaseComponent)) return false;
+  if (!Array.isArray(m.components) || m.components.length > 512 || !m.components.every(isValidReleaseComponent)) {
+    return false;
   }
 
   return true;
@@ -156,9 +157,8 @@ export function isValidReleaseAcceptance(val: unknown): val is ReleaseAcceptance
     return false;
   }
 
-  if (a.knownLimitations !== undefined) {
-    if (!Array.isArray(a.knownLimitations) || a.knownLimitations.length > 64) return false;
-    if (!a.knownLimitations.every((item) => typeof item === 'string')) return false;
+  if (!Array.isArray(a.knownLimitations) || a.knownLimitations.length > 64 || !a.knownLimitations.every((item) => typeof item === 'string')) {
+    return false;
   }
 
   return true;
@@ -166,7 +166,7 @@ export function isValidReleaseAcceptance(val: unknown): val is ReleaseAcceptance
 
 /**
  * Validates a ReleaseManifestPageResponse against the canonical contract.
- * JSON schema: additionalProperties: false, items array (max 200), optional nextCursor.
+ * JSON schema: additionalProperties: false, items array (max 200), required nullable nextCursor.
  */
 export function isValidReleaseManifestPage(val: unknown): val is ReleaseManifestPageResponse {
   if (!val || typeof val !== 'object' || Array.isArray(val)) return false;
@@ -176,7 +176,7 @@ export function isValidReleaseManifestPage(val: unknown): val is ReleaseManifest
   if (!Array.isArray(p.items) || p.items.length > 200) return false;
   if (!p.items.every(isValidReleaseManifest)) return false;
 
-  if (p.nextCursor !== undefined && p.nextCursor !== null && typeof p.nextCursor !== 'string') {
+  if (p.nextCursor !== null && typeof p.nextCursor !== 'string') {
     return false;
   }
 
@@ -185,7 +185,7 @@ export function isValidReleaseManifestPage(val: unknown): val is ReleaseManifest
 
 /**
  * Validates a ReleaseManifestDetailResponse against the canonical contract.
- * JSON schema: additionalProperties: false, release required, optional acceptances array.
+ * JSON schema: additionalProperties: false, release required, acceptances array required.
  */
 export function isValidReleaseManifestDetail(val: unknown): val is ReleaseManifestDetailResponse {
   if (!val || typeof val !== 'object' || Array.isArray(val)) return false;
@@ -194,9 +194,8 @@ export function isValidReleaseManifestDetail(val: unknown): val is ReleaseManife
 
   if (!isValidReleaseManifest(d.release)) return false;
 
-  if (d.acceptances !== undefined) {
-    if (!Array.isArray(d.acceptances) || d.acceptances.length > 256) return false;
-    if (!d.acceptances.every(isValidReleaseAcceptance)) return false;
+  if (!Array.isArray(d.acceptances) || d.acceptances.length > 256 || !d.acceptances.every(isValidReleaseAcceptance)) {
+    return false;
   }
 
   return true;

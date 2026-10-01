@@ -9,11 +9,12 @@ export type Name = string;
  * @maxItems 512
  */
 export type Components = ReleaseComponentResponse[];
-export type Confirmedoperatorcount = number;
+export type Confirmedoperatorcount = 0;
 export type Createdat = string;
 export type Manifestsha256 = string;
+export type Matchingacceptedusercount = number;
 export type Operatorsignoff = false;
-export type Operatorsignoffblockedby = 'human-attestation-contract-absent';
+export type Operatorsignoffblockedby = 'human-attestation-implementation-unavailable';
 export type Releaseid = string;
 export type Requireddistinctoperatorcount = 2;
 export type Version = string;
@@ -35,19 +36,32 @@ export type Version = string;
  * the field read true. A key that proves existence was read as proof of
  * humanity.
  *
- * So the field is pinned false until there is a contract for attesting that a
- * person decided. ``requiredDistinctOperatorCount`` and
- * ``confirmedOperatorCount`` carry the recorded fact in the meantime, named as
- * the write contract (``#282``, card 184) names them: two distinct operators
- * are required, and a count below that is not sign-off however it was written.
+ * So the field is pinned false, and the two counts beside it say different
+ * things on purpose, by the coordinator's decision of 2026-10-01:
+ *
+ * * ``confirmedOperatorCount`` is **distinct operators whose decision a person
+ *   is attested to have made**, as the write contract (``#282``, card 184)
+ *   defines attestation. That implementation does not exist yet, so on this
+ *   read surface the field is ``Literal[0]``. It is not "no acceptances"; it is
+ *   "no decision here has been attested to a person";
+ * * ``matchingAcceptedUserCount`` is the **raw recorded fact**: distinct user
+ *   ids with an ``accepted`` row pinning this manifest's hash. A service
+ *   principal can be one of them, which is precisely why it is a different
+ *   field with a different name. The first version of this model called this
+ *   count ``confirmedOperatorCount``, which read as though a person had been
+ *   confirmed.
+ *
+ * ``requiredDistinctOperatorCount`` is the quorum, so a reader sees "0 of 2"
+ * and can tell it apart from "1 of 2".
  */
 export interface ReleaseManifestResponse {
   acceptanceCount: Acceptancecount;
   componentCount: Componentcount;
-  components?: Components;
+  components: Components;
   confirmedOperatorCount: Confirmedoperatorcount;
   createdAt: Createdat;
   manifestSha256: Manifestsha256;
+  matchingAcceptedUserCount: Matchingacceptedusercount;
   operatorSignOff: Operatorsignoff;
   operatorSignOffBlockedBy: Operatorsignoffblockedby;
   releaseId: Releaseid;

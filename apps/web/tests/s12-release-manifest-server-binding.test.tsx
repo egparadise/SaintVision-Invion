@@ -55,9 +55,10 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
     manifestSha256: sampleManifestSha,
     createdAt: '2026-10-01T10:00:00Z',
     operatorSignOff: false,
-    operatorSignOffBlockedBy: 'human-attestation-contract-absent',
+    operatorSignOffBlockedBy: 'human-attestation-implementation-unavailable',
     requiredDistinctOperatorCount: 2,
-    confirmedOperatorCount: 1,
+    confirmedOperatorCount: 0,
+    matchingAcceptedUserCount: 1,
     acceptanceCount: 1,
     components: [
       { name: 'control-plane', kind: 'service', digest: sampleDigest1 },
@@ -72,9 +73,10 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
     manifestSha256: sampleManifestSha,
     createdAt: '2026-10-01T11:00:00Z',
     operatorSignOff: false,
-    operatorSignOffBlockedBy: 'human-attestation-contract-absent',
+    operatorSignOffBlockedBy: 'human-attestation-implementation-unavailable',
     requiredDistinctOperatorCount: 2,
     confirmedOperatorCount: 0,
+    matchingAcceptedUserCount: 0,
     acceptanceCount: 0,
     components: [
       { name: 'control-plane', kind: 'service', digest: sampleDigest1 },
@@ -115,7 +117,7 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
       expect(isValidReleaseComponent({ name: '', kind: 'svc', digest: sampleDigest1 })).toBe(false);
     });
 
-    it('isValidReleaseManifest enforces Literal[False] operatorSignOff and blockedBy reason (Codex F1)', () => {
+    it('isValidReleaseManifest enforces Literal[False] operatorSignOff, Literal[0] confirmedOperatorCount, and blockedBy reason', () => {
       expect(isValidReleaseManifest(mockReleaseItem)).toBe(true);
       expect(isValidReleaseManifest(null)).toBe(false);
       expect(isValidReleaseManifest({})).toBe(false);
@@ -125,14 +127,20 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
       expect(isValidReleaseManifest({ ...mockReleaseItem, operatorSignOffBlockedBy: 'other-reason' as any })).toBe(false);
       // requiredDistinctOperatorCount must be 2
       expect(isValidReleaseManifest({ ...mockReleaseItem, requiredDistinctOperatorCount: 1 as any })).toBe(false);
-      // confirmedOperatorCount must be non-negative integer
-      expect(isValidReleaseManifest({ ...mockReleaseItem, confirmedOperatorCount: -1 })).toBe(false);
+      // confirmedOperatorCount must be Literal[0] (1 is rejected)
+      expect(isValidReleaseManifest({ ...mockReleaseItem, confirmedOperatorCount: 1 as any })).toBe(false);
+      expect(isValidReleaseManifest({ ...mockReleaseItem, confirmedOperatorCount: -1 as any })).toBe(false);
+      // matchingAcceptedUserCount must be non-negative integer
+      expect(isValidReleaseManifest({ ...mockReleaseItem, matchingAcceptedUserCount: -1 })).toBe(false);
       // componentCount: 0 rejected (schema minimum: 1)
       expect(isValidReleaseManifest({ ...mockReleaseItem, componentCount: 0 })).toBe(false);
       // short SHA rejected
       expect(isValidReleaseManifest({ ...mockReleaseItem, manifestSha256: 'short-sha' })).toBe(false);
       // extra unknown key rejected
       expect(isValidReleaseManifest({ ...mockReleaseItem, extraKey: 'invented' })).toBe(false);
+      // missing components rejected
+      const { components, ...withoutComponents } = mockReleaseItem;
+      expect(isValidReleaseManifest(withoutComponents)).toBe(false);
     });
 
     it('isValidReleaseAcceptance enforces outcome enum, manifestMatches boolean, and strict keys', () => {
@@ -148,16 +156,19 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
       expect(isValidReleaseAcceptance({ ...validAcc, extraKey: 123 })).toBe(false);
     });
 
-    it('isValidReleaseManifestPage strictly requires items array and rejects unknown keys', () => {
+    it('isValidReleaseManifestPage strictly requires items array and nextCursor and rejects unknown keys', () => {
       expect(isValidReleaseManifestPage({ items: [mockReleaseItem], nextCursor: null })).toBe(true);
-      expect(isValidReleaseManifestPage({ items: [] })).toBe(true);
+      expect(isValidReleaseManifestPage({ items: [], nextCursor: null })).toBe(true);
+      expect(isValidReleaseManifestPage({ items: [], nextCursor: 'cur_abc' })).toBe(true);
+      // missing nextCursor rejected (required and nullable)
+      expect(isValidReleaseManifestPage({ items: [] })).toBe(false);
       // missing items rejected (cannot default to [])
       expect(isValidReleaseManifestPage({ nextCursor: null })).toBe(false);
       expect(isValidReleaseManifestPage({})).toBe(false);
       // extra unknown key rejected
       expect(isValidReleaseManifestPage({ items: [], nextCursor: null, unknown: 1 })).toBe(false);
       // invalid item inside items rejected
-      expect(isValidReleaseManifestPage({ items: [{ ...mockReleaseItem, componentCount: 0 }] })).toBe(false);
+      expect(isValidReleaseManifestPage({ items: [{ ...mockReleaseItem, componentCount: 0 }], nextCursor: null })).toBe(false);
     });
 
     it('fetchReleaseManifests asserts exact canonical endpoint and query parameters (kills M2)', async () => {
@@ -194,7 +205,8 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
       );
       expect(res.release.releaseId).toBe('rel-2026-s12-001');
       expect(res.release.operatorSignOff).toBe(false);
-      expect(res.release.confirmedOperatorCount).toBe(1);
+      expect(res.release.confirmedOperatorCount).toBe(0);
+      expect(res.release.matchingAcceptedUserCount).toBe(1);
     });
 
     it('fetchReleaseManifests throws contract violation if server returns operatorSignOff=true (kills M10, Codex F1)', async () => {
@@ -281,11 +293,12 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
       const signoffEl = container.querySelector('[data-testid="server-operator-signoff"]');
       expect(signoffEl?.textContent).toContain('미서명 (operatorSignOff: false)');
       expect(signoffEl?.textContent).toContain('미서명 — 사람 확인 계약 미구현');
-      expect(signoffEl?.textContent).toContain('human-attestation-contract-absent');
+      expect(signoffEl?.textContent).toContain('human-attestation-implementation-unavailable');
 
       // Verify operator quorum count
       const quorumEl = container.querySelector('[data-testid="server-operator-quorum"]');
-      expect(quorumEl?.textContent).toContain('1 / 2 확인 기록 (서명 아님)');
+      expect(quorumEl?.textContent).toContain('사람 확인 0 / 2 (서명 아님)');
+      expect(quorumEl?.textContent).toContain('해시 일치 수락 기록 1건 (사람 확인 아님)');
 
       // Strictly does NOT render '서버 검증됨' or '운영자 최종 서명 완료'
       expect(container.textContent).not.toContain('서버 검증됨');
@@ -627,6 +640,9 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
       }
       for (const req of acceptanceSchema.required) {
         expect(ALLOWED_ACCEPTANCE_KEYS.has(req)).toBe(true);
+      }
+      for (const req of pageSchema.required) {
+        expect(ALLOWED_PAGE_KEYS.has(req)).toBe(true);
       }
       for (const req of detailSchema.required) {
         expect(ALLOWED_DETAIL_KEYS.has(req)).toBe(true);

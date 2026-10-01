@@ -1,13 +1,13 @@
 ---
 doc_id: "HIST-20261001-C183-S12FE-001"
 title: "Card 183 (S12-FE) 릴리스 선언서(Release Manifest) 및 운영자 인수 서버 경로 결속 기록"
-version: "1.2.0"
+version: "1.3.0"
 status: "proposed"
 author: "Gemini"
 created: "2026-10-01T18:50:00+09:00"
-updated: "2026-10-01T20:20:00+09:00"
+updated: "2026-10-01T20:30:00+09:00"
 source_of_truth: "Git"
-base_sha: "4114f8ba"
+base_sha: "79fcb772"
 task_ids: ["S12-FE", "S12-BE"]
 tags: ["s12", "release-manifest", "acceptance", "binding", "read-only", "security-boundary", "gemini"]
 ---
@@ -181,9 +181,9 @@ PR #280에서 Codex F1 검토 결과, 기존 `acceptance_records`의 `decided_by
 
 ## 8. 인계 및 검토 요청
 
-- **Base 브랜치**: `agent/claude/c182-s12-manifest-routes` (PR #280 head `4114f8ba`)
+- **Base 브랜치**: `agent/claude/c182-s12-manifest-routes` (PR #280 head `79fcb772`)
 - **작업 브랜치**: `agent/gemini/c183-s12fe-release-binding`
-- **조치 커밋**: Claude UI r1/r2 및 Codex r1/r2 피드백 전수 조치 완료
+- **조치 커밋**: Claude UI r1/r2 및 Codex r1/r2 피드백 전수 조치 완료, #280 head `79fcb772` 계약 변경 머지 및 동기화 완료
 - **검토 요청**:
   - Claude: UI/사용자 경험, 404/403 ProblemDetails 해석, 계약 위반 분리 표출, 셀렉터 변경 인터랙션, 단위 시험 21 passed 검토 요청.
   - Codex: strict wire 스키마 계약 검증(Blocker 1 & 2), canonical 5개 스키마 1:1 결속 검증, ProblemDetails 정본 코드(RES-0004, AUTH-0030) 검토 요청.
@@ -199,3 +199,22 @@ PR #280에서 Codex F1 검토 결과, 기존 `acceptance_records`의 `decided_by
 | **Low 1** | 잔여 문구 정비 | 상단 KPI 카드 `IntranetDeploymentView.tsx:318`에 잔존하던 'SIGN-OFF 대기 (백엔드 미연결)' 문구 정비 | • 'SIGN-OFF 대기 (백엔드 미연결)' 문구를 'SIGN-OFF 대기 (로컬 모의)'로 교체하여 오래된 "미연결" 문구를 완전히 제거.<br>• `s12-defect-fixes.test.tsx` line 54 단언을 'SIGN-OFF 대기 (로컬 모의)'로 갱신하여 23 passed 유지. | **조치 완료** |
 | **Low 2** | UI 상호작용 검증 | 릴리스 선택기(`<select data-testid="deployment-release-selector">`) 변경 시 상세 쿼리 재호출 및 화면 갱신 시험 부재 | • `deployment-release-selector`에서 다른 릴리스(`rel-2026-s12-002`)를 선택하는 사용자 동작을 모의하는 테스트 추가.<br>• `/v1/release-manifests/rel-2026-s12-002` 엔드포인트 호출 및 화면의 수락 결정 이력이 두 번째 릴리스의 0건(`server-acceptances-empty`, '기록된 수락 결정 없음')으로 갱신됨을 단언. | **조치 완료** |
 | **Codex r2 차단 1 & 2 선제 대비** | 계약 스키마 1:1 결속 검증 | `contracts/release-*.schema.json` 5개 스키마와 `releaseObservation.ts`의 허용 키셋 및 필수 필드 1:1 일치 시험 부재 | • 5개 스키마 파일(`release-component-response`, `release-manifest-response`, `release-acceptance-response`, `release-manifest-page-response`, `release-manifest-detail-response`)을 직접 로드하여 `additionalProperties === false` 불변식 검증.<br>• `releaseObservation.ts`의 `ALLOWED_*_KEYS` 5개 셋이 스키마의 `properties` 키셋과 1:1 정확히 일치함을 단언.<br>• 스키마의 모든 `required` 속성이 런타임 가드에서 검증됨을 단언. | **조치 완료** |
+
+---
+
+## 10. 부모 #280 신규 Head (79fcb772) 계약 변경 머지 및 후속 동기화
+
+Codex 계약 축 r2 권고에 따라 #280에서 다음과 같이 계약이 정밀화되었으며, 이를 merge로 안전하게 추적함:
+1. **필드 분리 및 의미 정합**:
+   - `matchingAcceptedUserCount`: 해시 일치 `accepted` 결정을 내린 서로 다른 사용자(서비스 주체 포함 가능)의 실제 원시 건수.
+   - `confirmedOperatorCount`: 사람 확인(Human Attestation) 메커니즘을 거친 고유 운영자 수로 `Literal[0]` 고정 (아직 사람 확인 구현 미제공 상태).
+   - `operatorSignOffBlockedBy`: `'human-attestation-implementation-unavailable'` (#282 계약은 존재하나 구현 미제공 상태를 정확히 명시).
+2. **모든 목록 및 nextCursor 필수화**:
+   - `ReleaseManifestPageResponse`: `items` 및 `nextCursor`가 `required`로 정의됨 (`nextCursor`는 nullable).
+   - `components`, `knownLimitations`, `acceptances`가 모두 `required`로 정의됨.
+3. **TypeScript 계약 및 런타임 가드 동기화**:
+   - `api-response-contracts.mjs --write` 실행으로 40개 API 응답 TypeScript 타입 재생성 (`contracts:check` PASS).
+   - `releaseObservation.ts`의 `isValidReleaseManifest`, `isValidReleaseAcceptance`, `isValidReleaseManifestPage`, `isValidReleaseManifestDetail`을 신규 정본 스키마와 1:1로 완전 동기화.
+4. **UI 화면 반영**:
+   - 릴리스 선택기: `{version} ({releaseId}) - 미서명 (사람 확인 {confirmedOperatorCount}/{requiredDistinctOperatorCount} · 해시 일치 {matchingAcceptedUserCount}건)`
+   - 3-A 섹션 운영자 정족수: `사람 확인 {confirmedOperatorCount} / {requiredDistinctOperatorCount} (서명 아님)` 및 `해시 일치 수락 기록 {matchingAcceptedUserCount}건 (사람 확인 아님)` 분리 표출.

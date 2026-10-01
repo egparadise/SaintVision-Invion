@@ -823,7 +823,7 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
                 >
                   {serverManifests.map((item) => (
                     <option key={item.releaseId} value={item.releaseId}>
-                      {item.version} ({item.releaseId}) - 미서명 ({item.confirmedOperatorCount}/{item.requiredDistinctOperatorCount} 확인)
+                      {item.version} ({item.releaseId}) - 미서명 (사람 확인 {item.confirmedOperatorCount}/{item.requiredDistinctOperatorCount} · 해시 일치 {item.matchingAcceptedUserCount}건)
                     </option>
                   ))}
                 </select>
@@ -962,10 +962,13 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
                 <div style={{ color: '#8b949e' }}>운영자 확인 현황 (Operator Quorum)</div>
                 <div data-testid="server-operator-quorum" style={{ marginTop: '2px' }}>
                   <span style={{ color: '#f0f6fc', fontWeight: 600 }}>
-                    {serverManifestDetail.release.confirmedOperatorCount} / {serverManifestDetail.release.requiredDistinctOperatorCount} 확인 기록 (서명 아님)
+                    사람 확인 {serverManifestDetail.release.confirmedOperatorCount} / {serverManifestDetail.release.requiredDistinctOperatorCount} (서명 아님)
                   </span>
+                  <div data-testid="server-matching-user-count" style={{ fontSize: '11px', color: '#8b949e', marginTop: '2px' }}>
+                    해시 일치 수락 기록 {serverManifestDetail.release.matchingAcceptedUserCount}건 (사람 확인 아님)
+                  </div>
                   <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '2px' }}>
-                    해시 일치 수락의 서로 다른 사용자 수 (서비스 주체 포함 가능 — 2명 고유 사람 확인 계약 전 서명 불인정)
+                    서비스 주체 포함 가능 — 2명 고유 사람 확인 계약 구현 전 서명 불인정
                   </div>
                 </div>
               </div>

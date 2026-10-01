@@ -14,11 +14,18 @@ export type Outcome = 'accepted' | 'conditional' | 'rejected';
 /**
  * One recorded acceptance decision, without the person who made it.
  *
- * The accepting user is deliberately absent. ``accepted_by_user_id`` is a real
- * foreign key precisely so the system cannot sign its own acceptance, but a
- * read surface that names people turns an audit column into a directory;
- * ``RunRecordResponse`` set that rule first and this follows it. ``notes`` is
- * free text and is absent for the same reason.
+ * The accepting user is deliberately absent: a read surface that names people
+ * turns an audit column into a directory, and ``RunRecordResponse`` set that
+ * rule first. ``notes`` is free text and is absent for the same reason.
+ *
+ * This docstring used to add that ``accepted_by_user_id`` is a foreign key
+ * "precisely so the system cannot sign its own acceptance". **That is false**,
+ * and Codex measured it: ``users`` does not distinguish a person from a service,
+ * so a principal whose subject was ``svc:release-bot`` wrote an ``accepted`` row
+ * through this very column. The key constrains the row to name a user that
+ * exists and says nothing about who that user is -- which is why
+ * ``operatorSignOff`` is pinned false in ``ReleaseManifestResponse`` rather than
+ * computed from these records.
  *
  * ``manifestMatches`` is computed, not stored: an acceptance pins the manifest
  * hash as it stood when it was granted, and accepting one composition while
@@ -30,7 +37,7 @@ export interface ReleaseAcceptanceResponse {
   acceptanceIdRef: Acceptanceidref;
   acceptedManifestSha256: Acceptedmanifestsha256;
   decidedAt: Decidedat;
-  knownLimitations?: Knownlimitations;
+  knownLimitations: Knownlimitations;
   manifestMatches: Manifestmatches;
   outcome: Outcome;
 }
