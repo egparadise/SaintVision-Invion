@@ -27,7 +27,7 @@ def _module():
     return module
 
 
-def test_lane_is_opt_in_pinned_and_never_uses_privileged_or_host_socket():
+def test_lane_is_opt_in_pinned_and_does_not_mount_host_socket_or_use_privileged():
     workflow = yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))
     trigger = workflow[True]["workflow_dispatch"]["inputs"]["correlation_id"]
     assert trigger == {
@@ -90,6 +90,7 @@ def _container_inspect():
             "State": {"Running": True, "Pid": 3210},
             "Config": {
                 "User": "user",
+                "Cmd": ["--addr", "tcp://0.0.0.0:1234"],
                 "Labels": {"ai.saintvision.s08-buildkit-reference": "55"},
             },
             "HostConfig": {
@@ -128,6 +129,14 @@ def _container_inspect():
         lambda value: value[0]["HostConfig"].__setitem__("CapAdd", ["SYS_ADMIN"]),
         lambda value: value[0]["HostConfig"].__setitem__("MaskedPaths", ["/proc/kcore"]),
         lambda value: value[0]["HostConfig"].__setitem__("ReadonlyPaths", ["/proc/sys"]),
+        lambda value: value[0]["HostConfig"]["SecurityOpt"].append("no-new-privileges=true"),
+        lambda value: value[0]["Config"]["Labels"].__setitem__(
+            "ai.saintvision.s08-buildkit-reference", "other"
+        ),
+        lambda value: value[0]["State"].__setitem__("Running", False),
+        lambda value: value[0]["Config"]["Cmd"].append(
+            "--allow-insecure-entitlement=security.insecure"
+        ),
         lambda value: value[0]["Config"].__setitem__("User", "root"),
         lambda value: value[0]["NetworkSettings"]["Ports"]["1234/tcp"][0].__setitem__(
             "HostIp", "0.0.0.0"
@@ -158,6 +167,45 @@ def test_container_boundary_accepts_only_owned_rootless_shape(monkeypatch):
     module = _module()
     monkeypatch.setenv("GITHUB_RUN_ID", "55")
     assert module._validated_container_inspect(_container_inspect())["State"]["Pid"] == 3210
+
+
+@pytest.mark.parametrize(
+    "status",
+    [{}, {"Uid": "invalid"}, {"Uid": "0\t0\t0\t0"}],
+)
+def test_daemon_uid_must_be_observed_and_unprivileged(status):
+    module = _module()
+    with pytest.raises(RuntimeError, match="uid|unprivileged"):
+        module._positive_process_uid(status)
+
+
+def test_runtime_image_digest_must_match_docker_repo_digest():
+    module = _module()
+    digest = "sha256:" + "c" * 64
+    assert (
+        module._verified_runtime_image_digest(
+            "docker.io/moby/buildkit@" + digest,
+            [{"RepoDigests": ["moby/buildkit@" + digest]}],
+        )
+        == digest
+    )
+
+
+@pytest.mark.parametrize(
+    "runtime_image,values",
+    [
+        ("docker.io/moby/buildkit:latest", [{"RepoDigests": []}]),
+        (
+            "docker.io/moby/buildkit@sha256:" + "c" * 64,
+            [{"RepoDigests": ["moby/buildkit@sha256:" + "d" * 64]}],
+        ),
+        ("docker.io/moby/buildkit@sha256:" + "c" * 64, [{"RepoDigests": []}]),
+    ],
+)
+def test_runtime_image_digest_rejects_unpinned_or_unmatched_image(runtime_image, values):
+    module = _module()
+    with pytest.raises(RuntimeError, match="digest"):
+        module._verified_runtime_image_digest(runtime_image, values)
 
 
 def test_container_mode_derives_pid_from_inspect_instead_of_cli(monkeypatch, tmp_path):

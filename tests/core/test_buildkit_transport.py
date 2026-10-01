@@ -11,6 +11,7 @@ import pytest
 from inv.buildkit_transport import (
     BuildkitTransportConfiguration,
     RootlessBuildkitTransport,
+    _normalized_platforms,
 )
 from inv.errors import DomainError
 
@@ -20,6 +21,31 @@ TENANT = "123e4567-e89b-12d3-a456-426614174000"
 ULID = "01ARZ3NDEKTSV4RRFFQ69G5FAV"
 HEAD = "a" * 40
 TREE = "b" * 40
+
+
+def test_worker_platforms_normalize_buildkit_strings_and_oci_structures():
+    assert _normalized_platforms(
+        [
+            "linux/amd64",
+            {"os": "linux", "architecture": "amd64", "variant": "v3"},
+        ]
+    ) == ("linux/amd64", "linux/amd64/v3")
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        [],
+        [{"os": "linux"}],
+        [{"os": "linux", "architecture": "amd64", "unknown": "x"}],
+        [{"os": "Linux", "architecture": "amd64"}],
+        ["linux"],
+        ["linux/amd64/"],
+    ],
+)
+def test_worker_platforms_reject_unknown_or_ambiguous_shapes(value):
+    with pytest.raises(DomainError, match="RES-0006"):
+        _normalized_platforms(value)
 
 
 def _health():
@@ -49,6 +75,19 @@ def _health():
             "noNewPrivileges": False,
             "cgroupMode": "v2",
         },
+        "fieldSources": {
+            "pid": "caller-passed-rootlesskit-process",
+            "processStartTicks": "proc-rootlesskit-process",
+            "rootless": "proc-uid-map",
+            "privileged": "caller-asserted-reference-boundary",
+            "hostAccess": "caller-asserted-reference-boundary",
+            "entitlements": "caller-asserted-reference-boundary",
+            "devices": "caller-asserted-reference-boundary",
+            "binds": "caller-asserted-reference-boundary",
+            "runtimeIdentity": "buildkitd-binary-sha256",
+            "seccompMode": "proc-process-status",
+            "lsm": "host-lsm-detection",
+        },
     }
 
 
@@ -60,7 +99,7 @@ class _Runner:
         self.workers = [
             {
                 "ID": "worker-1",
-                "Platforms": ["linux/amd64"],
+                "Platforms": [{"architecture": "amd64", "os": "linux"}],
                 "Labels": {"org.mobyproject.buildkit.worker.executor": "oci"},
             }
         ]
@@ -226,6 +265,7 @@ def test_measure_binds_exact_protected_health_and_live_worker(boundary):
         "hostAccess": False,
         "entitlements": [],
         "runtimeIdentity": "sha256:" + "7" * 64,
+        "fieldSources": _health()["fieldSources"],
     }
     arguments, _cwd, timeout, environment = runner.calls[-1]
     assert arguments[1:4] == ("--addr", _health()["address"], "debug")
@@ -241,11 +281,19 @@ def test_measure_binds_exact_protected_health_and_live_worker(boundary):
         (lambda value: value.__setitem__("entitlements", ["security.insecure"]), "RES-0006"),
         (lambda value: value.__setitem__("privileged", True), "RES-0006"),
         (lambda value: value.__setitem__("hostAccess", True), "RES-0006"),
+        (lambda value: value.__setitem__("recoveryEpoch", 8), "RES-0006"),
+        (lambda value: value.__setitem__("address", "tcp://127.0.0.1:4321"), "RES-0006"),
         (lambda value: value.__setitem__("devices", ["/dev/dri"]), "RES-0006"),
         (lambda value: value.__setitem__("unexpected", True), "RES-0006"),
         (
             lambda value: value.__setitem__(
                 "observedAt", (NOW - timedelta(seconds=16)).isoformat()
+            ),
+            "RES-0003",
+        ),
+        (
+            lambda value: value.__setitem__(
+                "observedAt", (NOW + timedelta(microseconds=1)).isoformat()
             ),
             "RES-0003",
         ),
@@ -327,6 +375,10 @@ def test_reference_roundtrip_uses_fixed_no_network_oci_export(boundary, tmp_path
         ),
         (
             lambda _request, plan: plan.__setitem__("builderInstanceId", "builder-other"),
+            "VERIFY-0002",
+        ),
+        (
+            lambda request, _plan: request.__setitem__("targetPlatform", "linux/arm64"),
             "VERIFY-0002",
         ),
     ],

@@ -35,6 +35,7 @@ TRANSPORT_ENABLE_SETTING = "INV_BUILDKIT_REFERENCE_ENABLED"
 _HEX_40 = re.compile(r"[0-9a-f]{40}")
 _HEX_64 = re.compile(r"[0-9a-f]{64}")
 _IMAGE_DIGEST = re.compile(r"sha256:[0-9a-f]{64}")
+_PLATFORM_COMPONENT = re.compile(r"[a-z0-9][a-z0-9_.-]{0,63}")
 _HEALTH_KEYS = frozenset(
     {
         "schemaVersion",
@@ -56,6 +57,7 @@ _HEALTH_KEYS = frozenset(
         "rootlesskitVersion",
         "runtimeIdentity",
         "isolation",
+        "fieldSources",
     }
 )
 _ISOLATION_KEYS = frozenset(
@@ -67,6 +69,32 @@ _ISOLATION_KEYS = frozenset(
         "cgroupMode",
     }
 )
+_CONTAINER_FIELD_SOURCES = {
+    "pid": "proc-descendant-buildkitd",
+    "processStartTicks": "proc-buildkitd",
+    "rootless": "proc-user-namespace",
+    "privileged": "docker-inspect-host-config",
+    "hostAccess": "docker-inspect-rootless-boundary",
+    "entitlements": "docker-inspect-config-command",
+    "devices": "docker-inspect-host-config",
+    "binds": "docker-inspect-host-config",
+    "runtimeIdentity": "docker-repo-digest",
+    "seccompMode": "docker-inspect-unconfined",
+    "lsm": "docker-inspect-unconfined",
+}
+_PROCESS_FIELD_SOURCES = {
+    "pid": "caller-passed-rootlesskit-process",
+    "processStartTicks": "proc-rootlesskit-process",
+    "rootless": "proc-uid-map",
+    "privileged": "caller-asserted-reference-boundary",
+    "hostAccess": "caller-asserted-reference-boundary",
+    "entitlements": "caller-asserted-reference-boundary",
+    "devices": "caller-asserted-reference-boundary",
+    "binds": "caller-asserted-reference-boundary",
+    "runtimeIdentity": "buildkitd-binary-sha256",
+    "seccompMode": "proc-process-status",
+    "lsm": "host-lsm-detection",
+}
 
 
 class CommandRunner(Protocol):
@@ -187,6 +215,52 @@ def _parse_workers(output: str) -> tuple[dict, ...]:
     return tuple(values)
 
 
+def _normalized_platforms(value: object) -> tuple[str, ...]:
+    if not isinstance(value, list) or not value:
+        raise DomainError("RES-0006", "BuildKit worker inventory is invalid", 503, retryable=True)
+    normalized = []
+    for item in value:
+        if isinstance(item, str):
+            parts = item.split("/")
+            if len(parts) not in {2, 3} or any(
+                not _PLATFORM_COMPONENT.fullmatch(part) for part in parts
+            ):
+                raise DomainError(
+                    "RES-0006", "BuildKit worker inventory is invalid", 503, retryable=True
+                )
+            normalized.append(item)
+            continue
+        if not isinstance(item, dict) or not {"os", "architecture"} <= set(item) <= {
+            "os",
+            "architecture",
+            "variant",
+        }:
+            raise DomainError(
+                "RES-0006", "BuildKit worker inventory is invalid", 503, retryable=True
+            )
+        operating_system = item.get("os")
+        architecture = item.get("architecture")
+        variant = item.get("variant")
+        if (
+            not isinstance(operating_system, str)
+            or not _PLATFORM_COMPONENT.fullmatch(operating_system)
+            or not isinstance(architecture, str)
+            or not _PLATFORM_COMPONENT.fullmatch(architecture)
+            or (
+                variant is not None
+                and (not isinstance(variant, str) or not _PLATFORM_COMPONENT.fullmatch(variant))
+            )
+        ):
+            raise DomainError(
+                "RES-0006", "BuildKit worker inventory is invalid", 503, retryable=True
+            )
+        normalized.append(
+            f"{operating_system}/{architecture}"
+            + (f"/{variant}" if isinstance(variant, str) else "")
+        )
+    return tuple(sorted(set(normalized)))
+
+
 class RootlessBuildkitTransport:
     """Concrete buildctl transport, restricted to a CI reference roundtrip.
 
@@ -241,6 +315,7 @@ class RootlessBuildkitTransport:
     def _health(self) -> dict:
         receipt = _protected_json(self.configuration.health_receipt_path)
         isolation = receipt.get("isolation")
+        field_sources = receipt.get("fieldSources")
         if (
             set(receipt) != _HEALTH_KEYS
             or receipt.get("schemaVersion") != 1
@@ -270,10 +345,13 @@ class RootlessBuildkitTransport:
             or not isinstance(isolation, dict)
             or set(isolation) != _ISOLATION_KEYS
             or isolation.get("userNamespace") is not True
-            or isolation.get("seccompMode") not in {"filter", "unavailable-ci-reference"}
-            or isolation.get("lsm") not in {"apparmor", "selinux", "unavailable-ci-reference"}
+            or isolation.get("seccompMode")
+            not in {"filter", "unavailable-ci-reference", "unconfined-ci-reference"}
+            or isolation.get("lsm")
+            not in {"apparmor", "selinux", "unavailable-ci-reference", "unconfined-ci-reference"}
             or type(isolation.get("noNewPrivileges")) is not bool
             or isolation.get("cgroupMode") not in {"v2", "unavailable-ci-reference"}
+            or field_sources not in (_CONTAINER_FIELD_SOURCES, _PROCESS_FIELD_SOURCES)
         ):
             raise DomainError(
                 "RES-0006", "BuildKit health receipt is not qualified", 503, retryable=True
@@ -306,21 +384,15 @@ class RootlessBuildkitTransport:
             )
         worker = workers[0]
         worker_id = worker.get("ID") or worker.get("id")
-        platforms = worker.get("Platforms") or worker.get("platforms")
-        if (
-            not isinstance(worker_id, str)
-            or not worker_id
-            or not isinstance(platforms, list)
-            or not platforms
-            or any(not isinstance(item, str) or not item for item in platforms)
-        ):
+        platforms = _normalized_platforms(worker.get("Platforms") or worker.get("platforms"))
+        if not isinstance(worker_id, str) or not worker_id:
             raise DomainError(
                 "RES-0006", "BuildKit worker inventory is invalid", 503, retryable=True
             )
         measurement = {
             "health": receipt,
             "workerId": worker_id,
-            "platforms": sorted(set(platforms)),
+            "platforms": list(platforms),
         }
         provider = BuildProviderObservation(
             builder_instance_id=receipt["builderInstanceId"],
@@ -332,7 +404,7 @@ class RootlessBuildkitTransport:
         return MeasuredBuilder(
             provider,
             worker_id,
-            tuple(sorted(set(platforms))),
+            platforms,
             receipt["buildkitVersion"],
             receipt["rootlesskitVersion"],
             dict(receipt["isolation"]),
@@ -347,6 +419,7 @@ class RootlessBuildkitTransport:
                 "hostAccess": receipt["hostAccess"],
                 "entitlements": list(receipt["entitlements"]),
                 "runtimeIdentity": receipt["runtimeIdentity"],
+                "fieldSources": dict(receipt["fieldSources"]),
             },
         )
 

@@ -68,6 +68,59 @@ def _host_uid(pid: int) -> int:
     return mappings[0][1]
 
 
+def _positive_process_uid(status: dict[str, str]) -> int:
+    try:
+        uid = int(status["Uid"].split()[0])
+    except (KeyError, ValueError, IndexError):
+        raise RuntimeError("rootless BuildKit daemon uid is invalid") from None
+    if uid <= 0:
+        raise RuntimeError("rootless BuildKit daemon is not an unprivileged process")
+    return uid
+
+
+def _buildkitd_descendant_pid(container_init_pid: int) -> int:
+    pending = [container_init_pid]
+    visited = set()
+    candidates = []
+    while pending:
+        pid = pending.pop()
+        if pid in visited:
+            continue
+        visited.add(pid)
+        try:
+            children = Path(f"/proc/{pid}/task/{pid}/children").read_text(encoding="ascii")
+            pending.extend(int(value) for value in children.split())
+            command = Path(f"/proc/{pid}/comm").read_text(encoding="ascii").strip()
+        except (OSError, ValueError):
+            raise RuntimeError("rootless BuildKit process tree is unavailable") from None
+        if command == "buildkitd":
+            candidates.append(pid)
+    if len(candidates) != 1:
+        raise RuntimeError("rootless BuildKit daemon process is not exclusive")
+    return candidates[0]
+
+
+def _verified_runtime_image_digest(runtime_image: str, values: object) -> str:
+    expected = runtime_image.rsplit("@", 1)[-1]
+    if (
+        not expected.startswith("sha256:")
+        or len(expected) != 71
+        or not isinstance(values, list)
+        or len(values) != 1
+        or not isinstance(values[0], dict)
+    ):
+        raise RuntimeError("rootless BuildKit image is not digest pinned")
+    repo_digests = values[0].get("RepoDigests")
+    if (
+        not isinstance(repo_digests, list)
+        or not repo_digests
+        or not all(isinstance(value, str) for value in repo_digests)
+        or not any(value.endswith("@" + expected) for value in repo_digests)
+    ):
+        raise RuntimeError("rootless BuildKit image digest does not match the pulled image")
+    return expected
+
+
 def _lsm() -> str:
     apparmor = Path("/sys/module/apparmor/parameters/enabled")
     if apparmor.is_file() and apparmor.read_text(encoding="ascii").strip().lower() == "y":
@@ -111,6 +164,19 @@ def _process_health_receipt(args, observed_at: datetime) -> dict:
                 else "unavailable-ci-reference"
             ),
         },
+        "fieldSources": {
+            "pid": "caller-passed-rootlesskit-process",
+            "processStartTicks": "proc-rootlesskit-process",
+            "rootless": "proc-uid-map",
+            "privileged": "caller-asserted-reference-boundary",
+            "hostAccess": "caller-asserted-reference-boundary",
+            "entitlements": "caller-asserted-reference-boundary",
+            "devices": "caller-asserted-reference-boundary",
+            "binds": "caller-asserted-reference-boundary",
+            "runtimeIdentity": "buildkitd-binary-sha256",
+            "seccompMode": "proc-process-status",
+            "lsm": "host-lsm-detection",
+        },
     }
 
 
@@ -118,25 +184,27 @@ def _container_health_receipt(args, observed_at: datetime) -> dict:
     values = json.loads(_command("docker", "inspect", args.container_name))
     value = _validated_container_inspect(values)
     state = value["State"]
-    status = _status(state["Pid"])
-    uid = int(status["Uid"].split()[0])
-    if uid <= 0:
-        raise RuntimeError("rootless BuildKit container process is not an unprivileged user")
-    stat_fields = Path(f"/proc/{state['Pid']}/stat").read_text(encoding="ascii").split()
-    image_digest = args.runtime_image.rsplit("@", 1)[-1]
-    if not image_digest.startswith("sha256:"):
-        raise RuntimeError("rootless BuildKit image is not digest pinned")
+    daemon_pid = _buildkitd_descendant_pid(state["Pid"])
+    status = _status(daemon_pid)
+    uid = _positive_process_uid(status)
+    stat_fields = Path(f"/proc/{daemon_pid}/stat").read_text(encoding="ascii").split()
+    user_namespace = Path(f"/proc/{daemon_pid}/ns/user").stat().st_ino
+    host_user_namespace = Path("/proc/1/ns/user").stat().st_ino
+    if user_namespace == host_user_namespace:
+        raise RuntimeError("rootless BuildKit daemon is not in a separate user namespace")
+    image_values = json.loads(_command("docker", "image", "inspect", args.runtime_image))
+    image_digest = _verified_runtime_image_digest(args.runtime_image, image_values)
     return {
         "schemaVersion": 1,
         "builderInstanceId": INSTANCE,
         "builderProfileId": PROFILE,
         "recoveryEpoch": EPOCH,
         "address": args.address,
-        "pid": state["Pid"],
+        "pid": daemon_pid,
         "hostUid": uid,
         "processStartTicks": int(stat_fields[21]),
-        "rootless": True,
-        "privileged": False,
+        "rootless": user_namespace != host_user_namespace,
+        "privileged": value["HostConfig"]["Privileged"],
         "hostAccess": False,
         "entitlements": [],
         "devices": [],
@@ -150,17 +218,30 @@ def _container_health_receipt(args, observed_at: datetime) -> dict:
         ),
         "runtimeIdentity": image_digest,
         "isolation": {
-            "userNamespace": True,
+            "userNamespace": user_namespace != host_user_namespace,
             # The official rootless image needs these host filters relaxed on a
             # hosted runner. This is why the result remains ci-reference only.
-            "seccompMode": "unavailable-ci-reference",
-            "lsm": "unavailable-ci-reference",
+            "seccompMode": "unconfined-ci-reference",
+            "lsm": "unconfined-ci-reference",
             "noNewPrivileges": status.get("NoNewPrivs") == "1",
             "cgroupMode": (
                 "v2"
                 if Path("/sys/fs/cgroup/cgroup.controllers").is_file()
                 else "unavailable-ci-reference"
             ),
+        },
+        "fieldSources": {
+            "pid": "proc-descendant-buildkitd",
+            "processStartTicks": "proc-buildkitd",
+            "rootless": "proc-user-namespace",
+            "privileged": "docker-inspect-host-config",
+            "hostAccess": "docker-inspect-rootless-boundary",
+            "entitlements": "docker-inspect-config-command",
+            "devices": "docker-inspect-host-config",
+            "binds": "docker-inspect-host-config",
+            "runtimeIdentity": "docker-repo-digest",
+            "seccompMode": "docker-inspect-unconfined",
+            "lsm": "docker-inspect-unconfined",
         },
     }
 
@@ -175,12 +256,15 @@ def _validated_container_inspect(values: object) -> dict:
     ports = value.get("NetworkSettings", {}).get("Ports", {}).get("1234/tcp")
     mounts = value.get("Mounts") or []
     user = config.get("User")
+    command = config.get("Cmd")
     if (
         state.get("Running") is not True
         or type(state.get("Pid")) is not int
         or state["Pid"] <= 1
         or not isinstance(user, str)
         or user in {"", "0", "root", "0:0", "root:root"}
+        or not isinstance(command, list)
+        or any(not isinstance(argument, str) for argument in command)
     ):
         raise RuntimeError(
             "rootless BuildKit container boundary is broader than declared: identity"
@@ -206,9 +290,13 @@ def _validated_container_inspect(values: object) -> dict:
         raise RuntimeError(
             "rootless BuildKit container boundary is broader than declared: capability"
         )
-    if host.get("MaskedPaths") not in (None, []) or host.get("ReadonlyPaths") not in (None, []):
+    if host.get("MaskedPaths") != [] or host.get("ReadonlyPaths") != []:
         raise RuntimeError(
             "rootless BuildKit container boundary is broader than declared: system-path"
+        )
+    if any(argument.startswith("--allow-insecure-entitlement") for argument in command):
+        raise RuntimeError(
+            "rootless BuildKit container boundary is broader than declared: entitlement"
         )
     if any(
         mount.get("Type") != "tmpfs"
