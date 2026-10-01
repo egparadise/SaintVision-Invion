@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 
 import pytest
+import inv.build_governance as build_governance
 
 from inv.build_governance import (
     BUILD_ACTION,
@@ -325,6 +326,26 @@ def test_authorize_build_rejects_malformed_provider_observation():
         )
 
 
+def test_authorize_build_rejects_tenant_mismatch_before_policy(monkeypatch):
+    request = _request()
+    request["tenantId"] = "223e4567-e89b-12d3-a456-426614174000"
+    decision = _decision(request)
+    provider = _provider()
+    plan = _plan(request, decision, provider)
+    monkeypatch.setattr(build_governance, "enforce_decision", lambda *args, **kwargs: None)
+    with pytest.raises(DomainError, match="AUTH-0011"):
+        _authorize(request=request, decision=decision, provider=provider, plan=plan)
+
+
+def test_authorize_build_rejects_expired_policy():
+    request = _request()
+    decision = _decision(request, expiresAt="2026-10-01T05:59:59Z")
+    provider = _provider()
+    plan = _plan(request, decision, provider)
+    with pytest.raises(DomainError, match="AUTH-0012"):
+        _authorize(request=request, decision=decision, provider=provider, plan=plan)
+
+
 @pytest.mark.parametrize(
     "field,value",
     [
@@ -409,6 +430,33 @@ def test_revalidate_build_repeats_live_containment_and_rejects_drift():
         )
 
 
+def test_revalidate_build_rejects_plan_swap_against_admitted_binding():
+    request = _request()
+    decision = _decision(request)
+    provider = _provider()
+    admitted_plan = _plan(request, decision, provider)
+    admitted = _authorize(
+        request=request,
+        decision=decision,
+        provider=provider,
+        plan=admitted_plan,
+    )
+    swapped_plan = deepcopy(admitted_plan)
+    swapped_plan["budget"]["memoryBytes"] += 1
+    with pytest.raises(DomainError, match="VERIFY-0002"):
+        revalidate_build(
+            _Connection(),
+            _principal(),
+            request,
+            swapped_plan,
+            decision,
+            policy_version="s08-build-v1",
+            provider=provider,
+            now=NOW,
+            admitted_binding_digest=admitted["bindingDigest"],
+        )
+
+
 def test_finalize_build_cannot_emit_evidence_after_kill_switch():
     request = _request()
     decision = _decision(request)
@@ -456,6 +504,13 @@ def test_success_receipt_emits_strict_policy_bound_evidence():
 def test_build_evidence_rejects_scope_digest_and_audit_drift(mutate):
     receipt = _receipt()
     mutate(receipt)
+    with pytest.raises(DomainError, match="VERIFY-0002"):
+        _evidence(receipt=receipt)
+
+
+def test_build_evidence_rejects_adjacent_duplicate_audit_event():
+    receipt = _receipt()
+    receipt["auditEvents"].insert(5, deepcopy(receipt["auditEvents"][4]))
     with pytest.raises(DomainError, match="VERIFY-0002"):
         _evidence(receipt=receipt)
 

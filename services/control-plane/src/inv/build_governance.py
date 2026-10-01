@@ -277,7 +277,8 @@ def _build_evidence(
         else "build_cancelled" if receipt["result"] == "cancelled" else "build_failed"
     )
     if (
-        set(names) != required
+        len(names) != len(required)
+        or set(names) != required
         or names != sorted(names, key=_AUDIT_ORDER.index)
         or any(
             event["traceId"] != plan["traceId"]
