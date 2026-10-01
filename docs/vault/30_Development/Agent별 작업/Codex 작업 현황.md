@@ -1,15 +1,26 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.237"
+version: "1.0.238"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T14:19:55+09:00"
+updated: "2026-10-01T15:00:17+09:00"
 source_of_truth: "Git"
-active_card: "CARD-172 S08-BE BuildKit contract boundary"
-active_card_status: "Claude r3 W2 exact enum vocabularies pinned in addition to negative controls; focused PG-free 55 passed"
-active_card_next: "exact-head hosted Core/Backend and Claude re-review; adapter/ROOF/GPU remain separate cards"
+active_card: "CARD-173 S08-BE Build path ROOF binding"
+active_card_status: "pre-dispatch/final live policy, containment, provider and receipt/evidence binding implemented; focused 91 passed"
+active_card_next: "contract/docs gates, stacked PR and Claude review; daemon adapter and GPU remain separate cards"
 ---
+
+## 2026-10-01 Card 173 — S08-BE Build 경로 ROOF 결속
+
+- #269의 strict Build 계약 위에 live project authority·kill switch·PolicyDecision·fresh
+  builder observation을 pre-dispatch와 final transaction에서 반복 검증하는 내부 runtime
+  경계를 추가했다.
+- receipt는 plan/source/policy/trace, 결과별 exact audit event 순서, output·cleanup digest,
+  verified cleanup과 failed/cancelled cache quarantine를 통과해야 `EvidenceEnvelope`가 된다.
+- focused PG-free **91 passed**. daemon·socket·secret/cache/network·실제 cancel은 아직
+  `NOT_OBSERVED`이며 다음 adapter 카드에서만 판정한다.
+- 근거: [[2026-10-01_15-00-17_KST_S08-BE_ROOF_결속_Codex]].
 
 ## 2026-10-01 Card 172 — S08-BE BuildKit 계약 경계
 

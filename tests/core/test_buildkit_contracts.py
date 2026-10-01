@@ -183,6 +183,7 @@ def test_build_contract_enum_vocabularies_are_literal_and_complete():
         "build_started",
         "network_decision",
         "output_verified",
+        "build_failed",
         "build_cancelled",
         "cleanup_verified",
     ]

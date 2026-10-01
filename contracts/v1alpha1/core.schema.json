@@ -861,6 +861,7 @@
             "build_started",
             "network_decision",
             "output_verified",
+            "build_failed",
             "build_cancelled",
             "cleanup_verified"
           ]

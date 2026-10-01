@@ -332,6 +332,7 @@ class Event(StrEnum):
     build_started = 'build_started'
     network_decision = 'network_decision'
     output_verified = 'output_verified'
+    build_failed = 'build_failed'
     build_cancelled = 'build_cancelled'
     cleanup_verified = 'cleanup_verified'
 

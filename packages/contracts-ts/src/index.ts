@@ -175,7 +175,7 @@ export interface BuildCleanupReceipt {
 }
 
 export interface BuildAuditEvent {
-  event: "request_validated" | "policy_bound" | "builder_claimed" | "build_started" | "network_decision" | "output_verified" | "build_cancelled" | "cleanup_verified";
+  event: "request_validated" | "policy_bound" | "builder_claimed" | "build_started" | "network_decision" | "output_verified" | "build_failed" | "build_cancelled" | "cleanup_verified";
   traceId: TraceId;
   timestamp: Timestamp;
   decisionId: string;
