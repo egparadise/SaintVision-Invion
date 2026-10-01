@@ -78,7 +78,8 @@ func Verify(envelope []byte, config Config) (Permit, error) {
 		}
 	}
 	seen := map[contracts.LeaseId]bool{}
-	var cpu, memory int64
+	var cpu, memory, gpu int64
+	var gpuLease *contracts.NodeAllocation
 	deadline, err := time.Parse(time.RFC3339Nano, string(claim.NotAfter))
 	if err != nil {
 		return permit, errors.New("NODE-0007: invalid deadline")
@@ -99,10 +100,29 @@ func Verify(envelope []byte, config Config) (Permit, error) {
 			cpu += l.Amount
 		} else if a.Kind == "memory" {
 			memory += l.Amount
+		} else if a.Kind == "gpu" {
+			gpu += l.Amount
+			copy := a
+			gpuLease = &copy
 		}
 	}
 	if cpu < plan.CpuMillis || memory < plan.MemoryBytes {
 		return permit, errors.New("NODE-0009: allocation limits insufficient")
+	}
+	if plan.GpuAllocation == nil {
+		if gpu != 0 {
+			return permit, errors.New("NODE-0009: unexpected GPU allocation")
+		}
+	} else {
+		g := plan.GpuAllocation
+		if gpu != 1 || gpuLease == nil || gpuLease.Lease.Amount != 1 ||
+			g.NodeId != claim.NodeId || g.NodeId != gpuLease.NodeId ||
+			g.ResourceId != gpuLease.Lease.ResourceId || g.LeaseId != gpuLease.Lease.LeaseId ||
+			g.FencingToken != gpuLease.Lease.FencingToken || g.RecoveryEpoch != claim.RecoveryEpoch ||
+			g.ProfileVersion != claim.ProfileVersion || !g.Exclusive || !g.RuntimeCompatible || !g.Healthy ||
+			g.DeviceRequestDriver != "nvidia" {
+			return permit, errors.New("NODE-0009: GPU allocation proof rejected")
+		}
 	}
 	return permit, nil
 }

@@ -646,6 +646,49 @@ class ClaimId(RootModel[UUID]):
     root: UUID
 
 
+class GPUDeviceObservation(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    resourceId: ResourceId
+    deviceId: constr(pattern=r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$')
+    vendor: constr(min_length=1, max_length=64)
+    model: constr(min_length=1, max_length=128)
+    totalVramBytes: conint(ge=1, le=9007199254740991)
+    computeCapability: constr(pattern=r'^[0-9]{1,2}[.][0-9]{1,2}$')
+    driverVersion: constr(min_length=1, max_length=64)
+    runtimeVersion: constr(min_length=1, max_length=64)
+    providerVersion: constr(min_length=1, max_length=200)
+    observationDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    healthy: Literal[True]
+    exclusive: Literal[True]
+    runtimeCompatible: Literal[True]
+    deviceRequestDriver: Literal['nvidia']
+
+
+class GPUAllocation(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    nodeId: NodeId
+    resourceId: ResourceId
+    leaseId: LeaseId
+    fencingToken: constr(
+        pattern=r'^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}:[1-9][0-9]*$'
+    )
+    deviceId: constr(pattern=r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$')
+    vramBytes: conint(ge=1, le=9007199254740991)
+    providerVersion: constr(min_length=1, max_length=200)
+    profileVersion: constr(min_length=1, max_length=200)
+    recoveryEpoch: UUID
+    observationDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    observedAt: Timestamp
+    exclusive: Literal[True]
+    runtimeCompatible: Literal[True]
+    healthy: Literal[True]
+    deviceRequestDriver: Literal['nvidia']
+
+
 class ArgvItem(RootModel[constr(min_length=1, max_length=4096)]):
     root: constr(min_length=1, max_length=4096)
 
@@ -677,6 +720,7 @@ class ExecutionClaim(BaseModel):
 class Kind2(StrEnum):
     cpu = 'cpu'
     memory = 'memory'
+    gpu = 'gpu'
 
 
 class NodeAllocation(BaseModel):
@@ -805,6 +849,7 @@ class NodeResourceSnapshot(BaseModel):
     memoryAvailableBytes: conint(ge=0, le=9007199254740991)
     osType: Literal['linux']
     agentVersion: Literal['0.1.0']
+    gpuDevices: list[GPUDeviceObservation] | None = Field(None, max_length=16)
 
 
 class NodeChunkInput(BaseModel):
@@ -1991,6 +2036,7 @@ class SandboxLaunchSpec(BaseModel):
     noNewPrivileges: Literal[True]
     privileged: Literal[False]
     hostAccess: Literal[False]
+    gpuAllocation: GPUAllocation | None = None
     workspaceInput: WorkspaceInput | None = None
     terminal: TerminalSpec | None = None
 

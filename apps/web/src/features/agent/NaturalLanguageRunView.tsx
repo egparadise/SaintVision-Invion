@@ -280,7 +280,17 @@ export const NaturalLanguageRunView: React.FC = () => {
                   return (
                     <span
                       key={file}
+                      role="button"
+                      tabIndex={0}
+                      aria-pressed={isSelected}
+                      aria-label={`참조 Context 파일 ${file} ${isSelected ? '선택 해제' : '선택'}`}
                       onClick={() => toggleFile(file)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          toggleFile(file);
+                        }
+                      }}
                       style={{
                         padding: '4px 10px',
                         borderRadius: '4px',

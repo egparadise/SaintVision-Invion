@@ -318,6 +318,8 @@ def test_real_browser_bootstrap_uses_the_current_resolved_oidc_config_shape():
     assert "lambda route, body=" not in source
     assert '"passedChecks": 8' not in source
     assert '"keyboardNavigationPass": True' not in source
+    assert "start_menu = page.locator('#desktop-start-menu-dropdown')" in source
+    assert "page.locator('div[role=\"menu\"]')" not in source
 
 
 def test_main_returns_two_when_report_validation_fails(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
