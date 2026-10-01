@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.230"
+version: "1.0.231"
 status: "review"
 author: "Codex"
-updated: "2026-09-30T17:21:52+09:00"
+updated: "2026-10-01T09:15:24+09:00"
 source_of_truth: "Git"
 ---
 
@@ -30,7 +30,8 @@ source_of_truth: "Git"
   분리했다. 같은 transaction의 선행 권한 검사가 이미 잡은 lock을 재사용하도록 함수
   중복 잠금을 제거했고 owner UPDATE 권한은 넓히지 않았다. route 403과 함수 내부
   권한 재도출, rollback·event ID·terminal·shard 변이를 보강했으며 PG-free bridge
-  15건과 AC-11 집계 85건을 재통과했다. 이전 revision 회복 시 0056 policy가
+  17건과 AC-11 집계 85건을 재통과했다. shard 증거는 PG-free 호출부·변이 guard이고
+  parent/member real-PG fixture는 NOT_RUN인 Codex 후속 항목이다. 이전 revision 회복 시 0056 policy가
   중복되던 결함도 수렴 재적용으로 닫았고, 월 audit partition 부재의 503·전체
   rollback·같은 key 복구 시험을 추가했다. exact-code `44556845`의 hosted
   Backend 3.12/3.14와 Core가 모두 green이고, Core JUnit에서 bridge 실 PG 17건의

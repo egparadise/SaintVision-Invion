@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-20260930-CARD160-S04-CANCEL-PRODUCT-BRIDGE-CODEX"
 title: "CARD-160 S04-DB core cancel 제품 경로 결속 설계"
-version: "1.2.0"
+version: "1.2.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-30T17:21:52+09:00"
+updated: "2026-10-01T09:15:24+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "c9c1d836ff8fcd606b5bca3862c6cd764eadf4fd"
@@ -115,7 +115,9 @@ registry 상태를 바꾸지 않았고 S04-DB는 `review`를 유지한다.
   `tests.integration.test_kernel_cancel_bridge_real_pg` **17건 실행, 17 passed,
   failure/error/skip 0**을 확인했다. 여기에는 route 403, 함수 내부 권한 재도출,
   mapping·terminal·event ID 부정군, lock timeout, EXECUTE 회수, audit partition 부재,
-  shard·동시 취소와 catalogue digest 검증이 포함된다.
+  동시 취소와 catalogue digest 검증이 포함된다. shard 결속은 이 17건에 포함되지
+  않았고 PG-free 호출부·변이 guard만 통과했다. 설계 시험 7의 shard parent/member
+  real-PG fixture는 **NOT_RUN**이며 owner Codex의 후속 카드로 남긴다.
 - 계약·ontology·docs·path citation·migration graph·diff gate는 아래 문서 commit 전
   최종 working tree에서 다시 실행한다.
 
