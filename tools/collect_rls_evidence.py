@@ -62,7 +62,7 @@ BASELINE_PATH = Path(__file__).with_name("rls-boundary-baseline.json")
 #: report that omitted inv_audit_reader would read as "no role sees another
 #: tenant's audit rows", which is not what 0047_audit_events_isolation does.
 DEFAULT_ROLES = ("inv_app", "inv_kernel", "inv_runtime_dev", "inv_discovery_issuer", "inv_discovery_issuer_guard",
-                 "inv_audit_writer", "inv_audit_reader")
+                 "inv_audit_writer", "inv_audit_reader", "inv_cancel_bridge_owner")
 SCHEMAS = ("public", "inv")
 TENANT_GUC = "inv.tenant_id"
 PRIVILEGES = ("SELECT", "INSERT", "UPDATE", "DELETE")

@@ -1,12 +1,14 @@
 """Project-scoped browser boundary; trusted workers keep the execution authority."""
 
 from .approvals import ApprovalStore
+from .business_cancel import record_user_cancel
 from .contracts import validate_contract
 from .errors import DomainError
 from .ids import new_id
 from .leases import lock_run, lock_resources
 from .reservations import reclaim_unclaimed
 from .runs import RunStore, event, public
+from .tracing import nonzero_id
 
 
 class Control:
@@ -166,10 +168,11 @@ class Control:
                 raise DomainError("RES-0004", "Shard parent not found", 404)
             return ShardRuntime._status(conn, project, link["plan_id"])
 
-    def cancel(self, principal, project, run_id, expected_version, key):
+    def cancel(self, principal, project, run_id, expected_version, key, *, trace_id=None):
         validate_contract("RunId", run_id)
         if type(expected_version) is not int or not 1 <= expected_version <= 9007199254740991:
             raise DomainError("VAL-0003", "Current integer Run version required", 422)
+        trace_id = trace_id or nonzero_id(16)
         with self.db.transaction(principal.tenant_id) as conn:
             parent = conn.execute(
                 "SELECT plan_id FROM inv.shard_parents WHERE project_id=%s AND run_id=%s",
@@ -184,6 +187,7 @@ class Control:
                 parent["plan_id"],
                 key=key,
                 expected_parent_version=expected_version,
+                trace_id=trace_id,
             )
             parent_result = result["parentRun"]
             validate_contract("ControlRunDetail", parent_result)
@@ -218,6 +222,7 @@ class Control:
                 reason="cancelled_before_claim",
             )
             if row["state"] != "cancelled":
+                record_user_cancel(conn, principal, project, run_id, trace_id)
                 event(
                     conn,
                     principal.tenant_id,

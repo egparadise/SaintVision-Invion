@@ -1,0 +1,73 @@
+{
+  "acceptanceClaim": false,
+  "codeSha": "13c20c83b959f88c466c09d6198c4b824889ee7e",
+  "collectorSha256": "767736d454d0d9015a735912927523c4060b2f1b4a4a75f14b39af4d59eb3178",
+  "criteria": {
+    "clientCredentialsRefused": "the public client refuses a client-credentials grant",
+    "controlPlaneRejectsBadToken": "GET /v1/session with a malformed bearer answers 401",
+    "controlPlaneRejectsMissingToken": "GET /v1/session with no Authorization answers 401",
+    "idpDiscoveryIssuer": "the discovery issuer equals the string the control plane is given",
+    "idpHttpsVerified": "TLS verifies against the internal CA bundle with hostname checking on",
+    "idpJwksSameOrigin": "jwks_uri shares the issuer's origin and serves an RS256 signing key",
+    "idpNameResolves": "the system resolver finds the IdP name; no substitute is accepted",
+    "passwordGrantRefused": "the public client refuses a password grant (synthetic account only)"
+  },
+  "observations": {
+    "clientCredentialsRefused": {
+      "reason": "the IdP name does not resolve on this host",
+      "status": "BLOCKED_EXTERNAL"
+    },
+    "controlPlaneRejectsBadToken": {
+      "httpStatus": 401,
+      "problemCode": "AUTH-0050",
+      "status": "MEASURED_PASS"
+    },
+    "controlPlaneRejectsMissingToken": {
+      "httpStatus": 401,
+      "problemCode": "AUTH-0050",
+      "status": "MEASURED_PASS"
+    },
+    "idpDiscoveryIssuer": {
+      "reason": "the IdP name does not resolve on this host",
+      "status": "BLOCKED_EXTERNAL"
+    },
+    "idpHttpsVerified": {
+      "reason": "the IdP name does not resolve on this host",
+      "status": "BLOCKED_EXTERNAL"
+    },
+    "idpJwksSameOrigin": {
+      "reason": "the IdP name does not resolve on this host",
+      "status": "BLOCKED_EXTERNAL"
+    },
+    "idpNameResolves": {
+      "reason": "hosts-not-applied",
+      "status": "BLOCKED_EXTERNAL"
+    },
+    "passwordGrantRefused": {
+      "reason": "the IdP name does not resolve on this host",
+      "status": "BLOCKED_EXTERNAL"
+    }
+  },
+  "provenance": {
+    "branch": "agent/claude/c155-intranet-e2e-smoke",
+    "contentClean": true,
+    "executor": "claude",
+    "workingTreeClean": true
+  },
+  "schemaVersion": "intranet-e2e-smoke:1",
+  "source": {
+    "caBundleSha256": "92455f1b778130334da43b0eee977357b5ae498eb1005bc29ecc6c3afb7192ba",
+    "controlPlaneHost": "loopback",
+    "controlPlanePort": 18081,
+    "expectedIssuer": "https://idp.sv.lan/realms/saintvision",
+    "idpHost": "idp.sv.lan",
+    "inputBindingSha256": "85dbc30310029a34cff2a70150be11c253385c37cfd19b2d7a07cdde1fb10233",
+    "observedAt": "2026-09-30T00:35:15Z",
+    "resolutionOverridden": false,
+    "runEnvironment": "operator-workstation",
+    "sourceFinishedAt": "2026-09-30T00:35:15Z",
+    "sourceStartedAt": "2026-09-30T00:35:15Z",
+    "verificationDisabled": false
+  },
+  "verdict": "BLOCKED_EXTERNAL"
+}

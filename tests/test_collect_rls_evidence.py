@@ -215,7 +215,14 @@ def rls_db():
 def test_real_pg_boundary_passes_and_records_kernel_denial(rls_db, tmp_path):
     observation = tool.collect(
         rls_db["owner"],
-        ("inv_app", "inv_kernel", "inv_runtime_dev", "inv_audit_writer", "inv_audit_reader"),
+        (
+            "inv_app",
+            "inv_kernel",
+            "inv_runtime_dev",
+            "inv_audit_writer",
+            "inv_audit_reader",
+            "inv_cancel_bridge_owner",
+        ),
         rls_db["tenant_a"],
     )
     violations, accepted = tool.apply_baseline(tool.evaluate(observation), tool.load_baseline())
@@ -234,6 +241,25 @@ def test_real_pg_boundary_passes_and_records_kernel_denial(rls_db, tmp_path):
     assert [p["cmd"] for p in reader_audit["policies"]] == ["SELECT"]
     writer_audit = observation["roles"]["inv_audit_writer"]["tables"]["public.audit_events"]
     assert writer_audit["privileges"] == {"select": None, "insert": "table", "update": None, "delete": None}
+    bridge = observation["roles"]["inv_cancel_bridge_owner"]
+    assert bridge["present"] and not bridge["superuser"] and not bridge["bypassrls"]
+    assert not bridge["login"] and not bridge["inherit"] and bridge["member_of"] == []
+    bridge_audit = bridge["tables"]["public.audit_events"]
+    assert bridge_audit["privileges"] == {
+        "select": "column", "insert": "column", "update": None, "delete": None
+    }
+    assert [p["cmd"] for p in bridge_audit["policies"]] == ["INSERT", "SELECT"]
+    bridge_function = [
+        k for k in observation["definer_functions"]
+        if k.startswith("public.record_kernel_run_cancel(")
+    ]
+    assert len(bridge_function) == 1
+    assert observation["definer_functions"][bridge_function[0]]["owner"] == (
+        "inv_cancel_bridge_owner"
+    )
+    assert observation["definer_functions"][bridge_function[0]]["execute_grants"] == [
+        "inv_kernel"
+    ]
     denial = [k for k in observation["definer_functions"] if k.startswith("public.record_auth_denial(")]
     assert len(denial) == 1
     assert observation["definer_functions"][denial[0]]["owner"] == "inv_audit_writer"

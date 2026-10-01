@@ -1,0 +1,102 @@
+{
+  "schemaVersion": "s01-readiness-inventory:1",
+  "topology": "cp-colocated-plus-four-workers",
+  "hostnames": {
+    "controlPlane": [
+      "cp.sv.lan"
+    ],
+    "portal": [
+      "portal.sv.lan"
+    ],
+    "idp": [
+      "idp.sv.lan"
+    ]
+  },
+  "nodes": [
+    {
+      "nodeId": null,
+      "hostname": null,
+      "dnsName": "node1.sv.lan",
+      "ip": null,
+      "installationId": null,
+      "os": null,
+      "role": "worker",
+      "certificateSHA256": null,
+      "profile": null,
+      "hardware": null,
+      "capacity": null,
+      "allowedResources": null,
+      "allowedFolders": null,
+      "ntp": null,
+      "storageRole": null
+    },
+    {
+      "nodeId": null,
+      "hostname": null,
+      "dnsName": "node2.sv.lan",
+      "ip": null,
+      "installationId": null,
+      "os": null,
+      "role": "worker",
+      "certificateSHA256": null,
+      "profile": null,
+      "hardware": null,
+      "capacity": null,
+      "allowedResources": null,
+      "allowedFolders": null,
+      "ntp": null,
+      "storageRole": null
+    },
+    {
+      "nodeId": null,
+      "hostname": null,
+      "dnsName": "node3.sv.lan",
+      "ip": null,
+      "installationId": null,
+      "os": null,
+      "role": "worker",
+      "certificateSHA256": null,
+      "profile": null,
+      "hardware": null,
+      "capacity": null,
+      "allowedResources": null,
+      "allowedFolders": null,
+      "ntp": null,
+      "storageRole": null
+    },
+    {
+      "nodeId": null,
+      "hostname": null,
+      "dnsName": "node4.sv.lan",
+      "ip": null,
+      "installationId": null,
+      "os": null,
+      "role": "worker",
+      "certificateSHA256": null,
+      "profile": null,
+      "hardware": null,
+      "capacity": null,
+      "allowedResources": null,
+      "allowedFolders": null,
+      "ntp": null,
+      "storageRole": null
+    },
+    {
+      "nodeId": null,
+      "hostname": null,
+      "dnsName": "node5.sv.lan",
+      "ip": null,
+      "installationId": null,
+      "os": null,
+      "role": "cp-colocated",
+      "certificateSHA256": null,
+      "profile": null,
+      "hardware": null,
+      "capacity": null,
+      "allowedResources": null,
+      "allowedFolders": null,
+      "ntp": null,
+      "storageRole": null
+    }
+  ]
+}

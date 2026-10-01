@@ -1,0 +1,102 @@
+{
+  "acceptanceClaim": false,
+  "codeSha": "4e60acf35075e32bda3252b005c8ad9d25d26374",
+  "collectorSha256": "b3c1d6f011f822fb1881e9d541f594a1d89f4b1502c9033600911bc377dcf859",
+  "criteria": {
+    "clientCredentialsRefused": "the portal client refuses a client-credentials grant",
+    "controlPlaneConfigurationBound": "the issuer, client id and trusted keys come from the control plane's own configuration, whose bytes are hashed into this report",
+    "controlPlaneRejectsBadToken": "GET /v1/session with a signed-but-invalid bearer answers 401 as canonical ProblemDetails with code AUTH-0050",
+    "controlPlaneRejectsMissingToken": "GET /v1/session with no Authorization answers the same canonical 401",
+    "idpDiscoveryIssuer": "the announced issuer equals the configured issuer, on the same origin",
+    "idpHttpsVerified": "TLS to the issuer's own host verifies against an allowed internal root, with hostname checking on",
+    "idpJwksMatchesTrustBundle": "the signing keys the provider serves are the keys the control plane trusts",
+    "idpNameResolves": "the system resolver finds the issuer's host; no substitute is accepted",
+    "passwordGrantRefused": "the portal client refuses a password grant (synthetic account only)",
+    "portalClientKnown": "the configured client id is known to the provider"
+  },
+  "observations": {
+    "clientCredentialsRefused": {
+      "reason": "the issuer's host does not resolve on this host",
+      "status": "BLOCKED_EXTERNAL"
+    },
+    "controlPlaneConfigurationBound": {
+      "clientIdSha256": "13c95d85eba6d768927953300fc8136037048105df85461f86b76c87dd8ee17f",
+      "issuerIsCanonical": true,
+      "status": "MEASURED_PASS",
+      "trustedKeyCount": 1
+    },
+    "controlPlaneRejectsBadToken": {
+      "canonicalShape": true,
+      "contentType": "application/problem+json",
+      "httpStatus": 401,
+      "probe": "signed-but-invalid",
+      "problemCode": "AUTH-0050",
+      "status": "MEASURED_PASS"
+    },
+    "controlPlaneRejectsMissingToken": {
+      "canonicalShape": true,
+      "contentType": "application/problem+json",
+      "httpStatus": 401,
+      "probe": "no-authorization",
+      "problemCode": "AUTH-0050",
+      "status": "MEASURED_PASS"
+    },
+    "idpDiscoveryIssuer": {
+      "reason": "the issuer's host does not resolve on this host",
+      "status": "BLOCKED_EXTERNAL"
+    },
+    "idpHttpsVerified": {
+      "reason": "the issuer's host does not resolve on this host",
+      "status": "BLOCKED_EXTERNAL"
+    },
+    "idpJwksMatchesTrustBundle": {
+      "reason": "the issuer's host does not resolve on this host",
+      "status": "BLOCKED_EXTERNAL"
+    },
+    "idpNameResolves": {
+      "reason": "hosts-not-applied",
+      "status": "BLOCKED_EXTERNAL"
+    },
+    "passwordGrantRefused": {
+      "reason": "the issuer's host does not resolve on this host",
+      "status": "BLOCKED_EXTERNAL"
+    },
+    "portalClientKnown": {
+      "reason": "the issuer's host does not resolve on this host",
+      "status": "BLOCKED_EXTERNAL"
+    }
+  },
+  "provenance": {
+    "branch": "agent/claude/c155-intranet-e2e-smoke",
+    "contentClean": true,
+    "executor": "claude",
+    "workingTreeClean": true
+  },
+  "schemaVersion": "intranet-e2e-smoke:2",
+  "source": {
+    "allowedRootSha256": [
+      "276fc650a9c948905994c89b2a4e82d3c5d8d3ea5bd078b1eaadd1a0e1b4dd57",
+      "87079ab3a94cfd61c0e43be8e451fb72863f518b1b4b3b68dd9357fb0727ed17"
+    ],
+    "caBundleSha256": "92455f1b778130334da43b0eee977357b5ae498eb1005bc29ecc6c3afb7192ba",
+    "clientIdSha256": "13c95d85eba6d768927953300fc8136037048105df85461f86b76c87dd8ee17f",
+    "controlPlaneConfigSha256": "a2eb56f0bb2ba7d767b46203a1e998ef2ee8095938c8114d983ffb6a79e9f2cc",
+    "controlPlaneHost": "loopback",
+    "controlPlanePort": 18082,
+    "inputBindingSha256": "d3c288d580bb9a9f1be25a741097e6675fcc988f809488bad484f5e665796e5e",
+    "issuer": "https://idp.sv.lan/realms/saintvision",
+    "keyLoggingDisabled": true,
+    "observedAt": "2026-09-30T01:51:02Z",
+    "readyz": {
+      "readyzHttpStatus": 503,
+      "status": "RECORDED_ONLY"
+    },
+    "resolutionOverridden": false,
+    "runEnvironment": "operator-workstation",
+    "sourceFinishedAt": "2026-09-30T01:51:04Z",
+    "sourceStartedAt": "2026-09-30T01:51:02Z",
+    "trustBundleSha256": "fee3816aec406534d41646dc9ad1ef80d17b52b1dd5077ad6ee39f47dfff199c",
+    "verificationDisabled": false
+  },
+  "verdict": "BLOCKED_EXTERNAL"
+}

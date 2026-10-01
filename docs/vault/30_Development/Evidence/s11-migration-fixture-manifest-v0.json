@@ -27,6 +27,7 @@
     {"revision": "0050_dataset_digest_lookup", "expected": "PRESERVED"},
     {"revision": "0053_eval_suite_project_scope", "expected": "PRESERVED"},
     {"revision": "0054_model_version_measurements", "expected": "PRESERVED"},
-    {"revision": "0055_adapter_conformance_records", "expected": "PRESERVED"}
+    {"revision": "0055_adapter_conformance_records", "expected": "PRESERVED"},
+    {"revision": "0056_kernel_cancel_audit_bridge", "expected": "PRESERVED"}
   ]
 }

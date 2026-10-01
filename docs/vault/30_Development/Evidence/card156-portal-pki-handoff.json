@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "card156-portal-pki-handoff:1",
+  "observedAt": "2026-09-30T09:13:57+09:00",
+  "source": {
+    "parentPullRequest": 249,
+    "parentHeadSha": "1125536392cd42ba45ba81ac13b7c9e4aeb167ef",
+    "issuanceToolCommit": "dea0a2b33ddc9726d9e8d7f9cab8b67610a4f6cf",
+    "issuanceToolPath": "tools/intranet_pki.py",
+    "issuanceToolGitBlobSHA1": "ef10834d2ffa7d36456ce0cbaaddf0135df4886d"
+  },
+  "portalCertificate": {
+    "hostname": "portal.sv.lan",
+    "publicKeyAlgorithm": "ECDSA-P256",
+    "certificateSHA256": "8200400fa8909211a8ab94b1f98a792fb3fc6c049b3b840d627b2d0ffcffa964",
+    "notAfter": "2026-12-29T00:12:06+00:00",
+    "dnsSanVerified": true,
+    "privateAddressSanVerified": true,
+    "webPkiChainVerified": true
+  },
+  "delivery": {
+    "targetRole": "node2-object-store",
+    "targetIdentityRedacted": true,
+    "targetDirectory": "<node-home>/.local/share/saintvision-intranet/tls/portal.sv.lan-20260930T001206Z",
+    "directoryMode": "0700",
+    "privateKeyMode": "0400",
+    "ownerMatchesSshPrincipal": true,
+    "certificateFingerprintMatchesIssuerOutput": true,
+    "chainVerifiedOnTarget": true,
+    "transferStagingResidueCount": 0,
+    "serviceActivated": false,
+    "liveTlsObserved": false,
+    "status": "DELIVERED_NOT_ACTIVATED"
+  },
+  "operatorCopy": {
+    "locationClass": "ignored-operator-private",
+    "aclIsolated": true,
+    "committed": false,
+    "retentionRule": "retain-until-successor-activated-and-old-leaf-revocation-completed",
+    "revocationRule": "replace-leaf-and-deployed-trust-boundary; crl-file-only-is-not-completion",
+    "crlDistributionEnforced": false
+  },
+  "controlPlaneCandidate": {
+    "hostname": "cp.sv.lan",
+    "certificateExistsInOperatorPrivateStore": true,
+    "certificateSHA256": "4a3fd0249bac447e6ef1fb0e7254340831eb376485ca9e3bd70225f8f24ad50f",
+    "notAfter": "2026-12-28T23:05:05+00:00",
+    "targetHostSelected": false,
+    "delivered": false,
+    "deploymentStatus": "BLOCKED_HOST_SELECTION",
+    "nextAction": "verify-selected-host-address-against-san-or-reissue-before-delivery"
+  },
+  "redaction": {
+    "privateKeyEmitted": false,
+    "credentialEmitted": false,
+    "privateAddressEmitted": false,
+    "operatorAccountEmitted": false
+  }
+}
