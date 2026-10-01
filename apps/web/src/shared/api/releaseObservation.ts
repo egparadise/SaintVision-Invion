@@ -17,8 +17,18 @@ export interface FetchReleaseManifestsOptions {
   signal?: AbortSignal;
 }
 
-const ALLOWED_COMPONENT_KEYS = new Set(['name', 'kind', 'digest']);
-const ALLOWED_MANIFEST_KEYS = new Set([
+export class ContractViolationError extends Error {
+  readonly isContractViolation = true;
+  readonly code = 'CONTRACT-VIOLATION';
+
+  constructor(message: string) {
+    super(message);
+    this.name = 'ContractViolationError';
+  }
+}
+
+export const ALLOWED_COMPONENT_KEYS = new Set(['name', 'kind', 'digest']);
+export const ALLOWED_MANIFEST_KEYS = new Set([
   'releaseId',
   'version',
   'componentCount',
@@ -31,7 +41,7 @@ const ALLOWED_MANIFEST_KEYS = new Set([
   'acceptanceCount',
   'components',
 ]);
-const ALLOWED_ACCEPTANCE_KEYS = new Set([
+export const ALLOWED_ACCEPTANCE_KEYS = new Set([
   'acceptanceId',
   'acceptanceIdRef',
   'outcome',
@@ -40,10 +50,10 @@ const ALLOWED_ACCEPTANCE_KEYS = new Set([
   'decidedAt',
   'knownLimitations',
 ]);
-const ALLOWED_PAGE_KEYS = new Set(['items', 'nextCursor']);
-const ALLOWED_DETAIL_KEYS = new Set(['release', 'acceptances']);
+export const ALLOWED_PAGE_KEYS = new Set(['items', 'nextCursor']);
+export const ALLOWED_DETAIL_KEYS = new Set(['release', 'acceptances']);
 
-const VALID_OUTCOMES = new Set(['accepted', 'conditional', 'rejected']);
+export const VALID_OUTCOMES = new Set(['accepted', 'conditional', 'rejected']);
 
 function hasOnlyAllowedKeys(obj: Record<string, unknown>, allowed: Set<string>): boolean {
   return Object.keys(obj).every((key) => allowed.has(key));
@@ -217,7 +227,7 @@ export async function fetchReleaseManifests(
   });
 
   if (!isValidReleaseManifestPage(res)) {
-    throw new Error('ReleaseManifestPageResponse contract violation: invalid page shape or items');
+    throw new ContractViolationError('ReleaseManifestPageResponse contract violation: invalid page shape or items');
   }
 
   return res;
@@ -226,7 +236,7 @@ export async function fetchReleaseManifests(
 /**
  * Fetch a specific release manifest detail with recorded acceptances.
  * Canonical route: GET /v1/release-manifests/{release_id}
- * Non-existent or other-tenant release returns RFC 9457 ProblemDetails 404 (RES-RELEASE-NOT-FOUND).
+ * Non-existent or other-tenant release returns RFC 9457 ProblemDetails 404 (RES-0004).
  */
 export async function fetchReleaseManifestDetail(
   releaseId: string,
@@ -243,7 +253,7 @@ export async function fetchReleaseManifestDetail(
   });
 
   if (!isValidReleaseManifestDetail(res)) {
-    throw new Error('ReleaseManifestDetailResponse contract violation: invalid detail shape or acceptances');
+    throw new ContractViolationError('ReleaseManifestDetailResponse contract violation: invalid detail shape or acceptances');
   }
 
   return res;

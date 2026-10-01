@@ -84,12 +84,13 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
             setServerManifestDetail(detail);
           } catch (detailErr: any) {
             if (!isMounted) return;
+            const isContractViolation = Boolean(detailErr?.isContractViolation || detailErr?.name === 'ContractViolationError');
             const prob = detailErr?.problem;
-            const status = prob?.status || detailErr.status || 0;
+            const status = isContractViolation ? 0 : prob?.status || detailErr.status || 0;
             setServerManifestError({
               status,
-              code: prob?.code || (status === 404 ? 'RES-RELEASE-NOT-FOUND' : 'FETCH_DETAIL_ERROR'),
-              message: prob?.detail || detailErr.message || '릴리스 상세 조회 실패',
+              code: isContractViolation ? 'CONTRACT-VIOLATION' : prob?.code || (status === 404 ? 'RES-0004' : status === 403 ? 'AUTH-0030' : 'FETCH_DETAIL_ERROR'),
+              message: isContractViolation ? detailErr.message : prob?.detail || detailErr.message || '릴리스 상세 조회 실패',
             });
             setServerManifestDetail(null);
           } finally {
@@ -105,12 +106,13 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
         if (!isMounted) return;
         if (err.name === 'AbortError') return;
         setHasFetchedServerReleases(true);
+        const isContractViolation = Boolean(err?.isContractViolation || err?.name === 'ContractViolationError');
         const prob = err?.problem;
-        const status = prob?.status || err.status || 0;
+        const status = isContractViolation ? 0 : prob?.status || err.status || 0;
         setServerManifestError({
           status,
-          code: prob?.code || (status === 403 ? 'AUTH-FORBIDDEN' : status === 404 ? 'RES-NOT-FOUND' : 'NET-ERROR'),
-          message: prob?.detail || err.message || '릴리스 선언서 목록 조회 실패',
+          code: isContractViolation ? 'CONTRACT-VIOLATION' : prob?.code || (status === 403 ? 'AUTH-0030' : status === 404 ? 'RES-0004' : 'NET-ERROR'),
+          message: isContractViolation ? err.message : prob?.detail || err.message || '릴리스 선언서 목록 조회 실패',
         });
         setServerManifests([]);
         setServerManifestDetail(null);
@@ -137,12 +139,13 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
       const detail = await fetchReleaseManifestDetail(releaseId);
       setServerManifestDetail(detail);
     } catch (err: any) {
+      const isContractViolation = Boolean(err?.isContractViolation || err?.name === 'ContractViolationError');
       const prob = err?.problem;
-      const status = prob?.status || err.status || 0;
+      const status = isContractViolation ? 0 : prob?.status || err.status || 0;
       setServerManifestError({
         status,
-        code: prob?.code || (status === 403 ? 'AUTH-FORBIDDEN' : status === 404 ? 'RES-RELEASE-NOT-FOUND' : 'NET-ERROR'),
-        message: prob?.detail || err.message || '릴리스 상세 조회 실패',
+        code: isContractViolation ? 'CONTRACT-VIOLATION' : prob?.code || (status === 403 ? 'AUTH-0030' : status === 404 ? 'RES-0004' : 'NET-ERROR'),
+        message: isContractViolation ? err.message : prob?.detail || err.message || '릴리스 상세 조회 실패',
       });
       setServerManifestDetail(null);
     } finally {
@@ -315,7 +318,7 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
               marginTop: '4px',
             }}
           >
-            {localSimulationCompleted ? '모의 서명 완료 ✔' : 'SIGN-OFF 대기 (백엔드 미연결)'}
+            {localSimulationCompleted ? '모의 서명 완료 ✔' : 'SIGN-OFF 대기 (로컬 모의)'}
           </div>
           <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
             {localSimulationCompleted
@@ -850,7 +853,9 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
             {!isLoadingDetail && serverManifestError && (
               <div
                 data-testid={
-                  serverManifestError.status === 403
+                  serverManifestError.code === 'CONTRACT-VIOLATION'
+                    ? 'deployment-manifest-error-contract'
+                    : serverManifestError.status === 403
                     ? 'deployment-manifest-error-403'
                     : serverManifestError.status === 404
                     ? 'deployment-manifest-error-404'
@@ -871,7 +876,9 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
                 }}
               >
                 <div style={{ fontWeight: 600 }}>
-                  🛑 {serverManifestError.status === 403
+                  🛑 {serverManifestError.code === 'CONTRACT-VIOLATION'
+                    ? '계약 위반 응답: 잘못된 서버 응답 규격'
+                    : serverManifestError.status === 403
                     ? '403 Forbidden: 접근 권한 없음'
                     : serverManifestError.status === 404
                     ? '404 Not Found: 릴리스 선언서 부재'
@@ -1122,7 +1129,9 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
         {!isLoadingServerManifests && serverManifests.length === 0 && serverManifestError && (
           <div
             data-testid={
-              serverManifestError.status === 403
+              serverManifestError.code === 'CONTRACT-VIOLATION'
+                ? 'deployment-manifest-error-contract'
+                : serverManifestError.status === 403
                 ? 'deployment-manifest-error-403'
                 : serverManifestError.status === 404
                 ? 'deployment-manifest-error-404'
@@ -1143,7 +1152,9 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
             }}
           >
             <div style={{ fontWeight: 600 }}>
-              🛑 {serverManifestError.status === 403
+              🛑 {serverManifestError.code === 'CONTRACT-VIOLATION'
+                ? '계약 위반 응답: 잘못된 서버 응답 규격'
+                : serverManifestError.status === 403
                 ? '403 Forbidden: 접근 권한 없음'
                 : serverManifestError.status === 404
                 ? '404 Not Found: 릴리스 선언서 부재'

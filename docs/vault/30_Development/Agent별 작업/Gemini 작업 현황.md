@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.166"
+version: "1.0.167"
 status: "approved"
 author: "Gemini"
-updated: "2026-10-01T19:40:00+09:00"
+updated: "2026-10-01T20:20:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,7 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-10-01T19:30:00+09:00 (Card 183 S12-FE 릴리스 선언서 및 운영자 인수 서버 경로 결속 r1 조치 완료: Claude UI r1 F1~F10 및 Codex r1 차단 사항 전수 해소, 5개 계약 strict JSON Schema 런타임 검증기 구축, 엔드포인트 URL/쿼리 직접 단언으로 경로 변이 사살, 네트워크 오류 날조 500 방지, 상세 오류 시 selector 보존, nextCursor 표출, 빈 상태 role="status", History 경로 인용 4건 수정으로 check_doc_path_citations ratchet 통과, Vitest 17 passed, 변이 14종 100% 사살, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 규칙 0 위반).
+- 확인 기준: 2026-10-01T20:20:00+09:00 (Card 183 S12-FE 릴리스 선언서 및 운영자 인수 서버 경로 결속 r2 조치 완료: Claude UI r2 및 Codex r2 피드백 전수 해소 — 404/403 fixture 코드를 canonical RES-0004 / AUTH-0030으로 정정하여 fixture-problem-codes-integrity 통과, ContractViolationError 및 deployment-manifest-error-contract 전용 계약 위반 상태 분리, 상단 KPI 카드 'SIGN-OFF 대기 (로컬 모의)' 문구 정비, 릴리스 선택기 변경 시 상세 재호출 및 화면 갱신 검증 시험 추가, canonical 5개 스키마 additionalProperties: false 및 허용 키셋 1:1 결속 시험 추가, Vitest 21 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 규칙 0 위반).
 
 ## 2026-10-01 S12-FE 릴리스 선언서(Release Manifest) 및 운영자 인수 서버 경로 결속 (Card 183 2단계, `agent/gemini/c183-s12fe-release-binding`, base `4114f8ba` PR #280)
 - **개요**: Claude 카드 182(PR #280)에서 구축된 정본 계약 스키마 5종(`release-manifest-response`, `release-manifest-detail-response`, `release-manifest-page-response`, `release-acceptance-response`, `release-component-response`) 및 읽기 전용 REST 라우트(`GET /v1/release-manifests`, `GET /v1/release-manifests/{release_id}`)를 프런트엔드 `apps/web`에 온전히 결속:

@@ -2,6 +2,8 @@
 // @ts-ignore
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 import React, { act } from 'react';
+import * as fs from 'fs';
+import * as path from 'path';
 import { createRoot, Root } from 'react-dom/client';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { IntranetDeploymentView } from '../src/features/deployment/IntranetDeploymentView';
@@ -15,6 +17,12 @@ import {
   isValidReleaseManifestDetail,
   ReleaseManifestResponse,
   ReleaseManifestDetailResponse,
+  ALLOWED_COMPONENT_KEYS,
+  ALLOWED_MANIFEST_KEYS,
+  ALLOWED_ACCEPTANCE_KEYS,
+  ALLOWED_PAGE_KEYS,
+  ALLOWED_DETAIL_KEYS,
+  ContractViolationError,
 } from '../src/shared/api/releaseObservation';
 
 describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Binding', () => {
@@ -370,7 +378,7 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
             type: 'about:blank',
             title: 'Not Found',
             status: 404,
-            code: 'RES-RELEASE-NOT-FOUND',
+            code: 'RES-0004',
             category: 'RES',
             detail: '요청한 릴리스 선언서를 찾을 수 없습니다.',
             retryable: false,
@@ -393,6 +401,8 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
       expect(errEl).not.toBeNull();
       expect(errEl?.getAttribute('role')).toBe('alert');
       expect(errEl?.textContent).toContain('404 Not Found: 릴리스 선언서 부재');
+      expect(errEl?.textContent).toContain('RES-0004');
+      expect(errEl?.textContent).toContain('요청한 릴리스 선언서를 찾을 수 없습니다.');
     });
 
     it('handles 403 Forbidden cleanly with alert role on list query', async () => {
@@ -404,7 +414,7 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
           type: 'about:blank',
           title: 'Forbidden',
           status: 403,
-          code: 'AUTH-0403',
+          code: 'AUTH-0030',
           category: 'AUTH',
           detail: '접근 권한이 부족하여 릴리스 선언서를 조회할 수 없습니다.',
           retryable: false,
@@ -422,6 +432,119 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
       expect(errEl).not.toBeNull();
       expect(errEl?.getAttribute('role')).toBe('alert');
       expect(errEl?.textContent).toContain('403 Forbidden: 접근 권한 없음');
+      expect(errEl?.textContent).toContain('AUTH-0030');
+      expect(errEl?.textContent).toContain('접근 권한이 부족하여 릴리스 선언서를 조회할 수 없습니다.');
+    });
+
+    it('displays dedicated contract violation error when server returns operatorSignOff=true (kills R2-2)', async () => {
+      // Server returns operatorSignOff: true (breaching the Literal[False] contract)
+      vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: new Headers({ 'Content-Type': 'application/json' }),
+        json: async () => ({
+          items: [{ ...mockReleaseItem, operatorSignOff: true }],
+          nextCursor: null,
+        }),
+      } as Response);
+
+      await act(async () => {
+        root.render(<IntranetDeploymentView currentUser={{ id: 'usr_lead', name: 'Lead', role: 'operator' }} />);
+      });
+
+      // Contract violation must be rendered as a dedicated alert, NOT generic '네트워크 통신 오류'
+      const errEl = container.querySelector('[data-testid="deployment-manifest-error-contract"]');
+      expect(errEl).not.toBeNull();
+      expect(errEl?.getAttribute('role')).toBe('alert');
+      expect(errEl?.textContent).toContain('계약 위반 응답: 잘못된 서버 응답 규격');
+      expect(errEl?.textContent).toContain('CONTRACT-VIOLATION');
+      expect(errEl?.textContent).not.toContain('네트워크 통신 오류');
+    });
+
+    it('displays dedicated contract violation error when detail query returns invalid schema (kills R2-2 detail)', async () => {
+      // List query succeeds, but detail query returns invalid schema (violates 64-hex regex)
+      vi.spyOn(globalThis, 'fetch')
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          headers: new Headers({ 'Content-Type': 'application/json' }),
+          json: async () => ({
+            items: [mockReleaseItem],
+            nextCursor: null,
+          }),
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          headers: new Headers({ 'Content-Type': 'application/json' }),
+          json: async () => ({
+            release: { ...mockReleaseItem, manifestSha256: 'corrupt-sha' },
+          }),
+        } as Response);
+
+      await act(async () => {
+        root.render(<IntranetDeploymentView currentUser={{ id: 'usr_lead', name: 'Lead', role: 'operator' }} />);
+      });
+
+      const errEl = container.querySelector('[data-testid="deployment-manifest-error-contract"]');
+      expect(errEl).not.toBeNull();
+      expect(errEl?.getAttribute('role')).toBe('alert');
+      expect(errEl?.textContent).toContain('계약 위반 응답: 잘못된 서버 응답 규격');
+      expect(errEl?.textContent).toContain('CONTRACT-VIOLATION');
+    });
+
+    it('switching release in selector triggers detail query for the selected release and updates view (kills Low 2)', async () => {
+      const fetchSpy = vi.spyOn(globalThis, 'fetch')
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          headers: new Headers({ 'Content-Type': 'application/json' }),
+          json: async () => ({
+            items: [mockReleaseItem, mockReleaseItem2],
+            nextCursor: null,
+          }),
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          headers: new Headers({ 'Content-Type': 'application/json' }),
+          json: async () => mockDetailWithAcceptance,
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          headers: new Headers({ 'Content-Type': 'application/json' }),
+          json: async () => mockDetailZeroAcceptance,
+        } as Response);
+
+      await act(async () => {
+        root.render(<IntranetDeploymentView currentUser={{ id: 'usr_lead', name: 'Lead', role: 'operator' }} />);
+      });
+
+      // Initially selected is rel-2026-s12-001
+      const selector = container.querySelector('[data-testid="deployment-release-selector"]') as HTMLSelectElement;
+      expect(selector).not.toBeNull();
+      expect(selector.value).toBe('rel-2026-s12-001');
+
+      // First detail view displays 1 acceptance
+      expect(container.textContent).toContain('acc-2026-0001');
+
+      // Switch selector to rel-2026-s12-002
+      await act(async () => {
+        selector.value = 'rel-2026-s12-002';
+        selector.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+
+      // Verify fetch called the second release detail URL
+      expect(fetchSpy).toHaveBeenLastCalledWith(
+        '/v1/release-manifests/rel-2026-s12-002',
+        expect.anything()
+      );
+
+      // Verify UI updated to reflect second release detail (0 acceptances)
+      expect(container.querySelector('[data-testid="server-acceptances-empty"]')).not.toBeNull();
+      expect(container.textContent).toContain('기록된 수락 결정 없음');
+      expect(container.textContent).not.toContain('acc-2026-0001');
     });
 
     it('strictly maintains localSimulationCompleted separated from server operatorSignOff and prohibits write UI', async () => {
@@ -470,6 +593,44 @@ describe('Card 183 / S12-FE: Server Release Manifests & Operator Sign-off Bindin
       // Ensure server section has NO POST forms
       const serverSection = container.querySelector('[data-testid="deployment-server-manifest-section"]');
       expect(serverSection?.querySelectorAll('form')).toHaveLength(0);
+    });
+
+    it('canonical 5 release schemas enforce additionalProperties: false and 1:1 property match with runtime validators', () => {
+      const contractsDir = path.resolve(__dirname, '../../../contracts');
+
+      const componentSchema = JSON.parse(fs.readFileSync(path.join(contractsDir, 'release-component-response.schema.json'), 'utf-8'));
+      const manifestSchema = JSON.parse(fs.readFileSync(path.join(contractsDir, 'release-manifest-response.schema.json'), 'utf-8'));
+      const acceptanceSchema = JSON.parse(fs.readFileSync(path.join(contractsDir, 'release-acceptance-response.schema.json'), 'utf-8'));
+      const pageSchema = JSON.parse(fs.readFileSync(path.join(contractsDir, 'release-manifest-page-response.schema.json'), 'utf-8'));
+      const detailSchema = JSON.parse(fs.readFileSync(path.join(contractsDir, 'release-manifest-detail-response.schema.json'), 'utf-8'));
+
+      // 1. All 5 schemas strictly enforce additionalProperties: false
+      expect(componentSchema.additionalProperties).toBe(false);
+      expect(manifestSchema.additionalProperties).toBe(false);
+      expect(acceptanceSchema.additionalProperties).toBe(false);
+      expect(pageSchema.additionalProperties).toBe(false);
+      expect(detailSchema.additionalProperties).toBe(false);
+
+      // 2. Runtime allowed keys match schema properties 1:1
+      expect(ALLOWED_COMPONENT_KEYS).toEqual(new Set(Object.keys(componentSchema.properties)));
+      expect(ALLOWED_MANIFEST_KEYS).toEqual(new Set(Object.keys(manifestSchema.properties)));
+      expect(ALLOWED_ACCEPTANCE_KEYS).toEqual(new Set(Object.keys(acceptanceSchema.properties)));
+      expect(ALLOWED_PAGE_KEYS).toEqual(new Set(Object.keys(pageSchema.properties)));
+      expect(ALLOWED_DETAIL_KEYS).toEqual(new Set(Object.keys(detailSchema.properties)));
+
+      // 3. Schema required fields are strictly subset of properties
+      for (const req of componentSchema.required) {
+        expect(ALLOWED_COMPONENT_KEYS.has(req)).toBe(true);
+      }
+      for (const req of manifestSchema.required) {
+        expect(ALLOWED_MANIFEST_KEYS.has(req)).toBe(true);
+      }
+      for (const req of acceptanceSchema.required) {
+        expect(ALLOWED_ACCEPTANCE_KEYS.has(req)).toBe(true);
+      }
+      for (const req of detailSchema.required) {
+        expect(ALLOWED_DETAIL_KEYS.has(req)).toBe(true);
+      }
     });
 
     it('mutation invariant: fails if server release manifest binding is reverted to static fixture', () => {

@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-20261001-C183-S12FE-001"
 title: "Card 183 (S12-FE) 릴리스 선언서(Release Manifest) 및 운영자 인수 서버 경로 결속 기록"
-version: "1.0.0"
+version: "1.2.0"
 status: "proposed"
 author: "Gemini"
 created: "2026-10-01T18:50:00+09:00"
-updated: "2026-10-01T19:40:00+09:00"
+updated: "2026-10-01T20:20:00+09:00"
 source_of_truth: "Git"
 base_sha: "4114f8ba"
 task_ids: ["S12-FE", "S12-BE"]
@@ -181,10 +181,21 @@ PR #280에서 Codex F1 검토 결과, 기존 `acceptance_records`의 `decided_by
 
 ## 8. 인계 및 검토 요청
 
-- **Base 브랜치**: `agent/claude/c182-s12-manifest-routes` (PR #280 head `3ff89b84`)
+- **Base 브랜치**: `agent/claude/c182-s12-manifest-routes` (PR #280 head `4114f8ba`)
 - **작업 브랜치**: `agent/gemini/c183-s12fe-release-binding`
-- **조치 커밋**: Claude UI r1 (F1~F10) 및 Codex r1 차단 사항(F1~F4) 전수 조치 커밋
+- **조치 커밋**: Claude UI r1/r2 및 Codex r1/r2 피드백 전수 조치 완료
 - **검토 요청**:
-  - Claude: UI/사용자 경험 및 단위 시험 17 passed / 변이 14종 사살 검토 요청.
-  - Codex: strict wire 스키마 계약 검증(Blocker 1) 및 URL/경로 결속(Blocker 2) 검토 요청.
-- **주의 사항**: #280에서 Codex r1 F1으로 operatorSignOff 사람 provenance 의미가 변경된 새 head가 도착하면 merge로 안전하게 동기화 예정.
+  - Claude: UI/사용자 경험, 404/403 ProblemDetails 해석, 계약 위반 분리 표출, 셀렉터 변경 인터랙션, 단위 시험 21 passed 검토 요청.
+  - Codex: strict wire 스키마 계약 검증(Blocker 1 & 2), canonical 5개 스키마 1:1 결속 검증, ProblemDetails 정본 코드(RES-0004, AUTH-0030) 검토 요청.
+
+---
+
+## 9. Claude UI r2 및 Codex r2 피드백 전수 조치표
+
+| 식별자 | 분류 | 검토 요구사항 | 조치 내용 및 정정 근거 | 상태 |
+|---|---|---|---|---|
+| **Claude UI r2 차단 1 & Codex r2 차단 3** | 테스트 정합성 / CI 게이트 | `s12-release-manifest-server-binding.test.tsx:373` 404 픽스처가 `code: 'RES-RELEASE-NOT-FOUND'`를 사용하여 `fixture-problem-codes-integrity.test.ts`(/^[A-Z]+-[0-9]{4}$/) 거부로 CI 실패 | • 404 fixture `code`를 표준 백엔드 RFC 9457 코드인 `RES-0004`로 교체.<br>• 403 fixture `code`를 정본 인가 코드인 `AUTH-0030`으로 교체.<br>• UI 및 시험에서 `RES-0004`, `AUTH-0030` 코드와 ProblemDetails `detail` 메시지('요청한 릴리스 선언서를 찾을 수 없습니다.', '접근 권한이 부족하여...')를 직접 단언.<br>• `npm run test -- fixture-problem-codes-integrity.test.ts` 실행 결과 **1 passed (0 violations, exit 0)** 확인. | **조치 완료** |
+| **R2-2 [Med]** | 계약 위반 상태 분리 | 서버가 `operatorSignOff=true`를 반환하거나 스키마 계약 위반 시 `네트워크 통신 오류` 대신 별도의 계약 위반 상태 표출 | • `releaseObservation.ts`에 `ContractViolationError` 클래스(`isContractViolation = true`, `code = 'CONTRACT-VIOLATION'`) 정의 및 검증 실패 시 투척.<br>• `IntranetDeploymentView.tsx` 에러 상태에 `CONTRACT-VIOLATION` 분기 추가.<br>• UI 에러 알림 컨테이너에 `data-testid="deployment-manifest-error-contract"`, 라벨 `🛑 계약 위반 응답: 잘못된 서버 응답 규격`으로 독립 렌더링.<br>• 목록 및 상세 계약 위반 변이 사살 시험 2종 추가(목록 operatorSignOff=true, 상세 corrupt-sha regex 위반). | **조치 완료** |
+| **Low 1** | 잔여 문구 정비 | 상단 KPI 카드 `IntranetDeploymentView.tsx:318`에 잔존하던 'SIGN-OFF 대기 (백엔드 미연결)' 문구 정비 | • 'SIGN-OFF 대기 (백엔드 미연결)' 문구를 'SIGN-OFF 대기 (로컬 모의)'로 교체하여 오래된 "미연결" 문구를 완전히 제거.<br>• `s12-defect-fixes.test.tsx` line 54 단언을 'SIGN-OFF 대기 (로컬 모의)'로 갱신하여 23 passed 유지. | **조치 완료** |
+| **Low 2** | UI 상호작용 검증 | 릴리스 선택기(`<select data-testid="deployment-release-selector">`) 변경 시 상세 쿼리 재호출 및 화면 갱신 시험 부재 | • `deployment-release-selector`에서 다른 릴리스(`rel-2026-s12-002`)를 선택하는 사용자 동작을 모의하는 테스트 추가.<br>• `/v1/release-manifests/rel-2026-s12-002` 엔드포인트 호출 및 화면의 수락 결정 이력이 두 번째 릴리스의 0건(`server-acceptances-empty`, '기록된 수락 결정 없음')으로 갱신됨을 단언. | **조치 완료** |
+| **Codex r2 차단 1 & 2 선제 대비** | 계약 스키마 1:1 결속 검증 | `contracts/release-*.schema.json` 5개 스키마와 `releaseObservation.ts`의 허용 키셋 및 필수 필드 1:1 일치 시험 부재 | • 5개 스키마 파일(`release-component-response`, `release-manifest-response`, `release-acceptance-response`, `release-manifest-page-response`, `release-manifest-detail-response`)을 직접 로드하여 `additionalProperties === false` 불변식 검증.<br>• `releaseObservation.ts`의 `ALLOWED_*_KEYS` 5개 셋이 스키마의 `properties` 키셋과 1:1 정확히 일치함을 단언.<br>• 스키마의 모든 `required` 속성이 런타임 가드에서 검증됨을 단언. | **조치 완료** |
