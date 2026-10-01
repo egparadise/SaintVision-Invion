@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.163"
+version: "1.0.164"
 status: "approved"
 author: "Gemini"
-updated: "2026-10-01T18:33:00+09:00"
+updated: "2026-10-01T19:12:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,7 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-10-01T18:33:00+09:00 (Card 180 S11-FE ACC-09 디자인 토큰 명도 대비 전수 적합화 및 독립 검토 r3 F1 React DOM 렌더링 style.color 단언/F2 multiset 인벤토리 래칫 조치: RunDetail/NodeList/DeveloperStudio 실제 렌더링 style.color 단언으로 주석 decoy 변이 3종 전원 사살, COLOR_LITERAL_MULTISET_BASELINE 42개 파일 multiset 인벤토리로 동일 개수 신규 색상 치환(#d97706 -> #abcdef) 및 상한 초과 변이 등 5종 전원 사살, 8종 변이 100% 사살 실측, acc09-contrast-tokens.test.tsx 9 passed, tsc -b/build/route_coverage 100% 클린).
+- 확인 기준: 2026-10-01T19:12:00+09:00 (Card 180 S11-FE ACC-09 디자인 토큰 명도 대비 전수 적합화, 독립 검토 r3 F1/F2 조치, Claude UI r1 조건부 승인 피드백 반영: NodeList 라이트 상태 배지 실측치 백로그 이월, 상태색 구별도·미사용 토큰 관측, 산문 수치 정정 완료, 코드 수정 없이 불변식 보존, acc09-contrast-tokens.test.tsx 9 passed, 8종 변이 100% 사살 실측, tsc -b/build/route_coverage 100% 클린).
 
 ## 2026-10-01 S11-FE ACC-09 디자인 토큰 명도 대비 전수 적합화 및 수학적 계산 단위 시험 (Card 180, `agent/gemini/c180-s11fe-contrast-fixes`, base `coord/train7-ci-1641`)
 - **개요**: S11-FE ACC-09 접근성 기준(WCAG 2.2 AA 본문 텍스트 >= 4.5:1, UI 경계 >= 3.0:1)을 충족하기 위해 `apps/web/src/index.css` 디자인 토큰 및 제품 코드 실제 조합 보정, 독립 검토 r3(F1 실제 DOM 렌더링 단언, F2 파일별 multiset 인벤토리) 피드백 전수 조치:
@@ -46,6 +46,9 @@ source_of_truth: "Git"
   4. **수학적 대비 계산 단위 시험 (`acc09-contrast-tokens.test.tsx`, 9 tests, 8종 변이 전원 사살)**:
      - `index.css` 및 실사용 페어 직접 검증, 6대 Revert-Fail 프로브 영구 검증, F2 Multiset 인벤토리 래칫 검증.
      - 8종 단일 변이(컴포넌트 3종 주석 decoy 되살림, 동일 개수 신규 치환 1종, 기존 리터럴 팽창 치환 1종, 신규 파일 hex/rgb 유입 2종, #30363d 상한 초과 1종) 전원 사살(Killed: 8, Survived: 0) 실측.
+  5. **Claude UI r1 조건부 승인 피드백 전수 반영 (코드 변경 금지 원칙 준수)**:
+     - **[조건 1] 남은 영역 백로그 등록**: `NodeList.tsx` 상태 배지 라이트 테마 하드코딩 리터럴 실측치(`#38bdf8` 2.14:1, `#f85149` 3.35:1, `#d29922` 2.52:1 on `#ffffff`)를 History 남은 영역으로 공식 등록. `COLOR_LITERAL_MULTISET_BASELINE` 불변식을 보존하기 위해 본 PR에서는 코드 수정을 배제하고 차기 배지 토큰화 카드로 안전하게 이월.
+     - **[기록 사항] 구별도·토큰 정리 및 수치 정정**: 상태색 구별도 협소 관측(offline/risk-l3 `#b91c1c`, neutral/text-muted `#59677b`), 미사용 토큰(`--color-status-offline-hover-bg`) 관측, 산문 주석 수치(Section 1 버튼 6.70:1, Section 2 인디케이터 5.02:1, 7.58:1) 정정 완료.
 - **담당 및 역할**: Gemini (Frontend / UI / 접근성 소유). Reviewer: Claude (UI/접근성/테스트), Codex (무결성/계약/디자인토큰).
 - **관측 근거 (Evidence)**:
   - 단위 시험: `npm run test -- acc09-contrast-tokens.test.tsx` (9 passed 100%, 788ms, 8종 변이 전원 사살)
