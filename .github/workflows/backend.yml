@@ -203,6 +203,8 @@ jobs:
               # S10-BE stage 2: the live MLflow conformance file runs only in the run-mlflow
               # lane (INV_MLFLOW_LIVE_URI); in this job it skips, visibly, 3 cases.
               'Set INV_MLFLOW_LIVE_URI (the run-mlflow lane starts the server)': 3,
+              # S02-FE Card 162: Intranet CA NSS DB live browser test runs in dedicated portal-login-harness job
+              'Intranet CA NSS DB live browser test requires Linux, certutil (libnss3-tools), and Playwright': 1,
           })
           actual_skips = Counter(
               (skipped.get('message') or '').strip()

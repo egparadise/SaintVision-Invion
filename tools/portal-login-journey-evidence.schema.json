@@ -1,0 +1,300 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PortalLoginJourneyEvidence",
+  "description": "Strict redacted observation evidence for S02-FE intranet portal login journey",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "timestamp",
+    "codeSha",
+    "measurementKind",
+    "referenceOnly",
+    "acceptanceClaim",
+    "targetUrl",
+    "overallStatus",
+    "blockingReason",
+    "caDigest",
+    "steps",
+    "audit"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "enum": [
+        "1.0.0",
+        "1.1.0"
+      ]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "codeSha": {
+      "type": "string",
+      "pattern": "^(?!0+$)[0-9a-f]{8,40}$"
+    },
+    "measurementKind": {
+      "type": "string",
+      "enum": [
+        "LIVE_BROWSER",
+        "REFERENCE_SIMULATION"
+      ]
+    },
+    "referenceOnly": {
+      "type": "boolean"
+    },
+    "acceptanceClaim": {
+      "type": "boolean"
+    },
+    "targetUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "overallStatus": {
+      "type": "string",
+      "enum": [
+        "PASS",
+        "FAIL",
+        "BLOCKED_EXTERNAL"
+      ]
+    },
+    "blockingReason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "caDigest": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "required": [
+        "caBundleSha256",
+        "rootFingerprint",
+        "fingerprintVerified"
+      ],
+      "properties": {
+        "caBundleSha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "rootFingerprint": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "fingerprintVerified": {
+          "type": "boolean"
+        }
+      }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "status",
+          "durationMs",
+          "detail",
+          "observations"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "portal_tls_reachability",
+              "login_initiation",
+              "pkce_callback",
+              "identity_session_display",
+              "logout"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PASS",
+              "FAIL",
+              "BLOCKED_EXTERNAL",
+              "NOT_OBSERVED"
+            ]
+          },
+          "durationMs": {
+            "type": "number",
+            "minimum": 0
+          },
+          "detail": {
+            "type": "string"
+          },
+          "observations": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "httpStatus": {
+                "type": "integer"
+              },
+              "url": {
+                "type": "string"
+              },
+              "dnsResolved": {
+                "type": "boolean"
+              },
+              "hostname": {
+                "type": "string"
+              },
+              "tlsHandshakeVerified": {
+                "type": "boolean"
+              },
+              "initiated": {
+                "type": "boolean"
+              },
+              "idpRedirectObserved": {
+                "type": "boolean"
+              },
+              "callbackHandled": {
+                "type": "boolean"
+              },
+              "tokenEndpointObserved": {
+                "type": "boolean"
+              },
+              "tokenHttpStatus": {
+                "type": "integer"
+              },
+              "identityObserved": {
+                "type": "boolean"
+              },
+              "authenticatedViewActive": {
+                "type": "boolean"
+              },
+              "sessionEndpointObserved": {
+                "type": "boolean"
+              },
+              "sessionHttpStatus": {
+                "type": "integer"
+              },
+              "sessionShapeValid": {
+                "type": "boolean"
+              },
+              "loginScreenRestored": {
+                "type": "boolean"
+              },
+              "transactionCleared": {
+                "type": "boolean"
+              },
+              "storagePurged": {
+                "type": "boolean"
+              },
+              "inMemorySeamPresent": {
+                "type": "boolean"
+              },
+              "inMemoryTokenPurged": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    "audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "redacted",
+        "tokenCount",
+        "ipCount",
+        "credentialCount",
+        "accountCount",
+        "oidcParamCount",
+        "circumventionFlagsDetected",
+        "tlsValidationEnforced",
+        "cleanWorktreeVerified",
+        "remoteContainmentVerified",
+        "trustStoreMode",
+        "userDataDirIsolated",
+        "caBundleAppliedToBrowser"
+      ],
+      "properties": {
+        "redacted": {
+          "type": "boolean",
+          "enum": [
+            true
+          ]
+        },
+        "tokenCount": {
+          "type": "integer",
+          "enum": [
+            0
+          ]
+        },
+        "ipCount": {
+          "type": "integer",
+          "enum": [
+            0
+          ]
+        },
+        "credentialCount": {
+          "type": "integer",
+          "enum": [
+            0
+          ]
+        },
+        "accountCount": {
+          "type": "integer",
+          "enum": [
+            0
+          ]
+        },
+        "oidcParamCount": {
+          "type": "integer",
+          "enum": [
+            0
+          ]
+        },
+        "circumventionFlagsDetected": {
+          "type": "boolean",
+          "enum": [
+            false
+          ]
+        },
+        "tlsValidationEnforced": {
+          "type": "boolean"
+        },
+        "cleanWorktreeVerified": {
+          "type": "boolean"
+        },
+        "remoteContainmentVerified": {
+          "type": "boolean"
+        },
+        "trustStoreMode": {
+          "type": "string",
+          "enum": [
+            "ISOLATED_PROFILE",
+            "SYSTEM_OPERATOR_STORE",
+            "SIMULATED"
+          ]
+        },
+        "userDataDirIsolated": {
+          "type": "boolean"
+        },
+        "caBundleAppliedToBrowser": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}
