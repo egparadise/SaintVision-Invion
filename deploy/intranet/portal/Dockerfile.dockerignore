@@ -1,0 +1,18 @@
+# Docker buildignore for SaintVision Intranet Portal
+# Overrides root .dockerignore when building with -f deploy/intranet/portal/Dockerfile
+**
+!apps/web/
+!apps/web/**
+!packages/contracts-ts/
+!packages/contracts-ts/**
+!deploy/intranet/portal/
+!deploy/intranet/portal/**
+apps/web/node_modules/
+apps/web/dist/
+apps/web/.turbo/
+**/.git
+**/.github
+**/*.pem
+**/*.key
+**/.env*
+**/*.log
