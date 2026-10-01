@@ -14,6 +14,10 @@ import { InvFileExplorer } from '../src/features/desktop/InvFileExplorer';
 import { ModelLineageView } from '../src/features/mlops/ModelLineageView';
 import { AdminSecurityConsole } from '../src/features/admin/AdminSecurityConsole';
 import { IntranetDeploymentView } from '../src/features/deployment/IntranetDeploymentView';
+import type {
+  ReleaseManifestResponse,
+  ReleaseManifestDetailResponse,
+} from '../src/contracts/release-manifest-detail-response';
 import * as client from '../src/shared/api/client';
 import * as projectObservation from '../src/shared/api/projectObservation';
 import { fabricObservation } from '../src/shared/api/fabricObservation';
@@ -2307,28 +2311,41 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
 
   // 9f. [Card 202 / ACC-09] Component DOM Rendering & Binding Verification: IntranetDeploymentView
   it('ACC-09 / Card 202: IntranetDeploymentView DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification', async () => {
+    const strictManifestItem: ReleaseManifestResponse = {
+      releaseId: 'rel_01ARZ3NDEKTSV4RRFFQ69G5FAV',
+      version: 'v1.4.0',
+      manifestSha256: '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+      createdAt: '2026-10-02T00:00:00Z',
+      componentCount: 1,
+      components: [{ name: 'web', kind: 'frontend', digest: 'sha256:fedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321' }],
+      confirmedOperatorCount: 0,
+      requiredDistinctOperatorCount: 2,
+      matchingAcceptedUserCount: 2,
+      acceptanceCount: 1,
+      operatorSignOff: false,
+      operatorSignOffBlockedBy: 'release-acceptance-prerequisites-unavailable',
+    };
+
+    const strictDetailFixture: ReleaseManifestDetailResponse = {
+      release: strictManifestItem,
+      acceptances: [
+        {
+          acceptanceId: 'acc_01',
+          acceptanceIdRef: 'ref_01',
+          acceptedManifestSha256: '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+          decidedAt: '2026-10-02T00:00:00Z',
+          knownLimitations: [],
+          manifestMatches: true,
+          outcome: 'accepted',
+        },
+      ],
+    };
+
     const originalFetch = globalThis.fetch;
     globalThis.fetch = vi.fn().mockImplementation((url: string) => {
       if (url.includes('/v1/release-manifests')) {
         return Promise.resolve(new Response(JSON.stringify({
-          items: [
-            {
-              releaseId: 'rel_01ARZ3NDEKTSV4RRFFQ69G5FAV',
-              version: 'v1.4.0',
-              builtCommitSha: 'abcdef1234567890abcdef1234567890abcdef12',
-              createdAt: '2026-10-02T00:00:00Z',
-              components: [{ name: 'web', kind: 'frontend', imageUri: 'ghcr.io/saintvision/web:1.4.0' }],
-              acceptances: [
-                {
-                  acceptanceId: 'acc_01',
-                  acceptanceIdRef: 'ref_01',
-                  acceptanceDecision: 'accept',
-                  manifestMatches: true,
-                  unconfirmedReasonCodes: [],
-                },
-              ],
-            },
-          ],
+          items: [strictManifestItem],
           nextCursor: null,
         }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
       }
@@ -2346,41 +2363,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
           <IntranetDeploymentView
             currentUser={{ id: 'usr_deployer', name: 'Deployer', role: 'operator' }}
             autoFetch={false}
-            initialManifests={[
-              {
-                releaseId: 'rel_01ARZ3NDEKTSV4RRFFQ69G5FAV',
-                version: 'v1.4.0',
-                builtCommitSha: 'abcdef1234567890abcdef1234567890abcdef12',
-                createdAt: '2026-10-02T00:00:00Z',
-                components: [{ name: 'web', kind: 'frontend', imageUri: 'ghcr.io/saintvision/web:1.4.0' }],
-                acceptances: [],
-              } as any,
-            ]}
-            initialDetail={{
-              release: {
-                releaseId: 'rel_01ARZ3NDEKTSV4RRFFQ69G5FAV',
-                version: 'v1.4.0',
-                manifestSha256: 'sha256:1234567890abcdef',
-                builtCommitSha: 'abcdef1234567890abcdef1234567890abcdef12',
-                createdAt: '2026-10-02T00:00:00Z',
-                componentCount: 1,
-                components: [{ name: 'web', kind: 'frontend', imageUri: 'ghcr.io/saintvision/web:1.4.0' }],
-                operatorSignOffBlockedBy: 'NONE',
-                confirmedOperatorCount: 2,
-                requiredDistinctOperatorCount: 2,
-                matchingAcceptedUserCount: 2,
-                acceptanceCount: 1,
-              },
-              acceptances: [
-                {
-                  acceptanceId: 'acc_01',
-                  acceptanceIdRef: 'ref_01',
-                  acceptanceDecision: 'accept',
-                  manifestMatches: true,
-                  unconfirmedReasonCodes: [],
-                } as any,
-              ],
-            }}
+            initialManifests={[strictManifestItem]}
+            initialDetail={strictDetailFixture}
             clusterNodes={[
               {
                 id: 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAV',
@@ -2444,7 +2428,44 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(getContrast(lightTokens[acFg], lightTokens['--color-bg-subtle']), 'Server acceptance count light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
       expect(getContrast(darkTokens[acFg], darkTokens['--color-bg-subtle']), 'Server acceptance count dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
 
-      // 5. Unauthenticated Notice (render with currentUser=null)
+      // 5. #281 Status & Quorum Observability Binding (U2 & C1: strict schema & token pinning)
+      const opSignoff = container.querySelector('[data-testid="server-operator-signoff"]') as HTMLElement;
+      expect(opSignoff, 'Server operator signoff container must render').not.toBeNull();
+      const signoffSpan = opSignoff.querySelector('span') as HTMLElement;
+      expect(signoffSpan, 'Unconfirmed signoff badge must render').not.toBeNull();
+      expect(signoffSpan.style.color, 'Unconfirmed signoff badge must bind to var(--color-status-degraded)').toBe('var(--color-status-degraded)');
+      expect(signoffSpan.textContent).toContain('미서명 (operatorSignOff: false)');
+      const soFg = helperExtractVar(signoffSpan.style.color);
+      expect(getContrast(lightTokens[soFg], lightTokens['--color-bg-subtle']), 'Signoff light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[soFg], darkTokens['--color-bg-subtle']), 'Signoff dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      const blockedBy = container.querySelector('[data-testid="server-operator-signoff-blocked-by"]') as HTMLElement;
+      expect(blockedBy, 'Signoff blocked by notice must render').not.toBeNull();
+      expect(blockedBy.style.color, 'Signoff blocked by must bind to var(--color-text-secondary)').toBe('var(--color-text-secondary)');
+      expect(blockedBy.textContent).toContain('release-acceptance-prerequisites-unavailable');
+      const bbFg = helperExtractVar(blockedBy.style.color);
+      expect(getContrast(lightTokens[bbFg], lightTokens['--color-bg-subtle']), 'BlockedBy light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[bbFg], darkTokens['--color-bg-subtle']), 'BlockedBy dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      const quorum = container.querySelector('[data-testid="server-operator-quorum"]') as HTMLElement;
+      expect(quorum, 'Quorum status container must render').not.toBeNull();
+      const quorumSpan = quorum.querySelector('span') as HTMLElement;
+      expect(quorumSpan, 'Quorum headline must render').not.toBeNull();
+      expect(quorumSpan.style.color, 'Quorum headline must bind to var(--color-text-primary)').toBe('var(--color-text-primary)');
+      expect(quorumSpan.textContent).toContain('사람 확인 0 / 2 (서명 아님)');
+      const qFg = helperExtractVar(quorumSpan.style.color);
+      expect(getContrast(lightTokens[qFg], lightTokens['--color-bg-subtle']), 'Quorum light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[qFg], darkTokens['--color-bg-subtle']), 'Quorum dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      const matchingUsers = container.querySelector('[data-testid="server-matching-user-count"]') as HTMLElement;
+      expect(matchingUsers, 'Matching user count notice must render').not.toBeNull();
+      expect(matchingUsers.style.color, 'Matching users must bind to var(--color-text-secondary)').toBe('var(--color-text-secondary)');
+      expect(matchingUsers.textContent).toContain('해시 일치 수락 기록 2건 (사람 확인 아님)');
+      const muFg = helperExtractVar(matchingUsers.style.color);
+      expect(getContrast(lightTokens[muFg], lightTokens['--color-bg-subtle']), 'Matching users light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[muFg], darkTokens['--color-bg-subtle']), 'Matching users dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      // 6. Unauthenticated Notice (render with currentUser=null)
       await act(async () => {
         root.render(<IntranetDeploymentView currentUser={null} autoFetch={false} />);
       });
@@ -2460,6 +2481,37 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(getContrast(darkTokens[anFg], darkTokens[anBg]), 'Auth notice dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
       expect(getContrast(lightTokens[anBorder], lightTokens[anBg]), 'Auth notice light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
       expect(getContrast(darkTokens[anBorder], darkTokens[anBg]), 'Auth notice dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 7. Contract Violation Error Alert State (#281 Status & Alert Verification)
+      vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: new Headers({ 'Content-Type': 'application/json' }),
+        json: async () => ({
+          items: [{ ...strictManifestItem, operatorSignOff: true }], // breach contract
+          nextCursor: null,
+        }),
+      } as Response);
+
+      await act(async () => {
+        root.render(<IntranetDeploymentView currentUser={{ id: 'usr_deployer', name: 'Deployer', role: 'operator' }} autoFetch={true} />);
+      });
+
+      const contractAlert = container.querySelector('[data-testid="deployment-manifest-error-contract"]') as HTMLElement;
+      expect(contractAlert, 'Contract violation alert must render').not.toBeNull();
+      expect(contractAlert.getAttribute('role'), 'Contract alert role must be alert').toBe('alert');
+      expect(contractAlert.style.backgroundColor, 'Contract alert bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(contractAlert.style.color, 'Contract alert text must bind to var(--color-status-offline)').toBe('var(--color-status-offline)');
+      expect(contractAlert.style.borderColor, 'Contract alert border must bind to var(--color-status-offline)').toBe('var(--color-status-offline)');
+      expect(contractAlert.textContent).toContain('계약 위반 응답: 잘못된 서버 응답 규격');
+      expect(contractAlert.textContent).toContain('CONTRACT-VIOLATION');
+      const cBg = helperExtractVar(contractAlert.style.backgroundColor);
+      const cFg = helperExtractVar(contractAlert.style.color);
+      const cBorder = helperExtractVar(contractAlert.style.borderColor);
+      expect(getContrast(lightTokens[cFg], lightTokens[cBg]), 'Contract alert light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[cFg], darkTokens[cBg]), 'Contract alert dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[cBorder], lightTokens[cBg]), 'Contract alert light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[cBorder], darkTokens[cBg]), 'Contract alert dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
     } finally {
       globalThis.fetch = originalFetch;
       act(() => {
@@ -2503,6 +2555,17 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       return branches;
     }
 
+    function extractOpacity(node: ts.Node): number | null {
+      if (ts.isNumericLiteral(node)) return parseFloat(node.text);
+      if (ts.isConditionalExpression(node)) {
+        const trueOp = extractOpacity(node.whenTrue);
+        const falseOp = extractOpacity(node.whenFalse);
+        if (trueOp !== null && falseOp !== null) return Math.min(trueOp, falseOp);
+        return trueOp ?? falseOp;
+      }
+      return null;
+    }
+
     let checkedPairs = 0;
     let checkedObjects = 0;
     let totalStyleAttrs = 0;
@@ -2512,7 +2575,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     const violations: string[] = [];
     const containerBgs = ['--color-bg-surface', '--color-bg-subtle', '--color-bg-canvas'];
 
-    function checkPair(bgToken: string, fgToken: string, pos: number) {
+    function checkPair(bgToken: string, fgToken: string, pos: number, opacity: number = 1.0) {
       checkedPairs++;
       const { line } = sf.getLineAndCharacterOfPosition(pos);
       const lightBg = resolveTokenHex(bgToken, lightTokens);
@@ -2520,7 +2583,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       const darkBg = resolveTokenHex(bgToken, darkTokens);
       const darkFg = resolveTokenHex(fgToken, darkTokens);
 
-      if (bgToken === fgToken) {
+      if (bgToken === fgToken && opacity >= 1.0) {
         violations.push(`L${line + 1}: 1:1 token collision between background and foreground (${bgToken})`);
         return;
       }
@@ -2530,21 +2593,24 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
         return;
       }
 
-      if (lightBg && lightFg) {
-        const cr = getContrast(lightFg, lightBg);
+      const effectiveLFg = opacity < 1.0 && lightBg && lightFg ? blendRgba(parseHex(lightFg), opacity, lightBg) : lightFg;
+      const effectiveDFg = opacity < 1.0 && darkBg && darkFg ? blendRgba(parseHex(darkFg), opacity, darkBg) : darkFg;
+
+      if (lightBg && effectiveLFg) {
+        const cr = getContrast(effectiveLFg, lightBg);
         if (cr < 4.5) {
-          violations.push(`L${line + 1}: Light text contrast ${cr.toFixed(2)}:1 < 4.5:1 (${fgToken} on ${bgToken})`);
+          violations.push(`L${line + 1}: Light text contrast ${cr.toFixed(2)}:1 < 4.5:1 (${fgToken} on ${bgToken}${opacity < 1.0 ? ` opacity ${opacity.toFixed(2)}` : ''})`);
         }
       }
-      if (darkBg && darkFg) {
-        const cr = getContrast(darkFg, darkBg);
+      if (darkBg && effectiveDFg) {
+        const cr = getContrast(effectiveDFg, darkBg);
         if (cr < 4.5) {
-          violations.push(`L${line + 1}: Dark text contrast ${cr.toFixed(2)}:1 < 4.5:1 (${fgToken} on ${bgToken})`);
+          violations.push(`L${line + 1}: Dark text contrast ${cr.toFixed(2)}:1 < 4.5:1 (${fgToken} on ${bgToken}${opacity < 1.0 ? ` opacity ${opacity.toFixed(2)}` : ''})`);
         }
       }
     }
 
-    function checkBorderPair(bgToken: string, borderToken: string, pos: number) {
+    function checkBorderPair(bgToken: string, borderToken: string, pos: number, opacity: number = 1.0) {
       checkedBorderPairs++;
       const { line } = sf.getLineAndCharacterOfPosition(pos);
       const lBg = resolveTokenHex(bgToken, lightTokens);
@@ -2552,7 +2618,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       const lBorder = resolveTokenHex(borderToken, lightTokens);
       const dBorder = resolveTokenHex(borderToken, darkTokens);
 
-      if (bgToken === borderToken) {
+      if (bgToken === borderToken && opacity >= 1.0) {
         violations.push(`L${line + 1}: Identical border-background token collision (1:1 contrast) detected: ${borderToken} on ${bgToken}`);
         return;
       }
@@ -2562,22 +2628,27 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
         return;
       }
 
-      if (lBg && lBorder) {
-        const cr = getContrast(lBorder, lBg);
+      const effectiveLBorder = opacity < 1.0 && lBg && lBorder ? blendRgba(parseHex(lBorder), opacity, lBg) : lBorder;
+      const effectiveDBorder = opacity < 1.0 && dBg && dBorder ? blendRgba(parseHex(dBorder), opacity, dBg) : dBorder;
+
+      if (lBg && effectiveLBorder) {
+        const cr = getContrast(effectiveLBorder, lBg);
         if (cr < 3.0) {
-          violations.push(`L${line + 1}: Light border contrast ${cr.toFixed(2)}:1 < 3.0:1 (${borderToken} on ${bgToken})`);
+          violations.push(`L${line + 1}: Light border contrast ${cr.toFixed(2)}:1 < 3.0:1 (${borderToken} on ${bgToken}${opacity < 1.0 ? ` opacity ${opacity.toFixed(2)}` : ''})`);
         }
       }
-      if (dBg && dBorder) {
-        const cr = getContrast(dBorder, dBg);
+      if (dBg && effectiveDBorder) {
+        const cr = getContrast(effectiveDBorder, dBg);
         if (cr < 3.0) {
-          violations.push(`L${line + 1}: Dark border contrast ${cr.toFixed(2)}:1 < 3.0:1 (${borderToken} on ${bgToken})`);
+          violations.push(`L${line + 1}: Dark border contrast ${cr.toFixed(2)}:1 < 3.0:1 (${borderToken} on ${bgToken}${opacity < 1.0 ? ` opacity ${opacity.toFixed(2)}` : ''})`);
         }
       }
     }
 
-    function traverseJsx(node: ts.Node, ancestorBgTokens: string[]) {
+    function traverseJsx(node: ts.Node, ancestorBgTokens: string[], ancestorFgTokens: string[], ancestorOpacity: number) {
       let currentBgTokens = ancestorBgTokens;
+      let currentFgTokens = ancestorFgTokens;
+      let currentOpacity = ancestorOpacity;
 
       if (ts.isJsxElement(node) || ts.isJsxSelfClosingElement(node)) {
         const opening = ts.isJsxElement(node) ? node.openingElement : node;
@@ -2597,6 +2668,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
           let bgNode: ts.Expression | null = null;
           let fgNode: ts.Expression | null = null;
           let borderNode: ts.Expression | null = null;
+          let opacityNode: ts.Expression | null = null;
+
           for (const p of styleObj.properties) {
             if (ts.isPropertyAssignment(p)) {
               const name = p.name.getText(sf);
@@ -2605,7 +2678,13 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
               if (['border', 'borderColor', 'borderTop', 'borderBottom', 'borderLeft', 'borderRight'].includes(name)) {
                 borderNode = p.initializer;
               }
+              if (name === 'opacity') opacityNode = p.initializer;
             }
+          }
+
+          if (opacityNode) {
+            const elemOp = extractOpacity(opacityNode);
+            if (elemOp !== null) currentOpacity = ancestorOpacity * elemOp;
           }
 
           const bgBranches = bgNode ? extractBranches(bgNode) : [];
@@ -2619,23 +2698,35 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
             }
           }
 
+          const fgBranches = fgNode ? extractBranches(fgNode) : [];
+          if (fgBranches.length > 0) {
+            currentFgTokens = fgBranches.map(b => b.token);
+          }
+
           if (bgNode && fgNode) {
             checkedObjects++;
-            const fgBranches = extractBranches(fgNode);
             for (const bgB of bgBranches) {
               for (const fgB of fgBranches) {
                 if (!bgB.cond || !fgB.cond || bgB.cond === fgB.cond) {
-                  checkPair(bgB.token, fgB.token, styleObj.getStart(sf));
+                  checkPair(bgB.token, fgB.token, styleObj.getStart(sf), currentOpacity);
                 }
               }
             }
           } else if (!bgNode && fgNode) {
             unboundColorObjects++;
-            const fgBranches = extractBranches(fgNode);
             const effectiveBgs = ancestorBgTokens.length > 0 ? ancestorBgTokens : containerBgs;
             for (const fgB of fgBranches) {
               for (const cBg of effectiveBgs) {
-                checkPair(cBg, fgB.token, styleObj.getStart(sf));
+                checkPair(cBg, fgB.token, styleObj.getStart(sf), currentOpacity);
+              }
+            }
+          } else if (opacityNode && !fgNode && currentFgTokens.length > 0) {
+            // Element with opacity inheriting foreground from ancestor
+            unboundColorObjects++;
+            const effectiveBgs = currentBgTokens.length > 0 ? currentBgTokens : (ancestorBgTokens.length > 0 ? ancestorBgTokens : containerBgs);
+            for (const fgT of currentFgTokens) {
+              for (const cBg of effectiveBgs) {
+                checkPair(cBg, fgT, styleObj.getStart(sf), currentOpacity);
               }
             }
           }
@@ -2648,7 +2739,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
                 for (const bB of borderBranches) {
                   for (const bgB of bgBranches) {
                     if (!bB.cond || !bgB.cond || bB.cond === bgB.cond) {
-                      checkBorderPair(bgB.token, bB.token, styleObj.getStart(sf));
+                      checkBorderPair(bgB.token, bB.token, styleObj.getStart(sf), currentOpacity);
                     }
                   }
                 }
@@ -2656,7 +2747,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
                 const effectiveBgs = ancestorBgTokens.length > 0 ? ancestorBgTokens : containerBgs;
                 for (const bB of borderBranches) {
                   for (const cBg of effectiveBgs) {
-                    checkBorderPair(cBg, bB.token, styleObj.getStart(sf));
+                    checkBorderPair(cBg, bB.token, styleObj.getStart(sf), currentOpacity);
                   }
                 }
               }
@@ -2665,17 +2756,17 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
         }
       }
 
-      ts.forEachChild(node, child => traverseJsx(child, currentBgTokens));
+      ts.forEachChild(node, child => traverseJsx(child, currentBgTokens, currentFgTokens, currentOpacity));
     }
 
-    traverseJsx(sf, []);
+    traverseJsx(sf, [], [], 1.0);
 
     // Exact ratchet assertions covering 100% of IntranetDeploymentView style declarations
     expect(totalStyleAttrs, 'Total style attributes in IntranetDeploymentView must be exactly 193').toBe(193);
     expect(checkedObjects, 'Style objects with explicit background and foreground must be exactly 22').toBe(22);
-    expect(checkedPairs, 'Evaluated foreground-background pairs across conditional branches must be exactly 143').toBe(143);
-    expect(unboundColorObjects, 'Elements with foreground color inheriting container background must be exactly 100').toBe(100);
-    expect(checkedObjects + unboundColorObjects, 'Total covered color style objects must be exactly 122').toBe(122);
+    expect(checkedPairs, 'Evaluated foreground-background pairs across conditional branches must be exactly 145').toBe(145);
+    expect(unboundColorObjects, 'Elements with foreground color inheriting container background must be exactly 102').toBe(102);
+    expect(checkedObjects + unboundColorObjects, 'Total covered color style objects must be exactly 124').toBe(124);
     expect(checkedBorderObjects, 'Style objects with explicit border token declarations must be exactly 34').toBe(34);
     expect(checkedBorderPairs, 'Evaluated border-background pairs across conditional and container branches must be exactly 36').toBe(36);
     expect(violations, `Expected 0 style-pair contrast/collision violations in IntranetDeploymentView, got:\n${violations.join('\n')}`).toEqual([]);
@@ -2936,6 +3027,26 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     // Probe 55 [Card 202]: IntranetDeploymentView 1:1 border collision in notice strictly fails 3.0:1
     expect(getContrast(lightTokens['--color-bg-subtle'], lightTokens['--color-bg-subtle']), 'Notice border on notice bg 1:1 collision in light fails 3.0:1').toBe(1.0);
     expect(getContrast(darkTokens['--color-bg-subtle'], darkTokens['--color-bg-subtle']), 'Notice border on notice bg 1:1 collision in dark fails 3.0:1').toBe(1.0);
+
+    // Probe 56 [Card 202 r1 / U1]: Operator input border with 0.8 opacity over surface fails 3.0:1
+    const defectiveBorderOp08Light = blendRgba(parseHex(lightTokens['--color-border-subtle']), 0.8, lightTokens['--color-bg-surface']);
+    const defectiveBorderOp08Dark = blendRgba(parseHex(darkTokens['--color-border-subtle']), 0.8, darkTokens['--color-bg-surface']);
+    const probe56LightCr = getContrast(defectiveBorderOp08Light, lightTokens['--color-bg-surface']);
+    const probe56DarkCr = getContrast(defectiveBorderOp08Dark, darkTokens['--color-bg-surface']);
+    expect(probe56LightCr, 'Defective 0.8 opacity border on light surface fails 3.0:1').toBeLessThan(3.0);
+    expect(probe56LightCr).toBeCloseTo(2.60, 2);
+    expect(probe56DarkCr, 'Defective 0.8 opacity border on dark surface fails 3.0:1').toBeLessThan(3.0);
+    expect(probe56DarkCr).toBeCloseTo(2.86, 2);
+
+    // Probe 57 [Card 202 r1 / U1]: Error state message with 0.5 opacity (mutant B5) fails 4.5:1
+    const defectiveTextOp05Light = blendRgba(parseHex(lightTokens['--color-status-offline']), 0.5, lightTokens['--color-bg-subtle']);
+    const defectiveTextOp05Dark = blendRgba(parseHex(darkTokens['--color-status-offline']), 0.5, darkTokens['--color-bg-subtle']);
+    const probe57LightCr = getContrast(defectiveTextOp05Light, lightTokens['--color-bg-subtle']);
+    const probe57DarkCr = getContrast(defectiveTextOp05Dark, darkTokens['--color-bg-subtle']);
+    expect(probe57LightCr, 'Defective 0.5 opacity text on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe57LightCr).toBeCloseTo(2.46, 2);
+    expect(probe57DarkCr, 'Defective 0.5 opacity text on dark subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe57DarkCr).toBeCloseTo(2.31, 2);
 
     // Legacy Token Reverts:
     // Legacy Dark --color-border-subtle: #374151

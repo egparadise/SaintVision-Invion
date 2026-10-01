@@ -1210,7 +1210,6 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
                 padding: '6px 12px',
                 fontSize: '13px',
                 color: 'var(--color-text-primary)',
-                opacity: currentUser ? 0.8 : 1,
               }}
             />
             <Button
