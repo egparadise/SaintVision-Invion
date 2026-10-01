@@ -10,10 +10,14 @@ from __future__ import annotations
 
 import copy
 import json
+from pathlib import Path
 
 import pytest
 
 from tools import check_idp_realm_config as checker
+
+
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def matching_config():
@@ -66,6 +70,27 @@ def matching_config():
                             "access.token.claim": "true",
                         },
                     },
+                    {
+                        "name": "fresh-auth-time",
+                        "protocolMapper": "oidc-usersessionmodel-note-mapper",
+                        "config": {
+                            "user.session.note": "AUTH_TIME",
+                            "claim.name": "auth_time",
+                            "jsonType.label": "long",
+                            "access.token.claim": "true",
+                            "id.token.claim": "false",
+                            "userinfo.token.claim": "false",
+                        },
+                    },
+                    {
+                        "name": "fresh-auth-amr",
+                        "protocolMapper": "oidc-amr-mapper",
+                        "config": {
+                            "access.token.claim": "true",
+                            "id.token.claim": "false",
+                            "lightweight.claim": "false",
+                        },
+                    },
                 ],
             },
         },
@@ -77,6 +102,20 @@ def matching_config():
                     "include.in.token.scope": "true",
                     "display.on.consent.screen": "false",
                 },
+            },
+        },
+        "authenticatorReferences": {
+            "auth-username-password-form": {
+                "config": {
+                    "default.reference.value": "pwd",
+                    "default.reference.maxAge": "300",
+                }
+            },
+            "auth-otp-form": {
+                "config": {
+                    "default.reference.value": "otp",
+                    "default.reference.maxAge": "300",
+                }
             },
         },
     }
@@ -153,6 +192,19 @@ def relax_scope(mutate):
         ("client_id claims another client",
          lambda c, p, a: p["protocolMappers"][1]["config"].__setitem__(
              "claim.value", "somebody-else"), "client_id claim is not sv-portal"),
+        ("auth_time mapper removed",
+         lambda c, p, a: p["protocolMappers"].pop(2), "fresh-auth-time"),
+        ("auth_time mapper reads another session note",
+         lambda c, p, a: p["protocolMappers"][2]["config"].__setitem__(
+             "user.session.note", "user-input"), "exactly bind AUTH_TIME"),
+        ("auth_time mapper writes a string",
+         lambda c, p, a: p["protocolMappers"][2]["config"].__setitem__(
+             "jsonType.label", "String"), "exactly bind AUTH_TIME"),
+        ("amr mapper removed",
+         lambda c, p, a: p["protocolMappers"].pop(3), "fresh-auth-amr"),
+        ("amr mapper stops writing access tokens",
+         lambda c, p, a: p["protocolMappers"][3]["config"].__setitem__(
+             "access.token.claim", "false"), "access-token-only"),
         ("plaintext redirect on a real host",
          lambda c, p, a: p["redirectUris"].append("http://portal.sv.lan/*"),
          "plaintext or wildcard"),
@@ -260,3 +312,40 @@ def test_both_https_enforcement_levels_are_accepted(value):
     config = matching_config()
     config["realm"]["sslRequired"] = value
     assert findings(config) == []
+
+
+@pytest.mark.parametrize(
+    ("provider", "field", "value", "expected"),
+    [
+        ("auth-username-password-form", "default.reference.value", "webauthn", "RFC 8176 pwd"),
+        ("auth-username-password-form", "default.reference.maxAge", "301", "300 seconds"),
+        ("auth-otp-form", "default.reference.value", "mfa", "RFC 8176 otp"),
+        ("auth-otp-form", "default.reference.maxAge", "0", "300 seconds"),
+    ],
+)
+def test_fresh_auth_execution_references_are_exact(provider, field, value, expected):
+    config = matching_config()
+    config["authenticatorReferences"][provider]["config"][field] = value
+    assert any(expected in finding for finding in findings(config))
+
+
+def test_missing_reference_snapshot_is_unusable_not_a_false_pass():
+    config = matching_config()
+    del config["authenticatorReferences"]
+    with pytest.raises(checker.ConfigUnusable, match="authenticatorReferences"):
+        findings(config)
+
+
+def test_realm_configurator_emits_the_exact_fresh_auth_snapshot():
+    script = (ROOT / "deploy" / "intranet" / "idp-realm.sh").read_text(encoding="utf-8")
+    for required in (
+        '"protocolMapper": "oidc-usersessionmodel-note-mapper"',
+        '"user.session.note": "AUTH_TIME"',
+        '"claim.name": "auth_time"',
+        '"protocolMapper": "oidc-amr-mapper"',
+        '"default.reference.maxAge": "300"',
+        'ensure_execution_reference "auth-username-password-form" "pwd"',
+        'ensure_execution_reference "auth-otp-form" "otp"',
+        '"authenticatorReferences"',
+    ):
+        assert required in script

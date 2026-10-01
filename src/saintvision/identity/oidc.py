@@ -118,12 +118,23 @@ class OidcPrincipalVerifier:
             with session.begin():
                 with tenant_scope(session, tenant_id):
                     return principal_for_subject(
-                        session, tenant_id=tenant_id, subject=subject
+                        session,
+                        tenant_id=tenant_id,
+                        subject=subject,
+                        verified_fresh_auth_claims=True,
+                        auth_time=getattr(identity, "auth_time", None),
+                        amr=frozenset(getattr(identity, "amr", ())),
                     )
 
 
 def principal_for_subject(
-    session: Session, *, tenant_id: uuid.UUID, subject: str
+    session: Session,
+    *,
+    tenant_id: uuid.UUID,
+    subject: str,
+    verified_fresh_auth_claims: bool = False,
+    auth_time: int | None = None,
+    amr: frozenset[str] = frozenset(),
 ) -> Principal:
     """Find the person this verified subject belongs to.
 
@@ -184,4 +195,7 @@ def principal_for_subject(
         # request it was built for is handled.
         project_ids=frozenset(project_id for project_id, _ in memberships),
         roles=frozenset(role for _, role in memberships),
+        verified_fresh_auth_claims=verified_fresh_auth_claims,
+        auth_time=auth_time,
+        amr=amr,
     )

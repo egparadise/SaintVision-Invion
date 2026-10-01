@@ -22,6 +22,20 @@ class Strict(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 
 
+class FreshAuthenticationStepUpRequest(Strict):
+    """OIDC authorization parameters for a release-acceptance step-up.
+
+    This is a redirect/query contract for the portal handoff, not a control
+    plane JSON body.  The generated schema keeps the two security-sensitive
+    values literal until the Gemini-owned portal implements the redirect.
+    """
+
+    prompt: Literal["login"]
+    max_age: Literal[300] = Field(alias="max_age")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
 class CapabilityPayload(Strict):
     kind: str = Field(pattern="^(cpu|gpu|ram|disk)$")
     total_quantity: float = Field(ge=0, alias="totalQuantity")
