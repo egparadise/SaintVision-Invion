@@ -45,8 +45,24 @@ BROWSER_FLOW="${SV_IDP_BROWSER_FLOW:-browser}"
 # reject that path and buy nothing, because no network client can reach http at all.
 SSL_REQUIRED="${SV_IDP_SSL_REQUIRED:-external}"
 CHECKER="${SV_REALM_CHECKER:-}"
+APPLY_MODE="${SV_IDP_APPLY_MODE:-full}"
 
-set -a; . "$USERS_FILE"; set +a
+case "$APPLY_MODE" in
+  full|fresh-auth-only) ;;
+  *)
+    echo "unsupported SV_IDP_APPLY_MODE: expected full or fresh-auth-only" >&2
+    exit 2
+    ;;
+esac
+
+# The fresh-auth-only mode is the safe operational repair path: it never reads
+# user credentials and never creates, updates, or resets a user.  It also
+# refuses to create realm/client/scope prerequisites.  Operators can therefore
+# re-assert the two token mappers and the two browser execution references
+# without widening the change into account or client administration.
+if [ "$APPLY_MODE" = "full" ]; then
+  set -a; . "$USERS_FILE"; set +a
+fi
 
 # -i only where a heredoc feeds kcadm. Without that split, a "docker exec -i"
 # with no input of its own swallows the rest of this script when it is piped
@@ -74,40 +90,58 @@ docker exec "$CONTAINER" sh -c '
       --server http://localhost:8080 --realm master --user "$KC_BOOTSTRAP_ADMIN_USERNAME"
 ' >/dev/null
 
-if ! kc get "realms/$REALM" --fields realm >/dev/null 2>&1; then
-  kc create realms -s "realm=$REALM" -s enabled=true
+if [ "$APPLY_MODE" = "full" ]; then
+  if ! kc get "realms/$REALM" --fields realm >/dev/null 2>&1; then
+    kc create realms -s "realm=$REALM" -s enabled=true
+  fi
+  # Re-asserted every run, not only on create. The verifier refuses exp - iat > 3600,
+  # so a widened lifespan is a broken realm that still has all the right objects in it,
+  # and a "create if missing" script would keep reporting success.
+  kc update "realms/$REALM" -s enabled=true -s "accessTokenLifespan=$TOKEN_LIFESPAN" \
+    -s "sslRequired=$SSL_REQUIRED"
+elif ! kc get "realms/$REALM" --fields realm >/dev/null 2>&1; then
+  echo "fresh-auth-only refuses to create missing realm: $REALM" >&2
+  exit 2
 fi
-# Re-asserted every run, not only on create. The verifier refuses exp - iat > 3600,
-# so a widened lifespan is a broken realm that still has all the right objects in it,
-# and a "create if missing" script would keep reporting success.
-kc update "realms/$REALM" -s enabled=true -s "accessTokenLifespan=$TOKEN_LIFESPAN" \
-  -s "sslRequired=$SSL_REQUIRED"
 
 client_id_of() { csv get clients -r "$REALM" -q "clientId=$1" --fields id | head -1; }
 
 # The API client exists only to name an audience; it never logs anyone in.
 if [ -z "$(client_id_of "$API_CLIENT")" ]; then
-  kc create clients -r "$REALM" -s "clientId=$API_CLIENT" -s enabled=true
+  if [ "$APPLY_MODE" = "full" ]; then
+    kc create clients -r "$REALM" -s "clientId=$API_CLIENT" -s enabled=true
+  else
+    echo "fresh-auth-only refuses to create missing client: $API_CLIENT" >&2
+    exit 2
+  fi
 fi
 API_ID="$(client_id_of "$API_CLIENT")"
-kc update "clients/$API_ID" -r "$REALM" -s enabled=true -s publicClient=false \
-  -s standardFlowEnabled=false -s directAccessGrantsEnabled=false \
-  -s implicitFlowEnabled=false -s serviceAccountsEnabled=false
+if [ "$APPLY_MODE" = "full" ]; then
+  kc update "clients/$API_ID" -r "$REALM" -s enabled=true -s publicClient=false \
+    -s standardFlowEnabled=false -s directAccessGrantsEnabled=false \
+    -s implicitFlowEnabled=false -s serviceAccountsEnabled=false
+fi
 
 # The portal is a browser client: public, so PKCE S256 is mandatory, and no
 # direct access grants -- a password grant from a public client is a credential
 # funnel, and the code below turns it off on every run in case someone enabled it.
 if [ -z "$(client_id_of "$PORTAL_CLIENT")" ]; then
-  kc create clients -r "$REALM" -s "clientId=$PORTAL_CLIENT" -s enabled=true \
-    -s publicClient=true -s standardFlowEnabled=true
+  if [ "$APPLY_MODE" = "full" ]; then
+    kc create clients -r "$REALM" -s "clientId=$PORTAL_CLIENT" -s enabled=true \
+      -s publicClient=true -s standardFlowEnabled=true
+  else
+    echo "fresh-auth-only refuses to create missing client: $PORTAL_CLIENT" >&2
+    exit 2
+  fi
 fi
 PORTAL_ID="$(client_id_of "$PORTAL_CLIENT")"
 
-redirects=""; origins=""
-for origin in $PORTAL_ORIGINS; do
-  redirects="$redirects\"$origin/*\","; origins="$origins\"$origin\","
-done
-kc_in update "clients/$PORTAL_ID" -r "$REALM" -f - <<JSON
+if [ "$APPLY_MODE" = "full" ]; then
+  redirects=""; origins=""
+  for origin in $PORTAL_ORIGINS; do
+    redirects="$redirects\"$origin/*\","; origins="$origins\"$origin\","
+  done
+  kc_in update "clients/$PORTAL_ID" -r "$REALM" -f - <<JSON
 {
   "enabled": true,
   "publicClient": true,
@@ -123,46 +157,51 @@ kc_in update "clients/$PORTAL_ID" -r "$REALM" -f - <<JSON
   }
 }
 JSON
+fi
 
 mapper_id() { csv get "clients/$PORTAL_ID/protocol-mappers/models" -r "$REALM" --fields id,name \
   | awk -F, -v want="$1" '$2 == want {print $1}' | head -1; }
 
 # Created if absent, then overwritten either way: a mapper that stopped writing to
 # the access token is still a mapper, and "create if missing" would leave it alone.
-if [ -z "$(mapper_id "$API_CLIENT-audience")" ]; then
-  kc_in create "clients/$PORTAL_ID/protocol-mappers/models" -r "$REALM" -f - <<JSON
+if [ "$APPLY_MODE" = "full" ]; then
+  if [ -z "$(mapper_id "$API_CLIENT-audience")" ]; then
+    kc_in create "clients/$PORTAL_ID/protocol-mappers/models" -r "$REALM" -f - <<JSON
 {"name": "$API_CLIENT-audience", "protocol": "openid-connect",
  "protocolMapper": "oidc-audience-mapper",
  "config": {"included.client.audience": "$API_CLIENT",
             "access.token.claim": "true", "id.token.claim": "false"}}
 JSON
-fi
-AUDIENCE_MAPPER_ID="$(mapper_id "$API_CLIENT-audience")"
-kc_in update "clients/$PORTAL_ID/protocol-mappers/models/$AUDIENCE_MAPPER_ID" -r "$REALM" -f - <<JSON
+  fi
+  AUDIENCE_MAPPER_ID="$(mapper_id "$API_CLIENT-audience")"
+  kc_in update "clients/$PORTAL_ID/protocol-mappers/models/$AUDIENCE_MAPPER_ID" -r "$REALM" -f - <<JSON
 {"id": "$AUDIENCE_MAPPER_ID", "name": "$API_CLIENT-audience", "protocol": "openid-connect",
  "protocolMapper": "oidc-audience-mapper",
  "config": {"included.client.audience": "$API_CLIENT",
             "access.token.claim": "true", "id.token.claim": "false"}}
 JSON
+fi
 
 # inv.identity requires a client_id claim; Keycloak emits azp and nothing else.
-if [ -z "$(mapper_id "client-id")" ]; then
-  kc_in create "clients/$PORTAL_ID/protocol-mappers/models" -r "$REALM" -f - <<JSON
+if [ "$APPLY_MODE" = "full" ]; then
+  if [ -z "$(mapper_id "client-id")" ]; then
+    kc_in create "clients/$PORTAL_ID/protocol-mappers/models" -r "$REALM" -f - <<JSON
 {"name": "client-id", "protocol": "openid-connect",
  "protocolMapper": "oidc-hardcoded-claim-mapper",
  "config": {"claim.name": "client_id", "claim.value": "$PORTAL_CLIENT",
             "jsonType.label": "String",
             "access.token.claim": "true", "id.token.claim": "false"}}
 JSON
-fi
-CLIENT_ID_MAPPER_ID="$(mapper_id "client-id")"
-kc_in update "clients/$PORTAL_ID/protocol-mappers/models/$CLIENT_ID_MAPPER_ID" -r "$REALM" -f - <<JSON
+  fi
+  CLIENT_ID_MAPPER_ID="$(mapper_id "client-id")"
+  kc_in update "clients/$PORTAL_ID/protocol-mappers/models/$CLIENT_ID_MAPPER_ID" -r "$REALM" -f - <<JSON
 {"id": "$CLIENT_ID_MAPPER_ID", "name": "client-id", "protocol": "openid-connect",
  "protocolMapper": "oidc-hardcoded-claim-mapper",
  "config": {"claim.name": "client_id", "claim.value": "$PORTAL_CLIENT",
             "jsonType.label": "String",
             "access.token.claim": "true", "id.token.claim": "false"}}
 JSON
+fi
 
 # The release-acceptance boundary never decodes an unverified token to recover
 # these values.  auth_time comes from Keycloak's server-side user-session note;
@@ -258,35 +297,45 @@ OTP_REFERENCE_CONFIG_ID="$(ensure_execution_reference "auth-otp-form" "otp" "sv-
 # strict_aud forbids an audience list, and the built-in "roles" scope adds
 # "account" through its audience-resolve mapper. Drop the scope, not the mapper:
 # the mapper lives in a realm-wide scope other clients may still want.
-ROLES_ID="$(csv get "clients/$PORTAL_ID/default-client-scopes" -r "$REALM" --fields id,name \
-  | awk -F, '$2 == "roles" {print $1}' | head -1)"
-if [ -n "$ROLES_ID" ]; then
-  kc delete "clients/$PORTAL_ID/default-client-scopes/$ROLES_ID" -r "$REALM"
+if [ "$APPLY_MODE" = "full" ]; then
+  ROLES_ID="$(csv get "clients/$PORTAL_ID/default-client-scopes" -r "$REALM" --fields id,name \
+    | awk -F, '$2 == "roles" {print $1}' | head -1)"
+  if [ -n "$ROLES_ID" ]; then
+    kc delete "clients/$PORTAL_ID/default-client-scopes/$ROLES_ID" -r "$REALM"
+  fi
 fi
 
 scope_id() { csv get client-scopes -r "$REALM" --fields id,name \
   | awk -F, -v want="$1" '$2 == want {print $1}' | head -1; }
 
 if [ -z "$(scope_id "$SCOPE")" ]; then
-  kc_in create client-scopes -r "$REALM" -f - <<JSON
+  if [ "$APPLY_MODE" = "full" ]; then
+    kc_in create client-scopes -r "$REALM" -f - <<JSON
 {"name": "$SCOPE", "protocol": "openid-connect",
  "attributes": {"include.in.token.scope": "true", "display.on.consent.screen": "false"}}
 JSON
+  else
+    echo "fresh-auth-only refuses to create missing client scope: $SCOPE" >&2
+    exit 2
+  fi
 fi
 SCOPE_ID="$(scope_id "$SCOPE")"
 # Re-applied every run. Assigning the scope to the client is not enough: with
 # include.in.token.scope false the scope is assigned and the token still has no
 # inv.api in it, so the verifier answers 401 while this script reports success.
-kc_in update "client-scopes/$SCOPE_ID" -r "$REALM" -f - <<JSON
+if [ "$APPLY_MODE" = "full" ]; then
+  kc_in update "client-scopes/$SCOPE_ID" -r "$REALM" -f - <<JSON
 {"id": "$SCOPE_ID", "name": "$SCOPE", "protocol": "openid-connect",
  "attributes": {"include.in.token.scope": "true", "display.on.consent.screen": "false"}}
 JSON
-if ! csv get "clients/$PORTAL_ID/default-client-scopes" -r "$REALM" --fields name \
-  | grep -qx "$SCOPE"; then
-  kc update "clients/$PORTAL_ID/default-client-scopes/$SCOPE_ID" -r "$REALM"
+  if ! csv get "clients/$PORTAL_ID/default-client-scopes" -r "$REALM" --fields name \
+    | grep -qx "$SCOPE"; then
+    kc update "clients/$PORTAL_ID/default-client-scopes/$SCOPE_ID" -r "$REALM"
+  fi
 fi
 
-for pair in "$SV_USER1:$SV_USER1_PASSWORD" "$SV_USER2:$SV_USER2_PASSWORD"; do
+if [ "$APPLY_MODE" = "full" ]; then
+  for pair in "$SV_USER1:$SV_USER1_PASSWORD" "$SV_USER2:$SV_USER2_PASSWORD"; do
   username="${pair%%:*}"; password="${pair#*:}"
   if [ -z "$(csv get users -r "$REALM" -q "username=$username" --fields id | head -1)" ]; then
     kc create users -r "$REALM" -s "username=$username" -s enabled=true
@@ -305,7 +354,8 @@ JSON
   kc_in update "users/$uid/reset-password" -r "$REALM" -f - <<JSON
 {"type": "password", "value": "$password", "temporary": false}
 JSON
-done
+  done
+fi
 
 # Setting the realm is not the same as knowing it is still set. Read the live
 # configuration back and judge it; an admin-console click that relaxes any of this

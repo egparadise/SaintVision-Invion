@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "saintvision.idp-fresh-auth-live-readback.v1",
+  "runPurpose": "card-209-live-realm-fresh-auth-mapper-application",
+  "targetKind": "operational-intranet-idp",
+  "targetService": "idp.sv.lan",
+  "sourceBaseSha": "d0b2a4c6b05674a7d8d0ca011f080f580a873b06",
+  "sourceCodeSha": "7aea9cc32c0f38bd4a762d73d8b347a2957dbe06",
+  "deployedScriptSha256": "95d48cb7505a1ba4da37b44db7c303ec12441f112b67ac3138a004e674c26980",
+  "checkerSha256": "287bbfc848aa6fc7b88de1d10f633e324efc4a6ed014085d356334f042c133dd",
+  "observedAt": "2026-10-02T06:44:15+09:00",
+  "applyMode": "fresh-auth-only",
+  "preApply": {
+    "verdict": "DRIFT_OBSERVED",
+    "freshAuthTimeMapperMatches": false,
+    "freshAuthAmrMapperMatches": false,
+    "passwordExecutionReferencePresent": false,
+    "otpExecutionReferencePresent": false,
+    "snapshotFileCount": 2,
+    "protectedSnapshotManifestSha256": "55b2592b7b85b3ba5e7a9700de8e9dea7eda3f87d6bc43d1f02b72d900289db6"
+  },
+  "apply": {
+    "exitCode": 0,
+    "idempotentReapplyExitCode": 0,
+    "canonicalToolInstalled": true,
+    "canonicalPathReadbackExitCode": 0,
+    "canonicalInstallWrapperExitCode": 2,
+    "canonicalInstallWrapperFailure": "post-readback hash formatting command only",
+    "hashAndTemporaryFileCleanupRetryExitCode": 0,
+    "userCredentialFileRead": false,
+    "userMutationCount": 0,
+    "otpEnrollmentPerformed": false
+  },
+  "postApply": {
+    "verdict": "MEASURED",
+    "freshAuthTimeMapperMatches": true,
+    "freshAuthAmrMapperMatches": true,
+    "passwordExecutionReferenceMatches": true,
+    "otpExecutionReferenceMatches": true,
+    "liveRealmCheckerExitCode": 0,
+    "driftCount": 0,
+    "snapshotFileCount": 4,
+    "protectedSnapshotManifestSha256": "db7629cba7b31d1c534cfe93d8d6838c8b015365685635596178a082e63d1733"
+  },
+  "secretValuesEmitted": 0,
+  "identifyingNetworkValuesEmitted": 0,
+  "rollback": {
+    "protectedBackupLocation": "~/.sv-idp/backups/card209-20261001T213815Z",
+    "protectedToolBackupLocation": "~/.sv-idp/backups/card209-tool-20261001T214700Z",
+    "previousToolSha256": "06fc79e7e04a8fb60b60f70207ea6a104d54a88afffe2691ae82600060a0889d",
+    "procedure": "remove only mappers/configs absent from the protected pre-apply snapshot; otherwise restore the exact protected JSON by captured object id, restore the protected prior tool only when rolling back code, then rerun the live checker",
+    "performed": false
+  },
+  "limitations": [
+    "No OTP was enrolled and no user account or operational data was changed.",
+    "No fresh-auth access token was minted, so exact auth_time/amr token observation remains NOT_OBSERVED.",
+    "Protected snapshots remain operator-private and are represented here only by counts and SHA-256 manifests."
+  ]
+}

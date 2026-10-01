@@ -48,6 +48,15 @@ active_card_next: "Push the #302 repair head, confirm exact-head Backend and Fro
 - exact-head run `36929190888`도 같은 실제 왕복 gate를 통과했다. archive 독립 변조와 process-mode
   identity 공백을 보강해 focused **78 passed**이며, liveness는 아직 evidence 도구 조건이지 제품 조건은 아니다.
 - [[2026-10-02_05-55-05_KST_S08-BE_OCI_digest_buildkitd_PID_결속_Codex]].
+## 2026-10-02 Card 209 — 사내망 Keycloak fresh-auth mapper 적용·read-back
+
+- `fresh-auth-only` 모드는 user credential을 읽거나 사용자·realm·client 일반 설정을 바꾸지 않고
+  mapper/reference 네 항목만 재적용한다. pre-apply 네 항목 drift를 기록하고 보호 백업 뒤 실행했다.
+- 첫 apply·동일 명령 재실행·live checker가 모두 exit 0, post drift 0이었다. 비밀 출력과 사용자 변경은
+  0이며 OTP 등록·실 token claim 관측은 하지 않아 `NOT_OBSERVED`로 남긴다.
+- fake-docker 행동 시험은 `fresh-auth-only`의 realm 변경 호출을 mapper update 2건과 execution config
+  update 2건의 exact set으로 고정하고, unknown mode는 Docker 호출 전에 exit 2로 닫는다.
+- [[2026-10-02_06-45-07_KST_Card209_IdP_fresh_auth_live_readback_Codex]].
 
 ## 2026-10-01 Card 194 — S12 acceptance target·Evidence resolver 구현
 
