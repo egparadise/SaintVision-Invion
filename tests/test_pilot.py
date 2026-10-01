@@ -652,7 +652,20 @@ def test_readiness_reports_a_drill_that_passed_but_missed_the_target(
     assert report["drillsMissingTargets"][0]["measuredRtoSeconds"] > TARGET_RTO_SECONDS
 
 
-def test_a_rejected_acceptance_blocks_readiness(app_sessionmaker, pilot):
+def test_a_rejected_acceptance_never_produces_sign_off(app_sessionmaker, pilot):
+    """A rejected decision is not an accepted one, and that needs no rule of its own.
+
+    This test used to assert the blocker string "a rejected acceptance stands against
+    this release", which ``pilot_readiness`` produced from its own rule. Design #282 §5
+    removed that rule: one projection answers whether a release is operator-signed, and
+    a rejected criterion fails it by not being accepted. A second rule saying the same
+    thing is a rule that can be changed in one place only, and the two could disagree
+    about the same release.
+
+    So the assertion moves to the thing that matters -- no sign-off -- and keeps the
+    distinction the old version blurred: the rejection is still *recorded*, so the
+    record catalogue is not missing anything, while the release is not signed off.
+    """
     with app_sessionmaker() as session:
         with session.begin():
             with tenant_scope(session, pilot["tenant_a"]):
@@ -669,7 +682,12 @@ def test_a_rejected_acceptance_blocks_readiness(app_sessionmaker, pilot):
                     session, tenant_id=pilot["tenant_a"],
                     release_id=release.release_id, now=NOW,
                 )
-    assert "a rejected acceptance stands against this release" in report["blockers"]
+    assert report["operatorSignOff"] is False
+    assert report["operatorSignOffBlockedBy"] == "release-acceptance-prerequisites-unavailable"
+    assert report["signOffUnmet"], "the projection must say which criterion is unmet"
+    # The record exists, so the catalogue is not what is missing here.
+    assert "no acceptance record for AC-12 in this release" not in report["blockers"]
+    assert [a["outcome"] for a in report["acceptances"]] == ["rejected"]
 
 
 # --------------------------------------------------------------------------

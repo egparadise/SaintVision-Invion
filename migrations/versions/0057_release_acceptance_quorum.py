@@ -325,6 +325,34 @@ def upgrade() -> None:
         "ix_release_acceptance_slots_release", SLOT_TABLE, ["tenant_id", "release_id"]
     )
 
+    # ---------------------------------------------------------------- the policy pin
+    # Which required criteria this release was accepted against, pinned at deployment
+    # (§5-1). Nullable because every existing release has no pin, and the projection
+    # refuses an unpinned release rather than reading today's registry as its policy:
+    # that would be deciding retroactively what a release was accepted against.
+    # Both columns move together -- a version without a digest names a document nobody
+    # can identify, and a digest without a version cannot be compared for monotonicity.
+    op.add_column("release_manifests", sa.Column("policy_version", sa.Integer, nullable=True))
+    op.add_column(
+        "release_manifests", sa.Column("policy_registry_sha256", SHA256, nullable=True)
+    )
+    op.create_check_constraint(
+        "policy_pin_is_whole",
+        "release_manifests",
+        "(policy_version IS NULL) = (policy_registry_sha256 IS NULL)",
+    )
+    op.create_check_constraint(
+        "policy_pin_digest_is_lowercase",
+        "release_manifests",
+        "policy_registry_sha256 IS NULL "
+        "OR policy_registry_sha256 = lower(policy_registry_sha256)",
+    )
+    op.create_check_constraint(
+        "policy_pin_version_positive",
+        "release_manifests",
+        "policy_version IS NULL OR policy_version > 0",
+    )
+
     # ---------------------------------------------------------------- acceptance_records
     # Existing rows are classified, not judged. ``legacy-unverified`` is what they are:
     # written by the one-person path, with nothing recorded about the human. The default
