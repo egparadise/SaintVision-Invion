@@ -336,6 +336,7 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({
 
         {/* Active Lease & Allocations Panel */}
         <div
+          data-testid="node-detail-lease-panel"
           style={{
             padding: '24px',
             backgroundColor: 'var(--color-bg-surface)',
@@ -360,7 +361,10 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({
                 {totalPhysicalDisplay}
               </div>
             </div>
-            <div style={{ padding: '10px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)', fontSize: '0.75rem' }}>
+            <div
+              data-testid="node-detail-observed-usage-box"
+              style={{ padding: '10px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)', fontSize: '0.75rem' }}
+            >
               <div style={{ color: 'var(--color-text-muted)', marginBottom: '2px' }}>관측 사용량</div>
               <div
                 data-testid="node-detail-observed-usage-value"
@@ -371,7 +375,10 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({
                   : '미측정'}
               </div>
             </div>
-            <div style={{ padding: '10px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)', fontSize: '0.75rem' }}>
+            <div
+              data-testid="node-detail-observed-headroom-box"
+              style={{ padding: '10px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)', fontSize: '0.75rem' }}
+            >
               <div style={{ color: 'var(--color-text-muted)', marginBottom: '2px' }}>관측 여유량 (Headroom)</div>
               <div
                 data-testid="node-detail-observed-headroom-value"

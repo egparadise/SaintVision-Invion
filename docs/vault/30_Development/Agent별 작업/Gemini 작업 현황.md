@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.171"
+version: "1.0.172"
 status: "proposed"
 author: "Gemini"
-updated: "2026-10-01T23:00:00+09:00"
+updated: "2026-10-01T23:55:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,6 +19,7 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
+- 확인 기준: 2026-10-01T23:55:00+09:00 (Card 193 NodeDetail 잔여 리터럴 9건 r1 조치: Claude UI r1 및 Codex r1 피드백 반영, data-testid를 통한 상위 컨테이너(resource-usage-card-cpu subtle, node-detail-observed-usage-box subtle, node-detail-observed-headroom-box subtle, node-detail-lease-panel surface) 배경 DOM 직접 추출 및 동적 대비율 단언, Z1~Z5 5종 변이 100% 사살 실측, History §2 표 및 §3-2 대비 수치·배경 수학적 정밀 수치 정정, Probe 19~23 주석 수치 및 subtle 베이스 정정, Vitest 13 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-01T23:00:00+09:00 (Card 193 NodeDetail 잔여 리터럴 9건 전수 해소 및 대비 래칫 강화: base 3e19b682 위 작업, #3fb950 4건·#2ea043 1건·#58a6ff 2건·rgba 2건 전수 제거, 배지 및 4-Tier 수치, online 타임라인을 var(--color-status-online), var(--color-brand-primary), var(--color-bg-subtle)로 결속하여 라이트/다크 모두 4.5:1(텍스트)/3.0:1(UI경계) 충족, COLOR_LITERAL_MULTISET_BASELINE 순수 감소 래칫, 11종 변이 100% 사살 실측, 잔여 저대비 리터럴 결함 백로그 0건, Vitest 13 passed, node 스위트 40 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-01T22:15:00+09:00 (Card 189 NodeList 및 NodeDetail 잔여 저대비 리터럴 토큰화 Claude UI r1 및 Codex r1 조치: base ec75b4f0 위 작업, DOM style.backgroundColor 실제 배경 직접 추출 및 canvas/surface 위 동적 합성 resolveDomColor 적용, 1:1 배경교체 B1·alpha변조 B2·정상분기복귀 B3·degraded병합 B4 4종 단독 변이 및 M1~M9 총 13종 변이 100% 사살 실측, NodeDetail 저대비 리터럴 14건 순수 감소 래칫, 잔여 9건 정직한 백로그 목록화, status: proposed 준수, reviewer 사전 기재 제거, raw CR 0건, Vitest 12 passed, tsc 0 error, build 성공, route coverage 40 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-01T21:30:00+09:00 (Card 183 S12-FE 릴리스 선언서 및 운영자 인수 서버 경로 결속 #282 최종 계약 머지 및 Train 9 착지 차단 해제: origin/agent/codex/c184-s12-acceptance-contract b96068b6 머지 완료, operatorSignOffBlockedBy='release-acceptance-prerequisites-unavailable' 동기화, api-response-contracts.mjs 40 types PASS, strict guard 갱신 및 legacy blockedBy 유입 시 ContractViolationError 사살 시험 추가, UI 사유 문구 갱신, Vitest 22 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 프런트 무결성 규칙 0 위반).
@@ -59,7 +60,7 @@ source_of_truth: "Git"
   - 문서 경로 인용 래칫: `python tools/check_doc_path_citations.py --ratchet --base-ref 3e19b682` PASS (exit 0)
   - Git diff 공백: `git diff --check 3e19b682` 클린 (exit 0)
   - 봇 호출 태그: 0건 준수
-- **전문 문서**: [[2026-10-01_23-00-00_KST_Card193_NodeDetail_잔여대비_Gemini]]
+- **전문 문서**: [[2026-10-01_23-55-00_KST_Card193_NodeDetail_잔여대비_r1_Gemini]], [[2026-10-01_23-00-00_KST_Card193_NodeDetail_잔여대비_Gemini]]
 
 ## 2026-10-01 NodeList 및 NodeDetail 잔여 저대비 리터럴 토큰화 및 WCAG AA 적합성 완결 (Card 189, ACC-09 잔여, `agent/gemini/c189-node-residual-contrast`, base `ec75b4f0` PR #284)
 - **개요**: PR #284 (Card 186) Claude UI r1 검토(i1) 및 PR #288 Claude UI r1(issuecomment-5931871184) 피드백에 따라, `NodeList.tsx` 및 `NodeDetail.tsx`에 잔존하던 하드코딩 색상 리터럴 저대비 결함을 전수 해결하고 디자인 토큰으로 승격 및 변이 사살 완전성 강화:

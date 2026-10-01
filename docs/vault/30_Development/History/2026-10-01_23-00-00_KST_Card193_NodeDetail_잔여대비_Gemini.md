@@ -25,16 +25,16 @@
 
 | 대상 요소 | 기존 리터럴 및 배경 | 기존 대비율 (Light / Dark) | 변경 후 디자인 토큰 및 배경 | 변경 후 대비율 (Light / Dark) | WCAG 기준 충족 |
 |---|---|---|---|---|---|
-| **최근 하트비트 타임라인 online 상태** (`:440`) | `#3fb950` on `#ffffff` / `#111827` (surface) | Light **2.54:1** (FAIL) / Dark 7.60:1 | `var(--color-status-online)` on surface (`#ffffff` / `#111827`) | Light **5.05:1** / Dark **7.60:1** | $\ge 4.5:1$ (본문 텍스트) |
-| **측정됨 배지 텍스트** (`:249`) | `#3fb950` on `rgba(46,160,67,0.15)` / canvas | Light **2.16:1** (FAIL) / Dark 5.79:1 | `var(--color-status-online)` on `var(--color-bg-subtle)` | Light **4.50:1** / Dark **6.42:1** | $\ge 4.5:1$ (배지 텍스트) |
+| **최근 하트비트 타임라인 online 상태** (`:447`) | `#3fb950` on `#ffffff` / `#111827` (surface) | Light **2.54:1** (FAIL) / Dark **6.98:1** | `var(--color-status-online)` on surface (`#ffffff` / `#111827`) | Light **5.02:1** / Dark **7.79:1** | $\ge 4.5:1$ (본문 텍스트) |
+| **측정됨 배지 텍스트** (`:250`) | `#3fb950` on `rgba(46,160,67,0.15)` on subtle (`#d4e8de` / `#213b39`) | Light **1.98:1** (FAIL) / Dark **4.73:1** | `var(--color-status-online)` on subtle (`#f1f5f9` / `#1f2937`) | Light **4.58:1** / Dark **6.44:1** | $\ge 4.5:1$ (배지 텍스트) |
 | **측정됨 배지 배경** (`:249`) | `rgba(46, 160, 67, 0.15)` | 임의 틴트 리터럴 | `var(--color-bg-subtle)` | - | 토큰화 (리터럴 제거) |
-| **측정됨 배지 테두리** (`:250`) | `#2ea043` on canvas | Light **2.88:1** (FAIL) / Dark 4.88:1 | `var(--color-status-online)` on `var(--color-bg-subtle)` | Light **4.50:1** / Dark **6.42:1** | $\ge 3.0:1$ (UI 경계) |
+| **측정됨 배지 테두리** (`:251`) | `#2ea043` on subtle tint (`#d4e8de` / `#213b39`) | Light **2.63:1** (FAIL) / Dark **3.56:1** | `var(--color-status-online)` on subtle (`#f1f5f9` / `#1f2937`) | Light **4.58:1** / Dark **6.44:1** | $\ge 3.0:1$ (UI 경계) |
 | **미측정 배지 배경** (`:249`) | `rgba(110, 118, 129, 0.2)` | 임의 틴트 리터럴 | `var(--color-bg-subtle)` | - | 토큰화 (리터럴 제거) |
-| **미측정 배지 테두리** (`:250`) | `var(--color-border-subtle)` | - | `var(--color-border-subtle)` on `var(--color-bg-subtle)` | Light **3.18:1** / Dark **3.08:1** | $\ge 3.0:1$ (UI 경계) |
-| **예약 할당 (Reserved) 수치** (`:268`) | `#58a6ff` on `var(--color-bg-canvas)` | Light **2.39:1** (FAIL) / Dark 7.28:1 | `var(--color-brand-primary)` on `var(--color-bg-canvas)` | Light **5.02:1** / Dark **7.28:1** | $\ge 4.5:1$ (본문 텍스트) |
-| **가용 잔여 (Spare) 수치** (`:274`) | `#3fb950` on `var(--color-bg-canvas)` | Light **2.45:1** (FAIL) / Dark 7.98:1 | `var(--color-status-online)` on `var(--color-bg-canvas)` | Light **4.80:1** / Dark **7.98:1** | $\ge 4.5:1$ (본문 텍스트) |
-| **4-Tier 관측 사용량 수치** (`:367`) | `#58a6ff` on `var(--color-bg-subtle)` | Light **2.24:1** (FAIL) / Dark 5.85:1 | `var(--color-brand-primary)` on `var(--color-bg-subtle)` | Light **4.70:1** / Dark **5.85:1** | $\ge 4.5:1$ (본문 텍스트) |
-| **4-Tier 관측 여유량 수치** (`:375`) | `#3fb950` on `var(--color-bg-subtle)` | Light **2.26:1** (FAIL) / Dark 6.42:1 | `var(--color-status-online)` on `var(--color-bg-subtle)` | Light **4.50:1** / Dark **6.42:1** | $\ge 4.5:1$ (본문 텍스트) |
+| **미측정 배지 테두리** (`:251`) | `var(--color-border-subtle)` | - | `var(--color-border-subtle)` on subtle (`#f1f5f9` / `#1f2937`) | Light **3.18:1** / Dark **3.08:1** | $\ge 3.0:1$ (UI 경계) |
+| **예약 할당 (Reserved) 수치** (`:270`) | `#58a6ff` on `var(--color-bg-subtle)` (`#f1f5f9` / `#1f2937`) | Light **2.31:1** (FAIL) / Dark **5.81:1** | `var(--color-brand-primary)` on subtle (`#f1f5f9` / `#1f2937`) | Light **4.72:1** / Dark **5.77:1** | $\ge 4.5:1$ (본문 텍스트) |
+| **가용 잔여 (Spare) 수치** (`:279`) | `#3fb950` on `var(--color-bg-subtle)` (`#f1f5f9` / `#1f2937`) | Light **2.32:1** (FAIL) / Dark **5.78:1** | `var(--color-status-online)` on subtle (`#f1f5f9` / `#1f2937`) | Light **4.58:1** / Dark **6.44:1** | $\ge 4.5:1$ (본문 텍스트) |
+| **4-Tier 관측 사용량 수치** (`:371`) | `#58a6ff` on `var(--color-bg-subtle)` (`#f1f5f9` / `#1f2937`) | Light **2.31:1** (FAIL) / Dark **5.81:1** | `var(--color-brand-primary)` on subtle (`#f1f5f9` / `#1f2937`) | Light **4.72:1** / Dark **5.77:1** | $\ge 4.5:1$ (본문 텍스트) |
+| **4-Tier 관측 여유량 수치** (`:384`) | `#3fb950` on `var(--color-bg-subtle)` (`#f1f5f9` / `#1f2937`) | Light **2.32:1** (FAIL) / Dark **5.78:1** | `var(--color-status-online)` on subtle (`#f1f5f9` / `#1f2937`) | Light **4.58:1** / Dark **6.44:1** | $\ge 4.5:1$ (본문 텍스트) |
 
 ---
 
@@ -45,19 +45,19 @@
   - `resource-measured-badge`: 배경을 `var(--color-bg-subtle)`로 통일하고, `res.measured ? 'var(--color-status-online)' : 'var(--color-text-muted)'` (글자), `res.measured ? 'var(--color-status-online)' : 'var(--color-border-subtle)'` (테두리)로 결속.
   - `resource-reserved-val`: `res.reserved !== null ? 'var(--color-brand-primary)' : 'var(--color-text-muted)'`.
   - `resource-spare-val`: `res.spare !== null ? 'var(--color-status-online)' : 'var(--color-text-muted)'`.
-- **4-Tier 관측 카드 (`:360-380`)**:
+- **4-Tier 관측 카드 (`:360-385`)**:
   - `node-detail-observed-usage-value`: `color: 'var(--color-brand-primary)'`.
   - `node-detail-observed-headroom-value`: `color: 'var(--color-status-online)'`.
-- **최근 하트비트 스냅샷 타임라인 (`:435-445`)**:
+- **최근 하트비트 스냅샷 타임라인 (`:440-455`)**:
   - `node-detail-timeline-status`: `node.status === 'online'` 분기 색상을 `#3fb950`에서 `var(--color-status-online)`로 교체.
 
 ### 2) `apps/web/tests/acc09-contrast-tokens.test.tsx`
 - **`COLOR_LITERAL_MULTISET_BASELINE` 래칫 감소**:
   - `features/nodes/NodeDetail.tsx`의 인벤토리에서 `#2ea043`, `#3fb950`, `#58a6ff`, `rgba(110,118,129,0.2)`, `rgba(46,160,67,0.15)`를 완전히 제거하고 의도된 경고/에러 틴트 3건만 보존.
 - **Test 9 확장**:
-  - `onlineNode` 및 `sampleResourceUsage`를 렌더링하고, DOM에서 추출한 스타일 토큰을 기반으로 실측 대비율(5.05:1, 4.50:1, 4.70:1, 4.80:1 등)을 fail-closed로 단언.
+  - `onlineNode` 및 `sampleResourceUsage`를 렌더링하고, DOM에서 추출한 스타일 토큰 및 렌더된 상위 컨테이너 배경(`var(--color-bg-subtle)`, `var(--color-bg-surface)`)을 기반으로 WCAG AA 기준(텍스트 $\ge 4.5:1$, UI 경계 $\ge 3.0:1$)을 fail-closed로 단언.
 - **Revert-Fail Probes (Probes 19~23 추가)**:
-  - 과거 결함 리터럴 조합(`#3fb950` on subtle/surface/canvas, `#58a6ff` on subtle/canvas, `#3fb950` on green tint)의 4.5:1 미만 위반을 영구 고정.
+  - 과거 결함 리터럴 조합(`#3fb950` on subtle/surface/canvas, `#58a6ff` on subtle/canvas, `#3fb950` on green subtle tint)의 4.5:1 미만 위반을 영구 고정.
 
 ---
 
