@@ -86,6 +86,21 @@ class Refused(RuntimeError):
     """The manifest cannot be written, which is not the same as the axes failing."""
 
 
+def emitted_axes(importer: str | None) -> set[str]:
+    """The AC-11 axis names ``importer`` actually writes, read from its source.
+
+    The question this answers is "what goes into the aggregator from this chain", and
+    the answer has to come from the file rather than from the row describing it: a row
+    can claim anything, and the security chain was classified complete on exactly such
+    a claim (#299 r1). A row with no importer emits nothing -- the producer may well
+    name its axis, but nothing turns that report into an envelope.
+    """
+    if not importer:
+        return set()
+    source = (REPO_ROOT / importer).read_text(encoding="utf-8")
+    return {axis for axis in REQUIRED_AXES if f'"{axis}"' in source}
+
+
 def _no_duplicates(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
     seen: dict[str, Any] = {}
     for key, value in pairs:
@@ -160,27 +175,29 @@ def load_sources(path: Path) -> list[dict[str, Any]]:
             isinstance(value, str) and value in REQUIRED_AXES for value in emits
         ):
             raise Refused(f"{axis}: importerEmitsAxes names something that is not an axis")
+        if len(set(emits)) != len(emits):
+            raise Refused(f"{axis}: importerEmitsAxes repeats an axis")
         if emits and axis not in emits:
             raise Refused(f"{axis}: importerEmitsAxes does not include this axis")
         for field in ("workflow", "producer", "importer"):
             value = entry[field]
             if value is not None and not (REPO_ROOT / value).is_file():
                 raise Refused(f"{axis}: {field} {value} is not in the tree")
-        if entry["importer"]:
-            # Bound to the importer's own source: the names it writes have to be the names
-            # claimed here. The security importer names no axis at all, which is exactly how
-            # its chain was mis-classified as complete (#299 r1).
-            source = (REPO_ROOT / entry["importer"]).read_text(encoding="utf-8")
-            producer_source = (
-                (REPO_ROOT / entry["producer"]).read_text(encoding="utf-8")
-                if entry["producer"] else ""
+        # Bound to the importer's own source as an EXACT set, not as a subset. r1 only
+        # checked that each claimed name appears somewhere, so dropping the second axis
+        # from the migration rows left a true statement that described half the chain --
+        # and half a bundle read as a whole one (#299 r2). An absent importer emits
+        # nothing, which is why no-importer means the empty set rather than "unchecked".
+        actual = emitted_axes(entry["importer"])
+        if set(emits) != actual:
+            raise Refused(
+                f"{axis}: importerEmitsAxes is {sorted(emits)} but "
+                + (
+                    f"{entry['importer']} writes {sorted(actual)}"
+                    if entry["importer"]
+                    else "this row has no importer, so the set must be empty"
+                )
             )
-            for named in emits:
-                if f'"{named}"' not in source and f'"{named}"' not in producer_source:
-                    raise Refused(
-                        f"{axis}: importerEmitsAxes claims {named!r} but neither "
-                        f"{entry['importer']} nor the producer names it"
-                    )
         if entry["envelopeMember"]:
             # The member lives inside the artifact zip, so the tree cannot hold it -- but the
             # workflow that uploads it names it, and that is checkable here.

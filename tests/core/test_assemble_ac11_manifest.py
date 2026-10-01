@@ -53,6 +53,12 @@ def write(directory: Path, name: str, document) -> Path:
     return target
 
 
+#: What tools/import_ac11_migration_rehearsal.py actually writes. Hard-coded rather than
+#: computed from the assembler, so that a change to the importer fails this fixture loudly
+#: instead of quietly agreeing with itself (#299 r2).
+MIGRATION_AXES = ["migration-reversible-segment", "irreversible-restore-forward"]
+
+
 def sources(**overrides):
     """A minimal valid axis map: one complete chain, the rest absent with reasons."""
     axes = []
@@ -69,7 +75,9 @@ def sources(**overrides):
             "importerArchiveFlag": "--artifact-zip" if complete else None,
             "artifactNamePrefix": "s11-ac11-migration-" if complete else None,
             "envelopeMember": "s11-ac11-migration-rehearsal.json" if complete else None,
-            "importerEmitsAxes": [axis] if complete else [],
+            # The exact set, not this row's axis alone: one importer writes both migration
+            # axes, and r1's subset rule accepted a row that named only one of them.
+            "importerEmitsAxes": list(MIGRATION_AXES) if complete else [],
             "envelopeShape": "axis-evidence" if complete else None,
             "reason": None if complete else "no producer exists",
         })
@@ -278,6 +286,21 @@ def test_a_release_sha_that_is_not_a_commit_is_refused(tmp_path):
         (lambda d: d.__setitem__("purpose", "  "), "must be a non-empty string"),
         (lambda d: d["axes"][0].__setitem__("envelopeShape", "not-an-axis-envelope"),
          "needs an admissible envelopeShape"),
+        # The two #299 r2 named: the migration row left with one axis. Both passed r1's
+        # subset rule, and each describes half a chain whose importer writes both -- so a
+        # bundle carrying two envelopes would be read as if one axis were never claimed.
+        (lambda d: d["axes"][0].__setitem__("importerEmitsAxes", ["migration-reversible-segment"]),
+         "writes ['irreversible-restore-forward', 'migration-reversible-segment']"),
+        (lambda d: d["axes"][0].__setitem__("importerEmitsAxes", ["irreversible-restore-forward"]),
+         "does not include this axis"),
+        # And two of the same shape: a repeat that would game a length comparison, and a row
+        # with no importer claiming its axis is emitted. Nothing emits it -- that is what
+        # "no importer" means.
+        (lambda d: d["axes"][0].__setitem__(
+            "importerEmitsAxes", ["migration-reversible-segment", "migration-reversible-segment"]),
+         "repeats an axis"),
+        (lambda d: d["axes"][1].__setitem__("importerEmitsAxes", [d["axes"][1]["axis"]]),
+         "no importer, so the set must be empty"),
     ],
 )
 def test_an_axis_map_that_cannot_be_trusted_is_refused(tmp_path, mutate, expected):
@@ -286,6 +309,27 @@ def test_an_axis_map_that_cannot_be_trusted_is_refused(tmp_path, mutate, expecte
     with pytest.raises(assembler.Refused) as refused:
         assembler.load_sources(sources_file(tmp_path, document))
     assert expected in str(refused.value)
+
+
+def test_emitted_axes_reads_the_importer_rather_than_the_claim():
+    """Measured from the two importers, which is the whole point of the binding.
+
+    The migration importer names both of its axes; the security importer names none, which
+    is why that chain cannot be complete however many files exist (#299 r1). A row with no
+    importer emits nothing at all.
+    """
+    assert assembler.emitted_axes("tools/import_ac11_migration_rehearsal.py") == set(MIGRATION_AXES)
+    assert assembler.emitted_axes("tools/import_ac11_security_scan.py") == set()
+    assert assembler.emitted_axes("tools/import_ac11_composite_long_soak.py") == {"long-soak"}
+    assert assembler.emitted_axes(None) == set()
+
+
+def test_the_shipped_map_claims_exactly_what_each_importer_writes():
+    """Every row, against its own importer's source. No subsets, no extras."""
+    for entry in assembler.load_sources(assembler.DEFAULT_SOURCES):
+        assert set(entry["importerEmitsAxes"]) == assembler.emitted_axes(entry["importer"]), (
+            entry["axis"]
+        )
 
 
 def test_a_duplicate_key_in_the_axis_map_is_refused(tmp_path):
