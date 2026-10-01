@@ -1,15 +1,31 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.252"
+version: "1.0.255"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T20:30:20+09:00"
+updated: "2026-10-01T22:14:13+09:00"
 source_of_truth: "Git"
-active_card: "CARD-184 S12 release acceptance/operator sign-off write contract"
-active_card_status: "Card 187 implementation questions resolved and locally gated: focused 68 passed on Pydantic default/2.13.5; schema 93/93 and docs/bindings/citations exit 0"
-active_card_next: "Push exact head and confirm Backend 3.12/3.14 green; implementation remains disabled until fresh-auth and authoritative resolvers land"
+active_card: "CARD-190 S12 acceptance target/Evidence canonical resolver contract"
+active_card_status: "Claude r1 F1-F9 and r2 Low five resolved in design/contract v1.1.1; implementation remains NOT_OBSERVED"
+active_card_next: "Confirm exact-head Backend and Claude final review; implement reserved migration 0058 only in the next Claude card"
 ---
+
+## 2026-10-01 Card 190 — S12 수락 target·Evidence 정본 resolver 계약
+
+- #282 v1.3.0의 두 번째 write prerequisite를 선택했다. `input_sha256` fallback을 금지하고
+  target registry·Evidence envelope digest·release/project binding을 server-owned 경계로 설계했다.
+- AC-12 target registry는 정본 source commit/path/blob, 4 criteria, canonical target digest를
+  고정한다. strict 공개 계약 2개와 generated schema 2개를 추가했다.
+- Evidence digest는 `(evidence_id,recorded_at)`의 partition identity를 포함한 row 전체 의미이며,
+  예약 승인된 migration `0058`에서 inline trigger 계산·legacy NULL fail-closed·receipt backfill을 요구한다.
+- Claude r1에 따라 ledger/lock 순서, `RES-0007`, binder/discovery route, release·policy·registry pin DTO,
+  duplicate-key raw loader, merge-only source 도달성을 v1.1에 고정했다.
+- Claude r2의 Low 5건도 strict discovery page, trigger/helper digest equality, owner 독립 변이,
+  DTO criterion 정합, criterion coordination slot 용어로 닫았다.
+- PG-free resolver **33 passed**, write contract 포함 **61 passed**. resolver·migration·real-PG·write enable은 `NOT_OBSERVED`다.
+  [[S12-BE_release_acceptance_target_Evidence_resolver_설계]],
+  [[2026-10-01_21-35-49_KST_S12_acceptance_target_Evidence_resolver_Codex]].
 
 ## 2026-10-01 Card 184 — S12 release 수락·operator sign-off 쓰기 계약
 
