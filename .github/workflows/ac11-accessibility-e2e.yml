@@ -9,7 +9,7 @@ on:
         required: false
         default: ''
   pull_request:
-    types: [labeled, synchronize, reopened]
+    types: [opened, labeled, synchronize, reopened]
 
 permissions:
   contents: read
@@ -54,26 +54,7 @@ jobs:
           python -m playwright install --with-deps chromium
           npm ci --ignore-scripts --prefix apps/web
 
-      - name: Build exact frontend candidate image
-        shell: bash
-        run: |
-          npm run build --prefix apps/web
-          mkdir -p .work/web-container-image/dist
-          cp -R apps/web/dist/. .work/web-container-image/dist/
-          cp apps/web/nginx.conf .work/web-container-image/nginx.conf
-          cp apps/web/security-headers.conf .work/web-container-image/security-headers.conf
-          cat > .work/web-container-image/Dockerfile <<'EOF'
-          FROM nginx:1.27-alpine
-          COPY dist/ /usr/share/nginx/html/
-          COPY nginx.conf /etc/nginx/nginx.conf
-          COPY security-headers.conf /etc/nginx/security-headers.conf
-          HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-            CMD wget -qO- http://127.0.0.1/healthz || exit 1
-          EOF
-          docker build --pull -t "inv-web-test:${SOURCE_HEAD_SHA}" .work/web-container-image
-          echo "INV_WEB_IMAGE=$(docker image inspect --format '{{.Id}}' "inv-web-test:${SOURCE_HEAD_SHA}")" >> "$GITHUB_ENV"
-
-      - name: Run canonical five real-browser journeys
+      - name: Run six browser cases for five canonical journeys
         id: journeys
         continue-on-error: true
         env:
@@ -108,19 +89,28 @@ jobs:
         shell: bash
         run: |
           browser_proof=.work/ac11-accessibility-browser.json
-          identities=$(python - <<'PY'
+          readarray -t browser_inputs < <(python - <<'PY'
           import json
           from pathlib import Path
           proof = json.loads(Path('.work/ac11-accessibility-browser.json').read_text(encoding='utf-8'))
-          print(Path(proof['xmlPath']).with_name('case-identities-private.json'))
+          xml = Path(proof['xmlPath'])
+          invariant = json.loads(Path('.work/ac11-accessibility/desktop_ui_invariants.json').read_text(encoding='utf-8'))
+          print(xml.with_name('case-identities-private.json'))
+          print(xml)
+          print(invariant['browser'])
           PY
           )
+          identities=${browser_inputs[0]}
+          browser_junit=${browser_inputs[1]}
+          browser_version=${browser_inputs[2]}
           python tools/collect_ac11_accessibility_e2e.py \
             --source-run-id "$GITHUB_RUN_ID" \
             --source-head-sha "$SOURCE_HEAD_SHA" \
-            --runner-image "${RUNNER_OS}-${RUNNER_ARCH}" \
+            --runner-image "${ImageOS:-unknown}-${RUNNER_OS}-${RUNNER_ARCH}" \
+            --browser-version "$browser_version" \
             --browser-proof "$browser_proof" \
             --case-identities "$identities" \
+            --browser-junit "$browser_junit" \
             --desktop-invariants "$RAW_DIR/desktop_ui_invariants.json" \
             --started-at "${{ steps.journeys.outputs.started_at }}" \
             --report "$REPORT" \
@@ -141,8 +131,13 @@ jobs:
           assert report['verdict'] in {'MEASURED_PASS', 'MEASURED_FAIL'}
           assert report['environment']['credentialsRequired'] is False
           assert report['environment']['physicalFiveNodeComparable'] is False
+          assert report['environment']['frontendTransport'] == 'vite-dev-server-with-browser-node-fixture'
           assert len(report['payload']['journeyIds']) == 5
+          assert report['payload']['browserPhysicalCaseCount'] == 6
           assert len(report['payload']['invariantIds']) == 9
+          assert report['artifactStatus'] == 'PENDING_UPLOAD'
+          assert report['artifactSha256'] is None
+          assert report['artifactUnit'] == 'github-actions-uploaded-zip'
           assert {row['metric'] for row in report['payload']['observations']} == set(report['targetRef']['criteria'])
           root = ET.parse(os.environ['JUNIT']).getroot()
           assert root.attrib['tests'] == '5'

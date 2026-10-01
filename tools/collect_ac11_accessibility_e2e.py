@@ -20,12 +20,12 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SCHEMA_VERSION = "1.0.0"
+SCHEMA_VERSION = "1.1.0"
 RUN_PURPOSE = "s11-ac11-accessibility-e2e-hosted"
 AXIS = "accessibility-e2e"
-TARGET_COMMIT = "a3ed04f189d5b2b7672348069b160a95be620267"
+TARGET_COMMIT = "4b6d4fab2925bb422f1deb6db2794fac0ccaa54f"
 TARGET_PATH = "docs/vault/30_Development/S11_AC11_accessibility_e2e_hosted_target_v0.md"
-TARGET_BLOB = "7ec8eb1409531011737eaea79c4516bb130cf990"
+TARGET_BLOB = "30bc37df03e1568f4af126843ab1fefb71b23de0"
 SHA1_RE = re.compile(r"^[0-9a-f]{40}$")
 RUN_ID_RE = re.compile(r"^[0-9]+$")
 EXPECTED_JOURNEYS = {
@@ -34,6 +34,10 @@ EXPECTED_JOURNEYS = {
     "test_browser_real_catalogue_owner_scope_and_revocation",
     "test_browser_real_committed_model_and_current_permission",
     "test_full_studio_login_project_approval_and_logout",
+}
+EXPECTED_JOURNEY_MULTIPLICITY = {
+    journey: (2 if journey == "test_full_studio_login_project_approval_and_logout" else 1)
+    for journey in EXPECTED_JOURNEYS
 }
 EXPECTED_INVARIANTS = {f"inv{number:02d}" for number in range(1, 10)}
 EXPECTED_CONTRAST = {
@@ -121,7 +125,33 @@ def _utc(value: str, label: str) -> datetime:
     return parsed
 
 
-def _journey_result(proof: dict[str, Any], identities: Any) -> tuple[int, list[str]]:
+def _junit_cases(path: Path) -> list[dict[str, str]]:
+    try:
+        root = ET.fromstring(path.read_bytes())
+    except (OSError, ET.ParseError) as exc:
+        raise AccessibilityEvidenceError(
+            f"browser JUnit is unreadable: {type(exc).__name__}"
+        ) from None
+    if root.tag not in {"testsuite", "testsuites"}:
+        raise AccessibilityEvidenceError("browser JUnit root is unsupported")
+    result: list[dict[str, str]] = []
+    for case in root.findall(".//testcase"):
+        classname = case.get("classname")
+        name = case.get("name")
+        if not isinstance(classname, str) or not isinstance(name, str):
+            raise AccessibilityEvidenceError("browser JUnit case identity is malformed")
+        statuses = [tag for tag in ("failure", "error", "skipped") if case.find(tag) is not None]
+        if len(statuses) > 1:
+            raise AccessibilityEvidenceError("browser JUnit case has multiple outcomes")
+        result.append({"classname": classname, "name": name, "outcome": statuses[0] if statuses else "passed"})
+    if not result:
+        raise AccessibilityEvidenceError("browser JUnit has no cases")
+    return result
+
+
+def _journey_result(
+    proof: dict[str, Any], identities: Any, browser_junit_path: Path, case_identities_path: Path
+) -> tuple[int, list[str], int]:
     if not isinstance(identities, list) or not identities:
         raise AccessibilityEvidenceError("browser case identities are empty or malformed")
     journeys: list[str] = []
@@ -132,27 +162,50 @@ def _journey_result(proof: dict[str, Any], identities: Any) -> tuple[int, list[s
         if not isinstance(name, str):
             raise AccessibilityEvidenceError("browser case name is not a string")
         journeys.append(re.sub(r"\[.*\]$", "", name))
-    if len(journeys) != len(set(journeys)) or set(journeys) != EXPECTED_JOURNEYS:
+    multiplicity = {journey: journeys.count(journey) for journey in set(journeys)}
+    if multiplicity != EXPECTED_JOURNEY_MULTIPLICITY:
         raise AccessibilityEvidenceError("canonical browser journey identity set drifted")
+    if proof.get("caseIdentitiesSha256") != file_sha256(case_identities_path):
+        raise AccessibilityEvidenceError("browser case identity digest drifted")
+    if proof.get("xmlSha256") != file_sha256(browser_junit_path):
+        raise AccessibilityEvidenceError("browser JUnit digest drifted")
+    junit_cases = _junit_cases(browser_junit_path)
+    junit_identities = [
+        {"classname": case["classname"], "name": case["name"]} for case in junit_cases
+    ]
+    if junit_identities != identities:
+        raise AccessibilityEvidenceError("browser JUnit identities differ from private identities")
     tests = proof.get("tests")
     if not isinstance(tests, dict) or set(tests) != {"failure", "error", "skipped", "passed"}:
         raise AccessibilityEvidenceError("browser proof test counts are malformed")
     if any(isinstance(tests[key], bool) or not isinstance(tests[key], int) or tests[key] < 0 for key in tests):
         raise AccessibilityEvidenceError("browser proof test counts are invalid")
-    failures = tests["failure"] + tests["error"] + tests["skipped"]
-    if tests["passed"] + failures != len(journeys):
+    recomputed_counts = {
+        outcome: sum(case["outcome"] == outcome for case in junit_cases)
+        for outcome in ("failure", "error", "skipped", "passed")
+    }
+    if tests != recomputed_counts:
+        raise AccessibilityEvidenceError("browser proof counts differ from JUnit")
+    physical_failures = tests["failure"] + tests["error"] + tests["skipped"]
+    if tests["passed"] + physical_failures != len(journeys):
         raise AccessibilityEvidenceError("browser proof counts differ from case identities")
     if proof.get("browserOptIn") is not True or proof.get("isolatedContainerRemoved") is not True:
         raise AccessibilityEvidenceError("browser proof isolation is incomplete")
-    expected_exit = 0 if failures == 0 else 1
-    expected_status = "complete" if failures == 0 else "partial"
+    pytest_failures = tests["failure"] + tests["error"]
+    expected_exit = 0 if pytest_failures == 0 else 1
+    expected_status = "complete" if pytest_failures == 0 else "partial"
     if (
         proof.get("exitCode") != expected_exit
         or proof.get("subprocessExitCode") != expected_exit
         or proof.get("evidenceStatus") != expected_status
     ):
         raise AccessibilityEvidenceError("browser proof outcome differs from recomputed failures")
-    return failures, sorted(journeys)
+    failed_journeys = {
+        re.sub(r"\[.*\]$", "", case["name"])
+        for case in junit_cases
+        if case["outcome"] != "passed"
+    }
+    return len(failed_journeys), sorted(EXPECTED_JOURNEYS), len(junit_cases)
 
 
 def _invariant_result(report: dict[str, Any], source_head_sha: str) -> tuple[int, int, int, list[str]]:
@@ -203,8 +256,8 @@ def _invariant_result(report: dict[str, Any], source_head_sha: str) -> tuple[int
         inv06.get("modalDismissed") is True and inv06.get("triggerFocusRestored") is True,
     ]
     keyboard_failures = sum(not passed for passed in keyboard_checks)
-    if accessibility.get("keyboardNavigationPass") is not (inv05.get("pass") is True):
-        raise AccessibilityEvidenceError("keyboard navigation summary differs from Alt+Tab check")
+    if accessibility.get("keyboardNavigationPass") is not all(keyboard_checks):
+        raise AccessibilityEvidenceError("keyboard navigation summary differs from measured checks")
     return invariant_failures, contrast_failures, keyboard_failures, sorted(rows)
 
 
@@ -225,15 +278,17 @@ def build_report(
     source_run_id: str,
     source_head_sha: str,
     runner_image: str,
+    browser_version: str,
     browser_proof_path: Path,
     case_identities_path: Path,
+    browser_junit_path: Path,
     invariant_path: Path,
     started_at: str,
 ) -> dict[str, Any]:
     if not RUN_ID_RE.fullmatch(source_run_id):
         raise AccessibilityEvidenceError("source run ID must be numeric")
-    if not runner_image.strip():
-        raise AccessibilityEvidenceError("runner image is required")
+    if not runner_image.strip() or not browser_version.strip():
+        raise AccessibilityEvidenceError("runner image and browser version are required")
     started = _utc(started_at, "startedAt")
     if started > datetime.now(timezone.utc):
         raise AccessibilityEvidenceError("startedAt is in the future")
@@ -241,7 +296,13 @@ def build_report(
     proof = _load_object(browser_proof_path, "browser proof")
     identities = json.loads(case_identities_path.read_text(encoding="utf-8"))
     invariants = _load_object(invariant_path, "desktop invariant report")
-    journey_failures, journey_ids = _journey_result(proof, identities)
+    if invariants.get("browser") != browser_version:
+        raise AccessibilityEvidenceError("declared browser version differs from invariant report")
+    if invariants.get("frontendTransport") != "vite-dev-server-with-browser-node-fixture":
+        raise AccessibilityEvidenceError("desktop invariant frontend transport is unsupported")
+    journey_failures, journey_ids, physical_case_count = _journey_result(
+        proof, identities, browser_junit_path, case_identities_path
+    )
     invariant_failures, contrast_failures, keyboard_failures, invariant_ids = _invariant_result(
         invariants, source_head_sha
     )
@@ -255,10 +316,12 @@ def build_report(
     failed = any(row["failureCount"] for row in observations)
     payload = {
         "journeyIds": journey_ids,
+        "browserPhysicalCaseCount": physical_case_count,
         "invariantIds": invariant_ids,
         "inputDigests": {
             "browserProofSha256": file_sha256(browser_proof_path),
             "caseIdentitiesSha256": file_sha256(case_identities_path),
+            "browserJunitSha256": file_sha256(browser_junit_path),
             "desktopInvariantSha256": file_sha256(invariant_path),
         },
         "observations": observations,
@@ -276,7 +339,8 @@ def build_report(
         "environment": {
             "topology": "github-hosted-single-runner",
             "runnerImage": runner_image,
-            "browser": "google-chrome",
+            "browser": browser_version,
+            "frontendTransport": invariants.get("frontendTransport"),
             "credentialsRequired": False,
             "physicalFiveNodeComparable": False,
         },
@@ -288,6 +352,13 @@ def build_report(
         },
         "verdict": "MEASURED_FAIL" if failed else "MEASURED_PASS",
         "acceptanceClaim": False,
+        "artifactSha256": None,
+        "artifactStatus": "PENDING_UPLOAD",
+        "artifactUnit": "github-actions-uploaded-zip",
+        "cleanup": {
+            "isolatedBrowserContainerRemoved": True,
+            "producerTempResidueCount": None,
+        },
         "limitation": "hosted automatic measurement; same-SHA user-device keyboard/screen-reader acceptance absent",
         "payload": payload,
         "payloadSha256": canonical_sha256(payload),
@@ -318,8 +389,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--source-run-id", required=True)
     parser.add_argument("--source-head-sha", required=True)
     parser.add_argument("--runner-image", required=True)
+    parser.add_argument("--browser-version", required=True)
     parser.add_argument("--browser-proof", type=Path, required=True)
     parser.add_argument("--case-identities", type=Path, required=True)
+    parser.add_argument("--browser-junit", type=Path, required=True)
     parser.add_argument("--desktop-invariants", type=Path, required=True)
     parser.add_argument("--started-at", required=True)
     parser.add_argument("--report", type=Path, required=True)
@@ -330,8 +403,10 @@ def main(argv: list[str] | None = None) -> int:
             source_run_id=args.source_run_id,
             source_head_sha=args.source_head_sha,
             runner_image=args.runner_image,
+            browser_version=args.browser_version,
             browser_proof_path=args.browser_proof,
             case_identities_path=args.case_identities,
+            browser_junit_path=args.browser_junit,
             invariant_path=args.desktop_invariants,
             started_at=args.started_at,
         )

@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.237"
+version: "1.0.238"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T13:03:25+09:00"
+updated: "2026-10-01T13:14:36+09:00"
 source_of_truth: "Git"
 active_card: "CARD-171 AC-11 accessibility-e2e hosted measurement"
-active_card_status: "Two hosted runs isolated strict OIDC config shape/order drift after five journeys; resolved config order fixed, 12 PG-free tests pass"
-active_card_next: "Rerun exact-head hosted lane and record JSON/JUnit verdict and artifact"
+active_card_status: "Claude findings addressed in progress: physical 6/logical 5 case binding, measured invariant values, and hosted node fixture"
+active_card_next: "Run focused gates, push exact head, and obtain JSON/JUnit hosted evidence"
 ---
 
 ## 2026-10-01 Card 171 — AC-11 accessibility-e2e hosted 측정 수단
@@ -16,12 +16,15 @@ active_card_next: "Rerun exact-head hosted lane and record JSON/JUnit verdict an
 - AC-11 8축을 대조해 이미 측정 수단이 있는 migration/security와 외부 전제가 필요한
   PITR·물리 5노드·long-soak를 제외하고 accessibility-e2e를 첫 공백으로 선택했다.
 - [[S11_AC11_accessibility_e2e_hosted_target_v0]]을 결과보다 먼저 commit/blob으로
-  고정하고, 정본 browser journey 5개·invariant 9개·contrast 3개·keyboard/focus 2개를
+  고정하고, 물리 browser case 6개/논리 journey 5개·invariant 9개·contrast 3개·keyboard/focus 2개를
   재계산하는 collector와 opt-in workflow를 구현했다.
 - 같은 SHA의 수동 사용자 인수 부재는 `manualAcceptanceMissingCount=1`로 보존한다.
   따라서 hosted 자동 결과를 AC-11 done이나 점수 승격으로 부풀리지 않는다. 첫 run
   `36812706742`는 five-journey PASS 뒤 OIDC runner drift로 invariant가 `NOT_OBSERVED`였고,
-  current resolved config의 `redirectUri` 결속을 보강했다. PG-free 단일 시험은 12 passed다.
+  current resolved config의 `redirectUri` 결속을 보강했다. 세 번째 run `36813368397`은
+  invariant 9의 node route drift로 Evidence 생성 전 중단되어 `NOT_OBSERVED`다. collector는
+  JUnit·identity digest와 parameter multiplicity를 검증하고 producer는 focus·대비·capacity
+  실측값을 그대로 기록하도록 보강했으며 PG-free 단일 시험은 16 passed다.
 
 ## 2026-09-30 Card151 Claude F1-F12 보안·측정 경계 후속
 - PR #248에서 root·service·PITR 자격을 host argv와 Docker `Config.Env`에서 제거하고 단일 보호 파일 mount로 고정했다. PITR policy의 delete 권한을 제거하고 bucket versioning을 활성화했다.
