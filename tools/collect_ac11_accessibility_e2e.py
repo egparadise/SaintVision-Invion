@@ -307,9 +307,24 @@ def build_report(
         invariants, source_head_sha
     )
     observations = [
-        _observation("canonicalJourneyFailureCount", 5, journey_failures, "browser-journey-failed"),
-        _observation("desktopInvariantFailureCount", 9, invariant_failures, "desktop-invariant-failed"),
-        _observation("contrastFailureCount", 3, contrast_failures, "wcag-aa-contrast-failed"),
+        _observation(
+            "canonicalJourneyFailureCount",
+            len(EXPECTED_JOURNEYS),
+            journey_failures,
+            "browser-journey-failed",
+        ),
+        _observation(
+            "desktopInvariantFailureCount",
+            len(EXPECTED_INVARIANTS),
+            invariant_failures,
+            "desktop-invariant-failed",
+        ),
+        _observation(
+            "contrastFailureCount",
+            len(EXPECTED_CONTRAST),
+            contrast_failures,
+            "wcag-aa-contrast-failed",
+        ),
         _observation("keyboardFailureCount", 2, keyboard_failures, "keyboard-or-focus-failed"),
         _observation("manualAcceptanceMissingCount", 1, 1, "manual-acceptance-not-supplied"),
     ]

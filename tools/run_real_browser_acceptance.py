@@ -1163,10 +1163,10 @@ def run_scenario(
                 page.wait_for_timeout(500)
                 assert not start_menu.is_visible(), "Escape must dismiss start menu modal"
                 focus_is_trigger = bool(page.evaluate('() => document.activeElement && document.activeElement.getAttribute("aria-label") === "SaintVision 시작 메뉴"'))
-                print(f"ℹ [Keyboard A11y Escape] Start menu modal dismissed: True | Focus returned to trigger button: {focus_is_trigger} (Note: DesktopShell.tsx implements setIsStartMenuOpen(false) only; trigger focus return is absent in React code)")
+                print(f"ℹ [Keyboard A11y Escape] Start menu modal dismissed: True | Focus returned to trigger button: {focus_is_trigger}")
                 screenshot_escape = os.path.join(output_dir, "real_chrome_desktop_03_escape_dismissed.png")
                 page.screenshot(path=screenshot_escape)
-                print(f"✔ [Invariant 6: PARTIAL] Escape modal dismissal verified, trigger focus return recorded as absent! Saved: {screenshot_escape}")
+                print(f"✔ [Invariant 6] Escape modal dismissal verified; trigger focus restored={focus_is_trigger}. Saved: {screenshot_escape}")
 
                 # -------------------------------------------------------------
                 # Invariant 7: Layout Persistence (Geometry & localStorage)

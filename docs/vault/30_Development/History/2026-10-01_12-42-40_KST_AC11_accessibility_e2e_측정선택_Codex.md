@@ -82,7 +82,13 @@ producer다. 최초 hosted run ID와 artifact digest는 PR에서 실행한 뒤 �
 
 ## 정본 hosted 측정
 
-- exact-head `21591430bc4383d7617ede654ee318223958633a`, run `36814708026`의 모든 workflow step이 성공했다. GitHub artifact `11140119083`의 digest는 `sha256:77d30b61dfa0027a86b123be94e5cb5e545dd1110b9cc12c0b2f151d11797cbb`, 만료 시각은 `2026-10-31T04:23:23Z`다.
-- 브라우저는 `Google Chrome 153.0.8010.52`, 실행 표면은 `vite-dev-server-with-browser-node-fixture`로 기록됐다. 물리 case 6건은 논리 journey 5건으로 묶였고 journey failure 0, desktop invariant 0/9, contrast 0/3, keyboard/focus 0/2였다.
+- 최종 exact-head `48d9840a3025f09f274d713789350be6eaac9537`, run `36815036836`의 모든 workflow step이 성공했다. GitHub artifact `11141236582`의 digest는 `sha256:b02d7bd0f83d0e1066cbb95dda01fd153c95847c024a0eb18697b7a85bad4e12`, 만료 시각은 `2026-10-31T04:27:29Z`다. 앞선 `21591430` run은 최종 문서 commit 이전의 성공 근거이며 이 최종 run이 대체한다.
+- 브라우저는 Evidence에 기록된 `Google Chrome 154.0.8037.57 (Blink engine)`, 실행 표면은 `vite-dev-server-with-browser-node-fixture`다. 물리 case 6건은 논리 journey 5건으로 묶였고 journey failure 0, desktop invariant 0/9, contrast 0/3, keyboard/focus 0/2였다.
 - 수동 사용자 장비·화면낭독기 인수 producer는 여전히 없으므로 `manualAcceptanceMissingCount=1`, 최종 raw verdict는 의도대로 `MEASURED_FAIL`이다. 이는 자동 접근성 결함이 아니라 사전 등록한 completeness failure이며 AC-11 done 또는 점수 승격을 뜻하지 않는다.
 - raw report의 `artifactSha256=null`, `artifactStatus=PENDING_UPLOAD`는 upload 전 producer 경계를 나타낸다. 위 GitHub artifact metadata는 History와 PR 검토에 별도로 결속하며, importer가 생기기 전에는 aggregator-consumable Evidence라고 주장하지 않는다.
+
+## Claude r2 조건 후속
+
+- private identity digest 대조문을 제거하면 실패하도록 `caseIdentitiesSha256` 단독 변이 시험을 추가했다. XML digest 시험과 분리되어 두 입력 결속이 각각 되살림 방지 시험을 가진다.
+- observation의 journey·invariant·contrast 분모는 사전 등록 집합의 `len(...)`에서 계산해 목록과 리터럴을 따로 고칠 수 없게 했다.
+- focus 복원 로그는 실측 boolean을 그대로 말하며, 복원됐는데도 `PARTIAL`·`absent`라고 쓰던 낡은 문구를 제거했다.

@@ -239,6 +239,14 @@ def test_browser_junit_and_identity_digests_are_recomputed(inputs):
         _build(inputs)
 
 
+def test_browser_identity_digest_is_recomputed_independently(inputs):
+    proof = json.loads(inputs["proof"].read_text(encoding="utf-8"))
+    proof["caseIdentitiesSha256"] = "0" * 64
+    inputs["proof"].write_text(json.dumps(proof), encoding="utf-8")
+    with pytest.raises(tool.AccessibilityEvidenceError, match="identity digest drifted"):
+        _build(inputs)
+
+
 def test_parameterized_journey_requires_both_physical_cases(inputs):
     identities = _journeys()
     identities.pop()
