@@ -136,6 +136,57 @@ describe('Card 192 / S12-FE: Portal Step-Up Re-Authentication UI Entry Point', (
     );
   });
 
+  it('button click executes unmocked beginStepUp and redirects to authorize URL with exact prompt and max_age', async () => {
+    const storage = new Map<string, string>();
+    vi.stubGlobal('sessionStorage', {
+      getItem: (k: string) => storage.get(k) ?? null,
+      setItem: (k: string, v: string) => storage.set(k, v),
+      removeItem: (k: string) => storage.delete(k),
+    });
+
+    const assignMock = vi.fn();
+    delete (window as any).location;
+    (window as any).location = {
+      pathname: '/intranet/deployment',
+      assign: assignMock,
+      origin: 'https://portal.saintvision.lan',
+    };
+    (window as any).__SAINTVISION_CONFIG__ = {
+      issuer: 'https://idp.saintvision.lan:8443/realms/saintvision',
+      idpAuthorizeUrl: 'https://idp.saintvision.lan:8443/realms/saintvision/protocol/openid-connect/auth',
+      idpTokenUrl: 'https://idp.saintvision.lan:8443/realms/saintvision/protocol/openid-connect/token',
+      clientId: 'saintvision-web',
+      scope: 'openid inv.api',
+      redirectUri: 'https://portal.saintvision.lan/callback',
+    };
+
+    await act(async () => {
+      root.render(
+        <IntranetDeploymentView
+          currentUser={{ id: 'usr_operator_lead', name: 'Lead', role: 'operator' }}
+          initialManifests={[mockReleaseItem]}
+          initialDetail={mockDetail}
+          autoFetch={false}
+        />
+      );
+    });
+
+    const stepUpBtn = container.querySelector('[data-testid="deployment-step-up-button"]') as HTMLButtonElement;
+    expect(stepUpBtn).not.toBeNull();
+
+    await act(async () => {
+      stepUpBtn.click();
+    });
+
+    expect(assignMock).toHaveBeenCalledTimes(1);
+    const assignedUrl = new URL(assignMock.mock.calls[0][0]);
+    expect(assignedUrl.origin + assignedUrl.pathname).toBe('https://idp.saintvision.lan:8443/realms/saintvision/protocol/openid-connect/auth');
+    expect(assignedUrl.searchParams.get('prompt')).toBe('login');
+    expect(assignedUrl.searchParams.get('max_age')).toBe('300');
+    expect(assignedUrl.searchParams.get('client_id')).toBe('saintvision-web');
+    expect(assignedUrl.searchParams.get('response_type')).toBe('code');
+  });
+
   it('displays error notice if beginStepUp fails', async () => {
     vi.spyOn(authSession, 'beginStepUp').mockRejectedValueOnce(
       new Error('OIDC Discovery failed')

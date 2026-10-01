@@ -988,7 +988,7 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
               style={{
                 padding: '16px',
                 backgroundColor: 'var(--color-bg-canvas)',
-                border: '1px solid var(--color-border-subtle)',
+                border: '1px solid var(--color-border-strong)',
                 borderRadius: '6px',
                 display: 'flex',
                 flexDirection: 'column',
@@ -1012,18 +1012,18 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
                     fontSize: '11px',
                     fontWeight: 600,
                     backgroundColor: 'var(--color-bg-subtle)',
-                    border: '1px solid var(--color-status-warning)',
-                    color: 'var(--color-status-warning)',
+                    border: '1px solid var(--color-status-unknown)',
+                    color: 'var(--color-status-unknown)',
                   }}
                 >
-                  재인증 필요 (Step-Up Required)
+                  릴리스 수락 전 재인증 필요 (Step-Up Required)
                 </div>
               </div>
 
               <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
                 • <strong>백엔드 쓰기 경로 상태</strong>: <code>INV_RELEASE_ACCEPTANCE_WRITE_ENABLED=false</code> (설계 기본값 비활성 유지 — 쓰기 UI 미노출)<br />
                 • <strong>IdP 관측 상태</strong>: <code>BLOCKED_EXTERNAL</code> (사내 hosts 미적용으로 <code>idp.sv.lan</code> 실장비 토큰 관측 대기)<br />
-                • <strong>보안 경계</strong>: 인증 실패 또는 취소 시 기존 토큰이 유지되며, 수락 완료 또는 서명 성공을 합성하지 않습니다.
+                • <strong>보안 경계</strong>: 페이지 이동 전 실패 시에는 현재 메모리 세션이 유지되며, IdP 리다이렉트 후 실패·취소 시에는 자격증명 잔류 없이 재로그인을 요구합니다. 수락 완료 또는 서명 성공을 합성하지 않습니다.
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '4px' }}>

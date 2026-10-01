@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.171"
+version: "1.0.172"
 status: "proposed"
 author: "Gemini"
-updated: "2026-10-01T22:45:00+09:00"
+updated: "2026-10-01T23:45:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,39 +19,50 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
+- 확인 기준: 2026-10-01T23:45:00+09:00 (Card 192 S12-FE portal step-up 재로그인 진입점 r1 조치 완료: Codex 보안(F-R1~F-R4) 및 Claude UI(S1~S6) 10건 피드백 전수 조치, Train 10 후보 c41fe2da 머지 b6b69648 완료, Web Crypto RS256/ES256 JWKS 서명 검증 및 위조/unknown kid/alg 완화 거부, Web Storage 토큰 0건 불변식 강제(Codex 결정 b), sanitizeReturnUrl 6종 검증, 토큰 교환 전 step-up 트랜잭션 식별 및 교차 호출 차단, openid 스코프 필수화, 조기 setAuthToken 제거 및 caller commitSession 원자적 반영, CSS 미정의 토큰 var(--color-status-unknown) 정비 및 borderSubtleCount 141 래칫 불변식 준수, 9종 변이 100% 사살 실측, Vitest 5개 스위트 119 passed, tsc 0 error, build 성공, route coverage 41 passed, frontend integrity 0 violation).
 - 확인 기준: 2026-10-01T22:45:00+09:00 (Card 192 S12-FE portal step-up 재로그인 진입점 및 OIDC PKCE 인증 흐름 결속 완료: Codex #285 인계 완결, FreshAuthenticationStepUpRequest 계약 동기화, exact prompt=login&max_age=300 인가 엔드포인트 파라미터 결속, 암호학적 verifier/state/nonce 신규 생성, completeLogin 실패 시 rollbackPreviousToken으로 이전 토큰 무파괴 보존, IntranetDeploymentView step-up 안내 및 로그인 유도 버튼 결속, 쓰기 UI 0건, Vitest 단위 시험 27 passed, tsc 0 error, build 성공, route coverage 41 passed, frontend integrity 0 violation, BLOCKED_EXTERNAL 경계 명시).
 - 확인 기준: 2026-10-01T22:15:00+09:00 (Card 189 NodeList 및 NodeDetail 잔여 저대비 리터럴 토큰화 Claude UI r1 및 Codex r1 조치: base ec75b4f0 위 작업, DOM style.backgroundColor 실제 배경 직접 추출 및 canvas/surface 위 동적 합성 resolveDomColor 적용, 1:1 배경교체 B1·alpha변조 B2·정상분기복귀 B3·degraded병합 B4 4종 단독 변이 및 M1~M9 총 13종 변이 100% 사살 실측, NodeDetail 저대비 리터럴 14건 순수 감소 래칫, 잔여 9건 정직한 백로그 목록화, status: proposed 준수, reviewer 사전 기재 제거, raw CR 0건, Vitest 12 passed, tsc 0 error, build 성공, route coverage 40 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-01T21:30:00+09:00 (Card 183 S12-FE 릴리스 선언서 및 운영자 인수 서버 경로 결속 #282 최종 계약 머지 및 Train 9 착지 차단 해제: origin/agent/codex/c184-s12-acceptance-contract b96068b6 머지 완료, operatorSignOffBlockedBy='release-acceptance-prerequisites-unavailable' 동기화, api-response-contracts.mjs 40 types PASS, strict guard 갱신 및 legacy blockedBy 유입 시 ContractViolationError 사살 시험 추가, UI 사유 문구 갱신, Vitest 22 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 프런트 무결성 규칙 0 위반).
 - 확인 기준: 2026-10-01T20:52:00+09:00 (Card 186 NodeList 상태 배지 라이트 테마 대비 보정 및 디자인 토큰화 r1 피드백 전수 조치 및 base 37119fc1 머지: train 8 머지 반영, Claude UI r1 조건부 승인 조건 m1 CR 바이트 4건 정정, m2 History §1 표 subtle/surface 수치 정정, m3/Codex F1~F3 실제 DOM 렌더링 배경 결속 및 동적 대비 계산 단언, CSS 주석 decoy 제거 및 상태 토큰 블록별 고유 선언 단언, unknown role=status/⚠️ 및 관측 전용 배너/예약가능 라벨 단언, 범위 밖 잔여 리터럴 백로그 등록, 9종 변이 100% 사살 실측, Vitest 11 passed, tsc 0 error, build 성공, route coverage 40 passed, 9대 무결성 규칙 0 위반).
 - 확인 기준: 2026-10-01T20:33:00+09:00 (Card 183 S12-FE 릴리스 선언서 및 운영자 인수 서버 경로 결속 r2 조치 완료 및 #280 신규 head 79fcb772 머지 반영: Claude UI r2 및 Codex r2 피드백 전수 해소 — 404/403 fixture 코드를 canonical RES-0004 / AUTH-0030으로 정정하여 fixture-problem-codes-integrity 통과, ContractViolationError 및 deployment-manifest-error-contract 전용 계약 위반 상태 분리, 상단 KPI 카드 'SIGN-OFF 대기 (로컬 모의)' 문구 정비, 릴리스 선택기 변경 시 상세 재호출 및 화면 갱신 검증 시험 추가, canonical 5개 스키마 additionalProperties: false 및 허용 키셋 1:1 결속 시험 추가; #280 신규 계약 머지 — matchingAcceptedUserCount와 confirmedOperatorCount(Literal[0]) 분리 표출, operatorSignOffBlockedBy='human-attestation-implementation-unavailable' 동기화, components/knownLimitations/acceptances/nextCursor 필수화 계약 반영, Vitest 21 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 규칙 0 위반).
 
-## 2026-10-01 S12-FE Card 192: Portal Step-Up 재로그인 진입점 및 OIDC PKCE 인증 흐름 결속 (`agent/gemini/c192-portal-step-up`, base `6b2a3786` PR #285)
-- **개요**: PR #285 (Card 188, head `6b2a3786`)에서 Codex가 fresh-auth claim 공급원을 완성하고 인계한 portal step-up 재인증 진입점을 Gemini 프런트엔드 영역에서 결속:
-  1. **계약 생성 및 검증 자동화**: `apps/web/scripts/api-response-contracts.mjs`에 `fresh-authentication-step-up-request` 등록, `contracts:check` 41개 API 응답 TypeScript 타입 동기화 (exit 0).
-  2. **OIDC PKCE Step-Up 인증 세션 구현 (`apps/web/src/features/auth/session.ts`)**:
-     - `validateStepUpRequest`: `prompt === 'login'`, `max_age === 300`, `additionalProperties: false` fail-closed 런타임 검증기.
-     - `beginStepUp`: 기존 활성 토큰을 `previousToken`으로 포획, 신규 PKCE `code_verifier`, `code_challenge` (S256), `state`, `nonce` 생성, `prompt=login&max_age=300` 결속된 인가 URL 생성 및 트랜잭션 보존.
-     - `completeLogin` / `completeStepUp`: 실패·취소·state 불일치 시 `catch` 블록에서 `rollbackPreviousToken`으로 이전 토큰을 무조건 온전히 보존(불변식), 성공 시에만 신선 토큰으로 교체, 서명 합성 원천 차단.
-  3. **내부망 배포 화면 UI 결속 (`apps/web/src/features/deployment/IntranetDeploymentView.tsx`)**:
-     - `deployment-step-up-section`, `deployment-step-up-status-badge` (`재인증 필요 (Step-Up Required)`), `deployment-step-up-button` (`재인증 필요 (Step-Up 로그인)`, `size="sm"`).
-     - 안내 문구: `INV_RELEASE_ACCEPTANCE_WRITE_ENABLED=false` (설계 기본값 유지), `BLOCKED_EXTERNAL` (사내 hosts 미적용).
-     - 디자인 토큰(CSS variables) 100% 적용으로 신규 하드코딩 색상 리터럴 0건 유지.
-     - 쓰기 UI 0건: 수락/서명 등록 폼이나 엔드포인트 호출 코드 원천 배제.
-- **담당 및 역할**: Gemini (Frontend / UI / 인증 흐름 소유). Reviewer: Claude (UI/인증 흐름/테스트 축), Codex (보안 계약/토큰 보존/불변식 축).
+## 2026-10-01 S12-FE Card 192: Portal Step-Up 재로그인 진입점 및 OIDC PKCE 인증 흐름 결속 r1 조치 (`agent/gemini/c192-portal-step-up`, base `c41fe2da` Train 10 후보 머지 `b6b69648`)
+- **개요**: Codex 보안(F-R1~F-R4) 및 Claude UI(S1~S6) r1 리뷰 지적사항 10건 전수 조치 및 Train 10 후보(`c41fe2da`) 머지 완료:
+  1. **Web Crypto 기반 ID 토큰 서명 검증 (F-R1, M7, M8)**:
+     - `verifyIdTokenSignature(idToken, config)`: issuer JWKS 기반 RS256/ES256 전자 서명 검증.
+     - 서명 변조 1글자 즉각 거절, 미등록 kid 거절, `none`/`HS256` 알고리즘 완화 공격 즉시 차단 실측.
+  2. **Web Storage 토큰 잔류 0건 불변식 (F-R2, M9, Codex Decision b)**:
+     - `Transaction` 및 `beginStepUp`에서 `previousToken` 완전 제거.
+     - `sessionStorage`에 비밀/토큰/Bearer 문자열 일체 보존 금지 (오직 비비밀 복귀 상태만 격리 저장).
+     - `sanitizeReturnUrl`: 절대 URL, scheme-relative(`//`), fragment(`#`), userinfo(`@`) 주입 시 `/studio`로 정규화 (S1).
+  3. **토큰 교환 전 Step-Up 트랜잭션 식별 및 교차 호출 차단 (F-R3, M6)**:
+     - `completeStepUp`: `tx.isStepUp === true` 마커 미부합 시 네트워크 교환 전 즉시 거절.
+     - `completeLogin`: Step-Up 트랜잭션 진입 시 즉시 거절.
+     - `Login.tsx`: `isStepUpPending() ? completeStepUp() : completeLogin()` 분기.
+  4. **OpenID Scope 강제 (F-R4, M5)**:
+     - `beginStepUp`: `config.scope` 내 `openid` 누락 시 fail-closed 거절.
+  5. **리다이렉트 메모리 휘발 모사 및 원자적 세션 반영 (S2, S3, M4)**:
+     - 테스트 전 `clearAuthToken()` / `clearSessionExpiration()`으로 브라우저 페이지 전환 모사.
+     - `completeStepUp` / `completeLogin`의 조기 `setAuthToken` 제거.
+     - 호출자(`Login.tsx`) 활성 컴포넌트 경계 내에서 `commitSession(token, expiresAt)`을 통한 원자적 커밋.
+  6. **UI 및 디자인 토큰 정비 (S4)**:
+     - `IntranetDeploymentView.tsx`: 미정의 토큰 `var(--color-status-warning)`을 `var(--color-status-unknown)`으로 정정.
+     - 컨테이너 테두리는 `var(--color-border-strong)`을 적용하여 `borderSubtleCount === 141` 래칫 엄격 유지 (13/13 pass).
+- **담당 및 역할**: Gemini (Frontend / UI / 인증 흐름 소유). Reviewer: Codex (보안 계약/서명 검증/무저장 불변식 축), Claude (UI/리다이렉트 경계/원자적 커밋 축).
 - **관측 근거 (Evidence)**:
-  - Vitest: `auth-step-up-contract.test.ts` 23 passed (22ms), `auth-step-up-ui.test.tsx` 4 passed (183ms) (전원 통과)
-  - 변이 검사: 8종 단일 변이 전원 사살 실측 (사살율 100%)
+  - Vitest: 5개 스위트 119 passed 전원 통과 (`auth-step-up-contract` 34, `acc09-contrast` 13, `auth-step-up-ui` 5, `auth-oidc` 50, `auth-session` 17)
+  - 변이 검사: 9종 변이(M1~M9) 전수 사살 실측 (사살율 100%)
   - TypeScript 정적 점검: `npx tsc -b` 타입 에러 0건 (exit 0)
-  - 프로덕션 번들 빌드: `npm run build` 성공 (Vite bundle 정상 생성, 8.50s, exit 0)
+  - 프로덕션 번들 빌드: `npm run build` 성공 (Vite bundle 정상 생성, 10.18s, exit 0)
   - 계약 동기화 점검: `npm run contracts:check` 41 types PASS (exit 0)
   - 라우트 커버리지 점검: `pytest tests/test_route_coverage.py` 41 passed 100% (exit 0)
   - 프런트엔드 무결성 점검: `python tools/check_frontend_integrity.py` 93개 파일 스캔, 9대 무결성 규칙 위반 0건 (exit 0)
   - 계약 바인딩 점검: `python tools/check_contract_bindings.py` 55개 픽스처 + 20개 커널 응답 타입 앵커 통과 (exit 0)
   - 문서 무결성 점검: `python tools/check_docs.py` PASS (exit 0)
-  - 문서 경로 인용 래칫: `python tools/check_doc_path_citations.py --ratchet --base-ref 6b2a3786` PASS (exit 0)
-  - Git 공백 검사: `git diff --check 6b2a3786` 클린 (exit 0)
+  - 문서 경로 인용 래칫: `python tools/check_doc_path_citations.py --ratchet --base-ref c41fe2da` PASS (exit 0)
+  - Git 공백 검사: `git diff --check` 클린 (exit 0)
   - 봇 호출 태그 점검: 0건 준수
-- **전문 문서**: [[2026-10-01_22-45-00_KST_Card192_portal_step_up_Gemini]]
+- **전문 문서**: [[2026-10-01_23-45-00_KST_Card192_portal_step_up_r1_Gemini]], [[2026-10-01_22-45-00_KST_Card192_portal_step_up_Gemini]]
 
 
 ## 2026-10-01 S12-FE 릴리스 선언서(Release Manifest) 및 운영자 인수 서버 경로 결속 (Card 183 2단계, `agent/gemini/c183-s12fe-release-binding`, base `79fcb772` PR #280)
