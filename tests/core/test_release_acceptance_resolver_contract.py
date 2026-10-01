@@ -242,6 +242,9 @@ def test_discovery_page_is_bounded_scoped_and_criterion_consistent():
         lambda document: document["targets"][0].update(
             {"acceptanceIdRef": "AC-11"}
         ),
+        lambda document: document["items"].append(
+            copy.deepcopy(document["items"][0])
+        ),
         lambda document: document.update({"operatorSelectedProjectId": "project-1"}),
     ):
         document = _discovery_page()
