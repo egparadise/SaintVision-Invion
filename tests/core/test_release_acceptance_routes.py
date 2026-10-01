@@ -23,6 +23,7 @@ import json
 import sys
 import uuid
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 from fastapi.testclient import TestClient
@@ -94,8 +95,11 @@ class BoundResolver:
 
     bound = True
 
+    def __init__(self, acceptance_id_ref: str = "AC-12") -> None:
+        self.acceptance_id_ref = acceptance_id_ref
+
     def resolve(self, session, *, tenant_id, release_id, target_refs, measurement_refs):
-        return None
+        return SimpleNamespace(acceptance_id_ref=self.acceptance_id_ref)
 
 
 def build(monkeypatch, *, enabled: bool, fresh: bool = True, session=None, resolver=None):
@@ -169,9 +173,7 @@ def test_every_route_including_the_gets_is_refused_before_it_touches_anything(
 
 
 @pytest.mark.parametrize("method,path,body", GATED, ids=lambda value: str(value)[:40])
-def test_authentication_comes_first_and_the_gate_immediately_after(
-    monkeypatch, method, path, body
-):
+def test_authentication_comes_first_and_the_gate_immediately_after(monkeypatch, method, path, body):
     """No token is ``AUTH-0050``/401; a verified token on a closed surface is 503.
 
     I first wrote this test asserting 503 for an unauthenticated caller too, reasoning
@@ -245,7 +247,10 @@ def test_the_enabled_flag_alone_does_not_open_the_surface(monkeypatch):
     is a fact about the deployment, not a setting, so an operator cannot enable a
     two-person rule the build cannot prove (§0-1.2, §0-1.4).
     """
-    client = build(monkeypatch, enabled=True)
+    # Card 194 binds the production resolver. Exercise the independent half of the
+    # gate explicitly: a deployment that has not bound it still stays closed even when
+    # an operator flips the write flag.
+    client = build(monkeypatch, enabled=True, resolver=service.UnboundReferenceResolver())
     response = client.post(DECIDE, headers=JSON, content=json.dumps(DECISION_BODY))
     assert response.status_code == 503
     assert response.json()["code"] == "SYS-0003"
@@ -260,7 +265,13 @@ def test_the_gate_is_the_first_statement_of_every_handler():
     """
     import inspect
 
-    for handler in (route.decide, route.list_pending, route.read_pending, route.confirm, route.withdraw):
+    for handler in (
+        route.decide,
+        route.list_pending,
+        route.read_pending,
+        route.confirm,
+        route.withdraw,
+    ):
         body = inspect.getsource(handler)
         statements = [
             line.strip()

@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+from types import SimpleNamespace
 import time
 
 import pytest
@@ -55,14 +56,16 @@ class BoundResolver:
 
     bound = True
 
-    def __init__(self) -> None:
+    def __init__(self, acceptance_id_ref: str = "AC-12") -> None:
         self.calls: list[tuple[str, int, int]] = []
         self.refuse_after = None
+        self.acceptance_id_ref = acceptance_id_ref
 
     def resolve(self, session, *, tenant_id, release_id, target_refs, measurement_refs):
         self.calls.append((release_id, len(target_refs), len(measurement_refs)))
         if self.refuse_after is not None and len(self.calls) > self.refuse_after:
             raise service.ReferencesUnresolvable("the evidence is no longer resolvable")
+        return SimpleNamespace(acceptance_id_ref=self.acceptance_id_ref)
 
 
 def _fresh(now: dt.datetime) -> dict:
@@ -90,8 +93,10 @@ def operators(owner_engine, app_engine, clean_tables):
     }
     with owner_engine.begin() as c:
         c.execute(
-            text("INSERT INTO tenants (tenant_id, slug, display_name, created_at, version) "
-                 "VALUES (:t, :slug, 'Acceptance', now(), 1)"),
+            text(
+                "INSERT INTO tenants (tenant_id, slug, display_name, created_at, version) "
+                "VALUES (:t, :slug, 'Acceptance', now(), 1)"
+            ),
             {"t": ids["tenant"], "slug": f"acc-{str(ids['tenant'])[:8]}"},
         )
         for key in ("one", "two", "three"):
@@ -117,9 +122,10 @@ def _release(owner_engine, *, tenant, user) -> tuple[str, str]:
     """A release with the policy pin the projection and the proposal digest bind to."""
     release_id = new_id("release")
     manifest = "a1" * 32
-    version, digest = policy.load(
-        pinned_sha256=policy.digest_of()
-    ).policy_version, policy.digest_of()
+    version, digest = (
+        policy.load(pinned_sha256=policy.digest_of()).policy_version,
+        policy.digest_of(),
+    )
     with owner_engine.begin() as c:
         c.execute(
             text(
@@ -165,9 +171,7 @@ def _client_with(app_engine, monkeypatch, *, operators, who="one", now=NOW, reso
     monkeypatch.setattr(service, "active_resolver", lambda: resolver or BoundResolver())
     app = create_app(
         engine=app_engine,
-        settings=Settings(
-            database_url="test-only", release_acceptance_write_enabled=True
-        ),
+        settings=Settings(database_url="test-only", release_acceptance_write_enabled=True),
         verifier=StaticPrincipalVerifier({"token": principal}, allow_outside_dev=True),
         clock=lambda: now,
         check_partitions_on_startup=False,
@@ -226,13 +230,31 @@ def test_the_same_decision_under_a_second_key_converges_on_the_first_proposal(
     assert second.json()["replayed"] is True
     assert second.json()["proposalId"] == first.json()["proposalId"]
     # One of each: the second key produced a receipt, not a second decision.
-    assert _count(owner_engine, "SELECT count(*) FROM release_acceptance_proposals "
-                                "WHERE tenant_id=:t", t=operators["tenant"]) == 1
-    assert _count(owner_engine, "SELECT count(*) FROM release_acceptance_votes "
-                                "WHERE tenant_id=:t", t=operators["tenant"]) == 1
-    assert _count(owner_engine, "SELECT count(*) FROM audit_events WHERE tenant_id=:t "
-                                "AND action='release.acceptance.proposed'",
-                  t=operators["tenant"]) == 1
+    assert (
+        _count(
+            owner_engine,
+            "SELECT count(*) FROM release_acceptance_proposals " "WHERE tenant_id=:t",
+            t=operators["tenant"],
+        )
+        == 1
+    )
+    assert (
+        _count(
+            owner_engine,
+            "SELECT count(*) FROM release_acceptance_votes " "WHERE tenant_id=:t",
+            t=operators["tenant"],
+        )
+        == 1
+    )
+    assert (
+        _count(
+            owner_engine,
+            "SELECT count(*) FROM audit_events WHERE tenant_id=:t "
+            "AND action='release.acceptance.proposed'",
+            t=operators["tenant"],
+        )
+        == 1
+    )
 
 
 def test_a_different_decision_under_a_second_key_is_a_conflict(
@@ -243,8 +265,12 @@ def test_a_different_decision_under_a_second_key_is_a_conflict(
     client = _client(app_engine, monkeypatch, operators=operators)
     path = f"/v1/release-manifests/{release_id}/acceptance-decisions"
 
-    assert client.post(path, headers=_headers("key-one"),
-                       content=json.dumps(_decision_body(manifest))).status_code == 202
+    assert (
+        client.post(
+            path, headers=_headers("key-one"), content=json.dumps(_decision_body(manifest))
+        ).status_code
+        == 202
+    )
     other = _decision_body(manifest)
     other["reasonCode"] = "SECURITY_REVIEW"
     clash = client.post(path, headers=_headers("key-two"), content=json.dumps(other))
@@ -259,7 +285,9 @@ def test_the_losing_confirmation_converges_on_the_recorded_decision(
     release_id, manifest = _release(owner_engine, tenant=operators["tenant"], user=operators["one"])
     proposer = _client(app_engine, monkeypatch, operators=operators, who="one")
     path = f"/v1/release-manifests/{release_id}/acceptance-decisions"
-    opened = proposer.post(path, headers=_headers("open"), content=json.dumps(_decision_body(manifest)))
+    opened = proposer.post(
+        path, headers=_headers("open"), content=json.dumps(_decision_body(manifest))
+    )
     assert opened.status_code == 202, opened.text
     proposal = opened.json()
 
@@ -277,13 +305,31 @@ def test_the_losing_confirmation_converges_on_the_recorded_decision(
     assert lost.status_code == 201, lost.text
     assert lost.json()["replayed"] is True
     assert lost.json()["acceptanceId"] == won.json()["acceptanceId"]
-    assert _count(owner_engine, "SELECT count(*) FROM release_acceptance_votes "
-                                "WHERE tenant_id=:t", t=operators["tenant"]) == 2
-    assert _count(owner_engine, "SELECT count(*) FROM acceptance_records WHERE tenant_id=:t",
-                  t=operators["tenant"]) == 1
-    assert _count(owner_engine, "SELECT count(*) FROM audit_events WHERE tenant_id=:t "
-                                "AND action='release.acceptance.confirmed'",
-                  t=operators["tenant"]) == 1
+    assert (
+        _count(
+            owner_engine,
+            "SELECT count(*) FROM release_acceptance_votes " "WHERE tenant_id=:t",
+            t=operators["tenant"],
+        )
+        == 2
+    )
+    assert (
+        _count(
+            owner_engine,
+            "SELECT count(*) FROM acceptance_records WHERE tenant_id=:t",
+            t=operators["tenant"],
+        )
+        == 1
+    )
+    assert (
+        _count(
+            owner_engine,
+            "SELECT count(*) FROM audit_events WHERE tenant_id=:t "
+            "AND action='release.acceptance.confirmed'",
+            t=operators["tenant"],
+        )
+        == 1
+    )
 
 
 # ----------------------------------------------------------------- the invalidation commit
@@ -317,13 +363,31 @@ def test_an_expired_proposal_keeps_its_closing_and_returns_the_same_409_to_any_k
     assert refused.headers["content-type"].startswith("application/problem+json")
 
     # The closing survived the response.
-    assert _count(owner_engine, "SELECT count(*) FROM release_acceptance_lifecycle_events "
-                                "WHERE tenant_id=:t", t=operators["tenant"]) == 1
-    assert _count(owner_engine, "SELECT count(*) FROM release_acceptance_slots "
-                                "WHERE tenant_id=:t AND active_proposal_id IS NULL",
-                  t=operators["tenant"]) == 1
-    assert _count(owner_engine, "SELECT count(*) FROM acceptance_records WHERE tenant_id=:t",
-                  t=operators["tenant"]) == 0
+    assert (
+        _count(
+            owner_engine,
+            "SELECT count(*) FROM release_acceptance_lifecycle_events " "WHERE tenant_id=:t",
+            t=operators["tenant"],
+        )
+        == 1
+    )
+    assert (
+        _count(
+            owner_engine,
+            "SELECT count(*) FROM release_acceptance_slots "
+            "WHERE tenant_id=:t AND active_proposal_id IS NULL",
+            t=operators["tenant"],
+        )
+        == 1
+    )
+    assert (
+        _count(
+            owner_engine,
+            "SELECT count(*) FROM acceptance_records WHERE tenant_id=:t",
+            t=operators["tenant"],
+        )
+        == 0
+    )
 
     # The same key replays the receipt; a different key re-reads the closed state.
     replay = confirmer.post(confirm_path, headers=_headers("confirm-one"), content=payload)
@@ -333,11 +397,75 @@ def test_an_expired_proposal_keeps_its_closing_and_returns_the_same_409_to_any_k
     assert again.status_code == 409
     assert again.json()["code"] == "GRAPH-0003"
     # Still one closing, not three.
-    assert _count(owner_engine, "SELECT count(*) FROM release_acceptance_lifecycle_events "
-                                "WHERE tenant_id=:t", t=operators["tenant"]) == 1
+    assert (
+        _count(
+            owner_engine,
+            "SELECT count(*) FROM release_acceptance_lifecycle_events " "WHERE tenant_id=:t",
+            t=operators["tenant"],
+        )
+        == 1
+    )
 
 
 # ----------------------------------------------------------------- the resolver at confirm
+
+
+def test_a_resolver_cannot_authorize_a_different_acceptance_criterion(
+    app_engine, owner_engine, operators, monkeypatch
+):
+    release_id, manifest = _release(owner_engine, tenant=operators["tenant"], user=operators["one"])
+    path = f"/v1/release-manifests/{release_id}/acceptance-decisions"
+    mismatched = _client(
+        app_engine,
+        monkeypatch,
+        operators=operators,
+        who="one",
+        resolver=BoundResolver("AC-13"),
+    ).post(path, headers=_headers("wrong-criterion"), content=json.dumps(_decision_body(manifest)))
+    assert mismatched.status_code == 409, mismatched.text
+    assert (
+        _count(
+            owner_engine,
+            "SELECT count(*) FROM release_acceptance_proposals WHERE tenant_id=:t",
+            t=operators["tenant"],
+        )
+        == 0
+    )
+
+
+def test_confirmation_rebinds_to_the_proposal_criterion(
+    app_engine, owner_engine, operators, monkeypatch
+):
+    release_id, manifest = _release(owner_engine, tenant=operators["tenant"], user=operators["one"])
+    path = f"/v1/release-manifests/{release_id}/acceptance-decisions"
+    proposal = (
+        _client(app_engine, monkeypatch, operators=operators, who="one", resolver=BoundResolver())
+        .post(path, headers=_headers("open"), content=json.dumps(_decision_body(manifest)))
+        .json()
+    )
+
+    refused = _client(
+        app_engine,
+        monkeypatch,
+        operators=operators,
+        who="two",
+        resolver=BoundResolver("AC-13"),
+    ).post(
+        f"{path}/{proposal['proposalId']}/confirm",
+        headers=_headers("confirm-wrong-criterion"),
+        content=json.dumps(
+            {"proposalDigest": proposal["proposalDigest"], "targetManifestSha256": manifest}
+        ),
+    )
+    assert refused.status_code == 409, refused.text
+    assert (
+        _count(
+            owner_engine,
+            "SELECT count(*) FROM acceptance_records WHERE tenant_id=:t",
+            t=operators["tenant"],
+        )
+        == 0
+    )
 
 
 def test_a_reference_that_stops_resolving_refuses_the_confirmation(
@@ -369,8 +497,14 @@ def test_a_reference_that_stops_resolving_refuses_the_confirmation(
     )
     assert refused.status_code == 409, refused.text
     assert len(resolver.calls) == 2, "confirm must resolve again"
-    assert _count(owner_engine, "SELECT count(*) FROM acceptance_records WHERE tenant_id=:t",
-                  t=operators["tenant"]) == 0
+    assert (
+        _count(
+            owner_engine,
+            "SELECT count(*) FROM acceptance_records WHERE tenant_id=:t",
+            t=operators["tenant"],
+        )
+        == 0
+    )
 
 
 def test_a_revoked_grant_between_proposal_and_confirmation_refuses(
@@ -386,8 +520,10 @@ def test_a_revoked_grant_between_proposal_and_confirmation_refuses(
 
     with owner_engine.begin() as c:
         c.execute(
-            text("UPDATE inv.business_admin_grants SET enabled=false "
-                 "WHERE tenant_id=:t AND user_id=:u AND permission='releases.accept'"),
+            text(
+                "UPDATE inv.business_admin_grants SET enabled=false "
+                "WHERE tenant_id=:t AND user_id=:u AND permission='releases.accept'"
+            ),
             {"t": operators["tenant"], "u": operators["two"]},
         )
     confirmer = _client(app_engine, monkeypatch, operators=operators, who="two")
@@ -399,8 +535,14 @@ def test_a_revoked_grant_between_proposal_and_confirmation_refuses(
         ),
     )
     assert refused.status_code == 403, refused.text
-    assert _count(owner_engine, "SELECT count(*) FROM acceptance_records WHERE tenant_id=:t",
-                  t=operators["tenant"]) == 0
+    assert (
+        _count(
+            owner_engine,
+            "SELECT count(*) FROM acceptance_records WHERE tenant_id=:t",
+            t=operators["tenant"],
+        )
+        == 0
+    )
 
 
 # ----------------------------------------------------------------- the denial audit
@@ -432,14 +574,16 @@ def test_a_refused_state_transition_is_audited_once_with_the_action_the_contract
     rows = _count(
         owner_engine,
         "SELECT count(*) FROM audit_events WHERE tenant_id=:t AND action=:a AND outcome='deny'",
-        t=operators["tenant"], a=service.AUDIT_DENIED,
+        t=operators["tenant"],
+        a=service.AUDIT_DENIED,
     )
     assert rows == 1, "exactly one denial row, with the contract's action"
     generic = _count(
         owner_engine,
         "SELECT count(*) FROM audit_events WHERE tenant_id=:t AND outcome='deny' "
         "AND action <> :a",
-        t=operators["tenant"], a=service.AUDIT_DENIED,
+        t=operators["tenant"],
+        a=service.AUDIT_DENIED,
     )
     assert generic == 0, "and no second row under the generic template action"
 
@@ -468,13 +612,21 @@ def test_a_second_final_decision_on_one_criterion_is_refused(
     second = client.post(path, headers=_headers("record-two"), content=json.dumps(hedged))
     assert second.status_code == 409, second.text
     assert second.json()["code"] == "GRAPH-0003"
-    assert _count(owner_engine, "SELECT count(*) FROM acceptance_records WHERE tenant_id=:t",
-                  t=operators["tenant"]) == 1
+    assert (
+        _count(
+            owner_engine,
+            "SELECT count(*) FROM acceptance_records WHERE tenant_id=:t",
+            t=operators["tenant"],
+        )
+        == 1
+    )
     # The slot still names the first decision.
     with owner_engine.begin() as c:
         active = c.execute(
-            text("SELECT active_acceptance_id FROM release_acceptance_slots "
-                 "WHERE tenant_id=:t AND release_id=:r"),
+            text(
+                "SELECT active_acceptance_id FROM release_acceptance_slots "
+                "WHERE tenant_id=:t AND release_id=:r"
+            ),
             {"t": operators["tenant"], "r": release_id},
         ).scalar_one()
     assert active == first.json()["acceptanceId"]
