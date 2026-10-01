@@ -25,7 +25,7 @@ ACC-09(접근성 명도 대비 적합화) 트랙의 후속 영역으로, 내부�
   - 레거시 하드코딩 리터럴 잔여 상한 래칫 강화:
     - `#30363d`: 92건(13개 파일) -> **66건 이하(12개 파일 이하)**
   - 컴포넌트 DOM 렌더링 검증 시험(Test 9f)에 미노출 안내 배너, 서버 매니페스트 배너, 서버 릴리스 버전, 서버 수락 기록 건수, 미인증 경고 배너, #281 릴리스 상태 요소 4종 및 계약 위반 에러 알림(`deployment-manifest-error-contract`)의 동적 명도 대비 및 테두리 대비 결속 추가 (정본 스키마 기반 엄밀 픽스처, `as any` 전면 제거).
-  - 계층적 조상 컨테이너 추적 및 요소/조상 불투명도(opacity) 합성 기반 동적 AST 스타일-쌍 대비 계산기(Test 9f-2): 193개 style 속성 총수 래칫 및 조상 컨테이너 배경 스택 추적 동적 AST 명도 대비 계산 및 커버리지 래칫 (checkedObjects 22, checkedPairs 145, unboundColorObjects 102, coveredColorObjects 124, checkedBorderObjects 34, checkedBorderPairs 36, violations 0건).
+  - 계층적 조상 컨테이너 추적 및 요소/조상 불투명도(opacity) 합성 기반 동적 AST 스타일-쌍 대비 계산기(Test 9f-2): 201개 style 속성 총수 래칫(#289 step-up 재인증 섹션 8개 속성 포함) 및 조상 컨테이너 배경 스택 추적 동적 AST 명도 대비 계산 및 커버리지 래칫 (checkedObjects 23, checkedPairs 150, unboundColorObjects 106, coveredColorObjects 129, checkedBorderObjects 36, checkedBorderPairs 38, violations 0건).
   - Revert-Fail Probes 51~57 신설 및 `tools/test_c202_mutations.py` 스크립트 커밋으로 10종 뮤테이션(B1~B5, M6~M10) 전원 사살 실측(사살율 **100.0%**).
 
 ---
@@ -189,14 +189,14 @@ python tools/test_c202_mutations.py
     - `deployment-manifest-error-contract`: `role="alert"`, `var(--color-status-offline)` 텍스트/테두리, `var(--color-bg-subtle)` 배경, 텍스트 'CONTRACT-VIOLATION', 대비 >= 4.5:1 / 테두리 >= 3.0:1.
 - **Test 9f-2 개선 (Claude UI U1)**:
   - 동적 AST 스타일-쌍 계산기에 불투명도(opacity) 추적 엔진 추가 (`extractOpacity`, 요소 및 조상 불투명도 누적 곱연산, `blendRgba`를 통한 실효 텍스트/테두리 색상 합성 및 대비 계산).
-  - 총 style 속성 수: **193개**.
-  - 명시적 배경/전경 검사 객체: **22개**.
-  - 평가된 전경-배경 쌍(분기 및 조상 컨테이너 포함): **145개**.
-  - 상속 컨테이너 배경 대상 글자 객체: **102개**.
-  - 총 커버된 색상 스타일 객체: **124개**.
-  - 명시적 테두리 스타일 객체: **34개**.
-  - 평가된 테두리-배경 쌍: **36개**.
-  - 위반 건수: **0건**.
+  - 총 style 속성 수: **201개** (Train 14 병합 및 #289 step-up 재인증 섹션 8개 반영).
+  - 명시적 배경/전경 검사 객체: **23개** (+1개).
+  - 평가된 전경-배경 쌍(분기 및 조상 컨테이너 포함): **150개** (+5개).
+  - 상속 컨테이너 배경 대상 글자 객체: **106개** (+4개).
+  - 총 커버된 색상 스타일 객체: **129개** (+5개).
+  - 명시적 테두리 스타일 객체: **36개** (+2개).
+  - 평가된 테두리-배경 쌍: **38개** (+2개).
+  - 위반 건수: **0건** (전수 통과).
 - **Revert-Fail Probes 51~57**:
   - Probe 51: 이전 `#58a6ff` on subtle 결함 (2.31:1 < 4.5:1)
   - Probe 52: 이전 `#8b949e` on subtle 결함 (2.81:1 < 4.5:1)
@@ -227,7 +227,7 @@ python tools/test_c202_mutations.py
 3. **타입 검사**:
    - `cd apps/web && npx tsc -b`: error 0건, clean pass (exit 0).
 4. **프로덕션 빌드**:
-   - `cd apps/web && npm run build`: built in 8.04s (dist 생성 정상, exit 0).
+   - `cd apps/web && npm run build`: built in 9.82s (dist 생성 정상, exit 0).
 5. **백엔드 라우트 커버리지 및 EvidenceViewer 무결성 불변식**:
    - `pytest tests/test_route_coverage.py`: 41 passed (100%), exit 0.
 6. **프런트엔드 무결성 게이트**:
@@ -244,4 +244,37 @@ python tools/test_c202_mutations.py
 ## 5. 다음 담당자 및 후속 과제
 
 - **다음 담당자**: 코디네이터 및 독립 리뷰어 (Claude UI, Codex).
-- **후속 작업**: PR #301 r1 피드백 해소 커밋 푸시 및 검토 인계 -> 후속 카드 206(`DeveloperStudio.tsx`) 계속 진행.
+- **후속 작업**: PR #301 Train 14 동기화 커밋 푸시 및 검토 인계 -> 후속 카드 206(`DeveloperStudio.tsx`) branch로 merge 후 카드 206 계속 진행.
+
+---
+
+## 6. Train 14 Tip (d0b2a4c6) 머지 및 #289 Step-Up 섹션 래칫 동기화 (2026-10-02 06:49 KST)
+
+Train 14 착지 tip `d0b2a4c6` (PR #289 / Card 192 포털 step-up 재인증 섹션 포함)를 `agent/gemini/c202-intranet-deploy-contrast` 브랜치(`58c18acc`)에 병합하였습니다 (merge commit `8e0def39`).
+
+### 6.1 병합 내역 및 #289 신규 섹션 분석
+- **출처 PR**: #289 (카드 192, S12-BE fresh auth claims 공급원 및 포털 step-up 재인증 UI).
+- **영향 컴포넌트**: `apps/web/src/features/deployment/IntranetDeploymentView.tsx` 985~1052행.
+- **추가된 요소**:
+  - `deployment-step-up-section`: 컨테이너 (`backgroundColor: var(--color-bg-canvas)`, `border: 1px solid var(--color-border-strong)`).
+  - `deployment-step-up-status-badge`: 상태 배지 (`backgroundColor: var(--color-bg-subtle)`, `border: 1px solid var(--color-status-unknown)`, `color: var(--color-status-unknown)`).
+  - `deployment-step-up-button`: `Button variant="secondary" size="sm"`.
+  - 안내 문구 및 텍스트 5개 (`color: var(--color-text-primary)` 및 `color: var(--color-text-muted)`).
+- **신규 style 속성 수**: 정확히 **8개**.
+
+### 6.2 계산형 가드 적합성 검증 및 래칫 재고정
+- **명도 대비 및 무결성 검증**:
+  - `deployment-step-up-section` 컨테이너 배경 `var(--color-bg-canvas)` 및 `var(--color-border-strong)` 테두리는 상위 컨테이너 대비 비텍스트 >= 3.0:1 충족.
+  - 내부 `h4` 제목 및 텍스트는 `var(--color-text-primary)` / `var(--color-text-muted)`로 실제 캔버스 배경 위에서 텍스트 >= 4.5:1 충족.
+  - `deployment-step-up-status-badge` 배지는 `var(--color-bg-subtle)` 배경 위 `var(--color-status-unknown)`로 텍스트 >= 4.5:1, 테두리 >= 3.0:1 충족.
+  - AST 계산형 가드 검증 결과 위반(`violations`): **0건 (클린 패스)**.
+- **Fail-Closed 래칫 재고정**:
+  - `totalStyleAttrs`: 193 -> **201** (+8개)
+  - `checkedObjects`: 22 -> **23** (+1개)
+  - `checkedPairs`: 145 -> **150** (+5개)
+  - `unboundColorObjects`: 102 -> **106** (+4개)
+  - `coveredColorObjects`: 124 -> **129** (+5개)
+  - `checkedBorderObjects`: 34 -> **36** (+2개)
+  - `checkedBorderPairs`: 36 -> **38** (+2개)
+  - `violations`: **0건**.
+  - `COLOR_LITERAL_MULTISET_BASELINE`: `features/deployment/IntranetDeploymentView.tsx: {}` (리터럴 0건 유지).

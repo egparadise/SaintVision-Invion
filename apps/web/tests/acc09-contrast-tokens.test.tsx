@@ -2761,14 +2761,14 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
 
     traverseJsx(sf, [], [], 1.0);
 
-    // Exact ratchet assertions covering 100% of IntranetDeploymentView style declarations
-    expect(totalStyleAttrs, 'Total style attributes in IntranetDeploymentView must be exactly 193').toBe(193);
-    expect(checkedObjects, 'Style objects with explicit background and foreground must be exactly 22').toBe(22);
-    expect(checkedPairs, 'Evaluated foreground-background pairs across conditional branches must be exactly 145').toBe(145);
-    expect(unboundColorObjects, 'Elements with foreground color inheriting container background must be exactly 102').toBe(102);
-    expect(checkedObjects + unboundColorObjects, 'Total covered color style objects must be exactly 124').toBe(124);
-    expect(checkedBorderObjects, 'Style objects with explicit border token declarations must be exactly 34').toBe(34);
-    expect(checkedBorderPairs, 'Evaluated border-background pairs across conditional and container branches must be exactly 36').toBe(36);
+    // Exact ratchet assertions covering 100% of IntranetDeploymentView style declarations (ratcheted for #289 step-up section merge)
+    expect(totalStyleAttrs, 'Total style attributes in IntranetDeploymentView must be exactly 201').toBe(201);
+    expect(checkedObjects, 'Style objects with explicit background and foreground must be exactly 23').toBe(23);
+    expect(checkedPairs, 'Evaluated foreground-background pairs across conditional branches must be exactly 150').toBe(150);
+    expect(unboundColorObjects, 'Elements with foreground color inheriting container background must be exactly 106').toBe(106);
+    expect(checkedObjects + unboundColorObjects, 'Total covered color style objects must be exactly 129').toBe(129);
+    expect(checkedBorderObjects, 'Style objects with explicit border token declarations must be exactly 36').toBe(36);
+    expect(checkedBorderPairs, 'Evaluated border-background pairs across conditional and container branches must be exactly 38').toBe(38);
     expect(violations, `Expected 0 style-pair contrast/collision violations in IntranetDeploymentView, got:\n${violations.join('\n')}`).toEqual([]);
   });
 

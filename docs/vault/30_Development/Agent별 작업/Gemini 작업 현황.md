@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.188"
+version: "1.0.189"
 status: "proposed"
 author: "Gemini"
-updated: "2026-10-02T06:22:08+09:00"
+updated: "2026-10-02T06:50:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,6 +19,7 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
+- 확인 기준: 2026-10-02T06:50:00+09:00 (Card 202 사내망 배포 화면 Train 14 tip d0b2a4c6 머지 및 #289 step-up 재인증 섹션 래칫 동기화: PR #289 / Card 192 step-up 재인증 UI(8개 style 객체, 0개 리터럴) 병합 후 AST 가드 전수 통과 확인(violations 0), totalStyleAttrs 193 -> 201, checkedObjects 23, checkedPairs 150, unboundColorObjects 106, coveredColorObjects 129, checkedBorderObjects 36, checkedBorderPairs 38로 래칫 재고정, COLOR_LITERAL_MULTISET_BASELINE {} 0건 유지, Vitest 20 passed, tsc 0 error, build 성공, route coverage 41 passed, check_frontend_integrity 0 위반, check_docs PASS, diff --check clean).
 - 확인 기준: 2026-10-02T06:22:08+09:00 (Card 202 사내망 배포 화면 r2 조치: Claude UI r2 조건부 승인 지적 2건 전수 반영 — (1) §2.2 bash heredoc index.css 동적 재현 명령의 Python 정규식 따옴표 회귀 및 SyntaxError를 r"\[data-theme='dark'\]\s*\{([\s\S]*?)\}"로 완전 수정하고 실제 실행 exit code 0 콘솔 출력 직접 결속; (2) §2.1 표 첫 행 미노출 안내 Before composite hex를 index.css 정본 캔버스(#f8fafc / #090d16) 위 0.12 alpha 합성 실측치인 #e1edfc 2.13:1(Light) / #0f1c32 6.75:1(Dark)로 시험과 동일하게 정정; 문서 단독 commit).
 - 확인 기준: 2026-10-02T06:01:00+09:00 (Card 202 사내망 배포 화면 r1 조치: Claude UI r1 및 Codex r1 피드백 전수 반영 — U1/U2/U3/U4/C1/C2/C3 해소: IntranetDeploymentView 226건 -> 0건 해소 정정, Test 9f-2 가드에 불투명도(opacity) 추적 및 실효 대비 합성 엔진 신설, 연산자 입력 필드 opacity 0.8 제거(테두리 대비 2.60/2.86 -> 3.48/3.73 >= 3.0:1 복원), Test 9f as any 전면 제거 및 strict schema 픽스처(confirmedOperatorCount 0, requiredDistinctOperatorCount 2, matchingAcceptedUserCount 2, operatorSignOff false) 바인딩, #281 상태 요소 4종 및 계약 위반 에러 알림(deployment-manifest-error-contract) DOM 렌더링/토큰 단언, Revert-Fail Probes 56~57 신설, 독립 재현 가능한 tools/test_c202_mutations.py 커밋으로 10종 뮤테이션 B1~B5/M6~M10 10/10 100% 사살 실측, History 표 대표 표본 명시 및 before 실제 베이스 정정, Vitest 20 passed, deployment 13 passed, tsc 0 error, build 성공, route coverage 41 passed, check_frontend_integrity 0 위반, check_docs PASS, diff --check clean).
 - 확인 기준: 2026-10-02T05:24:00+09:00 (Card 202 사내망 배포 화면 IntranetDeploymentView 색상 리터럴 inventory 전수(226→0), 대비 표본/DOM 결속 감사 및 디자인 토큰 승격: base dca1aa06 위 작업, IntranetDeploymentView 226건 -> 0건 해소, COLOR_LITERAL_MULTISET_BASELINE {} 래칫, border-subtle 346건/25개 파일 래칫, 레거시 #30363d 66건/12파일 상한 강화, Test 9f DOM 실제 렌더링 동적 대비 단언 신설, Test 9f-2 193개 style 속성 전수 AST 스타일-쌍 명도 대비 및 조상 추적 가드 신설, Revert-Fail Probes 51~55 추가, 10종 변이 10/10 100% 사살 실측; Vitest 20 passed, deployment tests 13 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
