@@ -1,15 +1,27 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.261"
+version: "1.0.262"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T06:23:06+09:00"
+updated: "2026-10-02T07:24:06+09:00"
 source_of_truth: "Git"
 active_card: "CARD-211 VF-CL CI receipt attestation"
-active_card_status: "Stacked #295 authoritative-receipt contract and #302 Python 3.10 procedure fix; implementing fail-closed CI attestation verification"
-active_card_next: "Complete checker/workflow mutation tests, obtain an exact-head attested hosted run, and request Claude review"
+active_card_status: "Fail-closed receipt creator/verifier, workflow minimum permissions, and registry rule 7 attestation boundary implemented; hosted exact-head run pending"
+active_card_next: "Push one implementation commit, obtain workflow_dispatch attestation evidence, record the honest result, and request Claude review"
 ---
+
+## 2026-10-02 Card 211 — VF-CL CI receipt attestation
+
+- `#295`의 offline receipt 위조 생존을 닫기 위해 workflow_dispatch-only receipt producer와
+  `actions/attest@v4` 서명 job, GitHub identity·source SHA/ref·receipt byte 검증기를 구현했다.
+- 서명 권한은 별도 job에만 두고 PR event에는 OIDC token이 가지 않는다. bundle 부재·다른 repository,
+  workflow, SHA, ref·위조 receipt·만료 artifact는 모두 fail closed다.
+- 구현 tree에는 정본 bundle이 아직 없으므로 `VF-CL-04.ciVerified=false`를 유지한다. hosted exact-head run과
+  착지 SHA 검증은 구분한다. 설계 [[VF-CL-04_CI_receipt_attestation_설계_Codex]], History
+  [[2026-10-02_07-24-06_KST_Card211_VF-CL_CI_receipt_attestation_Codex]].
+- `#302`의 사용자 절차는 Windows Python 3.10을 downloader/ZIP 생성에만 쓰고 importer는 agent의 지원
+  Python 3.12/3.14에서 실행하도록 선반영했다.
 
 ## 2026-10-01 Card 194 — S12 acceptance target·Evidence resolver 구현
 

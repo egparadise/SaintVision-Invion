@@ -138,6 +138,11 @@ import re
 import subprocess
 import sys
 
+try:
+    from tools import verify_vf_cl_ci_attestation
+except ModuleNotFoundError:  # Direct ``python tools/...py`` execution in CI and runbooks.
+    import verify_vf_cl_ci_attestation
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_REGISTRY = REPO_ROOT / "docs/vf-cl-task-registry.json"
 DEFAULT_MANIFEST = REPO_ROOT / "docs/vf-cl-registry-manifest.json"
@@ -158,20 +163,23 @@ RECEIPT_ARTIFACT_KEYS = frozenset({"id", "name", "digest", "expiresAt"})
 RECEIPT_INPUT_KEYS = frozenset({
     "runMetadataSha256", "jobsMetadataSha256", "artifactMetadataSha256",
 })
-#: Why no card may derive ``ciVerified: true`` yet (#295 r2 F1, coordinator's call).
+#: Why an unsigned offline receipt may not derive ``ciVerified: true`` (#295 r2 F1).
 #:
 #: The receipt is built offline from JSON the caller passed in, and its ``receiptSha256`` is
 #: a digest, not a signature -- Codex forged a run id in the receipt *and* the registry,
 #: recomputed the hash, and the checker exited 0. Binding two files to each other proves
-#: they agree; it does not prove either is about a run that happened. Until a receipt
-#: carries something this tool can verify it did not write -- a CI-produced attestation --
-#: the honest value is ``false``, and this makes ``true`` unreachable rather than
-#: discouraged.
+#: they agree; it does not prove either is about a run that happened. A true claim is
+#: therefore opened only by ``ciVerifiedAttestation`` and a GitHub/Sigstore bundle that
+#: this checker verifies against the exact repository, workflow, source commit, branch,
+#: and receipt bytes.
 UNATTESTED_RECEIPT = (
     "a receipt built from passed-in JSON cannot carry ciVerified=true: its digest is not a "
     "signature, so a forged run id survives re-hashing. An attested CI-produced receipt is "
     "the follow-up card; until then the honest value is false"
 )
+ATTESTATION_EXPECTATION_KEYS = frozenset({
+    "receiptPath", "bundlePath", "repository", "workflowPath", "headSha", "headRef",
+})
 #: A receipt names a full commit, like every other sha in this file.
 COMMIT_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 
@@ -184,7 +192,7 @@ STATE_FIELDS = (
 )
 #: A blocker that names a pull request is claiming to wait for it.
 PULL_REQUEST = re.compile(r"(?:\bpr-|#)(\d{1,5})\b")
-CHECK_KINDS = ("references", "absent", "path-exists")
+CHECK_KINDS = ("references", "absent", "path-exists", "path-absent")
 #: A card may only be called accepted when these hold, or when ``notApplicable`` names the
 #: field and says why. Acceptance is the one claim nobody downstream re-checks.
 ACCEPTANCE_REQUIRES = ("ciVerified", "independentlyReviewed")
@@ -367,10 +375,28 @@ def load_manifest(path: Path, identifiers: list[str]) -> dict:
                 f"{name} claims ciVerified={ci_implied!r} with no ciVerifiedChecks"
             )
         if ci_implied is True:
-            # Rule 7c, unconditional on purpose. An opt-out flag here would be a second
-            # place to assert the thing the rule exists to stop being asserted; when an
-            # attestation this tool can verify exists, this branch is what that card edits.
-            raise RegistryUnusable(f"{name}: {UNATTESTED_RECEIPT}")
+            attestation = entry.get("ciVerifiedAttestation")
+            if not isinstance(attestation, dict) or set(attestation) != ATTESTATION_EXPECTATION_KEYS:
+                raise RegistryUnusable(
+                    f"{name}: ciVerified=true requires an exact ciVerifiedAttestation object"
+                )
+            for field in ATTESTATION_EXPECTATION_KEYS:
+                if not isinstance(attestation[field], str) or not attestation[field].strip():
+                    raise RegistryUnusable(
+                        f"{name}.ciVerifiedAttestation.{field} must be a non-empty string"
+                    )
+            if attestation["repository"] != RECEIPT_REPOSITORY:
+                raise RegistryUnusable(
+                    f"{name}.ciVerifiedAttestation.repository is not {RECEIPT_REPOSITORY}"
+                )
+            if not COMMIT_PATTERN.fullmatch(attestation["headSha"]):
+                raise RegistryUnusable(
+                    f"{name}.ciVerifiedAttestation.headSha is not a full commit"
+                )
+            if not attestation["headRef"].startswith("refs/heads/"):
+                raise RegistryUnusable(
+                    f"{name}.ciVerifiedAttestation.headRef is not a branch ref"
+                )
         if ci_implied is not None and entry.get("ciVerifiedReceipt") is not None:
             # The expectations live here, not in the registry: a file that can choose which
             # workflow and which steps count has not been held to anything.
@@ -664,6 +690,64 @@ def ci_run_findings(
     return findings
 
 
+def verify_ci_attestation(receipt_path: Path, bundle_path: Path, expectation: dict[str, Any]):
+    """One replaceable boundary so tests can prove checker behaviour without a network."""
+    return verify_vf_cl_ci_attestation.verify(
+        receipt_path,
+        bundle_path,
+        expected_repository=expectation["repository"],
+        expected_workflow=expectation["workflowPath"],
+        expected_head=expectation["headSha"],
+        expected_ref=expectation["headRef"],
+    )
+
+
+def ci_attestation_findings(
+    identifier: str,
+    recorded: object,
+    expectation: dict[str, Any],
+    root: Path,
+) -> list[str]:
+    """Require a cryptographically verified receipt before ciVerified can be true."""
+    receipt_relative = expectation["receiptPath"]
+    bundle_relative = expectation["bundlePath"]
+    try:
+        receipt = verify_ci_attestation(
+            root / receipt_relative,
+            root / bundle_relative,
+            expectation,
+        )
+    except verify_vf_cl_ci_attestation.AttestationError as error:
+        return [f"{identifier}: authoritative CI attestation refused: {error}"]
+    if not isinstance(recorded, dict):
+        return [f"{identifier}.ciVerified=true names no ciVerifiedAttestation record"]
+    findings: list[str] = []
+    for field, expected in (
+        ("runId", receipt.get("runId")),
+        ("headSha", receipt.get("headSha")),
+        ("headRef", receipt.get("headRef")),
+        ("receipt", receipt_relative),
+        ("bundle", bundle_relative),
+    ):
+        if recorded.get(field) != expected:
+            findings.append(
+                f"{identifier}.ciVerifiedAttestation.{field} is {recorded.get(field)!r}, "
+                f"expected {expected!r}"
+            )
+    evidence = receipt.get("evidenceArtifact") or {}
+    recorded_artifact = recorded.get("evidenceArtifact")
+    if not isinstance(recorded_artifact, dict):
+        findings.append(f"{identifier}.ciVerifiedAttestation names no evidenceArtifact")
+    else:
+        for field in ("id", "digest"):
+            if recorded_artifact.get(field) != evidence.get(field):
+                findings.append(
+                    f"{identifier}.ciVerifiedAttestation.evidenceArtifact.{field} differs "
+                    "from the attested receipt"
+                )
+    return findings
+
+
 def run_check(check: dict, root: Path) -> str | None:
     """None when the check holds, otherwise why it does not."""
     kind = check.get("kind")
@@ -675,6 +759,8 @@ def run_check(check: dict, root: Path) -> str | None:
     target = root / relative
     if kind == "path-exists":
         return None if target.is_file() else f"{relative} is not in the tree"
+    if kind == "path-absent":
+        return None if not target.exists() else f"{relative} is already in the tree"
     if not target.is_file():
         return f"{relative} is not in the tree"
     text = check.get("text")
@@ -850,6 +936,13 @@ def audit(registry: dict, root: Path, manifest_path: Path = DEFAULT_MANIFEST) ->
                 str((registry.get("verifiedAgainst") or {}).get("tree") or ""),
                 root,
                 dt.datetime.now(dt.timezone.utc),
+            ))
+        if ci_implied is True:
+            findings.extend(ci_attestation_findings(
+                identifier,
+                card.get("ciVerifiedAttestation"),
+                entry["ciVerifiedAttestation"],
+                root,
             ))
 
         # Rule 5: acceptance is the claim nobody downstream re-checks.

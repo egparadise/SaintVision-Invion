@@ -232,6 +232,17 @@ def test_an_absent_check_catches_something_coming_back(tmp_path):
     assert audit(document, tmp_path, mirrored) == []
 
 
+def test_a_path_absent_check_breaks_when_authoritative_evidence_arrives(tmp_path):
+    check = {"kind": "path-absent", "path": "evidence/attestation.bundle.json"}
+    assert checker.run_check(check, tmp_path) is None
+    target = tmp_path / "evidence" / "attestation.bundle.json"
+    target.parent.mkdir()
+    target.write_text("{}", encoding="utf-8")
+    assert checker.run_check(check, tmp_path) == (
+        "evidence/attestation.bundle.json is already in the tree"
+    )
+
+
 def test_an_unknown_check_kind_is_unusable_not_silently_skipped(tmp_path):
     """A check nobody runs is worse than no check: it reads as verified."""
     document = registry(tmp_path)
@@ -928,17 +939,95 @@ def test_a_ci_verified_claim_the_tree_contradicts_is_reported(tmp_path):
 
 
 def test_the_manifest_may_not_derive_a_true_ci_verified_at_all(tmp_path):
-    """Rule 7c (#295 r2 F1). Unconditional, and that is the point.
-
-    Codex forged a run id in the receipt *and* the registry, recomputed the receipt's own
-    digest, and the checker exited 0 -- the test below reproduces that. Binding two files to
-    each other shows they agree; it does not show either describes a run that happened. So
-    the value is refused until an attestation exists that this tool did not write.
-    """
+    """Rule 7c now opens only for an exact, cryptographically verified attestation."""
     manifest_document = ci_asserting(manifest(), implies=True)
     with pytest.raises(checker.RegistryUnusable) as unusable:
         audit(registry(tmp_path), tmp_path, manifest_document)
-    assert "cannot carry ciVerified=true" in str(unusable.value)
+    assert "requires an exact ciVerifiedAttestation" in str(unusable.value)
+
+
+def attestation_expectation(tmp_path):
+    del tmp_path
+    head = "a" * 40
+    return {
+        "receiptPath": "docs/vf-cl-ci-attestations/VF-CL-0X.json",
+        "bundlePath": "docs/vf-cl-ci-attestations/VF-CL-0X.bundle.json",
+        "repository": checker.RECEIPT_REPOSITORY,
+        "workflowPath": ".github/workflows/fixture.yml",
+        "headSha": head,
+        "headRef": "refs/heads/fixture",
+    }
+
+
+def attested_receipt(tmp_path):
+    expectation = attestation_expectation(tmp_path)
+    return {
+        "runId": "36930000000",
+        "headSha": expectation["headSha"],
+        "headRef": expectation["headRef"],
+        "evidenceArtifact": {"id": "11190000000", "digest": "sha256:" + "d" * 64},
+    }
+
+
+def test_a_verified_attestation_can_derive_true(tmp_path, monkeypatch):
+    document = registry(tmp_path)
+    expectation = attestation_expectation(tmp_path)
+    recorded_receipt = attested_receipt(tmp_path)
+    document["cards"][0]["ciVerifiedAttestation"] = {
+        **recorded_receipt,
+        "receipt": expectation["receiptPath"],
+        "bundle": expectation["bundlePath"],
+    }
+    manifest_document = ci_asserting(manifest(), implies=True)
+    manifest_document["cards"]["VF-CL-0X"].pop("ciVerifiedReceipt", None)
+    manifest_document["cards"]["VF-CL-0X"]["ciVerifiedAttestation"] = expectation
+    monkeypatch.setattr(checker, "verify_ci_attestation", lambda *_args: recorded_receipt)
+    assert audit(document, tmp_path, manifest_document) == []
+
+
+def test_a_missing_or_invalid_attestation_is_fail_closed(tmp_path, monkeypatch):
+    document = registry(tmp_path)
+    expectation = attestation_expectation(tmp_path)
+    document["cards"][0]["ciVerifiedAttestation"] = {}
+    manifest_document = ci_asserting(manifest(), implies=True)
+    manifest_document["cards"]["VF-CL-0X"].pop("ciVerifiedReceipt", None)
+    manifest_document["cards"]["VF-CL-0X"]["ciVerifiedAttestation"] = expectation
+
+    def refuse(*_args):
+        raise checker.verify_vf_cl_ci_attestation.AttestationError("attestation bundle is missing")
+
+    monkeypatch.setattr(checker, "verify_ci_attestation", refuse)
+    findings = audit(document, tmp_path, manifest_document)
+    assert any("authoritative CI attestation refused" in finding for finding in findings)
+
+
+@pytest.mark.parametrize("field", checker.ATTESTATION_EXPECTATION_KEYS)
+def test_a_true_claim_requires_every_attestation_expectation_field(tmp_path, field):
+    manifest_document = ci_asserting(manifest(), implies=True)
+    manifest_document["cards"]["VF-CL-0X"].pop("ciVerifiedReceipt", None)
+    expectation = attestation_expectation(tmp_path)
+    expectation.pop(field)
+    manifest_document["cards"]["VF-CL-0X"]["ciVerifiedAttestation"] = expectation
+    with pytest.raises(checker.RegistryUnusable, match="exact ciVerifiedAttestation"):
+        audit(registry(tmp_path), tmp_path, manifest_document)
+
+
+def test_a_registry_run_id_cannot_differ_from_the_attested_receipt(tmp_path, monkeypatch):
+    document = registry(tmp_path)
+    expectation = attestation_expectation(tmp_path)
+    receipt = attested_receipt(tmp_path)
+    document["cards"][0]["ciVerifiedAttestation"] = {
+        **receipt,
+        "runId": "99999999999",
+        "receipt": expectation["receiptPath"],
+        "bundle": expectation["bundlePath"],
+    }
+    manifest_document = ci_asserting(manifest(), implies=True)
+    manifest_document["cards"]["VF-CL-0X"].pop("ciVerifiedReceipt", None)
+    manifest_document["cards"]["VF-CL-0X"]["ciVerifiedAttestation"] = expectation
+    monkeypatch.setattr(checker, "verify_ci_attestation", lambda *_args: receipt)
+    findings = audit(document, tmp_path, manifest_document)
+    assert any("runId is '99999999999'" in finding for finding in findings)
 
 
 def test_a_forged_and_resealed_receipt_is_why_true_is_refused(tmp_path):
@@ -1273,17 +1362,20 @@ def test_the_shipped_pair_derives_the_card_whose_workflow_names_its_own_tools():
     """
     manifest_document = json.loads(checker.DEFAULT_MANIFEST.read_text(encoding="utf-8"))
     cards = manifest_document["cards"]
-    # False, and derived: while the workflow carries no attestation step, this stays false
-    # (#295 r2 F1). The checks below are still the chain that makes the *facts* re-derivable.
+    # False, and derived: the implementation exists, but no authoritative bundle is committed
+    # yet. Adding one breaks this assertion and forces a cryptographically verified true claim.
     assert cards["VF-CL-04"]["impliesCiVerified"] is False
     assert any(
-        check["kind"] == "absent" and check["text"] == "attest-build-provenance"
+        check["kind"] == "path-absent"
+        and check["path"] == "docs/vf-cl-ci-attestations/VF-CL-04.bundle.json"
         for check in cards["VF-CL-04"]["ciVerifiedChecks"]
     )
     texts = [check.get("text") or check["path"]
              for check in cards["VF-CL-04"]["ciVerifiedChecks"]]
     assert "python tools/collect_s12_acceptance_evidence.py" in texts
     assert "python tools/check_s12_acceptance_shape.py" in texts
+    assert "uses: actions/attest@v4" in texts
+    assert "python tools/verify_vf_cl_ci_attestation.py" in texts
     assert "pitr-configuration-possible" in texts
     assert "pitr-rehearsal-dry-run-observed" in texts
     for name in ("VF-CL-01", "VF-CL-02", "VF-CL-03", "VF-CL-05"):
@@ -1474,12 +1566,13 @@ def test_the_shipped_manifest_keeps_the_reason_the_last_edit_wrote():
     """The value that vanished, pinned by content.
 
     The duplicate meant VF-CL-04's ``whyCiVerified`` read as the older sentence. The reason
-    this card is false now is the attestation, and that is what the file has to say.
+    this card remains false now is the missing authoritative bundle, not missing machinery.
     """
     manifest_document = checker.load_json_strictly(checker.DEFAULT_MANIFEST, "manifest")
     why = manifest_document["cards"]["VF-CL-04"]["whyCiVerified"]
-    assert "not authoritative" in why
-    assert "attestation" in why
+    assert "support a GitHub/Sigstore-attested" in why
+    assert "no authoritative bundle yet" in why
+    assert "implementation-only commit cannot attest" in why
 
 
 # --- r4: a timestamp that parses is not a timestamp in UTC -------------------------------

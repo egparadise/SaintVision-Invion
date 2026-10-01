@@ -113,7 +113,7 @@
   "VF-CL-04": {
    "impliesImplemented": true,
    "impliesCiVerified": false,
-   "whyCiVerified": "The facts are measured and the receipt binds them, but a receipt built offline from passed-in JSON is not authoritative: its digest is a hash, not a signature, so a forged run id survives re-hashing (#295 r2 F1). So the tree implies false -- not because CI cannot re-derive this card, but because nothing here can show that it did. The check below is what makes that a derivation rather than an opinion: while the workflow carries no attestation step, this stays false, and the day one is added the check breaks and this entry has to be revisited. What the checks below DO establish is the chain of literals: s12-acceptance-evidence.yml runs this card's collector and then the shape gate over what it produced, and the collector is where the two named acceptance observations come from -- which is why this card is the one rule 7 could ever assert, unlike the cards whose tests merely ride a whole-directory lane.",
+   "whyCiVerified": "The workflow and checker now support a GitHub/Sigstore-attested CI-produced receipt, but this source tree intentionally carries no authoritative bundle yet. An implementation-only commit cannot attest its later Evidence commit or landing SHA, so rule 7 stays false until an exact-head workflow_dispatch run is verified and its receipt plus bundle are recorded. The path-absent check makes that distinction mechanical: adding the bundle breaks this false derivation and requires a cryptographically verified true claim rather than a prose flip.",
    "ciVerifiedReceipt": {
     "path": "docs/vf-cl-ci-receipts/VF-CL-04.json",
     "workflowPath": ".github/workflows/s12-acceptance-evidence.yml",
@@ -151,9 +151,18 @@
      "text": "pitr-rehearsal-dry-run-observed"
     },
     {
-     "kind": "absent",
+     "kind": "references",
      "path": ".github/workflows/s12-acceptance-evidence.yml",
-     "text": "attest-build-provenance"
+     "text": "uses: actions/attest@v4"
+    },
+    {
+     "kind": "references",
+     "path": ".github/workflows/s12-acceptance-evidence.yml",
+     "text": "python tools/verify_vf_cl_ci_attestation.py"
+    },
+    {
+     "kind": "path-absent",
+     "path": "docs/vf-cl-ci-attestations/VF-CL-04.bundle.json"
     }
    ],
    "checks": [
