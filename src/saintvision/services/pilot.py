@@ -647,29 +647,41 @@ def _release_components(manifest: ReleaseManifest) -> list[dict]:
 #: whose target lives only in a design document.
 REQUIRED_DISTINCT_OPERATOR_COUNT = 2
 
-#: Why ``operatorSignOff`` is false on every row this module produces. One value,
-#: in the response, so a reader is never left deciding whether "false" means
-#: nobody signed or this surface cannot tell.
-OPERATOR_SIGN_OFF_BLOCKED_BY = "human-attestation-contract-absent"
+#: Why ``operatorSignOff`` is false on every row this module produces. The write
+#: contract for human attestation exists (``#282``, card 184); what is absent is an
+#: implementation of it, and the value names that rather than leaving a reader to
+#: decide whether "false" means nobody signed or this surface cannot tell.
+OPERATOR_SIGN_OFF_BLOCKED_BY = "human-attestation-implementation-unavailable"
+
+#: Distinct operators whose decision is attested to a person. Zero, as a constant,
+#: because the attestation this counts is ``#282``'s and nothing implements it yet.
+#: It is not computed from the rows: no arrangement of rows this module can read
+#: would make it anything else, and a function would invite someone to try.
+CONFIRMED_OPERATOR_COUNT = 0
 
 
-def confirmed_operator_count(
+def matching_accepted_user_count(
     manifest: ReleaseManifest, acceptances: list[AcceptanceRecord]
 ) -> int:
-    """How many **distinct** users have an ``accepted`` row pinning this composition.
+    """How many **distinct user ids** have an ``accepted`` row pinning this composition.
 
-    A recorded fact and deliberately not an attestation. The first version of
-    this module had a function called ``operator_sign_off`` that returned true
-    from exactly this condition, reasoning that ``accepted_by_user_id`` is a
-    foreign key to ``users`` and therefore "the system cannot sign its own
-    acceptance". **Codex measured that and it is false**: ``users`` does not
-    distinguish a person from a service, a Principal is built from any
-    ``external_subject``, and the key proves only that the referenced row exists.
-    An ``external_subject`` of ``svc:release-bot`` produced a true sign-off.
+    The recorded fact, and the name says only what is recorded. Two earlier names
+    for this number were both wrong, each in a way worth keeping visible:
 
-    So this counts, and nothing here calls the count a signature. Distinct users
-    rather than rows, because the write contract's quorum is two *operators* and
-    one operator deciding twice is one operator.
+    * ``operator_sign_off``, returning true from exactly this condition on the
+      reasoning that ``accepted_by_user_id`` is a foreign key to ``users`` and so
+      "the system cannot sign its own acceptance". **Codex measured that and it is
+      false**: ``users`` does not distinguish a person from a service, a Principal
+      is built from any ``external_subject``, and the key proves only that the
+      referenced row exists. A subject of ``svc:release-bot`` produced a true
+      sign-off;
+    * ``confirmed_operator_count``, which fixed the boolean but kept the word
+      "operator" over a number a service account can raise. The coordinator
+      reserved ``confirmedOperatorCount`` for human-attested operators (``#282``)
+      and this count took a name that claims nothing.
+
+    Distinct ids rather than rows, because the unique constraint is on (release,
+    criterion) and counting rows would let one account reach a quorum by itself.
     """
 
     return len({
@@ -695,11 +707,13 @@ def _acceptance_payload(record: AcceptanceRecord, manifest: ReleaseManifest) -> 
 
 
 def _manifest_payload(manifest: ReleaseManifest, acceptances: list[AcceptanceRecord]) -> dict:
-    """The recorded release. ``operatorSignOff`` is the literal ``False``.
+    """The recorded release. ``operatorSignOff`` and ``confirmedOperatorCount`` are literals.
 
-    Not a computation that currently evaluates false -- the literal. There is no
-    input to this function that can change it, which is the point: a reader of
-    the code should not have to work out whether some row could flip it.
+    Not computations that currently evaluate to false and zero -- the literals.
+    There is no input to this function that can change either, which is the
+    point: a reader of the code should not have to work out whether some row
+    could flip them. The number that does move with the rows is
+    ``matchingAcceptedUserCount``, and its name says what it counts.
     """
 
     return {
@@ -712,7 +726,8 @@ def _manifest_payload(manifest: ReleaseManifest, acceptances: list[AcceptanceRec
         "operatorSignOff": False,
         "operatorSignOffBlockedBy": OPERATOR_SIGN_OFF_BLOCKED_BY,
         "requiredDistinctOperatorCount": REQUIRED_DISTINCT_OPERATOR_COUNT,
-        "confirmedOperatorCount": confirmed_operator_count(manifest, acceptances),
+        "confirmedOperatorCount": CONFIRMED_OPERATOR_COUNT,
+        "matchingAcceptedUserCount": matching_accepted_user_count(manifest, acceptances),
         "acceptanceCount": len(acceptances),
     }
 

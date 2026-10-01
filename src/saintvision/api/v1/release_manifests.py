@@ -12,11 +12,16 @@ the contract. The first version computed it from the acceptance rows and read an
 ``accepted`` row with a matching hash as a sign-off, on the reasoning that
 ``accepted_by_user_id`` is a foreign key to ``users``. Codex measured that and it
 is wrong: ``users`` does not distinguish a person from a service, so a principal
-whose subject was ``svc:release-bot`` made the field read true. The field is now
-pinned false with ``operatorSignOffBlockedBy`` naming why, and the recorded fact
-travels as ``confirmedOperatorCount`` against
-``requiredDistinctOperatorCount`` -- the names the write contract (``#282``,
-card 184) uses, where two distinct operators are the quorum.
+whose subject was ``svc:release-bot`` made the field read true.
+
+The field is pinned false, ``operatorSignOffBlockedBy`` names why, and the two
+counts beside it are deliberately different claims (coordinator's decision,
+2026-10-01): ``confirmedOperatorCount`` means distinct operators whose decision is
+attested to a person as ``#282`` (card 184) defines attestation, and is
+``Literal[0]`` here because nothing implements that attestation yet;
+``matchingAcceptedUserCount`` is the raw recorded count of distinct users with a
+matching ``accepted`` row, which a service account can raise.
+``requiredDistinctOperatorCount`` is the quorum, so the response reads "0 of 2".
 
 **Read only, deliberately.** Creating a signature or an acceptance is a security
 boundary: ``acceptance_records.accepted_by_user_id`` is a foreign key to
@@ -139,10 +144,11 @@ async def read_release_manifest(
 ) -> schemas.ReleaseManifestDetailResponse:
     """One release, its pinned components, and every acceptance decision on it.
 
-    ``operatorSignOff`` is false here by contract, not by computation: nothing in
-    the request or the rows can make it true, because this surface cannot tell a
-    person's decision from a service account's. ``confirmedOperatorCount`` is the
-    recorded fact instead.
+    ``operatorSignOff`` is false here by contract, not by computation, and
+    ``confirmedOperatorCount`` is zero the same way: nothing in the request or the
+    rows can change either, because this surface cannot tell a person's decision
+    from a service account's. ``matchingAcceptedUserCount`` is the recorded fact
+    instead, and its name claims only what it counts.
 
     The accepting person is not in the response: ``RunRecordResponse`` set the
     rule that a read surface reports identifiers and digests rather than people,
