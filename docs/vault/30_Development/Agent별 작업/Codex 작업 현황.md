@@ -1,15 +1,26 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.234"
+version: "1.0.235"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T09:40:00+09:00"
+updated: "2026-10-01T10:40:20+09:00"
 source_of_truth: "Git"
-active_card: "CARD-151 intranet ObjectStore and PITR rehearsal"
-active_card_status: "PR 248 review follow-up; Claude F1-F12 remediated, TLS operational U6 PASS, G-22 replication HBA blocked external"
-active_card_next: "Claude re-review; continue Card 154 independent review and canonical preflight when corrected inputs land"
+active_card: "CARD-166 S04 kernel cancel shard bridge evidence"
+active_card_status: "PG-free 21 passed; shard parent/member real-PG fixture and authority negatives implemented; hosted Core pending"
+active_card_next: "push PR, add run-core, verify exact-head Core JUnit and request Claude review"
 ---
+
+## 2026-10-01 Card 166 — shard parent/member cancel bridge 후속
+
+- train 4d `73fa1274` 위에서 #257의 NOT_RUN 시험 7을 구현했다. kernel에서 먼저
+  취소된 mapped member는 audit 0, 같은 요청이 실제 전이한 다른 member와 parent는
+  audit 각 1건이어야 하며 replay는 건수를 늘리지 않는다.
+- `viewer`, archived project, disabled business project 직접 함수 호출은 `42501`로
+  거부하고 public draft·audit 0을 유지한다. H1 guard는 네 PostgreSQL row-lock
+  clause를 모두 잡는 정규식으로 넓혔다.
+- PG-free 21 passed. 제품·계약·migration 변경은 0이며 real-PG는 exact-head
+  `run-core` JUnit 전까지 `NOT_RUN`이다.
 
 ## 2026-09-30 Card151 Claude F1-F12 보안·측정 경계 후속
 - PR #248에서 root·service·PITR 자격을 host argv와 Docker `Config.Env`에서 제거하고 단일 보호 파일 mount로 고정했다. PITR policy의 delete 권한을 제거하고 bucket versioning을 활성화했다.

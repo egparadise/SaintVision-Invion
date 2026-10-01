@@ -14,11 +14,13 @@ from psycopg import sql
 import pytest
 
 from inv.ids import new_id
+from inv.shards import ShardRuntime
 from test_approvals import approval
 from test_business_handoff import business
 from test_node_delivery import remote
 from test_node_runtime import node_runtime
 from test_snapshots import storage
+from test_shards import admissions
 from test_workspace_api import workspace_http
 
 
@@ -85,6 +87,52 @@ def _direct_call(a, *, subject="requester", project=None, run_id=None, event_id=
         ).fetchone()[0]
 
 
+def _map_business_runs(a, run_ids):
+    with psycopg.connect(a.e.owner) as conn:
+        for run_id in run_ids:
+            conn.execute(
+                """INSERT INTO public.runs
+                     (tenant_id,run_id,workspace_id,workload_id,requested_by_user_id)
+                   VALUES(%s,%s,%s,%s,%s)""",
+                (
+                    a.e.tenant,
+                    run_id,
+                    a.workspace_id,
+                    a.workload_id,
+                    a.users["requester"],
+                ),
+            )
+            conn.execute(
+                """INSERT INTO inv.business_runs
+                     (tenant_id,project_id,run_id,workspace_id)
+                   VALUES(%s,%s,%s,%s)""",
+                (a.e.tenant, a.e.project, run_id, a.workspace_id),
+            )
+
+
+def _shard_cancel_facts(a, run_ids):
+    with psycopg.connect(a.e.owner) as conn:
+        kernel = conn.execute(
+            """SELECT run_id,state FROM inv.runs
+                WHERE tenant_id=%s AND run_id=ANY(%s) ORDER BY run_id""",
+            (a.e.tenant, run_ids),
+        ).fetchall()
+        public = conn.execute(
+            """SELECT run_id,state,termination_reason FROM public.runs
+                WHERE tenant_id=%s AND run_id=ANY(%s) ORDER BY run_id""",
+            (a.e.tenant, run_ids),
+        ).fetchall()
+        audit = conn.execute(
+            """SELECT target_id,actor_id,trace_id,detail
+                FROM public.audit_events
+                WHERE tenant_id=%s AND target_id=ANY(%s)
+                  AND action='run.cancel.requested'
+                ORDER BY target_id""",
+            (a.e.tenant, run_ids),
+        ).fetchall()
+    return kernel, public, audit
+
+
 def test_http_cancel_commits_kernel_public_and_exact_audit_once(business):
     a = business
     response = a.http.post(
@@ -129,6 +177,76 @@ def test_kernel_pre_cancel_is_not_relabelled_as_a_user_business_cancel(business)
     assert kernel[0] == "cancelled"
     assert public[0] == "draft"
     assert audit == []
+
+
+def test_shard_parent_cancel_audits_only_member_and_parent_transitions(business):
+    a = business
+    shard_admissions = admissions(a)
+    runtime = ShardRuntime(a.e.db, a.profile)
+    queued = runtime.enqueue(
+        a.e.tenant,
+        a.e.project,
+        "cancel-bridge-parent-members",
+        shard_admissions,
+        signing_key=a.key,
+        splittable=True,
+    )
+    parent_id = queued["parentRunId"]
+    member_ids = sorted(item.command["runId"] for item in shard_admissions)
+    run_ids = [parent_id, *member_ids]
+    _map_business_runs(a, run_ids)
+
+    pre_cancelled = a.e.runs.get(a.e.tenant, member_ids[0])
+    a.e.runs.transition(
+        a.e.tenant,
+        member_ids[0],
+        "cancelled",
+        expected_version=pre_cancelled["version"],
+    )
+    with psycopg.connect(a.e.owner) as conn:
+        parent_version = conn.execute(
+            "SELECT version FROM inv.runs WHERE tenant_id=%s AND run_id=%s",
+            (a.e.tenant, parent_id),
+        ).fetchone()[0]
+
+    url = f"/v1/projects/{a.e.project}/runs/{parent_id}/cancel"
+    response = a.http.post(
+        url,
+        json={"expectedVersion": parent_version},
+        headers=a.headers(key="cancel-bridge-shard-parent"),
+    )
+    assert response.status_code == 200, response.text
+    assert response.json()["state"] == "cancelled"
+    assert response.json()["version"] == parent_version + 1
+
+    kernel, public, audit = _shard_cancel_facts(a, run_ids)
+    assert {row[0]: row[1] for row in kernel} == {
+        run_id: "cancelled" for run_id in run_ids
+    }
+    assert {row[0]: row[1:] for row in public} == {
+        pre_cancelled["runId"]: ("draft", None),
+        member_ids[1]: ("cancelled", "cancelled_by_user"),
+        parent_id: ("cancelled", "cancelled_by_user"),
+    }
+    trace_id = response.headers["traceparent"].split("-")[1]
+    assert audit == [
+        (
+            run_id,
+            a.users["requester"],
+            trace_id,
+            {"reason": "cancelled_by_user"},
+        )
+        for run_id in sorted((member_ids[1], parent_id))
+    ]
+
+    replay = a.http.post(
+        url,
+        json={"expectedVersion": parent_version},
+        headers=a.headers(key="cancel-bridge-shard-parent"),
+    )
+    assert replay.status_code == 200, replay.text
+    assert replay.json() == response.json()
+    assert _shard_cancel_facts(a, run_ids)[2] == audit
 
 
 def test_public_run_lock_timeout_rolls_back_every_kernel_write_and_same_key_retries(business):
@@ -297,7 +415,17 @@ def test_business_authority_is_rederived_and_failure_rolls_back_kernel_state(bus
     assert _facts(a)[1][0] == "draft" and _facts(a)[2] == []
 
 
-@pytest.mark.parametrize("authority_change", ["subject-disabled", "user-suspended", "approver"])
+@pytest.mark.parametrize(
+    "authority_change",
+    [
+        "subject-disabled",
+        "user-suspended",
+        "approver",
+        "viewer",
+        "project-archived",
+        "business-project-disabled",
+    ],
+)
 def test_direct_function_rejects_stale_or_non_requesting_business_authority(
     business, authority_change
 ):
@@ -315,11 +443,23 @@ def test_direct_function_rejects_stale_or_non_requesting_business_authority(
                 "UPDATE public.users SET status='suspended' WHERE tenant_id=%s AND user_id=%s",
                 (a.e.tenant, a.users["requester"]),
             )
+        elif authority_change in {"approver", "viewer"}:
+            conn.execute(
+                "UPDATE public.project_members SET role_code=%s "
+                "WHERE tenant_id=%s AND project_id=%s AND user_id=%s",
+                (authority_change, a.e.tenant, a.e.project, a.users["requester"]),
+            )
+        elif authority_change == "project-archived":
+            conn.execute(
+                "UPDATE public.projects SET status='archived' "
+                "WHERE tenant_id=%s AND project_id=%s",
+                (a.e.tenant, a.e.project),
+            )
         else:
             conn.execute(
-                "UPDATE public.project_members SET role_code='approver' "
-                "WHERE tenant_id=%s AND project_id=%s AND user_id=%s",
-                (a.e.tenant, a.e.project, a.users["requester"]),
+                "UPDATE inv.business_projects SET enabled=false "
+                "WHERE tenant_id=%s AND project_id=%s",
+                (a.e.tenant, a.e.project),
             )
     with pytest.raises(psycopg.Error) as denied:
         _direct_call(a)

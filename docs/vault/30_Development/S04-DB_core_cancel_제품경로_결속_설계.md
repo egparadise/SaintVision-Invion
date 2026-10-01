@@ -1,11 +1,11 @@
 ---
 doc_id: "DESIGN-S04-DB-CORE-CANCEL-PRODUCT-BRIDGE-001"
 title: "S04-DB core cancel 제품 경로 결속 설계"
-version: "1.2.1"
+version: "1.2.2"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-01T09:15:24+09:00"
+updated: "2026-10-01T10:40:20+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "c9c1d836ff8fcd606b5bca3862c6cd764eadf4fd"
@@ -194,9 +194,11 @@ lock은 없다. bridge 실패 뒤 idempotency 응답을 저장하지 않는다.
    상태/outbox/resource/idempotency와 public 상태가 모두 rollback.
 6. mapping 없는 kernel run: 기존 동작과 응답이 동일하고 public audit 0.
 7. shard parent와 mapping된 member fixture: mapping된 각 run만 exact audit 1,
-   전체 shard rollback 원자성 유지. 현재 증거는 PG-free 호출부·변이 guard뿐이며
-   real-PG fixture는 **NOT_RUN**이다. owner Codex가 후속 카드에서 닫기 전에는 hosted
-   bridge 17건의 범위나 운영 판정에 포함하지 않는다.
+   전체 shard rollback 원자성을 유지. CARD-166은 한 parent 취소 요청 안에서 이미
+   kernel-cancelled 된 mapped member는 public draft·audit 0으로 남기고, 실제 전이한
+   다른 member와 parent만 `cancelled_by_user`·audit 각 1건으로 결속하는 real-PG
+   fixture를 추가했다. 구현은 완료됐지만 hosted Core JUnit 전에는 **NOT_RUN**이며,
+   실행 결과는 PR의 exact-head evidence에서만 판정한다.
 8. 다른 transaction이 public run lock을 보유하면 `RES-0007/503/retryable=true`,
    kernel/outbox/resource/ledger/public/audit 모두 미저장이고 같은 key 재시도는 성공해
    audit가 정확히 1이다.
@@ -268,3 +270,20 @@ Claude의 2026-09-30 조건부 승인(M1~M4, L1~L5, R5~R8)을 이 v1.1에 반영
   각각 **5629 passed / 50 skipped / 2 deselected**였다. 이 수치는 운영 배포 관측이
   아니라 제품 tree와 실 PostgreSQL 경계의 구현 검증이다. 이 17건에는 shard
   parent/member real-PG fixture가 없으며, 시험 7은 위의 **NOT_RUN** 후속 상태다.
+
+## 10. CARD-166 시험 7 후속(v1.2.2)
+
+- shard parent route 한 요청이 parent와 member를 같은 transaction에서 취소하는 실제
+  경로를 `tests/integration/test_kernel_cancel_bridge_real_pg.py`에 고정했다. 먼저
+  member 하나를 kernel에서 취소한 뒤 요청하므로, bridge가 단순히 최종 state만 보고
+  호출되는 변이는 그 member의 public state·audit 단언에서 실패한다. 같은 key replay도
+  audit 건수를 늘릴 수 없다.
+- 직접 함수 부정군은 `viewer`, archived public project, disabled
+  `inv.business_projects`를 추가했다. 세 경우 모두 kernel state가 cancelled여도 현재
+  business authority를 재도출하지 못하므로 `42501`, public draft, audit 0이어야 한다.
+- H1 PG-free guard는 특정 `FOR SHARE` 문자열 하나가 아니라
+  `FOR (KEY SHARE|SHARE|NO KEY UPDATE|UPDATE)` 전체를 정규식으로 잡는다. public run의
+  의도된 최종 `FOR UPDATE OF r`은 허용하고, 그 전에 kernel·mapping·authority 행을
+  다시 잠그는 변형만 거부한다.
+- 로컬 PG-free 단일 파일은 21 passed다. real-PG 판정은 `run-core` exact-head JUnit
+  전까지 `NOT_RUN`이며, 공개 계약·migration·제품 코드는 변경하지 않았다.

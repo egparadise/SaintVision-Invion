@@ -6,6 +6,7 @@ import hashlib
 import importlib.util
 import json
 from pathlib import Path
+import re
 import subprocess
 from types import SimpleNamespace
 
@@ -18,6 +19,10 @@ from inv.errors import DomainError
 ROOT = Path(__file__).resolve().parents[2]
 MIGRATION = ROOT / "migrations/versions/0056_kernel_cancel_audit_bridge.py"
 REAL_PG = ROOT / "tests/integration/test_kernel_cancel_bridge_real_pg.py"
+ROW_LOCK = re.compile(
+    r"\bFOR\s+(?:KEY\s+SHARE|SHARE|NO\s+KEY\s+UPDATE|UPDATE)\b",
+    re.IGNORECASE,
+)
 
 
 class Result:
@@ -67,6 +72,7 @@ def test_real_pg_suite_registers_the_standalone_business_fixture_chain():
         "from test_node_delivery import remote",
         "from test_node_runtime import node_runtime",
         "from test_snapshots import storage",
+        "from test_shards import admissions",
         "from test_workspace_api import workspace_http",
     ):
         assert fixture_import in source
@@ -220,8 +226,8 @@ def test_definer_does_not_relock_caller_locked_or_immutable_kernel_rows():
     mapping_check = body.split("SELECT br.workspace_id", 1)[1].split(
         "IF v_workspace_id", 1
     )[0]
-    assert "FOR SHARE" not in kernel_check
-    assert "FOR SHARE" not in mapping_check
+    assert ROW_LOCK.search(kernel_check) is None
+    assert ROW_LOCK.search(mapping_check) is None
 
 
 def test_definer_reuses_control_grant_authority_locks_without_extra_row_locks():
@@ -230,8 +236,12 @@ def test_definer_reuses_control_grant_authority_locks_without_extra_row_locks():
     authority_check = body.split("SELECT s.user_id", 1)[1].split(
         "IF v_user_id", 1
     )[0]
-    assert "FOR SHARE" not in authority_check
-    assert "FOR SHARE OF bp, s, p, u, pm" not in body
+    assert ROW_LOCK.search(authority_check) is None
+
+
+@pytest.mark.parametrize("clause", ["KEY SHARE", "SHARE", "NO KEY UPDATE", "UPDATE"])
+def test_duplicate_row_lock_guard_covers_every_postgresql_lock_strength(clause):
+    assert ROW_LOCK.search(f"SELECT identity FROM authority FOR {clause}") is not None
 
 
 def test_definer_rejects_reused_audit_event_identifiers():
