@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.258"
+version: "1.0.264"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T06:23:06+09:00"
+updated: "2026-10-02T07:35:00+09:00"
 source_of_truth: "Git"
 active_card: "CARD-205 AC-11 accessibility user-device manual acceptance importer"
-active_card_status: "Claude r2 conditions fixed: Python 3.10 procedure, user/agent split, CLI trust boundary, placeholder and time-bound mutations; exact-head CI pending"
-active_card_next: "Push PR, request Claude independent review, and hand the exact manifest replacement row to #299/#300 owners"
+active_card_status: "Merged train 15 candidate containing #299; binding the accessibility importer into the canonical AC-11 manifest"
+active_card_next: "Flip the canonical row to complete, add assembler-to-aggregator consumption regression, then run exact-head CI"
 ---
 
 ## 2026-10-02 Card 205 — AC-11 사용자 기기 접근성 수동 인수 importer
@@ -31,6 +31,58 @@ active_card_next: "Push PR, request Claude independent review, and hand the exac
 - PG-free focused **178 passed**. Windows-safe downloader는 실제 GitHub artifact에서 no-BOM JSON과
   정상 ZIP을 확인했다. `py_compile`·CLI help·`check_docs`·citation ratchet(새 결함 0)·
   contract bindings는 모두 exit 0이다.
+
+## 2026-10-02 Card 207 — OCI digest·live buildkitd PID 결속
+
+- train 14 후보 `d0b2a4c6` 위에서 #297의 이연 항목 M6/M7만 구현했다. OCI tar 내부
+  manifest/config/layer blob의 SHA-256·size를 재계산하고 metadata digest와 exact 대조한다.
+- health receipt의 PID는 실제 `buildkitd`여야 하고 왕복 전·후 PID/start ticks·UID·rootless
+  경계가 같아야 한다. rootlesskit PID 또는 재시작된 daemon은 evidence를 만들 수 없다.
+- 기본 flag off, 제품 caller 미도달, S08-BE 완료 비주장 경계는 그대로다. focused **72 passed**.
+  hosted run `36928934670`은 OCI blob 3개를 재검산하고 live `buildkitd` PID 32/start ticks
+  28815를 왕복 전·후 대조해 `MEASURED_PASS`였다. LAN 운영 인수는 `BLOCKED_EXTERNAL`이다.
+- exact-head run `36929190888`도 같은 실제 왕복 gate를 통과했다. archive 독립 변조와 process-mode
+  identity 공백을 보강해 focused **78 passed**이며, liveness는 아직 evidence 도구 조건이지 제품 조건은 아니다.
+- [[2026-10-02_05-55-05_KST_S08-BE_OCI_digest_buildkitd_PID_결속_Codex]].
+
+## 2026-10-01 Card 194 — S12 acceptance target·Evidence resolver 구현
+
+- coordinator 정정에 따라 #286 head `faba659d`를 merge commit `e19aff84`로 적층한 뒤, 최신
+  #286 head `795db3c2`도 merge commit `fe066c06`으로 따라갔고,
+  `0058_release_acceptance_resolver`의 부모를 반드시 `0057_release_acceptance_quorum`으로 고정했다.
+  `tools/migration_graph.py --head`는 단일 head `0058_release_acceptance_resolver`를 보고한다.
+- Evidence 전체 stored field의 PostgreSQL 16 canonical digest, caller digest overwrite, release별 target registry pin,
+  append-only tenant RLS binding, Evidence→Run→Workload project 재도출을 migration과 모델에 결속했다.
+- server-owned exact resolver와 내부 binder, fresh human + live `releases.accept`를 다시 확인하는 read-only discovery GET을 구현했다.
+  caller project·telemetry·actor는 응답에 없고 404/409/503 경계를 redacted ProblemDetails로 고정했다.
+- `INV_RELEASE_ACCEPTANCE_WRITE_ENABLED` 기본값과 `AUTHORITATIVE_REFS_BOUND`는 의도적으로 false다. 기존 sign-off
+  projection은 실제 ref 재해석 결과를 받지 않으므로 상수만 true로 바꾸면 허위 합격이 된다.
+- PG-free focused **31 passed**, schema export **97/97**, contract bindings, docs, ontology는 exit 0이다.
+  로컬은 지원 Python 3.12/3.14 test env와 `INV_TEST_ADMIN_DSN`이 없어 real-PG를 실행하지 않았으며, hosted Core
+  실행 전에는 migration·trigger·RLS 결과를 `NOT_OBSERVED`로 유지한다.
+- 첫 hosted Core run `36879319911`은 0058 뒤에도 definer policy revision이 0057이어서 migration upgrade
+  gate가 fail closed했다. function allowlist는 유지하고 revision을 0058로 동기화했으며 재실행 대기 중이다.
+- Claude r1의 3개 결함과 Low 회귀를 `e0505648`·`be1bb8d7`에서 닫았고 r2는 코드·시험을 조건부
+  승인했다. 이후 기존 resume probe의 head/pin·공유 DB 오염을 `93a42a26`·`09fd39a3`에서 교정했다.
+- #286 최신 `37db674f`는 merge `f2b589d1`으로 따라갔다. 0057 manifest·policy pin trigger와 0058
+  target-registry pin trigger는 독립이며 API 충돌은 resolver와 denial audit를 모두 보존했다.
+- `596def53` Backend 3.12는 7018 passed·51 skipped 뒤 결합 시험 2건이 실패했다. 승인된 #286의
+  커밋형 409 감사 예외를 기존 전역 금지 시험이 몰랐고, 0054 downgrade 시험이 현재 0058 head 대신
+  과거 revision을 전제했다. `ed46b2b9`에서 예외를 정확히 1곳으로 고정하고 downgrade 실패 뒤 현재
+  head 보존을 단언했다. 최종 exact-head green 전에는 hosted real-PG를 `NOT_OBSERVED`로 유지한다.
+- 근거: [[S12-BE_release_acceptance_target_Evidence_resolver_설계]],
+  [[2026-10-01_23-43-41_KST_Card194_S12-BE_target_Evidence_resolver_구현_Codex]].
+
+## 2026-10-02 Card 200 — S08-BE concrete rootless BuildKit transport Stage 1
+
+- base `25f43a25` 위에서 disabled-by-default concrete transport, strict health/worker 측정,
+  fail-closed product methods, opt-in hosted lane을 구현했다.
+- hosted run `36912381153`은 exact code `c4130ae4`, BuildKit v0.20.2·RootlessKit v2.3.4에서
+  OCI reference 왕복 1/1을 통과했다. 실제 daemon PID/UID/userns와 Docker privilege 경계,
+  pulled image digest를 측정·대조했다.
+- 결과는 `ci-reference`이며 제품 caller·cleanup·lease release·Evidence persistence는 미결속,
+  LAN builder는 `BLOCKED_EXTERNAL`, S08-BE 상태·점수는 유지한다.
+- [[2026-10-02_04-12-15_KST_S08-BE_rootless_BuildKit_transport_Codex]] · PR #297.
 
 ## 2026-10-01 Card 190 — S12 수락 target·Evidence 정본 resolver 계약
 

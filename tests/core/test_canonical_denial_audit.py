@@ -204,15 +204,23 @@ def test_is_audited_denial_is_the_category_and_status_rule():
 
 
 def test_no_route_records_a_denial_itself():
-    """The boundary is the only recorder: no route module touches the audit
-    writer for a refusal (a route is inside the transaction the refusal rolls
-    back, and per-route recording drifts)."""
+    """Routes never write denial rows outside their business transaction.
+
+    Ordinary AUTH/SEC refusals reach the canonical boundary.  The committed
+    release-acceptance GRAPH refusal is instead recorded by the service in the
+    same transaction that closes its proposal.  Neither case permits a route
+    module to call the out-of-band recorder directly.
+    """
     import pathlib
 
     root = pathlib.Path(run_records.__file__).parent
+    direct_recorders = []
     for path in root.glob("*.py"):
         source = path.read_text(encoding="utf-8")
-        assert "record_denial_out_of_band" not in source, path.name
+        if "record_denial_out_of_band" in source:
+            direct_recorders.append(path)
+
+    assert direct_recorders == []
 
 
 # ---------------------------------------------------------------- action regression on the real routes

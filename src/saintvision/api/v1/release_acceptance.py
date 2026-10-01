@@ -42,6 +42,7 @@ from ...errors import (
 )
 from ...identity.principal import Principal
 from ...services import release_acceptance as service
+from ...services import release_acceptance_resolver as resolver_service
 from .. import schemas
 from ..deps import (
     get_now,
@@ -58,6 +59,7 @@ from ..problem import (
     GRAPH_PRECONDITION,
     GRAPH_STATE_DRIFT,
     RES_NOT_FOUND,
+    RES_RETRYABLE,
     SYS_PREREQUISITES_UNAVAILABLE,
     VAL_REQUEST,
     CanonicalProblem,
@@ -73,6 +75,7 @@ DECISIONS_PATH = "/release-manifests/{release_id}/acceptance-decisions"
 PROPOSAL_PATH = "/release-manifests/{release_id}/acceptance-decisions/{proposal_id}"
 CONFIRM_PATH = "/release-manifests/{release_id}/acceptance-decisions/{proposal_id}/confirm"
 WITHDRAWAL_PATH = "/release-manifests/{release_id}/acceptances/{acceptance_id}/withdrawals"
+EVIDENCE_DISCOVERY_PATH = "/release-manifests/{release_id}/acceptance-evidence"
 
 #: The sentence every refused request gets, whichever prerequisite is absent.
 PREREQUISITES_DETAIL = "Release acceptance prerequisites are unavailable."
@@ -141,6 +144,38 @@ def _conflict() -> CanonicalProblem:
     )
 
 
+def _reference_problem(error: Exception) -> CanonicalProblem:
+    """Closed, redacted resolver failures; no identifier or digest is reflected."""
+
+    if isinstance(error, service.PrerequisitesUnavailable):
+        return CanonicalProblem(
+            SYS_PREREQUISITES_UNAVAILABLE,
+            503,
+            PREREQUISITES_DETAIL,
+            retryable=False,
+        )
+    if isinstance(error, service.ReferenceNotFound):
+        return CanonicalProblem(
+            RES_NOT_FOUND,
+            404,
+            "No such release acceptance evidence.",
+            retryable=False,
+        )
+    if isinstance(error, service.ReferenceRetryable):
+        return CanonicalProblem(
+            RES_RETRYABLE,
+            503,
+            "Release acceptance resolution is temporarily unavailable; retry.",
+            retryable=True,
+        )
+    return CanonicalProblem(
+        GRAPH_STATE_DRIFT,
+        409,
+        "The release acceptance reference changed before it was resolved.",
+        retryable=False,
+    )
+
+
 def _refusal(refused: service.Refused, *, trace_id: str) -> JSONResponse:
     """A refusal returned as a **response**, so the transaction that recorded it commits.
 
@@ -159,6 +194,61 @@ def _refusal(refused: service.Refused, *, trace_id: str) -> JSONResponse:
         CanonicalProblem(refused.code, refused.status, refused.detail, retryable=False)
     )
     return canonical_response(problem, trace_id=trace_id)
+
+
+# ------------------------------------------------------------------- evidence discovery
+
+
+@router.get(
+    "/release-manifests/{release_id}/acceptance-evidence",
+    response_model=schemas.ReleaseAcceptanceEvidenceDiscoveryPageResponse,
+    response_model_by_alias=True,
+)
+async def discover_acceptance_evidence(
+    request: Request,
+    release_id: str,
+    acceptance_id_ref: str = Query(alias="acceptanceIdRef"),
+    limit: int = Query(default=100, ge=1, le=resolver_service.DISCOVERY_PAGE_MAX),
+    cursor: str | None = Query(default=None, min_length=1, max_length=256),
+    principal: Principal = Depends(get_principal),
+    session: Session = Depends(get_session),
+    now: dt.datetime = Depends(get_now),
+) -> schemas.ReleaseAcceptanceEvidenceDiscoveryPageResponse:
+    """List only server-bound Evidence identities for one release criterion.
+
+    This read surface does not enable decision writes. It requires the same fresh
+    interactive human and live ``releases.accept`` grant on every page, and exposes no
+    project, actor, telemetry, or caller-selected scope.
+    """
+
+    # Parse the Git prerequisite before any release lookup. The principal dependency has
+    # already authenticated the caller, but an invalid deployment is one fixed 503 and
+    # never an existence oracle.
+    try:
+        resolver_service.load_target_registry()
+    except service.PrerequisitesUnavailable as error:
+        raise _reference_problem(error) from None
+    require_absent_body(await read_bounded_body(request))
+    try:
+        service.require_fresh_operator(session, principal=principal, now=now)
+        return resolver_service.discovery_page(
+            session,
+            tenant_id=principal.tenant_id,
+            release_id=release_id,
+            acceptance_id_ref=acceptance_id_ref,
+            limit=limit,
+            cursor=cursor,
+        )
+    except (
+        service.PrerequisitesUnavailable,
+        service.ReferenceNotFound,
+        service.ReferenceRetryable,
+    ) as error:
+        raise _reference_problem(error) from None
+    except service.ReferencesUnresolvable as error:
+        raise _reference_problem(error) from None
+    except InvError as error:
+        raise _audited(translate(error, table=TRANSLATION, detail="Not permitted.")) from None
 
 
 # --------------------------------------------------------------------------- decisions
@@ -233,8 +323,13 @@ async def decide(
             resolver=service.active_resolver(),
             now=now,
         )
-    except service.ReferencesUnresolvable:
-        raise _conflict() from None
+    except (
+        service.PrerequisitesUnavailable,
+        service.ReferenceNotFound,
+        service.ReferenceRetryable,
+        service.ReferencesUnresolvable,
+    ) as error:
+        raise _reference_problem(error) from None
     except InvError as error:
         raise _audited(
             translate(error, table=TRANSLATION, detail="The decision was not recorded.")
@@ -410,6 +505,13 @@ async def confirm(
             resolver=service.active_resolver(),
             now=now,
         )
+    except (
+        service.PrerequisitesUnavailable,
+        service.ReferenceNotFound,
+        service.ReferenceRetryable,
+        service.ReferencesUnresolvable,
+    ) as error:
+        raise _reference_problem(error) from None
     except InvError as error:
         raise _audited(
             translate(error, table=TRANSLATION, detail="The proposal was not confirmed.")
@@ -548,6 +650,7 @@ __all__ = [
     "PROPOSAL_PATH",
     "CONFIRM_PATH",
     "WITHDRAWAL_PATH",
+    "EVIDENCE_DISCOVERY_PATH",
     "PREREQUISITES_DETAIL",
     "TRANSLATION",
 ]
