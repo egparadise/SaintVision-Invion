@@ -18,6 +18,7 @@ export interface InvFileExplorerProps {
     fileUri: string,
     targetNodeId: string
   ) => Promise<{ success: boolean; repairedReplicas: InvReplicaLocation[]; message?: string }>;
+  initialRepairError?: string;
 }
 
 import { calculateSha256 } from '@/shared/utils/crypto';
@@ -31,6 +32,7 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
   initialNamespace = 'models',
   initialFiles = [],
   clusterNodes = [],
+  initialRepairError,
   onOpenFile,
   onVerifyIntegrity,
   onRepairReplicas,
@@ -182,7 +184,7 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
   }>({
     isRepairing: false,
     repairMessage: null,
-    repairError: null,
+    repairError: initialRepairError || null,
   });
 
   const formatBytes = (bytes: number | null | undefined) => {

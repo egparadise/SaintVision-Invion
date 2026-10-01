@@ -1390,6 +1390,30 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(getContrast(lightTokens[errBannerBorderVar], lightTokens[errBannerBgVar]), 'Error banner light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
       expect(getContrast(darkTokens[errBannerBorderVar], darkTokens[errBannerBgVar]), 'Error banner dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
 
+      // 1.i) ResourceExplorer discovery success message
+      await act(async () => {
+        root.render(
+          <ResourceExplorer
+            key="discovery-tab"
+            nodes={testNodes}
+            initialTab="discovery"
+            initialDiscoveryMessage="노드 검색이 정상적으로 완료되었습니다."
+          />
+        );
+      });
+      const discoveryMsg = container.querySelector('[data-testid="discovery-action-success"]') as HTMLElement;
+      expect(discoveryMsg, 'Discovery action success message must render').not.toBeNull();
+      expect(discoveryMsg.style.backgroundColor, 'Discovery success bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(discoveryMsg.style.color, 'Discovery success text must bind to var(--color-brand-primary)').toBe('var(--color-brand-primary)');
+      expect(discoveryMsg.style.borderColor, 'Discovery success border must bind to var(--color-brand-primary)').toBe('var(--color-brand-primary)');
+      const discBgVar = helperExtractVar(discoveryMsg.style.backgroundColor);
+      const discFgVar = helperExtractVar(discoveryMsg.style.color);
+      const discBorderVar = helperExtractVar(discoveryMsg.style.borderColor);
+      expect(getContrast(lightTokens[discFgVar], lightTokens[discBgVar]), 'Discovery success light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[discFgVar], darkTokens[discBgVar]), 'Discovery success dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[discBorderVar], lightTokens[discBgVar]), 'Discovery success light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[discBorderVar], darkTokens[discBgVar]), 'Discovery success dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
       // 2) Render InvFileExplorer
       const locationsSpy = vi.spyOn(fabricObservation, 'locations').mockResolvedValue({ items: [], nextCursor: null });
       await act(async () => {
@@ -1399,6 +1423,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
             initialFiles={testFiles}
             initialNamespace="models"
             initialUri="inv://models"
+            initialRepairError="복구 실패: 생존 노드 부재"
           />
         );
       });
@@ -1519,6 +1544,20 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(getContrast(darkTokens[repairFgVar], darkTokens[repairBgVar]), 'Disabled repair btn dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
       expect(getContrast(lightTokens[repairBorderVar], lightTokens[repairBgVar]), 'Disabled repair btn light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
       expect(getContrast(darkTokens[repairBorderVar], darkTokens[repairBgVar]), 'Disabled repair btn dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 2.i) Repair error banner (InvFileExplorer)
+      const repairErr = container.querySelector('[data-testid="repair-action-error"]') as HTMLElement;
+      expect(repairErr, 'Repair action error must render').not.toBeNull();
+      expect(repairErr.style.backgroundColor, 'Repair error bg must bind to var(--color-bg-surface)').toBe('var(--color-bg-surface)');
+      expect(repairErr.style.color, 'Repair error text must bind to var(--color-status-lost)').toBe('var(--color-status-lost)');
+      expect(repairErr.style.borderColor, 'Repair error border must bind to var(--color-status-lost)').toBe('var(--color-status-lost)');
+      const repErrBgVar = helperExtractVar(repairErr.style.backgroundColor);
+      const repErrFgVar = helperExtractVar(repairErr.style.color);
+      const repErrBorderVar = helperExtractVar(repairErr.style.borderColor);
+      expect(getContrast(lightTokens[repErrFgVar], lightTokens[repErrBgVar]), 'Repair error light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[repErrFgVar], darkTokens[repErrBgVar]), 'Repair error dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[repErrBorderVar], lightTokens[repErrBgVar]), 'Repair error light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[repErrBorderVar], darkTokens[repErrBgVar]), 'Repair error dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
     } finally {
       act(() => {
         root.unmount();
@@ -1657,7 +1696,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(getContrast('#34d399', lightTokens['--color-bg-surface']), 'Defective #34d399 on light surface must fail 4.5:1').toBeLessThan(4.5);
     expect(getContrast('#34d399', lightTokens['--color-bg-subtle']), 'Defective #34d399 on light subtle must fail 4.5:1').toBeLessThan(4.5);
 
-    // Probe 26 [Card 195]: Desktop Explorers former lost/error literal #f87171 on light surface (#ffffff) (3.44:1) strictly fails 4.5:1
+    // Probe 26 [Card 195]: Desktop Explorers former lost/error literal #f87171 on light surface (#ffffff) (2.77:1) strictly fails 4.5:1
     expect(getContrast('#f87171', lightTokens['--color-bg-surface']), 'Defective #f87171 on light surface must fail 4.5:1').toBeLessThan(4.5);
     expect(getContrast('#f87171', lightTokens['--color-bg-subtle']), 'Defective #f87171 on light subtle must fail 4.5:1').toBeLessThan(4.5);
 
@@ -1671,6 +1710,14 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     // Probe 29 [Card 195]: Defective disabled button former text-inverse on border-subtle in light (3.483:1) and dark (3.751:1) strictly fails 4.5:1
     expect(getContrast(lightTokens['--color-text-inverse'], lightTokens['--color-border-subtle']), 'Defective text-inverse on border-subtle in light must fail 4.5:1').toBeLessThan(4.5);
     expect(getContrast(darkTokens['--color-text-inverse'], darkTokens['--color-border-subtle']), 'Defective text-inverse on border-subtle in dark must fail 4.5:1').toBeLessThan(4.5);
+
+    // Probe 30 [Card 195 r2]: Defective discovery-action-success text swapped to bg-subtle (1:1 with container)
+    expect(getContrast(lightTokens['--color-bg-subtle'], lightTokens['--color-bg-subtle']), 'Defective discovery success text on subtle in light fails 4.5:1').toBe(1.0);
+    expect(getContrast(darkTokens['--color-bg-subtle'], darkTokens['--color-bg-subtle']), 'Defective discovery success text on subtle in dark fails 4.5:1').toBe(1.0);
+
+    // Probe 31 [Card 195 r2]: Defective repair-action-error bg swapped to status-lost (1:1 with text/border)
+    expect(getContrast(lightTokens['--color-status-lost'], lightTokens['--color-status-lost']), 'Defective repair error text on lost in light fails 4.5:1').toBe(1.0);
+    expect(getContrast(darkTokens['--color-status-lost'], darkTokens['--color-status-lost']), 'Defective repair error text on lost in dark fails 4.5:1').toBe(1.0);
 
     // Legacy Token Reverts:
     // Legacy Dark --color-border-subtle: #374151

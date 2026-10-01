@@ -52,6 +52,7 @@ export interface ResourceExplorerProps {
   initialNodeDetailError?: string | null;
   initialSampleRequestId?: string;
   initialPlanResult?: DistributedPlanResponse | null;
+  initialDiscoveryMessage?: string;
   lastFetchedAt?: Date | null;
 }
 
@@ -76,6 +77,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   initialNodeDetailError,
   initialSampleRequestId,
   initialPlanResult,
+  initialDiscoveryMessage,
   lastFetchedAt = null,
 }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'storage' | 'pools' | 'nodes' | 'discovery'>(initialTab);
@@ -154,7 +156,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   const [admissionResult, setAdmissionResult] = useState<AdmissionResponse | null>(null);
   const [announcementHostname, setAnnouncementHostname] = useState('Node-07-Candidate');
   const [announcementOs, setAnnouncementOs] = useState<'windows' | 'linux'>('windows');
-  const [discoveryMessage, setDiscoveryMessage] = useState<string | null>(null);
+  const [discoveryMessage, setDiscoveryMessage] = useState<string | null>(initialDiscoveryMessage || null);
 
   // ---------------------------------------------------------------------------
   // Honest Aggregate Logical Pool (Zero-Mock calculation from live nodes)
