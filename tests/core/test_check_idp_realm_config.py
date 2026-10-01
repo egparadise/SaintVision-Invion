@@ -10,7 +10,11 @@ from __future__ import annotations
 
 import copy
 import json
+import os
 from pathlib import Path
+import shutil
+import subprocess
+import sys
 
 import pytest
 
@@ -388,3 +392,141 @@ def test_fresh_auth_only_mode_fails_closed_on_missing_prerequisites():
 
     for prerequisite in ("realm", "client", "client scope"):
         assert f"fresh-auth-only refuses to create missing {prerequisite}" in script
+
+
+def _fake_docker(tmp_path: Path) -> tuple[Path, Path]:
+    """Return a fake docker CLI and its call log for the fresh-auth-only path."""
+    log = tmp_path / "docker-calls.jsonl"
+    executable = tmp_path / "docker"
+    executable.write_text(
+        """#!/usr/bin/env python3
+import json, os, sys
+
+args = sys.argv[1:]
+with open(os.environ["SV_FAKE_DOCKER_LOG"], "a", encoding="utf-8") as handle:
+    handle.write(json.dumps(args, separators=(",", ":")) + "\\n")
+
+if args[:2] == ["exec", "sv-idp"] and args[2:4] == ["sh", "-c"]:
+    raise SystemExit(0)
+if args and args[0] == "exec":
+    at = 1
+    if args[at] == "-i":
+        at += 1
+    at += 2  # container and kcadm path
+    method = args[at]
+    path = args[at + 1] if at + 1 < len(args) and not args[at + 1].startswith("-") else ""
+    joined = " ".join(args)
+    if method == "get" and path == "realms/saintvision":
+        print(json.dumps({"realm":"saintvision","enabled":True,"accessTokenLifespan":300,"sslRequired":"external"}))
+    elif method == "get" and path == "clients" and "clientId=sv-api" in joined:
+        print("api-id")
+    elif method == "get" and path == "clients" and "clientId=sv-portal" in joined:
+        print("portal-id")
+    elif method == "get" and path == "clients/api-id":
+        print(json.dumps({"clientId":"sv-api"}))
+    elif method == "get" and path == "clients/portal-id":
+        print(json.dumps({"clientId":"sv-portal"}))
+    elif method == "get" and path == "clients/portal-id/protocol-mappers/models":
+        print("time-id,fresh-auth-time")
+        print("amr-id,fresh-auth-amr")
+    elif method == "get" and path == "authentication/flows/browser/executions":
+        print(json.dumps([
+            {"id":"pwd-exec","providerId":"auth-username-password-form","authenticationConfig":"pwd-config"},
+            {"id":"otp-exec","providerId":"auth-otp-form","authenticationConfig":"otp-config"}
+        ]))
+    elif method == "get" and path == "client-scopes":
+        print("scope-id,inv.api")
+    elif method == "get" and path == "clients/portal-id/default-client-scopes":
+        print(json.dumps([{"name":"inv.api"}]))
+    elif method == "get" and path == "client-scopes/scope-id":
+        print(json.dumps({"name":"inv.api"}))
+    elif method == "get" and path == "authentication/config/pwd-config":
+        print(json.dumps({"config":{}}))
+    elif method == "get" and path == "authentication/config/otp-config":
+        print(json.dumps({"config":{}}))
+    raise SystemExit(0)
+""",
+        encoding="utf-8",
+    )
+    executable.chmod(0o700)
+    if os.name == "nt":
+        python3 = tmp_path / "python3"
+        python3.write_text(
+            f"#!/usr/bin/env bash\nexec '{Path(sys.executable).as_posix()}' \"$@\"\n",
+            encoding="utf-8",
+        )
+        python3.chmod(0o700)
+    return executable, log
+
+
+def _bash() -> str | None:
+    if os.name == "nt":
+        git_bash = Path(r"C:\Program Files\Git\bin\bash.exe")
+        return str(git_bash) if git_bash.is_file() else None
+    return shutil.which("bash")
+
+
+def test_fresh_auth_only_behaviour_allows_exactly_four_realm_mutations(tmp_path):
+    """A removed realm/client/scope guard must add a call and fail this allowlist."""
+    bash = _bash()
+    if bash is None:
+        pytest.skip("bash is required to execute the configurator behaviour test")
+    _fake, log = _fake_docker(tmp_path)
+    checker = tmp_path / "checker.py"
+    checker.write_text("import sys; sys.stdin.read(); raise SystemExit(0)\n", encoding="utf-8")
+    env = {
+        **os.environ,
+        "PATH": str(tmp_path) + os.pathsep + os.environ.get("PATH", ""),
+        "SV_FAKE_DOCKER_LOG": str(log),
+        "SV_IDP_APPLY_MODE": "fresh-auth-only",
+        "SV_REALM_CHECKER": str(checker),
+    }
+    completed = subprocess.run(
+        [bash, "deploy/intranet/idp-realm.sh"],
+        cwd=ROOT,
+        env=env,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    calls = [json.loads(line) for line in log.read_text(encoding="utf-8").splitlines()]
+    mutations = []
+    for call in calls:
+        if not call or call[0] != "exec":
+            continue
+        at = 1 + (call[1] == "-i")
+        method_at = at + 2
+        if len(call) <= method_at + 1 or call[method_at] not in {"create", "update", "delete"}:
+            continue
+        mutations.append((call[method_at], call[method_at + 1]))
+    assert mutations == [
+        ("update", "clients/portal-id/protocol-mappers/models/time-id"),
+        ("update", "clients/portal-id/protocol-mappers/models/amr-id"),
+        ("update", "authentication/config/pwd-config"),
+        ("update", "authentication/config/otp-config"),
+    ]
+
+
+def test_unknown_apply_mode_exits_before_any_docker_call(tmp_path):
+    bash = _bash()
+    if bash is None:
+        pytest.skip("bash is required to execute the configurator behaviour test")
+    _fake, log = _fake_docker(tmp_path)
+    env = {
+        **os.environ,
+        "PATH": str(tmp_path) + os.pathsep + os.environ.get("PATH", ""),
+        "SV_FAKE_DOCKER_LOG": str(log),
+        "SV_IDP_APPLY_MODE": "unexpected",
+    }
+    completed = subprocess.run(
+        [bash, "deploy/intranet/idp-realm.sh"],
+        cwd=ROOT,
+        env=env,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert completed.returncode == 2
+    assert "unsupported SV_IDP_APPLY_MODE" in completed.stderr
+    assert not log.exists()

@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-CARD209-IDP-FRESH-AUTH-LIVE-READBACK-20261002"
 title: "Card 209 사내망 Keycloak fresh-auth mapper 적용과 read-back"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-02T06:45:07+09:00"
+updated: "2026-10-02T07:05:49+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "d0b2a4c6b05674a7d8d0ca011f080f580a873b06"
@@ -23,8 +23,9 @@ reference를 적용했고, 정본 `tools/check_idp_realm_config.py`의 live read
 
 ## 안전 경계와 dry-run
 
-- 적용 전 읽기 전용 probe는 mapper 2개와 execution reference 2개가 모두 없음을
-  `DRIFT_OBSERVED`/exit 3으로 기록했다. 이어 관련 mapper/execution JSON만 operator-private
+- 적용 전 operator-private 임시 Python probe는 mapper 2개와 execution reference 2개가 모두 없음을
+  `DRIFT_OBSERVED`/exit 3으로 기록했다. 이 probe는 커밋된 `check_idp_realm_config.py` CLI가 아니며,
+  정본 checker의 공개 exit 계약은 PASS=0, drift=1, unusable=2다. 이어 관련 mapper/execution JSON만 operator-private
   경로에 0600으로 백업했고, 파일 2개의 manifest SHA-256만 Evidence에 남겼다.
 - 기존 `deploy/intranet/idp-realm.sh`의 full 경로는 사용자 profile과 password를 다시 쓰므로
   카드 범위에 맞지 않았다. code commit `7aea9cc3`에서 `fresh-auth-only` 모드를 추가했다.
@@ -37,14 +38,14 @@ reference를 적용했고, 정본 `tools/check_idp_realm_config.py`의 live read
 
 | 단계 | 결과 |
 |---|---|
-| pre-apply read-only diff | 네 fresh-auth 항목 불일치, exit 3 |
+| pre-apply 임시 read-only probe | 네 fresh-auth 항목 불일치, `DRIFT_OBSERVED`/exit 3; 미커밋 operator-private probe이며 정본 checker exit가 아님 |
 | 보호 백업 | 파일 2, manifest `55b2592b…89db6` |
 | `fresh-auth-only` apply | exit 0 |
 | live checker read-back | token contract 일치, drift 0, exit 0 |
 | 동일 명령 재실행 | exit 0 |
 | 재실행 뒤 read-only diff | 네 항목 일치, exit 0 |
 | post snapshot | 파일 4, manifest `db7629cb…d1733` |
-| PG-free 회귀 | 86 passed, `bash -n`·`git diff --check` exit 0 |
+| PG-free 회귀 | 54 focused passed; fake-docker는 fresh-auth-only의 변경 호출 exact set을 mapper 2 + execution config 2로 고정하고 unknown mode의 변경 호출 0을 확인. `bash -n`·`git diff --check` exit 0 |
 
 배포 스크립트 SHA-256 `95d48cb7…26980`과 remote 실행 파일이 같고, checker SHA-256
 `287bbfc8…133dd`도 local 정본과 remote read-back 파일이 같음을 적용 뒤 대조했다.
