@@ -1,5 +1,6 @@
 """Fail-closed sequencing for the admitted S08-BE build transport boundary."""
 
+import asyncio
 from contextlib import contextmanager
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
@@ -16,7 +17,6 @@ from inv.build_adapter import (
 from inv.build_governance import BuildProviderObservation
 from inv.errors import DomainError
 from inv.policy import action_digest
-
 
 TENANT = "123e4567-e89b-12d3-a456-426614174000"
 EPOCH = "223e4567-e89b-12d3-a456-426614174000"
@@ -76,12 +76,12 @@ class _Transport:
         assert len(admitted.binding_digest) == 64
         assert admitted.binding_digest != admitted.roof_binding_digest
         assert admitted.roof_binding_digest == "b" * 64
-        assert admitted.builder_node_id == "node-1"
+        assert admitted.leased_node_id == "node-1"
         assert admitted.binding_digest == action_digest(
             {
                 "roofBindingDigest": admitted.roof_binding_digest,
                 "runId": admitted.run_id,
-                "builderNodeId": admitted.builder_node_id,
+                "leasedNodeId": admitted.leased_node_id,
                 "leaseId": admitted.plan["lease"]["leaseId"],
                 "resourceId": admitted.plan["lease"]["resourceId"],
                 "fencingToken": admitted.plan["lease"]["fencingToken"],
@@ -119,6 +119,7 @@ def _inputs():
 
 def _patch_boundary(monkeypatch, *, authorize_error=None, finalize_error=None):
     calls = []
+    claims = set()
     monkeypatch.setattr(adapter_module, "validate_contract", lambda *_args: None)
 
     def authorize(_conn, _principal, request, plan, _decision, **_kwargs):
@@ -131,6 +132,16 @@ def _patch_boundary(monkeypatch, *, authorize_error=None, finalize_error=None):
         calls.append(("live", deepcopy(request), deepcopy(plan), run_id))
         return "node-1"
 
+    def claim(_conn, request, plan, decision, run_id, binding_digest):
+        identity = (decision["decisionId"], run_id, plan["lease"]["leaseId"])
+        calls.append(("claim", identity, binding_digest))
+        if identity in claims:
+            raise DomainError("IDEM-0001", "Build dispatch identity is already consumed", 409)
+        claims.add(identity)
+
+    def quarantine(_database, _request, admitted, reason_code):
+        calls.append(("quarantine", admitted.binding_digest, reason_code))
+
     def finalize(_conn, _principal, request, plan, _decision, receipt, **_kwargs):
         calls.append(("finalize", deepcopy(request), deepcopy(plan), deepcopy(receipt)))
         if finalize_error:
@@ -139,6 +150,8 @@ def _patch_boundary(monkeypatch, *, authorize_error=None, finalize_error=None):
 
     monkeypatch.setattr(adapter_module, "authorize_build", authorize)
     monkeypatch.setattr(adapter_module, "_lock_live_build_authority", live)
+    monkeypatch.setattr(adapter_module, "_claim_build_dispatch", claim)
+    monkeypatch.setattr(adapter_module, "_record_build_quarantine", quarantine)
     monkeypatch.setattr(adapter_module, "finalize_build", finalize)
     return calls
 
@@ -166,7 +179,13 @@ def test_transport_receives_only_admitted_binding_between_two_short_transactions
 
     assert database.transaction_count == 2
     assert transport.calls == ["observe", "dispatch", "observe"]
-    assert [call[0] for call in calls] == ["authorize", "live", "live", "finalize"]
+    assert [call[0] for call in calls] == [
+        "authorize",
+        "live",
+        "claim",
+        "live",
+        "finalize",
+    ]
     assert "transportMutation" not in calls[-1][2]
     assert result.evidence == {"result": "succeeded"}
 
@@ -201,6 +220,123 @@ def test_failed_live_lease_admission_has_zero_dispatch_side_effect(monkeypatch):
 
     assert database.transaction_count == 1
     assert transport.calls == ["observe"]
+
+
+def test_consumed_admission_cannot_dispatch_twice(monkeypatch):
+    _patch_boundary(monkeypatch)
+    database = _Database()
+    transport = _Transport(database)
+    adapter = BuildExecutionAdapter(database, transport)
+
+    _execute(adapter)
+    with pytest.raises(DomainError, match="IDEM-0001"):
+        _execute(adapter)
+
+    assert transport.calls.count("dispatch") == 1
+
+
+class _ClaimConnection:
+    def __init__(self, *, inserted, prior_hash=None):
+        self.inserted = inserted
+        self.prior_hash = prior_hash
+        self.statements = []
+
+    def execute(self, sql, params=None):
+        normalized = " ".join(sql.split())
+        self.statements.append((normalized, params))
+        if "INSERT INTO inv.idempotency" in normalized:
+            return _One({"key": "claim"} if self.inserted else None)
+        if "SELECT request_hash FROM inv.idempotency" in normalized:
+            return _One({"request_hash": self.prior_hash} if self.prior_hash is not None else None)
+        raise AssertionError(normalized)
+
+
+def test_atomic_claim_uses_unique_ledger_and_redacted_audit(monkeypatch):
+    events = []
+    monkeypatch.setattr(
+        adapter_module,
+        "_audit_event",
+        lambda _conn, tenant, run, kind, payload: events.append((tenant, run, kind, payload)),
+    )
+    conn = _ClaimConnection(inserted=True)
+    _, request, plan, decision = _inputs()
+
+    adapter_module._claim_build_dispatch(conn, request, plan, decision, "run-1", "c" * 64)
+
+    assert "ON CONFLICT DO NOTHING RETURNING key" in conn.statements[0][0]
+    assert "'build.dispatch'" in conn.statements[0][0]
+    assert events == [
+        (
+            TENANT,
+            "run-1",
+            "inv.build.dispatch_claimed",
+            {
+                "bindingDigest": "c" * 64,
+                "resourceId": "resource-1",
+                "leaseId": "lease-1",
+            },
+        )
+    ]
+
+
+@pytest.mark.parametrize("prior_hash", ["c" * 64, "d" * 64])
+def test_atomic_claim_rejects_same_or_different_replay(monkeypatch, prior_hash):
+    monkeypatch.setattr(
+        adapter_module,
+        "_audit_event",
+        lambda *_args, **_kwargs: pytest.fail("replay must not emit a claim event"),
+    )
+    conn = _ClaimConnection(inserted=False, prior_hash=prior_hash)
+    _, request, plan, decision = _inputs()
+
+    with pytest.raises(DomainError, match="IDEM-0001"):
+        adapter_module._claim_build_dispatch(conn, request, plan, decision, "run-1", "c" * 64)
+
+    assert "FOR UPDATE" in conn.statements[1][0]
+
+
+def test_quarantine_audit_is_redacted_and_persisted_after_cleanup(monkeypatch):
+    events = []
+    monkeypatch.setattr(
+        adapter_module,
+        "lock_run",
+        lambda _conn, run, project: {"run_id": run, "project_id": project},
+    )
+    monkeypatch.setattr(
+        adapter_module,
+        "_audit_event",
+        lambda _conn, tenant, run, kind, payload: events.append((tenant, run, kind, payload)),
+    )
+    _, request, plan, decision = _inputs()
+    admitted = _AdmittedBuild(
+        request=request,
+        plan=plan,
+        decision=decision,
+        policy_version="s08-build-v1",
+        run_id="run-1",
+        evidence_id="evidence-1",
+        actor_id="operator-1",
+        leased_node_id="node-1",
+        roof_binding_digest="b" * 64,
+        binding_digest="c" * 64,
+    )
+    database = _Database()
+
+    adapter_module._record_build_quarantine(database, request, admitted, "LEASE-0002")
+
+    assert database.transaction_count == 1
+    assert events == [
+        (
+            TENANT,
+            "run-1",
+            "inv.build.dispatch_quarantined",
+            {
+                "bindingDigest": "c" * 64,
+                "leasedNodeId": "node-1",
+                "reasonCode": "LEASE-0002",
+            },
+        )
+    ]
 
 
 def test_final_authority_drift_cancels_and_quarantines(monkeypatch):
@@ -245,11 +381,24 @@ def test_final_builder_node_drift_cancels_and_quarantines(monkeypatch):
 
 
 def test_ambiguous_dispatch_failure_also_cancels_and_quarantines(monkeypatch):
-    _patch_boundary(monkeypatch)
+    calls = _patch_boundary(monkeypatch)
     database = _Database()
     transport = _Transport(database, dispatch_error=RuntimeError("unknown side effect"))
 
     with pytest.raises(RuntimeError, match="unknown side effect"):
+        _execute(BuildExecutionAdapter(database, transport))
+
+    assert transport.calls == ["observe", "dispatch", ("cancel", "SYS-0001")]
+    assert calls[-1][0] == "quarantine"
+
+
+@pytest.mark.parametrize("interrupt", [KeyboardInterrupt(), asyncio.CancelledError()])
+def test_base_exception_dispatch_failure_still_cancels_and_quarantines(monkeypatch, interrupt):
+    _patch_boundary(monkeypatch)
+    database = _Database()
+    transport = _Transport(database, dispatch_error=interrupt)
+
+    with pytest.raises(type(interrupt)):
         _execute(BuildExecutionAdapter(database, transport))
 
     assert transport.calls == ["observe", "dispatch", ("cancel", "SYS-0001")]
@@ -263,6 +412,24 @@ def test_unverified_cancel_is_a_cleanup_failure(monkeypatch):
         dispatch_error=RuntimeError("unknown side effect"),
         cleanup_error=RuntimeError("cancel unobserved"),
     )
+
+    with pytest.raises(DomainError, match="VERIFY-0022"):
+        _execute(BuildExecutionAdapter(database, transport))
+
+
+def test_unpersisted_quarantine_audit_is_a_cleanup_failure(monkeypatch):
+    _patch_boundary(monkeypatch)
+
+    def fail_audit(*_args, **_kwargs):
+        raise RuntimeError("audit failed")
+
+    monkeypatch.setattr(
+        adapter_module,
+        "_record_build_quarantine",
+        fail_audit,
+    )
+    database = _Database()
+    transport = _Transport(database, dispatch_error=RuntimeError("ambiguous"))
 
     with pytest.raises(DomainError, match="VERIFY-0022"):
         _execute(BuildExecutionAdapter(database, transport))
@@ -326,7 +493,11 @@ def _patch_locks(monkeypatch):
     monkeypatch.setattr(
         adapter_module,
         "lock_run",
-        lambda _conn, run, project: {"run_id": run, "project_id": project},
+        lambda _conn, run, project: {
+            "run_id": run,
+            "project_id": project,
+            "state": "scheduled",
+        },
     )
     monkeypatch.setattr(
         adapter_module,
@@ -361,7 +532,13 @@ class _LockOrderConnection:
         normalized = " ".join(sql.split())
         self.statements.append(normalized)
         if "FROM inv.runs" in normalized:
-            return _One({"run_id": "run-1", "project_id": "project-1"})
+            return _One(
+                {
+                    "run_id": "run-1",
+                    "project_id": "project-1",
+                    "state": "scheduled",
+                }
+            )
         if "FROM inv.resources WHERE resource_id=ANY" in normalized:
             return _One([{"resource_id": "resource-1", "node_id": "node-1"}])
         if "FROM inv.nodes WHERE node_id=%s FOR UPDATE" in normalized:
@@ -396,6 +573,63 @@ def test_live_build_authority_uses_run_node_resource_lease_lock_order():
     assert "FROM inv.resources" in conn.statements[3] and "FOR UPDATE" in conn.statements[3]
     assert "FROM inv.resource_leases" in conn.statements[4] and "FOR UPDATE" in conn.statements[4]
     assert "SELECT status,recovery_epoch,heartbeat_at,clock_skew_seconds" in conn.statements[5]
+
+
+@pytest.mark.parametrize("state", ["planned", "cancelled", "failed", "succeeded", "recovering"])
+def test_live_build_authority_rejects_non_dispatchable_run_states(monkeypatch, state):
+    lease, node, request, plan = _live_rows()
+    monkeypatch.setattr(
+        adapter_module,
+        "lock_run",
+        lambda _conn, run, project: {
+            "run_id": run,
+            "project_id": project,
+            "state": state,
+        },
+    )
+
+    with pytest.raises(DomainError, match="RES-0005"):
+        _lock_live_build_authority(
+            _LeaseConnection(lease, node),
+            request,
+            plan,
+            "run-1",
+            database_recovery_epoch=EPOCH,
+            now=NOW,
+        )
+
+
+def test_live_build_authority_rejects_exact_but_expired_database_lease(monkeypatch):
+    _patch_locks(monkeypatch)
+    lease, node, request, plan = _live_rows()
+    lease["expires_at"] = NOW
+    plan["lease"]["expiresAt"] = NOW.isoformat()
+
+    with pytest.raises(DomainError, match="LEASE-0002"):
+        _lock_live_build_authority(
+            _LeaseConnection(lease, node),
+            request,
+            plan,
+            "run-1",
+            database_recovery_epoch=EPOCH,
+            now=NOW,
+        )
+
+
+def test_live_build_authority_rejects_node_recovery_epoch_drift_independently(monkeypatch):
+    _patch_locks(monkeypatch)
+    lease, node, request, plan = _live_rows()
+    node["recovery_epoch"] = UUID("523e4567-e89b-12d3-a456-426614174000")
+
+    with pytest.raises(DomainError, match="NODE-0033"):
+        _lock_live_build_authority(
+            _LeaseConnection(lease, node),
+            request,
+            plan,
+            "run-1",
+            database_recovery_epoch=EPOCH,
+            now=NOW,
+        )
 
 
 @pytest.mark.parametrize(
@@ -449,6 +683,7 @@ def test_live_build_authority_uses_run_node_resource_lease_lock_order():
             "RES-0003",
         ),
         (lambda _lease, node, _plan: node.__setitem__("clock_skew_seconds", 6), "RES-0003"),
+        (lambda _lease, node, _plan: node.__setitem__("clock_skew_seconds", None), "RES-0003"),
     ],
 )
 def test_live_build_authority_rejects_lease_fence_drain_and_observation_drift(

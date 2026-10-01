@@ -8,13 +8,25 @@ Evidence.
 
 This module does not implement a BuildKit daemon, persist Evidence, or release
 the kernel lease.  Those operations require an authenticated physical cleanup
-receipt and remain outside this adapter boundary.
+receipt and remain outside this adapter boundary.  Its one-shot claim is
+deliberately fail-closed: a crash after claim commit requires operator
+reconciliation and never permits an automatic second dispatch.
+
+Only the leased resource Node is checked here.  The provider observation does
+not prove the builder process location, drain state, or health, so a public
+route or concrete transport must remain disconnected until that measured
+binding exists.  Pre-admission denials likewise have no persisted Evidence at
+this private boundary; claimed dispatches and quarantines emit redacted outbox
+audit events instead.
 """
 
 from copy import deepcopy
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Protocol
+from uuid import uuid4
+
+from psycopg.types.json import Jsonb
 
 from .build_governance import (
     BuildProviderObservation,
@@ -26,8 +38,17 @@ from .errors import DomainError
 from .leases import fence, lock_resources, lock_run
 from .policy import action_digest
 
-
 NODE_FRESHNESS_SECONDS = 15
+
+
+def _audit_event(conn, tenant_id: str, run_id: str, event_type: str, payload: dict) -> None:
+    """Write one redacted build boundary event without importing the Run service."""
+
+    conn.execute(
+        """INSERT INTO inv.outbox(tenant_id,run_id,event_id,event_type,payload)
+        VALUES (%s,%s,%s,%s,%s)""",
+        (tenant_id, run_id, uuid4(), event_type, Jsonb(payload)),
+    )
 
 
 @dataclass(frozen=True)
@@ -41,7 +62,7 @@ class _AdmittedBuild:
     run_id: str
     evidence_id: str
     actor_id: str
-    builder_node_id: str
+    leased_node_id: str
     roof_binding_digest: str
     binding_digest: str
 
@@ -83,7 +104,9 @@ def _lock_live_build_authority(
 ) -> str:
     """Lock Run -> Node -> Resource -> lease and reject stale dispatch authority."""
 
-    lock_run(conn, run_id, request["projectId"])
+    run = lock_run(conn, run_id, request["projectId"])
+    if run["state"] not in {"scheduled", "running", "verifying"}:
+        raise DomainError("RES-0005", "Run cannot dispatch a build in its current state")
     resource_id = plan["lease"]["resourceId"]
     resources = lock_resources(conn, [resource_id])
     resource = resources[resource_id]
@@ -116,17 +139,108 @@ def _lock_live_build_authority(
         or str(node["recovery_epoch"]) != database_recovery_epoch
     ):
         raise DomainError("NODE-0033", "Build node is not current and online", 409)
+    heartbeat = node["heartbeat_at"]
+    skew = node["clock_skew_seconds"]
+    try:
+        skew_is_current = (
+            skew is not None
+            and (not hasattr(skew, "is_finite") or skew.is_finite())
+            and abs(skew) <= 5
+        )
+    except (ArithmeticError, TypeError, ValueError):
+        skew_is_current = False
     if (
-        node["heartbeat_at"] is None
-        or node["heartbeat_at"] > now
-        or node["heartbeat_at"] < now - timedelta(seconds=NODE_FRESHNESS_SECONDS)
-        or abs(node["clock_skew_seconds"]) > 5
+        not isinstance(heartbeat, datetime)
+        or heartbeat.tzinfo is None
+        or heartbeat > now
+        or heartbeat < now - timedelta(seconds=NODE_FRESHNESS_SECONDS)
+        or not skew_is_current
     ):
         raise DomainError("RES-0003", "Build node observation is stale", 409)
     return str(resource["node_id"])
 
 
-def _reason_code(error: Exception) -> str:
+def _claim_build_dispatch(
+    conn,
+    request: dict,
+    plan: dict,
+    decision: dict,
+    run_id: str,
+    binding_digest: str,
+) -> None:
+    """Atomically consume one decision/lease dispatch identity.
+
+    A committed claim is never replayed, even when its digest is identical.
+    That makes an ambiguous crash fail closed until an operator reconciles the
+    external builder state.
+    """
+
+    claim_key = action_digest(
+        {
+            "decisionId": decision["decisionId"],
+            "runId": run_id,
+            "leaseId": plan["lease"]["leaseId"],
+        }
+    )
+    inserted = conn.execute(
+        """INSERT INTO inv.idempotency(
+        tenant_id,project_id,operation,key,request_hash,response
+        ) VALUES (%s,%s,'build.dispatch',%s,%s,%s)
+        ON CONFLICT DO NOTHING RETURNING key""",
+        (
+            request["tenantId"],
+            request["projectId"],
+            claim_key,
+            binding_digest,
+            Jsonb({"state": "claimed", "bindingDigest": binding_digest}),
+        ),
+    ).fetchone()
+    if not inserted:
+        prior = conn.execute(
+            """SELECT request_hash FROM inv.idempotency
+            WHERE project_id=%s AND operation='build.dispatch' AND key=%s FOR UPDATE""",
+            (request["projectId"], claim_key),
+        ).fetchone()
+        message = (
+            "Build dispatch identity already has different content"
+            if prior and prior["request_hash"] != binding_digest
+            else "Build dispatch identity is already consumed"
+        )
+        raise DomainError("IDEM-0001", message, 409)
+    _audit_event(
+        conn,
+        request["tenantId"],
+        run_id,
+        "inv.build.dispatch_claimed",
+        {
+            "bindingDigest": binding_digest,
+            "resourceId": plan["lease"]["resourceId"],
+            "leaseId": plan["lease"]["leaseId"],
+        },
+    )
+
+
+def _record_build_quarantine(
+    database, request: dict, admitted: _AdmittedBuild, reason_code: str
+) -> None:
+    """Persist a redacted post-dispatch quarantine audit after cleanup."""
+
+    with database.transaction(request["tenantId"]) as conn:
+        lock_run(conn, admitted.run_id, request["projectId"])
+        _audit_event(
+            conn,
+            request["tenantId"],
+            admitted.run_id,
+            "inv.build.dispatch_quarantined",
+            {
+                "bindingDigest": admitted.binding_digest,
+                "leasedNodeId": admitted.leased_node_id,
+                "reasonCode": reason_code,
+            },
+        )
+
+
+def _reason_code(error: BaseException) -> str:
     return error.code if isinstance(error, DomainError) else "SYS-0001"
 
 
@@ -171,7 +285,7 @@ class BuildExecutionAdapter:
                 provider=provider,
                 now=now,
             )
-            builder_node_id = _lock_live_build_authority(
+            leased_node_id = _lock_live_build_authority(
                 conn,
                 frozen_request,
                 frozen_plan,
@@ -180,14 +294,23 @@ class BuildExecutionAdapter:
                 now=now,
             )
 
-        dispatch_binding = {
-            "roofBindingDigest": binding["bindingDigest"],
-            "runId": run_id,
-            "builderNodeId": builder_node_id,
-            "leaseId": frozen_plan["lease"]["leaseId"],
-            "resourceId": frozen_plan["lease"]["resourceId"],
-            "fencingToken": frozen_plan["lease"]["fencingToken"],
-        }
+            dispatch_binding = {
+                "roofBindingDigest": binding["bindingDigest"],
+                "runId": run_id,
+                "leasedNodeId": leased_node_id,
+                "leaseId": frozen_plan["lease"]["leaseId"],
+                "resourceId": frozen_plan["lease"]["resourceId"],
+                "fencingToken": frozen_plan["lease"]["fencingToken"],
+            }
+            binding_digest = action_digest(dispatch_binding)
+            _claim_build_dispatch(
+                conn,
+                frozen_request,
+                frozen_plan,
+                frozen_decision,
+                run_id,
+                binding_digest,
+            )
 
         admitted = _AdmittedBuild(
             request=deepcopy(frozen_request),
@@ -197,19 +320,17 @@ class BuildExecutionAdapter:
             run_id=run_id,
             evidence_id=evidence_id,
             actor_id=actor_id,
-            builder_node_id=builder_node_id,
+            leased_node_id=leased_node_id,
             roof_binding_digest=binding["bindingDigest"],
-            binding_digest=action_digest(dispatch_binding),
+            binding_digest=binding_digest,
         )
 
-        attempted = False
         try:
-            attempted = True
             receipt = self._transport.dispatch(admitted)
             final_provider = self._transport.observe(deepcopy(frozen_plan))
             with self.db.transaction(frozen_request["tenantId"]) as conn:
                 now = _database_now(conn)
-                final_builder_node_id = _lock_live_build_authority(
+                final_leased_node_id = _lock_live_build_authority(
                     conn,
                     frozen_request,
                     frozen_plan,
@@ -217,7 +338,7 @@ class BuildExecutionAdapter:
                     database_recovery_epoch=self.db.recovery_epoch,
                     now=now,
                 )
-                if final_builder_node_id != admitted.builder_node_id:
+                if final_leased_node_id != admitted.leased_node_id:
                     raise DomainError("NODE-0033", "Build node authority changed", 409)
                 evidence = finalize_build(
                     conn,
@@ -235,14 +356,15 @@ class BuildExecutionAdapter:
                     actor_id=actor_id,
                 )
             return BuildAdapterResult(receipt=receipt, evidence=evidence)
-        except Exception as error:
-            if attempted:
-                try:
-                    self._transport.cancel_and_quarantine(admitted, _reason_code(error))
-                except Exception as cleanup_error:
-                    raise DomainError(
-                        "VERIFY-0022",
-                        "Build cancellation and quarantine are not verified",
-                        409,
-                    ) from cleanup_error
+        except BaseException as error:
+            try:
+                reason_code = _reason_code(error)
+                self._transport.cancel_and_quarantine(admitted, reason_code)
+                _record_build_quarantine(self.db, frozen_request, admitted, reason_code)
+            except BaseException as cleanup_error:
+                raise DomainError(
+                    "VERIFY-0022",
+                    "Build cancellation and quarantine are not verified",
+                    409,
+                ) from cleanup_error
             raise

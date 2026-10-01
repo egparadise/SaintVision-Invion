@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.243"
+version: "1.0.244"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T16:09:29+09:00"
+updated: "2026-10-01T16:18:16+09:00"
 source_of_truth: "Git"
 active_card: "CARD-174 S08-BE admitted Build adapter"
-active_card_status: "binding-only dispatch, canonical lock order, live lease/node/fence revalidation and cancel+quarantine implemented; focused 124 passed and gates green"
-active_card_next: "stacked PR and Claude review; physical BuildKit and authenticated cleanup persistence remain NOT_OBSERVED"
+active_card_status: "one-shot dispatch claim, terminal run rejection, leased-node revalidation and redacted claim/quarantine audit implemented; focused 140 passed"
+active_card_next: "Claude re-review and exact-head CI; measured builder location/health, denial Evidence, physical cleanup and lease release remain NOT_OBSERVED"
 ---
 
 ## 2026-10-01 Card 174 — S08-BE admitted Build adapter
@@ -17,13 +17,18 @@ active_card_next: "stacked PR and Claude review; physical BuildKit and authentic
   transport로 전달하는 adapter 경계를 구현 중이다. 외부 호출 양쪽에 짧은 DB transaction을
   두고 live lease/fencing, Node online/drain·heartbeat·clock skew와 ROOF authority를
   반복 검증한다.
-- capability digest는 run·builder Node·lease/resource·full fencing token까지 결속해,
+- capability digest는 run·leased resource Node·lease/resource·full fencing token까지 결속해,
   final Node drift가 transport 결과를 승인하지 못하게 한다.
-- dispatch 시도 뒤 오류·final drift는 cancel+quarantine으로 수렴하며, 정리 자체가
-  확인되지 않으면 `VERIFY-0022`로 실패한다. canonical lock 순서와 live authority 각 필드의
-  부정 변이까지 포함한 focused PG-free **124 passed**다.
+- `decisionId + runId + leaseId` claim은 live authority transaction 안에서 원자 소비하며
+  동일 payload 재생도 `IDEM-0001`이다. claim commit 뒤 crash는 자동 재실행하지 않고 운영자
+  reconciliation을 요구한다. terminal Run은 `RES-0005`로 dispatch 전에 거부한다.
+- dispatch 시도 뒤 오류·final drift는 cancel+quarantine과 redacted outbox audit로 수렴하며,
+  정리나 audit이 확인되지 않으면 `VERIFY-0022`로 실패한다. canonical lock 순서, live authority,
+  재생, `BaseException`, audit 실패 부정 변이까지 포함한 focused PG-free **140 passed**다.
 - 실제 rootless daemon, 인증된 물리 cleanup receipt, kernel lease release와 Evidence DB
-  원자 저장은 합성하지 않고 `NOT_OBSERVED`로 유지한다.
+  원자 저장은 합성하지 않고 `NOT_OBSERVED`로 유지한다. builder process 위치·drain·health는
+  measured binding이 없어 leased Node와 구분하며, pre-admission denial Evidence도 공개 route
+  카드 전까지 미구현이므로 concrete transport/route 연결을 금지한다.
 - 근거: [[2026-10-01_15-56-16_KST_S08-BE_Build_adapter_결속_Codex]].
 
 ## 2026-10-01 Card 173 — S08-BE Build 경로 ROOF 결속
