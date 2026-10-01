@@ -1,15 +1,27 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.247"
+version: "1.0.248"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T18:09:41+09:00"
+updated: "2026-10-01T21:10:00+09:00"
 source_of_truth: "Git"
-active_card: "CARD-175 S08-BE measured single GPU"
-active_card_status: "fresh exact GPU observation/resource/lease/fence, one-device Docker request and uncertain-cleanup quarantine implemented; Claude r1 second-device counterexample added"
-active_card_next: "exact-head run-core rerun and Claude condition recheck; physical Linux GPU execution/detach/reallocation remains NOT_OBSERVED"
+active_card: "CARD-188 S12 fresh-auth claim source"
+active_card_status: "Keycloak auth_time/amr mappers, verified Principal metadata, 300-second AMR policy and exact portal step-up contract implemented; live IdP remains BLOCKED_EXTERNAL"
+active_card_next: "focused gates, exact-head hosted CI and Claude independent review; Antigravity portal step-up remains a separate handoff"
 ---
+
+## 2026-10-01 Card 188 — S12 fresh-auth claim 공급원
+
+- train 9 base `89c8f366` 위에 Keycloak `AUTH_TIME`·AMR mapper와 password/OTP RFC 8176
+  reference를 고정하고, 서명 검증된 token에서만 Principal fresh-auth metadata가 생기도록
+  결속했다.
+- 정책은 300초 안의 `mfa` 또는 `pwd+(otp|hwk|swk)`만 허용한다. 누락·오래됨·미래·
+  `pwd` 단독·`webauthn`·unknown claim은 fail closed다.
+- portal 인계 계약은 exact `prompt=login&max_age=300`이다. FE 구현과 live Keycloak token
+  관측은 아직 없으므로 write route flag는 off이고 운영 인수는 `BLOCKED_EXTERNAL`이다.
+- 근거: [[2026-10-01_21-10-00_KST_Card188_fresh_auth_claim_공급원_Codex]],
+  [[S12-BE_fresh_auth_claim_공급원_및_portal_step-up_인계]].
 
 ## 2026-10-01 Card 166 — shard parent/member cancel bridge 후속
 
