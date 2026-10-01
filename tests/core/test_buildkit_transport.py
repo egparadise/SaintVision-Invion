@@ -41,6 +41,7 @@ def _health():
         "observedAt": NOW.isoformat(),
         "buildkitVersion": "buildkitd github.com/moby/buildkit v0.20.2",
         "rootlesskitVersion": "rootlesskit version 2.3.4",
+        "runtimeIdentity": "sha256:" + "7" * 64,
         "isolation": {
             "userNamespace": True,
             "seccompMode": "filter",
@@ -224,6 +225,7 @@ def test_measure_binds_exact_protected_health_and_live_worker(boundary):
         "privileged": False,
         "hostAccess": False,
         "entitlements": [],
+        "runtimeIdentity": "sha256:" + "7" * 64,
     }
     arguments, _cwd, timeout, environment = runner.calls[-1]
     assert arguments[1:4] == ("--addr", _health()["address"], "debug")

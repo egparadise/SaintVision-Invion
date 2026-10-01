@@ -29,8 +29,7 @@ jobs:
     env:
       BUILDKIT_VERSION: v0.20.2
       BUILDKIT_ARCHIVE_SHA256: f64589601e0f06164041dc6be45ed259cffb67539130e434d236551d63ab6030
-      ROOTLESSKIT_VERSION: v3.2.0
-      ROOTLESSKIT_ARCHIVE_SHA256: ff612d1d35854a52569acc4a4e9152f41504e69dcc13ff4c94cc9040dc28b3d9
+      BUILDKIT_ROOTLESS_IMAGE: docker.io/moby/buildkit@sha256:cb5bb371545222c430528556acfdf424144b69897f5deaad391bd227187e90df
       INV_EVIDENCE_CODE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
       - uses: actions/checkout@v4
@@ -47,35 +46,20 @@ jobs:
         run: |
           test "$(git rev-parse HEAD)" = "$INV_EVIDENCE_CODE_SHA"
           test -z "$(git status --porcelain=v1 --untracked-files=all)"
-      - name: Install rootless user-namespace prerequisites
+      - name: Download digest-pinned BuildKit client
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends uidmap slirp4netns
-          if ! grep -q "^${USER}:" /etc/subuid; then
-            echo "${USER}:100000:65536" | sudo tee -a /etc/subuid >/dev/null
-          fi
-          if ! grep -q "^${USER}:" /etc/subgid; then
-            echo "${USER}:100000:65536" | sudo tee -a /etc/subgid >/dev/null
-          fi
-      - name: Download digest-pinned BuildKit and RootlessKit
-        run: |
-          mkdir -p dist/s08-buildkit-reference "$RUNNER_TEMP/s08-download" "$RUNNER_TEMP/s08-bin/buildkit" "$RUNNER_TEMP/s08-bin/rootlesskit"
+          mkdir -p dist/s08-buildkit-reference "$RUNNER_TEMP/s08-download" "$RUNNER_TEMP/s08-bin/buildkit"
           curl --fail --location --retry 3 --silent --show-error \
             --output "$RUNNER_TEMP/s08-download/buildkit.tar.gz" \
             "https://github.com/moby/buildkit/releases/download/${BUILDKIT_VERSION}/buildkit-${BUILDKIT_VERSION}.linux-amd64.tar.gz"
           echo "$BUILDKIT_ARCHIVE_SHA256  $RUNNER_TEMP/s08-download/buildkit.tar.gz" | sha256sum --check
           tar -xzf "$RUNNER_TEMP/s08-download/buildkit.tar.gz" -C "$RUNNER_TEMP/s08-bin/buildkit" --strip-components=1
-          curl --fail --location --retry 3 --silent --show-error \
-            --output "$RUNNER_TEMP/s08-download/rootlesskit.tar.gz" \
-            "https://github.com/rootless-containers/rootlesskit/releases/download/${ROOTLESSKIT_VERSION}/rootlesskit-x86_64.tar.gz"
-          echo "$ROOTLESSKIT_ARCHIVE_SHA256  $RUNNER_TEMP/s08-download/rootlesskit.tar.gz" | sha256sum --check
-          tar -xzf "$RUNNER_TEMP/s08-download/rootlesskit.tar.gz" -C "$RUNNER_TEMP/s08-bin/rootlesskit"
           "$RUNNER_TEMP/s08-bin/buildkit/buildkitd" --version | tee dist/s08-buildkit-reference/buildkit-version.txt
-          "$RUNNER_TEMP/s08-bin/rootlesskit/rootlesskit" --version | tee dist/s08-buildkit-reference/rootlesskit-version.txt
       - name: Execute actual rootless BuildKit OCI roundtrip
         env:
           SV_BUILDKIT_BIN_DIR: ${{ runner.temp }}/s08-bin/buildkit
-          SV_ROOTLESSKIT_BIN: ${{ runner.temp }}/s08-bin/rootlesskit/rootlesskit
+          SV_BUILDKIT_RUNTIME_IMAGE: ${{ env.BUILDKIT_ROOTLESS_IMAGE }}
+          SV_BUILDKIT_CONTAINER_NAME: sv-s08-buildkit-${{ github.run_id }}-${{ github.run_attempt }}
           SV_BUILDKIT_OUTPUT_DIR: ${{ github.workspace }}/dist/s08-buildkit-reference
           SV_BUILDKIT_RUNTIME_DIR: ${{ runner.temp }}/s08-buildkit-runtime
         run: bash tools/run_buildkit_rootless_lane.sh
@@ -116,5 +100,4 @@ jobs:
             dist/s08-buildkit-reference/rootless-buildkit-metadata.json
             dist/s08-buildkit-reference/buildkitd.log
             dist/s08-buildkit-reference/buildkit-version.txt
-            dist/s08-buildkit-reference/rootlesskit-version.txt
           retention-days: 30

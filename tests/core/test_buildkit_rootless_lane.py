@@ -39,12 +39,15 @@ def test_lane_is_opt_in_pinned_and_never_uses_privileged_or_host_socket():
     job = workflow["jobs"]["rootless-roundtrip"]
     assert job["env"]["BUILDKIT_VERSION"] == "v0.20.2"
     assert len(job["env"]["BUILDKIT_ARCHIVE_SHA256"]) == 64
-    assert job["env"]["ROOTLESSKIT_VERSION"] == "v3.2.0"
-    assert len(job["env"]["ROOTLESSKIT_ARCHIVE_SHA256"]) == 64
+    assert job["env"]["BUILDKIT_ROOTLESS_IMAGE"] == (
+        "docker.io/moby/buildkit@sha256:cb5bb371545222c430528556acfdf424144b69897f5deaad391bd227187e90df"
+    )
     text = json.dumps(job, sort_keys=True) + LANE.read_text(encoding="utf-8")
     assert "--privileged" not in text
     assert "/var/run/docker.sock" not in text
-    assert "docker run" not in text
+    assert "docker run" in text
+    assert "--security-opt seccomp=unconfined" in text
+    assert "--publish 127.0.0.1:1234:1234" in text
     checkout = next(step for step in job["steps"] if step.get("uses") == "actions/checkout@v4")
     assert checkout["with"]["persist-credentials"] is False
 
@@ -76,6 +79,79 @@ def test_reference_plan_has_no_secret_network_device_or_bind_capability():
     assert plan["networkMode"] == "none"
     assert plan["devices"] == []
     assert plan["binds"] == []
+
+
+def _container_inspect():
+    return [
+        {
+            "State": {"Running": True, "Pid": 3210},
+            "Config": {
+                "User": "user",
+                "Labels": {"ai.saintvision.s08-buildkit-reference": "55"},
+            },
+            "HostConfig": {
+                "Privileged": False,
+                "SecurityOpt": [
+                    "seccomp=unconfined",
+                    "apparmor=unconfined",
+                    "systempaths=unconfined",
+                ],
+                "Binds": None,
+                "Devices": [],
+                "CapAdd": None,
+            },
+            "NetworkSettings": {
+                "Ports": {"1234/tcp": [{"HostIp": "127.0.0.1", "HostPort": "1234"}]}
+            },
+            "Mounts": [
+                {
+                    "Type": "tmpfs",
+                    "Source": "",
+                    "Destination": "/home/user/.local/share/buildkit",
+                    "RW": True,
+                }
+            ],
+        }
+    ]
+
+
+@pytest.mark.parametrize(
+    "mutate",
+    [
+        lambda value: value[0]["HostConfig"].__setitem__("Privileged", True),
+        lambda value: value[0]["HostConfig"].__setitem__("Binds", ["/var/run/docker.sock:/x"]),
+        lambda value: value[0]["HostConfig"].__setitem__("Devices", [{"PathOnHost": "/dev/kvm"}]),
+        lambda value: value[0]["HostConfig"].__setitem__("CapAdd", ["SYS_ADMIN"]),
+        lambda value: value[0]["Config"].__setitem__("User", "root"),
+        lambda value: value[0]["NetworkSettings"]["Ports"]["1234/tcp"][0].__setitem__(
+            "HostIp", "0.0.0.0"
+        ),
+        lambda value: value[0].__setitem__(
+            "Mounts",
+            [
+                {
+                    "Type": "bind",
+                    "Source": "/host",
+                    "Destination": "/host",
+                    "RW": True,
+                }
+            ],
+        ),
+    ],
+)
+def test_container_boundary_rejects_privilege_host_device_and_broad_publish(monkeypatch, mutate):
+    module = _module()
+    monkeypatch.setenv("GITHUB_RUN_ID", "55")
+    value = _container_inspect()
+    mutate(value)
+    with pytest.raises(RuntimeError, match="broader than declared"):
+        module._validated_container_inspect(value)
+
+
+def test_container_boundary_accepts_only_owned_rootless_shape(monkeypatch):
+    module = _module()
+    monkeypatch.setenv("GITHUB_RUN_ID", "55")
+    assert module._validated_container_inspect(_container_inspect())["State"]["Pid"] == 3210
 
 
 def test_main_emits_reference_only_evidence_and_exact_junit(monkeypatch, tmp_path):

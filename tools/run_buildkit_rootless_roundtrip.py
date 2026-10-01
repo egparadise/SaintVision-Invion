@@ -76,7 +76,7 @@ def _lsm() -> str:
     return "unavailable-ci-reference"
 
 
-def _health_receipt(args, observed_at: datetime) -> dict:
+def _process_health_receipt(args, observed_at: datetime) -> dict:
     status = _status(args.daemon_pid)
     stat_fields = Path(f"/proc/{args.daemon_pid}/stat").read_text(encoding="ascii").split()
     return {
@@ -97,6 +97,7 @@ def _health_receipt(args, observed_at: datetime) -> dict:
         "observedAt": observed_at.isoformat(),
         "buildkitVersion": _command(str(args.buildkitd), "--version"),
         "rootlesskitVersion": _command(str(args.rootlesskit), "--version"),
+        "runtimeIdentity": "sha256:" + hashlib.sha256(args.buildkitd.read_bytes()).hexdigest(),
         "isolation": {
             "userNamespace": True,
             "seccompMode": "filter" if status.get("Seccomp") == "2" else "unavailable-ci-reference",
@@ -109,6 +110,103 @@ def _health_receipt(args, observed_at: datetime) -> dict:
             ),
         },
     }
+
+
+def _container_health_receipt(args, observed_at: datetime) -> dict:
+    values = json.loads(_command("docker", "inspect", args.container_name))
+    value = _validated_container_inspect(values)
+    state = value["State"]
+    status = _status(state["Pid"])
+    uid = int(status["Uid"].split()[0])
+    if uid <= 0:
+        raise RuntimeError("rootless BuildKit container process is not an unprivileged user")
+    stat_fields = Path(f"/proc/{state['Pid']}/stat").read_text(encoding="ascii").split()
+    image_digest = args.runtime_image.rsplit("@", 1)[-1]
+    if not image_digest.startswith("sha256:"):
+        raise RuntimeError("rootless BuildKit image is not digest pinned")
+    return {
+        "schemaVersion": 1,
+        "builderInstanceId": INSTANCE,
+        "builderProfileId": PROFILE,
+        "recoveryEpoch": EPOCH,
+        "address": args.address,
+        "pid": state["Pid"],
+        "hostUid": uid,
+        "processStartTicks": int(stat_fields[21]),
+        "rootless": True,
+        "privileged": False,
+        "hostAccess": False,
+        "entitlements": [],
+        "devices": [],
+        "binds": [],
+        "observedAt": observed_at.isoformat(),
+        "buildkitVersion": _command(
+            "docker", "exec", args.container_name, "buildkitd", "--version"
+        ),
+        "rootlesskitVersion": _command(
+            "docker", "exec", args.container_name, "rootlesskit", "--version"
+        ),
+        "runtimeIdentity": image_digest,
+        "isolation": {
+            "userNamespace": True,
+            # The official rootless image needs these host filters relaxed on a
+            # hosted runner. This is why the result remains ci-reference only.
+            "seccompMode": "unavailable-ci-reference",
+            "lsm": "unavailable-ci-reference",
+            "noNewPrivileges": status.get("NoNewPrivs") == "1",
+            "cgroupMode": (
+                "v2"
+                if Path("/sys/fs/cgroup/cgroup.controllers").is_file()
+                else "unavailable-ci-reference"
+            ),
+        },
+    }
+
+
+def _validated_container_inspect(values: object) -> dict:
+    """Reject any runtime boundary wider than the declared CI reference."""
+
+    if not isinstance(values, list) or len(values) != 1 or not isinstance(values[0], dict):
+        raise RuntimeError("rootless BuildKit container inspection is invalid")
+    value = values[0]
+    state, config, host = value["State"], value["Config"], value["HostConfig"]
+    ports = value.get("NetworkSettings", {}).get("Ports", {}).get("1234/tcp")
+    mounts = value.get("Mounts") or []
+    user = config.get("User")
+    if (
+        state.get("Running") is not True
+        or type(state.get("Pid")) is not int
+        or state["Pid"] <= 1
+        or not isinstance(user, str)
+        or user in {"", "0", "root", "0:0", "root:root"}
+        or host.get("Privileged") is not False
+        or set(host.get("SecurityOpt") or [])
+        != {"seccomp=unconfined", "apparmor=unconfined", "systempaths=unconfined"}
+        or host.get("Binds") not in (None, [])
+        or host.get("Devices") not in (None, [])
+        or host.get("CapAdd") not in (None, [])
+        or any(
+            mount.get("Type") != "tmpfs"
+            or mount.get("Destination") != "/home/user/.local/share/buildkit"
+            or mount.get("RW") is not True
+            or mount.get("Source") not in (None, "")
+            for mount in mounts
+        )
+        or not isinstance(ports, list)
+        or len(ports) != 1
+        or ports[0].get("HostIp") != "127.0.0.1"
+        or ports[0].get("HostPort") != "1234"
+        or config.get("Labels", {}).get("ai.saintvision.s08-buildkit-reference")
+        != os.environ.get("GITHUB_RUN_ID")
+    ):
+        raise RuntimeError("rootless BuildKit container boundary is broader than declared")
+    return value
+
+
+def _health_receipt(args, observed_at: datetime) -> dict:
+    if args.container_name:
+        return _container_health_receipt(args, observed_at)
+    return _process_health_receipt(args, observed_at)
 
 
 def _request(head: str, tree: str) -> dict:
@@ -204,14 +302,20 @@ def _junit(path: Path, *, error: BaseException | None = None) -> None:
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--buildctl", type=Path, required=True)
-    parser.add_argument("--buildkitd", type=Path, required=True)
-    parser.add_argument("--rootlesskit", type=Path, required=True)
+    parser.add_argument("--buildkitd", type=Path)
+    parser.add_argument("--rootlesskit", type=Path)
+    parser.add_argument("--container-name")
+    parser.add_argument("--runtime-image")
     parser.add_argument("--address", required=True)
     parser.add_argument("--daemon-pid", type=int, required=True)
     parser.add_argument("--health-receipt", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--junit", type=Path, required=True)
     args = parser.parse_args(argv)
+    if bool(args.container_name) != bool(args.runtime_image):
+        parser.error("--container-name and --runtime-image are required together")
+    if not args.container_name and (args.buildkitd is None or args.rootlesskit is None):
+        parser.error("process mode requires --buildkitd and --rootlesskit")
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
     args.health_receipt.parent.mkdir(parents=True, exist_ok=True)

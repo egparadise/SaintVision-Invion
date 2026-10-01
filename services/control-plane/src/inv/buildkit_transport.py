@@ -54,6 +54,7 @@ _HEALTH_KEYS = frozenset(
         "observedAt",
         "buildkitVersion",
         "rootlesskitVersion",
+        "runtimeIdentity",
         "isolation",
     }
 )
@@ -263,6 +264,9 @@ class RootlessBuildkitTransport:
             or not receipt["buildkitVersion"]
             or not isinstance(receipt.get("rootlesskitVersion"), str)
             or not receipt["rootlesskitVersion"]
+            or not isinstance(receipt.get("runtimeIdentity"), str)
+            or not receipt["runtimeIdentity"].startswith("sha256:")
+            or not _HEX_64.fullmatch(receipt["runtimeIdentity"].removeprefix("sha256:"))
             or not isinstance(isolation, dict)
             or set(isolation) != _ISOLATION_KEYS
             or isolation.get("userNamespace") is not True
@@ -342,6 +346,7 @@ class RootlessBuildkitTransport:
                 "privileged": receipt["privileged"],
                 "hostAccess": receipt["hostAccess"],
                 "entitlements": list(receipt["entitlements"]),
+                "runtimeIdentity": receipt["runtimeIdentity"],
             },
         )
 
