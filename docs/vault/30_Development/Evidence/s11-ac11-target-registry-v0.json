@@ -178,9 +178,9 @@
       "targetId": "s11-accessibility-user-device-v1",
       "axis": "accessibility-e2e",
       "sourceDocument": {
-        "commit": "94970b00b263bd833b08f967d4ab51c1abcf0aec",
+        "commit": "db8c8a785a8c7f78a4d252cf5205e0417f1cc6fe",
         "path": "docs/vault/30_Development/S11_AC11_accessibility_user_device_target_v1.md",
-        "blob": "d3869f371f64fb8b76e2d5223583543e5e35092c"
+        "blob": "bd878c30cc74e235b63e4105b4226e76cfb60a54"
       },
       "criteria": {
         "canonicalJourneyFailureCount": {"operator": "eq", "value": 0},
@@ -192,7 +192,7 @@
       "requiredEnvironment": {
         "topology": "hosted-plus-user-device",
         "evidenceClass": "accessibility-manual-v1",
-        "humanBinding": "oidc-fresh-auth-v1"
+        "humanBindingPolicy": "fresh-human-import-authorization-v1"
       }
     }
   ]
