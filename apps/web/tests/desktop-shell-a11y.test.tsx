@@ -398,7 +398,7 @@ describe('DesktopShell & useModalA11y Accessibility (ACC-03, ACC-04, focus_is_tr
     const closeNotifBtn = focusable[0];
     expect(closeNotifBtn.getAttribute('aria-label')).toBe('알림 센터 닫기');
 
-    closeNotifBtn.focus();
+    // R10 & R13: Drawer opening automatically focuses its close button without manual .focus()
     expect(document.activeElement).toBe(closeNotifBtn);
 
     // Notification trap Tab keeps focus on close button
@@ -462,6 +462,9 @@ describe('DesktopShell & useModalA11y Accessibility (ACC-03, ACC-04, focus_is_tr
     );
     const firstStartBtn = focusable[0];
     const lastStartBtn = focusable[focusable.length - 1];
+
+    // R9 & R13: Start menu opening automatically focuses first interactive item without manual .focus()
+    expect(document.activeElement).toBe(firstStartBtn);
 
     // Start trap forward wrap: last -> first
     lastStartBtn.focus();
@@ -598,6 +601,8 @@ describe('DesktopShell & useModalA11y Accessibility (ACC-03, ACC-04, focus_is_tr
     // 5. Focus is placed on the newly opened window or its title
     const expectedTitleEl = container.querySelector('#window-title-win_file_explorer');
     expect(expectedTitleEl).not.toBeNull();
+    // W1: Assert tabindex="-1" on window title element so plain-div without tabindex is rejected
+    expect(expectedTitleEl?.getAttribute('tabindex')).toBe('-1');
     expect(document.activeElement).toBe(expectedTitleEl);
   });
 });
