@@ -1,13 +1,13 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.257"
+version: "1.0.258"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T06:06:48+09:00"
+updated: "2026-10-02T06:23:06+09:00"
 source_of_truth: "Git"
 active_card: "CARD-205 AC-11 accessibility user-device manual acceptance importer"
-active_card_status: "Claude r1 proof-boundary, strict scenario, Windows download, timestamp and provenance findings fixed; exact-head CI and re-review pending"
+active_card_status: "Claude r2 conditions fixed: Python 3.10 procedure, user/agent split, CLI trust boundary, placeholder and time-bound mutations; exact-head CI pending"
 active_card_next: "Push PR, request Claude independent review, and hand the exact manifest replacement row to #299/#300 owners"
 ---
 
@@ -15,7 +15,7 @@ active_card_next: "Push PR, request Claude independent review, and hand the exac
 
 - train 13 후보 `9d9389a1`에서 #300이 확인한 `manualAcceptanceMissingCount=1` 상수와
   same-SHA importer 부재를 외부 장비 없이 닫을 수 있는 AC-11 선행 카드로 선택했다.
-- Claude r1 뒤 정직한 proof scope·strict session schema·6개 수행 단계·v1.1 target을 `db8c8a78`에 고정하고,
+- Claude r1/r2 뒤 정직한 proof scope·strict session schema·6개 수행 단계·v1.1.1 target을 `505a5f4b`에 고정하고,
   canonical registry에 `s11-accessibility-user-device-v1`을 등록했다. 기존 hosted-only target을
   소급 변경하지 않는다.
 - importer는 GitHub run/head/artifact digest·만료·exact ZIP member를 검증한다. 수동 기록이
@@ -28,7 +28,7 @@ active_card_next: "Push PR, request Claude independent review, and hand the exac
   주장하지 않는다.
 - `docs/ac11-axis-sources-accessibility-patch-v1.json`에 #299 manifest의 exact replacement row를
   고정했다. 사용자 실행 절차는 [[AC-11_사용자_기기_접근성_수동_인수_절차]]다.
-- PG-free focused **177 passed**. Windows-safe downloader는 실제 GitHub artifact에서 no-BOM JSON과
+- PG-free focused **178 passed**. Windows-safe downloader는 실제 GitHub artifact에서 no-BOM JSON과
   정상 ZIP을 확인했다. `py_compile`·CLI help·`check_docs`·citation ratchet(새 결함 0)·
   contract bindings는 모두 exit 0이다.
 

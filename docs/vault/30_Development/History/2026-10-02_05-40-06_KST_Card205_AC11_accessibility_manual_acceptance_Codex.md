@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-2026-10-02-CARD205-AC11-ACCESSIBILITY-MANUAL"
 title: "Card 205 AC-11 사용자 기기 접근성 수동 인수 importer"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-02T06:06:48+09:00"
+updated: "2026-10-02T06:23:06+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "9d9389a110eb7bc62351f261ae28e9482c8149ad"
@@ -24,11 +24,11 @@ SHA Evidence에 합칠 importer가 없음을 확인했다. 이는 train 13 후�
 
 ## 2. 사전 등록과 registry
 
-- Claude r1 뒤 증명 범위를 먼저 정정한 v1.1 target·strict JSON Schema·안전 기본 template과
-  Windows runbook을 commit `db8c8a78`에 고정했다.
-- target source document blob은 `bd878c30cc74e235b63e4105b4226e76cfb60a54`다.
-- canonical registry commit은 `c58df176`, blob은
-  `f00a38e13239f37ddfc28fb2e5c7444392882ed9`다.
+- Claude r1/r2 뒤 증명 범위와 사용자 역할을 정정한 v1.1.1 target·strict JSON Schema·안전 기본
+  template과 Windows runbook을 commit `505a5f4b`에 고정했다.
+- target source document blob은 `737853bbde0bc3da077c37acea132552e55f8eb9`다.
+- canonical registry commit은 `0ee9542a`, blob은
+  `eeb43dc262f5de1816237ef85fc902cdca4ab6fd`다.
 - `accessibility-e2e`는 `s11-accessibility-user-device-v1` target만 허용한다. migration과
   long-soak importer pin도 같은 registry blob으로 함께 재고정했다.
 
@@ -65,7 +65,7 @@ stdin token import 명령을 인용할 수 있다.
 
 ```text
 python -m pytest tests/test_import_ac11_accessibility_evidence.py tests/test_collect_ac11_accessibility_e2e.py tests/test_aggregate_ac11_evidence.py tests/test_import_ac11_migration_rehearsal.py tests/test_import_ac11_composite_long_soak.py -q
-177 passed
+178 passed
 
 python -m py_compile tools/collect_ac11_accessibility_e2e.py tools/import_ac11_accessibility_evidence.py tools/aggregate_ac11_evidence.py
 exit 0
@@ -85,6 +85,11 @@ PASS / exit 0
 
 부정 대조군은 가짜·다른 SHA, run/artifact head·digest·expiry·workflow/event drift, scenario
 누락·중복·비문자 identity, placeholder, 비엄격·하한 이전·미래 시각, stale/handwritten receipt,
-pwd 단독, duplicate JSON key를 포함한다. PowerShell 5.1 대신 Python downloader로 실제 run
+pwd 단독, duplicate JSON key를 포함한다. `MANUAL_NOT_BEFORE`는 hosted provenance와 분리된
+단독 시험으로 고정했다. PowerShell 5.1 대신 기본 Python 3.10 downloader로 실제 run
 `36816759719`/artifact `11141508456`을 받아 no-BOM JSON과 2-entry ZIP도 확인했다. 실제 사용자 기기 수행과 실제 access token import는
 아직 없으므로 운영 수동 인수 결과는 `NOT_OBSERVED`다.
+
+사용자는 provenance 다운로드·시나리오 수행·비밀 없는 manual session 기록까지만 수행하고,
+에이전트/코디네이터는 token을 받거나 import를 대행하지 않는다. 현재 memory-only portal에는 안전한
+token export/CLI가 없어 사용자 로컬 import도 아직 BLOCKED이며, 지원되는 importer 신뢰 경계는 CLI다.

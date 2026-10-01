@@ -33,7 +33,7 @@ from aggregate_ac11_evidence import RepositoryGit, _migration_reversible_segment
 
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
-REGISTRY_BLOB = "f00a38e13239f37ddfc28fb2e5c7444392882ed9"
+REGISTRY_BLOB = "eeb43dc262f5de1816237ef85fc902cdca4ab6fd"
 TARGET_ID = "s11-irreversible-restore-forward-v0"
 REVERSIBLE_TARGET_ID = "s11-migration-reversible-roundtrip-v1"
 HEX40 = re.compile(r"^[0-9a-f]{40}$")
