@@ -133,6 +133,14 @@ class CanonicalProblem(Exception):
     retryable: bool = False
     cause_ref: str | None = None
     evidence_id: str | None = None
+    #: An action name for the denial audit, when this refusal is one a route's contract
+    #: names. ``None`` keeps the generic ``METHOD <template>`` action. It exists so a
+    #: contract that requires a specific audited action -- #282 §8's
+    #: ``release.acceptance.denied`` -- gets it **without** a route writing its own audit
+    #: row: the single audit point stays the shared handler, which is the rule
+    #: ``app._record_denial`` is built on, and a per-route write would be a second row for
+    #: one refusal.
+    audit_action: str | None = None
     category: str = field(init=False)
 
     def __post_init__(self) -> None:
@@ -208,7 +216,15 @@ DenialRecorder = Callable[..., None]
 
 
 def is_audited_denial(error: CanonicalProblem) -> bool:
-    """Whether a canonical problem is a denial the shared handler records."""
+    """Whether a canonical problem is a denial the shared handler records.
+
+    Two ways to be one: the historical rule -- an AUTH or SEC refusal at 401/403 -- or a
+    refusal whose route named an ``audit_action``. The second exists because #282 §8
+    requires the *state* refusals (a stale digest, an expired proposal) to be audited too,
+    and those are GRAPH 409s that the first rule does not cover.
+    """
+    if error.audit_action:
+        return True
     return error.category in DENIAL_CATEGORIES and error.status in DENIAL_STATUSES
 
 
@@ -228,6 +244,8 @@ def install_canonical_problem_handler(
     async def _canonical(request: Request, exc: CanonicalProblem) -> JSONResponse:
         trace_id = getattr(request.state, "trace_id", None) or new_trace_id()
         if on_denial is not None and is_audited_denial(exc):
+            if exc.audit_action:
+                request.state.denial_action = exc.audit_action
             on_denial(request, code=exc.code, trace_id=trace_id)
         return canonical_response(exc, trace_id=trace_id)
 

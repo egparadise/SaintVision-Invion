@@ -27,7 +27,7 @@ from pathlib import Path
 import pytest
 from sqlalchemy import text
 
-from saintvision.db.session import tenant_scope
+from saintvision.db.session import actor_scope, tenant_scope
 from saintvision.ids import new_id
 from saintvision.services import release_acceptance_policy as policy
 from saintvision.services import release_sign_off
@@ -60,6 +60,16 @@ def people(owner_engine, two_tenants):
                     "VALUES (:u, :t, :s, 'Operator', 'active', now(), now(), 1)"
                 ),
                 {"u": ids[key], "t": tenant_a, "s": f"oidc:{key}"},
+            )
+            # The live grant 0057's policies read. Without it the policy refuses the
+            # insert, which is the binding working: a human who may not accept releases
+            # cannot leave a proposal or a vote behind, whatever path reaches the table.
+            c.execute(
+                text(
+                    "INSERT INTO inv.business_admin_grants(tenant_id,user_id,permission,"
+                    "enabled) VALUES(:t,:u,'releases.accept',true)"
+                ),
+                {"t": tenant_a, "u": ids[key]},
             )
     return ids
 
@@ -112,11 +122,19 @@ def accept(
     The routes are not enabled in this build (§0-1.5), so the projection is tested
     against rows in the shape the canonical function produces. Every column that the
     projection reads is set here explicitly, which is also why a test can remove one.
+
+    Each insert runs as the human the row names. 0057's policies require that -- an actor
+    column has to equal ``inv.user_id``, and the human has to be active and permitted --
+    so a helper that wrote the rows anonymously, as this one did, is refused. That refusal
+    is the point: the first version passed, and Codex measured that a row could name
+    somebody else entirely.
     """
     version, digest = registry_pin()
     proposal_id = new_id("acceptance_proposal")
     acceptance_id = new_id("acceptance")
     pinned = manifest_sha256 or release.manifest_sha256
+    proposer_scope = actor_scope(session, proposer)
+    proposer_scope.__enter__()
     session.execute(
         text(
             "INSERT INTO release_acceptance_proposals(proposal_id,tenant_id,release_id,"
@@ -146,6 +164,8 @@ def accept(
     for index, (user, role) in enumerate(((proposer, "proposer"), (confirmer, "confirmer"))):
         if index >= voters:
             break
+        # The GUC is transaction-scoped, so this re-points it at the voter for each row.
+        actor_scope(session, user).__enter__()
         session.execute(
             text(
                 "INSERT INTO release_acceptance_votes(vote_id,tenant_id,proposal_id,user_id,"
@@ -188,6 +208,7 @@ def accept(
             "p": proposal_id,
         },
     )
+    actor_scope(session, confirmer).__enter__()
     session.execute(
         text(
             "INSERT INTO release_acceptance_slots(slot_id,tenant_id,release_id,"
@@ -212,6 +233,7 @@ def accept(
          "a": acceptance_id, "now": NOW},
     )
     session.flush()
+    proposer_scope.__exit__(None, None, None)
     return acceptance_id
 
 
@@ -450,6 +472,7 @@ def test_a_withdrawn_decision_leaves_the_criterion_unmet(app_sessionmaker, peopl
                     confirmer=people["two"],
                 )
                 before = answer(session, tenant_id=people["tenant_a"], release=release)
+                actor_scope(session, people["one"]).__enter__()
                 session.execute(
                     text(
                         "INSERT INTO release_acceptance_withdrawals(withdrawal_id,tenant_id,"

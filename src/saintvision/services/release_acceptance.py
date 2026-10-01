@@ -35,12 +35,13 @@ below changes shape.
 
 from __future__ import annotations
 
+import base64
 import datetime as dt
 import uuid
 from dataclasses import dataclass
 from typing import Any, Protocol
 
-from sqlalchemy import select, text
+from sqlalchemy import select, text, tuple_
 from sqlalchemy.orm import Session
 
 from ..db.models import (
@@ -57,9 +58,10 @@ from ..errors import (
     AUTH_PROJECT_SCOPE,
     GRAPH_INVALID_TRANSITION,
     RES_RELEASE_NOT_FOUND,
+    VAL_SCHEMA,
     InvError,
 )
-from ..ids import new_id
+from ..ids import is_id, new_id
 from . import audit as audit_service
 from . import release_acceptance_auth as fresh
 from . import release_acceptance_digest as digest
@@ -93,6 +95,117 @@ PERMISSION = "releases.accept"
 #: The page §3 allows for pending proposals.
 PENDING_PAGE_MAX = 100
 PENDING_STATE = "pending_second_operator"
+
+
+@dataclass(frozen=True)
+class Refused:
+    """A refusal the caller is told about **after** the transaction commits.
+
+    §4 and §5 are explicit that an expired proposal and a superseded manifest are not
+    errors to roll back: the proposal really did expire, the slot really is empty, and
+    those are rows to keep. Raising was the first implementation and Codex measured what
+    it did -- the ``InvError`` propagated through the route, ``get_write_session``'s
+    ``with session.begin()`` rolled the whole transaction back, and the lifecycle event,
+    the cleared slot, the audit row and the idempotency receipt all disappeared. The
+    caller then saw a 409 describing a state the database had never reached.
+
+    So the service returns this instead of raising, the route stores it as the receipt and
+    returns it as a response, and the commit happens because nothing threw.
+    """
+
+    status: int
+    code: str
+    detail: str
+    #: For a log and a test, never for the response body.
+    reason: str
+
+
+@dataclass(frozen=True)
+class Outcome:
+    """What a write produced: a body to serialise, or a refusal to commit and return."""
+
+    status: int
+    body: dict[str, Any] | None = None
+    refused: Refused | None = None
+
+
+#: The fields that make two decision requests the same decision (§4 convergence). Not the
+#: proposal digest: that binds ``expiresAt``, which is the proposer's own fresh-auth
+#: window, so two operators sending identical bodies would never match on it.
+_SAME_DECISION_FIELDS = (
+    "acceptance_id_ref",
+    "outcome",
+    "target_manifest_sha256",
+    "reason_code",
+)
+
+
+def _same_decision(proposal: ReleaseAcceptanceProposal, request: Any) -> bool:
+    """Whether this request is the proposal that already exists.
+
+    Compares the content an operator reviewed, in order, including the reference lists --
+    their order carries meaning, so a reordered list is a different decision and gets the
+    conflict rather than the receipt.
+    """
+    if proposal.acceptance_id_ref != request.acceptance_id_ref:
+        return False
+    if request.outcome != "accepted" or proposal.outcome != "accepted":
+        return False
+    if str(proposal.target_manifest_sha256) != request.target_manifest_sha256:
+        return False
+    if proposal.reason_code != request.reason_code:
+        return False
+    targets = [
+        {"targetId": item.target_id, "targetSha256": item.target_sha256}
+        for item in request.target_refs
+    ]
+    measurements = [
+        {
+            "evidenceId": item.evidence_id,
+            "evidenceSha256": item.evidence_sha256,
+            "observedAt": digest.format_instant(item.observed_at),
+        }
+        for item in request.measurement_refs
+    ]
+    return (
+        list(proposal.target_refs or []) == targets
+        and list(proposal.measurement_refs or []) == measurements
+        and list(proposal.known_limitations or []) == list(request.known_limitations)
+    )
+
+
+def _proposal_body(proposal: ReleaseAcceptanceProposal, *, replayed: bool) -> dict[str, Any]:
+    return {
+        "proposalId": proposal.proposal_id,
+        "releaseId": proposal.release_id,
+        "acceptanceIdRef": proposal.acceptance_id_ref,
+        "outcome": "accepted",
+        "state": PENDING_STATE,
+        "targetManifestSha256": proposal.target_manifest_sha256,
+        "proposalDigest": proposal.proposal_digest,
+        "requiredDistinctOperatorCount": 2,
+        "proposalConfirmationCount": 1,
+        "decisionSignOff": False,
+        "expiresAt": proposal.expires_at,
+        "replayed": replayed,
+    }
+
+
+def _recorded_body(decision: AcceptanceRecord, *, replayed: bool) -> dict[str, Any]:
+    accepted = decision.outcome == "accepted"
+    return {
+        "acceptanceId": decision.acceptance_id,
+        "releaseId": decision.release_id,
+        "acceptanceIdRef": decision.acceptance_id_ref,
+        "outcome": decision.outcome,
+        "state": "recorded",
+        "acceptedManifestSha256": decision.accepted_manifest_sha256,
+        "manifestMatches": True,
+        "decisionSignOff": accepted,
+        "decisionConfirmationCount": 2 if accepted else 1,
+        "decidedAt": decision.decided_at,
+        "replayed": replayed,
+    }
 
 
 class PrerequisitesUnavailable(Exception):
@@ -185,6 +298,14 @@ def require_fresh_operator(
 
     Re-read on every request and before every replay. A login-time snapshot of a role
     is not a permission; the row is.
+
+    It also **puts the verified human into the transaction**, which is why every write
+    route calls this first. The row-level policies on these tables check that the actor
+    column equals ``inv.user_id`` and that the human is active and permitted, so a write
+    issued before this call is refused by the database. That is how I found that setting
+    the scope only around the confirm function was not enough -- the proposal and vote
+    inserts happen earlier in the same transaction. ``SET LOCAL`` lasts for the
+    transaction, so one call covers the whole request and ends with it.
     """
     try:
         proof = fresh.proof_of_interactive_human(principal, now=now)
@@ -196,6 +317,10 @@ def require_fresh_operator(
     settings_service.require_global_administrator(
         session, tenant_id=principal.tenant_id, user_id=principal.user_id, permission=PERMISSION
     )
+    # Entered and left immediately: the SET LOCAL it issues belongs to the transaction,
+    # not to this block, which is the property the policies rely on.
+    with actor_scope(session, principal.user_id):
+        pass
     return proof
 
 
@@ -268,7 +393,9 @@ def _audit(
         actor_type="user",
         actor_id=principal.user_id,
         action=action,
-        outcome="succeeded",
+        # ``allow``, not ``succeeded``: the column is varchar(8) with a closed set of
+        # allow/deny/error, and an audit row that fails to insert fails the request.
+        outcome="allow",
         tenant_id=principal.tenant_id,
         target_type="release_manifest",
         target_id=detail.get("releaseId"),
@@ -285,7 +412,7 @@ def propose_or_record(
     proof: fresh.FreshAuthProof,
     resolver: ReferenceResolver,
     now: dt.datetime,
-) -> tuple[int, dict[str, Any]]:
+) -> Outcome:
     """``accepted`` opens a proposal; ``conditional`` and ``rejected`` are final at once.
 
     The asymmetry is the contract's: only ``accepted`` claims something about the world
@@ -314,16 +441,19 @@ def propose_or_record(
     )
 
     if request.outcome != "accepted":
-        return 201, _record_final(
-            session,
-            principal=principal,
-            release=release,
-            slot=slot,
-            request=request,
-            proof=proof,
-            now=now,
+        return Outcome(
+            status=201,
+            body=_record_final(
+                session,
+                principal=principal,
+                release=release,
+                slot=slot,
+                request=request,
+                proof=proof,
+                now=now,
+            ),
         )
-    return 202, _open_proposal(
+    body = _open_proposal(
         session,
         principal=principal,
         release=release,
@@ -333,6 +463,7 @@ def propose_or_record(
         loaded=loaded,
         now=now,
     )
+    return Outcome(status=202, body=body)
 
 
 def _record_final(
@@ -340,7 +471,19 @@ def _record_final(
 ) -> dict[str, Any]:
     """A ``conditional`` or ``rejected`` decision: one person, recorded, no sign-off."""
     if slot.active_proposal_id is not None:
-        raise InvError(GRAPH_INVALID_TRANSITION, "this criterion already has a proposal awaiting a second operator")
+        raise InvError(
+            GRAPH_INVALID_TRANSITION,
+            "this criterion already has a proposal awaiting a second operator",
+        )
+    if slot.active_acceptance_id is not None:
+        # This function used to overwrite the slot's active decision, so a release's
+        # sign-off could change with no withdrawal recorded anywhere. The database refuses
+        # it too (0057's trigger); this is the refusal that says why in the contract's
+        # words rather than as a constraint violation.
+        raise InvError(
+            GRAPH_INVALID_TRANSITION,
+            "this criterion already has an active decision; withdraw it first",
+        )
     acceptance_id = new_id("acceptance")
     session.add(
         AcceptanceRecord(
@@ -396,12 +539,17 @@ def _open_proposal(
     """An ``accepted`` decision awaiting a distinct second human."""
     if slot.active_proposal_id is not None:
         existing = session.get(ReleaseAcceptanceProposal, slot.active_proposal_id)
-        # Converging rather than creating a second pending proposal: a confirmer must
-        # not be able to approve one while another is open on the same criterion (§4).
+        if existing is not None and _same_decision(existing, request):
+            # §4's convergence: the same body under a different key is the same decision,
+            # so it gets the first proposal's answer and leaves no second vote and no
+            # second audit row. Returning a conflict here instead -- which is what this
+            # did -- would make a retry whose response was lost unrecoverable: the
+            # operator cannot re-send it and cannot confirm it either, because confirming
+            # requires having read the proposal they were never told about.
+            return _proposal_body(existing, replayed=True)
         raise InvError(
             GRAPH_INVALID_TRANSITION,
-            "this criterion already has a proposal awaiting a second operator",
-            extra={"proposalId": existing.proposal_id if existing else None},
+            "this criterion already has a different proposal awaiting a second operator",
         )
     expires_at = min(proof.window_ends_at, now + dt.timedelta(seconds=fresh.FRESH_AUTH_WINDOW_SECONDS))
     proposal_id = new_id("acceptance_proposal")
@@ -520,6 +668,36 @@ def _review_payload(proposal: ReleaseAcceptanceProposal) -> dict[str, Any]:
     }
 
 
+def encode_cursor(created_at: dt.datetime, proposal_id: str) -> str:
+    """The page's position as one opaque string over **both** sort keys (§3, P1-7).
+
+    The first version filtered on ``proposal_id`` alone while ordering by
+    ``(created_at, proposal_id)``. Those two orders are not the same -- a ULID orders by
+    the millisecond it was minted, a ``created_at`` by the request's clock -- so a page
+    could skip a proposal or show one twice. Both keys travel, and the string is opaque so
+    a caller cannot build one by hand and ask for a position the server never issued.
+    """
+    raw = f"{digest.format_instant(created_at)}|{proposal_id}".encode("utf-8")
+    return base64.urlsafe_b64encode(raw).decode("ascii").rstrip("=")
+
+
+def decode_cursor(cursor: str) -> tuple[dt.datetime, str]:
+    """The inverse, strict. A cursor that does not decode is refused, not ignored."""
+    if not isinstance(cursor, str) or not 1 <= len(cursor) <= 256:
+        raise InvError(VAL_SCHEMA, "cursor is not a page position")
+    try:
+        padded = cursor + "=" * (-len(cursor) % 4)
+        stamp, _, proposal_id = base64.urlsafe_b64decode(padded).decode("utf-8").partition("|")
+        moment = dt.datetime.strptime(stamp, "%Y-%m-%dT%H:%M:%S.%fZ").replace(
+            tzinfo=dt.timezone.utc
+        )
+    except (ValueError, TypeError) as error:
+        raise InvError(VAL_SCHEMA, "cursor is not a page position") from error
+    if not is_id(proposal_id, "acceptance_proposal"):
+        raise InvError(VAL_SCHEMA, "cursor is not a page position")
+    return moment, proposal_id
+
+
 def pending_page(
     session: Session, *, tenant_id: uuid.UUID, release_id: str, limit: int, cursor: str | None
 ) -> dict[str, Any]:
@@ -545,12 +723,21 @@ def pending_page(
         .limit(bounded + 1)
     )
     if cursor:
-        query = query.where(ReleaseAcceptanceProposal.proposal_id > cursor)
+        # The row-value comparison, so the filter is the same order as the ORDER BY.
+        after, last_id = decode_cursor(cursor)
+        query = query.where(
+            tuple_(ReleaseAcceptanceProposal.created_at, ReleaseAcceptanceProposal.proposal_id)
+            > (after, last_id)
+        )
     rows = list(session.scalars(query).all())
     page = rows[:bounded]
     return {
         "items": [_review_payload(row) for row in page],
-        "nextCursor": page[-1].proposal_id if len(rows) > bounded and page else None,
+        "nextCursor": (
+            encode_cursor(page[-1].created_at, page[-1].proposal_id)
+            if len(rows) > bounded and page
+            else None
+        ),
     }
 
 
@@ -594,6 +781,10 @@ def _close_proposal(
             occurred_at=now,
         )
     )
+    # Flushed before the slot moves, because the slot's trigger asks whether this proposal
+    # has been closed and this session does not autoflush: without it the UPDATE runs
+    # before the event exists and the database refuses the transition it is part of.
+    session.flush()
     session.execute(
         text(
             "UPDATE release_acceptance_slots SET active_proposal_id=NULL, updated_at=:now "
@@ -622,6 +813,16 @@ def _close_proposal(
     )
 
 
+#: The refusal a closed proposal produces, in one place so the first request and every
+#: later one with a different key answer identically (§5).
+STALE = Refused(
+    status=409,
+    code="GRAPH-0003",
+    detail="The release acceptance state changed before this request was applied.",
+    reason="the proposal was closed by expiry or by a superseded manifest",
+)
+
+
 def confirm(
     session: Session,
     *,
@@ -630,12 +831,16 @@ def confirm(
     proposal_id: str,
     request: Any,
     proof: fresh.FreshAuthProof,
+    resolver: ReferenceResolver,
     now: dt.datetime,
-) -> dict[str, Any]:
+) -> Outcome:
     """The second operator. The database re-checks everything this function checked.
 
     Both layers on purpose: this one produces the contract's errors, and the canonical
     function is what holds if a future caller reaches the tables another way.
+
+    Returns an :class:`Outcome` rather than raising for a closed proposal, because that
+    refusal has to survive the commit -- see :class:`Refused`.
     """
     release = _locked_release(session, tenant_id=principal.tenant_id, release_id=release_id)
     proposal = session.scalars(
@@ -653,20 +858,80 @@ def confirm(
         release_id=release_id,
         acceptance_id_ref=proposal.acceptance_id_ref,
     )
+
+    # §4's confirmer race, from the loser's side: the winner's transaction has committed,
+    # so this one finds the proposal closed and the decision recorded. It converges on that
+    # decision instead of reporting a state error -- two operators who both confirmed the
+    # same proposal did not disagree about anything.
+    settled = session.scalars(
+        select(ReleaseAcceptanceLifecycleEvent).where(
+            ReleaseAcceptanceLifecycleEvent.tenant_id == principal.tenant_id,
+            ReleaseAcceptanceLifecycleEvent.proposal_id == proposal_id,
+        )
+    ).all()
+    confirmed = next((event for event in settled if event.event_kind == "confirmed"), None)
+    if confirmed is not None and confirmed.acceptance_id:
+        decision = session.get(AcceptanceRecord, confirmed.acceptance_id)
+        if decision is not None:
+            return Outcome(status=201, body=_recorded_body(decision, replayed=True))
+    if settled:
+        # Closed for a reason that produced no decision. The same 409 as the request that
+        # closed it, so a different key asking again gets the same answer rather than a
+        # fresh attempt at an already-settled proposal.
+        return Outcome(status=409, refused=STALE)
+
     if slot.active_proposal_id != proposal_id:
         raise InvError(GRAPH_INVALID_TRANSITION, "the proposal is no longer awaiting confirmation")
     if now >= proposal.expires_at:
         _close_proposal(session, principal=principal, proposal=proposal, kind="expired", now=now)
-        raise InvError(GRAPH_INVALID_TRANSITION, "the proposal has expired")
+        # Committed, then refused: the expiry is a fact, not an error (§4, §5).
+        return Outcome(status=409, refused=STALE)
     if str(release.manifest_sha256) != str(proposal.target_manifest_sha256):
         _close_proposal(
             session, principal=principal, proposal=proposal, kind="manifest-superseded", now=now
         )
-        raise InvError(GRAPH_INVALID_TRANSITION, "the release composition has changed")
+        return Outcome(status=409, refused=STALE)
     if request.proposal_digest != proposal.proposal_digest:
         raise InvError(GRAPH_INVALID_TRANSITION, "the confirmed digest is not this proposal's")
     if request.target_manifest_sha256 != str(release.manifest_sha256):
         raise InvError(GRAPH_INVALID_TRANSITION, "the release composition has changed")
+
+    # §4 step 6 and step 8, which were missing. The proposal's references are re-resolved
+    # against the authoritative registries *here*, not only when the proposal was made:
+    # between the two there is a second human and an unbounded gap, and Evidence can be
+    # withdrawn in it. Codex measured the gap by deleting the one resolve() call in the
+    # decision path and watching 124 focused tests still pass.
+    try:
+        resolver.resolve(
+            session,
+            tenant_id=principal.tenant_id,
+            release_id=release_id,
+            target_refs=list(proposal.target_refs or []),
+            measurement_refs=list(proposal.measurement_refs or []),
+        )
+    except ReferencesUnresolvable:
+        return Outcome(status=409, refused=STALE)
+    # The live grant again, immediately before the write. The check at the top of the
+    # request ran before every lock above it.
+    settings_service.require_global_administrator(
+        session,
+        tenant_id=principal.tenant_id,
+        user_id=principal.user_id,
+        permission=PERMISSION,
+    )
+    # And the manifest once more from the locked row, so the digest the decision stores is
+    # the one that was true at the moment of writing rather than at the moment of reading.
+    current = session.scalars(
+        select(ReleaseManifest.manifest_sha256).where(
+            ReleaseManifest.tenant_id == principal.tenant_id,
+            ReleaseManifest.release_id == release_id,
+        )
+    ).one()
+    if str(current) != str(proposal.target_manifest_sha256):
+        _close_proposal(
+            session, principal=principal, proposal=proposal, kind="manifest-superseded", now=now
+        )
+        return Outcome(status=409, refused=STALE)
 
     acceptance_id = new_id("acceptance")
     event_id = _audit(
@@ -711,19 +976,22 @@ def confirm(
             )
         except Exception as error:  # noqa: BLE001 - mapped to the contract below
             raise _mapped_db_refusal(error) from error
-    return {
-        "acceptanceId": acceptance_id,
-        "releaseId": release.release_id,
-        "acceptanceIdRef": proposal.acceptance_id_ref,
-        "outcome": "accepted",
-        "state": "recorded",
-        "acceptedManifestSha256": release.manifest_sha256,
-        "manifestMatches": True,
-        "decisionSignOff": True,
-        "decisionConfirmationCount": 2,
-        "decidedAt": now,
-        "replayed": False,
-    }
+    return Outcome(
+        status=201,
+        body={
+            "acceptanceId": acceptance_id,
+            "releaseId": release.release_id,
+            "acceptanceIdRef": proposal.acceptance_id_ref,
+            "outcome": "accepted",
+            "state": "recorded",
+            "acceptedManifestSha256": release.manifest_sha256,
+            "manifestMatches": True,
+            "decisionSignOff": True,
+            "decisionConfirmationCount": 2,
+            "decidedAt": now,
+            "replayed": False,
+        },
+    )
 
 
 def _mapped_db_refusal(error: Exception) -> InvError:
@@ -783,6 +1051,22 @@ def withdraw(
     ).one_or_none()
     if already is not None:
         raise InvError(GRAPH_INVALID_TRANSITION, "this decision is already withdrawn")
+
+    # §4 step 8 for this route as well: the fresh-auth proof and the live grant are
+    # re-checked immediately before the append, because everything above this line was a
+    # read and a lock and the operator's window can close inside it.
+    try:
+        fresh.proof_of_interactive_human(principal, now=now)
+    except fresh.NotInteractiveHuman as error:
+        raise InvError(
+            AUTH_PROJECT_SCOPE, "fresh interactive operator authentication is required"
+        ) from error
+    settings_service.require_global_administrator(
+        session,
+        tenant_id=principal.tenant_id,
+        user_id=principal.user_id,
+        permission=PERMISSION,
+    )
 
     withdrawal_id = new_id("acceptance_withdrawal")
     session.add(

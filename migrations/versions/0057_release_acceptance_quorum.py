@@ -421,12 +421,63 @@ def upgrade() -> None:
     )
 
     # ---------------------------------------------------------------- RLS and privileges
+    # A tenant-only WITH CHECK was the first version and Codex measured what it allows:
+    # with the actor scope set to one user, a row naming *another* user as proposer
+    # inserted fine. Tenant isolation is not actor binding, and the application role holds
+    # the INSERT, so the row's own actor column has to be checked by the policy.
+    #
+    # ``release_acceptance_actor_is_live`` answers the three questions the design asks of
+    # every write (§2-1, §2-2): is this the human the request was verified as, is that
+    # human still active, and do they hold ``releases.accept`` right now. It is
+    # SECURITY INVOKER, takes no user argument it does not re-derive, and is used inside
+    # the policies so the answer is enforced by the database rather than by whoever wrote
+    # the INSERT.
+    op.execute(
+        f"""
+        CREATE FUNCTION public.release_acceptance_actor_is_live(
+            p_tenant uuid, p_actor text
+        ) RETURNS boolean LANGUAGE sql SECURITY INVOKER STABLE AS $fn$
+          SELECT p_actor IS NOT NULL
+             AND p_actor = {ACTOR_EXPR}
+             AND p_tenant = {TENANT_EXPR}
+             AND EXISTS (
+                   SELECT 1 FROM public.users u
+                    WHERE u.tenant_id = p_tenant AND u.user_id = p_actor
+                      AND u.status = 'active')
+             AND public.business_admin_allowed(p_tenant, p_actor, 'releases.accept')
+        $fn$
+        """
+    )
+    op.execute(
+        "REVOKE ALL ON FUNCTION public.release_acceptance_actor_is_live(uuid,text) FROM PUBLIC"
+    )
+    op.execute(
+        "GRANT EXECUTE ON FUNCTION public.release_acceptance_actor_is_live(uuid,text) "
+        f"TO {APP_ROLE}"
+    )
+
+    #: Which column names the human who wrote each row. The lifecycle table has none --
+    #: an event is the system closing a proposal -- so it is bound to the acting human
+    #: being live rather than to a column.
+    actor_columns = {
+        "release_acceptance_proposals": "proposed_by_user_id",
+        "release_acceptance_votes": "user_id",
+        "release_acceptance_withdrawals": "withdrawn_by_user_id",
+        "release_acceptance_lifecycle_events": None,
+    }
     for table in (*APPEND_ONLY, SLOT_TABLE):
         op.execute(f"ALTER TABLE {table} ENABLE ROW LEVEL SECURITY")
         op.execute(f"ALTER TABLE {table} FORCE ROW LEVEL SECURITY")
+        actor = actor_columns.get(table)
+        bound = (
+            f"public.release_acceptance_actor_is_live(tenant_id, {actor})"
+            if actor
+            else f"public.release_acceptance_actor_is_live(tenant_id, {ACTOR_EXPR})"
+        )
         op.execute(
             f"CREATE POLICY {table}_tenant_isolation ON {table} FOR ALL TO {APP_ROLE} "
-            f"USING (tenant_id = {TENANT_EXPR}) WITH CHECK (tenant_id = {TENANT_EXPR})"
+            f"USING (tenant_id = {TENANT_EXPR}) "
+            f"WITH CHECK (tenant_id = {TENANT_EXPR} AND {bound})"
         )
     for table in APPEND_ONLY:
         op.execute(f"GRANT SELECT, INSERT ON {table} TO {APP_ROLE}")
@@ -451,14 +502,31 @@ def upgrade() -> None:
         "    RAISE EXCEPTION 'a coordination slot cannot change which criterion it is' "
         "      USING ERRCODE = 'check_violation', CONSTRAINT = 'slot_identity_is_fixed'; "
         "  END IF; "
-        # A pending proposal may become the final decision it turned into, or be
-        # released. It may not be replaced by a different pending proposal: that would be
-        # a second proposal a confirmer could approve without seeing the first.
+        # A pending proposal leaves the slot only once it has been closed, and that is
+        # checked against the lifecycle table rather than against the statement. The first
+        # version compared OLD and NEW in one UPDATE, and Codex measured the hole: inside
+        # one transaction, clearing the slot and then setting a different proposal passed
+        # both times, because neither statement was a non-null to non-null replacement.
+        # Asking "is the proposal this slot is giving up actually closed" has no such
+        # seam -- there is no order of statements that satisfies it without the event.
         "  IF OLD.active_proposal_id IS NOT NULL "
-        "     AND NEW.active_proposal_id IS NOT NULL "
-        "     AND NEW.active_proposal_id IS DISTINCT FROM OLD.active_proposal_id THEN "
-        "    RAISE EXCEPTION 'a pending proposal cannot be replaced by another' "
+        "     AND NEW.active_proposal_id IS DISTINCT FROM OLD.active_proposal_id "
+        "     AND NOT EXISTS ( "
+        "       SELECT 1 FROM release_acceptance_lifecycle_events e "
+        "        WHERE e.proposal_id = OLD.active_proposal_id) THEN "
+        "    RAISE EXCEPTION 'a pending proposal leaves the slot only when it is closed' "
         "      USING ERRCODE = 'check_violation', CONSTRAINT = 'slot_pending_is_exclusive'; "
+        "  END IF; "
+        # An active final decision is replaced only after it has been withdrawn. Without
+        # this, recording a second decision on a criterion silently overwrote the first in
+        # the slot and the release's sign-off changed with no withdrawal anywhere.
+        "  IF OLD.active_acceptance_id IS NOT NULL "
+        "     AND NEW.active_acceptance_id IS DISTINCT FROM OLD.active_acceptance_id "
+        "     AND NOT EXISTS ( "
+        "       SELECT 1 FROM release_acceptance_withdrawals w "
+        "        WHERE w.acceptance_id = OLD.active_acceptance_id) THEN "
+        "    RAISE EXCEPTION 'an active decision leaves the slot only when it is withdrawn' "
+        "      USING ERRCODE = 'check_violation', CONSTRAINT = 'slot_final_is_exclusive'; "
         "  END IF; "
         # The row a slot names must be this criterion's. Without this the FK would be
         # satisfied by any proposal of any release in the tenant.
@@ -692,6 +760,9 @@ def downgrade() -> None:
         "integer,char(64),timestamptz)"
     )
     op.execute("DROP FUNCTION IF EXISTS public.release_acceptance_slot_forward()")
+    op.execute(
+        "DROP FUNCTION IF EXISTS public.release_acceptance_actor_is_live(uuid,text)"
+    )
 
     # The permission CHECK and the grants 0005 gave, as they were.
     op.execute(

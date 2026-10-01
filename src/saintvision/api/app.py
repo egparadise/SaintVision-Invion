@@ -126,6 +126,10 @@ def create_app(
         request ends as a generic 500 with nothing privileged done -- an audit
         failure is not disguised as a successful refusal.
         """
+        # A route may name the action its contract requires; otherwise it is the
+        # bounded ``METHOD <template>`` (#189). Either way this is still the only place a
+        # denial is written.
+        declared = getattr(request.state, "denial_action", None)
         project_id = request.path_params.get("project_id")
         target = ("project", project_id) if is_id(project_id, "project") else (None, None)
         record_denial_out_of_band(
@@ -133,7 +137,7 @@ def create_app(
             now=now(),
             actor_type=getattr(request.state, "actor_type", "anonymous"),
             actor_id=getattr(request.state, "actor_id", None),
-            action=audit_action(request),
+            action=declared if isinstance(declared, str) and declared else audit_action(request),
             outcome="deny",
             tenant_id=getattr(request.state, "tenant_id", None),
             reason_code=code,

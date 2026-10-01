@@ -24,9 +24,11 @@ from __future__ import annotations
 
 import datetime as dt
 import re
+from dataclasses import replace
 from typing import Mapping
 
 from fastapi import APIRouter, Depends, Header, Query, Request, Response
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from ...config import Settings
@@ -59,6 +61,7 @@ from ..problem import (
     SYS_PREREQUISITES_UNAVAILABLE,
     VAL_REQUEST,
     CanonicalProblem,
+    canonical_response,
     read_bounded_body,
     require_absent_body,
     strict_json_object,
@@ -116,13 +119,39 @@ def _gate(settings: Settings) -> None:
         ) from None
 
 
-def _conflict(error: Exception) -> CanonicalProblem:
-    return CanonicalProblem(
-        GRAPH_STATE_DRIFT,
-        409,
-        "The release acceptance state changed before this request was applied.",
-        retryable=False,
+def _audited(problem: CanonicalProblem) -> CanonicalProblem:
+    """Mark a refusal as the one §8 names, so the shared handler records that action.
+
+    Not an audit call. The repository has exactly one place that writes a denial --
+    ``app._record_denial``, reached from the canonical handler -- and its docstring says
+    why: a route is inside a transaction the refusal rolls back, and per-route recording
+    drifts. So the route *names* the action and the single audit point uses it.
+    """
+    return replace(problem, audit_action=service.AUDIT_DENIED)
+
+
+def _conflict() -> CanonicalProblem:
+    return _audited(
+        CanonicalProblem(
+            GRAPH_STATE_DRIFT,
+            409,
+            "The release acceptance state changed before this request was applied.",
+            retryable=False,
+        )
     )
+
+
+def _refusal(refused: service.Refused, *, trace_id: str) -> JSONResponse:
+    """A refusal returned as a **response**, so the transaction that recorded it commits.
+
+    §5 requires the expiry and manifest-drift transitions to be committed and *then*
+    reported, with the 409 confirmed as the idempotency receipt. Raising would roll the
+    transition back, which is what the first implementation did.
+    """
+    problem = _audited(
+        CanonicalProblem(refused.code, refused.status, refused.detail, retryable=False)
+    )
+    return canonical_response(problem, trace_id=trace_id)
 
 
 # --------------------------------------------------------------------------- decisions
@@ -160,7 +189,7 @@ async def decide(
     try:
         proof = service.require_fresh_operator(session, principal=principal, now=now)
     except InvError as error:
-        raise translate(error, table=TRANSLATION, detail="Not permitted.") from None
+        raise _audited(translate(error, table=TRANSLATION, detail="Not permitted.")) from None
 
     # The canonical ledger payload includes the path ID, so one key cannot be reused
     # against another release (§3).
@@ -180,13 +209,15 @@ async def decide(
             ttl_seconds=settings.idempotency_ttl_seconds,
         )
     except InvError as error:
-        raise translate(error, table=TRANSLATION, detail="Idempotency key reused.") from None
+        raise _audited(
+            translate(error, table=TRANSLATION, detail="Idempotency key reused.")
+        ) from None
     if stored is not None:
         response.status_code = int(stored.get("status", 202))
         return {**stored.get("body", {}), "replayed": True}
 
     try:
-        status, result = service.propose_or_record(
+        outcome = service.propose_or_record(
             session,
             principal=principal,
             release_id=release_id,
@@ -196,16 +227,19 @@ async def decide(
             now=now,
         )
     except service.ReferencesUnresolvable:
-        raise _conflict(None) from None
+        raise _conflict() from None
     except InvError as error:
-        raise translate(error, table=TRANSLATION, detail="The decision was not recorded.") from None
+        raise _audited(
+            translate(error, table=TRANSLATION, detail="The decision was not recorded.")
+        ) from None
 
+    status = outcome.status
     model = (
         schemas.ReleaseAcceptanceProposalResponse
         if status == 202
         else schemas.ReleaseAcceptanceRecordedResponse
     )
-    validated = model.model_validate(result)
+    validated = model.model_validate(outcome.body)
     store_idempotent_response(
         session,
         principal=principal,
@@ -260,7 +294,7 @@ async def list_pending(
             cursor=cursor,
         )
     except InvError as error:
-        raise translate(error, table=TRANSLATION, detail="Not permitted.") from None
+        raise _audited(translate(error, table=TRANSLATION, detail="Not permitted.")) from None
     return schemas.ReleaseAcceptanceProposalReviewPageResponse.model_validate(page)
 
 
@@ -290,7 +324,7 @@ async def read_pending(
             proposal_id=proposal_id,
         )
     except InvError as error:
-        raise translate(error, table=TRANSLATION, detail="No such proposal.") from None
+        raise _audited(translate(error, table=TRANSLATION, detail="No such proposal.")) from None
     return schemas.ReleaseAcceptanceProposalReviewResponse.model_validate(proposal)
 
 
@@ -319,7 +353,7 @@ async def confirm(
     try:
         proof = service.require_fresh_operator(session, principal=principal, now=now)
     except InvError as error:
-        raise translate(error, table=TRANSLATION, detail="Not permitted.") from None
+        raise _audited(translate(error, table=TRANSLATION, detail="Not permitted.")) from None
 
     endpoint = f"POST {CONFIRM_PATH}"
     canonical = {
@@ -341,36 +375,80 @@ async def confirm(
             ttl_seconds=settings.idempotency_ttl_seconds,
         )
     except InvError as error:
-        raise translate(error, table=TRANSLATION, detail="Idempotency key reused.") from None
+        raise _audited(
+            translate(error, table=TRANSLATION, detail="Idempotency key reused.")
+        ) from None
     if stored is not None:
-        response.status_code = int(stored.get("status", 201))
+        status = int(stored.get("status", 201))
+        if status >= 400:
+            # A refused receipt replays as that refusal, with no ``replayed`` key: a
+            # ProblemDetails has an exact ten-key shape and is not a success body.
+            return JSONResponse(
+                stored.get("body", {}),
+                status_code=status,
+                media_type="application/problem+json",
+                headers={"Cache-Control": "no-store"},
+            )
+        response.status_code = status
         return {**stored.get("body", {}), "replayed": True}
 
     try:
-        result = service.confirm(
+        outcome = service.confirm(
             session,
             principal=principal,
             release_id=release_id,
             proposal_id=proposal_id,
             request=payload,
             proof=proof,
+            resolver=service.active_resolver(),
             now=now,
         )
     except InvError as error:
-        raise translate(error, table=TRANSLATION, detail="The proposal was not confirmed.") from None
-    validated = schemas.ReleaseAcceptanceRecordedResponse.model_validate(result)
+        raise _audited(
+            translate(error, table=TRANSLATION, detail="The proposal was not confirmed.")
+        ) from None
+
+    if outcome.refused is not None:
+        # The transition this request recorded -- a lifecycle event, an emptied slot, an
+        # audit row -- stays, because this returns rather than raises. The 409 is confirmed
+        # as the receipt in the same transaction, so a replay of the same key gets it back
+        # and a different key re-reads the closed state and produces the same answer (§5).
+        trace_id = getattr(request.state, "trace_id", "")
+        body = _audited(
+            CanonicalProblem(
+                outcome.refused.code, outcome.refused.status, outcome.refused.detail,
+                retryable=False,
+            )
+        ).body(trace_id=trace_id)
+        store_idempotent_response(
+            session,
+            principal=principal,
+            endpoint=endpoint,
+            idempotency_key=key,
+            payload=canonical,
+            response_status=outcome.refused.status,
+            response_body={"status": outcome.refused.status, "body": body},
+            now=now,
+            ttl_seconds=settings.idempotency_ttl_seconds,
+        )
+        return _refusal(outcome.refused, trace_id=trace_id)
+
+    validated = schemas.ReleaseAcceptanceRecordedResponse.model_validate(outcome.body)
     store_idempotent_response(
         session,
         principal=principal,
         endpoint=endpoint,
         idempotency_key=key,
         payload=canonical,
-        response_status=201,
-        response_body={"status": 201, "body": validated.model_dump(mode="json", by_alias=True)},
+        response_status=outcome.status,
+        response_body={
+            "status": outcome.status,
+            "body": validated.model_dump(mode="json", by_alias=True),
+        },
         now=now,
         ttl_seconds=settings.idempotency_ttl_seconds,
     )
-    response.status_code = 201
+    response.status_code = outcome.status
     return validated.model_dump(mode="json", by_alias=True)
 
 
@@ -399,7 +477,7 @@ async def withdraw(
     try:
         service.require_fresh_operator(session, principal=principal, now=now)
     except InvError as error:
-        raise translate(error, table=TRANSLATION, detail="Not permitted.") from None
+        raise _audited(translate(error, table=TRANSLATION, detail="Not permitted.")) from None
 
     endpoint = f"POST {WITHDRAWAL_PATH}"
     canonical = {
@@ -421,7 +499,9 @@ async def withdraw(
             ttl_seconds=settings.idempotency_ttl_seconds,
         )
     except InvError as error:
-        raise translate(error, table=TRANSLATION, detail="Idempotency key reused.") from None
+        raise _audited(
+            translate(error, table=TRANSLATION, detail="Idempotency key reused.")
+        ) from None
     if stored is not None:
         response.status_code = int(stored.get("status", 201))
         return {**stored.get("body", {}), "replayed": True}
@@ -436,7 +516,9 @@ async def withdraw(
             now=now,
         )
     except InvError as error:
-        raise translate(error, table=TRANSLATION, detail="The decision was not withdrawn.") from None
+        raise _audited(
+            translate(error, table=TRANSLATION, detail="The decision was not withdrawn.")
+        ) from None
     validated = schemas.ReleaseAcceptanceWithdrawalResponse.model_validate(result)
     store_idempotent_response(
         session,

@@ -72,7 +72,13 @@ def _components():
 
 
 def seed(session, *, tenant_id, user_id, criterion="AC-12", expires=LATER):
-    """A release with one pending proposal and its proposer's vote."""
+    """A release with one pending proposal and its proposer's vote.
+
+    Every insert runs inside ``actor_scope`` for the human the row names, because the
+    policies now require that and a request is the only thing that can set it. The first
+    version of this helper wrote the rows with no actor scope at all, and it passed --
+    which is precisely the hole Codex measured: tenant isolation is not actor binding.
+    """
     release = pilot_service.create_release_manifest(
         session,
         tenant_id=tenant_id,
@@ -83,6 +89,8 @@ def seed(session, *, tenant_id, user_id, criterion="AC-12", expires=LATER):
     )
     session.flush()
     proposal_id = new_id("acceptance_proposal")
+    actor = actor_scope(session, user_id)
+    actor.__enter__()
     session.execute(
         text(
             "INSERT INTO release_acceptance_proposals(proposal_id,tenant_id,release_id,"
@@ -143,6 +151,7 @@ def seed(session, *, tenant_id, user_id, criterion="AC-12", expires=LATER):
         },
     )
     session.flush()
+    actor.__exit__(None, None, None)
     return release, proposal_id
 
 
@@ -411,6 +420,8 @@ def test_a_pending_proposal_cannot_be_replaced_by_another(app_sessionmaker, two_
                     session, tenant_id=two_operators["tenant_a"], user_id=two_operators["one"]
                 )
                 second = new_id("acceptance_proposal")
+                other = actor_scope(session, two_operators["two"])
+                other.__enter__()
                 session.execute(
                     text(
                         "INSERT INTO release_acceptance_proposals(proposal_id,tenant_id,"
@@ -437,6 +448,7 @@ def test_a_pending_proposal_cannot_be_replaced_by_another(app_sessionmaker, two_
                     },
                 )
                 session.flush()
+                other.__exit__(None, None, None)
                 with pytest.raises((IntegrityError, DBAPIError)) as refused:
                     session.execute(
                         text(
@@ -445,7 +457,7 @@ def test_a_pending_proposal_cannot_be_replaced_by_another(app_sessionmaker, two_
                         ),
                         {"p": second, "t": two_operators["tenant_a"], "r": release.release_id},
                     )
-    assert "cannot be replaced" in str(refused.value)
+    assert "leaves the slot only when it is closed" in str(refused.value)
 
 
 # ------------------------------------------------------------------ the confirm function
@@ -465,6 +477,13 @@ def test_the_function_refuses_when_no_human_is_in_transaction_scope(
                 release, proposal_id = seed(
                     session, tenant_id=two_operators["tenant_a"], user_id=two_operators["one"]
                 )
+        # A second transaction, because ``SET LOCAL`` lasts for the transaction that
+        # issued it: the seed above had to be a human, so asking "what if nobody is in
+        # scope" means asking in a transaction that never set one. Finding this is what
+        # showed the service must set the scope for the whole write rather than only
+        # around the function call.
+        with session.begin():
+            with tenant_scope(session, two_operators["tenant_a"]):
                 with pytest.raises(DBAPIError) as refused:
                     confirm_call(
                         session,
@@ -742,6 +761,8 @@ def test_two_connections_cannot_both_claim_one_criterion(app_sessionmaker, two_o
                 first.flush()
         with first.begin():
             with tenant_scope(first, tenant):
+                held_actor = actor_scope(first, two_operators["one"])
+                held_actor.__enter__()
                 first.execute(
                     text(
                         "INSERT INTO release_acceptance_slots(slot_id,tenant_id,release_id,"
@@ -756,7 +777,7 @@ def test_two_connections_cannot_both_claim_one_criterion(app_sessionmaker, two_o
                 )
                 first.flush()
                 with second.begin():
-                    with tenant_scope(second, tenant):
+                    with tenant_scope(second, tenant), actor_scope(second, two_operators["two"]):
                         second.execute(text("SET LOCAL lock_timeout = '750ms'"))
                         with pytest.raises(DBAPIError) as blocked_on_index:
                             second.execute(
@@ -821,3 +842,355 @@ def test_a_second_slot_row_for_one_criterion_is_impossible(app_sessionmaker, two
                         },
                     )
     assert "uq_release_acceptance_slots_criterion" in str(refused.value)
+
+
+# ------------------------------------------------------------ the bypasses Codex measured
+
+
+def _proposal_values(tenant, release, user, proposal_id, digest="9" * 64):
+    return {
+        "p": proposal_id,
+        "t": tenant,
+        "r": release.release_id,
+        "m": release.manifest_sha256,
+        "pd": digest,
+        "tr": '[{"targetId":"t.x","targetSha256":"' + "c" * 64 + '"}]',
+        "mr": '[{"evidenceId":"e.x","evidenceSha256":"' + "e" * 64
+        + '","observedAt":"2026-10-01T10:00:00.000000Z"}]',
+        "d": "b" * 64,
+        "u": user,
+        "now": NOW,
+        "exp": LATER,
+    }
+
+
+PROPOSAL_INSERT = text(
+    "INSERT INTO release_acceptance_proposals(proposal_id,tenant_id,release_id,"
+    "acceptance_id_ref,outcome,target_manifest_sha256,proposal_digest,reason_code,"
+    "target_refs,measurement_refs,known_limitations,policy_version,"
+    "policy_registry_sha256,proposed_by_user_id,created_at,expires_at) "
+    "VALUES(:p,:t,:r,'AC-12','accepted',:m,:pd,'OPERATIONAL_ACCEPTANCE',"
+    "cast(:tr AS jsonb),cast(:mr AS jsonb),'[]'::jsonb,1,:d,:u,:now,:exp)"
+)
+
+
+def test_a_row_cannot_name_an_actor_other_than_the_verified_human(app_sessionmaker, two_operators):
+    """Codex's probe, now refused.
+
+    With the actor scope set to one operator, inserting a proposal that names the *other*
+    as proposer used to succeed, because the policy checked only the tenant. Tenant
+    isolation is not actor binding: every user in a tenant passes it.
+    """
+    tenant = two_operators["tenant_a"]
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, tenant):
+                release = pilot_service.create_release_manifest(
+                    session, tenant_id=tenant, version="R4", components=_components(),
+                    created_by_user_id=two_operators["one"], now=NOW,
+                )
+                session.flush()
+                with actor_scope(session, two_operators["one"]):
+                    with pytest.raises(DBAPIError) as refused:
+                        session.execute(
+                            PROPOSAL_INSERT,
+                            _proposal_values(
+                                tenant, release, two_operators["two"],
+                                new_id("acceptance_proposal"),
+                            ),
+                        )
+    assert "row-level security" in str(refused.value).lower()
+
+
+def test_a_vote_cannot_be_cast_on_another_persons_behalf(app_sessionmaker, two_operators):
+    tenant = two_operators["tenant_a"]
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, tenant):
+                release, proposal_id = seed(
+                    session, tenant_id=tenant, user_id=two_operators["one"]
+                )
+                with actor_scope(session, two_operators["one"]):
+                    with pytest.raises(DBAPIError) as refused:
+                        session.execute(
+                            text(
+                                "INSERT INTO release_acceptance_votes(vote_id,tenant_id,"
+                                "proposal_id,user_id,vote_role,human_attestation_version,"
+                                "verified_issuer,verified_client_id,auth_time,amr_sha256,"
+                                "identity_verification_event_id,created_at) "
+                                "VALUES(:v,:t,:p,:u,'confirmer','fresh-interactive-v1',:iss,"
+                                "'portal',:at,:amr,:ev,:now)"
+                            ),
+                            {
+                                "v": new_id("acceptance_vote"),
+                                "t": tenant,
+                                "p": proposal_id,
+                                # The other operator, not the one in scope.
+                                "u": two_operators["two"],
+                                "iss": ISSUER,
+                                "at": int(NOW.timestamp()),
+                                "amr": AMR,
+                                "ev": new_id("audit_event"),
+                                "now": LATER,
+                            },
+                        )
+    assert "row-level security" in str(refused.value).lower()
+
+
+def test_an_actor_whose_grant_was_revoked_cannot_write_at_all(
+    app_sessionmaker, owner_engine, two_operators
+):
+    """The policy re-reads the grant, so a revoked operator cannot even insert a proposal.
+
+    Before, the grant was checked in the service and nowhere else; a path that reached the
+    table another way wrote the row.
+    """
+    tenant = two_operators["tenant_a"]
+    with owner_engine.begin() as c:
+        c.execute(
+            text(
+                "UPDATE inv.business_admin_grants SET enabled=false "
+                "WHERE tenant_id=:t AND user_id=:u AND permission='releases.accept'"
+            ),
+            {"t": tenant, "u": two_operators["one"]},
+        )
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, tenant):
+                release = pilot_service.create_release_manifest(
+                    session, tenant_id=tenant, version="R4", components=_components(),
+                    created_by_user_id=two_operators["one"], now=NOW,
+                )
+                session.flush()
+                with actor_scope(session, two_operators["one"]):
+                    with pytest.raises(DBAPIError) as refused:
+                        session.execute(
+                            PROPOSAL_INSERT,
+                            _proposal_values(
+                                tenant, release, two_operators["one"],
+                                new_id("acceptance_proposal"),
+                            ),
+                        )
+    assert "row-level security" in str(refused.value).lower()
+
+
+def test_clearing_the_slot_and_setting_another_proposal_is_refused(
+    app_sessionmaker, two_operators
+):
+    """The other half of Codex's probe: two statements instead of one.
+
+    Clearing ``active_proposal_id`` and then setting a different proposal passed the first
+    trigger, because neither statement replaced a non-null with a different non-null. The
+    rule is now about the proposal being closed, which no ordering of statements gets
+    around.
+    """
+    tenant = two_operators["tenant_a"]
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, tenant):
+                release, first = seed(session, tenant_id=tenant, user_id=two_operators["one"])
+                second = new_id("acceptance_proposal")
+                with actor_scope(session, two_operators["two"]):
+                    session.execute(
+                        PROPOSAL_INSERT,
+                        _proposal_values(tenant, release, two_operators["two"], second,
+                                         digest="8" * 64),
+                    )
+                    session.flush()
+                    with pytest.raises(DBAPIError) as refused:
+                        session.execute(
+                            text(
+                                "UPDATE release_acceptance_slots SET active_proposal_id=NULL "
+                                "WHERE tenant_id=:t AND release_id=:r "
+                                "AND acceptance_id_ref='AC-12'"
+                            ),
+                            {"t": tenant, "r": release.release_id},
+                        )
+    assert "leaves the slot only when it is closed" in str(refused.value)
+
+
+def test_an_active_decision_is_not_overwritten_without_a_withdrawal(
+    app_sessionmaker, two_operators
+):
+    """``_record_final`` used to overwrite the slot's active acceptance.
+
+    The release's sign-off then changed with no withdrawal recorded anywhere -- the
+    criterion simply pointed at a different decision. The database now refuses it.
+    """
+    tenant = two_operators["tenant_a"]
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, tenant):
+                release, proposal_id = seed(
+                    session, tenant_id=tenant, user_id=two_operators["one"]
+                )
+                with actor_scope(session, two_operators["two"]):
+                    first_decision = confirm_call(
+                        session,
+                        proposal_id=proposal_id,
+                        proposal_digest=PROPOSAL_DIGEST,
+                        manifest_sha256=release.manifest_sha256,
+                    )
+                    second_decision = new_id("acceptance")
+                    session.execute(
+                        text(
+                            "INSERT INTO acceptance_records(acceptance_id,tenant_id,release_id,"
+                            "acceptance_id_ref,outcome,accepted_manifest_sha256,"
+                            "known_limitations,accepted_by_user_id,decided_at,"
+                            "attestation_version) VALUES(:a,:t,:r,'AC-12','rejected',:m,"
+                            "'[]'::jsonb,:u,:now,'fresh-interactive-v1')"
+                        ),
+                        {
+                            "a": second_decision,
+                            "t": tenant,
+                            "r": release.release_id,
+                            "m": release.manifest_sha256,
+                            "u": two_operators["two"],
+                            "now": LATER,
+                        },
+                    )
+                    session.flush()
+                    with pytest.raises(DBAPIError) as refused:
+                        session.execute(
+                            text(
+                                "UPDATE release_acceptance_slots SET active_acceptance_id=:a "
+                                "WHERE tenant_id=:t AND release_id=:r "
+                                "AND acceptance_id_ref='AC-12'"
+                            ),
+                            {"a": second_decision, "t": tenant, "r": release.release_id},
+                        )
+    assert first_decision
+    assert "leaves the slot only when it is withdrawn" in str(refused.value)
+
+
+def test_a_lifecycle_event_needs_a_verified_human_in_scope(app_sessionmaker, two_operators):
+    """The one table with no actor column is bound to the acting human instead."""
+    tenant = two_operators["tenant_a"]
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, tenant):
+                release, proposal_id = seed(
+                    session, tenant_id=tenant, user_id=two_operators["one"]
+                )
+        with session.begin():
+            with tenant_scope(session, tenant):
+                with pytest.raises(DBAPIError) as refused:
+                    session.execute(
+                        text(
+                            "INSERT INTO release_acceptance_lifecycle_events(event_id,"
+                            "tenant_id,proposal_id,event_kind,occurred_at) "
+                            "VALUES(:e,:t,:p,'expired',:now)"
+                        ),
+                        {
+                            "e": new_id("acceptance_lifecycle_event"),
+                            "t": tenant,
+                            "p": proposal_id,
+                            "now": LATER,
+                        },
+                    )
+    assert "row-level security" in str(refused.value).lower()
+
+
+# ------------------------------------------------------------------ the page cursor
+
+
+def test_the_page_cursor_walks_both_sort_keys(app_sessionmaker, two_operators):
+    """The bug the tuple cursor fixes, built on purpose.
+
+    The page is ordered by ``(created_at, proposal_id)``. The old filter was
+    ``proposal_id > cursor`` alone, so the two orders had to agree -- and they need not: a
+    ULID orders by the millisecond it was minted, ``created_at`` by the clock the request
+    passed in. Here the proposal with the *later* ID has the *earlier* ``created_at``, which
+    is exactly the arrangement that made the old filter skip a row. Both keys travel in the
+    cursor now, and the page returns each proposal once.
+    """
+    from saintvision.services import release_acceptance as service
+
+    tenant = two_operators["tenant_a"]
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, tenant):
+                release = pilot_service.create_release_manifest(
+                    session, tenant_id=tenant, version="R4", components=_components(),
+                    created_by_user_id=two_operators["one"], now=NOW,
+                )
+                session.flush()
+                # Two IDs, sorted rather than assumed: ULIDs minted in the same
+                # millisecond are not ordered by mint time, which this test found by
+                # asserting they were.
+                early_id, late_id = sorted(
+                    (new_id("acceptance_proposal"), new_id("acceptance_proposal"))
+                )
+                with actor_scope(session, two_operators["one"]):
+                    for proposal_id, criterion, created in (
+                        # The later ID, created first: the disagreement.
+                        (late_id, "AC-12", NOW),
+                        (early_id, "AC-13", NOW + dt.timedelta(minutes=1)),
+                    ):
+                        values = _proposal_values(
+                            tenant, release, two_operators["one"], proposal_id,
+                            digest="7" * 64,
+                        )
+                        values["now"] = created
+                        values["exp"] = created + dt.timedelta(minutes=5)
+                        session.execute(
+                            text(
+                                str(PROPOSAL_INSERT).replace("\'AC-12\'", f"\'{criterion}\'")
+                            ),
+                            values,
+                        )
+                        session.execute(
+                            text(
+                                "INSERT INTO release_acceptance_slots(slot_id,tenant_id,"
+                                "release_id,acceptance_id_ref,active_proposal_id,updated_at) "
+                                "VALUES(:s,:t,:r,:c,:p,:now)"
+                            ),
+                            {
+                                "s": new_id("acceptance_slot"),
+                                "t": tenant,
+                                "r": release.release_id,
+                                "c": criterion,
+                                "p": proposal_id,
+                                "now": created,
+                            },
+                        )
+                    session.flush()
+
+                first = service.pending_page(
+                    session, tenant_id=tenant, release_id=release.release_id, limit=1, cursor=None
+                )
+                assert [item["proposalId"] for item in first["items"]] == [late_id]
+                assert first["nextCursor"]
+                second = service.pending_page(
+                    session, tenant_id=tenant, release_id=release.release_id, limit=1,
+                    cursor=first["nextCursor"],
+                )
+                assert [item["proposalId"] for item in second["items"]] == [early_id]
+                assert second["nextCursor"] is None
+                # The cursor is opaque and round-trips to the position it names.
+                moment, last = service.decode_cursor(first["nextCursor"])
+                assert last == late_id and moment == NOW
+
+
+def test_a_cursor_that_was_not_issued_here_is_refused(app_sessionmaker, two_operators):
+    """An opaque cursor is refused rather than read as a position the caller invented."""
+    from saintvision.errors import InvError
+    from saintvision.services import release_acceptance as service
+
+    tenant = two_operators["tenant_a"]
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, tenant):
+                release = pilot_service.create_release_manifest(
+                    session, tenant_id=tenant, version="R4", components=_components(),
+                    created_by_user_id=two_operators["one"], now=NOW,
+                )
+                session.flush()
+                # ``""`` is absent rather than invalid -- ``?cursor=`` means the first
+                # page -- so it is not in this list.
+                for bad in ("rap_01J8Z3XQ2K9WMV5T7N4B6C8D0E", "!!!", "x" * 300, "YWJj"):
+                    with pytest.raises(InvError):
+                        service.pending_page(
+                            session, tenant_id=tenant, release_id=release.release_id,
+                            limit=10, cursor=bad,
+                        )
