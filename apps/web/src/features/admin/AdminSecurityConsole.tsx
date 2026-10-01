@@ -858,6 +858,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       {/* Sub-Tab 1: Immutable Audit Trail */}
       {activeSubTab === 'audit' && (
         <div
+          data-testid="admin-audit-subtab-container"
           style={{
             backgroundColor: 'var(--color-bg-surface)',
             border: '1px solid var(--color-border-subtle)',

@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.182"
+version: "1.0.183"
 status: "proposed"
 author: "Gemini"
-updated: "2026-10-02T04:30:39+09:00"
+updated: "2026-10-02T04:56:34+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,6 +19,7 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
+- 확인 기준: 2026-10-02T04:56:34+09:00 (Card 199 관리자 보안 콘솔 r1 조치: Claude UI r1 및 Codex r1 피드백 전수 반영 — T1 Test 9e-2에 계층적 조상 컨테이너 배경 추적(ancestorBgTokens) 및 텍스트 토큰 배경 거부 로직 추가, admin-audit-subtab-container DOM 결속, 변이 A1 사살; T2 모달 백드롭 스크림 alpha >= 0.50 엄밀 단언 및 0.75 alpha 합성 캔버스 위 모달 서피스 대비 10.68:1 >= 3.0:1 실측, 변이 A6 사살; T3/Codex F1 History §2.1 표 및 §3 내 다크 실측 수치 7개 오류를 index.css 정본 토큰 공식으로 전수 동기화(text-secondary/surface 14.33, status-online/surface 7.79, brand-hover/surface 9.84, status-degraded/subtle 6.83, text-secondary/subtle 11.86, brand-hover/subtle 8.14, brand-primary/subtle 5.77), brand-hover 채택 근거 정확화, Python 독립 재현 명령 문서 결속; T4 표현 명확화; Revert-Fail Probes 49~50 추가, 12종 변이 M1~M12 12/12 100% 사살 실측; Vitest 18 passed, admin tests 59 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반, diff --check clean).
 - 확인 기준: 2026-10-02T04:30:39+09:00 (Card 199 관리자 보안 콘솔 AdminSecurityConsole 색상 리터럴 inventory 전수(186→0), 대비 표본/DOM 결속 감사 및 디자인 토큰 승격: base 67df36e8 위 작업, AdminSecurityConsole 186건 -> 0건 해소, COLOR_LITERAL_MULTISET_BASELINE {} 래칫, index.css --color-bg-backdrop 토큰 등록, border-subtle 317건/24개 파일 래칫, 레거시 #30363d 92건/13파일 상한 강화, Test 9e DOM 실제 렌더링 동적 대비 단언 신설, Test 9e-2 142개 style 속성 전수 AST 스타일-쌍 명도 대비 및 커버리지 래칫 신설, Revert-Fail Probes 44~48 추가, 10종 변이 10/10 100% 사살 실측; Vitest 18 passed, admin tests 59 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-02T04:17:45+09:00 (Card 197 모델 계보 화면 r3 조치: Claude r3 조건부 승인 지적 3건 전수 반영 — W1 테두리 비텍스트 대비(>= 3.0:1) 및 1:1 충돌 검사 로직(checkBorderPair, checkInheritedBorder) 신설, TemplateExpression 지원, checkedBorderObjects 83 / checkedBorderPairs 122 엄밀 래칫 추가, badge-w3-verify-seam 검증 완료 분기를 brand-subtle / brand-hover(5.49:1/8.11:1)로 통일, Probe 43 추가로 M14/M15 포함 15/15 변이 전원 사살 실측; W2 History 내 일반화된 "100%" 표현을 실제 측정 범위(텍스트 >= 4.5:1, 테두리 >= 3.0:1, 정확 coverage)로 명확화; W3 git diff --check 불필요한 EOF 빈 줄 제거 및 clean exit 0 달성; Vitest 16 passed, defect regression 16 passed, model-lineage 33 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-02T03:58:00+09:00 (Card 197 모델 계보 화면 r2 조치: Claude UI r2 조건부 승인 및 Codex r2 피드백 전수 반영 — index.css 정본 동적 파싱 기반 전경/배경 실제 명도 대비 및 상속 배경 3종(surface/subtle/canvas) AST 동적 연산 엔진 신설(Test 9d-2), totalStyleAttrs 359 / checkedObjects 58 / checkedPairs 76 / unboundColorObjects 176 / coveredColorObjects 234 / pureLayoutWrappers 125 엄밀 래칫 단언, Probe 42 추가로 단일 변이 M13(brand-hover -> brand-primary-fg 1.22:1) 포함 13/13(100%) 변이 전수 사살 실측, History §7 해소표 및 커버리지 전수 수치 동기화; Vitest 16 passed, defect regression 16 passed, model-lineage 33 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
@@ -32,7 +33,7 @@ source_of_truth: "Git"
 - 확인 기준: 2026-10-01T23:55:00+09:00 (Card 193 NodeDetail 잔여 리터럴 9건 r1 조치: Claude UI r1 및 Codex r1 피드백 반영, data-testid를 통한 상위 컨테이너(resource-usage-card-cpu subtle, node-detail-observed-usage-box subtle, node-detail-observed-headroom-box subtle, node-detail-lease-panel surface) 배경 DOM 직접 추출 및 동적 대비율 단언, Z1~Z5 5종 변이 100% 사살 실측, History §2 표 및 §3-2 대비 수치·배경 수학적 정밀 수치 정정, Probe 19~23 주석 수치 및 subtle 베이스 정정, Vitest 13 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 
 ## 2026-10-02 관리자 보안 콘솔 (AdminSecurityConsole) 색상 리터럴 inventory 전수(186→0), 대비 표본/DOM 결속 감사 및 디자인 토큰 승격 (Card 199, `agent/gemini/c199-admin-security-contrast`, base `67df36e8` PR #296 r3)
-- **개요**: ACC-09 다음 영역인 관리자 보안 콘솔(`AdminSecurityConsole.tsx`, 긴급 비상 정지 Kill Switch 모달 및 노드 격리 Drain UI 포함)의 색상 리터럴 inventory 전수(186→0), 대비 표본/DOM 결속은 명시 범위로 감사하고 디자인 토큰으로 승격:
+- **개요**: ACC-09 다음 영역인 관리자 보안 콘솔(`AdminSecurityConsole.tsx`, 긴급 비상 정지 Kill Switch 모달 및 노드 격리 Drain UI 포함)의 색상 리터럴 inventory 전수(186→0), 대비 표본/DOM 결속은 명시 범위로 감사하고 디자인 토큰으로 승격 (r1 보강: T1 조상 배경 추적, T2 백드롭 알파/경계 대비, T3/Codex F1 정본 수치 동기화):
   1. **색상 리터럴 전수 해소**:
      - `AdminSecurityConsole.tsx`: 기존 186건 $\rightarrow$ **0건** (전수 제거).
      - `index.css`: `--color-bg-backdrop: rgba(0, 0, 0, 0.75);` 디자인 토큰 등록.
@@ -41,19 +42,19 @@ source_of_truth: "Git"
      - `var(--color-border-subtle)` 사용 횟수 292건 $\rightarrow$ **317건**(+25건), 파일 수 23개 $\rightarrow$ **24개**로 fail-closed 단언 갱신.
      - 레거시 리터럴 상한치 강화 (`#30363d` <= 92/13).
   3. **실제 렌더링 DOM 기반 동적 대비 단언 및 변이 100% 사살**:
-     - Test 9e 신설: `AdminSecurityConsole` DOM 렌더링 및 동적 대비율(텍스트 >= 4.5:1, UI 경계 >= 3.0:1) 단언.
-     - Test 9e-2 신설: 142개 style 속성 대상 동적 AST 스타일-쌍 명도 대비 계산 및 커버리지 래칫 (checkedPairs 244, checkedBorderPairs 52, violations 0).
-     - Revert-Fail Probes 44~48 추가.
-     - 10종 변이 M1~M10 전원 사살 실측 (10/10 = 100% killed).
+     - Test 9e 신설 및 보강: `AdminSecurityConsole` DOM 렌더링 및 동적 대비율(텍스트 >= 4.5:1, UI 경계 >= 3.0:1) 단언, 감사 로그 컨테이너 결속 및 모달 백드롭 스크림 alpha >= 0.50 / 모달 서피스 대비 10.68:1 실측.
+     - Test 9e-2 신설 및 계층적 AST 가드: 142개 style 속성 대상 조상 컨테이너 배경 스택 추적 동적 AST 명도 대비 계산 및 커버리지 래칫 (checkedPairs 98, checkedBorderPairs 48, violations 0).
+     - Revert-Fail Probes 44~50 추가.
+     - 12종 변이 M1~M12 전원 사살 실측 (12/12 = 100% killed).
   4. **잔여 백로그 현황**:
      - 관리자 보안 콘솔 잔여 색상 리터럴: **0건**.
 - **담당 및 역할**: Gemini (Frontend / UI / 접근성 소유). Reviewer: Claude (UI/접근성/테스트), Codex (디자인 토큰/무결성/불변식).
 - **관측 근거 (Evidence)**:
   - 단위 시험: `npm test -- tests/acc09-contrast-tokens.test.tsx` (18 passed 100%, exit 0)
   - 관리자 단위 스위트: `npm test -- tests/admin-security-kill-switch-wiring.test.tsx tests/admin-security.test.ts tests/defect-recovery-admin-recovery-editor.test.tsx` (59 passed 100%, exit 0)
-  - 변이 불변식 실측: `python scratch/test_c199_mutations.py` (10 / 10 killed 100%)
+  - 변이 불변식 실측: `python scratch/test_c199_mutations.py` (12 / 12 killed 100%)
   - 타입 검사: `cd apps/web && npx tsc -b` (에러 0건, 클린 통과)
-  - 프로덕션 빌드: `cd apps/web && npm run build` (built in 8.90s, exit 0)
+  - 프로덕션 빌드: `cd apps/web && npm run build` (built in 7.99s, exit 0)
   - 라우트 커버리지: `pytest tests/test_route_coverage.py` (41 passed 100%, exit 0)
   - 프런트엔드 무결성: `python tools/check_frontend_integrity.py` (93 files scanned, 0 violations, exit 0)
   - 계약 바인딩: `python tools/check_contract_bindings.py` (55 fixtures, 20 bound types, exit 0)
