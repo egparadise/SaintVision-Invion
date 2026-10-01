@@ -339,5 +339,71 @@ describe('화면 결함 5대 부류 치유 트랙 (Priority 1: 노드 에러 은
       // 정직한 안내문 표출 확인
       expect(container.textContent).toContain('코드 Diff 모의 적용 완료: 백엔드 코드 패치 API가 미노출 상태이므로 실제 작업공간 파일시스템에는 기록되지 않았습니다');
     });
+
+    it('자연어 Run 제안 diff는 루프 0/3으로 시작하고, 3회 보정 후 4회째에 REJECTED로 전이되어 버튼이 숨겨진다 (N1/N2)', async () => {
+      act(() => {
+        root.render(<NaturalLanguageRunView />);
+      });
+
+      // 1. 초기 제안 diff 생성
+      const submitBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('자연어 Run 분석 및 제안 Diff 생성')
+      );
+      expect(submitBtn).toBeDefined();
+      await act(async () => {
+        submitBtn?.click();
+      });
+
+      // 2. 초기 루프 표기: 0/3 및 READY 상태 확인
+      expect(container.textContent).toContain('루프: 0/3');
+      const badge = container.querySelector('span[style*="font-weight: 700"]');
+      expect(badge?.textContent).toBe('READY');
+
+      // 3. 1차 보정 클릭 (Loop 1/3)
+      const getRefineBtn = () =>
+        Array.from(container.querySelectorAll('button')).find((b) =>
+          b.textContent?.includes('추가 보정 요청')
+        );
+      expect(getRefineBtn()).toBeDefined();
+
+      await act(async () => {
+        getRefineBtn()?.click();
+      });
+      expect(container.textContent).toContain('루프: 1/3');
+      expect(container.textContent).toContain('🔄 Bounded Repair Loop 1/3 실행 완료');
+      expect(badge?.textContent).toBe('REPAIRING');
+
+      // 4. 2차 보정 클릭 (Loop 2/3)
+      await act(async () => {
+        getRefineBtn()?.click();
+      });
+      expect(container.textContent).toContain('루프: 2/3');
+      expect(container.textContent).toContain('🔄 Bounded Repair Loop 2/3 실행 완료');
+
+      // 5. 3차 보정 클릭 (Loop 3/3, 최대 한도 도달)
+      await act(async () => {
+        getRefineBtn()?.click();
+      });
+      expect(container.textContent).toContain('루프: 3/3');
+      expect(container.textContent).toContain('🔄 Bounded Repair Loop 3/3 실행 완료');
+
+      // 6. 4차 보정 클릭 (한도 초과 거절)
+      await act(async () => {
+        getRefineBtn()?.click();
+      });
+
+      // 에러 알림 노출
+      expect(container.textContent).toContain('BOUNDED_LOOP_EXCEEDED: Maximum repair limit (3) reached');
+
+      // 배지가 REJECTED로 갱신되었는지 검증 (N1: error 분기 setActiveRequest 호출)
+      expect(badge?.textContent).toBe('REJECTED');
+
+      // 보정 요청 및 Diff 승인 버튼이 화면에서 사라졌는지 검증
+      expect(getRefineBtn()).toBeUndefined();
+      const applyBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('Diff 승인 및 코드 적용')
+      );
+      expect(applyBtn).toBeUndefined();
+    });
   });
 });
