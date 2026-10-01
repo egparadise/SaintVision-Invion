@@ -44,7 +44,6 @@ export function isValidContainmentView(v: unknown): v is ContainmentView {
   if (!v || typeof v !== 'object' || Array.isArray(v)) return false;
   const o = v as Record<string, unknown>;
   const keys = Object.keys(o);
-  if (keys.length !== 8) return false;
   for (const k of keys) {
     if (!ALLOWED_CONTAINMENT_VIEW_KEYS.has(k)) return false;
   }
@@ -90,7 +89,6 @@ export function isValidContainmentResult(
   if (!r || typeof r !== 'object' || Array.isArray(r)) return false;
   const res = r as Record<string, unknown>;
   const keys = Object.keys(res);
-  if (keys.length !== 4) return false;
   for (const k of keys) {
     if (!ALLOWED_CONTAINMENT_RESULT_KEYS.has(k)) return false;
   }
@@ -114,8 +112,8 @@ export function isValidContainmentResult(
     } else {
       if (res.control.nodeId === null || !isValidNodeId(res.control.nodeId)) return false;
     }
-    // operation 'drain'인데 nodeStatus 'online' 등 모순 응답 거부
-    if (res.control.nodeStatus !== 'draining' && (res.control.nodeStatus as string) !== 'drained') {
+    // operation 'drain'인데 nodeStatus 'online' 등 모순 응답 거부 (정본 enum: online, offline, draining, quarantined)
+    if (res.control.nodeStatus !== 'draining') {
       return false;
     }
   } else if (expectedOperation === 'resume') {

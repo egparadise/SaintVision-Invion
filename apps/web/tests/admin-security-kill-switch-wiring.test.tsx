@@ -1393,4 +1393,167 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
     const resumeBtnAfter = container.querySelector(`[data-testid="drain-node-btn-${DRAINING_NODES[0].id}"]`);
     expect(resumeBtnAfter?.textContent).toContain('Drain 해제');
   });
+
+  it('Claude r5 (W1): isKillSwitchReady가 참이어도 currentUser가 null(actor 부재)이면 확정 버튼이 disabled이고 클릭 시 POST fetch를 호출하지 않는다', async () => {
+    let postFetchCalled = false;
+    mockFetch((url) => {
+      if (url === '/v1/operations/kill-switch') {
+        return { status: 200, body: VALID_INACTIVE_VIEW };
+      }
+      if (url === '/v1/operations/kill-switch/kill') {
+        postFetchCalled = true;
+        return { status: 200, body: {} };
+      }
+      return { status: 404, body: {} };
+    });
+
+    // 1. 처음엔 로그인된 상태로 렌더링하고 승인 ID 입력 후 모달 오픈
+    await act(async () => {
+      root.render(
+        <AdminSecurityConsole
+          nodes={MOCK_NODES}
+          currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+        />
+      );
+    });
+
+    const approvalInput = container.querySelector('[data-testid="input-kill-switch-approval-id"]') as HTMLInputElement;
+    expect(approvalInput).not.toBeNull();
+    await act(async () => {
+      const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+      nativeSetter?.call(approvalInput, '550e8400-e29b-41d4-a716-446655440000');
+      approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
+      approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    const toggleBtn = container.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLButtonElement;
+    expect(toggleBtn).not.toBeNull();
+    await act(async () => {
+      toggleBtn.click();
+    });
+
+    // 2. 모달이 열린 상태에서 세션이 만료되거나 currentUser={null}로 전환
+    await act(async () => {
+      root.render(
+        <AdminSecurityConsole
+          nodes={MOCK_NODES}
+          currentUser={null} // actor 부재
+        />
+      );
+    });
+
+    const confirmBtn = container.querySelector('[data-testid="kill-switch-confirm-btn"]') as HTMLButtonElement;
+    expect(confirmBtn).not.toBeNull();
+
+    // actor가 없으므로 확정 버튼은 반드시 disabled & aria-disabled=true 이어야 함 (canConfirmKillSwitch의 actor && 불변식)
+    expect(confirmBtn.disabled).toBe(true);
+    expect(confirmBtn.getAttribute('aria-disabled')).toBe('true');
+
+    // 비활성 버튼 클릭 시도시에도 POST fetch 미발생 단언
+    await act(async () => {
+      confirmBtn.click();
+    });
+
+    expect(postFetchCalled).toBe(false);
+  });
+
+  it('Claude r5 (W2): GET 응답에 미지의 추가 키(extraKey)가 포함되거나 POST 응답에 미지의 추가 키가 포함되면 fail-closed로 거부한다', async () => {
+    // 1. GET 응답에 extraKey가 포함된 경우
+    mockFetch((url) => {
+      if (url === '/v1/operations/kill-switch') {
+        return {
+          status: 200,
+          body: {
+            ...VALID_INACTIVE_VIEW,
+            extraKey: 1, // 정본 ContainmentView 미지 키
+          },
+        };
+      }
+      return { status: 404, body: {} };
+    });
+
+    await act(async () => {
+      root.render(
+        <AdminSecurityConsole
+          nodes={MOCK_NODES}
+          currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+        />
+      );
+    });
+
+    // ContainmentView validation 실패로 status가 error가 됨: 모달 열었을 때 unready notice 노출 및 확정 버튼 비활성화 (fail-closed) 확인
+    const toggleBtn = container.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLButtonElement;
+    expect(toggleBtn).not.toBeNull();
+    await act(async () => {
+      toggleBtn.click();
+    });
+
+    const unreadyNotice = container.querySelector('[data-testid="kill-switch-backend-unready-notice"]');
+    expect(unreadyNotice).not.toBeNull();
+    expect(unreadyNotice?.textContent).toContain('비상 정지 변경이 비활성화되었습니다');
+
+    const confirmBtnDisabled = container.querySelector('[data-testid="kill-switch-confirm-btn"]') as HTMLButtonElement;
+    expect(confirmBtnDisabled.disabled).toBe(true);
+
+    // 2. GET은 정상이지만 POST 응답에 extraKey가 포함된 ContainmentResult를 반환한 경우
+    await act(async () => {
+      root.unmount();
+      container.innerHTML = '';
+      root = createRoot(container);
+    });
+
+    mockFetch((url, init) => {
+      if (url === '/v1/operations/kill-switch') {
+        if (init?.method === 'POST') {
+          return {
+            status: 202,
+            body: {
+              requestId: 'c0000000-0000-4000-8000-000000000001',
+              operation: 'kill',
+              approvalId: '550e8400-e29b-41d4-a716-446655440000',
+              control: VALID_ACTIVE_VIEW,
+              extraResultKey: 1, // 정본 ContainmentResult 미지 키
+            },
+          };
+        }
+        return { status: 200, body: VALID_INACTIVE_VIEW };
+      }
+      return { status: 404, body: {} };
+    });
+
+    await act(async () => {
+      root.render(
+        <AdminSecurityConsole
+          nodes={MOCK_NODES}
+          currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+        />
+      );
+    });
+
+    const approvalInputValid = container.querySelector('[data-testid="input-kill-switch-approval-id"]') as HTMLInputElement;
+    await act(async () => {
+      const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+      nativeSetter?.call(approvalInputValid, '550e8400-e29b-41d4-a716-446655440000');
+      approvalInputValid.dispatchEvent(new Event('input', { bubbles: true }));
+      approvalInputValid.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    const toggleBtnValid = container.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLButtonElement;
+    await act(async () => {
+      toggleBtnValid.click();
+    });
+
+    const confirmBtn = container.querySelector('[data-testid="kill-switch-confirm-btn"]') as HTMLButtonElement;
+    expect(confirmBtn.disabled).toBe(false);
+
+    await act(async () => {
+      confirmBtn.click();
+    });
+
+    // POST 결과가 ContainmentResult 규격 불일치(extraResultKey)로 거부되어 에러 표출 & 로컬 상태 미변경
+    const banner = container.querySelector('[data-testid="kill-switch-error-banner"]');
+    expect(banner).not.toBeNull();
+    expect(banner?.textContent).toContain('CONTRACT-MISMATCH');
+    expect(container.querySelector('[data-testid="kill-switch-active-badge"]')).toBeNull();
+  });
 });
