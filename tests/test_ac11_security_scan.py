@@ -157,6 +157,16 @@ def test_workflow_redaction_checks_fields_not_benign_path_substrings():
     assert "name in lowered" not in workflow
 
 
+def test_reviewed_pyjwt_security_pin_is_identical_in_runtime_and_scan_input():
+    expected = "PyJWT==2.15.1"
+    requirements = (ROOT / "requirements-core.txt").read_text(encoding="utf-8").splitlines()
+    project = (ROOT / "services/control-plane/pyproject.toml").read_text(encoding="utf-8")
+
+    assert [line for line in requirements if line.startswith("PyJWT==")] == [expected]
+    assert project.count(f'"{expected}"') == 1
+    assert "PyJWT==2.13.0" not in project
+
+
 def test_pip_audit_vulnerability_is_conservatively_high_and_cannot_be_ignored(source):
     source["pip"].write_text(
         json.dumps(
