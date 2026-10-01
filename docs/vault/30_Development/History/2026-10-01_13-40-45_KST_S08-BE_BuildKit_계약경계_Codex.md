@@ -40,7 +40,7 @@ source_of_truth: "Git"
 
 ## 검증
 
-- `python -m pytest tests/core/test_buildkit_contracts.py -q` → **44 passed**.
+- `python -m pytest tests/core/test_buildkit_contracts.py -q` → **45 passed**.
 - `python tools/generate_contracts.py` → 생성 완료; 생성 직후 정본 schema와 Python·
   TypeScript·Go·Node mirror가 동일 입력에서 재생성됐다.
 - `npx --yes --package typescript@5.9.3 tsc --noEmit --strict packages/contracts-ts/src/index.ts`
@@ -58,8 +58,9 @@ source_of_truth: "Git"
 첫 exact-head Core run `36817019372`는 contract regeneration까지 통과한 뒤 Node Go
 validator가 Build path/network 정규식의 lookahead·noncapturing group을 컴파일하지 못해
 `NODE-0004: schema unavailable`로 실패했다. ECMA 전용 표현을 제거하고 Go RE2와 공통인
-capturing group 및 schema `not` 조합으로 바꿨다. Build 계약 pattern에 `(?`가 다시
-들어오면 실패하는 회귀 시험을 추가했으며, 교정 head의 hosted Core를 재실행한다.
+capturing group만으로 canonical segment를 표현했다. `.`·`..` segment는 거부하되 `.build`
+같은 정본 hidden path는 허용한다. Build 계약 pattern에 `(?`가 다시 들어오면 실패하는
+회귀 시험을 추가했으며, 교정 head의 hosted Core를 재실행한다.
 
 ## 정직성 경계
 

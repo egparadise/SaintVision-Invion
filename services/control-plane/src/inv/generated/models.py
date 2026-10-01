@@ -198,9 +198,22 @@ class BuildSecretRefId(RootModel[constr(pattern=r'^sec_[0-9A-HJKMNP-TV-Z]{26}$')
     root: constr(pattern=r'^sec_[0-9A-HJKMNP-TV-Z]{26}$')
 
 
-class BuildCanonicalRelativePath(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
+class BuildCanonicalRelativePath(
+    RootModel[
+        constr(
+            pattern=r'^\.*[A-Za-z0-9_-][A-Za-z0-9._-]*(/\.*[A-Za-z0-9_-][A-Za-z0-9._-]*)*$',
+            min_length=1,
+            max_length=1024,
+        )
+    ]
+):
+    root: constr(
+        pattern=r'^\.*[A-Za-z0-9_-][A-Za-z0-9._-]*(/\.*[A-Za-z0-9_-][A-Za-z0-9._-]*)*$',
+        min_length=1,
+        max_length=1024,
+    ) = Field(
+        ...,
+        description='Canonical repository-relative path; absolute, parent, current-directory, duplicate-separator, and backslash forms are forbidden.',
     )
 
 

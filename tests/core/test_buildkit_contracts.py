@@ -241,6 +241,13 @@ def test_build_context_paths_are_canonical_and_bounded(field, value):
     _rejected("BuildRequest", changed)
 
 
+def test_build_context_allows_canonical_hidden_repository_paths():
+    changed = _request()
+    changed["contextPath"] = ".build/context"
+    changed["dockerfilePath"] = ".build/Dockerfile"
+    validate_contract("BuildRequest", changed)
+
+
 @pytest.mark.parametrize(
     "field,value",
     [
