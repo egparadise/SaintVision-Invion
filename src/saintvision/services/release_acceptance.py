@@ -239,7 +239,7 @@ class ReferenceResolver(Protocol):
         release_id: str,
         target_refs: list[Any],
         measurement_refs: list[Any],
-    ) -> None: ...
+    ) -> Any: ...
 
 
 @dataclass(frozen=True)
@@ -262,6 +262,17 @@ class UnboundReferenceResolver:
 UNBOUND_RESOLVER = UnboundReferenceResolver()
 
 
+def _require_resolution_criterion(resolution: Any, acceptance_id_ref: str) -> None:
+    """Bind a resolver result to the criterion the write is about.
+
+    A successful resolver call is not enough: as the target registry grows, returning
+    a different criterion must not authorize this proposal or confirmation.
+    """
+
+    if getattr(resolution, "acceptance_id_ref", None) != acceptance_id_ref:
+        raise ReferencesUnresolvable("the resolved target does not match the acceptance criterion")
+
+
 def active_resolver() -> ReferenceResolver:
     """The resolver this deployment holds.
 
@@ -276,9 +287,7 @@ def active_resolver() -> ReferenceResolver:
 # ----------------------------------------------------------------------- step 0: the gate
 
 
-def require_prerequisites(
-    *, enabled: bool, resolver: ReferenceResolver = UNBOUND_RESOLVER
-) -> None:
+def require_prerequisites(*, enabled: bool, resolver: ReferenceResolver = UNBOUND_RESOLVER) -> None:
     """The first thing every one of the five routes does, GETs included.
 
     Two conditions, one answer. Separating them in the response would tell an
@@ -354,7 +363,9 @@ def _required_criterion(release: ReleaseManifest, acceptance_id_ref: str) -> pol
     if acceptance_id_ref not in loaded.names():
         # §5-1: a decision about a criterion the registry does not require is refused
         # rather than recorded, because it would look like progress on sign-off.
-        raise InvError(GRAPH_INVALID_TRANSITION, "this criterion is not required by the pinned policy")
+        raise InvError(
+            GRAPH_INVALID_TRANSITION, "this criterion is not required by the pinned policy"
+        )
     return loaded
 
 
@@ -431,13 +442,14 @@ def propose_or_record(
         # Stale target, not malformed input: the caller accepted a composition this
         # release no longer has (§5).
         raise InvError(GRAPH_INVALID_TRANSITION, "the release composition has changed")
-    resolver.resolve(
+    resolution = resolver.resolve(
         session,
         tenant_id=principal.tenant_id,
         release_id=release_id,
         target_refs=list(request.target_refs),
         measurement_refs=list(request.measurement_refs),
     )
+    _require_resolution_criterion(resolution, request.acceptance_id_ref)
     slot = _slot(
         session,
         tenant_id=principal.tenant_id,
@@ -556,7 +568,9 @@ def _open_proposal(
             GRAPH_INVALID_TRANSITION,
             "this criterion already has a different proposal awaiting a second operator",
         )
-    expires_at = min(proof.window_ends_at, now + dt.timedelta(seconds=fresh.FRESH_AUTH_WINDOW_SECONDS))
+    expires_at = min(
+        proof.window_ends_at, now + dt.timedelta(seconds=fresh.FRESH_AUTH_WINDOW_SECONDS)
+    )
     proposal_id = new_id("acceptance_proposal")
     proposal_digest = digest.proposal_digest(
         tenant_id=principal.tenant_id,
@@ -907,13 +921,14 @@ def confirm(
     # withdrawn in it. Codex measured the gap by deleting the one resolve() call in the
     # decision path and watching 124 focused tests still pass.
     try:
-        resolver.resolve(
+        resolution = resolver.resolve(
             session,
             tenant_id=principal.tenant_id,
             release_id=release_id,
             target_refs=list(proposal.target_refs or []),
             measurement_refs=list(proposal.measurement_refs or []),
         )
+        _require_resolution_criterion(resolution, proposal.acceptance_id_ref)
     except ReferencesUnresolvable:
         return Outcome(status=409, refused=STALE)
     # The live grant again, immediately before the write. The check at the top of the
@@ -1010,10 +1025,12 @@ def _mapped_db_refusal(error: Exception) -> InvError:
     text_of = str(getattr(error, "orig", error))
     if "proposer cannot be the second operator" in text_of:
         return InvError(AUTH_PROJECT_SCOPE, "a distinct second operator is required")
-    if "insufficient_privilege" in text_of or "may not accept" in text_of or "not active" in text_of:
-        return InvError(
-            AUTH_PROJECT_SCOPE, "fresh interactive operator authentication is required"
-        )
+    if (
+        "insufficient_privilege" in text_of
+        or "may not accept" in text_of
+        or "not active" in text_of
+    ):
+        return InvError(AUTH_PROJECT_SCOPE, "fresh interactive operator authentication is required")
     return InvError(GRAPH_INVALID_TRANSITION, "the proposal state changed before it was confirmed")
 
 
@@ -1047,7 +1064,9 @@ def withdraw(
     if request.accepted_manifest_sha256 != str(decision.accepted_manifest_sha256):
         # The digest on the row, not the release's current one: they differ exactly when
         # the release has moved on, which is a common reason to withdraw (§6).
-        raise InvError(GRAPH_INVALID_TRANSITION, "the withdrawal names a different accepted composition")
+        raise InvError(
+            GRAPH_INVALID_TRANSITION, "the withdrawal names a different accepted composition"
+        )
     already = session.scalars(
         select(ReleaseAcceptanceWithdrawal).where(
             ReleaseAcceptanceWithdrawal.tenant_id == principal.tenant_id,

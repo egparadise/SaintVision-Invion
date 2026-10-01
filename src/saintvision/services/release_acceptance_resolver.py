@@ -25,9 +25,7 @@ from ..db.models import EvidenceEnvelope, ReleaseEvidenceBinding, ReleaseManifes
 from . import release_acceptance_policy as policy
 
 REGISTRY_PATH = (
-    Path(__file__).resolve().parents[3]
-    / "contracts"
-    / "release-acceptance-target-registry-v1.json"
+    Path(__file__).resolve().parents[3] / "contracts" / "release-acceptance-target-registry-v1.json"
 )
 REGISTRY_ID = "release-acceptance-targets-v1"
 REGISTRY_VERSION = 1
@@ -84,9 +82,7 @@ def load_target_registry(path: Path = REGISTRY_PATH) -> LoadedTargetRegistry:
     )
 
 
-def _release(
-    session: Session, *, tenant_id: uuid.UUID, release_id: str
-) -> ReleaseManifest:
+def _release(session: Session, *, tenant_id: uuid.UUID, release_id: str) -> ReleaseManifest:
     from .release_acceptance import ReferenceNotFound
 
     row = session.scalars(
@@ -113,12 +109,8 @@ def _registry_for_release(release: ReleaseManifest) -> LoadedTargetRegistry:
         raise PrerequisitesUnavailable("the release has no target registry pin")
     if (
         release.target_registry_version != REGISTRY_VERSION
-        or not hmac.compare_digest(
-            str(release.target_registry_git_blob_sha), registry.git_blob_sha
-        )
-        or not hmac.compare_digest(
-            str(release.target_registry_file_sha256), registry.file_sha256
-        )
+        or not hmac.compare_digest(str(release.target_registry_git_blob_sha), registry.git_blob_sha)
+        or not hmac.compare_digest(str(release.target_registry_file_sha256), registry.file_sha256)
     ):
         raise PrerequisitesUnavailable("the release target registry pin is unavailable")
     loaded_policy = policy.load(
@@ -192,8 +184,7 @@ def _measurement_row(
             EvidenceEnvelope,
             and_(
                 EvidenceEnvelope.evidence_id == ReleaseEvidenceBinding.evidence_id,
-                EvidenceEnvelope.recorded_at
-                == ReleaseEvidenceBinding.evidence_recorded_at,
+                EvidenceEnvelope.recorded_at == ReleaseEvidenceBinding.evidence_recorded_at,
                 EvidenceEnvelope.tenant_id == ReleaseEvidenceBinding.tenant_id,
             ),
         )
@@ -324,7 +315,9 @@ def bind_evidence(
         select(EvidenceEnvelope, Workload.project_id)
         .join(
             Run,
-            and_(Run.tenant_id == EvidenceEnvelope.tenant_id, Run.run_id == EvidenceEnvelope.run_id),
+            and_(
+                Run.tenant_id == EvidenceEnvelope.tenant_id, Run.run_id == EvidenceEnvelope.run_id
+            ),
         )
         .join(
             Workload,
@@ -357,7 +350,10 @@ def bind_evidence(
 
 def _encode_cursor(recorded_at: dt.datetime, evidence_id: str) -> str:
     payload = json.dumps(
-        {"recordedAt": recorded_at.astimezone(dt.timezone.utc).isoformat(), "evidenceId": evidence_id},
+        {
+            "recordedAt": recorded_at.astimezone(dt.timezone.utc).isoformat(),
+            "evidenceId": evidence_id,
+        },
         separators=(",", ":"),
         sort_keys=True,
     ).encode("utf-8")
@@ -395,7 +391,11 @@ def discovery_page(
     """Return only identities already bound by the server, never raw Evidence."""
 
     from ..api.schemas import ReleaseAcceptanceEvidenceDiscoveryPageResponse
-    from .release_acceptance import ReferenceNotFound, ReferencesUnresolvable
+    from .release_acceptance import (
+        PrerequisitesUnavailable,
+        ReferenceNotFound,
+        ReferencesUnresolvable,
+    )
 
     if not 1 <= limit <= DISCOVERY_PAGE_MAX:
         raise ReferencesUnresolvable("discovery limit is outside the contract")
@@ -413,7 +413,11 @@ def discovery_page(
         pinned_version=release.policy_version,
     )
     required = next(
-        (item for item in loaded_policy.required_criteria if item.acceptance_id_ref == acceptance_id_ref),
+        (
+            item
+            for item in loaded_policy.required_criteria
+            if item.acceptance_id_ref == acceptance_id_ref
+        ),
         None,
     )
     if required is None or required.target_registry_ref != REGISTRY_ID:
@@ -445,7 +449,10 @@ def discovery_page(
     except OperationalError as error:
         _retryable(error)
     if not rows:
-        raise ReferenceNotFound("no bound Evidence is available in this scope")
+        # A known release and criterion with no server-owned binding is an unavailable
+        # acceptance prerequisite, not a resource-existence question.  Returning 404
+        # here would let the read surface disagree with the write prerequisite gate.
+        raise PrerequisitesUnavailable("no bound Evidence is available in this scope")
     page = rows[:limit]
     verified_items: list[dict[str, Any]] = []
     try:

@@ -5,6 +5,7 @@ from __future__ import annotations
 import datetime as dt
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -36,9 +37,7 @@ def test_checked_in_registry_is_exactly_pinned_and_nonempty():
         lambda raw: raw + b"\n",
     ],
 )
-def test_registry_absence_empty_version_or_byte_drift_is_a_prerequisite_failure(
-    tmp_path, mutate
-):
+def test_registry_absence_empty_version_or_byte_drift_is_a_prerequisite_failure(tmp_path, mutate):
     target = tmp_path / "registry.json"
     target.write_bytes(mutate(resolver.REGISTRY_PATH.read_bytes()))
     with pytest.raises(acceptance.PrerequisitesUnavailable):
@@ -61,6 +60,18 @@ def test_target_hash_is_compared_to_registry_not_to_another_caller_value():
         )
 
 
+def test_resolved_target_must_name_the_write_criterion():
+    acceptance._require_resolution_criterion(  # noqa: SLF001 - mutation guard
+        SimpleNamespace(acceptance_id_ref="AC-12"), "AC-12"
+    )
+    with pytest.raises(acceptance.ReferencesUnresolvable):
+        acceptance._require_resolution_criterion(  # noqa: SLF001
+            SimpleNamespace(acceptance_id_ref="AC-13"), "AC-12"
+        )
+    with pytest.raises(acceptance.ReferencesUnresolvable):
+        acceptance._require_resolution_criterion(None, "AC-12")  # noqa: SLF001
+
+
 def test_cursor_is_opaque_exact_and_rejects_extra_or_naive_state():
     instant = dt.datetime(2026, 10, 1, 1, 2, 3, 456789, tzinfo=UTC)
     encoded = resolver._encode_cursor(instant, "ev_01")  # noqa: SLF001
@@ -69,9 +80,11 @@ def test_cursor_is_opaque_exact_and_rejects_extra_or_naive_state():
     payload = {"recordedAt": "2026-10-01T01:02:03", "evidenceId": "ev_01"}
     import base64
 
-    malformed = base64.urlsafe_b64encode(
-        json.dumps(payload, separators=(",", ":")).encode()
-    ).decode().rstrip("=")
+    malformed = (
+        base64.urlsafe_b64encode(json.dumps(payload, separators=(",", ":")).encode())
+        .decode()
+        .rstrip("=")
+    )
     with pytest.raises(acceptance.ReferencesUnresolvable):
         resolver._decode_cursor(malformed)  # noqa: SLF001
 
@@ -84,6 +97,11 @@ def test_migration_is_linear_invoker_only_and_caller_values_are_not_preserved():
     assert "NEW.envelope_sha256 :=" in source
     assert "binding_project_is_server_derived" in source
     assert "binding_digest_is_server_derived" in source
+    assert "release_target_registry_pin_immutable" in source
+    assert "NEW.target_registry_version IS DISTINCT FROM OLD.target_registry_version" in source
+    assert "pg_catalog.sha256" in source
+    assert "pgcrypto" not in source
+    assert "public.digest" not in source
     assert "SET search_path = pg_catalog" in source
     assert "dynamic SQL" not in source
 

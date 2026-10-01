@@ -64,20 +64,14 @@ def _digest_object(row: str) -> str:
 
 def _digest_expression(row: str) -> str:
     return (
-        "pg_catalog.encode(public.digest(pg_catalog.convert_to("
+        "pg_catalog.encode(pg_catalog.sha256(pg_catalog.convert_to("
         "'saintvision:evidence-envelope:v1' || pg_catalog.chr(10) || "
-        f"{_digest_object(row)}, 'UTF8'), 'sha256'), 'hex')::char(64)"
+        f"{_digest_object(row)}, 'UTF8')), 'hex')::char(64)"
     )
 
 
 def upgrade() -> None:
-    # ``digest(bytea,text)`` is supplied by pgcrypto.  Keep the extension on downgrade:
-    # another consumer may already use it and extension ownership is deployment-wide.
-    op.execute("CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public")
-
-    op.add_column(
-        "evidence_envelopes", sa.Column("envelope_sha256", SHA256, nullable=True)
-    )
+    op.add_column("evidence_envelopes", sa.Column("envelope_sha256", SHA256, nullable=True))
     op.create_check_constraint(
         "envelope_digest_is_lowercase",
         "evidence_envelopes",
@@ -123,9 +117,7 @@ def upgrade() -> None:
         END $fn$
         """
     )
-    op.execute(
-        "REVOKE ALL ON FUNCTION public.evidence_envelope_digest_on_insert() FROM PUBLIC"
-    )
+    op.execute("REVOKE ALL ON FUNCTION public.evidence_envelope_digest_on_insert() FROM PUBLIC")
     op.execute(
         f"REVOKE ALL ON FUNCTION public.evidence_envelope_digest_on_insert() FROM {APP_ROLE}"
     )
@@ -168,8 +160,36 @@ def upgrade() -> None:
     op.create_check_constraint(
         "target_registry_digest_is_lowercase",
         "release_manifests",
-        "target_registry_file_sha256 IS NULL OR "
-        "target_registry_file_sha256 ~ '^[0-9a-f]{64}$'",
+        "target_registry_file_sha256 IS NULL OR " "target_registry_file_sha256 ~ '^[0-9a-f]{64}$'",
+    )
+    op.execute(
+        """
+        CREATE FUNCTION public.release_target_registry_pin_immutable()
+        RETURNS trigger
+        LANGUAGE plpgsql SECURITY INVOKER
+        SET search_path = pg_catalog
+        AS $fn$
+        BEGIN
+          IF NEW.target_registry_version IS DISTINCT FROM OLD.target_registry_version
+             OR NEW.target_registry_git_blob_sha IS DISTINCT FROM OLD.target_registry_git_blob_sha
+             OR NEW.target_registry_file_sha256 IS DISTINCT FROM OLD.target_registry_file_sha256
+          THEN
+            RAISE EXCEPTION 'the release target registry pin is immutable'
+              USING ERRCODE = 'object_not_in_prerequisite_state',
+                    CONSTRAINT = 'release_target_registry_pin_immutable';
+          END IF;
+          RETURN NEW;
+        END $fn$
+        """
+    )
+    op.execute("REVOKE ALL ON FUNCTION public.release_target_registry_pin_immutable() FROM PUBLIC")
+    op.execute(
+        f"REVOKE ALL ON FUNCTION public.release_target_registry_pin_immutable() FROM {APP_ROLE}"
+    )
+    op.execute(
+        "CREATE TRIGGER release_target_registry_pin_immutable_before_update "
+        "BEFORE UPDATE ON public.release_manifests FOR EACH ROW "
+        "EXECUTE FUNCTION public.release_target_registry_pin_immutable()"
     )
 
     op.create_table(
@@ -246,12 +266,8 @@ def upgrade() -> None:
         END $fn$
         """
     )
-    op.execute(
-        "REVOKE ALL ON FUNCTION public.release_evidence_binding_exact() FROM PUBLIC"
-    )
-    op.execute(
-        f"REVOKE ALL ON FUNCTION public.release_evidence_binding_exact() FROM {APP_ROLE}"
-    )
+    op.execute("REVOKE ALL ON FUNCTION public.release_evidence_binding_exact() FROM PUBLIC")
+    op.execute(f"REVOKE ALL ON FUNCTION public.release_evidence_binding_exact() FROM {APP_ROLE}")
     op.execute(
         "CREATE TRIGGER release_evidence_binding_exact_before_insert "
         "BEFORE INSERT ON public.release_evidence_bindings FOR EACH ROW "
@@ -277,8 +293,7 @@ def downgrade() -> None:
         )
     if connection.execute(
         sa.text(
-            "SELECT count(*) FROM release_manifests "
-            "WHERE target_registry_version IS NOT NULL"
+            "SELECT count(*) FROM release_manifests " "WHERE target_registry_version IS NOT NULL"
         )
     ).scalar_one():
         raise RuntimeError(
@@ -291,6 +306,11 @@ def downgrade() -> None:
     )
     op.execute("DROP FUNCTION IF EXISTS public.release_evidence_binding_exact()")
     op.drop_table("release_evidence_bindings")
+    op.execute(
+        "DROP TRIGGER IF EXISTS release_target_registry_pin_immutable_before_update "
+        "ON release_manifests"
+    )
+    op.execute("DROP FUNCTION IF EXISTS public.release_target_registry_pin_immutable()")
 
     op.drop_constraint("target_registry_digest_is_lowercase", "release_manifests", type_="check")
     op.drop_constraint("target_registry_blob_is_lowercase", "release_manifests", type_="check")
@@ -301,13 +321,11 @@ def downgrade() -> None:
     op.drop_column("release_manifests", "target_registry_version")
 
     op.execute(
-        "DROP TRIGGER IF EXISTS evidence_envelope_digest_before_insert "
-        "ON evidence_envelopes"
+        "DROP TRIGGER IF EXISTS evidence_envelope_digest_before_insert " "ON evidence_envelopes"
     )
     op.execute("DROP FUNCTION IF EXISTS public.evidence_envelope_digest_on_insert()")
     op.execute(
-        "DROP FUNCTION IF EXISTS public.evidence_envelope_digest_v1("
-        "public.evidence_envelopes)"
+        "DROP FUNCTION IF EXISTS public.evidence_envelope_digest_v1(" "public.evidence_envelopes)"
     )
     op.drop_index(
         "ix_evidence_envelopes_tenant_evidence_recorded",

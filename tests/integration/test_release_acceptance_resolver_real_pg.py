@@ -9,7 +9,7 @@ import uuid
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import text
-from sqlalchemy.exc import IntegrityError, ProgrammingError
+from sqlalchemy.exc import DBAPIError, IntegrityError, ProgrammingError
 
 from saintvision.api.app import create_app
 from saintvision.config import Settings
@@ -53,8 +53,7 @@ def test_0058_downgrade_forward_and_partition_column_propagation(
         ).scalar_one()
         partitions = connection.execute(
             text(
-                "SELECT count(*) FROM pg_inherits "
-                "WHERE inhparent='evidence_envelopes'::regclass"
+                "SELECT count(*) FROM pg_inherits " "WHERE inhparent='evidence_envelopes'::regclass"
             )
         ).scalar_one()
         assert columns == partitions + 1
@@ -77,8 +76,12 @@ def resolved_rows(owner_engine, app_sessionmaker, clean_tables):
                 "INSERT INTO tenants(tenant_id,slug,display_name,created_at,version) "
                 "VALUES(:t,:s,'Resolver',now(),1),(:o,:os,'Other',now(),1)"
             ),
-            {"t": tenant, "s": f"resolver-{str(tenant)[:8]}", "o": other_tenant,
-             "os": f"other-{str(other_tenant)[:8]}"},
+            {
+                "t": tenant,
+                "s": f"resolver-{str(tenant)[:8]}",
+                "o": other_tenant,
+                "os": f"other-{str(other_tenant)[:8]}",
+            },
         )
         connection.execute(
             text(
@@ -296,6 +299,83 @@ def test_binding_trigger_rejects_caller_forged_scope_or_digest(
                     )
 
 
+def test_inv_app_cannot_repin_a_release_target_registry(app_sessionmaker, resolved_rows):
+    with pytest.raises(DBAPIError):
+        with app_sessionmaker() as session:
+            with session.begin(), tenant_scope(session, resolved_rows["tenant"]):
+                session.execute(
+                    text(
+                        "UPDATE release_manifests SET target_registry_version=2 "
+                        "WHERE tenant_id=:tenant AND release_id=:release"
+                    ),
+                    {
+                        "tenant": resolved_rows["tenant"],
+                        "release": resolved_rows["release"],
+                    },
+                )
+
+
+def test_inv_app_cannot_mutate_an_append_only_evidence_binding(app_sessionmaker, resolved_rows):
+    with pytest.raises(DBAPIError):
+        with app_sessionmaker() as session:
+            with session.begin(), tenant_scope(session, resolved_rows["tenant"]):
+                session.execute(
+                    text(
+                        "UPDATE release_evidence_bindings SET envelope_sha256=:digest "
+                        "WHERE tenant_id=:tenant AND release_id=:release"
+                    ),
+                    {
+                        "digest": "0" * 64,
+                        "tenant": resolved_rows["tenant"],
+                        "release": resolved_rows["release"],
+                    },
+                )
+
+
+def test_release_without_a_target_registry_pin_is_a_prerequisite_failure(
+    owner_engine, app_sessionmaker, resolved_rows
+):
+    legacy_release = new_id("release")
+    with owner_engine.begin() as connection:
+        connection.execute(
+            text(
+                "INSERT INTO release_manifests(release_id,tenant_id,version,components,"
+                "component_count,manifest_sha256,created_by_user_id,created_at,policy_version,"
+                "policy_registry_sha256) VALUES(:release,:tenant,'legacy-card194',"
+                "cast(:components AS jsonb),1,:manifest,:user,now(),1,:policy)"
+            ),
+            {
+                "release": legacy_release,
+                "tenant": resolved_rows["tenant"],
+                "components": json.dumps(
+                    [{"name": "legacy", "kind": "service", "digest": "7" * 64}]
+                ),
+                "manifest": "8" * 64,
+                "user": resolved_rows["user"],
+                "policy": policy.digest_of(),
+            },
+        )
+    target = resolver.load_target_registry().document.targets[0]
+    with app_sessionmaker() as session:
+        with session.begin(), tenant_scope(session, resolved_rows["tenant"]):
+            with pytest.raises(acceptance.PrerequisitesUnavailable):
+                resolver.RESOLVER.resolve(
+                    session,
+                    tenant_id=resolved_rows["tenant"],
+                    release_id=legacy_release,
+                    target_refs=[
+                        {"targetId": target.target_id, "targetSha256": target.target_sha256}
+                    ],
+                    measurement_refs=[
+                        {
+                            "evidenceId": resolved_rows["evidence"],
+                            "evidenceSha256": resolved_rows["digest"],
+                            "observedAt": NOW,
+                        }
+                    ],
+                )
+
+
 def test_exact_resolve_discovery_and_cross_scope_fail_closed(app_sessionmaker, resolved_rows):
     loaded = resolver.load_target_registry().document.targets[0]
     with app_sessionmaker() as session:
@@ -304,9 +384,7 @@ def test_exact_resolve_discovery_and_cross_scope_fail_closed(app_sessionmaker, r
                 session,
                 tenant_id=resolved_rows["tenant"],
                 release_id=resolved_rows["release"],
-                target_refs=[
-                    {"targetId": loaded.target_id, "targetSha256": loaded.target_sha256}
-                ],
+                target_refs=[{"targetId": loaded.target_id, "targetSha256": loaded.target_sha256}],
                 measurement_refs=[
                     {
                         "evidenceId": resolved_rows["evidence"],
@@ -395,7 +473,7 @@ def test_legacy_null_digest_is_not_relabelled_as_input_digest(
 
 
 def test_discovery_route_requires_and_returns_only_fresh_server_bound_identity(
-    app_engine, resolved_rows
+    app_engine, owner_engine, resolved_rows
 ):
     principal = Principal(
         user_id=resolved_rows["user"],
@@ -434,3 +512,22 @@ def test_discovery_route_requires_and_returns_only_fresh_server_bound_identity(
     ]
     assert "projectId" not in json.dumps(body)
     assert "telemetry" not in json.dumps(body)
+
+    with owner_engine.begin() as connection:
+        connection.execute(
+            text(
+                "DELETE FROM release_evidence_bindings "
+                "WHERE tenant_id=:tenant AND release_id=:release"
+            ),
+            {
+                "tenant": resolved_rows["tenant"],
+                "release": resolved_rows["release"],
+            },
+        )
+    unavailable = client.get(
+        f"/v1/release-manifests/{resolved_rows['release']}/acceptance-evidence",
+        params={"acceptanceIdRef": "AC-12"},
+        headers={"Authorization": "Bearer token"},
+    )
+    assert unavailable.status_code == 503, unavailable.text
+    assert unavailable.json()["code"] == "SYS-0003"
