@@ -946,28 +946,63 @@
           "pattern": "^[0-9a-f]{40}$"
         },
         "outputImageDigest": {
-          "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "outputConfigDigest": {
-          "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "sbomEvidenceDigest": {
-          "type": "string",
-          "pattern": "^[0-9a-f]{64}$"
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "scanEvidenceDigest": {
-          "type": "string",
-          "pattern": "^[0-9a-f]{64}$"
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "cacheInputDigest": {
           "type": "string",
           "pattern": "^[0-9a-f]{64}$"
         },
         "cacheOutputDigest": {
-          "type": "string",
-          "pattern": "^[0-9a-f]{64}$"
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "networkSummaryDigest": {
           "type": "string",
@@ -1050,6 +1085,26 @@
                     ]
                   }
                 }
+              },
+              "outputImageDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "outputConfigDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "sbomEvidenceDigest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "scanEvidenceDigest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "cacheOutputDigest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
               }
             }
           }

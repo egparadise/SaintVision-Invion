@@ -195,12 +195,12 @@ export interface BuildReceipt {
   planDigest: string;
   sourceCommitSha: string;
   sourceTreeSha: string;
-  outputImageDigest: string;
-  outputConfigDigest: string;
-  sbomEvidenceDigest: string;
-  scanEvidenceDigest: string;
+  outputImageDigest: (string | null);
+  outputConfigDigest: (string | null);
+  sbomEvidenceDigest: (string | null);
+  scanEvidenceDigest: (string | null);
   cacheInputDigest: string;
-  cacheOutputDigest: string;
+  cacheOutputDigest: (string | null);
   networkSummaryDigest: string;
   startedAt: Timestamp;
   finishedAt: Timestamp;

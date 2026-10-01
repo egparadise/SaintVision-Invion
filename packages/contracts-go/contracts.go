@@ -197,12 +197,12 @@ type BuildReceipt struct {
     PlanDigest string `json:"planDigest"`
     SourceCommitSha string `json:"sourceCommitSha"`
     SourceTreeSha string `json:"sourceTreeSha"`
-    OutputImageDigest string `json:"outputImageDigest"`
-    OutputConfigDigest string `json:"outputConfigDigest"`
-    SbomEvidenceDigest string `json:"sbomEvidenceDigest"`
-    ScanEvidenceDigest string `json:"scanEvidenceDigest"`
+    OutputImageDigest *string `json:"outputImageDigest"`
+    OutputConfigDigest *string `json:"outputConfigDigest"`
+    SbomEvidenceDigest *string `json:"sbomEvidenceDigest"`
+    ScanEvidenceDigest *string `json:"scanEvidenceDigest"`
     CacheInputDigest string `json:"cacheInputDigest"`
-    CacheOutputDigest string `json:"cacheOutputDigest"`
+    CacheOutputDigest *string `json:"cacheOutputDigest"`
     NetworkSummaryDigest string `json:"networkSummaryDigest"`
     StartedAt Timestamp `json:"startedAt"`
     FinishedAt Timestamp `json:"finishedAt"`

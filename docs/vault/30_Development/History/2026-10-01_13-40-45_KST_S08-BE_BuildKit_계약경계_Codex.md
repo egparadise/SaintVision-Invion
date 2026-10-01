@@ -34,10 +34,13 @@ source_of_truth: "Git"
 - receipt는 plan/source/output/SBOM/scan/cache/network digest, trace가 있는 audit
   event, cleanup receipt를 필수로 한다. 성공 receipt는 lease·builder claim·cgroup
   정리 확인과 non-quarantine cache disposition 없이는 거부된다.
+- 실패·취소 receipt는 생성되지 않은 output image/config, SBOM, scan, cache output을
+  `null`로 기록할 수 있다. 성공일 때는 다섯 digest가 모두 유효해야 하므로 실패에서
+  값을 합성하거나 성공에서 증거 부재를 숨길 수 없다.
 
 ## 검증
 
-- `python -m pytest tests/core/test_buildkit_contracts.py -q` → **37 passed**.
+- `python -m pytest tests/core/test_buildkit_contracts.py -q` → **43 passed**.
 - `python tools/generate_contracts.py` → 생성 완료; 생성 직후 정본 schema와 Python·
   TypeScript·Go·Node mirror가 동일 입력에서 재생성됐다.
 - `npx --yes --package typescript@5.9.3 tsc --noEmit --strict packages/contracts-ts/src/index.ts`

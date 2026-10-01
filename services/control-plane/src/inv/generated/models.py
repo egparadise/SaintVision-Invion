@@ -362,12 +362,12 @@ class BuildReceipt(BaseModel):
     planDigest: constr(pattern=r'^[0-9a-f]{64}$')
     sourceCommitSha: constr(pattern=r'^[0-9a-f]{40}$')
     sourceTreeSha: constr(pattern=r'^[0-9a-f]{40}$')
-    outputImageDigest: constr(pattern=r'^sha256:[0-9a-f]{64}$')
-    outputConfigDigest: constr(pattern=r'^sha256:[0-9a-f]{64}$')
-    sbomEvidenceDigest: constr(pattern=r'^[0-9a-f]{64}$')
-    scanEvidenceDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    outputImageDigest: constr(pattern=r'^sha256:[0-9a-f]{64}$') | None
+    outputConfigDigest: constr(pattern=r'^sha256:[0-9a-f]{64}$') | None
+    sbomEvidenceDigest: constr(pattern=r'^[0-9a-f]{64}$') | None
+    scanEvidenceDigest: constr(pattern=r'^[0-9a-f]{64}$') | None
     cacheInputDigest: constr(pattern=r'^[0-9a-f]{64}$')
-    cacheOutputDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    cacheOutputDigest: constr(pattern=r'^[0-9a-f]{64}$') | None
     networkSummaryDigest: constr(pattern=r'^[0-9a-f]{64}$')
     startedAt: Timestamp
     finishedAt: Timestamp

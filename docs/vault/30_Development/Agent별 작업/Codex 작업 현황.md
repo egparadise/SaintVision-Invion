@@ -7,7 +7,7 @@ author: "Codex"
 updated: "2026-10-01T13:40:45+09:00"
 source_of_truth: "Git"
 active_card: "CARD-172 S08-BE BuildKit contract boundary"
-active_card_status: "strict BuildRequest/BuildPlan/BuildReceipt and generated bindings implemented; focused PG-free 37 passed"
+active_card_status: "strict BuildRequest/BuildPlan/BuildReceipt and generated bindings implemented; focused PG-free 43 passed"
 active_card_next: "contract/docs gates, PR and Claude review; adapter/ROOF/GPU remain separate cards"
 ---
 
@@ -18,7 +18,7 @@ active_card_next: "contract/docs gates, PR and Claude review; adapter/ROOF/GPU r
 - `BuildPlan`의 rootless/privileged/hostAccess/devices/binds를 literal로 고정하고,
   network policy, resource budget, lease/fencing, cache·secret reference digest,
   immutable base digest를 필수화했다. `WorkloadSpec`과 build 계약은 섞이지 않는다.
-- focused PG-free 계약 시험은 37 passed다. rootless daemon과 실제 격리·감사 실행은
+- focused PG-free 계약 시험은 43 passed다. rootless daemon과 실제 격리·감사 실행은
   아직 `NOT_OBSERVED`이며 Claude 계약 검토 뒤 별도 adapter 카드로 진행한다.
 - 근거: [[2026-10-01_13-40-45_KST_S08-BE_BuildKit_계약경계_Codex]].
 

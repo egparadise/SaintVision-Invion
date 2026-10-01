@@ -233,6 +233,31 @@ def test_success_receipt_requires_verified_cleanup(field, value):
     _rejected("BuildReceipt", changed)
 
 
+@pytest.mark.parametrize(
+    "field",
+    ["outputImageDigest", "outputConfigDigest", "sbomEvidenceDigest", "scanEvidenceDigest", "cacheOutputDigest"],
+)
+def test_success_receipt_cannot_claim_missing_output_or_scan_evidence(field):
+    changed = _receipt()
+    changed[field] = None
+    _rejected("BuildReceipt", changed)
+
+
+def test_failed_receipt_records_unavailable_outputs_as_null_without_fabrication():
+    changed = _receipt()
+    changed["result"] = "failed"
+    for field in (
+        "outputImageDigest",
+        "outputConfigDigest",
+        "sbomEvidenceDigest",
+        "scanEvidenceDigest",
+        "cacheOutputDigest",
+    ):
+        changed[field] = None
+    changed["cleanup"]["cacheDisposition"] = "quarantined"
+    validate_contract("BuildReceipt", changed)
+
+
 def test_receipt_audit_is_strict_and_nonempty():
     changed = _receipt()
     changed["auditEvents"][0]["rawSecret"] = "must-not-appear"
