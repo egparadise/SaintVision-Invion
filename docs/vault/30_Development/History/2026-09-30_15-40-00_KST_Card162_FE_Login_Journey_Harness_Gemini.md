@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-GEMINI-CARD162-001"
 title: "History: Card 162 S02-FE 사내 포털 로그인 여정 관측 하네스 구축 및 증거 생성"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Gemini"
-updated: "2026-10-01T09:30:00+09:00"
+updated: "2026-10-01T10:05:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -149,3 +149,34 @@ Codex 계약·보안 축의 PR #259 1차 독립 검토 지적사항 6건(F1~F6)�
   - 의미론적 모순(PASS 불일치, 단계 순서 변조) 거부
   - 계정/IP/OIDC 파라미터 누출 감사 검출 반례
   - 실 브라우저 5단계 전수 성공 및 단계별 실패 시 downstream `NOT_OBSERVED` 전파 실측
+
+---
+
+## 6. Codex 2차 검토(r2) 지적사항 전수 조치 (2026-10-01)
+
+Codex 계약·보안 축 2차 검토(09:40)에서 제기된 지적사항 5건(F1, F2, F4, F5, F6)을 전수 조치하고 자동화 검증 스위트를 43개로 보강 완료하였습니다:
+
+### 1) F1 [High] 3~5단계 네트워크 수준 실측 관측 및 fake page 사살
+- **문제점**: Step 3~5가 URL 및 DOM 엘리먼트 존재만 확인하여 네트워크 토큰 교환/세션 조회가 없어도 통과할 수 있는 취약점 존재.
+- **조치**:
+  - Step 3 (pkce_callback): Playwright `page.on("response", ...)` 리스너를 결속하여 IdP 토큰 엔드포인트(`/protocol/openid-connect/token` 또는 IdP 호스트의 `/token`)의 실제 네트워크 HTTP 200 응답 수신을 브라우저 네트워크 이벤트로 실측.
+  - Step 4 (identity_session_display): UI 신원 텍스트뿐 아니라 `/v1/session` 엔드포인트의 실제 HTTP 200 응답 수신 및 엄격한 정본 세션 스키마 형상(`subjectId`는 `oidc:` 접두사 필수, `tenantId` 비어있지 않은 문자열, `expiresAt` 정수) 실측 검증.
+  - Step 5 (logout): 로그아웃 클릭 후 `sessionStorage`의 OAuth 트랜잭션(`saintvision.oauth.transaction`) 완전 삭제(`txCleared: true`), 스토리지 내 잔류 토큰/자격증명 부재(`storagePurged: true`), 로그인 폼 복귀 실측.
+  - 연산자 자격증명: 비밀 비노출 환경변수(`SV_IDP_USERNAME`, `SV_IDP_PASSWORD`) 또는 비노출 대화형 폼 제출 연동. 네트워크 응답이 누락된 fake page는 Step 3에서 fail-closed 차단하는 회귀 시험 강화(`test_live_browser_fails_when_network_token_or_session_not_observed`).
+
+### 2) F2 [High] CA 번들 및 allowlist fail-closed 강제
+- **문제점**: `--ca-bundle` 기본값 None 상태에서도 `acceptanceClaim=True`가 가능했던 취약점 및 allowlist가 비어있을 때 검사를 건너뛰는 문제.
+- **조치**:
+  - `acceptanceClaim=True`는 검증된 사내 CA 번들(`tlsValidationEnforced=True`, `caDigest.fingerprintVerified=True`)이 존재할 때만 허용되며, 스키마 검증기(`validate_evidence`)에서 상호 모순 시 즉시 예외 발생.
+  - allowlist가 비어있거나(`[]`) 누락(`None`)된 경우 `inspect_ca_bundle`이 즉시 fail-closed(False) 반환하도록 방어.
+  - Chromium 실행 인수에 루트 CA의 SPKI SHA-256 base64 해시(`--ignore-certificate-errors-spki-list=<hash>`)를 결속하면서도 `ignore_https_errors=False` 불변식을 엄격히 유지.
+
+### 3) F4 [Medium-High] Git provenance 엄격성
+- **조치**: `get_git_sha`에 `require_clean=True`(`git status --porcelain`) 및 `require_remote_containment=True`(`git branch -r --contains`)를 탑재하여 오염된 작업 트리 또는 원격 미추적 커밋 감지 시 즉시 거부하는 단위 시험 구축.
+
+### 4) F5 [Medium-High] 접두사 무관 계정 식별자 키 검출 및 비식별화
+- **조치**: `ACCOUNT_KEYS`를 확장하고 스네이크케이스 분할 검출(`is_account_key`)을 적용하여 `actor`, `custom_user_id`, `operator` 등 임의 접두사가 붙은 계정 식별자까지 철저히 마스킹. `observations` 스키마를 `additionalProperties: false`로 닫고 허용된 속성만 명시. `audit` 컨테이너 자체에 대한 오탐 격리.
+
+### 5) F6 [Medium] X.509 인증서 확장 필드 보강 및 변이 사살 시험
+- **조치**: Windows/OpenSSL 3.x 환경에서 발생하는 `Missing Authority Key Identifier` 오류를 방지하기 위해 테스트 CA 및 서버 인증서에 `SubjectKeyIdentifier` 및 `AuthorityKeyIdentifier`를 완비. 소스 코드 수준에서 `ignore_https_errors=False` 불변식 강제 검증.
+- **결과**: `tests/test_portal_login_journey_harness.py` 43개 자동화 시험 100% PASS.

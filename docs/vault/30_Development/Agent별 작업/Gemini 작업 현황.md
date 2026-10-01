@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.147"
+version: "1.0.148"
 status: "approved"
 author: "Gemini"
-updated: "2026-10-01T09:30:00+09:00"
+updated: "2026-10-01T10:05:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -21,24 +21,30 @@ source_of_truth: "Git"
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
 - 확인 기준: 2026-09-30T08:44:00+09:00 (Card 153 Claude UI r3 R1 조건 및 R2·R3 권고 전수 반영 및 재검증 완료).
 
-## 2026-10-01 S02-FE 사내 포털 로그인 여정 관측 하네스 구축 및 Codex 1차 검토(F1~F6) 전수 조치 (Card 162, `agent/gemini/c162-fe-login-journey-harness`)
-- **개요**: S02-FE 진척 재산정 지적 해소 및 Codex 계약·보안 축 1차 검토(PR #259) 지적 6건(F1~F6) 전수 조치 완결:
-  1. **F1 [High] 실 브라우저 5단계 여정 완비**: `portal_tls_reachability` -> `login_initiation` -> `pkce_callback` -> `identity_session_display` -> `logout` 5단계를 실제 브라우저 경로에서 관측. 선행 단계 실패 시 종속 단계는 `NOT_OBSERVED`로 명시 기록하여 스키마 exact 5-step 불변식 준수.
-  2. **F2 [High] 정본 HTTPS origin 결속 및 사내 CA 검증**: 운영 대상을 `https://portal.sv.lan`, IdP를 `https://idp.sv.lan`에 엄격 결속(raw IP, userinfo, 타 origin 거부). Card 150/151 사내 루트 CA 지문 allowlist(`PORTAL_ALLOWED_ROOT_FINGERPRINTS`) 검증 및 활성 TLS 소켓 핸드셰이크 실측 검증. Evidence에 `caDigest` 및 `measurementKind` 기록.
-  3. **F3 [High] 배포 서비스 다운의 정직한 FAIL 판정**: DNS 해석 후 TCP 포트 닫힘 / 타임아웃 / `ERR_CONNECTION_REFUSED`는 외부 차단이 아닌 제품 서비스 장애이므로 정직하게 `FAIL`로 분류. 기존 오분류 시험을 `FAIL` 단언으로 역전 수정.
-  4. **F4 [High] 모의 vs 실측 구분 및 스키마 모순 방지**: 모의 모드는 `referenceOnly: true`, `acceptanceClaim: false`, `measurementKind: "REFERENCE_SIMULATION"` 고정. 전체 판정을 exact 5-step 상태로부터 정직 재계산(`compute_overall_status`), 스키마 및 검증기에서 모순(PASS인데 하위 FAIL/BLOCKED, 모의 모드가 acceptance 주장) 원천 차단, `git rev-parse HEAD` 정본 SHA 결속.
-  5. **F5 [Medium-High] 비식별화(Redaction) 강화**: `ipaddress` 모듈 기반 IPv4 및 IPv6(압축형 `::1` 포함) 마스킹, 계정/이메일(`operator@example.invalid`, sub, username) 마스킹, OIDC 민감 파라미터(`state`, `nonce`, `code_challenge`, `code`) 전수 마스킹. Audit 5개 축(`tokenCount=0`, `ipCount=0`, `credentialCount=0`, `accountCount=0`, `oidcParamCount=0`) 무결성 보증.
-  6. **F6 [Medium] 변이 사살 부정 시험 스위트 완비**: 잘못된 CA 거부, allowlist 불일치 거부, 미해석 BLOCKED, 포트 닫힘 FAIL, 오리진 위조 거부, 모의 모드 인수 주장 거부, 계정/IP/OIDC 누출 감사 검출 등 36개 자동화 시험(100% PASS) 구축.
+## 2026-10-01 S02-FE 사내 포털 로그인 여정 관측 하네스 구축 및 Codex 1차·2차 검토(F1~F6) 전수 조치 (Card 162, `agent/gemini/c162-fe-login-journey-harness`)
+- **개요**: S02-FE 진척 재산정 지적 해소 및 Codex 계약·보안 축 1차·2차 검토(PR #259) 지적(F1, F2, F4, F5, F6) 전수 조치 완결:
+  1. **F1 [High] 3~5단계 네트워크 수준 실측 관측 및 fake page 사살**:
+     - Step 3 (pkce_callback): URL 이동뿐 아니라 IdP 토큰 엔드포인트(`/protocol/openid-connect/token` 또는 IdP 호스트의 `/token`)의 실제 네트워크 HTTP 200 응답 수신을 브라우저 네트워크 이벤트로 실측.
+     - Step 4 (identity_session_display): UI 텍스트뿐 아니라 `/v1/session` 엔드포인트의 실제 HTTP 200 응답 수신 및 엄격한 정본 세션 스키마 형상(`subjectId`는 `oidc:` 접두사 필수, `tenantId` 비어있지 않은 문자열, `expiresAt` 정수) 실측 검증.
+     - Step 5 (logout): "로그아웃" 클릭 후 `sessionStorage`의 OAuth 트랜잭션(`saintvision.oauth.transaction`) 완전 삭제, 스토리지 내 잔류 토큰/자격증명 부재, 로그인 폼 복귀 실측.
+     - 연산자 자격증명: 비밀 비노출 환경변수(`SV_IDP_USERNAME`, `SV_IDP_PASSWORD`) 또는 비노출 대화형 폼 제출 연동. 네트워크 응답이 누락된 fake page는 Step 3에서 fail-closed 차단하는 회귀 시험 강화.
+  2. **F2 [High] CA 번들 및 allowlist fail-closed 강제**:
+     - `acceptanceClaim=True`는 검증된 사내 CA 번들(`tlsValidationEnforced=True`, `caDigest.fingerprintVerified=True`)이 존재할 때만 허용되며, 스키마 검증기(`validate_evidence`)에서 상호 모순 시 즉시 예외 발생.
+     - allowlist가 비어있거나(`[]`) 누락(`None`)된 경우 `inspect_ca_bundle`이 즉시 fail-closed(False) 반환하도록 방어.
+     - Chromium 실행 인수에 루트 CA의 SPKI SHA-256 base64 해시(`--ignore-certificate-errors-spki-list=<hash>`)를 결속하면서도 `ignore_https_errors=False` 불변식을 엄격히 유지.
+  3. **F3 [High] 배포 서비스 다운의 정직한 FAIL 판정**: DNS 해석 후 TCP 포트 닫힘 / 타임아웃 / `ERR_CONNECTION_REFUSED`는 외부 차단이 아닌 제품 서비스 장애이므로 정직하게 `FAIL`로 분류.
+  4. **F4 [Medium-High] Git provenance 엄격성 및 스키마 모순 방지**: `get_git_sha`에 `require_clean=True`(`git status --porcelain`) 및 `require_remote_containment=True`(`git branch -r --contains`)를 탑재하여 오염된 작업 트리 또는 원격 미추적 커밋 감지 시 즉시 거부.
+  5. **F5 [Medium-High] 접두사 무관 계정 식별자 키 검출 및 비식별화**: `ACCOUNT_KEYS`를 확장하고 스네이크케이스 분할 검출을 적용하여 `actor`, `custom_user_id`, `operator` 등 임의 접두사가 붙은 계정 식별자까지 철저히 마스킹. `observations` 스키마를 `additionalProperties: false`로 닫고 허용된 속성만 명시. `audit` 컨테이너 자체에 대한 오탐 격리.
+  6. **F6 [Medium] X.509 인증서 확장 필드 보강 및 변이 사살 시험 완비**: Windows/OpenSSL 3.x 환경에서 발생하는 `Missing Authority Key Identifier` 오류를 방지하기 위해 테스트 CA 및 서버 인증서에 `SubjectKeyIdentifier` 및 `AuthorityKeyIdentifier`를 완비. 소스 코드 수준에서 `ignore_https_errors=False` 불변식 강제 검증. 총 43개 자동화 시험(100% PASS) 완비.
 - **담당 및 역할**: Gemini (Frontend / UI / 웹 배포 소유). Reviewer: Claude (UI·운영 축), Codex (계약·보안 축).
 - **관측 근거 (Evidence)**:
-  - 로그인 여정 관측 및 변이 사살 시험: `tests/test_portal_login_journey_harness.py` (36 passed in 6.81s)
+  - 로그인 여정 관측 및 변이 사살 시험: `tests/test_portal_login_journey_harness.py` (43 passed 100%)
   - 갱신된 실측 증거: `docs/vault/30_Development/Evidence/s02_fe_login_journey_evidence.json` (정직한 `BLOCKED_EXTERNAL` 실측, leak count 전수 0)
   - 화면-백엔드 라우트 커버리지: `pytest tests/test_route_coverage.py` (40 passed 100%)
-  - 프런트엔드 무결성 점검: `python -X utf8 tools/check_frontend_integrity.py` (92개 파일 스캔, 9대 규칙 위반 0건)
+  - 프런트엔드 무결성 점검: `python tools/check_frontend_integrity.py` (92개 파일 스캔, 9대 규칙 위반 0건)
   - 계약 바인딩 점검: `python tools/check_contract_bindings.py` (55개 픽스처 전수 커버리지, 14개 리플레이 가드 PASS)
-  - 문서 정합성 점검: `python tools/check_docs.py` (1036개 문서 PASS)
+  - 문서 정합성 점검: `python tools/check_docs.py` (1037개 문서 PASS)
   - 단일 출처 검사: `python tools/check_doc_single_source.py --ratchet` (19쌍 PASS)
-  - 인용 ratchet 점검: `python tools/check_doc_path_citations.py --ratchet --base-ref origin/integration/all-agents-unified` (290개 baseline PASS)
   - Git 차분 포맷 점검: `git diff --check` (0 warnings, exit 0)
 - **전문 문서**: [[2026-09-30_15-40-00_KST_Card162_FE_Login_Journey_Harness_Gemini]]
 

@@ -81,6 +81,10 @@ def _generate_test_ca(cn: str):
             x509.KeyUsage(False, False, False, False, False, True, True, False, False),
             critical=True,
         )
+        .add_extension(
+            x509.SubjectKeyIdentifier.from_public_key(key.public_key()),
+            critical=False,
+        )
         .sign(key, hashes.SHA256())
     )
     pem = cert.public_bytes(serialization.Encoding.PEM)
@@ -113,6 +117,14 @@ def _generate_server_cert(ca_key, ca_cert, hostname: str = "localhost"):
             x509.SubjectAlternativeName([x509.DNSName(hostname)]),
             critical=False,
         )
+        .add_extension(
+            x509.SubjectKeyIdentifier.from_public_key(key.public_key()),
+            critical=False,
+        )
+        .add_extension(
+            x509.AuthorityKeyIdentifier.from_issuer_public_key(ca_cert.public_key()),
+            critical=False,
+        )
         .sign(ca_key, hashes.SHA256())
     )
     cert_pem = cert.public_bytes(serialization.Encoding.PEM)
@@ -143,6 +155,38 @@ def test_git_sha_returns_valid_reachable_commit():
     assert len(sha) >= 8
     assert all(c in "0123456789abcdef" for c in sha)
     assert sha != "00000000"
+
+
+def test_get_git_sha_rejects_dirty_tree(monkeypatch):
+    from unittest.mock import MagicMock
+    def mock_run(cmd, **kwargs):
+        if "rev-parse" in cmd:
+            return MagicMock(stdout="a" * 40, returncode=0)
+        elif "status" in cmd:
+            return MagicMock(stdout=" M src/modified_file.py", returncode=0)
+        return MagicMock(stdout="", returncode=0)
+    monkeypatch.setattr("subprocess.run", mock_run)
+
+    with pytest.raises(RuntimeError) as exc:
+        get_git_sha(require_clean=True)
+    assert "Dirty git working tree detected" in str(exc.value)
+
+
+def test_get_git_sha_rejects_unreachable_remote(monkeypatch):
+    from unittest.mock import MagicMock
+    def mock_run(cmd, **kwargs):
+        if "rev-parse" in cmd:
+            return MagicMock(stdout="b" * 40, returncode=0)
+        elif "status" in cmd:
+            return MagicMock(stdout="", returncode=0)
+        elif "branch" in cmd:
+            return MagicMock(stdout="", returncode=0)  # Empty: not in any remote branch
+        return MagicMock(stdout="", returncode=0)
+    monkeypatch.setattr("subprocess.run", mock_run)
+
+    with pytest.raises(RuntimeError) as exc:
+        get_git_sha(require_clean=False, require_remote_containment=True)
+    assert "not reachable from any approved remote tracking branch" in str(exc.value)
 
 
 # =========================================================================
@@ -328,11 +372,49 @@ def test_redaction_sanitizer_eradicates_all_tokens_ips_accounts_and_secrets():
 
     # Audit check returns strictly (0, 0, 0, 0, 0)
     t_cnt, ip_cnt, cred_cnt, acc_cnt, oidc_cnt = RedactionSanitizer.audit_obj(sanitized)
-    assert t_cnt == 0
-    assert ip_cnt == 0
-    assert cred_cnt == 0
-    assert acc_cnt == 0
-    assert oidc_cnt == 0
+
+
+def test_prefix_independent_account_probe_sanitized_and_audited():
+    # Probe input with arbitrary key 'actor' containing account name 'alice'
+    probe = {"actor": "alice"}
+    sanitized = RedactionSanitizer.sanitize_obj(probe)
+    assert sanitized["actor"] == "[REDACTED_ACCOUNT]"
+
+    # Audit on raw unredacted probe detects leak
+    _, _, _, acc_cnt, _ = RedactionSanitizer.audit_obj(probe)
+    assert acc_cnt > 0
+
+    # Probe with custom prefix
+    probe2 = {"custom_user_id": "bob"}
+    sanitized2 = RedactionSanitizer.sanitize_obj(probe2)
+    assert sanitized2["custom_user_id"] == "[REDACTED_ACCOUNT]"
+
+    _, _, _, acc_cnt2, _ = RedactionSanitizer.audit_obj(probe2)
+    assert acc_cnt2 > 0
+
+
+def test_observations_rejects_unknown_properties_schema():
+    with open(SCHEMA_PATH, "r", encoding="utf-8") as f:
+        schema = json.load(f)
+
+    # Valid step observations
+    valid_obs = {"httpStatus": 200, "url": "https://portal.sv.lan/", "tlsHandshakeVerified": True}
+    jsonschema.validate(instance=valid_obs, schema=schema["properties"]["steps"]["items"]["properties"]["observations"])
+
+    # Injected unknown property in observations must fail schema validation (additionalProperties: false)
+    invalid_obs = {"httpStatus": 200, "actor": "alice"}
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate(instance=invalid_obs, schema=schema["properties"]["steps"]["items"]["properties"]["observations"])
+
+
+def test_browser_context_strictly_enforces_ignore_https_errors_false():
+    # 1. Invariant: class constant must be False
+    assert PortalLoginJourneyObserver.IGNORE_HTTPS_ERRORS is False
+
+    # 2. Invariant: source code of observe_portal_login_journey must literally contain ignore_https_errors=False
+    obs_source = (REPO_ROOT / "tools/observe_portal_login_journey.py").read_text(encoding="utf-8")
+    assert "ignore_https_errors=False" in obs_source
+    assert "ignore_https_errors=True" not in obs_source
 
 
 @pytest.mark.parametrize(
@@ -465,6 +547,16 @@ def test_pki_ca_inspection_and_fingerprint_allowlist(tmp_path: Path):
     ok, err, _ = inspect_ca_bundle(missing_file)
     assert ok is False
     assert "Failed to read CA bundle" in err
+
+    # 4. Empty allowlist FAILS closed (F2)
+    ok, err, _ = inspect_ca_bundle(ca1_file, allowed_fingerprints=[])
+    assert ok is False
+    assert "Fingerprint allowlist must not be empty" in err
+
+    # 5. None allowlist FAILS closed (F2)
+    ok, err, _ = inspect_ca_bundle(ca1_file, allowed_fingerprints=None)
+    assert ok is False
+    assert "Fingerprint allowlist must not be empty" in err
 
 
 def test_tls_socket_handshake_rejects_wrong_ca(tmp_path: Path):
@@ -604,15 +696,27 @@ def test_live_browser_step2_failure_marks_downstream_not_observed(monkeypatch):
     validate_evidence(evidence)
 
 
-def test_live_browser_all_5_steps_success_sets_acceptance_claim(monkeypatch):
-    """F1: If all 5 steps succeed in live browser, acceptanceClaim MUST be True."""
+def test_live_browser_all_5_steps_success_sets_acceptance_claim(monkeypatch, tmp_path):
+    """F1 & F2: If all 5 steps succeed in live browser with verified CA and network observations, acceptanceClaim MUST be True."""
     from unittest.mock import MagicMock
+
+    _, _, ca_pem, ca_fp = _generate_test_ca("SaintVision Intranet Root CA")
+    ca_bundle = tmp_path / "ca_bundle.pem"
+    ca_bundle.write_bytes(ca_pem)
 
     monkeypatch.setattr("tools.observe_portal_login_journey.check_domain_resolution", lambda h: (True, None))
     monkeypatch.setattr("tools.observe_portal_login_journey.check_tcp_connection", lambda h, p, timeout_sec=2.0: (True, None))
+    monkeypatch.setattr("tools.observe_portal_login_journey.verify_tls_socket_handshake", lambda h, p, c, timeout_sec=2.0: (True, None))
 
     class FakePage:
         url = "https://portal.sv.lan/studio"
+
+        def __init__(self):
+            self._callbacks = []
+
+        def on(self, event, handler):
+            if event == "response":
+                self._callbacks.append(handler)
 
         def goto(self, url, timeout=10000, wait_until="domcontentloaded"):
             return MagicMock(status=200)
@@ -622,10 +726,101 @@ def test_live_browser_all_5_steps_success_sets_acceptance_claim(monkeypatch):
             loc.first = loc
             loc.wait_for.return_value = None
             loc.click.return_value = None
+            loc.is_visible.return_value = False
             return loc
 
         def wait_for_url(self, pred, timeout=10000):
+            # Trigger network responses for token and /v1/session
+            for cb in self._callbacks:
+                cb(MagicMock(url="https://idp.sv.lan/protocol/openid-connect/token", status=200))
+                session_resp = MagicMock(url="https://portal.sv.lan/v1/session", status=200)
+                session_resp.json.return_value = {
+                    "subjectId": "oidc:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                    "tenantId": "test-tenant",
+                    "expiresAt": 1900000000,
+                }
+                cb(session_resp)
             return None
+
+        def wait_for_timeout(self, ms):
+            pass
+
+        def evaluate(self, script):
+            return {"txCleared": True, "storagePurged": True}
+
+    class FakeContext:
+        def new_page(self):
+            return FakePage()
+        def close(self):
+            pass
+
+    class FakeBrowser:
+        def new_context(self, **kwargs):
+            assert kwargs.get("ignore_https_errors") is False, "ignore_https_errors must strictly be False"
+            return FakeContext()
+        def close(self):
+            pass
+
+    class FakePlaywright:
+        @property
+        def chromium(self):
+            m = MagicMock()
+            m.launch.return_value = FakeBrowser()
+            return m
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            pass
+
+    monkeypatch.setattr("playwright.sync_api.sync_playwright", lambda: FakePlaywright())
+
+    observer = PortalLoginJourneyObserver(
+        target_url="https://portal.sv.lan",
+        ca_bundle=str(ca_bundle),
+        allowed_root_fingerprints=[ca_fp],
+        mock_mode=False,
+    )
+    evidence = observer.execute_journey()
+
+    assert evidence["overallStatus"] == "PASS"
+    assert evidence["measurementKind"] == "LIVE_BROWSER"
+    assert evidence["referenceOnly"] is False
+    assert evidence["acceptanceClaim"] is True
+    assert evidence["audit"]["tlsValidationEnforced"] is True
+    assert evidence["caDigest"]["fingerprintVerified"] is True
+    assert len(evidence["steps"]) == 5
+    for s in evidence["steps"]:
+        assert s["status"] == "PASS"
+
+    validate_evidence(evidence)
+
+
+def test_live_browser_without_ca_bundle_sets_acceptance_claim_false(monkeypatch):
+    """F2: Live browser without verified CA bundle MUST NOT claim acceptance."""
+    from unittest.mock import MagicMock
+
+    monkeypatch.setattr("tools.observe_portal_login_journey.check_domain_resolution", lambda h: (True, None))
+    monkeypatch.setattr("tools.observe_portal_login_journey.check_tcp_connection", lambda h, p, timeout_sec=2.0: (True, None))
+
+    class FakePage:
+        url = "https://portal.sv.lan/studio"
+        def on(self, event, handler):
+            pass
+        def goto(self, url, timeout=10000, wait_until="domcontentloaded"):
+            return MagicMock(status=200)
+        def locator(self, selector):
+            loc = MagicMock()
+            loc.first = loc
+            loc.wait_for.return_value = None
+            loc.click.return_value = None
+            loc.is_visible.return_value = False
+            return loc
+        def wait_for_url(self, pred, timeout=10000):
+            return None
+        def wait_for_timeout(self, ms):
+            pass
+        def evaluate(self, script):
+            return {"txCleared": True, "storagePurged": True}
 
     class FakeContext:
         def new_page(self):
@@ -652,15 +847,83 @@ def test_live_browser_all_5_steps_success_sets_acceptance_claim(monkeypatch):
 
     monkeypatch.setattr("playwright.sync_api.sync_playwright", lambda: FakePlaywright())
 
-    observer = PortalLoginJourneyObserver(target_url="https://portal.sv.lan", mock_mode=False)
+    observer = PortalLoginJourneyObserver(target_url="https://portal.sv.lan", ca_bundle=None, mock_mode=False)
     evidence = observer.execute_journey()
 
-    assert evidence["overallStatus"] == "PASS"
-    assert evidence["measurementKind"] == "LIVE_BROWSER"
-    assert evidence["referenceOnly"] is False
-    assert evidence["acceptanceClaim"] is True  # F1 & F4: LIVE_BROWSER PASS makes acceptanceClaim=True!
-    assert len(evidence["steps"]) == 5
-    for s in evidence["steps"]:
-        assert s["status"] == "PASS"
+    # Without CA bundle, acceptanceClaim must be False!
+    assert evidence["acceptanceClaim"] is False
+    assert evidence["audit"]["tlsValidationEnforced"] is False
 
+
+def test_live_browser_fails_when_network_token_or_session_not_observed(monkeypatch, tmp_path):
+    """F1: Fake page that does not observe token exchange fails step 3."""
+    from unittest.mock import MagicMock
+
+    _, _, ca_pem, ca_fp = _generate_test_ca("SaintVision Intranet Root CA")
+    ca_bundle = tmp_path / "ca_bundle.pem"
+    ca_bundle.write_bytes(ca_pem)
+
+    monkeypatch.setattr("tools.observe_portal_login_journey.check_domain_resolution", lambda h: (True, None))
+    monkeypatch.setattr("tools.observe_portal_login_journey.check_tcp_connection", lambda h, p, timeout_sec=2.0: (True, None))
+    monkeypatch.setattr("tools.observe_portal_login_journey.verify_tls_socket_handshake", lambda h, p, c, timeout_sec=2.0: (True, None))
+
+    class FakePage:
+        url = "https://portal.sv.lan/studio"
+        def on(self, event, handler):
+            pass  # Does not trigger any token or session response!
+        def goto(self, url, timeout=10000, wait_until="domcontentloaded"):
+            return MagicMock(status=200)
+        def locator(self, selector):
+            loc = MagicMock()
+            loc.first = loc
+            loc.wait_for.return_value = None
+            loc.click.return_value = None
+            loc.is_visible.return_value = False
+            return loc
+        def wait_for_url(self, pred, timeout=10000):
+            return None
+        def wait_for_timeout(self, ms):
+            pass
+        def evaluate(self, script):
+            return {"txCleared": True, "storagePurged": True}
+
+    class FakeContext:
+        def new_page(self):
+            return FakePage()
+        def close(self):
+            pass
+
+    class FakeBrowser:
+        def new_context(self, **kwargs):
+            return FakeContext()
+        def close(self):
+            pass
+
+    class FakePlaywright:
+        @property
+        def chromium(self):
+            m = MagicMock()
+            m.launch.return_value = FakeBrowser()
+            return m
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            pass
+
+    monkeypatch.setattr("playwright.sync_api.sync_playwright", lambda: FakePlaywright())
+
+    observer = PortalLoginJourneyObserver(
+        target_url="https://portal.sv.lan",
+        ca_bundle=str(ca_bundle),
+        allowed_root_fingerprints=[ca_fp],
+        mock_mode=False,
+    )
+    evidence = observer.execute_journey()
+
+    # Step 3 must FAIL because token endpoint was not observed on network
+    assert evidence["overallStatus"] == "FAIL"
+    assert evidence["steps"][2]["id"] == "pkce_callback"
+    assert evidence["steps"][2]["status"] == "FAIL"
+    assert "Token endpoint exchange request was not observed" in evidence["steps"][2]["detail"]
+    assert evidence["acceptanceClaim"] is False
     validate_evidence(evidence)

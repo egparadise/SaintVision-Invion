@@ -143,7 +143,63 @@
           },
           "observations": {
             "type": "object",
-            "additionalProperties": true
+            "additionalProperties": false,
+            "properties": {
+              "httpStatus": {
+                "type": "integer"
+              },
+              "url": {
+                "type": "string"
+              },
+              "dnsResolved": {
+                "type": "boolean"
+              },
+              "hostname": {
+                "type": "string"
+              },
+              "tlsHandshakeVerified": {
+                "type": "boolean"
+              },
+              "initiated": {
+                "type": "boolean"
+              },
+              "idpRedirectObserved": {
+                "type": "boolean"
+              },
+              "callbackHandled": {
+                "type": "boolean"
+              },
+              "tokenEndpointObserved": {
+                "type": "boolean"
+              },
+              "tokenHttpStatus": {
+                "type": "integer"
+              },
+              "identityObserved": {
+                "type": "boolean"
+              },
+              "authenticatedViewActive": {
+                "type": "boolean"
+              },
+              "sessionEndpointObserved": {
+                "type": "boolean"
+              },
+              "sessionHttpStatus": {
+                "type": "integer"
+              },
+              "sessionShapeValid": {
+                "type": "boolean"
+              },
+              "loginScreenRestored": {
+                "type": "boolean"
+              },
+              "transactionCleared": {
+                "type": "boolean"
+              },
+              "storagePurged": {
+                "type": "boolean"
+              }
+            }
           }
         }
       }
