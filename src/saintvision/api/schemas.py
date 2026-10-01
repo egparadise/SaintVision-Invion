@@ -1516,3 +1516,163 @@ AdapterConformanceUnion = Annotated[
     Union[AdapterConformanceNotObservedResponse, AdapterConformanceRecordedResponse],
     Field(discriminator="status"),
 ]
+
+
+class ReleaseComponentResponse(Strict):
+    """One pinned component of a release.
+
+    Every entry carries a digest because the manifest hash covers the list: a
+    name is not an identity, so "we shipped R4" has to be checkable rather than
+    asserted (``operations_pilot.ReleaseManifest``).
+    """
+
+    name: StrictStr = Field(min_length=1, max_length=200)
+    kind: StrictStr = Field(min_length=1, max_length=64)
+    digest: StrictStr = Field(min_length=1, max_length=200)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceResponse(Strict):
+    """One recorded acceptance decision, without the person who made it.
+
+    The accepting user is deliberately absent: a read surface that names people
+    turns an audit column into a directory, and ``RunRecordResponse`` set that
+    rule first. ``notes`` is free text and is absent for the same reason.
+
+    This docstring used to add that ``accepted_by_user_id`` is a foreign key
+    "precisely so the system cannot sign its own acceptance". **That is false**,
+    and Codex measured it: ``users`` does not distinguish a person from a service,
+    so a principal whose subject was ``svc:release-bot`` wrote an ``accepted`` row
+    through this very column. The key constrains the row to name a user that
+    exists and says nothing about who that user is -- which is why
+    ``operatorSignOff`` is pinned false in ``ReleaseManifestResponse`` rather than
+    computed from these records.
+
+    ``manifestMatches`` is computed, not stored: an acceptance pins the manifest
+    hash as it stood when it was granted, and accepting one composition while
+    shipping another is the failure that pinning exists to catch. A reader that
+    only saw ``outcome`` could not tell the two apart.
+    """
+
+    acceptance_id: StrictStr = Field(alias="acceptanceId", min_length=1, max_length=64)
+    acceptance_id_ref: StrictStr = Field(alias="acceptanceIdRef", min_length=1, max_length=16)
+    outcome: Literal["accepted", "conditional", "rejected"]
+    accepted_manifest_sha256: StrictStr = Field(
+        alias="acceptedManifestSha256", pattern="^[0-9a-f]{64}$"
+    )
+    manifest_matches: StrictBool = Field(alias="manifestMatches")
+    #: Required, not defaulted. The service always sends this key, so an absent one
+    #: is a bug rather than "no limitations" -- and a reader cannot tell the two
+    #: apart after the fact. Pydantic's default would also publish the field as
+    #: optional, which generates ``knownLimitations?:`` and makes a strict
+    #: front-end guard refuse the payload the server actually sends.
+    known_limitations: list[StrictStr] = Field(alias="knownLimitations", max_length=64)
+    decided_at: AwareDatetime = Field(alias="decidedAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseManifestResponse(Strict):
+    """A recorded release, and what is recorded about accepting it.
+
+    ``operatorSignOff`` is **``Literal[False]``**: this reader cannot emit true,
+    and the contract says so rather than the docstring promising it.
+
+    The first version of this model computed it from the acceptance rows and
+    called an ``accepted`` row with a matching hash a sign-off, on the reasoning
+    that ``acceptance_records.accepted_by_user_id`` is a foreign key to ``users``
+    so "the system cannot sign its own acceptance". **That reasoning was wrong,
+    and Codex measured it**: ``users`` draws no line between a person and a
+    service -- ``identity.py`` builds a Principal from any ``external_subject``
+    -- and the foreign key proves only that the row names a user that exists. A
+    principal whose subject was ``svc:release-bot`` wrote an ``accepted`` row and
+    the field read true. A key that proves existence was read as proof of
+    humanity.
+
+    So the field is pinned false, and the two counts beside it say different
+    things on purpose, by the coordinator's decision of 2026-10-01:
+
+    * ``confirmedOperatorCount`` is **distinct operators whose decision a person
+      is attested to have made**, as the write contract (``#282``, card 184)
+      defines attestation. That implementation does not exist yet, so on this
+      read surface the field is ``Literal[0]``. It is not "no acceptances"; it is
+      "no decision here has been attested to a person";
+    * ``matchingAcceptedUserCount`` is the **raw recorded fact**: distinct user
+      ids with an ``accepted`` row pinning this manifest's hash. A service
+      principal can be one of them, which is precisely why it is a different
+      field with a different name. The first version of this model called this
+      count ``confirmedOperatorCount``, which read as though a person had been
+      confirmed.
+
+    ``requiredDistinctOperatorCount`` is the quorum, so a reader sees "0 of 2"
+    and can tell it apart from "1 of 2".
+    """
+
+    release_id: StrictStr = Field(alias="releaseId", min_length=1, max_length=64)
+    version: StrictStr = Field(min_length=1, max_length=64)
+    component_count: StrictInt = Field(alias="componentCount", ge=1)
+    manifest_sha256: StrictStr = Field(alias="manifestSha256", pattern="^[0-9a-f]{64}$")
+    #: Required for the same reason as every other list here: the manifest hash
+    #: covers this list, so "the key was missing" and "the release pins nothing"
+    #: are different facts and only one of them is a release.
+    components: list[ReleaseComponentResponse] = Field(max_length=512)
+    created_at: AwareDatetime = Field(alias="createdAt")
+    #: Pinned false. Only the write contract may ever make this true, and only
+    #: with an attestation that a person decided -- which does not exist yet.
+    operator_sign_off: Literal[False] = Field(alias="operatorSignOff")
+    #: Why it is false, in the response, so a reader is not left to guess whether
+    #: the answer is "nobody signed" or "this surface cannot tell". The contract
+    #: for human attestation now exists (``#282``); what is missing is its
+    #: implementation, and the value says which of the two it is.
+    operator_sign_off_blocked_by: Literal["human-attestation-implementation-unavailable"] = Field(
+        alias="operatorSignOffBlockedBy"
+    )
+    #: The quorum the write contract requires. A constant here so a reader sees
+    #: "0 of 2" rather than a bare count whose target lives in another document.
+    required_distinct_operator_count: Literal[2] = Field(alias="requiredDistinctOperatorCount")
+    #: Distinct **human-attested** operators. Pinned to zero on this surface: the
+    #: attestation the count is about is ``#282``'s, and nothing implements it
+    #: yet, so no number other than zero can be honest here.
+    confirmed_operator_count: Literal[0] = Field(alias="confirmedOperatorCount")
+    #: Distinct user ids with an `accepted` row whose pinned hash matches this
+    #: manifest. The recorded fact, and deliberately not called confirmation: a
+    #: service principal can be one of these users.
+    matching_accepted_user_count: StrictInt = Field(alias="matchingAcceptedUserCount", ge=0)
+    acceptance_count: StrictInt = Field(alias="acceptanceCount", ge=0)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseManifestDetailResponse(Strict):
+    """One release with every acceptance decision recorded against it."""
+
+    release: ReleaseManifestResponse
+    #: Required: an absent list would read as "nobody has decided", which is a
+    #: claim about the release rather than about the response.
+    acceptances: list[ReleaseAcceptanceResponse] = Field(max_length=256)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseManifestPageResponse(Strict):
+    """A page of releases. An empty tenant is an empty list, not a 404.
+
+    Both fields are **required**, and that is the fix for a contract mismatch
+    Codex found while reviewing ``#281``: ``items`` carried
+    ``default_factory=list``, so the published schema listed no required
+    properties at all and the generated TypeScript said ``items?:``. The
+    front-end guard is strict and refuses a missing key -- so the contract
+    permitted a payload the client would reject, while the server never sent one.
+    An empty page is ``items: []``; an absent ``items`` is a broken response and
+    both ends should say so.
+
+    ``nextCursor`` is required and nullable for the same reason: the service
+    always sends the key, and ``null`` ("this is the last page") is a different
+    statement from the key being absent ("this response does not say").
+    """
+
+    items: list[ReleaseManifestResponse] = Field(max_length=200)
+    next_cursor: str | None = Field(alias="nextCursor")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
