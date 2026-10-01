@@ -1,9 +1,9 @@
-# 2026-10-02 01:20:00 KST — Card 195: 데스크톱 탐색기 (ResourceExplorer & InvFileExplorer) Light/Dark 명도 대비 전수 감사 및 디자인 토큰 승격 (Gemini)
+# 2026-10-02 01:20:00 KST — Card 195: 데스크톱 탐색기 (ResourceExplorer & InvFileExplorer) Light/Dark 명도 대비 감사 및 디자인 토큰 승격 (Gemini)
 
 - **문서 ID**: HIST-GEMINI-CARD195-DESKTOP-EXPLORER-CONTRAST
 - **작업 branch**: agent/gemini/c195-desktop-explorer-contrast
 - **Base commit**: db37dbc53f2e45ed987b9ed0e0b81ed88f2a7644 (PR #290 HEAD)
-- **KST 시각**: 2026-10-02 01:20:00 KST (r1 보강: 02:00:00 KST, r2 보강: 02:22:00 KST)
+- **KST 시각**: 2026-10-02 01:20:00 KST (r1 보강: 02:00:00 KST, r2 보강: 02:22:00 KST, r3 보강: 02:45:00 KST)
 - **작업자**: Gemini (Frontend / UI / 접근성)
 - **독립 검토자 요청**: Claude UI (UI/접근성 축), Codex (계약/디자인 토큰/불변식 축)
 - **상태**: proposed (검토 전 자가 승인 금지)
@@ -12,7 +12,7 @@
 
 ## 1. 작업 개요 및 감사 목적
 
-ACC-09(접근성 명도 대비 전수 적합화) 트랙의 일환으로, 데스크톱 UI에서 가장 빈번하게 조회 및 조작되는 양대 탐색기 화면의 색상 리터럴을 전수 감사하고 디자인 토큰으로 승격하였습니다.
+ACC-09(접근성 명도 대비 적합화) 트랙의 일환으로, 데스크톱 UI에서 가장 빈번하게 조회 및 조작되는 양대 탐색기 화면의 색상 리터럴을 감사하고 디자인 토큰으로 승격하였습니다.
 
 - **대상 파일**:
   1. `apps/web/src/features/desktop/ResourceExplorer.tsx` (기존 baseline 리터럴: **390건**)
@@ -28,32 +28,34 @@ ACC-09(접근성 명도 대비 전수 적합화) 트랙의 일환으로, 데스�
 
 ---
 
-## 2. 명도 대비 전수 실측 및 개선 결과표
+## 2. 명도 대비 실측 및 개선 결과표
 
-### 2.1 실제 렌더 배경 기반 전수 실측치 비교 (Before vs After)
+### 2.1 실제 렌더 배경 기반 실측치 비교 (Before vs After)
 
 > **배경 실측 기준**:
 > - Light 테마: Surface = `#ffffff`, Subtle = `#f1f5f9`
-> - Dark 테마 (SaintVision 베이스 패널 정본): Surface = `#0f172a`, Subtle = `#1e293b`
+> - Dark 테마 (index.css 정본 토큰): Surface (`--color-bg-surface`) = `#111827`, Subtle (`--color-bg-subtle`) = `#1f2937`
+>
+> *주*: 기존 소스 코드는 다크 전용 하드코딩 리터럴로 작성되어 있었으므로, 아래 '이전 대비율'의 Light 테마 수치는 동일한 리터럴이 Light 테마 캔버스/서피스에 배치되었을 때의 **가상 비교(Virtual Comparison)** 수치입니다. Dark 테마의 Before 수치는 `index.css` 정본 배경(`#111827`, `#1f2937`) 위에서 렌더링된 실측치입니다.
 
-| 요소 / 위치 (파일:행) | 이전 리터럴 (실제 렌더 배경) | 이전 대비율 (Light / Dark) | 이전 판정 | 신규 디자인 토큰 (실제 렌더 배경) | 신규 대비율 (Light) | 신규 대비율 (Dark) | WCAG AA 충족 여부 |
+| 요소 / 위치 (파일:행) | 이전 리터럴 (실제 렌더 배경) | 이전 대비율 (Light 가상 / Dark 정본) | 이전 판정 | 신규 디자인 토큰 (실제 렌더 배경) | 신규 대비율 (Light) | 신규 대비율 (Dark) | WCAG AA 충족 여부 |
 |---|---|---|---|---|---|---|---|
 | **기본 액션 버튼 (Primary Button)**<br>(ResourceExplorer:1316, :1505, :1810, :1949, :2203;<br>InvFileExplorer:520, :635, :679, :834, :1025) | `#ffffff` on `#2563eb`<br>(단일 라인 `var(--color-brand-primary)`) | 5.17:1 / 5.17:1 | **FAIL**<br>(DEF-S11-09 위반) | `var(--color-brand-primary-fg)` on<br>`var(--color-brand-primary-bg)` | **5.17:1** | **6.70:1** | **PASS** (>= 4.5:1, DEF-S11-09 준수) |
-| **활성 네임스페이스 칩 텍스트**<br>(InvFileExplorer:669-671) | `#2563eb` on `#dbeafe` (Light)<br>`#93c5fd` on `rgba(59, 130, 246, 0.2)` over `#0f172a` (Dark) | **4.24:1** / 7.23:1 | **FAIL**<br>(Light < 4.5:1) | `var(--color-brand-hover)` on<br>`var(--color-brand-subtle)` | **5.49:1** | **8.11:1** | **PASS** (>= 4.5:1) |
-| **활성 네임스페이스 칩 테두리**<br>(InvFileExplorer:668-669) | `#2563eb` on `#dbeafe` (Light)<br>`#3b82f6` on `rgba(59, 130, 246, 0.2)` over `#0f172a` (Dark) | **4.24:1** / 4.14:1 | PASS (>= 3.0:1) | `var(--color-brand-hover)` on<br>`var(--color-brand-subtle)` | **5.49:1** | **8.11:1** | **PASS** (>= 3.0:1) |
-| **파일 버전/등급 배지 텍스트**<br>(InvFileExplorer:848-852) | `#2563eb` on `#dbeafe` (Light)<br>`#60a5fa` on `rgba(59, 130, 246, 0.15)` over `#1e293b` (Dark) | **4.24:1** / 6.88:1 | **FAIL**<br>(Light < 4.5:1) | `var(--color-brand-hover)` on<br>`var(--color-brand-subtle)` | **5.49:1** | **8.11:1** | **PASS** (>= 4.5:1) |
+| **활성 네임스페이스 칩 텍스트**<br>(InvFileExplorer:669-671) | `#2563eb` on `#dbeafe` (Light)<br>`#93c5fd` on `rgba(59, 130, 246, 0.2)` over `#111827` (`#1a3351`) (Dark) | **4.24:1** / 7.60:1 | **FAIL**<br>(Light < 4.5:1) | `var(--color-brand-hover)` on<br>`var(--color-brand-subtle)` | **5.49:1** | **8.11:1** | **PASS** (>= 4.5:1) |
+| **활성 네임스페이스 칩 테두리**<br>(InvFileExplorer:668-669) | `#2563eb` on `#dbeafe` (Light)<br>`#3b82f6` on `rgba(59, 130, 246, 0.2)` over `#111827` (Dark) | **4.24:1** / 3.73:1 | PASS (>= 3.0:1) | `var(--color-brand-hover)` on<br>`var(--color-brand-subtle)` | **5.49:1** | **8.11:1** | **PASS** (>= 3.0:1) |
+| **파일 버전/등급 배지 텍스트**<br>(InvFileExplorer:848-852) | `#2563eb` on `#dbeafe` (Light)<br>`#60a5fa` on `rgba(59, 130, 246, 0.15)` over `#1f2937` (`#283c59`) (Dark) | **4.24:1** / 4.78:1 | **FAIL**<br>(Light < 4.5:1) | `var(--color-brand-hover)` on<br>`var(--color-brand-subtle)` | **5.49:1** | **8.11:1** | **PASS** (>= 4.5:1) |
 | **비활성 버튼 텍스트**<br>(InvFileExplorer:531-532, :1202-1206) | `#ffffff` on `#7b8b9e` (Light)<br>`#0f172a` on `#64748b` (Dark) | **3.48:1** / **3.75:1** | **FAIL**<br>(양 테마 < 4.5:1) | `var(--color-text-muted)` on<br>`var(--color-bg-subtle)` | **5.25:1** | **5.78:1** | **PASS** (>= 4.5:1, SC 1.4.3 예외) |
-| **비활성 버튼 테두리**<br>(InvFileExplorer:531, :1207) | `#7b8b9e` on `#f1f5f9` (Light)<br>`#64748b` on `#1e293b` (Dark) | 3.18:1 / 3.08:1 | PASS (>= 3.0:1) | `var(--color-border-subtle)` on<br>`var(--color-bg-subtle)` | **3.18:1** | **3.08:1** | **PASS** (>= 3.0:1) |
-| **부차/보조 텍스트 (Muted on Surface)**<br>(ResourceExplorer:1260, :1342; InvFileExplorer:465, :1097) | `#94a3b8` on `#ffffff` (Light)<br>`#94a3b8` on `#0f172a` (Dark) | **2.56:1** / 6.96:1 | **FAIL**<br>(Light < 4.5:1) | `var(--color-text-muted)` on<br>`var(--color-bg-surface)` | **5.75:1** | **6.99:1** | **PASS** (>= 4.5:1) |
-| **보조 텍스트 (Muted on Subtle)**<br>(노드 하트비트 ResourceExplorer:1285; 용량 카드 라벨 :832, :858; InvFileExplorer:1088) | `#94a3b8` on `#f1f5f9` (Light)<br>`#94a3b8` on `#1e293b` (Dark) | **2.34:1** / 5.71:1 | **FAIL**<br>(Light < 4.5:1) | `var(--color-text-muted)` on<br>`var(--color-bg-subtle)` | **5.25:1** | **5.78:1** | **PASS** (>= 4.5:1) |
-| **정상/가용 텍스트 (Online on Surface)**<br>(InvFileExplorer 복제본 상태 :1106; ResourceExplorer :1244) | `#34d399` on `#ffffff` (Light)<br>`#34d399` on `#0f172a` (Dark) | **1.92:1** / 9.29:1 | **FAIL**<br>(Light < 4.5:1) | `var(--color-status-online)` on<br>`var(--color-bg-surface)` | **5.02:1** | **7.79:1** | **PASS** (>= 4.5:1) |
-| **정상 배지 텍스트 (Online on Subtle)**<br>(InvFileExplorer:1069; ResourceExplorer:754) | `#34d399` on `#f1f5f9` (Light)<br>`#34d399` on `#1e293b` (Dark) | **1.75:1** / 7.61:1 | **FAIL**<br>(Light < 4.5:1) | `var(--color-status-online)` on<br>`var(--color-bg-subtle)` | **4.58:1** | **6.44:1** | **PASS** (>= 4.5:1) |
-| **경고/장애 텍스트 (Offline on Surface)**<br>(ResourceExplorer:747; InvFileExplorer:985, :1004, :1054, :1125) | `#f87171` on `#ffffff` (Light)<br>`#f87171` on `#0f172a` (Dark) | **2.77:1** / 6.45:1 | **FAIL**<br>(Light < 4.5:1) | `var(--color-status-lost)` on<br>`var(--color-bg-surface)` | **5.86:1** | **6.45:1** | **PASS** (>= 4.5:1) |
-| **장애 배너 텍스트 (Offline on Subtle)**<br>(ResourceExplorer 에러 배너 :780, :795; :1420) | `#ef4444` on `#f1f5f9` (Light)<br>`#ef4444` on `#1e293b` (Dark) | **3.44:1** / **3.89:1** | **FAIL**<br>(양 테마 < 4.5:1) | `var(--color-status-offline)` on<br>`var(--color-bg-subtle)` | **5.91:1** | **5.31:1** | **PASS** (>= 4.5:1) |
-| **강조/링크 텍스트 (Brand on Surface)**<br>(선택 탭, URI 강조 ResourceExplorer:620, :1375; InvFileExplorer:442) | `#60a5fa` on `#ffffff` (Light)<br>`#60a5fa` on `#0f172a` (Dark) | **2.53:1** / 7.02:1 | **FAIL**<br>(Light < 4.5:1) | `var(--color-brand-primary)` on<br>`var(--color-bg-surface)` | **5.17:1** | **6.98:1** | **PASS** (>= 4.5:1) |
-| **강조 텍스트 (Brand on Subtle)**<br>(신선도 고지, 계획 결과 메시지 ResourceExplorer:768, :795, :1150) | `#60a5fa` on `#f1f5f9` (Light)<br>`#60a5fa` on `#1e293b` (Dark) | **2.31:1** / 5.75:1 | **FAIL**<br>(Light < 4.5:1) | `var(--color-brand-primary)` on<br>`var(--color-bg-subtle)` | **4.72:1** | **5.77:1** | **PASS** (>= 4.5:1) |
-| **대화형 테두리 (Border on Surface)**<br>(노드 카드, 입력창, 컨테이너 ResourceExplorer:1235; InvFileExplorer:670) | `#334155` on `#ffffff` (Light)<br>`#334155` on `#0f172a` (Dark) | 10.35:1 / **1.72:1** | **FAIL**<br>(Dark < 3.0:1) | `var(--color-border-subtle)` on<br>`var(--color-bg-surface)` | **3.48:1** | **3.73:1** | **PASS** (>= 3.0:1) |
-| **대화형 테두리 (Border on Subtle)**<br>(용량 카드, 주소창, 배지 테두리 ResourceExplorer:830, :856; InvFileExplorer:625, :1088) | `#e2e8f0` on `#f1f5f9` (Light)<br>`#334155` on `#1e293b` (Dark) | **1.13:1** / **1.41:1** | **FAIL**<br>(양 테마 < 3.0:1) | `var(--color-border-subtle)` on<br>`var(--color-bg-subtle)` | **3.18:1** | **3.08:1** | **PASS** (>= 3.0:1) |
+| **비활성 버튼 테두리**<br>(InvFileExplorer:531, :1207) | `#7b8b9e` on `#f1f5f9` (Light)<br>`#64748b` on `#1f2937` (Dark) | 3.18:1 / 3.08:1 | PASS (>= 3.0:1) | `var(--color-border-subtle)` on<br>`var(--color-bg-subtle)` | **3.18:1** | **3.08:1** | **PASS** (>= 3.0:1) |
+| **부차/보조 텍스트 (Muted on Surface)**<br>(ResourceExplorer:1260, :1342; InvFileExplorer:465, :1097) | `#94a3b8` on `#ffffff` (Light)<br>`#94a3b8` on `#111827` (Dark) | **2.56:1** / 6.92:1 | **FAIL**<br>(Light < 4.5:1) | `var(--color-text-muted)` on<br>`var(--color-bg-surface)` | **5.75:1** | **6.99:1** | **PASS** (>= 4.5:1) |
+| **보조 텍스트 (Muted on Subtle)**<br>(노드 하트비트 ResourceExplorer:1285; 용량 카드 라벨 :832, :858; InvFileExplorer:1088) | `#94a3b8` on `#f1f5f9` (Light)<br>`#94a3b8` on `#1f2937` (Dark) | **2.34:1** / 5.72:1 | **FAIL**<br>(Light < 4.5:1) | `var(--color-text-muted)` on<br>`var(--color-bg-subtle)` | **5.25:1** | **5.78:1** | **PASS** (>= 4.5:1) |
+| **정상/가용 텍스트 (Online on Surface)**<br>(InvFileExplorer 복제본 상태 :1106; ResourceExplorer :1244) | `#34d399` on `#ffffff` (Light)<br>`#34d399` on `#111827` (Dark) | **1.92:1** / 9.23:1 | **FAIL**<br>(Light < 4.5:1) | `var(--color-status-online)` on<br>`var(--color-bg-surface)` | **5.02:1** | **7.79:1** | **PASS** (>= 4.5:1) |
+| **정상 배지 텍스트 (Online on Subtle)**<br>(InvFileExplorer:1069; ResourceExplorer:754) | `#34d399` on `#f1f5f9` (Light)<br>`#34d399` on `#1f2937` (Dark) | **1.75:1** / 7.64:1 | **FAIL**<br>(Light < 4.5:1) | `var(--color-status-online)` on<br>`var(--color-bg-subtle)` | **4.58:1** | **6.44:1** | **PASS** (>= 4.5:1) |
+| **경고/장애 텍스트 (Offline on Surface)**<br>(ResourceExplorer:747; InvFileExplorer:985, :1004, :1054, :1125) | `#f87171` on `#ffffff` (Light)<br>`#f87171` on `#111827` (Dark) | **2.77:1** / 6.41:1 | **FAIL**<br>(Light < 4.5:1) | `var(--color-status-lost)` on<br>`var(--color-bg-surface)` | **6.47:1** | **6.41:1** | **PASS** (>= 4.5:1) |
+| **장애 배너 텍스트 (Offline on Subtle)**<br>(ResourceExplorer 에러 배너 :780, :795; :1420) | `#ef4444` on `#f1f5f9` (Light)<br>`#ef4444` on `#1f2937` (Dark) | **3.44:1** / **3.90:1** | **FAIL**<br>(양 테마 < 4.5:1) | `var(--color-status-offline)` on<br>`var(--color-bg-subtle)` | **5.91:1** | **5.31:1** | **PASS** (>= 4.5:1) |
+| **강조/링크 텍스트 (Brand on Surface)**<br>(선택 탭, URI 강조 ResourceExplorer:620, :1375; InvFileExplorer:442) | `#60a5fa` on `#ffffff` (Light)<br>`#60a5fa` on `#111827` (Dark) | **2.53:1** / 6.98:1 | **FAIL**<br>(Light < 4.5:1) | `var(--color-brand-primary)` on<br>`var(--color-bg-surface)` | **5.17:1** | **6.98:1** | **PASS** (>= 4.5:1) |
+| **강조 텍스트 (Brand on Subtle)**<br>(신선도 고지, 계획 결과 메시지 ResourceExplorer:768, :795, :1150) | `#60a5fa` on `#f1f5f9` (Light)<br>`#60a5fa` on `#1f2937` (Dark) | **2.31:1** / 5.77:1 | **FAIL**<br>(Light < 4.5:1) | `var(--color-brand-primary)` on<br>`var(--color-bg-subtle)` | **4.72:1** | **5.77:1** | **PASS** (>= 4.5:1) |
+| **대화형 테두리 (Border on Surface)**<br>(노드 카드, 입력창, 컨테이너 ResourceExplorer:1235; InvFileExplorer:670) | `#334155` on `#ffffff` (Light)<br>`#334155` on `#111827` (Dark) | 10.35:1 / **1.71:1** | **FAIL**<br>(Dark < 3.0:1) | `var(--color-border-subtle)` on<br>`var(--color-bg-surface)` | **3.48:1** | **3.73:1** | **PASS** (>= 3.0:1) |
+| **대화형 테두리 (Border on Subtle)**<br>(용량 카드, 주소창, 배지 테두리 ResourceExplorer:830, :856; InvFileExplorer:625, :1088) | `#e2e8f0` on `#f1f5f9` (Light)<br>`#334155` on `#1f2937` (Dark) | **1.13:1** / **1.42:1** | **FAIL**<br>(양 테마 < 3.0:1) | `var(--color-border-subtle)` on<br>`var(--color-bg-subtle)` | **3.18:1** | **3.08:1** | **PASS** (>= 3.0:1) |
 
 ---
 
@@ -73,7 +75,7 @@ ACC-09(접근성 명도 대비 전수 적합화) 트랙의 일환으로, 데스�
   - 물리 노드 카드(`node-card-...`): 선택 상태 `var(--color-brand-primary)` 테두리, 기본 상태 `var(--color-border-subtle)` 테두리.
   - 스토리지 기여도 테이블 및 관측 패널: `var(--color-border-subtle)` 테두리, `var(--color-bg-surface)` 헤더 및 바디 배경.
   - 배치 계획 생성 결과 메시지(`plan-result-message`): `var(--color-brand-primary)` 텍스트 (Light 4.72:1, Dark 5.77:1).
-  - 노드 탐색 성공 알림 메시지(`discovery-action-success`): `var(--color-brand-primary)` 텍스트 및 테두리, `var(--color-bg-subtle)` 배경 결속 (Light 6.55:1, Dark 5.75:1).
+  - 노드 탐색 성공 알림 메시지(`discovery-action-success`): `var(--color-brand-primary)` 텍스트 및 테두리, `var(--color-bg-subtle)` 배경 결속 (Light 4.718:1, Dark 5.774:1).
 
 ### 3.2 `apps/web/src/features/desktop/InvFileExplorer.tsx`
 - **리터럴 감축**: 124건 -> **0건** (전수 제거).
@@ -86,7 +88,7 @@ ACC-09(접근성 명도 대비 전수 적합화) 트랙의 일환으로, 데스�
   - 복제본 헬스 배지: 정상 상태 `var(--color-bg-subtle)` 배경, `var(--color-status-online)` 텍스트 및 테두리.
   - 파일 버전/등급 배지(`file-version-badge`): `var(--color-brand-subtle)` 배경, `var(--color-brand-hover)` 텍스트 및 테두리 (Light 5.49:1, Dark 8.11:1).
   - 비활성화된 정규 조회 버튼(`inv-canonical-lookup-btn`) 및 복구 버튼(`repair-replicas-btn`): `var(--color-bg-subtle)` 배경, `var(--color-text-muted)` 텍스트 (Light 5.25:1, Dark 5.78:1), `var(--color-border-subtle)` 테두리.
-  - 복구 실패 알림 배너(`repair-action-error`): `var(--color-bg-surface)` 배경, `var(--color-status-lost)` 텍스트 및 테두리 (Light 5.86:1, Dark 6.45:1).
+  - 복구 실패 알림 배너(`repair-action-error`): `var(--color-bg-surface)` 배경, `var(--color-status-lost)` 텍스트 및 테두리 (Light 6.470:1, Dark 6.413:1).
 
 ---
 
@@ -110,6 +112,15 @@ ACC-09(접근성 명도 대비 전수 적합화) 트랙의 일환으로, 데스�
 | **M10** | Background Swap | InvFileExplorer 비활성 복구 버튼 배경을 `var(--color-brand-subtle)`로 치환 | 비활성 버튼 배경 바인딩 단언 실패로 Test 9c 2.h Assertion 실패 | **KILLED** |
 | **M11 (Codex r2)** | Foreground Swap | ResourceExplorer `discovery-action-success` 텍스트를 `var(--color-bg-subtle)`로 치환 | 컨테이너 배경과 1:1 대비 결함으로 Test 9c 1.i 및 Probe 30 실패 | **KILLED** |
 | **M12 (Codex r2)** | Background Swap | InvFileExplorer `repair-action-error` 배경을 `var(--color-status-lost)`로 치환 | 에러 텍스트/테두리와 1:1 대비 결함으로 Test 9c 2.i 및 Probe 31 실패 | **KILLED** |
+
+### 4.2 잔여 비차단 백로그 및 관측 사항
+
+1. **테스트 미포함 배너 swap 변이 1종 생존 및 정적 가드 부재**:
+   - 컴포넌트 내 일부 비핵심 상태 배너의 배경 스왑 변이가 현재 12개 테스트 범위 외부에 존재하여 단독 생존할 수 있습니다.
+   - 이는 차단 대상이 아니며, 향후 UI 전체 정적 린터 룰렛 및 공통 배너 컴포넌트 추출 트랙에서 통합 가드로 커버할 예정입니다.
+2. **ResourceExplorer 탐색 테스트의 unmocked network fetch**:
+   - 컴포넌트 마운트 시 발생하는 백엔드 polling fetch 호출에 대해 현재 테스트에서 콘솔 경고가 관측됩니다.
+   - 기능 동작 및 단언에는 영향이 없으나, E2E Mock 하네스 고도화 트랙에서 unmocked fetch 전수 모킹을 적용하도록 백로그로 이월합니다.
 
 ---
 
