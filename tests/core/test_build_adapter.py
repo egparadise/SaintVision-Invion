@@ -186,6 +186,23 @@ def test_failed_admission_has_zero_dispatch_side_effect(monkeypatch):
     assert transport.calls == ["observe"]
 
 
+def test_failed_live_lease_admission_has_zero_dispatch_side_effect(monkeypatch):
+    _patch_boundary(monkeypatch)
+
+    def reject_live_lease(*_args, **_kwargs):
+        raise DomainError("LEASE-0002", "Stale live lease", 409)
+
+    monkeypatch.setattr(adapter_module, "_lock_live_build_authority", reject_live_lease)
+    database = _Database()
+    transport = _Transport(database)
+
+    with pytest.raises(DomainError, match="LEASE-0002"):
+        _execute(BuildExecutionAdapter(database, transport))
+
+    assert database.transaction_count == 1
+    assert transport.calls == ["observe"]
+
+
 def test_final_authority_drift_cancels_and_quarantines(monkeypatch):
     _patch_boundary(
         monkeypatch,
@@ -271,6 +288,9 @@ class _One:
     def fetchone(self):
         return self.row
 
+    def fetchall(self):
+        return self.row
+
 
 def _live_rows():
     lease = {
@@ -331,19 +351,100 @@ def test_live_build_authority_accepts_exact_fresh_online_lease(monkeypatch):
     )
 
 
+class _LockOrderConnection:
+    def __init__(self, lease, node):
+        self.lease = lease
+        self.node = node
+        self.statements = []
+
+    def execute(self, sql, _params=None):
+        normalized = " ".join(sql.split())
+        self.statements.append(normalized)
+        if "FROM inv.runs" in normalized:
+            return _One({"run_id": "run-1", "project_id": "project-1"})
+        if "FROM inv.resources WHERE resource_id=ANY" in normalized:
+            return _One([{"resource_id": "resource-1", "node_id": "node-1"}])
+        if "FROM inv.nodes WHERE node_id=%s FOR UPDATE" in normalized:
+            return _One({"node_id": "node-1"})
+        if "FROM inv.resources WHERE resource_id=%s FOR UPDATE" in normalized:
+            return _One({"resource_id": "resource-1", "node_id": "node-1"})
+        if "FROM inv.resource_leases" in normalized:
+            return _One(self.lease)
+        if "SELECT status,recovery_epoch,heartbeat_at,clock_skew_seconds" in normalized:
+            return _One(self.node)
+        raise AssertionError(normalized)
+
+
+def test_live_build_authority_uses_run_node_resource_lease_lock_order():
+    lease, node, request, plan = _live_rows()
+    conn = _LockOrderConnection(lease, node)
+
+    assert (
+        _lock_live_build_authority(
+            conn,
+            request,
+            plan,
+            "run-1",
+            database_recovery_epoch=EPOCH,
+            now=NOW,
+        )
+        == "node-1"
+    )
+    assert "FROM inv.runs" in conn.statements[0]
+    assert "resource_id=ANY" in conn.statements[1]
+    assert "FROM inv.nodes" in conn.statements[2] and "FOR UPDATE" in conn.statements[2]
+    assert "FROM inv.resources" in conn.statements[3] and "FOR UPDATE" in conn.statements[3]
+    assert "FROM inv.resource_leases" in conn.statements[4] and "FOR UPDATE" in conn.statements[4]
+    assert "SELECT status,recovery_epoch,heartbeat_at,clock_skew_seconds" in conn.statements[5]
+
+
 @pytest.mark.parametrize(
     "mutate,code",
     [
+        (
+            lambda lease, _node, _plan: lease.__setitem__(
+                "tenant_id", UUID("323e4567-e89b-12d3-a456-426614174000")
+            ),
+            "LEASE-0002",
+        ),
+        (
+            lambda lease, _node, _plan: lease.__setitem__("project_id", "project-2"),
+            "LEASE-0002",
+        ),
         (lambda lease, _node, _plan: lease.__setitem__("released_at", NOW), "LEASE-0002"),
         (lambda lease, _node, _plan: lease.__setitem__("expires_at", NOW), "LEASE-0002"),
         (
+            lambda lease, _node, _plan: lease.__setitem__(
+                "recovery_epoch", UUID("423e4567-e89b-12d3-a456-426614174000")
+            ),
+            "LEASE-0002",
+        ),
+        (
             lambda _lease, _node, plan: plan["lease"].__setitem__("fencingToken", f"{EPOCH}:8"),
+            "LEASE-0002",
+        ),
+        (
+            lambda _lease, _node, plan: plan["lease"].__setitem__(
+                "expiresAt", (NOW + timedelta(seconds=11)).isoformat()
+            ),
             "LEASE-0002",
         ),
         (lambda _lease, node, _plan: node.__setitem__("status", "draining"), "NODE-0033"),
         (
             lambda _lease, node, _plan: node.__setitem__(
+                "recovery_epoch", UUID("523e4567-e89b-12d3-a456-426614174000")
+            ),
+            "NODE-0033",
+        ),
+        (
+            lambda _lease, node, _plan: node.__setitem__(
                 "heartbeat_at", NOW - timedelta(seconds=16)
+            ),
+            "RES-0003",
+        ),
+        (
+            lambda _lease, node, _plan: node.__setitem__(
+                "heartbeat_at", NOW + timedelta(microseconds=1)
             ),
             "RES-0003",
         ),

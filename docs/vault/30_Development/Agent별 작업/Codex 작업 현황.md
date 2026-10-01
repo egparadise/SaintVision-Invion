@@ -1,13 +1,13 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.242"
+version: "1.0.243"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T16:04:35+09:00"
+updated: "2026-10-01T16:09:29+09:00"
 source_of_truth: "Git"
 active_card: "CARD-174 S08-BE admitted Build adapter"
-active_card_status: "binding-only dispatch, live lease/node/fence revalidation and cancel+quarantine boundary implemented; focused 116 passed and gates green"
+active_card_status: "binding-only dispatch, canonical lock order, live lease/node/fence revalidation and cancel+quarantine implemented; focused 124 passed and gates green"
 active_card_next: "stacked PR and Claude review; physical BuildKit and authenticated cleanup persistence remain NOT_OBSERVED"
 ---
 
@@ -20,7 +20,8 @@ active_card_next: "stacked PR and Claude review; physical BuildKit and authentic
 - capability digest는 run·builder Node·lease/resource·full fencing token까지 결속해,
   final Node drift가 transport 결과를 승인하지 못하게 한다.
 - dispatch 시도 뒤 오류·final drift는 cancel+quarantine으로 수렴하며, 정리 자체가
-  확인되지 않으면 `VERIFY-0022`로 실패한다. 관련 focused PG-free **116 passed**다.
+  확인되지 않으면 `VERIFY-0022`로 실패한다. canonical lock 순서와 live authority 각 필드의
+  부정 변이까지 포함한 focused PG-free **124 passed**다.
 - 실제 rootless daemon, 인증된 물리 cleanup receipt, kernel lease release와 Evidence DB
   원자 저장은 합성하지 않고 `NOT_OBSERVED`로 유지한다.
 - 근거: [[2026-10-01_15-56-16_KST_S08-BE_Build_adapter_결속_Codex]].

@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-S08-BE-BUILD-ADAPTER-20261001"
 title: "S08-BE Build adapter 결속"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-01T16:04:35+09:00"
+updated: "2026-10-01T16:09:29+09:00"
 source_of_truth: "Git"
 ---
 
@@ -59,6 +59,12 @@ source_of_truth: "Git"
 | 2026-10-01 15:58 | `python tools/check_doc_path_citations.py --ratchet --base-ref agent/codex/s08-be-roof-binding` | exit 0, 새 결함 0 |
 | 2026-10-01 15:58 | `git diff --check` | exit 0 |
 | 2026-10-01 16:04 | Node identity를 포함한 dispatch binding 보강 뒤 focused 3파일 재실행 | exit 0, 116 passed |
+| 2026-10-01 16:09 | 실제 helper SQL 순서와 live authority 부정 행렬 보강 뒤 focused 3파일 재실행 | exit 0, 124 passed |
+
+실제 `lock_run`·`lock_resources` helper를 통과하는 시험은 Run → Node → Resource → lease
+`FOR UPDATE` 순서를 고정한다. tenant/project/released/expiry/recovery epoch/fence와 plan expiry,
+Node status/epoch/heartbeat 미래·stale/clock skew를 각각 바꾸는 부정 시험은 모두 dispatch 전
+거부를 고정한다.
 
 stacked PR을 열고 Claude에게 독립 검토를 요청한다. exact-head hosted CI 전에는 실제
 daemon 실행이나 제품 인수를 주장하지 않는다.
