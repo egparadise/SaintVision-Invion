@@ -3,7 +3,7 @@
 - **문서 ID**: HIST-GEMINI-CARD195-DESKTOP-EXPLORER-CONTRAST
 - **작업 branch**: agent/gemini/c195-desktop-explorer-contrast
 - **Base commit**: db37dbc53f2e45ed987b9ed0e0b81ed88f2a7644 (PR #290 HEAD)
-- **KST 시각**: 2026-10-02 01:20:00 KST (r1 보강: 02:00:00 KST, r2 보강: 02:22:00 KST, r3 보강: 02:45:00 KST)
+- **KST 시각**: 2026-10-02 01:20:00 KST (r1 보강: 02:00:00 KST, r2 보강: 02:22:00 KST, r3 보강: 02:40:05 KST, r4 보강: 02:51:22 KST)
 - **작업자**: Gemini (Frontend / UI / 접근성)
 - **독립 검토자 요청**: Claude UI (UI/접근성 축), Codex (계약/디자인 토큰/불변식 축)
 - **상태**: proposed (검토 전 자가 승인 금지)
@@ -41,9 +41,9 @@ ACC-09(접근성 명도 대비 적합화) 트랙의 일환으로, 데스크톱 U
 | 요소 / 위치 (파일:행) | 이전 리터럴 (실제 렌더 배경) | 이전 대비율 (Light 가상 / Dark 정본) | 이전 판정 | 신규 디자인 토큰 (실제 렌더 배경) | 신규 대비율 (Light) | 신규 대비율 (Dark) | WCAG AA 충족 여부 |
 |---|---|---|---|---|---|---|---|
 | **기본 액션 버튼 (Primary Button)**<br>(ResourceExplorer:1316, :1505, :1810, :1949, :2203;<br>InvFileExplorer:520, :635, :679, :834, :1025) | `#ffffff` on `#2563eb`<br>(단일 라인 `var(--color-brand-primary)`) | 5.17:1 / 5.17:1 | **FAIL**<br>(DEF-S11-09 위반) | `var(--color-brand-primary-fg)` on<br>`var(--color-brand-primary-bg)` | **5.17:1** | **6.70:1** | **PASS** (>= 4.5:1, DEF-S11-09 준수) |
-| **활성 네임스페이스 칩 텍스트**<br>(InvFileExplorer:669-671) | `#2563eb` on `#dbeafe` (Light)<br>`#93c5fd` on `rgba(59, 130, 246, 0.2)` over `#111827` (`#1a3351`) (Dark) | **4.24:1** / 7.60:1 | **FAIL**<br>(Light < 4.5:1) | `var(--color-brand-hover)` on<br>`var(--color-brand-subtle)` | **5.49:1** | **8.11:1** | **PASS** (>= 4.5:1) |
+| **활성 네임스페이스 칩 텍스트**<br>(InvFileExplorer:669-671) | `#2563eb` on `#dbeafe` (Light)<br>`#93c5fd` on `rgba(59, 130, 246, 0.2)` over `#111827` (`#192d50`) (Dark) | **4.24:1** / 7.60:1 | **FAIL**<br>(Light < 4.5:1) | `var(--color-brand-hover)` on<br>`var(--color-brand-subtle)` | **5.49:1** | **8.11:1** | **PASS** (>= 4.5:1) |
 | **활성 네임스페이스 칩 테두리**<br>(InvFileExplorer:668-669) | `#2563eb` on `#dbeafe` (Light)<br>`#3b82f6` on `rgba(59, 130, 246, 0.2)` over `#111827` (Dark) | **4.24:1** / 3.73:1 | PASS (>= 3.0:1) | `var(--color-brand-hover)` on<br>`var(--color-brand-subtle)` | **5.49:1** | **8.11:1** | **PASS** (>= 3.0:1) |
-| **파일 버전/등급 배지 텍스트**<br>(InvFileExplorer:848-852) | `#2563eb` on `#dbeafe` (Light)<br>`#60a5fa` on `rgba(59, 130, 246, 0.15)` over `#1f2937` (`#283c59`) (Dark) | **4.24:1** / 4.78:1 | **FAIL**<br>(Light < 4.5:1) | `var(--color-brand-hover)` on<br>`var(--color-brand-subtle)` | **5.49:1** | **8.11:1** | **PASS** (>= 4.5:1) |
+| **파일 버전/등급 배지 텍스트**<br>(InvFileExplorer:848-852) | `#2563eb` on `#dbeafe` (Light)<br>`#60a5fa` on `rgba(59, 130, 246, 0.15)` over `#1f2937` (`#233654`) (Dark) | **4.24:1** / 4.78:1 | **FAIL**<br>(Light < 4.5:1) | `var(--color-brand-hover)` on<br>`var(--color-brand-subtle)` | **5.49:1** | **8.11:1** | **PASS** (>= 4.5:1) |
 | **비활성 버튼 텍스트**<br>(InvFileExplorer:531-532, :1202-1206) | `#ffffff` on `#7b8b9e` (Light)<br>`#0f172a` on `#64748b` (Dark) | **3.48:1** / **3.75:1** | **FAIL**<br>(양 테마 < 4.5:1) | `var(--color-text-muted)` on<br>`var(--color-bg-subtle)` | **5.25:1** | **5.78:1** | **PASS** (>= 4.5:1, SC 1.4.3 예외) |
 | **비활성 버튼 테두리**<br>(InvFileExplorer:531, :1207) | `#7b8b9e` on `#f1f5f9` (Light)<br>`#64748b` on `#1f2937` (Dark) | 3.18:1 / 3.08:1 | PASS (>= 3.0:1) | `var(--color-border-subtle)` on<br>`var(--color-bg-subtle)` | **3.18:1** | **3.08:1** | **PASS** (>= 3.0:1) |
 | **부차/보조 텍스트 (Muted on Surface)**<br>(ResourceExplorer:1260, :1342; InvFileExplorer:465, :1097) | `#94a3b8` on `#ffffff` (Light)<br>`#94a3b8` on `#111827` (Dark) | **2.56:1** / 6.92:1 | **FAIL**<br>(Light < 4.5:1) | `var(--color-text-muted)` on<br>`var(--color-bg-surface)` | **5.75:1** | **6.99:1** | **PASS** (>= 4.5:1) |
