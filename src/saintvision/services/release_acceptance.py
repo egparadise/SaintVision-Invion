@@ -35,7 +35,7 @@ from __future__ import annotations
 import base64
 import datetime as dt
 import uuid
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from typing import Any, Protocol
 
 from sqlalchemy import select, text, tuple_
@@ -74,6 +74,13 @@ AUDIT_CONFIRMED = "release.acceptance.confirmed"
 AUDIT_INVALIDATED = "release.acceptance.proposal_invalidated"
 AUDIT_WITHDRAWN = "release.acceptance.withdrawn"
 AUDIT_DENIED = "release.acceptance.denied"
+#: ``audit_events.outcome`` is ``varchar(8)`` over a closed set, and this feature writes
+#: two of its three members: five actions that happened, and the one refusal that is a
+#: committed fact rather than a rolled-back error (§8). ``error`` belongs to a request that
+#: did not reach a decision, which this service never records -- such a request raises and
+#: the canonical handler answers.
+AUDIT_OUTCOMES = frozenset({"allow", "deny"})
+
 AUDIT_ACTIONS = frozenset(
     {
         AUDIT_PROPOSED,
@@ -115,14 +122,6 @@ class Refused:
     detail: str
     #: For a log and a test, never for the response body.
     reason: str
-    #: Whether *this* request performed the state transition it is refusing over.
-    #:
-    #: It decides who gets audited. The denial §8 asks for belongs to the request that
-    #: closed the proposal -- the one that wrote the lifecycle event and emptied the slot.
-    #: A later request that merely re-reads an already-closed proposal is the same answer
-    #: about the same fact, not a second denial, and recording one per retry would make the
-    #: audit a count of retries rather than of refusals.
-    transitioned: bool = False
 
 
 @dataclass(frozen=True)
@@ -407,19 +406,28 @@ def _slot(
 
 
 def _audit(
-    session: Session, *, principal, action: str, detail: dict[str, Any], now: dt.datetime
+    session: Session,
+    *,
+    principal,
+    action: str,
+    detail: dict[str, Any],
+    now: dt.datetime,
+    outcome: str = "allow",
 ) -> str:
     if action not in AUDIT_ACTIONS:
         raise ValueError(f"{action} is not one of the six allowed acceptance audit actions")
+    # ``allow``/``deny``, never ``succeeded``: the column is varchar(8) over a closed set,
+    # so a value outside it is a failed INSERT in the middle of a request rather than a
+    # mislabelled row. Checked here so the refusal is a ValueError at the call site.
+    if outcome not in AUDIT_OUTCOMES:
+        raise ValueError(f"{outcome} is not one of the allowed acceptance audit outcomes")
     return audit_service.record_event(
         session,
         now=now,
         actor_type="user",
         actor_id=principal.user_id,
         action=action,
-        # ``allow``, not ``succeeded``: the column is varchar(8) with a closed set of
-        # allow/deny/error, and an audit row that fails to insert fails the request.
-        outcome="allow",
+        outcome=outcome,
         tenant_id=principal.tenant_id,
         target_type="release_manifest",
         target_id=detail.get("releaseId"),
@@ -826,31 +834,56 @@ def _close_proposal(
             "p": proposal.proposal_id,
         },
     )
+    detail = {
+        "releaseId": proposal.release_id,
+        "proposalId": proposal.proposal_id,
+        "acceptanceIdRef": proposal.acceptance_id_ref,
+        "closedReason": kind,
+    }
+    _audit(session, principal=principal, action=AUDIT_INVALIDATED, detail=detail, now=now)
+    # **The denial §8 asks for, written here and nowhere else.**
+    #
+    # Every call of this function ends in the committed 409 of §5, so the request that
+    # closes the proposal is exactly the request that is refused -- and a later request
+    # that re-reads an already-closed proposal never arrives here, which is why a replay
+    # or a different key adds no second row. The audit stays a count of refusals rather
+    # than of retries without anything having to remember who transitioned.
+    #
+    # Why not the canonical denial boundary. That boundary audits the AC-02 category --
+    # ``AUTH``/``SEC`` at 401/403, which ``is_audited_denial`` states and a global test
+    # pins -- and this is a ``GRAPH`` 409 that the boundary deliberately does not record.
+    # Reaching it would mean widening a security contract for one route. It also could not
+    # describe this fact honestly: the only post-response hook above the route is the
+    # trace middleware, and that runs *before* ``get_write_session`` commits (measured:
+    # route, middleware, teardown), so a row written there would precede the commit it
+    # claims to describe and would survive a commit that failed.
+    #
+    # In this transaction it is atomic with what it describes: the lifecycle event, the
+    # emptied slot, the 409 receipt and this row all exist, or none of them do. That is
+    # also the rule the repository's one-recorder invariant protects -- a denial must not
+    # be left behind by a transaction that rolled back -- met from the other side.
     _audit(
         session,
         principal=principal,
-        action=AUDIT_INVALIDATED,
-        detail={
-            "releaseId": proposal.release_id,
-            "proposalId": proposal.proposal_id,
-            "acceptanceIdRef": proposal.acceptance_id_ref,
-            "closedReason": kind,
-        },
+        action=AUDIT_DENIED,
+        detail={**detail, "refusedCode": STALE_CODE},
         now=now,
+        outcome="deny",
     )
 
+
+#: The code of that refusal, named before the refusal itself because ``_close_proposal``
+#: records it in the audit row and is defined above.
+STALE_CODE = "GRAPH-0003"
 
 #: The refusal a closed proposal produces, in one place so the first request and every
 #: later one with a different key answer identically (§5).
 STALE = Refused(
     status=409,
-    code="GRAPH-0003",
+    code=STALE_CODE,
     detail="The release acceptance state changed before this request was applied.",
     reason="the proposal was closed by expiry or by a superseded manifest",
 )
-
-#: The same refusal, from the request that did the closing. Only this one is audited.
-STALE_CLOSED_HERE = replace(STALE, transitioned=True)
 
 
 def confirm(
@@ -915,12 +948,12 @@ def confirm(
     if now >= proposal.expires_at:
         _close_proposal(session, principal=principal, proposal=proposal, kind="expired", now=now)
         # Committed, then refused: the expiry is a fact, not an error (§4, §5).
-        return Outcome(status=409, refused=STALE_CLOSED_HERE)
+        return Outcome(status=409, refused=STALE)
     if str(release.manifest_sha256) != str(proposal.target_manifest_sha256):
         _close_proposal(
             session, principal=principal, proposal=proposal, kind="manifest-superseded", now=now
         )
-        return Outcome(status=409, refused=STALE_CLOSED_HERE)
+        return Outcome(status=409, refused=STALE)
     if request.proposal_digest != proposal.proposal_digest:
         raise InvError(GRAPH_INVALID_TRANSITION, "the confirmed digest is not this proposal's")
     if request.target_manifest_sha256 != str(release.manifest_sha256):
@@ -970,7 +1003,7 @@ def confirm(
         _close_proposal(
             session, principal=principal, proposal=proposal, kind="manifest-superseded", now=now
         )
-        return Outcome(status=409, refused=STALE_CLOSED_HERE)
+        return Outcome(status=409, refused=STALE)
 
     acceptance_id = new_id("acceptance")
     event_id = _audit(

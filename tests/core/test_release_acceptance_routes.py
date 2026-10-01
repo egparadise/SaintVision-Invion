@@ -375,3 +375,49 @@ def test_duplicate_reference_ids_are_refused(monkeypatch, field):
     body = {**DECISION_BODY, field: list(DECISION_BODY[field]) * 2}
     response = client.post(DECIDE, headers=JSON, content=json.dumps(body))
     assert response.status_code == 422
+
+
+# ------------------------------------------------------------------ where the denial is written
+
+
+def test_the_audit_helper_refuses_an_outcome_the_column_does_not_allow():
+    """``audit_events.outcome`` is ``varchar(8)`` over allow/deny/error (#286 r3).
+
+    The denial of a committed refusal is the first ``deny`` this service writes, so the
+    helper takes the outcome now -- and a value outside the set has to be a ValueError at
+    the call site rather than a failed INSERT in the middle of a request.
+    """
+    assert service.AUDIT_OUTCOMES == frozenset({"allow", "deny"})
+    with pytest.raises(ValueError) as refused:
+        service._audit(
+            None,
+            principal=None,
+            action=service.AUDIT_DENIED,
+            detail={},
+            now=NOW,
+            outcome="succeeded",
+        )
+    assert "outcome" in str(refused.value)
+
+
+def test_closing_a_proposal_is_the_only_place_the_denial_is_written():
+    """The route records nothing, and exactly one function writes the row (#286 r3).
+
+    Read from the source, because the point is *where* the call is rather than that some
+    call exists: an out-of-band recorder in the route passed every behavioural test in r2
+    and still broke the global invariant that the canonical boundary is the only route-side
+    denial writer.
+    """
+    route_source = Path(route.__file__).read_text(encoding="utf-8")
+    for writer in ("record_denial_out_of_band", "record_event", "audit_service"):
+        assert writer not in route_source, writer
+    # It may still *name* the action: ``_audited`` puts it on the problem so the shared
+    # canonical handler uses it for the refusals that raise. Naming is not writing, and
+    # that one line is the whole of the route's part in the audit.
+    assert route_source.count("audit_action=service.AUDIT_DENIED") == 1
+
+    source = Path(service.__file__).read_text(encoding="utf-8")
+    writing = [line for line in source.splitlines() if "action=AUDIT_DENIED" in line]
+    assert len(writing) == 1, writing
+    body = source.split("def _close_proposal(")[1].split("\ndef ")[0]
+    assert "action=AUDIT_DENIED" in body and 'outcome="deny"' in body

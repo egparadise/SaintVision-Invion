@@ -615,14 +615,19 @@ def test_a_second_final_decision_on_one_criterion_is_refused(
 def test_the_committed_409_is_audited_once_however_many_times_it_is_asked(
     app_engine, owner_engine, operators, monkeypatch
 ):
-    """§8's sixth action for the refusal that *commits* (#286 r2, finding 1).
+    """§8's sixth action for the refusal that *commits* (#286 r2 finding 1, r3).
 
     Returning the 409 as a response instead of raising skipped the shared handler, so the
     closing left a ``proposal_invalidated`` row and **no** ``denied`` one -- Codex probed
-    exactly that. The route now records it out of band, and only the request that performed
-    the transition does: a replay returns the stored receipt, and another key re-reads an
-    already-closed proposal. Neither denied anything new, so the count stays one and the
-    audit remains a count of refusals rather than of retries.
+    exactly that. r2 answered it inside the route, which broke the repository's invariant
+    that no route records a denial (``tests/core/test_canonical_denial_audit.py``). It is
+    now written by ``_close_proposal``, in the transaction that closes the proposal and
+    beside the lifecycle event -- so the two rows below are one commit, and the count
+    cannot drift from the number of closings.
+
+    A replay returns the stored receipt and another key re-reads an already-closed
+    proposal; neither reaches the closing, so neither adds a row. The audit stays a count
+    of refusals rather than of retries, and nothing has to remember who transitioned.
     """
     release_id, manifest = _release(owner_engine, tenant=operators["tenant"], user=operators["one"])
     proposer = _client(app_engine, monkeypatch, operators=operators, who="one")
@@ -668,3 +673,19 @@ def test_the_committed_409_is_audited_once_however_many_times_it_is_asked(
         "SELECT count(*) FROM release_acceptance_lifecycle_events WHERE tenant_id=:t",
         t=operators["tenant"],
     ) == 1
+
+    # The row itself: the closed action, the ``deny`` outcome the column's set allows, the
+    # code the caller was actually given, and the confirmer as the actor -- an out-of-band
+    # recorder had to rebuild that actor from request state.
+    with owner_engine.begin() as connection:
+        row = connection.execute(
+            text(
+                "SELECT actor_type, actor_id, outcome, detail->>'refusedCode' AS code, "
+                "detail->>'closedReason' AS reason FROM audit_events "
+                "WHERE tenant_id=:t AND action=:a"
+            ),
+            {"t": operators["tenant"], "a": service.AUDIT_DENIED},
+        ).one()
+    assert row.outcome == "deny" and row.code == "GRAPH-0003"
+    assert row.actor_type == "user" and row.actor_id == operators["two"]
+    assert row.reason == "expired"
