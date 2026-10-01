@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-20261001-CARD170-S08BE-DESIGN-CODEX"
 title: "CARD-170 S08-BE ROOF·BuildKit·단일 GPU 구현 설계"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-01T12:26:22+09:00"
+updated: "2026-10-01T12:42:40+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "7851412db792b4ef6c53cb92944be530d77eb2de"
@@ -41,7 +41,7 @@ tags: ["card-170", "s08-be", "roof", "buildkit", "gpu", "design"]
 
 ## 설계 결과
 
-[[S08-BE_ROOF_BuildKit_단일_GPU_구현_설계]] v1.0은 다음을 결정했다.
+[[S08-BE_ROOF_BuildKit_단일_GPU_구현_설계]] v1.1은 다음을 결정했다.
 
 1. ROOF를 새 monolith로 만들지 않고 policy·observability·ownership·recovery의 공통
    불변식으로 BuildKit/GPU 경로에 적용한다.
@@ -51,6 +51,20 @@ tags: ["card-170", "s08-be", "roof", "buildkit", "gpu", "design"]
    첫 범위는 Linux exclusive 단일 GPU이고 provider가 없으면 현재 거부를 유지한다.
 4. synthetic provider/hosted BuildKit은 코드 계약 증거다. 실제 단일 GPU와 LAN builder
    운영 인수 전에는 AC-08 전체, S08-BE done, 실장비 PASS를 주장하지 않는다.
+
+## Claude 조건부 승인 반영
+
+- `BuildPlan`의 `rootless=true`, `privileged=false`, `hostAccess=false`, `devices=[]`,
+  `binds=[]`와 network policy를 literal로 고정하고, build job도 tenant+project
+  CPU/memory/storage budget·lease·fencing을 소비하도록 했다. builder daemon은 bounded
+  service이며 kill/drain은 새 job 거부와 진행 job cancel·cleanup으로 전파된다.
+- rootless user namespace, seccomp, AppArmor/SELinux, per-job cgroup quota와 cache key의
+  builder instance·recovery epoch를 필수로 했다.
+- GPU Docker read-back은 permit의 exact `gpuAllocation`만 허용하고 추가 device나 bind는
+  `NODE-0024`로 닫는다.
+- registry의 “합성 GPU 실행 성공”은 AC-08 criterion 3의 구현 증거로 인정하되, AC-08
+  전체·S08-BE done·물리 인수와 분리했다. S08-BE 전용 Go runtime, BuildKit adapter,
+  GPU provider 시험을 새로 만들며 S03-BE/S07-BE 시험은 중복 fund하지 않는다.
 
 ## 다음
 

@@ -1,11 +1,11 @@
 ---
 doc_id: "DESIGN-S08-BE-ROOF-BUILDKIT-SINGLE-GPU-001"
 title: "S08-BE ROOF·BuildKit·단일 GPU 구현 설계"
-version: "1.0.0"
+version: "1.1.0"
 status: "proposed"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-01T12:26:22+09:00"
+updated: "2026-10-01T12:42:40+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "7851412db792b4ef6c53cb92944be530d77eb2de"
@@ -106,7 +106,7 @@ BuildKit과 GPU 모두 다음 순서를 지켜야 한다.
 | 계약 | 필수 내용 |
 |---|---|
 | `BuildRequest` | tenant/project/workspace, clean source commit SHA와 tree SHA, context·Dockerfile의 canonical relative path, target/platform, network policy ID, cache policy ID, opaque secret reference ID 목록, timeout |
-| `BuildPlan` | request/action digest, current `PolicyDecision` ID/version/expiry, builder instance·profile·recovery epoch, rootless=true, allowed egress host+port digest, cache namespace digest, resolved immutable base image digest 목록 |
+| `BuildPlan` | request/action digest, current `PolicyDecision` ID/version/expiry, builder instance·profile·recovery epoch, rootless=true, privileged=false, hostAccess=false, network policy와 허용 egress host+port digest, devices=[], binds=[], CPU/memory/storage budget와 lease/fencing, cache namespace digest, resolved immutable base image digest 목록 |
 | `BuildReceipt` | plan digest, source/tree SHA, output image/config digest, SBOM·scan evidence digest, cache input/output digest, redacted network summary, started/finished timestamps, result, cleanup receipt |
 
 모두 `additionalProperties:false`다. source branch·tag, mutable base tag, literal secret,
@@ -114,13 +114,23 @@ arbitrary build arg/environment, caller supplied output digest는 받지 않는�
 필요한지는 구현 카드에서 route inventory와 함께 결정하되, 어떤 route도 기존
 `WorkloadSpec`을 build request로 해석하지 않는다.
 
+`rootless`, `privileged`, `hostAccess`, `devices`, `binds`는 caller가 선택하는 옵션이
+아니라 위 literal로 고정한다. network는 `none` 또는 policy가 고정한 allowlist profile만
+허용한다. builder daemon은 bounded service CPU/memory/storage quota 안에서만 실행하고,
+각 build job은 별도의 tenant+project resource budget과 lease/fencing을 소비한다. 따라서
+build가 placement 바깥의 무제한 side channel이 되지 않는다. kill switch와 drain은 새
+job을 거부하고 진행 job을 cancel하며, lease·cgroup·cache cleanup receipt 전에는 자원을
+재사용하지 않는다.
+
 ### D-B3. network·cache·secret 정책
 
 - network 기본은 `none`이다. dependency fetch가 필요한 profile만 hostname+port
   allowlist와 TLS trust bundle digest를 policy에 고정한다. redirect, proxy environment,
   DNS 결과 drift와 허용 밖 목적지는 거부한다.
-- cache key는 tenant+project+builder profile+source tree+Dockerfile+resolved base digest+
-  build args digest를 포함한다. cross-tenant import/export와 mutable cache ref는 금지한다.
+- cache key는 tenant+project+builder instance+builder profile+recovery epoch+source tree+
+  Dockerfile+resolved base digest+build args digest를 포함한다. cross-tenant import/export와
+  mutable cache ref는 금지한다. cancel·cleanup 미확인 또는 epoch 변경 뒤에는 이전 key를
+  quarantine하고 재사용하지 않는다.
 - secret은 opaque ID만 계약에 넣고 실행 직전에 authorized provider에서 받아 BuildKit
   secret mount로만 전달한다. file/argv/env/layer/cache/log에 남지 않는 것을 부정 시험과
   output inspection으로 확인한다.
@@ -134,6 +144,11 @@ cleanup을 같은 trace로 기록한다. 출력 digest와 receipt가 다르거�
 않으면 성공으로 완료하지 않는다. kill switch 시 adapter는 build cancel을 보내고,
 bounded deadline 안에 종료가 확인되지 않으면 builder를 quarantine하며 cache를 다른
 작업에 재사용하지 않는다.
+
+BuildKit worker는 rootless user namespace(`newuidmap`/`newgidmap` mapping 검증), seccomp,
+AppArmor 또는 SELinux, no-new-privileges와 per-job cgroup quota를 동시에 적용한다. 하나라도
+지원·적용 여부를 read-back하지 못하면 dispatch하지 않는다. daemon이 살아 있다는 사실만으로
+job 격리나 quota가 측정됐다고 보지 않는다.
 
 ## 4. 단일 GPU 결정
 
@@ -169,6 +184,13 @@ fail closed다.
 - `ExecutionClaim.planDigest`가 GPU allocation을 포함한 launch plan 전체를 서명한다.
   Node는 permit의 allocation과 live provider inventory가 exact match일 때만 exact device
   request를 만든다. caller supplied `NVIDIA_VISIBLE_DEVICES` 같은 환경 값은 무시·거부한다.
+
+Node의 Docker create 뒤 read-back은 실제 `Devices`/`DeviceRequests`가 서명된
+`gpuAllocation`의 device ID·count·capability와 정확히 같을 때만 허용한다. GPU 없는 plan은
+두 필드가 모두 비어 있어야 하고 `Binds`는 GPU 유무와 관계없이 항상 0이다. 불일치·추가
+device·broad capability·bind가 하나라도 있으면 기존 `NODE-0024` 거부를 유지한다. 이를
+위해 `services/node-agent/runtime/docker.go`의 현재 비어 있지 않은 device 거부는 임의
+완화하지 않고, permit exact-match 분기에서만 좁게 대체한다.
 
 GPU resource row와 lease는 device별이어야 한다. CPU/memory aggregate lease만 잡고
 GPU를 실행하지 않는다. final commit에서 fresh observation, offer, active lease 합계,
@@ -211,21 +233,29 @@ exact device 미사용, kill switch와 recovery epoch를 재검증한다.
   1-GPU normal/cancel/replay/fencing 시험이 통과한다.
 - provider 없음·claimed only·stale·health/runtime mismatch·VRAM 부족·중복 lease·
   gpuCount>1은 모두 launch side effect 0으로 거부한다.
-- 실제 단일 GPU에서 device identity, VRAM observation, workload output, cancel, detach,
-  재할당을 측정하기 전에는 AC-08 전체나 S08-BE done을 주장하지 않는다.
+- task registry의 AC-08 criterion 3인 “합성 GPU 실행 성공”은 synthetic provider의
+  product implementation 증거로 충족할 수 있다. 그러나 AC-08 전체에는 Docker socket,
+  approval bypass, backup/restore 등 다른 기준이 함께 있고, 실제 단일 GPU에서 device
+  identity, VRAM observation, workload output, cancel, detach, 재할당을 측정하기 전에는
+  S08-BE done·100이나 물리 인수 PASS를 주장하지 않는다.
 
 ## 6. 필수 부정 시험
 
 | 축 | 되살리면 실패해야 하는 변이 |
 |---|---|
 | 공통 | final 권한 재검증 제거, expired policy 허용, kill switch 검사 순서 뒤집기, unknown field 허용, evidence digest 미대조 |
-| BuildKit | host socket mount, privileged/host entitlement, context path escape, mutable base tag, allowlist 밖 egress/redirect/proxy, literal secret, cross-tenant cache, output digest 위조, cancel 뒤 cache 재사용 |
-| GPU | announcement count로 provider 합성, stale snapshot 허용, gpuCount 2 허용, unknown/duplicate device, insufficient VRAM, runtime drift, exact-device 제한 제거, stale fencing, 종료 receipt 전 lease release |
+| BuildKit | BuildPlan literal 완화, host socket mount, privileged/host entitlement, user namespace/seccomp/LSM/cgroup 하나 제거, budget/lease 없는 job, context path escape, mutable base tag, allowlist 밖 egress/redirect/proxy, literal secret, cross-tenant cache, builder instance/epoch 없는 cache key, output digest 위조, cancel 뒤 cache 재사용 |
+| GPU | announcement count로 provider 합성, stale snapshot 허용, gpuCount 2 허용, unknown/duplicate device, insufficient VRAM, runtime drift, permit과 다른 Devices/DeviceRequests read-back, Binds 허용, stale fencing, 종료 receipt 전 lease release |
 
 PG-free에서는 schema·policy·adapter·mutation 시험을 한다. hosted에서는 rootless BuildKit과
 synthetic GPU provider를 opt-in lane에서 한 job씩 실행하고 exact PR head, clean checkout,
 도구/version, JUnit과 redacted Evidence를 보존한다. 기본 CI는 무거운 daemon이나 GPU를
 자동 기동하지 않는다.
+
+S08-BE 자금 귀속 시험은 새 이름으로 분리한다. Go의 Node runtime read-back/permit 시험,
+BuildKit contract·adapter 시험, GPU provider 시험이 각각 S08-BE를 fund한다. 기존
+`tests/core/test_sandbox_contracts.py`는 S03-BE, `tests/integration/test_containment.py`는
+S07-BE 소유 증거이므로 S08-BE 합격 건수로 중복 계산하지 않는다.
 
 ## 7. 외부 전제와 판정 경계
 
@@ -233,7 +263,7 @@ synthetic GPU provider를 opt-in lane에서 한 job씩 실행하고 exact PR hea
 |---|---|---|
 | ROOF | strict policy/evidence/kill/cancel/cleanup 결속 | 운영 alert·incident drill은 별도 인수 |
 | BuildKit | hosted rootless daemon, 우회·secret·cache 부정 시험 | LAN builder 설치·운영 registry credential·운영 egress policy는 외부 운영 인수 |
-| GPU | synthetic provider로 contract·placement·fencing·회수 | Linux 단일 GPU 장비, driver/toolkit, 승인 image와 operator 관측이 필요; 그 전 `BLOCKED_EXTERNAL` |
+| GPU | synthetic provider로 AC-08 criterion 3의 contract·placement·fencing·회수 | Linux 단일 GPU 장비, driver/toolkit, 승인 image와 operator 관측이 필요; 그 전 S08-BE 물리 인수는 `BLOCKED_EXTERNAL` |
 | 5-node | 코드·inventory preflight 재사용 | 실제 5-node 성능/복구는 G-19/G-24 외부 전제 |
 
 `NOT_OBSERVED`, `BLOCKED_EXTERNAL`, synthetic PASS를 실제 GPU/운영 BuildKit PASS로
@@ -246,8 +276,8 @@ synthetic GPU provider를 opt-in lane에서 한 job씩 실행하고 exact PR hea
    별도 계약 diff로 제시한다.
 2. **BuildKit 카드**: rootless adapter, policy/evidence/cancel/cleanup, PG-free + hosted
    opt-in lane. Node Docker socket 경계는 건드리지 않는다.
-3. **GPU 카드**: synthetic measured provider, device lease/fencing, launch/teardown. 기본
-   provider는 none이고 기존 GPU 거부를 유지한다.
+3. **GPU 카드**: synthetic measured provider, device lease/fencing, launch/teardown,
+   permit↔Docker read-back exact match. 기본 provider는 none이고 기존 GPU 거부를 유지한다.
 4. **실장비 인수 카드**: 운영자가 준비한 단일 GPU와 LAN builder에서 exact landed SHA로
    실행한다. 여기서만 AC-08의 물리 증거를 판정한다.
 

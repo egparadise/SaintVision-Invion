@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.235"
+version: "1.0.236"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T12:26:22+09:00"
+updated: "2026-10-01T12:42:40+09:00"
 source_of_truth: "Git"
 active_card: "CARD-170 S08-BE ROOF·BuildKit·single-GPU contract-first design"
-active_card_status: "Design v1.0 drafted on train5 base; product code, migration and registry unchanged"
-active_card_next: "Run documentation gates, open docs PR, request Claude design review before implementation"
+active_card_status: "Claude conditional approval reflected in design v1.1; product code, migration and registry unchanged"
+active_card_next: "Request Claude re-review, then begin S08-BE contract implementation after approval"
 ---
 
 ## 2026-10-01 Card 170 — S08-BE ROOF·BuildKit·단일 GPU 계약 선행 설계
@@ -21,6 +21,9 @@ active_card_next: "Run documentation gates, open docs PR, request Claude design 
   고정했다.
 - 제품 코드·migration·registry를 바꾸지 않았고 S08-BE는 `planned`·50을 유지한다.
   다음은 Claude 설계 검토 뒤 계약 delta다.
+- Claude 조건부 승인에서 요구한 BuildPlan literal, builder resource lease·kill/drain,
+  user namespace/seccomp/LSM/cgroup, cache epoch, GPU permit↔Docker read-back exact match,
+  AC-08 합성 criterion과 물리 인수의 분리, S08-BE 전용 시험 귀속을 설계 v1.1에 반영했다.
 
 ## 2026-09-30 Card151 Claude F1-F12 보안·측정 경계 후속
 - PR #248에서 root·service·PITR 자격을 host argv와 Docker `Config.Env`에서 제거하고 단일 보호 파일 mount로 고정했다. PITR policy의 delete 권한을 제거하고 bucket versioning을 활성화했다.
