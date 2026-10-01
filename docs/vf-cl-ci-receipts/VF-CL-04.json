@@ -1,0 +1,32 @@
+{
+ "artifact": {
+  "digest": "sha256:1d8e0acdcb49dc42a7a2888dd8484fe879280a0d9fb27a49ee93389981fba131",
+  "expiresAt": "2026-12-30T10:52:59Z",
+  "id": "11155274241",
+  "name": "s12-acceptance-40b3ec78ba63731dd94dcfdeb2d757381aee8a3b"
+ },
+ "card": "VF-CL-04",
+ "claimedTree": "25f43a25a999568c70ecccbf5881dbc2d11f3b5e",
+ "conclusion": "success",
+ "event": "workflow_dispatch",
+ "headBranch": "agent/claude/c185-vfcl-next",
+ "headRelationToClaimedTree": "ancestor",
+ "headSha": "40b3ec78ba63731dd94dcfdeb2d757381aee8a3b",
+ "inputDigests": {
+  "artifactMetadataSha256": "d140445757bbcd8581b0755855d70fa7ae2d9467e8199c32d7651dd9fe36bebb",
+  "jobsMetadataSha256": "ee7bf1f822f4acd312c06dbd0498b39b72804cd7513c76bd014df974a243a3cc",
+  "runMetadataSha256": "a948bde62566c1268f9fb395bbe8e586060236d162a014207f97b623119d6f4a"
+ },
+ "receiptSha256": "fcf7b2a00d916ae74bf42a158f13f63936a77eeb4d0642c84b0eab45123c9ad9",
+ "recordedAt": "2026-10-01T18:23:14.418939Z",
+ "repository": "egparadise/SaintVision-Invion",
+ "requiredSteps": [
+  "Derive the AC-12 acceptance items",
+  "Hold the bundle to its shape and to this head",
+  "Record that the two named observations were derived here",
+  "Upload the acceptance evidence"
+ ],
+ "runId": "36851875128",
+ "schemaVersion": "vf-cl-ci-receipt:1",
+ "workflowPath": ".github/workflows/s12-acceptance-evidence.yml"
+}
