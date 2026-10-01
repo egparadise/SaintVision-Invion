@@ -1723,6 +1723,42 @@ class ReleaseAcceptanceTargetRegistryResponse(Strict):
         return self
 
 
+def load_release_acceptance_target_registry_json(
+    raw: str | bytes,
+) -> ReleaseAcceptanceTargetRegistryResponse:
+    """Parse the Git-owned registry without normalizing attacker-controlled JSON.
+
+    ``BaseModel.model_validate_json`` cannot report duplicate object keys, and
+    ``Strict`` normally strips surrounding whitespace.  Neither behaviour is
+    acceptable for a byte-pinned registry whose digest is meant to identify the
+    exact declared strings, so the registry loader rejects both before use.
+    """
+
+    if isinstance(raw, bytes):
+        raw = raw.decode("utf-8")
+
+    def unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        result: dict[str, Any] = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError(f"duplicate target registry key: {key}")
+            result[key] = value
+        return result
+
+    def reject_constant(value: str) -> None:
+        raise ValueError(f"target registry forbids JSON constant: {value}")
+
+    document = json.loads(
+        raw,
+        object_pairs_hook=unique_object,
+        parse_constant=reject_constant,
+    )
+    parsed = ReleaseAcceptanceTargetRegistryResponse.model_validate(document)
+    if document != parsed.model_dump(by_alias=True, mode="json"):
+        raise ValueError("target registry strings must already be exact and untrimmed")
+    return parsed
+
+
 class ReleaseAcceptanceResolvedTarget(Strict):
     target_id: StrictStr = Field(
         alias="targetId", pattern="^[A-Za-z][A-Za-z0-9_.:/-]{0,127}$"
@@ -1758,12 +1794,21 @@ class ReleaseAcceptanceReferenceResolutionResponse(Strict):
     schema_version: Literal["release-acceptance-reference-resolution:1"] = Field(
         alias="schemaVersion"
     )
+    release_id: StrictStr = Field(alias="releaseId", min_length=1, max_length=64)
+    acceptance_id_ref: StrictStr = Field(
+        alias="acceptanceIdRef", pattern="^[A-Z][A-Z0-9-]{1,15}$"
+    )
+    policy_registry_version: Literal[1] = Field(alias="policyRegistryVersion")
+    policy_registry_sha256: ReleaseAcceptanceSha256 = Field(alias="policyRegistrySha256")
     target_registry_id: Literal["release-acceptance-targets-v1"] = Field(
         alias="targetRegistryId"
     )
     target_registry_version: Literal[1] = Field(alias="targetRegistryVersion")
-    target_registry_blob_sha256: ReleaseAcceptanceSha256 = Field(
-        alias="targetRegistryBlobSha256"
+    target_registry_git_blob_sha: ReleaseAcceptanceGitSha = Field(
+        alias="targetRegistryGitBlobSha"
+    )
+    target_registry_file_sha256: ReleaseAcceptanceSha256 = Field(
+        alias="targetRegistryFileSha256"
     )
     targets: list[ReleaseAcceptanceResolvedTarget] = Field(min_length=1, max_length=64)
     measurements: list[ReleaseAcceptanceResolvedMeasurement] = Field(

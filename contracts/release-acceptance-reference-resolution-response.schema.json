@@ -70,6 +70,11 @@
   "additionalProperties": false,
   "description": "All-or-nothing result passed to the decision writer inside the server.\n\nThe resolver never returns a partial list and this contract does not expose\nraw Evidence telemetry, actor identifiers, or caller-supplied fallback data.",
   "properties": {
+    "acceptanceIdRef": {
+      "pattern": "^[A-Z][A-Z0-9-]{1,15}$",
+      "title": "Acceptanceidref",
+      "type": "string"
+    },
     "allResolved": {
       "const": true,
       "title": "Allresolved",
@@ -84,6 +89,24 @@
       "title": "Measurements",
       "type": "array"
     },
+    "policyRegistrySha256": {
+      "maxLength": 64,
+      "minLength": 64,
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Policyregistrysha256",
+      "type": "string"
+    },
+    "policyRegistryVersion": {
+      "const": 1,
+      "title": "Policyregistryversion",
+      "type": "integer"
+    },
+    "releaseId": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Releaseid",
+      "type": "string"
+    },
     "schemaVersion": {
       "const": "release-acceptance-reference-resolution:1",
       "title": "Schemaversion",
@@ -94,11 +117,18 @@
       "title": "Scopeverified",
       "type": "boolean"
     },
-    "targetRegistryBlobSha256": {
+    "targetRegistryFileSha256": {
       "maxLength": 64,
       "minLength": 64,
       "pattern": "^[0-9a-f]{64}$",
-      "title": "Targetregistryblobsha256",
+      "title": "Targetregistryfilesha256",
+      "type": "string"
+    },
+    "targetRegistryGitBlobSha": {
+      "maxLength": 40,
+      "minLength": 40,
+      "pattern": "^[0-9a-f]{40}$",
+      "title": "Targetregistrygitblobsha",
       "type": "string"
     },
     "targetRegistryId": {
@@ -123,9 +153,14 @@
   },
   "required": [
     "schemaVersion",
+    "releaseId",
+    "acceptanceIdRef",
+    "policyRegistryVersion",
+    "policyRegistrySha256",
     "targetRegistryId",
     "targetRegistryVersion",
-    "targetRegistryBlobSha256",
+    "targetRegistryGitBlobSha",
+    "targetRegistryFileSha256",
     "targets",
     "measurements",
     "scopeVerified",

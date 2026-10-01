@@ -12,6 +12,7 @@ from pydantic import ValidationError
 from saintvision.api.schemas import (
     ReleaseAcceptanceReferenceResolutionResponse,
     ReleaseAcceptanceTargetRegistryResponse,
+    load_release_acceptance_target_registry_json,
 )
 
 
@@ -38,9 +39,14 @@ def _canonical_target_sha256(target: dict) -> str:
 def _resolution() -> dict:
     return {
         "schemaVersion": "release-acceptance-reference-resolution:1",
+        "releaseId": "rel-1",
+        "acceptanceIdRef": "AC-12",
+        "policyRegistryVersion": 1,
+        "policyRegistrySha256": "9" * 64,
         "targetRegistryId": "release-acceptance-targets-v1",
         "targetRegistryVersion": 1,
-        "targetRegistryBlobSha256": "a" * 64,
+        "targetRegistryGitBlobSha": "a" * 40,
+        "targetRegistryFileSha256": "b" * 64,
         "targets": [
             {
                 "targetId": "AC-12.release-acceptance-v1",
@@ -63,7 +69,9 @@ def _resolution() -> dict:
 
 def test_checked_in_target_registry_is_strict_nonempty_and_self_consistent():
     raw = _registry()
-    parsed = ReleaseAcceptanceTargetRegistryResponse.model_validate(raw)
+    parsed = load_release_acceptance_target_registry_json(
+        REGISTRY.read_text(encoding="utf-8")
+    )
 
     assert parsed.registry_id == "release-acceptance-targets-v1"
     assert len(parsed.targets) == 1
@@ -87,6 +95,32 @@ def test_target_source_commit_and_blob_are_real_git_objects():
         text=True,
     ).stdout.strip()
     assert blob == source["blobSha"]
+    subprocess.run(
+        ["git", "merge-base", "--is-ancestor", source["commitSha"], "HEAD"],
+        cwd=ROOT,
+        check=True,
+    )
+
+
+@pytest.mark.parametrize(
+    "mutate",
+    [
+        lambda text: text.replace(
+            '"owner": "S12-BE",',
+            '"owner": "S12-BE",\n  "owner": "S12-BE",',
+            1,
+        ),
+        lambda text: text.replace(
+            "The five-node development, deployment, and recovery journey is recorded.",
+            "The five-node development, deployment, and recovery journey is recorded. ",
+            1,
+        ),
+    ],
+)
+def test_registry_loader_rejects_duplicate_keys_and_implicit_string_trimming(mutate):
+    raw = REGISTRY.read_text(encoding="utf-8")
+    with pytest.raises(ValueError):
+        load_release_acceptance_target_registry_json(mutate(raw))
 
 
 @pytest.mark.parametrize(
@@ -96,6 +130,7 @@ def test_target_source_commit_and_blob_are_real_git_objects():
         lambda document: document.update({"owner": "operator"}),
         lambda document: document.update({"registryVersion": 2}),
         lambda document: document.update({"unexpected": True}),
+        lambda document: document["targets"][0].update({"owner": "operator"}),
         lambda document: document["targets"][0].update({"targetSha256": "A" * 64}),
         lambda document: document["targets"][0].update({"criteria": []}),
         lambda document: document["targets"][0]["criteria"].append(
@@ -121,6 +156,15 @@ def test_target_digest_mutation_is_detected_even_when_shape_remains_valid():
         ReleaseAcceptanceTargetRegistryResponse.model_validate(document)
 
 
+def test_non_nfc_target_string_is_rejected_even_with_recomputed_digest():
+    document = _registry()
+    target = document["targets"][0]
+    target["criteria"][0]["statement"] += " e\u0301"
+    target["targetSha256"] = _canonical_target_sha256(target)
+    with pytest.raises(ValidationError, match="NFC-normalized"):
+        ReleaseAcceptanceTargetRegistryResponse.model_validate(document)
+
+
 def test_reference_resolution_contract_is_all_or_nothing():
     parsed = ReleaseAcceptanceReferenceResolutionResponse.model_validate(_resolution())
     assert parsed.scope_verified is True
@@ -134,6 +178,12 @@ def test_reference_resolution_contract_is_all_or_nothing():
         lambda document: document.update({"scopeVerified": False}),
         lambda document: document.update({"targets": []}),
         lambda document: document.update({"measurements": []}),
+        lambda document: document.pop("releaseId"),
+        lambda document: document.pop("acceptanceIdRef"),
+        lambda document: document.pop("policyRegistrySha256"),
+        lambda document: document.update({"policyRegistrySha256": "A" * 64}),
+        lambda document: document.update({"targetRegistryFileSha256": "a" * 63}),
+        lambda document: document.update({"targetRegistryFileSha256": "A" * 64}),
         lambda document: document["measurements"][0].update(
             {"observedAt": "2026-10-01T12:00:00"}
         ),
@@ -160,6 +210,9 @@ def test_public_schema_keeps_digest_and_resolution_guards_literal():
     assert resolution_schema["additionalProperties"] is False
     assert resolution_schema["properties"]["allResolved"]["const"] is True
     assert resolution_schema["properties"]["scopeVerified"]["const"] is True
+    assert resolution_schema["properties"]["policyRegistrySha256"]["pattern"] == "^[0-9a-f]{64}$"
+    assert resolution_schema["properties"]["targetRegistryGitBlobSha"]["pattern"] == "^[0-9a-f]{40}$"
+    assert resolution_schema["properties"]["targetRegistryFileSha256"]["pattern"] == "^[0-9a-f]{64}$"
     sha = resolution_schema["$defs"]["ReleaseAcceptanceResolvedMeasurement"]["properties"][
         "evidenceSha256"
     ]
