@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One pinned component of a release.\n\nEvery entry carries a digest because the manifest hash covers the list: a\nname is not an identity, so \"we shipped R4\" has to be checkable rather than\nasserted (``operations_pilot.ReleaseManifest``).",
+  "properties": {
+    "digest": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Digest",
+      "type": "string"
+    },
+    "kind": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Kind",
+      "type": "string"
+    },
+    "name": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "kind",
+    "digest"
+  ],
+  "title": "ReleaseComponentResponse",
+  "type": "object"
+}
