@@ -189,7 +189,7 @@ Codex 계약·보안 축 2차 검토(09:40)에서 제기된 지적사항 5건(F1
 - **문제**: URL 부분 문자열 검사(`/protocol/openid-connect/token` in url, `self.hostname` in url)로 인해 `https://idp.sv.lan.attacker.invalid/...`, `https://portal.sv.lan.attacker.invalid/v1/session` 등 유사 호스트 주입 시 통과하고, 세션 응답 바디 검증이 미약하여 계약상 무효인 세션(`{"subjectId":"oidc:x","tenantId":"not-a-uuid","expiresAt":-1}`)으로도 acceptanceClaim=true가 가능했던 결함.
 - **조치**:
   1. `urlsplit(resp.url)`을 사용하여 토큰 및 세션 엔드포인트의 scheme, hostname, port, canonical path(`idp.sv.lan`, `portal.sv.lan/v1/session`)를 완전 일치(`==`)로 엄격히 결속.
-  2. `validate_session_view(data, now_ts)`를 구축하여 정본 `contracts/v1alpha1/core.schema.json#/definitions/SessionView`(`subjectId = ^oidc:[0-9a-f]{64}$`, `tenantId = UUID`, `expiresAt >= 1`, 추가 필드 거부) 및 프런트 제품 경계(`expiresAt > now`)를 엄격히 강제.
+  2. `validate_session_view(data, now_ts)`를 구축하여 정본 `contracts/v1alpha1/core.schema.json`의 `definitions.SessionView`(`subjectId = ^oidc:[0-9a-f]{64}$`, `tenantId = UUID`, `expiresAt >= 1`, 추가 필드 거부) 및 프런트 제품 경계(`expiresAt > now`)를 엄격히 강제.
   3. lookalike host, 잘못된 UUID, 잘못된 subject, 만료 세션 각각에 대한 독립 음성 시험 5종 완비.
 
 ### 2) N2 [High] 인증서 우회 플래그 전면 제거 및 Chromium launch args 0건 단언
