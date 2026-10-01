@@ -65,9 +65,11 @@ distinct-voter UNIQUE, the one-withdrawal UNIQUE, the one-terminal-event UNIQUE,
 slot's single-state CHECK and its state-machine trigger, and the CHECK that a canonical
 accepted row names a proposal. A bug that bypasses the function meets the same wall.
 
-**Downgrade refuses.** Proposals, votes and withdrawals are the record of who accepted
-what; restoring the old unique key would also mean deciding which of several decisions to
-keep. A reviewed forward fix is the way back.
+**Downgrade reverses while nothing has been recorded.** Guarded, not unconditional: an
+irreversible head would empty AC-11's ``migration-reversible-segment``, and 0053-0056 all
+guard rather than refuse. Each guard asks whether the old shape could hold what the new one
+now holds -- a proposal, a vote, a withdrawal, an attested acceptance, two decisions on one
+criterion, a ``releases.accept`` grant -- and names the one that stops it.
 """
 
 from __future__ import annotations
@@ -626,10 +628,105 @@ def upgrade() -> None:
     )
 
 
+#: What must be absent for this revision to reverse. Each one is a thing the old shape
+#: cannot hold, so the downgrade asks the database rather than assuming.
+_BLOCKING_COUNTS = (
+    (
+        "SELECT count(*) FROM release_acceptance_proposals",
+        "a release acceptance proposal exists",
+    ),
+    ("SELECT count(*) FROM release_acceptance_votes", "an operator vote exists"),
+    (
+        "SELECT count(*) FROM release_acceptance_withdrawals",
+        "a withdrawal exists",
+    ),
+    (
+        "SELECT count(*) FROM release_acceptance_lifecycle_events",
+        "a proposal lifecycle event exists",
+    ),
+    (
+        "SELECT count(*) FROM acceptance_records WHERE attestation_version = 'fresh-interactive-v1'",
+        "an attested two-person acceptance exists",
+    ),
+    (
+        "SELECT count(*) FROM (SELECT release_id, acceptance_id_ref FROM acceptance_records "
+        "GROUP BY release_id, acceptance_id_ref HAVING count(*) > 1) AS d",
+        "a criterion has been decided more than once, which the old unique key forbids",
+    ),
+    (
+        "SELECT count(*) FROM inv.business_admin_grants WHERE permission = 'releases.accept'",
+        "a releases.accept grant exists, which the old permission CHECK forbids",
+    ),
+)
+
+
 def downgrade() -> None:
-    raise RuntimeError(
-        "0057_release_acceptance_quorum is irreversible: proposals, votes and "
-        "withdrawals are the record of who accepted which release, and restoring "
-        "uq_acceptance_records_release_criterion would also mean choosing which of "
-        "several recorded decisions to keep; apply a reviewed forward fix"
+    """Reverse while nothing has been recorded, and refuse once anything has.
+
+    An unconditional refusal was the first draft and it was wrong for a reason worth
+    keeping: AC-11's ``migration-reversible-segment`` axis measures how far the head can
+    roll back, and an irreversible head empties that segment. 0053-0056 all guard instead
+    -- refuse while rows exist, otherwise drop empty structures -- and this revision has
+    exactly that shape, so the segment stays four revisions long rather than becoming
+    zero because a new table was added.
+
+    The guards are the honest part. Each asks whether the *old* shape could hold what the
+    new one now holds: a proposal, a vote, a withdrawal, a lifecycle event, an attested
+    acceptance, two decisions on one criterion (which the restored unique key forbids), or
+    a ``releases.accept`` grant (which the restored CHECK forbids). Any of them and the
+    downgrade stops and names which, because dropping them would be deciding on an
+    operator's behalf which recorded decision to discard.
+    """
+    connection = op.get_bind()
+    for statement, reason in _BLOCKING_COUNTS:
+        if connection.execute(sa.text(statement)).scalar_one():
+            raise RuntimeError(
+                "0057_release_acceptance_quorum cannot be reversed: "
+                f"{reason}. Apply a reviewed forward fix instead of discarding it."
+            )
+
+    op.execute(f"DROP TRIGGER IF EXISTS {SLOT_TABLE}_forward ON {SLOT_TABLE}")
+    op.execute(
+        "DROP FUNCTION IF EXISTS public.release_acceptance_confirm("
+        "char(30),char(64),char(64),char(30),char(30),char(30),char(30),text,text,text,"
+        "integer,char(64),timestamptz)"
     )
+    op.execute("DROP FUNCTION IF EXISTS public.release_acceptance_slot_forward()")
+
+    # The permission CHECK and the grants 0005 gave, as they were.
+    op.execute(
+        "ALTER TABLE inv.business_admin_grants "
+        "DROP CONSTRAINT IF EXISTS business_admin_grants_permission_allowed"
+    )
+    op.execute(
+        "ALTER TABLE inv.business_admin_grants ADD CONSTRAINT "
+        "business_admin_grants_permission_check "
+        "CHECK (permission IN ('users.manage','resources.manage'))"
+    )
+    op.execute(f"GRANT UPDATE, DELETE ON acceptance_records TO {APP_ROLE}")
+
+    op.drop_constraint(
+        "attested_acceptance_names_its_proposal", "acceptance_records", type_="check"
+    )
+    op.drop_constraint("attestation_version_allowed", "acceptance_records", type_="check")
+    op.drop_constraint("fk_acceptance_records_proposal", "acceptance_records", type_="foreignkey")
+    op.drop_column("acceptance_records", "proposal_id")
+    op.drop_column("acceptance_records", "attestation_version")
+    op.create_unique_constraint(
+        "uq_acceptance_records_release_criterion",
+        "acceptance_records",
+        ["release_id", "acceptance_id_ref"],
+    )
+
+    op.drop_constraint("policy_pin_version_positive", "release_manifests", type_="check")
+    op.drop_constraint("policy_pin_digest_is_lowercase", "release_manifests", type_="check")
+    op.drop_constraint("policy_pin_is_whole", "release_manifests", type_="check")
+    op.drop_column("release_manifests", "policy_registry_sha256")
+    op.drop_column("release_manifests", "policy_version")
+
+    # Slot first: it is the only table that references the others.
+    op.drop_table(SLOT_TABLE)
+    op.drop_table("release_acceptance_lifecycle_events")
+    op.drop_table("release_acceptance_withdrawals")
+    op.drop_table("release_acceptance_votes")
+    op.drop_table("release_acceptance_proposals")

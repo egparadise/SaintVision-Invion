@@ -182,7 +182,7 @@ def test_the_graph_has_one_head_and_it_is_this_revision():
     )
     assert head.returncode == 0, head.stderr
     # 0055 conformance records and the reversible 0056 cancel bridge sit above it.
-    assert head.stdout.strip() == "0056_kernel_cancel_audit_bridge"
+    assert head.stdout.strip() == "0057_release_acceptance_quorum"
 
 
 # ---------------------------------------------------------------- the kernel's SQL and the reader
@@ -259,7 +259,7 @@ def test_the_definer_policy_pins_exactly_this_revisions_reader():
     assert entry["definitionSHA256"] == M.reader_definition_sha256() == hashlib.sha256(M.reader_definition().encode()).hexdigest()
     assert entry["executeRoles"] == ["inv_app"] and entry["kind"] == "tenant-bound"
     # The policy revision follows the graph head; 0056 adds the cancel definer.
-    assert policy["revision"] == "0056_kernel_cancel_audit_bridge"
+    assert policy["revision"] == "0057_release_acceptance_quorum"
 
 
 def test_the_rendered_definition_follows_the_shape_postgresql_uses_for_0044():
