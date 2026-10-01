@@ -855,8 +855,16 @@ def test_an_acceptance_pinning_a_different_hash_is_not_sign_off(
     reads the hash from the release rather than taking it, so today the two
     always agree and ``manifestMatches`` is always true. The row stores its own
     copy anyway, and a reader that ignored it would call any future writer's
-    mismatch a sign-off -- so the comparison is defence, and this test creates
-    the state the only way it can be created: by writing the column directly.
+    mismatch a sign-off -- so the comparison is defence, and this test has to
+    create the state some other way.
+
+    It used to do that with ``UPDATE acceptance_records``. It cannot any more:
+    0057 revokes UPDATE and DELETE on that table from ``inv_app``, because a
+    recorded decision is withdrawn by appending a row and never edited (design
+    #282 §4-1). The construction is now an INSERT of a row that pins a different
+    composition, which is both a privilege the application legitimately holds and
+    a closer picture of the real thing -- a decision about a release as it stood,
+    kept after the release moved on.
     """
 
     other_hash = "b" * 64
@@ -867,26 +875,20 @@ def test_an_acceptance_pinning_a_different_hash_is_not_sign_off(
                     session, tenant_id=pilot["tenant_a"], user_id=pilot["user_id"]
                 )
                 assert release.manifest_sha256 != other_hash
-                acceptance = pilot_service.record_acceptance(
-                    session,
-                    tenant_id=pilot["tenant_a"],
-                    release_id=release.release_id,
-                    acceptance_criterion="AC-12",
-                    outcome="accepted",
-                    known_limitations=[],
-                    accepted_by_user_id=pilot["user_id"],
-                    now=NOW,
-                )
-                session.flush()
                 session.execute(
                     text(
-                        "UPDATE acceptance_records SET accepted_manifest_sha256=:h "
-                        "WHERE tenant_id=:t AND acceptance_id=:a"
+                        "INSERT INTO acceptance_records(acceptance_id,tenant_id,release_id,"
+                        "acceptance_id_ref,outcome,accepted_manifest_sha256,known_limitations,"
+                        "accepted_by_user_id,decided_at) "
+                        "VALUES(:a,:t,:r,'AC-12','accepted',:h,'[]'::jsonb,:u,:now)"
                     ),
                     {
-                        "h": other_hash,
+                        "a": new_id("acceptance"),
                         "t": pilot["tenant_a"],
-                        "a": acceptance.acceptance_id,
+                        "r": release.release_id,
+                        "h": other_hash,
+                        "u": pilot["user_id"],
+                        "now": NOW,
                     },
                 )
                 session.expire_all()
