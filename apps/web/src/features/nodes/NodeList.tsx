@@ -429,7 +429,7 @@ export const NodeList: React.FC<NodeListProps> = ({
                       fontWeight: 600,
                       borderRadius: 'var(--radius-sm)',
                       backgroundColor: node.observationOnly ? 'var(--color-border-strong)' : 'var(--color-brand-primary-bg)',
-                      color: '#ffffff',
+                      color: node.observationOnly ? 'var(--color-text-inverse)' : '#ffffff',
                       border: 'none',
                       cursor: 'pointer',
                     }}

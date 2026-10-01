@@ -29,9 +29,9 @@
     --color-status-neutral: #59677b;
 
     /* Risk Grades (L0~L3) */
-    --color-risk-l0: #047857; /* 조회·읽기 전용 */
-    --color-risk-l1: #2563eb; /* 격리 쓰기 */
-    --color-risk-l2: #b45309; /* 외부 영향 가능 */
+    --color-risk-l0: #065f46; /* 조회·읽기 전용 */
+    --color-risk-l1: #1d4ed8; /* 격리 쓰기 */
+    --color-risk-l2: #92400e; /* 외부 영향 가능 */
     --color-risk-l3: #b91c1c; /* 인프라·보안 경계 위험 */
 
     /* Spacing & Radius */
@@ -73,7 +73,7 @@
     --color-status-offline-bg: #dc2626;
     --color-status-neutral: #9ca3af;
 
-    --color-risk-l0: #10b981;
+    --color-risk-l0: #34d399;
     --color-risk-l1: #60a5fa;
     --color-risk-l2: #f59e0b;
     --color-risk-l3: #f87171;
