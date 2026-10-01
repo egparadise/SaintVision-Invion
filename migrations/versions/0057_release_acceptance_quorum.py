@@ -105,6 +105,41 @@ APPEND_ONLY = (
 SLOT_TABLE = "release_acceptance_slots"
 SLOT_UPDATE_COLUMNS = ("active_proposal_id", "active_acceptance_id", "updated_at")
 
+# ------------------------------------------------------------------------- convergence
+#: Everything this revision adds, as the questions "is it already there?" -- the same
+#: technique 0052-0056 use, and for the same reason: a test may rewind
+#: ``alembic_version`` to exercise one revision's downgrade in isolation and then upgrade
+#: to head again, so a revision that cannot be re-applied over its own objects breaks
+#: suites that have nothing to do with it. The backend lane found exactly that.
+_TABLE_PRESENT = (
+    "SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n "
+    "ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relname = '{}'"
+)
+_COLUMN_PRESENT = (
+    "SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' "
+    "AND table_name = '{}' AND column_name = '{}'"
+)
+
+
+def _objects(bind) -> dict[str, bool]:
+    """What of this revision is already in the database, by name."""
+    state: dict[str, bool] = {}
+    for table in (*APPEND_ONLY, SLOT_TABLE):
+        state[f"table {table}"] = bool(
+            bind.exec_driver_sql(_TABLE_PRESENT.format(table)).fetchall()
+        )
+    for table, column in (
+        ("acceptance_records", "attestation_version"),
+        ("acceptance_records", "proposal_id"),
+        ("release_manifests", "policy_version"),
+        ("release_manifests", "policy_registry_sha256"),
+    ):
+        state[f"column {table}.{column}"] = bool(
+            bind.exec_driver_sql(_COLUMN_PRESENT.format(table, column)).fetchall()
+        )
+    return state
+
+
 #: ``releases.accept`` is the new live permission. The grant-governance permission named
 #: in §4-1 is ``users.manage``, which §2-2 already assigns that role and which the CHECK
 #: already allows -- so this revision adds exactly one value and invents no new one.
@@ -112,6 +147,32 @@ PERMISSIONS = ("users.manage", "resources.manage", "releases.accept")
 
 
 def upgrade() -> None:
+    """Apply, or converge over an identical application, or refuse a partial one.
+
+    Offline rendering issues the DDL and asks nothing, like every other revision here.
+    Against a live database: nothing of this revision present means apply it; all of it
+    present means it is already applied and this returns; *some* of it present is a shape
+    nobody reviewed, and that is refused before any DDL rather than half-repaired.
+    """
+    context = op.get_context()
+    if context.as_sql:
+        _apply()
+        return
+    state = _objects(op.get_bind())
+    if not any(state.values()):
+        _apply()
+        return
+    absent = sorted(name for name, present in state.items() if not present)
+    if absent:
+        raise RuntimeError(
+            "0057_release_acceptance_quorum is partially applied "
+            f"(absent: {', '.join(absent)}); refusing to converge over a shape nobody "
+            "reviewed. Apply a reviewed forward fix instead."
+        )
+    return
+
+
+def _apply() -> None:
     op.create_table(
         "release_acceptance_proposals",
         sa.Column("proposal_id", INV_ID, primary_key=True),
@@ -746,7 +807,13 @@ def downgrade() -> None:
     operator's behalf which recorded decision to discard.
     """
     connection = op.get_bind()
+    state = _objects(connection)
     for statement, reason in _BLOCKING_COUNTS:
+        table = statement.split(" FROM ")[1].split()[0].strip("(")
+        if table.startswith("release_acceptance") and not state.get(f"table {table}", False):
+            # Not there to hold anything. A downgrade that queried it would fail on the
+            # missing relation instead of reporting what it protects.
+            continue
         if connection.execute(sa.text(statement)).scalar_one():
             raise RuntimeError(
                 "0057_release_acceptance_quorum cannot be reversed: "
@@ -772,31 +839,43 @@ def downgrade() -> None:
     )
     op.execute(f"GRANT UPDATE, DELETE ON acceptance_records TO {APP_ROLE}")
 
-    op.drop_constraint(
-        "attested_acceptance_names_its_proposal", "acceptance_records", type_="check"
+    # ``IF EXISTS`` throughout, so reversing a partially applied revision reports what it
+    # protects rather than failing on the first object that is not there.
+    for table, constraint in (
+        ("acceptance_records", "attested_acceptance_names_its_proposal"),
+        ("acceptance_records", "attestation_version_allowed"),
+        ("acceptance_records", "fk_acceptance_records_proposal"),
+        ("release_manifests", "policy_pin_version_positive"),
+        ("release_manifests", "policy_pin_digest_is_lowercase"),
+        ("release_manifests", "policy_pin_is_whole"),
+    ):
+        op.execute(f"ALTER TABLE {table} DROP CONSTRAINT IF EXISTS {constraint}")
+    for table, column in (
+        ("acceptance_records", "proposal_id"),
+        ("acceptance_records", "attestation_version"),
+        ("release_manifests", "policy_registry_sha256"),
+        ("release_manifests", "policy_version"),
+    ):
+        op.execute(f"ALTER TABLE {table} DROP COLUMN IF EXISTS {column}")
+    op.execute(
+        "ALTER TABLE acceptance_records DROP CONSTRAINT IF EXISTS "
+        "uq_acceptance_records_release_criterion"
     )
-    op.drop_constraint("attestation_version_allowed", "acceptance_records", type_="check")
-    op.drop_constraint("fk_acceptance_records_proposal", "acceptance_records", type_="foreignkey")
-    op.drop_column("acceptance_records", "proposal_id")
-    op.drop_column("acceptance_records", "attestation_version")
     op.create_unique_constraint(
         "uq_acceptance_records_release_criterion",
         "acceptance_records",
         ["release_id", "acceptance_id_ref"],
     )
 
-    op.drop_constraint("policy_pin_version_positive", "release_manifests", type_="check")
-    op.drop_constraint("policy_pin_digest_is_lowercase", "release_manifests", type_="check")
-    op.drop_constraint("policy_pin_is_whole", "release_manifests", type_="check")
-    op.drop_column("release_manifests", "policy_registry_sha256")
-    op.drop_column("release_manifests", "policy_version")
-
     # Slot first: it is the only table that references the others.
-    op.drop_table(SLOT_TABLE)
-    op.drop_table("release_acceptance_lifecycle_events")
-    op.drop_table("release_acceptance_withdrawals")
-    op.drop_table("release_acceptance_votes")
-    op.drop_table("release_acceptance_proposals")
+    for table in (
+        SLOT_TABLE,
+        "release_acceptance_lifecycle_events",
+        "release_acceptance_withdrawals",
+        "release_acceptance_votes",
+        "release_acceptance_proposals",
+    ):
+        op.execute(f"DROP TABLE IF EXISTS {table}")
 
     # The two functions last, because the policies that call them live on those tables and
     # go away with them. Dropping the actor function first failed with
