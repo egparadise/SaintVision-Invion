@@ -94,9 +94,12 @@ def test_only_signature_verified_claims_enter_the_access_identity(tmp_path):
 def test_tampered_signature_cannot_supply_fresh_auth_claims(tmp_path):
     identity = jwt_fixture(tmp_path, str(uuid4()))
     token = identity.token(claims={"auth_time": int(time.time()), "amr": ["mfa"]})
-    replacement = "A" if token[-1] != "A" else "B"
+    header, payload, signature = token.split(".")
+    offset = len(signature) // 2
+    replacement = "A" if signature[offset] != "A" else "B"
+    tampered_signature = signature[:offset] + replacement + signature[offset + 1 :]
     with pytest.raises(DomainError):
-        identity.auth.verify(token[:-1] + replacement)
+        identity.auth.verify(".".join((header, payload, tampered_signature)))
 
 
 def test_step_up_redirect_contract_is_exact_and_has_no_credential_fields():
