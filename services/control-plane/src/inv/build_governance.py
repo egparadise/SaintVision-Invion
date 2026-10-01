@@ -34,6 +34,8 @@ _AUDIT_ORDER = (
 
 @dataclass(frozen=True)
 class BuildProviderObservation:
+    """Measured builder state; the digest excludes the collection timestamp."""
+
     builder_instance_id: str
     builder_profile_id: str
     observation_digest: str
@@ -90,6 +92,7 @@ def _binding(
     *,
     policy_version: str,
     provider: BuildProviderObservation,
+    now: datetime,
 ) -> dict:
     expected = {
         "tenantId": request["tenantId"],
@@ -111,6 +114,16 @@ def _binding(
         or any(plan.get(field) != value for field, value in expected.items())
     ):
         raise DomainError("VERIFY-0002", "Build plan authority differs", 422)
+    lease_expires = _timestamp(plan["lease"]["expiresAt"])
+    policy_expires = _timestamp(decision["expiresAt"])
+    fencing_epoch = int(plan["lease"]["fencingToken"].rsplit(":", 1)[1])
+    if (
+        lease_expires <= now
+        or lease_expires > policy_expires
+        or (lease_expires - now).total_seconds() > request["timeoutSeconds"]
+        or fencing_epoch != provider.recovery_epoch
+    ):
+        raise DomainError("VERIFY-0002", "Build lease authority differs", 422)
     return {
         "requestDigest": expected["requestDigest"],
         "actionDigest": expected["actionDigest"],
@@ -159,6 +172,7 @@ def authorize_build(
         decision,
         policy_version=policy_version,
         provider=provider,
+        now=now,
     )
     return {**binding, "bindingDigest": action_digest(binding)}
 
@@ -211,6 +225,7 @@ def _build_evidence(
     run_id: str,
     evidence_id: str,
     actor_id: str,
+    now: datetime,
 ) -> dict:
     """Validate completion, cleanup and ordered audit before emitting Evidence."""
 
@@ -233,7 +248,8 @@ def _build_evidence(
     ):
         raise DomainError("VERIFY-0002", "Build receipt authority differs", 422)
     started, finished = _timestamp(receipt["startedAt"]), _timestamp(receipt["finishedAt"])
-    if finished < started:
+    cleanup_verified = _timestamp(receipt["cleanup"]["verifiedAt"])
+    if finished < started or finished > now or cleanup_verified > now:
         raise DomainError("VERIFY-0002", "Build receipt timestamp differs", 422)
 
     cleanup = receipt["cleanup"]
@@ -290,7 +306,7 @@ def _build_evidence(
         or by_name[terminal]["outputDigest"] != output_digest
         or by_name["cleanup_verified"]["timestamp"] != cleanup["verifiedAt"]
         or by_name["cleanup_verified"]["outputDigest"] != action_digest(cleanup)
-        or _timestamp(cleanup["verifiedAt"]) < finished
+        or cleanup_verified < finished
     ):
         raise DomainError("VERIFY-0002", "Build audit receipt differs", 422)
 
@@ -348,4 +364,5 @@ def finalize_build(
         run_id=run_id,
         evidence_id=evidence_id,
         actor_id=actor_id,
+        now=now,
     )

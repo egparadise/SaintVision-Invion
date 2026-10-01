@@ -349,6 +349,46 @@ def test_authorize_build_rejects_each_plan_authority_drift(field, value):
         _authorize(request=request, decision=decision, provider=provider, plan=plan)
 
 
+def test_authorize_build_rejects_expired_lease():
+    request = _request()
+    decision = _decision(request)
+    provider = _provider()
+    plan = _plan(request, decision, provider)
+    plan["lease"]["expiresAt"] = "2026-10-01T06:00:00Z"
+    with pytest.raises(DomainError, match="VERIFY-0002"):
+        _authorize(request=request, decision=decision, provider=provider, plan=plan)
+
+
+def test_authorize_build_rejects_lease_beyond_request_timeout():
+    request = _request()
+    request["timeoutSeconds"] = 240
+    decision = _decision(request)
+    provider = _provider()
+    plan = _plan(request, decision, provider)
+    with pytest.raises(DomainError, match="VERIFY-0002"):
+        _authorize(request=request, decision=decision, provider=provider, plan=plan)
+
+
+def test_authorize_build_rejects_lease_beyond_policy_expiry():
+    request = _request()
+    decision = _decision(request, expiresAt="2026-10-01T06:04:00Z")
+    provider = _provider()
+    plan = _plan(request, decision, provider)
+    plan["lease"]["expiresAt"] = "2026-10-01T06:05:00Z"
+    with pytest.raises(DomainError, match="VERIFY-0002"):
+        _authorize(request=request, decision=decision, provider=provider, plan=plan)
+
+
+def test_authorize_build_rejects_lease_fencing_epoch_drift():
+    request = _request()
+    decision = _decision(request)
+    provider = _provider()
+    plan = _plan(request, decision, provider)
+    plan["lease"]["fencingToken"] = "123e4567-e89b-12d3-a456-426614174000:8"
+    with pytest.raises(DomainError, match="VERIFY-0002"):
+        _authorize(request=request, decision=decision, provider=provider, plan=plan)
+
+
 def test_revalidate_build_repeats_live_containment_and_rejects_drift():
     request = _request()
     decision = _decision(request)
@@ -452,6 +492,20 @@ def test_non_success_receipt_requires_terminal_audit_and_quarantined_cache(resul
 def test_build_evidence_rejects_reverse_time():
     receipt = _receipt()
     receipt["finishedAt"] = "2026-10-01T05:59:59Z"
+    with pytest.raises(DomainError, match="VERIFY-0002"):
+        _evidence(receipt=receipt)
+
+
+@pytest.mark.parametrize("field", ["finishedAt", "cleanup.verifiedAt"])
+def test_build_evidence_rejects_future_completion_claim(field):
+    receipt = _receipt()
+    if field == "finishedAt":
+        receipt["finishedAt"] = "2026-10-01T06:01:03Z"
+        receipt["auditEvents"][5]["timestamp"] = receipt["finishedAt"]
+    else:
+        receipt["cleanup"]["verifiedAt"] = "2026-10-01T06:01:03Z"
+        receipt["auditEvents"][6]["timestamp"] = receipt["cleanup"]["verifiedAt"]
+        receipt["auditEvents"][6]["outputDigest"] = action_digest(receipt["cleanup"])
     with pytest.raises(DomainError, match="VERIFY-0002"):
         _evidence(receipt=receipt)
 
