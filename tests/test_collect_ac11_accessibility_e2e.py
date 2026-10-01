@@ -278,8 +278,8 @@ def test_junit_preserves_each_failed_metric(tmp_path: Path, inputs):
 
 
 def test_target_pin_and_criteria_are_literal_and_complete():
-    assert tool.TARGET_COMMIT == "4b6d4fab2925bb422f1deb6db2794fac0ccaa54f"
-    assert tool.TARGET_BLOB == "30bc37df03e1568f4af126843ab1fefb71b23de0"
+    assert tool.TARGET_COMMIT == "94970b00b263bd833b08f967d4ab51c1abcf0aec"
+    assert tool.TARGET_BLOB == "d3869f371f64fb8b76e2d5223583543e5e35092c"
     assert set(tool.CRITERIA) == {
         "canonicalJourneyFailureCount",
         "desktopInvariantFailureCount",

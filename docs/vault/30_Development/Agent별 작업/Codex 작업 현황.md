@@ -1,15 +1,34 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.255"
+version: "1.0.256"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T22:14:13+09:00"
+updated: "2026-10-02T05:40:06+09:00"
 source_of_truth: "Git"
-active_card: "CARD-190 S12 acceptance target/Evidence canonical resolver contract"
-active_card_status: "Claude r1 F1-F9 and r2 Low five resolved in design/contract v1.1.1; implementation remains NOT_OBSERVED"
-active_card_next: "Confirm exact-head Backend and Claude final review; implement reserved migration 0058 only in the next Claude card"
+active_card: "CARD-205 AC-11 accessibility user-device manual acceptance importer"
+active_card_status: "strict session schema, exact-SHA artifact importer, canonical fresh-auth binding, AC-11 registry target and aggregator path implemented; review pending"
+active_card_next: "Push PR, request Claude independent review, and hand the exact manifest replacement row to #299/#300 owners"
 ---
+
+## 2026-10-02 Card 205 — AC-11 사용자 기기 접근성 수동 인수 importer
+
+- train 13 후보 `9d9389a1`에서 #300이 확인한 `manualAcceptanceMissingCount=1` 상수와
+  same-SHA importer 부재를 외부 장비 없이 닫을 수 있는 AC-11 선행 카드로 선택했다.
+- 결과보다 먼저 strict session schema·6개 scenario·v1 target을 `94970b00`에 고정하고,
+  canonical registry에 `s11-accessibility-user-device-v1`을 등록했다. 기존 hosted-only target을
+  소급 변경하지 않는다.
+- importer는 GitHub run/head/artifact digest·만료·exact ZIP member를 검증한다. 수동 기록이
+  있으면 token을 stdin에서만 읽고 `inv.identity.AccessTokens`와 canonical
+  `has_fresh_interactive_auth`로 사람·300초 freshness·AMR를 확인한 뒤, token 없이 해시된
+  provenance receipt만 Evidence에 남긴다. 서비스 계정·pwd 단독·다른 SHA는 fail closed다.
+- 수동 기록 부재·시나리오 FAIL은 계속 `manualAcceptanceMissingCount=1`; exact SHA·exact six·
+  all PASS·fresh human 결속에서만 0이다. 이 축은 사용자 전체 인수·AC-11 done·점수 승격을
+  주장하지 않는다.
+- `docs/ac11-axis-sources-accessibility-patch-v1.json`에 #299 manifest의 exact replacement row를
+  고정했다. 사용자 실행 절차는 [[AC-11_사용자_기기_접근성_수동_인수_절차]]다.
+- PG-free focused **157 passed**. `py_compile`·CLI help·`check_docs`·citation ratchet(새 결함 0)·
+  contract bindings는 모두 exit 0이다.
 
 ## 2026-10-01 Card 190 — S12 수락 target·Evidence 정본 resolver 계약
 

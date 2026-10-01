@@ -32,7 +32,7 @@ DEFAULT_ALLOWLIST = (
     ROOT / ALLOWLIST_REPO_PATH
 )
 TARGET_REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
-TARGET_REGISTRY_BLOB = "be99a506efecdb2ff29cf4e7a96a8772f5524473"
+TARGET_REGISTRY_BLOB = "a645b8e8f5985a5cdf8eb66511ffb55c65bc1493"
 ALLOWLIST_BLOB = "ff2f9966956da677ebcdee92ec1de2292bd5ec52"
 ALLOWLIST_CANONICAL_SHA256 = "b73aba8ff97443bbd1e314d5ca0375fdcbce8205a1a746bc5a73759a04083707"
 SCAN_ALLOWLIST_REPO_PATH = (
@@ -69,6 +69,7 @@ REQUIRED_AXES = (
 REQUIRED_TARGET_BY_AXIS = {
     "actual-pitr-rpo-rto-retention": "s11-st-actual-pitr-archive-failure-v0",
     "long-soak": "s11-ac11-composite-long-soak-v0",
+    "accessibility-e2e": "s11-accessibility-user-device-v1",
 }
 
 SHA1_RE = re.compile(r"^[0-9a-f]{40}$")

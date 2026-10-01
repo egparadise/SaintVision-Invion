@@ -1,8 +1,9 @@
 """Collect fail-closed AC-11 accessibility/E2E evidence from hosted browser runs.
 
-This producer binds two existing real-browser reports to one clean source tree.  It
-does not claim user acceptance: until a separately reviewed same-SHA manual
-keyboard/screen-reader importer exists, the completeness metric remains failed.
+This producer binds two existing real-browser reports to one clean source tree. It
+does not accept manual input on its CLI. The separately reviewed importer may bind a
+strict same-SHA user-device session after fresh-auth verification; otherwise the
+completeness metric remains failed.
 """
 
 from __future__ import annotations
@@ -20,12 +21,12 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SCHEMA_VERSION = "1.1.0"
+SCHEMA_VERSION = "1.2.0"
 RUN_PURPOSE = "s11-ac11-accessibility-e2e-hosted"
 AXIS = "accessibility-e2e"
-TARGET_COMMIT = "4b6d4fab2925bb422f1deb6db2794fac0ccaa54f"
-TARGET_PATH = "docs/vault/30_Development/S11_AC11_accessibility_e2e_hosted_target_v0.md"
-TARGET_BLOB = "30bc37df03e1568f4af126843ab1fefb71b23de0"
+TARGET_COMMIT = "94970b00b263bd833b08f967d4ab51c1abcf0aec"
+TARGET_PATH = "docs/vault/30_Development/S11_AC11_accessibility_user_device_target_v1.md"
+TARGET_BLOB = "d3869f371f64fb8b76e2d5223583543e5e35092c"
 SHA1_RE = re.compile(r"^[0-9a-f]{40}$")
 RUN_ID_RE = re.compile(r"^[0-9]+$")
 EXPECTED_JOURNEYS = {
@@ -271,6 +272,43 @@ def _observation(metric: str, n: int, failures: int, error: str) -> dict[str, An
         "value": failures,
         "errorsByClass": {error: failures} if failures else {},
     }
+
+
+def bind_verified_manual_acceptance(
+    report: dict[str, Any], manual_acceptance: dict[str, Any]
+) -> dict[str, Any]:
+    """Attach an importer-verified manual session without exposing a CLI bypass."""
+
+    if manual_acceptance.get("sourceHeadSha") != report.get("sourceHeadSha"):
+        raise AccessibilityEvidenceError("manual acceptance source SHA differs from hosted evidence")
+    receipt = manual_acceptance.get("performerReceipt")
+    if not isinstance(receipt, dict) or receipt.get("binding") != "oidc-fresh-auth-v1":
+        raise AccessibilityEvidenceError("manual acceptance lacks verified human binding")
+    scenarios = manual_acceptance.get("scenarios")
+    if not isinstance(scenarios, list) or not scenarios:
+        raise AccessibilityEvidenceError("manual acceptance scenarios are absent")
+    passed = manual_acceptance.get("overallResult") == "PASS" and all(
+        isinstance(row, dict) and row.get("result") == "PASS" for row in scenarios
+    )
+    bound = json.loads(json.dumps(report))
+    observations = bound["payload"]["observations"]
+    matches = [row for row in observations if row.get("metric") == "manualAcceptanceMissingCount"]
+    if len(matches) != 1:
+        raise AccessibilityEvidenceError("hosted report manual completeness metric is malformed")
+    replacement = _observation(
+        "manualAcceptanceMissingCount", 1, 0 if passed else 1, "manual-acceptance-failed"
+    )
+    observations[observations.index(matches[0])] = replacement
+    bound["payload"]["manualAcceptance"] = manual_acceptance
+    bound["payloadSha256"] = canonical_sha256(bound["payload"])
+    bound["verdict"] = (
+        "MEASURED_FAIL" if any(row["failureCount"] for row in observations) else "MEASURED_PASS"
+    )
+    bound["limitation"] = (
+        "hosted automatic measurement plus exact-SHA user-device acceptance; "
+        "this axis is not whole-release acceptance"
+    )
+    return bound
 
 
 def build_report(
