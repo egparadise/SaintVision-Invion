@@ -1,12 +1,12 @@
 ---
 doc_id: "DESIGN-S12-BE-RELEASE-MANIFEST-READ-20261001"
 title: "S12-BE release manifest 읽기 route와 서명·수락 쓰기 경계 — operatorSignOff는 외래키로 증명되지 않아 계약에서 false로 고정하고, 사람 확인 수와 원시 수락 수를 두 필드로 분리했다(코디네이터 결정), 쓰기는 Codex 계약 요청 (카드 182, r3)"
-version: "1.2.0"
+version: "1.3.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-01T20:08:58+09:00"
+updated: "2026-10-01T20:30:20+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "7e670d77"
@@ -40,7 +40,7 @@ tags: ["s12", "release-manifest", "acceptance", "route", "read-only", "security-
 | 필드 | 값 | 뜻 |
 |---|---|---|
 | `operatorSignOff` | **`Literal[False]`** | 이 읽기 표면은 참을 **낼 수 없다**. docstring의 약속이 아니라 **계약**이 거부한다 |
-| `operatorSignOffBlockedBy` | `"human-attestation-implementation-unavailable"` | 왜 거짓인지. **`#282`로 계약은 존재하므로** 없는 것은 그 계약의 **구현**이고, 값이 둘 중 어느 쪽인지 말한다 |
+| `operatorSignOffBlockedBy` | `"release-acceptance-prerequisites-unavailable"` | 왜 거짓인지. 카드 187의 코드만으로는 부족하며, 검증된 fresh-auth/step-up 공급과 authoritative target/Evidence resolver가 모두 결속돼야 한다. 어느 하나라도 없으면 이 값이다 |
 | `requiredDistinctOperatorCount` | **`Literal[2]`** | 쓰기 계약(`#282`, 카드 184)의 정족수 |
 | `confirmedOperatorCount` | **`Literal[0]`** | **사람 확인(`#282`의 human attestation)된 서로 다른 운영자 수.** 그 구현이 없으므로 이 표면에서는 0 고정이다. "수락이 없다"가 아니라 "여기 어떤 결정도 사람에게 귀속되지 않았다"는 뜻이다 |
 | `matchingAcceptedUserCount` | 정수(≥0) | **원시 기록**: 해시가 맞는 `accepted` 행의 서로 다른 사용자 id 수. 서비스 주체가 그중 하나일 수 있고, **그래서 이름이 다른 필드**다 |

@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-S12-BE-RELEASE-ACCEPTANCE-WRITE-20261001"
 title: "S12-BE release 수락·operator sign-off 쓰기 보안 계약 — 설계·strict schema"
-version: "1.2.3"
+version: "1.3.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-01T20:13:44+09:00"
+updated: "2026-10-01T20:30:20+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "3ff89b84"
@@ -117,6 +117,21 @@ validator에만 숨어 있지 않게 했다.
 - `python tools/check_docs.py` → **exit 0**, `check_doc_path_citations --ratchet` → **exit 0**
   (기존 baseline 290, 신규·stale 위반 0), `git diff --check` → **exit 0**.
 - real PG·route·migration 시험은 구현 범위가 아니므로 실행하지 않았다.
+
+## 카드 187 구현 질문 판정
+
+- read blocker를 `release-acceptance-prerequisites-unavailable`로 넓혔다. attestation 코드만이 아니라
+  verified fresh-auth/portal step-up과 authoritative target/Evidence resolver까지 모두 있어야 해제된다.
+- `evidenceSha256`을 기존 `input_sha256`에 결속하지 않았다. canonical Evidence envelope digest가
+  없으므로 별도 resolver 계약 전에는 모든 decision write를 enable하지 않는다.
+- permission은 `releases.accept`만 추가하고 grant governance는 기존 `users.manage` 두 사람을 쓴다.
+- 카드 187은 policy registry만 만들며 target/Evidence registry는 별도 카드로 남긴다.
+- route는 기본 off인 `INV_RELEASE_ACCEPTANCE_WRITE_ENABLED` 아래 등록한다. off/prerequisite 부재는
+  `SYS-0003/503/retryable=false`, enable 뒤 caller의 fresh-auth 부재는 `AUTH-0030/403`, resolver
+  digest drift는 `GRAPH-0003/409`다. migration 번호는 승인된 `0057`이다.
+- v1.3 focused 계약·읽기 route 시험은 기본 Pydantic과 2.13.5에서 각각 **68 passed**다.
+  schema export **93/93**, contract bindings·docs·citation ratchet·diff check는 모두 exit 0이다.
+  `tests/test_pilot.py`는 로컬 DSN 부재로 **46 skipped**였으며 실 PG 성공으로 세지 않았다.
 
 ## 다음
 

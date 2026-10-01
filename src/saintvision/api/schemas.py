@@ -1867,9 +1867,11 @@ class ReleaseManifestResponse(Strict):
     operator_sign_off: Literal[False] = Field(alias="operatorSignOff")
     #: Why it is false, in the response, so a reader is not left to guess whether
     #: the answer is "nobody signed" or "this surface cannot tell". The contract
-    #: for human attestation now exists (``#282``); what is missing is its
-    #: implementation, and the value says which of the two it is.
-    operator_sign_off_blocked_by: Literal["human-attestation-implementation-unavailable"] = Field(
+    #: for human attestation now exists (``#282``), but the verified fresh-auth
+    #: supply and authoritative target/Evidence resolvers do not.  The literal
+    #: names that wider prerequisite boundary rather than claiming that code
+    #: alone can make this release operator-signed.
+    operator_sign_off_blocked_by: Literal["release-acceptance-prerequisites-unavailable"] = Field(
         alias="operatorSignOffBlockedBy"
     )
     #: The quorum the write contract requires. A constant here so a reader sees

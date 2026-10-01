@@ -1,18 +1,22 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.251"
+version: "1.0.252"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T20:13:44+09:00"
+updated: "2026-10-01T20:30:20+09:00"
 source_of_truth: "Git"
 active_card: "CARD-184 S12 release acceptance/operator sign-off write contract"
-active_card_status: "Claude r3 conditions reflected: #280 head 79fcb772 merged at fec2169c; read/write field semantics align; exact-head Backend pending"
-active_card_next: "Exact-head Backend 3.12/3.14 green and Claude final confirmation; implementation remains blocked until IdP step-up, migration and authoritative registries land together"
+active_card_status: "Card 187 implementation questions resolved and locally gated: focused 68 passed on Pydantic default/2.13.5; schema 93/93 and docs/bindings/citations exit 0"
+active_card_next: "Push exact head and confirm Backend 3.12/3.14 green; implementation remains disabled until fresh-auth and authoritative resolvers land"
 ---
 
 ## 2026-10-01 Card 184 — S12 release 수락·operator sign-off 쓰기 계약
 
+- 카드 187의 구현 질문 5건을 설계 v1.3으로 판정했다. blocker는
+  `release-acceptance-prerequisites-unavailable`, Evidence `input_sha256` fallback은 금지,
+  permission은 `releases.accept` 하나, target/Evidence resolver는 별도 카드, route는 기본 off와
+  `SYS-0003/503/retryable=false`로 고정했다. 승인 migration 번호는 `0057`이다.
 - #280 최종 head `79fcb772`를 merge `fec2169c`로 따라갔다. 읽기 route는
   `confirmedOperatorCount=0`, raw `matchingAcceptedUserCount`, implementation-unavailable blocker를
   실제 계약·서비스·시험에 적용했고 #282의 proposal/decision 이름과 충돌하지 않는다. 합친 focused

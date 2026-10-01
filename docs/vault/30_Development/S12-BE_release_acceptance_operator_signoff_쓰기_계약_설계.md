@@ -1,12 +1,12 @@
 ---
 doc_id: "DESIGN-S12-BE-RELEASE-ACCEPTANCE-WRITE-20261001"
 title: "S12-BE release 수락·operator sign-off 쓰기 보안 계약 설계"
-version: "1.2.3"
+version: "1.3.0"
 status: "proposed"
 author: "Codex"
 reviewer: "Claude"
 audience: "agent"
-updated: "2026-10-01T20:13:44+09:00"
+updated: "2026-10-01T20:30:20+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "3ff89b84"
@@ -44,13 +44,45 @@ release 범위 `confirmedOperatorCount`는 현재 manifest와 required criterion
 client-credentials 주체는 세지 않는다. `operatorSignOff`는 비어 있지 않은 policy registry의
 모든 required criterion이 유효한 `decisionSignOff=true`일 때만 true다. 이 정의의 owner는
 #282다. #280 head `79fcb772`는 attestation 구현 전 `confirmedOperatorCount=0`,
-`operatorSignOff=false`, `operatorSignOffBlockedBy=human-attestation-implementation-unavailable`
+`operatorSignOff=false`로 냈고, 카드 187 구현 시작 시점의 실제 공백을 다시 대조한 결과 blocker는
+`operatorSignOffBlockedBy=release-acceptance-prerequisites-unavailable`
 로 내고, legacy accepted 행과 manifest hash만 맞는 raw 사용자 수를 별도
 `matchingAcceptedUserCount`로 표시한다. 이 release 집계는 proposal 투표 수가 아니며
 #282의 `proposalConfirmationCount`·`decisionConfirmationCount`·`decisionSignOff`와 이름과
 범위를 분리한다. 구현 카드는 아래 attestation·
 quorum·withdrawal projection이 한 transaction 경계로 모두 착지한 뒤에만 blocker literal을
 제거하고 true variant를 공개한다.
+
+### 0-1. 카드 187 구현 해석 결정
+
+구현 owner가 2026-10-01 20:21 KST에 측정한 fresh-auth 공급·target/Evidence resolver 공백을
+계약 owner가 다음처럼 하나로 고정한다.
+
+1. release 읽기의 blocker literal은 **`release-acceptance-prerequisites-unavailable`**이다.
+   proposal·vote·projection 코드의 존재만으로 수락 경계가 준비됐다고 할 수 없다. 검증된
+   `auth_time`·`amr` 공급과 portal step-up, authoritative target/Evidence resolver 중 하나라도
+   없으면 이 값을 유지한다.
+2. `measurementRefs[].evidenceSha256`을 `evidence_envelopes.input_sha256`과 비교하지 않는다.
+   전자는 immutable Evidence envelope identity이고 후자는 collector 입력 identity라 의미가 다르다.
+   canonical envelope digest 열·규칙이 아직 없으므로 authoritative resolver는 별도 계약 카드로
+   만들며, 그 전에는 모든 decision write를 enable하지 않는다. caller의 ID·hash만 비교하는
+   fallback도 없다.
+3. `business_admin_grants.permission`에 추가하는 값은 **`releases.accept` 하나**다. grant의
+   제안·확정 권한은 기존 **`users.manage`**를 그대로 쓰며 `grants.manage` 같은 새 permission은
+   만들지 않는다.
+4. 카드 187은 `release-acceptance-policy-registry-v1.json`만 만든다. target registry와 Evidence
+   canonical digest resolver는 별도 카드다. 두 authoritative resolver가 모두 결속되기 전에는
+   decision write 전체가 fail closed다.
+5. route는 strict body·인가·오류 계약을 시험할 수 있도록 **등록**하되
+   `INV_RELEASE_ACCEPTANCE_WRITE_ENABLED=false`가 기본값이다. off이거나 위 prerequisite가 하나라도
+   없으면 **`SYS-0003` / HTTP 503 / `retryable=false`**와 고정 detail
+   `Release acceptance prerequisites are unavailable.`을 반환한다. 운영자 설정·배포가 필요한
+   상태이므로 재시도로 회복한다고 주장하지 않는다. feature를 켠 뒤 개별 요청의 fresh-auth가
+   부족한 경우만 기존 `AUTH-0030/403`이고, ref가 authoritative resolver와 다르면
+   `GRAPH-0003/409`다.
+
+`0057`은 coordinator가 승인한 구현 migration 번호다. 위 prerequisite gate는 idempotency ledger
+획득보다 먼저 평가하며, off 응답은 receipt를 만들거나 proposal·audit row를 남기지 않는다.
 
 ## 1. 현재 코드 경계와 필요한 변경
 
@@ -303,7 +335,8 @@ proposal digest는 그 고정값을 함께 결속한다.
 | 조건 | code / HTTP / retryable |
 |---|---|
 | token 부재·무효·만료 | `AUTH-0050` / 401 / false |
-| fresh interactive auth 부재, user 비활성, 권한 없음 | `AUTH-0030` / 403 / false |
+| route off 또는 fresh-auth 공급·target/Evidence resolver prerequisite 부재 | `SYS-0003` / 503 / false |
+| enabled route에서 fresh interactive auth 부재, user 비활성, 권한 없음 | `AUTH-0030` / 403 / false |
 | 같은 사람 confirm, distinct quorum 없음 | `AUTH-0033` / 403 / false |
 | 다른 tenant·부재 release/proposal/acceptance | `RES-0004` / 404 / false |
 | malformed JSON·unknown key·schema 위반 | `VAL-0003` / 422 / false |
@@ -381,6 +414,9 @@ nonaccepted sign-off true를 각각 독립 시험이 죽여야 한다.
 - 현재 OIDC principal에는 fresh-auth metadata가 없으므로 이 설계만으로 사람 인증이
   측정됐다고 주장하지 않는다.
 - target/Evidence authoritative registry가 결속되기 전에는 accepted route를 enable하지 않는다.
+- `input_sha256`은 Evidence envelope digest가 아니다. authoritative target registry와 canonical
+  Evidence digest resolver가 모두 결속되기 전에는 conditional/rejected를 포함한 decision write
+  전체를 enable하지 않는다.
 - Keycloak access-token `auth_time`·`amr` mapper와 portal step-up 흐름이 exact claim fixture로
   검증되기 전에는 모든 write route를 enable하지 않는다.
 - 기존 #280 read route는 withdrawal/quorum/required-criterion-aware projection으로 교체하고
