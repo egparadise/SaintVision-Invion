@@ -32,6 +32,8 @@ from saintvision.api.v1 import release_manifests as route  # noqa: E402
 from saintvision.config import Settings  # noqa: E402
 from saintvision.errors import RES_RELEASE_NOT_FOUND, InvError  # noqa: E402
 from saintvision.identity.principal import Principal, StaticPrincipalVerifier  # noqa: E402
+from saintvision.api import schemas  # noqa: E402
+from saintvision.services import pilot as pilot_service  # noqa: E402
 
 TENANT = uuid.UUID("22222222-2222-2222-2222-222222222222")
 AUTH = {"Authorization": "Bearer release-token"}
@@ -51,6 +53,9 @@ MANIFEST = {
     ],
     "createdAt": NOW,
     "operatorSignOff": False,
+    "operatorSignOffBlockedBy": "human-attestation-contract-absent",
+    "requiredDistinctOperatorCount": 2,
+    "confirmedOperatorCount": 0,
     "acceptanceCount": 0,
 }
 
@@ -132,12 +137,13 @@ def test_an_accepted_decision_is_reported_with_its_pinned_hash(client, monkeypat
     _detail(
         monkeypatch,
         {
-            "release": {**MANIFEST, "operatorSignOff": True, "acceptanceCount": 1},
+            "release": {**MANIFEST, "confirmedOperatorCount": 1, "acceptanceCount": 1},
             "acceptances": [acceptance],
         },
     )
     body = client.get(f"/v1/release-manifests/{RELEASE_ID}", headers=AUTH).json()
-    assert body["release"]["operatorSignOff"] is True
+    assert body["release"]["operatorSignOff"] is False
+    assert body["release"]["confirmedOperatorCount"] == 1
     assert set(body["acceptances"][0]) == set(acceptance)
     assert "acceptedByUserId" not in body["acceptances"][0]
     assert "notes" not in body["acceptances"][0]
@@ -240,3 +246,57 @@ def test_the_router_serves_exactly_the_two_documented_paths():
         "/v1" + route.DETAIL_PATH,
     ]
     assert all(set(r.methods) == {"GET"} for r in route.router.routes)
+
+
+def test_the_contract_itself_refuses_an_operator_sign_off_of_true(client, monkeypatch):
+    """Not "the reader happens to send false" -- the model cannot serialise true.
+
+    ``operatorSignOff`` is ``Literal[False]``. A future change that computed the
+    field again and got it wrong would fail here at validation rather than
+    reaching a screen, which is the difference between a pinned contract and a
+    docstring promising one.
+    """
+    import pydantic
+
+    with pytest.raises(pydantic.ValidationError):
+        schemas.ReleaseManifestResponse.model_validate({**MANIFEST, "operatorSignOff": True})
+
+
+def test_the_blocked_reason_is_a_fixed_value(client, monkeypatch):
+    import pydantic
+
+    with pytest.raises(pydantic.ValidationError):
+        schemas.ReleaseManifestResponse.model_validate(
+            {**MANIFEST, "operatorSignOffBlockedBy": "whatever"}
+        )
+
+
+def test_the_required_quorum_is_two_and_cannot_be_lowered_in_the_response(client, monkeypatch):
+    """Lowering the target is the other way to make "1 of 2" read as satisfied."""
+    import pydantic
+
+    with pytest.raises(pydantic.ValidationError):
+        schemas.ReleaseManifestResponse.model_validate(
+            {**MANIFEST, "requiredDistinctOperatorCount": 1}
+        )
+
+
+@pytest.mark.parametrize(
+    "builder",
+    [
+        lambda: pilot_service.release_page_query(tenant_id=TENANT),
+        lambda: pilot_service.release_page_query(tenant_id=TENANT, cursor=RELEASE_ID),
+        lambda: pilot_service.release_detail_query(tenant_id=TENANT, release_id=RELEASE_ID),
+        lambda: pilot_service.acceptances_query(tenant_id=TENANT, release_ids=[RELEASE_ID]),
+    ],
+)
+def test_every_read_names_the_tenant_in_its_sql(builder):
+    """The explicit predicate, asserted where row-level security cannot hide it.
+
+    Deleting a ``tenant_id ==`` condition left the cross-tenant test green,
+    because RLS refused the row and the assertion that was meant to catch the
+    deletion never fired -- Codex measured that. Compiling the statement tests the
+    layer itself: the predicate is either in the SQL or it is not.
+    """
+    sql = " ".join(str(builder().compile(compile_kwargs={"literal_binds": False})).split())
+    assert "tenant_id =" in sql, sql

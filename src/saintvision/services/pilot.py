@@ -642,27 +642,42 @@ def _release_components(manifest: ReleaseManifest) -> list[dict]:
     return components
 
 
-def operator_sign_off(manifest: ReleaseManifest, acceptances: list[AcceptanceRecord]) -> bool:
-    """Has a person accepted *this* composition?
+#: The quorum the write contract (``#282``, card 184) requires before a sign-off
+#: exists at all. Named here so this reader reports "1 of 2" instead of a count
+#: whose target lives only in a design document.
+REQUIRED_DISTINCT_OPERATOR_COUNT = 2
 
-    True only when an ``accepted`` decision pins the same manifest hash. The
-    three ways this stays false are each a real distinction:
+#: Why ``operatorSignOff`` is false on every row this module produces. One value,
+#: in the response, so a reader is never left deciding whether "false" means
+#: nobody signed or this surface cannot tell.
+OPERATOR_SIGN_OFF_BLOCKED_BY = "human-attestation-contract-absent"
 
-    * no acceptance row at all -- nobody has looked;
-    * ``conditional`` or ``rejected`` -- somebody looked and did not sign off;
-    * ``accepted`` with a different ``accepted_manifest_sha256`` -- somebody
-      signed off on a differently-composed release of the same name, which is
-      the failure the pinned hash exists to catch.
 
-    The system cannot make this true by itself: ``accepted_by_user_id`` is a
-    foreign key to ``users``, so every row this reads was written for a person.
+def confirmed_operator_count(
+    manifest: ReleaseManifest, acceptances: list[AcceptanceRecord]
+) -> int:
+    """How many **distinct** users have an ``accepted`` row pinning this composition.
+
+    A recorded fact and deliberately not an attestation. The first version of
+    this module had a function called ``operator_sign_off`` that returned true
+    from exactly this condition, reasoning that ``accepted_by_user_id`` is a
+    foreign key to ``users`` and therefore "the system cannot sign its own
+    acceptance". **Codex measured that and it is false**: ``users`` does not
+    distinguish a person from a service, a Principal is built from any
+    ``external_subject``, and the key proves only that the referenced row exists.
+    An ``external_subject`` of ``svc:release-bot`` produced a true sign-off.
+
+    So this counts, and nothing here calls the count a signature. Distinct users
+    rather than rows, because the write contract's quorum is two *operators* and
+    one operator deciding twice is one operator.
     """
 
-    return any(
-        record.outcome == "accepted"
-        and str(record.accepted_manifest_sha256) == str(manifest.manifest_sha256)
+    return len({
+        str(record.accepted_by_user_id)
         for record in acceptances
-    )
+        if record.outcome == "accepted"
+        and str(record.accepted_manifest_sha256) == str(manifest.manifest_sha256)
+    })
 
 
 def _acceptance_payload(record: AcceptanceRecord, manifest: ReleaseManifest) -> dict:
@@ -680,6 +695,13 @@ def _acceptance_payload(record: AcceptanceRecord, manifest: ReleaseManifest) -> 
 
 
 def _manifest_payload(manifest: ReleaseManifest, acceptances: list[AcceptanceRecord]) -> dict:
+    """The recorded release. ``operatorSignOff`` is the literal ``False``.
+
+    Not a computation that currently evaluates false -- the literal. There is no
+    input to this function that can change it, which is the point: a reader of
+    the code should not have to work out whether some row could flip it.
+    """
+
     return {
         "releaseId": manifest.release_id,
         "version": manifest.version,
@@ -687,9 +709,54 @@ def _manifest_payload(manifest: ReleaseManifest, acceptances: list[AcceptanceRec
         "manifestSha256": manifest.manifest_sha256,
         "components": _release_components(manifest),
         "createdAt": manifest.created_at,
-        "operatorSignOff": operator_sign_off(manifest, acceptances),
+        "operatorSignOff": False,
+        "operatorSignOffBlockedBy": OPERATOR_SIGN_OFF_BLOCKED_BY,
+        "requiredDistinctOperatorCount": REQUIRED_DISTINCT_OPERATOR_COUNT,
+        "confirmedOperatorCount": confirmed_operator_count(manifest, acceptances),
         "acceptanceCount": len(acceptances),
     }
+
+
+#: The three reads below are built by named functions rather than inline, so a test
+#: can compile each one and assert the tenant predicate is in the SQL.
+#:
+#: Why that matters: row-level security also restricts these tables, so deleting an
+#: explicit ``tenant_id ==`` condition leaves the cross-tenant test passing -- RLS
+#: catches it and the assertion that was supposed to catch it never fires. Codex
+#: measured exactly that. Defence in depth is worth having, but a layer no test can
+#: see is a layer that can be deleted by accident, and then only RLS stands between a
+#: bug and a cross-tenant read. Compiling the statement tests the layer itself.
+
+
+def release_page_query(*, tenant_id, cursor: str | None = None, limit: int = 50):
+    """The page read. Named so its SQL can be compiled and asserted."""
+
+    query = select(ReleaseManifest).where(ReleaseManifest.tenant_id == tenant_id)
+    if cursor:
+        query = query.where(ReleaseManifest.release_id < cursor)
+    return query.order_by(ReleaseManifest.release_id.desc()).limit(limit)
+
+
+def release_detail_query(*, tenant_id, release_id: str):
+    """The single-release read. Named for the same reason."""
+
+    return select(ReleaseManifest).where(
+        ReleaseManifest.tenant_id == tenant_id,
+        ReleaseManifest.release_id == release_id,
+    )
+
+
+def acceptances_query(*, tenant_id, release_ids: list[str]):
+    """The acceptance read. Named for the same reason."""
+
+    return (
+        select(AcceptanceRecord)
+        .where(
+            AcceptanceRecord.tenant_id == tenant_id,
+            AcceptanceRecord.release_id.in_(release_ids),
+        )
+        .order_by(AcceptanceRecord.decided_at, AcceptanceRecord.acceptance_id)
+    )
 
 
 def _acceptances_for(session: Session, *, tenant_id, release_ids: list[str]) -> dict[str, list]:
@@ -703,12 +770,7 @@ def _acceptances_for(session: Session, *, tenant_id, release_ids: list[str]) -> 
     if not release_ids:
         return {}
     rows = session.scalars(
-        select(AcceptanceRecord)
-        .where(
-            AcceptanceRecord.tenant_id == tenant_id,
-            AcceptanceRecord.release_id.in_(release_ids),
-        )
-        .order_by(AcceptanceRecord.decided_at, AcceptanceRecord.acceptance_id)
+        acceptances_query(tenant_id=tenant_id, release_ids=release_ids)
     ).all()
     grouped: dict[str, list] = {release_id: [] for release_id in release_ids}
     for row in rows:
@@ -732,11 +794,8 @@ def release_manifest_page(
     """
 
     bounded = max(1, min(int(limit), RELEASE_PAGE_MAX))
-    query = select(ReleaseManifest).where(ReleaseManifest.tenant_id == tenant_id)
-    if cursor:
-        query = query.where(ReleaseManifest.release_id < cursor)
     manifests = session.scalars(
-        query.order_by(ReleaseManifest.release_id.desc()).limit(bounded + 1)
+        release_page_query(tenant_id=tenant_id, cursor=cursor, limit=bounded + 1)
     ).all()
     page = list(manifests[:bounded])
     acceptances = _acceptances_for(
@@ -760,10 +819,7 @@ def release_manifest_detail(session: Session, *, tenant_id, release_id: str) -> 
     """
 
     manifest = session.scalars(
-        select(ReleaseManifest).where(
-            ReleaseManifest.tenant_id == tenant_id,
-            ReleaseManifest.release_id == release_id,
-        )
+        release_detail_query(tenant_id=tenant_id, release_id=release_id)
     ).first()
     if manifest is None:
         raise InvError(RES_RELEASE_NOT_FOUND, "release manifest not found", status=404)

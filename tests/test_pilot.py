@@ -787,27 +787,30 @@ def test_a_release_without_any_acceptance_keeps_operator_sign_off_false(
                 )
     assert detail["acceptances"] == []
     assert detail["release"]["operatorSignOff"] is False
+    assert detail["release"]["operatorSignOffBlockedBy"] == "human-attestation-contract-absent"
+    assert detail["release"]["confirmedOperatorCount"] == 0
     assert detail["release"]["acceptanceCount"] == 0
     assert detail["release"]["componentCount"] == len(_components())
 
 
 @pytest.mark.parametrize(
-    "outcome,limitations,expected",
+    "outcome,limitations,confirmed",
     [
-        ("accepted", [], True),
-        ("conditional", ["browser acceptance not observed"], False),
-        ("rejected", [], False),
+        ("accepted", [], 1),
+        ("conditional", ["browser acceptance not observed"], 0),
+        ("rejected", [], 0),
     ],
 )
-def test_only_an_accepted_decision_grants_operator_sign_off(
-    app_sessionmaker, pilot, outcome, limitations, expected
+def test_only_an_accepted_decision_is_counted_and_none_of_them_sign_off(
+    app_sessionmaker, pilot, outcome, limitations, confirmed
 ):
-    """``conditional`` is not a yes.
+    """``conditional`` is not counted, and ``accepted`` is counted but is not sign-off.
 
     The table already refuses a conditional acceptance with an empty limitation
-    list -- a hedge has to say what it is hedging. The reader has to agree with
-    that: treating conditional as sign-off would discard the distinction the
-    constraint exists to keep.
+    list -- a hedge has to say what it is hedging -- so the reader counts only
+    ``accepted``. What it does **not** do is call that count a signature: this
+    test asserted ``operatorSignOff is True`` for the accepted case until Codex
+    showed a service principal could produce it.
     """
 
     with app_sessionmaker() as session:
@@ -831,7 +834,9 @@ def test_only_an_accepted_decision_grants_operator_sign_off(
                     tenant_id=pilot["tenant_a"],
                     release_id=release.release_id,
                 )
-    assert detail["release"]["operatorSignOff"] is expected
+    assert detail["release"]["operatorSignOff"] is False
+    assert detail["release"]["confirmedOperatorCount"] == confirmed
+    assert detail["release"]["requiredDistinctOperatorCount"] == 2
     assert detail["release"]["acceptanceCount"] == 1
     assert detail["acceptances"][0]["outcome"] == outcome
     assert detail["acceptances"][0]["manifestMatches"] is True
@@ -887,6 +892,7 @@ def test_an_acceptance_pinning_a_different_hash_is_not_sign_off(
                     release_id=release.release_id,
                 )
     assert detail["release"]["operatorSignOff"] is False
+    assert detail["release"]["confirmedOperatorCount"] == 0
     assert detail["acceptances"][0]["manifestMatches"] is False
 
 
@@ -940,6 +946,9 @@ def test_the_reader_never_returns_the_accepting_person_or_the_notes(
         "components",
         "createdAt",
         "operatorSignOff",
+        "operatorSignOffBlockedBy",
+        "requiredDistinctOperatorCount",
+        "confirmedOperatorCount",
         "acceptanceCount",
     }
 
@@ -1006,3 +1015,94 @@ def test_the_page_is_bounded_and_the_cursor_walks_to_the_end(app_sessionmaker, p
     assert second["nextCursor"] is None
     seen = [row["releaseId"] for row in first["items"] + second["items"]]
     assert len(set(seen)) == 3
+
+
+def test_a_service_principal_cannot_produce_operator_sign_off(app_sessionmaker, pilot):
+    """The finding Codex measured, pinned so it cannot come back.
+
+    ``users`` draws no line between a person and a service: a Principal is built
+    from any ``external_subject``, and ``accepted_by_user_id`` being a foreign key
+    proves only that the referenced row exists. So a subject of
+    ``svc:release-bot`` can write an ``accepted`` row with a matching hash -- and
+    the reader must still answer false, because it cannot tell that decision from
+    a person's.
+
+    What it may report is the count, which is the recorded fact. One is not two,
+    and the quorum is in the response beside it.
+    """
+
+    service_user = new_id("user")
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, pilot["tenant_a"]):
+                session.execute(
+                    text(
+                        "INSERT INTO users(tenant_id,user_id,external_subject,"
+                        "display_name,status) VALUES(:t,:u,:s,:n,'active')"
+                    ),
+                    {
+                        "t": pilot["tenant_a"],
+                        "u": service_user,
+                        # Nothing in the schema marks this as a service account.
+                        # That absence is the finding.
+                        "s": "svc:release-bot",
+                        "n": "release bot",
+                    },
+                )
+                release = _release(
+                    session, tenant_id=pilot["tenant_a"], user_id=pilot["user_id"]
+                )
+                pilot_service.record_acceptance(
+                    session,
+                    tenant_id=pilot["tenant_a"],
+                    release_id=release.release_id,
+                    acceptance_criterion="AC-12",
+                    outcome="accepted",
+                    known_limitations=[],
+                    accepted_by_user_id=service_user,
+                    now=NOW,
+                )
+                detail = pilot_service.release_manifest_detail(
+                    session,
+                    tenant_id=pilot["tenant_a"],
+                    release_id=release.release_id,
+                )
+    assert detail["release"]["operatorSignOff"] is False
+    assert detail["release"]["operatorSignOffBlockedBy"] == "human-attestation-contract-absent"
+    assert detail["release"]["confirmedOperatorCount"] == 1
+    assert detail["release"]["requiredDistinctOperatorCount"] == 2
+
+
+def test_one_operator_deciding_twice_is_one_operator(app_sessionmaker, pilot):
+    """The count is of distinct users, because the quorum is two *operators*.
+
+    Two rows are possible under different criteria -- the unique constraint is on
+    (release, criterion) -- so counting rows would let one account reach the
+    quorum by itself.
+    """
+
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, pilot["tenant_a"]):
+                release = _release(
+                    session, tenant_id=pilot["tenant_a"], user_id=pilot["user_id"]
+                )
+                for criterion in ("AC-12", "AC-13"):
+                    pilot_service.record_acceptance(
+                        session,
+                        tenant_id=pilot["tenant_a"],
+                        release_id=release.release_id,
+                        acceptance_criterion=criterion,
+                        outcome="accepted",
+                        known_limitations=[],
+                        accepted_by_user_id=pilot["user_id"],
+                        now=NOW,
+                    )
+                detail = pilot_service.release_manifest_detail(
+                    session,
+                    tenant_id=pilot["tenant_a"],
+                    release_id=release.release_id,
+                )
+    assert detail["release"]["acceptanceCount"] == 2
+    assert detail["release"]["confirmedOperatorCount"] == 1
+    assert detail["release"]["operatorSignOff"] is False
