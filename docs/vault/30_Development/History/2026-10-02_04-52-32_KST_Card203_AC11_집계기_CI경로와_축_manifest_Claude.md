@@ -148,7 +148,27 @@ gh run list --workflow ac11-aggregate.yml --limit 5   --json databaseId,headSha,
 
 ### 5-5. 실측 — 새 lane을 exact head에서 한 번 dispatch했다
 
-@@DISPATCH@@
+**먼저 측정된 것은 실패였다.** `workflow_dispatch` 전용이고 한 번도 돈 적 없는 workflow는 GitHub의 workflow index에 없어서
+
+```
+HTTP 404: workflow ac11-aggregate.yml not found on the default branch
+```
+
+로 거부된다. `ac11-security-scan.yml`도 `main`에 없지만 dispatch가 되는 이유는 **label PR trigger로 이미 등록돼 있기** 때문이다. 그래서 같은 모양을 더했다 — `pull_request: [labeled, synchronize, reopened]`에 `run-ac11-aggregate` label gate, PR event에서는 그 PR의 head SHA를 쓴다. **`push` trigger는 여전히 없으므로 §5-4의 역래칫 판단은 그대로다.**
+
+그 뒤 label을 붙여 **실제로 돌렸다**.
+
+| | |
+|---|---|
+| run | **[36921447095](https://github.com/egparadise/SaintVision-Invion/actions/runs/36921447095)** (`pull_request`, head `9b26dbf9`) |
+| lane 결과 | **success** — 열세 step 전부 success |
+| 집계기 | **exit 2**, `verdict: INVALID_RUN`, `done: False` |
+| 조립 보고 | `assembledAxes: []`, `aggregationWillBeInvalid: true`, **8축 전부 사유와 함께 이름이 적혔다** |
+| artifact | `s11-ac11-aggregate-9b26dbf9f56da9819c9c43308036be2cb71d8853` (manifest·조립 보고·집계 결과) |
+
+**이것이 0/8이 왜 0/8인지를 도구가 말한 첫 기록이다.** 그 run의 로그에 여덟 줄이 그대로 남는다 — migration 두 축은 "이 SHA에서 rehearsal을 dispatch하고 importer를 돌려라", security는 "importer가 axis envelope을 내지 않는다", long-soak은 "workflow가 없다", accessibility는 "importer가 없다", 나머지 셋은 `G-22`·`G-19/24`·`G-21/24`.
+
+lane이 **success**인 것은 의도된 것이다 — 집계기의 exit 0·1·2는 모두 **답**이고, lane의 실패는 집계기가 돌지 못한 경우뿐이다.
 
 ### 5-6. 검증
 
