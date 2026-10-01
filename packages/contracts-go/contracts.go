@@ -169,12 +169,93 @@ type BuildPlan struct {
     ResolvedBaseImageDigests []string `json:"resolvedBaseImageDigests"`
 }
 
+type BuildDaemonIdentity struct {
+    Pid int64 `json:"pid"`
+    ProcessUid int64 `json:"processUid"`
+    ProcessStartTicks int64 `json:"processStartTicks"`
+    Comm string `json:"comm"`
+}
+
+type BuildIsolationObservation struct {
+    UserNamespace bool `json:"userNamespace"`
+    SeccompMode string `json:"seccompMode"`
+    Lsm string `json:"lsm"`
+    NoNewPrivileges bool `json:"noNewPrivileges"`
+    CgroupMode string `json:"cgroupMode"`
+}
+
+type BuildHealthFieldSources struct {
+    DaemonIdentity string `json:"daemonIdentity"`
+    RuntimeIdentity string `json:"runtimeIdentity"`
+    Rootless string `json:"rootless"`
+    Privileged string `json:"privileged"`
+    HostAccess string `json:"hostAccess"`
+    Entitlements string `json:"entitlements"`
+    Devices string `json:"devices"`
+    Binds string `json:"binds"`
+    UserNamespace string `json:"userNamespace"`
+    SeccompMode string `json:"seccompMode"`
+    Lsm string `json:"lsm"`
+    NoNewPrivileges string `json:"noNewPrivileges"`
+    CgroupMode string `json:"cgroupMode"`
+}
+
+type BuildProviderHealthReceipt struct {
+    SchemaVersion string `json:"schemaVersion"`
+    WriterKind string `json:"writerKind"`
+    NodeId NodeId `json:"nodeId"`
+    BuilderInstanceId string `json:"builderInstanceId"`
+    BuilderProfileId string `json:"builderProfileId"`
+    RecoveryEpoch int64 `json:"recoveryEpoch"`
+    ObservedAt Timestamp `json:"observedAt"`
+    RuntimeIdentity string `json:"runtimeIdentity"`
+    DaemonIdentity BuildDaemonIdentity `json:"daemonIdentity"`
+    Rootless bool `json:"rootless"`
+    Privileged bool `json:"privileged"`
+    HostAccess bool `json:"hostAccess"`
+    Entitlements []string `json:"entitlements"`
+    Devices []string `json:"devices"`
+    Binds []string `json:"binds"`
+    BuildkitVersion string `json:"buildkitVersion"`
+    RootlesskitVersion string `json:"rootlesskitVersion"`
+    Isolation BuildIsolationObservation `json:"isolation"`
+    FieldSources BuildHealthFieldSources `json:"fieldSources"`
+}
+
+type BuildPhysicalCleanupReceipt struct {
+    SchemaVersion string `json:"schemaVersion"`
+    WriterKind string `json:"writerKind"`
+    BuildSessionId string `json:"buildSessionId"`
+    NodeId NodeId `json:"nodeId"`
+    ResourceId ResourceId `json:"resourceId"`
+    LeaseId LeaseId `json:"leaseId"`
+    RecoveryEpoch int64 `json:"recoveryEpoch"`
+    DaemonIdentity BuildDaemonIdentity `json:"daemonIdentity"`
+    StopResult string `json:"stopResult"`
+    PartialExportDisposition *string `json:"partialExportDisposition"`
+    CacheDisposition string `json:"cacheDisposition"`
+    BuilderClaimReleased bool `json:"builderClaimReleased"`
+    CgroupRemoved bool `json:"cgroupRemoved"`
+    VerifiedAt Timestamp `json:"verifiedAt"`
+}
+
 type BuildCleanupReceipt struct {
     LeaseReleased bool `json:"leaseReleased"`
     BuilderClaimReleased bool `json:"builderClaimReleased"`
     CgroupRemoved bool `json:"cgroupRemoved"`
     CacheDisposition string `json:"cacheDisposition"`
     VerifiedAt Timestamp `json:"verifiedAt"`
+    PhysicalReceipt BuildPhysicalCleanupReceipt `json:"physicalReceipt"`
+    PhysicalReceiptDigest string `json:"physicalReceiptDigest"`
+}
+
+type BuildDispatchCompletedPayload struct {
+    DecisionId string `json:"decisionId"`
+    BindingDigest string `json:"bindingDigest"`
+    ResourceId ResourceId `json:"resourceId"`
+    LeaseId LeaseId `json:"leaseId"`
+    EvidenceId EvidenceId `json:"evidenceId"`
+    EvidenceDigest string `json:"evidenceDigest"`
 }
 
 type BuildAuditEvent struct {
