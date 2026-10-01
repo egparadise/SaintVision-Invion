@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "release-acceptance-target-registry:1",
+  "registryId": "release-acceptance-targets-v1",
+  "registryVersion": 1,
+  "owner": "S12-BE",
+  "canonicalization": "saintvision-canonical-json-v1",
+  "targets": [
+    {
+      "targetId": "AC-12.release-acceptance-v1",
+      "targetVersion": 1,
+      "acceptanceIdRef": "AC-12",
+      "owner": "S12-BE",
+      "source": {
+        "repository": "egparadise/SaintVision-Invion",
+        "commitSha": "b96068b6d009cf2d9ea677b9801749a1e6efd9d0",
+        "path": "docs/vault/30_Development/Sprints/S12 파일럿.md",
+        "blobSha": "0606c0dc2a1adb90636bf1461deba37541726caa"
+      },
+      "criteria": [
+        {
+          "criterionId": "five-node-journey-recorded",
+          "statement": "The five-node development, deployment, and recovery journey is recorded."
+        },
+        {
+          "criterionId": "quantitative-targets-recorded",
+          "statement": "Pre-registered quantitative targets and their measured results are recorded."
+        },
+        {
+          "criterionId": "known-limitations-recorded",
+          "statement": "Known limitations and every unmeasured external prerequisite are recorded."
+        },
+        {
+          "criterionId": "human-acceptance-recorded",
+          "statement": "Fresh, distinct human operator acceptance is recorded against the exact release manifest."
+        }
+      ],
+      "targetSha256": "d57198451ef2b1784cd61c04c70d9092a285565b633853b2ec57ef18d25eee9d"
+    }
+  ]
+}

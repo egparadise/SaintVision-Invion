@@ -96,13 +96,14 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({
       {/* Observation-Only Alert Callout */}
       {node.observationOnly && (
         <div
+          data-testid="node-detail-observation-callout"
           style={{
             marginBottom: '20px',
             padding: '16px 20px',
             backgroundColor: 'rgba(210, 153, 34, 0.12)',
             borderRadius: 'var(--radius-lg)',
-            border: '1px solid #d29922',
-            color: '#d29922',
+            border: '1px solid var(--color-status-unknown)',
+            color: 'var(--color-status-unknown)',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, fontSize: '0.9375rem' }}>
@@ -186,8 +187,8 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({
             padding: '16px 20px',
             backgroundColor: 'rgba(248, 81, 73, 0.1)',
             borderRadius: 'var(--radius-md)',
-            border: '1px solid #f85149',
-            color: '#f85149',
+            border: '1px solid var(--color-status-lost)',
+            color: 'var(--color-status-lost)',
             fontSize: '0.875rem',
           }}
         >
@@ -370,18 +371,25 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({
               </div>
             </div>
             <div
+              data-testid="node-detail-schedulable-box"
               style={{
                 padding: '10px',
-                backgroundColor: node.observationOnly ? 'rgba(210, 153, 34, 0.15)' : 'rgba(46, 160, 67, 0.15)',
-                border: `1px solid ${node.observationOnly ? '#d29922' : '#2ea043'}`,
+                backgroundColor: node.observationOnly ? 'rgba(210, 153, 34, 0.15)' : 'var(--color-bg-subtle)',
+                border: `1px solid ${node.observationOnly ? 'var(--color-status-unknown)' : 'var(--color-status-online)'}`,
                 borderRadius: 'var(--radius-sm)',
                 fontSize: '0.75rem',
               }}
             >
-              <div style={{ color: node.observationOnly ? '#d29922' : '#3fb950', marginBottom: '2px', fontWeight: 600 }}>
+              <div
+                data-testid="node-detail-schedulable-label"
+                style={{ color: node.observationOnly ? 'var(--color-status-unknown)' : 'var(--color-status-online)', marginBottom: '2px', fontWeight: 600 }}
+              >
                 예약 가능량 (Schedulable)
               </div>
-              <div style={{ fontWeight: 800, fontSize: '0.875rem', color: node.observationOnly ? '#d29922' : (node.allocatableCores !== undefined ? '#3fb950' : 'var(--color-text-muted)') }}>
+              <div
+                data-testid="node-detail-schedulable-value"
+                style={{ fontWeight: 800, fontSize: '0.875rem', color: node.observationOnly ? 'var(--color-status-unknown)' : (node.allocatableCores !== undefined ? 'var(--color-status-online)' : 'var(--color-text-muted)') }}
+              >
                 {node.observationOnly
                   ? '0C (차단)'
                   : node.allocatableCores !== undefined && node.allocatableMemoryBytes !== undefined
@@ -414,8 +422,10 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({
           <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontFamily: 'monospace', display: 'flex', flexDirection: 'column', gap: '4px' }}>
             <div>
               [{node.heartbeatAt ? new Date(node.heartbeatAt).toLocaleTimeString() : '미기록'}]{' '}
-              <span style={{
-                color: node.status === 'online' ? '#3fb950' : node.status === 'active' ? '#38bdf8' : node.status === 'degraded' || node.status === 'unknown' ? '#d29922' : '#f85149',
+              <span
+                data-testid="node-detail-timeline-status"
+                style={{
+                color: node.status === 'online' ? '#3fb950' : node.status === 'active' ? 'var(--color-status-active)' : node.status === 'degraded' ? 'var(--color-status-degraded)' : node.status === 'unknown' ? 'var(--color-status-unknown)' : 'var(--color-status-lost)',
                 fontWeight: 600
               }}>
                 {node.status === 'online'

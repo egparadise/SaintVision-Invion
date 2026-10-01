@@ -218,3 +218,26 @@ Codex 계약 축 r2 권고에 따라 #280에서 다음과 같이 계약이 정�
 4. **UI 화면 반영**:
    - 릴리스 선택기: `{version} ({releaseId}) - 미서명 (사람 확인 {confirmedOperatorCount}/{requiredDistinctOperatorCount} · 해시 일치 {matchingAcceptedUserCount}건)`
    - 3-A 섹션 운영자 정족수: `사람 확인 {confirmedOperatorCount} / {requiredDistinctOperatorCount} (서명 아님)` 및 `해시 일치 수락 기록 {matchingAcceptedUserCount}건 (사람 확인 아님)` 분리 표출.
+
+---
+
+## 11. #282 최종 릴리스 수락 계약(b96068b6) 머지 및 차단 사유 동기화 (Train 9 착지 차단 해제)
+
+Codex #282(`agent/codex/c184-s12-acceptance-contract` commit `b96068b6`)에서 릴리스 수락 전제 조건 확장에 따라 `operatorSignOffBlockedBy` 상수가 정정되었으며, 이를 merge로 안전하게 결속하여 Train 9 착지 차단을 해제함:
+
+1. **머지 및 계약 스키마 정합**:
+   - `origin/agent/codex/c184-s12-acceptance-contract` (`b96068b6`) 머지 완료 (no force push).
+   - `operatorSignOffBlockedBy` 상수가 `'human-attestation-implementation-unavailable'`에서 `'release-acceptance-prerequisites-unavailable'`로 3개 스키마(`release-manifest-response.schema.json`, `release-manifest-detail-response.schema.json`, `release-manifest-page-response.schema.json`)에서 갱신됨.
+   - `node apps/web/scripts/api-response-contracts.mjs --write` 실행하여 40개 API 응답 TypeScript 타입 재생성 (`npm run contracts:check` 40/40 PASS).
+
+2. **Strict 런타임 가드 갱신 (`releaseObservation.ts`)**:
+   - `isValidReleaseManifest`: `m.operatorSignOffBlockedBy !== 'release-acceptance-prerequisites-unavailable'` 엄격 검증.
+   - 구버전 `'human-attestation-implementation-unavailable'` 또는 알 수 없는 사유 반환 시 즉시 fail-closed 처리되어 `ContractViolationError`(`CONTRACT-VIOLATION`) 투척.
+
+3. **UI 화면 표출 갱신 (`IntranetDeploymentView.tsx`)**:
+   - 서명 차단 사유 표출 문구를 `미서명 — 릴리스 수락 전제 조건 미충족 (<code>{serverManifestDetail.release.operatorSignOffBlockedBy}</code>)`으로 갱신.
+
+4. **단위 및 계약 위반 검증 시험 갱신 (`s12-release-manifest-server-binding.test.tsx`)**:
+   - 픽스처 및 단언의 `operatorSignOffBlockedBy`를 `'release-acceptance-prerequisites-unavailable'`로 정비.
+   - 레거시 사유 `'human-attestation-implementation-unavailable'` 반환 시 fail-closed되어 `data-testid="deployment-manifest-error-contract"` UI 경고가 렌더링됨을 입증하는 사살 시험 추가 (`it('displays dedicated contract violation error when server returns legacy operatorSignOffBlockedBy="human-attestation-implementation-unavailable"')`).
+   - 총 22개 단위 시험 100% 통과 (636ms).

@@ -70,6 +70,7 @@ const contracts = [
   { schema: 'release-manifest-page-response', output: 'release-manifest-page-response' },
   { schema: 'release-acceptance-response', output: 'release-acceptance-response' },
   { schema: 'release-component-response', output: 'release-component-response' },
+  { schema: 'fresh-authentication-step-up-request', output: 'fresh-authentication-step-up-request' },
 ];
 const mode = process.argv[2];
 
