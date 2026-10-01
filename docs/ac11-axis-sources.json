@@ -51,16 +51,18 @@
   },
   {
    "axis": "accessibility-e2e",
-   "chain": "incomplete",
+   "chain": "complete",
    "workflow": ".github/workflows/ac11-accessibility-e2e.yml",
    "producer": "tools/collect_ac11_accessibility_e2e.py",
-   "importer": null,
-   "importerArchiveFlag": null,
+   "importer": "tools/import_ac11_accessibility_evidence.py",
+   "importerArchiveFlag": "--archive",
    "artifactNamePrefix": "s11-ac11-accessibility-",
    "envelopeMember": "s11-ac11-accessibility-e2e.json",
-   "importerEmitsAxes": [],
-   "reason": "The producer and the workflow exist and a run uploads the envelope, but no importer binds that envelope to its GitHub run and artifact digest -- and the aggregator requires artifactSha256, artifactObservedSha256, artifactAvailable and artifactExpiresAt, which a producer cannot put inside the artifact whose digest they describe. So this axis has evidence and no admissible envelope. Writing an importer for it is a follow-up card; it is not a judgement about the axis definition.",
-   "envelopeShape": null
+   "importerEmitsAxes": [
+    "accessibility-e2e"
+   ],
+   "reason": null,
+   "envelopeShape": "axis-evidence"
   },
   {
    "axis": "long-soak",
