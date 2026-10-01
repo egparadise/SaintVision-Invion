@@ -1,5 +1,5 @@
 {
- "version": "1.3.1",
+ "version": "1.4.0",
  "source": "ROADMAP-VIRTUAL-COMPUTER-001@1.0.0",
  "track": "VF-CL",
  "owner": "Claude",
@@ -82,7 +82,7 @@
    ],
    "implemented": true,
    "locallyVerified": true,
-   "ciVerified": false,
+   "ciVerified": true,
    "independentlyReviewed": false,
    "operationallyAccepted": false,
    "blockers": [
@@ -124,7 +124,7 @@
     {
      "what": "tests/integration/test_recovery_drill.py",
      "condition": "19 of 20 cases need a CX01 container on this host -- 17 for CX01_CONTAINER and 2 for the archiver image, which is that container's image. This workstation has no CX01 container and local docker is off by memory constraint.",
-     "measuredIn": "hosted Core run 36521298082 at 6fc0428b (step 'Require executed CX01 recovery evidence'): 0 skips, 20 passed",
+     "measuredIn": "hosted Core run 36886647197 at 25f43a25 (step 'Require executed CX01 recovery evidence'): 0 skips, 20 passed. Re-measured at this registry's tree; the first measurement was run 36521298082 at 6fc0428b and a claim about a tree has to be shown at that tree.",
      "note": "Filed as a blocker in registry 1.2.0 and in the restatedBlockers note. That was wrong twice over: first it waited for merged PR #126, then it waited for inputs hosted CI already supplies. A gap in my own measurement is not a gap in the work.",
      "blockerIdsThisReplaces": [
       "restore-drill-19-setup-skips-in-hosted-core-until-pr-126",
@@ -132,7 +132,20 @@
      ]
     }
    ],
-   "ciVerifiedNote": "The restore drill itself IS ci-verified at 6fc0428b (run 36521298082). This stays false for the rest of the card: no workflow runs tools/collect_s12_acceptance_evidence.py, so the named acceptance observations pitr-configuration-possible and pitr-rehearsal-dry-run-observed are produced by hand and CI never re-derives them. The tools' unit tests do run in Core; the gate that turns them into acceptance does not."
+   "ciVerifiedNote": "Re-derived at 25f43a25 and now true. The reason this was false -- no workflow runs tools/collect_s12_acceptance_evidence.py -- stopped being true when .github/workflows/s12-acceptance-evidence.yml landed with #283: CI derives the bundle, holds it to its shape and to the head it was derived at, and uploads it. The restore drill stays ci-verified by core.yml's owned CX01 steps, now at this tree. What is still NOT ci-verified is anything beyond this card: no workflow aggregates the AC-11 axes, and operational acceptance needs a real restore on real hardware.",
+   "ciVerifiedRun": {
+    "runId": "36851875128",
+    "workflow": "S12 Acceptance Evidence",
+    "headSha": "40b3ec78ba63731dd94dcfdeb2d757381aee8a3b",
+    "conclusion": "success",
+    "steps": [
+     "Derive the AC-12 acceptance items: success",
+     "Hold the bundle to its shape and to this head: success",
+     "Record that the two named observations were derived here: success",
+     "Upload the acceptance evidence: success"
+    ],
+    "why": "The dispatch at #283's final head, which is an ancestor of this registry's verifiedAgainst.tree. The gate step is what makes it evidence rather than a green tick: check_s12_acceptance_shape.py re-derives the verdict and the seventeen item sources from the collector and refuses a bundle whose codeSha is not the head the run checked out, so a fabricated PASS cannot pass it."
+   }
   },
   {
    "id": "VF-CL-05",
@@ -153,13 +166,13 @@
   }
  ],
  "verifiedAgainst": {
-  "tree": "6fc0428b",
-  "ref": "origin/integration/all-agents-unified",
-  "note": "Implementation-side claims re-verified by reading the landed tree; review-side booleans and their blockers are the reviewer's and were not touched.",
+  "tree": "25f43a25",
+  "ref": "coord/train11-ci-0047",
+  "note": "Implementation-side claims re-verified by reading the landed tree; review-side booleans and their blockers are the reviewer's and were not touched. The tree moved from 6fc0428b to the train 11 candidate 25f43a25, and the hosted run moved with it: a claim about a tree has to be shown at that tree.",
   "hostedRun": {
-   "runId": "36521298082",
+   "runId": "36886647197",
    "workflow": "Core Build",
-   "headSha": "6fc0428b49f28379cb4da17830d92256b55c2eb2",
+   "headSha": "25f43a25a999568c70ecccbf5881dbc2d11f3b5e",
    "conclusion": "success",
    "steps": [
     "Create disposable CX01 PostgreSQL: success",

@@ -85,6 +85,11 @@ def manifest(**overrides):
         "cards": {
             "VF-CL-0X": {
                 "impliesImplemented": True,
+                # Rule 7 asserts nothing by default, so the tests that are about other
+                # rules stay about them. The tests that are about rule 7 opt in below.
+                "impliesCiVerified": None,
+                "whyCiVerified": "the fixture lane runs a directory, so the tree cannot say it",
+                "ciVerifiedChecks": [],
                 "forbiddenBlockers": [RETIRED],
                 "checks": [{"kind": "path-exists", "path": "src/route.py"}],
                 "closedBlockers": {
@@ -557,19 +562,27 @@ def test_a_local_gap_that_names_where_it_is_measured_is_accepted(tmp_path):
 
 
 def test_the_shipped_registry_records_the_hosted_run_that_closed_the_drill():
-    """The correction has to carry the evidence, not just drop the blocker."""
+    """The correction has to carry the evidence, not just drop the blocker.
+
+    The run id is no longer written here. It was, and then the registry's tree moved and
+    this test still passed while the recorded run described a different tree -- so the
+    assertion is now the relationship rather than the value: the run that backs a claim
+    about ``verifiedAgainst.tree`` has to be a run **at** that tree, and the local gap has
+    to point at the same run it says the work is measured in.
+    """
     document = json.loads(
         (checker.DEFAULT_REGISTRY).read_text(encoding="utf-8")
     )
     hosted = document["verifiedAgainst"]["hostedRun"]
-    assert hosted["runId"] == "36521298082"
-    assert hosted["headSha"].startswith("6fc0428b")
+    tree = document["verifiedAgainst"]["tree"]
+    assert hosted["runId"].isdigit()
+    assert hosted["headSha"].startswith(tree), (hosted["headSha"], tree)
     assert hosted["conclusion"] == "success"
     four = next(card for card in document["cards"] if card["id"] == "VF-CL-04")
     assert not [b for b in four["blockers"] if "restore-drill" in b]
     gap = next(entry for entry in four["localUnmeasured"]
                if entry["what"].endswith("test_recovery_drill.py"))
-    assert "36521298082" in gap["measuredIn"]
+    assert hosted["runId"] in gap["measuredIn"]
     assert "collect_s12_acceptance_evidence.py" in four["ciVerifiedNote"]
 
 
@@ -790,3 +803,182 @@ def test_every_job_that_collects_this_check_has_the_history_it_needs(workflow, j
     checkout = section.index("uses: actions/checkout@v4")
     setup = section.index("uses: actions/setup-python@v5")
     assert "fetch-depth: 0" in section[checkout:setup], section[checkout:setup]
+
+
+# --- rule 7: the tree decides ciVerified too ------------------------------------------
+
+
+def ci_asserting(manifest_document, implies=True):
+    """The fixture manifest, asserting ciVerified over a file the tiny tree has."""
+    entry = manifest_document["cards"]["VF-CL-0X"]
+    entry["impliesCiVerified"] = implies
+    entry["ciVerifiedChecks"] = [{"kind": "path-exists", "path": "src/route.py"}]
+    entry.pop("whyCiVerified", None)
+    return manifest_document
+
+
+def ci_run(**overrides):
+    run = {
+        "runId": "36851875128",
+        "workflow": "S12 Acceptance Evidence",
+        "headSha": "40b3ec78ba63731dd94dcfdeb2d757381aee8a3b",
+        "conclusion": "success",
+        "steps": ["Derive the AC-12 acceptance items: success"],
+    }
+    run.update(overrides)
+    return run
+
+
+def test_a_ci_verified_claim_the_tree_contradicts_is_reported(tmp_path):
+    """The drift this rule exists for, in the direction it actually happened.
+
+    ``VF-CL-04`` said ``ciVerified: false`` with a note whose reason -- no workflow runs
+    the collector -- had stopped being true. Nothing in the file could fault it, because
+    nothing compared that field to anything.
+    """
+    document = registry(tmp_path)
+    document["cards"][0]["ciVerified"] = False
+    document["cards"][0]["ciVerifiedRun"] = ci_run()
+    findings = audit(document, tmp_path, ci_asserting(manifest()))
+    assert any("the tree shows ciVerified=True but the registry says False" in finding
+               for finding in findings), findings
+
+
+def test_a_ci_verified_claim_the_tree_supports_is_accepted(tmp_path):
+    document = registry(tmp_path)
+    document["cards"][0]["ciVerifiedRun"] = ci_run()
+    assert audit(document, tmp_path, ci_asserting(manifest())) == []
+
+
+def test_a_premature_ci_verified_is_reported(tmp_path):
+    """The other direction: the flag up while the tree shows the lane is not there."""
+    document = registry(tmp_path)
+    manifest_document = ci_asserting(manifest(), implies=False)
+    findings = audit(document, tmp_path, manifest_document)
+    assert any("the tree shows ciVerified=False but the registry says True" in finding
+               for finding in findings), findings
+
+
+def test_a_ci_verified_assertion_that_stopped_holding_is_reported(tmp_path):
+    document = registry(tmp_path)
+    document["cards"][0]["ciVerifiedRun"] = ci_run()
+    manifest_document = ci_asserting(manifest())
+    manifest_document["cards"]["VF-CL-0X"]["ciVerifiedChecks"] = [
+        {"kind": "path-exists", "path": "src/workflow-that-went-away.yml"}
+    ]
+    findings = audit(document, tmp_path, manifest_document)
+    assert any("ciVerified assertion no longer holds in the tree" in finding
+               for finding in findings), findings
+
+
+def test_a_derived_ci_verified_must_name_the_run_that_showed_it(tmp_path):
+    """This registry's own lesson as a rule: the flag does not go up before the evidence."""
+    document = registry(tmp_path)
+    findings = audit(document, tmp_path, ci_asserting(manifest()))
+    assert any("names no ciVerifiedRun" in finding for finding in findings), findings
+
+
+@pytest.mark.parametrize(
+    ("overrides", "expected"),
+    [
+        ({"conclusion": "failure"}, "so it shows nothing"),
+        ({"conclusion": None}, "so it shows nothing"),
+        ({"runId": "pending"}, "which is not a run id"),
+        ({"runId": 36851875128}, None),           # an int is read as its digits
+        ({"steps": []}, "names no steps"),
+        ({"steps": ["  "]}, "names no steps"),
+        ({"steps": "one step"}, "names no steps"),
+        ({"headSha": "not-a-sha"}, "ciVerifiedRun.headSha"),
+    ],
+)
+def test_a_named_run_that_shows_nothing_is_reported(tmp_path, overrides, expected):
+    document = registry(tmp_path)
+    document["cards"][0]["ciVerifiedRun"] = ci_run(**overrides)
+    findings = audit(document, tmp_path, ci_asserting(manifest()))
+    if expected is None:
+        assert findings == [], findings
+    else:
+        assert any(expected in finding for finding in findings), findings
+
+
+def test_a_null_ci_verified_assertion_does_not_require_a_run(tmp_path):
+    """Asserting nothing must not become a back door for requiring nothing *and* saying
+    nothing: the manifest has to say why, which the next test pins."""
+    document = registry(tmp_path)
+    assert audit(document, tmp_path) == []
+
+
+def test_a_manifest_that_asserts_nothing_about_ci_verified_has_to_say_why(tmp_path):
+    manifest_document = manifest()
+    manifest_document["cards"]["VF-CL-0X"].pop("whyCiVerified")
+    with pytest.raises(checker.RegistryUnusable) as unusable:
+        audit(registry(tmp_path), tmp_path, manifest_document)
+    assert "asserts nothing about ciVerified and does not say why" in str(unusable.value)
+
+
+def test_a_manifest_that_omits_the_ci_verified_field_entirely_is_unusable(tmp_path):
+    """Deleting an entry is a failure, not a silence -- the same rule as the rest."""
+    manifest_document = manifest()
+    manifest_document["cards"]["VF-CL-0X"].pop("impliesCiVerified")
+    with pytest.raises(checker.RegistryUnusable) as unusable:
+        audit(registry(tmp_path), tmp_path, manifest_document)
+    assert "does not say impliesCiVerified" in str(unusable.value)
+
+
+@pytest.mark.parametrize("value", ["partial", "true", 1, 0])
+def test_an_implies_ci_verified_outside_the_three_is_unusable(tmp_path, value):
+    """``implemented`` has a third value; this field does not. ``1`` is not ``True`` by
+    identity, and that is how a count read as a boolean once already."""
+    manifest_document = manifest()
+    manifest_document["cards"]["VF-CL-0X"]["impliesCiVerified"] = value
+    with pytest.raises(checker.RegistryUnusable) as unusable:
+        audit(registry(tmp_path), tmp_path, manifest_document)
+    assert "impliesCiVerified is" in str(unusable.value)
+
+
+def test_an_asserted_ci_verified_with_no_checks_is_unusable(tmp_path):
+    manifest_document = manifest()
+    manifest_document["cards"]["VF-CL-0X"]["impliesCiVerified"] = True
+    with pytest.raises(checker.RegistryUnusable) as unusable:
+        audit(registry(tmp_path), tmp_path, manifest_document)
+    assert "with no ciVerifiedChecks" in str(unusable.value)
+
+
+def test_a_ci_verified_checks_value_that_is_not_a_list_is_unusable(tmp_path):
+    manifest_document = manifest()
+    manifest_document["cards"]["VF-CL-0X"]["ciVerifiedChecks"] = "src/route.py"
+    with pytest.raises(checker.RegistryUnusable) as unusable:
+        audit(registry(tmp_path), tmp_path, manifest_document)
+    assert "ciVerifiedChecks array" in str(unusable.value)
+
+
+def test_the_shipped_pair_derives_the_card_whose_workflow_names_its_own_tools():
+    """The shipped assertion, read rather than assumed.
+
+    ``VF-CL-04`` is the one card rule 7 asserts, and the chain is literal: the workflow
+    runs this card's collector and then the gate over what it produced, and the collector
+    is where the two named observations come from. The other cards state ``null`` and say
+    why -- a lane that runs a whole directory cannot distinguish them.
+    """
+    manifest_document = json.loads(checker.DEFAULT_MANIFEST.read_text(encoding="utf-8"))
+    cards = manifest_document["cards"]
+    assert cards["VF-CL-04"]["impliesCiVerified"] is True
+    texts = [check.get("text") or check["path"]
+             for check in cards["VF-CL-04"]["ciVerifiedChecks"]]
+    assert "python tools/collect_s12_acceptance_evidence.py" in texts
+    assert "python tools/check_s12_acceptance_shape.py" in texts
+    assert "pitr-configuration-possible" in texts
+    assert "pitr-rehearsal-dry-run-observed" in texts
+    for name in ("VF-CL-01", "VF-CL-02", "VF-CL-03", "VF-CL-05"):
+        assert cards[name]["impliesCiVerified"] is None, name
+        assert cards[name]["whyCiVerified"].strip(), name
+
+    registry_document = json.loads(checker.DEFAULT_REGISTRY.read_text(encoding="utf-8"))
+    four = next(card for card in registry_document["cards"] if card["id"] == "VF-CL-04")
+    assert four["ciVerified"] is True
+    assert four["ciVerifiedRun"]["runId"].isdigit()
+    assert four["ciVerifiedRun"]["conclusion"] == "success"
+    # The note may recount why it *was* false -- that is history -- but it must not still
+    # state it as the present, and it has to name the workflow that changed the answer.
+    assert "s12-acceptance-evidence.yml" in four["ciVerifiedNote"]
+    assert "stays false" not in four["ciVerifiedNote"]

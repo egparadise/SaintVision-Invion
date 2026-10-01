@@ -11,6 +11,11 @@ written:
 * ``VF-CL-04`` said the restore drill was skipping
   ``until-pr-126`` -- and PR #126 had merged. Anyone waiting for it would wait forever.
   The 19 skips are real but they are waiting for container inputs, not for that PR.
+* ``VF-CL-04``'s ``ciVerified`` stayed ``false`` with a note whose stated reason was
+  "no workflow runs ``tools/collect_s12_acceptance_evidence.py``". By the time this was
+  written one does -- ``.github/workflows/s12-acceptance-evidence.yml`` landed with
+  ``#283`` -- so the registry was again telling a reader to wait for something that had
+  happened. That is rule 7, and it is the same mistake in a field rule 4 did not reach.
 
 Nothing validated that file, which is why it drifted quietly. This does, and it is
 deliberately mechanical: it re-derives facts rather than reading prose.
@@ -52,6 +57,21 @@ Six rules:
    ``operationallyAccepted`` while it has open blockers, is not ``ciVerified`` or
    ``independentlyReviewed`` (unless ``notApplicable`` says why), or is not in state
    ``accepted``.
+7. **The tree decides ``ciVerified`` too, and a true one must name its run.** Rule 4
+   covers ``implemented``; nothing covered the field that said whether CI re-derives the
+   card. So the manifest carries ``impliesCiVerified`` with its own ``ciVerifiedChecks``,
+   compared the same way -- and a ``null`` must say ``whyCiVerified`` rather than leave a
+   gap that reads as coverage. Where it is asserted ``true``, the card must also carry a
+   ``ciVerifiedRun`` with a numeric ``runId``, ``conclusion: success`` and the step names
+   that showed it. That second half is this registry's own lesson written as a rule:
+   raising a flag first and attaching the evidence later is what ``restatedBlockers`` and
+   ``localUnmeasured`` exist to record.
+
+   What it does **not** reach: a card whose tests merely ride a whole-directory lane.
+   ``pytest tests/core`` says nothing about *which* card's behaviour ran, so a check
+   pointing at a lane that runs a directory would read as coverage while asserting
+   nothing. Those cards state ``impliesCiVerified: null`` and say that out loud.
+
 6. **A local gap is not a blocker.** ``localUnmeasured`` entries say what was not measured
    here and **where it is measured instead**; the same subject may not also be a blocker.
    The restore drill was filed as an external precondition when it was measured in hosted
@@ -208,6 +228,23 @@ def load_manifest(path: Path, identifiers: list[str]) -> dict:
             raise RegistryUnusable(f"{name} asserts nothing and does not say why")
         if implied is not None and not checks:
             raise RegistryUnusable(f"{name} claims implemented={implied!r} with no checks")
+        # Rule 7's half of the entry. Required by key, not by presence of a value: a
+        # deleted entry has to be a failure, like every other assertion here.
+        if "impliesCiVerified" not in entry:
+            raise RegistryUnusable(f"{name} does not say impliesCiVerified")
+        ci_implied = entry["impliesCiVerified"]
+        if ci_implied is not True and ci_implied is not False and ci_implied is not None:
+            raise RegistryUnusable(f"{name}.impliesCiVerified is {ci_implied!r}")
+        ci_checks = entry.get("ciVerifiedChecks")
+        if not isinstance(ci_checks, list):
+            raise RegistryUnusable(f"{name} needs a ciVerifiedChecks array, even an empty one")
+        if ci_implied is None and not str(entry.get("whyCiVerified") or "").strip():
+            raise RegistryUnusable(f"{name} asserts nothing about ciVerified and does not "
+                                   f"say why")
+        if ci_implied is not None and not ci_checks:
+            raise RegistryUnusable(
+                f"{name} claims ciVerified={ci_implied!r} with no ciVerifiedChecks"
+            )
         if not isinstance(entry.get("closedBlockers", {}), dict):
             raise RegistryUnusable(f"{name}.closedBlockers must be an object")
         forbidden = entry.get("forbiddenBlockers", [])
@@ -216,6 +253,39 @@ def load_manifest(path: Path, identifiers: list[str]) -> dict:
         ):
             raise RegistryUnusable(f"{name}.forbiddenBlockers must be a list of ids")
     return manifest
+
+
+def ci_run_findings(identifier: str, recorded: object) -> list[str]:
+    """Rule 7's second half: a ``ciVerified`` the manifest asserts must name its run.
+
+    The registry already carries this shape in ``verifiedAgainst.hostedRun`` -- a run id,
+    a conclusion and the step names -- because a correction that drops a blocker without
+    the evidence is the thing it had to correct twice. A boolean on its own cannot be
+    re-checked by anybody downstream; a run id can.
+
+    Deliberately offline: the id, the conclusion and the steps are compared as written.
+    Asking GitHub whether the run exists would make this tool need a network and a token
+    to answer a question about a file.
+    """
+    if not isinstance(recorded, dict):
+        return [f"{identifier}.ciVerified is derived true but it names no ciVerifiedRun"]
+    findings: list[str] = []
+    run_id = str(recorded.get("runId") or "")
+    if not run_id.isdigit():
+        findings.append(f"{identifier}.ciVerifiedRun.runId is {recorded.get('runId')!r}, "
+                        f"which is not a run id")
+    if recorded.get("conclusion") != "success":
+        findings.append(f"{identifier}.ciVerifiedRun concluded "
+                        f"{recorded.get('conclusion')!r}, so it shows nothing")
+    steps = recorded.get("steps")
+    if not isinstance(steps, list) or not steps or not all(
+        isinstance(step, str) and step.strip() for step in steps
+    ):
+        findings.append(f"{identifier}.ciVerifiedRun names no steps")
+    head = str(recorded.get("headSha") or "")
+    if not re.fullmatch(r"[0-9a-f]{8,40}", head):
+        findings.append(f"{identifier}.ciVerifiedRun.headSha is {recorded.get('headSha')!r}")
+    return findings
 
 
 def run_check(check: dict, root: Path) -> str | None:
@@ -339,6 +409,26 @@ def audit(registry: dict, root: Path, manifest_path: Path = DEFAULT_MANIFEST) ->
                 f"{identifier}: the tree shows implemented={implied!r} but the registry "
                 f"says {implemented!r}"
             )
+
+        # Rule 7: the same comparison for the field that says whether CI re-derives this
+        # card. Separate checks, because the files that show a thing is implemented are not
+        # the files that show CI runs it.
+        ci_implied = entry["impliesCiVerified"]
+        ci_broken = [problem for problem in
+                     (run_check(check, root) for check in entry.get("ciVerifiedChecks") or [])
+                     if problem]
+        if ci_broken:
+            findings.append(
+                f"{identifier}: the manifest's ciVerified assertion no longer holds in the "
+                f"tree: " + "; ".join(ci_broken)
+            )
+        elif ci_implied is not None and card.get("ciVerified") is not ci_implied:
+            findings.append(
+                f"{identifier}: the tree shows ciVerified={ci_implied!r} but the registry "
+                f"says {card.get('ciVerified')!r}"
+            )
+        if ci_implied is True:
+            findings.extend(ci_run_findings(identifier, card.get("ciVerifiedRun")))
 
         # Rule 5: acceptance is the claim nobody downstream re-checks.
         if card.get("operationallyAccepted") is True:
@@ -494,7 +584,7 @@ def main(argv: list[str] | None = None) -> int:
                 "manifest": args.manifest.name,
                 "verifiedAgainst": registry.get("verifiedAgainst", {}).get("tree"),
                 "acceptedCards": registry.get("acceptedCards"),
-                "status": "every implementation claim re-derived from the tree",
+                "status": "every implementation and ciVerified claim re-derived from the tree",
             },
             ensure_ascii=False,
         )
