@@ -1,13 +1,135 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { NodeItem, SyntheticGpuResult, ContainmentInput, ContainmentView, ContainmentResult } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { useModalA11y } from '@/shared/ui/useModalA11y';
 import { apiClient } from '@/shared/api/client';
 import { SecurityControlManager } from './securityEngine';
 
+export const RFC4122_UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-function isValidUuid(id: string): boolean {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id.trim());
+export function isValidUuid(id: unknown): id is string {
+  return typeof id === 'string' && RFC4122_UUID_REGEX.test(id);
+}
+
+export const NODE_ID_REGEX = /^nod_[0-9A-HJKMNP-TV-Z]{26}$/;
+
+export function isValidNodeId(id: unknown): id is string {
+  return typeof id === 'string' && NODE_ID_REGEX.test(id);
+}
+
+export const MAX_SAFE_CONTRACT_INTEGER = 9007199254740991; // 2^53 - 1 (core.schema.json maximum)
+
+function isValidContractInteger(n: unknown): n is number {
+  return (
+    typeof n === 'number' &&
+    Number.isInteger(n) &&
+    n >= 0 &&
+    n <= MAX_SAFE_CONTRACT_INTEGER
+  );
+}
+
+const ALLOWED_CONTAINMENT_VIEW_KEYS = new Set([
+  'nodeId',
+  'version',
+  'killSwitchActive',
+  'nodeStatus',
+  'activeLeases',
+  'pendingDeliveries',
+  'unsettledRuns',
+  'settled',
+]);
+
+export function isValidContainmentView(v: unknown): v is ContainmentView {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return false;
+  const o = v as Record<string, unknown>;
+  const keys = Object.keys(o);
+  for (const k of keys) {
+    if (!ALLOWED_CONTAINMENT_VIEW_KEYS.has(k)) return false;
+  }
+  const validNodeId = o.nodeId === null || isValidNodeId(o.nodeId);
+  const validVersion = isValidContractInteger(o.version);
+  const validKillSwitch = typeof o.killSwitchActive === 'boolean';
+  const validNodeStatus =
+    o.nodeStatus === null ||
+    o.nodeStatus === 'online' ||
+    o.nodeStatus === 'offline' ||
+    o.nodeStatus === 'draining' ||
+    o.nodeStatus === 'quarantined';
+  const validActiveLeases = isValidContractInteger(o.activeLeases);
+  const validPendingDeliveries = isValidContractInteger(o.pendingDeliveries);
+  const validUnsettledRuns = isValidContractInteger(o.unsettledRuns);
+  const validSettled = typeof o.settled === 'boolean';
+
+  return (
+    validNodeId &&
+    validVersion &&
+    validKillSwitch &&
+    validNodeStatus &&
+    validActiveLeases &&
+    validPendingDeliveries &&
+    validUnsettledRuns &&
+    validSettled
+  );
+}
+
+const ALLOWED_CONTAINMENT_RESULT_KEYS = new Set([
+  'requestId',
+  'operation',
+  'approvalId',
+  'control',
+]);
+
+export function isValidContainmentResult(
+  r: unknown,
+  expectedOperation: 'kill' | 'clear' | 'drain' | 'resume',
+  expectedApprovalId: string,
+  expectedNodeId?: string | null
+): r is ContainmentResult {
+  if (!r || typeof r !== 'object' || Array.isArray(r)) return false;
+  const res = r as Record<string, unknown>;
+  const keys = Object.keys(res);
+  for (const k of keys) {
+    if (!ALLOWED_CONTAINMENT_RESULT_KEYS.has(k)) return false;
+  }
+
+  if (!isValidUuid(res.requestId)) return false;
+  if (res.operation !== expectedOperation) return false;
+  if (!isValidUuid(res.approvalId)) return false;
+  if (res.approvalId.toLowerCase() !== expectedApprovalId.toLowerCase()) return false;
+
+  if (!isValidContainmentView(res.control)) return false;
+
+  if (expectedOperation === 'kill' || expectedOperation === 'clear') {
+    // Global kill-switch route는 nodeId === null 결속
+    if (res.control.nodeId !== null) return false;
+    const expectedKillSwitchActive = expectedOperation === 'kill';
+    if (res.control.killSwitchActive !== expectedKillSwitchActive) return false;
+  } else if (expectedOperation === 'drain') {
+    // Node-scoped drain: nodeId 일치 & control.nodeStatus 정본 상태 전이 검증 (draining | drained)
+    if (expectedNodeId !== undefined) {
+      if (res.control.nodeId !== expectedNodeId) return false;
+    } else {
+      if (res.control.nodeId === null || !isValidNodeId(res.control.nodeId)) return false;
+    }
+    // operation 'drain'인데 nodeStatus 'online' 등 모순 응답 거부 (정본 enum: online, offline, draining, quarantined)
+    if (res.control.nodeStatus !== 'draining') {
+      return false;
+    }
+  } else if (expectedOperation === 'resume') {
+    // Node-scoped resume: nodeId 일치 & control.nodeStatus 정본 상태 전이 검증 (online)
+    if (expectedNodeId !== undefined) {
+      if (res.control.nodeId !== expectedNodeId) return false;
+    } else {
+      if (res.control.nodeId === null || !isValidNodeId(res.control.nodeId)) return false;
+    }
+    // operation 'resume'인데 nodeStatus 'draining', 'drained' 등 모순 응답 거부
+    if (res.control.nodeStatus !== 'online') {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 function generateIdempotencyKey(prefix: string): string {
@@ -30,11 +152,16 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
   const [drainApprovalId, setDrainApprovalId] = useState<string>('');
   type BackendKillSwitchState =
     | { status: 'loading' }
-    | { status: 'active'; version?: number }
-    | { status: 'inactive'; version?: number }
+    | { status: 'active'; version: number }
+    | { status: 'inactive'; version: number }
     | { status: 'error'; message: string };
 
   const [backendKillSwitch, setBackendKillSwitch] = useState<BackendKillSwitchState>({ status: 'loading' });
+  const [killSwitchReasonCode, setKillSwitchReasonCode] = useState<'maintenance' | 'incident' | 'operator_request'>('operator_request');
+  const [killSwitchApprovalId, setKillSwitchApprovalId] = useState<string>('');
+  const [killSwitchError, setKillSwitchError] = useState<string | null>(null);
+  const [killSwitchLoading, setKillSwitchLoading] = useState(false);
+  const [killSwitchIdempotencyKey, setKillSwitchIdempotencyKey] = useState<string>(() => generateIdempotencyKey('killswitch'));
   const [gpuRunError, setGpuRunError] = useState<string | null>(null);
   interface CachedOperation {
     idempotencyKey: string;
@@ -46,35 +173,37 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
 
   const actor = currentUser?.id?.trim() || null;
 
-  useEffect(() => {
-    let isMounted = true;
-    apiClient<ContainmentView>('/v1/operations/kill-switch')
-      .then((res) => {
-        if (!isMounted) return;
-        if (res && typeof res.killSwitchActive === 'boolean') {
-          setBackendKillSwitch({
-            status: res.killSwitchActive ? 'active' : 'inactive',
-            version: typeof res.version === 'number' ? res.version : undefined,
-          });
-        } else {
-          setBackendKillSwitch({
-            status: 'error',
-            message: '조회 실패 [응답 형식 불일치]',
-          });
-        }
-      })
-      .catch((err: any) => {
-        if (!isMounted) return;
-        const code = err?.problem?.code || (err?.problem?.status ? `HTTP ${err.problem.status}` : err?.status ? `HTTP ${err.status}` : 'UNKNOWN');
+  const fetchBackendKillSwitch = useCallback(async () => {
+    try {
+      const res = await apiClient<ContainmentView>('/v1/operations/kill-switch', {
+        method: 'GET',
+        expectedStatus: 200,
+      });
+      if (isValidContainmentView(res) && res.nodeId === null) {
+        setBackendKillSwitch({
+          status: res.killSwitchActive ? 'active' : 'inactive',
+          version: res.version,
+        });
+      } else {
         setBackendKillSwitch({
           status: 'error',
-          message: `조회 실패 [${code}]`,
+          message: '조회 실패 [응답 형식 불일치]',
         });
+      }
+    } catch (err: any) {
+      const code =
+        err?.problem?.code ||
+        (err?.problem?.status ? `HTTP ${err.problem.status}` : err?.status ? `HTTP ${err.status}` : 'UNKNOWN');
+      setBackendKillSwitch({
+        status: 'error',
+        message: `조회 실패 [${code}]`,
       });
-    return () => {
-      isMounted = false;
-    };
+    }
   }, []);
+
+  useEffect(() => {
+    fetchBackendKillSwitch();
+  }, [fetchBackendKillSwitch]);
 
   // Interactive states
   const [ledgerVerification, setLedgerVerification] = useState<{ isValid: boolean; checked: number } | null>(null);
@@ -112,7 +241,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       : (nodeControlStatuses[nodeId]?.nodeStatus === 'draining' || nodeControlStatuses[nodeId]?.nodeStatus === 'quarantined' || secManager.isNodeDrained(nodeId));
     const targetAction: 'drain' | 'resume' = isNodeCurrentlyDrained ? 'resume' : 'drain';
 
-    const opKey = `${nodeId}:${targetAction}:${drainReasonCode}:${drainApprovalId.trim()}`;
+    const opKey = `${nodeId}:${targetAction}:${drainReasonCode}:${drainApprovalId}`;
     let idempotencyKey: string;
     let payload: ContainmentInput;
 
@@ -126,12 +255,14 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       let expectedVersion: number;
       let serverNodeStatus: string | null;
       try {
-        const ctrl = await apiClient<ContainmentView>(`/v1/nodes/${encodeURIComponent(nodeId)}/control`);
-        if (typeof ctrl?.version === 'number') {
+        const ctrl = await apiClient<ContainmentView>(`/v1/nodes/${encodeURIComponent(nodeId)}/control`, {
+          expectedStatus: 200,
+        });
+        if (isValidContainmentView(ctrl) && ctrl.nodeId === nodeId) {
           expectedVersion = ctrl.version;
-          serverNodeStatus = ctrl.nodeStatus ?? null;
+          serverNodeStatus = ctrl.nodeStatus;
         } else {
-          setDrainError('노드 제어 버전(expectedVersion) 응답 형식 불일치로 작업을 중단했습니다.');
+          setDrainError('노드 제어 버전(expectedVersion) 응답 형식 또는 nodeId 불일치로 작업을 중단했습니다 (fail-closed).');
           return;
         }
 
@@ -161,7 +292,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       payload = {
         expectedVersion,
         reasonCode: drainReasonCode,
-        approvalId: drainApprovalId.trim(),
+        approvalId: drainApprovalId,
       };
 
       // Cache for retry idempotency
@@ -179,11 +310,12 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
         method: 'POST',
         idempotencyKey,
         body: JSON.stringify(payload),
+        expectedStatus: 200,
       });
 
-      // Invariant: Successful response MUST contain canonical control field. Do NOT synthesize!
-      if (!result?.control || typeof result.control.nodeStatus !== 'string' || typeof result.control.version !== 'number') {
-        setDrainError('응답 오류: 서버 응답에 canonical control 필드가 누락되었거나 형식이 올바르지 않습니다.');
+      // Invariant: Successful response MUST be validated by strict isValidContainmentResult. Do NOT trust blindly or synthesize!
+      if (!isValidContainmentResult(result, targetAction, drainApprovalId, nodeId)) {
+        setDrainError('응답 오류: 서버 응답에 canonical control 필드가 누락되었거나 ContainmentResult 규격 불일치(requestId/approvalId/operation/nodeId/control 불일치 또는 위장)로 작업을 중단했습니다 (fail-closed).');
         return;
       }
 
@@ -199,7 +331,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       }));
 
       if (canonicalStatus === 'draining' || canonicalStatus === 'quarantined') {
-        secManager.drainNode(nodeId, actor, `[${drainReasonCode}] approval: ${drainApprovalId.trim()}`);
+        secManager.drainNode(nodeId, actor, `[${drainReasonCode}] approval: ${drainApprovalId}`);
       } else {
         secManager.undrainNode(nodeId, actor);
       }
@@ -261,6 +393,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
 
   const handleOpenKillSwitchModal = () => {
     previousActiveElementRef.current = (document.activeElement as HTMLElement) || null;
+    setKillSwitchError(null);
     setShowKillSwitchModal(true);
   };
 
@@ -397,22 +530,101 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
     }, 600);
   };
 
-  // 5. Toggle Emergency Kill Switch
-  const handleConfirmKillSwitch = () => {
+  const isKillSwitchReady =
+    (backendKillSwitch.status === 'active' || backendKillSwitch.status === 'inactive') &&
+    typeof backendKillSwitch.version === 'number';
+
+  const canConfirmKillSwitch = Boolean(
+    actor &&
+    !killSwitchLoading &&
+    isKillSwitchReady &&
+    isValidUuid(killSwitchApprovalId)
+  );
+
+  // 5. Toggle Emergency Kill Switch via Real Backend API
+  const handleConfirmKillSwitch = async () => {
     if (!actor) {
-      setDrainError('비상 정지(Kill Switch) 명령을 실행하려면 인증된 관리자 식별자(actor)가 필수입니다.');
-      handleCloseKillSwitchModal();
+      setKillSwitchError('비상 정지(Kill Switch) 명령을 실행하려면 인증된 관리자 식별자(actor)가 필수입니다.');
       return;
     }
-    secManager.toggleEmergencyKillSwitch(actor, 'Admin manual emergency intervention');
-    handleCloseKillSwitchModal();
-    refreshState();
+    if (backendKillSwitch.status !== 'active' && backendKillSwitch.status !== 'inactive') {
+      setKillSwitchError('백엔드 제어 평면 상태가 정상이 아니어서 비상 정지 변경을 수행할 수 없습니다 (fail-closed).');
+      return;
+    }
+    if (typeof backendKillSwitch.version !== 'number') {
+      setKillSwitchError('백엔드 제어 평면 버전 정보가 유효하지 않아 비상 정지 변경을 수행할 수 없습니다.');
+      return;
+    }
+    if (!isValidUuid(killSwitchApprovalId)) {
+      setKillSwitchError('유효한 Containment 승인 UUID(approvalId)가 필요합니다. 표준 UUIDv4 형식을 입력하십시오 (공백 불가).');
+      return;
+    }
+
+    const isCurrentlyActive = backendKillSwitch.status === 'active';
+    const targetAction: 'kill' | 'clear' = isCurrentlyActive ? 'clear' : 'kill';
+    const endpoint = isCurrentlyActive ? '/v1/operations/kill-switch/clear' : '/v1/operations/kill-switch';
+    const expectedStatus = isCurrentlyActive ? 200 : 202;
+    const currentVersion = backendKillSwitch.version;
+
+    const payload: ContainmentInput = {
+      expectedVersion: currentVersion,
+      reasonCode: killSwitchReasonCode,
+      approvalId: killSwitchApprovalId,
+    };
+
+    setKillSwitchLoading(true);
+    setKillSwitchError(null);
+
+    try {
+      const result = await apiClient<ContainmentResult>(endpoint, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: {
+          'Idempotency-Key': killSwitchIdempotencyKey,
+        },
+        expectedStatus,
+      });
+
+      if (!isValidContainmentResult(result, targetAction, killSwitchApprovalId)) {
+        setKillSwitchError('백엔드 제어 평면 응답 형식 또는 제어 상태 불일치 [CONTRACT-MISMATCH]');
+        await fetchBackendKillSwitch();
+        return;
+      }
+
+      const nextActive = result.control.killSwitchActive;
+      const nextVersion = result.control.version;
+
+      setBackendKillSwitch({
+        status: nextActive ? 'active' : 'inactive',
+        version: nextVersion,
+      });
+
+      if (nextActive !== status.emergencyKillSwitchActive) {
+        secManager.toggleEmergencyKillSwitch(
+          actor,
+          `Backend ${result.operation} via ${killSwitchApprovalId}`
+        );
+      }
+
+      setKillSwitchIdempotencyKey(generateIdempotencyKey('killswitch'));
+      handleCloseKillSwitchModal();
+      refreshState();
+    } catch (err: any) {
+      const problemCode =
+        err?.problem?.code ||
+        err?.code ||
+        (err?.problem?.status ? `HTTP ${err.problem.status}` : err?.status ? `HTTP ${err.status}` : 'UNKNOWN');
+      const problemDetail = err?.problem?.detail || err?.message || '비상 정지 API 요청 처리에 실패했습니다.';
+      setKillSwitchError(`[${problemCode}] ${problemDetail}`);
+    } finally {
+      setKillSwitchLoading(false);
+    }
   };
 
   return (
     <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Emergency Kill Switch Banner if Active */}
-      {status.emergencyKillSwitchActive && (
+      {(status.emergencyKillSwitchActive || backendKillSwitch.status === 'active') && (
         <div
           role="alert"
           data-testid="kill-switch-active-banner"
@@ -431,7 +643,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
               🚨 [모의 시뮬레이션] EMERGENCY KILL SWITCH ACTIVE — LOCAL SECURITY ENGINE ISOLATION
             </div>
             <div style={{ color: '#c9d1d9', fontSize: '13px', marginTop: '4px' }}>
-              로컬 보안 통제 엔진이 모의 격리 상태입니다. (백엔드 제어 평면 비상 정지 API(GET/POST /v1/operations/kill-switch)가 존재하며, 본 토글은 UI 로컬 보안 엔진 시뮬레이션 격리 상태입니다)
+              로컬 보안 통제 엔진이 모의 격리 상태입니다. (백엔드 제어 평면 비상 정지 API(GET/POST /v1/operations/kill-switch)가 존재하며, 비상 정지 게이트와 실배선 연동되었습니다)
             </div>
           </div>
           <Button variant="danger" size="sm" onClick={handleOpenKillSwitchModal}>
@@ -568,26 +780,75 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
           </Button>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
-          <Button
-            size="sm"
-            variant={status.emergencyKillSwitchActive ? 'secondary' : 'danger'}
-            onClick={handleOpenKillSwitchModal}
-            disabled={!actor}
-            aria-disabled={!actor}
-            title={!actor ? '관리자 세션 식별자(actor)가 필요합니다.' : undefined}
-            data-testid="emergency-kill-switch-toggle-btn"
-          >
-            {status.emergencyKillSwitchActive ? 'Kill Switch 해제 (모의)' : '🚨 긴급 Kill Switch 발동 (모의)'}
-          </Button>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <label style={{ fontSize: '11px', color: '#8b949e', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              사유:
+              <select
+                data-testid="kill-switch-reason-select"
+                value={killSwitchReasonCode}
+                onChange={(e) => {
+                  setKillSwitchReasonCode(e.target.value as any);
+                  setKillSwitchIdempotencyKey(generateIdempotencyKey('killswitch'));
+                }}
+                style={{
+                  padding: '3px 6px',
+                  backgroundColor: '#0d1117',
+                  border: '1px solid #30363d',
+                  borderRadius: '4px',
+                  color: '#c9d1d9',
+                  fontSize: '11px',
+                }}
+              >
+                <option value="operator_request">operator_request</option>
+                <option value="incident">incident</option>
+                <option value="maintenance">maintenance</option>
+              </select>
+            </label>
+            <label style={{ fontSize: '11px', color: '#8b949e', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              승인ID:
+              <input
+                data-testid="input-kill-switch-approval-id"
+                type="text"
+                value={killSwitchApprovalId}
+                onChange={(e) => {
+                  setKillSwitchApprovalId(e.target.value);
+                  setKillSwitchError(null);
+                  setKillSwitchIdempotencyKey(generateIdempotencyKey('killswitch'));
+                }}
+                placeholder="UUIDv4"
+                style={{
+                  width: '180px',
+                  padding: '3px 6px',
+                  backgroundColor: '#0d1117',
+                  border: '1px solid #30363d',
+                  borderRadius: '4px',
+                  color: '#c9d1d9',
+                  fontSize: '11px',
+                  fontFamily: 'monospace',
+                }}
+              />
+            </label>
+            <Button
+              size="sm"
+              variant={status.emergencyKillSwitchActive || backendKillSwitch.status === 'active' ? 'secondary' : 'danger'}
+              onClick={handleOpenKillSwitchModal}
+              disabled={!actor}
+              aria-disabled={!actor}
+              title={!actor ? '관리자 세션 식별자(actor)가 필요합니다.' : undefined}
+              data-testid="emergency-kill-switch-toggle-btn"
+            >
+              {status.emergencyKillSwitchActive || backendKillSwitch.status === 'active' ? 'Kill Switch 해제' : '🚨 긴급 Kill Switch 발동'}
+            </Button>
+          </div>
           <div data-testid="backend-kill-switch-status" style={{ fontSize: '11px', color: '#8b949e' }}>
             백엔드 제어 평면: {
               backendKillSwitch.status === 'loading'
                 ? '확인 중...'
                 : backendKillSwitch.status === 'active'
-                ? '🚨 ACTIVE'
+                ? (typeof backendKillSwitch.version === 'number' ? `🚨 ACTIVE (v${backendKillSwitch.version})` : '🚨 ACTIVE')
                 : backendKillSwitch.status === 'inactive'
-                ? '✔ INACTIVE'
+                ? (typeof backendKillSwitch.version === 'number' ? `✔ INACTIVE (v${backendKillSwitch.version})` : '✔ INACTIVE')
                 : `⚠️ ${backendKillSwitch.message}`
             } (GET /v1/operations/kill-switch)
           </div>
@@ -1185,8 +1446,26 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
             }}
           >
             <h3 id="kill-switch-modal-title" style={{ margin: 0, color: '#f85149', fontSize: '18px' }}>
-              {status.emergencyKillSwitchActive ? 'Kill Switch 비활성화 확인' : '🚨 [모의 시뮬레이션] 긴급 Kill Switch 발동 확인'}
+              {status.emergencyKillSwitchActive || backendKillSwitch.status === 'active'
+                ? 'Kill Switch 비활성화(해제) 확인'
+                : '🚨 [모의 시뮬레이션] 긴급 Kill Switch 발동 확인'}
             </h3>
+            {killSwitchError && (
+              <div
+                role="alert"
+                data-testid="kill-switch-error-banner"
+                style={{
+                  padding: '10px 14px',
+                  borderRadius: '6px',
+                  backgroundColor: 'rgba(248, 81, 73, 0.15)',
+                  border: '1px solid #f85149',
+                  color: '#ff7b72',
+                  fontSize: '12px',
+                }}
+              >
+                🚨 {killSwitchError}
+              </div>
+            )}
             <div
               role="status"
               data-testid="kill-switch-mock-notice"
@@ -1200,12 +1479,73 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
                 lineHeight: '1.5',
               }}
             >
-              ⚠️ <strong>[모의 시뮬레이션 고지]</strong>: 백엔드 제어 평면에 비상 정지 API(GET/POST /v1/operations/kill-switch)가 존재합니다. 현재 화면의 토글은 프론트엔드 보안 엔진의 로컬 모의 에뮬레이션(Local Simulation)으로 동작하며, 로컬 비상 정지 발동 시 화면 내 모의 작업 디스패치(소켓 마운트 시험, 승인 우회 시험, GPU 벤치마크)가 차단됩니다. 백엔드 계약 불변식에 따라 노드 격리(Drain/Resume) 제어는 비상 정지 상태에서도 안전한 장애 격리를 위해 계속 허용됩니다.
+              ⚠️ <strong>[모의 시뮬레이션 고지 및 백엔드 실배선 안내]</strong>: 백엔드 제어 평면에 비상 정지 API(GET/POST /v1/operations/kill-switch)가 존재합니다. 본 비상 정지 버튼은 백엔드 제어 평면의 비상 정지 엔드포인트(POST /v1/operations/kill-switch 및 /clear)와 실배선 연결되어 멱등키와 승인 UUID를 전달하며, 로컬 보안 통제 엔진과 제어 평면 실행 장벽을 동기화합니다. 백엔드 계약 불변식에 따라 노드 격리(Drain/Resume) 제어는 비상 정지 상태에서도 안전한 장애 격리를 위해 계속 허용됩니다.
+            </div>
+            {!isValidUuid(killSwitchApprovalId.trim()) && (
+              <div
+                role="alert"
+                data-testid="kill-switch-approval-required-notice"
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  backgroundColor: 'rgba(248, 81, 73, 0.15)',
+                  border: '1px solid #f85149',
+                  color: '#ff7b72',
+                  fontSize: '12px',
+                }}
+              >
+                ⚠️ 유효한 Containment 승인 UUID(UUIDv4) 입력이 필수입니다. 상단 제어바에서 승인 식별자를 입력해야 확정할 수 있습니다 (fail-closed).
+              </div>
+            )}
+            {!isKillSwitchReady && (
+              <div
+                role="alert"
+                data-testid="kill-switch-backend-unready-notice"
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  backgroundColor: 'rgba(248, 81, 73, 0.15)',
+                  border: '1px solid #f85149',
+                  color: '#ff7b72',
+                  fontSize: '12px',
+                }}
+              >
+                ⚠️ 백엔드 제어 평면 상태가 정상이 아니어서 비상 정지 변경이 비활성화되었습니다 ({backendKillSwitch.status === 'loading' ? '확인 중' : backendKillSwitch.status === 'error' ? backendKillSwitch.message : '버전 정보 부재'}).
+              </div>
+            )}
+            <div
+              data-testid="kill-switch-params-summary"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+                fontSize: '12px',
+                color: '#c9d1d9',
+                backgroundColor: '#0d1117',
+                padding: '12px 14px',
+                borderRadius: '6px',
+                border: '1px solid #30363d',
+              }}
+            >
+              <div>
+                <span style={{ color: '#8b949e' }}>비상 정지 사유 (reasonCode): </span>
+                <span style={{ fontFamily: 'monospace', color: '#58a6ff' }}>{killSwitchReasonCode}</span>
+              </div>
+              <div>
+                <span style={{ color: '#8b949e' }}>승인 식별자 (approvalId): </span>
+                <span style={{ fontFamily: 'monospace', color: isValidUuid(killSwitchApprovalId.trim()) ? '#3fb950' : '#f85149' }}>
+                  {killSwitchApprovalId.trim() || '(미입력 - 상단 제어바에서 설정)'}
+                </span>
+              </div>
+              <div>
+                <span style={{ color: '#8b949e' }}>멱등키 (Idempotency-Key): </span>
+                <span style={{ fontFamily: 'monospace', color: '#8b949e', fontSize: '11px' }}>{killSwitchIdempotencyKey}</span>
+              </div>
             </div>
             <p style={{ margin: 0, color: '#c9d1d9', fontSize: '13px', lineHeight: '20px' }}>
-              {status.emergencyKillSwitchActive
-                ? 'Kill Switch를 해제하면 클러스터 보안 엔진 모의 작업 디스패치가 재개됩니다.'
-                : 'Kill Switch를 발동하면 프론트엔드 보안 통제 계층에서 모든 모의 작업 디스패치가 일시 중지됩니다.'}
+              {status.emergencyKillSwitchActive || backendKillSwitch.status === 'active'
+                ? 'Kill Switch를 해제(재개)하면 백엔드 제어 평면 및 클러스터 보안 엔진의 작업 디스패치가 정상 재개됩니다.'
+                : 'Kill Switch를 발동하면 백엔드 제어 평면 및 프론트엔드 보안 통제 계층에서 모든 신규 작업 생성이 즉각 차단됩니다.'}
             </p>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
               <Button
@@ -1219,11 +1559,26 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
               </Button>
               <Button
                 size="sm"
-                variant={status.emergencyKillSwitchActive ? 'primary' : 'danger'}
+                variant={status.emergencyKillSwitchActive || backendKillSwitch.status === 'active' ? 'primary' : 'danger'}
                 onClick={handleConfirmKillSwitch}
+                disabled={!canConfirmKillSwitch}
+                aria-disabled={!canConfirmKillSwitch}
+                title={
+                  !actor
+                    ? '관리자 세션 식별자(actor)가 필요합니다.'
+                    : !isKillSwitchReady
+                    ? '백엔드 제어 평면 상태가 정상이 아니거나 확인 중입니다.'
+                    : !isValidUuid(killSwitchApprovalId.trim())
+                    ? '유효한 Containment 승인 UUID(approvalId)가 필요합니다.'
+                    : undefined
+                }
                 data-testid="kill-switch-confirm-btn"
               >
-                {status.emergencyKillSwitchActive ? '해제 실행' : '긴급 발동 확정'}
+                {killSwitchLoading
+                  ? '처리 중...'
+                  : status.emergencyKillSwitchActive || backendKillSwitch.status === 'active'
+                  ? '해제 실행'
+                  : '긴급 발동 확정'}
               </Button>
             </div>
           </div>
