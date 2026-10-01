@@ -1,7 +1,9 @@
 // @vitest-environment happy-dom
+import fs from 'fs';
+import path from 'path';
 import React, { act } from 'react';
 import { createRoot, Root } from 'react-dom/client';
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, vi } from 'vitest';
 import { MlopsManager } from '../src/features/mlops/mlopsEngine';
 import { TEST_FIXTURE_LINEAGES } from './fixtures/model-lineage';
 import { ModelLineageView } from '../src/features/mlops/ModelLineageView';
@@ -24,6 +26,15 @@ import {
 } from '../src/shared/api/adapterObservation';
 
 describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (AC-10)', () => {
+  const originalFetch = globalThis.fetch;
+  beforeAll(() => {
+    globalThis.fetch = vi.fn().mockImplementation(() =>
+      Promise.resolve(new Response(JSON.stringify({}), { status: 200, headers: { 'Content-Type': 'application/json' } }))
+    );
+  });
+  afterAll(() => {
+    globalThis.fetch = originalFetch;
+  });
   describe('Provider Adapter Conformance (AC-10 Codex = Claude)', () => {
     it('verifies Codex and Claude adapters conform to identical schemas and protocols', () => {
       const mlops = new MlopsManager();
@@ -1452,7 +1463,30 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
             return (lighter + 0.05) / (darker + 0.05);
           };
 
+          const indexCssPath = path.resolve(__dirname, '../src/index.css');
+          const indexCssContent = fs.readFileSync(indexCssPath, 'utf-8');
+          const darkMatch = indexCssContent.match(/\[data-theme=['"]dark['"]\]\s*\{([\s\S]*?)\}/);
+          if (!darkMatch) throw new Error('Could not find [data-theme="dark"] block in index.css');
+          const darkCleanBlock = darkMatch[1].replace(/\/\*[\s\S]*?\*\//g, '');
+          const darkTokenMap: Record<string, string> = {};
+          const tokenRegex = /(--color-[a-z0-9-]+)\s*:\s*([^;]+);/g;
+          let tm;
+          while ((tm = tokenRegex.exec(darkCleanBlock)) !== null) {
+            const val = tm[2].trim();
+            if (val.startsWith('#')) {
+              darkTokenMap[tm[1].trim()] = val;
+            }
+          }
+
           const parseRgba = (colorStr: string): [number, number, number, number] => {
+            if (colorStr.startsWith('var(')) {
+              const varName = colorStr.replace(/var\(|\)/g, '').trim();
+              if (darkTokenMap[varName]) {
+                colorStr = darkTokenMap[varName];
+              } else {
+                throw new Error(`Unresolved CSS token: ${varName}`);
+              }
+            }
             if (colorStr.startsWith('#')) {
               const clean = colorStr.replace('#', '');
               return [
@@ -1483,7 +1517,12 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
             ];
           };
 
-          const darkBgRgb: [number, number, number] = [22, 27, 34]; // #161b22
+          const subtleHex = darkTokenMap['--color-bg-subtle'] || '#1f2937';
+          const darkBgRgb: [number, number, number] = [
+            parseInt(subtleHex.replace('#', '').substring(0, 2), 16),
+            parseInt(subtleHex.replace('#', '').substring(2, 4), 16),
+            parseInt(subtleHex.replace('#', '').substring(4, 6), 16),
+          ];
 
           // 1. Read DOM style of Status Badge (미측정 NOT_OBSERVED)
           const statusBadge = container.querySelector<HTMLElement>('[data-testid="conformance-status-badge"]');

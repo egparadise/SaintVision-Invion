@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
 import ts from 'typescript';
@@ -11,6 +11,7 @@ import { NodeDetail } from '../src/features/nodes/NodeDetail';
 import { DeveloperStudio } from '../src/features/studio/DeveloperStudio';
 import { ResourceExplorer } from '../src/features/desktop/ResourceExplorer';
 import { InvFileExplorer } from '../src/features/desktop/InvFileExplorer';
+import { ModelLineageView } from '../src/features/mlops/ModelLineageView';
 import * as client from '../src/shared/api/client';
 import * as projectObservation from '../src/shared/api/projectObservation';
 import { fabricObservation } from '../src/shared/api/fabricObservation';
@@ -209,7 +210,7 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/editor/GitCommitModal.tsx": {"#0d1117": 3, "#161b22": 1, "#30363d": 6, "#58a6ff": 1, "#8b949e": 5, "#c9d1d9": 3, "#e3b341": 2, "#f0f6fc": 1, "#f85149": 1, "rgba(0,0,0,0.5)": 1, "rgba(0,0,0,0.75)": 1, "rgba(56,139,253,0.1)": 1},
   "features/editor/MonacoWorkspaceEditor.tsx": {"#070a0e": 1, "#090d13": 3, "#0d1117": 4, "#161b22": 4, "#1f242c": 1, "#21262d": 6, "#2ea043": 1, "#30363d": 7, "#3fb950": 4, "#484f58": 2, "#58a6ff": 9, "#79c0ff": 1, "#8b949e": 9, "#c9d1d9": 6, "#e3b341": 6, "#f0f6fc": 5, "#f85149": 3, "rgba(210,153,34,0.2)": 1, "rgba(227,179,65,0.15)": 2, "rgba(227,179,65,0.3)": 1, "rgba(248,81,73,0.15)": 1, "rgba(248,81,73,0.2)": 1, "rgba(46,160,67,0.12)": 1, "rgba(46,160,67,0.15)": 1, "rgba(46,160,67,0.2)": 1, "rgba(56,139,253,0.1)": 1, "rgba(56,139,253,0.12)": 2, "rgba(56,139,253,0.2)": 1, "rgba(56,139,253,0.3)": 1},
   "features/evidence/EvidenceViewer.tsx": {"#10b981": 1, "#d97706": 3, "#f87171": 1, "rgba(16,185,129,0.15)": 1, "rgba(234,179,8,0.08)": 1, "rgba(234,179,8,0.15)": 1, "rgba(234,179,8,0.3)": 1, "rgba(248,81,73,0.08)": 1, "rgba(248,81,73,0.1)": 2, "rgba(248,81,73,0.15)": 2, "rgba(248,81,73,0.3)": 1, "rgba(56,139,253,0.15)": 1},
-  "features/mlops/ModelLineageView.tsx": {"#0d1117": 34, "#161b22": 13, "#1a7f37": 1, "#1f242c": 7, "#1f6feb": 1, "#21262d": 7, "#30363d": 53, "#388bfd": 2, "#3d1214": 1, "#3fb950": 20, "#58a6ff": 40, "#8b949e": 108, "#94a3b8": 1, "#a0a8b2": 2, "#c9d1d9": 43, "#cf222e": 1, "#d29922": 4, "#e3b341": 3, "#eab308": 1, "#f0883e": 9, "#f0f6fc": 30, "#f59e0b": 3, "#f85149": 14, "#fde047": 1, "#fed7aa": 7, "#ff7b72": 10, "#ffb4a9": 1, "#ffffff": 2, "rgba(139,148,158,0.15)": 1, "rgba(160,168,178,0.15)": 2, "rgba(210,153,34,0.2)": 1, "rgba(234,179,8,0.12)": 1, "rgba(240,136,62,0.15)": 5, "rgba(248,81,73,0.12)": 3, "rgba(248,81,73,0.15)": 7, "rgba(248,81,73,0.2)": 1, "rgba(46,160,67,0.12)": 5, "rgba(46,160,67,0.15)": 1, "rgba(46,160,67,0.2)": 1, "rgba(56,139,253,0.12)": 1, "rgba(56,139,253,0.15)": 8, "rgba(56,139,253,0.2)": 1},
+  "features/mlops/ModelLineageView.tsx": {},
   "features/nodes/NodeDetail.tsx": {"rgba(210,153,34,0.12)": 1, "rgba(210,153,34,0.15)": 1, "rgba(248,81,73,0.1)": 1},
   "features/nodes/NodeList.tsx": {"#1e1e1e": 1, "#2d3748": 1, "#4ade80": 2, "#fff": 1, "#ffffff": 1, "rgba(210,153,34,0.15)": 1, "rgba(56,189,248,0.12)": 1, "rgba(56,189,248,0.3)": 1},
   "features/placement/PlacementExplainView.tsx": {"#d97706": 1, "rgba(16,185,129,0.1)": 1, "rgba(16,185,129,0.15)": 1, "rgba(234,179,8,0.15)": 1, "rgba(234,179,8,0.3)": 1},
@@ -242,6 +243,17 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
 
   const lightTokens = extractTokens(lightBlockMatch[1]);
   const darkTokens = extractTokens(darkBlockMatch[1]);
+
+  let originalGlobalFetch: typeof globalThis.fetch;
+  beforeAll(() => {
+    originalGlobalFetch = globalThis.fetch;
+    globalThis.fetch = vi.fn().mockImplementation(() =>
+      Promise.resolve(new Response(JSON.stringify({}), { status: 200, headers: { 'Content-Type': 'application/json' } }))
+    );
+  });
+  afterAll(() => {
+    globalThis.fetch = originalGlobalFetch;
+  });
 
   // Codex F2: Status tokens must be declared exactly once per theme block without comment decoys
   it('ACC-09 / Codex F2: Status tokens are declared exactly once per theme block without comment decoys', () => {
@@ -1567,6 +1579,329 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
   });
 
+  // 9d. [Card 197 / ACC-09] Component DOM Rendering & Binding Verification: ModelLineageView
+  it('ACC-09 / Card 197: ModelLineageView DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification', async () => {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = vi.fn().mockImplementation(() =>
+      Promise.resolve(new Response(JSON.stringify({}), { status: 200, headers: { 'Content-Type': 'application/json' } }))
+    );
+
+    const container = document.createElement('div');
+    container.setAttribute('data-theme', 'light');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    try {
+      await act(async () => {
+        root.render(<ModelLineageView />);
+      });
+
+      // 1. Control Panel and Header
+      const controlPanel = container.querySelector('[data-testid="model-registry-control-panel"]') as HTMLElement;
+      expect(controlPanel, 'Control panel must render').not.toBeNull();
+      expect(controlPanel.style.backgroundColor, 'Control panel bg must bind to var(--color-bg-surface)').toBe('var(--color-bg-surface)');
+      expect(controlPanel.style.borderColor, 'Control panel border must bind to var(--color-border-subtle)').toBe('var(--color-border-subtle)');
+
+      const cpBgVar = helperExtractVar(controlPanel.style.backgroundColor);
+      const cpBorderVar = helperExtractVar(controlPanel.style.borderColor);
+      expect(getContrast(lightTokens[cpBorderVar], lightTokens[cpBgVar]), 'Control panel light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[cpBorderVar], darkTokens[cpBgVar]), 'Control panel dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 2. W3 Seam Badge
+      const seamBadge = container.querySelector('[data-testid="badge-w3-verify-seam"]') as HTMLElement;
+      expect(seamBadge, 'W3 verify seam badge must render').not.toBeNull();
+      expect(seamBadge.style.backgroundColor, 'Seam badge bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(seamBadge.style.color, 'Seam badge text must bind to var(--color-text-muted)').toBe('var(--color-text-muted)');
+      expect(seamBadge.style.borderColor, 'Seam badge border must bind to var(--color-border-subtle)').toBe('var(--color-border-subtle)');
+
+      const seamBgVar = helperExtractVar(seamBadge.style.backgroundColor);
+      const seamFgVar = helperExtractVar(seamBadge.style.color);
+      const seamBorderVar = helperExtractVar(seamBadge.style.borderColor);
+      expect(getContrast(lightTokens[seamFgVar], lightTokens[seamBgVar]), 'Seam badge light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[seamFgVar], darkTokens[seamBgVar]), 'Seam badge dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[seamBorderVar], lightTokens[seamBgVar]), 'Seam badge light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[seamBorderVar], darkTokens[seamBgVar]), 'Seam badge dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 3. Project ID Input
+      const projInput = container.querySelector('[data-testid="input-project-id"]') as HTMLElement;
+      expect(projInput, 'Project ID input must render').not.toBeNull();
+      expect(projInput.style.backgroundColor, 'Project input bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(projInput.style.color, 'Project input text must bind to var(--color-text-primary)').toBe('var(--color-text-primary)');
+      expect(projInput.style.borderColor, 'Project input border must bind to var(--color-border-subtle)').toBe('var(--color-border-subtle)');
+
+      const inputBgVar = helperExtractVar(projInput.style.backgroundColor);
+      const inputFgVar = helperExtractVar(projInput.style.color);
+      const inputBorderVar = helperExtractVar(projInput.style.borderColor);
+      expect(getContrast(lightTokens[inputFgVar], lightTokens[inputBgVar]), 'Input light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[inputFgVar], darkTokens[inputBgVar]), 'Input dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[inputBorderVar], lightTokens[inputBgVar]), 'Input light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[inputBorderVar], darkTokens[inputBgVar]), 'Input dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 4. Governance Approval Notice Banner (canApprove = false default)
+      const noApproveBanner = container.querySelector('[data-testid="banner-no-approve-permission"]') as HTMLElement;
+      expect(noApproveBanner, 'No approve permission banner must render').not.toBeNull();
+      expect(noApproveBanner.style.backgroundColor, 'Banner bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(noApproveBanner.style.color, 'Banner text must bind to var(--color-status-offline)').toBe('var(--color-status-offline)');
+      expect(noApproveBanner.style.borderColor, 'Banner border must bind to var(--color-status-offline)').toBe('var(--color-status-offline)');
+
+      const bannerBgVar = helperExtractVar(noApproveBanner.style.backgroundColor);
+      const bannerFgVar = helperExtractVar(noApproveBanner.style.color);
+      const bannerBorderVar = helperExtractVar(noApproveBanner.style.borderColor);
+      expect(getContrast(lightTokens[bannerFgVar], lightTokens[bannerBgVar]), 'Banner light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[bannerFgVar], darkTokens[bannerBgVar]), 'Banner dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[bannerBorderVar], lightTokens[bannerBgVar]), 'Banner light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[bannerBorderVar], darkTokens[bannerBgVar]), 'Banner dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 5. Action Navigation Tabs: Active Tab (Trace) and Inactive Tab (Register)
+      const tabTrace = container.querySelector('[data-testid="tab-trace"]') as HTMLElement;
+      expect(tabTrace, 'Tab trace must render').not.toBeNull();
+      expect(tabTrace.style.backgroundColor, 'Active tab bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(tabTrace.style.color, 'Active tab text must bind to var(--color-brand-primary)').toBe('var(--color-brand-primary)');
+      expect(tabTrace.style.borderColor, 'Active tab border must bind to var(--color-brand-primary)').toBe('var(--color-brand-primary)');
+
+      const activeTabBgVar = helperExtractVar(tabTrace.style.backgroundColor);
+      const activeTabFgVar = helperExtractVar(tabTrace.style.color);
+      const activeTabBorderVar = helperExtractVar(tabTrace.style.borderColor);
+      expect(getContrast(lightTokens[activeTabFgVar], lightTokens[activeTabBgVar]), 'Active tab light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[activeTabFgVar], darkTokens[activeTabBgVar]), 'Active tab dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[activeTabBorderVar], lightTokens[activeTabBgVar]), 'Active tab light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[activeTabBorderVar], darkTokens[activeTabBgVar]), 'Active tab dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      const tabRegister = container.querySelector('[data-testid="tab-register"]') as HTMLElement;
+      expect(tabRegister, 'Tab register must render').not.toBeNull();
+      expect(tabRegister.style.color, 'Inactive tab text must bind to var(--color-text-muted)').toBe('var(--color-text-muted)');
+      const inactiveTabFgVar = helperExtractVar(tabRegister.style.color);
+      expect(getContrast(lightTokens[inactiveTabFgVar], lightTokens[cpBgVar]), 'Inactive tab light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[inactiveTabFgVar], darkTokens[cpBgVar]), 'Inactive tab dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      // 6. Lineage Unexposed Notice Banner
+      const unexposedNotice = container.querySelector('[data-testid="lineage-unexposed-notice"]') as HTMLElement;
+      expect(unexposedNotice, 'Lineage unexposed notice must render').not.toBeNull();
+      expect(unexposedNotice.style.backgroundColor, 'Unexposed notice bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(unexposedNotice.style.color, 'Unexposed notice text must bind to var(--color-status-degraded)').toBe('var(--color-status-degraded)');
+      expect(unexposedNotice.style.borderColor, 'Unexposed notice border must bind to var(--color-status-degraded)').toBe('var(--color-status-degraded)');
+
+      const unexpBgVar = helperExtractVar(unexposedNotice.style.backgroundColor);
+      const unexpFgVar = helperExtractVar(unexposedNotice.style.color);
+      const unexpBorderVar = helperExtractVar(unexposedNotice.style.borderColor);
+      expect(getContrast(lightTokens[unexpFgVar], lightTokens[unexpBgVar]), 'Unexposed notice light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[unexpFgVar], darkTokens[unexpBgVar]), 'Unexposed notice dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[unexpBorderVar], lightTokens[unexpBgVar]), 'Unexposed notice light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[unexpBorderVar], darkTokens[unexpBgVar]), 'Unexposed notice dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    } finally {
+      globalThis.fetch = originalFetch;
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    }
+  });
+
+  // 9d-2. [Card 197 r2 / ACC-09 / Claude r2 & Codex r2] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: ModelLineageView
+  it('ACC-09 / Card 197: ModelLineageView style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
+    const filePath = path.resolve(__dirname, '../src/features/mlops/ModelLineageView.tsx');
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const sf = ts.createSourceFile('ModelLineageView.tsx', content, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+
+    interface Branch {
+      cond: string;
+      token: string;
+    }
+
+    function extractBranches(node: ts.Node): Branch[] {
+      const branches: Branch[] = [];
+      function collect(n: ts.Node, condPath: string) {
+        if (ts.isConditionalExpression(n)) {
+          const condText = n.condition.getText(sf).replace(/\s+/g, ' ');
+          collect(n.whenTrue, condPath ? `${condPath} && ${condText}` : condText);
+          collect(n.whenFalse, condPath ? `${condPath} && !(${condText})` : `!(${condText})`);
+        } else if (ts.isTemplateExpression(n)) {
+          for (const span of n.templateSpans) {
+            collect(span.expression, condPath);
+          }
+        } else {
+          const text = n.getText(sf);
+          const m = text.match(/var\((--color-[a-z0-9-]+)\)/);
+          if (m) {
+            branches.push({ cond: condPath, token: m[1] });
+          }
+        }
+      }
+      collect(node, '');
+      return branches;
+    }
+
+    let checkedPairs = 0;
+    let checkedObjects = 0;
+    let totalStyleAttrs = 0;
+    let unboundColorObjects = 0;
+    let checkedBorderObjects = 0;
+    let checkedBorderPairs = 0;
+    const violations: string[] = [];
+    const containerBgs = ['--color-bg-surface', '--color-bg-subtle', '--color-bg-canvas'];
+
+    function checkPair(bgToken: string, fgToken: string, pos: number) {
+      checkedPairs++;
+      const { line } = sf.getLineAndCharacterOfPosition(pos);
+      const lightBg = lightTokens[bgToken];
+      const lightFg = lightTokens[fgToken];
+      const darkBg = darkTokens[bgToken];
+      const darkFg = darkTokens[fgToken];
+
+      if (bgToken === fgToken) {
+        violations.push(`L${line + 1}: 1:1 token collision between background and foreground (${bgToken})`);
+        return;
+      }
+
+      if (lightBg && lightFg) {
+        const cr = getContrast(lightFg, lightBg);
+        if (cr < 4.5) {
+          violations.push(`L${line + 1}: Light text contrast ${cr.toFixed(2)}:1 < 4.5:1 (${fgToken} on ${bgToken})`);
+        }
+      }
+      if (darkBg && darkFg) {
+        const cr = getContrast(darkFg, darkBg);
+        if (cr < 4.5) {
+          violations.push(`L${line + 1}: Dark text contrast ${cr.toFixed(2)}:1 < 4.5:1 (${fgToken} on ${bgToken})`);
+        }
+      }
+    }
+
+    function checkInheritedColor(fgToken: string, pos: number) {
+      const { line } = sf.getLineAndCharacterOfPosition(pos);
+      const lightFg = lightTokens[fgToken];
+      const darkFg = darkTokens[fgToken];
+
+      for (const bgToken of containerBgs) {
+        const lightBg = lightTokens[bgToken];
+        const darkBg = darkTokens[bgToken];
+
+        if (lightBg && lightFg) {
+          const cr = getContrast(lightFg, lightBg);
+          if (cr < 4.5) {
+            violations.push(`L${line + 1}: Inherited Light text contrast ${cr.toFixed(2)}:1 < 4.5:1 (${fgToken} on container ${bgToken})`);
+          }
+        }
+        if (darkBg && darkFg) {
+          const cr = getContrast(darkFg, darkBg);
+          if (cr < 4.5) {
+            violations.push(`L${line + 1}: Inherited Dark text contrast ${cr.toFixed(2)}:1 < 4.5:1 (${fgToken} on container ${bgToken})`);
+          }
+        }
+      }
+    }
+
+    function checkBorderPair(bgToken: string, borderToken: string, pos: number) {
+      checkedBorderPairs++;
+      const { line } = sf.getLineAndCharacterOfPosition(pos);
+      const lBg = lightTokens[bgToken];
+      const dBg = darkTokens[bgToken];
+      const lBorder = lightTokens[borderToken];
+      const dBorder = darkTokens[borderToken];
+
+      if (bgToken === borderToken) {
+        violations.push(`L${line + 1}: Identical border-background token collision (1:1 contrast) detected: ${borderToken} on ${bgToken}`);
+        return;
+      }
+
+      if (lBg && lBorder) {
+        const cr = getContrast(lBorder, lBg);
+        if (cr < 3.0) {
+          violations.push(`L${line + 1}: Light border contrast ${cr.toFixed(2)}:1 < 3.0:1 (${borderToken} on ${bgToken})`);
+        }
+      }
+      if (dBg && dBorder) {
+        const cr = getContrast(dBorder, dBg);
+        if (cr < 3.0) {
+          violations.push(`L${line + 1}: Dark border contrast ${cr.toFixed(2)}:1 < 3.0:1 (${borderToken} on ${bgToken})`);
+        }
+      }
+    }
+
+    function checkInheritedBorder(borderToken: string, pos: number) {
+      for (const bgToken of containerBgs) {
+        checkBorderPair(bgToken, borderToken, pos);
+      }
+    }
+
+    function visit(node: ts.Node) {
+      if (ts.isJsxAttribute(node) && node.name.text === 'style') {
+        totalStyleAttrs++;
+        function findObjects(n: ts.Node) {
+          if (ts.isObjectLiteralExpression(n)) {
+            let bgNode: ts.Expression | null = null;
+            let fgNode: ts.Expression | null = null;
+            let borderNode: ts.Expression | null = null;
+            for (const p of n.properties) {
+              if (ts.isPropertyAssignment(p)) {
+                const name = p.name.getText(sf);
+                if (name === 'backgroundColor' || name === 'background') bgNode = p.initializer;
+                if (name === 'color') fgNode = p.initializer;
+                if (['border', 'borderColor', 'borderTop', 'borderBottom', 'borderLeft', 'borderRight'].includes(name)) {
+                  borderNode = p.initializer;
+                }
+              }
+            }
+            if (bgNode && fgNode) {
+              checkedObjects++;
+              const bgBranches = extractBranches(bgNode);
+              const fgBranches = extractBranches(fgNode);
+
+              for (const bgB of bgBranches) {
+                for (const fgB of fgBranches) {
+                  if (!bgB.cond || !fgB.cond || bgB.cond === fgB.cond) {
+                    checkPair(bgB.token, fgB.token, n.getStart(sf));
+                  }
+                }
+              }
+            } else if (!bgNode && fgNode) {
+              unboundColorObjects++;
+              const fgBranches = extractBranches(fgNode);
+              for (const fgB of fgBranches) {
+                checkInheritedColor(fgB.token, n.getStart(sf));
+              }
+            }
+
+            if (borderNode) {
+              const borderBranches = extractBranches(borderNode);
+              if (borderBranches.length > 0) {
+                checkedBorderObjects++;
+                if (bgNode) {
+                  const bgBranches = extractBranches(bgNode);
+                  for (const bB of borderBranches) {
+                    for (const bgB of bgBranches) {
+                      if (!bB.cond || !bgB.cond || bB.cond === bgB.cond) {
+                        checkBorderPair(bgB.token, bB.token, n.getStart(sf));
+                      }
+                    }
+                  }
+                } else {
+                  for (const bB of borderBranches) {
+                    checkInheritedBorder(bB.token, n.getStart(sf));
+                  }
+                }
+              }
+            }
+          }
+          ts.forEachChild(n, findObjects);
+        }
+        findObjects(node);
+      }
+      ts.forEachChild(node, visit);
+    }
+    visit(sf);
+
+    // Exact ratchet assertions covering 100% of ModelLineageView style declarations
+    expect(totalStyleAttrs, 'Total style attributes in ModelLineageView must be exactly 359').toBe(359);
+    expect(checkedObjects, 'Style objects with explicit background and foreground must be exactly 58').toBe(58);
+    expect(checkedPairs, 'Evaluated foreground-background pairs across conditional branches must be exactly 76').toBe(76);
+    expect(unboundColorObjects, 'Elements with foreground color inheriting container background must be exactly 176').toBe(176);
+    expect(checkedObjects + unboundColorObjects, 'Total covered color style objects must be exactly 234').toBe(234);
+    expect(checkedBorderObjects, 'Style objects with explicit border token declarations must be exactly 83').toBe(83);
+    expect(checkedBorderPairs, 'Evaluated border-background pairs across conditional and container branches must be exactly 122').toBe(122);
+    expect(violations, `Expected 0 style-pair contrast/collision violations in ModelLineageView, got:\n${violations.join('\n')}`).toEqual([]);
+  });
+
   // 9. [F1 & Card 186 Revert-Fail Probes] Mutating fixes back to defective combinations strictly fails
   it('ACC-09 Revert-Fail Probes: Defective color combinations strictly fail WCAG AA criteria', () => {
     // Probe 1: RiskBadge light L1 with former #2563eb on 15% tint over light surface
@@ -1719,6 +2054,52 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(getContrast(lightTokens['--color-status-lost'], lightTokens['--color-status-lost']), 'Defective repair error text on lost in light fails 4.5:1').toBe(1.0);
     expect(getContrast(darkTokens['--color-status-lost'], darkTokens['--color-status-lost']), 'Defective repair error text on lost in dark fails 4.5:1').toBe(1.0);
 
+    // Probe 32 [Card 197]: ModelLineageView former primary text literal #f0f6fc on light surface (#ffffff) (1.09:1) strictly fails 4.5:1
+    expect(getContrast('#f0f6fc', lightTokens['--color-bg-surface']), 'Defective #f0f6fc on light surface must fail 4.5:1').toBeLessThan(4.5);
+
+    // Probe 33 [Card 197]: ModelLineageView former secondary text literal #c9d1d9 on light surface (#ffffff) (1.54:1) strictly fails 4.5:1
+    expect(getContrast('#c9d1d9', lightTokens['--color-bg-surface']), 'Defective #c9d1d9 on light surface must fail 4.5:1').toBeLessThan(4.5);
+
+    // Probe 34 [Card 197]: ModelLineageView former muted text literal #8b949e on light surface (#ffffff) (3.08:1) strictly fails 4.5:1
+    expect(getContrast('#8b949e', lightTokens['--color-bg-surface']), 'Defective #8b949e on light surface must fail 4.5:1').toBeLessThan(4.5);
+
+    // Probe 35 [Card 197]: ModelLineageView former brand text literal #58a6ff on light surface (#ffffff) (2.53:1) strictly fails 4.5:1
+    expect(getContrast('#58a6ff', lightTokens['--color-bg-surface']), 'Defective #58a6ff on light surface must fail 4.5:1').toBeLessThan(4.5);
+
+    // Probe 36 [Card 197]: ModelLineageView former warning badge text #fed7aa on light subtle (#f1f5f9) (1.24:1) strictly fails 4.5:1
+    expect(getContrast('#fed7aa', lightTokens['--color-bg-subtle']), 'Defective #fed7aa on light subtle must fail 4.5:1').toBeLessThan(4.5);
+
+    // Probe 37 [Card 197]: ModelLineageView former border literal #30363d on dark surface (#111827) (1.45:1) strictly fails 3.0:1
+    expect(getContrast('#30363d', darkTokens['--color-bg-surface']), 'Defective #30363d on dark surface must fail 3.0:1').toBeLessThan(3.0);
+
+    // Probe 38 [Card 197 r1 / Z1 / F2]: Brand primary on brand subtle in light mode (4.24:1) strictly fails 4.5:1
+    const probe38Cr = getContrast(lightTokens['--color-brand-primary'], lightTokens['--color-brand-subtle']);
+    expect(probe38Cr, 'Defective brand-primary on brand-subtle in light must fail 4.5:1').toBeLessThan(4.5);
+    expect(probe38Cr).toBeCloseTo(4.24, 2);
+
+    // Probe 39 [Card 197 r1 / Z2 / F1]: Eval-gate-badge white text on status-online in dark mode (2.28:1) strictly fails 4.5:1
+    const probe39Cr = getContrast(darkTokens['--color-brand-primary-fg'], darkTokens['--color-status-online']);
+    expect(probe39Cr, 'Defective white on status-online in dark must fail 4.5:1').toBeLessThan(4.5);
+    expect(probe39Cr).toBeCloseTo(2.28, 2);
+
+    // Probe 40 [Card 197 r1 / Z2 / F1]: Eval-gate-badge white text on status-offline in dark mode (2.77:1) strictly fails 4.5:1
+    const probe40Cr = getContrast(darkTokens['--color-brand-primary-fg'], darkTokens['--color-status-offline']);
+    expect(probe40Cr, 'Defective white on status-offline in dark must fail 4.5:1').toBeLessThan(4.5);
+    expect(probe40Cr).toBeCloseTo(2.77, 2);
+
+    // Probe 41 [Card 197 r1 / Z3 / F3]: Swapping status-online into background of status-online text (1:1 mutation S3) strictly fails 4.5:1
+    expect(getContrast(lightTokens['--color-status-online'], lightTokens['--color-status-online']), 'Defective online on online in light fails 4.5:1').toBe(1.0);
+    expect(getContrast(darkTokens['--color-status-online'], darkTokens['--color-status-online']), 'Defective online on online in dark fails 4.5:1').toBe(1.0);
+
+    // Probe 42 [Card 197 r2 / Claude r2 & Codex r2]: Replay foreground brand-hover -> brand-primary-fg on brand-subtle in light mode (1.22:1) strictly fails 4.5:1
+    const probe42Cr = getContrast(lightTokens['--color-brand-primary-fg'], lightTokens['--color-brand-subtle']);
+    expect(probe42Cr, 'Defective brand-primary-fg on brand-subtle in light must fail 4.5:1').toBeLessThan(4.5);
+    expect(probe42Cr).toBeCloseTo(1.22, 2);
+
+    // Probe 43 [Card 197 r3 / Claude r3 W1]: Swapping badge border to same as badge background (1:1 border collision) strictly fails 3.0:1
+    expect(getContrast(lightTokens['--color-brand-subtle'], lightTokens['--color-brand-subtle']), 'Defective badge border on subtle background in light fails 3.0:1').toBe(1.0);
+    expect(getContrast(darkTokens['--color-brand-subtle'], darkTokens['--color-brand-subtle']), 'Defective badge border on subtle background in dark fails 3.0:1').toBe(1.0);
+
     // Legacy Token Reverts:
     // Legacy Dark --color-border-subtle: #374151
     expect(getContrast('#374151', darkTokens['--color-bg-surface'])).toBeLessThan(3.0); // 1.72:1
@@ -1730,8 +2111,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(getContrast('#64748b', lightTokens['--color-bg-subtle'])).toBeLessThan(4.5); // 4.34:1
   });
 
-  // 10. [F2 Fail-Closed Multiset Inventory & Ratchet] var(--color-border-subtle) exact 233/22 and exact per-file literal multisets strictly bounded
-  it('ACC-09 / F2 Fail-Closed Multiset Inventory & Ratchet: var(--color-border-subtle) exact 233/22 and exact per-file literal multisets strictly bounded', () => {
+  // 10. [F2 Fail-Closed Multiset Inventory & Ratchet] var(--color-border-subtle) exact 292/23 and exact per-file literal multisets strictly bounded
+  it('ACC-09 / F2 Fail-Closed Multiset Inventory & Ratchet: var(--color-border-subtle) exact 292/23 and exact per-file literal multisets strictly bounded', () => {
     const srcDir = path.resolve(__dirname, '../src');
     const allFiles = getAllSourceFiles(srcDir);
 
@@ -1813,28 +2194,28 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
 
     // Exact count verification for var(--color-border-subtle)
-    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 233').toBe(233);
-    expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 22').toBe(22);
+    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 292').toBe(292);
+    expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 23').toBe(23);
 
     // Fail-closed check 3: Total files with color literals must not exceed baseline file count
     const baselineFileCount = Object.keys(COLOR_LITERAL_MULTISET_BASELINE).length;
     expect(Object.keys(observedFileMultisets).length, 'Total files with color literals must not exceed baseline').toBeLessThanOrEqual(baselineFileCount);
 
     // Ratchet assertions for specific legacy literals (occurrences & files)
-    expect(legacyCounts['#64748b'], 'Legacy #64748b literal count must not exceed 15').toBeLessThanOrEqual(15);
-    expect(legacyFiles['#64748b'].size, 'Legacy #64748b file count must not exceed 6').toBeLessThanOrEqual(6);
+    expect(legacyCounts['#64748b'], 'Legacy #64748b literal count must not exceed 5').toBeLessThanOrEqual(5);
+    expect(legacyFiles['#64748b'].size, 'Legacy #64748b file count must not exceed 4').toBeLessThanOrEqual(4);
 
     expect(legacyCounts['#d97706'], 'Legacy #d97706 literal count must not exceed 14').toBeLessThanOrEqual(14);
     expect(legacyFiles['#d97706'].size, 'Legacy #d97706 file count must not exceed 6').toBeLessThanOrEqual(6);
 
-    expect(legacyCounts['#e2e8f0'], 'Legacy #e2e8f0 literal count must not exceed 3').toBeLessThanOrEqual(3);
-    expect(legacyFiles['#e2e8f0'].size, 'Legacy #e2e8f0 file count must not exceed 2').toBeLessThanOrEqual(2);
+    expect(legacyCounts['#e2e8f0'], 'Legacy #e2e8f0 literal count must not exceed 1').toBeLessThanOrEqual(1);
+    expect(legacyFiles['#e2e8f0'].size, 'Legacy #e2e8f0 file count must not exceed 1').toBeLessThanOrEqual(1);
 
     expect(legacyCounts['#dc2626'], 'Legacy #dc2626 literal count must not exceed 1').toBeLessThanOrEqual(1);
     expect(legacyFiles['#dc2626'].size, 'Legacy #dc2626 file count must not exceed 1').toBeLessThanOrEqual(1);
 
-    expect(legacyCounts['#30363d'], 'Legacy #30363d literal count must not exceed 169').toBeLessThanOrEqual(169);
-    expect(legacyFiles['#30363d'].size, 'Legacy #30363d file count must not exceed 15').toBeLessThanOrEqual(15);
+    expect(legacyCounts['#30363d'], 'Legacy #30363d literal count must not exceed 116').toBeLessThanOrEqual(116);
+    expect(legacyFiles['#30363d'].size, 'Legacy #30363d file count must not exceed 14').toBeLessThanOrEqual(14);
   });
 
   // 11. Comment-trivia exclusion: comments are never colours, but real string/template/JSX values still count
