@@ -37,7 +37,7 @@ from ..db.models import (
     StorageCheck,
     StorageContribution,
 )
-from ..errors import RES_ARTIFACT_NOT_FOUND, VAL_SCHEMA, InvError
+from ..errors import RES_ARTIFACT_NOT_FOUND, RES_RELEASE_NOT_FOUND, VAL_SCHEMA, InvError
 from ..ids import new_id
 
 BACKUP_KINDS = ("base", "wal", "logical")
@@ -609,4 +609,168 @@ def pilot_readiness(
             "physical Node and authenticated browser acceptance",
         ],
         "evidenceComplete": False,
+    }
+
+
+#: A read page is bounded so a tenant with a long release history cannot be
+#: asked for all of it in one request. The ceiling is the contract's, not a
+#: preference: ``ReleaseManifestPageResponse`` declares ``max_length=200``.
+RELEASE_PAGE_MAX = 200
+RELEASE_PAGE_DEFAULT = 50
+
+
+def _release_components(manifest: ReleaseManifest) -> list[dict]:
+    """The pinned component list, with entries that are not a mapping dropped.
+
+    ``components`` is JSONB, so the column can hold a shape the current writer
+    would never produce -- an older row, or a hand-edited one. A reader that
+    assumed the shape would turn that into a 500; dropping the entry keeps the
+    answer honest about what the row contains, and ``componentCount`` is read
+    from its own column so the discrepancy stays visible rather than being
+    papered over.
+    """
+
+    rows = manifest.components if isinstance(manifest.components, list) else []
+    components = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        name, kind, digest = row.get("name"), row.get("kind"), row.get("digest")
+        if not all(isinstance(value, str) and value for value in (name, kind, digest)):
+            continue
+        components.append({"name": name, "kind": kind, "digest": digest})
+    return components
+
+
+def operator_sign_off(manifest: ReleaseManifest, acceptances: list[AcceptanceRecord]) -> bool:
+    """Has a person accepted *this* composition?
+
+    True only when an ``accepted`` decision pins the same manifest hash. The
+    three ways this stays false are each a real distinction:
+
+    * no acceptance row at all -- nobody has looked;
+    * ``conditional`` or ``rejected`` -- somebody looked and did not sign off;
+    * ``accepted`` with a different ``accepted_manifest_sha256`` -- somebody
+      signed off on a differently-composed release of the same name, which is
+      the failure the pinned hash exists to catch.
+
+    The system cannot make this true by itself: ``accepted_by_user_id`` is a
+    foreign key to ``users``, so every row this reads was written for a person.
+    """
+
+    return any(
+        record.outcome == "accepted"
+        and str(record.accepted_manifest_sha256) == str(manifest.manifest_sha256)
+        for record in acceptances
+    )
+
+
+def _acceptance_payload(record: AcceptanceRecord, manifest: ReleaseManifest) -> dict:
+    limitations = record.known_limitations if isinstance(record.known_limitations, list) else []
+    return {
+        "acceptanceId": record.acceptance_id,
+        "acceptanceIdRef": record.acceptance_id_ref,
+        "outcome": record.outcome,
+        "acceptedManifestSha256": record.accepted_manifest_sha256,
+        "manifestMatches": str(record.accepted_manifest_sha256)
+        == str(manifest.manifest_sha256),
+        "knownLimitations": [item for item in limitations if isinstance(item, str)],
+        "decidedAt": record.decided_at,
+    }
+
+
+def _manifest_payload(manifest: ReleaseManifest, acceptances: list[AcceptanceRecord]) -> dict:
+    return {
+        "releaseId": manifest.release_id,
+        "version": manifest.version,
+        "componentCount": int(manifest.component_count),
+        "manifestSha256": manifest.manifest_sha256,
+        "components": _release_components(manifest),
+        "createdAt": manifest.created_at,
+        "operatorSignOff": operator_sign_off(manifest, acceptances),
+        "acceptanceCount": len(acceptances),
+    }
+
+
+def _acceptances_for(session: Session, *, tenant_id, release_ids: list[str]) -> dict[str, list]:
+    """Every acceptance row for these releases, grouped, in one query.
+
+    One query rather than one per release: a page of fifty releases would
+    otherwise be fifty-one round trips, and the page size is bounded precisely
+    so this stays a single bounded read.
+    """
+
+    if not release_ids:
+        return {}
+    rows = session.scalars(
+        select(AcceptanceRecord)
+        .where(
+            AcceptanceRecord.tenant_id == tenant_id,
+            AcceptanceRecord.release_id.in_(release_ids),
+        )
+        .order_by(AcceptanceRecord.decided_at, AcceptanceRecord.acceptance_id)
+    ).all()
+    grouped: dict[str, list] = {release_id: [] for release_id in release_ids}
+    for row in rows:
+        grouped.setdefault(str(row.release_id), []).append(row)
+    return grouped
+
+
+def release_manifest_page(
+    session: Session,
+    *,
+    tenant_id,
+    limit: int = RELEASE_PAGE_DEFAULT,
+    cursor: str | None = None,
+) -> dict:
+    """A bounded page of recorded releases, newest first.
+
+    A tenant with no releases is an empty list. That is not a 404: the question
+    "what has been released here" has an answer, and the answer is "nothing
+    yet". Returning a not-found for it would make an empty pilot
+    indistinguishable from a tenant the caller cannot see.
+    """
+
+    bounded = max(1, min(int(limit), RELEASE_PAGE_MAX))
+    query = select(ReleaseManifest).where(ReleaseManifest.tenant_id == tenant_id)
+    if cursor:
+        query = query.where(ReleaseManifest.release_id < cursor)
+    manifests = session.scalars(
+        query.order_by(ReleaseManifest.release_id.desc()).limit(bounded + 1)
+    ).all()
+    page = list(manifests[:bounded])
+    acceptances = _acceptances_for(
+        session, tenant_id=tenant_id, release_ids=[str(row.release_id) for row in page]
+    )
+    return {
+        "items": [
+            _manifest_payload(row, acceptances.get(str(row.release_id), [])) for row in page
+        ],
+        "nextCursor": str(page[-1].release_id) if len(manifests) > bounded and page else None,
+    }
+
+
+def release_manifest_detail(session: Session, *, tenant_id, release_id: str) -> dict:
+    """One release and every acceptance decision recorded against it.
+
+    A release in another tenant is the same ``RES-RELEASE-NOT-FOUND`` as one
+    that does not exist -- the row is not visible under this tenant's scope, and
+    saying "exists but not yours" would answer a question the caller is not
+    allowed to ask.
+    """
+
+    manifest = session.scalars(
+        select(ReleaseManifest).where(
+            ReleaseManifest.tenant_id == tenant_id,
+            ReleaseManifest.release_id == release_id,
+        )
+    ).first()
+    if manifest is None:
+        raise InvError(RES_RELEASE_NOT_FOUND, "release manifest not found", status=404)
+    acceptances = _acceptances_for(
+        session, tenant_id=tenant_id, release_ids=[str(manifest.release_id)]
+    ).get(str(manifest.release_id), [])
+    return {
+        "release": _manifest_payload(manifest, acceptances),
+        "acceptances": [_acceptance_payload(row, manifest) for row in acceptances],
     }

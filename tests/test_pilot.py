@@ -732,3 +732,277 @@ def test_failed_or_aborted_drill_keeps_measurements_without_claiming_targets(app
             with session.begin():
                 with tenant_scope(session, pilot["tenant_a"]):
                     session.execute(text("UPDATE recovery_drills SET met_targets=true WHERE drill_id=:d"), {"d":drill_id})
+
+
+# ---------------------------------------------------------------------------
+# Read-only release manifest surface (card 182, DEF-S12)
+#
+# The question these answer is the one the re-score recorded as unanswerable:
+# "has a person signed this release off?". Each test fixes one way the answer
+# must stay false, because a reader that says true too easily is worse than the
+# hard-coded false it replaces.
+# ---------------------------------------------------------------------------
+
+
+def _release(session, *, tenant_id, user_id, version="R4"):
+    return pilot_service.create_release_manifest(
+        session,
+        tenant_id=tenant_id,
+        version=version,
+        components=_components(),
+        created_by_user_id=user_id,
+        now=NOW,
+    )
+
+
+def test_an_empty_tenant_reads_an_empty_release_page(app_sessionmaker, pilot):
+    """No releases recorded is an empty list, not a not-found.
+
+    "Nothing has been released here" is an answer. Making it a 404 would make an
+    untouched pilot indistinguishable from a tenant the caller cannot see.
+    """
+
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, pilot["tenant_a"]):
+                page = pilot_service.release_manifest_page(
+                    session, tenant_id=pilot["tenant_a"]
+                )
+    assert page == {"items": [], "nextCursor": None}
+
+
+def test_a_release_without_any_acceptance_keeps_operator_sign_off_false(
+    app_sessionmaker, pilot
+):
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, pilot["tenant_a"]):
+                release = _release(
+                    session, tenant_id=pilot["tenant_a"], user_id=pilot["user_id"]
+                )
+                detail = pilot_service.release_manifest_detail(
+                    session,
+                    tenant_id=pilot["tenant_a"],
+                    release_id=release.release_id,
+                )
+    assert detail["acceptances"] == []
+    assert detail["release"]["operatorSignOff"] is False
+    assert detail["release"]["acceptanceCount"] == 0
+    assert detail["release"]["componentCount"] == len(_components())
+
+
+@pytest.mark.parametrize(
+    "outcome,limitations,expected",
+    [
+        ("accepted", [], True),
+        ("conditional", ["browser acceptance not observed"], False),
+        ("rejected", [], False),
+    ],
+)
+def test_only_an_accepted_decision_grants_operator_sign_off(
+    app_sessionmaker, pilot, outcome, limitations, expected
+):
+    """``conditional`` is not a yes.
+
+    The table already refuses a conditional acceptance with an empty limitation
+    list -- a hedge has to say what it is hedging. The reader has to agree with
+    that: treating conditional as sign-off would discard the distinction the
+    constraint exists to keep.
+    """
+
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, pilot["tenant_a"]):
+                release = _release(
+                    session, tenant_id=pilot["tenant_a"], user_id=pilot["user_id"]
+                )
+                pilot_service.record_acceptance(
+                    session,
+                    tenant_id=pilot["tenant_a"],
+                    release_id=release.release_id,
+                    acceptance_criterion="AC-12",
+                    outcome=outcome,
+                    known_limitations=limitations,
+                    accepted_by_user_id=pilot["user_id"],
+                    now=NOW,
+                )
+                detail = pilot_service.release_manifest_detail(
+                    session,
+                    tenant_id=pilot["tenant_a"],
+                    release_id=release.release_id,
+                )
+    assert detail["release"]["operatorSignOff"] is expected
+    assert detail["release"]["acceptanceCount"] == 1
+    assert detail["acceptances"][0]["outcome"] == outcome
+    assert detail["acceptances"][0]["manifestMatches"] is True
+
+
+def test_an_acceptance_pinning_a_different_hash_is_not_sign_off(
+    app_sessionmaker, pilot
+):
+    """Accepting "R4" and shipping a differently-composed R4 is the whole point.
+
+    **This state is not reachable through the writer.** ``record_acceptance``
+    reads the hash from the release rather than taking it, so today the two
+    always agree and ``manifestMatches`` is always true. The row stores its own
+    copy anyway, and a reader that ignored it would call any future writer's
+    mismatch a sign-off -- so the comparison is defence, and this test creates
+    the state the only way it can be created: by writing the column directly.
+    """
+
+    other_hash = "b" * 64
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, pilot["tenant_a"]):
+                release = _release(
+                    session, tenant_id=pilot["tenant_a"], user_id=pilot["user_id"]
+                )
+                assert release.manifest_sha256 != other_hash
+                acceptance = pilot_service.record_acceptance(
+                    session,
+                    tenant_id=pilot["tenant_a"],
+                    release_id=release.release_id,
+                    acceptance_criterion="AC-12",
+                    outcome="accepted",
+                    known_limitations=[],
+                    accepted_by_user_id=pilot["user_id"],
+                    now=NOW,
+                )
+                session.flush()
+                session.execute(
+                    text(
+                        "UPDATE acceptance_records SET accepted_manifest_sha256=:h "
+                        "WHERE tenant_id=:t AND acceptance_id=:a"
+                    ),
+                    {
+                        "h": other_hash,
+                        "t": pilot["tenant_a"],
+                        "a": acceptance.acceptance_id,
+                    },
+                )
+                session.expire_all()
+                detail = pilot_service.release_manifest_detail(
+                    session,
+                    tenant_id=pilot["tenant_a"],
+                    release_id=release.release_id,
+                )
+    assert detail["release"]["operatorSignOff"] is False
+    assert detail["acceptances"][0]["manifestMatches"] is False
+
+
+def test_the_reader_never_returns_the_accepting_person_or_the_notes(
+    app_sessionmaker, pilot
+):
+    """A read surface reports decisions, not a directory.
+
+    ``accepted_by_user_id`` exists so the system cannot sign its own acceptance;
+    it is an audit column, and ``notes`` is free text. Neither belongs in a
+    response a screen renders, so the key set is pinned here rather than left to
+    whatever the serializer happens to include.
+    """
+
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, pilot["tenant_a"]):
+                release = _release(
+                    session, tenant_id=pilot["tenant_a"], user_id=pilot["user_id"]
+                )
+                pilot_service.record_acceptance(
+                    session,
+                    tenant_id=pilot["tenant_a"],
+                    release_id=release.release_id,
+                    acceptance_criterion="AC-12",
+                    outcome="accepted",
+                    known_limitations=[],
+                    accepted_by_user_id=pilot["user_id"],
+                    notes="signed in the pilot review",
+                    now=NOW,
+                )
+                detail = pilot_service.release_manifest_detail(
+                    session,
+                    tenant_id=pilot["tenant_a"],
+                    release_id=release.release_id,
+                )
+    assert set(detail["acceptances"][0]) == {
+        "acceptanceId",
+        "acceptanceIdRef",
+        "outcome",
+        "acceptedManifestSha256",
+        "manifestMatches",
+        "knownLimitations",
+        "decidedAt",
+    }
+    assert set(detail["release"]) == {
+        "releaseId",
+        "version",
+        "componentCount",
+        "manifestSha256",
+        "components",
+        "createdAt",
+        "operatorSignOff",
+        "acceptanceCount",
+    }
+
+
+def test_another_tenants_release_is_not_found_rather_than_forbidden(
+    app_sessionmaker, pilot
+):
+    """Cross-tenant is a 404 at the service boundary, and the page is empty.
+
+    "Exists but not yours" answers a question the caller is not allowed to ask,
+    so the reader gives the same answer for a release in another tenant as for a
+    release that was never recorded.
+    """
+
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, pilot["tenant_a"]):
+                release = _release(
+                    session, tenant_id=pilot["tenant_a"], user_id=pilot["user_id"]
+                )
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, pilot["tenant_b"]):
+                page = pilot_service.release_manifest_page(
+                    session, tenant_id=pilot["tenant_b"]
+                )
+                assert page["items"] == []
+                with pytest.raises(InvError) as raised:
+                    pilot_service.release_manifest_detail(
+                        session,
+                        tenant_id=pilot["tenant_b"],
+                        release_id=release.release_id,
+                    )
+    assert raised.value.code == "RES-RELEASE-NOT-FOUND"
+    assert raised.value.status == 404
+    assert release.release_id not in str(raised.value)
+
+
+def test_the_page_is_bounded_and_the_cursor_walks_to_the_end(app_sessionmaker, pilot):
+    """A long release history is read in bounded pages, not all at once."""
+
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, pilot["tenant_a"]):
+                for index in range(3):
+                    _release(
+                        session,
+                        tenant_id=pilot["tenant_a"],
+                        user_id=pilot["user_id"],
+                        version=f"R{index}",
+                    )
+                first = pilot_service.release_manifest_page(
+                    session, tenant_id=pilot["tenant_a"], limit=2
+                )
+                assert len(first["items"]) == 2
+                assert first["nextCursor"] is not None
+                second = pilot_service.release_manifest_page(
+                    session,
+                    tenant_id=pilot["tenant_a"],
+                    limit=2,
+                    cursor=first["nextCursor"],
+                )
+    assert len(second["items"]) == 1
+    assert second["nextCursor"] is None
+    seen = [row["releaseId"] for row in first["items"] + second["items"]]
+    assert len(set(seen)) == 3

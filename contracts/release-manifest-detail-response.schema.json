@@ -1,0 +1,176 @@
+{
+  "$defs": {
+    "ReleaseAcceptanceResponse": {
+      "additionalProperties": false,
+      "description": "One recorded acceptance decision, without the person who made it.\n\nThe accepting user is deliberately absent. ``accepted_by_user_id`` is a real\nforeign key precisely so the system cannot sign its own acceptance, but a\nread surface that names people turns an audit column into a directory;\n``RunRecordResponse`` set that rule first and this follows it. ``notes`` is\nfree text and is absent for the same reason.\n\n``manifestMatches`` is computed, not stored: an acceptance pins the manifest\nhash as it stood when it was granted, and accepting one composition while\nshipping another is the failure that pinning exists to catch. A reader that\nonly saw ``outcome`` could not tell the two apart.",
+      "properties": {
+        "acceptanceId": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Acceptanceid",
+          "type": "string"
+        },
+        "acceptanceIdRef": {
+          "maxLength": 16,
+          "minLength": 1,
+          "title": "Acceptanceidref",
+          "type": "string"
+        },
+        "acceptedManifestSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Acceptedmanifestsha256",
+          "type": "string"
+        },
+        "decidedAt": {
+          "format": "date-time",
+          "title": "Decidedat",
+          "type": "string"
+        },
+        "knownLimitations": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 64,
+          "title": "Knownlimitations",
+          "type": "array"
+        },
+        "manifestMatches": {
+          "title": "Manifestmatches",
+          "type": "boolean"
+        },
+        "outcome": {
+          "enum": [
+            "accepted",
+            "conditional",
+            "rejected"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        }
+      },
+      "required": [
+        "acceptanceId",
+        "acceptanceIdRef",
+        "outcome",
+        "acceptedManifestSha256",
+        "manifestMatches",
+        "decidedAt"
+      ],
+      "title": "ReleaseAcceptanceResponse",
+      "type": "object"
+    },
+    "ReleaseComponentResponse": {
+      "additionalProperties": false,
+      "description": "One pinned component of a release.\n\nEvery entry carries a digest because the manifest hash covers the list: a\nname is not an identity, so \"we shipped R4\" has to be checkable rather than\nasserted (``operations_pilot.ReleaseManifest``).",
+      "properties": {
+        "digest": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Digest",
+          "type": "string"
+        },
+        "kind": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Kind",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "kind",
+        "digest"
+      ],
+      "title": "ReleaseComponentResponse",
+      "type": "object"
+    },
+    "ReleaseManifestResponse": {
+      "additionalProperties": false,
+      "description": "A recorded release, and whether a person has signed it off.\n\n``operatorSignOff`` is **computed from the acceptance rows**, never stored\nand never supplied by a caller. It is true only when an ``accepted``\ndecision exists whose pinned hash equals this manifest's hash. A\n``conditional`` decision, a ``rejected`` one, and an acceptance of a\ndifferent composition all leave it false, which is the whole point: DEF-S12\nrecorded ``operatorSignOff=false`` because no server route existed to answer\nthe question, and a route that answered ``true`` from anything less than a\nperson's matching acceptance would be worse than no route at all.",
+      "properties": {
+        "acceptanceCount": {
+          "minimum": 0,
+          "title": "Acceptancecount",
+          "type": "integer"
+        },
+        "componentCount": {
+          "minimum": 1,
+          "title": "Componentcount",
+          "type": "integer"
+        },
+        "components": {
+          "items": {
+            "$ref": "#/$defs/ReleaseComponentResponse"
+          },
+          "maxItems": 512,
+          "title": "Components",
+          "type": "array"
+        },
+        "createdAt": {
+          "format": "date-time",
+          "title": "Createdat",
+          "type": "string"
+        },
+        "manifestSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Manifestsha256",
+          "type": "string"
+        },
+        "operatorSignOff": {
+          "title": "Operatorsignoff",
+          "type": "boolean"
+        },
+        "releaseId": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Releaseid",
+          "type": "string"
+        },
+        "version": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "releaseId",
+        "version",
+        "componentCount",
+        "manifestSha256",
+        "createdAt",
+        "operatorSignOff",
+        "acceptanceCount"
+      ],
+      "title": "ReleaseManifestResponse",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One release with every acceptance decision recorded against it.",
+  "properties": {
+    "acceptances": {
+      "items": {
+        "$ref": "#/$defs/ReleaseAcceptanceResponse"
+      },
+      "maxItems": 256,
+      "title": "Acceptances",
+      "type": "array"
+    },
+    "release": {
+      "$ref": "#/$defs/ReleaseManifestResponse"
+    }
+  },
+  "required": [
+    "release"
+  ],
+  "title": "ReleaseManifestDetailResponse",
+  "type": "object"
+}

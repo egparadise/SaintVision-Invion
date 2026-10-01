@@ -1516,3 +1516,91 @@ AdapterConformanceUnion = Annotated[
     Union[AdapterConformanceNotObservedResponse, AdapterConformanceRecordedResponse],
     Field(discriminator="status"),
 ]
+
+
+class ReleaseComponentResponse(Strict):
+    """One pinned component of a release.
+
+    Every entry carries a digest because the manifest hash covers the list: a
+    name is not an identity, so "we shipped R4" has to be checkable rather than
+    asserted (``operations_pilot.ReleaseManifest``).
+    """
+
+    name: StrictStr = Field(min_length=1, max_length=200)
+    kind: StrictStr = Field(min_length=1, max_length=64)
+    digest: StrictStr = Field(min_length=1, max_length=200)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceResponse(Strict):
+    """One recorded acceptance decision, without the person who made it.
+
+    The accepting user is deliberately absent. ``accepted_by_user_id`` is a real
+    foreign key precisely so the system cannot sign its own acceptance, but a
+    read surface that names people turns an audit column into a directory;
+    ``RunRecordResponse`` set that rule first and this follows it. ``notes`` is
+    free text and is absent for the same reason.
+
+    ``manifestMatches`` is computed, not stored: an acceptance pins the manifest
+    hash as it stood when it was granted, and accepting one composition while
+    shipping another is the failure that pinning exists to catch. A reader that
+    only saw ``outcome`` could not tell the two apart.
+    """
+
+    acceptance_id: StrictStr = Field(alias="acceptanceId", min_length=1, max_length=64)
+    acceptance_id_ref: StrictStr = Field(alias="acceptanceIdRef", min_length=1, max_length=16)
+    outcome: Literal["accepted", "conditional", "rejected"]
+    accepted_manifest_sha256: StrictStr = Field(
+        alias="acceptedManifestSha256", pattern="^[0-9a-f]{64}$"
+    )
+    manifest_matches: StrictBool = Field(alias="manifestMatches")
+    known_limitations: list[StrictStr] = Field(
+        alias="knownLimitations", default_factory=list, max_length=64
+    )
+    decided_at: AwareDatetime = Field(alias="decidedAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseManifestResponse(Strict):
+    """A recorded release, and whether a person has signed it off.
+
+    ``operatorSignOff`` is **computed from the acceptance rows**, never stored
+    and never supplied by a caller. It is true only when an ``accepted``
+    decision exists whose pinned hash equals this manifest's hash. A
+    ``conditional`` decision, a ``rejected`` one, and an acceptance of a
+    different composition all leave it false, which is the whole point: DEF-S12
+    recorded ``operatorSignOff=false`` because no server route existed to answer
+    the question, and a route that answered ``true`` from anything less than a
+    person's matching acceptance would be worse than no route at all.
+    """
+
+    release_id: StrictStr = Field(alias="releaseId", min_length=1, max_length=64)
+    version: StrictStr = Field(min_length=1, max_length=64)
+    component_count: StrictInt = Field(alias="componentCount", ge=1)
+    manifest_sha256: StrictStr = Field(alias="manifestSha256", pattern="^[0-9a-f]{64}$")
+    components: list[ReleaseComponentResponse] = Field(default_factory=list, max_length=512)
+    created_at: AwareDatetime = Field(alias="createdAt")
+    operator_sign_off: StrictBool = Field(alias="operatorSignOff")
+    acceptance_count: StrictInt = Field(alias="acceptanceCount", ge=0)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseManifestDetailResponse(Strict):
+    """One release with every acceptance decision recorded against it."""
+
+    release: ReleaseManifestResponse
+    acceptances: list[ReleaseAcceptanceResponse] = Field(default_factory=list, max_length=256)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseManifestPageResponse(Strict):
+    """A page of releases. An empty tenant is an empty list, not a 404."""
+
+    items: list[ReleaseManifestResponse] = Field(default_factory=list, max_length=200)
+    next_cursor: str | None = Field(default=None, alias="nextCursor")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)

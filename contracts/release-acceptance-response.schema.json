@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One recorded acceptance decision, without the person who made it.\n\nThe accepting user is deliberately absent. ``accepted_by_user_id`` is a real\nforeign key precisely so the system cannot sign its own acceptance, but a\nread surface that names people turns an audit column into a directory;\n``RunRecordResponse`` set that rule first and this follows it. ``notes`` is\nfree text and is absent for the same reason.\n\n``manifestMatches`` is computed, not stored: an acceptance pins the manifest\nhash as it stood when it was granted, and accepting one composition while\nshipping another is the failure that pinning exists to catch. A reader that\nonly saw ``outcome`` could not tell the two apart.",
+  "properties": {
+    "acceptanceId": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Acceptanceid",
+      "type": "string"
+    },
+    "acceptanceIdRef": {
+      "maxLength": 16,
+      "minLength": 1,
+      "title": "Acceptanceidref",
+      "type": "string"
+    },
+    "acceptedManifestSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Acceptedmanifestsha256",
+      "type": "string"
+    },
+    "decidedAt": {
+      "format": "date-time",
+      "title": "Decidedat",
+      "type": "string"
+    },
+    "knownLimitations": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 64,
+      "title": "Knownlimitations",
+      "type": "array"
+    },
+    "manifestMatches": {
+      "title": "Manifestmatches",
+      "type": "boolean"
+    },
+    "outcome": {
+      "enum": [
+        "accepted",
+        "conditional",
+        "rejected"
+      ],
+      "title": "Outcome",
+      "type": "string"
+    }
+  },
+  "required": [
+    "acceptanceId",
+    "acceptanceIdRef",
+    "outcome",
+    "acceptedManifestSha256",
+    "manifestMatches",
+    "decidedAt"
+  ],
+  "title": "ReleaseAcceptanceResponse",
+  "type": "object"
+}

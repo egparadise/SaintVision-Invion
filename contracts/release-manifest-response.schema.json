@@ -1,0 +1,95 @@
+{
+  "$defs": {
+    "ReleaseComponentResponse": {
+      "additionalProperties": false,
+      "description": "One pinned component of a release.\n\nEvery entry carries a digest because the manifest hash covers the list: a\nname is not an identity, so \"we shipped R4\" has to be checkable rather than\nasserted (``operations_pilot.ReleaseManifest``).",
+      "properties": {
+        "digest": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Digest",
+          "type": "string"
+        },
+        "kind": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Kind",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "kind",
+        "digest"
+      ],
+      "title": "ReleaseComponentResponse",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "A recorded release, and whether a person has signed it off.\n\n``operatorSignOff`` is **computed from the acceptance rows**, never stored\nand never supplied by a caller. It is true only when an ``accepted``\ndecision exists whose pinned hash equals this manifest's hash. A\n``conditional`` decision, a ``rejected`` one, and an acceptance of a\ndifferent composition all leave it false, which is the whole point: DEF-S12\nrecorded ``operatorSignOff=false`` because no server route existed to answer\nthe question, and a route that answered ``true`` from anything less than a\nperson's matching acceptance would be worse than no route at all.",
+  "properties": {
+    "acceptanceCount": {
+      "minimum": 0,
+      "title": "Acceptancecount",
+      "type": "integer"
+    },
+    "componentCount": {
+      "minimum": 1,
+      "title": "Componentcount",
+      "type": "integer"
+    },
+    "components": {
+      "items": {
+        "$ref": "#/$defs/ReleaseComponentResponse"
+      },
+      "maxItems": 512,
+      "title": "Components",
+      "type": "array"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "title": "Createdat",
+      "type": "string"
+    },
+    "manifestSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Manifestsha256",
+      "type": "string"
+    },
+    "operatorSignOff": {
+      "title": "Operatorsignoff",
+      "type": "boolean"
+    },
+    "releaseId": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Releaseid",
+      "type": "string"
+    },
+    "version": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "releaseId",
+    "version",
+    "componentCount",
+    "manifestSha256",
+    "createdAt",
+    "operatorSignOff",
+    "acceptanceCount"
+  ],
+  "title": "ReleaseManifestResponse",
+  "type": "object"
+}
