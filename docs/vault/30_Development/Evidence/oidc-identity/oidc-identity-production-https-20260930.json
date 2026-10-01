@@ -1,0 +1,54 @@
+{
+  "acceptanceClaim": true,
+  "codeSha": "de84d1061a3358ff2163c81538a9b96e1a37aee8",
+  "collectorSha256": "f7f11c3196086d6ca804c59bb1e2c32f7fc6c71d9e11114617cc519c837cf49b",
+  "criteria": {
+    "bundleAccepted": "inv.identity.AccessTokens._keys loads the bundle this repo built",
+    "liveTokenVerified": "a token the running provider issued passes AccessTokens.verify",
+    "tamperedTokenRefused": "the same verifier refuses a one-character payload edit"
+  },
+  "observations": {
+    "bundleAccepted": {
+      "loadedKeyCount": 1,
+      "status": "MEASURED_PASS"
+    },
+    "liveTokenVerified": {
+      "expiresAtInFuture": true,
+      "status": "MEASURED_PASS",
+      "subjectIsDerivedPseudonym": true,
+      "tokenTypeHeader": "at+jwt"
+    },
+    "tamperedTokenRefused": {
+      "code": "AUTH-0050",
+      "httpStatus": 401,
+      "status": "MEASURED_PASS"
+    }
+  },
+  "provenance": {
+    "branch": "agent/claude/card152-intranet-idp",
+    "contentClean": true,
+    "executor": "claude",
+    "workingTreeClean": true
+  },
+  "schemaVersion": "oidc-identity-evidence:1",
+  "source": {
+    "audienceSha256": "a7c0f1ec44785d07a39bae0b48f1d114c723931f9e3eb96bdeb8258b3c85da48",
+    "clientIdSha256": "13c95d85eba6d768927953300fc8136037048105df85461f86b76c87dd8ee17f",
+    "droppedNonSigningKeys": 1,
+    "inputBindingSha256": "84f8cbd0700f419f2e2018d34aeecf5140970e2206851e398e00566afd9ab9b8",
+    "issuerScheme": "https",
+    "issuerSha256": "ae8816d9369e5861cd6ac6b9a4269fae617855bb3adb4cb7088649ba5466bd93",
+    "keyCount": 1,
+    "kidSha256": [
+      "98ed279bada9f26de359874566bf64175ac2cad0287f9e2430cbd46ae36bd6de"
+    ],
+    "observedAt": "2026-09-29T23:42:47Z",
+    "providerRole": "production",
+    "signedByKidSha256": "98ed279bada9f26de359874566bf64175ac2cad0287f9e2430cbd46ae36bd6de",
+    "sourceFinishedAt": "2026-09-29T23:42:57Z",
+    "sourceStartedAt": "2026-09-29T23:42:47Z",
+    "temporaryBundleRemoved": true,
+    "tokenLifetimeSeconds": 300
+  },
+  "verdict": "PASS"
+}

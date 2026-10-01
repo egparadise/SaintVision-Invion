@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "card151-intranet-storage-redacted:1",
+  "codeSha": "a4f4dde6975fb01cbf3898c2752b1a96d8465ba8",
+  "observedAt": "2026-09-29T23:00:36.327799Z",
+  "storageRoundtrip": {
+    "status": "PASS",
+    "targetKind": "operational",
+    "checks": {
+      "put": true,
+      "get": true,
+      "bodySha256": true,
+      "metadataSha256": true,
+      "delete": true,
+      "cleanupVerified": true
+    },
+    "sourceSha256": "1aa5d9876037f3599e8a1cb065b3ae29414272f8682493acede5b473b4bff3d2",
+    "attestationSha256": "1f275df127c0c39a2631e956cfae659fcf18d4f0ee212c18dfcf164c519176ef",
+    "pitrBucketVersioningEnabled": true
+  },
+  "scopeNegative": {
+    "productCredentialToPitrBucketStatus": 403,
+    "pitrCredentialToProductBucketStatus": 403
+  },
+  "pitrPreflight": {
+    "status": "BLOCKED_EXTERNAL",
+    "reason": "physical-replication-hba-rejected",
+    "sourceMutated": false,
+    "restoreAttempted": false,
+    "measuredRpoSeconds": null,
+    "measuredRtoSeconds": null,
+    "sourceSha256": "d66663b47da8e6717febdd7b19859c135f827673b9e35c30daa0172b5d244ba9"
+  },
+  "redacted": true
+}

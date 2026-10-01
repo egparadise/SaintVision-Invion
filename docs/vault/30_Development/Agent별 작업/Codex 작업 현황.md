@@ -1,14 +1,148 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.224"
+version: "1.0.234"
 status: "review"
 author: "Codex"
-updated: "2026-09-29T03:40:51+09:00"
+updated: "2026-10-01T09:40:00+09:00"
 source_of_truth: "Git"
+active_card: "CARD-151 intranet ObjectStore and PITR rehearsal"
+active_card_status: "PR 248 review follow-up; Claude F1-F12 remediated, TLS operational U6 PASS, G-22 replication HBA blocked external"
+active_card_next: "Claude re-review; continue Card 154 independent review and canonical preflight when corrected inputs land"
 ---
 
+## 2026-09-30 Card151 Claude F1-F12 보안·측정 경계 후속
+- PR #248에서 root·service·PITR 자격을 host argv와 Docker `Config.Env`에서 제거하고 단일 보호 파일 mount로 고정했다. PITR policy의 delete 권한을 제거하고 bucket versioning을 활성화했다.
+- bounded PITR rehearsal은 streaming receiver·source major·archive mode·retention tool hash를 확인하며, RTO를 download 시작부터 promotion까지 잰다. 지속 장애 시점이 없는 이 예행은 RPO를 측정하지 않아 `measuredRpoSeconds=null`로 남긴다.
+- 최신 TLS operational roundtrip은 6/6 PASS, 교차 bucket은 403/403이다. redacted evidence를 저장소에 고정했고 G-22는 replication HBA 미승인으로 계속 `BLOCKED_EXTERNAL`이다.
+## 2026-09-30 Card 156 지원 — portal.sv.lan TLS 인계
+
+- Card 150의 ECDSA P-256 HTTPS CA로 `portal.sv.lan` leaf를 발급해 object-store
+  provider인 node2의 신규 전용 디렉터리에 전달했다. directory `0700`, key
+  `0400`, owner·fingerprint·chain 일치와 staging 잔존 0을 확인했다.
+- 서비스·DNS·container는 변경하지 않아 상태는 `DELIVERED_NOT_ACTIVATED`다.
+  운영자 사본은 후속 leaf 활성화와 이전 leaf 폐기 완료까지 ignored private
+  저장소에 보관하며 CRL 파일 생성만으로 폐기 완료를 주장하지 않는다.
+- 기존 `cp.sv.lan` leaf는 CP 호스트가 정해질 때까지 전송하지 않는다. 선택한
+  주소가 현 SAN과 다르면 재발급한다. [[2026-09-30_09-13-57_KST_portal_sv_lan_TLS_인계_Codex]].
+
+## 2026-09-30 Card 150 — 사내망 PKI·LAN pilot 재수립
+
+- 독립 검토 F1~F10과 worker 3건을 반영했다. HTTPS root/intermediate/leaf는
+  ECDSA P-256으로 다시 만들고 Web PKI verifier로 CP·IdP leaf 2장을 검증했다.
+  Node mTLS Ed25519 hierarchy는 별도 유지한다. root는 현재 operator host에
+  있으므로 `rootOffline=false`이고 passphrase만 online CA directory 밖으로
+  분리했다.
+- worker-1·worker-2는 Node-local CSR→intermediate leaf→DB channel pin→실제
+  mTLS heartbeat/snapshot까지 완료했다. worker-3은 Docker socket 권한, CP 동거
+  worker는 API 1.41, 네 번째 Ubuntu worker는 미제공이라 configured 3 /
+  enrolled 2 / observed 2이며 5-node readiness는 `BLOCKED_EXTERNAL`이다.
+- 원격 DB trust 경계를 폐기했다. v5 candidate는 SCRAM, admin/runtime 분리
+  credential, 전용 user-defined network 1개, loopback publish이며 no/wrong
+  credential 거부와 두 양성 role을 실측했다. 과거 후보 3개는 stop·보존했고
+  active pilot state는 아직 v5로 이관하지 않아 DB readiness는 BLOCKED다.
+- Card 152 inventory는 5행이지만 필수값 71개가 비어 있다. 정본 lint와 두
+  readiness probe는 각각 `inventory-values-missing`과 `inventory-not-ready`로
+  차단됐으며 이를 PASS로 세지 않았다. focused Python 시험은 68 passed다.
+- 공개 Evidence에서 private IP·hostname·Node ID·certificate fingerprint를
+  제거했다. ordinal·count·status·digest만 남기고 agent image source와 CP
+  tooling commit, 도구 4개 SHA-256을 분리 결속했다. 회귀 시험이 redaction과
+  hash 일치를 강제한다.
+- intermediate encrypted key와 password의 pilot-state 동시 복제를 자체감사로
+  제거했다. state는 public chain만 가지며 외부 CA enrollment마다 중앙 세
+  입력을 다시 요구한다. Node-local private key 경계는 그대로다.
+- pilot status/observe의 snapshot에서 tenant·epoch·nonce를 제거하고 profile·
+  capacity·관측 시각만 남겼다. CRL refresh는 구현했지만 배포·강제는 없고,
+  Node leaf 자동 회전도 미구현이라 두 항목을 완료로 세지 않는다.
+- worker·Claude r2에 따라 runtime secret argv 전달을 stdin 파일 경계로
+  바꾸고 runtime role의 5개 위험 권한을 매 실행 재고정·검증한다. nonloopback
+  DSN, md5 HBA, SUPERUSER 변이와 실제 CLI option 순서도 회귀로 고정했다.
+- commit `8ce88ba9` 스크립트를 원격 v5에 재적용해 no/wrong credential 거부,
+  두 role 양성, SCRAM-only, 최소 권한, network 1개, loopback을 재검증했다.
+  active state 이관은 하지 않았다. 임시 script만 삭제하고 DB volume은 보존했다.
+- 00:08 worker/pilot 값은 `d3d8d927` commit보다 먼저 실행된 working tree
+  관측이므로 commit 재현 주장 대신 `uncommitted-working-tree`와
+  `firstCommittedIn`으로 정정했다. 미관측 worker-3에는 도구 commit을 붙이지
+  않는다.
+- 수정 후 focused PG-free는 PKI 6 passed, LAN pilot 22 passed이며 두 DB shell
+  script 문법과 diff gate가 exit 0이다. hosted CI 재실행과 Claude 재검토가
+  다음이다.
+- 첫 state의 `18443` 충돌은 숨기지 않고 실패 증거로 보존했다. 최종 state는
+  immutable identity에 `18444`를 처음부터 넣었다. 공개 증거에는 비밀·DSN·
+  tenant·epoch·nonce·network identity가 없다. [[사내망_PKI_LAN_pilot_운영절차_Codex]],
+  [[2026-09-30_00-10-21_KST_사내망_PKI_LAN_pilot_Codex]].
+
 # Codex 작업 현황
+
+## 2026-09-30 Card154 사내망 자체 구축 독립 검증
+
+- Card 150 PR #249와 Card 153 PR #247에 보안·계약 수정 요청을 게시했고, Card 152 PR #250의 기존 F-R1~F-R5는 head가 바뀌지 않아 유지한다. Card 151 PR #248은 자기 작성 범위라 독립 승인으로 세지 않고 Claude 검토를 대기한다.
+- canonical preflight는 storage operational evidence만 PASS, 전체 PASS 1/FAIL 2/BLOCKED 6과 `acceptanceAssessed=false`다. 미입력 token·inventory·DNS를 합성하지 않았고 U6 전체도 configuration route/operator token 부재로 BLOCKED다. [[2026-09-30_01-10-00_KST_Card154_사내망_독립검증_Codex_검토]].
+
+## 2026-09-30 Card151 사내 Storage TLS 운영 증거·canonical 검증
+
+- `.210`의 카드 소유 MinIO를 Card 150 intermediate가 서명한 `objects.sv.lan`/`.210` server leaf로 TLS 전환했다. exact image, non-root/read-only/cap-drop, data+cert 2 mount, 9000 단일 publish를 유지했고 product/PITR 교차 쓰기는 HTTPS에서도 403/403이다.
+- reachable head `c075e669`에서 operational roundtrip 6/6와 cleanup PASS, 별도 attestation SHA·시각 결속을 확보했다. canonical S01은 storage check 1개만 PASS하고 operator/session token·CP DNS/HTTPS·inventory 사용자 값 부재로 FAIL 2/BLOCKED 6, `acceptanceAssessed=false`다.
+- TLS 전환에서 발견한 cert-dir/loopback CA/bootstrap process-argument 문제를 회귀시험과 bounded rollback으로 닫고, 진단 시 노출된 root 자격은 즉시 회전했다. G-22는 source physical replication HBA 미승인 때문에 source mutation 전 BLOCKED_EXTERNAL이며 RPO/RTO는 여전히 null이다. [[2026-09-30_00-19-37_KST_Card151_사내_Storage_PITR_Codex_구현]].
+- PR #248 보안 후속 head `0a768892`는 PITR 전송과 source PostgreSQL 자격을 각각 보호 파일 read-only mount와 컨테이너 내부 읽기로 바꿔 host argv·Docker `Config.Env` 비노출을 고정했다. PG-free 4 passed, local·remote shell syntax와 diff check는 exit 0이다.
+## 2026-10-01 CARD-162 AC-11 security landing SHA 증거
+
+- #258 v1.6 §4-3-3이 다음 판정 조건으로 명시한 "integration 착지 SHA의 security-critical-high 실행 1건"을 선택했다. 외부 장비 없이 현 integration `6fc0428b`의 이미 승인된 producer·importer·opt-in workflow로 닫을 수 있기 때문이다.
+- exact integration workflow_dispatch `36794567345`는 artifact를 보존했지만 gate는 정직하게 실패했다. `pip-audit`가 runtime/scan pin PyJWT 2.13.0에서 allowlist 밖 HIGH 13건을 검출했고, Bandit HIGH는 0건이었다. 예외 allowlist를 늘리지 않고 두 정본 pin을 PyJWT 2.15.1로 함께 올리며, 되돌리면 실패하는 exact-pin 시험을 추가한다.
+- PR #260 exact head `d28a1e1d`의 opt-in run `36795087571`은 success였다. artifact `11133655643`(digest `73d0e566…112c0`)을 인증된 run/artifact metadata와 함께 importer로 검증해 exit 0, `MEASURED_PASS / NONE`, HIGH 0, CRITICAL 0을 확인했다. focused scanner 시험은 14 passed이며 로컬 Python 3.10의 `StrEnum` 부재로 collect되지 않은 identity 시험은 성공 수치에 포함하지 않았다.
+- 문서 head `3684fcc6` Backend `36795581647`은 10월 1일에 처음 노출된 test fixture의 9월 고정 clock partition 부재로 두 matrix가 함께 red였다(3.14: 5440 passed, 82 failed, 81 errors). 제품 partition 정책은 유지하고 disposable DB에만 고정 clock 월을 준비하며, 세 partitioned table을 단언하는 회귀 시험을 추가했다. 이는 PyJWT 호환성 실패가 아니다.
+- 이 카드의 성공 조건은 PR head security lane green만이 아니다. 수정이 integration에 착지한 뒤 그 착지 SHA로 workflow_dispatch를 다시 실행해야 #258의 조건이 닫힌다. 그 전에는 S11-BE 75, AC-11 전체 미완료를 유지한다. [[2026-10-01_09-10-32_KST_AC11_security_landing_SHA_Codex]].
+## 2026-09-30 Card 158 — S04-DB C1-K kernel 승인 결속 collector 검토 요청
+
+- 선행 착지 `6fc0428b`에서 S04-DB의 별도 kernel 경계 C1-K를 가장 앞의 외부 전제 없는 Codex 고난도 카드로 선택했다. 계약은 `8cf8c1ab`, collector·PG-free/실 PG 단일 파일은 `fc08a856`·`b0ff6b69`, evidence count 재계산 보강은 `26448c94`에 구현했다.
+- K1~K3는 approval→dispatch→claim→permit→execution attempt의 scope·digest·policy version·epoch·bound version·state event를 fail-closed로 대조한다. claim 직전 current policy decision ID, 실행 당시 epoch history K4, permit 공개키 provenance는 각각 독립 durable peer 부재·`NOT_REGISTERED`·`RECORDED_ONLY`로 남겨 거짓 합격을 막는다.
+- PG-free **25 passed**, Black·diff check exit 0. Claude 독립 검토 F1·F3~F8을 반영해 실 PG fixture 결속, timezone instant 비교, database-wide FORCE RLS visibility, RR/RO validator, 중복 event와 재승인 attempt 시험을 추가했고 criteria v1.0.2 `6d677d4e`에 고정했다. 공유 PG에서 전체 relation을 읽는 시험은 kernel evidence 대상 table을 명시적으로 비우는 local autouse fixture로 격리했다. 실 PG는 hosted Core exact-head 결과 대기이며 공개 계약·migration·registry status 변경 0, S04-DB `review` 유지다. [[2026-09-30_10-27-14_KST_S04-DB_C1-K_착수_Codex]], [[S04-DB_C1-K_kernel_승인_결속_Evidence_계약]].
+## 2026-09-30 CARD-160 S04-DB core cancel 제품 경로 결속 설계·구현
+
+- Claude 조건부 승인 M1~M4/L1~L5/R5~R8을 설계 v1.1에 반영했다. bridge는 이
+  요청이 kernel 전이를 실제 수행한 경우에만 호출하며, kernel 선취소를 사용자
+  actor/audit로 재분류하지 않는다. 함수 인자·상수·kernel authority 앵커·owner/RLS·
+  definer gate·audit partition fail-closed·kill-switch 탈출구를 구현 전 고정했다.
+- CARD-159 승인 head `c9c1d836`의 자연스러운 후속으로, 외부 장비 없이 닫을 수
+  있는 core 취소 producer의 제품 호출 경로 공백을 선택했다.
+- 정본 public route는 kernel에 유지하고 JSON 계약 변경 0으로 결정했다. 같은 URL을
+  business app에 중복 등록하거나 localhost HTTP/별도 transaction으로 core를
+  호출하는 방식은 resource·shard·audit 원자성을 깨므로 기각했다.
+- business-mapped run만 kernel transaction 안의 최소권한 SECURITY DEFINER
+  primitive로 public 상태와 exact audit를 함께 갱신한다. actor는 인증 subject의
+  현재 user mapping에서 파생하고, normal·shard·replay·rollback 시험을 승인 조건으로
+  고정했다. migration `0056`과 제품 결속을 구현했으며 실제 catalogue definition
+  SHA-256 `3ebb7553…32a0c1`을 definer policy와 AC-11 pin에 고정했다.
+- hosted Core 두 번의 fail-closed 503으로 kernel·mapping·authority 중복 잠금을
+  분리했다. 같은 transaction의 선행 권한 검사가 이미 잡은 lock을 재사용하도록 함수
+  중복 잠금을 제거했고 owner UPDATE 권한은 넓히지 않았다. route 403과 함수 내부
+  권한 재도출, rollback·event ID·terminal·shard 변이를 보강했으며 PG-free bridge
+  17건과 AC-11 집계 85건을 재통과했다. shard 증거는 PG-free 호출부·변이 guard이고
+  parent/member real-PG fixture는 NOT_RUN인 Codex 후속 항목이다. 이전 revision 회복 시 0056 policy가
+  중복되던 결함도 수렴 재적용으로 닫았고, 월 audit partition 부재의 503·전체
+  rollback·같은 key 복구 시험을 추가했다. exact-code `44556845`의 hosted
+  Backend 3.12/3.14와 Core가 모두 green이고, Core JUnit에서 bridge 실 PG 17건의
+  실행·성공을 확인했다. 운영 배포 관측은 아직 없으므로 S04-DB `review`와 clean C1
+  `RECORDED_ONLY`를 유지한다.
+  [[S04-DB_core_cancel_제품경로_결속_설계]],
+  [[2026-09-30_13-52-17_KST_S04-DB_core_cancel_제품경로_결속_설계_Codex]].
+
+## 2026-09-30 CARD-159 S04-DB C1 core 취소 이력 producer — Claude 검토 요청
+
+- integration `6fc0428b` 기준으로 task-registry와 57.81% 이후 로드맵을 대조해,
+  외부 PC 없이 닫을 수 있는 가장 앞의 Codex 고난도 공백인 S04-DB C1 취소 이력
+  producer를 선택했다.
+- `06c57ca9`에서 기준 v1.3.0을 먼저 고정하고 `6e2039c2`에서 첫 취소 상태 전이와
+  exact `run.cancel.requested` audit 1행을 같은 transaction에 결속했다. replay는
+  중복 audit 0, audit 실패는 취소 상태 rollback이며 actor·trace를 명시적으로 받는다.
+- Claude 조건 C-1~C-3을 반영해 기준 v1.3.1에서 run 행 `FOR UPDATE` 직렬화와
+  두 connection 실 PG 경쟁 시험을 추가했다. actor ID가 있는 anonymous와 비정본
+  `run.cancel.denied` fixture도 fail-closed로 고정했다. 제품 HTTP·worker 호출자는
+  아직 0이므로 호출 경로 존재를 운영 PASS의 추가 선행 조건으로 기록했다.
+- PG-free **7+8 passed**, 계약·ontology·docs 게이트 exit 0. 운영 배포 SHA·활성 시각·
+  관측 창 미결속 때문에 clean C1은 `RECORDED_ONLY`, C1-K·물리 Node 경계는 계속
+  미관측이고 S04-DB `review`를 유지한다.
+  [[2026-09-30_12-17-56_KST_S04-DB_C1_cancel_history_producer_착수_Codex]].
 
 ## 2026-09-29 S05 Card114 c50 일반 suite 격리 — Claude 재확인 요청
 

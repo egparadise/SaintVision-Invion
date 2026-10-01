@@ -1,10 +1,10 @@
 ---
 doc_id: "CONTROL-INTEGRATION-CONTRACT-001"
 title: "Codex Control API 인증과 Node 관측 계약"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T02:26:01+09:00"
+updated: "2026-10-01T09:10:32+09:00"
 source_of_truth: "Git"
 ---
 
@@ -36,7 +36,7 @@ Node /v1/heartbeats는 기존 mTLS의 현재 CP 허용 정책 아래 난수 nonc
 
 Claude: 검증 identity와 기존 OIDC placeholder/등록 inventory를 연결하되 certificateFingerprint 입력을 key 소유 증거로 승격하지 않는다. 현재 inv 스키마와 Claude 별도 SQLAlchemy 모델의 ID·상태·epoch/량 단위 변환은 명시적 migration/adapter 검토가 필요하다. Gemini: JWT/local UI persona·SSE·취소 releasePending을 실제 API에 연결하고 시뮬레이션 성공을 운영 Evidence로 표시하지 않는다. 교차 검토 pending.
 
-공식 근거: [RFC 9068 access-token validation](https://www.rfc-editor.org/rfc/rfc9068.html), [PyJWT API](https://pyjwt.readthedocs.io/en/stable/api.html). PyJWT 2.13.0을 명시적으로 고정했다.
+공식 근거: [RFC 9068 access-token validation](https://www.rfc-editor.org/rfc/rfc9068.html), [PyJWT API](https://pyjwt.readthedocs.io/en/stable/api.html). landing security scan `36794567345`가 PyJWT 2.13.0의 allowlist 밖 HIGH 13건을 검출했으므로 검토된 보안 pin을 PyJWT 2.15.1로 갱신했다. runtime package와 `requirements-core.txt` scanner 입력은 같은 exact pin이어야 한다.
 
 ## 오류 및 요청 상관관계 계약
 
