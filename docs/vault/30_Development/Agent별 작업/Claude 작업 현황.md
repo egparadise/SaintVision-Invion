@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.47"
+version: "1.2.64"
 status: "review"
 author: "Claude"
-updated: "2026-09-29T12:19:52+09:00"
+updated: "2026-10-01T09:53:52+09:00"
 
 
 
@@ -14,6 +14,8 @@ source_of_truth: "Git"
 ---
 
 # Claude 작업 현황
+
+시험이 없어 50인 행의 75 근거 (Claude, 2026-10-01, 카드 163 r2, branch `agent/claude/c163-missing-task-tests`): v1.6이 "task 고유 시험 없음"으로 50에 둔 세 행을 다시 봤고, **세 행의 답이 서로 다르다**. v1.6의 검색이 `git ls-tree --name-only`였고 그것은 **파일 이름만** 돌려준다 — `storage-contributions-response.json`을 내용으로 다루는 `tests/core/test_storage_list_response_contract.py`가 이름에 `contribution`이 없어 걸리지 않았다. **S02-ST**는 그 파일이 두 strict response model을 정본 fixture와 왕복 동일로 고정하고 **네 drift 변이를 두 모델 각각** 거부하며 실제 route 직렬화까지 보므로 **이미 75 근거가 있다**(검토자가 exact head에서 12 passed 확인). **S09-ST**는 `tests/test_context_eval.py`의 **artifact-pin 3건**(`test_diff_test_and_trace_artifacts_are_pinned_by_role`·`test_an_unverified_artifact_cannot_be_pinned`·`test_a_later_overwrite_is_detected_by_the_pin`)이 그 행의 "Artifact 연결"을 직접 관측하므로 **이미 있다** — r1에서 27건 전체를 근거로 적은 것은 범위를 부풀린 것이어서 검토 지적대로 **3건으로 좁혔다**. **S08-BE는 50을 유지한다.** r1은 75로 올리려 했고 독립 검토가 두 결함을 짚었는데 **둘 다 맞다**. (1) 시험이 `require_execution(conn)` helper를 직접 불러서 `runs.py`의 **호출을 지워도 48건이 전부 통과**했다 — guard가 컴파일된다는 것만 증명한 시험이다. 이제 `RunStore.create()`·`RunStore.transition()`을 직접 부르고 **닫힌 gate에서 `inv.runs` 쓰기 문장이 하나도 실행되지 않는 것**과 **gate 질의가 INSERT보다 앞인 것**(문장 순서를 기록하는 `ScriptedConnection`)을 단언해 그 변이가 **죽는다**. (2) r1 §5-1의 ROOF 구현 근거가 **`grep -i roof`가 `proof`를 잡은 결과**였다 — 낱말 경계로 세면 `roof`는 제품·시험 전체에서 **1건**, Go 시험 안의 문자열 `"roof:test:1"`뿐이다. **v1.2(범위)·v1.6(파일명)에 이어 세 번째 같은 실수** — 한 번의 검색 결과를 읽지 않고 결론으로 썼다. 네 낱말을 다시 세면 **kill switch만 구현이 있다**: BuildKit은 `workspace_api.py:36` **docstring 1건**이고 daemon·socket·privileged·host access 경계 0건, 단일 GPU는 `sandbox.py:117`이 **거부**하고 `placement.py`가 fail closed다 — **거부는 지원이 아니므로 거부 시험으로 대체하지 않는다**. 파일 이름도 `tests/core/test_s08_be_kill_switch_execution_gate.py`로 고쳤다(옛 이름이 없는 BuildKit·GPU를 광고했다). **54 passed**, PG·Docker·GPU 전부 불필요. **변이 9종 중 8종 사망**, 생존한 1종(`compile_launch`의 GPU 허용)은 이 파일이 더 이상 그 경로를 주장하지 않기 때문이고 **`tests/core/test_sandbox_contracts.py`가 죽인다** — 그 파일은 재채점에서 **`S03-BE`를 funding**하므로 복제해 붙이지 않았다(한 시험이 두 행을 funding하지 않는 규칙). **점수는 올리지 않았다** — 재채점 문서가 #258에서 검토 중이라 충돌을 피했고, 착지 뒤 v1.7에서 **S02-ST·S09-ST만** 50→75로 옮기고 `S08-BE`는 50에 두되 §4-3-5의 사유를 "그 이름의 시험 파일이 없다"에서 "**네 축 중 셋에 구현이 없다**"로 정정한다. 제품 코드·migration 변경 0, 문서 gate 3종 exit 0, `git diff --check` exit 0. 전문 [[2026-10-01 시험이 없어 50인 행의 75 근거]]. 다음 첫 행동: Codex r2 재검토.
 
 [[전체 개발 진행 현황]] → 이 페이지 → [[Agent 지속 개발 운영 규칙]] 순서로 확인한다. 이 페이지는 현재 후속 카드 목록이며 이전 장문 보고서는 SHA별 근거다.
 

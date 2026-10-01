@@ -1,14 +1,22 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.224"
+version: "1.0.227"
 status: "review"
 author: "Codex"
-updated: "2026-09-29T03:40:51+09:00"
+updated: "2026-10-01T09:40:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-10-01 CARD-162 AC-11 security landing SHA 증거
+
+- #258 v1.6 §4-3-3이 다음 판정 조건으로 명시한 "integration 착지 SHA의 security-critical-high 실행 1건"을 선택했다. 외부 장비 없이 현 integration `6fc0428b`의 이미 승인된 producer·importer·opt-in workflow로 닫을 수 있기 때문이다.
+- exact integration workflow_dispatch `36794567345`는 artifact를 보존했지만 gate는 정직하게 실패했다. `pip-audit`가 runtime/scan pin PyJWT 2.13.0에서 allowlist 밖 HIGH 13건을 검출했고, Bandit HIGH는 0건이었다. 예외 allowlist를 늘리지 않고 두 정본 pin을 PyJWT 2.15.1로 함께 올리며, 되돌리면 실패하는 exact-pin 시험을 추가한다.
+- PR #260 exact head `d28a1e1d`의 opt-in run `36795087571`은 success였다. artifact `11133655643`(digest `73d0e566…112c0`)을 인증된 run/artifact metadata와 함께 importer로 검증해 exit 0, `MEASURED_PASS / NONE`, HIGH 0, CRITICAL 0을 확인했다. focused scanner 시험은 14 passed이며 로컬 Python 3.10의 `StrEnum` 부재로 collect되지 않은 identity 시험은 성공 수치에 포함하지 않았다.
+- 문서 head `3684fcc6` Backend `36795581647`은 10월 1일에 처음 노출된 test fixture의 9월 고정 clock partition 부재로 두 matrix가 함께 red였다(3.14: 5440 passed, 82 failed, 81 errors). 제품 partition 정책은 유지하고 disposable DB에만 고정 clock 월을 준비하며, 세 partitioned table을 단언하는 회귀 시험을 추가했다. 이는 PyJWT 호환성 실패가 아니다.
+- 이 카드의 성공 조건은 PR head security lane green만이 아니다. 수정이 integration에 착지한 뒤 그 착지 SHA로 workflow_dispatch를 다시 실행해야 #258의 조건이 닫힌다. 그 전에는 S11-BE 75, AC-11 전체 미완료를 유지한다. [[2026-10-01_09-10-32_KST_AC11_security_landing_SHA_Codex]].
 
 ## 2026-09-29 S05 Card114 c50 일반 suite 격리 — Claude 재확인 요청
 
