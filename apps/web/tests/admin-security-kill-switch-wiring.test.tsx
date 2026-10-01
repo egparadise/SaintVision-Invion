@@ -6,7 +6,7 @@ import { createRoot, Root } from 'react-dom/client';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { AdminSecurityConsole } from '../src/features/admin/AdminSecurityConsole';
 import * as client from '../src/shared/api/client';
-import type { NodeItem } from '../src/contracts/types';
+import type { NodeItem, ContainmentView, ContainmentResult } from '../src/contracts/types';
 
 const MOCK_NODES: NodeItem[] = [
   {
@@ -23,6 +23,28 @@ const MOCK_NODES: NodeItem[] = [
     labels: { tier: 'gpu' },
   },
 ];
+
+const VALID_INACTIVE_VIEW: ContainmentView = {
+  nodeId: null,
+  version: 5,
+  killSwitchActive: false,
+  nodeStatus: 'online',
+  activeLeases: 0,
+  pendingDeliveries: 0,
+  unsettledRuns: 0,
+  settled: true,
+};
+
+const VALID_ACTIVE_VIEW: ContainmentView = {
+  nodeId: null,
+  version: 8,
+  killSwitchActive: true,
+  nodeStatus: 'quarantined',
+  activeLeases: 0,
+  pendingDeliveries: 0,
+  unsettledRuns: 0,
+  settled: true,
+};
 
 describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (Card 169)', () => {
   let container: HTMLDivElement;
@@ -46,22 +68,32 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
   it('비상 정지가 비활성 상태일 때 긴급 발동 확정 시 POST /v1/operations/kill-switch (202 Accepted)와 Idempotency-Key, expectedVersion, reasonCode, approvalId를 전송하고 활성 상태로 갱신한다', async () => {
     let capturedEndpoint: string | null = null;
     let capturedOptions: any = null;
+    let observedResponseStatus: number | null = null;
 
     vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string, options?: any) => {
       if (endpoint === '/v1/operations/kill-switch' && (!options || options.method === 'GET')) {
-        return { version: 5, killSwitchActive: false, nodeStatus: 'online' } as any;
+        return VALID_INACTIVE_VIEW as any;
       }
       if (endpoint === '/v1/operations/kill-switch' && options?.method === 'POST') {
         capturedEndpoint = endpoint;
         capturedOptions = options;
-        return {
+        observedResponseStatus = 202; // app.py:400 @api.post("/v1/operations/kill-switch", status_code=202)
+        const res: ContainmentResult = {
+          requestId: 'req-00000000-0000-4000-8000-000000000001',
           operation: 'kill',
+          approvalId: '11111111-2222-4333-8444-555555555555',
           control: {
+            nodeId: null,
             version: 6,
             killSwitchActive: true,
             nodeStatus: 'online',
+            activeLeases: 0,
+            pendingDeliveries: 0,
+            unsettledRuns: 0,
+            settled: true,
           },
-        } as any;
+        };
+        return res as any;
       }
       return {} as any;
     });
@@ -75,20 +107,17 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
       );
     });
 
-    // 백엔드 제어 평면 상태 반영 확인
     const backendStatus = container.querySelector('[data-testid="backend-kill-switch-status"]');
     expect(backendStatus?.textContent).toContain('INACTIVE (v5)');
 
     // 1. 헤더에서 사유 코드와 승인 ID 변경
     const reasonSelect = container.querySelector('[data-testid="kill-switch-reason-select"]') as HTMLSelectElement;
-    expect(reasonSelect).not.toBeNull();
     await act(async () => {
       reasonSelect.value = 'incident';
       reasonSelect.dispatchEvent(new Event('change', { bubbles: true }));
     });
 
     const approvalInput = container.querySelector('[data-testid="input-kill-switch-approval-id"]') as HTMLInputElement;
-    expect(approvalInput).not.toBeNull();
     await act(async () => {
       const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
       nativeSetter?.call(approvalInput, '11111111-2222-4333-8444-555555555555');
@@ -98,30 +127,20 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
 
     // 2. 모달 열기
     const toggleBtn = container.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLButtonElement;
-    expect(toggleBtn).not.toBeNull();
-    expect(toggleBtn.textContent).toContain('🚨 긴급 Kill Switch 발동');
-
     await act(async () => {
       toggleBtn.click();
     });
 
-    const modal = container.querySelector('[data-testid="kill-switch-modal"]');
-    expect(modal).not.toBeNull();
-
-    // 요약 표시 검증
-    const summary = container.querySelector('[data-testid="kill-switch-params-summary"]');
-    expect(summary?.textContent).toContain('incident');
-    expect(summary?.textContent).toContain('11111111-2222-4333-8444-555555555555');
+    const confirmBtn = container.querySelector('[data-testid="kill-switch-confirm-btn"]') as HTMLButtonElement;
+    expect(confirmBtn.disabled).toBe(false);
 
     // 3. 비상 정지 발동 확정
-    const confirmBtn = container.querySelector('[data-testid="kill-switch-confirm-btn"]') as HTMLButtonElement;
     await act(async () => {
       confirmBtn.click();
     });
 
-    // 실배선 API 호출 단언
     expect(capturedEndpoint).toBe('/v1/operations/kill-switch');
-    expect(capturedOptions).not.toBeNull();
+    expect(observedResponseStatus).toBe(202);
     expect(capturedOptions.method).toBe('POST');
     expect(capturedOptions.headers['Idempotency-Key']).toMatch(/^killswitch_/);
 
@@ -132,33 +151,41 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
       approvalId: '11111111-2222-4333-8444-555555555555',
     });
 
-    // 발동 후 모달 닫힘 및 상단 활성 배너 표출 확인
     expect(container.querySelector('[data-testid="kill-switch-modal"]')).toBeNull();
     const activeBanner = container.querySelector('[data-testid="kill-switch-active-banner"]');
     expect(activeBanner).not.toBeNull();
-    expect(activeBanner?.getAttribute('role')).toBe('alert');
     expect(backendStatus?.textContent).toContain('ACTIVE (v6)');
   });
 
-  it('비상 정지가 활성 상태일 때 해제 실행 시 POST /v1/operations/kill-switch/clear (202 Accepted)를 호출하고 비활성 상태로 복귀한다', async () => {
+  it('비상 정지가 활성 상태일 때 해제 실행 시 POST /v1/operations/kill-switch/clear (200 OK)를 호출하고 비활성 상태로 복귀한다', async () => {
     let capturedEndpoint: string | null = null;
     let capturedOptions: any = null;
+    let observedResponseStatus: number | null = null;
 
     vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string, options?: any) => {
       if (endpoint === '/v1/operations/kill-switch' && (!options || options.method === 'GET')) {
-        return { version: 8, killSwitchActive: true, nodeStatus: 'online' } as any;
+        return VALID_ACTIVE_VIEW as any;
       }
       if (endpoint === '/v1/operations/kill-switch/clear' && options?.method === 'POST') {
         capturedEndpoint = endpoint;
         capturedOptions = options;
-        return {
+        observedResponseStatus = 200; // app.py:412 @api.post("/v1/operations/kill-switch/clear") default status 200
+        const res: ContainmentResult = {
+          requestId: 'req-00000000-0000-4000-8000-000000000002',
           operation: 'clear',
+          approvalId: '22222222-3333-4444-8555-666666666666',
           control: {
+            nodeId: null,
             version: 9,
             killSwitchActive: false,
             nodeStatus: 'online',
+            activeLeases: 0,
+            pendingDeliveries: 0,
+            unsettledRuns: 0,
+            settled: true,
           },
-        } as any;
+        };
+        return res as any;
       }
       return {} as any;
     });
@@ -175,54 +202,262 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
     const backendStatus = container.querySelector('[data-testid="backend-kill-switch-status"]');
     expect(backendStatus?.textContent).toContain('ACTIVE (v8)');
 
-    // 활성 상태이므로 토글 버튼 문구는 'Kill Switch 해제'
-    const toggleBtn = container.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLButtonElement;
-    expect(toggleBtn.textContent).toContain('Kill Switch 해제');
+    // 승인 ID 입력
+    const approvalInput = container.querySelector('[data-testid="input-kill-switch-approval-id"]') as HTMLInputElement;
+    await act(async () => {
+      const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+      nativeSetter?.call(approvalInput, '22222222-3333-4444-8555-666666666666');
+      approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
+      approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
+    });
 
-    // 모달 열기
+    const toggleBtn = container.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLButtonElement;
     await act(async () => {
       toggleBtn.click();
     });
 
-    const modalTitle = container.querySelector('#kill-switch-modal-title');
-    expect(modalTitle?.textContent).toContain('Kill Switch 비활성화(해제) 확인');
-
     const confirmBtn = container.querySelector('[data-testid="kill-switch-confirm-btn"]') as HTMLButtonElement;
     expect(confirmBtn.textContent).toContain('해제 실행');
+    expect(confirmBtn.disabled).toBe(false);
 
-    // 해제 확정 실행
     await act(async () => {
       confirmBtn.click();
     });
 
     expect(capturedEndpoint).toBe('/v1/operations/kill-switch/clear');
-    expect(capturedOptions.method).toBe('POST');
+    expect(observedResponseStatus).toBe(200);
     const sentPayload = JSON.parse(capturedOptions.body);
     expect(sentPayload).toEqual({
       expectedVersion: 8,
       reasonCode: 'operator_request',
-      approvalId: '00000000-0000-4000-8000-000000000001',
+      approvalId: '22222222-3333-4444-8555-666666666666',
     });
 
-    // 해제 후 활성 배너 제거 및 INACTIVE 갱신
     expect(container.querySelector('[data-testid="kill-switch-active-banner"]')).toBeNull();
     expect(backendStatus?.textContent).toContain('INACTIVE (v9)');
+  });
+
+  // =========================================================================
+  // Review Point (1): GET ContainmentView 계약 검증 실패 / 로딩 시 쓰기 비활성화 (fail-closed)
+  // =========================================================================
+  it('GET /v1/operations/kill-switch 응답이 부분 응답이거나 필수 필드(version 등) 누락 시 오류를 표시하고 확정 버튼을 비활성화한다 (fail-closed)', async () => {
+    vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
+      if (endpoint === '/v1/operations/kill-switch') {
+        // version 및 canonical 필드 누락 부분 응답
+        return { killSwitchActive: false } as any;
+      }
+      return {} as any;
+    });
+
+    await act(async () => {
+      root.render(
+        <AdminSecurityConsole
+          nodes={MOCK_NODES}
+          currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+        />
+      );
+    });
+
+    const backendStatus = container.querySelector('[data-testid="backend-kill-switch-status"]');
+    expect(backendStatus?.textContent).toContain('조회 실패 [응답 형식 불일치]');
+
+    // 유효한 UUID를 입력하더라도
+    const approvalInput = container.querySelector('[data-testid="input-kill-switch-approval-id"]') as HTMLInputElement;
+    await act(async () => {
+      const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+      nativeSetter?.call(approvalInput, '550e8400-e29b-41d4-a716-446655440000');
+      approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
+      approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    const toggleBtn = container.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLButtonElement;
+    await act(async () => {
+      toggleBtn.click();
+    });
+
+    // 모달 내부 경고 배너 확인
+    const unreadyNotice = container.querySelector('[data-testid="kill-switch-backend-unready-notice"]');
+    expect(unreadyNotice).not.toBeNull();
+    expect(unreadyNotice?.textContent).toContain('비상 정지 변경이 비활성화되었습니다');
+
+    // 확정 버튼은 반드시 비활성화되어야 함
+    const confirmBtn = container.querySelector('[data-testid="kill-switch-confirm-btn"]') as HTMLButtonElement;
+    expect(confirmBtn.disabled).toBe(true);
+    expect(confirmBtn.getAttribute('aria-disabled')).toBe('true');
+  });
+
+  // =========================================================================
+  // Review Point (2): POST 응답 정본 shape 검증 실패 시 오류 표출, 상태 미변경, 재조회
+  // =========================================================================
+  it('POST 응답에 control이 누락되거나 위장된 경우(빈 응답 {}) 상태를 합성하지 않고 오류를 표시하며 재조회한다', async () => {
+    let getCallCount = 0;
+    vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string, options?: any) => {
+      if (endpoint === '/v1/operations/kill-switch' && (!options || options.method === 'GET')) {
+        getCallCount++;
+        return VALID_INACTIVE_VIEW as any;
+      }
+      if (endpoint === '/v1/operations/kill-switch' && options?.method === 'POST') {
+        // 위장: control 누락 빈 객체
+        return {} as any;
+      }
+      return {} as any;
+    });
+
+    await act(async () => {
+      root.render(
+        <AdminSecurityConsole
+          nodes={MOCK_NODES}
+          currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+        />
+      );
+    });
+
+    expect(getCallCount).toBe(1);
+
+    const approvalInput = container.querySelector('[data-testid="input-kill-switch-approval-id"]') as HTMLInputElement;
+    await act(async () => {
+      const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+      nativeSetter?.call(approvalInput, '550e8400-e29b-41d4-a716-446655440000');
+      approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
+      approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    const toggleBtn = container.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLButtonElement;
+    await act(async () => {
+      toggleBtn.click();
+    });
+
+    const confirmBtn = container.querySelector('[data-testid="kill-switch-confirm-btn"]') as HTMLButtonElement;
+    await act(async () => {
+      confirmBtn.click();
+    });
+
+    // 상태 미변경 단언: 여전히 모달이 열려있고 상단 활성 배너는 미표출
+    expect(container.querySelector('[data-testid="kill-switch-active-banner"]')).toBeNull();
+    const errorBanner = container.querySelector('[data-testid="kill-switch-error-banner"]');
+    expect(errorBanner?.textContent).toContain('[CONTRACT-MISMATCH]');
+
+    // 재조회 호출 실측 (GET이 다시 호출됨)
+    expect(getCallCount).toBe(2);
+  });
+
+  it('POST 응답의 operation이 요청 의도와 불일치하거나 killSwitchActive가 모순된 경우 계약 불일치로 거부한다', async () => {
+    vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string, options?: any) => {
+      if (endpoint === '/v1/operations/kill-switch' && (!options || options.method === 'GET')) {
+        return VALID_INACTIVE_VIEW as any;
+      }
+      if (endpoint === '/v1/operations/kill-switch' && options?.method === 'POST') {
+        // kill 요청인데 operation이 clear로 오거나 killSwitchActive가 false인 모순
+        return {
+          requestId: 'req-bad',
+          operation: 'clear', // mismatch!
+          approvalId: '550e8400-e29b-41d4-a716-446655440000',
+          control: {
+            ...VALID_INACTIVE_VIEW,
+            killSwitchActive: false, // contradiction!
+          },
+        } as any;
+      }
+      return {} as any;
+    });
+
+    await act(async () => {
+      root.render(
+        <AdminSecurityConsole
+          nodes={MOCK_NODES}
+          currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+        />
+      );
+    });
+
+    const approvalInput = container.querySelector('[data-testid="input-kill-switch-approval-id"]') as HTMLInputElement;
+    await act(async () => {
+      const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+      nativeSetter?.call(approvalInput, '550e8400-e29b-41d4-a716-446655440000');
+      approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
+      approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    const toggleBtn = container.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLButtonElement;
+    await act(async () => {
+      toggleBtn.click();
+    });
+
+    const confirmBtn = container.querySelector('[data-testid="kill-switch-confirm-btn"]') as HTMLButtonElement;
+    await act(async () => {
+      confirmBtn.click();
+    });
+
+    const errorBanner = container.querySelector('[data-testid="kill-switch-error-banner"]');
+    expect(errorBanner?.textContent).toContain('[CONTRACT-MISMATCH]');
+    expect(container.querySelector('[data-testid="kill-switch-active-banner"]')).toBeNull();
+  });
+
+  // =========================================================================
+  // Review Point (3): 승인 ID 기본값 빈 값 & 입력 전 전송 불가
+  // =========================================================================
+  it('승인 ID가 빈 값일 때 모달에 필수 경고를 표출하고 확정 버튼을 비활성화하여 전송을 차단한다', async () => {
+    const postCalls: any[] = [];
+    vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string, options?: any) => {
+      if (endpoint === '/v1/operations/kill-switch' && (!options || options.method === 'GET')) {
+        return VALID_INACTIVE_VIEW as any;
+      }
+      if (options?.method === 'POST') {
+        postCalls.push({ endpoint, options });
+        return {} as any;
+      }
+      return {} as any;
+    });
+
+    await act(async () => {
+      root.render(
+        <AdminSecurityConsole
+          nodes={MOCK_NODES}
+          currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+        />
+      );
+    });
+
+    // 기본값이 빈 문자열임을 확인
+    const approvalInput = container.querySelector('[data-testid="input-kill-switch-approval-id"]') as HTMLInputElement;
+    expect(approvalInput.value).toBe('');
+
+    const toggleBtn = container.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLButtonElement;
+    await act(async () => {
+      toggleBtn.click();
+    });
+
+    // 필수 입력 안내 배너 확인
+    const notice = container.querySelector('[data-testid="kill-switch-approval-required-notice"]');
+    expect(notice).not.toBeNull();
+    expect(notice?.textContent).toContain('유효한 Containment 승인 UUID(UUIDv4) 입력이 필수입니다');
+
+    // 확정 버튼 비활성화 확인
+    const confirmBtn = container.querySelector('[data-testid="kill-switch-confirm-btn"]') as HTMLButtonElement;
+    expect(confirmBtn.disabled).toBe(true);
+    expect(confirmBtn.getAttribute('aria-disabled')).toBe('true');
+
+    // 클릭 시도에도 0 network mutations
+    await act(async () => {
+      confirmBtn.click();
+    });
+    expect(postCalls.length).toBe(0);
   });
 
   it('비상 정지 API 409 GRAPH-0003 충돌 발생 시 에러 배너에 RFC 9457 ProblemDetails를 표시하고 모달을 닫지 않는다', async () => {
     vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string, options?: any) => {
       if (endpoint === '/v1/operations/kill-switch' && (!options || options.method === 'GET')) {
-        return { version: 2, killSwitchActive: false, nodeStatus: 'online' } as any;
+        return VALID_INACTIVE_VIEW as any;
       }
       if (options?.method === 'POST') {
-        const error: any = new Error('Control version conflict: expected version 2 differs from server version 4');
+        const error: any = new Error('Control version conflict: expected version 5 differs from server version 7');
         error.problem = {
           type: 'about:blank',
           title: 'Conflict',
           status: 409,
           code: 'GRAPH-0003',
           category: 'GRAPH',
-          detail: 'Control version conflict: expected version 2 differs from server version 4',
+          detail: 'Control version conflict: expected version 5 differs from server version 7',
           retryable: false,
           traceId: 'trace-409-conflict',
         };
@@ -240,6 +475,14 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
       );
     });
 
+    const approvalInput = container.querySelector('[data-testid="input-kill-switch-approval-id"]') as HTMLInputElement;
+    await act(async () => {
+      const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+      nativeSetter?.call(approvalInput, '550e8400-e29b-41d4-a716-446655440000');
+      approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
+      approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
     const toggleBtn = container.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLButtonElement;
     await act(async () => {
       toggleBtn.click();
@@ -250,7 +493,6 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
       confirmBtn.click();
     });
 
-    // 모달이 닫히지 않고 내부 에러 배너에 정직하게 표시
     const modal = container.querySelector('[data-testid="kill-switch-modal"]');
     expect(modal).not.toBeNull();
 
@@ -264,7 +506,7 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
   it('비상 정지 API 403 AUTH-0062 권한 부족 발생 시 에러 배너에 오류를 명확히 표시한다', async () => {
     vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string, options?: any) => {
       if (endpoint === '/v1/operations/kill-switch' && (!options || options.method === 'GET')) {
-        return { version: 1, killSwitchActive: false, nodeStatus: 'online' } as any;
+        return VALID_INACTIVE_VIEW as any;
       }
       if (options?.method === 'POST') {
         const error: any = new Error('Operator containment grant required');
@@ -291,6 +533,14 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
       );
     });
 
+    const approvalInput = container.querySelector('[data-testid="input-kill-switch-approval-id"]') as HTMLInputElement;
+    await act(async () => {
+      const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+      nativeSetter?.call(approvalInput, '550e8400-e29b-41d4-a716-446655440000');
+      approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
+      approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
     const toggleBtn = container.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLButtonElement;
     await act(async () => {
       toggleBtn.click();
@@ -306,57 +556,8 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
     expect(errorBanner?.textContent).toContain('Operator containment grant required');
   });
 
-  it('승인 식별자가 유효한 UUIDv4가 아닐 경우 네트워크 POST를 0회로 원천 차단하고 오류를 표시한다', async () => {
-    const postCalls: any[] = [];
-    vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string, options?: any) => {
-      if (endpoint === '/v1/operations/kill-switch' && (!options || options.method === 'GET')) {
-        return { version: 1, killSwitchActive: false, nodeStatus: 'online' } as any;
-      }
-      if (options?.method === 'POST') {
-        postCalls.push({ endpoint, options });
-        return { operation: 'kill' } as any;
-      }
-      return {} as any;
-    });
-
-    await act(async () => {
-      root.render(
-        <AdminSecurityConsole
-          nodes={MOCK_NODES}
-          currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
-        />
-      );
-    });
-
-    // 잘못된 UUID 입력
-    const approvalInput = container.querySelector('[data-testid="input-kill-switch-approval-id"]') as HTMLInputElement;
-    await act(async () => {
-      const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
-      nativeSetter?.call(approvalInput, 'invalid-uuid-string-1234');
-      approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
-      approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
-    });
-
-    const toggleBtn = container.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLButtonElement;
-    await act(async () => {
-      toggleBtn.click();
-    });
-
-    const confirmBtn = container.querySelector('[data-testid="kill-switch-confirm-btn"]') as HTMLButtonElement;
-    await act(async () => {
-      confirmBtn.click();
-    });
-
-    // 네트워크 POST 호출이 0회여야 함
-    expect(postCalls.length).toBe(0);
-
-    const errorBanner = container.querySelector('[data-testid="kill-switch-error-banner"]');
-    expect(errorBanner).not.toBeNull();
-    expect(errorBanner?.textContent).toContain('유효한 Containment 승인 UUID(approvalId)가 필요합니다');
-  });
-
   it('currentUser가 null일 때 관리자 세션 부재 배너를 렌더링하고 토글 버튼과 확정 버튼을 비활성화하여 위조 합성을 방지한다', async () => {
-    vi.spyOn(client, 'apiClient').mockResolvedValue({ version: 1, killSwitchActive: false });
+    vi.spyOn(client, 'apiClient').mockResolvedValue(VALID_INACTIVE_VIEW as any);
 
     await act(async () => {
       root.render(

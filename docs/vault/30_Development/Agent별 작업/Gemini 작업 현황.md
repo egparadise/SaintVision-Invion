@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.159"
+version: "1.0.160"
 status: "approved"
 author: "Gemini"
-updated: "2026-10-01T12:57:03+09:00"
+updated: "2026-10-01T13:17:15+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,23 +19,27 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-10-01T12:57:03+09:00 (Card 169 S08-FE 관리자 비상 정지 백엔드 실배선, 멱등키/승인ID 연동, 202 Accepted 처리, vitest 6 passed, tsc -b/build/route_coverage 100%).
+- 확인 기준: 2026-10-01T13:17:15+09:00 (Card 169 S08-FE 관리자 비상 정지 백엔드 실배선, PR #267 독립 검토 전수 조치: 정본 ContainmentView/Result 엄격 검증, fail-closed 쓰기 차단, 승인 UUID 빈 값 시작, Clear 200 OK 단언, vitest 9 passed, tsc -b/build/route_coverage 100%).
 
-## 2026-10-01 관리자 보안 콘솔 비상 정지(Kill Switch) 백엔드 실배선 및 멱등/승인ID 제어 평면 연동 (Card 169, S08-FE, `agent/gemini/c169-s08fe-killswitch-real-wiring`)
+## 2026-10-01 관리자 보안 콘솔 비상 정지(Kill Switch) 백엔드 실배선 및 멱등/승인ID 제어 평면 연동 (Card 169, S08-FE, `agent/gemini/c169-s08fe-killswitch-real-wiring`, PR #267)
 - **개요**:
-  1. **착수 배경**: 병합 열차(`coord/train5-ci-1135`, `7851412d`)에서 카드 113 서버 멱등 계약이 착지 완료되었고, 모델 레지스트리 Release UI fail-closed 해제는 이미 카드 118에서 완비되었음. 진행판 75% 카드 중 외부 전제(`—`)가 없는 S08-FE 행의 관리자 비상 정지(Kill Switch)를 브라우저 로컬 모의 시뮬레이션에서 백엔드 제어 평면 실엔드포인트(`POST /v1/operations/kill-switch` [202 Accepted] 및 `/clear`)로 실배선 승격.
-  2. **구현**:
-     - `AdminSecurityConsole.tsx`: `handleConfirmKillSwitch`에서 `ContainmentInput`(`expectedVersion`, `reasonCode`, `approvalId`) 및 헤더 `Idempotency-Key`를 전송하여 제어 평면 202 Accepted 수신 후 제어 평면 상태 및 버전 동기화, 로컬 보안 엔진 미러링 및 멱등키 회전.
-     - **포커스 트랩 보존**: 모달 내 2-요소 키보드 트랩(`cancelBtn` $\leftrightarrow$ `confirmBtn`)을 깨지 않도록 `reasonCode`와 `approvalId` 입력을 상단 헤더 제어바에 배치하고 모달에는 요약 및 RFC 9457 오류 배너 표출.
-     - **Fail-Closed 보안**: actor 부재 시 차단, 무효 UUIDv4 입력 시 네트워크 POST 0회 차단, 403/409/422 ProblemDetails 에러 배너 정직 표출.
+  1. **착수 배경**: 병합 열차(`coord/train5-ci-1135`, `7851412d`)에서 카드 113 서버 멱등 계약이 착지 완료되었고, 모델 레지스트리 Release UI fail-closed 해제는 이미 카드 118에서 완비되었음. 진행판 75% 카드 중 외부 전제(`—`)가 없는 S08-FE 행의 관리자 비상 정지(Kill Switch)를 브라우저 로컬 모의 시뮬레이션에서 백엔드 제어 평면 실엔드포인트(`POST /v1/operations/kill-switch` [202 Accepted] 및 `/clear` [200 OK])로 실배선 승격.
+  2. **구현 및 PR #267 독립 검토 전수 조치**:
+     - `AdminSecurityConsole.tsx`:
+       - `isValidContainmentView`: `GET /v1/operations/kill-switch` 응답의 모든 정본 필드(`nodeId`, 정수 `version`, `killSwitchActive`, `nodeStatus`, `activeLeases`, `pendingDeliveries`, `unsettledRuns`, `settled`)를 엄격 검증. 부분 응답/형식 불일치/로딩/오류 시 `backendKillSwitch.status = 'error'`, `isKillSwitchReady = false`로 fail-closed 쓰기 차단 (`canConfirmKillSwitch = false`).
+       - `isValidContainmentResult`: `POST` 응답을 엄격 검증. `requestId`, `operation`, `approvalId`, `control` shape 및 상태 일치를 단언하고, 불일치 시 임의 버전 합성(`version ?? currentVersion+1` 등)을 배제하고 `[CONTRACT-MISMATCH]` 표시 및 상태 미변경 유지, 제어 평면 상태 재조회.
+       - 승인 ID 기본값을 빈 문자열(`''`)로 초기화하여 실제 UUIDv4 입력 전에는 모달 경고 표출 및 확정 버튼 비활성화, 0 network mutations 보장.
+       - 해제(`POST /v1/operations/kill-switch/clear`)는 서버 `app.py:412` 정본 기본 상태인 `200 OK` 규격을 반영하고 HTTP status 관측.
+     - **포커스 트랩 보존**: 모달 내 2-요소 키보드 트랩(`cancelBtn` $\leftrightarrow$ `confirmBtn`)을 유지하고 승인 UUID 설정 시 원활한 순환 검증.
   3. **검증**:
-     - `apps/web/tests/admin-security-kill-switch-wiring.test.tsx` 신규 6개 시험 전원 통과.
-     - `apps/web/tests/defect-recovery-admin-recovery-editor.test.tsx` 26개 시험 전원 통과.
+     - `apps/web/tests/admin-security-kill-switch-wiring.test.tsx` 9개 시험 전원 통과 (반례 음성 시험 완비).
+     - `apps/web/tests/defect-recovery-admin-recovery-editor.test.tsx` 26개 시험 전원 통과 (포커스 트랩 및 회귀 시험 완비).
      - `apps/web/tests/write-actions-integrity-wiring.test.tsx` 8개 시험 전원 통과.
      - `npx tsc -b` 타입 에러 0건.
-     - `npm run build` Vite 프로덕션 번들 정상 생성.
+     - `npm run build` Vite 프로덕션 번들 정상 생성 (7.12s).
      - `pytest tests/test_route_coverage.py` 40 passed 100%.
      - `python tools/check_frontend_integrity.py` 92개 파일 9대 무결성 규칙 0 위반.
+     - `python tools/check_docs.py` PASS.
 - **담당 및 역할**: Gemini (Frontend / UI 소유). Reviewer: Claude (UI·테스트 축), Codex 계약·보안 축.
 - **전문 문서**: [[2026-10-01_12-57-03_KST_Card169_S08FE_KillSwitch_Real_Wiring_Gemini]]
 

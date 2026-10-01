@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-20261001-C169-S08FE-001"
 title: "Card 169 (S08-FE) 관리자 보안 콘솔 비상 정지(Kill Switch) 백엔드 제어 평면 실배선 및 202 Accepted 멱등 연동 기록"
-version: "1.0.0"
+version: "1.0.1"
 status: "approved"
 author: "Gemini"
 created: "2026-10-01T12:57:03+09:00"
-updated: "2026-10-01T12:57:03+09:00"
+updated: "2026-10-01T13:17:15+09:00"
 source_of_truth: "Git"
 ---
 
@@ -44,16 +44,32 @@ source_of_truth: "Git"
    - 무효 UUID 입력 시 네트워크 POST 0회 차단 검증.
    - `currentUser=null` 시 관리자 부재 배너 및 버튼 비활성화 검증.
 
-## 3. 로컬 실측 검증 (Evidence)
-- `npm test -- admin-security-kill-switch-wiring`: 6 passed (exit 0)
+## 3. PR #267 독립 검토(13:02) 지적사항 전수 조치 (Remediation Details)
+1. **(1)[High] GET ContainmentView 계약 완전 검증 및 fail-closed 쓰기 차단**:
+   - `isValidContainmentView(v: unknown): v is ContainmentView`: `nodeId` (string | null), 정수 `version >= 0`, boolean `killSwitchActive`, `nodeStatus` (string | null), 음수 아닌 정수 `activeLeases`, `pendingDeliveries`, `unsettledRuns`, boolean `settled`를 전수 검증.
+   - 부분 응답(예: `{ killSwitchActive: false }`), 필드 누락, 로딩 중, 오류 응답 수신 시 `backendKillSwitch.status = 'error'`, `isKillSwitchReady = false`로 처리하여 쓰기 버튼(`kill-switch-confirm-btn`)을 원천 비활성화(`canConfirmKillSwitch = false`, fail-closed).
+2. **(2)[High] POST ContainmentResult 정본 shape 검증, 상태 합성 제거 및 재조회**:
+   - `isValidContainmentResult(r: unknown, expectedOperation, expectedApprovalId)`: `requestId` (비어있지 않은 문자열), `operation === expectedOperation`, `approvalId` 대소문자 무관 일치, `control`의 `isValidContainmentView` 만족 및 `control.killSwitchActive === (expectedOperation === 'kill')`를 엄격 검증.
+   - 응답 위장 또는 `control` 누락 시 임의 상태 합성(`version ?? currentVersion + 1` 등)을 배제하고 `[CONTRACT-MISMATCH]` 오류 표시, 로컬 상태 미변경(불변), 즉시 제어 평면 상태 재조회(`fetchBackendKillSwitch()`) 실행.
+3. **(3)[Medium] 승인 UUID 기본값 빈 문자열 초기화 및 사전 가드**:
+   - 모의 승인 UUID(`00000000-0000-4000-8000-000000000001`) 기본값을 제거하고 `''`로 초기화.
+   - 유효한 UUIDv4 입력 전에는 모달 내 `kill-switch-approval-required-notice` (role="alert")를 표출하고 확정 버튼을 비활성화(`canConfirmKillSwitch = false`), 클릭 시도 시에도 네트워크 호출을 0회로 원천 차단.
+4. **(4)[Medium] Clear HTTP 200 OK 정본 규격 반영 및 상태 관측**:
+   - 서버 `app.py:412` (`@api.post("/v1/operations/kill-switch/clear")`) 정본 기본 status인 `200 OK`를 시험 및 mock에 반영하고, mock이 실제 HTTP status를 관측/단언하도록 정합. (활성화는 202 Accepted, 해제는 200 OK).
+   - 각 반례(부분 응답, 위장 응답, 모순 상태, 승인 ID 빈 값)에 대한 음성 시험 완비 (총 9개 시험).
+
+## 4. 로컬 실측 검증 (Evidence)
+- `npm test -- admin-security-kill-switch-wiring`: 9 passed (exit 0, 반례 부정 시험 전수 통과)
 - `npm test -- defect-recovery-admin`: 26 passed (exit 0, 포커스 트랩 및 Kill Switch 회귀 100% 통과)
 - `npm test -- write-actions`: 8 passed (exit 0)
 - `npx tsc -b`: 타입 오류 0건 (exit 0)
-- `npm run build`: Vite 프로덕션 번들 정상 생성 (exit 0)
+- `npm run build`: Vite 프로덕션 번들 정상 생성 (exit 0, 7.12s)
 - `pytest tests/test_route_coverage.py`: 40 passed 100% (exit 0)
 - `python -X utf8 tools/check_frontend_integrity.py`: 92개 파일 스캔, 9대 규칙 위반 0건 (exit 0)
+- `python tools/check_docs.py`: PASS (24 hashes, 1055 docs, 48 tasks, 12 outcomes)
 
-## 4. 이어서 할 첫 행동 및 담당
+## 5. 이어서 할 첫 행동 및 담당
 - **담당**: Gemini (Frontend / UI 소유).
 - **Reviewer**: Claude (UI·테스트 축), Codex 계약·보안 축.
-- **다음 행동**: Git commit, origin push, PR 오픈 (`coord/train5-ci-1135` 기준), 리뷰 요청 등록.
+- **다음 행동**: Git commit, origin push, PR #267 통합 조치표 코멘트 등록 및 재검토 요청.
+

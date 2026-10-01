@@ -8,6 +8,7 @@ import { ResourceExplorer } from '../src/features/desktop/ResourceExplorer';
 import { AdminSecurityConsole } from '../src/features/admin/AdminSecurityConsole';
 import { ModelLineageView } from '../src/features/mlops/ModelLineageView';
 import * as fabricApi from '../src/features/desktop/fabricControlApi';
+import * as client from '../src/shared/api/client';
 import { NodeItem, DiscoveryCandidate, ModelLineage } from '../src/contracts/types';
 
 // Mock fabricControlApi
@@ -279,6 +280,40 @@ describe('화면 결함 5대 부류 치유 트랙 5차: 고위험 쓰기 동작 
     });
 
     it('관리자 로그인 시 Kill Switch 모달에 [모의 시뮬레이션] 고지가 명시되고 활성화 시 모의 배너가 표출된다', async () => {
+      const mockApiClient = vi.mocked(client.apiClient);
+      mockApiClient.mockImplementation(async (endpoint: string, options?: any) => {
+        if (endpoint === '/v1/operations/kill-switch' && (!options || options.method === 'GET')) {
+          return {
+            nodeId: null,
+            version: 1,
+            killSwitchActive: false,
+            nodeStatus: 'online',
+            activeLeases: 0,
+            pendingDeliveries: 0,
+            unsettledRuns: 0,
+            settled: true,
+          } as any;
+        }
+        if (endpoint === '/v1/operations/kill-switch' && options?.method === 'POST') {
+          return {
+            requestId: 'req-01',
+            operation: 'kill',
+            approvalId: '550e8400-e29b-41d4-a716-446655440000',
+            control: {
+              nodeId: null,
+              version: 2,
+              killSwitchActive: true,
+              nodeStatus: 'online',
+              activeLeases: 0,
+              pendingDeliveries: 0,
+              unsettledRuns: 0,
+              settled: true,
+            },
+          } as any;
+        }
+        return {} as any;
+      });
+
       await act(async () => {
         root.render(
           <AdminSecurityConsole
@@ -287,6 +322,17 @@ describe('화면 결함 5대 부류 치유 트랙 5차: 고위험 쓰기 동작 
           />
         );
       });
+
+      // 승인 ID 입력 (실제 계약 전송 요구사항)
+      const approvalInput = container.querySelector('[data-testid="input-kill-switch-approval-id"]') as HTMLInputElement;
+      if (approvalInput) {
+        await act(async () => {
+          const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+          nativeSetter?.call(approvalInput, '550e8400-e29b-41d4-a716-446655440000');
+          approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
+          approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+      }
 
       // Kill Switch 토글 버튼 활성화 상태 확인
       const killSwitchBtn = container.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLButtonElement;

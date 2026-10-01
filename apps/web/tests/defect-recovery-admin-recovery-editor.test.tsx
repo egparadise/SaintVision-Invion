@@ -314,10 +314,35 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
           } as any;
         }
         if (endpoint === '/v1/operations/kill-switch') {
-          return {
-            version: 1,
-            killSwitchActive: false,
-          } as any;
+          if (!options || options.method === 'GET') {
+            return {
+              nodeId: null,
+              version: 1,
+              killSwitchActive: false,
+              nodeStatus: 'online',
+              activeLeases: 0,
+              pendingDeliveries: 0,
+              unsettledRuns: 0,
+              settled: true,
+            } as any;
+          }
+          if (options?.method === 'POST') {
+            return {
+              requestId: 'req-01',
+              operation: 'kill',
+              approvalId: '550e8400-e29b-41d4-a716-446655440000',
+              control: {
+                nodeId: null,
+                version: 2,
+                killSwitchActive: true,
+                nodeStatus: 'online',
+                activeLeases: 0,
+                pendingDeliveries: 0,
+                unsettledRuns: 0,
+                settled: true,
+              },
+            } as any;
+          }
         }
         return {} as any;
       });
@@ -330,6 +355,17 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
           />
         );
       });
+
+      // 승인 ID 입력
+      const killSwitchApprovalInput = container.querySelector('[data-testid="input-kill-switch-approval-id"]') as HTMLInputElement;
+      if (killSwitchApprovalInput) {
+        await act(async () => {
+          const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+          nativeSetter?.call(killSwitchApprovalInput, '550e8400-e29b-41d4-a716-446655440000');
+          killSwitchApprovalInput.dispatchEvent(new Event('input', { bubbles: true }));
+          killSwitchApprovalInput.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+      }
 
       // 1. 로컬 비상 Kill Switch 활성화
       const killSwitchToggleBtn = container.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLButtonElement;
@@ -705,7 +741,21 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
 
     it('Kill Switch 모달은 열릴 때 취소 버튼에 초기 포커스되고, Tab/Shift+Tab 순환 후 Esc 닫기 시 열기 전 요소로 포커스를 복원한다', async () => {
       vi.useFakeTimers();
-      vi.spyOn(client, 'apiClient').mockResolvedValue({});
+      vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
+        if (endpoint === '/v1/operations/kill-switch') {
+          return {
+            nodeId: null,
+            version: 1,
+            killSwitchActive: false,
+            nodeStatus: 'online',
+            activeLeases: 0,
+            pendingDeliveries: 0,
+            unsettledRuns: 0,
+            settled: true,
+          } as any;
+        }
+        return {} as any;
+      });
 
       await act(async () => {
         root.render(
@@ -715,6 +765,17 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
           />
         );
       });
+
+      // 승인 ID 입력 (유효한 UUID 설정으로 확정 버튼 활성화)
+      const killSwitchApprovalInput = container.querySelector('[data-testid="input-kill-switch-approval-id"]') as HTMLInputElement;
+      if (killSwitchApprovalInput) {
+        await act(async () => {
+          const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+          nativeSetter?.call(killSwitchApprovalInput, '550e8400-e29b-41d4-a716-446655440000');
+          killSwitchApprovalInput.dispatchEvent(new Event('input', { bubbles: true }));
+          killSwitchApprovalInput.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+      }
 
       // 1. Focus toggle button and open modal
       const toggleBtn = container.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLButtonElement;
