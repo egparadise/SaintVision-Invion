@@ -1,11 +1,11 @@
 ---
 doc_id: "S12-BE-FRESH-AUTH-SOURCE-001"
 title: "S12-BE fresh-auth claim 공급원 및 portal step-up 인계"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-01T21:10:00+09:00"
+updated: "2026-10-01T21:39:29+09:00"
 source_of_truth: "Git"
 base_sha: "89c8f3665d8f467cfa9d73e7160a985841488ef3"
 source_commit: "e166b214a9c6eb4b57b8bdbf2acaa58224732704"
@@ -19,8 +19,9 @@ card: "188"
 PR #282 v1.3.0이 정한 release acceptance 쓰기 경계는 서명 검증된 access token의
 `auth_time`과 `amr`만 fresh-auth 증거로 사용한다. 이번 카드는 그 공급원과 판정 계약을
 추가하지만 release acceptance write route를 enable하지 않는다.
-`INV_RELEASE_ACCEPTANCE_WRITE_ENABLED`의 기본값은 계속 `false`이며, 실제 Keycloak token
-관측과 portal step-up 구현이 끝나기 전에는 모든 write route가 disabled 상태다.
+#282가 `INV_RELEASE_ACCEPTANCE_WRITE_ENABLED=false`를 기본으로 설계했지만 이 branch에는 아직
+route와 flag 구현이 없다(Claude 카드 187 구현 범위). 실제 Keycloak token 관측과 portal step-up,
+target/Evidence resolver가 끝나기 전에는 그 구현도 모든 write route를 disabled로 유지해야 한다.
 
 사내 hosts가 아직 적용되지 않아 실제 `idp.sv.lan` 로그인과 access token 관측은
 **BLOCKED_EXTERNAL**이다. 따라서 이 문서는 live Keycloak PASS, 운영자 수락 완료 또는
@@ -43,6 +44,15 @@ browser flow의 password와 OTP execution에는 RFC 8176 reference `pwd`, `otp`�
 `default.reference.maxAge=300`을 지정한다. hardware/software key execution은 현재 realm에
 없으므로 설정이나 관측을 주장하지 않는다. 서버 정책은 향후 정본 mapper가 내는 `hwk`,
 `swk`를 수용할 수 있지만 임의 문자열과 `webauthn` 문자열은 거부한다.
+
+정적 checker가 확인하는 것은 두 execution reference **객체의 모양**까지다. 그것만으로 portal이
+실제로 쓰는 realm `browserFlow` 또는 client `authenticationFlowBindingOverrides`에 execution이
+연결됐다고 주장하지 않는다. 또한 현재 realm user에게 OTP credential/required action이 없으면
+실제 token은 `amr=["pwd"]`이고 fresh-auth는 누구에게도 성립하지 않는다. 운영 enable 전에는
+서로 다른 두 사람 모두 `CONFIGURE_TOTP`를 완료하고, portal authorization-code flow가 사용하는
+flow에서 password+OTP가 완료되며, redacted live access token에 `pwd`+`otp`(또는 승인된 `mfa`)
+조합이 나타나는 것을 관측해야 한다. 하나라도 없으면 `BLOCKED_EXTERNAL`이며 checker exit 0을
+"AMR 공급 가능" 또는 write-ready 증거로 세지 않는다.
 
 `services/control-plane/src/inv/identity.py`는 JWT signature, issuer, audience, subject,
 expiry, token type, client와 scope 검증이 모두 끝난 뒤에만 두 claim을 trusted Identity로
@@ -88,7 +98,8 @@ write-route enable 조건은 충족되지 않는다.
 ## 5. 정적 검증과 후속 인수
 
 - `tools/check_idp_realm_config.py`는 두 mapper와 password/OTP reference·300초 max age를
-  live snapshot에서 exact 비교한다.
+  live snapshot에서 exact 비교한다. flow binding·사용자 OTP 등록·실제 token AMR은 별도 live
+  관측 항목이며 이 static PASS로 대체하지 않는다.
 - `tests/core/test_check_idp_realm_config.py`는 mapper 또는 reference 완화 변이를 거부한다.
 - `tests/core/test_fresh_auth_claims.py`는 서명 검증 후 전파, 허용/거부 조합, 300초 경계와
   portal redirect 계약을 고정한다.

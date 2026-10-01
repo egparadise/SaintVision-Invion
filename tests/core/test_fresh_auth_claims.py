@@ -9,6 +9,7 @@ from uuid import uuid4
 
 import pytest
 
+from inv.errors import DomainError
 from saintvision.api.schemas import FreshAuthenticationStepUpRequest
 from saintvision.identity.principal import Principal, has_fresh_interactive_auth
 from jwt_support import jwt_fixture
@@ -55,6 +56,9 @@ def test_exact_interactive_combinations_are_fresh(amr):
         (int(NOW.timestamp()), ("webauthn",), True),
         (int(NOW.timestamp()), ("otp",), True),
         (int(NOW.timestamp()), ("mfa",), False),
+        (str(int(NOW.timestamp())), ("mfa",), True),
+        (float(int(NOW.timestamp())), ("mfa",), True),
+        (-1, ("mfa",), True),
     ],
 )
 def test_missing_stale_future_or_noninteractive_proof_is_not_fresh(auth_time, amr, verified):
@@ -76,6 +80,8 @@ def test_only_signature_verified_claims_enter_the_access_identity(tmp_path):
     for claims in (
         {},
         {"auth_time": True, "amr": ["mfa"]},
+        {"auth_time": str(fixed_now), "amr": ["mfa"]},
+        {"auth_time": float(fixed_now), "amr": ["mfa"]},
         {"auth_time": fixed_now, "amr": "mfa"},
         {"auth_time": fixed_now, "amr": ["pwd", "pwd"]},
         {"auth_time": fixed_now, "amr": ["mfa", "webauthn"]},
@@ -83,6 +89,14 @@ def test_only_signature_verified_claims_enter_the_access_identity(tmp_path):
         value = identity.auth.verify(identity.token(claims=claims))
         assert value.auth_time is None
         assert value.amr == ()
+
+
+def test_tampered_signature_cannot_supply_fresh_auth_claims(tmp_path):
+    identity = jwt_fixture(tmp_path, str(uuid4()))
+    token = identity.token(claims={"auth_time": int(time.time()), "amr": ["mfa"]})
+    replacement = "A" if token[-1] != "A" else "B"
+    with pytest.raises(DomainError):
+        identity.auth.verify(token[:-1] + replacement)
 
 
 def test_step_up_redirect_contract_is_exact_and_has_no_credential_fields():

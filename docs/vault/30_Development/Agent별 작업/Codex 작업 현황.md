@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.248"
+version: "1.0.249"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T21:10:00+09:00"
+updated: "2026-10-01T21:39:29+09:00"
 source_of_truth: "Git"
 active_card: "CARD-188 S12 fresh-auth claim source"
-active_card_status: "Keycloak auth_time/amr mappers, verified Principal metadata, 300-second AMR policy and exact portal step-up contract implemented; live IdP remains BLOCKED_EXTERNAL"
-active_card_next: "focused gates, exact-head hosted CI and Claude independent review; Antigravity portal step-up remains a separate handoff"
+active_card_status: "Claude r1 condition addressed: flow/OTP operational prerequisite documented and six surviving claim/mapper mutations covered"
+active_card_next: "Run focused gates, push follow-up commit and request Claude final confirmation; live token and portal step-up remain BLOCKED_EXTERNAL"
 ---
 
 ## 2026-10-01 Card 188 — S12 fresh-auth claim 공급원
@@ -20,6 +20,9 @@ active_card_next: "focused gates, exact-head hosted CI and Claude independent re
   `pwd` 단독·`webauthn`·unknown claim은 fail closed다.
 - portal 인계 계약은 exact `prompt=login&max_age=300`이다. FE 구현과 live Keycloak token
   관측은 아직 없으므로 write route flag는 off이고 운영 인수는 `BLOCKED_EXTERNAL`이다.
+- Claude r1에 따라 static reference PASS와 실제 portal flow/OTP 등록을 분리했다. 두 운영자의
+  OTP 등록과 live `pwd+otp|mfa` token 관측 전에는 write-ready가 아니다. str/float auth_time,
+  변조 서명, AMR token target 변이 시험도 보강했다.
 - 근거: [[2026-10-01_21-10-00_KST_Card188_fresh_auth_claim_공급원_Codex]],
   [[S12-BE_fresh_auth_claim_공급원_및_portal_step-up_인계]].
 

@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-CARD188-FRESH-AUTH-20261001"
 title: "Card 188 fresh-auth claim 공급원 구현"
-version: "1.0.2"
+version: "1.0.3"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-01T21:20:29+09:00"
+updated: "2026-10-01T21:39:29+09:00"
 source_of_truth: "Git"
 source_commit: "e166b214a9c6eb4b57b8bdbf2acaa58224732704"
 ---
@@ -55,10 +55,20 @@ source_commit: "e166b214a9c6eb4b57b8bdbf2acaa58224732704"
 
 exact-head hosted CI 결과는 PR 생성 뒤 PR 코멘트에 기록한다.
 
+### Claude r1 조건 반영
+
+- checker가 execution reference 객체만 검사한다는 경계를 명시했다. portal이 실제 사용하는 flow
+  결속, 두 운영자의 OTP 등록과 `pwd+otp|mfa` live token 관측 전에는 `BLOCKED_EXTERNAL`이다.
+- identity와 policy 양쪽의 string/float `auth_time`, 변조 서명, AMR id-token 출력, script 두
+  AMR mapper의 access-token-only 설정을 각각 독립 시험으로 고정했다.
+- 이 branch에는 write flag 코드가 없으며 `INV_RELEASE_ACCEPTANCE_WRITE_ENABLED=false`는 #282
+  설계와 Claude 카드 187의 구현 전제라는 문구로 정정했다.
+
 ## 정직성 경계와 다음 owner
 
 - 사내 hosts 미적용으로 실제 `idp.sv.lan` token은 관측하지 못했다. live mapper/token
   결과는 **BLOCKED_EXTERNAL**이며 이번 로컬 정적 결과를 운영 PASS로 세지 않는다.
 - portal step-up은 Gemini/Antigravity 영역이다. exact parameter, PKCE/state/nonce 유지,
   callback 뒤 새 token 교체와 실패 시 sign-off 합성 금지를 별도 카드로 인계한다.
-- 두 live 후속이 끝날 때까지 `INV_RELEASE_ACCEPTANCE_WRITE_ENABLED=false`를 유지한다.
+- route/flag는 이 branch에 없고 Claude 카드 187 구현 범위다. 구현 뒤에도 두 live 후속과
+  authoritative resolver가 끝날 때까지 설계 기본값 `false`를 유지한다.

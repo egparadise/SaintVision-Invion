@@ -205,6 +205,9 @@ def relax_scope(mutate):
         ("amr mapper stops writing access tokens",
          lambda c, p, a: p["protocolMappers"][3]["config"].__setitem__(
              "access.token.claim", "false"), "access-token-only"),
+        ("amr mapper starts writing id tokens",
+         lambda c, p, a: p["protocolMappers"][3]["config"].__setitem__(
+             "id.token.claim", "true"), "access-token-only"),
         ("plaintext redirect on a real host",
          lambda c, p, a: p["redirectUris"].append("http://portal.sv.lan/*"),
          "plaintext or wildcard"),
@@ -349,3 +352,13 @@ def test_realm_configurator_emits_the_exact_fresh_auth_snapshot():
         '"authenticatorReferences"',
     ):
         assert required in script
+
+
+def test_both_amr_mapper_writes_are_access_token_only():
+    script = (ROOT / "deploy" / "intranet" / "idp-realm.sh").read_text(encoding="utf-8")
+    exact = (
+        '"config": {"access.token.claim": "true", "id.token.claim": "false",\n'
+        '            "lightweight.claim": "false"}'
+    )
+    assert script.count('"name": "fresh-auth-amr"') == 2
+    assert script.count(exact) == 2
