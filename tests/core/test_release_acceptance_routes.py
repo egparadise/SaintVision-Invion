@@ -247,7 +247,10 @@ def test_the_enabled_flag_alone_does_not_open_the_surface(monkeypatch):
     is a fact about the deployment, not a setting, so an operator cannot enable a
     two-person rule the build cannot prove (§0-1.2, §0-1.4).
     """
-    client = build(monkeypatch, enabled=True)
+    # Card 194 binds the production resolver. Exercise the independent half of the
+    # gate explicitly: a deployment that has not bound it still stays closed even when
+    # an operator flips the write flag.
+    client = build(monkeypatch, enabled=True, resolver=service.UnboundReferenceResolver())
     response = client.post(DECIDE, headers=JSON, content=json.dumps(DECISION_BODY))
     assert response.status_code == 503
     assert response.json()["code"] == "SYS-0003"

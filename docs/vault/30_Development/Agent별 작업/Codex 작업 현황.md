@@ -1,15 +1,32 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.255"
+version: "1.0.256"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T22:14:13+09:00"
+updated: "2026-10-01T23:43:41+09:00"
 source_of_truth: "Git"
-active_card: "CARD-190 S12 acceptance target/Evidence canonical resolver contract"
-active_card_status: "Claude r1 F1-F9 and r2 Low five resolved in design/contract v1.1.1; implementation remains NOT_OBSERVED"
-active_card_next: "Confirm exact-head Backend and Claude final review; implement reserved migration 0058 only in the next Claude card"
+active_card: "CARD-194 S12 acceptance target/Evidence canonical resolver implementation"
+active_card_status: "0058 digest/binding, exact resolver and discovery implemented on #286 0057; hosted real-PG and Claude review pending"
+active_card_next: "Push stacked PR against #286, run exact-head Core, then address Claude independent review without enabling acceptance writes"
 ---
+
+## 2026-10-01 Card 194 — S12 acceptance target·Evidence resolver 구현
+
+- coordinator 정정에 따라 #286 head `faba659d`를 merge commit `e19aff84`로 적층했고,
+  `0058_release_acceptance_resolver`의 부모를 반드시 `0057_release_acceptance_quorum`으로 고정했다.
+  `tools/migration_graph.py --head`는 단일 head `0058_release_acceptance_resolver`를 보고한다.
+- Evidence 전체 stored field의 PostgreSQL 16 canonical digest, caller digest overwrite, release별 target registry pin,
+  append-only tenant RLS binding, Evidence→Run→Workload project 재도출을 migration과 모델에 결속했다.
+- server-owned exact resolver와 내부 binder, fresh human + live `releases.accept`를 다시 확인하는 read-only discovery GET을 구현했다.
+  caller project·telemetry·actor는 응답에 없고 404/409/503 경계를 redacted ProblemDetails로 고정했다.
+- `INV_RELEASE_ACCEPTANCE_WRITE_ENABLED` 기본값과 `AUTHORITATIVE_REFS_BOUND`는 의도적으로 false다. 기존 sign-off
+  projection은 실제 ref 재해석 결과를 받지 않으므로 상수만 true로 바꾸면 허위 합격이 된다.
+- PG-free focused **31 passed**, schema export **97/97**, contract bindings, docs, ontology는 exit 0이다.
+  로컬은 지원 Python 3.12/3.14 test env와 `INV_TEST_ADMIN_DSN`이 없어 real-PG를 실행하지 않았으며, hosted Core
+  실행 전에는 migration·trigger·RLS 결과를 `NOT_OBSERVED`로 유지한다.
+- 근거: [[S12-BE_release_acceptance_target_Evidence_resolver_설계]],
+  [[2026-10-01_23-43-41_KST_Card194_S12-BE_target_Evidence_resolver_구현_Codex]].
 
 ## 2026-10-01 Card 190 — S12 수락 target·Evidence 정본 resolver 계약
 

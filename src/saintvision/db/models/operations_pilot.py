@@ -252,6 +252,12 @@ class ReleaseManifest(Base):
     #: today's registry as their policy.
     policy_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
     policy_registry_sha256: Mapped[Sha256 | None] = mapped_column(nullable=True)
+    #: Exact Git-owned target registry deployed for this release. The three values
+    #: are nullable only as a unit; legacy rows therefore remain unresolved rather
+    #: than silently adopting today's registry.
+    target_registry_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    target_registry_git_blob_sha: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    target_registry_file_sha256: Mapped[Sha256 | None] = mapped_column(nullable=True)
 
 
 class AcceptanceRecord(Base):

@@ -19,18 +19,15 @@ each step is where it is matters more than the list:
 5. **the references**, re-resolved against the authoritative registries;
 6. **the rows and the audit event in the same transaction**, then the receipt.
 
-**Why nothing here can run today.** The gate refuses every request: no identity provider
-in this deployment emits ``auth_time``/``amr`` (card 188 is building that), and there is
-no authoritative target registry or canonical Evidence digest to resolve references
-against -- which the contract owner made separate cards while forbidding a fallback that
-compares the caller's own values (§0-1.2, §0-1.4). The code below is still written and
-tested, with the gate and the resolver injected, because the alternative is a card that
-delivers a flag and discovers the logic later.
+**Why writes remain closed by default.** Card 188 supplies verified fresh-auth claims and
+card 194 binds the target/Evidence resolver, but neither card flips the deployment-owned
+``INV_RELEASE_ACCEPTANCE_WRITE_ENABLED`` flag. The implementation can therefore be tested
+at its real seams while a deployment still refuses every write until its operator has
+installed all prerequisites and deliberately enables it.
 
-The resolver is a seam rather than a stub: ``UnboundReferenceResolver`` is what the
-application holds, and it refuses. A test passes one that resolves. The day the
-registries exist, one implementation is added and the gate stops refusing -- nothing
-below changes shape.
+The resolver is a seam rather than caller-value comparison: production now holds
+``DatabaseReferenceResolver`` and tests can still inject ``UnboundReferenceResolver`` to
+prove the independent half of the gate. Nothing below treats caller refs as authority.
 """
 
 from __future__ import annotations
@@ -220,6 +217,14 @@ class ReferencesUnresolvable(Exception):
     """A target or measurement reference does not resolve. ``GRAPH-0003`` / 409."""
 
 
+class ReferenceNotFound(Exception):
+    """A scoped release, binding, or Evidence row is absent. ``RES-0004`` / 404."""
+
+
+class ReferenceRetryable(Exception):
+    """A resolver DB lock/deadlock/statement timeout. ``RES-0007`` / 503."""
+
+
 class ReferenceResolver(Protocol):
     """Binds declared references to rows and blobs the server owns (§3-1)."""
 
@@ -260,12 +265,12 @@ UNBOUND_RESOLVER = UnboundReferenceResolver()
 def active_resolver() -> ReferenceResolver:
     """The resolver this deployment holds.
 
-    A function rather than a module constant read directly, so there is one place the
-    follow-up card replaces and one place a test substitutes. Both matter: without it,
-    the gate's second condition would be untestable from the route, and the route's body
-    rules would be unreachable behind a refusal that fires first.
+    A function rather than a module constant read directly, so tests can substitute an
+    explicitly unbound resolver and prove the second half of the prerequisite gate.
     """
-    return UNBOUND_RESOLVER
+    from .release_acceptance_resolver import RESOLVER
+
+    return RESOLVER
 
 
 # ----------------------------------------------------------------------- step 0: the gate
