@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-S08-BE-OCI-DIGEST-BUILDKITD-PID-BINDING-20261002"
 title: "S08-BE OCI digest와 live buildkitd PID 결속"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T05:55:05+09:00"
+updated: "2026-10-02T06:29:43+09:00"
 source_of_truth: "Git"
 ---
 
@@ -38,8 +38,15 @@ source_of_truth: "Git"
 - `python -m compileall -q services/control-plane/src/inv/buildkit_transport.py tools/run_buildkit_rootless_roundtrip.py`
   → exit 0.
 - `bash -n tools/run_buildkit_rootless_lane.sh` → exit 0.
-- 실제 rootless BuildKit hosted roundtrip은 이 기록 시점에 `NOT_OBSERVED`다. PR exact head의
-  opt-in lane에서 OCI blob 수치와 buildkitd PID/start ticks를 확보한 뒤 이 절을 갱신한다.
+- PR #303 hosted run `36928934670`, source `ad5b25f33addf9839c49b4f9aca272c0c7ff9e43`은
+  rootless roundtrip과 measured-reference gate를 모두 통과했다. artifact `11195047135`, GitHub
+  digest `sha256:a6f2970f…91af5`, 만료 `2026-10-31T21:29:05Z`다.
+- report는 `MEASURED_PASS`, product dispatch false, operational acceptance false다. OCI archive
+  SHA-256은 `a714a972…897c`, 검증 blob 3개(manifest/config/layer 각 1), manifest
+  `sha256:f95a64bb…6387`, config `sha256:0d57d413…62f6`였다. OCI tar도 artifact에 함께 보존됐다.
+- 실제 daemon은 PID 32, UID 1000, start ticks 28815, process name `buildkitd`였고 왕복 전·후
+  생존·identity가 일치했다. 이는 hosted CI reference 측정이며 LAN builder 운영 인수는 계속
+  `BLOCKED_EXTERNAL`, 제품 consumer·lease release·durable Evidence는 계속 미결속이다.
 
 ## 되살림 방지
 
