@@ -787,7 +787,7 @@ def test_a_release_without_any_acceptance_keeps_operator_sign_off_false(
                 )
     assert detail["acceptances"] == []
     assert detail["release"]["operatorSignOff"] is False
-    assert detail["release"]["operatorSignOffBlockedBy"] == "human-attestation-implementation-unavailable"
+    assert detail["release"]["operatorSignOffBlockedBy"] == "release-acceptance-prerequisites-unavailable"
     assert detail["release"]["confirmedOperatorCount"] == 0
     assert detail["release"]["matchingAcceptedUserCount"] == 0
     assert detail["release"]["acceptanceCount"] == 0
@@ -1076,7 +1076,7 @@ def test_a_service_principal_cannot_produce_operator_sign_off(app_sessionmaker, 
                     release_id=release.release_id,
                 )
     assert detail["release"]["operatorSignOff"] is False
-    assert detail["release"]["operatorSignOffBlockedBy"] == "human-attestation-implementation-unavailable"
+    assert detail["release"]["operatorSignOffBlockedBy"] == "release-acceptance-prerequisites-unavailable"
     assert detail["release"]["confirmedOperatorCount"] == 0
     assert detail["release"]["matchingAcceptedUserCount"] == 1
     assert detail["release"]["requiredDistinctOperatorCount"] == 2
