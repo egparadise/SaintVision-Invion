@@ -1,6 +1,19 @@
 name: Portal Login Journey Harness
+# Only a dispatch that passes `correlation_id` changes this; every other event keeps
+# the workflow name. The value is used for the run's display name only.
+run-name: ${{ inputs.correlation_id || github.workflow }}
 on:
   workflow_dispatch:
+    inputs:
+      correlation_id:
+        # Opaque id echoed into the run name, and read nowhere else, so a tool that
+        # dispatched this run can recognise it among runs other people dispatched at
+        # the same ref and commit (tools/post_landing_verify.py). The run list gives
+        # no link between a dispatch and the run it creates, and run ids and
+        # timestamps cannot tell two concurrent dispatches apart.
+        description: 'Opaque id for a tool to bind this exact run; leave empty for a normal manual run'
+        required: false
+        default: ''
   push:
     branches:
       - main
