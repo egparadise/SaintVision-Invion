@@ -245,9 +245,11 @@ export const RunList: React.FC<RunListProps> = ({
               return (
                 <tr
                   key={run.id}
+                  onClick={onSelectRun ? () => onSelectRun(run.id) : undefined}
                   style={{
                     borderBottom: '1px solid var(--color-border-subtle)',
                     transition: 'background-color 0.15s',
+                    cursor: onSelectRun ? 'pointer' : 'default',
                   }}
                   onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-bg-subtle)')}
                   onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
@@ -258,7 +260,10 @@ export const RunList: React.FC<RunListProps> = ({
                         type="button"
                         data-testid={`run-select-btn-${run.id}`}
                         aria-label={`실행 작업 ${run.id} 상세 조회`}
-                        onClick={() => onSelectRun(run.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelectRun(run.id);
+                        }}
                         style={{
                           background: 'none',
                           border: 'none',

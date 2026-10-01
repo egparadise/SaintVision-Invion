@@ -182,12 +182,14 @@ export const NodeList: React.FC<NodeListProps> = ({
               key={node.id}
               role={node.status === 'lost' ? 'alert' : 'status'}
               data-testid={`node-card-${node.id}`}
+              onClick={onSelectNode ? () => onSelectNode(node.id) : undefined}
               style={{
                 padding: '20px',
                 backgroundColor: 'var(--color-bg-surface)',
                 borderRadius: 'var(--radius-lg)',
                 border: `1px solid ${node.status === 'lost' ? '#ef4444' : node.status === 'unknown' ? '#f59e0b' : 'var(--color-border-subtle)'}`,
                 boxShadow: 'var(--shadow-sm)',
+                cursor: onSelectNode ? 'pointer' : 'default',
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
@@ -282,6 +284,7 @@ export const NodeList: React.FC<NodeListProps> = ({
             <div
               key={node.id}
               data-testid={`node-card-${node.id}`}
+              onClick={onSelectNode ? () => onSelectNode(node.id) : undefined}
               style={{
                 padding: '20px',
                 backgroundColor: 'var(--color-bg-surface)',
@@ -289,6 +292,7 @@ export const NodeList: React.FC<NodeListProps> = ({
                 border: '1px solid var(--color-border-subtle)',
                 boxShadow: 'var(--shadow-sm)',
                 transition: 'border-color 0.2s, box-shadow 0.2s',
+                cursor: onSelectNode ? 'pointer' : 'default',
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
@@ -419,7 +423,10 @@ export const NodeList: React.FC<NodeListProps> = ({
                       type="button"
                       data-testid={`node-select-btn-${node.id}`}
                       aria-label={`노드 ${node.hostname} 선택`}
-                      onClick={() => onSelectNode(node.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectNode(node.id);
+                      }}
                       style={{
                         padding: '4px 10px',
                         fontSize: '0.75rem',
@@ -438,7 +445,10 @@ export const NodeList: React.FC<NodeListProps> = ({
                     <button
                       type="button"
                       data-testid={`node-studio-btn-${node.id}`}
-                      onClick={() => onOpenStudio(node.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onOpenStudio(node.id);
+                      }}
                       title={node.observationOnly ? '관측 전용 노드는 업무 배치가 비활성화되어 있습니다' : '이 노드로 Studio 열기'}
                       style={{
                         padding: '4px 10px',

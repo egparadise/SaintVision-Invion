@@ -156,11 +156,20 @@ describe('ACC-01~09 Interactive Navigation & Tablist WAI-ARIA Suite', () => {
     expect(card1).not.toBeNull();
     expect(card2).not.toBeNull();
 
-    // 1. F3: Normal card container MUST NOT have role="button" or tabIndex (avoids nested button antipattern)
+    // 1. F3 & N1: Normal card container MUST NOT have role="button" or tabIndex (avoids nested button antipattern), but retains surface pointer click
     expect(card1.getAttribute('role')).toBeNull();
     expect(card1.getAttribute('tabindex')).toBeNull();
 
-    // 2. F3: Sibling native buttons inside normal card
+    // 2. F3 & N1: Surface click 1 time -> onSelectNode called exactly 1 time
+    onSelectNode.mockClear();
+    onOpenStudio.mockClear();
+    await act(async () => {
+      card1.click();
+    });
+    expect(onSelectNode).toHaveBeenCalledTimes(1);
+    expect(onSelectNode).toHaveBeenCalledWith('node-online-1');
+
+    // 3. F3 & N1: Sibling native buttons inside normal card
     const selectBtn = container.querySelector('[data-testid="node-select-btn-node-online-1"]') as HTMLButtonElement;
     const studioBtn = container.querySelector('[data-testid="node-studio-btn-node-online-1"]') as HTMLButtonElement;
 
@@ -171,39 +180,62 @@ describe('ACC-01~09 Interactive Navigation & Tablist WAI-ARIA Suite', () => {
     expect(studioBtn).not.toBeNull();
     expect(studioBtn.tagName.toLowerCase()).toBe('button');
 
+    // Native button click 1 time -> onSelectNode called exactly 1 time (stopPropagation prevents double call)
+    onSelectNode.mockClear();
+    await act(async () => {
+      selectBtn.click();
+    });
+    expect(onSelectNode).toHaveBeenCalledTimes(1);
+    expect(onSelectNode).toHaveBeenCalledWith('node-online-1');
+
     // Trigger select via Enter on native button
+    onSelectNode.mockClear();
     await act(async () => {
       selectBtn.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
       selectBtn.click();
     });
+    expect(onSelectNode).toHaveBeenCalledTimes(1);
     expect(onSelectNode).toHaveBeenCalledWith('node-online-1');
 
-    // Trigger Studio via click on native button
+    // Trigger Studio via click on native button -> onOpenStudio called 1 time, onSelectNode NOT called
+    onSelectNode.mockClear();
+    onOpenStudio.mockClear();
     await act(async () => {
       studioBtn.click();
     });
+    expect(onOpenStudio).toHaveBeenCalledTimes(1);
     expect(onOpenStudio).toHaveBeenCalledWith('node-online-1');
+    expect(onSelectNode).not.toHaveBeenCalled();
 
-    // 3. F3: Telemetry-unavailable card retains role="alert" container without click/tabIndex on outer container
+    // 4. F3 & N1: Telemetry-unavailable card retains role="alert" container without tabIndex, but surface click works
     expect(card2.getAttribute('role')).toBe('alert');
     expect(card2.getAttribute('tabindex')).toBeNull();
 
-    // Sibling detail button inside telemetry-unavailable card handles selection
+    onSelectNode.mockClear();
+    await act(async () => {
+      card2.click();
+    });
+    expect(onSelectNode).toHaveBeenCalledTimes(1);
+    expect(onSelectNode).toHaveBeenCalledWith('node-lost-2');
+
+    // Detail button inside telemetry-unavailable card handles selection (stopPropagation prevents double call)
     const detailBtn = container.querySelector('[data-testid="node-detail-btn-node-lost-2"]') as HTMLButtonElement;
     expect(detailBtn).not.toBeNull();
     expect(detailBtn.tagName.toLowerCase()).toBe('button');
     expect(detailBtn.getAttribute('aria-label')).toBe('노드 worker-node-2 상세 및 자원 보기');
 
+    onSelectNode.mockClear();
     await act(async () => {
       detailBtn.click();
     });
+    expect(onSelectNode).toHaveBeenCalledTimes(1);
     expect(onSelectNode).toHaveBeenCalledWith('node-lost-2');
   });
 
   // --------------------------------------------------------------------------
-  // ACC-02: RunList Keyboard Navigation (F2: Native table semantics, cell action button)
+  // ACC-02: RunList Keyboard Navigation (F2: Native table semantics, cell action button, N1: surface click)
   // --------------------------------------------------------------------------
-  it('ACC-02 (F2): RunList preserves native table row semantics and provides accessible cell control for selection', async () => {
+  it('ACC-02 (F2 & N1): RunList preserves native table row semantics with surface click and accessible cell button with stopPropagation', async () => {
     const mockRuns: RunItem[] = [
       {
         id: 'run-001',
@@ -229,13 +261,30 @@ describe('ACC-01~09 Interactive Navigation & Tablist WAI-ARIA Suite', () => {
     expect(tr.getAttribute('role')).toBeNull();
     expect(tr.getAttribute('tabindex')).toBeNull();
 
-    // F2: Native accessible action button inside first table cell
+    // N1: Surface click on <tr> 1 time -> onSelectRun called exactly 1 time
+    onSelectRun.mockClear();
+    await act(async () => {
+      tr.click();
+    });
+    expect(onSelectRun).toHaveBeenCalledTimes(1);
+    expect(onSelectRun).toHaveBeenCalledWith('run-001');
+
+    // F2 & N1: Native accessible action button inside first table cell
     const runBtn = container.querySelector('[data-testid="run-select-btn-run-001"]') as HTMLButtonElement;
     expect(runBtn).not.toBeNull();
     expect(runBtn.tagName.toLowerCase()).toBe('button');
     expect(runBtn.getAttribute('aria-label')).toBe('실행 작업 run-001 상세 조회');
 
+    // N1: Button click 1 time -> onSelectRun called exactly 1 time (stopPropagation prevents double-call via tr)
+    onSelectRun.mockClear();
+    await act(async () => {
+      runBtn.click();
+    });
+    expect(onSelectRun).toHaveBeenCalledTimes(1);
+    expect(onSelectRun).toHaveBeenCalledWith('run-001');
+
     // Enter key triggers onSelectRun
+    onSelectRun.mockClear();
     await act(async () => {
       runBtn.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
       runBtn.click();
@@ -243,11 +292,12 @@ describe('ACC-01~09 Interactive Navigation & Tablist WAI-ARIA Suite', () => {
     expect(onSelectRun).toHaveBeenCalledWith('run-001');
 
     // Space key triggers onSelectRun
+    onSelectRun.mockClear();
     await act(async () => {
       runBtn.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
       runBtn.click();
     });
-    expect(onSelectRun).toHaveBeenCalledTimes(2);
+    expect(onSelectRun).toHaveBeenCalledWith('run-001');
   });
 
   // --------------------------------------------------------------------------
