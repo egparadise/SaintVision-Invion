@@ -116,3 +116,32 @@ ACC-09(접근성 명도 대비 적합화) 트랙의 후속 영역으로, 프런�
    - `python tools/check_docs.py` -> exit code **0** (PASS)
    - `python tools/check_doc_path_citations.py --ratchet --base-ref c41fe2da` -> exit code **0** (PASS)
    - `git diff --check` -> exit code **0** (Clean)
+
+---
+
+## 6. Card 197 r1 검토 조치 내역 (Claude UI·Codex 독립 검토 지적 전수 해소)
+
+### 6.1 조치 요약표
+
+| 지적 ID | 출처 및 심각도 | 지적 내용 | 조치 내용 | 조치 후 실측치 및 판정 |
+|---|---|---|---|---|
+| **F1 / Z2** | Codex F1 / Claude Z2 (Major) | `eval-gate-badge`(:1828) 다크 테마에서 흰 글자(`--color-brand-primary-fg`) on 상태색(`--color-status-online`/`--color-status-offline`) 대비 2.28:1 / 2.77:1로 4.5:1 미달 (회귀) | subtle 배경(`var(--color-bg-subtle)`) + 상태색 전경/테두리(`var(--color-status-online)` / `var(--color-status-offline)`)로 정형화 | Light: 4.58:1 / 5.91:1, Dark: 6.44:1 / 5.31:1 (텍스트 >= 4.5:1, 테두리 >= 3.0:1 전수 **PASS**) |
+| **F2 / Z1** | Codex F2 / Claude Z1 (Major) | `--color-brand-primary` 글자를 `--color-brand-subtle` 배경 위에 쓰면 라이트 테마 4.24:1로 4.5:1 미달 (10개 위치) | 전경 및 테두리를 `#293` 검증 조합인 `var(--color-brand-hover)`로 전수 승격 | Light: **5.49:1**, Dark: **8.11:1** (양 테마 >= 4.5:1 전수 **PASS**, 테두리 >= 3.0:1) |
+| **F3 / Z3** | Codex F3 / Claude Z3 (Major) | 결속 범위 밖 배경/전경 교체 변이(Claude S3 `registry-release-success` 배경→status-online, Codex F3 `eval-gate-badge` 전경→bg-subtle) 생존 | Test 9d-2 신설: TS AST 기반 전수(359개 스타일 객체) 스타일-쌍 명도 대비 및 1:1 충돌 방지 정적 가드 추가; Revert-Fail Probes 38~41 신설 | S3, F3, F1, F2 단일 변이 전수 사살 (12/12 **100% KILLED**) |
+| **Z4** | Claude Z4 (Minor) | `model-lineage.test.ts`가 다크 토큰 사본(`darkTokenMap`) 및 `#161b22`를 하드코딩하여 토큰 정본 변경 시 괴리 위험 | `fs`/`path`로 `index.css` 정본 파일에서 `:root` 및 `[data-theme='dark']` 토큰을 동적으로 추출하고 실제 배경(`--color-bg-subtle` #1f2937)으로 계산하도록 개선 | 33/33 passed (100% **PASS**) |
+| **Z5** | Claude Z5 (Info) | Test 9d 실행 시 jsdom 환경에서 미모킹 fetch로 인한 `AggregateError: connect ECONNREFUSED ::1:3000` 콘솔 출력 | `beforeAll`/`afterAll`에서 `globalThis.fetch`를 mockResponse로 격리 | 테스트 콘솔 에러 0건 (**CLEAN**) |
+
+### 6.2 DOM 결속 범위 및 백로그 정직성 명시
+
+- **DOM 렌더링 결속 요소 (Test 9d)**:
+  1. `model-registry-control-panel` (헤더 컨테이너: Surface 배경 / Border Subtle)
+  2. `badge-w3-verify-seam` (Seam 배지: Subtle 배경 / Text Muted / Border Subtle)
+  3. `input-project-id` (입력창: Subtle 배경 / Text Primary / Border Subtle)
+  4. `banner-no-approve-permission` (승인 권한 없음 경고 배너: Subtle 배경 / Status Offline 텍스트 및 테두리)
+  5. `tab-trace` (활성 탭: Subtle 배경 / Brand Primary 텍스트 및 테두리)
+  6. `tab-register` (비활성 탭: Surface 상위 배경 / Text Muted 텍스트)
+  7. `lineage-unexposed-notice` (계보 미노출 안내 배너: Subtle 배경 / Status Degraded 텍스트 및 테두리)
+- **정적 AST 스타일-쌍 가드 결속 범위 (Test 9d-2)**:
+  - 파일 내 선언된 **359개 전체 JSX style 객체 리터럴**에 대해 1:1 전경-배경 충돌, `brand-primary` on `brand-subtle`(라이트 4.24:1 결함), 상태색 배경 위 흰 글자(다크 2.28:1 / 2.77:1 결함)를 fail-closed하게 차단.
+- **백로그 명시**:
+  - 사용자 인터랙션 후 조건부 렌더링되는 `eval-gate-badge`, `registry-release-success`, `conformance-status-badge` 등은 Test 9d-2 정적 AST 가드로 모든 조건 분기의 대비와 1:1 충돌을 100% 보증하며, 향후 폼 제출 트리거를 포함한 전수 대화형 DOM 결속 확장을 후속 트랙 백로그로 관리합니다.

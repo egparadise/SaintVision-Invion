@@ -1,4 +1,6 @@
 // @vitest-environment happy-dom
+import fs from 'fs';
+import path from 'path';
 import React, { act } from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
@@ -1452,36 +1454,28 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
             return (lighter + 0.05) / (darker + 0.05);
           };
 
-          const darkTokenMap: Record<string, string> = {
-            '--color-bg-canvas': '#090d16',
-            '--color-bg-surface': '#111827',
-            '--color-bg-subtle': '#1f2937',
-            '--color-border-subtle': '#64748b',
-            '--color-border-strong': '#9ca3af',
-            '--color-text-primary': '#f9fafb',
-            '--color-text-secondary': '#e5e7eb',
-            '--color-text-muted': '#9ca3af',
-            '--color-text-inverse': '#0f172a',
-            '--color-brand-primary': '#60a5fa',
-            '--color-brand-primary-bg': '#1d4ed8',
-            '--color-brand-primary-fg': '#ffffff',
-            '--color-brand-hover': '#93c5fd',
-            '--color-brand-subtle': '#1e293b',
-            '--color-status-online': '#22c55e',
-            '--color-status-degraded': '#f59e0b',
-            '--color-status-offline': '#f87171',
-            '--color-status-offline-bg': '#dc2626',
-            '--color-status-neutral': '#9ca3af',
-            '--color-status-active': '#38bdf8',
-            '--color-status-lost': '#f87171',
-            '--color-status-unknown': '#d29922',
-          };
+          const indexCssPath = path.resolve(__dirname, '../src/index.css');
+          const indexCssContent = fs.readFileSync(indexCssPath, 'utf-8');
+          const darkMatch = indexCssContent.match(/\[data-theme=['"]dark['"]\]\s*\{([\s\S]*?)\}/);
+          if (!darkMatch) throw new Error('Could not find [data-theme="dark"] block in index.css');
+          const darkCleanBlock = darkMatch[1].replace(/\/\*[\s\S]*?\*\//g, '');
+          const darkTokenMap: Record<string, string> = {};
+          const tokenRegex = /(--color-[a-z0-9-]+)\s*:\s*([^;]+);/g;
+          let tm;
+          while ((tm = tokenRegex.exec(darkCleanBlock)) !== null) {
+            const val = tm[2].trim();
+            if (val.startsWith('#')) {
+              darkTokenMap[tm[1].trim()] = val;
+            }
+          }
 
           const parseRgba = (colorStr: string): [number, number, number, number] => {
             if (colorStr.startsWith('var(')) {
               const varName = colorStr.replace(/var\(|\)/g, '').trim();
               if (darkTokenMap[varName]) {
                 colorStr = darkTokenMap[varName];
+              } else {
+                throw new Error(`Unresolved CSS token: ${varName}`);
               }
             }
             if (colorStr.startsWith('#')) {
@@ -1514,7 +1508,12 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
             ];
           };
 
-          const darkBgRgb: [number, number, number] = [22, 27, 34]; // #161b22
+          const subtleHex = darkTokenMap['--color-bg-subtle'] || '#1f2937';
+          const darkBgRgb: [number, number, number] = [
+            parseInt(subtleHex.replace('#', '').substring(0, 2), 16),
+            parseInt(subtleHex.replace('#', '').substring(2, 4), 16),
+            parseInt(subtleHex.replace('#', '').substring(4, 6), 16),
+          ];
 
           // 1. Read DOM style of Status Badge (미측정 NOT_OBSERVED)
           const statusBadge = container.querySelector<HTMLElement>('[data-testid="conformance-status-badge"]');

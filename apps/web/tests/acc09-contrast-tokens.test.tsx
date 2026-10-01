@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
 import ts from 'typescript';
@@ -243,6 +243,17 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
 
   const lightTokens = extractTokens(lightBlockMatch[1]);
   const darkTokens = extractTokens(darkBlockMatch[1]);
+
+  let originalGlobalFetch: typeof globalThis.fetch;
+  beforeAll(() => {
+    originalGlobalFetch = globalThis.fetch;
+    globalThis.fetch = vi.fn().mockImplementation(() =>
+      Promise.resolve(new Response(JSON.stringify({}), { status: 200, headers: { 'Content-Type': 'application/json' } }))
+    );
+  });
+  afterAll(() => {
+    globalThis.fetch = originalGlobalFetch;
+  });
 
   // Codex F2: Status tokens must be declared exactly once per theme block without comment decoys
   it('ACC-09 / Codex F2: Status tokens are declared exactly once per theme block without comment decoys', () => {
@@ -1570,6 +1581,11 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
 
   // 9d. [Card 197 / ACC-09] Component DOM Rendering & Binding Verification: ModelLineageView
   it('ACC-09 / Card 197: ModelLineageView DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification', async () => {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = vi.fn().mockImplementation(() =>
+      Promise.resolve(new Response(JSON.stringify({}), { status: 200, headers: { 'Content-Type': 'application/json' } }))
+    );
+
     const container = document.createElement('div');
     container.setAttribute('data-theme', 'light');
     document.body.appendChild(container);
@@ -1673,11 +1689,80 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(getContrast(lightTokens[unexpBorderVar], lightTokens[unexpBgVar]), 'Unexposed notice light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
       expect(getContrast(darkTokens[unexpBorderVar], darkTokens[unexpBgVar]), 'Unexposed notice dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
     } finally {
+      globalThis.fetch = originalFetch;
       act(() => {
         root.unmount();
       });
       container.remove();
     }
+  });
+
+  // 9d-2. [Card 197 r1 / ACC-09 / Claude Z3 & Codex F3] Static Style-Pair Contrast & Anti-Collision Guard: ModelLineageView
+  it('ACC-09 / Card 197: ModelLineageView style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
+    const filePath = path.resolve(__dirname, '../src/features/mlops/ModelLineageView.tsx');
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const sf = ts.createSourceFile('ModelLineageView.tsx', content, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+
+    const violations: string[] = [];
+    let checkedObjects = 0;
+
+    function checkObject(obj: ts.ObjectLiteralExpression) {
+      let bgExpr: string | null = null;
+      let fgExpr: string | null = null;
+
+      for (const prop of obj.properties) {
+        if (ts.isPropertyAssignment(prop)) {
+          const name = prop.name.getText(sf);
+          if (name === 'backgroundColor' || name === 'background') {
+            bgExpr = prop.initializer.getText(sf);
+          }
+          if (name === 'color') {
+            fgExpr = prop.initializer.getText(sf);
+          }
+        }
+      }
+
+      if (bgExpr && fgExpr) {
+        checkedObjects++;
+        // 1. Check for 1:1 token collision (e.g. S3 / F3)
+        const bgTokens = [...bgExpr.matchAll(/var\((--color-[a-z0-9-]+)\)/g)].map((x) => x[1]);
+        const fgTokens = [...fgExpr.matchAll(/var\((--color-[a-z0-9-]+)\)/g)].map((x) => x[1]);
+
+        for (const bt of bgTokens) {
+          if (fgTokens.includes(bt)) {
+            violations.push(`1:1 token collision between background and color (${bt}) in style: ${obj.getText(sf).slice(0, 60)}...`);
+          }
+        }
+
+        // 2. Check for brand-primary on brand-subtle (Z1 / F2 light 4.24:1 failure)
+        if (bgExpr.includes('--color-brand-subtle') && fgExpr.includes('--color-brand-primary') && !fgExpr.includes('--color-brand-primary-fg')) {
+          violations.push(`Defective brand-primary on brand-subtle (light 4.24:1 < 4.5:1) in style: ${obj.getText(sf).slice(0, 60)}...`);
+        }
+
+        // 3. Check for white text on status-online / status-offline in status badges (Z2 / F1 dark 2.28:1 / 2.77:1 failure)
+        if ((bgExpr.includes('--color-status-online') || bgExpr.includes('--color-status-offline')) &&
+            (fgExpr.includes('--color-brand-primary-fg') || fgExpr.includes('#ffffff') || fgExpr.includes('#fff'))) {
+          violations.push(`Defective white text on status-online/offline (dark 2.28:1 / 2.77:1 < 4.5:1) in style: ${obj.getText(sf).slice(0, 60)}...`);
+        }
+      }
+    }
+
+    function visit(node: ts.Node) {
+      if (ts.isJsxAttribute(node) && node.name.text === 'style') {
+        function findObjects(n: ts.Node) {
+          if (ts.isObjectLiteralExpression(n)) {
+            checkObject(n);
+          }
+          ts.forEachChild(n, findObjects);
+        }
+        findObjects(node);
+      }
+      ts.forEachChild(node, visit);
+    }
+    visit(sf);
+
+    expect(checkedObjects, 'Must check style objects with both foreground and background').toBeGreaterThanOrEqual(50);
+    expect(violations, `Expected 0 style-pair contrast/collision violations in ModelLineageView, got:\n${violations.join('\n')}`).toEqual([]);
   });
 
   // 9. [F1 & Card 186 Revert-Fail Probes] Mutating fixes back to defective combinations strictly fails
@@ -1849,6 +1934,25 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
 
     // Probe 37 [Card 197]: ModelLineageView former border literal #30363d on dark surface (#111827) (1.45:1) strictly fails 3.0:1
     expect(getContrast('#30363d', darkTokens['--color-bg-surface']), 'Defective #30363d on dark surface must fail 3.0:1').toBeLessThan(3.0);
+
+    // Probe 38 [Card 197 r1 / Z1 / F2]: Brand primary on brand subtle in light mode (4.24:1) strictly fails 4.5:1
+    const probe38Cr = getContrast(lightTokens['--color-brand-primary'], lightTokens['--color-brand-subtle']);
+    expect(probe38Cr, 'Defective brand-primary on brand-subtle in light must fail 4.5:1').toBeLessThan(4.5);
+    expect(probe38Cr).toBeCloseTo(4.24, 2);
+
+    // Probe 39 [Card 197 r1 / Z2 / F1]: Eval-gate-badge white text on status-online in dark mode (2.28:1) strictly fails 4.5:1
+    const probe39Cr = getContrast(darkTokens['--color-brand-primary-fg'], darkTokens['--color-status-online']);
+    expect(probe39Cr, 'Defective white on status-online in dark must fail 4.5:1').toBeLessThan(4.5);
+    expect(probe39Cr).toBeCloseTo(2.28, 2);
+
+    // Probe 40 [Card 197 r1 / Z2 / F1]: Eval-gate-badge white text on status-offline in dark mode (2.77:1) strictly fails 4.5:1
+    const probe40Cr = getContrast(darkTokens['--color-brand-primary-fg'], darkTokens['--color-status-offline']);
+    expect(probe40Cr, 'Defective white on status-offline in dark must fail 4.5:1').toBeLessThan(4.5);
+    expect(probe40Cr).toBeCloseTo(2.77, 2);
+
+    // Probe 41 [Card 197 r1 / Z3 / F3]: Swapping status-online into background of status-online text (1:1 mutation S3) strictly fails 4.5:1
+    expect(getContrast(lightTokens['--color-status-online'], lightTokens['--color-status-online']), 'Defective online on online in light fails 4.5:1').toBe(1.0);
+    expect(getContrast(darkTokens['--color-status-online'], darkTokens['--color-status-online']), 'Defective online on online in dark fails 4.5:1').toBe(1.0);
 
     // Legacy Token Reverts:
     // Legacy Dark --color-border-subtle: #374151

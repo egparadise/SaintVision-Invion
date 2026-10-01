@@ -1828,8 +1828,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 borderRadius: '4px',
                 fontSize: '11px',
                 fontWeight: 700,
-                backgroundColor: evalResult.passedGate ? 'var(--color-status-online)' : 'var(--color-status-offline)',
-                color: 'var(--color-brand-primary-fg)',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: evalResult.passedGate ? '1px solid var(--color-status-online)' : '1px solid var(--color-status-offline)',
+                color: evalResult.passedGate ? 'var(--color-status-online)' : 'var(--color-status-offline)',
               }}
             >
               {evalResult.passedGate ? 'GATE PASS' : 'GATE FAIL'}
@@ -1912,8 +1913,8 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             padding: '14px 18px',
             borderRadius: '8px',
             backgroundColor: relIsReplay ? 'var(--color-brand-subtle)' : 'var(--color-bg-subtle)',
-            border: `1px solid ${relIsReplay ? 'var(--color-brand-primary)' : 'var(--color-status-online)'}`,
-            color: relIsReplay ? 'var(--color-brand-primary)' : 'var(--color-status-online)',
+            border: `1px solid ${relIsReplay ? 'var(--color-brand-hover)' : 'var(--color-status-online)'}`,
+            color: relIsReplay ? 'var(--color-brand-hover)' : 'var(--color-status-online)',
             fontSize: '13px',
           }}
         >
@@ -1986,8 +1987,8 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                     fontSize: '11px',
                     fontWeight: 700,
                     backgroundColor: 'var(--color-brand-subtle)',
-                    color: 'var(--color-brand-primary)',
-                    border: '1px solid var(--color-brand-primary)',
+                    color: 'var(--color-brand-hover)',
+                    border: '1px solid var(--color-brand-hover)',
                   }}
                 >
                   프로젝트 범위 제한 적용
@@ -2564,13 +2565,13 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                     : 'var(--color-bg-subtle)',
                   border: `1px solid ${
                     conformanceLoading
-                      ? 'var(--color-brand-primary)'
+                      ? 'var(--color-brand-hover)'
                       : conformanceError
                       ? 'var(--color-status-offline)'
                       : 'var(--color-status-degraded)'
                   }`,
                   color: conformanceLoading
-                    ? 'var(--color-brand-primary)'
+                    ? 'var(--color-brand-hover)'
                     : conformanceError
                     ? 'var(--color-status-offline)'
                     : 'var(--color-status-degraded)',
@@ -2657,7 +2658,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                     fontSize: '11px',
                     fontWeight: 700,
                     backgroundColor: conformanceData.status === 'RECORDED' ? 'var(--color-brand-subtle)' : 'var(--color-bg-subtle)',
-                    color: conformanceData.status === 'RECORDED' ? 'var(--color-brand-primary)' : 'var(--color-status-degraded)',
+                    color: conformanceData.status === 'RECORDED' ? 'var(--color-brand-hover)' : 'var(--color-status-degraded)',
                   }}
                 >
                   {conformanceData.status === 'RECORDED' ? '기록됨 (RECORDED)' : `미측정 (${conformanceData.status})`}
@@ -2816,7 +2817,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                             fontSize: '11px',
                             fontWeight: 600,
                             backgroundColor: check.capabilityGated ? 'var(--color-brand-subtle)' : 'var(--color-bg-subtle)',
-                            color: check.capabilityGated ? 'var(--color-brand-primary)' : 'var(--color-text-muted)',
+                            color: check.capabilityGated ? 'var(--color-brand-hover)' : 'var(--color-text-muted)',
                           }}
                         >
                           {check.capabilityGated ? 'Capability Gated' : 'Standard'}
@@ -2831,7 +2832,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                             fontSize: '11px',
                             fontWeight: 600,
                             backgroundColor: conformanceData.status === 'RECORDED' ? 'var(--color-brand-subtle)' : 'var(--color-bg-subtle)',
-                            color: conformanceData.status === 'RECORDED' ? 'var(--color-brand-primary)' : 'var(--color-status-degraded)',
+                            color: conformanceData.status === 'RECORDED' ? 'var(--color-brand-hover)' : 'var(--color-status-degraded)',
                           }}
                         >
                           {conformanceData.status === 'RECORDED'
@@ -2927,13 +2928,13 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                       : 'var(--color-bg-subtle)',
                     border: `1px solid ${
                       singleConformanceLoading
-                        ? 'var(--color-brand-primary)'
+                        ? 'var(--color-brand-hover)'
                         : singleConformanceError
                         ? 'var(--color-status-offline)'
                         : 'var(--color-status-degraded)'
                     }`,
                     color: singleConformanceLoading
-                      ? 'var(--color-brand-primary)'
+                      ? 'var(--color-brand-hover)'
                       : singleConformanceError
                       ? 'var(--color-status-offline)'
                       : 'var(--color-status-degraded)',
@@ -3032,7 +3033,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                         singleConformanceData.status === 'RECORDED'
                           ? 'var(--color-brand-subtle)'
                           : 'var(--color-bg-subtle)',
-                      color: singleConformanceData.status === 'RECORDED' ? 'var(--color-brand-primary)' : 'var(--color-status-degraded)',
+                      color: singleConformanceData.status === 'RECORDED' ? 'var(--color-brand-hover)' : 'var(--color-status-degraded)',
                     }}
                   >
                     {singleConformanceData.status === 'RECORDED' ? '기록됨 (RECORDED)' : `미측정 (${singleConformanceData.status})`}
@@ -3145,7 +3146,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                                 fontSize: '11px',
                                 fontWeight: 600,
                                 backgroundColor: check.capabilityGated ? 'var(--color-brand-subtle)' : 'var(--color-bg-subtle)',
-                                color: check.capabilityGated ? 'var(--color-brand-primary)' : 'var(--color-text-muted)',
+                                color: check.capabilityGated ? 'var(--color-brand-hover)' : 'var(--color-text-muted)',
                               }}
                             >
                               {check.capabilityGated ? 'Capability Gated' : 'Standard'}
@@ -3199,7 +3200,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                                   : outcome.passed
                                   ? 'var(--color-brand-subtle)'
                                   : 'var(--color-bg-subtle)',
-                                color: outcome.skipped ? 'var(--color-text-muted)' : outcome.passed ? 'var(--color-brand-primary)' : 'var(--color-status-offline)',
+                                color: outcome.skipped ? 'var(--color-text-muted)' : outcome.passed ? 'var(--color-brand-hover)' : 'var(--color-status-offline)',
                               }}
                             >
                               {outcome.skipped ? '건너뜀 (Skipped)' : outcome.passed ? '통과 (Passed)' : '실패 (Failed)'}

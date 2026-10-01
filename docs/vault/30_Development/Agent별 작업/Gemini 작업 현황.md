@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.178"
+version: "1.0.179"
 status: "proposed"
 author: "Gemini"
-updated: "2026-10-02T02:58:10+09:00"
+updated: "2026-10-02T03:30:12+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,6 +19,7 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
+- 확인 기준: 2026-10-02T03:30:12+09:00 (Card 197 모델 계보 화면 r1 조치: Claude UI r1 및 Codex r1 피드백 전수 반영 — F1/Z2 eval-gate-badge 다크 대비 2.28/2.77 회귀를 subtle 배경 + 상태색 전경/테두리 4.58/5.91 및 6.44/5.31로 정형화, F2/Z1 brand-primary on brand-subtle 4.24:1 10곳 전수를 var(--color-brand-hover) 5.49/8.11로 승격, F3/Z3 TS AST 기반 359개 스타일 객체 전수 정적 스타일-쌍 명도 대비 및 1:1 충돌 가드 Test 9d-2 신설 및 Probes 38~41 추가로 12종 변이 100% 사살 실측, Z4 model-lineage.test.ts index.css 정본 동적 파싱 전환, Z5 beforeAll fetch mock으로 ECONNREFUSED 제거; Vitest 16 passed, defect regression 16 passed, model-lineage 33 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-02T02:58:10+09:00 (Card 197 모델 계보 화면 ModelLineageView 색상 리터럴 inventory 전수(457→0), 대비 표본/DOM 결속 감사 및 디자인 토큰 승격: base ea82c6ae 위 작업, ModelLineageView 457건 -> 0건 100% 해소, COLOR_LITERAL_MULTISET_BASELINE {} 래칫, border-subtle 292건/23개 파일 래칫, 레거시 #64748b 5건/4파일·#e2e8f0 1건/1파일·#30363d 116건/14파일 상한 강화, Test 9d DOM 실제 렌더링 동적 대비 단언 신설, Revert-Fail Probes 32~37 추가, 8종 변이 100% 사살 실측, Vitest 15 passed, defect regression 16 passed, model-lineage 33 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-02T02:51:22+09:00 (Card 195 데스크톱 탐색기 r4 조치: Claude r4 승인 및 Codex r4 문서 사실성 3건 반영 — F1 History 합성 hex #192d50 / #233654 실제 계산값 정정, F2 r3/r4 보강 시각을 commit 전 실제 시각(02:40:05, 02:51:22)으로 정정, F3 작업판 '전수 감사' 표현을 '색상 리터럴 inventory 전수(390/124→0), 대비 표본/DOM 결속은 명시 범위'로 좁힘; 문서 단독 commit).
 - 확인 기준: 2026-10-02T02:40:05+09:00 (Card 195 데스크톱 탐색기 r3 조치: Claude UI r3 조건부 승인 및 Codex r3 피드백 전수 반영 — §2.1 표를 index.css 정본 토큰(--color-bg-surface #111827 / --color-bg-subtle #1f2937) 배경으로 재계산, Light before 열 '가상 비교' 명시, §3 discovery success 4.718/5.774 및 repair error 6.470/6.413 수치 정정, '전수 감사' 표현 완화 및 비차단 배너 swap 백로그 기록; 문서 단독 commit).
