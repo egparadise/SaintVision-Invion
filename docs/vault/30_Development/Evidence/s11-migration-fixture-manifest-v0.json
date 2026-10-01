@@ -6,28 +6,105 @@
     "blob": "99776a491772c4a62e1be26644d35a365d80a030"
   },
   "revisions": [
-    {"revision": "0001_s02_baseline", "expected": "DECLARED_LOSS_REQUIRES_RESTORE"},
-    {"revision": "0002_s03_execution", "expected": "DECLARED_LOSS_REQUIRES_RESTORE"},
-    {"revision": "0003_s09_context_eval", "expected": "DECLARED_LOSS_REQUIRES_RESTORE"},
-    {"revision": "0004_s10_lineage", "expected": "DECLARED_LOSS_REQUIRES_RESTORE"},
-    {"revision": "0005_s12_pilot_operations", "expected": "DECLARED_LOSS_REQUIRES_RESTORE"},
-    {"revision": "0006_discovery_pools_placement", "expected": "DECLARED_LOSS_REQUIRES_RESTORE"},
-    {"revision": "0007_locality_replicas", "expected": "DECLARED_LOSS_REQUIRES_RESTORE"},
-    {"revision": "0008_node_certificate_lookup", "expected": "PRESERVED"},
-    {"revision": "0009_idempotency_and_inbox_scope", "expected": "DECLARED_LOSS_REQUIRES_RESTORE"},
-    {"revision": "0010_canonical_resource_units", "expected": "DECLARED_LOSS_REQUIRES_RESTORE"},
-    {"revision": "0024_project_kernel_link", "expected": "PRESERVED"},
-    {"revision": "0025_workspace_tool_choice", "expected": "DECLARED_LOSS_REQUIRES_RESTORE"},
-    {"revision": "0028_subject_kernel_link", "expected": "PRESERVED"},
-    {"revision": "0029_run_outputs", "expected": "PRESERVED"},
-    {"revision": "0030_apply_resource_offer", "expected": "PRESERVED"},
-    {"revision": "0026_subject_kernel_link", "expected": "PRESERVED"},
-    {"revision": "0031_workspace_input_state", "expected": "PRESERVED"},
-    {"revision": "0047_audit_events_isolation", "expected": "PRESERVED"},
-    {"revision": "0050_dataset_digest_lookup", "expected": "PRESERVED"},
-    {"revision": "0053_eval_suite_project_scope", "expected": "PRESERVED"},
-    {"revision": "0054_model_version_measurements", "expected": "PRESERVED"},
-    {"revision": "0055_adapter_conformance_records", "expected": "PRESERVED"},
-    {"revision": "0056_kernel_cancel_audit_bridge", "expected": "PRESERVED"}
+    {
+      "revision": "0001_s02_baseline",
+      "expected": "DECLARED_LOSS_REQUIRES_RESTORE"
+    },
+    {
+      "revision": "0002_s03_execution",
+      "expected": "DECLARED_LOSS_REQUIRES_RESTORE"
+    },
+    {
+      "revision": "0003_s09_context_eval",
+      "expected": "DECLARED_LOSS_REQUIRES_RESTORE"
+    },
+    {
+      "revision": "0004_s10_lineage",
+      "expected": "DECLARED_LOSS_REQUIRES_RESTORE"
+    },
+    {
+      "revision": "0005_s12_pilot_operations",
+      "expected": "DECLARED_LOSS_REQUIRES_RESTORE"
+    },
+    {
+      "revision": "0006_discovery_pools_placement",
+      "expected": "DECLARED_LOSS_REQUIRES_RESTORE"
+    },
+    {
+      "revision": "0007_locality_replicas",
+      "expected": "DECLARED_LOSS_REQUIRES_RESTORE"
+    },
+    {
+      "revision": "0008_node_certificate_lookup",
+      "expected": "PRESERVED"
+    },
+    {
+      "revision": "0009_idempotency_and_inbox_scope",
+      "expected": "DECLARED_LOSS_REQUIRES_RESTORE"
+    },
+    {
+      "revision": "0010_canonical_resource_units",
+      "expected": "DECLARED_LOSS_REQUIRES_RESTORE"
+    },
+    {
+      "revision": "0024_project_kernel_link",
+      "expected": "PRESERVED"
+    },
+    {
+      "revision": "0025_workspace_tool_choice",
+      "expected": "DECLARED_LOSS_REQUIRES_RESTORE"
+    },
+    {
+      "revision": "0028_subject_kernel_link",
+      "expected": "PRESERVED"
+    },
+    {
+      "revision": "0029_run_outputs",
+      "expected": "PRESERVED"
+    },
+    {
+      "revision": "0030_apply_resource_offer",
+      "expected": "PRESERVED"
+    },
+    {
+      "revision": "0026_subject_kernel_link",
+      "expected": "PRESERVED"
+    },
+    {
+      "revision": "0031_workspace_input_state",
+      "expected": "PRESERVED"
+    },
+    {
+      "revision": "0047_audit_events_isolation",
+      "expected": "PRESERVED"
+    },
+    {
+      "revision": "0050_dataset_digest_lookup",
+      "expected": "PRESERVED"
+    },
+    {
+      "revision": "0053_eval_suite_project_scope",
+      "expected": "PRESERVED"
+    },
+    {
+      "revision": "0054_model_version_measurements",
+      "expected": "PRESERVED"
+    },
+    {
+      "revision": "0055_adapter_conformance_records",
+      "expected": "PRESERVED"
+    },
+    {
+      "revision": "0056_kernel_cancel_audit_bridge",
+      "expected": "PRESERVED"
+    },
+    {
+      "revision": "0057_release_acceptance_quorum",
+      "expected": "PRESERVED"
+    },
+    {
+      "revision": "0058_release_acceptance_resolver",
+      "expected": "PRESERVED"
+    }
   ]
 }

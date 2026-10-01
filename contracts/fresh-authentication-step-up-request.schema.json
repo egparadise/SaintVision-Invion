@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "OIDC authorization parameters for a release-acceptance step-up.\n\nThis is a redirect/query contract for the portal handoff, not a control\nplane JSON body.  The generated schema keeps the two security-sensitive\nvalues literal until the Gemini-owned portal implements the redirect.",
+  "properties": {
+    "max_age": {
+      "const": 300,
+      "title": "Max Age",
+      "type": "integer"
+    },
+    "prompt": {
+      "const": "login",
+      "title": "Prompt",
+      "type": "string"
+    }
+  },
+  "required": [
+    "prompt",
+    "max_age"
+  ],
+  "title": "FreshAuthenticationStepUpRequest",
+  "type": "object"
+}

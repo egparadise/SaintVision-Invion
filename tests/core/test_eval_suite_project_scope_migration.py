@@ -133,9 +133,9 @@ def test_the_graph_has_one_head_and_it_is_this_revision():
         capture_output=True, text=True, cwd=root,
     )
     assert head.returncode == 0, head.stderr
-    # 0054 (W3 measurement seam) and 0055 (G-03 conformance records) sit above this
-    # revision now; the graph still has one head.
-    assert head.stdout.strip() == "0056_kernel_cancel_audit_bridge"
+    # Later revisions sit above this migration; the repository graph must still
+    # converge on the current release-acceptance resolver head.
+    assert head.stdout.strip() == "0058_release_acceptance_resolver"
 
 
 # ---------------------------------------------------------------- upgrade paths

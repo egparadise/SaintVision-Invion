@@ -39,6 +39,8 @@ from ..db.models import (
 )
 from ..errors import RES_ARTIFACT_NOT_FOUND, RES_RELEASE_NOT_FOUND, VAL_SCHEMA, InvError
 from ..ids import new_id
+from . import release_sign_off
+from . import release_acceptance_resolver
 
 BACKUP_KINDS = ("base", "wal", "logical")
 DRILL_SCOPES = ("database", "workspace", "artifact", "node")
@@ -378,6 +380,7 @@ def create_release_manifest(
         {"name": c.name, "kind": c.kind, "digest": c.digest}
         for c in sorted(components, key=lambda c: (c.kind, c.name))
     ]
+    target_registry = release_acceptance_resolver.load_target_registry()
     row = ReleaseManifest(
         release_id=new_id("release"),
         tenant_id=tenant_id,
@@ -387,6 +390,9 @@ def create_release_manifest(
         manifest_sha256=canonical_digest(payload),
         created_by_user_id=created_by_user_id,
         created_at=now,
+        target_registry_version=target_registry.document.registry_version,
+        target_registry_git_blob_sha=target_registry.git_blob_sha,
+        target_registry_file_sha256=target_registry.file_sha256,
     )
     session.add(row)
     session.flush()
@@ -542,17 +548,31 @@ def pilot_readiness(
     unhealthy = contributions_needing_attention(session, tenant_id=tenant_id, now=now)
 
     blockers: list[str] = []
+    sign_off: release_sign_off.SignOff | None = None
     if release_id is None:
         # Not a blocker and not a pass: this call was not asked about a release,
         # so it has nothing to say about acceptance and says that instead.
         pass
     else:
+        # The catalogue question stays a catalogue question: is the record there.
         if not any(a.acceptance_id_ref == "AC-12" for a in acceptances):
             blockers.append("no acceptance record for AC-12 in this release")
-        if any(a.outcome == "rejected" for a in acceptances):
-            blockers.append("a rejected acceptance stands against this release")
-        if any(a.accepted_manifest_sha256 != release.manifest_sha256 for a in acceptances):
-            blockers.append("an acceptance refers to a different manifest than the current one")
+        # The *judgement* questions move to the one projection (design #282 §5). This
+        # function used to decide two of them itself -- no ``rejected`` row may stand, no
+        # row may name another manifest -- and it could disagree with the read route
+        # about the same release. Both rules are gone from here; the projection owns
+        # them, and a rejected criterion needs no separate rule because it is simply not
+        # an accepted one.
+        #
+        # Reported beside the blockers rather than inside them, because "every record
+        # AC-12 asks for exists" and "this release is operator-signed" are different
+        # questions and this report's own scope line says so
+        # ("record-catalog-not-operational-acceptance"). Folding the second into the
+        # first would make a complete catalogue impossible to observe until the whole
+        # two-person write path and its prerequisites are deployed.
+        sign_off = release_sign_off.evaluate(
+            session, tenant_id=tenant_id, release=release, now=now
+        )
     if not database_drills:
         blockers.append("no passing database recovery drill")
     elif not any(
@@ -589,6 +609,13 @@ def pilot_readiness(
         # Stated rather than left to be inferred from a null release id: an
         # unassessed criterion must never read as a met one.
         "acceptanceAssessed": release_id is not None,
+        # The single sign-off projection's answer (design #282 §5). ``None`` when this
+        # call was not asked about a release, which is not the same as false.
+        "operatorSignOff": None if sign_off is None else sign_off.operator_sign_off,
+        "operatorSignOffBlockedBy": None if sign_off is None else sign_off.blocked_by,
+        "signOffUnmet": (
+            [] if sign_off is None else release_sign_off.unmet_criteria(sign_off)
+        ),
         "acceptances": [
             {"criterion": a.acceptance_id_ref, "outcome": a.outcome} for a in acceptances
         ],

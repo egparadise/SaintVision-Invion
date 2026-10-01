@@ -32,6 +32,7 @@ OWNERSHIP_LABELS = (
     "ai.saintvision.s11-storage",
     "ai.saintvision.s11-storage-minio",
     "ai.saintvision.s11-storage-network",
+    "ai.saintvision.s08-buildkit-reference",
     "ai.saintvision.test",
     "ai.saintvision.upgrade-test",
     "ai.saintvision.web-test",

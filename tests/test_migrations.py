@@ -288,6 +288,37 @@ def test_every_tenant_scoped_table_is_policed(rendered_sql):
         ), f"{table}: no isolation policy"
 
 
+def _net_privileges(rendered_sql: str, table: str, role: str = "inv_app") -> set[str]:
+    """What the role ends up holding on a table: grants and revokes, in render order.
+
+    Reading only the GRANTs was wrong once the schema started taking privileges back.
+    0005 granted UPDATE and DELETE on ``acceptance_records``; 0057 revoked both, because
+    the two-person acceptance contract (#282 §4-1) says a recorded decision cannot be
+    edited. A gate that stops at the GRANT reports the opposite of the live schema, and
+    it would also miss the reverse -- a revoke that a later migration quietly re-granted.
+    """
+    privileges: set[str] = set()
+    pattern = re.compile(
+        rf"(?:^|\s)(GRANT|REVOKE)\s+([^;]+?)\s+ON\s+{re.escape(table)}\s+(?:TO|FROM)\s+([^;]+);",
+        re.IGNORECASE,
+    )
+    for verb, listed, roles in pattern.findall(rendered_sql):
+        targets = {r.strip().lower() for r in roles.split(",")}
+        if role not in targets and "public" not in targets:
+            continue
+        named = {p.strip().upper() for p in listed.split(",")}
+        # A column-scoped grant ("UPDATE (a, b)") is not blanket UPDATE; it is checked
+        # by test_lifecycle_tables_get_column_scoped_update_and_no_delete instead.
+        named = {p for p in named if "(" not in p}
+        if "ALL" in named:
+            named = {"SELECT", "INSERT", "UPDATE", "DELETE"}
+        if verb.upper() == "GRANT":
+            privileges |= named
+        else:
+            privileges -= named
+    return privileges
+
+
 def test_append_only_tables_are_never_granted_update_or_delete(rendered_sql):
     import sys
 
@@ -297,9 +328,26 @@ def test_append_only_tables_are_never_granted_update_or_delete(rendered_sql):
     for table in APPEND_ONLY_TABLES:
         grants = re.findall(rf"GRANT ([^;]+) ON {table} TO inv_app", rendered_sql)
         assert grants, f"{table}: no grant rendered"
-        for grant in grants:
-            assert "UPDATE" not in grant.upper(), f"{table}: UPDATE granted"
-            assert "DELETE" not in grant.upper(), f"{table}: DELETE granted"
+        net = _net_privileges(rendered_sql, table)
+        assert "UPDATE" not in net, f"{table}: UPDATE is held after every grant and revoke"
+        assert "DELETE" not in net, f"{table}: DELETE is held after every grant and revoke"
+        # INSERT without SELECT is the audit tables' shape and is deliberate there; what
+        # every append-only table must have is the ability to add rows.
+        assert "INSERT" in net, f"{table}: INSERT was revoked and never restored"
+
+
+def test_a_revoke_is_what_makes_a_granted_table_append_only(rendered_sql):
+    """The one table whose append-only status is a revoke rather than a narrow grant.
+
+    0005 created ``acceptance_records`` with the full set because a decision was then a
+    row somebody might fix. #282 §4-1 removed that: history around the decision is
+    appended instead. This test states the transition rather than the end state, so
+    re-granting either privilege in a later migration fails here with the reason.
+    """
+    assert re.search(
+        r"REVOKE UPDATE, DELETE ON acceptance_records FROM inv_app", rendered_sql
+    ), "0057 must take back the UPDATE and DELETE 0005 granted"
+    assert _net_privileges(rendered_sql, "acceptance_records") == {"SELECT", "INSERT"}
 
 
 def test_lifecycle_tables_get_column_scoped_update_and_no_delete(rendered_sql):

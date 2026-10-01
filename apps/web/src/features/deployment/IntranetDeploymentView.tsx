@@ -8,6 +8,7 @@ import {
   ReleaseManifestResponse,
   ReleaseManifestDetailResponse,
 } from '@/shared/api/releaseObservation';
+import { beginStepUp } from '@/features/auth/session';
 
 export interface IntranetDeploymentViewProps {
   clusterNodes?: NodeItem[];
@@ -978,6 +979,75 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({
                 <div data-testid="server-acceptance-count" style={{ color: 'var(--color-text-primary)', fontWeight: 600, marginTop: '2px' }}>
                   {serverManifestDetail.release.acceptanceCount} 건
                 </div>
+              </div>
+            </div>
+
+            {/* Step-Up Re-Authentication Entry Point (Card 192 / S12-BE Handoff) */}
+            <div
+              data-testid="deployment-step-up-section"
+              style={{
+                padding: '16px',
+                backgroundColor: 'var(--color-bg-canvas)',
+                border: '1px solid var(--color-border-strong)',
+                borderRadius: '6px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                <div>
+                  <h4 style={{ margin: 0, fontSize: '13px', color: 'var(--color-text-primary)' }}>
+                    운영자 인수 수락 재인증 (Step-Up Re-Authentication)
+                  </h4>
+                  <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                    릴리스 수락을 위해서는 300초 이내의 신선한 상호작용 인증(prompt=login, max_age=300, amr: pwd+otp)이 필요합니다.
+                  </p>
+                </div>
+                <div
+                  data-testid="deployment-step-up-status-badge"
+                  style={{
+                    padding: '2px 8px',
+                    borderRadius: '4px',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    backgroundColor: 'var(--color-bg-subtle)',
+                    border: '1px solid var(--color-status-unknown)',
+                    color: 'var(--color-status-unknown)',
+                  }}
+                >
+                  릴리스 수락 전 재인증 필요 (Step-Up Required)
+                </div>
+              </div>
+
+              <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
+                • <strong>백엔드 쓰기 경로 상태</strong>: <code>INV_RELEASE_ACCEPTANCE_WRITE_ENABLED=false</code> (설계 기본값 비활성 유지 — 쓰기 UI 미노출)<br />
+                • <strong>IdP 관측 상태</strong>: <code>BLOCKED_EXTERNAL</code> (사내 hosts 미적용으로 <code>idp.sv.lan</code> 실장비 토큰 관측 대기)<br />
+                • <strong>보안 경계</strong>: 페이지 이동 전 실패 시에는 현재 메모리 세션이 유지되며, IdP 리다이렉트 후 실패·취소 시에는 자격증명 잔류 없이 재로그인을 요구합니다. 수락 완료 또는 서명 성공을 합성하지 않습니다.
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '4px' }}>
+                <Button
+                  data-testid="deployment-step-up-button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={async () => {
+                    try {
+                      const authorizeUrl = await beginStepUp({ returnUrl: window.location.pathname });
+                      window.location.assign(authorizeUrl);
+                    } catch (err) {
+                      setActionNotice({
+                        type: 'error',
+                        text: `🛑 재인증 요청 실패: ${(err as Error).message}`,
+                      });
+                    }
+                  }}
+                >
+                  재인증 필요 (Step-Up 로그인)
+                </Button>
+                <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                  IdP 인가 엔드포인트로 이동하여 <code>prompt=login&max_age=300</code> 상호작용 인증을 수행합니다.
+                </span>
               </div>
             </div>
 
