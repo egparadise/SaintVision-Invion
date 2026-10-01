@@ -14,7 +14,7 @@ from sqlalchemy.exc import DBAPIError, IntegrityError, ProgrammingError
 from saintvision.api.app import create_app
 from saintvision.config import Settings
 from saintvision.db.session import tenant_scope
-from saintvision.identity.principal import FreshAuth, Principal, StaticPrincipalVerifier
+from saintvision.identity.principal import Principal, StaticPrincipalVerifier
 from saintvision.ids import new_id
 from saintvision.services import evidence as evidence_service
 from saintvision.services import release_acceptance as acceptance
@@ -479,13 +479,12 @@ def test_discovery_route_requires_and_returns_only_fresh_server_bound_identity(
         user_id=resolved_rows["user"],
         tenant_id=resolved_rows["tenant"],
         external_subject="oidc:resolver",
-        fresh_auth=FreshAuth(
-            auth_time=int(NOW.timestamp()) - 30,
-            amr=frozenset({"mfa"}),
-            issuer="https://idp.example/realms/inv",
-            client_id="portal",
-            expires_at=int(NOW.timestamp()) + 600,
-        ),
+        verified_fresh_auth_claims=True,
+        auth_time=int(NOW.timestamp()) - 30,
+        amr=frozenset({"mfa"}),
+        verified_token_issuer="https://idp.example/realms/inv",
+        verified_token_client_id="portal",
+        verified_token_expires_at=int(NOW.timestamp()) + 600,
     )
     app = create_app(
         engine=app_engine,
