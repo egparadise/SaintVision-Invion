@@ -57,6 +57,7 @@ def _plan() -> dict:
         "policyExpiresAt": "2026-10-01T03:00:00Z",
         "builderInstanceId": "builder-rootless-01",
         "builderProfileId": "buildkit-rootless-v1",
+        "builderObservationDigest": "a" * 64,
         "recoveryEpoch": 7,
         "rootless": True,
         "privileged": False,
@@ -183,6 +184,7 @@ def test_build_contract_enum_vocabularies_are_literal_and_complete():
         "build_started",
         "network_decision",
         "output_verified",
+        "build_failed",
         "build_cancelled",
         "cleanup_verified",
     ]
