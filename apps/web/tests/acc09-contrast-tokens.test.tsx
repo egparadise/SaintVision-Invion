@@ -103,7 +103,7 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/evidence/EvidenceViewer.tsx": {"#10b981": 1, "#d97706": 3, "#f87171": 1, "rgba(16,185,129,0.15)": 1, "rgba(234,179,8,0.08)": 1, "rgba(234,179,8,0.15)": 1, "rgba(234,179,8,0.3)": 1, "rgba(248,81,73,0.08)": 1, "rgba(248,81,73,0.1)": 2, "rgba(248,81,73,0.15)": 2, "rgba(248,81,73,0.3)": 1, "rgba(56,139,253,0.15)": 1},
   "features/mlops/ModelLineageView.tsx": {"#0d1117": 34, "#161b22": 13, "#1a7f37": 1, "#1f242c": 7, "#1f6feb": 1, "#21262d": 7, "#218": 1, "#30363d": 53, "#388bfd": 2, "#3d1214": 1, "#3fb950": 20, "#58a6ff": 40, "#8b949e": 108, "#94a3b8": 1, "#a0a8b2": 2, "#c9d1d9": 43, "#cf222e": 1, "#d29922": 4, "#e3b341": 3, "#eab308": 1, "#f0883e": 9, "#f0f6fc": 30, "#f59e0b": 3, "#f85149": 14, "#fde047": 1, "#fed7aa": 7, "#ff7b72": 10, "#ffb4a9": 1, "#ffffff": 2, "rgba(139,148,158,0.15)": 1, "rgba(160,168,178,0.15)": 2, "rgba(210,153,34,0.2)": 1, "rgba(234,179,8,0.12)": 1, "rgba(240,136,62,0.15)": 5, "rgba(248,81,73,0.12)": 3, "rgba(248,81,73,0.15)": 7, "rgba(248,81,73,0.2)": 1, "rgba(46,160,67,0.12)": 5, "rgba(46,160,67,0.15)": 1, "rgba(46,160,67,0.2)": 1, "rgba(56,139,253,0.12)": 1, "rgba(56,139,253,0.15)": 8, "rgba(56,139,253,0.2)": 1},
   "features/nodes/NodeDetail.tsx": {"#2ea043": 2, "#38bdf8": 1, "#3fb950": 6, "#58a6ff": 2, "#d29922": 6, "#f85149": 3, "rgba(110,118,129,0.2)": 1, "rgba(210,153,34,0.12)": 1, "rgba(210,153,34,0.15)": 1, "rgba(248,81,73,0.1)": 1, "rgba(46,160,67,0.15)": 2},
-  "features/nodes/NodeList.tsx": {"#1e1e1e": 1, "#2d3748": 1, "#38bdf8": 5, "#3fb950": 1, "#4ade80": 2, "#7dd3fc": 1, "#d29922": 7, "#ef4444": 1, "#f59e0b": 1, "#f85149": 4, "#fca5a5": 1, "#fde68a": 1, "#fff": 1, "#ffffff": 1, "rgba(210,153,34,0.15)": 1, "rgba(56,189,248,0.12)": 1, "rgba(56,189,248,0.3)": 1},
+  "features/nodes/NodeList.tsx": {"#1e1e1e": 1, "#2d3748": 1, "#3fb950": 1, "#4ade80": 2, "#7dd3fc": 1, "#ef4444": 1, "#f59e0b": 1, "#fca5a5": 1, "#fde68a": 1, "#fff": 1, "#ffffff": 1, "rgba(210,153,34,0.15)": 1, "rgba(56,189,248,0.12)": 1, "rgba(56,189,248,0.3)": 1},
   "features/placement/PlacementExplainView.tsx": {"#d97706": 1, "rgba(16,185,129,0.1)": 1, "rgba(16,185,129,0.15)": 1, "rgba(234,179,8,0.15)": 1, "rgba(234,179,8,0.3)": 1},
   "features/placement/PlacementSimulator.tsx": {"#334155": 3, "#93c5fd": 1, "#94a3b8": 2, "#ef4444": 4, "#f87171": 1, "#fbbf24": 4, "#fca5a5": 4, "#fff": 3, "#ffffff": 2, "rgba(234,179,8,0.15)": 2, "rgba(234,179,8,0.3)": 2, "rgba(239,68,68,0.1)": 4, "rgba(35,134,54,0.1)": 1},
   "features/placement/ResourceTopologyGraph.tsx": {"#ffffff": 2, "rgba(16,185,129,0.08)": 1},
@@ -244,6 +244,9 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       '--color-status-degraded',
       '--color-status-offline',
       '--color-status-neutral',
+      '--color-status-active',
+      '--color-status-lost',
+      '--color-status-unknown',
     ];
     const bgTokenList = [
       '--color-bg-canvas',
@@ -442,7 +445,130 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
   });
 
-  // 8. [F1 Revert-Fail Probes] Mutating fixes back to defective combinations strictly fails
+  // 8. [Card 186 / ACC-09] Component DOM Rendering & Binding Verification: NodeList Status Badges (active, lost, unknown)
+  it('ACC-09 / Card 186: NodeList Status Badges bind to design tokens and maintain non-color semantic distinction', async () => {
+    const container = document.createElement('div');
+    container.setAttribute('data-theme', 'light');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    const testNodes = [
+      {
+        id: 'nod_active_01',
+        hostname: 'node-active-prod',
+        status: 'active',
+        os: 'linux',
+        cpuCores: 16,
+        cpuUsagePercent: 25,
+        memoryTotalBytes: 64 * 1024 ** 3,
+        memoryUsedBytes: 16 * 1024 ** 3,
+        storageTotalBytes: 1000 * 1024 ** 3,
+        storageUsedBytes: 200 * 1024 ** 3,
+        gpuCount: 0,
+        heartbeatAt: '2026-10-01T10:00:00Z',
+      },
+      {
+        id: 'nod_lost_01',
+        hostname: 'node-lost-dc2',
+        status: 'lost',
+        os: 'linux',
+        telemetryUnavailable: true,
+        cpuCores: 8,
+        cpuUsagePercent: 0,
+        memoryTotalBytes: 32 * 1024 ** 3,
+        memoryUsedBytes: 0,
+        storageTotalBytes: 500 * 1024 ** 3,
+        storageUsedBytes: 0,
+        gpuCount: 0,
+        heartbeatAt: '2026-10-01T09:00:00Z',
+      },
+      {
+        id: 'nod_unknown_01',
+        hostname: 'node-unknown-edge',
+        status: 'unknown',
+        os: 'linux',
+        observationOnly: true,
+        cpuCores: 4,
+        cpuUsagePercent: 10,
+        memoryTotalBytes: 16 * 1024 ** 3,
+        memoryUsedBytes: 2 * 1024 ** 3,
+        storageTotalBytes: 250 * 1024 ** 3,
+        storageUsedBytes: 20 * 1024 ** 3,
+        gpuCount: 0,
+        heartbeatAt: '2026-10-01T10:00:00Z',
+      },
+    ];
+
+    try {
+      await act(async () => {
+        root.render(<NodeList nodes={testNodes as any} onSelectNode={() => {}} />);
+      });
+
+      // 1) Active Node Badge & Notice Binding
+      const activeBadge = container.querySelector('[data-testid="node-status-badge-nod_active_01"]') as HTMLElement;
+      expect(activeBadge, 'Active node badge must render').not.toBeNull();
+      expect(activeBadge.style.color, 'Active badge text color must bind to var(--color-status-active)').toBe('var(--color-status-active)');
+      expect(activeBadge.style.borderColor, 'Active badge border must bind to var(--color-status-active)').toBe('var(--color-status-active)');
+      const activeDot = activeBadge.querySelector('span') as HTMLElement;
+      expect(activeDot.style.backgroundColor, 'Active badge dot must bind to var(--color-status-active)').toBe('var(--color-status-active)');
+
+      const activeNotice = container.querySelector('[data-testid="node-active-status-notice-nod_active_01"]') as HTMLElement;
+      expect(activeNotice, 'Active status notice banner must render').not.toBeNull();
+      expect(activeNotice.style.color, 'Active notice banner color must bind to var(--color-status-active)').toBe('var(--color-status-active)');
+
+      // Non-color semantic distinction
+      expect(activeBadge.textContent).toContain('ACTIVE');
+      expect(activeNotice.textContent).toContain('ℹ️');
+
+      // 2) Lost Node Badge (telemetryUnavailable branch) Binding
+      const lostBadge = container.querySelector('[data-testid="node-status-badge-nod_lost_01"]') as HTMLElement;
+      expect(lostBadge, 'Lost node badge must render').not.toBeNull();
+      expect(lostBadge.style.color, 'Lost badge text color must bind to var(--color-status-lost)').toBe('var(--color-status-lost)');
+      expect(lostBadge.style.borderColor, 'Lost badge border must bind to var(--color-status-lost)').toBe('var(--color-status-lost)');
+      const lostDot = lostBadge.querySelector('span') as HTMLElement;
+      expect(lostDot.style.backgroundColor, 'Lost badge dot must bind to var(--color-status-lost)').toBe('var(--color-status-lost)');
+
+      // Non-color semantic distinction
+      const lostCard = container.querySelector('[data-testid="node-card-nod_lost_01"]');
+      expect(lostCard?.getAttribute('role'), 'Lost node card must have alert role').toBe('alert');
+      expect(lostBadge.textContent).toContain('LOST');
+      expect(lostCard?.textContent).toContain('🔴');
+
+      // 3) Unknown Node Badge & Observation-only Banner Binding
+      const unknownBadge = container.querySelector('[data-testid="node-status-badge-nod_unknown_01"]') as HTMLElement;
+      expect(unknownBadge, 'Unknown node badge must render').not.toBeNull();
+      expect(unknownBadge.style.color, 'Unknown badge text color must bind to var(--color-status-unknown)').toBe('var(--color-status-unknown)');
+      expect(unknownBadge.style.borderColor, 'Unknown badge border must bind to var(--color-status-unknown)').toBe('var(--color-status-unknown)');
+      const unknownDot = unknownBadge.querySelector('span') as HTMLElement;
+      expect(unknownDot.style.backgroundColor, 'Unknown badge dot must bind to var(--color-status-unknown)').toBe('var(--color-status-unknown)');
+
+      const unknownCard = container.querySelector('[data-testid="node-card-nod_unknown_01"]');
+      expect(unknownBadge.textContent).toContain('UNKNOWN');
+
+      // 4) Contrast Verifications in Light Theme
+      const lightActiveCr = getContrast(lightTokens['--color-status-active'], lightTokens['--color-bg-surface']);
+      expect(lightActiveCr, 'Light --color-status-active on surface must be >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      const lightLostCr = getContrast(lightTokens['--color-status-lost'], lightTokens['--color-bg-surface']);
+      expect(lightLostCr, 'Light --color-status-lost on surface must be >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      const lightUnknownCr = getContrast(lightTokens['--color-status-unknown'], lightTokens['--color-bg-surface']);
+      expect(lightUnknownCr, 'Light --color-status-unknown on surface must be >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      // 5) Contrast Verifications in Dark Theme
+      const darkActiveCr = getContrast(darkTokens['--color-status-active'], darkTokens['--color-bg-surface']);
+      expect(darkActiveCr, 'Dark --color-status-active on surface must be >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      const darkLostCr = getContrast(darkTokens['--color-status-lost'], darkTokens['--color-bg-surface']);
+      expect(darkLostCr, 'Dark --color-status-lost on surface must be >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      const darkUnknownCr = getContrast(darkTokens['--color-status-unknown'], darkTokens['--color-bg-surface']);
+      expect(darkUnknownCr, 'Dark --color-status-unknown on surface must be >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    } finally {
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    }
+  });
+
+  // 9. [F1 & Card 186 Revert-Fail Probes] Mutating fixes back to defective combinations strictly fails
   it('ACC-09 Revert-Fail Probes: Defective color combinations strictly fail WCAG AA criteria', () => {
     // Probe 1: RiskBadge light L1 with former #2563eb on 15% tint over light surface
     const defectiveLightL1 = '#2563eb';
@@ -482,6 +608,24 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(probe6Cr, 'border-strong with hardcoded white text must fail 4.5:1').toBeLessThan(4.5);
     expect(probe6Cr).toBeCloseTo(2.539, 2);
 
+    // Probe 7: Card 186 NodeList active status former hardcoded literal #38bdf8 on light surface (2.14:1)
+    const defectiveLightActive = '#38bdf8';
+    const probe7Cr = getContrast(defectiveLightActive, lightTokens['--color-bg-surface']);
+    expect(probe7Cr, 'Defective light active #38bdf8 on light surface must fail 4.5:1').toBeLessThan(4.5);
+    expect(probe7Cr).toBeCloseTo(2.14, 1);
+
+    // Probe 8: Card 186 NodeList lost status former hardcoded literal #f85149 on light surface (3.35:1)
+    const defectiveLightLost = '#f85149';
+    const probe8Cr = getContrast(defectiveLightLost, lightTokens['--color-bg-surface']);
+    expect(probe8Cr, 'Defective light lost #f85149 on light surface must fail 4.5:1').toBeLessThan(4.5);
+    expect(probe8Cr).toBeCloseTo(3.35, 1);
+
+    // Probe 9: Card 186 NodeList unknown status former hardcoded literal #d29922 on light surface (2.52:1)
+    const defectiveLightUnknown = '#d29922';
+    const probe9Cr = getContrast(defectiveLightUnknown, lightTokens['--color-bg-surface']);
+    expect(probe9Cr, 'Defective light unknown #d29922 on light surface must fail 4.5:1').toBeLessThan(4.5);
+    expect(probe9Cr).toBeCloseTo(2.52, 1);
+
     // Legacy Token Reverts:
     // Legacy Dark --color-border-subtle: #374151
     expect(getContrast('#374151', darkTokens['--color-bg-surface'])).toBeLessThan(3.0); // 1.72:1
@@ -493,7 +637,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(getContrast('#64748b', lightTokens['--color-bg-subtle'])).toBeLessThan(4.5); // 4.34:1
   });
 
-  // 9. [F2 Fail-Closed Multiset Inventory & Ratchet] var(--color-border-subtle) exact 140/21 and exact per-file literal multisets strictly bounded
+  // 10. [F2 Fail-Closed Multiset Inventory & Ratchet] var(--color-border-subtle) exact 140/21 and exact per-file literal multisets strictly bounded
   it('ACC-09 / F2 Fail-Closed Multiset Inventory & Ratchet: var(--color-border-subtle) exact 140/21 and exact per-file literal multisets strictly bounded', () => {
     const srcDir = path.resolve(__dirname, '../src');
     const allFiles = getAllSourceFiles(srcDir);
