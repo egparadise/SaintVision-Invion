@@ -1,9 +1,9 @@
-# 2026-10-02 04:30:00 KST (2026-10-02 05:04:00 KST r2 보강) — Card 199: 관리자 보안 콘솔 (AdminSecurityConsole) 색상 리터럴 inventory 전수(186→0), 대비 표본/DOM 결속 감사 및 디자인 토큰 승격 (Gemini)
+# 2026-10-02 04:30:00 KST (2026-10-02 05:12:00 KST r3 보강) — Card 199: 관리자 보안 콘솔 (AdminSecurityConsole) 색상 리터럴 inventory 전수(186→0), 대비 표본/DOM 결속 감사 및 디자인 토큰 승격 (Gemini)
 
 - **문서 ID**: HIST-GEMINI-CARD199-ADMIN-SECURITY-CONTRAST
 - **작업 branch**: agent/gemini/c199-admin-security-contrast
 - **Base commit**: 67df36e8b4e723224b422ee5ec671d467972054c (PR #296 r3 HEAD)
-- **KST 시각**: 2026-10-02 04:30:00 KST (r1 보강: 04:56:00 KST, r2 보강: 2026-10-02 05:04:00 KST)
+- **KST 시각**: 2026-10-02 04:30:00 KST (r1 보강: 04:56:00 KST, r2 보강: 05:04:00 KST, r3 보강: 2026-10-02 05:12:00 KST)
 - **작업자**: Gemini (Frontend / UI / 접근성)
 - **독립 검토자 요청**: Claude UI (UI/접근성 축), Codex (계약/디자인 토큰/불변식 축)
 - **상태**: proposed (검토 전 자가 승인 금지)
@@ -68,7 +68,7 @@ ACC-09(접근성 명도 대비 적합화) 트랙의 후속 영역으로, 시스�
 
 ```bash
 # apps/web/src/index.css 직접 파싱 기반 전수 대비 동적 재현 명령 (Python)
-python -c "
+python - <<'PY'
 import math, re
 
 with open('apps/web/src/index.css', 'r', encoding='utf-8') as f:
@@ -82,7 +82,7 @@ def parse_tokens(block):
     return tokens
 
 light_tokens = parse_tokens(re.search(r':root\s*\{([\s\S]*?)\}', css).group(1))
-dark_tokens = parse_tokens(re.search(r'\[data-theme='dark'\]\s*\{([\s\S]*?)\}', css).group(1))
+dark_tokens = parse_tokens(re.search(r'\[data-theme=[\'"]dark[\'"]\]\s*\{([\s\S]*?)\}', css).group(1))
 
 def hex_to_rgb(h): return [int(h.lstrip('#')[i:i+2], 16) for i in (0, 2, 4)]
 def round_half_up(n): return int(math.floor(n + 0.5))
@@ -100,18 +100,32 @@ def cr(c1, c2):
     return (max(l1, l2) + 0.05) / (min(l1, l2) + 0.05)
 
 scrim_light = blend([0, 0, 0], 0.75, light_tokens['--color-bg-canvas'])
-print('modal surface on scrim_light (#3e3f3f):', f'{cr(light_tokens["--color-bg-surface"], scrim_light):.2f}:1')  # 10.57:1
+print('modal surface on scrim_light (#3e3f3f):', f'{cr(light_tokens["--color-bg-surface"], scrim_light):.2f}:1')
 scrim_dark = blend([0, 0, 0], 0.75, dark_tokens['--color-bg-canvas'])
-print('modal border (status-offline) on scrim_dark:', f'{cr(dark_tokens["--color-status-offline"], scrim_dark):.2f}:1')  # 7.46:1
-print('text-secondary / bg-surface (dark):', f'{cr(dark_tokens["--color-text-secondary"], dark_tokens["--color-bg-surface"]):.2f}:1')  # 14.33:1
-print('status-online / bg-surface (dark):', f'{cr(dark_tokens["--color-status-online"], dark_tokens["--color-bg-surface"]):.2f}:1')      # 7.79:1
-print('brand-hover / bg-surface (dark):', f'{cr(dark_tokens["--color-brand-hover"], dark_tokens["--color-bg-surface"]):.2f}:1')        # 9.84:1
-print('status-degraded / bg-subtle (dark):', f'{cr(dark_tokens["--color-status-degraded"], dark_tokens["--color-bg-subtle"]):.2f}:1')    # 6.83:1
-print('text-secondary / bg-subtle (dark):', f'{cr(dark_tokens["--color-text-secondary"], dark_tokens["--color-bg-subtle"]):.2f}:1')     # 11.86:1
-print('brand-hover / bg-subtle (dark):', f'{cr(dark_tokens["--color-brand-hover"], dark_tokens["--color-bg-subtle"]):.2f}:1')         # 8.14:1
-print('brand-primary / brand-subtle (dark):', f'{cr(dark_tokens["--color-brand-primary"], dark_tokens["--color-brand-subtle"]):.2f}:1') # 5.75:1
-print('brand-primary / brand-subtle (light):', f'{cr(light_tokens["--color-brand-primary"], light_tokens["--color-brand-subtle"]):.2f}:1') # 4.24:1
-"
+print('modal border (status-offline) on scrim_dark:', f'{cr(dark_tokens["--color-status-offline"], scrim_dark):.2f}:1')
+print('text-secondary / bg-surface (dark):', f'{cr(dark_tokens["--color-text-secondary"], dark_tokens["--color-bg-surface"]):.2f}:1')
+print('status-online / bg-surface (dark):', f'{cr(dark_tokens["--color-status-online"], dark_tokens["--color-bg-surface"]):.2f}:1')
+print('brand-hover / bg-surface (dark):', f'{cr(dark_tokens["--color-brand-hover"], dark_tokens["--color-bg-surface"]):.2f}:1')
+print('status-degraded / bg-subtle (dark):', f'{cr(dark_tokens["--color-status-degraded"], dark_tokens["--color-bg-subtle"]):.2f}:1')
+print('text-secondary / bg-subtle (dark):', f'{cr(dark_tokens["--color-text-secondary"], dark_tokens["--color-bg-subtle"]):.2f}:1')
+print('brand-hover / bg-subtle (dark):', f'{cr(dark_tokens["--color-brand-hover"], dark_tokens["--color-bg-subtle"]):.2f}:1')
+print('brand-primary / brand-subtle (dark):', f'{cr(dark_tokens["--color-brand-primary"], dark_tokens["--color-brand-subtle"]):.2f}:1')
+print('brand-primary / brand-subtle (light):', f'{cr(light_tokens["--color-brand-primary"], light_tokens["--color-brand-subtle"]):.2f}:1')
+PY
+```
+
+**실제 실행 콘솔 출력 (exit code 0 실측)**:
+```text
+modal surface on scrim_light (#3e3f3f): 10.57:1
+modal border (status-offline) on scrim_dark: 7.46:1
+text-secondary / bg-surface (dark): 14.33:1
+status-online / bg-surface (dark): 7.79:1
+brand-hover / bg-surface (dark): 9.84:1
+status-degraded / bg-subtle (dark): 6.83:1
+text-secondary / bg-subtle (dark): 11.86:1
+brand-hover / bg-subtle (dark): 8.14:1
+brand-primary / brand-subtle (dark): 5.75:1
+brand-primary / brand-subtle (light): 4.24:1
 ```
 
 ---

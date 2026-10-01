@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.184"
+version: "1.0.185"
 status: "proposed"
 author: "Gemini"
-updated: "2026-10-02T05:04:45+09:00"
+updated: "2026-10-02T05:13:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,6 +19,7 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
+- 확인 기준: 2026-10-02T05:13:00+09:00 (Card 199 관리자 보안 콘솔 r3 조치: Claude r3 조건부 승인 및 Codex r2 피드백 전수 반영 — History §2.2 index.css 동적 재현 명령을 bash heredoc(python - <<'PY' ... PY) 문법으로 완전 수정하고 실제 실행 콘솔 출력(exit code 0 실측: 10.57:1, 7.46:1 등 10개 지표)을 직접 결속; Gemini 작업판 내 10.68:1 오타를 정본 실측치 10.57:1(#3e3f3f)로 정정; 문서 단독 commit).
 - 확인 기준: 2026-10-02T05:04:45+09:00 (Card 199 관리자 보안 콘솔 r2 조치: Claude r2 조건부 승인 및 Codex r2 피드백 전수 반영 — V1/F1 모달 서피스 on 스크림 백드롭 합성(#3e3f3f) 명도 대비 실측치를 10.57:1로 정정(Math.round 정밀 일치), §2.2 재현 명령을 apps/web/src/index.css 파일 직접 파싱 및 동적 연산 방식으로 전면 개편, brand-hover 채택 근거에서 "다크 3.99" 삭제 및 라이트 4.24:1 미달 방지/다크 5.75:1 일관성 보장으로 사실성 정정; 문서 단독 commit).
 - 확인 기준: 2026-10-02T04:56:34+09:00 (Card 199 관리자 보안 콘솔 r1 조치: Claude UI r1 및 Codex r1 피드백 전수 반영 — T1 Test 9e-2에 계층적 조상 컨테이너 배경 추적(ancestorBgTokens) 및 텍스트 토큰 배경 거부 로직 추가, admin-audit-subtab-container DOM 결속, 변이 A1 사살; T2 모달 백드롭 스크림 alpha >= 0.50 엄밀 단언 및 0.75 alpha 합성 캔버스 위 모달 서피스 대비 10.57:1 >= 3.0:1 실측, 변이 A6 사살; T3/Codex F1 History §2.1 표 및 §3 내 다크 실측 수치 7개 오류를 index.css 정본 토큰 공식으로 전수 동기화(text-secondary/surface 14.33, status-online/surface 7.79, brand-hover/surface 9.84, status-degraded/subtle 6.83, text-secondary/subtle 11.86, brand-hover/subtle 8.14, brand-primary/subtle 5.77), brand-hover 채택 근거 정확화, Python 독립 재현 명령 문서 결속; T4 표현 명확화; Revert-Fail Probes 49~50 추가, 12종 변이 M1~M12 12/12 100% 사살 실측; Vitest 18 passed, admin tests 59 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반, diff --check clean).
 - 확인 기준: 2026-10-02T04:30:39+09:00 (Card 199 관리자 보안 콘솔 AdminSecurityConsole 색상 리터럴 inventory 전수(186→0), 대비 표본/DOM 결속 감사 및 디자인 토큰 승격: base 67df36e8 위 작업, AdminSecurityConsole 186건 -> 0건 해소, COLOR_LITERAL_MULTISET_BASELINE {} 래칫, index.css --color-bg-backdrop 토큰 등록, border-subtle 317건/24개 파일 래칫, 레거시 #30363d 92건/13파일 상한 강화, Test 9e DOM 실제 렌더링 동적 대비 단언 신설, Test 9e-2 142개 style 속성 전수 AST 스타일-쌍 명도 대비 및 커버리지 래칫 신설, Revert-Fail Probes 44~48 추가, 10종 변이 10/10 100% 사살 실측; Vitest 18 passed, admin tests 59 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
@@ -43,7 +44,7 @@ source_of_truth: "Git"
      - `var(--color-border-subtle)` 사용 횟수 292건 $\rightarrow$ **317건**(+25건), 파일 수 23개 $\rightarrow$ **24개**로 fail-closed 단언 갱신.
      - 레거시 리터럴 상한치 강화 (`#30363d` <= 92/13).
   3. **실제 렌더링 DOM 기반 동적 대비 단언 및 변이 100% 사살**:
-     - Test 9e 신설 및 보강: `AdminSecurityConsole` DOM 렌더링 및 동적 대비율(텍스트 >= 4.5:1, UI 경계 >= 3.0:1) 단언, 감사 로그 컨테이너 결속 및 모달 백드롭 스크림 alpha >= 0.50 / 모달 서피스 대비 10.68:1 실측.
+     - Test 9e 신설 및 보강: `AdminSecurityConsole` DOM 렌더링 및 동적 대비율(텍스트 >= 4.5:1, UI 경계 >= 3.0:1) 단언, 감사 로그 컨테이너 결속 및 모달 백드롭 스크림 alpha >= 0.50 / 모달 서피스 대비 10.57:1 실측 (#3e3f3f).
      - Test 9e-2 신설 및 계층적 AST 가드: 142개 style 속성 대상 조상 컨테이너 배경 스택 추적 동적 AST 명도 대비 계산 및 커버리지 래칫 (checkedPairs 98, checkedBorderPairs 48, violations 0).
      - Revert-Fail Probes 44~50 추가.
      - 12종 변이 M1~M12 전원 사살 실측 (12/12 = 100% killed).
