@@ -906,18 +906,26 @@ def test_live_browser_without_ca_bundle_sets_acceptance_claim_false(monkeypatch)
 
     monkeypatch.setattr("playwright.sync_api.sync_playwright", lambda: FakePlaywright())
 
-    observer = PortalLoginJourneyObserver(target_url="https://portal.sv.lan", ca_bundle=None, mock_mode=False)
-    evidence = observer.execute_journey(require_clean=False, require_remote_containment=False)
+    monkeypatch.setattr(
+        "tools.observe_portal_login_journey.get_git_sha",
+        lambda repo_path=None, require_clean=False, require_remote_containment=False, allowed_remotes=("origin/",): "0123456789abcdef0123456789abcdef01234567",
+    )
 
-    # Without CA bundle, all 5 steps pass on wire, but acceptanceClaim must strictly be False!
+    observer = PortalLoginJourneyObserver(target_url="https://portal.sv.lan", ca_bundle=None, mock_mode=False)
+    evidence = observer.execute_journey(require_clean=True, require_remote_containment=True)
+
+    # Without CA bundle, all 5 steps pass on wire and provenance is fully satisfied,
+    # but acceptanceClaim must strictly be False because CA bundle / TLS validation is absent!
     assert evidence["overallStatus"] == "PASS"
     assert len(evidence["steps"]) == 5
     for s in evidence["steps"]:
         assert s["status"] == "PASS"
-    assert evidence["acceptanceClaim"] is False
+    assert evidence["audit"]["cleanWorktreeVerified"] is True
+    assert evidence["audit"]["remoteContainmentVerified"] is True
     assert evidence["audit"]["tlsValidationEnforced"] is False
     assert evidence["audit"]["caBundleAppliedToBrowser"] is False
     assert evidence["caDigest"] is None
+    assert evidence["acceptanceClaim"] is False
     validate_evidence(evidence)
 
 
