@@ -48,6 +48,9 @@ reference를 적용했고, 정본 `tools/check_idp_realm_config.py`의 live read
 
 배포 스크립트 SHA-256 `95d48cb7…26980`과 remote 실행 파일이 같고, checker SHA-256
 `287bbfc8…133dd`도 local 정본과 remote read-back 파일이 같음을 적용 뒤 대조했다.
+노드 정본 경로에도 같은 스크립트를 설치하고 그 경로로 checker PASS를 다시 확인했다. 이어진
+hash 출력의 shell quoting 오류 때문에 wrapper 전체는 exit 2였지만 realm 적용·checker는 이미
+exit 0으로 끝난 뒤였고, hash 대조와 `/tmp` 작업 파일 정리는 별도 재시도에서 exit 0이었다.
 
 ## rollback
 
@@ -55,7 +58,8 @@ rollback은 사용자나 realm 전체를 되돌리지 않는다. operator-privat
 없었던 mapper/config만 해당 object id로 삭제하고, 기존 값이 있었던 경우에만 보호 JSON으로
 그 객체를 복원한다. 그 뒤 같은 live checker를 다시 실행한다. 보호 snapshot 본문은 비밀·운영
 경계이므로 Git에 넣지 않았고, Evidence에는 위치와 manifest SHA-256만 남겼다. 이번에는 rollback을
-실행하지 않았다.
+실행하지 않았다. 노드 도구도 별도 0600 보호 사본(`06fc79e7…889d`)으로 남겨 코드 rollback과
+realm rollback을 분리했다.
 
 ## 남은 경계
 

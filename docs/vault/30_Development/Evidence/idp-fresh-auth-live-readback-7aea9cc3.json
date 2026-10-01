@@ -21,6 +21,11 @@
   "apply": {
     "exitCode": 0,
     "idempotentReapplyExitCode": 0,
+    "canonicalToolInstalled": true,
+    "canonicalPathReadbackExitCode": 0,
+    "canonicalInstallWrapperExitCode": 2,
+    "canonicalInstallWrapperFailure": "post-readback hash formatting command only",
+    "hashAndTemporaryFileCleanupRetryExitCode": 0,
     "userCredentialFileRead": false,
     "userMutationCount": 0,
     "otpEnrollmentPerformed": false
@@ -40,7 +45,9 @@
   "identifyingNetworkValuesEmitted": 0,
   "rollback": {
     "protectedBackupLocation": "~/.sv-idp/backups/card209-20261001T213815Z",
-    "procedure": "remove only mappers/configs absent from the protected pre-apply snapshot; otherwise restore the exact protected JSON by captured object id, then rerun the live checker",
+    "protectedToolBackupLocation": "~/.sv-idp/backups/card209-tool-20261001T214700Z",
+    "previousToolSha256": "06fc79e7e04a8fb60b60f70207ea6a104d54a88afffe2691ae82600060a0889d",
+    "procedure": "remove only mappers/configs absent from the protected pre-apply snapshot; otherwise restore the exact protected JSON by captured object id, restore the protected prior tool only when rolling back code, then rerun the live checker",
     "performed": false
   },
   "limitations": [
