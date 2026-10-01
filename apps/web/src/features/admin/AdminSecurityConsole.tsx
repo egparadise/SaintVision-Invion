@@ -629,8 +629,8 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
           role="alert"
           data-testid="kill-switch-active-banner"
           style={{
-            backgroundColor: 'rgba(248, 81, 73, 0.2)',
-            border: '2px solid #f85149',
+            backgroundColor: 'var(--color-bg-subtle)',
+            border: '2px solid var(--color-status-offline)',
             borderRadius: '8px',
             padding: '16px 20px',
             display: 'flex',
@@ -639,10 +639,10 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
           }}
         >
           <div>
-            <div style={{ color: '#f85149', fontWeight: 'bold', fontSize: '16px' }}>
+            <div style={{ color: 'var(--color-status-offline)', fontWeight: 'bold', fontSize: '16px' }}>
               🚨 [모의 시뮬레이션] EMERGENCY KILL SWITCH ACTIVE — LOCAL SECURITY ENGINE ISOLATION
             </div>
-            <div style={{ color: '#c9d1d9', fontSize: '13px', marginTop: '4px' }}>
+            <div style={{ color: 'var(--color-text-secondary)', fontSize: '13px', marginTop: '4px' }}>
               로컬 보안 통제 엔진이 모의 격리 상태입니다. (백엔드 제어 평면 비상 정지 API(GET/POST /v1/operations/kill-switch)가 존재하며, 비상 정지 게이트와 실배선 연동되었습니다)
             </div>
           </div>
@@ -659,10 +659,10 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
           data-testid="admin-auth-required-notice"
           style={{
             padding: '12px 16px',
-            backgroundColor: 'rgba(248, 81, 73, 0.15)',
-            border: '1px solid #f85149',
+            backgroundColor: 'var(--color-bg-subtle)',
+            border: '1px solid var(--color-status-offline)',
             borderRadius: '6px',
-            color: '#f85149',
+            color: 'var(--color-status-offline)',
             fontSize: '13px',
           }}
         >
@@ -676,10 +676,10 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
           data-testid="admin-drain-error-banner"
           style={{
             padding: '12px 16px',
-            backgroundColor: 'rgba(248, 81, 73, 0.15)',
-            border: '1px solid #f85149',
+            backgroundColor: 'var(--color-bg-subtle)',
+            border: '1px solid var(--color-status-offline)',
             borderRadius: '6px',
-            color: '#f85149',
+            color: 'var(--color-status-offline)',
             fontSize: '13px',
           }}
         >
@@ -695,38 +695,38 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
           gap: '16px',
         }}
       >
-        <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
-          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>Docker Socket 노출 여부</div>
-          <div style={{ fontSize: '20px', fontWeight: 700, color: '#3fb950', marginTop: '4px' }}>
+        <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '8px', padding: '16px 20px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>Docker Socket 노출 여부</div>
+          <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--color-status-online)', marginTop: '4px' }}>
             {status.dockerSocketAttemptsBlocked} 건 차단 (모의 격리; 물리 컨테이너 UNMEASURED)
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>AC-08 미노출 보증 (모의 통과)</div>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>AC-08 미노출 보증 (모의 통과)</div>
         </div>
 
-        <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
-          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>승인 우회 시도 차단 수</div>
-          <div style={{ fontSize: '20px', fontWeight: 700, color: '#3fb950', marginTop: '4px' }}>
+        <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '8px', padding: '16px 20px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>승인 우회 시도 차단 수</div>
+          <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--color-status-online)', marginTop: '4px' }}>
             {status.approvalBypassesBlocked} 건 차단 (모의 차단; 물리 승인은 UNMEASURED)
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>L2/L3 위험 작업 Two-Person 강제</div>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>L2/L3 위험 작업 Two-Person 강제</div>
         </div>
 
-        <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
-          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>합성 GPU 실행 검증</div>
-          <div style={{ fontSize: '20px', fontWeight: 700, color: '#58a6ff', marginTop: '4px' }}>
+        <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '8px', padding: '16px 20px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>합성 GPU 실행 검증</div>
+          <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--color-brand-hover)', marginTop: '4px' }}>
             {gpuResult
               ? (gpuResult.exitCode === 0 ? '성공 (Exit 0; 모의)' : `실패 (Exit ${gpuResult.exitCode})`)
               : (gpuNodes.length > 0 ? '대기 중 (모의 검증 준비; 물리 GPU UNMEASURED)' : 'UNMEASURED (GPU 노드 없음)')}
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>RTX 4090 / A4000 합성 벤치마크 (물리 GPU 미측정)</div>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>RTX 4090 / A4000 합성 벤치마크 (물리 GPU 미측정)</div>
         </div>
 
-        <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
-          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>WAL 백업 RPO 현황</div>
-          <div style={{ fontSize: '20px', fontWeight: 700, color: '#3fb950', marginTop: '4px' }}>
+        <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '8px', padding: '16px 20px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>WAL 백업 RPO 현황</div>
+          <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--color-status-online)', marginTop: '4px' }}>
             {status.rpoMinutes} 분 전 (모의; 물리 S3 오프사이트 UNMEASURED)
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>RTO 12분 (모의; 물리 PITR UNMEASURED)</div>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>RTO 12분 (모의; 물리 PITR UNMEASURED)</div>
         </div>
       </div>
 
@@ -736,8 +736,8 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          backgroundColor: '#161b22',
-          border: '1px solid #30363d',
+          backgroundColor: 'var(--color-bg-surface)',
+          border: '1px solid var(--color-border-subtle)',
           borderRadius: '8px',
           padding: '12px 20px',
         }}
@@ -782,7 +782,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
 
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <label style={{ fontSize: '11px', color: '#8b949e', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <label style={{ fontSize: '11px', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
               사유:
               <select
                 data-testid="kill-switch-reason-select"
@@ -793,10 +793,10 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
                 }}
                 style={{
                   padding: '3px 6px',
-                  backgroundColor: '#0d1117',
-                  border: '1px solid #30363d',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-border-subtle)',
                   borderRadius: '4px',
-                  color: '#c9d1d9',
+                  color: 'var(--color-text-primary)',
                   fontSize: '11px',
                 }}
               >
@@ -805,7 +805,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
                 <option value="maintenance">maintenance</option>
               </select>
             </label>
-            <label style={{ fontSize: '11px', color: '#8b949e', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <label style={{ fontSize: '11px', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
               승인ID:
               <input
                 data-testid="input-kill-switch-approval-id"
@@ -820,10 +820,10 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
                 style={{
                   width: '180px',
                   padding: '3px 6px',
-                  backgroundColor: '#0d1117',
-                  border: '1px solid #30363d',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-border-subtle)',
                   borderRadius: '4px',
-                  color: '#c9d1d9',
+                  color: 'var(--color-text-primary)',
                   fontSize: '11px',
                   fontFamily: 'monospace',
                 }}
@@ -841,7 +841,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
               {status.emergencyKillSwitchActive || backendKillSwitch.status === 'active' ? 'Kill Switch 해제' : '🚨 긴급 Kill Switch 발동'}
             </Button>
           </div>
-          <div data-testid="backend-kill-switch-status" style={{ fontSize: '11px', color: '#8b949e' }}>
+          <div data-testid="backend-kill-switch-status" style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>
             백엔드 제어 평면: {
               backendKillSwitch.status === 'loading'
                 ? '확인 중...'
@@ -859,8 +859,8 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       {activeSubTab === 'audit' && (
         <div
           style={{
-            backgroundColor: '#161b22',
-            border: '1px solid #30363d',
+            backgroundColor: 'var(--color-bg-surface)',
+            border: '1px solid var(--color-border-subtle)',
             borderRadius: '8px',
             padding: '20px',
             display: 'flex',
@@ -870,16 +870,16 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <h3 style={{ margin: 0, fontSize: '16px', color: '#f0f6fc' }}>
+              <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--color-text-primary)' }}>
                 불변 감사 로그 원장 (로컬 합성 원장; 백엔드 감사 아님)
               </h3>
-              <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
+              <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: 'var(--color-text-secondary)' }}>
                 W3C Trace ID 기반 단방향 해시 체이닝 (Append-Only Cryptographic Ledger; 로컬 시뮬레이션)
               </p>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               {ledgerVerification && (
-                <span style={{ fontSize: '12px', color: ledgerVerification.isValid ? '#3fb950' : '#f85149', fontWeight: 600 }}>
+                <span style={{ fontSize: '12px', color: ledgerVerification.isValid ? 'var(--color-status-online)' : 'var(--color-status-offline)', fontWeight: 600 }}>
                   {ledgerVerification.isValid ? `✔ ${ledgerVerification.checked}개 레코드 무결성 검증 완료` : '❌ 원장 변조 감지됨'}
                 </span>
               )}
@@ -889,9 +889,9 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
             </div>
           </div>
 
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: 'var(--color-text-secondary)' }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
+              <tr style={{ borderBottom: '1px solid var(--color-border-subtle)', textAlign: 'left', color: 'var(--color-text-secondary)' }}>
                 <th style={{ padding: '10px 8px' }}>Timestamp</th>
                 <th style={{ padding: '10px 8px' }}>Actor</th>
                 <th style={{ padding: '10px 8px' }}>Action</th>
@@ -903,11 +903,11 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
             </thead>
             <tbody>
               {auditLogs.map((log) => (
-                <tr key={log.id} style={{ borderBottom: '1px solid #21262d' }}>
-                  <td style={{ padding: '10px 8px', color: '#8b949e', whiteSpace: 'nowrap' }}>
+                <tr key={log.id} style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
+                  <td style={{ padding: '10px 8px', color: 'var(--color-text-secondary)', whiteSpace: 'nowrap' }}>
                     {new Date(log.timestamp).toLocaleTimeString()}
                   </td>
-                  <td style={{ padding: '10px 8px', fontFamily: 'var(--font-mono, monospace)', color: '#58a6ff' }}>
+                  <td style={{ padding: '10px 8px', fontFamily: 'var(--font-mono, monospace)', color: 'var(--color-brand-hover)' }}>
                     {log.actor}
                   </td>
                   <td style={{ padding: '10px 8px', fontWeight: 600 }}>{log.action}</td>
@@ -919,15 +919,16 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
                         borderRadius: '4px',
                         fontSize: '11px',
                         fontWeight: 700,
-                        backgroundColor: log.outcome === 'allowed' ? 'rgba(46, 160, 67, 0.2)' : 'rgba(248, 81, 73, 0.2)',
-                        color: log.outcome === 'allowed' ? '#3fb950' : '#f85149',
+                        backgroundColor: 'var(--color-bg-subtle)',
+                        border: `1px solid ${log.outcome === 'allowed' ? 'var(--color-status-online)' : 'var(--color-status-offline)'}`,
+                        color: log.outcome === 'allowed' ? 'var(--color-status-online)' : 'var(--color-status-offline)',
                       }}
                     >
                       {log.outcome.toUpperCase()}
                     </span>
                   </td>
-                  <td style={{ padding: '10px 8px', color: '#8b949e' }}>{log.details}</td>
-                  <td style={{ padding: '10px 8px', fontFamily: 'var(--font-mono, monospace)', color: '#8b949e', fontSize: '11px' }}>
+                  <td style={{ padding: '10px 8px', color: 'var(--color-text-secondary)' }}>{log.details}</td>
+                  <td style={{ padding: '10px 8px', fontFamily: 'var(--font-mono, monospace)', color: 'var(--color-text-secondary)', fontSize: '11px' }}>
                     {log.integrityHash.slice(0, 12)}...
                   </td>
                 </tr>
@@ -943,8 +944,8 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
           {/* Docker Socket Inspector */}
           <div
             style={{
-              backgroundColor: '#161b22',
-              border: '1px solid #30363d',
+              backgroundColor: 'var(--color-bg-surface)',
+              border: '1px solid var(--color-border-subtle)',
               borderRadius: '8px',
               padding: '20px',
               display: 'flex',
@@ -953,10 +954,10 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
             }}
           >
             <div>
-              <h4 style={{ margin: 0, fontSize: '15px', color: '#f0f6fc' }}>
+              <h4 style={{ margin: 0, fontSize: '15px', color: 'var(--color-text-primary)' }}>
                 Docker Socket 미노출 검증 (AC-08)
               </h4>
-              <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
+              <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: 'var(--color-text-secondary)' }}>
                 컨테이너 호스트 제어권 탈취를 유발하는 `/var/run/docker.sock` 마운트 시도 원천 차단 검증
               </p>
             </div>
@@ -969,10 +970,10 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
                 style={{
                   flex: 1,
                   padding: '8px 12px',
-                  backgroundColor: '#0d1117',
-                  border: '1px solid #30363d',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-border-subtle)',
                   borderRadius: '6px',
-                  color: '#c9d1d9',
+                  color: 'var(--color-text-primary)',
                   fontSize: '13px',
                   fontFamily: 'var(--font-mono, monospace)',
                 }}
@@ -989,9 +990,9 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
                   padding: '10px 14px',
                   borderRadius: '6px',
                   fontSize: '12px',
-                  backgroundColor: mountTestResult.includes('DENIED') ? 'rgba(248, 81, 73, 0.15)' : 'rgba(46, 160, 67, 0.15)',
-                  border: mountTestResult.includes('DENIED') ? '1px solid #f85149' : '1px solid #3fb950',
-                  color: mountTestResult.includes('DENIED') ? '#f85149' : '#3fb950',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: `1px solid ${mountTestResult.includes('DENIED') ? 'var(--color-status-offline)' : 'var(--color-status-online)'}`,
+                  color: mountTestResult.includes('DENIED') ? 'var(--color-status-offline)' : 'var(--color-status-online)',
                 }}
               >
                 {mountTestResult}
@@ -1002,8 +1003,8 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
           {/* Approval Bypass Filter */}
           <div
             style={{
-              backgroundColor: '#161b22',
-              border: '1px solid #30363d',
+              backgroundColor: 'var(--color-bg-surface)',
+              border: '1px solid var(--color-border-subtle)',
               borderRadius: '8px',
               padding: '20px',
               display: 'flex',
@@ -1012,25 +1013,25 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
             }}
           >
             <div>
-              <h4 style={{ margin: 0, fontSize: '15px', color: '#f0f6fc' }}>
+              <h4 style={{ margin: 0, fontSize: '15px', color: 'var(--color-text-primary)' }}>
                 승인 우회 방지 검증 (AC-08)
               </h4>
-              <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
+              <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: 'var(--color-text-secondary)' }}>
                 L2/L3 등급 고위험 명령이 거버넌스 승인 ID 없이 단독 실행되는 시도를 100% 차단
               </p>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <label style={{ fontSize: '13px', color: '#8b949e' }}>시험할 위험 등급:</label>
+              <label style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>시험할 위험 등급:</label>
               <select
                 value={bypassRiskLevel}
                 onChange={(e) => setBypassRiskLevel(e.target.value as any)}
                 style={{
                   padding: '8px 12px',
-                  backgroundColor: '#0d1117',
-                  border: '1px solid #30363d',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-border-subtle)',
                   borderRadius: '6px',
-                  color: '#c9d1d9',
+                  color: 'var(--color-text-primary)',
                   fontSize: '13px',
                 }}
               >
@@ -1050,9 +1051,9 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
                   padding: '10px 14px',
                   borderRadius: '6px',
                   fontSize: '12px',
-                  backgroundColor: bypassTestResult.includes('BLOCKED') ? 'rgba(248, 81, 73, 0.15)' : 'rgba(46, 160, 67, 0.15)',
-                  border: bypassTestResult.includes('BLOCKED') ? '1px solid #f85149' : '1px solid #3fb950',
-                  color: bypassTestResult.includes('BLOCKED') ? '#f85149' : '#3fb950',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: `1px solid ${bypassTestResult.includes('BLOCKED') ? 'var(--color-status-offline)' : 'var(--color-status-online)'}`,
+                  color: bypassTestResult.includes('BLOCKED') ? 'var(--color-status-offline)' : 'var(--color-status-online)',
                 }}
               >
                 {bypassTestResult}
@@ -1066,8 +1067,8 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       {activeSubTab === 'gpu' && (
         <div
           style={{
-            backgroundColor: '#161b22',
-            border: '1px solid #30363d',
+            backgroundColor: 'var(--color-bg-surface)',
+            border: '1px solid var(--color-border-subtle)',
             borderRadius: '8px',
             padding: '20px',
             display: 'flex',
@@ -1076,16 +1077,16 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
           }}
         >
           <div>
-            <h3 style={{ margin: 0, fontSize: '16px', color: '#f0f6fc' }}>
+            <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--color-text-primary)' }}>
               합성 GPU 작업 실행 성능 검증 (AC-08)
             </h3>
-            <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
+            <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: 'var(--color-text-secondary)' }}>
               FP16 GEMM 텐서 연산 벤치마크 및 VRAM 할당 격리 검증
             </p>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <label style={{ fontSize: '13px', color: '#8b949e' }}>대상 GPU 노드:</label>
+            <label style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>대상 GPU 노드:</label>
             <select
               data-testid="gpu-node-select"
               value={selectedGpuNodeId}
@@ -1093,10 +1094,10 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
               disabled={gpuNodes.length === 0}
               style={{
                 padding: '8px 12px',
-                backgroundColor: '#0d1117',
-                border: '1px solid #30363d',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-border-subtle)',
                 borderRadius: '6px',
-                color: '#c9d1d9',
+                color: 'var(--color-text-primary)',
                 fontSize: '13px',
               }}
             >
@@ -1130,9 +1131,9 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
                 padding: '10px 14px',
                 borderRadius: '6px',
                 fontSize: '12px',
-                backgroundColor: 'rgba(248, 81, 73, 0.15)',
-                border: '1px solid #f85149',
-                color: '#f85149',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-status-offline)',
+                color: 'var(--color-status-offline)',
               }}
             >
               {gpuRunError}
@@ -1146,9 +1147,9 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
                 padding: '8px 12px',
                 borderRadius: '6px',
                 fontSize: '12px',
-                backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                border: '1px solid #ef4444',
-                color: '#fca5a5',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-status-offline)',
+                color: 'var(--color-status-offline)',
               }}
             >
               ⚠️ 클러스터 내에 가용한 GPU 노드가 없습니다. (위조 노드 합성 차단)
@@ -1158,8 +1159,8 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
           {gpuResult && (
             <div
               style={{
-                backgroundColor: '#0d1117',
-                border: '1px solid #3fb950',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-status-online)',
                 borderRadius: '6px',
                 padding: '16px',
                 display: 'flex',
@@ -1168,28 +1169,28 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: '#3fb950', fontWeight: 600, fontSize: '14px' }}>
+                <span style={{ color: 'var(--color-status-online)', fontWeight: 600, fontSize: '14px' }}>
                   ✔ 합성 GPU 벤치마크 정상 완료 (Exit Code: {gpuResult.exitCode})
                 </span>
-                <span style={{ fontSize: '12px', color: '#8b949e' }}>Evidence: <code>{gpuResult.evidenceId}</code></span>
+                <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>Evidence: <code>{gpuResult.evidenceId}</code></span>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', fontSize: '13px' }}>
                 <div>
-                  <span style={{ color: '#8b949e' }}>Target GPU:</span>
-                  <div style={{ fontWeight: 600, color: '#f0f6fc' }}>{gpuResult.gpuName}</div>
+                  <span style={{ color: 'var(--color-text-secondary)' }}>Target GPU:</span>
+                  <div style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>{gpuResult.gpuName}</div>
                 </div>
                 <div>
-                  <span style={{ color: '#8b949e' }}>Allocated VRAM:</span>
-                  <div style={{ fontWeight: 600, color: '#f0f6fc' }}>{Math.round(gpuResult.vramAllocatedBytes / 1024 ** 3)} GB</div>
+                  <span style={{ color: 'var(--color-text-secondary)' }}>Allocated VRAM:</span>
+                  <div style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>{Math.round(gpuResult.vramAllocatedBytes / 1024 ** 3)} GB</div>
                 </div>
                 <div>
-                  <span style={{ color: '#8b949e' }}>Compute Throughput:</span>
-                  <div style={{ fontWeight: 600, color: '#58a6ff' }}>{gpuResult.computeThroughputTflops} TFLOPS</div>
+                  <span style={{ color: 'var(--color-text-secondary)' }}>Compute Throughput:</span>
+                  <div style={{ fontWeight: 600, color: 'var(--color-brand-hover)' }}>{gpuResult.computeThroughputTflops} TFLOPS</div>
                 </div>
                 <div>
-                  <span style={{ color: '#8b949e' }}>Completed:</span>
-                  <div style={{ color: '#c9d1d9' }}>{new Date(gpuResult.completedAt).toLocaleTimeString()}</div>
+                  <span style={{ color: 'var(--color-text-secondary)' }}>Completed:</span>
+                  <div style={{ color: 'var(--color-text-secondary)' }}>{new Date(gpuResult.completedAt).toLocaleTimeString()}</div>
                 </div>
               </div>
             </div>
@@ -1201,8 +1202,8 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       {activeSubTab === 'backup' && (
         <div
           style={{
-            backgroundColor: '#161b22',
-            border: '1px solid #30363d',
+            backgroundColor: 'var(--color-bg-surface)',
+            border: '1px solid var(--color-border-subtle)',
             borderRadius: '8px',
             padding: '20px',
             display: 'flex',
@@ -1211,37 +1212,37 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
           }}
         >
           <div>
-            <h3 style={{ margin: 0, fontSize: '16px', color: '#f0f6fc' }}>
+            <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--color-text-primary)' }}>
               재해 복구 및 WAL 백업 원장 (AC-08)
             </h3>
-            <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
+            <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: 'var(--color-text-secondary)' }}>
               PostgreSQL WAL 기반 PITR 복원 및 Fencing Epoch 단조 전진 연계
             </p>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
-            <div style={{ backgroundColor: '#0d1117', padding: '14px', borderRadius: '6px', border: '1px solid #30363d' }}>
-              <div style={{ fontSize: '12px', color: '#8b949e' }}>Latest Snapshot WAL</div>
-              <div style={{ fontSize: '18px', fontWeight: 600, color: '#f0f6fc', marginTop: '4px' }}>
+            <div style={{ backgroundColor: 'var(--color-bg-subtle)', padding: '14px', borderRadius: '6px', border: '1px solid var(--color-border-subtle)' }}>
+              <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>Latest Snapshot WAL</div>
+              <div style={{ fontSize: '18px', fontWeight: 600, color: 'var(--color-text-primary)', marginTop: '4px' }}>
                 000000010000000A0000002F
               </div>
-              <div style={{ fontSize: '11px', color: '#3fb950', marginTop: '2px' }}>4분 전 기록 (모의 시뮬레이션; 물리 WAL UNMEASURED)</div>
+              <div style={{ fontSize: '11px', color: 'var(--color-status-online)', marginTop: '2px' }}>4분 전 기록 (모의 시뮬레이션; 물리 WAL UNMEASURED)</div>
             </div>
 
-            <div style={{ backgroundColor: '#0d1117', padding: '14px', borderRadius: '6px', border: '1px solid #30363d' }}>
-              <div style={{ fontSize: '12px', color: '#8b949e' }}>RPO 달성도 (Target ≤ 15m)</div>
-              <div style={{ fontSize: '18px', fontWeight: 600, color: '#3fb950', marginTop: '4px' }}>
+            <div style={{ backgroundColor: 'var(--color-bg-subtle)', padding: '14px', borderRadius: '6px', border: '1px solid var(--color-border-subtle)' }}>
+              <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>RPO 달성도 (Target ≤ 15m)</div>
+              <div style={{ fontSize: '18px', fontWeight: 600, color: 'var(--color-status-online)', marginTop: '4px' }}>
                 4.2 분 (모의 PASS; 물리 S3 RPO UNMEASURED)
               </div>
-              <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '2px' }}>S3 복제 (모의 시뮬레이션; 물리 오프사이트 UNMEASURED)</div>
+              <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>S3 복제 (모의 시뮬레이션; 물리 오프사이트 UNMEASURED)</div>
             </div>
 
-            <div style={{ backgroundColor: '#0d1117', padding: '14px', borderRadius: '6px', border: '1px solid #30363d' }}>
-              <div style={{ fontSize: '12px', color: '#8b949e' }}>RTO 모의 추정치 (Target ≤ 60m; 물리 RTO UNMEASURED)</div>
-              <div style={{ fontSize: '18px', fontWeight: 600, color: '#58a6ff', marginTop: '4px' }}>
+            <div style={{ backgroundColor: 'var(--color-bg-subtle)', padding: '14px', borderRadius: '6px', border: '1px solid var(--color-border-subtle)' }}>
+              <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>RTO 모의 추정치 (Target ≤ 60m; 물리 RTO UNMEASURED)</div>
+              <div style={{ fontSize: '18px', fontWeight: 600, color: 'var(--color-brand-hover)', marginTop: '4px' }}>
                 12.5 분 (모의 PASS; 물리 PITR 복원 UNMEASURED)
               </div>
-              <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '2px' }}>Epoch 전진 포함 (물리 재해 복구 UNMEASURED)</div>
+              <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>Epoch 전진 포함 (물리 재해 복구 UNMEASURED)</div>
             </div>
           </div>
         </div>
@@ -1251,8 +1252,8 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       {activeSubTab === 'drain' && (
         <div
           style={{
-            backgroundColor: '#161b22',
-            border: '1px solid #30363d',
+            backgroundColor: 'var(--color-bg-surface)',
+            border: '1px solid var(--color-border-subtle)',
             borderRadius: '8px',
             padding: '20px',
             display: 'flex',
@@ -1261,10 +1262,10 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
           }}
         >
           <div>
-            <h3 style={{ margin: 0, fontSize: '16px', color: '#f0f6fc' }}>
+            <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--color-text-primary)' }}>
               클러스터 노드 Drain 및 스케줄링 통제 (ADR-054)
             </h3>
-            <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
+            <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: 'var(--color-text-secondary)' }}>
               점검 또는 장애 노드를 스케줄링에서 즉시 제외(Drain)하고 실행 중인 워크로드를 안전하게 격리합니다.
             </p>
           </div>
@@ -1275,13 +1276,13 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
               flexDirection: 'column',
               gap: '10px',
               padding: '14px',
-              backgroundColor: '#0d1117',
+              backgroundColor: 'var(--color-bg-subtle)',
               borderRadius: '6px',
-              border: '1px solid #30363d',
+              border: '1px solid var(--color-border-subtle)',
             }}
           >
             <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
-              <label style={{ fontSize: '12px', color: '#8b949e' }}>
+              <label style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
                 사유 코드 (Reason Code):
                 <select
                   data-testid="drain-reason-code-select"
@@ -1290,10 +1291,10 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
                   style={{
                     marginLeft: '8px',
                     padding: '6px 10px',
-                    backgroundColor: '#161b22',
-                    border: '1px solid #30363d',
+                    backgroundColor: 'var(--color-bg-surface)',
+                    border: '1px solid var(--color-border-subtle)',
                     borderRadius: '4px',
-                    color: '#c9d1d9',
+                    color: 'var(--color-text-primary)',
                     fontSize: '12px',
                   }}
                 >
@@ -1303,7 +1304,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
                 </select>
               </label>
 
-              <label style={{ fontSize: '12px', color: '#8b949e', flex: 1, minWidth: '320px', display: 'flex', alignItems: 'center' }}>
+              <label style={{ fontSize: '12px', color: 'var(--color-text-secondary)', flex: 1, minWidth: '320px', display: 'flex', alignItems: 'center' }}>
                 <span>승인 식별자 (Approval ID):</span>
                 <input
                   type="text"
@@ -1315,10 +1316,10 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
                     marginLeft: '8px',
                     flex: 1,
                     padding: '6px 10px',
-                    backgroundColor: '#161b22',
-                    border: `1px solid ${isValidUuid(drainApprovalId) ? '#3fb950' : '#f85149'}`,
+                    backgroundColor: 'var(--color-bg-surface)',
+                    border: `1px solid ${isValidUuid(drainApprovalId) ? 'var(--color-status-online)' : 'var(--color-status-offline)'}`,
                     borderRadius: '4px',
-                    color: '#c9d1d9',
+                    color: 'var(--color-text-primary)',
                     fontSize: '12px',
                     fontFamily: 'var(--font-mono, monospace)',
                   }}
@@ -1330,7 +1331,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
               <div
                 role="alert"
                 data-testid="drain-approval-required-notice"
-                style={{ fontSize: '12px', color: '#f85149' }}
+                style={{ fontSize: '12px', color: 'var(--color-status-offline)' }}
               >
                 ⚠️ 유효한 Containment 승인 UUID(UUIDv4) 입력이 필수입니다. 합성 UUID는 거부되며, 입력되지 않으면 노드 Drain/Resume 실행이 비활성화됩니다.
               </div>
@@ -1351,36 +1352,37 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     padding: '14px 18px',
-                    backgroundColor: '#0d1117',
-                    border: `1px solid ${isDrained ? '#f85149' : '#30363d'}`,
+                    backgroundColor: 'var(--color-bg-subtle)',
+                    border: `1px solid ${isDrained ? 'var(--color-status-offline)' : 'var(--color-border-subtle)'}`,
                     borderRadius: '6px',
                   }}
                 >
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <span style={{ fontWeight: 600, color: '#f0f6fc', fontSize: '14px' }}>
+                      <span style={{ fontWeight: 600, color: 'var(--color-text-primary)', fontSize: '14px' }}>
                         {n.hostname}
                       </span>
-                      <code style={{ fontSize: '11px', color: '#58a6ff' }}>{n.id}</code>
+                      <code style={{ fontSize: '11px', color: 'var(--color-brand-hover)' }}>{n.id}</code>
                       <span
                         style={{
                           fontSize: '11px',
                           padding: '2px 8px',
                           borderRadius: '12px',
-                          backgroundColor: isDrained ? 'rgba(248,81,73,0.2)' : 'rgba(63,185,80,0.2)',
-                          color: isDrained ? '#f85149' : '#3fb950',
+                          backgroundColor: 'var(--color-bg-surface)',
+                          border: `1px solid ${isDrained ? 'var(--color-status-offline)' : 'var(--color-status-online)'}`,
+                          color: isDrained ? 'var(--color-status-offline)' : 'var(--color-status-online)',
                           fontWeight: 600,
                         }}
                       >
                         {isDrained ? '🚨 DRAINED (스케줄링 제외)' : '✔ SCHEDULABLE (가용)'}
                       </span>
                       {n.observationOnly && (
-                        <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '12px', backgroundColor: 'rgba(210,153,34,0.2)', color: '#d29922' }}>
+                        <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '12px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-status-degraded)', color: 'var(--color-status-degraded)' }}>
                           관측 전용
                         </span>
                       )}
                     </div>
-                    <div style={{ fontSize: '12px', color: '#8b949e' }}>
+                    <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
                       {n.telemetryUnavailable ? '자원 정보 미관측' : `OS: ${n.os.toUpperCase()} • CPU: ${n.cpuCores}C (${n.cpuUsagePercent}%) • RAM: ${(n.memoryTotalBytes / 1024 ** 3).toFixed(0)} GiB`}
                       {n.gpuName && ` • GPU: ${n.gpuName}`}
                     </div>
@@ -1422,7 +1424,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(0,0,0,0.75)',
+            backgroundColor: 'var(--color-bg-backdrop)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -1436,8 +1438,8 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
             style={{
               width: '100%',
               maxWidth: '520px',
-              backgroundColor: '#161b22',
-              border: '2px solid #f85149',
+              backgroundColor: 'var(--color-bg-surface)',
+              border: '2px solid var(--color-status-offline)',
               borderRadius: '8px',
               padding: '24px',
               display: 'flex',
@@ -1445,7 +1447,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
               gap: '16px',
             }}
           >
-            <h3 id="kill-switch-modal-title" style={{ margin: 0, color: '#f85149', fontSize: '18px' }}>
+            <h3 id="kill-switch-modal-title" style={{ margin: 0, color: 'var(--color-status-offline)', fontSize: '18px' }}>
               {status.emergencyKillSwitchActive || backendKillSwitch.status === 'active'
                 ? 'Kill Switch 비활성화(해제) 확인'
                 : '🚨 [모의 시뮬레이션] 긴급 Kill Switch 발동 확인'}
@@ -1457,9 +1459,9 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
                 style={{
                   padding: '10px 14px',
                   borderRadius: '6px',
-                  backgroundColor: 'rgba(248, 81, 73, 0.15)',
-                  border: '1px solid #f85149',
-                  color: '#ff7b72',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-status-offline)',
+                  color: 'var(--color-status-offline)',
                   fontSize: '12px',
                 }}
               >
@@ -1472,9 +1474,9 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
               style={{
                 padding: '10px 14px',
                 borderRadius: '6px',
-                backgroundColor: 'rgba(234, 179, 8, 0.15)',
-                border: '1px solid #eab308',
-                color: '#fde047',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-status-degraded)',
+                color: 'var(--color-status-degraded)',
                 fontSize: '12px',
                 lineHeight: '1.5',
               }}
@@ -1488,9 +1490,9 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
                 style={{
                   padding: '8px 12px',
                   borderRadius: '6px',
-                  backgroundColor: 'rgba(248, 81, 73, 0.15)',
-                  border: '1px solid #f85149',
-                  color: '#ff7b72',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-status-offline)',
+                  color: 'var(--color-status-offline)',
                   fontSize: '12px',
                 }}
               >
@@ -1504,9 +1506,9 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
                 style={{
                   padding: '8px 12px',
                   borderRadius: '6px',
-                  backgroundColor: 'rgba(248, 81, 73, 0.15)',
-                  border: '1px solid #f85149',
-                  color: '#ff7b72',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-status-offline)',
+                  color: 'var(--color-status-offline)',
                   fontSize: '12px',
                 }}
               >
@@ -1520,29 +1522,29 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
                 flexDirection: 'column',
                 gap: '8px',
                 fontSize: '12px',
-                color: '#c9d1d9',
-                backgroundColor: '#0d1117',
+                color: 'var(--color-text-secondary)',
+                backgroundColor: 'var(--color-bg-subtle)',
                 padding: '12px 14px',
                 borderRadius: '6px',
-                border: '1px solid #30363d',
+                border: '1px solid var(--color-border-subtle)',
               }}
             >
               <div>
-                <span style={{ color: '#8b949e' }}>비상 정지 사유 (reasonCode): </span>
-                <span style={{ fontFamily: 'monospace', color: '#58a6ff' }}>{killSwitchReasonCode}</span>
+                <span style={{ color: 'var(--color-text-secondary)' }}>비상 정지 사유 (reasonCode): </span>
+                <span style={{ fontFamily: 'monospace', color: 'var(--color-brand-hover)' }}>{killSwitchReasonCode}</span>
               </div>
               <div>
-                <span style={{ color: '#8b949e' }}>승인 식별자 (approvalId): </span>
-                <span style={{ fontFamily: 'monospace', color: isValidUuid(killSwitchApprovalId.trim()) ? '#3fb950' : '#f85149' }}>
+                <span style={{ color: 'var(--color-text-secondary)' }}>승인 식별자 (approvalId): </span>
+                <span style={{ fontFamily: 'monospace', color: isValidUuid(killSwitchApprovalId.trim()) ? 'var(--color-status-online)' : 'var(--color-status-offline)' }}>
                   {killSwitchApprovalId.trim() || '(미입력 - 상단 제어바에서 설정)'}
                 </span>
               </div>
               <div>
-                <span style={{ color: '#8b949e' }}>멱등키 (Idempotency-Key): </span>
-                <span style={{ fontFamily: 'monospace', color: '#8b949e', fontSize: '11px' }}>{killSwitchIdempotencyKey}</span>
+                <span style={{ color: 'var(--color-text-secondary)' }}>멱등키 (Idempotency-Key): </span>
+                <span style={{ fontFamily: 'monospace', color: 'var(--color-text-secondary)', fontSize: '11px' }}>{killSwitchIdempotencyKey}</span>
               </div>
             </div>
-            <p style={{ margin: 0, color: '#c9d1d9', fontSize: '13px', lineHeight: '20px' }}>
+            <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '13px', lineHeight: '20px' }}>
               {status.emergencyKillSwitchActive || backendKillSwitch.status === 'active'
                 ? 'Kill Switch를 해제(재개)하면 백엔드 제어 평면 및 클러스터 보안 엔진의 작업 디스패치가 정상 재개됩니다.'
                 : 'Kill Switch를 발동하면 백엔드 제어 평면 및 프론트엔드 보안 통제 계층에서 모든 신규 작업 생성이 즉각 차단됩니다.'}
