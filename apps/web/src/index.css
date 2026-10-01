@@ -4,6 +4,7 @@
     --color-bg-canvas: #f8fafc;
     --color-bg-surface: #ffffff;
     --color-bg-subtle: #f1f5f9;
+    --color-bg-backdrop: rgba(0, 0, 0, 0.75);
     --color-border-subtle: #7b8b9e;
     --color-border-strong: #475569;
 
@@ -58,6 +59,7 @@
     --color-bg-canvas: #090d16;
     --color-bg-surface: #111827;
     --color-bg-subtle: #1f2937;
+    --color-bg-backdrop: rgba(0, 0, 0, 0.75);
     --color-border-subtle: #64748b;
     --color-border-strong: #9ca3af;
 
