@@ -215,6 +215,49 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
       expect(isValidContainmentResult(validDrainResult, 'drain', '550e8400-e29b-41d4-a716-446655440000', 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAV')).toBe(true);
       expect(isValidContainmentResult(validDrainResult, 'drain', '550e8400-e29b-41d4-a716-446655440000', 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAW')).toBe(false);
 
+      // (Codex r4) operation 'drain'인데 nodeStatus 'online'인 모순 응답 거부
+      const contradictoryDrainResultOnline: ContainmentResult = {
+        ...validDrainResult,
+        control: {
+          ...validDrainResult.control,
+          nodeStatus: 'online',
+        },
+      };
+      expect(isValidContainmentResult(contradictoryDrainResultOnline, 'drain', '550e8400-e29b-41d4-a716-446655440000', 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAV')).toBe(false);
+
+      // (Codex r4) Node-scoped resume 연산의 canonical 승인 및 nodeStatus 'draining'/'drained' 모순 응답 거부
+      const validResumeResult: ContainmentResult = {
+        requestId: 'c0000000-0000-4000-8000-000000000004',
+        operation: 'resume',
+        approvalId: '550e8400-e29b-41d4-a716-446655440000',
+        control: {
+          ...VALID_INACTIVE_VIEW,
+          nodeId: 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAV',
+          nodeStatus: 'online',
+        },
+      };
+      expect(isValidContainmentResult(validResumeResult, 'resume', '550e8400-e29b-41d4-a716-446655440000', 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAV')).toBe(true);
+
+      // operation 'resume'인데 nodeStatus 'draining'인 모순 응답 거부
+      const contradictoryResumeResultDraining: ContainmentResult = {
+        ...validResumeResult,
+        control: {
+          ...validResumeResult.control,
+          nodeStatus: 'draining',
+        },
+      };
+      expect(isValidContainmentResult(contradictoryResumeResultDraining, 'resume', '550e8400-e29b-41d4-a716-446655440000', 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAV')).toBe(false);
+
+      // operation 'resume'인데 nodeStatus 'drained'인 모순 응답 거부
+      const contradictoryResumeResultDrained: any = {
+        ...validResumeResult,
+        control: {
+          ...validResumeResult.control,
+          nodeStatus: 'drained',
+        },
+      };
+      expect(isValidContainmentResult(contradictoryResumeResultDrained, 'resume', '550e8400-e29b-41d4-a716-446655440000', 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAV')).toBe(false);
+
       // (d) 공백 포함 approvalId 거부 (whitespace rejection)
       expect(
         isValidContainmentResult(
@@ -1183,5 +1226,171 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
     });
 
     expect(fetchCallCount).toBe(0);
+  });
+
+  it('Codex r4: operation "drain" 실행 시 서버가 nodeStatus "online"인 모순 응답을 반환하면 fail-closed 에러를 표출하고 로컬 상태를 변경하지 않는다', async () => {
+    mockFetch((url) => {
+      if (url === '/v1/operations/kill-switch') {
+        return { status: 200, body: VALID_INACTIVE_VIEW };
+      }
+      if (url.includes('/control')) {
+        return {
+          status: 200,
+          body: {
+            ...VALID_INACTIVE_VIEW,
+            nodeId: 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAV',
+            nodeStatus: 'online',
+            version: 7,
+          },
+        };
+      }
+      if (url.includes('/drain')) {
+        // 모순 응답: operation은 drain인데 nodeStatus는 online!
+        return {
+          status: 200,
+          body: {
+            requestId: 'c0000000-0000-4000-8000-000000000001',
+            operation: 'drain',
+            approvalId: '550e8400-e29b-41d4-a716-446655440000',
+            control: {
+              ...VALID_INACTIVE_VIEW,
+              nodeId: 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAV',
+              nodeStatus: 'online', // 모순!
+              version: 8,
+            },
+          },
+        };
+      }
+      return { status: 404, body: {} };
+    });
+
+    await act(async () => {
+      root.render(
+        <AdminSecurityConsole
+          nodes={MOCK_NODES}
+          currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+        />
+      );
+    });
+
+    const drainTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('노드 Drain 통제')
+    );
+    await act(async () => {
+      drainTabBtn?.click();
+    });
+
+    const drainApprovalInput = container.querySelector('[data-testid="drain-approval-id-input"]') as HTMLInputElement;
+    await act(async () => {
+      const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+      nativeSetter?.call(drainApprovalInput, '550e8400-e29b-41d4-a716-446655440000');
+      drainApprovalInput.dispatchEvent(new Event('input', { bubbles: true }));
+      drainApprovalInput.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    const drainBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('Node Drain')
+    ) as HTMLButtonElement;
+
+    await act(async () => {
+      drainBtn.click();
+    });
+
+    const banner = container.querySelector('[data-testid="admin-drain-error-banner"]');
+    expect(banner).not.toBeNull();
+    expect(banner?.textContent).toContain('ContainmentResult 규격 불일치');
+
+    // 로컬 상태가 변경되지 않았음을 단언 (여전히 Node Drain 버튼 노출)
+    const drainBtnAfter = Array.from(container.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('Node Drain')
+    );
+    expect(drainBtnAfter).not.toBeNull();
+  });
+
+  it('Codex r4: operation "resume" 실행 시 서버가 nodeStatus "draining"인 모순 응답을 반환하면 fail-closed 에러를 표출하고 로컬 상태를 변경하지 않는다', async () => {
+    // 노드가 이미 draining 상태인 노드 목록
+    const DRAINING_NODES: NodeItem[] = [
+      {
+        ...MOCK_NODES[0],
+        status: 'draining',
+      },
+    ];
+
+    mockFetch((url) => {
+      if (url === '/v1/operations/kill-switch') {
+        return { status: 200, body: VALID_INACTIVE_VIEW };
+      }
+      if (url.includes('/control')) {
+        return {
+          status: 200,
+          body: {
+            ...VALID_INACTIVE_VIEW,
+            nodeId: 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAV',
+            nodeStatus: 'draining',
+            version: 7,
+          },
+        };
+      }
+      if (url.includes('/resume')) {
+        // 모순 응답: operation은 resume인데 nodeStatus는 draining!
+        return {
+          status: 200,
+          body: {
+            requestId: 'c0000000-0000-4000-8000-000000000002',
+            operation: 'resume',
+            approvalId: '550e8400-e29b-41d4-a716-446655440000',
+            control: {
+              ...VALID_INACTIVE_VIEW,
+              nodeId: 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAV',
+              nodeStatus: 'draining', // 모순!
+              version: 8,
+            },
+          },
+        };
+      }
+      return { status: 404, body: {} };
+    });
+
+    await act(async () => {
+      root.render(
+        <AdminSecurityConsole
+          nodes={DRAINING_NODES}
+          currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+        />
+      );
+    });
+
+    const drainTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('노드 Drain 통제')
+    );
+    await act(async () => {
+      drainTabBtn?.click();
+    });
+
+    const drainApprovalInput = container.querySelector('[data-testid="drain-approval-id-input"]') as HTMLInputElement;
+    await act(async () => {
+      const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+      nativeSetter?.call(drainApprovalInput, '550e8400-e29b-41d4-a716-446655440000');
+      drainApprovalInput.dispatchEvent(new Event('input', { bubbles: true }));
+      drainApprovalInput.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    const resumeBtn = (container.querySelector(`[data-testid="drain-node-btn-${DRAINING_NODES[0].id}"]`) ||
+      Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('Drain 해제')
+      )) as HTMLButtonElement;
+    expect(resumeBtn).not.toBeNull();
+
+    await act(async () => {
+      resumeBtn.click();
+    });
+
+    const banner = container.querySelector('[data-testid="admin-drain-error-banner"]');
+    expect(banner).not.toBeNull();
+    expect(banner?.textContent).toContain('ContainmentResult 규격 불일치');
+
+    // 로컬 상태가 변경되지 않았음을 단언 (여전히 Drain 해제 버튼 노출)
+    const resumeBtnAfter = container.querySelector(`[data-testid="drain-node-btn-${DRAINING_NODES[0].id}"]`);
+    expect(resumeBtnAfter?.textContent).toContain('Drain 해제');
   });
 });

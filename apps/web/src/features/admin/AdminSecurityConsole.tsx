@@ -107,12 +107,27 @@ export function isValidContainmentResult(
     if (res.control.nodeId !== null) return false;
     const expectedKillSwitchActive = expectedOperation === 'kill';
     if (res.control.killSwitchActive !== expectedKillSwitchActive) return false;
-  } else {
-    // Node-scoped operations (drain/resume)
+  } else if (expectedOperation === 'drain') {
+    // Node-scoped drain: nodeId 일치 & control.nodeStatus 정본 상태 전이 검증 (draining | drained)
     if (expectedNodeId !== undefined) {
       if (res.control.nodeId !== expectedNodeId) return false;
     } else {
       if (res.control.nodeId === null || !isValidNodeId(res.control.nodeId)) return false;
+    }
+    // operation 'drain'인데 nodeStatus 'online' 등 모순 응답 거부
+    if (res.control.nodeStatus !== 'draining' && (res.control.nodeStatus as string) !== 'drained') {
+      return false;
+    }
+  } else if (expectedOperation === 'resume') {
+    // Node-scoped resume: nodeId 일치 & control.nodeStatus 정본 상태 전이 검증 (online)
+    if (expectedNodeId !== undefined) {
+      if (res.control.nodeId !== expectedNodeId) return false;
+    } else {
+      if (res.control.nodeId === null || !isValidNodeId(res.control.nodeId)) return false;
+    }
+    // operation 'resume'인데 nodeStatus 'draining', 'drained' 등 모순 응답 거부
+    if (res.control.nodeStatus !== 'online') {
+      return false;
     }
   }
 
