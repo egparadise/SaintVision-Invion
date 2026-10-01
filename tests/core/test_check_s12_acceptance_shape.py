@@ -500,6 +500,56 @@ def test_the_opt_out_is_explicit_and_says_so_in_the_output(tmp_path, capsys):
     assert summary["status"].startswith("head binding NOT checked")
 
 
+# ---------------------------------------------------------------------------- the lane
+
+
+def collector_step():
+    """The lane step that runs the collector, read from the workflow this gate serves."""
+
+    import yaml
+
+    document = yaml.safe_load(
+        (ROOT / ".github/workflows/s12-acceptance-evidence.yml").read_text(encoding="utf-8")
+    )
+    steps = document["jobs"]["s12-acceptance-evidence"]["steps"]
+    return next(step for step in steps if step.get("name", "").startswith("Derive the AC-12"))
+
+
+def test_the_lane_continues_on_every_exit_code_that_is_a_verdict():
+    """The collector's exit code *is* its verdict, and a verdict is not a lane failure.
+
+    This test is here, with the gate's, because it is the same mistake in a different file:
+    the step used to run the collector bare under ``bash -e``, with a comment claiming it
+    "exits 0 having recorded" a FAIL. ``EXIT_BY_VERDICT`` maps FAIL to 1. Run 36851234615
+    derived all seventeen items, wrote the bundle and uploaded it -- then failed the step, so
+    the gate was skipped and nothing was judged. Reading both the workflow and the collector's
+    own table is what keeps the two from drifting apart again.
+    """
+    import re
+
+    from collect_s12_acceptance_evidence import EXIT_BY_VERDICT
+
+    script = collector_step()["run"]
+    arms = re.findall(r"^\s*([0-9|]+)\)", script, re.MULTILINE)
+    assert arms, "the step does not decide anything about the exit code"
+    tolerated = {code for arm in arms for code in arm.split("|")}
+    for verdict, code in sorted(EXIT_BY_VERDICT.items()):
+        assert str(code) in tolerated, f"a {verdict} verdict (exit {code}) would fail the lane"
+    # 2 is the collector declining to measure at all -- a dirty tree, an unreachable head, no
+    # DSN. There is no bundle then, and the job must say so rather than continue.
+    assert "2" not in tolerated
+
+
+def test_the_gate_step_passes_this_head_to_the_checker():
+    """The binding is only real if the lane actually passes it."""
+
+    document_steps = __import__("yaml").safe_load(
+        (ROOT / ".github/workflows/s12-acceptance-evidence.yml").read_text(encoding="utf-8")
+    )["jobs"]["s12-acceptance-evidence"]["steps"]
+    gate = next(s for s in document_steps if "check_s12_acceptance_shape.py" in (s.get("run") or ""))
+    assert '--expected-head "$SOURCE_HEAD_SHA"' in gate["run"]
+
+
 # ---------------------------------------------------------------------------- the summary
 
 

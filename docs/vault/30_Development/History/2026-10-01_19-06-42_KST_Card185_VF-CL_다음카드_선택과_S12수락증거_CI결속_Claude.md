@@ -1,12 +1,12 @@
 ---
 doc_id: "HISTORY-VF-CL-NEXT-CARD-20261001"
 title: "VF-CL 다음 준비 카드 선택과 VF-CL-04의 ciVerified 공백 해소 — 수락 증거를 사람이 아니라 CI가 도출하게 (카드 185)"
-version: "1.1.0"
+version: "1.2.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-01T19:44:04+09:00"
+updated: "2026-10-01T19:51:27+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "8d5a7d9b"
@@ -164,10 +164,32 @@ Codex의 probe를 그대로 다시 만들어 **옛 gate(`50242e74`)에 걸어 �
 
 | 항목 | 결과 |
 |---|---|
-| gate 시험 | `tests/core/test_check_s12_acceptance_shape.py` **88 passed**(24 → 88) |
+| gate 시험 | `tests/core/test_check_s12_acceptance_shape.py` **90 passed**(24 → 90) |
 | 역방향 ratchet | `tests/core/test_post_landing_verify.py` **97 passed** — 이 workflow는 push trigger가 없으므로 lane을 지지 않는다(그대로다) |
 | 실제 묶음 | 기준 head의 로컬 묶음(17항목, verdict `FAIL`)을 새 gate에 걸어 **통과**. CI가 넘기지 않는 flag 하나(`unpushedHeadAllowed`)만 CI 모양으로 맞췄다 |
 | 가짜 묶음 | 위 사다리 8줄, 한 번에 한 가지씩 |
-| dispatch | **이 commit을 담은 head에서 1회** — run id와 artifact는 PR 코멘트에 적는다. commit이 자기 자신의 run id를 담을 수는 없다 |
+| dispatch | run **36851234615**(`76a14697`): migration·reachability 통과, 17항목 도출, artifact 생성 — 그리고 **§7-5**의 이유로 수집기 단계가 실패했다. 고친 뒤 다시 1회 돌린다. run id는 PR 코멘트에 적는다 — commit이 자기 자신의 run id를 담을 수는 없다 |
+
+
+### 7-5. 첫 dispatch가 하나를 더 드러냈다 — 내가 적은 주석이 틀렸다
+
+run **36851234615**(head `76a14697`)에서 `Apply the published migrations`는 **통과했다**(F-R1 해소). reachability 단계도 통과했고 묶음의 `remoteReachable`은 **true**다. 수집기는 **17개 항목을 전부 도출하고 묶음을 쓰고 artifact까지 올렸다** — 그리고 그 단계가 **exit 1로 실패**해서 gate 단계가 skip됐다.
+
+원인은 내가 그 단계에 적은 주석이다: *"the collector exits 0 having recorded it."* **거짓이다.** `EXIT_BY_VERDICT`는 `FAIL`을 **1**로 보내고, `FAIL`은 오늘의 정직한 verdict다. **도구의 exit 표를 읽지 않고 도구의 모양에서 exit code를 단언했다** — 이 branch에서 내가 반복해서 지적받은 바로 그 형태이고, 이번에는 lane을 하루 더 빨간색으로 두는 값이었다.
+
+고친 방식은 **verdict와 "측정 거부"를 구분하는 것**이다:
+
+| exit | 뜻 | lane |
+|---|---|---|
+| 0 | `PASS` / `PASS_MEASURED_PARTIAL` | gate로 넘어간다 |
+| 1 | `FAIL` | gate로 넘어간다 — **도달한 답이다** |
+| 3 | `NOT_OBSERVED` | gate로 넘어간다 |
+| 2 | 더러운 tree·닿지 않는 head·DSN 없음·덮어쓰기 거부 | **job 실패** — 판정할 묶음이 아예 없다 |
+
+시험 `test_the_lane_continues_on_every_exit_code_that_is_a_verdict`가 workflow의 `case` 가지와 수집기의 `EXIT_BY_VERDICT`를 **양쪽에서 읽어** 비교한다. 둘이 다시 갈라지면 시험이 죽는다. `2`가 허용 목록에 **없는 것**도 같이 단언한다.
+
+**그 run의 artifact를 내려받아 새 gate를 CI가 만든 묶음에 직접 걸었다**(gate가 CI에서 skip됐으므로): exit 0, `codeSha` = `76a14697…` = `--expected-head`, 파일 이름도 같은 head, `verdict FAIL` = 재계산값, 17항목 전부, `collectorSha256`이 이 tree의 수집기와 **일치**, `remoteReachable: true`, `working_tree_clean_status: true`, opt-out 기록 0. 묶음의 항목 분포는 로컬과 같았다(`PASS` 3, `FAIL` 6, `NOT_OBSERVED` 1, `BLOCKED_EXTERNAL` 7).
+
+즉 **provenance 결속이 CI에서 실제로 성립한다는 것은 추측이 아니라 CI가 만든 그 묶음으로 확인했다.** 남은 것은 gate가 CI **안에서** 그 묶음을 읽는 것이고, 그것이 다음 dispatch다.
 
 레지스트리 `VF-CL-04.ciVerified`는 **그대로 false**이고, 이 묶음은 **수락이 아니다**(`acceptanceClaim`은 언제나 `false`). r1에서 바뀐 것은 lane이 실제로 돌게 된 것과 gate가 손으로 적은 묶음을 거부하게 된 것뿐이다.
