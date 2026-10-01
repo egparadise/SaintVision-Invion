@@ -1,0 +1,37 @@
+---
+doc_id: "HISTORY-20261001-CARD162-AC11-SECURITY-LANDING-SHA-CODEX"
+title: "CARD-162 AC-11 security critical/high 착지 SHA 실행과 PyJWT 교정"
+version: "1.0.0"
+status: "in_progress"
+author: "Codex"
+reviewer: "Claude"
+updated: "2026-10-01T09:10:32+09:00"
+timezone: "Asia/Seoul"
+source_of_truth: "Git"
+task_id: "S11-BE"
+acceptance_id: "AC-11"
+tags: ["S11", "AC-11", "security", "landing-sha", "pip-audit", "PyJWT"]
+---
+
+# CARD-162 AC-11 security landing SHA 증거
+
+## 선택 근거
+
+기준은 `origin/integration/all-agents-unified`의 `6fc0428b49f28379cb4da17830d92256b55c2eb2`다. #258 v1.6 §4-3-3은 AC-11 security 축의 다음 판정 조건을 **착지 tree SHA에서의 실행 기록 1건**으로 특정한다. producer `tools/run_ac11_security_scan.py`, importer `tools/import_ac11_security_scan.py`, opt-in workflow `.github/workflows/ac11-security-scan.yml`은 이미 기준 tree에 있으므로 추가 PC·CP·hosts·실 PG 없이 실행할 수 있다. 이 이유로 외부 전제 없는 Codex 고난도 후속 중 이 항목을 먼저 선택했다.
+
+## 첫 착지 SHA 실행 — MEASURED_FAIL
+
+- `workflow_dispatch`, ref `integration/all-agents-unified`, run `36794567345`, head `6fc0428b49f28379cb4da17830d92256b55c2eb2`를 실행했다.
+- artifact `11132897489`의 이름은 `s11-ac11-security-6fc0428b49f28379cb4da17830d92256b55c2eb2`, GitHub digest는 `sha256:a0ec166d2263df013fd88897228d84cacb5faa906d5f249989dc23d10f950d4b`, 만료는 2026-10-31T00:08:07Z다.
+- report는 clean checkout·동일 source SHA·dependency 41개·Python 192파일을 결속했다. Bandit HIGH 0과 달리 `pip-audit`가 PyJWT 2.13.0의 allowlist 밖 HIGH 13건을 검출했다. producer는 `MEASURED_FAIL / UNALLOWLISTED_CRITICAL_HIGH`, JUnit은 4 tests / 1 failure로 보존했고 workflow gate는 exit 1이었다.
+- 이 실패는 실행 경로 결함이나 미관측이 아니다. landing tree의 실제 dependency finding이며 PASS로 세지 않는다.
+
+## 교정 결정
+
+- finding 13건을 allowlist에 넣지 않는다. PyPI의 현재 signed release와 upstream security changelog를 대조해 runtime과 scanner 입력의 exact pin을 PyJWT 2.15.1로 함께 올린다.
+- `tests/test_ac11_security_scan.py`에 두 pin의 동일성과 2.13.0 잔존 금지를 고정한다. 공개 HTTP·JSON Schema·ProblemDetails·migration 표면은 바뀌지 않는다.
+- PR head에서 focused identity/security 시험과 opt-in scan을 통과시켜도 **착지 SHA 조건은 아직 미충족**이다. 이 변경이 integration에 착지한 뒤 그 SHA로 같은 workflow를 다시 dispatch하고 importer로 artifact metadata·zip digest를 결속해야 조건이 닫힌다.
+
+## 상태
+
+S11-BE는 75, AC-11 전체는 미완료다. 첫 실패와 후속 성공을 모두 남기며, 운영 또는 landing 증거를 PR head 증거로 소급 대체하지 않는다.
