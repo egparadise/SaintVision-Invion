@@ -1,0 +1,121 @@
+{
+  "$defs": {
+    "ReleaseComponentResponse": {
+      "additionalProperties": false,
+      "description": "One pinned component of a release.\n\nEvery entry carries a digest because the manifest hash covers the list: a\nname is not an identity, so \"we shipped R4\" has to be checkable rather than\nasserted (``operations_pilot.ReleaseManifest``).",
+      "properties": {
+        "digest": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Digest",
+          "type": "string"
+        },
+        "kind": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Kind",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "kind",
+        "digest"
+      ],
+      "title": "ReleaseComponentResponse",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "A recorded release, and what is recorded about accepting it.\n\n``operatorSignOff`` is **``Literal[False]``**: this reader cannot emit true,\nand the contract says so rather than the docstring promising it.\n\nThe first version of this model computed it from the acceptance rows and\ncalled an ``accepted`` row with a matching hash a sign-off, on the reasoning\nthat ``acceptance_records.accepted_by_user_id`` is a foreign key to ``users``\nso \"the system cannot sign its own acceptance\". **That reasoning was wrong,\nand Codex measured it**: ``users`` draws no line between a person and a\nservice -- ``identity.py`` builds a Principal from any ``external_subject``\n-- and the foreign key proves only that the row names a user that exists. A\nprincipal whose subject was ``svc:release-bot`` wrote an ``accepted`` row and\nthe field read true. A key that proves existence was read as proof of\nhumanity.\n\nSo the field is pinned false, and the two counts beside it say different\nthings on purpose, by the coordinator's decision of 2026-10-01:\n\n* ``confirmedOperatorCount`` is **distinct operators whose decision a person\n  is attested to have made**, as the write contract (``#282``, card 184)\n  defines attestation. That implementation does not exist yet, so on this\n  read surface the field is ``Literal[0]``. It is not \"no acceptances\"; it is\n  \"no decision here has been attested to a person\";\n* ``matchingAcceptedUserCount`` is the **raw recorded fact**: distinct user\n  ids with an ``accepted`` row pinning this manifest's hash. A service\n  principal can be one of them, which is precisely why it is a different\n  field with a different name. The first version of this model called this\n  count ``confirmedOperatorCount``, which read as though a person had been\n  confirmed.\n\n``requiredDistinctOperatorCount`` is the quorum, so a reader sees \"0 of 2\"\nand can tell it apart from \"1 of 2\".",
+  "properties": {
+    "acceptanceCount": {
+      "minimum": 0,
+      "title": "Acceptancecount",
+      "type": "integer"
+    },
+    "componentCount": {
+      "minimum": 1,
+      "title": "Componentcount",
+      "type": "integer"
+    },
+    "components": {
+      "items": {
+        "$ref": "#/$defs/ReleaseComponentResponse"
+      },
+      "maxItems": 512,
+      "title": "Components",
+      "type": "array"
+    },
+    "confirmedOperatorCount": {
+      "const": 0,
+      "title": "Confirmedoperatorcount",
+      "type": "integer"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "title": "Createdat",
+      "type": "string"
+    },
+    "manifestSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Manifestsha256",
+      "type": "string"
+    },
+    "matchingAcceptedUserCount": {
+      "minimum": 0,
+      "title": "Matchingacceptedusercount",
+      "type": "integer"
+    },
+    "operatorSignOff": {
+      "const": false,
+      "title": "Operatorsignoff",
+      "type": "boolean"
+    },
+    "operatorSignOffBlockedBy": {
+      "const": "human-attestation-implementation-unavailable",
+      "title": "Operatorsignoffblockedby",
+      "type": "string"
+    },
+    "releaseId": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Releaseid",
+      "type": "string"
+    },
+    "requiredDistinctOperatorCount": {
+      "const": 2,
+      "title": "Requireddistinctoperatorcount",
+      "type": "integer"
+    },
+    "version": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "releaseId",
+    "version",
+    "componentCount",
+    "manifestSha256",
+    "components",
+    "createdAt",
+    "operatorSignOff",
+    "operatorSignOffBlockedBy",
+    "requiredDistinctOperatorCount",
+    "confirmedOperatorCount",
+    "matchingAcceptedUserCount",
+    "acceptanceCount"
+  ],
+  "title": "ReleaseManifestResponse",
+  "type": "object"
+}

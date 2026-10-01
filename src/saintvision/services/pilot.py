@@ -37,7 +37,7 @@ from ..db.models import (
     StorageCheck,
     StorageContribution,
 )
-from ..errors import RES_ARTIFACT_NOT_FOUND, VAL_SCHEMA, InvError
+from ..errors import RES_ARTIFACT_NOT_FOUND, RES_RELEASE_NOT_FOUND, VAL_SCHEMA, InvError
 from ..ids import new_id
 
 BACKUP_KINDS = ("base", "wal", "logical")
@@ -609,4 +609,239 @@ def pilot_readiness(
             "physical Node and authenticated browser acceptance",
         ],
         "evidenceComplete": False,
+    }
+
+
+#: A read page is bounded so a tenant with a long release history cannot be
+#: asked for all of it in one request. The ceiling is the contract's, not a
+#: preference: ``ReleaseManifestPageResponse`` declares ``max_length=200``.
+RELEASE_PAGE_MAX = 200
+RELEASE_PAGE_DEFAULT = 50
+
+
+def _release_components(manifest: ReleaseManifest) -> list[dict]:
+    """The pinned component list, with entries that are not a mapping dropped.
+
+    ``components`` is JSONB, so the column can hold a shape the current writer
+    would never produce -- an older row, or a hand-edited one. A reader that
+    assumed the shape would turn that into a 500; dropping the entry keeps the
+    answer honest about what the row contains, and ``componentCount`` is read
+    from its own column so the discrepancy stays visible rather than being
+    papered over.
+    """
+
+    rows = manifest.components if isinstance(manifest.components, list) else []
+    components = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        name, kind, digest = row.get("name"), row.get("kind"), row.get("digest")
+        if not all(isinstance(value, str) and value for value in (name, kind, digest)):
+            continue
+        components.append({"name": name, "kind": kind, "digest": digest})
+    return components
+
+
+#: The quorum the write contract (``#282``, card 184) requires before a sign-off
+#: exists at all. Named here so this reader reports "1 of 2" instead of a count
+#: whose target lives only in a design document.
+REQUIRED_DISTINCT_OPERATOR_COUNT = 2
+
+#: Why ``operatorSignOff`` is false on every row this module produces. The write
+#: contract for human attestation exists (``#282``, card 184); what is absent is an
+#: implementation of it, and the value names that rather than leaving a reader to
+#: decide whether "false" means nobody signed or this surface cannot tell.
+OPERATOR_SIGN_OFF_BLOCKED_BY = "human-attestation-implementation-unavailable"
+
+#: Distinct operators whose decision is attested to a person. Zero, as a constant,
+#: because the attestation this counts is ``#282``'s and nothing implements it yet.
+#: It is not computed from the rows: no arrangement of rows this module can read
+#: would make it anything else, and a function would invite someone to try.
+CONFIRMED_OPERATOR_COUNT = 0
+
+
+def matching_accepted_user_count(
+    manifest: ReleaseManifest, acceptances: list[AcceptanceRecord]
+) -> int:
+    """How many **distinct user ids** have an ``accepted`` row pinning this composition.
+
+    The recorded fact, and the name says only what is recorded. Two earlier names
+    for this number were both wrong, each in a way worth keeping visible:
+
+    * ``operator_sign_off``, returning true from exactly this condition on the
+      reasoning that ``accepted_by_user_id`` is a foreign key to ``users`` and so
+      "the system cannot sign its own acceptance". **Codex measured that and it is
+      false**: ``users`` does not distinguish a person from a service, a Principal
+      is built from any ``external_subject``, and the key proves only that the
+      referenced row exists. A subject of ``svc:release-bot`` produced a true
+      sign-off;
+    * ``confirmed_operator_count``, which fixed the boolean but kept the word
+      "operator" over a number a service account can raise. The coordinator
+      reserved ``confirmedOperatorCount`` for human-attested operators (``#282``)
+      and this count took a name that claims nothing.
+
+    Distinct ids rather than rows, because the unique constraint is on (release,
+    criterion) and counting rows would let one account reach a quorum by itself.
+    """
+
+    return len({
+        str(record.accepted_by_user_id)
+        for record in acceptances
+        if record.outcome == "accepted"
+        and str(record.accepted_manifest_sha256) == str(manifest.manifest_sha256)
+    })
+
+
+def _acceptance_payload(record: AcceptanceRecord, manifest: ReleaseManifest) -> dict:
+    limitations = record.known_limitations if isinstance(record.known_limitations, list) else []
+    return {
+        "acceptanceId": record.acceptance_id,
+        "acceptanceIdRef": record.acceptance_id_ref,
+        "outcome": record.outcome,
+        "acceptedManifestSha256": record.accepted_manifest_sha256,
+        "manifestMatches": str(record.accepted_manifest_sha256)
+        == str(manifest.manifest_sha256),
+        "knownLimitations": [item for item in limitations if isinstance(item, str)],
+        "decidedAt": record.decided_at,
+    }
+
+
+def _manifest_payload(manifest: ReleaseManifest, acceptances: list[AcceptanceRecord]) -> dict:
+    """The recorded release. ``operatorSignOff`` and ``confirmedOperatorCount`` are literals.
+
+    Not computations that currently evaluate to false and zero -- the literals.
+    There is no input to this function that can change either, which is the
+    point: a reader of the code should not have to work out whether some row
+    could flip them. The number that does move with the rows is
+    ``matchingAcceptedUserCount``, and its name says what it counts.
+    """
+
+    return {
+        "releaseId": manifest.release_id,
+        "version": manifest.version,
+        "componentCount": int(manifest.component_count),
+        "manifestSha256": manifest.manifest_sha256,
+        "components": _release_components(manifest),
+        "createdAt": manifest.created_at,
+        "operatorSignOff": False,
+        "operatorSignOffBlockedBy": OPERATOR_SIGN_OFF_BLOCKED_BY,
+        "requiredDistinctOperatorCount": REQUIRED_DISTINCT_OPERATOR_COUNT,
+        "confirmedOperatorCount": CONFIRMED_OPERATOR_COUNT,
+        "matchingAcceptedUserCount": matching_accepted_user_count(manifest, acceptances),
+        "acceptanceCount": len(acceptances),
+    }
+
+
+#: The three reads below are built by named functions rather than inline, so a test
+#: can compile each one and assert the tenant predicate is in the SQL.
+#:
+#: Why that matters: row-level security also restricts these tables, so deleting an
+#: explicit ``tenant_id ==`` condition leaves the cross-tenant test passing -- RLS
+#: catches it and the assertion that was supposed to catch it never fires. Codex
+#: measured exactly that. Defence in depth is worth having, but a layer no test can
+#: see is a layer that can be deleted by accident, and then only RLS stands between a
+#: bug and a cross-tenant read. Compiling the statement tests the layer itself.
+
+
+def release_page_query(*, tenant_id, cursor: str | None = None, limit: int = 50):
+    """The page read. Named so its SQL can be compiled and asserted."""
+
+    query = select(ReleaseManifest).where(ReleaseManifest.tenant_id == tenant_id)
+    if cursor:
+        query = query.where(ReleaseManifest.release_id < cursor)
+    return query.order_by(ReleaseManifest.release_id.desc()).limit(limit)
+
+
+def release_detail_query(*, tenant_id, release_id: str):
+    """The single-release read. Named for the same reason."""
+
+    return select(ReleaseManifest).where(
+        ReleaseManifest.tenant_id == tenant_id,
+        ReleaseManifest.release_id == release_id,
+    )
+
+
+def acceptances_query(*, tenant_id, release_ids: list[str]):
+    """The acceptance read. Named for the same reason."""
+
+    return (
+        select(AcceptanceRecord)
+        .where(
+            AcceptanceRecord.tenant_id == tenant_id,
+            AcceptanceRecord.release_id.in_(release_ids),
+        )
+        .order_by(AcceptanceRecord.decided_at, AcceptanceRecord.acceptance_id)
+    )
+
+
+def _acceptances_for(session: Session, *, tenant_id, release_ids: list[str]) -> dict[str, list]:
+    """Every acceptance row for these releases, grouped, in one query.
+
+    One query rather than one per release: a page of fifty releases would
+    otherwise be fifty-one round trips, and the page size is bounded precisely
+    so this stays a single bounded read.
+    """
+
+    if not release_ids:
+        return {}
+    rows = session.scalars(
+        acceptances_query(tenant_id=tenant_id, release_ids=release_ids)
+    ).all()
+    grouped: dict[str, list] = {release_id: [] for release_id in release_ids}
+    for row in rows:
+        grouped.setdefault(str(row.release_id), []).append(row)
+    return grouped
+
+
+def release_manifest_page(
+    session: Session,
+    *,
+    tenant_id,
+    limit: int = RELEASE_PAGE_DEFAULT,
+    cursor: str | None = None,
+) -> dict:
+    """A bounded page of recorded releases, newest first.
+
+    A tenant with no releases is an empty list. That is not a 404: the question
+    "what has been released here" has an answer, and the answer is "nothing
+    yet". Returning a not-found for it would make an empty pilot
+    indistinguishable from a tenant the caller cannot see.
+    """
+
+    bounded = max(1, min(int(limit), RELEASE_PAGE_MAX))
+    manifests = session.scalars(
+        release_page_query(tenant_id=tenant_id, cursor=cursor, limit=bounded + 1)
+    ).all()
+    page = list(manifests[:bounded])
+    acceptances = _acceptances_for(
+        session, tenant_id=tenant_id, release_ids=[str(row.release_id) for row in page]
+    )
+    return {
+        "items": [
+            _manifest_payload(row, acceptances.get(str(row.release_id), [])) for row in page
+        ],
+        "nextCursor": str(page[-1].release_id) if len(manifests) > bounded and page else None,
+    }
+
+
+def release_manifest_detail(session: Session, *, tenant_id, release_id: str) -> dict:
+    """One release and every acceptance decision recorded against it.
+
+    A release in another tenant is the same ``RES-RELEASE-NOT-FOUND`` as one
+    that does not exist -- the row is not visible under this tenant's scope, and
+    saying "exists but not yours" would answer a question the caller is not
+    allowed to ask.
+    """
+
+    manifest = session.scalars(
+        release_detail_query(tenant_id=tenant_id, release_id=release_id)
+    ).first()
+    if manifest is None:
+        raise InvError(RES_RELEASE_NOT_FOUND, "release manifest not found", status=404)
+    acceptances = _acceptances_for(
+        session, tenant_id=tenant_id, release_ids=[str(manifest.release_id)]
+    ).get(str(manifest.release_id), [])
+    return {
+        "release": _manifest_payload(manifest, acceptances),
+        "acceptances": [_acceptance_payload(row, manifest) for row in acceptances],
     }
