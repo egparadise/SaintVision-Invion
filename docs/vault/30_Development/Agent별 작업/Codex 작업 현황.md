@@ -1,15 +1,23 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.260"
+version: "1.0.261"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T04:12:15+09:00"
+updated: "2026-10-02T06:45:07+09:00"
 source_of_truth: "Git"
-active_card: "CARD-200 S08-BE concrete rootless BuildKit transport stage 1"
-active_card_status: "Hosted ci-reference OCI roundtrip MEASURED_PASS at run 36912381153; product dispatch remains disabled"
-active_card_next: "Claude r2 review; later bind operational builder, cleanup, lease release, and durable Evidence"
+active_card: "CARD-209 intranet Keycloak fresh-auth live mapper read-back"
+active_card_status: "Live mapper and execution-reference drift 0; idempotent apply measured without user mutation"
+active_card_next: "Claude independent review; OTP enrollment and exact token claim observation remain human/external"
 ---
+
+## 2026-10-02 Card 209 — 사내망 Keycloak fresh-auth mapper 적용·read-back
+
+- `fresh-auth-only` 모드는 user credential을 읽거나 사용자·realm·client 일반 설정을 바꾸지 않고
+  mapper/reference 네 항목만 재적용한다. pre-apply 네 항목 drift를 기록하고 보호 백업 뒤 실행했다.
+- 첫 apply·동일 명령 재실행·live checker가 모두 exit 0, post drift 0이었다. 비밀 출력과 사용자 변경은
+  0이며 OTP 등록·실 token claim 관측은 하지 않아 `NOT_OBSERVED`로 남긴다.
+- [[2026-10-02_06-45-07_KST_Card209_IdP_fresh_auth_live_readback_Codex]].
 
 ## 2026-10-01 Card 194 — S12 acceptance target·Evidence resolver 구현
 
