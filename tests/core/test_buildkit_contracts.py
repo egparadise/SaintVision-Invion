@@ -164,6 +164,30 @@ def test_build_contract_patterns_stay_go_re2_compatible():
     assert all("(?" not in pattern for pattern in patterns(build_defs))
 
 
+def test_build_contract_enum_vocabularies_are_literal_and_complete():
+    schema = json.loads(
+        (ROOT / "contracts" / "v1alpha1" / "core.schema.json").read_text(encoding="utf-8")
+    )
+    defs = schema["$defs"]
+    assert defs["BuildPlan"]["properties"]["networkMode"]["enum"] == ["none", "allowlist"]
+    assert defs["BuildCleanupReceipt"]["properties"]["cacheDisposition"]["enum"] == [
+        "retained",
+        "quarantined",
+        "purged",
+    ]
+    assert defs["BuildResult"]["enum"] == ["succeeded", "failed", "cancelled"]
+    assert defs["BuildAuditEvent"]["properties"]["event"]["enum"] == [
+        "request_validated",
+        "policy_bound",
+        "builder_claimed",
+        "build_started",
+        "network_decision",
+        "output_verified",
+        "build_cancelled",
+        "cleanup_verified",
+    ]
+
+
 @pytest.mark.parametrize("contract,factory", [("BuildRequest", _request), ("BuildPlan", _plan), ("BuildReceipt", _receipt)])
 def test_build_contract_positive_controls_and_every_top_level_field_is_required(contract, factory):
     value = factory()

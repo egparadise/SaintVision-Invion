@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-S08-BE-BUILDKIT-CONTRACT-20261001"
 title: "S08-BE BuildKit 계약 경계 구현"
-version: "1.0.1"
+version: "1.0.2"
 status: "in_progress"
 author: "Codex"
-updated: "2026-10-01T14:13:24+09:00"
+updated: "2026-10-01T14:19:55+09:00"
 source_of_truth: "Git"
 ---
 
@@ -40,7 +40,7 @@ source_of_truth: "Git"
 
 ## 검증
 
-- `python -m pytest tests/core/test_buildkit_contracts.py -q` → **54 passed**.
+- `python -m pytest tests/core/test_buildkit_contracts.py -q` → **55 passed**.
 - `python tools/generate_contracts.py` → 생성 완료; 생성 직후 정본 schema와 Python·
   TypeScript·Go·Node mirror가 동일 입력에서 재생성됐다.
 - `npx --yes --package typescript@5.9.3 tsc --noEmit --strict packages/contracts-ts/src/index.ts`
@@ -83,6 +83,10 @@ TypeScript mirror는 enum union을 제공하지만 runtime schema validator를 �
 validator는 아직 Build 계약을 소비하지 않는다. 따라서 같은 반례를 존재하지 않는 소비자에
 통과시켰다고 주장하지 않고, 정본 Draft 2020-12 validator 경계에서 9개를 고정했다. hosted
 Core의 schema compile·Go RE2 결과는 exact-head run으로 별도 확인한다.
+
+Claude r3 W2는 특정 허용 밖 값 하나만 거부하면 다른 새 enum 멤버 추가가 생존한다는
+지적이었다. `networkMode`, `cacheDisposition`, `BuildResult`, `BuildAuditEvent.event`의
+정확한 순서·집합을 리터럴로 단언해 네 어휘를 넓히거나 줄이는 변이도 실패하게 했다.
 
 ## 정직성 경계
 
