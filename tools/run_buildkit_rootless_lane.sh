@@ -27,7 +27,7 @@ cleanup() {
 trap cleanup EXIT
 
 docker pull --platform linux/amd64 "$SV_BUILDKIT_RUNTIME_IMAGE"
-docker run --detach --rm --platform linux/amd64 \
+docker run --detach --platform linux/amd64 \
   --name "$SV_BUILDKIT_CONTAINER_NAME" \
   --label "ai.saintvision.s08-buildkit-reference=$GITHUB_RUN_ID" \
   --security-opt seccomp=unconfined \
