@@ -1,27 +1,65 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.262"
+version: "1.0.264"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T07:24:06+09:00"
+updated: "2026-10-02T07:41:29+09:00"
 source_of_truth: "Git"
 active_card: "CARD-211 VF-CL CI receipt attestation"
-active_card_status: "Fail-closed receipt creator/verifier, workflow minimum permissions, and registry rule 7 attestation boundary implemented; hosted exact-head run pending"
-active_card_next: "Push one implementation commit, obtain workflow_dispatch attestation evidence, record the honest result, and request Claude review"
+active_card_status: "Fail-closed receipt creator/verifier and workflow attestation boundary implemented; canonical accessibility manifest merged"
+active_card_next: "Close the independent review conditions, run the label producer and exact-head dispatch, and record verification.json"
 ---
 
 ## 2026-10-02 Card 211 — VF-CL CI receipt attestation
 
 - `#295`의 offline receipt 위조 생존을 닫기 위해 workflow_dispatch-only receipt producer와
-  `actions/attest@v4` 서명 job, GitHub identity·source SHA/ref·receipt byte 검증기를 구현했다.
-- 서명 권한은 별도 job에만 두고 PR event에는 OIDC token이 가지 않는다. bundle 부재·다른 repository,
+  `actions/attest@v4` 서명 job, GitHub identity·source SHA/ref·receipt bytes 검증기를 구현했다.
+- 서명 권한은 별도 job에만 있고 PR event에서는 OIDC token을 받지 않는다. bundle 부재·타 repository,
   workflow, SHA, ref·위조 receipt·만료 artifact는 모두 fail closed다.
 - 구현 tree에는 정본 bundle이 아직 없으므로 `VF-CL-04.ciVerified=false`를 유지한다. hosted exact-head run과
-  착지 SHA 검증은 구분한다. 설계 [[VF-CL-04_CI_receipt_attestation_설계_Codex]], History
+  착지 SHA 재검증을 구분한다. 설계 [[VF-CL-04_CI_receipt_attestation_설계_Codex]], History
   [[2026-10-02_07-24-06_KST_Card211_VF-CL_CI_receipt_attestation_Codex]].
 - `#302`의 사용자 절차는 Windows Python 3.10을 downloader/ZIP 생성에만 쓰고 importer는 agent의 지원
   Python 3.12/3.14에서 실행하도록 선반영했다.
+
+## 2026-10-02 Card 205 — AC-11 사용자 기기 접근성 수동 인수 importer
+
+- train 13 후보 `9d9389a1`에서 #300이 확인한 `manualAcceptanceMissingCount=1` 상수와
+  same-SHA importer 부재를 외부 장비 없이 닫을 수 있는 AC-11 선행 카드로 선택했다.
+- Claude r1/r2 뒤 정직한 proof scope·strict session schema·6개 수행 단계·v1.1.1 target을 `505a5f4b`에 고정하고,
+  canonical registry에 `s11-accessibility-user-device-v1`을 등록했다. 기존 hosted-only target을
+  소급 변경하지 않는다.
+- importer는 GitHub run/head/artifact digest·만료·exact ZIP member를 검증한다. 수동 기록이
+  있으면 token을 stdin에서만 읽고 `inv.identity.AccessTokens`와 canonical
+  `has_fresh_interactive_auth`로 import 승인 운영자·300초 freshness·AMR를 확인한 뒤 token 없이
+  해시 receipt만 Evidence에 남긴다. 실제 시나리오 수행자는 self-attested이며 token이 수행자·기기
+  소유를 증명한다는 주장은 철회했다. 손으로 쓴 receipt·서비스 계정·pwd 단독·다른 SHA는 fail closed다.
+- 수동 기록 부재·시나리오 FAIL은 계속 `manualAcceptanceMissingCount=1`; exact SHA·exact six·
+  all PASS·fresh human 결속에서만 0이다. 이 축은 사용자 전체 인수·AC-11 done·점수 승격을
+  주장하지 않는다.
+- train 15 후보 `7dd9f9ca`로 #299를 merge한 뒤 `docs/ac11-axis-sources.json`의 canonical
+  `accessibility-e2e` 행에 importer와 exact `EMITTED_AXES`를 직접 결속했다. 임시 replacement patch는
+  제거했고 assembler→aggregator 소비 회귀를 추가했다. 사용자 실행 절차는
+  [[AC-11_사용자_기기_접근성_수동_인수_절차]]다.
+- PG-free focused **178 passed**. Windows-safe downloader는 실제 GitHub artifact에서 no-BOM JSON과
+  정상 ZIP을 확인했다. `py_compile`·CLI help·`check_docs`·citation ratchet(새 결함 0)·
+  contract bindings는 모두 exit 0이다.
+- train 15 결속 후 assembler+accessibility importer focused **94 passed**. 유효 envelope이 canonical row를
+  거쳐 aggregator에서 `MEASURED_PASS`로 재계산되며 나머지 7축 부재는 전체 `INVALID_RUN`으로 남는다.
+
+## 2026-10-02 Card 207 — OCI digest·live buildkitd PID 결속
+
+- train 14 후보 `d0b2a4c6` 위에서 #297의 이연 항목 M6/M7만 구현했다. OCI tar 내부
+  manifest/config/layer blob의 SHA-256·size를 재계산하고 metadata digest와 exact 대조한다.
+- health receipt의 PID는 실제 `buildkitd`여야 하고 왕복 전·후 PID/start ticks·UID·rootless
+  경계가 같아야 한다. rootlesskit PID 또는 재시작된 daemon은 evidence를 만들 수 없다.
+- 기본 flag off, 제품 caller 미도달, S08-BE 완료 비주장 경계는 그대로다. focused **72 passed**.
+  hosted run `36928934670`은 OCI blob 3개를 재검산하고 live `buildkitd` PID 32/start ticks
+  28815를 왕복 전·후 대조해 `MEASURED_PASS`였다. LAN 운영 인수는 `BLOCKED_EXTERNAL`이다.
+- exact-head run `36929190888`도 같은 실제 왕복 gate를 통과했다. archive 독립 변조와 process-mode
+  identity 공백을 보강해 focused **78 passed**이며, liveness는 아직 evidence 도구 조건이지 제품 조건은 아니다.
+- [[2026-10-02_05-55-05_KST_S08-BE_OCI_digest_buildkitd_PID_결속_Codex]].
 
 ## 2026-10-01 Card 194 — S12 acceptance target·Evidence resolver 구현
 
@@ -50,6 +88,7 @@ active_card_next: "Push one implementation commit, obtain workflow_dispatch atte
   head 보존을 단언했다. 최종 exact-head green 전에는 hosted real-PG를 `NOT_OBSERVED`로 유지한다.
 - 근거: [[S12-BE_release_acceptance_target_Evidence_resolver_설계]],
   [[2026-10-01_23-43-41_KST_Card194_S12-BE_target_Evidence_resolver_구현_Codex]].
+
 ## 2026-10-02 Card 200 — S08-BE concrete rootless BuildKit transport Stage 1
 
 - base `25f43a25` 위에서 disabled-by-default concrete transport, strict health/worker 측정,
@@ -60,23 +99,6 @@ active_card_next: "Push one implementation commit, obtain workflow_dispatch atte
 - 결과는 `ci-reference`이며 제품 caller·cleanup·lease release·Evidence persistence는 미결속,
   LAN builder는 `BLOCKED_EXTERNAL`, S08-BE 상태·점수는 유지한다.
 - [[2026-10-02_04-12-15_KST_S08-BE_rootless_BuildKit_transport_Codex]] · PR #297.
-
-## 2026-10-02 Card 205 — AC-11 사용자 기기 접근성 수동 인수 importer
-
-- train 13 후보 `9d9389a1`에서 #300이 확인한 `manualAcceptanceMissingCount=1` 상수와
-  same-SHA importer 부재를 외부 장비 없이 닫을 수 있는 AC-11 선행 카드로 선택했다.
-- Claude r1/r2의 정직한 proof scope·strict session schema·6개 수행 단계·v1.1.1 target을 `505a5f4b`에 고정하고,
-  canonical registry에 `s11-accessibility-user-device-v1`을 등록했다. 기존 hosted-only target은 소급 변경하지 않는다.
-- importer는 GitHub run/head/artifact digest·만료·exact ZIP member를 검증한 뒤 수동 기록을 읽으며, token은 stdin에서만 읽고
-  `inv.identity.AccessToken`의 canonical `has_fresh_interactive_auth`로 import 운영자의 300초 freshness·AMR를 확인한다. token 없이
-  다시 seal한 receipt만 Evidence에 넣는 경로는 없다. 실제 시나리오 수행자는 self-attested이며 token이 수행자·기기 소유를
-  증명한다는 주장은 철회했다. 임의 receipt·서비스 계정·pwd 단독·다른 SHA는 fail closed다.
-- 수동 기록 부재·시나리오 FAIL은 계속 `manualAcceptanceMissingCount=1`; exact SHA·exact six·all PASS·fresh human 결속에서만 0이다.
-  이 축은 사용자 전체 인수·AC-11 done·점수 승격을 주장하지 않는다.
-- `docs/ac11-axis-sources-accessibility-patch-v1.json`에 #299 manifest의 exact replacement row를 고정했다.
-  사용자 실행 절차는 [[AC-11_사용자_기기_접근성_수동_인수_절차]]다.
-- PG-free focused **178 passed**. Windows-safe downloader는 실제 GitHub artifact에서 no-BOM JSON과 정상 ZIP을 확인했다.
-  `py_compile`·CLI help·`check_docs`·citation ratchet(새 결함 0)·contract bindings는 모두 exit 0이다.
 
 ## 2026-10-01 Card 190 — S12 수락 target·Evidence 정본 resolver 계약
 

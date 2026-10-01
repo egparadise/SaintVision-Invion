@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-2026-10-02-CARD205-AC11-ACCESSIBILITY-MANUAL"
 title: "Card 205 AC-11 사용자 기기 접근성 수동 인수 importer"
-version: "1.2.0"
+version: "1.3.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-02T06:23:06+09:00"
+updated: "2026-10-02T07:41:29+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "9d9389a110eb7bc62351f261ae28e9482c8149ad"
@@ -55,9 +55,12 @@ release 수락 또는 S11 완료가 아니다.
 
 ## 4. #299·#300 결속
 
-#299는 기준 branch에 아직 없으므로 코드를 임의 merge하지 않았다. 대신
-`docs/ac11-axis-sources-accessibility-patch-v1.json`에 `chain=complete`, importer,
-`--archive`, artifact prefix/member, emitted axis와 envelope shape를 exact row로 기록했다.
+초기 head에서는 #299가 기준 branch에 없어 replacement patch만 기록했다. train 15 독립 검증이 그 파일은
+집계기가 소비하지 않는다는 결함을 발견한 뒤, #299를 포함한 `7dd9f9ca`를 merge하고 정본
+`docs/ac11-axis-sources.json`의 `accessibility-e2e` 행 자체를 `chain=complete`, importer,
+`--archive`, artifact prefix/member, exact `EMITTED_AXES`, `axis-evidence`로 바꿨다. 임시 patch 파일은 제거했다.
+assembler→aggregator 회귀는 importer가 만든 유효 envelope이 정본 row를 통해 실제
+`MEASURED_PASS`로 소비됨을 단언한다. 행을 incomplete/null로 되돌리면 complete-chain 단언이 실패한다.
 #300은 [[AC-11_사용자_기기_접근성_수동_인수_절차]]의 템플릿·GitHub metadata 다운로드·
 stdin token import 명령을 인용할 수 있다.
 
@@ -82,6 +85,11 @@ PASS / 새 결함 0 / exit 0
 python tools/check_contract_bindings.py
 PASS / exit 0
 ```
+
+train 15 결속 후 focused 재검증은
+`tests/core/test_assemble_ac11_manifest.py tests/test_import_ac11_accessibility_evidence.py` **94 passed**,
+`check_docs`, citation ratchet, `git diff --check` 모두 exit 0이다. exact-head hosted Backend·Frontend는
+push 뒤 확인한다.
 
 부정 대조군은 가짜·다른 SHA, run/artifact head·digest·expiry·workflow/event drift, scenario
 누락·중복·비문자 identity, placeholder, 비엄격·하한 이전·미래 시각, stale/handwritten receipt,
