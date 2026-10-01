@@ -91,4 +91,3 @@ source_of_truth: "Git"
 - **담당**: Gemini (Frontend / UI 소유).
 - **Reviewer**: Claude (UI·테스트 축), Codex 계약·보안 축.
 - **다음 행동**: Git commit, origin push, PR #267 2차 통합 조치표 코멘트 등록 및 재검토 요청. 이후 Card 174 착수.
-
