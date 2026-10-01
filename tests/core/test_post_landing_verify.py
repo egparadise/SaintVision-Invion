@@ -24,6 +24,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from tools.post_landing_verify import (  # noqa: E402
+    AXIS_EVIDENCE_LANES,
+    CRITERIA,
     DEFAULT_REF,
     DISPATCH_EVENT,
     LANES,
@@ -992,7 +994,7 @@ def test_the_run_name_keeps_the_workflow_name_when_no_id_is_given():
 #: Lanes whose workflow does not run on the landing push and is therefore always
 #: dispatched by the tool. Adding one here is a deliberate statement that the landing
 #: push produces no run for it.
-DISPATCH_ONLY_WORKFLOWS = {"ac11-security-scan.yml"}
+DISPATCH_ONLY_WORKFLOWS = {"ac11-security-scan.yml", "ac11-accessibility-e2e.yml"}
 
 
 class UnsupportedTrigger(AssertionError):
@@ -1185,6 +1187,49 @@ def test_the_portal_login_harness_lane_names_the_job_the_workflow_defines():
     ]
 
 
+def test_the_accessibility_lane_names_the_job_the_workflow_defines():
+    """The lane added for `#266`'s workflow, pinned to that file rather than to prose."""
+    import yaml
+
+    document = yaml.load(
+        (WORKFLOW_DIR / "ac11-accessibility-e2e.yml").read_text(encoding="utf-8"),
+        Loader=yaml.BaseLoader,
+    )
+    lane = next(item for item in LANES if item["workflow"] == "ac11-accessibility-e2e.yml")
+    assert lane["jobs"] == {"accessibility-e2e": 1}
+    assert set(lane["jobs"]) <= set(document["jobs"])
+    # It is dispatched, never adopted: no push trigger at all.
+    assert "push" not in document["on"]
+
+
+def test_an_axis_lane_criterion_separates_job_success_from_the_axis_verdict():
+    """A reader of the record must not take a lane pass for an AC-11 axis pass.
+
+    The accessibility collector writes `manualAcceptanceMissingCount` as a constant
+    failure until a same-SHA user-device importer exists, so its envelope reads
+    `MEASURED_FAIL` on every run while the job concludes `success`. Three observed runs
+    (`36816759719`, `36824614975`, `36825340732`) did exactly that. The two statements
+    answer different questions, and the criterion text has to say so -- `CRITERIA` is
+    compared for exact equality by `validate_evidence`, so this sentence is in every
+    record the tool writes.
+    """
+    assert AXIS_EVIDENCE_LANES == ("securityCriticalHigh", "accessibilityE2e")
+    for key in AXIS_EVIDENCE_LANES:
+        lane = next(item for item in LANES if item["key"] == key)
+        text = CRITERIA[key]
+        assert lane["axisEvidence"] in text, key
+        assert "job conclusions only" in text, key
+        assert "MEASURED_FAIL there is not a failure of this lane" in text, key
+        assert "a pass here is not a pass of that axis" in text, key
+
+
+def test_a_lane_without_its_own_axis_evidence_makes_no_such_claim():
+    """The clause is not boilerplate on every lane -- only where an artifact carries a verdict."""
+    for lane in LANES:
+        if lane.get("axisEvidence"):
+            continue
+        assert "axis verdict" not in CRITERIA[lane["key"]], lane["key"]
+        assert "MEASURED_FAIL" not in CRITERIA[lane["key"]], lane["key"]
 def write_workflow(directory, name: str, body: str) -> None:
     (directory / name).write_text(body, encoding="utf-8", newline=NL)
 

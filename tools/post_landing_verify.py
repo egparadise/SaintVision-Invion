@@ -116,8 +116,25 @@ LANES: tuple[dict[str, Any], ...] = (
         "key": "securityCriticalHigh",
         "workflow": "ac11-security-scan.yml",
         "jobs": {"security-critical-high": 1},
+        "axisEvidence": "s11-ac11-security-scan.json",
+    },
+    {
+        "key": "accessibilityE2e",
+        "workflow": "ac11-accessibility-e2e.yml",
+        "jobs": {"accessibility-e2e": 1},
+        "axisEvidence": "s11-ac11-accessibility-e2e.json",
     },
 )
+
+#: An AC-11 lane uploads an axis evidence envelope that carries **its own** verdict, and that
+#: verdict answers a different question from this lane's status. The accessibility collector
+#: makes the gap unmissable: it records `manualAcceptanceMissingCount` as a constant failure
+#: until a same-SHA user-device importer exists, so its envelope reads `MEASURED_FAIL` on
+#: every run while the job concludes `success`. A lane status of `MEASURED_PASS` therefore
+#: means "the run existed at the landed SHA and its jobs succeeded" -- it neither claims the
+#: axis passed nor is contradicted by an axis `MEASURED_FAIL`. `axisEvidence` names the file
+#: so the criterion text in every record says this out loud.
+AXIS_EVIDENCE_LANES = tuple(lane["key"] for lane in LANES if lane.get("axisEvidence"))
 
 PRE_FLIGHT = ("landingWasFastForward", "refIsAtLandedSha")
 REQUIRED = tuple(lane["key"] for lane in LANES) + PRE_FLIGHT
@@ -138,6 +155,14 @@ CRITERIA = {
             + ", ".join(
                 name if count == 1 else f"{count} x {name}"
                 for name, count in lane["jobs"].items()
+            )
+            + (
+                f". this status is the run's job conclusions only: the AC-11 axis verdict "
+                f"is inside {lane['axisEvidence']} in the run's artifact and is recomputed "
+                f"by tools/aggregate_ac11_evidence.py, so a MEASURED_FAIL there is not a "
+                f"failure of this lane and a pass here is not a pass of that axis"
+                if lane.get("axisEvidence")
+                else ""
             )
         )
         for lane in LANES
