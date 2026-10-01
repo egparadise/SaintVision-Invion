@@ -51,6 +51,7 @@ export interface ResourceExplorerProps {
   initialNodeDetail?: NodeDetailResponse | null;
   initialNodeDetailError?: string | null;
   initialSampleRequestId?: string;
+  initialPlanResult?: DistributedPlanResponse | null;
   lastFetchedAt?: Date | null;
 }
 
@@ -74,6 +75,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   initialNodeDetail,
   initialNodeDetailError,
   initialSampleRequestId,
+  initialPlanResult,
   lastFetchedAt = null,
 }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'storage' | 'pools' | 'nodes' | 'discovery'>(initialTab);
@@ -131,7 +133,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   const [planRunId, setPlanRunId] = useState('');
   const [planStrategy, setPlanStrategy] = useState<'single_node' | 'data_parallel' | 'sharded'>('sharded');
   const [planShardCount, setPlanShardCount] = useState(2);
-  const [planResult, setPlanResult] = useState<DistributedPlanResponse | null>(null);
+  const [planResult, setPlanResult] = useState<DistributedPlanResponse | null>(initialPlanResult ?? null);
   const [poolMessage, setPoolMessage] = useState<string | null>(null);
 
   // ---------------------------------------------------------------------------
@@ -1313,9 +1315,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 fontSize: '0.75rem',
                 fontWeight: 600,
                 borderRadius: '6px',
-                backgroundColor: nodes.length > 0 ? 'var(--color-brand-primary)' : 'var(--color-bg-subtle)',
-                color: nodes.length > 0 ? 'var(--color-text-inverse)' : 'var(--color-text-muted)',
-                border: nodes.length > 0 ? 'none' : '1px solid var(--color-border-subtle)',
+                backgroundColor: nodes.length > 0 ? 'var(--color-brand-primary-bg)' : 'var(--color-bg-subtle)',
+                color: nodes.length > 0 ? 'var(--color-brand-primary-fg)' : 'var(--color-text-muted)',
+                border: nodes.length > 0 ? '1px solid transparent' : '1px solid var(--color-border-subtle)',
                 cursor: nodes.length > 0 ? 'pointer' : 'not-allowed',
               }}
             >
@@ -1401,7 +1403,15 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                       <td style={{ padding: '8px 12px' }}>{c.nodeId}</td>
                       <td style={{ padding: '8px 12px' }}>{c.declaredPath}</td>
                       <td style={{ padding: '8px 12px' }}>
-                        <span style={{ padding: '2px 5px', borderRadius: '3px', backgroundColor: 'var(--color-bg-subtle)', color: c.mode === 'read_write' ? 'var(--color-brand-primary)' : 'var(--color-text-muted)', border: '1px solid var(--color-border-subtle)' }}>
+                        <span
+                          style={{
+                            padding: '2px 5px',
+                            borderRadius: '3px',
+                            backgroundColor: 'var(--color-bg-subtle)',
+                            color: c.mode === 'read_write' ? 'var(--color-brand-primary)' : 'var(--color-text-muted)',
+                            border: '1px solid var(--color-border-subtle)',
+                          }}
+                        >
                           {c.mode}
                         </span>
                       </td>
@@ -1502,9 +1512,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                   fontSize: '0.75rem',
                   fontWeight: 600,
                   borderRadius: '4px',
-                  backgroundColor: (!projectId?.trim() || !runId?.trim() || !sampleRequestId.trim()) ? 'var(--color-bg-subtle)' : 'var(--color-brand-primary)',
-                  color: (!projectId?.trim() || !runId?.trim() || !sampleRequestId.trim()) ? 'var(--color-text-muted)' : 'var(--color-text-inverse)',
-                  border: (!projectId?.trim() || !runId?.trim() || !sampleRequestId.trim()) ? '1px solid var(--color-border-subtle)' : 'none',
+                  backgroundColor: (!projectId?.trim() || !runId?.trim() || !sampleRequestId.trim()) ? 'var(--color-bg-subtle)' : 'var(--color-brand-primary-bg)',
+                  color: (!projectId?.trim() || !runId?.trim() || !sampleRequestId.trim()) ? 'var(--color-text-muted)' : 'var(--color-brand-primary-fg)',
+                  border: (!projectId?.trim() || !runId?.trim() || !sampleRequestId.trim()) ? '1px solid var(--color-border-subtle)' : '1px solid transparent',
                   cursor: (!projectId?.trim() || !runId?.trim() || !sampleRequestId.trim()) ? 'not-allowed' : 'pointer',
                 }}
               >
@@ -1807,7 +1817,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 type="button"
                 data-testid="add-pool-member-btn"
                 onClick={handleAddMember}
-                style={{ padding: '6px 12px', fontSize: '0.75rem', backgroundColor: 'var(--color-brand-primary)', color: 'var(--color-text-inverse)', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+                style={{ padding: '6px 12px', fontSize: '0.75rem', backgroundColor: 'var(--color-brand-primary-bg)', color: 'var(--color-brand-primary-fg)', border: '1px solid transparent', borderRadius: '6px', cursor: 'pointer' }}
               >
                 멤버 추가
               </button>
@@ -1946,9 +1956,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                   marginTop: '10px',
                   padding: '6px 12px',
                   fontSize: '0.75rem',
-                  backgroundColor: planRunId.trim() ? 'var(--color-brand-primary)' : 'var(--color-bg-subtle)',
-                  color: planRunId.trim() ? 'var(--color-text-inverse)' : 'var(--color-text-muted)',
-                  border: planRunId.trim() ? 'none' : '1px solid var(--color-border-subtle)',
+                  backgroundColor: planRunId.trim() ? 'var(--color-brand-primary-bg)' : 'var(--color-bg-subtle)',
+                  color: planRunId.trim() ? 'var(--color-brand-primary-fg)' : 'var(--color-text-muted)',
+                  border: planRunId.trim() ? '1px solid transparent' : '1px solid var(--color-border-subtle)',
                   borderRadius: '6px',
                   cursor: planRunId.trim() ? 'pointer' : 'not-allowed',
                 }}
@@ -1969,7 +1979,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
 
               {planResult && (
                 <div style={{ marginTop: '10px', fontSize: '0.75rem' }}>
-                  <div style={{ fontWeight: 600, color: 'var(--color-brand-primary)' }}>생성된 계획: {planResult.planId}</div>
+                  <div data-testid="plan-result-message" style={{ fontWeight: 600, color: 'var(--color-brand-primary)' }}>생성된 계획: {planResult.planId}</div>
                   {planResult.placements.map((p) => (
                     <div key={p.shardIndex} style={{ padding: '3px 6px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: '4px', border: '1px solid var(--color-border-subtle)', marginTop: '2px' }}>
                       샤드 #{p.shardIndex} ➔ 노드 {p.nodeId}
@@ -2200,9 +2210,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 style={{
                   padding: '6px 12px',
                   fontSize: '0.75rem',
-                  backgroundColor: tenantId && tenantId.trim() ? 'var(--color-brand-primary)' : 'var(--color-bg-subtle)',
-                  color: tenantId && tenantId.trim() ? 'var(--color-text-inverse)' : 'var(--color-text-muted)',
-                  border: tenantId && tenantId.trim() ? 'none' : '1px solid var(--color-border-subtle)',
+                  backgroundColor: tenantId && tenantId.trim() ? 'var(--color-brand-primary-bg)' : 'var(--color-bg-subtle)',
+                  color: tenantId && tenantId.trim() ? 'var(--color-brand-primary-fg)' : 'var(--color-text-muted)',
+                  border: tenantId && tenantId.trim() ? '1px solid transparent' : '1px solid var(--color-border-subtle)',
                   borderRadius: '6px',
                   cursor: tenantId && tenantId.trim() ? 'pointer' : 'not-allowed',
                 }}
@@ -2243,7 +2253,18 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', margin: '4px 0' }}>
                 이 토큰은 평문으로 단 1회만 반환되며 이후 안전하게 암호화 해시 처리됩니다.
               </p>
-              <div style={{ padding: '8px 12px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '4px', fontFamily: 'monospace', fontSize: '0.8125rem', color: 'var(--color-brand-primary)', marginTop: '6px' }}>
+              <div
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: 'var(--color-bg-surface)',
+                  border: '1px solid var(--color-border-subtle)',
+                  borderRadius: '4px',
+                  fontFamily: 'monospace',
+                  fontSize: '0.8125rem',
+                  color: 'var(--color-brand-primary)',
+                  marginTop: '6px',
+                }}
+              >
                 {admissionResult.bootstrapToken}
               </div>
               <div style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>

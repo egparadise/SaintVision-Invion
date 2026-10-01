@@ -522,14 +522,15 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
         </label>
         <button
           type="submit"
+          data-testid="inv-canonical-lookup-btn"
           disabled={!uri || loading}
           style={{
             padding: '6px 14px',
             fontSize: '0.8125rem',
             borderRadius: '6px',
-            border: 'none',
-            backgroundColor: !uri || loading ? 'var(--color-border-subtle)' : 'var(--color-brand-primary)',
-            color: 'var(--color-text-inverse)',
+            border: !uri || loading ? '1px solid var(--color-border-subtle)' : '1px solid transparent',
+            backgroundColor: !uri || loading ? 'var(--color-bg-subtle)' : 'var(--color-brand-primary-bg)',
+            color: !uri || loading ? 'var(--color-text-muted)' : 'var(--color-brand-primary-fg)',
             cursor: !uri || loading ? 'not-allowed' : 'pointer',
           }}
         >
@@ -639,9 +640,9 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
               padding: '8px 16px',
               fontSize: '0.8125rem',
               fontWeight: 600,
-              backgroundColor: 'var(--color-brand-primary)',
-              color: 'var(--color-text-inverse)',
-              border: 'none',
+              backgroundColor: 'var(--color-brand-primary-bg)',
+              color: 'var(--color-brand-primary-fg)',
+              border: '1px solid transparent',
               borderRadius: '6px',
               cursor: 'pointer',
             }}
@@ -665,9 +666,9 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                   fontWeight: active ? 700 : 500,
                   borderRadius: '6px',
                   border: '1px solid',
-                  borderColor: active ? 'var(--color-brand-primary)' : 'var(--color-border-subtle)',
+                  borderColor: active ? 'var(--color-brand-hover)' : 'var(--color-border-subtle)',
                   backgroundColor: active ? 'var(--color-brand-subtle)' : 'transparent',
-                  color: active ? 'var(--color-brand-primary)' : 'var(--color-text-muted)',
+                  color: active ? 'var(--color-brand-hover)' : 'var(--color-text-muted)',
                   cursor: 'pointer',
                 }}
               >
@@ -729,9 +730,9 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                 fontSize: '0.75rem',
                 fontWeight: 600,
                 borderRadius: '4px',
-                backgroundColor: (!projectId?.trim() || !runId?.trim() || !inputCheckoutId.trim()) ? 'var(--color-border-strong)' : 'var(--color-brand-primary)',
-                color: 'var(--color-text-inverse)',
-                border: 'none',
+                backgroundColor: (!projectId?.trim() || !runId?.trim() || !inputCheckoutId.trim()) ? 'var(--color-bg-subtle)' : 'var(--color-brand-primary-bg)',
+                color: (!projectId?.trim() || !runId?.trim() || !inputCheckoutId.trim()) ? 'var(--color-text-muted)' : 'var(--color-brand-primary-fg)',
+                border: (!projectId?.trim() || !runId?.trim() || !inputCheckoutId.trim()) ? '1px solid var(--color-border-subtle)' : '1px solid transparent',
                 cursor: (!projectId?.trim() || !runId?.trim() || !inputCheckoutId.trim()) ? 'not-allowed' : 'pointer',
               }}
             >
@@ -840,13 +841,15 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <h3 style={{ fontSize: '0.9375rem', fontWeight: 600, margin: 0 }}>{selectedFile.name}</h3>
                 <span
+                  data-testid="file-version-badge"
                   style={{
                     fontSize: '0.6875rem',
                     fontWeight: 600,
                     padding: '2px 6px',
                     borderRadius: '4px',
                     backgroundColor: 'var(--color-brand-subtle)',
-                    color: 'var(--color-brand-primary)',
+                    color: 'var(--color-brand-hover)',
+                    border: '1px solid var(--color-brand-hover)',
                   }}
                 >
                   v{selectedFile.version} · {selectedFile.classification}
@@ -1017,9 +1020,9 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                   fontSize: '0.75rem',
                   fontWeight: 600,
                   borderRadius: '6px',
-                  backgroundColor: 'var(--color-brand-primary)',
-                  color: 'var(--color-text-inverse)',
-                  border: 'none',
+                  backgroundColor: 'var(--color-brand-primary-bg)',
+                  color: 'var(--color-brand-primary-fg)',
+                  border: '1px solid transparent',
                   cursor: 'pointer',
                 }}
               >
@@ -1199,9 +1202,9 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                       fontSize: '0.75rem',
                       fontWeight: 600,
                       borderRadius: '6px',
-                      backgroundColor: isDegraded ? 'var(--color-status-online)' : 'var(--color-border-subtle)',
-                      color: 'var(--color-text-inverse)',
-                      border: 'none',
+                      backgroundColor: isDegraded ? 'var(--color-brand-primary-bg)' : 'var(--color-bg-subtle)',
+                      color: isDegraded ? 'var(--color-brand-primary-fg)' : 'var(--color-text-muted)',
+                      border: isDegraded ? '1px solid transparent' : '1px solid var(--color-border-subtle)',
                       cursor: isDegraded ? 'pointer' : 'not-allowed',
                     }}
                   >

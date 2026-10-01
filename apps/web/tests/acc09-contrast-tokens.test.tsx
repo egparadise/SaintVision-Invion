@@ -1325,6 +1325,48 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(getContrast(lightTokens[nodeHbVar], lightTokens[unselCardBgVar]), 'Node heartbeat light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
       expect(getContrast(darkTokens[nodeHbVar], darkTokens[unselCardBgVar]), 'Node heartbeat dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
 
+      // 1.g) ResourceExplorer RAM capacity card
+      const ramCard = container.querySelector('[data-testid="logical-ram-card"]') as HTMLElement;
+      expect(ramCard, 'Logical RAM card must render').not.toBeNull();
+      expect(ramCard.style.backgroundColor, 'RAM card bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(ramCard.style.borderColor, 'RAM card border must bind to var(--color-border-subtle)').toBe('var(--color-border-subtle)');
+      const ramBgVar = helperExtractVar(ramCard.style.backgroundColor);
+      const ramBorderVar = helperExtractVar(ramCard.style.borderColor);
+      expect(getContrast(lightTokens[ramBorderVar], lightTokens[ramBgVar]), 'RAM card light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[ramBorderVar], darkTokens[ramBgVar]), 'RAM card dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 1.h) ResourceExplorer plan result message
+      await act(async () => {
+        root.render(
+          <ResourceExplorer
+            key="pools-tab"
+            nodes={testNodes}
+            initialTab="pools"
+            initialPoolCapacity={{
+              poolId: 'pool-default',
+              name: 'default',
+              memberCount: 2,
+              activeMemberCount: 2,
+              totalOffered: { cpuMillicores: 8000, ramBytes: 34359738368, gpuDevices: 0 },
+              largestSingleNode: { cpuMillicores: 4000, ramBytes: 17179869184, gpuDevices: 0 },
+              spareNow: { cpuMillicores: 6000, ramBytes: 25769803776, gpuDevices: 0 },
+              note: '',
+              nodes: [],
+              units: {} as any,
+              unmeasuredNodes: [],
+            }}
+            initialPoolCapacityState="success"
+            initialPlanResult={{ planId: 'plan_alpha_001', strategy: 'sharded', placements: [] } as any}
+          />
+        );
+      });
+      const planMsg = container.querySelector('[data-testid="plan-result-message"]') as HTMLElement;
+      expect(planMsg, 'Plan result message must render').not.toBeNull();
+      expect(planMsg.style.color, 'Plan result message text must bind to var(--color-brand-primary)').toBe('var(--color-brand-primary)');
+      const planFgVar = helperExtractVar(planMsg.style.color);
+      expect(getContrast(lightTokens[planFgVar], lightTokens['--color-bg-subtle']), 'Plan result message light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[planFgVar], darkTokens['--color-bg-subtle']), 'Plan result message dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
       // 1.f) Node error banner
       await act(async () => {
         root.render(
@@ -1353,6 +1395,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       await act(async () => {
         root.render(
           <InvFileExplorer
+            clusterNodes={testNodes}
             initialFiles={testFiles}
             initialNamespace="models"
             initialUri="inv://models"
@@ -1376,8 +1419,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
 
       const navBtn = container.querySelector('[data-testid="inv-navigate-btn"]') as HTMLElement;
       expect(navBtn, 'Navigate btn must render').not.toBeNull();
-      expect(navBtn.style.backgroundColor, 'Navigate btn bg must bind to var(--color-brand-primary)').toBe('var(--color-brand-primary)');
-      expect(navBtn.style.color, 'Navigate btn text must bind to var(--color-text-inverse)').toBe('var(--color-text-inverse)');
+      expect(navBtn.style.backgroundColor, 'Navigate btn bg must bind to var(--color-brand-primary-bg)').toBe('var(--color-brand-primary-bg)');
+      expect(navBtn.style.color, 'Navigate btn text must bind to var(--color-brand-primary-fg)').toBe('var(--color-brand-primary-fg)');
       const navBtnBgVar = helperExtractVar(navBtn.style.backgroundColor);
       const navBtnFgVar = helperExtractVar(navBtn.style.color);
       expect(getContrast(lightTokens[navBtnFgVar], lightTokens[navBtnBgVar]), 'Navigate btn light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
@@ -1420,6 +1463,62 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(getContrast(darkTokens[repBadgeFgVar], darkTokens[repBadgeBgVar]), 'Replica healthy badge dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
       expect(getContrast(lightTokens[repBadgeBorderVar], lightTokens[repBadgeBgVar]), 'Replica healthy badge light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
       expect(getContrast(darkTokens[repBadgeBorderVar], darkTokens[repBadgeBgVar]), 'Replica healthy badge dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 2.e) Active namespace chip (InvFileExplorer)
+      const activeChip = container.querySelector('[data-testid="nav-namespace-models"]') as HTMLElement;
+      expect(activeChip, 'Active namespace chip must render').not.toBeNull();
+      expect(activeChip.style.backgroundColor, 'Active chip bg must bind to var(--color-brand-subtle)').toBe('var(--color-brand-subtle)');
+      expect(activeChip.style.color, 'Active chip text must bind to var(--color-brand-hover)').toBe('var(--color-brand-hover)');
+      expect(activeChip.style.borderColor, 'Active chip border must bind to var(--color-brand-hover)').toBe('var(--color-brand-hover)');
+      const chipBgVar = helperExtractVar(activeChip.style.backgroundColor);
+      const chipFgVar = helperExtractVar(activeChip.style.color);
+      const chipBorderVar = helperExtractVar(activeChip.style.borderColor);
+      expect(getContrast(lightTokens[chipFgVar], lightTokens[chipBgVar]), 'Active chip light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[chipFgVar], darkTokens[chipBgVar]), 'Active chip dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[chipBorderVar], lightTokens[chipBgVar]), 'Active chip light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[chipBorderVar], darkTokens[chipBgVar]), 'Active chip dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 2.f) File version badge (InvFileExplorer)
+      const verBadge = container.querySelector('[data-testid="file-version-badge"]') as HTMLElement;
+      expect(verBadge, 'File version badge must render').not.toBeNull();
+      expect(verBadge.style.backgroundColor, 'File version badge bg must bind to var(--color-brand-subtle)').toBe('var(--color-brand-subtle)');
+      expect(verBadge.style.color, 'File version badge text must bind to var(--color-brand-hover)').toBe('var(--color-brand-hover)');
+      expect(verBadge.style.borderColor, 'File version badge border must bind to var(--color-brand-hover)').toBe('var(--color-brand-hover)');
+      const verBadgeBgVar = helperExtractVar(verBadge.style.backgroundColor);
+      const verBadgeFgVar = helperExtractVar(verBadge.style.color);
+      const verBadgeBorderVar = helperExtractVar(verBadge.style.borderColor);
+      expect(getContrast(lightTokens[verBadgeFgVar], lightTokens[verBadgeBgVar]), 'File version badge light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[verBadgeFgVar], darkTokens[verBadgeBgVar]), 'File version badge dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[verBadgeBorderVar], lightTokens[verBadgeBgVar]), 'File version badge light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[verBadgeBorderVar], darkTokens[verBadgeBgVar]), 'File version badge dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 2.g) Disabled canonical lookup button (InvFileExplorer)
+      const lookupBtn = container.querySelector('[data-testid="inv-canonical-lookup-btn"]') as HTMLElement;
+      expect(lookupBtn, 'Canonical lookup btn must render').not.toBeNull();
+      expect(lookupBtn.style.backgroundColor, 'Disabled lookup btn bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(lookupBtn.style.color, 'Disabled lookup btn text must bind to var(--color-text-muted)').toBe('var(--color-text-muted)');
+      expect(lookupBtn.style.borderColor, 'Disabled lookup btn border must bind to var(--color-border-subtle)').toBe('var(--color-border-subtle)');
+      const lookupBgVar = helperExtractVar(lookupBtn.style.backgroundColor);
+      const lookupFgVar = helperExtractVar(lookupBtn.style.color);
+      const lookupBorderVar = helperExtractVar(lookupBtn.style.borderColor);
+      expect(getContrast(lightTokens[lookupFgVar], lightTokens[lookupBgVar]), 'Disabled lookup btn light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[lookupFgVar], darkTokens[lookupBgVar]), 'Disabled lookup btn dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[lookupBorderVar], lightTokens[lookupBgVar]), 'Disabled lookup btn light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[lookupBorderVar], darkTokens[lookupBgVar]), 'Disabled lookup btn dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 2.h) Disabled repair replicas button (InvFileExplorer)
+      const repairBtn = container.querySelector('[data-testid="repair-replicas-btn"]') as HTMLElement;
+      expect(repairBtn, 'Repair replicas btn must render').not.toBeNull();
+      expect(repairBtn.style.backgroundColor, 'Disabled repair btn bg must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(repairBtn.style.color, 'Disabled repair btn text must bind to var(--color-text-muted)').toBe('var(--color-text-muted)');
+      expect(repairBtn.style.borderColor, 'Disabled repair btn border must bind to var(--color-border-subtle)').toBe('var(--color-border-subtle)');
+      const repairBgVar = helperExtractVar(repairBtn.style.backgroundColor);
+      const repairFgVar = helperExtractVar(repairBtn.style.color);
+      const repairBorderVar = helperExtractVar(repairBtn.style.borderColor);
+      expect(getContrast(lightTokens[repairFgVar], lightTokens[repairBgVar]), 'Disabled repair btn light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[repairFgVar], darkTokens[repairBgVar]), 'Disabled repair btn dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[repairBorderVar], lightTokens[repairBgVar]), 'Disabled repair btn light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[repairBorderVar], darkTokens[repairBgVar]), 'Disabled repair btn dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
     } finally {
       act(() => {
         root.unmount();
@@ -1566,6 +1665,13 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(getContrast('#60a5fa', lightTokens['--color-bg-surface']), 'Defective #60a5fa on light surface must fail 4.5:1').toBeLessThan(4.5);
     expect(getContrast('#60a5fa', lightTokens['--color-bg-subtle']), 'Defective #60a5fa on light subtle must fail 4.5:1').toBeLessThan(4.5);
 
+    // Probe 28 [Card 195]: Defective active chip former brand-primary on brand-subtle in light theme (4.236:1) strictly fails 4.5:1
+    expect(getContrast(lightTokens['--color-brand-primary'], lightTokens['--color-brand-subtle']), 'Defective brand-primary on brand-subtle in light must fail 4.5:1').toBeLessThan(4.5);
+
+    // Probe 29 [Card 195]: Defective disabled button former text-inverse on border-subtle in light (3.483:1) and dark (3.751:1) strictly fails 4.5:1
+    expect(getContrast(lightTokens['--color-text-inverse'], lightTokens['--color-border-subtle']), 'Defective text-inverse on border-subtle in light must fail 4.5:1').toBeLessThan(4.5);
+    expect(getContrast(darkTokens['--color-text-inverse'], darkTokens['--color-border-subtle']), 'Defective text-inverse on border-subtle in dark must fail 4.5:1').toBeLessThan(4.5);
+
     // Legacy Token Reverts:
     // Legacy Dark --color-border-subtle: #374151
     expect(getContrast('#374151', darkTokens['--color-bg-surface'])).toBeLessThan(3.0); // 1.72:1
@@ -1577,8 +1683,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(getContrast('#64748b', lightTokens['--color-bg-subtle'])).toBeLessThan(4.5); // 4.34:1
   });
 
-  // 10. [F2 Fail-Closed Multiset Inventory & Ratchet] var(--color-border-subtle) exact 141/21 and exact per-file literal multisets strictly bounded
-  it('ACC-09 / F2 Fail-Closed Multiset Inventory & Ratchet: var(--color-border-subtle) exact 141/21 and exact per-file literal multisets strictly bounded', () => {
+  // 10. [F2 Fail-Closed Multiset Inventory & Ratchet] var(--color-border-subtle) exact 233/22 and exact per-file literal multisets strictly bounded
+  it('ACC-09 / F2 Fail-Closed Multiset Inventory & Ratchet: var(--color-border-subtle) exact 233/22 and exact per-file literal multisets strictly bounded', () => {
     const srcDir = path.resolve(__dirname, '../src');
     const allFiles = getAllSourceFiles(srcDir);
 
@@ -1660,7 +1766,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
 
     // Exact count verification for var(--color-border-subtle)
-    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 232').toBe(232);
+    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 233').toBe(233);
     expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 22').toBe(22);
 
     // Fail-closed check 3: Total files with color literals must not exceed baseline file count
