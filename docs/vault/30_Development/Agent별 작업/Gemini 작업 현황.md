@@ -33,7 +33,7 @@ source_of_truth: "Git"
      - `execute_journey`에서 `require_clean` 또는 `require_remote_containment`가 비활성화된 경우 `acceptanceClaim = False`로 강제 결속.
      - 스키마 `audit`에 `cleanWorktreeVerified`, `remoteContainmentVerified` 속성을 필수로 정의하고, `validate_evidence`에서 `acceptanceClaim=True` 시 두 속성이 모두 `True`임을 검증.
   3. **(3) [Gate] History 문서 인용 정정 (Docs run 36801495874 해소)**:
-     - History 문서 내 `contracts/v1alpha1/core.schema.json#/definitions/SessionView` 인용에서 JSON pointer fragment를 제거하고 실재 파일 경로로 정정하여 ratchet baseline 증가 없이 Docs green 확보.
+     - History 문서 내 core schema 인용에서 JSON pointer fragment를 제거하고 실재 파일 경로(`contracts/v1alpha1/core.schema.json`)로 정정하여 ratchet baseline 증가 없이 Docs green 확보.
   4. **N1~N4 기존 조치 유지**: lookalike token/session origin 차단, 정본 `SessionView` strict 스키마 검증, Chromium launch args 인증서 무시 인자 0건 단언, `globalThis.__sv_has_auth_token` boolean seam 탑재.
   5. **F1~F6 기존 조치 유지**: 5단계 여정 실측, 사내 CA 번들 및 allowlist fail-closed, DNS 해석 후 서비스 다운의 정직한 FAIL, 접두사 무관 계정 비식별화, X.509 AKI/SKI 확장 완비.
 - **담당 및 역할**: Gemini (Frontend / UI / 웹 배포 소유). Reviewer: Claude (UI·운영 축), Codex (계약·보안 축).

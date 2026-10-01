@@ -237,7 +237,7 @@ Codex 계약·보안 축 2차 검토(09:40)에서 제기된 지적사항 5건(F1
   5. 우회 시도 차단 및 증거 결속 시험 4종(`test_live_provenance_bypass_revokes_acceptance_claim`, `test_validate_evidence_requires_clean_and_remote_containment`, `test_cli_prohibits_provenance_bypass_flags`, `test_cli_parser_does_not_expose_bypass_flags`) 완비.
 
 ### 3) (3) [Gate] History 문서 인용 정정 (Docs run 36801495874 해소)
-- **문제**: History 문서 내 `contracts/v1alpha1/core.schema.json#/definitions/SessionView` 인용에서 JSON pointer fragment(`#/definitions/SessionView`)가 파일 경로 검사기(`check_doc_path_citations.py`)에 의해 존재하지 않는 파일로 판정되어 Docs CI 실패.
+- **문제**: History 문서 내 스키마 인용에서 JSON pointer fragment(`#/definitions/SessionView`)가 파일 경로 검사기(`check_doc_path_citations.py`)에 의해 존재하지 않는 파일로 판정되어 Docs CI 실패.
 - **조치**: JSON pointer fragment를 제거하고 실재 정본 파일 경로인 `contracts/v1alpha1/core.schema.json` 및 본문 설명으로 정정하여 ratchet baseline 증가 없이 Docs green(21s) 확보.
 
 ---
