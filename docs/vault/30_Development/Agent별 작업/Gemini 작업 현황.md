@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.168"
+version: "1.0.169"
 status: "approved"
 author: "Gemini"
-updated: "2026-10-01T20:33:00+09:00"
+updated: "2026-10-01T21:30:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,7 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-10-01T20:33:00+09:00 (Card 183 S12-FE 릴리스 선언서 및 운영자 인수 서버 경로 결속 r2 조치 완료 및 #280 신규 head 79fcb772 머지 반영: Claude UI r2 및 Codex r2 피드백 전수 해소 — 404/403 fixture 코드를 canonical RES-0004 / AUTH-0030으로 정정하여 fixture-problem-codes-integrity 통과, ContractViolationError 및 deployment-manifest-error-contract 전용 계약 위반 상태 분리, 상단 KPI 카드 'SIGN-OFF 대기 (로컬 모의)' 문구 정비, 릴리스 선택기 변경 시 상세 재호출 및 화면 갱신 검증 시험 추가, canonical 5개 스키마 additionalProperties: false 및 허용 키셋 1:1 결속 시험 추가; #280 신규 계약 머지 — matchingAcceptedUserCount와 confirmedOperatorCount(Literal[0]) 분리 표출, operatorSignOffBlockedBy='human-attestation-implementation-unavailable' 동기화, components/knownLimitations/acceptances/nextCursor 필수화 계약 반영, Vitest 21 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 규칙 0 위반).
+- 확인 기준: 2026-10-01T21:30:00+09:00 (Card 183 S12-FE 릴리스 선언서 및 운영자 인수 서버 경로 결속 #282 최종 계약 머지 및 Train 9 착지 차단 해제: origin/agent/codex/c184-s12-acceptance-contract b96068b6 머지 완료, operatorSignOffBlockedBy='release-acceptance-prerequisites-unavailable' 동기화, api-response-contracts.mjs 40 types PASS, strict guard 갱신 및 legacy blockedBy 유입 시 ContractViolationError 사살 시험 추가, UI 사유 문구 갱신, Vitest 22 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 프런트 무결성 규칙 0 위반).
 
 ## 2026-10-01 S12-FE 릴리스 선언서(Release Manifest) 및 운영자 인수 서버 경로 결속 (Card 183 2단계, `agent/gemini/c183-s12fe-release-binding`, base `79fcb772` PR #280)
 - **개요**: Claude 카드 182(PR #280)에서 구축된 정본 계약 스키마 5종(`release-manifest-response`, `release-manifest-detail-response`, `release-manifest-page-response`, `release-acceptance-response`, `release-component-response`) 및 읽기 전용 REST 라우트(`GET /v1/release-manifests`, `GET /v1/release-manifests/{release_id}`)를 프런트엔드 `apps/web`에 온전히 결속:
@@ -49,12 +49,13 @@ source_of_truth: "Git"
      - **선택기 상호작용 시험**: 릴리스 선택 시 상세 재호출 및 UI 갱신 동작 E2E 검증 추가.
      - **계약 스키마 1:1 결속 시험**: 정본 5개 스키마의 `additionalProperties: false` 및 required 키셋과 런타임 검증기 1:1 일치 단언 추가.
      - **#280 신규 계약 동기화**: `matchingAcceptedUserCount`와 `confirmedOperatorCount: 0` 분리 표출, `human-attestation-implementation-unavailable` 정합, 목록 필드 필수화 반영.
+     - **#282 최종 계약 동기화 및 Train 9 차단 해제**: `origin/agent/codex/c184-s12-acceptance-contract` (`b96068b6`) 머지, `operatorSignOffBlockedBy` 상수를 `'release-acceptance-prerequisites-unavailable'`로 3개 스키마 및 TypeScript 계약 동기화, `releaseObservation.ts` strict guard 갱신, UI 문구 정합, 레거시 차단 사유 유입 시 fail-closed 검증 시험 추가.
 - **담당 및 역할**: Gemini (Frontend / UI 소유). Reviewer: Claude (UI·테스트 축), Codex (계약·보안 축).
 - **관측 근거 (Evidence)**:
-  - Vitest: `s12-release-manifest-server-binding.test.tsx` 21 passed (520ms), `s12-defect-fixes.test.tsx` 23 passed, `deployment-release-integrity-wiring.test.tsx` 4 passed, `fixture-problem-codes-integrity.test.ts` 1 passed (전원 통과)
-  - 변이 검사: 14종 단일 변이 전원 사살 실측 (사살율 100%)
+  - Vitest: `s12-release-manifest-server-binding.test.tsx` 22 passed (636ms), `s12-defect-fixes.test.tsx` 23 passed, `deployment-release-integrity-wiring.test.tsx` 4 passed, `fixture-problem-codes-integrity.test.ts` 1 passed (전원 통과)
+  - 변이 검사: 15종 단일 변이 전원 사살 실측 (사살율 100%)
   - TypeScript 정적 점검: `npx tsc -b` 타입 에러 0건 (exit 0)
-  - 프로덕션 번들 빌드: `npm run build` 성공 (Vite bundle 정상 생성, 9.25s, exit 0)
+  - 프로덕션 번들 빌드: `npm run build` 성공 (Vite bundle 정상 생성, 8.03s, exit 0)
   - 계약 동기화 점검: `npm run contracts:check` 40 types PASS (exit 0)
   - 라우트 커버리지 점검: `pytest tests/test_route_coverage.py` 41 passed 100% (exit 0)
   - 프런트엔드 무결성 점검: `python tools/check_frontend_integrity.py` 93개 파일 스캔, 9대 무결성 규칙 위반 0건 (exit 0)
