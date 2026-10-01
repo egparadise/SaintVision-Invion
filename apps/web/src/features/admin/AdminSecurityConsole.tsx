@@ -5,15 +5,51 @@ import { useModalA11y } from '@/shared/ui/useModalA11y';
 import { apiClient } from '@/shared/api/client';
 import { SecurityControlManager } from './securityEngine';
 
-function isValidUuid(id: string): boolean {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id.trim());
+export const RFC4122_UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+export function isValidUuid(id: unknown): id is string {
+  return typeof id === 'string' && RFC4122_UUID_REGEX.test(id.trim());
 }
+
+export const NODE_ID_REGEX = /^nod_[0-9A-HJKMNP-TV-Z]{26}$/;
+
+export function isValidNodeId(id: unknown): id is string {
+  return typeof id === 'string' && NODE_ID_REGEX.test(id.trim());
+}
+
+export const MAX_SAFE_CONTRACT_INTEGER = 9007199254740991; // 2^53 - 1 (core.schema.json maximum)
+
+function isValidContractInteger(n: unknown): n is number {
+  return (
+    typeof n === 'number' &&
+    Number.isInteger(n) &&
+    n >= 0 &&
+    n <= MAX_SAFE_CONTRACT_INTEGER
+  );
+}
+
+const ALLOWED_CONTAINMENT_VIEW_KEYS = new Set([
+  'nodeId',
+  'version',
+  'killSwitchActive',
+  'nodeStatus',
+  'activeLeases',
+  'pendingDeliveries',
+  'unsettledRuns',
+  'settled',
+]);
 
 export function isValidContainmentView(v: unknown): v is ContainmentView {
   if (!v || typeof v !== 'object' || Array.isArray(v)) return false;
   const o = v as Record<string, unknown>;
-  const validNodeId = o.nodeId === null || typeof o.nodeId === 'string';
-  const validVersion = typeof o.version === 'number' && Number.isInteger(o.version) && o.version >= 0;
+  const keys = Object.keys(o);
+  if (keys.length !== 8) return false;
+  for (const k of keys) {
+    if (!ALLOWED_CONTAINMENT_VIEW_KEYS.has(k)) return false;
+  }
+  const validNodeId = o.nodeId === null || isValidNodeId(o.nodeId);
+  const validVersion = isValidContractInteger(o.version);
   const validKillSwitch = typeof o.killSwitchActive === 'boolean';
   const validNodeStatus =
     o.nodeStatus === null ||
@@ -21,9 +57,9 @@ export function isValidContainmentView(v: unknown): v is ContainmentView {
     o.nodeStatus === 'offline' ||
     o.nodeStatus === 'draining' ||
     o.nodeStatus === 'quarantined';
-  const validActiveLeases = typeof o.activeLeases === 'number' && Number.isInteger(o.activeLeases) && o.activeLeases >= 0;
-  const validPendingDeliveries = typeof o.pendingDeliveries === 'number' && Number.isInteger(o.pendingDeliveries) && o.pendingDeliveries >= 0;
-  const validUnsettledRuns = typeof o.unsettledRuns === 'number' && Number.isInteger(o.unsettledRuns) && o.unsettledRuns >= 0;
+  const validActiveLeases = isValidContractInteger(o.activeLeases);
+  const validPendingDeliveries = isValidContractInteger(o.pendingDeliveries);
+  const validUnsettledRuns = isValidContractInteger(o.unsettledRuns);
   const validSettled = typeof o.settled === 'boolean';
 
   return (
@@ -38,22 +74,47 @@ export function isValidContainmentView(v: unknown): v is ContainmentView {
   );
 }
 
+const ALLOWED_CONTAINMENT_RESULT_KEYS = new Set([
+  'requestId',
+  'operation',
+  'approvalId',
+  'control',
+]);
+
 export function isValidContainmentResult(
   r: unknown,
-  expectedOperation: 'kill' | 'clear',
-  expectedApprovalId: string
+  expectedOperation: 'kill' | 'clear' | 'drain' | 'resume',
+  expectedApprovalId: string,
+  expectedNodeId?: string | null
 ): r is ContainmentResult {
   if (!r || typeof r !== 'object' || Array.isArray(r)) return false;
   const res = r as Record<string, unknown>;
+  const keys = Object.keys(res);
+  if (keys.length !== 4) return false;
+  for (const k of keys) {
+    if (!ALLOWED_CONTAINMENT_RESULT_KEYS.has(k)) return false;
+  }
 
-  if (typeof res.requestId !== 'string' || !res.requestId.trim()) return false;
+  if (!isValidUuid(res.requestId)) return false;
   if (res.operation !== expectedOperation) return false;
-  if (typeof res.approvalId !== 'string' || res.approvalId.trim().toLowerCase() !== expectedApprovalId.trim().toLowerCase()) return false;
+  if (!isValidUuid(res.approvalId)) return false;
+  if (res.approvalId.trim().toLowerCase() !== expectedApprovalId.trim().toLowerCase()) return false;
 
   if (!isValidContainmentView(res.control)) return false;
 
-  const expectedKillSwitchActive = expectedOperation === 'kill';
-  if (res.control.killSwitchActive !== expectedKillSwitchActive) return false;
+  if (expectedOperation === 'kill' || expectedOperation === 'clear') {
+    // Global kill-switch route는 nodeId === null 결속
+    if (res.control.nodeId !== null) return false;
+    const expectedKillSwitchActive = expectedOperation === 'kill';
+    if (res.control.killSwitchActive !== expectedKillSwitchActive) return false;
+  } else {
+    // Node-scoped operations (drain/resume)
+    if (expectedNodeId !== undefined) {
+      if (res.control.nodeId !== expectedNodeId) return false;
+    } else {
+      if (res.control.nodeId === null || !isValidNodeId(res.control.nodeId)) return false;
+    }
+  }
 
   return true;
 }
@@ -101,8 +162,11 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
 
   const fetchBackendKillSwitch = useCallback(async () => {
     try {
-      const res = await apiClient<ContainmentView>('/v1/operations/kill-switch');
-      if (isValidContainmentView(res)) {
+      const res = await apiClient<ContainmentView>('/v1/operations/kill-switch', {
+        method: 'GET',
+        expectedStatus: 200,
+      });
+      if (isValidContainmentView(res) && res.nodeId === null) {
         setBackendKillSwitch({
           status: res.killSwitchActive ? 'active' : 'inactive',
           version: res.version,
@@ -178,12 +242,14 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       let expectedVersion: number;
       let serverNodeStatus: string | null;
       try {
-        const ctrl = await apiClient<ContainmentView>(`/v1/nodes/${encodeURIComponent(nodeId)}/control`);
-        if (typeof ctrl?.version === 'number') {
+        const ctrl = await apiClient<ContainmentView>(`/v1/nodes/${encodeURIComponent(nodeId)}/control`, {
+          expectedStatus: 200,
+        });
+        if (isValidContainmentView(ctrl)) {
           expectedVersion = ctrl.version;
-          serverNodeStatus = ctrl.nodeStatus ?? null;
+          serverNodeStatus = ctrl.nodeStatus;
         } else {
-          setDrainError('노드 제어 버전(expectedVersion) 응답 형식 불일치로 작업을 중단했습니다.');
+          setDrainError('노드 제어 버전(expectedVersion) 응답 형식 불일치로 작업을 중단했습니다 (fail-closed).');
           return;
         }
 
@@ -481,9 +547,10 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       return;
     }
 
-    const isCurrentlyActive = backendKillSwitch.status === 'active' || status.emergencyKillSwitchActive;
+    const isCurrentlyActive = backendKillSwitch.status === 'active';
     const targetAction: 'kill' | 'clear' = isCurrentlyActive ? 'clear' : 'kill';
     const endpoint = isCurrentlyActive ? '/v1/operations/kill-switch/clear' : '/v1/operations/kill-switch';
+    const expectedStatus = isCurrentlyActive ? 200 : 202;
     const currentVersion = backendKillSwitch.version;
 
     const payload: ContainmentInput = {
@@ -502,6 +569,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
         headers: {
           'Idempotency-Key': killSwitchIdempotencyKey,
         },
+        expectedStatus,
       });
 
       if (!isValidContainmentResult(result, targetAction, trimmedApprovalId)) {

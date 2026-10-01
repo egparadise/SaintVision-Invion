@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.160"
+version: "1.0.161"
 status: "approved"
 author: "Gemini"
-updated: "2026-10-01T13:17:15+09:00"
+updated: "2026-10-01T13:52:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,24 +19,31 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-10-01T13:17:15+09:00 (Card 169 S08-FE 관리자 비상 정지 백엔드 실배선, PR #267 독립 검토 전수 조치: 정본 ContainmentView/Result 엄격 검증, fail-closed 쓰기 차단, 승인 UUID 빈 값 시작, Clear 200 OK 단언, vitest 9 passed, tsc -b/build/route_coverage 100%).
+- 확인 기준: 2026-10-01T13:52:00+09:00 (Card 169 S08-FE 관리자 비상 정지 백엔드 실배선, PR #267 2차 독립 검토 전수 조치: Claude V1~V5 & Codex r2 strict-contract (a)~(d) 전수 반영, NodeId Crockford base32 규격 및 null 결속, 9007199254740991 상한, RFC 4122 UUID 검증, real fetch mock status 관측, vitest 16 passed, tsc -b/build/route_coverage 100%).
 
 ## 2026-10-01 관리자 보안 콘솔 비상 정지(Kill Switch) 백엔드 실배선 및 멱등/승인ID 제어 평면 연동 (Card 169, S08-FE, `agent/gemini/c169-s08fe-killswitch-real-wiring`, PR #267)
 - **개요**:
   1. **착수 배경**: 병합 열차(`coord/train5-ci-1135`, `7851412d`)에서 카드 113 서버 멱등 계약이 착지 완료되었고, 모델 레지스트리 Release UI fail-closed 해제는 이미 카드 118에서 완비되었음. 진행판 75% 카드 중 외부 전제(`—`)가 없는 S08-FE 행의 관리자 비상 정지(Kill Switch)를 브라우저 로컬 모의 시뮬레이션에서 백엔드 제어 평면 실엔드포인트(`POST /v1/operations/kill-switch` [202 Accepted] 및 `/clear` [200 OK])로 실배선 승격.
-  2. **구현 및 PR #267 독립 검토 전수 조치**:
+  2. **구현 및 PR #267 2차 독립 검토(Claude r2 V1~V5 & Codex r2 strict-contract) 전수 조치**:
      - `AdminSecurityConsole.tsx`:
-       - `isValidContainmentView`: `GET /v1/operations/kill-switch` 응답의 모든 정본 필드(`nodeId`, 정수 `version`, `killSwitchActive`, `nodeStatus`, `activeLeases`, `pendingDeliveries`, `unsettledRuns`, `settled`)를 엄격 검증. 부분 응답/형식 불일치/로딩/오류 시 `backendKillSwitch.status = 'error'`, `isKillSwitchReady = false`로 fail-closed 쓰기 차단 (`canConfirmKillSwitch = false`).
-       - `isValidContainmentResult`: `POST` 응답을 엄격 검증. `requestId`, `operation`, `approvalId`, `control` shape 및 상태 일치를 단언하고, 불일치 시 임의 버전 합성(`version ?? currentVersion+1` 등)을 배제하고 `[CONTRACT-MISMATCH]` 표시 및 상태 미변경 유지, 제어 평면 상태 재조회.
-       - 승인 ID 기본값을 빈 문자열(`''`)로 초기화하여 실제 UUIDv4 입력 전에는 모달 경고 표출 및 확정 버튼 비활성화, 0 network mutations 보장.
-       - 해제(`POST /v1/operations/kill-switch/clear`)는 서버 `app.py:412` 정본 기본 상태인 `200 OK` 규격을 반영하고 HTTP status 관측.
+       - **(V1/V5/Codex a, b, c)** `isValidContainmentView`: `core.schema.json` 정본 규격 전수 검증.
+         - (a) `additionalProperties: false` (정확히 8개 필수 키 외 미지 키 즉시 거부).
+         - (b) `nodeId`: `null` 또는 Crockford base32 ULID 규격 (`^nod_[0-9A-HJKMNP-TV-Z]{26}$`) 검증 (소문자, 금지문자 I, L, O, U, 길이 부족 즉시 거부). 전역 비상 정지 GET 조회 시 `res.nodeId === null` 결속 검증.
+         - (c) 정수 상한 `MAX_SAFE_CONTRACT_INTEGER = 9007199254740991` (`version`, `activeLeases`, `pendingDeliveries`, `unsettledRuns` 음수 및 상한 초과 즉시 거부).
+         - (V1) 노드 Drain 통제 시 `/v1/nodes/:nodeId/control` 사전 조회 응답도 `isValidContainmentView(ctrl)`로 전수 검증하여 enum 불일치 시 POST 0회 fail-closed 차단.
+       - **(V5/Codex a, b, d)** `isValidContainmentResult`: `POST` 응답을 엄격 검증.
+         - (a) `additionalProperties: false` (4개 키 `requestId`, `operation`, `approvalId`, `control` 외 미지 키 거부).
+         - (b) 전역 kill/clear 시 `res.control.nodeId === null` 결속 단언. 노드 drain/resume 시 `expectedNodeId` 일치 검증.
+         - (d) `requestId` 및 `approvalId`를 RFC 4122 표준 UUID 포맷 (`/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i`)으로 엄격 검증.
+       - **(V2/V4)** `isCurrentlyActive = backendKillSwitch.status === 'active'`로 서버 제어 평면 상태를 단일 정본으로 삼음. 승인 ID 기본값을 빈 문자열(`''`)로 유지하여 실제 UUID 입력 전 0 mutations 보장.
+     - `client.ts`: `options.expectedStatus` 검사를 `!response.ok` 처리 블록 이후로 배치하여 4xx/5xx 서버 ProblemDetails body 파싱을 우선 보존하고, 2xx 성공 응답 시 기대 status(clear 200 vs 발동 202) 일치 여부를 엄격 검증.
      - **포커스 트랩 보존**: 모달 내 2-요소 키보드 트랩(`cancelBtn` $\leftrightarrow$ `confirmBtn`)을 유지하고 승인 UUID 설정 시 원활한 순환 검증.
   3. **검증**:
-     - `apps/web/tests/admin-security-kill-switch-wiring.test.tsx` 9개 시험 전원 통과 (반례 음성 시험 완비).
-     - `apps/web/tests/defect-recovery-admin-recovery-editor.test.tsx` 26개 시험 전원 통과 (포커스 트랩 및 회귀 시험 완비).
+     - `apps/web/tests/admin-security-kill-switch-wiring.test.tsx` 16개 시험 전원 통과 (순수 검증기 테이블 기반 반례 13종 + real fetch mock status 관측 + 409/403/500/잘못된 status 실패 시험 완비).
+     - `apps/web/tests/defect-recovery-admin-recovery-editor.test.tsx` 26개 시험 전원 통과 (V1 drain 사전 검증 fail-closed 음성 시험 및 회귀 시험 완비).
      - `apps/web/tests/write-actions-integrity-wiring.test.tsx` 8개 시험 전원 통과.
      - `npx tsc -b` 타입 에러 0건.
-     - `npm run build` Vite 프로덕션 번들 정상 생성 (7.12s).
+     - `npm run build` Vite 프로덕션 번들 정상 생성 (11.95s).
      - `pytest tests/test_route_coverage.py` 40 passed 100%.
      - `python tools/check_frontend_integrity.py` 92개 파일 9대 무결성 규칙 0 위반.
      - `python tools/check_docs.py` PASS.

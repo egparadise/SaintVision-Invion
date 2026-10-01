@@ -140,6 +140,7 @@ export class ApiError extends Error {
 export interface RequestOptions extends RequestInit {
   traceId?: string;
   idempotencyKey?: string;
+  expectedStatus?: number | number[];
 }
 
 /**
@@ -239,6 +240,20 @@ export async function apiClient<T>(endpoint: string, options: RequestOptions = {
       unauthorizedHandler(problem);
     }
     throw new ApiError(problem);
+  }
+
+  if (options.expectedStatus !== undefined) {
+    const expected = Array.isArray(options.expectedStatus) ? options.expectedStatus : [options.expectedStatus];
+    if (!expected.includes(response.status)) {
+      const problem = localProblem(
+        response.status,
+        'Unexpected status code',
+        `Unexpected status code: Server returned status ${response.status}, expected ${expected.join(' or ')}`,
+        traceId,
+        false
+      );
+      throw new ApiError(problem);
+    }
   }
 
   if (response.status === 204) {

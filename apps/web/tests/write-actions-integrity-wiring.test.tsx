@@ -296,7 +296,7 @@ describe('화면 결함 5대 부류 치유 트랙 5차: 고위험 쓰기 동작 
         }
         if (endpoint === '/v1/operations/kill-switch' && options?.method === 'POST') {
           return {
-            requestId: 'req-01',
+            requestId: 'c0000000-0000-4000-8000-000000000001',
             operation: 'kill',
             approvalId: '550e8400-e29b-41d4-a716-446655440000',
             control: {
@@ -323,17 +323,6 @@ describe('화면 결함 5대 부류 치유 트랙 5차: 고위험 쓰기 동작 
         );
       });
 
-      // 승인 ID 입력 (실제 계약 전송 요구사항)
-      const approvalInput = container.querySelector('[data-testid="input-kill-switch-approval-id"]') as HTMLInputElement;
-      if (approvalInput) {
-        await act(async () => {
-          const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
-          nativeSetter?.call(approvalInput, '550e8400-e29b-41d4-a716-446655440000');
-          approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
-          approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
-        });
-      }
-
       // Kill Switch 토글 버튼 활성화 상태 확인
       const killSwitchBtn = container.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLButtonElement;
       expect(killSwitchBtn.disabled).toBe(false);
@@ -349,6 +338,16 @@ describe('화면 결함 5대 부류 치유 트랙 5차: 고위험 쓰기 동작 
       expect(modal?.getAttribute('role')).toBe('dialog');
       expect(modal?.getAttribute('aria-modal')).toBe('true');
       expect(modal?.getAttribute('aria-labelledby')).toBe('kill-switch-modal-title');
+
+      // 승인 ID 입력 (실제 계약 전송 요구사항: 모달 내부에서 입력)
+      const approvalInput = container.querySelector('[data-testid="input-kill-switch-approval-id"]') as HTMLInputElement;
+      expect(approvalInput).not.toBeNull();
+      await act(async () => {
+        const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+        nativeSetter?.call(approvalInput, '550e8400-e29b-41d4-a716-446655440000');
+        approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
+        approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
+      });
 
       const mockNotice = container.querySelector('[data-testid="kill-switch-mock-notice"]');
       expect(mockNotice).not.toBeNull();

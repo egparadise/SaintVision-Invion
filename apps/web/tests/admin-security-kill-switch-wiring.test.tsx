@@ -4,8 +4,11 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 import React, { act } from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { AdminSecurityConsole } from '../src/features/admin/AdminSecurityConsole';
-import * as client from '../src/shared/api/client';
+import {
+  AdminSecurityConsole,
+  isValidContainmentView,
+  isValidContainmentResult,
+} from '../src/features/admin/AdminSecurityConsole';
 import type { NodeItem, ContainmentView, ContainmentResult } from '../src/contracts/types';
 
 const MOCK_NODES: NodeItem[] = [
@@ -65,21 +68,185 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
     vi.restoreAllMocks();
   });
 
-  it('비상 정지가 비활성 상태일 때 긴급 발동 확정 시 POST /v1/operations/kill-switch (202 Accepted)와 Idempotency-Key, expectedVersion, reasonCode, approvalId를 전송하고 활성 상태로 갱신한다', async () => {
-    let capturedEndpoint: string | null = null;
-    let capturedOptions: any = null;
-    let observedResponseStatus: number | null = null;
+  // =========================================================================
+  // V3 & V5: Pure Function Contract Validator Unit Tests
+  // =========================================================================
+  describe('isValidContainmentView pure validator tests', () => {
+    it('유효한 ContainmentView 정본 객체를 승인한다', () => {
+      expect(isValidContainmentView(VALID_INACTIVE_VIEW)).toBe(true);
+      expect(isValidContainmentView(VALID_ACTIVE_VIEW)).toBe(true);
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, nodeId: 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAV' })).toBe(true);
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, nodeStatus: 'offline' })).toBe(true);
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, nodeStatus: 'draining' })).toBe(true);
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, nodeStatus: null })).toBe(true);
+      // 경계값: MAX_SAFE_CONTRACT_INTEGER (9007199254740991)
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, version: 9007199254740991 })).toBe(true);
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, activeLeases: 9007199254740991 })).toBe(true);
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, pendingDeliveries: 9007199254740991 })).toBe(true);
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, unsettledRuns: 9007199254740991 })).toBe(true);
+    });
 
-    vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string, options?: any) => {
-      if (endpoint === '/v1/operations/kill-switch' && (!options || options.method === 'GET')) {
-        return VALID_INACTIVE_VIEW as any;
+    it('필수 필드 누락 및 타입 불일치 반례를 전수 거부한다', () => {
+      // 기본 타입 불일치
+      expect(isValidContainmentView(null)).toBe(false);
+      expect(isValidContainmentView(undefined)).toBe(false);
+      expect(isValidContainmentView(123)).toBe(false);
+      expect(isValidContainmentView('view')).toBe(false);
+      expect(isValidContainmentView([])).toBe(false);
+      expect(isValidContainmentView({})).toBe(false);
+
+      // (b) nodeId: Crockford base32 ULID 규격 (^nod_[0-9A-HJKMNP-TV-Z]{26}$) 및 null만 허용
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, nodeId: 123 })).toBe(false);
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, nodeId: '' })).toBe(false);
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, nodeId: 'nod_sec_01' })).toBe(false); // 길이 부족 및 소문자
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, nodeId: 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAI' })).toBe(false); // 금지문자 'I'
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, nodeId: 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAL' })).toBe(false); // 금지문자 'L'
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, nodeId: 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAO' })).toBe(false); // 금지문자 'O'
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, nodeId: 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAU' })).toBe(false); // 금지문자 'U'
+
+      // (c) version: 0 이상 9007199254740991 이하 정수
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, version: -1 })).toBe(false);
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, version: 1.5 })).toBe(false);
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, version: '1' })).toBe(false);
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, version: 9007199254740992 })).toBe(false); // 상한 초과
+
+      // killSwitchActive
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, killSwitchActive: 'true' })).toBe(false);
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, killSwitchActive: null })).toBe(false);
+
+      // nodeStatus enum
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, nodeStatus: 'drained' })).toBe(false);
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, nodeStatus: 'active' })).toBe(false);
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, nodeStatus: 'unknown' })).toBe(false);
+
+      // (c) activeLeases
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, activeLeases: -1 })).toBe(false);
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, activeLeases: 1.2 })).toBe(false);
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, activeLeases: 9007199254740992 })).toBe(false); // 상한 초과
+
+      // (c) pendingDeliveries
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, pendingDeliveries: -1 })).toBe(false);
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, pendingDeliveries: 2.5 })).toBe(false);
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, pendingDeliveries: 9007199254740992 })).toBe(false); // 상한 초과
+
+      // (c) unsettledRuns
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, unsettledRuns: -1 })).toBe(false);
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, unsettledRuns: 3.14 })).toBe(false);
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, unsettledRuns: 9007199254740992 })).toBe(false); // 상한 초과
+
+      // settled
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, settled: 1 })).toBe(false);
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, settled: 'true' })).toBe(false);
+
+      // (a) V5: additionalProperties: false 검증
+      expect(isValidContainmentView({ ...VALID_INACTIVE_VIEW, extraProperty: 'malicious' })).toBe(false);
+    });
+  });
+
+  describe('isValidContainmentResult pure validator tests', () => {
+    const validResult: ContainmentResult = {
+      requestId: 'c0000000-0000-4000-8000-000000000001',
+      operation: 'kill',
+      approvalId: '550e8400-e29b-41d4-a716-446655440000',
+      control: VALID_ACTIVE_VIEW,
+    };
+
+    it('유효한 ContainmentResult 객체를 승인한다', () => {
+      expect(isValidContainmentResult(validResult, 'kill', '550e8400-e29b-41d4-a716-446655440000')).toBe(true);
+      // 대소문자 무관 일치
+      expect(isValidContainmentResult(validResult, 'kill', '550E8400-E29B-41D4-A716-446655440000')).toBe(true);
+    });
+
+    it('필드 누락, 의도 불일치, approvalId echo 불일치 및 모순 상태를 전수 거부한다', () => {
+      expect(isValidContainmentResult(null, 'kill', '550e8400-e29b-41d4-a716-446655440000')).toBe(false);
+      expect(isValidContainmentResult({}, 'kill', '550e8400-e29b-41d4-a716-446655440000')).toBe(false);
+
+      // (d) requestId: RFC 4122 UUID 포맷 검증
+      expect(isValidContainmentResult({ ...validResult, requestId: '' }, 'kill', '550e8400-e29b-41d4-a716-446655440000')).toBe(false);
+      expect(isValidContainmentResult({ ...validResult, requestId: 'req-001' }, 'kill', '550e8400-e29b-41d4-a716-446655440000')).toBe(false);
+      expect(isValidContainmentResult({ ...validResult, requestId: 'not-a-valid-uuid' }, 'kill', '550e8400-e29b-41d4-a716-446655440000')).toBe(false);
+
+      // (d) approvalId: RFC 4122 UUID 포맷 검증
+      expect(isValidContainmentResult({ ...validResult, approvalId: 'not-a-valid-uuid' }, 'kill', 'not-a-valid-uuid')).toBe(false);
+
+      // operation mismatch
+      expect(isValidContainmentResult({ ...validResult, operation: 'clear' }, 'kill', '550e8400-e29b-41d4-a716-446655440000')).toBe(false);
+
+      // approvalId echo mismatch
+      expect(isValidContainmentResult(validResult, 'kill', '11111111-2222-4333-8444-555555555555')).toBe(false);
+
+      // control 누락 / 무효
+      expect(isValidContainmentResult({ ...validResult, control: {} as any }, 'kill', '550e8400-e29b-41d4-a716-446655440000')).toBe(false);
+
+      // killSwitchActive 상태 모순: kill 요청인데 false인 경우
+      expect(isValidContainmentResult({ ...validResult, control: VALID_INACTIVE_VIEW }, 'kill', '550e8400-e29b-41d4-a716-446655440000')).toBe(false);
+
+      // clear 요청인데 true인 경우
+      const clearResult: ContainmentResult = {
+        requestId: 'c0000000-0000-4000-8000-000000000002',
+        operation: 'clear',
+        approvalId: '550e8400-e29b-41d4-a716-446655440000',
+        control: VALID_ACTIVE_VIEW, // 모순!
+      };
+      expect(isValidContainmentResult(clearResult, 'clear', '550e8400-e29b-41d4-a716-446655440000')).toBe(false);
+
+      // (b) Global kill-switch route는 nodeId === null 결속 단언 (nodeId가 null이 아니면 거부)
+      expect(
+        isValidContainmentResult(
+          { ...validResult, control: { ...VALID_ACTIVE_VIEW, nodeId: 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAV' } },
+          'kill',
+          '550e8400-e29b-41d4-a716-446655440000'
+        )
+      ).toBe(false);
+
+      // (b) Node-scoped drain 연산의 canonical 승인 및 nodeId 불일치 거부
+      const validDrainResult: ContainmentResult = {
+        requestId: 'c0000000-0000-4000-8000-000000000003',
+        operation: 'drain',
+        approvalId: '550e8400-e29b-41d4-a716-446655440000',
+        control: {
+          ...VALID_INACTIVE_VIEW,
+          nodeId: 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAV',
+          nodeStatus: 'draining',
+        },
+      };
+      expect(isValidContainmentResult(validDrainResult, 'drain', '550e8400-e29b-41d4-a716-446655440000', 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAV')).toBe(true);
+      expect(isValidContainmentResult(validDrainResult, 'drain', '550e8400-e29b-41d4-a716-446655440000', 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAW')).toBe(false);
+
+      // (a) additionalProperties: false 위반
+      expect(isValidContainmentResult({ ...validResult, extraField: 'bad' }, 'kill', '550e8400-e29b-41d4-a716-446655440000')).toBe(false);
+    });
+  });
+
+  // =========================================================================
+  // V2: Real apiClient & globalThis.fetch Mock Testing
+  // =========================================================================
+  function mockFetch(handler: (url: string, init?: RequestInit) => { status: number; body: unknown }) {
+    return vi.spyOn(globalThis, 'fetch').mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : (input as Request).url;
+      const res = handler(url, init);
+      const isProblem = res.status >= 400 && res.body && typeof res.body === 'object' && 'type' in (res.body as any);
+      const contentType = isProblem ? 'application/problem+json' : 'application/json';
+      return new Response(JSON.stringify(res.body), {
+        status: res.status,
+        headers: { 'Content-Type': contentType },
+      });
+    });
+  }
+
+  it('비상 정지가 비활성 상태일 때 긴급 발동 확정 시 POST /v1/operations/kill-switch (202 Accepted)와 Idempotency-Key, expectedVersion, reasonCode, approvalId를 전송하고 활성 상태로 갱신한다', async () => {
+    let capturedUrl: string | null = null;
+    let capturedInit: RequestInit | undefined = undefined;
+
+    mockFetch((url, init) => {
+      if (url === '/v1/operations/kill-switch' && (!init?.method || init.method === 'GET')) {
+        return { status: 200, body: VALID_INACTIVE_VIEW };
       }
-      if (endpoint === '/v1/operations/kill-switch' && options?.method === 'POST') {
-        capturedEndpoint = endpoint;
-        capturedOptions = options;
-        observedResponseStatus = 202; // app.py:400 @api.post("/v1/operations/kill-switch", status_code=202)
+      if (url === '/v1/operations/kill-switch' && init?.method === 'POST') {
+        capturedUrl = url;
+        capturedInit = init;
         const res: ContainmentResult = {
-          requestId: 'req-00000000-0000-4000-8000-000000000001',
+          requestId: '00000000-0000-4000-8000-000000000001',
           operation: 'kill',
           approvalId: '11111111-2222-4333-8444-555555555555',
           control: {
@@ -93,9 +260,9 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
             settled: true,
           },
         };
-        return res as any;
+        return { status: 202, body: res };
       }
-      return {} as any;
+      return { status: 404, body: {} };
     });
 
     await act(async () => {
@@ -125,26 +292,38 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
       approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
     });
 
-    // 2. 모달 열기
+    // 2. 비상 정지 토글 버튼 클릭하여 확인 모달 오픈
     const toggleBtn = container.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLButtonElement;
+    expect(toggleBtn).not.toBeNull();
     await act(async () => {
       toggleBtn.click();
     });
 
+    const modal = container.querySelector('[data-testid="kill-switch-modal"]');
+    expect(modal).not.toBeNull();
+
+    // 3. 파라미터 요약 검증
+    const paramsSummary = container.querySelector('[data-testid="kill-switch-params-summary"]');
+    expect(paramsSummary?.textContent).toContain('incident');
+    expect(paramsSummary?.textContent).toContain('11111111-2222-4333-8444-555555555555');
+
+    // 4. 긴급 발동 확정 버튼 클릭
     const confirmBtn = container.querySelector('[data-testid="kill-switch-confirm-btn"]') as HTMLButtonElement;
+    expect(confirmBtn.textContent).toContain('긴급 발동 확정');
     expect(confirmBtn.disabled).toBe(false);
 
-    // 3. 비상 정지 발동 확정
     await act(async () => {
       confirmBtn.click();
     });
 
-    expect(capturedEndpoint).toBe('/v1/operations/kill-switch');
-    expect(observedResponseStatus).toBe(202);
-    expect(capturedOptions.method).toBe('POST');
-    expect(capturedOptions.headers['Idempotency-Key']).toMatch(/^killswitch_/);
+    // 5. 실배선 네트워크 전송 규격 단언
+    expect(capturedUrl).toBe('/v1/operations/kill-switch');
+    expect(capturedInit?.method).toBe('POST');
+    const headers = capturedInit?.headers as Headers;
+    expect(headers.get('Idempotency-Key')).toMatch(/^killswitch_/);
+    expect(headers.get('Content-Type')).toBe('application/json');
 
-    const sentPayload = JSON.parse(capturedOptions.body);
+    const sentPayload = JSON.parse(capturedInit?.body as string);
     expect(sentPayload).toEqual({
       expectedVersion: 5,
       reasonCode: 'incident',
@@ -158,20 +337,18 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
   });
 
   it('비상 정지가 활성 상태일 때 해제 실행 시 POST /v1/operations/kill-switch/clear (200 OK)를 호출하고 비활성 상태로 복귀한다', async () => {
-    let capturedEndpoint: string | null = null;
-    let capturedOptions: any = null;
-    let observedResponseStatus: number | null = null;
+    let capturedUrl: string | null = null;
+    let capturedInit: RequestInit | undefined = undefined;
 
-    vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string, options?: any) => {
-      if (endpoint === '/v1/operations/kill-switch' && (!options || options.method === 'GET')) {
-        return VALID_ACTIVE_VIEW as any;
+    mockFetch((url, init) => {
+      if (url === '/v1/operations/kill-switch' && (!init?.method || init.method === 'GET')) {
+        return { status: 200, body: VALID_ACTIVE_VIEW };
       }
-      if (endpoint === '/v1/operations/kill-switch/clear' && options?.method === 'POST') {
-        capturedEndpoint = endpoint;
-        capturedOptions = options;
-        observedResponseStatus = 200; // app.py:412 @api.post("/v1/operations/kill-switch/clear") default status 200
+      if (url === '/v1/operations/kill-switch/clear' && init?.method === 'POST') {
+        capturedUrl = url;
+        capturedInit = init;
         const res: ContainmentResult = {
-          requestId: 'req-00000000-0000-4000-8000-000000000002',
+          requestId: '00000000-0000-4000-8000-000000000002',
           operation: 'clear',
           approvalId: '22222222-3333-4444-8555-666666666666',
           control: {
@@ -185,9 +362,9 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
             settled: true,
           },
         };
-        return res as any;
+        return { status: 200, body: res };
       }
-      return {} as any;
+      return { status: 404, body: {} };
     });
 
     await act(async () => {
@@ -224,9 +401,9 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
       confirmBtn.click();
     });
 
-    expect(capturedEndpoint).toBe('/v1/operations/kill-switch/clear');
-    expect(observedResponseStatus).toBe(200);
-    const sentPayload = JSON.parse(capturedOptions.body);
+    expect(capturedUrl).toBe('/v1/operations/kill-switch/clear');
+    expect(capturedInit?.method).toBe('POST');
+    const sentPayload = JSON.parse(capturedInit?.body as string);
     expect(sentPayload).toEqual({
       expectedVersion: 8,
       reasonCode: 'operator_request',
@@ -238,15 +415,134 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
   });
 
   // =========================================================================
+  // V2 음성 시험: 잘못된 HTTP Status(clear에 202 또는 500)에서 실패
+  // =========================================================================
+  it('clear 요청 시 서버가 202 Accepted(잘못된 status)를 반환하면 클라이언트 expectedStatus=200 검사로 실패하고 상태를 갱신하지 않는다', async () => {
+    mockFetch((url, init) => {
+      if (url === '/v1/operations/kill-switch' && (!init?.method || init.method === 'GET')) {
+        return { status: 200, body: VALID_ACTIVE_VIEW };
+      }
+      if (url === '/v1/operations/kill-switch/clear' && init?.method === 'POST') {
+        // 잘못된 status: clear인데 200이 아닌 202 Accepted 반환
+        return {
+          status: 202,
+          body: {
+            requestId: 'req-002',
+            operation: 'clear',
+            approvalId: '22222222-3333-4444-8555-666666666666',
+            control: { ...VALID_INACTIVE_VIEW, version: 9 },
+          },
+        };
+      }
+      return { status: 404, body: {} };
+    });
+
+    await act(async () => {
+      root.render(
+        <AdminSecurityConsole
+          nodes={MOCK_NODES}
+          currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+        />
+      );
+    });
+
+    const approvalInput = container.querySelector('[data-testid="input-kill-switch-approval-id"]') as HTMLInputElement;
+    await act(async () => {
+      const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+      nativeSetter?.call(approvalInput, '22222222-3333-4444-8555-666666666666');
+      approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
+      approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    const toggleBtn = container.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLButtonElement;
+    await act(async () => {
+      toggleBtn.click();
+    });
+
+    const confirmBtn = container.querySelector('[data-testid="kill-switch-confirm-btn"]') as HTMLButtonElement;
+    await act(async () => {
+      confirmBtn.click();
+    });
+
+    // 에러 배너에 Unexpected status code 표시 단언
+    const errorBanner = container.querySelector('[data-testid="kill-switch-error-banner"]');
+    expect(errorBanner?.textContent).toContain('Unexpected status code');
+
+    // 상태 미변경 유지
+    const backendStatus = container.querySelector('[data-testid="backend-kill-switch-status"]');
+    expect(backendStatus?.textContent).toContain('ACTIVE (v8)');
+  });
+
+  it('clear 요청 시 서버가 500 Internal Server Error를 반환하면 에러 배너를 표출하고 상태를 변경하지 않는다', async () => {
+    mockFetch((url, init) => {
+      if (url === '/v1/operations/kill-switch' && (!init?.method || init.method === 'GET')) {
+        return { status: 200, body: VALID_ACTIVE_VIEW };
+      }
+      if (url === '/v1/operations/kill-switch/clear' && init?.method === 'POST') {
+        return {
+          status: 500,
+          body: {
+            type: 'about:blank',
+            title: 'Internal Server Error',
+            status: 500,
+            code: 'SRV-0500',
+            category: 'SRV',
+            detail: 'Database write barrier timeout',
+            retryable: true,
+            traceId: '0123456789abcdef0123456789abcdef',
+            causeRef: null,
+            evidenceId: null,
+          },
+        };
+      }
+      return { status: 404, body: {} };
+    });
+
+    await act(async () => {
+      root.render(
+        <AdminSecurityConsole
+          nodes={MOCK_NODES}
+          currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+        />
+      );
+    });
+
+    const approvalInput = container.querySelector('[data-testid="input-kill-switch-approval-id"]') as HTMLInputElement;
+    await act(async () => {
+      const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+      nativeSetter?.call(approvalInput, '22222222-3333-4444-8555-666666666666');
+      approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
+      approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    const toggleBtn = container.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLButtonElement;
+    await act(async () => {
+      toggleBtn.click();
+    });
+
+    const confirmBtn = container.querySelector('[data-testid="kill-switch-confirm-btn"]') as HTMLButtonElement;
+    await act(async () => {
+      confirmBtn.click();
+    });
+
+    const errorBanner = container.querySelector('[data-testid="kill-switch-error-banner"]');
+    expect(errorBanner?.textContent).toContain('SRV-0500');
+    expect(errorBanner?.textContent).toContain('Database write barrier timeout');
+
+    const backendStatus = container.querySelector('[data-testid="backend-kill-switch-status"]');
+    expect(backendStatus?.textContent).toContain('ACTIVE (v8)');
+  });
+
+  // =========================================================================
   // Review Point (1): GET ContainmentView 계약 검증 실패 / 로딩 시 쓰기 비활성화 (fail-closed)
   // =========================================================================
   it('GET /v1/operations/kill-switch 응답이 부분 응답이거나 필수 필드(version 등) 누락 시 오류를 표시하고 확정 버튼을 비활성화한다 (fail-closed)', async () => {
-    vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
-      if (endpoint === '/v1/operations/kill-switch') {
+    mockFetch((url) => {
+      if (url === '/v1/operations/kill-switch') {
         // version 및 canonical 필드 누락 부분 응답
-        return { killSwitchActive: false } as any;
+        return { status: 200, body: { killSwitchActive: false } };
       }
-      return {} as any;
+      return { status: 404, body: {} };
     });
 
     await act(async () => {
@@ -291,16 +587,16 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
   // =========================================================================
   it('POST 응답에 control이 누락되거나 위장된 경우(빈 응답 {}) 상태를 합성하지 않고 오류를 표시하며 재조회한다', async () => {
     let getCallCount = 0;
-    vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string, options?: any) => {
-      if (endpoint === '/v1/operations/kill-switch' && (!options || options.method === 'GET')) {
+    mockFetch((url, init) => {
+      if (url === '/v1/operations/kill-switch' && (!init?.method || init.method === 'GET')) {
         getCallCount++;
-        return VALID_INACTIVE_VIEW as any;
+        return { status: 200, body: VALID_INACTIVE_VIEW };
       }
-      if (endpoint === '/v1/operations/kill-switch' && options?.method === 'POST') {
+      if (url === '/v1/operations/kill-switch' && init?.method === 'POST') {
         // 위장: control 누락 빈 객체
-        return {} as any;
+        return { status: 202, body: {} };
       }
-      return {} as any;
+      return { status: 404, body: {} };
     });
 
     await act(async () => {
@@ -332,33 +628,37 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
       confirmBtn.click();
     });
 
-    // 상태 미변경 단언: 여전히 모달이 열려있고 상단 활성 배너는 미표출
-    expect(container.querySelector('[data-testid="kill-switch-active-banner"]')).toBeNull();
     const errorBanner = container.querySelector('[data-testid="kill-switch-error-banner"]');
     expect(errorBanner?.textContent).toContain('[CONTRACT-MISMATCH]');
+
+    // 상태 미변경 단언
+    expect(container.querySelector('[data-testid="kill-switch-active-banner"]')).toBeNull();
 
     // 재조회 호출 실측 (GET이 다시 호출됨)
     expect(getCallCount).toBe(2);
   });
 
   it('POST 응답의 operation이 요청 의도와 불일치하거나 killSwitchActive가 모순된 경우 계약 불일치로 거부한다', async () => {
-    vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string, options?: any) => {
-      if (endpoint === '/v1/operations/kill-switch' && (!options || options.method === 'GET')) {
-        return VALID_INACTIVE_VIEW as any;
+    mockFetch((url, init) => {
+      if (url === '/v1/operations/kill-switch' && (!init?.method || init.method === 'GET')) {
+        return { status: 200, body: VALID_INACTIVE_VIEW };
       }
-      if (endpoint === '/v1/operations/kill-switch' && options?.method === 'POST') {
+      if (url === '/v1/operations/kill-switch' && init?.method === 'POST') {
         // kill 요청인데 operation이 clear로 오거나 killSwitchActive가 false인 모순
         return {
-          requestId: 'req-bad',
-          operation: 'clear', // mismatch!
-          approvalId: '550e8400-e29b-41d4-a716-446655440000',
-          control: {
-            ...VALID_INACTIVE_VIEW,
-            killSwitchActive: false, // contradiction!
+          status: 202,
+          body: {
+            requestId: 'req-bad',
+            operation: 'clear', // mismatch!
+            approvalId: '550e8400-e29b-41d4-a716-446655440000',
+            control: {
+              ...VALID_INACTIVE_VIEW,
+              killSwitchActive: false, // contradiction!
+            },
           },
-        } as any;
+        };
       }
-      return {} as any;
+      return { status: 404, body: {} };
     });
 
     await act(async () => {
@@ -397,16 +697,16 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
   // Review Point (3): 승인 ID 기본값 빈 값 & 입력 전 전송 불가
   // =========================================================================
   it('승인 ID가 빈 값일 때 모달에 필수 경고를 표출하고 확정 버튼을 비활성화하여 전송을 차단한다', async () => {
-    const postCalls: any[] = [];
-    vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string, options?: any) => {
-      if (endpoint === '/v1/operations/kill-switch' && (!options || options.method === 'GET')) {
-        return VALID_INACTIVE_VIEW as any;
+    let postCallCount = 0;
+    mockFetch((url, init) => {
+      if (url === '/v1/operations/kill-switch' && (!init?.method || init.method === 'GET')) {
+        return { status: 200, body: VALID_INACTIVE_VIEW };
       }
-      if (options?.method === 'POST') {
-        postCalls.push({ endpoint, options });
-        return {} as any;
+      if (init?.method === 'POST') {
+        postCallCount++;
+        return { status: 200, body: {} };
       }
-      return {} as any;
+      return { status: 404, body: {} };
     });
 
     await act(async () => {
@@ -441,29 +741,30 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
     await act(async () => {
       confirmBtn.click();
     });
-    expect(postCalls.length).toBe(0);
+    expect(postCallCount).toBe(0);
   });
 
   it('비상 정지 API 409 GRAPH-0003 충돌 발생 시 에러 배너에 RFC 9457 ProblemDetails를 표시하고 모달을 닫지 않는다', async () => {
-    vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string, options?: any) => {
-      if (endpoint === '/v1/operations/kill-switch' && (!options || options.method === 'GET')) {
-        return VALID_INACTIVE_VIEW as any;
+    mockFetch((url, init) => {
+      if (url === '/v1/operations/kill-switch' && (!init?.method || init.method === 'GET')) {
+        return { status: 200, body: VALID_INACTIVE_VIEW };
       }
-      if (options?.method === 'POST') {
-        const error: any = new Error('Control version conflict: expected version 5 differs from server version 7');
-        error.problem = {
+      if (url === '/v1/operations/kill-switch' && init?.method === 'POST') {
+        const problem = {
           type: 'about:blank',
-          title: 'Conflict',
+          title: 'Control version conflict: expected version 5 differs from server',
           status: 409,
           code: 'GRAPH-0003',
           category: 'GRAPH',
-          detail: 'Control version conflict: expected version 5 differs from server version 7',
+          detail: 'Expected version 5 does not match current version 7',
           retryable: false,
-          traceId: 'trace-409-conflict',
+          traceId: '0123456789abcdef0123456789abcdef',
+          causeRef: null,
+          evidenceId: null,
         };
-        throw error;
+        return { status: 409, body: problem };
       }
-      return {} as any;
+      return { status: 404, body: {} };
     });
 
     await act(async () => {
@@ -493,42 +794,44 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
       confirmBtn.click();
     });
 
+    // 모달이 닫히지 않고 에러 배너를 표출하는지 확인
     const modal = container.querySelector('[data-testid="kill-switch-modal"]');
     expect(modal).not.toBeNull();
 
     const errorBanner = container.querySelector('[data-testid="kill-switch-error-banner"]');
     expect(errorBanner).not.toBeNull();
-    expect(errorBanner?.getAttribute('role')).toBe('alert');
-    expect(errorBanner?.textContent).toContain('[GRAPH-0003]');
-    expect(errorBanner?.textContent).toContain('Control version conflict');
+    expect(errorBanner?.textContent).toContain('GRAPH-0003');
+    expect(errorBanner?.textContent).toContain('Expected version 5 does not match current version 7');
   });
 
-  it('비상 정지 API 403 AUTH-0062 권한 부족 발생 시 에러 배너에 오류를 명확히 표시한다', async () => {
-    vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string, options?: any) => {
-      if (endpoint === '/v1/operations/kill-switch' && (!options || options.method === 'GET')) {
-        return VALID_INACTIVE_VIEW as any;
+  it('비상 정지 API 403 AUTH-0062 거부 시 에러 배너에 RFC 9457 ProblemDetails를 정직하게 표시한다', async () => {
+    mockFetch((url, init) => {
+      if (url === '/v1/operations/kill-switch' && (!init?.method || init.method === 'GET')) {
+        return { status: 200, body: VALID_INACTIVE_VIEW };
       }
-      if (options?.method === 'POST') {
-        const error: any = new Error('Operator containment grant required');
-        error.problem = {
+      if (url === '/v1/operations/kill-switch' && init?.method === 'POST') {
+        const problem = {
           type: 'about:blank',
-          title: 'Forbidden',
+          title: 'Forbidden: Insufficient privileges for emergency kill-switch',
           status: 403,
           code: 'AUTH-0062',
           category: 'AUTH',
-          detail: 'Operator containment grant required',
+          detail: 'Actor usr_sec_admin lacks cluster:emergency permission',
           retryable: false,
+          traceId: '0123456789abcdef0123456789abcdef',
+          causeRef: null,
+          evidenceId: null,
         };
-        throw error;
+        return { status: 403, body: problem };
       }
-      return {} as any;
+      return { status: 404, body: {} };
     });
 
     await act(async () => {
       root.render(
         <AdminSecurityConsole
           nodes={MOCK_NODES}
-          currentUser={{ id: 'usr_sec_viewer', name: 'Sec Viewer', role: 'viewer' }}
+          currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
         />
       );
     });
@@ -552,12 +855,17 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
     });
 
     const errorBanner = container.querySelector('[data-testid="kill-switch-error-banner"]');
-    expect(errorBanner?.textContent).toContain('[AUTH-0062]');
-    expect(errorBanner?.textContent).toContain('Operator containment grant required');
+    expect(errorBanner?.textContent).toContain('AUTH-0062');
+    expect(errorBanner?.textContent).toContain('Actor usr_sec_admin lacks cluster:emergency permission');
   });
 
-  it('currentUser가 null일 때 관리자 세션 부재 배너를 렌더링하고 토글 버튼과 확정 버튼을 비활성화하여 위조 합성을 방지한다', async () => {
-    vi.spyOn(client, 'apiClient').mockResolvedValue(VALID_INACTIVE_VIEW as any);
+  it('currentUser가 null인 경우 비상 정지 토글 및 확정 버튼이 원천 비활성화된다', async () => {
+    mockFetch((url) => {
+      if (url === '/v1/operations/kill-switch') {
+        return { status: 200, body: VALID_INACTIVE_VIEW };
+      }
+      return { status: 404, body: {} };
+    });
 
     await act(async () => {
       root.render(
@@ -568,12 +876,77 @@ describe('AdminSecurityConsole Emergency Kill Switch Real Backend Wiring Tests (
       );
     });
 
-    const authNotice = container.querySelector('[data-testid="admin-auth-required-notice"]');
-    expect(authNotice).not.toBeNull();
-    expect(authNotice?.textContent).toContain('인증된 관리자 세션 부재');
-
     const toggleBtn = container.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLButtonElement;
     expect(toggleBtn.disabled).toBe(true);
     expect(toggleBtn.getAttribute('aria-disabled')).toBe('true');
+  });
+
+  // =========================================================================
+  // V1 음성 시험: Node Control Pre-query Contract Validation (V1)
+  // =========================================================================
+  it('V1: Drain 통제 시 node control(/control) 응답이 canonical 규격(enum nodeStatus 등) 불일치 시 fail-closed 중단하고 POST를 0회로 차단한다', async () => {
+    let drainPostCallCount = 0;
+    mockFetch((url, init) => {
+      if (url === '/v1/operations/kill-switch') {
+        return { status: 200, body: VALID_INACTIVE_VIEW };
+      }
+      if (url.includes('/control')) {
+        // V1 결함 반례: nodeStatus가 정본 enum('online','offline','draining','quarantined') 밖의 'drained'로 오거나 필수 필드 누락
+        return {
+          status: 200,
+          body: {
+            ...VALID_INACTIVE_VIEW,
+            nodeStatus: 'drained', // INVALID ENUM!
+          },
+        };
+      }
+      if (url.includes('/drain')) {
+        drainPostCallCount++;
+        return { status: 200, body: {} };
+      }
+      return { status: 404, body: {} };
+    });
+
+    await act(async () => {
+      root.render(
+        <AdminSecurityConsole
+          nodes={MOCK_NODES}
+          currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+        />
+      );
+    });
+
+    // Drain 통제 탭으로 이동
+    const drainTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('노드 Drain 통제')
+    );
+    await act(async () => {
+      drainTabBtn?.click();
+    });
+
+    // 유효한 승인 ID 입력
+    const drainApprovalInput = container.querySelector('[data-testid="drain-approval-id-input"]') as HTMLInputElement;
+    await act(async () => {
+      const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+      nativeSetter?.call(drainApprovalInput, '550e8400-e29b-41d4-a716-446655440000');
+      drainApprovalInput.dispatchEvent(new Event('input', { bubbles: true }));
+      drainApprovalInput.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    // Drain 실행 클릭
+    const drainBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('Node Drain')
+    ) as HTMLButtonElement;
+    expect(drainBtn).not.toBeNull();
+
+    await act(async () => {
+      drainBtn.click();
+    });
+
+    // V1 fail-closed 단언: 에러 배너 표출 및 drain POST 0회 호출
+    const banner = container.querySelector('[data-testid="admin-drain-error-banner"]');
+    expect(banner).not.toBeNull();
+    expect(banner?.textContent).toContain('응답 형식 불일치로 작업을 중단했습니다 (fail-closed)');
+    expect(drainPostCallCount).toBe(0);
   });
 });

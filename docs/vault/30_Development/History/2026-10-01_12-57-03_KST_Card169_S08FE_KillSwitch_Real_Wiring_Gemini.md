@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-20261001-C169-S08FE-001"
 title: "Card 169 (S08-FE) 관리자 보안 콘솔 비상 정지(Kill Switch) 백엔드 제어 평면 실배선 및 202 Accepted 멱등 연동 기록"
-version: "1.0.1"
+version: "1.0.2"
 status: "approved"
 author: "Gemini"
 created: "2026-10-01T12:57:03+09:00"
-updated: "2026-10-01T13:17:15+09:00"
+updated: "2026-10-01T13:52:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -38,38 +38,57 @@ source_of_truth: "Git"
    - 백엔드 403(`AUTH-0062`), 409(`GRAPH-0003`), 422 ProblemDetails 에러 수신 시 모달을 닫지 않고 에러 배너에 RFC 9457 코드 및 상세 내역 정직하게 표시.
 4. **전용 검증 테스트 스위트 작성 (`admin-security-kill-switch-wiring.test.tsx`)**:
    - 긴급 발동 확정 시 `POST /v1/operations/kill-switch` 202 Accepted, `Idempotency-Key`, `expectedVersion`, `reasonCode`, `approvalId` 전송 및 `ACTIVE` 갱신 검증.
-   - 해제 확정 시 `POST /v1/operations/kill-switch/clear` 202 Accepted 및 `INACTIVE` 복귀 검증.
+   - 해제 확정 시 `POST /v1/operations/kill-switch/clear` 200 OK 및 `INACTIVE` 복귀 검증.
    - 409 Conflict ProblemDetails 처리 및 모달 유지 검증.
    - 403 Forbidden ProblemDetails 처리 검증.
    - 무효 UUID 입력 시 네트워크 POST 0회 차단 검증.
    - `currentUser=null` 시 관리자 부재 배너 및 버튼 비활성화 검증.
 
-## 3. PR #267 독립 검토(13:02) 지적사항 전수 조치 (Remediation Details)
+## 3. PR #267 1차 독립 검토(13:02) 지적사항 조치
 1. **(1)[High] GET ContainmentView 계약 완전 검증 및 fail-closed 쓰기 차단**:
-   - `isValidContainmentView(v: unknown): v is ContainmentView`: `nodeId` (string | null), 정수 `version >= 0`, boolean `killSwitchActive`, `nodeStatus` (string | null), 음수 아닌 정수 `activeLeases`, `pendingDeliveries`, `unsettledRuns`, boolean `settled`를 전수 검증.
-   - 부분 응답(예: `{ killSwitchActive: false }`), 필드 누락, 로딩 중, 오류 응답 수신 시 `backendKillSwitch.status = 'error'`, `isKillSwitchReady = false`로 처리하여 쓰기 버튼(`kill-switch-confirm-btn`)을 원천 비활성화(`canConfirmKillSwitch = false`, fail-closed).
+   - `isValidContainmentView`를 통해 필수 필드 및 타입 검증, 부분 응답 시 확정 버튼 비활성화 fail-closed 구현.
 2. **(2)[High] POST ContainmentResult 정본 shape 검증, 상태 합성 제거 및 재조회**:
-   - `isValidContainmentResult(r: unknown, expectedOperation, expectedApprovalId)`: `requestId` (비어있지 않은 문자열), `operation === expectedOperation`, `approvalId` 대소문자 무관 일치, `control`의 `isValidContainmentView` 만족 및 `control.killSwitchActive === (expectedOperation === 'kill')`를 엄격 검증.
-   - 응답 위장 또는 `control` 누락 시 임의 상태 합성(`version ?? currentVersion + 1` 등)을 배제하고 `[CONTRACT-MISMATCH]` 오류 표시, 로컬 상태 미변경(불변), 즉시 제어 평면 상태 재조회(`fetchBackendKillSwitch()`) 실행.
+   - 응답 위장 및 control 누락 시 임의 버전 합성 배제, `[CONTRACT-MISMATCH]` 표시 및 상태 재조회.
 3. **(3)[Medium] 승인 UUID 기본값 빈 문자열 초기화 및 사전 가드**:
-   - 모의 승인 UUID(`00000000-0000-4000-8000-000000000001`) 기본값을 제거하고 `''`로 초기화.
-   - 유효한 UUIDv4 입력 전에는 모달 내 `kill-switch-approval-required-notice` (role="alert")를 표출하고 확정 버튼을 비활성화(`canConfirmKillSwitch = false`), 클릭 시도 시에도 네트워크 호출을 0회로 원천 차단.
+   - 기본값을 빈 문자열 `''`로 초기화하고 실제 UUID 입력 전 네트워크 호출 차단.
 4. **(4)[Medium] Clear HTTP 200 OK 정본 규격 반영 및 상태 관측**:
-   - 서버 `app.py:412` (`@api.post("/v1/operations/kill-switch/clear")`) 정본 기본 status인 `200 OK`를 시험 및 mock에 반영하고, mock이 실제 HTTP status를 관측/단언하도록 정합. (활성화는 202 Accepted, 해제는 200 OK).
-   - 각 반례(부분 응답, 위장 응답, 모순 상태, 승인 ID 빈 값)에 대한 음성 시험 완비 (총 9개 시험).
+   - 서버 `app.py:412` 규격인 `200 OK`를 mock 및 시험에 반영.
 
-## 4. 로컬 실측 검증 (Evidence)
-- `npm test -- admin-security-kill-switch-wiring`: 9 passed (exit 0, 반례 부정 시험 전수 통과)
-- `npm test -- defect-recovery-admin`: 26 passed (exit 0, 포커스 트랩 및 Kill Switch 회귀 100% 통과)
-- `npm test -- write-actions`: 8 passed (exit 0)
+## 4. PR #267 2차 독립 검토(Claude r2 13:27 & Codex r2 13:31) 전수 조치 (Remediation Details)
+1. **(V1)[High] Node control 정본 규격 런타임 검증 및 fail-closed**:
+   - `handleToggleDrain`의 `/v1/nodes/:nodeId/control` 사전 조회 시 `isValidContainmentView(ctrl)`를 적용하여 8대 필수 필드, `nodeStatus` enum (`online`, `offline`, `draining`, `quarantined`, `null`), 정수 경계를 전수 검증.
+   - 규격 불일치 시 `setDrainError` 표출 후 즉시 중단(POST 0회 차단, fail-closed).
+2. **(V2)[High] Real fetch mock 및 실제 HTTP status 관측**:
+   - `apiClient` spy 대신 `globalThis.fetch`를 spy하여 실제 `new Response(..., { status, headers })`를 반환하도록 전면 개편.
+   - `client.ts`에 `options.expectedStatus` 기능을 구현하여 기대 status(발동 202, 해제 200)와 불일치 시 `Unexpected status code` ApiError 발생.
+   - `!response.ok` (4xx/5xx) 처리를 우선 파싱하여 RFC 9457 `GRAPH-0003`, `AUTH-0062`, `SRV-0500` ProblemDetails가 온전히 보존되도록 순서 보장.
+3. **(V3)[Medium] 순수 검증기 함수 직접 단위 테스트 테이블 완비**:
+   - `isValidContainmentView` 및 `isValidContainmentResult` 순수 함수를 컴포넌트 마운트 없이 독립 테스트 스위트에서 13종 이상의 반례를 테이블 기반으로 직접 검증.
+4. **(V4)[Low-Medium] 서버 제어 평면 상태 단일 정본화**:
+   - `isCurrentlyActive = backendKillSwitch.status === 'active'`로 단일화하여 클라이언트 로컬 상태와 혼재 방지.
+5. **(V5 & Codex a)[Low] additionalProperties: false 엄격 거부**:
+   - `ALLOWED_CONTAINMENT_VIEW_KEYS` (8개) 및 `ALLOWED_CONTAINMENT_RESULT_KEYS` (4개)를 선언하고, 미지의 추가 속성 존재 시 즉시 거부 (`keys.length !== allowed.size` 및 `ALLOWED.has(k)` 검사).
+6. **(Codex b)[Strict] NodeId Crockford base32 ULID 및 전역 kill-switch null 결속**:
+   - `NODE_ID_REGEX = /^nod_[0-9A-HJKMNP-TV-Z]{26}$/` 규격 엄격 적용 (소문자, 금지문자 I, L, O, U, 길이 불일치 즉시 거부).
+   - 전역 kill-switch GET (`/v1/operations/kill-switch`) 및 POST 응답(`kill`/`clear`)은 `nodeId === null` 결속을 필수 단언.
+   - 노드 Drain 연산 시 `expectedNodeId` 일치 검증.
+7. **(Codex c)[Strict] 정수 상한 9007199254740991 검증**:
+   - `MAX_SAFE_CONTRACT_INTEGER = 9007199254740991` (`Number.MAX_SAFE_INTEGER`, 2^53 - 1) 상한을 `version`, `activeLeases`, `pendingDeliveries`, `unsettledRuns`에 적용하여 상한 초과 수치 거부.
+8. **(Codex d)[Strict] requestId 및 approvalId RFC 4122 UUID 검증**:
+   - `RFC4122_UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i`를 적용하여 `requestId`와 `approvalId`를 RFC 4122 표준 포맷으로 엄격 검증 (`req-001`, 빈 문자열 등 즉시 거부).
+
+## 5. 로컬 실측 검증 (Evidence)
+- `npm test -- admin-security-kill-switch-wiring`: 16 passed (exit 0, 순수 검증기 4종 + 실배선/음성 시험 12종 전원 통과)
+- `npm test -- defect-recovery-admin`: 26 passed (exit 0, V1 fail-closed 사전 검증 및 포커스 트랩 회귀 100% 통과)
+- `npm test -- write-actions`: 8 passed (exit 0, 모의 시뮬레이션 고지 및 승인 ID 실배선 전원 통과)
 - `npx tsc -b`: 타입 오류 0건 (exit 0)
-- `npm run build`: Vite 프로덕션 번들 정상 생성 (exit 0, 7.12s)
+- `npm run build`: Vite 프로덕션 번들 정상 생성 (exit 0, 11.95s)
 - `pytest tests/test_route_coverage.py`: 40 passed 100% (exit 0)
 - `python -X utf8 tools/check_frontend_integrity.py`: 92개 파일 스캔, 9대 규칙 위반 0건 (exit 0)
 - `python tools/check_docs.py`: PASS (24 hashes, 1055 docs, 48 tasks, 12 outcomes)
 
-## 5. 이어서 할 첫 행동 및 담당
+## 6. 이어서 할 첫 행동 및 담당
 - **담당**: Gemini (Frontend / UI 소유).
 - **Reviewer**: Claude (UI·테스트 축), Codex 계약·보안 축.
-- **다음 행동**: Git commit, origin push, PR #267 통합 조치표 코멘트 등록 및 재검토 요청.
+- **다음 행동**: Git commit, origin push, PR #267 2차 통합 조치표 코멘트 등록 및 재검토 요청. 이후 Card 174 착수.
 

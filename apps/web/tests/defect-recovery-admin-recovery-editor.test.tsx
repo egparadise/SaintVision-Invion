@@ -45,6 +45,14 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
     vi.restoreAllMocks();
   });
 
+  const CANONICAL_CONTROL_BASE = {
+    nodeId: null,
+    activeLeases: 0,
+    pendingDeliveries: 0,
+    unsettledRuns: 0,
+    settled: true,
+  };
+
   // =========================================================================
   // Priority 4: AdminSecurityConsole usr_admin_01 하드코딩 제거 및 세션 실배선
   // =========================================================================
@@ -52,7 +60,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
     it('인증된 currentUser와 유효한 approval UUID가 주어졌을 때 Idempotency-Key와 ContainmentInput(조회된 expectedVersion=7)을 전송한다 (body에 actor 미포함)', async () => {
       const apiClientSpy = vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
         if (endpoint.includes('/control')) {
-          return { version: 7, killSwitchActive: false, nodeStatus: 'online' } as any;
+          return { ...CANONICAL_CONTROL_BASE, version: 7, killSwitchActive: false, nodeStatus: 'online' } as any;
         }
         return {} as any;
       });
@@ -186,7 +194,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       const apiError = new client.ApiError(problem as any);
       vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
         if (endpoint.includes('/control')) {
-          return { version: 1, killSwitchActive: false, nodeStatus: 'online' } as any;
+          return { ...CANONICAL_CONTROL_BASE, version: 1, killSwitchActive: false, nodeStatus: 'online' } as any;
         }
         if (endpoint.includes('/drain')) {
           throw apiError;
@@ -300,6 +308,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       const apiClientSpy = vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string, options?: any) => {
         if (endpoint.includes('/control')) {
           return {
+            ...CANONICAL_CONTROL_BASE,
             version: 5,
             killSwitchActive: false,
             nodeStatus: 'online',
@@ -314,7 +323,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
           } as any;
         }
         if (endpoint === '/v1/operations/kill-switch') {
-          if (!options || options.method === 'GET') {
+          if (!options || !options.method || options.method === 'GET') {
             return {
               nodeId: null,
               version: 1,
@@ -328,7 +337,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
           }
           if (options?.method === 'POST') {
             return {
-              requestId: 'req-01',
+              requestId: 'c0000000-0000-4000-8000-000000000001',
               operation: 'kill',
               approvalId: '550e8400-e29b-41d4-a716-446655440000',
               control: {
@@ -356,22 +365,21 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
         );
       });
 
-      // 승인 ID 입력
-      const killSwitchApprovalInput = container.querySelector('[data-testid="input-kill-switch-approval-id"]') as HTMLInputElement;
-      if (killSwitchApprovalInput) {
-        await act(async () => {
-          const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
-          nativeSetter?.call(killSwitchApprovalInput, '550e8400-e29b-41d4-a716-446655440000');
-          killSwitchApprovalInput.dispatchEvent(new Event('input', { bubbles: true }));
-          killSwitchApprovalInput.dispatchEvent(new Event('change', { bubbles: true }));
-        });
-      }
-
-      // 1. 로컬 비상 Kill Switch 활성화
+      // 1. 로컬 비상 Kill Switch 모달 열기
       const killSwitchToggleBtn = container.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLButtonElement;
       expect(killSwitchToggleBtn).not.toBeNull();
       await act(async () => {
         killSwitchToggleBtn.click();
+      });
+
+      // 모달 내부에서 승인 ID 입력 (실제 계약 전송 요구사항)
+      const killSwitchApprovalInput = container.querySelector('[data-testid="input-kill-switch-approval-id"]') as HTMLInputElement;
+      expect(killSwitchApprovalInput).not.toBeNull();
+      await act(async () => {
+        const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+        nativeSetter?.call(killSwitchApprovalInput, '550e8400-e29b-41d4-a716-446655440000');
+        killSwitchApprovalInput.dispatchEvent(new Event('input', { bubbles: true }));
+        killSwitchApprovalInput.dispatchEvent(new Event('change', { bubbles: true }));
       });
 
       const confirmBtn = container.querySelector('[data-testid="kill-switch-confirm-btn"]') as HTMLButtonElement;
@@ -428,7 +436,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
         if (endpoint.includes('/control')) {
           controlCallCount++;
           // Invariant: If code erroneously re-queries /control on retry, it returns version 8 instead of 7
-          return { version: controlCallCount === 1 ? 7 : 8, killSwitchActive: false, nodeStatus: 'online' } as any;
+          return { ...CANONICAL_CONTROL_BASE, version: controlCallCount === 1 ? 7 : 8, killSwitchActive: false, nodeStatus: 'online' } as any;
         }
         if (endpoint.includes('/drain')) {
           postCount++;
@@ -527,6 +535,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
           controlCallCount++;
           // First query returns stale version 7, second query returns refreshed version 8
           return {
+            ...CANONICAL_CONTROL_BASE,
             version: controlCallCount === 1 ? 7 : 8,
             killSwitchActive: false,
             nodeStatus: 'online',
@@ -633,6 +642,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
         if (endpoint.includes('/control')) {
           // Server reports node is already draining while UI displays 'Node Drain' (undrained)
           return {
+            ...CANONICAL_CONTROL_BASE,
             version: 15,
             killSwitchActive: false,
             nodeStatus: 'draining',
@@ -686,6 +696,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
         if (endpoint.includes('/control')) {
           return {
+            ...CANONICAL_CONTROL_BASE,
             version: 3,
             killSwitchActive: false,
             nodeStatus: 'online',
