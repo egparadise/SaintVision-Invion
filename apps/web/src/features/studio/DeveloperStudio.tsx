@@ -83,7 +83,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(initialStep);
 
   // Step 1: Projects & Workspaces
-  const projects = [project];
+  const projects = React.useMemo(() => [project], [project]);
   const selectedProjectId = project.id;
   const [workspaceError, setWorkspaceError] = useState<string | null>(null);
   const [workspaces, setWorkspaces] = useState<ProjectWorkspace[]>([]);
@@ -231,6 +231,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
       setCurrentStep(2);
     }
   }, [initialNodeId]);
+
 
   // Scroll logs to bottom
   useEffect(() => {
@@ -432,7 +433,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
           },
           riskLevel,
           requiresApproval: riskLevel !== 'L1',
-          policyReason: riskLevel !== 'L1' ? `거버넌스 위험 등급 ${riskLevel} 정책에 따른 사전 승인 요구 (Rule #304)` : undefined,
+          policyReason: riskLevel !== 'L1' ? `거버넌스 위험 등급 ${riskLevel} 정책에 따른 사전 승인 요구 (Rule No. 304)` : undefined,
         }),
       });
 
@@ -824,13 +825,14 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
           <div style={{ display: 'flex', gap: '8px' }}>
             {selectedNodeId && (
               <span
+                data-testid="studio-node-chip"
                 style={{
                   padding: '4px 10px',
-                  backgroundColor: 'rgba(56, 139, 253, 0.15)',
-                  border: '1px solid rgba(56, 139, 253, 0.3)',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-border-subtle)',
                   borderRadius: 'var(--radius-sm)',
                   fontSize: '0.75rem',
-                  color: '#58a6ff',
+                  color: 'var(--color-brand-hover)',
                   fontWeight: 600,
                 }}
               >
@@ -839,13 +841,14 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
             )}
             {selectedWorkspaceId && (
               <span
+                data-testid="studio-workspace-chip"
                 style={{
                   padding: '4px 10px',
-                  backgroundColor: 'rgba(46, 160, 67, 0.15)',
-                  border: '1px solid rgba(46, 160, 67, 0.3)',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-border-subtle)',
                   borderRadius: 'var(--radius-sm)',
                   fontSize: '0.75rem',
-                  color: '#3fb950',
+                  color: 'var(--color-status-online)',
                   fontWeight: 600,
                 }}
               >
@@ -872,6 +875,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
               <button
                 key={s.num}
                 role="tab"
+                data-testid={`studio-stepper-step-${s.num}`}
                 aria-selected={isActive}
                 onClick={() => setCurrentStep(s.num)}
                 style={{
@@ -880,12 +884,8 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                   alignItems: 'flex-start',
                   padding: '12px 16px',
                   borderRadius: 'var(--radius-md)',
-                  border: `2px solid ${isActive ? 'var(--color-brand-primary)' : isPassed ? '#2ea043' : 'var(--color-border-subtle)'}`,
-                  backgroundColor: isActive
-                    ? 'rgba(56, 139, 253, 0.08)'
-                    : isPassed
-                    ? 'rgba(46, 160, 67, 0.05)'
-                    : 'var(--color-bg-subtle)',
+                  border: `2px solid ${isActive ? 'var(--color-brand-primary)' : isPassed ? 'var(--color-status-online)' : 'var(--color-border-subtle)'}`,
+                  backgroundColor: 'var(--color-bg-subtle)',
                   cursor: 'pointer',
                   textAlign: 'left',
                   transition: 'all 0.2s ease',
@@ -907,7 +907,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                         : isPassed
                         ? 'var(--color-status-online)'
                         : 'var(--color-border-strong)',
-                      color: isActive ? '#ffffff' : 'var(--color-text-inverse)',
+                      color: isActive ? 'var(--color-brand-primary-fg)' : 'var(--color-text-inverse)',
                     }}
                   >
                     {isPassed ? '✓' : s.num}
@@ -936,26 +936,21 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
           style={{
             marginBottom: '20px',
             padding: '12px 18px',
-            backgroundColor:
-              studioActionNotice.type === 'error'
-                ? 'rgba(239, 68, 68, 0.15)'
-                : studioActionNotice.type === 'status'
-                ? 'rgba(34, 197, 94, 0.15)'
-                : 'rgba(59, 130, 246, 0.15)',
+            backgroundColor: 'var(--color-bg-subtle)',
             border: `1px solid ${
               studioActionNotice.type === 'error'
-                ? '#ef4444'
+                ? 'var(--color-status-offline)'
                 : studioActionNotice.type === 'status'
-                ? '#22c55e'
-                : '#3b82f6'
+                ? 'var(--color-status-online)'
+                : 'var(--color-brand-hover)'
             }`,
             borderRadius: 'var(--radius-md)',
             color:
               studioActionNotice.type === 'error'
-                ? '#fca5a5'
+                ? 'var(--color-status-offline)'
                 : studioActionNotice.type === 'status'
-                ? '#86efac'
-                : '#93c5fd',
+                ? 'var(--color-status-online)'
+                : 'var(--color-brand-hover)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -1012,7 +1007,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                       padding: '20px',
                       borderRadius: 'var(--radius-md)',
                       border: `2px solid ${isSelected ? 'var(--color-brand-primary)' : 'var(--color-border-subtle)'}`,
-                      backgroundColor: isSelected ? 'rgba(56, 139, 253, 0.05)' : 'var(--color-bg-surface)',
+                      backgroundColor: isSelected ? 'var(--color-bg-subtle)' : 'var(--color-bg-surface)',
                       cursor: 'pointer',
                       boxShadow: isSelected ? '0 0 0 1px var(--color-brand-primary)' : 'none',
                     }}
@@ -1021,11 +1016,11 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                         <h3 style={{ fontSize: '1rem', fontWeight: 600 }}>{proj.name}</h3>
                         {proj.kernelLinked === false ? (
-                          <span style={{ fontSize: '0.6875rem', padding: '2px 6px', borderRadius: 'var(--radius-sm)', backgroundColor: 'rgba(210, 153, 34, 0.2)', color: '#d29922', fontWeight: 600 }}>
+                          <span style={{ fontSize: '0.6875rem', padding: '2px 6px', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-border-subtle)', color: 'var(--color-status-degraded)', fontWeight: 600 }}>
                             ℹ️ 커널 미연결 (설명 상태)
                           </span>
                         ) : (
-                          <span style={{ fontSize: '0.6875rem', padding: '2px 6px', borderRadius: 'var(--radius-sm)', backgroundColor: 'rgba(46, 160, 67, 0.2)', color: '#3fb950', fontWeight: 600 }}>
+                          <span style={{ fontSize: '0.6875rem', padding: '2px 6px', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-bg-subtle)', border: '1px solid var(--color-border-subtle)', color: 'var(--color-status-online)', fontWeight: 600 }}>
                             ✅ 커널 연동
                           </span>
                         )}
@@ -1050,7 +1045,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                             </span>
                           </div>
                           <div style={{ height: '6px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: '3px', overflow: 'hidden' }}>
-                            <div style={{ width: `${budgetUsedPct}%`, height: '100%', backgroundColor: budgetUsedPct > 80 ? '#f85149' : '#2ea043' }} />
+                            <div style={{ width: `${budgetUsedPct}%`, height: '100%', backgroundColor: budgetUsedPct > 80 ? 'var(--color-status-offline)' : 'var(--color-status-online)' }} />
                           </div>
                         </div>
                       )}
@@ -1066,14 +1061,14 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 style={{
                   padding: '16px 20px',
                   borderRadius: 'var(--radius-md)',
-                  backgroundColor: 'rgba(56, 139, 253, 0.08)',
-                  border: '1px solid #388bfd',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-border-subtle)',
                   marginBottom: '24px',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
                   <span style={{ fontSize: '1.2rem' }}>ℹ️</span>
-                  <strong style={{ color: 'var(--color-brand-primary)', fontSize: '0.9375rem' }}>
+                  <strong style={{ color: 'var(--color-brand-hover)', fontSize: '0.9375rem' }}>
                     커널 미연결 상태 안내 (kernelLinked=false) — 오류가 아니라 설명할 정상 분리 상태입니다
                   </strong>
                 </div>
@@ -1111,7 +1106,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                       padding: '14px 16px',
                       borderRadius: 'var(--radius-md)',
                       border: `1px solid ${isWspSelected ? 'var(--color-brand-primary)' : 'var(--color-border-subtle)'}`,
-                      backgroundColor: isWspSelected ? 'rgba(56, 139, 253, 0.08)' : 'var(--color-bg-subtle)',
+                      backgroundColor: 'var(--color-bg-subtle)',
                       cursor: 'pointer',
                     }}
                   >
@@ -1125,28 +1120,21 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                           borderRadius: 'var(--radius-sm)',
                           border: `1px solid ${
                             wsp.status === 'ready'
-                              ? 'rgba(46, 160, 67, 0.4)'
+                              ? 'var(--color-status-online)'
                               : wsp.status === 'provisioning'
-                              ? 'rgba(210, 153, 34, 0.4)'
+                              ? 'var(--color-status-degraded)'
                               : wsp.status === 'deleting'
-                              ? 'rgba(248, 81, 73, 0.4)'
-                              : 'rgba(139, 148, 158, 0.3)'
+                              ? 'var(--color-status-offline)'
+                              : 'var(--color-border-subtle)'
                           }`,
-                          backgroundColor:
-                            wsp.status === 'ready'
-                              ? 'rgba(46, 160, 67, 0.2)'
-                              : wsp.status === 'provisioning'
-                              ? 'rgba(210, 153, 34, 0.2)'
-                              : wsp.status === 'deleting'
-                              ? 'rgba(248, 81, 73, 0.2)'
-                              : 'rgba(139, 148, 158, 0.2)',
+                          backgroundColor: 'var(--color-bg-subtle)',
                           color:
                             wsp.status === 'ready'
-                              ? '#3fb950'
+                              ? 'var(--color-status-online)'
                               : wsp.status === 'provisioning'
-                              ? '#d29922'
+                              ? 'var(--color-status-degraded)'
                               : wsp.status === 'deleting'
-                              ? '#f85149'
+                              ? 'var(--color-status-offline)'
                               : 'var(--color-text-muted)',
                         }}
                       >
@@ -1189,8 +1177,9 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                       padding: '4px 10px',
                       borderRadius: 'var(--radius-sm)',
                       fontWeight: 600,
-                      backgroundColor: readiness.executable ? 'rgba(46, 160, 67, 0.2)' : 'rgba(210, 153, 34, 0.2)',
-                      color: readiness.executable ? '#3fb950' : '#d29922',
+                      backgroundColor: 'var(--color-bg-surface)',
+                      border: `1px solid ${readiness.executable ? 'var(--color-status-online)' : 'var(--color-status-degraded)'}`,
+                      color: readiness.executable ? 'var(--color-status-online)' : 'var(--color-status-degraded)',
                     }}
                   >
                     {readiness.executable ? '✅ 실행 가능 (Ready)' : '⚠️ 승인/조치 대기 중'}
@@ -1207,9 +1196,9 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                   style={{
                     padding: '12px 14px',
                     borderRadius: 'var(--radius-sm)',
-                    border: '1px solid rgba(248, 81, 73, 0.4)',
-                    backgroundColor: 'rgba(248, 81, 73, 0.08)',
-                    color: '#f85149',
+                    border: '1px solid var(--color-status-offline)',
+                    backgroundColor: 'var(--color-bg-surface)',
+                    color: 'var(--color-status-offline)',
                     fontSize: '0.8125rem',
                   }}
                 >
@@ -1236,13 +1225,13 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                           style={{
                             padding: '12px 14px',
                             borderRadius: 'var(--radius-sm)',
-                            border: `1px solid ${isSatisfied ? 'rgba(46, 160, 67, 0.3)' : 'rgba(210, 153, 34, 0.4)'}`,
-                            backgroundColor: isSatisfied ? 'rgba(46, 160, 67, 0.04)' : 'rgba(210, 153, 34, 0.08)',
+                            border: `1px solid ${isSatisfied ? 'var(--color-status-online)' : 'var(--color-status-degraded)'}`,
+                            backgroundColor: 'var(--color-bg-surface)',
                             fontSize: '0.8125rem',
                           }}
                         >
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                            <strong style={{ color: isSatisfied ? '#3fb950' : '#d29922' }}>
+                            <strong style={{ color: isSatisfied ? 'var(--color-status-online)' : 'var(--color-status-degraded)' }}>
                               {isSatisfied ? '✅' : '⚠️'} {checkTitles[chk.check] || chk.check}
                             </strong>
                             {chk.resolvedBy && !isSatisfied && (
@@ -1251,8 +1240,9 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                                   fontSize: '0.6875rem',
                                   padding: '2px 6px',
                                   borderRadius: 'var(--radius-sm)',
-                                  backgroundColor: 'rgba(210, 153, 34, 0.25)',
-                                  color: '#d29922',
+                                  backgroundColor: 'var(--color-bg-subtle)',
+                                  border: '1px solid var(--color-status-degraded)',
+                                  color: 'var(--color-status-degraded)',
                                   fontWeight: 600,
                                 }}
                               >
@@ -1264,7 +1254,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                             {chk.detail}
                           </div>
                           {chk.snapshotBytes !== undefined && chk.snapshotBytes !== null && (
-                            <div style={{ fontSize: '0.75rem', color: '#58a6ff', marginBottom: '2px' }}>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--color-brand-hover)', marginBottom: '2px' }}>
                               📦 스냅샷 크기: {chk.snapshotBytes.toLocaleString()} / {chk.maxSnapshotBytes?.toLocaleString() || 65536} Bytes
                             </div>
                           )}
@@ -1280,7 +1270,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                   <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
                     요약: <strong>{readiness.summary}</strong>
                     {readiness.blockedBy && readiness.blockedBy.length > 0 && (
-                      <span style={{ marginLeft: '8px', color: '#d29922' }}>
+                      <span style={{ marginLeft: '8px', color: 'var(--color-status-degraded)' }}>
                         (필요 조치 권한자: <strong>{readiness.blockedBy.join(', ')}</strong>)
                       </span>
                     )}
@@ -1404,14 +1394,14 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
             <div
               style={{
                 padding: '12px 16px',
-                backgroundColor: 'rgba(56, 139, 253, 0.08)',
+                backgroundColor: 'var(--color-bg-subtle)',
                 borderRadius: 'var(--radius-md)',
-                border: '1px solid rgba(56, 139, 253, 0.25)',
+                border: '1px solid var(--color-border-subtle)',
                 fontSize: '0.8125rem',
                 color: 'var(--color-text-secondary)',
               }}
             >
-              <div style={{ fontWeight: 600, color: '#58a6ff', marginBottom: '4px' }}>
+              <div style={{ fontWeight: 600, color: 'var(--color-brand-hover)', marginBottom: '4px' }}>
                 📐 결정론적 다기준 배치 산출 공식 (ADR-018 / Strict Policy):
               </div>
               <div>
@@ -1474,14 +1464,9 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                   style={{
                     padding: '20px',
                     borderRadius: 'var(--radius-lg)',
-                    border: `2px solid ${isWinner ? '#2ea043' : isSelected ? 'var(--color-brand-primary)' : 'var(--color-border-subtle)'}`,
-                    backgroundColor: isWinner
-                      ? 'rgba(46, 160, 67, 0.05)'
-                      : isSelected
-                      ? 'rgba(56, 139, 253, 0.05)'
-                      : 'var(--color-bg-surface)',
+                    border: `2px solid ${isWinner ? 'var(--color-status-online)' : isSelected ? 'var(--color-brand-primary)' : 'var(--color-border-subtle)'}`,
+                    backgroundColor: 'var(--color-bg-surface)',
                     cursor: isNodeSchedulable ? 'pointer' : 'not-allowed',
-                    opacity: isNodeSchedulable ? 1 : 0.75,
                     boxShadow: 'var(--shadow-sm)',
                     position: 'relative',
                   }}
@@ -1492,13 +1477,14 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                         position: 'absolute',
                         top: '-12px',
                         right: '16px',
-                        backgroundColor: '#2ea043',
-                        color: '#ffffff',
+                        backgroundColor: 'var(--color-bg-subtle)',
+                        border: '1px solid var(--color-status-online)',
+                        color: 'var(--color-status-online)',
                         fontSize: '0.75rem',
                         fontWeight: 700,
                         padding: '2px 10px',
                         borderRadius: 'var(--radius-full)',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                        boxShadow: 'var(--shadow-sm)',
                       }}
                     >
                       👑 최적 노드 선정 (1순위)
@@ -1519,8 +1505,9 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                         padding: '2px 8px',
                         borderRadius: 'var(--radius-sm)',
                         fontWeight: 600,
-                        backgroundColor: evalInfo?.hardFilterPassed ? 'rgba(46, 160, 67, 0.2)' : 'rgba(248, 81, 73, 0.2)',
-                        color: evalInfo?.hardFilterPassed ? '#3fb950' : '#f85149',
+                        backgroundColor: 'var(--color-bg-subtle)',
+                        border: `1px solid ${evalInfo?.hardFilterPassed ? 'var(--color-status-online)' : 'var(--color-status-offline)'}`,
+                        color: evalInfo?.hardFilterPassed ? 'var(--color-status-online)' : 'var(--color-status-offline)',
                       }}
                     >
                       {evalInfo?.hardFilterPassed ? '하드 필터 통과' : '배치 부적합'}
@@ -1533,9 +1520,9 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                         marginBottom: '12px',
                         padding: '8px 12px',
                         borderRadius: 'var(--radius-sm)',
-                        backgroundColor: 'rgba(210, 153, 34, 0.15)',
-                        border: '1px solid #d29922',
-                        color: '#d29922',
+                        backgroundColor: 'var(--color-bg-subtle)',
+                        border: '1px solid var(--color-status-degraded)',
+                        color: 'var(--color-status-degraded)',
                         fontSize: '0.75rem',
                         fontWeight: 600,
                       }}
@@ -1562,28 +1549,28 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                       <div style={{ color: 'var(--color-text-muted)', marginBottom: '2px' }}>물리 총량</div>
                       <div style={{ fontWeight: 600 }}>{totalCores}C</div>
                       <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.6875rem' }}>{totalRamGb}G RAM</div>
-                      {node.gpuCount > 0 && <div style={{ color: '#58a6ff', fontSize: '0.6875rem' }}>{totalVramGb}G VRAM</div>}
+                      {node.gpuCount > 0 && <div style={{ color: 'var(--color-brand-hover)', fontSize: '0.6875rem' }}>{totalVramGb}G VRAM</div>}
                     </div>
 
                     <div style={{ borderLeft: '1px solid var(--color-border-subtle)' }}>
                       <div style={{ color: 'var(--color-text-muted)', marginBottom: '2px' }}>관측 사용</div>
-                      <div style={{ fontWeight: 600, color: cpuUsagePct > 60 ? '#f85149' : 'var(--color-text-primary)' }}>
+                      <div style={{ fontWeight: 600, color: cpuUsagePct > 60 ? 'var(--color-status-offline)' : 'var(--color-text-primary)' }}>
                         {cpuUsagePct}%
                       </div>
                       <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.6875rem' }}>{ramUsedGb}G</div>
-                      {node.gpuCount > 0 && <div style={{ color: '#58a6ff', fontSize: '0.6875rem' }}>{vramUsedGb}G</div>}
+                      {node.gpuCount > 0 && <div style={{ color: 'var(--color-brand-hover)', fontSize: '0.6875rem' }}>{vramUsedGb}G</div>}
                     </div>
 
                     <div style={{ borderLeft: '1px solid var(--color-border-subtle)' }}>
                       <div style={{ color: 'var(--color-text-muted)', marginBottom: '2px' }}>관측 여유</div>
-                      <div style={{ fontWeight: 600, color: '#3fb950' }}>{availCores}C</div>
-                      <div style={{ color: '#3fb950', fontSize: '0.6875rem' }}>{availRamGb}G</div>
-                      {node.gpuCount > 0 && <div style={{ color: '#58a6ff', fontSize: '0.6875rem' }}>{availVramGb}G</div>}
+                      <div style={{ fontWeight: 600, color: 'var(--color-status-online)' }}>{availCores}C</div>
+                      <div style={{ color: 'var(--color-status-online)', fontSize: '0.6875rem' }}>{availRamGb}G</div>
+                      {node.gpuCount > 0 && <div style={{ color: 'var(--color-brand-hover)', fontSize: '0.6875rem' }}>{availVramGb}G</div>}
                     </div>
 
-                    <div style={{ borderLeft: '1px solid var(--color-border-subtle)', backgroundColor: !isNodeSchedulable ? 'rgba(210, 153, 34, 0.08)' : 'rgba(46, 160, 67, 0.05)' }}>
+                    <div style={{ borderLeft: '1px solid var(--color-border-subtle)', backgroundColor: 'var(--color-bg-subtle)' }}>
                       <div style={{ color: 'var(--color-text-muted)', marginBottom: '2px' }}>예약 가능</div>
-                      <div style={{ fontWeight: 700, color: !isNodeSchedulable ? '#d29922' : '#3fb950' }}>
+                      <div style={{ fontWeight: 700, color: !isNodeSchedulable ? 'var(--color-status-degraded)' : 'var(--color-status-online)' }}>
                         {node.observationOnly
                           ? '0 C (차단)'
                           : node.schedulable === false || node.isDraining || node.killSwitchEngaged
@@ -1592,7 +1579,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                           ? `${node.allocatableCores}C`
                           : '미확인 (선택 불가)'}
                       </div>
-                      <div style={{ fontSize: '0.6875rem', color: !isNodeSchedulable ? '#d29922' : '#3fb950', fontWeight: 600 }}>
+                      <div style={{ fontSize: '0.6875rem', color: !isNodeSchedulable ? 'var(--color-status-degraded)' : 'var(--color-status-online)', fontWeight: 600 }}>
                         {node.observationOnly
                           ? '관측전용'
                           : node.schedulable === false
@@ -1631,13 +1618,13 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                         }}
                       >
                         <span>배치 종합 점수:</span>
-                        <span style={{ color: isWinner ? '#3fb950' : 'var(--color-brand-primary)' }}>
+                        <span style={{ color: isWinner ? 'var(--color-status-online)' : 'var(--color-brand-hover)' }}>
                           {evalInfo.scores.totalScore} / 100점
                         </span>
                       </div>
                     </div>
                   ) : (
-                    <div style={{ fontSize: '0.75rem', color: '#f85149', marginTop: '6px' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--color-status-offline)', marginTop: '6px' }}>
                       <strong>탈락 사유:</strong> {evalInfo?.rejectionReasons.join(', ') || '요구조건 미달'}
                     </div>
                   )}
@@ -1756,7 +1743,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                       color: isCurrent ? 'var(--color-brand-primary)' : 'var(--color-text-secondary)',
                       backgroundColor: isCurrent ? 'var(--color-bg-surface)' : 'var(--color-bg-subtle)',
                       border: '1px solid var(--color-border-subtle)',
-                      borderBottom: isCurrent ? '1px solid var(--color-bg-surface)' : '1px solid var(--color-border-subtle)',
+                      borderBottom: isCurrent ? '1px solid transparent' : '1px solid var(--color-border-subtle)',
                       borderRadius: 'var(--radius-sm) var(--radius-sm) 0 0',
                       cursor: 'pointer',
                       display: 'flex',
@@ -1821,16 +1808,14 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                     style={{
                       padding: '2px 6px',
                       backgroundColor:
-                        l.type === 'added'
-                          ? 'rgba(46, 160, 67, 0.2)'
-                          : l.type === 'removed'
-                          ? 'rgba(248, 81, 73, 0.2)'
+                        l.type === 'added' || l.type === 'removed'
+                          ? 'var(--color-bg-subtle)'
                           : 'transparent',
                       color:
                         l.type === 'added'
-                          ? '#3fb950'
+                          ? 'var(--color-status-online)'
                           : l.type === 'removed'
-                          ? '#f85149'
+                          ? 'var(--color-status-offline)'
                           : 'var(--color-text-secondary)',
                     }}
                   >
@@ -1848,13 +1833,13 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 style={{
                   marginBottom: '20px',
                   padding: '16px',
-                  backgroundColor: 'rgba(56, 139, 253, 0.08)',
+                  backgroundColor: 'var(--color-bg-subtle)',
                   borderRadius: 'var(--radius-md)',
-                  border: '1px solid rgba(56, 139, 253, 0.3)',
+                  border: '1px solid var(--color-border-subtle)',
                   fontSize: '0.8125rem',
                 }}
               >
-                <div style={{ fontWeight: 600, color: '#58a6ff', marginBottom: '6px' }}>
+                <div style={{ fontWeight: 600, color: 'var(--color-brand-hover)', marginBottom: '6px' }}>
                   🔒 ADR-044/045 불변 동결 스냅샷 (Frozen Input Snapshot)
                 </div>
                 <div>스냅샷 해시: <code>sha256:{computeSha256(activeFile.content)}</code></div>
@@ -1918,7 +1903,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                     <option value="L3">L3 (고위험 - Two-Person Rule 2인 승인 & Diff 필수)</option>
                   </select>
                   {riskLevel !== 'L1' && (
-                    <span style={{ fontSize: '0.75rem', color: '#d29922', fontWeight: 600 }}>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--color-status-degraded)', fontWeight: 600 }}>
                       ⚠️ 4단계에서 거버넌스 승인 절차가 진행됩니다.
                     </span>
                   )}
@@ -1927,16 +1912,16 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
 
               {/* Readiness Blocking Warning */}
               {projects.find((p) => p.id === selectedProjectId)?.kernelLinked === false ? (
-                <div style={{ marginTop: '12px', padding: '10px 14px', backgroundColor: 'rgba(210, 153, 34, 0.12)', borderRadius: 'var(--radius-sm)', border: '1px solid #d29922', fontSize: '0.8125rem', color: '#d29922' }}>
+                <div style={{ marginTop: '12px', padding: '10px 14px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-status-degraded)', fontSize: '0.8125rem', color: 'var(--color-status-degraded)' }}>
                   <strong>⚠️ 커널 미연결 프로젝트:</strong> 운영자(Operator)가 이 프로젝트를 커널에 연결(<code>kernelLinked=true</code>)할 때까지 실행 투입이 안전하게 보류됩니다.
                 </div>
               ) : readinessError ? (
-                <div style={{ marginTop: '12px', padding: '10px 14px', backgroundColor: 'rgba(248, 81, 73, 0.12)', borderRadius: 'var(--radius-sm)', border: '1px solid #f85149', fontSize: '0.8125rem', color: '#f85149' }}>
+                <div style={{ marginTop: '12px', padding: '10px 14px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-status-offline)', fontSize: '0.8125rem', color: 'var(--color-status-offline)' }}>
                   <strong>🛑 실행 전제조건 검증 실패:</strong> {readinessError} (커널 서버 연결 상태 확인 필요)
                 </div>
               ) : readiness && !readiness.executable ? (
-                <div style={{ marginTop: '12px', padding: '10px 14px', backgroundColor: 'rgba(210, 153, 34, 0.12)', borderRadius: 'var(--radius-sm)', border: '1px solid #d29922', fontSize: '0.8125rem', color: '#d29922' }}>
-                  <strong>⚠️ 실행 전제조건 미충족:</strong> {readiness.summary} (조치 필요: {readiness.blockedBy.join(', ')})
+                <div style={{ marginTop: '12px', padding: '10px 14px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-status-degraded)', fontSize: '0.8125rem', color: 'var(--color-status-degraded)' }}>
+                  <strong>⚠️ 실행 전제조건 미충족:</strong> {readiness.summary} (조치 필요: {readiness.blockedBy ? readiness.blockedBy.join(', ') : '없음'})
                 </div>
               ) : null}
 
@@ -1982,10 +1967,10 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 style={{
                   marginTop: '16px',
                   padding: '16px',
-                  backgroundColor: 'rgba(248, 81, 73, 0.15)',
+                  backgroundColor: 'var(--color-bg-subtle)',
                   borderRadius: 'var(--radius-md)',
-                  border: '1px solid #f85149',
-                  color: '#f85149',
+                  border: '1px solid var(--color-status-offline)',
+                  color: 'var(--color-status-offline)',
                   fontSize: '0.875rem',
                 }}
               >
@@ -2030,6 +2015,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                     실행 세션: <code>{activeRunId || '미지정'}</code>
                   </h2>
                   <span
+                    data-testid="studio-execution-status-badge"
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
@@ -2038,26 +2024,32 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                       borderRadius: 'var(--radius-sm)',
                       fontSize: '0.75rem',
                       fontWeight: 700,
-                      backgroundColor:
+                      backgroundColor: 'var(--color-bg-subtle)',
+                      border: `1px solid ${
                         currentRun?.state === 'succeeded'
-                          ? 'rgba(46, 160, 67, 0.2)'
+                          ? 'var(--color-status-online)'
                           : currentRun?.state === 'running'
-                          ? 'rgba(56, 139, 253, 0.2)'
+                          ? 'var(--color-brand-hover)'
                           : currentRun?.state === 'awaiting_approval'
-                          ? 'rgba(210, 153, 34, 0.2)'
+                          ? 'var(--color-status-degraded)'
                           : currentRun?.state === 'recovering'
-                          ? 'rgba(163, 113, 247, 0.2)'
-                          : 'rgba(248, 81, 73, 0.2)',
+                          ? 'var(--color-status-active)'
+                          : currentRun?.state === 'cancelled'
+                          ? 'var(--color-border-strong)'
+                          : 'var(--color-status-offline)'
+                      }`,
                       color:
                         currentRun?.state === 'succeeded'
-                          ? '#3fb950'
+                          ? 'var(--color-status-online)'
                           : currentRun?.state === 'running'
-                          ? '#58a6ff'
+                          ? 'var(--color-brand-hover)'
                           : currentRun?.state === 'awaiting_approval'
-                          ? '#d29922'
+                          ? 'var(--color-status-degraded)'
                           : currentRun?.state === 'recovering'
-                          ? '#bc8cff'
-                          : '#f85149',
+                          ? 'var(--color-status-active)'
+                          : currentRun?.state === 'cancelled'
+                          ? 'var(--color-status-neutral)'
+                          : 'var(--color-status-offline)',
                     }}
                   >
                     {currentRun?.state === 'running' && (
@@ -2066,7 +2058,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                           width: '8px',
                           height: '8px',
                           borderRadius: '50%',
-                          backgroundColor: '#58a6ff',
+                          backgroundColor: 'var(--color-brand-hover)',
                         }}
                       />
                     )}
@@ -2090,16 +2082,16 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                   <span>📦 파일: <code>{activeFile.path}</code></span>
                   <span>🔒 격리: <code>0600 sandbox</code></span>
                   {(currentRun?.stateUpdatedAt || artifactData?.stateUpdatedAt) && (
-                    <span data-testid="studio-run-state-updated-at" style={{ color: '#58a6ff' }}>
+                    <span data-testid="studio-run-state-updated-at" style={{ color: 'var(--color-brand-hover)' }}>
                       실행 상태 갱신: {new Date(currentRun?.stateUpdatedAt || artifactData?.stateUpdatedAt!).toLocaleString('ko-KR')}
                     </span>
                   )}
                   {artifactData?.completedAt && (
-                    <span data-testid="studio-run-completed-at" style={{ color: '#3fb950' }}>
+                    <span data-testid="studio-run-completed-at" style={{ color: 'var(--color-status-online)' }}>
                       실행 완료 시각: {new Date(artifactData.completedAt).toLocaleString('ko-KR')}
                     </span>
                   )}
-                  <span style={{ color: boundNode?.observationOnly ? '#d29922' : (boundNode?.allocatableCores !== undefined ? '#3fb950' : 'var(--color-text-muted)'), fontWeight: 600 }}>
+                  <span style={{ color: boundNode?.observationOnly ? 'var(--color-status-degraded)' : (boundNode?.allocatableCores !== undefined ? 'var(--color-status-online)' : 'var(--color-text-muted)'), fontWeight: 600 }}>
                     ⚡ 노드 예약가능량: {boundNode?.observationOnly ? '0C (차단)' : (boundNode?.allocatableCores !== undefined ? `${boundNode.allocatableCores}C` : '미확인 (선택 불가)')}
                   </span>
                 </div>
@@ -2188,11 +2180,11 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 style={{
                   marginTop: '12px',
                   padding: '8px 12px',
-                  backgroundColor: 'rgba(46, 160, 67, 0.15)',
-                  border: '1px solid rgba(46, 160, 67, 0.3)',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-status-online)',
                   borderRadius: 'var(--radius-sm)',
                   fontSize: '0.8125rem',
-                  color: '#3fb950',
+                  color: 'var(--color-status-online)',
                 }}
               >
                 {reclaimNotice}
@@ -2205,9 +2197,9 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
             <div
               style={{
                 padding: '20px 24px',
-                backgroundColor: 'rgba(210, 153, 34, 0.08)',
+                backgroundColor: 'var(--color-bg-subtle)',
                 borderRadius: 'var(--radius-lg)',
-                border: '1px solid rgba(210, 153, 34, 0.35)',
+                border: '1px solid var(--color-status-degraded)',
                 boxShadow: 'var(--shadow-sm)',
               }}
             >
@@ -2215,13 +2207,13 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 <div style={{ flex: 1, minWidth: '280px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
                     <span style={{ fontSize: '1.25rem' }}>⚠️</span>
-                    <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#d29922' }}>
+                    <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--color-status-degraded)' }}>
                       거버넌스 승인 대기 중 (Awaiting Governance Approval)
                     </h3>
                     {matchedApproval?.riskLevel ? <RiskBadge level={matchedApproval.riskLevel} /> : <span>위험도 미관측</span>}
                   </div>
                   <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', marginBottom: '12px', lineHeight: 1.5 }}>
-                    {matchedApproval?.policyReason || '원격 노드 실행 또는 특권 자원 접근 정책(Rule #304)에 따라 검토자의 승인이 완료되어야 실행이 재개됩니다.'}
+                    {matchedApproval?.policyReason || '원격 노드 실행 또는 특권 자원 접근 정책(Rule No. 304)에 따라 검토자의 승인이 완료되어야 실행이 재개됩니다.'}
                   </p>
 
                   <div style={{ display: 'flex', gap: '16px', fontSize: '0.75rem', color: 'var(--color-text-muted)', flexWrap: 'wrap' }}>
@@ -2293,9 +2285,9 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                     style={{
                       padding: '2px 6px',
                       borderRadius: '4px',
-                      backgroundColor: 'rgba(234, 179, 8, 0.15)',
-                      border: '1px solid rgba(234, 179, 8, 0.3)',
-                      color: '#fbbf24',
+                      backgroundColor: 'var(--color-bg-subtle)',
+                      border: '1px solid var(--color-status-degraded)',
+                      color: 'var(--color-status-degraded)',
                       fontSize: '0.6875rem',
                       fontWeight: 600,
                     }}
@@ -2309,18 +2301,20 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                     borderRadius: 'var(--radius-sm)',
                     fontSize: '0.75rem',
                     fontWeight: 700,
-                    backgroundColor:
+                    backgroundColor: 'var(--color-bg-subtle)',
+                    border: `1px solid ${
                       currentRun?.state === 'succeeded' && Boolean(artifactData?.verifiedEvidenceId) && !artifactData?.fallbackUsed
-                        ? 'rgba(46, 160, 67, 0.2)'
+                        ? 'var(--color-status-online)'
                         : currentRun?.state === 'running'
-                        ? 'rgba(56, 139, 253, 0.2)'
-                        : 'rgba(210, 153, 34, 0.2)',
+                        ? 'var(--color-brand-hover)'
+                        : 'var(--color-status-degraded)'
+                    }`,
                     color:
                       currentRun?.state === 'succeeded' && Boolean(artifactData?.verifiedEvidenceId) && !artifactData?.fallbackUsed
-                        ? '#3fb950'
+                        ? 'var(--color-status-online)'
                         : currentRun?.state === 'running'
-                        ? '#58a6ff'
-                        : '#d29922',
+                        ? 'var(--color-brand-hover)'
+                        : 'var(--color-status-degraded)',
                   }}
                 >
                   {currentRun?.state === 'succeeded' && Boolean(artifactData?.verifiedEvidenceId) && !artifactData?.fallbackUsed
@@ -2384,10 +2378,10 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 data-testid="artifact-error-banner"
                 style={{
                   padding: '10px 14px',
-                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                  border: '1px solid #ef4444',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-status-offline)',
                   borderRadius: 'var(--radius-md)',
-                  color: '#fca5a5',
+                  color: 'var(--color-status-offline)',
                   marginBottom: '16px',
                   fontSize: '0.8125rem',
                 }}
@@ -2420,7 +2414,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                   {artifactData?.outputHash ? (
                     artifactData.outputHash
                   ) : currentRun?.state === 'running' ? (
-                    <span style={{ color: '#58a6ff' }}>⏳ 생성 대기 중 (실행 진행 중)</span>
+                    <span style={{ color: 'var(--color-brand-hover)' }}>⏳ 생성 대기 중 (실행 진행 중)</span>
                   ) : (
                     <span style={{ color: 'var(--color-text-muted)' }}>미확인 (서버 응답 대기)</span>
                   )}
@@ -2461,11 +2455,11 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
                   불변 검증 증거 식별자 (Evidence ID)
                 </div>
-                <div style={{ fontFamily: 'monospace', fontSize: '0.8125rem', fontWeight: 600, color: artifactData?.verifiedEvidenceId ? '#3fb950' : 'var(--color-text-muted)' }}>
+                <div style={{ fontFamily: 'monospace', fontSize: '0.8125rem', fontWeight: 600, color: artifactData?.verifiedEvidenceId ? 'var(--color-status-online)' : 'var(--color-text-muted)' }}>
                   {artifactData?.verifiedEvidenceId ? (
                     artifactData.verifiedEvidenceId
                   ) : currentRun?.state === 'running' ? (
-                    <span style={{ color: '#58a6ff' }}>⏳ 미발행 (실행 완료 후 생성)</span>
+                    <span style={{ color: 'var(--color-brand-hover)' }}>⏳ 미발행 (실행 완료 후 생성)</span>
                   ) : (
                     '미발행 (실행 완료 후 생성)'
                   )}
@@ -2486,12 +2480,12 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
                   프로세스 종료 및 영수증 대조
                 </div>
-                <div style={{ fontSize: '0.875rem', fontWeight: 600, color: currentRun?.state === 'succeeded' ? '#3fb950' : 'var(--color-text-primary)' }}>
+                <div style={{ fontSize: '0.875rem', fontWeight: 600, color: currentRun?.state === 'succeeded' ? 'var(--color-status-online)' : 'var(--color-text-primary)' }}>
                   exitCode: {selectedReceipt?.exitCode ?? (artifactData?.exitCode ?? (currentRun?.state === 'running' ? 'N/A (실행 중)' : '미확인'))}
                 </div>
                 <div style={{ fontSize: '0.6875rem', marginTop: '2px', fontWeight: 600 }}>
                   {selectedReceipt?.physicallyStopped || (currentRun as any)?.allPhysicallyStopped ? (
-                    <span style={{ color: '#3fb950' }}>✓ NodeStopReceipt 물리 정지 및 자원 반환 일치</span>
+                    <span style={{ color: 'var(--color-status-online)' }}>✓ NodeStopReceipt 물리 정지 및 자원 반환 일치</span>
                   ) : (
                     <span style={{ color: 'var(--color-text-muted)' }}>미수신 (정지 영수증 대기 중)</span>
                   )}
@@ -2504,17 +2498,17 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
               <div
                 style={{
                   padding: '16px',
-                  backgroundColor: '#0d1117',
+                  backgroundColor: 'var(--color-bg-canvas)',
                   borderRadius: 'var(--radius-md)',
-                  border: '1px solid #30363d',
+                  border: '1px solid var(--color-border-subtle)',
                   fontSize: '0.8125rem',
                   fontFamily: 'Consolas, Monaco, "Courier New", monospace',
-                  color: '#e6edf3',
+                  color: 'var(--color-text-primary)',
                   maxHeight: '320px',
                   overflowY: 'auto',
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#8b949e', marginBottom: '8px', fontSize: '0.75rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--color-text-secondary)', marginBottom: '8px', fontSize: '0.75rem' }}>
                   <span>Artifact Manifest & Evidence Inspection ({activeRunId})</span>
                   <span>application/json</span>
                 </div>
@@ -2547,7 +2541,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
           {/* Live Real-time ANSI Console Stream */}
           <div
             style={{
-              backgroundColor: '#0d1117',
+              backgroundColor: 'var(--color-bg-canvas)',
               borderRadius: 'var(--radius-lg)',
               border: '1px solid var(--color-border-subtle)',
               overflow: 'hidden',
@@ -2560,18 +2554,18 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 padding: '10px 16px',
-                backgroundColor: '#161b22',
-                borderBottom: '1px solid #30363d',
+                backgroundColor: 'var(--color-bg-subtle)',
+                borderBottom: '1px solid var(--color-border-subtle)',
                 fontSize: '0.8125rem',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#c9d1d9' }}>
-                <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#2ea043' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-text-secondary)' }}>
+                <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--color-status-online)' }} />
                 <span>실시간 ANSI 로그 스트림 (Control Plane SSE)</span>
               </div>
 
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#8b949e', cursor: 'pointer' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--color-text-secondary)', cursor: 'pointer' }}>
                   <input
                     type="checkbox"
                     checked={autoScroll}
@@ -2584,7 +2578,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                   style={{
                     background: 'none',
                     border: 'none',
-                    color: '#8b949e',
+                    color: 'var(--color-text-secondary)',
                     cursor: 'pointer',
                     fontSize: '0.75rem',
                   }}
@@ -2603,21 +2597,21 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 fontFamily: 'Consolas, Monaco, "Courier New", monospace',
                 fontSize: '0.8125rem',
                 lineHeight: 1.6,
-                color: '#e6edf3',
+                color: 'var(--color-text-primary)',
               }}
             >
               {logs.map((log, index) => {
                 const color =
                   log.level === 'SUCCESS'
-                    ? '#3fb950'
+                    ? 'var(--color-status-online)'
                     : log.level === 'ERROR'
-                    ? '#f85149'
+                    ? 'var(--color-status-offline)'
                     : log.level === 'WARN'
-                    ? '#d29922'
-                    : '#58a6ff';
+                    ? 'var(--color-status-degraded)'
+                    : 'var(--color-brand-hover)';
                 return (
                   <div key={index} style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
-                    <span style={{ color: '#8b949e', marginRight: '8px' }}>[{log.timestamp}]</span>
+                    <span style={{ color: 'var(--color-text-secondary)', marginRight: '8px' }}>[{log.timestamp}]</span>
                     <span style={{ color, fontWeight: 600, marginRight: '8px' }}>[{log.level}]</span>
                     <span>{log.message}</span>
                   </div>
@@ -2661,7 +2655,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
               <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 <div>• 추론 레이턴시: <strong>4.2ms</strong> (배치 슬라이스당)</div>
                 <div>• GPU 메모리 대역폭: <strong>984 GB/s</strong> (PCIe Gen4)</div>
-                <div>• 다중 LLM 적합성 점수: <strong style={{ color: '#3fb950' }}>100% (4/4 모델 통과)</strong></div>
+                <div>• 다중 LLM 적합성 점수: <strong style={{ color: 'var(--color-status-online)' }}>100% (4/4 모델 통과)</strong></div>
                 <div>• 모델 계보 다이제스트: <code>sha256:d8a4f02b...</code></div>
               </div>
             </div>
@@ -2680,6 +2674,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
         <div
           ref={cancelModalRef}
           role="dialog"
+          data-testid="cancel-modal"
           aria-labelledby="cancel-title"
           aria-modal="true"
           onKeyDown={handleCancelKeyDown}
@@ -2690,7 +2685,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.6)',
+            backgroundColor: 'var(--color-bg-backdrop)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -2765,7 +2760,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.6)',
+            backgroundColor: 'var(--color-bg-backdrop)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -2801,11 +2796,11 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
             <div
               style={{
                 padding: '12px',
-                backgroundColor: 'rgba(210, 153, 34, 0.12)',
-                border: '1px solid rgba(210, 153, 34, 0.4)',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-status-degraded)',
                 borderRadius: 'var(--radius-md)',
                 fontSize: '0.8125rem',
-                color: '#d29922',
+                color: 'var(--color-status-degraded)',
                 marginBottom: '16px',
               }}
             >
@@ -2818,9 +2813,9 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', fontSize: '0.8125rem', marginBottom: '16px' }}>
               <div>바인딩 노드: <strong>{selectedReceipt.nodeId}</strong></div>
               <div>실행 명령: <strong>{selectedReceipt.commandId}</strong></div>
-              <div>물리 정지 확인: <strong style={{ color: selectedReceipt.physicallyStopped ? '#3fb950' : '#f85149' }}>{selectedReceipt.physicallyStopped ? '✓ Stopped' : 'Running'}</strong></div>
-              <div>자원 회수 상태: <strong style={{ color: selectedReceipt.resourceReclaimed ? '#3fb950' : '#f85149' }}>{selectedReceipt.resourceReclaimed ? '✓ Reclaimed' : 'Pending'}</strong></div>
-              <div>애플리케이션 검증: <strong style={{ color: selectedReceipt.verified ? '#3fb950' : '#d29922' }}>{selectedReceipt.verified ? '✓ Application Verified' : 'Unverified'}</strong></div>
+              <div>물리 정지 확인: <strong style={{ color: selectedReceipt.physicallyStopped ? 'var(--color-status-online)' : 'var(--color-status-offline)' }}>{selectedReceipt.physicallyStopped ? '✓ Stopped' : 'Running'}</strong></div>
+              <div>자원 회수 상태: <strong style={{ color: selectedReceipt.resourceReclaimed ? 'var(--color-status-online)' : 'var(--color-status-offline)' }}>{selectedReceipt.resourceReclaimed ? '✓ Reclaimed' : 'Pending'}</strong></div>
+              <div>애플리케이션 검증: <strong style={{ color: selectedReceipt.verified ? 'var(--color-status-online)' : 'var(--color-status-degraded)' }}>{selectedReceipt.verified ? '✓ Application Verified' : 'Unverified'}</strong></div>
               <div>종료 시각: <strong>{new Date(selectedReceipt.stoppedAt).toLocaleTimeString()}</strong></div>
             </div>
 

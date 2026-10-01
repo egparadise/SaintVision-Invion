@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.189"
+version: "1.0.190"
 status: "proposed"
 author: "Gemini"
-updated: "2026-10-02T06:50:00+09:00"
+updated: "2026-10-02T07:22:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,6 +19,7 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
+- 확인 기준: 2026-10-02T07:22:00+09:00 (Card 206 개발 스튜디오 화면 DeveloperStudio 색상 리터럴 inventory 전수(174→0), 대비 표본/DOM 결속 감사 및 디자인 토큰 승격: base b78b3b04 PR #301 head 위 작업, DeveloperStudio 174건 -> 0건 해소, COLOR_LITERAL_MULTISET_BASELINE {} 래칫, border-subtle 356건/25개 파일 래칫, 레거시 #30363d 64건/11파일 상한 강화, non-schedulable 카드 opacity 0.75 제거로 muted 텍스트 4.67/5.75 >= 4.5:1 보장, active tab borderBottom 1:1 충돌 transparent 교정, projects useMemo 메모이제이션 무한 재렌더링 차단, Step 2 readiness.blockedBy safe navigation 안정화, Test 9g DOM 실제 렌더링 동적 대비 단언 신설, Test 9g-2 252개 style 속성 전수 AST 스타일-쌍 명도 대비 및 조상/불투명도 추적 가드 신설, Revert-Fail Probes 58~60 추가, tools/test_c206_mutations.py 10종 변이 10/10 100% 사살 실측; Vitest 22 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반, check_contract_bindings PASS, check_docs PASS, diff --check clean).
 - 확인 기준: 2026-10-02T06:50:00+09:00 (Card 202 사내망 배포 화면 Train 14 tip d0b2a4c6 머지 및 #289 step-up 재인증 섹션 래칫 동기화: PR #289 / Card 192 step-up 재인증 UI(8개 style 객체, 0개 리터럴) 병합 후 AST 가드 전수 통과 확인(violations 0), totalStyleAttrs 193 -> 201, checkedObjects 23, checkedPairs 150, unboundColorObjects 106, coveredColorObjects 129, checkedBorderObjects 36, checkedBorderPairs 38로 래칫 재고정, COLOR_LITERAL_MULTISET_BASELINE {} 0건 유지, Vitest 20 passed, tsc 0 error, build 성공, route coverage 41 passed, check_frontend_integrity 0 위반, check_docs PASS, diff --check clean).
 - 확인 기준: 2026-10-02T06:22:08+09:00 (Card 202 사내망 배포 화면 r2 조치: Claude UI r2 조건부 승인 지적 2건 전수 반영 — (1) §2.2 bash heredoc index.css 동적 재현 명령의 Python 정규식 따옴표 회귀 및 SyntaxError를 r"\[data-theme='dark'\]\s*\{([\s\S]*?)\}"로 완전 수정하고 실제 실행 exit code 0 콘솔 출력 직접 결속; (2) §2.1 표 첫 행 미노출 안내 Before composite hex를 index.css 정본 캔버스(#f8fafc / #090d16) 위 0.12 alpha 합성 실측치인 #e1edfc 2.13:1(Light) / #0f1c32 6.75:1(Dark)로 시험과 동일하게 정정; 문서 단독 commit).
 - 확인 기준: 2026-10-02T06:01:00+09:00 (Card 202 사내망 배포 화면 r1 조치: Claude UI r1 및 Codex r1 피드백 전수 반영 — U1/U2/U3/U4/C1/C2/C3 해소: IntranetDeploymentView 226건 -> 0건 해소 정정, Test 9f-2 가드에 불투명도(opacity) 추적 및 실효 대비 합성 엔진 신설, 연산자 입력 필드 opacity 0.8 제거(테두리 대비 2.60/2.86 -> 3.48/3.73 >= 3.0:1 복원), Test 9f as any 전면 제거 및 strict schema 픽스처(confirmedOperatorCount 0, requiredDistinctOperatorCount 2, matchingAcceptedUserCount 2, operatorSignOff false) 바인딩, #281 상태 요소 4종 및 계약 위반 에러 알림(deployment-manifest-error-contract) DOM 렌더링/토큰 단언, Revert-Fail Probes 56~57 신설, 독립 재현 가능한 tools/test_c202_mutations.py 커밋으로 10종 뮤테이션 B1~B5/M6~M10 10/10 100% 사살 실측, History 표 대표 표본 명시 및 before 실제 베이스 정정, Vitest 20 passed, deployment 13 passed, tsc 0 error, build 성공, route coverage 41 passed, check_frontend_integrity 0 위반, check_docs PASS, diff --check clean).
@@ -36,7 +37,39 @@ source_of_truth: "Git"
 - 확인 기준: 2026-10-02T02:22:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer r2 조치: Claude UI r2 조건부 승인 및 Codex r2 피드백 반영 — W1 History 전수 표 'before' 열 SaintVision 정본 베이스 다크 패널(#0f172a surface, #1e293b subtle) 재계산 및 4개 수치 오류(2.77:1, 3.44:1, 10.35:1, 3.48:1/3.75:1) 정정, W2 discovery-action-success 및 repair-action-error DOM 바인딩 단언 및 Probe 30/31 추가로 1:1 결함 변이 M11/M12 100% 사살 실측(총 12/12 100%), W3 commit 전 시각 동기화; Vitest 14 passed, s11-defect-fixes 16 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-02T02:05:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer r1 조치: Claude UI r1 및 Codex r1 피드백 전수 반영 — R1 버튼 요소 DEF-S11-09 위반 해소 `var(--color-brand-primary-bg)` 및 `--color-brand-primary-fg` 승격; R2 활성 네임스페이스 칩 및 버전 배지 `var(--color-brand-hover)` 적용 5.49:1(Light)/8.11:1(Dark), 비활성 버튼 `var(--color-bg-subtle)`/`var(--color-text-muted)`/`var(--color-border-subtle)` 5.25:1/5.78:1 및 3.18:1/3.08:1 충족; R3 실제 렌더 배경 기반 전수 실측표 재구성; R4 Test 9c 확장 및 10종 변이 M1~M10 100% 사살 실측; R5 History 제어 바이트 60개 전수 제거 완료; 보라색 리터럴 의도적 브랜드 통합 명시; Vitest 14 passed, s11-defect-fixes 16 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-02T01:20:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer Light/Dark 명도 대비 전수 감사 및 디자인 토큰 승격: base db37dbc5 위 작업, ResourceExplorer 390건 -> 0건, InvFileExplorer 124건 -> 0건 100% 해소, COLOR_LITERAL_MULTISET_BASELINE 양 파일 {} 래칫, border-subtle 232건/22개 파일 래칫, DOM 실제 렌더링 동적 대비 단언 신설, 변이 M1~M4 100% 사살 실측, Vitest 9개 스위트 139 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
-- 확인 기준: 2026-10-01T23:55:00+09:00 (Card 193 NodeDetail 잔여 리터럴 9건 r1 조치: Claude UI r1 및 Codex r1 피드백 반영, data-testid를 통한 상위 컨테이너(resource-usage-card-cpu subtle, node-detail-observed-usage-box subtle, node-detail-observed-headroom-box subtle, node-detail-lease-panel surface) 배경 DOM 직접 추출 및 동적 대비율 단언, Z1~Z5 5종 변이 100% 사살 실측, History §2 표 및 §3-2 대비 수치·배경 수학적 정밀 수치 정정, Probe 19~23 주석 수치 및 subtle 베이스 정정, Vitest 13 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
+
+## 2026-10-02 개발 스튜디오 화면 (DeveloperStudio) 색상 리터럴 inventory 전수(174→0), 대비 표본/DOM 결속 감사 및 디자인 토큰 승격 (Card 206, `agent/gemini/c206-developer-studio-contrast`, base `b78b3b04` PR #301 head)
+- **개요**: ACC-09 다음 영역인 개발 스튜디오 화면(`DeveloperStudio.tsx`, 코드 에디터·diff 뷰어·배치 시뮬레이터·실행 세션 터미널 및 승인 워크플로 포함)의 색상 리터럴 inventory 전수(174→0), 대비 표본/DOM 결속 감사 및 디자인 토큰 승격:
+  1. **색상 리터럴 전수 해소**:
+     - `DeveloperStudio.tsx`: 기존 174건 $\rightarrow$ **0건** (전수 제거).
+     - 배치 비적격 노드 카드의 `opacity: isNodeSchedulable ? 1 : 0.75`를 제거하여 subtle 배경 위 muted 텍스트 명도 저하(3.94:1 < 4.5:1) 원천 차단. 비적격 안내는 `var(--color-status-degraded)` 경고 배지로 시맨틱 및 명도 대비 동시 보장.
+     - 활성 탭의 `borderBottom: '1px solid var(--color-bg-surface)'`가 surface 배경과 1:1 충돌(대비 1.0:1)하던 결함을 `borderBottom: '1px solid transparent'`로 교정하여 1:1 충돌 원천 차단.
+     - `projects = React.useMemo(() => [project], [project])` 메모이제이션으로 매 렌더마다 새 참조 생성으로 인한 `useEffect` 무한 재렌더링 루프 원천 차단.
+     - `readiness.blockedBy?.join(', ') || '없음'` safe navigation 적용으로 Step 2 미서명/블록 사유 미정의 시 런타임 TypeError 원천 차단.
+     - Step 4 실행 세션 배지의 완료 시각 판정에 `currentRun?.completedAt`을 추가하여 liveRun 폴링 완료 시각 실시간 동기화.
+  2. **Fail-Closed Multiset Baseline 래칫 강제**:
+     - `acc09-contrast-tokens.test.tsx`의 `COLOR_LITERAL_MULTISET_BASELINE`에서 `DeveloperStudio.tsx`의 허용 인벤토리를 `{}` (0건)으로 전면 갱신.
+     - `var(--color-border-subtle)` 사용 횟수 346건 $\rightarrow$ **356건**(+10건), 파일 수 **25개** 유지로 fail-closed 단언 갱신.
+     - 레거시 리터럴 상한치 강화 (`#30363d` <= 64/11).
+  3. **실제 렌더링 DOM 기반 동적 대비 단언 및 변이 100% 사살**:
+     - Test 9g 신설: `vi.mock('@/shared/api/client')` 모듈 모킹, 스텝퍼 1~4단계 DOM 렌더링 및 활성/완료 테두리·원형 배경 토큰 결속 단언, 노드 칩 및 비적격 카드 경고 배지 단언, Step 2 미준비 경고 배너 단언, 실행 세션 상태 배지(running, succeeded, failed, awaiting_approval)의 전경색/배경색/테두리색 및 dynamic 명도 대비 단언 (텍스트 >= 4.5:1, 테두리 >= 3.0:1), Step 4 터미널 탭 및 출력 텍스트 단언.
+     - Test 9g-2 신설: 252개 style 속성 대상 계층적 조상 컨테이너 배경 스택 추적 및 요소/조상 불투명도(opacity) 합성 기반 동적 AST 명도 대비 계산 및 커버리지 래칫 (checkedObjects 36, checkedPairs 156, unboundColorObjects 92, coveredColorObjects 128, checkedBorderObjects 68, checkedBorderPairs 92, violations 0).
+     - Revert-Fail Probes 58~60 추가 (Probe 58 hardcoded #d29922 fail, Probe 59 card opacity 0.75 fail, Probe 60 active tab borderBottom 1:1 collision fail).
+     - `tools/test_c206_mutations.py` 신규 커밋: 10종 변이 M1~M10 전원 사살 실측 (10/10 = 100% killed, exit code 0).
+  4. **잔여 백로그 현황**:
+     - 개발 스튜디오 화면 잔여 색상 리터럴: **0건**.
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성 소유). Reviewer: Claude (UI/접근성/테스트), Codex (디자인 토큰/무결성/불변식).
+- **관측 근거 (Evidence)**:
+  - 단위 시험: `npx vitest run tests/acc09-contrast-tokens.test.tsx` (22 passed 100%, exit 0)
+  - 변이 불변식 실측: `python tools/test_c206_mutations.py` (10 / 10 killed 100%, exit 0)
+  - 타입 검사: `cd apps/web && npx tsc -b` (에러 0건, 클린 통과, exit 0)
+  - 프로덕션 빌드: `cd apps/web && npm run build` (built in 9.94s, exit 0)
+  - 라우트 커버리지: `pytest tests/test_route_coverage.py` (41 passed 100%, exit 0)
+  - 프런트엔드 무결성: `python tools/check_frontend_integrity.py` (93 files scanned, 0 violations, exit 0)
+  - 계약 바인딩: `python tools/check_contract_bindings.py` (55 fixtures, 20 bound types, exit 0)
+  - 문서 일관성: `python tools/check_docs.py` (PASS, exit 0)
+  - Git 차분 검사: `git diff --check` (clean, exit 0)
+- **전문 문서**: [[2026-10-02_07-22-00_KST_Card206_Developer_Studio_대비감사_Gemini]]
 
 ## 2026-10-02 사내망 배포 화면 (IntranetDeploymentView) 색상 리터럴 inventory 전수(226→0), 대비 표본/DOM 결속 감사 및 디자인 토큰 승격 (Card 202, `agent/gemini/c202-intranet-deploy-contrast`, base `dca1aa06` PR #298 r4)
 - **개요**: ACC-09 다음 영역인 사내망 배포 화면(`IntranetDeploymentView.tsx`, #281 서버 릴리스 선언서 결속·운영자 2인 확인 표시·교육 훈련 워크스루 포함)의 색상 리터럴 inventory 전수(226→0), 대비 표본/DOM 결속은 명시 범위로 감사하고 디자인 토큰으로 승격 (r1 보강: U1/U2/C1/C2/C3 피드백 전수 반영):
