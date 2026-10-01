@@ -209,16 +209,16 @@ export const NodeList: React.FC<NodeListProps> = ({
                     borderRadius: 'var(--radius-sm)',
                     fontSize: '0.75rem',
                     fontWeight: 600,
-                    color: node.status === 'lost' ? '#f85149' : node.status === 'unknown' ? '#d29922' : node.status === 'active' ? '#38bdf8' : 'var(--color-text-muted)',
+                    color: node.status === 'lost' ? 'var(--color-status-lost)' : node.status === 'unknown' ? 'var(--color-status-unknown)' : node.status === 'active' ? 'var(--color-status-active)' : 'var(--color-text-muted)',
                     backgroundColor: 'var(--color-bg-subtle)',
-                    border: `1px solid ${node.status === 'lost' ? '#f85149' : node.status === 'unknown' ? '#d29922' : node.status === 'active' ? '#38bdf8' : 'var(--color-border-subtle)'}`,
+                    border: `1px solid ${node.status === 'lost' ? 'var(--color-status-lost)' : node.status === 'unknown' ? 'var(--color-status-unknown)' : node.status === 'active' ? 'var(--color-status-active)' : 'var(--color-border-subtle)'}`,
                   }}
                 >
                   <span style={{
                     width: '6px',
                     height: '6px',
                     borderRadius: '50%',
-                    backgroundColor: node.status === 'lost' ? '#f85149' : node.status === 'unknown' ? '#d29922' : node.status === 'active' ? '#38bdf8' : 'var(--color-text-muted)',
+                    backgroundColor: node.status === 'lost' ? 'var(--color-status-lost)' : node.status === 'unknown' ? 'var(--color-status-unknown)' : node.status === 'active' ? 'var(--color-status-active)' : 'var(--color-text-muted)',
                   }} />
                   {node.status === 'lost' ? 'LOST (단절)' : node.status === 'unknown' ? 'UNKNOWN (미확인)' : node.status === 'active' ? 'ACTIVE (활성 · 헬스 미결정)' : node.status.toUpperCase()}
                 </span>
@@ -266,13 +266,13 @@ export const NodeList: React.FC<NodeListProps> = ({
             node.status === 'online'
               ? 'var(--color-status-online)'
               : node.status === 'active'
-              ? '#38bdf8'
+              ? 'var(--color-status-active)'
               : node.status === 'degraded'
               ? 'var(--color-status-degraded)'
               : node.status === 'lost'
-              ? '#f85149'
+              ? 'var(--color-status-lost)'
               : node.status === 'unknown'
-              ? '#d29922'
+              ? 'var(--color-status-unknown)'
               : 'var(--color-status-offline)';
 
           const ramUsedGb = (node.memoryUsedBytes / (1024 ** 3)).toFixed(1);
@@ -283,6 +283,7 @@ export const NodeList: React.FC<NodeListProps> = ({
           return (
             <div
               key={node.id}
+              role={node.status === 'unknown' ? 'status' : undefined}
               data-testid={`node-card-${node.id}`}
               onClick={onSelectNode ? () => onSelectNode(node.id) : undefined}
               style={{
@@ -364,13 +365,14 @@ export const NodeList: React.FC<NodeListProps> = ({
               {/* Observation-Only and Schedulable Capacity */}
               {node.observationOnly && (
                 <div
+                  data-testid={`node-observation-banner-${node.id}`}
                   style={{
                     marginTop: '8px',
                     padding: '4px 8px',
                     borderRadius: 'var(--radius-sm)',
                     backgroundColor: 'rgba(210, 153, 34, 0.15)',
-                    border: '1px solid #d29922',
-                    color: '#d29922',
+                    border: '1px solid var(--color-status-unknown)',
+                    color: 'var(--color-status-unknown)',
                     fontSize: '0.6875rem',
                     fontWeight: 600,
                   }}
@@ -389,7 +391,7 @@ export const NodeList: React.FC<NodeListProps> = ({
                     borderRadius: 'var(--radius-sm)',
                     backgroundColor: 'rgba(56, 189, 248, 0.12)',
                     border: '1px solid rgba(56, 189, 248, 0.3)',
-                    color: '#38bdf8',
+                    color: 'var(--color-status-active)',
                     fontSize: '0.6875rem',
                     fontWeight: 500,
                   }}
@@ -413,7 +415,10 @@ export const NodeList: React.FC<NodeListProps> = ({
                   <span style={{ color: 'var(--color-text-muted)' }}>
                     관측여유: {(node.cpuCores * (1 - node.cpuUsagePercent / 100)).toFixed(1)}C · {((node.memoryTotalBytes - node.memoryUsedBytes) / 1024 ** 3).toFixed(1)}G
                   </span>
-                  <span style={{ fontWeight: 700, color: node.observationOnly ? '#d29922' : (node.allocatableCores !== undefined ? '#3fb950' : 'var(--color-text-muted)') }}>
+                  <span
+                    data-testid={`node-schedulable-${node.id}`}
+                    style={{ fontWeight: 700, color: node.observationOnly ? 'var(--color-status-unknown)' : (node.allocatableCores !== undefined ? '#3fb950' : 'var(--color-text-muted)') }}
+                  >
                     예약가능: {node.observationOnly ? '0C (차단)' : (node.allocatableCores !== undefined ? `${node.allocatableCores}C` : '미확인 (선택 불가)')}
                   </span>
                 </div>
