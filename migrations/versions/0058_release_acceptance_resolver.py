@@ -89,7 +89,7 @@ def upgrade() -> None:
         CREATE FUNCTION public.evidence_envelope_digest_v1(
             p_row public.evidence_envelopes
         ) RETURNS char(64)
-        LANGUAGE sql SECURITY INVOKER IMMUTABLE
+        LANGUAGE sql SECURITY INVOKER STABLE
         SET search_path = pg_catalog
         AS $fn$ SELECT {helper_expr} $fn$
         """

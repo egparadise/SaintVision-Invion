@@ -99,6 +99,8 @@ def test_migration_is_linear_invoker_only_and_caller_values_are_not_preserved():
     assert "binding_digest_is_server_derived" in source
     assert "release_target_registry_pin_immutable" in source
     assert "NEW.target_registry_version IS DISTINCT FROM OLD.target_registry_version" in source
+    assert "LANGUAGE sql SECURITY INVOKER STABLE" in source
+    assert "ALTER TABLE release_evidence_bindings FORCE ROW LEVEL SECURITY" in source
     assert "pg_catalog.sha256" in source
     assert "pgcrypto" not in source
     assert "public.digest" not in source
