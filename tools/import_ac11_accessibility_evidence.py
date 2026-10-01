@@ -32,6 +32,7 @@ REGISTRY_COMMIT = "c58df1765a8b47f0b250f31161592620119d8655"
 REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
 REGISTRY_BLOB = "f00a38e13239f37ddfc28fb2e5c7444392882ed9"
 TARGET_ID = "s11-accessibility-user-device-v1"
+EMITTED_AXES: tuple[str, ...] = ("accessibility-e2e",)
 MANUAL_PURPOSE = "s11-ac11-accessibility-user-device-manual"
 EXPECTED_SCENARIOS = {
     "ACC-MANUAL-KEYBOARD-JOURNEY",
@@ -464,7 +465,7 @@ def import_evidence(
     return {
         "schemaVersion": "1.0.0",
         "runPurpose": "ac11-axis-evidence",
-        "axis": collector.AXIS,
+        "axis": EMITTED_AXES[0],
         "verdict": bound["verdict"],
         "sourceRunId": source_run_id,
         "sourceHeadSha": source,

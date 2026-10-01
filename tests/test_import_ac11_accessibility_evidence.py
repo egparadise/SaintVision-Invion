@@ -358,13 +358,14 @@ def test_imported_pass_is_consumed_by_ac11_aggregator():
 
 def test_registry_and_manifest_contract_are_pinned():
     assert aggregate.TARGET_REGISTRY_BLOB == tool.REGISTRY_BLOB
+    assert tool.EMITTED_AXES == (collector.AXIS,)
     assert aggregate.REQUIRED_TARGET_BY_AXIS[collector.AXIS] == tool.TARGET_ID
     assert tool.REGISTRY_BLOB == "f00a38e13239f37ddfc28fb2e5c7444392882ed9"
     patch = json.loads(
         (ROOT / "docs/ac11-axis-sources-accessibility-patch-v1.json").read_text(encoding="utf-8")
     )["replacement"]
     assert patch["importer"] == "tools/import_ac11_accessibility_evidence.py"
-    assert patch["importerEmitsAxes"] == [collector.AXIS]
+    assert patch["importerEmitsAxes"] == list(tool.EMITTED_AXES)
     assert patch["envelopeShape"] == "axis-evidence"
 
 
