@@ -1769,7 +1769,7 @@ def test_the_concession_is_an_argument_and_not_a_broadened_error_set():
 # --- Codex r4 M2: the verifier judges the bytes that were hashed -------------------
 
 
-def test_the_verifier_judges_the_copy_of_the_bytes_that_were_hashed(tmp_path, monkeypatch):
+def test_a_configured_file_swapped_after_the_hash_refuses_the_run(tmp_path, monkeypatch):
     """A swap between the two reads must not change the verdict.
 
     The tool read the bundle and hashed it, then handed AccessTokens the *path*, which
@@ -1802,20 +1802,20 @@ def test_the_verifier_judges_the_copy_of_the_bytes_that_were_hashed(tmp_path, mo
         return data
 
     monkeypatch.setattr(Path, "read_bytes", read_then_swap)
-    result = smoke.read_control_plane_configuration(config)
+    # The configured file now genuinely differs from what was hashed, and the acceptance
+    # read notices. Neither version can be described honestly, so the run refuses instead of
+    # reporting a verdict -- which is what the coordinator's P1 guard is for. The property
+    # this test used to cover (the verdict follows the hashed bytes, not the file) is now
+    # held by test_the_verdict_comes_from_the_hashed_bytes_not_the_file_on_disk.
+    with pytest.raises(smoke.SmokeRefused, match="changed after this report read and hashed"):
+        smoke.read_control_plane_configuration(config)
     monkeypatch.undo()
 
     assert swapped["done"], "the probe did not get a chance to swap the file"
     assert json.loads(bundle_path.read_text(encoding="utf-8")) == good_bundle
-    assert any("refuses-this-configuration" in defect for defect in result["bundleDefects"]), (
-        result["bundleDefects"]
-    )
-    assert result["bundleSha256"] == hashlib.sha256(
-        json.dumps(enc_bundle).encode()
-    ).hexdigest()
 
 
-def test_the_swap_in_the_other_direction_does_not_manufacture_a_pass(tmp_path, monkeypatch):
+def test_the_same_swap_towards_an_unacceptable_bundle_also_refuses(tmp_path, monkeypatch):
     """The mirror: hashed bytes are acceptable, the path becomes unacceptable."""
     issuer = "https://idp.example.invalid/realms/sv"
     now = int(dt.datetime.now(dt.timezone.utc).timestamp())
@@ -1837,14 +1837,13 @@ def test_the_swap_in_the_other_direction_does_not_manufacture_a_pass(tmp_path, m
         return data
 
     monkeypatch.setattr(Path, "read_bytes", read_then_swap)
-    result = smoke.read_control_plane_configuration(config)
+    # Same in this direction: a swap towards an unacceptable bundle is refused rather than
+    # being reported as a defect, because the defect would be about bytes this report did
+    # not hash.
+    with pytest.raises(smoke.SmokeRefused, match="changed after this report read and hashed"):
+        smoke.read_control_plane_configuration(config)
     monkeypatch.undo()
-
     assert swapped["done"]
-    assert result["bundleDefects"] == [], result["bundleDefects"]
-    assert result["bundleSha256"] == hashlib.sha256(
-        json.dumps(good_bundle).encode()
-    ).hexdigest()
 
 
 def test_the_bundle_copy_is_removed_and_its_directory_with_it(tmp_path):
@@ -1954,13 +1953,22 @@ def test_a_duplicate_root_still_has_to_be_an_approved_root(world):
 # and e change nothing, because there is nothing left for them to race.
 
 
-def identity_for(tmp_path, issuer="https://idp.example.invalid/realms/sv"):
+def identity_for(tmp_path, sealed=None, issuer="https://idp.example.invalid/realms/sv"):
+    """The identity a real configuration would carry, with the configured file on disk.
+
+    The file has to exist and hold the sealed bytes now: the pin puts the operator's own
+    file through the product's acceptance checks, so a configured path that is not there is
+    a different failure from the one under test.
+    """
+    configured = tmp_path / "configured.json"
+    if sealed is not None:
+        configured.write_bytes(sealed)
     return {
         "tenant_id": "00000000-0000-4000-8000-000000000001",
         "issuer": issuer,
         "audience": "sv-api",
         "client_ids": ["sv-portal"],
-        "jwks_file": str(tmp_path / "configured.json"),
+        "jwks_file": str(configured),
     }
 
 
@@ -2024,7 +2032,7 @@ def test_a_swap_that_is_put_back_cannot_change_the_verdict(tmp_path, mode):
     sealed = bundle_bytes(keys=[{**SIGNING_KEY, "alg": "RSA-OAEP", "use": "enc"}])
     verifier = tampering_verifier(mode, bundle_bytes())
     defects = smoke.verifier_refusal(
-        verifier, identity_for(tmp_path), sealed, hashlib.sha256(sealed).hexdigest()
+        verifier, identity_for(tmp_path, sealed), sealed, hashlib.sha256(sealed).hexdigest()
     )
     # The tamperer did get its swap in, and the reader still handed over the sealed bytes.
     assert verifier.read == [sealed], "the pinned reader returned something else"
@@ -2040,7 +2048,7 @@ def test_case_e_cannot_manufacture_a_defect_either(tmp_path):
         "d", bundle_bytes(keys=[{**SIGNING_KEY, "alg": "RSA-OAEP", "use": "enc"}])
     )
     defects = smoke.verifier_refusal(
-        verifier, identity_for(tmp_path), sealed, hashlib.sha256(sealed).hexdigest()
+        verifier, identity_for(tmp_path, sealed), sealed, hashlib.sha256(sealed).hexdigest()
     )
     assert verifier.read == [sealed]
     assert defects == []
@@ -2079,7 +2087,7 @@ def test_the_real_verifier_reaches_its_verdict_through_the_pin(tmp_path, mode):
             super().__init__(**identity)
 
     defects = smoke.verifier_refusal(
-        Racing, identity_for(tmp_path), sealed, hashlib.sha256(sealed).hexdigest()
+        Racing, identity_for(tmp_path, sealed), sealed, hashlib.sha256(sealed).hexdigest()
     )
     assert attacked["done"], "the probe never ran"
     assert any("refuses-this-configuration" in defect for defect in defects), defects
@@ -2107,7 +2115,7 @@ def test_the_verdict_comes_from_the_hashed_bytes_not_the_file_on_disk(tmp_path):
             super().__init__(**identity)
 
     defects = smoke.verifier_refusal(
-        LeavesGoodBytesOnDisk, identity_for(tmp_path), sealed,
+        LeavesGoodBytesOnDisk, identity_for(tmp_path, sealed), sealed,
         hashlib.sha256(sealed).hexdigest(),
     )
     assert swapped["done"]
@@ -2128,7 +2136,7 @@ def test_the_mirror_of_that_does_not_manufacture_a_defect(tmp_path):
             super().__init__(**identity)
 
     assert smoke.verifier_refusal(
-        LeavesBadBytesOnDisk, identity_for(tmp_path), sealed,
+        LeavesBadBytesOnDisk, identity_for(tmp_path, sealed), sealed,
         hashlib.sha256(sealed).hexdigest(),
     ) == []
 
@@ -2137,7 +2145,7 @@ def test_an_acceptable_bundle_still_passes_through_the_pin(tmp_path):
     """The control, with the real product class and no interference."""
     sealed = bundle_bytes()
     assert smoke.verifier_refusal(
-        smoke.product_verifier(), identity_for(tmp_path), sealed,
+        smoke.product_verifier(), identity_for(tmp_path, sealed), sealed,
         hashlib.sha256(sealed).hexdigest(),
     ) == []
 
@@ -2151,7 +2159,7 @@ def test_a_verifier_that_never_reads_the_bundle_refuses_the_run(tmp_path):
     sealed = bundle_bytes()
     with pytest.raises(smoke.SmokeRefused, match="did not read the trust bundle"):
         smoke.verifier_refusal(
-            Lazy, identity_for(tmp_path), sealed, hashlib.sha256(sealed).hexdigest()
+            Lazy, identity_for(tmp_path, sealed), sealed, hashlib.sha256(sealed).hexdigest()
         )
 
 
@@ -2163,7 +2171,7 @@ def test_the_pin_is_restored_afterwards(tmp_path):
     before = module.trusted_file
     sealed = bundle_bytes()
     smoke.verifier_refusal(
-        smoke.product_verifier(), identity_for(tmp_path), sealed,
+        smoke.product_verifier(), identity_for(tmp_path, sealed), sealed,
         hashlib.sha256(sealed).hexdigest(),
     )
     assert module.trusted_file is before
@@ -2176,14 +2184,14 @@ def test_the_pin_is_restored_afterwards(tmp_path):
             raise RuntimeError("boom")
 
     smoke.verifier_refusal(
-        Exploding, identity_for(tmp_path), sealed, hashlib.sha256(sealed).hexdigest()
+        Exploding, identity_for(tmp_path, sealed), sealed, hashlib.sha256(sealed).hexdigest()
     )
     assert module.trusted_file is before, "not restored on the exception path"
 
     with pytest.raises(smoke.SmokeRefused):
         smoke.verifier_refusal(
             type("NoRead", (), {"__init__": lambda self, **kw: None}),
-            identity_for(tmp_path), sealed, hashlib.sha256(sealed).hexdigest(),
+            identity_for(tmp_path, sealed), sealed, hashlib.sha256(sealed).hexdigest(),
         )
     assert module.trusted_file is before, "not restored on the refusal path"
 
@@ -2194,7 +2202,12 @@ def test_the_pin_delegates_every_other_path(tmp_path):
     other.write_bytes(b'{"unrelated": true}')
     copy = tmp_path / "ours.json"
     copy.write_bytes(b'{"ours": true}')
-    with smoke.bundle_read_pinned(copy, b'{"pinned": true}') as reads:
+    # The configured path is the one the acceptance checks run against, so it holds the
+    # same bytes the pin will substitute.
+    configured = tmp_path / "configured.json"
+    configured.write_bytes(b'{"pinned": true}')
+    digest = hashlib.sha256(b'{"pinned": true}').hexdigest()
+    with smoke.bundle_read_pinned(copy, b'{"pinned": true}', str(configured), digest) as reads:
         assert trusted_file_of(copy) == b'{"pinned": true}'
         assert trusted_file_of(other) == b'{"unrelated": true}'
     assert reads == [str(copy)]
@@ -2206,12 +2219,149 @@ def test_the_pin_fails_loudly_if_the_product_has_no_such_reader(tmp_path, monkey
 
     monkeypatch.delattr(_sys.modules["inv.identity"], smoke.PRODUCT_READER)
     with pytest.raises(AttributeError):
-        with smoke.bundle_read_pinned(tmp_path / "x", b"{}"):
+        with smoke.bundle_read_pinned(tmp_path / "x", b"{}", str(tmp_path / "y"), "0" * 64):
             pass
 
 
 def test_bytes_that_do_not_match_the_recorded_digest_refuse_the_run(tmp_path):
     with pytest.raises(smoke.SmokeRefused, match="do not hash to the digest"):
         smoke.verifier_refusal(
-            smoke.product_verifier(), identity_for(tmp_path), b'{"issuer": "x"}', "0" * 64
+            smoke.product_verifier(), identity_for(tmp_path, b'{"issuer": "x"}'),
+            b'{"issuer": "x"}', "0" * 64
         )
+
+
+# --- coordinator P1: the product's acceptance checks are not skipped ----------------
+#
+# The pin returned the hashed bytes and nothing else, which skipped what trusted_file
+# enforces about the operator's own file: a regular file, at most 65536 bytes, and on POSIX
+# no group or world write. A 182,515-byte bundle therefore came back with no defect while
+# the product raises ValueError, and a group-writable original passed because this run's
+# copy is 0600. Not a false PASS -- the verdict weakened to NOT_BOUND -- but a defect the
+# report did not name.
+
+
+def oversized_bundle_bytes():
+    """Past the product's byte ceiling and otherwise **entirely valid**.
+
+    The padding is JSON whitespace, so the document these bytes parse to is the acceptable
+    bundle used everywhere else in this file. That isolates the rule under test: the only
+    reason the product can refuse is trusted_file's 65536-byte ceiling, which it applies to
+    the bytes before anything parses them.
+
+    A first version padded the modulus instead, and that was not a test of this rule at all
+    -- an over-long modulus is refused again later by the RSA size bound, so the defect
+    appeared either way and the mutation that skips the acceptance checks survived.
+    """
+    now = int(dt.datetime.now(dt.timezone.utc).timestamp())
+    document = {
+        "issuer": "https://idp.example.invalid/realms/sv",
+        "expiresAt": now + 3 * 86_400,
+        "keys": [dict(SIGNING_KEY)],
+    }
+    raw = json.dumps(document).encode() + b" " * 70_000
+    assert len(raw) > 65_536, len(raw)
+    assert json.loads(raw.decode()) == document, "the padding must not change the document"
+    return raw
+
+
+def test_a_bundle_past_the_size_ceiling_is_a_defect(tmp_path):
+    """The product refuses it, so this must report it rather than returning no defect."""
+    raw = oversized_bundle_bytes()
+    configured = tmp_path / "configured.json"
+    configured.write_bytes(raw)
+    defects = smoke.verifier_refusal(
+        smoke.product_verifier(),
+        {"tenant_id": "00000000-0000-4000-8000-000000000001",
+         "issuer": "https://idp.example.invalid/realms/sv",
+         "audience": "sv-api", "client_ids": ["sv-portal"],
+         "jwks_file": str(configured)},
+        raw, hashlib.sha256(raw).hexdigest(),
+    )
+    assert any("refuses-this-configuration" in defect for defect in defects), defects
+
+
+def test_the_size_ceiling_is_the_product_s_and_not_a_copy_of_it(tmp_path):
+    """Judge where the number comes from: the product's own function must raise.
+
+    A local size check in this tool would be a second implementation of the rule, which is
+    the drift this whole area keeps closing. So the test asserts the product refuses the
+    file directly.
+    """
+    raw = oversized_bundle_bytes()
+    configured = tmp_path / "configured.json"
+    configured.write_bytes(raw)
+    reader = sys.modules["inv.identity"].trusted_file
+    with pytest.raises(ValueError):
+        reader(configured)
+
+
+@pytest.mark.skipif(os.name == "nt", reason="POSIX mode bits; this runs on Linux CI")
+def test_a_group_writable_bundle_is_a_defect(tmp_path):
+    """The copy is 0600, so only checking the copy hid a group-writable original."""
+    raw = bundle_bytes()
+    configured = tmp_path / "configured.json"
+    configured.write_bytes(raw)
+    os.chmod(configured, 0o664)
+    defects = smoke.verifier_refusal(
+        smoke.product_verifier(),
+        {"tenant_id": "00000000-0000-4000-8000-000000000001",
+         "issuer": "https://idp.example.invalid/realms/sv",
+         "audience": "sv-api", "client_ids": ["sv-portal"],
+         "jwks_file": str(configured)},
+        raw, hashlib.sha256(raw).hexdigest(),
+    )
+    assert any("refuses-this-configuration" in defect for defect in defects), defects
+
+
+def test_an_acceptable_original_still_reaches_the_verdict(tmp_path):
+    """The control: a 0600 regular file under the ceiling passes and the bytes are used."""
+    raw = bundle_bytes()
+    configured = tmp_path / "configured.json"
+    configured.write_bytes(raw)
+    if os.name != "nt":
+        os.chmod(configured, 0o600)
+    assert smoke.verifier_refusal(
+        smoke.product_verifier(),
+        {"tenant_id": "00000000-0000-4000-8000-000000000001",
+         "issuer": "https://idp.example.invalid/realms/sv",
+         "audience": "sv-api", "client_ids": ["sv-portal"],
+         "jwks_file": str(configured)},
+        raw, hashlib.sha256(raw).hexdigest(),
+    ) == []
+
+
+def test_the_configured_file_changing_after_the_hash_refuses_the_run(tmp_path):
+    """The acceptance read is also an identity guard, and its refusal is not a verdict."""
+    raw = bundle_bytes()
+    configured = tmp_path / "configured.json"
+    configured.write_bytes(bundle_bytes(expiresAt=1))   # not what was hashed
+    with pytest.raises(smoke.SmokeRefused, match="changed after this report read and hashed"):
+        smoke.verifier_refusal(
+            smoke.product_verifier(),
+            {"tenant_id": "00000000-0000-4000-8000-000000000001",
+             "issuer": "https://idp.example.invalid/realms/sv",
+             "audience": "sv-api", "client_ids": ["sv-portal"],
+             "jwks_file": str(configured)},
+            raw, hashlib.sha256(raw).hexdigest(),
+        )
+
+
+def test_that_refusal_is_not_reported_as_a_bundle_defect(tmp_path):
+    """SmokeRefused from inside the pin must escape, not become a defect string."""
+    raw = bundle_bytes()
+    configured = tmp_path / "configured.json"
+    configured.write_bytes(bundle_bytes(expiresAt=1))
+    try:
+        smoke.verifier_refusal(
+            smoke.product_verifier(),
+            {"tenant_id": "00000000-0000-4000-8000-000000000001",
+             "issuer": "https://idp.example.invalid/realms/sv",
+             "audience": "sv-api", "client_ids": ["sv-portal"],
+             "jwks_file": str(configured)},
+            raw, hashlib.sha256(raw).hexdigest(),
+        )
+    except smoke.SmokeRefused as refusal:
+        assert "refuses-this-configuration" not in str(refusal)
+    else:
+        pytest.fail("the pin's refusal was swallowed")

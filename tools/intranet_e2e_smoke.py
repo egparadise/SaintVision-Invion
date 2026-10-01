@@ -45,9 +45,9 @@ from __future__ import annotations
 
 import argparse
 import base64
+import contextlib
 import datetime as dt
 import hashlib
-import contextlib
 import ipaddress
 import json
 import os
@@ -383,7 +383,7 @@ PRODUCT_READER = "trusted_file"
 
 
 @contextlib.contextmanager
-def bundle_read_pinned(copy: Path, bundle_raw: bytes):
+def bundle_read_pinned(copy: Path, bundle_raw: bytes, configured: str, bundle_sha: str):
     """Make the verifier's own read return the bytes that were already hashed.
 
     Round 6 sealed the copy before and after the verifier ran and refused on a difference.
@@ -403,6 +403,15 @@ def bundle_read_pinned(copy: Path, bundle_raw: bytes):
     verifier never read through it, the verdict is not about these bytes and must not be
     reported. A product that no longer has this function raises here rather than quietly
     falling back to reading the disk.
+
+    Returning the bytes and nothing else was not enough either. ``trusted_file`` is not only
+    a read: it refuses a non-regular file, anything over 65536 bytes, and on POSIX any file
+    with group or world write. Handing back ``bundle_raw`` skipped all three against the
+    operator's real file -- a 182,515-byte bundle came out of here with no defect while the
+    product raises ValueError, and a group-writable original passed because this run's copy
+    is 0600. Those checks belong to the operator's file, so the pin puts **that** file
+    through them and only then substitutes the hashed bytes. If what comes back differs from
+    what was hashed, the run refuses rather than judging either version.
     """
     # Resolve through product_verifier() rather than assuming the module is already in
     # sys.modules: it may not be when the caller passes its own verifier, and an assumption
@@ -414,7 +423,22 @@ def bundle_read_pinned(copy: Path, bundle_raw: bytes):
 
     def pinned(target):
         if Path(target) == copy:
+            # Recorded on entry, not on success: the acceptance check below can refuse the
+            # operator's file, and that refusal is the product's verdict about the bundle --
+            # it must not be mistaken for the verifier never having read it.
             reads.append(str(target))
+            # The acceptance checks run against the operator's own file, which is the file
+            # that has to satisfy them. A failure here propagates as the product's refusal,
+            # which is the honest verdict.
+            accepted = original(configured)
+            if hashlib.sha256(accepted).hexdigest() != bundle_sha:
+                raise SmokeRefused(
+                    "the configured trust bundle changed after this report read and hashed "
+                    "it, so neither version can be judged"
+                )
+            # Reaching here means `accepted` and `bundle_raw` are the same bytes, so which
+            # one is returned cannot differ -- returning the hashed bytes is the one that
+            # stays correct if the guard above is ever loosened.
             return bundle_raw
         # Any other path is the product's own business and is read as the product reads it.
         return original(target)
@@ -466,9 +490,13 @@ def verifier_refusal(verifier, identity: dict, bundle_raw: bytes, bundle_sha: st
                 "the trust bundle bytes do not hash to the digest this report recorded"
             )
         refused: list[str] = []
-        with bundle_read_pinned(copy, bundle_raw) as reads:
+        with bundle_read_pinned(copy, bundle_raw, str(identity["jwks_file"]), bundle_sha) as reads:
             try:
                 verifier(**{**identity, "jwks_file": str(copy)})
+            except SmokeRefused:
+                # The pin's own refusal is not a verdict about the bundle and must not be
+                # reported as one.
+                raise
             except Exception as error:
                 # The authority, and it enforces more than the names below: key type,
                 # algorithm, use, absence of a private exponent, key-id uniqueness, RSA size.
