@@ -2,9 +2,12 @@
 
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
+from io import BytesIO
+import hashlib
 import json
 from pathlib import Path
 import subprocess
+import tarfile
 
 import pytest
 
@@ -76,8 +79,8 @@ def _health():
             "cgroupMode": "v2",
         },
         "fieldSources": {
-            "pid": "caller-passed-rootlesskit-process",
-            "processStartTicks": "proc-rootlesskit-process",
+            "pid": "caller-passed-buildkitd-process",
+            "processStartTicks": "proc-buildkitd-process",
             "rootless": "proc-uid-map",
             "privileged": "caller-asserted-reference-boundary",
             "hostAccess": "caller-asserted-reference-boundary",
@@ -91,11 +94,81 @@ def _health():
     }
 
 
+def _json_bytes(value: object) -> bytes:
+    return json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
+
+
+def _digest(raw: bytes) -> str:
+    return "sha256:" + hashlib.sha256(raw).hexdigest()
+
+
+def _write_oci_archive(path: Path, *, omit_layer: bool = False) -> tuple[str, str]:
+    config = _json_bytes(
+        {
+            "architecture": "amd64",
+            "os": "linux",
+            "rootfs": {"type": "layers", "diff_ids": []},
+        }
+    )
+    layer = b"saintvision-buildkit-reference-layer"
+    config_digest = _digest(config)
+    layer_digest = _digest(layer)
+    manifest = _json_bytes(
+        {
+            "schemaVersion": 2,
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "config": {
+                "mediaType": "application/vnd.oci.image.config.v1+json",
+                "digest": config_digest,
+                "size": len(config),
+            },
+            "layers": [
+                {
+                    "mediaType": "application/vnd.oci.image.layer.v1.tar",
+                    "digest": layer_digest,
+                    "size": len(layer),
+                }
+            ],
+        }
+    )
+    manifest_digest = _digest(manifest)
+    index = _json_bytes(
+        {
+            "schemaVersion": 2,
+            "manifests": [
+                {
+                    "mediaType": "application/vnd.oci.image.manifest.v1+json",
+                    "digest": manifest_digest,
+                    "size": len(manifest),
+                }
+            ],
+        }
+    )
+    files = {
+        "oci-layout": _json_bytes({"imageLayoutVersion": "1.0.0"}),
+        "index.json": index,
+        f"blobs/sha256/{manifest_digest.removeprefix('sha256:')}": manifest,
+        f"blobs/sha256/{config_digest.removeprefix('sha256:')}": config,
+    }
+    if not omit_layer:
+        files[f"blobs/sha256/{layer_digest.removeprefix('sha256:')}"] = layer
+    with tarfile.open(path, mode="w") as archive:
+        for name, raw in files.items():
+            member = tarfile.TarInfo(name)
+            member.size = len(raw)
+            member.mtime = 0
+            archive.addfile(member, BytesIO(raw))
+    return manifest_digest, config_digest
+
+
 class _Runner:
     def __init__(self, root: Path):
         self.root = root
         self.calls = []
         self.fail = None
+        self.image_digest_override = None
+        self.config_digest_override = None
+        self.omit_layer = False
         self.workers = [
             {
                 "ID": "worker-1",
@@ -124,12 +197,15 @@ class _Runner:
                 arguments[arguments.index("--output") + 1].split("dest=", 1)[1].split(",", 1)[0]
             )
             metadata = Path(arguments[arguments.index("--metadata-file") + 1])
-            output.write_bytes(b"oci-reference")
+            image_digest, config_digest = _write_oci_archive(
+                output, omit_layer=self.omit_layer
+            )
             metadata.write_text(
                 json.dumps(
                     {
-                        "containerimage.digest": "sha256:" + "c" * 64,
-                        "containerimage.config.digest": "sha256:" + "d" * 64,
+                        "containerimage.digest": self.image_digest_override or image_digest,
+                        "containerimage.config.digest": self.config_digest_override
+                        or config_digest,
                     }
                 ),
                 encoding="utf-8",
@@ -343,6 +419,14 @@ def test_reference_roundtrip_uses_fixed_no_network_oci_export(boundary, tmp_path
     assert report["productDispatchEnabled"] is False
     assert "lease-release-not-bound" in report["limitations"]
     assert len(report["ociArchiveSha256"]) == 64
+    assert report["ociVerification"] == {
+        "layoutVersion": "1.0.0",
+        "manifestDigest": report["imageDigest"],
+        "configDigest": report["configDigest"],
+        "layerDigests": [report["ociVerification"]["layerDigests"][0]],
+        "verifiedBlobCount": 3,
+    }
+    assert report["ociVerification"]["layerDigests"][0].startswith("sha256:")
     build = next(call[0] for call in runner.calls if "build" in call[0])
     assert "--secret" not in build
     assert "--allow" not in build
@@ -437,3 +521,29 @@ def test_reference_roundtrip_rejects_failed_build_or_incomplete_metadata(boundar
     runner.run = incomplete
     with pytest.raises(DomainError, match="VERIFY-0002"):
         transport.reference_roundtrip(request, plan, tmp_path / "incomplete")
+
+
+@pytest.mark.parametrize(
+    "field",
+    ["image_digest_override", "config_digest_override"],
+)
+def test_reference_roundtrip_recomputes_metadata_digests_from_oci_archive(
+    boundary, tmp_path, field
+):
+    transport, runner, _receipt = boundary
+    measured = transport.measure()
+    setattr(runner, field, "sha256:" + "9" * 64)
+    with pytest.raises(DomainError, match="VERIFY-0002"):
+        transport.reference_roundtrip(
+            _request(), _plan(measured.provider.observation_digest), tmp_path / field
+        )
+
+
+def test_reference_roundtrip_rejects_missing_referenced_oci_layer(boundary, tmp_path):
+    transport, runner, _receipt = boundary
+    measured = transport.measure()
+    runner.omit_layer = True
+    with pytest.raises(DomainError, match="VERIFY-0002"):
+        transport.reference_roundtrip(
+            _request(), _plan(measured.provider.observation_digest), tmp_path / "missing-layer"
+        )

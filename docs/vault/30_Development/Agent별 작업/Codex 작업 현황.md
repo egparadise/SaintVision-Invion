@@ -1,15 +1,25 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.260"
+version: "1.0.261"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T04:12:15+09:00"
+updated: "2026-10-02T05:55:05+09:00"
 source_of_truth: "Git"
-active_card: "CARD-200 S08-BE concrete rootless BuildKit transport stage 1"
-active_card_status: "Hosted ci-reference OCI roundtrip MEASURED_PASS at run 36912381153; product dispatch remains disabled"
-active_card_next: "Claude r2 review; later bind operational builder, cleanup, lease release, and durable Evidence"
+active_card: "CARD-207 S08-BE OCI digest and live buildkitd PID binding"
+active_card_status: "Focused 72 passed; hosted rootless BuildKit exact-head measurement pending"
+active_card_next: "Run opt-in hosted lane, record OCI/PID evidence, request Claude independent review"
 ---
+
+## 2026-10-02 Card 207 — OCI digest·live buildkitd PID 결속
+
+- train 14 후보 `d0b2a4c6` 위에서 #297의 이연 항목 M6/M7만 구현했다. OCI tar 내부
+  manifest/config/layer blob의 SHA-256·size를 재계산하고 metadata digest와 exact 대조한다.
+- health receipt의 PID는 실제 `buildkitd`여야 하고 왕복 전·후 PID/start ticks·UID·rootless
+  경계가 같아야 한다. rootlesskit PID 또는 재시작된 daemon은 evidence를 만들 수 없다.
+- 기본 flag off, 제품 caller 미도달, S08-BE 완료 비주장 경계는 그대로다. focused **72 passed**,
+  hosted 실측은 `NOT_OBSERVED`이며 exact-head opt-in lane 실행 뒤 갱신한다.
+- [[2026-10-02_05-55-05_KST_S08-BE_OCI_digest_buildkitd_PID_결속_Codex]].
 
 ## 2026-10-01 Card 194 — S12 acceptance target·Evidence resolver 구현
 
