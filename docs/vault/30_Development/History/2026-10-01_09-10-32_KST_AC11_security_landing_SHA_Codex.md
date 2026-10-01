@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-20261001-CARD162-AC11-SECURITY-LANDING-SHA-CODEX"
 title: "CARD-162 AC-11 security critical/high 착지 SHA 실행과 PyJWT 교정"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-01T09:15:24+09:00"
+updated: "2026-10-01T09:40:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_id: "S11-BE"
@@ -43,3 +43,18 @@ tags: ["S11", "AC-11", "security", "landing-sha", "pip-audit", "PyJWT"]
 ## 상태
 
 S11-BE는 75, AC-11 전체는 미완료다. 첫 실패와 후속 성공을 모두 남기며, 운영 또는 landing 증거를 PR head 증거로 소급 대체하지 않는다.
+
+## 10월 경계의 hosted Backend 교정
+
+- 최종 문서 head `3684fcc6`의 Backend `36795581647`은 Python 3.12·3.14 모두
+  dependency 설치와 migration을 통과했지만 전체 suite가 각각 9월 timestamp를
+  partition에 쓰면서 red였다. 3.14 기준 **5440 passed / 50 skipped / 2 deselected /
+  82 failed / 81 errors**이고 주된 DB 오류는 `evidence_envelopes`와
+  `resource_snapshots`의 "no partition found"였다.
+- 원인은 제품 migration이 정당하게 wall-clock 현재 월(2026-10)부터 partition을
+  만드는 반면, 공유 PostgreSQL fixture의 결정적 `frozen_now`가 2026-09-09에
+  고정된 데 있다. 9월 30일까지는 우연히 같은 달이라 green이었고 10월 1일에
+  경계가 드러났다. PyJWT 2.15.1 사용처 오류나 scanner finding은 아니었다.
+- 제품 migration·retention·DEFAULT 없음 정책은 바꾸지 않는다. disposable test DB의
+  migration fixture가 고정 test clock 월을 `lead_months=0`으로 추가 생성한다. 회귀
+  시험은 세 partitioned table 모두에서 해당 월 runway가 1 이상임을 요구한다.
