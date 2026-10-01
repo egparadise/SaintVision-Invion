@@ -4,11 +4,11 @@ title: "Codex 작업 현황"
 version: "1.0.264"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T07:35:00+09:00"
+updated: "2026-10-02T07:41:29+09:00"
 source_of_truth: "Git"
 active_card: "CARD-205 AC-11 accessibility user-device manual acceptance importer"
-active_card_status: "Merged train 15 candidate containing #299; binding the accessibility importer into the canonical AC-11 manifest"
-active_card_next: "Flip the canonical row to complete, add assembler-to-aggregator consumption regression, then run exact-head CI"
+active_card_status: "Canonical AC-11 accessibility row now complete and assembler-to-aggregator consumption regression passes"
+active_card_next: "Push the #302 repair head, confirm exact-head Backend and Frontend, and post the UTF-8 remediation table"
 ---
 
 ## 2026-10-02 Card 205 — AC-11 사용자 기기 접근성 수동 인수 importer
@@ -26,11 +26,15 @@ active_card_next: "Flip the canonical row to complete, add assembler-to-aggregat
 - 수동 기록 부재·시나리오 FAIL은 계속 `manualAcceptanceMissingCount=1`; exact SHA·exact six·
   all PASS·fresh human 결속에서만 0이다. 이 축은 사용자 전체 인수·AC-11 done·점수 승격을
   주장하지 않는다.
-- `docs/ac11-axis-sources-accessibility-patch-v1.json`에 #299 manifest의 exact replacement row를
-  고정했다. 사용자 실행 절차는 [[AC-11_사용자_기기_접근성_수동_인수_절차]]다.
+- train 15 후보 `7dd9f9ca`로 #299를 merge한 뒤 `docs/ac11-axis-sources.json`의 canonical
+  `accessibility-e2e` 행에 importer와 exact `EMITTED_AXES`를 직접 결속했다. 임시 replacement patch는
+  제거했고 assembler→aggregator 소비 회귀를 추가했다. 사용자 실행 절차는
+  [[AC-11_사용자_기기_접근성_수동_인수_절차]]다.
 - PG-free focused **178 passed**. Windows-safe downloader는 실제 GitHub artifact에서 no-BOM JSON과
   정상 ZIP을 확인했다. `py_compile`·CLI help·`check_docs`·citation ratchet(새 결함 0)·
   contract bindings는 모두 exit 0이다.
+- train 15 결속 후 assembler+accessibility importer focused **94 passed**. 유효 envelope이 canonical row를
+  거쳐 aggregator에서 `MEASURED_PASS`로 재계산되며 나머지 7축 부재는 전체 `INVALID_RUN`으로 남는다.
 
 ## 2026-10-02 Card 207 — OCI digest·live buildkitd PID 결속
 

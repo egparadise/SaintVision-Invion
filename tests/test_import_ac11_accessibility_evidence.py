@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
 import aggregate_ac11_evidence as aggregate  # noqa: E402
+import assemble_ac11_manifest as assembler  # noqa: E402
 import collect_ac11_accessibility_e2e as collector  # noqa: E402
 import import_ac11_accessibility_evidence as tool  # noqa: E402
 
@@ -363,17 +364,57 @@ def test_imported_pass_is_consumed_by_ac11_aggregator():
     assert evaluated.reasons == ()
 
 
+def test_canonical_source_map_assembles_importer_output_for_the_aggregator(tmp_path):
+    """The canonical row, not the former hand-applied patch, connects all three stages."""
+    imported = _import(manual=_manual(), receipt=_receipt())
+    envelope_dir = tmp_path / "envelopes"
+    envelope_dir.mkdir()
+    (envelope_dir / "accessibility.json").write_text(
+        json.dumps(imported), encoding="utf-8"
+    )
+    sources = assembler.load_sources(assembler.DEFAULT_SOURCES)
+    accessibility = next(row for row in sources if row["axis"] == collector.AXIS)
+    assert accessibility["chain"] == "complete"
+    assert accessibility["importer"] == "tools/import_ac11_accessibility_evidence.py"
+    assert accessibility["importerEmitsAxes"] == list(tool.EMITTED_AXES)
+    assert accessibility in [row for row in sources if row["chain"] == "complete"]
+
+    manifest, absent = assembler.assemble(
+        sources=sources,
+        envelopes=assembler.read_envelopes(envelope_dir),
+        release_sha=SOURCE,
+        now=NOW,
+    )
+    row = next(item for item in manifest["axes"] if item["axis"] == collector.AXIS)
+    evaluated = aggregate.evaluate_axis(row, _Git(), {}, NOW)
+    assert evaluated.verdict is aggregate.Verdict.MEASURED_PASS
+    summary = aggregate.aggregate(
+        manifest,
+        _Git(),
+        json.loads(aggregate.DEFAULT_ALLOWLIST.read_text(encoding="utf-8")),
+        NOW,
+    )
+    accessibility_result = next(
+        item for item in summary["axes"] if item["axis"] == collector.AXIS
+    )
+    assert accessibility_result["verdict"] == "MEASURED_PASS"
+    assert summary["verdict"] == "INVALID_RUN"  # The seven absent axes remain fail closed.
+    assert all(not message.startswith(f"{collector.AXIS} ") for message in absent)
+
+
 def test_registry_and_manifest_contract_are_pinned():
     assert aggregate.TARGET_REGISTRY_BLOB == tool.REGISTRY_BLOB
     assert tool.EMITTED_AXES == (collector.AXIS,)
     assert aggregate.REQUIRED_TARGET_BY_AXIS[collector.AXIS] == tool.TARGET_ID
     assert tool.REGISTRY_BLOB == "eeb43dc262f5de1816237ef85fc902cdca4ab6fd"
-    patch = json.loads(
-        (ROOT / "docs/ac11-axis-sources-accessibility-patch-v1.json").read_text(encoding="utf-8")
-    )["replacement"]
-    assert patch["importer"] == "tools/import_ac11_accessibility_evidence.py"
-    assert patch["importerEmitsAxes"] == list(tool.EMITTED_AXES)
-    assert patch["envelopeShape"] == "axis-evidence"
+    source_map = json.loads(
+        (ROOT / "docs/ac11-axis-sources.json").read_text(encoding="utf-8")
+    )
+    canonical = next(row for row in source_map["axes"] if row["axis"] == collector.AXIS)
+    assert canonical["chain"] == "complete"
+    assert canonical["importer"] == "tools/import_ac11_accessibility_evidence.py"
+    assert canonical["importerEmitsAxes"] == list(tool.EMITTED_AXES)
+    assert canonical["envelopeShape"] == "axis-evidence"
 
 
 def test_published_manual_schema_is_strict_and_matches_scenarios():
