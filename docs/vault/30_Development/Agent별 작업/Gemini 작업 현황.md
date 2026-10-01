@@ -2,9 +2,9 @@
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
 version: "1.0.170"
-status: "approved"
+status: "proposed"
 author: "Gemini"
-updated: "2026-10-01T21:45:00+09:00"
+updated: "2026-10-01T22:05:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,31 +19,32 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-10-01T21:45:00+09:00 (Card 189 NodeList 및 NodeDetail 잔여 저대비 리터럴 토큰화 및 WCAG AA 적합성 완결: base ec75b4f0 위 작업, NodeList 텔레메트리 안내문 3종·예약가능 라벨·unknown/lost 카드 테두리 및 NodeDetail 관측전용 콜아웃·자원사용량 에러 알림·예약가능 박스·타임라인 상태 전수 디자인 토큰 결속, NodeDetail baseline multiset 10건 순수 감소, DOM 렌더링 동적 대비 단언 및 Revert-Fail Probes 10~14 추가, 9종 변이 100% 사살 실측, Vitest 12 passed, 전체 노드 시험 28 passed, tsc 0 error, build 성공, route coverage 40 passed, 9대 무결성 0 위반).
+- 확인 기준: 2026-10-01T22:05:00+09:00 (Card 189 NodeList 및 NodeDetail 잔여 저대비 리터럴 토큰화 Claude UI r1 보강: base ec75b4f0 위 작업, NodeList 및 NodeDetail 저대비 리터럴 14건 순수 제거, 렌더링 DOM 실제 배경(subtle/surface/canvas) 동적 대비 단언으로 배경 바꿔치기 변이 B1 사살, 예약가능 박스 비관측 분기 토큰화, 타임라인 degraded 상태 분리 및 변이 B4 사살, 11종 변이 100% 사살 실측, 잔여 9건 명시적 백로그 목록화, Vitest 12 passed, tsc 0 error, build 성공, route coverage 40 passed, 9대 무결성 0 위반).
 
 ## 2026-10-01 NodeList 및 NodeDetail 잔여 저대비 리터럴 토큰화 및 WCAG AA 적합성 완결 (Card 189, ACC-09 잔여, `agent/gemini/c189-node-residual-contrast`, base `ec75b4f0` PR #284)
-- **개요**: PR #284 (Card 186) Claude UI r1 검토(i1) 및 코디네이터 지시에 따라, `NodeList.tsx` 및 `NodeDetail.tsx`에 잔존하던 하드코딩 색상 리터럴(텔레메트리 안내문, 예약가능 라벨, 관측 전용 콜아웃, 에러 알림 테두리 등)의 저대비 결함을 전수 해결하고 디자인 토큰으로 승격:
+- **개요**: PR #284 (Card 186) Claude UI r1 검토(i1) 및 PR #288 Claude UI r1(issuecomment-5931871184) 피드백에 따라, `NodeList.tsx` 및 `NodeDetail.tsx`에 잔존하던 하드코딩 색상 리터럴 저대비 결함을 전수 해결하고 디자인 토큰으로 승격 및 변이 사살 완전성 강화:
   1. **화면 토큰 결속 및 리터럴 전수 제거 (`apps/web/src/features/nodes/NodeList.tsx`)**:
      - `:190` 카드 테두리: `node.status === 'lost' ? 'var(--color-status-lost)' : node.status === 'unknown' ? 'var(--color-status-unknown)' : 'var(--color-border-subtle)'` (unknown #f59e0b 2.15:1 $\rightarrow$ 7.09:1로 UI 경계 3:1 충족).
      - `:228` 텔레메트리 안내문: lost `var(--color-status-lost)` (6.47:1), unknown `var(--color-status-unknown)` (7.09:1), active `var(--color-status-active)` (5.93:1) 결속 (기존 #fca5a5 1.90:1, #fde68a 1.25:1, #7dd3fc 1.67:1 전수 해소).
      - `:420` 예약가능 라벨: `node.allocatableCores !== undefined ? 'var(--color-status-online)' : 'var(--color-text-muted)'` (기존 #3fb950 2.54:1 $\rightarrow$ 5.42:1 충족).
-  2. **상세 화면 토큰 결속 및 리터럴 10건 제거 (`apps/web/src/features/nodes/NodeDetail.tsx`)**:
+  2. **상세 화면 토큰 결속 및 리터럴 14건 순수 제거 (`apps/web/src/features/nodes/NodeDetail.tsx`)**:
      - `:105-106` 관측 전용 콜아웃 테두리/텍스트를 `var(--color-status-unknown)`에 결속 (기존 #d29922 2.52:1 $\rightarrow$ 7.09:1 충족).
      - `:190-191` 자원 사용량 에러 알림 테두리/텍스트를 `var(--color-status-lost)`에 결속 (기존 #f85149 3.35:1 $\rightarrow$ 6.47:1 충족).
-     - `:378-391` 관측 전용 시 예약가능 박스 테두리/라벨/값을 `var(--color-status-unknown)`에 결속.
-     - `:426` 타임라인 상태 텍스트를 `var(--color-status-active)`, `var(--color-status-unknown)`, `var(--color-status-lost)`에 결속.
-     - `NodeDetail.tsx` 내 `#38bdf8` 1건, `#d29922` 6건, `#f85149` 3건 전수 제거 (총 10건 순수 감소).
+     - `:374-391` 예약가능 박스: 관측 전용 분기는 `var(--color-status-unknown)`, 비관측(활성) 분기는 `backgroundColor: var(--color-bg-subtle)`, `borderColor/label/value: var(--color-status-online)`로 전수 토큰화 (기존 #3fb950 2.16:1 저대비 완전 해소, 4.58:1/6.44:1 $\ge 4.5:1$).
+     - `:428` 타임라인 상태 텍스트: active/degraded/unknown/lost 분기별 `var(--color-status-*)` 결속 (degraded 상태 `var(--color-status-degraded)` 독립 분리).
+     - `NodeDetail.tsx` baseline 리터럴 총 14건 순수 제거 (`#38bdf8` 1건, `#d29922` 6건, `#f85149` 3건, `#2ea043` 1건, `#3fb950` 2건, `rgba(46,160,67,0.15)` 1건). 잔여 9건은 전용 백로그로 정직하게 목록화.
   3. **단위 및 변이 불변식 검증 스위트 (`apps/web/tests/acc09-contrast-tokens.test.tsx`)**:
-     - `COLOR_LITERAL_MULTISET_BASELINE`: `features/nodes/NodeDetail.tsx` 항목에서 3개 리터럴 키 완전 삭제 (10건 순수 감소 래칫 고정).
-     - Test 9 (신규): `NodeDetail` DOM 렌더링 후 콜아웃/에러알림/예약가능박스/타임라인의 `style.borderColor` 및 `style.color` 토큰 결속 단언 및 동적 대비 계산 단언 (라이트/다크 전수 $\ge 4.5:1$, 테두리 $\ge 3.0:1$).
-     - Revert-Fail Probes 10~14 추가: 이전 하드코딩 리터럴(#fca5a5, #fde68a, #7dd3fc, #3fb950, #f59e0b) 결함 증명 프로브 추가.
-     - 9종 변이(M1~M9) 전원 사살 실측 (사살율 100%).
+     - `COLOR_LITERAL_MULTISET_BASELINE`: `features/nodes/NodeDetail.tsx` 항목 14건 감소 래칫 갱신.
+     - Test 8 & Test 9: 렌더링된 실제 DOM의 `backgroundColor`(subtle/surface/canvas 블렌딩)와 `color`/`borderColor` 토큰 쌍을 직접 추출하여 라이트/다크 동적 대비 계산 단언 (배경 바꿔치기 변이 B1 사살).
+     - degraded 타임라인 및 활성 예약가능 박스 렌더링 단언 추가로 변이 B4 및 예약가능 박스 변이 사살.
+     - Revert-Fail Probes 10~14 유지: 이전 하드코딩 리터럴(#fca5a5, #fde68a, #7dd3fc, #3fb950, #f59e0b) 결함 증명.
+     - 11종 변이(M1~M9, B1, B4) 전원 사살 실측 (사살율 100%).
 - **담당 및 역할**: Gemini (Frontend / 접근성 소유). Reviewer: Claude (UI/접근성 축), Codex (무결성/래칫 축).
 - **관측 근거 (Evidence)**:
-  - Vitest: `acc09-contrast-tokens.test.tsx` 12 passed (179ms), `node-status-lost-unknown-guard.test.tsx` 7 passed, `node-resource-usage-contract.test.tsx` 9 passed (28/28 passed 전원 통과)
-  - 변이 검사: 9종 변이 전원 사살 실측 (사살율 100%)
+  - Vitest: `acc09-contrast-tokens.test.tsx` 12 passed (exit 0), `node-status-lost-unknown-guard.test.tsx` 7 passed, `node-resource-usage-contract.test.tsx` 9 passed (28/28 passed 전원 통과)
+  - 변이 검사: 11종 변이 전원 사살 실측 (사살율 100%, B1 및 B4 사살 확인)
   - TypeScript 정적 점검: `npx tsc -b` 타입 에러 0건 (exit 0)
-  - 프로덕션 번들 빌드: `npm run build` 성공 (Vite bundle 정상 생성, 8.68s, exit 0)
+  - 프로덕션 번들 빌드: `npm run build` 성공 (Vite bundle 정상 생성, exit 0)
   - 라우트 커버리지 점검: `pytest tests/test_route_coverage.py` 40 passed 100% (exit 0)
   - 프런트엔드 무결성 점검: `python tools/check_frontend_integrity.py` 92개 파일 스캔, 9대 무결성 규칙 위반 0건 (exit 0)
   - 계약 바인딩 점검: `python tools/check_contract_bindings.py` 55개 픽스처 + 20개 커널 응답 타입 앵커 통과 (exit 0)

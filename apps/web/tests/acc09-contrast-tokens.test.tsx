@@ -118,7 +118,7 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/editor/MonacoWorkspaceEditor.tsx": {"#070a0e": 1, "#090d13": 3, "#0d1117": 4, "#161b22": 4, "#1f242c": 1, "#21262d": 6, "#2ea043": 1, "#30363d": 7, "#3fb950": 4, "#484f58": 2, "#58a6ff": 9, "#79c0ff": 1, "#8b949e": 9, "#c9d1d9": 6, "#e3b341": 6, "#f0f6fc": 5, "#f85149": 3, "rgba(210,153,34,0.2)": 1, "rgba(227,179,65,0.15)": 2, "rgba(227,179,65,0.3)": 1, "rgba(248,81,73,0.15)": 1, "rgba(248,81,73,0.2)": 1, "rgba(46,160,67,0.12)": 1, "rgba(46,160,67,0.15)": 1, "rgba(46,160,67,0.2)": 1, "rgba(56,139,253,0.1)": 1, "rgba(56,139,253,0.12)": 2, "rgba(56,139,253,0.2)": 1, "rgba(56,139,253,0.3)": 1},
   "features/evidence/EvidenceViewer.tsx": {"#10b981": 1, "#d97706": 3, "#f87171": 1, "rgba(16,185,129,0.15)": 1, "rgba(234,179,8,0.08)": 1, "rgba(234,179,8,0.15)": 1, "rgba(234,179,8,0.3)": 1, "rgba(248,81,73,0.08)": 1, "rgba(248,81,73,0.1)": 2, "rgba(248,81,73,0.15)": 2, "rgba(248,81,73,0.3)": 1, "rgba(56,139,253,0.15)": 1},
   "features/mlops/ModelLineageView.tsx": {"#0d1117": 34, "#161b22": 13, "#1a7f37": 1, "#1f242c": 7, "#1f6feb": 1, "#21262d": 7, "#218": 1, "#30363d": 53, "#388bfd": 2, "#3d1214": 1, "#3fb950": 20, "#58a6ff": 40, "#8b949e": 108, "#94a3b8": 1, "#a0a8b2": 2, "#c9d1d9": 43, "#cf222e": 1, "#d29922": 4, "#e3b341": 3, "#eab308": 1, "#f0883e": 9, "#f0f6fc": 30, "#f59e0b": 3, "#f85149": 14, "#fde047": 1, "#fed7aa": 7, "#ff7b72": 10, "#ffb4a9": 1, "#ffffff": 2, "rgba(139,148,158,0.15)": 1, "rgba(160,168,178,0.15)": 2, "rgba(210,153,34,0.2)": 1, "rgba(234,179,8,0.12)": 1, "rgba(240,136,62,0.15)": 5, "rgba(248,81,73,0.12)": 3, "rgba(248,81,73,0.15)": 7, "rgba(248,81,73,0.2)": 1, "rgba(46,160,67,0.12)": 5, "rgba(46,160,67,0.15)": 1, "rgba(46,160,67,0.2)": 1, "rgba(56,139,253,0.12)": 1, "rgba(56,139,253,0.15)": 8, "rgba(56,139,253,0.2)": 1},
-  "features/nodes/NodeDetail.tsx": {"#2ea043": 2, "#3fb950": 6, "#58a6ff": 2, "rgba(110,118,129,0.2)": 1, "rgba(210,153,34,0.12)": 1, "rgba(210,153,34,0.15)": 1, "rgba(248,81,73,0.1)": 1, "rgba(46,160,67,0.15)": 2},
+  "features/nodes/NodeDetail.tsx": {"#2ea043": 1, "#3fb950": 4, "#58a6ff": 2, "rgba(110,118,129,0.2)": 1, "rgba(210,153,34,0.12)": 1, "rgba(210,153,34,0.15)": 1, "rgba(248,81,73,0.1)": 1, "rgba(46,160,67,0.15)": 1},
   "features/nodes/NodeList.tsx": {"#1e1e1e": 1, "#2d3748": 1, "#4ade80": 2, "#fff": 1, "#ffffff": 1, "rgba(210,153,34,0.15)": 1, "rgba(56,189,248,0.12)": 1, "rgba(56,189,248,0.3)": 1},
   "features/placement/PlacementExplainView.tsx": {"#d97706": 1, "rgba(16,185,129,0.1)": 1, "rgba(16,185,129,0.15)": 1, "rgba(234,179,8,0.15)": 1, "rgba(234,179,8,0.3)": 1},
   "features/placement/PlacementSimulator.tsx": {"#334155": 3, "#93c5fd": 1, "#94a3b8": 2, "#ef4444": 4, "#f87171": 1, "#fbbf24": 4, "#fca5a5": 4, "#fff": 3, "#ffffff": 2, "rgba(234,179,8,0.15)": 2, "rgba(234,179,8,0.3)": 2, "rgba(239,68,68,0.1)": 4, "rgba(35,134,54,0.1)": 1},
@@ -659,58 +659,68 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(schedLabel.textContent).toContain('0C (차단)');
 
       // Card 189: Schedulable capacity label when allocatable binds to var(--color-status-online) with dynamic contrast
+      const stdCard = container.querySelector('[data-testid="node-card-nod_std_active"]') as HTMLElement;
+      expect(stdCard.style.backgroundColor, 'Standard active card background must be var(--color-bg-surface)').toBe('var(--color-bg-surface)');
+      const stdCardBg = helperExtractVar(stdCard.style.backgroundColor);
+
       const schedAllocatable = container.querySelector('[data-testid="node-schedulable-nod_std_active"]') as HTMLElement;
       expect(schedAllocatable, 'Schedulable allocatable label must render').not.toBeNull();
       expect(schedAllocatable.style.color, 'Schedulable allocatable label color must bind to var(--color-status-online)').toBe('var(--color-status-online)');
       expect(schedAllocatable.textContent).toContain('12C');
       const schedAllocVar = helperExtractVar(schedAllocatable.style.color);
-      expect(getContrast(lightTokens[schedAllocVar], lightTokens['--color-bg-surface']), 'Schedulable allocatable label light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
-      expect(getContrast(darkTokens[schedAllocVar], darkTokens['--color-bg-surface']), 'Schedulable allocatable label dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[schedAllocVar], lightTokens[stdCardBg]), 'Schedulable allocatable label light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[schedAllocVar], darkTokens[stdCardBg]), 'Schedulable allocatable label dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
 
       // Semantic distinctions in Telemetry Cards
       // 3) Telemetry Lost: role="alert", 🔴, border and notice text bind to var(--color-status-lost)
       const telemLostCard = container.querySelector('[data-testid="node-card-nod_telem_lost"]') as HTMLElement;
       expect(telemLostCard?.getAttribute('role'), 'Telemetry lost card must have alert role').toBe('alert');
       expect(telemLostCard.textContent).toContain('🔴');
+      expect(telemLostCard.style.backgroundColor, 'Telemetry lost card background must be var(--color-bg-surface)').toBe('var(--color-bg-surface)');
       expect(telemLostCard.style.borderColor, 'Telemetry lost card border must bind to var(--color-status-lost)').toBe('var(--color-status-lost)');
+      const telemLostBgVar = helperExtractVar(telemLostCard.style.backgroundColor);
       const telemLostBorderVar = helperExtractVar(telemLostCard.style.borderColor);
-      expect(getContrast(lightTokens[telemLostBorderVar], lightTokens['--color-bg-surface']), 'Telemetry lost card border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
-      expect(getContrast(darkTokens[telemLostBorderVar], darkTokens['--color-bg-surface']), 'Telemetry lost card border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(lightTokens[telemLostBorderVar], lightTokens[telemLostBgVar]), 'Telemetry lost card border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[telemLostBorderVar], darkTokens[telemLostBgVar]), 'Telemetry lost card border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
 
       const telemLostNotice = container.querySelector('[data-testid="node-telemetry-notice-nod_telem_lost"]') as HTMLElement;
       expect(telemLostNotice, 'Telemetry lost notice must render').not.toBeNull();
       expect(telemLostNotice.style.color, 'Telemetry lost notice color must bind to var(--color-status-lost)').toBe('var(--color-status-lost)');
       const telemLostNoticeVar = helperExtractVar(telemLostNotice.style.color);
-      expect(getContrast(lightTokens[telemLostNoticeVar], lightTokens['--color-bg-surface']), 'Telemetry lost notice light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
-      expect(getContrast(darkTokens[telemLostNoticeVar], darkTokens['--color-bg-surface']), 'Telemetry lost notice dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[telemLostNoticeVar], lightTokens[telemLostBgVar]), 'Telemetry lost notice light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[telemLostNoticeVar], darkTokens[telemLostBgVar]), 'Telemetry lost notice dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
 
       // 4) Telemetry Unknown: role="status", ⚠️, border and notice text bind to var(--color-status-unknown) (Codex F3)
       const telemUnknownCard = container.querySelector('[data-testid="node-card-nod_telem_unknown"]') as HTMLElement;
       expect(telemUnknownCard?.getAttribute('role'), 'Telemetry unknown card must have status role').toBe('status');
       expect(telemUnknownCard.textContent).toContain('⚠️');
+      expect(telemUnknownCard.style.backgroundColor, 'Telemetry unknown card background must be var(--color-bg-surface)').toBe('var(--color-bg-surface)');
       expect(telemUnknownCard.style.borderColor, 'Telemetry unknown card border must bind to var(--color-status-unknown)').toBe('var(--color-status-unknown)');
+      const telemUnknownBgVar = helperExtractVar(telemUnknownCard.style.backgroundColor);
       const telemUnknownBorderVar = helperExtractVar(telemUnknownCard.style.borderColor);
-      expect(getContrast(lightTokens[telemUnknownBorderVar], lightTokens['--color-bg-surface']), 'Telemetry unknown card border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
-      expect(getContrast(darkTokens[telemUnknownBorderVar], darkTokens['--color-bg-surface']), 'Telemetry unknown card border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(lightTokens[telemUnknownBorderVar], lightTokens[telemUnknownBgVar]), 'Telemetry unknown card border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[telemUnknownBorderVar], darkTokens[telemUnknownBgVar]), 'Telemetry unknown card border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
 
       const telemUnknownNotice = container.querySelector('[data-testid="node-telemetry-notice-nod_telem_unknown"]') as HTMLElement;
       expect(telemUnknownNotice, 'Telemetry unknown notice must render').not.toBeNull();
       expect(telemUnknownNotice.style.color, 'Telemetry unknown notice color must bind to var(--color-status-unknown)').toBe('var(--color-status-unknown)');
       const telemUnknownNoticeVar = helperExtractVar(telemUnknownNotice.style.color);
-      expect(getContrast(lightTokens[telemUnknownNoticeVar], lightTokens['--color-bg-surface']), 'Telemetry unknown notice light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
-      expect(getContrast(darkTokens[telemUnknownNoticeVar], darkTokens['--color-bg-surface']), 'Telemetry unknown notice dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[telemUnknownNoticeVar], lightTokens[telemUnknownBgVar]), 'Telemetry unknown notice light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[telemUnknownNoticeVar], darkTokens[telemUnknownBgVar]), 'Telemetry unknown notice dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
 
       // 5) Telemetry Active: role="status", ℹ️, notice text binds to var(--color-status-active)
       const telemActiveCard = container.querySelector('[data-testid="node-card-nod_telem_active"]') as HTMLElement;
       expect(telemActiveCard?.getAttribute('role'), 'Telemetry active card must have status role').toBe('status');
       expect(telemActiveCard.textContent).toContain('ℹ️');
+      expect(telemActiveCard.style.backgroundColor, 'Telemetry active card background must be var(--color-bg-surface)').toBe('var(--color-bg-surface)');
+      const telemActiveBgVar = helperExtractVar(telemActiveCard.style.backgroundColor);
 
       const telemActiveNotice = container.querySelector('[data-testid="node-active-status-notice-nod_telem_active"]') as HTMLElement;
       expect(telemActiveNotice, 'Telemetry active notice must render').not.toBeNull();
       expect(telemActiveNotice.style.color, 'Telemetry active notice color must bind to var(--color-status-active)').toBe('var(--color-status-active)');
       const telemActiveNoticeVar = helperExtractVar(telemActiveNotice.style.color);
-      expect(getContrast(lightTokens[telemActiveNoticeVar], lightTokens['--color-bg-surface']), 'Telemetry active notice light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
-      expect(getContrast(darkTokens[telemActiveNoticeVar], darkTokens['--color-bg-surface']), 'Telemetry active notice dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[telemActiveNoticeVar], lightTokens[telemActiveBgVar]), 'Telemetry active notice light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[telemActiveNoticeVar], darkTokens[telemActiveBgVar]), 'Telemetry active notice dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
     } finally {
       act(() => {
         root.unmount();
@@ -749,31 +759,51 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
         root.render(<NodeDetail node={obsNode as any} onBack={() => {}} />);
       });
 
-      // Observation callout border and text
+      // Observation callout border, background, and text
       const callout = container.querySelector('[data-testid="node-detail-observation-callout"]') as HTMLElement;
       expect(callout, 'NodeDetail observation callout must render').not.toBeNull();
+      expect(callout.style.backgroundColor, 'Observation callout background must bind to alpha tint').toBe('rgba(210, 153, 34, 0.12)');
       expect(callout.style.borderColor, 'Observation callout border must bind to var(--color-status-unknown)').toBe('var(--color-status-unknown)');
       expect(callout.style.color, 'Observation callout text color must bind to var(--color-status-unknown)').toBe('var(--color-status-unknown)');
       const calloutBorderVar = helperExtractVar(callout.style.borderColor);
       const calloutTextVar = helperExtractVar(callout.style.color);
-      expect(getContrast(lightTokens[calloutBorderVar], lightTokens['--color-bg-surface']), 'Callout border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
-      expect(getContrast(lightTokens[calloutTextVar], lightTokens['--color-bg-surface']), 'Callout text light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
-      expect(getContrast(darkTokens[calloutBorderVar], darkTokens['--color-bg-surface']), 'Callout border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
-      expect(getContrast(darkTokens[calloutTextVar], darkTokens['--color-bg-surface']), 'Callout text dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      if (callout.style.backgroundColor.startsWith('var(')) {
+        const calloutBgToken = helperExtractVar(callout.style.backgroundColor);
+        expect(calloutBgToken, 'Callout background token must not equal foreground token (kills B1)').not.toBe(calloutTextVar);
+      }
+      const calloutBgLight = blendRgba([210, 153, 34], 0.12, lightTokens['--color-bg-canvas']);
+      const calloutBgDark = blendRgba([210, 153, 34], 0.12, darkTokens['--color-bg-canvas']);
+      expect(getContrast(lightTokens[calloutBorderVar], calloutBgLight), 'Callout border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(lightTokens[calloutTextVar], calloutBgLight), 'Callout text light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[calloutBorderVar], calloutBgDark), 'Callout border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[calloutTextVar], calloutBgDark), 'Callout text dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
 
       // Schedulable card when observationOnly
       const schedBox = container.querySelector('[data-testid="node-detail-schedulable-box"]') as HTMLElement;
       expect(schedBox, 'Schedulable box must render').not.toBeNull();
+      expect(schedBox.style.backgroundColor, 'Schedulable obs box background must match alpha tint').toBe('rgba(210, 153, 34, 0.15)');
       expect(schedBox.style.borderColor, 'Schedulable box border must bind to var(--color-status-unknown)').toBe('var(--color-status-unknown)');
       const schedLabel = container.querySelector('[data-testid="node-detail-schedulable-label"]') as HTMLElement;
       expect(schedLabel.style.color, 'Schedulable label color must bind to var(--color-status-unknown)').toBe('var(--color-status-unknown)');
       const schedValue = container.querySelector('[data-testid="node-detail-schedulable-value"]') as HTMLElement;
       expect(schedValue.style.color, 'Schedulable value color must bind to var(--color-status-unknown)').toBe('var(--color-status-unknown)');
+      const schedBorderVar = helperExtractVar(schedBox.style.borderColor);
+      const schedLabelVar = helperExtractVar(schedLabel.style.color);
+      const schedValueVar = helperExtractVar(schedValue.style.color);
+      const schedObsBgLight = blendRgba([210, 153, 34], 0.15, lightTokens['--color-bg-surface']);
+      const schedObsBgDark = blendRgba([210, 153, 34], 0.15, darkTokens['--color-bg-surface']);
+      expect(getContrast(lightTokens[schedBorderVar], schedObsBgLight), 'Schedulable obs border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(lightTokens[schedLabelVar], schedObsBgLight), 'Schedulable obs label light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[schedValueVar], schedObsBgLight), 'Schedulable obs value light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[schedBorderVar], schedObsBgDark), 'Schedulable obs border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[schedLabelVar], schedObsBgDark), 'Schedulable obs label dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[schedValueVar], schedObsBgDark), 'Schedulable obs value dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
 
       // Timeline status for active node
       const timelineActive = container.querySelector('[data-testid="node-detail-timeline-status"]') as HTMLElement;
       expect(timelineActive, 'Timeline status must render').not.toBeNull();
       expect(timelineActive.style.color, 'Timeline active status color must bind to var(--color-status-active)').toBe('var(--color-status-active)');
+      expect(timelineActive.textContent).toContain('Heartbeat ACTIVE');
       const tlActiveVar = helperExtractVar(timelineActive.style.color);
       expect(getContrast(lightTokens[tlActiveVar], lightTokens['--color-bg-surface']), 'Timeline active light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
       expect(getContrast(darkTokens[tlActiveVar], darkTokens['--color-bg-surface']), 'Timeline active dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
@@ -797,20 +827,45 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
 
       const errAlert = container.querySelector('[data-testid="node-resource-usage-error"]') as HTMLElement;
       expect(errAlert, 'Resource usage error alert must render').not.toBeNull();
+      expect(errAlert.style.backgroundColor, 'Error alert background must bind to alpha tint').toBe('rgba(248, 81, 73, 0.1)');
       expect(errAlert.style.borderColor, 'Error alert border must bind to var(--color-status-lost)').toBe('var(--color-status-lost)');
       expect(errAlert.style.color, 'Error alert text color must bind to var(--color-status-lost)').toBe('var(--color-status-lost)');
       const errBorderVar = helperExtractVar(errAlert.style.borderColor);
       const errTextVar = helperExtractVar(errAlert.style.color);
-      expect(getContrast(lightTokens[errBorderVar], lightTokens['--color-bg-surface']), 'Error border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
-      expect(getContrast(lightTokens[errTextVar], lightTokens['--color-bg-surface']), 'Error text light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
-      expect(getContrast(darkTokens[errBorderVar], darkTokens['--color-bg-surface']), 'Error border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
-      expect(getContrast(darkTokens[errTextVar], darkTokens['--color-bg-surface']), 'Error text dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      if (errAlert.style.backgroundColor.startsWith('var(')) {
+        const errBgToken = helperExtractVar(errAlert.style.backgroundColor);
+        expect(errBgToken, 'Error alert background token must not equal foreground token').not.toBe(errTextVar);
+      }
+      const errBgLight = blendRgba([248, 81, 73], 0.1, lightTokens['--color-bg-canvas']);
+      const errBgDark = blendRgba([248, 81, 73], 0.1, darkTokens['--color-bg-canvas']);
+      expect(getContrast(lightTokens[errBorderVar], errBgLight), 'Error border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(lightTokens[errTextVar], errBgLight), 'Error text light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[errBorderVar], errBgDark), 'Error border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[errTextVar], errBgDark), 'Error text dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
 
       // Timeline status for lost node
       const timelineLost = container.querySelector('[data-testid="node-detail-timeline-status"]') as HTMLElement;
       expect(timelineLost.style.color, 'Timeline lost status color must bind to var(--color-status-lost)').toBe('var(--color-status-lost)');
+      expect(timelineLost.textContent).toContain('Heartbeat LOST');
 
-      // 3) Render unknown NodeDetail
+      // 3) Render degraded NodeDetail (F5: degraded and unknown semantic distinction)
+      const degradedNode = {
+        ...obsNode,
+        observationOnly: false,
+        status: 'degraded',
+      };
+      await act(async () => {
+        root.render(<NodeDetail node={degradedNode as any} onBack={() => {}} />);
+      });
+
+      const timelineDegraded = container.querySelector('[data-testid="node-detail-timeline-status"]') as HTMLElement;
+      expect(timelineDegraded.style.color, 'Timeline degraded status color must bind to var(--color-status-degraded)').toBe('var(--color-status-degraded)');
+      expect(timelineDegraded.textContent).toContain('Heartbeat Warning (Degraded)');
+      const tlDegradedVar = helperExtractVar(timelineDegraded.style.color);
+      expect(getContrast(lightTokens[tlDegradedVar], lightTokens['--color-bg-surface']), 'Timeline degraded light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[tlDegradedVar], darkTokens['--color-bg-surface']), 'Timeline degraded dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      // 4) Render unknown NodeDetail
       const unknownNode = {
         ...obsNode,
         observationOnly: false,
@@ -822,6 +877,40 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
 
       const timelineUnknown = container.querySelector('[data-testid="node-detail-timeline-status"]') as HTMLElement;
       expect(timelineUnknown.style.color, 'Timeline unknown status color must bind to var(--color-status-unknown)').toBe('var(--color-status-unknown)');
+      expect(timelineUnknown.textContent).toContain('Heartbeat UNKNOWN');
+
+      // 5) Render standard active non-observationOnly NodeDetail (F2: schedulable box non-obs branch)
+      const activeSchedNode = {
+        ...obsNode,
+        observationOnly: false,
+        status: 'active',
+        allocatableCores: 8,
+        allocatableMemoryBytes: 16 * 1024 ** 3,
+      };
+      await act(async () => {
+        root.render(<NodeDetail node={activeSchedNode as any} onBack={() => {}} />);
+      });
+
+      const activeSchedBox = container.querySelector('[data-testid="node-detail-schedulable-box"]') as HTMLElement;
+      expect(activeSchedBox, 'Active schedulable box must render').not.toBeNull();
+      expect(activeSchedBox.style.backgroundColor, 'Non-obs schedulable box background must be var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(activeSchedBox.style.borderColor, 'Non-obs schedulable box border must bind to var(--color-status-online)').toBe('var(--color-status-online)');
+      const activeSchedLabel = container.querySelector('[data-testid="node-detail-schedulable-label"]') as HTMLElement;
+      expect(activeSchedLabel.style.color, 'Non-obs schedulable label must bind to var(--color-status-online)').toBe('var(--color-status-online)');
+      const activeSchedValue = container.querySelector('[data-testid="node-detail-schedulable-value"]') as HTMLElement;
+      expect(activeSchedValue.style.color, 'Non-obs schedulable value must bind to var(--color-status-online)').toBe('var(--color-status-online)');
+      expect(activeSchedValue.textContent).toContain('8C / 16.0GB');
+
+      const activeBoxBgVar = helperExtractVar(activeSchedBox.style.backgroundColor);
+      const activeBoxBorderVar = helperExtractVar(activeSchedBox.style.borderColor);
+      const activeLabelVar = helperExtractVar(activeSchedLabel.style.color);
+      const activeValueVar = helperExtractVar(activeSchedValue.style.color);
+      expect(getContrast(lightTokens[activeLabelVar], lightTokens[activeBoxBgVar]), 'Non-obs sched label light contrast on subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[activeLabelVar], darkTokens[activeBoxBgVar]), 'Non-obs sched label dark contrast on subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[activeValueVar], lightTokens[activeBoxBgVar]), 'Non-obs sched value light contrast on subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[activeValueVar], darkTokens[activeBoxBgVar]), 'Non-obs sched value dark contrast on subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[activeBoxBorderVar], lightTokens[activeBoxBgVar]), 'Non-obs sched border light contrast on subtle >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[activeBoxBorderVar], darkTokens[activeBoxBgVar]), 'Non-obs sched border dark contrast on subtle >= 3.0:1').toBeGreaterThanOrEqual(3.0);
     } finally {
       act(() => {
         root.unmount();

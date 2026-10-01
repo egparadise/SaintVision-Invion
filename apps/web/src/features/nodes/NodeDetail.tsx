@@ -374,21 +374,21 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({
               data-testid="node-detail-schedulable-box"
               style={{
                 padding: '10px',
-                backgroundColor: node.observationOnly ? 'rgba(210, 153, 34, 0.15)' : 'rgba(46, 160, 67, 0.15)',
-                border: `1px solid ${node.observationOnly ? 'var(--color-status-unknown)' : '#2ea043'}`,
+                backgroundColor: node.observationOnly ? 'rgba(210, 153, 34, 0.15)' : 'var(--color-bg-subtle)',
+                border: `1px solid ${node.observationOnly ? 'var(--color-status-unknown)' : 'var(--color-status-online)'}`,
                 borderRadius: 'var(--radius-sm)',
                 fontSize: '0.75rem',
               }}
             >
               <div
                 data-testid="node-detail-schedulable-label"
-                style={{ color: node.observationOnly ? 'var(--color-status-unknown)' : '#3fb950', marginBottom: '2px', fontWeight: 600 }}
+                style={{ color: node.observationOnly ? 'var(--color-status-unknown)' : 'var(--color-status-online)', marginBottom: '2px', fontWeight: 600 }}
               >
                 예약 가능량 (Schedulable)
               </div>
               <div
                 data-testid="node-detail-schedulable-value"
-                style={{ fontWeight: 800, fontSize: '0.875rem', color: node.observationOnly ? 'var(--color-status-unknown)' : (node.allocatableCores !== undefined ? '#3fb950' : 'var(--color-text-muted)') }}
+                style={{ fontWeight: 800, fontSize: '0.875rem', color: node.observationOnly ? 'var(--color-status-unknown)' : (node.allocatableCores !== undefined ? 'var(--color-status-online)' : 'var(--color-text-muted)') }}
               >
                 {node.observationOnly
                   ? '0C (차단)'
