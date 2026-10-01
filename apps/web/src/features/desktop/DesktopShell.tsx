@@ -392,7 +392,13 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
       }
       // Meta / Win Key: Toggle Start Menu
       if (e.key === 'Meta') {
-        setActiveOverlay((prev) => (prev === 'start' ? 'none' : 'start'));
+        if (activeOverlay === 'start') {
+          dismissReasonRef.current = 'dismiss';
+          setActiveOverlay('none');
+          startMenuTriggerRef.current?.focus();
+        } else {
+          setActiveOverlay('start');
+        }
       }
     };
 

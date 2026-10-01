@@ -605,4 +605,98 @@ describe('DesktopShell & useModalA11y Accessibility (ACC-03, ACC-04, focus_is_tr
     expect(expectedTitleEl?.getAttribute('tabindex')).toBe('-1');
     expect(document.activeElement).toBe(expectedTitleEl);
   });
+
+  it('T4: Meta/Win key closes Start Menu and restores focus to Start trigger button', async () => {
+    await act(async () => {
+      root.render(<DesktopShell {...MOCK_PROPS} />);
+    });
+
+    const startBtn = container.querySelector('button[aria-label="SaintVision 시작 메뉴"]') as HTMLButtonElement;
+
+    // Open Start Menu
+    await act(async () => {
+      startBtn.click();
+      vi.advanceTimersByTime(50);
+    });
+    expect(container.querySelector('#desktop-start-menu-dropdown')).not.toBeNull();
+
+    // Press Meta key to close Start Menu
+    await act(async () => {
+      const metaEvent = new KeyboardEvent('keydown', { key: 'Meta', bubbles: true, cancelable: true });
+      window.dispatchEvent(metaEvent);
+      vi.advanceTimersByTime(50);
+    });
+
+    expect(container.querySelector('#desktop-start-menu-dropdown')).toBeNull();
+    expect(document.activeElement).toBe(startBtn);
+  });
+
+  it('T5: Outside click on desktop surface closes Start Menu and restores focus to Start trigger button', async () => {
+    await act(async () => {
+      root.render(<DesktopShell {...MOCK_PROPS} />);
+    });
+
+    const startBtn = container.querySelector('button[aria-label="SaintVision 시작 메뉴"]') as HTMLButtonElement;
+    const desktopMain = container.querySelector('main') as HTMLElement;
+
+    // Open Start Menu
+    await act(async () => {
+      startBtn.click();
+      vi.advanceTimersByTime(50);
+    });
+    expect(container.querySelector('#desktop-start-menu-dropdown')).not.toBeNull();
+
+    // Click outside on desktop canvas
+    await act(async () => {
+      desktopMain.click();
+      vi.advanceTimersByTime(50);
+    });
+
+    expect(container.querySelector('#desktop-start-menu-dropdown')).toBeNull();
+    expect(document.activeElement).toBe(startBtn);
+  });
+
+  it('T6: useModalA11y restores focus to trigger element on unmount when open', async () => {
+    const externalTrigger = document.createElement('button');
+    externalTrigger.id = 't6-external-trigger';
+    document.body.appendChild(externalTrigger);
+    externalTrigger.focus();
+    expect(document.activeElement).toBe(externalTrigger);
+
+    const triggerRefHolder = { current: externalTrigger };
+
+    const UnmountTestModal: React.FC<{ mounted: boolean }> = ({ mounted }) => {
+      const { containerRef, handleKeyDown } = useModalA11y({
+        isOpen: true,
+        onClose: vi.fn(),
+        triggerRef: triggerRefHolder,
+      });
+      if (!mounted) return null;
+      return (
+        <div ref={containerRef} role="dialog" aria-modal="true" onKeyDown={handleKeyDown}>
+          <button id="t6-modal-btn">Modal Button</button>
+        </div>
+      );
+    };
+
+    // Mount open modal
+    await act(async () => {
+      root.render(<UnmountTestModal mounted={true} />);
+      vi.advanceTimersByTime(50);
+    });
+
+    const modalBtn = container.querySelector('#t6-modal-btn');
+    expect(document.activeElement).toBe(modalBtn);
+
+    // Unmount component while open
+    await act(async () => {
+      root.render(<div>Unmounted</div>);
+      vi.advanceTimersByTime(50);
+    });
+
+    // Cleanup hook effect restores focus to externalTrigger
+    expect(document.activeElement).toBe(externalTrigger);
+
+    externalTrigger.remove();
+  });
 });
