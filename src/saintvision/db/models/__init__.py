@@ -129,6 +129,15 @@ from .operations_pilot import (
     ReleaseManifest,
     StorageCheck,
 )
+from .release_acceptance import (
+    HUMAN_ATTESTATION_VERSION,
+    LEGACY_ATTESTATION_VERSION,
+    ReleaseAcceptanceLifecycleEvent,
+    ReleaseAcceptanceProposal,
+    ReleaseAcceptanceSlot,
+    ReleaseAcceptanceVote,
+    ReleaseAcceptanceWithdrawal,
+)
 from .placement import (
     PLACEMENT_STATES,
     PLAN_STATES,
@@ -217,6 +226,12 @@ TENANT_SCOPED_TABLES: tuple[str, ...] = (
     "release_manifests",
     "acceptance_records",
     "permission_snapshots",
+    # S12-BE two-person acceptance (0057, design #282 §4-1)
+    "release_acceptance_proposals",
+    "release_acceptance_votes",
+    "release_acceptance_withdrawals",
+    "release_acceptance_lifecycle_events",
+    "release_acceptance_slots",
     # discovery and pools
     "node_announcements",
     "resource_pools",
@@ -256,6 +271,19 @@ APPEND_ONLY_TABLES: tuple[str, ...] = (
     # that could be rewritten would not be one (design #218 §2-4). Host-global
     # by design, so it is here and not in TENANT_SCOPED_TABLES.
     "adapter_conformance_records",
+    # Who proposed, who confirmed, how a proposal ended, and what was withdrawn.
+    # A proposal is closed by appending an event, never by editing the proposal
+    # (design #282 §4-1); the coordination slot is the one row that moves and is
+    # in LIFECYCLE_UPDATE_COLUMNS instead.
+    "release_acceptance_proposals",
+    "release_acceptance_votes",
+    "release_acceptance_withdrawals",
+    "release_acceptance_lifecycle_events",
+    # Append-only since 0057, by revoking what 0005 granted rather than by a narrow
+    # grant: a recorded decision is not edited, it is withdrawn by appending a row
+    # (design #282 §4-1). The declarative helper above therefore stops granting it
+    # UPDATE and DELETE too, which is the same statement in the other place.
+    "acceptance_records",
 )
 
 #: Append-only tables the application role may write but **not read**. Their
@@ -283,10 +311,25 @@ LIFECYCLE_UPDATE_COLUMNS: dict[str, tuple[str, ...]] = {
         "announcement_id",
         "last_announcement_at",
     ),
+    # Which proposal is pending and which decision is active for one criterion. The
+    # identity columns are absent on purpose: a slot cannot become another
+    # criterion's, and 0057's trigger refuses that even for the owner.
+    "release_acceptance_slots": (
+        "active_proposal_id",
+        "active_acceptance_id",
+        "updated_at",
+    ),
 }
 
 __all__ = [
     "ACCEPTANCE_OUTCOMES",
+    "HUMAN_ATTESTATION_VERSION",
+    "LEGACY_ATTESTATION_VERSION",
+    "ReleaseAcceptanceLifecycleEvent",
+    "ReleaseAcceptanceProposal",
+    "ReleaseAcceptanceSlot",
+    "ReleaseAcceptanceVote",
+    "ReleaseAcceptanceWithdrawal",
     "AdapterConformanceRecord",
     "CONFORMANCE_PROVENANCES",
     "CONFORMANCE_SUBJECTS",

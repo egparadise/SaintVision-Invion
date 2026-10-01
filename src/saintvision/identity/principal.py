@@ -34,6 +34,15 @@ from ..config import SettingUnresolved
 from ..errors import AUTH_INVALID_CREDENTIAL, AUTH_PROJECT_SCOPE, InvError
 
 
+# ``FreshAuth`` lived here. It was a second representation of the same claims, and
+# Codex's #286 decision removed it: ``#285``'s verified-and-normalised values plus
+# ``has_fresh_interactive_auth()`` below are the only source. Keeping both allowed a
+# combination one side admitted and the other refused -- measured on the #291 merge,
+# where ``mfa+sms`` passed an independent RFC 8176 check while the canonical allowlist
+# refused it, and where the other path read ``identity.issuer`` that the kernel did not
+# emit and so stayed permanently ``None``. Fail-open and fail-closed at once.
+
+
 @dataclass(frozen=True, slots=True)
 class Principal:
     user_id: str
@@ -57,6 +66,16 @@ class Principal:
     verified_fresh_auth_claims: bool = False
     auth_time: int | None = None
     amr: frozenset[str] = field(default_factory=frozenset)
+    #: Token provenance a release acceptance receipt records (#282 §2-1): which issuer
+    #: and client the signature was checked against, and when that token expires.
+    #:
+    #: Copied from the verified ``inv.identity.Identity`` and from nowhere else -- not
+    #: from a request body and not by decoding the token again. ``None`` is the normal
+    #: state for every verifier that is not the OIDC one, and the acceptance boundary
+    #: treats a missing value as a refusal rather than as something to default.
+    verified_token_issuer: str | None = None
+    verified_token_client_id: str | None = None
+    verified_token_expires_at: int | None = None
 
     def require_project(self, project_id: str) -> None:
         if project_id not in self.project_ids:
@@ -74,6 +93,19 @@ class Principal:
 
 
 FRESH_AUTH_MAX_AGE_SECONDS = 300
+#: The RFC 8176 values this product accepts, and **the only place the set lives**
+#: (#286 Codex 결정 02:38 §2, F1).
+#:
+#: ``inv.identity.AccessTokens.verify()`` used to carry the same set and erase the claims
+#: when a value fell outside it. Two copies meant the refusal happened at the verifier
+#: while this constant looked like the policy -- Codex added ``sms`` here alone and 59
+#: tests still passed. The verifier now normalises format only, so an unknown method
+#: arrives here as a verified value and is refused *by this predicate*, which is the thing
+#: a test can hold.
+#:
+#: ``webauthn`` is deliberately absent: it is not an RFC 8176 value, and hardware or
+#: software possession is ``hwk``/``swk``. ``sms`` is absent because a code sent to a
+#: phone number is not a second factor this product counts.
 FRESH_AUTH_AMR_VALUES = frozenset({"mfa", "pwd", "otp", "hwk", "swk"})
 FRESH_AUTH_SECOND_FACTORS = frozenset({"otp", "hwk", "swk"})
 

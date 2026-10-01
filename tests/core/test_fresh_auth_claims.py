@@ -68,6 +68,13 @@ def test_missing_stale_future_or_noninteractive_proof_is_not_fresh(auth_time, am
 
 
 def test_only_signature_verified_claims_enter_the_access_identity(tmp_path):
+    """The verifier normalises shape. It no longer judges which methods count (#286 F1).
+
+    It used to erase the claims when a value fell outside its own allowlist, which made two
+    allowlists and moved the real refusal here -- Codex added ``sms`` to the product set
+    alone and 59 tests still passed. So the cases below are all about *shape*, and the
+    unknown-method case moved to the test under it.
+    """
     identity = jwt_fixture(tmp_path, str(uuid4()))
     fixed_now = int(time.time())
 
@@ -84,11 +91,63 @@ def test_only_signature_verified_claims_enter_the_access_identity(tmp_path):
         {"auth_time": float(fixed_now), "amr": ["mfa"]},
         {"auth_time": fixed_now, "amr": "mfa"},
         {"auth_time": fixed_now, "amr": ["pwd", "pwd"]},
-        {"auth_time": fixed_now, "amr": ["mfa", "webauthn"]},
+        # Shape, not policy: an empty token, one that is too long, one that is not a
+        # printable token, a list that is too long, and a non-string member.
+        {"auth_time": fixed_now, "amr": [""]},
+        {"auth_time": fixed_now, "amr": ["a" * 33]},
+        {"auth_time": fixed_now, "amr": ["mfa pwd"]},
+        {"auth_time": fixed_now, "amr": [f"m{index}" for index in range(9)]},
+        {"auth_time": fixed_now, "amr": ["mfa", 3]},
     ):
         value = identity.auth.verify(identity.token(claims=claims))
         assert value.auth_time is None
         assert value.amr == ()
+
+
+@pytest.mark.parametrize("unknown", ["webauthn", "sms", "kba", "tel"])
+def test_an_unknown_method_reaches_the_identity_and_is_refused_by_the_policy(tmp_path, unknown):
+    """#286 F1: the verifier passes it on, and the one policy refuses it.
+
+    This is the half that was missing. With the value filtered at the verifier, the product
+    allowlist could be widened without any test noticing -- the refusal was happening
+    somewhere else. Now the claim arrives verified, and ``has_fresh_interactive_auth`` is
+    what says no, which is a thing this test can hold.
+    """
+    identity = jwt_fixture(tmp_path, str(uuid4()))
+    fixed_now = int(time.time())
+    value = identity.auth.verify(
+        identity.token(claims={"auth_time": fixed_now, "amr": ["mfa", unknown]})
+    )
+    assert value.auth_time == fixed_now
+    assert set(value.amr) == {"mfa", unknown}, "the verifier normalises, it does not filter"
+
+    principal = _principal(auth_time=fixed_now, amr=value.amr)
+    assert not has_fresh_interactive_auth(
+        principal, now=dt.datetime.fromtimestamp(fixed_now, tz=UTC)
+    ), "the canonical predicate is what refuses an unknown method"
+
+
+def test_the_amr_allowlist_lives_in_exactly_one_place():
+    """The drift this closes, pinned by name rather than by behaviour.
+
+    A behavioural test cannot see a second allowlist that happens to agree. These
+    assertions can: the kernel must carry no value set at all, and the product's set must
+    be exactly the five values -- so adding ``sms`` to it is a one-line change that fails
+    here and in the two tests above.
+    """
+    from pathlib import Path
+
+    from inv import identity as kernel
+    from saintvision.identity import principal as policy
+
+    assert not hasattr(kernel, "_FRESH_AUTH_AMR_VALUES")
+    source = Path(kernel.__file__).read_text(encoding="utf-8")
+    for value in ("mfa", "pwd", "otp", "hwk", "swk"):
+        assert f'"{value}"' not in source, f"the kernel still names {value}"
+    assert policy.FRESH_AUTH_AMR_VALUES == frozenset({"mfa", "pwd", "otp", "hwk", "swk"})
+    assert "sms" not in policy.FRESH_AUTH_AMR_VALUES
+    assert "webauthn" not in policy.FRESH_AUTH_AMR_VALUES
+    assert policy.FRESH_AUTH_SECOND_FACTORS == frozenset({"otp", "hwk", "swk"})
 
 
 def test_tampered_signature_cannot_supply_fresh_auth_claims(tmp_path):

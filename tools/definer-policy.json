@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "0056_kernel_cancel_audit_bridge",
+  "revision": "0057_release_acceptance_quorum",
   "referenceSource": "1e8baf045c5a554209aaef601ae4883b64da50a7",
   "scope": "Exact catalogue definitions and execute grants; runtime authorization tests remain required",
   "functions": {
