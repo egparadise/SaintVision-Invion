@@ -5,6 +5,7 @@ export interface UseModalA11yOptions {
   onClose: () => void;
   autoFocusFirst?: boolean;
   initialFocusRef?: React.RefObject<HTMLElement | null>;
+  triggerRef?: React.RefObject<HTMLElement | null>;
 }
 
 /**
@@ -18,28 +19,42 @@ export function useModalA11y<T extends HTMLElement = HTMLDivElement>({
   onClose,
   autoFocusFirst = true,
   initialFocusRef,
+  triggerRef: explicitTriggerRef,
 }: UseModalA11yOptions) {
   const containerRef = useRef<T>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
+  const wasOpenRef = useRef(false);
+
+  const restoreFocus = useCallback(() => {
+    const target = explicitTriggerRef?.current || triggerRef.current;
+    if (target && typeof target.focus === 'function') {
+      target.focus();
+    }
+    triggerRef.current = null;
+  }, [explicitTriggerRef]);
 
   useLayoutEffect(() => {
     if (isOpen) {
-      if (!triggerRef.current && document.activeElement && document.activeElement !== document.body) {
+      if (explicitTriggerRef?.current) {
+        triggerRef.current = explicitTriggerRef.current;
+      } else if (!triggerRef.current && document.activeElement && document.activeElement !== document.body) {
         triggerRef.current = document.activeElement as HTMLElement;
       }
     }
-  }, [isOpen]);
+  }, [isOpen, explicitTriggerRef]);
 
   useEffect(() => {
     if (!isOpen) {
-      if (triggerRef.current && typeof triggerRef.current.focus === 'function') {
-        triggerRef.current.focus();
-        triggerRef.current = null;
+      if (wasOpenRef.current) {
+        restoreFocus();
       }
+      wasOpenRef.current = false;
       return;
     }
+
+    wasOpenRef.current = true;
 
     if (autoFocusFirst) {
       if (initialFocusRef?.current) {
@@ -58,12 +73,11 @@ export function useModalA11y<T extends HTMLElement = HTMLDivElement>({
 
     return () => {
       // Restore focus to the trigger element when the modal is closed / unmounted
-      if (triggerRef.current && typeof triggerRef.current.focus === 'function') {
-        triggerRef.current.focus();
-        triggerRef.current = null;
+      if (wasOpenRef.current) {
+        restoreFocus();
       }
     };
-  }, [isOpen, autoFocusFirst, initialFocusRef]);
+  }, [isOpen, autoFocusFirst, initialFocusRef, restoreFocus]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent | KeyboardEvent) => {
