@@ -1,7 +1,7 @@
 """Verify, at the SHA that just landed on integration, that every required lane ran.
 
 A merge train lands by fast-forwarding `integration/all-agents-unified`. What each pull
-request proved was proved at *its own* head; nothing yet says the six lanes pass at the tree
+request proved was proved at *its own* head; nothing yet says the required lanes pass at the tree
 that is now integration. One lane cannot say it from pull-request runs at all -- `AC-11
 Security Critical High Scan` runs only on a label or a manual dispatch -- which is why the
 48-task re-score records its axis as measurable with no execution record bound to a landed
@@ -10,8 +10,8 @@ SHA.
 So this binds a run to the landed SHA for each lane, waits, and writes down what happened.
 It records; it does not promote. No score moves because this ran.
 
-**It adopts the landing's own push run rather than dispatching a second one.** Five of the
-six workflows trigger on `push` to `integration/all-agents-unified`, so the landing already
+**It adopts the landing's own push run rather than dispatching a second one.** Six of the
+seven workflows trigger on `push` to `integration/all-agents-unified`, so the landing already
 started them at exactly this SHA. Those workflows also set `cancel-in-progress: false` for
 that ref, so a dispatch does not replace the push run -- it **queues behind it**, spending a
 second runner and roughly doubling the wall-clock to learn the same thing. The tool therefore
@@ -28,7 +28,7 @@ Four things it refuses to do, because each would make the record untrue:
 * **It will not accept a run whose `headSha` differs from the landed SHA**, even one it
   dispatched itself -- the ref can move between the dispatch and the run being created.
 * **It identifies a run it dispatched by a correlation id, not by watching the list.** Each
-  dispatch passes a fresh uuid as the `correlation_id` input, the six workflows echo that
+  dispatch passes a fresh uuid as the `correlation_id` input, every lane's workflow echoes that
   input into `run-name`, and only a run whose name equals that uuid is bound. Watching the
   list cannot do this job: GitHub returns no link between a dispatch and the run it creates,
   so "the newest candidate at this SHA" binds whichever dispatch GitHub happened to register
@@ -88,9 +88,14 @@ SCHEMA_VERSION = "post-landing-verify:1"
 DEFAULT_REF = "integration/all-agents-unified"
 DEFAULT_OUT_DIR = REPO_ROOT / "docs/vault/30_Development/Evidence/landing"
 
-#: The six lanes. `workflow` is the **file**, `jobs` maps each job id to how many jobs that
+#: The lanes. `workflow` is the **file**, `jobs` maps each job id to how many jobs that
 #: id must contribute -- `backend` is a two-version matrix, so GitHub names its jobs
 #: `backend (3.12)` and `backend (3.14)` and both have to be there.
+#:
+#: Every workflow whose `push` trigger lists `DEFAULT_REF` produces a run on the landing
+#: push, so leaving one out means the evidence reports green for a tree whose lanes were
+#: not all read. `test_every_push_triggered_workflow_has_a_lane` holds that set equal to
+#: this one; a new workflow fails that test instead of disappearing from the proof.
 LANES: tuple[dict[str, Any], ...] = (
     {"key": "backend", "workflow": "backend.yml", "jobs": {"backend": 2, "mlflow-live": 1}},
     {"key": "core", "workflow": "core.yml", "jobs": {"core": 1, "s01-storage-roundtrip": 1}},
@@ -101,6 +106,11 @@ LANES: tuple[dict[str, Any], ...] = (
         "jobs": {"desktop-browser": 1},
     },
     {"key": "docs", "workflow": "docs.yml", "jobs": {"docs": 1}},
+    {
+        "key": "portalLoginHarness",
+        "workflow": "portal-login-harness.yml",
+        "jobs": {"portal-login-harness": 1},
+    },
     {
         # The file name is not the check name. See the module docstring.
         "key": "securityCriticalHigh",

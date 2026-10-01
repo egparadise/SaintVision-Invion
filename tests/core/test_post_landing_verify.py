@@ -24,6 +24,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from tools.post_landing_verify import (  # noqa: E402
+    DEFAULT_REF,
     DISPATCH_EVENT,
     LANES,
     PRE_FLIGHT,
@@ -988,3 +989,283 @@ def test_the_run_name_keeps_the_workflow_name_when_no_id_is_given():
     """
     for lane in LANES:
         assert "|| github.workflow }}" in workflow_text(lane), lane["workflow"]
+#: Lanes whose workflow does not run on the landing push and is therefore always
+#: dispatched by the tool. Adding one here is a deliberate statement that the landing
+#: push produces no run for it.
+DISPATCH_ONLY_WORKFLOWS = {"ac11-security-scan.yml"}
+
+
+class UnsupportedTrigger(AssertionError):
+    """A trigger shape this check cannot decide. Raised rather than guessed.
+
+    Silence is the dangerous answer here: a shape we do not understand must not be read
+    as "no push trigger", because that is exactly how a workflow leaves the landing proof
+    unnoticed. So the check refuses and a human decides.
+    """
+
+
+#: GitHub branch-filter metacharacters. `*`, `**` and `?` are translated below; the rest
+#: are refused rather than approximated.
+_TRANSLATED = "*?"
+_REFUSED = "[]+!"
+
+
+def branch_filter_matches(pattern: str, ref: str) -> bool:
+    """Does a `push.branches` entry select `ref`?
+
+    GitHub's documented semantics for the subset we use: `**` matches any characters
+    including `/`, `*` matches any characters except `/`, `?` matches one character except
+    `/`. Character classes, `+` and leading `!` are refused -- approximating a negation
+    would make the ratchet lie in the unsafe direction.
+    """
+    import re
+
+    if any(ch in pattern for ch in _REFUSED):
+        raise UnsupportedTrigger(
+            f"branch filter {pattern!r} uses one of {_REFUSED!r}, which this check does "
+            f"not implement; decide the lane by hand or extend branch_filter_matches"
+        )
+    out = []
+    i = 0
+    while i < len(pattern):
+        ch = pattern[i]
+        if ch == "*":
+            if pattern[i + 1:i + 2] == "*":
+                out.append(".*")
+                i += 2
+                continue
+            out.append("[^/]*")
+        elif ch == "?":
+            out.append("[^/]")
+        else:
+            out.append(re.escape(ch))
+        i += 1
+    return re.fullmatch("".join(out), ref) is not None
+
+
+def _event_name(path, text: str) -> str:
+    """`BaseLoader` keeps every scalar a string, so `on: 7` arrives as `'7'`.
+
+    An `on:` scalar that is not an event name is a shape this check cannot read, and
+    reading it as "no push trigger" is the unsafe direction.
+    """
+    import re
+
+    if not re.fullmatch(r"[a-z][a-z_]*", text):
+        raise UnsupportedTrigger(
+            f"{path.name} names {text!r} in its `on:`, which is not a workflow event name"
+        )
+    return text
+
+
+def push_triggered_workflows(ref: str, directory: Path | None = None) -> set[str]:
+    """Every workflow file that can produce a run when `ref` is pushed.
+
+    Fail-closed in every ambiguous case. The shapes GitHub allows are not one shape:
+
+    * `on: push` (a string) and `on: [push, ...]` (a list) declare the event with no
+      filter at all, so every branch triggers it -- including this one.
+    * `push:` with a null value, or a mapping with no `branches`, is likewise every
+      branch. The previous version of this check read both as "no push trigger" because
+      `dict.get` returns `None` for an absent key and for a null value alike, which is the
+      defect Codex found: the two mean opposite things. (`BaseLoader` renders that null as
+      the empty string, so the empty string is what the value test looks for.)
+    * `branches` entries may be patterns, so a literal `in` test is not enough.
+    * `.yaml` is as valid an extension as `.yml`.
+
+    Anything outside that -- `branches-ignore`, a non-list `branches`, a document that is
+    not a mapping, an `on` that is neither string, list nor mapping -- raises
+    `UnsupportedTrigger`. A path filter (`paths`/`paths-ignore`) does not change the
+    answer: the workflow can still run on this ref, so it still needs a lane.
+
+    `yaml.BaseLoader` is deliberate: under YAML 1.1 a plain loader turns the key `on`
+    into the boolean `True`, so the trigger block would be unreachable by name.
+    """
+    import yaml
+
+    root = WORKFLOW_DIR if directory is None else directory
+    found = set()
+    paths = sorted(list(root.glob("*.yml")) + list(root.glob("*.yaml")))
+    for path in paths:
+        document = yaml.load(path.read_text(encoding="utf-8"), Loader=yaml.BaseLoader)
+        if not isinstance(document, dict):
+            raise UnsupportedTrigger(f"{path.name} is not a mapping at the top level")
+        if "on" not in document:
+            raise UnsupportedTrigger(f"{path.name} declares no `on:` block")
+        triggers = document["on"]
+        if isinstance(triggers, str):
+            events = {_event_name(path, triggers): None}
+        elif isinstance(triggers, list):
+            events = {_event_name(path, str(event)): None for event in triggers}
+        elif isinstance(triggers, dict):
+            events = triggers
+        else:
+            raise UnsupportedTrigger(
+                f"{path.name} has an `on:` that is neither a string, a list nor a mapping"
+            )
+        if "push" not in events:
+            continue
+        push = events["push"]
+        if push is None or push == "":
+            found.add(path.name)        # `push:` with no filter -- every branch
+            continue
+        if not isinstance(push, dict):
+            raise UnsupportedTrigger(
+                f"{path.name} has a `push:` value that is neither null nor a mapping"
+            )
+        if "branches-ignore" in push:
+            raise UnsupportedTrigger(
+                f"{path.name} filters push with `branches-ignore`, which this check does "
+                f"not implement; it is an allow-everything-except list and reading it "
+                f"wrongly would drop a lane silently"
+            )
+        if "branches" not in push:
+            found.add(path.name)        # a mapping without `branches` -- every branch
+            continue
+        branches = push["branches"]
+        if not isinstance(branches, list):
+            raise UnsupportedTrigger(f"{path.name} has a `branches` that is not a list")
+        if any(branch_filter_matches(str(entry), ref) for entry in branches):
+            found.add(path.name)
+    return found
+
+
+def test_every_push_triggered_workflow_has_a_lane():
+    """A workflow added to the repository must not quietly leave the landing proof.
+
+    The landing push creates one run per workflow that triggers on `DEFAULT_REF`. If the
+    lane list misses one, the evidence reports every lane green while that run was never
+    read -- a red lane lands silently. The tool itself cannot notice: it only walks
+    `LANES` and never looks at `.github/workflows`. So the comparison lives here.
+
+    This is the test that was missing when `portal-login-harness.yml` arrived with
+    `#259`: nothing in 77 cases could fail, because every one of them iterated `LANES`.
+    """
+    expected = push_triggered_workflows(DEFAULT_REF)
+    covered = {lane["workflow"] for lane in LANES} - DISPATCH_ONLY_WORKFLOWS
+    missing = expected - covered
+    assert not missing, (
+        f"these workflows run on the landing push to {DEFAULT_REF} but have no lane: "
+        f"{sorted(missing)}"
+    )
+    stale = covered - expected
+    assert not stale, (
+        f"these lanes name a workflow that no longer runs on the landing push: "
+        f"{sorted(stale)} -- either restore the push trigger or move the workflow into "
+        f"DISPATCH_ONLY_WORKFLOWS"
+    )
+
+
+def test_the_dispatch_only_lane_really_does_not_run_on_the_landing_push():
+    """The exception list is not a place to park a workflow that does trigger on push."""
+    on_push = push_triggered_workflows(DEFAULT_REF)
+    for workflow in DISPATCH_ONLY_WORKFLOWS:
+        assert workflow not in on_push, (
+            f"{workflow} triggers on the landing push, so it does not belong in "
+            f"DISPATCH_ONLY_WORKFLOWS"
+        )
+        assert workflow in {lane["workflow"] for lane in LANES}, workflow
+
+
+def test_the_portal_login_harness_lane_names_the_job_the_workflow_defines():
+    """The lane added for `#259`'s workflow, pinned to that file rather than to prose."""
+    import yaml
+
+    document = yaml.load(
+        (WORKFLOW_DIR / "portal-login-harness.yml").read_text(encoding="utf-8"),
+        Loader=yaml.BaseLoader,
+    )
+    lane = next(item for item in LANES if item["workflow"] == "portal-login-harness.yml")
+    assert set(lane["jobs"]) <= set(document["jobs"]), lane["jobs"]
+    assert lane["jobs"] == {"portal-login-harness": 1}
+    assert document["on"]["push"]["branches"] == [
+        "main",
+        "integration/all-agents-unified",
+        "agent/**",
+    ]
+
+
+def write_workflow(directory, name: str, body: str) -> None:
+    (directory / name).write_text(body, encoding="utf-8", newline=NL)
+
+
+def test_the_ratchet_counts_a_bare_push_event_in_every_shape(tmp_path):
+    """`on: push`, `on: [push]`, `push:` null and a `push:` mapping with no `branches`.
+
+    All four trigger on every branch, so all four need a lane. The version of this check
+    that shipped in card 178 read the last two as "no push trigger", because `dict.get`
+    cannot tell an absent key from a null value -- Codex's probe found it.
+    """
+    write_workflow(tmp_path, "a.yml", "name: A" + NL + "on: push" + NL + "jobs: {}" + NL)
+    write_workflow(tmp_path, "b.yml", "name: B" + NL + "on: [push, pull_request]" + NL + "jobs: {}" + NL)
+    write_workflow(tmp_path, "c.yml", "name: C" + NL + "on:" + NL + "  push:" + NL + "jobs: {}" + NL)
+    write_workflow(
+        tmp_path, "d.yml",
+        "name: D" + NL + "on:" + NL + "  push:" + NL + "    paths:" + NL
+        + "      - src/**" + NL + "jobs: {}" + NL,
+    )
+    assert push_triggered_workflows(DEFAULT_REF, tmp_path) == {"a.yml", "b.yml", "c.yml", "d.yml"}
+
+
+def test_the_ratchet_reads_the_yaml_extension_too(tmp_path):
+    write_workflow(tmp_path, "e.yaml", "name: E" + NL + "on: push" + NL + "jobs: {}" + NL)
+    assert push_triggered_workflows(DEFAULT_REF, tmp_path) == {"e.yaml"}
+
+
+def test_the_ratchet_ignores_a_push_trigger_for_other_branches_only(tmp_path):
+    write_workflow(
+        tmp_path, "f.yml",
+        "name: F" + NL + "on:" + NL + "  push:" + NL + "    branches:" + NL
+        + "      - main" + NL + "      - 'agent/**'" + NL + "jobs: {}" + NL,
+    )
+    assert push_triggered_workflows(DEFAULT_REF, tmp_path) == set()
+
+
+def test_the_ratchet_matches_a_branch_pattern_that_does_cover_the_ref(tmp_path):
+    write_workflow(
+        tmp_path, "g.yml",
+        "name: G" + NL + "on:" + NL + "  push:" + NL + "    branches:" + NL
+        + "      - 'integration/**'" + NL + "jobs: {}" + NL,
+    )
+    assert push_triggered_workflows(DEFAULT_REF, tmp_path) == {"g.yml"}
+
+
+def test_branch_filter_semantics_follow_the_documented_subset():
+    ref = DEFAULT_REF  # integration/all-agents-unified
+    assert branch_filter_matches(ref, ref)
+    assert branch_filter_matches("integration/**", ref)
+    assert branch_filter_matches("integration/*", ref)
+    assert branch_filter_matches("**", ref)
+    assert not branch_filter_matches("agent/**", ref)
+    assert not branch_filter_matches("main", ref)
+    # `*` stops at a slash; `**` does not.
+    assert not branch_filter_matches("integration*", ref)
+    assert branch_filter_matches("integration**", ref)
+    assert branch_filter_matches("integration/all-agents-unifie?", ref)
+    assert not branch_filter_matches("integration/all-agents-unifie?x", ref)
+
+
+@pytest.mark.parametrize("body", [
+    "name: X" + NL + "on:" + NL + "  push:" + NL + "    branches-ignore:" + NL + "      - gh-pages" + NL,
+    "name: X" + NL + "on:" + NL + "  push:" + NL + "    branches: main" + NL,
+    "name: X" + NL + "on: 7" + NL,
+    "name: X" + NL + "jobs: {}" + NL,
+    "[]" + NL,
+])
+def test_the_ratchet_refuses_a_shape_it_cannot_decide(tmp_path, body):
+    """Refusing is the fail-closed answer: silence would read as "no push trigger"."""
+    write_workflow(tmp_path, "x.yml", body)
+    with pytest.raises(UnsupportedTrigger):
+        push_triggered_workflows(DEFAULT_REF, tmp_path)
+
+
+@pytest.mark.parametrize("pattern", ["integration/[ab]*", "integration/+", "!main"])
+def test_an_unsupported_branch_pattern_is_refused_not_approximated(pattern):
+    with pytest.raises(UnsupportedTrigger):
+        branch_filter_matches(pattern, DEFAULT_REF)
+
+
+def test_the_real_workflow_directory_has_no_shape_this_check_refuses():
+    """The repository's own files must all be decidable, or the ratchet is not running."""
+    found = push_triggered_workflows(DEFAULT_REF)
+    assert found, "the ratchet found no push-triggered workflow at all, which cannot be right"
