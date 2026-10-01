@@ -302,25 +302,25 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
         }
       }
 
-      // Arrow navigation for Start Menu (WCAG role="menu" pattern: ArrowDown, ArrowUp, Home, End - Claude D1)
+      // Arrow navigation for Start Menu (보조 기능: ArrowDown, ArrowUp, Home, End - WAI-ARIA dialog 보조)
       if (activeOverlay === 'start') {
         if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Home' || e.key === 'End') {
           const container = startMenuContainerRef.current;
           if (container) {
-            const menuItems = Array.from(container.querySelectorAll<HTMLElement>('[role="menuitem"]'));
-            if (menuItems.length > 0) {
+            const menuButtons = Array.from(container.querySelectorAll<HTMLButtonElement>('button:not([disabled])'));
+            if (menuButtons.length > 0) {
               e.preventDefault();
-              const currentIndex = menuItems.indexOf(document.activeElement as HTMLElement);
+              const currentIndex = menuButtons.indexOf(document.activeElement as HTMLButtonElement);
               if (e.key === 'Home') {
-                menuItems[0].focus();
+                menuButtons[0].focus();
               } else if (e.key === 'End') {
-                menuItems[menuItems.length - 1].focus();
+                menuButtons[menuButtons.length - 1].focus();
               } else if (e.key === 'ArrowDown') {
-                const nextIndex = currentIndex === -1 || currentIndex === menuItems.length - 1 ? 0 : currentIndex + 1;
-                menuItems[nextIndex].focus();
+                const nextIndex = currentIndex === -1 || currentIndex === menuButtons.length - 1 ? 0 : currentIndex + 1;
+                menuButtons[nextIndex].focus();
               } else if (e.key === 'ArrowUp') {
-                const prevIndex = currentIndex <= 0 ? menuItems.length - 1 : currentIndex - 1;
-                menuItems[prevIndex].focus();
+                const prevIndex = currentIndex <= 0 ? menuButtons.length - 1 : currentIndex - 1;
+                menuButtons[prevIndex].focus();
               }
             }
           }
@@ -501,7 +501,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
             id="desktop-start-menu-trigger"
             onClick={() => setActiveOverlay((prev) => (prev === 'start' ? 'none' : 'start'))}
             aria-expanded={isStartMenuOpen}
-            aria-haspopup="menu"
+            aria-haspopup="dialog"
             aria-controls="desktop-start-menu-dropdown"
             aria-label="SaintVision 시작 메뉴"
             style={{
@@ -630,9 +630,9 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
         <div
           ref={startMenuContainerRef}
           id="desktop-start-menu-dropdown"
-          role="menu"
-          aria-label="SaintVision 시작 메뉴"
-          aria-labelledby="desktop-start-menu-trigger"
+          role="dialog"
+          aria-label="시작 메뉴"
+          aria-modal={true}
           tabIndex={-1}
           style={{
             position: 'absolute',
@@ -659,7 +659,6 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
               <button
                 key={app.appId}
                 type="button"
-                role="menuitem"
                 onClick={() => openApp(app.appId)}
                 style={{
                   display: 'flex',
@@ -685,7 +684,6 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', marginTop: '8px', paddingTop: '8px' }}>
             <button
               type="button"
-              role="menuitem"
               onClick={onSwitchToPortalView}
               style={{
                 width: '100%',

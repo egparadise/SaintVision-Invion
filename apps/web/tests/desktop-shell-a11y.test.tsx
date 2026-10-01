@@ -66,7 +66,7 @@ describe('DesktopShell & useModalA11y Accessibility (ACC-03, ACC-04, focus_is_tr
 
     const startBtn = container.querySelector('button[aria-label="SaintVision 시작 메뉴"]') as HTMLButtonElement;
     expect(startBtn).not.toBeNull();
-    expect(startBtn.getAttribute('aria-haspopup')).toBe('menu');
+    expect(startBtn.getAttribute('aria-haspopup')).toBe('dialog');
     expect(startBtn.getAttribute('aria-expanded')).toBe('false');
 
     // 1. Open Start Menu by clicking trigger
@@ -77,7 +77,8 @@ describe('DesktopShell & useModalA11y Accessibility (ACC-03, ACC-04, focus_is_tr
 
     const startMenu = container.querySelector('#desktop-start-menu-dropdown') as HTMLDivElement;
     expect(startMenu).not.toBeNull();
-    expect(startMenu.getAttribute('role')).toBe('menu');
+    expect(startMenu.getAttribute('role')).toBe('dialog');
+    expect(startMenu.getAttribute('aria-label')).toBe('시작 메뉴');
     expect(startBtn.getAttribute('aria-expanded')).toBe('true');
 
     // 2. Press Escape key to dismiss Start Menu
@@ -492,7 +493,7 @@ describe('DesktopShell & useModalA11y Accessibility (ACC-03, ACC-04, focus_is_tr
     expect(document.activeElement).toBe(startBtn);
   });
 
-  it('D1: Start Menu role="menu" has 9 role="menuitem" buttons with Arrow key (ArrowDown/Up/Home/End) navigation', async () => {
+  it('D1 & F1: Start Menu is a dialog (role="dialog", aria-label="시작 메뉴") with 0 menu/menuitem roles and supporting arrow key navigation', async () => {
     await act(async () => {
       root.render(<DesktopShell {...MOCK_PROPS} />);
     });
@@ -505,25 +506,35 @@ describe('DesktopShell & useModalA11y Accessibility (ACC-03, ACC-04, focus_is_tr
 
     const startMenu = container.querySelector('#desktop-start-menu-dropdown') as HTMLDivElement;
     expect(startMenu).not.toBeNull();
-    expect(startMenu.getAttribute('role')).toBe('menu');
+    expect(startMenu.getAttribute('role')).toBe('dialog');
+    expect(startMenu.getAttribute('aria-label')).toBe('시작 메뉴');
+    expect(startMenu.getAttribute('aria-modal')).toBe('true');
 
-    // D1: Verify probe buttons=9 and menuitem-role=9
-    const allButtons = startMenu.querySelectorAll('button');
-    const menuItems = startMenu.querySelectorAll<HTMLElement>('[role="menuitem"]');
+    // Strict assertion: 0 menu and 0 menuitem roles across Start Menu and entire container
+    expect(startMenu.querySelectorAll('[role="menu"]').length).toBe(0);
+    expect(startMenu.querySelectorAll('[role="menuitem"]').length).toBe(0);
+    expect(container.querySelectorAll('[role="menu"]').length).toBe(0);
+    expect(container.querySelectorAll('[role="menuitem"]').length).toBe(0);
+
+    // 9 plain native buttons with role === null
+    const allButtons = Array.from(startMenu.querySelectorAll<HTMLButtonElement>('button'));
     expect(allButtons.length).toBe(9);
-    expect(menuItems.length).toBe(9);
+    for (const btn of allButtons) {
+      expect(btn.getAttribute('role')).toBeNull();
+    }
 
-    // Initial focus on first menuitem
-    menuItems[0].focus();
-    expect(document.activeElement).toBe(menuItems[0]);
+    // Initial focus on first button
+    allButtons[0].focus();
+    expect(document.activeElement).toBe(allButtons[0]);
 
+    // Arrow navigation across buttons as auxiliary navigation
     // ArrowDown moves to next item
     await act(async () => {
       const downEvent = new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true });
       window.dispatchEvent(downEvent);
       expect(downEvent.defaultPrevented).toBe(true);
     });
-    expect(document.activeElement).toBe(menuItems[1]);
+    expect(document.activeElement).toBe(allButtons[1]);
 
     // ArrowUp moves to previous item
     await act(async () => {
@@ -531,7 +542,7 @@ describe('DesktopShell & useModalA11y Accessibility (ACC-03, ACC-04, focus_is_tr
       window.dispatchEvent(upEvent);
       expect(upEvent.defaultPrevented).toBe(true);
     });
-    expect(document.activeElement).toBe(menuItems[0]);
+    expect(document.activeElement).toBe(allButtons[0]);
 
     // ArrowUp on first item wraps to last item
     await act(async () => {
@@ -539,7 +550,7 @@ describe('DesktopShell & useModalA11y Accessibility (ACC-03, ACC-04, focus_is_tr
       window.dispatchEvent(wrapUpEvent);
       expect(wrapUpEvent.defaultPrevented).toBe(true);
     });
-    expect(document.activeElement).toBe(menuItems[menuItems.length - 1]);
+    expect(document.activeElement).toBe(allButtons[allButtons.length - 1]);
 
     // ArrowDown on last item wraps to first item
     await act(async () => {
@@ -547,16 +558,16 @@ describe('DesktopShell & useModalA11y Accessibility (ACC-03, ACC-04, focus_is_tr
       window.dispatchEvent(wrapDownEvent);
       expect(wrapDownEvent.defaultPrevented).toBe(true);
     });
-    expect(document.activeElement).toBe(menuItems[0]);
+    expect(document.activeElement).toBe(allButtons[0]);
 
     // Home key jumps to first item
-    menuItems[4].focus();
+    allButtons[4].focus();
     await act(async () => {
       const homeEvent = new KeyboardEvent('keydown', { key: 'Home', bubbles: true, cancelable: true });
       window.dispatchEvent(homeEvent);
       expect(homeEvent.defaultPrevented).toBe(true);
     });
-    expect(document.activeElement).toBe(menuItems[0]);
+    expect(document.activeElement).toBe(allButtons[0]);
 
     // End key jumps to last item
     await act(async () => {
@@ -564,7 +575,7 @@ describe('DesktopShell & useModalA11y Accessibility (ACC-03, ACC-04, focus_is_tr
       window.dispatchEvent(endEvent);
       expect(endEvent.defaultPrevented).toBe(true);
     });
-    expect(document.activeElement).toBe(menuItems[menuItems.length - 1]);
+    expect(document.activeElement).toBe(allButtons[allButtons.length - 1]);
   });
 
   it('D2: Launching app from Start Menu (openApp) moves focus to newly opened window/title, NOT Start Menu trigger', async () => {
