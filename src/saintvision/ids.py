@@ -78,6 +78,13 @@ PREFIXES: Final[dict[str, str]] = {
     "storage_check": "chk",
     "release": "rel",
     "acceptance": "acc",
+    #: Two-person release acceptance (0057, design #282 §4-1). The proposal, one
+    #: person's attested vote on it, how it was closed, and a withdrawal.
+    "acceptance_proposal": "rap",
+    "acceptance_vote": "rav",
+    "acceptance_lifecycle_event": "ral",
+    "acceptance_withdrawal": "raw",
+    "acceptance_slot": "ras",
     "permission_snapshot": "psn",
     # discovery, pools and distributed placement
     "announcement": "anc",

@@ -35,6 +35,29 @@ from ..errors import AUTH_INVALID_CREDENTIAL, AUTH_PROJECT_SCOPE, InvError
 
 
 @dataclass(frozen=True, slots=True)
+class FreshAuth:
+    """What a verified token said about the human who authenticated.
+
+    Only ever built from claims a verifier checked, and it holds no credential: an
+    authentication time, the methods used, and which issuer and client verified them.
+    Those four are what a release acceptance vote records (design #282 §2-1), and the
+    reason they are a separate object is that almost every request has none -- the
+    field is ``None`` for every endpoint that does not need step-up, and code that
+    needs it must therefore say so.
+
+    ``amr`` is a set because order carries no meaning, and ``expires_at`` is here
+    because an accepted proposal's window is the earlier of ``auth_time + 300s`` and
+    the token's own expiry (§2-2).
+    """
+
+    auth_time: int
+    amr: frozenset[str]
+    issuer: str
+    client_id: str
+    expires_at: int
+
+
+@dataclass(frozen=True, slots=True)
 class Principal:
     user_id: str
     tenant_id: uuid.UUID
@@ -57,6 +80,11 @@ class Principal:
     verified_fresh_auth_claims: bool = False
     auth_time: int | None = None
     amr: frozenset[str] = field(default_factory=frozenset)
+    #: Present only when the verifier was given a token carrying verified fresh-auth
+    #: claims. ``None`` is the normal state and means exactly "this request proves no
+    #: interactive authentication", which the acceptance routes treat as a refusal
+    #: rather than as a missing optimisation.
+    fresh_auth: FreshAuth | None = None
 
     def require_project(self, project_id: str) -> None:
         if project_id not in self.project_ids:
