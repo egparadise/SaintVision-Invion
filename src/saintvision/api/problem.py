@@ -95,6 +95,9 @@ RES_NOT_FOUND = "RES-0004"
 GRAPH_PRECONDITION = "GRAPH-0002"
 SYS_UPSTREAM_UNAVAILABLE = "SYS-0001"
 SYS_UNMAPPED = "SYS-0002"
+#: A deployed feature is registered but its operator-controlled prerequisites
+#: are not bound.  Retrying the same request cannot repair deployment state.
+SYS_PREREQUISITES_UNAVAILABLE = "SYS-0003"
 
 # These historical service codes have one unambiguous public meaning: the
 # named resource is absent or intentionally hidden from this caller. Other

@@ -18,11 +18,16 @@ from jsonschema.exceptions import ValidationError as JsonSchemaValidationError
 from pydantic import ValidationError
 
 from saintvision.api import schemas
+from saintvision.api.problem import SYS_PREREQUISITES_UNAVAILABLE
 
 
 ROOT = Path(__file__).resolve().parents[2]
 HASH = "a" * 64
 NOW = dt.datetime(2026, 10, 1, 9, 48, tzinfo=dt.timezone.utc)
+
+
+def test_disabled_write_surface_has_a_distinct_nonretryable_prerequisite_code():
+    assert SYS_PREREQUISITES_UNAVAILABLE == "SYS-0003"
 
 
 def decision(**changes):
