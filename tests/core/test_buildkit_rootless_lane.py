@@ -193,6 +193,12 @@ def test_container_mode_derives_pid_from_inspect_instead_of_cli(monkeypatch, tmp
         ]
         == "RuntimeError"
     )
+    assert (
+        json.loads((output / "rootless-buildkit-reference.json").read_text(encoding="utf-8"))[
+            "failureStage"
+        ]
+        == "health-receipt"
+    )
 
 
 def test_main_emits_reference_only_evidence_and_exact_junit(monkeypatch, tmp_path):
@@ -301,4 +307,5 @@ def test_main_fails_closed_when_exact_head_is_missing_or_different(monkeypatch, 
         "operationalAcceptanceAssessed": False,
         "productDispatchEnabled": False,
         "failureClass": "RuntimeError",
+        "failureStage": "source-binding",
     }

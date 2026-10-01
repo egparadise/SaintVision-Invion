@@ -323,17 +323,20 @@ def main(argv=None) -> int:
     args.output_dir.mkdir(parents=True, exist_ok=True)
     args.health_receipt.parent.mkdir(parents=True, exist_ok=True)
     now = datetime.now(timezone.utc)
+    failure_stage = "health-receipt"
     try:
         receipt = _health_receipt(args, now)
         args.health_receipt.write_text(
             json.dumps(receipt, sort_keys=True, separators=(",", ":")), encoding="utf-8"
         )
         args.health_receipt.chmod(0o600)
+        failure_stage = "source-binding"
         head = _command("git", "rev-parse", "HEAD")
         expected = os.environ.get("INV_EVIDENCE_CODE_SHA")
         if expected != head:
             raise RuntimeError("exact hosted head is not the checked-out source")
         tree = _command("git", "rev-parse", "HEAD^{tree}")
+        failure_stage = "transport-configuration"
         configuration = BuildkitTransportConfiguration(
             buildctl_path=args.buildctl,
             address=args.address,
@@ -352,8 +355,10 @@ def main(argv=None) -> int:
                 "XDG_RUNTIME_DIR": os.environ.get("XDG_RUNTIME_DIR", ""),
             },
         )
+        failure_stage = "provider-measurement"
         measured = transport.measure()
         request = _request(head, tree)
+        failure_stage = "reference-roundtrip"
         result = transport.reference_roundtrip(
             request,
             _plan(request, measured.provider.observation_digest, now),
@@ -376,6 +381,7 @@ def main(argv=None) -> int:
             "operationalAcceptanceAssessed": False,
             "productDispatchEnabled": False,
             "failureClass": type(error).__name__,
+            "failureStage": failure_stage,
         }
         (args.output_dir / "rootless-buildkit-reference.json").write_text(
             json.dumps(failure, indent=2, sort_keys=True) + "\n", encoding="utf-8"
