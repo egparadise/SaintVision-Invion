@@ -1,13 +1,13 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.236"
+version: "1.0.237"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T12:59:33+09:00"
+updated: "2026-10-01T13:03:25+09:00"
 source_of_truth: "Git"
 active_card: "CARD-171 AC-11 accessibility-e2e hosted measurement"
-active_card_status: "First hosted run exposed OIDC harness drift after five canonical journeys; redirect binding fixed, 12 PG-free tests pass"
+active_card_status: "Two hosted runs isolated strict OIDC config shape/order drift after five journeys; resolved config order fixed, 12 PG-free tests pass"
 active_card_next: "Rerun exact-head hosted lane and record JSON/JUnit verdict and artifact"
 ---
 

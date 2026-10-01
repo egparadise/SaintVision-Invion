@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-20261001-CARD171-AC11-ACCESSIBILITY-CODEX"
 title: "CARD-171 AC-11 accessibility-e2e hosted 측정 선택"
-version: "1.1.1"
+version: "1.1.2"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-01T12:59:33+09:00"
+updated: "2026-10-01T13:03:25+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "7851412db792b4ef6c53cb92944be530d77eb2de"
@@ -59,6 +59,12 @@ callback 검증에서 거부됐고, invariant report는 생성되지 않았다. 
 아니라 `NOT_OBSERVED`인 harness drift다. `tools/run_real_browser_acceptance.py`의 test OIDC
 config에 동일-origin `/callback`을 명시하고 이를 되살림 방지 시험으로 추가했다. 수정 뒤
 PG-free 단일 파일은 12 passed이며 새 exact-head hosted run으로 다시 측정한다.
+
+두 번째 run `36813057397`도 journey 5개는 통과했으나 JavaScript object의 key insertion
+order가 resolved config와 달라 같은 strict `JSON.stringify` 검사를 통과하지 못했다.
+resolved `authConfig()` 반환 순서(`clientId`, `scope`, authorize, token, redirect)에 test
+config를 맞추고 순서 자체를 회귀 시험으로 고정했다. 제품 UI 판정에는 여전히 도달하지
+않았으므로 이 run도 `NOT_OBSERVED`이며 접근성 실패 수치로 세지 않는다.
 
 ## 판정 경계
 

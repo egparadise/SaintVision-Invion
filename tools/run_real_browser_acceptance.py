@@ -562,10 +562,10 @@ def run_scenario(
             # Setup OAuth transaction with protected test configuration
             page.add_init_script(f"""
                 const testConfig = {{
-                    idpAuthorizeUrl: '{frontend_url}/oauth/authorize',
-                    idpTokenUrl: '{frontend_url}/oauth/token',
                     clientId: 'saintvision-web',
                     scope: 'openid profile email',
+                    idpAuthorizeUrl: '{frontend_url}/oauth/authorize',
+                    idpTokenUrl: '{frontend_url}/oauth/token',
                     redirectUri: '{frontend_url}/callback'
                 }};
                 try {{

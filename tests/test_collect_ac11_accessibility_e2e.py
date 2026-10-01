@@ -224,3 +224,6 @@ def test_real_browser_bootstrap_uses_the_current_resolved_oidc_config_shape():
     source = (ROOT / "tools/run_real_browser_acceptance.py").read_text(encoding="utf-8")
     assert "redirectUri: '{frontend_url}/callback'" in source
     assert "redirectUri: '{frontend_url}/callback',\n                    config: testConfig" in source
+    assert source.index("clientId: 'saintvision-web'") < source.index("scope: 'openid profile email'")
+    assert source.index("scope: 'openid profile email'") < source.index("idpAuthorizeUrl: '{frontend_url}/oauth/authorize'")
+    assert source.index("idpTokenUrl: '{frontend_url}/oauth/token'") < source.index("redirectUri: '{frontend_url}/callback'")
