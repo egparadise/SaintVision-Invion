@@ -1,12 +1,12 @@
 ---
 doc_id: "HISTORY-CARD198-VF-CL-04-CIVERIFIED-REDERIVED-20261002"
 title: "카드 198 — VF-CL-04의 ciVerified를 진술에서 재도출로: 거짓이던 이유가 #283로 사라졌고, 레지스트리는 그것을 혼자 알 수 없었다 (rule 7, 그리고 미선택 행의 차단 사유)"
-version: "1.2.0"
+version: "1.3.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-02T03:52:15+09:00"
+updated: "2026-10-02T04:20:38+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "25f43a25"
@@ -172,3 +172,29 @@ Codex r2가 두 가지를 측정했다. **F1**: receipt와 레지스트리에서
 | F1 probe | 위조+재봉인 쌍은 여전히 findings 0 — **그래서 `true`가 거부된다**(시험으로 고정) |
 | 검사기 | exit 0, `verifiedAgainst: 25f43a25`, `VF-CL-04.ciVerified: false` |
 | 후속 | [[VF-CL-04 ciVerified 권위 있는 receipt 계약 요청]] |
+
+## 10. r3 — 정확한 key 집합은 그 key 안의 값에 대해 아무것도 말하지 않는다
+
+Codex r3이 두 가지를 들었고 **둘 다 제 실수**다.
+
+### 10-1. F1 — `recordedAt: 123`이 통과했다
+
+strict schema를 "key 집합이 정확하다"로만 만들었다. 그런데 **두 field는 canonical digest에서 제외된다**(`receiptSha256`과 `recordedAt`) — 설계상 그렇게 해야 digest를 재계산할 수 있기 때문인데, 그 말은 **그 두 자리의 잘못된 type은 재해시조차 필요 없다**는 뜻이다. Codex가 `recordedAt`을 숫자 `123`으로 바꿨고 checker는 exit 0이었다.
+
+이제 **16개 receipt field와 4개 artifact field 전부**에 type·format 규칙이 있다(표로 적었다 — `RECEIPT_FIELD_RULES`·`RECEIPT_ARTIFACT_RULES`). `test_every_receipt_key_is_typed`가 **그 표의 key 집합과 schema의 key 집합을 같다고 단언**하므로, 나중에 field를 더하면서 규칙을 빼먹을 수 없다.
+
+실측(한 번에 하나, 원복 후 clean 재확인): `recordedAt: 123` · `runId`를 int로 · `event: schedule` · relation `descendant` · `requiredSteps`에 빈 문자열 · `headBranch`를 list로 · `receiptSha256` 비hex · `artifact.id`를 int로 · digest에 `sha256:` 접두 없음 · `expiresAt`을 숫자로 — **열 가지 전부 보고**된다.
+
+### 10-2. F2 — 중복 key가 제 정정을 조용히 지웠다
+
+`docs/vf-cl-registry-manifest.json`의 `VF-CL-04`에 **`whyCiVerified`가 두 번** 있었다(116행·128행). `json.loads`는 **마지막**을 채택하므로, r2에서 쓴 "권위가 없어서 false다"라는 새 사유가 **r1의 옛 문장으로 대체돼 사라졌다**. 원인은 제 r2 patch가 **이미 그 key를 가진 entry에 같은 key를 넣은 것**이고, JSON이 조용히 받아 준 것이다.
+
+중복을 지우고 옛 문장 중 **아직 사실인 부분**(검사들이 세우는 literal chain)은 남은 값 안으로 합쳤다. 그리고 **같은 모양이 다시 일어나지 못하게** `object_pairs_hook`으로 중복 key를 거부한다 — manifest와 레지스트리는 `RegistryUnusable`, receipt는 **finding**이다(receipt 하나가 나쁜 것은 그 카드의 drift이고 나머지는 판정할 수 있다). shipped 세 파일을 strict loader로 읽는 회귀 시험과, `VF-CL-04`의 `whyCiVerified`가 **attestation 사유를 담고 있다**는 내용 단언도 함께 넣었다.
+
+**읽고 쓰는 파일을 두 번 같은 방식으로 읽을 수 없으면 기록이 아니다** — 이 레지스트리가 세 번째로 가르친 같은 교훈이고, 이번에는 drift가 아니라 **내 편집이 원인**이었다.
+
+### 10-3. 시험에서 제가 틀린 두 가지
+
+- artifact field 변이 시험이 **git repo가 생기기 전에** receipt fixture를 불렀다(`git rev-parse HEAD` exit 128). fixture를 먼저 돌리고 그것이 쓴 파일을 고치는 순서로 바꿨다.
+- `receiptSha256`을 나쁜 값으로 두는 case를 **다시 봉인하는 fixture**로 넣었다 — 봉인이 그 field를 덮어쓰므로 변이가 사라졌다. 그 한 case만 **봉인하지 않고** 파일을 직접 쓰는 시험으로 분리했다.
+- `card` 형식 규칙을 `VF-CL-\d{2}`로 썼더니 fixture의 `VF-CL-0X`가 걸렸다. **identity는 따로 검사된다**(receipt의 card == 판정 중인 카드)는 것을 확인하고 형식 규칙을 두 글자 영숫자로 넓혔다 — 형식과 identity를 혼동한 것이다.

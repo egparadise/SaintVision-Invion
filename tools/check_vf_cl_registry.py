@@ -206,6 +206,33 @@ class RegistryUnusable(ValueError):
     """The registry cannot be judged, which is not the same as it being wrong."""
 
 
+def _reject_duplicate_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    """``json.loads`` keeps the **last** of two identical keys. That is how a correction
+    disappeared: an edit added ``whyCiVerified`` to an entry that already had one, and the
+    new reason was silently replaced by the old one (#295 r3 F2). A file nobody can read
+    twice the same way is not a record, so a duplicate is refused rather than resolved.
+    """
+    seen: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in seen:
+            raise RegistryUnusable(f"duplicate JSON key {key!r}")
+        seen[key] = value
+    return seen
+
+
+def load_json_strictly(path: Path, label: str) -> dict[str, Any]:
+    """Read a JSON object, refusing a duplicate key anywhere in it."""
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=_reject_duplicate_keys)
+    except RegistryUnusable as refusal:
+        raise RegistryUnusable(f"{label}: {refusal}") from None
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise RegistryUnusable(f"{label} is not readable JSON: {type(error).__name__}") from None
+    if not isinstance(value, dict):
+        raise RegistryUnusable(f"{label} must be a JSON object")
+    return value
+
+
 def shallow_repository(root: Path) -> bool:
     """Whether this checkout has been truncated.
 
@@ -293,11 +320,8 @@ def load_manifest(path: Path, identifiers: list[str]) -> dict:
     """
     if not path.is_file():
         raise RegistryUnusable(f"the re-derivation manifest is missing: {path.name}")
-    try:
-        manifest = json.loads(path.read_text(encoding="utf-8"))
-    except (UnicodeError, json.JSONDecodeError) as error:
-        raise RegistryUnusable(f"the manifest is not readable JSON: {type(error).__name__}")
-    if not isinstance(manifest, dict) or manifest.get("schemaVersion") != MANIFEST_SCHEMA:
+    manifest = load_json_strictly(path, "the manifest")
+    if manifest.get("schemaVersion") != MANIFEST_SCHEMA:
         raise RegistryUnusable(f"the manifest must declare schemaVersion {MANIFEST_SCHEMA}")
     cards = manifest.get("cards")
     if not isinstance(cards, dict):
@@ -375,6 +399,89 @@ def load_manifest(path: Path, identifiers: list[str]) -> dict:
     return manifest
 
 
+#: Each receipt field and what it must be. ``check`` returns True when the value is
+#: acceptable; the message says what it had to be. Written as a table because a field
+#: added to ``RECEIPT_KEYS`` without an entry here is a field nobody typed -- the test
+#: ``test_every_receipt_key_is_typed`` holds the two lists equal.
+RECEIPT_FIELD_RULES: tuple[tuple[str, Any, str], ...] = (
+    ("schemaVersion", lambda v: v == RECEIPT_SCHEMA, f"must be {RECEIPT_SCHEMA!r}"),
+    # Two characters, because the identity that matters is checked separately: the receipt's
+    # card must equal the card being judged. This is the shape, not the identity.
+    ("card", lambda v: isinstance(v, str) and re.fullmatch(r"VF-CL-[0-9A-Z]{2}", v),
+     "must be a VF-CL card id"),
+    ("repository", lambda v: v == RECEIPT_REPOSITORY, "must be the canonical repository"),
+    ("workflowPath", lambda v: isinstance(v, str) and v.startswith(".github/workflows/")
+     and v.endswith((".yml", ".yaml")), "must be a workflow file path"),
+    ("runId", lambda v: isinstance(v, str) and re.fullmatch(r"[0-9]{1,20}", v),
+     "must be a run id written as digits in a string"),
+    ("event", lambda v: v in {"workflow_dispatch", "pull_request"},
+     "must be an opt-in event"),
+    ("conclusion", lambda v: v == "success", "must be 'success'"),
+    ("headSha", lambda v: isinstance(v, str) and COMMIT_PATTERN.fullmatch(v),
+     "must be a full 40-hex commit"),
+    ("headBranch", lambda v: isinstance(v, str) and 0 < len(v) <= 255
+     and "\n" not in v, "must be a branch name"),
+    ("claimedTree", lambda v: isinstance(v, str) and COMMIT_PATTERN.fullmatch(v),
+     "must be a full 40-hex commit"),
+    ("headRelationToClaimedTree", lambda v: v in {"same", "ancestor"},
+     "must be 'same' or 'ancestor'"),
+    ("requiredSteps", lambda v: isinstance(v, list) and v and all(
+        isinstance(step, str) and step.strip() for step in v),
+     "must be a non-empty list of non-empty strings"),
+    ("artifact", lambda v: isinstance(v, dict), "must be an object"),
+    ("inputDigests", lambda v: isinstance(v, dict), "must be an object"),
+    ("recordedAt", lambda v: _is_utc_timestamp(v), "must be a UTC RFC3339 timestamp"),
+    ("receiptSha256", lambda v: isinstance(v, str) and re.fullmatch(r"[0-9a-f]{64}", v),
+     "must be a sha256"),
+)
+
+#: The artifact object's fields, typed the same way.
+RECEIPT_ARTIFACT_RULES: tuple[tuple[str, Any, str], ...] = (
+    ("id", lambda v: isinstance(v, str) and re.fullmatch(r"[0-9]{1,20}", v),
+     "must be an artifact id written as digits in a string"),
+    ("name", lambda v: isinstance(v, str) and 0 < len(v) <= 255 and "/" not in v,
+     "must be an artifact name"),
+    ("digest", lambda v: isinstance(v, str) and re.fullmatch(r"sha256:[0-9a-f]{64}", v),
+     "must be 'sha256:<64 hex>'"),
+    ("expiresAt", lambda v: _is_utc_timestamp(v), "must be a UTC RFC3339 timestamp"),
+)
+
+
+def _is_utc_timestamp(value: Any) -> bool:
+    if not isinstance(value, str):
+        return False
+    try:
+        parsed = dt.datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return False
+    return parsed.tzinfo is not None
+
+
+def receipt_field_findings(receipt: dict[str, Any]) -> list[str]:
+    """What each field had to be, for the fields that are not.
+
+    Deliberately independent of the digest. Two fields -- ``receiptSha256`` and
+    ``recordedAt`` -- are excluded from the canonical digest by construction, so a wrong
+    type in them survives without any re-hashing at all. That is the hole Codex found.
+    """
+    findings: list[str] = []
+    for key, check, message in RECEIPT_FIELD_RULES:
+        if key not in receipt:
+            continue                      # the exact-key-set check reports an absence
+        if not check(receipt[key]):
+            findings.append(f"the receipt's {key} {message}, not {receipt[key]!r}")
+    artifact = receipt.get("artifact")
+    if isinstance(artifact, dict):
+        for key, check, message in RECEIPT_ARTIFACT_RULES:
+            if key not in artifact:
+                continue
+            if not check(artifact[key]):
+                findings.append(
+                    f"the receipt's artifact.{key} {message}, not {artifact[key]!r}"
+                )
+    return findings
+
+
 def ci_run_findings(
     identifier: str,
     recorded: object,
@@ -404,10 +511,13 @@ def ci_run_findings(
     relative = str(expectation.get("path") or "")
     receipt_path = root / relative
     try:
-        receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+        receipt = load_json_strictly(receipt_path, f"the receipt {relative}")
+    except RegistryUnusable as refusal:
+        # Reported as a finding rather than raised: a bad receipt is drift in a card, and
+        # the rest of the registry can still be judged.
+        return [f"{identifier}: {refusal}"]
     except (OSError, UnicodeError, json.JSONDecodeError) as error:
-        return [f"{identifier}.ciVerified is derived true but its receipt {relative} is "
-                f"unusable: {type(error).__name__}"]
+        return [f"{identifier}: its receipt {relative} is unusable: {type(error).__name__}"]
     if not isinstance(receipt, dict):
         return [f"{identifier}: the receipt {relative} is not an object"]
     if receipt.get("schemaVersion") != RECEIPT_SCHEMA:
@@ -435,6 +545,10 @@ def ci_run_findings(
         for value in digests.values()
     ):
         findings.append(f"{identifier}: an inputDigests value is not a sha256")
+    # Every field, by type and format. An exact key set says nothing about what is *in*
+    # the keys, and two of these fields are outside the digest, so a wrong type there
+    # needs no re-hash at all: ``recordedAt: 123`` passed the first version (#295 r3 F1).
+    findings.extend(f"{identifier}: {problem}" for problem in receipt_field_findings(receipt))
     if receipt.get("card") != identifier:
         findings.append(f"{identifier}: the receipt is for {receipt.get('card')!r}")
     body = {key: value for key, value in receipt.items()
@@ -854,7 +968,7 @@ def parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = parser().parse_args(argv)
     try:
-        registry = json.loads(args.registry.read_text(encoding="utf-8"))
+        registry = load_json_strictly(args.registry, "the registry")
         findings = audit(registry, args.root, args.manifest)
     except RegistryUnusable as error:
         print(f"unusable: {error}", file=sys.stderr)

@@ -1007,7 +1007,7 @@ def test_a_missing_receipt_is_reported(tmp_path):
     document, manifest_document = bound(tmp_path)
     (tmp_path / "docs/vf-cl-ci-receipts/VF-CL-0X.json").unlink()
     findings = audit(document, tmp_path, manifest_document)
-    assert any("is unusable: FileNotFoundError" in finding for finding in findings), findings
+    assert any("not readable JSON: FileNotFoundError" in finding for finding in findings), findings
 
 
 def test_a_receipt_edited_after_it_was_built_is_reported(tmp_path):
@@ -1330,3 +1330,153 @@ def test_the_shipped_registry_marks_its_tree_as_a_pre_landing_candidate():
     assert verified["candidate"] is True
     assert verified["reverifyAt"] == "integration/all-agents-unified"
     assert verified["ref"].startswith("coord/")
+
+
+# --- r3 F1: an exact key set says nothing about what is in the keys ---------------------
+
+
+def test_every_receipt_key_is_typed():
+    """A key added to the schema without a rule is a key nobody typed.
+
+    Held as set equality rather than as a count: the two lists drift apart silently
+    otherwise, and the drift would read as coverage.
+    """
+    typed = {key for key, _check, _message in checker.RECEIPT_FIELD_RULES}
+    assert typed == checker.RECEIPT_KEYS
+    artifact_typed = {key for key, _check, _message in checker.RECEIPT_ARTIFACT_RULES}
+    assert artifact_typed == checker.RECEIPT_ARTIFACT_KEYS
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "expected"),
+    [
+        # The one Codex found: outside the canonical digest, so no re-hash is needed.
+        ("recordedAt", 123, "must be a UTC RFC3339 timestamp"),
+        ("recordedAt", "2026-10-02", "must be a UTC RFC3339 timestamp"),
+        ("schemaVersion", "vf-cl-ci-receipt:2", "must be 'vf-cl-ci-receipt:1'"),
+        ("card", "VF-CL-4", "must be a VF-CL card id"),
+        ("repository", "someone/else", "must be the canonical repository"),
+        ("workflowPath", "tools/whatever.py", "must be a workflow file path"),
+        ("runId", 36851875128, "must be a run id written as digits in a string"),
+        ("runId", "36851875128x", "must be a run id written as digits in a string"),
+        ("event", "schedule", "must be an opt-in event"),
+        ("conclusion", "failure", "must be 'success'"),
+        ("headSha", "40b3ec78", "must be a full 40-hex commit"),
+        ("headBranch", ["main"], "must be a branch name"),
+        ("headBranch", "", "must be a branch name"),
+        ("claimedTree", None, "must be a full 40-hex commit"),
+        ("headRelationToClaimedTree", "descendant", "must be 'same' or 'ancestor'"),
+        ("requiredSteps", [], "must be a non-empty list of non-empty strings"),
+        ("requiredSteps", ["ok", "  "], "must be a non-empty list of non-empty strings"),
+        ("requiredSteps", "Derive the thing", "must be a non-empty list of non-empty strings"),
+        ("artifact", ["id"], "must be an object"),
+        ("inputDigests", "none", "must be an object"),
+    ],
+)
+def test_a_receipt_field_of_the_wrong_type_is_reported(tmp_path, field, value, expected):
+    document, manifest_document = bound(tmp_path, receipt_overrides={field: value})
+    findings = audit(document, tmp_path, manifest_document)
+    assert any(expected in finding for finding in findings), (field, findings)
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "expected"),
+    [
+        ("id", 11155274241, "artifact.id must be an artifact id"),
+        ("id", "", "artifact.id must be an artifact id"),
+        ("name", "dir/name", "artifact.name must be an artifact name"),
+        ("digest", "0" * 64, "artifact.digest must be 'sha256:<64 hex>'"),
+        ("digest", "sha256:zz", "artifact.digest must be 'sha256:<64 hex>'"),
+        ("expiresAt", 0, "artifact.expiresAt must be a UTC RFC3339 timestamp"),
+        ("expiresAt", "2099-12-30 10:52:59", "artifact.expiresAt must be a UTC RFC3339"),
+    ],
+)
+def test_an_artifact_field_of_the_wrong_type_is_reported(tmp_path, field, value, expected):
+    # The repository has to exist before a receipt can name its HEAD, so the fixture runs
+    # first and the artifact is edited in the file it wrote.
+    document, manifest_document = bound(tmp_path)
+    target = tmp_path / "docs/vf-cl-ci-receipts/VF-CL-0X.json"
+    edited = json.loads(target.read_text(encoding="utf-8"))
+    edited["artifact"][field] = value
+    target.write_text(json.dumps(seal(edited)), encoding="utf-8")
+    findings = audit(document, tmp_path, manifest_document)
+    assert any(expected in finding for finding in findings), (field, findings)
+
+
+def test_a_receipt_whose_own_digest_is_not_a_digest_is_reported(tmp_path):
+    """Written unsealed on purpose: the fixture re-seals, and this field is the seal."""
+    document, manifest_document = bound(tmp_path)
+    target = tmp_path / "docs/vf-cl-ci-receipts/VF-CL-0X.json"
+    edited = json.loads(target.read_text(encoding="utf-8"))
+    edited["receiptSha256"] = "nope"
+    target.write_text(json.dumps(edited), encoding="utf-8")
+    findings = audit(document, tmp_path, manifest_document)
+    assert any("receiptSha256 must be a sha256" in finding for finding in findings), findings
+
+
+def test_the_shipped_receipt_has_no_field_of_the_wrong_type():
+    shipped = json.loads(
+        (checker.REPO_ROOT / "docs/vf-cl-ci-receipts/VF-CL-04.json").read_text(encoding="utf-8")
+    )
+    assert checker.receipt_field_findings(shipped) == []
+
+
+# --- r3 F2: json.loads keeps the last of two identical keys -----------------------------
+
+
+def test_a_duplicate_key_in_the_manifest_is_unusable(tmp_path):
+    """The mistake this closes, reproduced.
+
+    An edit added ``whyCiVerified`` to an entry that already had one, and ``json.loads``
+    kept the **last** -- so the new reason was replaced by the old one and nothing said so.
+    """
+    target = tmp_path / "manifest.json"
+    target.write_text(
+        '{"schemaVersion": "%s", "cards": {"VF-CL-0X": {"why": "new", "why": "old"}}}'
+        % checker.MANIFEST_SCHEMA,
+        encoding="utf-8",
+    )
+    with pytest.raises(checker.RegistryUnusable) as unusable:
+        checker.load_manifest(target, ["VF-CL-0X"])
+    assert "duplicate JSON key 'why'" in str(unusable.value)
+
+
+def test_a_duplicate_key_in_the_registry_is_unusable(tmp_path):
+    target = tmp_path / "registry.json"
+    target.write_text('{"version": "1", "version": "2"}', encoding="utf-8")
+    with pytest.raises(checker.RegistryUnusable) as unusable:
+        checker.load_json_strictly(target, "the registry")
+    assert "duplicate JSON key 'version'" in str(unusable.value)
+
+
+def test_a_duplicate_key_in_the_receipt_is_reported_as_drift(tmp_path):
+    """A finding rather than unusable: a bad receipt is one card's drift, and the rest of
+    the registry can still be judged."""
+    document, manifest_document = bound(tmp_path)
+    (tmp_path / "docs/vf-cl-ci-receipts/VF-CL-0X.json").write_text(
+        '{"card": "VF-CL-0X", "card": "VF-CL-0X"}', encoding="utf-8"
+    )
+    findings = audit(document, tmp_path, manifest_document)
+    assert any("duplicate JSON key 'card'" in finding for finding in findings), findings
+
+
+@pytest.mark.parametrize(
+    "path",
+    ["docs/vf-cl-task-registry.json", "docs/vf-cl-registry-manifest.json",
+     "docs/vf-cl-ci-receipts/VF-CL-04.json"],
+)
+def test_the_shipped_files_have_no_duplicate_keys(path):
+    """The regression for F2 itself: read the shipped pair the strict way."""
+    checker.load_json_strictly(checker.REPO_ROOT / path, path)
+
+
+def test_the_shipped_manifest_keeps_the_reason_the_last_edit_wrote():
+    """The value that vanished, pinned by content.
+
+    The duplicate meant VF-CL-04's ``whyCiVerified`` read as the older sentence. The reason
+    this card is false now is the attestation, and that is what the file has to say.
+    """
+    manifest_document = checker.load_json_strictly(checker.DEFAULT_MANIFEST, "manifest")
+    why = manifest_document["cards"]["VF-CL-04"]["whyCiVerified"]
+    assert "not authoritative" in why
+    assert "attestation" in why

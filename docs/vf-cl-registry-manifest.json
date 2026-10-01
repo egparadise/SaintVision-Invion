@@ -113,7 +113,7 @@
   "VF-CL-04": {
    "impliesImplemented": true,
    "impliesCiVerified": false,
-   "whyCiVerified": "The facts are measured and the receipt binds them, but a receipt built offline from passed-in JSON is not authoritative: its digest is a hash, not a signature, so a forged run id survives re-hashing (#295 r2 F1). So the tree implies false -- not because CI cannot re-derive this card, but because nothing here can show that it did. The check below is what makes that a derivation rather than an opinion: while the workflow carries no attestation step, this stays false, and the day one is added the check breaks and this entry has to be revisited.",
+   "whyCiVerified": "The facts are measured and the receipt binds them, but a receipt built offline from passed-in JSON is not authoritative: its digest is a hash, not a signature, so a forged run id survives re-hashing (#295 r2 F1). So the tree implies false -- not because CI cannot re-derive this card, but because nothing here can show that it did. The check below is what makes that a derivation rather than an opinion: while the workflow carries no attestation step, this stays false, and the day one is added the check breaks and this entry has to be revisited. What the checks below DO establish is the chain of literals: s12-acceptance-evidence.yml runs this card's collector and then the shape gate over what it produced, and the collector is where the two named acceptance observations come from -- which is why this card is the one rule 7 could ever assert, unlike the cards whose tests merely ride a whole-directory lane.",
    "ciVerifiedReceipt": {
     "path": "docs/vf-cl-ci-receipts/VF-CL-04.json",
     "workflowPath": ".github/workflows/s12-acceptance-evidence.yml",
@@ -125,7 +125,6 @@
     ],
     "artifactNamePrefix": "s12-acceptance-"
    },
-   "whyCiVerified": "This card is the one with a workflow of its own, so the tree can say it: s12-acceptance-evidence.yml runs this card's collector and then the shape gate over what it produced, and the collector is where the two named acceptance observations come from. That is a chain of literals, not a lane that happens to include a directory.",
    "ciVerifiedChecks": [
     {
      "kind": "path-exists",
