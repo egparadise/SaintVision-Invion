@@ -45,7 +45,6 @@ is visible.
 from __future__ import annotations
 
 import uuid
-from dataclasses import replace
 from typing import Any, Protocol
 
 from sqlalchemy import select
@@ -54,7 +53,7 @@ from sqlalchemy.orm import Session
 from ..config import SettingUnresolved
 from ..db.models import Project, ProjectMember, User
 from ..errors import AUTH_INVALID_CREDENTIAL, InvError
-from .principal import FreshAuth, Principal
+from .principal import Principal
 
 
 class TokenVerifier(Protocol):
@@ -118,49 +117,41 @@ class OidcPrincipalVerifier:
         with self._session_factory() as session:
             with session.begin():
                 with tenant_scope(session, tenant_id):
-                    principal = principal_for_subject(
-                        session, tenant_id=tenant_id, subject=subject
+                    return principal_for_subject(
+                        session,
+                        tenant_id=tenant_id,
+                        subject=subject,
+                        verified_fresh_auth_claims=True,
+                        auth_time=getattr(identity, "auth_time", None),
+                        amr=frozenset(getattr(identity, "amr", ())),
+                        # Handed over, never re-derived: these are the issuer and client
+                        # the signature was already checked against, and the token's own
+                        # expiry. Read with getattr so a verifier stub that predates them
+                        # yields None -- which the acceptance boundary refuses -- rather
+                        # than raising here and turning a refusal into a 500.
+                        verified_token_issuer=getattr(identity, "issuer", None),
+                        verified_token_client_id=getattr(identity, "client_id", None),
+                        verified_token_expires_at=getattr(identity, "expires_at", None),
                     )
-        return replace(principal, fresh_auth=_fresh_auth_from(identity))
 
 
-def _fresh_auth_from(identity: Any) -> FreshAuth | None:
-    """Carry forward the fresh-auth claims the kernel verified, if it verified any.
-
-    Read tolerantly on purpose. ``inv.identity.AccessTokens`` does not surface
-    ``auth_time`` or ``amr`` yet -- card 188 is adding that supply along with the
-    identity provider's mapper -- and this side must not guess in the meantime. A
-    kernel that offers nothing yields ``None``, which the acceptance routes treat as a
-    refusal (design #282 §2-1), and the same code starts carrying real values the day
-    the kernel starts verifying them. Nothing here decodes a token or reads a claim the
-    kernel did not check: that would be a second answer to who the caller is.
-    """
-    auth_time = getattr(identity, "auth_time", None)
-    amr = getattr(identity, "amr", None)
-    if not isinstance(auth_time, int) or isinstance(auth_time, bool) or auth_time <= 0:
-        return None
-    if not isinstance(amr, (list, tuple, frozenset, set)) or not amr:
-        return None
-    if any(not isinstance(value, str) for value in amr):
-        return None
-    expires_at = getattr(identity, "expires_at", None)
-    issuer = getattr(identity, "issuer", None) or getattr(identity.principal, "issuer", None)
-    client_id = getattr(identity, "client_id", None)
-    if not isinstance(expires_at, int) or not isinstance(issuer, str) or not isinstance(
-        client_id, str
-    ):
-        return None
-    return FreshAuth(
-        auth_time=auth_time,
-        amr=frozenset(amr),
-        issuer=issuer,
-        client_id=client_id,
-        expires_at=expires_at,
-    )
+# ``_fresh_auth_from()`` lived here: a second parse and a second judgement of the same
+# claims. Codex's #286 decision removed it. Nothing in this module decides whether an
+# authentication was fresh -- ``saintvision.identity.principal.has_fresh_interactive_auth``
+# does, on the values ``inv.identity.AccessTokens.verify`` normalised.
 
 
 def principal_for_subject(
-    session: Session, *, tenant_id: uuid.UUID, subject: str
+    session: Session,
+    *,
+    tenant_id: uuid.UUID,
+    subject: str,
+    verified_fresh_auth_claims: bool = False,
+    auth_time: int | None = None,
+    amr: frozenset[str] = frozenset(),
+    verified_token_issuer: str | None = None,
+    verified_token_client_id: str | None = None,
+    verified_token_expires_at: int | None = None,
 ) -> Principal:
     """Find the person this verified subject belongs to.
 
@@ -221,4 +212,10 @@ def principal_for_subject(
         # request it was built for is handled.
         project_ids=frozenset(project_id for project_id, _ in memberships),
         roles=frozenset(role for _, role in memberships),
+        verified_fresh_auth_claims=verified_fresh_auth_claims,
+        auth_time=auth_time,
+        amr=amr,
+        verified_token_issuer=verified_token_issuer,
+        verified_token_client_id=verified_token_client_id,
+        verified_token_expires_at=verified_token_expires_at,
     )

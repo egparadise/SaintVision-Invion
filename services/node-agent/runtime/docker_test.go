@@ -13,6 +13,8 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+
+	contracts "github.com/egparadise/SaintVision-Invion/packages/contracts-go"
 )
 
 func testDocker(t *testing.T, handler http.HandlerFunc) *Docker {
@@ -125,5 +127,25 @@ func TestDockerOutputUsesNegotiatedVersion(t *testing.T) {
 	})
 	if output, err := d.Output(context.Background(), id, record); err != nil || output.SizeBytes == 0 {
 		t.Fatalf("output=%v err=%v", output, err)
+	}
+}
+
+func TestGPUDeviceRequestIsExactAndNeverBroadOrPrivileged(t *testing.T) {
+	_, permit, _ := fixture(t)
+	permit.Launch.GpuAllocation = &contracts.GPUAllocation{DeviceId: "GPU-01234567", DeviceRequestDriver: "nvidia"}
+	expected := gpuRequests(permit.Launch)
+	if len(expected) != 1 || expected[0].Count != 0 || !equal(expected[0].DeviceIDs, []string{"GPU-01234567"}) || !equal(expected[0].Capabilities[0], []string{"gpu"}) || len(expected[0].Options) != 0 {
+		t.Fatalf("unexpected device request: %#v", expected)
+	}
+	for name, changed := range map[string][]deviceRequest{
+		"all-devices": {{Driver: "nvidia", Count: -1, Capabilities: [][]string{{"gpu"}}, Options: map[string]string{}}},
+		"other-device": {{Driver: "nvidia", DeviceIDs: []string{"GPU-other"}, Capabilities: [][]string{{"gpu"}}, Options: map[string]string{}}},
+		"broad-capability": {{Driver: "nvidia", DeviceIDs: []string{"GPU-01234567"}, Capabilities: [][]string{{"gpu", "utility"}}, Options: map[string]string{}}},
+	} {
+		t.Run(name, func(t *testing.T) {
+			if equalDeviceRequests(changed, expected) {
+				t.Fatal("broad GPU exposure accepted")
+			}
+		})
 	}
 }

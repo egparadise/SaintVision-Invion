@@ -66,6 +66,36 @@ func TestValidPermitAndBoundBudget(t *testing.T) {
 		t.Fatalf("budget %v: %v", budget, err)
 	}
 }
+
+func TestSingleGPUAllocationMustMatchTheSignedLeaseExactly(t *testing.T) {
+	c, p, k := fixture(t)
+	now := time.Now().UTC()
+	stamp := func(value time.Time) contracts.Timestamp { return contracts.Timestamp(value.Format(time.RFC3339Nano)) }
+	lease := contracts.ResourceLease{LeaseId: contracts.LeaseId("lse_" + strings.Repeat("3", 26)), TenantId: p.Claim.TenantId, RunId: p.Claim.RunId, ResourceId: contracts.ResourceId("res_" + strings.Repeat("3", 26)), Amount: 1, FencingToken: c.Epoch + ":1", GrantedAt: stamp(now.Add(-time.Second)), ExpiresAt: stamp(now.Add(time.Minute))}
+	p.Allocations = append(p.Allocations, contracts.NodeAllocation{Lease: lease, NodeId: p.Claim.NodeId, Kind: "gpu"})
+	p.Launch.GpuAllocation = &contracts.GPUAllocation{NodeId: p.Claim.NodeId, ResourceId: lease.ResourceId, LeaseId: lease.LeaseId, FencingToken: lease.FencingToken, DeviceId: "GPU-01234567", VramBytes: 1024, ProviderVersion: "synthetic:1", ProfileVersion: c.Profile, RecoveryEpoch: c.Epoch, ObservationDigest: strings.Repeat("b", 64), ObservedAt: stamp(now), Exclusive: true, RuntimeCompatible: true, Healthy: true, DeviceRequestDriver: "nvidia"}
+	if _, err := Verify(signed(t, p, k), c); err != nil {
+		t.Fatal(err)
+	}
+	for name, mutate := range map[string]func(*contracts.NodeExecutionPermit){
+		"resource": func(value *contracts.NodeExecutionPermit) { value.Launch.GpuAllocation.ResourceId = contracts.ResourceId("res_" + strings.Repeat("4", 26)) },
+		"lease": func(value *contracts.NodeExecutionPermit) { value.Launch.GpuAllocation.LeaseId = contracts.LeaseId("lse_" + strings.Repeat("4", 26)) },
+		"fence": func(value *contracts.NodeExecutionPermit) { value.Launch.GpuAllocation.FencingToken = c.Epoch + ":2" },
+		"node": func(value *contracts.NodeExecutionPermit) { value.Launch.GpuAllocation.NodeId = contracts.NodeId("nod_" + strings.Repeat("4", 26)) },
+		"extra": func(value *contracts.NodeExecutionPermit) { value.Allocations = append(value.Allocations, value.Allocations[len(value.Allocations)-1]) },
+	} {
+		t.Run(name, func(t *testing.T) {
+			changed := p
+			allocation := *p.Launch.GpuAllocation
+			changed.Launch.GpuAllocation = &allocation
+			changed.Allocations = append([]contracts.NodeAllocation{}, p.Allocations...)
+			mutate(&changed)
+			if _, err := Verify(signed(t, changed, k), c); err == nil {
+				t.Fatal("GPU allocation drift accepted")
+			}
+		})
+	}
+}
 func TestPermitRejectsBoundaryViolations(t *testing.T) {
 	cases := map[string]func(*Config, *contracts.NodeExecutionPermit){
 		"wrong-key":    func(c *Config, p *contracts.NodeExecutionPermit) { c.PublicKey = make([]byte, 32) },

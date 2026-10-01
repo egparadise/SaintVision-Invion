@@ -22,6 +22,7 @@ from .errors import DomainError
 from .leases import Allocation, LeaseStore, active_total, lock_resources, lock_run
 from .runs import event
 from .scheduler import Candidate, Request, place
+from .gpu import verified_gpu_devices
 
 
 class _StalePlacement(Exception):
@@ -54,14 +55,14 @@ class PlacementStore:
             model_observation, LocalModelObservation
         ):
             raise DomainError("VAL-0003", "Trusted model observation required", 422)
-        if (
-            request.gpu_count
-            or request.min_vram_bytes
-            or (request.required_bytes and model_observation is None)
+        if request.gpu_count not in {0, 1} or (request.gpu_count == 0) != (
+            request.min_vram_bytes == 0
         ):
+            raise DomainError("VAL-0003", "A single explicit GPU request is required", 422)
+        if request.required_bytes and model_observation is None:
             raise DomainError(
                 "RES-0008",
-                "Measured GPU and locality providers are not configured",
+                "Measured locality provider is not configured",
                 422,
             )
         if (
@@ -127,9 +128,7 @@ class PlacementStore:
             ).fetchone():
                 raise DomainError("MODEL-0003", "Run already has a model input reservation", 409)
             lease_store._admit_locked(conn, project, run_id, run=run)
-            mark_statement_phase(
-                "placement-legacy-lock-wait", track_lock_hold=False
-            )
+            mark_statement_phase("placement-legacy-lock-wait", track_lock_hold=False)
             wait_started = perf_counter_ns()
             try:
                 conn.execute(
@@ -146,9 +145,7 @@ class PlacementStore:
                     {
                         "mode": "placement-legacy-lock-wait",
                         "attempt": 1,
-                        "waitMs": round(
-                            (perf_counter_ns() - wait_started) / 1_000_000, 3
-                        ),
+                        "waitMs": round((perf_counter_ns() - wait_started) / 1_000_000, 3),
                         "outcome": "timeout",
                         "sqlState": getattr(error, "sqlstate", None),
                     },
@@ -159,9 +156,7 @@ class PlacementStore:
                 {
                     "mode": "placement-legacy-lock-wait",
                     "attempt": 1,
-                    "waitMs": round(
-                        (perf_counter_ns() - wait_started) / 1_000_000, 3
-                    ),
+                    "waitMs": round((perf_counter_ns() - wait_started) / 1_000_000, 3),
                     "outcome": "acquired",
                     "sqlState": None,
                 },
@@ -187,7 +182,7 @@ class PlacementStore:
             resource_ids = [
                 r["resource_id"]
                 for r in conn.execute(
-                    "SELECT resource_id FROM inv.resources WHERE node_id=ANY(%s) AND kind IN ('cpu','memory') ORDER BY resource_id LIMIT 129",
+                    "SELECT resource_id FROM inv.resources WHERE node_id=ANY(%s) AND kind IN ('cpu','memory','gpu') ORDER BY resource_id LIMIT 129",
                     (selected_pool,),
                 ).fetchall()
             ]
@@ -230,6 +225,14 @@ class PlacementStore:
                 snapshot = row["snapshot"]
                 if snapshot["cpuCapacityMillis"] <= 0:
                     continue
+                gpu_devices = verified_gpu_devices(snapshot, resources, row["node_id"])
+                available_gpu = tuple(
+                    (device_id, device["totalVramBytes"])
+                    for device_id, device in sorted(gpu_devices.items())
+                    if resources[device["resourceId"]]["offered"]
+                    - int(active_total(conn, device["resourceId"]))
+                    >= 1
+                )
                 candidates.append(
                     Candidate(
                         row["node_id"],
@@ -237,7 +240,7 @@ class PlacementStore:
                         row["received_at"],
                         node["spare"]["cpuMillis"],
                         node["spare"]["memoryBytes"],
-                        (),
+                        available_gpu,
                         locality.get(row["node_id"], 0),
                         None,
                         Decimal(snapshot["cpuBusyMillis"]) / Decimal(snapshot["cpuCapacityMillis"]),
@@ -304,13 +307,32 @@ class PlacementStore:
                     raise DomainError(
                         "RES-0001", "Measured placement no longer fits offered slices"
                     )
+            if request.gpu_count:
+                selected_devices = verified_gpu_devices(
+                    next(r["snapshot"] for r in rows if r["node_id"] == explain["nodeId"]),
+                    resources,
+                    explain["nodeId"],
+                )
+                selected = selected_devices[explain["gpuDeviceIds"][0]]["resourceId"]
+                if resources[selected]["offered"] - int(active_total(conn, selected)) < 1:
+                    raise DomainError(
+                        "RES-0001", "Measured GPU is already allocated", retryable=True
+                    )
+                allocations.append(Allocation(selected, 1))
             locked_allocations = {
                 allocation.resource_id: resources[allocation.resource_id]
                 for allocation in allocations
             }
             leases = lease_store._reserve_prepared_locked(
-                conn, principal.tenant_id, project, run_id, sorted(allocations), ttl_seconds,
-                run=run, limits=limits, resources=locked_allocations,
+                conn,
+                principal.tenant_id,
+                project,
+                run_id,
+                sorted(allocations),
+                ttl_seconds,
+                run=run,
+                limits=limits,
+                resources=locked_allocations,
             )
             result = {"runId": run_id, "placement": explain, "leases": leases}
             if model_observation is not None:
@@ -374,9 +396,7 @@ class PlacementStore:
                         "memory": limits["memory_bytes"],
                     }
                 ),
-                "membership": [
-                    [row["node_id"], bool(row["enabled"])] for row in memberships
-                ],
+                "membership": [[row["node_id"], bool(row["enabled"])] for row in memberships],
                 "resources": [
                     {
                         key: (
@@ -393,7 +413,7 @@ class PlacementStore:
         )
 
     @staticmethod
-    def _locked_fit(conn, resources, node_id, request):
+    def _locked_fit(conn, resources, node_id, request, *, gpu_resource_ids=()):
         """Recompute exact active fit after selected Node/Resource locks."""
 
         allocations = []
@@ -418,6 +438,19 @@ class PlacementStore:
                     need -= amount
             if need:
                 raise _StalePlacement()
+        if request.gpu_count:
+            if len(gpu_resource_ids) != 1:
+                raise _StalePlacement()
+            resource_id = gpu_resource_ids[0]
+            resource = resources.get(resource_id)
+            if (
+                not resource
+                or resource["node_id"] != node_id
+                or resource["kind"] != "gpu"
+                or resource["offered"] - int(active_total(conn, resource_id)) < 1
+            ):
+                raise _StalePlacement()
+            allocations.append(Allocation(resource_id, 1))
         return sorted(allocations)
 
     def _speculate(
@@ -455,7 +488,7 @@ class PlacementStore:
                 raise DomainError("AUTH-0030", "Pool contains unauthorized project nodes", 403)
             resource_rows = conn.execute(
                 """SELECT * FROM inv.resources WHERE node_id=ANY(%s)
-                AND kind IN ('cpu','memory') ORDER BY resource_id LIMIT 129""",
+                AND kind IN ('cpu','memory','gpu') ORDER BY resource_id LIMIT 129""",
                 (selected_pool,),
             ).fetchall()
             if not resource_rows or len(resource_rows) > 128:
@@ -491,6 +524,14 @@ class PlacementStore:
                 if not node or row["snapshot"]["cpuCapacityMillis"] <= 0:
                     continue
                 snapshot = row["snapshot"]
+                gpu_devices = verified_gpu_devices(snapshot, resources, row["node_id"])
+                available_gpu = tuple(
+                    (device_id, device["totalVramBytes"])
+                    for device_id, device in sorted(gpu_devices.items())
+                    if resources[device["resourceId"]]["offered"]
+                    - int(active_total(conn, device["resourceId"]))
+                    >= 1
+                )
                 candidates.append(
                     Candidate(
                         row["node_id"],
@@ -498,11 +539,10 @@ class PlacementStore:
                         row["received_at"],
                         node["spare"]["cpuMillis"],
                         node["spare"]["memoryBytes"],
-                        (),
+                        available_gpu,
                         locality.get(row["node_id"], 0),
                         None,
-                        Decimal(snapshot["cpuBusyMillis"])
-                        / Decimal(snapshot["cpuCapacityMillis"]),
+                        Decimal(snapshot["cpuBusyMillis"]) / Decimal(snapshot["cpuCapacityMillis"]),
                         clock_skew_seconds=row["clock_skew_seconds"],
                     )
                 )
@@ -563,12 +603,32 @@ class PlacementStore:
                         allocations.append(Allocation(resource_id, amount))
                         need -= amount
                 if need:
-                    raise DomainError("RES-0001", "Measured placement no longer fits offered slices")
+                    raise DomainError(
+                        "RES-0001", "Measured placement no longer fits offered slices"
+                    )
+            gpu_resource_ids = []
+            if request.gpu_count:
+                selected_snapshot = next(
+                    row["snapshot"] for row in rows if row["node_id"] == explain["nodeId"]
+                )
+                selected_devices = verified_gpu_devices(
+                    selected_snapshot, resources, explain["nodeId"]
+                )
+                gpu_resource_ids = [
+                    selected_devices[device_id]["resourceId"]
+                    for device_id in explain["gpuDeviceIds"]
+                ]
+                for resource_id in gpu_resource_ids:
+                    if resources[resource_id]["offered"] - int(active_total(conn, resource_id)) < 1:
+                        raise DomainError(
+                            "RES-0001", "Measured GPU is already allocated", retryable=True
+                        )
+                    allocations.append(Allocation(resource_id, 1))
             resource_ids = [
                 resource_id
                 for resource_id, resource in resources.items()
                 if resource["node_id"] == explain["nodeId"]
-                and resource["kind"] in {"cpu", "memory"}
+                and (resource["kind"] in {"cpu", "memory"} or resource_id in gpu_resource_ids)
             ]
             return {
                 "explain": explain,
@@ -576,6 +636,7 @@ class PlacementStore:
                 "resourceIds": sorted(resource_ids),
                 "guard": self._selected_guard(conn, project, limits, resource_ids),
                 "locality": locality,
+                "gpuResourceIds": gpu_resource_ids,
             }
 
     def _reserve_short_commit(
@@ -626,9 +687,7 @@ class PlacementStore:
                         )
                         run = lock_run(conn, run_id, project)
                         if prior is not None:
-                            Control(self.db).grant(
-                                conn, principal, project, "can_request"
-                            )
+                            Control(self.db).grant(conn, principal, project, "can_request")
                             return prior
                         if conn.execute(
                             "SELECT 1 FROM inv.model_run_inputs WHERE run_id=%s", (run_id,)
@@ -704,23 +763,25 @@ class PlacementStore:
                         # acquire the project ceiling row. SQL diagnostics
                         # retain any 55P03/57014 acquisition failure separately.
                         mark_statement_phase("placement-short-commit", attempt=attempt)
-                        resources = lock_resources(
-                            conn, speculative["resourceIds"]
-                        )
+                        resources = lock_resources(conn, speculative["resourceIds"])
                         Control(self.db).grant(conn, principal, project, "can_request")
-                        if self._selected_guard(
-                            conn,
-                            project,
-                            limits,
-                            list(resources),
-                            lock_membership=True,
-                        ) != speculative["guard"]:
+                        if (
+                            self._selected_guard(
+                                conn,
+                                project,
+                                limits,
+                                list(resources),
+                                lock_membership=True,
+                            )
+                            != speculative["guard"]
+                        ):
                             raise _StalePlacement()
                         allocations = self._locked_fit(
                             conn,
                             resources,
                             speculative["explain"]["nodeId"],
                             request,
+                            gpu_resource_ids=speculative["gpuResourceIds"],
                         )
                         if model_observation is not None:
                             now = conn.execute("SELECT clock_timestamp() AS now").fetchone()["now"]
@@ -759,9 +820,7 @@ class PlacementStore:
                             "leases": leases,
                         }
                         if model_observation is not None:
-                            model_observation.bind(
-                                conn, principal, project, run_id, result
-                            )
+                            model_observation.bind(conn, principal, project, run_id, result)
                         event(
                             conn,
                             principal.tenant_id,
@@ -769,9 +828,7 @@ class PlacementStore:
                             "inv.run.placement_reserved",
                             result,
                         )
-                        return approvals._save(
-                            conn, project, "placement.reserve", key, result
-                        )
+                        return approvals._save(conn, project, "placement.reserve", key, result)
             except _StalePlacement:
                 continue
         raise DomainError(

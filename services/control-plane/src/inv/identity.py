@@ -64,6 +64,43 @@ def trusted_file(path):
 class Identity:
     principal: Principal
     expires_at: int
+    # These values are copied only after the JWT signature and all of the
+    # resource-server claims above have been verified.  They are optional on
+    # purpose: ordinary read access keeps working for tokens minted before the
+    # fresh-auth rollout, while a privileged caller must treat either absence
+    # or malformed input as "not freshly authenticated".
+    auth_time: int | None = None
+    amr: tuple[str, ...] = ()
+    # Which issuer and which client the signature above was checked against. They are
+    # already verified by the time an Identity exists -- `issuer` is this verifier's own
+    # configured issuer and `client_id` was compared to the allowed set -- so carrying
+    # them is handing over what was checked, not re-deriving it. A release acceptance
+    # receipt records them (#282 §2-1); nothing else here reads them.
+    issuer: str | None = None
+    client_id: str | None = None
+
+
+# RFC 8176 registry values used by the product policy.  A signed but unknown
+# value is not promoted into the trusted Identity metadata.  In particular,
+# ``webauthn`` is not an RFC 8176 value; hardware/software possession is
+# represented by ``hwk``/``swk``.
+_FRESH_AUTH_AMR_VALUES = frozenset({"mfa", "pwd", "otp", "hwk", "swk"})
+
+
+def _fresh_auth_claims(claims):
+    auth_time = claims.get("auth_time")
+    amr = claims.get("amr")
+    if type(auth_time) is not int:
+        return None, ()
+    if (
+        not isinstance(amr, list)
+        or not 1 <= len(amr) <= len(_FRESH_AUTH_AMR_VALUES)
+        or any(not isinstance(value, str) for value in amr)
+        or len(set(amr)) != len(amr)
+        or not set(amr).issubset(_FRESH_AUTH_AMR_VALUES)
+    ):
+        return None, ()
+    return auth_time, tuple(sorted(amr))
 
 
 class AccessTokens:
@@ -166,9 +203,14 @@ class AccessTokens:
             scope = claims.get("scope")
             if not isinstance(scope, str) or "inv.api" not in scope.split(" "):
                 raise ValueError()
+            auth_time, amr = _fresh_auth_claims(claims)
             return Identity(
                 Principal(self.tenant_id, public_subject(self.issuer, claims["sub"])),
                 claims["exp"],
+                auth_time,
+                amr,
+                self.issuer,
+                claims["client_id"],
             )
         except (
             ValueError,

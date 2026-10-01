@@ -1,12 +1,12 @@
 ---
 doc_id: "DESIGN-S12-BE-RELEASE-ACCEPTANCE-WRITE-20261001"
 title: "S12-BE release 수락·operator sign-off 쓰기 보안 계약 설계"
-version: "1.3.0"
+version: "1.3.1"
 status: "proposed"
 author: "Codex"
 reviewer: "Claude"
 audience: "agent"
-updated: "2026-10-01T20:30:20+09:00"
+updated: "2026-10-01T22:00:04+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "3ff89b84"
@@ -192,7 +192,9 @@ credential은 digest에 들어가지 않는다.
 - `targetRefs[] = {targetId,targetSha256}`는 Git에 고정된 수용 목표·registry blob의
   identity다.
 - `measurementRefs[] = {evidenceId,evidenceSha256,observedAt}`는 이미 저장된 immutable
-  Evidence identity다.
+  Evidence identity다. 여기서 `observedAt`은 수집기가 주장한 관측 시각이 아니라 정본
+  `evidence_envelopes.recorded_at` 기본키를 UTC microseconds로 직렬화한 값이며, proposer는 카드 190의
+  권한 있는 acceptance-evidence read surface에서 이 세 값을 함께 얻는다.
 - 둘은 각각 1개 이상 필요하고 ID 중복은 거부한다. `knownLimitations`는
   `conditional`일 때만 비어 있지 않을 수 있다.
 - 구현은 모든 ref를 서버가 소유한 target/Evidence registry에서 exact digest로 resolve해야

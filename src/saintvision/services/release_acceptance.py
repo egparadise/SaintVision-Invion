@@ -63,6 +63,7 @@ from ..errors import (
 )
 from ..ids import is_id, new_id
 from . import audit as audit_service
+from ..identity import principal as principal_policy
 from . import release_acceptance_auth as fresh
 from . import release_acceptance_digest as digest
 from . import release_acceptance_policy as policy
@@ -567,7 +568,12 @@ def _open_proposal(
             GRAPH_INVALID_TRANSITION,
             "this criterion already has a different proposal awaiting a second operator",
         )
-    expires_at = min(proof.window_ends_at, now + dt.timedelta(seconds=fresh.FRESH_AUTH_WINDOW_SECONDS))
+    expires_at = min(
+        proof.window_ends_at,
+        # The canonical window, imported rather than restated: #286's decision is that
+        # one module owns how long a fresh authentication counts for.
+        now + dt.timedelta(seconds=principal_policy.FRESH_AUTH_MAX_AGE_SECONDS),
+    )
     proposal_id = new_id("acceptance_proposal")
     proposal_digest = digest.proposal_digest(
         tenant_id=principal.tenant_id,

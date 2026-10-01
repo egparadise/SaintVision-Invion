@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import time
 
 import pytest
 from fastapi.testclient import TestClient
@@ -33,9 +34,12 @@ from sqlalchemy import text
 
 from saintvision.api.app import create_app
 from saintvision.config import Settings
-from saintvision.identity.principal import FreshAuth, Principal, StaticPrincipalVerifier
+from saintvision.identity.principal import Principal, StaticPrincipalVerifier
 from saintvision.ids import new_id
+from saintvision.db.session import make_session_factory, tenant_scope
+from saintvision.errors import AUTH_PROJECT_SCOPE, InvError
 from saintvision.services import release_acceptance as service
+from saintvision.services import release_acceptance_auth as fresh_auth
 from saintvision.services import release_acceptance_policy as policy
 
 pytestmark = pytest.mark.postgres
@@ -61,14 +65,16 @@ class BoundResolver:
             raise service.ReferencesUnresolvable("the evidence is no longer resolvable")
 
 
-def _fresh(now: dt.datetime) -> FreshAuth:
-    return FreshAuth(
-        auth_time=int(now.timestamp()) - 30,
-        amr=frozenset({"mfa"}),
-        issuer=ISSUER,
-        client_id="portal",
-        expires_at=int(now.timestamp()) + 900,
-    )
+def _fresh(now: dt.datetime) -> dict:
+    """The verified fresh-auth fields a principal carries (#286: one representation)."""
+    return {
+        "verified_fresh_auth_claims": True,
+        "auth_time": int(now.timestamp()) - 30,
+        "amr": frozenset({"mfa"}),
+        "verified_token_issuer": ISSUER,
+        "verified_token_client_id": "portal",
+        "verified_token_expires_at": int(now.timestamp()) + 900,
+    }
 
 
 @pytest.fixture
@@ -136,11 +142,25 @@ def _release(owner_engine, *, tenant, user) -> tuple[str, str]:
 
 
 def _client(app_engine, monkeypatch, *, operators, who="one", now=NOW, resolver=None):
+    return _client_with(
+        app_engine, monkeypatch, operators=operators, who=who, now=now,
+        resolver=resolver, fields=_fresh(now),
+    )
+
+
+def _client_with(app_engine, monkeypatch, *, operators, who="one", now=NOW, resolver=None,
+                 fields=None):
+    """A client whose principal carries exactly these verified fields.
+
+    Separate from ``_client`` so a test can withhold one of them: #286's decision makes
+    the token provenance part of the proof, and "what happens when it is missing" is a
+    question about this boundary rather than about a malformed fixture.
+    """
     principal = Principal(
         user_id=operators[who],
         tenant_id=operators["tenant"],
         external_subject=f"oidc:{who}",
-        fresh_auth=_fresh(now),
+        **(fields if fields is not None else _fresh(now)),
     )
     monkeypatch.setattr(service, "active_resolver", lambda: resolver or BoundResolver())
     app = create_app(
@@ -537,3 +557,206 @@ def test_the_committed_409_is_audited_once_however_many_times_it_is_asked(
     assert row.outcome == "deny" and row.code == "GRAPH-0003"
     assert row.actor_type == "user" and row.actor_id == operators["two"]
     assert row.reason == "expired"
+
+
+# ------------------------------------------------------------------ the whole chain, once
+
+
+def _oidc_chain(app_engine, owner_engine, operators, tmp_path):
+    """A real signed token, a real subject mapping, a real verifier.
+
+    The point of going through all three is that the defect #286 closed lived *between*
+    them: ``AccessTokens.verify`` normalised one set of claims and a second reader in the
+    business layer judged them again. A test that calls the predicate directly cannot see
+    that, and a test that stubs the verifier proves the stub.
+    """
+    from inv.identity import public_subject
+    from saintvision.db.session import make_session_factory
+    from saintvision.identity.oidc import OidcPrincipalVerifier
+    from jwt_support import jwt_fixture
+
+    tokens = jwt_fixture(tmp_path, str(operators["tenant"]))
+    subject = public_subject(tokens.issuer, "operator-two")
+    with owner_engine.begin() as connection:
+        connection.execute(
+            text("UPDATE users SET external_subject=:s WHERE tenant_id=:t AND user_id=:u"),
+            {"s": subject, "t": operators["tenant"], "u": operators["two"]},
+        )
+    verifier = OidcPrincipalVerifier(tokens.auth, make_session_factory(app_engine))
+    return tokens, verifier
+
+
+#: Exactly the combinations the canonical allowlist admits (#285), and the age boundary.
+FRESH_ALLOWED = (
+    ("mfa",),
+    ("pwd", "otp"),
+    ("pwd", "hwk"),
+    ("pwd", "swk"),
+)
+
+
+@pytest.mark.parametrize("amr", FRESH_ALLOWED)
+@pytest.mark.parametrize("age", [0, 300])
+def test_the_whole_chain_admits_the_canonical_combinations(
+    app_engine, owner_engine, operators, tmp_path, amr, age
+):
+    tokens, verifier = _oidc_chain(app_engine, owner_engine, operators, tmp_path)
+    # Minted against the real clock on purpose: ``AccessTokens.verify`` checks ``exp`` for
+    # real, so a token stamped with this module's frozen NOW is simply expired. The policy
+    # clock is then derived from the token rather than the other way round.
+    issued = int(time.time())
+    now = dt.datetime.fromtimestamp(issued, tz=UTC)
+    token = tokens.token(
+        "operator-two",
+        claims={"auth_time": issued - age, "amr": list(amr), "exp": issued + 600,
+                "iat": issued},
+    )
+    principal = verifier.verify(token)
+    assert principal.verified_fresh_auth_claims is True
+    assert principal.verified_token_issuer == tokens.issuer
+    assert principal.verified_token_client_id == "synthetic-web"
+    assert principal.verified_token_expires_at == issued + 600
+
+    sessionmaker = make_session_factory(app_engine)
+    with sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, operators["tenant"]):
+                proof = service.require_fresh_operator(
+                    session, principal=principal, now=now
+                )
+    assert proof.auth_time == issued - age
+    assert proof.issuer == tokens.issuer and proof.client_id == "synthetic-web"
+    assert proof.amr_sha256 == fresh_auth.amr_digest(frozenset(amr))
+
+
+@pytest.mark.parametrize(
+    ("label", "claims"),
+    [
+        ("no claims at all", {}),
+        ("auth_time is a bool", {"auth_time": True, "amr": ["mfa"]}),
+        ("auth_time is a string", {"auth_time": "1790000000", "amr": ["mfa"]}),
+        ("auth_time is a float", {"auth_time": 1790000000.0, "amr": ["mfa"]}),
+        ("auth_time is negative", {"auth_time": -1, "amr": ["mfa"]}),
+        ("auth_time is in the future", {"auth_time": "FUTURE", "amr": ["mfa"]}),
+        ("301 seconds old", {"auth_time": "STALE", "amr": ["mfa"]}),
+        ("no method at all", {"auth_time": "NOW", "amr": []}),
+        ("a password alone", {"auth_time": "NOW", "amr": ["pwd"]}),
+        ("a one-time code alone", {"auth_time": "NOW", "amr": ["otp"]}),
+        ("an unregistered method", {"auth_time": "NOW", "amr": ["webauthn"]}),
+        # The one that matters most: this combination passed an independent RFC 8176
+        # check while the canonical allowlist refused it. With one policy it is refused
+        # once, here, and there is no second answer for it to disagree with.
+        ("mfa with an out-of-allowlist factor", {"auth_time": "NOW", "amr": ["mfa", "sms"]}),
+    ],
+)
+def test_the_whole_chain_refuses_everything_else(
+    app_engine, owner_engine, operators, tmp_path, label, claims
+):
+    tokens, verifier = _oidc_chain(app_engine, owner_engine, operators, tmp_path)
+    issued = int(time.time())
+    now = dt.datetime.fromtimestamp(issued, tz=UTC)
+    resolved = dict(claims)
+    substitutions = {"NOW": issued, "FUTURE": issued + 1, "STALE": issued - 301}
+    if resolved.get("auth_time") in substitutions:
+        resolved["auth_time"] = substitutions[resolved["auth_time"]]
+    token = tokens.token(
+        "operator-two", claims={**resolved, "exp": issued + 600, "iat": issued}
+    )
+    principal = verifier.verify(token)
+
+    sessionmaker = make_session_factory(app_engine)
+    with sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, operators["tenant"]):
+                with pytest.raises(InvError) as refused:
+                    service.require_fresh_operator(session, principal=principal, now=now)
+    assert refused.value.code == AUTH_PROJECT_SCOPE, label
+
+
+@pytest.mark.parametrize("missing", ["issuer", "client_id", "expires_at"])
+def test_token_provenance_is_fail_closed_and_writes_nothing(
+    app_engine, owner_engine, operators, monkeypatch, missing
+):
+    """§2-1's receipt facts are verified metadata, not optional decoration.
+
+    A principal that is fresh by the canonical predicate but carries no verified issuer,
+    client or expiry is refused -- and the refusal is the same ``AUTH-0030``/403 as a
+    missing permission, with no proposal, no vote and no audit row behind it.
+    """
+    fields = dict(_fresh(NOW))
+    fields[f"verified_token_{missing}"] = None
+    release_id, manifest = _release(
+        owner_engine, tenant=operators["tenant"], user=operators["one"]
+    )
+    client = _client_with(app_engine, monkeypatch, operators=operators, who="one",
+                          fields=fields)
+    response = client.post(
+        f"/v1/release-manifests/{release_id}/acceptance-decisions",
+        headers=_headers("provenance"),
+        content=json.dumps(_decision_body(manifest)),
+    )
+    assert response.status_code == 403, response.text
+    assert response.json()["code"] == "AUTH-0030"
+    for table in ("release_acceptance_proposals", "release_acceptance_votes",
+                  "acceptance_records"):
+        assert _count(
+            owner_engine, f"SELECT count(*) FROM {table} WHERE tenant_id=:t",
+            t=operators["tenant"],
+        ) == 0, table
+    # The refusal itself IS audited -- §8 asks for exactly that, and the canonical
+    # boundary records it. What must be absent is any audit of a write that did not
+    # happen.
+    assert _count(
+        owner_engine,
+        "SELECT count(*) FROM audit_events WHERE tenant_id=:t AND action=:a",
+        t=operators["tenant"], a=service.AUDIT_DENIED,
+    ) == 1
+    for action in (service.AUDIT_PROPOSED, service.AUDIT_RECORDED, service.AUDIT_CONFIRMED,
+                   service.AUDIT_WITHDRAWN, service.AUDIT_INVALIDATED):
+        assert _count(
+            owner_engine,
+            "SELECT count(*) FROM audit_events WHERE tenant_id=:t AND action=:a",
+            t=operators["tenant"], a=action,
+        ) == 0, action
+
+
+def test_an_expired_verified_token_cannot_cast_a_vote(app_engine, owner_engine, operators,
+                                                      monkeypatch):
+    """The window a receipt records would already be over."""
+    fields = dict(_fresh(NOW))
+    fields["verified_token_expires_at"] = int(NOW.timestamp()) - 1
+    release_id, manifest = _release(
+        owner_engine, tenant=operators["tenant"], user=operators["one"]
+    )
+    client = _client_with(app_engine, monkeypatch, operators=operators, who="one",
+                          fields=fields)
+    response = client.post(
+        f"/v1/release-manifests/{release_id}/acceptance-decisions",
+        headers=_headers("expired"),
+        content=json.dumps(_decision_body(manifest)),
+    )
+    assert response.status_code == 403, response.text
+    assert response.json()["code"] == "AUTH-0030"
+
+
+def test_a_hand_built_principal_cannot_claim_fresh_authentication(app_engine, owner_engine,
+                                                                 operators, monkeypatch):
+    """Filling the fields is not the same as having been verified.
+
+    ``verified_fresh_auth_claims`` is set by ``OidcPrincipalVerifier`` and by nothing
+    else, so a development verifier that fills ``auth_time`` and ``amr`` is still refused.
+    """
+    fields = dict(_fresh(NOW))
+    fields["verified_fresh_auth_claims"] = False
+    release_id, manifest = _release(
+        owner_engine, tenant=operators["tenant"], user=operators["one"]
+    )
+    client = _client_with(app_engine, monkeypatch, operators=operators, who="one",
+                          fields=fields)
+    response = client.post(
+        f"/v1/release-manifests/{release_id}/acceptance-decisions",
+        headers=_headers("hand-built"),
+        content=json.dumps(_decision_body(manifest)),
+    )
+    assert response.status_code == 403, response.text
+    assert response.json()["code"] == "AUTH-0030"

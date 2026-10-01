@@ -219,6 +219,36 @@ class NodeDelivery:
         self.channels = NodeChannels(database)
         self.receipts = NodeReceiptStore(database)
 
+    def _quarantine_gpu_node(self, node, claim, allocation, error):
+        """Retain every lease and quarantine the Node after uncertain GPU cleanup."""
+
+        from .runs import event
+
+        reason_code = error.code if isinstance(error, DomainError) else "SYS-0001"
+        with self.db.transaction(node.tenant_id) as conn:
+            current = conn.execute(
+                "SELECT status FROM inv.nodes WHERE node_id=%s FOR UPDATE",
+                (node.node_id,),
+            ).fetchone()
+            if not current:
+                raise DomainError("NODE-0033", "GPU Node identity is unavailable", 409)
+            conn.execute(
+                "UPDATE inv.nodes SET status='quarantined' WHERE node_id=%s",
+                (node.node_id,),
+            )
+            event(
+                conn,
+                node.tenant_id,
+                claim["runId"],
+                "inv.gpu.cleanup_quarantined",
+                {
+                    "resourceId": allocation["resourceId"],
+                    "leaseId": allocation["leaseId"],
+                    "observationDigest": allocation["observationDigest"],
+                    "reasonCode": reason_code,
+                },
+            )
+
     def deliver(self, node, permit, *, observation_only=False, cancel_only=False):
         permit = deepcopy(permit)
         validate_contract("SignedNodePermit", permit)
@@ -242,31 +272,37 @@ class NodeDelivery:
             if not observation_only and not cancel_only:
                 error.not_sent = True
             raise
-        result = self.client.exchange(
-            channel,
-            permit,
-            observation_only=observation_only,
-            **({"cancel_only": True} if cancel_only else {}),
-        )
-        receipt = result["receipt"]
-        if (
-            any(
-                receipt[k] != claim[k]
-                for k in [
-                    "claimId",
-                    "commandId",
-                    "tenantId",
-                    "nodeId",
-                    "projectId",
-                    "runId",
-                    "recoveryEpoch",
-                    "planDigest",
-                ]
+        gpu_allocation = payload["launch"].get("gpuAllocation")
+        try:
+            result = self.client.exchange(
+                channel,
+                permit,
+                observation_only=observation_only,
+                **({"cancel_only": True} if cancel_only else {}),
             )
-            or receipt["allocations"] != payload["allocations"]
-        ):
-            raise DomainError(
-                "NODE-0035", "Node response is not bound to the requested permit", 502
-            )
-        self.receipts.record(node, receipt, channel=channel)
-        return result
+            receipt = result["receipt"]
+            if (
+                any(
+                    receipt[k] != claim[k]
+                    for k in [
+                        "claimId",
+                        "commandId",
+                        "tenantId",
+                        "nodeId",
+                        "projectId",
+                        "runId",
+                        "recoveryEpoch",
+                        "planDigest",
+                    ]
+                )
+                or receipt["allocations"] != payload["allocations"]
+            ):
+                raise DomainError(
+                    "NODE-0035", "Node response is not bound to the requested permit", 502
+                )
+            self.receipts.record(node, receipt, channel=channel)
+            return result
+        except Exception as error:
+            if gpu_allocation is not None and not observation_only:
+                self._quarantine_gpu_node(node, claim, gpu_allocation, error)
+            raise

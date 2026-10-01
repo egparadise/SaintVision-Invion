@@ -373,6 +373,41 @@ export interface AuthorizedCommand {
 
 export type ClaimId = string;
 
+export interface GPUDeviceObservation {
+  resourceId: ResourceId;
+  deviceId: string;
+  vendor: string;
+  model: string;
+  totalVramBytes: number;
+  computeCapability: string;
+  driverVersion: string;
+  runtimeVersion: string;
+  providerVersion: string;
+  observationDigest: string;
+  healthy: true;
+  exclusive: true;
+  runtimeCompatible: true;
+  deviceRequestDriver: "nvidia";
+}
+
+export interface GPUAllocation {
+  nodeId: NodeId;
+  resourceId: ResourceId;
+  leaseId: LeaseId;
+  fencingToken: string;
+  deviceId: string;
+  vramBytes: number;
+  providerVersion: string;
+  profileVersion: string;
+  recoveryEpoch: string;
+  observationDigest: string;
+  observedAt: Timestamp;
+  exclusive: true;
+  runtimeCompatible: true;
+  healthy: true;
+  deviceRequestDriver: "nvidia";
+}
+
 export interface SandboxLaunchSpec {
   profileVersion: string;
   imageDigest: string;
@@ -391,6 +426,7 @@ export interface SandboxLaunchSpec {
   noNewPrivileges: true;
   privileged: false;
   hostAccess: false;
+  gpuAllocation?: GPUAllocation;
   workspaceInput?: WorkspaceInput;
   terminal?: TerminalSpec;
 }
@@ -413,7 +449,7 @@ export interface ExecutionClaim {
 export interface NodeAllocation {
   lease: ResourceLease;
   nodeId: NodeId;
-  kind: "cpu" | "memory";
+  kind: "cpu" | "memory" | "gpu";
 }
 
 export interface NodeExecutionPermit {
@@ -515,6 +551,7 @@ export interface NodeResourceSnapshot {
   memoryAvailableBytes: number;
   osType: "linux";
   agentVersion: "0.1.0";
+  gpuDevices?: Array<GPUDeviceObservation>;
 }
 
 export interface NodeChunkInput {

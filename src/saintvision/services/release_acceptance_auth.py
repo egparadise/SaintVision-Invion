@@ -2,28 +2,31 @@
 
 A release acceptance vote has to rest on an interactive human authenticating a few
 minutes ago. Nothing in a request body can establish that -- a body is what the caller
-chose to send -- so this module reads only what a verifier already checked, and it
-refuses by default:
+chose to send -- so this module reads only what a verifier already checked.
 
-* **no fresh-auth claims at all is a refusal, not a gap to fill in later.** Today that
-  is every token, because no identity provider in this deployment emits ``auth_time``
-  or ``amr`` yet (card 188 is building that supply). The acceptance routes are
-  consequently closed, and this module is the reason they are closed *honestly* rather
-  than by a flag somebody could flip without the claims arriving;
-* ``auth_time`` must be an integer, not in the future, and within 300 seconds of now.
-  A future value is refused rather than clamped: a clock that disagrees that much is
-  not evidence of anything, and treating it as "very fresh" would reward the error;
-* ``amr`` must contain only values from the IANA AMR registry (RFC 8176). An
-  unregistered string is refused even when it sounds strong -- ``webauthn`` is the
-  example the design names, and the point is that this code cannot know what a string
-  it does not recognise means;
-* the methods must amount to more than a password: ``mfa``, or ``pwd`` together with
-  one of ``otp`` / ``hwk`` / ``swk``. ``pwd`` alone is refused. A token lifetime
-  (``exp - iat``) is not a substitute, however short.
+**It does not decide.** ``saintvision.identity.principal.has_fresh_interactive_auth()``
+decides, on the values ``inv.identity.AccessTokens.verify()`` normalised after checking
+the signature, issuer, audience, client and expiry. This module is the consumer that
+turns a true answer into the facts a vote row stores.
 
-What it returns is a ``FreshAuthProof``: the facts a vote row stores. The AMR set
-travels as a digest, not as a list, because the vote table must not become a claim
-store -- a digest cannot grow a free-text field.
+That split is Codex's #286 decision, and it closes a measured defect rather than a
+matter of taste. The first version of this module carried its own RFC 8176 allowlist, its
+own second-factor rule and its own window constant, and the merge of ``#285`` with
+``#286`` put the two policies side by side: ``mfa+sms`` passed this module's registry
+check while the canonical allowlist refused it, and the other direction was worse --
+this module's reader expected ``identity.issuer``/``client_id``, which the kernel did not
+emit, so on the real OIDC path the proof was permanently absent. One representation can
+be wrong; two can be wrong in opposite directions at the same time.
+
+So what remains here is narrow:
+
+* ask the canonical predicate, and refuse if it says no. No second opinion, no widened
+  registry, no local window;
+* read the token provenance the verifier handed over -- issuer, client, expiry -- and
+  refuse if any is missing, is not the right type, or has already passed. These are
+  receipt facts, not policy inputs, and nothing re-reads a token or a body to get them;
+* return the vote's facts, with the AMR set as a **digest** rather than a list, because
+  the vote table must not become a claim store.
 """
 
 from __future__ import annotations
@@ -32,43 +35,11 @@ import datetime as dt
 import hashlib
 from dataclasses import dataclass
 
-from ..identity.principal import FreshAuth, Principal
-
-#: The IANA "Authentication Method Reference Values" registry (RFC 8176 §2). Written
-#: out because the rule is "only registered values", and a rule that referred to a
-#: document nobody can check at runtime would be a comment, not a check.
-RFC8176_VALUES = frozenset(
-    {
-        "face",
-        "fpt",
-        "geo",
-        "hwk",
-        "iris",
-        "kba",
-        "mca",
-        "mfa",
-        "otp",
-        "pin",
-        "pop",
-        "pwd",
-        "retina",
-        "rba",
-        "sc",
-        "sms",
-        "swk",
-        "tel",
-        "user",
-        "vbm",
-        "wia",
-    }
+from ..identity.principal import (
+    FRESH_AUTH_MAX_AGE_SECONDS,
+    Principal,
+    has_fresh_interactive_auth,
 )
-
-#: Methods that, with ``pwd``, make the authentication more than a password.
-SECOND_FACTORS = frozenset({"otp", "hwk", "swk"})
-
-#: How recently the human must have authenticated (§2-1). Also the length of an
-#: accepted proposal's confirmation window (§2-2), which is why it is one constant.
-FRESH_AUTH_WINDOW_SECONDS = 300
 
 #: Which rule admitted a vote. Stored on the row, so a later reader learns what was
 #: checked rather than assuming today's rule.
@@ -83,8 +54,8 @@ class FreshAuthProof:
     amr_sha256: str
     issuer: str
     client_id: str
-    #: The earlier of ``auth_time + 300s`` and the token's expiry: after it, a new
-    #: fresh-auth proposal is needed rather than a longer-lived one (§2-2).
+    #: The earlier of ``auth_time + the canonical window`` and the token's expiry: after
+    #: it, a new fresh-auth proposal is needed rather than a longer-lived one (§2-2).
     window_ends_at: dt.datetime
     attestation_version: str = ATTESTATION_VERSION
 
@@ -112,62 +83,53 @@ def amr_digest(values: frozenset[str]) -> str:
     return hashlib.sha256(",".join(sorted(values)).encode("utf-8")).hexdigest()
 
 
-def _check_methods(amr: frozenset[str]) -> None:
-    if not amr:
-        raise NotInteractiveHuman("the token names no authentication method")
-    unknown = sorted(amr - RFC8176_VALUES)
-    if unknown:
-        # Named in the reason for a log, not for a response. An unregistered value is
-        # refused even if it sounds strong: this code cannot know what it means.
-        raise NotInteractiveHuman(f"unregistered authentication method reference: {unknown}")
-    if "mfa" in amr:
-        return
-    if "pwd" in amr and amr & SECOND_FACTORS:
-        return
-    raise NotInteractiveHuman("the authentication was not more than a password")
-
-
-def proof_of_interactive_human(
-    principal: Principal, *, now: dt.datetime, window_seconds: int = FRESH_AUTH_WINDOW_SECONDS
-) -> FreshAuthProof:
+def proof_of_interactive_human(principal: Principal, *, now: dt.datetime) -> FreshAuthProof:
     """The proof, or ``NotInteractiveHuman``. Never a partial answer.
 
     Raises rather than returning ``None`` because every caller must stop, and an
     optional return invites a caller that forgets to look.
+
+    The window is not a parameter. A caller that could pass a wider one would be a
+    second policy, which is the thing this module stopped being.
     """
-    fresh: FreshAuth | None = getattr(principal, "fresh_auth", None)
-    if fresh is None:
-        raise NotInteractiveHuman("the verified credential carries no fresh-auth claims")
-    if not isinstance(fresh.auth_time, int) or isinstance(fresh.auth_time, bool):
-        raise NotInteractiveHuman("auth_time is not an integer")
-    if fresh.auth_time <= 0:
-        raise NotInteractiveHuman("auth_time is not a time")
-    if not isinstance(fresh.expires_at, int) or fresh.expires_at <= 0:
-        raise NotInteractiveHuman("the token expiry is not a time")
-    if not isinstance(fresh.issuer, str) or not fresh.issuer.startswith("https://"):
-        raise NotInteractiveHuman("the verified issuer is not an https issuer")
-    if not isinstance(fresh.client_id, str) or not fresh.client_id:
-        raise NotInteractiveHuman("the verified client is unnamed")
-    if now.tzinfo is None:
+    if now.tzinfo is None or now.utcoffset() is None:
         raise NotInteractiveHuman("the request time must say which zone it is in")
 
-    authenticated = dt.datetime.fromtimestamp(fresh.auth_time, tz=dt.timezone.utc)
-    if authenticated > now:
-        # Not clamped. A clock this wrong is not evidence, and calling a future
-        # authentication "very fresh" would make the error useful to an attacker.
-        raise NotInteractiveHuman("auth_time is in the future")
-    if (now - authenticated).total_seconds() > window_seconds:
-        raise NotInteractiveHuman("the interactive authentication is not recent enough")
+    # The one judgement, made in one place. Everything below is bookkeeping about a
+    # request that has already been admitted.
+    if not has_fresh_interactive_auth(principal, now=now):
+        raise NotInteractiveHuman("no verified fresh interactive authentication")
 
-    _check_methods(frozenset(fresh.amr or frozenset()))
+    auth_time = principal.auth_time
+    if type(auth_time) is not int:                       # pragma: no cover - predicate holds
+        raise NotInteractiveHuman("auth_time is not an integer")
 
-    token_expiry = dt.datetime.fromtimestamp(fresh.expires_at, tz=dt.timezone.utc)
+    issuer = principal.verified_token_issuer
+    client_id = principal.verified_token_client_id
+    expires_at = principal.verified_token_expires_at
+    if not isinstance(issuer, str) or not issuer.startswith("https://"):
+        raise NotInteractiveHuman("the verified issuer is not an https issuer")
+    if not isinstance(client_id, str) or not client_id:
+        raise NotInteractiveHuman("the verified client is unnamed")
+    if type(expires_at) is not int or expires_at <= 0:
+        raise NotInteractiveHuman("the token expiry is not a time")
+
+    token_expiry = dt.datetime.fromtimestamp(expires_at, tz=dt.timezone.utc)
+    if token_expiry <= now:
+        # A receipt whose token had already expired would record a window that was over
+        # before the vote was cast.
+        raise NotInteractiveHuman("the verified token had already expired")
+
+    authenticated = dt.datetime.fromtimestamp(auth_time, tz=dt.timezone.utc)
     return FreshAuthProof(
-        auth_time=fresh.auth_time,
-        amr_sha256=amr_digest(frozenset(fresh.amr)),
-        issuer=fresh.issuer,
-        client_id=fresh.client_id,
+        auth_time=auth_time,
+        amr_sha256=amr_digest(frozenset(principal.amr)),
+        issuer=issuer,
+        client_id=client_id,
         # The earlier of the two, so neither a long-lived token nor a long window can
-        # extend the other (§2-2).
-        window_ends_at=min(authenticated + dt.timedelta(seconds=window_seconds), token_expiry),
+        # extend the other (§2-2). The window length is the canonical one.
+        window_ends_at=min(
+            authenticated + dt.timedelta(seconds=FRESH_AUTH_MAX_AGE_SECONDS),
+            token_expiry,
+        ),
     )

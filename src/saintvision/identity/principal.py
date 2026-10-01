@@ -24,6 +24,7 @@ isolation, but every user in a tenant passes RLS, so "another project's data"
 
 from __future__ import annotations
 
+import datetime as dt
 import os
 import uuid
 from dataclasses import dataclass, field
@@ -33,27 +34,13 @@ from ..config import SettingUnresolved
 from ..errors import AUTH_INVALID_CREDENTIAL, AUTH_PROJECT_SCOPE, InvError
 
 
-@dataclass(frozen=True, slots=True)
-class FreshAuth:
-    """What a verified token said about the human who authenticated.
-
-    Only ever built from claims a verifier checked, and it holds no credential: an
-    authentication time, the methods used, and which issuer and client verified them.
-    Those four are what a release acceptance vote records (design #282 §2-1), and the
-    reason they are a separate object is that almost every request has none -- the
-    field is ``None`` for every endpoint that does not need step-up, and code that
-    needs it must therefore say so.
-
-    ``amr`` is a set because order carries no meaning, and ``expires_at`` is here
-    because an accepted proposal's window is the earlier of ``auth_time + 300s`` and
-    the token's own expiry (§2-2).
-    """
-
-    auth_time: int
-    amr: frozenset[str]
-    issuer: str
-    client_id: str
-    expires_at: int
+# ``FreshAuth`` lived here. It was a second representation of the same claims, and
+# Codex's #286 decision removed it: ``#285``'s verified-and-normalised values plus
+# ``has_fresh_interactive_auth()`` below are the only source. Keeping both allowed a
+# combination one side admitted and the other refused -- measured on the #291 merge,
+# where ``mfa+sms`` passed an independent RFC 8176 check while the canonical allowlist
+# refused it, and where the other path read ``identity.issuer`` that the kernel did not
+# emit and so stayed permanently ``None``. Fail-open and fail-closed at once.
 
 
 @dataclass(frozen=True, slots=True)
@@ -73,11 +60,22 @@ class Principal:
     #: the row the execution kernel reads.
     project_ids: frozenset[str] = field(default_factory=frozenset)
     roles: frozenset[str] = field(default_factory=frozenset)
-    #: Present only when the verifier was given a token carrying verified fresh-auth
-    #: claims. ``None`` is the normal state and means exactly "this request proves no
-    #: interactive authentication", which the acceptance routes treat as a refusal
-    #: rather than as a missing optimisation.
-    fresh_auth: FreshAuth | None = None
+    # Only OidcPrincipalVerifier sets this flag.  Hand-built principals used by
+    # development/test verifiers cannot claim fresh authentication merely by
+    # filling the two fields below.
+    verified_fresh_auth_claims: bool = False
+    auth_time: int | None = None
+    amr: frozenset[str] = field(default_factory=frozenset)
+    #: Token provenance a release acceptance receipt records (#282 §2-1): which issuer
+    #: and client the signature was checked against, and when that token expires.
+    #:
+    #: Copied from the verified ``inv.identity.Identity`` and from nowhere else -- not
+    #: from a request body and not by decoding the token again. ``None`` is the normal
+    #: state for every verifier that is not the OIDC one, and the acceptance boundary
+    #: treats a missing value as a refusal rather than as something to default.
+    verified_token_issuer: str | None = None
+    verified_token_client_id: str | None = None
+    verified_token_expires_at: int | None = None
 
     def require_project(self, project_id: str) -> None:
         if project_id not in self.project_ids:
@@ -92,6 +90,42 @@ class Principal:
 
     def has_role(self, code: str) -> bool:
         return code in self.roles
+
+
+FRESH_AUTH_MAX_AGE_SECONDS = 300
+FRESH_AUTH_AMR_VALUES = frozenset({"mfa", "pwd", "otp", "hwk", "swk"})
+FRESH_AUTH_SECOND_FACTORS = frozenset({"otp", "hwk", "swk"})
+
+
+def has_fresh_interactive_auth(
+    principal: Principal,
+    *,
+    now: dt.datetime,
+    max_age_seconds: int = FRESH_AUTH_MAX_AGE_SECONDS,
+) -> bool:
+    """Return whether a verified principal carries the S12 fresh-auth proof.
+
+    This is deliberately a predicate rather than an authentication exception:
+    read-only routes can keep accepting a valid older token, while the release
+    acceptance write boundary can return its canonical AUTH-0030 response.
+    """
+
+    if now.tzinfo is None or now.utcoffset() is None:
+        raise ValueError("now must be timezone-aware")
+    if type(max_age_seconds) is not int or not 1 <= max_age_seconds <= 300:
+        raise ValueError("fresh-auth max age must be an integer in 1..300")
+    if not principal.verified_fresh_auth_claims or type(principal.auth_time) is not int:
+        return False
+    if not principal.amr or not principal.amr.issubset(FRESH_AUTH_AMR_VALUES):
+        return False
+
+    current = int(now.timestamp())
+    age = current - principal.auth_time
+    if age < 0 or age > max_age_seconds:
+        return False
+    return "mfa" in principal.amr or (
+        "pwd" in principal.amr and bool(principal.amr & FRESH_AUTH_SECOND_FACTORS)
+    )
 
 
 class PrincipalVerifier(Protocol):
