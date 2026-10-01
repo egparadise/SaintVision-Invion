@@ -66,7 +66,13 @@ jobs:
       INV_TEST_ARCHIVER_IMAGE: postgres:16
 
     steps:
+      # Full history: tools/check_vf_cl_registry.py re-derives two rules from it -- whether
+      # verifiedAgainst.tree is an ancestor of HEAD, and which pull requests merged. With
+      # the default fetch-depth 1 neither is knowable, and the checker reports that rather
+      # than passing quietly, so this job would fail on a truncated checkout.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
