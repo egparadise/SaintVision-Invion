@@ -53,9 +53,10 @@ MANIFEST = {
     ],
     "createdAt": NOW,
     "operatorSignOff": False,
-    "operatorSignOffBlockedBy": "human-attestation-contract-absent",
+    "operatorSignOffBlockedBy": "human-attestation-implementation-unavailable",
     "requiredDistinctOperatorCount": 2,
     "confirmedOperatorCount": 0,
+    "matchingAcceptedUserCount": 0,
     "acceptanceCount": 0,
 }
 
@@ -137,13 +138,14 @@ def test_an_accepted_decision_is_reported_with_its_pinned_hash(client, monkeypat
     _detail(
         monkeypatch,
         {
-            "release": {**MANIFEST, "confirmedOperatorCount": 1, "acceptanceCount": 1},
+            "release": {**MANIFEST, "matchingAcceptedUserCount": 1, "acceptanceCount": 1},
             "acceptances": [acceptance],
         },
     )
     body = client.get(f"/v1/release-manifests/{RELEASE_ID}", headers=AUTH).json()
     assert body["release"]["operatorSignOff"] is False
-    assert body["release"]["confirmedOperatorCount"] == 1
+    assert body["release"]["confirmedOperatorCount"] == 0
+    assert body["release"]["matchingAcceptedUserCount"] == 1
     assert set(body["acceptances"][0]) == set(acceptance)
     assert "acceptedByUserId" not in body["acceptances"][0]
     assert "notes" not in body["acceptances"][0]
@@ -271,6 +273,41 @@ def test_the_blocked_reason_is_a_fixed_value(client, monkeypatch):
         )
 
 
+@pytest.mark.parametrize("count", [1, 2, 3])
+def test_the_contract_refuses_a_confirmed_operator_count_above_zero(client, monkeypatch, count):
+    """``confirmedOperatorCount`` is about attestation, and nothing implements it.
+
+    The coordinator's decision of 2026-10-01 reserves this field for operators a
+    person is attested to be (``#282``, card 184). Until that exists, a number
+    above zero on this surface would be a count of something else wearing the
+    word "confirmed" -- which is what the field did before the rename, with the
+    raw count of matching accepted users in it. So the model refuses it, rather
+    than this module promising not to compute it.
+    """
+    import pydantic
+
+    with pytest.raises(pydantic.ValidationError):
+        schemas.ReleaseManifestResponse.model_validate(
+            {**MANIFEST, "confirmedOperatorCount": count}
+        )
+
+
+def test_the_raw_count_is_a_separate_field_that_may_be_above_zero(client, monkeypatch):
+    """The other half of the decision: the recorded fact still travels.
+
+    If the rename had only pinned a field to zero, the response would have lost
+    the number a reader needs -- how many distinct users have an accepted row on
+    this composition. It is here, under a name that claims nothing about who they
+    are.
+    """
+    body = schemas.ReleaseManifestResponse.model_validate(
+        {**MANIFEST, "matchingAcceptedUserCount": 2}
+    )
+    assert body.matching_accepted_user_count == 2
+    assert body.confirmed_operator_count == 0
+    assert body.operator_sign_off is False
+
+
 def test_the_required_quorum_is_two_and_cannot_be_lowered_in_the_response(client, monkeypatch):
     """Lowering the target is the other way to make "1 of 2" read as satisfied."""
     import pydantic
@@ -279,6 +316,104 @@ def test_the_required_quorum_is_two_and_cannot_be_lowered_in_the_response(client
         schemas.ReleaseManifestResponse.model_validate(
             {**MANIFEST, "requiredDistinctOperatorCount": 1}
         )
+
+
+# --------------------------------------------------------------- what the contract requires
+
+#: What each response must always carry. Written out rather than derived from the models,
+#: because the point is to state the intent: every one of these five responses sends every
+#: field it declares, so nothing here is optional. A list that was optional in the schema
+#: generated `items?:` for the front end, whose guard then refused the payload the server
+#: sends -- Codex found that reviewing #281. Absent is not empty.
+REQUIRED_FIELDS = {
+    "ReleaseComponentResponse": {"name", "kind", "digest"},
+    "ReleaseAcceptanceResponse": {
+        "acceptanceId",
+        "acceptanceIdRef",
+        "outcome",
+        "acceptedManifestSha256",
+        "manifestMatches",
+        "knownLimitations",
+        "decidedAt",
+    },
+    "ReleaseManifestResponse": {
+        "releaseId",
+        "version",
+        "componentCount",
+        "manifestSha256",
+        "components",
+        "createdAt",
+        "operatorSignOff",
+        "operatorSignOffBlockedBy",
+        "requiredDistinctOperatorCount",
+        "confirmedOperatorCount",
+        "matchingAcceptedUserCount",
+        "acceptanceCount",
+    },
+    "ReleaseManifestDetailResponse": {"release", "acceptances"},
+    "ReleaseManifestPageResponse": {"items", "nextCursor"},
+}
+
+CONTRACT_FILES = {
+    "ReleaseManifestResponse": "release-manifest-response.schema.json",
+    "ReleaseManifestDetailResponse": "release-manifest-detail-response.schema.json",
+    "ReleaseManifestPageResponse": "release-manifest-page-response.schema.json",
+}
+
+
+@pytest.mark.parametrize("name,required", sorted(REQUIRED_FIELDS.items()))
+def test_every_field_these_responses_declare_is_required(name, required):
+    """No optional fields, and the declared set is the required set.
+
+    Two assertions, because either alone would miss half of it: a field could be
+    required and undeclared (impossible), or declared and optional (what happened).
+    """
+    document = getattr(schemas, name).model_json_schema(by_alias=True)
+    assert set(document["properties"]) == required
+    assert set(document.get("required", [])) == required
+
+
+@pytest.mark.parametrize("name,filename", sorted(CONTRACT_FILES.items()))
+def test_the_published_contract_requires_them_too(name, filename):
+    """The generated client reads the file, not the model.
+
+    ``export_schemas.py --check`` already asserts the file matches the model, but this
+    names the property the front end depends on, so a future default that slipped
+    through would fail with the reason rather than as a diff.
+    """
+    document = json.loads(
+        (ROOT / "contracts" / filename).read_text(encoding="utf-8")
+    )
+    assert set(document.get("required", [])) == REQUIRED_FIELDS[name]
+
+
+@pytest.mark.parametrize(
+    "model,payload",
+    [
+        ("ReleaseManifestPageResponse", {"nextCursor": None}),
+        ("ReleaseManifestPageResponse", {"items": []}),
+        ("ReleaseManifestDetailResponse", {"release": MANIFEST}),
+        ("ReleaseAcceptanceResponse", "acceptance-without-limitations"),
+        ("ReleaseManifestResponse", "manifest-without-components"),
+    ],
+)
+def test_a_response_missing_a_list_or_cursor_is_refused(model, payload):
+    """Each omission on its own, including the one the server could never send."""
+    import pydantic
+
+    if payload == "acceptance-without-limitations":
+        payload = {
+            "acceptanceId": "acc_01J8Z3XQ2K9WMV5T7N4B6C8D0E",
+            "acceptanceIdRef": "acc_01J8Z3XQ",
+            "outcome": "accepted",
+            "acceptedManifestSha256": HASH,
+            "manifestMatches": True,
+            "decidedAt": NOW,
+        }
+    elif payload == "manifest-without-components":
+        payload = {k: v for k, v in MANIFEST.items() if k != "components"}
+    with pytest.raises(pydantic.ValidationError):
+        getattr(schemas, model).model_validate(payload)
 
 
 @pytest.mark.parametrize(
