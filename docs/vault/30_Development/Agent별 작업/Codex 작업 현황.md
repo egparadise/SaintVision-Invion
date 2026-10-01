@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.235"
+version: "1.0.236"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T13:40:45+09:00"
+updated: "2026-10-01T14:13:24+09:00"
 source_of_truth: "Git"
 active_card: "CARD-172 S08-BE BuildKit contract boundary"
-active_card_status: "strict BuildRequest/BuildPlan/BuildReceipt and generated bindings implemented; Go RE2 drift corrected; focused PG-free 45 passed"
-active_card_next: "contract/docs gates, PR and Claude review; adapter/ROOF/GPU remain separate cards"
+active_card_status: "Claude r2 W1 enum/pattern/unknown-key mutations pinned by negative controls; focused PG-free 54 passed"
+active_card_next: "exact-head hosted Core/Backend and Claude re-review; adapter/ROOF/GPU remain separate cards"
 ---
 
 ## 2026-10-01 Card 172 — S08-BE BuildKit 계약 경계
@@ -18,8 +18,10 @@ active_card_next: "contract/docs gates, PR and Claude review; adapter/ROOF/GPU r
 - `BuildPlan`의 rootless/privileged/hostAccess/devices/binds를 literal로 고정하고,
   network policy, resource budget, lease/fencing, cache·secret reference digest,
   immutable base digest를 필수화했다. `WorkloadSpec`과 build 계약은 섞이지 않는다.
-- focused PG-free 계약 시험은 45 passed다. 첫 Core에서 Go RE2 비호환 pattern을 잡아
+- focused PG-free 계약 시험은 54 passed다. 첫 Core에서 Go RE2 비호환 pattern을 잡아
   공통 정규식으로 교정했으며 재발 방지 source guard를 추가했다.
+  Claude r2 W1의 enum 4종·pattern 4종·unknown-key 변이는 각각 독립 부정
+  대조군으로 고정했다.
   rootless daemon과 실제 격리·감사 실행은
   아직 `NOT_OBSERVED`이며 Claude 계약 검토 뒤 별도 adapter 카드로 진행한다.
 - 근거: [[2026-10-01_13-40-45_KST_S08-BE_BuildKit_계약경계_Codex]].

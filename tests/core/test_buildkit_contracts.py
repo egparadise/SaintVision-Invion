@@ -124,6 +124,21 @@ def _receipt() -> dict:
     }
 
 
+def _failed_receipt() -> dict:
+    receipt = _receipt()
+    receipt["result"] = "failed"
+    for field in (
+        "outputImageDigest",
+        "outputConfigDigest",
+        "sbomEvidenceDigest",
+        "scanEvidenceDigest",
+        "cacheOutputDigest",
+    ):
+        receipt[field] = None
+    receipt["cleanup"]["cacheDisposition"] = "quarantined"
+    return receipt
+
+
 def _rejected(contract: str, value: dict) -> None:
     with pytest.raises(DomainError, match="VAL-0002"):
         validate_contract(contract, value)
@@ -204,6 +219,67 @@ def test_build_plan_network_mode_and_policy_are_bound(mode, policy):
     changed = _plan()
     changed["networkMode"] = mode
     changed["networkPolicyId"] = policy
+    _rejected("BuildPlan", changed)
+
+
+@pytest.mark.parametrize(
+    "contract,factory,mutate",
+    [
+        ("BuildPlan", _plan, lambda value: value.__setitem__("networkMode", "host")),
+        (
+            "BuildReceipt",
+            _failed_receipt,
+            lambda value: value["cleanup"].__setitem__("cacheDisposition", "reused"),
+        ),
+        ("BuildReceipt", _receipt, lambda value: value.__setitem__("result", "partial")),
+        (
+            "BuildReceipt",
+            _receipt,
+            lambda value: value["auditEvents"][0].__setitem__("event", "secret_exposed"),
+        ),
+        (
+            "BuildRequest",
+            _request,
+            lambda value: value.__setitem__("networkPolicyId", "NETPOL_untrusted"),
+        ),
+        (
+            "BuildPlan",
+            _plan,
+            lambda value: value["lease"].__setitem__(
+                "fencingToken", "123e4567-e89b-12d3-a456-426614174000:0"
+            ),
+        ),
+        (
+            "BuildRequest",
+            _request,
+            lambda value: value.__setitem__("secretRefIds", ["literal-secret-name"]),
+        ),
+        (
+            "BuildPlan",
+            _plan,
+            lambda value: value.__setitem__("egressAllowlistDigest", "g" * 64),
+        ),
+    ],
+    ids=[
+        "network-mode-enum",
+        "cache-disposition-enum",
+        "build-result-enum",
+        "audit-event-enum",
+        "network-policy-id-pattern",
+        "fencing-token-pattern",
+        "secret-ref-id-pattern",
+        "digest-64-hex-pattern",
+    ],
+)
+def test_build_contract_value_domains_are_fail_closed(contract, factory, mutate):
+    changed = factory()
+    mutate(changed)
+    _rejected(contract, changed)
+
+
+def test_build_plan_rejects_unknown_compiler_output_fields():
+    changed = _plan()
+    changed["unboundedRuntimeOption"] = "caller-controlled"
     _rejected("BuildPlan", changed)
 
 

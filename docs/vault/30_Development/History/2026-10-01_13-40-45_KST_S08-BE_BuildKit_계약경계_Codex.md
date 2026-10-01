@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-S08-BE-BUILDKIT-CONTRACT-20261001"
 title: "S08-BE BuildKit 계약 경계 구현"
-version: "1.0.0"
+version: "1.0.1"
 status: "in_progress"
 author: "Codex"
-updated: "2026-10-01T13:40:45+09:00"
+updated: "2026-10-01T14:13:24+09:00"
 source_of_truth: "Git"
 ---
 
@@ -40,7 +40,7 @@ source_of_truth: "Git"
 
 ## 검증
 
-- `python -m pytest tests/core/test_buildkit_contracts.py -q` → **45 passed**.
+- `python -m pytest tests/core/test_buildkit_contracts.py -q` → **54 passed**.
 - `python tools/generate_contracts.py` → 생성 완료; 생성 직후 정본 schema와 Python·
   TypeScript·Go·Node mirror가 동일 입력에서 재생성됐다.
 - `npx --yes --package typescript@5.9.3 tsc --noEmit --strict packages/contracts-ts/src/index.ts`
@@ -61,6 +61,28 @@ validator가 Build path/network 정규식의 lookahead·noncapturing group을 �
 capturing group만으로 canonical segment를 표현했다. `.`·`..` segment는 거부하되 `.build`
 같은 정본 hidden path는 허용한다. Build 계약 pattern에 `(?`가 다시 들어오면 실패하는
 회귀 시험을 추가했으며, 교정 head의 hosted Core를 재실행한다.
+
+### Claude r2 W1 조치
+
+값 정의역을 넓히는 schema 변이가 기존 양성·구조 시험만으로 생존한다는 검토를 반영해
+각 변이를 단독으로 거부하는 표 기반 반례를 추가했다.
+
+| 변이 | 사살하는 반례 |
+|---|---|
+| `networkMode`에 `host` 추가 | `BuildPlan.networkMode=host` 거부 |
+| `cacheDisposition`에 `reused` 추가 | failed receipt의 `cacheDisposition=reused` 거부 |
+| `BuildResult`에 `partial` 추가 | `BuildReceipt.result=partial` 거부 |
+| audit event enum에 임의 값 추가 | `event=secret_exposed` 거부 |
+| `networkPolicyId` pattern 제거 | request의 `NETPOL_untrusted` 거부 |
+| `fencingToken` pattern 제거 | epoch 0인 fence token 거부 |
+| `BuildSecretRefId` pattern 제거 | literal secret 이름 거부 |
+| 64-hex digest pattern 제거 | 비-hex 64자 egress digest 거부 |
+| `BuildPlan.additionalProperties=true` | `unboundedRuntimeOption` 거부 |
+
+TypeScript mirror는 enum union을 제공하지만 runtime schema validator를 내장하지 않고, Node Go
+validator는 아직 Build 계약을 소비하지 않는다. 따라서 같은 반례를 존재하지 않는 소비자에
+통과시켰다고 주장하지 않고, 정본 Draft 2020-12 validator 경계에서 9개를 고정했다. hosted
+Core의 schema compile·Go RE2 결과는 exact-head run으로 별도 확인한다.
 
 ## 정직성 경계
 
