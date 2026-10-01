@@ -49,6 +49,9 @@ userns 차단, state 권한, Unix/TCP 주소, Python 의존성, container-mode P
 정본 reference 실측은 [run 36912381153](https://github.com/egparadise/SaintVision-Invion/actions/runs/36912381153),
 code SHA `c4130ae42bf6e5ee190100500fd73128b566d046`, tree
 `83e22c3dc75a4713993eb23345dfc1e3c026a1d5`다.
+문서까지 포함한 exact head `a9db8483c7899147dbff525130436195f31de466`에서도
+[run 36912906944](https://github.com/egparadise/SaintVision-Invion/actions/runs/36912906944)가
+같은 실제 왕복과 evidence gate를 통과했다.
 
 | 항목 | 결과 |
 |---|---|
@@ -66,7 +69,7 @@ code SHA `c4130ae42bf6e5ee190100500fd73128b566d046`, tree
 ## 검증
 
 - `PYTHONPATH=services/control-plane/src python -m pytest tests/core/test_buildkit_transport.py tests/core/test_buildkit_rootless_lane.py tests/test_cleanup_owned_docker_label_inventory.py -q`
-  → **63 passed**, exit 0.
+  → **67 passed**, exit 0.
 - `python -m compileall -q services/control-plane/src/inv/buildkit_transport.py tools/run_buildkit_rootless_roundtrip.py`
   → exit 0.
 - `bash -n tools/run_buildkit_rootless_lane.sh` → exit 0.
@@ -86,4 +89,3 @@ platform fixture도 hosted 실측과 같은 OCI 객체 형태로 바꿨다.
   live PID/start-tick 재결속, OCI archive 내부 manifest/config digest 대조, pinned base/egress,
   cleanup·lease release·Evidence persistence를 구현한 뒤 별도 판정한다.
 - LAN builder와 실장비 인수는 `BLOCKED_EXTERNAL`이다. S08-BE status·점수는 변경하지 않는다.
-

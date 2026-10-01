@@ -27,7 +27,7 @@ def _module():
     return module
 
 
-def test_lane_is_opt_in_pinned_and_does_not_mount_host_socket_or_use_privileged():
+def test_lane_is_opt_in_pinned_and_never_mounts_host_socket_or_uses_privileged():
     workflow = yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))
     trigger = workflow[True]["workflow_dispatch"]["inputs"]["correlation_id"]
     assert trigger == {
@@ -44,6 +44,8 @@ def test_lane_is_opt_in_pinned_and_does_not_mount_host_socket_or_use_privileged(
     )
     text = json.dumps(job, sort_keys=True) + LANE.read_text(encoding="utf-8")
     assert "--privileged" not in text
+    # The runner uses its Docker client to create the reference container, but the
+    # builder itself must never receive the host daemon socket as a bind mount.
     assert "/var/run/docker.sock" not in text
     assert "docker run" in text
     assert "--security-opt seccomp=unconfined" in text
@@ -200,12 +202,52 @@ def test_runtime_image_digest_must_match_docker_repo_digest():
             [{"RepoDigests": ["moby/buildkit@sha256:" + "d" * 64]}],
         ),
         ("docker.io/moby/buildkit@sha256:" + "c" * 64, [{"RepoDigests": []}]),
+        (
+            "docker.io/moby/buildkit@sha256:abc",
+            [{"RepoDigests": ["moby/buildkit@sha256:abc"]}],
+        ),
     ],
 )
 def test_runtime_image_digest_rejects_unpinned_or_unmatched_image(runtime_image, values):
     module = _module()
     with pytest.raises(RuntimeError, match="digest"):
         module._verified_runtime_image_digest(runtime_image, values)
+
+
+def test_container_buildkitd_pid_requires_exactly_one_daemon(monkeypatch):
+    module = _module()
+    monkeypatch.setattr(module, "_command", lambda *_args: "32\n41")
+    with pytest.raises(RuntimeError, match="not exclusive"):
+        module._container_buildkitd_pid("rootless-builder")
+
+
+def test_container_health_rejects_daemon_in_host_user_namespace(monkeypatch):
+    module = _module()
+    monkeypatch.setenv("GITHUB_RUN_ID", "55")
+    monkeypatch.setattr(module, "_container_buildkitd_pid", lambda _name: 32)
+
+    def command(*arguments):
+        joined = " ".join(str(value) for value in arguments)
+        if arguments[:2] == ("docker", "inspect"):
+            return json.dumps(_container_inspect())
+        if joined.endswith("/proc/32/status"):
+            return "Uid:\t1000\t1000\t1000\t1000\nNoNewPrivs:\t0"
+        if joined.endswith("/proc/32/stat"):
+            return " ".join(["0"] * 22)
+        if "%i" in arguments:
+            return "4242\n4242"
+        raise AssertionError(f"unexpected command: {arguments!r}")
+
+    monkeypatch.setattr(module, "_command", command)
+    args = SimpleNamespace(
+        container_name="rootless-builder",
+        runtime_image="docker.io/moby/buildkit@sha256:" + "c" * 64,
+        address="tcp://127.0.0.1:1234",
+    )
+    with pytest.raises(RuntimeError, match="separate user namespace"):
+        module._container_health_receipt(
+            args, datetime(2026, 10, 2, 0, 0, tzinfo=timezone.utc)
+        )
 
 
 def test_container_mode_derives_pid_from_inspect_instead_of_cli(monkeypatch, tmp_path):

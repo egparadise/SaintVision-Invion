@@ -284,6 +284,10 @@ def test_measure_binds_exact_protected_health_and_live_worker(boundary):
         (lambda value: value.__setitem__("recoveryEpoch", 8), "RES-0006"),
         (lambda value: value.__setitem__("address", "tcp://127.0.0.1:4321"), "RES-0006"),
         (lambda value: value.__setitem__("devices", ["/dev/dri"]), "RES-0006"),
+        (
+            lambda value: value["fieldSources"].__setitem__("rootless", "forged"),
+            "RES-0006",
+        ),
         (lambda value: value.__setitem__("unexpected", True), "RES-0006"),
         (
             lambda value: value.__setitem__(
