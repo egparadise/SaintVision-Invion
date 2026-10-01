@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "An accepted decision awaiting a distinct second human operator.",
+  "properties": {
+    "acceptanceIdRef": {
+      "pattern": "^[A-Z][A-Z0-9-]{1,15}$",
+      "title": "Acceptanceidref",
+      "type": "string"
+    },
+    "decisionSignOff": {
+      "const": false,
+      "title": "Decisionsignoff",
+      "type": "boolean"
+    },
+    "expiresAt": {
+      "format": "date-time",
+      "title": "Expiresat",
+      "type": "string"
+    },
+    "outcome": {
+      "const": "accepted",
+      "title": "Outcome",
+      "type": "string"
+    },
+    "proposalConfirmationCount": {
+      "const": 1,
+      "title": "Proposalconfirmationcount",
+      "type": "integer"
+    },
+    "proposalDigest": {
+      "maxLength": 64,
+      "minLength": 64,
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Proposaldigest",
+      "type": "string"
+    },
+    "proposalId": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Proposalid",
+      "type": "string"
+    },
+    "releaseId": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Releaseid",
+      "type": "string"
+    },
+    "replayed": {
+      "title": "Replayed",
+      "type": "boolean"
+    },
+    "requiredDistinctOperatorCount": {
+      "const": 2,
+      "title": "Requireddistinctoperatorcount",
+      "type": "integer"
+    },
+    "state": {
+      "const": "pending_second_operator",
+      "title": "State",
+      "type": "string"
+    },
+    "targetManifestSha256": {
+      "maxLength": 64,
+      "minLength": 64,
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Targetmanifestsha256",
+      "type": "string"
+    }
+  },
+  "required": [
+    "proposalId",
+    "releaseId",
+    "acceptanceIdRef",
+    "outcome",
+    "state",
+    "targetManifestSha256",
+    "proposalDigest",
+    "requiredDistinctOperatorCount",
+    "proposalConfirmationCount",
+    "decisionSignOff",
+    "expiresAt",
+    "replayed"
+  ],
+  "title": "ReleaseAcceptanceProposalResponse",
+  "type": "object"
+}
