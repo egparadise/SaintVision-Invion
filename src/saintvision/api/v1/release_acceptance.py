@@ -42,6 +42,7 @@ from ...errors import (
 )
 from ...identity.principal import Principal
 from ...services import release_acceptance as service
+from ...services.audit import record_denial_out_of_band
 from .. import schemas
 from ..deps import (
     get_now,
@@ -141,13 +142,42 @@ def _conflict() -> CanonicalProblem:
     )
 
 
-def _refusal(refused: service.Refused, *, trace_id: str) -> JSONResponse:
+def _refusal(
+    request: Request, refused: service.Refused, *, trace_id: str
+) -> JSONResponse:
     """A refusal returned as a **response**, so the transaction that recorded it commits.
 
     §5 requires the expiry and manifest-drift transitions to be committed and *then*
     reported, with the 409 confirmed as the idempotency receipt. Raising would roll the
     transition back, which is what the first implementation did.
+
+    **Returning instead of raising skipped the audit**, and Codex measured it: the
+    canonical handler is what calls the denial recorder, and a response never reaches it,
+    so the closing left a ``proposal_invalidated`` row and no ``denied`` one. This is the
+    one place a route records a denial itself, and the reason the repository's rule exists
+    -- "a route is inside a transaction that the refusal rolls back" -- is exactly what
+    does **not** apply here: this refusal is committed. It is written out of band anyway,
+    in its own transaction, so a failure to audit cannot be mistaken for a clean refusal.
+
+    Only the request that performed the transition is audited. A later request that
+    re-reads the closed proposal gets the same 409 and writes nothing, because it denied
+    nothing new -- otherwise the audit would count retries.
     """
+    if refused.transitioned:
+        record_denial_out_of_band(
+            request.app.state.engine,
+            now=request.app.state.clock(),
+            actor_type=getattr(request.state, "actor_type", "anonymous"),
+            actor_id=getattr(request.state, "actor_id", None),
+            action=service.AUDIT_DENIED,
+            outcome="deny",
+            tenant_id=getattr(request.state, "tenant_id", None),
+            reason_code=refused.code,
+            trace_id=trace_id,
+            detail={},
+            source_ip=request.client.host if request.client else None,
+            user_agent=request.headers.get("user-agent"),
+        )
     problem = _audited(
         CanonicalProblem(refused.code, refused.status, refused.detail, retryable=False)
     )
@@ -431,7 +461,7 @@ async def confirm(
             now=now,
             ttl_seconds=settings.idempotency_ttl_seconds,
         )
-        return _refusal(outcome.refused, trace_id=trace_id)
+        return _refusal(request, outcome.refused, trace_id=trace_id)
 
     validated = schemas.ReleaseAcceptanceRecordedResponse.model_validate(outcome.body)
     store_idempotent_response(

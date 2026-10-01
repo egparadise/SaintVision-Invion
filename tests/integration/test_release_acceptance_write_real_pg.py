@@ -458,3 +458,61 @@ def test_a_second_final_decision_on_one_criterion_is_refused(
             {"t": operators["tenant"], "r": release_id},
         ).scalar_one()
     assert active == first.json()["acceptanceId"]
+
+
+def test_the_committed_409_is_audited_once_however_many_times_it_is_asked(
+    app_engine, owner_engine, operators, monkeypatch
+):
+    """§8's sixth action for the refusal that *commits* (#286 r2, finding 1).
+
+    Returning the 409 as a response instead of raising skipped the shared handler, so the
+    closing left a ``proposal_invalidated`` row and **no** ``denied`` one -- Codex probed
+    exactly that. The route now records it out of band, and only the request that performed
+    the transition does: a replay returns the stored receipt, and another key re-reads an
+    already-closed proposal. Neither denied anything new, so the count stays one and the
+    audit remains a count of refusals rather than of retries.
+    """
+    release_id, manifest = _release(owner_engine, tenant=operators["tenant"], user=operators["one"])
+    proposer = _client(app_engine, monkeypatch, operators=operators, who="one")
+    path = f"/v1/release-manifests/{release_id}/acceptance-decisions"
+    proposal = proposer.post(
+        path, headers=_headers("open"), content=json.dumps(_decision_body(manifest))
+    ).json()
+
+    later = NOW + dt.timedelta(minutes=30)
+    confirmer = _client(app_engine, monkeypatch, operators=operators, who="two", now=later)
+    confirm_path = f"{path}/{proposal['proposalId']}/confirm"
+    payload = json.dumps(
+        {"proposalDigest": proposal["proposalDigest"], "targetManifestSha256": manifest}
+    )
+
+    first = confirmer.post(confirm_path, headers=_headers("confirm-one"), content=payload)
+    assert first.status_code == 409, first.text
+
+    def denials() -> int:
+        return _count(
+            owner_engine,
+            "SELECT count(*) FROM audit_events WHERE tenant_id=:t AND action=:a "
+            "AND outcome='deny'",
+            t=operators["tenant"], a=service.AUDIT_DENIED,
+        )
+
+    assert denials() == 1, "the request that closed the proposal is audited"
+    assert _count(
+        owner_engine,
+        "SELECT count(*) FROM audit_events WHERE tenant_id=:t AND action=:a",
+        t=operators["tenant"], a=service.AUDIT_INVALIDATED,
+    ) == 1, "and the invalidation row is still there, in the same commit"
+
+    replay = confirmer.post(confirm_path, headers=_headers("confirm-one"), content=payload)
+    assert replay.status_code == 409
+    assert denials() == 1, "a replay of the receipt denies nothing new"
+
+    other_key = confirmer.post(confirm_path, headers=_headers("confirm-two"), content=payload)
+    assert other_key.status_code == 409
+    assert denials() == 1, "and neither does another key re-reading a closed proposal"
+    assert _count(
+        owner_engine,
+        "SELECT count(*) FROM release_acceptance_lifecycle_events WHERE tenant_id=:t",
+        t=operators["tenant"],
+    ) == 1

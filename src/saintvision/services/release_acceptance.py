@@ -38,7 +38,7 @@ from __future__ import annotations
 import base64
 import datetime as dt
 import uuid
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Protocol
 
 from sqlalchemy import select, text, tuple_
@@ -118,6 +118,14 @@ class Refused:
     detail: str
     #: For a log and a test, never for the response body.
     reason: str
+    #: Whether *this* request performed the state transition it is refusing over.
+    #:
+    #: It decides who gets audited. The denial §8 asks for belongs to the request that
+    #: closed the proposal -- the one that wrote the lifecycle event and emptied the slot.
+    #: A later request that merely re-reads an already-closed proposal is the same answer
+    #: about the same fact, not a second denial, and recording one per retry would make the
+    #: audit a count of retries rather than of refusals.
+    transitioned: bool = False
 
 
 @dataclass(frozen=True)
@@ -822,6 +830,9 @@ STALE = Refused(
     reason="the proposal was closed by expiry or by a superseded manifest",
 )
 
+#: The same refusal, from the request that did the closing. Only this one is audited.
+STALE_CLOSED_HERE = replace(STALE, transitioned=True)
+
 
 def confirm(
     session: Session,
@@ -885,12 +896,12 @@ def confirm(
     if now >= proposal.expires_at:
         _close_proposal(session, principal=principal, proposal=proposal, kind="expired", now=now)
         # Committed, then refused: the expiry is a fact, not an error (§4, §5).
-        return Outcome(status=409, refused=STALE)
+        return Outcome(status=409, refused=STALE_CLOSED_HERE)
     if str(release.manifest_sha256) != str(proposal.target_manifest_sha256):
         _close_proposal(
             session, principal=principal, proposal=proposal, kind="manifest-superseded", now=now
         )
-        return Outcome(status=409, refused=STALE)
+        return Outcome(status=409, refused=STALE_CLOSED_HERE)
     if request.proposal_digest != proposal.proposal_digest:
         raise InvError(GRAPH_INVALID_TRANSITION, "the confirmed digest is not this proposal's")
     if request.target_manifest_sha256 != str(release.manifest_sha256):
@@ -911,14 +922,22 @@ def confirm(
         )
     except ReferencesUnresolvable:
         return Outcome(status=409, refused=STALE)
-    # The live grant again, immediately before the write. The check at the top of the
-    # request ran before every lock above it.
-    settings_service.require_global_administrator(
-        session,
-        tenant_id=principal.tenant_id,
-        user_id=principal.user_id,
-        permission=PERMISSION,
-    )
+    # **The canonical function is the single authority for the grant at write time**, and
+    # this is where a second service-level re-read used to be. Measured, not assumed:
+    # ``business_admin_allowed`` takes ``FOR SHARE`` on the grant row, so the check at the
+    # top of the request pins that row for the whole transaction -- a concurrent revocation
+    # blocks until commit (probed on a scratch database: the revoking statement times out).
+    # A second call inside the same transaction therefore *cannot* return a different
+    # answer, which is why a mutation deleting it changed nothing and no test could kill
+    # it. Dead code that looks like a security check is worse than its absence: it tells a
+    # reader the grant is enforced twice when the second time is provably inert.
+    #
+    # What does hold: the first check, which takes the lock, and
+    # ``public.release_acceptance_confirm``, which re-reads the grant itself and so covers
+    # any path that reaches the tables without passing through this function (§4-1). §4
+    # step 8's "re-check immediately before the write" is satisfied there, inside the same
+    # statement that inserts the row.
+    #
     # And the manifest once more from the locked row, so the digest the decision stores is
     # the one that was true at the moment of writing rather than at the moment of reading.
     current = session.scalars(
@@ -931,7 +950,7 @@ def confirm(
         _close_proposal(
             session, principal=principal, proposal=proposal, kind="manifest-superseded", now=now
         )
-        return Outcome(status=409, refused=STALE)
+        return Outcome(status=409, refused=STALE_CLOSED_HERE)
 
     acceptance_id = new_id("acceptance")
     event_id = _audit(

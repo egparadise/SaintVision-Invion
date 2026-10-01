@@ -137,6 +137,13 @@ def _objects(bind) -> dict[str, bool]:
         state[f"column {table}.{column}"] = bool(
             bind.exec_driver_sql(_COLUMN_PRESENT.format(table, column)).fetchall()
         )
+    state["trigger release_manifests_pin_is_final"] = bool(
+        bind.exec_driver_sql(
+            "SELECT 1 FROM pg_catalog.pg_trigger t JOIN pg_catalog.pg_class c "
+            "ON c.oid = t.tgrelid WHERE c.relname = 'release_manifests' "
+            "AND t.tgname = 'release_manifests_pin_is_final'"
+        ).fetchall()
+    )
     return state
 
 
@@ -547,6 +554,49 @@ def _apply() -> None:
         f"GRANT UPDATE ({', '.join(SLOT_UPDATE_COLUMNS)}) ON {SLOT_TABLE} TO {APP_ROLE}"
     )
 
+    # ---------------------------------------------------------------- the pin is immutable
+    # 0005 gave the application blanket UPDATE on release_manifests, and that outlives this
+    # revision's purpose: a decision pins ``manifest_sha256`` and the policy pair, and the
+    # sign-off projection compares against them. Whoever can rewrite them can make an
+    # accepted decision describe a composition it never saw -- or quietly re-scope which
+    # criteria were required -- without touching a single acceptance row.
+    #
+    # A trigger rather than a column-privilege revoke, which is what #291 did for the
+    # registry pin: the grant is blanket and shared with writers this card does not own, so
+    # narrowing it would be a change to their contract. The trigger states the rule where
+    # every writer meets it, and SECURITY INVOKER means it carries no privileges of its
+    # own.
+    #
+    # The policy pair is write-once rather than frozen: it starts NULL on every release
+    # recorded before the pin existed, and a deployment sets it. Setting it once is the
+    # pinning; changing it afterwards is re-scoping, and the projection has no way to tell
+    # the two apart, which is why only the database can.
+    op.execute(
+        "CREATE FUNCTION public.release_manifest_pin_is_final() RETURNS trigger "
+        "LANGUAGE plpgsql SECURITY INVOKER AS $fn$ "
+        "BEGIN "
+        "  IF NEW.manifest_sha256 IS DISTINCT FROM OLD.manifest_sha256 THEN "
+        "    RAISE EXCEPTION 'a release manifest digest is the release''s identity' "
+        "      USING ERRCODE = 'check_violation', CONSTRAINT = 'manifest_digest_is_final'; "
+        "  END IF; "
+        "  IF OLD.policy_version IS NOT NULL "
+        "     AND NEW.policy_version IS DISTINCT FROM OLD.policy_version THEN "
+        "    RAISE EXCEPTION 'a pinned policy version cannot be repinned' "
+        "      USING ERRCODE = 'check_violation', CONSTRAINT = 'policy_pin_is_final'; "
+        "  END IF; "
+        "  IF OLD.policy_registry_sha256 IS NOT NULL "
+        "     AND NEW.policy_registry_sha256 IS DISTINCT FROM OLD.policy_registry_sha256 THEN "
+        "    RAISE EXCEPTION 'a pinned policy registry digest cannot be repinned' "
+        "      USING ERRCODE = 'check_violation', CONSTRAINT = 'policy_pin_is_final'; "
+        "  END IF; "
+        "  RETURN NEW; "
+        "END $fn$"
+    )
+    op.execute(
+        "CREATE TRIGGER release_manifests_pin_is_final BEFORE UPDATE ON release_manifests "
+        "FOR EACH ROW EXECUTE FUNCTION public.release_manifest_pin_is_final()"
+    )
+
     # ---------------------------------------------------------------- slot state machine
     # What a slot may do, enforced wherever the UPDATE comes from. The function is
     # SECURITY INVOKER, so the application role holds this UPDATE and could issue it
@@ -821,6 +871,10 @@ def downgrade() -> None:
             )
 
     op.execute(f"DROP TRIGGER IF EXISTS {SLOT_TABLE}_forward ON {SLOT_TABLE}")
+    op.execute(
+        "DROP TRIGGER IF EXISTS release_manifests_pin_is_final ON release_manifests"
+    )
+    op.execute("DROP FUNCTION IF EXISTS public.release_manifest_pin_is_final()")
     op.execute(
         "DROP FUNCTION IF EXISTS public.release_acceptance_confirm("
         "char(30),char(64),char(64),char(30),char(30),char(30),char(30),text,text,text,"
