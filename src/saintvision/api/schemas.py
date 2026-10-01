@@ -15,7 +15,7 @@ import datetime as dt
 import uuid
 from typing import Annotated, Any, Literal, Union
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr, field_validator, model_validator
+from pydantic import AwareDatetime, BaseModel, BeforeValidator, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr, field_validator, model_validator
 
 
 class Strict(BaseModel):
@@ -1568,11 +1568,28 @@ ReleaseAcceptanceReasonCode = Annotated[StrictStr, Field(pattern="^[A-Z][A-Z0-9_
 ReleaseAcceptanceLimitation = Annotated[StrictStr, Field(min_length=1, max_length=300)]
 
 
+def _exact_lower_hex_sha256(value: Any) -> Any:
+    """Reject input that would only match after ``Strict`` whitespace stripping."""
+
+    if not isinstance(value, str) or len(value) != 64 or any(
+        char not in "0123456789abcdef" for char in value
+    ):
+        raise ValueError("must be exactly 64 lowercase hexadecimal characters")
+    return value
+
+
+ReleaseAcceptanceSha256 = Annotated[
+    StrictStr,
+    BeforeValidator(_exact_lower_hex_sha256),
+    Field(min_length=64, max_length=64, pattern="^[0-9a-f]{64}$"),
+]
+
+
 class ReleaseAcceptanceTargetRef(Strict):
     """A desired acceptance target, not evidence that it was measured."""
 
     target_id: StrictStr = Field(alias="targetId", pattern="^[A-Za-z][A-Za-z0-9_.:/-]{0,127}$")
-    target_sha256: StrictStr = Field(alias="targetSha256", pattern="^[0-9a-f]{64}$")
+    target_sha256: ReleaseAcceptanceSha256 = Field(alias="targetSha256")
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
@@ -1581,7 +1598,7 @@ class ReleaseAcceptanceMeasurementRef(Strict):
     """One observed Evidence object, kept distinct from a target declaration."""
 
     evidence_id: StrictStr = Field(alias="evidenceId", pattern="^[A-Za-z][A-Za-z0-9_.:/-]{0,127}$")
-    evidence_sha256: StrictStr = Field(alias="evidenceSha256", pattern="^[0-9a-f]{64}$")
+    evidence_sha256: ReleaseAcceptanceSha256 = Field(alias="evidenceSha256")
     observed_at: AwareDatetime = Field(alias="observedAt")
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
@@ -1597,9 +1614,7 @@ class ReleaseAcceptanceDecisionRequest(Strict):
 
     acceptance_id_ref: StrictStr = Field(alias="acceptanceIdRef", pattern="^[A-Z][A-Z0-9-]{1,15}$")
     outcome: ReleaseAcceptanceOutcome
-    target_manifest_sha256: StrictStr = Field(
-        alias="targetManifestSha256", pattern="^[0-9a-f]{64}$"
-    )
+    target_manifest_sha256: ReleaseAcceptanceSha256 = Field(alias="targetManifestSha256")
     reason_code: ReleaseAcceptanceReasonCode = Field(alias="reasonCode")
     target_refs: list[ReleaseAcceptanceTargetRef] = Field(
         alias="targetRefs", min_length=1, max_length=64
@@ -1646,10 +1661,8 @@ class ReleaseAcceptanceDecisionRequest(Strict):
 class ReleaseAcceptanceConfirmationRequest(Strict):
     """A second operator confirms one exact accepted proposal and manifest."""
 
-    proposal_digest: StrictStr = Field(alias="proposalDigest", pattern="^[0-9a-f]{64}$")
-    target_manifest_sha256: StrictStr = Field(
-        alias="targetManifestSha256", pattern="^[0-9a-f]{64}$"
-    )
+    proposal_digest: ReleaseAcceptanceSha256 = Field(alias="proposalDigest")
+    target_manifest_sha256: ReleaseAcceptanceSha256 = Field(alias="targetManifestSha256")
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
@@ -1662,15 +1675,41 @@ class ReleaseAcceptanceProposalResponse(Strict):
     acceptance_id_ref: StrictStr = Field(alias="acceptanceIdRef", pattern="^[A-Z][A-Z0-9-]{1,15}$")
     outcome: Literal["accepted"]
     state: Literal["pending_second_operator"]
-    target_manifest_sha256: StrictStr = Field(
-        alias="targetManifestSha256", pattern="^[0-9a-f]{64}$"
-    )
-    proposal_digest: StrictStr = Field(alias="proposalDigest", pattern="^[0-9a-f]{64}$")
+    target_manifest_sha256: ReleaseAcceptanceSha256 = Field(alias="targetManifestSha256")
+    proposal_digest: ReleaseAcceptanceSha256 = Field(alias="proposalDigest")
     required_distinct_operator_count: Literal[2] = Field(alias="requiredDistinctOperatorCount")
     confirmed_operator_count: Literal[1] = Field(alias="confirmedOperatorCount")
     operator_sign_off: Literal[False] = Field(alias="operatorSignOff")
     expires_at: AwareDatetime = Field(alias="expiresAt")
     replayed: StrictBool
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceProposalReviewResponse(Strict):
+    """The exact pending content a distinct confirmer must review before voting."""
+
+    proposal_id: StrictStr = Field(alias="proposalId", min_length=1, max_length=64)
+    release_id: StrictStr = Field(alias="releaseId", min_length=1, max_length=64)
+    acceptance_id_ref: StrictStr = Field(alias="acceptanceIdRef", pattern="^[A-Z][A-Z0-9-]{1,15}$")
+    outcome: Literal["accepted"]
+    state: Literal["pending_second_operator"]
+    target_manifest_sha256: ReleaseAcceptanceSha256 = Field(alias="targetManifestSha256")
+    proposal_digest: ReleaseAcceptanceSha256 = Field(alias="proposalDigest")
+    reason_code: ReleaseAcceptanceReasonCode = Field(alias="reasonCode")
+    target_refs: list[ReleaseAcceptanceTargetRef] = Field(
+        alias="targetRefs", min_length=1, max_length=64
+    )
+    measurement_refs: list[ReleaseAcceptanceMeasurementRef] = Field(
+        alias="measurementRefs", min_length=1, max_length=64
+    )
+    known_limitations: list[ReleaseAcceptanceLimitation] = Field(
+        alias="knownLimitations", max_length=0
+    )
+    required_distinct_operator_count: Literal[2] = Field(alias="requiredDistinctOperatorCount")
+    confirmed_operator_count: Literal[1] = Field(alias="confirmedOperatorCount")
+    operator_sign_off: Literal[False] = Field(alias="operatorSignOff")
+    expires_at: AwareDatetime = Field(alias="expiresAt")
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
@@ -1683,9 +1722,7 @@ class ReleaseAcceptanceRecordedResponse(Strict):
     acceptance_id_ref: StrictStr = Field(alias="acceptanceIdRef", pattern="^[A-Z][A-Z0-9-]{1,15}$")
     outcome: ReleaseAcceptanceOutcome
     state: Literal["recorded"]
-    accepted_manifest_sha256: StrictStr = Field(
-        alias="acceptedManifestSha256", pattern="^[0-9a-f]{64}$"
-    )
+    accepted_manifest_sha256: ReleaseAcceptanceSha256 = Field(alias="acceptedManifestSha256")
     manifest_matches: Literal[True] = Field(alias="manifestMatches")
     operator_sign_off: StrictBool = Field(alias="operatorSignOff")
     confirmed_operator_count: StrictInt = Field(alias="confirmedOperatorCount", ge=1, le=2)
@@ -1732,9 +1769,7 @@ class ReleaseAcceptanceRecordedResponse(Strict):
 class ReleaseAcceptanceWithdrawalRequest(Strict):
     """Withdraw a final decision without deleting or rewriting its history."""
 
-    target_manifest_sha256: StrictStr = Field(
-        alias="targetManifestSha256", pattern="^[0-9a-f]{64}$"
-    )
+    accepted_manifest_sha256: ReleaseAcceptanceSha256 = Field(alias="acceptedManifestSha256")
     reason_code: Literal[
         "manifest-superseded", "acceptance-error", "security-concern", "operator-request"
     ] = Field(alias="reasonCode")
@@ -1749,9 +1784,7 @@ class ReleaseAcceptanceWithdrawalResponse(Strict):
     acceptance_id: StrictStr = Field(alias="acceptanceId", min_length=1, max_length=64)
     release_id: StrictStr = Field(alias="releaseId", min_length=1, max_length=64)
     state: Literal["withdrawn"]
-    target_manifest_sha256: StrictStr = Field(
-        alias="targetManifestSha256", pattern="^[0-9a-f]{64}$"
-    )
+    accepted_manifest_sha256: ReleaseAcceptanceSha256 = Field(alias="acceptedManifestSha256")
     withdrawn_acceptance_counts_toward_sign_off: Literal[False] = Field(
         alias="withdrawnAcceptanceCountsTowardSignOff"
     )

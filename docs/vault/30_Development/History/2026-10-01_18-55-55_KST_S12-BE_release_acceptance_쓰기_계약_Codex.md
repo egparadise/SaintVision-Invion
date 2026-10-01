@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-S12-BE-RELEASE-ACCEPTANCE-WRITE-20261001"
 title: "S12-BE release 수락·operator sign-off 쓰기 보안 계약 — 설계·strict schema"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-01T18:55:55+09:00"
+updated: "2026-10-01T19:24:38+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "3ff89b84"
@@ -43,11 +43,12 @@ body를 먼저 고정했다. 이 PR은 설계·계약만이며 route·DB·migrat
 ## 공개 계약
 
 `src/saintvision/api/schemas.py`에 아래 strict Pydantic source를 추가하고
-`tools/export_schemas.py`로 JSON Schema 6개를 생성했다.
+`tools/export_schemas.py`로 JSON Schema 7개를 생성했다.
 
 - `ReleaseAcceptanceDecisionRequest`
 - `ReleaseAcceptanceConfirmationRequest`
 - `ReleaseAcceptanceProposalResponse`
+- `ReleaseAcceptanceProposalReviewResponse`
 - `ReleaseAcceptanceRecordedResponse`
 - `ReleaseAcceptanceWithdrawalRequest`
 - `ReleaseAcceptanceWithdrawalResponse`
@@ -56,10 +57,32 @@ request의 unknown field, 사람 ID, secret, free-form note는 모두 거부한�
 conditional limitation과 accepted 2인 quorum/sign-off 조건을 `if/then/else`로 넣어 Pydantic
 validator에만 숨어 있지 않게 했다.
 
+## Claude r1 수정 반영
+
+- 두 번째 운영자가 proposal의 target·measurement·reason·expiry를 직접 보는 인증된 GET 계약과
+  strict `ReleaseAcceptanceProposalReviewResponse`를 추가했다. proposer/confirming user ID는
+  응답하지 않는다.
+- idempotency canonical payload를 `{releaseId,proposalId|acceptanceId,request}`로 고정하고,
+  replay 전에 active human·fresh AMR·live permission을 다시 확인한다. 다른 path에 같은 key를
+  재사용하면 `IDEM-0001`이다.
+- proposal은 immutable이고 만료·manifest drift를 lifecycle event로 append한 뒤 coordination
+  slot을 해제해 commit한다. error rollback과 상태 영속화의 모순을 제거했다.
+- `operatorSignOff`는 required criterion 전부가 2인 accepted일 때만 true이고, legacy 1인
+  `record_acceptance(accepted)`는 계수하지 않도록 고정했다. 철회 digest는 current manifest가
+  아니라 철회 대상 final row의 `acceptedManifestSha256`이다.
+- #280 새 head `4114f8ba`의 fail-closed 읽기 의미와 맞췄다. 구현 전에는
+  `operatorSignOff=false`/`human-attestation-contract-absent`이고 distinct user 수는 관측값이다.
+  vote에 fresh interactive human attestation을 immutable하게 저장·검증한 뒤에만 true 계약을 연다.
+- migration의 RLS/FORCE RLS, append-only grant, vote/withdrawal/slot unique, permission CHECK,
+  SECURITY DEFINER 금지 경계를 명시했다. IdP에는 `auth_time`·RFC 8176 `amr` mapper와 portal
+  step-up이 선행돼야 하며 `pwd` 단독은 허용하지 않는다.
+- digest는 strip 전 소문자 hex 64자를 요구하고 canonical datetime은 UTC 6자리 소수초 `Z`로
+  고정했다. 7개 contract의 exact required set과 대문자·63자·끝 개행 부정 시험을 추가했다.
+
 ## 실제 검증
 
-- `python -m pytest tests/core/test_release_acceptance_write_contract.py -q` → **22 passed**.
-- `python tools/export_schemas.py --check` → **PASS, 91 schemas match**.
+- `python -m pytest tests/core/test_release_acceptance_write_contract.py -q` → **27 passed**.
+- `python tools/export_schemas.py --check` → **PASS, 92 schemas match**.
 - `python tools/check_contract_bindings.py` → **exit 0**. 새 6 contract는 fixture·contract
   시험에 결속됐고 아직 backend route가 없다는 report-only dead-contract 경고는 이 카드의
   계약 선행 범위와 일치한다.
@@ -69,6 +92,6 @@ validator에만 숨어 있지 않게 했다.
 
 ## 다음
 
-Claude 독립 설계 검토 뒤 다음 구현 카드가 OIDC verified claim 전달, migration, tenant permission,
+Claude r1 재검토 뒤 다음 구현 카드가 OIDC verified claim 전달, migration, tenant permission,
 route·service·audit, hosted real-PG 경합 시험을 구현한다. authoritative target/Evidence resolve가
 없으면 accepted route는 enable하지 않는다.

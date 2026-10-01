@@ -9,6 +9,13 @@
       "title": "Acceptanceid",
       "type": "string"
     },
+    "acceptedManifestSha256": {
+      "maxLength": 64,
+      "minLength": 64,
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Acceptedmanifestsha256",
+      "type": "string"
+    },
     "operatorSignOff": {
       "title": "Operatorsignoff",
       "type": "boolean"
@@ -38,11 +45,6 @@
       "title": "State",
       "type": "string"
     },
-    "targetManifestSha256": {
-      "pattern": "^[0-9a-f]{64}$",
-      "title": "Targetmanifestsha256",
-      "type": "string"
-    },
     "withdrawalId": {
       "maxLength": 64,
       "minLength": 1,
@@ -65,7 +67,7 @@
     "acceptanceId",
     "releaseId",
     "state",
-    "targetManifestSha256",
+    "acceptedManifestSha256",
     "withdrawnAcceptanceCountsTowardSignOff",
     "operatorSignOff",
     "reasonCode",

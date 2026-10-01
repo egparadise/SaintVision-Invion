@@ -57,39 +57,21 @@
   },
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
-  "allOf": [
-    {
-      "else": {
-        "properties": {
-          "knownLimitations": {
-            "maxItems": 0
-          }
-        }
-      },
-      "if": {
-        "properties": {
-          "outcome": {
-            "const": "conditional"
-          }
-        },
-        "required": [
-          "outcome"
-        ]
-      },
-      "then": {
-        "properties": {
-          "knownLimitations": {
-            "minItems": 1
-          }
-        }
-      }
-    }
-  ],
-  "description": "The bounded, non-secret content an operator decides on.\n\nIdentity and fresh-authentication proof are deliberately absent: the server\nderives both from the verified access token.  Targets say what was required;\nmeasurements say what was observed.  Neither may be replaced by free text.",
+  "description": "The exact pending content a distinct confirmer must review before voting.",
   "properties": {
     "acceptanceIdRef": {
       "pattern": "^[A-Z][A-Z0-9-]{1,15}$",
       "title": "Acceptanceidref",
+      "type": "string"
+    },
+    "confirmedOperatorCount": {
+      "const": 1,
+      "title": "Confirmedoperatorcount",
+      "type": "integer"
+    },
+    "expiresAt": {
+      "format": "date-time",
+      "title": "Expiresat",
       "type": "string"
     },
     "knownLimitations": {
@@ -98,7 +80,7 @@
         "minLength": 1,
         "type": "string"
       },
-      "maxItems": 64,
+      "maxItems": 0,
       "title": "Knownlimitations",
       "type": "array"
     },
@@ -111,18 +93,48 @@
       "title": "Measurementrefs",
       "type": "array"
     },
+    "operatorSignOff": {
+      "const": false,
+      "title": "Operatorsignoff",
+      "type": "boolean"
+    },
     "outcome": {
-      "enum": [
-        "accepted",
-        "conditional",
-        "rejected"
-      ],
+      "const": "accepted",
       "title": "Outcome",
+      "type": "string"
+    },
+    "proposalDigest": {
+      "maxLength": 64,
+      "minLength": 64,
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Proposaldigest",
+      "type": "string"
+    },
+    "proposalId": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Proposalid",
       "type": "string"
     },
     "reasonCode": {
       "pattern": "^[A-Z][A-Z0-9_]{2,63}$",
       "title": "Reasoncode",
+      "type": "string"
+    },
+    "releaseId": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Releaseid",
+      "type": "string"
+    },
+    "requiredDistinctOperatorCount": {
+      "const": 2,
+      "title": "Requireddistinctoperatorcount",
+      "type": "integer"
+    },
+    "state": {
+      "const": "pending_second_operator",
+      "title": "State",
       "type": "string"
     },
     "targetManifestSha256": {
@@ -143,14 +155,22 @@
     }
   },
   "required": [
+    "proposalId",
+    "releaseId",
     "acceptanceIdRef",
     "outcome",
+    "state",
     "targetManifestSha256",
+    "proposalDigest",
     "reasonCode",
     "targetRefs",
     "measurementRefs",
-    "knownLimitations"
+    "knownLimitations",
+    "requiredDistinctOperatorCount",
+    "confirmedOperatorCount",
+    "operatorSignOff",
+    "expiresAt"
   ],
-  "title": "ReleaseAcceptanceDecisionRequest",
+  "title": "ReleaseAcceptanceProposalReviewResponse",
   "type": "object"
 }

@@ -1,17 +1,23 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.246"
+version: "1.0.247"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T18:55:55+09:00"
+updated: "2026-10-01T19:24:38+09:00"
 source_of_truth: "Git"
 active_card: "CARD-184 S12 release acceptance/operator sign-off write contract"
-active_card_status: "fresh human auth, accepted two-person quorum, manifest digest binding, idempotency/concurrency, append-only withdrawal and strict public schemas designed; PG-free 22 passed"
-active_card_next: "Claude independent design review; implementation card owns OIDC auth metadata, migration, route/service/audit and hosted real-PG contention tests"
+active_card_status: "Claude r1 F1-F11 reflected: authenticated proposal review, path-scoped replay, append-only lifecycle, required-criterion sign-off, DB/IdP invariants and 7 strict contracts; PG-free 27 passed"
+active_card_next: "Claude r2 review; implementation remains blocked until IdP step-up, migration, authoritative target/Evidence binding and read projection land together"
 ---
 
 ## 2026-10-01 Card 184 — S12 release 수락·operator sign-off 쓰기 계약
+
+- Claude r1의 2인 확인 내용 미노출, path ID 없는 replay, proposal 만료 rollback 모순,
+  read/sign-off·legacy 1인 경로, DB 불변식, IdP AMR 공백을 설계 v1.1과 공개 계약으로 닫았다.
+  pending proposal review GET과 7번째 strict response를 추가했고 withdrawal digest를 대상 final
+  row에 결속했다. digest required/pattern 변이 시험을 보강해 PG-free **27 passed**, schema
+  **92/92**다.
 
 - PR #280 head `3ff89b84` 위에서 읽기 메모가 요청한 보안 결정을 계약으로 고정했다. 모든
   결정은 server-derived active human + 5분 fresh interactive auth + live tenant permission이고,

@@ -140,6 +140,39 @@ def test_pending_proposal_can_never_report_operator_sign_off():
         schemas.ReleaseAcceptanceProposalResponse.model_validate({**body, "operatorSignOff": True})
 
 
+def test_distinct_operator_can_read_the_exact_pending_content_without_identity_data():
+    body = {
+        "proposalId": "proposal_01",
+        "releaseId": "release_01",
+        "acceptanceIdRef": "AC-12",
+        "outcome": "accepted",
+        "state": "pending_second_operator",
+        "targetManifestSha256": HASH,
+        "proposalDigest": "d" * 64,
+        "reasonCode": "RELEASE_ACCEPTANCE",
+        "targetRefs": decision()["targetRefs"],
+        "measurementRefs": decision()["measurementRefs"],
+        "knownLimitations": [],
+        "requiredDistinctOperatorCount": 2,
+        "confirmedOperatorCount": 1,
+        "operatorSignOff": False,
+        "expiresAt": (NOW + dt.timedelta(minutes=5)).isoformat(),
+    }
+    parsed = schemas.ReleaseAcceptanceProposalReviewResponse.model_validate(body)
+    assert parsed.target_refs[0].target_sha256 == "b" * 64
+    assert parsed.measurement_refs[0].evidence_sha256 == "c" * 64
+    assert "acceptedByUserId" not in parsed.model_dump(by_alias=True)
+
+    with pytest.raises(ValidationError):
+        schemas.ReleaseAcceptanceProposalReviewResponse.model_validate(
+            {**body, "acceptedByUserId": "must-not-become-a-directory"}
+        )
+    with pytest.raises(ValidationError):
+        schemas.ReleaseAcceptanceProposalReviewResponse.model_validate(
+            {**body, "knownLimitations": ["accepted cannot hide a limitation"]}
+        )
+
+
 @pytest.mark.parametrize(
     ("outcome", "count", "sign_off", "valid"),
     [
@@ -174,7 +207,7 @@ def test_only_a_two_person_accepted_record_can_create_sign_off(outcome, count, s
 
 def test_withdrawal_is_a_closed_reason_and_the_withdrawn_row_can_never_sign():
     request = {
-        "targetManifestSha256": HASH,
+        "acceptedManifestSha256": HASH,
         "reasonCode": "security-concern",
     }
     schemas.ReleaseAcceptanceWithdrawalRequest.model_validate(request)
@@ -188,7 +221,7 @@ def test_withdrawal_is_a_closed_reason_and_the_withdrawn_row_can_never_sign():
         "acceptanceId": "acceptance_01",
         "releaseId": "release_01",
         "state": "withdrawn",
-        "targetManifestSha256": HASH,
+        "acceptedManifestSha256": HASH,
         "withdrawnAcceptanceCountsTowardSignOff": False,
         "operatorSignOff": False,
         "reasonCode": "security-concern",
@@ -212,6 +245,7 @@ def test_exported_contracts_are_closed_and_do_not_publish_identity_or_secret_fie
         "release-acceptance-decision-request",
         "release-acceptance-confirmation-request",
         "release-acceptance-proposal-response",
+        "release-acceptance-proposal-review-response",
         "release-acceptance-recorded-response",
         "release-acceptance-withdrawal-request",
         "release-acceptance-withdrawal-response",
@@ -261,3 +295,138 @@ def test_exported_json_schema_enforces_decision_and_quorum_semantics():
         Draft202012Validator(recorded_schema).validate(
             {**valid, "confirmedOperatorCount": 1, "operatorSignOff": False}
         )
+
+
+EXPECTED_REQUIRED = {
+    "release-acceptance-decision-request": {
+        "acceptanceIdRef", "outcome", "targetManifestSha256", "reasonCode",
+        "targetRefs", "measurementRefs", "knownLimitations",
+    },
+    "release-acceptance-confirmation-request": {
+        "proposalDigest", "targetManifestSha256",
+    },
+    "release-acceptance-proposal-response": {
+        "proposalId", "releaseId", "acceptanceIdRef", "outcome", "state",
+        "targetManifestSha256", "proposalDigest", "requiredDistinctOperatorCount",
+        "confirmedOperatorCount", "operatorSignOff", "expiresAt", "replayed",
+    },
+    "release-acceptance-proposal-review-response": {
+        "proposalId", "releaseId", "acceptanceIdRef", "outcome", "state",
+        "targetManifestSha256", "proposalDigest", "reasonCode", "targetRefs",
+        "measurementRefs", "knownLimitations", "requiredDistinctOperatorCount",
+        "confirmedOperatorCount", "operatorSignOff", "expiresAt",
+    },
+    "release-acceptance-recorded-response": {
+        "acceptanceId", "releaseId", "acceptanceIdRef", "outcome", "state",
+        "acceptedManifestSha256", "manifestMatches", "operatorSignOff",
+        "confirmedOperatorCount", "decidedAt", "replayed",
+    },
+    "release-acceptance-withdrawal-request": {
+        "acceptedManifestSha256", "reasonCode",
+    },
+    "release-acceptance-withdrawal-response": {
+        "withdrawalId", "acceptanceId", "releaseId", "state",
+        "acceptedManifestSha256", "withdrawnAcceptanceCountsTowardSignOff",
+        "operatorSignOff", "reasonCode", "withdrawnAt", "replayed",
+    },
+}
+
+
+def test_exported_contract_required_sets_are_exact():
+    for name, expected in EXPECTED_REQUIRED.items():
+        document = json.loads((ROOT / "contracts" / f"{name}.schema.json").read_text())
+        assert set(document["required"]) == expected, name
+    decision_schema = json.loads(
+        (ROOT / "contracts/release-acceptance-decision-request.schema.json").read_text()
+    )
+    assert set(decision_schema["$defs"]["ReleaseAcceptanceTargetRef"]["required"]) == {
+        "targetId", "targetSha256",
+    }
+    assert set(decision_schema["$defs"]["ReleaseAcceptanceMeasurementRef"]["required"]) == {
+        "evidenceId", "evidenceSha256", "observedAt",
+    }
+
+
+@pytest.mark.parametrize("bad", ["A" * 64, "a" * 63, "a" * 64 + "\n"])
+def test_digests_are_exact_lowercase_hex_before_whitespace_normalisation(bad):
+    review = {
+        "proposalId": "proposal_01",
+        "releaseId": "release_01",
+        "acceptanceIdRef": "AC-12",
+        "outcome": "accepted",
+        "state": "pending_second_operator",
+        "targetManifestSha256": HASH,
+        "proposalDigest": "d" * 64,
+        "reasonCode": "RELEASE_ACCEPTANCE",
+        "targetRefs": decision()["targetRefs"],
+        "measurementRefs": decision()["measurementRefs"],
+        "knownLimitations": [],
+        "requiredDistinctOperatorCount": 2,
+        "confirmedOperatorCount": 1,
+        "operatorSignOff": False,
+        "expiresAt": (NOW + dt.timedelta(minutes=5)).isoformat(),
+    }
+    recorded = {
+        "acceptanceId": "acceptance_01",
+        "releaseId": "release_01",
+        "acceptanceIdRef": "AC-12",
+        "outcome": "accepted",
+        "state": "recorded",
+        "acceptedManifestSha256": bad,
+        "manifestMatches": True,
+        "operatorSignOff": True,
+        "confirmedOperatorCount": 2,
+        "decidedAt": NOW.isoformat(),
+        "replayed": False,
+    }
+    withdrawal = {
+        "acceptedManifestSha256": bad,
+        "reasonCode": "security-concern",
+    }
+    cases = [
+        (
+            schemas.ReleaseAcceptanceDecisionRequest,
+            "release-acceptance-decision-request",
+            decision(targetManifestSha256=bad),
+        ),
+        (
+            schemas.ReleaseAcceptanceDecisionRequest,
+            "release-acceptance-decision-request",
+            decision(targetRefs=[{"targetId": "AC-12", "targetSha256": bad}]),
+        ),
+        (
+            schemas.ReleaseAcceptanceDecisionRequest,
+            "release-acceptance-decision-request",
+            decision(measurementRefs=[{
+                "evidenceId": "evidence:ac12:physical-lane",
+                "evidenceSha256": bad,
+                "observedAt": NOW.isoformat(),
+            }]),
+        ),
+        (
+            schemas.ReleaseAcceptanceConfirmationRequest,
+            "release-acceptance-confirmation-request",
+            {"proposalDigest": bad, "targetManifestSha256": HASH},
+        ),
+        (
+            schemas.ReleaseAcceptanceProposalReviewResponse,
+            "release-acceptance-proposal-review-response",
+            {**review, "proposalDigest": bad},
+        ),
+        (
+            schemas.ReleaseAcceptanceRecordedResponse,
+            "release-acceptance-recorded-response",
+            recorded,
+        ),
+        (
+            schemas.ReleaseAcceptanceWithdrawalRequest,
+            "release-acceptance-withdrawal-request",
+            withdrawal,
+        ),
+    ]
+    for model, contract_name, payload in cases:
+        with pytest.raises(ValidationError):
+            model.model_validate(payload)
+        document = json.loads((ROOT / "contracts" / f"{contract_name}.schema.json").read_text())
+        with pytest.raises(JsonSchemaValidationError):
+            Draft202012Validator(document).validate(payload)

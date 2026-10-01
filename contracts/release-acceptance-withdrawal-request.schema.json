@@ -3,6 +3,13 @@
   "additionalProperties": false,
   "description": "Withdraw a final decision without deleting or rewriting its history.",
   "properties": {
+    "acceptedManifestSha256": {
+      "maxLength": 64,
+      "minLength": 64,
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Acceptedmanifestsha256",
+      "type": "string"
+    },
     "reasonCode": {
       "enum": [
         "manifest-superseded",
@@ -12,15 +19,10 @@
       ],
       "title": "Reasoncode",
       "type": "string"
-    },
-    "targetManifestSha256": {
-      "pattern": "^[0-9a-f]{64}$",
-      "title": "Targetmanifestsha256",
-      "type": "string"
     }
   },
   "required": [
-    "targetManifestSha256",
+    "acceptedManifestSha256",
     "reasonCode"
   ],
   "title": "ReleaseAcceptanceWithdrawalRequest",
