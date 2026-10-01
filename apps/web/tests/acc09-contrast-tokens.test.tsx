@@ -207,7 +207,7 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/editor/MonacoWorkspaceEditor.tsx": {"#070a0e": 1, "#090d13": 3, "#0d1117": 4, "#161b22": 4, "#1f242c": 1, "#21262d": 6, "#2ea043": 1, "#30363d": 7, "#3fb950": 4, "#484f58": 2, "#58a6ff": 9, "#79c0ff": 1, "#8b949e": 9, "#c9d1d9": 6, "#e3b341": 6, "#f0f6fc": 5, "#f85149": 3, "rgba(210,153,34,0.2)": 1, "rgba(227,179,65,0.15)": 2, "rgba(227,179,65,0.3)": 1, "rgba(248,81,73,0.15)": 1, "rgba(248,81,73,0.2)": 1, "rgba(46,160,67,0.12)": 1, "rgba(46,160,67,0.15)": 1, "rgba(46,160,67,0.2)": 1, "rgba(56,139,253,0.1)": 1, "rgba(56,139,253,0.12)": 2, "rgba(56,139,253,0.2)": 1, "rgba(56,139,253,0.3)": 1},
   "features/evidence/EvidenceViewer.tsx": {"#10b981": 1, "#d97706": 3, "#f87171": 1, "rgba(16,185,129,0.15)": 1, "rgba(234,179,8,0.08)": 1, "rgba(234,179,8,0.15)": 1, "rgba(234,179,8,0.3)": 1, "rgba(248,81,73,0.08)": 1, "rgba(248,81,73,0.1)": 2, "rgba(248,81,73,0.15)": 2, "rgba(248,81,73,0.3)": 1, "rgba(56,139,253,0.15)": 1},
   "features/mlops/ModelLineageView.tsx": {"#0d1117": 34, "#161b22": 13, "#1a7f37": 1, "#1f242c": 7, "#1f6feb": 1, "#21262d": 7, "#30363d": 53, "#388bfd": 2, "#3d1214": 1, "#3fb950": 20, "#58a6ff": 40, "#8b949e": 108, "#94a3b8": 1, "#a0a8b2": 2, "#c9d1d9": 43, "#cf222e": 1, "#d29922": 4, "#e3b341": 3, "#eab308": 1, "#f0883e": 9, "#f0f6fc": 30, "#f59e0b": 3, "#f85149": 14, "#fde047": 1, "#fed7aa": 7, "#ff7b72": 10, "#ffb4a9": 1, "#ffffff": 2, "rgba(139,148,158,0.15)": 1, "rgba(160,168,178,0.15)": 2, "rgba(210,153,34,0.2)": 1, "rgba(234,179,8,0.12)": 1, "rgba(240,136,62,0.15)": 5, "rgba(248,81,73,0.12)": 3, "rgba(248,81,73,0.15)": 7, "rgba(248,81,73,0.2)": 1, "rgba(46,160,67,0.12)": 5, "rgba(46,160,67,0.15)": 1, "rgba(46,160,67,0.2)": 1, "rgba(56,139,253,0.12)": 1, "rgba(56,139,253,0.15)": 8, "rgba(56,139,253,0.2)": 1},
-  "features/nodes/NodeDetail.tsx": {"#2ea043": 1, "#3fb950": 4, "#58a6ff": 2, "rgba(110,118,129,0.2)": 1, "rgba(210,153,34,0.12)": 1, "rgba(210,153,34,0.15)": 1, "rgba(248,81,73,0.1)": 1, "rgba(46,160,67,0.15)": 1},
+  "features/nodes/NodeDetail.tsx": {"rgba(210,153,34,0.12)": 1, "rgba(210,153,34,0.15)": 1, "rgba(248,81,73,0.1)": 1},
   "features/nodes/NodeList.tsx": {"#1e1e1e": 1, "#2d3748": 1, "#4ade80": 2, "#fff": 1, "#ffffff": 1, "rgba(210,153,34,0.15)": 1, "rgba(56,189,248,0.12)": 1, "rgba(56,189,248,0.3)": 1},
   "features/placement/PlacementExplainView.tsx": {"#d97706": 1, "rgba(16,185,129,0.1)": 1, "rgba(16,185,129,0.15)": 1, "rgba(234,179,8,0.15)": 1, "rgba(234,179,8,0.3)": 1},
   "features/placement/PlacementSimulator.tsx": {"#334155": 3, "#93c5fd": 1, "#94a3b8": 2, "#ef4444": 4, "#f87171": 1, "#fbbf24": 4, "#fca5a5": 4, "#fff": 3, "#ffffff": 2, "rgba(234,179,8,0.15)": 2, "rgba(234,179,8,0.3)": 2, "rgba(239,68,68,0.1)": 4, "rgba(35,134,54,0.1)": 1},
@@ -1010,6 +1010,145 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(getContrast(darkTokens[activeValueVar], darkTokens[activeBoxBgVar]), 'Non-obs sched value dark contrast on subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
       expect(getContrast(lightTokens[activeBoxBorderVar], lightTokens[activeBoxBgVar]), 'Non-obs sched border light contrast on subtle >= 3.0:1').toBeGreaterThanOrEqual(3.0);
       expect(getContrast(darkTokens[activeBoxBorderVar], darkTokens[activeBoxBgVar]), 'Non-obs sched border dark contrast on subtle >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 6) Render online NodeDetail with resource usage (Card 193: NodeDetail residual 9 literals resolution)
+      const onlineNode = {
+        ...obsNode,
+        observationOnly: false,
+        status: 'online',
+        cpuUsagePercent: 35,
+        memoryUsedBytes: 12 * 1024 ** 3,
+        memoryTotalBytes: 32 * 1024 ** 3,
+      };
+      const sampleResourceUsage = {
+        source: 'execution-kernel' as const,
+        nodeId: 'node_obs_detail',
+        stateAsOf: '2026-10-01T12:00:00Z',
+        resources: [
+          {
+            resourceId: 'res_cpu_01',
+            kind: 'cpu',
+            unit: 'cores',
+            capacity: 8,
+            offered: 8,
+            reserved: 4,
+            spare: 4,
+            measured: true,
+            observedAt: '2026-10-01T12:00:00Z',
+          },
+          {
+            resourceId: 'res_gpu_01',
+            kind: 'gpu',
+            unit: 'devices',
+            capacity: 2,
+            offered: 2,
+            reserved: 0,
+            spare: 2,
+            measured: false,
+            observedAt: '2026-10-01T12:00:00Z',
+          },
+        ],
+      };
+
+      await act(async () => {
+        root.render(
+          <NodeDetail
+            node={onlineNode as any}
+            resourceUsage={sampleResourceUsage as any}
+            resourceUsageState="success"
+            onBack={() => {}}
+          />
+        );
+      });
+
+      // 6.a) Online Timeline Status (replaces #3fb950)
+      const timelineOnline = container.querySelector('[data-testid="node-detail-timeline-status"]') as HTMLElement;
+      expect(timelineOnline, 'Timeline online status must render').not.toBeNull();
+      expect(timelineOnline.style.color, 'Timeline online status must bind to var(--color-status-online)').toBe('var(--color-status-online)');
+      expect(timelineOnline.textContent).toContain('Heartbeat OK');
+      const tlOnlineVar = helperExtractVar(timelineOnline.style.color);
+
+      // Extract enclosing panel background from DOM
+      const timelinePanel = container.querySelector('[data-testid="node-detail-lease-panel"]') as HTMLElement;
+      expect(timelinePanel, 'Timeline lease panel must render').not.toBeNull();
+      expect(timelinePanel.style.backgroundColor, 'Timeline lease panel background must bind to var(--color-bg-surface)').toBe('var(--color-bg-surface)');
+      const tlPanelBgVar = helperExtractVar(timelinePanel.style.backgroundColor);
+
+      expect(getContrast(lightTokens[tlOnlineVar], lightTokens[tlPanelBgVar]), 'Timeline online light contrast on surface >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[tlOnlineVar], darkTokens[tlPanelBgVar]), 'Timeline online dark contrast on surface >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      // 6.b) Resource Measured Badge - measured=true (replaces rgba(46,160,67,0.15), #3fb950, #2ea043)
+      const measuredBadge = container.querySelector('[data-testid="resource-measured-badge-cpu"]') as HTMLElement;
+      expect(measuredBadge, 'Measured badge must render').not.toBeNull();
+      expect(measuredBadge.style.backgroundColor, 'Measured badge background must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(measuredBadge.style.color, 'Measured badge text must bind to var(--color-status-online)').toBe('var(--color-status-online)');
+      expect(measuredBadge.style.borderColor, 'Measured badge border must bind to var(--color-status-online)').toBe('var(--color-status-online)');
+      const mbTextVar = helperExtractVar(measuredBadge.style.color);
+      const mbBgVar = helperExtractVar(measuredBadge.style.backgroundColor);
+      const mbBorderVar = helperExtractVar(measuredBadge.style.borderColor);
+      expect(getContrast(lightTokens[mbTextVar], lightTokens[mbBgVar]), 'Measured badge text light contrast on subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[mbTextVar], darkTokens[mbBgVar]), 'Measured badge text dark contrast on subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[mbBorderVar], lightTokens[mbBgVar]), 'Measured badge border light contrast on subtle >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[mbBorderVar], darkTokens[mbBgVar]), 'Measured badge border dark contrast on subtle >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 6.c) Resource Measured Badge - measured=false (replaces rgba(110,118,129,0.2))
+      const unmeasuredBadge = container.querySelector('[data-testid="resource-measured-badge-gpu"]') as HTMLElement;
+      expect(unmeasuredBadge, 'Unmeasured badge must render').not.toBeNull();
+      expect(unmeasuredBadge.style.backgroundColor, 'Unmeasured badge background must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      expect(unmeasuredBadge.style.color, 'Unmeasured badge text must bind to var(--color-text-muted)').toBe('var(--color-text-muted)');
+      expect(unmeasuredBadge.style.borderColor, 'Unmeasured badge border must bind to var(--color-border-subtle)').toBe('var(--color-border-subtle)');
+      const umbTextVar = helperExtractVar(unmeasuredBadge.style.color);
+      const umbBgVar = helperExtractVar(unmeasuredBadge.style.backgroundColor);
+      const umbBorderVar = helperExtractVar(unmeasuredBadge.style.borderColor);
+      expect(getContrast(lightTokens[umbTextVar], lightTokens[umbBgVar]), 'Unmeasured badge text light contrast on subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[umbTextVar], darkTokens[umbBgVar]), 'Unmeasured badge text dark contrast on subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[umbBorderVar], lightTokens[umbBgVar]), 'Unmeasured badge border light contrast on subtle >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[umbBorderVar], darkTokens[umbBgVar]), 'Unmeasured badge border dark contrast on subtle >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 6.d) Resource Reserved & Spare Values (replaces #58a6ff, #3fb950)
+      const resCardCpu = container.querySelector('[data-testid="resource-usage-card-cpu"]') as HTMLElement;
+      expect(resCardCpu, 'Resource usage card must render').not.toBeNull();
+      expect(resCardCpu.style.backgroundColor, 'Resource usage card background must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      const resCardBgVar = helperExtractVar(resCardCpu.style.backgroundColor);
+
+      const resReservedVal = container.querySelector('[data-testid="resource-reserved-val-cpu"]') as HTMLElement;
+      expect(resReservedVal, 'Resource reserved value must render').not.toBeNull();
+      expect(resReservedVal.style.color, 'Reserved value must bind to var(--color-brand-primary)').toBe('var(--color-brand-primary)');
+      const resReservedVar = helperExtractVar(resReservedVal.style.color);
+      expect(getContrast(lightTokens[resReservedVar], lightTokens[resCardBgVar]), 'Reserved value light contrast on subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[resReservedVar], darkTokens[resCardBgVar]), 'Reserved value dark contrast on subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      const resSpareVal = container.querySelector('[data-testid="resource-spare-val-cpu"]') as HTMLElement;
+      expect(resSpareVal, 'Resource spare value must render').not.toBeNull();
+      expect(resSpareVal.style.color, 'Spare value must bind to var(--color-status-online)').toBe('var(--color-status-online)');
+      const resSpareVar = helperExtractVar(resSpareVal.style.color);
+      expect(getContrast(lightTokens[resSpareVar], lightTokens[resCardBgVar]), 'Spare value light contrast on subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[resSpareVar], darkTokens[resCardBgVar]), 'Spare value dark contrast on subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      // 6.e) 4-Tier Breakdown Observed Usage & Headroom Values (replaces #58a6ff, #3fb950)
+      const obsUsageBox = container.querySelector('[data-testid="node-detail-observed-usage-box"]') as HTMLElement;
+      expect(obsUsageBox, 'Observed usage box must render').not.toBeNull();
+      expect(obsUsageBox.style.backgroundColor, 'Observed usage box background must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      const obsUsageBoxBgVar = helperExtractVar(obsUsageBox.style.backgroundColor);
+
+      const obsUsageVal = container.querySelector('[data-testid="node-detail-observed-usage-value"]') as HTMLElement;
+      expect(obsUsageVal, 'Observed usage value must render').not.toBeNull();
+      expect(obsUsageVal.style.color, 'Observed usage value must bind to var(--color-brand-primary)').toBe('var(--color-brand-primary)');
+      const obsUsageVar = helperExtractVar(obsUsageVal.style.color);
+      expect(getContrast(lightTokens[obsUsageVar], lightTokens[obsUsageBoxBgVar]), 'Observed usage light contrast on subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[obsUsageVar], darkTokens[obsUsageBoxBgVar]), 'Observed usage dark contrast on subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      const obsHeadroomBox = container.querySelector('[data-testid="node-detail-observed-headroom-box"]') as HTMLElement;
+      expect(obsHeadroomBox, 'Observed headroom box must render').not.toBeNull();
+      expect(obsHeadroomBox.style.backgroundColor, 'Observed headroom box background must bind to var(--color-bg-subtle)').toBe('var(--color-bg-subtle)');
+      const obsHeadroomBoxBgVar = helperExtractVar(obsHeadroomBox.style.backgroundColor);
+
+      const obsHeadroomVal = container.querySelector('[data-testid="node-detail-observed-headroom-value"]') as HTMLElement;
+      expect(obsHeadroomVal, 'Observed headroom value must render').not.toBeNull();
+      expect(obsHeadroomVal.style.color, 'Observed headroom value must bind to var(--color-status-online)').toBe('var(--color-status-online)');
+      const obsHeadroomVar = helperExtractVar(obsHeadroomVal.style.color);
+      expect(getContrast(lightTokens[obsHeadroomVar], lightTokens[obsHeadroomBoxBgVar]), 'Observed headroom light contrast on subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[obsHeadroomVar], darkTokens[obsHeadroomBoxBgVar]), 'Observed headroom dark contrast on subtle >= 4.5:1').toBeGreaterThanOrEqual(4.5);
     } finally {
       act(() => {
         root.unmount();
@@ -1122,6 +1261,22 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
 
     // Probe 18 [Codex r1]: Timeline degraded status former #d29922 (2.52:1 on light surface)
     expect(getContrast('#d29922', lightTokens['--color-bg-surface']), 'Defective #d29922 on light surface must fail 4.5:1').toBeLessThan(4.5);
+
+    // Probe 19 [Card 193]: Former #3fb950 on light subtle (#f1f5f9) (2.32:1) strictly fails 4.5:1
+    expect(getContrast('#3fb950', lightTokens['--color-bg-subtle']), 'Defective former #3fb950 on light subtle must fail 4.5:1').toBeLessThan(4.5);
+
+    // Probe 20 [Card 193]: Former #3fb950 on light surface (#ffffff) (2.54:1) strictly fails 4.5:1
+    expect(getContrast('#3fb950', lightTokens['--color-bg-surface']), 'Defective former #3fb950 on light surface must fail 4.5:1').toBeLessThan(4.5);
+
+    // Probe 21 [Card 193]: Former #58a6ff on light subtle (#f1f5f9) (2.31:1) strictly fails 4.5:1
+    expect(getContrast('#58a6ff', lightTokens['--color-bg-subtle']), 'Defective former #58a6ff on light subtle must fail 4.5:1').toBeLessThan(4.5);
+
+    // Probe 22 [Card 193]: Former #58a6ff on light canvas (#f8fafc) (2.41:1) strictly fails 4.5:1
+    expect(getContrast('#58a6ff', lightTokens['--color-bg-canvas']), 'Defective former #58a6ff on light canvas must fail 4.5:1').toBeLessThan(4.5);
+
+    // Probe 23 [Card 193]: Former #3fb950 on 15% green tint composite over light subtle (1.98:1) strictly fails 4.5:1
+    const defectiveGreenTintBadge = blendRgba([46, 160, 67], 0.15, lightTokens['--color-bg-subtle']);
+    expect(getContrast('#3fb950', defectiveGreenTintBadge), 'Defective #3fb950 on green tint over subtle must fail 4.5:1').toBeLessThan(4.5);
 
     // Legacy Token Reverts:
     // Legacy Dark --color-border-subtle: #374151
