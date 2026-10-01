@@ -401,7 +401,8 @@ export function isStepUpPending(): boolean {
     const saved = sessionStorage.getItem(STORAGE_KEY);
     if (!saved) return false;
     const tx = JSON.parse(saved);
-    return Boolean(tx?.isStepUp);
+    if (typeof tx !== 'object' || tx === null || Array.isArray(tx)) return false;
+    return tx.isStepUp === true;
   } catch {
     return false;
   }
@@ -651,8 +652,11 @@ export async function completeLogin(): Promise<{
   }
 
   // F-R3: Step-up transaction must not be handled by completeLogin()
-  if (tx.isStepUp) {
+  if (tx.isStepUp === true) {
     throw new Error('재인증(Step-Up) 트랜잭션은 completeStepUp()으로 처리해야 합니다.');
+  }
+  if (tx.isStepUp !== undefined && typeof tx.isStepUp !== 'boolean') {
+    throw new Error('로그인 요청 검증에 실패했습니다. 다시 로그인하세요.');
   }
 
   try {
@@ -820,8 +824,8 @@ export async function completeStepUp(): Promise<{
     throw new Error('로그인 요청이 없거나 만료됐습니다. 다시 로그인하세요.');
   }
 
-  // F-R3: Verify step-up marker BEFORE token exchange
-  if (!tx.isStepUp) {
+  // F-R3: Verify step-up marker strictly BEFORE token exchange (reject non-boolean / truthy values)
+  if (tx.isStepUp !== true) {
     throw new Error('진행 중인 재인증(Step-Up) 트랜잭션이 아닙니다.');
   }
 

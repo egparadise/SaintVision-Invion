@@ -11,6 +11,8 @@ import { ReleaseManifestResponse, ReleaseManifestDetailResponse } from '../src/s
 describe('Card 192 / S12-FE: Portal Step-Up Re-Authentication UI Entry Point', () => {
   let container: HTMLDivElement;
   let root: Root;
+  const originalLocation = window.location;
+  const originalConfig = (window as any).__SAINTVISION_CONFIG__;
 
   beforeEach(() => {
     container = document.createElement('div');
@@ -24,7 +26,10 @@ describe('Card 192 / S12-FE: Portal Step-Up Re-Authentication UI Entry Point', (
       root.unmount();
     });
     container.remove();
+    vi.unstubAllGlobals();
     vi.restoreAllMocks();
+    (window as any).location = originalLocation;
+    (window as any).__SAINTVISION_CONFIG__ = originalConfig;
   });
 
   const sampleManifestSha = '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
@@ -126,6 +131,7 @@ describe('Card 192 / S12-FE: Portal Step-Up Re-Authentication UI Entry Point', (
 
     await act(async () => {
       stepUpBtn.click();
+      await new Promise((r) => setTimeout(r, 50));
     });
 
     expect(beginStepUpSpy).toHaveBeenCalledWith({
@@ -176,6 +182,7 @@ describe('Card 192 / S12-FE: Portal Step-Up Re-Authentication UI Entry Point', (
 
     await act(async () => {
       stepUpBtn.click();
+      await new Promise((r) => setTimeout(r, 50));
     });
 
     expect(assignMock).toHaveBeenCalledTimes(1);
@@ -208,6 +215,7 @@ describe('Card 192 / S12-FE: Portal Step-Up Re-Authentication UI Entry Point', (
 
     await act(async () => {
       stepUpBtn.click();
+      await new Promise((r) => setTimeout(r, 50));
     });
 
     expect(container.textContent).toContain('🛑 재인증 요청 실패: OIDC Discovery failed');

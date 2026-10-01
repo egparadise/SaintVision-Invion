@@ -20,12 +20,12 @@ Codex Security (F-R1~F-R4, 22:53) 및 Claude UI (S1~S6, 22:42)의 r1 리뷰 지�
 | **F-R2** | Codex | High / Security | `beginStepUp`이 `previousToken`을 `sessionStorage`에 직렬화. Codex 보안 결정 선택지 (b) 적용 요구 (Web Storage 토큰 0건 불변식) | `Transaction` 인터페이스 및 `beginStepUp`에서 `previousToken` 완전 제거. `sessionStorage`에 토큰/비밀/Bearer 문자열 0건 잔류 불변식 강제 (M9 사살). `sanitizeReturnUrl`로 오픈 리다이렉트 원천 차단 |
 | **F-R3** | Codex | High / Security | 토큰 엔드포인트 교환 전 step-up 트랜잭션 마커 검증 부재. 일반/Step-Up 교차 호출 차단 필요 | `completeStepUp()`은 `tx.isStepUp === true`가 아니면 네트워크 호출 전 즉시 fail-closed 거부. `completeLogin()`은 step-up 트랜잭션 진입 시 즉시 거부 (M6 사살). `Login.tsx`에서 `isStepUpPending()` 분기 |
 | **F-R4** | Codex | Medium / Security | Step-up authorize 요청 시 `openid` 스코프 누락 가능성. fail-closed 강제 필요 | `beginStepUp()` 진입 시 `config.scope.split(/\s+/).includes('openid')` 검사, 누락 시 네트워크/저장소 조작 전 즉시 fail-closed 예외 발생 (M5 사살) |
-| **S1** | Claude | Major / Contract | `sanitizeReturnUrl`의 동일 origin 및 safe path 계약 준수 | 절대 URL, scheme-relative(`//`), fragment(`#`), userinfo(`@`) 주입 시 안전 기본값 `/studio`로 정규화되는 계약 검증 6개 케이스 추가 |
+| **S1** | Claude | Blocker / Security | `sessionStorage`에 bearer 토큰 저장 금지 (선택지 b 적용 요구) | `Transaction.previousToken` 완전 제거, `sessionStorage`에 토큰/비밀 문자열 0건 불변식 강제 (M9 사살), same-origin `returnUrl`만 허용 |
 | **S2** | Claude | Major / Boundary | 브라우저 리다이렉트 시 메모리 토큰 휘발 모사 누락 | 콜백 시험 전 `clearAuthToken()` 및 `clearSessionExpiration()`을 호출하여 실제 페이지 언로드/리다이렉트 경계를 충실히 모사 |
-| **S3** | Claude | Major / Lifecycle | `completeStepUp` 및 `completeLogin`의 조기 `setAuthToken` 호출로 인한 원자성 훼손 | `completeStepUp` 및 `completeLogin` 내부의 조기 `setAuthToken` 제거. 결과 반환 후 호출자(`Login.tsx`) 컴포넌트 활성 수명주기 내에서 `commitSession(token, expiresAt)`으로 원자적 커밋 (M4 사살) |
+| **S3** | Claude | Major / Lifecycle | 실패 시 숨은 토큰과 화면 불일치 방지 및 조기 `setAuthToken` 원자성 훼손 방지 | `completeStepUp` 및 `completeLogin` 내부의 조기 `setAuthToken` 제거. 결과 반환 후 호출자(`Login.tsx`) 컴포넌트 활성 수명주기 내에서 `commitSession(token, expiresAt)`으로 원자적 커밋, 실패 시 `clearAuthToken()` 수행 (M4 사살) |
 | **S4** | Claude | Minor / Design | `IntranetDeploymentView.tsx`의 미정의 토큰 `var(--color-status-warning)` 사용 및 래칫 불변식 주의 | 정의된 상태 토큰 `var(--color-status-unknown)`으로 교체. 컨테이너 테두리는 `var(--color-border-strong)`을 적용하여 `borderSubtleCount === 141` 래칫 엄격 준수 (13/13 pass) |
-| **S5** | Claude | Minor / Test | Vitest 병렬 실행 시 `window.__SAINTVISION_CONFIG__` 스텁 오염 | 독립 격리 옵션 및 `--maxWorkers=1` 환경에서 5개 테스트 스위트 119개 시험 100% 통과 실측 |
-| **S6** | Claude | Minor / Doc | 오류 타입(`Error`) 일치, 함수 시그니처, 무저장/재인증 경계 문서화 | History 및 작업 현황판에 실제 함수 시그니처 및 저장소 무저장(선택지 b) 불변식 충실 반영 |
+| **S5** | Claude | Minor / UI & A11y | 문구 및 사용자 안내 개선 ("재인증 필요" 및 실패 동작 설명) | "릴리스 수락 전 재인증 필요" 문구 반영, 리다이렉트 전/후 실패 동작 설명 문구 반영 |
+| **S6** | Claude | Minor / Doc | 오류 타입(`Error`) 일치, 함수 시그니처(`()`), 무저장/재인증 경계 문서화 | `ContractViolationError` 대신 `Error` 명시, 무인자 시그니처 `()`, 저장소 무저장(선택지 b) 불변식 충실 반영 |
 
 ---
 

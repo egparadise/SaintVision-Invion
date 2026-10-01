@@ -36,13 +36,13 @@
 - `Transaction` 인터페이스 확장: `isStepUp?: boolean`, `previousToken?: string | null`, `returnUrl?: string` 필드 추가.
 - `validateStepUpRequest(req)`:
   - `prompt === 'login'`, `max_age === 300`을 엄격히 검증.
-  - 객체가 아니거나 잉여 속성(`additionalProperties`)이 존재할 시 `ContractViolationError` 발생.
+  - 객체가 아니거나 잉여 속성(`additionalProperties`)이 존재할 시 `Error` 발생 (계약 위반 예외).
 - `beginStepUp(options)`:
   - 기존 세션의 `getAuthToken()`을 `previousToken`으로 포획.
   - 신규 `code_verifier`, `code_challenge` (S256), `state`, `nonce`를 암호학적으로 생성.
   - `prompt=login&max_age=300`을 authorize 쿼리 파라미터에 엄격히 결속하며, 인가 엔드포인트 URL을 반환.
   - `sessionStorage`에 step-up 트랜잭션 안전 보존.
-- `completeLogin(currentUrl)` / `completeStepUp(currentUrl)`:
+- `completeLogin()` / `completeStepUp()`:
   - callback 처리 실패 시(`access_denied`, network error, state mismatch, token parse error, `/v1/session` exchange failure) `catch` 블록에서 `rollbackPreviousToken(tx)`을 호출하여 이전 토큰을 즉각 복구.
   - callback 성공 시에만 새 토큰(`freshToken`)으로 교체하고 이전 토큰을 결과 객체에 포함하여 반환.
   - `completeStepUp`은 트랜잭션이 step-up이 아닌 경우 즉시 거부(`Step-Up 트랜잭션이 아닙니다`).

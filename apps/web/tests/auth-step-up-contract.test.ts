@@ -6,6 +6,7 @@ import {
   commitSession,
   completeLogin,
   completeStepUp,
+  isStepUpPending,
   validateStepUpRequest,
   STORAGE_KEY,
   clearSessionExpiration,
@@ -301,6 +302,41 @@ describe('Card 192 / S12-BE Handoff: Portal OIDC Step-Up Re-Authentication Flow'
       expect(getAuthToken()).toBeNull();
       expect(storage.size, 'Transaction must be cleared').toBe(0);
     });
+
+    it.each([
+      ['문자열 "false"', 'false'],
+      ['문자열 "true"', 'true'],
+      ['문자열 "1"', '1'],
+      ['숫자 1', 1],
+      ['숫자 0', 0],
+      ['빈 객체 {}', {}],
+      ['빈 배열 []', []],
+    ])('isStepUp marker가 비-boolean 값 (%s)으로 변조되면 isStepUpPending()은 false를 반환하고 completeStepUp()은 토큰 엔드포인트 호출 전에 거부한다', async (_, invalidMarker) => {
+      const url = new URL(await beginLogin());
+      location.pathname = '/callback';
+      location.search = `?code=tampered_code&state=${url.searchParams.get('state')}`;
+
+      // Mutate stored transaction's marker to non-boolean value
+      const rawTx = JSON.parse(storage.get(STORAGE_KEY)!);
+      rawTx.isStepUp = invalidMarker;
+      storage.set(STORAGE_KEY, JSON.stringify(rawTx));
+
+      // 1. isStepUpPending must strictly evaluate to false
+      expect(isStepUpPending(), 'isStepUpPending must be strictly false for non-boolean marker').toBe(false);
+
+      // 2. Simulate pre-redirect memory token (previous token in memory)
+      setAuthToken('pre-existing-bearer-token');
+
+      // 3. completeStepUp must reject before token exchange
+      await expect(completeStepUp()).rejects.toThrow('진행 중인 재인증(Step-Up) 트랜잭션이 아닙니다');
+
+      // 4. Invariants: 0 token endpoint calls, 0 /v1/session calls, active token preserved
+      expect(mockFetch, 'Must NOT invoke token endpoint or /v1/session').not.toHaveBeenCalled();
+      expect(getAuthToken(), 'Active token must remain unchanged').toBe('pre-existing-bearer-token');
+      expect(storage.size, 'Storage transaction must be cleared on consumption').toBe(0);
+
+      clearAuthToken();
+    });
   });
 
   // 6. F-R1: ID Token Signature Verification via JWKS
@@ -366,11 +402,13 @@ describe('Card 192 / S12-BE Handoff: Portal OIDC Step-Up Re-Authentication Flow'
         exp: now + 300,
       });
 
-      // Tamper signature by changing the last character
+      // Tamper signature deterministically by flipping a valid bit in the center component (matching Card 185)
       const parts = authenticIdToken.split('.');
-      const lastChar = parts[2].slice(-1);
-      const replacementChar = lastChar === 'a' ? 'b' : 'a';
-      const tamperedIdToken = `${parts[0]}.${parts[1]}.${parts[2].slice(0, -1)}${replacementChar}`;
+      const signature = parts[2];
+      const offset = Math.floor(signature.length / 2);
+      const replacement = signature[offset] !== 'A' ? 'A' : 'B';
+      const tamperedSignature = signature.slice(0, offset) + replacement + signature.slice(offset + 1);
+      const tamperedIdToken = `${parts[0]}.${parts[1]}.${tamperedSignature}`;
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
