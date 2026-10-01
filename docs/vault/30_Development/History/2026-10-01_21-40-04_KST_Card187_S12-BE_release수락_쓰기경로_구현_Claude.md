@@ -1,12 +1,12 @@
 ---
 doc_id: "HISTORY-S12-BE-RELEASE-ACCEPTANCE-WRITE-IMPL-20261001"
 title: "S12-BE release 수락·operator sign-off 쓰기 경로 구현 — 두 사람, 그 순서로. 그리고 왜 지금은 닫혀 있는지 (카드 187)"
-version: "1.0.0"
+version: "1.1.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-01T21:40:04+09:00"
+updated: "2026-10-02T01:12:52+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "b96068b6"
@@ -117,3 +117,44 @@ commit되지 않은 행은 보이지 않으므로 두 번째는 잠글 행을 �
   projection은 이미 있고 그 값들과 **일치하는지 시험이 확인한다**(카드 187 1단계).
 - **감사 사건은 여섯 종으로 닫았고**, 일곱 번째를 쓰면 `ValueError`다. denial 감사는 기존 `record_denial_out_of_band` 경로를 쓴다.
 - Keycloak mapper·portal step-up은 카드 188의 것이다.
+
+## 6. 검토에서 바뀐 결정 — write-time grant의 단일 정본은 DB 함수다
+
+`#286` 보안 검토 r2에서 Codex가 변이 하나를 들었다: `src/saintvision/services/release_acceptance.py`의 **두 번째**
+`require_global_administrator()` 호출을 **지워도 시험이 전부 통과한다**. 설계 §4 step 8이 "쓰기 직전 권한 재검사"를
+요구하므로 그 호출은 그 문장을 코드로 옮긴 것처럼 보였다.
+
+**측정한 것.** 그 호출이 왜 죽일 수 없는지 먼저 확인했다. `public.business_admin_allowed`는 grant 행에 **`FOR SHARE`** 를
+잡는다. 그래서 요청 머리에서의 **첫** 검사가 그 행을 **transaction 전체 동안** 고정하고, 동시 회수는 commit까지 **막힌다**
+— scratch database에서 직접 재현했다: 회수하는 statement가 그대로 멈춰 timeout까지 간다. 같은 transaction 안에서의 두 번째
+호출은 따라서 **다른 답을 낼 수 없다**. 변이가 생존한 이유는 시험이 약해서가 아니라 그 코드가 **증명 가능하게 무력**하기
+때문이다.
+
+**결정.** 호출을 **삭제했다**. 보안 검사처럼 보이는 죽은 코드는 없는 것보다 나쁘다 — 읽는 사람에게 grant가 두 번
+집행된다고 말하지만 두 번째는 무력하고, 시험으로 보호할 수도 없으니 다음 refactor가 아무 신호 없이 지워도 똑같다.
+그래서 **`public.release_acceptance_confirm`이 write-time grant의 단일 정본**이다. 남는 것은 둘이다.
+
+| 무엇이 실제로 집행하나 | 어디서 |
+|---|---|
+| 요청 경계의 첫 검사 — 그리고 **lock을 잡는 쪽이 이것**이다 | `confirm()` 머리의 `require_global_administrator()` |
+| 쓰기 직전 재검사 — grant를 **스스로 다시 읽는다**, 행을 넣는 **같은 statement 안에서** | `public.release_acceptance_confirm` (0057, `SECURITY INVOKER`) |
+
+두 번째가 §4 step 8을 만족시키고, **service 함수를 거치지 않고 table에 닿는 경로까지** 덮는다(§4-1). 반대 선택지는 service
+재검사를 독립 경계로 선언하고 호출을 잡는 시험을 두는 것이었는데, 그 시험은 **집행을 측정하지 못한다** — 호출이 있는지만
+본다. 측정할 수 없는 경계를 선언하지 않기로 했다.
+
+이 결정은 세 자리에 적는다: 계약·설계는 `#282` v1.3.0 §4 step 8, 주석은 호출이 있던 자리
+(`src/saintvision/services/release_acceptance.py`의 `confirm()` 안, manifest 재확인 바로 위), 그리고 이 절이다.
+
+### 6-1. 같은 round의 다른 두 가지
+
+- **commit되는 409도 감사한다.** 만료·manifest-superseded는 lifecycle 행과 slot 해제를 **commit한 뒤** 409를 돌려주므로
+  정본 problem handler를 거치지 않았고, `proposal_invalidated`만 남고 `denied`는 **0행**이었다(Codex 측정). route가 스스로
+  `record_denial_out_of_band()`로 **정확히 1행**을 쓴다 — repository 규칙("route는 거부가 되돌리는 transaction 안에 있다")이
+  **적용되지 않는 유일한 경우**가 이것이고, 그래서 band 밖에서 쓴다. **전이를 수행한 요청만** 기록한다: 같은 key replay와
+  다른 key 재요청은 같은 사실에 대한 같은 답이므로 0행이고, 그렇지 않으면 감사가 거부가 아니라 **재시도**를 센다.
+- **release의 정체성과 policy pin은 다시 쓸 수 없다**(`#291` r2 Low). 0005가 app 역할에 `release_manifests` 전체 UPDATE를
+  주었으므로, `manifest_sha256`을 고칠 수 있는 사람은 **수락 행을 건드리지 않고** 이미 수락된 결정이 본 적 없는 구성을
+  가리키게 만들 수 있었다. `release_manifest_pin_is_final()` trigger(`SECURITY INVOKER`)가 digest는 **불변**, policy 쌍은
+  **한 번만 쓰기**로 고정한다 — 열 권한 회수가 아니라 trigger인 이유는 그 grant가 이 카드가 소유하지 않은 writer와 공유되기
+  때문이다.
