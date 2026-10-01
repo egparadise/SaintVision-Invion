@@ -110,9 +110,9 @@ describe('ACC-01~09 Interactive Navigation & Tablist WAI-ARIA Suite', () => {
   });
 
   // --------------------------------------------------------------------------
-  // ACC-02: NodeList Keyboard Navigation
+  // ACC-02: NodeList Keyboard Navigation (F3: No nested buttons, sibling native controls)
   // --------------------------------------------------------------------------
-  it('ACC-02: NodeList node cards have tabIndex=0, aria-label, and trigger onSelectNode via Enter and Space keys', async () => {
+  it('ACC-02 (F3): NodeList separates card surface and secondary action into sibling native controls without nested interactive buttons', async () => {
     const mockNodes: NodeItem[] = [
       {
         id: 'node-online-1',
@@ -122,6 +122,12 @@ describe('ACC-01~09 Interactive Navigation & Tablist WAI-ARIA Suite', () => {
         os: 'linux',
         labels: { tier: 'primary' },
         resources: { cpuTotal: 16, cpuUsage: 25, memoryTotal: 32768, memoryUsage: 45, diskTotal: 1000, diskUsage: 30, gpus: [] },
+        cpuCores: 16,
+        cpuUsagePercent: 25,
+        memoryTotalBytes: 32768 * 1024 * 1024,
+        memoryUsedBytes: 14745 * 1024 * 1024,
+        allocatableCores: 12,
+        allocatableMemoryBytes: 16384 * 1024 * 1024,
         lastHeartbeat: new Date().toISOString(),
       },
       {
@@ -138,9 +144,10 @@ describe('ACC-01~09 Interactive Navigation & Tablist WAI-ARIA Suite', () => {
     ];
 
     const onSelectNode = vi.fn();
+    const onOpenStudio = vi.fn();
 
     await act(async () => {
-      root.render(<NodeList nodes={mockNodes} onSelectNode={onSelectNode} />);
+      root.render(<NodeList nodes={mockNodes} onSelectNode={onSelectNode} onOpenStudio={onOpenStudio} />);
     });
 
     const card1 = container.querySelector('[data-testid="node-card-node-online-1"]') as HTMLElement;
@@ -149,38 +156,60 @@ describe('ACC-01~09 Interactive Navigation & Tablist WAI-ARIA Suite', () => {
     expect(card1).not.toBeNull();
     expect(card2).not.toBeNull();
 
-    // Schedulable/online node card
-    expect(card1.getAttribute('role')).toBe('button');
-    expect(card1.getAttribute('tabindex')).toBe('0');
-    expect(card1.getAttribute('aria-label')).toBe('노드 worker-node-1 선택');
+    // 1. F3: Normal card container MUST NOT have role="button" or tabIndex (avoids nested button antipattern)
+    expect(card1.getAttribute('role')).toBeNull();
+    expect(card1.getAttribute('tabindex')).toBeNull();
 
-    // Telemetry-unavailable / lost node card
-    expect(card2.getAttribute('role')).toBe('alert');
-    expect(card2.getAttribute('tabindex')).toBe('0');
-    expect(card2.getAttribute('aria-label')).toBe('노드 worker-node-2 (lost)');
+    // 2. F3: Sibling native buttons inside normal card
+    const selectBtn = container.querySelector('[data-testid="node-select-btn-node-online-1"]') as HTMLButtonElement;
+    const studioBtn = container.querySelector('[data-testid="node-studio-btn-node-online-1"]') as HTMLButtonElement;
 
-    // Trigger onSelectNode via Enter
+    expect(selectBtn).not.toBeNull();
+    expect(selectBtn.tagName.toLowerCase()).toBe('button');
+    expect(selectBtn.getAttribute('aria-label')).toBe('노드 worker-node-1 선택');
+
+    expect(studioBtn).not.toBeNull();
+    expect(studioBtn.tagName.toLowerCase()).toBe('button');
+
+    // Trigger select via Enter on native button
     await act(async () => {
-      card1.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      selectBtn.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      selectBtn.click();
     });
     expect(onSelectNode).toHaveBeenCalledWith('node-online-1');
 
-    // Trigger onSelectNode via Space
+    // Trigger Studio via click on native button
     await act(async () => {
-      card2.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      studioBtn.click();
+    });
+    expect(onOpenStudio).toHaveBeenCalledWith('node-online-1');
+
+    // 3. F3: Telemetry-unavailable card retains role="alert" container without click/tabIndex on outer container
+    expect(card2.getAttribute('role')).toBe('alert');
+    expect(card2.getAttribute('tabindex')).toBeNull();
+
+    // Sibling detail button inside telemetry-unavailable card handles selection
+    const detailBtn = container.querySelector('[data-testid="node-detail-btn-node-lost-2"]') as HTMLButtonElement;
+    expect(detailBtn).not.toBeNull();
+    expect(detailBtn.tagName.toLowerCase()).toBe('button');
+    expect(detailBtn.getAttribute('aria-label')).toBe('노드 worker-node-2 상세 및 자원 보기');
+
+    await act(async () => {
+      detailBtn.click();
     });
     expect(onSelectNode).toHaveBeenCalledWith('node-lost-2');
   });
 
   // --------------------------------------------------------------------------
-  // ACC-02: RunList Keyboard Navigation
+  // ACC-02: RunList Keyboard Navigation (F2: Native table semantics, cell action button)
   // --------------------------------------------------------------------------
-  it('ACC-02: RunList rows have role=button, tabIndex=0, aria-label, and trigger onSelectRun via Enter/Space', async () => {
+  it('ACC-02 (F2): RunList preserves native table row semantics and provides accessible cell control for selection', async () => {
     const mockRuns: RunItem[] = [
       {
         id: 'run-001',
         workspaceId: 'wsp-1',
         status: 'running',
+        state: 'running',
         createdAt: new Date().toISOString(),
         triggerType: 'manual',
         taskDescription: 'Build pipeline run',
@@ -195,19 +224,28 @@ describe('ACC-01~09 Interactive Navigation & Tablist WAI-ARIA Suite', () => {
 
     const tr = container.querySelector('tbody tr') as HTMLTableRowElement;
     expect(tr).not.toBeNull();
-    expect(tr.getAttribute('role')).toBe('button');
-    expect(tr.getAttribute('tabindex')).toBe('0');
-    expect(tr.getAttribute('aria-label')).toBe('실행 작업 run-001 상세 조회');
+
+    // F2: <tr> MUST retain native table row semantics — NO role="button" or tabIndex on <tr>!
+    expect(tr.getAttribute('role')).toBeNull();
+    expect(tr.getAttribute('tabindex')).toBeNull();
+
+    // F2: Native accessible action button inside first table cell
+    const runBtn = container.querySelector('[data-testid="run-select-btn-run-001"]') as HTMLButtonElement;
+    expect(runBtn).not.toBeNull();
+    expect(runBtn.tagName.toLowerCase()).toBe('button');
+    expect(runBtn.getAttribute('aria-label')).toBe('실행 작업 run-001 상세 조회');
 
     // Enter key triggers onSelectRun
     await act(async () => {
-      tr.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      runBtn.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      runBtn.click();
     });
     expect(onSelectRun).toHaveBeenCalledWith('run-001');
 
     // Space key triggers onSelectRun
     await act(async () => {
-      tr.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      runBtn.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      runBtn.click();
     });
     expect(onSelectRun).toHaveBeenCalledTimes(2);
   });
@@ -374,9 +412,9 @@ describe('ACC-01~09 Interactive Navigation & Tablist WAI-ARIA Suite', () => {
   });
 
   // --------------------------------------------------------------------------
-  // ACC-06: ResourceExplorer Tablist WAI-ARIA and Keyboard Navigation
+  // ACC-06: ResourceExplorer Tablist WAI-ARIA and Keyboard Navigation (F1: Focus assertions & Up/Down scrolling)
   // --------------------------------------------------------------------------
-  it('ACC-06: ResourceExplorer implements WAI-ARIA tablist pattern with arrow key navigation and matching tabpanels', async () => {
+  it('ACC-06 (F1): ResourceExplorer implements horizontal WAI-ARIA tablist roving tabindex with activeElement assertions and preserves vertical scroll', async () => {
     vi.spyOn(fabricApi, 'getDiscoveryCandidates').mockResolvedValue({ items: [] });
     vi.spyOn(storageObsApi, 'fetchStorageObservation').mockResolvedValue({
       status: 'success',
@@ -416,7 +454,12 @@ describe('ACC-01~09 Interactive Navigation & Tablist WAI-ARIA Suite', () => {
     expect(overviewPanel?.getAttribute('aria-labelledby')).toBe('tab-overview');
     expect(overviewPanel?.getAttribute('tabindex')).toBe('0');
 
+    // Initial focus on overviewTab
+    overviewTab.focus();
+    expect(document.activeElement).toBe(overviewTab);
+
     // 4. Keyboard Arrow Navigation (ArrowRight: overview -> storage)
+    // F1 requirement: document.activeElement MUST be asserted for each roving navigation step
     await act(async () => {
       overviewTab.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
     });
@@ -425,6 +468,7 @@ describe('ACC-01~09 Interactive Navigation & Tablist WAI-ARIA Suite', () => {
     expect(storageTab.getAttribute('tabindex')).toBe('0');
     expect(overviewTab.getAttribute('aria-selected')).toBe('false');
     expect(overviewTab.getAttribute('tabindex')).toBe('-1');
+    expect(document.activeElement).toBe(storageTab); // F1: Assert roving focus explicitly transferred
 
     const storagePanel = container.querySelector('#tabpanel-storage');
     expect(storagePanel).not.toBeNull();
@@ -438,6 +482,7 @@ describe('ACC-01~09 Interactive Navigation & Tablist WAI-ARIA Suite', () => {
 
     expect(discoveryTab.getAttribute('aria-selected')).toBe('true');
     expect(discoveryTab.getAttribute('tabindex')).toBe('0');
+    expect(document.activeElement).toBe(discoveryTab); // F1: Assert roving focus on End
 
     const discoveryPanel = container.querySelector('#tabpanel-discovery');
     expect(discoveryPanel).not.toBeNull();
@@ -451,12 +496,28 @@ describe('ACC-01~09 Interactive Navigation & Tablist WAI-ARIA Suite', () => {
 
     expect(overviewTab.getAttribute('aria-selected')).toBe('true');
     expect(overviewTab.getAttribute('tabindex')).toBe('0');
+    expect(document.activeElement).toBe(overviewTab); // F1: Assert roving focus on Home
 
     // 7. Keyboard Navigation (ArrowLeft: overview -> discovery wrap-around)
     await act(async () => {
       overviewTab.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
     });
 
+    expect(discoveryTab.getAttribute('aria-selected')).toBe('true');
+    expect(discoveryTab.getAttribute('tabindex')).toBe('0');
+    expect(document.activeElement).toBe(discoveryTab); // F1: Assert roving focus on ArrowLeft wrap
+
+    // 8. F1: Horizontal tablist MUST NOT intercept ArrowDown or ArrowUp (preserve page/browser vertical scroll)
+    const downEvent = new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true });
+    discoveryTab.dispatchEvent(downEvent);
+    expect(downEvent.defaultPrevented).toBe(false); // F1: preventDefault not called
+    expect(document.activeElement).toBe(discoveryTab); // F1: focus and selection remained unchanged
+    expect(discoveryTab.getAttribute('aria-selected')).toBe('true');
+
+    const upEvent = new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true });
+    discoveryTab.dispatchEvent(upEvent);
+    expect(upEvent.defaultPrevented).toBe(false); // F1: preventDefault not called
+    expect(document.activeElement).toBe(discoveryTab); // F1: focus and selection remained unchanged
     expect(discoveryTab.getAttribute('aria-selected')).toBe('true');
   });
 });

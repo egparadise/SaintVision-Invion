@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.159"
+version: "1.0.160"
 status: "approved"
 author: "Gemini"
-updated: "2026-10-01T16:05:00+09:00"
+updated: "2026-10-01T16:30:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,32 +19,39 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-10-01T16:05:00+09:00 (Card 174 2부 S11-FE ACC-01~09 전수 대조 및 대화형 카드 키보드 탐색·Tablist WAI-ARIA 접근성 구현, 6개 신규 시험 및 77개 접근성/DOM 스위트 100% 통과, tsc/build/integrity/route_coverage 100% 클린).
+- 확인 기준: 2026-10-01T16:30:00+09:00 (Card 174 2부 PR #275 Codex 수정요청 F1·F2·F3 조치 완결: APG 수평 tablist scroll 보존 및 activeElement 엄격 단언, native tr 의미 보존 및 td 셀 버튼 분리, 노드 카드 비대화형 컨테이너화 및 형제 네이티브 버튼 분리, 6개 신규 시험 및 84개 관련 스위트 100% 통과, tsc/build/integrity/route_coverage 100% 클린).
 
-## 2026-10-01 S11-FE ACC-01~09 전수 대조 및 대화형 카드 키보드 탐색·Tablist WAI-ARIA 접근성 구현 (Card 174 2부, `agent/gemini/c174-s11fe-acc01-09`, base `coord/train6-ci-1413`)
-- **개요**: S11-FE 정본 문서의 접근성 항목 ACC-01~09를 `apps/web` 실제 구현과 전수 대조하고, 외부 전제 없는 미흡/부분 항목(ACC-02 대화형 카드 키보드 접근성, ACC-06 ResourceExplorer WAI-ARIA tablist 순환 탐색)을 완전 구현:
-  1. **ACC-02 대화형 요소 키보드 조작성 완결**:
+## 2026-10-01 S11-FE ACC-01~09 전수 대조 및 대화형 카드 키보드 탐색·Tablist WAI-ARIA 접근성 구현 및 Codex 리뷰 조치 (Card 174 2부, PR #275, `agent/gemini/c174-s11fe-acc01-09`, base `coord/train6-ci-1413`)
+- **개요**: S11-FE 정본 문서의 접근성 항목 ACC-01~09를 `apps/web` 실제 구현과 전수 대조하고, 외부 전제 없는 미흡/부분 항목 구현 및 PR #275 Codex 검토의견(F1, F2, F3)을 완전 반영:
+  1. **F1 (High) ResourceExplorer WAI-ARIA Tablist 및 APG 수평 탭 scroll 보존**:
+     - `ResourceExplorer.tsx`: 최상위 탭 컨테이너에 `role="tablist"` 및 `aria-label="자원 탐색기 탭 목록"` 부여.
+     - WAI-ARIA APG Tabs 가이드라인에 따라 수평 탭 목록에서 상/하 방향키(`ArrowUp`, `ArrowDown`)가 선택/포커스를 변경하거나 브라우저 네이티브 수직 스크롤을 막지 않도록(`preventDefault()` 호출 금지) 제한.
+     - `ArrowRight`, `ArrowLeft`, `Home`, `End`에 의한 roving tabindex 포커스 이동 구현.
+     - `acc-interactive-navigation.test.tsx`: ArrowRight/ArrowLeft/Home/End 시 `expect(document.activeElement).toBe(...)`를 직접 단언하여 `nextEl?.focus()` 제거 시 엄격히 실패하도록 보강하고, ArrowDown/ArrowUp 시 `defaultPrevented === false` 및 포커스 유지 단언 추가.
+  2. **F2 (High) RunList 네이티브 테이블 의미(`<tr>`) 보존 및 액션 버튼 분리**:
+     - `RunList.tsx`: `<table>` 하위 `<tr>`에 `role="button"` 및 `tabIndex`를 부여하여 HTML-ARIA 네이티브 테이블 의미를 훼손하던 안티패턴 제거.
+     - 첫 번째 `<td>` 셀 내부에 네이티브 `<button type="button" data-testid={`run-select-btn-${run.id}`} aria-label={`실행 작업 ${run.id} 상세 조회`}>`를 배치하여 행 포커스/선택을 접근 가능하게 분리.
+     - `acc-interactive-navigation.test.tsx`: `<tr>`이 기본 테이블 행 의미(`role === null`, `tabIndex === -1`)를 유지하고 내부 셀 버튼을 통해 Enter/Space/클릭이 정상 작동함을 단언.
+  3. **F3 (High) NodeList 카드 중첩 상호작용 제거 및 형제 네이티브 버튼 분리**:
+     - `NodeList.tsx`: 카드 외곽 `<div>`에 부여되었던 `role="button"` 및 `tabIndex={0}`을 전면 제거하고 카드 컨테이너를 순수 레이아웃 요소로 정리 (중첩 `<button>` 안티패턴 해소).
+     - 일반 카드 하단에 형제 네이티브 버튼으로 `node-select-btn-${node.id}` ("노드 선택") 및 `node-studio-btn-${node.id}` ("⚡ Studio 열기")를 분리 배치.
+     - 텔레메트리 미제공(lost/unknown) 카드는 컨테이너에 `role="alert"`/`role="status"`만 유지하고(`tabIndex` 없음), 내부 액션은 `node-detail-btn-${node.id}` ("상세 및 자원 보기") 네이티브 버튼으로 일원화.
+     - `acc-interactive-navigation.test.tsx`: 카드 컨테이너가 버튼 역할을 갖지 않으며 형제 버튼들이 독립적으로 각 콜백을 호출하고, lost 카드가 `role="alert"`(비대화형)와 내부 버튼을 가짐을 단언.
+  4. **ACC-02 대화형 요소 키보드 조작성 완결**:
      - `ApprovalCenter.tsx`: 승인 안건 카드에 `role="button"`, `tabIndex={0}`, `aria-pressed`, `aria-label`, Enter/Space `onKeyDown` 부여.
-     - `NodeList.tsx`: 온라인 및 lost 노드 카드에 `tabIndex={0}`, `aria-label`, Enter/Space `onKeyDown` 부여 (`role="button"` / `role="alert"` 유지).
-     - `RunList.tsx`: 실행 작업 행 `<tr>`에 `role="button"`, `tabIndex={0}`, `aria-label`, Enter/Space `onKeyDown` 부여.
      - `NaturalLanguageRunView.tsx`: 참조 Context 파일 칩 `<span>`에 `role="button"`, `tabIndex={0}`, `aria-pressed`, `aria-label`, Enter/Space `onKeyDown` 토글 부여.
      - `DeveloperStudio.tsx`: Step 1 워크스페이스 선택 카드 및 Step 2 노드 배치 카드에 `role="button"`, `tabIndex={0}`, `aria-pressed`, `aria-label`, Enter/Space `onKeyDown` 부여 (배치 불가 노드는 `tabIndex={-1}`, `aria-disabled="true"` 불변식 준수).
-  2. **ACC-06 ResourceExplorer WAI-ARIA Tablist 및 방향키 탐색 완결**:
-     - `ResourceExplorer.tsx`: 최상위 탭 컨테이너에 `role="tablist"` 및 `aria-label="자원 탐색기 탭 목록"` 부여.
-     - 5대 탭 버튼에 `role="tab"`, `aria-selected`, `aria-controls`, `tabIndex` 및 WAI-ARIA 방향키 순환 탐색(`ArrowRight`/`ArrowDown`, `ArrowLeft`/`ArrowUp`, `Home`, `End`) 구현.
-     - 5대 탭 본문 영역에 `role="tabpanel"`, `aria-labelledby`, `tabIndex={0}` 부여.
-  3. **되돌림 실패(Revert-Fail) 단위 시험 6종 완비**:
-     - `apps/web/tests/acc-interactive-navigation.test.tsx`: 승인 안건 선택, 노드 카드 활성화, 실행 작업 상세 진입, 컨텍스트 칩 토글, 워크스페이스/노드 카드 키보드 선택, ResourceExplorer WAI-ARIA 탭 순환 탐색 전수 검증.
-  4. **Codex 소유 측정 러너 seam 요청 카탈로그화**:
+  5. **Codex 소유 측정 러너 seam 요청 카탈로그화**:
      - `tools/run_real_browser_acceptance.py`를 건드리지 않고, History 문서에 SEAM-ACC-01~03(트리거 포커스 복원 정직 바인딩, tablist 방향키 프로브, 대화형 카드 Enter/Space 프로브) 명시.
 - **담당 및 역할**: Gemini (Frontend / UI / 접근성 소유). Reviewer: Claude (UI/접근성/테스트), Codex (무결성/계약).
 - **관측 근거 (Evidence)**:
   - 단위 시험: `npm run test -- acc-interactive-navigation.test.tsx` (6 passed 100%)
-  - 관련 스위트: `npm run test -- s11-defect-fixes.test.tsx accessibility-status-and-guards.test.tsx resource-explorer-dom.test.tsx developer-studio-dom.test.tsx` (77 passed 100%)
+  - 관련 스위트: `npm run test -- s11-defect-fixes.test.tsx accessibility-status-and-guards.test.tsx resource-explorer-dom.test.tsx developer-studio-dom.test.tsx node-status-lost-unknown-guard.test.tsx` (84 passed 100%)
   - 타입 검사: `npx tsc -b` (에러 0건, 클린 통과)
-  - 프로덕션 번들: `npm run build` (빌드 완료, 7.52s)
+  - 프로덕션 번들: `npm run build` (빌드 완료, 7.55s)
   - 라우트 커버리지: `pytest tests/test_route_coverage.py` (40 passed 100%)
   - 프런트 무결성: `python tools/check_frontend_integrity.py` (92개 파일 스캔, 9대 규칙 위반 0건)
+  - 계약 바인딩: `python tools/check_contract_bindings.py` (55 fixtures PASS)
   - 문서 정합성: `python tools/check_docs.py` (PASS, exit 0)
   - 봇 호출 방지 검사: 금지 봇 호출 태그 0건 검출 확인
 

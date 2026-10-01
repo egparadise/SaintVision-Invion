@@ -245,30 +245,39 @@ export const RunList: React.FC<RunListProps> = ({
               return (
                 <tr
                   key={run.id}
-                  role={onSelectRun ? 'button' : undefined}
-                  tabIndex={onSelectRun ? 0 : undefined}
-                  aria-label={`실행 작업 ${run.id} 상세 조회`}
-                  onClick={() => onSelectRun?.(run.id)}
-                  onKeyDown={
-                    onSelectRun
-                      ? (e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            onSelectRun(run.id);
-                          }
-                        }
-                      : undefined
-                  }
                   style={{
                     borderBottom: '1px solid var(--color-border-subtle)',
-                    cursor: onSelectRun ? 'pointer' : 'default',
                     transition: 'background-color 0.15s',
                   }}
                   onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-bg-subtle)')}
                   onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
                 >
                   <td style={{ padding: '12px 16px', fontFamily: 'monospace', fontWeight: 600 }}>
-                    <div>{run.id}</div>
+                    {onSelectRun ? (
+                      <button
+                        type="button"
+                        data-testid={`run-select-btn-${run.id}`}
+                        aria-label={`실행 작업 ${run.id} 상세 조회`}
+                        onClick={() => onSelectRun(run.id)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          padding: 0,
+                          margin: 0,
+                          fontFamily: 'monospace',
+                          fontWeight: 600,
+                          fontSize: 'inherit',
+                          color: '#58a6ff',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          textDecoration: 'underline',
+                        }}
+                      >
+                        {run.id}
+                      </button>
+                    ) : (
+                      <div>{run.id}</div>
+                    )}
                     {run.parentId && (
                       <span
                         style={{

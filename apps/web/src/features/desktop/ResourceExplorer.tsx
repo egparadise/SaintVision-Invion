@@ -692,10 +692,10 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               onClick={() => setActiveTab(t.id)}
               onKeyDown={(e) => {
                 let nextIdx = -1;
-                if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                if (e.key === 'ArrowRight') {
                   e.preventDefault();
                   nextIdx = (idx + 1) % arr.length;
-                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                } else if (e.key === 'ArrowLeft') {
                   e.preventDefault();
                   nextIdx = (idx - 1 + arr.length) % arr.length;
                 } else if (e.key === 'Home') {
