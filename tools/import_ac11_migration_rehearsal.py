@@ -32,6 +32,15 @@ from aggregate_ac11_evidence import RepositoryGit, _migration_reversible_segment
 
 
 ROOT = Path(__file__).resolve().parents[1]
+#: The AC-11 axes this importer writes envelopes for, as string literals at module
+#: level. The contract is read by tools/assemble_ac11_manifest.py with ``ast``, so the
+#: axis map's claim is checked against this declaration rather than against a string
+#: search over this file -- a search answers "is the name written anywhere", which a
+#: comment satisfies and a constant reference defeats (#299 r3).
+EMITTED_AXES: tuple[str, ...] = (
+    "migration-reversible-segment",
+    "irreversible-restore-forward",
+)
 REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
 REGISTRY_BLOB = "be99a506efecdb2ff29cf4e7a96a8772f5524473"
 TARGET_ID = "s11-irreversible-restore-forward-v0"
@@ -238,7 +247,7 @@ def import_artifact(
     by_name = {row.get("axis"): row for row in axes if isinstance(row, dict)}
     reversible = by_name.get("migration-reversible-segment")
     restore = by_name.get("irreversible-restore-forward")
-    if set(by_name) != {"migration-reversible-segment", "irreversible-restore-forward"}:
+    if set(by_name) != set(EMITTED_AXES):
         raise EvidenceImportError("producer axes are missing or duplicated")
     expected_reversible = (
         {

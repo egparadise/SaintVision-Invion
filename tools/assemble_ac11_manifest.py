@@ -37,6 +37,7 @@ Exit codes: 0 the manifest was written, 2 the inputs do not support writing one.
 from __future__ import annotations
 
 import argparse
+import ast
 import datetime as dt
 import json
 from pathlib import Path
@@ -76,6 +77,10 @@ ENVELOPE_SHAPES = ("axis-evidence", "axes-bundle", "not-an-axis-envelope")
 #: The one repository this chain's artifacts come from. Pinned, because an axis map that can
 #: name another repository can point a lane at someone else's runs.
 REPOSITORY = "egparadise/SaintVision-Invion"
+#: The module-level constant every AC-11 importer declares to say which axes it writes.
+#: Named here because every refusal below quotes it, and because the contract is shared
+#: with other pull requests' importers (#299 r3).
+EMITTED_AXES = "EMITTED_AXES"
 #: ``runPurpose`` of a bundle that carries axis envelopes inside it.
 BUNDLE_PURPOSES = frozenset({
     "ac11-migration-rehearsal-import",
@@ -87,18 +92,73 @@ class Refused(RuntimeError):
 
 
 def emitted_axes(importer: str | None) -> set[str]:
-    """The AC-11 axis names ``importer`` actually writes, read from its source.
+    """The AC-11 axes ``importer`` declares it writes, read from its ``EMITTED_AXES``.
 
     The question this answers is "what goes into the aggregator from this chain", and
-    the answer has to come from the file rather than from the row describing it: a row
-    can claim anything, and the security chain was classified complete on exactly such
-    a claim (#299 r1). A row with no importer emits nothing -- the producer may well
-    name its axis, but nothing turns that report into an envelope.
+    the answer has to come from the importer rather than from the row describing it: a
+    row can claim anything, and the security chain was classified complete on exactly
+    such a claim (#299 r1). A row with no importer at all emits nothing -- the producer
+    may well name its axis, but nothing turns that report into an envelope.
+
+    r1 and r2 answered it by searching the source for the quoted axis names, which was
+    wrong in both directions (#299 r3): a chain whose importer takes the name from a
+    constant (``axis=collector.AXIS``) reads as emitting nothing, and a lone comment
+    mentioning an axis invents one. So every AC-11 importer declares the contract at
+    module level and this reads that declaration -- comments and docstrings are not
+    code, and ``ast`` does not see them.
     """
     if not importer:
         return set()
-    source = (REPO_ROOT / importer).read_text(encoding="utf-8")
-    return {axis for axis in REQUIRED_AXES if f'"{axis}"' in source}
+    return declared_axes((REPO_ROOT / importer).read_text(encoding="utf-8"), importer)
+
+
+def declared_axes(source: str, label: str) -> set[str]:
+    """``EMITTED_AXES`` as declared in ``source``, or a refusal.
+
+    Fail closed on every uncertainty: no declaration, two of them, a declaration that
+    is not a literal tuple or list, an element that is not a string literal, a name
+    AC-11 does not have, a repeat. "I could not read the contract" must never read as
+    "the contract is empty", because empty is a legitimate answer here -- the security
+    importer declares ``()`` -- and the two would then be indistinguishable.
+    """
+    try:
+        module = ast.parse(source)
+    except SyntaxError:
+        raise Refused(f"{label} does not parse, so its {EMITTED_AXES} cannot be read")
+    declarations = [
+        node.value
+        for node in module.body          # module level only; a local one is not a contract
+        if isinstance(node, (ast.Assign, ast.AnnAssign))
+        for target in (node.targets if isinstance(node, ast.Assign) else [node.target])
+        if isinstance(target, ast.Name) and target.id == EMITTED_AXES
+    ]
+    if not declarations:
+        raise Refused(
+            f"{label} declares no module-level {EMITTED_AXES}; every AC-11 importer has "
+            f"to say which axes it writes"
+        )
+    if len(declarations) > 1:
+        raise Refused(f"{label} declares {EMITTED_AXES} {len(declarations)} times")
+    value = declarations[0]
+    if not isinstance(value, (ast.Tuple, ast.List)):
+        raise Refused(
+            f"{label}: {EMITTED_AXES} must be a literal tuple or list of axis names"
+        )
+    axes: set[str] = set()
+    for element in value.elts:
+        if not isinstance(element, ast.Constant) or not isinstance(element.value, str):
+            raise Refused(
+                f"{label}: every {EMITTED_AXES} element must be a string literal, so that "
+                f"reading the declaration does not mean executing the module"
+            )
+        if element.value not in REQUIRED_AXES:
+            raise Refused(
+                f"{label}: {EMITTED_AXES} names {element.value!r}, which AC-11 does not have"
+            )
+        if element.value in axes:
+            raise Refused(f"{label}: {EMITTED_AXES} repeats {element.value!r}")
+        axes.add(element.value)
+    return axes
 
 
 def _no_duplicates(pairs: list[tuple[str, Any]]) -> dict[str, Any]:

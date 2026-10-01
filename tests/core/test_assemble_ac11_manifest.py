@@ -301,6 +301,11 @@ def test_a_release_sha_that_is_not_a_commit_is_refused(tmp_path):
          "repeats an axis"),
         (lambda d: d["axes"][1].__setitem__("importerEmitsAxes", [d["axes"][1]["axis"]]),
          "no importer, so the set must be empty"),
+        # #299 r3: a row pointing at a file that exists and is not an AC-11 importer. The
+        # path check passes because the file is in the tree; the contract is absent, so this
+        # fails closed instead of reading as "emits nothing".
+        (lambda d: d["axes"][0].__setitem__("importer", "tools/check_docs.py"),
+         "declares no module-level EMITTED_AXES"),
     ],
 )
 def test_an_axis_map_that_cannot_be_trusted_is_refused(tmp_path, mutate, expected):
@@ -311,17 +316,79 @@ def test_an_axis_map_that_cannot_be_trusted_is_refused(tmp_path, mutate, expecte
     assert expected in str(refused.value)
 
 
-def test_emitted_axes_reads_the_importer_rather_than_the_claim():
-    """Measured from the two importers, which is the whole point of the binding.
+def test_emitted_axes_reads_each_importers_declaration():
+    """Measured from the three importers' EMITTED_AXES, which is the binding (#299 r3).
 
-    The migration importer names both of its axes; the security importer names none, which
-    is why that chain cannot be complete however many files exist (#299 r1). A row with no
-    importer emits nothing at all.
+    The migration importer declares both of its axes; the security importer declares ``()``
+    -- and that emptiness is the finding, not a gap in this check -- which is why that chain
+    cannot be complete however many files exist (#299 r1). A row with no importer at all
+    emits nothing.
     """
     assert assembler.emitted_axes("tools/import_ac11_migration_rehearsal.py") == set(MIGRATION_AXES)
     assert assembler.emitted_axes("tools/import_ac11_security_scan.py") == set()
     assert assembler.emitted_axes("tools/import_ac11_composite_long_soak.py") == {"long-soak"}
     assert assembler.emitted_axes(None) == set()
+
+
+def test_every_ac11_importer_in_the_tree_declares_the_contract():
+    """The contract is shared with other pull requests' importers, so check the tree.
+
+    Any tools/import_ac11_*.py has to declare EMITTED_AXES. A new importer that forgets it
+    fails here rather than being read as emitting nothing.
+    """
+    importers = sorted((assembler.REPO_ROOT / "tools").glob("import_ac11_*.py"))
+    assert importers, "no AC-11 importers found, so this test proves nothing"
+    for importer in importers:
+        assert assembler.emitted_axes(f"tools/{importer.name}") <= set(REQUIRED_AXES), importer.name
+
+
+# A comment and a docstring are not code. r1/r2 searched the source text for quoted axis
+# names, so either of these invented an axis -- and an importer that takes the name from a
+# constant, which is the shape #302's accessibility importer uses, read as emitting nothing
+# (#299 r3).
+DECOYS = [
+    ("a comment", '# "accessibility-e2e"\nEMITTED_AXES = ()\n', set()),
+    (
+        "a docstring",
+        '"""This importer writes "long-soak" envelopes."""\nEMITTED_AXES = ()\n',
+        set(),
+    ),
+    (
+        "a name the axis comes from",
+        'from collector import AXIS\n'
+        'EMITTED_AXES: tuple[str, ...] = ("accessibility-e2e",)\n'
+        'envelope = {"axis": AXIS}\n',
+        {"accessibility-e2e"},
+    ),
+]
+
+
+@pytest.mark.parametrize("source,expected", [row[1:] for row in DECOYS],
+                         ids=[row[0] for row in DECOYS])
+def test_the_declaration_is_what_counts_not_the_text_around_it(source, expected):
+    assert assembler.declared_axes(source, "fixture.py") == expected
+
+
+@pytest.mark.parametrize(
+    "source,expected",
+    [
+        ('# "accessibility-e2e"\nx = 1\n', "declares no module-level EMITTED_AXES"),
+        ("def f():\n    EMITTED_AXES = ()\n", "declares no module-level EMITTED_AXES"),
+        ('EMITTED_AXES = ()\nEMITTED_AXES = ("long-soak",)\n', "declares EMITTED_AXES 2 times"),
+        ("EMITTED_AXES = AXIS\n", "must be a literal tuple or list"),
+        ("EMITTED_AXES: tuple[str, ...]\n", "must be a literal tuple or list"),
+        ('AXIS = "long-soak"\nEMITTED_AXES = (AXIS,)\n', "must be a string literal"),
+        ('EMITTED_AXES = ("nope",)\n', "which AC-11 does not have"),
+        ('EMITTED_AXES = ("long-soak", "long-soak")\n', "repeats 'long-soak'"),
+        ("EMITTED_AXES = (\n", "does not parse"),
+    ],
+)
+def test_an_unreadable_declaration_is_refused_rather_than_read_as_empty(source, expected):
+    """Empty is a legitimate answer here -- security declares ``()`` -- so "I could not read
+    the contract" must never collapse into it."""
+    with pytest.raises(assembler.Refused) as refused:
+        assembler.declared_axes(source, "m.py")
+    assert expected in str(refused.value)
 
 
 def test_the_shipped_map_claims_exactly_what_each_importer_writes():
