@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-2026-10-02-CARD211-VFCL-CI-ATTESTATION-CODEX"
 title: "Card 211 VF-CL CI receipt attestation"
-version: "1.1.1"
-status: "in-progress"
+version: "1.2.0"
+status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-02T08:23:28+09:00"
+updated: "2026-10-02T08:29:06+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "d0b2a4c6"
@@ -38,8 +38,17 @@ runner에서 닫을 수 있으므로 train 14 후보 `d0b2a4c6` 위에 `#295`와
 ## 검증 상태
 
 - receipt/attestation, registry rule 7, accessibility importer focused: **265 passed**.
-- exact-head hosted attested run은 구현 push 뒤 실행하며, run ID와 artifact digest는 결과가 나온 뒤 이 절에
-  추가한다. 그 전에는 `ciVerified`를 올리지 않는다.
+- exact-head label producer run `36940633798`은 head `c8466697b156d896e62a1446281bf5410a37e2ef`에서
+  success했다. 같은 head의 workflow_dispatch run `36940757636`은 producer와 attestation job 모두
+  success했고, receipt 내부 run/head/ref/workflow와 verifier의 Sigstore identity가 일치했다.
+- Evidence artifact `11200122628`은 digest
+  `sha256:5615eba6779b020e4aa03d45b5fb68e1ff488c8a802f9408d4fe63bfd7e29025`, 만료 시각
+  `2026-10-31T23:26:34Z`다. attestation artifact `11200405399`는 digest
+  `sha256:efa66df4f8a7319f7720639b1bf955227a20d43831110d764d79e4e026482905`, 만료 시각
+  `2026-10-31T23:27:03Z`다. `verification.json`은 repository, workflow, branch ref, exact head,
+  GitHub-hosted runner와 receipt subject digest를 모두 검증했다.
+- 이 run은 feature head의 attestation machinery를 측정한 것이다. landing SHA의 권위 증거가 아니므로
+  `VF-CL-04.ciVerified=false`와 registry 상태는 유지한다.
 - label producer run `36940289003`은 head `8c2a703c`에서 success했다. 첫 workflow_dispatch run
   `36940396639`은 producer success 뒤 receipt step의 digest 비교에서 실패했다. `upload-artifact` output은
   64-hex, Actions API는 `sha256:<hex>`였는데 workflow가 형식을 정규화하지 않은 하네스 결함이다. 실패는

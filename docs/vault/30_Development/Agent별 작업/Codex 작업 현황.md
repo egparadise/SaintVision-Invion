@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.266"
+version: "1.0.267"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T08:23:28+09:00"
+updated: "2026-10-02T08:29:06+09:00"
 source_of_truth: "Git"
 active_card: "CARD-211 VF-CL CI receipt attestation"
-active_card_status: "Label producer passed; first dispatch exposed artifact-digest prefix normalization defect"
-active_card_next: "Push digest normalization regression, rerun exact-head dispatch, and record verification.json"
+active_card_status: "Exact-head producer and attestation dispatch passed; signed receipt remains feature-head evidence"
+active_card_next: "Request Claude re-review; keep ciVerified false until landing-SHA attestation"
 ---
 
 ## 2026-10-02 Card 211 — VF-CL CI receipt attestation
@@ -27,6 +27,11 @@ active_card_next: "Push digest normalization regression, rerun exact-head dispat
   즉시 거부한다. 세 focused 파일 **265 passed**.
 - label producer run `36940289003` success. dispatch `36940396639`은 raw 64-hex output과
   `sha256:` API digest 비교 형식 차이로 receipt step에서 실패했고, 정규화 회귀를 추가했다.
+- 정규화 뒤 exact-head label run `36940633798`과 workflow_dispatch run `36940757636`이 success했다.
+  Evidence artifact `11200122628`(`sha256:5615eba6…`, expires `2026-10-31T23:26:34Z`)와 attestation
+  artifact `11200405399`(`sha256:efa66df4…`, expires `2026-10-31T23:27:03Z`)을 독립 다운로드해
+  receipt·Sigstore repository/workflow/ref/head identity를 대조했다. feature-head 측정이므로
+  `ciVerified=false` 유지.
 
 ## 2026-10-02 Card 205 — AC-11 사용자 기기 접근성 수동 인수 importer
 
