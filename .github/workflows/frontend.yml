@@ -10,6 +10,8 @@ on:
       - 'apps/web/**'
       - 'contracts/**'
       - 'packages/contracts-ts/**'
+      - 'deploy/intranet/portal/**'
+      - 'tests/test_intranet_portal_deploy.py'
       - '.github/workflows/frontend.yml'
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -54,3 +56,389 @@ jobs:
           name: saintvision-web-dist
           path: apps/web/dist
           retention-days: 14
+
+  portal-runtime-smoke:
+    name: Portal Container Build & Hardened Runtime Smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build Portal Docker Image with BuildKit
+        run: |
+          DOCKER_BUILDKIT=1 docker build \
+            -f deploy/intranet/portal/Dockerfile \
+            -t saintvision-portal:test .
+
+      - name: Verify Lane-Internal Built Image Identity (Self-Derived)
+        id: image_info
+        run: |
+          # Lane-internal image identity check only: verify that the locally built image inspect .Id
+          # is passed to portal-up.sh. This validates local pipeline execution consistency,
+          # but does NOT constitute external supply-chain provenance or an independently signed release record.
+          IMAGE_ID=$(docker image inspect --format '{{.Id}}' saintvision-portal:test)
+          echo "IMAGE_ID=$IMAGE_ID" >> "$GITHUB_OUTPUT"
+          echo "Built Image ID (lane-internal execution consistency check): $IMAGE_ID"
+
+      - name: Produce Portal Release Tarball and Strict Release Evidence (Codex r6 Block 1)
+        run: |
+          mkdir -p /tmp/portal-release
+          TAR_FILE="/tmp/portal-release/portal-image.tar"
+          EVIDENCE_FILE="/tmp/portal-release/portal-release-evidence.json"
+
+          echo "Saving portal docker image to tarball..."
+          docker save saintvision-portal:test -o "$TAR_FILE"
+
+          TAR_SHA256=$(sha256sum "$TAR_FILE" | awk '{print $1}')
+          IMAGE_ID="${{ steps.image_info.outputs.IMAGE_ID }}"
+          COMMIT_SHA="${{ github.sha }}"
+          RUN_ID="${{ github.run_id }}"
+          BUILD_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          echo "Generating strict release evidence JSON..."
+          python3 - <<EOF
+          import json
+          data = {
+              "schemaVersion": "1.0.0",
+              "codeSha": "$COMMIT_SHA",
+              "imageId": "$IMAGE_ID",
+              "tarSha256": "$TAR_SHA256",
+              "buildRunId": str("$RUN_ID"),
+              "buildTimestamp": "$BUILD_TIME"
+          }
+          with open("$EVIDENCE_FILE", "w", encoding="utf-8") as f:
+              json.dump(data, f, indent=2)
+          EOF
+
+          echo "Release evidence generated at $EVIDENCE_FILE:"
+          cat "$EVIDENCE_FILE"
+
+      - name: Upload Portal Release Artifacts (Tarball & Evidence JSON)
+        uses: actions/upload-artifact@v4
+        with:
+          name: saintvision-portal-release
+          path: |
+            /tmp/portal-release/portal-image.tar
+            /tmp/portal-release/portal-release-evidence.json
+          retention-days: 14
+
+      - name: Verify Portal Load Release Script (--verify-only)
+        run: |
+          bash deploy/intranet/portal/portal-load-release.sh \
+            --evidence /tmp/portal-release/portal-release-evidence.json \
+            --tar /tmp/portal-release/portal-image.tar \
+            --verify-only
+
+      - name: Setup Mock Upstream HTTPS Server and Test PKI
+        run: |
+          mkdir -p /tmp/portal-ci/certs /tmp/portal-ci/upstream-certs
+
+          # 1. Generate Root CA (Test Authority)
+          openssl ecparam -name prime256v1 -genkey -noout -out /tmp/portal-ci/certs/root.key
+          openssl req -new -x509 -sha256 -key /tmp/portal-ci/certs/root.key \
+            -out /tmp/portal-ci/certs/root.crt \
+            -subj "/CN=SaintVision Test Root CA" -days 7
+
+          ROOT_FP=$(openssl x509 -in /tmp/portal-ci/certs/root.crt -noout -fingerprint -sha256 | sed 's/.*=//' | tr -d ': ')
+          echo "ROOT_FP=$ROOT_FP" >> "$GITHUB_ENV"
+
+          # 2. Generate Intermediate CA
+          openssl ecparam -name prime256v1 -genkey -noout -out /tmp/portal-ci/certs/inter.key
+          openssl req -new -key /tmp/portal-ci/certs/inter.key \
+            -out /tmp/portal-ci/certs/inter.csr \
+            -subj "/CN=SaintVision Test Intermediate CA"
+          cat > /tmp/portal-ci/certs/inter.ext <<'EOF'
+          basicConstraints=critical,CA:TRUE,pathlen:0
+          keyUsage=critical,digitalSignature,keyCertSign,cRLSign
+          EOF
+          openssl x509 -req -in /tmp/portal-ci/certs/inter.csr \
+            -CA /tmp/portal-ci/certs/root.crt -CAkey /tmp/portal-ci/certs/root.key -CAcreateserial \
+            -out /tmp/portal-ci/certs/inter.crt -extfile /tmp/portal-ci/certs/inter.ext -days 7
+
+          # Bundle contains intermediate and root
+          cat /tmp/portal-ci/certs/inter.crt /tmp/portal-ci/certs/root.crt > /tmp/portal-ci/certs/ca-bundle.crt
+
+          # 3. Generate Leaf Certificate for portal.sv.lan
+          openssl ecparam -name prime256v1 -genkey -noout -out /tmp/portal-ci/certs/server-key.pem
+          chmod 0400 /tmp/portal-ci/certs/server-key.pem
+          openssl req -new -key /tmp/portal-ci/certs/server-key.pem \
+            -out /tmp/portal-ci/certs/leaf.csr \
+            -subj "/CN=portal.sv.lan"
+          cat > /tmp/portal-ci/certs/leaf.ext <<'EOF'
+          basicConstraints=critical,CA:FALSE
+          keyUsage=critical,digitalSignature,keyEncipherment
+          extendedKeyUsage=serverAuth
+          subjectAltName=DNS:portal.sv.lan
+          EOF
+          openssl x509 -req -in /tmp/portal-ci/certs/leaf.csr \
+            -CA /tmp/portal-ci/certs/inter.crt -CAkey /tmp/portal-ci/certs/inter.key -CAcreateserial \
+            -out /tmp/portal-ci/certs/leaf.crt -extfile /tmp/portal-ci/certs/leaf.ext -days 7
+
+          # Server chain contains leaf and intermediate
+          cat /tmp/portal-ci/certs/leaf.crt /tmp/portal-ci/certs/inter.crt > /tmp/portal-ci/certs/server-chain.pem
+          chmod 0600 /tmp/portal-ci/certs/server-chain.pem
+
+          # 4. Generate Upstream CP Mock Certificate for cp.sv.lan
+          openssl ecparam -name prime256v1 -genkey -noout -out /tmp/portal-ci/upstream-certs/cp.key
+          openssl req -new -key /tmp/portal-ci/upstream-certs/cp.key \
+            -out /tmp/portal-ci/upstream-certs/cp.csr \
+            -subj "/CN=cp.sv.lan"
+          cat > /tmp/portal-ci/upstream-certs/cp.ext <<'EOF'
+          basicConstraints=critical,CA:FALSE
+          keyUsage=critical,digitalSignature,keyEncipherment
+          extendedKeyUsage=serverAuth
+          subjectAltName=DNS:cp.sv.lan
+          EOF
+          openssl x509 -req -in /tmp/portal-ci/upstream-certs/cp.csr \
+            -CA /tmp/portal-ci/certs/inter.crt -CAkey /tmp/portal-ci/certs/inter.key -CAcreateserial \
+            -out /tmp/portal-ci/upstream-certs/cp.crt -extfile /tmp/portal-ci/upstream-certs/cp.ext -days 7
+
+          # 5. Start lightweight Python SSL upstream stub for cp.sv.lan on port 443
+          sudo python3 - <<'EOF' > /tmp/portal-ci/mock_upstream.log 2>&1 &
+          import http.server, ssl, json, hashlib, base64
+
+          class Handler(http.server.BaseHTTPRequestHandler):
+              def do_GET(self):
+                  if self.path == "/v1/session":
+                      self.send_response(200)
+                      self.send_header("Content-Type", "application/json")
+                      self.end_headers()
+                      self.wfile.write(b'{"authenticated":true,"tenantId":"mock"}')
+                  elif "/events" in self.path:
+                      self.send_response(200)
+                      self.send_header("Content-Type", "text/event-stream")
+                      self.send_header("Cache-Control", "no-cache")
+                      self.send_header("Connection", "close")
+                      self.end_headers()
+                      self.wfile.write(b'data: {"type":"connected","project":"mock"}\n\n')
+                      self.wfile.flush()
+                      import time
+                      time.sleep(3)
+                      self.wfile.write(b'data: {"type":"heartbeat","seq":1}\n\n')
+                      self.wfile.flush()
+                      self.close_connection = True
+                  elif self.path == "/v1/terminal/ws":
+                      sec_key = self.headers.get("Sec-WebSocket-Key", "")
+                      self.send_response(101, "Switching Protocols")
+                      self.send_header("Upgrade", "websocket")
+                      self.send_header("Connection", "Upgrade")
+                      if sec_key:
+                          accept = base64.b64encode(hashlib.sha1((sec_key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11").encode()).digest()).decode()
+                          self.send_header("Sec-WebSocket-Accept", accept)
+                      self.end_headers()
+                      self.close_connection = True
+                  else:
+                      self.send_response(200)
+                      self.end_headers()
+                      self.wfile.write(b"OK")
+              def log_message(self, format, *args):
+                  pass
+
+          httpd = http.server.HTTPServer(("0.0.0.0", 443), Handler)
+          ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+          ctx.load_cert_chain("/tmp/portal-ci/upstream-certs/cp.crt", "/tmp/portal-ci/upstream-certs/cp.key")
+          httpd.socket = ctx.wrap_socket(httpd.socket, server_side=True)
+          httpd.serve_forever()
+          EOF
+
+          sleep 1
+
+      - name: Launch Portal Container via portal-up.sh
+        env:
+          PORTAL_IMAGE: saintvision-portal:test
+          PORTAL_IMAGE_ID: ${{ steps.image_info.outputs.IMAGE_ID }}
+          PORTAL_ALLOWED_ROOT_FINGERPRINTS: ${{ env.ROOT_FP }}
+          PORTAL_CERTS_DIR: /tmp/portal-ci/certs
+          PORTAL_CERT_FILE: /tmp/portal-ci/certs/server-chain.pem
+          PORTAL_KEY_FILE: /tmp/portal-ci/certs/server-key.pem
+          PORTAL_CA_BUNDLE: /tmp/portal-ci/certs/ca-bundle.crt
+          PORTAL_UPSTREAM_CP_HOST: cp.sv.lan:443
+          PORTAL_ADD_HOSTS: "cp.sv.lan:host-gateway"
+          PORTAL_HTTP_PORT: 8080
+          PORTAL_HTTPS_PORT: 8443
+        run: |
+          bash deploy/intranet/portal/portal-up.sh
+
+      - name: Execute Hardened Runtime Verification via curl
+        run: |
+          CA_FILE="/tmp/portal-ci/certs/ca-bundle.crt"
+
+          # 1. Plaintext HTTP port 8080 redirect to HTTPS
+          echo "Checking HTTP -> HTTPS redirect..."
+          REDIRECT_HEADER=$(curl -sI -o - http://127.0.0.1:8080/test-path | tr -d '\r')
+          echo "$REDIRECT_HEADER"
+          echo "$REDIRECT_HEADER" | grep -q "301 Moved Permanently"
+          echo "$REDIRECT_HEADER" | grep -q "Location: https://portal.sv.lan/test-path"
+
+          # 2. Plaintext HTTP port 8080 /healthz 200 OK
+          echo "Checking HTTP /healthz exception..."
+          HTTP_HEALTH=$(curl -s -o - http://127.0.0.1:8080/healthz)
+          [[ "$HTTP_HEALTH" == "OK" ]]
+
+          # 3. Verified HTTPS port 8443 /healthz with strict CA and hostname verification
+          echo "Checking HTTPS /healthz..."
+          HTTPS_HEALTH=$(curl -fsS --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/healthz)
+          [[ "$HTTPS_HEALTH" == "OK" ]]
+
+          # 4. Verified HTTPS Security Headers, full CSP string match, and status 200 on /index.html
+          echo "Checking HTTPS status 200 and security headers on /index.html..."
+          INDEX_HTML=$(curl -fsS --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/index.html)
+          INDEX_HEADERS=$(curl -fsS -I --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/index.html | tr -d '\r')
+          echo "$INDEX_HEADERS" | grep -iq "HTTP/.* 200"
+          echo "$INDEX_HEADERS" | grep -iq "Strict-Transport-Security: max-age=31536000; includeSubDomains"
+          echo "$INDEX_HEADERS" | grep -iq "X-Content-Type-Options: nosniff"
+          echo "$INDEX_HEADERS" | grep -iq "X-Frame-Options: DENY"
+          echo "$INDEX_HEADERS" | grep -iq "Cache-Control: no-cache, no-store, must-revalidate"
+
+          echo "Asserting full exact match for Content-Security-Policy (R5-M3)..."
+          EXPECTED_CSP="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://idp.sv.lan; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';"
+          ACTUAL_CSP=$(echo "$INDEX_HEADERS" | grep -i "^content-security-policy:" | head -n 1 | sed -e 's/^[cC][oO][nN][tT][eE][nN][tT]-[sS][eE][cC][uU][rR][iI][tT][yY]-[pP][oO][lL][iI][cC][yY]:[ ]*//' | tr -d '\r')
+          if [[ "$ACTUAL_CSP" != "$EXPECTED_CSP" ]]; then
+              echo "ERROR: Full CSP header mismatch!" >&2
+              echo "  Expected: '$EXPECTED_CSP'" >&2
+              echo "  Actual:   '$ACTUAL_CSP'" >&2
+              exit 1
+          fi
+          echo "✔ Full CSP header matched exactly."
+
+          # 5. Verified HTTPS /assets/ immutable caching on REAL hashed asset, assert 404 on missing
+          echo "Extracting real hashed asset from /index.html..."
+          REAL_ASSET=$(echo "$INDEX_HTML" | grep -oE '/assets/[^"'\''> ]+\.(js|css)' | head -n 1)
+          if [[ -z "$REAL_ASSET" ]]; then
+              echo "ERROR: No hashed asset found in /index.html" >&2
+              exit 1
+          fi
+          echo "Found real hashed asset: $REAL_ASSET"
+          REAL_ASSET_HEADERS=$(curl -fsS -I --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 "https://portal.sv.lan:8443${REAL_ASSET}" | tr -d '\r')
+          echo "$REAL_ASSET_HEADERS" | grep -iq "HTTP/.* 200"
+          echo "$REAL_ASSET_HEADERS" | grep -iq "Cache-Control: public, immutable"
+
+          echo "Asserting HTTP 404 for non-existent asset..."
+          MISSING_CODE=$(curl -s -o /dev/null -w "%{http_code}" --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/assets/non-existent-test-404.js)
+          if [[ "$MISSING_CODE" != "404" ]]; then
+              echo "ERROR: Expected HTTP 404 for missing asset, got $MISSING_CODE" >&2
+              exit 1
+          fi
+
+          # 6. Container exec nginx -t verification
+          echo "Checking container nginx -t..."
+          docker exec saintvision-portal nginx -t
+
+          # 7. Reverse Proxy to Upstream Control Plane: REST API, SSE, and Terminal WebSocket
+          echo "Checking reverse proxy REST API (/v1/session)..."
+          V1_RESPONSE=$(curl -fsS --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/v1/session)
+          echo "$V1_RESPONSE" | grep -q "authenticated"
+
+          echo "Checking reverse proxy SSE streaming (/v1/projects/mock/runs/run-1/events)..."
+          # With proxy_buffering off, the first event arrives immediately within --max-time 1.5s despite server 3s delay (R6-L3)
+          SSE_RESPONSE=$(curl -s -N --max-time 1.5 --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/v1/projects/mock/runs/run-1/events || true)
+          echo "$SSE_RESPONSE" | grep -q "connected"
+
+          echo "Checking reverse proxy Terminal WebSocket upgrade (/v1/terminal/ws)..."
+          WS_RESPONSE=$(curl -i -s -N --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 \
+            -H "Connection: Upgrade" \
+            -H "Upgrade: websocket" \
+            -H "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==" \
+            -H "Sec-WebSocket-Version: 13" \
+            https://portal.sv.lan:8443/v1/terminal/ws | tr -d '\r')
+          echo "$WS_RESPONSE" | grep -iq "101 Switching Protocols"
+          echo "$WS_RESPONSE" | grep -iq "Upgrade: websocket"
+          echo "$WS_RESPONSE" | grep -iq "Connection: Upgrade"
+
+          # 8. Verify strict TLS version: server rejection of legacy TLS 1.1 (R5-M3, R6-L2)
+          echo "Verifying server rejection of legacy TLS 1.1 with SECLEVEL=0 client..."
+          if ! openssl s_client -help 2>&1 | grep -q -- "-tls1_1"; then
+              echo "NOTICE: OpenSSL client binary does not support -tls1_1 flag on this runner; skipping client probe (R6-L2)."
+          else
+              TLS11_OUT=$(echo "Q" | openssl s_client -connect 127.0.0.1:8443 -servername portal.sv.lan -CAfile "$CA_FILE" -tls1_1 -cipher 'DEFAULT:@SECLEVEL=0' 2>&1 || true)
+              echo "$TLS11_OUT"
+              if echo "$TLS11_OUT" | grep -iq "Cipher is (NONE)" && echo "$TLS11_OUT" | grep -iqE "alert protocol version|alert number 70|handshake failure"; then
+                  echo "✔ Server actively rejected legacy TLS 1.1 with protocol version alert (fail-closed)."
+              else
+                  echo "ERROR: Server did not reject legacy TLS 1.1 with protocol version alert!" >&2
+                  exit 1
+              fi
+          fi
+
+          echo "✔ Hosted Portal Container Build & Hardened Runtime Smoke PASSED!"
+
+      - name: Verify Automatic Rollback on Production Swap Failure (R6-H1 & R6-H2)
+        env:
+          PORTAL_IMAGE: saintvision-portal:test
+          PORTAL_IMAGE_ID: ${{ steps.image_info.outputs.IMAGE_ID }}
+          PORTAL_ALLOWED_ROOT_FINGERPRINTS: ${{ env.ROOT_FP }}
+          PORTAL_CERTS_DIR: /tmp/portal-ci/certs
+          PORTAL_CERT_FILE: /tmp/portal-ci/certs/server-chain.pem
+          PORTAL_KEY_FILE: /tmp/portal-ci/certs/server-key.pem
+          PORTAL_CA_BUNDLE: /tmp/portal-ci/certs/ca-bundle.crt
+          PORTAL_UPSTREAM_CP_HOST: cp.sv.lan:443
+          PORTAL_ADD_HOSTS: "cp.sv.lan:host-gateway"
+          PORTAL_HTTP_PORT: 8080
+          PORTAL_HTTPS_PORT: 8443
+        run: |
+          echo "Capturing pre-swap running container ID..."
+          PRE_SWAP_ID=$(docker inspect --format '{{.Id}}' saintvision-portal)
+          echo "Pre-swap container ID: $PRE_SWAP_ID"
+
+          # External failure injection (R6-H2): Create a wrapper around docker that passes through
+          # to real docker for all operations EXCEPT when probing /healthz on the target container.
+          # This forces portal-up.sh's post-launch probe to fail naturally from the outside without test hooks.
+          WRAPPER_DIR="/tmp/docker-fail-wrapper"
+          mkdir -p "$WRAPPER_DIR"
+          REAL_DOCKER_BIN="$(command -v docker)"
+          cat > "${WRAPPER_DIR}/docker" <<EOF
+          #!/usr/bin/env bash
+          # Pass through to real docker for everything except the post-launch HTTPS probe
+          if [[ "\$1" == "exec" && "\$2" == "saintvision-portal" && "\$*" == *"/healthz"* ]]; then
+              echo "EXTERNAL_INJECTION: Simulating post-launch HTTPS probe failure on target container..." >&2
+              exit 1
+          fi
+          exec "$REAL_DOCKER_BIN" "\$@"
+          EOF
+          chmod +x "${WRAPPER_DIR}/docker"
+
+          echo "Running portal-up.sh with external probe failure wrapper..."
+          set +e
+          UP_OUTPUT=$(PATH="${WRAPPER_DIR}:${PATH}" bash deploy/intranet/portal/portal-up.sh 2>&1)
+          UP_EXIT=$?
+          set -e
+
+          echo "--- portal-up.sh execution log ---"
+          echo "$UP_OUTPUT"
+          echo "--- end portal-up.sh execution log (exit $UP_EXIT) ---"
+
+          if [[ $UP_EXIT -eq 0 ]]; then
+              echo "ERROR: Expected portal-up.sh to fail on post-launch probe failure, but it succeeded!" >&2
+              exit 1
+          fi
+
+          echo "Asserting exact rollback log lines occurred (R6-H1)..."
+          echo "$UP_OUTPUT" | grep -q "Preserving existing container 'saintvision-portal' as backup"
+          echo "$UP_OUTPUT" | grep -q "Initiating automatic rollback..."
+          echo "$UP_OUTPUT" | grep -q "Restoring previous production container from 'saintvision-portal-backup-"
+          echo "$UP_OUTPUT" | grep -q "Rollback complete: previous production container restored and running."
+          echo "✔ Exact rollback call sequence verified in execution output."
+
+          echo "Asserting that post-rollback container ID strictly equals pre-swap ID (R6-H1)..."
+          POST_ROLLBACK_ID=$(docker inspect --format '{{.Id}}' saintvision-portal)
+          echo "Post-rollback container ID: $POST_ROLLBACK_ID"
+          if [[ "$POST_ROLLBACK_ID" != "$PRE_SWAP_ID" ]]; then
+              echo "ERROR: Post-rollback container ID ($POST_ROLLBACK_ID) does not match pre-swap container ID ($PRE_SWAP_ID)!" >&2
+              exit 1
+          fi
+          echo "✔ Container ID preserved: exact pre-swap container restored."
+
+          echo "Checking that rollback restored previous healthy production container..."
+          CA_FILE="/tmp/portal-ci/certs/ca-bundle.crt"
+          RESTORED_HEALTH=$(curl -fsS --cacert "$CA_FILE" --resolve portal.sv.lan:8443:127.0.0.1 https://portal.sv.lan:8443/healthz)
+          if [[ "$RESTORED_HEALTH" != "OK" ]]; then
+              echo "ERROR: Restored container health check failed after rollback!" >&2
+              exit 1
+          fi
+          echo "✔ Automatic rollback successfully restored running container and /healthz is OK."
+
+      - name: Teardown Portal Container via portal-down.sh
+        if: always()
+        run: |
+          bash deploy/intranet/portal/portal-down.sh || true

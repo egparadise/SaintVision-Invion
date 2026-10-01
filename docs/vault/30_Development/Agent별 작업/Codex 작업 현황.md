@@ -1,14 +1,80 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.224"
+version: "1.0.233"
 status: "review"
 author: "Codex"
-updated: "2026-09-29T03:40:51+09:00"
+updated: "2026-09-30T09:01:42+09:00"
 source_of_truth: "Git"
+active_card: "CARD-151 intranet ObjectStore and PITR rehearsal"
+active_card_status: "PR 248 review follow-up; Claude F1-F12 remediated, TLS operational U6 PASS, G-22 replication HBA blocked external"
+active_card_next: "Claude re-review; continue Card 154 independent review and canonical preflight when corrected inputs land"
 ---
 
+## 2026-09-30 Card151 Claude F1-F12 보안·측정 경계 후속
+- PR #248에서 root·service·PITR 자격을 host argv와 Docker `Config.Env`에서 제거하고 단일 보호 파일 mount로 고정했다. PITR policy의 delete 권한을 제거하고 bucket versioning을 활성화했다.
+- bounded PITR rehearsal은 streaming receiver·source major·archive mode·retention tool hash를 확인하며, RTO를 download 시작부터 promotion까지 잰다. 지속 장애 시점이 없는 이 예행은 RPO를 측정하지 않아 `measuredRpoSeconds=null`로 남긴다.
+- 최신 TLS operational roundtrip은 6/6 PASS, 교차 bucket은 403/403이다. redacted evidence를 저장소에 고정했고 G-22는 replication HBA 미승인으로 계속 `BLOCKED_EXTERNAL`이다.
+
+## 2026-09-30 Card 150 — 사내망 PKI·LAN pilot 재수립
+
+- 독립 검토 F1~F10과 worker 3건을 반영했다. HTTPS root/intermediate/leaf는
+  ECDSA P-256으로 다시 만들고 Web PKI verifier로 CP·IdP leaf 2장을 검증했다.
+  Node mTLS Ed25519 hierarchy는 별도 유지한다. root는 현재 operator host에
+  있으므로 `rootOffline=false`이고 passphrase만 online CA directory 밖으로
+  분리했다.
+- worker-1·worker-2는 Node-local CSR→intermediate leaf→DB channel pin→실제
+  mTLS heartbeat/snapshot까지 완료했다. worker-3은 Docker socket 권한, CP 동거
+  worker는 API 1.41, 네 번째 Ubuntu worker는 미제공이라 configured 3 /
+  enrolled 2 / observed 2이며 5-node readiness는 `BLOCKED_EXTERNAL`이다.
+- 원격 DB trust 경계를 폐기했다. v5 candidate는 SCRAM, admin/runtime 분리
+  credential, 전용 user-defined network 1개, loopback publish이며 no/wrong
+  credential 거부와 두 양성 role을 실측했다. 과거 후보 3개는 stop·보존했고
+  active pilot state는 아직 v5로 이관하지 않아 DB readiness는 BLOCKED다.
+- Card 152 inventory는 5행이지만 필수값 71개가 비어 있다. 정본 lint와 두
+  readiness probe는 각각 `inventory-values-missing`과 `inventory-not-ready`로
+  차단됐으며 이를 PASS로 세지 않았다. focused Python 시험은 68 passed다.
+- 공개 Evidence에서 private IP·hostname·Node ID·certificate fingerprint를
+  제거했다. ordinal·count·status·digest만 남기고 agent image source와 CP
+  tooling commit, 도구 4개 SHA-256을 분리 결속했다. 회귀 시험이 redaction과
+  hash 일치를 강제한다.
+- intermediate encrypted key와 password의 pilot-state 동시 복제를 자체감사로
+  제거했다. state는 public chain만 가지며 외부 CA enrollment마다 중앙 세
+  입력을 다시 요구한다. Node-local private key 경계는 그대로다.
+- pilot status/observe의 snapshot에서 tenant·epoch·nonce를 제거하고 profile·
+  capacity·관측 시각만 남겼다. CRL refresh는 구현했지만 배포·강제는 없고,
+  Node leaf 자동 회전도 미구현이라 두 항목을 완료로 세지 않는다.
+- worker·Claude r2에 따라 runtime secret argv 전달을 stdin 파일 경계로
+  바꾸고 runtime role의 5개 위험 권한을 매 실행 재고정·검증한다. nonloopback
+  DSN, md5 HBA, SUPERUSER 변이와 실제 CLI option 순서도 회귀로 고정했다.
+- commit `8ce88ba9` 스크립트를 원격 v5에 재적용해 no/wrong credential 거부,
+  두 role 양성, SCRAM-only, 최소 권한, network 1개, loopback을 재검증했다.
+  active state 이관은 하지 않았다. 임시 script만 삭제하고 DB volume은 보존했다.
+- 00:08 worker/pilot 값은 `d3d8d927` commit보다 먼저 실행된 working tree
+  관측이므로 commit 재현 주장 대신 `uncommitted-working-tree`와
+  `firstCommittedIn`으로 정정했다. 미관측 worker-3에는 도구 commit을 붙이지
+  않는다.
+- 수정 후 focused PG-free는 PKI 6 passed, LAN pilot 22 passed이며 두 DB shell
+  script 문법과 diff gate가 exit 0이다. hosted CI 재실행과 Claude 재검토가
+  다음이다.
+- 첫 state의 `18443` 충돌은 숨기지 않고 실패 증거로 보존했다. 최종 state는
+  immutable identity에 `18444`를 처음부터 넣었다. 공개 증거에는 비밀·DSN·
+  tenant·epoch·nonce·network identity가 없다. [[사내망_PKI_LAN_pilot_운영절차_Codex]],
+  [[2026-09-30_00-10-21_KST_사내망_PKI_LAN_pilot_Codex]].
+
 # Codex 작업 현황
+
+## 2026-09-30 Card154 사내망 자체 구축 독립 검증
+
+- Card 150 PR #249와 Card 153 PR #247에 보안·계약 수정 요청을 게시했고, Card 152 PR #250의 기존 F-R1~F-R5는 head가 바뀌지 않아 유지한다. Card 151 PR #248은 자기 작성 범위라 독립 승인으로 세지 않고 Claude 검토를 대기한다.
+- canonical preflight는 storage operational evidence만 PASS, 전체 PASS 1/FAIL 2/BLOCKED 6과 `acceptanceAssessed=false`다. 미입력 token·inventory·DNS를 합성하지 않았고 U6 전체도 configuration route/operator token 부재로 BLOCKED다. [[2026-09-30_01-10-00_KST_Card154_사내망_독립검증_Codex_검토]].
+
+## 2026-09-30 Card151 사내 Storage TLS 운영 증거·canonical 검증
+
+- `.210`의 카드 소유 MinIO를 Card 150 intermediate가 서명한 `objects.sv.lan`/`.210` server leaf로 TLS 전환했다. exact image, non-root/read-only/cap-drop, data+cert 2 mount, 9000 단일 publish를 유지했고 product/PITR 교차 쓰기는 HTTPS에서도 403/403이다.
+- reachable head `c075e669`에서 operational roundtrip 6/6와 cleanup PASS, 별도 attestation SHA·시각 결속을 확보했다. canonical S01은 storage check 1개만 PASS하고 operator/session token·CP DNS/HTTPS·inventory 사용자 값 부재로 FAIL 2/BLOCKED 6, `acceptanceAssessed=false`다.
+- TLS 전환에서 발견한 cert-dir/loopback CA/bootstrap process-argument 문제를 회귀시험과 bounded rollback으로 닫고, 진단 시 노출된 root 자격은 즉시 회전했다. G-22는 source physical replication HBA 미승인 때문에 source mutation 전 BLOCKED_EXTERNAL이며 RPO/RTO는 여전히 null이다. [[2026-09-30_00-19-37_KST_Card151_사내_Storage_PITR_Codex_구현]].
+- PR #248 보안 후속 head `0a768892`는 PITR 전송과 source PostgreSQL 자격을 각각 보호 파일 read-only mount와 컨테이너 내부 읽기로 바꿔 host argv·Docker `Config.Env` 비노출을 고정했다. PG-free 4 passed, local·remote shell syntax와 diff check는 exit 0이다.
 
 ## 2026-09-29 S05 Card114 c50 일반 suite 격리 — Claude 재확인 요청
 
