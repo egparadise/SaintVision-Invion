@@ -1,11 +1,11 @@
 ---
 doc_id: "TARGET-S11-AC11-ACCESSIBILITY-USER-DEVICE-V1"
 title: "S11 AC-11 hosted 자동 측정 + 사용자 기기 수동 인수 target v1"
-version: "1.1.0"
+version: "1.1.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-02T06:06:48+09:00"
+updated: "2026-10-02T06:23:06+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S11-BE", "S11-FE"]
@@ -70,4 +70,4 @@ fresh-auth의 `auth_time`과 검증 시각은 수동 `finishedAt` 이상이어�
 | `ACC-MANUAL-ZOOM-REFLOW` | 200% zoom(또는 1280 CSS px에서 400% 동등 조건)으로 대표 화면을 사용한다. | 콘텐츠에 양방향 scroll이 필요 없고 핵심 control/text가 잘리거나 겹치지 않는다. |
 | `ACC-MANUAL-COGNITIVE-ERROR-RECOVERY` | 잘못된 입력 뒤 안내에 따라 수정·재시도한다. | 안내와 오류가 수정까지 유지되고 숨은 상태 손실·중복 제출 없이 복구된다. |
 
-template의 `NOT_RUN`은 의도적으로 schema에 통과하지 않는 안전 기본값이다. 실제 수행 후 각 결과와 `overallResult`를 `PASS` 또는 `FAIL`로 바꿔야 한다. placeholder, secret-like 문자열, 비엄격 timestamp, 2026-10-02T00:00:00Z 이전 수동 시작은 거부한다.
+template의 `NOT_RUN`은 의도적으로 schema에 통과하지 않는 안전 기본값이다. 실제 수행 후 각 결과와 `overallResult`를 `PASS` 또는 `FAIL`로 바꿔야 한다. 대소문자와 무관한 `REPLACE_WITH_`·`TODO`·`TBD`·`placeholder`, angle-bracket placeholder, secret-like 문자열, 비엄격 timestamp, 2026-10-02T00:00:00Z 이전 수동 시작은 거부한다. 지원되는 신뢰 경계는 stdin token을 받는 CLI이며 underscore-prefixed Python helper는 이미 신뢰된 같은 프로세스의 시험 seam이지 Evidence 입력 API가 아니다.

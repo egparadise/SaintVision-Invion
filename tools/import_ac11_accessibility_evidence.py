@@ -3,6 +3,8 @@
 The access token is accepted only on stdin, verified by the product's offline
 resource-server verifier, and never written or printed. Without a valid manual
 session the imported axis remains MEASURED_FAIL with the completeness metric at 1.
+Only ``main`` and its stdin-token CLI are a trust boundary. Underscore-prefixed
+Python helpers are internal seams for already-trusted same-process tests.
 """
 
 from __future__ import annotations
@@ -49,7 +51,7 @@ UTC_RFC3339_RE = re.compile(
     r"^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T"
     r"(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\.[0-9]{1,6})?Z$"
 )
-PLACEHOLDER_PREFIX = "REPLACE_WITH_"
+PLACEHOLDER_TOKENS = ("replace_with_", "todo", "tbd", "placeholder")
 MANUAL_NOT_BEFORE = datetime(2026, 10, 2, tzinfo=timezone.utc)
 _RECEIPT_SEAL = object()
 
@@ -118,7 +120,9 @@ def _bounded_public_label(value: Any, label: str, maximum: int) -> str:
     if (
         not isinstance(value, str)
         or not 1 <= len(value) <= maximum
-        or value.startswith(PLACEHOLDER_PREFIX)
+        or any(token in value.strip().lower() for token in PLACEHOLDER_TOKENS)
+        or "<" in value
+        or ">" in value
         or any(ord(character) < 0x20 for character in value)
         or re.search(r"(?i)bearer\s|eyJ[A-Za-z0-9_-]{8,}|[^\s@]+@[^\s@]+", value)
     ):

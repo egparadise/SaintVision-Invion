@@ -244,13 +244,20 @@ def test_manual_timestamps_are_strict_utc_rfc3339(value: str):
 
 def test_manual_lower_bound_placeholder_duplicate_and_non_string_identity_are_rejected():
     mutations = []
-    before = _manual(); before["startedAt"] = "2026-10-01T23:59:59Z"; mutations.append(before)
-    placeholder = _manual(); placeholder["browser"]["name"] = "REPLACE_WITH_BROWSER"; mutations.append(placeholder)
+    placeholder = _manual(); placeholder["browser"]["name"] = "replace_with_browser"; mutations.append(placeholder)
+    todo = _manual(); todo["device"]["operatingSystem"] = "TODO"; mutations.append(todo)
     duplicate = _manual(); duplicate["assistiveTechnologies"].append(copy.deepcopy(duplicate["assistiveTechnologies"][0])); mutations.append(duplicate)
     wrong_type = _manual(); wrong_type["scenarios"][0]["scenarioId"] = ["not", "a", "string"]; mutations.append(wrong_type)
     for manual in mutations:
         with pytest.raises(tool.AccessibilityImportError):
             _import(manual=manual, receipt=_receipt())
+
+
+def test_registered_manual_time_lower_bound_is_independent_of_hosted_provenance():
+    manual = _manual()
+    manual["startedAt"] = "2026-10-01T23:59:59Z"
+    with pytest.raises(tool.AccessibilityImportError, match="predates the registered target"):
+        tool.validate_manual_session(manual, SOURCE)
 
 
 @pytest.mark.parametrize(
