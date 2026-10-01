@@ -1,15 +1,26 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.234"
+version: "1.0.235"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T09:40:00+09:00"
+updated: "2026-10-01T13:40:45+09:00"
 source_of_truth: "Git"
-active_card: "CARD-151 intranet ObjectStore and PITR rehearsal"
-active_card_status: "PR 248 review follow-up; Claude F1-F12 remediated, TLS operational U6 PASS, G-22 replication HBA blocked external"
-active_card_next: "Claude re-review; continue Card 154 independent review and canonical preflight when corrected inputs land"
+active_card: "CARD-172 S08-BE BuildKit contract boundary"
+active_card_status: "strict BuildRequest/BuildPlan/BuildReceipt and generated bindings implemented; focused PG-free 37 passed"
+active_card_next: "contract/docs gates, PR and Claude review; adapter/ROOF/GPU remain separate cards"
 ---
+
+## 2026-10-01 Card 172 — S08-BE BuildKit 계약 경계
+
+- 승인된 PR #265 설계 v1.1.0과 기준 SHA `8e6c68c64`에 따라 첫 구현 범위를
+  공개 route·daemon 없는 strict 계약 카드로 제한했다.
+- `BuildPlan`의 rootless/privileged/hostAccess/devices/binds를 literal로 고정하고,
+  network policy, resource budget, lease/fencing, cache·secret reference digest,
+  immutable base digest를 필수화했다. `WorkloadSpec`과 build 계약은 섞이지 않는다.
+- focused PG-free 계약 시험은 37 passed다. rootless daemon과 실제 격리·감사 실행은
+  아직 `NOT_OBSERVED`이며 Claude 계약 검토 뒤 별도 adapter 카드로 진행한다.
+- 근거: [[2026-10-01_13-40-45_KST_S08-BE_BuildKit_계약경계_Codex]].
 
 ## 2026-09-30 Card151 Claude F1-F12 보안·측정 경계 후속
 - PR #248에서 root·service·PITR 자격을 host argv와 Docker `Config.Env`에서 제거하고 단일 보호 파일 mount로 고정했다. PITR policy의 delete 권한을 제거하고 bucket versioning을 활성화했다.

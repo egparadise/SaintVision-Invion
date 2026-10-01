@@ -103,6 +103,114 @@ type WorkloadSpec struct {
     ModelInput *ModelExecutionRef `json:"modelInput,omitempty"`
 }
 
+type BuildSecretRefId string
+
+type BuildCanonicalRelativePath string
+
+type BuildResourceBudget struct {
+    CpuMillis int64 `json:"cpuMillis"`
+    MemoryBytes int64 `json:"memoryBytes"`
+    StorageBytes int64 `json:"storageBytes"`
+}
+
+type BuildLeaseFence struct {
+    LeaseId LeaseId `json:"leaseId"`
+    ResourceId ResourceId `json:"resourceId"`
+    FencingToken string `json:"fencingToken"`
+    ExpiresAt Timestamp `json:"expiresAt"`
+}
+
+type BuildRequest struct {
+    ApiVersion string `json:"apiVersion"`
+    Kind string `json:"kind"`
+    TenantId TenantId `json:"tenantId"`
+    ProjectId ProjectId `json:"projectId"`
+    WorkspaceId WorkspaceId `json:"workspaceId"`
+    SourceCommitSha string `json:"sourceCommitSha"`
+    SourceTreeSha string `json:"sourceTreeSha"`
+    ContextPath BuildCanonicalRelativePath `json:"contextPath"`
+    DockerfilePath BuildCanonicalRelativePath `json:"dockerfilePath"`
+    TargetPlatform string `json:"targetPlatform"`
+    TargetStage string `json:"targetStage"`
+    NetworkPolicyId string `json:"networkPolicyId"`
+    CachePolicyId string `json:"cachePolicyId"`
+    SecretRefIds []BuildSecretRefId `json:"secretRefIds"`
+    TimeoutSeconds int64 `json:"timeoutSeconds"`
+}
+
+type BuildPlan struct {
+    ApiVersion string `json:"apiVersion"`
+    Kind string `json:"kind"`
+    TenantId TenantId `json:"tenantId"`
+    ProjectId ProjectId `json:"projectId"`
+    WorkspaceId WorkspaceId `json:"workspaceId"`
+    TraceId TraceId `json:"traceId"`
+    RequestDigest string `json:"requestDigest"`
+    ActionDigest string `json:"actionDigest"`
+    PolicyDecisionId string `json:"policyDecisionId"`
+    PolicyVersion string `json:"policyVersion"`
+    PolicyExpiresAt Timestamp `json:"policyExpiresAt"`
+    BuilderInstanceId string `json:"builderInstanceId"`
+    BuilderProfileId string `json:"builderProfileId"`
+    RecoveryEpoch int64 `json:"recoveryEpoch"`
+    Rootless bool `json:"rootless"`
+    Privileged bool `json:"privileged"`
+    HostAccess bool `json:"hostAccess"`
+    NetworkMode string `json:"networkMode"`
+    NetworkPolicyId string `json:"networkPolicyId"`
+    EgressAllowlistDigest string `json:"egressAllowlistDigest"`
+    Devices []string `json:"devices"`
+    Binds []string `json:"binds"`
+    Budget BuildResourceBudget `json:"budget"`
+    Lease BuildLeaseFence `json:"lease"`
+    CacheNamespaceDigest string `json:"cacheNamespaceDigest"`
+    SecretRefsDigest string `json:"secretRefsDigest"`
+    ResolvedBaseImageDigests []string `json:"resolvedBaseImageDigests"`
+}
+
+type BuildCleanupReceipt struct {
+    LeaseReleased bool `json:"leaseReleased"`
+    BuilderClaimReleased bool `json:"builderClaimReleased"`
+    CgroupRemoved bool `json:"cgroupRemoved"`
+    CacheDisposition string `json:"cacheDisposition"`
+    VerifiedAt Timestamp `json:"verifiedAt"`
+}
+
+type BuildAuditEvent struct {
+    Event string `json:"event"`
+    TraceId TraceId `json:"traceId"`
+    Timestamp Timestamp `json:"timestamp"`
+    DecisionId string `json:"decisionId"`
+    InputDigest string `json:"inputDigest"`
+    OutputDigest *string `json:"outputDigest"`
+}
+
+type BuildResult string
+
+type BuildReceipt struct {
+    ApiVersion string `json:"apiVersion"`
+    Kind string `json:"kind"`
+    TenantId TenantId `json:"tenantId"`
+    ProjectId ProjectId `json:"projectId"`
+    WorkspaceId WorkspaceId `json:"workspaceId"`
+    TraceId TraceId `json:"traceId"`
+    PlanDigest string `json:"planDigest"`
+    SourceCommitSha string `json:"sourceCommitSha"`
+    SourceTreeSha string `json:"sourceTreeSha"`
+    OutputImageDigest string `json:"outputImageDigest"`
+    OutputConfigDigest string `json:"outputConfigDigest"`
+    SbomEvidenceDigest string `json:"sbomEvidenceDigest"`
+    ScanEvidenceDigest string `json:"scanEvidenceDigest"`
+    CacheInputDigest string `json:"cacheInputDigest"`
+    CacheOutputDigest string `json:"cacheOutputDigest"`
+    NetworkSummaryDigest string `json:"networkSummaryDigest"`
+    StartedAt Timestamp `json:"startedAt"`
+    FinishedAt Timestamp `json:"finishedAt"`
+    Result BuildResult `json:"result"`
+    Cleanup BuildCleanupReceipt `json:"cleanup"`
+    AuditEvents []BuildAuditEvent `json:"auditEvents"`
+}
+
 type ResourceLease struct {
     LeaseId LeaseId `json:"leaseId"`
     TenantId TenantId `json:"tenantId"`
