@@ -1,0 +1,136 @@
+{
+  "$defs": {
+    "ReleaseAcceptanceResolvedMeasurement": {
+      "additionalProperties": false,
+      "description": "Server-owned Evidence identity; ``observedAt`` is its partition key.",
+      "properties": {
+        "evidenceId": {
+          "pattern": "^[A-Za-z][A-Za-z0-9_.:/-]{0,127}$",
+          "title": "Evidenceid",
+          "type": "string"
+        },
+        "evidenceSha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Evidencesha256",
+          "type": "string"
+        },
+        "observedAt": {
+          "format": "date-time",
+          "title": "Observedat",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidenceId",
+        "evidenceSha256",
+        "observedAt"
+      ],
+      "title": "ReleaseAcceptanceResolvedMeasurement",
+      "type": "object"
+    },
+    "ReleaseAcceptanceResolvedTarget": {
+      "additionalProperties": false,
+      "properties": {
+        "acceptanceIdRef": {
+          "pattern": "^[A-Z][A-Z0-9-]{1,15}$",
+          "title": "Acceptanceidref",
+          "type": "string"
+        },
+        "targetId": {
+          "pattern": "^[A-Za-z][A-Za-z0-9_.:/-]{0,127}$",
+          "title": "Targetid",
+          "type": "string"
+        },
+        "targetSha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Targetsha256",
+          "type": "string"
+        },
+        "targetVersion": {
+          "minimum": 1,
+          "title": "Targetversion",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "targetId",
+        "targetVersion",
+        "acceptanceIdRef",
+        "targetSha256"
+      ],
+      "title": "ReleaseAcceptanceResolvedTarget",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "All-or-nothing result passed to the decision writer inside the server.\n\nThe resolver never returns a partial list and this contract does not expose\nraw Evidence telemetry, actor identifiers, or caller-supplied fallback data.",
+  "properties": {
+    "allResolved": {
+      "const": true,
+      "title": "Allresolved",
+      "type": "boolean"
+    },
+    "measurements": {
+      "items": {
+        "$ref": "#/$defs/ReleaseAcceptanceResolvedMeasurement"
+      },
+      "maxItems": 64,
+      "minItems": 1,
+      "title": "Measurements",
+      "type": "array"
+    },
+    "schemaVersion": {
+      "const": "release-acceptance-reference-resolution:1",
+      "title": "Schemaversion",
+      "type": "string"
+    },
+    "scopeVerified": {
+      "const": true,
+      "title": "Scopeverified",
+      "type": "boolean"
+    },
+    "targetRegistryBlobSha256": {
+      "maxLength": 64,
+      "minLength": 64,
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Targetregistryblobsha256",
+      "type": "string"
+    },
+    "targetRegistryId": {
+      "const": "release-acceptance-targets-v1",
+      "title": "Targetregistryid",
+      "type": "string"
+    },
+    "targetRegistryVersion": {
+      "const": 1,
+      "title": "Targetregistryversion",
+      "type": "integer"
+    },
+    "targets": {
+      "items": {
+        "$ref": "#/$defs/ReleaseAcceptanceResolvedTarget"
+      },
+      "maxItems": 64,
+      "minItems": 1,
+      "title": "Targets",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "targetRegistryId",
+    "targetRegistryVersion",
+    "targetRegistryBlobSha256",
+    "targets",
+    "measurements",
+    "scopeVerified",
+    "allResolved"
+  ],
+  "title": "ReleaseAcceptanceReferenceResolutionResponse",
+  "type": "object"
+}

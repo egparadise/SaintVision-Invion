@@ -1595,6 +1595,157 @@ ReleaseAcceptanceSha256 = Annotated[
 ]
 
 
+def _exact_lower_hex_git_sha(value: Any) -> Any:
+    if not isinstance(value, str) or len(value) != 40 or any(
+        char not in "0123456789abcdef" for char in value
+    ):
+        raise ValueError("must be exactly 40 lowercase hexadecimal characters")
+    return value
+
+
+ReleaseAcceptanceGitSha = Annotated[
+    StrictStr,
+    Field(min_length=40, max_length=40, pattern="^[0-9a-f]{40}$"),
+    BeforeValidator(_exact_lower_hex_git_sha),
+]
+
+
+class ReleaseAcceptanceTargetSource(Strict):
+    """The immutable Git source from which one target declaration was derived."""
+
+    repository: Literal["egparadise/SaintVision-Invion"]
+    commit_sha: ReleaseAcceptanceGitSha = Field(alias="commitSha")
+    path: StrictStr = Field(min_length=1, max_length=512)
+    blob_sha: ReleaseAcceptanceGitSha = Field(alias="blobSha")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceTargetCriterion(Strict):
+    """One stable, named part of an acceptance target declaration."""
+
+    criterion_id: StrictStr = Field(
+        alias="criterionId", pattern="^[a-z][a-z0-9-]{0,63}$"
+    )
+    statement: StrictStr = Field(min_length=1, max_length=512)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceTargetDefinition(Strict):
+    """A versioned target whose digest excludes only ``targetSha256`` itself."""
+
+    target_id: StrictStr = Field(
+        alias="targetId", pattern="^[A-Za-z][A-Za-z0-9_.:/-]{0,127}$"
+    )
+    target_version: StrictInt = Field(alias="targetVersion", ge=1)
+    acceptance_id_ref: StrictStr = Field(
+        alias="acceptanceIdRef", pattern="^[A-Z][A-Z0-9-]{1,15}$"
+    )
+    owner: Literal["S12-BE"]
+    source: ReleaseAcceptanceTargetSource
+    criteria: list[ReleaseAcceptanceTargetCriterion] = Field(min_length=1, max_length=64)
+    target_sha256: ReleaseAcceptanceSha256 = Field(alias="targetSha256")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    @model_validator(mode="after")
+    def _criteria_are_unique(self) -> "ReleaseAcceptanceTargetDefinition":
+        identities = [criterion.criterion_id for criterion in self.criteria]
+        if len(set(identities)) != len(identities):
+            raise ValueError("criteria must have unique criterionId values")
+        return self
+
+
+class ReleaseAcceptanceTargetRegistryResponse(Strict):
+    """The Git-owned target registry consumed by release acceptance resolution.
+
+    This is a public data contract, not an HTTP route.  A deployment pins the
+    registry blob separately; an empty or absent registry is never equivalent
+    to an acceptance target with no criteria.
+    """
+
+    schema_version: Literal["release-acceptance-target-registry:1"] = Field(
+        alias="schemaVersion"
+    )
+    registry_id: Literal["release-acceptance-targets-v1"] = Field(alias="registryId")
+    registry_version: Literal[1] = Field(alias="registryVersion")
+    owner: Literal["S12-BE"]
+    canonicalization: Literal["saintvision-canonical-json-v1"]
+    targets: list[ReleaseAcceptanceTargetDefinition] = Field(min_length=1, max_length=64)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    @model_validator(mode="after")
+    def _target_versions_are_unique(self) -> "ReleaseAcceptanceTargetRegistryResponse":
+        identities = [(target.target_id, target.target_version) for target in self.targets]
+        if len(set(identities)) != len(identities):
+            raise ValueError("targets must have unique (targetId, targetVersion) values")
+        return self
+
+
+class ReleaseAcceptanceResolvedTarget(Strict):
+    target_id: StrictStr = Field(
+        alias="targetId", pattern="^[A-Za-z][A-Za-z0-9_.:/-]{0,127}$"
+    )
+    target_version: StrictInt = Field(alias="targetVersion", ge=1)
+    acceptance_id_ref: StrictStr = Field(
+        alias="acceptanceIdRef", pattern="^[A-Z][A-Z0-9-]{1,15}$"
+    )
+    target_sha256: ReleaseAcceptanceSha256 = Field(alias="targetSha256")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceResolvedMeasurement(Strict):
+    """Server-owned Evidence identity; ``observedAt`` is its partition key."""
+
+    evidence_id: StrictStr = Field(
+        alias="evidenceId", pattern="^[A-Za-z][A-Za-z0-9_.:/-]{0,127}$"
+    )
+    evidence_sha256: ReleaseAcceptanceSha256 = Field(alias="evidenceSha256")
+    observed_at: AwareDatetime = Field(alias="observedAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ReleaseAcceptanceReferenceResolutionResponse(Strict):
+    """All-or-nothing result passed to the decision writer inside the server.
+
+    The resolver never returns a partial list and this contract does not expose
+    raw Evidence telemetry, actor identifiers, or caller-supplied fallback data.
+    """
+
+    schema_version: Literal["release-acceptance-reference-resolution:1"] = Field(
+        alias="schemaVersion"
+    )
+    target_registry_id: Literal["release-acceptance-targets-v1"] = Field(
+        alias="targetRegistryId"
+    )
+    target_registry_version: Literal[1] = Field(alias="targetRegistryVersion")
+    target_registry_blob_sha256: ReleaseAcceptanceSha256 = Field(
+        alias="targetRegistryBlobSha256"
+    )
+    targets: list[ReleaseAcceptanceResolvedTarget] = Field(min_length=1, max_length=64)
+    measurements: list[ReleaseAcceptanceResolvedMeasurement] = Field(
+        min_length=1, max_length=64
+    )
+    scope_verified: Literal[True] = Field(alias="scopeVerified")
+    all_resolved: Literal[True] = Field(alias="allResolved")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    @model_validator(mode="after")
+    def _resolved_references_are_unique(self) -> "ReleaseAcceptanceReferenceResolutionResponse":
+        target_ids = [target.target_id for target in self.targets]
+        evidence_ids = [measurement.evidence_id for measurement in self.measurements]
+        if len(set(target_ids)) != len(target_ids):
+            raise ValueError("resolved targets must have unique targetId values")
+        if len(set(evidence_ids)) != len(evidence_ids):
+            raise ValueError("resolved measurements must have unique evidenceId values")
+        return self
+
+
 class ReleaseAcceptanceTargetRef(Strict):
     """A desired acceptance target, not evidence that it was measured."""
 
