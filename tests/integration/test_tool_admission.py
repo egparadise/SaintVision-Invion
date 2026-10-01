@@ -5,13 +5,17 @@ from threading import Barrier
 from uuid import uuid4
 import json
 import psycopg
+from psycopg.types.json import Jsonb
 import pytest
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from inv.approvals import digest
 from inv.contracts import validate_contract
 from inv.db import Database
 from inv.errors import DomainError
 from inv.ids import new_id
 from inv.leases import Allocation
+from inv.node_execution import seal_permit
+from inv.node_transport import NodeDelivery
 from inv.policy import action_digest
 from inv.sandbox import SandboxProfile, RuntimeCapabilities, REQUIRED_CAPABILITIES
 from inv.tooling import ToolGateway, NodePrincipal, CurrentPolicy
@@ -55,6 +59,103 @@ def gateway(approval):
     return a
 
 
+@pytest.fixture
+def gpu_gateway(approval):
+    a = approval
+    a.workload.update(command=["/usr/bin/printf", "gpu"])
+    a.workload["resources"].update(gpuCount=1, minVramBytes=1024)
+    a.policy["actionDigest"] = action_digest(a.workload)
+    a.row = approved(a)
+    a.command = dispatch(a, a.row)
+    memory = new_id("res")
+    gpu = new_id("res")
+    profile = SandboxProfile(
+        "restricted:gpu:1",
+        frozenset({a.workload["imageDigest"]}),
+        frozenset({"/usr/bin/printf"}),
+    )
+    device = {
+        "resourceId": gpu,
+        "deviceId": "GPU-synthetic-0",
+        "vendor": "synthetic",
+        "model": "single-device",
+        "totalVramBytes": 24 * 1024**3,
+        "computeCapability": "8.0",
+        "driverVersion": "synthetic-driver:1",
+        "runtimeVersion": "synthetic-runtime:1",
+        "providerVersion": "synthetic-provider:1",
+        "healthy": True,
+        "exclusive": True,
+        "runtimeCompatible": True,
+        "deviceRequestDriver": "nvidia",
+    }
+    device["observationDigest"] = action_digest(device)
+    snapshot = {
+        "nonce": "a" * 64,
+        "tenantId": a.e.tenant,
+        "nodeId": a.e.node,
+        "recoveryEpoch": a.e.epoch,
+        "profileVersion": profile.version,
+        "observedAt": datetime.now(timezone.utc).isoformat(),
+        "sampleMillis": 100,
+        "cpuCapacityMillis": 1000,
+        "cpuBusyMillis": 0,
+        "memoryCapacityBytes": 1024**3,
+        "memoryAvailableBytes": 1024**3,
+        "osType": "linux",
+        "agentVersion": "0.1.0",
+        "gpuDevices": [device],
+    }
+    with psycopg.connect(a.e.owner) as conn:
+        conn.execute(
+            "UPDATE inv.nodes SET heartbeat_at=clock_timestamp(),clock_skew_seconds=0 WHERE node_id=%s",
+            (a.e.node,),
+        )
+        conn.execute(
+            "INSERT INTO inv.resources VALUES(%s,%s,%s,'memory',%s,%s),(%s,%s,%s,'gpu',1,1)",
+            (
+                a.e.tenant,
+                memory,
+                a.e.node,
+                1024**3,
+                1024**3,
+                a.e.tenant,
+                gpu,
+                a.e.node,
+            ),
+        )
+        conn.execute(
+            """INSERT INTO inv.node_channels(
+            tenant_id,node_id,recovery_epoch,version,endpoint,certificate_sha256,
+            certificate_not_after,enabled
+            ) VALUES(%s,%s,%s,1,'https://127.0.0.1:9443',%s,
+            clock_timestamp()+interval '1 hour',true)""",
+            (a.e.tenant, a.e.node, a.e.epoch, "b" * 64),
+        )
+        conn.execute(
+            """INSERT INTO inv.node_resource_snapshots(
+            tenant_id,node_id,recovery_epoch,channel_version,received_at,snapshot
+            ) VALUES(%s,%s,%s,1,clock_timestamp(),%s)""",
+            (a.e.tenant, a.e.node, a.e.epoch, Jsonb(snapshot)),
+        )
+    leases = a.e.leases.reserve(
+        a.e.tenant,
+        a.e.project,
+        a.run["runId"],
+        [Allocation(a.e.resource, 1), Allocation(memory, 1), Allocation(gpu, 1)],
+        key="gpu-gateway-resources",
+        ttl_seconds=60,
+    )
+    a.leases = leases
+    a.proofs = {row["leaseId"]: row["fencingToken"] for row in leases}
+    a.profile = profile
+    a.gateway = ToolGateway(a.e.db, profile)
+    a.node = NodePrincipal(a.e.tenant, a.e.node)
+    a.gpu_resource = gpu
+    a.memory_resource = memory
+    return a
+
+
 def inputs(a):
     now = datetime.now(timezone.utc)
     decision = {
@@ -94,12 +195,102 @@ def test_valid_approval_allocation_and_runtime_produce_one_bound_plan(gateway):
         persisted = conn.execute(
             "SELECT payload FROM inv.outbox WHERE event_type='inv.execution.claimed'"
         ).fetchone()["payload"]
-        rows = conn.execute(
-            "SELECT to_jsonb(c) AS row FROM inv.tool_claims c"
-        ).fetchall()
+        rows = conn.execute("SELECT to_jsonb(c) AS row FROM inv.tool_claims c").fetchall()
     assert persisted == result.claim
     assert "synthetic-private-value" not in json.dumps(rows, default=str)
     assert "synthetic-private-value" not in json.dumps(persisted)
+
+
+def test_measured_single_gpu_allocation_is_bound_into_the_signed_plan(gpu_gateway):
+    a = gpu_gateway
+    result = claim(a)
+    allocation = result.launch["gpuAllocation"]
+    assert allocation["resourceId"] == a.gpu_resource
+    assert allocation["deviceId"] == "GPU-synthetic-0"
+    assert allocation["vramBytes"] == 24 * 1024**3
+    assert allocation["exclusive"] is True
+    assert result.claim["planDigest"] == digest(result.launch)
+
+
+def test_uncertain_gpu_cleanup_quarantines_node_and_retains_all_leases(gpu_gateway):
+    a = gpu_gateway
+    result = claim(a)
+    kind_by_resource = {
+        a.e.resource: "cpu",
+        a.memory_resource: "memory",
+        a.gpu_resource: "gpu",
+    }
+    allocations = [
+        {
+            "nodeId": a.e.node,
+            "kind": kind_by_resource[row["resourceId"]],
+            "lease": row,
+        }
+        for row in a.leases
+    ]
+    permit = seal_permit(result, allocations, Ed25519PrivateKey.generate())
+
+    class UncertainClient:
+        @staticmethod
+        def exchange(*_args, **_kwargs):
+            raise DomainError("NODE-0030", "Synthetic lost cleanup receipt", 503)
+
+    with pytest.raises(DomainError, match="NODE-0030"):
+        NodeDelivery(a.e.db, UncertainClient()).deliver(a.node, permit)
+
+    with a.e.db.transaction(a.e.tenant) as conn:
+        assert (
+            conn.execute("SELECT status FROM inv.nodes WHERE node_id=%s", (a.e.node,)).fetchone()[
+                "status"
+            ]
+            == "quarantined"
+        )
+        assert (
+            conn.execute(
+                "SELECT count(*) AS n FROM inv.resource_leases WHERE run_id=%s AND released_at IS NULL",
+                (a.run["runId"],),
+            ).fetchone()["n"]
+            == 3
+        )
+        payload = conn.execute(
+            "SELECT payload FROM inv.outbox WHERE event_type='inv.gpu.cleanup_quarantined'"
+        ).fetchone()["payload"]
+    assert payload == {
+        "resourceId": a.gpu_resource,
+        "leaseId": result.launch["gpuAllocation"]["leaseId"],
+        "observationDigest": result.launch["gpuAllocation"]["observationDigest"],
+        "reasonCode": "NODE-0030",
+    }
+
+
+@pytest.mark.parametrize("damage", ["stale", "digest", "missing"])
+def test_stale_unbound_or_missing_gpu_provider_never_creates_a_claim(gpu_gateway, damage):
+    a = gpu_gateway
+    with psycopg.connect(a.e.owner) as conn:
+        if damage == "stale":
+            conn.execute(
+                "UPDATE inv.node_resource_snapshots SET received_at=clock_timestamp()-interval '1 minute' WHERE node_id=%s",
+                (a.e.node,),
+            )
+        elif damage == "missing":
+            conn.execute(
+                "DELETE FROM inv.node_resource_snapshots WHERE node_id=%s",
+                (a.e.node,),
+            )
+        else:
+            row = conn.execute(
+                "SELECT snapshot FROM inv.node_resource_snapshots WHERE node_id=%s",
+                (a.e.node,),
+            ).fetchone()
+            snapshot = row[0]
+            snapshot["gpuDevices"][0]["observationDigest"] = "c" * 64
+            conn.execute(
+                "UPDATE inv.node_resource_snapshots SET snapshot=%s WHERE node_id=%s",
+                (Jsonb(snapshot), a.e.node),
+            )
+    with pytest.raises(DomainError, match="RES-000[38]"):
+        claim(a)
+    assert count(a, "tool_claims") == 0
 
 
 def test_eight_concurrent_deliveries_authorize_start_only_once(gateway):
@@ -132,9 +323,7 @@ def test_lost_first_response_restart_cancel_and_revocation_never_regrant(gateway
             (a.e.tenant,),
         )
     replay = claim(a, policy=None, runtime=None)
-    assert (
-        not replay.may_start and replay.launch is None and replay.claim == first.claim
-    )
+    assert not replay.may_start and replay.launch is None and replay.claim == first.claim
     a.workload["command"][1] = "different"
     with pytest.raises(DomainError, match="IDEM-0001"):
         claim(a)
@@ -171,9 +360,7 @@ def test_forged_outbox_content_has_no_execution_effect(gateway, field, value):
         "expired",
     ],
 )
-def test_execution_requires_exact_owned_live_and_sufficient_allocations(
-    gateway, change
-):
+def test_execution_requires_exact_owned_live_and_sufficient_allocations(gateway, change):
     a = gateway
     if change == "tenant":
         a.node = NodePrincipal(a.e.other, a.e.node)
@@ -229,9 +416,7 @@ def test_stale_node_cannot_receive_launch_permission(gateway, fault):
         "epoch": "recovery_epoch=NULL",
     }
     with psycopg.connect(a.e.owner) as conn:
-        conn.execute(
-            "UPDATE inv.nodes SET " + updates[fault] + " WHERE node_id=%s", (a.e.node,)
-        )
+        conn.execute("UPDATE inv.nodes SET " + updates[fault] + " WHERE node_id=%s", (a.e.node,))
     with pytest.raises(DomainError, match="RES-0006"):
         claim(a)
     assert count(a, "tool_claims") == 0
@@ -279,9 +464,7 @@ def test_current_policy_is_required_and_cannot_weaken_approval(gateway, fault):
     assert count(a, "tool_claims") == 0
 
 
-@pytest.mark.parametrize(
-    "fault", ["missing", "features", "node", "epoch", "version", "expired"]
-)
+@pytest.mark.parametrize("fault", ["missing", "features", "node", "epoch", "version", "expired"])
 def test_unverified_or_incomplete_runtime_is_denied(gateway, fault):
     a = gateway
     runtime = inputs(a)["runtime"]
@@ -311,9 +494,7 @@ def test_authorization_revoked_after_dispatch_stops_first_claim(gateway, actor):
     assert count(a, "tool_claims") == 0
 
 
-def test_audit_publish_failure_rolls_back_claim_so_retry_can_be_first(
-    gateway, monkeypatch
-):
+def test_audit_publish_failure_rolls_back_claim_so_retry_can_be_first(gateway, monkeypatch):
     import inv.tooling as module
 
     a = gateway
@@ -336,9 +517,7 @@ def test_audit_publish_failure_rolls_back_claim_so_retry_can_be_first(
         assert not conn.execute("SELECT 1 FROM inv.tool_claims").fetchone()
 
 
-@pytest.mark.parametrize(
-    "fault", ["cancel", "restore", "changed-content", "profile-revoked"]
-)
+@pytest.mark.parametrize("fault", ["cancel", "restore", "changed-content", "profile-revoked"])
 def test_changed_execution_context_is_rejected_before_first_claim(gateway, fault):
     a = gateway
     if fault == "cancel":

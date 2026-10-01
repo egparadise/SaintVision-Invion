@@ -156,6 +156,27 @@ func labels(r Record) map[string]string {
 	return map[string]string{"ai.saintvision.node": string(r.Claim.NodeId), "ai.saintvision.tenant": string(r.Claim.TenantId), "ai.saintvision.command": string(r.Claim.CommandId), "ai.saintvision.plan": string(r.Claim.PlanDigest), "ai.saintvision.epoch": r.Claim.RecoveryEpoch}
 }
 
+type deviceRequest struct {
+	Driver       string            `json:"Driver"`
+	Count        int64             `json:"Count"`
+	DeviceIDs    []string          `json:"DeviceIDs"`
+	Capabilities [][]string        `json:"Capabilities"`
+	Options      map[string]string `json:"Options"`
+}
+
+func gpuRequests(plan contracts.SandboxLaunchSpec) []deviceRequest {
+	if plan.GpuAllocation == nil {
+		return nil
+	}
+	return []deviceRequest{{
+		Driver:       plan.GpuAllocation.DeviceRequestDriver,
+		Count:        0,
+		DeviceIDs:    []string{plan.GpuAllocation.DeviceId},
+		Capabilities: [][]string{{"gpu"}},
+		Options:      map[string]string{},
+	}}
+}
+
 func (d *Docker) Create(ctx context.Context, r Record, p contracts.SandboxLaunchSpec) (string, error) {
 	var image struct {
 		ID     string `json:"Id"`
@@ -192,9 +213,11 @@ func (d *Docker) Create(ctx context.Context, r Record, p contracts.SandboxLaunch
 		environment = append(environment, "INV_TERMINAL_SPEC="+string(terminal), "INV_TERMINAL_COMMAND="+string(r.Claim.CommandId))
 	}
 	tmpfs := map[string]string{"/workspace": "rw,nosuid,nodev,noexec,size=16777216,uid=65532,gid=65532,mode=0700", "/tmp": "rw,nosuid,nodev,noexec,size=16777216,uid=65532,gid=65532,mode=0700"}
+	deviceRequests := gpuRequests(p)
 	host := map[string]any{"NetworkMode": "none", "ReadonlyRootfs": true, "CapDrop": []string{"ALL"}, "SecurityOpt": []string{"no-new-privileges:true"}, "Privileged": false,
 		"PidsLimit": int64(64), "Memory": p.MemoryBytes, "MemorySwap": p.MemoryBytes, "NanoCpus": p.CpuMillis * 1000000, "Tmpfs": tmpfs, "AutoRemove": false,
-		"IpcMode": "private", "CgroupnsMode": "private", "RestartPolicy": map[string]any{"Name": "no"}, "LogConfig": map[string]any{"Type": "json-file", "Config": map[string]string{"max-size": "512k", "max-file": "1"}}}
+		"IpcMode": "private", "CgroupnsMode": "private", "DeviceRequests": deviceRequests,
+		"RestartPolicy": map[string]any{"Name": "no"}, "LogConfig": map[string]any{"Type": "json-file", "Config": map[string]string{"max-size": "512k", "max-file": "1"}}}
 	command := append([]string{"--not-after", string(r.Claim.NotAfter), "--timeout", strconv.FormatInt(p.TimeoutSeconds, 10), "--"}, p.Argv...)
 	config := map[string]any{"Image": p.ImageDigest, "Entrypoint": []string{"/inv-supervisor"}, "Cmd": command, "User": "65532:65532", "WorkingDir": "/workspace", "Env": environment,
 		"Labels": labels(r), "NetworkDisabled": true, "AttachStdout": false, "AttachStderr": false, "OpenStdin": false, "Tty": false, "HostConfig": host}
@@ -230,7 +253,7 @@ func (d *Docker) Create(ctx context.Context, r Record, p contracts.SandboxLaunch
 	if actual.Image != p.ImageDigest || actual.Config.User != "65532:65532" || actual.Config.WorkingDir != "/workspace" || !equal(actual.Config.Entrypoint, []string{"/inv-supervisor"}) || !equal(actual.Config.Cmd, command) ||
 		h.NetworkMode != "none" || !h.ReadonlyRootfs || h.Privileged || h.Memory != p.MemoryBytes || h.MemorySwap != p.MemoryBytes || h.NanoCpus != p.CpuMillis*1000000 || h.PidsLimit != 64 ||
 		!equal(h.CapDrop, []string{"ALL"}) || !(equal(h.SecurityOpt, []string{"no-new-privileges:true"}) || equal(h.SecurityOpt, []string{"no-new-privileges"})) ||
-		len(h.Binds) != 0 || len(h.Devices) != 0 || len(h.DeviceRequests) != 0 || len(h.PortBindings) != 0 || h.PidMode != "" || h.IpcMode != "private" || h.UTSMode != "" || h.CgroupnsMode != "private" || h.AutoRemove || h.RestartPolicy.Name != "no" || h.LogConfig.Type != "json-file" || h.LogConfig.Config["max-size"] != "512k" || h.LogConfig.Config["max-file"] != "1" || len(h.LogConfig.Config) != 2 || len(h.Tmpfs) != 2 {
+		len(h.Binds) != 0 || len(h.Devices) != 0 || !equalDeviceRequests(h.DeviceRequests, deviceRequests) || len(h.PortBindings) != 0 || h.PidMode != "" || h.IpcMode != "private" || h.UTSMode != "" || h.CgroupnsMode != "private" || h.AutoRemove || h.RestartPolicy.Name != "no" || h.LogConfig.Type != "json-file" || h.LogConfig.Config["max-size"] != "512k" || h.LogConfig.Config["max-file"] != "1" || len(h.LogConfig.Config) != 2 || len(h.Tmpfs) != 2 {
 		return "", errors.New("NODE-0024: daemon isolation configuration differs")
 	}
 	for path, options := range tmpfs {
@@ -252,6 +275,20 @@ func equal(a, b []string) bool {
 	return true
 }
 
+func equalDeviceRequests(actual, expected []deviceRequest) bool {
+	if len(actual) != len(expected) {
+		return false
+	}
+	for index := range actual {
+		if actual[index].Driver != expected[index].Driver || actual[index].Count != expected[index].Count ||
+			!equal(actual[index].DeviceIDs, expected[index].DeviceIDs) || len(actual[index].Capabilities) != 1 ||
+			!equal(actual[index].Capabilities[0], []string{"gpu"}) || len(actual[index].Options) != 0 {
+			return false
+		}
+	}
+	return true
+}
+
 type inspection struct {
 	ID          string `json:"Id"`
 	Name, Image string
@@ -265,7 +302,8 @@ type inspection struct {
 		ReadonlyRootfs, Privileged, AutoRemove  bool
 		Memory, MemorySwap, NanoCpus, PidsLimit int64
 		CapDrop, SecurityOpt, Binds             []string
-		Devices, DeviceRequests                 []any
+		Devices                                []any
+		DeviceRequests                         []deviceRequest
 		PortBindings                            map[string]any
 		Tmpfs                                   map[string]string
 		PidMode, IpcMode, UTSMode, CgroupnsMode string
