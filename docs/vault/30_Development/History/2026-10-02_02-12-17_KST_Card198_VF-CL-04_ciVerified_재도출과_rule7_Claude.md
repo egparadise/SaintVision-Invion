@@ -1,12 +1,12 @@
 ---
 doc_id: "HISTORY-CARD198-VF-CL-04-CIVERIFIED-REDERIVED-20261002"
 title: "카드 198 — VF-CL-04의 ciVerified를 진술에서 재도출로: 거짓이던 이유가 #283로 사라졌고, 레지스트리는 그것을 혼자 알 수 없었다 (rule 7, 그리고 미선택 행의 차단 사유)"
-version: "1.1.0"
+version: "1.2.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-02T03:24:43+09:00"
+updated: "2026-10-02T03:52:15+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "25f43a25"
@@ -143,3 +143,32 @@ receipt의 입력은 **인증된 호출자의 `gh api`가 돌려준 것**이다.
 | 검사기 | exit 0, `verifiedAgainst: 25f43a25` |
 | producer | 실제 세 `gh api` 문서로 receipt 생성, 재생성 시 `recordedAt`만 바뀌고 **digest 불변**(digest가 `recordedAt`을 제외하는 설계가 그대로 작동) |
 | 문서 gate | 3종 + `git diff --check` exit 0 |
+
+## 9. r2 — 결속은 두 파일이 서로 맞는다는 것만 보여 준다
+
+Codex r2가 두 가지를 측정했다. **F1**: receipt와 레지스트리에서 `runId`를 **함께** `99999999999`로 위조하고 `receiptSha256`을 다시 계산하니 checker가 **exit 0**이다. **F2**: receipt에 알 수 없는 top-level key `unexpected`를 더하고 다시 봉인하니 역시 **exit 0**이고, nested `artifact`·`inputDigests`의 key 집합은 아예 검사하지 않았다.
+
+**둘 다 재현했다.** 그리고 F1은 **설계의 한계이지 버그가 아니다** — `canonical_digest()`는 서명이 아니므로, 편집할 수 있는 사람은 다시 계산할 수 있다. 제가 §8-1에 "조용한 편집을 닫는다"고 적은 것은 맞지만, **"조용하지 않은 편집"은 닫지 않는다**는 것을 r1에서 충분히 크게 적지 않았다.
+
+### 9-1. 코디네이터 판단대로 — 권위가 없으면 `true`가 아니다
+
+두 길 중 **(b)**를 받았다: 이 PR은 **strict schema**와 **"권위 없는 receipt로는 `ciVerified: true`를 만들 수 없다"는 fail-closed 규칙**만 넣고 **`ciVerified`는 `false`로 되돌린다**. 정직성이 먼저다.
+
+| 무엇 | 어떻게 |
+|---|---|
+| **rule 7c** | `impliesCiVerified: true`는 **무조건 거부**다(`RegistryUnusable`). opt-out flag를 두지 않았다 — 규칙이 막으려는 주장을 다시 주장할 자리를 만드는 셈이기 때문이다. 검증 가능한 attestation이 생기는 날 **이 분기가 고쳐질 자리**다 |
+| **strict schema**(F2) | receipt의 top-level key 집합이 **정확히** `RECEIPT_KEYS`여야 하고(없는 key·추가 key 양쪽), `artifact`·`inputDigests`의 key 집합도 정확해야 하며, 입력 digest 셋은 각각 sha256이어야 한다 |
+| **registry** | `VF-CL-04.ciVerified: false`. `ciVerifiedRun`과 receipt는 **MEASUREMENT RECORD**로 남고(여전히 서로 결속되고 strict schema를 받는다), note가 **거짓인 이유가 바뀌었다는 것**을 적는다 — "workflow가 없다"에서 "attested가 아니다"로 |
+| **manifest** | `impliesCiVerified: false`이고, 그 `false`도 **도출된 것**이다: `{"kind": "absent", "path": ".github/workflows/s12-acceptance-evidence.yml", "text": "attest-build-provenance"}`. attestation step이 생기면 이 검사가 깨지고 이 entry를 다시 보게 된다 |
+
+**위조 생존을 시험으로 남겼다** — `test_a_forged_and_resealed_receipt_is_why_true_is_refused`는 위조된 쌍이 **findings 0**임을 단언한다. 닫지 못한 것을 "닫았다"고 적는 대신, **왜 `true`가 거부되는지의 근거**로 둔 것이다. 누군가 attestation을 넣어 그 시험이 깨지는 날이 rule 7c를 풀 수 있는 순간이다.
+
+### 9-2. 검증
+
+| 항목 | 결과 |
+|---|---|
+| `tests/core/test_check_vf_cl_registry.py` | **148 passed**(r1 139) |
+| F2 probe | unknown top-level key · artifact 추가/누락 key · `inputDigests` 누락/추가 key · sha256 아닌 digest **전부 보고** |
+| F1 probe | 위조+재봉인 쌍은 여전히 findings 0 — **그래서 `true`가 거부된다**(시험으로 고정) |
+| 검사기 | exit 0, `verifiedAgainst: 25f43a25`, `VF-CL-04.ciVerified: false` |
+| 후속 | [[VF-CL-04 ciVerified 권위 있는 receipt 계약 요청]] |

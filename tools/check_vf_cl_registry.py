@@ -82,11 +82,18 @@ Six rules:
    claim whose evidence can no longer be fetched has stopped being re-checkable, which is
    the same standard ``aggregate_ac11_evidence.py`` applies with its freshness window.
 
-   The residual boundary is stated rather than hidden: the receipt's inputs are what an
-   authenticated caller's ``gh api`` returned, exactly as in
-   ``tools/import_ac11_security_scan.py``. Closing *that* means having CI produce the
-   receipt under ``actions: read``; these lanes run with ``contents: read``, so it is a
-   workflow-permission decision and not something this tool can settle.
+   **And that is still not enough to say ``true``** (#295 r2 F1). The receipt is built
+   offline from JSON the caller passed in, and ``receiptSha256`` is a digest rather than a
+   signature: Codex forged a run id in the receipt *and* the registry, recomputed the hash,
+   and this tool exited 0. Binding two files to each other proves they agree; it does not
+   prove either describes a run that happened. So ``impliesCiVerified: true`` is
+   **refused** until an entry carries ``receiptIsAttested`` -- which nothing can yet,
+   because the attestation does not exist. A receipt is still read and bound wherever one
+   is named, so the facts stay re-checkable as a *measurement record* while the claim stays
+   ``false``. Making the claim honest is the follow-up card; the receipt's inputs being an
+   authenticated caller's ``gh api`` output (the same boundary
+   ``tools/import_ac11_security_scan.py`` declares) is what that card has to close, by
+   having CI produce and attest the receipt under ``actions: read``.
 
    What it does **not** reach: a card whose tests merely ride a whole-directory lane.
    ``pytest tests/core`` says nothing about *which* card's behaviour ran, so a check
@@ -139,6 +146,32 @@ MANIFEST_SCHEMA = "vf-cl-registry-manifest:1"
 #: shape cannot be read as this one.
 RECEIPT_SCHEMA = "vf-cl-ci-receipt:1"
 RECEIPT_REPOSITORY = "egparadise/SaintVision-Invion"
+#: The receipt's key set, exactly. Not a minimum: a document that may carry extra keys is a
+#: document whose digest covers fields nobody reads, and Codex got an unknown top-level key
+#: past the first version by re-hashing (#295 r2 F2). Nested shapes are pinned too.
+RECEIPT_KEYS = frozenset({
+    "schemaVersion", "card", "repository", "workflowPath", "runId", "event", "conclusion",
+    "headSha", "headBranch", "claimedTree", "headRelationToClaimedTree", "requiredSteps",
+    "artifact", "inputDigests", "recordedAt", "receiptSha256",
+})
+RECEIPT_ARTIFACT_KEYS = frozenset({"id", "name", "digest", "expiresAt"})
+RECEIPT_INPUT_KEYS = frozenset({
+    "runMetadataSha256", "jobsMetadataSha256", "artifactMetadataSha256",
+})
+#: Why no card may derive ``ciVerified: true`` yet (#295 r2 F1, coordinator's call).
+#:
+#: The receipt is built offline from JSON the caller passed in, and its ``receiptSha256`` is
+#: a digest, not a signature -- Codex forged a run id in the receipt *and* the registry,
+#: recomputed the hash, and the checker exited 0. Binding two files to each other proves
+#: they agree; it does not prove either is about a run that happened. Until a receipt
+#: carries something this tool can verify it did not write -- a CI-produced attestation --
+#: the honest value is ``false``, and this makes ``true`` unreachable rather than
+#: discouraged.
+UNATTESTED_RECEIPT = (
+    "a receipt built from passed-in JSON cannot carry ciVerified=true: its digest is not a "
+    "signature, so a forged run id survives re-hashing. An attested CI-produced receipt is "
+    "the follow-up card; until then the honest value is false"
+)
 #: A receipt names a full commit, like every other sha in this file.
 COMMIT_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 
@@ -310,12 +343,17 @@ def load_manifest(path: Path, identifiers: list[str]) -> dict:
                 f"{name} claims ciVerified={ci_implied!r} with no ciVerifiedChecks"
             )
         if ci_implied is True:
+            # Rule 7c, unconditional on purpose. An opt-out flag here would be a second
+            # place to assert the thing the rule exists to stop being asserted; when an
+            # attestation this tool can verify exists, this branch is what that card edits.
+            raise RegistryUnusable(f"{name}: {UNATTESTED_RECEIPT}")
+        if ci_implied is not None and entry.get("ciVerifiedReceipt") is not None:
             # The expectations live here, not in the registry: a file that can choose which
             # workflow and which steps count has not been held to anything.
             expectation = entry.get("ciVerifiedReceipt")
             if not isinstance(expectation, dict):
                 raise RegistryUnusable(
-                    f"{name} derives ciVerified=true with no ciVerifiedReceipt expectation"
+                    f"{name}.ciVerifiedReceipt is not an object"
                 )
             for field in ("path", "workflowPath", "artifactNamePrefix"):
                 if not str(expectation.get(field) or "").strip():
@@ -375,6 +413,28 @@ def ci_run_findings(
     if receipt.get("schemaVersion") != RECEIPT_SCHEMA:
         findings.append(f"{identifier}: the receipt declares schemaVersion "
                         f"{receipt.get('schemaVersion')!r}")
+    # Strict, and in both directions. An unknown key passed the first version once its
+    # digest was recomputed, and a missing nested key simply read as absent (#295 r2 F2).
+    if set(receipt) != RECEIPT_KEYS:
+        unexpected = sorted(set(receipt) - RECEIPT_KEYS)
+        missing = sorted(RECEIPT_KEYS - set(receipt))
+        findings.append(
+            f"{identifier}: the receipt's key set is not exact"
+            + (f"; unexpected {unexpected}" if unexpected else "")
+            + (f"; missing {missing}" if missing else "")
+        )
+    nested = receipt.get("artifact")
+    if isinstance(nested, dict) and set(nested) != RECEIPT_ARTIFACT_KEYS:
+        findings.append(f"{identifier}: the receipt's artifact key set is not exact: "
+                        f"{sorted(set(nested) ^ RECEIPT_ARTIFACT_KEYS)}")
+    digests = receipt.get("inputDigests")
+    if not isinstance(digests, dict) or set(digests) != RECEIPT_INPUT_KEYS:
+        findings.append(f"{identifier}: the receipt's inputDigests key set is not exact")
+    elif not all(
+        isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value)
+        for value in digests.values()
+    ):
+        findings.append(f"{identifier}: an inputDigests value is not a sha256")
     if receipt.get("card") != identifier:
         findings.append(f"{identifier}: the receipt is for {receipt.get('card')!r}")
     body = {key: value for key, value in receipt.items()
@@ -650,7 +710,7 @@ def audit(registry: dict, root: Path, manifest_path: Path = DEFAULT_MANIFEST) ->
                 f"{identifier}: the tree shows ciVerified={ci_implied!r} but the registry "
                 f"says {card.get('ciVerified')!r}"
             )
-        if ci_implied is True:
+        if (entry.get("ciVerifiedReceipt") or {}).get("path"):
             findings.extend(ci_run_findings(
                 identifier,
                 card.get("ciVerifiedRun"),

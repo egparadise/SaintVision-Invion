@@ -82,7 +82,7 @@
    ],
    "implemented": true,
    "locallyVerified": true,
-   "ciVerified": true,
+   "ciVerified": false,
    "independentlyReviewed": false,
    "operationallyAccepted": false,
    "blockers": [
@@ -132,7 +132,7 @@
      ]
     }
    ],
-   "ciVerifiedNote": "Re-derived at 25f43a25 and now true. The reason this was false -- no workflow runs tools/collect_s12_acceptance_evidence.py -- stopped being true when .github/workflows/s12-acceptance-evidence.yml landed with #283: CI derives the bundle, holds it to its shape and to the head it was derived at, and uploads it. The restore drill stays ci-verified by core.yml's owned CX01 steps, now at this tree. What is still NOT ci-verified is anything beyond this card: no workflow aggregates the AC-11 axes, and operational acceptance needs a real restore on real hardware.",
+   "ciVerifiedNote": "Stays false, and the reason changed. The old reason -- no workflow runs tools/collect_s12_acceptance_evidence.py -- stopped being true when .github/workflows/s12-acceptance-evidence.yml landed with #283: CI derives the bundle, holds it to its shape and to the head it was derived at, and uploads it, and run 36851875128 did exactly that at 40b3ec78 (an ancestor of this tree). The new reason is that none of it is attested: the receipt below is built offline from gh api JSON and its receiptSha256 is a hash rather than a signature, so a run id forged in the receipt and the registry together survives re-hashing (#295 r2 F1, reproduced). ciVerifiedRun and the receipt are therefore a MEASUREMENT RECORD, not the basis of a true claim -- the checker binds them to each other, holds the receipt to an exact key set, and refuses impliesCiVerified: true outright until a receipt carries something it did not write. A CI-produced attested receipt is the follow-up card. The restore drill remains ci-verified by core.yml owned CX01 steps at this tree.",
    "ciVerifiedRun": {
     "runId": "36851875128",
     "workflow": "S12 Acceptance Evidence",

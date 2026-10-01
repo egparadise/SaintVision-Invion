@@ -866,18 +866,19 @@ def with_receipt(tmp_path, document=None, path="docs/vf-cl-ci-receipts/VF-CL-0X.
     return path
 
 
-def ci_asserting(manifest_document, implies=True, path="docs/vf-cl-ci-receipts/VF-CL-0X.json"):
+def ci_asserting(manifest_document, implies=False, path="docs/vf-cl-ci-receipts/VF-CL-0X.json"):
+    """A manifest that names a receipt. ``implies`` is ``False`` by default, because rule 7c
+    refuses ``true`` outright (#295 r2 F1) and the receipt is read wherever one is named."""
     entry = manifest_document["cards"]["VF-CL-0X"]
     entry["impliesCiVerified"] = implies
     entry["ciVerifiedChecks"] = [{"kind": "path-exists", "path": "src/route.py"}]
-    entry.pop("whyCiVerified", None)
-    if implies is True:
-        entry["ciVerifiedReceipt"] = {
-            "path": path,
-            "workflowPath": ".github/workflows/fixture.yml",
-            "requiredSteps": ["Derive the thing", "Hold it to its shape"],
-            "artifactNamePrefix": "fixture-",
-        }
+    entry["whyCiVerified"] = "the fixture names a receipt and claims nothing from it"
+    entry["ciVerifiedReceipt"] = {
+        "path": path,
+        "workflowPath": ".github/workflows/fixture.yml",
+        "requiredSteps": ["Derive the thing", "Hold it to its shape"],
+        "artifactNamePrefix": "fixture-",
+    }
     return manifest_document
 
 
@@ -898,9 +899,10 @@ def run_block(tmp_path, **overrides):
     return block
 
 
-def bound(tmp_path, block_overrides=None, receipt_overrides=None):
-    """A registry and manifest whose ciVerified claim is backed by a receipt."""
+def bound(tmp_path, block_overrides=None, receipt_overrides=None, ci_verified=False):
+    """A registry and manifest that name a receipt and agree about what it shows."""
     document = registry(tmp_path)
+    document["cards"][0]["ciVerified"] = ci_verified
     with_receipt(tmp_path, receipt(tmp_path, **(receipt_overrides or {})))
     document["cards"][0]["ciVerifiedRun"] = run_block(tmp_path, **(block_overrides or {}))
     return document, ci_asserting(manifest())
@@ -912,23 +914,48 @@ def test_a_receipt_backed_claim_is_accepted(tmp_path):
 
 
 def test_a_ci_verified_claim_the_tree_contradicts_is_reported(tmp_path):
-    """The drift this rule exists for, in the direction it happened.
+    """The comparison itself, in the direction the tree can assert today.
 
-    ``VF-CL-04`` said ``ciVerified: false`` with a note whose reason -- no workflow runs
-    the collector -- had stopped being true, and nothing compared that field to anything.
+    ``VF-CL-04`` said ``ciVerified: false`` with a reason that had stopped being true, and
+    nothing compared that field to anything. Now the manifest's value and the registry's
+    have to agree -- and since rule 7c refuses ``true``, the direction a card can get wrong
+    is claiming ``true`` while the tree implies ``false``.
     """
-    document, manifest_document = bound(tmp_path)
-    document["cards"][0]["ciVerified"] = False
+    document, manifest_document = bound(tmp_path, ci_verified=True)
     findings = audit(document, tmp_path, manifest_document)
-    assert any("the tree shows ciVerified=True but the registry says False" in finding
-               for finding in findings), findings
-
-
-def test_a_premature_ci_verified_is_reported(tmp_path):
-    document = registry(tmp_path)
-    findings = audit(document, tmp_path, ci_asserting(manifest(), implies=False))
     assert any("the tree shows ciVerified=False but the registry says True" in finding
                for finding in findings), findings
+
+
+def test_the_manifest_may_not_derive_a_true_ci_verified_at_all(tmp_path):
+    """Rule 7c (#295 r2 F1). Unconditional, and that is the point.
+
+    Codex forged a run id in the receipt *and* the registry, recomputed the receipt's own
+    digest, and the checker exited 0 -- the test below reproduces that. Binding two files to
+    each other shows they agree; it does not show either describes a run that happened. So
+    the value is refused until an attestation exists that this tool did not write.
+    """
+    manifest_document = ci_asserting(manifest(), implies=True)
+    with pytest.raises(checker.RegistryUnusable) as unusable:
+        audit(registry(tmp_path), tmp_path, manifest_document)
+    assert "cannot carry ciVerified=true" in str(unusable.value)
+
+
+def test_a_forged_and_resealed_receipt_is_why_true_is_refused(tmp_path):
+    """The survival this rule is a response to, kept as a test rather than as a claim.
+
+    This asserts that the binding does **not** catch a receipt forged together with the
+    registry. It is the justification for rule 7c, and if someone ever makes it fail -- by
+    adding verifiable attestation -- that is the moment rule 7c can be relaxed.
+    """
+    document, manifest_document = bound(
+        tmp_path,
+        block_overrides={"runId": "99999999999"},
+        receipt_overrides={"runId": "99999999999"},
+    )
+    assert audit(document, tmp_path, manifest_document) == [], (
+        "a forged-and-resealed pair still agrees with itself; that is why true is refused"
+    )
 
 
 def test_a_ci_verified_assertion_that_stopped_holding_is_reported(tmp_path):
@@ -1047,15 +1074,12 @@ def test_a_receipt_of_a_different_workflow_is_reported(tmp_path):
 # --- the manifest holds the standard --------------------------------------------------
 
 
-def test_a_derived_true_with_no_receipt_expectation_is_unusable(tmp_path):
-    manifest_document = manifest()
-    entry = manifest_document["cards"]["VF-CL-0X"]
-    entry["impliesCiVerified"] = True
-    entry["ciVerifiedChecks"] = [{"kind": "path-exists", "path": "src/route.py"}]
-    entry.pop("whyCiVerified", None)
+def test_a_receipt_expectation_that_is_not_an_object_is_unusable(tmp_path):
+    manifest_document = ci_asserting(manifest())
+    manifest_document["cards"]["VF-CL-0X"]["ciVerifiedReceipt"] = "docs/receipt.json"
     with pytest.raises(checker.RegistryUnusable) as unusable:
         audit(registry(tmp_path), tmp_path, manifest_document)
-    assert "no ciVerifiedReceipt expectation" in str(unusable.value)
+    assert "ciVerifiedReceipt is not an object" in str(unusable.value)
 
 
 @pytest.mark.parametrize("field", ["path", "workflowPath", "artifactNamePrefix"])
@@ -1186,6 +1210,59 @@ def test_a_reverify_target_this_clone_does_not_know_is_reported_as_itself(tmp_pa
 # --- the shipped pair ----------------------------------------------------------------
 
 
+# --- r2 F2: the receipt's shape is exact -------------------------------------------------
+
+
+def test_an_unknown_top_level_key_is_reported_however_it_is_sealed(tmp_path):
+    """Codex added ``unexpected`` and re-hashed, and the first version exited 0.
+
+    A document that may carry extra keys has a digest that covers fields nobody reads.
+    """
+    document, manifest_document = bound(tmp_path, receipt_overrides={"unexpected": "whatever"})
+    findings = audit(document, tmp_path, manifest_document)
+    assert any("key set is not exact" in finding and "unexpected" in finding
+               for finding in findings), findings
+
+
+def test_a_missing_top_level_key_is_reported(tmp_path):
+    document, manifest_document = bound(tmp_path)
+    target = tmp_path / "docs/vf-cl-ci-receipts/VF-CL-0X.json"
+    partial = json.loads(target.read_text(encoding="utf-8"))
+    partial.pop("headBranch")
+    target.write_text(json.dumps(seal(partial)), encoding="utf-8")
+    findings = audit(document, tmp_path, manifest_document)
+    assert any("missing ['headBranch']" in finding for finding in findings), findings
+
+
+@pytest.mark.parametrize(
+    ("mutate", "expected"),
+    [
+        (lambda r: r["artifact"].__setitem__("extra", 1), "artifact key set is not exact"),
+        (lambda r: r["artifact"].pop("expiresAt"), "artifact key set is not exact"),
+        (lambda r: r["inputDigests"].pop("jobsMetadataSha256"), "inputDigests key set"),
+        (lambda r: r["inputDigests"].__setitem__("extraSha256", "a" * 64), "inputDigests key set"),
+        (lambda r: r["inputDigests"].__setitem__("jobsMetadataSha256", "nope"), "not a sha256"),
+    ],
+)
+def test_a_nested_key_set_that_is_not_exact_is_reported(tmp_path, mutate, expected):
+    document, manifest_document = bound(tmp_path)
+    target = tmp_path / "docs/vf-cl-ci-receipts/VF-CL-0X.json"
+    edited = json.loads(target.read_text(encoding="utf-8"))
+    mutate(edited)
+    target.write_text(json.dumps(seal(edited)), encoding="utf-8")
+    findings = audit(document, tmp_path, manifest_document)
+    assert any(expected in finding for finding in findings), findings
+
+
+def test_the_shipped_receipt_has_the_exact_key_sets():
+    shipped = json.loads(
+        (checker.REPO_ROOT / "docs/vf-cl-ci-receipts/VF-CL-04.json").read_text(encoding="utf-8")
+    )
+    assert set(shipped) == checker.RECEIPT_KEYS
+    assert set(shipped["artifact"]) == checker.RECEIPT_ARTIFACT_KEYS
+    assert set(shipped["inputDigests"]) == checker.RECEIPT_INPUT_KEYS
+
+
 def test_the_shipped_pair_derives_the_card_whose_workflow_names_its_own_tools():
     """The shipped assertion, read rather than assumed.
 
@@ -1196,7 +1273,13 @@ def test_the_shipped_pair_derives_the_card_whose_workflow_names_its_own_tools():
     """
     manifest_document = json.loads(checker.DEFAULT_MANIFEST.read_text(encoding="utf-8"))
     cards = manifest_document["cards"]
-    assert cards["VF-CL-04"]["impliesCiVerified"] is True
+    # False, and derived: while the workflow carries no attestation step, this stays false
+    # (#295 r2 F1). The checks below are still the chain that makes the *facts* re-derivable.
+    assert cards["VF-CL-04"]["impliesCiVerified"] is False
+    assert any(
+        check["kind"] == "absent" and check["text"] == "attest-build-provenance"
+        for check in cards["VF-CL-04"]["ciVerifiedChecks"]
+    )
     texts = [check.get("text") or check["path"]
              for check in cards["VF-CL-04"]["ciVerifiedChecks"]]
     assert "python tools/collect_s12_acceptance_evidence.py" in texts
@@ -1209,9 +1292,11 @@ def test_the_shipped_pair_derives_the_card_whose_workflow_names_its_own_tools():
 
     registry_document = json.loads(checker.DEFAULT_REGISTRY.read_text(encoding="utf-8"))
     four = next(card for card in registry_document["cards"] if card["id"] == "VF-CL-04")
-    assert four["ciVerified"] is True
+    assert four["ciVerified"] is False
+    # The run block stays -- as a measurement record bound to the receipt, not as a basis.
     assert four["ciVerifiedRun"]["runId"].isdigit()
     assert four["ciVerifiedRun"]["conclusion"] == "success"
+    assert "MEASUREMENT RECORD" in four["ciVerifiedNote"]
     # The note may recount why it *was* false -- that is history -- but it must not still
     # state it as the present, and it has to name the workflow that changed the answer.
     assert "s12-acceptance-evidence.yml" in four["ciVerifiedNote"]

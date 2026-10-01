@@ -112,7 +112,8 @@
   },
   "VF-CL-04": {
    "impliesImplemented": true,
-   "impliesCiVerified": true,
+   "impliesCiVerified": false,
+   "whyCiVerified": "The facts are measured and the receipt binds them, but a receipt built offline from passed-in JSON is not authoritative: its digest is a hash, not a signature, so a forged run id survives re-hashing (#295 r2 F1). So the tree implies false -- not because CI cannot re-derive this card, but because nothing here can show that it did. The check below is what makes that a derivation rather than an opinion: while the workflow carries no attestation step, this stays false, and the day one is added the check breaks and this entry has to be revisited.",
    "ciVerifiedReceipt": {
     "path": "docs/vf-cl-ci-receipts/VF-CL-04.json",
     "workflowPath": ".github/workflows/s12-acceptance-evidence.yml",
@@ -149,6 +150,11 @@
      "kind": "references",
      "path": "tools/collect_s12_acceptance_evidence.py",
      "text": "pitr-rehearsal-dry-run-observed"
+    },
+    {
+     "kind": "absent",
+     "path": ".github/workflows/s12-acceptance-evidence.yml",
+     "text": "attest-build-provenance"
     }
    ],
    "checks": [
