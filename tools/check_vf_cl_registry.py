@@ -447,14 +447,32 @@ RECEIPT_ARTIFACT_RULES: tuple[tuple[str, Any, str], ...] = (
 )
 
 
+#: The lexical form a receipt timestamp must have. ``fromisoformat`` is far more generous
+#: than RFC3339 -- it accepts a space separator and any offset -- so checking only that a
+#: timezone *exists* let ``2026-10-01T18:23:14+09:00`` and ``... 18:23:14Z`` through
+#: (#295 r4). These values are compared and sorted across machines, so the form is pinned
+#: and the offset must be UTC, written as ``Z`` or ``+00:00``.
+#:
+#: ``-00:00`` is refused on purpose: RFC3339 §4.3 gives it the meaning "offset unknown",
+#: which is not the same claim as UTC.
+UTC_TIMESTAMP = re.compile(
+    r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,9})?(Z|\+00:00)$"
+)
+
+
 def _is_utc_timestamp(value: Any) -> bool:
-    if not isinstance(value, str):
+    """RFC3339, in UTC, in the one form this registry writes.
+
+    Both halves matter: the pattern fixes the form, and the parse rejects a value that
+    looks right and is not a date (month 13, day 32), which a pattern alone admits.
+    """
+    if not isinstance(value, str) or not UTC_TIMESTAMP.fullmatch(value):
         return False
     try:
         parsed = dt.datetime.fromisoformat(value.replace("Z", "+00:00"))
     except ValueError:
         return False
-    return parsed.tzinfo is not None
+    return parsed.utcoffset() == dt.timedelta(0)
 
 
 def receipt_field_findings(receipt: dict[str, Any]) -> list[str]:

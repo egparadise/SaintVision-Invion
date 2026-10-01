@@ -1,12 +1,12 @@
 ---
 doc_id: "HISTORY-CARD198-VF-CL-04-CIVERIFIED-REDERIVED-20261002"
 title: "카드 198 — VF-CL-04의 ciVerified를 진술에서 재도출로: 거짓이던 이유가 #283로 사라졌고, 레지스트리는 그것을 혼자 알 수 없었다 (rule 7, 그리고 미선택 행의 차단 사유)"
-version: "1.3.0"
+version: "1.4.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-02T04:20:38+09:00"
+updated: "2026-10-02T04:32:35+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "25f43a25"
@@ -198,3 +198,15 @@ strict schema를 "key 집합이 정확하다"로만 만들었다. 그런데 **�
 - artifact field 변이 시험이 **git repo가 생기기 전에** receipt fixture를 불렀다(`git rev-parse HEAD` exit 128). fixture를 먼저 돌리고 그것이 쓴 파일을 고치는 순서로 바꿨다.
 - `receiptSha256`을 나쁜 값으로 두는 case를 **다시 봉인하는 fixture**로 넣었다 — 봉인이 그 field를 덮어쓰므로 변이가 사라졌다. 그 한 case만 **봉인하지 않고** 파일을 직접 쓰는 시험으로 분리했다.
 - `card` 형식 규칙을 `VF-CL-\d{2}`로 썼더니 fixture의 `VF-CL-0X`가 걸렸다. **identity는 따로 검사된다**(receipt의 card == 판정 중인 카드)는 것을 확인하고 형식 규칙을 두 글자 영숫자로 넓혔다 — 형식과 identity를 혼동한 것이다.
+
+### 10-4. r4 — 파싱되는 timestamp가 UTC인 timestamp는 아니다
+
+`_is_utc_timestamp()`가 `datetime.fromisoformat()`의 **tzinfo 존재만** 봤다. `fromisoformat`은 RFC3339보다 훨씬 관대해서 **공백 구분자**와 **어떤 offset이든** 받으므로, `2026-10-01T18:23:14+09:00`과 `2026-10-01 18:23:14Z`가 통과했다. 이 값들은 **기계를 넘나들며 비교·정렬되는** 것이므로 형식과 offset을 둘 다 고정했다.
+
+```
+UTC_TIMESTAMP = ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,9})?(Z|\+00:00)$
+```
+
+그리고 **파싱도 계속한다** — 정규식만으로는 13월·32일을 받기 때문이다. `-00:00`은 거부한다: RFC3339 §4.3이 그것에 **"offset 불명"** 이라는 뜻을 주고, 그것은 UTC라는 주장과 다르다.
+
+실측(13가지): 쓰는 세 형식(`Z`, 소수점 있는 `Z`, `+00:00`)은 통과, 그리고 `+09:00`·공백 구분자·offset 없음·`-00:00`·소문자·13월·32일·소수점 10자리·숫자·`None`은 **전부 거부**다. receipt 수준에서도 `recordedAt`과 `artifact.expiresAt` 각각에 대해 `+09:00`·공백 구분자 부정 시험을 두었다.

@@ -1480,3 +1480,76 @@ def test_the_shipped_manifest_keeps_the_reason_the_last_edit_wrote():
     why = manifest_document["cards"]["VF-CL-04"]["whyCiVerified"]
     assert "not authoritative" in why
     assert "attestation" in why
+
+
+# --- r4: a timestamp that parses is not a timestamp in UTC -------------------------------
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        "2026-12-30T10:52:59Z",
+        "2026-10-01T18:23:14.418939Z",
+        "2026-10-01T18:23:14+00:00",
+    ],
+)
+def test_the_utc_forms_this_registry_writes_are_accepted(value):
+    assert checker._is_utc_timestamp(value)
+
+
+@pytest.mark.parametrize(
+    ("value", "why"),
+    [
+        ("2026-10-01T18:23:14+09:00", "an offset that is not UTC"),
+        ("2026-10-01 18:23:14Z", "a space separator fromisoformat happens to accept"),
+        ("2026-10-01T18:23:14", "no offset at all"),
+        ("2026-10-01T18:23:14-00:00", "RFC3339's 'offset unknown', which is not UTC"),
+        ("2026-10-01t18:23:14z", "lower case"),
+        ("2026-13-01T10:00:00Z", "a month that does not exist"),
+        ("2026-10-32T10:00:00Z", "a day that does not exist"),
+        ("2026-10-01T18:23:14.1234567890Z", "more fractional digits than the form allows"),
+        (123, "not a string"),
+        (None, "not a string"),
+    ],
+)
+def test_a_timestamp_that_is_not_utc_rfc3339_is_refused(value, why):
+    """``fromisoformat`` is far more generous than RFC3339 (#295 r4).
+
+    Checking only that a timezone *exists* accepted ``+09:00`` and a space separator. These
+    values are compared and sorted across machines, so the form and the offset are both
+    pinned -- and the parse still runs, because a pattern alone admits month 13.
+    """
+    assert not checker._is_utc_timestamp(value), why
+
+
+@pytest.mark.parametrize("field", ["recordedAt"])
+@pytest.mark.parametrize(
+    "value", ["2026-10-01T18:23:14+09:00", "2026-10-01 18:23:14Z"]
+)
+def test_a_receipt_timestamp_that_is_not_utc_is_reported(tmp_path, field, value):
+    document, manifest_document = bound(tmp_path, receipt_overrides={field: value})
+    findings = audit(document, tmp_path, manifest_document)
+    assert any(f"{field} must be a UTC RFC3339 timestamp" in finding
+               for finding in findings), findings
+
+
+@pytest.mark.parametrize(
+    "value", ["2099-12-30T10:52:59+09:00", "2099-12-30 10:52:59Z"]
+)
+def test_an_artifact_expiry_that_is_not_utc_is_reported(tmp_path, value):
+    document, manifest_document = bound(tmp_path)
+    target = tmp_path / "docs/vf-cl-ci-receipts/VF-CL-0X.json"
+    edited = json.loads(target.read_text(encoding="utf-8"))
+    edited["artifact"]["expiresAt"] = value
+    target.write_text(json.dumps(seal(edited)), encoding="utf-8")
+    findings = audit(document, tmp_path, manifest_document)
+    assert any("artifact.expiresAt must be a UTC RFC3339 timestamp" in finding
+               for finding in findings), findings
+
+
+def test_the_shipped_receipt_timestamps_are_utc():
+    shipped = json.loads(
+        (checker.REPO_ROOT / "docs/vf-cl-ci-receipts/VF-CL-04.json").read_text(encoding="utf-8")
+    )
+    assert checker._is_utc_timestamp(shipped["recordedAt"])
+    assert checker._is_utc_timestamp(shipped["artifact"]["expiresAt"])
