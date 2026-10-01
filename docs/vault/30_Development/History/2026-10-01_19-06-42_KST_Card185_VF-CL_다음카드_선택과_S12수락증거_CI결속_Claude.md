@@ -1,12 +1,12 @@
 ---
 doc_id: "HISTORY-VF-CL-NEXT-CARD-20261001"
 title: "VF-CL 다음 준비 카드 선택과 VF-CL-04의 ciVerified 공백 해소 — 수락 증거를 사람이 아니라 CI가 도출하게 (카드 185)"
-version: "1.0.0"
+version: "1.1.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-01T19:06:42+09:00"
+updated: "2026-10-01T19:44:04+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "8d5a7d9b"
@@ -85,7 +85,9 @@ tags: ["vf-cl", "s12", "acceptance", "ci", "evidence", "fail-closed", "claude"]
 | 이름 붙은 두 관측이 **`source` 도구를 명시한다** | 레지스트리의 주장은 "CI가 도출한다"이고 "항목이 보인다"가 아니다. `source`가 빈 항목은 사람이 적었을 수도 있다 — 바로 그 상태가 `ciVerifiedNote`가 적은 상태다 |
 | 파일에 연결 문자열·비밀번호가 없다 | 수집기가 직렬화 전에 가리고 자기 텍스트를 다시 보지만, 이것은 **실제로 올라간 파일**을 독립적으로 다시 읽는 것이다. artifact는 내려받을 수 있는 자리다 |
 
-시험 24건이 각 거부 경로를 하나씩 고정한다 — 특히 **17개 항목을 하나씩 빼는 17가지 전부**를 돌린다(일부만 덮는 gate는 추첨이 된다), `acceptanceClaim`의 `True`·`None`·`"false"`·`0`·`1`, JSON escape로 숨긴 DSN, 그리고 **`FAIL` verdict가 통과하는 것**.
+시험이 각 거부 경로를 하나씩 고정한다 — 특히 **17개 항목을 하나씩 빼는 17가지 전부**를 돌린다(일부만 덮는 gate는 추첨이 된다), `acceptanceClaim`의 `True`·`None`·`"false"`·`0`·`1`, JSON escape로 숨긴 DSN, 그리고 **`FAIL` verdict가 통과하는 것**.
+
+> **위 표는 충분하지 않았다.** Codex가 r1에서 측정했다: 이 단언들만으로는 **사람이 손으로 적은 묶음**이 통과한다 — 17개 이름이 다 있으면 되기 때문이다. 무엇이 모자랐고 무엇을 묶었는지는 **§7-2**에 적는다. 이 절은 처음에 무엇을 단언했는지를 보이기 위해 지우지 않고 남긴다.
 
 ### 4-3. 기준 tree에서 실제로 돌려 보았다
 
@@ -104,3 +106,68 @@ tags: ["vf-cl", "s12", "acceptance", "ci", "evidence", "fail-closed", "claude"]
 - **수락(`operationallyAccepted`)은 움직이지 않는다.** 이 lane은 수락 묶음을 **도출**하고, `acceptanceClaim`은 언제나 `false`다. AC-12는 닫히지 않는다.
 - **VF-CL-02·03의 독립 검토를 하지 않았다.** reviewer가 Codex이고 내 작업의 검토를 내가 할 수 없다.
 - **`web-smoke-journeys`는 `NOT_OBSERVED`로 남는다.** 수집기는 `--web-smoke-proof` 경로를 받을 수 있지만 그 증거는 다른 lane의 산출물이고, 이 lane에서 합성하지 않았다.
+
+
+## 7. Codex r1 조치
+
+### 7-1. F-R1 — lane이 migration 단계에서 죽었다
+
+기준 head의 `workflow_dispatch` run **36847277078**이 `Apply the published migrations`에서 `ModuleNotFoundError: No module named 'psycopg2'`로 실패했다. 그 뒤 수집기·gate 단계는 skip되고 artifact가 없었다 — **그래서 이 PR에는 hosted 관측이 하나도 없었다.** 지적이 맞다.
+
+원인은 **DSN 한 줄의 철자**다. 같은 데이터베이스를 세 이름으로 주지만 **소비자가 둘이고 철자가 둘이다**:
+
+| 환경 변수 | 소비자 | 필요한 철자 | 왜 |
+|---|---|---|---|
+| `INV_READINESS_DSN` | `tools/operational_readiness.py` → `psycopg.connect(dsn)` | `postgresql://` | libpq가 읽는 문자열이다 |
+| `INV_PITR_DSN` | `tools/pitr_readiness.py` → `psycopg.connect(dsn)` | `postgresql://` | 같다 |
+| `INV_MIGRATION_DSN` | `migrations/env.py` → SQLAlchemy | **`postgresql+psycopg://`** | SQLAlchemy는 **scheme으로 driver를 고른다**. `postgresql://`는 psycopg2를 뜻하고, 이 프로젝트는 `psycopg[binary]==3.3.5`만 설치한다 |
+
+`postgresql+psycopg://`는 Backend lane이 이미 쓰는 그 철자다(`.github/workflows/backend.yml`의 세 자리 전부). 추측으로 고르지 않고 설치 목록과 기존 lane을 읽어 맞췄다.
+
+**reachability도 같이 고쳤다.** 수집기는 **원격 ref가 담지 못하는 head를 거부한다**(exit 2) — 아무도 check out 할 수 없는 증거는 증거가 아니기 때문이다. 그 판정을 `merge-base --is-ancestor` + `ls-remote` 신선도로 하는데, lane이 넘기던 `--reachable-ref`는 **base ref**였다. base는 정의상 PR head를 담지 않으므로 labelled PR 경로에서는 그 거부가 확정이었다. head ref로 바꾸고, checkout이 SHA로 fetch해 `refs/remotes/origin/*`을 남기지 않을 수 있으므로 **그 ref 하나를 명시적으로 fetch하는 단계**를 넣었다. 이 단계는 **검사를 통과시키는 것이 아니다** — ancestry와 live `ls-remote` 비교는 그대로 측정되고, branch에 없는 head는 여전히 거부된다.
+
+### 7-2. F-R2 — gate가 가짜 PASS를 통과시켰다
+
+Codex의 probe를 그대로 다시 만들어 **옛 gate(`50242e74`)에 걸어 보았다**: `verdict: FABRICATED_PASS`, `codeSha` 없음, `provenance` 없음, 17개 항목 전부 `PASS`에 `source: typed-by-human` — **exit 0, "shape accepted"**. 재현된다.
+
+고친 방향은 "좋은 verdict를 요구"가 아니라 **묶음을 도출 과정에 결속**이다. 사다리로 하나씩 측정했다(각 줄은 앞 줄에 한 가지만 더한 것이다):
+
+| 손으로 적은 묶음 | 새 gate |
+|---|---|
+| 1 Codex의 probe 그대로 | 거부: `pitr-configuration-possible`이 `'typed-by-human'`에서 왔다고 말한다 — 레지스트리의 주장은 `pitr_readiness`가 도출한다는 것이다 |
+| 2 + 진짜 source 이름 | 거부: `verdict 'FABRICATED_PASS'`는 **수집기가 낼 수 없는** 값이다(집합은 수집기의 `EXIT_BY_VERDICT`에서 읽는다) |
+| 3 + enum 안의 verdict(`PASS`) | 거부: `codeSha`가 없다 — 어느 commit을 말하는지 없는 증거는 무엇과도 맞춰볼 수 없다 |
+| 4 + `codeSha` | 거부: `provenance`가 없다 |
+| 5 + provenance, 다른 digest | 거부: `collectorSha256`이 **이 tree의 수집기 bytes**와 다르다 |
+| 6 + 진짜 digest, 더러운 tree | 거부: `working_tree_clean_status`가 false다 |
+| 7 + 깨끗한 tree, 다른 commit | 거부: 이 묶음은 `bbbb…`를 말하고 시험 중인 head는 `8d5a7d9b…`다 |
+| 8 + 이 head | **통과.** 결속 전부를 만족시켜야 통과한다 |
+
+묶은 축:
+
+| 단언 | 왜 이것이 "모양"보다 센가 |
+|---|---|
+| `verdict`가 **수집기가 낼 수 있는 값**이고 **이 항목들에서 수집기 규칙이 내는 값**과 같다 | `overall_verdict`를 **import**해서 비교한다 — 주장이 "이 수집기가 이 항목들에서 내릴 결론이다"가 되고, "누가 여기 베껴 둔 규칙과 맞다"가 아니다. 없는 단어가 죽고, **FAIL 항목 위의 진짜 `PASS`도 죽는다** |
+| `scope` 목록을 항목 status에서 **다시 계산**해 비교한다 | 요약이 인용하는 목록이 그것이다. 항목을 목록 사이에서만 옮기면 읽는 사람이 확인할 수 없는 주장이 된다 |
+| **모든 항목의 `source`**가 수집기 catalog가 그 항목에 지정한 도구다. 이름 붙은 두 개는 **literal로 한 번 더** 확인하고 그 도구가 tree에 **파일로 있어야** 한다 | `typed-by-human`이 죽는다. 두 개를 catalog에서 읽어오기만 하면 **검사 대상에서 주장을 빌려오는 것**이 된다 |
+| `codeSha` = `provenance.commit_sha` = `--expected-head` = **파일 이름** | lane은 glob으로 묶음을 찾는다. 다른 commit의 묶음이 같은 자리에 있으면 그것이 검사되고 통과했을 것이다 |
+| provenance가 **깨끗하고 push된 checkout**을 말하고 **opt-out이 하나도 없다** | 수집기는 더러운 tree와 닿지 않는 head를 거부하고, 넘기면 그 사실을 기록한다. CI는 그 기록이 있어서는 안 되는 자리다 |
+| `provenance.collectorSha256`이 **이 tree의 수집기 digest**다 | 묶음이 자신을 만든 bytes를 적고, gate가 그 bytes를 읽는다 |
+
+### 7-3. 이 gate가 여전히 증명하지 못하는 것
+
+**파일이 수집기에서 나왔다는 것을 증명하지 못한다.** 위 칸은 전부 위조하려는 사람이 계산할 수 있는 값이다(digest는 공개 파일의 해시고, provenance는 타이핑할 수 있다). 묶음을 증거로 만드는 것은 **CI가 같은 job에서 수집기와 이 gate를 head의 checkout 위에서 돌린다**는 사실이고, 결속은 위조에 **검토가 보는 코드 변경**을 요구하게 만든다. 그 이상을 주장하는 gate는 같은 실수를 자리만 옮긴 것이다 — 그래서 docstring에도 이 문장을 적었다.
+
+**verdict가 좋은지는 여전히 판정하지 않는다.** 7-2의 단언은 "verdict가 이 항목들과 **일치**한다"이고 "verdict가 좋다"가 아니다. `FAIL` 묶음은 통과한다 — 시험의 첫 줄이 그것이다.
+
+### 7-4. 검증
+
+| 항목 | 결과 |
+|---|---|
+| gate 시험 | `tests/core/test_check_s12_acceptance_shape.py` **88 passed**(24 → 88) |
+| 역방향 ratchet | `tests/core/test_post_landing_verify.py` **97 passed** — 이 workflow는 push trigger가 없으므로 lane을 지지 않는다(그대로다) |
+| 실제 묶음 | 기준 head의 로컬 묶음(17항목, verdict `FAIL`)을 새 gate에 걸어 **통과**. CI가 넘기지 않는 flag 하나(`unpushedHeadAllowed`)만 CI 모양으로 맞췄다 |
+| 가짜 묶음 | 위 사다리 8줄, 한 번에 한 가지씩 |
+| dispatch | **이 commit을 담은 head에서 1회** — run id와 artifact는 PR 코멘트에 적는다. commit이 자기 자신의 run id를 담을 수는 없다 |
+
+레지스트리 `VF-CL-04.ciVerified`는 **그대로 false**이고, 이 묶음은 **수락이 아니다**(`acceptanceClaim`은 언제나 `false`). r1에서 바뀐 것은 lane이 실제로 돌게 된 것과 gate가 손으로 적은 묶음을 거부하게 된 것뿐이다.

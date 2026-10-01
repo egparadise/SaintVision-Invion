@@ -49,9 +49,14 @@ jobs:
           --health-retries 20
     env:
       SOURCE_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-      # One DSN, three names: the collector reads the readiness and PITR DSNs from the
-      # environment by name and never emits them, and the migration env reads its own.
-      INV_MIGRATION_DSN: postgresql://invowner:ci_local_only@localhost:5432/invdev
+      HEAD_REF: ${{ github.event.pull_request.head.ref || github.ref_name }}
+      # One database, three names, two spellings. The readiness and PITR tools hand their DSN
+      # to `psycopg.connect`, which wants a libpq URL. Alembic hands INV_MIGRATION_DSN to
+      # SQLAlchemy, which reads the scheme to choose a driver: `postgresql://` means psycopg2,
+      # which this project does not install, and run 36847277078 failed with
+      # `ModuleNotFoundError: No module named 'psycopg2'` for exactly that reason. The
+      # `+psycopg` spelling is what every other Backend lane in this repository uses.
+      INV_MIGRATION_DSN: postgresql+psycopg://invowner:ci_local_only@localhost:5432/invdev
       INV_READINESS_DSN: postgresql://invowner:ci_local_only@localhost:5432/invdev
       INV_PITR_DSN: postgresql://invowner:ci_local_only@localhost:5432/invdev
       OUT_DIR: evidence/s12-acceptance
@@ -64,6 +69,16 @@ jobs:
           # it reads provenance from history, so a shallow checkout would make it refuse
           # for the wrong reason.
           fetch-depth: 0
+      - name: Make the remote ref the reachability check reads
+        # The collector refuses a head that no remote ref contains -- evidence nobody can check
+        # out is not evidence -- and it measures that with `merge-base --is-ancestor` against a
+        # remote-tracking ref whose tip it re-reads with `ls-remote`. The checkout above is by
+        # SHA, which need not leave refs/remotes/origin/* behind, so this creates the one ref
+        # the check reads. It does not make the check pass: ancestry and live freshness are
+        # still measured, and a head that is not on the branch still fails. A fork PR has no
+        # such ref on origin and fails here loudly, which is the honest outcome; every lane in
+        # this repository pushes its branch to origin.
+        run: git fetch --no-tags origin "+refs/heads/$HEAD_REF:refs/remotes/origin/$HEAD_REF"
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -92,13 +107,19 @@ jobs:
             --pitr-backups .work/s12/backups \
             --out-dir "$OUT_DIR" \
             --executor github-actions \
-            --reachable-ref "origin/${{ github.event.pull_request.base.ref || github.ref_name }}" \
+            --reachable-ref "origin/$HEAD_REF" \
             --note "derived by CI at $SOURCE_HEAD_SHA; promotes no score and claims no acceptance"
-      - name: Hold the bundle to its shape
+      - name: Hold the bundle to its shape and to this head
+        # --expected-head is what makes this a check of *this* run's bundle: the gate requires
+        # codeSha, provenance.commit_sha and the file's own name to be this commit, the verdict
+        # to be the one the collector's rule produces from these items, every item to name the
+        # tool the collector's catalogue names, and the provenance to describe a clean, pushed
+        # checkout whose collector digest is the collector in this tree. Without it the gate
+        # accepted a hand-written bundle with a verdict nothing emitted and no commit at all.
         run: |
           bundle="$(ls "$OUT_DIR"/*.json | head -1)"
           test -n "$bundle"
-          python tools/check_s12_acceptance_shape.py "$bundle"
+          python tools/check_s12_acceptance_shape.py "$bundle" --expected-head "$SOURCE_HEAD_SHA"
       - name: Record that the two named observations were derived here
         # The VF-CL registry's `ciVerifiedNote` said these two were produced by hand and
         # that CI never re-derived them. This step is the line a reader can point at.
