@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Run the opt-in S08-BE rootless BuildKit reference lane.
 
-The caller starts ``buildkitd`` inside RootlessKit and passes its namespace PID.
-This tool records only redacted process/worker facts, then exercises the concrete
-transport against the repository's scratch-only fixture.  The emitted JSON is
-reference evidence and is not a product ``EvidenceEnvelope``.
+In process mode the caller passes the RootlessKit namespace PID. Container mode
+derives the PID from a validated ``docker inspect`` result. This tool records
+only redacted process/worker facts, then exercises the concrete transport
+against the repository's scratch-only fixture. The emitted JSON is reference
+evidence and is not a product ``EvidenceEnvelope``.
 """
 
 from __future__ import annotations
@@ -307,7 +308,7 @@ def main(argv=None) -> int:
     parser.add_argument("--container-name")
     parser.add_argument("--runtime-image")
     parser.add_argument("--address", required=True)
-    parser.add_argument("--daemon-pid", type=int, required=True)
+    parser.add_argument("--daemon-pid", type=int)
     parser.add_argument("--health-receipt", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--junit", type=Path, required=True)
@@ -316,6 +317,8 @@ def main(argv=None) -> int:
         parser.error("--container-name and --runtime-image are required together")
     if not args.container_name and (args.buildkitd is None or args.rootlesskit is None):
         parser.error("process mode requires --buildkitd and --rootlesskit")
+    if not args.container_name and args.daemon_pid is None:
+        parser.error("process mode requires --daemon-pid")
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
     args.health_receipt.parent.mkdir(parents=True, exist_ok=True)

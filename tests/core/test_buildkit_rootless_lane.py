@@ -157,6 +157,44 @@ def test_container_boundary_accepts_only_owned_rootless_shape(monkeypatch):
     assert module._validated_container_inspect(_container_inspect())["State"]["Pid"] == 3210
 
 
+def test_container_mode_derives_pid_from_inspect_instead_of_cli(monkeypatch, tmp_path):
+    module = _module()
+    binary = tmp_path / "buildctl"
+    binary.write_text("binary", encoding="utf-8")
+    monkeypatch.setenv("INV_EVIDENCE_CODE_SHA", HEAD)
+    monkeypatch.setattr(
+        module, "_health_receipt", lambda *_args: (_ for _ in ()).throw(RuntimeError("stop"))
+    )
+    output, junit = tmp_path / "out", tmp_path / "junit.xml"
+
+    result = module.main(
+        [
+            "--buildctl",
+            str(binary),
+            "--container-name",
+            "rootless-builder",
+            "--runtime-image",
+            "image@sha256:" + "c" * 64,
+            "--address",
+            "tcp://127.0.0.1:1234",
+            "--health-receipt",
+            str(tmp_path / "health.json"),
+            "--output-dir",
+            str(output),
+            "--junit",
+            str(junit),
+        ]
+    )
+
+    assert result == 1
+    assert (
+        json.loads((output / "rootless-buildkit-reference.json").read_text(encoding="utf-8"))[
+            "failureClass"
+        ]
+        == "RuntimeError"
+    )
+
+
 def test_main_emits_reference_only_evidence_and_exact_junit(monkeypatch, tmp_path):
     module = _module()
     bins = []
