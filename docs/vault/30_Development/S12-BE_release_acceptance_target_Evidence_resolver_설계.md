@@ -1,10 +1,10 @@
 ---
 doc_id: "DESIGN-S12-ACCEPTANCE-RESOLVER-001"
 title: "S12 release 수락 target·Evidence 정본 resolver 설계"
-version: "1.1.0"
+version: "1.1.1"
 status: "proposed"
 author: "Codex"
-updated: "2026-10-01T22:00:04+09:00"
+updated: "2026-10-01T22:14:13+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["S12-BE", "acceptance", "target-registry", "evidence", "resolver", "security"]
@@ -137,11 +137,14 @@ identity가 아니다(`src/saintvision/services/evidence.py:23-42`, `:62-101`).
    기존 증거는 exact source artifact/provenance를 검증하는 importer만 연결할 수 있다.
 6. proposer가 유효한 ref를 발견하는 read surface
    `GET /v1/release-manifests/{release_id}/acceptance-evidence?acceptanceIdRef=...`를 구현 카드가 추가한다.
-   `releases.accept` 권한과 같은 tenant/project scope에서 server-derived
-   `{evidenceId,observedAt,evidenceSha256,targetId,targetSha256}`만 반환하고 telemetry·actor·project를
-   노출하지 않는다. binder/route가 배포되지 않았거나 binding이 하나도 없으면 per-row 404가 아니라
-   prerequisite `SYS-0003/503/false`다. `observedAt`은 수집 시각이 아니라 Evidence 기본키의
-   `recorded_at`을 UTC microseconds로 직렬화한 값이다.
+   서명 검증된 fresh human principal과 live `releases.accept`를 매 page 요청에서 재확인한다. caller가
+   project를 고르지 않으며 server-owned release binding이 Run→Workload project를 결속한다.
+   `ReleaseAcceptanceEvidenceDiscoveryPageResponse`가 release·criterion·policy/target pin,
+   `targets[1..64]`, server-derived Evidence `items[1..100]`, opaque `nextCursor`, literal
+   `scopeVerified=true`를 반환하고 telemetry·actor·project를 노출하지 않는다. binder/route가 배포되지
+   않았거나 binding이 하나도 없으면 빈 page나 per-row 404가 아니라 prerequisite
+   `SYS-0003/503/false`다. `observedAt`은 수집 시각이 아니라 Evidence 기본키의 `recorded_at`을 UTC
+   microseconds로 직렬화한 값이다.
 
 ### 2-3. legacy backfill
 
@@ -164,7 +167,8 @@ resolve하지 않는다. ref resolve는 #282 §4의 lock 순서 안에서 수행
 입력은 verified principal의 `tenant_id`, path의 `release_id`, policy에서 고른 `acceptance_id_ref`,
 Pydantic으로 검증한 target/measurement refs다. 순서는 다음과 같다.
 
-1. #282 순서대로 idempotency ledger와 release/project coordination row를 먼저 잠근다.
+1. #282 순서대로 idempotency ledger와
+   `(tenant_id,release_id,acceptance_id_ref)` criterion coordination slot을 먼저 잠근다.
 2. release를 같은 tenant로 exact 조회하고, 배포·release manifest에 pin된 policy registry와 target
    registry Git blob SHA-1/file SHA-256/version을 검증한다. 없으면 존재 비노출 404다.
 3. #282 §4 단계 6에서 target ref마다 registry row를 server-side 조회해 target
@@ -206,6 +210,11 @@ proposal, vote, acceptance, success audit를 쓰지 않는다.
   SHA-1/file SHA-256를 포함해 어느 release·criterion·policy pin의 결과인지 고정한다.
   targets·measurements는 각각 1..64, ID unique, digest lowercase hex, aware timestamp이고
   `allResolved`·`scopeVerified`는 literal true다. partial/false branch는 존재하지 않는다.
+- `ReleaseAcceptanceEvidenceDiscoveryPageResponse`는 위 GET route의 공개 schema다. page 상한은 100,
+  target 상한은 64이며, `nextCursor` 외 caller-selected scope는 없다. top-level `acceptanceIdRef`와 모든
+  target의 ref가 exact match해야 한다.
+- policy registry v1을 `Literal[1]`로 고정한 것은 의도다. policyVersion이 증가하면 새 schema version과
+  generated contract review가 필요하며 구 계약이 새 policy를 조용히 해석하지 않는다.
 - 공개 response는 target/evidence의 identity만 담고 Evidence actor/telemetry, binding project,
   caller fallback 값은 담지 않는다.
 - generated files는 `tools/export_schemas.py`로만 만들며 손 편집하지 않는다.
@@ -220,6 +229,7 @@ proposal, vote, acceptance, success audit를 쓰지 않는다.
 3. 빈 registry, unknown version/owner(전체/target), duplicate/extra key, non-NFC string, uppercase·63자
    digest 거부.
 4. resolution의 partial list, false scope/allResolved, naive time, duplicate refs, caller fallback key 거부.
+   top-level/target `acceptanceIdRef` drift와 discovery page의 빈 items·false scope·caller project도 거부.
 5. real-PG에서 commit한 fixed Evidence serialization byte/digest vector를 PG-free에서 대조한다.
    timestamp timezone·microseconds, NULL, JSONB key order, array order, UUID cast, telemetry 한 byte
    변화마다 예상 digest를 검증한다.
@@ -229,6 +239,8 @@ proposal, vote, acceptance, success audit를 쓰지 않는다.
 
 1. migration 0058 forward/downgrade/forward, 기존 partition 열 전파, `SET ROLE inv_app` INSERT 성공,
    trigger overwrite, direct digest helper EXECUTE 거부.
+   trigger가 저장한 `envelope_sha256 == owner helper(same row)`를 exact 비교해 신규 INSERT와 backfill
+   직렬화가 갈라지는 변이를 거부한다.
 2. 같은 semantic row의 JSONB key 순서 차이는 같은 digest; recorded_at/tenant/run/telemetry 한 필드
    변화는 다른 digest.
 3. tenant A release가 tenant B evidence를 resolve 못함; 같은 tenant 다른 project/release binding도 404.

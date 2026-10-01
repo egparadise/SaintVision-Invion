@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-20261001-CODEX-CARD190"
 title: "S12 수락 target·Evidence 정본 resolver 설계와 공개 계약"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T22:00:04+09:00"
+updated: "2026-10-01T22:14:13+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["S12-BE", "Card190", "acceptance", "resolver", "Evidence"]
@@ -53,11 +53,16 @@ backfill, hosted real-PG 결과는 `NOT_OBSERVED`다. 따라서 decision write f
   uppercase·63자 hash 변이를 고정했다.
 - #282 source head는 merge commit으로만 착지해 도달성을 유지한다. resolver·migration·binder·route와
   hosted real-PG는 여전히 `NOT_OBSERVED`다.
+- Claude r2 Low 5건도 v1.1.1에서 닫았다. discovery route는 fresh human+live permission을 요구하는
+  strict 100-item page 계약이며 caller project를 받지 않는다. hosted 계획은 trigger/helper digest
+  exact equality를 단언한다. target owner는 digest 재계산 뒤에도 거부하고, resolution/discovery의
+  top-level과 target `acceptanceIdRef`가 같아야 한다. coordination 용어는 #282의 criterion slot으로
+  통일했다.
 
 ## 실제 검증
 
-- focused resolver contract: `31 passed`; 기존 write contract 포함 `59 passed`.
-- schema export/check: `95/95`.
+- focused resolver contract: `33 passed`; 기존 write contract 포함 `61 passed`.
+- schema export/check: `96/96`.
 - `git diff --check`: exit 0.
 - docs·bindings·citation·ontology gate와 hosted CI는 commit 후 실행/인용한다.
 

@@ -10,6 +10,7 @@ import pytest
 from pydantic import ValidationError
 
 from saintvision.api.schemas import (
+    ReleaseAcceptanceEvidenceDiscoveryPageResponse,
     ReleaseAcceptanceReferenceResolutionResponse,
     ReleaseAcceptanceTargetRegistryResponse,
     load_release_acceptance_target_registry_json,
@@ -64,6 +65,24 @@ def _resolution() -> dict:
         ],
         "scopeVerified": True,
         "allResolved": True,
+    }
+
+
+def _discovery_page() -> dict:
+    resolution = _resolution()
+    return {
+        "schemaVersion": "release-acceptance-evidence-discovery-page:1",
+        "releaseId": resolution["releaseId"],
+        "acceptanceIdRef": resolution["acceptanceIdRef"],
+        "policyRegistryVersion": resolution["policyRegistryVersion"],
+        "policyRegistrySha256": resolution["policyRegistrySha256"],
+        "targetRegistryVersion": resolution["targetRegistryVersion"],
+        "targetRegistryGitBlobSha": resolution["targetRegistryGitBlobSha"],
+        "targetRegistryFileSha256": resolution["targetRegistryFileSha256"],
+        "targets": resolution["targets"],
+        "items": resolution["measurements"],
+        "nextCursor": None,
+        "scopeVerified": True,
     }
 
 
@@ -130,7 +149,6 @@ def test_registry_loader_rejects_duplicate_keys_and_implicit_string_trimming(mut
         lambda document: document.update({"owner": "operator"}),
         lambda document: document.update({"registryVersion": 2}),
         lambda document: document.update({"unexpected": True}),
-        lambda document: document["targets"][0].update({"owner": "operator"}),
         lambda document: document["targets"][0].update({"targetSha256": "A" * 64}),
         lambda document: document["targets"][0].update({"criteria": []}),
         lambda document: document["targets"][0]["criteria"].append(
@@ -165,6 +183,15 @@ def test_non_nfc_target_string_is_rejected_even_with_recomputed_digest():
         ReleaseAcceptanceTargetRegistryResponse.model_validate(document)
 
 
+def test_target_owner_is_literal_even_with_recomputed_digest():
+    document = _registry()
+    target = document["targets"][0]
+    target["owner"] = "operator"
+    target["targetSha256"] = _canonical_target_sha256(target)
+    with pytest.raises(ValidationError):
+        ReleaseAcceptanceTargetRegistryResponse.model_validate(document)
+
+
 def test_reference_resolution_contract_is_all_or_nothing():
     parsed = ReleaseAcceptanceReferenceResolutionResponse.model_validate(_resolution())
     assert parsed.scope_verified is True
@@ -184,6 +211,7 @@ def test_reference_resolution_contract_is_all_or_nothing():
         lambda document: document.update({"policyRegistrySha256": "A" * 64}),
         lambda document: document.update({"targetRegistryFileSha256": "a" * 63}),
         lambda document: document.update({"targetRegistryFileSha256": "A" * 64}),
+        lambda document: document["targets"][0].update({"acceptanceIdRef": "AC-11"}),
         lambda document: document["measurements"][0].update(
             {"observedAt": "2026-10-01T12:00:00"}
         ),
@@ -201,9 +229,33 @@ def test_partial_ambiguous_or_unscoped_resolution_is_rejected(mutate):
         ReleaseAcceptanceReferenceResolutionResponse.model_validate(document)
 
 
+def test_discovery_page_is_bounded_scoped_and_criterion_consistent():
+    parsed = ReleaseAcceptanceEvidenceDiscoveryPageResponse.model_validate(
+        _discovery_page()
+    )
+    assert parsed.scope_verified is True
+    assert len(parsed.items) == 1
+
+    for mutate in (
+        lambda document: document.update({"items": []}),
+        lambda document: document.update({"scopeVerified": False}),
+        lambda document: document["targets"][0].update(
+            {"acceptanceIdRef": "AC-11"}
+        ),
+        lambda document: document.update({"operatorSelectedProjectId": "project-1"}),
+    ):
+        document = _discovery_page()
+        mutate(document)
+        with pytest.raises(ValidationError):
+            ReleaseAcceptanceEvidenceDiscoveryPageResponse.model_validate(document)
+
+
 def test_public_schema_keeps_digest_and_resolution_guards_literal():
     registry_schema = ReleaseAcceptanceTargetRegistryResponse.model_json_schema(by_alias=True)
     resolution_schema = ReleaseAcceptanceReferenceResolutionResponse.model_json_schema(by_alias=True)
+    discovery_schema = ReleaseAcceptanceEvidenceDiscoveryPageResponse.model_json_schema(
+        by_alias=True
+    )
 
     assert registry_schema["additionalProperties"] is False
     assert registry_schema["properties"]["targets"]["minItems"] == 1
@@ -213,6 +265,10 @@ def test_public_schema_keeps_digest_and_resolution_guards_literal():
     assert resolution_schema["properties"]["policyRegistrySha256"]["pattern"] == "^[0-9a-f]{64}$"
     assert resolution_schema["properties"]["targetRegistryGitBlobSha"]["pattern"] == "^[0-9a-f]{40}$"
     assert resolution_schema["properties"]["targetRegistryFileSha256"]["pattern"] == "^[0-9a-f]{64}$"
+    assert discovery_schema["additionalProperties"] is False
+    assert discovery_schema["properties"]["items"]["minItems"] == 1
+    assert discovery_schema["properties"]["items"]["maxItems"] == 100
+    assert discovery_schema["properties"]["scopeVerified"]["const"] is True
     sha = resolution_schema["$defs"]["ReleaseAcceptanceResolvedMeasurement"]["properties"][
         "evidenceSha256"
     ]

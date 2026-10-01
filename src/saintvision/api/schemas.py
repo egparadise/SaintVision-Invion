@@ -1825,8 +1825,61 @@ class ReleaseAcceptanceReferenceResolutionResponse(Strict):
         evidence_ids = [measurement.evidence_id for measurement in self.measurements]
         if len(set(target_ids)) != len(target_ids):
             raise ValueError("resolved targets must have unique targetId values")
+        if any(
+            target.acceptance_id_ref != self.acceptance_id_ref
+            for target in self.targets
+        ):
+            raise ValueError("resolved targets must match the top-level acceptanceIdRef")
         if len(set(evidence_ids)) != len(evidence_ids):
             raise ValueError("resolved measurements must have unique evidenceId values")
+        return self
+
+
+class ReleaseAcceptanceEvidenceDiscoveryPageResponse(Strict):
+    """Authorized, bounded discovery of server-bound acceptance evidence.
+
+    The route returns only immutable reference identities.  It does not expose
+    Evidence telemetry, actors, projects, or an operator-selected scope.
+    """
+
+    schema_version: Literal["release-acceptance-evidence-discovery-page:1"] = Field(
+        alias="schemaVersion"
+    )
+    release_id: StrictStr = Field(alias="releaseId", min_length=1, max_length=64)
+    acceptance_id_ref: StrictStr = Field(
+        alias="acceptanceIdRef", pattern="^[A-Z][A-Z0-9-]{1,15}$"
+    )
+    policy_registry_version: Literal[1] = Field(alias="policyRegistryVersion")
+    policy_registry_sha256: ReleaseAcceptanceSha256 = Field(alias="policyRegistrySha256")
+    target_registry_version: Literal[1] = Field(alias="targetRegistryVersion")
+    target_registry_git_blob_sha: ReleaseAcceptanceGitSha = Field(
+        alias="targetRegistryGitBlobSha"
+    )
+    target_registry_file_sha256: ReleaseAcceptanceSha256 = Field(
+        alias="targetRegistryFileSha256"
+    )
+    targets: list[ReleaseAcceptanceResolvedTarget] = Field(min_length=1, max_length=64)
+    items: list[ReleaseAcceptanceResolvedMeasurement] = Field(min_length=1, max_length=100)
+    next_cursor: StrictStr | None = Field(
+        default=None, alias="nextCursor", min_length=1, max_length=256
+    )
+    scope_verified: Literal[True] = Field(alias="scopeVerified")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    @model_validator(mode="after")
+    def _discovered_references_are_consistent(
+        self,
+    ) -> "ReleaseAcceptanceEvidenceDiscoveryPageResponse":
+        if any(
+            target.acceptance_id_ref != self.acceptance_id_ref
+            for target in self.targets
+        ):
+            raise ValueError("discovered targets must match the top-level acceptanceIdRef")
+        if len({target.target_id for target in self.targets}) != len(self.targets):
+            raise ValueError("discovered targets must have unique targetId values")
+        if len({item.evidence_id for item in self.items}) != len(self.items):
+            raise ValueError("discovered evidence must have unique evidenceId values per page")
         return self
 
 
