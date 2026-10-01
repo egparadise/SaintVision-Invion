@@ -79,7 +79,7 @@
           "type": "boolean"
         },
         "operatorSignOffBlockedBy": {
-          "const": "human-attestation-implementation-unavailable",
+          "const": "release-acceptance-prerequisites-unavailable",
           "title": "Operatorsignoffblockedby",
           "type": "string"
         },

@@ -53,7 +53,7 @@ MANIFEST = {
     ],
     "createdAt": NOW,
     "operatorSignOff": False,
-    "operatorSignOffBlockedBy": "human-attestation-implementation-unavailable",
+    "operatorSignOffBlockedBy": "release-acceptance-prerequisites-unavailable",
     "requiredDistinctOperatorCount": 2,
     "confirmedOperatorCount": 0,
     "matchingAcceptedUserCount": 0,

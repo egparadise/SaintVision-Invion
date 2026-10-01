@@ -1,12 +1,12 @@
 ---
 doc_id: "DESIGN-S12-BE-RELEASE-MANIFEST-READ-20261001"
 title: "S12-BE release manifest 읽기 route와 서명·수락 쓰기 경계 — operatorSignOff는 외래키로 증명되지 않아 계약에서 false로 고정하고, 사람 확인 수와 원시 수락 수를 두 필드로 분리했다(코디네이터 결정), 쓰기는 Codex 계약 요청 (카드 182, r3)"
-version: "1.2.0"
+version: "1.3.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-01T20:08:58+09:00"
+updated: "2026-10-01T20:30:20+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "7e670d77"
@@ -40,12 +40,17 @@ tags: ["s12", "release-manifest", "acceptance", "route", "read-only", "security-
 | 필드 | 값 | 뜻 |
 |---|---|---|
 | `operatorSignOff` | **`Literal[False]`** | 이 읽기 표면은 참을 **낼 수 없다**. docstring의 약속이 아니라 **계약**이 거부한다 |
-| `operatorSignOffBlockedBy` | `"human-attestation-implementation-unavailable"` | 왜 거짓인지. **`#282`로 계약은 존재하므로** 없는 것은 그 계약의 **구현**이고, 값이 둘 중 어느 쪽인지 말한다 |
+| `operatorSignOffBlockedBy` | `"release-acceptance-prerequisites-unavailable"` | 왜 거짓인지. 카드 187의 코드만으로는 부족하며, 검증된 fresh-auth/step-up 공급과 authoritative target/Evidence resolver가 모두 결속돼야 한다. 어느 하나라도 없으면 이 값이다 |
 | `requiredDistinctOperatorCount` | **`Literal[2]`** | 쓰기 계약(`#282`, 카드 184)의 정족수 |
 | `confirmedOperatorCount` | **`Literal[0]`** | **사람 확인(`#282`의 human attestation)된 서로 다른 운영자 수.** 그 구현이 없으므로 이 표면에서는 0 고정이다. "수락이 없다"가 아니라 "여기 어떤 결정도 사람에게 귀속되지 않았다"는 뜻이다 |
 | `matchingAcceptedUserCount` | 정수(≥0) | **원시 기록**: 해시가 맞는 `accepted` 행의 서로 다른 사용자 id 수. 서비스 주체가 그중 하나일 수 있고, **그래서 이름이 다른 필드**다 |
 
 **이름은 코디네이터가 2026-10-01에 정했다**(`#282`에도 같은 결정이 전달됐다). r2에서 나는 원시 수를 `confirmedOperatorCount`에 담았고, 그러면 **서비스 계정이 올릴 수 있는 수에 "confirmed"라는 말이 붙는다** — F1에서 고친 것과 같은 종류의 과잉 주장이다. 이제 `confirmedOperatorCount`는 사람 확인의 자리로 비워 두고(0 고정), 기록된 사실은 아무 주장도 하지 않는 이름으로 나간다.
+
+이 필드들은 **release 전체 읽기 범위**다. `#282`의 proposal/decision 응답은
+`proposalConfirmationCount`·`decisionConfirmationCount`·`decisionSignOff`로 분리한다.
+따라서 release의 `confirmedOperatorCount`를 proposal 투표 수로 읽거나, release의
+`operatorSignOff`를 개별 criterion decision의 quorum 값으로 읽어서는 안 된다.
 
 `matchingAcceptedUserCount`가 `0`으로 남는 세 경우는 그대로 각각 다른 사실이다.
 

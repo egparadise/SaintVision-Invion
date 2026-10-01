@@ -51,7 +51,7 @@ describe('S12-FE Products Defect Fixes (DEF-S12-01 ~ DEF-S12-18)', () => {
     });
 
     // Before sign-off: shows pending state without false production approval
-    expect(container.textContent).toContain('SIGN-OFF 대기 (백엔드 미연결)');
+    expect(container.textContent).toContain('SIGN-OFF 대기 (로컬 모의)');
     expect(container.textContent).not.toContain('프로덕션 가동 승인 완료');
     expect(container.textContent).not.toContain('SIGNED-OFF ✔');
 
