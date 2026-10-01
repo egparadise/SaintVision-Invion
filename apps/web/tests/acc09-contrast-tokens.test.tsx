@@ -68,6 +68,52 @@ function getAllSourceFiles(dir: string): string[] {
   return files;
 }
 
+// Fail-closed baseline of registered files and their exact color literal counts
+const COLOR_LITERAL_BASELINE: Record<string, number> = {
+  "app/App.tsx": 11,
+  "contracts/model-verify-request.ts": 1,
+  "contracts/model-version-register-request.ts": 1,
+  "features/admin/AdminSecurityConsole.tsx": 186,
+  "features/agent/NaturalLanguageRunView.tsx": 79,
+  "features/agent/evalRunner.ts": 1,
+  "features/approvals/ApprovalCenter.tsx": 17,
+  "features/approvals/ApprovalDetail.tsx": 7,
+  "features/dashboard/ClusterOverview.tsx": 17,
+  "features/deployment/IntranetDeploymentView.tsx": 152,
+  "features/desktop/DesktopShell.tsx": 49,
+  "features/desktop/DesktopWindow.tsx": 17,
+  "features/desktop/InvFileExplorer.tsx": 124,
+  "features/desktop/ModelStudioView.tsx": 78,
+  "features/desktop/ResourceExplorer.tsx": 390,
+  "features/desktop/TerminalSessionView.tsx": 37,
+  "features/editor/ConflictResolutionModal.tsx": 16,
+  "features/editor/DiffViewer.tsx": 18,
+  "features/editor/GitCommitModal.tsx": 26,
+  "features/editor/MonacoWorkspaceEditor.tsx": 86,
+  "features/evidence/EvidenceViewer.tsx": 16,
+  "features/mlops/ModelLineageView.tsx": 458,
+  "features/nodes/NodeDetail.tsx": 26,
+  "features/nodes/NodeList.tsx": 31,
+  "features/placement/PlacementExplainView.tsx": 5,
+  "features/placement/PlacementSimulator.tsx": 33,
+  "features/placement/ResourceTopologyGraph.tsx": 3,
+  "features/recovery/DistributedRecoveryView.tsx": 81,
+  "features/release/ReleaseCandidateView.tsx": 84,
+  "features/release/releaseEngine.ts": 6,
+  "features/runs/RunDetail.tsx": 122,
+  "features/runs/RunList.tsx": 45,
+  "features/runs/SealRecordPanel.tsx": 135,
+  "features/studio/DeveloperStudio.tsx": 176,
+  "features/terminal/WebTerminal.tsx": 32,
+  "features/workspaces/ExecutionResultView.tsx": 1,
+  "features/workspaces/WorkspaceCreateModal.tsx": 1,
+  "features/workspaces/WorkspaceList.tsx": 9,
+  "shared/api/adapterObservation.ts": 2,
+  "shared/ui/Button.tsx": 2,
+  "shared/ui/Header.tsx": 11,
+  "shared/ui/RiskBadge.tsx": 4,
+};
+
 describe('Card 180: S11-FE ACC-09 Design Token & Composite Contrast Calculation Suite', () => {
   const rootBlock = indexCss.match(/:root\s*\{([^}]+)\}/)?.[1] || '';
   const darkBlock = indexCss.match(/\[data-theme=['"]dark['"]\]\s*\{([^}]+)\}/)?.[1] || '';
@@ -141,7 +187,7 @@ describe('Card 180: S11-FE ACC-09 Design Token & Composite Contrast Calculation 
     expect(strongCr).toBeGreaterThan(subtleCr);
   });
 
-  // 3. Dark Theme ([data-theme=\'dark\']) - Text Tokens on Solid Underlays
+  // 3. Dark Theme ([data-theme='dark']) - Text Tokens on Solid Underlays
   it('ACC-09: Dark Theme ([data-theme="dark"]) text tokens achieve >= 4.5:1 on canvas, surface, and subtle backgrounds', () => {
     const bgs = [
       { name: 'bg-surface', val: darkTokens['--color-bg-surface'] },
@@ -177,7 +223,7 @@ describe('Card 180: S11-FE ACC-09 Design Token & Composite Contrast Calculation 
     }
   });
 
-  // 4. Dark Theme ([data-theme=\'dark\']) - UI Component and Boundary Tokens
+  // 4. Dark Theme ([data-theme='dark']) - UI Component and Boundary Tokens
   it('ACC-09 / DEF-S11-10: Dark Theme ([data-theme="dark"]) border tokens achieve >= 3.0:1 on all dark backgrounds', () => {
     const bgs = [
       { name: 'bg-surface', val: darkTokens['--color-bg-surface'] },
@@ -272,34 +318,58 @@ describe('Card 180: S11-FE ACC-09 Design Token & Composite Contrast Calculation 
     }
   });
 
-  // 7. [F1.b & F1.c] Real Usage Pairs: Status/Border as Background with text-inverse / white
-  it('ACC-09 / F1.b & F1.c: Real component usage pairs achieve >= 4.5:1 with text-inverse and white text', () => {
+  // 7. [F1.b & F1.c] Real Usage Pairs: Source-Bound Binding Verification for RunDetail, NodeList, and DeveloperStudio
+  it('ACC-09 / F1.b & F1.c: Component Source-Bound Verification: RunDetail, NodeList, and DeveloperStudio bind to var(--color-text-inverse)', () => {
     // 1) RunDetail.tsx:1080-1098 Lifecycle Step Indicator (isPassed background)
-    // Dark: --color-status-online background with --color-text-inverse
+    const runDetailPath = path.resolve(__dirname, '../src/features/runs/RunDetail.tsx');
+    const runDetailSrc = fs.readFileSync(runDetailPath, 'utf-8');
+
+    // Source-bound assertion: isPassed must bind to var(--color-text-inverse) and never hardcoded #ffffff
+    expect(runDetailSrc, 'RunDetail.tsx must bind isPassed step text to var(--color-text-inverse)').toMatch(
+      /isPassed\s*\?\s*['"]var\(--color-text-inverse\)['"]/
+    );
+    expect(runDetailSrc, 'RunDetail.tsx must not hardcode white text for isPassed').not.toMatch(
+      /color:\s*isPassed\s*\|\|\s*isCurrent\s*\?\s*['"]#ffffff['"]/
+    );
+
+    // Verify contrast ratio of the bound token against the bound background (--color-status-online)
     const darkStatusOnline = darkTokens['--color-status-online']; // #22c55e
     const darkTextInverse = darkTokens['--color-text-inverse'];   // #0f172a
     const runDetailDarkCr = getContrast(darkStatusOnline, darkTextInverse);
     expect(runDetailDarkCr, 'RunDetail dark isPassed step with text-inverse must be >= 4.5:1').toBeGreaterThanOrEqual(4.5);
 
-    // Light: --color-status-online background with --color-text-inverse (#ffffff)
     const lightStatusOnline = lightTokens['--color-status-online']; // #15803d
     const lightTextInverse = lightTokens['--color-text-inverse'];   // #ffffff
     const runDetailLightCr = getContrast(lightStatusOnline, lightTextInverse);
     expect(runDetailLightCr, 'RunDetail light isPassed step with text-inverse must be >= 4.5:1').toBeGreaterThanOrEqual(4.5);
 
     // 2) NodeList.tsx:431-432 Observation-only Studio Button
-    // Dark: --color-border-strong (#9ca3af) with --color-text-inverse (#0f172a)
+    const nodeListPath = path.resolve(__dirname, '../src/features/nodes/NodeList.tsx');
+    const nodeListSrc = fs.readFileSync(nodeListPath, 'utf-8');
+
+    // Source-bound assertion: node.observationOnly must bind text to var(--color-text-inverse)
+    expect(nodeListSrc, 'NodeList.tsx must bind observationOnly button text to var(--color-text-inverse)').toMatch(
+      /node\.observationOnly\s*\?\s*['"]var\(--color-text-inverse\)['"]/
+    );
+
+    // Verify contrast ratio of the bound token against the bound background (--color-border-strong)
     const darkBorderStrong = darkTokens['--color-border-strong']; // #9ca3af
     const nodeListDarkCr = getContrast(darkBorderStrong, darkTextInverse);
     expect(nodeListDarkCr, 'NodeList observationOnly dark button with text-inverse must be >= 4.5:1').toBeGreaterThanOrEqual(4.5);
 
-    // Light: --color-border-strong (#475569) with --color-text-inverse (#ffffff)
     const lightBorderStrong = lightTokens['--color-border-strong']; // #475569
     const nodeListLightCr = getContrast(lightBorderStrong, lightTextInverse);
     expect(nodeListLightCr, 'NodeList observationOnly light button with text-inverse must be >= 4.5:1').toBeGreaterThanOrEqual(4.5);
 
     // 3) DeveloperStudio.tsx:905-906 Stepper Circle
-    // Step upcoming (border-strong) and step passed (status-online) with text-inverse
+    const devStudioPath = path.resolve(__dirname, '../src/features/studio/DeveloperStudio.tsx');
+    const devStudioSrc = fs.readFileSync(devStudioPath, 'utf-8');
+
+    // Source-bound assertion: stepper text must bind to var(--color-text-inverse) when not active
+    expect(devStudioSrc, 'DeveloperStudio.tsx must bind stepper text to var(--color-text-inverse)').toMatch(
+      /isActive\s*\?\s*['"]#ffffff['"]\s*:\s*['"]var\(--color-text-inverse\)['"]/
+    );
+
     const devStudioUpcomingDarkCr = getContrast(darkBorderStrong, darkTextInverse);
     expect(devStudioUpcomingDarkCr, 'DeveloperStudio upcoming step dark with text-inverse must be >= 4.5:1').toBeGreaterThanOrEqual(4.5);
     const devStudioPassedDarkCr = getContrast(darkStatusOnline, darkTextInverse);
@@ -357,10 +427,10 @@ describe('Card 180: S11-FE ACC-09 Design Token & Composite Contrast Calculation 
     expect(getContrast('#64748b', lightTokens['--color-bg-subtle'])).toBeLessThan(4.5); // 4.34:1
   });
 
-  // 9. [F2 Ratchet] Exact token propagation count and legacy literal inventory ratchet
-  it('ACC-09 / F2 Ratchet: var(--color-border-subtle) exact count and legacy literal allowlist inventory', () => {
+  // 9. [F2 Fail-Closed Inventory & Ratchet] var(--color-border-subtle) exact 140/21 and all hex/rgb/hsl literals strictly bounded
+  it('ACC-09 / F2 Fail-Closed Inventory & Ratchet: var(--color-border-subtle) exact 140/21 and all hex/rgb/hsl literals strictly bounded', () => {
     const srcDir = path.resolve(__dirname, '../src');
-    const files = getAllSourceFiles(srcDir);
+    const allFiles = getAllSourceFiles(srcDir);
 
     let borderSubtleCount = 0;
     const borderSubtleFiles = new Set<string>();
@@ -370,12 +440,26 @@ describe('Card 180: S11-FE ACC-09 Design Token & Composite Contrast Calculation 
       '#d97706': 0,
       '#e2e8f0': 0,
       '#dc2626': 0,
+      '#30363d': 0,
+    };
+    const legacyFiles: Record<string, Set<string>> = {
+      '#64748b': new Set(),
+      '#d97706': new Set(),
+      '#e2e8f0': new Set(),
+      '#dc2626': new Set(),
+      '#30363d': new Set(),
     };
 
     const borderSubtleRegex = /var\(--color-border-subtle/g;
+    const hexRegex = /#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3,4})\b/g;
+    const rgbRegex = /rgba?\s*\([^)]+\)/gi;
+    const hslRegex = /hsla?\s*\([^)]+\)/gi;
 
-    for (const f of files) {
+    const observedFileCounts: Record<string, number> = {};
+
+    for (const f of allFiles) {
       const content = fs.readFileSync(f, 'utf-8');
+      const relPath = path.relative(srcDir, f).replace(/\\/g, '/');
       const isIndexCss = f.endsWith('index.css');
 
       // 1) Border subtle token usage count
@@ -385,12 +469,37 @@ describe('Card 180: S11-FE ACC-09 Design Token & Composite Contrast Calculation 
         borderSubtleFiles.add(f);
       }
 
-      // 2) Legacy literal inventory in source files (excluding index.css design token definitions)
+      // 2) Scan all color literals (excluding index.css design token definitions)
       if (!isIndexCss) {
+        const hMatches = content.match(hexRegex) || [];
+        const rMatches = content.match(rgbRegex) || [];
+        const sMatches = content.match(hslRegex) || [];
+        const totalLiterals = hMatches.length + rMatches.length + sMatches.length;
+
+        if (totalLiterals > 0) {
+          observedFileCounts[relPath] = totalLiterals;
+
+          // Fail-closed check 1: File must be in baseline allowlist
+          expect(
+            COLOR_LITERAL_BASELINE[relPath],
+            `New unregistered file containing color literals detected: "${relPath}". All files with color literals must be registered in COLOR_LITERAL_BASELINE.`
+          ).toBeDefined();
+
+          // Fail-closed check 2: File literal count must not exceed baseline
+          expect(
+            totalLiterals,
+            `Color literal count in "${relPath}" (${totalLiterals}) exceeded baseline (${COLOR_LITERAL_BASELINE[relPath]}). New color literals are prohibited.`
+          ).toBeLessThanOrEqual(COLOR_LITERAL_BASELINE[relPath]);
+        }
+
+        // Count specific legacy tokens
         const lower = content.toLowerCase();
         for (const lit of Object.keys(legacyCounts)) {
           const occurrences = (lower.match(new RegExp(lit, 'g')) || []).length;
-          legacyCounts[lit] += occurrences;
+          if (occurrences > 0) {
+            legacyCounts[lit] += occurrences;
+            legacyFiles[lit].add(relPath);
+          }
         }
       }
     }
@@ -399,10 +508,24 @@ describe('Card 180: S11-FE ACC-09 Design Token & Composite Contrast Calculation 
     expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 140').toBe(140);
     expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 21').toBe(21);
 
-    // Ratchet assertions for legacy literals (must never increase)
+    // Fail-closed check 3: Total files with color literals must not exceed baseline file count
+    const baselineFileCount = Object.keys(COLOR_LITERAL_BASELINE).length;
+    expect(Object.keys(observedFileCounts).length, 'Total files with color literals must not exceed baseline').toBeLessThanOrEqual(baselineFileCount);
+
+    // Ratchet assertions for specific legacy literals (occurrences & files)
     expect(legacyCounts['#64748b'], 'Legacy #64748b literal count must not exceed 15').toBeLessThanOrEqual(15);
+    expect(legacyFiles['#64748b'].size, 'Legacy #64748b file count must not exceed 6').toBeLessThanOrEqual(6);
+
     expect(legacyCounts['#d97706'], 'Legacy #d97706 literal count must not exceed 14').toBeLessThanOrEqual(14);
+    expect(legacyFiles['#d97706'].size, 'Legacy #d97706 file count must not exceed 6').toBeLessThanOrEqual(6);
+
     expect(legacyCounts['#e2e8f0'], 'Legacy #e2e8f0 literal count must not exceed 3').toBeLessThanOrEqual(3);
+    expect(legacyFiles['#e2e8f0'].size, 'Legacy #e2e8f0 file count must not exceed 2').toBeLessThanOrEqual(2);
+
     expect(legacyCounts['#dc2626'], 'Legacy #dc2626 literal count must not exceed 1').toBeLessThanOrEqual(1);
+    expect(legacyFiles['#dc2626'].size, 'Legacy #dc2626 file count must not exceed 1').toBeLessThanOrEqual(1);
+
+    expect(legacyCounts['#30363d'], 'Legacy #30363d literal count must not exceed 161').toBeLessThanOrEqual(161);
+    expect(legacyFiles['#30363d'].size, 'Legacy #30363d file count must not exceed 15').toBeLessThanOrEqual(15);
   });
 });
