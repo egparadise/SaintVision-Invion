@@ -1,15 +1,28 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.245"
+version: "1.0.247"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T16:30:21+09:00"
+updated: "2026-10-01T18:09:41+09:00"
 source_of_truth: "Git"
-active_card: "CARD-174 S08-BE admitted Build adapter"
-active_card_status: "decision-scoped one-shot claim, terminal run rejection, leased-node revalidation and redacted claim/quarantine audit implemented; focused 141 passed"
-active_card_next: "Claude re-review and exact-head CI; measured builder location/health, denial Evidence, physical cleanup and lease release remain NOT_OBSERVED"
+active_card: "CARD-175 S08-BE measured single GPU"
+active_card_status: "fresh exact GPU observation/resource/lease/fence, one-device Docker request and uncertain-cleanup quarantine implemented; Claude r1 second-device counterexample added"
+active_card_next: "exact-head run-core rerun and Claude condition recheck; physical Linux GPU execution/detach/reallocation remains NOT_OBSERVED"
 ---
+
+## 2026-10-01 Card 175 — S08-BE measured single GPU
+
+- #274 승인 head `3059c978` 위에 strict GPU observation/allocation 계약과 device별
+  placement·lease·fencing을 결속했다. provider 없음·stale·digest drift·GPU 2개·VRAM 부족은
+  tool claim 전에 닫히고, GPU 없는 CPU 경로는 기존 동작을 유지한다.
+- Node permit과 Docker read-back은 한 `nvidia` device ID만 허용한다. privileged·bind·all-device·
+  broad capability는 계속 금지한다. cleanup receipt 또는 lease release가 불명확하면 Node를
+  quarantine하고 모든 lease를 유지하며 redacted audit만 남긴다.
+- source `197caef5`, 로컬 PG-free focused **131 passed**, contract binding gate exit 0.
+  #274 권고 R2의 실 PG 동시 claim 시험도 추가했으며 hosted `run-core`에서 실행 여부와 JUnit을
+  확인한다. 실 GPU workload·detach·재할당은 `NOT_OBSERVED`이고 S08-BE 승격은 없다.
+- 근거: [[2026-10-01_17-30-19_KST_S08-BE_단일_GPU_결속_Codex]].
 
 ## 2026-10-01 Card 174 — S08-BE admitted Build adapter
 

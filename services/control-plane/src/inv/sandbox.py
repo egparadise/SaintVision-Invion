@@ -103,7 +103,14 @@ class RuntimeCapabilities:
             )
 
 
-def compile_launch(workload, profile: SandboxProfile, *, workspace_input=None):
+def compile_launch(
+    workload,
+    profile: SandboxProfile,
+    *,
+    workspace_input=None,
+    gpu_allocation=None,
+    now=None,
+):
     validate_contract("WorkloadSpec", workload)
     resources = workload["resources"]
     argv = workload["command"]
@@ -114,11 +121,29 @@ def compile_launch(workload, profile: SandboxProfile, *, workspace_input=None):
         or any(not arg or "\x00" in arg or len(arg) > 4096 for arg in argv)
         or resources["cpuMillis"] > profile.max_cpu_millis
         or resources["memoryBytes"] > profile.max_memory_bytes
-        or resources["gpuCount"] != 0
-        or resources["minVramBytes"] != 0
+        or resources["gpuCount"] not in {0, 1}
+        or (resources["gpuCount"] == 0) != (resources["minVramBytes"] == 0)
         or workload["timeoutSeconds"] > profile.max_timeout_seconds
     ):
         raise DomainError("SANDBOX-0002", "Workload exceeds the approved sandbox profile", 403)
+    if resources["gpuCount"] == 0:
+        if gpu_allocation is not None:
+            raise DomainError("SANDBOX-0002", "Unexpected GPU allocation", 403)
+    else:
+        if gpu_allocation is None:
+            raise DomainError("SANDBOX-0002", "Measured GPU allocation is required", 403)
+        validate_contract("GPUAllocation", gpu_allocation)
+        if now is None:
+            raise DomainError("SANDBOX-0002", "Measured GPU clock is required", 403)
+        observed = datetime.fromisoformat(gpu_allocation["observedAt"].replace("Z", "+00:00"))
+        if (
+            now.tzinfo is None
+            or observed.tzinfo is None
+            or not now - timedelta(seconds=15) <= observed <= now
+            or gpu_allocation["profileVersion"] != profile.version
+            or gpu_allocation["vramBytes"] < resources["minVramBytes"]
+        ):
+            raise DomainError("RES-0003", "Measured GPU allocation is stale", 409)
     plan = {
         "profileVersion": profile.version,
         "imageDigest": workload["imageDigest"],
@@ -138,6 +163,8 @@ def compile_launch(workload, profile: SandboxProfile, *, workspace_input=None):
         "privileged": False,
         "hostAccess": False,
     }
+    if gpu_allocation is not None:
+        plan["gpuAllocation"] = dict(gpu_allocation)
     if "workspaceResume" in workload or "workspaceStart" in workload or "modelInput" in workload:
         if workspace_input is None:
             raise DomainError("AUTH-0044", "Verified Workspace input required", 403)

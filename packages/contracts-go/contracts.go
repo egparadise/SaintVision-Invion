@@ -375,6 +375,41 @@ type AuthorizedCommand struct {
 
 type ClaimId string
 
+type GPUDeviceObservation struct {
+    ResourceId ResourceId `json:"resourceId"`
+    DeviceId string `json:"deviceId"`
+    Vendor string `json:"vendor"`
+    Model string `json:"model"`
+    TotalVramBytes int64 `json:"totalVramBytes"`
+    ComputeCapability string `json:"computeCapability"`
+    DriverVersion string `json:"driverVersion"`
+    RuntimeVersion string `json:"runtimeVersion"`
+    ProviderVersion string `json:"providerVersion"`
+    ObservationDigest string `json:"observationDigest"`
+    Healthy bool `json:"healthy"`
+    Exclusive bool `json:"exclusive"`
+    RuntimeCompatible bool `json:"runtimeCompatible"`
+    DeviceRequestDriver string `json:"deviceRequestDriver"`
+}
+
+type GPUAllocation struct {
+    NodeId NodeId `json:"nodeId"`
+    ResourceId ResourceId `json:"resourceId"`
+    LeaseId LeaseId `json:"leaseId"`
+    FencingToken string `json:"fencingToken"`
+    DeviceId string `json:"deviceId"`
+    VramBytes int64 `json:"vramBytes"`
+    ProviderVersion string `json:"providerVersion"`
+    ProfileVersion string `json:"profileVersion"`
+    RecoveryEpoch string `json:"recoveryEpoch"`
+    ObservationDigest string `json:"observationDigest"`
+    ObservedAt Timestamp `json:"observedAt"`
+    Exclusive bool `json:"exclusive"`
+    RuntimeCompatible bool `json:"runtimeCompatible"`
+    Healthy bool `json:"healthy"`
+    DeviceRequestDriver string `json:"deviceRequestDriver"`
+}
+
 type SandboxLaunchSpec struct {
     ProfileVersion string `json:"profileVersion"`
     ImageDigest string `json:"imageDigest"`
@@ -393,6 +428,7 @@ type SandboxLaunchSpec struct {
     NoNewPrivileges bool `json:"noNewPrivileges"`
     Privileged bool `json:"privileged"`
     HostAccess bool `json:"hostAccess"`
+    GpuAllocation *GPUAllocation `json:"gpuAllocation,omitempty"`
     WorkspaceInput *WorkspaceInput `json:"workspaceInput,omitempty"`
     Terminal *TerminalSpec `json:"terminal,omitempty"`
 }
@@ -517,6 +553,7 @@ type NodeResourceSnapshot struct {
     MemoryAvailableBytes int64 `json:"memoryAvailableBytes"`
     OsType string `json:"osType"`
     AgentVersion string `json:"agentVersion"`
+    GpuDevices *[]GPUDeviceObservation `json:"gpuDevices,omitempty"`
 }
 
 type NodeChunkInput struct {

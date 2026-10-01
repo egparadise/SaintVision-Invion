@@ -1800,6 +1800,61 @@
       "type": "string",
       "format": "uuid"
     },
+    "GPUDeviceObservation": {
+      "description": "Authenticated measured single-GPU provider observation. Discovery announcements are not authority.",
+      "type": "object",
+      "properties": {
+        "resourceId": {"$ref": "#/$defs/ResourceId"},
+        "deviceId": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
+        "vendor": {"type": "string", "minLength": 1, "maxLength": 64},
+        "model": {"type": "string", "minLength": 1, "maxLength": 128},
+        "totalVramBytes": {"type": "integer", "minimum": 1, "maximum": 9007199254740991},
+        "computeCapability": {"type": "string", "pattern": "^[0-9]{1,2}[.][0-9]{1,2}$"},
+        "driverVersion": {"type": "string", "minLength": 1, "maxLength": 64},
+        "runtimeVersion": {"type": "string", "minLength": 1, "maxLength": 64},
+        "providerVersion": {"type": "string", "minLength": 1, "maxLength": 200},
+        "observationDigest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "healthy": {"type": "boolean", "const": true},
+        "exclusive": {"type": "boolean", "const": true},
+        "runtimeCompatible": {"type": "boolean", "const": true},
+        "deviceRequestDriver": {"type": "string", "const": "nvidia"}
+      },
+      "required": [
+        "resourceId", "deviceId", "vendor", "model", "totalVramBytes",
+        "computeCapability", "driverVersion", "runtimeVersion", "providerVersion",
+        "observationDigest", "healthy", "exclusive", "runtimeCompatible",
+        "deviceRequestDriver"
+      ],
+      "additionalProperties": false
+    },
+    "GPUAllocation": {
+      "description": "Exact measured device and live lease bound into a signed launch plan.",
+      "type": "object",
+      "properties": {
+        "nodeId": {"$ref": "#/$defs/NodeId"},
+        "resourceId": {"$ref": "#/$defs/ResourceId"},
+        "leaseId": {"$ref": "#/$defs/LeaseId"},
+        "fencingToken": {"type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}:[1-9][0-9]*$"},
+        "deviceId": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
+        "vramBytes": {"type": "integer", "minimum": 1, "maximum": 9007199254740991},
+        "providerVersion": {"type": "string", "minLength": 1, "maxLength": 200},
+        "profileVersion": {"type": "string", "minLength": 1, "maxLength": 200},
+        "recoveryEpoch": {"type": "string", "format": "uuid"},
+        "observationDigest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "observedAt": {"$ref": "#/$defs/Timestamp"},
+        "exclusive": {"type": "boolean", "const": true},
+        "runtimeCompatible": {"type": "boolean", "const": true},
+        "healthy": {"type": "boolean", "const": true},
+        "deviceRequestDriver": {"type": "string", "const": "nvidia"}
+      },
+      "required": [
+        "nodeId", "resourceId", "leaseId", "fencingToken", "deviceId",
+        "vramBytes", "providerVersion", "profileVersion", "recoveryEpoch",
+        "observationDigest", "observedAt", "exclusive", "runtimeCompatible",
+        "healthy", "deviceRequestDriver"
+      ],
+      "additionalProperties": false
+    },
     "SandboxLaunchSpec": {
       "type": "object",
       "properties": {
@@ -1883,6 +1938,9 @@
         "hostAccess": {
           "type": "boolean",
           "const": false
+        },
+        "gpuAllocation": {
+          "$ref": "#/$defs/GPUAllocation"
         },
         "workspaceInput": {
           "$ref": "#/$defs/WorkspaceInput"
@@ -2045,7 +2103,8 @@
           "type": "string",
           "enum": [
             "cpu",
-            "memory"
+            "memory",
+            "gpu"
           ]
         }
       },
@@ -2537,6 +2596,12 @@
         "agentVersion": {
           "type": "string",
           "const": "0.1.0"
+        },
+        "gpuDevices": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/GPUDeviceObservation"},
+          "maxItems": 16,
+          "uniqueItems": true
         }
       }
     },
