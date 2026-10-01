@@ -362,3 +362,29 @@ def test_both_amr_mapper_writes_are_access_token_only():
     )
     assert script.count('"name": "fresh-auth-amr"') == 2
     assert script.count(exact) == 2
+
+
+def test_fresh_auth_only_mode_cannot_read_or_mutate_user_records():
+    script = (ROOT / "deploy" / "intranet" / "idp-realm.sh").read_text(encoding="utf-8")
+
+    assert 'APPLY_MODE="${SV_IDP_APPLY_MODE:-full}"' in script
+    assert "full|fresh-auth-only" in script
+    assert (
+        'if [ "$APPLY_MODE" = "full" ]; then\n'
+        '  set -a; . "$USERS_FILE"; set +a\n'
+        "fi"
+    ) in script
+    user_guard = (
+        'if [ "$APPLY_MODE" = "full" ]; then\n'
+        '  for pair in "$SV_USER1:$SV_USER1_PASSWORD" "$SV_USER2:$SV_USER2_PASSWORD"; do'
+    )
+    assert user_guard in script
+    assert script.index(user_guard) < script.index('kc_in update "users/$uid"')
+    assert script.index(user_guard) < script.index('kc_in update "users/$uid/reset-password"')
+
+
+def test_fresh_auth_only_mode_fails_closed_on_missing_prerequisites():
+    script = (ROOT / "deploy" / "intranet" / "idp-realm.sh").read_text(encoding="utf-8")
+
+    for prerequisite in ("realm", "client", "client scope"):
+        assert f"fresh-auth-only refuses to create missing {prerequisite}" in script
