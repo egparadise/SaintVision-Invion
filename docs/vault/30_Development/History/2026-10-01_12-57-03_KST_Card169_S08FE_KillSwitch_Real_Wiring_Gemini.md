@@ -4,8 +4,8 @@ title: "Card 169 (S08-FE) 관리자 보안 콘솔 비상 정지(Kill Switch) 백
 version: "1.0.0"
 status: "approved"
 author: "Gemini"
-created: "2026-10-01T13:00:00+09:00"
-updated: "2026-10-01T13:00:00+09:00"
+created: "2026-10-01T12:57:03+09:00"
+updated: "2026-10-01T12:57:03+09:00"
 source_of_truth: "Git"
 ---
 
