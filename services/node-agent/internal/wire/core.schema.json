@@ -673,6 +673,10 @@
           "minLength": 1,
           "maxLength": 200
         },
+        "builderObservationDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
         "recoveryEpoch": {
           "type": "integer",
           "minimum": 1,
@@ -758,6 +762,7 @@
         "policyExpiresAt",
         "builderInstanceId",
         "builderProfileId",
+        "builderObservationDigest",
         "recoveryEpoch",
         "rootless",
         "privileged",

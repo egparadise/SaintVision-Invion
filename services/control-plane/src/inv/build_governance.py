@@ -36,6 +36,7 @@ _AUDIT_ORDER = (
 class BuildProviderObservation:
     builder_instance_id: str
     builder_profile_id: str
+    observation_digest: str
     recovery_epoch: int
     observed_at: datetime
 
@@ -69,6 +70,9 @@ def _provider_fresh(provider: BuildProviderObservation, now: datetime) -> bool:
         or not provider.builder_instance_id
         or not isinstance(provider.builder_profile_id, str)
         or not provider.builder_profile_id
+        or not isinstance(provider.observation_digest, str)
+        or len(provider.observation_digest) != 64
+        or any(character not in "0123456789abcdef" for character in provider.observation_digest)
         or type(provider.recovery_epoch) is not int
         or provider.recovery_epoch < 1
         or provider.observed_at.tzinfo is None
@@ -98,6 +102,7 @@ def _binding(
         "policyExpiresAt": decision["expiresAt"],
         "builderInstanceId": provider.builder_instance_id,
         "builderProfileId": provider.builder_profile_id,
+        "builderObservationDigest": provider.observation_digest,
         "recoveryEpoch": provider.recovery_epoch,
     }
     if (
@@ -113,6 +118,7 @@ def _binding(
         "policyDecisionId": decision["decisionId"],
         "builderInstanceId": provider.builder_instance_id,
         "builderProfileId": provider.builder_profile_id,
+        "builderObservationDigest": provider.observation_digest,
         "recoveryEpoch": provider.recovery_epoch,
     }
 

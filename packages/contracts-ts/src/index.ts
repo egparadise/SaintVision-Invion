@@ -150,6 +150,7 @@ export interface BuildPlan {
   policyExpiresAt: Timestamp;
   builderInstanceId: string;
   builderProfileId: string;
+  builderObservationDigest: string;
   recoveryEpoch: number;
   rootless: true;
   privileged: false;

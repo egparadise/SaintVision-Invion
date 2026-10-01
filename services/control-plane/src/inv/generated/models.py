@@ -290,6 +290,7 @@ class BuildPlan(BaseModel):
     policyExpiresAt: Timestamp
     builderInstanceId: constr(min_length=1, max_length=200)
     builderProfileId: constr(min_length=1, max_length=200)
+    builderObservationDigest: constr(pattern=r'^[0-9a-f]{64}$')
     recoveryEpoch: conint(ge=1, le=9007199254740991)
     rootless: Literal[True]
     privileged: Literal[False]

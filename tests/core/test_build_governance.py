@@ -81,6 +81,7 @@ def _provider(**changes):
     values = {
         "builder_instance_id": "builder-rootless-01",
         "builder_profile_id": "buildkit-rootless-v1",
+        "observation_digest": "a" * 64,
         "recovery_epoch": 7,
         "observed_at": NOW - timedelta(seconds=1),
     }
@@ -124,6 +125,7 @@ def _plan(request=None, decision=None, provider=None):
         "policyExpiresAt": decision["expiresAt"],
         "builderInstanceId": provider.builder_instance_id,
         "builderProfileId": provider.builder_profile_id,
+        "builderObservationDigest": provider.observation_digest,
         "recoveryEpoch": provider.recovery_epoch,
         "rootless": True,
         "privileged": False,
@@ -310,6 +312,19 @@ def test_authorize_build_fails_closed(conn, decision, provider, expected):
         _authorize(conn, decision=decision, provider=provider)
 
 
+def test_authorize_build_rejects_malformed_provider_observation():
+    request = _request()
+    decision = _decision(request)
+    plan = _plan(request, decision, _provider())
+    with pytest.raises(DomainError, match="RES-0003"):
+        _authorize(
+            request=request,
+            decision=decision,
+            plan=plan,
+            provider=_provider(observation_digest="not-a-digest"),
+        )
+
+
 @pytest.mark.parametrize(
     "field,value",
     [
@@ -320,6 +335,7 @@ def test_authorize_build_fails_closed(conn, decision, provider, expected):
         ("policyExpiresAt", "2026-10-01T06:04:00Z"),
         ("builderInstanceId", "other"),
         ("builderProfileId", "other"),
+        ("builderObservationDigest", "0" * 64),
         ("recoveryEpoch", 8),
     ],
 )
