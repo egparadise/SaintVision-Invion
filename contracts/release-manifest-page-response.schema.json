@@ -33,7 +33,7 @@
     },
     "ReleaseManifestResponse": {
       "additionalProperties": false,
-      "description": "A recorded release, and whether a person has signed it off.\n\n``operatorSignOff`` is **computed from the acceptance rows**, never stored\nand never supplied by a caller. It is true only when an ``accepted``\ndecision exists whose pinned hash equals this manifest's hash. A\n``conditional`` decision, a ``rejected`` one, and an acceptance of a\ndifferent composition all leave it false, which is the whole point: DEF-S12\nrecorded ``operatorSignOff=false`` because no server route existed to answer\nthe question, and a route that answered ``true`` from anything less than a\nperson's matching acceptance would be worse than no route at all.",
+      "description": "A recorded release, and what is recorded about accepting it.\n\n``operatorSignOff`` is **``Literal[False]``**: this reader cannot emit true,\nand the contract says so rather than the docstring promising it.\n\nThe first version of this model computed it from the acceptance rows and\ncalled an ``accepted`` row with a matching hash a sign-off, on the reasoning\nthat ``acceptance_records.accepted_by_user_id`` is a foreign key to ``users``\nso \"the system cannot sign its own acceptance\". **That reasoning was wrong,\nand Codex measured it**: ``users`` draws no line between a person and a\nservice -- ``identity.py`` builds a Principal from any ``external_subject``\n-- and the foreign key proves only that the row names a user that exists. A\nprincipal whose subject was ``svc:release-bot`` wrote an ``accepted`` row and\nthe field read true. A key that proves existence was read as proof of\nhumanity.\n\nSo the field is pinned false until there is a contract for attesting that a\nperson decided. ``requiredDistinctOperatorCount`` and\n``confirmedOperatorCount`` carry the recorded fact in the meantime, named as\nthe write contract (``#282``, card 184) names them: two distinct operators\nare required, and a count below that is not sign-off however it was written.",
       "properties": {
         "acceptanceCount": {
           "minimum": 0,
@@ -53,6 +53,11 @@
           "title": "Components",
           "type": "array"
         },
+        "confirmedOperatorCount": {
+          "minimum": 0,
+          "title": "Confirmedoperatorcount",
+          "type": "integer"
+        },
         "createdAt": {
           "format": "date-time",
           "title": "Createdat",
@@ -64,14 +69,25 @@
           "type": "string"
         },
         "operatorSignOff": {
+          "const": false,
           "title": "Operatorsignoff",
           "type": "boolean"
+        },
+        "operatorSignOffBlockedBy": {
+          "const": "human-attestation-contract-absent",
+          "title": "Operatorsignoffblockedby",
+          "type": "string"
         },
         "releaseId": {
           "maxLength": 64,
           "minLength": 1,
           "title": "Releaseid",
           "type": "string"
+        },
+        "requiredDistinctOperatorCount": {
+          "const": 2,
+          "title": "Requireddistinctoperatorcount",
+          "type": "integer"
         },
         "version": {
           "maxLength": 64,
@@ -87,6 +103,9 @@
         "manifestSha256",
         "createdAt",
         "operatorSignOff",
+        "operatorSignOffBlockedBy",
+        "requiredDistinctOperatorCount",
+        "confirmedOperatorCount",
         "acceptanceCount"
       ],
       "title": "ReleaseManifestResponse",

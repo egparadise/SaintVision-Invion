@@ -1,12 +1,12 @@
 ---
 doc_id: "DESIGN-S12-BE-RELEASE-MANIFEST-READ-20261001"
-title: "S12-BE release manifest 읽기 route와 서명·수락 쓰기 경계 — 읽기는 구현했고 쓰기는 Codex 계약을 요청한다 (카드 182)"
-version: "1.0.0"
+title: "S12-BE release manifest 읽기 route와 서명·수락 쓰기 경계 — operatorSignOff는 외래키로 증명되지 않아 계약에서 false로 고정했다(독립 검토 F1 정정), 쓰기는 Codex 계약 요청 (카드 182, r2)"
+version: "1.1.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-01T18:26:20+09:00"
+updated: "2026-10-01T19:22:31+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "7e670d77"
@@ -29,21 +29,34 @@ tags: ["s12", "release-manifest", "acceptance", "route", "read-only", "security-
 | `GET /v1/release-manifests` | `ReleaseManifestPageResponse` | tenant의 release 목록, `release_id` 역순, 기본 50·상한 200 |
 | `GET /v1/release-manifests/{release_id}` | `ReleaseManifestDetailResponse` | 그 release와 **기록된 수락 전부** |
 
-### 1-1. `operatorSignOff`는 **계산값**이고 저장값이 아니다
+### 1-1. `operatorSignOff`는 **계약에서 `false`로 고정**된다 (r2 정정)
 
-`release_manifests`에는 그런 열이 없다. `pilot.operator_sign_off`가 수락 행에서 계산하며 **참이 되는 길은 하나**다 — `outcome='accepted'`이고 `accepted_manifest_sha256`이 **이 manifest의 해시와 같을 때**.
+**v1.0의 이 절은 틀렸다.** 그때는 `operatorSignOff`를 수락 행에서 계산하고 `outcome='accepted'`에 해시가 맞으면 **참**으로 냈다. 근거로 "`accepted_by_user_id`가 `users`로 가는 실제 외래키이므로 시스템은 스스로 서명할 수 없다"를 적었다.
 
-거짓으로 남는 세 경우가 각각 다른 사실이다.
+**독립 검토(Codex, `#280` r1 F1)가 그것을 측정해 반증했다.** `users`는 사람과 서비스를 구분하지 않는다 — `identity.py`가 임의의 `external_subject`로 Principal을 만들고, 외래키는 **참조된 행이 존재한다는 것만** 증명한다. `external_subject`가 `svc:release-bot`인 사용자로 `record_acceptance(accepted)`를 쓰면 **`operatorSignOff`가 참이 되었다.** 존재 증명을 사람 증명으로 읽은 것이고, 그것이 내가 다른 PR에서 계속 지적해 온 바로 그 형태다 — **기구의 모양에서 성질을 단언한 것.**
+
+그래서 이제:
+
+| 필드 | 값 | 뜻 |
+|---|---|---|
+| `operatorSignOff` | **`Literal[False]`** | 이 읽기 표면은 참을 **낼 수 없다**. docstring의 약속이 아니라 **계약**이 거부한다 |
+| `operatorSignOffBlockedBy` | `"human-attestation-contract-absent"` | 왜 거짓인지 — "아무도 서명 안 함"과 "이 표면은 알 수 없음"을 읽는 사람이 구별할 수 있게 |
+| `requiredDistinctOperatorCount` | **`Literal[2]`** | 쓰기 계약(`#282`, 카드 184)의 정족수 |
+| `confirmedOperatorCount` | 정수 | 해시가 맞는 `accepted` 행의 **서로 다른 사용자 수**. 기록된 사실이고 서명이 아니다 — 서비스 주체도 이 수에 들어갈 수 있고, **그래서** 서명이 아니다 |
+
+필드 이름은 `#282`가 쓰는 이름을 그대로 쓴다(`operatorSignOff`·`requiredDistinctOperatorCount`·`confirmedOperatorCount`). `#282`의 base가 `#280`이므로 이름을 새로 만들면 두 PR이 다른 말을 하게 된다.
+
+`confirmedOperatorCount`가 `0`으로 남는 세 경우는 그대로 각각 다른 사실이다.
 
 1. **수락 행이 없다** — 아무도 보지 않았다.
 2. **`conditional` 또는 `rejected`** — 누군가 보았고 승인하지 않았다. 표가 이미 "조건부인데 제약 목록이 비면" 거절하므로(`conditional_requires_limitations`), 읽기가 조건부를 승인으로 읽으면 그 제약이 지키려던 구별을 버리는 것이 된다.
 3. **`accepted`인데 해시가 다르다** — 같은 이름의 **다르게 구성된** release를 승인했다. 해시를 고정하는 이유가 바로 그것이고, 응답의 `manifestMatches`가 그것을 말한다.
 
-**이 route는 `operatorSignOff`를 참으로 만들 수 없다.** `accepted_by_user_id`가 `users`로 가는 실제 외래키이므로 읽은 모든 행은 사람을 위해 쓰인 것이다.
+**이 route는 `operatorSignOff`를 참으로 만들 수 없다** — 이제는 계약이 그것을 거부하기 때문이고, 외래키 때문이 아니다. 시험이 **서비스 주체로 `accepted` 행을 써도 거짓**임을 고정한다(`test_a_service_principal_cannot_produce_operator_sign_off`).
 
 ### 1-2. tenant scope이고 project scope이 아니다
 
-`release_manifests`·`acceptance_records`에는 `tenant_id`가 있고 **`project_id`가 없다** — release는 배포 전체의 속성이고 그 안의 한 project의 것이 아니다. 그래서 범위는 검증된 principal의 tenant이고, `get_session`의 `SET LOCAL`이 요청 트랜잭션 안에서 적용하며 **모든 질의가 `tenant_id`를 명시**한다(RLS 하나에만 의존하지 않는다).
+`release_manifests`·`acceptance_records`에는 `tenant_id`가 있고 **`project_id`가 없다** — release는 배포 전체의 속성이고 그 안의 한 project의 것이 아니다. 그래서 범위는 검증된 principal의 tenant이고, `get_session`의 `SET LOCAL`이 요청 트랜잭션 안에서 적용하며 **모든 질의가 `tenant_id`를 명시**한다(RLS 하나에만 의존하지 않는다). 그 명시 조건은 **compile된 SQL로 단언**한다(`release_page_query`·`release_detail_query`·`acceptances_query`) — RLS가 같은 행을 막기 때문에 조건 하나를 지워도 교차 tenant 시험이 녹색으로 남았고(`#280` r1 F2), **시험이 볼 수 없는 층은 실수로 지워질 수 있는 층**이다.
 
 **다른 tenant의 release는 403이 아니라 404다.** "있지만 당신 것이 아니다"는 caller가 물을 자격이 없는 질문에 답하는 것이다.
 
@@ -69,6 +82,7 @@ tags: ["s12", "release-manifest", "acceptance", "route", "read-only", "security-
 1. **사람의 결정을 HTTP에서 증명하는 방식.** 토큰만으로는 부족하다는 전제에서, 어떤 추가 증거(재인증, 승인 ID, 서명된 승인 봉투 중 무엇)를 요구할지.
 2. **tenant 전역 운영 권한 등급의 정의.** release 수락을 누가 할 수 있는가 — 역할 이름과, 정지된 사용자를 어떻게 배제하는가.
 3. **멱등과 재결정 규칙.** 같은 `(release, 기준)`에 두 번째 결정이 오면 409인지, 이전 결정을 감사와 함께 대체하는지.
+3-bis. **사람과 서비스 주체의 구별.** 지금 `users`에는 그 구별이 없다(`identity.py`). `operatorSignOff`가 언제든 참이 되려면 그 구별이 스키마나 attestation에 있어야 한다 — 이것이 F1이 드러낸 가장 중요한 공백이다.
 4. **해시를 받을지 읽을지.** 받는다면 불일치를 422로 거절하는 규칙까지.
 5. **감사 사건 이름과 payload.** 수락이 남길 사건, 그리고 거절된 시도가 남길 사건.
 
@@ -79,4 +93,5 @@ tags: ["s12", "release-manifest", "acceptance", "route", "read-only", "security-
 - **실제 화면과 연결해 보지 않았다.** `apps/web`의 `ReleaseManifest` 타입은 FE 지역 타입이고 `imageDigest`·`targetClusters`·`smokePassedRatio` 같은 **DB에 없는 필드**를 갖는다. 이 route는 **표가 기록한 것만** 내보낸다 — FE가 그 모양을 쓰려면 별도 카드가 필요하고, 이 route로 `operatorSignOff`를 **묻는 것**은 지금 가능하다.
 - **점수를 올리지 않았다.** `S12-FE`의 50은 화면 쪽 판정이고, 이 카드는 서버 route 부재라는 **사유 하나**를 없앴을 뿐이다. 재산정은 별도 카드가 다시 센다.
 - **쓰기 경로를 설계하지 않았다.** §3은 요청이고 설계가 아니다.
+- **`operatorSignOff`가 참이 될 수 있는 길을 설계하지 않았다.** 이 PR은 그것을 **거짓으로 고정**했을 뿐이고, 참이 되는 조건은 `#282`의 계약이다.
 - **`manifestMatches`는 현재 writer로는 항상 참이다.** `record_acceptance`가 해시를 release에서 읽기 때문이다. 그래도 읽기가 비교하는 이유는 그 열이 자기 사본을 갖기 때문이고, 시험은 그 상태를 **열을 직접 써서** 만든다(현재 writer로 만들 수 없음을 시험 docstring에 적었다).

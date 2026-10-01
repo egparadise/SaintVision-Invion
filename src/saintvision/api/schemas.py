@@ -1564,16 +1564,27 @@ class ReleaseAcceptanceResponse(Strict):
 
 
 class ReleaseManifestResponse(Strict):
-    """A recorded release, and whether a person has signed it off.
+    """A recorded release, and what is recorded about accepting it.
 
-    ``operatorSignOff`` is **computed from the acceptance rows**, never stored
-    and never supplied by a caller. It is true only when an ``accepted``
-    decision exists whose pinned hash equals this manifest's hash. A
-    ``conditional`` decision, a ``rejected`` one, and an acceptance of a
-    different composition all leave it false, which is the whole point: DEF-S12
-    recorded ``operatorSignOff=false`` because no server route existed to answer
-    the question, and a route that answered ``true`` from anything less than a
-    person's matching acceptance would be worse than no route at all.
+    ``operatorSignOff`` is **``Literal[False]``**: this reader cannot emit true,
+    and the contract says so rather than the docstring promising it.
+
+    The first version of this model computed it from the acceptance rows and
+    called an ``accepted`` row with a matching hash a sign-off, on the reasoning
+    that ``acceptance_records.accepted_by_user_id`` is a foreign key to ``users``
+    so "the system cannot sign its own acceptance". **That reasoning was wrong,
+    and Codex measured it**: ``users`` draws no line between a person and a
+    service -- ``identity.py`` builds a Principal from any ``external_subject``
+    -- and the foreign key proves only that the row names a user that exists. A
+    principal whose subject was ``svc:release-bot`` wrote an ``accepted`` row and
+    the field read true. A key that proves existence was read as proof of
+    humanity.
+
+    So the field is pinned false until there is a contract for attesting that a
+    person decided. ``requiredDistinctOperatorCount`` and
+    ``confirmedOperatorCount`` carry the recorded fact in the meantime, named as
+    the write contract (``#282``, card 184) names them: two distinct operators
+    are required, and a count below that is not sign-off however it was written.
     """
 
     release_id: StrictStr = Field(alias="releaseId", min_length=1, max_length=64)
@@ -1582,7 +1593,21 @@ class ReleaseManifestResponse(Strict):
     manifest_sha256: StrictStr = Field(alias="manifestSha256", pattern="^[0-9a-f]{64}$")
     components: list[ReleaseComponentResponse] = Field(default_factory=list, max_length=512)
     created_at: AwareDatetime = Field(alias="createdAt")
-    operator_sign_off: StrictBool = Field(alias="operatorSignOff")
+    #: Pinned false. Only the write contract may ever make this true, and only
+    #: with an attestation that a person decided -- which does not exist yet.
+    operator_sign_off: Literal[False] = Field(alias="operatorSignOff")
+    #: Why it is false, in the response, so a reader is not left to guess whether
+    #: the answer is "nobody signed" or "this surface cannot tell".
+    operator_sign_off_blocked_by: Literal["human-attestation-contract-absent"] = Field(
+        alias="operatorSignOffBlockedBy"
+    )
+    #: The quorum the write contract requires. A constant here so a reader sees
+    #: "1 of 2" rather than a bare count whose target lives in another document.
+    required_distinct_operator_count: Literal[2] = Field(alias="requiredDistinctOperatorCount")
+    #: Distinct users with an `accepted` row whose pinned hash matches this
+    #: manifest. A recorded fact, not an attestation: a service principal can
+    #: contribute to this count, which is exactly why it is not sign-off.
+    confirmed_operator_count: StrictInt = Field(alias="confirmedOperatorCount", ge=0)
     acceptance_count: StrictInt = Field(alias="acceptanceCount", ge=0)
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)

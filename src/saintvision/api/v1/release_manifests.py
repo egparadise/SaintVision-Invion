@@ -5,9 +5,18 @@
 **Why this exists.** The re-score records ``S12-FE`` at 50 with the reason
 "서버 route 부재로 ``ReleaseManifest.operatorSignOff=false`` 유지" (DEF-S12): the
 tables, the service and their tests were all present, and nothing served them, so
-the screen had no way to ask whether a person had signed a release off and kept
-the field hard-coded false. These two routes answer the question. They do not
-make it true -- see ``pilot.operator_sign_off``.
+the screen had no way to ask what is recorded about accepting a release.
+
+**What these routes do not answer.** ``operatorSignOff`` is ``Literal[False]`` in
+the contract. The first version computed it from the acceptance rows and read an
+``accepted`` row with a matching hash as a sign-off, on the reasoning that
+``accepted_by_user_id`` is a foreign key to ``users``. Codex measured that and it
+is wrong: ``users`` does not distinguish a person from a service, so a principal
+whose subject was ``svc:release-bot`` made the field read true. The field is now
+pinned false with ``operatorSignOffBlockedBy`` naming why, and the recorded fact
+travels as ``confirmedOperatorCount`` against
+``requiredDistinctOperatorCount`` -- the names the write contract (``#282``,
+card 184) uses, where two distinct operators are the quorum.
 
 **Read only, deliberately.** Creating a signature or an acceptance is a security
 boundary: ``acceptance_records.accepted_by_user_id`` is a foreign key to
@@ -130,11 +139,14 @@ async def read_release_manifest(
 ) -> schemas.ReleaseManifestDetailResponse:
     """One release, its pinned components, and every acceptance decision on it.
 
-    ``operatorSignOff`` is computed from those decisions and is false unless an
-    ``accepted`` one pins this manifest's own hash. The accepting person is not
-    in the response: ``RunRecordResponse`` set the rule that a read surface
-    reports identifiers and digests rather than people, and an audit column is
-    not a directory.
+    ``operatorSignOff`` is false here by contract, not by computation: nothing in
+    the request or the rows can make it true, because this surface cannot tell a
+    person's decision from a service account's. ``confirmedOperatorCount`` is the
+    recorded fact instead.
+
+    The accepting person is not in the response: ``RunRecordResponse`` set the
+    rule that a read surface reports identifiers and digests rather than people,
+    and an audit column is not a directory.
     """
 
     require_absent_body(await read_bounded_body(request))
