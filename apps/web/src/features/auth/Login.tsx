@@ -1,7 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '@/shared/ui/Button';
-import { setAuthToken } from '@/shared/api/client';
-import { authConfig, beginLogin, completeLogin, hasLoginCallback, registerSessionExpiration, type SessionUser } from './session';
+import { clearAuthToken } from '@/shared/api/client';
+import {
+  authConfig,
+  beginLogin,
+  clearSessionExpiration,
+  commitSession,
+  completeLogin,
+  completeStepUp,
+  hasLoginCallback,
+  isStepUpPending,
+  type SessionUser,
+} from './session';
 
 export interface LoginProps {
   onLoginSuccess: (user: SessionUser) => void;
@@ -19,19 +29,25 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess, initialError }) =>
   const success = useRef(onLoginSuccess); success.current = onLoginSuccess;
   useEffect(() => {
     let active = true;
-    if (!exchange.current && hasLoginCallback()) exchange.current = completeLogin();
+    if (!exchange.current && hasLoginCallback()) {
+      exchange.current = isStepUpPending() ? completeStepUp() : completeLogin();
+    }
     if (exchange.current) {
       setLoading(true);
       exchange.current.then(({ token, user, expiresAt }) => {
         if (active) {
-          setAuthToken(token);
-          if (typeof expiresAt === 'number') {
-            registerSessionExpiration(expiresAt);
-          }
+          commitSession(token, expiresAt);
           success.current(user);
         }
-      }).catch(err => { if (active) setError(err.message); })
-        .finally(() => { if (active) setLoading(false); });
+      }).catch(err => {
+        if (active) {
+          clearAuthToken();
+          clearSessionExpiration();
+          setError(err.message);
+        }
+      }).finally(() => {
+        if (active) setLoading(false);
+      });
     } else {
       try { authConfig(); } catch (err) { setError((err as Error).message); }
     }

@@ -1,12 +1,12 @@
 ---
 doc_id: "HISTORY-S12-BE-RELEASE-ACCEPTANCE-WRITE-IMPL-20261001"
 title: "S12-BE release 수락·operator sign-off 쓰기 경로 구현 — 두 사람, 그 순서로. 그리고 왜 지금은 닫혀 있는지 (카드 187)"
-version: "1.1.0"
+version: "1.3.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-02T01:12:52+09:00"
+updated: "2026-10-02T03:38:12+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "b96068b6"
@@ -158,3 +158,33 @@ commit되지 않은 행은 보이지 않으므로 두 번째는 잠글 행을 �
   가리키게 만들 수 있었다. `release_manifest_pin_is_final()` trigger(`SECURITY INVOKER`)가 digest는 **불변**, policy 쌍은
   **한 번만 쓰기**로 고정한다 — 열 권한 회수가 아니라 trigger인 이유는 그 grant가 이 카드가 소유하지 않은 writer와 공유되기
   때문이다.
+
+## 7. fresh-auth 단일 정본 — §3의 `FreshAuth` 서술은 더 이상 코드가 아니다
+
+`#286` 보안 검토에서 Codex가 `#285`·`#286`·`#291` 결합 tree를 대조하고 **결정**을 냈다: **`#285`의 검증·정규화 결과와 `has_fresh_interactive_auth()`가 유일한 정본**이다. 그대로 구현했고, 그래서 §3이 적은 "`Principal`이 `FreshAuth`를 선택적으로 나른다"는 **지금 코드가 아니다.**
+
+**두 표현을 함께 두면 양쪽으로 틀릴 수 있었다**는 것이 결정의 근거이고, 둘 다 측정된 것이다.
+
+| 방향 | 무엇 |
+|---|---|
+| fail-open | `mfa+sms`는 canonical allowlist(`{mfa,pwd,otp,hwk,swk}`)가 거부하는데 이 카드의 **독립 RFC 8176 검사는 통과**시킨다 — `sms`는 등록된 값이고 `mfa`가 있으므로 |
+| 영구 fail-closed | 이 카드의 `_fresh_auth_from()`은 `identity.issuer`·`client_id`를 기대했지만 kernel `Identity`는 **그 필드를 내보내지 않았다** — 실 OIDC 경로에서는 언제나 `fresh_auth=None`이고, 그 사실이 시험에 걸리지 않았다 |
+
+**바뀐 것**: `FreshAuth` 와 `Principal.fresh_auth`, `oidc._fresh_auth_from()`, 그리고 이 카드가 들고 있던 `RFC8176_VALUES`·`SECOND_FACTORS`·`FRESH_AUTH_WINDOW_SECONDS`를 **지웠다**. `Principal`은 `#285`의 `verified_fresh_auth_claims`·`auth_time`·`amr`에 **token provenance 셋**(`verified_token_issuer`·`verified_token_client_id`·`verified_token_expires_at`)을 더해 나르고, 그 셋은 `inv.identity.Identity`가 **이미 검증한 값**을 그대로 넘긴 것이다(kernel에 `issuer`·`client_id` 필드를 더했다). `proof_of_interactive_human()`은 **consumer**다 — canonical predicate가 참인 뒤 digest와 window만 만들고, window 길이도 `FRESH_AUTH_MAX_AGE_SECONDS`를 가져다 쓴다.
+
+**시험**: 실 signed token을 `AccessTokens.verify → OidcPrincipalVerifier.verify → require_fresh_operator`로 통과시키는 **단일 행렬**을 실 PG에 넣었다 — 허용 `mfa`·`pwd+otp`·`pwd+hwk`·`pwd+swk` × age 0·300, 거부 12종(claims 부재, bool·string·float·음수 `auth_time`, 미래, 301초, 빈 AMR, `pwd` 단독, `otp` 단독, `webauthn`, 그리고 **`mfa+sms`** — 두 정책이 갈라지던 그 조합). provenance 셋 중 하나라도 없으면 `AUTH-0030`/403이고 write 3표 0행이며 **거부는 1행 감사된다**(§8이 요구하는 것이 그것이다). 손으로 채운 principal은 `verified_fresh_auth_claims`가 거짓이라 거부된다. 그리고 정적 단언으로 **지운 이름들이 돌아오지 못하게** 고정했다(`FreshAuth`·`_fresh_auth_from`·세 상수·`webauthn` 문자열 0건, canonical predicate 호출 1건, 다섯 route 전부가 같은 consumer를 쓴다는 것을 route 수와 대조).
+
+### 7-1. F1 — 허용 집합이 **둘**이었다
+
+위 §7은 "독립 판정을 지웠다"고 적었는데, Codex 재검토가 **한 쌍이 더 남아 있었다**는 것을 측정했다. AMR 허용 집합이 두 곳에 있었다 — kernel의 `inv/identity.py::_FRESH_AUTH_AMR_VALUES`(verifier 단계에서 집합 밖 값이 하나라도 있으면 `auth_time=None`·`amr=()`로 **지운다**)와 제품의 `principal.py::FRESH_AUTH_AMR_VALUES`. 그래서 **`mfa+sms`의 거부는 정본 predicate가 아니라 verifier가 하고 있었고**, 제품 집합에 `sms`만 더한 변이가 **59 passed로 생존**했다. 정본이라고 적힌 쪽을 아무 시험도 쓰지 않은 것이다.
+
+**결정(`#286` 02:38 Codex, §2 "허용 AMR 집합·조합은 오직 `has_fresh_interactive_auth()`가 판정한다")대로 고쳤다.** `#285`의 kernel 코드를 건드리는 변경이므로 그 근거를 여기에 적는다.
+
+| 어디 | 전 | 후 |
+|---|---|---|
+| `inv/identity.py::_fresh_auth_claims` | list·길이·중복·문자열 + **집합 소속**까지 보고, 집합 밖이면 claims를 지움 | **형식만** — list, 길이 1..8, 중복 없음, 각 값이 `^[A-Za-z0-9_-]{1,32}$`. 모르는 값도 **verified AMR 값으로 전달**한다. 집합 상수는 **삭제** |
+| `principal.py::FRESH_AUTH_AMR_VALUES` | 둘 중 하나 | **유일한 집합**이고, 왜 `webauthn`·`sms`가 없는지 주석에 적었다 |
+
+**bounded collection은 남겼다** — 모르는 문자열을 통과시키는 순간 길이·개수 한계가 transport의 책임이 되기 때문이다. 그것은 인증에 대한 판단이 아니라 resource server가 무한한 것을 넘기지 않는다는 성질이다.
+
+**그 변이가 지금은 두 시험을 죽인다**: `test_an_unknown_method_reaches_the_identity_and_is_refused_by_the_policy[sms]`(claim이 verified로 도착하고 **predicate가** 거부하는 것을 단언)와 `test_the_amr_allowlist_lives_in_exactly_one_place`(kernel에 값 집합이 **없다**는 것과 제품 집합이 정확히 다섯이라는 것). 실 PG 사슬에도 `mfa+sms` 전용 시험을 두어 **principal이 두 방법을 verified로 들고 있었음**을 먼저 단언한 뒤 거부를 본다 — 거부가 어디서 일어나는지를 관측으로 고정한 것이다.

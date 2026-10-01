@@ -37,11 +37,7 @@ from saintvision.api.deps import get_session, get_write_session  # noqa: E402
 from saintvision.api.v1 import release_acceptance as route  # noqa: E402
 from saintvision.services import release_acceptance as service  # noqa: E402
 from saintvision.config import Settings  # noqa: E402
-from saintvision.identity.principal import (
-    FreshAuth,
-    Principal,
-    StaticPrincipalVerifier,
-)  # noqa: E402
+from saintvision.identity.principal import Principal, StaticPrincipalVerifier  # noqa: E402
 
 TENANT = uuid.UUID("22222222-2222-2222-2222-222222222222")
 USER = "usr_01J8Z3XQ2K9WMV5T7N4B6C8D0E"
@@ -111,17 +107,15 @@ def build(monkeypatch, *, enabled: bool, fresh: bool = True, session=None, resol
         user_id=USER,
         tenant_id=TENANT,
         external_subject="oidc:operator",
-        fresh_auth=(
-            FreshAuth(
-                auth_time=int(NOW.timestamp()) - 60,
-                amr=frozenset({"mfa"}),
-                issuer="https://idp.example/realms/inv",
-                client_id="portal",
-                expires_at=int(NOW.timestamp()) + 600,
-            )
-            if fresh
-            else None
-        ),
+        # #286's decision: one representation. A principal is fresh because the
+        # verifier marked the claims verified and the canonical predicate admits them,
+        # not because a second object was attached.
+        verified_fresh_auth_claims=fresh,
+        auth_time=int(NOW.timestamp()) - 60 if fresh else None,
+        amr=frozenset({"mfa"}) if fresh else frozenset(),
+        verified_token_issuer="https://idp.example/realms/inv" if fresh else None,
+        verified_token_client_id="portal" if fresh else None,
+        verified_token_expires_at=int(NOW.timestamp()) + 600 if fresh else None,
     )
     monkeypatch.setenv("INV_ENV", "test")
     # A denied request is audited in its own transaction, which opens a session from the
@@ -421,3 +415,76 @@ def test_closing_a_proposal_is_the_only_place_the_denial_is_written():
     assert len(writing) == 1, writing
     body = source.split("def _close_proposal(")[1].split("\ndef ")[0]
     assert "action=AUDIT_DENIED" in body and 'outcome="deny"' in body
+
+
+# ------------------------------------------------------------------ one policy, statically
+
+
+def test_no_second_fresh_auth_representation_survives_in_the_tree():
+    """#286's decision, pinned where a revival would be visible.
+
+    A behavioural test cannot see a *second* policy that happens to agree today. These
+    assertions can: the removed names, and the removed constants, must not come back.
+    """
+    from saintvision.identity import oidc as oidc_module
+    from saintvision.identity import principal as principal_module
+    from saintvision.services import release_acceptance_auth as auth_module
+    from saintvision.services import release_acceptance as service_module
+
+    identity_source = Path(oidc_module.__file__).read_text(encoding="utf-8")
+    principal_source = Path(principal_module.__file__).read_text(encoding="utf-8")
+    auth_source = Path(auth_module.__file__).read_text(encoding="utf-8")
+    service_source = Path(service_module.__file__).read_text(encoding="utf-8")
+
+    # The second parse and the second object are gone, and `FreshAuth` is not importable.
+    assert not hasattr(principal_module, "FreshAuth")
+    assert not hasattr(oidc_module, "_fresh_auth_from")
+    assert "def _fresh_auth_from" not in identity_source
+    assert "fresh_auth=" not in identity_source
+    assert "class FreshAuth:" not in principal_source
+
+    # The acceptance side holds no policy of its own: no registry, no second-factor set,
+    # no window constant.
+    for banned in ("RFC8176", "SECOND_FACTORS", "FRESH_AUTH_WINDOW_SECONDS", "webauthn"):
+        assert banned not in auth_source, banned
+    assert not hasattr(auth_module, "RFC8176_VALUES")
+    assert not hasattr(auth_module, "SECOND_FACTORS")
+    assert not hasattr(auth_module, "FRESH_AUTH_WINDOW_SECONDS")
+
+    # It asks the canonical predicate, exactly once, and the window it uses is the
+    # canonical one.
+    assert auth_source.count("has_fresh_interactive_auth(principal, now=now)") == 1
+    assert "FRESH_AUTH_MAX_AGE_SECONDS" in auth_source
+    assert "principal_policy.FRESH_AUTH_MAX_AGE_SECONDS" in service_source
+
+    # And the one judge is where #285 put it.
+    assert hasattr(principal_module, "has_fresh_interactive_auth")
+
+
+def test_removing_the_canonical_predicate_call_is_caught():
+    """The mutation this pins: an acceptance boundary that stops asking.
+
+    Read from the source rather than monkeypatched, because the mutation that matters is
+    the call disappearing -- and a test that patches the function still passes when the
+    call is gone.
+    """
+    from saintvision.services import release_acceptance_auth as auth_module
+
+    source = Path(auth_module.__file__).read_text(encoding="utf-8")
+    body = source.split("def proof_of_interactive_human(")[1]
+    assert "if not has_fresh_interactive_auth(principal, now=now):" in body
+    assert "raise NotInteractiveHuman" in body.split(
+        "if not has_fresh_interactive_auth(principal, now=now):"
+    )[1][:200]
+
+
+def test_every_write_route_goes_through_the_one_consumer():
+    """Including the replay path: a route that skipped it would admit a stale operator."""
+    from saintvision.services import release_acceptance as service_module
+
+    source = Path(service_module.__file__).read_text(encoding="utf-8")
+    assert source.count("fresh.proof_of_interactive_human(principal, now=now)") == 2
+    # Every route, counted against the number of routes rather than a number I typed:
+    # a sixth route that forgot the call would otherwise pass.
+    route_source = Path(route.__file__).read_text(encoding="utf-8")
+    assert route_source.count("service.require_fresh_operator(") == route_source.count("@router.")
