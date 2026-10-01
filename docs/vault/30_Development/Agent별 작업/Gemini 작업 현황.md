@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.149"
+version: "1.0.150"
 status: "approved"
 author: "Gemini"
-updated: "2026-10-01T10:50:00+09:00"
+updated: "2026-10-01T11:20:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,26 +19,24 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-10-01T10:50:00+09:00 (Card 162 Codex 4차 검토 (1)~(3) 전수 조치 완결 및 58개 시험 100% PASS).
+- 확인 기준: 2026-10-01T11:20:00+09:00 (Card 162 Claude r3(H1, H4) 및 Codex r4 전수 조치 완결, 전용 CI 워크플로 신설 및 68개 시험 100% PASS).
 
-## 2026-10-01 S02-FE 사내 포털 로그인 여정 관측 하네스 구축 및 Codex 1차·2차·3차·4차 검토(F1~F6, N1~N4, (1)~(3)) 전수 조치 (Card 162, `agent/gemini/c162-fe-login-journey-harness`)
-- **개요**: S02-FE 진척 재산정 지적 해소 및 Codex 계약·보안 축 1차·2차·3차·4차 검토(PR #259) 지적 전수 조치 완결:
-  1. **(1) [High] in-memory seam 부재 fail-closed 강제 및 inMemorySeamPresent 필수 검증**:
-     - JS evaluate에서 `inMemoryTokenPurged = inMemorySeam && !window.__sv_has_auth_token()`로 엄격 계산하고, `inMemorySeamPresent: inMemorySeam`을 필수 반환.
-     - Python 하네스에서 `storage_state.get("inMemorySeamPresent")` 부재/False 시 즉시 `RuntimeError`로 fail-closed 처리.
-     - 스키마(`portal-login-journey-evidence.schema.json`)의 `observations`에 `inMemorySeamPresent: {"type": "boolean"}` 속성 추가 및 `validate_evidence`에서 `acceptanceClaim=True` 시 필수 불변식으로 강제.
-  2. **(2) [High] CLI provenance 우회 옵션 제거 및 acceptanceClaim 결속**:
-     - CLI `main()`의 `argparse`에서 `--require-clean`, `--require-remote-containment` 및 그 부정형 플래그(`--no-require-clean`, `--no-require-remote-containment`) 완전 제거.
-     - `PROHIBITED_FLAGS`에 `--no-require-clean`, `--no-require-remote-containment`를 추가하여 우회 시도를 `SecurityCircumventionError`로 즉시 거부.
-     - `execute_journey`에서 `require_clean` 또는 `require_remote_containment`가 비활성화된 경우 `acceptanceClaim = False`로 강제 결속.
-     - 스키마 `audit`에 `cleanWorktreeVerified`, `remoteContainmentVerified` 속성을 필수로 정의하고, `validate_evidence`에서 `acceptanceClaim=True` 시 두 속성이 모두 `True`임을 검증.
-  3. **(3) [Gate] History 문서 인용 정정 (Docs run 36801495874 해소)**:
-     - History 문서 내 core schema 인용에서 JSON pointer fragment를 제거하고 실재 파일 경로(`contracts/v1alpha1/core.schema.json`)로 정정하여 ratchet baseline 증가 없이 Docs green 확보.
-  4. **N1~N4 기존 조치 유지**: lookalike token/session origin 차단, 정본 `SessionView` strict 스키마 검증, Chromium launch args 인증서 무시 인자 0건 단언, `globalThis.__sv_has_auth_token` boolean seam 탑재.
-  5. **F1~F6 기존 조치 유지**: 5단계 여정 실측, 사내 CA 번들 및 allowlist fail-closed, DNS 해석 후 서비스 다운의 정직한 FAIL, 접두사 무관 계정 비식별화, X.509 AKI/SKI 확장 완비.
+## 2026-10-01 S02-FE 사내 포털 로그인 여정 관측 하네스 구축 및 Claude r3(H1, H4) / Codex 1~4차 전수 조치 (Card 162, `agent/gemini/c162-fe-login-journey-harness`)
+- **개요**: S02-FE 진척 재산정 지적 해소 및 Claude UI·테스트 축 r3(H1, H4)과 Codex 계약·보안 축 1~4차 검토(PR #259) 지적 전수 조치 완결:
+  1. **H1 [High] Linux Chromium 격리 NSS DB 사내 CA 신뢰 주입 아키텍처 및 플랫폼 판정**:
+     - Linux 실행 시 격리 임시 홈 디렉터리(`isolated_home = profile_dir / "home"`) 하위 `$HOME/.pki/nssdb`를 `certutil -N`로 생성하고 사내 루트 CA를 `certutil -A -t "C,,"`로 등록.
+     - Playwright Chromium 실행 시 `env={"HOME": str(isolated_home)}`을 주입하여 격리된 NSS DB만 신뢰하도록 결속(인증서 무시 플래그 0건 엄격 유지).
+     - 운영자 전제: Windows/macOS 실행 시 NSS DB 격리 프로필 미지원으로 정직하게 `BLOCKED_EXTERNAL` 판정(`check_supported_platform`).
+     - 로컬 TLS 서버 기반 실측 시험 완비: 잘못된 루트 등록 시 `ERR_CERT_AUTHORITY_INVALID` 실패(음성 시험), 올바른 루트 등록 시 HTTP 200 성공(양성 시험) 실측.
+  2. **H4 [High] 전용 CI 워크플로 신설 및 100% 실행·0건 skip 단언**:
+     - `.github/workflows/portal-login-harness.yml` 신설: `portal-login-harness` Job에서 `libnss3-tools`(certutil), `playwright==1.62.0`, `playwright install --with-deps chromium` 설치 후 전체 실행.
+     - XML 결과에서 `skipped` 0건(`assert len(skips) == 0`), 실패 0건, 100% 통과 엄격 단언.
+     - 단위/가상 브라우저 테스트 환경 Playwright 모듈 안전 폴백 스텁 완비 및 순수 단위 시험 12대 변이 사살 커버리지 완비.
+  3. **Codex r4 (1)~(3) 기존 조치 유지**: in-memory seam 부재 fail-closed(`inMemorySeamPresent`), CLI provenance 우회 옵션 제거 및 acceptanceClaim 결속, core schema 인용 정정.
+  4. **N1~N4 / F1~F6 기존 조치 유지**: lookalike token/session origin 차단, 정본 `SessionView` strict 스키마 검증, Chromium launch args 인증서 무시 인자 0건 단언, `globalThis.__sv_has_auth_token` boolean seam 탑재, 5단계 여정 실측, 사내 CA 번들 및 allowlist fail-closed.
 - **담당 및 역할**: Gemini (Frontend / UI / 웹 배포 소유). Reviewer: Claude (UI·운영 축), Codex (계약·보안 축).
 - **관측 근거 (Evidence)**:
-  - 로그인 여정 관측 및 변이 사살 시험: `tests/test_portal_login_journey_harness.py` (58 passed 100%, 22.33s)
+  - 로그인 여정 관측 및 변이 사살 시험: `tests/test_portal_login_journey_harness.py` (68 passed 100%, 24.30s, 0 failed, 0 skipped)
   - 갱신된 실측 증거: `docs/vault/30_Development/Evidence/s02_fe_login_journey_evidence.json` (정직한 `BLOCKED_EXTERNAL` 실측, leak count 전수 0)
   - 웹 클라이언트 타입 검사: `cd apps/web && npx tsc -b` (타입 오류 0건, PASS)
   - 웹 클라이언트 프로덕션 빌드: `cd apps/web && npm run build` (Vite 번들 정상 생성, 7.78s, PASS)

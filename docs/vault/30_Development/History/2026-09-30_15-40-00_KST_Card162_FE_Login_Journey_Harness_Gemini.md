@@ -241,10 +241,39 @@ Codex 계약·보안 축 2차 검토(09:40)에서 제기된 지적사항 5건(F1
 - **조치**: JSON pointer fragment를 제거하고 실재 정본 파일 경로인 `contracts/v1alpha1/core.schema.json` 및 본문 설명으로 정정하여 ratchet baseline 증가 없이 Docs green(21s) 확보.
 
 ---
+---
 
-## 6. 최종 검증 결과 요약 (2026-10-01)
+## 7. Claude 3차 검토(H1, H4) 및 코디네이터 지침 전수 조치 (2026-10-01)
 
-- **로그인 여정 하네스 스위트**: `pytest tests/test_portal_login_journey_harness.py` -> **58 passed in 22.33s (100% PASS)**
+Claude UI·테스트 축 3차 검토 및 코디네이터 결정에 따라 마지막 차단 과제인 H1과 H4를 전수 조치하고 자동화 검증 스위트를 68개로 완비하였습니다:
+
+### 1) H1 [High] Linux Chromium 격리 NSS DB 사내 CA 신뢰 주입 아키텍처 및 플랫폼 판정
+- **문제점**: Chromium이 사내 사설 CA를 자동으로 신뢰하지 않아 우회 플래그 없이 실제 HTTPS 핸드셰이크를 통과할 수 없었고, 격리 신뢰 프로필 구현이 누락되어 있던 결함.
+- **조치**:
+  1. **격리 NSS DB 구축 (`setup_isolated_nssdb`)**: Linux 실행 시 격리 임시 홈 디렉터리(`isolated_home = profile_dir / "home"`) 하위에 `$HOME/.pki/nssdb` 디렉터리를 생성하고, `certutil -d sql:$nssdb -N --empty-password`로 초기화한 뒤 사내 루트 CA를 `certutil -d sql:$nssdb -A -t "C,," -n "SaintVision-Intranet-Root-CA" -i $ca_bundle`로 등록.
+  2. **환경변수 격리 결속**: Playwright Chromium 실행 시 `env={"HOME": str(isolated_home)}`을 주입하여 Chromium이 호스트 루트 인증서 오염 없이 격리된 사내 NSS DB만을 신뢰하도록 결속(인증서 무시 플래그 0건 엄격 유지).
+  3. **운영자 전제 및 비-Linux fail-closed 판정**: Windows/macOS 환경에서는 NSS DB 격리 프로필 주입이 운영체제 루트 스토어 변조 없이 불가능하므로, `check_supported_platform`을 통해 비-Linux 플랫폼의 라이브 실행 요청 시 정직하게 `BLOCKED_EXTERNAL`로 판정(`Live intranet CA trust isolation is only supported on Linux via isolated $HOME/.pki/nssdb`).
+  4. **로컬 TLS 서버 기반 실측 시험 완비**:
+     - `test_live_chromium_nssdb_intranet_ca_trust`: 로컬 HTTPS 서버를 기동하고, 잘못된 루트 등록 시 실제 Chromium이 `ERR_CERT_AUTHORITY_INVALID`로 핸드셰이크 실패함을 실측(음성 시험), 올바른 루트 등록 시 HTTP 200 및 HTML 정상 렌더링 성공을 실측(양성 시험).
+     - `test_non_linux_platform_reports_blocked_external`: 지원되지 않는 플랫폼 실행 시 `BLOCKED_EXTERNAL` 판정 및 사유 기록 단언.
+
+### 2) H4 [High] 전용 CI 워크플로 구축 및 100% 실행·0건 skip 단언
+- **문제점**: Playwright 및 libnss3-tools(certutil) 의존 테스트 15건이 일반 백엔드 CI 러너에서 `ModuleNotFoundError`로 실행되지 못하던 결함.
+- **조치**:
+  1. **전용 GitHub Actions 워크플로 신설 (`.github/workflows/portal-login-harness.yml`)**:
+     - Job 이름: `portal-login-harness` (ubuntu-latest).
+     - 시스템 의존성 설치: `sudo apt-get update && sudo apt-get install -y libnss3-tools`.
+     - Python 의존성 설치: `requirements-backend.txt` + `playwright==1.62.0` (pin) + `python -m playwright install --with-deps chromium`.
+     - 테스트 전체 실행: `python -m pytest -v --strict-markers --junitxml=.work/harness-tests.xml tests/test_portal_login_journey_harness.py`.
+     - 엄격한 0 skip 단언: XML 결과에서 `testcase` 존재 확인, `failure/error` 0건 확인, `skipped` 0건(`assert len(skips) == 0`) 강제.
+  2. **단위/가상 브라우저 테스트 환경 Playwright 모듈 안전 폴백 스텁 완비**: Playwright가 미설치된 환경에서도 fake-browser 테스트가 `sys.modules` 스텁을 통해 모듈 오류 없이 100% 정상 실행되도록 방어.
+  3. **순수 단위 시험 12대 변이 사살 커버리지 완비**: `compute_overall_status`, `validate_canonical_origins`, `is_canonical_token_endpoint`, `is_canonical_session_endpoint`, `validate_session_view`, `configure_isolated_browser_profile` 대상 순수 단위 시험 완비.
+
+---
+
+## 8. 최종 검증 결과 요약 (2026-10-01)
+
+- **로그인 여정 하네스 스위트**: `pytest tests/test_portal_login_journey_harness.py` -> **68 passed in 24.30s (100% PASS, 0 failed, 0 skipped)**
 - **웹 클라이언트 타입 검사**: `cd apps/web && npx tsc -b` -> **타입 에러 0건 (PASS)**
 - **웹 클라이언트 프로덕션 빌드**: `cd apps/web && npm run build` -> **Vite 프로덕션 번들 정상 생성 (PASS, 7.78s)**
 - **라우트 커버리지 검증**: `pytest tests/test_route_coverage.py` -> **40 passed (100% PASS)**

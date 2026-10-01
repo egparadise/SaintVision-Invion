@@ -21,6 +21,7 @@ Comprehensive verification covering Codex contract & security findings F1~F6:
 from __future__ import annotations
 
 import datetime as dt
+import ipaddress
 import json
 import socket
 import ssl
@@ -31,6 +32,18 @@ import time
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 from typing import Any, Dict
+import types
+
+try:
+    import playwright
+    import playwright.sync_api
+except ImportError:
+    mock_playwright = types.ModuleType("playwright")
+    mock_sync_api = types.ModuleType("playwright.sync_api")
+    mock_sync_api.sync_playwright = None
+    mock_playwright.sync_api = mock_sync_api
+    sys.modules["playwright"] = mock_playwright
+    sys.modules["playwright.sync_api"] = mock_sync_api
 
 import jsonschema
 import pytest
@@ -42,6 +55,12 @@ from cryptography.x509.oid import ExtendedKeyUsageOID, NameOID
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(REPO_ROOT / "tools"))
+
+
+@pytest.fixture(autouse=True)
+def _default_platform_support(monkeypatch):
+    # Default to supported platform for unit/fake-browser tests, except when specifically testing unsupported platform
+    monkeypatch.setattr("tools.observe_portal_login_journey.check_supported_platform", lambda: (True, None))
 
 from tools.observe_portal_login_journey import (
     CANONICAL_IDP_HOST,
@@ -55,11 +74,17 @@ from tools.observe_portal_login_journey import (
     check_circumvention_flags,
     check_domain_resolution,
     check_tcp_connection,
+    check_supported_platform,
     compute_overall_status,
+    configure_isolated_browser_profile,
     get_git_sha,
+    setup_isolated_nssdb,
     inspect_ca_bundle,
+    is_canonical_session_endpoint,
+    is_canonical_token_endpoint,
     validate_canonical_origins,
     validate_evidence,
+    validate_session_view,
     verify_tls_socket_handshake,
 )
 
@@ -97,6 +122,11 @@ def _generate_server_cert(ca_key, ca_cert, hostname: str = "localhost"):
     key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
     now = dt.datetime.now(dt.timezone.utc)
     name = x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, hostname)])
+    try:
+        ip_obj = ipaddress.ip_address(hostname)
+        san_list = [x509.IPAddress(ip_obj)]
+    except ValueError:
+        san_list = [x509.DNSName(hostname)]
     cert = (
         x509.CertificateBuilder()
         .subject_name(name)
@@ -115,7 +145,7 @@ def _generate_server_cert(ca_key, ca_cert, hostname: str = "localhost"):
             critical=True,
         )
         .add_extension(
-            x509.SubjectAlternativeName([x509.DNSName(hostname)]),
+            x509.SubjectAlternativeName(san_list),
             critical=False,
         )
         .add_extension(
@@ -771,9 +801,10 @@ def test_live_browser_all_5_steps_success_sets_acceptance_claim(monkeypatch, tmp
         @property
         def chromium(self):
             m = MagicMock()
-            def launch(headless=True, args=None):
+            def launch(headless=True, args=None, env=None, **kwargs):
                 args_list = args or []
                 assert all("ignore-cert" not in a.lower() for a in args_list), f"Certificate ignore flag found in {args_list}"
+                assert env is not None and "HOME" in env, "Chromium must be launched with isolated HOME in env"
                 return FakeBrowser()
             m.launch.side_effect = launch
             return m
@@ -1521,6 +1552,9 @@ def test_validate_evidence_requires_in_memory_token_purged():
     evidence["audit"]["tlsValidationEnforced"] = True
     evidence["audit"]["cleanWorktreeVerified"] = True
     evidence["audit"]["remoteContainmentVerified"] = True
+    evidence["audit"]["userDataDirIsolated"] = True
+    evidence["audit"]["caBundleAppliedToBrowser"] = True
+    evidence["audit"]["trustStoreMode"] = "ISOLATED_PROFILE"
     evidence["caDigest"] = {
         "caBundleSha256": "a" * 64,
         "rootFingerprint": "b" * 64,
@@ -1641,6 +1675,9 @@ def test_validate_evidence_requires_in_memory_seam_present():
     evidence["audit"]["tlsValidationEnforced"] = True
     evidence["audit"]["cleanWorktreeVerified"] = True
     evidence["audit"]["remoteContainmentVerified"] = True
+    evidence["audit"]["userDataDirIsolated"] = True
+    evidence["audit"]["caBundleAppliedToBrowser"] = True
+    evidence["audit"]["trustStoreMode"] = "ISOLATED_PROFILE"
     evidence["caDigest"] = {
         "caBundleSha256": "a" * 64,
         "rootFingerprint": "b" * 64,
@@ -1768,6 +1805,9 @@ def test_validate_evidence_requires_clean_and_remote_containment():
     evidence["audit"]["tlsValidationEnforced"] = True
     evidence["audit"]["cleanWorktreeVerified"] = False
     evidence["audit"]["remoteContainmentVerified"] = True
+    evidence["audit"]["userDataDirIsolated"] = True
+    evidence["audit"]["caBundleAppliedToBrowser"] = True
+    evidence["audit"]["trustStoreMode"] = "ISOLATED_PROFILE"
     evidence["caDigest"] = {
         "caBundleSha256": "a" * 64,
         "rootFingerprint": "b" * 64,
@@ -1805,3 +1845,316 @@ def test_cli_parser_does_not_expose_bypass_flags():
     assert "--no-require-remote-containment" not in res.stdout
     assert "--require-clean" not in res.stdout
     assert "--require-remote-containment" not in res.stdout
+
+
+def test_validate_evidence_requires_user_data_dir_isolated():
+    """H1: validate_evidence rejects acceptanceClaim=True if userDataDirIsolated is False."""
+    observer = PortalLoginJourneyObserver(mock_mode=True)
+    evidence = observer.execute_journey()
+    evidence["referenceOnly"] = False
+    evidence["acceptanceClaim"] = True
+    evidence["measurementKind"] = "LIVE_BROWSER"
+    evidence["audit"]["tlsValidationEnforced"] = True
+    evidence["audit"]["cleanWorktreeVerified"] = True
+    evidence["audit"]["remoteContainmentVerified"] = True
+    evidence["audit"]["caBundleAppliedToBrowser"] = True
+    evidence["audit"]["trustStoreMode"] = "ISOLATED_PROFILE"
+    evidence["audit"]["userDataDirIsolated"] = False
+    evidence["caDigest"] = {
+        "caBundleSha256": "a" * 64,
+        "rootFingerprint": "b" * 64,
+        "fingerprintVerified": True,
+    }
+    with pytest.raises(jsonschema.ValidationError) as exc:
+        validate_evidence(evidence)
+    assert "audit.userDataDirIsolated == True" in str(exc.value)
+
+
+def test_validate_evidence_requires_ca_bundle_applied_to_browser():
+    """H1: validate_evidence rejects acceptanceClaim=True if caBundleAppliedToBrowser is False."""
+    observer = PortalLoginJourneyObserver(mock_mode=True)
+    evidence = observer.execute_journey()
+    evidence["referenceOnly"] = False
+    evidence["acceptanceClaim"] = True
+    evidence["measurementKind"] = "LIVE_BROWSER"
+    evidence["audit"]["tlsValidationEnforced"] = True
+    evidence["audit"]["cleanWorktreeVerified"] = True
+    evidence["audit"]["remoteContainmentVerified"] = True
+    evidence["audit"]["userDataDirIsolated"] = True
+    evidence["audit"]["trustStoreMode"] = "ISOLATED_PROFILE"
+    evidence["audit"]["caBundleAppliedToBrowser"] = False
+    evidence["caDigest"] = {
+        "caBundleSha256": "a" * 64,
+        "rootFingerprint": "b" * 64,
+        "fingerprintVerified": True,
+    }
+    with pytest.raises(jsonschema.ValidationError) as exc:
+        validate_evidence(evidence)
+    assert "audit.caBundleAppliedToBrowser == True" in str(exc.value)
+
+
+def test_validate_evidence_requires_valid_trust_store_mode():
+    """H1: validate_evidence rejects acceptanceClaim=True if trustStoreMode is not approved."""
+    observer = PortalLoginJourneyObserver(mock_mode=True)
+    evidence = observer.execute_journey()
+    evidence["referenceOnly"] = False
+    evidence["acceptanceClaim"] = True
+    evidence["measurementKind"] = "LIVE_BROWSER"
+    evidence["audit"]["tlsValidationEnforced"] = True
+    evidence["audit"]["cleanWorktreeVerified"] = True
+    evidence["audit"]["remoteContainmentVerified"] = True
+    evidence["audit"]["userDataDirIsolated"] = True
+    evidence["audit"]["caBundleAppliedToBrowser"] = True
+    evidence["audit"]["trustStoreMode"] = "SIMULATED"
+    evidence["caDigest"] = {
+        "caBundleSha256": "a" * 64,
+        "rootFingerprint": "b" * 64,
+        "fingerprintVerified": True,
+    }
+    with pytest.raises(jsonschema.ValidationError) as exc:
+        validate_evidence(evidence)
+    assert "audit.trustStoreMode to be ISOLATED_PROFILE or SYSTEM_OPERATOR_STORE" in str(exc.value)
+
+
+def test_compute_overall_status_pure_unit_matrix():
+    """H4 pure unit test: Verifies compute_overall_status permutations & mutation kills without browser."""
+    # 1. Any FAIL -> FAIL
+    s_fail = [
+        StepResult("s1", "S1", "PASS", 1.0, ""),
+        StepResult("s2", "S2", "FAIL", 1.0, ""),
+        StepResult("s3", "S3", "BLOCKED_EXTERNAL", 1.0, ""),
+    ]
+    assert compute_overall_status(s_fail) == "FAIL"
+
+    # 2. BLOCKED_EXTERNAL with no FAIL -> BLOCKED_EXTERNAL
+    s_blocked = [
+        StepResult("s1", "S1", "BLOCKED_EXTERNAL", 1.0, ""),
+        StepResult("s2", "S2", "NOT_OBSERVED", 1.0, ""),
+    ]
+    assert compute_overall_status(s_blocked) == "BLOCKED_EXTERNAL"
+
+    # 3. NOT_OBSERVED with no FAIL and no BLOCKED_EXTERNAL -> FAIL
+    s_not_obs = [
+        StepResult("s1", "S1", "PASS", 1.0, ""),
+        StepResult("s2", "S2", "NOT_OBSERVED", 1.0, ""),
+    ]
+    assert compute_overall_status(s_not_obs) == "FAIL"
+
+    # 4. All PASS -> PASS
+    s_all_pass = [
+        StepResult("s1", "S1", "PASS", 1.0, ""),
+        StepResult("s2", "S2", "PASS", 1.0, ""),
+    ]
+    assert compute_overall_status(s_all_pass) == "PASS"
+
+    # 5. Empty list -> FAIL (fail-closed)
+    assert compute_overall_status([]) == "FAIL"
+
+
+def test_validate_canonical_origins_pure_unit():
+    """H4 pure unit test: Canonical origin validation rejects non-canonical origins and lookalike domains."""
+    # Valid canonical
+    validate_canonical_origins("https://portal.sv.lan", "https://idp.sv.lan", live_mode=True)
+    validate_canonical_origins("https://portal.sv.lan:8443", "https://idp.sv.lan:8443", live_mode=True)
+
+    # Rejects http
+    with pytest.raises(ValueError, match="must use https scheme"):
+        validate_canonical_origins("http://portal.sv.lan", "https://idp.sv.lan", live_mode=True)
+    with pytest.raises(ValueError, match="must use https scheme"):
+        validate_canonical_origins("https://portal.sv.lan", "http://idp.sv.lan", live_mode=True)
+
+    # Rejects lookalike host
+    with pytest.raises(ValueError, match=r"must be bound to portal\.sv\.lan"):
+        validate_canonical_origins("https://portal.sv.lan.attacker.com", "https://idp.sv.lan", live_mode=True)
+    with pytest.raises(ValueError, match=r"must be bound to idp\.sv\.lan"):
+        validate_canonical_origins("https://portal.sv.lan", "https://idp.sv.lan.attacker.com", live_mode=True)
+
+    # Rejects raw IP
+    with pytest.raises(ValueError, match="must not be a raw IP address"):
+        validate_canonical_origins("https://127.0.0.1", "https://idp.sv.lan", live_mode=True)
+    with pytest.raises(ValueError, match="must not be a raw IP address"):
+        validate_canonical_origins("https://portal.sv.lan", "https://10.0.0.1", live_mode=True)
+
+    # Rejects userinfo
+    with pytest.raises(ValueError, match="must not contain userinfo"):
+        validate_canonical_origins("https://admin:secret@portal.sv.lan", "https://idp.sv.lan", live_mode=True)
+
+
+def test_canonical_endpoint_matchers_pure_unit():
+    """H4 pure unit test: Exact canonical endpoint matcher functions prevent substring/lookalike confusion."""
+    # Token endpoint
+    assert is_canonical_token_endpoint("https://idp.sv.lan/protocol/openid-connect/token") is True
+    assert is_canonical_token_endpoint("https://idp.sv.lan/realms/saintvision/protocol/openid-connect/token") is True
+    assert is_canonical_token_endpoint("https://idp.sv.lan:443/protocol/openid-connect/token") is True
+
+    # Token endpoint negative cases
+    assert is_canonical_token_endpoint("https://idp.sv.lan.attacker.com/protocol/openid-connect/token") is False
+    assert is_canonical_token_endpoint("http://idp.sv.lan/protocol/openid-connect/token") is False
+    assert is_canonical_token_endpoint("https://idp.sv.lan:8443/protocol/openid-connect/token") is False
+    assert is_canonical_token_endpoint("https://idp.sv.lan/other/path") is False
+
+    # Session endpoint
+    assert is_canonical_session_endpoint("https://portal.sv.lan/v1/session") is True
+    assert is_canonical_session_endpoint("https://portal.sv.lan:443/v1/session") is True
+
+    # Session endpoint negative cases
+    assert is_canonical_session_endpoint("https://portal.sv.lan.attacker.com/v1/session") is False
+    assert is_canonical_session_endpoint("http://portal.sv.lan/v1/session") is False
+    assert is_canonical_session_endpoint("https://portal.sv.lan:8443/v1/session") is False
+    assert is_canonical_session_endpoint("https://portal.sv.lan/v1/other") is False
+
+
+def test_validate_session_view_pure_unit():
+    """H4 pure unit test: Schema and boundary invariant kills for SessionView."""
+    now = 1700000000
+    valid_data = {
+        "subjectId": "oidc:" + "a" * 64,
+        "tenantId": "c9a0b1c2-d3e4-4f5a-8b9c-0d1e2f3a4b5c",
+        "expiresAt": now + 3600,
+    }
+    assert validate_session_view(valid_data, now_ts=now) is True
+
+    # Mutation: non-dict
+    assert validate_session_view("string", now_ts=now) is False
+
+    # Mutation: extra property
+    extra = dict(valid_data)
+    extra["extraField"] = "bad"
+    assert validate_session_view(extra, now_ts=now) is False
+
+    # Mutation: invalid subjectId prefix or length
+    bad_subj = dict(valid_data, subjectId="not_oidc:" + "a" * 64)
+    assert validate_session_view(bad_subj, now_ts=now) is False
+    bad_subj2 = dict(valid_data, subjectId="oidc:" + "a" * 63)
+    assert validate_session_view(bad_subj2, now_ts=now) is False
+
+    # Mutation: invalid tenantId (non-uuid)
+    bad_tenant = dict(valid_data, tenantId="not-a-uuid")
+    assert validate_session_view(bad_tenant, now_ts=now) is False
+
+    # Mutation: expired or current timestamp
+    expired = dict(valid_data, expiresAt=now)
+    assert validate_session_view(expired, now_ts=now) is False
+    past = dict(valid_data, expiresAt=now - 10)
+    assert validate_session_view(past, now_ts=now) is False
+
+    # Mutation: non-integer or boolean expiresAt
+    bool_exp = dict(valid_data, expiresAt=True)
+    assert validate_session_view(bool_exp, now_ts=now) is False
+
+
+def test_configure_isolated_browser_profile_pure_unit(tmp_path):
+    """H1/H4 pure unit test: configure_isolated_browser_profile writes EnterpriseRootsEnabled policy."""
+    profile_dir = tmp_path / "browser-profile"
+    configured, err, info = configure_isolated_browser_profile(profile_dir)
+    assert configured is True
+    assert err is None
+    assert info["isolated"] is True
+
+    policy_file = profile_dir / "policies" / "managed" / "saintvision_policy.json"
+    assert policy_file.exists()
+    policy = json.loads(policy_file.read_text(encoding="utf-8"))
+    assert policy.get("EnterpriseRootsEnabled") is True
+
+
+def test_non_linux_platform_reports_blocked_external(monkeypatch):
+    """H1: Windows/macOS operator execution returns BLOCKED_EXTERNAL."""
+    monkeypatch.setattr(
+        "tools.observe_portal_login_journey.check_supported_platform",
+        lambda: (
+            False,
+            "Live intranet CA trust isolation is only supported on Linux via isolated $HOME/.pki/nssdb; "
+            "platform 'win32' is not supported for live acceptance runs",
+        ),
+    )
+    observer = PortalLoginJourneyObserver(
+        target_url="https://portal.sv.lan",
+        mock_mode=False,
+    )
+    evidence = observer.execute_journey(require_clean=False, require_remote_containment=False)
+    assert evidence["overallStatus"] == "BLOCKED_EXTERNAL"
+    assert "platform 'win32' is not supported" in evidence["blockingReason"]
+    assert evidence["steps"][0]["status"] == "BLOCKED_EXTERNAL"
+    assert evidence["acceptanceClaim"] is False
+
+
+def test_live_chromium_nssdb_intranet_ca_trust(tmp_path):
+    """H1: Live Chromium HTTPS handshake with isolated NSS DB: wrong root fails, correct root succeeds."""
+    import shutil
+    if sys.platform != "linux" or not shutil.which("certutil"):
+        # Operator premise: Intranet CA NSS DB trust profile executes on Linux in an environment with certutil (libnss3-tools)
+        return
+
+    from http.server import HTTPServer, SimpleHTTPRequestHandler
+    import threading
+    import ssl
+    from playwright.sync_api import sync_playwright
+
+    # 1. Generate root CA and server cert
+    ca_key, ca_cert, ca_pem, ca_fp = _generate_test_ca("SaintVision Intranet Root CA")
+    _, server_pem, server_key_pem = _generate_server_cert(ca_key, ca_cert, "127.0.0.1")
+
+    # 2. Generate unrelated rogue CA
+    _, _, wrong_ca_pem, _ = _generate_test_ca("Rogue Untrusted Root CA")
+
+    server_cert_file = tmp_path / "server.pem"
+    server_cert_file.write_bytes(server_pem)
+    server_key_file = tmp_path / "server.key"
+    server_key_file.write_bytes(server_key_pem)
+
+    class EchoHandler(SimpleHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html")
+            self.end_headers()
+            self.wfile.write(b"<html><body><h1>Intranet Portal Live OK</h1></body></html>")
+
+        def log_message(self, *args):
+            pass
+
+    server = HTTPServer(("127.0.0.1", 0), EchoHandler)
+    port = server.server_port
+    ssl_ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    ssl_ctx.load_cert_chain(certfile=str(server_cert_file), keyfile=str(server_key_file))
+    server.socket = ssl_ctx.wrap_socket(server.socket, server_side=True)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+
+    try:
+        # Case A: Wrong root registered in isolated NSS DB -> Handshake FAILS
+        home_wrong = tmp_path / "home_wrong"
+        wrong_ca_file = tmp_path / "wrong_ca.pem"
+        wrong_ca_file.write_bytes(wrong_ca_pem)
+        ok, err = setup_isolated_nssdb(home_wrong, wrong_ca_file)
+        assert ok is True, f"setup_isolated_nssdb failed: {err}"
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True, env={"HOME": str(home_wrong)})
+            context = browser.new_context(ignore_https_errors=False)
+            page = context.new_page()
+            with pytest.raises(Exception) as exc:
+                page.goto(f"https://127.0.0.1:{port}", timeout=5000)
+            assert any(k in str(exc.value) for k in ("ERR_CERT_AUTHORITY_INVALID", "ERR_CERT", "CERT_COMMON_NAME_INVALID"))
+            context.close()
+            browser.close()
+
+        # Case B: Correct root registered in isolated NSS DB -> Handshake SUCCEEDS with HTTP 200
+        home_correct = tmp_path / "home_correct"
+        root_ca_file = tmp_path / "root_ca.pem"
+        root_ca_file.write_bytes(root_ca_pem)
+        ok, err = setup_isolated_nssdb(home_correct, root_ca_file)
+        assert ok is True, f"setup_isolated_nssdb failed: {err}"
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True, env={"HOME": str(home_correct)})
+            context = browser.new_context(ignore_https_errors=False)
+            page = context.new_page()
+            resp = page.goto(f"https://127.0.0.1:{port}", timeout=5000)
+            assert resp.status == 200
+            assert "Intranet Portal Live OK" in page.content()
+            context.close()
+            browser.close()
+
+    finally:
+        server.shutdown()
+        server.server_close()

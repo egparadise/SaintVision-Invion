@@ -35,6 +35,7 @@ import ipaddress
 import json
 import os
 import re
+import shutil
 import socket
 import ssl
 import subprocess
@@ -131,6 +132,135 @@ def validate_session_view(data: Any, now_ts: Optional[int] = None) -> bool:
     return True
 
 
+def is_canonical_token_endpoint(
+    url: str,
+    idp_scheme: str = "https",
+    idp_hostname: str = CANONICAL_IDP_HOST,
+    idp_port: int = 443,
+) -> bool:
+    try:
+        parsed = urlsplit(url)
+    except Exception:
+        return False
+    port = parsed.port or (443 if parsed.scheme == "https" else 80)
+    return (
+        parsed.scheme == idp_scheme
+        and parsed.hostname == idp_hostname
+        and port == idp_port
+        and parsed.path in ("/protocol/openid-connect/token", "/realms/saintvision/protocol/openid-connect/token")
+    )
+
+
+def is_canonical_session_endpoint(
+    url: str,
+    portal_scheme: str = "https",
+    portal_hostname: str = CANONICAL_PORTAL_HOST,
+    portal_port: int = 443,
+) -> bool:
+    try:
+        parsed = urlsplit(url)
+    except Exception:
+        return False
+    port = parsed.port or (443 if parsed.scheme == "https" else 80)
+    return (
+        parsed.scheme == portal_scheme
+        and parsed.hostname == portal_hostname
+        and port == portal_port
+        and parsed.path == "/v1/session"
+    )
+
+
+def check_supported_platform() -> Tuple[bool, Optional[str]]:
+    """Validates that the host execution platform supports Chromium NSS DB intranet CA isolation."""
+    if sys.platform != "linux":
+        return False, (
+            f"Live intranet CA trust isolation is only supported on Linux via isolated $HOME/.pki/nssdb; "
+            f"platform '{sys.platform}' is not supported for live acceptance runs"
+        )
+    return True, None
+
+
+def setup_isolated_nssdb(
+    isolated_home: Path,
+    ca_bundle_path: Optional[Path] = None,
+) -> Tuple[bool, Optional[str]]:
+    """Creates an isolated $HOME/.pki/nssdb and imports the intranet root CA with trust flags 'C,,'."""
+    nssdb_dir = isolated_home / ".pki" / "nssdb"
+    nssdb_dir.mkdir(parents=True, exist_ok=True)
+
+    certutil_bin = shutil.which("certutil")
+    if not certutil_bin:
+        return False, "certutil binary (libnss3-tools) not found on host"
+
+    if sys.platform != "linux":
+        return False, f"NSS certutil is only supported on Linux, not {sys.platform}"
+
+    try:
+        cert_db = nssdb_dir / "cert9.db"
+        if not cert_db.exists():
+            subprocess.run(
+                [certutil_bin, "-d", f"sql:{nssdb_dir}", "-N", "--empty-password"],
+                check=True,
+                capture_output=True,
+            )
+        if ca_bundle_path and ca_bundle_path.exists():
+            subprocess.run(
+                [
+                    certutil_bin,
+                    "-d",
+                    f"sql:{nssdb_dir}",
+                    "-A",
+                    "-t",
+                    "C,,",
+                    "-n",
+                    "SaintVision-Intranet-Root-CA",
+                    "-i",
+                    str(ca_bundle_path),
+                ],
+                check=True,
+                capture_output=True,
+            )
+        return True, None
+    except subprocess.CalledProcessError as e:
+        return False, f"NSS DB configuration failed: {e.stderr or e}"
+    except Exception as e:
+        return False, f"Failed to initialize isolated NSS DB: {e}"
+
+
+def configure_isolated_browser_profile(
+    profile_dir: Path,
+    ca_bundle_path: Optional[Path] = None,
+) -> Tuple[bool, Optional[str], Dict[str, Any]]:
+    """Configures an isolated Chromium profile directory with managed enterprise policy and isolated $HOME/.pki/nssdb."""
+    profile_dir.mkdir(parents=True, exist_ok=True)
+    isolated_home = profile_dir / "home"
+    isolated_home.mkdir(parents=True, exist_ok=True)
+
+    policy_configured = False
+    policy_dir = profile_dir / "policies" / "managed"
+    policy_dir.mkdir(parents=True, exist_ok=True)
+    policy_file = policy_dir / "saintvision_policy.json"
+    policy_data = {
+        "EnterpriseRootsEnabled": True,
+    }
+    policy_file.write_text(json.dumps(policy_data, indent=2), encoding="utf-8")
+    policy_configured = True
+
+    nss_configured = False
+    nss_err = None
+    if ca_bundle_path and ca_bundle_path.exists():
+        nss_configured, nss_err = setup_isolated_nssdb(isolated_home, ca_bundle_path)
+
+    profile_info = {
+        "profileDir": str(profile_dir),
+        "isolatedHome": str(isolated_home),
+        "policyConfigured": policy_configured,
+        "nssConfigured": nss_configured,
+        "isolated": True,
+    }
+    return True, nss_err, profile_info
+
+
 class SecurityCircumventionError(RuntimeError):
     """Raised when circumvention flags (--host-resolver-rules, ignoreHTTPSErrors) are attempted."""
     pass
@@ -221,10 +351,10 @@ def validate_canonical_origins(target_url: str, idp_url: str, live_mode: bool) -
         raise ValueError(f"Live target URL must use https scheme: {target_url}")
     if parsed_target.username or parsed_target.password:
         raise ValueError(f"Live target URL must not contain userinfo: {target_url}")
+    if is_ip_address(parsed_target.hostname or ""):
+        raise ValueError(f"Live target URL must be bound to {CANONICAL_PORTAL_HOST} (must not be a raw IP address): {target_url}")
     if parsed_target.hostname != CANONICAL_PORTAL_HOST:
         raise ValueError(f"Live target URL must be bound to {CANONICAL_PORTAL_HOST}: {target_url}")
-    if is_ip_address(parsed_target.hostname or ""):
-        raise ValueError(f"Live target URL must not be a raw IP address: {target_url}")
 
     # 2. IdP URL
     parsed_idp = urlsplit(idp_url)
@@ -232,10 +362,10 @@ def validate_canonical_origins(target_url: str, idp_url: str, live_mode: bool) -
         raise ValueError(f"Live IdP URL must use https scheme: {idp_url}")
     if parsed_idp.username or parsed_idp.password:
         raise ValueError(f"Live IdP URL must not contain userinfo: {idp_url}")
+    if is_ip_address(parsed_idp.hostname or ""):
+        raise ValueError(f"Live IdP URL must be bound to {CANONICAL_IDP_HOST} (must not be a raw IP address): {idp_url}")
     if parsed_idp.hostname != CANONICAL_IDP_HOST:
         raise ValueError(f"Live IdP URL must be bound to {CANONICAL_IDP_HOST}: {idp_url}")
-    if is_ip_address(parsed_idp.hostname or ""):
-        raise ValueError(f"Live IdP URL must not be a raw IP address: {idp_url}")
 
 
 class RedactionSanitizer:
@@ -651,6 +781,7 @@ class PortalLoginJourneyObserver:
         mock_mode: bool = False,
         timeout_sec: float = 10.0,
         extra_args: Optional[List[str]] = None,
+        user_data_dir: Optional[str] = None,
     ):
         self.target_url = target_url
         self.idp_url = idp_url
@@ -658,6 +789,7 @@ class PortalLoginJourneyObserver:
         self.mock_mode = mock_mode
         self.timeout_sec = timeout_sec
         self.extra_args = extra_args or []
+        self.user_data_dir = user_data_dir or str(REPO_ROOT / ".work" / "portal-browser-profile")
 
         # Read allowlist from args or environment variable
         env_allowed = os.environ.get("PORTAL_ALLOWED_ROOT_FINGERPRINTS", "")
@@ -830,6 +962,9 @@ class PortalLoginJourneyObserver:
             tls_validation_enforced=False,
             clean_worktree_verified=clean_worktree_verified,
             remote_containment_verified=remote_containment_verified,
+            trust_store_mode="SIMULATED",
+            user_data_dir_isolated=False,
+            ca_bundle_applied_to_browser=False,
         )
 
     def _execute_live_browser(
@@ -839,11 +974,65 @@ class PortalLoginJourneyObserver:
         clean_worktree_verified: bool = True,
         remote_containment_verified: bool = True,
     ) -> Dict[str, Any]:
-        from playwright.sync_api import sync_playwright
+        try:
+            from playwright.sync_api import sync_playwright
+        except ImportError:
+            sync_playwright = getattr(sys.modules.get("playwright.sync_api"), "sync_playwright", None)
+            if sync_playwright is None:
+                raise
 
         steps: List[StepResult] = []
         ca_digest: Optional[Dict[str, Any]] = None
         tls_validation_enforced = False
+        user_data_dir_isolated = True
+        ca_bundle_applied_to_browser = bool(self.ca_bundle)
+        trust_store_mode = "ISOLATED_PROFILE"
+
+        # 0. Platform check: Linux required for Chromium NSS DB profile isolation
+        supported, plat_err = check_supported_platform()
+        if not supported:
+            steps.append(
+                StepResult(
+                    id="portal_tls_reachability",
+                    name="Portal TLS Reachability & Certificate Check",
+                    status="BLOCKED_EXTERNAL",
+                    duration_ms=1.0,
+                    detail=f"External preflight blocked: {plat_err}",
+                    observations={"platform": sys.platform, "supported": False},
+                )
+            )
+            for sid, sname in STEP_METADATA[1:]:
+                steps.append(
+                    StepResult(
+                        id=sid,
+                        name=sname,
+                        status="NOT_OBSERVED",
+                        duration_ms=0.0,
+                        detail=f"Not observed: prerequisite step portal_tls_reachability blocked on unsupported platform ({sys.platform})",
+                    )
+                )
+            return self._build_evidence(
+                start_time=start_time,
+                code_sha=code_sha,
+                measurement_kind="LIVE_BROWSER",
+                reference_only=False,
+                acceptance_claim=False,
+                overall_status="BLOCKED_EXTERNAL",
+                blocking_reason=plat_err,
+                ca_digest=None,
+                steps=steps,
+                tls_validation_enforced=False,
+                clean_worktree_verified=clean_worktree_verified,
+                remote_containment_verified=remote_containment_verified,
+                trust_store_mode="ISOLATED_PROFILE",
+                user_data_dir_isolated=True,
+                ca_bundle_applied_to_browser=False,
+            )
+
+        profile_path = Path(self.user_data_dir).resolve()
+        ca_path = Path(self.ca_bundle).resolve() if self.ca_bundle else None
+        _, _, profile_info = configure_isolated_browser_profile(profile_path, ca_path)
+        isolated_home = profile_info["isolatedHome"]
 
         # --- Stage A: Preflight Checks ---
         # 1. DNS check (domain resolution)
@@ -880,6 +1069,11 @@ class PortalLoginJourneyObserver:
                 ca_digest=None,
                 steps=steps,
                 tls_validation_enforced=False,
+                clean_worktree_verified=clean_worktree_verified,
+                remote_containment_verified=remote_containment_verified,
+                trust_store_mode=trust_store_mode,
+                user_data_dir_isolated=user_data_dir_isolated,
+                ca_bundle_applied_to_browser=ca_bundle_applied_to_browser,
             )
 
         # 2. CA bundle existence & inspection
@@ -917,6 +1111,11 @@ class PortalLoginJourneyObserver:
                     ca_digest=None,
                     steps=steps,
                     tls_validation_enforced=False,
+                clean_worktree_verified=clean_worktree_verified,
+                remote_containment_verified=remote_containment_verified,
+                trust_store_mode=trust_store_mode,
+                user_data_dir_isolated=user_data_dir_isolated,
+                ca_bundle_applied_to_browser=ca_bundle_applied_to_browser,
                 )
 
             ca_ok, ca_err, ca_info = inspect_ca_bundle(ca_path, self.allowed_root_fingerprints)
@@ -951,6 +1150,11 @@ class PortalLoginJourneyObserver:
                     ca_digest=None,
                     steps=steps,
                     tls_validation_enforced=False,
+                clean_worktree_verified=clean_worktree_verified,
+                remote_containment_verified=remote_containment_verified,
+                trust_store_mode=trust_store_mode,
+                user_data_dir_isolated=user_data_dir_isolated,
+                ca_bundle_applied_to_browser=ca_bundle_applied_to_browser,
                 )
             ca_digest = ca_info
 
@@ -987,6 +1191,11 @@ class PortalLoginJourneyObserver:
                 ca_digest=ca_digest,
                 steps=steps,
                 tls_validation_enforced=False,
+                clean_worktree_verified=clean_worktree_verified,
+                remote_containment_verified=remote_containment_verified,
+                trust_store_mode=trust_store_mode,
+                user_data_dir_isolated=user_data_dir_isolated,
+                ca_bundle_applied_to_browser=ca_bundle_applied_to_browser,
             )
 
         # 4. Strict TLS handshake check with CA bundle
@@ -1028,11 +1237,20 @@ class PortalLoginJourneyObserver:
                     ca_digest=ca_digest,
                     steps=steps,
                     tls_validation_enforced=False,
+                clean_worktree_verified=clean_worktree_verified,
+                remote_containment_verified=remote_containment_verified,
+                trust_store_mode=trust_store_mode,
+                user_data_dir_isolated=user_data_dir_isolated,
+                ca_bundle_applied_to_browser=ca_bundle_applied_to_browser,
                 )
             tls_validation_enforced = True
 
         # --- Stage B: Live Browser Execution (Exact 5 Steps) ---
+        browser_env = dict(os.environ)
+        browser_env["HOME"] = isolated_home
+
         browser_args: List[str] = list(self.extra_args)
+        browser_args.append(f"--user-data-dir={profile_path}")
         check_circumvention_flags(browser_args)
         for arg in browser_args:
             if "ignore-cert" in arg.lower() or "ignore_cert" in arg.lower():
@@ -1041,7 +1259,7 @@ class PortalLoginJourneyObserver:
                 )
 
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True, args=browser_args)
+            browser = p.chromium.launch(headless=True, args=browser_args, env=browser_env)
             if self.IGNORE_HTTPS_ERRORS is not False:
                 raise SecurityCircumventionError("Circumvention prohibited: IGNORE_HTTPS_ERRORS must strictly be False")
             context = browser.new_context(
@@ -1070,22 +1288,22 @@ class PortalLoginJourneyObserver:
                 idp_port = self.idp_port or (443 if self.idp_scheme == "https" else 80)
 
                 # Token endpoint check: exact scheme, exact hostname, exact port, canonical path
-                is_token_endpoint = (
-                    parsed_resp.scheme == self.idp_scheme
-                    and parsed_resp.hostname == self.idp_hostname
-                    and resp_port == idp_port
-                    and parsed_resp.path in ("/protocol/openid-connect/token", "/realms/saintvision/protocol/openid-connect/token")
+                is_token_endpoint = is_canonical_token_endpoint(
+                    resp.url,
+                    idp_scheme=self.idp_scheme,
+                    idp_hostname=self.idp_hostname,
+                    idp_port=idp_port,
                 )
                 if is_token_endpoint:
                     network_events["token_endpoint_observed"] = True
                     network_events["token_http_status"] = resp.status
 
                 # Session endpoint check: exact scheme, exact hostname, exact port, canonical path
-                is_session_endpoint = (
-                    parsed_resp.scheme == self.scheme
-                    and parsed_resp.hostname == self.hostname
-                    and resp_port == target_port
-                    and parsed_resp.path == "/v1/session"
+                is_session_endpoint = is_canonical_session_endpoint(
+                    resp.url,
+                    portal_scheme=self.scheme,
+                    portal_hostname=self.hostname,
+                    portal_port=target_port,
                 )
                 if is_session_endpoint:
                     network_events["session_endpoint_observed"] = True
@@ -1129,7 +1347,13 @@ class PortalLoginJourneyObserver:
                         raise RuntimeError(f"Unexpected HTTP status {status_code}")
                 except Exception as e:
                     err_msg = str(e)
-                    s_status = "BLOCKED_EXTERNAL" if "ERR_NAME_NOT_RESOLVED" in err_msg else "FAIL"
+                    if "ERR_NAME_NOT_RESOLVED" in err_msg:
+                        s_status = "BLOCKED_EXTERNAL"
+                    elif any(k in err_msg for k in ("ERR_CERT_AUTHORITY_INVALID", "CERT_COMMON_NAME_INVALID", "ERR_CERT")):
+                        s_status = "FAIL"
+                        err_msg = f"Browser intranet TLS trust verification failed: {err_msg}"
+                    else:
+                        s_status = "FAIL"
                     steps.append(
                         StepResult(
                             id="portal_tls_reachability",
@@ -1160,6 +1384,11 @@ class PortalLoginJourneyObserver:
                         ca_digest=ca_digest,
                         steps=steps,
                         tls_validation_enforced=tls_validation_enforced,
+                clean_worktree_verified=clean_worktree_verified,
+                remote_containment_verified=remote_containment_verified,
+                trust_store_mode=trust_store_mode,
+                user_data_dir_isolated=user_data_dir_isolated,
+                ca_bundle_applied_to_browser=ca_bundle_applied_to_browser,
                     )
 
                 # Step 2: Login Initiation
@@ -1234,13 +1463,18 @@ class PortalLoginJourneyObserver:
                         ca_digest=ca_digest,
                         steps=steps,
                         tls_validation_enforced=tls_validation_enforced,
+                clean_worktree_verified=clean_worktree_verified,
+                remote_containment_verified=remote_containment_verified,
+                trust_store_mode=trust_store_mode,
+                user_data_dir_isolated=user_data_dir_isolated,
+                ca_bundle_applied_to_browser=ca_bundle_applied_to_browser,
                     )
 
                 # Step 3: Callback
                 t0 = time.perf_counter()
                 try:
                     page.wait_for_url(
-                        lambda u: "/callback" in u or "/studio" in u or u == self.target_url or u.startswith(self.target_url),
+                        lambda u: "/callback" in u and "code=" in u,
                         timeout=int(self.timeout_sec * 1000),
                     )
 
@@ -1301,6 +1535,11 @@ class PortalLoginJourneyObserver:
                         ca_digest=ca_digest,
                         steps=steps,
                         tls_validation_enforced=tls_validation_enforced,
+                clean_worktree_verified=clean_worktree_verified,
+                remote_containment_verified=remote_containment_verified,
+                trust_store_mode=trust_store_mode,
+                user_data_dir_isolated=user_data_dir_isolated,
+                ca_bundle_applied_to_browser=ca_bundle_applied_to_browser,
                     )
 
                 # Step 4: Identity & Session Display
@@ -1370,6 +1609,11 @@ class PortalLoginJourneyObserver:
                         ca_digest=ca_digest,
                         steps=steps,
                         tls_validation_enforced=tls_validation_enforced,
+                clean_worktree_verified=clean_worktree_verified,
+                remote_containment_verified=remote_containment_verified,
+                trust_store_mode=trust_store_mode,
+                user_data_dir_isolated=user_data_dir_isolated,
+                ca_bundle_applied_to_browser=ca_bundle_applied_to_browser,
                     )
 
                 # Step 5: Logout
@@ -1449,6 +1693,9 @@ class PortalLoginJourneyObserver:
                         tls_validation_enforced=tls_validation_enforced,
                         clean_worktree_verified=clean_worktree_verified,
                         remote_containment_verified=remote_containment_verified,
+            trust_store_mode=trust_store_mode,
+            user_data_dir_isolated=user_data_dir_isolated,
+            ca_bundle_applied_to_browser=ca_bundle_applied_to_browser,
                     )
 
             finally:
@@ -1478,6 +1725,9 @@ class PortalLoginJourneyObserver:
             tls_validation_enforced=tls_validation_enforced,
             clean_worktree_verified=clean_worktree_verified,
             remote_containment_verified=remote_containment_verified,
+            trust_store_mode=trust_store_mode,
+            user_data_dir_isolated=user_data_dir_isolated,
+            ca_bundle_applied_to_browser=ca_bundle_applied_to_browser,
         )
 
     def _build_evidence(
@@ -1494,6 +1744,9 @@ class PortalLoginJourneyObserver:
         tls_validation_enforced: bool,
         clean_worktree_verified: bool = False,
         remote_containment_verified: bool = False,
+        trust_store_mode: str = "ISOLATED_PROFILE",
+        user_data_dir_isolated: bool = False,
+        ca_bundle_applied_to_browser: bool = False,
     ) -> Dict[str, Any]:
         raw_steps = [s.to_dict() for s in steps]
 
@@ -1524,6 +1777,9 @@ class PortalLoginJourneyObserver:
                 "tlsValidationEnforced": tls_validation_enforced,
                 "cleanWorktreeVerified": clean_worktree_verified,
                 "remoteContainmentVerified": remote_containment_verified,
+                "trustStoreMode": trust_store_mode,
+                "userDataDirIsolated": user_data_dir_isolated,
+                "caBundleAppliedToBrowser": ca_bundle_applied_to_browser,
             },
         }
 
@@ -1543,6 +1799,8 @@ class PortalLoginJourneyObserver:
 
 
 def compute_overall_status(steps: List[StepResult]) -> str:
+    if not steps:
+        return "FAIL"
     statuses = [s.status for s in steps]
     if any(s == "FAIL" for s in statuses):
         return "FAIL"
@@ -1613,6 +1871,18 @@ def validate_evidence(evidence: Dict[str, Any]) -> None:
             raise jsonschema.ValidationError(
                 "Contradiction: acceptanceClaim requires audit.remoteContainmentVerified == True"
             )
+        if evidence.get("audit", {}).get("userDataDirIsolated") is not True:
+            raise jsonschema.ValidationError(
+                "Contradiction: acceptanceClaim requires audit.userDataDirIsolated == True"
+            )
+        if evidence.get("audit", {}).get("caBundleAppliedToBrowser") is not True:
+            raise jsonschema.ValidationError(
+                "Contradiction: acceptanceClaim requires audit.caBundleAppliedToBrowser == True"
+            )
+        if evidence.get("audit", {}).get("trustStoreMode") not in ("ISOLATED_PROFILE", "SYSTEM_OPERATOR_STORE"):
+            raise jsonschema.ValidationError(
+                "Contradiction: acceptanceClaim requires audit.trustStoreMode to be ISOLATED_PROFILE or SYSTEM_OPERATOR_STORE"
+            )
         ca_d = evidence.get("caDigest")
         if not ca_d or not ca_d.get("fingerprintVerified"):
             raise jsonschema.ValidationError(
@@ -1664,6 +1934,7 @@ def main() -> int:
         default=None,
         help="Allowed root CA SHA-256 fingerprints",
     )
+    parser.add_argument("--user-data-dir", default=None, help="Isolated Chromium user data directory")
     parser.add_argument("--output-evidence", default=None, help="Output evidence JSON path")
     parser.add_argument("--mock-mode", action="store_true", help="Run in mock/simulation mode for local validation")
     parser.add_argument("--timeout", type=float, default=10.0, help="Per-step timeout in seconds")
@@ -1686,6 +1957,7 @@ def main() -> int:
             mock_mode=args.mock_mode,
             timeout_sec=args.timeout,
             extra_args=unknown,
+            user_data_dir=args.user_data_dir,
         )
     except ValueError as e:
         print(f"[CONFIGURATION ERROR] {e}", file=sys.stderr)

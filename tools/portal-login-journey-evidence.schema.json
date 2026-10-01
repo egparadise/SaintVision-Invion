@@ -223,7 +223,10 @@
         "circumventionFlagsDetected",
         "tlsValidationEnforced",
         "cleanWorktreeVerified",
-        "remoteContainmentVerified"
+        "remoteContainmentVerified",
+        "trustStoreMode",
+        "userDataDirIsolated",
+        "caBundleAppliedToBrowser"
       ],
       "properties": {
         "redacted": {
@@ -275,6 +278,20 @@
           "type": "boolean"
         },
         "remoteContainmentVerified": {
+          "type": "boolean"
+        },
+        "trustStoreMode": {
+          "type": "string",
+          "enum": [
+            "ISOLATED_PROFILE",
+            "SYSTEM_OPERATOR_STORE",
+            "SIMULATED"
+          ]
+        },
+        "userDataDirIsolated": {
+          "type": "boolean"
+        },
+        "caBundleAppliedToBrowser": {
           "type": "boolean"
         }
       }
