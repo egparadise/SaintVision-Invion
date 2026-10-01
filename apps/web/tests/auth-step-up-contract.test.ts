@@ -337,6 +337,36 @@ describe('Card 192 / S12-BE Handoff: Portal OIDC Step-Up Re-Authentication Flow'
 
       clearAuthToken();
     });
+
+    it.each([
+      ['문자열 "false"', 'false'],
+      ['문자열 "true"', 'true'],
+      ['문자열 "1"', '1'],
+      ['숫자 1', 1],
+      ['숫자 0', 0],
+      ['빈 객체 {}', {}],
+      ['빈 배열 []', []],
+    ])('isStepUp marker가 비-boolean 값 (%s)으로 변조되면 completeLogin()은 토큰 엔드포인트 호출 전에 즉시 거부한다 (M3 사살)', async (_, invalidMarker) => {
+      const url = new URL(await beginLogin());
+      const tx = JSON.parse(storage.get(STORAGE_KEY)!);
+      location.pathname = '/callback';
+      location.search = `?code=auth_code_sample&state=${tx.state}`;
+
+      // Mutate stored transaction's marker to non-boolean value
+      tx.isStepUp = invalidMarker;
+      storage.set(STORAGE_KEY, JSON.stringify(tx));
+
+      setAuthToken('pre-existing-bearer-token');
+
+      await expect(completeLogin()).rejects.toThrow('로그인 요청 검증에 실패했습니다. 다시 로그인하세요.');
+
+      // Invariants: 0 token endpoint calls, 0 /v1/session calls, active token preserved
+      expect(mockFetch, 'Must NOT invoke token endpoint or /v1/session under non-boolean marker (M3 kill)').not.toHaveBeenCalled();
+      expect(getAuthToken(), 'Active token must remain unchanged').toBe('pre-existing-bearer-token');
+      expect(storage.size, 'Storage transaction must be cleared on consumption').toBe(0);
+
+      clearAuthToken();
+    });
   });
 
   // 6. F-R1: ID Token Signature Verification via JWKS

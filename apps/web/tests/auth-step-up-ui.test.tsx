@@ -182,10 +182,11 @@ describe('Card 192 / S12-FE: Portal Step-Up Re-Authentication UI Entry Point', (
 
     await act(async () => {
       stepUpBtn.click();
-      await new Promise((r) => setTimeout(r, 50));
     });
 
-    expect(assignMock).toHaveBeenCalledTimes(1);
+    await vi.waitFor(() => {
+      expect(assignMock).toHaveBeenCalledTimes(1);
+    });
     const assignedUrl = new URL(assignMock.mock.calls[0][0]);
     expect(assignedUrl.origin + assignedUrl.pathname).toBe('https://idp.saintvision.lan:8443/realms/saintvision/protocol/openid-connect/auth');
     expect(assignedUrl.searchParams.get('prompt')).toBe('login');
@@ -215,10 +216,11 @@ describe('Card 192 / S12-FE: Portal Step-Up Re-Authentication UI Entry Point', (
 
     await act(async () => {
       stepUpBtn.click();
-      await new Promise((r) => setTimeout(r, 50));
     });
 
-    expect(container.textContent).toContain('🛑 재인증 요청 실패: OIDC Discovery failed');
+    await vi.waitFor(() => {
+      expect(container.textContent).toContain('🛑 재인증 요청 실패: OIDC Discovery failed');
+    });
   });
 
   it('strictly prohibits write UI: zero acceptance submit forms or mutation endpoints', async () => {

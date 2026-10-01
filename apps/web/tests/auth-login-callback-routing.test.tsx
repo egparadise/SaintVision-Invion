@@ -190,12 +190,54 @@ describe('Card 192 / U3: Login Component Callback Routing and Failure Handling I
     await act(async () => {
       root.render(<Login onLoginSuccess={vi.fn()} />);
     });
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 50));
+    await vi.waitFor(() => {
+      expect(completeLoginSpy).toHaveBeenCalledTimes(1);
     });
 
     // completeStepUp must NOT be selected for truthy string marker "false"
     expect(completeStepUpSpy, 'Must NEVER select completeStepUp for non-boolean marker').not.toHaveBeenCalled();
     expect(completeLoginSpy, 'Must fallback to completeLogin for non-boolean marker').toHaveBeenCalledTimes(1);
+  });
+
+  it('V1 Mutation Guard: End-to-end Login callback with non-boolean marker executes real completeLogin(), rejects before network calls, and clears active token', async () => {
+    const fetchSpy = vi.fn();
+    vi.stubGlobal('fetch', fetchSpy);
+
+    const cfg = sessionModule.authConfig();
+    const storageMap = new Map<string, string>();
+    storageMap.set(sessionModule.STORAGE_KEY, JSON.stringify({
+      isStepUp: 'false', // String non-boolean marker
+      state: 'mock_state',
+      verifier: 'mock_verifier_abcdefghijklmnopqrstuvwxyz0123456789',
+      createdAt: Date.now(),
+      redirectUri: 'https://portal.saintvision.lan/callback',
+      config: cfg,
+    }));
+
+    vi.stubGlobal('sessionStorage', {
+      getItem: (k: string) => storageMap.get(k) ?? null,
+      setItem: (k: string, v: string) => storageMap.set(k, v),
+      removeItem: (k: string) => storageMap.delete(k),
+    });
+
+    setAuthToken('pre-existing-bearer-token');
+    expect(getAuthToken()).toBe('pre-existing-bearer-token');
+
+    const onLoginSuccessSpy = vi.fn();
+
+    // Do NOT mock completeLogin or completeStepUp - run real implementation
+    await act(async () => {
+      root.render(<Login onLoginSuccess={onLoginSuccessSpy} />);
+    });
+
+    await vi.waitFor(() => {
+      expect(container.textContent).toContain('로그인 요청 검증에 실패했습니다. 다시 로그인하세요.');
+    });
+
+    // Invariants: 0 network calls, active token cleared by Login catch block, onLoginSuccess not called
+    expect(fetchSpy, 'Must NEVER call network endpoints when non-boolean marker is rejected').not.toHaveBeenCalled();
+    expect(getAuthToken(), 'Active token must be cleared by Login failure handler').toBeNull();
+    expect(onLoginSuccessSpy).not.toHaveBeenCalled();
+    expect(storageMap.size).toBe(0);
   });
 });

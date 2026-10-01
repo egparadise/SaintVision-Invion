@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.173"
+version: "1.0.174"
 status: "proposed"
 author: "Gemini"
-updated: "2026-10-02T00:20:00+09:00"
+updated: "2026-10-02T00:35:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,6 +19,7 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
+- 확인 기준: 2026-10-02T00:35:00+09:00 (Card 192 S12-FE portal step-up 재로그인 진입점 r3 조치: Claude UI r3 조건 V1 해소 — completeLogin()의 비-boolean marker("false", "true", "1", 1, 0, {}, []) 거부 경로 시험을 auth-step-up-contract.test.ts it.each에 추가하여 M3 변이 100% 사살 실측, auth-login-callback-routing.test.tsx에 실제 completeLogin() 구동 및 비-boolean 마커 거부·네트워크 호출 0회·활성 토큰 파기 단언 E2E 시험 추가로 M3 사살, auth-step-up-ui.test.tsx 임의 setTimeout(50)을 vi.waitFor() 조건부 대기로 전면 교체하여 V2 해소, 서명 결정성 8회 연속 PASS, Vitest 3개 스위트 59 passed, tsc 0 error, build 성공, route coverage 41 passed, frontend integrity 0 violation).
 - 확인 기준: 2026-10-02T00:20:00+09:00 (Card 192 S12-FE portal step-up 재로그인 진입점 r2 조치: Codex 보안 차단 1 & 2 및 Claude UI U1~U5 전수 조치, isStepUpPending() 및 completeStepUp() 엄격 boolean 마커(tx.isStepUp === true) 강제 및 비-boolean 마커 7종("false", "true", "1", 1, 0, {}, []) 토큰 엔드포인트 0회·/v1/session 0회·활성 토큰 불변 단언, auth-step-up-ui.test.tsx 전역 스텁 격리 및 비동기 클릭 핸들러 대기로 hosted frontend green 확보(U1 완전 해소), 서명 컴포넌트 중앙 유효 비트 결정적 변조(U2 10/10 PASS), Login.tsx 콜백 라우팅 및 실패 경로 테스트 신설(U3 L1/L2 변이 100% 사살), r1 History 대조표 및 원본 문서 정정(U4), Vitest 3개 스위트 51 passed, tsc 0 error, build 성공, route coverage 41 passed, frontend integrity 0 violation).
 - 확인 기준: 2026-10-01T23:45:00+09:00 (Card 192 S12-FE portal step-up 재로그인 진입점 r1 조치 완료: Codex 보안(F-R1~F-R4) 및 Claude UI(S1~S6) 10건 피드백 전수 조치, Train 10 후보 c41fe2da 머지 b6b69648 완료, Web Crypto RS256/ES256 JWKS 서명 검증 및 위조/unknown kid/alg 완화 거부, Web Storage 토큰 0건 불변식 강제(Codex 결정 b), sanitizeReturnUrl 6종 검증, 토큰 교환 전 step-up 트랜잭션 식별 및 교차 호출 차단, openid 스코프 필수화, 조기 setAuthToken 제거 및 caller commitSession 원자적 반영, CSS 미정의 토큰 var(--color-status-unknown) 정비 및 borderSubtleCount 141 래칫 불변식 준수, 9종 변이 100% 사살 실측, Vitest 5개 스위트 119 passed, tsc 0 error, build 성공, route coverage 41 passed, frontend integrity 0 violation).
 - 확인 기준: 2026-10-01T22:45:00+09:00 (Card 192 S12-FE portal step-up 재로그인 진입점 및 OIDC PKCE 인증 흐름 결속 완료: Codex #285 인계 완결, FreshAuthenticationStepUpRequest 계약 동기화, exact prompt=login&max_age=300 인가 엔드포인트 파라미터 결속, 암호학적 verifier/state/nonce 신규 생성, completeLogin 실패 시 rollbackPreviousToken으로 이전 토큰 무파괴 보존, IntranetDeploymentView step-up 안내 및 로그인 유도 버튼 결속, 쓰기 UI 0건, Vitest 단위 시험 27 passed, tsc 0 error, build 성공, route coverage 41 passed, frontend integrity 0 violation, BLOCKED_EXTERNAL 경계 명시).
@@ -63,7 +64,7 @@ source_of_truth: "Git"
   - 문서 경로 인용 래칫: `python tools/check_doc_path_citations.py --ratchet --base-ref c41fe2da` PASS (exit 0)
   - Git 공백 검사: `git diff --check` 클린 (exit 0)
   - 봇 호출 태그 점검: 0건 준수
-- **전문 문서**: [[2026-10-02_00-20-00_KST_Card192_portal_step_up_r2_Gemini]], [[2026-10-01_23-45-00_KST_Card192_portal_step_up_r1_Gemini]], [[2026-10-01_22-45-00_KST_Card192_portal_step_up_Gemini]]
+- **전문 문서**: [[2026-10-02_00-35-00_KST_Card192_portal_step_up_r3_Gemini]], [[2026-10-02_00-20-00_KST_Card192_portal_step_up_r2_Gemini]], [[2026-10-01_23-45-00_KST_Card192_portal_step_up_r1_Gemini]], [[2026-10-01_22-45-00_KST_Card192_portal_step_up_Gemini]]
 
 
 ## 2026-10-01 S12-FE 릴리스 선언서(Release Manifest) 및 운영자 인수 서버 경로 결속 (Card 183 2단계, `agent/gemini/c183-s12fe-release-binding`, base `79fcb772` PR #280)
