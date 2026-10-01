@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.258"
+version: "1.0.260"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T23:50:30+09:00"
+updated: "2026-10-02T01:26:38+09:00"
 source_of_truth: "Git"
 active_card: "CARD-194 S12 acceptance target/Evidence canonical resolver implementation"
-active_card_status: "0058 digest/binding, exact resolver and discovery implemented on #286 0057; hosted real-PG and Claude review pending"
-active_card_next: "Push stacked PR against #286, run exact-head Core, then address Claude independent review without enabling acceptance writes"
+active_card_status: "Claude r2 code approval; #286 37db674f merged, combined-suite invariant fixes ed46b2b9 pushed"
+active_card_next: "Require final exact-head Core green and record it in PR #291; keep acceptance writes disabled"
 ---
 
 ## 2026-10-01 Card 194 — S12 acceptance target·Evidence resolver 구현
@@ -28,6 +28,14 @@ active_card_next: "Push stacked PR against #286, run exact-head Core, then addre
   실행 전에는 migration·trigger·RLS 결과를 `NOT_OBSERVED`로 유지한다.
 - 첫 hosted Core run `36879319911`은 0058 뒤에도 definer policy revision이 0057이어서 migration upgrade
   gate가 fail closed했다. function allowlist는 유지하고 revision을 0058로 동기화했으며 재실행 대기 중이다.
+- Claude r1의 3개 결함과 Low 회귀를 `e0505648`·`be1bb8d7`에서 닫았고 r2는 코드·시험을 조건부
+  승인했다. 이후 기존 resume probe의 head/pin·공유 DB 오염을 `93a42a26`·`09fd39a3`에서 교정했다.
+- #286 최신 `37db674f`는 merge `f2b589d1`으로 따라갔다. 0057 manifest·policy pin trigger와 0058
+  target-registry pin trigger는 독립이며 API 충돌은 resolver와 denial audit를 모두 보존했다.
+- `596def53` Backend 3.12는 7018 passed·51 skipped 뒤 결합 시험 2건이 실패했다. 승인된 #286의
+  커밋형 409 감사 예외를 기존 전역 금지 시험이 몰랐고, 0054 downgrade 시험이 현재 0058 head 대신
+  과거 revision을 전제했다. `ed46b2b9`에서 예외를 정확히 1곳으로 고정하고 downgrade 실패 뒤 현재
+  head 보존을 단언했다. 최종 exact-head green 전에는 hosted real-PG를 `NOT_OBSERVED`로 유지한다.
 - 근거: [[S12-BE_release_acceptance_target_Evidence_resolver_설계]],
   [[2026-10-01_23-43-41_KST_Card194_S12-BE_target_Evidence_resolver_구현_Codex]].
 
