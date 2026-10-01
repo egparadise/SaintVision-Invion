@@ -4,11 +4,11 @@ title: "Codex 작업 현황"
 version: "1.0.260"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T01:26:38+09:00"
+updated: "2026-10-02T04:12:15+09:00"
 source_of_truth: "Git"
-active_card: "CARD-194 S12 acceptance target/Evidence canonical resolver implementation"
-active_card_status: "Claude r2 code approval; #286 37db674f merged, combined-suite invariant fixes ed46b2b9 pushed"
-active_card_next: "Require final exact-head Core green and record it in PR #291; keep acceptance writes disabled"
+active_card: "CARD-200 S08-BE concrete rootless BuildKit transport stage 1"
+active_card_status: "Hosted ci-reference OCI roundtrip MEASURED_PASS at run 36912381153; product dispatch remains disabled"
+active_card_next: "Claude r2 review; later bind operational builder, cleanup, lease release, and durable Evidence"
 ---
 
 ## 2026-10-01 Card 194 — S12 acceptance target·Evidence resolver 구현
@@ -38,6 +38,16 @@ active_card_next: "Require final exact-head Core green and record it in PR #291;
   head 보존을 단언했다. 최종 exact-head green 전에는 hosted real-PG를 `NOT_OBSERVED`로 유지한다.
 - 근거: [[S12-BE_release_acceptance_target_Evidence_resolver_설계]],
   [[2026-10-01_23-43-41_KST_Card194_S12-BE_target_Evidence_resolver_구현_Codex]].
+## 2026-10-02 Card 200 — S08-BE concrete rootless BuildKit transport Stage 1
+
+- base `25f43a25` 위에서 disabled-by-default concrete transport, strict health/worker 측정,
+  fail-closed product methods, opt-in hosted lane을 구현했다.
+- hosted run `36912381153`은 exact code `c4130ae4`, BuildKit v0.20.2·RootlessKit v2.3.4에서
+  OCI reference 왕복 1/1을 통과했다. 실제 daemon PID/UID/userns와 Docker privilege 경계,
+  pulled image digest를 측정·대조했다.
+- 결과는 `ci-reference`이며 제품 caller·cleanup·lease release·Evidence persistence는 미결속,
+  LAN builder는 `BLOCKED_EXTERNAL`, S08-BE 상태·점수는 유지한다.
+- [[2026-10-02_04-12-15_KST_S08-BE_rootless_BuildKit_transport_Codex]] · PR #297.
 
 ## 2026-10-01 Card 190 — S12 수락 target·Evidence 정본 resolver 계약
 
