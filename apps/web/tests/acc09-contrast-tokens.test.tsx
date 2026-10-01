@@ -58,6 +58,41 @@ function helperExtractVar(val: string): string {
   return m[1];
 }
 
+function parseRgba(str: string): { rgb: [number, number, number]; a: number } | null {
+  const m = str.trim().match(/^rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([\d.]+)\s*\)$/i);
+  if (!m) return null;
+  return {
+    rgb: [parseInt(m[1], 10), parseInt(m[2], 10), parseInt(m[3], 10)],
+    a: parseFloat(m[4]),
+  };
+}
+
+function resolveDomColor(domValue: string, underlayHex: string, tokens: Record<string, string>): string {
+  const trimmed = domValue.trim();
+  if (trimmed.startsWith('var(')) {
+    const varName = helperExtractVar(trimmed);
+    const hex = tokens[varName];
+    if (!hex) throw new Error(`Token ${varName} not found in theme tokens`);
+    return hex;
+  }
+  const rgba = parseRgba(trimmed);
+  if (rgba) {
+    return blendRgba(rgba.rgb, rgba.a, underlayHex);
+  }
+  const rgbMatch = trimmed.match(/^rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i);
+  if (rgbMatch) {
+    const r = parseInt(rgbMatch[1], 10);
+    const g = parseInt(rgbMatch[2], 10);
+    const b = parseInt(rgbMatch[3], 10);
+    const toHex = (n: number) => n.toString(16).padStart(2, '0');
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+  }
+  if (trimmed.startsWith('#')) {
+    return trimmed;
+  }
+  throw new Error(`Unsupported DOM color format: "${domValue}"`);
+}
+
 function extractTokens(block: string): Record<string, string> {
   const cleanBlock = block.replace(/\/\*[\s\S]*?\*\//g, '');
   const tokens: Record<string, string> = {};
@@ -762,26 +797,28 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       // Observation callout border, background, and text
       const callout = container.querySelector('[data-testid="node-detail-observation-callout"]') as HTMLElement;
       expect(callout, 'NodeDetail observation callout must render').not.toBeNull();
-      expect(callout.style.backgroundColor, 'Observation callout background must bind to alpha tint').toBe('rgba(210, 153, 34, 0.12)');
       expect(callout.style.borderColor, 'Observation callout border must bind to var(--color-status-unknown)').toBe('var(--color-status-unknown)');
       expect(callout.style.color, 'Observation callout text color must bind to var(--color-status-unknown)').toBe('var(--color-status-unknown)');
       const calloutBorderVar = helperExtractVar(callout.style.borderColor);
       const calloutTextVar = helperExtractVar(callout.style.color);
-      if (callout.style.backgroundColor.startsWith('var(')) {
-        const calloutBgToken = helperExtractVar(callout.style.backgroundColor);
-        expect(calloutBgToken, 'Callout background token must not equal foreground token (kills B1)').not.toBe(calloutTextVar);
-      }
-      const calloutBgLight = blendRgba([210, 153, 34], 0.12, lightTokens['--color-bg-canvas']);
-      const calloutBgDark = blendRgba([210, 153, 34], 0.12, darkTokens['--color-bg-canvas']);
+
+      // DOM extraction for background and dynamic blending over canvas (kills B1 1:1 mutation)
+      const calloutBgLight = resolveDomColor(callout.style.backgroundColor, lightTokens['--color-bg-canvas'], lightTokens);
+      const calloutBgDark = resolveDomColor(callout.style.backgroundColor, darkTokens['--color-bg-canvas'], darkTokens);
       expect(getContrast(lightTokens[calloutBorderVar], calloutBgLight), 'Callout border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
       expect(getContrast(lightTokens[calloutTextVar], calloutBgLight), 'Callout text light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
       expect(getContrast(darkTokens[calloutBorderVar], calloutBgDark), 'Callout border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
       expect(getContrast(darkTokens[calloutTextVar], calloutBgDark), 'Callout text dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
 
+      // Strict alpha and RGB tint checks (kills alpha mutation)
+      const calloutRgba = parseRgba(callout.style.backgroundColor);
+      expect(calloutRgba, 'Callout background must be rgba alpha tint').not.toBeNull();
+      expect(calloutRgba?.a, 'Callout alpha tint must be exactly 0.12').toBe(0.12);
+      expect(calloutRgba?.rgb, 'Callout tint RGB must match amber [210, 153, 34]').toEqual([210, 153, 34]);
+
       // Schedulable card when observationOnly
       const schedBox = container.querySelector('[data-testid="node-detail-schedulable-box"]') as HTMLElement;
       expect(schedBox, 'Schedulable box must render').not.toBeNull();
-      expect(schedBox.style.backgroundColor, 'Schedulable obs box background must match alpha tint').toBe('rgba(210, 153, 34, 0.15)');
       expect(schedBox.style.borderColor, 'Schedulable box border must bind to var(--color-status-unknown)').toBe('var(--color-status-unknown)');
       const schedLabel = container.querySelector('[data-testid="node-detail-schedulable-label"]') as HTMLElement;
       expect(schedLabel.style.color, 'Schedulable label color must bind to var(--color-status-unknown)').toBe('var(--color-status-unknown)');
@@ -790,14 +827,21 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       const schedBorderVar = helperExtractVar(schedBox.style.borderColor);
       const schedLabelVar = helperExtractVar(schedLabel.style.color);
       const schedValueVar = helperExtractVar(schedValue.style.color);
-      const schedObsBgLight = blendRgba([210, 153, 34], 0.15, lightTokens['--color-bg-surface']);
-      const schedObsBgDark = blendRgba([210, 153, 34], 0.15, darkTokens['--color-bg-surface']);
+
+      // DOM extraction for background and dynamic blending over surface
+      const schedObsBgLight = resolveDomColor(schedBox.style.backgroundColor, lightTokens['--color-bg-surface'], lightTokens);
+      const schedObsBgDark = resolveDomColor(schedBox.style.backgroundColor, darkTokens['--color-bg-surface'], darkTokens);
       expect(getContrast(lightTokens[schedBorderVar], schedObsBgLight), 'Schedulable obs border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
       expect(getContrast(lightTokens[schedLabelVar], schedObsBgLight), 'Schedulable obs label light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
       expect(getContrast(lightTokens[schedValueVar], schedObsBgLight), 'Schedulable obs value light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
       expect(getContrast(darkTokens[schedBorderVar], schedObsBgDark), 'Schedulable obs border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
       expect(getContrast(darkTokens[schedLabelVar], schedObsBgDark), 'Schedulable obs label dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
       expect(getContrast(darkTokens[schedValueVar], schedObsBgDark), 'Schedulable obs value dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      const schedObsRgba = parseRgba(schedBox.style.backgroundColor);
+      expect(schedObsRgba, 'Schedulable obs background must be rgba alpha tint').not.toBeNull();
+      expect(schedObsRgba?.a, 'Schedulable obs alpha tint must be exactly 0.15').toBe(0.15);
+      expect(schedObsRgba?.rgb, 'Schedulable obs tint RGB must match amber [210, 153, 34]').toEqual([210, 153, 34]);
 
       // Timeline status for active node
       const timelineActive = container.querySelector('[data-testid="node-detail-timeline-status"]') as HTMLElement;
@@ -827,21 +871,23 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
 
       const errAlert = container.querySelector('[data-testid="node-resource-usage-error"]') as HTMLElement;
       expect(errAlert, 'Resource usage error alert must render').not.toBeNull();
-      expect(errAlert.style.backgroundColor, 'Error alert background must bind to alpha tint').toBe('rgba(248, 81, 73, 0.1)');
       expect(errAlert.style.borderColor, 'Error alert border must bind to var(--color-status-lost)').toBe('var(--color-status-lost)');
       expect(errAlert.style.color, 'Error alert text color must bind to var(--color-status-lost)').toBe('var(--color-status-lost)');
       const errBorderVar = helperExtractVar(errAlert.style.borderColor);
       const errTextVar = helperExtractVar(errAlert.style.color);
-      if (errAlert.style.backgroundColor.startsWith('var(')) {
-        const errBgToken = helperExtractVar(errAlert.style.backgroundColor);
-        expect(errBgToken, 'Error alert background token must not equal foreground token').not.toBe(errTextVar);
-      }
-      const errBgLight = blendRgba([248, 81, 73], 0.1, lightTokens['--color-bg-canvas']);
-      const errBgDark = blendRgba([248, 81, 73], 0.1, darkTokens['--color-bg-canvas']);
+
+      // DOM extraction for background and dynamic blending over canvas
+      const errBgLight = resolveDomColor(errAlert.style.backgroundColor, lightTokens['--color-bg-canvas'], lightTokens);
+      const errBgDark = resolveDomColor(errAlert.style.backgroundColor, darkTokens['--color-bg-canvas'], darkTokens);
       expect(getContrast(lightTokens[errBorderVar], errBgLight), 'Error border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
       expect(getContrast(lightTokens[errTextVar], errBgLight), 'Error text light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
       expect(getContrast(darkTokens[errBorderVar], errBgDark), 'Error border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
       expect(getContrast(darkTokens[errTextVar], errBgDark), 'Error text dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      const errRgba = parseRgba(errAlert.style.backgroundColor);
+      expect(errRgba, 'Error alert background must be rgba alpha tint').not.toBeNull();
+      expect(errRgba?.a, 'Error alert alpha tint must be exactly 0.1').toBe(0.1);
+      expect(errRgba?.rgb, 'Error alert tint RGB must match red [248, 81, 73]').toEqual([248, 81, 73]);
 
       // Timeline status for lost node
       const timelineLost = container.querySelector('[data-testid="node-detail-timeline-status"]') as HTMLElement;
@@ -1006,6 +1052,23 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     const probe14Cr = getContrast(defectiveCardBorder, lightTokens['--color-bg-surface']);
     expect(probe14Cr, 'Defective card border #f59e0b on light surface must fail 3.0:1 UI boundary').toBeLessThan(3.0);
     expect(probe14Cr).toBeCloseTo(2.15, 1);
+
+    // Probe 15 [Codex r1]: Observation callout background replaced with var(--color-status-unknown) (1:1 fg/bg)
+    const probe15CalloutBg = lightTokens['--color-status-unknown'];
+    const probe15Fg = lightTokens['--color-status-unknown'];
+    expect(getContrast(probe15Fg, probe15CalloutBg), '1:1 callout foreground/background must fail 4.5:1').toBe(1.0);
+
+    // Probe 16 [Codex r1]: Observation callout alpha mutated to 0.8 on dark canvas
+    const probe16CalloutBg = blendRgba([210, 153, 34], 0.8, darkTokens['--color-bg-canvas']);
+    const probe16Fg = darkTokens['--color-status-unknown'];
+    expect(getContrast(probe16Fg, probe16CalloutBg), '0.8 alpha callout on dark canvas must fail 4.5:1').toBeLessThan(4.5);
+
+    // Probe 17 [Codex r1]: Defective schedulable non-obs box former #3fb950 on 15% green tint over light subtle
+    const defectiveGreenTint = blendRgba([46, 160, 67], 0.15, lightTokens['--color-bg-subtle']);
+    expect(getContrast('#3fb950', defectiveGreenTint), 'Defective #3fb950 on green tint must fail 4.5:1').toBeLessThan(4.5);
+
+    // Probe 18 [Codex r1]: Timeline degraded status former #d29922 (2.52:1 on light surface)
+    expect(getContrast('#d29922', lightTokens['--color-bg-surface']), 'Defective #d29922 on light surface must fail 4.5:1').toBeLessThan(4.5);
 
     // Legacy Token Reverts:
     // Legacy Dark --color-border-subtle: #374151

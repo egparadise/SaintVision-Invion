@@ -4,7 +4,7 @@ title: "Gemini 작업 현황"
 version: "1.0.170"
 status: "proposed"
 author: "Gemini"
-updated: "2026-10-01T22:05:00+09:00"
+updated: "2026-10-01T22:15:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,7 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-10-01T22:05:00+09:00 (Card 189 NodeList 및 NodeDetail 잔여 저대비 리터럴 토큰화 Claude UI r1 보강: base ec75b4f0 위 작업, NodeList 및 NodeDetail 저대비 리터럴 14건 순수 제거, 렌더링 DOM 실제 배경(subtle/surface/canvas) 동적 대비 단언으로 배경 바꿔치기 변이 B1 사살, 예약가능 박스 비관측 분기 토큰화, 타임라인 degraded 상태 분리 및 변이 B4 사살, 11종 변이 100% 사살 실측, 잔여 9건 명시적 백로그 목록화, Vitest 12 passed, tsc 0 error, build 성공, route coverage 40 passed, 9대 무결성 0 위반).
+- 확인 기준: 2026-10-01T22:15:00+09:00 (Card 189 NodeList 및 NodeDetail 잔여 저대비 리터럴 토큰화 Claude UI r1 및 Codex r1 조치: base ec75b4f0 위 작업, DOM style.backgroundColor 실제 배경 직접 추출 및 canvas/surface 위 동적 합성 resolveDomColor 적용, 1:1 배경교체 B1·alpha변조 B2·정상분기복귀 B3·degraded병합 B4 4종 단독 변이 및 M1~M9 총 13종 변이 100% 사살 실측, NodeDetail 저대비 리터럴 14건 순수 감소 래칫, 잔여 9건 정직한 백로그 목록화, status: proposed 준수, reviewer 사전 기재 제거, raw CR 0건, Vitest 12 passed, tsc 0 error, build 성공, route coverage 40 passed, 9대 무결성 0 위반).
 
 ## 2026-10-01 NodeList 및 NodeDetail 잔여 저대비 리터럴 토큰화 및 WCAG AA 적합성 완결 (Card 189, ACC-09 잔여, `agent/gemini/c189-node-residual-contrast`, base `ec75b4f0` PR #284)
 - **개요**: PR #284 (Card 186) Claude UI r1 검토(i1) 및 PR #288 Claude UI r1(issuecomment-5931871184) 피드백에 따라, `NodeList.tsx` 및 `NodeDetail.tsx`에 잔존하던 하드코딩 색상 리터럴 저대비 결함을 전수 해결하고 디자인 토큰으로 승격 및 변이 사살 완전성 강화:
@@ -39,10 +39,10 @@ source_of_truth: "Git"
      - degraded 타임라인 및 활성 예약가능 박스 렌더링 단언 추가로 변이 B4 및 예약가능 박스 변이 사살.
      - Revert-Fail Probes 10~14 유지: 이전 하드코딩 리터럴(#fca5a5, #fde68a, #7dd3fc, #3fb950, #f59e0b) 결함 증명.
      - 11종 변이(M1~M9, B1, B4) 전원 사살 실측 (사살율 100%).
-- **담당 및 역할**: Gemini (Frontend / 접근성 소유). Reviewer: Claude (UI/접근성 축), Codex (무결성/래칫 축).
+- **담당 및 역할**: Gemini (Frontend / 접근성 소유).
 - **관측 근거 (Evidence)**:
-  - Vitest: `acc09-contrast-tokens.test.tsx` 12 passed (exit 0), `node-status-lost-unknown-guard.test.tsx` 7 passed, `node-resource-usage-contract.test.tsx` 9 passed (28/28 passed 전원 통과)
-  - 변이 검사: 11종 변이 전원 사살 실측 (사살율 100%, B1 및 B4 사살 확인)
+  - Vitest: `acc09-contrast-tokens.test.tsx` 12 passed (exit 0), `npm run test -- node` 6 test files 40 passed (exit 0)
+  - 변이 검사: 13종 변이 전원 사살 실측 (사살율 100%, B1 배경교체·B2 alpha변조·B3 정상분기복귀·B4 degraded병합 단독 변이 전원 사살)
   - TypeScript 정적 점검: `npx tsc -b` 타입 에러 0건 (exit 0)
   - 프로덕션 번들 빌드: `npm run build` 성공 (Vite bundle 정상 생성, exit 0)
   - 라우트 커버리지 점검: `pytest tests/test_route_coverage.py` 40 passed 100% (exit 0)
