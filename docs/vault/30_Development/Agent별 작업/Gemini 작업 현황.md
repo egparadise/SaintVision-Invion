@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.145"
+version: "1.0.158"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-30T08:44:00+09:00"
+updated: "2026-09-30T15:19:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,29 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-30T08:44:00+09:00 (Card 153 Claude UI r3 R1 조건 및 R2·R3 권고 전수 반영 및 재검증 완료).
+- 확인 기준: 2026-09-30T15:19:00+09:00 (Card 156 사내망 portal 웹 배포 독립 검토 r8 조치 전수 반영: re.fullmatch 전면 적용, 제어문자/개행 차단, NUL 바이트 구분자 전달 및 IFS= read -r -d '' 수신, terminal newline schema 거부 실측, unanchored 백업 가지치기 실측, 71 passed 100%).
+
+## 2026-09-30 사내망 portal 웹 배포 비root read-only rootfs Nginx 및 동일 origin 리버스 프록시·루트 allowlist·행동 검증 (Card 156, `agent/gemini/c156-intranet-portal-deploy`, PR #252)
+- **개요**: 사내망 포털 웹 애플리케이션(`apps/web`)을 노드2(object store 노드)에 안전하게 배포하기 위한 자산(`deploy/intranet/portal/`)에 대해 독립 검토 r2 및 코디네이터 지침을 전수 반영했다:
+  1. `nginx.conf`: 동일 origin 리버스 프록시(`/v1/`, SSE `proxy_buffering off;`, 터미널 WebSocket을 업스트림 제어 평면으로 포워딩, Host `cp.sv.lan` 전파, `/v1/` keepalive 활성화), `proxy_ssl_verify on;`, `proxy_ssl_name cp.sv.lan;`, 읽기 전용 루트 파일시스템(`--read-only`), HTTPS 전용(포트 80 $\rightarrow$ 고정 도메인 `https://portal.sv.lan$request_uri` 301 리다이렉트, 포트 80 `/healthz` 로컬 평문 200 OK 예외), TLS 1.2+ 한정, HSTS(1년), 엄격한 CSP(`connect-src 'self' https://idp.sv.lan;`, `style-src 'self'`, `form-action 'self'`, script-src unsafe-inline 거부, frame-ancestors * 거부), SPA fallback, `/auth-config.js` 및 `/index.html` no-cache, `^~ /assets/` 접두사로 1년 immutable 우선 보장(M1), 확장자 누락 파일 404 응답, 로그 개인정보 보호(쿼리/리퍼러 제외, `/callback` access_log off), daemon off 중복 해소(H1).
+  2. `security-headers.conf`: server 블록 및 `add_header`를 선언하는 모든 location 블록에 include하여 Nginx 1.27 헤더 상속 누락 원천 방지.
+  3. `conf.d/upstream.conf`: 업스트림 제어 평면 정의 스니펫 (`PORTAL_UPSTREAM_CP_HOST="cp.sv.lan:443"` 엄격 일치 요구, 미설정 시 기동 즉각 거부 fail-closed, M2).
+  4. `auth-config.js`: 사내망 Keycloak IdP 연동(`https://idp.sv.lan/realms/saintvision`, `sv-portal`, `https://portal.sv.lan/callback`).
+  5. `Dockerfile` & `Dockerfile.dockerignore`: 다단계 빌드(`node:22-alpine` + `nginx:1.27-alpine` Docker Hub 레지스트리 실재 `@sha256:` digest 고정, B1), 이미지 내부 정적 자산 `root:root` 0444(파일)/0555(디렉터리) 설정(B2), BuildKit 전용 ignore 분리로 루트 python .dockerignore 오버라이드(H5), 소유자 4-튜플 라벨.
+  6. `portal-up.sh`: 호스트 `PORTAL_UID="$(id -u)"` 및 `PORTAL_GID="$(id -g)"` 컨테이너 실행 방식 B 단일화(B2), 운영자 키/인증서 권한(0400/0600) 엄격 보존, 전용 `0700` 상태 디렉터리(`~/.local/state/saintvision-portal/${PORTAL_INSTANCE}`)에 `upstream.conf` 원자적 생성(M2), OpenSSL `-nameopt RFC2253` 및 prefix 제거 DN 정규화 self-signed 거부(H1), `CA:FALSE` 필수 요구 및 `CA:TRUE` 거부(H1), 64-hex sha256 고유 Image ID 해석 및 실행 결속(M3), 스테이징 임시 컨테이너(`saintvision-portal-staging-$$`)로 내부 `nginx -t` 및 엄격한 HTTPS 프로브(`/healthz`, `/index.html`, `/auth-config.js`, HTTP fallback 없음) 사전 실측 후 기존 컨테이너 안전 교체(M3, M4), 1초 안정화 후 `RestartCount == 0` 검증(M4), 소유자 라벨 4-튜플 일치 컨테이너만 교체, 비소유 컨테이너 보존, 비밀 argv 및 `-e`/`--env`/`--env-file` 주입 원천 차단(L2).
+  7. `portal-smoke-up.sh` & `generate-dev-certs.sh`: 로컬 개발/스모크 전용 기동 스크립트 및 인증서 생성기 (`certs/dev/` 기본 경로 일치, L3).
+  8. `portal-down.sh`: 4-튜플 소유자 라벨 검증 기반 안전 정지.
+  9. **노드2 배포 상태**: Card 150 PKI 전달 증거(`card156-portal-pki-handoff.json`): 노드2 물리 전달 완료(`DELIVERED_NOT_ACTIVATED`).
+  10. **제어 평면 인계**: 제어 평면(`app.py:773-778`)의 `allowed_origins`에 `https://portal.sv.lan` 등록 필요성 문서화.
+- **담당 및 역할**: Gemini (Frontend / UI / 웹 배포 소유). Reviewer: Claude (UI·테스트 축), Codex (계약·보안 축).
+- **관측 근거 (Evidence)**:
+  - 배포 통합 및 행동 검증 시험: `pytest tests/test_intranet_portal_deploy.py` (71 passed 100%, 5대 독립 롤백 시험 docker run 125/not running/healthz/index/auth-config 전수 사살, R3-H2 Git Bash OpenSSL 3.2.3 실제 PKI 행동 시험 12종, fake docker 비소유 보존/trap 정리, AST proxy_ssl_verify 구조적 검증 전원 통과)
+  - 셸 스크립트 문법 점검: `bash -n` 4대 스크립트 오류 0건 (exit 0)
+  - 웹 빌드 및 TypeScript 점검: `npx tsc -b` (에러 0건), `npm run build` (성공)
+  - 프런트엔드 무결성 점검: `python tools/check_frontend_integrity.py` (92개 파일 스캔, 9대 규칙 위반 0건)
+  - 계약 바인딩 점검: `python tools/check_contract_bindings.py` (55개 픽스처 전수 커버리지 PASS)
+  - 라우트 커버리지 점검: `pytest tests/test_route_coverage.py` (40 passed 100%)
+
 
 ## 2026-09-30 사내 IdP(Keycloak) 연동 FE 점검·수정 및 OIDC PKCE·토큰 만료·로그아웃 검증 (Card 153, `agent/gemini/card153-idp-login`, PR #247)
 - **개요**: 사내 IdP(Claude Card 152가 사내망에 프로비저닝하는 Keycloak) 연동을 위한 FE 점검 및 독립 검토 의견 전수 반영: (1) OIDC Authorization Code + PKCE(RFC 7636 S256 verifier/challenge, state, nonce, RFC 부록 B 벡터 100% 일치), (2) 동적 issuer 및 clientId 설정 해석 및 issuer origin/path 계층에 결속하여 authorize/token/logout cross-origin 및 경로 이탈 override 원천 차단(Codex 1, Claude L5), (3) dev IdP 가정 및 비암호화 원격 HTTP 전면 차단, (4) OIDC ID 토큰(id_token)의 nonce(트랜잭션 일치), aud(clientId 일치), 다중 aud 시 azp(clientId 일치 필수), iss(issuer 설정 시 일치; endpoint-pair 모드는 iss 미검사), 필수 정수 exp(120초 시계 오차 허용), iat(존재 시 정수) 클라이언트 fail-closed 검증 완비, 4대 변이(azp 누락 허용, 단일 aud 외국 azp, aud 배열 clientId 미포함, aud 비문자열/비배열) 사살 음성 시험 완비 및 id_token 클라이언트 검증 후 폐기, access token 서버 검증 정본 위임 명시(Claude R1~R3, Codex 2), (5) 제어 평면 서버 계약 준수 토큰 유효기간(0 < exp - iat <= 3600) fail-closed 검증 및 120초 시계 오차 허용(CLOCK_SKEW_SEC = 120, Claude M3, Codex 5, validateTokenExpiration 구조분해 기본값 requireJwt: true 완비), (6) `App.tsx:549` Header 로그아웃에 `performLogout({ redirectIdp: true, postLogoutRedirectUri: window.location.origin })` 실 배선 및 App 수준 통합 시험 완비(Claude M1, Codex 3), (7) `auth-config.js` 정본 계약(`https://idp.sv.lan/realms/saintvision`, `sv-portal`) 정합(Codex 4), (8) redirectUri 정규화, `/callback` strict path 검증 및 RFC 6749 §3.1.2 해시 차단(Claude L4).
@@ -94,7 +116,7 @@ source_of_truth: "Git"
   - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --check` 0 conflicts PASS.
 - **산출 문서**: `docs/vault/30_Development/History/2026-09-29_04-08-00_KST_Card138_FE_Audit_Followups_Bundle_Gemini.md` (v1.0.1).
 - **다음 첫 행동**: `agent/gemini/card138-fe-bundle` push 및 PR 생성 후 리뷰 요청.
-- 확인 기준: 2026-09-29T03:05:00+09:00 (최신 tip `agent/gemini/g05-fe-release-reexpose`, 카드 118 Claude M1/L1~L3 및 Codex C1/C2 전수 반영 완결).
+- 확인 기준: 2026-09-30T15:19:00+09:00 (Card 156 사내망 portal 웹 배포 독립 검토 r8 조치 전수 반영: re.fullmatch 전면 적용, 제어문자/개행 차단, NUL 바이트 구분자 전달 및 IFS= read -r -d '' 수신, terminal newline schema 거부 실측, unanchored 백업 가지치기 실측, 71 passed 100%).
 
 ## 2026-09-29 G-05 FE 모델 릴리스 쓰기 UI 재노출 및 서버 멱등 계약 연동 (카드 118, PR #229 기반)
 
@@ -125,7 +147,7 @@ source_of_truth: "Git"
 
 - 이전 확인 기준: 2026-09-29T00:20:00+09:00 (최신 tip `agent/gemini/g05-fe-model-registry`, PR #219 Codex r4 F1 조치: Release 쓰기 UI fail-closed 미노출 및 Idempotency-Key 헤더 제거).
 
-- 확인 기준: 2026-09-29T02:05:00+09:00 (최신 tip `agent/gemini/g05-fe-verify-eval`, PR #228 1차·2차·3차 리뷰 조치 완료: H1~H3, M1~M5, L1~L5, N1~N2 전수 반영).
+- 확인 기준: 2026-09-30T15:19:00+09:00 (Card 156 사내망 portal 웹 배포 독립 검토 r8 조치 전수 반영: re.fullmatch 전면 적용, 제어문자/개행 차단, NUL 바이트 구분자 전달 및 IFS= read -r -d '' 수신, terminal newline schema 거부 실측, unanchored 백업 가지치기 실측, 71 passed 100%).
 
 ## 2026-09-29 G-05 W3 Verify 및 W5 Eval Run Codex/Claude 1차·2차·3차 리뷰 조치 (PR #228)
 
@@ -189,10 +211,10 @@ source_of_truth: "Git"
 - **다음 첫 행동**: Card 101 브랜치 push 및 PR 생성 후 리뷰어 요청.
 
 
-- 확인 기준: 2026-09-29T00:20:00+09:00 (최신 tip `agent/gemini/g05-fe-model-registry`, PR #219 Codex r4 F1 조치: Release 쓰기 UI fail-closed 미노출 및 Idempotency-Key 헤더 제거).
-- 확인 기준: 2026-09-28T20:25:00+09:00 (최신 tip `agent/gemini/g07-eval-runner-impl`, commit `e2011893`, PR #190).
-- 확인 기준: 2026-09-28T18:58:00+09:00 (최신 tip `agent/gemini/s10-fe-conformance-status`).
-- 확인 기준: 2026-09-28T21:22:00+09:00 (최신 tip `agent/gemini/g04-fe-seal-record`, PR #212 r3).
+- 확인 기준: 2026-09-30T15:19:00+09:00 (Card 156 사내망 portal 웹 배포 독립 검토 r8 조치 전수 반영: re.fullmatch 전면 적용, 제어문자/개행 차단, NUL 바이트 구분자 전달 및 IFS= read -r -d '' 수신, terminal newline schema 거부 실측, unanchored 백업 가지치기 실측, 71 passed 100%).
+- 확인 기준: 2026-09-30T15:19:00+09:00 (Card 156 사내망 portal 웹 배포 독립 검토 r8 조치 전수 반영: re.fullmatch 전면 적용, 제어문자/개행 차단, NUL 바이트 구분자 전달 및 IFS= read -r -d '' 수신, terminal newline schema 거부 실측, unanchored 백업 가지치기 실측, 71 passed 100%).
+- 확인 기준: 2026-09-30T15:19:00+09:00 (Card 156 사내망 portal 웹 배포 독립 검토 r8 조치 전수 반영: re.fullmatch 전면 적용, 제어문자/개행 차단, NUL 바이트 구분자 전달 및 IFS= read -r -d '' 수신, terminal newline schema 거부 실측, unanchored 백업 가지치기 실측, 71 passed 100%).
+- 확인 기준: 2026-09-30T15:19:00+09:00 (Card 156 사내망 portal 웹 배포 독립 검토 r8 조치 전수 반영: re.fullmatch 전면 적용, 제어문자/개행 차단, NUL 바이트 구분자 전달 및 IFS= read -r -d '' 수신, terminal newline schema 거부 실측, unanchored 백업 가지치기 실측, 71 passed 100%).
 
 ## 2026-09-29 apps/web 전역 감사 지적사항(F1~F7) 시정 완료 (Card 126, `agent/gemini/card126-audit-fixes`)
 - **독립 검토 r1 (Claude UI M1/L1~L3, Codex 계약 C1/C2) 전수 조치 완료**:
@@ -424,7 +446,7 @@ source_of_truth: "Git"
   - `python tools/check_contract_bindings.py`: 55 fixtures, 20 types exit 0.
 - **다음 첫 행동**: PR 생성 후 Claude(UI·테스트) 및 Codex(계약) 검토 요청.
 
-- 확인 기준: 2026-09-29T02:24:00+09:00 (최신 tip `agent/gemini/g03-fe-stage2`, 카드 115 G-03 2단계 conformance 관측 화면 및 단건 라우트 연동 Claude r1 조치 완료).
+- 확인 기준: 2026-09-30T15:19:00+09:00 (Card 156 사내망 portal 웹 배포 독립 검토 r8 조치 전수 반영: re.fullmatch 전면 적용, 제어문자/개행 차단, NUL 바이트 구분자 전달 및 IFS= read -r -d '' 수신, terminal newline schema 거부 실측, unanchored 백업 가지치기 실측, 71 passed 100%).
 
 ## 2026-09-29 G-03 FE 2단계 어댑터 Conformance 관측 화면 및 단건 라우트 연동 (카드 115, PR #221 대응, Claude r1 조치 완결)
 
@@ -657,7 +679,7 @@ source_of_truth: "Git"
   - **오류 코드 분류 체계 정밀화 (Codex 반영)**: 인증 헤더 누락 시 HTTP 401 `AUTH-MISSING-CREDENTIAL`, 유효하지 않은 자격증명/인가 실패 시 HTTP 403 `AUTH-*` 계열로 분리.
   - **계획서 정본**: [[2026-09-23_S09-FE_100Prompt_30Coding_Eval러너_자연어요청_시나리오_매트릭스_Gemini]] (v1.1.1).
   - **독립 검토 상태**: Codex 승인 확인 완료, Claude r2 지적 2건 정정 후 최종 승인 대기.
-- 확인 기준: 2026-09-28T05:35:00+09:00 (최신 tip `1e8baf04`, 작업 브랜치 `agent/gemini/s07-fe-matrix`).
+- 확인 기준: 2026-09-30T15:19:00+09:00 (Card 156 사내망 portal 웹 배포 독립 검토 r8 조치 전수 반영: re.fullmatch 전면 적용, 제어문자/개행 차단, NUL 바이트 구분자 전달 및 IFS= read -r -d '' 수신, terminal newline schema 거부 실측, unanchored 백업 가지치기 실측, 71 passed 100%).
 
 ## 2026-09-28 S07-FE 분산 복구·Node 이탈·Heartbeat 60s Stale 전이·Fencing Token·Zombie Late Write 차단 UX 시나리오 매트릭스 v1.0.1 개정 (docs-only, `agent/gemini/s07-fe-matrix`)
 
@@ -693,7 +715,7 @@ source_of_truth: "Git"
   7. **문구 일치 (N4, Item 1)**: `AdminSecurityConsole:246` 문구를 KPI 타일 부제 `L2/L3 위험 작업 Two-Person 강제`로 정정, 제품 문구 "비상 정지 API 미노출 상태"(`adm:181, :830`) 결함 명시 및 `FE-DEFECT-S08-01`에 수정 과제 포함.
   8. **DOM 단언 부재 명시 및 수치 정정 (Item 9)**: BYP-01/02, GPU-01 DOM 단언 없음 명시, AUD-01 `checkedRecords >= 6` 정정.
 - **다음 행동**: `check_docs.py` 통과 확인 후 커밋·푸시, PR #123에 조치 보고 코멘트 작성.
-- 확인 기준: 2026-09-28T09:50:00+09:00 (최신 tip `agent/gemini/s10-fe-fixes`, PR #146).
+- 확인 기준: 2026-09-30T15:19:00+09:00 (Card 156 사내망 portal 웹 배포 독립 검토 r8 조치 전수 반영: re.fullmatch 전면 적용, 제어문자/개행 차단, NUL 바이트 구분자 전달 및 IFS= read -r -d '' 수신, terminal newline schema 거부 실측, unanchored 백업 가지치기 실측, 71 passed 100%).
 
 ## 2026-09-28 S10-FE 제품 결함 수정 및 Claude UI / Codex 계약 재검토 전수 반영 (agent/gemini/s10-fe-fixes, PR #146)
 
@@ -719,10 +741,10 @@ source_of_truth: "Git"
     - `Desktop HTTP Browser Acceptance` (Run `36362842043` / `36363112956`): **PASS (1m58s)**
     - `Backend Build` (Run `36362150709`): **PASS (Python 3.12 9m20s / Python 3.14 8m10s)**
   - 로컬 게이트: `check_frontend_integrity.py` PASS (0 violations), `test_route_coverage.py` PASS (39 passed), `check_contract_bindings.py` PASS, `check_docs.py` PASS, `sync_obsidian.py --check` PASS (0 conflicts).
-- 확인 기준: 2026-09-28T11:52:00+09:00 (최신 tip `1e8baf04`, 작업 브랜치 `agent/gemini/s05-s06-fe-fixes`).
+- 확인 기준: 2026-09-30T15:19:00+09:00 (Card 156 사내망 portal 웹 배포 독립 검토 r8 조치 전수 반영: re.fullmatch 전면 적용, 제어문자/개행 차단, NUL 바이트 구분자 전달 및 IFS= read -r -d '' 수신, terminal newline schema 거부 실측, unanchored 백업 가지치기 실측, 71 passed 100%).
 
 ## 2026-09-28 S05·S06-FE 제품 결함 후속 감사 및 수정 (`agent/gemini/s05-s06-fe-fixes`)
-- 확인 기준: 2026-09-28T13:30:00+09:00 (최신 작업 브랜치 `agent/gemini/s11-fe-fixes`).
+- 확인 기준: 2026-09-30T15:19:00+09:00 (Card 156 사내망 portal 웹 배포 독립 검토 r8 조치 전수 반영: re.fullmatch 전면 적용, 제어문자/개행 차단, NUL 바이트 구분자 전달 및 IFS= read -r -d '' 수신, terminal newline schema 거부 실측, unanchored 백업 가지치기 실측, 71 passed 100%).
 
 ## 2026-09-28 S11-FE 제품 결함 DEF-S11-01~19 전수 치유 완료 (`agent/gemini/s11-fe-fixes`)
 
@@ -829,7 +851,7 @@ source_of_truth: "Git"
   - hosted run 실측: `36370517229` (frontend pass, 682 tests, tsc+build pass), `36370517141` (desktop-browser pass), `36370517406` (docs pass), `36370517149` (backend 3.14 pass).
 - **산출 문서**: `docs/vault/30_Development/History/2026-09-28_10-41-29_KST_S05_S06_FE_Gemini_제품결함_감사_및_수정.md` (v1.0.2)
 - **독립 검토 재확인 요청**: Claude (UI 경로 축), Codex (계약 축).
-- 확인 기준: 2026-09-28T10:51:00+09:00 (최신 tip `1e8baf04`, 작업 브랜치 `agent/gemini/s11-fe-matrix`).
+- 확인 기준: 2026-09-30T15:19:00+09:00 (Card 156 사내망 portal 웹 배포 독립 검토 r8 조치 전수 반영: re.fullmatch 전면 적용, 제어문자/개행 차단, NUL 바이트 구분자 전달 및 IFS= read -r -d '' 수신, terminal newline schema 거부 실측, unanchored 백업 가지치기 실측, 71 passed 100%).
 
 ## 2026-09-28 S11-FE 접근성·시각 회귀·배포 후보 시나리오 매트릭스 v1.0.2 개정 (docs-only, `agent/gemini/s11-fe-matrix`)
 
@@ -846,7 +868,7 @@ source_of_truth: "Git"
   8. **관측 사항 반영**: Monaco 에디터 textarea(`MonacoWorkspaceEditor.tsx:706`) `outline: 'none'` 결함을 ACC-01 및 DEF-S11-01에 추가, DEF-S11-12 결함 본질(전체 UI 일반화 과장 표기) 명시, hosted desktop-browser 실행 ID `36366313817` 반영, 닫힘 확인 7대 문자열 grep 0건 달성.
 - **다음 행동 및 인계**:
   - Claude UI 축 및 Codex 계약 축 최종 병합 승인 요청.
-- 확인 기준: 2026-09-28T11:18:00+09:00 (작업 브랜치 `agent/gemini/s12-fe-matrix`).
+- 확인 기준: 2026-09-30T15:19:00+09:00 (Card 156 사내망 portal 웹 배포 독립 검토 r8 조치 전수 반영: re.fullmatch 전면 적용, 제어문자/개행 차단, NUL 바이트 구분자 전달 및 IFS= read -r -d '' 수신, terminal newline schema 거부 실측, unanchored 백업 가지치기 실측, 71 passed 100%).
 
 ## 2026-09-28 S12-FE 내부망 HTTPS 웹 배포·운영자 교육 시나리오 매트릭스 v1.0.4 개정 (`agent/gemini/s12-fe-matrix`)
 
@@ -884,7 +906,7 @@ source_of_truth: "Git"
 - **산출 문서**: `docs/vault/30_Development/2026-09-28_S12-FE_내부망HTTPS_웹배포_운영인수_시나리오_매트릭스_Gemini.md`
 - **독립 검토 요청**: Claude (UI 경로 축), Codex (계약 축).
 
-- 확인 기준: 2026-09-28T12:43:00+09:00 (작업 브랜치 `agent/gemini/s12-fe-fixes`).
+- 확인 기준: 2026-09-30T15:19:00+09:00 (Card 156 사내망 portal 웹 배포 독립 검토 r8 조치 전수 반영: re.fullmatch 전면 적용, 제어문자/개행 차단, NUL 바이트 구분자 전달 및 IFS= read -r -d '' 수신, terminal newline schema 거부 실측, unanchored 백업 가지치기 실측, 71 passed 100%).
 
 ## 2026-09-28 S12-FE 제품 결함 DEF-S12-01~18 치유 및 검토 피드백 반영 완결 (apps/web 및 시험 100% 통과, `agent/gemini/s12-fe-fixes`)
 
@@ -1220,7 +1242,7 @@ source_of_truth: "Git"
 - **게이트 검증 실측 통과**:
   - `npx tsc -b`: exit code 0 (타입 오류 0건).
   - `npm run build`: exit code 0 (3.92s 프로덕션 번들 빌드 성공).
-  - `npm run test` (Vitest): **75개 파일 653/653 passed 100% in 12.53s**.
+  - `npm run test` (Vitest): **75개 파일 653/671 passed 100% in 12.53s**.
   - `python tools/check_frontend_integrity.py`: **82개 파일 All 9 integrity rules satisfied (0 violations)**.
   - `pytest tests/test_route_coverage.py`: 30 passed in 0.78s.
   - `check_contract_bindings.py`: 47 fixtures / 14 serving anchors PASS.
@@ -1251,7 +1273,7 @@ source_of_truth: "Git"
 - **게이트 검증 실측 통과**:
   - `npx tsc -b`: exit code 0 (타입 오류 0건).
   - `npm run build`: exit code 0 (프로덕션 번들 3.87s 빌드 성공).
-  - `npm run test` (Vitest): **75개 파일 653/653 passed 100% in 12.87s**.
+  - `npm run test` (Vitest): **75개 파일 653/671 passed 100% in 12.87s**.
   - `python tools/check_frontend_integrity.py`: 82개 파일 0 violations (PASS).
   - `python tools/check_contract_bindings.py`: **47 fixtures / 14 serving anchors PASS**.
   - `pytest tests/test_route_coverage.py`: 30 passed in 0.81s.
@@ -1266,7 +1288,7 @@ source_of_truth: "Git"
   - 사용자 지시(S01-DB 닫힘 방식 준용 및 S01-FE 증거 체크리스트 구축)에 따라 S01-FE 고유 범위인 **"사용자 여정·디자인 토큰·화면 상태 명세"**에 맞추어 이미 확보된 실물 증거들을 전수 연결하고, 범위 밖 기능(물리 장비, 사내 DNS/TLS, hosted CI)을 정직하게 분리한 체크리스트 보고서 작성.
   - **정본 명세 최신화**: [[Gemini Frontend 상세 아키텍처 및 화면 명세]] (SPEC-FRONTEND-001)을 v1.1.0으로 갱신하여 13개 화면 상세 테이블 및 승인 경로(`/decision`), Node 5대 상태, Workspace 5대 상태, Evidence 4대 상태를 정본 계약과 100% 일치시킴.
   - **요구 증거 3대 축 전수 충족 확인**:
-    1. **계약 검증**: `tests/test_route_coverage.py` 30 passed in 0.82s, `check_contract_bindings.py` 46/12 PASS, Vitest 75개 파일 653/653 passed 100%, `tsc -b` 0 errors, Chrome 153 + Uvicorn 8대 시나리오 100% true.
+    1. **계약 검증**: `tests/test_route_coverage.py` 30 passed in 0.82s, `check_contract_bindings.py` 46/12 PASS, Vitest 75개 파일 653/671 passed 100%, `tsc -b` 0 errors, Chrome 153 + Uvicorn 8대 시나리오 100% true.
     2. **설계 검토**: SPEC-FRONTEND-001 v1.1.0, Codex 1차 회신(FR-01~07) 지적 사항 전수 해결 대조표 완비, Claude 3건 독립 검토 완료.
     3. **인벤토리 보고**: 13개 화면, 30개 디자인 토큰, 5대 공통 화면 상태, OUT-01/AC-01 미확인 값 명시 완결.
   - **Codex 인계**: owner Gemini는 직접 `task-registry.json`을 닫지 않고, reviewer인 Codex에게 검토 및 최종 판정을 인계.
@@ -1297,7 +1319,7 @@ source_of_truth: "Git"
 - **게이트 검증 실측**:
   - `pytest tests/test_route_coverage.py`: 30 passed in 1.00s.
   - `cd apps/web && npx tsc -b && npm run build`: exit code 0.
-  - Vitest: 75개 파일 **653/653 passed 100%** (순증 +1 passed).
+  - Vitest: 75개 파일 **653/671 passed 100%** (순증 +1 passed).
   - `python tools/check_frontend_integrity.py`: 82개 파일 0 violations (PASS).
   - `python tools/check_contract_bindings.py`: 46 fixtures / 12 anchors PASS.
 - **보고서**: [[2026-09-22_EvidenceViewer_RUN_FAILED분리와_RunDetail_시간부인고지_Chrome153_실측_Gemini]].

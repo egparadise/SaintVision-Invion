@@ -16,5 +16,6 @@ build/
 
 /deploy/certs/saintvision.crt
 /deploy/certs/saintvision.key
+/deploy/intranet/portal/certs/
 
 scratch/
