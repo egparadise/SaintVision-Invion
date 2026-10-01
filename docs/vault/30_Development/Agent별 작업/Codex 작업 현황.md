@@ -4,11 +4,11 @@ title: "Codex 작업 현황"
 version: "1.0.240"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T14:19:55+09:00"
+updated: "2026-10-01T15:18:53+09:00"
 source_of_truth: "Git"
-active_card: "CARD-172 S08-BE BuildKit contract boundary"
-active_card_status: "Claude r3 W2 exact enum vocabularies pinned in addition to negative controls; focused PG-free 55 passed"
-active_card_next: "exact-head hosted Core/Backend and Claude re-review; adapter/ROOF/GPU remain separate cards"
+active_card: "CARD-173 S08-BE Build path ROOF binding"
+active_card_status: "pre-dispatch/final live policy, containment, provider, declared lease/fencing and receipt/evidence binding implemented; focused 103 passed"
+active_card_next: "contract/docs gates, stacked PR and Claude review; daemon adapter and GPU remain separate cards"
 ---
 
 ## 2026-10-01 Card 166 — shard parent/member cancel bridge 후속
@@ -43,6 +43,20 @@ active_card_next: "exact-head hosted Core/Backend and Claude re-review; adapter/
   `sha256:77d30b61dfa0027a86b123be94e5cb5e545dd1110b9cc12c0b2f151d11797cbb`다.
   수동 사용자 인수 부재 1건 때문에 raw verdict는 사전 등록대로 `MEASURED_FAIL`이며
   AC-11 done·점수 승격은 하지 않는다.
+## 2026-10-01 Card 173 — S08-BE Build 경로 ROOF 결속
+
+- #269의 strict Build 계약 위에 live project authority·kill switch·PolicyDecision·fresh
+  builder observation을 pre-dispatch와 final transaction에서 반복 검증하는 내부 runtime
+  경계를 추가했다.
+- receipt는 plan/source/policy/trace, 결과별 exact audit event 순서, output·cleanup digest,
+  verified cleanup과 failed/cancelled cache quarantine를 통과해야 `EvidenceEnvelope`가 된다.
+- focused PG-free **103 passed**. lease expiry/timeout·fencing epoch와 final receipt 미래 시각,
+  admitted plan swap·tenant 방어선·중복 audit·policy expiry 부정 대조군까지 닫았다.
+  daemon·socket·secret/cache/network·실제 cancel과 live lease 재조회·builder drain·거부
+  Evidence는 아직
+  `NOT_OBSERVED`이며 다음 adapter 카드에서만 판정한다.
+- 근거: [[2026-10-01_15-00-17_KST_S08-BE_ROOF_결속_Codex]].
+
 ## 2026-10-01 Card 172 — S08-BE BuildKit 계약 경계
 
 - 승인된 PR #265 설계 v1.1.0과 기준 SHA `8e6c68c64`에 따라 첫 구현 범위를
