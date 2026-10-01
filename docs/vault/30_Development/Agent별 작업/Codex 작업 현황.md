@@ -92,6 +92,11 @@ active_card_next: "Claude re-review; continue Card 154 independent review and ca
 - PR #260 exact head `d28a1e1d`의 opt-in run `36795087571`은 success였다. artifact `11133655643`(digest `73d0e566…112c0`)을 인증된 run/artifact metadata와 함께 importer로 검증해 exit 0, `MEASURED_PASS / NONE`, HIGH 0, CRITICAL 0을 확인했다. focused scanner 시험은 14 passed이며 로컬 Python 3.10의 `StrEnum` 부재로 collect되지 않은 identity 시험은 성공 수치에 포함하지 않았다.
 - 문서 head `3684fcc6` Backend `36795581647`은 10월 1일에 처음 노출된 test fixture의 9월 고정 clock partition 부재로 두 matrix가 함께 red였다(3.14: 5440 passed, 82 failed, 81 errors). 제품 partition 정책은 유지하고 disposable DB에만 고정 clock 월을 준비하며, 세 partitioned table을 단언하는 회귀 시험을 추가했다. 이는 PyJWT 호환성 실패가 아니다.
 - 이 카드의 성공 조건은 PR head security lane green만이 아니다. 수정이 integration에 착지한 뒤 그 착지 SHA로 workflow_dispatch를 다시 실행해야 #258의 조건이 닫힌다. 그 전에는 S11-BE 75, AC-11 전체 미완료를 유지한다. [[2026-10-01_09-10-32_KST_AC11_security_landing_SHA_Codex]].
+## 2026-09-30 Card 158 — S04-DB C1-K kernel 승인 결속 collector 검토 요청
+
+- 선행 착지 `6fc0428b`에서 S04-DB의 별도 kernel 경계 C1-K를 가장 앞의 외부 전제 없는 Codex 고난도 카드로 선택했다. 계약은 `8cf8c1ab`, collector·PG-free/실 PG 단일 파일은 `fc08a856`·`b0ff6b69`, evidence count 재계산 보강은 `26448c94`에 구현했다.
+- K1~K3는 approval→dispatch→claim→permit→execution attempt의 scope·digest·policy version·epoch·bound version·state event를 fail-closed로 대조한다. claim 직전 current policy decision ID, 실행 당시 epoch history K4, permit 공개키 provenance는 각각 독립 durable peer 부재·`NOT_REGISTERED`·`RECORDED_ONLY`로 남겨 거짓 합격을 막는다.
+- PG-free **25 passed**, Black·diff check exit 0. Claude 독립 검토 F1·F3~F8을 반영해 실 PG fixture 결속, timezone instant 비교, database-wide FORCE RLS visibility, RR/RO validator, 중복 event와 재승인 attempt 시험을 추가했고 criteria v1.0.2 `6d677d4e`에 고정했다. 공유 PG에서 전체 relation을 읽는 시험은 kernel evidence 대상 table을 명시적으로 비우는 local autouse fixture로 격리했다. 실 PG는 hosted Core exact-head 결과 대기이며 공개 계약·migration·registry status 변경 0, S04-DB `review` 유지다. [[2026-09-30_10-27-14_KST_S04-DB_C1-K_착수_Codex]], [[S04-DB_C1-K_kernel_승인_결속_Evidence_계약]].
 
 ## 2026-09-29 S05 Card114 c50 일반 suite 격리 — Claude 재확인 요청
 
