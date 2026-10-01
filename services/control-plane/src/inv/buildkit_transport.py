@@ -525,7 +525,7 @@ class RootlessBuildkitTransport:
                 "lease-release-not-bound",
                 "evidence-persistence-not-bound",
                 "lan-builder-acceptance-blocked-external",
-                "host-apparmor-rootlesskit-profile-relaxed",
+                "host-apparmor-userns-policy-relaxed",
             ],
         }
         report.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
