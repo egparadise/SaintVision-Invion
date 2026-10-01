@@ -173,6 +173,27 @@
         "faultInjection": "controlled-v1",
         "windowClass": "physical-24h"
       }
+    },
+    {
+      "targetId": "s11-accessibility-user-device-v1",
+      "axis": "accessibility-e2e",
+      "sourceDocument": {
+        "commit": "505a5f4b040badfbe1e703d5cac091ddf1db9620",
+        "path": "docs/vault/30_Development/S11_AC11_accessibility_user_device_target_v1.md",
+        "blob": "737853bbde0bc3da077c37acea132552e55f8eb9"
+      },
+      "criteria": {
+        "canonicalJourneyFailureCount": {"operator": "eq", "value": 0},
+        "desktopInvariantFailureCount": {"operator": "eq", "value": 0},
+        "contrastFailureCount": {"operator": "eq", "value": 0},
+        "keyboardFailureCount": {"operator": "eq", "value": 0},
+        "manualAcceptanceMissingCount": {"operator": "eq", "value": 0}
+      },
+      "requiredEnvironment": {
+        "topology": "hosted-plus-user-device",
+        "evidenceClass": "accessibility-manual-v1",
+        "humanBindingPolicy": "fresh-human-import-authorization-v1"
+      }
     }
   ]
 }
