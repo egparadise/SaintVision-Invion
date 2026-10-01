@@ -245,10 +245,23 @@ export const RunList: React.FC<RunListProps> = ({
               return (
                 <tr
                   key={run.id}
+                  role={onSelectRun ? 'button' : undefined}
+                  tabIndex={onSelectRun ? 0 : undefined}
+                  aria-label={`실행 작업 ${run.id} 상세 조회`}
                   onClick={() => onSelectRun?.(run.id)}
+                  onKeyDown={
+                    onSelectRun
+                      ? (e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            onSelectRun(run.id);
+                          }
+                        }
+                      : undefined
+                  }
                   style={{
                     borderBottom: '1px solid var(--color-border-subtle)',
-                    cursor: 'pointer',
+                    cursor: onSelectRun ? 'pointer' : 'default',
                     transition: 'background-color 0.15s',
                   }}
                   onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-bg-subtle)')}

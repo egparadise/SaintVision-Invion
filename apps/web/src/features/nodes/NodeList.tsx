@@ -181,8 +181,20 @@ export const NodeList: React.FC<NodeListProps> = ({
             <div
               key={node.id}
               role={node.status === 'lost' ? 'alert' : 'status'}
+              tabIndex={onSelectNode ? 0 : undefined}
+              aria-label={`노드 ${node.hostname} (${node.status})`}
               data-testid={`node-card-${node.id}`}
               onClick={() => onSelectNode?.(node.id)}
+              onKeyDown={
+                onSelectNode
+                  ? (e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        onSelectNode(node.id);
+                      }
+                    }
+                  : undefined
+              }
               style={{
                 padding: '20px',
                 backgroundColor: 'var(--color-bg-surface)',
@@ -282,15 +294,28 @@ export const NodeList: React.FC<NodeListProps> = ({
           return (
             <div
               key={node.id}
+              role={onSelectNode ? 'button' : undefined}
+              tabIndex={onSelectNode ? 0 : undefined}
+              aria-label={`노드 ${node.hostname} 선택`}
               data-testid={`node-card-${node.id}`}
               onClick={() => onSelectNode?.(node.id)}
+              onKeyDown={
+                onSelectNode
+                  ? (e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        onSelectNode(node.id);
+                      }
+                    }
+                  : undefined
+              }
               style={{
                 padding: '20px',
                 backgroundColor: 'var(--color-bg-surface)',
                 borderRadius: 'var(--radius-lg)',
                 border: '1px solid var(--color-border-subtle)',
                 boxShadow: 'var(--shadow-sm)',
-                cursor: 'pointer',
+                cursor: onSelectNode ? 'pointer' : 'default',
                 transition: 'border-color 0.2s, box-shadow 0.2s',
               }}
             >

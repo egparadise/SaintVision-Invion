@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.158"
+version: "1.0.159"
 status: "approved"
 author: "Gemini"
-updated: "2026-10-01T12:15:00+09:00"
+updated: "2026-10-01T16:05:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,35 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-30T15:19:00+09:00 (Card 156 사내망 portal 웹 배포 독립 검토 r8 조치 전수 반영: re.fullmatch 전면 적용, 제어문자/개행 차단, NUL 바이트 구분자 전달 및 IFS= read -r -d '' 수신, terminal newline schema 거부 실측, unanchored 백업 가지치기 실측, 71 passed 100%).
+- 확인 기준: 2026-10-01T16:05:00+09:00 (Card 174 2부 S11-FE ACC-01~09 전수 대조 및 대화형 카드 키보드 탐색·Tablist WAI-ARIA 접근성 구현, 6개 신규 시험 및 77개 접근성/DOM 스위트 100% 통과, tsc/build/integrity/route_coverage 100% 클린).
+
+## 2026-10-01 S11-FE ACC-01~09 전수 대조 및 대화형 카드 키보드 탐색·Tablist WAI-ARIA 접근성 구현 (Card 174 2부, `agent/gemini/c174-s11fe-acc01-09`, base `coord/train6-ci-1413`)
+- **개요**: S11-FE 정본 문서의 접근성 항목 ACC-01~09를 `apps/web` 실제 구현과 전수 대조하고, 외부 전제 없는 미흡/부분 항목(ACC-02 대화형 카드 키보드 접근성, ACC-06 ResourceExplorer WAI-ARIA tablist 순환 탐색)을 완전 구현:
+  1. **ACC-02 대화형 요소 키보드 조작성 완결**:
+     - `ApprovalCenter.tsx`: 승인 안건 카드에 `role="button"`, `tabIndex={0}`, `aria-pressed`, `aria-label`, Enter/Space `onKeyDown` 부여.
+     - `NodeList.tsx`: 온라인 및 lost 노드 카드에 `tabIndex={0}`, `aria-label`, Enter/Space `onKeyDown` 부여 (`role="button"` / `role="alert"` 유지).
+     - `RunList.tsx`: 실행 작업 행 `<tr>`에 `role="button"`, `tabIndex={0}`, `aria-label`, Enter/Space `onKeyDown` 부여.
+     - `NaturalLanguageRunView.tsx`: 참조 Context 파일 칩 `<span>`에 `role="button"`, `tabIndex={0}`, `aria-pressed`, `aria-label`, Enter/Space `onKeyDown` 토글 부여.
+     - `DeveloperStudio.tsx`: Step 1 워크스페이스 선택 카드 및 Step 2 노드 배치 카드에 `role="button"`, `tabIndex={0}`, `aria-pressed`, `aria-label`, Enter/Space `onKeyDown` 부여 (배치 불가 노드는 `tabIndex={-1}`, `aria-disabled="true"` 불변식 준수).
+  2. **ACC-06 ResourceExplorer WAI-ARIA Tablist 및 방향키 탐색 완결**:
+     - `ResourceExplorer.tsx`: 최상위 탭 컨테이너에 `role="tablist"` 및 `aria-label="자원 탐색기 탭 목록"` 부여.
+     - 5대 탭 버튼에 `role="tab"`, `aria-selected`, `aria-controls`, `tabIndex` 및 WAI-ARIA 방향키 순환 탐색(`ArrowRight`/`ArrowDown`, `ArrowLeft`/`ArrowUp`, `Home`, `End`) 구현.
+     - 5대 탭 본문 영역에 `role="tabpanel"`, `aria-labelledby`, `tabIndex={0}` 부여.
+  3. **되돌림 실패(Revert-Fail) 단위 시험 6종 완비**:
+     - `apps/web/tests/acc-interactive-navigation.test.tsx`: 승인 안건 선택, 노드 카드 활성화, 실행 작업 상세 진입, 컨텍스트 칩 토글, 워크스페이스/노드 카드 키보드 선택, ResourceExplorer WAI-ARIA 탭 순환 탐색 전수 검증.
+  4. **Codex 소유 측정 러너 seam 요청 카탈로그화**:
+     - `tools/run_real_browser_acceptance.py`를 건드리지 않고, History 문서에 SEAM-ACC-01~03(트리거 포커스 복원 정직 바인딩, tablist 방향키 프로브, 대화형 카드 Enter/Space 프로브) 명시.
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성 소유). Reviewer: Claude (UI/접근성/테스트), Codex (무결성/계약).
+- **관측 근거 (Evidence)**:
+  - 단위 시험: `npm run test -- acc-interactive-navigation.test.tsx` (6 passed 100%)
+  - 관련 스위트: `npm run test -- s11-defect-fixes.test.tsx accessibility-status-and-guards.test.tsx resource-explorer-dom.test.tsx developer-studio-dom.test.tsx` (77 passed 100%)
+  - 타입 검사: `npx tsc -b` (에러 0건, 클린 통과)
+  - 프로덕션 번들: `npm run build` (빌드 완료, 7.52s)
+  - 라우트 커버리지: `pytest tests/test_route_coverage.py` (40 passed 100%)
+  - 프런트 무결성: `python tools/check_frontend_integrity.py` (92개 파일 스캔, 9대 규칙 위반 0건)
+  - 문서 정합성: `python tools/check_docs.py` (PASS, exit 0)
+  - 봇 호출 방지 검사: 금지 봇 호출 태그 0건 검출 확인
+
 
 ## 2026-09-30 사내망 portal 웹 배포 비root read-only rootfs Nginx 및 동일 origin 리버스 프록시·루트 allowlist·행동 검증 (Card 156, `agent/gemini/c156-intranet-portal-deploy`, PR #252)
 - **개요**: 사내망 포털 웹 애플리케이션(`apps/web`)을 노드2(object store 노드)에 안전하게 배포하기 위한 자산(`deploy/intranet/portal/`)에 대해 독립 검토 r2 및 코디네이터 지침을 전수 반영했다:
