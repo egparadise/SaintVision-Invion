@@ -1,11 +1,11 @@
 ---
 doc_id: "TARGET-S11-AC11-ACCESSIBILITY-E2E-HOSTED-V0"
 title: "S11 AC-11 accessibility-e2e hosted 측정 target v0"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-01T12:42:40+09:00"
+updated: "2026-10-01T13:09:22+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "7851412db792b4ef6c53cb92944be530d77eb2de"
@@ -89,3 +89,10 @@ workflow는 `workflow_dispatch` 또는 명시 label에서만 실행하고 PR hea
 job concurrency는 `cancel-in-progress:false`, credential은 0, artifact는 30일 보존한다.
 기본 frontend/backend/Core job과 skip map은 바꾸지 않는다. 로컬·물리 5노드와 수치를
 직접 비교하지 않으며, 이 카드에서 score·registry task status를 바꾸지 않는다.
+
+## 6. 자동화 범위와 미측정 항목
+
+- canonical browser 입력은 물리 test case 6건이다. `test_full_studio_login_project_approval_and_logout`의 두 parameter case를 하나의 논리 journey로 묶으므로 논리 journey는 5건이다. collector는 물리 case의 정확한 multiplicity와 JUnit 결과를 함께 검증한다.
+- desktop invariant producer가 자동 측정하는 접근성 범위는 computed-style 대비 3건과 keyboard/focus 2건뿐이다.
+- ACC-01~09 전체, 화면낭독기 발화, 사용자 장비 키보드 흐름, 인지 접근성은 이 hosted 자동화로 측정하지 않는다. 같은 SHA의 별도 producer/importer가 생기기 전에는 `manualAcceptanceMissingCount=1`을 유지한다.
+- `MEASURED_PASS` 또는 `MEASURED_FAIL`은 위 자동화 범위에만 적용하며 사용자 접근성 인수 완료나 AC-11 전체 완료를 뜻하지 않는다.
