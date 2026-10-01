@@ -19,10 +19,10 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-10-01T20:45:00+09:00 (Card 186 NodeList 상태 배지 라이트 테마 대비 보정 및 디자인 토큰화 r1 피드백 전수 조치: Claude UI r1 조건부 승인 조건 m1 CR 바이트 4건 정정, m2 History §1 표 subtle/surface 수치 정정, m3/Codex F1~F3 실제 DOM 렌더링 배경 결속 및 동적 대비 계산 단언, CSS 주석 decoy 제거 및 상태 토큰 블록별 고유 선언 단언, unknown role=status/⚠️ 및 관측 전용 배너/예약가능 라벨 단언, 9종 변이 100% 사살 실측, Vitest 11 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 규칙 0 위반).
+- 확인 기준: 2026-10-01T20:52:00+09:00 (Card 186 NodeList 상태 배지 라이트 테마 대비 보정 및 디자인 토큰화 r1 피드백 전수 조치 및 base 37119fc1 머지: train 8 머지 반영, Claude UI r1 조건부 승인 조건 m1 CR 바이트 4건 정정, m2 History §1 표 subtle/surface 수치 정정, m3/Codex F1~F3 실제 DOM 렌더링 배경 결속 및 동적 대비 계산 단언, CSS 주석 decoy 제거 및 상태 토큰 블록별 고유 선언 단언, unknown role=status/⚠️ 및 관측 전용 배너/예약가능 라벨 단언, 범위 밖 잔여 리터럴 백로그 등록, 9종 변이 100% 사살 실측, Vitest 11 passed, tsc 0 error, build 성공, route coverage 40 passed, 9대 무결성 규칙 0 위반).
 
-## 2026-10-01 NodeList 상태 배지 라이트 테마 대비 보정 및 디자인 토큰화 (Card 186, ACC-09 남은 영역, `agent/gemini/c186-nodelist-badge-contrast`, base `2d2e0021` PR #277)
-- **개요**: PR #277(승인 커밋 `2d2e0021`)에서 History 및 Claude UI r1 피드백으로 백로그 이월되었던 `NodeList.tsx` 상태 배지 라이트 테마 하드코딩 리터럴 3종(`#38bdf8` 2.14:1, `#f85149` 3.35:1, `#d29922` 2.52:1 on `#ffffff`)의 저대비 결함을 전수 해소:
+## 2026-10-01 NodeList 상태 배지 라이트 테마 대비 보정 및 디자인 토큰화 (Card 186, ACC-09 남은 영역, `agent/gemini/c186-nodelist-badge-contrast`, base `37119fc1` PR #277)
+- **개요**: PR #277(승인 커밋 `2d2e0021`, train 8 머지 `37119fc1`)에서 History 및 Claude UI r1 피드백으로 백로그 이월되었던 `NodeList.tsx` 상태 배지 라이트 테마 하드코딩 리터럴 3종(`#38bdf8` 2.14:1, `#f85149` 3.35:1, `#d29922` 2.52:1 on `#ffffff`)의 저대비 결함을 전수 해소:
   1. **디자인 토큰 정의 (`apps/web/src/index.css`)**:
      - `--color-status-active`: Light `#0369a1` (5.93:1 on surface, 5.42:1 on subtle) / Dark `#38bdf8` (8.28:1 on surface, 6.85:1 on subtle) $\ge 4.5:1$.
      - `--color-status-lost`: Light `#b91c1c` (6.47:1 on surface, 5.91:1 on subtle) / Dark `#f87171` (6.41:1 on surface, 5.31:1 on subtle) $\ge 4.5:1$.
@@ -41,18 +41,20 @@ source_of_truth: "Git"
      - Test 8 (신규): `NodeList` DOM 렌더링 후 표준/텔레메트리 6개 분기 전수 결속 단언, 렌더된 DOM 배경(`var(--color-bg-subtle)`) 및 DOM 토큰 쌍 기반 동적 대비 계산 단언 (Codex F1 해소), 관측 전용 배너/예약가능 라벨 단언 (Claude MD/m3 해소), unknown `role="status"` 및 ⚠️ 단언 (Codex F3 해소).
      - Test 9 (Revert-Fail Probes): 이전 하드코딩 리터럴(2.14:1, 3.35:1, 2.52:1) 결함 증명 프로브 7, 8, 9 추가.
      - 9종 변이 전원 사살 실측 (사살율 100%).
+  5. **범위 밖 잔여 리터럴 후속 백로그 등록 (Claude i1 피드백)**:
+     - `NodeList.tsx:228` telemetryUnavailable 카드 안내문 `<p>` (`#fca5a5`, `#fde68a`, `#7dd3fc`), `:420` 예약가능 라벨 (`#3fb950`), `:190` 카드 테두리 (`#f59e0b`), `NodeDetail.tsx` 내 동일 3개 리터럴을 `COLOR_LITERAL_MULTISET_BASELINE`에 봉인한 채 차기 카드로 이월.
 - **담당 및 역할**: Gemini (Frontend / 접근성 소유). Reviewer: Claude (UI/접근성/스타일링 축), Codex (무결성/래칫 축).
 - **관측 근거 (Evidence)**:
-  - Vitest: `acc09-contrast-tokens.test.tsx` 11 passed (170ms), `node-status-lost-unknown-guard.test.tsx` passed, `node-resource-usage-contract.test.tsx` passed
+  - Vitest: `acc09-contrast-tokens.test.tsx` 11 passed, `node-status-lost-unknown-guard.test.tsx` 7 passed, `node-resource-usage-contract.test.tsx` 9 passed (27/27 passed 전원 통과)
   - 변이 검사: 9종 변이 전원 사살 실측 (사살율 100%)
   - TypeScript 정적 점검: `npx tsc -b` 타입 에러 0건 (exit 0)
   - 프로덕션 번들 빌드: `npm run build` 성공 (Vite bundle 정상 생성, exit 0)
-  - 라우트 커버리지 점검: `pytest tests/test_route_coverage.py` 41 passed 100% (exit 0)
-  - 프런트엔드 무결성 점검: `python tools/check_frontend_integrity.py` 93개 파일 스캔, 9대 무결성 규칙 위반 0건 (exit 0)
+  - 라우트 커버리지 점검: `pytest tests/test_route_coverage.py` 40 passed 100% (exit 0)
+  - 프런트엔드 무결성 점검: `python tools/check_frontend_integrity.py` 92개 파일 스캔, 9대 무결성 규칙 위반 0건 (exit 0)
   - 계약 바인딩 점검: `python tools/check_contract_bindings.py` 55개 픽스처 + 20개 커널 응답 타입 앵커 통과 (exit 0)
   - 문서 무결성 점검: `python tools/check_docs.py` PASS (exit 0)
-  - 문서 경로 인용 래칫: `python tools/check_doc_path_citations.py --ratchet --base-ref 2d2e0021` PASS (exit 0)
-  - Git 공백 검사: `git diff --check 2d2e0021` 클린 (exit 0)
+  - 문서 경로 인용 래칫: `python tools/check_doc_path_citations.py --ratchet --base-ref 37119fc1` PASS (exit 0)
+  - Git 공백 검사: `git diff --check 37119fc1` 클린 (exit 0)
 - **전문 문서**: [[2026-10-01_19-50-00_KST_Card186_NodeList_배지_라이트대비_Gemini]]
 
 ## 2026-10-01 S11-FE ACC-09 디자인 토큰 명도 대비 전수 적합화 및 수학적 계산 단위 시험 (Card 180, `agent/gemini/c180-s11fe-contrast-fixes`, base `coord/train7-ci-1641`)

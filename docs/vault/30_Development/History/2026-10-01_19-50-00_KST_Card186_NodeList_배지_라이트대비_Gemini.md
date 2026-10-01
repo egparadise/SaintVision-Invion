@@ -5,9 +5,9 @@ version: "1.0.1"
 status: "proposed"
 author: "Gemini"
 created: "2026-10-01T19:50:00+09:00"
-updated: "2026-10-01T20:45:00+09:00"
+updated: "2026-10-01T20:52:00+09:00"
 source_of_truth: "Git"
-base_sha: "2d2e0021"
+base_sha: "37119fc1"
 task_ids: ["ACC-09", "S11-FE"]
 tags: ["a11y", "contrast", "wcag", "nodelist", "status-badge", "design-tokens", "gemini"]
 ---
@@ -16,7 +16,7 @@ tags: ["a11y", "contrast", "wcag", "nodelist", "status-badge", "design-tokens", 
 
 ## 1. 배경 및 문제 정의 (PR #277 백로그 해소)
 
-PR #277(승인 커밋 `2d2e0021`)에서 카드 180 디자인 토큰 기반 대비 전수 개선 및 140곳 저대비 요소 일괄 해소가 완료되었으나, History 7.1절 및 Claude UI r1 피드백에서 `apps/web/src/features/nodes/NodeList.tsx`의 내부 상태 배지에 하드코딩 리터럴 색상 3종(`#38bdf8`, `#f85149`, `#d29922`)이 잔존하여 라이트 표면(`--color-bg-surface: #ffffff`) 위에서 WCAG 2.2 AA 본문 텍스트 기준($\ge 4.5:1$)에 미달함이 백로그로 식별되었다.
+PR #277(승인 커밋 `2d2e0021`, train 8 머지 `37119fc1`)에서 카드 180 디자인 토큰 기반 대비 전수 개선 및 140곳 저대비 요소 일괄 해소가 완료되었으나, History 7.1절 및 Claude UI r1 피드백에서 `apps/web/src/features/nodes/NodeList.tsx`의 내부 상태 배지에 하드코딩 리터럴 색상 3종(`#38bdf8`, `#f85149`, `#d29922`)이 잔존하여 라이트 표면(`--color-bg-surface: #ffffff`) 위에서 WCAG 2.2 AA 본문 텍스트 기준($\ge 4.5:1$)에 미달함이 백로그로 식별되었다.
 
 본 카드(카드 186)는 해당 3개 상태색을 하드코딩 리터럴에서 정식 디자인 토큰으로 승격하고, 라이트/다크 양쪽 테마에서 본문 텍스트 기준($\ge 4.5:1$)을 전수 달성하며, 색상 외 텍스트·아이콘 수단을 동반하여 상태 간 의미적 구별성을 확보하는 것을 목표로 한다.
 
@@ -120,20 +120,33 @@ PR #277(승인 커밋 `2d2e0021`)에서 카드 180 디자인 토큰 기반 대�
 | **NodeList 관련 회귀 테스트** | `npm run test -- node-status-lost-unknown-guard.test.tsx node-resource-usage-contract.test.tsx` | **PASS (전원 통과)** | 노드 상태 표출 및 자원 계약 무파괴 통과 |
 | **TypeScript 컴파일** | `npx tsc -b` (apps/web) | **PASS (에러 0건)** | 타입 체커 통과 |
 | **프로덕션 번들 빌드** | `npm run build` (apps/web) | **PASS (exit 0)** | Vite production bundle 정상 생성 |
-| **화면-백엔드 라우트 커버리지** | `pytest tests/test_route_coverage.py` | **PASS (41 passed)** | 41개 라우트/화면 검증 전원 통과 |
-| **프런트엔드 무결성 점검** | `python tools/check_frontend_integrity.py` | **PASS (0 violations)** | 93개 파일 9대 무결성 규칙 클린 통과 |
+| **화면-백엔드 라우트 커버리지** | `pytest tests/test_route_coverage.py` | **PASS (40 passed)** | 40개 라우트/화면 검증 전원 통과 |
+| **프런트엔드 무결성 점검** | `python tools/check_frontend_integrity.py` | **PASS (0 violations)** | 92개 파일 9대 무결성 규칙 클린 통과 |
 | **계약 바인딩 점검** | `python tools/check_contract_bindings.py` | **PASS (exit 0)** | 55개 픽스처 + 20개 커널 응답 타입 앵커 통과 |
 | **문서 정합성 점검** | `python tools/check_docs.py` | **PASS (exit 0)** | 1066개 문서 일관성 통과 |
-| **문서 인용 래칫 점검** | `python tools/check_doc_path_citations.py --ratchet --base-ref 2d2e0021` | **PASS (exit 0)** | 0 new broken citations |
-| **Git 포맷 무결성** | `git diff --check 2d2e0021` | **PASS (클린)** | 공백 및 개행 오류 0건 |
+| **문서 인용 래칫 점검** | `python tools/check_doc_path_citations.py --ratchet --base-ref 37119fc1` | **PASS (exit 0)** | 0 new broken citations |
+| **Git 포맷 무결성** | `git diff --check 37119fc1` | **PASS (클린)** | 공백 및 개행 오류 0건 |
 | **금지 문자열 검사** | 봇 호출 태그 점검 | **0건 검출 확인** | 커밋, 문서, PR 코멘트 대상 |
 
 ---
 
 ## 5. 인계 및 검토 요청
 
-- **Base 브랜치**: `agent/gemini/c180-s11fe-contrast-fixes` (head `2d2e0021`, PR #277)
+- **Base 브랜치**: `agent/gemini/c180-s11fe-contrast-fixes` (head `37119fc1`, PR #277)
 - **작업 브랜치**: `agent/gemini/c186-nodelist-badge-contrast`
 - **검토 요청**:
   - Claude: UI/접근성/스타일링 축 — 상태 배지 라이트 테마 시각적 대비, 비색상 의미 구별(아이콘/텍스트/ARIA) 및 단위 시험 11 passed 검토 요청.
   - Codex: 무결성/래칫 축 — `COLOR_LITERAL_MULTISET_BASELINE` 순수 감소, 9종 변이 100% 사살 불변식 검토 요청.
+
+---
+
+## 6. 범위 밖 잔여 리터럴 후속 백로그 등록 (Claude i1 피드백)
+
+본 카드(Card 186)는 NodeList 상태 배지 3개 리터럴(`#38bdf8`, `#f85149`, `#d29922`)의 디자인 토큰 승격 및 라이트 대비 개선을 전담하였으며, 아래 식별된 잔여 리터럴은 `COLOR_LITERAL_MULTISET_BASELINE`에 봉인된 상태로 차기 접근성/디자인 토큰 정비 카드로 안전하게 이월함:
+- `NodeList.tsx:228` telemetryUnavailable 카드 안내문 `<p>` 색상:
+  - `#fca5a5` (라이트 surface 대비 1.90:1)
+  - `#fde68a` (라이트 surface 대비 1.25:1)
+  - `#7dd3fc` (라이트 surface 대비 1.67:1)
+- `NodeList.tsx:420` 예약가능 라벨: `#3fb950` (라이트 surface 대비 2.54:1)
+- `NodeList.tsx:190` 카드 테두리: `#f59e0b`
+- `NodeDetail.tsx` 내 동일 3개 리터럴 (`#fca5a5`: 1건, `#fde68a`: 6건, `#7dd3fc`: 3건)
