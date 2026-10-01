@@ -276,6 +276,8 @@ jobs:
               # full-suite work. Keep both visible in the exact skip ratchet.
               'run only through tools/placement_lock_wait_diagnostic.py': 1,
               'run only through tools/placement_benchmark.py': 1,
+              # 실행 증거는 portal-login-harness job
+              'Intranet CA NSS DB live browser test requires Linux, certutil (libnss3-tools), and Playwright': 1,
           })
           actual_skips = Counter(
               (skipped.get('message') or '').strip()

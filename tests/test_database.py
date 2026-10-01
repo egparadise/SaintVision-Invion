@@ -329,6 +329,21 @@ def test_migration_created_a_three_month_lead(app_engine, migrated):
     assert statuses["audit_events"] >= 4
 
 
+def test_shared_database_fixture_covers_the_frozen_test_clock(
+    owner_engine, migrated, frozen_now
+):
+    """The deterministic test clock remains routable after a calendar rollover."""
+    with owner_engine.connect() as connection:
+        statuses = partition_status(connection, now=frozen_now)
+
+    assert {status.table for status in statuses} == {
+        "audit_events",
+        "evidence_envelopes",
+        "resource_snapshots",
+    }
+    assert all(status.months_ahead >= 1 for status in statuses)
+
+
 def test_there_is_no_default_partition(app_engine, migrated):
     """CR-06: a DEFAULT partition would absorb stray rows and then block
     attaching the real partition for that range."""

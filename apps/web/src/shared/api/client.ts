@@ -94,6 +94,16 @@ export function getAuthToken(): string | null {
 declare global {
   // eslint-disable-next-line no-var
   var __sv_auth_teardown_listeners: Set<() => void> | undefined;
+  // eslint-disable-next-line no-var
+  var __sv_has_auth_token: (() => boolean) | undefined;
+}
+
+if (typeof globalThis !== 'undefined') {
+  globalThis.__sv_has_auth_token = () => inMemoryAuthToken !== null;
+}
+
+export function hasAuthToken(): boolean {
+  return inMemoryAuthToken !== null;
 }
 
 export function onAuthTeardown(listener: () => void): () => void {
