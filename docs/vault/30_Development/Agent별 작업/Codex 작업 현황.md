@@ -1,15 +1,29 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.234"
+version: "1.0.236"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T09:40:00+09:00"
+updated: "2026-10-01T12:42:40+09:00"
 source_of_truth: "Git"
-active_card: "CARD-151 intranet ObjectStore and PITR rehearsal"
-active_card_status: "PR 248 review follow-up; Claude F1-F12 remediated, TLS operational U6 PASS, G-22 replication HBA blocked external"
-active_card_next: "Claude re-review; continue Card 154 independent review and canonical preflight when corrected inputs land"
+active_card: "CARD-170 S08-BE ROOF·BuildKit·single-GPU contract-first design"
+active_card_status: "Claude conditional approval reflected in design v1.1; product code, migration and registry unchanged"
+active_card_next: "Request Claude re-review, then begin S08-BE contract implementation after approval"
 ---
+
+## 2026-10-01 Card 170 — S08-BE ROOF·BuildKit·단일 GPU 계약 선행 설계
+
+- #264 v1.7의 S08-BE 50 유지 근거를 정본 문서와 코드로 재대조했다. ROOF 정의는
+  이미 있으나 단일 구현체는 없고, 현재 제품 지원은 kill switch에 한정된다.
+- BuildKit은 Node Docker socket과 분리한 rootless Build Service, GPU는 claimed count가
+  아닌 fresh measured device provider로 설계했다. strict 계약, 부정 시험, kill/cancel/
+  cleanup, synthetic와 실장비 증거 경계를 [[S08-BE_ROOF_BuildKit_단일_GPU_구현_설계]]에
+  고정했다.
+- 제품 코드·migration·registry를 바꾸지 않았고 S08-BE는 `planned`·50을 유지한다.
+  다음은 Claude 설계 검토 뒤 계약 delta다.
+- Claude 조건부 승인에서 요구한 BuildPlan literal, builder resource lease·kill/drain,
+  user namespace/seccomp/LSM/cgroup, cache epoch, GPU permit↔Docker read-back exact match,
+  AC-08 합성 criterion과 물리 인수의 분리, S08-BE 전용 시험 귀속을 설계 v1.1에 반영했다.
 
 ## 2026-09-30 Card151 Claude F1-F12 보안·측정 경계 후속
 - PR #248에서 root·service·PITR 자격을 host argv와 Docker `Config.Env`에서 제거하고 단일 보호 파일 mount로 고정했다. PITR policy의 delete 권한을 제거하고 bucket versioning을 활성화했다.
