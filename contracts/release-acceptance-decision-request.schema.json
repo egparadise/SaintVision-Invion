@@ -1,0 +1,156 @@
+{
+  "$defs": {
+    "ReleaseAcceptanceMeasurementRef": {
+      "additionalProperties": false,
+      "description": "One observed Evidence object, kept distinct from a target declaration.",
+      "properties": {
+        "evidenceId": {
+          "pattern": "^[A-Za-z][A-Za-z0-9_.:/-]{0,127}$",
+          "title": "Evidenceid",
+          "type": "string"
+        },
+        "evidenceSha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Evidencesha256",
+          "type": "string"
+        },
+        "observedAt": {
+          "format": "date-time",
+          "title": "Observedat",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidenceId",
+        "evidenceSha256",
+        "observedAt"
+      ],
+      "title": "ReleaseAcceptanceMeasurementRef",
+      "type": "object"
+    },
+    "ReleaseAcceptanceTargetRef": {
+      "additionalProperties": false,
+      "description": "A desired acceptance target, not evidence that it was measured.",
+      "properties": {
+        "targetId": {
+          "pattern": "^[A-Za-z][A-Za-z0-9_.:/-]{0,127}$",
+          "title": "Targetid",
+          "type": "string"
+        },
+        "targetSha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Targetsha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "targetId",
+        "targetSha256"
+      ],
+      "title": "ReleaseAcceptanceTargetRef",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "else": {
+        "properties": {
+          "knownLimitations": {
+            "maxItems": 0
+          }
+        }
+      },
+      "if": {
+        "properties": {
+          "outcome": {
+            "const": "conditional"
+          }
+        },
+        "required": [
+          "outcome"
+        ]
+      },
+      "then": {
+        "properties": {
+          "knownLimitations": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ],
+  "description": "The bounded, non-secret content an operator decides on.\n\nIdentity and fresh-authentication proof are deliberately absent: the server\nderives both from the verified access token.  Targets say what was required;\nmeasurements say what was observed.  Neither may be replaced by free text.",
+  "properties": {
+    "acceptanceIdRef": {
+      "pattern": "^[A-Z][A-Z0-9-]{1,15}$",
+      "title": "Acceptanceidref",
+      "type": "string"
+    },
+    "knownLimitations": {
+      "items": {
+        "maxLength": 300,
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 64,
+      "title": "Knownlimitations",
+      "type": "array"
+    },
+    "measurementRefs": {
+      "items": {
+        "$ref": "#/$defs/ReleaseAcceptanceMeasurementRef"
+      },
+      "maxItems": 64,
+      "minItems": 1,
+      "title": "Measurementrefs",
+      "type": "array"
+    },
+    "outcome": {
+      "enum": [
+        "accepted",
+        "conditional",
+        "rejected"
+      ],
+      "title": "Outcome",
+      "type": "string"
+    },
+    "reasonCode": {
+      "pattern": "^[A-Z][A-Z0-9_]{2,63}$",
+      "title": "Reasoncode",
+      "type": "string"
+    },
+    "targetManifestSha256": {
+      "maxLength": 64,
+      "minLength": 64,
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Targetmanifestsha256",
+      "type": "string"
+    },
+    "targetRefs": {
+      "items": {
+        "$ref": "#/$defs/ReleaseAcceptanceTargetRef"
+      },
+      "maxItems": 64,
+      "minItems": 1,
+      "title": "Targetrefs",
+      "type": "array"
+    }
+  },
+  "required": [
+    "acceptanceIdRef",
+    "outcome",
+    "targetManifestSha256",
+    "reasonCode",
+    "targetRefs",
+    "measurementRefs",
+    "knownLimitations"
+  ],
+  "title": "ReleaseAcceptanceDecisionRequest",
+  "type": "object"
+}
