@@ -241,7 +241,7 @@ describe('DesktopShell & useModalA11y Accessibility (ACC-03, ACC-04, focus_is_tr
     externalTrigger.remove();
   });
 
-  it('F3: Notification Center: Focus Trap cycles inside drawer (Tab & Shift+Tab)', async () => {
+  it('F3: Notification Center: Focus Trap cycles inside single-control drawer (Tab & Shift+Tab)', async () => {
     await act(async () => {
       root.render(<DesktopShell {...MOCK_PROPS} />);
     });
@@ -258,27 +258,48 @@ describe('DesktopShell & useModalA11y Accessibility (ACC-03, ACC-04, focus_is_tr
     const focusable = notifDrawer.querySelectorAll<HTMLElement>(
       'button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])'
     );
-    expect(focusable.length).toBeGreaterThanOrEqual(2);
-    const firstBtn = focusable[0];
-    const lastBtn = focusable[focusable.length - 1];
+    // Strict WCAG 2.4.3: Dialog contains only the close button (no fake controls)
+    expect(focusable.length).toBe(1);
+    const closeBtn = focusable[0];
+    expect(closeBtn.getAttribute('aria-label')).toBe('알림 센터 닫기');
 
-    // Focus last button and press Tab -> should wrap to first button
-    lastBtn.focus();
-    expect(document.activeElement).toBe(lastBtn);
+    // 1. Focus on close button -> Tab remains trapped on close button
+    closeBtn.focus();
+    expect(document.activeElement).toBe(closeBtn);
     await act(async () => {
       const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
       window.dispatchEvent(tabEvent);
+      expect(tabEvent.defaultPrevented).toBe(true);
     });
-    expect(document.activeElement).toBe(firstBtn);
+    expect(document.activeElement).toBe(closeBtn);
 
-    // Focus first button and press Shift+Tab -> should wrap to last button
-    firstBtn.focus();
-    expect(document.activeElement).toBe(firstBtn);
+    // 2. Focus on close button -> Shift+Tab remains trapped on close button
     await act(async () => {
       const shiftTabEvent = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true });
       window.dispatchEvent(shiftTabEvent);
+      expect(shiftTabEvent.defaultPrevented).toBe(true);
     });
-    expect(document.activeElement).toBe(lastBtn);
+    expect(document.activeElement).toBe(closeBtn);
+
+    // 3. Focus escaped to document.body while drawer open -> Tab pulls focus back to close button
+    document.body.focus();
+    expect(document.activeElement).toBe(document.body);
+    await act(async () => {
+      const extTabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
+      window.dispatchEvent(extTabEvent);
+      expect(extTabEvent.defaultPrevented).toBe(true);
+    });
+    expect(document.activeElement).toBe(closeBtn);
+
+    // 4. Focus escaped to document.body -> Shift+Tab pulls focus back to close button
+    document.body.focus();
+    expect(document.activeElement).toBe(document.body);
+    await act(async () => {
+      const extShiftTabEvent = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true });
+      window.dispatchEvent(extShiftTabEvent);
+      expect(extShiftTabEvent.defaultPrevented).toBe(true);
+    });
+    expect(document.activeElement).toBe(closeBtn);
   });
 
   it('F3: useModalA11y: initial closed state (isOpen=false) does NOT steal focus on mount', async () => {
@@ -373,24 +394,28 @@ describe('DesktopShell & useModalA11y Accessibility (ACC-03, ACC-04, focus_is_tr
     const focusable = notifDrawer.querySelectorAll<HTMLElement>(
       'button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])'
     );
-    const firstNotifBtn = focusable[0];
-    const lastNotifBtn = focusable[focusable.length - 1];
+    expect(focusable.length).toBe(1);
+    const closeNotifBtn = focusable[0];
+    expect(closeNotifBtn.getAttribute('aria-label')).toBe('알림 센터 닫기');
 
-    // Notification trap forward wrap: last -> first
-    lastNotifBtn.focus();
+    closeNotifBtn.focus();
+    expect(document.activeElement).toBe(closeNotifBtn);
+
+    // Notification trap Tab keeps focus on close button
     await act(async () => {
       const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
       window.dispatchEvent(tabEvent);
+      expect(tabEvent.defaultPrevented).toBe(true);
     });
-    expect(document.activeElement).toBe(firstNotifBtn);
+    expect(document.activeElement).toBe(closeNotifBtn);
 
-    // Notification trap backward wrap: first -> last
-    firstNotifBtn.focus();
+    // Notification trap Shift+Tab keeps focus on close button
     await act(async () => {
       const shiftTabEvent = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true });
       window.dispatchEvent(shiftTabEvent);
+      expect(shiftTabEvent.defaultPrevented).toBe(true);
     });
-    expect(document.activeElement).toBe(lastNotifBtn);
+    expect(document.activeElement).toBe(closeNotifBtn);
 
     // 5. Press Escape: drawer closes, and focus returns specifically to Notification trigger (not Start trigger!)
     await act(async () => {

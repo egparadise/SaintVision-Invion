@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.160"
+version: "1.0.161"
 status: "approved"
 author: "Gemini"
-updated: "2026-10-01T15:10:00+09:00"
+updated: "2026-10-01T15:30:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,16 +19,16 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-10-01T15:10:00+09:00 (Card 174 S11-FE 접근성 결함 수정 및 트리거 포커스 복원: F2 Overlay 상호 배타 activeOverlay 도입 및 전환 시험, F3 알림 센터 포커스 트랩 되살림 및 useModalA11y 초기 closed 포커스 탈취 방지, Vitest 9 passed, tsc 0 error, build 성공, route coverage 40 passed 100%).
+- 확인 기준: 2026-10-01T15:30:00+09:00 (Card 174 S11-FE 접근성 결함 수정 및 트리거 포커스 복원: F2 Overlay 상호 배타 activeOverlay 도입 및 전환 시험, F3 알림 센터 포커스 트랩 되살림 및 useModalA11y 초기 closed 포커스 탈취 방지, N1 알림 센터 모의 제어 버튼 제거 및 단일 컨트롤 대화상자 포커스 트랩 단언 시험 완비, Vitest 9 passed, tsc 0 error, build 성공, route coverage 40 passed 100%).
 
 ## 2026-10-01 S11-FE 접근성 결함 수정 및 대화상자·드로어 닫힘 트리거 포커스 복원 (Card 174, `agent/gemini/c174-s11fe-a11y-fixes`, PR #270)
-- **개요**: 실브라우저 인수 시험(`tools/run_real_browser_acceptance.py` Invariant 6)에서 PARTIAL로 기록되어 온 '트리거로 focus 복귀'(`focus_is_trigger`) 결함을 치유하고, Codex 리뷰 의견(F2, F3)을 반영하여 접근성 불변식을 완비하였다:
+- **개요**: 실브라우저 인수 시험(`tools/run_real_browser_acceptance.py` Invariant 6)에서 PARTIAL로 기록되어 온 '트리거로 focus 복귀'(`focus_is_trigger`) 결함을 치유하고, Codex 리뷰 의견(F2, F3, N1)을 반영하여 접근성 불변식을 완비하였다:
   1. `DesktopShell.tsx` 오버레이 상호 배타(`activeOverlay`: `'none' | 'start' | 'notifications'`) 단일 활성 스코프 도입 (F2):
      - 시작 메뉴와 알림 센터가 동시에 열려 포커스 트랩이 상호 간섭하거나 시작 메뉴 트랩이 알림 센터를 가로채던 결함을 원천 치유함.
      - 오버레이 간 직접 전환(`start` $\leftrightarrow$ `notifications`) 시 이전 트리거로의 불필요한 포커스 복원을 억제하고 신규 활성화된 오버레이로 포커스를 매끄럽게 이양함.
      - 오버레이가 완전히 닫힐 때(`none`)에만 해당 오버레이의 트리거 버튼으로 포커스를 정확히 복원함.
-  2. `DesktopShell.tsx` 알림 센터 포커스 트랩 되살림 (F3):
-     - 알림 센터 헤더에 '모두 확인'(`button[data-testid="notif-clear-all-btn"]`) 및 '닫기'(`×`) 상호작용 요소를 배치하여 W3C WCAG 2.4.3 표준 Tab / Shift+Tab 순환 잠금을 실현함.
+  2. `DesktopShell.tsx` 알림 센터 포커스 트랩 (F3 & N1):
+     - 알림 센터 헤더의 동작 없는 모의 제어 버튼(`notif-clear-all-btn`)을 완전 제거하고, 닫기(`×`) 단일 대화상자 요소 환경에서 W3C WCAG 2.4.3 표준 Tab / Shift+Tab 순환 잠금(닫기 버튼 상주 및 외부 이탈 시 닫기 버튼으로 강제 포커스)을 실현하고 회귀 시험을 완비함.
   3. `useModalA11y.ts` 초기 마운트 closed 상태(`isOpen=false`) 포커스 탈취 결함 치유 (F3):
      - `wasOpenRef.current` 추적 가드를 도입하여 모달이 닫힌 상태로 초기 마운트될 때 `triggerRef`로 포커스를 강탈하던 문제를 원천 방지함.
   4. WAI-ARIA 규격 강화: 시작 메뉴 `aria-haspopup="menu"`, `aria-controls`, `role="menu"`, `aria-expanded`; 알림 센터 `aria-haspopup="dialog"`, `aria-controls`, `role="dialog"`, `aria-modal="true"`, `aria-expanded` 완비.

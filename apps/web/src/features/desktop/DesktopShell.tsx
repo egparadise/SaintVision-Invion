@@ -677,35 +677,17 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
             <span style={{ fontWeight: 700, fontSize: '0.875rem' }}>알림 센터</span>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <button
-                type="button"
-                data-testid="notif-clear-all-btn"
-                aria-label="알림 모두 확인"
-                style={{
-                  background: 'none',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  borderRadius: '4px',
-                  color: '#94a3b8',
-                  cursor: 'pointer',
-                  fontSize: '0.6875rem',
-                  padding: '2px 6px',
-                }}
-              >
-                모두 확인
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveOverlay('none');
-                  notifTriggerRef.current?.focus();
-                }}
-                aria-label="알림 센터 닫기"
-                style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
-              >
-                ×
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveOverlay('none');
+                notifTriggerRef.current?.focus();
+              }}
+              aria-label="알림 센터 닫기"
+              style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+            >
+              ×
+            </button>
           </div>
           {notifications.map((n) => (
             <div
