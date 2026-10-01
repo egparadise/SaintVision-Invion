@@ -167,16 +167,97 @@ export interface BuildPlan {
   resolvedBaseImageDigests: Array<string>;
 }
 
+export interface BuildDaemonIdentity {
+  pid: number;
+  processUid: number;
+  processStartTicks: number;
+  comm: "buildkitd";
+}
+
+export interface BuildIsolationObservation {
+  userNamespace: true;
+  seccompMode: "filter";
+  lsm: "apparmor" | "selinux";
+  noNewPrivileges: true;
+  cgroupMode: "v2";
+}
+
+export interface BuildHealthFieldSources {
+  daemonIdentity: "node-proc-buildkitd";
+  runtimeIdentity: "node-container-image-digest" | "node-buildkitd-binary-sha256";
+  rootless: "node-proc-user-namespace";
+  privileged: "node-runtime-security-readback";
+  hostAccess: "node-runtime-security-readback";
+  entitlements: "node-runtime-security-readback";
+  devices: "node-runtime-security-readback";
+  binds: "node-runtime-security-readback";
+  userNamespace: "node-proc-user-namespace";
+  seccompMode: "node-host-security-readback";
+  lsm: "node-host-security-readback";
+  noNewPrivileges: "node-host-security-readback";
+  cgroupMode: "node-host-security-readback";
+}
+
+export interface BuildProviderHealthReceipt {
+  schemaVersion: "build-provider-health-receipt:1";
+  writerKind: "node-agent";
+  nodeId: NodeId;
+  builderInstanceId: string;
+  builderProfileId: string;
+  recoveryEpoch: number;
+  observedAt: Timestamp;
+  runtimeIdentity: string;
+  daemonIdentity: BuildDaemonIdentity;
+  rootless: true;
+  privileged: false;
+  hostAccess: false;
+  entitlements: Array<string>;
+  devices: Array<string>;
+  binds: Array<string>;
+  buildkitVersion: string;
+  rootlesskitVersion: string;
+  isolation: BuildIsolationObservation;
+  fieldSources: BuildHealthFieldSources;
+}
+
+export interface BuildPhysicalCleanupReceipt {
+  schemaVersion: "build-physical-cleanup-receipt:1";
+  writerKind: "node-agent";
+  buildSessionId: string;
+  nodeId: NodeId;
+  resourceId: ResourceId;
+  leaseId: LeaseId;
+  recoveryEpoch: number;
+  daemonIdentity: BuildDaemonIdentity;
+  stopResult: "stopped" | "already-absent";
+  partialExportDisposition: ("quarantined" | "purged" | null);
+  cacheDisposition: "retained" | "quarantined" | "purged";
+  builderClaimReleased: true;
+  cgroupRemoved: true;
+  verifiedAt: Timestamp;
+}
+
 export interface BuildCleanupReceipt {
   leaseReleased: boolean;
   builderClaimReleased: boolean;
   cgroupRemoved: boolean;
   cacheDisposition: "retained" | "quarantined" | "purged";
   verifiedAt: Timestamp;
+  physicalReceipt: BuildPhysicalCleanupReceipt;
+  physicalReceiptDigest: string;
+}
+
+export interface BuildDispatchCompletedPayload {
+  decisionId: string;
+  bindingDigest: string;
+  resourceId: ResourceId;
+  leaseId: LeaseId;
+  evidenceId: EvidenceId;
+  evidenceDigest: string;
 }
 
 export interface BuildAuditEvent {
-  event: "request_validated" | "policy_bound" | "builder_claimed" | "build_started" | "network_decision" | "output_verified" | "build_failed" | "build_cancelled" | "cleanup_verified";
+  event: "request_validated" | "policy_bound" | "builder_claimed" | "build_started" | "network_decision" | "output_verified" | "build_failed" | "build_cancelled" | "cleanup_verified" | "dispatch_completed";
   traceId: TraceId;
   timestamp: Timestamp;
   decisionId: string;

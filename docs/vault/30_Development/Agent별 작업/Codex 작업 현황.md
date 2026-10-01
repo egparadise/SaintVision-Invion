@@ -1,15 +1,25 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.263"
+version: "1.0.264"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T06:41:34+09:00"
+updated: "2026-10-02T08:38:37+09:00"
 source_of_truth: "Git"
-active_card: "CARD-207 S08-BE OCI digest and live buildkitd PID binding"
-active_card_status: "Exact-head hosted rootless BuildKit measured pass; independent archive mutation and process identity tests added"
-active_card_next: "Claude condition recheck; product liveness binding remains a later card"
+active_card: "CARD-214 prerequisite S08-BE BuildKit node receipt contract"
+active_card_status: "Strict node health, physical cleanup, and dispatch-completed contracts generated and focused-tested"
+active_card_next: "Open contract PR for Claude review; card 214 stacks only after approval"
 ---
+
+## 2026-10-02 Card 214 선행 — BuildKit node receipt 계약
+
+- PR #306의 계약 질문은 선택지 (a)로 확정했다. strict node-agent health/physical cleanup
+  receipt와 `dispatch_completed` 감사 계약을 먼저 고정하고 제품 caller는 이 PR 위에 stack한다.
+- control-plane writer, CI isolation 완화값, caller-asserted source, 누락·unknown field를 schema에서
+  거부한다. cleanup receipt의 canonical digest와 redacted 완료 payload exact set도 고정했다.
+- migration·제품 config·caller·route는 0건이며 기존 `inv.evidence`/`inv.outbox`를 재사용한다.
+  focused contract 시험 **78 passed**. [[S08-BE_BuildKit_node_receipt_계약]],
+  [[2026-10-02_08-38-37_KST_S08-BE_BuildKit_node_receipt_계약_Codex]].
 
 ## 2026-10-02 Card 207 — OCI digest·live buildkitd PID 결속
 

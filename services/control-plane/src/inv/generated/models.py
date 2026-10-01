@@ -309,10 +309,115 @@ class BuildPlan(BaseModel):
     )
 
 
+class BuildDaemonIdentity(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    pid: conint(ge=2, le=2147483647)
+    processUid: conint(ge=1, le=4294967295)
+    processStartTicks: conint(ge=1, le=9007199254740991)
+    comm: Literal['buildkitd']
+
+
+class Lsm(StrEnum):
+    apparmor = 'apparmor'
+    selinux = 'selinux'
+
+
+class BuildIsolationObservation(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    userNamespace: Literal[True]
+    seccompMode: Literal['filter']
+    lsm: Lsm
+    noNewPrivileges: Literal[True]
+    cgroupMode: Literal['v2']
+
+
+class RuntimeIdentity(StrEnum):
+    node_container_image_digest = 'node-container-image-digest'
+    node_buildkitd_binary_sha256 = 'node-buildkitd-binary-sha256'
+
+
+class BuildHealthFieldSources(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    daemonIdentity: Literal['node-proc-buildkitd']
+    runtimeIdentity: RuntimeIdentity
+    rootless: Literal['node-proc-user-namespace']
+    privileged: Literal['node-runtime-security-readback']
+    hostAccess: Literal['node-runtime-security-readback']
+    entitlements: Literal['node-runtime-security-readback']
+    devices: Literal['node-runtime-security-readback']
+    binds: Literal['node-runtime-security-readback']
+    userNamespace: Literal['node-proc-user-namespace']
+    seccompMode: Literal['node-host-security-readback']
+    lsm: Literal['node-host-security-readback']
+    noNewPrivileges: Literal['node-host-security-readback']
+    cgroupMode: Literal['node-host-security-readback']
+
+
+class BuildProviderHealthReceipt(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    schemaVersion: Literal['build-provider-health-receipt:1']
+    writerKind: Literal['node-agent']
+    nodeId: NodeId
+    builderInstanceId: constr(min_length=1, max_length=200)
+    builderProfileId: constr(min_length=1, max_length=200)
+    recoveryEpoch: conint(ge=1, le=9007199254740991)
+    observedAt: Timestamp
+    runtimeIdentity: constr(pattern=r'^sha256:[0-9a-f]{64}$')
+    daemonIdentity: BuildDaemonIdentity
+    rootless: Literal[True]
+    privileged: Literal[False]
+    hostAccess: Literal[False]
+    entitlements: list[str] = Field(..., max_length=0)
+    devices: list[str] = Field(..., max_length=0)
+    binds: list[str] = Field(..., max_length=0)
+    buildkitVersion: constr(min_length=1, max_length=100)
+    rootlesskitVersion: constr(min_length=1, max_length=100)
+    isolation: BuildIsolationObservation
+    fieldSources: BuildHealthFieldSources
+
+
+class StopResult(StrEnum):
+    stopped = 'stopped'
+    already_absent = 'already-absent'
+
+
+class PartialExportDisposition(StrEnum):
+    quarantined = 'quarantined'
+    purged = 'purged'
+
+
 class CacheDisposition(StrEnum):
     retained = 'retained'
     quarantined = 'quarantined'
     purged = 'purged'
+
+
+class BuildPhysicalCleanupReceipt(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    schemaVersion: Literal['build-physical-cleanup-receipt:1']
+    writerKind: Literal['node-agent']
+    buildSessionId: UUID
+    nodeId: NodeId
+    resourceId: ResourceId
+    leaseId: LeaseId
+    recoveryEpoch: conint(ge=1, le=9007199254740991)
+    daemonIdentity: BuildDaemonIdentity
+    stopResult: StopResult
+    partialExportDisposition: PartialExportDisposition | None
+    cacheDisposition: CacheDisposition
+    builderClaimReleased: Literal[True]
+    cgroupRemoved: Literal[True]
+    verifiedAt: Timestamp
 
 
 class BuildCleanupReceipt(BaseModel):
@@ -324,6 +429,20 @@ class BuildCleanupReceipt(BaseModel):
     cgroupRemoved: bool
     cacheDisposition: CacheDisposition
     verifiedAt: Timestamp
+    physicalReceipt: BuildPhysicalCleanupReceipt
+    physicalReceiptDigest: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class BuildDispatchCompletedPayload(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    decisionId: constr(min_length=1, max_length=200)
+    bindingDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    resourceId: ResourceId
+    leaseId: LeaseId
+    evidenceId: EvidenceId
+    evidenceDigest: constr(pattern=r'^[0-9a-f]{64}$')
 
 
 class Event(StrEnum):
@@ -336,6 +455,7 @@ class Event(StrEnum):
     build_failed = 'build_failed'
     build_cancelled = 'build_cancelled'
     cleanup_verified = 'cleanup_verified'
+    dispatch_completed = 'dispatch_completed'
 
 
 class BuildAuditEvent(BaseModel):
