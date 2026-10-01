@@ -271,3 +271,8 @@ def test_workflow_grants_signing_permissions_only_to_manual_attestation_job():
     )
     assert producer_upload["with"]["retention-days"] == 30
     assert attestation_upload["with"]["retention-days"] == 30
+    create_step = next(
+        step for step in attestation["steps"]
+        if step.get("name") == "Create the authoritative VF-CL receipt"
+    )
+    assert 'sha256:${EVIDENCE_ARTIFACT_DIGEST#sha256:}' in create_step["run"]

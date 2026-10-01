@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.265"
+version: "1.0.266"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T08:16:01+09:00"
+updated: "2026-10-02T08:23:28+09:00"
 source_of_truth: "Git"
 active_card: "CARD-211 VF-CL CI receipt attestation"
-active_card_status: "Claude r1 expiry and interpreter conditions implemented; 265 focused tests pass"
-active_card_next: "Push one review-fix commit, run the label producer and exact-head dispatch, and record verification.json"
+active_card_status: "Label producer passed; first dispatch exposed artifact-digest prefix normalization defect"
+active_card_next: "Push digest normalization regression, rerun exact-head dispatch, and record verification.json"
 ---
 
 ## 2026-10-02 Card 211 — VF-CL CI receipt attestation
@@ -25,6 +25,8 @@ active_card_next: "Push one review-fix commit, run the label producer and exact-
 - Claude r1의 만료 공백을 닫아 evidence artifact 보존기간을 30일로 고정하고, attested/recorded
   `expiresAt` 누락·불일치·만료를 모두 거부한다. importer는 Python 3.11 미만에서 stdin을 읽기 전에
   즉시 거부한다. 세 focused 파일 **265 passed**.
+- label producer run `36940289003` success. dispatch `36940396639`은 raw 64-hex output과
+  `sha256:` API digest 비교 형식 차이로 receipt step에서 실패했고, 정규화 회귀를 추가했다.
 
 ## 2026-10-02 Card 205 — AC-11 사용자 기기 접근성 수동 인수 importer
 

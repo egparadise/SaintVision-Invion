@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-2026-10-02-CARD211-VFCL-CI-ATTESTATION-CODEX"
 title: "Card 211 VF-CL CI receipt attestation"
-version: "1.1.0"
+version: "1.1.1"
 status: "in-progress"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-02T08:16:01+09:00"
+updated: "2026-10-02T08:23:28+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "d0b2a4c6"
@@ -40,3 +40,7 @@ runner에서 닫을 수 있으므로 train 14 후보 `d0b2a4c6` 위에 `#295`와
 - receipt/attestation, registry rule 7, accessibility importer focused: **265 passed**.
 - exact-head hosted attested run은 구현 push 뒤 실행하며, run ID와 artifact digest는 결과가 나온 뒤 이 절에
   추가한다. 그 전에는 `ciVerified`를 올리지 않는다.
+- label producer run `36940289003`은 head `8c2a703c`에서 success했다. 첫 workflow_dispatch run
+  `36940396639`은 producer success 뒤 receipt step의 digest 비교에서 실패했다. `upload-artifact` output은
+  64-hex, Actions API는 `sha256:<hex>`였는데 workflow가 형식을 정규화하지 않은 하네스 결함이다. 실패는
+  숨기지 않고 보존하며 `sha256:${digest#sha256:}` 정규화와 회귀 시험 뒤 exact-head를 재실행한다.
