@@ -21,7 +21,16 @@ from typing import Any, Protocol
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_VERSION = "1.0.0"
-AXIS = "long-soak"
+#: The AC-11 axes this importer writes envelopes for, as string literals at module
+#: level. The contract is read by tools/assemble_ac11_manifest.py with ``ast``, so the
+#: axis map's claim is checked against this declaration rather than against a string
+#: search over this file -- a search answers "is the name written anywhere", which a
+#: comment satisfies and a constant reference defeats (#299 r3).
+EMITTED_AXES: tuple[str, ...] = (
+    "long-soak",
+)
+#: One source for the name: the envelope's axis is the axis this importer declares.
+AXIS = EMITTED_AXES[0]
 TARGET_ID = "s11-ac11-composite-long-soak-v0"
 DRY_RUN_PURPOSE = "s11-ac11-composite-long-soak-dry-run"
 REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
