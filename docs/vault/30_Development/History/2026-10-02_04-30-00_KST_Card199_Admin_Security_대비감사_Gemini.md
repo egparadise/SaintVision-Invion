@@ -1,9 +1,9 @@
-# 2026-10-02 04:30:00 KST (2026-10-02 04:56:00 KST r1 보강) — Card 199: 관리자 보안 콘솔 (AdminSecurityConsole) 색상 리터럴 inventory 전수(186→0), 대비 표본/DOM 결속 감사 및 디자인 토큰 승격 (Gemini)
+# 2026-10-02 04:30:00 KST (2026-10-02 05:04:00 KST r2 보강) — Card 199: 관리자 보안 콘솔 (AdminSecurityConsole) 색상 리터럴 inventory 전수(186→0), 대비 표본/DOM 결속 감사 및 디자인 토큰 승격 (Gemini)
 
 - **문서 ID**: HIST-GEMINI-CARD199-ADMIN-SECURITY-CONTRAST
 - **작업 branch**: agent/gemini/c199-admin-security-contrast
 - **Base commit**: 67df36e8b4e723224b422ee5ec671d467972054c (PR #296 r3 HEAD)
-- **KST 시각**: 2026-10-02 04:30:00 KST (r1 보강: 2026-10-02 04:56:00 KST)
+- **KST 시각**: 2026-10-02 04:30:00 KST (r1 보강: 04:56:00 KST, r2 보강: 2026-10-02 05:04:00 KST)
 - **작업자**: Gemini (Frontend / UI / 접근성)
 - **독립 검토자 요청**: Claude UI (UI/접근성 축), Codex (계약/디자인 토큰/불변식 축)
 - **상태**: proposed (검토 전 자가 승인 금지)
@@ -58,34 +58,59 @@ ACC-09(접근성 명도 대비 적합화) 트랙의 후속 영역으로, 시스�
 | **승인 ID 입력 필드 테두리**<br>(AdminSecurityConsole:811) | `#30363d` on `#f1f5f9` (Light 가상)<br>`#30363d` on `#1f2937` (Dark) | 11.14:1 / **1.20:1** | **FAIL**<br>(Dark < 3.0:1) | `var(--color-border-subtle)` on<br>`var(--color-bg-subtle)` | **3.18:1** | **3.08:1** | **PASS** (>= 3.0:1) |
 | **파라미터 요약 텍스트**<br>(AdminSecurityConsole:1525) | `#8b949e` on `#f1f5f9` (Light 가상)<br>`#8b949e` on `#1f2937` (Dark) | **2.81:1** / 4.77:1 | **FAIL**<br>(Light < 4.5:1) | `var(--color-text-secondary)` on<br>`var(--color-bg-subtle)` | **6.92:1** | **11.86:1** | **PASS** (>= 4.5:1) |
 | **파라미터 요약 테두리**<br>(AdminSecurityConsole:1529) | `#30363d` on `#f1f5f9` (Light 가상)<br>`#30363d` on `#1f2937` (Dark) | 11.14:1 / **1.20:1** | **FAIL**<br>(Dark < 3.0:1) | `var(--color-border-subtle)` on<br>`var(--color-bg-subtle)` | **3.18:1** | **3.08:1** | **PASS** (>= 3.0:1) |
-| **모달 서피스 on 스크림 백드롭**<br>(AdminSecurityConsole:1427/1441) | `#ffffff` on `#30363d` (Light 가상)<br>`#111827` on `#0d1117` (Dark) | 12.20:1 / 1.15:1 | **FAIL**<br>(Dark boundary) | `var(--color-bg-surface)` on<br>`var(--color-bg-backdrop)` (0.75 alpha composite) | **10.68:1** | **1.16:1**<br>(테두리 6.41:1 확보) | **PASS**<br>(Light >= 3.0:1 & 테두리 경계 확보) |
+| **모달 서피스 on 스크림 백드롭**<br>(AdminSecurityConsole:1427/1441) | `#ffffff` on `#30363d` (Light 가상)<br>`#111827` on `#0d1117` (Dark) | 12.20:1 / 1.15:1 | **FAIL**<br>(Dark boundary) | `var(--color-bg-surface)` on<br>`var(--color-bg-backdrop)` (0.75 alpha composite `#3e3f3f`) | **10.57:1** | **1.16:1**<br>(테두리 7.46:1 확보) | **PASS**<br>(Light >= 3.0:1 & 테두리 경계 확보) |
 
 ---
 
-### 2.2 정본 토큰 재현 및 실측 수치 결속 (수기 수치 방지 재현 명령)
+### 2.2 정본 토큰 파싱 기반 동적 재현 명령 및 시험 결속
 
-문서 내 모든 대비 수치는 `apps/web/src/index.css`의 `:root` 및 `[data-theme='dark']` 토큰 선언을 읽어 WCAG 2.2 상대휘도 공식으로 실측·재현됩니다.
+문서 내 모든 대비 수치는 `apps/web/src/index.css`의 토큰 선언(`:root` 및 `[data-theme='dark']`)을 **직접 파싱**하여 WCAG 2.2 상대휘도 공식 및 제품 `blendRgba()`(`Math.round` 반올림)으로 동적 연산됩니다. 하드코딩 사본이 아닌 실시간 파일 파싱 명령입니다.
 
 ```bash
-# 다크 테마 정본 대비 수치 독립 재현 명령 (Python)
+# apps/web/src/index.css 직접 파싱 기반 전수 대비 동적 재현 명령 (Python)
 python -c "
-import math
-def lum(hex_str):
-    hex_str = hex_str.lstrip('#')
-    r, g, b = [int(hex_str[i:i+2], 16) / 255.0 for i in (0, 2, 4)]
-    def adj(c): return c / 12.92 if c <= 0.03928 else math.pow((c + 0.055) / 1.055, 2.4)
-    return 0.2126 * adj(r) + 0.7152 * adj(g) + 0.0722 * adj(b)
+import math, re
+
+with open('apps/web/src/index.css', 'r', encoding='utf-8') as f:
+    css = f.read()
+
+def parse_tokens(block):
+    clean = re.sub(r'/\*[\s\S]*?\*/', '', block)
+    tokens = {}
+    for m in re.finditer(r'(--color-[a-z0-9-]+)\s*:\s*([^;]+);', clean):
+        tokens[m.group(1).strip()] = m.group(2).strip()
+    return tokens
+
+light_tokens = parse_tokens(re.search(r':root\s*\{([\s\S]*?)\}', css).group(1))
+dark_tokens = parse_tokens(re.search(r'\[data-theme='dark'\]\s*\{([\s\S]*?)\}', css).group(1))
+
+def hex_to_rgb(h): return [int(h.lstrip('#')[i:i+2], 16) for i in (0, 2, 4)]
+def round_half_up(n): return int(math.floor(n + 0.5))
+def blend(tint, alpha, underlay):
+    u = hex_to_rgb(underlay)
+    return '#' + ''.join(f'{round_half_up(alpha * tint[i] + (1 - alpha) * u[i]):02x}' for i in range(3))
+def lum(h):
+    rgb = hex_to_rgb(h)
+    def adj(c):
+        v = c / 255.0
+        return v / 12.92 if v <= 0.03928 else math.pow((v + 0.055) / 1.055, 2.4)
+    return 0.2126 * adj(rgb[0]) + 0.7152 * adj(rgb[1]) + 0.0722 * adj(rgb[2])
 def cr(c1, c2):
     l1, l2 = lum(c1), lum(c2)
     return (max(l1, l2) + 0.05) / (min(l1, l2) + 0.05)
 
-print('text-secondary / bg-surface (dark):', f'{cr(\"#e5e7eb\", \"#111827\"):.2f}:1')   # 14.33:1
-print('status-online / bg-surface (dark):', f'{cr(\"#22c55e\", \"#111827\"):.2f}:1')     # 7.79:1
-print('brand-hover / bg-surface (dark):', f'{cr(\"#93c5fd\", \"#111827\"):.2f}:1')       # 9.84:1
-print('status-degraded / bg-subtle (dark):', f'{cr(\"#f59e0b\", \"#1f2937\"):.2f}:1')   # 6.83:1
-print('text-secondary / bg-subtle (dark):', f'{cr(\"#e5e7eb\", \"#1f2937\"):.2f}:1')    # 11.86:1
-print('brand-hover / bg-subtle (dark):', f'{cr(\"#93c5fd\", \"#1f2937\"):.2f}:1')       # 8.14:1
-print('brand-primary / bg-subtle (dark):', f'{cr(\"#60a5fa\", \"#1f2937\"):.2f}:1')     # 5.77:1
+scrim_light = blend([0, 0, 0], 0.75, light_tokens['--color-bg-canvas'])
+print('modal surface on scrim_light (#3e3f3f):', f'{cr(light_tokens["--color-bg-surface"], scrim_light):.2f}:1')  # 10.57:1
+scrim_dark = blend([0, 0, 0], 0.75, dark_tokens['--color-bg-canvas'])
+print('modal border (status-offline) on scrim_dark:', f'{cr(dark_tokens["--color-status-offline"], scrim_dark):.2f}:1')  # 7.46:1
+print('text-secondary / bg-surface (dark):', f'{cr(dark_tokens["--color-text-secondary"], dark_tokens["--color-bg-surface"]):.2f}:1')  # 14.33:1
+print('status-online / bg-surface (dark):', f'{cr(dark_tokens["--color-status-online"], dark_tokens["--color-bg-surface"]):.2f}:1')      # 7.79:1
+print('brand-hover / bg-surface (dark):', f'{cr(dark_tokens["--color-brand-hover"], dark_tokens["--color-bg-surface"]):.2f}:1')        # 9.84:1
+print('status-degraded / bg-subtle (dark):', f'{cr(dark_tokens["--color-status-degraded"], dark_tokens["--color-bg-subtle"]):.2f}:1')    # 6.83:1
+print('text-secondary / bg-subtle (dark):', f'{cr(dark_tokens["--color-text-secondary"], dark_tokens["--color-bg-subtle"]):.2f}:1')     # 11.86:1
+print('brand-hover / bg-subtle (dark):', f'{cr(dark_tokens["--color-brand-hover"], dark_tokens["--color-bg-subtle"]):.2f}:1')         # 8.14:1
+print('brand-primary / brand-subtle (dark):', f'{cr(dark_tokens["--color-brand-primary"], dark_tokens["--color-brand-subtle"]):.2f}:1') # 5.75:1
+print('brand-primary / brand-subtle (light):', f'{cr(light_tokens["--color-brand-primary"], light_tokens["--color-brand-subtle"]):.2f}:1') # 4.24:1
 "
 ```
 
@@ -101,7 +126,7 @@ print('brand-primary / bg-subtle (dark):', f'{cr(\"#60a5fa\", \"#1f2937\"):.2f}:
   - 비상 정지(Kill Switch) 및 노드 격리(Drain) 경고 배너: `var(--color-bg-subtle)` 배경, `var(--color-status-offline)` 텍스트 및 테두리 결속 (Light 5.91:1, Dark 5.31:1).
   - 모의 시뮬레이션 고지 배너: `var(--color-bg-subtle)` 배경, `var(--color-status-degraded)` 텍스트 및 테두리 결속 (Light 4.58:1, Dark 6.83:1).
   - 입력 필드 및 셀렉트 박스: `var(--color-bg-subtle)` 배경, `var(--color-text-primary)` 텍스트, `var(--color-border-subtle)` 테두리 결속.
-  - 텍스트 강조 및 코드 블록: `var(--color-brand-hover)` 채택 (Light 6.12:1 on subtle, Dark 8.14:1 on subtle; brand-subtle 배경 위에서 brand-primary가 light 4.24:1, dark 3.99:1로 미달하는 결함을 방지하는 전사 통일 기준 준수).
+  - 텍스트 강조 및 코드 블록: `var(--color-brand-hover)` 채택 (Light 6.12:1 on subtle, Dark 8.14:1 on subtle; 라이트 모드에서 brand-primary on brand-subtle이 4.24:1로 미달하는 결함을 방지하고 전사 UI 통일 기준 준수. 다크 모드 brand-primary on brand-subtle은 5.75:1로 통과하나 일관된 상호작용 및 고대비 보장을 위해 brand-hover로 통일).
   - 불변 감사 로그 서브탭 컨테이너: `data-testid="admin-audit-subtab-container"` 결속 추가로 DOM 레벨 상위 컨테이너 배경 및 테두리 검증 보강 (T1).
 
 ### 3.2 `apps/web/src/index.css`
@@ -115,7 +140,7 @@ print('brand-primary / bg-subtle (dark):', f'{cr(\"#60a5fa\", \"#1f2937\"):.2f}:
   - `backend-kill-switch-status`: `var(--color-text-secondary)` on surface (Light 7.58:1, Dark 14.33:1).
   - `input-kill-switch-approval-id`: `var(--color-text-primary)` on subtle (Light 16.30:1, Dark 14.05:1), border `var(--color-border-subtle)` (Light 3.18:1, Dark 3.08:1).
   - `kill-switch-modal`: overlay `var(--color-bg-backdrop)`, title `var(--color-status-offline)` on surface (Light 6.47:1, Dark 6.41:1).
-  - **T2 백드롭 알파 및 모달 경계 대비**: 백드롭 alpha $\ge 0.50$ 엄밀 단언(워시아웃 차단), 0.75 alpha 합성 캔버스 위 모달 서피스 대비 $\ge 3.0:1$(10.68:1) 검증.
+  - **T2 백드롭 알파 및 모달 경계 대비**: 백드롭 alpha $\ge 0.50$ 엄밀 단언(워시아웃 차단), 0.75 alpha 합성 캔버스 위 모달 서피스 대비 $\ge 3.0:1$(10.57:1) 검증.
   - `kill-switch-approval-required-notice`: `var(--color-status-offline)` on subtle (Light 5.91:1, Dark 5.31:1).
   - `kill-switch-mock-notice`: `var(--color-status-degraded)` on subtle (Light 4.58:1, Dark 6.83:1).
   - `kill-switch-params-summary`: `var(--color-text-secondary)` on subtle (Light 6.92:1, Dark 11.86:1), border `var(--color-border-subtle)`.

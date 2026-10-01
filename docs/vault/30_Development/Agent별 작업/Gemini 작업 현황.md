@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.183"
+version: "1.0.184"
 status: "proposed"
 author: "Gemini"
-updated: "2026-10-02T04:56:34+09:00"
+updated: "2026-10-02T05:04:45+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,8 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-10-02T04:56:34+09:00 (Card 199 관리자 보안 콘솔 r1 조치: Claude UI r1 및 Codex r1 피드백 전수 반영 — T1 Test 9e-2에 계층적 조상 컨테이너 배경 추적(ancestorBgTokens) 및 텍스트 토큰 배경 거부 로직 추가, admin-audit-subtab-container DOM 결속, 변이 A1 사살; T2 모달 백드롭 스크림 alpha >= 0.50 엄밀 단언 및 0.75 alpha 합성 캔버스 위 모달 서피스 대비 10.68:1 >= 3.0:1 실측, 변이 A6 사살; T3/Codex F1 History §2.1 표 및 §3 내 다크 실측 수치 7개 오류를 index.css 정본 토큰 공식으로 전수 동기화(text-secondary/surface 14.33, status-online/surface 7.79, brand-hover/surface 9.84, status-degraded/subtle 6.83, text-secondary/subtle 11.86, brand-hover/subtle 8.14, brand-primary/subtle 5.77), brand-hover 채택 근거 정확화, Python 독립 재현 명령 문서 결속; T4 표현 명확화; Revert-Fail Probes 49~50 추가, 12종 변이 M1~M12 12/12 100% 사살 실측; Vitest 18 passed, admin tests 59 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반, diff --check clean).
+- 확인 기준: 2026-10-02T05:04:45+09:00 (Card 199 관리자 보안 콘솔 r2 조치: Claude r2 조건부 승인 및 Codex r2 피드백 전수 반영 — V1/F1 모달 서피스 on 스크림 백드롭 합성(#3e3f3f) 명도 대비 실측치를 10.57:1로 정정(Math.round 정밀 일치), §2.2 재현 명령을 apps/web/src/index.css 파일 직접 파싱 및 동적 연산 방식으로 전면 개편, brand-hover 채택 근거에서 "다크 3.99" 삭제 및 라이트 4.24:1 미달 방지/다크 5.75:1 일관성 보장으로 사실성 정정; 문서 단독 commit).
+- 확인 기준: 2026-10-02T04:56:34+09:00 (Card 199 관리자 보안 콘솔 r1 조치: Claude UI r1 및 Codex r1 피드백 전수 반영 — T1 Test 9e-2에 계층적 조상 컨테이너 배경 추적(ancestorBgTokens) 및 텍스트 토큰 배경 거부 로직 추가, admin-audit-subtab-container DOM 결속, 변이 A1 사살; T2 모달 백드롭 스크림 alpha >= 0.50 엄밀 단언 및 0.75 alpha 합성 캔버스 위 모달 서피스 대비 10.57:1 >= 3.0:1 실측, 변이 A6 사살; T3/Codex F1 History §2.1 표 및 §3 내 다크 실측 수치 7개 오류를 index.css 정본 토큰 공식으로 전수 동기화(text-secondary/surface 14.33, status-online/surface 7.79, brand-hover/surface 9.84, status-degraded/subtle 6.83, text-secondary/subtle 11.86, brand-hover/subtle 8.14, brand-primary/subtle 5.77), brand-hover 채택 근거 정확화, Python 독립 재현 명령 문서 결속; T4 표현 명확화; Revert-Fail Probes 49~50 추가, 12종 변이 M1~M12 12/12 100% 사살 실측; Vitest 18 passed, admin tests 59 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반, diff --check clean).
 - 확인 기준: 2026-10-02T04:30:39+09:00 (Card 199 관리자 보안 콘솔 AdminSecurityConsole 색상 리터럴 inventory 전수(186→0), 대비 표본/DOM 결속 감사 및 디자인 토큰 승격: base 67df36e8 위 작업, AdminSecurityConsole 186건 -> 0건 해소, COLOR_LITERAL_MULTISET_BASELINE {} 래칫, index.css --color-bg-backdrop 토큰 등록, border-subtle 317건/24개 파일 래칫, 레거시 #30363d 92건/13파일 상한 강화, Test 9e DOM 실제 렌더링 동적 대비 단언 신설, Test 9e-2 142개 style 속성 전수 AST 스타일-쌍 명도 대비 및 커버리지 래칫 신설, Revert-Fail Probes 44~48 추가, 10종 변이 10/10 100% 사살 실측; Vitest 18 passed, admin tests 59 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-02T04:17:45+09:00 (Card 197 모델 계보 화면 r3 조치: Claude r3 조건부 승인 지적 3건 전수 반영 — W1 테두리 비텍스트 대비(>= 3.0:1) 및 1:1 충돌 검사 로직(checkBorderPair, checkInheritedBorder) 신설, TemplateExpression 지원, checkedBorderObjects 83 / checkedBorderPairs 122 엄밀 래칫 추가, badge-w3-verify-seam 검증 완료 분기를 brand-subtle / brand-hover(5.49:1/8.11:1)로 통일, Probe 43 추가로 M14/M15 포함 15/15 변이 전원 사살 실측; W2 History 내 일반화된 "100%" 표현을 실제 측정 범위(텍스트 >= 4.5:1, 테두리 >= 3.0:1, 정확 coverage)로 명확화; W3 git diff --check 불필요한 EOF 빈 줄 제거 및 clean exit 0 달성; Vitest 16 passed, defect regression 16 passed, model-lineage 33 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-02T03:58:00+09:00 (Card 197 모델 계보 화면 r2 조치: Claude UI r2 조건부 승인 및 Codex r2 피드백 전수 반영 — index.css 정본 동적 파싱 기반 전경/배경 실제 명도 대비 및 상속 배경 3종(surface/subtle/canvas) AST 동적 연산 엔진 신설(Test 9d-2), totalStyleAttrs 359 / checkedObjects 58 / checkedPairs 76 / unboundColorObjects 176 / coveredColorObjects 234 / pureLayoutWrappers 125 엄밀 래칫 단언, Probe 42 추가로 단일 변이 M13(brand-hover -> brand-primary-fg 1.22:1) 포함 13/13(100%) 변이 전수 사살 실측, History §7 해소표 및 커버리지 전수 수치 동기화; Vitest 16 passed, defect regression 16 passed, model-lineage 33 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
