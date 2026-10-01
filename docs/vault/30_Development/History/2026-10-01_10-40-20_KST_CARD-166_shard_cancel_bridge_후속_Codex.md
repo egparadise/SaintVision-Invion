@@ -49,3 +49,8 @@ shard parent/member 경로는 PG-free 호출부 guard만 있고 real-PG fixture�
   설치된 Python 3.14에는 pytest가 없다. 이 환경에서 실 PG 결과를 합성하지 않는다.
 - real-PG fixture와 직접 함수 부정군은 PR exact head의 `run-core` JUnit으로만
   판정한다. 그 전 상태는 **NOT_RUN**이다.
+- 첫 hosted Core run `36802539762`는 전체 `6507 passed / 1 failed / 22 skipped /
+  2 deselected`였다. 새 shard fixture가 제품 취소 경로에 들어가기 전,
+  business row의 JWT subject와 재사용 admission helper의 평문 subject가 달라
+  `AUTH-0030`으로 차단됐다. 이는 제품 회귀로 세지 않고, shard 준비 복제본의
+  principal만 JWT subject로 정렬한 exact-head 후속 run에서 다시 판정한다.

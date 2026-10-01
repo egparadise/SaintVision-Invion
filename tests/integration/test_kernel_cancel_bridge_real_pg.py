@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
+from copy import copy
 from datetime import datetime, timezone
 import hashlib
 import json
@@ -13,6 +14,7 @@ import psycopg
 from psycopg import sql
 import pytest
 
+from inv.approvals import Principal
 from inv.ids import new_id
 from inv.shards import ShardRuntime
 from test_approvals import approval
@@ -110,6 +112,17 @@ def _map_business_runs(a, run_ids):
             )
 
 
+def _business_shard_admissions(a):
+    """Prepare shard admissions with the same JWT subjects the business rows bind."""
+    kernel = copy(a)
+    kernel.people = {
+        actor: Principal(a.e.tenant, a.jwt.subject(actor))
+        for actor in ("requester", "alice", "bob")
+    }
+    kernel.policy = {**a.policy, "subjectId": a.jwt.subject("requester")}
+    return admissions(kernel)
+
+
 def _shard_cancel_facts(a, run_ids):
     with psycopg.connect(a.e.owner) as conn:
         kernel = conn.execute(
@@ -181,7 +194,7 @@ def test_kernel_pre_cancel_is_not_relabelled_as_a_user_business_cancel(business)
 
 def test_shard_parent_cancel_audits_only_member_and_parent_transitions(business):
     a = business
-    shard_admissions = admissions(a)
+    shard_admissions = _business_shard_admissions(a)
     runtime = ShardRuntime(a.e.db, a.profile)
     queued = runtime.enqueue(
         a.e.tenant,
