@@ -8,9 +8,13 @@
     "schemaVersion",
     "timestamp",
     "codeSha",
+    "measurementKind",
+    "referenceOnly",
+    "acceptanceClaim",
     "targetUrl",
     "overallStatus",
     "blockingReason",
+    "caDigest",
     "steps",
     "audit"
   ],
@@ -18,7 +22,8 @@
     "schemaVersion": {
       "type": "string",
       "enum": [
-        "1.0.0"
+        "1.0.0",
+        "1.1.0"
       ]
     },
     "timestamp": {
@@ -27,7 +32,20 @@
     },
     "codeSha": {
       "type": "string",
-      "pattern": "^[0-9a-f]{8,40}$"
+      "pattern": "^(?!0+$)[0-9a-f]{8,40}$"
+    },
+    "measurementKind": {
+      "type": "string",
+      "enum": [
+        "LIVE_BROWSER",
+        "REFERENCE_SIMULATION"
+      ]
+    },
+    "referenceOnly": {
+      "type": "boolean"
+    },
+    "acceptanceClaim": {
+      "type": "boolean"
     },
     "targetUrl": {
       "type": "string",
@@ -46,6 +64,37 @@
         "string",
         "null"
       ]
+    },
+    "caDigest": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "required": [
+        "caBundleSha256",
+        "rootFingerprint",
+        "fingerprintVerified"
+      ],
+      "properties": {
+        "caBundleSha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "rootFingerprint": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "fingerprintVerified": {
+          "type": "boolean"
+        }
+      }
     },
     "steps": {
       "type": "array",
@@ -81,7 +130,8 @@
             "enum": [
               "PASS",
               "FAIL",
-              "BLOCKED_EXTERNAL"
+              "BLOCKED_EXTERNAL",
+              "NOT_OBSERVED"
             ]
           },
           "durationMs": {
@@ -106,6 +156,8 @@
         "tokenCount",
         "ipCount",
         "credentialCount",
+        "accountCount",
+        "oidcParamCount",
         "circumventionFlagsDetected",
         "tlsValidationEnforced"
       ],
@@ -134,6 +186,18 @@
             0
           ]
         },
+        "accountCount": {
+          "type": "integer",
+          "enum": [
+            0
+          ]
+        },
+        "oidcParamCount": {
+          "type": "integer",
+          "enum": [
+            0
+          ]
+        },
         "circumventionFlagsDetected": {
           "type": "boolean",
           "enum": [
@@ -141,10 +205,7 @@
           ]
         },
         "tlsValidationEnforced": {
-          "type": "boolean",
-          "enum": [
-            true
-          ]
+          "type": "boolean"
         }
       }
     }

@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-GEMINI-CARD162-001"
 title: "History: Card 162 S02-FE 사내 포털 로그인 여정 관측 하네스 구축 및 증거 생성"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Gemini"
-updated: "2026-09-30T15:40:00+09:00"
+updated: "2026-10-01T09:30:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -107,3 +107,45 @@ source_of_truth: "Git"
 - **검토 요청**:
   - Claude 검토 (UI·운영 축): Playwright 브라우저 관측 여정 흐름 및 `BLOCKED_EXTERNAL` 정직 표기 검증.
   - Codex 검토 (계약·보안 축): Anti-circumvention fail-closed 정책, zero-token/zero-ip Redaction 무결성 및 엄격 JSON 스키마 계약 검증.
+---
+
+## 6. Codex 1차 독립 검토(F1~F6) 지적사항 전수 조치 및 음성·변이 사살 검증 (2026-10-01)
+
+Codex 계약·보안 축의 PR #259 1차 독립 검토 지적사항 6건(F1~F6)에 대하여 다음 조치를 전수 완료하였다:
+
+### 1) F1 [High] 실 브라우저 5단계 여정 완비 및 상태 전파
+- `_execute_live_browser()` 내에 `portal_tls_reachability` -> `login_initiation` -> `pkce_callback` -> `identity_session_display` -> `logout` 5단계 여정 실행 경로를 완성.
+- 단계별 실패 발생 시 downstream 종속 단계는 `BLOCKED_EXTERNAL`이 아닌 `NOT_OBSERVED`로 명시 기록.
+- 스키마의 exact 5-step 배열 순서와 ID 불변식을 엄격 준수.
+
+### 2) F2 [High] 정본 HTTPS origin 결속 및 사내 CA 검증
+- 라이브 측정 대상을 `https://portal.sv.lan` 및 IdP `https://idp.sv.lan`으로 엄격 결속(`validate_canonical_origins`).
+- 원시 IP 주소, userinfo, 타 origin 주입을 즉각 fail-closed 차단.
+- Card 150/151 사내 루트 CA 지문 allowlist(`PORTAL_ALLOWED_ROOT_FINGERPRINTS`) 검증 및 활성 TLS 소켓 핸드셰이크 실측 검증(`verify_tls_socket_handshake`).
+- 관측되지 않은 TLS 속성의 허위 true 기록을 제거하고, 실제 검증 시에만 `tlsValidationEnforced: true` 및 `caDigest`를 기록.
+
+### 3) F3 [High] 배포 서비스 다운의 정직한 FAIL 판정
+- DNS 해석 완료 후 TCP 포트 거부 / 타임아웃 / `ERR_CONNECTION_REFUSED`는 외부 차단이 아닌 서비스 다운이므로 정직하게 `FAIL`로 분류.
+- 기존의 오분류 시험 `test_closed_tcp_port_honestly_reports_blocked_external`을 `test_closed_tcp_port_honestly_reports_fail`로 역전하여 fail-closed 단언.
+
+### 4) F4 [High] 모의 vs 실측 구분 및 스키마 모순 방지
+- `--mock-mode`는 `referenceOnly: true`, `acceptanceClaim: false`, `measurementKind: "REFERENCE_SIMULATION"`으로 고정하여 운영 합격(acceptance)으로 위장될 수 없도록 차단.
+- 전체 판정을 exact 5-step 상태로부터 정직 재계산(`compute_overall_status`).
+- 스키마 및 의미 검증기(`validate_evidence`)에서 모순(하위 단계 FAIL/BLOCKED/NOT_OBSERVED가 존재하는데 overallStatus가 PASS인 경우, 모의 모드가 acceptanceClaim=True를 주장하는 경우)을 원천 거부.
+- `git rev-parse HEAD`를 통한 reachable exact SHA provenance 강제.
+
+### 5) F5 [Medium-High] 비식별화(Redaction) 및 감사(Audit) 강화
+- Python `ipaddress` 모듈 기반으로 IPv4 및 IPv6(압축형 `::1`, `[::1]` 포함) 전수 탐지 및 마스킹.
+- 계정/이메일(`operator@example.invalid`, sub, username) 패턴 마스킹.
+- OIDC 트랜잭션 쿼리 매개변수(`state`, `nonce`, `code_challenge`, `code`) 전수 마스킹.
+- Audit 검증을 5개 축(`tokenCount=0`, `ipCount=0`, `credentialCount=0`, `accountCount=0`, `oidcParamCount=0`)으로 확장하여 단 1건의 잔존 누출도 허용하지 않음.
+
+### 6) F6 [Medium] 변이 사살 부정 시험 스위트 완비
+- `tests/test_portal_login_journey_harness.py`에 36개 자동화 시험 완비 (100% 통과):
+  - 승인 CA 성공 vs 잘못된 CA 거부 vs self-signed 거부 vs allowlist 불일치 거부
+  - 라이브 대상 URL 오리진 위조 거부 (HTTP, IP, userinfo, foreign host)
+  - DNS 해석 후 포트 거부 시 FAIL 단언
+  - 모의 모드의 인수(acceptance) 주장 거부
+  - 의미론적 모순(PASS 불일치, 단계 순서 변조) 거부
+  - 계정/IP/OIDC 파라미터 누출 감사 검출 반례
+  - 실 브라우저 5단계 전수 성공 및 단계별 실패 시 downstream `NOT_OBSERVED` 전파 실측

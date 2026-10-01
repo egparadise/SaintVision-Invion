@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.146"
+version: "1.0.147"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-30T15:40:00+09:00"
+updated: "2026-10-01T09:30:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -21,12 +21,18 @@ source_of_truth: "Git"
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
 - 확인 기준: 2026-09-30T08:44:00+09:00 (Card 153 Claude UI r3 R1 조건 및 R2·R3 권고 전수 반영 및 재검증 완료).
 
-## 2026-09-30 S02-FE 사내 포털 로그인 여정 관측 하네스 구축 및 증거 생성 (Card 162, `agent/gemini/c162-fe-login-journey-harness`)
-- **개요**: S02-FE 진척 재산정 지적(도메인 미해석으로 인한 여정 관측 부재)을 해소하기 위한 정규 관측 하네스 완비: (1) `apps/web`의 Playwright/브라우저 시험 방식을 따른 `https://portal.sv.lan` 대상의 5단계 로그인 여정 관측 도구(`tools/observe_portal_login_journey.py`), (2) 사전 DNS/TCP 검사를 통한 정직한 `BLOCKED_EXTERNAL` 기록(도메인 미해석 또는 포털 미기동 시 크래시나 우회 꼼수 없이 정직 표기), (3) 우회 플래그(`--host-resolver-rules`, `--ignore-certificate-errors`, `ignoreHTTPSErrors`) 전면 금지 및 감지 시 즉각 fail-closed 차단(`SecurityCircumventionError`, exit 2), (4) 엄격 비식별화(Redaction) 보증: 토큰 0건, IP 0건, 자격증명 0건 엄격 검증 및 스키마 enum `[0]` 강제, (5) 엄격 JSON 스키마(`tools/portal-login-journey-evidence.schema.json`) 및 자동화 단위 시험 스위트(`tests/test_portal_login_journey_harness.py`, 16 passed) 완비.
+## 2026-10-01 S02-FE 사내 포털 로그인 여정 관측 하네스 구축 및 Codex 1차 검토(F1~F6) 전수 조치 (Card 162, `agent/gemini/c162-fe-login-journey-harness`)
+- **개요**: S02-FE 진척 재산정 지적 해소 및 Codex 계약·보안 축 1차 검토(PR #259) 지적 6건(F1~F6) 전수 조치 완결:
+  1. **F1 [High] 실 브라우저 5단계 여정 완비**: `portal_tls_reachability` -> `login_initiation` -> `pkce_callback` -> `identity_session_display` -> `logout` 5단계를 실제 브라우저 경로에서 관측. 선행 단계 실패 시 종속 단계는 `NOT_OBSERVED`로 명시 기록하여 스키마 exact 5-step 불변식 준수.
+  2. **F2 [High] 정본 HTTPS origin 결속 및 사내 CA 검증**: 운영 대상을 `https://portal.sv.lan`, IdP를 `https://idp.sv.lan`에 엄격 결속(raw IP, userinfo, 타 origin 거부). Card 150/151 사내 루트 CA 지문 allowlist(`PORTAL_ALLOWED_ROOT_FINGERPRINTS`) 검증 및 활성 TLS 소켓 핸드셰이크 실측 검증. Evidence에 `caDigest` 및 `measurementKind` 기록.
+  3. **F3 [High] 배포 서비스 다운의 정직한 FAIL 판정**: DNS 해석 후 TCP 포트 닫힘 / 타임아웃 / `ERR_CONNECTION_REFUSED`는 외부 차단이 아닌 제품 서비스 장애이므로 정직하게 `FAIL`로 분류. 기존 오분류 시험을 `FAIL` 단언으로 역전 수정.
+  4. **F4 [High] 모의 vs 실측 구분 및 스키마 모순 방지**: 모의 모드는 `referenceOnly: true`, `acceptanceClaim: false`, `measurementKind: "REFERENCE_SIMULATION"` 고정. 전체 판정을 exact 5-step 상태로부터 정직 재계산(`compute_overall_status`), 스키마 및 검증기에서 모순(PASS인데 하위 FAIL/BLOCKED, 모의 모드가 acceptance 주장) 원천 차단, `git rev-parse HEAD` 정본 SHA 결속.
+  5. **F5 [Medium-High] 비식별화(Redaction) 강화**: `ipaddress` 모듈 기반 IPv4 및 IPv6(압축형 `::1` 포함) 마스킹, 계정/이메일(`operator@example.invalid`, sub, username) 마스킹, OIDC 민감 파라미터(`state`, `nonce`, `code_challenge`, `code`) 전수 마스킹. Audit 5개 축(`tokenCount=0`, `ipCount=0`, `credentialCount=0`, `accountCount=0`, `oidcParamCount=0`) 무결성 보증.
+  6. **F6 [Medium] 변이 사살 부정 시험 스위트 완비**: 잘못된 CA 거부, allowlist 불일치 거부, 미해석 BLOCKED, 포트 닫힘 FAIL, 오리진 위조 거부, 모의 모드 인수 주장 거부, 계정/IP/OIDC 누출 감사 검출 등 36개 자동화 시험(100% PASS) 구축.
 - **담당 및 역할**: Gemini (Frontend / UI / 웹 배포 소유). Reviewer: Claude (UI·운영 축), Codex (계약·보안 축).
 - **관측 근거 (Evidence)**:
-  - 신규 로그인 여정 관측 시험: `tests/test_portal_login_journey_harness.py` (16 passed in 3.57s)
-  - 실제 포털 관측 증거: `docs/vault/30_Development/Evidence/s02_fe_login_journey_evidence.json` (정직한 `BLOCKED_EXTERNAL` 실측, 토큰 0건, IP 0건, 자격증명 0건)
+  - 로그인 여정 관측 및 변이 사살 시험: `tests/test_portal_login_journey_harness.py` (36 passed in 6.81s)
+  - 갱신된 실측 증거: `docs/vault/30_Development/Evidence/s02_fe_login_journey_evidence.json` (정직한 `BLOCKED_EXTERNAL` 실측, leak count 전수 0)
   - 화면-백엔드 라우트 커버리지: `pytest tests/test_route_coverage.py` (40 passed 100%)
   - 프런트엔드 무결성 점검: `python -X utf8 tools/check_frontend_integrity.py` (92개 파일 스캔, 9대 규칙 위반 0건)
   - 계약 바인딩 점검: `python tools/check_contract_bindings.py` (55개 픽스처 전수 커버리지, 14개 리플레이 가드 PASS)
