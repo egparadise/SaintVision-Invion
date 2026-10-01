@@ -4,13 +4,13 @@
     --color-bg-canvas: #f8fafc;
     --color-bg-surface: #ffffff;
     --color-bg-subtle: #f1f5f9;
-    --color-border-subtle: #e2e8f0;
-    --color-border-strong: #64748b;
+    --color-border-subtle: #7b8b9e;
+    --color-border-strong: #475569;
 
     /* Typography */
     --color-text-primary: #0f172a;
     --color-text-secondary: #475569;
-    --color-text-muted: #64748b;
+    --color-text-muted: #59677b;
     --color-text-inverse: #ffffff;
 
     /* Primary Brand */
@@ -21,18 +21,18 @@
     --color-brand-subtle: #dbeafe;
 
     /* Status Colors */
-    --color-status-online: #16a34a;
-    --color-status-degraded: #d97706;
-    --color-status-offline: #dc2626;
+    --color-status-online: #15803d;
+    --color-status-degraded: #b45309;
+    --color-status-offline: #b91c1c;
     --color-status-offline-bg: #dc2626;
     --color-status-offline-hover-bg: #b91c1c;
-    --color-status-neutral: #64748b;
+    --color-status-neutral: #59677b;
 
     /* Risk Grades (L0~L3) */
-    --color-risk-l0: #059669; /* 조회·읽기 전용 */
-    --color-risk-l1: #2563eb; /* 격리 쓰기 */
-    --color-risk-l2: #d97706; /* 외부 영향 가능 */
-    --color-risk-l3: #dc2626; /* 인프라·보안 경계 위험 */
+    --color-risk-l0: #065f46; /* 조회·읽기 전용 */
+    --color-risk-l1: #1d4ed8; /* 격리 쓰기 */
+    --color-risk-l2: #92400e; /* 외부 영향 가능 */
+    --color-risk-l3: #b91c1c; /* 인프라·보안 경계 위험 */
 
     /* Spacing & Radius */
     --space-1: 0.25rem;
@@ -54,7 +54,7 @@
     --color-bg-canvas: #090d16;
     --color-bg-surface: #111827;
     --color-bg-subtle: #1f2937;
-    --color-border-subtle: #374151;
+    --color-border-subtle: #64748b;
     --color-border-strong: #9ca3af;
 
     --color-text-primary: #f9fafb;
@@ -73,7 +73,7 @@
     --color-status-offline-bg: #dc2626;
     --color-status-neutral: #9ca3af;
 
-    --color-risk-l0: #10b981;
+    --color-risk-l0: #34d399;
     --color-risk-l1: #60a5fa;
     --color-risk-l2: #f59e0b;
     --color-risk-l3: #f87171;

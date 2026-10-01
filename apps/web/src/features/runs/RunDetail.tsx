@@ -1080,7 +1080,11 @@ export const RunDetail: React.FC<RunDetailProps> = ({
                           : isPassed
                           ? 'var(--color-status-online)'
                           : 'var(--color-bg-subtle)',
-                        color: isPassed || isCurrent ? '#ffffff' : 'var(--color-text-muted)',
+                        color: isCurrent
+                          ? '#ffffff'
+                          : isPassed
+                          ? 'var(--color-text-inverse)'
+                          : 'var(--color-text-muted)',
                         border: isCurrent ? '3px solid var(--color-brand-subtle)' : 'none',
                       }}
                     >
