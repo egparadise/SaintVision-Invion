@@ -184,16 +184,27 @@ def _validated_container_inspect(values: object) -> dict:
         raise RuntimeError(
             "rootless BuildKit container boundary is broader than declared: identity"
         )
-    if (
-        host.get("Privileged") is not False
-        or set(host.get("SecurityOpt") or [])
-        != {"seccomp=unconfined", "apparmor=unconfined", "systempaths=unconfined"}
-        or host.get("Binds") not in (None, [])
-        or host.get("Devices") not in (None, [])
-        or host.get("CapAdd") not in (None, [])
-    ):
+    if host.get("Privileged") is not False:
         raise RuntimeError(
-            "rootless BuildKit container boundary is broader than declared: privilege"
+            "rootless BuildKit container boundary is broader than declared: privileged"
+        )
+    if set(host.get("SecurityOpt") or []) != {
+        "seccomp=unconfined",
+        "apparmor=unconfined",
+        "systempaths=unconfined",
+    }:
+        observed_options = ",".join(sorted(host.get("SecurityOpt") or []))
+        raise RuntimeError(
+            "rootless BuildKit container boundary is broader than declared: "
+            f"security-opt={observed_options}"
+        )
+    if host.get("Binds") not in (None, []):
+        raise RuntimeError("rootless BuildKit container boundary is broader than declared: bind")
+    if host.get("Devices") not in (None, []):
+        raise RuntimeError("rootless BuildKit container boundary is broader than declared: device")
+    if host.get("CapAdd") not in (None, []):
+        raise RuntimeError(
+            "rootless BuildKit container boundary is broader than declared: capability"
         )
     if any(
         mount.get("Type") != "tmpfs"
