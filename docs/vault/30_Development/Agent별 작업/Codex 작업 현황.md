@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.264"
+version: "1.0.265"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T07:41:29+09:00"
+updated: "2026-10-02T08:16:01+09:00"
 source_of_truth: "Git"
 active_card: "CARD-211 VF-CL CI receipt attestation"
-active_card_status: "Fail-closed receipt creator/verifier and workflow attestation boundary implemented; canonical accessibility manifest merged"
-active_card_next: "Close the independent review conditions, run the label producer and exact-head dispatch, and record verification.json"
+active_card_status: "Claude r1 expiry and interpreter conditions implemented; 265 focused tests pass"
+active_card_next: "Push one review-fix commit, run the label producer and exact-head dispatch, and record verification.json"
 ---
 
 ## 2026-10-02 Card 211 — VF-CL CI receipt attestation
@@ -22,6 +22,9 @@ active_card_next: "Close the independent review conditions, run the label produc
   [[2026-10-02_07-24-06_KST_Card211_VF-CL_CI_receipt_attestation_Codex]].
 - `#302`의 사용자 절차는 Windows Python 3.10을 downloader/ZIP 생성에만 쓰고 importer는 agent의 지원
   Python 3.12/3.14에서 실행하도록 선반영했다.
+- Claude r1의 만료 공백을 닫아 evidence artifact 보존기간을 30일로 고정하고, attested/recorded
+  `expiresAt` 누락·불일치·만료를 모두 거부한다. importer는 Python 3.11 미만에서 stdin을 읽기 전에
+  즉시 거부한다. 세 focused 파일 **265 passed**.
 
 ## 2026-10-02 Card 205 — AC-11 사용자 기기 접근성 수동 인수 importer
 

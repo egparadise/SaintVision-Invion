@@ -158,6 +158,7 @@ jobs:
           name: s12-acceptance-${{ github.event.pull_request.head.sha || github.sha }}
           path: ${{ env.OUT_DIR }}
           if-no-files-found: error
+          retention-days: 30
 
   attest-vf-cl-ci-receipt:
     # PR code never receives an OIDC signing token.  Only an explicit workflow_dispatch
@@ -243,3 +244,4 @@ jobs:
             ${{ steps.receipt-attestation.outputs.bundle-path }}
             ${{ env.RECEIPT_DIR }}/verification.json
           if-no-files-found: error
+          retention-days: 30

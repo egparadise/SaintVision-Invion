@@ -707,8 +707,10 @@ def ci_attestation_findings(
     recorded: object,
     expectation: dict[str, Any],
     root: Path,
+    now: dt.datetime | None = None,
 ) -> list[str]:
     """Require a cryptographically verified receipt before ciVerified can be true."""
+    current = now or dt.datetime.now(dt.timezone.utc)
     receipt_relative = expectation["receiptPath"]
     bundle_relative = expectation["bundlePath"]
     try:
@@ -735,11 +737,23 @@ def ci_attestation_findings(
                 f"expected {expected!r}"
             )
     evidence = receipt.get("evidenceArtifact") or {}
+    expires = evidence.get("expiresAt")
+    if not _is_utc_timestamp(expires):
+        findings.append(
+            f"{identifier}: the attested evidenceArtifact.expiresAt is {expires!r}"
+        )
+    else:
+        expiry = dt.datetime.fromisoformat(str(expires).replace("Z", "+00:00"))
+        if expiry <= current.astimezone(dt.timezone.utc):
+            findings.append(
+                f"{identifier}: the attested evidence artifact expired at {expires}, "
+                "so ciVerified is no longer re-checkable"
+            )
     recorded_artifact = recorded.get("evidenceArtifact")
     if not isinstance(recorded_artifact, dict):
         findings.append(f"{identifier}.ciVerifiedAttestation names no evidenceArtifact")
     else:
-        for field in ("id", "digest"):
+        for field in ("id", "digest", "expiresAt"):
             if recorded_artifact.get(field) != evidence.get(field):
                 findings.append(
                     f"{identifier}.ciVerifiedAttestation.evidenceArtifact.{field} differs "

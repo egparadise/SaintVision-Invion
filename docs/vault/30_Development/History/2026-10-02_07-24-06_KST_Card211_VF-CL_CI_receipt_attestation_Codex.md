@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-2026-10-02-CARD211-VFCL-CI-ATTESTATION-CODEX"
 title: "Card 211 VF-CL CI receipt attestation"
-version: "1.0.0"
+version: "1.1.0"
 status: "in-progress"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-02T07:24:06+09:00"
+updated: "2026-10-02T08:16:01+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "d0b2a4c6"
@@ -30,10 +30,13 @@ runner에서 닫을 수 있으므로 train 14 후보 `d0b2a4c6` 위에 `#295`와
   bundle이 없으므로 manifest와 registry는 false를 유지한다.
 - 카드 205의 사용자 Windows Python 3.10 단계는 download/ZIP까지만 담당하고, importer는 agent의 지원
   Python 3.12/3.14에서 실행하도록 `#302`에 선반영했다.
+- Claude r1 조건에 따라 artifact 보존기간을 workflow에 30일로 명시하고, 서명된 receipt라도
+  `evidenceArtifact.expiresAt`이 없거나 현재 시각을 지났으면 registry true를 거부한다. registry 기록도
+  같은 `expiresAt`을 복제해야 한다.
+- 접근성 importer는 Python 3.11 미만을 stdin token 읽기 전에 exit 2로 거부한다.
 
 ## 검증 상태
 
-- `tests/test_vf_cl_ci_attestation.py`: receipt/attestation/workflow 권한 경계 focused PASS.
-- `tests/core/test_check_vf_cl_registry.py`: rule 7 fail-closed와 shipped manifest 회귀를 검증 중이다.
+- receipt/attestation, registry rule 7, accessibility importer focused: **265 passed**.
 - exact-head hosted attested run은 구현 push 뒤 실행하며, run ID와 artifact digest는 결과가 나온 뒤 이 절에
   추가한다. 그 전에는 `ciVerified`를 올리지 않는다.

@@ -1,11 +1,11 @@
 ---
 doc_id: "DESIGN-VF-CL-04-CI-ATTESTATION-001"
 title: "VF-CL-04 CI receipt attestation 설계"
-version: "1.0.0"
+version: "1.1.0"
 status: "implemented-pending-exact-head-evidence"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-02T07:24:06+09:00"
+updated: "2026-10-02T08:16:01+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "d0b2a4c6"
@@ -34,6 +34,7 @@ Evidence commit이나 실제 착지 SHA를 증명하지 못한다. 따라서 정
 - PR event는 서명 job에 들어갈 수 없다. 조건은 `workflow_dispatch`와 producer success의 conjunction이다.
 - self-hosted runner attestation은 verifier의 `--deny-self-hosted-runners`로 거부한다.
 - evidence artifact는 현재 run의 artifact id, name, head SHA, expiry, GitHub digest와 모두 일치해야 한다.
+  producer와 attestation artifact의 보존기간은 `retention-days: 30`으로 명시한다.
 
 ## 3. Receipt와 검증 경계
 
@@ -47,7 +48,8 @@ repository·workflow·SHA·ref가 기대값과 다르면 네트워크 호출 전
 기존 bundle의 subject digest를 재사용할 수 없다.
 
 `tools/check_vf_cl_registry.py`는 manifest가 고정한 receipt/bundle/repository/workflow/head/ref를 verifier에
-넘기고, 검증된 receipt의 runId·artifact id/digest를 registry 값과 다시 대조한다. bundle이나 네트워크 검증이
+넘기고, 검증된 receipt의 runId·artifact id/digest/**expiresAt**을 registry 값과 다시 대조한다. 서명이
+유효해도 현재 시각이 `expiresAt` 이상이면 더는 재검증할 수 없으므로 findings다. bundle이나 네트워크 검증이
 없으면 false가 아니라 **검증 불가 findings**이며 true claim은 fail closed다.
 
 ## 4. 시험과 아직 주장하지 않는 것
@@ -64,4 +66,5 @@ Evidence producer → receipt → OIDC attestation → verifier의 한 방향을
 
 카드 205 사용자 절차의 PowerShell 5.1 다운로드·ZIP 작성은 Python 3.10으로 동작하지만 importer는 지원
 Python 3.12/3.14에서 agent가 실행한다. 사용자가 3.12를 설치했다고 가정하지 않으며, 두 단계를 runbook과
-회귀 시험이 분리한다.
+회귀 시험이 분리한다. importer는 Python 3.11 미만이면 argparse·파일·stdin보다 먼저 exit 2로 끝나며,
+fresh-auth token을 한 byte도 읽지 않았음을 명확한 오류로 알린다.

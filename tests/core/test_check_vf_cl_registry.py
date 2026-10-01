@@ -18,6 +18,7 @@ below as a probe.
 
 from __future__ import annotations
 
+import datetime as dt
 import hashlib
 import json
 import subprocess
@@ -965,7 +966,11 @@ def attested_receipt(tmp_path):
         "runId": "36930000000",
         "headSha": expectation["headSha"],
         "headRef": expectation["headRef"],
-        "evidenceArtifact": {"id": "11190000000", "digest": "sha256:" + "d" * 64},
+        "evidenceArtifact": {
+            "id": "11190000000",
+            "digest": "sha256:" + "d" * 64,
+            "expiresAt": "2099-12-31T00:00:00Z",
+        },
     }
 
 
@@ -999,6 +1004,47 @@ def test_a_missing_or_invalid_attestation_is_fail_closed(tmp_path, monkeypatch):
     monkeypatch.setattr(checker, "verify_ci_attestation", refuse)
     findings = audit(document, tmp_path, manifest_document)
     assert any("authoritative CI attestation refused" in finding for finding in findings)
+
+
+def test_an_expired_attested_artifact_cannot_derive_ci_verified(tmp_path, monkeypatch):
+    expectation = attestation_expectation(tmp_path)
+    receipt = attested_receipt(tmp_path)
+    receipt["evidenceArtifact"]["expiresAt"] = "2026-10-01T00:00:00Z"
+    recorded = {
+        **receipt,
+        "receipt": expectation["receiptPath"],
+        "bundle": expectation["bundlePath"],
+    }
+    monkeypatch.setattr(checker, "verify_ci_attestation", lambda *_args: receipt)
+
+    findings = checker.ci_attestation_findings(
+        "VF-CL-0X",
+        recorded,
+        expectation,
+        tmp_path,
+        now=dt.datetime(2026, 10, 2, tzinfo=dt.timezone.utc),
+    )
+
+    assert any("expired at 2026-10-01T00:00:00Z" in finding for finding in findings)
+
+
+def test_recorded_attestation_must_copy_the_artifact_expiry(tmp_path, monkeypatch):
+    expectation = attestation_expectation(tmp_path)
+    receipt = attested_receipt(tmp_path)
+    recorded = {
+        **receipt,
+        "receipt": expectation["receiptPath"],
+        "bundle": expectation["bundlePath"],
+    }
+    recorded["evidenceArtifact"] = dict(recorded["evidenceArtifact"])
+    recorded["evidenceArtifact"].pop("expiresAt")
+    monkeypatch.setattr(checker, "verify_ci_attestation", lambda *_args: receipt)
+
+    findings = checker.ci_attestation_findings(
+        "VF-CL-0X", recorded, expectation, tmp_path,
+    )
+
+    assert any("evidenceArtifact.expiresAt differs" in finding for finding in findings)
 
 
 @pytest.mark.parametrize("field", checker.ATTESTATION_EXPECTATION_KEYS)

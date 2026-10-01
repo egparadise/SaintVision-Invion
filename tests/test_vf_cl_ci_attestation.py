@@ -262,3 +262,12 @@ def test_workflow_grants_signing_permissions_only_to_manual_attestation_job():
     uses = [step.get("uses") for step in attestation["steps"]]
     assert uses.count("actions/attest@v4") == 1
     assert "pull_request" not in attestation["if"]
+    producer_upload = next(
+        step for step in producer["steps"] if step.get("uses") == "actions/upload-artifact@v4"
+    )
+    attestation_upload = next(
+        step for step in attestation["steps"]
+        if step.get("uses") == "actions/upload-artifact@v4"
+    )
+    assert producer_upload["with"]["retention-days"] == 30
+    assert attestation_upload["with"]["retention-days"] == 30
