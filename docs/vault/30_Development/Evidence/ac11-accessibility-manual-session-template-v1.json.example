@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "1.0.0",
+  "runPurpose": "s11-ac11-accessibility-user-device-manual",
+  "sourceHeadSha": "REPLACE_WITH_EXACT_40_HEX_SHA",
+  "startedAt": "REPLACE_WITH_RFC3339_START",
+  "finishedAt": "REPLACE_WITH_RFC3339_FINISH",
+  "device": {
+    "class": "desktop",
+    "operatingSystem": "REPLACE_WITH_OS_AND_VERSION",
+    "displayMode": "standard",
+    "keyboard": "physical"
+  },
+  "browser": {
+    "name": "REPLACE_WITH_BROWSER",
+    "version": "REPLACE_WITH_VERSION",
+    "engine": "REPLACE_WITH_ENGINE"
+  },
+  "assistiveTechnologies": [
+    {
+      "kind": "screen-reader",
+      "product": "REPLACE_WITH_PRODUCT",
+      "version": "REPLACE_WITH_VERSION"
+    }
+  ],
+  "scenarios": [
+    {"scenarioId": "ACC-MANUAL-KEYBOARD-JOURNEY", "result": "NOT_RUN"},
+    {"scenarioId": "ACC-MANUAL-SCREEN-READER-NAVIGATION", "result": "NOT_RUN"},
+    {"scenarioId": "ACC-MANUAL-SCREEN-READER-ERRORS", "result": "NOT_RUN"},
+    {"scenarioId": "ACC-MANUAL-FOCUS-ORDER", "result": "NOT_RUN"},
+    {"scenarioId": "ACC-MANUAL-ZOOM-REFLOW", "result": "NOT_RUN"},
+    {"scenarioId": "ACC-MANUAL-COGNITIVE-ERROR-RECOVERY", "result": "NOT_RUN"}
+  ],
+  "overallResult": "NOT_RUN",
+  "performedBy": {
+    "kind": "human",
+    "binding": "self-attested-session"
+  }
+}
