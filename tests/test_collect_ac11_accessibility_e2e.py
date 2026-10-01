@@ -218,3 +218,9 @@ def test_workflow_is_opt_in_exact_head_and_does_not_cancel_measurement():
     assert "cancel-in-progress: false" in workflow
     assert "tools/collect_ac11_accessibility_e2e.py" in workflow
     assert "retention-days: 30" in workflow
+
+
+def test_real_browser_bootstrap_uses_the_current_resolved_oidc_config_shape():
+    source = (ROOT / "tools/run_real_browser_acceptance.py").read_text(encoding="utf-8")
+    assert "redirectUri: '{frontend_url}/callback'" in source
+    assert "redirectUri: '{frontend_url}/callback',\n                    config: testConfig" in source

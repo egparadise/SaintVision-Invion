@@ -565,7 +565,8 @@ def run_scenario(
                     idpAuthorizeUrl: '{frontend_url}/oauth/authorize',
                     idpTokenUrl: '{frontend_url}/oauth/token',
                     clientId: 'saintvision-web',
-                    scope: 'openid profile email'
+                    scope: 'openid profile email',
+                    redirectUri: '{frontend_url}/callback'
                 }};
                 try {{
                     Object.defineProperty(window, '__SAINTVISION_CONFIG__', {{

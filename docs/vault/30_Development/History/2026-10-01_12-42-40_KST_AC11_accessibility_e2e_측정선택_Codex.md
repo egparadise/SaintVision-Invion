@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-20261001-CARD171-AC11-ACCESSIBILITY-CODEX"
 title: "CARD-171 AC-11 accessibility-e2e hosted 측정 선택"
-version: "1.1.0"
+version: "1.1.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-01T12:52:17+09:00"
+updated: "2026-10-01T12:59:33+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "7851412db792b4ef6c53cb92944be530d77eb2de"
@@ -52,6 +52,13 @@ hosted workflow를 구현한다. 실제 hosted 결과와 run ID는 실행 뒤 �
 - PG-free 단일 파일 `tests/test_collect_ac11_accessibility_e2e.py`는 11 passed다. journey
   누락·skip/실패, invariant PARTIAL 재분류, contrast flag 위조, SHA drift, 수동 인수
   fabrication과 workflow opt-in 경계를 되살림 방지 시험으로 고정했다.
+
+첫 hosted run `36812706742`는 VF 정본 journey 5개까지 통과했지만 desktop invariant
+runner가 현재 `authConfig()`의 resolved `redirectUri`를 transaction config에 넣지 않아
+callback 검증에서 거부됐고, invariant report는 생성되지 않았다. 이는 제품 접근성 FAIL이
+아니라 `NOT_OBSERVED`인 harness drift다. `tools/run_real_browser_acceptance.py`의 test OIDC
+config에 동일-origin `/callback`을 명시하고 이를 되살림 방지 시험으로 추가했다. 수정 뒤
+PG-free 단일 파일은 12 passed이며 새 exact-head hosted run으로 다시 측정한다.
 
 ## 판정 경계
 
