@@ -760,3 +760,37 @@ def test_a_hand_built_principal_cannot_claim_fresh_authentication(app_engine, ow
     )
     assert response.status_code == 403, response.text
     assert response.json()["code"] == "AUTH-0030"
+
+
+def test_the_whole_chain_refuses_mfa_plus_sms_at_the_canonical_policy(
+    app_engine, owner_engine, operators, tmp_path
+):
+    """#286 F1: observed, not inferred — the claim arrives verified and the policy refuses.
+
+    ``mfa+sms`` is the combination where two allowlists disagreed. The refusal has to come
+    from ``has_fresh_interactive_auth``, so this asserts the principal *carried* both
+    methods with ``verified_fresh_auth_claims`` set — meaning the verifier passed them on —
+    and only then that the write boundary refused.
+    """
+    tokens, verifier = _oidc_chain(app_engine, owner_engine, operators, tmp_path)
+    issued = int(time.time())
+    now = dt.datetime.fromtimestamp(issued, tz=UTC)
+    token = tokens.token(
+        "operator-two",
+        claims={"auth_time": issued, "amr": ["mfa", "sms"], "exp": issued + 600,
+                "iat": issued},
+    )
+    principal = verifier.verify(token)
+    assert principal.verified_fresh_auth_claims is True
+    assert principal.amr == frozenset({"mfa", "sms"}), "the verifier did not filter it"
+
+    from saintvision.identity.principal import has_fresh_interactive_auth
+    assert not has_fresh_interactive_auth(principal, now=now)
+
+    sessionmaker = make_session_factory(app_engine)
+    with sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, operators["tenant"]):
+                with pytest.raises(InvError) as refused:
+                    service.require_fresh_operator(session, principal=principal, now=now)
+    assert refused.value.code == AUTH_PROJECT_SCOPE

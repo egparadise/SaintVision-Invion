@@ -80,11 +80,23 @@ class Identity:
     client_id: str | None = None
 
 
-# RFC 8176 registry values used by the product policy.  A signed but unknown
-# value is not promoted into the trusted Identity metadata.  In particular,
-# ``webauthn`` is not an RFC 8176 value; hardware/software possession is
-# represented by ``hwk``/``swk``.
-_FRESH_AUTH_AMR_VALUES = frozenset({"mfa", "pwd", "otp", "hwk", "swk"})
+# This verifier normalises; it does not decide which methods are strong enough.
+#
+# It used to carry its own allowlist and erase the claims when a value was outside it.
+# That made **two** allowlists -- this one and the product's -- and Codex measured what
+# that costs: adding ``sms`` to the product set alone left 59 tests passing, because the
+# refusal of ``mfa+sms`` was happening here, at the verifier, and not at the policy that
+# claims to own the decision (#286 F1). A policy nobody exercises is not a policy.
+#
+# So an unknown-but-well-formed value travels as a verified AMR value, and
+# ``saintvision.identity.principal.has_fresh_interactive_auth()`` is the one place that
+# says whether a set of methods is interactive enough (#286 Codex 결정 02:38 §2).
+#
+# What stays here is what a resource server must not pass on unbounded: a list, of
+# bounded length, of distinct, bounded, printable tokens. Those are properties of the
+# transport, not judgements about authentication.
+_AMR_MAX_VALUES = 8
+_AMR_VALUE = re.compile(r"^[A-Za-z0-9_-]{1,32}$")
 
 
 def _fresh_auth_claims(claims):
@@ -94,10 +106,9 @@ def _fresh_auth_claims(claims):
         return None, ()
     if (
         not isinstance(amr, list)
-        or not 1 <= len(amr) <= len(_FRESH_AUTH_AMR_VALUES)
-        or any(not isinstance(value, str) for value in amr)
+        or not 1 <= len(amr) <= _AMR_MAX_VALUES
+        or any(not isinstance(value, str) or not _AMR_VALUE.fullmatch(value) for value in amr)
         or len(set(amr)) != len(amr)
-        or not set(amr).issubset(_FRESH_AUTH_AMR_VALUES)
     ):
         return None, ()
     return auth_time, tuple(sorted(amr))

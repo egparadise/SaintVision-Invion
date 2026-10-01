@@ -93,6 +93,19 @@ class Principal:
 
 
 FRESH_AUTH_MAX_AGE_SECONDS = 300
+#: The RFC 8176 values this product accepts, and **the only place the set lives**
+#: (#286 Codex 결정 02:38 §2, F1).
+#:
+#: ``inv.identity.AccessTokens.verify()`` used to carry the same set and erase the claims
+#: when a value fell outside it. Two copies meant the refusal happened at the verifier
+#: while this constant looked like the policy -- Codex added ``sms`` here alone and 59
+#: tests still passed. The verifier now normalises format only, so an unknown method
+#: arrives here as a verified value and is refused *by this predicate*, which is the thing
+#: a test can hold.
+#:
+#: ``webauthn`` is deliberately absent: it is not an RFC 8176 value, and hardware or
+#: software possession is ``hwk``/``swk``. ``sms`` is absent because a code sent to a
+#: phone number is not a second factor this product counts.
 FRESH_AUTH_AMR_VALUES = frozenset({"mfa", "pwd", "otp", "hwk", "swk"})
 FRESH_AUTH_SECOND_FACTORS = frozenset({"otp", "hwk", "swk"})
 
