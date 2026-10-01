@@ -44,7 +44,7 @@ _HEALTH_KEYS = frozenset(
         "recoveryEpoch",
         "address",
         "pid",
-        "hostUid",
+        "processUid",
         "processStartTicks",
         "rootless",
         "privileged",
@@ -70,9 +70,9 @@ _ISOLATION_KEYS = frozenset(
     }
 )
 _CONTAINER_FIELD_SOURCES = {
-    "pid": "proc-descendant-buildkitd",
-    "processStartTicks": "proc-buildkitd",
-    "rootless": "proc-user-namespace",
+    "pid": "container-proc-buildkitd",
+    "processStartTicks": "container-proc-buildkitd",
+    "rootless": "container-proc-user-namespace",
     "privileged": "docker-inspect-host-config",
     "hostAccess": "docker-inspect-rootless-boundary",
     "entitlements": "docker-inspect-config-command",
@@ -325,8 +325,8 @@ class RootlessBuildkitTransport:
             or receipt.get("address") != self.configuration.address
             or type(receipt.get("pid")) is not int
             or receipt["pid"] <= 1
-            or type(receipt.get("hostUid")) is not int
-            or receipt["hostUid"] <= 0
+            or type(receipt.get("processUid")) is not int
+            or receipt["processUid"] <= 0
             or type(receipt.get("processStartTicks")) is not int
             or receipt["processStartTicks"] <= 0
             or receipt.get("rootless") is not True
@@ -410,7 +410,7 @@ class RootlessBuildkitTransport:
             dict(receipt["isolation"]),
             {
                 "pid": receipt["pid"],
-                "hostUid": receipt["hostUid"],
+                "processUid": receipt["processUid"],
                 "processStartTicks": receipt["processStartTicks"],
                 "address": receipt["address"],
                 "observedAt": receipt["observedAt"],

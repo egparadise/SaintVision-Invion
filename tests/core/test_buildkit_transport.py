@@ -56,7 +56,7 @@ def _health():
         "recoveryEpoch": 7,
         "address": "unix:///run/user/1001/buildkit/buildkitd.sock",
         "pid": 8123,
-        "hostUid": 1001,
+        "processUid": 1001,
         "processStartTicks": 123456,
         "rootless": True,
         "privileged": False,
@@ -256,7 +256,7 @@ def test_measure_binds_exact_protected_health_and_live_worker(boundary):
     assert measured.platforms == ("linux/amd64",)
     assert measured.process_measurement == {
         "pid": 8123,
-        "hostUid": 1001,
+        "processUid": 1001,
         "processStartTicks": 123456,
         "address": _health()["address"],
         "observedAt": NOW.isoformat(),
@@ -277,7 +277,7 @@ def test_measure_binds_exact_protected_health_and_live_worker(boundary):
     "mutate,code",
     [
         (lambda value: value.__setitem__("rootless", False), "RES-0006"),
-        (lambda value: value.__setitem__("hostUid", 0), "RES-0006"),
+        (lambda value: value.__setitem__("processUid", 0), "RES-0006"),
         (lambda value: value.__setitem__("entitlements", ["security.insecure"]), "RES-0006"),
         (lambda value: value.__setitem__("privileged", True), "RES-0006"),
         (lambda value: value.__setitem__("hostAccess", True), "RES-0006"),

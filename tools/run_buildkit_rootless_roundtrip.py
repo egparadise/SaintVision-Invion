@@ -60,14 +60,6 @@ def _status(pid: int) -> dict[str, str]:
     return values
 
 
-def _host_uid(pid: int) -> int:
-    rows = Path(f"/proc/{pid}/uid_map").read_text(encoding="ascii").splitlines()
-    mappings = [tuple(int(part) for part in row.split()) for row in rows]
-    if not mappings or mappings[0][0] != 0 or mappings[0][1] <= 0:
-        raise RuntimeError("buildkitd is not in a rootless user namespace")
-    return mappings[0][1]
-
-
 def _positive_process_uid(status: dict[str, str]) -> int:
     try:
         uid = int(status["Uid"].split()[0])
@@ -78,23 +70,38 @@ def _positive_process_uid(status: dict[str, str]) -> int:
     return uid
 
 
-def _buildkitd_descendant_pid(container_init_pid: int) -> int:
-    pending = [container_init_pid]
-    visited = set()
-    candidates = []
-    while pending:
-        pid = pending.pop()
-        if pid in visited:
-            continue
-        visited.add(pid)
-        try:
-            children = Path(f"/proc/{pid}/task/{pid}/children").read_text(encoding="ascii")
-            pending.extend(int(value) for value in children.split())
-            command = Path(f"/proc/{pid}/comm").read_text(encoding="ascii").strip()
-        except (OSError, ValueError):
-            raise RuntimeError("rootless BuildKit process tree is unavailable") from None
-        if command == "buildkitd":
-            candidates.append(pid)
+def _process_has_rootless_uid_map(pid: int) -> bool:
+    try:
+        rows = Path(f"/proc/{pid}/uid_map").read_text(encoding="ascii").splitlines()
+        mappings = [tuple(int(part) for part in row.split()) for row in rows]
+    except (OSError, ValueError):
+        raise RuntimeError("rootless BuildKit uid map is unavailable") from None
+    if not mappings or mappings[0][0] != 0 or mappings[0][1] <= 0:
+        raise RuntimeError("buildkitd is not in a rootless user namespace")
+    return True
+
+
+def _status_text(value: str) -> dict[str, str]:
+    values = {}
+    for line in value.splitlines():
+        if ":" in line:
+            key, item = line.split(":", 1)
+            values[key] = item.strip()
+    return values
+
+
+def _container_buildkitd_pid(container_name: str) -> int:
+    output = _command(
+        "docker",
+        "exec",
+        container_name,
+        "sh",
+        "-eu",
+        "-c",
+        'for item in /proc/[0-9]*/comm; do if test "$(cat "$item")" = buildkitd; '
+        'then basename "$(dirname "$item")"; fi; done',
+    )
+    candidates = [int(value) for value in output.splitlines() if value.isdigit()]
     if len(candidates) != 1:
         raise RuntimeError("rootless BuildKit daemon process is not exclusive")
     return candidates[0]
@@ -134,6 +141,7 @@ def _lsm() -> str:
 def _process_health_receipt(args, observed_at: datetime) -> dict:
     status = _status(args.daemon_pid)
     stat_fields = Path(f"/proc/{args.daemon_pid}/stat").read_text(encoding="ascii").split()
+    rootless = _process_has_rootless_uid_map(args.daemon_pid)
     return {
         "schemaVersion": 1,
         "builderInstanceId": INSTANCE,
@@ -141,9 +149,9 @@ def _process_health_receipt(args, observed_at: datetime) -> dict:
         "recoveryEpoch": EPOCH,
         "address": args.address,
         "pid": args.daemon_pid,
-        "hostUid": _host_uid(args.daemon_pid),
+        "processUid": _positive_process_uid(status),
         "processStartTicks": int(stat_fields[21]),
-        "rootless": True,
+        "rootless": rootless,
         "privileged": False,
         "hostAccess": False,
         "entitlements": [],
@@ -154,7 +162,7 @@ def _process_health_receipt(args, observed_at: datetime) -> dict:
         "rootlesskitVersion": _command(str(args.rootlesskit), "--version"),
         "runtimeIdentity": "sha256:" + hashlib.sha256(args.buildkitd.read_bytes()).hexdigest(),
         "isolation": {
-            "userNamespace": True,
+            "userNamespace": rootless,
             "seccompMode": "filter" if status.get("Seccomp") == "2" else "unavailable-ci-reference",
             "lsm": _lsm(),
             "noNewPrivileges": status.get("NoNewPrivs") == "1",
@@ -183,13 +191,28 @@ def _process_health_receipt(args, observed_at: datetime) -> dict:
 def _container_health_receipt(args, observed_at: datetime) -> dict:
     values = json.loads(_command("docker", "inspect", args.container_name))
     value = _validated_container_inspect(values)
-    state = value["State"]
-    daemon_pid = _buildkitd_descendant_pid(state["Pid"])
-    status = _status(daemon_pid)
+    daemon_pid = _container_buildkitd_pid(args.container_name)
+    status = _status_text(
+        _command("docker", "exec", args.container_name, "cat", f"/proc/{daemon_pid}/status")
+    )
     uid = _positive_process_uid(status)
-    stat_fields = Path(f"/proc/{daemon_pid}/stat").read_text(encoding="ascii").split()
-    user_namespace = Path(f"/proc/{daemon_pid}/ns/user").stat().st_ino
-    host_user_namespace = Path("/proc/1/ns/user").stat().st_ino
+    stat_fields = _command(
+        "docker", "exec", args.container_name, "cat", f"/proc/{daemon_pid}/stat"
+    ).split()
+    namespace_values = _command(
+        "docker",
+        "exec",
+        args.container_name,
+        "stat",
+        "-L",
+        "-c",
+        "%i",
+        f"/proc/{daemon_pid}/ns/user",
+        "/proc/1/ns/user",
+    ).splitlines()
+    if len(namespace_values) != 2 or any(not value.isdigit() for value in namespace_values):
+        raise RuntimeError("rootless BuildKit user namespace measurement is invalid")
+    user_namespace, host_user_namespace = (int(value) for value in namespace_values)
     if user_namespace == host_user_namespace:
         raise RuntimeError("rootless BuildKit daemon is not in a separate user namespace")
     image_values = json.loads(_command("docker", "image", "inspect", args.runtime_image))
@@ -201,7 +224,7 @@ def _container_health_receipt(args, observed_at: datetime) -> dict:
         "recoveryEpoch": EPOCH,
         "address": args.address,
         "pid": daemon_pid,
-        "hostUid": uid,
+        "processUid": uid,
         "processStartTicks": int(stat_fields[21]),
         "rootless": user_namespace != host_user_namespace,
         "privileged": value["HostConfig"]["Privileged"],
@@ -231,9 +254,9 @@ def _container_health_receipt(args, observed_at: datetime) -> dict:
             ),
         },
         "fieldSources": {
-            "pid": "proc-descendant-buildkitd",
-            "processStartTicks": "proc-buildkitd",
-            "rootless": "proc-user-namespace",
+            "pid": "container-proc-buildkitd",
+            "processStartTicks": "container-proc-buildkitd",
+            "rootless": "container-proc-user-namespace",
             "privileged": "docker-inspect-host-config",
             "hostAccess": "docker-inspect-rootless-boundary",
             "entitlements": "docker-inspect-config-command",
