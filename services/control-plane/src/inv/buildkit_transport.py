@@ -34,6 +34,7 @@ from .policy import action_digest
 
 
 TRANSPORT_ENABLE_SETTING = "INV_BUILDKIT_REFERENCE_ENABLED"
+_SESSION_ID = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
 _HEX_40 = re.compile(r"[0-9a-f]{40}")
 _HEX_64 = re.compile(r"[0-9a-f]{64}")
 _IMAGE_DIGEST = re.compile(r"sha256:[0-9a-f]{64}")
@@ -781,3 +782,61 @@ class RootlessBuildkitTransport:
         }
         report.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         return value
+
+
+#: Where the node agent leaves the product-grade receipts.  Both are read with the same
+#: protections as the reference health receipt: no symlink, one link, small, owner-only.
+#: This module collects them and checks the low-level file properties; the authority
+#: comparison (``nodeId == leasedNodeId``, epoch agreement, required observations) is
+#: ``inv.build_execution.BuildExecutionService``, and the strict field schemas are fixed
+#: by the card 211 contract PR rather than here.
+PRODUCT_HEALTH_RECEIPT = "product-health.json"
+PRODUCT_CLEANUP_RECEIPT_PREFIX = "cleanup-"
+
+
+class NodeAgentReceipts:
+    """Read-only collector for the two node-agent receipts on this host.
+
+    It deliberately has no write path and no network call: the node agent writes, the
+    control plane reads.  A collector that could also produce a receipt would make the
+    freshness of one the opinion of the other.
+    """
+
+    def __init__(self, directory: Path):
+        self._directory = Path(directory)
+
+    def collect_product_health(self) -> dict:
+        return _protected_json(self._directory / PRODUCT_HEALTH_RECEIPT)
+
+    def collect_cleanup_receipt(self, build_session_id: str) -> dict:
+        if not isinstance(build_session_id, str) or not _SESSION_ID.fullmatch(build_session_id):
+            raise DomainError(
+                "VERIFY-0022", "Build cleanup receipt was asked for under an invalid session", 409
+            )
+        name = f"{PRODUCT_CLEANUP_RECEIPT_PREFIX}{build_session_id}.json"
+        return _protected_json(self._directory / name)
+
+    def daemon_identity(self) -> dict:
+        """The daemon identity as the node agent currently reports it."""
+
+        receipt = _protected_json(self._directory / PRODUCT_HEALTH_RECEIPT)
+        daemon = receipt.get("daemon")
+        if not isinstance(daemon, dict):
+            raise DomainError(
+                "RES-0006", "Node agent health receipt records no daemon", 503, retryable=True
+            )
+        return daemon
+
+    def cancel_and_quarantine_session(self, build_session_id: str, reason_code: str) -> None:
+        raise DomainError(
+            "VERIFY-0022",
+            "Node agent session cancellation is not connected",
+            409,
+        )
+
+    def quarantine_node(self, node_id: str, reason_code: str) -> None:
+        raise DomainError(
+            "VERIFY-0022",
+            "Node agent quarantine is not connected",
+            409,
+        )
