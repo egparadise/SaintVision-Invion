@@ -1,12 +1,12 @@
 ---
 doc_id: "DESIGN-S12-BE-RELEASE-MANIFEST-READ-20261001"
 title: "S12-BE release manifest 읽기 route와 서명·수락 쓰기 경계 — operatorSignOff는 외래키로 증명되지 않아 계약에서 false로 고정했다(독립 검토 F1 정정), 쓰기는 Codex 계약 요청 (카드 182, r2)"
-version: "1.1.0"
+version: "1.1.1"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-01T19:22:31+09:00"
+updated: "2026-10-01T19:43:04+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "7e670d77"
@@ -44,7 +44,10 @@ tags: ["s12", "release-manifest", "acceptance", "route", "read-only", "security-
 | `requiredDistinctOperatorCount` | **`Literal[2]`** | 쓰기 계약(`#282`, 카드 184)의 정족수 |
 | `confirmedOperatorCount` | 정수 | 해시가 맞는 `accepted` 행의 **서로 다른 사용자 수**. 기록된 사실이고 서명이 아니다 — 서비스 주체도 이 수에 들어갈 수 있고, **그래서** 서명이 아니다 |
 
-필드 이름은 `#282`가 쓰는 이름을 그대로 쓴다(`operatorSignOff`·`requiredDistinctOperatorCount`·`confirmedOperatorCount`). `#282`의 base가 `#280`이므로 이름을 새로 만들면 두 PR이 다른 말을 하게 된다.
+이 세 필드는 **release 전체 읽기 범위**다. `#282`의 proposal/decision 응답은 r2 N2 뒤
+`proposalConfirmationCount`·`decisionConfirmationCount`·`countsTowardReleaseSignOff`로 이름을
+분리했다. 따라서 여기의 `confirmedOperatorCount`를 proposal 투표 수로 읽거나, 여기의
+`operatorSignOff`를 개별 criterion decision의 quorum 값으로 읽어서는 안 된다.
 
 `confirmedOperatorCount`가 `0`으로 남는 세 경우는 그대로 각각 다른 사실이다.
 

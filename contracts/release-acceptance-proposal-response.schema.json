@@ -8,25 +8,25 @@
       "title": "Acceptanceidref",
       "type": "string"
     },
-    "confirmedOperatorCount": {
-      "const": 1,
-      "title": "Confirmedoperatorcount",
-      "type": "integer"
+    "countsTowardReleaseSignOff": {
+      "const": false,
+      "title": "Countstowardreleasesignoff",
+      "type": "boolean"
     },
     "expiresAt": {
       "format": "date-time",
       "title": "Expiresat",
       "type": "string"
     },
-    "operatorSignOff": {
-      "const": false,
-      "title": "Operatorsignoff",
-      "type": "boolean"
-    },
     "outcome": {
       "const": "accepted",
       "title": "Outcome",
       "type": "string"
+    },
+    "proposalConfirmationCount": {
+      "const": 1,
+      "title": "Proposalconfirmationcount",
+      "type": "integer"
     },
     "proposalDigest": {
       "maxLength": 64,
@@ -78,8 +78,8 @@
     "targetManifestSha256",
     "proposalDigest",
     "requiredDistinctOperatorCount",
-    "confirmedOperatorCount",
-    "operatorSignOff",
+    "proposalConfirmationCount",
+    "countsTowardReleaseSignOff",
     "expiresAt",
     "replayed"
   ],

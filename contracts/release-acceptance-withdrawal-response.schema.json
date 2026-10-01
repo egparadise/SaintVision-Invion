@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
-  "description": "An append-only withdrawal receipt; the withdrawn row cannot sign.",
+  "description": "An append-only withdrawal receipt with release-scope aggregate sign-off.",
   "properties": {
     "acceptanceId": {
       "maxLength": 64,

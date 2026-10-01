@@ -64,10 +64,10 @@
       "title": "Acceptanceidref",
       "type": "string"
     },
-    "confirmedOperatorCount": {
-      "const": 1,
-      "title": "Confirmedoperatorcount",
-      "type": "integer"
+    "countsTowardReleaseSignOff": {
+      "const": false,
+      "title": "Countstowardreleasesignoff",
+      "type": "boolean"
     },
     "expiresAt": {
       "format": "date-time",
@@ -93,15 +93,15 @@
       "title": "Measurementrefs",
       "type": "array"
     },
-    "operatorSignOff": {
-      "const": false,
-      "title": "Operatorsignoff",
-      "type": "boolean"
-    },
     "outcome": {
       "const": "accepted",
       "title": "Outcome",
       "type": "string"
+    },
+    "proposalConfirmationCount": {
+      "const": 1,
+      "title": "Proposalconfirmationcount",
+      "type": "integer"
     },
     "proposalDigest": {
       "maxLength": 64,
@@ -167,8 +167,8 @@
     "measurementRefs",
     "knownLimitations",
     "requiredDistinctOperatorCount",
-    "confirmedOperatorCount",
-    "operatorSignOff",
+    "proposalConfirmationCount",
+    "countsTowardReleaseSignOff",
     "expiresAt"
   ],
   "title": "ReleaseAcceptanceProposalReviewResponse",

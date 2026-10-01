@@ -1,18 +1,24 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.247"
+version: "1.0.248"
 status: "review"
 author: "Codex"
-updated: "2026-10-01T19:24:38+09:00"
+updated: "2026-10-01T19:43:04+09:00"
 source_of_truth: "Git"
 active_card: "CARD-184 S12 release acceptance/operator sign-off write contract"
-active_card_status: "Claude r1 F1-F11 reflected: authenticated proposal review, path-scoped replay, append-only lifecycle, required-criterion sign-off, DB/IdP invariants and 7 strict contracts; PG-free 27 passed"
-active_card_next: "Claude r2 review; implementation remains blocked until IdP step-up, migration, authoritative target/Evidence binding and read projection land together"
+active_card_status: "Claude r2 conditional approval reflected: non-empty pinned policy registry is fail-closed; proposal/decision counts are distinct from release aggregate; 8 strict contracts, PG-free 27 passed"
+active_card_next: "Exact-head Backend green and Claude final confirmation; implementation remains blocked until IdP step-up, migration, authoritative registries and read projection land together"
 ---
 
 ## 2026-10-01 Card 184 — S12 release 수락·operator sign-off 쓰기 계약
 
+- Claude r2 N1/N2를 설계 v1.2와 계약에 반영했다. required criterion registry는 S12-BE 소유의
+  versioned Git 정본으로 정의하고 누락·빈 집합·digest/version drift를 release sign-off false로
+  고정했다. #280 release 집계 필드는 유지하되 proposal/decision 범위는
+  `proposalConfirmationCount`·`decisionConfirmationCount`·`countsTowardReleaseSignOff`로 분리했다.
+  인증된 pending proposal 목록을 포함해 strict contract는 8개이며 PG-free 27 passed, schema
+  93/93이다.
 - Claude r1의 2인 확인 내용 미노출, path ID 없는 replay, proposal 만료 rollback 모순,
   read/sign-off·legacy 1인 경로, DB 불변식, IdP AMR 공백을 설계 v1.1과 공개 계약으로 닫았다.
   pending proposal review GET과 7번째 strict response를 추가했고 withdrawal digest를 대상 final

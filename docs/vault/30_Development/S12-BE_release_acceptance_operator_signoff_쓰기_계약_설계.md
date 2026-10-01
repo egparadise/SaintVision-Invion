@@ -1,12 +1,12 @@
 ---
 doc_id: "DESIGN-S12-BE-RELEASE-ACCEPTANCE-WRITE-20261001"
 title: "S12-BE release 수락·operator sign-off 쓰기 보안 계약 설계"
-version: "1.1.0"
+version: "1.2.0"
 status: "proposed"
 author: "Codex"
 reviewer: "Claude"
 audience: "agent"
-updated: "2026-10-01T19:20:08+09:00"
+updated: "2026-10-01T19:43:04+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "3ff89b84"
@@ -24,9 +24,10 @@ tags: ["s12", "release-manifest", "acceptance", "operator-sign-off", "security",
 1. **모든 결정은 신선한 대화형 인증을 마친 활성 사람**만 쓸 수 있다. 요청 본문은
    `acceptedByUserId`, bearer token, 재인증 증거를 받지 않는다. 서버가 검증된 OIDC
    subject에서 `public.users`의 활성 사용자를 다시 도출한다.
-2. `accepted`만 **서로 다른 두 사람**이 같은 proposal digest를 확인해야 최종
-   `operatorSignOff=true`가 된다. `conditional`과 `rejected`는 한 사람의 최종 기록이지만
-   sign-off를 만들지 않는다.
+2. `accepted`만 **서로 다른 두 사람**이 같은 proposal digest를 확인해야 그 decision이
+   `countsTowardReleaseSignOff=true`가 된다. release 전체의 `operatorSignOff`는 그 뒤 §5의
+   required criterion 전부를 집계한 읽기 projection만 계산한다. `conditional`과 `rejected`는
+   한 사람의 최종 기록이지만 sign-off에 세지 않는다.
 3. 클라이언트는 승인하려는 `targetManifestSha256`을 보낸다. 서버는 잠근 manifest에서
    digest를 다시 읽어 일치할 때만 그 서버 값을 기록한다. caller 값은 저장값의 정본이
    아니다.
@@ -39,7 +40,9 @@ tags: ["s12", "release-manifest", "acceptance", "operator-sign-off", "security",
 감사 기록 구현은 Claude의 다음 카드다. 구현 전까지 기존 읽기 route는 계속 read-only이고
 `operatorSignOff`를 새로 true로 만들 수 없다. #280 head `4114f8ba`가 고정한 현재 읽기 계약은
 `operatorSignOff=false`, `operatorSignOffBlockedBy=human-attestation-contract-absent`,
-`requiredDistinctOperatorCount=2`와 관측용 `confirmedOperatorCount`다. 구현 카드는 아래 attestation·
+`requiredDistinctOperatorCount=2`와 release 전체의 관측용 `confirmedOperatorCount`다. 이 값은
+proposal 투표 수가 아니며 #282의 `proposalConfirmationCount`·`decisionConfirmationCount`와
+이름과 범위를 분리한다. 구현 카드는 아래 attestation·
 quorum·withdrawal projection이 한 transaction 경계로 모두 착지한 뒤에만 blocker literal을
 제거하고 true variant를 공개한다.
 
@@ -100,6 +103,11 @@ context로 전달한다.
   제안·확정할 수 없고, 서로 다른 두 `users.manage` 활성 사람이 같은 grant digest를
   확인해야 enable된다. 한 관리자가 두 번째 계정을 만들고 스스로 권한까지 주는 경로를
   허용하지 않는다.
+- 초기 bootstrap도 한 사람의 web route로 열지 않는다. 설치 시 서로 다른 두 물리 운영자가
+  서명한 offline bootstrap bundle을 배포 도구가 검증해 최초 두 `users.manage`를 만들고,
+  bundle digest·두 operator certificate fingerprint·적용 결과를 append-only audit에 남긴다.
+  bundle이 없거나 서명이 하나뿐이면 tenant는 `releases.accept`를 부여하지 못하는 상태로
+  fail closed한다. break-glass도 같은 2인 서명과 사후 감사 없이는 허용하지 않는다.
 
 ## 3. 공개 route와 strict body
 
@@ -111,15 +119,23 @@ context로 전달한다.
 | route | 요청 contract | 성공 |
 |---|---|---|
 | `POST /v1/release-manifests/{release_id}/acceptance-decisions` | `ReleaseAcceptanceDecisionRequest` | `accepted`: `202 ReleaseAcceptanceProposalResponse`; `conditional/rejected`: `201 ReleaseAcceptanceRecordedResponse` |
+| `GET /v1/release-manifests/{release_id}/acceptance-decisions?state=pending_second_operator&limit={1..100}&cursor={opaque}` | body 없음 | `200 ReleaseAcceptanceProposalReviewPageResponse` |
 | `GET /v1/release-manifests/{release_id}/acceptance-decisions/{proposal_id}` | body 없음 | `200 ReleaseAcceptanceProposalReviewResponse` |
 | `POST /v1/release-manifests/{release_id}/acceptance-decisions/{proposal_id}/confirm` | `ReleaseAcceptanceConfirmationRequest` | `201 ReleaseAcceptanceRecordedResponse` |
 | `POST /v1/release-manifests/{release_id}/acceptances/{acceptance_id}/withdrawals` | `ReleaseAcceptanceWithdrawalRequest` | `201 ReleaseAcceptanceWithdrawalResponse` |
 
-GET은 같은 tenant의 fresh active human이 live `releases.accept`를 보유할 때만 pending proposal의
+두 GET은 같은 tenant의 fresh active human이 live `releases.accept`를 보유할 때만 pending proposal의
 outcome·reasonCode·manifest/proposal digest·targetRefs·measurementRefs·knownLimitations·expiresAt을
 반환한다. proposer/confirming user ID는 반환하지 않는다. confirmer는 이 응답의 내용을 본 뒤
 그 `proposalDigest`를 confirm body에 넣는다. inactive·다른 tenant proposal은 존재 비노출
-`RES-0004/404`다.
+`RES-0004/404`다. 목록은 `(created_at,proposal_id)` 안정 정렬, `limit+1`, opaque cursor를 쓰고
+최대 100건만 반환한다. 따라서 confirmer가 proposal ID를 out-of-band로 전달받을 필요가 없다.
+
+proposal 범위 공개 필드는 `proposalConfirmationCount`와
+`countsTowardReleaseSignOff=false`, final decision 범위는 `decisionConfirmationCount`와
+`countsTowardReleaseSignOff`다. #280 읽기의 `confirmedOperatorCount`·`operatorSignOff`는 release
+전체 집계 범위이므로 write 응답에서 재사용하지 않는다. withdrawal 응답의 `operatorSignOff`만
+철회 commit 뒤의 release 집계값이라는 같은 의미로 유지한다.
 
 ledger canonical payload는 parse 완료 모델에서 다음 exact object로 만든다.
 
@@ -203,8 +219,10 @@ tenant-scoped table로 만들고 모두 `ENABLE ROW LEVEL SECURITY` + `FORCE ROW
 - 기존 `uq_acceptance_records_release_criterion`은 새 slot 불변식으로 대체한다. 0005의
   `inv_app UPDATE,DELETE` grant는 회수한다.
 - proposal/vote/withdrawal RLS `WITH CHECK`는 current tenant와 server-derived user mapping을
-  다시 확인한다. raw user ID를 받는 SECURITY DEFINER 함수, dynamic SQL, PUBLIC/inv_app EXECUTE는
-  금지한다.
+  다시 확인한다. canonical write 함수는 `SECURITY INVOKER`이고 EXECUTE는 `inv_app`에만 준다.
+  함수는 raw user ID 인자를 받지 않고 요청 transaction이 verified principal에서 설정한
+  `SET LOCAL inv.tenant_id`·`inv.user_id`를 읽어 active mapping과 권한을 다시 확인한다.
+  SECURITY DEFINER 함수, dynamic SQL, PUBLIC EXECUTE는 금지한다.
 
 기존 `record_acceptance()`의 1인 `accepted` 경로는 migration과 같은 release에서 폐쇄한다.
 legacy row는 `attestation_version=legacy-unverified`로 분류해 sign-off에 세지 않으며, 함수가
@@ -215,7 +233,9 @@ accepted를 받으면 fail closed한다. conditional/rejected도 새 canonical s
 - request digest 불일치는 malformed input이 아니라 stale target이므로 `GRAPH-0003/409`다.
 - proposal 이후 manifest digest가 달라지면 confirm은 invalidation event와 slot 해제를 commit하고
   `GRAPH-0003/409`를 반환한다. 시간 만료도 `now >= expires_at`으로 계산한 뒤 같은 방식으로
-  append-only event를 남긴다.
+  append-only event를 남긴다. 그 409 ProblemDetails를 같은 idempotency transaction의 receipt로
+  확정하므로 같은 key·payload replay는 인증·fresh-auth·권한 재확인 뒤 같은 409를 돌려준다.
+  다른 key는 inactive state를 다시 판정해 같은 409를 새 receipt로 확정한다.
 - v1에는 proposer 임의 취소 route를 열지 않는다. 잘못 만든 proposal은 최대 5분 뒤 만료되고,
   security operator는 manifest/permission을 바꿔 fail closed시킬 수 있다. 취소를 추가하려면
   별도 reason enum·idempotency·audit 계약을 먼저 추가한다.
@@ -230,6 +250,23 @@ accepted를 받으면 fail closed한다. conditional/rejected도 새 canonical s
   이 단일 함수를 사용하고 별도 rejected 규칙을 만들지 않는다.
 - manifest가 바뀌면 기존 행을 수정하지 않아도 즉시 false다. 같은 이름의 새 composition은
   새 proposal과 두 fresh operators가 필요하다.
+
+### 5-1. required criterion policy registry
+
+구현 카드는 기존 `contracts` 디렉터리에 Git 소유 정본
+`release-acceptance-policy-registry-v1.json`을 새로 만들고 S12-BE owner가 관리한다. 파일은 strict
+JSON object이며 `schemaVersion`, 단조 증가 `policyVersion`,
+`requiredCriteria[]`(`acceptanceIdRef`, `targetRegistryRef`, `measurementRegistryRef`)를 갖는다.
+배포는 파일 bytes의 SHA-256과 `policyVersion`을 release manifest에 고정하고, 읽기 projection과
+proposal digest는 그 고정값을 함께 결속한다.
+
+- 파일 누락·parse/schema 실패·`requiredCriteria=[]`·중복 criterion·고정 digest 불일치는
+  `operatorSignOff=false`다. 빈 집합에 `all(...)`을 적용해 true로 만들 수 없다.
+- registry에 없는 `acceptanceIdRef` decision은 `GRAPH-0003/409`로 거부하고 final row를 만들지 않는다.
+- registry version/digest가 바뀌면 기존 release는 manifest drift와 같은 방식으로 즉시 false이며,
+  새 manifest와 새 proposal·두 fresh operators가 필요하다.
+- 정책 파일과 이를 읽는 code owner는 S12-BE, 계약·보안 reviewer는 Codex다. merge review 없이
+  required criterion을 줄이거나 빈 목록으로 바꾸는 운영 override는 없다.
 
 ## 6. 철회·재결정
 
@@ -294,14 +331,19 @@ token, OIDC claims, user display data, free text, target/measurement payload, kn
 2. body의 `acceptedByUserId`·token·reauth proof·notes 거부.
 3. conditional limitation 규칙과 target/measurement 최소 1·중복 ID 거부.
 4. service token, missing/future/stale `auth_time`, non-interactive/malformed `amr` 거부.
-5. accepted proposal이 sign-off false, accepted final이 2명/true, nonaccepted가 1명/false.
+5. pending proposal은 `proposalConfirmationCount=1`·`countsTowardReleaseSignOff=false`,
+   accepted final은 `decisionConfirmationCount=2`·counts true, nonaccepted는 count 1·false.
 6. same key same body replay; 같은 key를 다른 release/proposal/acceptance path에 재사용 거부;
    replay 전 auth·fresh-auth·permission 재확인; same proposal 다른 key 수렴.
 7. same actor confirm 거부, proposal expiry, manifest/evidence/permission drift.
-8. proposal GET은 refs/reason/expiry를 전부 반환하고 user ID 0; 만료·manifest drift lifecycle event
-   append 뒤 409; withdrawal append-only·double withdrawal·required criterion 미충족 계산.
+8. proposal 목록·단건 GET은 refs/reason/expiry를 전부 반환하고 user ID 0; stable cursor·100건
+   상한; 만료·manifest drift lifecycle event append와 409 receipt 확정; withdrawal append-only·
+   double withdrawal·required criterion 미충족 계산.
 9. 오류 10-key exact·no-store·identifier/non-secret leakage 0, audit payload closed set.
-10. 생성된 `contracts/*.schema.json`과 Pydantic source 일치.
+10. 생성된 `contracts/*.schema.json`과 Pydantic source 일치. pending review의
+    `countsTowardReleaseSignOff=true` 변이는 Pydantic과 JSON Schema 양쪽에서 거부.
+11. policy registry 누락·빈 required set·unknown criterion·version/digest drift는 모두
+    release sign-off false 또는 decision 409이며 빈 `all()` true는 금지.
 
 ### hosted real PostgreSQL
 
@@ -330,7 +372,8 @@ nonaccepted sign-off true를 각각 독립 시험이 죽여야 한다.
   검증되기 전에는 모든 write route를 enable하지 않는다.
 - 기존 #280 read route는 withdrawal/quorum/required-criterion-aware projection으로 교체하고
   `operator_sign_off()`와 `pilot_readiness()`가 같은 함수를 쓰기 전에는 이 계약과 결속됐다고
-  주장하지 않는다.
+  주장하지 않는다. 그 release 범위의 `confirmedOperatorCount` 이름은 유지하되 criterion별
+  quorum 표현으로 교체하고, proposal/decision 범위 count 이름과 혼용하지 않는다.
 - physical 5-node acceptance, operator training, PITR 복구, browser sign-off는 이 계약의
   `measurementRefs` 입력일 뿐 이 PR이 측정한 결과가 아니다.
 - 구현 owner는 Claude, 계약·보안 reviewer는 Codex다. migration이 필요하므로 구현자는

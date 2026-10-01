@@ -1678,8 +1678,10 @@ class ReleaseAcceptanceProposalResponse(Strict):
     target_manifest_sha256: ReleaseAcceptanceSha256 = Field(alias="targetManifestSha256")
     proposal_digest: ReleaseAcceptanceSha256 = Field(alias="proposalDigest")
     required_distinct_operator_count: Literal[2] = Field(alias="requiredDistinctOperatorCount")
-    confirmed_operator_count: Literal[1] = Field(alias="confirmedOperatorCount")
-    operator_sign_off: Literal[False] = Field(alias="operatorSignOff")
+    proposal_confirmation_count: Literal[1] = Field(alias="proposalConfirmationCount")
+    counts_toward_release_sign_off: Literal[False] = Field(
+        alias="countsTowardReleaseSignOff"
+    )
     expires_at: AwareDatetime = Field(alias="expiresAt")
     replayed: StrictBool
 
@@ -1707,15 +1709,26 @@ class ReleaseAcceptanceProposalReviewResponse(Strict):
         alias="knownLimitations", max_length=0
     )
     required_distinct_operator_count: Literal[2] = Field(alias="requiredDistinctOperatorCount")
-    confirmed_operator_count: Literal[1] = Field(alias="confirmedOperatorCount")
-    operator_sign_off: Literal[False] = Field(alias="operatorSignOff")
+    proposal_confirmation_count: Literal[1] = Field(alias="proposalConfirmationCount")
+    counts_toward_release_sign_off: Literal[False] = Field(
+        alias="countsTowardReleaseSignOff"
+    )
     expires_at: AwareDatetime = Field(alias="expiresAt")
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+class ReleaseAcceptanceProposalReviewPageResponse(Strict):
+    """Pending proposals discoverable by an authorized second operator."""
+
+    items: list[ReleaseAcceptanceProposalReviewResponse] = Field(max_length=256)
+    next_cursor: StrictStr | None = Field(default=None, alias="nextCursor", min_length=1, max_length=256)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
 class ReleaseAcceptanceRecordedResponse(Strict):
-    """A final decision; only two-person ``accepted`` may set sign-off true."""
+    """A final decision; only two-person ``accepted`` counts toward release sign-off."""
 
     acceptance_id: StrictStr = Field(alias="acceptanceId", min_length=1, max_length=64)
     release_id: StrictStr = Field(alias="releaseId", min_length=1, max_length=64)
@@ -1724,8 +1737,8 @@ class ReleaseAcceptanceRecordedResponse(Strict):
     state: Literal["recorded"]
     accepted_manifest_sha256: ReleaseAcceptanceSha256 = Field(alias="acceptedManifestSha256")
     manifest_matches: Literal[True] = Field(alias="manifestMatches")
-    operator_sign_off: StrictBool = Field(alias="operatorSignOff")
-    confirmed_operator_count: StrictInt = Field(alias="confirmedOperatorCount", ge=1, le=2)
+    counts_toward_release_sign_off: StrictBool = Field(alias="countsTowardReleaseSignOff")
+    decision_confirmation_count: StrictInt = Field(alias="decisionConfirmationCount", ge=1, le=2)
     decided_at: AwareDatetime = Field(alias="decidedAt")
     replayed: StrictBool
 
@@ -1741,14 +1754,14 @@ class ReleaseAcceptanceRecordedResponse(Strict):
                     },
                     "then": {
                         "properties": {
-                            "confirmedOperatorCount": {"const": 2},
-                            "operatorSignOff": {"const": True},
+                            "decisionConfirmationCount": {"const": 2},
+                            "countsTowardReleaseSignOff": {"const": True},
                         }
                     },
                     "else": {
                         "properties": {
-                            "confirmedOperatorCount": {"const": 1},
-                            "operatorSignOff": {"const": False},
+                            "decisionConfirmationCount": {"const": 1},
+                            "countsTowardReleaseSignOff": {"const": False},
                         }
                     },
                 }
@@ -1759,10 +1772,12 @@ class ReleaseAcceptanceRecordedResponse(Strict):
     @model_validator(mode="after")
     def _quorum_controls_sign_off(self) -> "ReleaseAcceptanceRecordedResponse":
         if self.outcome == "accepted":
-            if not self.operator_sign_off or self.confirmed_operator_count != 2:
-                raise ValueError("accepted requires two operators and operatorSignOff=true")
-        elif self.operator_sign_off or self.confirmed_operator_count != 1:
-            raise ValueError("conditional and rejected decisions never create operator sign-off")
+            if not self.counts_toward_release_sign_off or self.decision_confirmation_count != 2:
+                raise ValueError(
+                    "accepted requires two confirmations and countsTowardReleaseSignOff=true"
+                )
+        elif self.counts_toward_release_sign_off or self.decision_confirmation_count != 1:
+            raise ValueError("conditional and rejected decisions never count toward release sign-off")
         return self
 
 
@@ -1778,7 +1793,7 @@ class ReleaseAcceptanceWithdrawalRequest(Strict):
 
 
 class ReleaseAcceptanceWithdrawalResponse(Strict):
-    """An append-only withdrawal receipt; the withdrawn row cannot sign."""
+    """An append-only withdrawal receipt with release-scope aggregate sign-off."""
 
     withdrawal_id: StrictStr = Field(alias="withdrawalId", min_length=1, max_length=64)
     acceptance_id: StrictStr = Field(alias="acceptanceId", min_length=1, max_length=64)
@@ -1817,9 +1832,12 @@ class ReleaseManifestResponse(Strict):
 
     So the field is pinned false until there is a contract for attesting that a
     person decided. ``requiredDistinctOperatorCount`` and
-    ``confirmedOperatorCount`` carry the recorded fact in the meantime, named as
-    the write contract (``#282``, card 184) names them: two distinct operators
-    are required, and a count below that is not sign-off however it was written.
+    ``confirmedOperatorCount`` carry a release-wide recorded fact in the
+    meantime: the number of distinct users across matching legacy accepted rows.
+    They deliberately do not reuse the write contract's proposal-scoped
+    ``proposalConfirmationCount`` or decision-scoped
+    ``decisionConfirmationCount`` names, and are not sign-off however they were
+    written.
     """
 
     release_id: StrictStr = Field(alias="releaseId", min_length=1, max_length=64)

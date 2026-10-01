@@ -5,11 +5,11 @@
     {
       "else": {
         "properties": {
-          "confirmedOperatorCount": {
-            "const": 1
-          },
-          "operatorSignOff": {
+          "countsTowardReleaseSignOff": {
             "const": false
+          },
+          "decisionConfirmationCount": {
+            "const": 1
           }
         }
       },
@@ -25,17 +25,17 @@
       },
       "then": {
         "properties": {
-          "confirmedOperatorCount": {
-            "const": 2
-          },
-          "operatorSignOff": {
+          "countsTowardReleaseSignOff": {
             "const": true
+          },
+          "decisionConfirmationCount": {
+            "const": 2
           }
         }
       }
     }
   ],
-  "description": "A final decision; only two-person ``accepted`` may set sign-off true.",
+  "description": "A final decision; only two-person ``accepted`` counts toward release sign-off.",
   "properties": {
     "acceptanceId": {
       "maxLength": 64,
@@ -55,24 +55,24 @@
       "title": "Acceptedmanifestsha256",
       "type": "string"
     },
-    "confirmedOperatorCount": {
-      "maximum": 2,
-      "minimum": 1,
-      "title": "Confirmedoperatorcount",
-      "type": "integer"
+    "countsTowardReleaseSignOff": {
+      "title": "Countstowardreleasesignoff",
+      "type": "boolean"
     },
     "decidedAt": {
       "format": "date-time",
       "title": "Decidedat",
       "type": "string"
     },
+    "decisionConfirmationCount": {
+      "maximum": 2,
+      "minimum": 1,
+      "title": "Decisionconfirmationcount",
+      "type": "integer"
+    },
     "manifestMatches": {
       "const": true,
       "title": "Manifestmatches",
-      "type": "boolean"
-    },
-    "operatorSignOff": {
-      "title": "Operatorsignoff",
       "type": "boolean"
     },
     "outcome": {
@@ -108,8 +108,8 @@
     "state",
     "acceptedManifestSha256",
     "manifestMatches",
-    "operatorSignOff",
-    "confirmedOperatorCount",
+    "countsTowardReleaseSignOff",
+    "decisionConfirmationCount",
     "decidedAt",
     "replayed"
   ],
