@@ -1580,8 +1580,8 @@ def _exact_lower_hex_sha256(value: Any) -> Any:
 
 ReleaseAcceptanceSha256 = Annotated[
     StrictStr,
-    BeforeValidator(_exact_lower_hex_sha256),
     Field(min_length=64, max_length=64, pattern="^[0-9a-f]{64}$"),
+    BeforeValidator(_exact_lower_hex_sha256),
 ]
 
 
