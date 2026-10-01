@@ -5,6 +5,9 @@
  "cards": {
   "VF-CL-01": {
    "impliesImplemented": true,
+   "impliesCiVerified": null,
+   "whyCiVerified": "The lane that collects this card's tests runs a whole directory (pytest tests/core, pytest tests/), so no check over the tree can say that *this* card's behaviour was exercised rather than its neighbours'. A check pointing at that lane would read as coverage while asserting nothing, so nothing is asserted here. The field stays what the owner recorded, and rule 7 does not confirm it.",
+   "ciVerifiedChecks": [],
    "checks": [
     {
      "kind": "path-exists",
@@ -34,6 +37,9 @@
   },
   "VF-CL-02": {
    "impliesImplemented": true,
+   "impliesCiVerified": null,
+   "whyCiVerified": "The lane that collects this card's tests runs a whole directory (pytest tests/core, pytest tests/), so no check over the tree can say that *this* card's behaviour was exercised rather than its neighbours'. A check pointing at that lane would read as coverage while asserting nothing, so nothing is asserted here. The field stays what the owner recorded, and rule 7 does not confirm it.",
+   "ciVerifiedChecks": [],
    "checks": [
     {
      "kind": "path-exists",
@@ -60,6 +66,9 @@
   },
   "VF-CL-03": {
    "impliesImplemented": true,
+   "impliesCiVerified": null,
+   "whyCiVerified": "The lane that collects this card's tests runs a whole directory (pytest tests/core, pytest tests/), so no check over the tree can say that *this* card's behaviour was exercised rather than its neighbours'. A check pointing at that lane would read as coverage while asserting nothing, so nothing is asserted here. The field stays what the owner recorded, and rule 7 does not confirm it.",
+   "ciVerifiedChecks": [],
    "checks": [
     {
      "kind": "path-exists",
@@ -103,6 +112,50 @@
   },
   "VF-CL-04": {
    "impliesImplemented": true,
+   "impliesCiVerified": false,
+   "whyCiVerified": "The facts are measured and the receipt binds them, but a receipt built offline from passed-in JSON is not authoritative: its digest is a hash, not a signature, so a forged run id survives re-hashing (#295 r2 F1). So the tree implies false -- not because CI cannot re-derive this card, but because nothing here can show that it did. The check below is what makes that a derivation rather than an opinion: while the workflow carries no attestation step, this stays false, and the day one is added the check breaks and this entry has to be revisited. What the checks below DO establish is the chain of literals: s12-acceptance-evidence.yml runs this card's collector and then the shape gate over what it produced, and the collector is where the two named acceptance observations come from -- which is why this card is the one rule 7 could ever assert, unlike the cards whose tests merely ride a whole-directory lane.",
+   "ciVerifiedReceipt": {
+    "path": "docs/vf-cl-ci-receipts/VF-CL-04.json",
+    "workflowPath": ".github/workflows/s12-acceptance-evidence.yml",
+    "requiredSteps": [
+     "Derive the AC-12 acceptance items",
+     "Hold the bundle to its shape and to this head",
+     "Record that the two named observations were derived here",
+     "Upload the acceptance evidence"
+    ],
+    "artifactNamePrefix": "s12-acceptance-"
+   },
+   "ciVerifiedChecks": [
+    {
+     "kind": "path-exists",
+     "path": ".github/workflows/s12-acceptance-evidence.yml"
+    },
+    {
+     "kind": "references",
+     "path": ".github/workflows/s12-acceptance-evidence.yml",
+     "text": "python tools/collect_s12_acceptance_evidence.py"
+    },
+    {
+     "kind": "references",
+     "path": ".github/workflows/s12-acceptance-evidence.yml",
+     "text": "python tools/check_s12_acceptance_shape.py"
+    },
+    {
+     "kind": "references",
+     "path": "tools/collect_s12_acceptance_evidence.py",
+     "text": "pitr-configuration-possible"
+    },
+    {
+     "kind": "references",
+     "path": "tools/collect_s12_acceptance_evidence.py",
+     "text": "pitr-rehearsal-dry-run-observed"
+    },
+    {
+     "kind": "absent",
+     "path": ".github/workflows/s12-acceptance-evidence.yml",
+     "text": "attest-build-provenance"
+    }
+   ],
    "checks": [
     {
      "kind": "path-exists",
@@ -200,6 +253,9 @@
   },
   "VF-CL-05": {
    "impliesImplemented": null,
+   "impliesCiVerified": null,
+   "whyCiVerified": "A review card ships review documents. There is no code for CI to execute, which the registry's notApplicable already says; re-deriving it from the tree would mean asserting something about the absence of code, and that is not what these checks can see.",
+   "ciVerifiedChecks": [],
    "why": "A review card ships review documents. Their existence in the tree does not re-derive that the reviews were performed, and a check that looked only for file names would read as coverage while asserting nothing. So this card's implemented field is not re-derived here, and that is stated rather than left as an empty entry.",
    "checks": [],
    "closedBlockers": {},
