@@ -1697,61 +1697,127 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
   });
 
-  // 9d-2. [Card 197 r1 / ACC-09 / Claude Z3 & Codex F3] Static Style-Pair Contrast & Anti-Collision Guard: ModelLineageView
+  // 9d-2. [Card 197 r2 / ACC-09 / Claude r2 & Codex r2] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: ModelLineageView
   it('ACC-09 / Card 197: ModelLineageView style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
     const filePath = path.resolve(__dirname, '../src/features/mlops/ModelLineageView.tsx');
     const content = fs.readFileSync(filePath, 'utf-8');
     const sf = ts.createSourceFile('ModelLineageView.tsx', content, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
 
-    const violations: string[] = [];
-    let checkedObjects = 0;
+    interface Branch {
+      cond: string;
+      token: string;
+    }
 
-    function checkObject(obj: ts.ObjectLiteralExpression) {
-      let bgExpr: string | null = null;
-      let fgExpr: string | null = null;
-
-      for (const prop of obj.properties) {
-        if (ts.isPropertyAssignment(prop)) {
-          const name = prop.name.getText(sf);
-          if (name === 'backgroundColor' || name === 'background') {
-            bgExpr = prop.initializer.getText(sf);
-          }
-          if (name === 'color') {
-            fgExpr = prop.initializer.getText(sf);
+    function extractBranches(node: ts.Node): Branch[] {
+      const branches: Branch[] = [];
+      function collect(n: ts.Node, condPath: string) {
+        if (ts.isConditionalExpression(n)) {
+          const condText = n.condition.getText(sf).replace(/\s+/g, ' ');
+          collect(n.whenTrue, condPath ? `${condPath} && ${condText}` : condText);
+          collect(n.whenFalse, condPath ? `${condPath} && !(${condText})` : `!(${condText})`);
+        } else {
+          const text = n.getText(sf);
+          const m = text.match(/var\((--color-[a-z0-9-]+)\)/);
+          if (m) {
+            branches.push({ cond: condPath, token: m[1] });
           }
         }
       }
+      collect(node, '');
+      return branches;
+    }
 
-      if (bgExpr && fgExpr) {
-        checkedObjects++;
-        // 1. Check for 1:1 token collision (e.g. S3 / F3)
-        const bgTokens = [...bgExpr.matchAll(/var\((--color-[a-z0-9-]+)\)/g)].map((x) => x[1]);
-        const fgTokens = [...fgExpr.matchAll(/var\((--color-[a-z0-9-]+)\)/g)].map((x) => x[1]);
+    let checkedPairs = 0;
+    let checkedObjects = 0;
+    let totalStyleAttrs = 0;
+    let unboundColorObjects = 0;
+    const violations: string[] = [];
+    const containerBgs = ['--color-bg-surface', '--color-bg-subtle', '--color-bg-canvas'];
 
-        for (const bt of bgTokens) {
-          if (fgTokens.includes(bt)) {
-            violations.push(`1:1 token collision between background and color (${bt}) in style: ${obj.getText(sf).slice(0, 60)}...`);
+    function checkPair(bgToken: string, fgToken: string, pos: number) {
+      checkedPairs++;
+      const { line } = sf.getLineAndCharacterOfPosition(pos);
+      const lightBg = lightTokens[bgToken];
+      const lightFg = lightTokens[fgToken];
+      const darkBg = darkTokens[bgToken];
+      const darkFg = darkTokens[fgToken];
+
+      if (bgToken === fgToken) {
+        violations.push(`L${line + 1}: 1:1 token collision between background and foreground (${bgToken})`);
+        return;
+      }
+
+      if (lightBg && lightFg) {
+        const cr = getContrast(lightFg, lightBg);
+        if (cr < 4.5) {
+          violations.push(`L${line + 1}: Light text contrast ${cr.toFixed(2)}:1 < 4.5:1 (${fgToken} on ${bgToken})`);
+        }
+      }
+      if (darkBg && darkFg) {
+        const cr = getContrast(darkFg, darkBg);
+        if (cr < 4.5) {
+          violations.push(`L${line + 1}: Dark text contrast ${cr.toFixed(2)}:1 < 4.5:1 (${fgToken} on ${bgToken})`);
+        }
+      }
+    }
+
+    function checkInheritedColor(fgToken: string, pos: number) {
+      const { line } = sf.getLineAndCharacterOfPosition(pos);
+      const lightFg = lightTokens[fgToken];
+      const darkFg = darkTokens[fgToken];
+
+      for (const bgToken of containerBgs) {
+        const lightBg = lightTokens[bgToken];
+        const darkBg = darkTokens[bgToken];
+
+        if (lightBg && lightFg) {
+          const cr = getContrast(lightFg, lightBg);
+          if (cr < 4.5) {
+            violations.push(`L${line + 1}: Inherited Light text contrast ${cr.toFixed(2)}:1 < 4.5:1 (${fgToken} on container ${bgToken})`);
           }
         }
-
-        // 2. Check for brand-primary on brand-subtle (Z1 / F2 light 4.24:1 failure)
-        if (bgExpr.includes('--color-brand-subtle') && fgExpr.includes('--color-brand-primary') && !fgExpr.includes('--color-brand-primary-fg')) {
-          violations.push(`Defective brand-primary on brand-subtle (light 4.24:1 < 4.5:1) in style: ${obj.getText(sf).slice(0, 60)}...`);
-        }
-
-        // 3. Check for white text on status-online / status-offline in status badges (Z2 / F1 dark 2.28:1 / 2.77:1 failure)
-        if ((bgExpr.includes('--color-status-online') || bgExpr.includes('--color-status-offline')) &&
-            (fgExpr.includes('--color-brand-primary-fg') || fgExpr.includes('#ffffff') || fgExpr.includes('#fff'))) {
-          violations.push(`Defective white text on status-online/offline (dark 2.28:1 / 2.77:1 < 4.5:1) in style: ${obj.getText(sf).slice(0, 60)}...`);
+        if (darkBg && darkFg) {
+          const cr = getContrast(darkFg, darkBg);
+          if (cr < 4.5) {
+            violations.push(`L${line + 1}: Inherited Dark text contrast ${cr.toFixed(2)}:1 < 4.5:1 (${fgToken} on container ${bgToken})`);
+          }
         }
       }
     }
 
     function visit(node: ts.Node) {
       if (ts.isJsxAttribute(node) && node.name.text === 'style') {
+        totalStyleAttrs++;
         function findObjects(n: ts.Node) {
           if (ts.isObjectLiteralExpression(n)) {
-            checkObject(n);
+            let bgNode: ts.Expression | null = null;
+            let fgNode: ts.Expression | null = null;
+            for (const p of n.properties) {
+              if (ts.isPropertyAssignment(p)) {
+                const name = p.name.getText(sf);
+                if (name === 'backgroundColor' || name === 'background') bgNode = p.initializer;
+                if (name === 'color') fgNode = p.initializer;
+              }
+            }
+            if (bgNode && fgNode) {
+              checkedObjects++;
+              const bgBranches = extractBranches(bgNode);
+              const fgBranches = extractBranches(fgNode);
+
+              for (const bgB of bgBranches) {
+                for (const fgB of fgBranches) {
+                  if (!bgB.cond || !fgB.cond || bgB.cond === fgB.cond) {
+                    checkPair(bgB.token, fgB.token, n.getStart(sf));
+                  }
+                }
+              }
+            } else if (!bgNode && fgNode) {
+              unboundColorObjects++;
+              const fgBranches = extractBranches(fgNode);
+              for (const fgB of fgBranches) {
+                checkInheritedColor(fgB.token, n.getStart(sf));
+              }
+            }
           }
           ts.forEachChild(n, findObjects);
         }
@@ -1761,7 +1827,12 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
     visit(sf);
 
-    expect(checkedObjects, 'Must check style objects with both foreground and background').toBeGreaterThanOrEqual(50);
+    // Exact ratchet assertions covering 100% of ModelLineageView style declarations
+    expect(totalStyleAttrs, 'Total style attributes in ModelLineageView must be exactly 359').toBe(359);
+    expect(checkedObjects, 'Style objects with explicit background and foreground must be exactly 58').toBe(58);
+    expect(checkedPairs, 'Evaluated foreground-background pairs across conditional branches must be exactly 76').toBe(76);
+    expect(unboundColorObjects, 'Elements with foreground color inheriting container background must be exactly 176').toBe(176);
+    expect(checkedObjects + unboundColorObjects, 'Total covered color style objects must be exactly 234').toBe(234);
     expect(violations, `Expected 0 style-pair contrast/collision violations in ModelLineageView, got:\n${violations.join('\n')}`).toEqual([]);
   });
 
@@ -1953,6 +2024,11 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     // Probe 41 [Card 197 r1 / Z3 / F3]: Swapping status-online into background of status-online text (1:1 mutation S3) strictly fails 4.5:1
     expect(getContrast(lightTokens['--color-status-online'], lightTokens['--color-status-online']), 'Defective online on online in light fails 4.5:1').toBe(1.0);
     expect(getContrast(darkTokens['--color-status-online'], darkTokens['--color-status-online']), 'Defective online on online in dark fails 4.5:1').toBe(1.0);
+
+    // Probe 42 [Card 197 r2 / Claude r2 & Codex r2]: Replay foreground brand-hover -> brand-primary-fg on brand-subtle in light mode (1.22:1) strictly fails 4.5:1
+    const probe42Cr = getContrast(lightTokens['--color-brand-primary-fg'], lightTokens['--color-brand-subtle']);
+    expect(probe42Cr, 'Defective brand-primary-fg on brand-subtle in light must fail 4.5:1').toBeLessThan(4.5);
+    expect(probe42Cr).toBeCloseTo(1.22, 2);
 
     // Legacy Token Reverts:
     // Legacy Dark --color-border-subtle: #374151

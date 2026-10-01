@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import React, { act } from 'react';
 import { createRoot, Root } from 'react-dom/client';
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, vi } from 'vitest';
 import { MlopsManager } from '../src/features/mlops/mlopsEngine';
 import { TEST_FIXTURE_LINEAGES } from './fixtures/model-lineage';
 import { ModelLineageView } from '../src/features/mlops/ModelLineageView';
@@ -26,6 +26,15 @@ import {
 } from '../src/shared/api/adapterObservation';
 
 describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (AC-10)', () => {
+  const originalFetch = globalThis.fetch;
+  beforeAll(() => {
+    globalThis.fetch = vi.fn().mockImplementation(() =>
+      Promise.resolve(new Response(JSON.stringify({}), { status: 200, headers: { 'Content-Type': 'application/json' } }))
+    );
+  });
+  afterAll(() => {
+    globalThis.fetch = originalFetch;
+  });
   describe('Provider Adapter Conformance (AC-10 Codex = Claude)', () => {
     it('verifies Codex and Claude adapters conform to identical schemas and protocols', () => {
       const mlops = new MlopsManager();

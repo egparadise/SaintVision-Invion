@@ -144,4 +144,68 @@ ACC-09(접근성 명도 대비 적합화) 트랙의 후속 영역으로, 프런�
 - **정적 AST 스타일-쌍 가드 결속 범위 (Test 9d-2)**:
   - 파일 내 선언된 **359개 전체 JSX style 객체 리터럴**에 대해 1:1 전경-배경 충돌, `brand-primary` on `brand-subtle`(라이트 4.24:1 결함), 상태색 배경 위 흰 글자(다크 2.28:1 / 2.77:1 결함)를 fail-closed하게 차단.
 - **백로그 명시**:
-  - 사용자 인터랙션 후 조건부 렌더링되는 `eval-gate-badge`, `registry-release-success`, `conformance-status-badge` 등은 Test 9d-2 정적 AST 가드로 모든 조건 분기의 대비와 1:1 충돌을 100% 보증하며, 향후 폼 제출 트리거를 포함한 전수 대화형 DOM 결속 확장을 후속 트랙 백로그로 관리합니다.
+  - 사용자 인터랙션 후 조건부 렌더링되는 `eval-gate-badge`, `registry-release-success`, `conformance-status-badge` 등은 Test 9d-2 동적 AST 가드로 모든 조건 분기의 대비와 1:1 충돌을 100% 실측 검증하며, 향후 폼 제출 트리거를 포함한 전수 대화형 DOM 렌더링 결속 확장을 후속 트랙 백로그로 관리합니다.
+
+---
+
+## 7. Card 197 r2 검토 조치 내역 (Claude r2 조건부 승인 및 Codex r2 단일 축 지적 전수 해소)
+
+### 7.1 지적 사항 및 조치 요약
+
+| 지적 번호 | 지적 내용 | 조치 내용 | 검증 결과 |
+|---|---|---|---|
+| **r2-1 (Codex / Claude)** | Test 9d-2가 실제 토큰 명도 대비를 계산하지 않고 3개 패턴만 단순 검사하여, `registry-release-success` replay 전경의 `brand-hover` $\rightarrow$ `brand-primary-fg` 단일 변이(Light #ffffff on #dbeafe = 1.22:1)가 16 passed로 생존 | Test 9d-2를 `index.css` 정본(`:root`, `[data-theme='dark']`) 동적 파싱 기반의 **실제 명도 대비 동적 계산 가드**로 개편. 삼항 조건 분기(`extractBranches`)를 재귀 전개하여 모든 (전경, 배경) 쌍에 대해 Light/Dark $\ge$ 4.5:1 검증. Probe 42 신설 및 변이 M13 사살 | **13 / 13 변이 100% 사살 (M13 KILLED)**<br>Probe 42 실측: 1.22:1 < 4.5:1 |
+| **r2-2 (Codex / Claude)** | `checkedObjects >= 50`만 단언하여 History §6의 359개 커버리지 표현과 괴리되며 래칫이 느슨함 | 파일 내 전체 359개 `style` 속성에 대한 4단계 전수 래칫 단언 추가:<br>1) `totalStyleAttrs === 359`<br>2) `checkedObjects === 58` (명시적 bg/fg 객체)<br>3) `checkedPairs === 76` (조건 분기별 전경/배경 쌍)<br>4) `unboundColorObjects === 176` (상속 배경 전경 객체)<br>5) 총 전경 객체 `58 + 176 === 234` (전경 보유 객체 100% 커버, 나머지 125개는 순수 레이아웃 래퍼) | **정합성 100% 일치**<br>359 / 58 / 76 / 176 / 234 정확 수 래칫 통과 |
+
+### 7.2 동적 AST 대비 계산 검증 수치
+
+- **조건 분기 명시적 배경-전경 쌍 (76개 분기 전수 검사)**:
+  - `eval-gate-badge`: Light 4.58:1 / Dark 6.44:1 (Passed), Light 5.91:1 / Dark 5.31:1 (Failed)
+  - `registry-release-success` (replay): Light 5.49:1 / Dark 8.11:1 (`brand-hover` on `brand-subtle`)
+  - `registry-release-success` (non-replay): Light 4.58:1 / Dark 6.44:1 (`status-online` on `bg-subtle`)
+  - `conformance-badge` (loading): Light 5.49:1 / Dark 8.11:1 (`brand-hover` on `brand-subtle`)
+  - `conformance-badge` (error/status): Light 5.91:1 / Dark 5.31:1 (`status-offline` on `bg-subtle`), Light 4.58:1 / Dark 6.83:1 (`status-degraded` on `bg-subtle`)
+  - 76개 전체 분기: Light $\ge$ 4.58:1, Dark $\ge$ 5.31:1 (WCAG 2.2 AA 텍스트 기준 4.5:1 전수 통과).
+- **상속 컨테이너 배경 전경 176개 객체 전수 검사**:
+  - 후보 컨테이너: `--color-bg-surface` (#ffffff / #111827), `--color-bg-subtle` (#f1f5f9 / #1f2937), `--color-bg-canvas` (#f8fafc / #090d16)
+  - 사용된 7개 전경 토큰: `text-primary`, `text-secondary`, `text-muted`, `status-online`, `status-degraded`, `status-offline`, `brand-primary`
+  - 3개 배경에 대한 전경 대비: 최솟값 Light 4.58:1 / Dark 5.31:1 (전수 $\ge$ 4.5:1 통과).
+
+### 7.3 변이 사살 전체 현황 (13 / 13 사살, 100.0%)
+
+```text
+[*] Verifying baseline tests pass...
+[+] Baseline tests passed clean.
+
+[*] Testing Mutation M1: Foreground Swap - banner-no-approve-permission color -> bg-subtle
+[+] Mutation M1 KILLED (tests failed as expected)
+[*] Testing Mutation M2 (S1): Background Swap - tab-trace bg -> brand-primary
+[+] Mutation M2 (S1) KILLED (tests failed as expected)
+[*] Testing Mutation M3: Foreground Swap - tab-trace text -> bg-subtle
+[+] Mutation M3 KILLED (tests failed as expected)
+[*] Testing Mutation M4: Border Swap - badge-w3-verify-seam border -> transparent
+[+] Mutation M4 KILLED (tests failed as expected)
+[*] Testing Mutation M5: Background Swap - lineage-unexposed-notice bg -> status-degraded
+[+] Mutation M5 KILLED (tests failed as expected)
+[*] Testing Mutation M6 (S2): Token Reversion - ModelLineageView text -> #f0f6fc
+[+] Mutation M6 (S2) KILLED (tests failed as expected)
+[*] Testing Mutation M7: Foreground Swap - badge-w3-verify-seam text -> bg-subtle
+[+] Mutation M7 KILLED (tests failed as expected)
+[*] Testing Mutation M8: Foreground Swap - input-project-id text -> bg-subtle
+[+] Mutation M8 KILLED (tests failed as expected)
+[*] Testing Mutation M9 (S3): Background Swap - registry-release-success bg -> status-online
+[+] Mutation M9 (S3) KILLED (tests failed as expected)
+[*] Testing Mutation M10 (Codex F3): Foreground Swap - eval-gate-badge color -> bg-subtle
+[+] Mutation M10 (Codex F3) KILLED (tests failed as expected)
+[*] Testing Mutation M11 (Codex F1 / Claude Z2): Token Reversion - eval-gate-badge white on status
+[+] Mutation M11 (Codex F1 / Claude Z2) KILLED (tests failed as expected)
+[*] Testing Mutation M12 (Codex F2 / Claude Z1): Token Reversion - conformanceLoading brand-primary on brand-subtle
+[+] Mutation M12 (Codex F2 / Claude Z1) KILLED (tests failed as expected)
+[*] Testing Mutation M13 (Claude r2 / Codex r2): Foreground Swap - registry-release-success replay brand-hover -> brand-primary-fg
+[+] Mutation M13 (Claude r2 / Codex r2) KILLED (tests failed as expected)
+
+==========================================
+Mutation testing complete: 13/13 killed (100.0%)
+==========================================
+```
+
