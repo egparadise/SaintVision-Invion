@@ -16,6 +16,7 @@
     /* Primary Brand */
     --color-brand-primary: #2563eb;
     --color-brand-primary-bg: #2563eb;
+    --color-brand-primary-fg: #ffffff;
     --color-brand-hover: #1d4ed8;
     --color-brand-primary-hover-bg: #1d4ed8;
     --color-brand-subtle: #dbeafe;
@@ -67,6 +68,7 @@
 
     --color-brand-primary: #60a5fa;
     --color-brand-primary-bg: #1d4ed8;
+    --color-brand-primary-fg: #ffffff;
     --color-brand-hover: #93c5fd;
     --color-brand-subtle: #1e293b;
 

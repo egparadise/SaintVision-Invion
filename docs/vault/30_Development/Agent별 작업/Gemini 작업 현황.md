@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.174"
+version: "1.0.177"
 status: "proposed"
 author: "Gemini"
-updated: "2026-10-02T00:35:00+09:00"
+updated: "2026-10-02T02:51:22+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,40 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
+- 확인 기준: 2026-10-02T02:51:22+09:00 (Card 195 데스크톱 탐색기 r4 조치: Claude r4 승인 및 Codex r4 문서 사실성 3건 반영 — F1 History 합성 hex #192d50 / #233654 실제 계산값 정정, F2 r3/r4 보강 시각을 commit 전 실제 시각(02:40:05, 02:51:22)으로 정정, F3 작업판 '전수 감사' 표현을 '색상 리터럴 inventory 전수(390/124→0), 대비 표본/DOM 결속은 명시 범위'로 좁힘; 문서 단독 commit).
+- 확인 기준: 2026-10-02T02:40:05+09:00 (Card 195 데스크톱 탐색기 r3 조치: Claude UI r3 조건부 승인 및 Codex r3 피드백 전수 반영 — §2.1 표를 index.css 정본 토큰(--color-bg-surface #111827 / --color-bg-subtle #1f2937) 배경으로 재계산, Light before 열 '가상 비교' 명시, §3 discovery success 4.718/5.774 및 repair error 6.470/6.413 수치 정정, '전수 감사' 표현 완화 및 비차단 배너 swap 백로그 기록; 문서 단독 commit).
+- 확인 기준: 2026-10-02T02:22:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer r2 조치: Claude UI r2 조건부 승인 및 Codex r2 피드백 반영 — W1 History 전수 표 'before' 열 SaintVision 정본 베이스 다크 패널(#0f172a surface, #1e293b subtle) 재계산 및 4개 수치 오류(2.77:1, 3.44:1, 10.35:1, 3.48:1/3.75:1) 정정, W2 discovery-action-success 및 repair-action-error DOM 바인딩 단언 및 Probe 30/31 추가로 1:1 결함 변이 M11/M12 100% 사살 실측(총 12/12 100%), W3 commit 전 시각 동기화; Vitest 14 passed, s11-defect-fixes 16 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
+- 확인 기준: 2026-10-02T02:05:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer r1 조치: Claude UI r1 및 Codex r1 피드백 전수 반영 — R1 버튼 요소 DEF-S11-09 위반 해소 `var(--color-brand-primary-bg)` 및 `--color-brand-primary-fg` 승격; R2 활성 네임스페이스 칩 및 버전 배지 `var(--color-brand-hover)` 적용 5.49:1(Light)/8.11:1(Dark), 비활성 버튼 `var(--color-bg-subtle)`/`var(--color-text-muted)`/`var(--color-border-subtle)` 5.25:1/5.78:1 및 3.18:1/3.08:1 충족; R3 실제 렌더 배경 기반 전수 실측표 재구성; R4 Test 9c 확장 및 10종 변이 M1~M10 100% 사살 실측; R5 History 제어 바이트 60개 전수 제거 완료; 보라색 리터럴 의도적 브랜드 통합 명시; Vitest 14 passed, s11-defect-fixes 16 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
+- 확인 기준: 2026-10-02T01:20:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer Light/Dark 명도 대비 전수 감사 및 디자인 토큰 승격: base db37dbc5 위 작업, ResourceExplorer 390건 -> 0건, InvFileExplorer 124건 -> 0건 100% 해소, COLOR_LITERAL_MULTISET_BASELINE 양 파일 {} 래칫, border-subtle 232건/22개 파일 래칫, DOM 실제 렌더링 동적 대비 단언 신설, 변이 M1~M4 100% 사살 실측, Vitest 9개 스위트 139 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-01T23:55:00+09:00 (Card 193 NodeDetail 잔여 리터럴 9건 r1 조치: Claude UI r1 및 Codex r1 피드백 반영, data-testid를 통한 상위 컨테이너(resource-usage-card-cpu subtle, node-detail-observed-usage-box subtle, node-detail-observed-headroom-box subtle, node-detail-lease-panel surface) 배경 DOM 직접 추출 및 동적 대비율 단언, Z1~Z5 5종 변이 100% 사살 실측, History §2 표 및 §3-2 대비 수치·배경 수학적 정밀 수치 정정, Probe 19~23 주석 수치 및 subtle 베이스 정정, Vitest 13 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
+
+## 2026-10-02 데스크톱 탐색기 (ResourceExplorer & InvFileExplorer) 색상 리터럴 inventory 전수(390/124→0), 대비 표본/DOM 결속은 명시 범위 감사 및 디자인 토큰 승격 (Card 195, `agent/gemini/c195-desktop-explorer-contrast`, base `db37dbc5` PR #290)
+- **개요**: ACC-09 다음 영역인 데스크톱 양대 탐색기(`ResourceExplorer.tsx`, `InvFileExplorer.tsx`)의 색상 리터럴 inventory 전수(390/124→0), 대비 표본/DOM 결속은 명시 범위로 감사하고 디자인 토큰으로 승격:
+  1. **색상 리터럴 100% 전수 해소**:
+     - `ResourceExplorer.tsx`: 기존 390건 $\rightarrow$ **0건** (전수 제거).
+     - `InvFileExplorer.tsx`: 기존 124건 $\rightarrow$ **0건** (전수 제거).
+     - 두 파일 모두 잔여 하드코딩 리터럴 결함 백로그 0건 달성.
+  2. **Fail-Closed Multiset Baseline 래칫 강제**:
+     - `acc09-contrast-tokens.test.tsx`의 `COLOR_LITERAL_MULTISET_BASELINE`에서 양 파일 허용 인벤토리를 `{}` (0건)으로 전면 갱신.
+     - `var(--color-border-subtle)` 사용 횟수 141건 $\rightarrow$ **232건**(+91건), 파일 수 21개 $\rightarrow$ **22개**로 fail-closed 단언 갱신.
+  3. **실제 렌더링 DOM 기반 동적 대비 단언 및 변이 100% 사살**:
+     - Test 9c 신설: `ResourceExplorer` (신선도 고지, 스윕 버튼, 용량 카드 4종, 필터 버튼, 노드 카드 선택/비선택, 에러 배너) 및 `InvFileExplorer` (주소창, 이동 버튼, 선택 파일 행, 무결성 배지, 복제본 정상 배지) DOM 렌더링 및 동적 대비율(텍스트 >= 4.5:1, UI 경계 >= 3.0:1) 단언.
+     - 변이 M1~M4 (배경 바꿔치기, 토큰 되돌림 등) 전원 사살 실측 (4/4 = 100% killed).
+  4. **잔여 백로그 현황**:
+     - 양대 탐색기 화면 잔여 색상 리터럴: **0건**.
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성 소유). Reviewer: Claude (UI/접근성/테스트), Codex (디자인 토큰/무결성/불변식).
+- **관측 근거 (Evidence)**:
+  - 단위 시험: `npm test -- tests/acc09-contrast-tokens.test.tsx` (14 passed 100%, exit 0)
+  - 관련 스위트 전체: 9개 테스트 파일, 139 passed 100% (exit 0)
+  - 변이 불변식 실측: `python test_c195_mutations.py` (4 / 4 killed 100%)
+  - 타입 검사: `cd apps/web && npx tsc -b` (에러 0건, 클린 통과)
+  - 프로덕션 빌드: `cd apps/web && npm run build` (built in 7.59s, exit 0)
+  - 라우트 커버리지: `pytest tests/test_route_coverage.py` (41 passed 100%, exit 0)
+  - 프런트엔드 무결성: `python tools/check_frontend_integrity.py` (93 files scanned, 0 violations, exit 0)
+  - 계약 바인딩: `python tools/check_contract_bindings.py` (55 fixtures, 20 bound types, exit 0)
+  - 문서 일관성: `python tools/check_docs.py` (PASS, exit 0)
+  - 문서 경로 인용 래칫: `python tools/check_doc_path_citations.py --ratchet --base-ref c41fe2da` (PASS, exit 0)
+  - Git 공백/충돌 검사: `git diff --check` (Clean, exit 0)
 - 확인 기준: 2026-10-01T23:00:00+09:00 (Card 193 NodeDetail 잔여 리터럴 9건 전수 해소 및 대비 래칫 강화: base 3e19b682 위 작업, #3fb950 4건·#2ea043 1건·#58a6ff 2건·rgba 2건 전수 제거, 배지 및 4-Tier 수치, online 타임라인을 var(--color-status-online), var(--color-brand-primary), var(--color-bg-subtle)로 결속하여 라이트/다크 모두 4.5:1(텍스트)/3.0:1(UI경계) 충족, COLOR_LITERAL_MULTISET_BASELINE 순수 감소 래칫, 11종 변이 100% 사살 실측, 잔여 저대비 리터럴 결함 백로그 0건, Vitest 13 passed, node 스위트 40 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-02T00:35:00+09:00 (Card 192 S12-FE portal step-up 재로그인 진입점 r3 조치: Claude UI r3 조건 V1 해소 — completeLogin()의 비-boolean marker("false", "true", "1", 1, 0, {}, []) 거부 경로 시험을 auth-step-up-contract.test.ts it.each에 추가하여 M3 변이 100% 사살 실측, auth-login-callback-routing.test.tsx에 실제 completeLogin() 구동 및 비-boolean 마커 거부·네트워크 호출 0회·활성 토큰 파기 단언 E2E 시험 추가로 M3 사살, auth-step-up-ui.test.tsx 임의 setTimeout(50)을 vi.waitFor() 조건부 대기로 전면 교체하여 V2 해소, 서명 결정성 8회 연속 PASS, Vitest 3개 스위트 59 passed, tsc 0 error, build 성공, route coverage 41 passed, frontend integrity 0 violation).
 - 확인 기준: 2026-10-02T00:20:00+09:00 (Card 192 S12-FE portal step-up 재로그인 진입점 r2 조치: Codex 보안 차단 1 & 2 및 Claude UI U1~U5 전수 조치, isStepUpPending() 및 completeStepUp() 엄격 boolean 마커(tx.isStepUp === true) 강제 및 비-boolean 마커 7종("false", "true", "1", 1, 0, {}, []) 토큰 엔드포인트 0회·/v1/session 0회·활성 토큰 불변 단언, auth-step-up-ui.test.tsx 전역 스텁 격리 및 비동기 클릭 핸들러 대기로 hosted frontend green 확보(U1 완전 해소), 서명 컴포넌트 중앙 유효 비트 결정적 변조(U2 10/10 PASS), Login.tsx 콜백 라우팅 및 실패 경로 테스트 신설(U3 L1/L2 변이 100% 사살), r1 History 대조표 및 원본 문서 정정(U4), Vitest 3개 스위트 51 passed, tsc 0 error, build 성공, route coverage 41 passed, frontend integrity 0 violation).
