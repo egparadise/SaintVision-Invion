@@ -33,7 +33,7 @@ docker run --detach --platform linux/amd64 \
   --security-opt seccomp=unconfined \
   --security-opt apparmor=unconfined \
   --security-opt systempaths=unconfined \
-  --tmpfs /home/user/.local/share/buildkit:rw,nosuid,nodev,size=2g \
+  --tmpfs /home/user/.local/share/buildkit:rw,nosuid,nodev,size=2g,uid=1000,gid=1000,mode=0700 \
   --publish 127.0.0.1:1234:1234 \
   "$SV_BUILDKIT_RUNTIME_IMAGE" >/dev/null
 
