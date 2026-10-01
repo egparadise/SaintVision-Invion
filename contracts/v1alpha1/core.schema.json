@@ -663,6 +663,10 @@
         "policyExpiresAt": {
           "$ref": "#/$defs/Timestamp"
         },
+        "buildSessionId": {
+          "type": "string",
+          "format": "uuid"
+        },
         "builderInstanceId": {
           "type": "string",
           "minLength": 1,
@@ -989,9 +993,8 @@
           "maxLength": 200
         },
         "recoveryEpoch": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 9007199254740991
+          "type": "string",
+          "format": "uuid"
         },
         "observedAt": {
           "$ref": "#/$defs/Timestamp"
@@ -1101,9 +1104,8 @@
           "$ref": "#/$defs/LeaseId"
         },
         "recoveryEpoch": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 9007199254740991
+          "type": "string",
+          "format": "uuid"
         },
         "daemonIdentity": {
           "$ref": "#/$defs/BuildDaemonIdentity"
