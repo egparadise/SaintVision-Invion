@@ -24,9 +24,9 @@ ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_VERSION = "1.2.0"
 RUN_PURPOSE = "s11-ac11-accessibility-e2e-hosted"
 AXIS = "accessibility-e2e"
-TARGET_COMMIT = "94970b00b263bd833b08f967d4ab51c1abcf0aec"
+TARGET_COMMIT = "db8c8a785a8c7f78a4d252cf5205e0417f1cc6fe"
 TARGET_PATH = "docs/vault/30_Development/S11_AC11_accessibility_user_device_target_v1.md"
-TARGET_BLOB = "d3869f371f64fb8b76e2d5223583543e5e35092c"
+TARGET_BLOB = "bd878c30cc74e235b63e4105b4226e76cfb60a54"
 SHA1_RE = re.compile(r"^[0-9a-f]{40}$")
 RUN_ID_RE = re.compile(r"^[0-9]+$")
 EXPECTED_JOURNEYS = {
@@ -281,9 +281,9 @@ def bind_verified_manual_acceptance(
 
     if manual_acceptance.get("sourceHeadSha") != report.get("sourceHeadSha"):
         raise AccessibilityEvidenceError("manual acceptance source SHA differs from hosted evidence")
-    receipt = manual_acceptance.get("performerReceipt")
+    receipt = manual_acceptance.get("importAuthorizationReceipt")
     if not isinstance(receipt, dict) or receipt.get("binding") != "oidc-fresh-auth-v1":
-        raise AccessibilityEvidenceError("manual acceptance lacks verified human binding")
+        raise AccessibilityEvidenceError("manual acceptance lacks verified import authorization")
     scenarios = manual_acceptance.get("scenarios")
     if not isinstance(scenarios, list) or not scenarios:
         raise AccessibilityEvidenceError("manual acceptance scenarios are absent")

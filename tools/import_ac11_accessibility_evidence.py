@@ -8,6 +8,7 @@ session the imported axis remains MEASURED_FAIL with the completeness metric at 
 from __future__ import annotations
 
 import argparse
+from dataclasses import dataclass
 import hashlib
 import json
 import re
@@ -16,7 +17,7 @@ import zipfile
 from datetime import datetime, timezone
 from io import BytesIO
 from pathlib import Path, PurePosixPath
-from typing import Any, Callable
+from typing import Any, Callable, Mapping
 
 import collect_ac11_accessibility_e2e as collector
 
@@ -27,9 +28,9 @@ WORKFLOW_PATH = ".github/workflows/ac11-accessibility-e2e.yml"
 REPORT_MEMBER = "s11-ac11-accessibility-e2e.json"
 JUNIT_MEMBER = "s11-ac11-accessibility-e2e.xml"
 MEMBERS = {REPORT_MEMBER, JUNIT_MEMBER}
-REGISTRY_COMMIT = "139fd9767fcc97a29c985d983c62d36362fa3da6"
+REGISTRY_COMMIT = "c58df1765a8b47f0b250f31161592620119d8655"
 REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
-REGISTRY_BLOB = "a645b8e8f5985a5cdf8eb66511ffb55c65bc1493"
+REGISTRY_BLOB = "f00a38e13239f37ddfc28fb2e5c7444392882ed9"
 TARGET_ID = "s11-accessibility-user-device-v1"
 MANUAL_PURPOSE = "s11-ac11-accessibility-user-device-manual"
 EXPECTED_SCENARIOS = {
@@ -43,10 +44,25 @@ EXPECTED_SCENARIOS = {
 SHA1_RE = re.compile(r"^[0-9a-f]{40}$")
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 RUN_ID_RE = re.compile(r"^[0-9]+$")
+UTC_RFC3339_RE = re.compile(
+    r"^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T"
+    r"(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\.[0-9]{1,6})?Z$"
+)
+PLACEHOLDER_PREFIX = "REPLACE_WITH_"
+MANUAL_NOT_BEFORE = datetime(2026, 10, 2, tzinfo=timezone.utc)
+_RECEIPT_SEAL = object()
 
 
 class AccessibilityImportError(RuntimeError):
     """Fail-closed, redacted accessibility import error."""
+
+
+@dataclass(frozen=True)
+class _VerifiedPerformerReceipt:
+    """Opaque proof that the product verifier produced this redacted receipt."""
+
+    value: Mapping[str, Any]
+    seal: object
 
 
 def canonical_sha256(value: Any) -> str:
@@ -86,15 +102,27 @@ def _json_file(path: Path, label: str) -> dict[str, Any]:
 
 
 def _utc(value: Any, label: str) -> datetime:
-    if not isinstance(value, str):
-        raise AccessibilityImportError(f"{label} must be RFC3339")
+    if not isinstance(value, str) or not UTC_RFC3339_RE.fullmatch(value):
+        raise AccessibilityImportError(f"{label} must be strict UTC RFC3339")
     try:
         parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
     except ValueError:
-        raise AccessibilityImportError(f"{label} must be RFC3339") from None
-    if parsed.tzinfo is None:
-        raise AccessibilityImportError(f"{label} must include a timezone")
-    return parsed.astimezone(timezone.utc)
+        raise AccessibilityImportError(f"{label} must be strict UTC RFC3339") from None
+    if parsed.utcoffset() != timezone.utc.utcoffset(parsed):
+        raise AccessibilityImportError(f"{label} must be UTC")
+    return parsed
+
+
+def _bounded_public_label(value: Any, label: str, maximum: int) -> str:
+    if (
+        not isinstance(value, str)
+        or not 1 <= len(value) <= maximum
+        or value.startswith(PLACEHOLDER_PREFIX)
+        or any(ord(character) < 0x20 for character in value)
+        or re.search(r"(?i)bearer\s|eyJ[A-Za-z0-9_-]{8,}|[^\s@]+@[^\s@]+", value)
+    ):
+        raise AccessibilityImportError(f"{label} is invalid or contains a secret-like value")
+    return value
 
 
 def _numeric(value: Any, label: str) -> str:
@@ -152,6 +180,8 @@ def validate_manual_session(session: dict[str, Any], source_sha: str) -> None:
         raise AccessibilityImportError("manual session source SHA differs from hosted evidence")
     started = _utc(session["startedAt"], "manual startedAt")
     finished = _utc(session["finishedAt"], "manual finishedAt")
+    if started < MANUAL_NOT_BEFORE:
+        raise AccessibilityImportError("manual startedAt predates the registered target")
     if finished < started:
         raise AccessibilityImportError("manual finishedAt precedes startedAt")
     device = _exact_object(
@@ -163,12 +193,10 @@ def validate_manual_session(session: dict[str, Any], source_sha: str) -> None:
         raise AccessibilityImportError("display mode is unsupported")
     if device["keyboard"] not in {"physical", "on-screen", "switch-control"}:
         raise AccessibilityImportError("keyboard type is unsupported")
-    for key in ("operatingSystem",):
-        if not isinstance(device[key], str) or not 1 <= len(device[key]) <= 100:
-            raise AccessibilityImportError(f"device {key} is invalid")
+    _bounded_public_label(device["operatingSystem"], "device operatingSystem", 100)
     browser = _exact_object(session["browser"], {"name", "version", "engine"}, "browser")
-    if any(not isinstance(browser[key], str) or not 1 <= len(browser[key]) <= 80 for key in browser):
-        raise AccessibilityImportError("browser identity is invalid")
+    for key in browser:
+        _bounded_public_label(browser[key], f"browser {key}", 80)
     technologies = session["assistiveTechnologies"]
     if not isinstance(technologies, list) or not 1 <= len(technologies) <= 4:
         raise AccessibilityImportError("assistive technology list is incomplete")
@@ -176,8 +204,13 @@ def validate_manual_session(session: dict[str, Any], source_sha: str) -> None:
         _exact_object(row, {"kind", "product", "version"}, "assistive technology")
         if row["kind"] not in {"screen-reader", "magnifier", "voice-control", "switch-control"}:
             raise AccessibilityImportError("assistive technology kind is unsupported")
-        if any(not isinstance(row[key], str) or not 1 <= len(row[key]) <= 80 for key in ("product", "version")):
-            raise AccessibilityImportError("assistive technology identity is invalid")
+        for key in ("product", "version"):
+            _bounded_public_label(row[key], f"assistive technology {key}", 80)
+    identities_for_technologies = [
+        (row["kind"], row["product"], row["version"]) for row in technologies
+    ]
+    if len(identities_for_technologies) != len(set(identities_for_technologies)):
+        raise AccessibilityImportError("assistive technology rows must be unique")
     if not any(row["kind"] == "screen-reader" for row in technologies):
         raise AccessibilityImportError("a measured screen reader is required")
     scenarios = session["scenarios"]
@@ -187,6 +220,8 @@ def validate_manual_session(session: dict[str, Any], source_sha: str) -> None:
     results: list[str] = []
     for row in scenarios:
         _exact_object(row, {"scenarioId", "result"}, "manual scenario")
+        if not isinstance(row["scenarioId"], str):
+            raise AccessibilityImportError("manual scenarioId must be a string")
         identities.append(row["scenarioId"])
         results.append(row["result"])
     if set(identities) != EXPECTED_SCENARIOS or len(identities) != len(set(identities)):
@@ -197,12 +232,14 @@ def validate_manual_session(session: dict[str, Any], source_sha: str) -> None:
     if session["overallResult"] != recomputed:
         raise AccessibilityImportError("manual overall result differs from scenarios")
     if session["performedBy"] != {
-        "kind": "human", "binding": "verified-fresh-auth-at-import"
+        "kind": "human", "binding": "self-attested-session"
     }:
         raise AccessibilityImportError("manual performer declaration is unsupported")
 
 
-def validate_performer_receipt(receipt: dict[str, Any], now: datetime) -> None:
+def _seal_performer_receipt(
+    receipt: dict[str, Any], now: datetime
+) -> _VerifiedPerformerReceipt:
     keys = {
         "kind", "binding", "subjectSha256", "tenantSha256", "issuerSha256",
         "clientIdSha256", "authTime", "amr", "tokenExpiresAt", "jwksSha256",
@@ -226,6 +263,16 @@ def validate_performer_receipt(receipt: dict[str, Any], now: datetime) -> None:
     verified_at = _utc(receipt["verifiedAt"], "performer verifiedAt")
     if verified_at > now or (now - verified_at).total_seconds() > 300:
         raise AccessibilityImportError("performer receipt is stale or future-dated")
+    return _VerifiedPerformerReceipt(dict(receipt), _RECEIPT_SEAL)
+
+
+def _verified_receipt_value(receipt: object, now: datetime) -> dict[str, Any]:
+    if not isinstance(receipt, _VerifiedPerformerReceipt) or receipt.seal is not _RECEIPT_SEAL:
+        raise AccessibilityImportError(
+            "manual import requires a receipt produced by fresh token verification"
+        )
+    # Revalidate at use time so a long-lived in-process object cannot outlive freshness.
+    return dict(_seal_performer_receipt(dict(receipt.value), now).value)
 
 
 def verify_human_token(
@@ -238,7 +285,7 @@ def verify_human_token(
     jwks_file: Path,
     now: datetime,
     token_verifier: Any | None = None,
-) -> dict[str, Any]:
+) -> _VerifiedPerformerReceipt:
     if now.tzinfo is None:
         raise AccessibilityImportError("verification clock must be timezone-aware")
     services = ROOT / "services" / "control-plane" / "src"
@@ -291,7 +338,7 @@ def verify_human_token(
         raise AccessibilityImportError(
             f"fresh-auth verification refused: {type(exc).__name__}"
         ) from None
-    return {
+    return _seal_performer_receipt({
         "kind": "human",
         "binding": "oidc-fresh-auth-v1",
         "subjectSha256": hashlib.sha256(identity.principal.subject_id.encode()).hexdigest(),
@@ -303,7 +350,7 @@ def verify_human_token(
         "tokenExpiresAt": identity.expires_at,
         "jwksSha256": hashlib.sha256(jwks_before).hexdigest(),
         "verifiedAt": now.isoformat().replace("+00:00", "Z"),
-    }
+    }, now)
 
 
 def _validate_producer(report: dict[str, Any]) -> None:
@@ -343,7 +390,7 @@ def import_evidence(
     artifact_metadata: dict[str, Any],
     *,
     manual_session: dict[str, Any] | None = None,
-    performer_receipt: dict[str, Any] | None = None,
+    performer_receipt: _VerifiedPerformerReceipt | None = None,
     now: datetime | None = None,
 ) -> dict[str, Any]:
     observed_now = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
@@ -393,14 +440,24 @@ def import_evidence(
     bound = report
     if manual_session is not None and performer_receipt is not None:
         validate_manual_session(manual_session, source)
-        validate_performer_receipt(performer_receipt, observed_now)
+        receipt_value = _verified_receipt_value(performer_receipt, observed_now)
+        manual_started = _utc(manual_session["startedAt"], "manual startedAt")
         manual_finished = _utc(manual_session["finishedAt"], "manual finishedAt")
         if manual_finished > observed_now:
             raise AccessibilityImportError("manual finishedAt is in the future")
+        hosted_finished = _utc(report.get("finishedAt"), "producer finishedAt")
+        if manual_started < hosted_finished:
+            raise AccessibilityImportError("manual session predates the hosted exact-SHA run")
+        auth_time = datetime.fromtimestamp(receipt_value["authTime"], timezone.utc)
+        verified_at = _utc(receipt_value["verifiedAt"], "performer verifiedAt")
+        if auth_time < manual_finished or verified_at < manual_finished:
+            raise AccessibilityImportError(
+                "fresh import authorization must be obtained after the manual session"
+            )
         manual_acceptance = {
             **manual_session,
             "sessionSha256": canonical_sha256(manual_session),
-            "performerReceipt": performer_receipt,
+            "importAuthorizationReceipt": receipt_value,
         }
         bound = collector.bind_verified_manual_acceptance(report, manual_acceptance)
 
@@ -426,7 +483,7 @@ def import_evidence(
             "comparableGroup": "ac11-accessibility-user-device-v1",
             "topology": "hosted-plus-user-device",
             "evidenceClass": "accessibility-manual-v1",
-            "humanBinding": "oidc-fresh-auth-v1",
+            "humanBindingPolicy": "fresh-human-import-authorization-v1",
             "automaticRunner": bound["environment"],
             "manualDeviceMeasured": manual_session is not None,
         },

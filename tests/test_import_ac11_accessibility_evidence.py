@@ -120,11 +120,11 @@ def _manual() -> dict:
             for name in sorted(tool.EXPECTED_SCENARIOS)
         ],
         "overallResult": "PASS",
-        "performedBy": {"kind": "human", "binding": "verified-fresh-auth-at-import"},
+        "performedBy": {"kind": "human", "binding": "self-attested-session"},
     }
 
 
-def _receipt() -> dict:
+def _receipt_value() -> dict:
     return {
         "kind": "human",
         "binding": "oidc-fresh-auth-v1",
@@ -140,9 +140,20 @@ def _receipt() -> dict:
     }
 
 
-def _import(*, manual: dict | None = None, receipt: dict | None = None) -> dict:
+def _receipt(**changes):
+    value = _receipt_value()
+    value.update(changes)
+    return tool._seal_performer_receipt(value, NOW)
+
+
+def _import(*, manual: dict | None = None, receipt=None, run_mutation=None,
+            artifact_mutation=None) -> dict:
     archive = _archive()
     run, artifact = _metadata(archive)
+    if run_mutation:
+        run_mutation(run)
+    if artifact_mutation:
+        artifact_mutation(artifact)
     return tool.import_evidence(
         archive,
         run,
@@ -168,7 +179,7 @@ def test_exact_sha_fresh_human_record_is_the_only_path_to_zero():
     assert observations["manualAcceptanceMissingCount"] == collector._observation(
         "manualAcceptanceMissingCount", 1, 0, "manual-acceptance-failed"
     )
-    assert result["manualAcceptance"]["performerReceipt"]["binding"] == "oidc-fresh-auth-v1"
+    assert result["manualAcceptance"]["importAuthorizationReceipt"]["binding"] == "oidc-fresh-auth-v1"
     assert "opaque-not-persisted" not in json.dumps(result)
 
 
@@ -200,14 +211,71 @@ def test_measured_manual_failure_cannot_become_pass():
 
 
 def test_forged_or_stale_performer_receipt_is_rejected():
-    receipt = _receipt()
-    receipt["subjectSha256"] = "not-a-digest"
     with pytest.raises(tool.AccessibilityImportError, match="subjectSha256"):
-        _import(manual=_manual(), receipt=receipt)
-    receipt = _receipt()
-    receipt["verifiedAt"] = "2026-10-01T01:00:00Z"
+        _receipt(subjectSha256="not-a-digest")
     with pytest.raises(tool.AccessibilityImportError, match="stale"):
-        _import(manual=_manual(), receipt=receipt)
+        _receipt(verifiedAt="2026-10-01T01:00:00Z")
+
+
+def test_handwritten_receipt_cannot_create_a_pass():
+    with pytest.raises(tool.AccessibilityImportError, match="fresh token verification"):
+        _import(manual=_manual(), receipt=_receipt_value())
+
+
+def test_manual_session_must_follow_hosted_run_and_fresh_auth_must_follow_session():
+    manual = _manual()
+    manual["startedAt"] = "2026-10-02T00:19:59Z"
+    with pytest.raises(tool.AccessibilityImportError, match="predates the hosted"):
+        _import(manual=manual, receipt=_receipt())
+    with pytest.raises(tool.AccessibilityImportError, match="after the manual session"):
+        _import(manual=_manual(), receipt=_receipt(authTime=int(NOW.timestamp()) - 3600))
+
+
+@pytest.mark.parametrize(
+    "value",
+    ["2026-10-02 00:30:00Z", "2026-10-02T00:30:00+00:00", "2026-10-02T00:30:00", "2026-10-02T00:30:00.1234567Z"],
+)
+def test_manual_timestamps_are_strict_utc_rfc3339(value: str):
+    manual = _manual()
+    manual["startedAt"] = value
+    with pytest.raises(tool.AccessibilityImportError, match="strict UTC RFC3339"):
+        _import(manual=manual, receipt=_receipt())
+
+
+def test_manual_lower_bound_placeholder_duplicate_and_non_string_identity_are_rejected():
+    mutations = []
+    before = _manual(); before["startedAt"] = "2026-10-01T23:59:59Z"; mutations.append(before)
+    placeholder = _manual(); placeholder["browser"]["name"] = "REPLACE_WITH_BROWSER"; mutations.append(placeholder)
+    duplicate = _manual(); duplicate["assistiveTechnologies"].append(copy.deepcopy(duplicate["assistiveTechnologies"][0])); mutations.append(duplicate)
+    wrong_type = _manual(); wrong_type["scenarios"][0]["scenarioId"] = ["not", "a", "string"]; mutations.append(wrong_type)
+    for manual in mutations:
+        with pytest.raises(tool.AccessibilityImportError):
+            _import(manual=manual, receipt=_receipt())
+
+
+@pytest.mark.parametrize(
+    ("run_mutation", "artifact_mutation"),
+    [
+        (lambda row: row.__setitem__("head_sha", "c" * 40), None),
+        (None, lambda row: row["workflow_run"].__setitem__("head_sha", "c" * 40)),
+        (None, lambda row: row.__setitem__("digest", "sha256:" + "0" * 64)),
+        (None, lambda row: row.__setitem__("expired", True)),
+        (None, lambda row: row.__setitem__("expires_at", "2026-10-01T00:00:00Z")),
+        (lambda row: row.__setitem__("path", "wrong.yml@refs/heads/x"), None),
+        (lambda row: row.__setitem__("event", "push"), None),
+    ],
+)
+def test_provenance_mutations_are_rejected(run_mutation, artifact_mutation):
+    with pytest.raises(tool.AccessibilityImportError):
+        _import(manual=_manual(), receipt=_receipt(), run_mutation=run_mutation,
+                artifact_mutation=artifact_mutation)
+
+
+def test_future_manual_finished_at_is_rejected():
+    manual = _manual()
+    manual["finishedAt"] = "2026-10-02T01:00:01Z"
+    with pytest.raises(tool.AccessibilityImportError, match="future"):
+        _import(manual=manual, receipt=_receipt())
 
 
 def test_duplicate_json_key_is_rejected(tmp_path: Path):
@@ -242,7 +310,7 @@ def test_product_verifier_and_canonical_fresh_auth_are_used(tmp_path: Path):
         now=NOW,
         token_verifier=verifier,
     )
-    assert receipt["binding"] == "oidc-fresh-auth-v1"
+    assert receipt.value["binding"] == "oidc-fresh-auth-v1"
     identity.amr = ("pwd",)
     with pytest.raises(tool.AccessibilityImportError, match="fresh interactive"):
         tool.verify_human_token(
@@ -291,7 +359,7 @@ def test_imported_pass_is_consumed_by_ac11_aggregator():
 def test_registry_and_manifest_contract_are_pinned():
     assert aggregate.TARGET_REGISTRY_BLOB == tool.REGISTRY_BLOB
     assert aggregate.REQUIRED_TARGET_BY_AXIS[collector.AXIS] == tool.TARGET_ID
-    assert tool.REGISTRY_BLOB == "a645b8e8f5985a5cdf8eb66511ffb55c65bc1493"
+    assert tool.REGISTRY_BLOB == "f00a38e13239f37ddfc28fb2e5c7444392882ed9"
     patch = json.loads(
         (ROOT / "docs/ac11-axis-sources-accessibility-patch-v1.json").read_text(encoding="utf-8")
     )["replacement"]
@@ -309,3 +377,7 @@ def test_published_manual_schema_is_strict_and_matches_scenarios():
     scenario = schema["properties"]["scenarios"]
     assert scenario["minItems"] == scenario["maxItems"] == len(tool.EXPECTED_SCENARIOS)
     assert set(scenario["items"]["properties"]["scenarioId"]["enum"]) == tool.EXPECTED_SCENARIOS
+    assert schema["properties"]["performedBy"]["properties"]["binding"]["const"] == "self-attested-session"
+    import re
+    assert re.fullmatch(schema["properties"]["startedAt"]["pattern"], "2026-10-02T00:00:00Z")
+    assert not re.fullmatch(schema["properties"]["startedAt"]["pattern"], "2026-10-02T00:00:00+00:00")

@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-2026-10-02-CARD205-AC11-ACCESSIBILITY-MANUAL"
 title: "Card 205 AC-11 사용자 기기 접근성 수동 인수 importer"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-02T05:40:06+09:00"
+updated: "2026-10-02T06:06:48+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "9d9389a110eb7bc62351f261ae28e9482c8149ad"
@@ -24,11 +24,11 @@ SHA Evidence에 합칠 importer가 없음을 확인했다. 이는 train 13 후�
 
 ## 2. 사전 등록과 registry
 
-- 결과를 보기 전에 `S11_AC11_accessibility_user_device_target_v1.md`, strict JSON Schema,
-  사용자 템플릿과 runbook을 commit `94970b00`에 고정했다.
-- target source document blob은 `d3869f371f64fb8b76e2d5223583543e5e35092c`다.
-- canonical registry commit은 `139fd976`, blob은
-  `a645b8e8f5985a5cdf8eb66511ffb55c65bc1493`다.
+- Claude r1 뒤 증명 범위를 먼저 정정한 v1.1 target·strict JSON Schema·안전 기본 template과
+  Windows runbook을 commit `db8c8a78`에 고정했다.
+- target source document blob은 `bd878c30cc74e235b63e4105b4226e76cfb60a54`다.
+- canonical registry commit은 `c58df176`, blob은
+  `f00a38e13239f37ddfc28fb2e5c7444392882ed9`다.
 - `accessibility-e2e`는 `s11-accessibility-user-device-v1` target만 허용한다. migration과
   long-soak importer pin도 같은 registry blob으로 함께 재고정했다.
 
@@ -39,13 +39,18 @@ SHA Evidence에 합칠 importer가 없음을 확인했다. 이는 train 13 후�
 1. canonical repository/workflow, completed success run, exact `sourceHeadSha`와 numeric run ID.
 2. exact artifact name, unexpired GitHub artifact metadata, ZIP SHA-256과 exact member set.
 3. producer target·payload digest·5개 metric identity와 hosted 단계의 manual missing=1.
-4. 수동 session의 exact 6 scenario, screen reader 관측, exact SHA, 전체 결과 재계산.
+4. 수동 session의 exact 6 scenario, 구체 수행 단계, screen reader 관측, exact SHA, 전체 결과 재계산.
 5. stdin access token을 제품 `AccessTokens`로 검증하고 canonical fresh-auth predicate로 300초
    freshness와 `mfa` 또는 `pwd+(otp|hwk|swk)`를 검증. 토큰은 출력·Evidence·argv·환경 변수에
    남기지 않고 subject/tenant/issuer/client와 JWKS의 SHA-256만 남긴다.
 
+수동 기록의 수행자는 self-attested다. fresh-auth receipt는 수동 session 종료 뒤 import를 승인한
+운영자 세션만 증명하며 실제 수행자·기기 소유자·수행 중 세션을 증명하지 않는다. 저장소에 canonical
+운영자 subject/role registry가 없으므로 caller-supplied allowlist를 추가하지 않았고 그 범위를 넘는
+사람 provenance를 주장하지 않는다. 손으로 쓴 receipt dict는 PASS 경로에 들어갈 수 없다.
+
 수동 기록이 없거나 FAIL이면 metric은 1이다. schema·SHA·provenance drift는 import 거부이며,
-all PASS와 verified human receipt가 함께 있을 때만 0이다. 이것은 AC-11 한 축의 측정이지 전체
+all PASS와 verified fresh import authorization이 함께 있을 때만 0이다. 이것은 AC-11 한 축의 측정이지 전체
 release 수락 또는 S11 완료가 아니다.
 
 ## 4. #299·#300 결속
@@ -60,7 +65,7 @@ stdin token import 명령을 인용할 수 있다.
 
 ```text
 python -m pytest tests/test_import_ac11_accessibility_evidence.py tests/test_collect_ac11_accessibility_e2e.py tests/test_aggregate_ac11_evidence.py tests/test_import_ac11_migration_rehearsal.py tests/test_import_ac11_composite_long_soak.py -q
-157 passed
+177 passed
 
 python -m py_compile tools/collect_ac11_accessibility_e2e.py tools/import_ac11_accessibility_evidence.py tools/aggregate_ac11_evidence.py
 exit 0
@@ -78,6 +83,8 @@ python tools/check_contract_bindings.py
 PASS / exit 0
 ```
 
-부정 대조군은 가짜·다른 SHA, scenario 누락·중복, unknown key, stale/forged performer receipt,
-pwd 단독, duplicate JSON key를 포함한다. 실제 사용자 기기 수행과 실제 access token import는
+부정 대조군은 가짜·다른 SHA, run/artifact head·digest·expiry·workflow/event drift, scenario
+누락·중복·비문자 identity, placeholder, 비엄격·하한 이전·미래 시각, stale/handwritten receipt,
+pwd 단독, duplicate JSON key를 포함한다. PowerShell 5.1 대신 Python downloader로 실제 run
+`36816759719`/artifact `11141508456`을 받아 no-BOM JSON과 2-entry ZIP도 확인했다. 실제 사용자 기기 수행과 실제 access token import는
 아직 없으므로 운영 수동 인수 결과는 `NOT_OBSERVED`다.
