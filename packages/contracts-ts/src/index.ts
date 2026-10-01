@@ -101,6 +101,114 @@ export interface WorkloadSpec {
   modelInput?: ModelExecutionRef;
 }
 
+export type BuildSecretRefId = string;
+
+export type BuildCanonicalRelativePath = string;
+
+export interface BuildResourceBudget {
+  cpuMillis: number;
+  memoryBytes: number;
+  storageBytes: number;
+}
+
+export interface BuildLeaseFence {
+  leaseId: LeaseId;
+  resourceId: ResourceId;
+  fencingToken: string;
+  expiresAt: Timestamp;
+}
+
+export interface BuildRequest {
+  apiVersion: "inv.saintvision.ai/v1alpha1";
+  kind: "BuildRequest";
+  tenantId: TenantId;
+  projectId: ProjectId;
+  workspaceId: WorkspaceId;
+  sourceCommitSha: string;
+  sourceTreeSha: string;
+  contextPath: BuildCanonicalRelativePath;
+  dockerfilePath: BuildCanonicalRelativePath;
+  targetPlatform: "linux/amd64" | "linux/arm64";
+  targetStage: string;
+  networkPolicyId: string;
+  cachePolicyId: string;
+  secretRefIds: Array<BuildSecretRefId>;
+  timeoutSeconds: number;
+}
+
+export interface BuildPlan {
+  apiVersion: "inv.saintvision.ai/v1alpha1";
+  kind: "BuildPlan";
+  tenantId: TenantId;
+  projectId: ProjectId;
+  workspaceId: WorkspaceId;
+  traceId: TraceId;
+  requestDigest: string;
+  actionDigest: string;
+  policyDecisionId: string;
+  policyVersion: string;
+  policyExpiresAt: Timestamp;
+  builderInstanceId: string;
+  builderProfileId: string;
+  recoveryEpoch: number;
+  rootless: true;
+  privileged: false;
+  hostAccess: false;
+  networkMode: "none" | "allowlist";
+  networkPolicyId: string;
+  egressAllowlistDigest: string;
+  devices: Array<string>;
+  binds: Array<string>;
+  budget: BuildResourceBudget;
+  lease: BuildLeaseFence;
+  cacheNamespaceDigest: string;
+  secretRefsDigest: string;
+  resolvedBaseImageDigests: Array<string>;
+}
+
+export interface BuildCleanupReceipt {
+  leaseReleased: boolean;
+  builderClaimReleased: boolean;
+  cgroupRemoved: boolean;
+  cacheDisposition: "retained" | "quarantined" | "purged";
+  verifiedAt: Timestamp;
+}
+
+export interface BuildAuditEvent {
+  event: "request_validated" | "policy_bound" | "builder_claimed" | "build_started" | "network_decision" | "output_verified" | "build_cancelled" | "cleanup_verified";
+  traceId: TraceId;
+  timestamp: Timestamp;
+  decisionId: string;
+  inputDigest: string;
+  outputDigest: (string | null);
+}
+
+export type BuildResult = "succeeded" | "failed" | "cancelled";
+
+export interface BuildReceipt {
+  apiVersion: "inv.saintvision.ai/v1alpha1";
+  kind: "BuildReceipt";
+  tenantId: TenantId;
+  projectId: ProjectId;
+  workspaceId: WorkspaceId;
+  traceId: TraceId;
+  planDigest: string;
+  sourceCommitSha: string;
+  sourceTreeSha: string;
+  outputImageDigest: (string | null);
+  outputConfigDigest: (string | null);
+  sbomEvidenceDigest: (string | null);
+  scanEvidenceDigest: (string | null);
+  cacheInputDigest: string;
+  cacheOutputDigest: (string | null);
+  networkSummaryDigest: string;
+  startedAt: Timestamp;
+  finishedAt: Timestamp;
+  result: BuildResult;
+  cleanup: BuildCleanupReceipt;
+  auditEvents: Array<BuildAuditEvent>;
+}
+
 export interface ResourceLease {
   leaseId: LeaseId;
   tenantId: TenantId;

@@ -194,6 +194,193 @@ class NodeResourceUsageResponse(BaseModel):
     resources: list[ResourceUsageMeasurement] = Field(..., max_length=1024)
 
 
+class BuildSecretRefId(RootModel[constr(pattern=r'^sec_[0-9A-HJKMNP-TV-Z]{26}$')]):
+    root: constr(pattern=r'^sec_[0-9A-HJKMNP-TV-Z]{26}$')
+
+
+class BuildCanonicalRelativePath(
+    RootModel[
+        constr(
+            pattern=r'^\.*[A-Za-z0-9_-][A-Za-z0-9._-]*(/\.*[A-Za-z0-9_-][A-Za-z0-9._-]*)*$',
+            min_length=1,
+            max_length=1024,
+        )
+    ]
+):
+    root: constr(
+        pattern=r'^\.*[A-Za-z0-9_-][A-Za-z0-9._-]*(/\.*[A-Za-z0-9_-][A-Za-z0-9._-]*)*$',
+        min_length=1,
+        max_length=1024,
+    ) = Field(
+        ...,
+        description='Canonical repository-relative path; absolute, parent, current-directory, duplicate-separator, and backslash forms are forbidden.',
+    )
+
+
+class BuildResourceBudget(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    cpuMillis: conint(ge=1, le=9007199254740991)
+    memoryBytes: conint(ge=1, le=9007199254740991)
+    storageBytes: conint(ge=1, le=9007199254740991)
+
+
+class BuildLeaseFence(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    leaseId: LeaseId
+    resourceId: ResourceId
+    fencingToken: constr(
+        pattern=r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[1-9][0-9]*$'
+    )
+    expiresAt: Timestamp
+
+
+class TargetPlatform(StrEnum):
+    linux_amd64 = 'linux/amd64'
+    linux_arm64 = 'linux/arm64'
+
+
+class BuildRequest(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    apiVersion: Literal['inv.saintvision.ai/v1alpha1']
+    kind: Literal['BuildRequest']
+    tenantId: TenantId
+    projectId: ProjectId
+    workspaceId: WorkspaceId
+    sourceCommitSha: constr(pattern=r'^[0-9a-f]{40}$')
+    sourceTreeSha: constr(pattern=r'^[0-9a-f]{40}$')
+    contextPath: BuildCanonicalRelativePath
+    dockerfilePath: BuildCanonicalRelativePath
+    targetPlatform: TargetPlatform
+    targetStage: constr(pattern=r'^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$')
+    networkPolicyId: constr(pattern=r'^(none|netpol_[a-z0-9][a-z0-9._-]{0,62})$')
+    cachePolicyId: constr(pattern=r'^cachepol_[a-z0-9][a-z0-9._-]{0,62}$')
+    secretRefIds: list[BuildSecretRefId] = Field(..., max_length=32)
+    timeoutSeconds: conint(ge=1, le=3600)
+
+
+class NetworkMode(StrEnum):
+    none = 'none'
+    allowlist = 'allowlist'
+
+
+class ResolvedBaseImageDigest(RootModel[constr(pattern=r'^sha256:[0-9a-f]{64}$')]):
+    root: constr(pattern=r'^sha256:[0-9a-f]{64}$')
+
+
+class BuildPlan(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    apiVersion: Literal['inv.saintvision.ai/v1alpha1']
+    kind: Literal['BuildPlan']
+    tenantId: TenantId
+    projectId: ProjectId
+    workspaceId: WorkspaceId
+    traceId: TraceId
+    requestDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    actionDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    policyDecisionId: constr(min_length=1, max_length=200)
+    policyVersion: constr(min_length=1, max_length=200)
+    policyExpiresAt: Timestamp
+    builderInstanceId: constr(min_length=1, max_length=200)
+    builderProfileId: constr(min_length=1, max_length=200)
+    recoveryEpoch: conint(ge=1, le=9007199254740991)
+    rootless: Literal[True]
+    privileged: Literal[False]
+    hostAccess: Literal[False]
+    networkMode: NetworkMode
+    networkPolicyId: constr(pattern=r'^(none|netpol_[a-z0-9][a-z0-9._-]{0,62})$')
+    egressAllowlistDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    devices: list[str] = Field(..., max_length=0)
+    binds: list[str] = Field(..., max_length=0)
+    budget: BuildResourceBudget
+    lease: BuildLeaseFence
+    cacheNamespaceDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    secretRefsDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    resolvedBaseImageDigests: list[ResolvedBaseImageDigest] = Field(
+        ..., max_length=64, min_length=1
+    )
+
+
+class CacheDisposition(StrEnum):
+    retained = 'retained'
+    quarantined = 'quarantined'
+    purged = 'purged'
+
+
+class BuildCleanupReceipt(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    leaseReleased: bool
+    builderClaimReleased: bool
+    cgroupRemoved: bool
+    cacheDisposition: CacheDisposition
+    verifiedAt: Timestamp
+
+
+class Event(StrEnum):
+    request_validated = 'request_validated'
+    policy_bound = 'policy_bound'
+    builder_claimed = 'builder_claimed'
+    build_started = 'build_started'
+    network_decision = 'network_decision'
+    output_verified = 'output_verified'
+    build_cancelled = 'build_cancelled'
+    cleanup_verified = 'cleanup_verified'
+
+
+class BuildAuditEvent(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    event: Event
+    traceId: TraceId
+    timestamp: Timestamp
+    decisionId: constr(min_length=1, max_length=200)
+    inputDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    outputDigest: constr(pattern=r'^[0-9a-f]{64}$') | None
+
+
+class BuildResult(StrEnum):
+    succeeded = 'succeeded'
+    failed = 'failed'
+    cancelled = 'cancelled'
+
+
+class BuildReceipt(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    apiVersion: Literal['inv.saintvision.ai/v1alpha1']
+    kind: Literal['BuildReceipt']
+    tenantId: TenantId
+    projectId: ProjectId
+    workspaceId: WorkspaceId
+    traceId: TraceId
+    planDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    sourceCommitSha: constr(pattern=r'^[0-9a-f]{40}$')
+    sourceTreeSha: constr(pattern=r'^[0-9a-f]{40}$')
+    outputImageDigest: constr(pattern=r'^sha256:[0-9a-f]{64}$') | None
+    outputConfigDigest: constr(pattern=r'^sha256:[0-9a-f]{64}$') | None
+    sbomEvidenceDigest: constr(pattern=r'^[0-9a-f]{64}$') | None
+    scanEvidenceDigest: constr(pattern=r'^[0-9a-f]{64}$') | None
+    cacheInputDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    cacheOutputDigest: constr(pattern=r'^[0-9a-f]{64}$') | None
+    networkSummaryDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    startedAt: Timestamp
+    finishedAt: Timestamp
+    result: BuildResult
+    cleanup: BuildCleanupReceipt
+    auditEvents: list[BuildAuditEvent] = Field(..., max_length=64, min_length=1)
+
+
 class ResourceLease(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -2010,6 +2197,9 @@ class INVCore(
         | Heartbeat
         | ResourceSnapshot
         | WorkloadSpec
+        | BuildRequest
+        | BuildPlan
+        | BuildReceipt
         | ResourceLease
         | PolicyDecision
         | EvidenceEnvelope
@@ -2054,6 +2244,9 @@ class INVCore(
         | Heartbeat
         | ResourceSnapshot
         | WorkloadSpec
+        | BuildRequest
+        | BuildPlan
+        | BuildReceipt
         | ResourceLease
         | PolicyDecision
         | EvidenceEnvelope
