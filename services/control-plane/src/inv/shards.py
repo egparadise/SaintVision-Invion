@@ -12,12 +12,14 @@ from dataclasses import dataclass
 from uuid import UUID
 from psycopg.types.json import Jsonb
 from .approvals import ApprovalStore, digest
+from .business_cancel import record_user_cancel
 from .control import Control
 from .contracts import validate_contract
 from .errors import DomainError
 from .leases import lock_run, lock_resources
 from .tooling import ToolGateway
 from .runs import RunStore, event, public
+from .tracing import nonzero_id
 from .state import TERMINAL
 from .reservations import reclaim_unclaimed
 from .leases import fence
@@ -363,13 +365,23 @@ class ShardRuntime:
             raise DomainError("NODE-0062", "Shard plan is incomplete")
         return [(member, lock_run(conn, member["run_id"], project)) for member in members]
 
-    def cancel(self, principal, project, plan_id, *, key, expected_parent_version=None):
+    def cancel(
+        self,
+        principal,
+        project,
+        plan_id,
+        *,
+        key,
+        expected_parent_version=None,
+        trace_id=None,
+    ):
         """One authorized, atomic cancellation request for all nonterminal members.
 
         Queue workers deliver individual cancellations. Physical leases remain
         reserved until each authenticated stop receipt, including uncertain ones.
         """
         approvals = ApprovalStore(self.db)
+        trace_id = trace_id or nonzero_id(16)
         with self.db.transaction(principal.tenant_id) as conn:
             prior = approvals._ledger(
                 conn,
@@ -411,6 +423,7 @@ class ShardRuntime:
                     RunStore(self.db)._transition(
                         conn, principal.tenant_id, run, "cancelled", run["version"]
                     )
+                    record_user_cancel(conn, principal, project, run["run_id"], trace_id)
                     event(
                         conn,
                         principal.tenant_id,
@@ -425,6 +438,7 @@ class ShardRuntime:
                     parent_public = RunStore(self.db)._transition(
                         conn, principal.tenant_id, parent, "cancelled", parent["version"]
                     )
+                    record_user_cancel(conn, principal, project, parent["run_id"], trace_id)
                     event(
                         conn,
                         principal.tenant_id,

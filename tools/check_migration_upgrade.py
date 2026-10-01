@@ -202,6 +202,18 @@ def main():
             from check_definer_functions import audit
 
             findings = audit(make_conninfo(admin, dbname=name))
+            # Function signatures, policy problem codes and definition digests
+            # are reviewed catalogue metadata, not credentials or row data.
+            # Preserve those three safe fields so a new function can be pinned
+            # without weakening the credential-safe exception boundary below.
+            for finding in findings:
+                if finding["problems"]:
+                    print(
+                        "Definer policy mismatch: "
+                        f"function={finding['function']} "
+                        f"definitionSHA256={finding.get('definitionSHA256')} "
+                        f"problems={','.join(finding['problems'])}"
+                    )
             assert findings and not any(f["problems"] for f in findings), (
                 "Applied privileged function catalogue differs from policy"
             )
