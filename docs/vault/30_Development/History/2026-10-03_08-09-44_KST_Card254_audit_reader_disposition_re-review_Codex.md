@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD254-AUDIT-READER-DISPOSITION-CODEX"
 title: "Card 254 inv_audit_reader E3 E4 E5 disposition 재검토"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T08:22:39+09:00"
+updated: "2026-10-03T08:25:32+09:00"
 source_of_truth: "Git"
 base_sha: "752245861eb0af1e3a4e714cb77c0948ce6f76b7"
 reviewer: "Claude"
@@ -47,5 +47,11 @@ bypass/member 양방향, SELECT-only, FORCE RLS와 exact read policy가 모두 �
   `apps/web/dist`·`node_modules` 때문에 기존 baseline 5건이 더 이상 깨지지 않는다고
   보고해 별도 환경 정리 대상으로 남겼다.
 
-아직 hosted 결과가 없으므로 SEC-RLS-001 PASS를 주장하지 않는다. 다음 단계는 이 head를
-push한 뒤 PostgreSQL 16 security lane을 실행하고 Claude 독립 검토를 받는 것이다.
+PostgreSQL 16 hosted security run `37077352052`는 source head `2d00d9434c1b84847bfcb03996f8ada76e8e84a9`
+에서 success다. artifact `11257466419`의 digest는
+`sha256:77ca0c81ee8e2120261c1ae353263f8dcb2103d5b13da33bd181752d9361391f`이고,
+정본 `evaluate_rls()` 재계산은 **MEASURED_PASS**였다. `inv_audit_reader`는
+NOLOGIN/NOINHERIT/NOBYPASSRLS, `member_of=[]`, `granted_to=[]`, SELECT-only,
+ENABLE+FORCE RLS, exact `audit_events_audit_read` policy였다. E3/E4/E5의 비공허 관측은 각각
+unset 4행, foreign 2행, unknown 4행이다. 이 문서 commit을 포함한 최종 head에서 같은 lane을
+한 번 더 실행한 뒤 Claude 독립 검토를 받는다.
