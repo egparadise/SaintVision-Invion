@@ -238,6 +238,44 @@ export interface BuildPhysicalCleanupReceipt {
   verifiedAt: Timestamp;
 }
 
+export interface BuildQuarantineRequest {
+  schemaVersion: "build-quarantine-request:1";
+  requestId: string;
+  tenantId: TenantId;
+  nodeId: NodeId;
+  recoveryEpoch: string;
+  scope: "build-session" | "node";
+  buildSessionId: string;
+  leaseId: LeaseId;
+  resourceId: ResourceId;
+  decisionId: string;
+  bindingDigest: string;
+  daemonIdentity: BuildDaemonIdentity;
+  reasonCode: string;
+  requestedAt: Timestamp;
+}
+
+export interface BuildQuarantineReceipt {
+  schemaVersion: "build-quarantine-receipt:1";
+  writerKind: "node-agent";
+  requestId: string;
+  tenantId: TenantId;
+  nodeId: NodeId;
+  recoveryEpoch: string;
+  scope: "build-session" | "node";
+  buildSessionId: string;
+  leaseId: LeaseId;
+  resourceId: ResourceId;
+  decisionId: string;
+  bindingDigest: string;
+  daemonIdentity: BuildDaemonIdentity;
+  reasonCode: string;
+  requestedAt: Timestamp;
+  recordedAt: Timestamp;
+  durable: true;
+  replayed: boolean;
+}
+
 export interface BuildCleanupReceipt {
   leaseReleased: boolean;
   builderClaimReleased: boolean;

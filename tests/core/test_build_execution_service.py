@@ -16,6 +16,7 @@ from copy import deepcopy
 from datetime import datetime, timezone
 
 import pytest
+from psycopg import OperationalError
 from psycopg.types.json import Jsonb
 
 from inv.build_execution import (
@@ -119,6 +120,8 @@ class _Connection:
             self._result = {"now": self.db.now}
         elif "FROM inv.resources" in text:
             self._result = {"node_id": self.db.resource_node_id}
+        elif "FROM inv.nodes" in text and "FOR UPDATE" in text:
+            self._result = {"status": self.db.node_status, "recovery_epoch": EPOCH}
         elif "FROM inv.resource_leases" in text and "FOR UPDATE" in text:
             self._result = deepcopy(self.db.lease_row)
         elif text.startswith("INSERT INTO inv.evidence"):
@@ -127,6 +130,10 @@ class _Connection:
         elif text.startswith("UPDATE inv.resource_leases"):
             self.db.writes.append(("release", params))
             self._result = {"lease_id": LEASE} if self.db.release_succeeds else None
+        elif text.startswith("UPDATE inv.nodes SET status='quarantined'"):
+            self.db.writes.append(("node_quarantine", params))
+            self.db.node_status = "quarantined"
+            self._result = None
         elif text.startswith("INSERT INTO inv.outbox"):
             self.db.writes.append(("outbox", params))
             self._result = None
@@ -145,6 +152,7 @@ class _Database:
         self.now = now or NOW
         self.resource_node_id = resource_node_id
         self.release_succeeds = release_succeeds
+        self.node_status = "online"
         self.writes = []
         self.committed = []
         self.rolled_back = []
@@ -210,12 +218,22 @@ class _Boundary:
     #: opposite, which is the whole of N2.
     records_durable_quarantine = True
 
-    def __init__(self, *, health_receipt=None, cleanup_receipt=None, daemon_after=None):
+    def __init__(
+        self, *, health_receipt=None, cleanup_receipt=None, daemon_after=None,
+        preflight_error=None,
+    ):
         self.health_receipt = health_receipt if health_receipt is not None else health()
         self.cleanup_receipt = cleanup_receipt if cleanup_receipt is not None else cleanup()
         self.daemon_after = daemon_after if daemon_after is not None else dict(DAEMON)
         self.quarantined_nodes = []
         self.cancelled_sessions = []
+        self.preflight_calls = []
+        self.preflight_error = preflight_error
+
+    def preflight_quarantine(self, node_id, recovery_epoch):
+        self.preflight_calls.append((node_id, recovery_epoch))
+        if self.preflight_error is not None:
+            raise self.preflight_error
 
     def collect_product_health(self):
         return deepcopy(self.health_receipt)
@@ -227,10 +245,10 @@ class _Boundary:
         assert build_session_id == SESSION
         return deepcopy(self.cleanup_receipt)
 
-    def cancel_and_quarantine_session(self, build_session_id, reason_code):
+    def cancel_and_quarantine_session(self, build_session_id, reason_code, **identity):
         self.cancelled_sessions.append((build_session_id, reason_code))
 
-    def quarantine_node(self, node_id, reason_code):
+    def quarantine_node(self, node_id, build_session_id, reason_code, **identity):
         self.quarantined_nodes.append((node_id, reason_code))
 
 
@@ -272,6 +290,34 @@ def run(service, *, lease_epoch=EPOCH):
     )
 
 
+def assert_only_quarantine_was_committed(database, reason_code):
+    """A failed post-dispatch commit may persist only the scheduling fence."""
+
+    writes = [(kind, params) for batch in database.committed for kind, params in batch]
+    assert [kind for kind, _ in writes] == ["node_quarantine", "outbox"]
+    event = writes[1][1]
+    assert event[3] == "inv.build.node_quarantined"
+    assert event[4]["reasonCode"] == reason_code
+    assert event[4]["buildSessionId"] == SESSION
+    assert event[4]["leaseId"] == LEASE
+    assert event[4]["resourceId"] == RESOURCE
+    assert event[4]["decisionId"] == "dec_c214"
+    assert len(event[4]["bindingDigest"]) == 64
+    assert database.node_status == "quarantined"
+
+
+def assert_only_preflight_observation_was_committed(database):
+    """A pre-dispatch outage is observed, but never permanently fences the Node."""
+
+    writes = [(kind, params) for batch in database.committed for kind, params in batch]
+    assert [kind for kind, _ in writes] == ["outbox"]
+    event = writes[0][1]
+    assert event[3] == "inv.build.quarantine_preflight_unavailable"
+    assert event[4]["reasonCode"] == "RES-0006"
+    assert event[4]["nodeId"] == NODE
+    assert database.node_status == "online"
+
+
 # --- the control -------------------------------------------------------------------------
 
 
@@ -300,6 +346,22 @@ def test_product_dispatch_is_off_unless_the_value_is_exactly_one(environment):
         run(service)
     assert refused.value.code == "RES-0006" and refused.value.status == 503
     assert adapter.calls == 0
+
+
+def test_an_unreachable_runtime_channel_is_observed_without_permanent_quarantine():
+    """N-1: a transient pre-dispatch outage refuses only this dispatch."""
+
+    boundary = _Boundary(
+        preflight_error=DomainError(
+            "RES-0006", "Node quarantine channel is not live", 503, retryable=True
+        )
+    )
+    service, database, adapter, _boundary = build(boundary=boundary)
+    with pytest.raises(DomainError) as refused:
+        run(service)
+    assert refused.value.code == "RES-0006" and refused.value.retryable is True
+    assert adapter.calls == 0
+    assert_only_preflight_observation_was_committed(database)
 
 
 # --- health authority --------------------------------------------------------------------
@@ -381,9 +443,11 @@ def test_a_daemon_that_changed_across_the_dispatch_goes_to_cleanup(after, code):
     with pytest.raises(DomainError) as refused:
         run(service)
     assert refused.value.code == code
-    assert all(batch == [] for batch in database.committed)
     if code == "VERIFY-0002":
+        assert_only_quarantine_was_committed(database, code)
         assert boundary.cancelled_sessions == [(SESSION, "VERIFY-0002")]
+    else:
+        assert all(batch == [] for batch in database.committed)
 
 
 # --- cleanup authority -------------------------------------------------------------------
@@ -416,8 +480,8 @@ def test_every_required_cleanup_observation_must_agree_or_nothing_is_released(ov
         run(service)
     assert refused.value.code == "VERIFY-0022" and refused.value.status == 409
     assert fragment in str(refused.value)
-    # Nothing committed, nothing released, and the node is quarantined instead.
-    assert all(batch == [] for batch in database.committed)
+    # No product success is committed; the independent scheduling fence is.
+    assert_only_quarantine_was_committed(database, "VERIFY-0022")
     assert boundary.quarantined_nodes == [(NODE, "VERIFY-0022")]
 
 
@@ -428,7 +492,7 @@ def test_a_missing_cleanup_receipt_is_refused_rather_than_treated_as_clean():
     with pytest.raises(DomainError) as refused:
         run(service)
     assert refused.value.code == "VERIFY-0022"
-    assert all(batch == [] for batch in database.committed)
+    assert_only_quarantine_was_committed(database, "VERIFY-0022")
 
 
 # --- atomicity ---------------------------------------------------------------------------
@@ -444,7 +508,7 @@ def test_a_lease_released_concurrently_rolls_the_whole_commit_back():
     # state whether it succeeded (#312 N1).  So the only statement to unwind is the release,
     # and no Evidence row or outbox event ever existed to be discarded.
     assert database.rolled_back and [kind for kind, _ in database.rolled_back[-1]] == ["release"]
-    assert all(batch == [] for batch in database.committed)
+    assert_only_quarantine_was_committed(database, "LEASE-0002")
     assert _boundary.quarantined_nodes == [(NODE, "LEASE-0002")]
 
 
@@ -464,7 +528,7 @@ def test_a_lease_that_drifts_between_dispatch_and_commit_is_refused_at_commit():
     with pytest.raises(DomainError) as refused:
         run(service)
     assert refused.value.code == "LEASE-0002" and refused.value.status == 409
-    assert all(batch == [] for batch in database.committed)
+    assert_only_quarantine_was_committed(database, "LEASE-0002")
     # The external dispatch already happened, so the loser leaves a reconciliation marker
     # rather than raising and forgetting (#312 F-R4).
     assert boundary.quarantined_nodes == [(NODE, "LEASE-0002")]
@@ -579,7 +643,7 @@ def test_a_mismatched_physical_digest_is_refused_rather_than_committed():
         BuildExecutionService._require_physical_pair = original
     assert refused.value.code == "VERIFY-0022"
     assert "does not match the physical receipt" in str(refused.value)
-    assert all(batch == [] for batch in database.committed)
+    assert_only_quarantine_was_committed(database, "VERIFY-0022")
 
 
 # --- #312 Codex review: four boundaries the earlier tests fixed as success ---------------
@@ -623,7 +687,7 @@ def test_the_two_cleanup_receipts_must_agree_on_every_duplicated_observation(ove
     with pytest.raises(DomainError) as refused:
         run(service)
     assert refused.value.code == "VERIFY-0022"
-    assert all(batch == [] for batch in database.committed)
+    assert_only_quarantine_was_committed(database, "VERIFY-0022")
     assert boundary.quarantined_nodes == [(NODE, "VERIFY-0022")]
 
 
@@ -649,7 +713,7 @@ def test_losing_a_lease_race_after_the_external_dispatch_records_reconciliation(
     with pytest.raises(DomainError) as refused:
         run(service)
     assert refused.value.code == "LEASE-0002"
-    assert all(batch == [] for batch in database.committed)
+    assert_only_quarantine_was_committed(database, "LEASE-0002")
     # Nothing durable landed, so the node holds unaccounted external state.
     assert boundary.quarantined_nodes == [(NODE, "LEASE-0002")]
 
@@ -726,8 +790,8 @@ def test_the_production_collector_declares_the_quarantine_capability_absent():
 def test_a_failing_quarantine_does_not_replace_the_race_it_was_recording():
     """#312 N2: the transport's own refusal must not become the caller's answer."""
 
-    def refuse(node_id, reason_code):
-        raise DomainError("VERIFY-0022", "Node agent quarantine is not connected", 409)
+    def refuse(node_id, build_session_id, reason_code, **identity):
+        raise DomainError("NODE-0030", "Node agent quarantine is unavailable", 503)
 
     boundary = _Boundary()
     boundary.quarantine_node = refuse
@@ -736,6 +800,22 @@ def test_a_failing_quarantine_does_not_replace_the_race_it_was_recording():
     with pytest.raises(DomainError) as refused:
         run(service)
     assert refused.value.code == "LEASE-0002"
+    assert_only_quarantine_was_committed(database, "LEASE-0002")
+
+
+def test_a_failing_control_plane_fence_does_not_replace_the_original_error(monkeypatch):
+    """N-2: driver/check/FK failures are secondary to the dispatch authority failure."""
+
+    boundary = _Boundary(daemon_after={**DAEMON, "pid": 99})
+    service, _database, _adapter, _b = build(boundary=boundary)
+
+    def unavailable(**_kwargs):
+        raise OperationalError("database unavailable")
+
+    monkeypatch.setattr(service, "_mark_node_quarantined", unavailable)
+    with pytest.raises(DomainError) as refused:
+        run(service)
+    assert refused.value.code == "VERIFY-0002"
 
 
 def test_two_callers_contending_on_one_lease_release_and_record_exactly_once():
@@ -758,8 +838,14 @@ def test_two_callers_contending_on_one_lease_release_and_record_exactly_once():
     assert refused.value.code == "LEASE-0002"
 
     releases = [k for batch in database.committed for k, _ in batch if k == "release"]
-    outbox = [k for batch in database.committed for k, _ in batch if k == "outbox"]
-    assert releases == ["release"] and outbox == ["outbox"]
+    outbox_types = [
+        params[3]
+        for batch in database.committed
+        for kind, params in batch
+        if kind == "outbox"
+    ]
+    assert releases == ["release"]
+    assert outbox_types == ["inv.build.dispatch_completed", "inv.build.node_quarantined"]
     assert boundary_a.quarantined_nodes == []
     assert boundary_b.quarantined_nodes == [(NODE, "LEASE-0002")]
 
