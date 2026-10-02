@@ -218,6 +218,28 @@ AUDIT_ROWS = [
 ]
 
 
+AUDIT_READER_ROWS = [
+    ("inv_audit_reader", "public.audit_events", rule) for rule in ("E3", "E4", "E5")
+]
+
+
+def reviewed_triples(allowlist=None):
+    """(role, table, rule) the **reviewed** allowlist accepts, read from it rather than assumed.
+
+    Card 236 wrote these tests while the audit reader had no reviewed disposition, and asserted
+    the verdict that implied (VIOLATIONS / MEASURED_FAIL).  `#333` then reviewed that exception in,
+    so the same measurement is a PASS -- and a test that hardcodes either answer breaks whenever
+    the review moves.  What is invariant is the **rule**: what the allowlist carries is accepted,
+    what it does not carry is a violation.  The expectation is derived from the allowlist here, so
+    both decisions are expressible and neither is baked in (카드 243 리허설에서 찾았다).
+    """
+
+    entries = (allowlist or APPROVED_ALLOWLIST)["rlsAcceptedDispositions"]
+    return {
+        (entry["role"], entry["table"], rule) for entry in entries for rule in entry["rules"]
+    }
+
+
 def judged(monkeypatch, rows, *, unverified=()):
     """``rls_report`` over a stubbed evaluation, so the subject is *which* baseline is applied."""
 
@@ -256,13 +278,25 @@ def test_an_exception_the_reviewed_allowlist_does_not_carry_is_a_violation(monke
     """
 
     report = judged(monkeypatch, [REVIEWED_ROW, *AUDIT_ROWS])
-    assert report["verdict"] == "VIOLATIONS" and report["exitCode"] == 1
-    assert [(row["role"], row["table"], row["rule"]) for row in report["violations"]] == [
-        ("inv_audit_reader", "public.audit_events", rule) for rule in ("E3", "E4", "E5")
+    reviewed = reviewed_triples()
+    expected_violations = [row for row in AUDIT_READER_ROWS if row not in reviewed]
+    observed_violations = [
+        (row["role"], row["table"], row["rule"]) for row in report["violations"]
     ]
-    assert [(row["role"], row["table"], row["rule"]) for row in report["accepted"]] == [
-        ("inv_app", "public.tenants", "E3")
-    ]
+    observed_accepted = [(row["role"], row["table"], row["rule"]) for row in report["accepted"]]
+
+    # The rule, in both directions: nothing outside the reviewed list is accepted, and everything
+    # outside it is a violation.
+    assert observed_violations == expected_violations
+    assert all(row in reviewed for row in observed_accepted)
+    assert ("inv_app", "public.tenants", "E3") in observed_accepted
+    for row in AUDIT_READER_ROWS:
+        assert (row in observed_accepted) == (row in reviewed), row
+    # And the verdict follows from that, rather than being written down.
+    if expected_violations:
+        assert report["verdict"] == "VIOLATIONS" and report["exitCode"] == 1
+    else:
+        assert report["verdict"] == "PASS" and report["exitCode"] == 0
 
 
 def test_a_reviewed_disposition_is_still_accepted_with_its_proof(monkeypatch):
@@ -526,12 +560,18 @@ def test_the_axis_now_measures_a_verdict_instead_of_observing_nothing(before_and
     assert aggregator.evaluate_rls(before_document, APPROVED_ALLOWLIST, NOW) is (
         aggregator.Verdict.NOT_OBSERVED
     )
-    assert aggregator.evaluate_rls(after_document, APPROVED_ALLOWLIST, NOW) is (
-        aggregator.Verdict.MEASURED_FAIL
+    reviewed = reviewed_triples()
+    expected_violations = [row for row in AUDIT_READER_ROWS if row not in reviewed]
+    # Whether this is a FAIL or a PASS is the reviewed allowlist's decision, not this test's.
+    # What the seed changed is that the comparison is **measured** at all: before it, the axis
+    # said NOT_OBSERVED over an empty table.
+    expected = (
+        aggregator.Verdict.MEASURED_FAIL if expected_violations else aggregator.Verdict.MEASURED_PASS
     )
-    assert [(row["role"], row["table"], row["rule"]) for row in after["violations"]] == [
-        ("inv_audit_reader", "public.audit_events", rule) for rule in ("E3", "E4", "E5")
-    ]
+    assert aggregator.evaluate_rls(after_document, APPROVED_ALLOWLIST, NOW) is expected
+    assert [(row["role"], row["table"], row["rule"]) for row in after["violations"]] == (
+        expected_violations
+    )
 
 
 @pytest.fixture
