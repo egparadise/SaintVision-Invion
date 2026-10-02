@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD254-AUDIT-READER-DISPOSITION-CODEX"
 title: "Card 254 inv_audit_reader E3 E4 E5 disposition 재검토"
-version: "1.0.2"
+version: "1.0.3"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T08:25:32+09:00"
+updated: "2026-10-03T08:28:13+09:00"
 source_of_truth: "Git"
 base_sha: "752245861eb0af1e3a4e714cb77c0948ce6f76b7"
 reviewer: "Claude"
@@ -43,9 +43,9 @@ bypass/member 양방향, SELECT-only, FORCE RLS와 exact read policy가 모두 �
 - focused PG-free는 **386 passed, 15 skipped**다. 15건은 모두 disposable PostgreSQL DSN이
   필요한 실-PG node이며 hosted security lane에서 실행한다.
 - `write_ac11_security_allowlist.py --check`, `check_docs.py`, `git diff --check`는 exit 0이다.
-  path-citation ratchet은 이 카드가 추가한 결함이 아니라 현재 작업 트리에 생성된
-  `apps/web/dist`·`node_modules` 때문에 기존 baseline 5건이 더 이상 깨지지 않는다고
-  보고해 별도 환경 정리 대상으로 남겼다.
+  로컬 path-citation ratchet은 작업 트리의 생성 산출물과 dependency directory 때문에
+  기존 baseline 5건이 더 이상 깨지지 않는다고 보고했다. clean hosted checkout에서 이
+  설명 자체를 경로 인용으로 해석하지 않도록 일반 문구로 기록하고 gate를 다시 확인한다.
 
 PostgreSQL 16 hosted security run `37077352052`는 source head `2d00d9434c1b84847bfcb03996f8ada76e8e84a9`
 에서 success다. artifact `11257466419`의 digest는
