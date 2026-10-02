@@ -6,7 +6,7 @@ status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "user"
-updated: "2026-10-02T21:48:39+09:00"
+updated: "2026-10-02T21:49:05+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "ed6033da"
@@ -43,10 +43,10 @@ git status --porcelain | head         # 비어 있어야 한다: 배포본이 tr
 
 | | 전제 | 성립하지 않으면 |
 |---|---|---|
-| **A** | 배포된 코드가 그 설정을 **두 곳에서** 읽는다(service와 worker) | 켜도 경로가 열리지 않는다 |
-| **B** | 배포 설정이 그 변수를 **프로세스에 전달**한다 | 호스트에 export해도 컨테이너는 보지 못한다 |
-| **C** | DB가 **intent queue가 있는 migration head**다 | producer가 행을 넣을 표가 없다 |
-| **D** | 그 queue를 소비하는 **worker loop와 producer가 배포본에 있다** | 행이 쌓이고 아무도 dispatch하지 않는다 |
+| **A** | 배포된 코드가 그 설정을 **네 자리에서** 읽는다(정의·composition root·tick·claim 전) | 켜도 경로가 열리지 않는다 |
+| **B** | 배포 설정이 그 변수와 `INV_WORKER_CONFIG`를 **worker 프로세스에** 전달한다 | 호스트에 export해도, control-plane에만 넣어도 그 경로는 켜지지 않는다 |
+| **C** | DB가 **`0059`와 `0060` 두 표를 가진 정본 head**다 | producer가 admission 행을 넣을 표가 없다 |
+| **D** | 그 두 표를 쓰는 **producer와 product loop가 착지해 배포본에 있다** | 행이 쌓이고 아무도 승격·dispatch하지 않는다 |
 | **E** | transport가 **durable quarantine 채널과 함께** 구성된다 | 모든 dispatch가 `RES-0006`으로 거부된다 |
 | **F** | 대상 node가 **online·heartbeat 신선·channel epoch 일치**다 | lease·probe 단계에서 거부된다 |
 | **G** | 배포 SHA에서 **hosted 시험이 green**이다 | 켜는 것이 아니라 먼저 그 실패를 본다 |
