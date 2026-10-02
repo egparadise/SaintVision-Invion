@@ -137,12 +137,12 @@ def main() -> int:
     print(f"Total Audit Items: {len(ITEMS)} | Passed: {len(ITEMS) - len(failed_items)} | Failed: {len(failed_items)}")
 
     if not all_passed:
-        print("\\n[FAIL] Some items failed contrast requirements:")
+        print("\n[FAIL] Some items failed contrast requirements:")
         for f in failed_items:
             print(f"  - {f[0]}: Light {f[1]:.2f}:1, Dark {f[2]:.2f}:1 (Required >= {f[3]:.1f}:1)")
         return 1
 
-    print("\\n[SUCCESS] All 28 items strictly pass WCAG AA contrast thresholds in both Light and Dark themes.")
+    print("\n[SUCCESS] All 28 items strictly pass WCAG AA contrast thresholds in both Light and Dark themes.")
     return 0
 
 if __name__ == "__main__":

@@ -164,7 +164,7 @@ describe('NaturalLanguageRunView (S09-FE PR 4 UI Integration)', () => {
       });
 
       const statusBadge = container.querySelector('[data-testid="agent-status-badge"]');
-      expect(statusBadge?.textContent).toContain('COMPLETED');
+      expect(statusBadge?.textContent).toBe('COMPLETED');
 
       const actionNotice = container.querySelector('[data-testid="agent-action-notice"]');
       expect(actionNotice).not.toBeNull();

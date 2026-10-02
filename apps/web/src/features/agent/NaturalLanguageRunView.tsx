@@ -3,122 +3,53 @@ import { AgentRunRequest } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { AgentLoopManager } from './agentEngine';
 
-export type AgentRunStatusKey =
-  | 'draft'
-  | 'planning'
-  | 'evaluating'
-  | 'ready'
-  | 'running'
-  | 'executing'
-  | 'awaiting_approval'
-  | 'repairing'
-  | 'completed'
-  | 'rejected'
-  | 'failed'
-  | 'blocked'
-  | 'idle';
+export type AgentRunStatusKey = AgentRunRequest['status'];
 
 export interface AgentRunStatusStyle {
   color: string;
   bg: string;
   border: string;
   label: string;
-  icon: string;
 }
 
-export const AGENT_RUN_STATUS_CONFIG: Record<AgentRunStatusKey, AgentRunStatusStyle> = {
+export const AGENT_RUN_STATUS_CONFIG = {
   draft: {
     color: 'var(--color-text-secondary)',
     bg: 'var(--color-bg-subtle)',
     border: 'var(--color-border-subtle)',
-    label: '초안 (DRAFT)',
-    icon: '📝',
-  },
-  planning: {
-    color: 'var(--color-status-active)',
-    bg: 'var(--color-bg-subtle)',
-    border: 'var(--color-status-active)',
-    label: '계획 수립 (PLANNING)',
-    icon: '🧭',
+    label: 'DRAFT',
   },
   evaluating: {
-    color: 'var(--color-status-active)',
+    color: 'var(--color-brand-hover)',
     bg: 'var(--color-bg-subtle)',
-    border: 'var(--color-status-active)',
-    label: '평가 중 (EVALUATING)',
-    icon: '⏳',
+    border: 'var(--color-brand-hover)',
+    label: 'EVALUATING',
   },
   ready: {
     color: 'var(--color-brand-hover)',
     bg: 'var(--color-bg-subtle)',
     border: 'var(--color-brand-hover)',
-    label: '준비 완료 (READY)',
-    icon: '⚡',
-  },
-  running: {
-    color: 'var(--color-brand-hover)',
-    bg: 'var(--color-bg-subtle)',
-    border: 'var(--color-brand-hover)',
-    label: '실행 중 (RUNNING)',
-    icon: '⚡',
-  },
-  executing: {
-    color: 'var(--color-brand-hover)',
-    bg: 'var(--color-bg-subtle)',
-    border: 'var(--color-brand-hover)',
-    label: '실행 중 (EXECUTING)',
-    icon: '⚡',
-  },
-  awaiting_approval: {
-    color: 'var(--color-status-degraded)',
-    bg: 'var(--color-bg-subtle)',
-    border: 'var(--color-status-degraded)',
-    label: '승인 대기 (AWAITING APPROVAL)',
-    icon: '⏸️',
+    label: 'READY',
   },
   repairing: {
     color: 'var(--color-status-degraded)',
     bg: 'var(--color-bg-subtle)',
     border: 'var(--color-status-degraded)',
-    label: '보정 루프 (REPAIRING)',
-    icon: '🔄',
+    label: 'REPAIRING',
   },
   completed: {
     color: 'var(--color-status-online)',
     bg: 'var(--color-bg-subtle)',
     border: 'var(--color-status-online)',
-    label: '적용 완료 (COMPLETED)',
-    icon: '✔',
+    label: 'COMPLETED',
   },
   rejected: {
     color: 'var(--color-status-offline)',
     bg: 'var(--color-bg-subtle)',
     border: 'var(--color-status-offline)',
-    label: '반려/차단 (REJECTED)',
-    icon: '🛑',
+    label: 'REJECTED',
   },
-  failed: {
-    color: 'var(--color-status-offline)',
-    bg: 'var(--color-bg-subtle)',
-    border: 'var(--color-status-offline)',
-    label: '실패 (FAILED)',
-    icon: '❌',
-  },
-  blocked: {
-    color: 'var(--color-status-offline)',
-    bg: 'var(--color-bg-subtle)',
-    border: 'var(--color-status-offline)',
-    label: '차단 (BLOCKED)',
-    icon: '🚫',
-  },
-  idle: {
-    color: 'var(--color-text-secondary)',
-    bg: 'var(--color-bg-subtle)',
-    border: 'var(--color-border-subtle)',
-    label: '대기 (IDLE)',
-    icon: '💤',
-  },
-};
+} as const satisfies Record<AgentRunStatusKey, AgentRunStatusStyle>;
 
 export function getAgentRunStatusConfig(status?: string | null): AgentRunStatusStyle {
   if (status && Object.hasOwn(AGENT_RUN_STATUS_CONFIG, status)) {
@@ -128,8 +59,7 @@ export function getAgentRunStatusConfig(status?: string | null): AgentRunStatusS
     color: 'var(--color-status-unknown)',
     bg: 'var(--color-bg-subtle)',
     border: 'var(--color-status-unknown)',
-    label: `UNKNOWN (${status || 'UNKNOWN'})`,
-    icon: '❓',
+    label: (status || 'UNKNOWN').toUpperCase(),
   };
 }
 
@@ -499,9 +429,6 @@ export const NaturalLanguageRunView: React.FC = () => {
                 <span
                   data-testid="agent-status-badge"
                   style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px',
                     padding: '2px 8px',
                     borderRadius: '4px',
                     fontSize: '11px',
@@ -511,8 +438,7 @@ export const NaturalLanguageRunView: React.FC = () => {
                     color: statusCfg.color,
                   }}
                 >
-                  <span data-testid="agent-status-icon" aria-hidden="true">{statusCfg.icon}</span>
-                  <span data-testid="agent-status-label">{statusCfg.label}</span>
+                  {statusCfg.label}
                 </span>
               );
             })()}
