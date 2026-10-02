@@ -25,6 +25,13 @@ import { InvFileExplorer } from '../src/features/desktop/InvFileExplorer';
 import { ModelLineageView } from '../src/features/mlops/ModelLineageView';
 import { AdminSecurityConsole } from '../src/features/admin/AdminSecurityConsole';
 import { IntranetDeploymentView } from '../src/features/deployment/IntranetDeploymentView';
+import {
+  ReleaseCandidateView,
+  SLO_STATUS_CONFIG,
+  AUDIT_STATUS_CONFIG,
+  CANDIDATE_STATUS_CONFIG,
+} from '../src/features/release/ReleaseCandidateView';
+import { ReleaseManager } from '../src/features/release/releaseEngine';
 import type {
   ReleaseManifestResponse,
   ReleaseManifestDetailResponse,
@@ -292,7 +299,7 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/placement/PlacementSimulator.tsx": {"#334155": 3, "#93c5fd": 1, "#94a3b8": 2, "#ef4444": 4, "#f87171": 1, "#fbbf24": 4, "#fca5a5": 4, "#fff": 3, "#ffffff": 2, "rgba(234,179,8,0.15)": 2, "rgba(234,179,8,0.3)": 2, "rgba(239,68,68,0.1)": 4, "rgba(35,134,54,0.1)": 1},
   "features/placement/ResourceTopologyGraph.tsx": {"#ffffff": 2, "rgba(16,185,129,0.08)": 1},
   "features/recovery/DistributedRecoveryView.tsx": {},
-  "features/release/ReleaseCandidateView.tsx": {"#0d1117": 1, "#161b22": 7, "#21262d": 2, "#30363d": 11, "#3fb950": 10, "#58a6ff": 5, "#8b949e": 22, "#c9d1d9": 2, "#d29922": 2, "#f0f6fc": 7, "#f85149": 5, "rgba(139,148,158,0.1)": 1, "rgba(139,148,158,0.2)": 1, "rgba(248,81,73,0.15)": 1, "rgba(248,81,73,0.2)": 2, "rgba(46,160,67,0.15)": 1, "rgba(46,160,67,0.2)": 2, "rgba(56,139,253,0.12)": 1, "rgba(56,139,253,0.2)": 1},
+  "features/release/ReleaseCandidateView.tsx": {},
   "features/release/releaseEngine.ts": {"#0d1117": 1, "#6e7681": 1},
   "features/runs/RunDetail.tsx": {},
   "features/runs/RunList.tsx": {},
@@ -4730,7 +4737,154 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
   });
 
-  // 9j-2. [Card 215 & Card 218 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList & DistributedRecoveryView
+
+  // 9k. [Card 220 / ACC-09] Component DOM Rendering Verification: ReleaseCandidateView binds foregrounds and container backgrounds to design tokens with dynamic contrast verification
+  it('ACC-09 / Card 220: ReleaseCandidateView DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification', async () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    try {
+      await act(async () => {
+        root.render(<ReleaseCandidateView />);
+      });
+
+      // 1. Notice Banner (var(--color-bg-subtle), var(--color-border-subtle), var(--color-text-secondary))
+      const noticeBanner = container.querySelector('[data-testid="release-unexposed-notice"]') as HTMLElement;
+      expect(noticeBanner, 'Release unexposed notice banner must render').not.toBeNull();
+      expect(noticeBanner.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(noticeBanner.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(noticeBanner.style.color).toBe('var(--color-text-secondary)');
+      const nbFg = helperExtractVar(noticeBanner.style.color);
+      const nbBg = helperExtractVar(noticeBanner.style.backgroundColor);
+      const nbBd = helperExtractVar(noticeBanner.style.borderColor);
+      expect(getContrast(lightTokens[nbFg], lightTokens[nbBg]), 'Notice banner light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[nbFg], darkTokens[nbBg]), 'Notice banner dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[nbBd], lightTokens[nbBg]), 'Notice banner light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[nbBd], darkTokens[nbBg]), 'Notice banner dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 2. Top Metrics Cards
+      const vulnsCard = container.querySelector('[data-testid="kpi-vulns-card"]') as HTMLElement;
+      const sloCard = container.querySelector('[data-testid="kpi-slo-card"]') as HTMLElement;
+      const wcagCard = container.querySelector('[data-testid="kpi-wcag-card"]') as HTMLElement;
+      const activeRcCard = container.querySelector('[data-testid="active-candidate-card"]') as HTMLElement;
+      expect(vulnsCard.style.backgroundColor).toBe('var(--color-bg-surface)');
+      expect(vulnsCard.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(sloCard.style.backgroundColor).toBe('var(--color-bg-surface)');
+      expect(sloCard.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(wcagCard.style.backgroundColor).toBe('var(--color-bg-surface)');
+      expect(wcagCard.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(activeRcCard.style.backgroundColor).toBe('var(--color-bg-surface)');
+      expect(activeRcCard.style.borderColor).toBe('var(--color-border-subtle)');
+
+      // Outline ring on active candidate card
+      expect(activeRcCard.style.outlineColor || activeRcCard.style.outline).toContain('var(--color-brand-primary)');
+      expect(activeRcCard.style.outlineOffset).toBe('2px');
+
+      // 3. SLO Status Badges
+      for (const [status, cfg] of Object.entries(SLO_STATUS_CONFIG)) {
+        const cVar = helperExtractVar(cfg.color);
+        const bVar = helperExtractVar(cfg.border);
+        const bgVar = helperExtractVar(cfg.bg);
+        expect(getContrast(lightTokens[cVar], lightTokens[bgVar]), `SLO status ${status} light text contrast >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
+        expect(getContrast(darkTokens[cVar], darkTokens[bgVar]), `SLO status ${status} dark text contrast >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
+        expect(getContrast(lightTokens[bVar], lightTokens['--color-bg-surface']), `SLO status ${status} light border contrast >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
+        expect(getContrast(darkTokens[bVar], darkTokens['--color-bg-surface']), `SLO status ${status} dark border contrast >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
+      }
+
+      // Check rendered SLO badge
+      const sloBadges = container.querySelectorAll('[data-testid^="slo-status-badge-"]');
+      expect(sloBadges.length).toBeGreaterThan(0);
+      sloBadges.forEach((b) => {
+        const el = b as HTMLElement;
+        expect(el.style.backgroundColor).toBe('var(--color-bg-subtle)');
+        expect(el.style.opacity || '1', 'SLO badge must not have degraded opacity').toBe('1');
+        expect(el.textContent!.trim().length).toBeGreaterThan(0);
+      });
+
+      // 4. Audit Status Badges
+      for (const [status, cfg] of Object.entries(AUDIT_STATUS_CONFIG)) {
+        const cVar = helperExtractVar(cfg.color);
+        const bVar = helperExtractVar(cfg.border);
+        const bgVar = helperExtractVar(cfg.bg);
+        expect(getContrast(lightTokens[cVar], lightTokens[bgVar]), `Audit status ${status} light text contrast >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
+        expect(getContrast(darkTokens[cVar], darkTokens[bgVar]), `Audit status ${status} dark text contrast >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
+        expect(getContrast(lightTokens[bVar], lightTokens['--color-bg-surface']), `Audit status ${status} light border contrast >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
+        expect(getContrast(darkTokens[bVar], darkTokens['--color-bg-surface']), `Audit status ${status} dark border contrast >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
+      }
+
+      // 5. Candidate Active Badges
+      for (const [status, cfg] of Object.entries(CANDIDATE_STATUS_CONFIG)) {
+        const cVar = helperExtractVar(cfg.color);
+        const bVar = helperExtractVar(cfg.border);
+        const bgVar = helperExtractVar(cfg.bg);
+        expect(getContrast(lightTokens[cVar], lightTokens[bgVar]), `Candidate status ${status} light text contrast >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
+        expect(getContrast(darkTokens[cVar], darkTokens[bgVar]), `Candidate status ${status} dark text contrast >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
+        expect(getContrast(lightTokens[bVar], lightTokens['--color-bg-surface']), `Candidate status ${status} light border contrast >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
+        expect(getContrast(darkTokens[bVar], darkTokens['--color-bg-surface']), `Candidate status ${status} dark border contrast >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
+      }
+
+      // Check rendered candidate badges and non-empty text label
+      const candidateBadges = container.querySelectorAll('[data-testid^="candidate-status-badge-"]');
+      expect(candidateBadges.length).toBeGreaterThan(0);
+      candidateBadges.forEach((b) => {
+        const el = b as HTMLElement;
+        expect(el.textContent!.trim().length).toBeGreaterThan(0);
+      });
+
+      // Uniqueness and state color semantics
+      expect(CANDIDATE_STATUS_CONFIG.active.color).not.toBe(CANDIDATE_STATUS_CONFIG.waiting.color);
+      expect(SLO_STATUS_CONFIG.met.color).not.toBe(SLO_STATUS_CONFIG.breached.color);
+      expect(AUDIT_STATUS_CONFIG.fail.color).toBe('var(--color-status-offline)');
+      expect(AUDIT_STATUS_CONFIG.pass.color).toBe('var(--color-status-online)');
+      expect(AUDIT_STATUS_CONFIG.pass.color).not.toBe(AUDIT_STATUS_CONFIG.fail.color);
+
+      // 6. Action Notification
+      // 6.a Error action notice via simulated rollback failure
+      const rollbackSpy = vi.spyOn(ReleaseManager.prototype, 'rollbackToVersion').mockReturnValueOnce({
+        success: false,
+        error: '모의 롤백 시뮬레이션 인프라 장애',
+      });
+
+      const rollbackBtn = container.querySelector('button[aria-label*="롤백 실행"]') as HTMLButtonElement;
+      expect(rollbackBtn, 'Rollback button must render for inactive candidate').not.toBeNull();
+      await act(async () => {
+        rollbackBtn.click();
+      });
+
+      const errorNotice = container.querySelector('[data-testid="release-action-notice"]') as HTMLElement;
+      expect(errorNotice, 'Error action notice banner must render').not.toBeNull();
+      expect(errorNotice.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(errorNotice.style.borderColor).toBe('var(--color-status-offline)');
+      expect(errorNotice.style.color).toBe('var(--color-status-offline)');
+
+      // 6.b Success action notice via normal rollback
+      rollbackSpy.mockRestore();
+      await act(async () => {
+        rollbackBtn.click();
+      });
+
+      const actionNotice = container.querySelector('[data-testid="release-action-notice"]') as HTMLElement;
+      expect(actionNotice, 'Action notice banner must render').not.toBeNull();
+      expect(actionNotice.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(actionNotice.style.borderColor).toBe('var(--color-status-online)');
+      expect(actionNotice.style.color).toBe('var(--color-status-online)');
+      const anFg = helperExtractVar(actionNotice.style.color);
+      const anBg = helperExtractVar(actionNotice.style.backgroundColor);
+      const anBd = helperExtractVar(actionNotice.style.borderColor);
+      expect(getContrast(lightTokens[anFg], lightTokens[anBg]), 'Action notice light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[anFg], darkTokens[anBg]), 'Action notice dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[anBd], lightTokens[anBg]), 'Action notice light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[anBd], darkTokens[anBg]), 'Action notice dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    } finally {
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    }
+  });
+
+  // 9j-2. [Card 215 & Card 218 & Card 220 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList, DistributedRecoveryView & ReleaseCandidateView
   it('ACC-09 / Card 215 & Card 218: RunList and DistributedRecoveryView style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
     interface Branch {
       cond: string;
@@ -4958,7 +5112,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       }
 
       function checkConfigTables(node: ts.Node) {
-        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG') && node.initializer && ts.isObjectLiteralExpression(node.initializer)) {
+        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG') && node.initializer && ts.isObjectLiteralExpression(node.initializer)) {
           for (const prop of node.initializer.properties) {
             if (ts.isPropertyAssignment(prop) && ts.isObjectLiteralExpression(prop.initializer)) {
               totalStyleAttrs++;
@@ -5025,6 +5179,17 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(recoveryStats.checkedBorderObjects, 'Border objects in DistributedRecoveryView must be exactly 20').toBe(20);
     expect(recoveryStats.checkedBorderPairs, 'Border pairs in DistributedRecoveryView must be exactly 23').toBe(23);
     expect(recoveryStats.violations, `DistributedRecoveryView violations:\n${recoveryStats.violations.join('\n')}`).toEqual([]);
+
+    const releaseStats = analyzeFile('features/release/ReleaseCandidateView.tsx');
+    expect(releaseStats.totalStyleAttrs, 'Total style attributes in ReleaseCandidateView must be exactly 80').toBe(80);
+    expect(releaseStats.checkedObjects, 'Explicit style objects in ReleaseCandidateView must be exactly 9').toBe(9);
+    expect(releaseStats.checkedPairs, 'Evaluated pairs in ReleaseCandidateView must be exactly 52').toBe(52);
+    expect(releaseStats.unboundColorObjects, 'Unbound color objects in ReleaseCandidateView must be exactly 35').toBe(35);
+    expect(releaseStats.coveredColorObjects, 'Total covered color objects in ReleaseCandidateView must be exactly 44').toBe(44);
+    expect(releaseStats.checkedBorderObjects, 'Border objects in ReleaseCandidateView must be exactly 21').toBe(21);
+    expect(releaseStats.checkedBorderPairs, 'Border pairs in ReleaseCandidateView must be exactly 22').toBe(22);
+    expect(releaseStats.violations, `ReleaseCandidateView violations:\n${releaseStats.violations.join('\n')}`).toEqual([]);
+
   });
 
 
@@ -5393,6 +5558,37 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(probe75Cr, 'DistributedRecoveryView former #e3b341 on light subtle fails 4.5:1').toBeLessThan(4.5);
     expect(probe75Cr).toBeCloseTo(1.78, 2);
 
+    // Probe 76 [Card 220]: ReleaseCandidateView former hardcoded #58a6ff on light canvas notice composite #e1edfc strictly fails 4.5:1
+    const lightCanvasNoticeComposite = blendRgba([56, 139, 253], 0.12, lightTokens['--color-bg-canvas']);
+    const probe76Cr = getContrast('#58a6ff', lightCanvasNoticeComposite);
+    expect(probe76Cr, 'ReleaseCandidateView former #58a6ff on light canvas notice composite fails 4.5:1').toBeLessThan(4.5);
+    expect(probe76Cr).toBeCloseTo(2.13, 1);
+
+    // Probe 77 [Card 220]: ReleaseCandidateView former hardcoded #f85149 on light canvas error composite #f8e1e1 strictly fails 4.5:1
+    const lightCanvasErrorComposite = blendRgba([248, 81, 73], 0.15, lightTokens['--color-bg-canvas']);
+    const probe77Cr = getContrast('#f85149', lightCanvasErrorComposite);
+    expect(probe77Cr, 'ReleaseCandidateView former #f85149 on light canvas error composite fails 4.5:1').toBeLessThan(4.5);
+    expect(probe77Cr).toBeCloseTo(2.69, 1);
+
+    // Probe 78 [Card 220]: ReleaseCandidateView former hardcoded #3fb950 on light canvas success composite #daece0 strictly fails 4.5:1
+    const lightCanvasSuccessComposite = blendRgba([46, 160, 67], 0.15, lightTokens['--color-bg-canvas']);
+    const probe78Cr = getContrast('#3fb950', lightCanvasSuccessComposite);
+    expect(probe78Cr, 'ReleaseCandidateView former #3fb950 on light canvas success composite fails 4.5:1').toBeLessThan(4.5);
+    expect(probe78Cr).toBeCloseTo(2.06, 1);
+
+    // Probe 79 [Card 220]: ReleaseCandidateView former hardcoded #8b949e on dark subtle unmeasured badge composite #2d333b strictly fails 4.5:1
+    const darkSubtleUnmeasuredComposite = blendRgba([139, 148, 158], 0.2, '#161b22');
+    const probe79Cr = getContrast('#8b949e', darkSubtleUnmeasuredComposite);
+    expect(probe79Cr, 'ReleaseCandidateView former #8b949e on dark unmeasured composite fails 4.5:1').toBeLessThan(4.5);
+    expect(probe79Cr).toBeCloseTo(4.14, 1);
+
+    // Probe 80 [Card 220]: ReleaseCandidateView former hardcoded #f85149 on dark subtle breached badge composite #43262a strictly fails 4.5:1
+    const darkSubtleBreachedComposite = blendRgba([248, 81, 73], 0.2, '#161b22');
+    const probe80Cr = getContrast('#f85149', darkSubtleBreachedComposite);
+    expect(probe80Cr, 'ReleaseCandidateView former #f85149 on dark breached composite fails 4.5:1').toBeLessThan(4.5);
+    expect(probe80Cr).toBeCloseTo(4.04, 1);
+
+
     // Legacy Token Reverts:
     // Legacy Dark --color-border-subtle: #374151
     expect(getContrast('#374151', darkTokens['--color-bg-surface'])).toBeLessThan(3.0); // 1.72:1
@@ -5487,8 +5683,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
 
     // Exact count verification for var(--color-border-subtle)
-    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 402').toBe(402);
-    expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 27').toBe(27);
+    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 417').toBe(417);
+    expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 28').toBe(28);
 
     // Fail-closed check 3: Total files with color literals must not exceed baseline file count
     const baselineFileCount = Object.keys(COLOR_LITERAL_MULTISET_BASELINE).length;
@@ -5507,9 +5703,9 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(legacyCounts['#dc2626'], 'Legacy #dc2626 literal count must not exceed 1').toBeLessThanOrEqual(1);
     expect(legacyFiles['#dc2626'].size, 'Legacy #dc2626 file count must not exceed 1').toBeLessThanOrEqual(1);
 
-    expect(legacyCounts['#30363d'], 'Legacy #30363d literal count must not exceed 43').toBeLessThanOrEqual(43);
-    expect(legacyFiles['#30363d'].size, 'Legacy #30363d file count must not exceed 8').toBeLessThanOrEqual(8);
-  });
+    expect(legacyCounts['#30363d'], 'Legacy #30363d literal count must not exceed 34').toBeLessThanOrEqual(34);
+    expect(legacyFiles['#30363d'].size, 'Legacy #30363d file count must not exceed 7').toBeLessThanOrEqual(7);
+  }, 30000);
 
   // 11. Comment-trivia exclusion: comments are never colours, but real string/template/JSX values still count
   it('ACC-09 / F2 Comment-trivia exclusion: comment-only #abc is ignored while string, template and JSX literals are still counted', () => {
