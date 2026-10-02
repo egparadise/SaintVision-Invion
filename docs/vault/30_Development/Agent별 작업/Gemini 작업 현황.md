@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.205"
+version: "1.0.207"
 status: "proposed"
 author: "Gemini"
-updated: "2026-10-02T17:20:00+09:00"
+updated: "2026-10-02T17:40:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,6 +19,7 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
+- 확인 기준: 2026-10-02T17:40:00+09:00 (Card 230 [r2] 데스크톱 셸 화면 DesktopShell 색상 리터럴 전수 토큰화(49 occurrences→0), 상태 색 정합성 및 접근성 승격: PR #328, base f17a486f, DesktopShell 49건 -> 0건 100% 해소, COLOR_LITERAL_MULTISET_BASELINE {} 래칫, border-subtle 451건/31개 파일 래칫, NOTIFICATION_LEVEL_CONFIG wire 계약 enum(info/success/warning/error 4종)과 100% 일치 및 config 키 집합 == wire enum 불변식 시험 고정, getNotificationLevelConfig Object.hasOwn 기반 fail-closed own-key 방어 및 out-of-contract/prototype key(toString·constructor·__proto__)·케이스·공백·alias UNKNOWN (<raw>) 강등 부정 시험 단언(WCAG 1.4.1 준수), Test 9n DOM 렌더 결속, desktop-icon hover 피드백 보존, Test 9j-2 AST 커버리지 래칫(borderTop 포함, violations 0), tools/test_c230_mutations.py 40종 변이 Y1~Y40 40/40 100% 사살 실측, tools/reproduce_c230_contrast.py 34개 지표 Light/Dark 100% 통과; Vitest 31 passed, desktop-shell-a11y 14 passed, browser-matrix 12 passed, desktop-layout 16 passed, s05-s06 16 passed, s11 16 passed, tsc 0 error, build 성공, route coverage 41 passed, check_frontend_integrity 0 위반, check_contract_bindings PASS, check_docs PASS, sync_obsidian --check 0 conflicts).
 - 확인 기준: 2026-10-02T17:20:00+09:00 (Card 228 자연어 실행 화면 NaturalLanguageRunView [r3] 조치: Claude UI r2 및 Codex r2 피드백 전수 반영 — (1) R2-1 hosted docs path citation ratchet 해소: History 및 작업판 내 `apps/web/tests/node-fetch-error-workspace-wiring.test.tsx:360` 및 `apps/web/src/contracts/types.ts:420` 정본 경로 접두사 복원, (2) R2-2 fail-closed 미지 상태 UNKNOWN (<raw>) 레이블 체계 확립: 계약 외 값(planning, running, failed 등) 및 임의 미지값 입력 시 UNKNOWN (<raw>) 형식으로 fail-closed 렌더링하여 WCAG 1.4.1 비색상 식별 수단 엄수 및 사용자 오인 원천 차단(빈값/null/undefined는 UNKNOWN), (3) R2-3 exact-match lookup invariants 단언 신설: 케이스 변이(COMPLETED, Completed), 공백 변이( completed), 별칭(succeeded, failed) 조회 시 wire enum 승격 원천 차단 및 X30, X31, X31b 변이 전원 사살 실측, (4) R2-4 실측 Before 명도비 동기화: body canvas(#090d16) 위 0.15 alpha 합성 실측(에러 5.00:1, 성공 6.47:1, 안내 6.46:1), 테두리 canvas 11.66:1/1.59:1(FAIL), 패널 #161b22 위 테두리 1.42:1(FAIL) 및 칩/배지 5.59/5.19/5.15/5.79/5.19:1 정정, (5) R2-5 baseline multiset 정정(Hex 13종 72건, RGBA 5종 7건, 합계 18종 79건), satisfies TS2353/TS1360 컴파일 정적 가드 및 Test 9m 런타임 가드 명문화, (6) R2-6 1px border 의도적 시각 설계 명시; 35종 변이 X1~X34 + X31b 35/35 100% 사살 실측: tools/test_c228_mutations.py exit code 0; Vitest 30 passed, 자연어 실행 단위시험 8 passed, node-fetch-error 10 passed, tsc 0 error, build 성공, route coverage 41 passed, check_frontend_integrity 0 위반, check_contract_bindings PASS, check_docs PASS, git diff --check clean).
 - 확인 기준: 2026-10-02T15:43:00+09:00 (Card 226 모델 스튜디오 화면 ModelStudioView r3 조치: Codex r2 피드백 전수 반영 — (1) F-R1 wire 계약 enum 일치 및 fail-closed 검증: REPLICA_STATUS_CONFIG에서 wire 계약(virtualFabric.ts:194) 외 임의 별칭이었던 unhealthy·degraded를 제거하여 known 부당 승격을 원천 차단하고 healthy·repairing·missing 3종으로 한정, MODEL_AVAILABILITY_CONFIG에서 wire 계약(fabricObservation.ts:38) 외 임의 상태인 observed를 제거하고 unknown 1종으로 한정, config 키 집합 == 계약 enum 집합 동등성 불변식 시험(Object.keys().sort()) 고정, unhealthy·degraded·observed·bogus·toString 등 계약 밖 값 렌더 시 fail-closed UNKNOWN(var(--color-status-unknown)) 강등 부정 시험 단언, (2) Test 9j-2 AST 커버리지 래칫 갱신: totalStyleAttrs 83, checkedObjects 21, checkedPairs 39, coveredColorObjects 39, checkedBorderObjects 26, checkedBorderPairs 26, violations 0, (3) F-R2 변이 M23 단일 유효 JSX style 주입 개정: 중복 style 속성 오류를 배제하고 shard repair button style 객체 내부 outline: 'none' 주입 단일 변이로 개정하여 Test 9j-2 및 Test 9l로 100% 사살, tools/test_c226_mutations.py 23종 변이 M1~M23 23/23 100% 사살 실측, tools/reproduce_c226_contrast.py 26개 지표 통과; Vitest 29 passed, s11-defect-fixes 16 passed, tsc 0 error, build 성공, route coverage 41 passed, check_frontend_integrity 0 위반, check_contract_bindings PASS, check_docs PASS, sync_obsidian --check 0 conflicts).
 - 확인 기준: 2026-10-02T14:03:00+09:00 (Card 220 릴리스 후보 화면 ReleaseCandidateView [r3]: Codex r2 & Claude r2 피드백 전수 반영 — (1) fail-closed 미지 상태 helper(getSloStatusConfig, getAuditStatusConfig, getCandidateStatusConfig)에서 'status in CONFIG'를 'Object.hasOwn(CONFIG, status)' own-key 검사로 교체하여 prototype key(toString·constructor·__proto__) 탈취 차단 및 3종 전수 UNKNOWN (<raw>)·unknown token DOM 렌더링 단일 부정 시험 단언, (2) 계산된 DOM outline-style/width 및 인라인 outline: 0/none/outlineWidth 0 단언과 AST 가드 확장으로 outline: 0 변이 사살, (3) 작업판·History 시각 14:03:00 commit 이하 동기화, (4) 22종 변이 M1~M22 22/22 100% 사살 실측; Vitest 28 passed, tsc 0 error, build 성공, route coverage 41 passed, check_frontend_integrity 0 위반, check_contract_bindings PASS, check_docs PASS, sync_obsidian --check 0 conflicts).
@@ -47,10 +48,33 @@ source_of_truth: "Git"
 - 확인 기준: 2026-10-02T02:05:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer r1 조치: Claude UI r1 및 Codex r1 피드백 전수 반영 — R1 버튼 요소 DEF-S11-09 위반 해소 `var(--color-brand-primary-bg)` 및 `--color-brand-primary-fg` 승격; R2 활성 네임스페이스 칩 및 버전 배지 `var(--color-brand-hover)` 적용 5.49:1(Light)/8.11:1(Dark), 비활성 버튼 `var(--color-bg-subtle)`/`var(--color-text-muted)`/`var(--color-border-subtle)` 5.25:1/5.78:1 및 3.18:1/3.08:1 충족; R3 실제 렌더 배경 기반 전수 실측표 재구성; R4 Test 9c 확장 및 10종 변이 M1~M10 100% 사살 실측; R5 History 제어 바이트 60개 전수 제거 완료; 보라색 리터럴 의도적 브랜드 통합 명시; Vitest 14 passed, s11-defect-fixes 16 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-02T01:20:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer Light/Dark 명도 대비 전수 감사 및 디자인 토큰 승격: base db37dbc5 위 작업, ResourceExplorer 390건 -> 0건, InvFileExplorer 124건 -> 0건 100% 해소, COLOR_LITERAL_MULTISET_BASELINE 양 파일 {} 래칫, border-subtle 232건/22개 파일 래칫, DOM 실제 렌더링 동적 대비 단언 신설, 변이 M1~M4 100% 사살 실측, Vitest 9개 스위트 139 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 
+## 2026-10-02 데스크톱 셸 화면 (DesktopShell) 색상 리터럴 전수 토큰화(49 occurrences→0), 상태 색 정합성 및 접근성 승격 [r2] (Card 230, `agent/gemini/c230-desktop-shell-contrast`, PR #328, base `6426f970` PR #325 head, PR 대상 `agent/gemini/c228-nl-run-contrast`)
+- **개요**: ACC-09 다음 영역인 데스크톱 셸 메인 화면(`DesktopShell.tsx`)의 색상 리터럴 inventory 전수(49 occurrences→0), 대비 표본/DOM 결속 감사 및 알림 레벨 계약 순수성 접근성 승격 (Claude UI r1 검토 의견 전수 반영 [r2]):
+  1. **색상 리터럴 전수 해소 및 의도적 상태 디자인 승격 (Card 213, 215, 218, 220, 226, 228 정합)**:
+     - `DesktopShell.tsx`: 기존 하드코딩 색상 리터럴 전수(49건: Hex 23건, RGBA 26건) -> **0건** (100% 토큰화).
+     - 4대 알림 레벨 설정 객체 최상단 정의 및 export: `NOTIFICATION_LEVEL_CONFIG` (`info`, `success`, `warning`, `error`). 정본 wire 계약(`DesktopNotification['level']`)과 엄밀 일치시키고 계약 외 임의 레벨(critical, debug, bogus 등) 배제.
+     - 알림 레벨 간 고유성 및 대비 보장: `info`(`var(--color-brand-hover)`), `success`(`var(--color-status-online)`), `warning`(`var(--color-status-degraded)`), `error`(`var(--color-status-offline)`).
+     - fail-closed 미지 상태 및 own-key 방어: `getNotificationLevelConfig`에 `Object.hasOwn` 기반 own-key 검사를 적용하여 prototype key(`toString`, `constructor`, `__proto__`), 계약 외 값, 케이스 변이(`ERROR`), 임의 레벨 탈취/fail-open 승격을 원천 차단하고 `var(--color-status-unknown)` 및 `UNKNOWN (<raw>)` 형식(null/undefined/빈값은 `UNKNOWN`)으로 fail-closed 매핑(WCAG 1.4.1 준수).
+     - 키보드 포커스 링 보존: 시작 버튼, 독 타일, 알림 닫기 버튼, 모드 전환 버튼에 인라인 `outline: none/0` 억제 배제 및 focus 후 computed outline 단언으로 focus ring 보존.
+     - 바탕화면 바로가기 아이콘 hover 피드백(`transition: background-color 0.15s ease`, `onMouseEnter`/`onMouseLeave` via `var(--color-bg-subtle)`) 보존.
+     - 셸 크롬 및 하단 독, 알림 드로어 전면 토큰화로 다크/라이트 양 테마 WCAG 2.2 AA (텍스트 >= 4.5:1, 비텍스트/테두리 >= 3.0:1) 100% 충족.
+  2. **Fail-Closed Multiset Baseline 래칫 강제**:
+     - `acc09-contrast-tokens.test.tsx`의 `COLOR_LITERAL_MULTISET_BASELINE`에서 `features/desktop/DesktopShell.tsx`의 허용 인벤토리를 `{}` (0건)으로 전면 고정.
+     - `borderSubtleCount` 442건/30개 파일 -> **451건/31개 파일** 래칫.
+  3. **실제 렌더링 DOM 기반 동적 대비 단언 및 40종 변이 100% 사살**:
+     - Test 9n 신설 및 보강: 상단 헤더, 시작 메뉴, 알림 배지(계약외 critical·case 변형 ERROR·proto toString 실제 DOM 렌더링 검속), 플로팅 독 타일 및 비활성/활성 실행 인디케이터, 아이콘 렌더링, 알림 종 🔔 글리프 DOM 전경/배경/테두리/opacity: 1/텍스트 단언, config 키 집합 == wire enum 집합 동등성 단언, 계약 밖 레벨 및 prototype key fail-closed own-key 방어 단언.
+     - Test 9j-2 확장: `DesktopShell.tsx` style 속성 AST 가드 기반 스타일-쌍 명도 대비 계산 및 커버리지 래칫 (borderTop 포함, violations 0). 조건식 양쪽 분기 및 AsExpression unwrap 지원.
+     - Revert-Fail Probes 91~95 추가.
+     - `tools/test_c230_mutations.py`: 40종 변이 Y1~Y40 전원 사살 실측 (40/40 = 100% killed, exit code 0).
+     - `tools/reproduce_c230_contrast.py` 34개 지표 실측 통과.
+  4. **잔여 백로그 현황**:
+     - desktop shell 관련 하드코딩 리터럴 잔여 0건.
+
 ## 2026-10-02 자연어 실행 화면 (NaturalLanguageRunView) 색상 리터럴 전수 토큰화(18종/79 occurrences→0), 상태 색 정합성 및 접근성 승격 [r3] (Card 228, `agent/gemini/c228-nl-run-contrast`, PR #325, base `02d5f969` PR #324 r3 head)
 - **개요**: ACC-09 다음 영역인 자연어 실행 및 Bounded Repair 화면(`NaturalLanguageRunView.tsx`)의 색상 리터럴 inventory 전수(18종/79 occurrences→0), 대비 표본/DOM 결속 감사 및 상태 색 정합성 접근성 승격 (Claude UI r2 및 Codex r2 검토 의견 전수 반영 [r3]):
   1. **색상 리터럴 전수 해소 및 의도적 상태 디자인 승격 (Card 213, 215, 218, 220, 226 정합)**:
      - `NaturalLanguageRunView.tsx`: 기존 하드코딩 색상 리터럴 전수(Hex 13종 72건, RGBA 5종 7건, 합계 18종 79건) -> **0건** (전수 제거).
+
      - 6대 상태 설정 객체 최상단 정의 및 export: `AGENT_RUN_STATUS_CONFIG` (`draft`, `evaluating`, `ready`, `repairing`, `completed`, `rejected`). 정본 wire 계약(`apps/web/src/contracts/types.ts:420`, `AgentRunRequest['status']`)과 엄밀 일치시키고 계약 외 임의 상태(planning, running, executing, awaiting_approval, failed, blocked, idle 7종) 제거.
      - 수명주기 상태 간 고유성 및 대비 보장: `ready`(`var(--color-brand-hover)`), `repairing`(`var(--color-status-degraded)`), `completed`(`var(--color-status-online)`), `rejected`(`var(--color-status-offline)`), `draft`/`evaluating`(`var(--color-text-secondary)`).
      - fail-closed 미지 상태 및 own-key 방어: `getAgentRunStatusConfig`에 `Object.hasOwn` 기반 own-key 검사를 적용하여 prototype key(`toString`, `constructor`, `__proto__`), 계약 외 값, 케이스/공백 변이(`COMPLETED`, ` completed`) 및 alias(`succeeded`) 탈취/fail-open 승격을 원천 차단하고 `var(--color-status-unknown)` 및 `UNKNOWN (<raw>)` 형식(빈값/null/undefined는 `UNKNOWN`)으로 fail-closed 매핑.
