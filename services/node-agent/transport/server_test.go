@@ -14,6 +14,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"errors"
+	contracts "github.com/egparadise/SaintVision-Invion/packages/contracts-go"
 	node "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime"
 	"io"
 	"log"
@@ -72,9 +73,10 @@ func issue(t *testing.T, ca testCA, identity string, usage x509.ExtKeyUsage, exp
 }
 
 type fakeRunner struct {
-	calls   atomic.Int32
-	wait    atomic.Bool
-	started chan struct{}
+	calls           atomic.Int32
+	quarantineCalls atomic.Int32
+	wait            atomic.Bool
+	started         chan struct{}
 }
 
 func (f *fakeRunner) Execute(ctx context.Context, _ []byte) (node.Result, error) {
@@ -87,6 +89,24 @@ func (f *fakeRunner) Execute(ctx context.Context, _ []byte) (node.Result, error)
 }
 func (f *fakeRunner) Observe(ctx context.Context, raw []byte) (node.Result, error) {
 	return f.Execute(ctx, raw)
+}
+func (f *fakeRunner) Quarantine(_ context.Context, raw []byte) (contracts.BuildQuarantineReceipt, error) {
+	f.quarantineCalls.Add(1)
+	var request contracts.BuildQuarantineRequest
+	if err := json.Unmarshal(raw, &request); err != nil {
+		return contracts.BuildQuarantineReceipt{}, err
+	}
+	return contracts.BuildQuarantineReceipt{
+		SchemaVersion: "build-quarantine-receipt:1", WriterKind: "node-agent",
+		RequestId: request.RequestId, TenantId: request.TenantId, NodeId: request.NodeId,
+		RecoveryEpoch: request.RecoveryEpoch, Scope: request.Scope,
+		BuildSessionId: request.BuildSessionId, LeaseId: request.LeaseId,
+		ResourceId: request.ResourceId, DecisionId: request.DecisionId,
+		BindingDigest: request.BindingDigest, DaemonIdentity: request.DaemonIdentity,
+		ReasonCode: request.ReasonCode,
+		RequestedAt: request.RequestedAt, RecordedAt: request.RequestedAt,
+		Durable: true, Replayed: false,
+	}, nil
 }
 func write(t *testing.T, path string, data []byte) {
 	t.Helper()
@@ -197,6 +217,37 @@ func call(t *testing.T, client *http.Client, address, path string, body []byte) 
 	defer response.Body.Close()
 	_, _ = io.Copy(io.Discard, response.Body)
 	return response.StatusCode, nil
+}
+
+func TestAuthenticatedQuarantineRequestReachesDurableRecorder(t *testing.T) {
+	s := fixture(t)
+	request := map[string]any{
+		"schemaVersion":  "build-quarantine-request:1",
+		"requestId":      "33333333-3333-4333-8333-333333333333",
+		"tenantId":       s.c.TenantID,
+		"nodeId":         s.c.NodeID,
+		"recoveryEpoch":  s.c.Epoch,
+		"scope":          "node",
+		"buildSessionId": "44444444-4444-4444-8444-444444444444",
+		"leaseId":        "lse_00000000000000000000000000",
+		"resourceId":     "res_00000000000000000000000000",
+		"decisionId":     "decision-card222",
+		"bindingDigest":  "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+		"daemonIdentity": map[string]any{"pid": 42, "processUid": 1000, "processStartTicks": 28815, "comm": "buildkitd"},
+		"reasonCode":     "VERIFY-0022",
+		"requestedAt":    "2026-10-02T00:00:00Z",
+	}
+	body, _ := json.Marshal(request)
+	status, err := call(t, s.client, s.server.URL, "/v1/builds/quarantine", body)
+	if err != nil || status != 200 || s.runner.quarantineCalls.Load() != 1 {
+		t.Fatal("authenticated quarantine call did not reach recorder", status, err)
+	}
+	request["extra"] = true
+	body, _ = json.Marshal(request)
+	status, err = call(t, s.client, s.server.URL, "/v1/builds/quarantine", body)
+	if err != nil || status != 400 || s.runner.quarantineCalls.Load() != 1 {
+		t.Fatal("invalid quarantine request reached recorder", status, err)
+	}
 }
 func TestMTLSAllowsOnlyPinnedScopedClient(t *testing.T) {
 	s := fixture(t)

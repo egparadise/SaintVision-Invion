@@ -1,15 +1,37 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.267"
+version: "1.0.271"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T09:45:53+09:00"
+updated: "2026-10-02T12:46:10+09:00"
 source_of_truth: "Git"
-active_card: "CARD-211 VF-CL CI receipt attestation"
-active_card_status: "Exact-head producer and attestation dispatch passed; signed receipt remains feature-head evidence"
-active_card_next: "Land with train 16 (#302 repair merged; Backend/Frontend green on repair head 1d6894fe); after landing, the user runs the §12 device manual acceptance per the #300 checklist and imports it with tools/import_ac11_accessibility_evidence.py"
+active_card: "CARD-222 node-agent durable quarantine channel"
+active_card_status: "Claude r3 condition addressed: Node-wide quarantine resume requires every scope settled, trusted stop receipt, fresh observation and two-person approval"
+active_card_next: "Push r2 fixes, obtain exact-head Core/Backend green and Claude r3, then start Card 223 product caller on the approved head"
 ---
+
+## 2026-10-02 Card 222 — node-agent durable quarantine channel
+
+- `#312` N2가 드러낸 기록 없는 `VERIFY-0022` quarantine seam을 strict request/receipt 계약,
+  authenticated Node route, private fsync+atomic journal, exact replay로 닫았다.
+- mTLS client와 pinned channel proof가 함께 없으면 capability는 false이며 제품 dispatch는 계속
+  `RES-0006` fail closed다. 같은 requestId의 다른 원인·identity는 덮어쓰지 않는다.
+- receipt는 reconciliation 의무 기록이며 cleanup·lease release·복구 완료 증거가 아니다. S08-BE
+  상태·점수와 물리 builder 인수는 유지한다. [[S08-BE_node-agent_durable_quarantine_channel]] ·
+  [[2026-10-02_11-49-10_KST_Card222_node_agent_durable_quarantine_Codex]].
+- Claude r1 뒤 lease/session/daemon/decision/binding/epoch를 request·receipt·replay key에 결속했다.
+  fresh nonce preflight 실패는 dispatch 전에 `RES-0006`과 DB node quarantine/outbox marker를 남긴다.
+  post-dispatch Node journal 실패도 최초 경합 원인을 덮지 않으며 CP scheduling fence가 다음 build를
+  막는다. focused Python **239 passed, 1 skipped**; exact-head hosted 판정 대기다.
+- Claude r2에서 일시 probe 실패의 영구 격리를 제거했다. preflight는 그 dispatch만 거부하고 outbox
+  관측만 남긴다. post-dispatch 영구 격리는 `can_resume` 사람 운영자+2인 approval+settled+fresh
+  authenticated Node evidence를 요구하는 기존 resume 경로로만 해제한다. driver 오류도 최초 원인을
+  덮지 않으며 ±5초 freshness 변이는 단독 시험으로 사살했다.
+- Claude r3 잔여 판단은 build/GPU별 부분 해제가 아닌 Node-wide fence로 확정했다. quarantine 상태에서
+  active lease가 하나라도 있으면 resume는 `LEASE-0003`; trusted Node stop receipt가 release를 기록하고
+  모든 run/delivery가 settled된 뒤 fresh observation과 2인 승인이 있어야만 online이 된다. 이 경계를
+  quarantine 전용 실 PG 회귀로 고정했으며 resume를 cleanup 증명 자체로 과장하지 않는다.
 
 ## 2026-10-02 Card 211 — VF-CL CI receipt attestation
 

@@ -125,6 +125,18 @@ class NodeTLSClient:
             channel, request, "/v1/terminals/frame", "NodeTerminalResult", timeout=3
         )
 
+    def quarantine(self, channel, request):
+        """Record a durable reconciliation obligation on the authenticated Node."""
+
+        validate_contract("BuildQuarantineRequest", request)
+        return self._request(
+            channel,
+            request,
+            "/v1/builds/quarantine",
+            "BuildQuarantineReceipt",
+            timeout=3,
+        )
+
     def _request(
         self,
         channel,
