@@ -36,6 +36,15 @@ import {
   getNotificationLevelConfig,
   DESKTOP_SHORTCUTS,
 } from '../src/features/desktop/DesktopShell';
+import {
+  PlacementSimulator,
+  DISCOVERY_CANDIDATE_STATE_CONFIG,
+  getDiscoveryCandidateStateConfig,
+  PoolItem,
+  CandidateItem,
+} from '../src/features/placement/PlacementSimulator';
+import type { PoolCapacityResponse } from '../src/contracts/pool-capacity-response';
+import type { NodeItem } from '../src/contracts/types';
 import type { DesktopNotification } from '../src/contracts/virtualFabric';
 import {
   ModelStudioView,
@@ -322,7 +331,7 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/nodes/NodeDetail.tsx": {"rgba(210,153,34,0.12)": 1, "rgba(210,153,34,0.15)": 1, "rgba(248,81,73,0.1)": 1},
   "features/nodes/NodeList.tsx": {"#1e1e1e": 1, "#2d3748": 1, "#4ade80": 2, "#fff": 1, "#ffffff": 1, "rgba(210,153,34,0.15)": 1, "rgba(56,189,248,0.12)": 1, "rgba(56,189,248,0.3)": 1},
   "features/placement/PlacementExplainView.tsx": {"#d97706": 1, "rgba(16,185,129,0.1)": 1, "rgba(16,185,129,0.15)": 1, "rgba(234,179,8,0.15)": 1, "rgba(234,179,8,0.3)": 1},
-  "features/placement/PlacementSimulator.tsx": {"#334155": 3, "#93c5fd": 1, "#94a3b8": 2, "#ef4444": 4, "#f87171": 1, "#fbbf24": 4, "#fca5a5": 4, "#fff": 3, "#ffffff": 2, "rgba(234,179,8,0.15)": 2, "rgba(234,179,8,0.3)": 2, "rgba(239,68,68,0.1)": 4, "rgba(35,134,54,0.1)": 1},
+  "features/placement/PlacementSimulator.tsx": {},
   "features/placement/ResourceTopologyGraph.tsx": {"#ffffff": 2, "rgba(16,185,129,0.08)": 1},
   "features/recovery/DistributedRecoveryView.tsx": {},
   "features/release/ReleaseCandidateView.tsx": {},
@@ -5890,8 +5899,395 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
   });
 
 
-  // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView & DesktopShell
-  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, and DesktopShell style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
+  // 9o. [Card 235 / ACC-09] Component DOM Rendering Verification: PlacementSimulator binds foregrounds and container backgrounds to design tokens with dynamic contrast verification
+  it('ACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification', async () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    const mockNodes: NodeItem[] = [
+      {
+        id: 'nod_test_01',
+        name: 'Node 01 (Win GPU)',
+        hostname: 'node-win-01',
+        os: 'windows' as const,
+        cpuCores: 16,
+        cpuUsagePercent: 20,
+        memoryTotalBytes: 64 * 1024 ** 3,
+        memoryUsedBytes: 16 * 1024 ** 3,
+        memoryUsagePercent: 25,
+        gpuName: 'RTX 4090',
+        gpuCount: 1,
+        status: 'online' as const,
+        labels: {},
+        observationOnly: false,
+        schedulable: true,
+        allocatableCores: 14,
+        allocatableMemoryBytes: 50 * 1024 ** 3,
+      },
+      {
+        id: 'nod_test_02',
+        name: 'Node 02 (Linux CPU)',
+        hostname: 'node-linux-02',
+        os: 'linux' as const,
+        cpuCores: 8,
+        cpuUsagePercent: 30,
+        memoryTotalBytes: 32 * 1024 ** 3,
+        memoryUsedBytes: 8 * 1024 ** 3,
+        memoryUsagePercent: 25,
+        gpuName: '',
+        gpuCount: 0,
+        status: 'online' as const,
+        labels: {},
+        observationOnly: false,
+        schedulable: true,
+        allocatableCores: 6,
+        allocatableMemoryBytes: 24 * 1024 ** 3,
+      },
+    ];
+
+    const mockPools: PoolItem[] = [
+      { poolId: 'pool_01', projectId: 'prj_test_01', name: 'GPU 가속 연산 풀', status: 'active', memberCount: 3 },
+      { poolId: 'pool_02', projectId: 'prj_test_01', name: 'CPU 범용 풀', status: 'active', memberCount: 2 },
+    ];
+
+    const mockCapacity: PoolCapacityResponse = {
+      activeMemberCount: 3,
+      memberCount: 3,
+      name: 'GPU 가속 연산 풀',
+      poolId: 'pool_01',
+      note: '정상 가동',
+      units: {},
+      unmeasuredNodes: [],
+      spareNow: { cpuMillicores: 12000, ramBytes: 48 * 1024 ** 3, gpuDevices: 2 },
+      totalOffered: { cpuMillicores: 24000, ramBytes: 96 * 1024 ** 3, gpuDevices: 4 },
+      largestSingleNode: { cpuMillicores: 8000, ramBytes: 32 * 1024 ** 3, gpuDevices: 2 },
+      nodes: [],
+    };
+
+    const mockCandidates: CandidateItem[] = [
+      {
+        announcementId: 'ann_01',
+        claimedHostname: 'node-cand-alpha',
+        claimedOsType: 'linux',
+        claimedCpuCores: 16,
+        claimedRamBytes: 64 * 1024 ** 3,
+        claimedGpuCount: 1,
+        state: 'candidate' as const,
+        verified: false as const,
+        announceCount: 1,
+        firstSeenAt: '2026-10-02T10:00:00Z',
+        lastSeenAt: '2026-10-02T10:05:00Z',
+        sourceIp: '10.0.0.1',
+        stale: false,
+        instanceId: 'inst_01',
+      },
+      {
+        announcementId: 'ann_02',
+        claimedHostname: 'node-cand-beta',
+        claimedOsType: 'windows',
+        claimedCpuCores: 8,
+        claimedRamBytes: 32 * 1024 ** 3,
+        claimedGpuCount: 0,
+        state: 'admitted' as any,
+        verified: false as const,
+        announceCount: 2,
+        firstSeenAt: '2026-10-02T10:00:00Z',
+        lastSeenAt: '2026-10-02T10:05:00Z',
+        sourceIp: '10.0.0.2',
+        stale: false,
+        instanceId: 'inst_02',
+      },
+      {
+        announcementId: 'ann_03',
+        claimedHostname: 'node-cand-gamma',
+        claimedOsType: 'linux',
+        claimedCpuCores: 4,
+        claimedRamBytes: 16 * 1024 ** 3,
+        claimedGpuCount: 0,
+        state: 'CANDIDATE' as any,
+        verified: false as const,
+        announceCount: 3,
+        firstSeenAt: '2026-10-02T10:00:00Z',
+        lastSeenAt: '2026-10-02T10:05:00Z',
+        sourceIp: '10.0.0.3',
+        stale: false,
+        instanceId: 'inst_03',
+      },
+      {
+        announcementId: 'ann_04',
+        claimedHostname: 'node-cand-delta',
+        claimedOsType: 'linux',
+        claimedCpuCores: 8,
+        claimedRamBytes: 32 * 1024 ** 3,
+        claimedGpuCount: 0,
+        state: 'toString' as any,
+        verified: false as const,
+        announceCount: 1,
+        firstSeenAt: '2026-10-02T10:00:00Z',
+        lastSeenAt: '2026-10-02T10:05:00Z',
+        sourceIp: '10.0.0.4',
+        stale: false,
+        instanceId: 'inst_04',
+      },
+    ];
+
+    const mockProps = {
+      nodes: mockNodes,
+      initialPools: mockPools,
+      initialPoolsState: 'success' as const,
+      initialPoolCapacity: mockCapacity,
+      initialPoolCapacityState: 'error' as const,
+      initialPoolCapacityError: '실시간 용량 초과 경고: 모의 한도 도달',
+      initialPreviewState: 'error' as const,
+      initialPreviewError: '서버 배치 미리보기 실패: 모의 연결 오류',
+      initialCandidates: mockCandidates,
+      initialCandidatesState: 'success' as const,
+    };
+
+    try {
+      await act(async () => {
+        root.render(<PlacementSimulator {...mockProps} />);
+      });
+
+      // 1. Local Simulation Badge
+      const localSimBadge = container.querySelector('[data-testid="local-simulation-badge"]') as HTMLElement;
+      expect(localSimBadge, 'Local simulation badge must render').not.toBeNull();
+      expect(localSimBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(localSimBadge.style.borderColor).toBe('var(--color-status-degraded)');
+      expect(localSimBadge.style.color).toBe('var(--color-status-degraded)');
+      expect(localSimBadge.textContent).toContain('로컬 결정론적 평가 (UNVERIFIED: 로컬 시뮬레이션 전용)');
+      expect(localSimBadge.style.opacity || '1', 'Badge must not have degraded opacity').toBe('1');
+
+      // 2. Resource Pool selection buttons (Selected vs Unselected)
+      const poolButtons = container.querySelectorAll('button');
+      const pool01Btn = Array.from(poolButtons).find((b) => b.textContent?.includes('GPU 가속 연산 풀')) as HTMLButtonElement;
+      const pool02Btn = Array.from(poolButtons).find((b) => b.textContent?.includes('CPU 범용 풀')) as HTMLButtonElement;
+      expect(pool01Btn, 'Pool 01 button must render').toBeDefined();
+      expect(pool02Btn, 'Pool 02 button must render').toBeDefined();
+
+      // Initially pool_01 is selected
+      expect(pool01Btn.style.backgroundColor).toBe('var(--color-brand-subtle)');
+      expect(pool01Btn.style.borderColor).toBe('var(--color-brand-hover)');
+      expect(pool01Btn.style.color).toBe('var(--color-brand-hover)');
+
+      expect(pool02Btn.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(pool02Btn.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(pool02Btn.style.color).toBe('var(--color-text-secondary)');
+
+      // Click pool_02 to toggle selection
+      await act(async () => {
+        pool02Btn.click();
+      });
+      expect(pool02Btn.style.backgroundColor).toBe('var(--color-brand-subtle)');
+      expect(pool02Btn.style.borderColor).toBe('var(--color-brand-hover)');
+      expect(pool02Btn.style.color).toBe('var(--color-brand-hover)');
+
+      expect(pool01Btn.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(pool01Btn.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(pool01Btn.style.color).toBe('var(--color-text-secondary)');
+
+      // 3. GPU Toggle Button
+      const gpuBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('CPU 전용 가능') || b.textContent?.includes('GPU 필수 요구')
+      ) as HTMLButtonElement;
+      expect(gpuBtn, 'GPU toggle button must render').toBeDefined();
+
+      // Initially requiresGpu is false
+      expect(gpuBtn.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(gpuBtn.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(gpuBtn.style.color).toBe('var(--color-text-secondary)');
+
+      // Click to toggle requiresGpu to true
+      await act(async () => {
+        gpuBtn.click();
+      });
+      expect(gpuBtn.style.backgroundColor).toBe('var(--color-brand-subtle)');
+      expect(gpuBtn.style.borderColor).toBe('var(--color-brand-hover)');
+      expect(gpuBtn.style.color).toBe('var(--color-brand-hover)');
+
+      // Focus ring preservation on GPU button
+      const computedGpu = window.getComputedStyle(gpuBtn);
+      expect(computedGpu.outlineStyle || 'inherit').not.toBe('none');
+      expect(computedGpu.outlineWidth || 'inherit').not.toMatch(/^(0px|0)$/);
+      expect(gpuBtn.style.outline || 'inherit').not.toMatch(/(none|0px|\b0\b)/);
+      expect(gpuBtn.style.outlineWidth || 'inherit').not.toMatch(/^(0px|0)$/);
+      expect(gpuBtn.style.outlineStyle || 'inherit').not.toBe('none');
+
+      gpuBtn.focus();
+      gpuBtn.dispatchEvent(new Event('focus'));
+      expect(gpuBtn.style.outline || 'inherit').not.toMatch(/(none|0px|\b0\b)/);
+      expect(gpuBtn.style.outlineStyle || 'inherit').not.toBe('none');
+
+      // Focus ring preservation on pool button
+      const computedPool = window.getComputedStyle(pool01Btn);
+      expect(computedPool.outlineStyle || 'inherit').not.toBe('none');
+      expect(pool01Btn.style.outline || 'inherit').not.toMatch(/(none|0px|\b0\b)/);
+      expect(pool01Btn.style.outlineStyle || 'inherit').not.toBe('none');
+
+      // 4. Preview Error Banner & Retry Button
+      const prevErrorBanner = container.querySelector('[data-testid="preview-error-banner"]') as HTMLElement;
+      expect(prevErrorBanner, 'Preview error banner must render').not.toBeNull();
+      expect(prevErrorBanner.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(prevErrorBanner.style.borderColor).toBe('var(--color-status-offline)');
+      expect(prevErrorBanner.style.color).toBe('var(--color-status-offline)');
+      expect(prevErrorBanner.textContent, 'Preview error banner must contain warning icon').toContain('⚠️');
+      expect(prevErrorBanner.textContent, 'Preview error banner must contain failure heading').toContain('서버 배치 미리보기 실패');
+
+      const prevRetryBtn = container.querySelector('[data-testid="preview-retry-btn"]') as HTMLButtonElement;
+      expect(prevRetryBtn, 'Preview retry button must render').not.toBeNull();
+      expect(prevRetryBtn.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(prevRetryBtn.style.color).toBe('var(--color-text-primary)');
+      expect(prevRetryBtn.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(prevRetryBtn.textContent).toContain('재시도 (Retry)');
+
+      // Focus ring preservation on retry button
+      const computedRetry = window.getComputedStyle(prevRetryBtn);
+      expect(computedRetry.outlineStyle || 'inherit').not.toBe('none');
+      expect(prevRetryBtn.style.outline || 'inherit').not.toMatch(/(none|0px|\b0\b)/);
+      expect(prevRetryBtn.style.outlineStyle || 'inherit').not.toBe('none');
+
+      // 4a. Pool capacity error in DOM
+      const capError = container.querySelector('[data-testid="pool-capacity-error"]') as HTMLElement;
+      expect(capError, 'Pool capacity error banner must render').not.toBeNull();
+      expect(capError.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(capError.style.borderColor).toBe('var(--color-status-offline)');
+      expect(capError.style.color).toBe('var(--color-status-offline)');
+      expect(capError.textContent).toContain('⚠️');
+      expect(capError.textContent).toContain('실시간 용량 초과 경고');
+
+      // 5. Discovery Candidates State Badges (Contract candidate, Out-of-contract, Case variant, Prototype key)
+      const candAlphaBadge = container.querySelector('[data-testid="candidate-status-ann_01"]') as HTMLElement;
+      expect(candAlphaBadge, 'Candidate alpha badge must render').not.toBeNull();
+      expect(candAlphaBadge.textContent).toBe('CANDIDATE (미검증)');
+      expect(candAlphaBadge.style.color).toBe('var(--color-status-degraded)');
+      expect(candAlphaBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(candAlphaBadge.style.borderColor).toBe('var(--color-status-degraded)');
+      expect(candAlphaBadge.style.opacity || '1', 'Candidate badge must not have degraded opacity').toBe('1');
+
+      const candBetaBadge = container.querySelector('[data-testid="candidate-status-ann_02"]') as HTMLElement;
+      expect(candBetaBadge, 'Out-of-contract candidate beta badge must render with UNKNOWN (admitted)').not.toBeNull();
+      expect(candBetaBadge.textContent).toBe('UNKNOWN (admitted)');
+      expect(candBetaBadge.style.color).toBe('var(--color-status-unknown)');
+      expect(candBetaBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(candBetaBadge.style.borderColor).toBe('var(--color-status-unknown)');
+
+      const candGammaBadge = container.querySelector('[data-testid="candidate-status-ann_03"]') as HTMLElement;
+      expect(candGammaBadge, 'Case-variant candidate gamma badge must render with UNKNOWN (CANDIDATE)').not.toBeNull();
+      expect(candGammaBadge.textContent).toBe('UNKNOWN (CANDIDATE)');
+      expect(candGammaBadge.style.color).toBe('var(--color-status-unknown)');
+      expect(candGammaBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(candGammaBadge.style.borderColor).toBe('var(--color-status-unknown)');
+
+      const candDeltaBadge = container.querySelector('[data-testid="candidate-status-ann_04"]') as HTMLElement;
+      expect(candDeltaBadge, 'Prototype key candidate delta badge must render with UNKNOWN (toString)').not.toBeNull();
+      expect(candDeltaBadge.textContent).toBe('UNKNOWN (toString)');
+      expect(candDeltaBadge.style.color).toBe('var(--color-status-unknown)');
+      expect(candDeltaBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(candDeltaBadge.style.borderColor).toBe('var(--color-status-unknown)');
+
+      // 5b. Danger Banners in DOM (pools-error-banner and candidates-error-banner)
+      await act(async () => {
+        root.render(
+          <PlacementSimulator
+            key="error-state-render"
+            {...mockProps}
+            initialPoolsState="error"
+            initialPoolsError="자원 풀 서버 연결 거부"
+            initialCandidatesState="error"
+            initialCandidatesError="후보 노드 레지스트리 통신 오류"
+          />
+        );
+      });
+
+      // 5b-1. pools-error-banner
+      const poolsErrorBanner = container.querySelector('[data-testid="pools-error-banner"]') as HTMLElement;
+      expect(poolsErrorBanner, 'Pools error banner must render').not.toBeNull();
+      expect(poolsErrorBanner.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(poolsErrorBanner.style.borderColor).toBe('var(--color-status-offline)');
+      expect(poolsErrorBanner.style.color).toBe('var(--color-status-offline)');
+      expect(poolsErrorBanner.textContent).toContain('⚠️');
+      expect(poolsErrorBanner.textContent).toContain('자원 풀 연동 실패');
+      expect(poolsErrorBanner.textContent).toContain('자원 풀 서버 연결 거부');
+
+      const poolsRetryBtn = container.querySelector('[data-testid="pools-retry-btn"]') as HTMLButtonElement;
+      expect(poolsRetryBtn, 'Pools retry button must render').not.toBeNull();
+      expect(poolsRetryBtn.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(poolsRetryBtn.style.color).toBe('var(--color-text-primary)');
+      expect(poolsRetryBtn.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(poolsRetryBtn.textContent).toContain('재시도 (Retry)');
+      const computedPoolsRetry = window.getComputedStyle(poolsRetryBtn);
+      expect(computedPoolsRetry.outlineStyle || 'inherit').not.toBe('none');
+      expect(poolsRetryBtn.style.outline || 'inherit').not.toMatch(/(none|0px|\b0\b)/);
+
+      // 5b-2. candidates-error-banner
+      const candErrorBanner = container.querySelector('[data-testid="candidates-error-banner"]') as HTMLElement;
+      expect(candErrorBanner, 'Candidates error banner must render').not.toBeNull();
+      expect(candErrorBanner.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(candErrorBanner.style.borderColor).toBe('var(--color-status-offline)');
+      expect(candErrorBanner.style.color).toBe('var(--color-status-offline)');
+      expect(candErrorBanner.textContent).toContain('⚠️');
+      expect(candErrorBanner.textContent).toContain('디스커버리 후보 조회 실패');
+      expect(candErrorBanner.textContent).toContain('후보 노드 레지스트리 통신 오류');
+
+      const candRetryBtn = container.querySelector('[data-testid="candidates-retry-btn"]') as HTMLButtonElement;
+      expect(candRetryBtn, 'Candidates retry button must render').not.toBeNull();
+      expect(candRetryBtn.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(candRetryBtn.style.color).toBe('var(--color-text-primary)');
+      expect(candRetryBtn.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(candRetryBtn.textContent).toContain('재시도 (Retry)');
+      const computedCandRetry = window.getComputedStyle(candRetryBtn);
+      expect(computedCandRetry.outlineStyle || 'inherit').not.toBe('none');
+      expect(candRetryBtn.style.outline || 'inherit').not.toMatch(/(none|0px|\b0\b)/);
+
+      // 6. DISCOVERY_CANDIDATE_STATE_CONFIG exact key set contract check
+      expect(Object.keys(DISCOVERY_CANDIDATE_STATE_CONFIG).sort()).toEqual(['candidate']);
+
+      // 7. Unit helper fail-closed and prototype key defense
+      const normCfg = getDiscoveryCandidateStateConfig('candidate');
+      expect(normCfg.color).toBe('var(--color-status-degraded)');
+      expect(normCfg.label).toBe('CANDIDATE (미검증)');
+
+      const admittedCfg = getDiscoveryCandidateStateConfig('admitted');
+      expect(admittedCfg.color).toBe('var(--color-status-unknown)');
+      expect(admittedCfg.label).toBe('UNKNOWN (admitted)');
+
+      const upperCandCfg = getDiscoveryCandidateStateConfig('CANDIDATE');
+      expect(upperCandCfg.color).toBe('var(--color-status-unknown)');
+      expect(upperCandCfg.label).toBe('UNKNOWN (CANDIDATE)');
+
+      const titleCandCfg = getDiscoveryCandidateStateConfig('Candidate');
+      expect(titleCandCfg.color).toBe('var(--color-status-unknown)');
+      expect(titleCandCfg.label).toBe('UNKNOWN (Candidate)');
+
+      const nullCandCfg = getDiscoveryCandidateStateConfig(null);
+      expect(nullCandCfg.color).toBe('var(--color-status-unknown)');
+      expect(nullCandCfg.label).toBe('UNKNOWN');
+
+      const undefCandCfg = getDiscoveryCandidateStateConfig(undefined);
+      expect(undefCandCfg.color).toBe('var(--color-status-unknown)');
+      expect(undefCandCfg.label).toBe('UNKNOWN');
+
+      const emptyCandCfg = getDiscoveryCandidateStateConfig('');
+      expect(emptyCandCfg.color).toBe('var(--color-status-unknown)');
+      expect(emptyCandCfg.label).toBe('UNKNOWN');
+
+      const protoKeys = ['toString', 'constructor', '__proto__', 'valueOf', 'hasOwnProperty', 'isPrototypeOf'];
+      for (const pk of protoKeys) {
+        const protoCfg = getDiscoveryCandidateStateConfig(pk as any);
+        expect(protoCfg.color, `Prototype key ${pk} must fall back to var(--color-status-unknown)`).toBe('var(--color-status-unknown)');
+        expect(protoCfg.label).toBe(`UNKNOWN (${pk})`);
+      }
+    } finally {
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    }
+  });
+
+  // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell & PlacementSimulator
+  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, and PlacementSimulator style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
     interface Branch {
       cond: string;
       token: string;
@@ -6180,7 +6576,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       }
 
       function checkConfigTables(node: ts.Node) {
-        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG' || node.name.getText(sf) === 'AGENT_RUN_STATUS_CONFIG' || node.name.getText(sf) === 'NOTIFICATION_LEVEL_CONFIG') && node.initializer) {
+        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG' || node.name.getText(sf) === 'AGENT_RUN_STATUS_CONFIG' || node.name.getText(sf) === 'NOTIFICATION_LEVEL_CONFIG' || node.name.getText(sf) === 'DISCOVERY_CANDIDATE_STATE_CONFIG') && node.initializer) {
           let init = node.initializer;
           while (ts.isAsExpression(init) || ts.isSatisfiesExpression(init) || ts.isParenthesizedExpression(init)) {
             init = init.expression;
@@ -6293,6 +6689,16 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(desktopShellStats.checkedBorderObjects, 'Border objects in DesktopShell must be exactly 14').toBe(14);
     expect(desktopShellStats.checkedBorderPairs, 'Border pairs in DesktopShell must be exactly 15').toBe(15);
     expect(desktopShellStats.violations, `DesktopShell violations:\n${desktopShellStats.violations.join('\n')}`).toEqual([]);
+
+    const placementStats = analyzeFile('features/placement/PlacementSimulator.tsx');
+    expect(placementStats.totalStyleAttrs, 'Total style attributes in PlacementSimulator must be exactly 78').toBe(78);
+    expect(placementStats.checkedObjects, 'Explicit style objects in PlacementSimulator must be exactly 16').toBe(16);
+    expect(placementStats.checkedPairs, 'Evaluated pairs in PlacementSimulator must be exactly 41').toBe(41);
+    expect(placementStats.unboundColorObjects, 'Unbound color objects in PlacementSimulator must be exactly 23').toBe(23);
+    expect(placementStats.coveredColorObjects, 'Total covered color objects in PlacementSimulator must be exactly 39').toBe(39);
+    expect(placementStats.checkedBorderObjects, 'Border objects in PlacementSimulator must be exactly 21').toBe(21);
+    expect(placementStats.checkedBorderPairs, 'Border pairs in PlacementSimulator must be exactly 23').toBe(23);
+    expect(placementStats.violations, `PlacementSimulator violations:\n${placementStats.violations.join('\n')}`).toEqual([]);
   });
 
 
@@ -6772,6 +7178,32 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(probe95Cr, 'DesktopShell former #ffffff on light canvas fails 4.5:1').toBeLessThan(4.5);
     expect(probe95Cr).toBeCloseTo(1.05, 1);
 
+    // Probe 96 [Card 235]: PlacementSimulator former unverified badge text #fbbf24 on light canvas strictly fails 4.5:1
+    const probe96Cr = getContrast('#fbbf24', lightTokens['--color-bg-canvas']);
+    expect(probe96Cr, 'PlacementSimulator former #fbbf24 on light canvas fails 4.5:1').toBeLessThan(4.5);
+    expect(probe96Cr).toBeCloseTo(1.60, 1);
+
+    // Probe 97 [Card 235]: PlacementSimulator former error text #fca5a5 on light canvas strictly fails 4.5:1
+    const probe97Cr = getContrast('#fca5a5', lightTokens['--color-bg-canvas']);
+    expect(probe97Cr, 'PlacementSimulator former #fca5a5 on light canvas fails 4.5:1').toBeLessThan(4.5);
+    expect(probe97Cr).toBeCloseTo(1.81, 1);
+
+    // Probe 98 [Card 235]: PlacementSimulator former error subtext #f87171 on light canvas strictly fails 4.5:1
+    const probe98Cr = getContrast('#f87171', lightTokens['--color-bg-canvas']);
+    expect(probe98Cr, 'PlacementSimulator former #f87171 on light canvas fails 4.5:1').toBeLessThan(4.5);
+    expect(probe98Cr).toBeCloseTo(2.64, 1);
+
+    // Probe 99 [Card 235]: PlacementSimulator former unverified badge border rgba(234, 179, 8, 0.3) on light canvas strictly fails 3.0:1
+    const defectiveUnverifiedBorder = blendRgba([234, 179, 8], 0.3, lightTokens['--color-bg-canvas']);
+    const probe99Cr = getContrast(defectiveUnverifiedBorder, lightTokens['--color-bg-canvas']);
+    expect(probe99Cr, 'PlacementSimulator former unverified border on canvas fails 3.0:1').toBeLessThan(3.0);
+    expect(probe99Cr).toBeCloseTo(1.20, 1);
+
+    // Probe 100 [Card 235]: PlacementSimulator former operator note #93c5fd on light surface strictly fails 4.5:1
+    const probe100Cr = getContrast('#93c5fd', lightTokens['--color-bg-surface']);
+    expect(probe100Cr, 'PlacementSimulator former #93c5fd on light surface fails 4.5:1').toBeLessThan(4.5);
+    expect(probe100Cr).toBeCloseTo(1.80, 1);
+
 
     // Legacy Token Reverts:
     // Legacy Dark --color-border-subtle: #374151
@@ -6867,7 +7299,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
 
     // Exact count verification for var(--color-border-subtle)
-    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 451').toBe(451);
+    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 456').toBe(456);
     expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 31').toBe(31);
 
     // Fail-closed check 3: Total files with color literals must not exceed baseline file count
