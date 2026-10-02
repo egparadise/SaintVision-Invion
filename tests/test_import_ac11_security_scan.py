@@ -71,28 +71,64 @@ def tool_files(importer_blob: str | None = None) -> list[dict]:
     ]
 
 
-def payload(**over) -> dict:
+#: Measured from the real artifact of run 36949022989: ``scannedPythonFiles`` is the sorted
+#: list of files bandit read (207 of them there), not a count, and every summary number is
+#: that list's own arithmetic.  r1's fixture used a count, so the importer agreed with a
+#: payload the canonical evaluator would refuse (#313 r2).
+SCANNED_FILES = [
+    "services/control-plane/src/inv/build_execution.py",
+    "services/control-plane/src/inv/buildkit_transport.py",
+    "src/saintvision/__init__.py",
+]
+AUDITED = [
+    {"name": "alembic", "version": "1.19.2"},
+    {"name": "anyio", "version": "4.15.1"},
+]
+#: bandit's low and medium counts are real on the hosted lane (16 and 4), which is why its
+#: exit code is 1 while no critical or high finding exists.
+BANDIT_NOISE = {"lowFindingCount": 16, "mediumFindingCount": 4}
+
+
+def finding(finding_id: str, severity: str = "HIGH", scanner: str = "bandit") -> dict:
+    return {
+        "findingId": finding_id,
+        "scanner": scanner,
+        "severity": severity,
+        "ruleId": "B602" if scanner == "bandit" else "GHSA-0000-0000",
+        "component": "services/control-plane/src/inv/build_execution.py",
+        "location": "services/control-plane/src/inv/build_execution.py:12",
+    }
+
+
+def payload(*findings: dict, **over) -> dict:
+    rows = sorted(findings, key=lambda row: row["findingId"])
+    summaries = {
+        "bandit": {
+            **BANDIT_NOISE,
+            "highFindingCount": sum(row["scanner"] == "bandit" for row in rows),
+            "scannedFileCount": len(SCANNED_FILES),
+        },
+        "pip-audit": {
+            "dependencyCount": len(AUDITED),
+            "findingCount": sum(row["scanner"] == "pip-audit" for row in rows),
+        },
+    }
     body = {
         "scannerVersions": {row["id"]: row["version"] for row in SCAN_ALLOWLIST["scanners"]},
-        "scannerExitCodes": {"bandit": 1, "pip-audit": 0},
+        "scannerExitCodes": {
+            "bandit": 1,
+            "pip-audit": 1 if summaries["pip-audit"]["findingCount"] else 0,
+        },
         "scanInputs": [
             {"path": path, "objectId": git("rev-parse", f"HEAD:{path}")} for path in SCOPE
         ],
-        "summaries": {
-            "bandit": {
-                "lowFindingCount": 0,
-                "mediumFindingCount": 0,
-                "highFindingCount": 0,
-                "scannedFileCount": 120,
-            },
-            "pip-audit": {"dependencyCount": 60, "findingCount": 0},
-        },
-        "auditedDependencies": [{"name": "alembic", "version": "1.19.2"}],
-        "scannedPythonFiles": 120,
-        "criticalHighFindings": [],
-        "criticalCount": 0,
-        "highCount": 0,
-        "unallowlistedFindingIds": [],
+        "summaries": summaries,
+        "auditedDependencies": copy.deepcopy(AUDITED),
+        "scannedPythonFiles": list(SCANNED_FILES),
+        "criticalHighFindings": rows,
+        "criticalCount": sum(row["severity"] == "CRITICAL" for row in rows),
+        "highCount": sum(row["severity"] == "HIGH" for row in rows),
+        "unallowlistedFindingIds": sorted(row["findingId"] for row in rows),
         "expiredFindingIds": [],
         "staleAllowlistFindingIds": [],
         "severityMismatchFindingIds": [],
@@ -324,10 +360,92 @@ def test_four_threat_rows_this_importer_cannot_recompute_cannot_become_a_pass():
 
 
 def test_a_scan_verdict_that_contradicts_its_own_payload_is_refused():
-    report = producer_report(payload(criticalCount=1, criticalHighFindings=["CVE-2026-0001"]))
+    body = payload(finding("GHSA-0001", "CRITICAL"))
+    report = producer_report(body)
     report["verdict"] = "MEASURED_PASS"
     with pytest.raises(tool.SecurityImportError, match="recomputes MEASURED_FAIL"):
         imported(report)
+
+
+def test_a_finding_row_the_counts_do_not_admit_is_refused():
+    """#313 r2 N1, probe 1: a HIGH row with ``highCount: 0`` recomputed MEASURED_PASS.
+
+    The counts are the axis's claim -- "critical and high are zero" -- so they are recomputed
+    from the rows.  r1 read the counts and the inventory lengths only, so a payload carrying a
+    finding nobody counted passed, and the reason called that scan a success.
+    """
+
+    body = payload(finding("GHSA-0001", "HIGH"))
+    body["criticalCount"] = 0
+    body["highCount"] = 0
+    body["unallowlistedFindingIds"] = []
+    report = producer_report(body, verdict="MEASURED_PASS", failureClass="NONE")
+    with pytest.raises(tool.SecurityImportError, match="contradicts itself"):
+        imported(report)
+
+
+def _empty_bandit_coverage(body: dict) -> None:
+    body["scannedPythonFiles"] = []
+    body["summaries"]["bandit"] = {
+        "lowFindingCount": 0, "mediumFindingCount": 0,
+        "highFindingCount": 0, "scannedFileCount": 0,
+    }
+    body["scannerExitCodes"]["bandit"] = 0
+
+
+def _empty_pip_audit_coverage(body: dict) -> None:
+    body["auditedDependencies"] = []
+    body["summaries"]["pip-audit"] = {"dependencyCount": 0, "findingCount": 0}
+
+
+@pytest.mark.parametrize(
+    "empty",
+    [
+        _empty_bandit_coverage,
+        _empty_pip_audit_coverage,
+        lambda body: (_empty_bandit_coverage(body), _empty_pip_audit_coverage(body)),
+    ],
+    ids=["bandit-read-no-files", "pip-audit-read-no-dependencies", "both-probe-2"],
+)
+def test_a_scan_that_read_nothing_is_not_a_pass(empty):
+    """#313 r2 N1, probe 2: zero scanned files and zero audited dependencies passed.
+
+    Coverage of nothing is not evidence that nothing is wrong, and the canonical evaluator
+    refuses an empty inventory for exactly that reason.  Each scanner is emptied on its own as
+    well as together, because a check that only one of the two cases can reach is a check the
+    other case does not have.
+    """
+
+    body = payload()
+    empty(body)
+    report = producer_report(body, verdict="MEASURED_PASS", failureClass="NONE")
+    with pytest.raises(tool.SecurityImportError, match="contradicts itself"):
+        imported(report)
+
+
+def test_a_summary_that_disagrees_with_the_finding_rows_is_refused():
+    """The per-scanner summaries and the rows are the same scan, so they must agree."""
+
+    body = payload(finding("GHSA-0001", "HIGH"))
+    body["summaries"]["bandit"]["highFindingCount"] = 0
+    report = producer_report(body, verdict="MEASURED_FAIL",
+                             failureClass="UNALLOWLISTED_CRITICAL_HIGH")
+    with pytest.raises(tool.SecurityImportError, match="contradicts itself"):
+        imported(report)
+
+
+def test_the_importer_and_the_aggregator_recompute_the_payload_with_one_function():
+    """#313 r2 N1: two validators of one claim drift, so there is one of them.
+
+    The canonical function is the aggregator's; the importer calls it rather than keeping a
+    shorter list of its own, which is what let the two disagree about the same bytes.
+    """
+
+    from aggregate_ac11_evidence import scan_payload_invariants
+
+    assert tool.scan_payload_invariants is scan_payload_invariants
+    findings, broken = scan_payload_invariants(payload(finding("GHSA-0001")))
+    assert broken == () and list(findings) == ["GHSA-0001"]
 
 
 def test_a_measured_failure_is_carried_with_the_recomputed_detail_rather_than_hidden():
@@ -338,26 +456,44 @@ def test_a_measured_failure_is_carried_with_the_recomputed_detail_rather_than_hi
     laundered into "not observed" with nothing to read.
     """
 
-    body = payload(criticalCount=2, highCount=1, criticalHighFindings=["a", "b", "c"])
-    envelope = imported(producer_report(body, verdict="MEASURED_FAIL", failureClass="UNALLOWLISTED_CRITICAL_HIGH"))
+    body = payload(
+        finding("GHSA-0001", "CRITICAL"),
+        finding("GHSA-0002", "CRITICAL"),
+        finding("GHSA-0003", "HIGH"),
+    )
+    envelope = imported(
+        producer_report(body, verdict="MEASURED_FAIL", failureClass="UNALLOWLISTED_CRITICAL_HIGH")
+    )
     assert envelope["verdict"] == "NOT_OBSERVED"
     assert envelope["scanRecomputed"] == "MEASURED_FAIL"
     assert "recomputes MEASURED_FAIL" in envelope["reason"]
     assert "criticalCount=2" in envelope["reason"] and "highCount=1" in envelope["reason"]
 
 
-def test_an_unallowlisted_finding_is_a_measured_failure_even_with_zero_counts():
-    body = payload(unallowlistedFindingIds=["GHSA-xxxx"])
-    envelope = imported(producer_report(body, verdict="MEASURED_FAIL", failureClass="UNALLOWLISTED_CRITICAL_HIGH"))
+def test_an_unallowlisted_finding_is_a_measured_failure():
+    """The reviewed allowlist accepts nothing, so any finding at all is unallowlisted."""
+
+    body = payload(finding("GHSA-0001", "HIGH"))
+    envelope = imported(
+        producer_report(body, verdict="MEASURED_FAIL", failureClass="UNALLOWLISTED_CRITICAL_HIGH")
+    )
     assert envelope["scanRecomputed"] == "MEASURED_FAIL"
     assert "unallowlistedFindingIds=1" in envelope["reason"]
 
 
-def test_scanners_that_did_not_both_run_are_not_a_pass():
-    body = payload(scannerExitCodes={"bandit": 1})
-    envelope = imported(producer_report(body, verdict="NOT_OBSERVED", failureClass="SCANNER_UNAVAILABLE"))
-    assert envelope["scanRecomputed"] == "NOT_OBSERVED"
-    assert "did not both run" in envelope["reason"]
+def test_a_scanner_exit_code_that_contradicts_its_summary_is_refused():
+    """The exit codes are derived from the summaries, so one missing or wrong is a refusal.
+
+    r1 answered NOT_OBSERVED here.  A *complete* report whose payload disagrees with itself is
+    not an unobserved scan, it is evidence nobody can read -- the producer's own unavailable
+    path is the one that means "not observed", and it is answered above.
+    """
+
+    for exits in ({"bandit": 1}, {"bandit": 0, "pip-audit": 0}):
+        body = payload(scannerExitCodes=exits)
+        report = producer_report(body, verdict="MEASURED_PASS", failureClass="NONE")
+        with pytest.raises(tool.SecurityImportError, match="contradicts itself"):
+            imported(report)
 
 
 def test_an_unavailable_scan_report_is_not_a_pass():

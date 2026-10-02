@@ -38,7 +38,7 @@ ALLOWLIST_CANONICAL_SHA256 = "b73aba8ff97443bbd1e314d5ca0375fdcbce8205a1a746bc5a
 SCAN_ALLOWLIST_REPO_PATH = (
     "docs/vault/30_Development/Evidence/s11-security-dependency-sast-allowlist-v1.json"
 )
-SCAN_ALLOWLIST_BLOB = "74cb88b37c841133d1354773bc7d1451e2691eb7"
+SCAN_ALLOWLIST_BLOB = "67e80df8d4db56f5095496857dc53339cb01f3bf"
 #: The importer that may write this axis's envelopes, pinned by path here and by blob in
 #: the reviewed allowlist above (#313 F-R3).
 SECURITY_IMPORTER_REPO_PATH = "tools/import_ac11_security_scan.py"
@@ -867,76 +867,25 @@ def evaluate_security_scan(
     expected_versions = {key: scanner_specs[key]["version"] for key in sorted(scanner_specs)}
     if payload.get("scannerVersions") != expected_versions:
         return Verdict.INVALID_RUN
-    exits = payload.get("scannerExitCodes")
-    if (
-        not isinstance(exits, dict)
-        or set(exits) != {"bandit", "pip-audit"}
-        or any(value not in (0, 1) for value in exits.values())
-    ):
+    # Everything the payload says about itself -- the finding rows, the two counts, the
+    # per-scanner summaries, the two scanner exit codes and the two coverage inventories --
+    # is recomputed by one function that the security importer calls as well, so the two
+    # recomputations of "critical and high are zero" cannot drift (#313 r2 N1).
+    actual, broken = scan_payload_invariants(payload)
+    if broken:
         return Verdict.INVALID_RUN
+    summaries = payload["summaries"]
+    audited = payload["auditedDependencies"]
+    audited_map = {row["name"]: row["version"] for row in audited}
+    inputs = payload["scanInputs"]
     expected_scope = sorted(
         {path for scanner in scanner_specs.values() for path in scanner["scopePaths"]}
     )
-    inputs = payload.get("scanInputs")
-    if not isinstance(inputs, list) or len(inputs) != len(expected_scope):
+    # Which paths had to be scanned, and whether the objects scanned are the source tree's:
+    # both questions belong to the allowlist and to Git, so they stay here.
+    if [str(row["path"]) for row in inputs] != expected_scope:
         return Verdict.INVALID_RUN
-    normalized_inputs: list[dict[str, str]] = []
-    for row in inputs:
-        if (
-            not isinstance(row, dict)
-            or set(row) != {"path", "objectId"}
-            or not SHA1_RE.fullmatch(str(row["objectId"]))
-        ):
-            return Verdict.INVALID_RUN
-        normalized_inputs.append({"path": str(row["path"]), "objectId": str(row["objectId"])})
-    if [row["path"] for row in normalized_inputs] != expected_scope:
-        return Verdict.INVALID_RUN
-    if any(git.blob(source, row["path"]) != row["objectId"] for row in normalized_inputs):
-        return Verdict.INVALID_RUN
-    expected_payload_keys = {
-        "scannerVersions", "scannerExitCodes", "scanInputs", "summaries",
-        "auditedDependencies", "scannedPythonFiles",
-        "criticalHighFindings", "criticalCount", "highCount",
-        "unallowlistedFindingIds", "expiredFindingIds", "staleAllowlistFindingIds",
-        "severityMismatchFindingIds",
-    }
-    if set(payload) != expected_payload_keys:
-        return Verdict.INVALID_RUN
-    summaries = payload["summaries"]
-    if (
-        not isinstance(summaries, dict)
-        or set(summaries) != {"bandit", "pip-audit"}
-        or set(summaries["bandit"]) != {
-            "lowFindingCount", "mediumFindingCount", "highFindingCount",
-            "scannedFileCount",
-        }
-        or set(summaries["pip-audit"]) != {"dependencyCount", "findingCount"}
-        or any(
-            isinstance(count, bool) or not isinstance(count, int) or count < 0
-            for summary in summaries.values()
-            for count in summary.values()
-        )
-    ):
-        return Verdict.INVALID_RUN
-    audited = payload["auditedDependencies"]
-    if not isinstance(audited, list) or not audited:
-        return Verdict.INVALID_RUN
-    audited_map: dict[str, str] = {}
-    for row in audited:
-        if (
-            not isinstance(row, dict)
-            or set(row) != {"name", "version"}
-            or not isinstance(row["name"], str)
-            or not row["name"]
-            or not isinstance(row["version"], str)
-            or not row["version"]
-            or row["name"] in audited_map
-        ):
-            return Verdict.INVALID_RUN
-        audited_map[row["name"]] = row["version"]
-    if audited != [
-        {"name": name, "version": audited_map[name]} for name in sorted(audited_map)
-    ]:
+    if any(git.blob(source, str(row["path"])) != row["objectId"] for row in inputs):
         return Verdict.INVALID_RUN
     requirements_path = scanner_specs["pip-audit"]["scopePaths"][0]
     try:
@@ -945,17 +894,7 @@ def evaluate_security_scan(
         return Verdict.INVALID_RUN
     if any(audited_map.get(name) != version for name, version in required_pins.items()):
         return Verdict.INVALID_RUN
-    if summaries["pip-audit"]["dependencyCount"] != len(audited):
-        return Verdict.INVALID_RUN
     scanned_files = payload["scannedPythonFiles"]
-    if (
-        not isinstance(scanned_files, list)
-        or not scanned_files
-        or scanned_files != sorted(scanned_files)
-        or len(scanned_files) != len(set(scanned_files))
-        or any(not isinstance(path, str) or not path.endswith(".py") for path in scanned_files)
-    ):
-        return Verdict.INVALID_RUN
     expected_python_files = sorted(
         path
         for prefix in scanner_specs["bandit"]["scopePaths"]
@@ -963,49 +902,6 @@ def evaluate_security_scan(
         if path.endswith(".py")
     )
     if scanned_files != expected_python_files:
-        return Verdict.INVALID_RUN
-    if summaries["bandit"]["scannedFileCount"] != len(scanned_files):
-        return Verdict.INVALID_RUN
-    findings = payload["criticalHighFindings"]
-    if not isinstance(findings, list):
-        return Verdict.INVALID_RUN
-    actual: dict[str, dict[str, Any]] = {}
-    finding_keys = {"findingId", "scanner", "severity", "ruleId", "component", "location"}
-    for finding in findings:
-        if not isinstance(finding, dict) or set(finding) != finding_keys:
-            return Verdict.INVALID_RUN
-        finding_id = finding["findingId"]
-        if (
-            not isinstance(finding_id, str)
-            or not finding_id
-            or finding_id in actual
-            or finding["scanner"] not in scanner_specs
-            or finding["severity"] not in {"CRITICAL", "HIGH"}
-            or any(not isinstance(finding[key], str) or not finding[key] for key in finding_keys - {"findingId", "scanner", "severity"})
-        ):
-            return Verdict.INVALID_RUN
-        if finding["scanner"] == "pip-audit" and finding["severity"] != "HIGH":
-            return Verdict.INVALID_RUN
-        actual[finding_id] = finding
-    if findings != sorted(findings, key=lambda row: row["findingId"]):
-        return Verdict.INVALID_RUN
-    critical = sum(row["severity"] == "CRITICAL" for row in findings)
-    high = sum(row["severity"] == "HIGH" for row in findings)
-    if payload["criticalCount"] != critical or payload["highCount"] != high:
-        return Verdict.INVALID_RUN
-    if summaries["bandit"]["highFindingCount"] != sum(
-        row["scanner"] == "bandit" for row in findings
-    ) or summaries["pip-audit"]["findingCount"] != sum(
-        row["scanner"] == "pip-audit" for row in findings
-    ):
-        return Verdict.INVALID_RUN
-    expected_pip_exit = 1 if summaries["pip-audit"]["findingCount"] else 0
-    bandit_total = sum(
-        summaries["bandit"][key]
-        for key in ("lowFindingCount", "mediumFindingCount", "highFindingCount")
-    )
-    expected_bandit_exit = 1 if bandit_total else 0
-    if exits != {"pip-audit": expected_pip_exit, "bandit": expected_bandit_exit}:
         return Verdict.INVALID_RUN
     accepted = {row["findingId"]: row for row in scan_allowlist["acceptedFindings"]}
     stale = sorted(set(accepted) - set(actual))
@@ -1044,6 +940,191 @@ def evaluate_security_scan(
     if report.get("failureClass") != failure_class or report.get("verdict") != computed.value:
         return Verdict.INVALID_RUN
     return computed
+
+
+#: The exact payload of a SEC-SCAN-001 report.  A key nobody validates is a measurement
+#: nobody made, so the set is compared rather than sampled.
+SCAN_PAYLOAD_KEYS = {
+    "scannerVersions", "scannerExitCodes", "scanInputs", "summaries",
+    "auditedDependencies", "scannedPythonFiles",
+    "criticalHighFindings", "criticalCount", "highCount",
+    "unallowlistedFindingIds", "expiredFindingIds", "staleAllowlistFindingIds",
+    "severityMismatchFindingIds",
+}
+#: A critical/high finding row, exactly.
+SCAN_FINDING_KEYS = {"findingId", "scanner", "severity", "ruleId", "component", "location"}
+SCAN_SCANNER_IDS = ("bandit", "pip-audit")
+SCAN_BANDIT_SEVERITY_KEYS = ("lowFindingCount", "mediumFindingCount", "highFindingCount")
+
+
+def scan_payload_invariants(payload: Any) -> tuple[dict[str, dict[str, Any]], tuple[str, ...]]:
+    """Recompute what a security-scan payload says about itself.
+
+    Returns the finding rows by ID and the names of the invariants that do not hold.  An
+    empty second element means the payload agrees with itself: the finding rows, the two
+    counts, the per-scanner summaries, the two exit codes and the two coverage inventories
+    all describe the same scan.  It does not mean the scan passed -- the allowlist comparison
+    and the Git provenance are separate questions, and they stay with ``evaluate_security_scan``
+    because only the aggregator can ask them.
+
+    This exists because two validators of the same claim will drift: the importer read only
+    the two counts and the four inventory lengths, so a payload with a HIGH finding row and
+    ``highCount: 0``, or one whose scanners read nothing at all, recomputed MEASURED_PASS
+    (#313 r2 N1).  Both callers now read these invariants instead of each keeping its own
+    shorter list.
+    """
+
+    broken: list[str] = []
+
+    def fails(name: str) -> None:
+        if name not in broken:
+            broken.append(name)
+
+    if not isinstance(payload, dict) or set(payload) != SCAN_PAYLOAD_KEYS:
+        return {}, ("payload-keys",)
+
+    versions = payload["scannerVersions"]
+    if not isinstance(versions, dict) or set(versions) != set(SCAN_SCANNER_IDS):
+        fails("scanner-versions")
+    inputs = payload["scanInputs"]
+    if not isinstance(inputs, list) or not inputs:
+        fails("scan-inputs")
+    else:
+        for row in inputs:
+            if (
+                not isinstance(row, dict)
+                or set(row) != {"path", "objectId"}
+                or not isinstance(row["path"], str)
+                or not row["path"]
+                or not SHA1_RE.fullmatch(str(row["objectId"]))
+            ):
+                fails("scan-inputs")
+                break
+
+    summaries = payload["summaries"]
+    if (
+        not isinstance(summaries, dict)
+        or set(summaries) != set(SCAN_SCANNER_IDS)
+        or set(summaries["bandit"]) != {*SCAN_BANDIT_SEVERITY_KEYS, "scannedFileCount"}
+        or set(summaries["pip-audit"]) != {"dependencyCount", "findingCount"}
+        or any(
+            isinstance(count, bool) or not isinstance(count, int) or count < 0
+            for summary in summaries.values()
+            for count in summary.values()
+        )
+    ):
+        return {}, tuple(broken + ["summaries"])
+
+    audited = payload["auditedDependencies"]
+    audited_map: dict[str, str] = {}
+    if not isinstance(audited, list) or not audited:
+        # A scan that audited nothing measured nothing: an empty inventory is not a pass.
+        fails("audited-dependencies")
+    else:
+        for row in audited:
+            if (
+                not isinstance(row, dict)
+                or set(row) != {"name", "version"}
+                or not isinstance(row["name"], str)
+                or not row["name"]
+                or not isinstance(row["version"], str)
+                or not row["version"]
+                or row["name"] in audited_map
+            ):
+                fails("audited-dependencies")
+                break
+            audited_map[row["name"]] = row["version"]
+        else:
+            if audited != [
+                {"name": name, "version": audited_map[name]} for name in sorted(audited_map)
+            ]:
+                fails("audited-dependencies")
+    if "audited-dependencies" not in broken:
+        if summaries["pip-audit"]["dependencyCount"] != len(audited):
+            fails("dependency-count")
+
+    scanned = payload["scannedPythonFiles"]
+    if (
+        not isinstance(scanned, list)
+        or not scanned
+        or scanned != sorted(scanned)
+        or len(scanned) != len(set(scanned))
+        or any(not isinstance(path, str) or not path.endswith(".py") for path in scanned)
+    ):
+        # Likewise: a bandit run over zero files is coverage nobody has.
+        fails("scanned-python-files")
+    elif summaries["bandit"]["scannedFileCount"] != len(scanned):
+        fails("scanned-file-count")
+
+    findings = payload["criticalHighFindings"]
+    actual: dict[str, dict[str, Any]] = {}
+    if not isinstance(findings, list):
+        return actual, tuple(broken + ["findings"])
+    for finding in findings:
+        if not isinstance(finding, dict) or set(finding) != SCAN_FINDING_KEYS:
+            fails("findings")
+            break
+        finding_id = finding["findingId"]
+        if (
+            not isinstance(finding_id, str)
+            or not finding_id
+            or finding_id in actual
+            or finding["scanner"] not in SCAN_SCANNER_IDS
+            or finding["severity"] not in {"CRITICAL", "HIGH"}
+            or any(
+                not isinstance(finding[key], str) or not finding[key]
+                for key in SCAN_FINDING_KEYS - {"findingId", "scanner", "severity"}
+            )
+        ):
+            fails("findings")
+            break
+        if finding["scanner"] == "pip-audit" and finding["severity"] != "HIGH":
+            fails("findings")
+            break
+        actual[finding_id] = finding
+    else:
+        if findings != sorted(findings, key=lambda row: row["findingId"]):
+            fails("findings")
+    if "findings" in broken:
+        return actual, tuple(broken)
+
+    critical = sum(row["severity"] == "CRITICAL" for row in findings)
+    high = sum(row["severity"] == "HIGH" for row in findings)
+    if payload["criticalCount"] != critical or payload["highCount"] != high:
+        # The counts are the axis's own claim, so they are recomputed from the rows rather
+        # than believed: a row with no count is a finding the verdict never saw.
+        fails("counts")
+    if summaries["bandit"]["highFindingCount"] != sum(
+        row["scanner"] == "bandit" for row in findings
+    ) or summaries["pip-audit"]["findingCount"] != sum(
+        row["scanner"] == "pip-audit" for row in findings
+    ):
+        fails("summary-finding-counts")
+
+    exits = payload["scannerExitCodes"]
+    bandit_total = sum(summaries["bandit"][key] for key in SCAN_BANDIT_SEVERITY_KEYS)
+    expected_exits = {
+        "pip-audit": 1 if summaries["pip-audit"]["findingCount"] else 0,
+        "bandit": 1 if bandit_total else 0,
+    }
+    if not isinstance(exits, dict) or exits != expected_exits:
+        fails("exit-codes")
+
+    for key in (
+        "unallowlistedFindingIds", "expiredFindingIds",
+        "staleAllowlistFindingIds", "severityMismatchFindingIds",
+    ):
+        value = payload[key]
+        if (
+            not isinstance(value, list)
+            or value != sorted(value)
+            or len(value) != len(set(value))
+            or any(not isinstance(item, str) or not item for item in value)
+        ):
+            fails("finding-inventories")
+            break
+
+    return actual, tuple(broken)
 
 
 def _security_observations(

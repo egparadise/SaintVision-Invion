@@ -20,6 +20,12 @@ from io import BytesIO
 from pathlib import Path, PurePosixPath
 from typing import Any
 
+# The canonical recomputation of a security-scan payload lives with the aggregator, which is
+# the validator the evidence has to satisfy.  Calling it here rather than keeping a shorter
+# list of checks is what stops the two from drifting again (#313 r2 N1); the sibling
+# migration importer reads the aggregator the same way.
+from aggregate_ac11_evidence import scan_payload_invariants
+
 
 #: The AC-11 axes this importer writes envelopes for, as string literals at module level
 #: (#299 r3).  It was ``()`` while this importer returned the producer's report unchanged;
@@ -328,9 +334,13 @@ def _recompute_scan(report: dict[str, Any]) -> tuple[str, str | None]:
     """Recompute SEC-SCAN-001 from the payload the artifact carries.
 
     The aggregator recomputes this axis in full and refuses an envelope whose verdict
-    disagrees with it.  This is the subset the importer can check offline, and it exists so
-    that "critical/high is zero" is something measured in the bytes rather than copied from
-    the producer's own claim.
+    disagrees with it.  The payload arithmetic is shared with it rather than restated here --
+    the finding rows against the two counts, the counts against the per-scanner summaries, the
+    exit codes against those summaries, and the two coverage inventories against the files and
+    dependencies the scanners actually read.  What stays here is what the artifact alone can
+    answer: whether the report is complete, whether its digest covers its payload, and what
+    the inventories say.  The allowlist comparison and the Git provenance remain the
+    aggregator's, because only it can ask them.
     """
 
     status = report.get("status")
@@ -341,33 +351,23 @@ def _recompute_scan(report: dict[str, Any]) -> tuple[str, str | None]:
         raise SecurityImportError("a complete scan report carries no payload to recompute")
     if _canonical_sha256(payload) != report.get("payloadSha256"):
         raise SecurityImportError("payloadSha256 does not cover the payload it travels with")
-    exits = payload.get("scannerExitCodes")
-    if (
-        not isinstance(exits, dict)
-        or set(exits) != set(SCANNER_IDS)
-        or any(isinstance(code, bool) or code not in (0, 1) for code in exits.values())
-    ):
-        return "NOT_OBSERVED", "the scanners did not both run to a readable exit code"
-    versions = payload.get("scannerVersions")
-    inputs = payload.get("scanInputs")
-    if (
-        not isinstance(versions, dict)
-        or set(versions) != set(SCANNER_IDS)
-        or not isinstance(inputs, list)
-        or not inputs
-    ):
-        return "NOT_OBSERVED", "the scan records no scanner versions or scanned inputs"
-    measured: dict[str, int] = {}
-    for name in ("criticalCount", "highCount"):
-        value = payload.get(name)
-        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
-            raise SecurityImportError(f"payload {name} is not a count")
-        measured[name] = value
+    findings, broken = scan_payload_invariants(payload)
+    if broken:
+        # A complete report whose payload disagrees with itself is not an unobserved scan --
+        # the producer's own unavailable path above is what "not observed" means -- it is
+        # evidence nobody can read, and reading it anyway is how a finding row with no count
+        # and a scanner that read no files both became MEASURED_PASS (#313 r2 N1).
+        raise SecurityImportError(
+            "the scan payload contradicts itself: " + ", ".join(broken)
+        )
+    # The invariants bind these to the finding rows, so reading them is reading the rows.
+    measured = {
+        "criticalCount": payload["criticalCount"],
+        "highCount": payload["highCount"],
+        "criticalHighFindings": len(findings),
+    }
     for name in FAILURE_INVENTORIES:
-        value = payload.get(name)
-        if not isinstance(value, list):
-            raise SecurityImportError(f"payload {name} is not a list")
-        measured[name] = len(value)
+        measured[name] = len(payload[name])
     failures = {name: count for name, count in measured.items() if count}
     if failures:
         return "MEASURED_FAIL", ", ".join(f"{name}={count}" for name, count in sorted(failures.items()))
