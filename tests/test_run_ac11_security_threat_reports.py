@@ -167,6 +167,10 @@ def test_the_boundary_is_measured_over_the_collector_s_own_role_population(monke
         return {
             "roles": {"inv_app": {"present": True}},
             "ground_truth": {"public.projects": {"tenantScoped": True}},
+            # The census travels with the report (#322 r2 F-R7), so the stub carries one too --
+            # this test is about which roles were asked, and the producer copies both through.
+            "table_census": {"schemas": ["inv", "public"], "count": 1,
+                             "sha256": "0" * 64, "tables": ["public.projects"]},
             "definer_functions": [],
         }
 
@@ -177,4 +181,5 @@ def test_the_boundary_is_measured_over_the_collector_s_own_role_population(monke
     assert seen["roles"] == rls.DEFAULT_ROLES
     assert len(rls.DEFAULT_ROLES) == 8
     assert report["measuredRoles"] == list(rls.DEFAULT_ROLES)
+    assert report["table_census"]["tables"] == ["public.projects"]
     assert report["exitCode"] == 0 and report["verdict"] == "PASS"

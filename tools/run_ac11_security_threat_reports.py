@@ -198,6 +198,10 @@ def rls_report(dsn: str | None, tenant: str | None, allowlist: dict[str, Any]) -
         "accepted": accepted,
         "unmeasured": unmeasured,
         "roles": observation["roles"],
+        # The collector's catalogue census travels with the report: the evaluator binds it to the
+        # reviewed table list, so the population a verdict covers is not the report's own choice
+        # (#322 r2 F-R7).
+        "table_census": observation["table_census"],
         "ground_truth": observation["ground_truth"],
         "baselineAccepted": baseline_accepted,
         "measuredRoles": list(rls.DEFAULT_ROLES),

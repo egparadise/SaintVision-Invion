@@ -29,12 +29,20 @@ and are reported under 'accepted'):
      SET -- judged by ROW IDENTITY, never by count or by a value projection:
      inside one REPEATABLE READ transaction the owner fingerprints tenant A's rows
      and the role fingerprints what it sees.  Identity is ``ctid`` when the role
-     can read it, otherwise ``tenant_id`` + the complete primary key when the role
-     can read all of them.  A different set (count inflation OR a same-count row
-     swap) is an E4 violation.  When neither identity is readable the table is
-     "identity unverifiable": it is reported under ``unmeasured`` and the verdict
-     becomes UNMEASURED (exit 3) -- never PASS -- unless the baseline accepts that
-     (role, table) with a reason;
+     can read it, else ``tenant_id`` + the complete primary key when the role can
+     read all of them, else -- only for a (role, table, columns) in
+     ``OWNER_VERIFIED_KEY_SCOPE`` -- the readable part of that key **when the owner
+     measures it, in the same snapshot, to be unique over at least one compared row
+     and free of NULL**: a projection the owner proved injective on this row set is
+     an identity, which is a different thing from believing a projection (card 225).
+     Tuples are serialised as ``jsonb_build_array(...)`` so no value can forge
+     another tuple's key through the separator.  A different set (count inflation OR
+     a same-count row swap) is an E4 violation.  When no identity is available --
+     ctid denied, the key not fully readable, and the readable part out of scope,
+     non-unique, NULL-bearing or **compared over zero rows** (a vacuous match proves
+     nothing) -- the table is "identity unverifiable": it is reported under
+     ``unmeasured`` and the verdict becomes UNMEASURED (exit 3) -- never PASS --
+     unless the baseline accepts that (role, table) with a reason;
   E5 with the GUC set to an unknown tenant the role sees 0 rows;
   E6 no SECURITY DEFINER function grants EXECUTE to PUBLIC.
 
@@ -49,6 +57,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import hashlib
 import json
 import os
 import subprocess
@@ -63,6 +72,15 @@ BASELINE_PATH = Path(__file__).with_name("rls-boundary-baseline.json")
 #: tenant's audit rows", which is not what 0047_audit_events_isolation does.
 DEFAULT_ROLES = ("inv_app", "inv_kernel", "inv_runtime_dev", "inv_discovery_issuer", "inv_discovery_issuer_guard",
                  "inv_audit_writer", "inv_audit_reader", "inv_cancel_bridge_owner")
+#: The exact (role, qualified table, identity columns) triples where E4 may fall back to
+#: an owner-verified readable key (card 225, #322 r2).  The fallback is deliberately NOT
+#: generic: a later grant or schema change must not silently promote some other unmeasured
+#: pair to PASS through it.  Adding a row here is a reviewed change -- this file's blob is
+#: pinned in the AC-11 aggregator's RLS_FILES, so that pin has to be rotated with it.
+OWNER_VERIFIED_KEY_METHOD = "owner-verified-key"
+OWNER_VERIFIED_KEY_SCOPE = frozenset(
+    {("inv_cancel_bridge_owner", "public.audit_events", ("tenant_id", "event_id"))}
+)
 SCHEMAS = ("public", "inv")
 TENANT_GUC = "inv.tenant_id"
 PRIVILEGES = ("SELECT", "INSERT", "UPDATE", "DELETE")
@@ -123,6 +141,23 @@ def _count(conn, schema: str, name: str, where: str = "", params=()) -> dict:
         return {"denied": error.sqlstate or "unknown"}
 
 
+def _key_expr(columns: list[str]):
+    """``jsonb_build_array(c1, c2, ...)::text`` -- a serialisation no value can forge.
+
+    ``concat_ws`` was wrong for this (#322 r2 F-R2): it drops NULLs and does not escape the
+    separator, so ``('a\x1fb', 'c')`` and ``('a', 'b\x1fc')`` -- two different tuples --
+    rendered as the same string, and a row swap could have survived the fingerprint.  jsonb
+    quotes and escapes each element and renders a NULL element as ``null``, so distinct tuples
+    always render distinctly.  Both sides of every comparison call this one function, so the
+    owner's and the role's fingerprints stay comparable.
+    """
+
+    from psycopg import sql
+    return sql.SQL("jsonb_build_array({})::text").format(
+        sql.SQL(", ").join(sql.Identifier(c) for c in columns)
+    )
+
+
 def _fingerprint(conn, schema: str, name: str, columns: list[str] | None, where: str = "", params=()) -> dict:
     """{"rows": n, "fp": md5-of-ordered-row-identities} or {"denied": sqlstate}.
 
@@ -133,7 +168,7 @@ def _fingerprint(conn, schema: str, name: str, columns: list[str] | None, where:
     if columns is None:
         expr = sql.SQL("md5(coalesce(string_agg(ctid::text, ',' ORDER BY ctid), ''))")
     else:
-        rowexpr = sql.SQL("concat_ws('\x1f', {})").format(sql.SQL(", ").join(sql.Identifier(c) for c in columns))
+        rowexpr = _key_expr(columns)
         expr = sql.SQL("md5(coalesce(string_agg({r}, ',' ORDER BY {r}), ''))").format(r=rowexpr)
     try:
         with conn.transaction():
@@ -141,6 +176,45 @@ def _fingerprint(conn, schema: str, name: str, columns: list[str] | None, where:
                 sql.SQL("SELECT count(*), {} FROM {}.{}" + (" WHERE " + where if where else "")).format(
                     expr, sql.Identifier(schema), sql.Identifier(name)), params).fetchone()
             return {"rows": int(row[0]), "fp": row[1]}
+    except psycopg.Error as error:
+        return {"denied": error.sqlstate or "unknown"}
+
+
+def _distinct_fingerprint(conn, schema: str, name: str, columns: list[str],
+                          where: str = "", params=()) -> dict:
+    """The owner's fingerprint of ``columns`` **and** whether they identify these rows.
+
+    ``{"rows": n, "distinct": d, "nullRows": k, "unique": ..., "fp": md5}`` or
+    ``{"denied": sqlstate}``.  Uniqueness is measured on the same rows that are about to be
+    compared and in the same snapshot, which is what lets a readable projection stand in for a
+    row identity: if the owner sees as many distinct tuples as rows, two different rows cannot
+    share one tuple here (card 225).  A projection nobody measured would only be a guess, and
+    E4 refuses guesses.
+
+    ``unique`` requires **more than zero rows** as well as ``rows == distinct``: over an empty
+    set every projection is trivially injective and every fingerprint matches, which measures
+    nothing (#322 r2 F-R1).  ``nullRows`` is counted so the caller can refuse a key with NULL
+    in it rather than leaving that to the serialisation.
+    """
+
+    from psycopg import sql
+    import psycopg
+    rowexpr = _key_expr(columns)
+    nulls = sql.SQL(" OR ").join(sql.SQL("{} IS NULL").format(sql.Identifier(c)) for c in columns)
+    try:
+        with conn.transaction():
+            row = conn.execute(
+                sql.SQL(
+                    "SELECT count(*), count(DISTINCT {r}), count(*) FILTER (WHERE {n}),"
+                    " md5(coalesce(string_agg({r}, ',' ORDER BY {r}), '')) FROM {}.{}"
+                    + (" WHERE " + where if where else "")
+                ).format(sql.Identifier(schema), sql.Identifier(name), r=rowexpr, n=nulls),
+                params,
+            ).fetchone()
+            rows, distinct, null_rows = int(row[0]), int(row[1]), int(row[2])
+            return {"rows": rows, "distinct": distinct, "nullRows": null_rows,
+                    "unique": rows > 0 and rows == distinct and null_rows == 0,
+                    "fp": row[3]}
     except psycopg.Error as error:
         return {"denied": error.sqlstate or "unknown"}
 
@@ -164,11 +238,45 @@ def _primary_key(conn, table: dict) -> list[str]:
     return [r[0] for r in rows]
 
 
+def _readable_key_refusal(scope: tuple, measured: dict) -> str | None:
+    """Why this readable key is not a row identity, or None when it is one.
+
+    Every branch here keeps a (role, table) under ``unmeasured``, which is UNMEASURED and
+    never PASS.  They are listed in one function so the collector cannot grow a path that
+    reaches the fingerprint comparison without passing all of them (#322 r2).
+    """
+
+    role, qualified, columns = scope
+    if scope not in OWNER_VERIFIED_KEY_SCOPE:
+        return (
+            f"the owner-verified readable key is not registered for "
+            f"({role}, {qualified}, {list(columns)}); OWNER_VERIFIED_KEY_SCOPE is reviewed "
+            f"and this pair is not in it"
+        )
+    if measured["rows"] == 0:
+        return (
+            f"the readable identity columns {list(columns)} were compared over 0 rows of the "
+            f"owner's tenant-A set: an empty comparison matches trivially and measures nothing"
+        )
+    if measured["nullRows"]:
+        return (
+            f"the readable identity columns {list(columns)} are NULL in "
+            f"{measured['nullRows']} of {measured['rows']} rows, so they cannot identify them"
+        )
+    if measured["rows"] != measured["distinct"]:
+        return (
+            f"the readable identity columns {list(columns)} are not unique over the owner's "
+            f"tenant-A rows ({measured['rows']} rows / {measured['distinct']} distinct)"
+        )
+    return None
+
+
 def _identity(conn, role: str, table: dict, tenant_a: str) -> dict:
     """Owner-side tenant-A row set vs the set the role sees under GUC = A (same snapshot).
 
-    Identity is ctid, else tenant_id + the full primary key; a value projection is
-    never accepted (two different rows may project to the same values).
+    Identity is ctid, else tenant_id + the full primary key, else the readable part of that
+    key once the owner has measured it unique over the compared rows; an unmeasured value
+    projection is never accepted (two different rows may project to the same values).
     Must be called inside the probe transaction BEFORE ``SET LOCAL ROLE``."""
     schema, name = table["schema"], table["name"]
     from psycopg import sql
@@ -176,8 +284,18 @@ def _identity(conn, role: str, table: dict, tenant_a: str) -> dict:
     readable = set(_readable_columns(conn, role, table))
     key_cols = ["tenant_id"] + [c for c in pk if c != "tenant_id"] if pk else []
     key_readable = bool(key_cols) and set(key_cols) <= readable
+    # The part of that key the role may read.  A partitioned table puts its partition key in
+    # the primary key, so a role granted the business columns only (for example
+    # ``SELECT (tenant_id, event_id)`` on a table partitioned by ``occurred_at``) can never
+    # read the whole key -- and that is a property of the reviewed grant, not a gap to widen.
+    subset_cols = [column for column in key_cols if column in readable]
     owner_ctid = _fingerprint(conn, schema, name, None, "tenant_id = %s", (tenant_a,))
     owner_key = _fingerprint(conn, schema, name, key_cols, "tenant_id = %s", (tenant_a,)) if key_readable else None
+    owner_subset = (
+        _distinct_fingerprint(conn, schema, name, subset_cols, "tenant_id = %s", (tenant_a,))
+        if not key_readable and subset_cols
+        else None
+    )
     conn.execute(sql.SQL("SET LOCAL ROLE {}").format(sql.Identifier(role)))
     conn.execute("SELECT set_config(%s, %s, true)", (TENANT_GUC, tenant_a))
     role_ctid = _fingerprint(conn, schema, name, None)
@@ -191,10 +309,34 @@ def _identity(conn, role: str, table: dict, tenant_a: str) -> dict:
                       "match": role_key["fp"] == owner_key["fp"]}
         else:
             result = {"method": "unverifiable", "reason": f"pk projection denied {role_key.get('denied')}"}
+    elif owner_subset is not None and "fp" in owner_subset:
+        scope = (role, f"{schema}.{name}", tuple(subset_cols))
+        refusal = _readable_key_refusal(scope, owner_subset)
+        if refusal is not None:
+            result = {"method": "unverifiable",
+                      "reason": f"ctid denied {role_ctid.get('denied')}; {refusal}"}
+        else:
+            role_subset = _fingerprint(conn, schema, name, subset_cols)
+            if "fp" in role_subset:
+                result = {
+                    "method": "owner-verified-key", "columns": subset_cols,
+                    "ownerDistinctness": {"rows": owner_subset["rows"],
+                                          "distinct": owner_subset["distinct"],
+                                          "nullRows": owner_subset["nullRows"]},
+                    "owner_a": {"rows": owner_subset["rows"], "fp": owner_subset["fp"]},
+                    "role_a": role_subset,
+                    "match": role_subset["fp"] == owner_subset["fp"],
+                }
+            else:
+                result = {"method": "unverifiable",
+                          "reason": f"readable-key projection denied {role_subset.get('denied')}"}
     else:
         missing = sorted(set(key_cols) - readable) if key_cols else ["<no primary key>"]
+        detail = (f"; readable identity columns {subset_cols} unreadable to the owner "
+                  f"({owner_subset.get('denied')})" if owner_subset is not None else "")
         result = {"method": "unverifiable",
-                  "reason": f"ctid denied {role_ctid.get('denied')}; identity columns not readable: {missing}"}
+                  "reason": f"ctid denied {role_ctid.get('denied')}; identity columns not "
+                            f"readable: {missing}{detail}"}
     conn.execute("RESET ROLE")
     conn.execute(f"RESET {TENANT_GUC}")
     return result
@@ -350,6 +492,17 @@ def collect(dsn: str, roles: tuple[str, ...], tenant_a: str | None = None) -> di
         "tenant_guc": {"name": TENANT_GUC, "unset_value": guc_unset, "tenant_a": tenant_a,
                        "known_tenants": len(tenants), "random_tenant": random_tenant},
         "schemas": list(SCHEMAS),
+        # The catalogue census: what this collector saw in ``pg_class`` for these schemas, as a
+        # statement separate from what it then measured per role.  The AC-11 evaluator binds it to
+        # a reviewed table list, so a report cannot quietly describe a smaller database than the
+        # one the reviewed population names (#322 r2 F-R7); a collector that skipped a table would
+        # also show here as census != measured.
+        "table_census": {
+            "schemas": list(SCHEMAS),
+            "count": len(truth),
+            "sha256": hashlib.sha256("\n".join(sorted(truth)).encode("utf-8")).hexdigest(),
+            "tables": sorted(truth),
+        },
         "ground_truth": truth,
         "roles": role_reports,
         "definer_functions": function_catalogue,
@@ -421,6 +574,31 @@ def evaluate(observation: dict) -> list[dict]:
     return violations
 
 
+def _recorded_identity_refusal(role: str, table: str, identity: dict) -> str | None:
+    """Re-apply the readable-key refusals to a recorded identity, not just to a live probe.
+
+    ``_identity`` already refuses an out-of-scope, vacuous, NULL-bearing or repeated key, but
+    the verdict is computed from the recorded report, so the same question is asked again here
+    (#322 r2).  A report that carries ``owner-verified-key`` without a measured, non-empty,
+    unique, NULL-free owner distinctness -- or for a pair the reviewed scope does not list --
+    is UNMEASURED rather than PASS, whoever wrote it.
+    """
+
+    if identity.get("method") == "unverifiable":
+        return str(identity.get("reason"))
+    if identity.get("method") != OWNER_VERIFIED_KEY_METHOD:
+        return None
+    measured = identity.get("ownerDistinctness")
+    columns = identity.get("columns")
+    if (
+        not isinstance(measured, dict)
+        or not isinstance(columns, list)
+        or not all(isinstance(measured.get(key), int) for key in ("rows", "distinct", "nullRows"))
+    ):
+        return "the owner-verified readable key records no measured distinctness"
+    return _readable_key_refusal((role, table, tuple(columns)), measured)
+
+
 def unverified_identities(observation: dict) -> list[dict]:
     """(role, table) pairs whose E4 row identity could not be checked: these make the
     verdict UNMEASURED (never PASS) unless the baseline accepts them for rule E4."""
@@ -430,9 +608,12 @@ def unverified_identities(observation: dict) -> list[dict]:
             continue
         for table, entry in report["tables"].items():
             identity = entry.get("visible", {}).get("identity")
-            if identity is not None and identity.get("method") == "unverifiable":
+            if identity is None:
+                continue
+            reason = _recorded_identity_refusal(role, table, identity)
+            if reason is not None:
                 out.append({"rule": "E4", "role": role, "table": table,
-                            "detail": f"row identity unverifiable: {identity.get('reason')}"})
+                            "detail": f"row identity unverifiable: {reason}"})
     return out
 
 

@@ -199,6 +199,97 @@ def definer_report(**over) -> dict:
     return document
 
 
+CTID_FP = "5d41402abc4b2a76b9719d911017c592"
+RLS_FIXTURE_TABLES = ("public.projects", "public.tenants",
+                      "public.discovery_credential_issue_budgets", "public.audit_events")
+
+
+@pytest.fixture(autouse=True)
+def reviewed_census(monkeypatch):
+    """These fixtures measure four tables; the reviewed census names the whole migrated schema.
+
+    The canonical evaluator binds the measured population to ``tools/rls-table-census.json``
+    (#322 r2 F-R7), so a fixture has to say which population it is about.  The file itself is
+    measured by the aggregator's own suite, and the hosted report is measured against it in the PR.
+    """
+
+    monkeypatch.setattr(aggregator, "rls_table_census", lambda: frozenset(RLS_FIXTURE_TABLES))
+
+
+def rls_population() -> dict:
+    """The eight measured roles, each with one clean observed table.
+
+    The evaluator validates this shape before it reads any number (#322 r2 F-R5), so a stub
+    like ``{"inv_app": {"present": True}}`` is no longer a report -- which is the point: the
+    fixtures that fed this importer were thinner than the producer's real output three times.
+    """
+
+    clean = {
+        "tenant_scoped": True, "rls_enabled": True, "rls_forced": True,
+        "privileges": {"select": "table", "insert": "table", "update": None, "delete": None},
+        "policies": [{"name": "tenant_isolation", "cmd": "ALL", "permissive": "PERMISSIVE",
+                      "roles": ["inv_app"], "using": True, "with_check": True}],
+        "visible": {
+            "guc_unset": {"rows": 0}, "guc_tenant_a": {"rows": 1},
+            "guc_tenant_a_foreign_rows": {"rows": 0}, "guc_unknown_tenant": {"rows": 0},
+            "guc_not_uuid": {"denied": "22P02"},
+            "identity": {"method": "ctid", "owner_a": {"rows": 1, "fp": CTID_FP},
+                         "role_a": {"rows": 1, "fp": CTID_FP}, "match": True},
+        },
+    }
+    return {
+        role: {
+            "present": True, "superuser": False, "bypassrls": False, "login": False,
+            "inherit": True, "member_of": [], "functions": {},
+            # Every role measures the same tables, and the set covers what the reviewed allowlist
+            # and the pinned readable-key scope anchor on (#322 r2 F-R6).
+            "tables": {name: copy.deepcopy(clean) for name in RLS_FIXTURE_TABLES},
+        }
+        for role in sorted(aggregator.RLS_REQUIRED_ROLES)
+    }
+
+
+def rls_violating_report(**over) -> dict:
+    """A report whose own observation produces the E2 violation it reports.
+
+    The evaluator re-derives E1..E5 from the recorded observation (#322 r2 F-R4), so a reported
+    violation has to be visible in the numbers: here ``public.audit_events`` is readable and
+    tenant-scoped without forced RLS, which is exactly E2.
+    """
+
+    population = rls_population()
+    population["inv_app"]["tables"]["public.audit_events"]["rls_forced"] = False
+    document = rls_report(
+        roles=population,
+        exitCode=1,
+        verdict="VIOLATIONS",
+        violations=[{"role": "inv_app", "table": "public.audit_events", "rule": "E2",
+                     "detail": "tenant-scoped readable table without enabled+forced RLS"}],
+    )
+    document.update(over)
+    return document
+
+
+def rls_unmeasured_report(**over) -> dict:
+    """A report whose observation carries an unverifiable identity, as UNMEASURED requires."""
+
+    population = rls_population()
+    table = population["inv_app"]["tables"]["public.projects"]
+    table["visible"]["identity"] = {
+        "method": "unverifiable",
+        "reason": "ctid denied 42501; identity columns not readable: ['occurred_at']",
+    }
+    document = rls_report(
+        roles=population,
+        exitCode=3,
+        verdict="UNMEASURED",
+        unmeasured=[{"role": "inv_app", "table": "public.projects", "rule": "E4",
+                     "detail": "row identity unverifiable"}],
+    )
+    document.update(over)
+    return document
+
+
 def rls_report(**over) -> dict:
     """A SEC-RLS-001 report the canonical evaluator admits."""
 
@@ -207,6 +298,14 @@ def rls_report(**over) -> dict:
         "sourceRunId": RUN_ID,
         "sourceHeadSha": SOURCE,
         "checkoutTreeSha": TREE,
+        # The producer's whole top-level key set: the evaluator's schema refuses a missing or an
+        # extra one, so a thinner fixture is not a report (#322 r2 F-R6).
+        "cleanCheckout": True,
+        "reportAvailable": True,
+        "runPurpose": "s11-ac11-security-threat-reports",
+        "schemaVersion": "1.0.0",
+        "startedAt": "2026-10-02T05:32:03.335160Z",
+        "finishedAt": "2026-10-02T05:32:08.135160Z",
         "toolFiles": [dict(row) for row in aggregator.RLS_FILES],
         "baselineAccepted": [
             {"role": entry["role"], "table": entry["table"], "rules": list(entry["rules"])}
@@ -217,8 +316,18 @@ def rls_report(**over) -> dict:
         "violations": [],
         "accepted": [],
         "unmeasured": [],
-        "roles": {"inv_app": {"present": True}},
-        "ground_truth": {"public.projects": {"tenantScoped": True}},
+        "measuredRoles": sorted(aggregator.RLS_REQUIRED_ROLES),
+        "roles": rls_population(),
+        "table_census": {
+            "schemas": ["inv", "public"],
+            "count": len(RLS_FIXTURE_TABLES),
+            "sha256": aggregator._rls_census_digest(RLS_FIXTURE_TABLES),
+            "tables": sorted(RLS_FIXTURE_TABLES),
+        },
+        "ground_truth": {
+            name: {"total": {"rows": 2}, "tenant_a": {"rows": 1}, "other_tenants": {"rows": 1}}
+            for name in RLS_FIXTURE_TABLES
+        },
     }
     document.update(over)
     return document
@@ -533,12 +642,7 @@ def test_the_four_measured_reports_recompute_a_pass_and_the_envelope_says_so():
 def test_an_unobserved_database_report_keeps_the_axis_unobserved_and_names_it():
     """The honest middle: the boundary was measured and one row could not be verified."""
 
-    unmeasured = rls_report(
-        exitCode=3,
-        verdict="UNMEASURED",
-        unmeasured=[{"role": "inv_cancel_bridge_owner", "table": "public.audit_events",
-                     "rule": "E4", "detail": "row identity unverifiable"}],
-    )
+    unmeasured = rls_unmeasured_report()
     envelope = imported(database=(definer_report(), unmeasured), vf=vf_bundle())
     assert envelope["verdict"] == "NOT_OBSERVED"
     assert "SEC-RLS-001 recomputes NOT_OBSERVED" in envelope["reason"]
@@ -548,12 +652,7 @@ def test_an_unobserved_database_report_keeps_the_axis_unobserved_and_names_it():
 def test_a_measured_database_failure_is_carried_as_a_failure():
     """A verdict is not lowered: a violation makes the axis MEASURED_FAIL."""
 
-    violated = rls_report(
-        exitCode=1,
-        verdict="VIOLATIONS",
-        violations=[{"role": "inv_app", "table": "public.audit_events", "rule": "E2",
-                     "detail": "tenant-scoped readable table without enabled+forced RLS"}],
-    )
+    violated = rls_violating_report()
     envelope = imported(database=(definer_report(), violated), vf=vf_bundle())
     assert envelope["verdict"] == "MEASURED_FAIL"
     assert "SEC-RLS-001 recomputes MEASURED_FAIL" in envelope["reason"]
@@ -571,12 +670,7 @@ def test_a_failure_outranks_an_unobserved_report_in_the_same_envelope():
         status="unavailable", exitCode=2, unsafe=None, functions=None,
     )
     unavailable.pop("functions")
-    violated = rls_report(
-        exitCode=1,
-        verdict="VIOLATIONS",
-        violations=[{"role": "inv_app", "table": "public.audit_events", "rule": "E2",
-                     "detail": "tenant-scoped readable table without enabled+forced RLS"}],
-    )
+    violated = rls_violating_report()
     envelope = imported(database=(unavailable, violated), vf=vf_bundle())
     assert envelope["verdict"] == "MEASURED_FAIL"
     assert envelope["threatReportVerdicts"]["SEC-DEF-001"] == "NOT_OBSERVED"
