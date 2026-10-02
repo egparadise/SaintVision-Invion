@@ -201,6 +201,27 @@ def _members(archive: bytes) -> dict[str, bytes]:
         raise SecurityImportError(f"artifact archive unreadable: {type(exc).__name__}") from None
 
 
+def _head_commit_tree(run_metadata: dict[str, Any], label: str, source: str) -> str:
+    """The tree GitHub recorded for that run's head commit -- not a value a report chose.
+
+    ``head_commit`` is part of the run metadata GitHub keeps for the workflow run that produced
+    the artifact, so its ``tree_id`` is an independent statement about which tree ran.  Checking
+    only ``head_sha`` left ``checkoutTreeSha`` free: the producer report could name any tree and
+    the VF report copied whatever the scan report said, so changing one field to ``f`` * 40
+    still imported as MEASURED_PASS (#319 r2 F2).  Strict object, exact commit, canonical tree.
+    """
+
+    commit = run_metadata.get("head_commit")
+    if not isinstance(commit, dict):
+        raise SecurityImportError(f"{label} run metadata carries no head_commit object")
+    if commit.get("id") != source:
+        raise SecurityImportError(f"{label} run head_commit is about another commit")
+    tree = commit.get("tree_id")
+    if not isinstance(tree, str) or not SHA1_RE.fullmatch(tree):
+        raise SecurityImportError(f"{label} run head_commit has no canonical tree id")
+    return tree
+
+
 def import_evidence(
     archive: bytes,
     run_metadata: dict[str, Any],
@@ -240,6 +261,9 @@ def import_evidence(
         raise SecurityImportError("GitHub run did not complete successfully")
     if run_metadata.get("head_sha") != source or workflow_run.get("head_sha") != source:
         raise SecurityImportError("GitHub run or artifact head differs from sourceHeadSha")
+    checkout_tree = _head_commit_tree(run_metadata, "security scan", source)
+    if report.get("checkoutTreeSha") != checkout_tree:
+        raise SecurityImportError("checkoutTreeSha differs from the run head_commit tree")
     repository = run_metadata.get("repository")
     if not isinstance(repository, dict) or repository.get("full_name") != REPOSITORY:
         raise SecurityImportError("run repository is not canonical")
@@ -549,6 +573,12 @@ def vf_report(
         raise SecurityImportError("browser lane run did not complete successfully")
     if run_metadata.get("head_sha") != source or workflow_run.get("head_sha") != source:
         raise SecurityImportError("browser lane run is about another source head")
+    # The browser run's own head_commit is the second, independent witness of the tree: the
+    # scan report's claim was already checked against the scan run's head_commit, and this one
+    # must agree with it.  Nothing here is copied from the scan report (#319 r2 F2).
+    checkout_tree = _head_commit_tree(run_metadata, "browser lane", source)
+    if report["checkoutTreeSha"] != checkout_tree:
+        raise SecurityImportError("browser lane run head_commit tree differs from the scan tree")
     if artifact_metadata.get("name") != VF_ARTIFACT_NAME:
         raise SecurityImportError("browser lane artifact name is not the reviewed one")
     if artifact_metadata.get("expired") is not False:
@@ -581,7 +611,8 @@ def vf_report(
         # two share is the source head, and that is checked above rather than copied.
         "sourceRunId": run_id,
         "sourceHeadSha": source,
-        "checkoutTreeSha": report["checkoutTreeSha"],
+        # Recorded from the verified head_commit tree, not from the scan report.
+        "checkoutTreeSha": checkout_tree,
         "vfArtifact": {
             "repository": REPOSITORY,
             "workflowPath": spec["workflow"]["path"],
