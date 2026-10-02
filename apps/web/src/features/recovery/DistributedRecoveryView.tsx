@@ -7,6 +7,46 @@ interface DistributedRecoveryViewProps {
   nodes: NodeItem[];
 }
 
+interface NodeHealthConfig {
+  label: string;
+  color: string;
+  bg: string;
+  border: string;
+}
+
+export const NODE_HEALTH_CONFIG: Record<ResilientNodeState['healthState'], NodeHealthConfig> = {
+  online: {
+    label: 'ONLINE',
+    color: 'var(--color-status-online)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-online)',
+  },
+  stale: {
+    label: 'STALE',
+    color: 'var(--color-status-degraded)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-degraded)',
+  },
+  offline: {
+    label: 'OFFLINE',
+    color: 'var(--color-status-offline)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-offline)',
+  },
+  recovering: {
+    label: 'RECOVERING',
+    color: 'var(--color-status-active)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-active)',
+  },
+  fenced: {
+    label: 'FENCED',
+    color: 'var(--color-status-neutral)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-border-strong)',
+  },
+};
+
 export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = ({ nodes }) => {
   const [recoveryManager] = useState<DistributedRecoveryManager>(() => {
     return new DistributedRecoveryManager(
@@ -155,10 +195,10 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
         data-testid="recovery-unexposed-notice"
         style={{
           padding: '12px 16px',
-          backgroundColor: 'rgba(56, 139, 253, 0.1)',
-          border: '1px solid rgba(56, 139, 253, 0.4)',
-          borderRadius: '6px',
-          color: '#58a6ff',
+          backgroundColor: 'var(--color-bg-subtle)',
+          border: '1px solid var(--color-brand-hover)',
+          borderRadius: 'var(--radius-md)',
+          color: 'var(--color-brand-hover)',
           fontSize: '13px',
           lineHeight: '1.5',
         }}
@@ -175,59 +215,65 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
         }}
       >
         <div
+          data-testid="kpi-card-detection"
           style={{
-            backgroundColor: 'var(--color-bg-surface, #161b22)',
-            border: '1px solid #30363d',
-            borderRadius: 'var(--radius-lg, 8px)',
+            backgroundColor: 'var(--color-bg-surface)',
+            border: '1px solid var(--color-border-subtle)',
+            borderRadius: 'var(--radius-lg)',
             padding: '16px 20px',
           }}
         >
-          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>AC-07 이탈 감지 시간</div>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>AC-07 이탈 감지 시간</div>
           <div
             data-testid="kpi-detection-time"
-            style={{ fontSize: '20px', fontWeight: 700, color: '#8b949e', marginTop: '4px' }}
+            style={{ fontSize: '20px', fontWeight: 700, color: 'var(--color-text-secondary)', marginTop: '4px' }}
           >
             UNMEASURED (물리 실측)
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>Heartbeat 60s 초과 감지 시뮬레이션 (물리 5노드 랩 실측 미실시)</div>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>Heartbeat 60s 초과 감지 시뮬레이션 (물리 5노드 랩 실측 미실시)</div>
         </div>
 
         <div
+          data-testid="kpi-card-zombie"
           style={{
-            backgroundColor: 'var(--color-bg-surface, #161b22)',
-            border: '1px solid #30363d',
-            borderRadius: 'var(--radius-lg, 8px)',
+            backgroundColor: 'var(--color-bg-surface)',
+            border: '1px solid var(--color-border-subtle)',
+            borderRadius: 'var(--radius-lg)',
             padding: '16px 20px',
           }}
         >
-          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>오래된 토큰(Zombie) 쓰기 수</div>
-          <div style={{ fontSize: '20px', fontWeight: 700, color: '#3fb950', marginTop: '4px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>오래된 토큰(Zombie) 쓰기 수</div>
+          <div
+            data-testid="kpi-zombie-writes"
+            style={{ fontSize: '20px', fontWeight: 700, color: 'var(--color-status-online)', marginTop: '4px' }}
+          >
             {recoveryManager.getStaleWritesAllowed()} 건 (모의 검증; 물리 AC-07 UNMEASURED)
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>단조 Fencing Token (Epoch:Seq) 클라이언트 시뮬레이션 검증</div>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>단조 Fencing Token (Epoch:Seq) 클라이언트 시뮬레이션 검증</div>
         </div>
 
         <div
+          data-testid="kpi-card-recovery"
           style={{
-            backgroundColor: 'var(--color-bg-surface, #161b22)',
-            border: '1px solid #30363d',
-            borderRadius: 'var(--radius-lg, 8px)',
+            backgroundColor: 'var(--color-bg-surface)',
+            border: '1px solid var(--color-border-subtle)',
+            borderRadius: 'var(--radius-lg)',
             padding: '16px 20px',
           }}
         >
-          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>분산 복구 성공률 목표</div>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>분산 복구 성공률 목표</div>
           <div
             data-testid="kpi-recovery-rate"
             style={{
               fontSize: '20px',
               fontWeight: 700,
-              color: calculatedRate !== null ? '#58a6ff' : '#8b949e',
+              color: calculatedRate !== null ? 'var(--color-brand-hover)' : 'var(--color-text-secondary)',
               marginTop: '4px',
             }}
           >
             {calculatedRate !== null ? `${calculatedRate}% (모의 ${successfulCount}/${recoveryCount}회; 물리 AC-07 UNMEASURED)` : 'UNMEASURED (미측정)'}
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
             {recoveryCount > 0 ? '클라이언트 인메모리 Drain & Reconcile 시뮬레이션 결과' : '복구 이력 부재 (Drain & Reconcile 실행 필요)'}
           </div>
         </div>
@@ -241,28 +287,23 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
           data-testid="recovery-action-notice"
           style={{
             padding: '12px 18px',
-            borderRadius: '6px',
+            borderRadius: 'var(--radius-md)',
             fontSize: '13px',
             fontWeight: 500,
-            backgroundColor:
-              actionNotice.type === 'error'
-                ? 'rgba(248, 81, 73, 0.15)'
-                : actionNotice.type === 'success'
-                ? 'rgba(46, 160, 67, 0.15)'
-                : 'rgba(56, 139, 253, 0.15)',
+            backgroundColor: 'var(--color-bg-subtle)',
             border: `1px solid ${
               actionNotice.type === 'error'
-                ? '#f85149'
+                ? 'var(--color-status-offline)'
                 : actionNotice.type === 'success'
-                ? '#3fb950'
-                : '#58a6ff'
+                ? 'var(--color-status-online)'
+                : 'var(--color-brand-hover)'
             }`,
             color:
               actionNotice.type === 'error'
-                ? '#f85149'
+                ? 'var(--color-status-offline)'
                 : actionNotice.type === 'success'
-                ? '#3fb950'
-                : '#58a6ff',
+                ? 'var(--color-status-online)'
+                : 'var(--color-brand-hover)',
           }}
         >
           {actionNotice.text}
@@ -276,9 +317,9 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
           style={{
             padding: '48px 24px',
             textAlign: 'center',
-            backgroundColor: 'var(--color-bg-surface, #161b22)',
-            border: '1px solid #30363d',
-            borderRadius: 'var(--radius-lg, 8px)',
+            backgroundColor: 'var(--color-bg-surface)',
+            border: '1px solid var(--color-border-subtle)',
+            borderRadius: 'var(--radius-lg)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -286,10 +327,10 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
           }}
         >
           <div style={{ fontSize: '32px' }}>📡</div>
-          <div style={{ fontSize: '18px', fontWeight: 600, color: '#f0f6fc' }}>
+          <div style={{ fontSize: '18px', fontWeight: 600, color: 'var(--color-text-primary)' }}>
             클러스터에 등록된 노드가 없거나 관측 대기 중입니다
           </div>
-          <div style={{ fontSize: '13px', color: '#8b949e', maxWidth: '560px', lineHeight: '1.5' }}>
+          <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', maxWidth: '560px', lineHeight: '1.5' }}>
             현재 백엔드 제어 평면 또는 관측 파이프라인에서 전달된 가용 노드가 없습니다 (0대 또는 관측 수집 대기).
             노드가 등록되거나 관측이 수신된 후 분산 복구 및 펜싱 시뮬레이션을 실행할 수 있습니다.
           </div>
@@ -298,18 +339,14 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
         <>
           {/* Cluster Grid */}
           <div>
-            <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#f0f6fc', marginBottom: '12px' }}>
+            <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '12px' }}>
               Cluster Resilience &amp; Fencing Simulation (AC-07 모의 검증)
             </h3>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
               {resilientNodes.map((node) => {
                 const isSelected = selectedNode && node.nodeId === selectedNode.nodeId;
-                let statusColor = '#3fb950';
-                if (node.healthState === 'stale') statusColor = '#e3b341';
-                if (node.healthState === 'offline') statusColor = '#f85149';
-                if (node.healthState === 'fenced') statusColor = '#a371f7';
-                if (node.healthState === 'recovering') statusColor = '#58a6ff';
+                const healthCfg = NODE_HEALTH_CONFIG[node.healthState] || NODE_HEALTH_CONFIG.online;
 
                 return (
                   <div
@@ -327,16 +364,18 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
                       }
                     }}
                     style={{
-                      backgroundColor: '#161b22',
-                      border: isSelected ? '2px solid #58a6ff' : '1px solid #30363d',
-                      borderRadius: 'var(--radius-lg, 8px)',
+                      backgroundColor: 'var(--color-bg-surface)',
+                      border: isSelected ? '2px solid var(--color-brand-hover)' : '1px solid var(--color-border-subtle)',
+                      outline: isSelected ? '2px solid var(--color-brand-primary)' : 'none',
+                      outlineOffset: '2px',
+                      borderRadius: 'var(--radius-lg)',
                       padding: '16px',
                       cursor: 'pointer',
                       transition: 'border-color 0.2s',
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                      <span style={{ fontWeight: 600, color: '#f0f6fc', fontSize: '14px' }}>
+                      <span style={{ fontWeight: 600, color: 'var(--color-text-primary)', fontSize: '14px' }}>
                         {node.hostname}
                       </span>
                       <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
@@ -344,11 +383,11 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
                           data-testid={`node-actual-status-${node.nodeId}`}
                           style={{
                             padding: '2px 6px',
-                            borderRadius: '4px',
+                            borderRadius: 'var(--radius-sm)',
                             fontSize: '10px',
-                            color: '#8b949e',
-                            backgroundColor: '#21262d',
-                            border: '1px solid #30363d',
+                            color: 'var(--color-text-secondary)',
+                            backgroundColor: 'var(--color-bg-subtle)',
+                            border: '1px solid var(--color-border-subtle)',
                           }}
                           title="백엔드 제어 평면 실제 보고 상태"
                         >
@@ -358,20 +397,20 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
                           data-testid={`node-sim-status-${node.nodeId}`}
                           style={{
                             padding: '2px 8px',
-                            borderRadius: '4px',
+                            borderRadius: 'var(--radius-sm)',
                             fontSize: '11px',
                             fontWeight: 700,
-                            backgroundColor: `${statusColor}22`,
-                            color: statusColor,
-                            border: `1px solid ${statusColor}`,
+                            backgroundColor: healthCfg.bg,
+                            color: healthCfg.color,
+                            border: `1px solid ${healthCfg.border}`,
                           }}
                         >
-                          시뮬레이션: {node.healthState.toUpperCase()}
+                          시뮬레이션: {healthCfg.label}
                         </span>
                       </div>
                     </div>
 
-                    <div style={{ fontSize: '12px', color: '#8b949e', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       <div>Fencing Token: <code>Epoch {node.fencingToken.epoch} : Seq {node.fencingToken.sequence}</code></div>
                       <div>Heartbeat: {node.heartbeatAgeSeconds >= 0 ? `${node.heartbeatAgeSeconds}s ago` : '미보고'}</div>
                       <div>Active Workspaces: {node.activeWorkspacesCount}</div>
@@ -386,15 +425,15 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
           {/* Targeted Failure Injection Panel */}
           <div
             style={{
-              backgroundColor: '#161b22',
-              border: '1px solid #30363d',
-              borderRadius: 'var(--radius-lg, 8px)',
+              backgroundColor: 'var(--color-bg-surface)',
+              border: '1px solid var(--color-border-subtle)',
+              borderRadius: 'var(--radius-lg)',
               padding: '20px',
             }}
           >
-            <h4 style={{ margin: '0 0 16px 0', fontSize: '15px', color: '#f0f6fc' }}>
+            <h4 style={{ margin: '0 0 16px 0', fontSize: '15px', color: 'var(--color-text-primary)' }}>
               Fault Injection &amp; Recovery Actions for Target:{' '}
-              <span style={{ color: '#58a6ff' }}>{selectedNode ? selectedNode.hostname : '(선택된 노드 없음)'}</span>
+              <span style={{ color: 'var(--color-brand-hover)' }}>{selectedNode ? selectedNode.hostname : '(선택된 노드 없음)'}</span>
             </h4>
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
@@ -441,9 +480,9 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
             {/* ADR-043 Writable Generation Panel */}
             <div
               style={{
-                backgroundColor: '#161b22',
-                border: '1px solid #30363d',
-                borderRadius: 'var(--radius-lg, 8px)',
+                backgroundColor: 'var(--color-bg-surface)',
+                border: '1px solid var(--color-border-subtle)',
+                borderRadius: 'var(--radius-lg)',
                 padding: '20px',
                 display: 'flex',
                 flexDirection: 'column',
@@ -452,10 +491,10 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <h4 style={{ margin: 0, fontSize: '15px', color: '#f0f6fc' }}>
+                  <h4 style={{ margin: 0, fontSize: '15px', color: 'var(--color-text-primary)' }}>
                     ADR-043 Writable Generation &amp; Checkouts (모의)
                   </h4>
-                  <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
+                  <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: 'var(--color-text-secondary)' }}>
                     격리된 복원 사본(0400 readonly)과 분리된 독립 private root의 수정 가능 세대(0600 file / 0700 dir, 단조 epoch 보증)
                   </p>
                 </div>
@@ -474,7 +513,7 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
                 {checkouts.length === 0 ? (
                   <div
                     data-testid="recovery-no-checkouts"
-                    style={{ color: '#8b949e', fontSize: '13px', textAlign: 'center', margin: 'auto' }}
+                    style={{ color: 'var(--color-text-secondary)', fontSize: '13px', textAlign: 'center', margin: 'auto' }}
                   >
                     생성된 시뮬레이션 체크아웃이 없습니다. (모의)
                   </div>
@@ -483,18 +522,20 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
                     <div
                       key={chk.checkoutId}
                       style={{
-                        backgroundColor: '#0d1117',
-                        border: '1px solid #30363d',
-                        borderRadius: '6px',
+                        backgroundColor: 'var(--color-bg-subtle)',
+                        border: '1px solid var(--color-border-subtle)',
+                        borderRadius: 'var(--radius-md)',
                         padding: '10px 14px',
                         fontSize: '12px',
                       }}
                     >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', color: '#58a6ff', fontWeight: 600 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--color-brand-hover)', fontWeight: 600 }}>
                         <span>{chk.checkoutId}</span>
-                        <span style={{ color: '#3fb950' }}>{chk.status.toUpperCase()} (모의)</span>
+                        <span style={{ color: chk.status === 'active' ? 'var(--color-status-online)' : 'var(--color-status-neutral)' }}>
+                          {chk.status.toUpperCase()} (모의)
+                        </span>
                       </div>
-                      <div style={{ color: '#8b949e', marginTop: '4px' }}>
+                      <div style={{ color: 'var(--color-text-secondary)', marginTop: '4px' }}>
                         Inode: <code>{chk.inode}</code> | Permissions: <code>{chk.permissions}</code> | Epoch: <code>{chk.epoch}</code>
                       </div>
                     </div>
@@ -506,9 +547,9 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
             {/* Late Result Rejection Audit Stream */}
             <div
               style={{
-                backgroundColor: '#161b22',
-                border: '1px solid #30363d',
-                borderRadius: 'var(--radius-lg, 8px)',
+                backgroundColor: 'var(--color-bg-surface)',
+                border: '1px solid var(--color-border-subtle)',
+                borderRadius: 'var(--radius-lg)',
                 padding: '20px',
                 display: 'flex',
                 flexDirection: 'column',
@@ -516,40 +557,41 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h4 style={{ margin: 0, fontSize: '15px', color: '#f0f6fc' }}>
+                <h4 style={{ margin: 0, fontSize: '15px', color: 'var(--color-text-primary)' }}>
                   Late Result Rejection Stream (Monotonic Fencing)
                 </h4>
-                <span style={{ fontSize: '12px', color: '#8b949e' }}>
+                <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
                   Total Rejections: {lateRejections.length}
                 </span>
               </div>
 
               <div style={{ flex: 1, minHeight: '200px', maxHeight: '260px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {lateRejections.length === 0 ? (
-                  <div style={{ color: '#8b949e', fontSize: '13px', textAlign: 'center', margin: 'auto' }}>
+                  <div style={{ color: 'var(--color-text-secondary)', fontSize: '13px', textAlign: 'center', margin: 'auto' }}>
                     No late result rejections yet. Click "Attempt Stale Token Write" to test zombie blocking.
                   </div>
                 ) : (
                   lateRejections.map((rej) => (
                     <div
                       key={rej.requestId}
+                      data-testid={`rejection-item-${rej.requestId}`}
                       style={{
-                        backgroundColor: '#0d1117',
-                        border: '1px solid #f85149',
-                        borderRadius: '6px',
+                        backgroundColor: 'var(--color-bg-subtle)',
+                        border: '1px solid var(--color-status-offline)',
+                        borderRadius: 'var(--radius-md)',
                         padding: '8px 12px',
                         fontSize: '12px',
                       }}
                     >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', color: '#f85149', fontWeight: 600 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--color-status-offline)', fontWeight: 600 }}>
                         <span>BLOCKED: {rej.requestId}</span>
                         <span>{new Date(rej.rejectedAt).toLocaleTimeString()}</span>
                       </div>
-                      <div style={{ color: '#8b949e', marginTop: '4px' }}>
+                      <div style={{ color: 'var(--color-text-secondary)', marginTop: '4px' }}>
                         Attempted: <code>Epoch {rej.attemptedToken.epoch} : Seq {rej.attemptedToken.sequence}</code> vs
                         Current: <code>Epoch {rej.currentToken.epoch} : Seq {rej.currentToken.sequence}</code>
                       </div>
-                      <div style={{ color: '#f85149', fontSize: '11px', marginTop: '2px' }}>{rej.reason}</div>
+                      <div style={{ color: 'var(--color-status-offline)', fontSize: '11px', marginTop: '2px' }}>{rej.reason}</div>
                     </div>
                   ))
                 )}
@@ -560,18 +602,18 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
           {/* Reconciliation Audit Trail */}
           <div
             style={{
-              backgroundColor: '#161b22',
-              border: '1px solid #30363d',
-              borderRadius: 'var(--radius-lg, 8px)',
+              backgroundColor: 'var(--color-bg-surface)',
+              border: '1px solid var(--color-border-subtle)',
+              borderRadius: 'var(--radius-lg)',
               padding: '20px',
             }}
           >
-            <h4 style={{ margin: '0 0 12px 0', fontSize: '15px', color: '#f0f6fc' }}>
+            <h4 style={{ margin: '0 0 12px 0', fontSize: '15px', color: 'var(--color-text-primary)' }}>
               Cluster Reconciliation Audit Trail (AC-07 모의 복구 시뮬레이션; 물리 AC-07 UNMEASURED)
             </h4>
 
             {reconciliations.length === 0 ? (
-              <div style={{ color: '#8b949e', fontSize: '13px', textAlign: 'center', padding: '16px' }}>
+              <div style={{ color: 'var(--color-text-secondary)', fontSize: '13px', textAlign: 'center', padding: '16px' }}>
                 No node reconciliations triggered yet.
               </div>
             ) : (
@@ -579,29 +621,30 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
                 {reconciliations.map((rec) => (
                   <div
                     key={rec.reconciliationId}
+                    data-testid={`reconciliation-item-${rec.reconciliationId}`}
                     style={{
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
-                      backgroundColor: '#0d1117',
+                      backgroundColor: 'var(--color-bg-subtle)',
                       padding: '10px 14px',
-                      borderRadius: '6px',
+                      borderRadius: 'var(--radius-md)',
                       fontSize: '13px',
-                      border: '1px solid #30363d',
+                      border: '1px solid var(--color-border-subtle)',
                     }}
                   >
                     <div>
-                      <span style={{ fontWeight: 600, color: '#f0f6fc' }}>Node: {rec.nodeId}</span>
-                      <span style={{ color: '#8b949e', marginLeft: '12px' }}>
+                      <span style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>Node: {rec.nodeId}</span>
+                      <span style={{ color: 'var(--color-text-secondary)', marginLeft: '12px' }}>
                         Evacuated: <strong>{rec.evacuatedWorkspacesCount}</strong> workspaces
                       </span>
-                      <span style={{ color: '#8b949e', marginLeft: '12px' }}>
+                      <span style={{ color: 'var(--color-text-secondary)', marginLeft: '12px' }}>
                         New Fencing Epoch: <strong>{rec.newEpoch}</strong>
                       </span>
                     </div>
                     <span
                       style={{
-                        color: rec.recoverySuccess ? '#3fb950' : '#f85149',
+                        color: rec.recoverySuccess ? 'var(--color-status-online)' : 'var(--color-status-offline)',
                         fontWeight: 600,
                         fontSize: '12px',
                       }}
