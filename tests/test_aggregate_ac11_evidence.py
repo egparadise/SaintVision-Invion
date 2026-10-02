@@ -337,6 +337,8 @@ def security_envelope(allowlist: dict) -> dict:
     value = envelope("security-critical-high-zero")
     value["observations"] = security_reports(allowlist)
     value["targetRef"] = target("security-critical-high-zero", {})
+    # The envelope names the importer that wrote it, bound to the source tree (#313 F-R3).
+    value["importerFile"] = copy.deepcopy(SCAN_ALLOWLIST["importer"])
     return value
 
 
@@ -892,6 +894,34 @@ def test_security_scan_reviewed_exception_requires_reason_and_unexpired_exact_id
     missing_reason["acceptedFindings"][0]["reason"] = ""
     with pytest.raises(ValueError, match="reason is required"):
         tool.validate_scan_allowlist(missing_reason)
+
+
+def test_security_envelope_must_name_an_importer_the_source_tree_contains(allowlist):
+    """#313 F-R3: the adapter that wrote the envelope has to exist at sourceHeadSha.
+
+    The allowlist's three pins are compared against the source tree below, but only after
+    all four threat reports are present -- so an envelope written by an importer the tree
+    does not contain was accepted as long as three reports were still missing.
+    """
+
+    absent = security_envelope(allowlist)
+    absent.pop("importerFile")
+    assert axis_result(absent, allowlist).verdict is tool.Verdict.INVALID_RUN
+
+    drifted = security_envelope(allowlist)
+    drifted["importerFile"]["blob"] = "0" * 40
+    assert axis_result(drifted, allowlist).verdict is tool.Verdict.INVALID_RUN
+
+    elsewhere = security_envelope(allowlist)
+    elsewhere["importerFile"]["path"] = "tools/not_pinned_anywhere.py"
+    assert axis_result(elsewhere, allowlist).verdict is tool.Verdict.INVALID_RUN
+
+    # It is checked before the missing-report answer, so it cannot hide behind NOT_OBSERVED.
+    partial = security_envelope(allowlist)
+    partial["verdict"] = "NOT_OBSERVED"
+    partial["observations"].pop()
+    partial["importerFile"]["blob"] = "0" * 40
+    assert axis_result(partial, allowlist).verdict is tool.Verdict.INVALID_RUN
 
 
 def test_security_scan_tool_or_scope_object_drift_is_invalid(allowlist):
