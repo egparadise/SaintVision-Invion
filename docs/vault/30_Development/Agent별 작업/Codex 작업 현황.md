@@ -19,6 +19,7 @@ active_card_next: "Claude design review; after approval, implement strict contra
   policy, provider, lease, evidence and approval actors remain server-owned and are revalidated.
 - The immutable pre-approval authority needs migration 0061; no migration or public contract is
   implemented before Claude approves the design. Flag default off and S08-BE score remain unchanged.
+- Design review: PR #341, reviewer Claude.
 - [[2026-10-03_01-06-39_KST_Card246_S08-BE_BuildRequest_제품_진입점_설계_Codex]].
 
 ## 2026-10-02 Card 232 — S08-BE product worker loop and trusted intent producer

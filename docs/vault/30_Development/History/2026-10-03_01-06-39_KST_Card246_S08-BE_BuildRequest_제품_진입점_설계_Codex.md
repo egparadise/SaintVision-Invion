@@ -32,5 +32,6 @@ intent를 서버 소유 BuildRequest/BuildPlan/PolicyDecision으로 바꾸는 �
   0061 배정을 요청한다. 이 PR에는 migration이나 공개 schema 변경이 없다.
 - flag 기본 off, 실제 builder/LAN 인수 NOT_OBSERVED, S08-BE 점수 불변이다.
 
-상세 정본은 [[S08-BE_BuildRequest_제품_진입점_설계]]이다.
+설계 PR은 [#341](https://github.com/egparadise/SaintVision-Invion/pull/341)이며 reviewer는 Claude다.
 
+상세 정본은 [[S08-BE_BuildRequest_제품_진입점_설계]]이다.
