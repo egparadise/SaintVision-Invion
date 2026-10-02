@@ -42,7 +42,7 @@ EMITTED_AXES: tuple[str, ...] = (
     "irreversible-restore-forward",
 )
 REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
-REGISTRY_BLOB = "eeb43dc262f5de1816237ef85fc902cdca4ab6fd"
+REGISTRY_BLOB = "60800cc0a86aa723f04308f2f38786423a94f968"
 TARGET_ID = "s11-irreversible-restore-forward-v0"
 REVERSIBLE_TARGET_ID = "s11-migration-reversible-roundtrip-v1"
 HEX40 = re.compile(r"^[0-9a-f]{40}$")
