@@ -3,8 +3,9 @@
 tools/test_c218_mutations.py
 
 Card 218 (ACC-09) Distributed Recovery screen (DistributedRecoveryView.tsx) Mutation Testing Suite.
-Verifies that 16 distinct regressions/mutations (M1-M16) across
+Verifies that 18 distinct regressions/mutations (M1-M18) across
 color contrast, border collisions, status semantics, testid binding,
+outline focus ring preservation, non-color label distinctness,
 and fail-closed multiset inventory are strictly caught and killed by the test suite
 (ACC-09 Test 9j, Test 9j-2, and Test 10).
 
@@ -62,16 +63,16 @@ MUTANTS = [
     {
         'id': 'M4 (A4)',
         'name': 'DistributedRecoveryView: node card unselected border -> bg-surface (border==bg collision)',
-        'target': "                      border: isSelected ? '2px solid var(--color-brand-hover)' : '1px solid var(--color-border-subtle)',\n                      outline: isSelected ? '2px solid var(--color-brand-primary)' : 'none',",
-        'replacement': "                      border: isSelected ? '2px solid var(--color-brand-hover)' : '1px solid var(--color-bg-surface)',\n                      outline: isSelected ? '2px solid var(--color-brand-primary)' : 'none',",
+        'target': "                      border: isSelected ? '2px solid var(--color-brand-hover)' : '1px solid var(--color-border-subtle)',",
+        'replacement': "                      border: isSelected ? '2px solid var(--color-brand-hover)' : '1px solid var(--color-bg-surface)',",
         'expected_guard': 'Test 9j-2 (AST guard: border-background collision) & Test 9j',
     },
     {
         'id': 'M5 (B1)',
-        'name': 'DistributedRecoveryView: selected node card outline ring removed',
-        'target': "                      border: isSelected ? '2px solid var(--color-brand-hover)' : '1px solid var(--color-border-subtle)',\n                      outline: isSelected ? '2px solid var(--color-brand-primary)' : 'none',\n                      outlineOffset: '2px',",
-        'replacement': "                      border: isSelected ? '2px solid var(--color-brand-hover)' : '1px solid var(--color-border-subtle)',\n                      outline: 'none',\n                      outlineOffset: '2px',",
-        'expected_guard': 'Test 9j (DOM assertion: nodeCard1 outline must contain brand-primary)',
+        'name': 'DistributedRecoveryView: unselected node card given inline outline: "none" (destroying :focus-visible keyboard focus ring)',
+        'target': "                      border: isSelected ? '2px solid var(--color-brand-hover)' : '1px solid var(--color-border-subtle)',",
+        'replacement': "                      border: isSelected ? '2px solid var(--color-brand-hover)' : '1px solid var(--color-border-subtle)',\n                      outline: 'none',",
+        'expected_guard': 'Test 9j (DOM assertion: nodeCard2 outline must be empty string to preserve :focus-visible)',
     },
     {
         'id': 'M6 (C1)',
@@ -150,6 +151,20 @@ MUTANTS = [
         'replacement': "  fenced: {\n    label: 'FENCED',\n    color: 'var(--color-status-neutral)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-border-subtle)',\n  },",
         'expected_guard': 'Test 9j (DOM assertion: fenced border must match border-strong token)',
     },
+    {
+        'id': 'M17 (G2)',
+        'name': 'DistributedRecoveryView: recovering label set to empty string (M8a non-color a11y)',
+        'target': "  recovering: {\n    label: 'RECOVERING',\n    color: 'var(--color-status-active)',",
+        'replacement': "  recovering: {\n    label: '',\n    color: 'var(--color-status-active)',",
+        'expected_guard': 'Test 9j (DOM / Config assertion: all health labels must be non-empty and recovering label must be RECOVERING)',
+    },
+    {
+        'id': 'M18 (G3)',
+        'name': 'DistributedRecoveryView: recovering label collapsed to ONLINE (M8d non-color state collapse)',
+        'target': "  recovering: {\n    label: 'RECOVERING',\n    color: 'var(--color-status-active)',",
+        'replacement': "  recovering: {\n    label: 'ONLINE',\n    color: 'var(--color-status-active)',",
+        'expected_guard': 'Test 9j (DOM / Config assertion: all 5 labels must be distinct and recovering label must be RECOVERING)',
+    },
 ]
 
 def run_test():
@@ -188,7 +203,7 @@ def extract_failure_reason(stdout, stderr):
 
 def main():
     print('================================================================================')
-    print(' Card 218 (ACC-09): Reproducible Mutant Test Suite (16 Mutants: M1-M16)')
+    print(' Card 218 (ACC-09): Reproducible Mutant Test Suite (18 Mutants: M1-M18)')
     print(' Target: DistributedRecoveryView.tsx')
     print('================================================================================\n')
 

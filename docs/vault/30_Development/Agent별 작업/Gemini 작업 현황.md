@@ -44,28 +44,28 @@ source_of_truth: "Git"
 - 확인 기준: 2026-10-02T02:05:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer r1 조치: Claude UI r1 및 Codex r1 피드백 전수 반영 — R1 버튼 요소 DEF-S11-09 위반 해소 `var(--color-brand-primary-bg)` 및 `--color-brand-primary-fg` 승격; R2 활성 네임스페이스 칩 및 버전 배지 `var(--color-brand-hover)` 적용 5.49:1(Light)/8.11:1(Dark), 비활성 버튼 `var(--color-bg-subtle)`/`var(--color-text-muted)`/`var(--color-border-subtle)` 5.25:1/5.78:1 및 3.18:1/3.08:1 충족; R3 실제 렌더 배경 기반 전수 실측표 재구성; R4 Test 9c 확장 및 10종 변이 M1~M10 100% 사살 실측; R5 History 제어 바이트 60개 전수 제거 완료; 보라색 리터럴 의도적 브랜드 통합 명시; Vitest 14 passed, s11-defect-fixes 16 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-02T01:20:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer Light/Dark 명도 대비 전수 감사 및 디자인 토큰 승격: base db37dbc5 위 작업, ResourceExplorer 390건 -> 0건, InvFileExplorer 124건 -> 0건 100% 해소, COLOR_LITERAL_MULTISET_BASELINE 양 파일 {} 래칫, border-subtle 232건/22개 파일 래칫, DOM 실제 렌더링 동적 대비 단언 신설, 변이 M1~M4 100% 사살 실측, Vitest 9개 스위트 139 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 
-## 2026-10-02 분산 복구 화면 (DistributedRecoveryView) 색상 리터럴 전수 토큰화(16종/81 occurrences→0), 클러스터 헬스 상태 색 정합성 및 접근성 승격 (Card 218, `agent/gemini/c218-recovery-contrast`, base `3ebfb1b8` PR #314 r3 head)
+## 2026-10-02 분산 복구 화면 (DistributedRecoveryView) 색상 리터럴 전수 토큰화(16종/81 occurrences→0), 클러스터 헬스 상태 색 정합성 및 접근성 승격 [r2] (Card 218, `agent/gemini/c218-recovery-contrast`, base `3ebfb1b8` PR #314 r3 head)
 - **개요**: ACC-09 다음 영역인 분산 복구 화면(`DistributedRecoveryView.tsx`)의 색상 리터럴 inventory 전수(16종/81 occurrences→0), 대비 표본/DOM 결속 감사 및 클러스터 헬스 상태 접근성 승격:
   1. **색상 리터럴 전수 해소 및 의도적 상태 디자인 승격 (Card 213 & 215 정합)**:
-     - `DistributedRecoveryView.tsx`: 기존 16종(81 occurrences) $ightarrow$ **0건** (전수 제거).
+     - `DistributedRecoveryView.tsx`: 기존 16종(81 occurrences) -> **0건** (전수 제거).
      - `NODE_HEALTH_CONFIG` 객체 리터럴 컴포넌트 최상단 정의 및 export: 5대 헬스 상태(`online`, `stale`, `offline`, `recovering`, `fenced`)의 전경색 및 테두리를 플랫폼 정본 토큰으로 승격.
      - `recovering` 상태: `var(--color-status-active)` (스카이블루, 테두리 일치)로 승격하여 `RunDetail.tsx`(Card 213) 및 `RunList.tsx`(Card 215)와의 화면 간 불일치 완전 해소.
      - `fenced` 상태: `var(--color-status-neutral)` (회색 텍스트/배경) 및 `var(--color-border-strong)` 테두리로 격리 상태 고유 시맨틱 부여.
      - `online` (`var(--color-status-online)`), `stale` (`var(--color-status-degraded)`), `offline` (`var(--color-status-offline)`).
-     - 노드 카드 활성 선택 링: `outline: isSelected ? '2px solid var(--color-brand-primary)' : 'none'`, `outlineOffset: '2px'`를 적용하여 캔버스/서피스 대비 6.47:1(Light) / 5.75:1(Dark) >= 3.0:1 보장.
-     - 공지 배너(`recovery-unexposed-notice`): `var(--color-bg-subtle)` 배경, `var(--color-border-subtle)` 테두리, `var(--color-text-secondary)` 텍스트.
-     - KPI 카드(`recovery-kpi-card-*`): 서피스 배경, `var(--color-text-primary)` 값 (13.79:1/14.33:1), `var(--color-text-muted)` 레이블 (5.25:1/5.78:1).
-     - 장애 주입 모달 및 시뮬레이션 제어기: `var(--color-bg-surface)` 배경, `var(--color-border-subtle)` 구분선, 텍스트 및 라디오/입력 폼 전수 토큰화.
-     - 비색상 식별 수단(레이블 `시뮬레이션: 상태`, 🚨 배지, BLOCKED 칩 등) 100% 보존.
+     - 노드 카드 선택 및 포커스 분리: 선택 시 `border: '2px solid var(--color-brand-hover)'`를 적용하고, 인라인 outline을 제거하여 `index.css` 전역 `:focus-visible` 키보드 포커스 링(`outline: 2px solid var(--color-brand-primary)`, `offset: 2px`)을 온전히 보존.
+     - 공지 배너(`recovery-unexposed-notice`): `var(--color-bg-subtle)` 배경, `var(--color-brand-hover)` 테두리 및 텍스트 (Light 6.12:1 / Dark 8.14:1 >= 4.5:1).
+     - KPI 카드(`kpi-card-detection`, `kpi-card-zombie`, `kpi-card-recovery`): 서피스 배경, `var(--color-border-subtle)` 테두리, 좀비 쓰기 수치 `var(--color-status-online)`, 성공률 `var(--color-brand-hover)`, 감지 시간 레이블 `var(--color-text-secondary)`.
+     - 장애 시뮬레이션 제어기 및 패널(ADR-043 체크아웃, 거부 감사 스트림, 복원 감사 패널): `var(--color-bg-surface)` 패널 배경, `var(--color-bg-subtle)` 아이템 배경, `var(--color-border-subtle)` 구분선, 거부 항목 `var(--color-status-offline)` 테두리/텍스트, 복원 상태 `var(--color-status-online)` 전수 토큰화.
+     - 비색상 식별 수단(5대 헬스 레이블 `ONLINE`, `STALE`, `OFFLINE`, `RECOVERING`, `FENCED`, 🚨 배지, BLOCKED 칩 등) 100% 보존.
   2. **Fail-Closed Multiset Baseline 래칫 강제**:
      - `acc09-contrast-tokens.test.tsx`의 `COLOR_LITERAL_MULTISET_BASELINE`에서 `features/recovery/DistributedRecoveryView.tsx`의 허용 인벤토리를 `{}` (0건)으로 전면 고정.
-     - `var(--color-border-subtle)` 사용 횟수 388건 $ightarrow$ **400건**(+12건), 파일 수 26개 $ightarrow$ **27개**(+1개)로 fail-closed 단언 갱신.
-     - 레거시 리터럴 상한치 강화 (`#30363d` <= 45/8).
-  3. **실제 렌더링 DOM 기반 동적 대비 단언 및 16종 변이 100% 사살**:
-     - Test 9j 신설: 공지 배너, 4개 KPI 카드, 5개 노드 카드 헬스 배지 전경/배경/테두리 명도 대비(텍스트 >= 4.5:1, 비텍스트/테두리 >= 3.0:1) 동적 단언, 선택 노드 카드 outline 링(2px solid var(--color-brand-primary), offset 2px) 단언, 시뮬레이션 상태 뱃지 4종(파티션, 좀비, 리컨실, 체크아웃) 단언, opacity 0.4 저하 금지 단언, 빈 상태 뷰 단언.
-     - Test 9j-2 신설: DistributedRecoveryView 68개 style 속성 및 NODE_HEALTH_CONFIG 객체 리터럴 AST 검사 로직(checkConfigTables) 기반 스타일-쌍 명도 대비 계산 및 커버리지 래칫 (checkedObjects 8, checkedPairs 47, unboundColorObjects 34, coveredColorObjects 42, checkedBorderObjects 20, checkedBorderPairs 23, violations 0).
+     - `var(--color-border-subtle)` 사용 횟수 388건 -> **401건**(+13건), 파일 수 26개 -> **27개**(+1개)로 fail-closed 단언 갱신.
+     - 레거시 리터럴 상한치 강화 (`#30363d` <= 43/8, 실측치 정확 고정).
+  3. **실제 렌더링 DOM 기반 동적 대비 단언 및 18종 변이 100% 사살**:
+     - Test 9j 신설: 공지 배너, 3개 KPI 카드, 4개 노드 카드(온라인, 스테일, 오프라인, 복구 중) 헬스 배지 전경/배경/테두리 명도 대비 동적 단언, 선택 카드 2px brand-hover 테두리 및 인라인 outline 제거(:focus-visible 보존) 단언, 5대 헬스 상태 레이블(ONLINE, STALE, OFFLINE, RECOVERING, FENCED) 비색상 식별 수단 고유성 단언, 시뮬레이션 상태 뱃지 4종(파티션, 좀비, 리컨실, 체크아웃) 단언, opacity 0.4 저하 금지 단언, 빈 상태 뷰 단언.
+     - Test 9j-2 신설: DistributedRecoveryView 68개 style 속성 및 NODE_HEALTH_CONFIG 객체 리터럴 AST 검사 로직(checkConfigTables) 기반 스타일-쌍 명도 대비 계산 및 커버리지 래칫 (checkedObjects 8, checkedPairs 47, unboundColorObjects 34, coveredColorObjects 42, checkedBorderObjects 20, checkedBorderPairs 23, violations 0), raw color literal 위반 검출 가드 추가.
      - Revert-Fail Probes 71~75 추가 (Probe 71 #58a6ff 2.31:1 fail, Probe 72 #3fb950 2.32:1 fail, Probe 73 #8b949e 3.08:1 fail, Probe 74 #f85149 3.06:1 fail, Probe 75 #e3b341 1.78:1 fail).
-     - `tools/test_c218_mutations.py` 신규 커밋: 16종 변이 M1~M16 전원 사살 실측 (16/16 = 100% killed, exit code 0).
+     - `tools/test_c218_mutations.py` 신규 커밋: 18종 변이 M1~M18 전원 사살 실측 (18/18 = 100% killed, exit code 0).
      - `tools/reproduce_c218_contrast.py` 21개 지표 실측 통과.
   4. **잔여 백로그 현황**:
      - 분산 복구 화면 잔여 색상 리터럴: **0건**.
@@ -73,7 +73,7 @@ source_of_truth: "Git"
 - **관측 근거 (Evidence)**:
   - 단위 시험: `npx vitest run tests/acc09-contrast-tokens.test.tsx` (27 passed, exit 0)
   - 연관 복구 시험: `npx vitest run tests/defect-recovery-admin-recovery-editor.test.tsx` (26 passed 100%, exit 0)
-  - 변이 불변식 실측: `python tools/test_c218_mutations.py` (16 / 16 killed 100%, exit code 0)
+  - 변이 불변식 실측: `python tools/test_c218_mutations.py` (18 / 18 killed 100%, exit code 0)
   - 명도 대비 재현: `python tools/reproduce_c218_contrast.py` (21개 항목 전수 실측 통과, exit code 0)
   - 타입 검사: `cd apps/web && npx tsc -b` (에러 0건, 클린 통과, exit 0)
   - 프로덕션 빌드: `cd apps/web && npm run build` (built in ~8.6s, exit 0)

@@ -41,39 +41,40 @@ def cr(c1, c2):
 
 # Backgrounds in DistributedRecoveryView:
 # Canvas: Light #f8fafc, Dark #090d16
-# Surface: Light #ffffff, Dark #111827 (originally hardcoded #161b22)
-# Subtle: Light #f1f5f9, Dark #1f2937 (originally hardcoded #0d1117 / #21262d)
+# Surface: Light #ffffff, Dark #111827 (originally var(--color-bg-surface, #161b22))
+# Card/Panel: Hardcoded #161b22 in both light and dark in base 3ebfb1b8
+# Items: Hardcoded #0d1117 in both light and dark in base 3ebfb1b8
 
 dark_canvas = "#090d16"
 light_canvas = "#f8fafc"
-dark_card_base = "#161b22"
-light_card_base = "#ffffff"
-dark_item_base = "#0d1117"
-light_item_base = "#0d1117"
+dark_surface = "#111827"
+light_surface = "#ffffff"
+base_card_bg = "#161b22"
+base_item_bg = "#0d1117"
 
-# 21 items corresponding to all key UI elements
+# 21 items corresponding to all key UI elements with actual base 3ebfb1b8 renders
 items = [
     ("unexposed notice banner / canvas", "#58a6ff", "#58a6ff", alpha_composite((56, 139, 253, 0.10), light_canvas), alpha_composite((56, 139, 253, 0.10), dark_canvas), "--color-brand-hover", "--color-bg-subtle"),
-    ("kpi detection title / surface", "#8b949e", "#8b949e", light_card_base, dark_card_base, "--color-text-secondary", "--color-bg-surface"),
-    ("kpi zombie write count / surface", "#3fb950", "#3fb950", light_card_base, dark_card_base, "--color-status-online", "--color-bg-surface"),
-    ("kpi recovery rate text / surface", "#58a6ff", "#58a6ff", light_card_base, dark_card_base, "--color-brand-hover", "--color-bg-surface"),
+    ("kpi detection title / surface", "#8b949e", "#8b949e", light_surface, dark_surface, "--color-text-secondary", "--color-bg-surface"),
+    ("kpi zombie write count / surface", "#3fb950", "#3fb950", light_surface, dark_surface, "--color-status-online", "--color-bg-surface"),
+    ("kpi recovery rate text / surface", "#58a6ff", "#58a6ff", light_surface, dark_surface, "--color-brand-hover", "--color-bg-surface"),
     ("action notice error / canvas", "#f85149", "#f85149", alpha_composite((248, 81, 73, 0.15), light_canvas), alpha_composite((248, 81, 73, 0.15), dark_canvas), "--color-status-offline", "--color-bg-subtle"),
     ("action notice success / canvas", "#3fb950", "#3fb950", alpha_composite((46, 160, 67, 0.15), light_canvas), alpha_composite((46, 160, 67, 0.15), dark_canvas), "--color-status-online", "--color-bg-subtle"),
     ("action notice info / canvas", "#58a6ff", "#58a6ff", alpha_composite((56, 139, 253, 0.15), light_canvas), alpha_composite((56, 139, 253, 0.15), dark_canvas), "--color-brand-hover", "--color-bg-subtle"),
-    ("empty screen title / surface", "#f0f6fc", "#f0f6fc", light_card_base, dark_card_base, "--color-text-primary", "--color-bg-surface"),
-    ("node card title / surface", "#f0f6fc", "#f0f6fc", light_card_base, dark_card_base, "--color-text-primary", "--color-bg-surface"),
+    ("empty screen title / surface", "#f0f6fc", "#f0f6fc", light_surface, dark_surface, "--color-text-primary", "--color-bg-surface"),
+    ("node card title / surface", "#f0f6fc", "#f0f6fc", base_card_bg, base_card_bg, "--color-text-primary", "--color-bg-surface"),
     ("node actual status badge / card", "#8b949e", "#8b949e", "#21262d", "#21262d", "--color-text-secondary", "--color-bg-subtle"),
-    ("badge: online / card", "#3fb950", "#3fb950", alpha_composite((63, 185, 80, 0.133), light_card_base), alpha_composite((63, 185, 80, 0.133), dark_card_base), "--color-status-online", "--color-bg-subtle"),
-    ("badge: stale / card", "#e3b341", "#e3b341", alpha_composite((227, 179, 65, 0.133), light_card_base), alpha_composite((227, 179, 65, 0.133), dark_card_base), "--color-status-degraded", "--color-bg-subtle"),
-    ("badge: offline / card", "#f85149", "#f85149", alpha_composite((248, 81, 73, 0.133), light_card_base), alpha_composite((248, 81, 73, 0.133), dark_card_base), "--color-status-offline", "--color-bg-subtle"),
-    ("badge: recovering / card", "#58a6ff", "#58a6ff", alpha_composite((88, 166, 255, 0.133), light_card_base), alpha_composite((88, 166, 255, 0.133), dark_card_base), "--color-status-active", "--color-bg-subtle"),
-    ("badge: fenced / card", "#a371f7", "#a371f7", alpha_composite((163, 113, 247, 0.133), light_card_base), alpha_composite((163, 113, 247, 0.133), dark_card_base), "--color-status-neutral", "--color-bg-subtle"),
-    ("target action node name / surface", "#58a6ff", "#58a6ff", light_card_base, dark_card_base, "--color-brand-hover", "--color-bg-surface"),
-    ("checkout item id link / subtle", "#58a6ff", "#58a6ff", dark_item_base, dark_item_base, "--color-brand-hover", "--color-bg-subtle"),
-    ("checkout item active badge / subtle", "#3fb950", "#3fb950", dark_item_base, dark_item_base, "--color-status-online", "--color-bg-subtle"),
-    ("rejection item blocked text / subtle", "#f85149", "#f85149", dark_item_base, dark_item_base, "--color-status-offline", "--color-bg-subtle"),
-    ("reconciliation item success / subtle", "#3fb950", "#3fb950", dark_item_base, dark_item_base, "--color-status-online", "--color-bg-subtle"),
-    ("reconciliation item failure / subtle", "#f85149", "#f85149", dark_item_base, dark_item_base, "--color-status-offline", "--color-bg-subtle"),
+    ("badge: online / card", "#3fb950", "#3fb950", alpha_composite((63, 185, 80, 34/255), base_card_bg), alpha_composite((63, 185, 80, 34/255), base_card_bg), "--color-status-online", "--color-bg-subtle"),
+    ("badge: stale / card", "#e3b341", "#e3b341", alpha_composite((227, 179, 65, 34/255), base_card_bg), alpha_composite((227, 179, 65, 34/255), base_card_bg), "--color-status-degraded", "--color-bg-subtle"),
+    ("badge: offline / card", "#f85149", "#f85149", alpha_composite((248, 81, 73, 34/255), base_card_bg), alpha_composite((248, 81, 73, 34/255), base_card_bg), "--color-status-offline", "--color-bg-subtle"),
+    ("badge: recovering / card", "#58a6ff", "#58a6ff", alpha_composite((88, 166, 255, 34/255), base_card_bg), alpha_composite((88, 166, 255, 34/255), base_card_bg), "--color-status-active", "--color-bg-subtle"),
+    ("badge: fenced / card", "#a371f7", "#a371f7", alpha_composite((163, 113, 247, 34/255), base_card_bg), alpha_composite((163, 113, 247, 34/255), base_card_bg), "--color-status-neutral", "--color-bg-subtle"),
+    ("target action node name / surface", "#58a6ff", "#58a6ff", base_card_bg, base_card_bg, "--color-brand-hover", "--color-bg-surface"),
+    ("checkout item id link / subtle", "#58a6ff", "#58a6ff", base_item_bg, base_item_bg, "--color-brand-hover", "--color-bg-subtle"),
+    ("checkout item active badge / subtle", "#3fb950", "#3fb950", base_item_bg, base_item_bg, "--color-status-online", "--color-bg-subtle"),
+    ("rejection item blocked text / subtle", "#f85149", "#f85149", base_item_bg, base_item_bg, "--color-status-offline", "--color-bg-subtle"),
+    ("reconciliation item success / subtle", "#3fb950", "#3fb950", base_item_bg, base_item_bg, "--color-status-online", "--color-bg-subtle"),
+    ("reconciliation item failure / subtle", "#f85149", "#f85149", base_item_bg, base_item_bg, "--color-status-offline", "--color-bg-subtle"),
 ]
 
 for name, b_fg_l, b_fg_d, b_bg_l, b_bg_d, a_fg, a_bg in items:
@@ -81,4 +82,4 @@ for name, b_fg_l, b_fg_d, b_bg_l, b_bg_d, a_fg, a_bg in items:
     b_d = cr(b_fg_d, b_bg_d)
     a_l = cr(light_tokens[a_fg], light_tokens[a_bg])
     a_d = cr(dark_tokens[a_fg], dark_tokens[a_bg])
-    print(f"{name:37s} | Before: {b_l:5.2f}:1 (L actual) / {b_d:5.2f}:1 (D actual on {b_bg_d}) | After: {a_l:5.2f}:1 (Light) / {a_d:5.2f}:1 (Dark)")
+    print(f"{name:37s} | Before: {b_l:5.2f}:1 (L actual on {b_bg_l}) / {b_d:5.2f}:1 (D actual on {b_bg_d}) | After: {a_l:5.2f}:1 (Light) / {a_d:5.2f}:1 (Dark)")

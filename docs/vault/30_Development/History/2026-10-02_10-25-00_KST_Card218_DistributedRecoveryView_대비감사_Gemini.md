@@ -1,9 +1,9 @@
-# 2026-10-02 10:25:00 KST — Card 218: 분산 복구 화면 (DistributedRecoveryView) 색상 리터럴 전수 토큰화(16종/81 occurrences→0), 수명주기 상태 색 정합성 및 접근성 승격
+# 2026-10-02 11:15:00 KST — Card 218: 분산 복구 화면 (DistributedRecoveryView) 색상 리터럴 전수 토큰화(16종/81 occurrences→0), 수명주기 상태 색 정합성 및 접근성 승격 [r2]
 
 - **문서 ID**: HIST-GEMINI-CARD218-RECOVERY-CONTRAST
 - **작업 branch**: agent/gemini/c218-recovery-contrast
-- **Base commit**: 3ebfb1b8c2810a95fa9ec006e8b4bbbbd80655e9 (Card 215 PR #314 r3 head)
-- **KST 시각**: 2026-10-02 10:25:00 KST
+- **Base commit**: 3ebfb1b8fada37d22ba6fb201101b25ae9d7c816 (Card 215 PR #314 r3 head)
+- **KST 시각**: 2026-10-02 11:15:00 KST
 - **작업자**: Gemini (Frontend / UI / 접근성)
 - **독립 검토자 요청**: Claude UI (UI/접근성/테스트 축), Codex (계약/디자인 토큰/불변식 축)
 - **상태**: proposed (검토 전 자가 승인 금지)
@@ -16,16 +16,16 @@ ACC-09(접근성 명도 대비 적합화) 트랙의 후속 영역으로, 분산 
 
 - **대상 파일**:
   - `apps/web/src/features/recovery/DistributedRecoveryView.tsx` (기존 baseline 리터럴: **16종(81 occurrences)** -> **0건**)
-  - `apps/web/tests/acc09-contrast-tokens.test.tsx` (Test 9j, Test 9j-2, Probes 71~75 추가, Fail-Closed 래칫 고정, AST config inspection, 16종 결함 사살)
+  - `apps/web/tests/acc09-contrast-tokens.test.tsx` (Test 9j, Test 9j-2, Probes 71~75 추가, Fail-Closed 래칫 고정, AST config inspection, 18종 결함 사살)
   - `tools/reproduce_c218_contrast.py` (21종 Before/After 명도 대비 동적 재현 스크립트)
-  - `tools/test_c218_mutations.py` (재현 가능한 16종 뮤테이션 M1~M16 전수 시험 러너)
+  - `tools/test_c218_mutations.py` (재현 가능한 18종 뮤테이션 M1~M18 전수 시험 러너)
 - **감사 및 조치 결과**:
   - `DistributedRecoveryView.tsx`: 16종(81 occurrences) -> **0건** (리터럴 잔여 0건 multiset `{}` 달성).
   - `COLOR_LITERAL_MULTISET_BASELINE`에서 `features/recovery/DistributedRecoveryView.tsx`의 허용 multiset을 `{}` (0건)으로 래칫 고정.
-  - 전역 `var(--color-border-subtle)` 사용 횟수: **400건**, 사용 파일 수: **27개** (정확 일치 래칫 통과).
+  - 전역 `var(--color-border-subtle)` 사용 횟수: **401건**, 사용 파일 수: **27개** (정확 일치 래칫 통과).
   - 레거시 하드코딩 리터럴 잔여 상한 래칫 전면 강화:
-    - `#30363d`: 55건 이하(9개 파일) -> **45건 이하(8개 파일 이하)**
-  - 비색상 런타임 동작(시뮬레이션 토큰 단조 증가, 격리 모의, 체크아웃 생성 등) 일체 불변.
+    - `#30363d`: 55건 이하(9개 파일) -> **43건 이하(8개 파일 이하, 실측치 정확 고정)**
+  - 비색상 변경: 노드 카드 및 체크아웃/감사 아이템 testid 추가, 체크아웃 상태 active 여부에 따른 토큰 조건화, 미지 헬스 상태 원문 텍스트 및 neutral 토큰 안전 폴백, 선택 카드는 2px brand-hover 테두리로 구분하며 브라우저 전역 :focus-visible 키보드 포커스 링을 온전히 보존.
 
 ### 1.1 수명주기 상태 색 정합성 및 화면 간 일관성 확보 (Card 213 & 215 정합)
 `RunDetail.tsx`(Card 213) 및 `RunList.tsx`(Card 215)에서 확립된 상태 색상 규격과 완벽히 일치하도록 `DistributedRecoveryView.tsx`의 `NODE_HEALTH_CONFIG`를 정비하였습니다:
@@ -44,9 +44,9 @@ ACC-09(접근성 명도 대비 적합화) 트랙의 후속 영역으로, 분산 
   - 좀비 쓰기 수치: `var(--color-status-online)` on surface. Light 5.02:1 / Dark 7.79:1 (>= 4.5:1 PASS).
   - 복구 성공률: `var(--color-brand-hover)` on surface. Light 6.70:1 / Dark 9.84:1 (>= 4.5:1 PASS).
   - 감지 시간 표기: `var(--color-text-secondary)` on surface. Light 7.58:1 / Dark 14.33:1 (>= 4.5:1 PASS).
-- **노드 카드 및 선택 포커스/아웃라인 링**:
+- **노드 카드 선택 및 전역 포커스 링 보호 (WCAG 2.4.7)**:
   - 카드 기본 배경: `var(--color-bg-surface)`, 비선택 테두리 `var(--color-border-subtle)`.
-  - 선택(Active) 카드: 테두리 `2px solid var(--color-brand-hover)`, 포커스 링 `outline: 2px solid var(--color-brand-primary)` (`outlineOffset: 2px`) 명시 부여.
+  - 선택(Active) 카드: 테두리 `2px solid var(--color-brand-hover)`. 인라인 `outline: 'none'`을 일체 부여하지 않아 `index.css` 전역 `:focus-visible` 키보드 포커스 링(`outline: 2px solid var(--color-brand-primary)`, `offset: 2px`)이 온전히 활성화됨.
   - 실제 상태 배지(`node-actual-status-*`): `var(--color-text-secondary)` on `var(--color-bg-subtle)`, 테두리 `var(--color-border-subtle)`. Light 6.92:1 / Dark 11.86:1 (>= 4.5:1 PASS).
 - **액션 결과 알림창 (`recovery-action-notice`)**:
   - 배경: `var(--color-bg-subtle)`.
@@ -75,26 +75,26 @@ ACC-09(접근성 명도 대비 적합화) 트랙의 후속 영역으로, 분산 
 ### 2.1 실제 base 코드 및 렌더 배경 기반 명도 대비 실측표
 
 모든 After 대비는 SaintVision 플랫폼 정본 배경(`apps/web/src/index.css` 기준: Light surface `#ffffff`, subtle `#f1f5f9`, canvas `#f8fafc`; Dark surface `#111827`, subtle `#1f2937`, canvas `#090d16`) 위에서 측정되었습니다.
-'Before' 열의 수치는 베이스 커밋 `fb25432a`의 실제 코드 색상, 실제 조상 배경(카드, 패널 및 캔버스), 그리고 알파 합성 배경을 정밀 계산한 실측치입니다.
+'Before' 열의 수치는 베이스 커밋 `3ebfb1b8`(3ebfb1b8fada37d22ba6fb201101b25ae9d7c816)의 실제 코드 색상, 실제 조상 배경(카드, 패널 및 캔버스), 그리고 알파 합성 배경을 정밀 계산한 실측치입니다.
 
 | 대상 UI 요소 / 배경 | Before 조합 (Light 실제) | Before 대비 (Light) | Before 조합 (Dark 실제) | Before 대비 (Dark) | After 디자인 토큰 조합 | After 대비 (Light) | After 대비 (Dark) | 최종 판정 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | `unexposed notice banner / canvas` | `#58a6ff` on `#e5effc` | 2.18:1 (FAIL) | `#58a6ff` on `#0e1a2d` | 6.90:1 (PASS) | `--color-brand-hover` on `--color-bg-subtle` | **6.12:1** | **8.14:1** | PASS |
-| `kpi detection title / surface` | `#8b949e` on `#ffffff` | 3.08:1 (FAIL) | `#8b949e` on `#161b22` | 5.62:1 (PASS) | `--color-text-secondary` on `--color-bg-surface` | **7.58:1** | **14.33:1** | PASS |
-| `kpi zombie write count / surface` | `#3fb950` on `#ffffff` | 2.54:1 (FAIL) | `#3fb950` on `#161b22` | 6.81:1 (PASS) | `--color-status-online` on `--color-bg-surface` | **5.02:1** | **7.79:1** | PASS |
-| `kpi recovery rate text / surface` | `#58a6ff` on `#ffffff` | 2.53:1 (FAIL) | `#58a6ff` on `#161b22` | 6.85:1 (PASS) | `--color-brand-hover` on `--color-bg-surface` | **6.70:1** | **9.84:1** | PASS |
+| `kpi detection title / surface` | `#8b949e` on `#ffffff` | 3.08:1 (FAIL) | `#8b949e` on `#111827` | 5.77:1 (PASS) | `--color-text-secondary` on `--color-bg-surface` | **7.58:1** | **14.33:1** | PASS |
+| `kpi zombie write count / surface` | `#3fb950` on `#ffffff` | 2.54:1 (FAIL) | `#3fb950` on `#111827` | 6.98:1 (PASS) | `--color-status-online` on `--color-bg-surface` | **5.02:1** | **7.79:1** | PASS |
+| `kpi recovery rate text / surface` | `#58a6ff` on `#ffffff` | 2.53:1 (FAIL) | `#58a6ff` on `#111827` | 7.02:1 (PASS) | `--color-brand-hover` on `--color-bg-surface` | **6.70:1** | **9.84:1** | PASS |
 | `action notice error / canvas` | `#f85149` on `#f8e1e1` | 2.69:1 (FAIL) | `#f85149` on `#2d171e` | 5.00:1 (PASS) | `--color-status-offline` on `--color-bg-subtle` | **5.91:1** | **5.31:1** | PASS |
 | `action notice success / canvas` | `#3fb950` on `#daece0` | 2.06:1 (FAIL) | `#3fb950` on `#0f231d` | 6.47:1 (PASS) | `--color-status-online` on `--color-bg-subtle` | **4.58:1** | **6.44:1** | PASS |
 | `action notice info / canvas` | `#58a6ff` on `#dbe9fc` | 2.05:1 (FAIL) | `#58a6ff` on `#102039` | 6.46:1 (PASS) | `--color-brand-hover` on `--color-bg-subtle` | **6.12:1** | **8.14:1** | PASS |
-| `empty screen title / surface` | `#f0f6fc` on `#ffffff` | 1.09:1 (FAIL) | `#f0f6fc` on `#161b22` | 15.89:1 (PASS) | `--color-text-primary` on `--color-bg-surface` | **17.85:1** | **16.98:1** | PASS |
-| `node card title / surface` | `#f0f6fc` on `#ffffff` | 1.09:1 (FAIL) | `#f0f6fc` on `#161b22` | 15.89:1 (PASS) | `--color-text-primary` on `--color-bg-surface` | **17.85:1** | **16.98:1** | PASS |
+| `empty screen title / surface` | `#f0f6fc` on `#ffffff` | 1.09:1 (FAIL) | `#f0f6fc` on `#111827` | 16.30:1 (PASS) | `--color-text-primary` on `--color-bg-surface` | **17.85:1** | **16.98:1** | PASS |
+| `node card title / surface` | `#f0f6fc` on `#161b22` | 15.89:1 (PASS) | `#f0f6fc` on `#161b22` | 15.89:1 (PASS) | `--color-text-primary` on `--color-bg-surface` | **17.85:1** | **16.98:1** | PASS |
 | `node actual status badge / card` | `#8b949e` on `#21262d` | 4.95:1 (PASS) | `#8b949e` on `#21262d` | 4.95:1 (PASS) | `--color-text-secondary` on `--color-bg-subtle` | **6.92:1** | **11.86:1** | PASS |
-| `badge: online / card` | `#3fb950` on `#e5f6e8` | 2.26:1 (FAIL) | `#3fb950` on `#1b3028` | 5.51:1 (PASS) | `--color-status-online` on `--color-bg-subtle` | **4.58:1** | **6.44:1** | PASS |
-| `badge: stale / card` | `#e3b341` on `#fbf5e6` | 1.79:1 (FAIL) | `#e3b341` on `#312f26` | 6.89:1 (PASS) | `--color-status-degraded` on `--color-bg-subtle` | **4.58:1** | **6.83:1** | PASS |
-| `badge: offline / card` | `#f85149` on `#fee8e7` | 2.86:1 (FAIL) | `#f85149` on `#342227` | 4.46:1 (PASS) | `--color-status-offline` on `--color-bg-subtle` | **5.91:1** | **5.31:1** | PASS |
-| `badge: recovering / card` | `#58a6ff` on `#e9f3ff` | 2.25:1 (FAIL) | `#58a6ff` on `#1f2d3f` | 5.52:1 (PASS) | `--color-status-active` on `--color-bg-subtle` | **5.42:1** | **6.85:1** | PASS |
-| `badge: fenced / card` | `#a371f7` on `#f3ecfe` | 2.91:1 (FAIL) | `#a371f7` on `#29263e` | 4.35:1 (PASS) | `--color-status-neutral` on `--color-bg-subtle` | **5.25:1** | **5.78:1** | PASS |
-| `target action node name / surface` | `#58a6ff` on `#ffffff` | 2.53:1 (FAIL) | `#58a6ff` on `#161b22` | 6.85:1 (PASS) | `--color-brand-hover` on `--color-bg-surface` | **6.70:1** | **9.84:1** | PASS |
+| `badge: online / card` | `#3fb950` on `#1b3028` | 5.51:1 (PASS) | `#3fb950` on `#1b3028` | 5.51:1 (PASS) | `--color-status-online` on `--color-bg-subtle` | **4.58:1** | **6.44:1** | PASS |
+| `badge: stale / card` | `#e3b341` on `#312f26` | 6.89:1 (PASS) | `#e3b341` on `#312f26` | 6.89:1 (PASS) | `--color-status-degraded` on `--color-bg-subtle` | **4.58:1** | **6.83:1** | PASS |
+| `badge: offline / card` | `#f85149` on `#342227` | 4.46:1 (FAIL) | `#f85149` on `#342227` | 4.46:1 (FAIL) | `--color-status-offline` on `--color-bg-subtle` | **5.91:1** | **5.31:1** | PASS |
+| `badge: recovering / card` | `#58a6ff` on `#1f2e3f` | 5.47:1 (PASS) | `#58a6ff` on `#1f2e3f` | 5.47:1 (PASS) | `--color-status-active` on `--color-bg-subtle` | **5.42:1** | **6.85:1** | PASS |
+| `badge: fenced / card` | `#a371f7` on `#29263e` | 4.35:1 (FAIL) | `#a371f7` on `#29263e` | 4.35:1 (FAIL) | `--color-status-neutral` on `--color-bg-subtle` | **5.25:1** | **5.78:1** | PASS |
+| `target action node name / surface` | `#58a6ff` on `#161b22` | 6.85:1 (PASS) | `#58a6ff` on `#161b22` | 6.85:1 (PASS) | `--color-brand-hover` on `--color-bg-surface` | **6.70:1** | **9.84:1** | PASS |
 | `checkout item id link / subtle` | `#58a6ff` on `#0d1117` | 7.49:1 (PASS) | `#58a6ff` on `#0d1117` | 7.49:1 (PASS) | `--color-brand-hover` on `--color-bg-subtle` | **6.12:1** | **8.14:1** | PASS |
 | `checkout item active badge / subtle` | `#3fb950` on `#0d1117` | 7.45:1 (PASS) | `#3fb950` on `#0d1117` | 7.45:1 (PASS) | `--color-status-online` on `--color-bg-subtle` | **4.58:1** | **6.44:1** | PASS |
 | `rejection item blocked text / subtle` | `#f85149` on `#0d1117` | 5.65:1 (PASS) | `#f85149` on `#0d1117` | 5.65:1 (PASS) | `--color-status-offline` on `--color-bg-subtle` | **5.91:1** | **5.31:1** | PASS |
@@ -104,96 +104,102 @@ ACC-09(접근성 명도 대비 적합화) 트랙의 후속 영역으로, 분산 
 ### 2.2 대비 재현 스크립트 실행 콘솔 출력 (`tools/reproduce_c218_contrast.py`)
 
 ```text
-unexposed notice banner / canvas      | Before:  2.18:1 (L actual) /  6.90:1 (D actual on #0e1a2d) | After:  6.12:1 (Light) /  8.14:1 (Dark)
-kpi detection title / surface         | Before:  3.08:1 (L actual) /  5.62:1 (D actual on #161b22) | After:  7.58:1 (Light) / 14.33:1 (Dark)
-kpi zombie write count / surface      | Before:  2.54:1 (L actual) /  6.81:1 (D actual on #161b22) | After:  5.02:1 (Light) /  7.79:1 (Dark)
-kpi recovery rate text / surface      | Before:  2.53:1 (L actual) /  6.85:1 (D actual on #161b22) | After:  6.70:1 (Light) /  9.84:1 (Dark)
-action notice error / canvas          | Before:  2.69:1 (L actual) /  5.00:1 (D actual on #2d171e) | After:  5.91:1 (Light) /  5.31:1 (Dark)
-action notice success / canvas        | Before:  2.06:1 (L actual) /  6.47:1 (D actual on #0f231d) | After:  4.58:1 (Light) /  6.44:1 (Dark)
-action notice info / canvas           | Before:  2.05:1 (L actual) /  6.46:1 (D actual on #102039) | After:  6.12:1 (Light) /  8.14:1 (Dark)
-empty screen title / surface          | Before:  1.09:1 (L actual) / 15.89:1 (D actual on #161b22) | After: 17.85:1 (Light) / 16.98:1 (Dark)
-node card title / surface             | Before:  1.09:1 (L actual) / 15.89:1 (D actual on #161b22) | After: 17.85:1 (Light) / 16.98:1 (Dark)
-node actual status badge / card       | Before:  4.95:1 (L actual) /  4.95:1 (D actual on #21262d) | After:  6.92:1 (Light) / 11.86:1 (Dark)
-badge: online / card                  | Before:  2.26:1 (L actual) /  5.51:1 (D actual on #1b3028) | After:  4.58:1 (Light) /  6.44:1 (Dark)
-badge: stale / card                   | Before:  1.79:1 (L actual) /  6.89:1 (D actual on #312f26) | After:  4.58:1 (Light) /  6.83:1 (Dark)
-badge: offline / card                 | Before:  2.86:1 (L actual) /  4.46:1 (D actual on #342227) | After:  5.91:1 (Light) /  5.31:1 (Dark)
-badge: recovering / card              | Before:  2.25:1 (L actual) /  5.52:1 (D actual on #1f2d3f) | After:  5.42:1 (Light) /  6.85:1 (Dark)
-badge: fenced / card                  | Before:  2.91:1 (L actual) /  4.35:1 (D actual on #29263e) | After:  5.25:1 (Light) /  5.78:1 (Dark)
-target action node name / surface     | Before:  2.53:1 (L actual) /  6.85:1 (D actual on #161b22) | After:  6.70:1 (Light) /  9.84:1 (Dark)
-checkout item id link / subtle        | Before:  7.49:1 (L actual) /  7.49:1 (D actual on #0d1117) | After:  6.12:1 (Light) /  8.14:1 (Dark)
-checkout item active badge / subtle   | Before:  7.45:1 (L actual) /  7.45:1 (D actual on #0d1117) | After:  4.58:1 (Light) /  6.44:1 (Dark)
-rejection item blocked text / subtle  | Before:  5.65:1 (L actual) /  5.65:1 (D actual on #0d1117) | After:  5.91:1 (Light) /  5.31:1 (Dark)
-reconciliation item success / subtle  | Before:  7.45:1 (L actual) /  7.45:1 (D actual on #0d1117) | After:  4.58:1 (Light) /  6.44:1 (Dark)
-reconciliation item failure / subtle  | Before:  5.65:1 (L actual) /  5.65:1 (D actual on #0d1117) | After:  5.91:1 (Light) /  5.31:1 (Dark)
+unexposed notice banner / canvas      | Before:  2.18:1 (L actual on #e5effc) /  6.90:1 (D actual on #0e1a2d) | After:  6.12:1 (Light) /  8.14:1 (Dark)
+kpi detection title / surface         | Before:  3.08:1 (L actual on #ffffff) /  5.77:1 (D actual on #111827) | After:  7.58:1 (Light) / 14.33:1 (Dark)
+kpi zombie write count / surface      | Before:  2.54:1 (L actual on #ffffff) /  6.98:1 (D actual on #111827) | After:  5.02:1 (Light) /  7.79:1 (Dark)
+kpi recovery rate text / surface      | Before:  2.53:1 (L actual on #ffffff) /  7.02:1 (D actual on #111827) | After:  6.70:1 (Light) /  9.84:1 (Dark)
+action notice error / canvas          | Before:  2.69:1 (L actual on #f8e1e1) /  5.00:1 (D actual on #2d171e) | After:  5.91:1 (Light) /  5.31:1 (Dark)
+action notice success / canvas        | Before:  2.06:1 (L actual on #daece0) /  6.47:1 (D actual on #0f231d) | After:  4.58:1 (Light) /  6.44:1 (Dark)
+action notice info / canvas           | Before:  2.05:1 (L actual on #dbe9fc) /  6.46:1 (D actual on #102039) | After:  6.12:1 (Light) /  8.14:1 (Dark)
+empty screen title / surface          | Before:  1.09:1 (L actual on #ffffff) / 16.30:1 (D actual on #111827) | After: 17.85:1 (Light) / 16.98:1 (Dark)
+node card title / surface             | Before: 15.89:1 (L actual on #161b22) / 15.89:1 (D actual on #161b22) | After: 17.85:1 (Light) / 16.98:1 (Dark)
+node actual status badge / card       | Before:  4.95:1 (L actual on #21262d) /  4.95:1 (D actual on #21262d) | After:  6.92:1 (Light) / 11.86:1 (Dark)
+badge: online / card                  | Before:  5.51:1 (L actual on #1b3028) /  5.51:1 (D actual on #1b3028) | After:  4.58:1 (Light) /  6.44:1 (Dark)
+badge: stale / card                   | Before:  6.89:1 (L actual on #312f26) /  6.89:1 (D actual on #312f26) | After:  4.58:1 (Light) /  6.83:1 (Dark)
+badge: offline / card                 | Before:  4.46:1 (L actual on #342227) /  4.46:1 (D actual on #342227) | After:  5.91:1 (Light) /  5.31:1 (Dark)
+badge: recovering / card              | Before:  5.47:1 (L actual on #1f2e3f) /  5.47:1 (D actual on #1f2e3f) | After:  5.42:1 (Light) /  6.85:1 (Dark)
+badge: fenced / card                  | Before:  4.35:1 (L actual on #29263e) /  4.35:1 (D actual on #29263e) | After:  5.25:1 (Light) /  5.78:1 (Dark)
+target action node name / surface     | Before:  6.85:1 (L actual on #161b22) /  6.85:1 (D actual on #161b22) | After:  6.70:1 (Light) /  9.84:1 (Dark)
+checkout item id link / subtle        | Before:  7.49:1 (L actual on #0d1117) /  7.49:1 (D actual on #0d1117) | After:  6.12:1 (Light) /  8.14:1 (Dark)
+checkout item active badge / subtle   | Before:  7.45:1 (L actual on #0d1117) /  7.45:1 (D actual on #0d1117) | After:  4.58:1 (Light) /  6.44:1 (Dark)
+rejection item blocked text / subtle  | Before:  5.65:1 (L actual on #0d1117) /  5.65:1 (D actual on #0d1117) | After:  5.91:1 (Light) /  5.31:1 (Dark)
+reconciliation item success / subtle  | Before:  7.45:1 (L actual on #0d1117) /  7.45:1 (D actual on #0d1117) | After:  4.58:1 (Light) /  6.44:1 (Dark)
+reconciliation item failure / subtle  | Before:  5.65:1 (L actual on #0d1117) /  5.65:1 (D actual on #0d1117) | After:  5.91:1 (Light) /  5.31:1 (Dark)
 ```
 
 ---
 
 ## 3. 재현 가능한 뮤테이션 테스트 및 결함 사살 검증 (`tools/test_c218_mutations.py`)
 
-`tools/test_c218_mutations.py`를 실행하여 16종의 다양한 단일 변이(A1~A4 배경/전경 충돌 및 텍스트 토큰 배경화, B1 포커스 링 제거, C1 배지 투명도 감쇠, D1~D2 레거시 리터럴 회귀, F1~F3 상태 붕괴 및 테두리 약화, G1 배지 텍스트 레이블 제거, E1~E4 알림/거부/빈화면 테두리·전경 스왑)를 시험하였으며, **16종 전수 사살(100.0% Kill Rate)**을 확인하였습니다.
+`tools/test_c218_mutations.py`를 실행하여 18종의 다양한 단일 변이(A1~A4 배경/전경 충돌 및 텍스트 토큰 배경화, B1 포커스 링 outline:none 주입 회귀, C1 배지 투명도 감쇠, D1~D2 레거시 리터럴 회귀, F1~F3 상태 붕괴 및 테두리 약화, G1~G3 배지 텍스트 레이블 제거/빈문자열/상태붕괴, E1~E4 알림/거부/빈화면 테두리·전경 스왑)를 시험하였으며, **18종 전수 사살(100.0% Kill Rate)**을 확인하였습니다.
 
 ```text
 ================================================================================
- Card 218 (ACC-09): Reproducible Mutant Test Suite (16 Mutants: M1-M16)
+ Card 218 (ACC-09): Reproducible Mutant Test Suite (18 Mutants: M1-M18)
  Target: DistributedRecoveryView.tsx
 ================================================================================
 
 [Baseline Check] Testing unmutated code...
 [Baseline Check] Clean pass (exit code 0).
 
-[01/16] M1 (A1): KILLED in 6.0s -- DistributedRecoveryView: notice banner bg -> brand-hover (fg==bg collision)
+[01/18] M1 (A1): KILLED in 5.4s -- DistributedRecoveryView: notice banner bg -> brand-hover (fg==bg collision)
          Reason: AssertionError: expected 'var(--color-brand-hover)' to be 'var(--color-bg-subtle)' // Object.is equa
-[02/16] M2 (A2): KILLED in 5.3s -- DistributedRecoveryView: NODE_HEALTH_CONFIG.online.bg -> status-online (fg==bg collision)
+[02/18] M2 (A2): KILLED in 4.8s -- DistributedRecoveryView: NODE_HEALTH_CONFIG.online.bg -> status-online (fg==bg collision)
          Reason: AssertionError: expected 'var(--color-status-online)' to be 'var(--color-bg-subtle)' // Object.is eq
-[03/16] M3 (A3): KILLED in 5.5s -- DistributedRecoveryView: NODE_HEALTH_CONFIG.fenced.bg -> text-secondary (text token as bg)
+[03/18] M3 (A3): KILLED in 5.0s -- DistributedRecoveryView: NODE_HEALTH_CONFIG.fenced.bg -> text-secondary (text token as bg)
          Reason: AssertionError: expected 'var(--color-text-secondary)' to be 'var(--color-bg-subtle)' // Object.is e
-[04/16] M4 (A4): KILLED in 5.4s -- DistributedRecoveryView: node card unselected border -> bg-surface (border==bg collision)
+[04/18] M4 (A4): KILLED in 5.2s -- DistributedRecoveryView: node card unselected border -> bg-surface (border==bg collision)
          Reason: AssertionError: expected 'var(--color-bg-surface)' to be 'var(--color-border-subtle)' // Object.is e
-[05/16] M5 (B1): KILLED in 5.1s -- DistributedRecoveryView: selected node card outline ring removed
-         Reason: AssertionError: expected 'none' to contain 'var(--color-brand-primary)'
-[06/16] M6 (C1): KILLED in 5.6s -- DistributedRecoveryView: status badge opacity degraded to 0.4
+[05/18] M5 (B1): KILLED in 5.3s -- DistributedRecoveryView: unselected node card given inline outline: "none" (destroying :focus-visible keyboard focus ring)
+         Reason: AssertionError: expected 'none none' to be '' // Object.is equality
+[06/18] M6 (C1): KILLED in 5.6s -- DistributedRecoveryView: status badge opacity degraded to 0.4
          Reason: AssertionError: Online badge must not have degraded opacity: expected '0.4' to be '1' // Object.is e
-[07/16] M7 (D1): KILLED in 5.7s -- DistributedRecoveryView: NODE_HEALTH_CONFIG.online.color reverted to legacy literal #3fb950
+[07/18] M7 (D1): KILLED in 5.1s -- DistributedRecoveryView: NODE_HEALTH_CONFIG.online.color reverted to legacy literal #3fb950
          Reason: AssertionError: expected '#3fb950' to be 'var(--color-status-online)' // Object.is equality
-[08/16] M8 (D2): KILLED in 4.9s -- DistributedRecoveryView: recovering color reverted to legacy literal #58a6ff
-         Reason: Error: Expected CSS variable in value: "#58a6ff"
-[09/16] M9 (F1): KILLED in 5.9s -- DistributedRecoveryView: recovering color collapsed to status-neutral (fenced collision)
-         Reason: AssertionError: All 5 recovery health states must have unique distinct color tokens: expected 4 to b
-[10/16] M10 (F2): KILLED in 4.8s -- DistributedRecoveryView: recovering color collapsed to status-online (online collision)
-         Reason: AssertionError: All 5 recovery health states must have unique distinct color tokens: expected 4 to b
-[11/16] M11 (G1): KILLED in 5.1s -- DistributedRecoveryView: status badge text label {healthCfg.label} removed
+[08/18] M8 (D2): KILLED in 4.9s -- DistributedRecoveryView: recovering color reverted to legacy literal #58a6ff
+         Reason: AssertionError: expected '#58a6ff' to be 'var(--color-status-active)' // Object.is equality
+[09/18] M9 (F1): KILLED in 6.7s -- DistributedRecoveryView: recovering color collapsed to status-neutral (fenced collision)
+         Reason: AssertionError: expected 'var(--color-status-neutral)' to be 'var(--color-status-active)' // Object.
+[10/18] M10 (F2): KILLED in 5.5s -- DistributedRecoveryView: recovering color collapsed to status-online (online collision)
+         Reason: AssertionError: expected 'var(--color-status-online)' to be 'var(--color-status-active)' // Object.i
+[11/18] M11 (G1): KILLED in 5.4s -- DistributedRecoveryView: status badge text label {healthCfg.label} removed
          Reason: AssertionError: expected '시뮬레이션: ' to be '시뮬레이션: ONLINE' // Object.is equality
-[12/16] M12 (E1): KILLED in 7.3s -- DistributedRecoveryView: action notice error border swapped to status-online
+[12/18] M12 (E1): KILLED in 5.1s -- DistributedRecoveryView: action notice error border swapped to status-online
          Reason: AssertionError: expected 'var(--color-status-online)' to be 'var(--color-status-offline)' // Object.
-[13/16] M13 (E2): KILLED in 5.2s -- DistributedRecoveryView: KPI zombie writes color swapped to text-secondary
+[13/18] M13 (E2): KILLED in 4.9s -- DistributedRecoveryView: KPI zombie writes color swapped to text-secondary
          Reason: AssertionError: expected 'var(--color-text-secondary)' to be 'var(--color-status-online)' // Object.
-[14/16] M14 (E3): KILLED in 5.4s -- DistributedRecoveryView: rejection item border swapped to border-subtle
+[14/18] M14 (E3): KILLED in 4.9s -- DistributedRecoveryView: rejection item border swapped to border-subtle
          Reason: AssertionError: expected 'var(--color-border-subtle)' to be 'var(--color-status-offline)' // Object.
-[15/16] M15 (E4): KILLED in 5.3s -- DistributedRecoveryView: empty screen border swapped to bg-surface (border==bg collision)
+[15/18] M15 (E4): KILLED in 4.9s -- DistributedRecoveryView: empty screen border swapped to bg-surface (border==bg collision)
          Reason: AssertionError: expected 'var(--color-bg-surface)' to be 'var(--color-border-subtle)' // Object.is e
-[16/16] M16 (F3): KILLED in 5.5s -- DistributedRecoveryView: fenced border token reverted from border-strong to border-subtle
+[16/18] M16 (F3): KILLED in 4.5s -- DistributedRecoveryView: fenced border token reverted from border-strong to border-subtle
          Reason: AssertionError: expected 'var(--color-border-subtle)' to be 'var(--color-border-strong)' // Object.i
+[17/18] M17 (G2): KILLED in 5.1s -- DistributedRecoveryView: recovering label set to empty string (M8a non-color a11y)
+         Reason: AssertionError: expected '시뮬레이션: ' to be '시뮬레이션: RECOVERING' // Object.is equality
+[18/18] M18 (G3): KILLED in 6.1s -- DistributedRecoveryView: recovering label collapsed to ONLINE (M8d non-color state collapse)
+         Reason: AssertionError: expected '시뮬레이션: ONLINE' to be '시뮬레이션: RECOVERING' // Object.is equality
 
 ================================================================================
- Summary: 16/16 mutants killed (100.0%)
+ Summary: 18/18 mutants killed (100.0%)
 ================================================================================
  [PASS] M1 (A1): KILLED   | DistributedRecoveryView: notice banner bg -> brand-hover (fg==bg collision) (AssertionError: expected 'var(--color-brand-hover)' to be 'var(--color-bg-subtle)' // Object.is equa)
  [PASS] M2 (A2): KILLED   | DistributedRecoveryView: NODE_HEALTH_CONFIG.online.bg -> status-online (fg==bg collision) (AssertionError: expected 'var(--color-status-online)' to be 'var(--color-bg-subtle)' // Object.is eq)
  [PASS] M3 (A3): KILLED   | DistributedRecoveryView: NODE_HEALTH_CONFIG.fenced.bg -> text-secondary (text token as bg) (AssertionError: expected 'var(--color-text-secondary)' to be 'var(--color-bg-subtle)' // Object.is e)
  [PASS] M4 (A4): KILLED   | DistributedRecoveryView: node card unselected border -> bg-surface (border==bg collision) (AssertionError: expected 'var(--color-bg-surface)' to be 'var(--color-border-subtle)' // Object.is e)
- [PASS] M5 (B1): KILLED   | DistributedRecoveryView: selected node card outline ring removed (AssertionError: expected 'none' to contain 'var(--color-brand-primary)')
+ [PASS] M5 (B1): KILLED   | DistributedRecoveryView: unselected node card given inline outline: "none" (destroying :focus-visible keyboard focus ring) (AssertionError: expected 'none none' to be '' // Object.is equality)
  [PASS] M6 (C1): KILLED   | DistributedRecoveryView: status badge opacity degraded to 0.4 (AssertionError: Online badge must not have degraded opacity: expected '0.4' to be '1' // Object.is e)
  [PASS] M7 (D1): KILLED   | DistributedRecoveryView: NODE_HEALTH_CONFIG.online.color reverted to legacy literal #3fb950 (AssertionError: expected '#3fb950' to be 'var(--color-status-online)' // Object.is equality)
- [PASS] M8 (D2): KILLED   | DistributedRecoveryView: recovering color reverted to legacy literal #58a6ff (Error: Expected CSS variable in value: "#58a6ff")
- [PASS] M9 (F1): KILLED   | DistributedRecoveryView: recovering color collapsed to status-neutral (fenced collision) (AssertionError: All 5 recovery health states must have unique distinct color tokens: expected 4 to b)
- [PASS] M10 (F2): KILLED   | DistributedRecoveryView: recovering color collapsed to status-online (online collision) (AssertionError: All 5 recovery health states must have unique distinct color tokens: expected 4 to b)
+ [PASS] M8 (D2): KILLED   | DistributedRecoveryView: recovering color reverted to legacy literal #58a6ff (AssertionError: expected '#58a6ff' to be 'var(--color-status-active)' // Object.is equality)
+ [PASS] M9 (F1): KILLED   | DistributedRecoveryView: recovering color collapsed to status-neutral (fenced collision) (AssertionError: expected 'var(--color-status-neutral)' to be 'var(--color-status-active)' // Object.)
+ [PASS] M10 (F2): KILLED   | DistributedRecoveryView: recovering color collapsed to status-online (online collision) (AssertionError: expected 'var(--color-status-online)' to be 'var(--color-status-active)' // Object.i)
  [PASS] M11 (G1): KILLED   | DistributedRecoveryView: status badge text label {healthCfg.label} removed (AssertionError: expected '시뮬레이션: ' to be '시뮬레이션: ONLINE' // Object.is equality)
  [PASS] M12 (E1): KILLED   | DistributedRecoveryView: action notice error border swapped to status-online (AssertionError: expected 'var(--color-status-online)' to be 'var(--color-status-offline)' // Object.)
  [PASS] M13 (E2): KILLED   | DistributedRecoveryView: KPI zombie writes color swapped to text-secondary (AssertionError: expected 'var(--color-text-secondary)' to be 'var(--color-status-online)' // Object.)
  [PASS] M14 (E3): KILLED   | DistributedRecoveryView: rejection item border swapped to border-subtle (AssertionError: expected 'var(--color-border-subtle)' to be 'var(--color-status-offline)' // Object.)
  [PASS] M15 (E4): KILLED   | DistributedRecoveryView: empty screen border swapped to bg-surface (border==bg collision) (AssertionError: expected 'var(--color-bg-surface)' to be 'var(--color-border-subtle)' // Object.is e)
  [PASS] M16 (F3): KILLED   | DistributedRecoveryView: fenced border token reverted from border-strong to border-subtle (AssertionError: expected 'var(--color-border-subtle)' to be 'var(--color-border-strong)' // Object.i)
+ [PASS] M17 (G2): KILLED   | DistributedRecoveryView: recovering label set to empty string (M8a non-color a11y) (AssertionError: expected '시뮬레이션: ' to be '시뮬레이션: RECOVERING' // Object.is equality)
+ [PASS] M18 (G3): KILLED   | DistributedRecoveryView: recovering label collapsed to ONLINE (M8d non-color state collapse) (AssertionError: expected '시뮬레이션: ONLINE' to be '시뮬레이션: RECOVERING' // Object.is equality)
 
 SUCCESS: 100% mutant kill rate achieved. All accessibility invariants strictly hold.
 ```
@@ -260,7 +266,7 @@ SUCCESS: 100% mutant kill rate achieved. All accessibility invariants strictly h
 ## 5. 다음 담당자 및 인계 사항
 
 - **작업 브랜치**: `agent/gemini/c218-recovery-contrast`
-- **Base 브랜치**: `agent/gemini/c215-runlist-contrast` (Head: `fb25432a`)
+- **Base 브랜치**: `agent/gemini/c215-runlist-contrast` (Head: `3ebfb1b8`)
 - **리뷰 요청**: Claude UI (접근성 및 UI 경험), Codex (계약 및 토큰 불변식)
 - **다음 행동**:
   - `agent/gemini/c218-recovery-contrast` 브랜치에 커밋 및 push (force push 절대 금지).

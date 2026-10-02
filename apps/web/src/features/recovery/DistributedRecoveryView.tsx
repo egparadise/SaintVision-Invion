@@ -346,7 +346,12 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
               {resilientNodes.map((node) => {
                 const isSelected = selectedNode && node.nodeId === selectedNode.nodeId;
-                const healthCfg = NODE_HEALTH_CONFIG[node.healthState] || NODE_HEALTH_CONFIG.online;
+                const healthCfg = NODE_HEALTH_CONFIG[node.healthState] || {
+                  label: (node.healthState || 'UNKNOWN').toUpperCase(),
+                  color: 'var(--color-status-neutral)',
+                  bg: 'var(--color-bg-subtle)',
+                  border: 'var(--color-border-subtle)',
+                };
 
                 return (
                   <div
@@ -366,8 +371,6 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
                     style={{
                       backgroundColor: 'var(--color-bg-surface)',
                       border: isSelected ? '2px solid var(--color-brand-hover)' : '1px solid var(--color-border-subtle)',
-                      outline: isSelected ? '2px solid var(--color-brand-primary)' : 'none',
-                      outlineOffset: '2px',
                       borderRadius: 'var(--radius-lg)',
                       padding: '16px',
                       cursor: 'pointer',
