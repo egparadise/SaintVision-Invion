@@ -12,6 +12,7 @@ identity, required cleanup observations -- and the atomicity of the commit.
 
 from contextlib import contextmanager
 from copy import deepcopy
+from datetime import datetime, timezone
 
 import pytest
 
@@ -26,14 +27,18 @@ TENANT = "123e4567-e89b-12d3-a456-426614174000"
 PROJECT = "prj_c214"
 EPOCH = "223e4567-e89b-12d3-a456-426614174000"
 RUN = "run_c214"
-NODE = "nod_c214"
-RESOURCE = "res_c214"
-LEASE = "lse_c214"
+NODE = "nod_01M3PTP800EEMWMDYKEZZ3CWNP"
+RESOURCE = "res_01M3PTP800EEMWMDYKEZZ3CWNQ"
+LEASE = "lse_01M3PTP800EEMWMDYKEZZ3CWNR"
 SESSION = "7f4a1c62-9d1e-4a3b-8c55-0f21aa9b4e10"
-EVIDENCE_ID = "evd_c214"
+EVIDENCE_ID = "evd_01M3PTP800EEMWMDYKEZZ3CWNS"
 ENABLED = {PRODUCT_ENABLE_SETTING: "1"}
 
 DAEMON = {"pid": 42, "processUid": 1000, "processStartTicks": 28815, "comm": "buildkitd"}
+NOW = datetime(2026, 10, 2, 9, 0, tzinfo=timezone.utc)
+FRESH = "2026-10-02T08:59:52Z"          # 8s old against NOW
+STALE = "2026-10-02T08:59:30Z"          # 30s old, beyond the 15s window
+FUTURE = "2026-10-02T09:00:30Z"         # ahead of the database clock
 
 
 def health(**overrides):
@@ -44,7 +49,7 @@ def health(**overrides):
         "builderInstanceId": "builder-c214",
         "builderProfileId": "rootless-product-v1",
         "recoveryEpoch": EPOCH,
-        "observedAt": "2026-10-02T08:00:00Z",
+        "observedAt": FRESH,
         "runtimeIdentity": "sha256:" + "a" * 64,
         "daemonIdentity": dict(DAEMON),
         "isolation": {
@@ -89,7 +94,9 @@ class _Connection:
 
     def execute(self, sql, params=None):
         text = " ".join(sql.split())
-        if "FROM inv.resources" in text:
+        if text == "SELECT clock_timestamp() AS now":   # exact: the release UPDATE also calls it
+            self._result = {"now": self.db.now}
+        elif "FROM inv.resources" in text:
             self._result = {"node_id": self.db.resource_node_id}
         elif "FROM inv.resource_leases" in text and "FOR UPDATE" in text:
             self._result = deepcopy(self.db.lease_row)
@@ -111,8 +118,10 @@ class _Connection:
 
 
 class _Database:
-    def __init__(self, *, lease_epoch=EPOCH, resource_node_id=NODE, release_succeeds=True):
+    def __init__(self, *, lease_epoch=EPOCH, resource_node_id=NODE, release_succeeds=True,
+                 now=None):
         self.recovery_epoch = EPOCH
+        self.now = now or NOW
         self.resource_node_id = resource_node_id
         self.release_succeeds = release_succeeds
         self.writes = []
@@ -141,9 +150,24 @@ class _Database:
             self.committed.append(self.writes[start:])
 
 
+def caller_cleanup(**overrides):
+    """The BuildReceipt's own cleanup receipt: it duplicates four physical observations."""
+
+    document = {
+        "cacheDisposition": "retained",
+        "builderClaimReleased": True,
+        "cgroupRemoved": True,
+        "verifiedAt": "2026-10-02T08:00:05Z",
+    }
+    document.update(overrides)
+    return document
+
+
 class _Adapter:
     def __init__(self, *, receipt=None, error=None):
-        self.receipt = receipt if receipt is not None else {"buildSessionId": SESSION}
+        self.receipt = receipt if receipt is not None else {
+            "buildSessionId": SESSION, "cleanup": caller_cleanup()
+        }
         self.error = error
         self.calls = 0
 
@@ -257,7 +281,7 @@ def test_product_dispatch_is_off_unless_the_value_is_exactly_one(environment):
 
 def test_a_health_receipt_about_another_node_is_refused():
     service, _database, adapter, _boundary = build(
-        boundary=_Boundary(health_receipt=health(nodeId="nod_somewhere_else"))
+        boundary=_Boundary(health_receipt=health(nodeId="nod_01M3PTP800EEMWMDYKEZZ3CWZZ"))
     )
     with pytest.raises(DomainError) as refused:
         run(service)
@@ -342,9 +366,9 @@ def test_a_daemon_that_changed_across_the_dispatch_goes_to_cleanup(after, code):
 @pytest.mark.parametrize(
     "override,fragment",
     [
-        ({"nodeId": "nod_other"}, "nodeId does not bind"),
-        ({"resourceId": "res_other"}, "resourceId does not bind"),
-        ({"leaseId": "lse_other"}, "leaseId does not bind"),
+        ({"nodeId": "nod_01M3PTP800EEMWMDYKEZZ3CWZZ"}, "nodeId does not bind"),
+        ({"resourceId": "res_01M3PTP800EEMWMDYKEZZ3CWZZ"}, "resourceId does not bind"),
+        ({"leaseId": "lse_01M3PTP800EEMWMDYKEZZ3CWZZ"}, "leaseId does not bind"),
         ({"buildSessionId": "11111111-2222-4333-8444-555555555555"},
          "buildSessionId does not bind"),
         ({"recoveryEpoch": "333e4567-e89b-12d3-a456-426614174000"}, "recovery epoch"),
@@ -396,6 +420,7 @@ def test_a_lease_released_concurrently_rolls_the_whole_commit_back():
         "release",
     ]
     assert all(batch == [] for batch in database.committed)
+    assert _boundary.quarantined_nodes == [(NODE, "LEASE-0002")]
 
 
 def test_a_lease_that_drifts_between_dispatch_and_commit_is_refused_at_commit():
@@ -415,7 +440,9 @@ def test_a_lease_that_drifts_between_dispatch_and_commit_is_refused_at_commit():
         run(service)
     assert refused.value.code == "LEASE-0002" and refused.value.status == 409
     assert all(batch == [] for batch in database.committed)
-    assert boundary.quarantined_nodes == []
+    # The external dispatch already happened, so the loser leaves a reconciliation marker
+    # rather than raising and forgetting (#312 F-R4).
+    assert boundary.quarantined_nodes == [(NODE, "LEASE-0002")]
 
 
 def test_the_outbox_event_type_is_the_contracted_string():
@@ -426,9 +453,9 @@ def test_the_outbox_event_type_is_the_contracted_string():
     assert outbox[0][3] == "inv.build.dispatch_completed"
     payload = outbox[0][4].obj
     # Redacted: decision, binding, resource, lease and the persisted Evidence only.
+    # Six keys: the contract's additionalProperties:false allows no more (#312 F-R3).
     assert set(payload) == {
-        "decisionId", "bindingDigest", "resourceId", "leaseId",
-        "leasedNodeId", "evidenceId", "evidenceDigest",
+        "decisionId", "bindingDigest", "resourceId", "leaseId", "evidenceId", "evidenceDigest",
     }
 
 
@@ -470,7 +497,7 @@ def test_a_plan_without_a_build_session_id_is_refused_before_dispatch():
 def test_a_receipt_session_that_differs_from_the_admitted_plan_is_refused():
     other = "22222222-3333-4444-8555-666666666666"
     service, database, _adapter, _boundary = build(
-        adapter=_Adapter(receipt={"buildSessionId": other})
+        adapter=_Adapter(receipt={"buildSessionId": other, "cleanup": caller_cleanup()})
     )
     with pytest.raises(DomainError) as refused:
         run(service)
@@ -481,7 +508,8 @@ def test_a_receipt_session_that_differs_from_the_admitted_plan_is_refused():
 
 def test_case_alone_never_decides_the_session_or_epoch_comparison():
     service, database, _adapter, _boundary = build(
-        adapter=_Adapter(receipt={"buildSessionId": SESSION.upper()})
+        adapter=_Adapter(receipt={"buildSessionId": SESSION.upper(),
+                                  "cleanup": caller_cleanup()})
     )
     result = run(service)
     assert result.lease_released is True
@@ -498,7 +526,13 @@ def test_the_persisted_cleanup_receipt_carries_the_pair_the_contract_only_pairs(
     run(service)
     evidence = [params for kind, params in database.committed[-1] if kind == "evidence"]
     cleanup = evidence[0][3].obj["cleanupReceipt"]
-    assert set(cleanup) == {"physicalReceipt", "physicalReceiptDigest"}
+    # The public receipt: its own four observations, the lease fact this transaction proved,
+    # and the physical pair the product path requires.
+    assert set(cleanup) == {
+        "cacheDisposition", "builderClaimReleased", "cgroupRemoved", "verifiedAt",
+        "leaseReleased", "physicalReceipt", "physicalReceiptDigest",
+    }
+    assert cleanup["leaseReleased"] is True
     from inv.build_execution import canonical_digest
 
     assert cleanup["physicalReceiptDigest"] == canonical_digest(cleanup["physicalReceipt"])
@@ -521,3 +555,119 @@ def test_a_mismatched_physical_digest_is_refused_rather_than_committed():
     assert refused.value.code == "VERIFY-0022"
     assert "does not match the physical receipt" in str(refused.value)
     assert all(batch == [] for batch in database.committed)
+
+
+# --- #312 Codex review: four boundaries the earlier tests fixed as success ---------------
+
+
+@pytest.mark.parametrize("observed,label", [(STALE, "30s old"), (FUTURE, "ahead of the clock")],
+                         ids=["stale", "future"])
+def test_a_health_receipt_that_is_not_fresh_is_refused(observed, label):
+    """F-R1: the contract's stale-observedAt boundary, measured against the database clock.
+
+    Codex reproduced a release with ``observedAt`` in 2020.  The adapter's own provider
+    freshness is about a different observation and does not stand in for this one.
+    """
+
+    service, database, adapter, _boundary = build(
+        boundary=_Boundary(health_receipt=health(observedAt=observed))
+    )
+    with pytest.raises(DomainError) as refused:
+        run(service)
+    assert refused.value.code == "RES-0003" and refused.value.status == 409
+    assert adapter.calls == 0
+    assert all(batch == [] for batch in database.committed)
+
+
+@pytest.mark.parametrize(
+    "override",
+    [
+        {"cacheDisposition": "quarantined"},
+        {"builderClaimReleased": False},
+        {"cgroupRemoved": False},
+        {"verifiedAt": "2020-01-01T00:00:00Z"},
+    ],
+    ids=["cacheDisposition", "builderClaimReleased", "cgroupRemoved", "verifiedAt"],
+)
+def test_the_two_cleanup_receipts_must_agree_on_every_duplicated_observation(override):
+    """F-R2: two cleanup receipts that contradict each other must not release a lease."""
+
+    service, database, _adapter, boundary = build(
+        adapter=_Adapter(receipt={"buildSessionId": SESSION, "cleanup": caller_cleanup(**override)})
+    )
+    with pytest.raises(DomainError) as refused:
+        run(service)
+    assert refused.value.code == "VERIFY-0022"
+    assert all(batch == [] for batch in database.committed)
+    assert boundary.quarantined_nodes == [(NODE, "VERIFY-0022")]
+
+
+def test_the_completed_payload_passes_the_public_contract_validator():
+    """F-R3: the six keys the contract allows, checked by the canonical validator."""
+
+    from inv.contracts import validate_contract
+
+    service, database, _adapter, _boundary = build()
+    run(service)
+    payload = [p for kind, p in database.committed[-1] if kind == "outbox"][0][4].obj
+    assert set(payload) == {
+        "decisionId", "bindingDigest", "resourceId", "leaseId", "evidenceId", "evidenceDigest",
+    }
+    validate_contract("BuildDispatchCompletedPayload", payload)
+
+
+def test_losing_a_lease_race_after_the_external_dispatch_records_reconciliation():
+    """F-R4: the loser dispatched externally, so it may not simply raise and forget."""
+
+    database = _Database(release_succeeds=False)
+    service, database, _adapter, boundary = build(database=database)
+    with pytest.raises(DomainError) as refused:
+        run(service)
+    assert refused.value.code == "LEASE-0002"
+    assert all(batch == [] for batch in database.committed)
+    # Nothing durable landed, so the node holds unaccounted external state.
+    assert boundary.quarantined_nodes == [(NODE, "LEASE-0002")]
+
+
+def test_two_callers_contending_on_one_lease_release_and_record_exactly_once():
+    """F-R4: the same lease, two commits. One lands; the other must not add a second.
+
+    The fake database is shared, so the winner's ``released_at`` is what the loser reads --
+    the same thing the conditional UPDATE enforces in PostgreSQL.
+    """
+
+    database = _Database()
+    first, _db, _adapter, boundary_a = build(database=database)
+    result = run(first)
+    assert result.lease_released is True
+
+    # The winner's release is now visible to anyone who looks.
+    database.lease_row["released_at"] = NOW
+    second, _db, _adapter, boundary_b = build(database=database)
+    with pytest.raises(DomainError) as refused:
+        run(second)
+    assert refused.value.code == "LEASE-0002"
+
+    releases = [k for batch in database.committed for k, _ in batch if k == "release"]
+    outbox = [k for batch in database.committed for k, _ in batch if k == "outbox"]
+    assert releases == ["release"] and outbox == ["outbox"]
+    assert boundary_a.quarantined_nodes == []
+    assert boundary_b.quarantined_nodes == [(NODE, "LEASE-0002")]
+
+
+def test_a_retry_after_a_lost_success_response_does_not_release_twice():
+    """F-R4: the caller never saw the answer, so it tries again. The lease says no.
+
+    This fake does not model the adapter's one-shot claim; the real second barrier is
+    ``IDEM-0001`` there, and this test pins the barrier this module owns -- the lease was
+    already released, so no second release or event can be written.
+    """
+
+    database = _Database()
+    service, _db, _adapter, _boundary = build(database=database)
+    run(service)
+    database.lease_row["released_at"] = NOW
+    with pytest.raises(DomainError) as refused:
+        run(service)
+    assert refused.value.code == "LEASE-0002"
+    assert [k for batch in database.committed for k, _ in batch if k == "release"] == ["release"]

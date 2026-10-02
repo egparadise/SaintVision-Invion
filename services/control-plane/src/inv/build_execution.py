@@ -30,8 +30,10 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import dataclass
+from datetime import timedelta
 import hashlib
 import json
+import datetime as dt
 import os
 import re
 from typing import Any, Mapping
@@ -39,6 +41,7 @@ from uuid import uuid4
 
 from psycopg.types.json import Jsonb
 
+from .contracts import validate_contract
 from .errors import DomainError
 from .policy import action_digest
 
@@ -70,6 +73,19 @@ SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 #: ``comm`` is included because a rootlesskit process answering in buildkitd's place
 #: would otherwise satisfy a pid-only comparison.
 DAEMON_IDENTITY_FIELDS = ("pid", "processUid", "processStartTicks", "comm")
+
+#: How old a node-agent health observation may be, measured against the database clock.
+#: The adapter checks its own provider observation with the same window; this is a
+#: different observation by a different writer and needs its own check (#312 F-R1).
+HEALTH_FRESHNESS_SECONDS = 15
+
+#: The observations ``BuildCleanupReceipt`` repeats from the physical receipt.  Two cleanup
+#: receipts that disagree about the same fact must not release a lease, so they are
+#: compared exactly rather than trusted separately (#312 F-R2).  ``leaseReleased`` is not
+#: here: it is proven by the conditional UPDATE, never by a caller's statement.
+DUPLICATED_CLEANUP_OBSERVATIONS = (
+    "cacheDisposition", "builderClaimReleased", "cgroupRemoved", "verifiedAt",
+)
 
 
 @dataclass(frozen=True)
@@ -121,11 +137,23 @@ class BuildExecutionService:
 
     # ---------------------------------------------------------------- preconditions
 
+    def _database_now(self, tenant_id: str):
+        """The authoritative current time, read from the database rather than this host."""
+
+        with self.db.transaction(tenant_id) as conn:
+            row = conn.execute("SELECT clock_timestamp() AS now").fetchone()
+        now = row.get("now") if isinstance(row, dict) else None
+        if now is None or getattr(now, "tzinfo", None) is None:
+            raise DomainError("SYS-0001", "Database clock is unavailable", 503)
+        return now
+
     def _require_product_enable(self) -> None:
         if self._environment.get(PRODUCT_ENABLE_SETTING) != PRODUCT_ENABLE_VALUE:
             raise _refuse_product_dispatch("BuildKit product dispatch is not enabled")
 
-    def _health_authority(self, health: Any, *, leased_node_id: str, lease_epoch: str) -> dict:
+    def _health_authority(
+        self, health: Any, *, leased_node_id: str, lease_epoch: str, now=None
+    ) -> dict:
         """Compare a collected health receipt against this dispatch's authority."""
 
         if not isinstance(health, dict):
@@ -149,7 +177,25 @@ class BuildExecutionService:
                 raise _refuse_product_dispatch(
                     f"builder isolation {key} is a CI reference value, not product isolation"
                 )
+        if now is not None:
+            self._require_fresh_observation(health.get("observedAt"), now)
         return self._daemon_identity(health, "builder health receipt")
+
+    @staticmethod
+    def _require_fresh_observation(observed_at: Any, now) -> None:
+        """Refuse an observation that is stale or ahead of the authoritative clock."""
+
+        try:
+            observed = dt.datetime.fromisoformat(str(observed_at).replace("Z", "+00:00"))
+        except (TypeError, ValueError):
+            raise DomainError(
+                "RES-0003", "builder health observation has no readable observedAt", 409
+            ) from None
+        if observed.tzinfo is None:
+            raise DomainError("RES-0003", "builder health observedAt has no time zone", 409)
+        age = (now - observed).total_seconds()
+        if age < 0 or age > HEALTH_FRESHNESS_SECONDS:
+            raise DomainError("RES-0003", "builder health observation is stale", 409)
 
     def _require_epoch_agreement(self, receipt_epoch: Any, lease_epoch: str) -> None:
         """Three-way agreement: receipt, this database's epoch and the lease's.
@@ -254,6 +300,33 @@ class BuildExecutionService:
             raise refuse("Build cleanup receipt records no verification time")
         return dict(receipt)
 
+    @staticmethod
+    def _require_duplicated_observations(caller: Any, physical: Mapping[str, Any]) -> None:
+        """The BuildReceipt's cleanup receipt must agree with the physical one, exactly.
+
+        The public receipt repeats four of the physical receipt's observations.  Checking
+        only the physical one leaves the pair free to contradict each other, and a release
+        justified by two receipts that disagree is justified by neither (#312 F-R2).
+        """
+
+        if not isinstance(caller, dict):
+            raise DomainError(
+                "VERIFY-0022", "the dispatched BuildReceipt carries no cleanup receipt", 409
+            )
+        for field in DUPLICATED_CLEANUP_OBSERVATIONS:
+            if field not in caller:
+                raise DomainError(
+                    "VERIFY-0022",
+                    f"the BuildReceipt cleanup receipt does not repeat {field}",
+                    409,
+                )
+            if caller[field] != physical.get(field):
+                raise DomainError(
+                    "VERIFY-0022",
+                    f"the two cleanup receipts disagree about {field}",
+                    409,
+                )
+
     def _require_physical_pair(self, cleanup: Any) -> None:
         """The product path requires the pair the contract only requires together.
 
@@ -297,6 +370,7 @@ class BuildExecutionService:
         evidence_id: str,
         evidence: Mapping[str, Any],
         cleanup_receipt: Any,
+        caller_cleanup: Any,
         build_session_id: str,
         daemon_before: Mapping[str, Any],
         lease_id: str,
@@ -347,6 +421,11 @@ class BuildExecutionService:
                 "physicalReceipt": deepcopy(verified),
                 "physicalReceiptDigest": canonical_digest(verified),
             }
+            self._require_duplicated_observations(caller_cleanup, verified)
+            cleanup_receipt = {
+                **deepcopy(dict(caller_cleanup)),
+                **cleanup_receipt,
+            }
             self._require_physical_pair(cleanup_receipt)
             envelope = {
                 **deepcopy(dict(evidence)),
@@ -366,6 +445,19 @@ class BuildExecutionService:
             ).fetchone()
             if not released:
                 raise DomainError("LEASE-0002", "Build lease was released concurrently", 409)
+            # ``leaseReleased`` is true because this UPDATE matched, not because anyone said so.
+            cleanup_receipt["leaseReleased"] = True
+            # The public payload is exactly the six keys the contract allows, and the
+            # canonical validator says so before the row exists rather than after (#312 F-R3).
+            payload = {
+                "decisionId": decision_id,
+                "bindingDigest": binding_digest,
+                "resourceId": resource_id,
+                "leaseId": lease_id,
+                "evidenceId": evidence_id,
+                "evidenceDigest": evidence_digest,
+            }
+            validate_contract("BuildDispatchCompletedPayload", payload)
             conn.execute(
                 """INSERT INTO inv.outbox(tenant_id,run_id,event_id,event_type,payload)
                 VALUES (%s,%s,%s,%s,%s)""",
@@ -374,17 +466,7 @@ class BuildExecutionService:
                     run_id,
                     uuid4(),
                     COMPLETED_EVENT,
-                    Jsonb(
-                        {
-                            "decisionId": decision_id,
-                            "bindingDigest": binding_digest,
-                            "resourceId": resource_id,
-                            "leaseId": lease_id,
-                            "leasedNodeId": leased_node_id,
-                            "evidenceId": evidence_id,
-                            "evidenceDigest": evidence_digest,
-                        }
-                    ),
+                    Jsonb(payload),
                 ),
             )
         return BuildExecutionResult(
@@ -428,7 +510,10 @@ class BuildExecutionService:
         leased_node_id = self._leased_node_id(request["tenantId"], resource_id)
         health = self._transport.collect_product_health()
         daemon_before = self._health_authority(
-            health, leased_node_id=leased_node_id, lease_epoch=lease_epoch
+            health,
+            leased_node_id=leased_node_id,
+            lease_epoch=lease_epoch,
+            now=self._database_now(request["tenantId"]),
         )
 
         dispatched = self._adapter.execute(
@@ -470,6 +555,7 @@ class BuildExecutionService:
                 evidence_id=evidence_id,
                 evidence=dispatched.evidence,
                 cleanup_receipt=cleanup_receipt,
+                caller_cleanup=dispatched.receipt.get("cleanup"),
                 build_session_id=build_session_id,
                 daemon_before=daemon_before,
                 lease_id=lease_id,
@@ -485,7 +571,12 @@ class BuildExecutionService:
                 decision_id=decision["decisionId"],
             )
         except DomainError as error:
-            if error.code == "VERIFY-0022":
+            # LEASE-0002 here means the external dispatch already happened and this caller
+            # lost the commit: nothing durable landed, so the node holds state nobody has
+            # accounted for. The one-shot decision claim is consumed, so an automatic retry
+            # answers IDEM-0001 -- which makes a durable reconciliation marker the only way
+            # an operator learns about it (#312 F-R4).
+            if error.code in {"VERIFY-0022", "LEASE-0002"}:
                 # Nothing committed: no Evidence, no release. The node keeps the
                 # unaccounted state, so it is quarantined rather than handed the next
                 # build, and an operator reconciles it.
