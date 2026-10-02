@@ -1105,6 +1105,24 @@ def test_duplicating_any_list_item_is_refused(allowlist):
     assert survivors == []
 
 
+def test_a_duplicated_measured_role_is_refused(allowlist):
+    """``measuredRoles`` names a population, so a name twice is not a longer population.
+
+    Three independent constraints say so -- ``uniqueItems``, the exact length, and the set
+    equality with ``roles`` -- which is why removing any one of them alone changes nothing.  The
+    case F-R6 found is the one that keeps the length: one name dropped, another repeated.
+    """
+
+    report = rls_report(allowlist)
+    report["measuredRoles"] = sorted(report["measuredRoles"])[:-1] + [report["measuredRoles"][0]]
+    assert len(report["measuredRoles"]) == len(tool.RLS_REQUIRED_ROLES)
+    assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.INVALID_RUN
+
+    longer = rls_report(allowlist)
+    longer["measuredRoles"] = sorted(longer["measuredRoles"]) + [longer["measuredRoles"][0]]
+    assert tool.evaluate_rls(longer, allowlist, NOW) is tool.Verdict.INVALID_RUN
+
+
 def test_ground_truth_must_correspond_to_the_measured_tables_both_ways(allowlist):
     """A truth row for a table nothing measured, and a measured table with no truth row.
 
