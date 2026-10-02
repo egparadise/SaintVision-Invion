@@ -35,6 +35,7 @@ REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.
 REGISTRY_BLOB = "eeb43dc262f5de1816237ef85fc902cdca4ab6fd"
 TARGET_ID = "s11-accessibility-user-device-v1"
 EMITTED_AXES: tuple[str, ...] = ("accessibility-e2e",)
+MINIMUM_PYTHON = (3, 11)
 MANUAL_PURPOSE = "s11-ac11-accessibility-user-device-manual"
 EXPECTED_SCENARIOS = {
     "ACC-MANUAL-KEYBOARD-JOURNEY",
@@ -518,6 +519,15 @@ def _token_from_stdin() -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # Check before argparse, file reads, and especially stdin.  On an unsupported
+    # interpreter a fresh bearer token must remain completely unread.
+    if sys.version_info[:2] < MINIMUM_PYTHON:
+        print(
+            "AC-11 accessibility import requires Python 3.11 or newer; "
+            "access-token stdin was not read",
+            file=sys.stderr,
+        )
+        return 2
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--archive", type=Path, required=True)
     parser.add_argument("--run-metadata", type=Path, required=True)

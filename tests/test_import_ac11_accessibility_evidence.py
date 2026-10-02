@@ -432,6 +432,18 @@ def test_published_manual_schema_is_strict_and_matches_scenarios():
     assert not re.fullmatch(schema["properties"]["startedAt"]["pattern"], "2026-10-02T00:00:00+00:00")
 
 
+def test_unsupported_python_refuses_before_reading_access_token(monkeypatch, capsys):
+    class RefuseRead:
+        def read(self, *_args, **_kwargs):
+            raise AssertionError("stdin token must not be read on unsupported Python")
+
+    monkeypatch.setattr(tool.sys, "version_info", (3, 10, 99))
+    monkeypatch.setattr(tool.sys, "stdin", RefuseRead())
+
+    assert tool.main([]) == 2
+    assert "requires Python 3.11 or newer" in capsys.readouterr().err
+
+
 def test_windows_runbook_separates_python310_download_from_supported_import_runtime():
     runbook = (
         ROOT / "docs/vault/40_Operations/AC-11_사용자_기기_접근성_수동_인수_절차.md"
@@ -439,5 +451,5 @@ def test_windows_runbook_separates_python310_download_from_supported_import_runt
 
     assert "사용자 PC의 기본 Python 3.10에서 실행하지 않는다" in runbook
     assert "Python 3.12 또는 3.14 환경에서만 실행한다" in runbook
-    assert "importer `--help`가 Python 3.10에서 보이는 것은 import 실행 호환성을 뜻하지 않는다" in runbook
+    assert "token stdin을 읽기 전에 Python 3.11 미만을 즉시 거부" in runbook
     assert "어느 전제라도\n없으면 import를 시도하지 않고 `NOT_OBSERVED`를 유지한다" in runbook

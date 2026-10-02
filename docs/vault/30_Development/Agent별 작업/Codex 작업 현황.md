@@ -1,15 +1,37 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.265"
+version: "1.0.267"
 status: "review"
 author: "Codex"
 updated: "2026-10-02T09:45:53+09:00"
 source_of_truth: "Git"
-active_card: "CARD-205 AC-11 accessibility user-device manual acceptance importer"
-active_card_status: "Canonical AC-11 accessibility row now complete and assembler-to-aggregator consumption regression passes"
+active_card: "CARD-211 VF-CL CI receipt attestation"
+active_card_status: "Exact-head producer and attestation dispatch passed; signed receipt remains feature-head evidence"
 active_card_next: "Land with train 16 (#302 repair merged; Backend/Frontend green on repair head 1d6894fe); after landing, the user runs the §12 device manual acceptance per the #300 checklist and imports it with tools/import_ac11_accessibility_evidence.py"
 ---
+
+## 2026-10-02 Card 211 — VF-CL CI receipt attestation
+
+- `#295`의 offline receipt 위조 생존을 닫기 위해 workflow_dispatch-only receipt producer와
+  `actions/attest@v4` 서명 job, GitHub identity·source SHA/ref·receipt bytes 검증기를 구현했다.
+- 서명 권한은 별도 job에만 있고 PR event에서는 OIDC token을 받지 않는다. bundle 부재·타 repository,
+  workflow, SHA, ref·위조 receipt·만료 artifact는 모두 fail closed다.
+- 구현 tree에는 정본 bundle이 아직 없으므로 `VF-CL-04.ciVerified=false`를 유지한다. hosted exact-head run과
+  착지 SHA 재검증을 구분한다. 설계 [[VF-CL-04_CI_receipt_attestation_설계_Codex]], History
+  [[2026-10-02_07-24-06_KST_Card211_VF-CL_CI_receipt_attestation_Codex]].
+- `#302`의 사용자 절차는 Windows Python 3.10을 downloader/ZIP 생성에만 쓰고 importer는 agent의 지원
+  Python 3.12/3.14에서 실행하도록 선반영했다.
+- Claude r1의 만료 공백을 닫아 evidence artifact 보존기간을 30일로 고정하고, attested/recorded
+  `expiresAt` 누락·불일치·만료를 모두 거부한다. importer는 Python 3.11 미만에서 stdin을 읽기 전에
+  즉시 거부한다. 세 focused 파일 **265 passed**.
+- label producer run `36940289003` success. dispatch `36940396639`은 raw 64-hex output과
+  `sha256:` API digest 비교 형식 차이로 receipt step에서 실패했고, 정규화 회귀를 추가했다.
+- 정규화 뒤 exact-head label run `36940633798`과 workflow_dispatch run `36940757636`이 success했다.
+  Evidence artifact `11200122628`(`sha256:5615eba6…`, expires `2026-10-31T23:26:34Z`)와 attestation
+  artifact `11200405399`(`sha256:efa66df4…`, expires `2026-10-31T23:27:03Z`)을 독립 다운로드해
+  receipt·Sigstore repository/workflow/ref/head identity를 대조했다. feature-head 측정이므로
+  `ciVerified=false` 유지.
 
 ## 2026-10-02 Card 205 — AC-11 사용자 기기 접근성 수동 인수 importer
 
