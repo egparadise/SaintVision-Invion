@@ -1,0 +1,127 @@
+{
+  "$defs": {
+    "ProjectDataLocationResponse": {
+      "additionalProperties": false,
+      "description": "A catalogued location as a project-scoped reader sees it (card 253).\n\nThe same fields the tenant-wide contract carries, plus the project the row\nis bound to. ``contributionId`` stays a reference: a contribution belongs to\na node and a tenant, not to a project, so there is no project-scoped\ncontribution list to point at (card 250 §3-2-1).",
+      "properties": {
+        "byteSize": {
+          "title": "Bytesize",
+          "type": "integer"
+        },
+        "checksumSha256": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checksumsha256"
+        },
+        "contributionId": {
+          "title": "Contributionid",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "artifact",
+            "dataset",
+            "model",
+            "workspace"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "locationId": {
+          "title": "Locationid",
+          "type": "string"
+        },
+        "projectId": {
+          "title": "Projectid",
+          "type": "string"
+        },
+        "ready": {
+          "title": "Ready",
+          "type": "boolean"
+        },
+        "relativePath": {
+          "title": "Relativepath",
+          "type": "string"
+        },
+        "retentionPinnedUntil": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Retentionpinneduntil"
+        },
+        "uri": {
+          "title": "Uri",
+          "type": "string"
+        },
+        "verifiedAt": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Verifiedat"
+        }
+      },
+      "required": [
+        "locationId",
+        "projectId",
+        "contributionId",
+        "uri",
+        "kind",
+        "relativePath",
+        "byteSize",
+        "ready"
+      ],
+      "title": "ProjectDataLocationResponse",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Paginated project-scoped catalogue locations (card 253).",
+  "properties": {
+    "items": {
+      "items": {
+        "$ref": "#/$defs/ProjectDataLocationResponse"
+      },
+      "title": "Items",
+      "type": "array"
+    },
+    "nextCursor": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Nextcursor"
+    }
+  },
+  "required": [
+    "items",
+    "nextCursor"
+  ],
+  "title": "ProjectDataLocationPageResponse",
+  "type": "object"
+}

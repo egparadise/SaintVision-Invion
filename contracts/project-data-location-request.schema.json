@@ -1,0 +1,195 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Catalogue one item of a contribution into a project (card 253).\n\n``projectId`` is deliberately **not** a field. The project comes from the\npath, after ``require_project_access`` has judged the caller's membership;\naccepting it in the body would let a caller name a project the server never\nchecked. ``extra=\"forbid\"`` refuses it, so sending one is an error rather\nthan a silently ignored hint.",
+  "oneOf": [
+    {
+      "properties": {
+        "kind": {
+          "const": "artifact"
+        },
+        "name": {
+          "not": {}
+        },
+        "version": {
+          "not": {}
+        },
+        "workspaceId": {
+          "not": {}
+        }
+      },
+      "required": [
+        "kind",
+        "runId",
+        "artifactId"
+      ]
+    },
+    {
+      "properties": {
+        "artifactId": {
+          "not": {}
+        },
+        "kind": {
+          "const": "dataset"
+        },
+        "runId": {
+          "not": {}
+        },
+        "workspaceId": {
+          "not": {}
+        }
+      },
+      "required": [
+        "kind",
+        "name",
+        "version"
+      ]
+    },
+    {
+      "properties": {
+        "artifactId": {
+          "not": {}
+        },
+        "kind": {
+          "const": "model"
+        },
+        "runId": {
+          "not": {}
+        },
+        "workspaceId": {
+          "not": {}
+        }
+      },
+      "required": [
+        "kind",
+        "name",
+        "version"
+      ]
+    },
+    {
+      "properties": {
+        "artifactId": {
+          "not": {}
+        },
+        "kind": {
+          "const": "workspace"
+        },
+        "name": {
+          "not": {}
+        },
+        "runId": {
+          "not": {}
+        },
+        "version": {
+          "not": {}
+        }
+      },
+      "required": [
+        "kind",
+        "workspaceId"
+      ]
+    }
+  ],
+  "properties": {
+    "artifactId": {
+      "anyOf": [
+        {
+          "maxLength": 30,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Artifactid"
+    },
+    "byteSize": {
+      "minimum": 0,
+      "title": "Bytesize",
+      "type": "integer"
+    },
+    "contributionId": {
+      "maxLength": 30,
+      "minLength": 1,
+      "title": "Contributionid",
+      "type": "string"
+    },
+    "kind": {
+      "enum": [
+        "artifact",
+        "dataset",
+        "model",
+        "workspace"
+      ],
+      "title": "Kind",
+      "type": "string"
+    },
+    "name": {
+      "anyOf": [
+        {
+          "maxLength": 200,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Name"
+    },
+    "relativePath": {
+      "maxLength": 4096,
+      "minLength": 1,
+      "title": "Relativepath",
+      "type": "string"
+    },
+    "runId": {
+      "anyOf": [
+        {
+          "maxLength": 30,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Runid"
+    },
+    "version": {
+      "anyOf": [
+        {
+          "maxLength": 200,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Version"
+    },
+    "workspaceId": {
+      "anyOf": [
+        {
+          "maxLength": 30,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Workspaceid"
+    }
+  },
+  "required": [
+    "contributionId",
+    "kind",
+    "relativePath",
+    "byteSize"
+  ],
+  "title": "ProjectDataLocationRequest",
+  "type": "object"
+}
