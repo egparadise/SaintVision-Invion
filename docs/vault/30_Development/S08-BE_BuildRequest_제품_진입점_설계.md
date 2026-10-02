@@ -1,11 +1,11 @@
 ---
 doc_id: "DESIGN-S08-BE-BUILD-REQUEST-ENTRY-001"
 title: "S08-BE BuildRequest 제품 진입점 설계"
-version: "1.0.0"
+version: "1.0.1"
 status: "proposed"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-03T01:06:39+09:00"
+updated: "2026-10-03T01:16:21+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "53458da3604027e91d428e11db02bc09d279097c"
@@ -130,8 +130,9 @@ lease expiry, containment)는 새 값과 exact binding이 다르면 fail closed�
 0060 `inv.build_execution_admissions`는 승인과 dispatch가 끝난 뒤의 immutable authority이며
 (`migrations/versions/0060_build_execution_admissions.py:24`), prepare와 review 사이 authority를
 보관할 수 없다. 기존 approval snapshot도 `WorkloadSpec`/policy 중심이고 BuildPlan, profile
-version, checkout/content binding을 소유하지 않는다. 그러므로 구현 전 **0061 번호 배정**이
-필요하다.
+version, checkout/content binding을 소유하지 않는다. coordinator는 0061을 **조건부 예약**했다.
+Claude가 이 설계에서 table 필요성을 승인하면 확정하며, 승인 전 migration 파일을 만들지 않는다.
+확정 시 `down_revision`은 0060이고 migration graph는 단일 head여야 한다.
 
 제안 table `inv.build_preparations`:
 
@@ -141,10 +142,16 @@ version, checkout/content binding을 소유하지 않는다. 그러므로 구현
   evidence ID, status(`awaiting_approval|approved|queued|rejected|expired`);
 - FORCE RLS, tenant exact policy, `inv_kernel` 최소 column grant;
 - payload/identity immutable trigger, 허용된 status 전이만 update, DELETE 금지;
-- downgrade는 row가 한 건이라도 있으면 거부한다.
+- `expires_at`은 approval/policy/lease 중 가장 이른 시각 이하이고 최대 1시간이다. 만료 row는
+  dispatch할 수 없고 `expired` terminal 전이와 감사만 허용한다;
+- terminal row는 감사·재현을 위해 35일 보존한 뒤 별도 운영 GC가 digest receipt를 남기고
+  삭제한다. migration downgrade는 row가 한 건이라도 있으면 거부한다.
 
 승인 snapshot과 preparation은 같은 transaction에서 만들어지며 approval ID와 action digest가
-양방향 exact match해야 한다. 0061은 coordinator가 배정하기 전 생성하지 않는다.
+양방향 exact match해야 한다. 구현 PR은 `tools/write_rls_table_census.py`로 RLS census와 ground
+truth를 재생성하며 손으로 편집하지 않는다. trigger가 새 SECURITY DEFINER를 요구한다면 #333
+allowlist/definer policy에 넣기 전에 별도 보안 검토 근거와 pin 회전을 제공한다. 가능하면
+SECURITY INVOKER trigger를 사용한다.
 
 ## 5. 오류와 공개 계약
 
