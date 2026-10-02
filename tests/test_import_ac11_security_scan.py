@@ -204,6 +204,18 @@ RLS_FIXTURE_TABLES = ("public.projects", "public.tenants",
                       "public.discovery_credential_issue_budgets", "public.audit_events")
 
 
+@pytest.fixture(autouse=True)
+def reviewed_census(monkeypatch):
+    """These fixtures measure four tables; the reviewed census names the whole migrated schema.
+
+    The canonical evaluator binds the measured population to ``tools/rls-table-census.json``
+    (#322 r2 F-R7), so a fixture has to say which population it is about.  The file itself is
+    measured by the aggregator's own suite, and the hosted report is measured against it in the PR.
+    """
+
+    monkeypatch.setattr(aggregator, "rls_table_census", lambda: frozenset(RLS_FIXTURE_TABLES))
+
+
 def rls_population() -> dict:
     """The eight measured roles, each with one clean observed table.
 
@@ -306,6 +318,12 @@ def rls_report(**over) -> dict:
         "unmeasured": [],
         "measuredRoles": sorted(aggregator.RLS_REQUIRED_ROLES),
         "roles": rls_population(),
+        "table_census": {
+            "schemas": ["inv", "public"],
+            "count": len(RLS_FIXTURE_TABLES),
+            "sha256": aggregator._rls_census_digest(RLS_FIXTURE_TABLES),
+            "tables": sorted(RLS_FIXTURE_TABLES),
+        },
         "ground_truth": {
             name: {"total": {"rows": 2}, "tenant_a": {"rows": 1}, "other_tenants": {"rows": 1}}
             for name in RLS_FIXTURE_TABLES

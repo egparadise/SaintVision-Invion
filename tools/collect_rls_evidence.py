@@ -57,6 +57,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import hashlib
 import json
 import os
 import subprocess
@@ -491,6 +492,17 @@ def collect(dsn: str, roles: tuple[str, ...], tenant_a: str | None = None) -> di
         "tenant_guc": {"name": TENANT_GUC, "unset_value": guc_unset, "tenant_a": tenant_a,
                        "known_tenants": len(tenants), "random_tenant": random_tenant},
         "schemas": list(SCHEMAS),
+        # The catalogue census: what this collector saw in ``pg_class`` for these schemas, as a
+        # statement separate from what it then measured per role.  The AC-11 evaluator binds it to
+        # a reviewed table list, so a report cannot quietly describe a smaller database than the
+        # one the reviewed population names (#322 r2 F-R7); a collector that skipped a table would
+        # also show here as census != measured.
+        "table_census": {
+            "schemas": list(SCHEMAS),
+            "count": len(truth),
+            "sha256": hashlib.sha256("\n".join(sorted(truth)).encode("utf-8")).hexdigest(),
+            "tables": sorted(truth),
+        },
         "ground_truth": truth,
         "roles": role_reports,
         "definer_functions": function_catalogue,

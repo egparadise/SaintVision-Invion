@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import sys
 from datetime import datetime, timezone
@@ -12,6 +13,16 @@ import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def git(*args: str) -> str:
+    """One git call, for the pin ratchets."""
+
+    import subprocess
+
+    return subprocess.run(
+        ["git", *args], cwd=ROOT, capture_output=True, text=True, check=True
+    ).stdout.strip()
 sys.path.insert(0, str(ROOT / "tools"))
 
 import aggregate_ac11_evidence as tool  # noqa: E402
@@ -376,6 +387,19 @@ ANCHOR_TABLES = ("public.projects", "public.tenants",
                  "public.discovery_credential_issue_budgets", "public.audit_events")
 
 
+@pytest.fixture(autouse=True)
+def reviewed_census(monkeypatch):
+    """These fixtures measure four tables; the real reviewed census names 155.
+
+    The evaluator binds the measured population to ``tools/rls-table-census.json`` (#322 r2
+    F-R7), so a four-table fixture has to say which population it is about.  The file itself is
+    checked by ``test_the_reviewed_table_census_is_the_pinned_one``, and the hosted report is
+    measured against the real file in the PR.
+    """
+
+    monkeypatch.setattr(tool, "rls_table_census", lambda: frozenset(ANCHOR_TABLES))
+
+
 def default_tables() -> dict:
     return {name: rls_table() for name in ANCHOR_TABLES}
 
@@ -452,6 +476,12 @@ def rls_report(allowlist: dict, exit_code: int = 0, roles: dict | None = None,
         "unmeasured": [],
         "measuredRoles": sorted(roles),
         "roles": roles,
+        "table_census": {
+            "schemas": ["inv", "public"],
+            "count": len(set(tables)),
+            "sha256": tool._rls_census_digest(set(tables)),
+            "tables": sorted(set(tables)),
+        },
         "ground_truth": ground_truth if ground_truth is not None else rls_ground_truth(*tables),
     }
     return value
@@ -1105,6 +1135,73 @@ def test_duplicating_any_list_item_is_refused(allowlist):
     assert survivors == []
 
 
+def test_the_reviewed_table_census_is_the_pinned_one(allowlist):
+    """The census file is the reviewed one, agrees with itself, and is what the evaluator loads.
+
+    It is the independent authority for the population a verdict covers, so it is pinned by blob
+    like every other reviewed sidecar in this chain and it restates its own contents (count and a
+    digest over the sorted names) so it cannot disagree with itself (#322 r2 F-R7).
+    """
+
+    path = ROOT / tool.RLS_CENSUS_REPO_PATH
+    raw = path.read_bytes()
+    assert b"\r\n" not in raw, "the census must be LF so the disk blob and git agree"
+    assert hashlib.sha1(b"blob %d\0" % len(raw) + raw).hexdigest() == tool.RLS_CENSUS_BLOB
+    assert tool.RLS_CENSUS_BLOB == git("hash-object", tool.RLS_CENSUS_REPO_PATH)
+    document = json.loads(raw.decode("utf-8"))
+    assert document["count"] == len(document["tables"]) == len(set(document["tables"]))
+    assert document["sha256"] == tool._rls_census_digest(document["tables"])
+    # The loader is what the evaluator uses; imported fresh so the fixture's patch is not in
+    # the way of measuring the real file.
+    import importlib.util
+    import sys
+
+    spec = importlib.util.spec_from_file_location(
+        "aggregate_ac11_evidence_fresh", ROOT / "tools" / "aggregate_ac11_evidence.py"
+    )
+    fresh = importlib.util.module_from_spec(spec)
+    sys.modules["aggregate_ac11_evidence_fresh"] = fresh
+    spec.loader.exec_module(fresh)
+    assert fresh.rls_table_census() == frozenset(document["tables"])
+    assert len(document["tables"]) > 100, "the reviewed population is the migrated schema"
+
+
+def test_a_report_about_another_table_population_is_refused(allowlist, monkeypatch):
+    """A report measuring a different set than the reviewed census is not about this database."""
+
+    monkeypatch.setattr(tool, "rls_table_census",
+                        lambda: frozenset(ANCHOR_TABLES) | {"public.reviewed_but_absent"})
+    assert tool.evaluate_rls(rls_report(allowlist), allowlist, NOW) is tool.Verdict.INVALID_RUN
+
+    monkeypatch.setattr(tool, "rls_table_census", lambda: frozenset(ANCHOR_TABLES[:2]))
+    assert tool.evaluate_rls(rls_report(allowlist), allowlist, NOW) is tool.Verdict.INVALID_RUN
+
+
+def test_an_unloadable_or_unpinned_census_refuses_every_report(allowlist, monkeypatch):
+    """No reviewed population, no verdict: the evaluator does not fall back to the report's own."""
+
+    monkeypatch.setattr(tool, "rls_table_census", lambda: None)
+    assert tool.evaluate_rls(rls_report(allowlist), allowlist, NOW) is tool.Verdict.INVALID_RUN
+
+
+def test_the_census_in_the_report_must_agree_with_itself_and_with_what_was_measured(allowlist):
+    """The collector's census is a second statement, so the report may not shrink only one of them."""
+
+    wrong_count = rls_report(allowlist)
+    wrong_count["table_census"]["count"] = len(ANCHOR_TABLES) + 1
+    assert tool.evaluate_rls(wrong_count, allowlist, NOW) is tool.Verdict.INVALID_RUN
+
+    wrong_digest = rls_report(allowlist)
+    wrong_digest["table_census"]["sha256"] = "0" * 64
+    assert tool.evaluate_rls(wrong_digest, allowlist, NOW) is tool.Verdict.INVALID_RUN
+
+    shrunk_census = rls_report(allowlist)
+    shrunk_census["table_census"]["tables"] = sorted(ANCHOR_TABLES[:-1])
+    shrunk_census["table_census"]["count"] = len(ANCHOR_TABLES) - 1
+    shrunk_census["table_census"]["sha256"] = tool._rls_census_digest(ANCHOR_TABLES[:-1])
+    assert tool.evaluate_rls(shrunk_census, allowlist, NOW) is tool.Verdict.INVALID_RUN
+
+
 def test_a_duplicated_measured_role_is_refused(allowlist):
     """``measuredRoles`` names a population, so a name twice is not a longer population.
 
@@ -1166,17 +1263,14 @@ def test_a_row_may_not_name_something_the_report_did_not_measure(allowlist):
         assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.INVALID_RUN
 
 
-def test_dropping_a_table_with_its_truth_is_caught_only_where_something_anchors_it(allowlist):
-    """The residual this evaluator cannot close, written down instead of left implied.
+def test_dropping_any_table_with_its_truth_and_its_rows_is_refused(allowlist):
+    """The sweep F-R7 asked for: every table, removed everywhere at once, must be refused.
 
-    A report that drops a table **together with** its ground-truth row and every row that names
-    it is internally consistent, and the evaluator cannot know how many tables the migrated
-    database has -- that number lives in the database, not in the report or the reviewed
-    allowlist.  Two anchors catch the cases that matter today: the tables the reviewed allowlist
-    accepts dispositions for, and the table the pinned readable-key scope names.  Beyond those,
-    the pair deletion is accepted, and closing it exactly would need the expected table set to
-    come from the reviewed source -- an AC-11 definition change, which this card does not make
-    (#322 r2 F-R6).
+    Before the reviewed census, a report that dropped a table **together with** its ground-truth
+    row and its baseline rows was internally consistent, and the evaluator accepted it -- a
+    MEASURED_PASS over a smaller database than the one the axis is about.  The population now
+    comes from ``tools/rls-table-census.json``, so there is no pair to delete: the sweep covers
+    every table in the fixture's population and expects no survivors.
     """
 
     def without(table_name: str) -> dict:
@@ -1187,17 +1281,25 @@ def test_dropping_a_table_with_its_truth_is_caught_only_where_something_anchors_
         report["baselineAccepted"] = [
             row for row in report["baselineAccepted"] if row["table"] != table_name
         ]
+        remaining = [name for name in ANCHOR_TABLES if name != table_name]
+        report["table_census"] = {
+            "schemas": ["inv", "public"],
+            "count": len(remaining),
+            "sha256": tool._rls_census_digest(remaining),
+            "tables": sorted(remaining),
+        }
         return report
 
-    # Anchored: the readable-key scope names this one, so its absence is a refusal.
-    assert tool.evaluate_rls(without("public.audit_events"), allowlist, NOW) is \
-        tool.Verdict.INVALID_RUN
-    # Anchored through baselineAccepted: dropping the table *and* its disposition no longer
-    # matches the reviewed allowlist, which is checked exactly.
-    assert tool.evaluate_rls(without("public.tenants"), allowlist, NOW) is tool.Verdict.INVALID_RUN
-    # Not anchored: this is the residual, and it is accepted today.
-    assert tool.evaluate_rls(without("public.projects"), allowlist, NOW) is \
-        tool.Verdict.MEASURED_PASS
+    assert tool.evaluate_rls(rls_report(allowlist), allowlist, NOW) is tool.Verdict.MEASURED_PASS
+    survivors = []
+    for table_name in ANCHOR_TABLES:
+        try:
+            verdict = tool.evaluate_rls(without(table_name), allowlist, NOW)
+        except ValueError:
+            continue
+        if verdict is not tool.Verdict.INVALID_RUN:
+            survivors.append((table_name, verdict))
+    assert survivors == []
 
 
 def test_the_one_role_no_migration_creates_may_be_absent_and_the_others_may_not(allowlist):
@@ -1223,7 +1325,7 @@ def test_the_one_role_no_migration_creates_may_be_absent_and_the_others_may_not(
         assert tool.evaluate_rls(hidden, allowlist, NOW) is tool.Verdict.INVALID_RUN, role
 
 
-def test_ground_truth_must_have_the_shape_that_table_actually_has(allowlist):
+def test_ground_truth_must_have_the_shape_that_table_actually_has(allowlist, monkeypatch):
     """A tenant-scoped table has a tenant-A truth; a table without a tenant column does not.
 
     The derivation compares the role's tenant-A count with the owner's, so a scoped table whose
@@ -1247,6 +1349,8 @@ def test_ground_truth_must_have_the_shape_that_table_actually_has(allowlist):
     })
     truth = rls_ground_truth()
     truth["inv.control_epoch"] = {"total": {"rows": 1}}
+    monkeypatch.setattr(tool, "rls_table_census",
+                        lambda: frozenset(ANCHOR_TABLES) | {"inv.control_epoch"})
     report = rls_report(allowlist, roles=unscoped, ground_truth=truth)
     assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.MEASURED_PASS
 
@@ -1418,7 +1522,7 @@ def test_every_rls_row_must_be_derivable_from_the_observations(forge, allowlist)
     assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.INVALID_RUN
 
 
-def test_the_collector_and_the_evaluator_derive_the_same_rows(allowlist):
+def test_the_collector_and_the_evaluator_derive_the_same_rows(allowlist, monkeypatch):
     """The two implementations of E1..E5 must agree, and this test is where drift shows.
 
     The evaluator re-derives the rules rather than trusting the report (#322 r2), so there are
@@ -1461,6 +1565,8 @@ def test_the_collector_and_the_evaluator_derive_the_same_rows(allowlist):
     assert [(row["rule"], row["table"]) for row in violations] == [("E4", "public.runs")]
     assert [(row["rule"], row["table"]) for row in unmeasured] == [("E4", "public.audit_events")]
 
+    monkeypatch.setattr(tool, "rls_table_census",
+                        lambda: frozenset(ANCHOR_TABLES) | {"public.runs"})
     report = rls_report(allowlist, 1, roles=roles, ground_truth=observation["ground_truth"])
     report.update(verdict="VIOLATIONS", violations=violations, unmeasured=unmeasured)
     assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.MEASURED_FAIL

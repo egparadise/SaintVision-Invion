@@ -87,7 +87,7 @@ DEFINER_FILES = [
     {"path": "tools/definer-policy.json", "blob": "90c0e34e7db172aea4e4203bcebad39f8f732514"},
 ]
 RLS_FILES = [
-    {"path": "tools/collect_rls_evidence.py", "blob": "a13d95ba6d55da67b488cde14e79a3573f5efa0c"},
+    {"path": "tools/collect_rls_evidence.py", "blob": "684e0f4896202e112a70798ea8c01a545ffd3896"},
     {"path": "tools/rls-boundary-baseline.json", "blob": "5f6eb104fa6ca455de78423a6f678fd8fc99d6df"},
 ]
 
@@ -682,8 +682,15 @@ RLS_REPORT_KEYS = frozenset({
     "threatId", "sourceRunId", "sourceHeadSha", "checkoutTreeSha", "cleanCheckout",
     "reportAvailable", "runPurpose", "schemaVersion", "startedAt", "finishedAt",
     "toolFiles", "baselineAccepted", "exitCode", "verdict", "violations", "accepted",
-    "unmeasured", "measuredRoles", "roles", "ground_truth",
+    "unmeasured", "measuredRoles", "roles", "table_census", "ground_truth",
 })
+#: The reviewed table population.  Without it the measured population was whatever the report
+#: carried, so deleting a table together with its truth row and its baseline rows left a
+#: self-consistent report and a MEASURED_PASS over a smaller database (#322 r2 F-R7).  A migration
+#: that adds or removes a table in ``inv``/``public`` makes this stale: regenerate with
+#: ``tools/collect_rls_evidence.py --disposable`` and repin the blob in the same reviewed change.
+RLS_CENSUS_REPO_PATH = "tools/rls-table-census.json"
+RLS_CENSUS_BLOB = "c3db5f3edd2a12f1973aef1819dbfadaab0dec41"
 #: Tables that must appear in the measured set, derived from the pinned readable-key scope (the
 #: reviewed allowlist's own tables are anchored separately, because ``baselineAccepted`` has to
 #: match it exactly and every table it names has to be measured).  An independent anchor against
@@ -941,10 +948,60 @@ def rls_report_schema() -> dict[str, Any]:
                     for name in sorted(RLS_REQUIRED_ROLES)
                 },
             },
+            "table_census": {
+                "type": "object", "additionalProperties": False,
+                "required": ["schemas", "count", "sha256", "tables"],
+                "properties": {
+                    "schemas": {"type": "array", "minItems": 1, "uniqueItems": True,
+                                "items": {"type": "string", "minLength": 1}},
+                    "count": {"type": "integer", "minimum": 1},
+                    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+                    "tables": {"type": "array", "minItems": 1, "uniqueItems": True,
+                               "items": {"type": "string", "minLength": 1}},
+                },
+            },
             "ground_truth": {"type": "object", "minProperties": 1,
                              "additionalProperties": truth},
         },
     }
+
+
+def _rls_census_digest(tables) -> str:
+    """The digest both the reviewed file and the report state over their sorted names."""
+
+    return hashlib.sha256(chr(10).join(sorted(tables)).encode("utf-8")).hexdigest()
+
+
+@functools.lru_cache(maxsize=1)
+def rls_table_census() -> frozenset[str] | None:
+    """The reviewed table population, or None when the file is missing or not the reviewed one.
+
+    Verified by blob, like every other reviewed sidecar in this chain, and re-derived from its own
+    contents: the file states a count and a digest over its sorted names, and both are recomputed
+    here so the file cannot disagree with itself either.
+    """
+
+    path = ROOT / RLS_CENSUS_REPO_PATH
+    try:
+        raw = path.read_bytes()
+    except OSError:
+        return None
+    blob = hashlib.sha1(f"blob {len(raw)}\0".encode() + raw).hexdigest()
+    if blob != RLS_CENSUS_BLOB:
+        return None
+    try:
+        document = json.loads(raw.decode("utf-8"))
+        tables = document["tables"]
+        if (
+            not isinstance(tables, list)
+            or len(tables) != len(set(tables))
+            or document["count"] != len(tables)
+            or document["sha256"] != _rls_census_digest(tables)
+        ):
+            return None
+    except (UnicodeError, json.JSONDecodeError, KeyError, TypeError):
+        return None
+    return frozenset(tables)
 
 
 @functools.lru_cache(maxsize=1)
@@ -1000,6 +1057,22 @@ def rls_report_shape(report: Any) -> str | None:
     if set(report["measuredRoles"]) != set(roles):
         return "measuredRoles must name exactly the measured population"
 
+    # The population a verdict covers comes from the reviewed census, not from the report.
+    reviewed = rls_table_census()
+    if reviewed is None:
+        return f"{RLS_CENSUS_REPO_PATH} is missing, unpinned or inconsistent with itself"
+    census = report["table_census"]
+    observed = set(census["tables"])
+    if census["count"] != len(census["tables"]):
+        return "table_census.count does not match the names it lists"
+    if census["sha256"] != _rls_census_digest(census["tables"]):
+        return "table_census.sha256 does not cover the names it lists"
+    if observed != reviewed:
+        unexpected = sorted(observed - reviewed)
+        absent = sorted(reviewed - observed)
+        return (f"the collector's catalogue census does not match the reviewed population "
+                f"(unreviewed {unexpected[:3]}, missing {absent[:3]})")
+
     measured: set[str] | None = None
     scoped: set[str] = set()
     for role_name, role_report in roles.items():
@@ -1018,6 +1091,11 @@ def rls_report_shape(report: Any) -> str | None:
                 scoped.add(table_name)
     if not measured:
         return "no role measured any table"
+    if measured != reviewed:
+        unexpected = sorted(measured - reviewed)
+        absent = sorted(reviewed - measured)
+        return (f"the measured tables are not the reviewed population "
+                f"(unreviewed {unexpected[:3]}, missing {absent[:3]})")
     if set(ground_truth) != measured:
         ghosts = sorted(set(ground_truth) - measured)
         gaps = sorted(measured - set(ground_truth))
