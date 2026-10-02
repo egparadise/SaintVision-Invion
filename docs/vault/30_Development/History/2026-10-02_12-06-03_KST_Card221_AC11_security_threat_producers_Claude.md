@@ -1,12 +1,12 @@
 ---
 doc_id: "HISTORY-CARD221-AC11-SECURITY-THREAT-PRODUCERS-20261002"
 title: "카드 221 — security 축의 나머지 세 threat report를 배선했다. 축은 NOT_OBSERVED로 평가되고, 막는 것이 코드에서 세 개의 검토 결정으로 바뀌었다"
-version: "1.0.0"
+version: "1.2.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-02T12:44:16+09:00"
+updated: "2026-10-02T14:52:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "7301c6a7"
@@ -77,6 +77,18 @@ tags: ["ac11", "security", "threat-reports", "rls", "definer", "s11", "claude"]
 
 **이전 artifact로는 재측정할 수 없었다** — F1을 고쳐 importer 파일이 바뀌자, 이전 head에서 돈 lane의 artifact가 pin한 importer blob과 실행 blob이 달라 `#313` F-R3의 결속이 **의도대로 거부**했다. 그래서 두 lane을 새 head에서 다시 돌렸다.
 
+## 2-2. `#319` F2 이후 — tree를 GitHub에서 읽고 다시 측정했다
+
+| 단계 | 결과 |
+|---|---|
+| security lane | **run `36968081091`**, head **`9efbbbbc`**, success. artifact `11210423938` |
+| browser lane | **run `36968084171`**, 같은 head, `workflow_dispatch`, success. artifact `11210801372` |
+| GitHub metadata | 두 run의 `head_commit`이 **`id = 9efbbbbc…`, `tree_id = 4484dc27…`** 로 서로 같다 — 서로 독립인 두 증인 |
+| importer | exit 0. `SEC-VF-001`의 `checkoutTreeSha`가 **browser run의 검증된 `tree_id`** 에서 기록된다(scan report 복사 아님) |
+| 봉투 | `NOT_OBSERVED` — SCAN **MEASURED_PASS** · VF **MEASURED_PASS** · RLS `NOT_OBSERVED`, `SEC-DEF-001`은 `INVALID_RUN`으로 빠진다 |
+
+**실제 입력으로 부정 probe 둘**: 내려받은 browser run metadata의 `head_commit.tree_id`를 `f`\*40으로 바꾸면 `browser lane run head_commit tree differs from the scan tree`로 거부하고, `head_commit`을 지우면 `carries no head_commit object`로 거부한다. 둘 다 exit 2다.
+
 ## 3. 막는 것 — 코드가 아니라 **세 개의 검토 결정**
 
 | # | 무엇이 막는가 | 왜 코드가 아닌가 |
@@ -138,6 +150,16 @@ tags: ["ac11", "security", "threat-reports", "rls", "definer", "s11", "claude"]
 **조치**: 입력을 셋으로 만들고(archive + run metadata + artifact metadata, 하나라도 없으면 거부) scan artifact와 같은 검증을 적용했다(§1-2). report의 provenance는 **검증한 VF run/artifact**이고, `vfArtifact` 블록이 runId·artifactId·이름·digest·observedDigest·만료·conclusion·proof digest를 남긴다.
 
 **단일 변이 부정 시험 열다섯**: 다른 run, 다른 head(run·artifact 각각), 다른 repository, 다른 workflow, 실패한 run, 미완 run, 승인되지 않은 event, 위조 digest, 만료 flag, 만료 시각, 다른 artifact 이름, proof member 없음, unsafe member path, 그리고 **입력 셋 중 하나를 빼는 것**(셋 — 빼기가 허용되면 caller가 싫은 결속만 버릴 수 있다). provenance 없는 입력을 정상으로 고정했던 fixture는 **실제 archive와 두 metadata로 교체**했다.
+
+## 7-2. `#319` F2 — tree를 결속하지 않고 **베꼈다**
+
+**지적이 맞다.** F1을 고친 뒤에도 `vf_report()`는 `head_sha`만 비교하고 `checkoutTreeSha`는 **scan report에서 복사**했다. 그래서 producer report의 그 한 필드를 `f`\*40으로 바꾸면 **그대로 통과**했다(Codex probe). head가 같다는 것은 tree가 같다는 뜻이지만, 그것을 *확인한 것*이 아니라 *보고가 그렇다고 말한 것*을 적고 있었다.
+
+**무엇이 잘못이었나**: F1에서 "GitHub이 서명한 artifact에서 왔는가"를 물었는데, **tree에 대해서는 같은 질문을 하지 않았다.** GitHub은 run마다 `head_commit`(그 안에 `tree_id`)을 들고 있고 그것이 바로 "어느 tree가 돌았는가"에 대한 GitHub 자신의 진술인데, 나는 그것을 읽지 않았다 — F1과 **같은 모양의 누락**이 한 필드 옆에 남아 있었다.
+
+**조치**: `_head_commit_tree()` 하나를 두고 **두 run 모두**에 적용한다. `head_commit`은 strict object로 필수이고, `id == sourceHeadSha`, `tree_id`는 40-hex여야 한다. scan report의 `checkoutTreeSha`는 **scan run의 `head_commit.tree_id`와 같아야** 하고, VF report의 `checkoutTreeSha`는 **browser run의 검증된 `tree_id`에서 기록**한다(§2-2). 두 run의 tree가 서로 다르면 거부한다.
+
+**단일 변이 부정 시험 다섯**: `head_commit` 누락(browser·scan 각각), `id`가 다른 commit, `tree_id` 없음, `tree_id`가 다른 tree, 그리고 **scan report의 `checkoutTreeSha`만 위조**(Codex가 돈 그 probe). 실제 run metadata로 같은 두 가지를 다시 확인했다(§2-2).
 
 ## 8. 다음 첫 행동
 

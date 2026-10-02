@@ -266,6 +266,8 @@ def vf_bundle(proof=None, run=None, artifact=None, members=None) -> tuple:
         "status": "completed",
         "conclusion": "success",
         "head_sha": SOURCE,
+        # GitHub's own statement about which commit -- and so which tree -- that run built.
+        "head_commit": {"id": SOURCE, "tree_id": TREE},
         "event": "workflow_dispatch",
         "path": APPROVED_ALLOWLIST["secVf001"]["workflow"]["path"] + "@refs/heads/x",
         "repository": {"full_name": tool.REPOSITORY},
@@ -312,6 +314,7 @@ def metadata(payload_bytes: bytes) -> tuple[dict, dict]:
         "status": "completed",
         "conclusion": "success",
         "head_sha": SOURCE,
+        "head_commit": {"id": SOURCE, "tree_id": TREE},
         "event": "pull_request",
         "path": f"{tool.WORKFLOW_PATH}@refs/pull/226/merge",
         "repository": {"full_name": tool.REPOSITORY},
@@ -636,6 +639,15 @@ def test_browser_lane_evidence_that_is_not_the_reviewed_one_is_refused(mutation)
         ("expired-flag", {"artifact": {"expired": True}}, "expired"),
         ("expired-date", {"artifact": {"expires_at": "2026-10-01T00:00:00Z"}}, "expired"),
         ("other-artifact-name", {"artifact": {"name": "something-else"}}, "artifact name"),
+        # #319 r2 F2: the tree was not bound at all, so these three were not refusals.
+        ("missing-head-commit", {"run": {"head_commit": None}}, "no head_commit object"),
+        ("head-commit-other-id", {"run": {"head_commit": {"id": "f" * 40, "tree_id": TREE}}},
+         "about another commit"),
+        ("head-commit-other-tree",
+         {"run": {"head_commit": {"id": SOURCE, "tree_id": "f" * 40}}},
+         "tree differs from the scan tree"),
+        ("head-commit-no-tree", {"run": {"head_commit": {"id": SOURCE}}},
+         "no canonical tree id"),
     ],
 )
 def test_browser_lane_provenance_is_verified_one_mutation_at_a_time(label, kwargs, message):
@@ -665,6 +677,40 @@ def test_the_vf_report_carries_the_browser_run_not_the_scan_run():
     assert binding["digest"] == binding["observedDigest"]
     assert binding["runConclusion"] == "success"
     assert len(binding["proofSha256"]) == 64
+
+
+def test_the_vf_tree_is_read_from_the_browser_head_commit_not_copied():
+    """#319 r2 F2: the exact probe Codex ran -- change the scan report's tree alone.
+
+    r1 compared ``head_sha`` and then copied ``checkoutTreeSha`` out of the scan report, so a
+    report naming any tree imported as MEASURED_PASS.  Now the scan run's own ``head_commit``
+    refuses that report, and what the VF report records comes from the browser run's verified
+    ``head_commit.tree_id`` -- the same value, reached independently.
+    """
+
+    forged = producer_report()
+    forged["checkoutTreeSha"] = "f" * 40
+    with pytest.raises(tool.SecurityImportError, match="head_commit tree"):
+        imported(forged, database=(definer_report(), rls_report()), vf=vf_bundle())
+
+    envelope = imported(database=(definer_report(), rls_report()), vf=vf_bundle())
+    vf = [row for row in envelope["observations"] if row["threatId"] == "SEC-VF-001"][0]
+    assert vf["checkoutTreeSha"] == TREE
+
+
+def test_a_scan_run_without_a_head_commit_tree_is_refused():
+    """The scan side is bound the same way: no head_commit, no import.
+
+    Both importers in this chain get their run metadata from ``gh api .../actions/runs/<id>``,
+    which carries ``head_commit``; a hand-written metadata file that drops it is exactly the
+    input this refusal exists for.
+    """
+
+    blob = archive(database=(definer_report(), rls_report()))
+    run_metadata, artifact_metadata = metadata(blob)
+    del run_metadata["head_commit"]
+    with pytest.raises(tool.SecurityImportError, match="no head_commit object"):
+        tool.import_evidence(blob, run_metadata, artifact_metadata, now=NOW)
 
 
 def test_a_browser_artifact_without_the_proof_member_is_refused():
