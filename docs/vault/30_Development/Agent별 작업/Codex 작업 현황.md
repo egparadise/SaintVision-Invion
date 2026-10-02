@@ -7,7 +7,7 @@ author: "Codex"
 updated: "2026-10-03T07:25:19+09:00"
 source_of_truth: "Git"
 active_card: "CARD-251 S08-BE fixed-SHA acceptance evidence"
-active_card_status: "Claude r1 findings closed; exact-head hosted run 37069106763 produced 13/13 MEASURED_PASS evidence"
+active_card_status: "Card 247 #343 is approved and exact-head green; Card 251 Claude r1 findings are closed and hosted run 37069106763 produced 13/13 MEASURED_PASS evidence"
 active_card_next: "Re-dispatch the docs-recorded final head, request Claude r2, keep product flag default off, and defer any 50-to-75 score decision to rescoring"
 ---
 
@@ -42,8 +42,9 @@ active_card_next: "Re-dispatch the docs-recorded final head, request Claude r2, 
   real-PG behavior guards for owner immutability, sixth-attempt `RES-0007/429`, and post-quorum
   source drift (`VERIFY-0002`, expired/failed, audit 1, admission 0). The UI follow-up rejects
   unknown kinds and undeclared build-summary keys, validates both digests, and renders only an
-  explicit redacted projection with shared-fixture API/DOM tests. Card 251 remains paused until the
-  replacement exact-head hosted runs and Claude r3 confirm this head.
+  explicit redacted projection with shared-fixture API/DOM tests. The replacement exact-head hosted
+  runs (Backend `37066783664`, Core `37066783581`) and Claude r3/r4 later confirmed this head, and
+  Card 251 resumed as PR #347.
 
 ## 2026-10-02 Card 241 — S08-BE trusted admission entry and deployment worker service
 
