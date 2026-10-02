@@ -33,13 +33,13 @@ DEFAULT_ALLOWLIST = (
     ROOT / ALLOWLIST_REPO_PATH
 )
 TARGET_REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
-TARGET_REGISTRY_BLOB = "eeb43dc262f5de1816237ef85fc902cdca4ab6fd"
-ALLOWLIST_BLOB = "ff2f9966956da677ebcdee92ec1de2292bd5ec52"
-ALLOWLIST_CANONICAL_SHA256 = "b73aba8ff97443bbd1e314d5ca0375fdcbce8205a1a746bc5a73759a04083707"
+TARGET_REGISTRY_BLOB = "60800cc0a86aa723f04308f2f38786423a94f968"
+ALLOWLIST_BLOB = "54f8edf27a845a35e1428b69bcdff6754de91bbc"
+ALLOWLIST_CANONICAL_SHA256 = "c75fc38a5a988852e6068329b901d6f01e6fa0aa7aab5dbab2846137fc16836e"
 SCAN_ALLOWLIST_REPO_PATH = (
     "docs/vault/30_Development/Evidence/s11-security-dependency-sast-allowlist-v1.json"
 )
-SCAN_ALLOWLIST_BLOB = "ea681e7b22e8deabc4f971c329a011a10b8e4d84"
+SCAN_ALLOWLIST_BLOB = "8f1a36c6584413c4ea308f35853c1f675f280fe9"
 #: The importer that may write this axis's envelopes, pinned by path here and by blob in
 #: the reviewed allowlist above (#313 F-R3).
 SECURITY_IMPORTER_REPO_PATH = "tools/import_ac11_security_scan.py"
@@ -519,7 +519,7 @@ def evaluate_definer(report: dict[str, Any], allowlist: dict[str, Any]) -> Verdi
     if exit_code not in (0, 1) or not isinstance(findings, list):
         return Verdict.INVALID_RUN
     expected = set(allowlist.get("definerPolicySignatures", []))
-    if len(expected) != 12:
+    if len(expected) != 15:
         return Verdict.INVALID_RUN
     seen: set[str] = set()
     problems: list[str] = []
@@ -593,11 +593,11 @@ def validate_allowlist(allowlist: Any) -> None:
     signatures = allowlist["definerPolicySignatures"]
     if (
         not isinstance(signatures, list)
-        or len(signatures) != 12
+        or len(signatures) != 15
         or len(set(signatures)) != len(signatures)
         or any(not isinstance(item, str) or not item for item in signatures)
     ):
-        raise ValueError("definerPolicySignatures must contain 12 unique signatures")
+        raise ValueError("definerPolicySignatures must contain 15 unique signatures")
     vf = allowlist["secVf001"]
     vf_keys = {
         "runner", "workflow", "nodeDependencyResolver", "testFiles", "requiredNodeIds",
