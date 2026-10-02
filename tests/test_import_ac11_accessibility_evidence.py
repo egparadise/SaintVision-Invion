@@ -406,7 +406,7 @@ def test_registry_and_manifest_contract_are_pinned():
     assert aggregate.TARGET_REGISTRY_BLOB == tool.REGISTRY_BLOB
     assert tool.EMITTED_AXES == (collector.AXIS,)
     assert aggregate.REQUIRED_TARGET_BY_AXIS[collector.AXIS] == tool.TARGET_ID
-    assert tool.REGISTRY_BLOB == "eeb43dc262f5de1816237ef85fc902cdca4ab6fd"
+    assert tool.REGISTRY_BLOB == "60800cc0a86aa723f04308f2f38786423a94f968"
     source_map = json.loads(
         (ROOT / "docs/ac11-axis-sources.json").read_text(encoding="utf-8")
     )
