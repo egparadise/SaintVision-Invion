@@ -33,6 +33,7 @@ def _authority(env, *, grant=True):
     run = env.runs.transition(env.tenant, run["runId"], "scheduled", expected_version=3)
     subject = "oidc:build-product-operator"
     lease_id = new_id("lse")
+    resource_id = new_id("res")
     expires = datetime.now(timezone.utc) + timedelta(minutes=4)
     policy_expires = expires + timedelta(minutes=1)
     with psycopg.connect(env.owner) as conn:
@@ -44,11 +45,15 @@ def _authority(env, *, grant=True):
                 (env.tenant, env.project, subject),
             )
         conn.execute(
+            "INSERT INTO inv.resources VALUES (%s,%s,%s,'cpu',10,10)",
+            (env.tenant, resource_id, env.node),
+        )
+        conn.execute(
             """INSERT INTO inv.resource_leases(
             tenant_id,project_id,run_id,resource_id,lease_id,amount,
             fencing_token,expires_at,recovery_epoch
             ) VALUES (%s,%s,%s,%s,%s,1,7,%s,%s)""",
-            (env.tenant, env.project, run["runId"], env.resource, lease_id, expires, env.epoch),
+            (env.tenant, env.project, run["runId"], resource_id, lease_id, expires, env.epoch),
         )
     request = {
         "apiVersion": "inv.saintvision.ai/v1alpha1",
@@ -107,7 +112,7 @@ def _authority(env, *, grant=True):
         "budget": {"cpuMillis": 2000, "memoryBytes": 1024**3, "storageBytes": 1024**3},
         "lease": {
             "leaseId": lease_id,
-            "resourceId": env.resource,
+            "resourceId": resource_id,
             "fencingToken": f"{env.epoch}:7",
             "expiresAt": _timestamp(expires),
         },
