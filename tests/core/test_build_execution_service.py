@@ -43,9 +43,9 @@ ENABLED = {PRODUCT_ENABLE_SETTING: "1"}
 
 DAEMON = {"pid": 42, "processUid": 1000, "processStartTicks": 28815, "comm": "buildkitd"}
 NOW = datetime(2026, 10, 2, 9, 0, tzinfo=timezone.utc)
-FRESH = "2026-10-02T08:59:52Z"          # 8s old against NOW
-STALE = "2026-10-02T08:59:30Z"          # 30s old, beyond the 15s window
-FUTURE = "2026-10-02T09:00:30Z"         # ahead of the database clock
+FRESH = "2026-10-02T08:59:52Z"  # 8s old against NOW
+STALE = "2026-10-02T08:59:30Z"  # 30s old, beyond the 15s window
+FUTURE = "2026-10-02T09:00:30Z"  # ahead of the database clock
 
 
 def health(**overrides):
@@ -98,8 +98,7 @@ def _serialised(params):
     if params is None:
         return None
     return tuple(
-        json.loads(json.dumps(item.obj)) if isinstance(item, Jsonb) else item
-        for item in params
+        json.loads(json.dumps(item.obj)) if isinstance(item, Jsonb) else item for item in params
     )
 
 
@@ -116,7 +115,7 @@ class _Connection:
         # object instead let a later mutation of the same dict appear in the "persisted" row,
         # which is how an envelope could gain a field after its digest was taken (#312 N1).
         params = _serialised(params)
-        if text == "SELECT clock_timestamp() AS now":   # exact: the release UPDATE also calls it
+        if text == "SELECT clock_timestamp() AS now":  # exact: the release UPDATE also calls it
             self._result = {"now": self.db.now}
         elif "FROM inv.resources" in text:
             self._result = {"node_id": self.db.resource_node_id}
@@ -148,8 +147,9 @@ class _Connection:
 
 
 class _Database:
-    def __init__(self, *, lease_epoch=EPOCH, resource_node_id=NODE, release_succeeds=True,
-                 now=None):
+    def __init__(
+        self, *, lease_epoch=EPOCH, resource_node_id=NODE, release_succeeds=True, now=None
+    ):
         self.recovery_epoch = EPOCH
         self.now = now or NOW
         self.resource_node_id = resource_node_id
@@ -196,9 +196,11 @@ def caller_cleanup(**overrides):
 
 class _Adapter:
     def __init__(self, *, receipt=None, error=None):
-        self.receipt = receipt if receipt is not None else {
-            "buildSessionId": SESSION, "cleanup": caller_cleanup()
-        }
+        self.receipt = (
+            receipt
+            if receipt is not None
+            else {"buildSessionId": SESSION, "cleanup": caller_cleanup()}
+        )
         self.error = error
         self.calls = 0
         self.call_kwargs = []
@@ -223,7 +225,11 @@ class _Boundary:
     records_durable_quarantine = True
 
     def __init__(
-        self, *, health_receipt=None, cleanup_receipt=None, daemon_after=None,
+        self,
+        *,
+        health_receipt=None,
+        cleanup_receipt=None,
+        daemon_after=None,
         preflight_error=None,
     ):
         self.health_receipt = health_receipt if health_receipt is not None else health()
@@ -263,9 +269,8 @@ def request_plan_decision(lease_epoch=EPOCH):
         "lease": {
             "leaseId": LEASE,
             "resourceId": RESOURCE,
-            "fencingToken": "7:1",
-            "recoveryEpoch": lease_epoch,
-        }
+            "fencingToken": f"{lease_epoch}:1",
+        },
     }
     decision = {"decisionId": "dec_c214"}
     return request, plan, decision
@@ -385,9 +390,15 @@ def test_product_dispatch_without_an_intent_claim_generation_is_refused():
 # --- the product enable ------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("environment", [{}, {PRODUCT_ENABLE_SETTING: "0"},
-                                         {PRODUCT_ENABLE_SETTING: "true"},
-                                         {PRODUCT_ENABLE_SETTING: " 1"}])
+@pytest.mark.parametrize(
+    "environment",
+    [
+        {},
+        {PRODUCT_ENABLE_SETTING: "0"},
+        {PRODUCT_ENABLE_SETTING: "true"},
+        {PRODUCT_ENABLE_SETTING: " 1"},
+    ],
+)
 def test_product_dispatch_is_off_unless_the_value_is_exactly_one(environment):
     service, _database, adapter, _boundary = build(environment=environment)
     with pytest.raises(DomainError) as refused:
@@ -428,10 +439,12 @@ def test_a_health_receipt_about_another_node_is_refused():
 @pytest.mark.parametrize(
     "receipt_epoch,lease_epoch",
     [
-        ("333e4567-e89b-12d3-a456-426614174000", EPOCH),   # builder disagrees
-        (EPOCH, "333e4567-e89b-12d3-a456-426614174000"),   # lease disagrees
-        ("333e4567-e89b-12d3-a456-426614174000",
-         "333e4567-e89b-12d3-a456-426614174000"),          # both, database alone differs
+        ("333e4567-e89b-12d3-a456-426614174000", EPOCH),  # builder disagrees
+        (EPOCH, "333e4567-e89b-12d3-a456-426614174000"),  # lease disagrees
+        (
+            "333e4567-e89b-12d3-a456-426614174000",
+            "333e4567-e89b-12d3-a456-426614174000",
+        ),  # both, database alone differs
     ],
     ids=["builder-epoch", "lease-epoch", "database-epoch"],
 )
@@ -507,8 +520,10 @@ def test_a_daemon_that_changed_across_the_dispatch_goes_to_cleanup(after, code):
         ({"nodeId": "nod_01M3PTP800EEMWMDYKEZZ3CWZZ"}, "nodeId does not bind"),
         ({"resourceId": "res_01M3PTP800EEMWMDYKEZZ3CWZZ"}, "resourceId does not bind"),
         ({"leaseId": "lse_01M3PTP800EEMWMDYKEZZ3CWZZ"}, "leaseId does not bind"),
-        ({"buildSessionId": "11111111-2222-4333-8444-555555555555"},
-         "buildSessionId does not bind"),
+        (
+            {"buildSessionId": "11111111-2222-4333-8444-555555555555"},
+            "buildSessionId does not bind",
+        ),
         ({"recoveryEpoch": "333e4567-e89b-12d3-a456-426614174000"}, "recovery epoch"),
         ({"writerKind": "control-plane"}, "node agent"),
         ({"schemaVersion": "build-physical-cleanup-receipt:0"}, "schema is not authoritative"),
@@ -592,7 +607,12 @@ def test_the_outbox_event_type_is_the_contracted_string():
     # Redacted: decision, binding, resource, lease and the persisted Evidence only.
     # Six keys: the contract's additionalProperties:false allows no more (#312 F-R3).
     assert set(payload) == {
-        "decisionId", "bindingDigest", "resourceId", "leaseId", "evidenceId", "evidenceDigest",
+        "decisionId",
+        "bindingDigest",
+        "resourceId",
+        "leaseId",
+        "evidenceId",
+        "evidenceDigest",
     }
 
 
@@ -623,8 +643,14 @@ def test_a_plan_without_a_build_session_id_is_refused_before_dispatch():
     plan.pop("buildSessionId")
     with pytest.raises(DomainError) as refused:
         service.execute(
-            object(), request, plan, decision,
-            policy_version="v1", run_id=RUN, evidence_id=EVIDENCE_ID, actor_id="act_c214",
+            object(),
+            request,
+            plan,
+            decision,
+            policy_version="v1",
+            run_id=RUN,
+            evidence_id=EVIDENCE_ID,
+            actor_id="act_c214",
         )
     assert refused.value.code == "RES-0006"
     assert "buildSessionId" in str(refused.value)
@@ -645,8 +671,7 @@ def test_a_receipt_session_that_differs_from_the_admitted_plan_is_refused():
 
 def test_case_alone_never_decides_the_session_or_epoch_comparison():
     service, database, _adapter, _boundary = build(
-        adapter=_Adapter(receipt={"buildSessionId": SESSION.upper(),
-                                  "cleanup": caller_cleanup()})
+        adapter=_Adapter(receipt={"buildSessionId": SESSION.upper(), "cleanup": caller_cleanup()})
     )
     result = run(service)
     assert result.lease_released is True
@@ -666,8 +691,13 @@ def test_the_persisted_cleanup_receipt_carries_the_pair_the_contract_only_pairs(
     # The public receipt: its own four observations, the lease fact this transaction proved,
     # and the physical pair the product path requires.
     assert set(cleanup) == {
-        "cacheDisposition", "builderClaimReleased", "cgroupRemoved", "verifiedAt",
-        "leaseReleased", "physicalReceipt", "physicalReceiptDigest",
+        "cacheDisposition",
+        "builderClaimReleased",
+        "cgroupRemoved",
+        "verifiedAt",
+        "leaseReleased",
+        "physicalReceipt",
+        "physicalReceiptDigest",
     }
     assert cleanup["leaseReleased"] is True
     from inv.build_execution import canonical_digest
@@ -697,8 +727,9 @@ def test_a_mismatched_physical_digest_is_refused_rather_than_committed():
 # --- #312 Codex review: four boundaries the earlier tests fixed as success ---------------
 
 
-@pytest.mark.parametrize("observed,label", [(STALE, "30s old"), (FUTURE, "ahead of the clock")],
-                         ids=["stale", "future"])
+@pytest.mark.parametrize(
+    "observed,label", [(STALE, "30s old"), (FUTURE, "ahead of the clock")], ids=["stale", "future"]
+)
 def test_a_health_receipt_that_is_not_fresh_is_refused(observed, label):
     """F-R1: the contract's stale-observedAt boundary, measured against the database clock.
 
@@ -748,7 +779,12 @@ def test_the_completed_payload_passes_the_public_contract_validator():
     run(service)
     payload = [p for kind, p in database.committed[-1] if kind == "outbox"][0][4]
     assert set(payload) == {
-        "decisionId", "bindingDigest", "resourceId", "leaseId", "evidenceId", "evidenceDigest",
+        "decisionId",
+        "bindingDigest",
+        "resourceId",
+        "leaseId",
+        "evidenceId",
+        "evidenceDigest",
     }
     validate_contract("BuildDispatchCompletedPayload", payload)
 
@@ -887,10 +923,7 @@ def test_two_callers_contending_on_one_lease_release_and_record_exactly_once():
 
     releases = [k for batch in database.committed for k, _ in batch if k == "release"]
     outbox_types = [
-        params[3]
-        for batch in database.committed
-        for kind, params in batch
-        if kind == "outbox"
+        params[3] for batch in database.committed for kind, params in batch if kind == "outbox"
     ]
     assert releases == ["release"]
     assert outbox_types == ["inv.build.dispatch_completed", "inv.build.node_quarantined"]

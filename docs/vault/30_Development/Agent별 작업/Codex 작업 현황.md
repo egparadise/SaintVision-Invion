@@ -1,15 +1,29 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.280"
+version: "1.0.281"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T18:01:15+09:00"
+updated: "2026-10-02T18:20:09+09:00"
 source_of_truth: "Git"
-active_card: "CARD-229 build dispatch activation fencing"
-active_card_status: "Approved by Claude r2 at 5afd8aac with exact-head Backend 36983834624 and Core 36983834554 green (real-PG); claim generation is checked before external dispatch and at the final consequence transaction; interruption/timeout/network are retryable; product dispatch remains disabled by default"
-active_card_next: "Land with its train; Card 232 (product worker loop and trusted intent producer) builds on this head"
+active_card: "CARD-232 S08-BE product worker loop and trusted intent producer"
+active_card_status: "Implementation and PG-free focused verification in progress on c57697d2; migration 0060 is the single head, product flag remains off, and hosted real-PG evidence is pending"
+active_card_next: "Commit and push Card 232, open its PR, run hosted Backend/Core, and request Claude independent review"
 ---
+
+## 2026-10-02 Card 232 — S08-BE product worker loop and trusted intent producer
+
+- Migration 0060 adds an immutable FORCE-RLS admission authority. The trusted internal
+  producer checks current permission, policy, Run, and live lease before commit; the
+  product loop rechecks and atomically promotes it to the 0059 intent plus a redacted
+  audit event. No public route or CLI accepts build documents.
+- `worker.py` constructs one build lane only for exact product flag `1`; default off does
+  not construct the runtime or touch the queue. The available concrete BuildKit transport
+  remains reference-only, so operational dispatch and physical acceptance are not claimed.
+- A strict-plan defect was corrected: Node preflight now receives the recovery UUID from
+  the canonical lease fencing token rather than a nonexistent lease field. Focused
+  PG-free verification is green; hosted real-PG is pending.
+- [[2026-10-02_18-20-09_KST_Card232_S08-BE_worker_loop_producer_Codex]].
 
 - **CARD-229 implementation:** migration 0059의 `attempt_count`를 단일 단조 claim fencing
   authority로 재사용한다. stale owner는 requeue/quarantine/complete뿐 아니라 lease release,

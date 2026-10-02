@@ -42,7 +42,7 @@ def test_0058_downgrade_forward_and_partition_column_propagation(
 
     with owner_engine.begin() as connection:
         assert connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one() == (
-            "0059_build_execution_intents"
+            "0060_build_execution_admissions"
         )
         columns = connection.execute(
             text(
