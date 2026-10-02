@@ -1,4 +1,11 @@
-"""PG-free trust-boundary tests for the AC-11 security artifact importer."""
+"""PG-free trust-boundary tests for the AC-11 security artifact importer.
+
+The fixtures here are the shape the producer actually writes, read out of the real artifact
+of run 36943527856: five environment keys and no comparability group, the counts inside
+``payload`` rather than at the top level, ``toolFiles`` copied from the reviewed allowlist.
+r1's stub was richer than reality on all three counts, which is why it agreed with an
+importer the aggregator refuses (#313).
+"""
 
 from __future__ import annotations
 
@@ -6,6 +13,7 @@ import copy
 import hashlib
 import io
 import json
+import subprocess
 import sys
 import zipfile
 from datetime import datetime, timezone
@@ -17,53 +25,128 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
+import aggregate_ac11_evidence as aggregator  # noqa: E402
 import import_ac11_security_scan as tool  # noqa: E402
 
 
-SOURCE = "a" * 40
-RUN_ID = "36443057935"
-ARTIFACT_ID = "10978439158"
-NOW = datetime(2026, 9, 29, 0, 30, tzinfo=timezone.utc)
+def git(*args: str) -> str:
+    done = subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True, timeout=20)
+    assert done.returncode == 0, done.stderr
+    return done.stdout.strip()
 
 
-def archive(report: dict | None = None, extra: str | None = None) -> bytes:
-    # What the producer actually writes: the report *is* the SEC-SCAN-001 threat report, so
-    # it carries threatId with the fields the aggregator reads (card 216).  The stub used to
-    # stop at the provenance fields, which the importer no longer accepts: an adapter that
-    # cannot find a threat report must say so rather than emit an envelope with none.
-    report = report or {
-        "schemaVersion": "1.0.0",
-        "runPurpose": "s11-ac11-security-scan",
-        "threatId": "SEC-SCAN-001",
-        "sourceRunId": RUN_ID,
-        "sourceHeadSha": SOURCE,
-        "checkoutTreeSha": "b" * 40,
-        "cleanCheckout": True,
-        "startedAt": "2026-09-28T15:20:00Z",
-        "finishedAt": "2026-09-28T15:22:46Z",
-        "environment": {"comparableGroup": "ac11-security-scan-v1"},
-        "verdict": "MEASURED_PASS",
+RUN_ID = "36943527856"
+ARTIFACT_ID = "11200951947"
+NOW = datetime(2026, 10, 2, 3, 0, tzinfo=timezone.utc)
+#: The envelope is about a tree the aggregator has to be able to read, so the fixtures are
+#: about this checkout rather than about ``"a" * 40``.
+SOURCE = git("rev-parse", "HEAD")
+TREE = git("rev-parse", "HEAD^{tree}")
+SCAN_ALLOWLIST = json.loads(
+    (ROOT / tool.SCAN_ALLOWLIST_REPO_PATH).read_text(encoding="utf-8")
+)
+SCOPE = sorted({path for row in SCAN_ALLOWLIST["scanners"] for path in row["scopePaths"]})
+#: Measured from the real artifact: the producer writes no comparability group.
+PRODUCER_ENVIRONMENT = {
+    "runnerImage": "Linux-X64",
+    "topology": "hosted",
+    "evidenceClass": "security-tools-v0",
+    "credentialsRequired": False,
+    "externalServicesRequired": True,
+}
+
+
+def tool_files(importer_blob: str | None = None) -> list[dict]:
+    """The three pins the producer copies out of the reviewed allowlist.
+
+    The importer pin is the executing blob by default so that these tests are about the
+    importer's rules rather than about whether the checkout is committed; that the file on
+    disk and the allowlist agree is its own test below.
+    """
+
+    return [
+        copy.deepcopy(SCAN_ALLOWLIST["producer"]),
+        copy.deepcopy(SCAN_ALLOWLIST["workflow"]),
+        {"path": tool.IMPORTER_REPO_PATH, "blob": importer_blob or tool.importer_blob()},
+    ]
+
+
+def payload(**over) -> dict:
+    body = {
+        "scannerVersions": {row["id"]: row["version"] for row in SCAN_ALLOWLIST["scanners"]},
+        "scannerExitCodes": {"bandit": 1, "pip-audit": 0},
+        "scanInputs": [
+            {"path": path, "objectId": git("rev-parse", f"HEAD:{path}")} for path in SCOPE
+        ],
+        "summaries": {
+            "bandit": {
+                "lowFindingCount": 0,
+                "mediumFindingCount": 0,
+                "highFindingCount": 0,
+                "scannedFileCount": 120,
+            },
+            "pip-audit": {"dependencyCount": 60, "findingCount": 0},
+        },
+        "auditedDependencies": [{"name": "alembic", "version": "1.19.2"}],
+        "scannedPythonFiles": 120,
+        "criticalHighFindings": [],
         "criticalCount": 0,
         "highCount": 0,
         "unallowlistedFindingIds": [],
         "expiredFindingIds": [],
         "staleAllowlistFindingIds": [],
+        "severityMismatchFindingIds": [],
+    }
+    body.update(over)
+    return body
+
+
+def producer_report(body: dict | None = None, **over) -> dict:
+    body = payload() if body is None else body
+    report = {
+        "schemaVersion": "1.0.0",
+        "runPurpose": "s11-ac11-security-scan",
+        "threatId": "SEC-SCAN-001",
+        "sourceRunId": RUN_ID,
+        "sourceHeadSha": SOURCE,
+        "checkoutTreeSha": TREE,
+        "cleanCheckout": True,
+        "startedAt": "2026-10-02T02:50:00Z",
+        "finishedAt": "2026-10-02T02:52:46Z",
+        "environment": copy.deepcopy(PRODUCER_ENVIRONMENT),
+        "reportAvailable": True,
+        "status": "complete",
+        "allowlist": {
+            "path": tool.SCAN_ALLOWLIST_REPO_PATH,
+            "blob": git("hash-object", tool.SCAN_ALLOWLIST_REPO_PATH),
+        },
+        "toolFiles": tool_files(),
+        "payloadSha256": tool._canonical_sha256(body),
+        "payload": body,
+        "verdict": "MEASURED_PASS",
+        "failureClass": "NONE",
         "cleanup": {"residueCount": 0},
     }
+    report.update(over)
+    return report
+
+
+def archive(report: dict | None = None, extra: str | None = None) -> bytes:
+    report = producer_report() if report is None else report
     output = io.BytesIO()
     with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as bundle:
         for name, content in (
             (tool.REPORT_MEMBER, json.dumps(report).encode()),
             (tool.JUNIT_MEMBER, b'<testsuite tests="4" failures="0"/>'),
         ):
-            info = zipfile.ZipInfo(name, (2026, 9, 28, 15, 22, 46))
+            info = zipfile.ZipInfo(name, (2026, 10, 2, 2, 52, 46))
             bundle.writestr(info, content)
         if extra is not None:
             bundle.writestr(extra, b"unexpected")
     return output.getvalue()
 
 
-def metadata(payload: bytes) -> tuple[dict, dict]:
+def metadata(payload_bytes: bytes) -> tuple[dict, dict]:
     run = {
         "id": int(RUN_ID),
         "status": "completed",
@@ -77,21 +160,27 @@ def metadata(payload: bytes) -> tuple[dict, dict]:
         "id": int(ARTIFACT_ID),
         "name": f"s11-ac11-security-{SOURCE}",
         "expired": False,
-        "expires_at": "2026-10-28T15:22:46Z",
-        "digest": "sha256:" + hashlib.sha256(payload).hexdigest(),
+        "expires_at": "2026-10-31T23:58:54Z",
+        "digest": "sha256:" + hashlib.sha256(payload_bytes).hexdigest(),
         "workflow_run": {"id": int(RUN_ID), "head_sha": SOURCE},
     }
     return run, artifact
 
 
+def imported(report: dict | None = None):
+    blob = archive(report)
+    run_metadata, artifact_metadata = metadata(blob)
+    return tool.import_evidence(blob, run_metadata, artifact_metadata, now=NOW)
+
+
 def test_import_binds_run_artifact_digest_and_member_hashes():
-    payload = archive()
-    run, artifact = metadata(payload)
-    result = tool.import_evidence(payload, run, artifact, now=NOW)
+    blob = archive()
+    run, artifact = metadata(blob)
+    result = tool.import_evidence(blob, run, artifact, now=NOW)
     binding = result["scanArtifact"]
     assert binding["runId"] == RUN_ID
     assert binding["artifactId"] == ARTIFACT_ID
-    assert binding["digest"] == hashlib.sha256(payload).hexdigest()
+    assert binding["digest"] == hashlib.sha256(blob).hexdigest()
     assert binding["observedDigest"] == binding["digest"]
     assert len(binding["producerReportSha256"]) == 64
     assert len(binding["junitSha256"]) == 64
@@ -113,23 +202,23 @@ def test_import_binds_run_artifact_digest_and_member_hashes():
     ],
 )
 def test_import_rejects_untrusted_github_metadata(mutate, message):
-    payload = archive()
-    run, artifact = metadata(payload)
+    blob = archive()
+    run, artifact = metadata(blob)
     mutate(run, artifact)
     with pytest.raises(tool.SecurityImportError, match=message):
-        tool.import_evidence(payload, run, artifact, now=NOW)
+        tool.import_evidence(blob, run, artifact, now=NOW)
 
 
 def test_import_rejects_missing_source_run_and_non_exact_archive():
-    payload = archive({"sourceHeadSha": SOURCE})
-    run, artifact = metadata(payload)
+    blob = archive({"sourceHeadSha": SOURCE})
+    run, artifact = metadata(blob)
     with pytest.raises(tool.SecurityImportError, match="sourceRunId"):
-        tool.import_evidence(payload, run, artifact, now=NOW)
+        tool.import_evidence(blob, run, artifact, now=NOW)
 
-    payload = archive(extra="../outside")
-    run, artifact = metadata(payload)
+    blob = archive(extra="../outside")
+    run, artifact = metadata(blob)
     with pytest.raises(tool.SecurityImportError, match="member set"):
-        tool.import_evidence(payload, run, artifact, now=NOW)
+        tool.import_evidence(blob, run, artifact, now=NOW)
 
 
 def test_the_envelope_is_admissible_and_names_the_threat_reports_it_lacks():
@@ -141,9 +230,7 @@ def test_the_envelope_is_admissible_and_names_the_threat_reports_it_lacks():
     INVALID_RUN for contradicting itself.
     """
 
-    payload = archive()
-    run_metadata, artifact_metadata = metadata(payload)
-    envelope = tool.import_evidence(payload, run_metadata, artifact_metadata, now=NOW)
+    envelope = imported()
     assert envelope["runPurpose"] == "ac11-axis-evidence"
     assert envelope["axis"] == "security-critical-high-zero"
     assert envelope["verdict"] == "NOT_OBSERVED"
@@ -152,48 +239,204 @@ def test_the_envelope_is_admissible_and_names_the_threat_reports_it_lacks():
     assert envelope["targetRef"]["targetId"] == "s11-security-critical-high-zero-v0"
     assert envelope["artifactSha256"] == envelope["artifactObservedSha256"]
     assert envelope["artifactAvailable"] is True
+    assert envelope["scanRecomputed"] == "MEASURED_PASS"
 
 
-def test_all_four_threat_reports_let_the_producer_verdict_through():
-    base = {
-        "schemaVersion": "1.0.0",
-        "runPurpose": "s11-ac11-security-scan",
-        "sourceRunId": RUN_ID,
-        "sourceHeadSha": SOURCE,
-        "checkoutTreeSha": "b" * 40,
-        "cleanCheckout": True,
-        "startedAt": "2026-09-28T15:20:00Z",
-        "finishedAt": "2026-09-28T15:22:46Z",
-        "environment": {"comparableGroup": "ac11-security-scan-v1"},
-        "verdict": "MEASURED_PASS",
-        "cleanup": {"residueCount": 0},
-        "observations": [
-            {"threatId": "SEC-DEF-001"}, {"threatId": "SEC-RLS-001"},
-            {"threatId": "SEC-VF-001"}, {"threatId": "SEC-SCAN-001"},
+class CheckoutGit(aggregator.RepositoryGit):
+    """The repository, answering one question about this checkout instead of the commit.
+
+    The envelope is bound to the importer that is *executing*, which while the change is
+    uncommitted is the working file rather than the committed one.  Overriding that single
+    answer keeps this test about the question it asks -- is the envelope admissible -- and
+    the binding itself is measured by its own tests below.
+    """
+
+    def blob(self, commit: str, path: str) -> str:
+        if path == tool.IMPORTER_REPO_PATH:
+            return tool.importer_blob()
+        return super().blob(commit, path)
+
+
+def test_the_envelope_this_adapter_writes_is_admissible_to_the_aggregator():
+    """#313 F-R1: the whole chain, importer -> evaluate_axis, against the real repository.
+
+    r1's envelope carried the producer's environment unchanged, so it reached the aggregator
+    without a comparability group and was refused at the common-envelope stage with
+    ``environment.comparableGroup is required`` -- INVALID_RUN, which is not an admissible
+    envelope however complete the chain looks in the map.  NOT_OBSERVED is: the axis is
+    evaluated and says what it lacks.
+    """
+
+    envelope = imported()
+    result = aggregator.evaluate_axis(envelope, CheckoutGit(ROOT), {}, NOW)
+    assert result.verdict is aggregator.Verdict.NOT_OBSERVED, result.reasons
+
+
+def test_the_importer_declares_the_lane_comparability_group_the_producer_omits():
+    envelope = imported()
+    assert envelope["environment"]["comparableGroup"] == tool.COMPARABLE_GROUP
+    # The producer's own description of the run survives next to it rather than being
+    # replaced by the label.
+    assert envelope["environment"]["runnerImage"] == "Linux-X64"
+    assert envelope["environment"]["externalServicesRequired"] is True
+
+
+def test_an_environment_outside_the_registered_lane_is_refused_not_relabelled():
+    """A comparability group is a claim about how the run was produced.
+
+    The registry requires ``topology: hosted`` and ``evidenceClass: security-tools-v0`` for
+    this target, so a report from anywhere else is refused instead of being stamped
+    comparable with runs that satisfy the requirement.
+    """
+
+    for field, value in (("topology", "physical-five-node"), ("evidenceClass", "other-v9")):
+        report = producer_report()
+        report["environment"][field] = value
+        with pytest.raises(tool.SecurityImportError, match="registered requirement"):
+            imported(report)
+
+
+def test_a_producer_comparability_group_that_disagrees_is_refused():
+    report = producer_report()
+    report["environment"]["comparableGroup"] = "something-else"
+    with pytest.raises(tool.SecurityImportError, match="different comparability group"):
+        imported(report)
+
+
+def test_four_threat_rows_this_importer_cannot_recompute_cannot_become_a_pass():
+    """#313 F-R2: r1 turned four empty rows and a top-level claim into MEASURED_PASS.
+
+    Nothing in those rows measures the definer policy, the RLS probes or the VF
+    observations, and this importer has no recomputation for them, so it refuses to answer
+    rather than passing a claim through.
+    """
+
+    report = producer_report(
+        observations=[
+            {"threatId": "SEC-DEF-001"},
+            {"threatId": "SEC-RLS-001"},
+            {"threatId": "SEC-VF-001"},
+            producer_report(),
         ],
+    )
+    with pytest.raises(tool.SecurityImportError, match="recomputes SEC-SCAN-001 only"):
+        imported(report)
+
+
+def test_a_scan_verdict_that_contradicts_its_own_payload_is_refused():
+    report = producer_report(payload(criticalCount=1, criticalHighFindings=["CVE-2026-0001"]))
+    report["verdict"] = "MEASURED_PASS"
+    with pytest.raises(tool.SecurityImportError, match="recomputes MEASURED_FAIL"):
+        imported(report)
+
+
+def test_a_measured_failure_is_carried_with_the_recomputed_detail_rather_than_hidden():
+    """The aggregator cannot see past the three missing reports, so the envelope says it.
+
+    The verdict stays NOT_OBSERVED because that is what the aggregator recomputes from the
+    same absence; the reason carries what the scan itself measured, so a failing scan is not
+    laundered into "not observed" with nothing to read.
+    """
+
+    body = payload(criticalCount=2, highCount=1, criticalHighFindings=["a", "b", "c"])
+    envelope = imported(producer_report(body, verdict="MEASURED_FAIL", failureClass="UNALLOWLISTED_CRITICAL_HIGH"))
+    assert envelope["verdict"] == "NOT_OBSERVED"
+    assert envelope["scanRecomputed"] == "MEASURED_FAIL"
+    assert "recomputes MEASURED_FAIL" in envelope["reason"]
+    assert "criticalCount=2" in envelope["reason"] and "highCount=1" in envelope["reason"]
+
+
+def test_an_unallowlisted_finding_is_a_measured_failure_even_with_zero_counts():
+    body = payload(unallowlistedFindingIds=["GHSA-xxxx"])
+    envelope = imported(producer_report(body, verdict="MEASURED_FAIL", failureClass="UNALLOWLISTED_CRITICAL_HIGH"))
+    assert envelope["scanRecomputed"] == "MEASURED_FAIL"
+    assert "unallowlistedFindingIds=1" in envelope["reason"]
+
+
+def test_scanners_that_did_not_both_run_are_not_a_pass():
+    body = payload(scannerExitCodes={"bandit": 1})
+    envelope = imported(producer_report(body, verdict="NOT_OBSERVED", failureClass="SCANNER_UNAVAILABLE"))
+    assert envelope["scanRecomputed"] == "NOT_OBSERVED"
+    assert "did not both run" in envelope["reason"]
+
+
+def test_an_unavailable_scan_report_is_not_a_pass():
+    envelope = imported(
+        producer_report(
+            status="unavailable",
+            reportAvailable=False,
+            verdict="NOT_OBSERVED",
+            failureClass="SCANNER_UNAVAILABLE",
+        )
+    )
+    assert envelope["scanRecomputed"] == "NOT_OBSERVED"
+    assert "reports the scan as" in envelope["reason"]
+
+
+def test_a_payload_digest_that_does_not_cover_the_payload_is_refused():
+    report = producer_report()
+    report["payload"]["criticalCount"] = 0
+    report["payloadSha256"] = "0" * 64
+    with pytest.raises(tool.SecurityImportError, match="payloadSha256"):
+        imported(report)
+
+
+def test_a_complete_scan_report_without_a_payload_is_refused():
+    report = producer_report()
+    report.pop("payload")
+    with pytest.raises(tool.SecurityImportError, match="no payload to recompute"):
+        imported(report)
+
+
+def test_an_artifact_pinned_to_a_different_importer_blob_is_refused():
+    """#313 F-R3: the probe, as a test.
+
+    The real artifact of run 36943527856 pins importer blob ``8661753330`` while the tree it
+    checked out carries ``a5be99df1d``, so the envelope r1 measured was written by an
+    importer that does not exist at its own ``sourceHeadSha``.  An adapter the source tree
+    does not pin does not get to write evidence about that tree.
+    """
+
+    report = producer_report(toolFiles=tool_files("8661753330" + "0" * 30))
+    with pytest.raises(tool.SecurityImportError, match="different importer blob"):
+        imported(report)
+
+
+def test_an_artifact_that_names_another_allowlist_is_refused():
+    report = producer_report(allowlist={"path": "docs/other.json", "blob": "0" * 40})
+    with pytest.raises(tool.SecurityImportError, match="reviewed scan allowlist"):
+        imported(report)
+
+
+def test_the_envelope_records_the_importer_blob_that_wrote_it():
+    envelope = imported()
+    assert envelope["importerFile"] == {
+        "path": tool.IMPORTER_REPO_PATH,
+        "blob": tool.importer_blob(),
     }
-    payload = archive(base)
-    run_metadata, artifact_metadata = metadata(payload)
-    envelope = tool.import_evidence(payload, run_metadata, artifact_metadata, now=NOW)
-    assert envelope["verdict"] == "MEASURED_PASS"
-    assert "reason" not in envelope
+    assert tool.importer_blob() == git("hash-object", tool.IMPORTER_REPO_PATH)
+
+
+def test_the_scan_allowlist_pins_the_files_this_checkout_actually_has():
+    """#313 F-R3: a stale pin is an INVALID_RUN waiting for the missing producers.
+
+    Every report copies these three pins into ``toolFiles`` and the aggregator refuses a
+    report whose pins differ from the source tree -- but only once all four threat reports
+    exist, which is why the drift stayed invisible.  ``0f614152`` moved the workflow and
+    ``8933b6bd`` moved this importer while the pins stayed where they were.
+    """
+
+    for key in ("producer", "workflow", "importer"):
+        row = SCAN_ALLOWLIST[key]
+        assert row["blob"] == git("hash-object", row["path"]), f"{key} pin is stale"
+    assert aggregator.SCAN_ALLOWLIST_BLOB == git(
+        "hash-object", tool.SCAN_ALLOWLIST_REPO_PATH
+    ), "the aggregator pins a different allowlist than this checkout has"
 
 
 def test_an_unregistered_threat_id_is_refused_rather_than_carried():
-    base = {
-        "schemaVersion": "1.0.0",
-        "runPurpose": "s11-ac11-security-scan",
-        "sourceRunId": RUN_ID,
-        "sourceHeadSha": SOURCE,
-        "checkoutTreeSha": "b" * 40,
-        "cleanCheckout": True,
-        "startedAt": "2026-09-28T15:20:00Z",
-        "finishedAt": "2026-09-28T15:22:46Z",
-        "environment": {"comparableGroup": "ac11-security-scan-v1"},
-        "verdict": "MEASURED_PASS",
-        "observations": [{"threatId": "SEC-INVENTED-001"}],
-    }
-    payload = archive(base)
-    run_metadata, artifact_metadata = metadata(payload)
+    report = producer_report(
+        observations=[{"threatId": "SEC-INVENTED-001"}],
+    )
     with pytest.raises(tool.SecurityImportError, match="unregistered security threat id"):
-        tool.import_evidence(payload, run_metadata, artifact_metadata, now=NOW)
+        imported(report)

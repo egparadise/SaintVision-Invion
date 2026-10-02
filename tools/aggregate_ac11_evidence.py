@@ -38,7 +38,10 @@ ALLOWLIST_CANONICAL_SHA256 = "b73aba8ff97443bbd1e314d5ca0375fdcbce8205a1a746bc5a
 SCAN_ALLOWLIST_REPO_PATH = (
     "docs/vault/30_Development/Evidence/s11-security-dependency-sast-allowlist-v1.json"
 )
-SCAN_ALLOWLIST_BLOB = "7e78403a33ebb66a4abd78ddbfa8fee405d3a3ba"
+SCAN_ALLOWLIST_BLOB = "74cb88b37c841133d1354773bc7d1451e2691eb7"
+#: The importer that may write this axis's envelopes, pinned by path here and by blob in
+#: the reviewed allowlist above (#313 F-R3).
+SECURITY_IMPORTER_REPO_PATH = "tools/import_ac11_security_scan.py"
 SCHEMA_VERSION = "1.0.0"
 RUN_PURPOSE = "ac11-release-gate"
 AXIS_PURPOSE = "ac11-axis-evidence"
@@ -1048,6 +1051,19 @@ def _security_observations(
 ) -> Verdict:
     reports = envelope.get("observations")
     if git.blob(source, ALLOWLIST_REPO_PATH) != ALLOWLIST_BLOB:
+        return Verdict.INVALID_RUN
+    # The envelope must name the importer that wrote it, bound to the source tree.  The
+    # allowlist's three pins are checked below, but only once all four threat reports exist,
+    # so an adapter that the run's own tree does not contain could otherwise write evidence
+    # about that tree and nothing would notice (#313 F-R3).
+    importer = envelope.get("importerFile")
+    if (
+        not isinstance(importer, dict)
+        or set(importer) != {"path", "blob"}
+        or importer["path"] != SECURITY_IMPORTER_REPO_PATH
+        or not SHA1_RE.fullmatch(str(importer["blob"]))
+        or git.blob(source, SECURITY_IMPORTER_REPO_PATH) != importer["blob"]
+    ):
         return Verdict.INVALID_RUN
     if not isinstance(reports, list) or not reports:
         raise ValueError("security observations must be a non-empty list")

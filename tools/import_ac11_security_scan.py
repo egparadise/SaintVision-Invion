@@ -39,6 +39,43 @@ TARGET_ID = "s11-security-critical-high-zero-v0"
 #: thing from the "no admissible envelope" this importer used to leave behind.
 REQUIRED_THREAT_IDS = ("SEC-DEF-001", "SEC-RLS-001", "SEC-VF-001", "SEC-SCAN-001")
 SCAN_THREAT_ID = "SEC-SCAN-001"
+#: The one threat report this importer can recompute for itself.  The aggregator owns the
+#: canonical recomputation of all four (``evaluate_definer``, ``evaluate_rls``,
+#: ``evaluate_vf``, ``evaluate_security_scan``); this importer is handed one artifact, so a
+#: verdict about the other three would be a verdict about measurements it has never seen.
+#: Rows that merely carry a threat ID are exactly that, and r1 accepted four of them as a
+#: pass (#313 F-R2), so the importer now refuses to answer instead of guessing.
+RECOMPUTABLE_THREAT_IDS = (SCAN_THREAT_ID,)
+#: The comparability group this importer declares for the hosted dependency/SAST lane.  The
+#: aggregator requires one on every axis envelope (``aggregate_ac11_evidence.py:334``) and
+#: the producer does not write one, so the adapter writes it the way the accessibility and
+#: migration importers already do (``import_ac11_accessibility_evidence.py:488``,
+#: ``import_ac11_migration_rehearsal.py:354``).  A name on its own would be a claim rather
+#: than a measurement, so it is only ever stamped on a report whose environment matches the
+#: environment the reviewed registry requires for this target: membership is checked, never
+#: asserted (#313 F-R1).
+COMPARABLE_GROUP = "ac11-security-dependency-sast-hosted-v1"
+#: ``requiredEnvironment`` of TARGET_ID in the reviewed registry.  The aggregator re-reads it
+#: from Git and refuses an environment that does not satisfy it; keeping it here lets the
+#: importer refuse a run from another lane *before* it labels that run comparable.
+REGISTERED_ENVIRONMENT = {"topology": "hosted", "evidenceClass": "security-tools-v0"}
+#: This file's own repository path.  The producer copies the reviewed scan allowlist's three
+#: pins into ``toolFiles``, so the importer pin in a report is the source tree's statement
+#: about which importer may write this axis envelope -- and an importer whose own blob is a
+#: different one is not that importer, however similar (#313 F-R3).
+IMPORTER_REPO_PATH = "tools/import_ac11_security_scan.py"
+SCAN_ALLOWLIST_REPO_PATH = (
+    "docs/vault/30_Development/Evidence/s11-security-dependency-sast-allowlist-v1.json"
+)
+SCANNER_IDS = ("bandit", "pip-audit")
+#: Finding inventories the producer reports.  A non-empty one is a measured failure, so an
+#: envelope may not call it a pass.
+FAILURE_INVENTORIES = (
+    "unallowlistedFindingIds",
+    "expiredFindingIds",
+    "staleAllowlistFindingIds",
+    "severityMismatchFindingIds",
+)
 REPOSITORY = "egparadise/SaintVision-Invion"
 WORKFLOW_PATH = ".github/workflows/ac11-security-scan.yml"
 REPORT_MEMBER = "s11-ac11-security-scan.json"
@@ -51,6 +88,29 @@ RUN_ID_RE = re.compile(r"^[0-9]+$")
 
 class SecurityImportError(RuntimeError):
     """Fail-closed, redacted evidence import failure."""
+
+
+def _canonical_sha256(value: Any) -> str:
+    """The producer's canonicalisation, byte for byte (``run_ac11_security_scan.py:51``)."""
+
+    return hashlib.sha256(
+        json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode(
+            "utf-8"
+        )
+    ).hexdigest()
+
+
+def importer_blob() -> str:
+    """The Git blob of the importer that is executing, computed from its own bytes.
+
+    The aggregator verifies the reviewed allowlist the same way: sha1 over Git's object
+    header and the file's bytes (``aggregate_ac11_evidence.py:1232``).  Reading ``__file__``
+    rather than Git keeps this importer offline, and it answers the right question: which
+    code wrote this envelope, not which code the checkout happens to contain.
+    """
+
+    data = Path(__file__).resolve().read_bytes()
+    return hashlib.sha1(f"blob {len(data)}\0".encode() + data).hexdigest()
 
 
 def _json(path: Path, label: str) -> dict[str, Any]:
@@ -210,6 +270,110 @@ def _threat_reports(report: dict[str, Any]) -> list[dict[str, Any]]:
     raise SecurityImportError("producer report carries no threat report to adapt")
 
 
+def _environment(report: dict[str, Any]) -> dict[str, Any]:
+    """The producer's environment plus the comparability group this lane belongs to.
+
+    The group is a constant because the lane is: the registry pins the environment this
+    target is measured in, and a report that does not match it is refused rather than
+    relabelled.  So the name describes a set this function has checked membership of, which
+    is the difference between declaring comparability and assuming it.
+    """
+
+    environment = report.get("environment")
+    if not isinstance(environment, dict):
+        raise SecurityImportError("producer report carries no environment")
+    for name, expected in REGISTERED_ENVIRONMENT.items():
+        if environment.get(name) != expected:
+            raise SecurityImportError(
+                f"producer environment does not satisfy the registered requirement: {name}"
+            )
+    declared = environment.get("comparableGroup")
+    if declared is not None and declared != COMPARABLE_GROUP:
+        raise SecurityImportError("producer declares a different comparability group")
+    return {**environment, "comparableGroup": COMPARABLE_GROUP}
+
+
+def _bound_importer(report: dict[str, Any]) -> dict[str, str]:
+    """Bind this envelope to the importer the source tree pins, or refuse to write one.
+
+    ``toolFiles`` is the reviewed allowlist's three pins, copied by the producer out of the
+    tree the run checked out.  If the pinned importer blob is not this file's blob, then the
+    envelope is being written by code the source tree does not pin -- which is how the r1
+    measurement came to describe an importer that does not exist at its own
+    ``sourceHeadSha`` (#313 F-R3).  The aggregator applies the same rule to all three pins,
+    but only once four threat reports exist, so the check belongs here as well as there.
+    """
+
+    reference = report.get("allowlist")
+    if not isinstance(reference, dict) or reference.get("path") != SCAN_ALLOWLIST_REPO_PATH:
+        raise SecurityImportError("producer report does not name the reviewed scan allowlist")
+    files = report.get("toolFiles")
+    if not isinstance(files, list):
+        raise SecurityImportError("producer report carries no toolFiles")
+    pinned = [
+        row for row in files if isinstance(row, dict) and row.get("path") == IMPORTER_REPO_PATH
+    ]
+    if len(pinned) != 1:
+        raise SecurityImportError("toolFiles does not pin this importer exactly once")
+    blob = importer_blob()
+    if pinned[0].get("blob") != blob:
+        raise SecurityImportError(
+            "the source tree pins a different importer blob than the importer writing this "
+            "envelope; re-run the lane at the head that carries this importer"
+        )
+    return {"path": IMPORTER_REPO_PATH, "blob": blob}
+
+
+def _recompute_scan(report: dict[str, Any]) -> tuple[str, str | None]:
+    """Recompute SEC-SCAN-001 from the payload the artifact carries.
+
+    The aggregator recomputes this axis in full and refuses an envelope whose verdict
+    disagrees with it.  This is the subset the importer can check offline, and it exists so
+    that "critical/high is zero" is something measured in the bytes rather than copied from
+    the producer's own claim.
+    """
+
+    status = report.get("status")
+    if status != "complete" or report.get("reportAvailable") is not True:
+        return "NOT_OBSERVED", f"the producer reports the scan as {status!r}"
+    payload = report.get("payload")
+    if not isinstance(payload, dict):
+        raise SecurityImportError("a complete scan report carries no payload to recompute")
+    if _canonical_sha256(payload) != report.get("payloadSha256"):
+        raise SecurityImportError("payloadSha256 does not cover the payload it travels with")
+    exits = payload.get("scannerExitCodes")
+    if (
+        not isinstance(exits, dict)
+        or set(exits) != set(SCANNER_IDS)
+        or any(isinstance(code, bool) or code not in (0, 1) for code in exits.values())
+    ):
+        return "NOT_OBSERVED", "the scanners did not both run to a readable exit code"
+    versions = payload.get("scannerVersions")
+    inputs = payload.get("scanInputs")
+    if (
+        not isinstance(versions, dict)
+        or set(versions) != set(SCANNER_IDS)
+        or not isinstance(inputs, list)
+        or not inputs
+    ):
+        return "NOT_OBSERVED", "the scan records no scanner versions or scanned inputs"
+    measured: dict[str, int] = {}
+    for name in ("criticalCount", "highCount"):
+        value = payload.get(name)
+        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+            raise SecurityImportError(f"payload {name} is not a count")
+        measured[name] = value
+    for name in FAILURE_INVENTORIES:
+        value = payload.get(name)
+        if not isinstance(value, list):
+            raise SecurityImportError(f"payload {name} is not a list")
+        measured[name] = len(value)
+    failures = {name: count for name, count in measured.items() if count}
+    if failures:
+        return "MEASURED_FAIL", ", ".join(f"{name}={count}" for name, count in sorted(failures.items()))
+    return "MEASURED_PASS", None
+
+
 def axis_envelope(
     report: dict[str, Any],
     *,
@@ -231,18 +395,43 @@ def axis_envelope(
     unregistered = sorted(present - set(REQUIRED_THREAT_IDS))
     if unregistered:
         raise SecurityImportError(f"unregistered security threat id: {unregistered[0]}")
+    scans = [row for row in reports if str(row["threatId"]) == SCAN_THREAT_ID]
+    if len(scans) != 1:
+        raise SecurityImportError("the artifact carries no SEC-SCAN-001 report")
+    scan_verdict, scan_detail = _recompute_scan(scans[0])
+    claimed = str(scans[0].get("verdict", ""))
+    if not claimed:
+        raise SecurityImportError("the scan report carries no verdict")
+    if claimed != scan_verdict:
+        raise SecurityImportError(
+            f"the scan report claims {claimed} while its own payload recomputes {scan_verdict}"
+        )
+    unrecomputable = [
+        threat
+        for threat in REQUIRED_THREAT_IDS
+        if threat in present and threat not in RECOMPUTABLE_THREAT_IDS
+    ]
+    if unrecomputable:
+        raise SecurityImportError(
+            "this importer recomputes SEC-SCAN-001 only, so it cannot say what "
+            + ", ".join(unrecomputable)
+            + " measured; that verdict belongs to the path that combines those producers' "
+            "verified results"
+        )
     missing = [threat for threat in REQUIRED_THREAT_IDS if threat not in present]
-    if missing:
-        # The aggregator reaches the same conclusion from the same absence; declaring it
-        # here keeps the envelope's own verdict equal to the recomputed one, which is what
-        # stops a partial scan from being read as a pass.
-        verdict = "NOT_OBSERVED"
-        reason = "no producer emits " + ", ".join(missing)
-    else:
-        verdict = str(report.get("verdict", ""))
-        reason = None
-        if not verdict:
-            raise SecurityImportError("producer report carries no verdict")
+    # The aggregator reaches the same conclusion from the same absence; declaring it here
+    # keeps the envelope's own verdict equal to the recomputed one, which is what stops a
+    # partial scan from being read as a pass.  It is always reached today: three of the four
+    # threat reports have no producer anywhere in this repository, and a report this
+    # importer cannot recompute is refused above rather than carried.
+    verdict = "NOT_OBSERVED"
+    reason = "no producer emits " + ", ".join(missing)
+    if scan_verdict != "MEASURED_PASS":
+        # A failing or unmeasured scan must not disappear into "not observed" without
+        # saying so: the aggregator cannot see past the missing reports either.
+        reason += f"; the SEC-SCAN-001 report itself recomputes {scan_verdict}"
+        if scan_detail:
+            reason += f" ({scan_detail})"
     envelope = {
         "schemaVersion": report.get("schemaVersion", "1.0.0"),
         "runPurpose": "ac11-axis-evidence",
@@ -259,7 +448,7 @@ def axis_envelope(
         "runConclusion": "success",
         "startedAt": report["startedAt"],
         "finishedAt": report["finishedAt"],
-        "environment": report["environment"],
+        "environment": _environment(report),
         "targetRef": {
             "commit": REGISTRY_COMMIT,
             "path": REGISTRY_PATH,
@@ -270,9 +459,10 @@ def axis_envelope(
         "observations": reports,
         "cleanup": report.get("cleanup", {"residueCount": 0}),
         "scanArtifact": scan_artifact,
+        "importerFile": _bound_importer(report),
+        "scanRecomputed": scan_verdict,
     }
-    if reason is not None:
-        envelope["reason"] = reason
+    envelope["reason"] = reason
     return envelope
 
 
