@@ -2,16 +2,16 @@
   "schemaVersion": "1.0.0",
   "note": "The tenant/inv tables the pinned collector observed in the live catalogue of a migrated database, recorded so the AC-11 evaluator can bind a report to a reviewed population instead of to the population the report itself chose (#322 r2 F-R7). A migration that adds or removes a table in these schemas makes this file stale: regenerate it with tools/collect_rls_evidence.py --disposable and tools/write_rls_table_census.py, and repin RLS_CENSUS_BLOB in tools/aggregate_ac11_evidence.py in the same reviewed change. tests/test_rls_table_census_ratchet.py fails when a migration creates a table this file does not list, so the next one is caught in its own PR (card 234).",
   "measuredFrom": {
-    "runId": "local",
-    "sourceHeadSha": "51435c4f",
-    "migrationHead": "0059_build_execution_intents"
+    "runId": "36992706201",
+    "sourceHeadSha": "1269f37f99d87c95126c2400ee24654d1d7debba",
+    "migrationHead": "0060_build_execution_admissions"
   },
   "schemas": [
     "inv",
     "public"
   ],
-  "count": 156,
-  "sha256": "e3a64e5ebf32c1b6452b8203d65a4bdfa7e341f1f4bdb019a750a36310e1d8cd",
+  "count": 157,
+  "sha256": "32ecadb725a9f231aef60117346c76f6707c5f32dded1084d48b6f002298299e",
   "tables": [
     "inv.account_provisioning_events",
     "inv.approval_audit",
@@ -20,6 +20,7 @@
     "inv.approval_requests",
     "inv.approval_review_snapshots",
     "inv.approval_votes",
+    "inv.build_execution_admissions",
     "inv.build_execution_intents",
     "inv.business_admin_grants",
     "inv.business_projects",

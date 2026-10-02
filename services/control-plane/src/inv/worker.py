@@ -10,6 +10,8 @@ import os
 import signal
 from threading import Event
 from uuid import UUID
+
+from .build_execution import PRODUCT_ENABLE_SETTING, PRODUCT_ENABLE_VALUE
 from .db import Database
 from .dispatch import DeliveryWorker
 from .identity import strict_object, trusted_file
@@ -59,6 +61,7 @@ def main():
             "tenantId",
             "tls",
             "outputRoot",
+            "buildExecution",
         }:
             raise ValueError()
         tenant = str(UUID(config["tenantId"]))
@@ -71,11 +74,26 @@ def main():
         # Migrations and tenant/epoch privileges are checked before serving work.
         with db.transaction(tenant) as conn:
             conn.execute("SELECT command_id FROM inv.execution_deliveries LIMIT 0")
+        build_runtime = None
+        if os.environ.get(PRODUCT_ENABLE_SETTING) == PRODUCT_ENABLE_VALUE:
+            from .build_product_runtime import configured_tenant_product_runtime
+
+            if "buildExecution" not in config:
+                raise ValueError("Build execution configuration unavailable")
+            build_runtime = configured_tenant_product_runtime(
+                db,
+                tenant,
+                config["buildExecution"],
+                tls=config["tls"],
+                environment=os.environ,
+            )
     except Exception:
         raise SystemExit("Explicit delivery worker configuration unavailable") from None
     worker = DeliveryWorker(db, delivery, output_provider=output_provider)
     if args.once:
         try:
+            if build_runtime is not None:
+                build_runtime.once(tenant)
             print(worker.once(tenant))
         except Exception:
             raise SystemExit("Delivery worker temporarily unavailable") from None
@@ -93,12 +111,22 @@ def main():
             # No raw exception, request, permit, identity token or key is logged.
             stop.wait(0.1 if outcome == "stopped" else 1.0)
 
+    def consume_builds():
+        while not stop.is_set():
+            try:
+                outcome = build_runtime.once(tenant)
+            except Exception:
+                outcome = "unavailable"
+            stop.wait(0.1 if outcome not in (None, "unavailable") else 1.0)
+
     # Five bounded control lanes remain available when execution lanes block in
     # network I/O. They can only cancel, never reserve another execution. Queue
     # leases coordinate all lanes and additional worker processes.
-    with ThreadPoolExecutor(max_workers=7) as executor:
+    with ThreadPoolExecutor(max_workers=8 if build_runtime is not None else 7) as executor:
         futures = [executor.submit(consume) for _ in range(2)]
         futures += [executor.submit(consume, True) for _ in range(5)]
+        if build_runtime is not None:
+            futures.append(executor.submit(consume_builds))
         for future in futures:
             future.result()
 
