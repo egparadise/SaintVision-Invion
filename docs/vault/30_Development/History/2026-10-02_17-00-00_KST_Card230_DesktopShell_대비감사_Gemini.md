@@ -1,13 +1,13 @@
-# 2026-10-02 17:00:00 KST — Card 230: 데스크톱 셸 (DesktopShell) 색상 리터럴 전수 토큰화(49건→0), 상태 색 정합성 및 접근성 승격 [r2]
+# 2026-10-02 17:00:00 KST — Card 230: 데스크톱 셸 (DesktopShell) 색상 리터럴 전수 토큰화(49건→0), 상태 색 정합성 및 접근성 승격 [r3]
 
 ## 1. 개요 및 변경 목적
 - **작업 ID**: Card 230 (ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory)
 - **대상 화면**: `apps/web/src/features/desktop/DesktopShell.tsx`
 - **담당자**: Gemini (Antigravity)
 - **작업 브랜치**: `agent/gemini/c230-desktop-shell-contrast`
-- **기반 커밋 (Base)**: `6426f970` (PR #325 head)
+- **기반 커밋 (Base)**: `f17a486f` (PR #325 head merge 후 실제 base)
 - **PR 대상 (Target)**: PR #328 (`agent/gemini/c228-nl-run-contrast`)
-- **KST 시각**: 2026-10-02 17:00:00 KST (r2 개정 2026-10-02 17:40:00 KST)
+- **KST 시각**: 2026-10-02 17:00:00 KST (r2 17:40:00 KST, r3 개정 2026-10-02 18:45:00 KST)
 
 ### 1.1 주요 작업 내역
 1. **색상 리터럴 전수 해소 (49 occurrences -> 0건, 100% 토큰화)**:
@@ -32,42 +32,42 @@
      - `violations`: [] (0건, 클린 패스)
 4. **키보드 접근성 및 포커스 링 보존**:
    - 인라인 `outline: none`, `outline: 0`, `outlineWidth: 0` 억제를 일체 배제하고 `apps/web/src/index.css` 전역 `:focus-visible` 키보드 포커스 링 스타일 온전 보존.
-   - mode switcher, start menu trigger, notification close button, dock buttons focus 이벤트 후 computed `outlineStyle`, `outlineWidth` 및 `outline !== 'none'` 검증.
+   - mode switcher focus 이벤트 후 computed `outlineStyle`, `outlineWidth` 및 `outline !== 'none'` 검증, 나머지 버튼 및 아이콘은 정적 AST 가드(outline: none/0 배제)로 보호.
 5. **Fail-Closed Multiset Baseline 래칫 강제**:
    - `COLOR_LITERAL_MULTISET_BASELINE`에서 `features/desktop/DesktopShell.tsx`의 허용 리터럴 인벤토리를 `{}` (0건)으로 전면 래칫 고정.
    - `var(--color-border-subtle)` 사용 횟수: 442건/30개 파일 -> **451건/31개 파일**로 엄밀 래칫 갱신.
-6. **37종 전수 변이 실측 사살 (tools/test_c230_mutations.py Y1~Y37 100% 사살)**:
-   - fg==bg 충돌, border==bg 충돌, text token as bg, 불투명도 저하, 주석 decoy, 토큰 되돌림, 상태 색 붕괴, 라벨/아이콘 제거, outline: none/0 억제, prototype key 탈취, 계약 외 값 주입, 명명 색상 주입 등 37종 변이를 컴파일 가능한 단일 유효 코드로 작성하여 전원 사살 실측.
+6. **40종 전수 변이 실측 사살 (tools/test_c230_mutations.py Y1~Y40 100% 사살)**:
+   - fg==bg 충돌, border==bg 충돌, text token as bg, 불투명도 저하, 주석 decoy, 토큰 되돌림, 상태 색 붕괴, 라벨/아이콘 제거, outline: none/0 억제, prototype key 탈취, 계약 외 값 주입, 명명 색상 주입, UNKNOWN 접두어 제거, 원문 uppercase bypass, case-insensitive lookup 등 40종 변이를 컴파일 가능한 단일 유효 코드로 작성하여 전원 사살 실측.
 
 ---
 
 ## 2. 실측 명도 대비 지표 (§2.1 대비 표본)
 
-아래 Before 값은 베이스(`6426f970`)의 실제 렌더링 합성값(어두운 캔버스 `#090d16` 위 `rgba(15, 23, 42, 0.85)` 표면 합성 `#0a0f1a`)을 기준으로 하며, 텍스트는 다크 테마에서 충족되었으나 라이트 테마 전환 시 심각한 결손(Probes 91~95 실측)과 알파 테두리 명도비 결손(< 3.0:1)이 존재했습니다. After 값은 `python tools/reproduce_c230_contrast.py` 실행 결과와 100% 일치합니다.
+아래 Before 값은 베이스의 실제 렌더링 합성값(어두운 캔버스 `#090d16` 위 상단 바 `rgba(15, 23, 42, 0.85)` 표면 합성 `#0e1627`, 시작 메뉴 `rgba(15, 23, 42, 0.95)` 합성 `#0f1629`, 독 `rgba(15, 23, 42, 0.75)` 합성 `#0e1425`)을 기준으로 하며, 텍스트는 다크 테마에서 충족되었으나 라이트 테마 전환 시 심각한 결손(Probes 91~95 실측)과 알파 테두리 명도비 결손(< 3.0:1)이 존재했습니다. After 값은 `python tools/reproduce_c230_contrast.py` 실행 결과와 100% 일치합니다.
 
 | UI 요소 | 식별자 / 위치 | Before 베이스 합성값 (Hex/RGBA on Canvas/Surface) | Before 명도비 (Dark 렌더 실측) | After 토큰 쌍 (전경 / 배경 / 테두리) | After 명도비 (Light) | After 명도비 (Dark) | WCAG 기준 | 판정 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| 상단 헤더 텍스트 | header text / surface | #f8fafc on #0a0f1a | 17.26:1 (PASS) | --color-text-primary on --color-bg-surface | 17.85:1 | 16.98:1 | >= 4.5:1 | PASS |
-| 상단 헤더 테두리 | header border / surface | rgba(255,255,255,0.1) on #0a0f1a | 1.31:1 (FAIL) | --color-border-subtle on --color-bg-surface | 3.48:1 | 3.73:1 | >= 3.0:1 | PASS |
-| 시작 메뉴 트리거 | start menu trigger / surface | #38bdf8 on #0a0f1a | 8.43:1 (PASS) | --color-brand-hover on --color-bg-surface | 6.70:1 | 9.84:1 | >= 4.5:1 | PASS |
-| 활성 창 제목 | active window title / surface | #f8fafc on #0a0f1a | 17.26:1 (PASS) | --color-text-primary on --color-bg-surface | 17.85:1 | 16.98:1 | >= 4.5:1 | PASS |
-| 활성 창 구분선 | active window sep / surface | #94a3b8 on #0a0f1a | 7.04:1 (PASS) | --color-text-muted on --color-bg-surface | 5.75:1 | 6.99:1 | >= 4.5:1 | PASS |
-| 패브릭 온라인 상태 | fabric status online / surface | #34d399 on #0a0f1a | 9.39:1 (PASS) | --color-status-online on --color-bg-surface | 5.02:1 | 7.79:1 | >= 4.5:1 | PASS |
-| RTT 지연시간 텍스트 | rtt latency text / surface | #94a3b8 on #0a0f1a | 7.04:1 (PASS) | --color-text-muted on --color-bg-surface | 5.75:1 | 6.99:1 | >= 4.5:1 | PASS |
-| 모드 전환기 텍스트 | mode switcher text / brand-subtle | #60a5fa on rgba(59,130,246,0.15) | 5.46:1 (PASS) | --color-brand-hover on --color-brand-subtle | 5.49:1 | 8.11:1 | >= 4.5:1 | PASS |
-| 모드 전환기 테두리 | mode switcher border / brand-subtle | rgba(59,130,246,0.3) on subtle | 1.62:1 (FAIL) | --color-brand-hover on --color-brand-subtle | 5.49:1 | 8.11:1 | >= 3.0:1 | PASS |
-| 테마 토글 아이콘 | theme toggle icon / surface | #94a3b8 on #0a0f1a | 7.04:1 (PASS) | --color-text-secondary on --color-bg-surface | 7.58:1 | 14.33:1 | >= 4.5:1 | PASS |
-| 알림 트리거 아이콘 | notif trigger icon / surface | #94a3b8 on #0a0f1a | 7.04:1 (PASS) | --color-text-secondary on --color-bg-surface | 7.58:1 | 14.33:1 | >= 4.5:1 | PASS |
-| 알림 미확인 점 | notif unread dot / surface | #ef4444 on #0a0f1a | 4.82:1 (PASS) | --color-status-offline on --color-bg-surface | 6.47:1 | 6.41:1 | >= 3.0:1 | PASS |
-| 시스템 시계 | system clock / surface | #f8fafc on #0a0f1a | 17.26:1 (PASS) | --color-text-primary on --color-bg-surface | 17.85:1 | 16.98:1 | >= 4.5:1 | PASS |
-| 시작 메뉴 제목 | start menu title / surface | #f8fafc on #0a0f1a | 17.26:1 (PASS) | --color-text-primary on --color-bg-surface | 17.85:1 | 16.98:1 | >= 4.5:1 | PASS |
-| 시작 메뉴 사용자 ID | start menu user id / surface | #94a3b8 on #0a0f1a | 7.04:1 (PASS) | --color-text-muted on --color-bg-surface | 5.75:1 | 6.99:1 | >= 4.5:1 | PASS |
-| 시작 메뉴 테두리 | start menu border / surface | rgba(255,255,255,0.15) on #0a0f1a | 1.50:1 (FAIL) | --color-border-subtle on --color-bg-surface | 3.48:1 | 3.73:1 | >= 3.0:1 | PASS |
-| 시작 메뉴 바로가기 | start menu shortcut / surface | #f8fafc on #0a0f1a | 17.26:1 (PASS) | --color-text-primary on --color-bg-surface | 17.85:1 | 16.98:1 | >= 4.5:1 | PASS |
-| 시작 메뉴 종료 링크 | start menu exit link / surface | #60a5fa on #0a0f1a | 6.22:1 (PASS) | --color-brand-hover on --color-bg-surface | 6.70:1 | 9.84:1 | >= 4.5:1 | PASS |
-| 알림 센터 제목 | notif center title / surface | #f8fafc on #0a0f1a | 17.26:1 (PASS) | --color-text-primary on --color-bg-surface | 17.85:1 | 16.98:1 | >= 4.5:1 | PASS |
-| 알림 닫기 버튼 | notif close btn / surface | #94a3b8 on #0a0f1a | 7.04:1 (PASS) | --color-text-muted on --color-bg-surface | 5.75:1 | 6.99:1 | >= 4.5:1 | PASS |
-| 알림 아이템 테두리 | notif item border / surface | rgba(255,255,255,0.05) on #0a0f1a | 1.15:1 (FAIL) | --color-border-subtle on --color-bg-surface | 3.48:1 | 3.73:1 | >= 3.0:1 | PASS |
+| 상단 헤더 텍스트 | header text / surface | #f8fafc on #0e1627 | 17.26:1 (PASS) | --color-text-primary on --color-bg-surface | 17.85:1 | 16.98:1 | >= 4.5:1 | PASS |
+| 상단 헤더 테두리 | header border / surface | rgba(255,255,255,0.1) on #0e1627 | 1.31:1 (FAIL) | --color-border-subtle on --color-bg-surface | 3.48:1 | 3.73:1 | >= 3.0:1 | PASS |
+| 시작 메뉴 트리거 | start menu trigger / surface | #38bdf8 on #0e1627 | 8.43:1 (PASS) | --color-brand-hover on --color-bg-surface | 6.70:1 | 9.84:1 | >= 4.5:1 | PASS |
+| 활성 창 제목 | active window title / surface | #f8fafc on #0e1627 | 17.26:1 (PASS) | --color-text-primary on --color-bg-surface | 17.85:1 | 16.98:1 | >= 4.5:1 | PASS |
+| 활성 창 구분선 | active window sep / surface | #94a3b8 on #0e1627 | 7.04:1 (PASS) | --color-text-muted on --color-bg-surface | 5.75:1 | 6.99:1 | >= 4.5:1 | PASS |
+| 패브릭 온라인 상태 | fabric status online / surface | #34d399 on #0e1627 | 9.39:1 (PASS) | --color-status-online on --color-bg-surface | 5.02:1 | 7.79:1 | >= 4.5:1 | PASS |
+| RTT 지연시간 텍스트 | rtt latency text / surface | #94a3b8 on #0e1627 | 7.04:1 (PASS) | --color-text-muted on --color-bg-surface | 5.75:1 | 6.99:1 | >= 4.5:1 | PASS |
+| 모드 전환기 텍스트 | mode switcher text / brand-subtle | #60a5fa on rgba(59,130,246,0.2) | 5.46:1 (PASS) | --color-brand-hover on --color-brand-subtle | 5.49:1 | 8.11:1 | >= 4.5:1 | PASS |
+| 모드 전환기 테두리 | mode switcher border / brand-subtle | rgba(59,130,246,0.4) on subtle | 1.71:1 (FAIL) | --color-brand-hover on --color-brand-subtle | 5.49:1 | 8.11:1 | >= 3.0:1 | PASS |
+| 테마 토글 아이콘 | theme toggle icon / surface | #94a3b8 on #0e1627 | 7.04:1 (PASS) | --color-text-secondary on --color-bg-surface | 7.58:1 | 14.33:1 | >= 4.5:1 | PASS |
+| 알림 트리거 아이콘 | notif trigger icon / surface | #94a3b8 on #0e1627 | 7.04:1 (PASS) | --color-text-secondary on --color-bg-surface | 7.58:1 | 14.33:1 | >= 4.5:1 | PASS |
+| 알림 미확인 점 | notif unread dot / surface | #ef4444 on #0e1627 | 4.82:1 (PASS) | --color-status-offline on --color-bg-surface | 6.47:1 | 6.41:1 | >= 3.0:1 | PASS |
+| 시스템 시계 | system clock / surface | #f8fafc on #0e1627 | 17.26:1 (PASS) | --color-text-primary on --color-bg-surface | 17.85:1 | 16.98:1 | >= 4.5:1 | PASS |
+| 시작 메뉴 제목 | start menu title / surface | #f8fafc on #0f1629 | 17.26:1 (PASS) | --color-text-primary on --color-bg-surface | 17.85:1 | 16.98:1 | >= 4.5:1 | PASS |
+| 시작 메뉴 사용자 ID | start menu user id / surface | #94a3b8 on #0f1629 | 7.04:1 (PASS) | --color-text-muted on --color-bg-surface | 5.75:1 | 6.99:1 | >= 4.5:1 | PASS |
+| 시작 메뉴 테두리 | start menu border / surface | rgba(255,255,255,0.15) on #0f1629 | 1.56:1 (FAIL) | --color-border-subtle on --color-bg-surface | 3.48:1 | 3.73:1 | >= 3.0:1 | PASS |
+| 시작 메뉴 바로가기 | start menu shortcut / surface | #f8fafc on #0f1629 | 17.26:1 (PASS) | --color-text-primary on --color-bg-surface | 17.85:1 | 16.98:1 | >= 4.5:1 | PASS |
+| 시작 메뉴 종료 링크 | start menu exit link / surface | #60a5fa on #0f1629 | 7.08:1 (PASS) | --color-brand-hover on --color-bg-surface | 6.70:1 | 9.84:1 | >= 4.5:1 | PASS |
+| 알림 센터 제목 | notif center title / surface | #f8fafc on #0e1627 | 17.26:1 (PASS) | --color-text-primary on --color-bg-surface | 17.85:1 | 16.98:1 | >= 4.5:1 | PASS |
+| 알림 닫기 버튼 | notif close btn / surface | #94a3b8 on #0e1627 | 7.04:1 (PASS) | --color-text-muted on --color-bg-surface | 5.75:1 | 6.99:1 | >= 4.5:1 | PASS |
+| 알림 아이템 테두리 | notif item border / surface | (베이스 테두리 없음, bg만 rgba(255,255,255,0.05)) | N/A (경계 미식별) | --color-border-subtle on --color-bg-surface | 3.48:1 | 3.73:1 | >= 3.0:1 | PASS |
 | 알림 메시지 텍스트 | notif message text / subtle | #94a3b8 on rgba(255,255,255,0.05) | 6.18:1 (PASS) | --color-text-secondary on --color-bg-subtle | 6.92:1 | 11.86:1 | >= 4.5:1 | PASS |
 | 알림 배지 INFO | notif badge INFO / subtle | (베이스 미구현, 미토큰화) | N/A (FAIL) | --color-brand-hover on --color-bg-subtle | 6.12:1 | 8.14:1 | >= 4.5:1 | PASS |
 | 알림 배지 SUCCESS | notif badge SUCCESS / subtle | (베이스 미구현, 미토큰화) | N/A (FAIL) | --color-status-online on --color-bg-subtle | 4.58:1 | 6.44:1 | >= 4.5:1 | PASS |
@@ -76,20 +76,20 @@
 | 알림 배지 UNKNOWN | notif badge UNKNOWN / subtle | (베이스 미구현, 미토큰화) | N/A (FAIL) | --color-status-unknown on --color-bg-subtle | 6.47:1 | 5.82:1 | >= 4.5:1 | PASS |
 | 바로가기 아이콘 테두리 | surface shortcut border / canvas | rgba(255,255,255,0.15) on #090d16 | 1.48:1 (FAIL) | --color-border-subtle on --color-bg-canvas | 3.33:1 | 4.08:1 | >= 3.0:1 | PASS |
 | 바로가기 아이콘 레이블 | surface shortcut label / canvas | #ffffff on #090d16 | 19.43:1 (PASS) | --color-text-primary on --color-bg-canvas | 17.06:1 | 18.59:1 | >= 4.5:1 | PASS |
-| 독 툴바 테두리 | dock toolbar border / canvas | rgba(255,255,255,0.15) on #090d16 | 1.48:1 (FAIL) | --color-border-subtle on --color-bg-canvas | 3.33:1 | 4.08:1 | >= 3.0:1 | PASS |
-| 독 타일 활성 테두리 | dock tile active border / brand-subtle | #38bdf8 on rgba(59,130,246,0.3) | 2.85:1 (FAIL) | --color-brand-hover on --color-brand-subtle | 5.49:1 | 8.11:1 | >= 3.0:1 | PASS |
-| 독 타일 비활성 테두리 | dock tile inactive border / surface | rgba(255,255,255,0.1) on #0a0f1a | 1.25:1 (FAIL) | --color-border-subtle on --color-bg-surface | 3.48:1 | 3.73:1 | >= 3.0:1 | PASS |
-| 독 실행 활성 점 | dock running active dot / surface | #38bdf8 on #0a0f1a | 8.43:1 (PASS) | --color-brand-hover on --color-bg-surface | 6.70:1 | 9.84:1 | >= 3.0:1 | PASS |
-| 독 실행 비활성 점 | dock running inactive dot / surface | rgba(255,255,255,0.5) on #0a0f1a | 2.45:1 (FAIL) | --color-border-strong on --color-bg-surface | 7.58:1 | 6.99:1 | >= 3.0:1 | PASS |
+| 독 툴바 테두리 | dock toolbar border / canvas | rgba(255,255,255,0.15) on #090d16 | 1.55:1 (FAIL) | --color-border-subtle on --color-bg-canvas | 3.33:1 | 4.08:1 | >= 3.0:1 | PASS |
+| 독 타일 활성 테두리 | dock tile active border / brand-subtle | #38bdf8 on rgba(59,130,246,0.3) over 독 (#1c3564) | 5.63:1 (PASS) | --color-brand-hover on --color-brand-subtle | 5.49:1 | 8.11:1 | >= 3.0:1 | PASS |
+| 독 타일 비활성 테두리 | dock tile inactive border / surface | rgba(255,255,255,0.1) on 독 (#0e1425) | 1.25:1 (FAIL) | --color-border-subtle on --color-bg-surface | 3.48:1 | 3.73:1 | >= 3.0:1 | PASS |
+| 독 실행 활성 점 | dock running active dot / surface | #38bdf8 on 독 (#0e1425) | 8.43:1 (PASS) | --color-brand-hover on --color-bg-surface | 6.70:1 | 9.84:1 | >= 3.0:1 | PASS |
+| 독 실행 비활성 점 | dock running inactive dot / surface | rgba(255,255,255,0.5) on 독 (#0e1425) | 5.29:1 (PASS) | --color-border-strong on --color-bg-surface | 7.58:1 | 6.99:1 | >= 3.0:1 | PASS |
 
 > [!NOTE]
 > **라이트 테마 Revert-Fail Probes (Probes 91~95)**:
 > 옛 다크 하드코딩 리터럴을 라이트 테마 표면 위에 적용할 경우의 심각한 명도 결손 실측:
-> - Probe 91 (`#94a3b8` on light surface `#ffffff`): **2.37:1** (< 4.5:1 FAIL)
-> - Probe 92 (`#38bdf8` on light surface `#ffffff`): **2.12:1** (< 4.5:1 FAIL)
-> - Probe 93 (`#34d399` on light surface `#ffffff`): **1.94:1** (< 4.5:1 FAIL)
-> - Probe 94 (`#60a5fa` on light surface `#ffffff`): **2.76:1** (< 4.5:1 FAIL)
-> - Probe 95 (`#ffffff` on light canvas `#f6f8fa`): **1.05:1** (< 4.5:1 FAIL)
+> - Probe 91 (`#94a3b8` on light surface `#ffffff`): **2.56:1** (< 4.5:1 FAIL)
+> - Probe 92 (`#38bdf8` on light surface `#ffffff`): **2.14:1** (< 4.5:1 FAIL)
+> - Probe 93 (`#34d399` on light surface `#ffffff`): **1.92:1** (< 4.5:1 FAIL)
+> - Probe 94 (`#60a5fa` on light surface `#ffffff`): **2.53:1** (< 4.5:1 FAIL)
+> - Probe 95 (`#ffffff` on light canvas `#f8fafc`): **1.05:1** (< 4.5:1 FAIL)
 
 ### 2.2 tools/reproduce_c230_contrast.py 실행 결과
 ```text
