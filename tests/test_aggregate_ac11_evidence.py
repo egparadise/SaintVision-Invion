@@ -345,6 +345,8 @@ def rls_table(identity: dict | None = None, **overrides) -> dict:
         "rls_enabled": True,
         "rls_forced": True,
         "privileges": {"select": "table", "insert": "table", "update": None, "delete": None},
+        "policies": [{"name": "tenant_isolation", "cmd": "ALL", "permissive": "PERMISSIVE",
+                      "roles": ["inv_app"], "using": True, "with_check": True}],
         "visible": {
             "guc_unset": {"rows": 0},
             "guc_tenant_a": {"rows": 1},
@@ -367,15 +369,32 @@ def rls_table(identity: dict | None = None, **overrides) -> dict:
     return table
 
 
-def rls_roles(tables: dict | None = None, *, role: str = "inv_app", **role_overrides) -> dict:
+def rls_role_entry(tables: dict | None = None, **overrides) -> dict:
     entry = {
         "present": True,
         "superuser": False,
         "bypassrls": False,
-        "tables": tables if tables is not None else {"public.projects": rls_table()},
+        "login": False,
+        "inherit": True,
+        "member_of": [],
+        "functions": {},
+        "tables": copy.deepcopy(tables) if tables is not None else {"public.projects": rls_table()},
     }
-    entry.update(role_overrides)
-    return {role: entry}
+    entry.update(overrides)
+    return entry
+
+
+def rls_roles(tables: dict | None = None, *, role: str = "inv_app", **role_overrides) -> dict:
+    """The whole measured population, with ``role`` carrying the interesting observation.
+
+    The evaluator requires exactly ``RLS_REQUIRED_ROLES`` and ``present: true`` for each
+    (#322 r2 F-R5): a report that drops a role, or calls it absent, shrinks what its verdict
+    covers without saying so.  So a fixture about one role still has to carry the other seven.
+    """
+
+    roles = {name: rls_role_entry() for name in sorted(tool.RLS_REQUIRED_ROLES)}
+    roles[role] = rls_role_entry(tables, **role_overrides)
+    return roles
 
 
 def rls_ground_truth(*tables: str) -> dict:
@@ -890,10 +909,242 @@ def test_an_owner_verified_key_identity_must_be_registered_and_non_vacuous(
     comparison into a PASS axis.
     """
 
-    report = rls_report(allowlist, roles=roles, ground_truth=rls_ground_truth(
-        "public.projects", "public.audit_events"
-    ))
+    report = rls_report(allowlist, roles=roles)
     assert tool.evaluate_rls(report, allowlist, NOW) is expected
+
+
+def strip(report: dict, path: tuple) -> dict:
+    """The report with one key removed at ``path`` (tuple of keys), for the sweep below."""
+
+    value = copy.deepcopy(report)
+    cursor = value
+    for key in path[:-1]:
+        cursor = cursor[key]
+    del cursor[path[-1]]
+    return value
+
+
+def required_key_paths(report: dict) -> list[tuple]:
+    """Every key the evaluator requires, as a path into the report.
+
+    Generated from the report rather than listed, so a field added to the collector's output
+    appears here automatically instead of being forgotten (#322 r2 F-R5 asked for the sweep).
+    """
+
+    paths: list[tuple] = [("measuredRoles",), ("roles",), ("ground_truth",), ("exitCode",),
+                          ("verdict",), ("toolFiles",), ("baselineAccepted",), ("violations",),
+                          ("accepted",), ("unmeasured",)]
+    for table_name in report["ground_truth"]:
+        paths.append(("ground_truth", table_name))
+        for field in report["ground_truth"][table_name]:
+            paths.append(("ground_truth", table_name, field))
+    for role_name, role_report in report["roles"].items():
+        paths.append(("roles", role_name))
+        for field in role_report:
+            paths.append(("roles", role_name, field))
+        for table_name, table in role_report["tables"].items():
+            paths.append(("roles", role_name, "tables", table_name))
+            for field in table:
+                paths.append(("roles", role_name, "tables", table_name, field))
+            for cell in table.get("visible", {}):
+                paths.append(("roles", role_name, "tables", table_name, "visible", cell))
+                if cell != "identity":
+                    paths.append(
+                        ("roles", role_name, "tables", table_name, "visible", cell,
+                         next(iter(table["visible"][cell])))
+                    )
+    return paths
+
+
+def test_removing_any_required_key_refuses_the_report(allowlist):
+    """Sweep: every required key, removed one at a time, must make the report inadmissible.
+
+    This is the shape of all four #322 r2 findings in one test.  The evaluator used to treat a
+    missing observation as a zero, so deleting ``guc_unset``, deleting every cell, emptying
+    ``tables`` or saying ``present: false`` each produced MEASURED_PASS -- a report could pass by
+    carrying **less**.  The paths are generated from the report, so a new field is swept too.
+    """
+
+    report = rls_report(allowlist)
+    assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.MEASURED_PASS
+    paths = required_key_paths(report)
+    assert len(paths) > 100, "the sweep must actually cover the report"
+    def passes(path: tuple) -> bool:
+        try:
+            return tool.evaluate_rls(strip(report, path), allowlist, NOW) is tool.Verdict.MEASURED_PASS
+        except ValueError:
+            # The aggregator's own refusal: ``aggregate``/``evaluate_axis`` turn it into
+            # INVALID_RUN with the message as the reason, so it is a refusal, not a pass.
+            return False
+
+    survivors = [path for path in paths if passes(path)]
+    assert survivors == []
+
+
+def test_the_one_role_no_migration_creates_may_be_absent_and_the_others_may_not(allowlist):
+    """``inv_runtime_dev`` is absent in the producer's database; the other seven may not be.
+
+    Measured on the hosted report: seven roles exist and ``inv_runtime_dev`` -- a developer login
+    no migration creates -- comes back ``{"present": false}``.  A role that does not exist cannot
+    bypass RLS, so that is a fact; but if any other role could be reported absent, a forger could
+    shrink the population a MEASURED_PASS covers (#322 r2 F-R5).  An absent role also carries
+    nothing but that one key.
+    """
+
+    report = rls_report(allowlist)
+    report["roles"]["inv_runtime_dev"] = {"present": False}
+    assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.MEASURED_PASS
+
+    report["roles"]["inv_runtime_dev"] = {"present": False, "superuser": True}
+    assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.INVALID_RUN
+
+    for role in sorted(tool.RLS_REQUIRED_ROLES - tool.RLS_OPTIONAL_ROLES):
+        hidden = rls_report(allowlist)
+        hidden["roles"][role] = {"present": False}
+        assert tool.evaluate_rls(hidden, allowlist, NOW) is tool.Verdict.INVALID_RUN, role
+
+
+def test_ground_truth_must_have_the_shape_that_table_actually_has(allowlist):
+    """A tenant-scoped table has a tenant-A truth; a table without a tenant column does not.
+
+    The derivation compares the role's tenant-A count with the owner's, so a scoped table whose
+    truth carries only ``total`` is a missing observation -- and the evaluator refuses it instead
+    of reading the absence as zero.
+    """
+
+    scoped_without_tenant_truth = rls_report(allowlist)
+    scoped_without_tenant_truth["ground_truth"]["public.projects"] = {"total": {"rows": 2}}
+    assert tool.evaluate_rls(scoped_without_tenant_truth, allowlist, NOW) is tool.Verdict.INVALID_RUN
+
+    # An unscoped readable table carries total alone, and claiming a tenant truth for it is also
+    # a shape the collector never writes.
+    unscoped = rls_roles({
+        "public.projects": rls_table(),
+        "inv.control_epoch": rls_table(
+            tenant_scoped=False,
+            visible={"guc_unset": {"rows": 1}, "guc_tenant_a": {"rows": 1},
+                     "guc_unknown_tenant": {"rows": 1}, "guc_not_uuid": {"rows": 1}},
+        ),
+    })
+    truth = rls_ground_truth("public.projects")
+    truth["inv.control_epoch"] = {"total": {"rows": 1}}
+    report = rls_report(allowlist, roles=unscoped, ground_truth=truth)
+    assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.MEASURED_PASS
+
+    truth["inv.control_epoch"] = {"total": {"rows": 1}, "tenant_a": {"rows": 1},
+                                  "other_tenants": {"rows": 0}}
+    assert tool.evaluate_rls(
+        rls_report(allowlist, roles=unscoped, ground_truth=truth), allowlist, NOW
+    ) is tool.Verdict.INVALID_RUN
+
+
+@pytest.mark.parametrize(
+    ("label", "mutate"),
+    [
+        pytest.param(
+            "one-cell-deleted",
+            lambda r: strip(r, ("roles", "inv_app", "tables", "public.projects", "visible",
+                                "guc_unset")),
+            id="one-cell-deleted",
+        ),
+        pytest.param(
+            "tenant-a-cell-deleted",
+            lambda r: strip(r, ("roles", "inv_app", "tables", "public.projects", "visible",
+                                "guc_tenant_a")),
+            id="tenant-a-cell-deleted",
+        ),
+        pytest.param(
+            "every-cell-deleted",
+            lambda r: _replace(r, ("roles", "inv_app", "tables", "public.projects", "visible"),
+                               {}),
+            id="every-cell-deleted",
+        ),
+        pytest.param(
+            "tables-emptied",
+            lambda r: _replace(r, ("roles", "inv_app", "tables"), {}),
+            id="tables-emptied",
+        ),
+        pytest.param(
+            "role-called-absent",
+            lambda r: _replace(r, ("roles", "inv_app"), {"present": False}),
+            id="role-called-absent",
+        ),
+        pytest.param(
+            "role-dropped",
+            lambda r: strip(r, ("roles", "inv_app")),
+            id="role-dropped",
+        ),
+        pytest.param(
+            "negative-row-count",
+            lambda r: _replace(r, ("roles", "inv_app", "tables", "public.projects", "visible",
+                                   "guc_unset"), {"rows": -1}),
+            id="negative-row-count",
+        ),
+        pytest.param(
+            "row-count-is-a-string",
+            lambda r: _replace(r, ("roles", "inv_app", "tables", "public.projects", "visible",
+                                   "guc_unset"), {"rows": "0"}),
+            id="row-count-is-a-string",
+        ),
+        pytest.param(
+            "row-count-is-a-boolean",
+            lambda r: _replace(r, ("roles", "inv_app", "tables", "public.projects", "visible",
+                                   "guc_unset"), {"rows": False}),
+            id="row-count-is-a-boolean",
+        ),
+        pytest.param(
+            "cell-carries-an-extra-key",
+            lambda r: _replace(r, ("roles", "inv_app", "tables", "public.projects", "visible",
+                                   "guc_unset"), {"rows": 0, "note": "fine"}),
+            id="cell-carries-an-extra-key",
+        ),
+        pytest.param(
+            "visible-carries-an-unknown-cell",
+            lambda r: _replace(r, ("roles", "inv_app", "tables", "public.projects", "visible",
+                                   "guc_future"), {"rows": 0}),
+            id="visible-carries-an-unknown-cell",
+        ),
+        pytest.param(
+            "unreadable-table-carries-a-probe",
+            lambda r: _replace(r, ("roles", "inv_app", "tables", "public.projects",
+                                   "privileges"),
+                               {"select": None, "insert": None, "update": None, "delete": None}),
+            id="unreadable-table-carries-a-probe",
+        ),
+        pytest.param(
+            "ground-truth-does-not-cover-a-judged-table",
+            lambda r: strip(r, ("ground_truth", "public.projects")),
+            id="ground-truth-missing",
+        ),
+        pytest.param(
+            "identity-method-is-unknown",
+            lambda r: _replace(r, ("roles", "inv_app", "tables", "public.projects", "visible",
+                                   "identity"), {"method": "trust-me", "match": True}),
+            id="identity-method-is-unknown",
+        ),
+    ],
+)
+def test_a_missing_or_malformed_observation_is_never_a_zero(label, mutate, allowlist):
+    """#322 r2 F-R5: each of these produced MEASURED_PASS by being read as "nothing to see".
+
+    A count that is absent, negative, a string, a boolean, or carried beside an extra key is not
+    an observation of zero rows; a role that calls itself absent, or disappears, is not a
+    measured population.  Validating the shape **before** deriving numbers is what makes every
+    one of these a refusal rather than a default.
+    """
+
+    report = mutate(rls_report(allowlist))
+    assert tool.evaluate_rls(report, allowlist, NOW) is not tool.Verdict.MEASURED_PASS
+    assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.INVALID_RUN
+
+
+def _replace(report: dict, path: tuple, value) -> dict:
+    out = copy.deepcopy(report)
+    cursor = out
+    for key in path[:-1]:
+        cursor = cursor[key]
+    cursor[path[-1]] = value
+    return out
 
 
 @pytest.mark.parametrize(
@@ -923,7 +1174,7 @@ def test_every_rls_row_must_be_derivable_from_the_observations(forge, allowlist)
 
     if forge == "measured-roles-differ":
         report = rls_report(allowlist)
-        report["measuredRoles"] = ["inv_app", "inv_kernel"]
+        report["measuredRoles"] = sorted(set(report["measuredRoles"]) - {"inv_app"})
     elif forge == "invented-violation":
         report = rls_report(allowlist, 1)
         report.update(verdict="VIOLATIONS", violations=[dict(row)])
@@ -943,7 +1194,7 @@ def test_every_rls_row_must_be_derivable_from_the_observations(forge, allowlist)
     else:
         roles = rls_roles()
         del roles["inv_app"]["tables"]
-        report = rls_report(allowlist, roles=roles, ground_truth=truth)
+        report = rls_report(allowlist, roles=roles, ground_truth=rls_ground_truth())
 
     assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.INVALID_RUN
 
@@ -978,7 +1229,9 @@ def test_the_collector_and_the_evaluator_derive_the_same_rows(allowlist):
     })
     observation = {
         "roles": copy.deepcopy(roles),
-        "ground_truth": rls_ground_truth("public.projects", "public.runs", "public.audit_events"),
+        "ground_truth": rls_ground_truth(
+            *[name for entry in roles.values() for name in entry["tables"]]
+        ),
         "definer_functions": {},
     }
     violations = [
@@ -1005,8 +1258,7 @@ def test_a_recomputed_identity_mismatch_cannot_hide_in_an_unmeasured_report(allo
     mismatch = identity_roles(
         {**OWNER_VERIFIED_IDENTITY, "role_a": {"rows": 2, "fp": OTHER_FP}, "match": False}
     )
-    truth = rls_ground_truth("public.audit_events")
-    report = rls_report(allowlist, 3, roles=mismatch, ground_truth=truth)
+    report = rls_report(allowlist, 3, roles=mismatch)
     report.update(
         verdict="UNMEASURED",
         unmeasured=[{"rule": "E4", "role": "inv_cancel_bridge_owner",
@@ -1015,7 +1267,7 @@ def test_a_recomputed_identity_mismatch_cannot_hide_in_an_unmeasured_report(allo
     assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.INVALID_RUN
 
     # The same observation reported honestly is a measured failure, which is admissible.
-    violation = rls_report(allowlist, 1, roles=mismatch, ground_truth=truth)
+    violation = rls_report(allowlist, 1, roles=mismatch)
     violation.update(
         verdict="VIOLATIONS",
         violations=[{"rule": "E4", "role": "inv_cancel_bridge_owner",
