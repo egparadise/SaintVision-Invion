@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Run the opt-in S08-BE rootless BuildKit reference lane.
 
-In process mode the caller passes the RootlessKit namespace PID. Container mode
-derives the PID from a validated ``docker inspect`` result. This tool records
+In process mode the caller passes the actual buildkitd PID. Container mode
+derives the buildkitd PID from the container ``/proc`` tree. This tool records
 only redacted process/worker facts, then exercises the concrete transport
 against the repository's scratch-only fixture. The emitted JSON is reference
 evidence and is not a product ``EvidenceEnvelope``.
@@ -107,6 +107,90 @@ def _container_buildkitd_pid(container_name: str) -> int:
     return candidates[0]
 
 
+def _process_buildkitd_snapshot(pid: int) -> dict:
+    try:
+        if Path(f"/proc/{pid}/comm").read_text(encoding="ascii").strip() != "buildkitd":
+            raise RuntimeError("measured process is not buildkitd")
+        status = _status(pid)
+        stat_fields = Path(f"/proc/{pid}/stat").read_text(encoding="ascii").split()
+        start_ticks = int(stat_fields[21])
+    except (OSError, ValueError, IndexError):
+        raise RuntimeError("buildkitd process is not alive") from None
+    return {
+        "pid": pid,
+        "processUid": _positive_process_uid(status),
+        "processStartTicks": start_ticks,
+        "rootless": _process_has_rootless_uid_map(pid),
+    }
+
+
+def _container_buildkitd_snapshot(container_name: str) -> dict:
+    pid = _container_buildkitd_pid(container_name)
+    comm = _command("docker", "exec", container_name, "cat", f"/proc/{pid}/comm")
+    status = _status_text(
+        _command("docker", "exec", container_name, "cat", f"/proc/{pid}/status")
+    )
+    try:
+        stat_fields = _command(
+            "docker", "exec", container_name, "cat", f"/proc/{pid}/stat"
+        ).split()
+        start_ticks = int(stat_fields[21])
+    except (ValueError, IndexError):
+        raise RuntimeError("buildkitd process identity is invalid") from None
+    namespace_values = _command(
+        "docker",
+        "exec",
+        container_name,
+        "stat",
+        "-L",
+        "-c",
+        "%i",
+        f"/proc/{pid}/ns/user",
+        "/proc/1/ns/user",
+    ).splitlines()
+    if (
+        comm != "buildkitd"
+        or len(namespace_values) != 2
+        or any(not value.isdigit() for value in namespace_values)
+    ):
+        raise RuntimeError("rootless BuildKit daemon process identity is invalid")
+    user_namespace, host_user_namespace = (int(value) for value in namespace_values)
+    if user_namespace == host_user_namespace:
+        raise RuntimeError("rootless BuildKit daemon is not in a separate user namespace")
+    return {
+        "pid": pid,
+        "processUid": _positive_process_uid(status),
+        "processStartTicks": start_ticks,
+        "rootless": True,
+    }
+
+
+def _live_buildkitd(args, receipt: dict) -> dict:
+    snapshot = (
+        _container_buildkitd_snapshot(args.container_name)
+        if args.container_name
+        else _process_buildkitd_snapshot(args.daemon_pid)
+    )
+    expected = {
+        "pid": receipt.get("pid"),
+        "processUid": receipt.get("processUid"),
+        "processStartTicks": receipt.get("processStartTicks"),
+        "rootless": receipt.get("rootless"),
+    }
+    if snapshot != expected:
+        raise RuntimeError("buildkitd process identity changed during measurement")
+    return {
+        "pid": snapshot["pid"],
+        "processStartTicks": snapshot["processStartTicks"],
+        "processName": "buildkitd",
+        "alive": True,
+        "verifiedAt": datetime.now(timezone.utc).isoformat(),
+        "source": (
+            "container-proc-buildkitd" if args.container_name else "host-proc-buildkitd"
+        ),
+    }
+
+
 def _verified_runtime_image_digest(runtime_image: str, values: object) -> str:
     expected = runtime_image.rsplit("@", 1)[-1]
     if (
@@ -139,19 +223,18 @@ def _lsm() -> str:
 
 
 def _process_health_receipt(args, observed_at: datetime) -> dict:
+    snapshot = _process_buildkitd_snapshot(args.daemon_pid)
     status = _status(args.daemon_pid)
-    stat_fields = Path(f"/proc/{args.daemon_pid}/stat").read_text(encoding="ascii").split()
-    rootless = _process_has_rootless_uid_map(args.daemon_pid)
     return {
         "schemaVersion": 1,
         "builderInstanceId": INSTANCE,
         "builderProfileId": PROFILE,
         "recoveryEpoch": EPOCH,
         "address": args.address,
-        "pid": args.daemon_pid,
-        "processUid": _positive_process_uid(status),
-        "processStartTicks": int(stat_fields[21]),
-        "rootless": rootless,
+        "pid": snapshot["pid"],
+        "processUid": snapshot["processUid"],
+        "processStartTicks": snapshot["processStartTicks"],
+        "rootless": snapshot["rootless"],
         "privileged": False,
         "hostAccess": False,
         "entitlements": [],
@@ -162,7 +245,7 @@ def _process_health_receipt(args, observed_at: datetime) -> dict:
         "rootlesskitVersion": _command(str(args.rootlesskit), "--version"),
         "runtimeIdentity": "sha256:" + hashlib.sha256(args.buildkitd.read_bytes()).hexdigest(),
         "isolation": {
-            "userNamespace": rootless,
+            "userNamespace": snapshot["rootless"],
             "seccompMode": "filter" if status.get("Seccomp") == "2" else "unavailable-ci-reference",
             "lsm": _lsm(),
             "noNewPrivileges": status.get("NoNewPrivs") == "1",
@@ -173,8 +256,8 @@ def _process_health_receipt(args, observed_at: datetime) -> dict:
             ),
         },
         "fieldSources": {
-            "pid": "caller-passed-rootlesskit-process",
-            "processStartTicks": "proc-rootlesskit-process",
+            "pid": "caller-passed-buildkitd-process",
+            "processStartTicks": "proc-buildkitd-process",
             "rootless": "proc-uid-map",
             "privileged": "caller-asserted-reference-boundary",
             "hostAccess": "caller-asserted-reference-boundary",
@@ -191,30 +274,11 @@ def _process_health_receipt(args, observed_at: datetime) -> dict:
 def _container_health_receipt(args, observed_at: datetime) -> dict:
     values = json.loads(_command("docker", "inspect", args.container_name))
     value = _validated_container_inspect(values)
-    daemon_pid = _container_buildkitd_pid(args.container_name)
+    snapshot = _container_buildkitd_snapshot(args.container_name)
+    daemon_pid = snapshot["pid"]
     status = _status_text(
         _command("docker", "exec", args.container_name, "cat", f"/proc/{daemon_pid}/status")
     )
-    uid = _positive_process_uid(status)
-    stat_fields = _command(
-        "docker", "exec", args.container_name, "cat", f"/proc/{daemon_pid}/stat"
-    ).split()
-    namespace_values = _command(
-        "docker",
-        "exec",
-        args.container_name,
-        "stat",
-        "-L",
-        "-c",
-        "%i",
-        f"/proc/{daemon_pid}/ns/user",
-        "/proc/1/ns/user",
-    ).splitlines()
-    if len(namespace_values) != 2 or any(not value.isdigit() for value in namespace_values):
-        raise RuntimeError("rootless BuildKit user namespace measurement is invalid")
-    user_namespace, host_user_namespace = (int(value) for value in namespace_values)
-    if user_namespace == host_user_namespace:
-        raise RuntimeError("rootless BuildKit daemon is not in a separate user namespace")
     image_values = json.loads(_command("docker", "image", "inspect", args.runtime_image))
     image_digest = _verified_runtime_image_digest(args.runtime_image, image_values)
     return {
@@ -224,9 +288,9 @@ def _container_health_receipt(args, observed_at: datetime) -> dict:
         "recoveryEpoch": EPOCH,
         "address": args.address,
         "pid": daemon_pid,
-        "processUid": uid,
-        "processStartTicks": int(stat_fields[21]),
-        "rootless": user_namespace != host_user_namespace,
+        "processUid": snapshot["processUid"],
+        "processStartTicks": snapshot["processStartTicks"],
+        "rootless": snapshot["rootless"],
         "privileged": value["HostConfig"]["Privileged"],
         "hostAccess": False,
         "entitlements": [],
@@ -241,7 +305,7 @@ def _container_health_receipt(args, observed_at: datetime) -> dict:
         ),
         "runtimeIdentity": image_digest,
         "isolation": {
-            "userNamespace": user_namespace != host_user_namespace,
+            "userNamespace": snapshot["rootless"],
             # The official rootless image needs these host filters relaxed on a
             # hosted runner. This is why the result remains ci-reference only.
             "seccompMode": "unconfined-ci-reference",
@@ -496,6 +560,8 @@ def main(argv=None) -> int:
                 "XDG_RUNTIME_DIR": os.environ.get("XDG_RUNTIME_DIR", ""),
             },
         )
+        failure_stage = "buildkitd-liveness-before-roundtrip"
+        liveness_before = _live_buildkitd(args, receipt)
         failure_stage = "provider-measurement"
         measured = transport.measure()
         request = _request(head, tree)
@@ -505,6 +571,24 @@ def main(argv=None) -> int:
             _plan(request, measured.provider.observation_digest, now),
             args.output_dir,
         )
+        failure_stage = "buildkitd-liveness-after-roundtrip"
+        liveness_after = _live_buildkitd(args, receipt)
+        if (
+            liveness_before["pid"] != liveness_after["pid"]
+            or liveness_before["processStartTicks"]
+            != liveness_after["processStartTicks"]
+        ):
+            raise RuntimeError("buildkitd process identity changed during roundtrip")
+        result["processLiveness"] = {
+            "pid": liveness_after["pid"],
+            "processStartTicks": liveness_after["processStartTicks"],
+            "processName": "buildkitd",
+            "aliveBeforeRoundtrip": liveness_before["alive"],
+            "aliveAfterRoundtrip": liveness_after["alive"],
+            "verifiedBeforeRoundtripAt": liveness_before["verifiedAt"],
+            "verifiedAfterRoundtripAt": liveness_after["verifiedAt"],
+            "source": liveness_after["source"],
+        }
         result["codeSha"] = head
         result["checkoutTreeSha"] = tree
         result["cleanCheckout"] = True

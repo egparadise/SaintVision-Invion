@@ -29,6 +29,10 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       contains(github.event.pull_request.labels.*.name, 'run-s12-acceptance')
     runs-on: ubuntu-latest
+    outputs:
+      evidence-artifact-id: ${{ steps.evidence-upload.outputs.artifact-id }}
+      evidence-artifact-name: s12-acceptance-${{ github.event.pull_request.head.sha || github.sha }}
+      evidence-artifact-digest: ${{ steps.evidence-upload.outputs.artifact-digest }}
     timeout-minutes: 20
     concurrency:
       group: s12-acceptance-${{ github.event.pull_request.head.sha || github.sha }}
@@ -148,8 +152,95 @@ jobs:
           PY
       - name: Upload the acceptance evidence
         if: always()
+        id: evidence-upload
         uses: actions/upload-artifact@v4
         with:
           name: s12-acceptance-${{ github.event.pull_request.head.sha || github.sha }}
           path: ${{ env.OUT_DIR }}
           if-no-files-found: error
+          retention-days: 30
+
+  attest-vf-cl-ci-receipt:
+    # PR code never receives an OIDC signing token.  Only an explicit workflow_dispatch
+    # reaches this job, after the unprivileged producer completed successfully.
+    if: github.event_name == 'workflow_dispatch' && needs.s12-acceptance-evidence.result == 'success'
+    needs: s12-acceptance-evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: s12-attestation-${{ github.run_id }}
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+      attestations: write
+      artifact-metadata: write
+    env:
+      SOURCE_HEAD_SHA: ${{ github.sha }}
+      EVIDENCE_ARTIFACT_ID: ${{ needs.s12-acceptance-evidence.outputs.evidence-artifact-id }}
+      EVIDENCE_ARTIFACT_NAME: ${{ needs.s12-acceptance-evidence.outputs.evidence-artifact-name }}
+      EVIDENCE_ARTIFACT_DIGEST: ${{ needs.s12-acceptance-evidence.outputs.evidence-artifact-digest }}
+      RECEIPT_DIR: .work/vf-cl-attestation
+      RECEIPT_PATH: .work/vf-cl-attestation/VF-CL-04.json
+    steps:
+      - name: Checkout the exact attested source head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download the exact evidence artifact
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ env.EVIDENCE_ARTIFACT_ID }}
+          path: .work/s12-evidence-download
+      - name: Read current-run artifact metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RECEIPT_DIR"
+          gh api "/repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts?name=$EVIDENCE_ARTIFACT_NAME" \
+            > "$RECEIPT_DIR/artifacts.json"
+      - name: Create the authoritative VF-CL receipt
+        run: |
+          python tools/create_vf_cl_ci_attestation_receipt.py \
+            --artifact-metadata "$RECEIPT_DIR/artifacts.json" \
+            --artifact-id "$EVIDENCE_ARTIFACT_ID" \
+            --artifact-name "$EVIDENCE_ARTIFACT_NAME" \
+            --expected-artifact-digest "$EVIDENCE_ARTIFACT_DIGEST" \
+            --producer-conclusion '${{ needs.s12-acceptance-evidence.result }}' \
+            --required-step 'Derive the AC-12 acceptance items' \
+            --required-step 'Hold the bundle to its shape and to this head' \
+            --required-step 'Record that the two named observations were derived here' \
+            --required-step 'Upload the acceptance evidence' \
+            --out "$RECEIPT_PATH"
+          test "$(sha256sum "$RECEIPT_PATH" | cut -d' ' -f1)" != ""
+      - name: Attest the CI-produced VF-CL receipt
+        id: receipt-attestation
+        uses: actions/attest@v4
+        with:
+          subject-path: ${{ env.RECEIPT_PATH }}
+      - name: Verify receipt signature, identity, source, and bytes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python tools/verify_vf_cl_ci_attestation.py \
+            --receipt "$RECEIPT_PATH" \
+            --bundle '${{ steps.receipt-attestation.outputs.bundle-path }}' \
+            --expected-head "$SOURCE_HEAD_SHA" \
+            --expected-ref "$GITHUB_REF" \
+            --output "$RECEIPT_DIR/verification.json"
+      - name: Upload the authoritative receipt and Sigstore bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: vf-cl-ci-attestation-${{ github.sha }}
+          path: |
+            ${{ env.RECEIPT_PATH }}
+            ${{ steps.receipt-attestation.outputs.bundle-path }}
+            ${{ env.RECEIPT_DIR }}/verification.json
+          if-no-files-found: error
+          retention-days: 30

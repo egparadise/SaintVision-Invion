@@ -22,6 +22,13 @@ from typing import Any
 
 
 REPOSITORY = "egparadise/SaintVision-Invion"
+#: Empty on purpose, and the emptiness is the finding. This importer returns the
+#: producer's report with runPurpose "s11-ac11-security-scan" and no axis field, so the
+#: aggregator -- which requires runPurpose "ac11-axis-evidence" and an axis in
+#: REQUIRED_AXES -- cannot take its output. Something has to adapt that report into an
+#: axis envelope and nothing does; declaring () says so in the code rather than leaving
+#: a reader to infer it from the absence of a name (#299 r1, r3).
+EMITTED_AXES: tuple[str, ...] = ()
 WORKFLOW_PATH = ".github/workflows/ac11-security-scan.yml"
 REPORT_MEMBER = "s11-ac11-security-scan.json"
 JUNIT_MEMBER = "s11-ac11-security-scan.xml"

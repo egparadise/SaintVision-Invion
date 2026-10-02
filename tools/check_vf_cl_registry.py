@@ -11,6 +11,11 @@ written:
 * ``VF-CL-04`` said the restore drill was skipping
   ``until-pr-126`` -- and PR #126 had merged. Anyone waiting for it would wait forever.
   The 19 skips are real but they are waiting for container inputs, not for that PR.
+* ``VF-CL-04``'s ``ciVerified`` stayed ``false`` with a note whose stated reason was
+  "no workflow runs ``tools/collect_s12_acceptance_evidence.py``". By the time this was
+  written one does -- ``.github/workflows/s12-acceptance-evidence.yml`` landed with
+  ``#283`` -- so the registry was again telling a reader to wait for something that had
+  happened. That is rule 7, and it is the same mistake in a field rule 4 did not reach.
 
 Nothing validated that file, which is why it drifted quietly. This does, and it is
 deliberately mechanical: it re-derives facts rather than reading prose.
@@ -34,6 +39,13 @@ Six rules:
 
 1. **Shape.** Every card carries the six state fields, ``implemented`` is one of
    ``true``/``false``/``"partial"``, and every blocker is a non-empty string.
+8. **A candidate tree does not inherit its verification.** ``verifiedAgainst`` may name
+   a pre-landing candidate, and then it must say so (``candidate: true``) and name where
+   re-verification is due (``reverifyAt``). Once that tree has reached the integration ref
+   -- when it is an ancestor of the local ``origin/<reverifyAt>`` tip -- the claim must be
+   **re-verified and re-recorded at the landed SHA**, and until it is, this reports. An
+   ancestry relation is not a licence to carry a candidate's evidence forward forever.
+
 2. **No blocker may name a merged pull request.** A blocker whose text contains
    ``pr-<n>`` or ``#<n>`` claims to be waiting for it. If that PR is already merged in
    this history the blocker is misstated, which is how #126 slipped through. This is
@@ -52,6 +64,42 @@ Six rules:
    ``operationallyAccepted`` while it has open blockers, is not ``ciVerified`` or
    ``independentlyReviewed`` (unless ``notApplicable`` says why), or is not in state
    ``accepted``.
+7. **The tree decides ``ciVerified`` too, and a true one must name its run.** Rule 4
+   covers ``implemented``; nothing covered the field that said whether CI re-derives the
+   card. So the manifest carries ``impliesCiVerified`` with its own ``ciVerifiedChecks``,
+   compared the same way -- and a ``null`` must say ``whyCiVerified`` rather than leave a
+   gap that reads as coverage. Where it is asserted ``true``, the card must be backed by a **receipt**
+   (``tools/record_vf_cl_ci_receipt.py``) that was built from GitHub's own answers about
+   one run, and the registry's ``ciVerifiedRun`` must agree with it field for field.
+
+   **The first version of that second half checked the shape of a sentence, and Codex
+   showed what that is worth**: an invented run id, a different 40-hex head, a workflow
+   nobody runs, invented step names, and all four at once -- five fabrications, zero
+   findings. A numeric-looking ``runId`` is not a run. So the rule now compares the
+   registry against a file whose fields came from ``gh api``, carries the digests of those
+   three documents, and re-measures the one thing a file cannot be trusted about: whether
+   the run's head is really in the claimed tree. The artifact's expiry is read too -- a
+   claim whose evidence can no longer be fetched has stopped being re-checkable, which is
+   the same standard ``aggregate_ac11_evidence.py`` applies with its freshness window.
+
+   **And that is still not enough to say ``true``** (#295 r2 F1). The receipt is built
+   offline from JSON the caller passed in, and ``receiptSha256`` is a digest rather than a
+   signature: Codex forged a run id in the receipt *and* the registry, recomputed the hash,
+   and this tool exited 0. Binding two files to each other proves they agree; it does not
+   prove either describes a run that happened. So ``impliesCiVerified: true`` is
+   **refused** until an entry carries ``receiptIsAttested`` -- which nothing can yet,
+   because the attestation does not exist. A receipt is still read and bound wherever one
+   is named, so the facts stay re-checkable as a *measurement record* while the claim stays
+   ``false``. Making the claim honest is the follow-up card; the receipt's inputs being an
+   authenticated caller's ``gh api`` output (the same boundary
+   ``tools/import_ac11_security_scan.py`` declares) is what that card has to close, by
+   having CI produce and attest the receipt under ``actions: read``.
+
+   What it does **not** reach: a card whose tests merely ride a whole-directory lane.
+   ``pytest tests/core`` says nothing about *which* card's behaviour ran, so a check
+   pointing at a lane that runs a directory would read as coverage while asserting
+   nothing. Those cards state ``impliesCiVerified: null`` and say that out loud.
+
 6. **A local gap is not a blocker.** ``localUnmeasured`` entries say what was not measured
    here and **where it is measured instead**; the same subject may not also be a blocker.
    The restore drill was filed as an external precondition when it was measured in hosted
@@ -82,16 +130,58 @@ Exit codes: 0 the registry matches the tree, 1 it does not (every mismatch is li
 from __future__ import annotations
 
 import argparse
+import datetime as dt
+import hashlib
 import json
 from pathlib import Path
 import re
 import subprocess
 import sys
 
+try:
+    from tools import verify_vf_cl_ci_attestation
+except ModuleNotFoundError:  # Direct ``python tools/...py`` execution in CI and runbooks.
+    import verify_vf_cl_ci_attestation
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_REGISTRY = REPO_ROOT / "docs/vf-cl-task-registry.json"
 DEFAULT_MANIFEST = REPO_ROOT / "docs/vf-cl-registry-manifest.json"
 MANIFEST_SCHEMA = "vf-cl-registry-manifest:1"
+#: What ``tools/record_vf_cl_ci_receipt.py`` writes. Pinned here so a receipt from another
+#: shape cannot be read as this one.
+RECEIPT_SCHEMA = "vf-cl-ci-receipt:1"
+RECEIPT_REPOSITORY = "egparadise/SaintVision-Invion"
+#: The receipt's key set, exactly. Not a minimum: a document that may carry extra keys is a
+#: document whose digest covers fields nobody reads, and Codex got an unknown top-level key
+#: past the first version by re-hashing (#295 r2 F2). Nested shapes are pinned too.
+RECEIPT_KEYS = frozenset({
+    "schemaVersion", "card", "repository", "workflowPath", "runId", "event", "conclusion",
+    "headSha", "headBranch", "claimedTree", "headRelationToClaimedTree", "requiredSteps",
+    "artifact", "inputDigests", "recordedAt", "receiptSha256",
+})
+RECEIPT_ARTIFACT_KEYS = frozenset({"id", "name", "digest", "expiresAt"})
+RECEIPT_INPUT_KEYS = frozenset({
+    "runMetadataSha256", "jobsMetadataSha256", "artifactMetadataSha256",
+})
+#: Why an unsigned offline receipt may not derive ``ciVerified: true`` (#295 r2 F1).
+#:
+#: The receipt is built offline from JSON the caller passed in, and its ``receiptSha256`` is
+#: a digest, not a signature -- Codex forged a run id in the receipt *and* the registry,
+#: recomputed the hash, and the checker exited 0. Binding two files to each other proves
+#: they agree; it does not prove either is about a run that happened. A true claim is
+#: therefore opened only by ``ciVerifiedAttestation`` and a GitHub/Sigstore bundle that
+#: this checker verifies against the exact repository, workflow, source commit, branch,
+#: and receipt bytes.
+UNATTESTED_RECEIPT = (
+    "a receipt built from passed-in JSON cannot carry ciVerified=true: its digest is not a "
+    "signature, so a forged run id survives re-hashing. An attested CI-produced receipt is "
+    "the follow-up card; until then the honest value is false"
+)
+ATTESTATION_EXPECTATION_KEYS = frozenset({
+    "receiptPath", "bundlePath", "repository", "workflowPath", "headSha", "headRef",
+})
+#: A receipt names a full commit, like every other sha in this file.
+COMMIT_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 
 STATE_FIELDS = (
     "implemented",
@@ -102,7 +192,7 @@ STATE_FIELDS = (
 )
 #: A blocker that names a pull request is claiming to wait for it.
 PULL_REQUEST = re.compile(r"(?:\bpr-|#)(\d{1,5})\b")
-CHECK_KINDS = ("references", "absent", "path-exists")
+CHECK_KINDS = ("references", "absent", "path-exists", "path-absent")
 #: A card may only be called accepted when these hold, or when ``notApplicable`` names the
 #: field and says why. Acceptance is the one claim nobody downstream re-checks.
 ACCEPTANCE_REQUIRES = ("ciVerified", "independentlyReviewed")
@@ -124,6 +214,33 @@ class RegistryUnusable(ValueError):
     """The registry cannot be judged, which is not the same as it being wrong."""
 
 
+def _reject_duplicate_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    """``json.loads`` keeps the **last** of two identical keys. That is how a correction
+    disappeared: an edit added ``whyCiVerified`` to an entry that already had one, and the
+    new reason was silently replaced by the old one (#295 r3 F2). A file nobody can read
+    twice the same way is not a record, so a duplicate is refused rather than resolved.
+    """
+    seen: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in seen:
+            raise RegistryUnusable(f"duplicate JSON key {key!r}")
+        seen[key] = value
+    return seen
+
+
+def load_json_strictly(path: Path, label: str) -> dict[str, Any]:
+    """Read a JSON object, refusing a duplicate key anywhere in it."""
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=_reject_duplicate_keys)
+    except RegistryUnusable as refusal:
+        raise RegistryUnusable(f"{label}: {refusal}") from None
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise RegistryUnusable(f"{label} is not readable JSON: {type(error).__name__}") from None
+    if not isinstance(value, dict):
+        raise RegistryUnusable(f"{label} must be a JSON object")
+    return value
+
+
 def shallow_repository(root: Path) -> bool:
     """Whether this checkout has been truncated.
 
@@ -137,6 +254,41 @@ def shallow_repository(root: Path) -> bool:
         cwd=root, capture_output=True, text=True,
     )
     return result.returncode == 0 and result.stdout.strip() == "true"
+
+
+def ancestry(candidate: str, descendant: str, root: Path) -> bool | None:
+    """Whether ``candidate`` is in ``descendant``'s history. ``None`` = cannot answer.
+
+    The distinction matters here for the same reason it does for the shallow rule: a
+    missing commit answers "no" to ``merge-base`` and that reads as drift. A question this
+    clone cannot answer has to be reported as itself.
+    """
+    for sha in (candidate, descendant):
+        if subprocess.run(
+            ["git", "cat-file", "-e", f"{sha}^{{commit}}"],
+            cwd=root, capture_output=True, text=True,
+        ).returncode != 0:
+            return None
+    return subprocess.run(
+        ["git", "merge-base", "--is-ancestor", candidate, descendant],
+        cwd=root, capture_output=True, text=True,
+    ).returncode == 0
+
+
+def remote_tip(ref: str, root: Path) -> str | None:
+    """The local clone's answer for ``origin/<ref>``, or None when it does not know.
+
+    Local on purpose: this tool answers questions about files, and reaching the network to
+    answer one would make it need a token in lanes that run with ``contents: read``. The
+    cost is that a stale clone cannot see a landing yet, which is why not knowing is
+    reported rather than treated as "has not landed".
+    """
+    done = subprocess.run(
+        ["git", "rev-parse", "--verify", "--quiet", f"refs/remotes/origin/{ref}"],
+        cwd=root, capture_output=True, text=True,
+    )
+    tip = done.stdout.strip()
+    return tip if done.returncode == 0 and tip else None
 
 
 def merged_pull_requests(root: Path) -> set[int]:
@@ -176,11 +328,8 @@ def load_manifest(path: Path, identifiers: list[str]) -> dict:
     """
     if not path.is_file():
         raise RegistryUnusable(f"the re-derivation manifest is missing: {path.name}")
-    try:
-        manifest = json.loads(path.read_text(encoding="utf-8"))
-    except (UnicodeError, json.JSONDecodeError) as error:
-        raise RegistryUnusable(f"the manifest is not readable JSON: {type(error).__name__}")
-    if not isinstance(manifest, dict) or manifest.get("schemaVersion") != MANIFEST_SCHEMA:
+    manifest = load_json_strictly(path, "the manifest")
+    if manifest.get("schemaVersion") != MANIFEST_SCHEMA:
         raise RegistryUnusable(f"the manifest must declare schemaVersion {MANIFEST_SCHEMA}")
     cards = manifest.get("cards")
     if not isinstance(cards, dict):
@@ -208,6 +357,64 @@ def load_manifest(path: Path, identifiers: list[str]) -> dict:
             raise RegistryUnusable(f"{name} asserts nothing and does not say why")
         if implied is not None and not checks:
             raise RegistryUnusable(f"{name} claims implemented={implied!r} with no checks")
+        # Rule 7's half of the entry. Required by key, not by presence of a value: a
+        # deleted entry has to be a failure, like every other assertion here.
+        if "impliesCiVerified" not in entry:
+            raise RegistryUnusable(f"{name} does not say impliesCiVerified")
+        ci_implied = entry["impliesCiVerified"]
+        if ci_implied is not True and ci_implied is not False and ci_implied is not None:
+            raise RegistryUnusable(f"{name}.impliesCiVerified is {ci_implied!r}")
+        ci_checks = entry.get("ciVerifiedChecks")
+        if not isinstance(ci_checks, list):
+            raise RegistryUnusable(f"{name} needs a ciVerifiedChecks array, even an empty one")
+        if ci_implied is None and not str(entry.get("whyCiVerified") or "").strip():
+            raise RegistryUnusable(f"{name} asserts nothing about ciVerified and does not "
+                                   f"say why")
+        if ci_implied is not None and not ci_checks:
+            raise RegistryUnusable(
+                f"{name} claims ciVerified={ci_implied!r} with no ciVerifiedChecks"
+            )
+        if ci_implied is True:
+            attestation = entry.get("ciVerifiedAttestation")
+            if not isinstance(attestation, dict) or set(attestation) != ATTESTATION_EXPECTATION_KEYS:
+                raise RegistryUnusable(
+                    f"{name}: ciVerified=true requires an exact ciVerifiedAttestation object"
+                )
+            for field in ATTESTATION_EXPECTATION_KEYS:
+                if not isinstance(attestation[field], str) or not attestation[field].strip():
+                    raise RegistryUnusable(
+                        f"{name}.ciVerifiedAttestation.{field} must be a non-empty string"
+                    )
+            if attestation["repository"] != RECEIPT_REPOSITORY:
+                raise RegistryUnusable(
+                    f"{name}.ciVerifiedAttestation.repository is not {RECEIPT_REPOSITORY}"
+                )
+            if not COMMIT_PATTERN.fullmatch(attestation["headSha"]):
+                raise RegistryUnusable(
+                    f"{name}.ciVerifiedAttestation.headSha is not a full commit"
+                )
+            if not attestation["headRef"].startswith("refs/heads/"):
+                raise RegistryUnusable(
+                    f"{name}.ciVerifiedAttestation.headRef is not a branch ref"
+                )
+        if ci_implied is not None and entry.get("ciVerifiedReceipt") is not None:
+            # The expectations live here, not in the registry: a file that can choose which
+            # workflow and which steps count has not been held to anything.
+            expectation = entry.get("ciVerifiedReceipt")
+            if not isinstance(expectation, dict):
+                raise RegistryUnusable(
+                    f"{name}.ciVerifiedReceipt is not an object"
+                )
+            for field in ("path", "workflowPath", "artifactNamePrefix"):
+                if not str(expectation.get(field) or "").strip():
+                    raise RegistryUnusable(f"{name}.ciVerifiedReceipt needs {field}")
+            steps = expectation.get("requiredSteps")
+            if not isinstance(steps, list) or not steps or not all(
+                isinstance(step, str) and step.strip() for step in steps
+            ):
+                raise RegistryUnusable(
+                    f"{name}.ciVerifiedReceipt.requiredSteps must name at least one step"
+                )
         if not isinstance(entry.get("closedBlockers", {}), dict):
             raise RegistryUnusable(f"{name}.closedBlockers must be an object")
         forbidden = entry.get("forbiddenBlockers", [])
@@ -216,6 +423,343 @@ def load_manifest(path: Path, identifiers: list[str]) -> dict:
         ):
             raise RegistryUnusable(f"{name}.forbiddenBlockers must be a list of ids")
     return manifest
+
+
+#: Each receipt field and what it must be. ``check`` returns True when the value is
+#: acceptable; the message says what it had to be. Written as a table because a field
+#: added to ``RECEIPT_KEYS`` without an entry here is a field nobody typed -- the test
+#: ``test_every_receipt_key_is_typed`` holds the two lists equal.
+RECEIPT_FIELD_RULES: tuple[tuple[str, Any, str], ...] = (
+    ("schemaVersion", lambda v: v == RECEIPT_SCHEMA, f"must be {RECEIPT_SCHEMA!r}"),
+    # Two characters, because the identity that matters is checked separately: the receipt's
+    # card must equal the card being judged. This is the shape, not the identity.
+    ("card", lambda v: isinstance(v, str) and re.fullmatch(r"VF-CL-[0-9A-Z]{2}", v),
+     "must be a VF-CL card id"),
+    ("repository", lambda v: v == RECEIPT_REPOSITORY, "must be the canonical repository"),
+    ("workflowPath", lambda v: isinstance(v, str) and v.startswith(".github/workflows/")
+     and v.endswith((".yml", ".yaml")), "must be a workflow file path"),
+    ("runId", lambda v: isinstance(v, str) and re.fullmatch(r"[0-9]{1,20}", v),
+     "must be a run id written as digits in a string"),
+    ("event", lambda v: v in {"workflow_dispatch", "pull_request"},
+     "must be an opt-in event"),
+    ("conclusion", lambda v: v == "success", "must be 'success'"),
+    ("headSha", lambda v: isinstance(v, str) and COMMIT_PATTERN.fullmatch(v),
+     "must be a full 40-hex commit"),
+    ("headBranch", lambda v: isinstance(v, str) and 0 < len(v) <= 255
+     and "\n" not in v, "must be a branch name"),
+    ("claimedTree", lambda v: isinstance(v, str) and COMMIT_PATTERN.fullmatch(v),
+     "must be a full 40-hex commit"),
+    ("headRelationToClaimedTree", lambda v: v in {"same", "ancestor"},
+     "must be 'same' or 'ancestor'"),
+    ("requiredSteps", lambda v: isinstance(v, list) and v and all(
+        isinstance(step, str) and step.strip() for step in v),
+     "must be a non-empty list of non-empty strings"),
+    ("artifact", lambda v: isinstance(v, dict), "must be an object"),
+    ("inputDigests", lambda v: isinstance(v, dict), "must be an object"),
+    ("recordedAt", lambda v: _is_utc_timestamp(v), "must be a UTC RFC3339 timestamp"),
+    ("receiptSha256", lambda v: isinstance(v, str) and re.fullmatch(r"[0-9a-f]{64}", v),
+     "must be a sha256"),
+)
+
+#: The artifact object's fields, typed the same way.
+RECEIPT_ARTIFACT_RULES: tuple[tuple[str, Any, str], ...] = (
+    ("id", lambda v: isinstance(v, str) and re.fullmatch(r"[0-9]{1,20}", v),
+     "must be an artifact id written as digits in a string"),
+    ("name", lambda v: isinstance(v, str) and 0 < len(v) <= 255 and "/" not in v,
+     "must be an artifact name"),
+    ("digest", lambda v: isinstance(v, str) and re.fullmatch(r"sha256:[0-9a-f]{64}", v),
+     "must be 'sha256:<64 hex>'"),
+    ("expiresAt", lambda v: _is_utc_timestamp(v), "must be a UTC RFC3339 timestamp"),
+)
+
+
+#: The lexical form a receipt timestamp must have. ``fromisoformat`` is far more generous
+#: than RFC3339 -- it accepts a space separator and any offset -- so checking only that a
+#: timezone *exists* let ``2026-10-01T18:23:14+09:00`` and ``... 18:23:14Z`` through
+#: (#295 r4). These values are compared and sorted across machines, so the form is pinned
+#: and the offset must be UTC, written as ``Z`` or ``+00:00``.
+#:
+#: ``-00:00`` is refused on purpose: RFC3339 §4.3 gives it the meaning "offset unknown",
+#: which is not the same claim as UTC.
+UTC_TIMESTAMP = re.compile(
+    r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,9})?(Z|\+00:00)$"
+)
+
+
+def _is_utc_timestamp(value: Any) -> bool:
+    """RFC3339, in UTC, in the one form this registry writes.
+
+    Both halves matter: the pattern fixes the form, and the parse rejects a value that
+    looks right and is not a date (month 13, day 32), which a pattern alone admits.
+    """
+    if not isinstance(value, str) or not UTC_TIMESTAMP.fullmatch(value):
+        return False
+    try:
+        parsed = dt.datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return False
+    return parsed.utcoffset() == dt.timedelta(0)
+
+
+def receipt_field_findings(receipt: dict[str, Any]) -> list[str]:
+    """What each field had to be, for the fields that are not.
+
+    Deliberately independent of the digest. Two fields -- ``receiptSha256`` and
+    ``recordedAt`` -- are excluded from the canonical digest by construction, so a wrong
+    type in them survives without any re-hashing at all. That is the hole Codex found.
+    """
+    findings: list[str] = []
+    for key, check, message in RECEIPT_FIELD_RULES:
+        if key not in receipt:
+            continue                      # the exact-key-set check reports an absence
+        if not check(receipt[key]):
+            findings.append(f"the receipt's {key} {message}, not {receipt[key]!r}")
+    artifact = receipt.get("artifact")
+    if isinstance(artifact, dict):
+        for key, check, message in RECEIPT_ARTIFACT_RULES:
+            if key not in artifact:
+                continue
+            if not check(artifact[key]):
+                findings.append(
+                    f"the receipt's artifact.{key} {message}, not {artifact[key]!r}"
+                )
+    return findings
+
+
+def ci_run_findings(
+    identifier: str,
+    recorded: object,
+    expectation: dict[str, Any],
+    claimed_tree: str,
+    root: Path,
+    now: dt.datetime,
+) -> list[str]:
+    """Rule 7's second half: the registry's run block must agree with a built receipt.
+
+    Three things are compared, and each closes one of the five fabrications that passed the
+    first version:
+
+    * the **receipt** itself -- schema, card, and its own canonical digest, so a value
+      edited in one place and not the other is visible;
+    * the **expectation** the manifest holds -- which workflow file and which steps count,
+      kept out of the registry because a file that chooses its own standard is not held to
+      one;
+    * the **registry's own block**, field for field against the receipt: a fabricated run
+      id or head no longer matches anything.
+
+    And one thing is re-measured rather than read: whether the run's head is really the
+    claimed tree or an ancestor of it. The receipt states the relation, but a file's claim
+    about ancestry is exactly what git can answer here.
+    """
+    findings: list[str] = []
+    relative = str(expectation.get("path") or "")
+    receipt_path = root / relative
+    try:
+        receipt = load_json_strictly(receipt_path, f"the receipt {relative}")
+    except RegistryUnusable as refusal:
+        # Reported as a finding rather than raised: a bad receipt is drift in a card, and
+        # the rest of the registry can still be judged.
+        return [f"{identifier}: {refusal}"]
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        return [f"{identifier}: its receipt {relative} is unusable: {type(error).__name__}"]
+    if not isinstance(receipt, dict):
+        return [f"{identifier}: the receipt {relative} is not an object"]
+    if receipt.get("schemaVersion") != RECEIPT_SCHEMA:
+        findings.append(f"{identifier}: the receipt declares schemaVersion "
+                        f"{receipt.get('schemaVersion')!r}")
+    # Strict, and in both directions. An unknown key passed the first version once its
+    # digest was recomputed, and a missing nested key simply read as absent (#295 r2 F2).
+    if set(receipt) != RECEIPT_KEYS:
+        unexpected = sorted(set(receipt) - RECEIPT_KEYS)
+        missing = sorted(RECEIPT_KEYS - set(receipt))
+        findings.append(
+            f"{identifier}: the receipt's key set is not exact"
+            + (f"; unexpected {unexpected}" if unexpected else "")
+            + (f"; missing {missing}" if missing else "")
+        )
+    nested = receipt.get("artifact")
+    if isinstance(nested, dict) and set(nested) != RECEIPT_ARTIFACT_KEYS:
+        findings.append(f"{identifier}: the receipt's artifact key set is not exact: "
+                        f"{sorted(set(nested) ^ RECEIPT_ARTIFACT_KEYS)}")
+    digests = receipt.get("inputDigests")
+    if not isinstance(digests, dict) or set(digests) != RECEIPT_INPUT_KEYS:
+        findings.append(f"{identifier}: the receipt's inputDigests key set is not exact")
+    elif not all(
+        isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value)
+        for value in digests.values()
+    ):
+        findings.append(f"{identifier}: an inputDigests value is not a sha256")
+    # Every field, by type and format. An exact key set says nothing about what is *in*
+    # the keys, and two of these fields are outside the digest, so a wrong type there
+    # needs no re-hash at all: ``recordedAt: 123`` passed the first version (#295 r3 F1).
+    findings.extend(f"{identifier}: {problem}" for problem in receipt_field_findings(receipt))
+    if receipt.get("card") != identifier:
+        findings.append(f"{identifier}: the receipt is for {receipt.get('card')!r}")
+    body = {key: value for key, value in receipt.items()
+            if key not in ("receiptSha256", "recordedAt")}
+    digest = hashlib.sha256(
+        json.dumps(body, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+        .encode("utf-8")
+    ).hexdigest()
+    if receipt.get("receiptSha256") != digest:
+        findings.append(f"{identifier}: the receipt's own digest does not match its "
+                        f"contents, so it was edited after it was built")
+    if receipt.get("repository") != RECEIPT_REPOSITORY:
+        findings.append(f"{identifier}: the receipt names repository "
+                        f"{receipt.get('repository')!r}")
+    if receipt.get("conclusion") != "success":
+        findings.append(f"{identifier}: the receipt's run concluded "
+                        f"{receipt.get('conclusion')!r}")
+    if receipt.get("workflowPath") != expectation.get("workflowPath"):
+        findings.append(f"{identifier}: the receipt is a run of "
+                        f"{receipt.get('workflowPath')!r}, not "
+                        f"{expectation.get('workflowPath')!r}")
+    wanted = sorted(expectation.get("requiredSteps") or [])
+    if sorted(receipt.get("requiredSteps") or []) != wanted:
+        findings.append(f"{identifier}: the receipt's required steps are not the ones the "
+                        f"manifest names")
+    head = str(receipt.get("headSha") or "")
+    if not COMMIT_PATTERN.fullmatch(head):
+        findings.append(f"{identifier}: the receipt's headSha is {receipt.get('headSha')!r}")
+    artifact = receipt.get("artifact")
+    if not isinstance(artifact, dict):
+        findings.append(f"{identifier}: the receipt carries no artifact")
+        artifact = {}
+    else:
+        prefix = str(expectation.get("artifactNamePrefix") or "")
+        if artifact.get("name") != f"{prefix}{head}":
+            findings.append(f"{identifier}: the artifact name {artifact.get('name')!r} is "
+                            f"not {prefix}<the run's head>")
+        digest_value = str(artifact.get("digest") or "")
+        if not digest_value.startswith("sha256:") or not re.fullmatch(
+            r"[0-9a-f]{64}", digest_value.removeprefix("sha256:")
+        ):
+            findings.append(f"{identifier}: the artifact digest is "
+                            f"{artifact.get('digest')!r}")
+        expires = artifact.get("expiresAt")
+        try:
+            moment = dt.datetime.fromisoformat(str(expires).replace("Z", "+00:00"))
+        except ValueError:
+            findings.append(f"{identifier}: the artifact expiresAt is {expires!r}")
+        else:
+            if moment.tzinfo is None or moment.astimezone(dt.timezone.utc) <= now:
+                # Not pedantry: the claim is "CI showed this", and an artifact nobody can
+                # fetch any more cannot show it again. Re-derive and re-record.
+                findings.append(f"{identifier}: the artifact that backs this claim expired "
+                                f"at {expires}, so the claim is no longer re-checkable")
+
+    # The relation to the tree the registry is about, measured here rather than believed.
+    if claimed_tree and head and COMMIT_PATTERN.fullmatch(head):
+        stated = str(receipt.get("claimedTree") or "")
+        if not stated.startswith(claimed_tree) and not claimed_tree.startswith(stated):
+            findings.append(f"{identifier}: the receipt is about tree {stated[:12]!r}, not "
+                            f"the registry's {claimed_tree[:12]!r}")
+        else:
+            relation = ancestry(head, stated or claimed_tree, root)
+            if relation is None:
+                findings.append(f"{identifier}: this clone cannot tell whether the run's "
+                                f"head is in the claimed tree")
+            elif not relation:
+                findings.append(f"{identifier}: the run's head is not in the claimed tree")
+
+    # And the registry's own block, which is what a reader sees first.
+    if not isinstance(recorded, dict):
+        findings.append(f"{identifier}.ciVerified is derived true but it names no "
+                        f"ciVerifiedRun")
+        return findings
+    for field, expected in (
+        ("runId", receipt.get("runId")),
+        ("headSha", receipt.get("headSha")),
+        ("workflowPath", receipt.get("workflowPath")),
+        ("conclusion", receipt.get("conclusion")),
+        ("receipt", relative),
+    ):
+        if recorded.get(field) != expected:
+            findings.append(f"{identifier}.ciVerifiedRun.{field} is "
+                            f"{recorded.get(field)!r} but the receipt says {expected!r}")
+    if sorted(recorded.get("requiredSteps") or []) != sorted(receipt.get("requiredSteps") or []):
+        findings.append(f"{identifier}.ciVerifiedRun.requiredSteps differs from the receipt")
+    block_artifact = recorded.get("artifact")
+    if not isinstance(block_artifact, dict):
+        findings.append(f"{identifier}.ciVerifiedRun names no artifact")
+    else:
+        for field in ("id", "digest"):
+            if block_artifact.get(field) != artifact.get(field):
+                findings.append(f"{identifier}.ciVerifiedRun.artifact.{field} differs from "
+                                f"the receipt")
+    return findings
+
+
+def verify_ci_attestation(receipt_path: Path, bundle_path: Path, expectation: dict[str, Any]):
+    """One replaceable boundary so tests can prove checker behaviour without a network."""
+    return verify_vf_cl_ci_attestation.verify(
+        receipt_path,
+        bundle_path,
+        expected_repository=expectation["repository"],
+        expected_workflow=expectation["workflowPath"],
+        expected_head=expectation["headSha"],
+        expected_ref=expectation["headRef"],
+    )
+
+
+def ci_attestation_findings(
+    identifier: str,
+    recorded: object,
+    expectation: dict[str, Any],
+    root: Path,
+    now: dt.datetime | None = None,
+) -> list[str]:
+    """Require a cryptographically verified receipt before ciVerified can be true."""
+    current = now or dt.datetime.now(dt.timezone.utc)
+    receipt_relative = expectation["receiptPath"]
+    bundle_relative = expectation["bundlePath"]
+    try:
+        receipt = verify_ci_attestation(
+            root / receipt_relative,
+            root / bundle_relative,
+            expectation,
+        )
+    except verify_vf_cl_ci_attestation.AttestationError as error:
+        return [f"{identifier}: authoritative CI attestation refused: {error}"]
+    if not isinstance(recorded, dict):
+        return [f"{identifier}.ciVerified=true names no ciVerifiedAttestation record"]
+    findings: list[str] = []
+    for field, expected in (
+        ("runId", receipt.get("runId")),
+        ("headSha", receipt.get("headSha")),
+        ("headRef", receipt.get("headRef")),
+        ("receipt", receipt_relative),
+        ("bundle", bundle_relative),
+    ):
+        if recorded.get(field) != expected:
+            findings.append(
+                f"{identifier}.ciVerifiedAttestation.{field} is {recorded.get(field)!r}, "
+                f"expected {expected!r}"
+            )
+    evidence = receipt.get("evidenceArtifact") or {}
+    expires = evidence.get("expiresAt")
+    if not _is_utc_timestamp(expires):
+        findings.append(
+            f"{identifier}: the attested evidenceArtifact.expiresAt is {expires!r}"
+        )
+    else:
+        expiry = dt.datetime.fromisoformat(str(expires).replace("Z", "+00:00"))
+        if expiry <= current.astimezone(dt.timezone.utc):
+            findings.append(
+                f"{identifier}: the attested evidence artifact expired at {expires}, "
+                "so ciVerified is no longer re-checkable"
+            )
+    recorded_artifact = recorded.get("evidenceArtifact")
+    if not isinstance(recorded_artifact, dict):
+        findings.append(f"{identifier}.ciVerifiedAttestation names no evidenceArtifact")
+    else:
+        for field in ("id", "digest", "expiresAt"):
+            if recorded_artifact.get(field) != evidence.get(field):
+                findings.append(
+                    f"{identifier}.ciVerifiedAttestation.evidenceArtifact.{field} differs "
+                    "from the attested receipt"
+                )
+    return findings
 
 
 def run_check(check: dict, root: Path) -> str | None:
@@ -229,6 +773,8 @@ def run_check(check: dict, root: Path) -> str | None:
     target = root / relative
     if kind == "path-exists":
         return None if target.is_file() else f"{relative} is not in the tree"
+    if kind == "path-absent":
+        return None if not target.exists() else f"{relative} is already in the tree"
     if not target.is_file():
         return f"{relative} is not in the tree"
     text = check.get("text")
@@ -280,6 +826,45 @@ def audit(registry: dict, root: Path, manifest_path: Path = DEFAULT_MANIFEST) ->
             # A claim about a tree this branch does not contain is a claim about
             # something else. The numbers may be right; they are not about here.
             findings.append(f"verifiedAgainst.tree {tree} is not an ancestor of HEAD")
+
+    # Rule 8: a candidate tree does not inherit its verification.
+    if isinstance(verified, dict) and verified.get("candidate") is not None:
+        if verified.get("candidate") is not True:
+            findings.append(
+                f"verifiedAgainst.candidate is {verified.get('candidate')!r}, which is not "
+                f"true or absent"
+            )
+        else:
+            reverify = str(verified.get("reverifyAt") or "")
+            tree = str(verified.get("tree") or "")
+            if not reverify:
+                findings.append(
+                    "verifiedAgainst is a pre-landing candidate and does not say "
+                    "reverifyAt"
+                )
+            elif truncated:
+                pass                                    # already reported, same reason
+            else:
+                tip = remote_tip(reverify, root)
+                if tip is None:
+                    findings.append(
+                        f"verifiedAgainst.candidate cannot be judged: this clone does not "
+                        f"know origin/{reverify}"
+                    )
+                else:
+                    landed = ancestry(tree, tip, root)
+                    if landed is None:
+                        findings.append(
+                            f"verifiedAgainst.candidate cannot be judged: the tree or "
+                            f"origin/{reverify} is missing from this clone"
+                        )
+                    elif landed:
+                        findings.append(
+                            f"verifiedAgainst.tree {tree} has reached origin/{reverify}, so "
+                            f"it is no longer a candidate: re-verify at the landed SHA and "
+                            f"re-record (an ancestry relation does not carry the "
+                            f"verification forward)"
+                        )
 
     for field in COUNT_FIELDS:
         value = registry.get(field)
@@ -339,6 +924,40 @@ def audit(registry: dict, root: Path, manifest_path: Path = DEFAULT_MANIFEST) ->
                 f"{identifier}: the tree shows implemented={implied!r} but the registry "
                 f"says {implemented!r}"
             )
+
+        # Rule 7: the same comparison for the field that says whether CI re-derives this
+        # card. Separate checks, because the files that show a thing is implemented are not
+        # the files that show CI runs it.
+        ci_implied = entry["impliesCiVerified"]
+        ci_broken = [problem for problem in
+                     (run_check(check, root) for check in entry.get("ciVerifiedChecks") or [])
+                     if problem]
+        if ci_broken:
+            findings.append(
+                f"{identifier}: the manifest's ciVerified assertion no longer holds in the "
+                f"tree: " + "; ".join(ci_broken)
+            )
+        elif ci_implied is not None and card.get("ciVerified") is not ci_implied:
+            findings.append(
+                f"{identifier}: the tree shows ciVerified={ci_implied!r} but the registry "
+                f"says {card.get('ciVerified')!r}"
+            )
+        if (entry.get("ciVerifiedReceipt") or {}).get("path"):
+            findings.extend(ci_run_findings(
+                identifier,
+                card.get("ciVerifiedRun"),
+                entry.get("ciVerifiedReceipt") or {},
+                str((registry.get("verifiedAgainst") or {}).get("tree") or ""),
+                root,
+                dt.datetime.now(dt.timezone.utc),
+            ))
+        if ci_implied is True:
+            findings.extend(ci_attestation_findings(
+                identifier,
+                card.get("ciVerifiedAttestation"),
+                entry["ciVerifiedAttestation"],
+                root,
+            ))
 
         # Rule 5: acceptance is the claim nobody downstream re-checks.
         if card.get("operationallyAccepted") is True:
@@ -474,7 +1093,7 @@ def parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = parser().parse_args(argv)
     try:
-        registry = json.loads(args.registry.read_text(encoding="utf-8"))
+        registry = load_json_strictly(args.registry, "the registry")
         findings = audit(registry, args.root, args.manifest)
     except RegistryUnusable as error:
         print(f"unusable: {error}", file=sys.stderr)
@@ -494,7 +1113,7 @@ def main(argv: list[str] | None = None) -> int:
                 "manifest": args.manifest.name,
                 "verifiedAgainst": registry.get("verifiedAgainst", {}).get("tree"),
                 "acceptedCards": registry.get("acceptedCards"),
-                "status": "every implementation claim re-derived from the tree",
+                "status": "every implementation and ciVerified claim re-derived from the tree",
             },
             ensure_ascii=False,
         )
