@@ -166,9 +166,9 @@ MUTANTS = [
     },
     {
         "id": "Z22",
-        "desc": "error banner: offline color collapsed to status-online",
-        "target": "border: '1px solid var(--color-status-offline)',\n            color: 'var(--color-status-offline)',\n            marginBottom: '20px',",
-        "replacement": "border: '1px solid var(--color-status-online)',\n            color: 'var(--color-status-online)',\n            marginBottom: '20px',",
+        "desc": "preview error banner: offline color collapsed to status-online",
+        "target": "padding: '12px',\n                backgroundColor: 'var(--color-bg-subtle)',\n                border: '1px solid var(--color-status-offline)',\n                borderRadius: '6px',\n                color: 'var(--color-status-offline)',",
+        "replacement": "padding: '12px',\n                backgroundColor: 'var(--color-bg-subtle)',\n                border: '1px solid var(--color-status-online)',\n                borderRadius: '6px',\n                color: 'var(--color-status-online)',",
     },
     {
         "id": "Z23",
@@ -252,9 +252,9 @@ MUTANTS = [
     },
     {
         "id": "Z35",
-        "desc": "contract bypass: state !== 'admitted' guard bypass",
-        "target": "return DISCOVERY_CANDIDATE_STATE_CONFIG[state as DiscoveryCandidateStateKey];",
-        "replacement": "return state === 'admitted' ? DISCOVERY_CANDIDATE_STATE_CONFIG.candidate : DISCOVERY_CANDIDATE_STATE_CONFIG[state as DiscoveryCandidateStateKey];",
+        "desc": "contract bypass: state !== 'candidate' bypass dropping candidate to unknown",
+        "target": "if (state && Object.hasOwn(DISCOVERY_CANDIDATE_STATE_CONFIG, state)) {",
+        "replacement": "if (state && state !== 'candidate' && Object.hasOwn(DISCOVERY_CANDIDATE_STATE_CONFIG, state)) {",
     },
 
     # 11. named color injections (Z36-Z37)
@@ -411,10 +411,9 @@ def run_batch(start_idx, end_idx):
                     status = "TIMEOUT"
                     detail = "Execution timed out (> 120s)"
                 elif v_rc != 0:
-                    # Find failed assertion line
-                    fail_line = ""
-                    for line in v_out.splitlines():
-                        if "AssertionError:" in line or "FAIL " in line or "violations:" in line:
+                    fail_line = "Assertion failure / AST guard violation"
+                    for line in (v_out + "\n" + v_err).splitlines():
+                        if any(k in line for k in ["AssertionError:", "violations:", "FAIL ", "Error:"]):
                             fail_line = line.strip()
                             break
                     print(f"  [KILLED] {mid} compiled cleanly (rc=0) and was KILLED by tests (rc={v_rc}): {fail_line}")

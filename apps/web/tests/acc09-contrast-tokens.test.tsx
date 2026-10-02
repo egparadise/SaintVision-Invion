@@ -6130,6 +6130,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(prevRetryBtn.style.backgroundColor).toBe('var(--color-bg-subtle)');
       expect(prevRetryBtn.style.color).toBe('var(--color-text-primary)');
       expect(prevRetryBtn.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(prevRetryBtn.textContent).toContain('재시도 (Retry)');
 
       // Focus ring preservation on retry button
       const computedRetry = window.getComputedStyle(prevRetryBtn);
@@ -6144,6 +6145,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(candAlphaBadge.style.color).toBe('var(--color-status-degraded)');
       expect(candAlphaBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
       expect(candAlphaBadge.style.borderColor).toBe('var(--color-status-degraded)');
+      expect(candAlphaBadge.style.opacity || '1', 'Candidate badge must not have degraded opacity').toBe('1');
 
       const candBetaBadge = container.querySelector('[data-testid="candidate-status-ann_02"]') as HTMLElement;
       expect(candBetaBadge, 'Out-of-contract candidate beta badge must render with UNKNOWN (admitted)').not.toBeNull();
