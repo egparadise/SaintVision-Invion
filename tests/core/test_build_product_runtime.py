@@ -428,6 +428,13 @@ def test_trusted_entry_is_composed_in_process_without_a_public_route():
     assert [(route.path, tuple(getattr(route, "methods", ()) or ())) for route in api.routes] == [
         (route.path, tuple(getattr(route, "methods", ()) or ())) for route in baseline.routes
     ]
+    public_build_admission_paths = [
+        route.path
+        for route in api.routes
+        if "build" in route.path.lower()
+        and ("admit" in route.path.lower() or "admission" in route.path.lower())
+    ]
+    assert public_build_admission_paths == []
     source = (ROOT / "services/control-plane/src/inv/app.py").read_text(encoding="utf-8")
     assert "build_admission_entry=TrustedBuildAdmissionEntry(database)" in source
     approvals = (ROOT / "services/control-plane/src/inv/approvals.py").read_text(encoding="utf-8")

@@ -15,6 +15,7 @@ from inv.build_execution import BuildExecutionResult, PRODUCT_ENABLE_SETTING
 from inv.build_execution_worker import BuildExecutionIntentQueue, BuildExecutionWorker
 from inv.build_governance import canonical_build_action
 from inv.build_product_runtime import (
+    ADMITTED_EVENT,
     BuildExecutionAdmissionStore,
     BuildProductRuntime,
     TrustedBuildAdmissionEntry,
@@ -349,6 +350,52 @@ def test_committed_admission_promotes_atomically_and_is_tenant_isolated(env):
     assert intent == ("pending", admission.request, admission.plan, admission.decision)
     assert len(audits) == 1
     assert set(audits[0][0]) == {"projectId", "runId", "decisionId", "evidenceId"}
+
+
+def test_committed_admission_rejects_forged_approved_by_without_changing_receipt(env):
+    principal, approver, run, request, plan, decision, row, evidence_id = _approved_build(env)
+    ApprovalStore(env.db).dispatch(
+        principal,
+        env.project,
+        row["approvalId"],
+        request,
+        key="build-dispatch:" + run["runId"],
+        build_plan=plan,
+        build_evidence_id=evidence_id,
+    )
+    actual_approvers = [approver.subject_id]
+    forged_variants = [
+        [principal.subject_id],
+        ["oidc:ghost-approver"],
+        [],
+        sorted([approver.subject_id, "oidc:ghost-approver"]),
+    ]
+    entry = TrustedBuildAdmissionEntry(env.db)
+    for forged in forged_variants:
+        with pytest.raises(DomainError) as caught:
+            entry.record_committed(
+                principal,
+                request,
+                plan,
+                {**decision, "approvedBy": forged},
+                policy_version="s08-build-v1",
+                run_id=run["runId"],
+                evidence_id=evidence_id,
+            )
+        assert caught.value.code == "AUTH-0032"
+
+    with psycopg.connect(env.owner) as conn:
+        stored = conn.execute(
+            "SELECT decision FROM inv.build_execution_admissions WHERE run_id=%s",
+            (run["runId"],),
+        ).fetchall()
+        admitted_events = conn.execute(
+            "SELECT count(*) FROM inv.outbox WHERE run_id=%s AND event_type=%s",
+            (run["runId"], ADMITTED_EVENT),
+        ).fetchone()[0]
+    assert len(stored) == 1
+    assert stored[0][0]["approvedBy"] == actual_approvers
+    assert admitted_events == 1
 
 
 def test_missing_project_permission_records_no_admission(env):
