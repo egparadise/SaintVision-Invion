@@ -1,4 +1,4 @@
-# 2026-10-02 10:15:00 KST — Card 215: 실행 목록 화면 (RunList) 색상 리터럴 전수 토큰화(34종/46 occurrences→0), 수명주기 상태 색 정합성 및 접근성 승격 [r2]
+# 2026-10-02 10:15:00 KST — Card 215: 실행 목록 화면 (RunList) 색상 리터럴 전수 토큰화(35종/46 occurrences→0), 수명주기 상태 색 정합성 및 접근성 승격 [r2]
 
 - **문서 ID**: HIST-GEMINI-CARD215-RUNLIST-CONTRAST
 - **작업 branch**: agent/gemini/c215-runlist-contrast
@@ -15,12 +15,12 @@
 ACC-09(접근성 명도 대비 적합화) 트랙의 후속 영역으로, 실행 작업 목록 화면인 `apps/web/src/features/runs/RunList.tsx`의 하드코딩 색상 리터럴을 전수 감사하고 플랫폼 정본 디자인 토큰으로 전면 승격하였습니다. 선행 Card 213(`RunDetail.tsx`, `SealRecordPanel.tsx`)에서 확립된 상태 색상 규격과 정합성을 달성하고, 텍스트 >= 4.5:1 및 비텍스트/테두리 >= 3.0:1 대비 기준을 100% 충족하도록 개선하였습니다.
 
 - **대상 파일**:
-  - `apps/web/src/features/runs/RunList.tsx` (기존 baseline 리터럴: **34종(46 occurrences)** -> **0건**)
+  - `apps/web/src/features/runs/RunList.tsx` (기존 baseline 리터럴: **35종(46 occurrences)** -> **0건**)
   - `apps/web/tests/acc09-contrast-tokens.test.tsx` (Test 9i, Test 9i-2, Probes 66~70 추가, Fail-Closed 래칫 고정, AST config inspection, 16종 결함 사살)
   - `tools/reproduce_c215_contrast.py` (21종 Before/After 명도 대비 동적 재현 스크립트)
   - `tools/test_c215_mutations.py` (재현 가능한 16종 뮤테이션 M1~M16 전수 시험 러너)
 - **감사 및 조치 결과**:
-  - `RunList.tsx`: 34종(46 occurrences) -> **0건** (리터럴 잔여 0건 multiset `{}` 달성).
+  - `RunList.tsx`: 35종(46 occurrences) -> **0건** (리터럴 잔여 0건 multiset `{}` 달성).
   - `COLOR_LITERAL_MULTISET_BASELINE`에서 `features/runs/RunList.tsx`의 허용 multiset을 `{}` (0건)으로 래칫 고정.
   - 전역 `var(--color-border-subtle)` 사용 횟수: **388건**, 사용 파일 수: **26개** (정확 일치 래칫 통과).
   - 레거시 하드코딩 리터럴 잔여 상한 래칫 전면 강화:
@@ -83,26 +83,26 @@ ACC-09(접근성 명도 대비 적합화) 트랙의 후속 영역으로, 실행 
 
 | 대상 UI 요소 / 배경 | Before 색상 조합 (Light 실제 / Dark 실제) | Before 대비 (Light 실제 / Dark 실제) | 판정 (WCAG AA) | After 디자인 토큰 조합 | After 대비 (Light) | After 대비 (Dark) | 최종 판정 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **배지: awaiting_approval / subtle** | `#f59e0b` on `#fef3c7` (L 실제 합성)<br>`#f59e0b` on `#332c23` (D 실제 합성) | 1.91:1 / 6.41:1 | **FAIL** (Light < 4.5:1) | `var(--color-status-degraded)` on<br>`var(--color-bg-subtle)` | **4.58:1** | **6.83:1** | **PASS** (>= 4.5:1) |
-| **배지: cancelled / subtle** | `#6b7280` on `#f3f4f6` (L 실제 합성)<br>`#6b7280` on `#1e2634` (D 실제 합성) | 4.02:1 / 3.14:1 | **FAIL** (Light < 4.5:1, Dark < 4.5:1) | `var(--color-status-neutral)` on<br>`var(--color-bg-subtle)` | **5.25:1** | **5.78:1** | **PASS** (>= 4.5:1) |
-| **배지: draft / subtle** | `#64748b` on `#f1f5f9` (L 실제 합성)<br>`#64748b` on `#1d2636` (D 실제 합성) | 3.95:1 / 3.19:1 | **FAIL** (Light < 4.5:1, Dark < 4.5:1) | `var(--color-text-secondary)` on<br>`var(--color-bg-subtle)` | **6.92:1** | **11.86:1** | **PASS** (>= 4.5:1) |
-| **배지: failed / subtle** | `#ef4444` on `#fee2e2` (L 실제 합성)<br>`#ef4444` on `#321f2b` (D 실제 합성) | 3.10:1 / 4.08:1 | **FAIL** (Light < 4.5:1, Dark < 4.5:1) | `var(--color-status-offline)` on<br>`var(--color-bg-subtle)` | **5.91:1** | **5.31:1** | **PASS** (>= 4.5:1) |
-| **배지: planned / subtle** | `#0284c7` on `#e0f2fe` (L 실제 합성)<br>`#0284c7` on `#0f283f` (D 실제 합성) | 3.39:1 / 3.67:1 | **FAIL** (Light < 4.5:1, Dark < 4.5:1) | `var(--color-text-secondary)` on<br>`var(--color-bg-subtle)` | **6.92:1** | **11.86:1** | **PASS** (>= 4.5:1) |
-| **배지: recovering / subtle** | `#f97316` on `#ffedd5` (L 실제 합성)<br>`#f97316` on `#342624` (D 실제 합성) | 2.40:1 / 5.17:1 | **FAIL** (Light < 4.5:1) | `var(--color-status-active)` on<br>`var(--color-bg-subtle)` | **5.42:1** | **6.85:1** | **PASS** (>= 4.5:1) |
-| **배지: running / subtle** | `#3b82f6` on `#dbeafe` (L 실제 합성)<br>`#3b82f6` on `#192d50` (D 실제 합성) | 2.92:1 / 3.73:1 | **FAIL** (Light < 4.5:1, Dark < 4.5:1) | `var(--color-brand-hover)` on<br>`var(--color-bg-subtle)` | **6.12:1** | **8.14:1** | **PASS** (>= 4.5:1) |
-| **배지: scheduled / subtle** | `#8b5cf6` on `#ede9fe` (L 실제 합성)<br>`#8b5cf6` on `#232246` (D 실제 합성) | 3.53:1 / 3.57:1 | **FAIL** (Light < 4.5:1, Dark < 4.5:1) | `var(--color-text-secondary)` on<br>`var(--color-bg-subtle)` | **6.92:1** | **11.86:1** | **PASS** (>= 4.5:1) |
-| **배지: succeeded / subtle** | `#10b981` on `#d1fae5` (L 실제 합성)<br>`#10b981` on `#113034` (D 실제 합성) | 2.19:1 / 5.53:1 | **FAIL** (Light < 4.5:1) | `var(--color-status-online)` on<br>`var(--color-bg-subtle)` | **4.58:1** | **6.44:1** | **PASS** (>= 4.5:1) |
-| **배지: validated / subtle** | `#3b82f6` on `#eff6ff` (L 실제 합성)<br>`#3b82f6` on `#172846` (D 실제 합성) | 3.09:1 / 4.00:1 | **FAIL** (Light < 4.5:1, Dark < 4.5:1) | `var(--color-text-secondary)` on<br>`var(--color-bg-subtle)` | **6.92:1** | **11.86:1** | **PASS** (>= 4.5:1) |
-| **배지: verifying / subtle** | `#06b6d4` on `#cffafe` (L 실제 합성)<br>`#06b6d4` on `#0f3041` (D 실제 합성) | 2.11:1 / 5.69:1 | **FAIL** (Light < 4.5:1) | `var(--color-text-secondary)` on<br>`var(--color-bg-subtle)` | **6.92:1** | **11.86:1** | **PASS** (>= 4.5:1) |
+| **배지: awaiting_approval / subtle** | `#f59e0b` on `#fef0da` (L 실제 합성)<br>`#f59e0b` on `#332c23` (D 실제 합성) | 1.91:1 / 6.41:1 | **FAIL** (Light < 4.5:1) | `var(--color-status-degraded)` on<br>`var(--color-bg-subtle)` | **4.58:1** | **6.83:1** | **PASS** (>= 4.5:1) |
+| **배지: cancelled / subtle** | `#6b7280` on `#e9eaec` (L 실제 합성)<br>`#6b7280` on `#1e2634` (D 실제 합성) | 4.02:1 / 3.14:1 | **FAIL** (Light < 4.5:1, Dark < 4.5:1) | `var(--color-status-neutral)` on<br>`var(--color-bg-subtle)` | **5.25:1** | **5.78:1** | **PASS** (>= 4.5:1) |
+| **배지: draft / subtle** | `#64748b` on `#e8eaee` (L 실제 합성)<br>`#64748b` on `#1d2636` (D 실제 합성) | 3.95:1 / 3.19:1 | **FAIL** (Light < 4.5:1, Dark < 4.5:1) | `var(--color-text-secondary)` on<br>`var(--color-bg-subtle)` | **6.92:1** | **11.86:1** | **PASS** (>= 4.5:1) |
+| **배지: failed / subtle** | `#ef4444` on `#fde3e3` (L 실제 합성)<br>`#ef4444` on `#321f2b` (D 실제 합성) | 3.10:1 / 4.08:1 | **FAIL** (Light < 4.5:1, Dark < 4.5:1) | `var(--color-status-offline)` on<br>`var(--color-bg-subtle)` | **5.91:1** | **5.31:1** | **PASS** (>= 4.5:1) |
+| **배지: planned / subtle** | `#0284c7` on `#d9edf7` (L 실제 합성)<br>`#0284c7` on `#0f283f` (D 실제 합성) | 3.39:1 / 3.67:1 | **FAIL** (Light < 4.5:1, Dark < 4.5:1) | `var(--color-text-secondary)` on<br>`var(--color-bg-subtle)` | **6.92:1** | **11.86:1** | **PASS** (>= 4.5:1) |
+| **배지: recovering / subtle** | `#f97316` on `#feeadc` (L 실제 합성)<br>`#f97316` on `#342624` (D 실제 합성) | 2.40:1 / 5.17:1 | **FAIL** (Light < 4.5:1) | `var(--color-status-active)` on<br>`var(--color-bg-subtle)` | **5.42:1** | **6.85:1** | **PASS** (>= 4.5:1) |
+| **배지: running / subtle** | `#3b82f6` on `#d8e6fd` (L 실제 합성)<br>`#3b82f6` on `#192d50` (D 실제 합성) | 2.92:1 / 3.73:1 | **FAIL** (Light < 4.5:1, Dark < 4.5:1) | `var(--color-brand-hover)` on<br>`var(--color-bg-subtle)` | **6.12:1** | **8.14:1** | **PASS** (>= 4.5:1) |
+| **배지: scheduled / subtle** | `#8b5cf6` on `#eee7fe` (L 실제 합성)<br>`#8b5cf6` on `#232246` (D 실제 합성) | 3.53:1 / 3.57:1 | **FAIL** (Light < 4.5:1, Dark < 4.5:1) | `var(--color-text-secondary)` on<br>`var(--color-bg-subtle)` | **6.92:1** | **11.86:1** | **PASS** (>= 4.5:1) |
+| **배지: succeeded / subtle** | `#10b981` on `#dbf4ec` (L 실제 합성)<br>`#10b981` on `#113034` (D 실제 합성) | 2.19:1 / 5.53:1 | **FAIL** (Light < 4.5:1) | `var(--color-status-online)` on<br>`var(--color-bg-subtle)` | **4.58:1** | **6.44:1** | **PASS** (>= 4.5:1) |
+| **배지: validated / subtle** | `#3b82f6` on `#e2ecfe` (L 실제 합성)<br>`#3b82f6` on `#172846` (D 실제 합성) | 3.09:1 / 4.00:1 | **FAIL** (Light < 4.5:1, Dark < 4.5:1) | `var(--color-text-secondary)` on<br>`var(--color-bg-subtle)` | **6.92:1** | **11.86:1** | **PASS** (>= 4.5:1) |
+| **배지: verifying / subtle** | `#06b6d4` on `#daf4f9` (L 실제 합성)<br>`#06b6d4` on `#0f3041` (D 실제 합성) | 2.11:1 / 5.69:1 | **FAIL** (Light < 4.5:1) | `var(--color-text-secondary)` on<br>`var(--color-bg-subtle)` | **6.92:1** | **11.86:1** | **PASS** (>= 4.5:1) |
 | **완료 시각 (실패) / surface** | `#f85149` on `#ffffff` (L 실제)<br>`#f85149` on `#111827` (D 실제) | 3.35:1 / 5.29:1 | **FAIL** (Light < 4.5:1) | `var(--color-status-offline)` on<br>`var(--color-bg-surface)` | **6.47:1** | **6.41:1** | **PASS** (>= 4.5:1) |
 | **완료 시각 (성공) / surface** | `#10b981` on `#ffffff` (L 실제)<br>`#10b981` on `#111827` (D 실제) | 2.54:1 / 6.99:1 | **FAIL** (Light < 4.5:1) | `var(--color-status-online)` on<br>`var(--color-bg-surface)` | **5.02:1** | **7.79:1** | **PASS** (>= 4.5:1) |
-| **에러 상태 제목 / subtle** | `#f87171` on `#231c29` (L 실제 합성)<br>`#f87171` on `#231c29` (D 실제 합성) | 1.71:1 / 8.72:1 | **FAIL** (Light < 4.5:1) | `var(--color-status-offline)` on<br>`var(--color-bg-subtle)` | **5.91:1** | **5.31:1** | **PASS** (>= 4.5:1) |
+| **에러 상태 제목 / subtle** | `#fca5a5` on `#fef0f0` (L 실제 합성)<br>`#fca5a5` on `#231c29` (D 실제 합성) | 1.71:1 / 8.72:1 | **FAIL** (Light < 4.5:1) | `var(--color-status-offline)` on<br>`var(--color-bg-subtle)` | **5.91:1** | **5.31:1** | **PASS** (>= 4.5:1) |
 | **에러 재시도 버튼 / offline-bg** | `#ffffff` on `#ef4444` (L 실제)<br>`#ffffff` on `#ef4444` (D 실제) | 3.76:1 / 3.76:1 | **FAIL** (Both < 4.5:1) | `var(--color-brand-primary-fg)` on<br>`var(--color-status-offline-bg)` | **4.83:1** | **4.83:1** | **PASS** (>= 4.5:1) |
-| **자원 반환 대기 배지 / subtle** | `#d97706` on `#fbf5e7` (L 실제 합성)<br>`#d97706` on `#2f2622` (D 실제 합성) | 2.72:1 / 4.64:1 | **FAIL** (Light < 4.5:1) | `var(--color-status-degraded)` on<br>`var(--color-bg-subtle)` | **4.58:1** | **6.83:1** | **PASS** (>= 4.5:1) |
+| **자원 반환 대기 배지 / subtle** | `#d97706` on `#f9ebda` (L 실제 합성)<br>`#d97706` on `#2f2622` (D 실제 합성) | 2.72:1 / 4.64:1 | **FAIL** (Light < 4.5:1) | `var(--color-status-degraded)` on<br>`var(--color-bg-subtle)` | **4.58:1** | **6.83:1** | **PASS** (>= 4.5:1) |
 | **실행 작업 링크 / surface** | `#58a6ff` on `#ffffff` (L 실제)<br>`#58a6ff` on `#111827` (D 실제) | 2.53:1 / 7.02:1 | **FAIL** (Light < 4.5:1) | `var(--color-brand-hover)` on<br>`var(--color-bg-surface)` | **6.70:1** | **9.84:1** | **PASS** (>= 4.5:1) |
-| **자식 샤드 배지 / subtle** | `#3b82f6` on `#f2f5fb` (L 실제 합성)<br>`#3b82f6` on `#15233c` (D 실제 합성) | 3.27:1 / 4.27:1 | **FAIL** (Light < 4.5:1, Dark < 4.5:1) | `var(--color-brand-hover)` on<br>`var(--color-bg-subtle)` | **6.12:1** | **8.14:1** | **PASS** (>= 4.5:1) |
-| **분산 부모 샤드 배지 / subtle** | `#8b5cf6` on `#f7f4fc` (L 실제 합성)<br>`#8b5cf6` on `#1d1f3c` (D 실제 합성) | 3.75:1 / 3.78:1 | **FAIL** (Light < 4.5:1, Dark < 4.5:1) | `var(--color-status-active)` on<br>`var(--color-bg-subtle)` | **5.42:1** | **6.85:1** | **PASS** (>= 4.5:1) |
-| **동기화 경고 문구 / subtle** | `#fca5a5` on `#fdeded` (L 실제 합성)<br>`#fca5a5` on `#271c2a` (D 실제 합성) | 1.66:1 / 8.61:1 | **FAIL** (Light < 4.5:1) | `var(--color-status-offline)` on<br>`var(--color-bg-subtle)` | **5.91:1** | **5.31:1** | **PASS** (>= 4.5:1) |
+| **자식 샤드 배지 / subtle** | `#3b82f6` on `#ebf2fe` (L 실제 합성)<br>`#3b82f6` on `#15233c` (D 실제 합성) | 3.27:1 / 4.27:1 | **FAIL** (Light < 4.5:1, Dark < 4.5:1) | `var(--color-brand-hover)` on<br>`var(--color-bg-subtle)` | **6.12:1** | **8.14:1** | **PASS** (>= 4.5:1) |
+| **분산 부모 샤드 배지 / subtle** | `#8b5cf6` on `#f3effe` (L 실제 합성)<br>`#8b5cf6` on `#1d1f3c` (D 실제 합성) | 3.75:1 / 3.78:1 | **FAIL** (Light < 4.5:1, Dark < 4.5:1) | `var(--color-status-active)` on<br>`var(--color-bg-subtle)` | **5.42:1** | **6.85:1** | **PASS** (>= 4.5:1) |
+| **동기화 경고 문구 / subtle** | `#fca5a5` on `#f7e8ea` (L 실제 합성)<br>`#fca5a5` on `#20121b` (D 실제 합성) | 1.60:1 / 9.51:1 | **FAIL** (Light < 4.5:1) | `var(--color-status-offline)` on<br>`var(--color-bg-subtle)` | **5.91:1** | **5.31:1** | **PASS** (>= 4.5:1) |
 | **상태 갱신 시각 / surface** | `#60a5fa` on `#ffffff` (L 실제)<br>`#60a5fa` on `#111827` (D 실제) | 2.54:1 / 6.98:1 | **FAIL** (Light < 4.5:1) | `var(--color-brand-hover)` on<br>`var(--color-bg-surface)` | **6.70:1** | **9.84:1** | **PASS** (>= 4.5:1) |
 
 ---
@@ -118,27 +118,27 @@ python tools/reproduce_c215_contrast.py
 
 실행 출력 (재현 실측치, Exit Code: 0):
 ```text
-badge: awaiting_approval / subtle      | Before:  1.91:1 (L actual) /  6.41:1 (D actual on #332c23) | After:  4.58:1 (Light) /  6.83:1 (Dark)
-badge: cancelled / subtle              | Before:  4.02:1 (L actual) /  3.14:1 (D actual on #1e2634) | After:  5.25:1 (Light) /  5.78:1 (Dark)
-badge: draft / subtle                  | Before:  3.95:1 (L actual) /  3.19:1 (D actual on #1d2636) | After:  6.92:1 (Light) / 11.86:1 (Dark)
-badge: failed / subtle                 | Before:  3.10:1 (L actual) /  4.08:1 (D actual on #321f2b) | After:  5.91:1 (Light) /  5.31:1 (Dark)
-badge: planned / subtle                | Before:  3.39:1 (L actual) /  3.67:1 (D actual on #0f283f) | After:  6.92:1 (Light) / 11.86:1 (Dark)
-badge: recovering / subtle             | Before:  2.40:1 (L actual) /  5.17:1 (D actual on #342624) | After:  5.42:1 (Light) /  6.85:1 (Dark)
-badge: running / subtle                | Before:  2.92:1 (L actual) /  3.73:1 (D actual on #192d50) | After:  6.12:1 (Light) /  8.14:1 (Dark)
-badge: scheduled / subtle              | Before:  3.53:1 (L actual) /  3.57:1 (D actual on #232246) | After:  6.92:1 (Light) / 11.86:1 (Dark)
-badge: succeeded / subtle              | Before:  2.19:1 (L actual) /  5.53:1 (D actual on #113034) | After:  4.58:1 (Light) /  6.44:1 (Dark)
-badge: validated / subtle              | Before:  3.09:1 (L actual) /  4.00:1 (D actual on #172846) | After:  6.92:1 (Light) / 11.86:1 (Dark)
-badge: verifying / subtle              | Before:  2.11:1 (L actual) /  5.69:1 (D actual on #0f3041) | After:  6.92:1 (Light) / 11.86:1 (Dark)
-completed at (failed) / surface        | Before:  3.35:1 (L actual) /  5.29:1 (D actual on #111827) | After:  6.47:1 (Light) /  6.41:1 (Dark)
-completed at (succeeded) / surface     | Before:  2.54:1 (L actual) /  6.99:1 (D actual on #111827) | After:  5.02:1 (Light) /  7.79:1 (Dark)
-fetch error banner title / subtle      | Before:  1.71:1 (L actual) /  8.72:1 (D actual on #231c29) | After:  5.91:1 (Light) /  5.31:1 (Dark)
-fetch error retry button / offline-bg  | Before:  3.76:1 (L actual) /  3.76:1 (D actual on #ef4444) | After:  4.83:1 (Light) /  4.83:1 (Dark)
-release pending badge / subtle         | Before:  2.72:1 (L actual) /  4.64:1 (D actual on #2f2622) | After:  4.58:1 (Light) /  6.83:1 (Dark)
-run select id link / surface           | Before:  2.53:1 (L actual) /  7.02:1 (D actual on #111827) | After:  6.70:1 (Light) /  9.84:1 (Dark)
-shard child badge / subtle             | Before:  3.27:1 (L actual) /  4.27:1 (D actual on #15233c) | After:  6.12:1 (Light) /  8.14:1 (Dark)
-shard parent badge / subtle            | Before:  3.75:1 (L actual) /  3.78:1 (D actual on #1d1f3c) | After:  5.42:1 (Light) /  6.85:1 (Dark)
-stale warning banner text / subtle     | Before:  1.66:1 (L actual) /  8.61:1 (D actual on #271c2a) | After:  5.91:1 (Light) /  5.31:1 (Dark)
-state updated at text / surface        | Before:  2.54:1 (L actual) /  6.98:1 (D actual on #111827) | After:  6.70:1 (Light) /  9.84:1 (Dark)
+badge: awaiting_approval / subtle      | Before:  1.91:1 (L actual on #fef0da) /  6.41:1 (D actual on #332c23) | After:  4.58:1 (Light) /  6.83:1 (Dark)
+badge: cancelled / subtle              | Before:  4.02:1 (L actual on #e9eaec) /  3.14:1 (D actual on #1e2634) | After:  5.25:1 (Light) /  5.78:1 (Dark)
+badge: draft / subtle                  | Before:  3.95:1 (L actual on #e8eaee) /  3.19:1 (D actual on #1d2636) | After:  6.92:1 (Light) / 11.86:1 (Dark)
+badge: failed / subtle                 | Before:  3.10:1 (L actual on #fde3e3) /  4.08:1 (D actual on #321f2b) | After:  5.91:1 (Light) /  5.31:1 (Dark)
+badge: planned / subtle                | Before:  3.39:1 (L actual on #d9edf7) /  3.67:1 (D actual on #0f283f) | After:  6.92:1 (Light) / 11.86:1 (Dark)
+badge: recovering / subtle             | Before:  2.40:1 (L actual on #feeadc) /  5.17:1 (D actual on #342624) | After:  5.42:1 (Light) /  6.85:1 (Dark)
+badge: running / subtle                | Before:  2.92:1 (L actual on #d8e6fd) /  3.73:1 (D actual on #192d50) | After:  6.12:1 (Light) /  8.14:1 (Dark)
+badge: scheduled / subtle              | Before:  3.53:1 (L actual on #eee7fe) /  3.57:1 (D actual on #232246) | After:  6.92:1 (Light) / 11.86:1 (Dark)
+badge: succeeded / subtle              | Before:  2.19:1 (L actual on #dbf4ec) /  5.53:1 (D actual on #113034) | After:  4.58:1 (Light) /  6.44:1 (Dark)
+badge: validated / subtle              | Before:  3.09:1 (L actual on #e2ecfe) /  4.00:1 (D actual on #172846) | After:  6.92:1 (Light) / 11.86:1 (Dark)
+badge: verifying / subtle              | Before:  2.11:1 (L actual on #daf4f9) /  5.69:1 (D actual on #0f3041) | After:  6.92:1 (Light) / 11.86:1 (Dark)
+completed at (failed) / surface        | Before:  3.35:1 (L actual on #ffffff) /  5.29:1 (D actual on #111827) | After:  6.47:1 (Light) /  6.41:1 (Dark)
+completed at (succeeded) / surface     | Before:  2.54:1 (L actual on #ffffff) /  6.99:1 (D actual on #111827) | After:  5.02:1 (Light) /  7.79:1 (Dark)
+fetch error banner title / subtle      | Before:  1.71:1 (L actual on #fef0f0) /  8.72:1 (D actual on #231c29) | After:  5.91:1 (Light) /  5.31:1 (Dark)
+fetch error retry button / offline-bg  | Before:  3.76:1 (L actual on #ef4444) /  3.76:1 (D actual on #ef4444) | After:  4.83:1 (Light) /  4.83:1 (Dark)
+release pending badge / subtle         | Before:  2.72:1 (L actual on #f9ebda) /  4.64:1 (D actual on #2f2622) | After:  4.58:1 (Light) /  6.83:1 (Dark)
+run select id link / surface           | Before:  2.53:1 (L actual on #ffffff) /  7.02:1 (D actual on #111827) | After:  6.70:1 (Light) /  9.84:1 (Dark)
+shard child badge / subtle             | Before:  3.27:1 (L actual on #ebf2fe) /  4.27:1 (D actual on #15233c) | After:  6.12:1 (Light) /  8.14:1 (Dark)
+shard parent badge / subtle            | Before:  3.75:1 (L actual on #f3effe) /  3.78:1 (D actual on #1d1f3c) | After:  5.42:1 (Light) /  6.85:1 (Dark)
+stale warning banner text / subtle     | Before:  1.60:1 (L actual on #f7e8ea) /  9.51:1 (D actual on #20121b) | After:  5.91:1 (Light) /  5.31:1 (Dark)
+state updated at text / surface        | Before:  2.54:1 (L actual on #ffffff) /  6.98:1 (D actual on #111827) | After:  6.70:1 (Light) /  9.84:1 (Dark)
 ```
 
 ---
@@ -149,9 +149,9 @@ state updated at text / surface        | Before:  2.54:1 (L actual) /  6.98:1 (D
 
 ```text
 ================================================================================
- Card 215 (ACC-09): Reproducible Mutant Test Suite (10 Mutants: M1-M10)
+ Card 215 (ACC-09): Reproducible Mutant Test Suite (16 Mutants: M1-M16)
  Target: RunList.tsx
-================================================================================\n
+================================================================================
 [Baseline Check] Testing unmutated code...
 [Baseline Check] Clean pass (exit code 0).
 
@@ -225,7 +225,7 @@ SUCCESS: 100% mutant kill rate achieved. All accessibility invariants strictly h
 2. **Vitest Unit & Contrast Suite (26 tests)**:
    ```powershell
    npx vitest run tests/acc09-contrast-tokens.test.tsx
-   # Tests: 2 passed, 24 skipped (26) | Exit Code: 0
+   # Tests: 26 passed (26) | Exit Code: 0
    ```
 3. **Sibling Run & Navigation Suites**:
    ```powershell

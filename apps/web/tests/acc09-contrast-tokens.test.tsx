@@ -4133,10 +4133,12 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       const faBg = helperExtractVar(filterAll.style.backgroundColor);
       expect(getContrast(lightTokens[faFg], lightTokens[faBg]), 'Filter ALL light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
       expect(getContrast(darkTokens[faFg], darkTokens[faBg]), 'Filter ALL dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(filterAll.textContent, 'Filter ALL textContent must contain 전체').toContain('전체');
 
       // 1-c. Filter pill unselected (e.g. running)
       const filterRunning = container.querySelector('[data-testid="run-filter-pill-running"]') as HTMLElement;
       expect(filterRunning, 'Running filter pill must render').not.toBeNull();
+      expect(filterRunning.textContent, 'Running filter pill must have non-color text label').toContain('실행 중');
       expect(filterRunning.style.color).toBe('var(--color-text-muted)');
       expect(filterRunning.style.backgroundColor).toBe('var(--color-bg-subtle)');
       expect(filterRunning.style.borderColor).toBe('var(--color-border-subtle)');

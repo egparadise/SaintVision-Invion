@@ -3,7 +3,7 @@
 tools/test_c215_mutations.py
 
 Card 215 (ACC-09) Runs execution list screen (RunList.tsx) Mutation Testing Suite.
-Verifies that 10 distinct regressions/mutations (M1-M10) across
+Verifies that 16 distinct regressions/mutations (M1-M16) across
 color contrast, border collisions, status semantics, testid binding,
 and fail-closed multiset inventory are strictly caught and killed by the test suite
 (ACC-09 Test 9i, Test 9i-2, and Test 10).
@@ -188,9 +188,9 @@ def extract_failure_reason(stdout, stderr):
 
 def main():
     print('================================================================================')
-    print(' Card 215 (ACC-09): Reproducible Mutant Test Suite (10 Mutants: M1-M10)')
+    print(' Card 215 (ACC-09): Reproducible Mutant Test Suite (16 Mutants: M1-M16)')
     print(' Target: RunList.tsx')
-    print('================================================================================\\n')
+    print('================================================================================\n')
 
     # Step 0: Verify clean baseline
     print('[Baseline Check] Testing unmutated code...')
