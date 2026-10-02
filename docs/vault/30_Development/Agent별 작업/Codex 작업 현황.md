@@ -7,7 +7,7 @@ author: "Codex"
 updated: "2026-10-02T14:16:24+09:00"
 source_of_truth: "Git"
 active_card: "CARD-223 S08-BE product caller"
-active_card_status: "PR #323 opened; first Backend run exposed AC-11 pin and replay-fixture defects, both corrected"
+active_card_status: "Base #318 approved at 2dd25ff7 with exact-head Core/Backend green; PR #323 first Backend run exposed AC-11 pin and replay-fixture defects, both corrected"
 active_card_next: "Push the corrective commit; require exact-head Backend/Core green, real-PG JUnit execution and Claude review"
 ---
 
