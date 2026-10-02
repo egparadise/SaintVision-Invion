@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.281"
+version: "1.0.282"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T18:20:09+09:00"
+updated: "2026-10-02T18:47:45+09:00"
 source_of_truth: "Git"
 active_card: "CARD-232 S08-BE product worker loop and trusted intent producer"
-active_card_status: "Implementation and PG-free focused verification in progress on c57697d2; migration 0060 is the single head, product flag remains off, and hosted real-PG evidence is pending"
-active_card_next: "Commit and push Card 232, open its PR, run hosted Backend/Core, and request Claude independent review"
+active_card_status: "PR #331 head 514a66a3 is in review; migration 0060 is the single head, product flag remains off, hosted real-PG is running, and #330 + 0060 requires a 157-table census repin"
+active_card_next: "Require exact-head Backend/Core and non-skipped real-PG evidence, close independent review findings, then hand the combined-tree census repin condition to the merge train"
 ---
 
 ## 2026-10-02 Card 232 — S08-BE product worker loop and trusted intent producer

@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD232-S08-BE-WORKER-PRODUCER-20261002"
 title: "Card 232 S08-BE product worker loop and trusted intent producer"
-version: "1.0.1"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T18:31:49+09:00"
+updated: "2026-10-02T18:47:45+09:00"
 source_of_truth: "Git"
 base_sha: "c57697d2ab80877f44e189c1efe172a6dd03a7e6"
 reviewer: "Claude"
@@ -49,6 +49,33 @@ dispatch. Thus this change proves a reachable product composition and durable pr
 not a physical builder success. The flag remains off; S08-BE completion and physical
 acceptance remain NOT_OBSERVED/BLOCKED_EXTERNAL. A successful LAN product build still
 requires the operational transport replacement and its Node receipts.
+
+# v1.12 75-point condition comparison
+
+The v1.12 rescore measured that the reviewed durable quarantine channel and the internal
+0059 worker seam already existed, but found two remaining 75-point implementation ends.
+This change compares itself to those exact conditions; it does not independently rescore
+the task.
+
+| v1.12 condition | Before | Card 232 result | Evidence boundary |
+|---|---|---|---|
+| A product process constructs and runs `BuildExecutionWorker` | zero product references outside its own module | `inv.worker` owns one bounded build loop behind the exact enable value | process-level flag-off/flag-on regressions; default off is preserved and was explicitly not a v1.12 blocker |
+| A trusted product producer supplies 0059 from committed authority | zero product enqueue path | 0060 admission rechecks the committed Run, current permission and policy, and the exact live lease before atomic 0059 promotion | FORCE-RLS/immutable migration, PG-free mutation guards, and hosted real-PG cases required before merge |
+
+Both code conditions that v1.12 named for a possible `S08-BE 50 -> 75` transition are now
+implemented. The scoring document remains the owner of the eventual score change after
+independent review and exact-head hosted evidence. This is not a 100-point or operational
+acceptance claim: the physical builder receipt path remains externally unmeasured and the
+reference transport still refuses product dispatch.
+
+# Cross-train RLS census condition
+
+Card 234 (`#330`) introduced the reviewed RLS-table census and correctly repinned it for
+0059 at 156 tables. Migration 0060 adds one more FORCE-RLS table, so a train that contains
+both changes must measure and repin the census to 157 before landing Card 232. This branch
+does not merge Card 234's wider train into the Card 229 stack; the merge-train owner must
+order Card 234 first and regenerate the census from the combined 0060 tree. A 156-table
+census beside 0060 is stale and must fail closed, never be accepted as this card's evidence.
 
 # Corrective finding
 
