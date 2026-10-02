@@ -833,6 +833,12 @@ class NodeAgentReceipts:
             )
         return daemon
 
+    #: Neither method below writes anything durable, so this collector declares the
+    #: capability absent and the product caller refuses a dispatch it could not reconcile
+    #: (#312 N2).  Whoever connects the write channel flips this and has to show a durable
+    #: quarantine receipt for it.
+    records_durable_quarantine = False
+
     def cancel_and_quarantine_session(self, build_session_id: str, reason_code: str) -> None:
         raise DomainError(
             "VERIFY-0022",

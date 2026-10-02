@@ -10,17 +10,23 @@ these tests assert the authority comparison -- node identity, epoch agreement, d
 identity, required cleanup observations -- and the atomicity of the commit.
 """
 
+import json
 from contextlib import contextmanager
 from copy import deepcopy
 from datetime import datetime, timezone
 
 import pytest
+from psycopg.types.json import Jsonb
 
 from inv.build_execution import (
     BuildExecutionResult,
     BuildExecutionService,
     PRODUCT_ENABLE_SETTING,
+    QUARANTINE_CAPABILITY,
+    canonical_digest,
 )
+from inv.buildkit_transport import NodeAgentReceipts
+from inv.contracts import validate_contract
 from inv.errors import DomainError
 
 TENANT = "123e4567-e89b-12d3-a456-426614174000"
@@ -85,6 +91,17 @@ def cleanup(**overrides):
     return document
 
 
+def _serialised(params):
+    """What the driver actually sends, with JSONB frozen at execute() time."""
+
+    if params is None:
+        return None
+    return tuple(
+        json.loads(json.dumps(item.obj)) if isinstance(item, Jsonb) else item
+        for item in params
+    )
+
+
 class _Connection:
     """Answers only the statements this service issues, and records the writes."""
 
@@ -94,6 +111,10 @@ class _Connection:
 
     def execute(self, sql, params=None):
         text = " ".join(sql.split())
+        # psycopg serialises a JSONB parameter when execute() is called.  Recording the live
+        # object instead let a later mutation of the same dict appear in the "persisted" row,
+        # which is how an envelope could gain a field after its digest was taken (#312 N1).
+        params = _serialised(params)
         if text == "SELECT clock_timestamp() AS now":   # exact: the release UPDATE also calls it
             self._result = {"now": self.db.now}
         elif "FROM inv.resources" in text:
@@ -184,6 +205,11 @@ class _Adapter:
 
 
 class _Boundary:
+    #: This fake records a quarantine durably enough for the orchestration under test: it
+    #: keeps the marker and the tests read it.  The production collector declares the
+    #: opposite, which is the whole of N2.
+    records_durable_quarantine = True
+
     def __init__(self, *, health_receipt=None, cleanup_receipt=None, daemon_after=None):
         self.health_receipt = health_receipt if health_receipt is not None else health()
         self.cleanup_receipt = cleanup_receipt if cleanup_receipt is not None else cleanup()
@@ -257,7 +283,7 @@ def test_an_agreeing_dispatch_persists_releases_and_records_in_one_transaction()
     assert adapter.calls == 1
     # One transaction carries all three writes, in this order, and nothing rolled back.
     committed = [batch for batch in database.committed if batch]
-    assert [kind for kind, _ in committed[-1]] == ["evidence", "release", "outbox"]
+    assert [kind for kind, _ in committed[-1]] == ["release", "evidence", "outbox"]
     assert database.rolled_back == []
     assert boundary.quarantined_nodes == []
 
@@ -414,11 +440,10 @@ def test_a_lease_released_concurrently_rolls_the_whole_commit_back():
     with pytest.raises(DomainError) as refused:
         run(service)
     assert refused.value.code == "LEASE-0002"
-    # The Evidence INSERT that preceded the failed release is discarded with it.
-    assert database.rolled_back and [kind for kind, _ in database.rolled_back[-1]] == [
-        "evidence",
-        "release",
-    ]
+    # The release is attempted before anything is written down, because the receipt has to
+    # state whether it succeeded (#312 N1).  So the only statement to unwind is the release,
+    # and no Evidence row or outbox event ever existed to be discarded.
+    assert database.rolled_back and [kind for kind, _ in database.rolled_back[-1]] == ["release"]
     assert all(batch == [] for batch in database.committed)
     assert _boundary.quarantined_nodes == [(NODE, "LEASE-0002")]
 
@@ -451,7 +476,7 @@ def test_the_outbox_event_type_is_the_contracted_string():
     outbox = [params for kind, params in database.committed[-1] if kind == "outbox"]
     assert len(outbox) == 1
     assert outbox[0][3] == "inv.build.dispatch_completed"
-    payload = outbox[0][4].obj
+    payload = outbox[0][4]
     # Redacted: decision, binding, resource, lease and the persisted Evidence only.
     # Six keys: the contract's additionalProperties:false allows no more (#312 F-R3).
     assert set(payload) == {
@@ -463,7 +488,7 @@ def test_the_persisted_envelope_carries_the_cleanup_receipt_and_its_digest():
     service, database, _adapter, _boundary = build()
     result = run(service)
     evidence = [params for kind, params in database.committed[-1] if kind == "evidence"]
-    envelope = evidence[0][3].obj
+    envelope = evidence[0][3]
     # The contract's names, and the pair the product path requires.
     assert envelope["cleanupReceipt"]["physicalReceipt"]["buildSessionId"] == SESSION
     assert len(envelope["cleanupReceipt"]["physicalReceiptDigest"]) == 64
@@ -525,7 +550,7 @@ def test_the_persisted_cleanup_receipt_carries_the_pair_the_contract_only_pairs(
     service, database, _adapter, _boundary = build()
     run(service)
     evidence = [params for kind, params in database.committed[-1] if kind == "evidence"]
-    cleanup = evidence[0][3].obj["cleanupReceipt"]
+    cleanup = evidence[0][3]["cleanupReceipt"]
     # The public receipt: its own four observations, the lease fact this transaction proved,
     # and the physical pair the product path requires.
     assert set(cleanup) == {
@@ -609,7 +634,7 @@ def test_the_completed_payload_passes_the_public_contract_validator():
 
     service, database, _adapter, _boundary = build()
     run(service)
-    payload = [p for kind, p in database.committed[-1] if kind == "outbox"][0][4].obj
+    payload = [p for kind, p in database.committed[-1] if kind == "outbox"][0][4]
     assert set(payload) == {
         "decisionId", "bindingDigest", "resourceId", "leaseId", "evidenceId", "evidenceDigest",
     }
@@ -627,6 +652,90 @@ def test_losing_a_lease_race_after_the_external_dispatch_records_reconciliation(
     assert all(batch == [] for batch in database.committed)
     # Nothing durable landed, so the node holds unaccounted external state.
     assert boundary.quarantined_nodes == [(NODE, "LEASE-0002")]
+
+
+def test_the_persisted_envelope_is_the_one_its_digest_covers():
+    """#312 N1: r1 wrote the Evidence row and *then* added ``leaseReleased`` to the receipt.
+
+    psycopg serialises a JSONB parameter at ``execute()``, so the stored envelope was missing a
+    field strict ``BuildCleanupReceipt`` requires; with serialisation deferred the stored
+    envelope gained the field afterwards and no longer matched the digest the outbox and the
+    result carry.  Recomputing the digest from what was persisted is the only assertion that
+    sees either outcome -- checking that the field is present does not.
+    """
+
+    service, database, _adapter, _boundary = build()
+    result = run(service)
+    stored = {kind: params for batch in database.committed for kind, params in batch}
+    envelope = stored["evidence"][3]
+    receipt = envelope["cleanupReceipt"]
+    # The row is a strict BuildCleanupReceipt, as persisted rather than as intended.
+    validate_contract("BuildCleanupReceipt", receipt)
+    assert receipt["leaseReleased"] is True
+    assert canonical_digest(envelope) == result.evidence_digest
+    assert stored["outbox"][4]["evidenceDigest"] == result.evidence_digest
+
+
+def test_a_cleanup_receipt_the_public_contract_does_not_allow_is_not_persisted():
+    """#312 N1: the row is checked against the strict contract before it exists.
+
+    ``BuildCleanupReceipt`` is ``additionalProperties: false``, so a field nobody validates
+    cannot ride into the Evidence envelope on the caller's receipt.  The duplicated-observation
+    comparison only looks at the four fields it compares, which is a different question.
+    """
+
+    service, database, _adapter, _boundary = build(
+        adapter=_Adapter(
+            receipt={
+                "buildSessionId": SESSION,
+                "cleanup": caller_cleanup(operatorNote="anything at all"),
+            }
+        )
+    )
+    with pytest.raises(DomainError) as refused:
+        run(service)
+    # The canonical validator refuses with its own redacted code; the row never exists.
+    assert refused.value.code == "VAL-0002"
+    assert "BuildCleanupReceipt" in str(refused.value)
+    assert all(batch == [] for batch in database.committed)
+
+
+def test_a_transport_that_cannot_record_a_quarantine_does_not_dispatch():
+    """#312 N2: the production collector's ``quarantine_node`` only raises.
+
+    A race loser dispatched externally and consumed its one-shot decision claim, so without a
+    durable marker nobody learns that the node holds unaccounted state.  The refusal belongs
+    before the dispatch: refusing afterwards leaves exactly that state behind.
+    """
+
+    boundary = _Boundary()
+    boundary.records_durable_quarantine = False
+    service, _database, adapter, _b = build(boundary=boundary)
+    with pytest.raises(DomainError) as refused:
+        run(service)
+    assert refused.value.code == "RES-0006" and refused.value.status == 503
+    assert adapter.calls == 0
+
+
+def test_the_production_collector_declares_the_quarantine_capability_absent():
+    """#312 N2: fail closed by default -- the declaration is the transport's, not a guess."""
+
+    assert getattr(NodeAgentReceipts, QUARANTINE_CAPABILITY, False) is False
+
+
+def test_a_failing_quarantine_does_not_replace_the_race_it_was_recording():
+    """#312 N2: the transport's own refusal must not become the caller's answer."""
+
+    def refuse(node_id, reason_code):
+        raise DomainError("VERIFY-0022", "Node agent quarantine is not connected", 409)
+
+    boundary = _Boundary()
+    boundary.quarantine_node = refuse
+    database = _Database(release_succeeds=False)
+    service, _database, _adapter, _b = build(database=database, boundary=boundary)
+    with pytest.raises(DomainError) as refused:
+        run(service)
+    assert refused.value.code == "LEASE-0002"
 
 
 def test_two_callers_contending_on_one_lease_release_and_record_exactly_once():

@@ -6,6 +6,7 @@ contract and the implementation do not yet agree on -- see the last test.
 """
 
 import json
+import os
 
 import pytest
 
@@ -67,9 +68,32 @@ def conforming_health(**overrides):
 
 
 def write_health(directory, document):
+    """Write the receipt the way a node agent must: readable by its owner only.
+
+    ``_protected_json`` refuses any group or other permission bit on POSIX, which is the
+    point of an operator receipt.  A fixture that leaves the default 0644 only passes where
+    that check cannot apply -- Windows -- so hosted Linux refused every reading with RES-0006
+    while the same tests were green locally (#312 r2 hosted regression).
+    """
+
     path = directory / PRODUCT_HEALTH_RECEIPT
     path.write_text(json.dumps(document) + "\n", encoding="utf-8")
+    os.chmod(path, 0o600)
     return path
+
+
+@pytest.mark.skipif(
+    os.name == "nt",
+    reason="POSIX permission bits: Windows has no group/other mode for the product to refuse",
+)
+def test_a_receipt_other_accounts_can_read_is_refused(tmp_path):
+    """The refusal under test is the product's, and it only exists on POSIX."""
+
+    path = write_health(tmp_path, conforming_health())
+    os.chmod(path, 0o644)
+    with pytest.raises(DomainError) as refused:
+        NodeAgentReceipts(tmp_path).collect_product_health()
+    assert refused.value.code == "RES-0006"
 
 
 def test_the_collector_accepts_a_conforming_node_agent_receipt(tmp_path):

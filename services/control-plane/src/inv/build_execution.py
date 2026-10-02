@@ -74,6 +74,14 @@ SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 #: would otherwise satisfy a pid-only comparison.
 DAEMON_IDENTITY_FIELDS = ("pid", "processUid", "processStartTicks", "comm")
 
+#: A transport attribute the product path requires to be ``True``.  F-R4 made the service
+#: record a reconciliation marker through the transport when a dispatch loses the commit, but
+#: the production collector's ``quarantine_node`` only raises: nothing durable is written, so
+#: the race loser would consume its one-shot decision claim with no marker anywhere (#312 N2).
+#: Absent or false means the capability is not connected, and a dispatch that could not be
+#: reconciled does not start.
+QUARANTINE_CAPABILITY = "records_durable_quarantine"
+
 #: How old a node-agent health observation may be, measured against the database clock.
 #: The adapter checks its own provider observation with the same window; this is a
 #: different observation by a different writer and needs its own check (#312 F-R1).
@@ -136,6 +144,23 @@ class BuildExecutionService:
         self._environment = dict(environment if environment is not None else os.environ)
 
     # ---------------------------------------------------------------- preconditions
+
+    def _require_reconciliation_channel(self) -> None:
+        """Refuse before the external dispatch if a lost race could not be recorded.
+
+        This is checked at the start rather than in the failure path because by the time the
+        marker is needed the build has already run on the node: refusing then leaves exactly
+        the unaccounted state the marker exists to report (#312 N2).
+        """
+
+        if getattr(self._transport, QUARANTINE_CAPABILITY, False) is not True:
+            raise DomainError(
+                "RES-0006",
+                "node quarantine is not connected, so a dispatch that lost its commit "
+                "could not be recorded for reconciliation",
+                503,
+                retryable=True,
+            )
 
     def _database_now(self, tenant_id: str):
         """The authoritative current time, read from the database rather than this host."""
@@ -413,29 +438,11 @@ class BuildExecutionService:
                 lease_epoch=str(lease["recovery_epoch"]),
                 daemon_before=daemon_before,
             )
-            # The contract's own names: BuildCleanupReceipt references the physical receipt
-            # and its canonical digest as ``physicalReceipt``/``physicalReceiptDigest``.  The
-            # pair is only ``dependentRequired`` there -- neither present is valid for a
-            # legacy caller -- so the product path requires it here before committing.
-            cleanup_receipt = {
-                "physicalReceipt": deepcopy(verified),
-                "physicalReceiptDigest": canonical_digest(verified),
-            }
             self._require_duplicated_observations(caller_cleanup, verified)
-            cleanup_receipt = {
-                **deepcopy(dict(caller_cleanup)),
-                **cleanup_receipt,
-            }
-            self._require_physical_pair(cleanup_receipt)
-            envelope = {
-                **deepcopy(dict(evidence)),
-                "cleanupReceipt": cleanup_receipt,
-            }
-            evidence_digest = canonical_digest(envelope)
-            conn.execute(
-                "INSERT INTO inv.evidence(tenant_id,run_id,evidence_id,envelope) VALUES (%s,%s,%s,%s)",
-                (tenant_id, run_id, evidence_id, Jsonb(envelope)),
-            )
+            # The release happens before the receipt is written down, because the receipt has
+            # to state whether the lease was released and only this UPDATE can answer that.
+            # Both statements are in one transaction, so a failure after this point unwinds
+            # the release with everything else.
             released = conn.execute(
                 """UPDATE inv.resource_leases
                 SET released_at=clock_timestamp()
@@ -445,8 +452,33 @@ class BuildExecutionService:
             ).fetchone()
             if not released:
                 raise DomainError("LEASE-0002", "Build lease was released concurrently", 409)
-            # ``leaseReleased`` is true because this UPDATE matched, not because anyone said so.
-            cleanup_receipt["leaseReleased"] = True
+            # The contract's own names: BuildCleanupReceipt references the physical receipt
+            # and its canonical digest as ``physicalReceipt``/``physicalReceiptDigest``.  The
+            # pair is only ``dependentRequired`` there -- neither present is valid for a
+            # legacy caller -- so the product path requires it here before committing.
+            # ``leaseReleased`` is true because the UPDATE above matched, not because anyone
+            # said so, and the receipt is finished *before* the envelope is digested: r1 added
+            # that field after the row was written, so the stored envelope was either missing
+            # a required field or no longer the one its digest covers (#312 N1).
+            persisted_cleanup = {
+                **deepcopy(dict(caller_cleanup)),
+                "physicalReceipt": deepcopy(verified),
+                "physicalReceiptDigest": canonical_digest(verified),
+                "leaseReleased": True,
+            }
+            self._require_physical_pair(persisted_cleanup)
+            # The row is the public contract's own shape, checked before it exists rather
+            # than trusted afterwards.
+            validate_contract("BuildCleanupReceipt", persisted_cleanup)
+            envelope = {
+                **deepcopy(dict(evidence)),
+                "cleanupReceipt": persisted_cleanup,
+            }
+            evidence_digest = canonical_digest(envelope)
+            conn.execute(
+                "INSERT INTO inv.evidence(tenant_id,run_id,evidence_id,envelope) VALUES (%s,%s,%s,%s)",
+                (tenant_id, run_id, evidence_id, Jsonb(envelope)),
+            )
             # The public payload is exactly the six keys the contract allows, and the
             # canonical validator says so before the row exists rather than after (#312 F-R3).
             payload = {
@@ -493,6 +525,7 @@ class BuildExecutionService:
         """Dispatch one admitted build and commit its durable consequences."""
 
         self._require_product_enable()
+        self._require_reconciliation_channel()
         # ``BuildPlan.buildSessionId`` is optional in the contract so a legacy plan without
         # one stays valid. The product path requires it: the physical cleanup receipt binds
         # itself to a session, and a dispatch with no session of its own has nothing for
@@ -580,5 +613,13 @@ class BuildExecutionService:
                 # Nothing committed: no Evidence, no release. The node keeps the
                 # unaccounted state, so it is quarantined rather than handed the next
                 # build, and an operator reconciles it.
-                self._transport.quarantine_node(leased_node_id, error.code)
+                try:
+                    self._transport.quarantine_node(leased_node_id, error.code)
+                except DomainError:
+                    # A failing reconciliation attempt must not replace the reason this
+                    # dispatch failed: an operator who sees the transport's own refusal here
+                    # loses the fact that a race was lost after an external dispatch.  The
+                    # product path refuses such a transport up front, so reaching this is a
+                    # transport regression -- and the original cause is what says so.
+                    pass
             raise
