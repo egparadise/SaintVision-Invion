@@ -34,8 +34,8 @@ DEFAULT_ALLOWLIST = (
 )
 TARGET_REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
 TARGET_REGISTRY_BLOB = "eeb43dc262f5de1816237ef85fc902cdca4ab6fd"
-ALLOWLIST_BLOB = "ff2f9966956da677ebcdee92ec1de2292bd5ec52"
-ALLOWLIST_CANONICAL_SHA256 = "b73aba8ff97443bbd1e314d5ca0375fdcbce8205a1a746bc5a73759a04083707"
+ALLOWLIST_BLOB = "47349f312f24629b83ac68e6ecdd006b39e46d48"
+ALLOWLIST_CANONICAL_SHA256 = "ff11a22d68853b2da52d755069dbf3b888f886151cb8dd704e52483c464280e6"
 SCAN_ALLOWLIST_REPO_PATH = (
     "docs/vault/30_Development/Evidence/s11-security-dependency-sast-allowlist-v1.json"
 )
@@ -519,7 +519,7 @@ def evaluate_definer(report: dict[str, Any], allowlist: dict[str, Any]) -> Verdi
     if exit_code not in (0, 1) or not isinstance(findings, list):
         return Verdict.INVALID_RUN
     expected = set(allowlist.get("definerPolicySignatures", []))
-    if len(expected) != 12:
+    if len(expected) != 15:
         return Verdict.INVALID_RUN
     seen: set[str] = set()
     problems: list[str] = []
@@ -593,11 +593,11 @@ def validate_allowlist(allowlist: Any) -> None:
     signatures = allowlist["definerPolicySignatures"]
     if (
         not isinstance(signatures, list)
-        or len(signatures) != 12
+        or len(signatures) != 15
         or len(set(signatures)) != len(signatures)
         or any(not isinstance(item, str) or not item for item in signatures)
     ):
-        raise ValueError("definerPolicySignatures must contain 12 unique signatures")
+        raise ValueError("definerPolicySignatures must contain 15 unique signatures")
     vf = allowlist["secVf001"]
     vf_keys = {
         "runner", "workflow", "nodeDependencyResolver", "testFiles", "requiredNodeIds",
