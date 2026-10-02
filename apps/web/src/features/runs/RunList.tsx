@@ -15,19 +15,74 @@ export interface RunListProps {
 
 const RUN_STATE_CONFIG: Record<
   RunState,
-  { label: string; color: string; bg: string }
+  { label: string; color: string; bg: string; border: string }
 > = {
-  draft: { label: '초안', color: '#64748b', bg: 'rgba(100, 116, 139, 0.15)' },
-  validated: { label: '검증됨', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.15)' },
-  planned: { label: '계획 수립', color: '#0284c7', bg: 'rgba(2, 132, 199, 0.15)' },
-  awaiting_approval: { label: '승인 대기', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)' },
-  scheduled: { label: '스케줄됨', color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.15)' },
-  running: { label: '실행 중', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.2)' },
-  verifying: { label: '결과 검증', color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.15)' },
-  recovering: { label: '복구 중', color: '#f97316', bg: 'rgba(249, 115, 22, 0.15)' },
-  succeeded: { label: '성공', color: '#10b981', bg: 'rgba(16, 185, 129, 0.15)' },
-  failed: { label: '실패', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.15)' },
-  cancelled: { label: '취소됨', color: '#6b7280', bg: 'rgba(107, 114, 128, 0.15)' },
+  draft: {
+    label: '초안',
+    color: 'var(--color-text-secondary)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-border-subtle)',
+  },
+  validated: {
+    label: '검증됨',
+    color: 'var(--color-text-secondary)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-border-subtle)',
+  },
+  planned: {
+    label: '계획 수립',
+    color: 'var(--color-text-secondary)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-border-subtle)',
+  },
+  awaiting_approval: {
+    label: '승인 대기',
+    color: 'var(--color-status-degraded)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-degraded)',
+  },
+  scheduled: {
+    label: '스케줄됨',
+    color: 'var(--color-text-secondary)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-border-subtle)',
+  },
+  running: {
+    label: '실행 중',
+    color: 'var(--color-brand-hover)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-brand-hover)',
+  },
+  verifying: {
+    label: '결과 검증',
+    color: 'var(--color-text-secondary)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-border-subtle)',
+  },
+  recovering: {
+    label: '복구 중',
+    color: 'var(--color-status-active)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-active)',
+  },
+  succeeded: {
+    label: '성공',
+    color: 'var(--color-status-online)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-online)',
+  },
+  failed: {
+    label: '실패',
+    color: 'var(--color-status-offline)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-offline)',
+  },
+  cancelled: {
+    label: '취소됨',
+    color: 'var(--color-status-neutral)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-border-strong)',
+  },
 };
 
 export const RunList: React.FC<RunListProps> = ({
@@ -57,10 +112,10 @@ export const RunList: React.FC<RunListProps> = ({
           style={{
             padding: '12px 16px',
             marginBottom: '16px',
-            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-            border: '1px solid #ef4444',
+            backgroundColor: 'var(--color-bg-subtle)',
+            border: '1px solid var(--color-status-offline)',
             borderRadius: 'var(--radius-md)',
-            color: '#fca5a5',
+            color: 'var(--color-status-offline)',
             fontSize: '0.8125rem',
           }}
         >
@@ -122,15 +177,16 @@ export const RunList: React.FC<RunListProps> = ({
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '20px' }}>
         <button
           onClick={() => setSelectedFilter('ALL')}
+          data-testid="run-filter-pill-ALL"
           style={{
             padding: '4px 10px',
             borderRadius: 'var(--radius-sm)',
             fontSize: '0.75rem',
             fontWeight: 600,
             cursor: 'pointer',
-            border: '1px solid var(--color-border-strong)',
+            border: selectedFilter === 'ALL' ? '1px solid var(--color-brand-primary-fg)' : '1px solid var(--color-border-subtle)',
             backgroundColor: selectedFilter === 'ALL' ? 'var(--color-brand-primary-bg)' : 'var(--color-bg-subtle)',
-            color: selectedFilter === 'ALL' ? '#ffffff' : 'var(--color-text-secondary)',
+            color: selectedFilter === 'ALL' ? 'var(--color-brand-primary-fg)' : 'var(--color-text-secondary)',
           }}
         >
           전체 ({runs.length})
@@ -144,6 +200,7 @@ export const RunList: React.FC<RunListProps> = ({
           return (
             <button
               key={state}
+              data-testid={`run-filter-pill-${state}`}
               onClick={() => setSelectedFilter(state)}
               style={{
                 padding: '4px 10px',
@@ -151,7 +208,7 @@ export const RunList: React.FC<RunListProps> = ({
                 fontSize: '0.75rem',
                 fontWeight: 600,
                 cursor: 'pointer',
-                border: `1px solid ${isCurrent ? cfg.color : 'var(--color-border-subtle)'}`,
+                border: `1px solid ${isCurrent ? cfg.border : 'var(--color-border-subtle)'}`,
                 backgroundColor: isCurrent ? cfg.bg : 'var(--color-bg-subtle)',
                 color: isCurrent ? cfg.color : 'var(--color-text-muted)',
               }}
@@ -197,15 +254,15 @@ export const RunList: React.FC<RunListProps> = ({
                     data-testid="run-fetch-error-state"
                     style={{
                       padding: '24px 20px',
-                      backgroundColor: 'rgba(239, 68, 68, 0.08)',
-                      border: '1px solid #ef4444',
+                      backgroundColor: 'var(--color-bg-subtle)',
+                      border: '1px solid var(--color-status-offline)',
                       borderRadius: 'var(--radius-md)',
                       maxWidth: '540px',
                       margin: '0 auto',
                     }}
                   >
                     <div style={{ fontSize: '1.5rem', marginBottom: '8px' }}>⚠️</div>
-                    <div style={{ fontSize: '1rem', fontWeight: 600, color: '#fca5a5', marginBottom: '6px' }}>
+                    <div style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--color-status-offline)', marginBottom: '6px' }}>
                       Run 작업 목록 동기화 실패
                     </div>
                     <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', margin: '0 0 16px 0' }}>
@@ -218,8 +275,8 @@ export const RunList: React.FC<RunListProps> = ({
                         onClick={() => onRefresh()}
                         style={{
                           padding: '6px 14px',
-                          backgroundColor: '#ef4444',
-                          color: '#fff',
+                          backgroundColor: 'var(--color-status-offline-bg)',
+                          color: 'var(--color-brand-primary-fg)',
                           border: 'none',
                           borderRadius: 'var(--radius-sm)',
                           fontSize: '0.8125rem',
@@ -272,7 +329,7 @@ export const RunList: React.FC<RunListProps> = ({
                           fontFamily: 'monospace',
                           fontWeight: 600,
                           fontSize: 'inherit',
-                          color: '#58a6ff',
+                          color: 'var(--color-brand-hover)',
                           cursor: 'pointer',
                           textAlign: 'left',
                           textDecoration: 'underline',
@@ -285,15 +342,16 @@ export const RunList: React.FC<RunListProps> = ({
                     )}
                     {run.parentId && (
                       <span
+                        data-testid={`run-shard-badge-${run.id}`}
                         style={{
                           display: 'inline-block',
                           marginTop: '2px',
                           padding: '1px 6px',
                           borderRadius: 'var(--radius-sm)',
                           fontSize: '0.6875rem',
-                          backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                          color: '#3b82f6',
-                          border: '1px solid rgba(59, 130, 246, 0.3)',
+                          backgroundColor: 'var(--color-bg-subtle)',
+                          color: 'var(--color-brand-hover)',
+                          border: '1px solid var(--color-brand-hover)',
                         }}
                       >
                         ↳ 샤드 #{((run.shardIndex ?? 0) + 1)} (부모: {run.parentId.slice(0, 14)}...)
@@ -301,15 +359,16 @@ export const RunList: React.FC<RunListProps> = ({
                     )}
                     {run.childRunIds && run.childRunIds.length > 0 && (
                       <span
+                        data-testid={`run-parent-shard-badge-${run.id}`}
                         style={{
                           display: 'inline-block',
                           marginTop: '2px',
                           padding: '1px 6px',
                           borderRadius: 'var(--radius-sm)',
                           fontSize: '0.6875rem',
-                          backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                          color: '#8b5cf6',
-                          border: '1px solid rgba(139, 92, 246, 0.3)',
+                          backgroundColor: 'var(--color-bg-subtle)',
+                          color: 'var(--color-status-active)',
+                          border: '1px solid var(--color-status-active)',
                         }}
                       >
                         ⚡ 분산 부모 ({run.childRunIds.length}개 샤드)
@@ -327,6 +386,7 @@ export const RunList: React.FC<RunListProps> = ({
                   <td style={{ padding: '12px 16px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-start' }}>
                       <span
+                        data-testid={`run-status-badge-${run.id}`}
                         style={{
                           display: 'inline-block',
                           padding: '2px 8px',
@@ -335,22 +395,23 @@ export const RunList: React.FC<RunListProps> = ({
                           fontWeight: 600,
                           color: cfg.color,
                           backgroundColor: cfg.bg,
-                          border: `1px solid ${cfg.color}`,
+                          border: `1px solid ${cfg.border}`,
                         }}
                       >
                         {cfg.label}
                       </span>
                       {run.resourceReleasePending && (
                         <span
+                          data-testid={`run-resource-release-badge-${run.id}`}
                           style={{
                             display: 'inline-block',
                             padding: '1px 6px',
                             borderRadius: 'var(--radius-sm)',
                             fontSize: '0.6875rem',
                             fontWeight: 600,
-                            color: '#d97706',
-                            backgroundColor: 'rgba(217, 119, 6, 0.15)',
-                            border: '1px solid #d97706',
+                            color: 'var(--color-status-degraded)',
+                            backgroundColor: 'var(--color-bg-subtle)',
+                            border: '1px solid var(--color-status-degraded)',
                           }}
                         >
                           ⏳ 자원 반환 대기 (ADR-040)
@@ -366,16 +427,16 @@ export const RunList: React.FC<RunListProps> = ({
                       생성: {run.createdAt ? new Date(run.createdAt).toLocaleString('ko-KR') : '미관측'}
                     </div>
                     {run.stateUpdatedAt && (
-                      <div data-testid={`run-state-updated-at-${run.id}`} style={{ fontSize: '0.75rem', color: '#60a5fa', marginTop: '2px' }}>
+                      <div data-testid={`run-state-updated-at-${run.id}`} style={{ fontSize: '0.75rem', color: 'var(--color-brand-hover)', marginTop: '2px' }}>
                         상태 갱신: {new Date(run.stateUpdatedAt).toLocaleString('ko-KR')}
                       </div>
                     )}
                     {run.completedAt ? (
-                      <div data-testid={`run-completed-at-${run.id}`} style={{ fontSize: '0.75rem', color: run.state === 'succeeded' ? '#10b981' : '#f85149', marginTop: '2px' }}>
+                      <div data-testid={`run-completed-at-${run.id}`} style={{ fontSize: '0.75rem', color: run.state === 'succeeded' ? 'var(--color-status-online)' : 'var(--color-status-offline)', marginTop: '2px' }}>
                         실행 완료: {new Date(run.completedAt).toLocaleString('ko-KR')}
                       </div>
                     ) : (run.state === 'succeeded' || run.state === 'failed') && (
-                      <div data-testid={`run-completed-at-${run.id}`} style={{ fontSize: '0.75rem', color: run.state === 'succeeded' ? '#10b981' : '#f85149', marginTop: '2px' }}>
+                      <div data-testid={`run-completed-at-${run.id}`} style={{ fontSize: '0.75rem', color: run.state === 'succeeded' ? 'var(--color-status-online)' : 'var(--color-status-offline)', marginTop: '2px' }}>
                         종료: {run.updatedAt ? new Date(run.updatedAt).toLocaleString('ko-KR') : '미관측'}
                       </div>
                     )}

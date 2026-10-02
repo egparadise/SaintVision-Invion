@@ -27,11 +27,26 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       contains(github.event.pull_request.labels.*.name, 'run-ac11-security')
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     concurrency:
       group: ac11-security-${{ github.event.pull_request.head.sha || github.sha }}
       cancel-in-progress: false
+    # SEC-DEF-001 and SEC-RLS-001 are catalogue and row-visibility observations, so this lane
+    # needs a database.  It is a service container the collectors create a *disposable migrated*
+    # database inside and drop afterwards -- no operational DSN is reachable from here and the
+    # password below is this runner's throwaway.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: inv_test_only
+          POSTGRES_DB: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
     env:
+      INV_TEST_ADMIN_DSN: postgresql://postgres:inv_test_only@127.0.0.1:5432/postgres
       SOURCE_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
       REPORT: evidence/s11-ac11-security-scan.json
       JUNIT: evidence/s11-ac11-security-scan.xml
@@ -102,6 +117,25 @@ jobs:
           set -e
           echo "producer_exit=$producer_exit" >> "$GITHUB_OUTPUT"
 
+      - name: Install database boundary dependencies
+        run: python -m pip install -r requirements-test.txt
+
+      - name: Measure the two database threat reports
+        id: threats
+        shell: bash
+        run: |
+          # The reports are written whichever way the measurement comes out: NOT_OBSERVED and
+          # MEASURED_FAIL are answers, and an unavailable observation is recorded as unavailable
+          # rather than dropped.  So this step does not fail the lane -- the gate at the end
+          # still enforces the dependency/SAST producer's own exit code.
+          set +e
+          python tools/run_ac11_security_threat_reports.py \
+            --source-run-id "${{ github.run_id }}" \
+            --source-head-sha "$SOURCE_HEAD_SHA" \
+            --output-dir evidence
+          echo "producer_exit=$?" >> "$GITHUB_OUTPUT"
+          set -e
+
       - name: Validate redacted evidence shape
         if: always()
         run: |
@@ -139,6 +173,25 @@ jobs:
           assert_redacted(report)
           root = ET.parse(junit_path).getroot()
           assert root.attrib['tests'] == '4'
+
+          # The two database threat reports travel in the same artifact as the scan, so they
+          # are held to the same provenance and the same redaction.
+          for member, threat_id in (
+              ('s11-ac11-security-definer.json', 'SEC-DEF-001'),
+              ('s11-ac11-security-rls.json', 'SEC-RLS-001'),
+          ):
+              path = report_path.parent / member
+              assert path.is_file(), f'missing {member}'
+              document = json.loads(path.read_text(encoding='utf-8'))
+              assert document['threatId'] == threat_id
+              assert document['sourceHeadSha'] == os.environ['SOURCE_HEAD_SHA']
+              assert document['sourceRunId'] == report['sourceRunId']
+              assert isinstance(document['exitCode'], int)
+              assert document['toolFiles'], 'a threat report must pin the tools that ran'
+              assert_redacted(document)
+              text = path.read_text(encoding='utf-8')
+              for secret in ('inv_test_only', 'postgresql://', 'password='):
+                  assert secret not in text, f'{member} carries connection material'
           PY
 
       - name: Upload AC-11 security evidence

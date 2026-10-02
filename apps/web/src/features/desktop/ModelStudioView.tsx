@@ -19,6 +19,98 @@ export interface ModelStudioViewProps {
   ) => Promise<{ success: boolean; repairedReplicas: any[]; message?: string }>;
 }
 
+export const REPLICA_STATUS_CONFIG = {
+  healthy: {
+    color: 'var(--color-status-online)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-online)',
+    label: '정상 (HEALTHY)',
+  },
+  repairing: {
+    color: 'var(--color-status-degraded)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-degraded)',
+    label: '복구 중 (REPAIRING)',
+  },
+  missing: {
+    color: 'var(--color-status-offline)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-offline)',
+    label: '유실 (MISSING)',
+  },
+} as const;
+
+export const MODEL_AVAILABILITY_CONFIG = {
+  unknown: {
+    color: 'var(--color-status-unknown)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-unknown)',
+    label: '알 수 없음 (unknown) · 실행 재검증 필요 (requiresExecutionRevalidation: true)',
+  },
+} as const;
+
+export const PLAN_FEASIBILITY_CONFIG = {
+  feasible: {
+    color: 'var(--color-status-online)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-online)',
+    label: '배치 가능 (Feasible)',
+  },
+  infeasible: {
+    color: 'var(--color-status-offline)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-offline)',
+    label: '배치 불가',
+  },
+} as const;
+
+export const NODE_ELIGIBILITY_CONFIG = {
+  eligible: {
+    color: 'var(--color-status-online)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-online)',
+    label: '할당 가능',
+  },
+  ineligible: {
+    color: 'var(--color-status-offline)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-offline)',
+    label: '관측 전용 노드 (연산 할당 불가)',
+  },
+} as const;
+
+export function getReplicaStatusConfig(status?: string | null) {
+  if (status && Object.hasOwn(REPLICA_STATUS_CONFIG, status)) {
+    return REPLICA_STATUS_CONFIG[status as keyof typeof REPLICA_STATUS_CONFIG];
+  }
+  return {
+    color: 'var(--color-status-unknown)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-unknown)',
+    label: `알 수 없음 (${status || 'UNKNOWN'})`,
+  };
+}
+
+export function getModelAvailabilityConfig(availability?: string | null) {
+  if (availability && Object.hasOwn(MODEL_AVAILABILITY_CONFIG, availability)) {
+    return MODEL_AVAILABILITY_CONFIG[availability as keyof typeof MODEL_AVAILABILITY_CONFIG];
+  }
+  return {
+    color: 'var(--color-status-unknown)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-unknown)',
+    label: `알 수 없음 (${availability || 'UNKNOWN'}) · 실행 재검증 필요 (requiresExecutionRevalidation: true)`,
+  };
+}
+
+export function getPlanFeasibilityConfig(isFeasible: boolean) {
+  return isFeasible ? PLAN_FEASIBILITY_CONFIG.feasible : PLAN_FEASIBILITY_CONFIG.infeasible;
+}
+
+export function getNodeEligibilityConfig(isObservation: boolean) {
+  return isObservation ? NODE_ELIGIBILITY_CONFIG.ineligible : NODE_ELIGIBILITY_CONFIG.eligible;
+}
+
 function formatBytes(bytes: number): string {
   if (bytes === 0) return '0 B';
   const k = 1024;
@@ -246,8 +338,8 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
         padding: '24px',
         overflow: 'auto',
         height: '100%',
-        backgroundColor: '#0f172a',
-        color: '#f8fafc',
+        backgroundColor: 'var(--color-bg-canvas)',
+        color: 'var(--color-text-primary)',
         display: 'flex',
         flexDirection: 'column',
         gap: '20px',
@@ -258,10 +350,10 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
         <h2 style={{ margin: '0 0 8px 0', fontSize: '1.25rem', fontWeight: 700 }}>
           모델 기록 조회
         </h2>
-        <p style={{ margin: '0 0 4px 0', fontSize: '0.875rem', color: '#94a3b8' }}>
+        <p style={{ margin: '0 0 4px 0', fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
           프로젝트: <strong>{projectId}</strong>
         </p>
-        <p style={{ margin: 0, fontSize: '0.8125rem', color: '#64748b' }}>
+        <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
           정확한 모델 ID와 버전으로 과거 커밋 기록을 조회합니다.
         </p>
       </div>
@@ -277,12 +369,12 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
           alignItems: 'center',
           flexWrap: 'wrap',
           padding: '12px 16px',
-          backgroundColor: '#1e293b',
+          backgroundColor: 'var(--color-bg-surface)',
           borderRadius: '8px',
-          border: '1px solid #334155',
+          border: '1px solid var(--color-border-subtle)',
         }}
       >
-        <label style={{ fontSize: '0.8125rem', color: '#cbd5e1' }}>
+        <label style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)' }}>
           모델 ID{' '}
           <input
             data-testid="model-id-input"
@@ -294,14 +386,14 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
             }}
             style={{
               padding: '6px 10px',
-              backgroundColor: '#0f172a',
-              border: '1px solid #475569',
+              backgroundColor: 'var(--color-bg-subtle)',
+              border: '1px solid var(--color-border-subtle)',
               borderRadius: '4px',
-              color: '#f8fafc',
+              color: 'var(--color-text-primary)',
             }}
           />
         </label>
-        <label style={{ fontSize: '0.8125rem', color: '#cbd5e1' }}>
+        <label style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)' }}>
           버전{' '}
           <input
             data-testid="model-version-input"
@@ -313,10 +405,10 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
             }}
             style={{
               padding: '6px 10px',
-              backgroundColor: '#0f172a',
-              border: '1px solid #475569',
+              backgroundColor: 'var(--color-bg-subtle)',
+              border: '1px solid var(--color-border-subtle)',
               borderRadius: '4px',
-              color: '#f8fafc',
+              color: 'var(--color-text-primary)',
             }}
           />
         </label>
@@ -325,8 +417,8 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
           disabled={!projectId || !modelId || !version || loading}
           style={{
             padding: '6px 14px',
-            backgroundColor: '#3b82f6',
-            color: '#fff',
+            backgroundColor: 'var(--color-brand-primary-bg)',
+            color: 'var(--color-brand-primary-fg)',
             border: 'none',
             borderRadius: '4px',
             cursor: loading ? 'not-allowed' : 'pointer',
@@ -337,17 +429,17 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
         </button>
       </form>
 
-      {loading && <p role="status" style={{ color: '#93c5fd' }}>조회 중…</p>}
-      {error && <p role="alert" style={{ color: '#f87171' }}>{error}</p>}
+      {loading && <p role="status" style={{ color: 'var(--color-brand-hover)' }}>조회 중…</p>}
+      {error && <p role="alert" style={{ color: 'var(--color-status-offline)' }}>{error}</p>}
 
       {result && (
         <article
           data-testid="model-manifest-article"
           style={{
             padding: '16px',
-            backgroundColor: '#1e293b',
+            backgroundColor: 'var(--color-bg-surface)',
             borderRadius: '8px',
-            border: '1px solid #334155',
+            border: '1px solid var(--color-border-subtle)',
             display: 'flex',
             flexDirection: 'column',
             gap: '8px',
@@ -356,46 +448,48 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
           <h3 style={{ margin: 0, fontSize: '1.125rem' }}>
             {result.modelId} · {result.version}
           </h3>
-          <p data-testid="model-committed-at" style={{ margin: 0, fontSize: '0.8125rem', color: '#94a3b8' }}>
+          <p data-testid="model-committed-at" style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--color-text-secondary)' }}>
             커밋 시각: {result.committedAt ? result.committedAt : '미관측 (CommittedAt Absent)'}
           </p>
-          <p style={{ margin: 0, fontSize: '0.8125rem', color: '#94a3b8', fontFamily: 'monospace' }}>
+          <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--color-text-secondary)', fontFamily: 'monospace' }}>
             Manifest SHA-256: {result.manifestHash || result.contentHash}
           </p>
-          <p style={{ margin: 0, fontSize: '0.8125rem', color: '#94a3b8' }}>
+          <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--color-text-secondary)' }}>
             원본 Run: {result.sourceRunId ? result.sourceRunId : '미지정 (Run ID Absent)'}
           </p>
-          <p style={{ margin: 0, fontSize: '0.8125rem', color: '#94a3b8' }}>
+          <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--color-text-secondary)' }}>
             {result.format} · {result.totalBytes} bytes · {result.shardCount || result.shards?.length || 1} shards
           </p>
-          <p style={{ margin: 0, fontSize: '0.8125rem', color: '#94a3b8' }}>
+          <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--color-text-secondary)' }}>
             라이선스: {result.licensePolicy} · 분류: {result.classification}
           </p>
-          <p
-            data-testid="model-availability-status"
-            style={{
-              margin: 0,
-              fontSize: '0.8125rem',
-              color: result.currentAvailability === 'unknown' ? '#f59e0b' : '#38bdf8',
-            }}
-          >
-            현재 가용성:{' '}
-            {result.currentAvailability === 'unknown'
-              ? '알 수 없음 (unknown) · 실행 재검증 필요 (requiresExecutionRevalidation: true)'
-              : '관측 완료 · 분산 패브릭 연동'}
-          </p>
+          {(() => {
+            const availCfg = getModelAvailabilityConfig(result.currentAvailability);
+            return (
+              <p
+                data-testid="model-availability-status"
+                style={{
+                  margin: 0,
+                  fontSize: '0.8125rem',
+                  color: availCfg.color,
+                }}
+              >
+                현재 가용성: {availCfg.label}
+              </p>
+            );
+          })()}
           <p
             data-testid="model-verification-notice"
             role="status"
             style={{
               margin: 0,
               fontSize: '0.8125rem',
-              color: '#f59e0b',
+              color: 'var(--color-status-degraded)',
             }}
           >
             무결성 상태: 검증 라우트 부재 (내부 verify만 존재) · 실행 재검증 필요 (requiresExecutionRevalidation: true)
             <br />
-            <span style={{ fontSize: '0.75rem', color: '#cbd5e1' }}>
+            <span style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>
               ℹ️ <strong>[제품 기능 미제공 (원격 검증 라우트 부재)]</strong>: 원격 HTTP 모델 검증 API는 현재 백엔드에서 서빙되지 않으며 커널 내부 검증만 존재합니다. 모델 무결성을 갱신하려면 작업 공간 실행(Run)을 통해 재검증을 수행하십시오.
             </span>
           </p>
@@ -409,10 +503,10 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
           role="status"
           style={{
             padding: '12px 16px',
-            backgroundColor: '#1e293b',
+            backgroundColor: 'var(--color-bg-surface)',
             borderRadius: '8px',
-            border: '1px solid #334155',
-            color: '#94a3b8',
+            border: '1px solid var(--color-border-subtle)',
+            color: 'var(--color-text-secondary)',
             fontSize: '0.8125rem',
             display: 'flex',
             alignItems: 'center',
@@ -429,9 +523,9 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
           data-testid="shards-matrix-section"
           style={{
             padding: '16px',
-            backgroundColor: '#1e293b',
+            backgroundColor: 'var(--color-bg-surface)',
             borderRadius: '8px',
-            border: '1px solid #334155',
+            border: '1px solid var(--color-border-subtle)',
             display: 'flex',
             flexDirection: 'column',
             gap: '12px',
@@ -447,10 +541,10 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
               role="alert"
               style={{
                 padding: '8px 12px',
-                backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                border: '1px solid #ef4444',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-status-offline)',
                 borderRadius: '6px',
-                color: '#fca5a5',
+                color: 'var(--color-status-offline)',
                 fontSize: '0.8125rem',
               }}
             >
@@ -464,10 +558,10 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
               role="alert"
               style={{
                 padding: '8px 12px',
-                backgroundColor: 'rgba(245, 158, 11, 0.15)',
-                border: '1px solid #f59e0b',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-status-degraded)',
                 borderRadius: '6px',
-                color: '#fde68a',
+                color: 'var(--color-status-degraded)',
                 fontSize: '0.8125rem',
               }}
             >
@@ -482,10 +576,10 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
               aria-live="polite"
               style={{
                 padding: '8px 12px',
-                backgroundColor: 'rgba(16, 185, 129, 0.15)',
-                border: '1px solid #10b981',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-status-online)',
                 borderRadius: '6px',
-                color: '#6ee7b7',
+                color: 'var(--color-status-online)',
                 fontSize: '0.8125rem',
               }}
             >
@@ -504,7 +598,7 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
               }}
             >
               <thead>
-                <tr style={{ borderBottom: '1px solid #475569', color: '#94a3b8' }}>
+                <tr style={{ borderBottom: '1px solid var(--color-border-subtle)', color: 'var(--color-text-secondary)' }}>
                   <th style={{ padding: '8px' }}>샤드 #</th>
                   <th style={{ padding: '8px' }}>바이트 범위</th>
                   <th style={{ padding: '8px' }}>레이어</th>
@@ -530,7 +624,7 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
                     <tr
                       key={shard.shardIndex}
                       data-testid={`shard-row-${shard.shardIndex}`}
-                      style={{ borderBottom: '1px solid #334155' }}
+                      style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
                     >
                       <td style={{ padding: '8px', fontWeight: 600 }}>Shard {shard.shardIndex}</td>
                       <td style={{ padding: '8px', fontFamily: 'monospace' }}>{shard.byteRange}</td>
@@ -538,24 +632,25 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
                       <td style={{ padding: '8px' }}>{formatBytes(shard.sizeBytes)}</td>
                       <td style={{ padding: '8px' }}>
                         <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                          {shard.replicas.map((r) => (
-                            <span
-                              key={r.nodeId}
-                              data-testid={`replica-status-${r.nodeId}`}
-                              style={{
-                                padding: '2px 6px',
-                                borderRadius: '4px',
-                                fontSize: '0.6875rem',
-                                backgroundColor:
-                                  r.status === 'healthy'
-                                    ? 'rgba(16, 185, 129, 0.2)'
-                                    : 'rgba(239, 68, 68, 0.2)',
-                                color: r.status === 'healthy' ? '#6ee7b7' : '#fca5a5',
-                              }}
-                            >
-                              {r.nodeHostname}: {r.status}
-                            </span>
-                          ))}
+                          {shard.replicas.map((r) => {
+                            const repCfg = getReplicaStatusConfig(r.status);
+                            return (
+                              <span
+                                key={r.nodeId}
+                                data-testid={`replica-status-${r.nodeId}`}
+                                style={{
+                                  padding: '2px 6px',
+                                  borderRadius: '4px',
+                                  fontSize: '0.6875rem',
+                                  backgroundColor: repCfg.bg,
+                                  border: `1px solid ${repCfg.border}`,
+                                  color: repCfg.color,
+                                }}
+                              >
+                                {r.nodeHostname}: {r.status}
+                              </span>
+                            );
+                          })}
                           {isDegraded && (
                             <span
                               data-testid="shard-degradation-badge"
@@ -564,8 +659,9 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
                                 padding: '2px 6px',
                                 borderRadius: '4px',
                                 fontSize: '0.6875rem',
-                                backgroundColor: 'rgba(245, 158, 11, 0.2)',
-                                color: '#fde68a',
+                                backgroundColor: 'var(--color-bg-subtle)',
+                                border: '1px solid var(--color-status-degraded)',
+                                color: 'var(--color-status-degraded)',
                                 fontWeight: 600,
                               }}
                             >
@@ -584,8 +680,8 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
                               style={{
                                 padding: '4px 8px',
                                 fontSize: '0.75rem',
-                                backgroundColor: '#d97706',
-                                color: '#fff',
+                                backgroundColor: 'var(--color-status-degraded)',
+                                color: 'var(--color-text-inverse)',
                                 border: 'none',
                                 borderRadius: '4px',
                                 cursor: 'pointer',
@@ -597,13 +693,13 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
                             <span
                               data-testid={`no-surviving-nodes-${shard.shardIndex}`}
                               role="alert"
-                              style={{ color: '#f87171', fontSize: '0.75rem', fontWeight: 600 }}
+                              style={{ color: 'var(--color-status-offline)', fontSize: '0.75rem', fontWeight: 600 }}
                             >
                               생존 노드 없음 (복구 불가)
                             </span>
                           )
                         ) : (
-                          <span style={{ color: '#10b981', fontSize: '0.75rem' }}>정상</span>
+                          <span style={{ color: 'var(--color-status-online)', fontSize: '0.75rem' }}>정상</span>
                         )}
                       </td>
                     </tr>
@@ -621,9 +717,9 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
           data-testid="execution-planner-section"
           style={{
             padding: '16px',
-            backgroundColor: '#1e293b',
+            backgroundColor: 'var(--color-bg-surface)',
             borderRadius: '8px',
-            border: '1px solid #334155',
+            border: '1px solid var(--color-border-subtle)',
             display: 'flex',
             flexDirection: 'column',
             gap: '12px',
@@ -633,36 +729,28 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
             <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>
               분산 실행 계획기 (Execution Planner - ADR-028/041)
             </h3>
-            {executionPlan.isFeasible ? (
-              <span
-                data-testid="plan-feasible-badge"
-                style={{
-                  padding: '4px 8px',
-                  backgroundColor: 'rgba(16, 185, 129, 0.2)',
-                  color: '#6ee7b7',
-                  borderRadius: '4px',
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                }}
-              >
-                배치 가능 (Feasible) · 점수 {executionPlan.localityScore}점
-              </span>
-            ) : (
-              <span
-                data-testid="plan-infeasible-badge"
-                role="alert"
-                style={{
-                  padding: '4px 8px',
-                  backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                  color: '#fca5a5',
-                  borderRadius: '4px',
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                }}
-              >
-                배치 불가
-              </span>
-            )}
+            {(() => {
+              const planCfg = getPlanFeasibilityConfig(executionPlan.isFeasible);
+              return (
+                <span
+                  data-testid={executionPlan.isFeasible ? 'plan-feasible-badge' : 'plan-infeasible-badge'}
+                  role={executionPlan.isFeasible ? undefined : 'alert'}
+                  style={{
+                    padding: '4px 8px',
+                    backgroundColor: planCfg.bg,
+                    border: `1px solid ${planCfg.border}`,
+                    color: planCfg.color,
+                    borderRadius: '4px',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                  }}
+                >
+                  {executionPlan.isFeasible
+                    ? `${planCfg.label} · 점수 ${executionPlan.localityScore}점`
+                    : planCfg.label}
+                </span>
+              );
+            })()}
           </div>
 
           {/* ADR-041 LAN Constraint Warning */}
@@ -672,10 +760,10 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
               role="alert"
               style={{
                 padding: '10px 14px',
-                backgroundColor: 'rgba(245, 158, 11, 0.15)',
-                border: '1px solid #f59e0b',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-status-degraded)',
                 borderRadius: '6px',
-                color: '#fde68a',
+                color: 'var(--color-status-degraded)',
                 fontSize: '0.8125rem',
                 lineHeight: 1.5,
               }}
@@ -691,10 +779,10 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
               role="alert"
               style={{
                 padding: '10px 14px',
-                backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                border: '1px solid #ef4444',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-status-offline)',
                 borderRadius: '6px',
-                color: '#fca5a5',
+                color: 'var(--color-status-offline)',
                 fontSize: '0.8125rem',
               }}
             >
@@ -704,16 +792,16 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
 
           {/* Mode Selector */}
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-            <label style={{ fontSize: '0.8125rem', color: '#cbd5e1' }}>실행 모드:</label>
+            <label style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)' }}>실행 모드:</label>
             <select
               data-testid="execution-mode-select"
               value={selectedMode}
               onChange={(e) => setSelectedMode(e.target.value as ExecutionPlanMode)}
               style={{
                 padding: '6px 10px',
-                backgroundColor: '#0f172a',
-                color: '#f8fafc',
-                border: '1px solid #475569',
+                backgroundColor: 'var(--color-bg-subtle)',
+                color: 'var(--color-text-primary)',
+                border: '1px solid var(--color-border-subtle)',
                 borderRadius: '4px',
                 fontSize: '0.8125rem',
               }}
@@ -733,7 +821,7 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
               style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8125rem' }}
             >
               <thead>
-                <tr style={{ borderBottom: '1px solid #475569', color: '#94a3b8' }}>
+                <tr style={{ borderBottom: '1px solid var(--color-border-subtle)', color: 'var(--color-text-secondary)' }}>
                   <th style={{ padding: '6px 8px' }}>선택</th>
                   <th style={{ padding: '6px 8px' }}>노드</th>
                   <th style={{ padding: '6px 8px' }}>GPU / VRAM</th>
@@ -745,12 +833,13 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
                 {clusterNodes.map((node) => {
                   const isObservation = node.observationOnly || node.schedulable === false;
                   const isChecked = selectedNodeIds.includes(node.id);
+                  const eligCfg = getNodeEligibilityConfig(isObservation);
 
                   return (
                     <tr
                       key={node.id}
                       data-testid={`node-row-${node.id}`}
-                      style={{ borderBottom: '1px solid #334155' }}
+                      style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
                     >
                       <td style={{ padding: '6px 8px' }}>
                         <input
@@ -782,15 +871,16 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
                               padding: '2px 6px',
                               borderRadius: '4px',
                               fontSize: '0.6875rem',
-                              backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                              color: '#fca5a5',
+                              backgroundColor: eligCfg.bg,
+                              border: `1px solid ${eligCfg.border}`,
+                              color: eligCfg.color,
                               fontWeight: 600,
                             }}
                           >
-                            관측 전용 노드 (연산 할당 불가)
+                            {eligCfg.label}
                           </span>
                         ) : (
-                          <span style={{ color: '#10b981', fontSize: '0.75rem' }}>할당 가능</span>
+                          <span style={{ color: eligCfg.color, fontSize: '0.75rem' }}>{eligCfg.label}</span>
                         )}
                       </td>
                     </tr>
