@@ -271,7 +271,7 @@ jobs:
           import xml.etree.ElementTree as ET
           root = ET.parse('dist/build-product-runtime-real-pg.xml').getroot()
           cases = root.findall('.//testcase')
-          assert len(cases) == 10, f'Expected 10 build admission cases, got {len(cases)}'
+          assert len(cases) == 12, f'Expected 12 build admission cases, got {len(cases)}'
           assert not root.findall('.//skipped'), 'Build admission real-PG cases must execute'
           assert not any(root.findall('.//' + tag) for tag in ('failure', 'error'))
           PY

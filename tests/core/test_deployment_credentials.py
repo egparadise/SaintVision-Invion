@@ -145,10 +145,13 @@ def test_worker_service_is_private_configured_and_build_dispatch_defaults_off():
     worker = compose["services"]["worker"]
     assert worker["command"] == ["python", "-m", "inv.worker"]
     assert "ports" not in worker
-    environment = set(worker["environment"])
-    assert "INV_WORKER_CONFIG=/run/saintvision/worker.json" in environment
-    assert "INV_API_CONFIG=/run/saintvision/api.json" in environment
-    assert "INV_BUILDKIT_PRODUCT_ENABLED=${INV_BUILDKIT_PRODUCT_ENABLED:-0}" in environment
+    environment = worker["environment"]
+    assert environment.count("INV_WORKER_CONFIG=/run/saintvision/worker.json") == 1
+    assert environment.count("INV_API_CONFIG=/run/saintvision/api.json") == 1
+    build_flags = [item for item in environment if item.startswith("INV_BUILDKIT_PRODUCT_ENABLED=")]
+    assert build_flags == [
+        "INV_BUILDKIT_PRODUCT_ENABLED=${INV_BUILDKIT_PRODUCT_ENABLED:-0}"
+    ]
     assert not any(item.startswith("INV_BUSINESS_DSN=") for item in environment)
     mount = next(item for item in worker["volumes"] if item["target"] == "/run/saintvision")
     assert mount["source"] == "server_config"

@@ -10,7 +10,7 @@ from time import monotonic
 import psycopg
 import pytest
 
-from inv.approvals import Principal
+from inv.approvals import ApprovalStore, Principal
 from inv.build_execution import BuildExecutionResult, PRODUCT_ENABLE_SETTING
 from inv.build_execution_worker import BuildExecutionIntentQueue, BuildExecutionWorker
 from inv.build_governance import canonical_build_action
@@ -35,8 +35,8 @@ def _authority(env, *, grant=True, node_id=None):
     run = env.runs.create(env.tenant, env.project)
     run = env.runs.transition(env.tenant, run["runId"], "validated", expected_version=1)
     run = env.runs.transition(env.tenant, run["runId"], "planned", expected_version=2)
-    run = env.runs.transition(env.tenant, run["runId"], "scheduled", expected_version=3)
     subject = "oidc:build-product-operator"
+    approver = "oidc:build-product-approver"
     lease_id = new_id("lse")
     resource_id = new_id("res")
     expires = datetime.now(timezone.utc) + timedelta(minutes=4)
@@ -56,8 +56,14 @@ def _authority(env, *, grant=True, node_id=None):
             conn.execute(
                 """INSERT INTO inv.project_grants(
                 tenant_id,project_id,subject_id,can_request,can_approve,enabled
-                ) VALUES (%s,%s,%s,true,false,true)""",
+                ) VALUES (%s,%s,%s,true,false,true) ON CONFLICT DO NOTHING""",
                 (env.tenant, env.project, subject),
+            )
+            conn.execute(
+                """INSERT INTO inv.project_grants(
+                tenant_id,project_id,subject_id,can_request,can_approve,enabled
+                ) VALUES (%s,%s,%s,false,true,true) ON CONFLICT DO NOTHING""",
+                (env.tenant, env.project, approver),
             )
         conn.execute(
             "INSERT INTO inv.resources VALUES (%s,%s,%s,'cpu',10,10)",
@@ -92,7 +98,7 @@ def _authority(env, *, grant=True, node_id=None):
         "tenantId": env.tenant,
         "projectId": env.project,
         "subjectId": subject,
-        "effect": "allow",
+        "effect": "require_approval",
         "riskLevel": "L1",
         "actionDigest": action_digest(canonical_build_action(request)),
         "expiresAt": _timestamp(policy_expires),
@@ -135,22 +141,132 @@ def _authority(env, *, grant=True, node_id=None):
         "secretRefsDigest": "e" * 64,
         "resolvedBaseImageDigests": ["sha256:" + "f" * 64],
     }
-    return Principal(env.tenant, subject), run["runId"], request, plan, decision
-
-
-def _record(env, *, grant=True, node_id=None):
-    principal, run_id, request, plan, decision = _authority(env, grant=grant, node_id=node_id)
-    evidence_id = new_id("evd")
-    admission = TrustedBuildAdmissionEntry(env.db).record_committed(
-        principal,
+    return (
+        Principal(env.tenant, subject),
+        Principal(env.tenant, approver),
+        run,
         request,
         plan,
         decision,
+    )
+
+
+def _approved_build(env, *, grant=True, node_id=None):
+    principal, approver, run, request, plan, decision = _authority(
+        env, grant=grant, node_id=node_id
+    )
+    evidence_id = new_id("evd")
+    approvals = ApprovalStore(env.db)
+    row = approvals.request(
+        principal,
+        run["runId"],
+        request,
+        decision,
         policy_version="s08-build-v1",
-        run_id=run_id,
+        expected_version=run["version"],
+        key="build-request:" + run["runId"],
+    )
+    challenge = approvals.challenge(approver, env.project, row["approvalId"])
+    row = approvals.decide(
+        approver,
+        env.project,
+        row["approvalId"],
+        "approve",
+        challenge["nonce"],
+        action_digest=row["actionDigest"],
+        key="build-decision:" + run["runId"],
+    )
+    assert row["status"] == "approved"
+    return principal, approver, run, request, plan, decision, row, evidence_id
+
+
+def _record(env, *, grant=True, node_id=None):
+    principal, approver, run, request, plan, decision, row, evidence_id = _approved_build(
+        env, grant=grant, node_id=node_id
+    )
+    approvals = ApprovalStore(env.db)
+    approvals.dispatch(
+        principal,
+        env.project,
+        row["approvalId"],
+        request,
+        key="build-dispatch:" + run["runId"],
+        build_plan=plan,
+        build_evidence_id=evidence_id,
+    )
+    approved_decision = {**decision, "approvedBy": [approver.subject_id]}
+    return TrustedBuildAdmissionEntry(env.db).record_committed(
+        principal,
+        request,
+        plan,
+        approved_decision,
+        policy_version="s08-build-v1",
+        run_id=run["runId"],
         evidence_id=evidence_id,
     )
-    return admission
+
+
+def test_uncommitted_or_merely_approved_decision_cannot_create_admission(env):
+    principal, approver, run, request, plan, decision = _authority(env)
+    uncommitted_run_id = run["runId"]
+    approved_decision = {**decision, "approvedBy": [approver.subject_id]}
+    with pytest.raises(DomainError) as missing:
+        TrustedBuildAdmissionEntry(env.db).record_committed(
+            principal,
+            request,
+            plan,
+            approved_decision,
+            policy_version="s08-build-v1",
+            run_id=run["runId"],
+            evidence_id=new_id("evd"),
+        )
+    assert missing.value.code == "AUTH-0031"
+
+    principal, approver, run, request, plan, decision, _row, evidence_id = _approved_build(
+        env, grant=False
+    )
+    approved_run_id = run["runId"]
+    with pytest.raises(DomainError) as not_dispatched:
+        TrustedBuildAdmissionEntry(env.db).record_committed(
+            principal,
+            request,
+            plan,
+            {**decision, "approvedBy": [approver.subject_id]},
+            policy_version="s08-build-v1",
+            run_id=run["runId"],
+            evidence_id=evidence_id,
+        )
+    assert not_dispatched.value.code == "AUTH-0032"
+    with psycopg.connect(env.owner) as conn:
+        assert conn.execute(
+            """SELECT count(*) FROM inv.build_execution_admissions
+            WHERE run_id = ANY(%s)""",
+            ([uncommitted_run_id, approved_run_id],),
+        ).fetchone()[0] == 0
+
+
+def test_build_dispatch_rejects_foreign_tenant_plan_and_rolls_back(env):
+    principal, _approver, run, request, plan, _decision, row, evidence_id = _approved_build(env)
+    plan["tenantId"] = env.other
+    with pytest.raises(DomainError) as caught:
+        ApprovalStore(env.db).dispatch(
+            principal,
+            env.project,
+            row["approvalId"],
+            request,
+            key="foreign-plan:" + run["runId"],
+            build_plan=plan,
+            build_evidence_id=evidence_id,
+        )
+    assert caught.value.code == "VERIFY-0002"
+    with psycopg.connect(env.owner) as conn:
+        assert conn.execute(
+            "SELECT count(*) FROM inv.build_execution_admissions WHERE run_id=%s",
+            (run["runId"],),
+        ).fetchone()[0] == 0
+        assert conn.execute(
+            "SELECT status FROM inv.approval_requests WHERE approval_id=%s", (row["approvalId"],)
+        ).fetchone()[0] == "approved"
 
 
 def _records_on_stale_node(env, count):
@@ -236,22 +352,23 @@ def test_committed_admission_promotes_atomically_and_is_tenant_isolated(env):
 
 
 def test_missing_project_permission_records_no_admission(env):
-    principal, run_id, request, plan, decision = _authority(env, grant=False)
+    principal, _approver, run, request, _plan, decision = _authority(env, grant=False)
     with pytest.raises(DomainError) as caught:
-        BuildExecutionAdmissionStore(env.db).record(
+        ApprovalStore(env.db).request(
             principal,
+            run["runId"],
             request,
-            plan,
             decision,
             policy_version="s08-build-v1",
-            run_id=run_id,
-            evidence_id=new_id("evd"),
+            expected_version=run["version"],
+            key="missing-permission:" + run["runId"],
         )
     assert caught.value.code == "AUTH-0030"
     with psycopg.connect(env.owner) as conn:
         assert (
             conn.execute(
-                "SELECT count(*) FROM inv.build_execution_admissions WHERE run_id=%s", (run_id,)
+                "SELECT count(*) FROM inv.build_execution_admissions WHERE run_id=%s",
+                (run["runId"],),
             ).fetchone()[0]
             == 0
         )

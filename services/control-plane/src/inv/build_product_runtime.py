@@ -16,7 +16,7 @@ from uuid import uuid4
 
 from psycopg.types.json import Jsonb
 
-from .approvals import Principal
+from .approvals import Principal, digest
 from .build_adapter import BuildExecutionAdapter, _database_now, _lock_live_build_authority
 from .build_execution import (
     PRODUCT_ENABLE_SETTING,
@@ -100,90 +100,184 @@ class BuildExecutionAdmissionStore:
         run_id: str,
         evidence_id: str,
     ) -> BuildExecutionAdmission:
+        with self.db.transaction(principal.tenant_id) as conn:
+            return self.record_on_connection(
+                conn,
+                principal,
+                request,
+                plan,
+                decision,
+                policy_version=policy_version,
+                run_id=run_id,
+                evidence_id=evidence_id,
+            )
+
+    def record_on_connection(
+        self,
+        conn,
+        principal: Principal,
+        request: Mapping[str, Any],
+        plan: Mapping[str, Any],
+        decision: Mapping[str, Any],
+        *,
+        policy_version: str,
+        run_id: str,
+        evidence_id: str,
+    ) -> BuildExecutionAdmission:
+        """Record inside the approval dispatch transaction after exact DB rebinding."""
+
         request_doc, plan_doc, decision_doc = _validated_documents(
             principal, request, plan, decision, policy_version=policy_version
         )
         project_id = request_doc["projectId"]
-        with self.db.transaction(principal.tenant_id) as conn:
-            Control(self.db).grant(conn, principal, project_id, "can_request")
-            now = _database_now(conn)
-            enforce_decision(
-                decision_doc,
-                action=canonical_build_action(request_doc),
-                tenant_id=principal.tenant_id,
-                project_id=project_id,
-                subject_id=principal.subject_id,
-                now=now,
-            )
-            _lock_live_build_authority(
-                conn,
-                request_doc,
-                plan_doc,
+        self._require_committed_approval(
+            conn,
+            principal,
+            request_doc,
+            decision_doc,
+            policy_version=policy_version,
+            run_id=run_id,
+        )
+        Control(self.db).grant(conn, principal, project_id, "can_request")
+        now = _database_now(conn)
+        enforce_decision(
+            decision_doc,
+            action=canonical_build_action(request_doc),
+            tenant_id=principal.tenant_id,
+            project_id=project_id,
+            subject_id=principal.subject_id,
+            now=now,
+        )
+        _lock_live_build_authority(
+            conn,
+            request_doc,
+            plan_doc,
+            run_id,
+            database_recovery_epoch=self.db.recovery_epoch,
+            now=now,
+        )
+        inserted = conn.execute(
+            """INSERT INTO inv.build_execution_admissions(
+            tenant_id,project_id,run_id,request,plan,decision,
+            policy_version,evidence_id,actor_id
+            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            ON CONFLICT DO NOTHING RETURNING run_id""",
+            (
+                principal.tenant_id,
+                project_id,
                 run_id,
-                database_recovery_epoch=self.db.recovery_epoch,
-                now=now,
-            )
-            inserted = conn.execute(
-                """INSERT INTO inv.build_execution_admissions(
-                tenant_id,project_id,run_id,request,plan,decision,
-                policy_version,evidence_id,actor_id
-                ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
-                ON CONFLICT DO NOTHING RETURNING run_id""",
+                Jsonb(request_doc),
+                Jsonb(plan_doc),
+                Jsonb(decision_doc),
+                policy_version,
+                evidence_id,
+                principal.subject_id,
+            ),
+        ).fetchone()
+        if inserted:
+            # The immutable authority record and its redacted audit event are
+            # committed together. Exact replay never emits a second event.
+            conn.execute(
+                """INSERT INTO inv.outbox(tenant_id,run_id,event_id,event_type,payload)
+                VALUES (%s,%s,%s,%s,%s)""",
                 (
                     principal.tenant_id,
-                    project_id,
                     run_id,
-                    Jsonb(request_doc),
-                    Jsonb(plan_doc),
-                    Jsonb(decision_doc),
-                    policy_version,
-                    evidence_id,
-                    principal.subject_id,
-                ),
-            ).fetchone()
-            if inserted:
-                # The immutable authority record and its redacted audit event are
-                # committed together.  Exact replay never emits a second event.
-                conn.execute(
-                    """INSERT INTO inv.outbox(tenant_id,run_id,event_id,event_type,payload)
-                    VALUES (%s,%s,%s,%s,%s)""",
-                    (
-                        principal.tenant_id,
-                        run_id,
-                        uuid4(),
-                        ADMITTED_EVENT,
-                        Jsonb(
-                            {
-                                "projectId": project_id,
-                                "runId": run_id,
-                                "decisionId": decision_doc["decisionId"],
-                                "evidenceId": evidence_id,
-                                "policyVersion": policy_version,
-                            }
-                        ),
+                    uuid4(),
+                    ADMITTED_EVENT,
+                    Jsonb(
+                        {
+                            "projectId": project_id,
+                            "runId": run_id,
+                            "decisionId": decision_doc["decisionId"],
+                            "evidenceId": evidence_id,
+                            "policyVersion": policy_version,
+                        }
                     ),
-                )
-            stored = conn.execute(
-                """SELECT * FROM inv.build_execution_admissions
-                WHERE project_id=%s AND run_id=%s FOR SHARE""",
-                (project_id, run_id),
-            ).fetchone()
-            if not stored:
-                raise DomainError("SYS-0001", "Build admission was not stored", 503)
-            candidate = _row(stored)
-            if (
-                candidate.request != request_doc
-                or candidate.plan != plan_doc
-                or candidate.decision != decision_doc
-                or candidate.policy_version != policy_version
-                or candidate.evidence_id != evidence_id
-                or candidate.actor_id != principal.subject_id
-            ):
-                raise DomainError("IDEM-0001", "Build admission replay differs", 409)
-            if candidate.status == "quarantined":
-                code = stored.get("last_error_code") or "VERIFY-0002"
-                raise DomainError(code, "Build admission is quarantined", 409)
-            return candidate
+                ),
+            )
+        stored = conn.execute(
+            """SELECT * FROM inv.build_execution_admissions
+            WHERE project_id=%s AND run_id=%s FOR SHARE""",
+            (project_id, run_id),
+        ).fetchone()
+        if not stored:
+            raise DomainError("SYS-0001", "Build admission was not stored", 503)
+        candidate = _row(stored)
+        if (
+            candidate.request != request_doc
+            or candidate.plan != plan_doc
+            or candidate.decision != decision_doc
+            or candidate.policy_version != policy_version
+            or candidate.evidence_id != evidence_id
+            or candidate.actor_id != principal.subject_id
+        ):
+            raise DomainError("IDEM-0001", "Build admission replay differs", 409)
+        if candidate.status == "quarantined":
+            code = stored.get("last_error_code") or "VERIFY-0002"
+            raise DomainError(code, "Build admission is quarantined", 409)
+        return candidate
+
+    def _require_committed_approval(
+        self,
+        conn,
+        principal: Principal,
+        request: Mapping[str, Any],
+        decision: Mapping[str, Any],
+        *,
+        policy_version: str,
+        run_id: str,
+    ) -> None:
+        """Bind the supplied decision to one dispatched human approval snapshot."""
+
+        approvals = conn.execute(
+            """SELECT * FROM inv.approval_requests
+            WHERE project_id=%s AND run_id=%s AND policy_decision_id=%s
+            ORDER BY approval_id FOR SHARE""",
+            (request["projectId"], run_id, decision["decisionId"]),
+        ).fetchall()
+        if len(approvals) != 1:
+            raise DomainError("AUTH-0031", "Committed build approval is unavailable", 403)
+        approval = approvals[0]
+        snapshot = conn.execute(
+            """SELECT workload,policy,policy_sha256
+            FROM inv.approval_review_snapshots WHERE approval_id=%s FOR SHARE""",
+            (approval["approval_id"],),
+        ).fetchone()
+        votes = conn.execute(
+            """SELECT actor_id FROM inv.approval_votes
+            WHERE approval_id=%s AND decision='approve' ORDER BY actor_id""",
+            (approval["approval_id"],),
+        ).fetchall()
+        dispatched = conn.execute(
+            "SELECT 1 FROM inv.approval_dispatches WHERE approval_id=%s FOR SHARE",
+            (approval["approval_id"],),
+        ).fetchone()
+        actors = sorted({row["actor_id"] for row in votes})
+        if not snapshot:
+            raise DomainError("AUTH-0031", "Committed build approval is unavailable", 403)
+        expected_decision = deepcopy(snapshot["policy"])
+        expected_decision["approvedBy"] = actors
+        expected_action = action_digest(canonical_build_action(dict(request)))
+        if any(
+            (
+                str(approval["tenant_id"]) != principal.tenant_id,
+                approval["project_id"] != request["projectId"],
+                approval["run_id"] != run_id,
+                approval["requester_id"] != principal.subject_id,
+                approval["status"] != "dispatched",
+                approval["action_digest"] != expected_action,
+                approval["policy_version"] != policy_version,
+                str(approval["recovery_epoch"]) != self.db.recovery_epoch,
+                snapshot["workload"] != request,
+                digest(snapshot["policy"]) != snapshot["policy_sha256"],
+                expected_decision != decision,
+                principal.subject_id in actors,
+                len(actors) < approval["required_approvals"],
+                not dispatched,
+            )
+        ):
+            raise DomainError("AUTH-0032", "Committed build approval binding differs", 403)
 
     def promote_next(self, tenant_id: str) -> BuildExecutionAdmission | None:
         """Atomically revalidate one admission and create its 0059 intent."""
@@ -343,12 +437,12 @@ class BuildExecutionAdmissionStore:
 
 
 class TrustedBuildAdmissionEntry:
-    """Internal-only product seam for already committed build authority.
+    """Internal-only product seam for approval-dispatched build authority.
 
     This object is installed in the configured Control Plane composition root,
-    but no HTTP route or CLI exposes it.  The upstream policy/planning service
-    must supply the exact committed documents; this boundary never synthesizes
-    a request, plan, decision, actor, Run, or Evidence identifier.
+    but no HTTP route or CLI exposes it. ApprovalStore dispatch supplies the
+    exact reviewed request and approved decision; this boundary rebinds them to
+    the database snapshot before recording any admission.
     """
 
     def __init__(self, database):
@@ -364,12 +458,14 @@ class TrustedBuildAdmissionEntry:
         policy_version: str,
         run_id: str,
         evidence_id: str,
+        connection=None,
     ) -> BuildExecutionAdmission:
-        return self._store.record(
-            principal,
-            request,
-            plan,
-            decision,
+        method = self._store.record if connection is None else self._store.record_on_connection
+        args = (principal, request, plan, decision)
+        if connection is not None:
+            args = (connection, *args)
+        return method(
+            *args,
             policy_version=policy_version,
             run_id=run_id,
             evidence_id=evidence_id,

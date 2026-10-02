@@ -359,7 +359,13 @@ def test_record_rechecks_permission_policy_and_live_lease_before_insert(monkeypa
         "_lock_live_build_authority",
         lambda *args, **kwargs: calls.append("lease"),
     )
-    result = BuildExecutionAdmissionStore(_Database(connection)).record(
+    store = BuildExecutionAdmissionStore(_Database(connection))
+    monkeypatch.setattr(
+        store,
+        "_require_committed_approval",
+        lambda *args, **kwargs: calls.append("approval"),
+    )
+    result = store.record(
         Principal(TENANT, SUBJECT),
         request,
         plan,
@@ -369,7 +375,7 @@ def test_record_rechecks_permission_policy_and_live_lease_before_insert(monkeypa
         evidence_id=EVIDENCE,
     )
     assert result.status == "ready"
-    assert calls == ["grant", "policy", "lease"]
+    assert calls == ["approval", "grant", "policy", "lease"]
     insert = next(sql for sql, _ in connection.statements if sql.startswith("INSERT INTO"))
     assert "inv.build_execution_admissions" in insert
     assert "ON CONFLICT DO NOTHING" in insert
@@ -416,8 +422,13 @@ def test_trusted_product_entry_delegates_exact_committed_documents(monkeypatch):
 
 def test_trusted_entry_is_composed_in_process_without_a_public_route():
     entry = object()
+    baseline = create_app()
     api = create_app(build_admission_entry=entry)
     assert api.state.build_admission_entry is entry
-    assert not any("build-admission" in route.path for route in api.routes)
+    assert [(route.path, tuple(getattr(route, "methods", ()) or ())) for route in api.routes] == [
+        (route.path, tuple(getattr(route, "methods", ()) or ())) for route in baseline.routes
+    ]
     source = (ROOT / "services/control-plane/src/inv/app.py").read_text(encoding="utf-8")
     assert "build_admission_entry=TrustedBuildAdmissionEntry(database)" in source
+    approvals = (ROOT / "services/control-plane/src/inv/approvals.py").read_text(encoding="utf-8")
+    assert "TrustedBuildAdmissionEntry(self.db).record_committed(" in approvals
