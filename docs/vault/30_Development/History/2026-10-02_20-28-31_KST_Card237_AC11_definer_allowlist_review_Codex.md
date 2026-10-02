@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD237-AC11-DEFINER-ALLOWLIST-20261002"
 title: "Card 237 AC-11 SECURITY DEFINER allowlist review"
-version: "1.4.0"
+version: "1.5.0"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T21:27:57+09:00"
+updated: "2026-10-02T22:57:28+09:00"
 source_of_truth: "Git"
 base_sha: "843d283c1ee70cc021385b0f8f25ec323d434829"
 reviewer: "Claude"
@@ -91,3 +91,21 @@ allowlist was mechanically repinned as well. Its resulting blob is
 `8f1a36c6584413c4ea308f35853c1f675f280fe9`. This second pin remains about the
 `ac11-security-scan.yml` producer and does not replace the distinct SEC-VF browser
 authority.
+
+# Migration 0060 composition rebind
+
+Merge commit `4c90791c4ae4de9c22eae0cd827c2699cf6622eb` composes the approved Card 237
+tree with train 26 candidate `a2d64b6193913a56448a0ef495d1b7b374de2a54` without changing either product
+implementation. Train 26 advances `tools/definer-policy.json` from revision
+`0059_build_execution_intents` to `0060_build_execution_admissions`; migration 0060
+adds no SECURITY DEFINER function, so the reviewed inventory remains the same exact
+15 signatures. The reviewer-owned source is rebound to that 0060 revision and the
+generator confirms the existing allowlist blob `54f8edf27a845a35e1428b69bcdff6754de91bbc`
+and canonical SHA-256 `c75fc38a5a988852e6068329b901d6f01e6fa0aa7aab5dbab2846137fc16836e`.
+
+Focused regression after composition passed `test_write_ac11_security_allowlist.py`
+11/11, `test_find_ac11_vf_evidence.py` 60/60, and
+`test_import_ac11_security_scan.py` 128/128. Combined-tree hosted security run
+`37012727613` independently observed SEC-RLS-001 PASS with zero violations and
+SEC-DEF-001 `matches_reviewed_policy`; this run is corroborating train evidence rather
+than a substitute for exact-head Backend and Core checks on this PR.
