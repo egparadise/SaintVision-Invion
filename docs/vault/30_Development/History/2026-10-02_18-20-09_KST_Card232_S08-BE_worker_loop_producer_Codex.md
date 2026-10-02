@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD232-S08-BE-WORKER-PRODUCER-20261002"
 title: "Card 232 S08-BE product worker loop and trusted intent producer"
-version: "1.4.0"
+version: "1.5.0"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T20:12:31+09:00"
+updated: "2026-10-02T20:22:58+09:00"
 source_of_truth: "Git"
 base_sha: "c57697d2ab80877f44e189c1efe172a6dd03a7e6"
 reviewer: "Claude"
@@ -160,3 +160,19 @@ The local workstation could only compile these two changed Python files: its ins
 Python 3.14 has no pytest package and default Python 3.10 cannot import `enum.StrEnum`.
 The real-PG result is therefore an exact-head hosted Core merge condition, not a local
 measurement claim.
+
+# Claude r3 bounded-tick correction
+
+The r2 `continue` fix could select the same oldest row again if validation of a large
+stale queue took longer than its one-second backoff. One `promote_next` call could then
+run indefinitely instead of returning control to the product loop. Each call now has a
+fixed 128-candidate budget and a call-local set of visited Run IDs. The SQL selection
+continues to exclude future `next_attempt_at` values and also excludes every row already
+visited by the current call. Exhausting the budget returns without weakening the durable
+per-row backoff or the next tick's ability to retry it.
+
+The hosted real-PostgreSQL regression creates 60 admissions on one stale Node followed
+by one healthy admission. A single promotion call must visit each stale row once, leave
+all 60 at `ready/RES-0003/retry_count=1`, promote the healthy row, and return in under
+15 seconds. Removing the visited-row SQL exclusion recreates the reviewer-observed
+long-running selection; reducing the budget below the healthy row prevents promotion.

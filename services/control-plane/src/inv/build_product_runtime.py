@@ -44,6 +44,7 @@ from .tooling import NodePrincipal
 PROMOTED_EVENT = "inv.build.intent_enqueued"
 TRANSIENT_PROMOTION_CODES = frozenset({"RES-0003", "RES-0007"})
 PROMOTION_RETRY_DELAY_SECONDS = 1
+MAX_PROMOTION_CANDIDATES_PER_TICK = 128
 
 
 @dataclass(frozen=True)
@@ -164,7 +165,8 @@ class BuildExecutionAdmissionStore:
     def promote_next(self, tenant_id: str) -> BuildExecutionAdmission | None:
         """Atomically revalidate one admission and create its 0059 intent."""
 
-        while True:
+        seen_run_ids: set[str] = set()
+        while len(seen_run_ids) < MAX_PROMOTION_CANDIDATES_PER_TICK:
             with self.db.transaction(tenant_id) as conn:
                 stored = conn.execute("""SELECT *,
                     request_sha256 = encode(sha256(convert_to(request::text,'UTF8')),'hex')
@@ -173,11 +175,15 @@ class BuildExecutionAdmissionStore:
                       AS digests_match
                     FROM inv.build_execution_admissions
                     WHERE status='ready' AND next_attempt_at <= clock_timestamp()
+                      AND NOT (run_id = ANY(%s::text[]))
                     ORDER BY created_at,project_id,run_id
-                    LIMIT 1 FOR UPDATE SKIP LOCKED""").fetchone()
+                    LIMIT 1 FOR UPDATE SKIP LOCKED""",
+                    (sorted(seen_run_ids),),
+                ).fetchone()
                 if not stored:
                     return None
                 admission = _row(stored)
+                seen_run_ids.add(admission.run_id)
                 if stored.get("digests_match") is not True:
                     conn.execute(
                         """UPDATE inv.build_execution_admissions
@@ -309,6 +315,7 @@ class BuildExecutionAdmissionStore:
                     ),
                 )
                 return admission
+        return None
 
 
 class BuildProductRuntime:

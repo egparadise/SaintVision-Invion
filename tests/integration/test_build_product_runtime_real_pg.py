@@ -5,6 +5,7 @@ from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from threading import Lock
+from time import monotonic
 
 import psycopg
 import pytest
@@ -391,3 +392,42 @@ def test_retryable_stale_admission_does_not_block_next_due_admission(env):
         healthy.run_id: "promoted:",
     }
     assert retries == (1, True)
+
+
+def test_promotion_tick_bounds_sixty_stale_admissions_and_reaches_healthy_row(env):
+    stale = [_record(env, grant=index == 0) for index in range(60)]
+    stale_node = new_id("nod")
+    with psycopg.connect(env.owner) as conn:
+        conn.execute(
+            """INSERT INTO inv.nodes(
+            tenant_id,node_id,status,heartbeat_at,recovery_epoch,clock_skew_seconds
+            ) VALUES (%s,%s,'online',clock_timestamp()-interval '1 hour',%s,0)""",
+            (env.tenant, stale_node, env.epoch),
+        )
+        conn.execute(
+            """UPDATE inv.resources SET node_id=%s
+            WHERE tenant_id=%s AND resource_id = ANY(%s::text[])""",
+            (
+                stale_node,
+                env.tenant,
+                [admission.plan["lease"]["resourceId"] for admission in stale],
+            ),
+        )
+
+    healthy = _record(env, grant=False)
+    started = monotonic()
+    promoted = BuildExecutionAdmissionStore(env.db).promote_next(env.tenant)
+    elapsed = monotonic() - started
+
+    assert promoted == healthy
+    assert elapsed < 15
+    with psycopg.connect(env.owner) as conn:
+        stale_counts = conn.execute(
+            """SELECT count(*),count(*) FILTER (
+                WHERE status='ready' AND last_error_code='RES-0003'
+                  AND retry_count=1 AND next_attempt_at > created_at
+            ) FROM inv.build_execution_admissions
+            WHERE run_id = ANY(%s::text[])""",
+            ([admission.run_id for admission in stale],),
+        ).fetchone()
+    assert stale_counts == (60, 60)
