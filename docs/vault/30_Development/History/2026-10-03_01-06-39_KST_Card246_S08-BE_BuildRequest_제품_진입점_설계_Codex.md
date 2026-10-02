@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-CARD-246-S08-BE-BUILD-REQUEST-ENTRY-001"
 title: "Card 246 S08-BE BuildRequest 제품 진입점 설계"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-03T01:16:21+09:00"
+updated: "2026-10-03T01:25:07+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "53458da3604027e91d428e11db02bc09d279097c"
@@ -30,7 +30,8 @@ intent를 서버 소유 BuildRequest/BuildPlan/PolicyDecision으로 바꾸는 �
 - 기존 approval review/challenge/decision과 distinct quorum을 재사용한다.
 - prepare-review 사이 immutable authority를 저장할 새 table이 필요하다. coordinator는 Claude가
   이 필요성을 승인하는 조건으로 0061을 예약했다. 승인 전 migration 파일은 만들지 않으며,
-  승인 뒤 0060 단일 부모·만료/35일 보존·RLS census 생성·필요한 definer 재검토를 적용한다.
+  승인 뒤 0060 단일 부모·만료/최소 35일 보존·DB-backed rate window·RLS census 생성·필요한
+  definer 재검토를 적용한다. v1은 DELETE를 허용하지 않고 별도 GC 계약 전까지 보존한다.
 - flag 기본 off, 실제 builder/LAN 인수 NOT_OBSERVED, S08-BE 점수 불변이다.
 
 설계 PR은 [#341](https://github.com/egparadise/SaintVision-Invion/pull/341)이며 reviewer는 Claude다.

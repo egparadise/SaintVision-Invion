@@ -1,11 +1,11 @@
 ---
 doc_id: "DESIGN-S08-BE-BUILD-REQUEST-ENTRY-001"
 title: "S08-BE BuildRequest 제품 진입점 설계"
-version: "1.0.1"
+version: "1.0.2"
 status: "proposed"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-03T01:16:21+09:00"
+updated: "2026-10-03T01:25:07+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "53458da3604027e91d428e11db02bc09d279097c"
@@ -119,7 +119,7 @@ lease expiry, containment)는 새 값과 exact binding이 다르면 fail closed�
 | 승인자 | requester와 다른 활성 사용자, 기존 challenge nonce, current quorum. `approvedBy`는 DB votes에서만 재구성한다. |
 | idempotency | operation은 path identity를 포함한 `build.prepare:{project}:{run}` / `build.enqueue:{project}:{run}:{build}`. replay 전에도 인증·권한을 다시 검사한다. |
 | 동시성 | run마다 nonterminal build preparation 하나. 두 prepare/enqueue가 경합하면 row lock+unique constraint로 한 건만 전이하고 패자는 exact replay 또는 `IDEM-0001`이다. |
-| rate limit | tenant+project+subject 기준 prepare 5회/분, enqueue 10회/분. DB-backed fixed window이고 재시작으로 초기화하지 않는다. 초과는 `RES-0007/429/retryable=true`; idempotent replay는 새 quota를 소비하지 않는다. |
+| rate limit | tenant+project+subject 기준 prepare 5회/분, enqueue 10회/분. 0061의 DB-backed fixed-window counter를 project row와 함께 잠그므로 재시작으로 초기화되지 않는다. 초과는 `RES-0007/429/retryable=true`; 인증·권한 확인을 마친 exact replay는 새 quota를 소비하지 않는다. |
 | 감사 | `inv.build.preparation_requested`, `inv.build.approval_bound`, `inv.build.enqueue_requested`, 카드 241의 `inv.build.admission_recorded`. ID와 digest만 기록하고 plan, paths, secret aliases, token은 기록하지 않는다. |
 
 감사 쓰기 실패는 business transaction 전체를 rollback한다. 권한·quorum·rate-limit 거부에는
@@ -141,11 +141,17 @@ Claude가 이 설계에서 table 필요성을 승인하면 확정하며, 승인 
 - strict request/plan/decision JSONB와 각 canonical SHA-256, checkout content hash,
   evidence ID, status(`awaiting_approval|approved|queued|rejected|expired`);
 - FORCE RLS, tenant exact policy, `inv_kernel` 최소 column grant;
-- payload/identity immutable trigger, 허용된 status 전이만 update, DELETE 금지;
+- payload/identity immutable trigger, 허용된 status 전이만 update, application DELETE 금지;
 - `expires_at`은 approval/policy/lease 중 가장 이른 시각 이하이고 최대 1시간이다. 만료 row는
   dispatch할 수 없고 `expired` terminal 전이와 감사만 허용한다;
-- terminal row는 감사·재현을 위해 35일 보존한 뒤 별도 운영 GC가 digest receipt를 남기고
-  삭제한다. migration downgrade는 row가 한 건이라도 있으면 거부한다.
+- terminal row는 감사·재현을 위해 최소 35일 보존한다. 0061 v1은 모든 DELETE를 거부하며,
+  삭제는 별도 승인된 GC 계약과 digest receipt가 생기기 전까지 NOT_IMPLEMENTED다. migration
+  downgrade는 row가 한 건이라도 있으면 거부한다.
+
+같은 0061에 `inv.build_preparation_rate_windows`를 둔다. PK는
+`(tenant_id,project_id,subject_id,operation,window_started_at)`이고 count와 expiry만 저장한다.
+FORCE RLS와 application DELETE 거부를 똑같이 적용하며, 만료 counter 정리는 별도 운영 GC 전까지
+하지 않는다. prepare payload나 identity token은 이 table에 저장하지 않는다.
 
 승인 snapshot과 preparation은 같은 transaction에서 만들어지며 approval ID와 action digest가
 양방향 exact match해야 한다. 구현 PR은 `tools/write_rls_table_census.py`로 RLS census와 ground
