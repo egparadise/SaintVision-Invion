@@ -7,6 +7,7 @@ import path from 'node:path';
 import ts from 'typescript';
 import { RunDetail } from '../src/features/runs/RunDetail';
 import { SealRecordPanel } from '../src/features/runs/SealRecordPanel';
+import { RunList } from '../src/features/runs/RunList';
 import { NodeList } from '../src/features/nodes/NodeList';
 import { NodeDetail } from '../src/features/nodes/NodeDetail';
 import { DeveloperStudio } from '../src/features/studio/DeveloperStudio';
@@ -285,7 +286,7 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/release/ReleaseCandidateView.tsx": {"#0d1117": 1, "#161b22": 7, "#21262d": 2, "#30363d": 11, "#3fb950": 10, "#58a6ff": 5, "#8b949e": 22, "#c9d1d9": 2, "#d29922": 2, "#f0f6fc": 7, "#f85149": 5, "rgba(139,148,158,0.1)": 1, "rgba(139,148,158,0.2)": 1, "rgba(248,81,73,0.15)": 1, "rgba(248,81,73,0.2)": 2, "rgba(46,160,67,0.15)": 1, "rgba(46,160,67,0.2)": 2, "rgba(56,139,253,0.12)": 1, "rgba(56,139,253,0.2)": 1},
   "features/release/releaseEngine.ts": {"#0d1117": 1, "#6e7681": 1},
   "features/runs/RunDetail.tsx": {},
-  "features/runs/RunList.tsx": {"#0284c7": 1, "#06b6d4": 1, "#10b981": 3, "#3b82f6": 3, "#58a6ff": 1, "#60a5fa": 1, "#64748b": 1, "#6b7280": 1, "#8b5cf6": 2, "#d97706": 2, "#ef4444": 4, "#f59e0b": 1, "#f85149": 2, "#f97316": 1, "#fca5a5": 2, "#fff": 1, "#ffffff": 1, "rgba(100,116,139,0.15)": 1, "rgba(107,114,128,0.15)": 1, "rgba(139,92,246,0.1)": 1, "rgba(139,92,246,0.15)": 1, "rgba(139,92,246,0.3)": 1, "rgba(16,185,129,0.15)": 1, "rgba(2,132,199,0.15)": 1, "rgba(217,119,6,0.15)": 1, "rgba(239,68,68,0.08)": 1, "rgba(239,68,68,0.1)": 1, "rgba(239,68,68,0.15)": 1, "rgba(245,158,11,0.15)": 1, "rgba(249,115,22,0.15)": 1, "rgba(59,130,246,0.1)": 1, "rgba(59,130,246,0.15)": 1, "rgba(59,130,246,0.2)": 1, "rgba(59,130,246,0.3)": 1, "rgba(6,182,212,0.15)": 1},
+  "features/runs/RunList.tsx": {},
   "features/runs/SealRecordPanel.tsx": {},
   "features/studio/DeveloperStudio.tsx": {},
   "features/terminal/WebTerminal.tsx": {"#090d16": 1, "#0d1117": 1, "#161b22": 1, "#1c1917": 1, "#238636": 1, "#30363d": 2, "#451a03": 1, "#58a6ff": 1, "#6b7280": 1, "#7f1d1d": 1, "#8b949e": 5, "#c9d1d9": 2, "#d29922": 1, "#d97706": 1, "#ea580c": 1, "#ef4444": 2, "#f0f6fc": 2, "#f85149": 1, "#fb923c": 1, "#fde68a": 2, "#fecaca": 1, "#fed7aa": 1, "#fff": 1},
@@ -4073,6 +4074,476 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(runStats.violations, `RunDetail violations:\n${runStats.violations.join('\n')}`).toEqual([]);
   });
 
+  // 9i. [Card 215 / ACC-09] Component DOM Rendering Verification: RunList binds to design tokens with dynamic contrast verification
+  it('ACC-09 / Card 215: RunList component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification', async () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    const sampleRuns: RunItem[] = [
+      { id: 'run_draft_01', projectId: 'prj_01', state: 'draft', objective: '초안 작업', requestedBy: 'user_1', createdAt: '2026-10-02T01:00:00Z' },
+      { id: 'run_val_01', projectId: 'prj_01', state: 'validated', objective: '검증 작업', requestedBy: 'user_1', createdAt: '2026-10-02T02:00:00Z' },
+      { id: 'run_plan_01', projectId: 'prj_01', state: 'planned', objective: '계획 수립', requestedBy: 'user_1', createdAt: '2026-10-02T03:00:00Z' },
+      { id: 'run_await_01', projectId: 'prj_01', state: 'awaiting_approval', objective: '승인 대기', requestedBy: 'user_1', createdAt: '2026-10-02T04:00:00Z' },
+      { id: 'run_sched_01', projectId: 'prj_01', state: 'scheduled', objective: '스케줄됨', requestedBy: 'user_1', createdAt: '2026-10-02T05:00:00Z' },
+      { id: 'run_run_01', projectId: 'prj_01', state: 'running', objective: '실행 중', requestedBy: 'user_1', createdAt: '2026-10-02T06:00:00Z', stateUpdatedAt: '2026-10-02T06:10:00Z' },
+      { id: 'run_ver_01', projectId: 'prj_01', state: 'verifying', objective: '결과 검증', requestedBy: 'user_1', createdAt: '2026-10-02T07:00:00Z' },
+      { id: 'run_rec_01', projectId: 'prj_01', state: 'recovering', objective: '복구 중', requestedBy: 'user_1', createdAt: '2026-10-02T08:00:00Z', resourceReleasePending: true },
+      { id: 'run_succ_01', projectId: 'prj_01', state: 'succeeded', objective: '성공 작업', requestedBy: 'user_1', createdAt: '2026-10-02T09:00:00Z', completedAt: '2026-10-02T09:15:00Z', parentId: 'run_parent_999999999', shardIndex: 2 },
+      { id: 'run_fail_01', projectId: 'prj_01', state: 'failed', objective: '실패 작업', requestedBy: 'user_1', createdAt: '2026-10-02T10:00:00Z', completedAt: '2026-10-02T10:05:00Z', childRunIds: ['run_c1', 'run_c2'] },
+      { id: 'run_canc_01', projectId: 'prj_01', state: 'cancelled', objective: '취소 작업', requestedBy: 'user_1', createdAt: '2026-10-02T11:00:00Z' },
+    ];
+
+    try {
+      // 1. Render RunList with 11 states and active warning banner
+      await act(async () => {
+        root.render(
+          <RunList
+            runs={sampleRuns}
+            isLoading={false}
+            runsState="error"
+            runError="503 Service Unavailable"
+            lastFetchedAt={new Date('2026-10-02T08:00:00Z')}
+            onRefresh={vi.fn()}
+            onSelectRun={vi.fn()}
+          />
+        );
+      });
+
+      // 1-a. Stale Warning Banner
+      const staleWarning = container.querySelector('[data-testid="run-stale-warning"]') as HTMLElement;
+      expect(staleWarning, 'RunList stale warning banner must render').not.toBeNull();
+      expect(staleWarning.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(staleWarning.style.borderColor).toBe('var(--color-status-offline)');
+      expect(staleWarning.style.color).toBe('var(--color-status-offline)');
+      const swFg = helperExtractVar(staleWarning.style.color);
+      const swBg = helperExtractVar(staleWarning.style.backgroundColor);
+      const swBorder = helperExtractVar(staleWarning.style.borderColor);
+      expect(getContrast(lightTokens[swFg], lightTokens[swBg]), 'Stale warning light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[swFg], darkTokens[swBg]), 'Stale warning dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[swBorder], lightTokens[swBg]), 'Stale warning border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[swBorder], darkTokens[swBg]), 'Stale warning border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 1-b. Filter pill 'ALL'
+      const filterAll = container.querySelector('[data-testid="run-filter-pill-ALL"]') as HTMLElement;
+      expect(filterAll, 'ALL filter pill must render').not.toBeNull();
+      expect(filterAll.style.backgroundColor).toBe('var(--color-brand-primary-bg)');
+      expect(filterAll.style.color).toBe('var(--color-brand-primary-fg)');
+      const faFg = helperExtractVar(filterAll.style.color);
+      const faBg = helperExtractVar(filterAll.style.backgroundColor);
+      expect(getContrast(lightTokens[faFg], lightTokens[faBg]), 'Filter ALL light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[faFg], darkTokens[faBg]), 'Filter ALL dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      // 1-c. Filter pill unselected (e.g. running)
+      const filterRunning = container.querySelector('[data-testid="run-filter-pill-running"]') as HTMLElement;
+      expect(filterRunning, 'Running filter pill must render').not.toBeNull();
+      expect(filterRunning.style.color).toBe('var(--color-text-muted)');
+      expect(filterRunning.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(filterRunning.style.borderColor).toBe('var(--color-border-subtle)');
+      const frFg = helperExtractVar(filterRunning.style.color);
+      const frBg = helperExtractVar(filterRunning.style.backgroundColor);
+      const frBorder = helperExtractVar(filterRunning.style.borderColor);
+      expect(getContrast(lightTokens[frFg], lightTokens[frBg]), 'Filter running light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[frFg], darkTokens[frBg]), 'Filter running dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[frBorder], lightTokens[frBg]), 'Filter running border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[frBorder], darkTokens[frBg]), 'Filter running border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 1-d. Table status badges for 11 states
+      const badgeSucceeded = container.querySelector('[data-testid="run-status-badge-run_succ_01"]') as HTMLElement;
+      const badgeRunning = container.querySelector('[data-testid="run-status-badge-run_run_01"]') as HTMLElement;
+      const badgeFailed = container.querySelector('[data-testid="run-status-badge-run_fail_01"]') as HTMLElement;
+      const badgeCancelled = container.querySelector('[data-testid="run-status-badge-run_canc_01"]') as HTMLElement;
+      const badgeRecovering = container.querySelector('[data-testid="run-status-badge-run_rec_01"]') as HTMLElement;
+      const badgeAwaiting = container.querySelector('[data-testid="run-status-badge-run_await_01"]') as HTMLElement;
+      const badgeDraft = container.querySelector('[data-testid="run-status-badge-run_draft_01"]') as HTMLElement;
+      const badgeValidated = container.querySelector('[data-testid="run-status-badge-run_val_01"]') as HTMLElement;
+      const badgePlanned = container.querySelector('[data-testid="run-status-badge-run_plan_01"]') as HTMLElement;
+      const badgeScheduled = container.querySelector('[data-testid="run-status-badge-run_sched_01"]') as HTMLElement;
+      const badgeVerifying = container.querySelector('[data-testid="run-status-badge-run_ver_01"]') as HTMLElement;
+
+      expect(badgeSucceeded?.style.color).toBe('var(--color-status-online)');
+      expect(badgeSucceeded?.style.borderColor).toBe('var(--color-status-online)');
+      expect(badgeSucceeded?.style.backgroundColor).toBe('var(--color-bg-subtle)');
+
+      expect(badgeRunning?.style.color).toBe('var(--color-brand-hover)');
+      expect(badgeRunning?.style.borderColor).toBe('var(--color-brand-hover)');
+      expect(badgeRunning?.style.backgroundColor).toBe('var(--color-bg-subtle)');
+
+      expect(badgeFailed?.style.color).toBe('var(--color-status-offline)');
+      expect(badgeFailed?.style.borderColor).toBe('var(--color-status-offline)');
+      expect(badgeFailed?.style.backgroundColor).toBe('var(--color-bg-subtle)');
+
+      expect(badgeCancelled?.style.color).toBe('var(--color-status-neutral)');
+      expect(badgeCancelled?.style.borderColor).toBe('var(--color-border-strong)');
+      expect(badgeCancelled?.style.backgroundColor).toBe('var(--color-bg-subtle)');
+
+      expect(badgeRecovering?.style.color).toBe('var(--color-status-active)');
+      expect(badgeRecovering?.style.borderColor).toBe('var(--color-status-active)');
+      expect(badgeRecovering?.style.backgroundColor).toBe('var(--color-bg-subtle)');
+
+      expect(badgeAwaiting?.style.color).toBe('var(--color-status-degraded)');
+      expect(badgeAwaiting?.style.borderColor).toBe('var(--color-status-degraded)');
+      expect(badgeAwaiting?.style.backgroundColor).toBe('var(--color-bg-subtle)');
+
+      expect(badgeDraft?.style.color).toBe('var(--color-text-muted)');
+      expect(badgeDraft?.style.borderColor).toBe('var(--color-border-subtle)');
+
+      expect(badgeValidated?.style.color).toBe('var(--color-brand-primary)');
+      expect(badgeValidated?.style.borderColor).toBe('var(--color-brand-primary)');
+
+      expect(badgePlanned?.style.color).toBe('var(--color-status-active)');
+      expect(badgePlanned?.style.borderColor).toBe('var(--color-status-active)');
+
+      expect(badgeScheduled?.style.color).toBe('var(--color-brand-hover)');
+      expect(badgeScheduled?.style.borderColor).toBe('var(--color-brand-hover)');
+
+      expect(badgeVerifying?.style.color).toBe('var(--color-brand-primary)');
+      expect(badgeVerifying?.style.borderColor).toBe('var(--color-brand-primary)');
+
+      // Strict distinction assertions
+      expect(badgeSucceeded.style.color, 'Succeeded and failed must not have identical tokens').not.toBe(badgeFailed.style.color);
+      expect(badgeSucceeded.style.color, 'Succeeded and running must not have identical tokens').not.toBe(badgeRunning.style.color);
+      expect(badgeFailed.style.color, 'Failed and cancelled must not have identical tokens').not.toBe(badgeCancelled.style.color);
+      expect(badgeRecovering.style.color, 'Recovering and succeeded must not have identical tokens').not.toBe(badgeSucceeded.style.color);
+      expect(badgeAwaiting.style.color, 'Awaiting approval and succeeded must not have identical tokens').not.toBe(badgeSucceeded.style.color);
+
+      // Contrast assertions on subtle background
+      const bSuccFg = helperExtractVar(badgeSucceeded.style.color);
+      const bFailFg = helperExtractVar(badgeFailed.style.color);
+      const bRunFg = helperExtractVar(badgeRunning.style.color);
+      const bRecFg = helperExtractVar(badgeRecovering.style.color);
+      const bCancFg = helperExtractVar(badgeCancelled.style.color);
+      const bAwFg = helperExtractVar(badgeAwaiting.style.color);
+
+      expect(getContrast(lightTokens[bSuccFg], lightTokens['--color-bg-subtle']), 'Succeeded badge light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[bSuccFg], darkTokens['--color-bg-subtle']), 'Succeeded badge dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[bFailFg], lightTokens['--color-bg-subtle']), 'Failed badge light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[bFailFg], darkTokens['--color-bg-subtle']), 'Failed badge dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[bRunFg], lightTokens['--color-bg-subtle']), 'Running badge light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[bRunFg], darkTokens['--color-bg-subtle']), 'Running badge dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[bRecFg], lightTokens['--color-bg-subtle']), 'Recovering badge light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[bRecFg], darkTokens['--color-bg-subtle']), 'Recovering badge dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[bCancFg], lightTokens['--color-bg-subtle']), 'Cancelled badge light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[bCancFg], darkTokens['--color-bg-subtle']), 'Cancelled badge dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[bAwFg], lightTokens['--color-bg-subtle']), 'Awaiting approval badge light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[bAwFg], darkTokens['--color-bg-subtle']), 'Awaiting approval badge dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      // 1-e. Shard and Parent badges
+      const shardBadge = container.querySelector('[data-testid="run-shard-badge-run_succ_01"]') as HTMLElement;
+      expect(shardBadge, 'Shard badge must render').not.toBeNull();
+      expect(shardBadge.style.color).toBe('var(--color-brand-hover)');
+      expect(shardBadge.style.borderColor).toBe('var(--color-brand-hover)');
+      expect(shardBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+
+      const parentBadge = container.querySelector('[data-testid="run-parent-shard-badge-run_fail_01"]') as HTMLElement;
+      expect(parentBadge, 'Parent shard badge must render').not.toBeNull();
+      expect(parentBadge.style.color).toBe('var(--color-status-active)');
+      expect(parentBadge.style.borderColor).toBe('var(--color-status-active)');
+      expect(parentBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+
+      // 1-f. Resource release pending badge
+      const releaseBadge = container.querySelector('[data-testid="run-resource-release-badge-run_rec_01"]') as HTMLElement;
+      expect(releaseBadge, 'Resource release pending badge must render').not.toBeNull();
+      expect(releaseBadge.style.color).toBe('var(--color-status-degraded)');
+      expect(releaseBadge.style.borderColor).toBe('var(--color-status-degraded)');
+      expect(releaseBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+
+      // 1-g. Link button & stateUpdatedAt
+      const selectBtn = container.querySelector('[data-testid="run-select-btn-run_draft_01"]') as HTMLElement;
+      expect(selectBtn, 'Select run button must render').not.toBeNull();
+      expect(selectBtn.style.color).toBe('var(--color-brand-hover)');
+
+      const stateUpdated = container.querySelector('[data-testid="run-state-updated-at-run_run_01"]') as HTMLElement;
+      expect(stateUpdated, 'State updated at must render').not.toBeNull();
+      expect(stateUpdated.style.color).toBe('var(--color-brand-hover)');
+
+      // 1-h. CompletedAt in succeeded and failed states
+      const succCompleted = container.querySelector('[data-testid="run-completed-at-run_succ_01"]') as HTMLElement;
+      const failCompleted = container.querySelector('[data-testid="run-completed-at-run_fail_01"]') as HTMLElement;
+      expect(succCompleted, 'Succeeded completedAt must render').not.toBeNull();
+      expect(failCompleted, 'Failed completedAt must render').not.toBeNull();
+      expect(succCompleted.style.color).toBe('var(--color-status-online)');
+      expect(failCompleted.style.color).toBe('var(--color-status-offline)');
+      expect(succCompleted.style.color, 'Succeeded and failed completedAt must have distinct status tokens').not.toBe(failCompleted.style.color);
+
+      // 2. Fetch error empty state
+      await act(async () => {
+        root.render(
+          <RunList
+            runs={[]}
+            isLoading={false}
+            runsState="error"
+            runError="Network down"
+            onRefresh={vi.fn()}
+          />
+        );
+      });
+
+      const fetchErrorState = container.querySelector('[data-testid="run-fetch-error-state"]') as HTMLElement;
+      expect(fetchErrorState, 'Fetch error state container must render').not.toBeNull();
+      expect(fetchErrorState.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(fetchErrorState.style.borderColor).toBe('var(--color-status-offline)');
+
+      const retryBtn = container.querySelector('[data-testid="run-error-retry-btn"]') as HTMLElement;
+      expect(retryBtn, 'Retry button must render').not.toBeNull();
+      expect(retryBtn.style.backgroundColor).toBe('var(--color-status-offline-bg)');
+      expect(retryBtn.style.color).toBe('var(--color-brand-primary-fg)');
+      const rbFg = helperExtractVar(retryBtn.style.color);
+      const rbBg = helperExtractVar(retryBtn.style.backgroundColor);
+      expect(getContrast(lightTokens[rbFg], lightTokens[rbBg]), 'Retry button light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[rbFg], darkTokens[rbBg]), 'Retry button dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+    } finally {
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    }
+  });
+
+  // 9i-2. [Card 215 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList
+  it('ACC-09 / Card 215: RunList style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
+    interface Branch {
+      cond: string;
+      token: string;
+    }
+
+    function analyzeFile(relativePath: string) {
+      const filePath = path.resolve(__dirname, '../src', relativePath);
+      const content = fs.readFileSync(filePath, 'utf-8');
+      const sf = ts.createSourceFile(path.basename(filePath), content, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+
+      function extractBranches(node: ts.Node): Branch[] {
+        const branches: Branch[] = [];
+        function collect(n: ts.Node, condPath: string) {
+          if (ts.isConditionalExpression(n)) {
+            const condText = n.condition.getText(sf).replace(/\s+/g, ' ');
+            collect(n.whenTrue, condPath ? `${condPath} && ${condText}` : condText);
+            collect(n.whenFalse, condPath ? `${condPath} && !(${condText})` : `!(${condText})`);
+          } else if (ts.isTemplateExpression(n)) {
+            for (const span of n.templateSpans) {
+              collect(span.expression, condPath);
+            }
+          } else {
+            const text = n.getText(sf);
+            const m = text.match(/var\((--color-[a-z0-9-]+)\)/);
+            if (m) {
+              branches.push({ cond: condPath, token: m[1] });
+            }
+          }
+        }
+        collect(node, '');
+        return branches;
+      }
+
+      function extractOpacity(node: ts.Node): number | null {
+        if (ts.isNumericLiteral(node)) return parseFloat(node.text);
+        if (ts.isConditionalExpression(node)) {
+          const trueOp = extractOpacity(node.whenTrue);
+          const falseOp = extractOpacity(node.whenFalse);
+          if (trueOp !== null && falseOp !== null) return Math.min(trueOp, falseOp);
+          return trueOp ?? falseOp;
+        }
+        return null;
+      }
+
+      let checkedPairs = 0;
+      let checkedObjects = 0;
+      let totalStyleAttrs = 0;
+      let unboundColorObjects = 0;
+      let checkedBorderObjects = 0;
+      let checkedBorderPairs = 0;
+      const violations: string[] = [];
+      const containerBgs = ['--color-bg-surface', '--color-bg-subtle', '--color-bg-canvas'];
+
+      function checkPair(bgToken: string, fgToken: string, pos: number, opacity: number = 1.0) {
+        checkedPairs++;
+        const { line } = sf.getLineAndCharacterOfPosition(pos);
+        const lightBg = resolveTokenHex(bgToken, lightTokens);
+        const lightFg = resolveTokenHex(fgToken, lightTokens);
+        const darkBg = resolveTokenHex(bgToken, darkTokens);
+        const darkFg = resolveTokenHex(fgToken, darkTokens);
+
+        if (bgToken === fgToken && opacity >= 1.0) {
+          violations.push(`L${line + 1}: 1:1 token collision between background and foreground (${bgToken})`);
+          return;
+        }
+
+        if (bgToken.startsWith('--color-text-')) {
+          violations.push(`L${line + 1}: Illegitimate background token derived from text token: ${bgToken}`);
+          return;
+        }
+
+        const effectiveLFg = opacity < 1.0 && lightBg && lightFg ? blendRgba(parseHex(lightFg), opacity, lightBg) : lightFg;
+        const effectiveDFg = opacity < 1.0 && darkBg && darkFg ? blendRgba(parseHex(darkFg), opacity, darkBg) : darkFg;
+
+        if (lightBg && effectiveLFg) {
+          const cr = getContrast(effectiveLFg, lightBg);
+          if (cr < 4.5) {
+            violations.push(`L${line + 1}: Light text contrast ${cr.toFixed(2)}:1 < 4.5:1 (${fgToken} on ${bgToken}${opacity < 1.0 ? ` opacity ${opacity.toFixed(2)}` : ''})`);
+          }
+        }
+        if (darkBg && effectiveDFg) {
+          const cr = getContrast(effectiveDFg, darkBg);
+          if (cr < 4.5) {
+            violations.push(`L${line + 1}: Dark text contrast ${cr.toFixed(2)}:1 < 4.5:1 (${fgToken} on ${bgToken}${opacity < 1.0 ? ` opacity ${opacity.toFixed(2)}` : ''})`);
+          }
+        }
+      }
+
+      function checkBorderPair(bgToken: string, borderToken: string, pos: number, opacity: number = 1.0) {
+        checkedBorderPairs++;
+        const { line } = sf.getLineAndCharacterOfPosition(pos);
+        const lBg = resolveTokenHex(bgToken, lightTokens);
+        const dBg = resolveTokenHex(bgToken, darkTokens);
+        const lBorder = resolveTokenHex(borderToken, lightTokens);
+        const dBorder = resolveTokenHex(borderToken, darkTokens);
+
+        if (bgToken === borderToken && opacity >= 1.0) {
+          violations.push(`L${line + 1}: Identical border-background token collision (1:1 contrast) detected: ${borderToken} on ${bgToken}`);
+          return;
+        }
+
+        if (bgToken.startsWith('--color-text-')) {
+          violations.push(`L${line + 1}: Illegitimate background token derived from text token: ${bgToken}`);
+          return;
+        }
+
+        const effectiveLBorder = opacity < 1.0 && lBg && lBorder ? blendRgba(parseHex(lBorder), opacity, lBg) : lBorder;
+        const effectiveDBorder = opacity < 1.0 && dBg && dBorder ? blendRgba(parseHex(dBorder), opacity, dBg) : dBorder;
+
+        if (lBg && effectiveLBorder) {
+          const cr = getContrast(effectiveLBorder, lBg);
+          if (cr < 3.0) {
+            violations.push(`L${line + 1}: Light border contrast ${cr.toFixed(2)}:1 < 3.0:1 (${borderToken} on ${bgToken}${opacity < 1.0 ? ` opacity ${opacity.toFixed(2)}` : ''})`);
+          }
+        }
+        if (dBg && effectiveDBorder) {
+          const cr = getContrast(effectiveDBorder, dBg);
+          if (cr < 3.0) {
+            violations.push(`L${line + 1}: Dark border contrast ${cr.toFixed(2)}:1 < 3.0:1 (${borderToken} on ${bgToken}${opacity < 1.0 ? ` opacity ${opacity.toFixed(2)}` : ''})`);
+          }
+        }
+      }
+
+      function traverseJsx(node: ts.Node, ancestorBgTokens: string[], ancestorFgTokens: string[], ancestorOpacity: number) {
+        let currentBgTokens = ancestorBgTokens;
+        let currentFgTokens = ancestorFgTokens;
+        let currentOpacity = ancestorOpacity;
+
+        if (ts.isJsxElement(node) || ts.isJsxSelfClosingElement(node)) {
+          const opening = ts.isJsxElement(node) ? node.openingElement : node;
+          const attrs = opening.attributes?.properties || [];
+          let styleObj: ts.ObjectLiteralExpression | null = null;
+
+          for (const attr of attrs) {
+            if (ts.isJsxAttribute(attr) && attr.name.text === 'style') {
+              totalStyleAttrs++;
+              if (attr.initializer && ts.isJsxExpression(attr.initializer) && attr.initializer.expression && ts.isObjectLiteralExpression(attr.initializer.expression)) {
+                styleObj = attr.initializer.expression;
+              }
+            }
+          }
+
+          if (styleObj) {
+            let bgNode: ts.Expression | null = null;
+            let fgNode: ts.Expression | null = null;
+            let borderNode: ts.Expression | null = null;
+            let opacityNode: ts.Expression | null = null;
+
+            for (const p of styleObj.properties) {
+              if (ts.isPropertyAssignment(p)) {
+                const name = p.name.getText(sf);
+                if (name === 'backgroundColor' || name === 'background') bgNode = p.initializer;
+                if (name === 'color') fgNode = p.initializer;
+                if (name === 'border' || name === 'borderColor' || name === 'borderBottom' || name === 'borderLeft') borderNode = p.initializer;
+                if (name === 'opacity') opacityNode = p.initializer;
+              }
+            }
+
+            const explicitOpacity = opacityNode ? extractOpacity(opacityNode) : null;
+            const effectiveOpacity = explicitOpacity !== null ? currentOpacity * explicitOpacity : currentOpacity;
+
+            const bgBranches = bgNode ? extractBranches(bgNode) : [];
+            const fgBranches = fgNode ? extractBranches(fgNode) : [];
+            const borderBranches = borderNode ? extractBranches(borderNode) : [];
+
+            if (bgBranches.length > 0) {
+              currentBgTokens = bgBranches.map(b => b.token);
+            }
+            if (fgBranches.length > 0) {
+              currentFgTokens = fgBranches.map(b => b.token);
+            }
+            currentOpacity = effectiveOpacity;
+
+            if (bgBranches.length > 0 && fgBranches.length > 0) {
+              checkedObjects++;
+              for (const b of bgBranches) {
+                for (const f of fgBranches) {
+                  if (!b.cond || !f.cond || b.cond === f.cond) {
+                    checkPair(b.token, f.token, styleObj.getStart(sf), effectiveOpacity);
+                  }
+                }
+              }
+            } else if (fgBranches.length > 0) {
+              unboundColorObjects++;
+              const targetBgs = currentBgTokens.length > 0 ? currentBgTokens : containerBgs;
+              for (const bg of targetBgs) {
+                for (const f of fgBranches) {
+                  checkPair(bg, f.token, styleObj.getStart(sf), effectiveOpacity);
+                }
+              }
+            }
+
+            if (borderBranches.length > 0) {
+              checkedBorderObjects++;
+              if (bgBranches.length > 0) {
+                for (const b of borderBranches) {
+                  for (const bgB of bgBranches) {
+                    if (!b.cond || !bgB.cond || b.cond === bgB.cond) {
+                      checkBorderPair(bgB.token, b.token, styleObj.getStart(sf), effectiveOpacity);
+                    }
+                  }
+                }
+              } else {
+                const targetBgs = currentBgTokens.length > 0 ? currentBgTokens : containerBgs;
+                for (const bg of targetBgs) {
+                  for (const b of borderBranches) {
+                    checkBorderPair(bg, b.token, styleObj.getStart(sf), effectiveOpacity);
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        ts.forEachChild(node, child => traverseJsx(child, currentBgTokens, currentFgTokens, currentOpacity));
+      }
+
+      traverseJsx(sf, ['--color-bg-canvas'], ['--color-text-primary'], 1.0);
+
+      return {
+        totalStyleAttrs,
+        checkedObjects,
+        checkedPairs,
+        unboundColorObjects,
+        coveredColorObjects: checkedObjects + unboundColorObjects,
+        checkedBorderObjects,
+        checkedBorderPairs,
+        violations,
+      };
+    }
+
+    const runListStats = analyzeFile('features/runs/RunList.tsx');
+    expect(runListStats.totalStyleAttrs, 'Total style attributes in RunList must be exactly 42').toBe(42);
+    expect(runListStats.checkedObjects, 'Explicit style objects in RunList must be exactly 8').toBe(8);
+    expect(runListStats.checkedPairs, 'Evaluated pairs in RunList must be exactly 25').toBe(25);
+    expect(runListStats.unboundColorObjects, 'Unbound color objects in RunList must be exactly 14').toBe(14);
+    expect(runListStats.coveredColorObjects, 'Total covered color objects in RunList must be exactly 22').toBe(22);
+    expect(runListStats.checkedBorderObjects, 'Border objects in RunList must be exactly 12').toBe(12);
+    expect(runListStats.checkedBorderPairs, 'Border pairs in RunList must be exactly 13').toBe(13);
+    expect(runListStats.violations, `RunList violations:\n${runListStats.violations.join('\n')}`).toEqual([]);
+  });
+
 
   // 9. [F1 & Card 186 Revert-Fail Probes] Mutating fixes back to defective combinations strictly fails
   it('ACC-09 Revert-Fail Probes: Defective color combinations strictly fail WCAG AA criteria', () => {
@@ -4389,6 +4860,31 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(probe65Cr, 'RunDetail former #d97706 on light surface fails 4.5:1').toBeLessThan(4.5);
     expect(probe65Cr).toBeCloseTo(3.19, 2);
 
+    // Probe 66 [Card 215]: RunList former hardcoded #64748b on light subtle strictly fails 4.5:1
+    const probe66Cr = getContrast('#64748b', lightTokens['--color-bg-subtle']);
+    expect(probe66Cr, 'RunList former #64748b on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe66Cr).toBeCloseTo(4.34, 2);
+
+    // Probe 67 [Card 215]: RunList former hardcoded #0284c7 on light subtle strictly fails 4.5:1
+    const probe67Cr = getContrast('#0284c7', lightTokens['--color-bg-subtle']);
+    expect(probe67Cr, 'RunList former #0284c7 on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe67Cr).toBeCloseTo(3.74, 2);
+
+    // Probe 68 [Card 215]: RunList former hardcoded #3b82f6 on light subtle strictly fails 4.5:1
+    const probe68Cr = getContrast('#3b82f6', lightTokens['--color-bg-subtle']);
+    expect(probe68Cr, 'RunList former #3b82f6 on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe68Cr).toBeCloseTo(3.36, 2);
+
+    // Probe 69 [Card 215]: RunList former hardcoded #8b5cf6 on light subtle strictly fails 4.5:1
+    const probe69Cr = getContrast('#8b5cf6', lightTokens['--color-bg-subtle']);
+    expect(probe69Cr, 'RunList former #8b5cf6 on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe69Cr).toBeCloseTo(3.87, 2);
+
+    // Probe 70 [Card 215]: RunList former hardcoded #fca5a5 on light subtle strictly fails 4.5:1
+    const probe70Cr = getContrast('#fca5a5', lightTokens['--color-bg-subtle']);
+    expect(probe70Cr, 'RunList former #fca5a5 on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe70Cr).toBeCloseTo(1.73, 2);
+
     // Legacy Token Reverts:
     // Legacy Dark --color-border-subtle: #374151
     expect(getContrast('#374151', darkTokens['--color-bg-surface'])).toBeLessThan(3.0); // 1.72:1
@@ -4483,7 +4979,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
 
     // Exact count verification for var(--color-border-subtle)
-    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 382').toBe(382);
+    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 384').toBe(384);
     expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 26').toBe(26);
 
     // Fail-closed check 3: Total files with color literals must not exceed baseline file count
@@ -4491,11 +4987,11 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(Object.keys(observedFileMultisets).length, 'Total files with color literals must not exceed baseline').toBeLessThanOrEqual(baselineFileCount);
 
     // Ratchet assertions for specific legacy literals (occurrences & files)
-    expect(legacyCounts['#64748b'], 'Legacy #64748b literal count must not exceed 5').toBeLessThanOrEqual(5);
-    expect(legacyFiles['#64748b'].size, 'Legacy #64748b file count must not exceed 4').toBeLessThanOrEqual(4);
+    expect(legacyCounts['#64748b'], 'Legacy #64748b literal count must not exceed 4').toBeLessThanOrEqual(4);
+    expect(legacyFiles['#64748b'].size, 'Legacy #64748b file count must not exceed 3').toBeLessThanOrEqual(3);
 
-    expect(legacyCounts['#d97706'], 'Legacy #d97706 literal count must not exceed 8').toBeLessThanOrEqual(8);
-    expect(legacyFiles['#d97706'].size, 'Legacy #d97706 file count must not exceed 5').toBeLessThanOrEqual(5);
+    expect(legacyCounts['#d97706'], 'Legacy #d97706 literal count must not exceed 6').toBeLessThanOrEqual(6);
+    expect(legacyFiles['#d97706'].size, 'Legacy #d97706 file count must not exceed 4').toBeLessThanOrEqual(4);
 
     expect(legacyCounts['#e2e8f0'], 'Legacy #e2e8f0 literal count must not exceed 0').toBeLessThanOrEqual(0);
     expect(legacyFiles['#e2e8f0'].size, 'Legacy #e2e8f0 file count must not exceed 0').toBeLessThanOrEqual(0);
