@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.302"
+version: "1.0.303"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T08:09:44+09:00"
+updated: "2026-10-03T08:22:39+09:00"
 source_of_truth: "Git"
 active_card: "CARD-254 inv_audit_reader E3/E4/E5 disposition re-review"
-active_card_status: "Card 251 PR #347 is independently approved at 4e148ae4 with hosted fixed-SHA run 37072629027; Card 254 re-measures the temporary audit-reader disposition on train 33 base 75224586"
-active_card_next: "Regenerate and repin the AC-11 security allowlist, run the hosted SEC-RLS-001 lane, then request Claude review"
+active_card_status: "Card 254 retains the audited E3/E4/E5 disposition through 2026-11-30 with stricter live role, grant, membership and exact-policy checks; focused PG-free 386 passed, 15 real-PG nodes await hosted execution"
+active_card_next: "Push the Card 254 review head, run hosted SEC-RLS-001, and request Claude independent review"
 ---
 
 ## 2026-10-03 Card 254 — inv_audit_reader disposition 재검토
@@ -19,7 +19,9 @@ active_card_next: "Regenerate and repin the AC-11 security allowlist, run the ho
   이후 role grant/policy 변경과 제품 reader 호출 경로가 없음을 다시 측정했다.
 - 다음 만료는 `2026-11-30T23:59:59+09:00`으로 한 달만 연장한다. collector/evaluator가
   member 양방향·role 속성·SELECT-only·FORCE RLS·exact policy를 live report에서 강제한다.
-- 현재 상태는 구현/hosted SEC-RLS-001 실측 전 `in_progress`다.
+- 생성 allowlist·target registry·모든 importer pin을 순서대로 회전했고 focused PG-free는
+  **386 passed, 15 skipped**다. skip 15건은 모두 disposable PostgreSQL DSN node다.
+- 현재 상태는 로컬 검증 완료·hosted SEC-RLS-001 실측 전 `review`다.
 
 ## 2026-10-03 Card 247 — S08-BE BuildRequest product entry
 
