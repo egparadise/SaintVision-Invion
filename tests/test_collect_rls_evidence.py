@@ -36,7 +36,8 @@ def _observation(**overrides) -> dict:
         "ground_truth": {"public.projects": {"total": {"rows": 2}, "tenant_a": {"rows": 1}, "other_tenants": {"rows": 1}}},
         "roles": {
             "inv_app": {
-                "present": True, "superuser": False, "bypassrls": False, "login": False, "inherit": True, "member_of": [],
+                "present": True, "superuser": False, "bypassrls": False, "login": False,
+                "inherit": True, "member_of": [], "granted_to": [],
                 "tables": {
                     "public.projects": {
                         "tenant_scoped": True, "rls_enabled": True, "rls_forced": True,
@@ -171,7 +172,7 @@ def _bridge_observation(identity: dict) -> dict:
     }
     observation["roles"]["inv_cancel_bridge_owner"] = {
         "present": True, "superuser": False, "bypassrls": False, "login": False,
-        "inherit": False, "member_of": [],
+        "inherit": False, "member_of": [], "granted_to": [],
         "tables": {
             "public.audit_events": {
                 "tenant_scoped": True, "rls_enabled": True, "rls_forced": True,
@@ -381,10 +382,10 @@ def seed_audit_rows(dsn: str, tenant_a: str, other: str) -> list[str]:
     """Two audit rows per tenant, inserted by this test and removed by it.
 
     They do **not** belong in ``disposable_database``: measured on this tree, seeding that
-    shared fixture makes ``inv_audit_reader``'s accepted E3/E4/E5 rows appear, and the reviewed
-    AC-11 allowlist carries three dispositions that do not include them -- so the AC-11 RLS
-    report would turn INVALID_RUN.  That is a review decision about the allowlist, not
-    something a test fixture may decide (card 225 §3).
+    shared fixture makes ``inv_audit_reader``'s accepted E3/E4/E5 rows appear.  The reviewed
+    AC-11 allowlist now accepts that real privileged visibility only while the role's measured
+    login/membership/grant boundary remains exact; this helper is for the isolated collector test,
+    not a second producer for that reviewed security evidence.
     """
 
     import psycopg
@@ -429,15 +430,23 @@ def test_real_pg_boundary_passes_and_records_kernel_denial(rls_db, tmp_path):
     assert audit["rls_enabled"] and audit["rls_forced"]
     assert audit["privileges"] == {"select": None, "insert": "table", "update": None, "delete": None}
     reader = observation["roles"]["inv_audit_reader"]
-    assert reader["present"] and not reader["superuser"] and not reader["bypassrls"] and not reader["login"]
+    assert reader["present"] and not reader["superuser"] and not reader["bypassrls"]
+    assert not reader["login"] and not reader["inherit"]
+    assert reader["member_of"] == [] and reader["granted_to"] == []
     reader_audit = reader["tables"]["public.audit_events"]
-    assert reader_audit["privileges"]["select"] == "table"
-    assert [p["cmd"] for p in reader_audit["policies"]] == ["SELECT"]
+    assert reader_audit["privileges"] == {
+        "select": "table", "insert": None, "update": None, "delete": None,
+    }
+    assert reader_audit["policies"] == [{
+        "name": "audit_events_audit_read", "cmd": "SELECT", "permissive": "PERMISSIVE",
+        "roles": ["inv_audit_reader"], "using": True, "with_check": False,
+    }]
     writer_audit = observation["roles"]["inv_audit_writer"]["tables"]["public.audit_events"]
     assert writer_audit["privileges"] == {"select": None, "insert": "table", "update": None, "delete": None}
     bridge = observation["roles"]["inv_cancel_bridge_owner"]
     assert bridge["present"] and not bridge["superuser"] and not bridge["bypassrls"]
-    assert not bridge["login"] and not bridge["inherit"] and bridge["member_of"] == []
+    assert not bridge["login"] and not bridge["inherit"]
+    assert bridge["member_of"] == [] and bridge["granted_to"] == []
     bridge_audit = bridge["tables"]["public.audit_events"]
     assert bridge_audit["privileges"] == {
         "select": "column", "insert": "column", "update": None, "delete": None

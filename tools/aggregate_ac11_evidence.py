@@ -34,8 +34,8 @@ DEFAULT_ALLOWLIST = (
 )
 TARGET_REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
 TARGET_REGISTRY_BLOB = "f2e705f853d06fc805d96e9d858a8a3f08566454"
-ALLOWLIST_BLOB = "20f761dce5d54bd7bc62e2cc3f33fcba7e844c9d"
-ALLOWLIST_CANONICAL_SHA256 = "89a7cadf7f66ea219595ce6b769d5eb0b8588f0afd74451c6c0901e5538f463f"
+ALLOWLIST_BLOB = "6c57afcf7b8b4e4a2ecb874f41b01501e48a2a74"
+ALLOWLIST_CANONICAL_SHA256 = "ec896c3f9398c1e888b1c90e4c287ae06cab92f5a9ad4785ff66be38ecb296c2"
 SCAN_ALLOWLIST_REPO_PATH = (
     "docs/vault/30_Development/Evidence/s11-security-dependency-sast-allowlist-v1.json"
 )
@@ -87,7 +87,7 @@ DEFINER_FILES = [
     {"path": "tools/definer-policy.json", "blob": "72e234f80d8c1cf7d114550dd302c1aa0570f3cc"},
 ]
 RLS_FILES = [
-    {"path": "tools/collect_rls_evidence.py", "blob": "684e0f4896202e112a70798ea8c01a545ffd3896"},
+    {"path": "tools/collect_rls_evidence.py", "blob": "d95fddf3260029953e0062e838bd2905e78702bf"},
     {"path": "tools/rls-boundary-baseline.json", "blob": "5f6eb104fa6ca455de78423a6f678fd8fc99d6df"},
 ]
 
@@ -656,7 +656,8 @@ RLS_REQUIRED_ROLES = frozenset({
 #: ``present: false`` on any of the other seven would shrink the population a verdict covers.
 RLS_OPTIONAL_ROLES = frozenset({"inv_runtime_dev"})
 RLS_ROLE_KEYS = frozenset({
-    "present", "superuser", "bypassrls", "login", "inherit", "member_of", "tables", "functions",
+    "present", "superuser", "bypassrls", "login", "inherit", "member_of", "granted_to",
+    "tables", "functions",
 })
 RLS_TABLE_KEYS = frozenset({
     "tenant_scoped", "rls_enabled", "rls_forced", "privileges", "policies",
@@ -851,6 +852,7 @@ def rls_report_schema() -> dict[str, Any]:
             "login": {"type": "boolean"},
             "inherit": {"type": "boolean"},
             "member_of": {"type": "array", "items": {"type": "string"}, "uniqueItems": True},
+            "granted_to": {"type": "array", "items": {"type": "string"}, "uniqueItems": True},
             "functions": {
                 "type": "object",
                 "additionalProperties": {
@@ -1316,6 +1318,36 @@ def evaluate_rls(report: dict[str, Any], allowlist: dict[str, Any], now: datetim
     # Shape first, numbers second: nothing below may read a field this did not check.
     if rls_report_shape(report) is not None:
         return Verdict.INVALID_RUN
+    # The audit reader's E3/E4/E5 disposition accepts real cross-tenant visibility, not a
+    # false positive.  Its reviewed safety boundary is therefore part of the verdict: the
+    # role remains a non-login, non-inheriting, non-bypass role with no member or parent role,
+    # and its audit_events privilege remains SELECT-only under the one unconditional read
+    # policy.  A later operational membership or wider grant must fail the axis immediately;
+    # waiting for the calendar expiry would turn the review into a prose-only control.
+    reader = roles.get("inv_audit_reader")
+    reader_table = reader.get("tables", {}).get("public.audit_events") if isinstance(reader, dict) else None
+    if (
+        not isinstance(reader, dict)
+        or reader.get("present") is not True
+        or any(reader.get(field) is not False for field in ("superuser", "bypassrls", "login", "inherit"))
+        or reader.get("member_of") != []
+        or reader.get("granted_to") != []
+        or not isinstance(reader_table, dict)
+        or reader_table.get("privileges") != {
+            "select": "table", "insert": None, "update": None, "delete": None
+        }
+        or reader_table.get("rls_enabled") is not True
+        or reader_table.get("rls_forced") is not True
+        or reader_table.get("policies") != [{
+            "name": "audit_events_audit_read",
+            "cmd": "SELECT",
+            "permissive": "PERMISSIVE",
+            "roles": ["inv_audit_reader"],
+            "using": True,
+            "with_check": False,
+        }]
+    ):
+        return Verdict.MEASURED_FAIL
     recomputed = _rls_recomputation(roles, ground_truth)
     if recomputed is None:
         return Verdict.INVALID_RUN

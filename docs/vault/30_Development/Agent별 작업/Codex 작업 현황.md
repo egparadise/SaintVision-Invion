@@ -1,15 +1,25 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.301"
+version: "1.0.302"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T07:21:40+09:00"
+updated: "2026-10-03T08:09:44+09:00"
 source_of_truth: "Git"
-active_card: "CARD-251 S08-BE fixed-SHA acceptance evidence"
-active_card_status: "Card 247 (#343) is approved (Claude backend r3, UI r2, r4 delta) with exact-head Backend 37066783664 and Core 37066783581 green, including the 0061 definer/allowlist rebind; Card 251 fixed-SHA acceptance evidence is PR #347 under Claude review"
-active_card_next: "Close the Claude r1 findings on #347 and record one hosted run_s08_acceptance dispatch at the fixed head; product dispatch stays off by default"
+active_card: "CARD-254 inv_audit_reader E3/E4/E5 disposition re-review"
+active_card_status: "Card 251 PR #347 is independently approved at 4e148ae4 with hosted fixed-SHA run 37072629027; Card 254 re-measures the temporary audit-reader disposition on train 33 base 75224586"
+active_card_next: "Regenerate and repin the AC-11 security allowlist, run the hosted SEC-RLS-001 lane, then request Claude review"
 ---
+
+## 2026-10-03 Card 254 — inv_audit_reader disposition 재검토
+
+- Base `752245861eb0af1e3a4e714cb77c0948ce6f76b7`; branch
+  `agent/codex/c254-audit-reader-disposition`; reviewer Claude.
+- E3/E4/E5는 `USING (true)`가 의도한 실제 privileged visibility다. 0061 tree에서 0047
+  이후 role grant/policy 변경과 제품 reader 호출 경로가 없음을 다시 측정했다.
+- 다음 만료는 `2026-11-30T23:59:59+09:00`으로 한 달만 연장한다. collector/evaluator가
+  member 양방향·role 속성·SELECT-only·FORCE RLS·exact policy를 live report에서 강제한다.
+- 현재 상태는 구현/hosted SEC-RLS-001 실측 전 `in_progress`다.
 
 ## 2026-10-03 Card 247 — S08-BE BuildRequest product entry
 
