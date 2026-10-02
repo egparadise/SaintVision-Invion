@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.304"
+version: "1.0.305"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T08:25:32+09:00"
+updated: "2026-10-03T08:48:03+09:00"
 source_of_truth: "Git"
-active_card: "CARD-254 inv_audit_reader E3/E4/E5 disposition re-review"
-active_card_status: "Card 254 hosted run 37077352052 recomputed SEC-RLS-001 MEASURED_PASS with non-vacuous E3/E4/E5 rows and exact audit-reader boundary; PR #349 is in review"
-active_card_next: "Run the security lane once more at the final documentation head, then request Claude independent review on PR #349"
+active_card: "CARD-255 S08 pre-enable Mediums (production plan budget, base-image digest, worker trust boundary in the API)"
+active_card_status: "Card 254 #349 is approved by Claude r1 at 280045f8; hosted run 37077352052 recomputed SEC-RLS-001 MEASURED_PASS and the inv_audit_reader E3/E4/E5 dispositions are renewed until 2026-11-30 with fail-closed boundary checks. Card 251 #347 is approved with hosted run 37072629027"
+active_card_next: "Close the three pre-enable Mediums recorded in the Card 247 History before any S08 flag enablement; product dispatch stays off by default"
 ---
 
 ## 2026-10-03 Card 254 — inv_audit_reader disposition 재검토
