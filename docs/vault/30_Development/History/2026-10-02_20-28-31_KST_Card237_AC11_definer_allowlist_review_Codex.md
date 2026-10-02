@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD237-AC11-DEFINER-ALLOWLIST-20261002"
 title: "Card 237 AC-11 SECURITY DEFINER allowlist review"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T20:28:31+09:00"
+updated: "2026-10-02T20:30:49+09:00"
 source_of_truth: "Git"
 base_sha: "843d283c1ee70cc021385b0f8f25ec323d434829"
 reviewer: "Claude"
@@ -44,3 +44,13 @@ Local verification uses the repository Python 3.14 virtual environment. The gene
 test file passed 10/10. The security importer file passed 127 tests and had one unrelated
 local Git ancestry timeout; it is rerun after the target-registry repin. Exact-head
 hosted security evidence and its canonical verdict remain merge conditions.
+
+# Registry repin
+
+The generated allowlist first landed in commit
+`0c7fbecd8fb96c91f887a509c78d64efc3c51b7e`, whose allowlist blob is
+`47349f312f24629b83ac68e6ecdd006b39e46d48`. The canonical AC-11 target registry now
+binds `s11-security-critical-high-zero-v0` to that reachable commit and exact blob. The
+resulting registry blob is `5f92d6f70c614501cb4b20a78615379b1aea7078`; the aggregator and all four registry-aware
+importers rotate to that same value in one follow-up commit. This is a definition-source
+repin, not a relaxation of the empty `criteria` or hosted environment boundary.
