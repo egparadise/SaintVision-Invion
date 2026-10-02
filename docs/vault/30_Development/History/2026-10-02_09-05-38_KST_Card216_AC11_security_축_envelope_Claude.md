@@ -6,7 +6,7 @@ status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-02T09:05:38+09:00"
+updated: "2026-10-02T10:06:01+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "097da87d"
@@ -47,7 +47,7 @@ tags: ["ac11", "security", "axis-envelope", "importer", "s11", "claude"]
 
 **그 마지막 한 줄이 이 카드가 남긴 것이다.** producer의 `environment`는 `runnerImage`·`topology`·`evidenceClass`·`credentialsRequired`·`externalServicesRequired`를 쓰고 **`comparableGroup`을 쓰지 않는다**(실제 artifact에서 읽었다). 집계기는 모든 축 envelope에 그것을 요구한다(`aggregate_ac11_evidence.py:334`).
 
-**adapter가 그 값을 만들지 않았다.** 두 run이 비교 가능한지는 **어떻게 생산됐는지의 성질**이고 adapter가 정할 것이 아니다 — 지어내면 서로 다른 조건의 두 run을 adapter가 "비교 가능"으로 선언하게 된다. accessibility 쪽은 producer/importer가 `ac11-accessibility-user-device-v1`을 들고 있다. **security producer(`tools/run_ac11_security_scan.py`)가 자기 comparability group 이름을 정해 쓰는 것이 맞고, 그것이 다음 조치다.**
+**[§7-1에서 정정 — 이 단락의 결론은 틀렸다.]** **adapter가 그 값을 만들지 않았다.** 두 run이 비교 가능한지는 **어떻게 생산됐는지의 성질**이고 adapter가 정할 것이 아니다 — 지어내면 서로 다른 조건의 두 run을 adapter가 "비교 가능"으로 선언하게 된다. accessibility 쪽은 producer/importer가 `ac11-accessibility-user-device-v1`을 들고 있다. **security producer(`tools/run_ac11_security_scan.py`)가 자기 comparability group 이름을 정해 쓰는 것이 맞고, 그것이 다음 조치다.**
 
 ## 3. manifest
 
@@ -75,8 +75,97 @@ tags: ["ac11", "security", "axis-envelope", "importer", "s11", "claude"]
 - **AC-11 축 정의를 손대지 않았다.** `REQUIRED_AXES`·`REQUIRED_TARGET_BY_AXIS`·네 threat ID 집합 모두 그대로다.
 - **hosted CI에서 이 변경으로 lane을 다시 돌리지 않았다.** 위 측정은 **이 PC에서 실제 artifact로** 한 것이고, lane 재실행은 PR의 CI가 답한다.
 
-## 6. 다음 첫 행동
+## 6. 다음 첫 행동 (초기 판정 — §7-7에서 갱신)
 
 1. **Codex(S11 producer owner)**: `tools/run_ac11_security_scan.py`의 `environment`에 `comparableGroup`을 추가할지와 그 이름. 그 한 값이 들어오면 이 축은 집계기에서 **`NOT_OBSERVED`로 평가**되고(현재는 `INVALID_RUN`), 축이 "평가되지 않음"에서 "관측되지 않음"으로 바뀐다.
 2. **Codex**: 남은 세 threat report(`SEC-DEF-001`·`SEC-RLS-001`·`SEC-VF-001`)에 producer를 둘지 — 그것이 이 축의 pass 조건이고 별도 카드다.
 3. **Claude**: 이 PR의 검토 반영.
+
+## 7. #313 r1 — Codex 변경 요청 3건 (head `626cbc5c`)
+
+### 7-0 한 줄
+
+세 건 전부 같은 뿌리였다 — **"들어갔다"와 "수용됐다"를 구분하지 않은 것**. 집계기는 이 축을 평가하기 **전에** 공통 봉투 단계에서 거부하고 있었고, 그 상태를 `complete`로 적었다. 이제 **실제 artifact로 `NOT_OBSERVED`까지 간다**.
+
+### 7-1 F-R1 — comparability group: adapter가 정하지 않는다던 판단이 틀렸다
+
+**재현**: 실제 producer 모양(실제 artifact에서 읽은 다섯 환경 키, `payload` 안의 count)으로 봉투를 만들어 `evaluate_axis()`에 넣었다 — `importer verdict = NOT_OBSERVED`, **`aggregator verdict = INVALID_RUN`**, 사유 `environment.comparableGroup is required` 한 줄. Codex probe와 같은 결과이고, 그것을 시험으로 고정했다(`test_the_envelope_this_adapter_writes_is_admissible_to_the_aggregator`, 실제 repository git).
+
+**§2의 판단이 틀렸다**: "adapter가 comparability group을 지어내면 안 된다"고 썼지만 **tree의 다른 두 importer가 이미 그렇게 한다** — `tools/import_ac11_accessibility_evidence.py`가 `ac11-accessibility-user-device-v1`을, `tools/import_ac11_migration_rehearsal.py`가 `hosted-ubuntu-postgres16-migration-rehearsal`을 **importer 상수로** 선언한다. 읽고 확인했고, 그 전례를 따랐다.
+
+**다만 이름만 붙이지 않는다**: 등록된 target의 `requiredEnvironment`(`topology: hosted`, `evidenceClass: security-tools-v0`)를 **먼저 확인하고** 거기에 맞는 report에만 붙인다. 맞지 않으면 **라벨을 바꿔 붙이지 않고 거부**한다(`test_an_environment_outside_the_registered_lane_is_refused_not_relabelled`). group 이름은 **소속을 확인한 집합의 이름**이고, 그 확인이 없으면 비교 가능성은 주장이 된다. producer가 다른 group을 쓰고 있으면 덮어쓰지 않고 거부한다.
+
+### 7-2 F-R2 — 실측 없는 PASS: importer는 재계산할 수 없는 것에 답하지 않는다
+
+r1은 `{"threatId": ...}` 네 개와 최상위 `MEASURED_PASS`를 그대로 통과시켰다. 두 가지를 바꿨다.
+
+| 바뀐 것 | 내용 |
+|---|---|
+| 재계산할 수 없는 report | `RECOMPUTABLE_THREAT_IDS = (SEC-SCAN-001,)`. DEF/RLS/VF row가 오면 **판정을 추측하지 않고 거부**한다 — 그 판정은 네 producer의 결과를 실제 결합하는 경로의 것이고, 이 importer는 artifact 한 개를 받는다 |
+| scan report | `payloadSha256`로 payload를 결속한 뒤 **직접 재계산**: `criticalCount`·`highCount`, 네 개의 finding inventory(`unallowlisted`·`expired`·`staleAllowlist`·`severityMismatch`), 두 scanner의 실행(`scannerExitCodes` 정확히 둘, 0/1), scanner version·scan input 존재 |
+
+**producer의 주장과 자기 payload가 다르면 거부한다** — `criticalCount: 1`인데 `MEASURED_PASS`라고 적힌 report는 들어오지 못한다. **측정된 실패는 숨지 않는다**: 세 report가 없으면 집계기는 그 뒤를 보지 못하므로(그래서 봉투 verdict는 `NOT_OBSERVED`여야 한다) `scanRecomputed`와 reason에 **그 수치를 적는다**(`criticalCount=2, highCount=1`). scanner가 둘 다 돌지 않았으면 그 역시 pass가 아니다.
+
+### 7-3 F-R3 — artifact가 새 importer에 결속되지 않았다: pin이 tree와 달라져 있었다
+
+producer의 `toolFiles`는 **검토된 allowlist의 세 pin을 그대로 복사**한다(`tools/run_ac11_security_scan.py:477`). 그 pin을 tree와 대조했다:
+
+| 파일 | allowlist pin (r1) | 실제 tree | 옮긴 commit |
+|---|---|---|---|
+| producer | `87d142e0` | `87d142e0` ✓ | — |
+| workflow | `84dea5d4` | `b1b37265` | **`0f614152`**(#262 r3, 2026-10-01) |
+| importer | `86617533` | `095af3d8` | **`8933b6bd`**(#299 r3, 내 commit) 이후 카드 216 |
+
+집계기는 모든 report의 `toolFiles` blob을 source tree와 대조하지만 **네 threat report가 다 있을 때만** 거기까지 간다. 그래서 이 drift는 **세 producer가 오는 순간 `INVALID_RUN`이 될 잠복 결함**이었고 아무도 보지 못했다. 셋을 했다:
+
+1. **pin을 실측값으로 회전**하고 allowlist `verifiedAt`을 갱신, 집계기의 `SCAN_ALLOWLIST_BLOB`을 새 allowlist blob(`74cb88b3`)으로 회전.
+2. **importer가 자기 실행 blob을 직접 확인**한다 — 자기 bytes로 git blob을 계산해 report가 pin한 importer blob과 다르면 **봉투를 쓰지 않고 거부**한다. 집계기가 나중에 할 검사를 import 시점에 fail-closed로 당긴 것이다.
+3. **집계기가 봉투의 `importerFile`을 확인**한다(`path`는 상수 pin, `blob`은 source tree와 대조). **누락된 report 때문에 `NOT_OBSERVED`로 빠지기 전에** 검사하므로, 지금(한 report)도 실제로 강제된다.
+4. **래칫 시험**: allowlist의 세 pin이 이 checkout의 파일과 같은지, 그리고 집계기의 allowlist pin이 그 파일과 같은지. `0f614152`가 지나간 자리를 다음에는 시험이 잡는다.
+
+### 7-4 실측 — exact head에서 lane을 다시 돌렸다
+
+| 단계 | 결과 |
+|---|---|
+| dispatch | **run `36949022989`**(`ac11-security-scan.yml`, `workflow_dispatch`, head **`626cbc5c`** = 이 PR head, conclusion **success**) |
+| artifact | **`11203590183`** `s11-ac11-security-626cbc5c…`, `expired: false`, API digest `bf8b3dcc…` = 내려받은 bytes의 sha256 |
+| report의 pin | `b1b37265`(workflow)·`b89c9206`(importer)·`74cb88b3`(allowlist) — **회전된 값이 실제 artifact에 들어왔다** |
+| importer | **exit 0**, `verdict NOT_OBSERVED`, `reason "no producer emits SEC-DEF-001, SEC-RLS-001, SEC-VF-001"`, `scanRecomputed MEASURED_PASS`, `importerFile {tools/import_ac11_security_scan.py, b89c9206…}`, `comparableGroup ac11-security-dependency-sast-hosted-v1` |
+| 조립기 | `assembledAxes: ["security-critical-high-zero"]`, 나머지 일곱 absent |
+| 집계기 | **축 verdict `NOT_OBSERVED`** (r1: `INVALID_RUN`). run 수준 `INVALID_RUN`은 **`missing required axes` 일곱 줄뿐** — 설계된 fail-closed다 |
+
+**그래서 `chain: complete`가 측정으로 뒷받침된다** — 이 파일이 말하는 complete는 "admissible envelope이 있다"이고, 이제 집계기가 **이 축을 평가한다**.
+
+### 7-5 변이 사살 — 8/8
+
+| 변이 | 죽은 시험 |
+|---|---|
+| adapter가 group 선언을 멈춤 | `test_the_envelope_this_adapter_writes_is_admissible_to_the_aggregator` |
+| lane 요구 확인 없이 라벨 | `test_an_environment_outside_the_registered_lane_is_refused_not_relabelled` |
+| 재계산 못 하는 report를 다시 통과 | `test_four_threat_rows_this_importer_cannot_recompute_cannot_become_a_pass` |
+| producer 주장과 payload 대조 제거 | `test_a_scan_verdict_that_contradicts_its_own_payload_is_refused` |
+| 측정된 실패를 reason에서 지움 | `test_a_measured_failure_is_carried_with_the_recomputed_detail_rather_than_hidden` |
+| importer가 자기 blob 확인 안 함 | `test_an_artifact_pinned_to_a_different_importer_blob_is_refused` |
+| 집계기가 `importerFile` 요구 안 함 | `test_security_envelope_must_name_an_importer_the_source_tree_contains` |
+| workflow pin을 낡은 값으로 되돌림 | `test_the_scan_allowlist_pins_the_files_this_checkout_actually_has` |
+
+**8건 모두 KILLED, 원본 복원 확인.**
+
+### 7-6 검증
+
+| 항목 | 결과 |
+|---|---|
+| `tests/test_import_ac11_security_scan.py` | 12 → **27 passed** |
+| `tests/test_aggregate_ac11_evidence.py` | 85 → **86 passed** |
+| `tests/test_ac11_security_scan.py` · `tests/core/test_assemble_ac11_manifest.py` · `tests/core/test_post_landing_verify.py` | **174 passed**(무변경, 역래칫 포함) |
+| 합산 | **287 passed** |
+| `git diff --check` | exit 0 |
+
+**fixture를 실제 producer 모양으로 바꿨다**: r1 stub은 환경에 `comparableGroup`을 들고 있었고(실제 producer는 쓰지 않는다) count를 최상위에 두었다(실제는 `payload` 안). **stub이 실제보다 풍부했던 것**이 집계기가 거부하는 importer와 시험이 합의한 이유다 — 카드 216의 §4에서 한 번 고친 것과 같은 종류이고, 이번에는 세 군데였다.
+
+### 7-7 남은 것 / 측정하지 못한 것
+
+- **`MEASURED_PASS`는 여전히 이 카드의 범위가 아니다.** 세 threat report에 producer가 없고, importer는 이제 **그 셋에 대해 답하지 않는다**(추측하지 않는 것이 7-2의 내용이다).
+- **네 report가 다 오는 경로**는 그 producer들을 두는 카드의 것이고, 그때 `RECOMPUTABLE_THREAT_IDS`를 그 재계산과 함께 넓히는 것이 올바른 순서다.
+- **producer는 자기 pin을 검증하지 않는다** — allowlist의 세 pin을 복사하면서 tree와 같은지 확인하지 않는다. 그래서 `0f614152` 이후의 run들이 tree에 없는 blob을 pin으로 담은 report를 냈다 — 카드 216이 쓴 run `36943527856`이 그중 하나다. producer owner에게 남기는 관찰이고, 이 PR은 importer·집계기·래칫에서 fail-closed로 막았다.
+- **AC-11 축 정의는 그대로다.** `REQUIRED_AXES`·`REQUIRED_TARGET_BY_AXIS`·네 threat ID 집합 어느 것도 바꾸지 않았다. 추가한 것은 **더 엄격한 결속**뿐이다.
