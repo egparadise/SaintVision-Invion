@@ -34,15 +34,116 @@ WORKFLOW = ".github/workflows/desktop-browser.yml"
 
 
 def run_row(**overrides) -> dict:
+    """One run as ``GET /repos/{repo}/actions/runs`` returns it, including its ``path``."""
+
     row = {
-        "databaseId": RUN_ID,
-        "headSha": SOURCE,
+        "id": RUN_ID,
+        "head_sha": SOURCE,
+        "path": WORKFLOW,
         "status": "completed",
         "conclusion": "success",
         "event": "workflow_dispatch",
     }
     row.update(overrides)
     return row
+
+
+def runs_payload(*rows, total=None, **overrides) -> dict:
+    """One page of that listing: the rows plus the ``total_count`` GitHub states."""
+
+    rows = list(rows)
+    if not rows and total is None:
+        rows = [run_row()]
+    payload = {"total_count": total if total is not None else len(rows), "workflow_runs": rows}
+    payload.update(overrides)
+    return payload
+
+
+def one_page(*rows, total=None):
+    """A ``fetch(page)`` that serves those rows as page 1 and nothing afterwards."""
+
+    def fetch(page: int):
+        if page == 1:
+            return runs_payload(*rows, total=total)
+        return {"total_count": total if total is not None else len(rows), "workflow_runs": []}
+
+    return fetch
+
+
+# ---------------------------------------------------------------- population (#332 r3 F2)
+
+
+def test_the_population_is_every_run_at_that_commit_paged_to_the_end():
+    """Two pages, and the candidate is on the second one.
+
+    This is the case the previous call could not see: ``gh run list --limit 50`` returned the
+    repository's most recent fifty runs of one workflow and the SHA filter came after, so an older
+    conflicting run at the same commit sat outside the window while a newer one sat inside.
+    """
+
+    filler = [run_row(id=RUN_ID + 100 + index, path=".github/workflows/core.yml")
+              for index in range(100)]
+    second_page = [run_row(id=RUN_ID + 1, event="pull_request"), run_row()]
+
+    def fetch(page: int):
+        rows = filler if page == 1 else second_page
+        return runs_payload(*rows, total=len(filler) + len(second_page))
+
+    rows = finder.runs_at_head(SOURCE, fetch)
+    assert len(rows) == 102
+    assert finder.candidate_runs(rows, SOURCE, WORKFLOW) == [RUN_ID, RUN_ID + 1], (
+        "the conflicting candidate outside the first page is still in the population"
+    )
+
+
+def test_a_population_that_cannot_be_listed_whole_is_a_refusal():
+    """GitHub says there are more runs than were listed: a short list is not "no other candidate"."""
+
+    with pytest.raises(finder.NoSingleCandidate, match="could be listed"):
+        finder.runs_at_head(SOURCE, one_page(run_row(), total=4))
+
+
+def test_a_population_larger_than_the_listing_endpoint_is_a_refusal():
+    """Past 1000 results the endpoint stops answering, so completeness cannot be proved."""
+
+    total = finder.RUNS_PER_PAGE * finder.MAX_RUN_PAGES + 1
+    with pytest.raises(finder.NoSingleCandidate, match="more than the"):
+        finder.runs_at_head(SOURCE, one_page(run_row(), total=total))
+
+
+def test_a_population_that_changes_while_it_is_listed_is_a_refusal():
+    """A new run landing mid-listing would make the pages describe two different populations."""
+
+    def fetch(page: int):
+        rows = [run_row(id=RUN_ID + index) for index in range(100)]
+        return runs_payload(*rows, total=150 if page == 1 else 151)
+
+    with pytest.raises(finder.NoSingleCandidate, match="changed while"):
+        finder.runs_at_head(SOURCE, fetch)
+
+
+@pytest.mark.parametrize(
+    ("label", "payload"),
+    [
+        ("not an object", [run_row()]),
+        ("no total", {"workflow_runs": [run_row()]}),
+        ("boolean total", {"total_count": True, "workflow_runs": []}),
+        ("negative total", {"total_count": -1, "workflow_runs": []}),
+        ("no rows list", {"total_count": 1, "workflow_runs": {}}),
+    ],
+)
+def test_a_runs_response_this_tool_cannot_read_is_an_environment_failure(label, payload):
+    """Exit 2, not exit 3: an unreadable answer is not the same as "no evidence at this SHA"."""
+
+    with pytest.raises(RuntimeError):
+        finder.runs_at_head(SOURCE, lambda _page: payload)
+
+
+def test_runs_of_another_workflow_at_the_same_commit_are_not_candidates():
+    """Every lane runs at this commit; only the reviewed workflow's runs are evidence for it."""
+
+    rows = [run_row(id=RUN_ID + 1, path=".github/workflows/core.yml"), run_row()]
+    assert finder.candidate_runs(rows, SOURCE, WORKFLOW) == [RUN_ID]
 
 
 # ---------------------------------------------------------------- selection
@@ -62,7 +163,7 @@ def artifacts_payload(*rows) -> dict:
 
 
 def test_the_successful_runs_at_that_sha_are_the_candidates():
-    rows = [run_row(), run_row(databaseId=1, headSha=OTHER), run_row(databaseId=RUN_ID + 1)]
+    rows = [run_row(), run_row(id=1, head_sha=OTHER), run_row(id=RUN_ID + 1)]
     assert finder.candidate_runs(rows, SOURCE, WORKFLOW) == sorted([RUN_ID, RUN_ID + 1])
 
 
@@ -70,7 +171,7 @@ def test_the_successful_runs_at_that_sha_are_the_candidates():
     ("label", "rows"),
     [
         ("none", []),
-        ("another head", [run_row(headSha=OTHER)]),
+        ("another head", [run_row(head_sha=OTHER)]),
         ("still running", [run_row(status="in_progress", conclusion=None)]),
         ("failed", [run_row(conclusion="failure")]),
         ("unapproved event", [run_row(event="push")]),
@@ -86,7 +187,7 @@ def test_no_candidate_at_this_sha_is_an_answer(label, rows):
 @pytest.mark.parametrize("bad", [0, True, "36982827634", None])
 def test_a_run_without_a_usable_id_is_refused(bad):
     with pytest.raises(finder.NoSingleCandidate):
-        finder.candidate_runs([run_row(databaseId=bad)], SOURCE, WORKFLOW)
+        finder.candidate_runs([run_row(id=bad)], SOURCE, WORKFLOW)
 
 
 @pytest.mark.parametrize(
@@ -278,6 +379,41 @@ def test_a_single_candidate_is_not_downloaded_to_be_compared_with_itself():
     assert (run_id, artifact["id"]) == (RUN_ID, ARTIFACT_ID)
 
 
+@pytest.mark.parametrize(
+    ("label", "forged"),
+    [
+        ("exitCode false", {"exitCode": False}),
+        ("subprocessExitCode false", {"subprocessExitCode": False}),
+        ("exitCode 0.0", {"exitCode": 0.0}),
+        ("exitCode \"0\"", {"exitCode": "0"}),
+        ("tests.failure false", {"tests": {"error": 0, "failure": False, "passed": 6,
+                                          "skipped": 0}}),
+        ("tests.passed 6.0", {"tests": {"error": 0, "failure": 0, "passed": 6.0, "skipped": 0}}),
+        ("evidenceStatus true", {"evidenceStatus": True}),
+        ("caseIdentitiesSha256 not a sha", {"caseIdentitiesSha256": "complete"}),
+        ("tests not an object", {"tests": [0, 0, 6, 0]}),
+        ("tests with an extra key", {"tests": {"error": 0, "failure": 0, "passed": 6,
+                                              "skipped": 0, "flaky": 0}}),
+    ],
+)
+def test_a_candidate_whose_decisive_field_has_the_wrong_json_type_is_a_refusal(label, forged):
+    """``0 == False`` in Python, so a boolean where a count belongs was "the same evidence".
+
+    Measured by Codex's probe on the previous head: ``ACCEPTED_TYPE_DISAGREEMENT ... 0 == False:
+    True`` -- two candidates disagreeing about a field's *type* passed as agreement, and the proof
+    that was then chosen carried the boolean into the envelope (#332 r3 F1).  The type is part of
+    the value now, checked in the importer's one validator before anything is compared.
+    """
+
+    artifacts_of, archive_of = two_candidates(vf_archive(OTHER_RUN_LOCAL, **forged))
+    with pytest.raises(finder.NoSingleCandidate, match="not a JSON integer|not a non-empty string"
+                                                      "|not a 64-character|not an object"
+                                                      "|keys are not exactly"):
+        finder.select_evidence(
+            [RUN_ID, RUN_ID + 1], artifacts_of, archive_of, importer.VF_ARTIFACT_NAME
+        )
+
+
 def test_a_candidate_whose_archive_carries_no_proof_is_a_refusal():
     """An archive without the proof member is not evidence to compare, and not a crash either."""
 
@@ -317,7 +453,7 @@ def answers(**overrides) -> dict:
     """
 
     state = {
-        "runs": [run_row()],
+        "runs": runs_payload(),
         "artifacts": {"artifacts": [{"id": ARTIFACT_ID, "name": importer.VF_ARTIFACT_NAME,
                                      "digest": DIGEST}]},
         # Optional per-run and per-artifact answers, for the two-candidate case.
@@ -336,8 +472,12 @@ def patched(monkeypatch, state: dict) -> list[tuple]:
 
     def fake_gh(*args: str) -> str:
         calls.append(args)
-        if args[:2] == ("run", "list"):
-            return json.dumps(state["runs"])
+        if args[0] == "api" and args[1] == "-X":
+            page = int([arg for arg in args if arg.startswith("page=")][0].split("=", 1)[1])
+            payload = state["runs"]
+            if page == 1:
+                return json.dumps(payload)
+            return json.dumps({"total_count": payload["total_count"], "workflow_runs": []})
         if args[0] == "api" and args[1].endswith("/artifacts"):
             run = int(args[1].rsplit("/", 2)[-2])
             return json.dumps(state["artifactsByRun"].get(run, state["artifacts"]))
@@ -375,7 +515,10 @@ def test_main_writes_the_document_and_the_three_files(tmp_path, monkeypatch):
     )
     assert archive == answers()["zip"]
     assert run_metadata["id"] == RUN_ID and artifact_metadata["id"] == ARTIFACT_ID
-    assert calls[0][:2] == ("run", "list")
+    # The call contract: the source SHA is in the *query*, not a filter applied to a short window.
+    assert calls[0][:4] == ("api", "-X", "GET", f"repos/{importer.REPOSITORY}/actions/runs")
+    assert f"head_sha={SOURCE}" in calls[0]
+    assert f"per_page={finder.RUNS_PER_PAGE}" in calls[0]
 
 
 def test_main_takes_the_lower_of_two_agreeing_runs_and_downloads_its_archive_once(
@@ -390,7 +533,7 @@ def test_main_takes_the_lower_of_two_agreeing_runs_and_downloads_its_archive_onc
 
     first, second = vf_archive(), vf_archive(OTHER_RUN_LOCAL)
     state = answers(
-        runs=[run_row(event="pull_request", databaseId=RUN_ID + 1), run_row()],
+        runs=runs_payload(run_row(event="pull_request", id=RUN_ID + 1), run_row()),
         artifactsByRun={
             RUN_ID: {"artifacts": [{"id": ARTIFACT_ID, "name": importer.VF_ARTIFACT_NAME}]},
             RUN_ID + 1: {"artifacts": [{"id": ARTIFACT_ID + 1,
@@ -412,7 +555,7 @@ def test_main_refuses_two_runs_that_disagree_without_losing_the_reason(tmp_path,
     """Exit 3 with the reason: the lane records SEC-VF-001 as NOT_OBSERVED rather than guessing."""
 
     state = answers(
-        runs=[run_row(event="pull_request", databaseId=RUN_ID + 1), run_row()],
+        runs=runs_payload(run_row(event="pull_request", id=RUN_ID + 1), run_row()),
         artifactsByRun={
             RUN_ID: {"artifacts": [{"id": ARTIFACT_ID, "name": importer.VF_ARTIFACT_NAME}]},
             RUN_ID + 1: {"artifacts": [{"id": ARTIFACT_ID + 1,
@@ -433,8 +576,8 @@ def test_main_refuses_two_runs_that_disagree_without_losing_the_reason(tmp_path,
 @pytest.mark.parametrize(
     ("label", "overrides"),
     [
-        ("no run at this sha", {"runs": [run_row(headSha=OTHER)]}),
-        ("no run at all", {"runs": []}),
+        ("no run at this sha", {"runs": runs_payload(run_row(head_sha=OTHER))}),
+        ("no run at all", {"runs": runs_payload(total=0)}),
         ("no artifact of that name", {"artifacts": {"artifacts": []}}),
         ("two artifacts of that name",
          {"artifacts": {"artifacts": [{"id": ARTIFACT_ID, "name": importer.VF_ARTIFACT_NAME,

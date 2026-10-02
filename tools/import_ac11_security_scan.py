@@ -116,6 +116,23 @@ VF_PROOF_MEMBER = "vf-desktop-browser-ci.json"
 VF_DECISIVE_FIELDS = (
     "caseIdentitiesSha256", "evidenceStatus", "exitCode", "subprocessExitCode", "tests",
 )
+#: The JSON shape each decisive field must have, checked **before** any comparison.
+#:
+#: Python's ``==`` is not JSON equality: ``0 == False`` and ``0 == 0.0`` are both true, so a proof
+#: whose ``exitCode`` is the JSON boolean ``false`` compared equal to the reviewed ``0`` and two
+#: candidates that disagree about the *type* of a field were called the same evidence (#332 r3 F1,
+#: found by probe: ``ACCEPTED_TYPE_DISAGREEMENT ... 0 == False: True``).  So the type is part of the
+#: value here: a sha and a status are strings, an exit code and a test count are integers with
+#: ``bool`` excluded, and ``tests`` is an exact key set of them.
+VF_FIELD_SHAPES = {
+    "caseIdentitiesSha256": "sha256",
+    "evidenceStatus": "text",
+    "exitCode": "count",
+    "subprocessExitCode": "count",
+    "tests": "counts",
+}
+#: The JUnit tally the browser lane reports, as an exact key set.
+VF_TEST_KEYS = ("error", "failure", "passed", "skipped")
 #: The document ``--vf-evidence`` takes: the three inputs the browser-lane binding needs, named
 #: once so the AC-11 aggregate lane can pass them as one argument (card 233).  It is validated as
 #: an **exact** key set with no defaults -- a missing key is a binding the caller dropped and an
@@ -613,21 +630,68 @@ def vf_required(spec: dict[str, Any]) -> dict[str, Any]:
         raise SecurityImportError(
             "the reviewed browser-lane fields and VF_DECISIVE_FIELDS disagree"
         )
-    return required
+    # Both sides of the comparison get the same shape check: a reviewed ``"failure": false`` would
+    # equal an observed ``0`` just as readily in the other direction (#332 r3 F1).
+    return vf_decisive(required, "reviewed browser-lane")
+
+
+def _vf_count(value: Any, label: str, field: str) -> int:
+    """A JSON integer, with ``bool`` excluded and negatives refused.
+
+    ``isinstance(False, int)`` is true in Python, which is exactly how a boolean ``exitCode``
+    reached a comparison against ``0`` and won it (#332 r3 F1).
+    """
+
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise SecurityImportError(
+            f"{label} proof {field} is {type(value).__name__}, not a JSON integer"
+        )
+    if value < 0:
+        raise SecurityImportError(f"{label} proof {field} is negative")
+    return value
 
 
 def vf_decisive(proof: dict[str, Any], label: str) -> dict[str, Any]:
-    """The decisive fields of one proof, every one of them actually stated.
+    """The decisive fields of one proof: all stated, and each of the exact JSON shape.
 
     A missing field is not "equal by absence": calling two candidates the same evidence on a
     field neither of them states would be a verdict about nothing observed, which is the
-    default-value class of fail-open this file has already had to close four times.
+    default-value class of fail-open this file has already had to close four times.  And a field
+    of the wrong JSON type is not a value either -- ``0 == False`` in Python, so without this the
+    comparison and the reviewed-value check both accepted a boolean where a count belongs.
     """
 
     missing = [field for field in VF_DECISIVE_FIELDS if field not in proof]
     if missing:
         raise SecurityImportError(f"{label} proof states no {', '.join(missing)}")
-    return {field: proof[field] for field in VF_DECISIVE_FIELDS}
+    if set(VF_FIELD_SHAPES) != set(VF_DECISIVE_FIELDS):
+        raise SecurityImportError("VF_FIELD_SHAPES and VF_DECISIVE_FIELDS disagree")
+    decisive: dict[str, Any] = {}
+    for field in VF_DECISIVE_FIELDS:
+        value = proof[field]
+        shape = VF_FIELD_SHAPES[field]
+        if shape == "sha256":
+            if not isinstance(value, str) or not SHA256_RE.fullmatch(value):
+                raise SecurityImportError(
+                    f"{label} proof {field} is not a 64-character lowercase SHA-256"
+                )
+        elif shape == "text":
+            if not isinstance(value, str) or not value:
+                raise SecurityImportError(f"{label} proof {field} is not a non-empty string")
+        elif shape == "count":
+            value = _vf_count(value, label, field)
+        elif shape == "counts":
+            if not isinstance(value, dict):
+                raise SecurityImportError(f"{label} proof {field} is not an object")
+            if tuple(sorted(value)) != VF_TEST_KEYS:
+                raise SecurityImportError(
+                    f"{label} proof {field} keys are not exactly {', '.join(VF_TEST_KEYS)}"
+                )
+            value = {key: _vf_count(value[key], label, f"{field}.{key}") for key in sorted(value)}
+        else:  # pragma: no cover - the mapping above is the only source of shapes
+            raise SecurityImportError(f"{label} proof {field} has no declared shape")
+        decisive[field] = value
+    return decisive
 
 
 def vf_proof_of_archive(archive: bytes) -> dict[str, Any]:

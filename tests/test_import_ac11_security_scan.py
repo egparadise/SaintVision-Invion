@@ -765,6 +765,79 @@ def test_browser_lane_evidence_that_is_not_the_reviewed_one_is_refused(mutation)
         )
 
 
+TYPE_CONFUSIONS = [
+    ("exit-code-false", {"exitCode": False}, "exitCode is bool"),
+    ("subprocess-exit-false", {"subprocessExitCode": False}, "subprocessExitCode is bool"),
+    ("exit-code-float", {"exitCode": 0.0}, "exitCode is float"),
+    ("exit-code-string", {"exitCode": "0"}, "exitCode is str"),
+    ("failure-false",
+     {"tests": {"error": 0, "failure": False, "passed": 6, "skipped": 0}},
+     "tests.failure is bool"),
+    ("error-false",
+     {"tests": {"error": False, "failure": 0, "passed": 6, "skipped": 0}},
+     "tests.error is bool"),
+    ("passed-float",
+     {"tests": {"error": 0, "failure": 0, "passed": 6.0, "skipped": 0}},
+     "tests.passed is float"),
+    ("tests-not-object", {"tests": [0, 0, 6, 0]}, "tests is not an object"),
+    ("tests-extra-key",
+     {"tests": {"error": 0, "failure": 0, "passed": 6, "skipped": 0, "flaky": 0}},
+     "keys are not exactly"),
+    ("tests-missing-key", {"tests": {"error": 0, "failure": 0, "passed": 6}},
+     "keys are not exactly"),
+    ("status-true", {"evidenceStatus": True}, "evidenceStatus is not a non-empty string"),
+    ("status-empty", {"evidenceStatus": ""}, "evidenceStatus is not a non-empty string"),
+    ("identity-not-a-sha", {"caseIdentitiesSha256": "complete"}, "64-character lowercase SHA-256"),
+    ("identity-uppercase", {"caseIdentitiesSha256": "A" * 64}, "64-character lowercase SHA-256"),
+    ("negative-exit", {"exitCode": -1}, "exitCode is negative"),
+]
+
+
+@pytest.mark.parametrize(
+    ("label", "mutation", "message"), TYPE_CONFUSIONS,
+    ids=[row[0] for row in TYPE_CONFUSIONS],
+)
+def test_a_decisive_field_of_the_wrong_json_type_never_reaches_the_envelope(
+    label, mutation, message
+):
+    """``0 == False`` in Python, so the whole importer called a boolean exit code a reviewed zero.
+
+    Measured by Codex on the previous head: a proof with ``exitCode: false`` and
+    ``subprocessExitCode: false`` was written into the observations and the threat report came out
+    ``MEASURED_PASS``; ``tests.failure: false`` did the same against the reviewed ``0`` (#332 r3 F1).
+    The shapes are checked in ``vf_decisive`` before any comparison, so these die here and in the
+    finder's candidate comparison alike.
+    """
+
+    with pytest.raises(tool.SecurityImportError, match=message):
+        imported(
+            database=(definer_report(), rls_report()),
+            vf=vf_bundle(proof=vf_proof(**mutation)),
+        )
+
+
+def test_the_declared_shapes_cover_exactly_the_decisive_fields():
+    """A decisive field with no declared shape would be compared with bare ``!=`` again."""
+
+    assert set(tool.VF_FIELD_SHAPES) == set(tool.VF_DECISIVE_FIELDS)
+    assert tuple(sorted(tool.VF_TEST_KEYS)) == tool.VF_TEST_KEYS
+
+
+def test_a_shape_declaration_that_drifts_from_the_decisive_fields_is_refused(monkeypatch):
+    monkeypatch.setattr(tool, "VF_FIELD_SHAPES", {"exitCode": "count"})
+    with pytest.raises(tool.SecurityImportError, match="VF_FIELD_SHAPES"):
+        tool.vf_decisive(vf_proof(), "browser lane")
+
+
+def test_the_reviewed_side_of_the_comparison_is_shape_checked_too():
+    """A reviewed ``"failure": false`` would equal an observed ``0`` just as readily."""
+
+    spec = dict(APPROVED_ALLOWLIST["secVf001"])
+    spec["expectedTests"] = {"error": 0, "failure": False, "passed": 6, "skipped": 0}
+    with pytest.raises(tool.SecurityImportError, match="tests.failure is bool"):
+        tool.vf_required(spec)
+
+
 @pytest.mark.parametrize(
     ("label", "kwargs", "message"),
     [

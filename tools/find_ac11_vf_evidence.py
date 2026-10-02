@@ -11,6 +11,8 @@ What it does, and deliberately only this:
 * reads **which** workflow and **which** artifact name from the reviewed sources -- the allowlist's
   ``secVf001.workflow.path`` and the importer's ``VF_ARTIFACT_NAME`` -- so this file adds no second
   definition of the browser lane's identity;
+* enumerates the population GitHub actually has **at that commit** and pages to the end, refusing
+  a listing it cannot prove complete -- a truncated window could hide the inconvenient candidate;
 * requires the candidates to be **one piece of evidence**: successful runs of that workflow at
   that source SHA from an approved event, each with one artifact of the reviewed name.  Zero is an
   answer ("no evidence at this SHA").  Several are accepted **only when their proofs agree on every
@@ -50,6 +52,16 @@ import import_ac11_security_scan as importer  # noqa: E402
 #: The events a VF run may come from.  The browser lane's attestation-grade inputs are only
 #: produced on an explicit opt-in, which is the same set the importer accepts.
 APPROVED_EVENTS = ("workflow_dispatch", "pull_request")
+#: How the population is enumerated.  ``gh run list --limit 50`` was a silent truncation: it
+#: returns the repository's most recent fifty runs of one workflow and the SHA filter was applied
+#: *after* that, so a conflicting older run at the same commit could sit outside the window while a
+#: newer one sat inside -- "do not pick the convenient candidate" with the inconvenient one unseen
+#: (#332 r3 F2).  The REST endpoint takes the commit itself, states ``total_count``, and carries
+#: each run's ``path``; this tool pages to the end and refuses anything it cannot enumerate whole.
+RUNS_PER_PAGE = 100
+#: GitHub serves at most 1000 results from a listing endpoint, so a larger population cannot be
+#: proved complete and is a refusal rather than a shorter list.
+MAX_RUN_PAGES = 10
 ARCHIVE_NAME = "vf-archive.zip"
 RUN_METADATA_NAME = "vf-run.json"
 ARTIFACT_METADATA_NAME = "vf-artifact.json"
@@ -80,31 +92,77 @@ def _gh_bytes(*args: str) -> bytes:
     return result.stdout
 
 
+def runs_at_head(source_sha: str, fetch) -> list[dict[str, Any]]:
+    """Every workflow run GitHub has at that exact commit, enumerated to the end.
+
+    ``fetch(page)`` returns one page of ``GET /repos/{repo}/actions/runs?head_sha=...``.  The
+    population is only usable if it is **complete**, so what GitHub states (``total_count``) is
+    compared with what was actually listed: a page that stops early, a page that is not a list, and
+    a population larger than the listing endpoint will serve are all refusals.  A short list would
+    otherwise be indistinguishable from "there is no other candidate" (#332 r3 F2).
+    """
+
+    collected: list[dict[str, Any]] = []
+    stated: int | None = None
+    for page in range(1, MAX_RUN_PAGES + 1):
+        payload = fetch(page)
+        if not isinstance(payload, dict):
+            raise RuntimeError("the runs response is not an object")
+        total = payload.get("total_count")
+        if not isinstance(total, int) or isinstance(total, bool) or total < 0:
+            raise RuntimeError("the runs response states no usable total_count")
+        rows = payload.get("workflow_runs")
+        if not isinstance(rows, list):
+            raise RuntimeError("the runs response carries no workflow_runs list")
+        if stated is None:
+            stated = total
+            if stated > RUNS_PER_PAGE * MAX_RUN_PAGES:
+                raise NoSingleCandidate(
+                    f"GitHub states {stated} runs at {source_sha}, more than the "
+                    f"{RUNS_PER_PAGE * MAX_RUN_PAGES} a listing can enumerate"
+                )
+        elif total != stated:
+            raise NoSingleCandidate(
+                f"the run population changed while it was being listed ({stated} then {total})"
+            )
+        collected.extend(row for row in rows if isinstance(row, dict))
+        if len(collected) >= stated or not rows:
+            break
+    if stated is None or len(collected) != stated:
+        raise NoSingleCandidate(
+            f"GitHub states {stated} runs at {source_sha} but {len(collected)} could be listed; "
+            f"a truncated population is not evidence"
+        )
+    return collected
+
+
 def candidate_runs(rows: Any, source_sha: str, workflow_path: str) -> list[int]:
     """Every successful run of that workflow at that SHA from an approved event, by id.
 
-    ``gh run list --json`` has no ``path`` field (measured: it refuses the name and prints the
-    fifteen it has), so the workflow is selected by the ``--workflow`` argument here and the
-    **path itself is verified by the importer** against the reviewed allowlist, from the run
-    metadata this tool downloads.  That keeps one definition of "the reviewed workflow".
+    The rows come from the REST listing, whose run objects do carry ``path`` (``gh run list
+    --json`` does not -- measured: it refuses the name and prints the fifteen fields it has).  The
+    workflow path is still **verified by the importer** against the reviewed allowlist, from the run
+    metadata this tool downloads, so selecting on it here adds no second definition of "the reviewed
+    workflow"; it only keeps other lanes' runs at the same commit out of the population.
     """
 
     if not isinstance(rows, list):
-        raise RuntimeError("gh run list did not return a list")
+        raise RuntimeError("the run population is not a list")
     found = []
     for row in rows:
         if not isinstance(row, dict):
             continue
         if (
-            row.get("headSha") != source_sha
+            row.get("head_sha") != source_sha
+            or str(row.get("path", "")).split("@", 1)[0] != workflow_path
             or row.get("status") != "completed"
             or row.get("conclusion") != "success"
             or row.get("event") not in APPROVED_EVENTS
         ):
             continue
-        run_id = row.get("databaseId")
+        run_id = row.get("id")
         if not isinstance(run_id, int) or isinstance(run_id, bool) or run_id <= 0:
-            raise NoSingleCandidate("a matching run has no usable databaseId")
+            raise NoSingleCandidate("a matching run has no usable id")
         found.append(run_id)
     if not found:
         raise NoSingleCandidate(
@@ -203,14 +261,18 @@ def main(argv: list[str] | None = None) -> int:
         print(f"the reviewed allowlist is unusable: {error}", file=sys.stderr)
         return 2
     repository = importer.REPOSITORY
-    try:
-        rows = json.loads(
+    def fetch_runs(page: int) -> Any:
+        return json.loads(
             _gh(
-                "run", "list", "--workflow", workflow_path.rsplit("/", 1)[-1], "--limit", "50",
-                "--json", "databaseId,headSha,status,conclusion,event",
+                "api", "-X", "GET", f"repos/{repository}/actions/runs",
+                "-f", f"head_sha={args.source_sha}",
+                "-f", f"per_page={RUNS_PER_PAGE}", "-f", f"page={page}",
             )
-            or "[]"
+            or "{}"
         )
+
+    try:
+        rows = runs_at_head(args.source_sha, fetch_runs)
         run_ids = candidate_runs(rows, args.source_sha, workflow_path)
 
         artifacts: dict[int, Any] = {}
