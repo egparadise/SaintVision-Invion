@@ -16,6 +16,7 @@ from copy import deepcopy
 from datetime import datetime, timezone
 
 import pytest
+from psycopg import OperationalError
 from psycopg.types.json import Jsonb
 
 from inv.build_execution import (
@@ -305,6 +306,18 @@ def assert_only_quarantine_was_committed(database, reason_code):
     assert database.node_status == "quarantined"
 
 
+def assert_only_preflight_observation_was_committed(database):
+    """A pre-dispatch outage is observed, but never permanently fences the Node."""
+
+    writes = [(kind, params) for batch in database.committed for kind, params in batch]
+    assert [kind for kind, _ in writes] == ["outbox"]
+    event = writes[0][1]
+    assert event[3] == "inv.build.quarantine_preflight_unavailable"
+    assert event[4]["reasonCode"] == "RES-0006"
+    assert event[4]["nodeId"] == NODE
+    assert database.node_status == "online"
+
+
 # --- the control -------------------------------------------------------------------------
 
 
@@ -335,8 +348,8 @@ def test_product_dispatch_is_off_unless_the_value_is_exactly_one(environment):
     assert adapter.calls == 0
 
 
-def test_an_unreachable_runtime_quarantine_channel_fences_the_node_before_dispatch():
-    """M-3/M-4: configured is not reachable, and unreachable is durably unschedulable."""
+def test_an_unreachable_runtime_channel_is_observed_without_permanent_quarantine():
+    """N-1: a transient pre-dispatch outage refuses only this dispatch."""
 
     boundary = _Boundary(
         preflight_error=DomainError(
@@ -348,7 +361,7 @@ def test_an_unreachable_runtime_quarantine_channel_fences_the_node_before_dispat
         run(service)
     assert refused.value.code == "RES-0006" and refused.value.retryable is True
     assert adapter.calls == 0
-    assert_only_quarantine_was_committed(database, "RES-0006")
+    assert_only_preflight_observation_was_committed(database)
 
 
 # --- health authority --------------------------------------------------------------------
@@ -788,6 +801,21 @@ def test_a_failing_quarantine_does_not_replace_the_race_it_was_recording():
         run(service)
     assert refused.value.code == "LEASE-0002"
     assert_only_quarantine_was_committed(database, "LEASE-0002")
+
+
+def test_a_failing_control_plane_fence_does_not_replace_the_original_error(monkeypatch):
+    """N-2: driver/check/FK failures are secondary to the dispatch authority failure."""
+
+    boundary = _Boundary(daemon_after={**DAEMON, "pid": 99})
+    service, _database, _adapter, _b = build(boundary=boundary)
+
+    def unavailable(**_kwargs):
+        raise OperationalError("database unavailable")
+
+    monkeypatch.setattr(service, "_mark_node_quarantined", unavailable)
+    with pytest.raises(DomainError) as refused:
+        run(service)
+    assert refused.value.code == "VERIFY-0002"
 
 
 def test_two_callers_contending_on_one_lease_release_and_record_exactly_once():

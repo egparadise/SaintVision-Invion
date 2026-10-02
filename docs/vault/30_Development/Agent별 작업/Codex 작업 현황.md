@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.269"
+version: "1.0.270"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T12:16:40+09:00"
+updated: "2026-10-02T12:34:09+09:00"
 source_of_truth: "Git"
 active_card: "CARD-222 node-agent durable quarantine channel"
-active_card_status: "Claude r1 M-1..M-4 fixed: full authority replay key, runtime preflight, CP scheduling fence, original-cause preservation; exact-head CI pending"
-active_card_next: "Push r1 fixes, obtain exact-head Core/Backend green and Claude r2, then start Card 223 product caller on the approved head"
+active_card_status: "Claude r2 N-1..N-3 fixed: transient preflight observation without fence, approved quarantine reconcile/resume, all secondary failures preserve original cause"
+active_card_next: "Push r2 fixes, obtain exact-head Core/Backend green and Claude r3, then start Card 223 product caller on the approved head"
 ---
 
 ## 2026-10-02 Card 222 — node-agent durable quarantine channel
@@ -24,6 +24,10 @@ active_card_next: "Push r1 fixes, obtain exact-head Core/Backend green and Claud
   fresh nonce preflight 실패는 dispatch 전에 `RES-0006`과 DB node quarantine/outbox marker를 남긴다.
   post-dispatch Node journal 실패도 최초 경합 원인을 덮지 않으며 CP scheduling fence가 다음 build를
   막는다. focused Python **239 passed, 1 skipped**; exact-head hosted 판정 대기다.
+- Claude r2에서 일시 probe 실패의 영구 격리를 제거했다. preflight는 그 dispatch만 거부하고 outbox
+  관측만 남긴다. post-dispatch 영구 격리는 `can_resume` 사람 운영자+2인 approval+settled+fresh
+  authenticated Node evidence를 요구하는 기존 resume 경로로만 해제한다. driver 오류도 최초 원인을
+  덮지 않으며 ±5초 freshness 변이는 단독 시험으로 사살했다.
 
 ## 2026-10-02 Card 211 — VF-CL CI receipt attestation
 

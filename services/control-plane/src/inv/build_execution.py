@@ -34,6 +34,7 @@ from datetime import timedelta
 import hashlib
 import json
 import datetime as dt
+import logging
 import os
 import re
 from typing import Any, Mapping
@@ -65,10 +66,12 @@ WRITER_KIND = "node-agent"
 DAEMON_COMM = "buildkitd"
 COMPLETED_EVENT = "inv.build.dispatch_completed"
 QUARANTINED_EVENT = "inv.build.node_quarantined"
+QUARANTINE_PREFLIGHT_UNAVAILABLE_EVENT = "inv.build.quarantine_preflight_unavailable"
 PARTIAL_EXPORT_DISPOSITIONS = frozenset({"quarantined", "purged"})
 CACHE_DISPOSITIONS = frozenset({"retained", "quarantined", "purged"})
 
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+LOGGER = logging.getLogger(__name__)
 
 #: The daemon identity fields that must be identical before and after the dispatch.
 #: ``comm`` is included because a rootlesskit process answering in buildkitd's place
@@ -325,6 +328,46 @@ class BuildExecutionService:
                 ),
             )
 
+    def _record_preflight_unavailable(
+        self,
+        *,
+        tenant_id: str,
+        project_id: str,
+        run_id: str,
+        leased_node_id: str,
+        identity: Mapping[str, Any],
+    ) -> None:
+        """Record channel unavailability without permanently fencing a healthy Node.
+
+        No external side effect exists before dispatch, so the correct safety action is
+        refusing the request.  A transient probe failure, clock skew, or channel
+        misconfiguration must not convert into an operator-only permanent quarantine.
+        """
+
+        with self.db.transaction(tenant_id) as conn:
+            conn.execute(
+                """INSERT INTO inv.outbox(tenant_id,run_id,event_id,event_type,payload)
+                VALUES (%s,%s,%s,%s,%s)""",
+                (
+                    tenant_id,
+                    run_id,
+                    uuid4(),
+                    QUARANTINE_PREFLIGHT_UNAVAILABLE_EVENT,
+                    Jsonb(
+                        {
+                            "projectId": project_id,
+                            "nodeId": leased_node_id,
+                            "reasonCode": "RES-0006",
+                            "buildSessionId": identity["build_session_id"],
+                            "leaseId": identity["lease_id"],
+                            "resourceId": identity["resource_id"],
+                            "decisionId": identity["decision_id"],
+                            "bindingDigest": identity["binding_digest"],
+                        }
+                    ),
+                ),
+            )
+
     def _record_post_dispatch_quarantine(
         self,
         *,
@@ -368,7 +411,10 @@ class BuildExecutionService:
         except Exception:
             # This marker is secondary evidence.  Even an unexpected client failure may not
             # replace the authority/race error which explains why quarantine was required.
-            pass
+            LOGGER.exception(
+                "node-agent quarantine marker failed",
+                extra={"reason_code": reason_code},
+            )
         try:
             self._mark_node_quarantined(
                 tenant_id=tenant_id,
@@ -379,8 +425,11 @@ class BuildExecutionService:
                 reason_code=reason_code,
                 identity=identity,
             )
-        except DomainError:
-            pass
+        except Exception:
+            LOGGER.exception(
+                "control-plane quarantine fence failed",
+                extra={"reason_code": reason_code},
+            )
 
     # ---------------------------------------------------------------- cleanup authority
 
@@ -671,20 +720,22 @@ class BuildExecutionService:
         try:
             self._transport.preflight_quarantine(leased_node_id, lease_epoch)
         except DomainError:
-            # A configured client is not a live reconciliation channel.  Fence the node in
-            # the control plane before returning the original fail-closed transport error.
+            # A configured client is not a live reconciliation channel.  Refuse before any
+            # external side effect and durably observe the failure, but do not permanently
+            # quarantine a healthy Node for a transient probe or local clock skew.
             try:
-                self._mark_node_quarantined(
+                self._record_preflight_unavailable(
                     tenant_id=request["tenantId"],
                     project_id=request["projectId"],
                     run_id=run_id,
                     leased_node_id=leased_node_id,
-                    recovery_epoch=lease_epoch,
-                    reason_code="RES-0006",
                     identity=preflight_identity,
                 )
-            except DomainError:
-                pass
+            except Exception:
+                LOGGER.exception(
+                    "quarantine preflight observation failed",
+                    extra={"reason_code": "RES-0006"},
+                )
             raise
         health = self._transport.collect_product_health()
         daemon_before = self._health_authority(

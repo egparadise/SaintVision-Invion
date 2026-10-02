@@ -390,6 +390,29 @@ def test_quarantine_preflight_requires_a_live_exact_mtls_channel(tmp_path):
 
 
 @pytest.mark.parametrize(
+    "observed_at",
+    ["2026-10-02T07:59:54Z", "2026-10-02T08:00:06Z"],
+    ids=["six-seconds-stale", "six-seconds-future"],
+)
+def test_quarantine_preflight_rejects_observations_outside_the_five_second_window(
+    tmp_path, observed_at
+):
+    """N-3: removing the freshness comparison must make this regression fail."""
+
+    client = _QuarantineClient()
+    original_probe = client.probe
+
+    def probe(channel, request):
+        return {**original_probe(channel, request), "observedAt": observed_at}
+
+    client.probe = probe
+    boundary = _quarantine_boundary(tmp_path, client)
+    with pytest.raises(DomainError) as refused:
+        boundary.preflight_quarantine(NODE, "223e4567-e89b-12d3-a456-426614174000")
+    assert refused.value.code == "RES-0006" and refused.value.retryable is True
+
+
+@pytest.mark.parametrize(
     ("node_id", "session_id", "reason"),
     [
         ("nod_11111111111111111111111111", None, "RES-0006"),

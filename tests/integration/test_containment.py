@@ -461,6 +461,32 @@ def test_drain_preserves_inflight_execution_and_resume_needs_fresh_probe(remote)
     assert a.ops.get(a.people["requester"], a.e.node)["nodeStatus"] == "draining"
     assert change(a, "resume", 1)["control"]["nodeStatus"] == "online"
 
+    # A post-dispatch quarantine can be cleared only through the same person-backed,
+    # two-person-approved resume operation, after a fresh authenticated observation.
+    with psycopg.connect(a.e.owner) as conn:
+        conn.execute(
+            "UPDATE inv.nodes SET status='quarantined' WHERE tenant_id=%s AND node_id=%s",
+            (a.e.tenant, a.e.node),
+        )
+        conn.execute(
+            "UPDATE inv.node_resource_snapshots SET received_at=clock_timestamp()-interval '1 minute' "
+            "WHERE tenant_id=%s AND node_id=%s",
+            (a.e.tenant, a.e.node),
+        )
+    with pytest.raises(DomainError, match="NODE-0062"):
+        change(a, "resume", 2, key="reconcile-stale")
+    NodeObservation(a.e.db, a.client).poll_resources(a.node)
+    reconciled = change(a, "resume", 2, key="reconcile-fresh")
+    assert reconciled["control"]["nodeStatus"] == "online"
+    with a.e.db.transaction(a.e.tenant) as conn:
+        audit = conn.execute(
+            "SELECT subject_id,reason_code,response FROM inv.containment_requests "
+            "WHERE operation='resume' AND key='reconcile-fresh'"
+        ).fetchone()
+    assert audit["subject_id"] == a.people["bob"].subject_id
+    assert audit["reason_code"] == "maintenance"
+    assert audit["response"]["approvalId"] == reconciled["approvalId"]
+
 
 def test_restart_reconciler_keeps_kill_active_after_operator_is_revoked(remote):
     a = queued_node(remote)

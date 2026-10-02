@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD222-NODE-QUARANTINE-20261002"
 title: "Card 222 node-agent durable quarantine channel"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T12:16:40+09:00"
+updated: "2026-10-02T12:34:09+09:00"
 source_of_truth: "Git"
 base_sha: "63ef20c4df9455eaae05758ff18d00ad46e5ff0f"
 reviewer: "Claude"
@@ -51,7 +51,7 @@ Claude r1 `issuecomment-5944843555`의 M-1~M-4를 다음처럼 닫았다.
 - lease/session/daemon/decision/binding/epoch를 request·receipt와 replay key에 결속했다. epoch 또는
   daemon만 바뀌어도 새 requestId가 생기고, lost acknowledgement만 exact replay한다.
 - capability 설정만 믿지 않고 매 dispatch fresh nonce preflight를 수행한다. 런타임 도달 불가도
-  adapter 호출 0건인 상태에서 DB scheduling fence와 redacted outbox로 durable 표시한다.
+  adapter 호출 0건인 상태에서 redacted outbox로 durable 표시하되 Node 상태는 바꾸지 않는다.
 - post-dispatch 격리는 Node journal과 `inv.nodes.status='quarantined'` 두 marker를 독립 기록한다.
   기존 placement/build admission의 online guard가 후속 배정을 거부한다.
 - focused Python 결과는 **239 passed, 1 skipped**였고, 추가 collector/service 재검증은
@@ -59,3 +59,18 @@ Claude r1 `issuecomment-5944843555`의 M-1~M-4를 다음처럼 닫았다.
 
 hosted Core·Backend exact-head 결과와 Claude r2 판정은 이 조치 commit 이후 기록한다. 제품 caller와
 실제 builder Node 인수는 여전히 별도 카드이며 S08-BE 완료를 주장하지 않는다.
+
+# Claude r2 조치
+
+- pre-dispatch probe 실패를 증명된 post-dispatch 위반과 분리했다. 다른 Node pin, 6초 clock skew,
+  429 같은 일시 오류는 `RES-0006`으로 그 dispatch만 거부하고
+  `inv.build.quarantine_preflight_unavailable` 관측을 남기며 Node는 online을 유지한다.
+- post-dispatch 격리 해제는 기존 containment `resume`을 사용한다. person-backed `can_resume` 운영자,
+  독립 2인 approval, settled 상태, fresh authenticated Node channel/resource snapshot, recovery epoch가
+  모두 맞아야 online으로 복귀한다. actor·reason·approval·response는 `inv.containment_requests`에 남는다.
+- Node journal이나 CP fence가 `DomainError` 밖의 driver/check/FK 오류를 내도 최초 `VERIFY-0002`·
+  `VERIFY-0022`·`LEASE-0002`를 유지하고 redacted structured log만 남긴다.
+- ±5초 freshness 경계를 각각 6초 stale/future fixture로 고정해 검사 제거 변이를 사살했다.
+
+focused collector/service는 **92 passed, 1 skipped**다. quarantine resume의 실 PostgreSQL 경로는
+exact-head Backend에서 실행하며, Core의 Linux journal과 함께 green 확인 전 승인·완료를 주장하지 않는다.
