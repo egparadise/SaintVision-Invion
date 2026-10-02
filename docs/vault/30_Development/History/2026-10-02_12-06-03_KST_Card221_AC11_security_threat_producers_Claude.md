@@ -6,7 +6,7 @@ status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-02T12:06:03+09:00"
+updated: "2026-10-02T12:44:16+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "7301c6a7"
@@ -39,7 +39,7 @@ tags: ["ac11", "security", "threat-reports", "rls", "definer", "s11", "claude"]
 ### 1-2. importer — 네 report를 담고, 판정은 집계기의 것을 쓴다
 
 - artifact의 두 member(`s11-ac11-security-definer.json`·`s11-ac11-security-rls.json`)를 읽고, **같은 run·같은 source head·같은 tree**가 아니면 거부한다(봉투에는 run id와 artifact digest가 하나씩이다).
-- `--vf-evidence`로 **브라우저 lane의 자기 증명**을 받아 `SEC-VF-001`을 만든다. 그 lane은 검토된 allowlist가 tool file로 pin하는 workflow이므로, long-soak importer의 child reference와 같은 모양으로 digest·head에 결속한다.
+- **브라우저 lane의 artifact와 그 run·artifact metadata 셋**을 받아 `SEC-VF-001`을 만든다(`--vf-archive`·`--vf-run-metadata`·`--vf-artifact-metadata`, 하나라도 없으면 거부). r1은 느슨한 증명 문서 하나만 받고 allowlist와 비교하는 **다섯 공개 값**만 확인했는데, 그 다섯은 전부 검토된 allowlist에 적혀 있으므로 **로컬에서 쓴 JSON이 통과**했고 그 report가 **scan의 provenance를 자기 것으로 복사**했다(§7-1, `#319` F1). 지금은 scan artifact와 같은 방식으로 결속한다 — canonical repository, 검토된 workflow path, 승인된 opt-in event, completed/success, **scan과 같은 source head**(run과 artifact 양쪽), artifact 이름, 만료, **bytes로 재계산한 GitHub digest**, 그리고 증명 문서는 **그 archive 안에서** 읽는다.
 - **판정은 `evaluate_definer`·`evaluate_rls`·`evaluate_vf`를 직접 호출해 정한다.** 두 번째 의견을 갖지 않는 것이 `#313` r2에서 배운 것이고, 여기서는 그것이 더 중요하다 — 세 report의 규칙은 집계기 안에만 있다.
 - evaluator가 `INVALID_RUN`이라 부른 report는 **이름과 함께 빼고 `reason`에 적는다**. 담으면 봉투 자신이 `INVALID_RUN`이 되고, 그러면 운영자는 **어느 report가 왜 안 되는지** 알 수 없다.
 - 그래서 `#313` r2의 "재계산할 수 없는 report는 거부" 규칙이 **더 강한 것으로 대체됐다** — 이제 그 report들은 *평가되고*, 빈 row 넷은 `INVALID_RUN`으로 이름이 불려 빠지며, **pass는 여전히 불가능하다**(그 시험을 그대로 유지했다).
@@ -64,6 +64,18 @@ tags: ["ac11", "security", "threat-reports", "rls", "definer", "s11", "claude"]
 **그리고 네 번째 report가 들어오는 순간을 측정했다** — 검토 집합과 같은 definer report를 더해 `_security_observations`를 직접 불렀더니 **`INVALID_RUN`**이고, 원인은 하나뿐이다: `SEC-VF-001`의 `.github/workflows/desktop-browser.yml` pin(`0cd345aa`)이 tree(`bb5708a8`)와 다르다. 집계기는 **네 report가 다 있을 때만** 그 pin을 tree와 대조하므로(`#313` F-R3와 같은 구조), **이 drift는 잠복이고 세 번째 결정이 닫히는 순간 축을 `INVALID_RUN`으로 만든다.**
 
 **로컬에서 같은 측정을 먼저 했고 결과가 같다**(이 PC의 disposable DB, 15 함수·unsafe 0, UNMEASURED 1행).
+
+## 2-1. `#319` F1 이후 — VF 결속을 다시 측정했다
+
+| 단계 | 결과 |
+|---|---|
+| security lane | **run `36961248484`**, head **`173d3c28`**, success. artifact `11207049917`, member 4개 |
+| browser lane | **run `36961250945`**, head **`173d3c28`**, `workflow_dispatch`, success. artifact `11208365520` `desktop-browser-safe-evidence`, 미만료, API digest == 내려받은 bytes |
+| importer | exit 0. `SEC-VF-001`의 `sourceRunId`가 **browser run**(`36961250945`)이고 scan run(`36961248484`)이 아니다 — r1에서는 그 반대였다 |
+| 봉투 | `verdict NOT_OBSERVED`, `threatReportVerdicts`: SCAN **MEASURED_PASS** · VF **MEASURED_PASS** · RLS **NOT_OBSERVED**(SEC-DEF-001은 `INVALID_RUN`으로 빠진다) |
+| 조립기 → 집계기 | `assembledAxes: ["security-critical-high-zero"]`, **축 `NOT_OBSERVED`** |
+
+**이전 artifact로는 재측정할 수 없었다** — F1을 고쳐 importer 파일이 바뀌자, 이전 head에서 돈 lane의 artifact가 pin한 importer blob과 실행 blob이 달라 `#313` F-R3의 결속이 **의도대로 거부**했다. 그래서 두 lane을 새 head에서 다시 돌렸다.
 
 ## 3. 막는 것 — 코드가 아니라 **세 개의 검토 결정**
 
@@ -116,6 +128,16 @@ tags: ["ac11", "security", "threat-reports", "rls", "definer", "s11", "claude"]
 - **AC-11 정의를 손대지 않았다.** `REQUIRED_AXES`·target registry·`s11-security-allowlist-v0.json`(= target의 `sourceDocument`) 어느 것도 바꾸지 않았다. 바꾼 것은 집계기의 **도구 pin 하나**와 dependency/SAST allowlist의 pin 둘이다.
 - **축을 낮추지 않았다.** role 모집단을 줄이면 이 tree는 PASS가 되지만 그 길을 막았다(§1-1).
 - **네 report가 함께 통과하는 봉투를 보지 못했다.** 세 개는 실측으로 들어왔고 네 번째(definer)는 검토 결정을 기다린다. 그리고 그 결정이 닫히면 **잠복한 VF pin drift가 축을 `INVALID_RUN`으로 만든다** — 그래서 §3의 1번과 2번은 **같이** 닫아야 하는 한 쌍이고, 그 사실이 이 카드가 측정으로 알아낸 것 중 가장 쓸모 있는 것이다.
+
+## 7-1. `#319` F1 — SEC-VF-001이 브라우저 run에 결속되지 않았다
+
+**지적이 맞다.** r1의 `vf_report()`는 검토된 allowlist와 비교하는 다섯 값(`caseIdentitiesSha256`·`tests`·`evidenceStatus`·두 exit code)만 확인했고, 없는 provenance 세 개(`sourceRunId`·`sourceHeadSha`·`checkoutTreeSha`)를 **security scan report에서 복사**했다. 그 다섯 값은 **전부 검토된 allowlist에 적힌 공개 값**이므로 누구나 통과하는 파일을 쓸 수 있고, 결과물은 **scan의 run을 자기 run이라 주장**했다.
+
+**무엇이 잘못이었나**: 나는 "이 증거가 reviewed pin과 맞는가"를 물었고 "이 증거가 **GitHub이 서명해 준 artifact에서 왔는가**"를 묻지 않았다. scan 쪽에는 그 질문이 처음부터 있었는데(`#313`에서 digest·head·run을 결속했다) **같은 질문을 VF 쪽에 옮기지 않았다** — 한 importer 안에서 두 입력의 기준이 달랐다.
+
+**조치**: 입력을 셋으로 만들고(archive + run metadata + artifact metadata, 하나라도 없으면 거부) scan artifact와 같은 검증을 적용했다(§1-2). report의 provenance는 **검증한 VF run/artifact**이고, `vfArtifact` 블록이 runId·artifactId·이름·digest·observedDigest·만료·conclusion·proof digest를 남긴다.
+
+**단일 변이 부정 시험 열다섯**: 다른 run, 다른 head(run·artifact 각각), 다른 repository, 다른 workflow, 실패한 run, 미완 run, 승인되지 않은 event, 위조 digest, 만료 flag, 만료 시각, 다른 artifact 이름, proof member 없음, unsafe member path, 그리고 **입력 셋 중 하나를 빼는 것**(셋 — 빼기가 허용되면 caller가 싫은 결속만 버릴 수 있다). provenance 없는 입력을 정상으로 고정했던 fixture는 **실제 archive와 두 metadata로 교체**했다.
 
 ## 8. 다음 첫 행동
 
