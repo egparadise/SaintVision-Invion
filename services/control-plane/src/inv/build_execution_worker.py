@@ -53,6 +53,9 @@ class BuildExecutionIntent:
     evidence_id: str
     actor_id: str
     status: str
+    attempt_count: int
+    next_attempt_at: Any
+    last_error_code: str | None
 
 
 def _refuse(detail: str) -> DomainError:
@@ -108,6 +111,9 @@ def _row_to_intent(row: Mapping[str, Any]) -> BuildExecutionIntent:
         evidence_id=row["evidence_id"],
         actor_id=row["actor_id"],
         status=row["status"],
+        attempt_count=row["attempt_count"],
+        next_attempt_at=row["next_attempt_at"],
+        last_error_code=row["last_error_code"],
     )
 
 
@@ -177,43 +183,87 @@ class BuildExecutionIntentQueue:
             return _row_to_intent(row)
 
     def claim_next(self, tenant_id: str) -> BuildExecutionIntent | None:
-        with self.db.transaction(tenant_id) as conn:
-            row = conn.execute(
-                """WITH candidate AS (
-                  SELECT tenant_id,project_id,run_id
-                  FROM inv.build_execution_intents
-                  WHERE tenant_id=%s AND status='pending'
-                    AND request_sha256 =
-                      encode(sha256(convert_to(request::text,'UTF8')),'hex')
-                    AND plan_sha256 =
-                      encode(sha256(convert_to(plan::text,'UTF8')),'hex')
-                    AND decision_sha256 =
-                      encode(sha256(convert_to(decision::text,'UTF8')),'hex')
-                  ORDER BY created_at,project_id,run_id
-                  LIMIT 1 FOR UPDATE SKIP LOCKED
+        while True:
+            invalid = False
+            with self.db.transaction(tenant_id) as conn:
+                # A restored or owner-mutated row must not poison the tenant queue. Quarantine
+                # every due row whose database-owned digest no longer describes its payload.
+                conn.execute(
+                    """WITH corrupt AS (
+                      SELECT tenant_id,project_id,run_id
+                      FROM inv.build_execution_intents
+                      WHERE tenant_id=%s AND status='pending'
+                        AND next_attempt_at <= clock_timestamp()
+                        AND (request_sha256 IS DISTINCT FROM
+                             encode(sha256(convert_to(request::text,'UTF8')),'hex')
+                          OR plan_sha256 IS DISTINCT FROM
+                             encode(sha256(convert_to(plan::text,'UTF8')),'hex')
+                          OR decision_sha256 IS DISTINCT FROM
+                             encode(sha256(convert_to(decision::text,'UTF8')),'hex'))
+                      FOR UPDATE SKIP LOCKED
+                    )
+                    UPDATE inv.build_execution_intents AS intent SET
+                      status='quarantined',last_error_code='VERIFY-0002'
+                    FROM corrupt
+                    WHERE (intent.tenant_id,intent.project_id,intent.run_id) =
+                          (corrupt.tenant_id,corrupt.project_id,corrupt.run_id)""",
+                    (tenant_id,),
                 )
-                UPDATE inv.build_execution_intents AS intent SET status='claimed'
-                FROM candidate
-                WHERE (intent.tenant_id,intent.project_id,intent.run_id) =
-                      (candidate.tenant_id,candidate.project_id,candidate.run_id)
-                RETURNING intent.*""",
-                (tenant_id,),
-            ).fetchone()
-            if not row:
-                return None
-            intent = _row_to_intent(row)
-            # The database binds scope and policy fields; the worker also validates the
-            # complete public contracts before any external side effect.
-            _validated_documents(
-                Principal(intent.tenant_id, intent.actor_id),
-                intent.request,
-                intent.plan,
-                intent.decision,
-                policy_version=intent.policy_version,
-            )
+                row = conn.execute(
+                    """WITH candidate AS (
+                      SELECT tenant_id,project_id,run_id
+                      FROM inv.build_execution_intents
+                      WHERE tenant_id=%s AND status='pending'
+                        AND next_attempt_at <= clock_timestamp()
+                      ORDER BY next_attempt_at,created_at,project_id,run_id
+                      LIMIT 1 FOR UPDATE SKIP LOCKED
+                    )
+                    UPDATE inv.build_execution_intents AS intent SET status='claimed'
+                    FROM candidate
+                    WHERE (intent.tenant_id,intent.project_id,intent.run_id) =
+                          (candidate.tenant_id,candidate.project_id,candidate.run_id)
+                    RETURNING intent.*""",
+                    (tenant_id,),
+                ).fetchone()
+                if not row:
+                    return None
+                intent = _row_to_intent(row)
+                try:
+                    # The trigger binds SQL-readable fields; this validates the complete strict
+                    # public contracts before any external side effect.
+                    _validated_documents(
+                        Principal(intent.tenant_id, intent.actor_id),
+                        intent.request,
+                        intent.plan,
+                        intent.decision,
+                        policy_version=intent.policy_version,
+                    )
+                except (DomainError, KeyError, TypeError, ValueError):
+                    conn.execute(
+                        """UPDATE inv.build_execution_intents SET
+                        status='quarantined',last_error_code='VERIFY-0002'
+                        WHERE tenant_id=%s AND project_id=%s AND run_id=%s
+                          AND status='claimed'""",
+                        (intent.tenant_id, intent.project_id, intent.run_id),
+                    )
+                    invalid = True
+            if invalid:
+                continue
             return intent
 
-    def requeue_if_unconsumed(self, intent: BuildExecutionIntent) -> bool:
+    def _dispatch_consumed(self, conn, intent: BuildExecutionIntent) -> bool:
+        claim_key = action_digest({"decisionId": intent.decision["decisionId"]})
+        return (
+            conn.execute(
+                """SELECT 1 FROM inv.idempotency
+                WHERE project_id=%s AND operation='build.dispatch' AND key=%s
+                  AND response->>'decisionId'=%s""",
+                (intent.project_id, claim_key, intent.decision["decisionId"]),
+            ).fetchone()
+            is not None
+        )
+
+    def requeue_if_unconsumed(self, intent: BuildExecutionIntent, error_code: str) -> bool:
         """Return a failed pre-dispatch claim to pending, never an admitted dispatch.
 
         ``BuildExecutionAdapter`` consumes the PolicyDecision in ``inv.idempotency`` before
@@ -222,23 +272,32 @@ class BuildExecutionIntentQueue:
         the same question so a direct runtime UPDATE cannot requeue a consumed dispatch.
         """
 
-        claim_key = action_digest({"decisionId": intent.decision["decisionId"]})
         with self.db.transaction(intent.tenant_id) as conn:
-            consumed = conn.execute(
-                """SELECT 1 FROM inv.idempotency
-                WHERE project_id=%s AND operation='build.dispatch' AND key=%s
-                  AND response->>'decisionId'=%s""",
-                (intent.project_id, claim_key, intent.decision["decisionId"]),
-            ).fetchone()
-            if consumed:
+            if self._dispatch_consumed(conn, intent):
                 return False
             pending = conn.execute(
-                """UPDATE inv.build_execution_intents SET status='pending'
+                """UPDATE inv.build_execution_intents
+                SET status='pending',last_error_code=%s
                 WHERE tenant_id=%s AND project_id=%s AND run_id=%s AND status='claimed'
                 RETURNING run_id""",
-                (intent.tenant_id, intent.project_id, intent.run_id),
+                (error_code, intent.tenant_id, intent.project_id, intent.run_id),
             ).fetchone()
             return pending is not None
+
+    def quarantine_if_unconsumed(self, intent: BuildExecutionIntent, error_code: str) -> bool:
+        """Terminally isolate a permanent pre-dispatch refusal, never a consumed dispatch."""
+
+        with self.db.transaction(intent.tenant_id) as conn:
+            if self._dispatch_consumed(conn, intent):
+                return False
+            quarantined = conn.execute(
+                """UPDATE inv.build_execution_intents
+                SET status='quarantined',last_error_code=%s
+                WHERE tenant_id=%s AND project_id=%s AND run_id=%s AND status='claimed'
+                RETURNING run_id""",
+                (error_code, intent.tenant_id, intent.project_id, intent.run_id),
+            ).fetchone()
+            return quarantined is not None
 
     def complete(self, intent: BuildExecutionIntent) -> None:
         with self.db.transaction(intent.tenant_id) as conn:
@@ -278,9 +337,13 @@ class BuildExecutionWorker:
                 evidence_id=intent.evidence_id,
                 actor_id=intent.actor_id,
             )
-        except BaseException:
+        except BaseException as error:
             try:
-                self.queue.requeue_if_unconsumed(intent)
+                code = error.code if isinstance(error, DomainError) else "SYS-0001"
+                if isinstance(error, DomainError) and error.retryable:
+                    self.queue.requeue_if_unconsumed(intent, code)
+                else:
+                    self.queue.quarantine_if_unconsumed(intent, code)
             except Exception:
                 # Requeue is a recovery aid, never permission to replace the original cause.
                 # A consumed dispatch or an unavailable DB therefore remains claimed.

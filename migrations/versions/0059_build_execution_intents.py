@@ -9,10 +9,10 @@ passes to ``BuildExecutionService``.
 The application role may insert and read an intent, and may update only its
 server-guarded lifecycle columns.  Payload identity and the PostgreSQL-canonical
 document digests never change.  A pending row is claimed with ``FOR UPDATE SKIP
-LOCKED`` by application code; the database trigger permits only
-``pending -> claimed -> completed``.  There is no retry transition: an ambiguous
-worker crash remains claimed and requires reconciliation rather than a second
-external dispatch.
+LOCKED`` by application code. Retryable pre-dispatch failures return to pending
+with a bounded backoff, invalid authority is quarantined, and a committed
+one-shot dispatch claim remains claimed for reconciliation rather than risking a
+second external dispatch.
 """
 
 from __future__ import annotations
@@ -46,6 +46,14 @@ def upgrade() -> None:
         sa.Column("evidence_id", sa.Text(), nullable=False),
         sa.Column("actor_id", sa.Text(), nullable=False),
         sa.Column("status", sa.Text(), nullable=False, server_default="pending"),
+        sa.Column("attempt_count", sa.Integer(), nullable=False, server_default="0"),
+        sa.Column(
+            "next_attempt_at",
+            sa.DateTime(timezone=True),
+            nullable=True,
+            server_default=sa.text("clock_timestamp()"),
+        ),
+        sa.Column("last_error_code", sa.Text(), nullable=True),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),
@@ -54,6 +62,7 @@ def upgrade() -> None:
         ),
         sa.Column("claimed_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("completed_at", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("quarantined_at", sa.DateTime(timezone=True), nullable=True),
         sa.PrimaryKeyConstraint("tenant_id", "project_id", "run_id"),
         sa.ForeignKeyConstraint(
             ["tenant_id", "project_id", "run_id"],
@@ -68,18 +77,30 @@ def upgrade() -> None:
             "decision_sha256 ~ '^[0-9a-f]{64}$'",
             name="document_digests_are_lowercase",
         ),
-        sa.CheckConstraint("length(policy_version) BETWEEN 1 AND 200", name="policy_version_length"),
+        sa.CheckConstraint(
+            "length(policy_version) BETWEEN 1 AND 200", name="policy_version_length"
+        ),
         sa.CheckConstraint(
             "evidence_id ~ '^evd_[0-9A-HJKMNP-TV-Z]{26}$'", name="evidence_id_shape"
         ),
         sa.CheckConstraint("length(actor_id) BETWEEN 1 AND 200", name="actor_id_length"),
         sa.CheckConstraint(
-            "status IN ('pending','claimed','completed')", name="status_allowed"
+            "status IN ('pending','claimed','completed','quarantined')", name="status_allowed"
+        ),
+        sa.CheckConstraint("attempt_count >= 0", name="attempt_count_nonnegative"),
+        sa.CheckConstraint(
+            "last_error_code IS NULL OR last_error_code ~ '^[A-Z]+-[0-9]{4}$'",
+            name="last_error_code_shape",
         ),
         sa.CheckConstraint(
-            "(status = 'pending' AND claimed_at IS NULL AND completed_at IS NULL) OR "
-            "(status = 'claimed' AND claimed_at IS NOT NULL AND completed_at IS NULL) OR "
-            "(status = 'completed' AND claimed_at IS NOT NULL AND completed_at IS NOT NULL)",
+            "(status = 'pending' AND claimed_at IS NULL AND completed_at IS NULL "
+            " AND quarantined_at IS NULL AND next_attempt_at IS NOT NULL) OR "
+            "(status = 'claimed' AND claimed_at IS NOT NULL AND completed_at IS NULL "
+            " AND quarantined_at IS NULL AND next_attempt_at IS NULL) OR "
+            "(status = 'completed' AND claimed_at IS NOT NULL AND completed_at IS NOT NULL "
+            " AND quarantined_at IS NULL AND next_attempt_at IS NULL) OR "
+            "(status = 'quarantined' AND completed_at IS NULL "
+            " AND quarantined_at IS NOT NULL AND next_attempt_at IS NULL)",
             name="status_timestamps_match",
         ),
         schema="inv",
@@ -87,14 +108,13 @@ def upgrade() -> None:
     op.create_index(
         "ix_build_execution_intents_pending",
         "build_execution_intents",
-        ["tenant_id", "created_at", "project_id", "run_id"],
+        ["tenant_id", "next_attempt_at", "created_at", "project_id", "run_id"],
         unique=False,
         schema="inv",
         postgresql_where=sa.text("status = 'pending'"),
     )
 
-    op.execute(
-        """
+    op.execute("""
         CREATE FUNCTION inv.build_execution_intent_guard()
         RETURNS trigger
         LANGUAGE plpgsql SECURITY INVOKER
@@ -110,8 +130,9 @@ def upgrade() -> None:
           END IF;
 
           IF TG_OP = 'INSERT' THEN
-            IF NEW.status <> 'pending'
-               OR NEW.claimed_at IS NOT NULL OR NEW.completed_at IS NOT NULL THEN
+            IF NEW.status <> 'pending' OR NEW.attempt_count <> 0
+               OR NEW.claimed_at IS NOT NULL OR NEW.completed_at IS NOT NULL
+               OR NEW.quarantined_at IS NOT NULL THEN
               RAISE EXCEPTION 'build execution intents begin pending'
                 USING ERRCODE = 'check_violation',
                       CONSTRAINT = 'build_execution_intent_begins_pending';
@@ -155,6 +176,10 @@ def upgrade() -> None:
           IF OLD.status = 'pending' AND NEW.status = 'claimed' THEN
             NEW.claimed_at := v_now;
             NEW.completed_at := NULL;
+            NEW.quarantined_at := NULL;
+            NEW.next_attempt_at := NULL;
+            NEW.attempt_count := OLD.attempt_count + 1;
+            NEW.last_error_code := NULL;
           ELSIF OLD.status = 'claimed' AND NEW.status = 'pending' THEN
             IF EXISTS (
               SELECT 1 FROM inv.idempotency
@@ -169,9 +194,45 @@ def upgrade() -> None:
             END IF;
             NEW.claimed_at := NULL;
             NEW.completed_at := NULL;
+            NEW.quarantined_at := NULL;
+            NEW.attempt_count := OLD.attempt_count;
+            NEW.next_attempt_at := v_now + make_interval(
+              secs => LEAST(60, (power(2, GREATEST(0, OLD.attempt_count - 1)))::integer)
+            );
+            IF NEW.last_error_code IS NULL THEN
+              RAISE EXCEPTION 'a retryable build intent requires an error code'
+                USING ERRCODE = 'check_violation',
+                      CONSTRAINT = 'build_execution_intent_retry_error';
+            END IF;
+          ELSIF OLD.status IN ('pending','claimed') AND NEW.status = 'quarantined' THEN
+            IF OLD.status = 'claimed' AND EXISTS (
+              SELECT 1 FROM inv.idempotency
+              WHERE tenant_id = OLD.tenant_id
+                AND project_id = OLD.project_id
+                AND operation = 'build.dispatch'
+                AND response->>'decisionId' = OLD.decision->>'decisionId'
+            ) THEN
+              RAISE EXCEPTION 'a consumed build dispatch cannot be quarantined'
+                USING ERRCODE = 'check_violation',
+                      CONSTRAINT = 'build_execution_intent_dispatch_consumed';
+            END IF;
+            NEW.claimed_at := OLD.claimed_at;
+            NEW.completed_at := NULL;
+            NEW.quarantined_at := v_now;
+            NEW.next_attempt_at := NULL;
+            NEW.attempt_count := OLD.attempt_count;
+            IF NEW.last_error_code IS NULL THEN
+              RAISE EXCEPTION 'a quarantined build intent requires an error code'
+                USING ERRCODE = 'check_violation',
+                      CONSTRAINT = 'build_execution_intent_quarantine_error';
+            END IF;
           ELSIF OLD.status = 'claimed' AND NEW.status = 'completed' THEN
             NEW.claimed_at := OLD.claimed_at;
             NEW.completed_at := v_now;
+            NEW.quarantined_at := NULL;
+            NEW.next_attempt_at := NULL;
+            NEW.attempt_count := OLD.attempt_count;
+            NEW.last_error_code := NULL;
           ELSE
             RAISE EXCEPTION 'invalid build execution intent transition'
               USING ERRCODE = 'check_violation',
@@ -179,8 +240,7 @@ def upgrade() -> None:
           END IF;
           RETURN NEW;
         END $fn$
-        """
-    )
+        """)
     op.execute("REVOKE ALL ON FUNCTION inv.build_execution_intent_guard() FROM PUBLIC")
     op.execute(f"REVOKE ALL ON FUNCTION inv.build_execution_intent_guard() FROM {APP_ROLE}")
     op.execute(
@@ -198,7 +258,8 @@ def upgrade() -> None:
     )
     op.execute("GRANT SELECT, INSERT ON inv.build_execution_intents TO inv_kernel")
     op.execute(
-        "GRANT UPDATE(status, claimed_at, completed_at) "
+        "GRANT UPDATE(status, attempt_count, next_attempt_at, last_error_code, "
+        "claimed_at, completed_at, quarantined_at) "
         "ON inv.build_execution_intents TO inv_kernel"
     )
 
@@ -209,9 +270,7 @@ def downgrade() -> None:
         raise RuntimeError(
             "0059_build_execution_intents cannot discard queued or completed product-build intents"
         )
-    op.execute(
-        "DROP TRIGGER IF EXISTS build_execution_intent_guard ON inv.build_execution_intents"
-    )
+    op.execute("DROP TRIGGER IF EXISTS build_execution_intent_guard ON inv.build_execution_intents")
     op.execute("DROP FUNCTION IF EXISTS inv.build_execution_intent_guard()")
     op.drop_index(
         "ix_build_execution_intents_pending",

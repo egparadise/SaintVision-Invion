@@ -1,20 +1,21 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.274"
+version: "1.0.275"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T14:34:00+09:00"
+updated: "2026-10-02T14:45:13+09:00"
 source_of_truth: "Git"
 active_card: "CARD-223 S08-BE product caller"
-active_card_status: "PR #323 Claude r1 findings F2-F6 corrected with consumed-claim-aware requeue, digest/poison guards and mutation-killing tests"
+active_card_status: "PR #323 Claude r1 exact requirements applied: bounded retry metadata, corrupt-row quarantine with queue progress, consumed-dispatch reconciliation"
 active_card_next: "Require exact-head Backend/Core green, nine real-PG JUnit cases and Claude r2 approval"
 ---
 
 - Card 223 r1 correction narrows retry to a durable boundary: only a claimed intent with no
   committed `build.dispatch` one-shot claim can return to pending; consumed dispatches stay claimed.
-- Database-owned digest checks skip corrupt restored rows; INSERT bindings reject poison actor,
-  action-digest and expiry combinations. Focused PG-free verification is **100 passed**; the
+- Database-owned digest checks quarantine corrupt restored rows and continue the queue; INSERT
+  bindings reject poison actor, action-digest and expiry combinations. Focused PG-free verification
+  is **101 passed**; the
   expanded **9-case** real-PG file awaits exact-head hosted Core execution.
 
 ## 2026-10-02 Card 223 — S08-BE product caller
@@ -24,7 +25,7 @@ active_card_next: "Require exact-head Backend/Core green, nine real-PG JUnit cas
   `2dd25ff77a152575988b19a568ede348fd4dc1d8`이다.
 - 예약된 migration `0059_build_execution_intents`는 `0058`을 단일 부모로 삼는다. tenant/project/run
   복합 PK, strict request/plan/decision JSONB, PostgreSQL canonical digest, policy/evidence/actor 결속,
-  FORCE RLS, payload 불변·DELETE 금지·`pending → claimed → completed` 전이만 둔다.
+  FORCE RLS, payload 불변·DELETE 금지, bounded retry와 terminal quarantine 전이를 둔다.
 - trusted internal enqueue와 `FOR UPDATE SKIP LOCKED` one-shot claim 뒤
   `BuildExecutionService.execute()`를 호출하는 worker seam을 추가했다. public route는 없고
   `INV_BUILDKIT_PRODUCT_ENABLED=1` exact 설정 전에는 pending 행도 소비하지 않는다.

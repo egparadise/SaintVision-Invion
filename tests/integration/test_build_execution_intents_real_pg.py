@@ -224,6 +224,7 @@ def test_payload_update_delete_and_invalid_transition_are_rejected_by_database(e
 
 def test_claim_skips_owner_tampered_digest_and_insert_rejects_poison_binding(env):
     queue, intent = enqueue(env)
+    _other_queue, healthy = enqueue(env)
     with psycopg.connect(env.owner) as conn:
         conn.execute("SET LOCAL session_replication_role=replica")
         conn.execute(
@@ -232,7 +233,37 @@ def test_claim_skips_owner_tampered_digest_and_insert_rejects_poison_binding(env
             WHERE run_id=%s""",
             (intent.run_id,),
         )
-    assert queue.claim_next(env.tenant) is None
+    claimed = queue.claim_next(env.tenant)
+    assert claimed is not None and claimed.run_id == healthy.run_id
+    with psycopg.connect(env.owner) as conn:
+        corrupt = conn.execute(
+            """SELECT status,last_error_code FROM inv.build_execution_intents
+            WHERE run_id=%s""",
+            (intent.run_id,),
+        ).fetchone()
+    assert corrupt == ("quarantined", "VERIFY-0002")
+
+    _bad_queue, bad_contract = enqueue(env)
+    _next_queue, next_healthy = enqueue(env)
+    with psycopg.connect(env.owner) as conn:
+        conn.execute("SET LOCAL session_replication_role=replica")
+        conn.execute(
+            """UPDATE inv.build_execution_intents
+            SET request=request - 'kind',
+                request_sha256=encode(
+                  sha256(convert_to((request - 'kind')::text,'UTF8')),'hex')
+            WHERE run_id=%s""",
+            (bad_contract.run_id,),
+        )
+    claimed = queue.claim_next(env.tenant)
+    assert claimed is not None and claimed.run_id == next_healthy.run_id
+    with psycopg.connect(env.owner) as conn:
+        invalid = conn.execute(
+            """SELECT status,last_error_code FROM inv.build_execution_intents
+            WHERE run_id=%s""",
+            (bad_contract.run_id,),
+        ).fetchone()
+    assert invalid == ("quarantined", "VERIFY-0002")
 
     run = scheduled_run(env)
     request, plan, decision = build_documents(env, "oidc:other-actor")
@@ -261,9 +292,20 @@ def test_claimed_intent_requeues_only_before_the_dispatch_decision_is_consumed(e
     queue, _intent = enqueue(env)
     claimed = queue.claim_next(env.tenant)
     assert claimed is not None
-    assert queue.requeue_if_unconsumed(claimed) is True
+    assert queue.requeue_if_unconsumed(claimed, "RES-0006") is True
+    assert queue.claim_next(env.tenant) is None
+    with psycopg.connect(env.owner) as conn:
+        retry = conn.execute(
+            """SELECT status,attempt_count,last_error_code,
+            next_attempt_at IS NOT NULL FROM inv.build_execution_intents
+            WHERE run_id=%s""",
+            (claimed.run_id,),
+        ).fetchone()
+        conn.execute("SELECT pg_sleep(1.1)")
+    assert retry == ("pending", 1, "RES-0006", True)
     claimed = queue.claim_next(env.tenant)
     assert claimed is not None
+    assert claimed.attempt_count == 2
 
     claim_key = action_digest({"decisionId": claimed.decision["decisionId"]})
     with psycopg.connect(env.owner) as conn:
@@ -285,11 +327,19 @@ def test_claimed_intent_requeues_only_before_the_dispatch_decision_is_consumed(e
                 ),
             ),
         )
-    assert queue.requeue_if_unconsumed(claimed) is False
+    assert queue.requeue_if_unconsumed(claimed, "RES-0006") is False
     with psycopg.connect(env.owner) as conn:
         with pytest.raises(psycopg.errors.CheckViolation):
             conn.execute(
                 "UPDATE inv.build_execution_intents SET status='pending' WHERE run_id=%s",
+                (claimed.run_id,),
+            )
+        conn.rollback()
+    with psycopg.connect(env.owner) as conn:
+        with pytest.raises(psycopg.errors.CheckViolation):
+            conn.execute(
+                """UPDATE inv.build_execution_intents
+                SET status='quarantined',last_error_code='SYS-0001' WHERE run_id=%s""",
                 (claimed.run_id,),
             )
 
@@ -352,7 +402,25 @@ def test_pre_dispatch_product_failure_returns_unconsumed_intent_to_pending(env):
     assert caught.value.code == "RES-0006"
     with psycopg.connect(env.owner) as conn:
         state = conn.execute(
-            "SELECT status,claimed_at FROM inv.build_execution_intents WHERE run_id=%s",
+            """SELECT status,claimed_at,attempt_count,last_error_code,
+            next_attempt_at IS NOT NULL
+            FROM inv.build_execution_intents WHERE run_id=%s""",
             (intent.run_id,),
         ).fetchone()
-    assert state == ("pending", None)
+        conn.execute("SELECT pg_sleep(1.1)")
+    assert state == ("pending", None, 1, "RES-0006", True)
+
+    success = SuccessfulService()
+    result = BuildExecutionWorker(
+        queue,
+        success,
+        environment={PRODUCT_ENABLE_SETTING: "1"},
+    ).once(env.tenant)
+    assert result is not None and len(success.calls) == 1
+    with psycopg.connect(env.owner) as conn:
+        retried = conn.execute(
+            """SELECT status,attempt_count,last_error_code
+            FROM inv.build_execution_intents WHERE run_id=%s""",
+            (intent.run_id,),
+        ).fetchone()
+    assert retried == ("completed", 2, None)

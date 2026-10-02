@@ -115,6 +115,9 @@ def intent() -> BuildExecutionIntent:
         evidence_id=EVIDENCE,
         actor_id=SUBJECT,
         status="claimed",
+        attempt_count=1,
+        next_attempt_at=None,
+        last_error_code=None,
     )
 
 
@@ -126,25 +129,30 @@ def test_migration_is_linear_tenant_scoped_payload_immutable_and_delete_forbidde
     assert "ALTER TABLE inv.build_execution_intents FORCE ROW LEVEL SECURITY" in source
     assert "CREATE POLICY build_execution_intents_tenant_isolation" in source
     assert "GRANT SELECT, INSERT ON inv.build_execution_intents TO inv_kernel" in source
-    assert "GRANT UPDATE(status, claimed_at, completed_at)" in source
+    assert "GRANT UPDATE(status, attempt_count, next_attempt_at, last_error_code" in source
     assert "build execution intent payload is immutable" in source
     assert "build execution intents are not deletable" in source
     assert "pending' AND NEW.status = 'claimed" in source
     assert "claimed' AND NEW.status = 'pending" in source
+    assert "OLD.status IN ('pending','claimed') AND NEW.status = 'quarantined'" in source
     assert "claimed' AND NEW.status = 'completed" in source
     assert "response->>'decisionId' = OLD.decision->>'decisionId'" in source
     assert "NEW.decision->>'subjectId' IS DISTINCT FROM NEW.actor_id" in source
     assert "NEW.plan->>'actionDigest' IS DISTINCT FROM NEW.decision->>'actionDigest'" in source
     assert "NEW.plan->>'policyExpiresAt' IS DISTINCT FROM NEW.decision->>'expiresAt'" in source
+    assert "NEW.attempt_count := OLD.attempt_count + 1" in source
+    assert "make_interval" in source
     assert "SELECT count(*) FROM inv.build_execution_intents" in source
 
 
 def test_worker_claim_is_skip_locked_and_no_public_route_is_added():
     source = WORKER.read_text(encoding="utf-8")
     assert "FOR UPDATE SKIP LOCKED" in source
-    assert "request_sha256 =" in source
-    assert "plan_sha256 =" in source
-    assert "decision_sha256 =" in source
+    assert "request_sha256 IS DISTINCT FROM" in source
+    assert "plan_sha256 IS DISTINCT FROM" in source
+    assert "decision_sha256 IS DISTINCT FROM" in source
+    assert "status='quarantined',last_error_code='VERIFY-0002'" in source
+    assert "next_attempt_at <= clock_timestamp()" in source
     assert "class BuildExecutionWorker" in source
     inv_root = ROOT / "services/control-plane/src/inv"
     consumers = []
@@ -191,6 +199,7 @@ class Queue:
         self.claims = 0
         self.completions = 0
         self.requeues = 0
+        self.quarantines = 0
 
     def claim_next(self, tenant_id):
         assert tenant_id == TENANT
@@ -201,9 +210,16 @@ class Queue:
         assert item is self.item
         self.completions += 1
 
-    def requeue_if_unconsumed(self, item):
+    def requeue_if_unconsumed(self, item, error_code):
         assert item is self.item
+        assert error_code == "RES-0006"
         self.requeues += 1
+        return True
+
+    def quarantine_if_unconsumed(self, item, error_code):
+        assert item is self.item
+        assert error_code == "SYS-0001"
+        self.quarantines += 1
         return True
 
 
@@ -257,18 +273,32 @@ def test_worker_failure_requeues_only_through_the_unconsumed_boundary():
     assert caught.value.code == "RES-0006"
     assert queue.claims == 1
     assert queue.requeues == 1
+    assert queue.quarantines == 0
     assert queue.completions == 0
 
 
 def test_worker_preserves_original_base_exception_when_requeue_fails():
     class BrokenQueue(Queue):
-        def requeue_if_unconsumed(self, item):
-            super().requeue_if_unconsumed(item)
+        def quarantine_if_unconsumed(self, item, error_code):
+            super().quarantine_if_unconsumed(item, error_code)
             raise RuntimeError("database unavailable")
 
     queue = BrokenQueue(intent())
     service = Service(KeyboardInterrupt("stop"))
     with pytest.raises(KeyboardInterrupt, match="stop"):
         BuildExecutionWorker(queue, service, environment={PRODUCT_ENABLE_SETTING: "1"}).once(TENANT)
-    assert queue.requeues == 1
+    assert queue.requeues == 0
+    assert queue.quarantines == 1
+    assert queue.completions == 0
+
+
+def test_permanent_domain_refusal_uses_terminal_quarantine_not_retry():
+    queue = Queue(intent())
+    error = DomainError("SYS-0001", "permanent refusal", 503, retryable=False)
+    with pytest.raises(DomainError, match="permanent refusal"):
+        BuildExecutionWorker(queue, Service(error), environment={PRODUCT_ENABLE_SETTING: "1"}).once(
+            TENANT
+        )
+    assert queue.requeues == 0
+    assert queue.quarantines == 1
     assert queue.completions == 0

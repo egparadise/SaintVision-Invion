@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD223-S08-BE-PRODUCT-CALLER-20261002"
 title: "Card 223 S08-BE product caller"
-version: "1.0.2"
+version: "1.0.3"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T14:34:00+09:00"
+updated: "2026-10-02T14:45:13+09:00"
 source_of_truth: "Git"
 base_sha: "2dd25ff77a152575988b19a568ede348fd4dc1d8"
 reviewer: "Claude"
@@ -21,12 +21,12 @@ preserved even when the recovery write itself fails.
 
 The claim query now verifies all three database-owned JSONB digests before transition. The INSERT
 trigger also binds actor/subject, plan/decision action digest, and plan/decision expiry, so an
-owner-restored corrupt row is skipped and a SQL-checkable poison row is rejected before it can
+owner-restored corrupt row is quarantined and a SQL-checkable poison row is rejected before it can
 block the queue. The strengthened real-PG cases cover a locked-first-row `SKIP LOCKED` selection,
 payload mutation during a valid transition, completed-to-pending rollback, unconsumed versus
 consumed requeue, digest tampering, poison binding, and a retryable pre-dispatch failure.
 
-PG-free focused verification is **100 passed**. The local real-PG file contains **9 cases** but is
+PG-free focused verification is **101 passed**. The local real-PG file contains **9 cases** but is
 `NOT_OBSERVED` locally because no disposable PostgreSQL DSN is configured; exact-head hosted Core
 must execute all nine before this revision is accepted. S08-BE completion or physical-builder
 acceptance is still not claimed.
@@ -48,8 +48,9 @@ intent만 허용하고, exact replay만 같은 행을 다시 읽는다.
 |---|---|
 | authority payload | strict `BuildRequest`·`BuildPlan`·`PolicyDecision` JSONB와 `policy_version`·`evidence_id`·사람 principal에서 얻은 `actor_id` |
 | digest | PostgreSQL 16 `jsonb::text` UTF-8 bytes의 SHA-256을 INSERT trigger가 계산; caller digest는 authority가 아님 |
-| lifecycle | `pending → claimed → completed`만 허용; claimed를 pending으로 되돌리는 retry 없음 |
-| immutability | lifecycle 외 열 UPDATE 거부, DELETE 거부, 실패·crash의 claimed 행은 operator reconciliation 대상 |
+| lifecycle | `pending → claimed → completed`, retryable pre-dispatch의 bounded-backoff `claimed → pending`, invalid authority의 terminal `quarantined`만 허용 |
+| retry metadata | claim마다 `attempt_count` 증가; retry는 `next_attempt_at` 1~60초 backoff와 `last_error_code`를 기록 |
+| immutability | lifecycle 외 authority payload UPDATE와 DELETE 거부; committed dispatch의 claimed 행은 operator reconciliation 대상 |
 | isolation | `ENABLE`+`FORCE ROW LEVEL SECURITY`, `inv.tenant_id` exact tenant policy, runtime role은 SELECT·INSERT와 lifecycle 열 UPDATE만 |
 | concurrency | `SELECT … FOR UPDATE SKIP LOCKED` 후보를 같은 transaction에서 claimed로 전이; 두 worker가 같은 행을 받을 수 없음 |
 | downgrade | 행이 하나라도 있으면 downgrade 거부; 기존 데이터 0인 배포에서만 빈 구조를 제거 |
@@ -61,7 +62,9 @@ tenant/project/policy/subject 결속을 먼저 검사하고 committed Run이 `sc
 저장한다. worker는 product flag가 exact `1`인지 **claim 전에** 확인하고, DB에서 되읽은 strict 문서로
 `BuildExecutionService.execute()`를 호출한다. 성공 뒤에만 completed로 전이한다.
 
-공개 route와 browser 입력은 없다. worker가 실패한 claimed intent를 재queue하지 않는다. 실제 dispatch의
+공개 route와 browser 입력은 없다. worker는 durable one-shot claim이 없는 retryable pre-dispatch
+거부만 bounded-backoff pending으로 되돌린다. 영구 거부와 손상 행은 quarantined로 격리하고 다음 행을
+계속 처리하며, one-shot claim이 있으면 claimed 상태를 보존한다. 실제 dispatch의
 decision one-shot, live lease/fence, ROOF, node-agent health·cleanup, durable quarantine은 기존
 `BuildExecutionAdapter`와 `BuildExecutionService`가 다시 검증한다. quarantine capability가 없거나 검증할
 수 없으면 `RES-0006`이고, 기본 flag off는 유지된다. 이 변경은 S08-BE 완료·75점·물리 LAN builder
