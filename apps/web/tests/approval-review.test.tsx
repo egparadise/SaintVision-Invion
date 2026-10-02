@@ -5,7 +5,7 @@ import type { ApprovalItem } from '../src/contracts/types';
 import { apiClient } from '../src/shared/api/client';
 import { approveReviewed, fetchApprovalReview, reviewedAction, reviewIdentity, type ApprovalReview } from '../src/shared/api/approvalReview';
 import { ApprovalDetail } from '../src/features/approvals/ApprovalDetail';
-import { approvalReviewFixture } from './fixtures/approval-review';
+import { approvalReviewFixture, buildApprovalReviewFixture } from './fixtures/approval-review';
 vi.mock('../src/shared/api/client', () => ({ apiClient: vi.fn(), generateTraceId: () => 'unique-test-key' }));
 const api = vi.mocked(apiClient);
 beforeEach(() => { api.mockReset(); });
@@ -37,21 +37,35 @@ it.each([{ command: [] }, { command: 'shell text' }, { projectId: 'other' }, { t
   await expect(fetchApprovalReview(item())).rejects.toThrow();
 });
 it('accepts only a complete redacted build review summary', async () => {
-  const v = review();
-  const buildReview = {
-    ...v,
-    workload: {
-      kind: 'build' as const, target: 'image' as const, riskLevel: 'L2' as const,
-      profileId: 'profile-rootless', profileVersion: 1, sourceRevision: 2,
-      contextDigest: 'd'.repeat(64), dockerfileDigest: 'e'.repeat(64),
-      networkMode: 'none' as const, cacheMode: 'read-only' as const,
-      usesSecrets: false, secretCount: 0,
-    },
-  };
+  const buildReview = structuredClone(buildApprovalReviewFixture);
   api.mockResolvedValue(buildReview);
   await expect(fetchApprovalReview(item())).resolves.toEqual(buildReview);
 
   api.mockResolvedValue({ ...buildReview, workload: { ...buildReview.workload, secretCount: 1 } });
+  await expect(fetchApprovalReview(item())).rejects.toThrow();
+});
+it.each([
+  { secretRefs: ['vault://operator-token'] },
+  { registryToken: 'must-not-render' },
+  { plan: { privileged: true } },
+])('rejects undeclared build review data %o', async extra => {
+  const buildReview = structuredClone(buildApprovalReviewFixture);
+  api.mockResolvedValue({ ...buildReview, workload: { ...buildReview.workload, ...extra } } as ApprovalReview);
+  await expect(fetchApprovalReview(item())).rejects.toThrow();
+});
+it.each([
+  { contextDigest: 'd'.repeat(63) },
+  { contextDigest: 'D'.repeat(64) },
+  { dockerfileDigest: 'not-a-digest' },
+  { dockerfileDigest: 'E'.repeat(64) },
+])('rejects an invalid build digest %o', async patch => {
+  const buildReview = structuredClone(buildApprovalReviewFixture);
+  api.mockResolvedValue({ ...buildReview, workload: { ...buildReview.workload, ...patch } } as ApprovalReview);
+  await expect(fetchApprovalReview(item())).rejects.toThrow();
+});
+it('rejects an unknown review workload kind even when legacy fields look valid', async () => {
+  const v = review();
+  api.mockResolvedValue({ ...v, workload: { ...v.workload, kind: 'exec' } } as unknown as ApprovalReview);
   await expect(fetchApprovalReview(item())).rejects.toThrow();
 });
 it('does not fallback or enable approval when review is unsupported', async () => {

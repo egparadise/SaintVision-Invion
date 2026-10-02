@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-CARD247-S08-BE-BUILD-REQUEST-ENTRY-001"
 title: "Card 247 S08-BE BuildRequest product entry implementation"
-version: "1.2.3"
+version: "1.2.4"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-03T04:55:31+09:00"
+updated: "2026-10-03T05:21:19+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S08-BE", "CARD-247"]
@@ -112,6 +112,15 @@ prepare attempt is `RES-0007/429` even though attempts 2--5 fail later; and a so
 two-person quorum makes enqueue return `VERIFY-0002/422`, expires the approval, fails the Run,
 records exactly one canonical terminal audit, and records no admission. These cases are intended
 to fail if the append-only trigger, quota accounting, or final TOCTOU revalidation is removed.
+
+The same review round found that the web panel serialized the entire build summary and that its
+runtime validator treated any non-`build` kind as a legacy Workload. The API boundary now requires
+the generated build summary's exact 12-key set, validates both SHA-256 fields and the profile ID,
+rejects unknown kinds, and returns a newly projected object. The panel independently renders only
+those declared fields instead of serializing an opaque object. A shared contract fixture plus API
+and DOM tests reject undeclared `secretRefs`, `registryToken`, and `plan` bait fields, reject invalid
+context/Dockerfile digests and `exec`, and assert both the visible projection and forbidden values.
+No color literal or ACC-09 surface changed.
 
 Two activation boundaries remain explicit rather than being presented as measured authority.
 The current plan's `1/1/1` budget and request-derived `resolvedBaseImageDigests` are placeholders,

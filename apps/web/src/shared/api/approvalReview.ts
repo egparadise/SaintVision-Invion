@@ -10,15 +10,50 @@ const sha256 = (value: unknown): value is string => typeof value === 'string' &&
 export const isBuildReviewSummary = (workload: ReviewedWorkload): workload is BuildReviewSummary =>
   workload.kind === 'build';
 
-function validBuildReviewSummary(workload: BuildReviewSummary, riskLevel: string): boolean {
-  return workload.target === 'image' && workload.riskLevel === 'L2' && riskLevel === 'L2' &&
+const BUILD_REVIEW_KEYS = [
+  'kind', 'target', 'riskLevel', 'profileId', 'profileVersion', 'sourceRevision',
+  'contextDigest', 'dockerfileDigest', 'networkMode', 'cacheMode', 'usesSecrets', 'secretCount',
+] as const;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function hasExactKeys(value: Record<string, unknown>, expected: readonly string[]): boolean {
+  const actual = Object.keys(value).sort();
+  const required = [...expected].sort();
+  return actual.length === required.length && actual.every((key, index) => key === required[index]);
+}
+
+function projectBuildReviewSummary(value: unknown, riskLevel: string): BuildReviewSummary | null {
+  if (!isRecord(value) || !hasExactKeys(value, BUILD_REVIEW_KEYS)) return null;
+  const workload = value as unknown as BuildReviewSummary;
+  const valid = workload.kind === 'build' && workload.target === 'image' &&
+    workload.riskLevel === 'L2' && riskLevel === 'L2' &&
     typeof workload.profileId === 'string' && workload.profileId.length > 0 &&
+    /^bpp_[0-9A-HJKMNP-TV-Z]{26}$/.test(workload.profileId) &&
     Number.isSafeInteger(workload.profileVersion) && workload.profileVersion > 0 &&
     Number.isSafeInteger(workload.sourceRevision) && workload.sourceRevision > 0 &&
     sha256(workload.contextDigest) && sha256(workload.dockerfileDigest) &&
     workload.networkMode === 'none' && ['disabled', 'read-only'].includes(workload.cacheMode) &&
     typeof workload.usesSecrets === 'boolean' && Number.isSafeInteger(workload.secretCount) &&
-    workload.secretCount >= 0 && workload.usesSecrets === (workload.secretCount > 0);
+    workload.secretCount >= 0 && workload.secretCount <= 32 &&
+    workload.usesSecrets === (workload.secretCount > 0);
+  if (!valid) return null;
+  return {
+    kind: workload.kind,
+    target: workload.target,
+    riskLevel: workload.riskLevel,
+    profileId: workload.profileId,
+    profileVersion: workload.profileVersion,
+    sourceRevision: workload.sourceRevision,
+    contextDigest: workload.contextDigest,
+    dockerfileDigest: workload.dockerfileDigest,
+    networkMode: workload.networkMode,
+    cacheMode: workload.cacheMode,
+    usesSecrets: workload.usesSecrets,
+    secretCount: workload.secretCount,
+  };
 }
 
 function validWorkloadSpec(workload: Exclude<ReviewedWorkload, BuildReviewSummary>, projectId: string): boolean {
@@ -39,10 +74,14 @@ export async function fetchApprovalReview(item: ApprovalItem): Promise<ApprovalR
   const expected = { ...item }; // Capture the displayed binding before awaiting the response.
   if (!expected.projectId || !sha256(expected.actionDigest)) throw new Error('승인 검토 정보가 불완전합니다.');
   const result = await apiClient<ApprovalReview>(`/v1/projects/${encodeURIComponent(expected.projectId)}/approvals/${encodeURIComponent(expected.id)}/review`);
-  const a = result?.approval; const w = result?.workload;
-  const workloadValid = !w ? false : (isBuildReviewSummary(w)
-    ? validBuildReviewSummary(w, result.riskLevel)
-    : validWorkloadSpec(w, expected.projectId));
+  const a = result?.approval; const w: unknown = result?.workload;
+  const workloadRecord = isRecord(w) ? w : null;
+  const projectedBuild = workloadRecord?.kind === 'build'
+    ? projectBuildReviewSummary(workloadRecord, result.riskLevel)
+    : null;
+  const workloadValid = projectedBuild !== null ||
+    (workloadRecord?.kind === 'Workload' &&
+      validWorkloadSpec(w as Exclude<ReviewedWorkload, BuildReviewSummary>, expected.projectId));
   if (!a || a.approvalId !== expected.id || a.projectId !== expected.projectId || a.runId !== expected.runId ||
       a.actionDigest !== expected.actionDigest || a.runVersion !== expected.boundRunVersion ||
       a.requesterId !== expected.requestedBy || a.requiredApprovals !== expected.requiredApprovals ||
@@ -51,7 +90,7 @@ export async function fetchApprovalReview(item: ApprovalItem): Promise<ApprovalR
       !workloadValid) {
     throw new Error('표시할 승인 내용이 현재 안건과 일치하지 않습니다. 목록을 새로고침하세요.');
   }
-  return result;
+  return projectedBuild ? { ...result, workload: projectedBuild } : result;
 }
 export function reviewedAction(review: ApprovalReview): ReviewedAction {
   const a = review.approval;
