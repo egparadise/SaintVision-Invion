@@ -63,8 +63,41 @@ E4의 의미를 그대로 두고 identity 방법을 **셋째**까지 넓혔다:
 | collector 판정 | `violations 0`, **`unmeasured 0`**, `verdict PASS`(8 role 모집단 그대로) |
 | 집계기 평가 | `evaluate_rls` → **`MEASURED_PASS`**(collector pin 회전 뒤) |
 | 봉투 | `SEC-SCAN-001` PASS · `SEC-RLS-001` **PASS** · `SEC-VF-001` PASS · `SEC-DEF-001`은 검토 공백으로 `INVALID_RUN` |
+| 축 판정 | **`NOT_OBSERVED`** — 올라간 것은 RLS 한 행이고, 축은 `SEC-DEF-001`의 검토 공백(카드 221 §3) 때문에 그대로다 |
 
 **부정 시험(정책 위반을 심었다)**: 그 role의 SELECT 정책을 "tenant A의 행 하나 + 다른 tenant의 행 하나"만 보이게 바꾸면 **행 수는 소유자와 같고 집합은 다르다**. identity fingerprint가 `match: false`를 내고 **E4 위반**이 되며 verdict는 `VIOLATIONS`다. 정본 정책을 되돌리면 같은 측정이 다시 PASS다. (foreign-row probe도 함께 잡는다 — 예상된 일이고, 한 위반을 두 관측이 본다는 뜻이다.)
+
+### 4-1. hosted 재실측 — 실제 run
+
+이 branch의 head를 그대로 두 lane에 dispatch하고, 받은 artifact로 importer → 집계기를 돌렸다.
+
+| 입력 | 값 |
+|---|---|
+| security lane run | `36963704528` (`completed/success`) |
+| browser lane run | `36963707158` (`completed/success`), artifact `11208544434` |
+| source head / tree | 두 run 모두 이 branch head, tree `49113c08` |
+| VF artifact digest | GitHub metadata와 **받은 바이트의 재계산이 같다**(`c7244c55…`) |
+
+hosted `SEC-RLS-001` 보고가 적은 것:
+
+```
+exit 0  verdict PASS  violations 0  unmeasured 0  accepted 3  measuredRoles 8
+inv_cancel_bridge_owner / public.audit_events / privileges.select = "column"
+identity = {"method":"owner-verified-key","columns":["tenant_id","event_id"],
+            "ownerDistinctness":{"rows":0,"distinct":0},"match":true}
+```
+
+**`unmeasured`가 1 → 0이다.** 그 행이 `method: owner-verified-key`로 **측정됐고**, `0/0`이라는 숫자가 이 run에서는 그 비교가 **vacuous**하다는 것까지 같이 적는다(§5) — 방법이 위반을 잡는다는 증명은 행을 심은 실 PG 시험이 한다.
+
+집계기를 importer와 **따로** 돌려 같은 결론을 확인했다:
+
+| 집계기 호출 | 결과 |
+|---|---|
+| `evaluate_rls(hosted 보고, 검토된 allowlist, now)` | **`MEASURED_PASS`** |
+| `evaluate_vf(hosted 보고, …)` | `MEASURED_PASS` (provenance는 browser run 자신의 것) |
+| `evaluate_axis(봉투, RepositoryGit, …)` | **`NOT_OBSERVED`**, `reasons: []` |
+
+**축은 올라가지 않았다. 정직하게 적는다**: 봉투의 사유는 `no admissible report for SEC-DEF-001; refused by the canonical evaluator: SEC-DEF-001 (INVALID_RUN)`이고, 그것은 **카드 221 §3이 이미 보고한 검토 공백**(definer 정책이 15 서명으로 자랐는데 검토된 allowlist는 12를 고정)이다. 카드 225가 고칠 수 있는 것이 아니고, 검토된 allowlist를 돌리는 것은 AC-11 정의 변경이라 금지된 길이다. 이 카드가 움직인 것은 **그 축 안의 RLS 한 행**이다.
 
 ## 5. 측정하다 발견한 것 — **네 번째 검토 결정**
 
