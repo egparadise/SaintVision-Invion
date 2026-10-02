@@ -39,6 +39,15 @@ def _authority(env, *, grant=True, node_id=None):
     policy_expires = expires + timedelta(minutes=1)
     selected_node = node_id or env.node
     with psycopg.connect(env.owner) as conn:
+        # A large fairness fixture creates hundreds of independently valid
+        # admissions. Keep its authority observation current while building
+        # the fixture; staleness is injected only after every admission is
+        # durably recorded against the original resource identity.
+        conn.execute(
+            """UPDATE inv.nodes SET heartbeat_at=clock_timestamp()
+            WHERE tenant_id=%s AND node_id=%s""",
+            (env.tenant, selected_node),
+        )
         if grant:
             conn.execute(
                 """INSERT INTO inv.project_grants(
