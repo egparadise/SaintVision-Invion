@@ -1,15 +1,33 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.301"
+version: "1.0.304"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T07:21:40+09:00"
+updated: "2026-10-03T08:08:48+09:00"
 source_of_truth: "Git"
-active_card: "CARD-251 S08-BE fixed-SHA acceptance evidence"
-active_card_status: "Card 247 (#343) is approved (Claude backend r3, UI r2, r4 delta) with exact-head Backend 37066783664 and Core 37066783581 green, including the 0061 definer/allowlist rebind; Card 251 fixed-SHA acceptance evidence is PR #347 under Claude review"
-active_card_next: "Close the Claude r1 findings on #347 and record one hosted run_s08_acceptance dispatch at the fixed head; product dispatch stays off by default"
+active_card: "CARD-254 inv_audit_reader disposition re-review before the 2026-10-31 expiry"
+active_card_status: "Card 251 #347 is approved by Claude r2 at 4e148ae4; the hosted run_s08_acceptance run 37072629027 at that final head produced 13/13 MEASURED_PASS (earlier run 37069106763 at 88890edc); product dispatch stays default off and any score change is left to rescoring"
+active_card_next: "Re-measure the inv_audit_reader E3/E4/E5 accepted dispositions on the current tree and renew or remove them before 2026-10-31"
 ---
+
+## 2026-10-03 Card 251 — S08-BE fixed-SHA acceptance evidence
+
+- The opt-in Core phase binds a clean exact checkout SHA and tree, the redacted worker
+  configuration digest, and the two original JUnit artifacts. It does not reimplement the
+  product path.
+- The fixed thirteen-case matrix covers the server-owned prepare-to-dispatch chain, both
+  default-off entry/runtime boundaries, explicit intent claim, project permission, raw
+  authority/provider rejection, tenant isolation, forged approver rejection,
+  idempotency/concurrency, quota, drift terminalization, and legacy no-regression.
+- The evaluator rejects non-exact object keys and duplicate JSON keys, re-reads both JUnit XML
+  files and worker config, independently binds run/attempt/tree/job, requires the real-PG 13-case
+  file with zero skip, includes unrelated suite failures in the verdict, and derives the verdict
+  from raw observations. Physical builder acceptance remains `NOT_OBSERVED`; score change claim is
+  always false. [[2026-10-03_06-29-37_KST_Card251_S08-BE_fixed_SHA_acceptance_evidence_Codex]].
+- Exact-head hosted run `37069106763` passed at source `88890edc`: fixed cases 13/13,
+  real-PG 13 passed/0 skipped, Core 8,358 passed/23 declared skips/0 failure/0 error.
+  Artifact `11255160387` is retained through `2026-11-01T22:24:08Z`.
 
 ## 2026-10-03 Card 247 — S08-BE BuildRequest product entry
 
