@@ -54,11 +54,11 @@ from ..db.models import (
 )
 from . import release_acceptance_policy as policy
 
-#: Whether the authoritative target registry and the Evidence canonical-digest resolver
-#: are bound in this build. False, measured rather than assumed: ``contracts`` holds no
-#: target registry and ``evidence_envelopes`` has no canonical envelope digest column.
-#: The follow-up contract card flips this; until then no decision can satisfy a
-#: criterion, and no write route is enabled either (§0-1.2, §0-1.4, §0-1.5).
+#: Card 194 supplies the registry and resolver, but this projection still accepts only a
+#: boolean seam and cannot re-resolve each proposal's stored refs. Leaving this false is
+#: deliberate: flipping it would count every attested row without checking its targets
+#: and Evidence. A follow-up must pass the actual resolver result, not merely change this
+#: constant; the public read contract consequently remains fail closed.
 AUTHORITATIVE_REFS_BOUND = False
 
 #: Why a release is not signed off, as the read surface's closed value (§0-1.1). One

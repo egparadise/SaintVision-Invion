@@ -19,18 +19,15 @@ each step is where it is matters more than the list:
 5. **the references**, re-resolved against the authoritative registries;
 6. **the rows and the audit event in the same transaction**, then the receipt.
 
-**Why nothing here can run today.** The gate refuses every request: no identity provider
-in this deployment emits ``auth_time``/``amr`` (card 188 is building that), and there is
-no authoritative target registry or canonical Evidence digest to resolve references
-against -- which the contract owner made separate cards while forbidding a fallback that
-compares the caller's own values (§0-1.2, §0-1.4). The code below is still written and
-tested, with the gate and the resolver injected, because the alternative is a card that
-delivers a flag and discovers the logic later.
+**Why writes remain closed by default.** Card 188 supplies verified fresh-auth claims and
+card 194 binds the target/Evidence resolver, but neither card flips the deployment-owned
+``INV_RELEASE_ACCEPTANCE_WRITE_ENABLED`` flag. The implementation can therefore be tested
+at its real seams while a deployment still refuses every write until its operator has
+installed all prerequisites and deliberately enables it.
 
-The resolver is a seam rather than a stub: ``UnboundReferenceResolver`` is what the
-application holds, and it refuses. A test passes one that resolves. The day the
-registries exist, one implementation is added and the gate stops refusing -- nothing
-below changes shape.
+The resolver is a seam rather than caller-value comparison: production now holds
+``DatabaseReferenceResolver`` and tests can still inject ``UnboundReferenceResolver`` to
+prove the independent half of the gate. Nothing below treats caller refs as authority.
 """
 
 from __future__ import annotations
@@ -228,6 +225,14 @@ class ReferencesUnresolvable(Exception):
     """A target or measurement reference does not resolve. ``GRAPH-0003`` / 409."""
 
 
+class ReferenceNotFound(Exception):
+    """A scoped release, binding, or Evidence row is absent. ``RES-0004`` / 404."""
+
+
+class ReferenceRetryable(Exception):
+    """A resolver DB lock/deadlock/statement timeout. ``RES-0007`` / 503."""
+
+
 class ReferenceResolver(Protocol):
     """Binds declared references to rows and blobs the server owns (§3-1)."""
 
@@ -242,7 +247,7 @@ class ReferenceResolver(Protocol):
         release_id: str,
         target_refs: list[Any],
         measurement_refs: list[Any],
-    ) -> None: ...
+    ) -> Any: ...
 
 
 @dataclass(frozen=True)
@@ -265,23 +270,32 @@ class UnboundReferenceResolver:
 UNBOUND_RESOLVER = UnboundReferenceResolver()
 
 
+def _require_resolution_criterion(resolution: Any, acceptance_id_ref: str) -> None:
+    """Bind a resolver result to the criterion the write is about.
+
+    A successful resolver call is not enough: as the target registry grows, returning
+    a different criterion must not authorize this proposal or confirmation.
+    """
+
+    if getattr(resolution, "acceptance_id_ref", None) != acceptance_id_ref:
+        raise ReferencesUnresolvable("the resolved target does not match the acceptance criterion")
+
+
 def active_resolver() -> ReferenceResolver:
     """The resolver this deployment holds.
 
-    A function rather than a module constant read directly, so there is one place the
-    follow-up card replaces and one place a test substitutes. Both matter: without it,
-    the gate's second condition would be untestable from the route, and the route's body
-    rules would be unreachable behind a refusal that fires first.
+    A function rather than a module constant read directly, so tests can substitute an
+    explicitly unbound resolver and prove the second half of the prerequisite gate.
     """
-    return UNBOUND_RESOLVER
+    from .release_acceptance_resolver import RESOLVER
+
+    return RESOLVER
 
 
 # ----------------------------------------------------------------------- step 0: the gate
 
 
-def require_prerequisites(
-    *, enabled: bool, resolver: ReferenceResolver = UNBOUND_RESOLVER
-) -> None:
+def require_prerequisites(*, enabled: bool, resolver: ReferenceResolver = UNBOUND_RESOLVER) -> None:
     """The first thing every one of the five routes does, GETs included.
 
     Two conditions, one answer. Separating them in the response would tell an
@@ -357,7 +371,9 @@ def _required_criterion(release: ReleaseManifest, acceptance_id_ref: str) -> pol
     if acceptance_id_ref not in loaded.names():
         # §5-1: a decision about a criterion the registry does not require is refused
         # rather than recorded, because it would look like progress on sign-off.
-        raise InvError(GRAPH_INVALID_TRANSITION, "this criterion is not required by the pinned policy")
+        raise InvError(
+            GRAPH_INVALID_TRANSITION, "this criterion is not required by the pinned policy"
+        )
     return loaded
 
 
@@ -443,13 +459,14 @@ def propose_or_record(
         # Stale target, not malformed input: the caller accepted a composition this
         # release no longer has (§5).
         raise InvError(GRAPH_INVALID_TRANSITION, "the release composition has changed")
-    resolver.resolve(
+    resolution = resolver.resolve(
         session,
         tenant_id=principal.tenant_id,
         release_id=release_id,
         target_refs=list(request.target_refs),
         measurement_refs=list(request.measurement_refs),
     )
+    _require_resolution_criterion(resolution, request.acceptance_id_ref)
     slot = _slot(
         session,
         tenant_id=principal.tenant_id,
@@ -952,13 +969,14 @@ def confirm(
     # withdrawn in it. Codex measured the gap by deleting the one resolve() call in the
     # decision path and watching 124 focused tests still pass.
     try:
-        resolver.resolve(
+        resolution = resolver.resolve(
             session,
             tenant_id=principal.tenant_id,
             release_id=release_id,
             target_refs=list(proposal.target_refs or []),
             measurement_refs=list(proposal.measurement_refs or []),
         )
+        _require_resolution_criterion(resolution, proposal.acceptance_id_ref)
     except ReferencesUnresolvable:
         return Outcome(status=409, refused=STALE)
     # **The canonical function is the single authority for the grant at write time**, and
@@ -1063,10 +1081,12 @@ def _mapped_db_refusal(error: Exception) -> InvError:
     text_of = str(getattr(error, "orig", error))
     if "proposer cannot be the second operator" in text_of:
         return InvError(AUTH_PROJECT_SCOPE, "a distinct second operator is required")
-    if "insufficient_privilege" in text_of or "may not accept" in text_of or "not active" in text_of:
-        return InvError(
-            AUTH_PROJECT_SCOPE, "fresh interactive operator authentication is required"
-        )
+    if (
+        "insufficient_privilege" in text_of
+        or "may not accept" in text_of
+        or "not active" in text_of
+    ):
+        return InvError(AUTH_PROJECT_SCOPE, "fresh interactive operator authentication is required")
     return InvError(GRAPH_INVALID_TRANSITION, "the proposal state changed before it was confirmed")
 
 
@@ -1100,7 +1120,9 @@ def withdraw(
     if request.accepted_manifest_sha256 != str(decision.accepted_manifest_sha256):
         # The digest on the row, not the release's current one: they differ exactly when
         # the release has moved on, which is a common reason to withdraw (§6).
-        raise InvError(GRAPH_INVALID_TRANSITION, "the withdrawal names a different accepted composition")
+        raise InvError(
+            GRAPH_INVALID_TRANSITION, "the withdrawal names a different accepted composition"
+        )
     already = session.scalars(
         select(ReleaseAcceptanceWithdrawal).where(
             ReleaseAcceptanceWithdrawal.tenant_id == principal.tenant_id,

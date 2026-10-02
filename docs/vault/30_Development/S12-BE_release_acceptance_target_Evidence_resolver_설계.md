@@ -1,10 +1,10 @@
 ---
 doc_id: "DESIGN-S12-ACCEPTANCE-RESOLVER-001"
 title: "S12 release 수락 target·Evidence 정본 resolver 설계"
-version: "1.1.1"
-status: "proposed"
+version: "1.1.2"
+status: "implemented-pending-hosted-review"
 author: "Codex"
-updated: "2026-10-01T22:14:13+09:00"
+updated: "2026-10-01T23:43:41+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["S12-BE", "acceptance", "target-registry", "evidence", "resolver", "security"]
@@ -22,10 +22,11 @@ tags: ["S12-BE", "acceptance", "target-registry", "evidence", "resolver", "secur
 2. Evidence envelope 자체의 versioned digest와 release 범위 binding 설계.
 3. caller ref를 server-owned row에 exact resolve한 all-or-nothing 내부 결과 계약.
 
-route, resolver service, DB migration, legacy backfill은 **미구현**이다. 따라서 이 PR만으로
-`INV_RELEASE_ACCEPTANCE_WRITE_ENABLED`를 켜거나 `operatorSignOff=true`를 만들 수 없다. 구현 owner는
-Claude이고 coordinator가 migration 번호 **`0058`을 카드 190 계열 구현에 예약 승인**했다
-(`0057`은 카드 187).
+카드 194는 route, resolver service, DB migration을 구현한다. legacy 전체 backfill과
+`INV_RELEASE_ACCEPTANCE_WRITE_ENABLED` 활성화, `operatorSignOff=true` 전환은 여전히 이 카드의
+범위가 아니다. 원래 구현 owner는 Claude였으나 카드 187 P0 대응과 DB trigger·digest·RLS 전문성 분리를
+위해 coordinator가 설계 owner Codex에게 구현을 교차 배정했고 Claude가 독립 검토한다. 예약 번호
+**`0058`**은 카드 187의 **`0057_release_acceptance_quorum`을 반드시 부모로 한다**.
 
 현재 사실은 다음과 같다.
 
@@ -268,11 +269,12 @@ proposal, vote, acceptance, success audit를 쓰지 않는다.
 
 ## 6. 착수/롤백 조건
 
-Claude 구현 카드는 예약된 `0058`로 target registry loader → digest migration/backfill dry-run →
-binder/read surface → binding/resolver → 카드 187 decision writer 결속 순으로 간다. 모든 focused/real-PG gate와 독립 검토가
-끝나기 전 write flag는 off다. migration rollback은 resolver/write flag를 먼저 off하고 binding
+카드 194는 예약된 `0058`로 target registry loader → digest migration → binder/read surface →
+binding/resolver 순서를 구현했다. 모든 focused/real-PG gate와 독립 검토가 끝나기 전 write flag는
+off다. migration rollback은 resolver/write flag를 먼저 off하고 binding
 trigger/table·digest trigger/function/index·column을 역순 제거한다. 이미 기록된 acceptance가 새 resolver
 없이 재검증될 수 없으므로 운영 data가 생긴 뒤 downgrade는 금지하고 restore 계획을 요구한다.
 
-이번 카드의 판정은 **계약 준비**다. 실제 resolver, backfill receipt, hosted PG evidence, 사람 인수는
-모두 `NOT_OBSERVED`다.
+현재 판정은 **구현 완료·hosted 실 PG 검증 대기**다. 신규 INSERT digest·binding·resolver·discovery는
+코드와 PG-free 시험이 있으며, legacy backfill receipt·hosted PG evidence·사람 인수는 아직
+`NOT_OBSERVED`다.

@@ -38,6 +38,8 @@ from test_model_version_digest_scope_real_pg import _insert, _project_with_model
 
 pytestmark = pytest.mark.postgres
 
+CURRENT_HEAD = "0058_release_acceptance_resolver"
+
 MIGRATION = Path(__file__).resolve().parents[2] / "migrations/versions/0054_model_version_measurements.py"
 MEASUREMENTS = "inv.model_version_measurements"
 DIGEST = "5" * 64
@@ -322,7 +324,7 @@ def _rerun(database_url, monkeypatch):
     with monkeypatch.context() as patch:
         patch.setenv("INV_DATABASE_URL", database_url)
         patch.setenv("INV_MIGRATION_DSN", database_url)
-        command.upgrade(config, "head")
+        command.upgrade(config, "0054_model_version_measurements")
 
 
 def _interrupt_after_the_table(owner_engine):
@@ -341,17 +343,21 @@ def _recorded(owner_engine):
 
 def _restore_head(owner_engine):
     with owner_engine.begin() as connection:
-        connection.execute(text("UPDATE alembic_version SET version_num = '0054_model_version_measurements'"))
+        connection.execute(
+            text("UPDATE alembic_version SET version_num = :head"),
+            {"head": CURRENT_HEAD},
+        )
 
 
 def test_a_run_interrupted_after_the_table_resumes_and_converges(owner_engine, database_url, migrated, clean_tables, monkeypatch):
     _interrupt_after_the_table(owner_engine)
     try:
         _rerun(database_url, monkeypatch)
+        assert _recorded(owner_engine) == "0054_model_version_measurements"
     finally:
         _restore_head(owner_engine)
     _assert_catalogue_is_whole(owner_engine)
-    assert _recorded(owner_engine) == "0054_model_version_measurements"
+    assert _recorded(owner_engine) == CURRENT_HEAD
 
 
 def test_a_resume_stops_on_a_verified_version_nothing_can_bind(owner_engine, database_url, migrated, draft, monkeypatch):
@@ -372,6 +378,7 @@ def test_a_resume_stops_on_a_verified_version_nothing_can_bind(owner_engine, dat
             assert not connection.exec_driver_sql(M.COLUMN_SHAPE).fetchall()      # no DDL happened
             connection.execute(text("UPDATE model_versions SET verified_at = NULL WHERE model_version_id = :m"), {"m": draft["version_id"]})
         _rerun(database_url, monkeypatch)                                          # resolved: converges
+        assert _recorded(owner_engine) == "0054_model_version_measurements"
     finally:
         _restore_head(owner_engine)
     _assert_catalogue_is_whole(owner_engine)
@@ -518,16 +525,24 @@ def test_a_downgrade_refuses_while_a_measurement_exists(owner_engine, database_u
     record_measurement(owner_engine, tenant_id=draft["tenant_a"], model_version_id=draft["version_id"], sha256=DIGEST)
     # Preconditions stated, so a database left behind by another test cannot
     # turn this into a no-op downgrade that "did not raise".
-    assert _recorded(owner_engine) == "0054_model_version_measurements"
+    assert _recorded(owner_engine) == CURRENT_HEAD
     with owner_engine.begin() as connection:
         assert connection.exec_driver_sql(M.MEASUREMENT_ROWS).scalar() >= 1
         assert connection.exec_driver_sql(M.COLUMN_SHAPE).fetchall()
     config = Config("alembic.ini")
     config.set_main_option("script_location", "migrations")
-    with monkeypatch.context() as patch:
-        patch.setenv("INV_DATABASE_URL", database_url)
-        patch.setenv("INV_MIGRATION_DSN", database_url)
-        with pytest.raises(RuntimeError, match="discard"):
-            command.downgrade(config, "0053_eval_suite_project_scope")
-    assert _recorded(owner_engine) == "0054_model_version_measurements"
+    try:
+        with monkeypatch.context() as patch:
+            patch.setenv("INV_DATABASE_URL", database_url)
+            patch.setenv("INV_MIGRATION_DSN", database_url)
+            with pytest.raises(RuntimeError, match="discard"):
+                command.downgrade(config, "0053_eval_suite_project_scope")
+        # PostgreSQL transactional DDL keeps the complete current head when
+        # 0054 refuses; it must not leave the shared test database half-downgraded.
+        assert _recorded(owner_engine) == CURRENT_HEAD
+    finally:
+        with monkeypatch.context() as patch:
+            patch.setenv("INV_DATABASE_URL", database_url)
+            patch.setenv("INV_MIGRATION_DSN", database_url)
+            command.upgrade(config, CURRENT_HEAD)
     _assert_catalogue_is_whole(owner_engine)

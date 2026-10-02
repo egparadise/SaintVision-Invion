@@ -33,6 +33,8 @@ from saintvision.ids import new_id
 
 pytestmark = pytest.mark.postgres
 
+CURRENT_HEAD = "0058_release_acceptance_resolver"
+
 OLD = "uq_model_versions_tenant_id_content_sha256"
 NEW = "uq_model_versions_model_id_content_sha256"
 
@@ -347,19 +349,22 @@ def test_a_run_interrupted_after_the_promotion_resumes_and_converges(
         with monkeypatch.context() as patch:
             patch.setenv("INV_DATABASE_URL", database_url)
             patch.setenv("INV_MIGRATION_DSN", database_url)
-            command.upgrade(config, "head")
+            command.upgrade(config, "0052_model_version_digest_scope")
+            with owner_engine.begin() as connection:
+                assert connection.execute(
+                    text("SELECT version_num FROM alembic_version")
+                ).scalar_one() == "0052_model_version_digest_scope"
     finally:
-        # Whatever happened, leave the database at head for the tests after this
-        # one: the old constraint gone, the revision recorded.
+        # Whatever happened, leave the shared session database at the real head.
+        # This test replays only 0052; replaying every later migration over its
+        # already-present objects is not the crash state under test.
         with owner_engine.begin() as connection:
             connection.execute(
                 text(f"ALTER TABLE model_versions DROP CONSTRAINT IF EXISTS {OLD}")
             )
             connection.execute(
-                text(
-                    "UPDATE alembic_version SET version_num = "
-                    "'0052_model_version_digest_scope'"
-                )
+                text("UPDATE alembic_version SET version_num = :head"),
+                {"head": CURRENT_HEAD},
             )
 
     names = _constraints(owner_engine)
@@ -372,7 +377,7 @@ def test_a_run_interrupted_after_the_promotion_resumes_and_converges(
         recorded = connection.execute(
             text("SELECT version_num FROM alembic_version")
         ).scalar_one()
-    assert recorded == "0052_model_version_digest_scope"
+    assert recorded == CURRENT_HEAD
 
 
 def test_the_index_the_new_constraint_owns_cannot_be_dropped_on_its_own(owner_engine, migrated):

@@ -32,7 +32,7 @@ DEFAULT_ALLOWLIST = (
     ROOT / ALLOWLIST_REPO_PATH
 )
 TARGET_REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
-TARGET_REGISTRY_BLOB = "be99a506efecdb2ff29cf4e7a96a8772f5524473"
+TARGET_REGISTRY_BLOB = "eeb43dc262f5de1816237ef85fc902cdca4ab6fd"
 ALLOWLIST_BLOB = "ff2f9966956da677ebcdee92ec1de2292bd5ec52"
 ALLOWLIST_CANONICAL_SHA256 = "b73aba8ff97443bbd1e314d5ca0375fdcbce8205a1a746bc5a73759a04083707"
 SCAN_ALLOWLIST_REPO_PATH = (
@@ -69,6 +69,7 @@ REQUIRED_AXES = (
 REQUIRED_TARGET_BY_AXIS = {
     "actual-pitr-rpo-rto-retention": "s11-st-actual-pitr-archive-failure-v0",
     "long-soak": "s11-ac11-composite-long-soak-v0",
+    "accessibility-e2e": "s11-accessibility-user-device-v1",
 }
 
 SHA1_RE = re.compile(r"^[0-9a-f]{40}$")
@@ -79,7 +80,7 @@ PIN_RE = re.compile(r"^([A-Za-z0-9_.-]+)(?:\[[^\]]+\])?==([^\s;]+)$")
 
 DEFINER_FILES = [
     {"path": "tools/check_definer_functions.py", "blob": "5831f8d8806900146add2e5e7b51b934dced3952"},
-    {"path": "tools/definer-policy.json", "blob": "db8add7d2febd71b6d4c9a031f755fa72e9c6e0b"},
+    {"path": "tools/definer-policy.json", "blob": "90c0e34e7db172aea4e4203bcebad39f8f732514"},
 ]
 RLS_FILES = [
     {"path": "tools/collect_rls_evidence.py", "blob": "446c6cc12ccdd2df373713ba4558792f02701c62"},

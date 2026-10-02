@@ -101,6 +101,10 @@
     {
       "revision": "0057_release_acceptance_quorum",
       "expected": "PRESERVED"
+    },
+    {
+      "revision": "0058_release_acceptance_resolver",
+      "expected": "PRESERVED"
     }
   ]
 }

@@ -138,6 +138,7 @@ from .release_acceptance import (
     ReleaseAcceptanceVote,
     ReleaseAcceptanceWithdrawal,
 )
+from .release_evidence import ReleaseEvidenceBinding
 from .placement import (
     PLACEMENT_STATES,
     PLAN_STATES,
@@ -232,6 +233,7 @@ TENANT_SCOPED_TABLES: tuple[str, ...] = (
     "release_acceptance_withdrawals",
     "release_acceptance_lifecycle_events",
     "release_acceptance_slots",
+    "release_evidence_bindings",
     # discovery and pools
     "node_announcements",
     "resource_pools",
@@ -279,6 +281,7 @@ APPEND_ONLY_TABLES: tuple[str, ...] = (
     "release_acceptance_votes",
     "release_acceptance_withdrawals",
     "release_acceptance_lifecycle_events",
+    "release_evidence_bindings",
     # Append-only since 0057, by revoking what 0005 granted rather than by a narrow
     # grant: a recorded decision is not edited, it is withdrawn by appending a row
     # (design #282 §4-1). The declarative helper above therefore stops granting it
@@ -330,6 +333,7 @@ __all__ = [
     "ReleaseAcceptanceSlot",
     "ReleaseAcceptanceVote",
     "ReleaseAcceptanceWithdrawal",
+    "ReleaseEvidenceBinding",
     "AdapterConformanceRecord",
     "CONFORMANCE_PROVENANCES",
     "CONFORMANCE_SUBJECTS",
