@@ -27,11 +27,28 @@ NOW = datetime(2026, 9, 29, 0, 30, tzinfo=timezone.utc)
 
 
 def archive(report: dict | None = None, extra: str | None = None) -> bytes:
+    # What the producer actually writes: the report *is* the SEC-SCAN-001 threat report, so
+    # it carries threatId with the fields the aggregator reads (card 216).  The stub used to
+    # stop at the provenance fields, which the importer no longer accepts: an adapter that
+    # cannot find a threat report must say so rather than emit an envelope with none.
     report = report or {
+        "schemaVersion": "1.0.0",
+        "runPurpose": "s11-ac11-security-scan",
+        "threatId": "SEC-SCAN-001",
         "sourceRunId": RUN_ID,
         "sourceHeadSha": SOURCE,
         "checkoutTreeSha": "b" * 40,
         "cleanCheckout": True,
+        "startedAt": "2026-09-28T15:20:00Z",
+        "finishedAt": "2026-09-28T15:22:46Z",
+        "environment": {"comparableGroup": "ac11-security-scan-v1"},
+        "verdict": "MEASURED_PASS",
+        "criticalCount": 0,
+        "highCount": 0,
+        "unallowlistedFindingIds": [],
+        "expiredFindingIds": [],
+        "staleAllowlistFindingIds": [],
+        "cleanup": {"residueCount": 0},
     }
     output = io.BytesIO()
     with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as bundle:
@@ -113,3 +130,70 @@ def test_import_rejects_missing_source_run_and_non_exact_archive():
     run, artifact = metadata(payload)
     with pytest.raises(tool.SecurityImportError, match="member set"):
         tool.import_evidence(payload, run, artifact, now=NOW)
+
+
+def test_the_envelope_is_admissible_and_names_the_threat_reports_it_lacks():
+    """Card 216: the adapter's verdict is the one the aggregator will recompute.
+
+    Only SEC-SCAN-001 has a producer in this repository.  The aggregator requires four
+    threat reports and answers NOT_OBSERVED when any is missing, so the envelope says the
+    same thing -- otherwise a partial scan would be read as a pass and the run would be
+    INVALID_RUN for contradicting itself.
+    """
+
+    payload = archive()
+    run_metadata, artifact_metadata = metadata(payload)
+    envelope = tool.import_evidence(payload, run_metadata, artifact_metadata, now=NOW)
+    assert envelope["runPurpose"] == "ac11-axis-evidence"
+    assert envelope["axis"] == "security-critical-high-zero"
+    assert envelope["verdict"] == "NOT_OBSERVED"
+    assert envelope["reason"] == "no producer emits SEC-DEF-001, SEC-RLS-001, SEC-VF-001"
+    assert [row["threatId"] for row in envelope["observations"]] == ["SEC-SCAN-001"]
+    assert envelope["targetRef"]["targetId"] == "s11-security-critical-high-zero-v0"
+    assert envelope["artifactSha256"] == envelope["artifactObservedSha256"]
+    assert envelope["artifactAvailable"] is True
+
+
+def test_all_four_threat_reports_let_the_producer_verdict_through():
+    base = {
+        "schemaVersion": "1.0.0",
+        "runPurpose": "s11-ac11-security-scan",
+        "sourceRunId": RUN_ID,
+        "sourceHeadSha": SOURCE,
+        "checkoutTreeSha": "b" * 40,
+        "cleanCheckout": True,
+        "startedAt": "2026-09-28T15:20:00Z",
+        "finishedAt": "2026-09-28T15:22:46Z",
+        "environment": {"comparableGroup": "ac11-security-scan-v1"},
+        "verdict": "MEASURED_PASS",
+        "cleanup": {"residueCount": 0},
+        "observations": [
+            {"threatId": "SEC-DEF-001"}, {"threatId": "SEC-RLS-001"},
+            {"threatId": "SEC-VF-001"}, {"threatId": "SEC-SCAN-001"},
+        ],
+    }
+    payload = archive(base)
+    run_metadata, artifact_metadata = metadata(payload)
+    envelope = tool.import_evidence(payload, run_metadata, artifact_metadata, now=NOW)
+    assert envelope["verdict"] == "MEASURED_PASS"
+    assert "reason" not in envelope
+
+
+def test_an_unregistered_threat_id_is_refused_rather_than_carried():
+    base = {
+        "schemaVersion": "1.0.0",
+        "runPurpose": "s11-ac11-security-scan",
+        "sourceRunId": RUN_ID,
+        "sourceHeadSha": SOURCE,
+        "checkoutTreeSha": "b" * 40,
+        "cleanCheckout": True,
+        "startedAt": "2026-09-28T15:20:00Z",
+        "finishedAt": "2026-09-28T15:22:46Z",
+        "environment": {"comparableGroup": "ac11-security-scan-v1"},
+        "verdict": "MEASURED_PASS",
+        "observations": [{"threatId": "SEC-INVENTED-001"}],
+    }
+    payload = archive(base)
+    run_metadata, artifact_metadata = metadata(payload)
+    with pytest.raises(tool.SecurityImportError, match="unregistered security threat id"):
+        tool.import_evidence(payload, run_metadata, artifact_metadata, now=NOW)

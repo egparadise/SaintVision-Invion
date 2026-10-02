@@ -21,14 +21,25 @@ from pathlib import Path, PurePosixPath
 from typing import Any
 
 
+#: The AC-11 axes this importer writes envelopes for, as string literals at module level
+#: (#299 r3).  It was ``()`` while this importer returned the producer's report unchanged;
+#: it now adapts that report into an axis envelope, which is what card 216 closes.
+EMITTED_AXES: tuple[str, ...] = (
+    "security-critical-high-zero",
+)
+#: The reviewed AC-11 target registry, pinned the same way the accessibility importer pins
+#: it: the aggregator refuses a targetRef whose blob is not the reviewed one.
+REGISTRY_COMMIT = "0ee9542a4f9b8c640a68545ff83a28370c94152c"
+REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
+REGISTRY_BLOB = "eeb43dc262f5de1816237ef85fc902cdca4ab6fd"
+TARGET_ID = "s11-security-critical-high-zero-v0"
+#: The four threat reports the aggregator requires for this axis.  Only SEC-SCAN-001 has a
+#: producer in this repository, so an envelope built from the security-scan artifact alone
+#: is admissible and recomputes NOT_OBSERVED -- which is the honest answer, and a different
+#: thing from the "no admissible envelope" this importer used to leave behind.
+REQUIRED_THREAT_IDS = ("SEC-DEF-001", "SEC-RLS-001", "SEC-VF-001", "SEC-SCAN-001")
+SCAN_THREAT_ID = "SEC-SCAN-001"
 REPOSITORY = "egparadise/SaintVision-Invion"
-#: Empty on purpose, and the emptiness is the finding. This importer returns the
-#: producer's report with runPurpose "s11-ac11-security-scan" and no axis field, so the
-#: aggregator -- which requires runPurpose "ac11-axis-evidence" and an axis in
-#: REQUIRED_AXES -- cannot take its output. Something has to adapt that report into an
-#: axis envelope and nothing does; declaring () says so in the code rather than leaving
-#: a reader to infer it from the absence of a name (#299 r1, r3).
-EMITTED_AXES: tuple[str, ...] = ()
 WORKFLOW_PATH = ".github/workflows/ac11-security-scan.yml"
 REPORT_MEMBER = "s11-ac11-security-scan.json"
 JUNIT_MEMBER = "s11-ac11-security-scan.xml"
@@ -153,7 +164,7 @@ def import_evidence(
     if observed_digest != expected_digest:
         raise SecurityImportError("downloaded artifact digest differs from GitHub metadata")
 
-    report["scanArtifact"] = {
+    scan_artifact = {
         "repository": REPOSITORY,
         "workflowPath": WORKFLOW_PATH,
         "runId": run_id,
@@ -166,7 +177,103 @@ def import_evidence(
         "producerReportSha256": hashlib.sha256(members[REPORT_MEMBER]).hexdigest(),
         "junitSha256": hashlib.sha256(members[JUNIT_MEMBER]).hexdigest(),
     }
-    return report
+    report["scanArtifact"] = scan_artifact
+    return axis_envelope(
+        report,
+        expected_digest=expected_digest,
+        observed_digest=observed_digest,
+        expires_at=expires_at,
+        scan_artifact=scan_artifact,
+    )
+
+
+def _threat_reports(report: dict[str, Any]) -> list[dict[str, Any]]:
+    """The threat reports this artifact carries, as the aggregator reads them.
+
+    The producer reports the scan; it does not report the definer policy, the RLS probes
+    or the VF observations, and nothing else in this repository emits them either.  So the
+    list is whatever the producer actually gave plus nothing invented: a missing report is
+    reported as missing, never defaulted to a pass.
+    """
+
+    observations = report.get("observations")
+    if isinstance(observations, list) and observations:
+        reports = [row for row in observations if isinstance(row, dict) and row.get("threatId")]
+        if len(reports) != len(observations):
+            raise SecurityImportError("producer observations contain a report without a threatId")
+        return reports
+    if report.get("threatId"):
+        # The producer's report *is* the scan threat report: it carries ``threatId`` at the
+        # top level together with the counts and allowlist fields the aggregator reads.
+        # Nothing is synthesised here; the report is listed as the one report it is.
+        return [report]
+    raise SecurityImportError("producer report carries no threat report to adapt")
+
+
+def axis_envelope(
+    report: dict[str, Any],
+    *,
+    expected_digest: str,
+    observed_digest: str,
+    expires_at: datetime,
+    scan_artifact: dict[str, Any],
+) -> dict[str, Any]:
+    """Adapt the validated producer report into an admissible AC-11 axis envelope.
+
+    Everything the aggregator binds -- the artifact digests, the clean checkout, the run
+    conclusion, the reviewed target registry -- is already measured above; this function
+    only arranges it in the shape ``aggregate_ac11_evidence`` accepts, and decides the one
+    thing the arrangement cannot borrow: the verdict.
+    """
+
+    reports = _threat_reports(report)
+    present = {str(row["threatId"]) for row in reports}
+    unregistered = sorted(present - set(REQUIRED_THREAT_IDS))
+    if unregistered:
+        raise SecurityImportError(f"unregistered security threat id: {unregistered[0]}")
+    missing = [threat for threat in REQUIRED_THREAT_IDS if threat not in present]
+    if missing:
+        # The aggregator reaches the same conclusion from the same absence; declaring it
+        # here keeps the envelope's own verdict equal to the recomputed one, which is what
+        # stops a partial scan from being read as a pass.
+        verdict = "NOT_OBSERVED"
+        reason = "no producer emits " + ", ".join(missing)
+    else:
+        verdict = str(report.get("verdict", ""))
+        reason = None
+        if not verdict:
+            raise SecurityImportError("producer report carries no verdict")
+    envelope = {
+        "schemaVersion": report.get("schemaVersion", "1.0.0"),
+        "runPurpose": "ac11-axis-evidence",
+        "axis": EMITTED_AXES[0],
+        "verdict": verdict,
+        "sourceRunId": report["sourceRunId"],
+        "sourceHeadSha": report["sourceHeadSha"],
+        "checkoutTreeSha": report["checkoutTreeSha"],
+        "artifactSha256": expected_digest,
+        "artifactObservedSha256": observed_digest,
+        "artifactAvailable": True,
+        "artifactExpiresAt": expires_at.isoformat().replace("+00:00", "Z"),
+        "cleanCheckout": report["cleanCheckout"],
+        "runConclusion": "success",
+        "startedAt": report["startedAt"],
+        "finishedAt": report["finishedAt"],
+        "environment": report["environment"],
+        "targetRef": {
+            "commit": REGISTRY_COMMIT,
+            "path": REGISTRY_PATH,
+            "blob": REGISTRY_BLOB,
+            "targetId": TARGET_ID,
+            "criteria": {},
+        },
+        "observations": reports,
+        "cleanup": report.get("cleanup", {"residueCount": 0}),
+        "scanArtifact": scan_artifact,
+    }
+    if reason is not None:
+        envelope["reason"] = reason
+    return envelope
 
 
 def main(argv: list[str] | None = None) -> int:
