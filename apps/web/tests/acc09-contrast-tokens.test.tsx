@@ -8,6 +8,15 @@ import ts from 'typescript';
 import { RunDetail } from '../src/features/runs/RunDetail';
 import { SealRecordPanel } from '../src/features/runs/SealRecordPanel';
 import { RunList } from '../src/features/runs/RunList';
+import {
+  DistributedRecoveryView,
+  NODE_HEALTH_CONFIG,
+  NODE_HEALTH_UNKNOWN_CONFIG,
+} from '../src/features/recovery/DistributedRecoveryView';
+import {
+  DistributedRecoveryManager,
+  evaluateInitialHealth,
+} from '../src/features/recovery/recoveryEngine';
 import { NodeList } from '../src/features/nodes/NodeList';
 import { NodeDetail } from '../src/features/nodes/NodeDetail';
 import { DeveloperStudio } from '../src/features/studio/DeveloperStudio';
@@ -282,7 +291,7 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/placement/PlacementExplainView.tsx": {"#d97706": 1, "rgba(16,185,129,0.1)": 1, "rgba(16,185,129,0.15)": 1, "rgba(234,179,8,0.15)": 1, "rgba(234,179,8,0.3)": 1},
   "features/placement/PlacementSimulator.tsx": {"#334155": 3, "#93c5fd": 1, "#94a3b8": 2, "#ef4444": 4, "#f87171": 1, "#fbbf24": 4, "#fca5a5": 4, "#fff": 3, "#ffffff": 2, "rgba(234,179,8,0.15)": 2, "rgba(234,179,8,0.3)": 2, "rgba(239,68,68,0.1)": 4, "rgba(35,134,54,0.1)": 1},
   "features/placement/ResourceTopologyGraph.tsx": {"#ffffff": 2, "rgba(16,185,129,0.08)": 1},
-  "features/recovery/DistributedRecoveryView.tsx": {"#0d1117": 3, "#161b22": 9, "#21262d": 1, "#30363d": 12, "#3fb950": 6, "#58a6ff": 8, "#8b949e": 20, "#a371f7": 1, "#e3b341": 1, "#f0f6fc": 8, "#f85149": 7, "rgba(248,81,73,0.15)": 1, "rgba(46,160,67,0.15)": 1, "rgba(56,139,253,0.1)": 1, "rgba(56,139,253,0.15)": 1, "rgba(56,139,253,0.4)": 1},
+  "features/recovery/DistributedRecoveryView.tsx": {},
   "features/release/ReleaseCandidateView.tsx": {"#0d1117": 1, "#161b22": 7, "#21262d": 2, "#30363d": 11, "#3fb950": 10, "#58a6ff": 5, "#8b949e": 22, "#c9d1d9": 2, "#d29922": 2, "#f0f6fc": 7, "#f85149": 5, "rgba(139,148,158,0.1)": 1, "rgba(139,148,158,0.2)": 1, "rgba(248,81,73,0.15)": 1, "rgba(248,81,73,0.2)": 2, "rgba(46,160,67,0.15)": 1, "rgba(46,160,67,0.2)": 2, "rgba(56,139,253,0.12)": 1, "rgba(56,139,253,0.2)": 1},
   "features/release/releaseEngine.ts": {"#0d1117": 1, "#6e7681": 1},
   "features/runs/RunDetail.tsx": {},
@@ -4391,8 +4400,338 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
   });
 
-  // 9i-2. [Card 215 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList
-  it('ACC-09 / Card 215: RunList style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
+  // 9j. [Card 218 / ACC-09] Component DOM Rendering Verification: DistributedRecoveryView binds foregrounds and container backgrounds to design tokens with dynamic contrast verification
+  it('ACC-09 / Card 218: DistributedRecoveryView component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification', async () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    const mockNodes: NodeItem[] = [
+      {
+        id: 'nod_rec_01',
+        hostname: 'node-rec-online',
+        os: 'linux',
+        cpuCores: 8,
+        cpuUsagePercent: 20,
+        memoryTotalBytes: 32 * 1024 ** 3,
+        memoryUsagePercent: 30,
+        status: 'online',
+        heartbeatAt: new Date(Date.now() - 5000).toISOString(),
+      },
+      {
+        id: 'nod_rec_02',
+        hostname: 'node-rec-stale',
+        os: 'linux',
+        cpuCores: 8,
+        cpuUsagePercent: 20,
+        memoryTotalBytes: 32 * 1024 ** 3,
+        memoryUsagePercent: 30,
+        status: 'degraded',
+        heartbeatAt: new Date(Date.now() - 75000).toISOString(),
+      },
+      {
+        id: 'nod_rec_03',
+        hostname: 'node-rec-offline',
+        os: 'linux',
+        cpuCores: 8,
+        cpuUsagePercent: 20,
+        memoryTotalBytes: 32 * 1024 ** 3,
+        memoryUsagePercent: 30,
+        status: 'offline',
+        heartbeatAt: null,
+      },
+      {
+        id: 'nod_rec_04',
+        hostname: 'node-rec-recovering',
+        os: 'linux',
+        cpuCores: 8,
+        cpuUsagePercent: 20,
+        memoryTotalBytes: 32 * 1024 ** 3,
+        memoryUsagePercent: 30,
+        status: 'offline',
+        heartbeatAt: null,
+      },
+    ];
+
+    const recoveryMgr = new DistributedRecoveryManager(
+      mockNodes.map((n, i) => ({
+        nodeId: n.id,
+        hostname: n.hostname,
+        activeWorkspaces: i + 1,
+        status: n.status,
+        heartbeatAt: n.heartbeatAt ?? null,
+      }))
+    );
+    // Node 4 was offline, transitions to recovering on fresh heartbeat recovery
+    recoveryMgr.evaluateNodeHealth('nod_rec_04', 150);
+    recoveryMgr.evaluateNodeHealth('nod_rec_04', 10);
+
+    try {
+      // 1. Initial render with 4 nodes (online, stale, offline, recovering)
+      await act(async () => {
+        root.render(<DistributedRecoveryView nodes={mockNodes} recoveryManager={recoveryMgr} />);
+      });
+
+      // 1-a. Notice Banner (var(--color-bg-subtle), var(--color-brand-hover))
+      const noticeBanner = container.querySelector('[data-testid="recovery-unexposed-notice"]') as HTMLElement;
+      expect(noticeBanner, 'Notice banner must render').not.toBeNull();
+      expect(noticeBanner.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(noticeBanner.style.borderColor).toBe('var(--color-brand-hover)');
+      expect(noticeBanner.style.color).toBe('var(--color-brand-hover)');
+      const nbFg = helperExtractVar(noticeBanner.style.color);
+      const nbBg = helperExtractVar(noticeBanner.style.backgroundColor);
+      const nbBd = helperExtractVar(noticeBanner.style.borderColor);
+      expect(getContrast(lightTokens[nbFg], lightTokens[nbBg]), 'Notice banner light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[nbFg], darkTokens[nbBg]), 'Notice banner dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[nbBd], lightTokens[nbBg]), 'Notice banner light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[nbBd], darkTokens[nbBg]), 'Notice banner dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 1-b. KPI Cards & Invariants
+      const kpiDetection = container.querySelector('[data-testid="kpi-card-detection"]') as HTMLElement;
+      const kpiZombie = container.querySelector('[data-testid="kpi-card-zombie"]') as HTMLElement;
+      const kpiRecovery = container.querySelector('[data-testid="kpi-card-recovery"]') as HTMLElement;
+      expect(kpiDetection.style.backgroundColor).toBe('var(--color-bg-surface)');
+      expect(kpiDetection.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(kpiZombie.style.backgroundColor).toBe('var(--color-bg-surface)');
+      expect(kpiZombie.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(kpiRecovery.style.backgroundColor).toBe('var(--color-bg-surface)');
+      expect(kpiRecovery.style.borderColor).toBe('var(--color-border-subtle)');
+
+      const zombieCount = container.querySelector('[data-testid="kpi-zombie-writes"]') as HTMLElement;
+      expect(zombieCount.style.color).toBe('var(--color-status-online)');
+      const zcFg = helperExtractVar(zombieCount.style.color);
+      expect(getContrast(lightTokens[zcFg], lightTokens['--color-bg-surface']), 'Zombie writes count light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[zcFg], darkTokens['--color-bg-surface']), 'Zombie writes count dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      // 1-c. Node Card Selection and Global Focus Ring Protection (WCAG 2.4.7)
+      const nodeCard1 = container.querySelector('[data-testid="node-card-nod_rec_01"]') as HTMLElement;
+      const nodeCard2 = container.querySelector('[data-testid="node-card-nod_rec_02"]') as HTMLElement;
+      expect(nodeCard1, 'Node card 1 must render').not.toBeNull();
+      expect(nodeCard2, 'Node card 2 must render').not.toBeNull();
+      expect(nodeCard1.style.backgroundColor).toBe('var(--color-bg-surface)');
+      expect(nodeCard1.style.borderColor).toBe('var(--color-brand-hover)');
+      expect(nodeCard1.style.border).toContain('2px');
+      // No inline outline overriding global :focus-visible on either card
+      expect(nodeCard1.style.outline).toBe('');
+      expect(nodeCard2.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(nodeCard2.style.outline).toBe('');
+
+      // 1-d. Node Actual & Simulated Badges
+      const actualBadge1 = container.querySelector('[data-testid="node-actual-status-nod_rec_01"]') as HTMLElement;
+      expect(actualBadge1.style.color).toBe('var(--color-text-secondary)');
+      expect(actualBadge1.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(actualBadge1.style.borderColor).toBe('var(--color-border-subtle)');
+      const abFg = helperExtractVar(actualBadge1.style.color);
+      const abBg = helperExtractVar(actualBadge1.style.backgroundColor);
+      const abBd = helperExtractVar(actualBadge1.style.borderColor);
+      expect(getContrast(lightTokens[abFg], lightTokens[abBg]), 'Actual status light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[abFg], darkTokens[abBg]), 'Actual status dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[abBd], lightTokens[abBg]), 'Actual status light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[abBd], darkTokens[abBg]), 'Actual status dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      const simBadgeOnline = container.querySelector('[data-testid="node-sim-status-nod_rec_01"]') as HTMLElement;
+      const simBadgeStale = container.querySelector('[data-testid="node-sim-status-nod_rec_02"]') as HTMLElement;
+      const simBadgeOffline = container.querySelector('[data-testid="node-sim-status-nod_rec_03"]') as HTMLElement;
+      const simBadgeRecovering = container.querySelector('[data-testid="node-sim-status-nod_rec_04"]') as HTMLElement;
+
+      expect(simBadgeOnline.textContent).toBe('시뮬레이션: ONLINE');
+      expect(simBadgeOnline.style.color).toBe('var(--color-status-online)');
+      expect(simBadgeOnline.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(simBadgeOnline.style.borderColor).toBe('var(--color-status-online)');
+
+      expect(simBadgeStale.textContent).toBe('시뮬레이션: STALE');
+      expect(simBadgeStale.style.color).toBe('var(--color-status-degraded)');
+      expect(simBadgeStale.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(simBadgeStale.style.borderColor).toBe('var(--color-status-degraded)');
+
+      expect(simBadgeOffline.textContent).toBe('시뮬레이션: OFFLINE');
+      expect(simBadgeOffline.style.color).toBe('var(--color-status-offline)');
+      expect(simBadgeOffline.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(simBadgeOffline.style.borderColor).toBe('var(--color-status-offline)');
+
+      expect(simBadgeRecovering.textContent).toBe('시뮬레이션: RECOVERING');
+      expect(simBadgeRecovering.style.color).toBe('var(--color-status-active)');
+      expect(simBadgeRecovering.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(simBadgeRecovering.style.borderColor).toBe('var(--color-status-active)');
+
+      expect(simBadgeOnline.style.opacity || '1', 'Online badge must not have degraded opacity').toBe('1');
+      expect(simBadgeStale.style.opacity || '1', 'Stale badge must not have degraded opacity').toBe('1');
+      expect(simBadgeOffline.style.opacity || '1', 'Offline badge must not have degraded opacity').toBe('1');
+      expect(simBadgeRecovering.style.opacity || '1', 'Recovering badge must not have degraded opacity').toBe('1');
+
+      // 1-e. Fault Injection Actions & FENCED state
+      const partitionBtn = container.querySelector('[data-testid="simulate-partition-btn"]') as HTMLButtonElement;
+      await act(async () => {
+        partitionBtn.click();
+      });
+
+      const simBadgeFenced = container.querySelector('[data-testid="node-sim-status-nod_rec_01"]') as HTMLElement;
+      expect(simBadgeFenced.textContent).toBe('시뮬레이션: FENCED');
+      expect(simBadgeFenced.style.color).toBe('var(--color-status-neutral)');
+      expect(simBadgeFenced.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(simBadgeFenced.style.borderColor).toBe('var(--color-border-strong)');
+      expect(simBadgeFenced.style.opacity || '1', 'Fenced badge must not have degraded opacity').toBe('1');
+
+      const actionNoticeErr = container.querySelector('[data-testid="recovery-action-notice"]') as HTMLElement;
+      expect(actionNoticeErr, 'Action notice error must render').not.toBeNull();
+      expect(actionNoticeErr.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(actionNoticeErr.style.borderColor).toBe('var(--color-status-offline)');
+      expect(actionNoticeErr.style.color).toBe('var(--color-status-offline)');
+      const aneFg = helperExtractVar(actionNoticeErr.style.color);
+      const aneBg = helperExtractVar(actionNoticeErr.style.backgroundColor);
+      const aneBd = helperExtractVar(actionNoticeErr.style.borderColor);
+      expect(getContrast(lightTokens[aneFg], lightTokens[aneBg]), 'Action notice error light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[aneFg], darkTokens[aneBg]), 'Action notice error dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[aneBd], lightTokens[aneBg]), 'Action notice error light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[aneBd], darkTokens[aneBg]), 'Action notice error dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 1-f. Stale write rejection audit stream
+      const zombieBtn = container.querySelector('[data-testid="attempt-zombie-write-btn"]') as HTMLButtonElement;
+      await act(async () => {
+        zombieBtn.click();
+      });
+
+      const rejItem = container.querySelector('[data-testid^="rejection-item-"]') as HTMLElement;
+      expect(rejItem, 'Rejection item must render').not.toBeNull();
+      expect(rejItem.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(rejItem.style.borderColor).toBe('var(--color-status-offline)');
+
+      // 1-g. Drain & Reconcile action
+      const drainBtn = container.querySelector('[data-testid="drain-reconcile-btn"]') as HTMLButtonElement;
+      await act(async () => {
+        drainBtn.click();
+      });
+
+      const actionNoticeSucc = container.querySelector('[data-testid="recovery-action-notice"]') as HTMLElement;
+      expect(actionNoticeSucc.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(actionNoticeSucc.style.borderColor).toBe('var(--color-status-online)');
+      expect(actionNoticeSucc.style.color).toBe('var(--color-status-online)');
+
+      const recItem = container.querySelector('[data-testid^="reconciliation-item-"]') as HTMLElement;
+      expect(recItem, 'Reconciliation item must render').not.toBeNull();
+      expect(recItem.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(recItem.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(recItem.textContent).toContain('RECOVERED (모의)');
+
+      // 1-h. Create checkout action (ADR-043)
+      const checkoutBtn = container.querySelector('[data-testid="create-checkout-btn"]') as HTMLButtonElement;
+      await act(async () => {
+        checkoutBtn.click();
+      });
+      expect(container.textContent).toContain('sim_chk_1');
+
+      // 1-i. Recovery health states: all 5 states distinct, distinct labels, and recovering mapped to active
+      const uniqueColors = new Set(Object.values(NODE_HEALTH_CONFIG).map(t => t.color));
+      expect(uniqueColors.size, 'All 5 recovery health states must have unique distinct color tokens').toBe(5);
+
+      // Non-color distinctness: all 5 health labels must be non-empty, unique, and exactly match expected strings (killing M8a & M8d)
+      expect(NODE_HEALTH_CONFIG.online.label).toBe('ONLINE');
+      expect(NODE_HEALTH_CONFIG.stale.label).toBe('STALE');
+      expect(NODE_HEALTH_CONFIG.offline.label).toBe('OFFLINE');
+      expect(NODE_HEALTH_CONFIG.recovering.label).toBe('RECOVERING');
+      expect(NODE_HEALTH_CONFIG.fenced.label).toBe('FENCED');
+      const healthLabels = Object.values(NODE_HEALTH_CONFIG).map(c => c.label);
+      expect(healthLabels.every(l => typeof l === 'string' && l.trim().length > 0), 'All health labels must be non-empty strings').toBe(true);
+      expect(new Set(healthLabels).size, 'All 5 health labels must be distinct').toBe(5);
+
+      for (const [state, cfg] of Object.entries(NODE_HEALTH_CONFIG)) {
+        const cVar = helperExtractVar(cfg.color);
+        const bVar = helperExtractVar(cfg.border);
+        const bgVar = helperExtractVar(cfg.bg);
+        expect(getContrast(lightTokens[cVar], lightTokens[bgVar]), `${state} light text contrast >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
+        expect(getContrast(darkTokens[cVar], darkTokens[bgVar]), `${state} dark text contrast >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
+        expect(getContrast(lightTokens[bVar], lightTokens[bgVar]), `${state} light border contrast >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
+        expect(getContrast(darkTokens[bVar], darkTokens[bgVar]), `${state} dark border contrast >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
+      }
+
+      // Parity with RunDetail/RunList recovering status
+      expect(NODE_HEALTH_CONFIG.recovering.color, 'recovering color must match active status token').toBe('var(--color-status-active)');
+      expect(NODE_HEALTH_CONFIG.fenced.border, 'fenced border must match border-strong token').toBe('var(--color-border-strong)');
+
+      // 1-j. Fail-Closed Non-Color State Contract & Negative Fallback Verification
+      // A: Engine level negative checks
+      expect(evaluateInitialHealth('unknown', null).health, 'Unreported heartbeat with unknown status must evaluate to offline').toBe('offline');
+      expect(evaluateInitialHealth(undefined, null).health, 'Missing status and heartbeat must evaluate to offline').toBe('offline');
+      expect(evaluateInitialHealth('corrupted_status' as any, null).health, 'Corrupted status must evaluate to offline').toBe('offline');
+      expect(evaluateInitialHealth('online', null).health, 'Online status without heartbeat must evaluate to stale, never silently online').toBe('stale');
+      expect(recoveryMgr.getNode('nod_rec_04')?.healthState, 'Recovered node with fresh heartbeat transitions to recovering').toBe('recovering');
+
+      // B: Config fallback contract: unknown telemetry states must never silently fallback to ONLINE
+      expect(NODE_HEALTH_UNKNOWN_CONFIG.label).toBe('UNKNOWN');
+      expect(NODE_HEALTH_UNKNOWN_CONFIG.color).toBe('var(--color-status-neutral)');
+      expect(NODE_HEALTH_UNKNOWN_CONFIG.color).not.toBe('var(--color-status-online)');
+
+      // C: DOM level negative checks: render view with unmapped/corrupted and missing health states
+      const failClosedMgr = new DistributedRecoveryManager([
+        {
+          nodeId: 'nod_rec_unmapped',
+          hostname: 'worker-unmapped.saint.local',
+          status: 'corrupted_variant',
+          heartbeatAt: new Date().toISOString(),
+        },
+        {
+          nodeId: 'nod_rec_missing',
+          hostname: 'worker-missing.saint.local',
+          status: 'unknown',
+          heartbeatAt: null,
+        },
+      ]);
+      // Force unmapped healthState to simulate unhandled or newly introduced backend telemetry variant
+      (failClosedMgr.getNodes()[0] as any).healthState = 'unknown_variant';
+      // Force null/undefined healthState to simulate missing state field
+      (failClosedMgr.getNodes()[1] as any).healthState = undefined;
+
+      await act(async () => {
+        root.render(<DistributedRecoveryView key="fail-closed" nodes={[]} recoveryManager={failClosedMgr} />);
+      });
+
+      const simBadgeUnmapped = container.querySelector('[data-testid="node-sim-status-nod_rec_unmapped"]') as HTMLElement;
+      expect(simBadgeUnmapped, 'Unmapped node badge must render').not.toBeNull();
+      expect(simBadgeUnmapped.textContent, 'Unmapped state must render uppercase label, not ONLINE').toBe('시뮬레이션: UNKNOWN_VARIANT');
+      expect(simBadgeUnmapped.textContent).not.toContain('ONLINE');
+      expect(simBadgeUnmapped.style.color, 'Unmapped state must use neutral token, not online').toBe('var(--color-status-neutral)');
+      expect(simBadgeUnmapped.style.color).not.toBe('var(--color-status-online)');
+      expect(simBadgeUnmapped.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(simBadgeUnmapped.style.borderColor).toBe('var(--color-border-subtle)');
+
+      const simBadgeMissing = container.querySelector('[data-testid="node-sim-status-nod_rec_missing"]') as HTMLElement;
+      expect(simBadgeMissing, 'Missing state node badge must render').not.toBeNull();
+      expect(simBadgeMissing.textContent, 'Missing state must render UNKNOWN fallback, not ONLINE').toBe('시뮬레이션: UNKNOWN');
+      expect(simBadgeMissing.textContent).not.toContain('ONLINE');
+      expect(simBadgeMissing.style.color, 'Missing state must use neutral token, not online').toBe('var(--color-status-neutral)');
+      expect(simBadgeMissing.style.color).not.toBe('var(--color-status-online)');
+      expect(simBadgeMissing.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(simBadgeMissing.style.borderColor).toBe('var(--color-border-subtle)');
+
+      // Verify aria-label non-crashing and semantic fallback for unmapped and missing states
+      const cardUnmapped = container.querySelector('[data-testid="node-card-nod_rec_unmapped"]') as HTMLElement;
+      expect(cardUnmapped.getAttribute('aria-label')).toBe('worker-unmapped.saint.local (실제: corrupted_variant, 시뮬레이션: UNKNOWN_VARIANT)');
+      const cardMissing = container.querySelector('[data-testid="node-card-nod_rec_missing"]') as HTMLElement;
+      expect(cardMissing.getAttribute('aria-label')).toBe('worker-missing.saint.local (실제: unknown, 시뮬레이션: UNKNOWN)');
+
+      // 2. Empty state screen
+      await act(async () => {
+        root.render(<DistributedRecoveryView nodes={[]} />);
+      });
+
+      const emptyScreen = container.querySelector('[data-testid="recovery-empty-nodes-screen"]') as HTMLElement;
+      expect(emptyScreen, 'Empty nodes screen must render').not.toBeNull();
+      expect(emptyScreen.style.backgroundColor).toBe('var(--color-bg-surface)');
+      expect(emptyScreen.style.borderColor).toBe('var(--color-border-subtle)');
+      const esBg = helperExtractVar(emptyScreen.style.backgroundColor);
+      const esBd = helperExtractVar(emptyScreen.style.borderColor);
+      expect(getContrast(lightTokens[esBd], lightTokens[esBg]), 'Empty screen light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[esBd], darkTokens[esBg]), 'Empty screen dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+    } finally {
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    }
+  });
+
+  // 9j-2. [Card 215 & Card 218 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList & DistributedRecoveryView
+  it('ACC-09 / Card 215 & Card 218: RunList and DistributedRecoveryView style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
     interface Branch {
       cond: string;
       token: string;
@@ -4419,6 +4758,14 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
             const m = text.match(/var\((--color-[a-z0-9-]+)\)/);
             if (m) {
               branches.push({ cond: condPath, token: m[1] });
+            } else {
+              const clean = text.replace(/['"`]/g, '').trim().toLowerCase();
+              const allowedNonTokens = ['transparent', 'inherit', 'currentcolor', 'none', 'initial', 'unset'];
+              const namedColors = ['white', 'black', 'red', 'green', 'blue', 'gray', 'yellow', 'orange', 'purple', 'lightgray', 'darkgray', 'silver', 'cyan', 'magenta', 'lime', 'maroon', 'navy', 'olive', 'teal', 'aqua', 'fuchsia'];
+              if (clean.startsWith('#') || clean.startsWith('rgb') || clean.startsWith('hsl') || namedColors.includes(clean) || (!allowedNonTokens.includes(clean) && /^[a-z]+$/.test(clean))) {
+                const { line } = sf.getLineAndCharacterOfPosition(n.getStart(sf));
+                violations.push(`L${line + 1}: Raw color literal detected instead of design token: ${text}`);
+              }
             }
           }
         }
@@ -4611,7 +4958,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       }
 
       function checkConfigTables(node: ts.Node) {
-        if (ts.isVariableDeclaration(node) && node.name.getText(sf) === 'RUN_STATE_CONFIG' && node.initializer && ts.isObjectLiteralExpression(node.initializer)) {
+        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG') && node.initializer && ts.isObjectLiteralExpression(node.initializer)) {
           for (const prop of node.initializer.properties) {
             if (ts.isPropertyAssignment(prop) && ts.isObjectLiteralExpression(prop.initializer)) {
               totalStyleAttrs++;
@@ -4668,6 +5015,16 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(runListStats.checkedBorderObjects, 'Border objects in RunList must be exactly 23').toBe(23);
     expect(runListStats.checkedBorderPairs, 'Border pairs in RunList must be exactly 24').toBe(24);
     expect(runListStats.violations, `RunList violations:\n${runListStats.violations.join('\n')}`).toEqual([]);
+
+    const recoveryStats = analyzeFile('features/recovery/DistributedRecoveryView.tsx');
+    expect(recoveryStats.totalStyleAttrs, 'Total style attributes in DistributedRecoveryView must be exactly 68').toBe(68);
+    expect(recoveryStats.checkedObjects, 'Explicit style objects in DistributedRecoveryView must be exactly 8').toBe(8);
+    expect(recoveryStats.checkedPairs, 'Evaluated pairs in DistributedRecoveryView must be exactly 47').toBe(47);
+    expect(recoveryStats.unboundColorObjects, 'Unbound color objects in DistributedRecoveryView must be exactly 34').toBe(34);
+    expect(recoveryStats.coveredColorObjects, 'Total covered color objects in DistributedRecoveryView must be exactly 42').toBe(42);
+    expect(recoveryStats.checkedBorderObjects, 'Border objects in DistributedRecoveryView must be exactly 20').toBe(20);
+    expect(recoveryStats.checkedBorderPairs, 'Border pairs in DistributedRecoveryView must be exactly 23').toBe(23);
+    expect(recoveryStats.violations, `DistributedRecoveryView violations:\n${recoveryStats.violations.join('\n')}`).toEqual([]);
   });
 
 
@@ -5011,6 +5368,31 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(probe70Cr, 'RunList former #fca5a5 on light subtle fails 4.5:1').toBeLessThan(4.5);
     expect(probe70Cr).toBeCloseTo(1.73, 2);
 
+    // Probe 71 [Card 218]: DistributedRecoveryView former hardcoded #58a6ff on light subtle strictly fails 4.5:1
+    const probe71Cr = getContrast('#58a6ff', lightTokens['--color-bg-subtle']);
+    expect(probe71Cr, 'DistributedRecoveryView former #58a6ff on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe71Cr).toBeCloseTo(2.31, 2);
+
+    // Probe 72 [Card 218]: DistributedRecoveryView former hardcoded #3fb950 on light subtle strictly fails 4.5:1
+    const probe72Cr = getContrast('#3fb950', lightTokens['--color-bg-subtle']);
+    expect(probe72Cr, 'DistributedRecoveryView former #3fb950 on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe72Cr).toBeCloseTo(2.32, 2);
+
+    // Probe 73 [Card 218]: DistributedRecoveryView former hardcoded #8b949e on light surface strictly fails 4.5:1
+    const probe73Cr = getContrast('#8b949e', lightTokens['--color-bg-surface']);
+    expect(probe73Cr, 'DistributedRecoveryView former #8b949e on light surface fails 4.5:1').toBeLessThan(4.5);
+    expect(probe73Cr).toBeCloseTo(3.08, 2);
+
+    // Probe 74 [Card 218]: DistributedRecoveryView former hardcoded #f85149 on light subtle strictly fails 4.5:1
+    const probe74Cr = getContrast('#f85149', lightTokens['--color-bg-subtle']);
+    expect(probe74Cr, 'DistributedRecoveryView former #f85149 on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe74Cr).toBeCloseTo(3.06, 2);
+
+    // Probe 75 [Card 218]: DistributedRecoveryView former hardcoded #e3b341 on light subtle strictly fails 4.5:1
+    const probe75Cr = getContrast('#e3b341', lightTokens['--color-bg-subtle']);
+    expect(probe75Cr, 'DistributedRecoveryView former #e3b341 on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe75Cr).toBeCloseTo(1.78, 2);
+
     // Legacy Token Reverts:
     // Legacy Dark --color-border-subtle: #374151
     expect(getContrast('#374151', darkTokens['--color-bg-surface'])).toBeLessThan(3.0); // 1.72:1
@@ -5105,8 +5487,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
 
     // Exact count verification for var(--color-border-subtle)
-    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 388').toBe(388);
-    expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 26').toBe(26);
+    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 402').toBe(402);
+    expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 27').toBe(27);
 
     // Fail-closed check 3: Total files with color literals must not exceed baseline file count
     const baselineFileCount = Object.keys(COLOR_LITERAL_MULTISET_BASELINE).length;
@@ -5125,8 +5507,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(legacyCounts['#dc2626'], 'Legacy #dc2626 literal count must not exceed 1').toBeLessThanOrEqual(1);
     expect(legacyFiles['#dc2626'].size, 'Legacy #dc2626 file count must not exceed 1').toBeLessThanOrEqual(1);
 
-    expect(legacyCounts['#30363d'], 'Legacy #30363d literal count must not exceed 55').toBeLessThanOrEqual(55);
-    expect(legacyFiles['#30363d'].size, 'Legacy #30363d file count must not exceed 9').toBeLessThanOrEqual(9);
+    expect(legacyCounts['#30363d'], 'Legacy #30363d literal count must not exceed 43').toBeLessThanOrEqual(43);
+    expect(legacyFiles['#30363d'].size, 'Legacy #30363d file count must not exceed 8').toBeLessThanOrEqual(8);
   });
 
   // 11. Comment-trivia exclusion: comments are never colours, but real string/template/JSX values still count
