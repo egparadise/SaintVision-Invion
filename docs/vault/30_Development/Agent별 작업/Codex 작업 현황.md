@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.281"
+version: "1.0.290"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T20:53:09+09:00"
+updated: "2026-10-02T22:23:04+09:00"
 source_of_truth: "Git"
-active_card: "CARD-237 SEC-DEF-001 definer review gap"
-active_card_status: "Approved by Claude r1 at f298180b; three new SECURITY DEFINER functions reviewed and allowlisted by generator; inv_audit_reader E3/E4/E5 accepted with expiry 2026-10-31; hosted run 37002464156 shows SEC-DEF-001 MEASURED_PASS"
-active_card_next: "Land with its train; continue Card 232 (#331) review fixes; revisit inv_audit_reader dispositions before 2026-10-31"
+active_card: "CARD-241 S08-BE admission entry and deploy worker service"
+active_card_status: "Card 232 (#331) and Card 237 (#333) approved with exact-head Backend/Core green; Card 241 in progress (admission entry from committed decisions, compose worker service, flag default off)"
+active_card_next: "Open Card 241 PR with real-PG end-to-end evidence; enabling product dispatch follows the S08 enablement runbook (#335); revisit inv_audit_reader dispositions before 2026-10-31"
 ---
 
 - **CARD-229 implementation:** migration 0059의 `attempt_count`를 단일 단조 claim fencing
