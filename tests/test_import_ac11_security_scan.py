@@ -357,6 +357,57 @@ def vf_proof(**over) -> dict:
     return document
 
 
+def test_the_reviewed_browser_fields_are_exactly_the_decisive_fields():
+    """One list, used twice: ``vf_report`` judges a proof with it and the finder compares with it.
+
+    ``find_ac11_vf_evidence`` asks "do two candidate runs carry the same evidence?" by comparing
+    exactly these fields, so a reviewed field added here without being added to
+    ``VF_DECISIVE_FIELDS`` would be a field the comparison is blind to.  The guard makes that a
+    refusal rather than a silent gap (card 233).
+    """
+
+    spec = APPROVED_ALLOWLIST["secVf001"]
+    assert set(tool.vf_required(spec)) == set(tool.VF_DECISIVE_FIELDS)
+    assert tool.vf_required(spec) == {
+        "caseIdentitiesSha256": spec["requiredCaseIdentitiesSha256"],
+        "tests": spec["expectedTests"],
+        "evidenceStatus": "complete",
+        "exitCode": 0,
+        "subprocessExitCode": 0,
+    }
+
+
+@pytest.mark.parametrize("dropped", sorted(tool.VF_DECISIVE_FIELDS))
+def test_a_decisive_field_outside_the_declared_list_is_refused(monkeypatch, dropped):
+    """If the two drift apart, the importer says so instead of comparing fewer fields."""
+
+    monkeypatch.setattr(
+        tool, "VF_DECISIVE_FIELDS",
+        tuple(field for field in tool.VF_DECISIVE_FIELDS if field != dropped),
+    )
+    with pytest.raises(tool.SecurityImportError, match="VF_DECISIVE_FIELDS disagree"):
+        tool.vf_required(APPROVED_ALLOWLIST["secVf001"])
+
+
+@pytest.mark.parametrize("missing", sorted(tool.VF_DECISIVE_FIELDS))
+def test_a_proof_that_omits_a_decisive_field_is_refused_by_name(missing):
+    """Absence is not a value: no default is substituted and the field is named in the refusal."""
+
+    proof = vf_proof()
+    proof.pop(missing)
+    with pytest.raises(tool.SecurityImportError, match=f"states no {missing}"):
+        tool.vf_decisive(proof, "browser lane")
+
+
+def test_the_decisive_fields_of_a_real_proof_are_read_once():
+    """What ``vf_decisive`` returns is what the report records, with nothing else added."""
+
+    proof = vf_proof()
+    decisive = tool.vf_decisive(proof, "browser lane")
+    assert decisive == {field: proof[field] for field in tool.VF_DECISIVE_FIELDS}
+    assert "evidenceScope" not in decisive, "only the fields the report asserts"
+
+
 def vf_bundle(proof=None, run=None, artifact=None, members=None) -> tuple:
     """The browser lane's artifact with the two GitHub metadata documents that bind it."""
 
@@ -714,6 +765,79 @@ def test_browser_lane_evidence_that_is_not_the_reviewed_one_is_refused(mutation)
         )
 
 
+TYPE_CONFUSIONS = [
+    ("exit-code-false", {"exitCode": False}, "exitCode is bool"),
+    ("subprocess-exit-false", {"subprocessExitCode": False}, "subprocessExitCode is bool"),
+    ("exit-code-float", {"exitCode": 0.0}, "exitCode is float"),
+    ("exit-code-string", {"exitCode": "0"}, "exitCode is str"),
+    ("failure-false",
+     {"tests": {"error": 0, "failure": False, "passed": 6, "skipped": 0}},
+     "tests.failure is bool"),
+    ("error-false",
+     {"tests": {"error": False, "failure": 0, "passed": 6, "skipped": 0}},
+     "tests.error is bool"),
+    ("passed-float",
+     {"tests": {"error": 0, "failure": 0, "passed": 6.0, "skipped": 0}},
+     "tests.passed is float"),
+    ("tests-not-object", {"tests": [0, 0, 6, 0]}, "tests is not an object"),
+    ("tests-extra-key",
+     {"tests": {"error": 0, "failure": 0, "passed": 6, "skipped": 0, "flaky": 0}},
+     "keys are not exactly"),
+    ("tests-missing-key", {"tests": {"error": 0, "failure": 0, "passed": 6}},
+     "keys are not exactly"),
+    ("status-true", {"evidenceStatus": True}, "evidenceStatus is not a non-empty string"),
+    ("status-empty", {"evidenceStatus": ""}, "evidenceStatus is not a non-empty string"),
+    ("identity-not-a-sha", {"caseIdentitiesSha256": "complete"}, "64-character lowercase SHA-256"),
+    ("identity-uppercase", {"caseIdentitiesSha256": "A" * 64}, "64-character lowercase SHA-256"),
+    ("negative-exit", {"exitCode": -1}, "exitCode is negative"),
+]
+
+
+@pytest.mark.parametrize(
+    ("label", "mutation", "message"), TYPE_CONFUSIONS,
+    ids=[row[0] for row in TYPE_CONFUSIONS],
+)
+def test_a_decisive_field_of_the_wrong_json_type_never_reaches_the_envelope(
+    label, mutation, message
+):
+    """``0 == False`` in Python, so the whole importer called a boolean exit code a reviewed zero.
+
+    Measured by Codex on the previous head: a proof with ``exitCode: false`` and
+    ``subprocessExitCode: false`` was written into the observations and the threat report came out
+    ``MEASURED_PASS``; ``tests.failure: false`` did the same against the reviewed ``0`` (#332 r3 F1).
+    The shapes are checked in ``vf_decisive`` before any comparison, so these die here and in the
+    finder's candidate comparison alike.
+    """
+
+    with pytest.raises(tool.SecurityImportError, match=message):
+        imported(
+            database=(definer_report(), rls_report()),
+            vf=vf_bundle(proof=vf_proof(**mutation)),
+        )
+
+
+def test_the_declared_shapes_cover_exactly_the_decisive_fields():
+    """A decisive field with no declared shape would be compared with bare ``!=`` again."""
+
+    assert set(tool.VF_FIELD_SHAPES) == set(tool.VF_DECISIVE_FIELDS)
+    assert tuple(sorted(tool.VF_TEST_KEYS)) == tool.VF_TEST_KEYS
+
+
+def test_a_shape_declaration_that_drifts_from_the_decisive_fields_is_refused(monkeypatch):
+    monkeypatch.setattr(tool, "VF_FIELD_SHAPES", {"exitCode": "count"})
+    with pytest.raises(tool.SecurityImportError, match="VF_FIELD_SHAPES"):
+        tool.vf_decisive(vf_proof(), "browser lane")
+
+
+def test_the_reviewed_side_of_the_comparison_is_shape_checked_too():
+    """A reviewed ``"failure": false`` would equal an observed ``0`` just as readily."""
+
+    spec = dict(APPROVED_ALLOWLIST["secVf001"])
+    spec["expectedTests"] = {"error": 0, "failure": False, "passed": 6, "skipped": 0}
+    with pytest.raises(tool.SecurityImportError, match="tests.failure is bool"):
+        tool.vf_required(spec)
+
+
 @pytest.mark.parametrize(
     ("label", "kwargs", "message"),
     [
@@ -805,6 +929,247 @@ def test_a_scan_run_without_a_head_commit_tree_is_refused():
     del run_metadata["head_commit"]
     with pytest.raises(tool.SecurityImportError, match="no head_commit object"):
         tool.import_evidence(blob, run_metadata, artifact_metadata, now=NOW)
+
+
+def vf_evidence_dir(tmp_path, bundle=None, **overrides):
+    """The three browser-lane inputs on disk plus the document that names them.
+
+    This is what the AC-11 aggregate lane now passes as one argument (card 233): the finder writes
+    it, the importer reads it, and these tests forge one field at a time.
+    """
+
+    archive, run_metadata, artifact_metadata = bundle if bundle is not None else vf_bundle()
+    (tmp_path / "vf-archive.zip").write_bytes(archive)
+    (tmp_path / "vf-run.json").write_text(json.dumps(run_metadata), encoding="utf-8")
+    (tmp_path / "vf-artifact.json").write_text(json.dumps(artifact_metadata), encoding="utf-8")
+    document = {
+        "schemaVersion": tool.VF_EVIDENCE_SCHEMA,
+        "repository": tool.REPOSITORY,
+        "workflowPath": APPROVED_ALLOWLIST["secVf001"]["workflow"]["path"],
+        "runId": str(run_metadata["id"]),
+        "artifactId": str(artifact_metadata["id"]),
+        "archive": "vf-archive.zip",
+        "runMetadata": "vf-run.json",
+        "artifactMetadata": "vf-artifact.json",
+    }
+    document.update(overrides)
+    for key in [key for key, value in overrides.items() if value is DROP]:
+        del document[key]
+    path = tmp_path / "vf-evidence.json"
+    path.write_text(json.dumps(document), encoding="utf-8")
+    return path
+
+
+DROP = object()
+
+
+def duplicated(document, path: tuple, key: str) -> str:
+    """``document`` rendered with ``key`` stated twice inside the object at ``path``.
+
+    ``json.dumps`` cannot write a duplicate key, so the text is built by splicing: the object at
+    that path is rendered, and its first key is repeated with a different value.  That is exactly
+    the document a forger would hand over -- valid JSON whose first value is for the reader and
+    whose second is for the parser (#332 r2 F1).
+    """
+
+    cursor = document
+    for step in path:
+        cursor = cursor[step]
+    rendered = json.dumps(cursor)
+    assert rendered.startswith("{"), "only an object can carry a duplicate key"
+    original = json.dumps(key) + ": " + json.dumps(cursor[key])
+    assert original in rendered or json.dumps(key) in rendered
+    forged = "{" + json.dumps(key) + ": " + json.dumps(_other_value(cursor[key])) + ", " + rendered[1:]
+    whole = json.dumps(document)
+    if path:
+        # Replace that one object's text inside the whole document.
+        assert rendered in whole, "the nested object must render identically in the whole document"
+        return whole.replace(rendered, forged, 1)
+    return forged
+
+
+def _other_value(value):
+    """Something of the same JSON type but different, so the duplicate is not a no-op."""
+
+    if isinstance(value, str):
+        return value + "-first"
+    if isinstance(value, bool):
+        return not value
+    if isinstance(value, (int, float)):
+        return value + 1
+    if isinstance(value, list):
+        return value + ["first"]
+    if isinstance(value, dict):
+        return {**value, "zzFirst": 1}
+    return "first"
+
+
+def object_paths(document, prefix=()) -> list[tuple]:
+    """Every object path in a document, so the sweep can duplicate a key in each."""
+
+    found = []
+    if isinstance(document, dict):
+        found.append(prefix)
+        for key, value in document.items():
+            found.extend(object_paths(value, prefix + (key,)))
+    elif isinstance(document, list):
+        for index, value in enumerate(document):
+            found.extend(object_paths(value, prefix + (index,)))
+    return found
+
+
+def test_a_duplicate_key_in_the_vf_evidence_document_is_refused(tmp_path):
+    """The exact case #332 r2 found: two ``schemaVersion`` values, the second one winning."""
+
+    document = vf_evidence_dir(tmp_path)
+    original = json.loads(document.read_text(encoding="utf-8"))
+    document.write_text(
+        '{"schemaVersion": "ac11-vf-evidence:0", '
+        + json.dumps(original)[1:],
+        encoding="utf-8",
+    )
+    with pytest.raises(tool.SecurityImportError, match="duplicate JSON key"):
+        tool.vf_evidence_inputs(document)
+
+
+@pytest.mark.parametrize(
+    "document_name",
+    ["producer report", "definer member", "rls member", "vf proof", "vf evidence",
+     "run metadata", "artifact metadata"],
+)
+def test_duplicating_any_key_of_any_input_document_is_refused(tmp_path, document_name):
+    """The sweep: every object in every input document, one duplicated key at a time.
+
+    Seven documents reach this importer and each one is checked field by field elsewhere -- but
+    every one of those checks reads the dict *after* parsing, so a duplicate had already been
+    resolved to the last value before any of them looked.  One parser now refuses it, and this
+    sweep is what keeps all seven on that parser.
+    """
+
+    documents = {
+        "producer report": producer_report(),
+        "definer member": definer_report(),
+        "rls member": rls_report(),
+        "vf proof": vf_proof(),
+        "vf evidence": json.loads(vf_evidence_dir(tmp_path).read_text(encoding="utf-8")),
+        "run metadata": metadata(archive())[0],
+        "artifact metadata": metadata(archive())[1],
+    }
+    document = documents[document_name]
+    paths = object_paths(document)
+    assert paths, document_name
+    survivors = []
+    for path in paths:
+        cursor = document
+        for step in path:
+            cursor = cursor[step]
+        if not cursor:
+            continue
+        key = next(iter(cursor))
+        try:
+            forged = duplicated(document, path, key)
+        except AssertionError:
+            continue  # the nested object does not render uniquely; other paths cover it
+        try:
+            tool._loads(forged, document_name)
+        except tool.SecurityImportError as refusal:
+            assert "duplicate JSON key" in str(refusal)
+            continue
+        survivors.append((path, key))
+    assert survivors == []
+
+
+def test_the_vf_evidence_document_imports_the_same_envelope_as_the_three_flags(tmp_path):
+    """One argument or three, the same evidence and the same verdict.
+
+    The aggregate lane passes one document because its loop cannot grow three per-axis arguments;
+    the envelope it produces has to be the one the three flags produce, or the lane would be
+    importing something else (card 233).
+    """
+
+    bundle = vf_bundle()
+    blob = archive(database=(definer_report(), rls_report()))
+    run_metadata, artifact_metadata = metadata(blob)
+    three = tool.import_evidence(
+        blob, run_metadata, artifact_metadata, now=NOW,
+        vf_archive=bundle[0], vf_run_metadata=bundle[1], vf_artifact_metadata=bundle[2],
+    )
+    document = vf_evidence_dir(tmp_path, bundle=bundle)
+    vf_archive, vf_run, vf_artifact = tool.vf_evidence_inputs(document)
+    one = tool.import_evidence(
+        blob, run_metadata, artifact_metadata, now=NOW,
+        vf_archive=vf_archive, vf_run_metadata=vf_run, vf_artifact_metadata=vf_artifact,
+    )
+    assert one == three
+    assert one["threatReportVerdicts"]["SEC-VF-001"] == "MEASURED_PASS"
+
+
+@pytest.mark.parametrize("key", sorted(tool.VF_EVIDENCE_KEYS))
+def test_removing_any_key_of_the_vf_evidence_document_is_refused(tmp_path, key):
+    """The sweep: every required key, removed one at a time.
+
+    A missing key is a binding the caller dropped, and defaulting one would make the document a
+    suggestion rather than a contract.
+    """
+
+    document = vf_evidence_dir(tmp_path, **{key: DROP})
+    with pytest.raises(tool.SecurityImportError, match="missing"):
+        tool.vf_evidence_inputs(document)
+
+
+def test_an_extra_key_in_the_vf_evidence_document_is_refused(tmp_path):
+    document = vf_evidence_dir(tmp_path, note="harmless")
+    with pytest.raises(tool.SecurityImportError, match="unexpected"):
+        tool.vf_evidence_inputs(document)
+
+
+@pytest.mark.parametrize(
+    ("label", "overrides", "message"),
+    [
+        ("another schema", {"schemaVersion": "ac11-vf-evidence:2"}, "schemaVersion"),
+        ("another repository", {"repository": "fork/example"}, "repository"),
+        ("another workflow", {"workflowPath": ".github/workflows/other.yml"}, "workflow"),
+        ("run id that is not digits", {"runId": "not-a-run"}, "runId"),
+        ("artifact id that is not digits", {"artifactId": "not-an-artifact"}, "artifactId"),
+        ("a run id the metadata does not have", {"runId": "36000000000"}, "another run"),
+        ("an artifact id the metadata does not have", {"artifactId": "99"}, "another artifact"),
+        ("an archive that is not there", {"archive": "absent.zip"}, "unreadable"),
+    ],
+)
+def test_each_forged_field_of_the_vf_evidence_document_is_refused(tmp_path, label, overrides,
+                                                                 message):
+    """Every value is cross-checked against the file it claims to describe.
+
+    The dangerous one is the pair at the end: a document that names one run and carries another
+    run's metadata would otherwise import the latter while the lane's log recorded the former.
+    """
+
+    document = vf_evidence_dir(tmp_path, **overrides)
+    with pytest.raises(tool.SecurityImportError, match=message):
+        tool.vf_evidence_inputs(document)
+
+
+def test_the_document_and_the_individual_flags_are_alternatives(tmp_path):
+    """Both at once is refused: nobody could tell which one was used, least of all the envelope."""
+
+    bundle = vf_bundle()
+    blob = archive(database=(definer_report(), rls_report()))
+    run_metadata, artifact_metadata = metadata(blob)
+    (tmp_path / "scan.zip").write_bytes(blob)
+    (tmp_path / "run.json").write_text(json.dumps(run_metadata), encoding="utf-8")
+    (tmp_path / "artifact.json").write_text(json.dumps(artifact_metadata), encoding="utf-8")
+    (tmp_path / "other.zip").write_bytes(bundle[0])
+    document = vf_evidence_dir(tmp_path, bundle=bundle)
+    code = tool.main([
+        "--archive", str(tmp_path / "scan.zip"),
+        "--run-metadata", str(tmp_path / "run.json"),
+        "--artifact-metadata", str(tmp_path / "artifact.json"),
+        "--vf-evidence", str(document),
+        "--vf-archive", str(tmp_path / "other.zip"),
+        "--output", str(tmp_path / "envelope.json"),
+    ])
+    assert code == 2
+    assert not (tmp_path / "envelope.json").exists()
 
 
 def test_a_browser_artifact_without_the_proof_member_is_refused():
