@@ -25,7 +25,7 @@ ACC-09(접근성 명도 대비 적합화) 트랙의 후속 영역으로, 분산 
   - 전역 `var(--color-border-subtle)` 사용 횟수: **402건**, 사용 파일 수: **27개** (정확 일치 래칫 통과).
   - 레거시 하드코딩 리터럴 잔여 상한 래칫 전면 강화:
     - `#30363d`: 55건 이하(9개 파일) -> **43건 이하(8개 파일 이하, 실측치 정확 고정)**
-  - 비색상 변경: 노드 카드 및 체크아웃/감사 아이템 testid 추가, 체크아웃 상태 active 여부에 따른 토큰 조건화, 미지 헬스 상태 원문 텍스트 및 neutral 토큰 안전 폴백, 선택 카드는 2px brand-hover 테두리로 구분하며 브라우저 전역 :focus-visible 키보드 포커스 링을 온전히 보존.
+  - 비색상 변경: 노드 카드 및 체크아웃/감사 아이템 testid 추가, 체크아웃 상태 active 여부에 따른 토큰 조건화, 미지 헬스 상태 원문 텍스트 및 neutral 토큰 안전 폴백, 선택 카드는 2px brand-hover 테두리로 구분하며 브라우저 전역 :focus-visible 키보드 포커스 링을 온전히 보존, 시험용 `recoveryManager` optional prop(`DistributedRecoveryViewProps`) 지원으로 상태 전이 결정론적 검증 지원, `evaluateInitialHealth`는 `recovering` 임의 매핑 없이 NodeStatus 정본 계약을 온전히 준수.
 
 ### 1.1 수명주기 상태 색 정합성 및 화면 간 일관성 확보 (Card 213 & 215 정합)
 `RunDetail.tsx`(Card 213) 및 `RunList.tsx`(Card 215)에서 확립된 상태 색상 규격과 완벽히 일치하도록 `DistributedRecoveryView.tsx`의 `NODE_HEALTH_CONFIG`를 정비하였습니다:

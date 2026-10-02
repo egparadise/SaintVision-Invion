@@ -4448,15 +4448,28 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
         cpuUsagePercent: 20,
         memoryTotalBytes: 32 * 1024 ** 3,
         memoryUsagePercent: 30,
-        status: 'recovering',
-        heartbeatAt: new Date().toISOString(),
+        status: 'offline',
+        heartbeatAt: null,
       },
     ];
+
+    const recoveryMgr = new DistributedRecoveryManager(
+      mockNodes.map((n, i) => ({
+        nodeId: n.id,
+        hostname: n.hostname,
+        activeWorkspaces: i + 1,
+        status: n.status,
+        heartbeatAt: n.heartbeatAt ?? null,
+      }))
+    );
+    // Node 4 was offline, transitions to recovering on fresh heartbeat recovery
+    recoveryMgr.evaluateNodeHealth('nod_rec_04', 150);
+    recoveryMgr.evaluateNodeHealth('nod_rec_04', 10);
 
     try {
       // 1. Initial render with 4 nodes (online, stale, offline, recovering)
       await act(async () => {
-        root.render(<DistributedRecoveryView nodes={mockNodes} />);
+        root.render(<DistributedRecoveryView nodes={mockNodes} recoveryManager={recoveryMgr} />);
       });
 
       // 1-a. Notice Banner (var(--color-bg-subtle), var(--color-brand-hover))
@@ -4641,7 +4654,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(evaluateInitialHealth(undefined, null).health, 'Missing status and heartbeat must evaluate to offline').toBe('offline');
       expect(evaluateInitialHealth('corrupted_status' as any, null).health, 'Corrupted status must evaluate to offline').toBe('offline');
       expect(evaluateInitialHealth('online', null).health, 'Online status without heartbeat must evaluate to stale, never silently online').toBe('stale');
-      expect(evaluateInitialHealth('recovering', new Date().toISOString()).health, 'Recovering status with fresh heartbeat must evaluate to recovering').toBe('recovering');
+      expect(recoveryMgr.getNode('nod_rec_04')?.healthState, 'Recovered node with fresh heartbeat transitions to recovering').toBe('recovering');
 
       // B: Config fallback contract: unknown telemetry states must never silently fallback to ONLINE
       expect(NODE_HEALTH_UNKNOWN_CONFIG.label).toBe('UNKNOWN');
@@ -4747,8 +4760,9 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
               branches.push({ cond: condPath, token: m[1] });
             } else {
               const clean = text.replace(/['"`]/g, '').trim().toLowerCase();
-              const namedColors = ['white', 'black', 'red', 'green', 'blue', 'gray', 'yellow', 'orange', 'purple'];
-              if (clean.startsWith('#') || clean.startsWith('rgb') || clean.startsWith('hsl') || namedColors.includes(clean)) {
+              const allowedNonTokens = ['transparent', 'inherit', 'currentcolor', 'none', 'initial', 'unset'];
+              const namedColors = ['white', 'black', 'red', 'green', 'blue', 'gray', 'yellow', 'orange', 'purple', 'lightgray', 'darkgray', 'silver', 'cyan', 'magenta', 'lime', 'maroon', 'navy', 'olive', 'teal', 'aqua', 'fuchsia'];
+              if (clean.startsWith('#') || clean.startsWith('rgb') || clean.startsWith('hsl') || namedColors.includes(clean) || (!allowedNonTokens.includes(clean) && /^[a-z]+$/.test(clean))) {
                 const { line } = sf.getLineAndCharacterOfPosition(n.getStart(sf));
                 violations.push(`L${line + 1}: Raw color literal detected instead of design token: ${text}`);
               }

@@ -51,11 +51,6 @@ export function evaluateInitialHealth(
     return { health: 'stale', ageSeconds };
   }
 
-  // 3. 'recovering' -> recovering
-  if (s === 'recovering') {
-    return { health: 'recovering', ageSeconds };
-  }
-
   // 3. Heartbeat age thresholds:
   if (ageSeconds > 120) {
     return { health: 'offline', ageSeconds };
