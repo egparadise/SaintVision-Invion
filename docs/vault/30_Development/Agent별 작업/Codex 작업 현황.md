@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.277"
+version: "1.0.278"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T15:39:41+09:00"
+updated: "2026-10-02T15:53:22+09:00"
 source_of_truth: "Git"
 active_card: "CARD-223 S08-BE product caller"
-active_card_status: "PR #323 Claude r3 conditions in progress: pre-scan and quarantined-terminal mutations have real-PG regressions; product dispatch remains disabled"
-active_card_next: "Require exact-head Backend/Core green with 12 real-PG JUnit cases and Claude r4 approval; CARD-224 activation fencing and interruption classification remains registered follow-up"
+active_card_status: "PR #323 Claude r4 conditionally approved: pre-scan and quarantined-terminal mutations are closed; exact-head Backend/Core confirmation remains; product dispatch stays disabled"
+active_card_next: "Require exact-head Backend/Core green with 12 real-PG JUnit cases; CARD-229 activation fencing and interruption classification remains registered follow-up"
 ---
 
 - Card 223 r3 adds real-PG regressions that require the set-based digest pre-scan to quarantine a
@@ -20,7 +20,7 @@ active_card_next: "Require exact-head Backend/Core green with 12 real-PG JUnit c
   ledger key exists. Both current and legacy response shapes remain claimed; the ledger response
   is not trusted as the discriminator. Focused PG-free verification is **277 passed** and the
   expanded **12-case** real-PG file awaits exact-head hosted Core execution.
-- **CARD-224 registered follow-up (activation prerequisite, owner Codex, reviewer Claude):** add a
+- **CARD-229 registered follow-up (activation prerequisite, owner Codex, reviewer Claude):** add a
   per-claim fencing token or equivalent heartbeat ownership before enabling product dispatch, and
   classify process interruption plus network/transport uncertainty as retryable rather than
   terminal quarantine. The default-off flag and S08-BE non-completion boundary remain until both
