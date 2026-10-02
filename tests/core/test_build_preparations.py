@@ -100,7 +100,7 @@ def test_routes_are_only_prepare_and_enqueue_and_no_raw_admit_surface():
     assert '@api.post("/v1/projects/{project}/runs/{run_id}/builds", status_code=201)' in source
     assert '@api.post("/v1/projects/{project}/runs/{run_id}/builds/{build_id}/enqueue")' in source
     assert "/v1/builds/admit" not in source
-    assert "/admit\"")" not in source
+    assert 'builds/admit' not in source
 
 
 def test_failed_same_key_is_reserved_before_quota_and_only_saved_response_replays():
