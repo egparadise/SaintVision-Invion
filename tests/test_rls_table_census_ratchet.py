@@ -24,10 +24,13 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
 import aggregate_ac11_evidence as aggregator  # noqa: E402
+import write_rls_table_census as census_writer  # noqa: E402
 
 SQL_DIR = ROOT / "services/control-plane/src/inv/migrations"
 PY_DIR = ROOT / "migrations/versions"
@@ -41,9 +44,7 @@ SQL_CREATE = re.compile(
 SQL_CREATE_UNQUALIFIED = re.compile(
     r"CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?([A-Za-z_]\w*)\s*\((.*?)(?=;)", re.S | re.I
 )
-SQL_DROP = re.compile(
-    r"DROP\s+TABLE\s+(?:IF\s+EXISTS\s+)?([A-Za-z_]\w*)\.([A-Za-z_]\w*)", re.I
-)
+SQL_DROP = re.compile(r"DROP\s+TABLE\s+(?:IF\s+EXISTS\s+)?([A-Za-z_]\w*)\.([A-Za-z_]\w*)", re.I)
 PY_CREATE = re.compile(r'op\.create_table\(\s*["\'](\w+)["\'](.*?)\n    \)', re.S)
 PY_SCHEMA = re.compile(r'schema\s*=\s*["\'](\w+)["\']')
 PY_DROP = re.compile(r'op\.drop_table\(\s*["\'](\w+)["\'](?:[^)]*schema\s*=\s*["\'](\w+)["\'])?')
@@ -80,9 +81,7 @@ def migration_tables() -> tuple[set[str], set[str]]:
             created.add(f"{schema.group(1) if schema else 'public'}.{name}")
         for name, schema in PY_DROP.findall(upgrade):
             dropped.add(f"{schema or 'public'}.{name}")
-    created = {
-        name for name in created - partitions if name.split(".", 1)[0] in MEASURED_SCHEMAS
-    }
+    created = {name for name in created - partitions if name.split(".", 1)[0] in MEASURED_SCHEMAS}
     return created, dropped
 
 
@@ -97,9 +96,9 @@ def test_the_parser_finds_the_schema_and_not_nothing():
     created, dropped = migration_tables()
     assert len(created) > 100, f"the migration parser found only {len(created)} tables"
     assert "inv.build_execution_intents" in created, "migration 0059's table must be found"
-    assert "inv.build_execution_intents" not in dropped, (
-        "a table dropped in its own migration's downgrade() is not a removal"
-    )
+    assert (
+        "inv.build_execution_intents" not in dropped
+    ), "a table dropped in its own migration's downgrade() is not a removal"
 
 
 def test_every_table_a_migration_creates_is_in_the_reviewed_census():
@@ -147,11 +146,43 @@ def test_the_census_file_is_self_consistent_and_pinned():
 def test_the_census_names_the_migration_head_it_was_measured_at():
     """The provenance is checkable: that head must be a migration this tree has."""
 
-    document = json.loads(
-        (ROOT / aggregator.RLS_CENSUS_REPO_PATH).read_text(encoding="utf-8")
-    )
+    document = json.loads((ROOT / aggregator.RLS_CENSUS_REPO_PATH).read_text(encoding="utf-8"))
     head = document["measuredFrom"]["migrationHead"]
     assert (PY_DIR / head).is_file() or (PY_DIR / f"{head}.py").is_file(), head
+
+
+def test_writer_accepts_only_a_measured_exact_run_hosted_rls_observation():
+    tables = ["inv.a", "public.b"]
+    digest = hashlib.sha256("inv.a\npublic.b".encode()).hexdigest()
+    report = {
+        "threatId": "SEC-RLS-001",
+        "reportAvailable": True,
+        "sourceRunId": "42",
+        "sourceHeadSha": "a" * 40,
+        "table_census": {
+            "schemas": ["inv", "public"],
+            "count": 2,
+            "sha256": digest,
+            "tables": tables,
+        },
+    }
+    document = census_writer.census_from_observation(
+        report, "42", migration_head="0060_build_execution_admissions"
+    )
+    assert document["measuredFrom"] == {
+        "runId": "42",
+        "sourceHeadSha": "a" * 40,
+        "migrationHead": "0060_build_execution_admissions",
+    }
+    for mutation in (
+        {**report, "reportAvailable": False},
+        {**report, "sourceRunId": "43"},
+        {**report, "threatId": "SEC-DEF-001"},
+    ):
+        with pytest.raises(ValueError):
+            census_writer.census_from_observation(
+                mutation, "42", migration_head="0060_build_execution_admissions"
+            )
 
 
 def git(*args: str) -> str:

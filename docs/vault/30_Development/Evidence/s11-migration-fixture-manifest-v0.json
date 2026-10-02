@@ -109,6 +109,10 @@
     {
       "revision": "0059_build_execution_intents",
       "expected": "PRESERVED"
+    },
+    {
+      "revision": "0060_build_execution_admissions",
+      "expected": "PRESERVED"
     }
   ]
 }

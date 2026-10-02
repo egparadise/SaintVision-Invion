@@ -11,6 +11,20 @@ active_card_status: "Card 232 (#331) and Card 237 (#333) approved with exact-hea
 active_card_next: "Open Card 241 PR with real-PG end-to-end evidence; enabling product dispatch follows the S08 enablement runbook (#335); revisit inv_audit_reader dispositions before 2026-10-31"
 ---
 
+## 2026-10-02 Card 232 — S08-BE product worker loop and trusted intent producer
+
+- Migration 0060 adds an immutable FORCE-RLS admission authority. The trusted internal
+  producer checks current permission, policy, Run, and live lease before commit; the
+  product loop rechecks and atomically promotes it to the 0059 intent plus a redacted
+  audit event. No public route or CLI accepts build documents.
+- `worker.py` constructs one build lane only for exact product flag `1`; default off does
+  not construct the runtime or touch the queue. The available concrete BuildKit transport
+  remains reference-only, so operational dispatch and physical acceptance are not claimed.
+- A strict-plan defect was corrected: Node preflight now receives the recovery UUID from
+  the canonical lease fencing token rather than a nonexistent lease field. Focused
+  PG-free verification is green; hosted real-PG is pending.
+- [[2026-10-02_18-20-09_KST_Card232_S08-BE_worker_loop_producer_Codex]].
+
 - **CARD-229 implementation:** migration 0059의 `attempt_count`를 단일 단조 claim fencing
   authority로 재사용한다. stale owner는 requeue/quarantine/complete뿐 아니라 lease release,
   Evidence, outbox를 담는 최종 transaction도 시작할 수 없다. process cancellation·timeout·network

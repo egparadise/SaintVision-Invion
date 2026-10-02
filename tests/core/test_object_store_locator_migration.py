@@ -179,12 +179,12 @@ def test_object_store_locator_revision_is_irreversible_and_the_chain_has_one_hea
     assert eval_scope.down_revision == "0052_model_version_digest_scope"   # W5 (G-04·G-05 §5-1), above 0052
     measurements = next(r for r in revisions if r.revision == "0054_model_version_measurements")
     assert measurements.down_revision == "0053_eval_suite_project_scope"   # W3 seam (#209 v1.1), above 0053
-    assert head.revision == "0059_build_execution_intents"
-    assert head.down_revision == "0058_release_acceptance_resolver"
+    assert head.revision == "0060_build_execution_admissions"
+    assert head.down_revision == "0059_build_execution_intents"
 
 
 def test_definer_policy_tracks_object_store_locator_head_without_catalog_drift():
     policy = json.loads(
         (ROOT / "tools/definer-policy.json").read_text(encoding="utf-8")
     )
-    assert policy["revision"] == chain()[-1].revision == "0059_build_execution_intents"
+    assert policy["revision"] == chain()[-1].revision == "0060_build_execution_admissions"
