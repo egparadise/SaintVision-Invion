@@ -22,7 +22,7 @@ export interface ModelStudioViewProps {
 export const REPLICA_STATUS_CONFIG = {
   healthy: {
     color: 'var(--color-status-online)',
-    bg: 'var(--color-status-online)',
+    bg: 'var(--color-bg-subtle)',
     border: 'var(--color-status-online)',
     label: '정상 (HEALTHY)',
   },
@@ -443,7 +443,7 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
             padding: '16px',
             backgroundColor: 'var(--color-bg-surface)',
             borderRadius: '8px',
-            border: '1px solid var(--color-border-subtle)',
+            border: '1px solid var(--color-bg-surface)',
             display: 'flex',
             flexDirection: 'column',
             gap: '8px',

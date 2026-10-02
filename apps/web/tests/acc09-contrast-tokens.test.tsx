@@ -5008,6 +5008,19 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
         allocatableCores: 0,
         memoryBytes: 64 * 1024 * 1024 * 1024,
       } as any,
+      {
+        id: 'node-03',
+        hostname: 'worker-gpu-03',
+        status: 'online',
+        schedulable: true,
+        observationOnly: false,
+        cpuCores: 32,
+        allocatableCores: 28,
+        memoryBytes: 128 * 1024 * 1024 * 1024,
+        gpuName: 'NVIDIA A100-SXM4-80GB',
+        gpuVramTotalBytes: 80 * 1024 * 1024 * 1024,
+        gpuVramUsedBytes: 0,
+      } as any,
     ];
 
     const mockManifest = {
@@ -5157,16 +5170,15 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       });
 
       const repairBtn = container.querySelector('[data-testid="repair-shard-0-btn"]') as HTMLButtonElement;
-      if (repairBtn) {
-        await act(async () => {
-          repairBtn.click();
-        });
-        const errAlert = container.querySelector('[data-testid="shard-repair-error"]') as HTMLElement;
-        expect(errAlert, 'Repair error alert must render on failed repair').not.toBeNull();
-        expect(errAlert.style.backgroundColor).toBe('var(--color-bg-subtle)');
-        expect(errAlert.style.borderColor).toBe('var(--color-status-offline)');
-        expect(errAlert.style.color).toBe('var(--color-status-offline)');
-      }
+      expect(repairBtn, 'Repair shard button must be rendered for repairable degraded shard').not.toBeNull();
+      await act(async () => {
+        repairBtn.click();
+      });
+      const errAlert = container.querySelector('[data-testid="shard-repair-error"]') as HTMLElement;
+      expect(errAlert, 'Repair error alert must render on failed repair').not.toBeNull();
+      expect(errAlert.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(errAlert.style.borderColor).toBe('var(--color-status-offline)');
+      expect(errAlert.style.color).toBe('var(--color-status-offline)');
     } finally {
       act(() => {
         root.unmount();
@@ -5175,8 +5187,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
   });
 
-  // 9j-2. [Card 215 & Card 218 & Card 220 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList, DistributedRecoveryView & ReleaseCandidateView
-  it('ACC-09 / Card 215 & Card 218 & Card 220: RunList, DistributedRecoveryView, and ReleaseCandidateView style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
+  // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList, DistributedRecoveryView, ReleaseCandidateView & ModelStudioView
+  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226: RunList, DistributedRecoveryView, ReleaseCandidateView, and ModelStudioView style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
     interface Branch {
       cond: string;
       token: string;
