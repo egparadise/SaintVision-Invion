@@ -35,6 +35,15 @@ active_card_next: "Land with train 16 (#302 repair merged; Backend/Frontend gree
   contract bindings는 모두 exit 0이다.
 - train 15 결속 후 assembler+accessibility importer focused **94 passed**. 유효 envelope이 canonical row를
   거쳐 aggregator에서 `MEASURED_PASS`로 재계산되며 나머지 7축 부재는 전체 `INVALID_RUN`으로 남는다.
+## 2026-10-02 Card 214 선행 — BuildKit node receipt 계약
+
+- PR #306의 계약 질문은 선택지 (a)로 확정했다. strict node-agent health/physical cleanup
+  receipt와 `dispatch_completed` 감사 계약을 먼저 고정하고 제품 caller는 이 PR 위에 stack한다.
+- control-plane writer, CI isolation 완화값, caller-asserted source, 누락·unknown field를 schema에서
+  거부한다. cleanup receipt의 canonical digest와 redacted 완료 payload exact set도 고정했다.
+- migration·제품 config·caller·route는 0건이며 기존 `inv.evidence`/`inv.outbox`를 재사용한다.
+  focused contract 시험 **78 passed**. [[S08-BE_BuildKit_node_receipt_계약]],
+  [[2026-10-02_08-38-37_KST_S08-BE_BuildKit_node_receipt_계약_Codex]].
 
 ## 2026-10-02 Card 207 — OCI digest·live buildkitd PID 결속
 

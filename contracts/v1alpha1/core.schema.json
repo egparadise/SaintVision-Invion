@@ -663,6 +663,11 @@
         "policyExpiresAt": {
           "$ref": "#/$defs/Timestamp"
         },
+        "buildSessionId": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
         "builderInstanceId": {
           "type": "string",
           "minLength": 1,
@@ -821,6 +826,353 @@
         }
       ]
     },
+    "BuildDaemonIdentity": {
+      "type": "object",
+      "properties": {
+        "pid": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 2147483647
+        },
+        "processUid": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967295
+        },
+        "processStartTicks": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "comm": {
+          "type": "string",
+          "const": "buildkitd"
+        }
+      },
+      "required": [
+        "pid",
+        "processUid",
+        "processStartTicks",
+        "comm"
+      ],
+      "additionalProperties": false
+    },
+    "BuildIsolationObservation": {
+      "type": "object",
+      "properties": {
+        "userNamespace": {
+          "type": "boolean",
+          "const": true
+        },
+        "seccompMode": {
+          "type": "string",
+          "const": "filter"
+        },
+        "lsm": {
+          "type": "string",
+          "enum": [
+            "apparmor",
+            "selinux"
+          ]
+        },
+        "noNewPrivileges": {
+          "type": "boolean",
+          "const": true
+        },
+        "cgroupMode": {
+          "type": "string",
+          "const": "v2"
+        }
+      },
+      "required": [
+        "userNamespace",
+        "seccompMode",
+        "lsm",
+        "noNewPrivileges",
+        "cgroupMode"
+      ],
+      "additionalProperties": false
+    },
+    "BuildHealthFieldSources": {
+      "type": "object",
+      "properties": {
+        "daemonIdentity": {
+          "type": "string",
+          "const": "node-proc-buildkitd"
+        },
+        "runtimeIdentity": {
+          "type": "string",
+          "enum": [
+            "node-container-image-digest",
+            "node-buildkitd-binary-sha256"
+          ]
+        },
+        "rootless": {
+          "type": "string",
+          "const": "node-proc-user-namespace"
+        },
+        "privileged": {
+          "type": "string",
+          "const": "node-runtime-security-readback"
+        },
+        "hostAccess": {
+          "type": "string",
+          "const": "node-runtime-security-readback"
+        },
+        "entitlements": {
+          "type": "string",
+          "const": "node-runtime-security-readback"
+        },
+        "devices": {
+          "type": "string",
+          "const": "node-runtime-security-readback"
+        },
+        "binds": {
+          "type": "string",
+          "const": "node-runtime-security-readback"
+        },
+        "userNamespace": {
+          "type": "string",
+          "const": "node-proc-user-namespace"
+        },
+        "seccompMode": {
+          "type": "string",
+          "const": "node-host-security-readback"
+        },
+        "lsm": {
+          "type": "string",
+          "const": "node-host-security-readback"
+        },
+        "noNewPrivileges": {
+          "type": "string",
+          "const": "node-host-security-readback"
+        },
+        "cgroupMode": {
+          "type": "string",
+          "const": "node-host-security-readback"
+        }
+      },
+      "required": [
+        "daemonIdentity",
+        "runtimeIdentity",
+        "rootless",
+        "privileged",
+        "hostAccess",
+        "entitlements",
+        "devices",
+        "binds",
+        "userNamespace",
+        "seccompMode",
+        "lsm",
+        "noNewPrivileges",
+        "cgroupMode"
+      ],
+      "additionalProperties": false
+    },
+    "BuildProviderHealthReceipt": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "const": "build-provider-health-receipt:1"
+        },
+        "writerKind": {
+          "type": "string",
+          "const": "node-agent"
+        },
+        "nodeId": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "builderInstanceId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "builderProfileId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "recoveryEpoch": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "observedAt": {
+          "$ref": "#/$defs/Timestamp"
+        },
+        "runtimeIdentity": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "daemonIdentity": {
+          "$ref": "#/$defs/BuildDaemonIdentity"
+        },
+        "rootless": {
+          "type": "boolean",
+          "const": true
+        },
+        "privileged": {
+          "type": "boolean",
+          "const": false
+        },
+        "hostAccess": {
+          "type": "boolean",
+          "const": false
+        },
+        "entitlements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 0
+        },
+        "devices": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 0
+        },
+        "binds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 0
+        },
+        "buildkitVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "rootlesskitVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "isolation": {
+          "$ref": "#/$defs/BuildIsolationObservation"
+        },
+        "fieldSources": {
+          "$ref": "#/$defs/BuildHealthFieldSources"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "writerKind",
+        "nodeId",
+        "builderInstanceId",
+        "builderProfileId",
+        "recoveryEpoch",
+        "observedAt",
+        "runtimeIdentity",
+        "daemonIdentity",
+        "rootless",
+        "privileged",
+        "hostAccess",
+        "entitlements",
+        "devices",
+        "binds",
+        "buildkitVersion",
+        "rootlesskitVersion",
+        "isolation",
+        "fieldSources"
+      ],
+      "additionalProperties": false
+    },
+    "BuildPhysicalCleanupReceipt": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "const": "build-physical-cleanup-receipt:1"
+        },
+        "writerKind": {
+          "type": "string",
+          "const": "node-agent"
+        },
+        "buildSessionId": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "nodeId": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "resourceId": {
+          "$ref": "#/$defs/ResourceId"
+        },
+        "leaseId": {
+          "$ref": "#/$defs/LeaseId"
+        },
+        "recoveryEpoch": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "daemonIdentity": {
+          "$ref": "#/$defs/BuildDaemonIdentity"
+        },
+        "stopResult": {
+          "type": "string",
+          "enum": [
+            "stopped",
+            "already-absent"
+          ]
+        },
+        "partialExportDisposition": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "quarantined",
+                "purged"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cacheDisposition": {
+          "type": "string",
+          "enum": [
+            "retained",
+            "quarantined",
+            "purged"
+          ]
+        },
+        "builderClaimReleased": {
+          "type": "boolean",
+          "const": true
+        },
+        "cgroupRemoved": {
+          "type": "boolean",
+          "const": true
+        },
+        "verifiedAt": {
+          "$ref": "#/$defs/Timestamp"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "writerKind",
+        "buildSessionId",
+        "nodeId",
+        "resourceId",
+        "leaseId",
+        "recoveryEpoch",
+        "daemonIdentity",
+        "stopResult",
+        "partialExportDisposition",
+        "cacheDisposition",
+        "builderClaimReleased",
+        "cgroupRemoved",
+        "verifiedAt"
+      ],
+      "additionalProperties": false
+    },
     "BuildCleanupReceipt": {
       "type": "object",
       "properties": {
@@ -843,6 +1195,13 @@
         },
         "verifiedAt": {
           "$ref": "#/$defs/Timestamp"
+        },
+        "physicalReceipt": {
+          "$ref": "#/$defs/BuildPhysicalCleanupReceipt"
+        },
+        "physicalReceiptDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
         }
       },
       "required": [
@@ -851,6 +1210,50 @@
         "cgroupRemoved",
         "cacheDisposition",
         "verifiedAt"
+      ],
+      "dependentRequired": {
+        "physicalReceipt": [
+          "physicalReceiptDigest"
+        ],
+        "physicalReceiptDigest": [
+          "physicalReceipt"
+        ]
+      },
+      "additionalProperties": false
+    },
+    "BuildDispatchCompletedPayload": {
+      "type": "object",
+      "properties": {
+        "decisionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "bindingDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "resourceId": {
+          "$ref": "#/$defs/ResourceId"
+        },
+        "leaseId": {
+          "$ref": "#/$defs/LeaseId"
+        },
+        "evidenceId": {
+          "$ref": "#/$defs/EvidenceId"
+        },
+        "evidenceDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "decisionId",
+        "bindingDigest",
+        "resourceId",
+        "leaseId",
+        "evidenceId",
+        "evidenceDigest"
       ],
       "additionalProperties": false
     },
@@ -868,7 +1271,8 @@
             "output_verified",
             "build_failed",
             "build_cancelled",
-            "cleanup_verified"
+            "cleanup_verified",
+            "dispatch_completed"
           ]
         },
         "traceId": {
@@ -1089,6 +1493,19 @@
                       "retained",
                       "purged"
                     ]
+                  },
+                  "physicalReceipt": {
+                    "properties": {
+                      "partialExportDisposition": {
+                        "type": "null"
+                      },
+                      "cacheDisposition": {
+                        "enum": [
+                          "retained",
+                          "purged"
+                        ]
+                      }
+                    }
                   }
                 }
               },

@@ -12,6 +12,7 @@ import pytest
 
 from inv.contracts import validate_contract
 from inv.errors import DomainError
+from inv.policy import action_digest
 
 
 ULID = "01ARZ3NDEKTSV4RRFFQ69G5FAV"
@@ -85,6 +86,7 @@ def _plan() -> dict:
 
 
 def _receipt() -> dict:
+    physical_receipt = _physical_cleanup_receipt()
     return {
         "apiVersion": "inv.saintvision.ai/v1alpha1",
         "kind": "BuildReceipt",
@@ -111,6 +113,8 @@ def _receipt() -> dict:
             "cgroupRemoved": True,
             "cacheDisposition": "retained",
             "verifiedAt": "2026-10-01T02:01:01Z",
+            "physicalReceipt": physical_receipt,
+            "physicalReceiptDigest": action_digest(physical_receipt),
         },
         "auditEvents": [
             {
@@ -137,7 +141,92 @@ def _failed_receipt() -> dict:
     ):
         receipt[field] = None
     receipt["cleanup"]["cacheDisposition"] = "quarantined"
+    receipt["cleanup"]["physicalReceipt"]["cacheDisposition"] = "quarantined"
+    receipt["cleanup"]["physicalReceipt"]["partialExportDisposition"] = "quarantined"
     return receipt
+
+
+def _daemon_identity() -> dict:
+    return {
+        "pid": 4242,
+        "processUid": 1000,
+        "processStartTicks": 987654,
+        "comm": "buildkitd",
+    }
+
+
+def _health_receipt() -> dict:
+    return {
+        "schemaVersion": "build-provider-health-receipt:1",
+        "writerKind": "node-agent",
+        "nodeId": f"nod_{ULID}",
+        "builderInstanceId": "builder-rootless-01",
+        "builderProfileId": "buildkit-rootless-v1",
+        "recoveryEpoch": "123e4567-e89b-12d3-a456-426614174001",
+        "observedAt": "2026-10-01T02:00:00Z",
+        "runtimeIdentity": "sha256:" + "1" * 64,
+        "daemonIdentity": _daemon_identity(),
+        "rootless": True,
+        "privileged": False,
+        "hostAccess": False,
+        "entitlements": [],
+        "devices": [],
+        "binds": [],
+        "buildkitVersion": "v0.20.2",
+        "rootlesskitVersion": "v2.3.5",
+        "isolation": {
+            "userNamespace": True,
+            "seccompMode": "filter",
+            "lsm": "apparmor",
+            "noNewPrivileges": True,
+            "cgroupMode": "v2",
+        },
+        "fieldSources": {
+            "daemonIdentity": "node-proc-buildkitd",
+            "runtimeIdentity": "node-buildkitd-binary-sha256",
+            "rootless": "node-proc-user-namespace",
+            "privileged": "node-runtime-security-readback",
+            "hostAccess": "node-runtime-security-readback",
+            "entitlements": "node-runtime-security-readback",
+            "devices": "node-runtime-security-readback",
+            "binds": "node-runtime-security-readback",
+            "userNamespace": "node-proc-user-namespace",
+            "seccompMode": "node-host-security-readback",
+            "lsm": "node-host-security-readback",
+            "noNewPrivileges": "node-host-security-readback",
+            "cgroupMode": "node-host-security-readback",
+        },
+    }
+
+
+def _physical_cleanup_receipt() -> dict:
+    return {
+        "schemaVersion": "build-physical-cleanup-receipt:1",
+        "writerKind": "node-agent",
+        "buildSessionId": "123e4567-e89b-42d3-a456-426614174000",
+        "nodeId": f"nod_{ULID}",
+        "resourceId": f"res_{ULID}",
+        "leaseId": f"lse_{ULID}",
+        "recoveryEpoch": "123e4567-e89b-12d3-a456-426614174001",
+        "daemonIdentity": _daemon_identity(),
+        "stopResult": "stopped",
+        "partialExportDisposition": None,
+        "cacheDisposition": "retained",
+        "builderClaimReleased": True,
+        "cgroupRemoved": True,
+        "verifiedAt": "2026-10-01T02:01:01Z",
+    }
+
+
+def _dispatch_completed_payload() -> dict:
+    return {
+        "decisionId": "policy-s08-build-1",
+        "bindingDigest": "b" * 64,
+        "resourceId": f"res_{ULID}",
+        "leaseId": f"lse_{ULID}",
+        "evidenceId": f"evd_{ULID}",
+        "evidenceDigest": "e" * 64,
+    }
 
 
 def _rejected(contract: str, value: dict) -> None:
@@ -187,10 +276,77 @@ def test_build_contract_enum_vocabularies_are_literal_and_complete():
         "build_failed",
         "build_cancelled",
         "cleanup_verified",
+        "dispatch_completed",
+    ]
+
+    assert defs["BuildProviderHealthReceipt"]["properties"]["writerKind"]["const"] == "node-agent"
+    assert defs["BuildPhysicalCleanupReceipt"]["properties"]["writerKind"]["const"] == "node-agent"
+    assert defs["BuildIsolationObservation"]["properties"]["lsm"]["enum"] == [
+        "apparmor",
+        "selinux",
+    ]
+    assert defs["BuildHealthFieldSources"]["properties"]["runtimeIdentity"]["enum"] == [
+        "node-container-image-digest",
+        "node-buildkitd-binary-sha256",
+    ]
+    assert defs["BuildPhysicalCleanupReceipt"]["properties"]["stopResult"]["enum"] == [
+        "stopped",
+        "already-absent",
+    ]
+    assert defs["BuildPhysicalCleanupReceipt"]["properties"]["cacheDisposition"]["enum"] == [
+        "retained",
+        "quarantined",
+        "purged",
     ]
 
 
-@pytest.mark.parametrize("contract,factory", [("BuildRequest", _request), ("BuildPlan", _plan), ("BuildReceipt", _receipt)])
+def test_build_plan_accepts_the_control_plane_issued_session_id_without_requiring_legacy_plans():
+    legacy = _plan()
+    validate_contract("BuildPlan", legacy)
+
+    planned = _plan()
+    planned["buildSessionId"] = "123e4567-e89b-42d3-a456-426614174000"
+    validate_contract("BuildPlan", planned)
+
+    planned["buildSessionId"] = "caller-session"
+    _rejected("BuildPlan", planned)
+
+
+@pytest.mark.parametrize(
+    "contract,factory,field",
+    [
+        ("BuildProviderHealthReceipt", _health_receipt, "recoveryEpoch"),
+        ("BuildPhysicalCleanupReceipt", _physical_cleanup_receipt, "recoveryEpoch"),
+        ("BuildPhysicalCleanupReceipt", _physical_cleanup_receipt, "buildSessionId"),
+    ],
+)
+@pytest.mark.parametrize(
+    "invalid",
+    [
+        7,
+        "not-a-uuid",
+        "123E4567-E89B-42D3-A456-426614174001",
+    ],
+)
+def test_node_receipt_authority_ids_are_canonical_lowercase_uuids(
+    contract, factory, field, invalid
+):
+    changed = factory()
+    changed[field] = invalid
+    _rejected(contract, changed)
+
+
+@pytest.mark.parametrize(
+    "contract,factory",
+    [
+        ("BuildRequest", _request),
+        ("BuildPlan", _plan),
+        ("BuildProviderHealthReceipt", _health_receipt),
+        ("BuildPhysicalCleanupReceipt", _physical_cleanup_receipt),
+        ("BuildDispatchCompletedPayload", _dispatch_completed_payload),
+        ("BuildReceipt", _receipt),
+    ],
+)
 def test_build_contract_positive_controls_and_every_top_level_field_is_required(contract, factory):
     value = factory()
     validate_contract(contract, value)
@@ -303,6 +459,137 @@ def test_build_contract_value_domains_are_fail_closed(contract, factory, mutate)
     _rejected(contract, changed)
 
 
+@pytest.mark.parametrize(
+    "contract,factory,path,value",
+    [
+        ("BuildProviderHealthReceipt", _health_receipt, ("writerKind",), "control-plane"),
+        ("BuildProviderHealthReceipt", _health_receipt, ("nodeId",), "nod_untrusted"),
+        ("BuildProviderHealthReceipt", _health_receipt, ("daemonIdentity", "comm"), "rootlesskit"),
+        ("BuildProviderHealthReceipt", _health_receipt, ("isolation", "seccompMode"), "unavailable-ci-reference"),
+        ("BuildProviderHealthReceipt", _health_receipt, ("isolation", "lsm"), "unconfined-ci-reference"),
+        ("BuildProviderHealthReceipt", _health_receipt, ("fieldSources", "daemonIdentity"), "caller-asserted"),
+        ("BuildPhysicalCleanupReceipt", _physical_cleanup_receipt, ("writerKind",), "control-plane"),
+        ("BuildPhysicalCleanupReceipt", _physical_cleanup_receipt, ("stopResult",), "unknown"),
+        ("BuildPhysicalCleanupReceipt", _physical_cleanup_receipt, ("partialExportDisposition",), "retained"),
+        ("BuildPhysicalCleanupReceipt", _physical_cleanup_receipt, ("builderClaimReleased",), False),
+        ("BuildPhysicalCleanupReceipt", _physical_cleanup_receipt, ("cgroupRemoved",), False),
+    ],
+)
+def test_authenticated_build_receipts_reject_unmeasured_or_untrusted_values(
+    contract, factory, path, value
+):
+    changed = factory()
+    target = changed
+    for field in path[:-1]:
+        target = target[field]
+    target[path[-1]] = value
+    _rejected(contract, changed)
+
+
+@pytest.mark.parametrize(
+    "contract,factory",
+    [
+        ("BuildProviderHealthReceipt", _health_receipt),
+        ("BuildPhysicalCleanupReceipt", _physical_cleanup_receipt),
+    ],
+)
+def test_authenticated_build_receipts_reject_unknown_fields(contract, factory):
+    changed = factory()
+    changed["callerAssertion"] = True
+    _rejected(contract, changed)
+
+
+@pytest.mark.parametrize(
+    "contract,factory,container",
+    [
+        ("BuildProviderHealthReceipt", _health_receipt, "daemonIdentity"),
+        ("BuildProviderHealthReceipt", _health_receipt, "isolation"),
+        ("BuildProviderHealthReceipt", _health_receipt, "fieldSources"),
+        ("BuildPhysicalCleanupReceipt", _physical_cleanup_receipt, "daemonIdentity"),
+    ],
+)
+def test_authenticated_build_receipt_nested_objects_reject_unknown_fields(
+    contract, factory, container
+):
+    changed = factory()
+    changed[container]["callerAssertion"] = True
+    _rejected(contract, changed)
+
+
+@pytest.mark.parametrize("field", ["entitlements", "devices", "binds"])
+def test_health_receipt_rejects_any_declared_host_capability(field):
+    changed = _health_receipt()
+    changed[field] = ["caller-requested"]
+    _rejected("BuildProviderHealthReceipt", changed)
+
+
+@pytest.mark.parametrize(
+    "contract,factory,container",
+    [
+        ("BuildProviderHealthReceipt", _health_receipt, "daemonIdentity"),
+        ("BuildProviderHealthReceipt", _health_receipt, "isolation"),
+        ("BuildProviderHealthReceipt", _health_receipt, "fieldSources"),
+        ("BuildPhysicalCleanupReceipt", _physical_cleanup_receipt, "daemonIdentity"),
+    ],
+)
+def test_authenticated_build_receipt_nested_fields_are_all_required(contract, factory, container):
+    for field in tuple(factory()[container]):
+        changed = factory()
+        del changed[container][field]
+        _rejected(contract, changed)
+
+
+def test_success_receipt_requires_no_partial_export_and_a_canonical_physical_digest():
+    changed = _receipt()
+    changed["cleanup"]["physicalReceipt"]["partialExportDisposition"] = "quarantined"
+    _rejected("BuildReceipt", changed)
+
+    changed = _receipt()
+    changed["cleanup"]["physicalReceiptDigest"] = "sha256:" + "a" * 64
+    _rejected("BuildReceipt", changed)
+
+    receipt = _receipt()
+    assert receipt["cleanup"]["physicalReceiptDigest"] == action_digest(
+        receipt["cleanup"]["physicalReceipt"]
+    )
+    assert receipt["cleanup"]["physicalReceiptDigest"] == (
+        "b5f0f9d09f6f0d024db67b3f7ae3ec2d0c7e4f3c4c8f601568e3cf5bb964e3fd"
+    )
+
+
+def test_legacy_cleanup_remains_compatible_but_a_partial_physical_pair_is_rejected():
+    legacy = _receipt()
+    del legacy["cleanup"]["physicalReceipt"]
+    del legacy["cleanup"]["physicalReceiptDigest"]
+    validate_contract("BuildReceipt", legacy)
+
+    for missing in ("physicalReceipt", "physicalReceiptDigest"):
+        partial = _receipt()
+        del partial["cleanup"][missing]
+        _rejected("BuildReceipt", partial)
+
+
+def test_dispatch_completed_is_a_closed_audit_event_value():
+    changed = _receipt()
+    changed["auditEvents"][0]["event"] = "dispatch_completed"
+    validate_contract("BuildReceipt", changed)
+
+    changed["auditEvents"][0]["event"] = "inv.build.dispatch_completed"
+    _rejected("BuildReceipt", changed)
+
+
+def test_dispatch_completed_payload_is_redacted_and_digest_bound():
+    validate_contract("BuildDispatchCompletedPayload", _dispatch_completed_payload())
+
+    changed = _dispatch_completed_payload()
+    changed["builderTopology"] = {"address": "unix:///run/buildkit/buildkitd.sock"}
+    _rejected("BuildDispatchCompletedPayload", changed)
+
+    changed = _dispatch_completed_payload()
+    changed["evidenceDigest"] = "sha256:" + "e" * 64
+    _rejected("BuildDispatchCompletedPayload", changed)
+
+
 def test_build_plan_rejects_unknown_compiler_output_fields():
     changed = _plan()
     changed["unboundedRuntimeOption"] = "caller-controlled"
@@ -405,7 +692,15 @@ def test_receipt_audit_is_strict_and_nonempty():
     [
         (
             "cleanup",
-            ("leaseReleased", "builderClaimReleased", "cgroupRemoved", "cacheDisposition", "verifiedAt"),
+            (
+                "leaseReleased",
+                "builderClaimReleased",
+                "cgroupRemoved",
+                "cacheDisposition",
+                "verifiedAt",
+                "physicalReceipt",
+                "physicalReceiptDigest",
+            ),
         ),
         ("auditEvents", ("event", "traceId", "timestamp", "decisionId", "inputDigest", "outputDigest")),
     ],
