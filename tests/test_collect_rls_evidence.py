@@ -148,6 +148,48 @@ def test_unverifiable_identity_is_unmeasured_never_pass():
     assert "**UNMEASURED**" in md and "Unverifiable row identities" in md
 
 
+GOOD_KEY = {
+    "method": "owner-verified-key", "columns": ["tenant_id", "event_id"],
+    "ownerDistinctness": {"rows": 2, "distinct": 2, "nullRows": 0},
+    "owner_a": {"rows": 2, "fp": "aa"}, "role_a": {"rows": 2, "fp": "aa"}, "match": True,
+}
+
+
+def _bridge_observation(identity: dict) -> dict:
+    """An observation whose **registered** pair carries ``identity``.
+
+    ``OWNER_VERIFIED_KEY_SCOPE`` lists exactly (inv_cancel_bridge_owner, public.audit_events,
+    (tenant_id, event_id)), so a test about the readable-key method has to use that pair: on
+    any other pair the method is refused by design (#322 r2 F-R2), which the unregistered-pair
+    test below measures.
+    """
+
+    observation = deepcopy(_observation())
+    observation["ground_truth"]["public.audit_events"] = {
+        "total": {"rows": 4}, "tenant_a": {"rows": 2}, "other_tenants": {"rows": 2},
+    }
+    observation["roles"]["inv_cancel_bridge_owner"] = {
+        "present": True, "superuser": False, "bypassrls": False, "login": False,
+        "inherit": False, "member_of": [],
+        "tables": {
+            "public.audit_events": {
+                "tenant_scoped": True, "rls_enabled": True, "rls_forced": True,
+                "privileges": {"select": "column", "insert": "column",
+                               "update": None, "delete": None},
+                "policies": [{"name": "cancel_bridge_audit_read", "cmd": "SELECT",
+                              "permissive": "PERMISSIVE", "roles": ["inv_cancel_bridge_owner"],
+                              "using": True, "with_check": False}],
+                "visible": {"guc_unset": {"rows": 0}, "guc_tenant_a": {"rows": 2},
+                            "guc_tenant_a_foreign_rows": {"rows": 0},
+                            "guc_unknown_tenant": {"rows": 0}, "guc_not_uuid": {"denied": "22P02"},
+                            "identity": deepcopy(identity)},
+            },
+        },
+        "functions": {},
+    }
+    return observation
+
+
 def test_e4_identity_can_be_a_readable_key_the_owner_measured_unique():
     """Card 225: a partitioned, column-granted table has an identity after all.
 
@@ -157,26 +199,87 @@ def test_e4_identity_can_be_a_readable_key_the_owner_measured_unique():
     full key is therefore unreadable and ``ctid`` is denied, which used to end in
     "identity unverifiable".  What closes it is a measurement, not a wider grant: the owner
     counts rows and distinct ``(tenant_id, event_id)`` tuples over the compared rows in the same
-    snapshot, and when those are equal the tuple *is* a row identity for this comparison.
+    snapshot, and when those are equal -- over at least one row, with no NULL -- the tuple *is*
+    a row identity for this comparison.
     """
 
-    observation = deepcopy(_observation())
-    vis = observation["roles"]["inv_app"]["tables"]["public.projects"]["visible"]
-    vis["guc_tenant_a_foreign_rows"] = {"denied": "42501"}
-    vis["identity"] = {
-        "method": "owner-verified-key", "columns": ["tenant_id", "event_id"],
-        "ownerDistinctness": {"rows": 2, "distinct": 2},
-        "owner_a": {"rows": 2, "fp": "aa"}, "role_a": {"rows": 2, "fp": "bb"}, "match": False,
-    }
+    observation = _bridge_observation({**GOOD_KEY, "role_a": {"rows": 2, "fp": "bb"},
+                                       "match": False})
     violations = tool.evaluate(observation)
     assert [v["rule"] for v in violations] == ["E4"]
     assert "owner-verified-key" in violations[0]["detail"]
     assert tool.unverified_identities(observation) == []
 
-    vis["identity"]["role_a"] = {"rows": 2, "fp": "aa"}
-    vis["identity"]["match"] = True
+    passing = _bridge_observation(GOOD_KEY)
+    assert tool.evaluate(passing) == []
+    assert tool.verdict([], tool.unverified_identities(passing)) == "PASS"
+
+
+@pytest.mark.parametrize(
+    ("identity", "expected"),
+    [
+        pytest.param(
+            {**GOOD_KEY, "ownerDistinctness": {"rows": 0, "distinct": 0, "nullRows": 0},
+             "owner_a": {"rows": 0, "fp": "d4"}, "role_a": {"rows": 0, "fp": "d4"}},
+            "compared over 0 rows",
+            id="vacuous-zero-rows",
+        ),
+        pytest.param(
+            {**GOOD_KEY, "ownerDistinctness": {"rows": 2, "distinct": 2, "nullRows": 1}},
+            "are NULL in 1 of 2 rows",
+            id="null-bearing-key",
+        ),
+        pytest.param(
+            {**GOOD_KEY, "ownerDistinctness": {"rows": 2, "distinct": 1, "nullRows": 0}},
+            "not unique",
+            id="repeated-key",
+        ),
+        pytest.param(
+            {**GOOD_KEY, "columns": ["tenant_id"]},
+            "not registered",
+            id="unregistered-columns",
+        ),
+        pytest.param(
+            {k: v for k, v in GOOD_KEY.items() if k != "ownerDistinctness"},
+            "records no measured distinctness",
+            id="no-distinctness-recorded",
+        ),
+    ],
+)
+def test_a_readable_key_is_only_an_identity_while_the_measurement_says_so(identity, expected):
+    """Each way the measurement falls short keeps the pair UNMEASURED, never PASS.
+
+    ``match: true`` is present in every case here, so nothing but these checks stands between a
+    forged or vacuous key and a PASS verdict.  Zero rows is the one the hosted run actually hit
+    (#322 r2 F-R1): over an empty set every projection is injective and every fingerprint
+    matches, which says nothing about a populated table.
+    """
+
+    observation = _bridge_observation(identity)
     assert tool.evaluate(observation) == []
-    assert tool.verdict([], tool.unverified_identities(observation)) == "PASS"
+    unmeasured = tool.unverified_identities(observation)
+    assert [(u["rule"], u["role"], u["table"]) for u in unmeasured] == [
+        ("E4", "inv_cancel_bridge_owner", "public.audit_events")
+    ]
+    assert expected in unmeasured[0]["detail"]
+    assert tool.verdict([], unmeasured) == "UNMEASURED"
+
+
+def test_the_readable_key_method_cannot_spread_to_an_unregistered_pair():
+    """The same well-formed key on a pair the reviewed scope does not list is refused.
+
+    Without this the fallback would be generic: a later grant or schema change could make some
+    other unmeasured (role, table) eligible and promote it to PASS with no review (#322 r2).
+    """
+
+    observation = deepcopy(_observation())
+    observation["roles"]["inv_app"]["tables"]["public.projects"]["visible"]["identity"] = deepcopy(
+        GOOD_KEY
+    )
+    unmeasured = tool.unverified_identities(observation)
+    assert [(u["role"], u["table"]) for u in unmeasured] == [("inv_app", "public.projects")]
+    assert "not registered" in unmeasured[0]["detail"]
+    assert tool.verdict(tool.evaluate(observation), unmeasured) == "UNMEASURED"
 
 
 def test_a_readable_key_that_is_not_unique_stays_unmeasured():
@@ -445,13 +548,15 @@ def test_real_pg_negative_control_unscoped_table_is_reported_then_clears(rls_db)
 
 
 @pytest.mark.postgres
-def test_real_pg_an_empty_audit_table_is_measured_but_says_so(rls_db):
-    """With no rows the comparison is measured and **vacuous**, and the numbers say which.
+def test_real_pg_an_empty_audit_table_stays_unmeasured_not_a_vacuous_pass(rls_db):
+    """Zero compared rows is not a measurement, so the pair stays UNMEASURED (#322 r2 F-R1).
 
     The AC-11 producer measures an empty ``public.audit_events`` (the disposable fixture seeds
-    tenants and projects, not audit rows), so this pair is no longer ``unmeasured`` -- but
-    ``match: true`` over zero rows proves nothing about a populated table, and the recorded row
-    counts are what let a reader tell the two apart.
+    tenants and projects, not audit rows).  Over an empty set every projection is injective and
+    every fingerprint matches, so an earlier version of this collector reported
+    ``owner-verified-key`` / ``match: true`` there and the hosted run turned that into PASS.
+    Nothing about a populated table was observed, so the honest verdict is UNMEASURED and the
+    reason says why.
     """
 
     observation = tool.collect(rls_db["owner"], tool.DEFAULT_ROLES, rls_db["tenant_a"])
@@ -459,11 +564,92 @@ def test_real_pg_an_empty_audit_table_is_measured_but_says_so(rls_db):
         observation["roles"]["inv_cancel_bridge_owner"]["tables"]["public.audit_events"]
         ["visible"]["identity"]
     )
-    assert identity["method"] == "owner-verified-key"
-    assert identity["match"] is True
-    assert identity["owner_a"]["rows"] == identity["role_a"]["rows"] == 0
-    assert identity["ownerDistinctness"] == {"rows": 0, "distinct": 0}
-    assert tool.unverified_identities(observation) == []
+    assert identity["method"] == "unverifiable"
+    assert "compared over 0 rows" in identity["reason"]
+    unmeasured, _ = tool.apply_baseline(
+        tool.unverified_identities(observation), tool.load_baseline()
+    )
+    assert ("E4", "inv_cancel_bridge_owner", "public.audit_events") in [
+        (row["rule"], row["role"], row["table"]) for row in unmeasured
+    ]
+    violations, _accepted = tool.apply_baseline(tool.evaluate(observation), tool.load_baseline())
+    assert tool.verdict(violations, unmeasured) == "UNMEASURED"
+
+
+@pytest.mark.postgres
+def test_real_pg_a_key_cannot_be_forged_by_a_separator_and_a_null_is_fail_closed(rls_db):
+    """Two different tuples must not render as one string, and a NULL key stays unmeasured.
+
+    ``concat_ws('\x1f', ...)`` rendered ``('a\x1fb', 'c')`` and ``('a', 'b\x1fc')``
+    identically, so a row swap between those two rows would have survived the owner's
+    fingerprint, and it dropped NULLs silently (#322 r2 F-R2).  ``jsonb_build_array`` escapes
+    both.  Measured on real PostgreSQL because this is a property of the server's rendering.
+    """
+
+    import psycopg
+    from psycopg import sql
+
+    name = "rls_key_probe_" + uuid4().hex[:12]
+    ident = sql.Identifier("public", name)
+    tenant = str(uuid4())
+    with psycopg.connect(rls_db["owner"], autocommit=True) as conn:
+        conn.execute(
+            sql.SQL("CREATE TABLE {}(tenant_id uuid, a text, b text)").format(ident)
+        )
+        try:
+            empty = tool._distinct_fingerprint(
+                conn, "public", name, ["a", "b"], "tenant_id = %s", (tenant,)
+            )
+            assert empty["rows"] == 0 and empty["distinct"] == 0
+            assert empty["unique"] is False, "zero rows is not a measured uniqueness"
+            conn.execute(
+                sql.SQL("INSERT INTO {} VALUES (%s,%s,%s),(%s,%s,%s)").format(ident),
+                (tenant, "a\x1fb", "c", tenant, "a", "b\x1fc"),
+            )
+            measured = tool._distinct_fingerprint(
+                conn, "public", name, ["a", "b"], "tenant_id = %s", (tenant,)
+            )
+            assert measured["rows"] == 2
+            assert measured["distinct"] == 2, "a separator inside a value forged the other tuple"
+            assert measured["nullRows"] == 0 and measured["unique"] is True
+            conn.execute(
+                sql.SQL("INSERT INTO {} VALUES (%s,%s,NULL)").format(ident), (tenant, "d")
+            )
+            with_null = tool._distinct_fingerprint(
+                conn, "public", name, ["a", "b"], "tenant_id = %s", (tenant,)
+            )
+            assert with_null["rows"] == 3 and with_null["nullRows"] == 1
+            assert with_null["unique"] is False, "a NULL in the key must be fail-closed"
+        finally:
+            conn.execute(sql.SQL("DROP TABLE {}").format(ident))
+
+
+@pytest.mark.postgres
+def test_real_pg_the_readable_key_is_refused_for_an_unregistered_pair(rls_db, monkeypatch):
+    """Take the pair out of the reviewed scope and the live probe refuses it.
+
+    Same database, same seeded rows, same grant: with an empty
+    ``OWNER_VERIFIED_KEY_SCOPE`` the collector reports the pair as unverifiable instead of
+    measuring it anyway, so a later grant or schema change cannot promote another pair to PASS
+    through this method (#322 r2 F-R2).
+    """
+
+    ids = seed_audit_rows(rls_db["owner"], rls_db["tenant_a"], str(uuid4()))
+    try:
+        monkeypatch.setattr(tool, "OWNER_VERIFIED_KEY_SCOPE", frozenset())
+        observation = tool.collect(rls_db["owner"], tool.DEFAULT_ROLES, rls_db["tenant_a"])
+    finally:
+        drop_audit_rows(rls_db["owner"], ids)
+    identity = (
+        observation["roles"]["inv_cancel_bridge_owner"]["tables"]["public.audit_events"]
+        ["visible"]["identity"]
+    )
+    assert identity["method"] == "unverifiable"
+    assert "not registered" in identity["reason"]
+    assert ("E4", "inv_cancel_bridge_owner", "public.audit_events") in [
+        (row["rule"], row["role"], row["table"])
+        for row in tool.unverified_identities(observation)
+    ]
 
 
 @pytest.mark.postgres
@@ -490,8 +676,7 @@ def test_real_pg_cancel_bridge_audit_identity_is_measured_not_unmeasured(rls_db)
     assert identity["columns"] == ["tenant_id", "event_id"]
     # Non-vacuous: rows exist for both tenants, so an empty set is not being compared with an
     # empty set -- which is the whole difference between "measured" and "trivially equal".
-    assert identity["ownerDistinctness"]["rows"] == 2
-    assert identity["ownerDistinctness"]["distinct"] == 2
+    assert identity["ownerDistinctness"] == {"rows": 2, "distinct": 2, "nullRows": 0}
     assert identity["role_a"]["rows"] == identity["owner_a"]["rows"] == 2
     assert identity["match"] is True
     truth = observation["ground_truth"]["public.audit_events"]

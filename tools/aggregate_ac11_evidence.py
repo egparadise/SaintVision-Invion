@@ -86,9 +86,20 @@ DEFINER_FILES = [
     {"path": "tools/definer-policy.json", "blob": "90c0e34e7db172aea4e4203bcebad39f8f732514"},
 ]
 RLS_FILES = [
-    {"path": "tools/collect_rls_evidence.py", "blob": "ad32949512eadac067209c194f909f3627b75cdd"},
+    {"path": "tools/collect_rls_evidence.py", "blob": "a13d95ba6d55da67b488cde14e79a3573f5efa0c"},
     {"path": "tools/rls-boundary-baseline.json", "blob": "5f6eb104fa6ca455de78423a6f678fd8fc99d6df"},
 ]
+
+#: E4 may fall back to an owner-verified readable key only for these (role, table, columns)
+#: triples, and the collector's own copy (``OWNER_VERIFIED_KEY_SCOPE`` in
+#: tools/collect_rls_evidence.py, whose blob is pinned above) must agree.  The check below is
+#: independent on purpose: a report is evidence about a tree, not a promise from the tool that
+#: wrote it, so the evaluator refuses an out-of-scope or vacuous readable-key identity even if
+#: some collector offered one (#322 r2).
+OWNER_VERIFIED_KEY_METHOD = "owner-verified-key"
+OWNER_VERIFIED_KEY_SCOPE = frozenset(
+    {("inv_cancel_bridge_owner", "public.audit_events", ("tenant_id", "event_id"))}
+)
 
 DEFINER_CRITICAL = {
     "unrecognized_privileged_function",
@@ -662,6 +673,32 @@ def evaluate_rls(report: dict[str, Any], allowlist: dict[str, Any], now: datetim
     for row in [*violations, *accepted, *unmeasured]:
         if not isinstance(row, dict) or row.get("rule") not in RLS_RULES:
             return Verdict.INVALID_RUN
+    for role_name, role_report in roles.items():
+        tables = role_report.get("tables") if isinstance(role_report, dict) else None
+        if not isinstance(tables, dict):
+            continue
+        for table_name, table_report in tables.items():
+            visible = table_report.get("visible") if isinstance(table_report, dict) else None
+            identity = visible.get("identity") if isinstance(visible, dict) else None
+            if not isinstance(identity, dict):
+                continue
+            if identity.get("method") != OWNER_VERIFIED_KEY_METHOD:
+                continue
+            columns = identity.get("columns")
+            measured = identity.get("ownerDistinctness")
+            if (
+                not isinstance(columns, list)
+                or (role_name, table_name, tuple(columns)) not in OWNER_VERIFIED_KEY_SCOPE
+                or not isinstance(measured, dict)
+                or not isinstance(measured.get("rows"), int)
+                or measured["rows"] < 1
+                or measured.get("distinct") != measured["rows"]
+                or measured.get("nullRows") != 0
+            ):
+                # An unregistered pair, an empty comparison (every projection is injective and
+                # every fingerprint matches over zero rows), a repeated key or a NULL-bearing
+                # key: none of these is a row identity, so the report is not admissible.
+                return Verdict.INVALID_RUN
     allowed_identities = {
         (entry["role"], entry["table"], rule)
         for entry in allowlist["rlsAcceptedDispositions"] for rule in entry["rules"]

@@ -688,6 +688,73 @@ def test_rls_unmeasured_and_unknown_exit_mapping(exit_code, expected, allowlist)
     assert tool.evaluate_rls(report, allowlist, NOW) is expected
 
 
+OWNER_VERIFIED_IDENTITY = {
+    "method": "owner-verified-key", "columns": ["tenant_id", "event_id"],
+    "ownerDistinctness": {"rows": 2, "distinct": 2, "nullRows": 0},
+    "owner_a": {"rows": 2, "fp": "aa"}, "role_a": {"rows": 2, "fp": "aa"}, "match": True,
+}
+
+
+def identity_roles(identity: dict, role: str = "inv_cancel_bridge_owner",
+                   table: str = "public.audit_events") -> dict:
+    return {role: {"present": True, "tables": {table: {"visible": {"identity": identity}}}}}
+
+
+@pytest.mark.parametrize(
+    ("roles", "expected"),
+    [
+        pytest.param(
+            identity_roles(OWNER_VERIFIED_IDENTITY),
+            tool.Verdict.MEASURED_PASS,
+            id="registered-and-measured",
+        ),
+        pytest.param(
+            identity_roles({**OWNER_VERIFIED_IDENTITY,
+                            "ownerDistinctness": {"rows": 0, "distinct": 0, "nullRows": 0}}),
+            tool.Verdict.INVALID_RUN,
+            id="vacuous-zero-rows",
+        ),
+        pytest.param(
+            identity_roles({**OWNER_VERIFIED_IDENTITY,
+                            "ownerDistinctness": {"rows": 2, "distinct": 1, "nullRows": 0}}),
+            tool.Verdict.INVALID_RUN,
+            id="repeated-key",
+        ),
+        pytest.param(
+            identity_roles({**OWNER_VERIFIED_IDENTITY,
+                            "ownerDistinctness": {"rows": 2, "distinct": 2, "nullRows": 1}}),
+            tool.Verdict.INVALID_RUN,
+            id="null-bearing-key",
+        ),
+        pytest.param(
+            identity_roles({**OWNER_VERIFIED_IDENTITY, "columns": ["tenant_id"]}),
+            tool.Verdict.INVALID_RUN,
+            id="unregistered-columns",
+        ),
+        pytest.param(
+            identity_roles(OWNER_VERIFIED_IDENTITY, role="inv_app", table="public.projects"),
+            tool.Verdict.INVALID_RUN,
+            id="unregistered-pair",
+        ),
+    ],
+)
+def test_an_owner_verified_key_identity_must_be_registered_and_non_vacuous(
+    roles, expected, allowlist
+):
+    """The evaluator asks the readable-key questions itself (#322 r2).
+
+    The collector refuses these cases too, but a report is evidence about a tree rather than a
+    promise from the tool that wrote it: an identity measured over zero rows, a repeated or
+    NULL-bearing key, or a pair the reviewed scope does not list makes the report inadmissible
+    here as well -- otherwise one pinned-but-patched collector would be enough to turn a vacuous
+    comparison into a PASS axis.
+    """
+
+    report = rls_report(allowlist)
+    report["roles"] = copy.deepcopy(roles)
+    assert tool.evaluate_rls(report, allowlist, NOW) is expected
+
+
 def test_security_requires_all_registered_reports_and_exact_vf_inventory(allowlist):
     missing = security_envelope(allowlist)
     missing["verdict"] = "NOT_OBSERVED"
