@@ -81,6 +81,9 @@ def sources(**overrides):
             "importerEmitsAxes": list(MIGRATION_AXES) if complete else [],
             "envelopeShape": "axis-evidence" if complete else None,
             "reason": None if complete else "no producer exists",
+            # Most axes need one artifact.  A row that needs a second one names the tool which
+            # finds it; the security row is the case and has its own tests below (card 233).
+            "supplementalEvidence": None,
         })
     document = {
         "schemaVersion": assembler.SOURCES_SCHEMA,
@@ -90,6 +93,23 @@ def sources(**overrides):
         "axes": axes,
     }
     document.update(overrides)
+    return document
+
+
+SUPPLEMENTAL = {
+    "threatId": "SEC-VF-001",
+    "finder": "tools/find_ac11_vf_evidence.py",
+    "flag": "--vf-evidence",
+}
+
+
+def with_supplemental(value, axis="migration-reversible-segment"):
+    """The fixture map with ``supplementalEvidence`` set on one row."""
+
+    document = sources()
+    for entry in document["axes"]:
+        if entry["axis"] == axis:
+            entry["supplementalEvidence"] = value
     return document
 
 
@@ -255,6 +275,59 @@ def test_a_release_sha_that_is_not_a_commit_is_refused(tmp_path):
 
 
 # --- the axis map itself ----------------------------------------------------------------
+
+
+def test_a_row_may_name_the_second_artifact_its_axis_needs(tmp_path):
+    """One axis needs two artifacts, and the map is where the lane learns that (card 233).
+
+    The security axis's fourth threat report comes from the browser lane, and the aggregate lane
+    passed only the security artifact -- so every envelope that lane produced was missing
+    SEC-VF-001 (#319 r2).  The row now names the finder, and the lane reads it from here rather
+    than hard-coding one axis's second input in the workflow.
+    """
+
+    loaded = assembler.load_sources(sources_file(tmp_path, with_supplemental(SUPPLEMENTAL)))
+    row = [entry for entry in loaded if entry["axis"] == "migration-reversible-segment"][0]
+    assert row["supplementalEvidence"] == SUPPLEMENTAL
+
+
+@pytest.mark.parametrize(
+    ("label", "value", "message"),
+    [
+        ("a missing key", {k: v for k, v in SUPPLEMENTAL.items() if k != "flag"}, "exactly"),
+        ("an extra key", {**SUPPLEMENTAL, "note": "why"}, "exactly"),
+        ("not an object", "tools/find_ac11_vf_evidence.py", "exactly"),
+        ("an unknown threat", {**SUPPLEMENTAL, "threatId": "SEC-NEW-001"}, "not a threat report"),
+        ("a flag that is not one", {**SUPPLEMENTAL, "flag": "vf-evidence"}, "option name"),
+        ("a finder that is not in the tree",
+         {**SUPPLEMENTAL, "finder": "tools/absent_finder.py"}, "is not in the tree"),
+    ],
+)
+def test_supplemental_evidence_is_exact_or_refused(tmp_path, label, value, message):
+    """The same strictness as the rest of the map: exact keys, named values, files that exist."""
+
+    with pytest.raises(assembler.Refused, match=message):
+        assembler.load_sources(sources_file(tmp_path, with_supplemental(value)))
+
+
+def test_supplemental_evidence_on_a_chain_that_cannot_be_collected_is_refused(tmp_path):
+    """A row nothing collects has nothing to supplement, so the field would be decoration."""
+
+    with pytest.raises(assembler.Refused, match="supplementalEvidence on a absent chain"):
+        assembler.load_sources(
+            sources_file(tmp_path, with_supplemental(SUPPLEMENTAL, axis="long-soak"))
+        )
+
+
+def test_the_real_axis_map_names_the_browser_lane_finder_on_the_security_row():
+    """The tree's own map, not a fixture: the security row is the one with a second artifact."""
+
+    rows = {entry["axis"]: entry for entry in assembler.load_sources(assembler.DEFAULT_SOURCES)}
+    security = rows["security-critical-high-zero"]["supplementalEvidence"]
+    assert security == SUPPLEMENTAL
+    assert [axis for axis, entry in rows.items() if entry["supplementalEvidence"]] == [
+        "security-critical-high-zero"
+    ]
 
 
 @pytest.mark.parametrize(
