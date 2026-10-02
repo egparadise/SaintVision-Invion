@@ -5,7 +5,7 @@ version: "1.0.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-02T08:38:37+09:00"
+updated: "2026-10-02T09:06:54+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "e8f2eb56c7dde99a5aacda4fed9ca0d9205d7ac5"
@@ -44,7 +44,8 @@ isolation, `caller-asserted` field source는 제품 입력이 아니다.
 
 receipt의 `recoveryEpoch`는 정수 fencing token이 아니라 UUID control epoch다. 구현 비교는
 `nodeId == leasedNodeId`와 `receipt.recoveryEpoch == inv.control_epoch.epoch ==
-inv.leases.recovery_epoch`를 요구한다. 기존 `BuildPlan.recoveryEpoch` 정수는 lease fencing token
+inv.resource_leases.recovery_epoch`를 요구한다. UUID 문자열은 소문자 canonical form으로
+고정한다. 기존 `BuildPlan.recoveryEpoch` 정수는 lease fencing token
 부분이라 이 UUID 비교에 사용하지 않는다.
 identity/epoch/격리 불일치는 `RES-0006/503/retryable=true`, stale `observedAt`은 기존
 `RES-0003/409`, dispatch 전후 daemon identity drift는 `VERIFY-0002/422`다.

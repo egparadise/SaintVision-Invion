@@ -5,7 +5,7 @@ version: "1.0.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-02T08:38:37+09:00"
+updated: "2026-10-02T09:06:54+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "e8f2eb56c7dde99a5aacda4fed9ca0d9205d7ac5"
@@ -30,7 +30,8 @@ PR #306 카드 214 착수 전 질문에서 health receipt, physical cleanup rece
   선행 계약만으로 활성 legacy receipt를 깨뜨리지 않도록 둘 다 없는 입력은 호환하되, 하나만
   있는 입력은 거부한다. concrete transport를 enable하는 카드 214 제품 검증이 두 필드를
   필수화하며, 그 전까지 transport 기본값은 disabled다.
-- receipt `recoveryEpoch`를 `inv.control_epoch.epoch`·`inv.leases.recovery_epoch`와 같은 UUID로
+- receipt `recoveryEpoch`를 `inv.control_epoch.epoch`·`inv.resource_leases.recovery_epoch`와
+  같은 소문자 canonical UUID로
   고정했다. 기존 `BuildPlan.recoveryEpoch` 정수는 fencing token이므로 비교 대상이 아니다.
 - control plane 발급 `BuildPlan.buildSessionId`를 optional 호환 필드로 추가했다. 카드 214 enable
   경로는 이를 필수로 요구하고 physical receipt와 exact 대조한다.
@@ -41,7 +42,7 @@ PR #306 카드 214 착수 전 질문에서 health receipt, physical cleanup rece
 
 ## 검증
 
-- `tests/core/test_buildkit_contracts.py`: 87 passed.
+- `tests/core/test_buildkit_contracts.py`: 96 passed.
 - writer/source/isolation/daemon/stop/disposition/unknown·missing field/digest/audit payload 변이가
   각각 거부된다.
 - generated Python/TypeScript/Go와 control-plane/node-agent schema를 같은 source에서 다시

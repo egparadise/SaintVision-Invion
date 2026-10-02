@@ -665,7 +665,8 @@
         },
         "buildSessionId": {
           "type": "string",
-          "format": "uuid"
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
         },
         "builderInstanceId": {
           "type": "string",
@@ -994,7 +995,8 @@
         },
         "recoveryEpoch": {
           "type": "string",
-          "format": "uuid"
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
         },
         "observedAt": {
           "$ref": "#/$defs/Timestamp"
@@ -1092,7 +1094,8 @@
         },
         "buildSessionId": {
           "type": "string",
-          "format": "uuid"
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
         },
         "nodeId": {
           "$ref": "#/$defs/NodeId"
@@ -1105,7 +1108,8 @@
         },
         "recoveryEpoch": {
           "type": "string",
-          "format": "uuid"
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
         },
         "daemonIdentity": {
           "$ref": "#/$defs/BuildDaemonIdentity"

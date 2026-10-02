@@ -313,6 +313,30 @@ def test_build_plan_accepts_the_control_plane_issued_session_id_without_requirin
 
 
 @pytest.mark.parametrize(
+    "contract,factory,field",
+    [
+        ("BuildProviderHealthReceipt", _health_receipt, "recoveryEpoch"),
+        ("BuildPhysicalCleanupReceipt", _physical_cleanup_receipt, "recoveryEpoch"),
+        ("BuildPhysicalCleanupReceipt", _physical_cleanup_receipt, "buildSessionId"),
+    ],
+)
+@pytest.mark.parametrize(
+    "invalid",
+    [
+        7,
+        "not-a-uuid",
+        "123E4567-E89B-42D3-A456-426614174001",
+    ],
+)
+def test_node_receipt_authority_ids_are_canonical_lowercase_uuids(
+    contract, factory, field, invalid
+):
+    changed = factory()
+    changed[field] = invalid
+    _rejected(contract, changed)
+
+
+@pytest.mark.parametrize(
     "contract,factory",
     [
         ("BuildRequest", _request),
