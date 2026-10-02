@@ -839,6 +839,122 @@ def vf_evidence_dir(tmp_path, bundle=None, **overrides):
 DROP = object()
 
 
+def duplicated(document, path: tuple, key: str) -> str:
+    """``document`` rendered with ``key`` stated twice inside the object at ``path``.
+
+    ``json.dumps`` cannot write a duplicate key, so the text is built by splicing: the object at
+    that path is rendered, and its first key is repeated with a different value.  That is exactly
+    the document a forger would hand over -- valid JSON whose first value is for the reader and
+    whose second is for the parser (#332 r2 F1).
+    """
+
+    cursor = document
+    for step in path:
+        cursor = cursor[step]
+    rendered = json.dumps(cursor)
+    assert rendered.startswith("{"), "only an object can carry a duplicate key"
+    original = json.dumps(key) + ": " + json.dumps(cursor[key])
+    assert original in rendered or json.dumps(key) in rendered
+    forged = "{" + json.dumps(key) + ": " + json.dumps(_other_value(cursor[key])) + ", " + rendered[1:]
+    whole = json.dumps(document)
+    if path:
+        # Replace that one object's text inside the whole document.
+        assert rendered in whole, "the nested object must render identically in the whole document"
+        return whole.replace(rendered, forged, 1)
+    return forged
+
+
+def _other_value(value):
+    """Something of the same JSON type but different, so the duplicate is not a no-op."""
+
+    if isinstance(value, str):
+        return value + "-first"
+    if isinstance(value, bool):
+        return not value
+    if isinstance(value, (int, float)):
+        return value + 1
+    if isinstance(value, list):
+        return value + ["first"]
+    if isinstance(value, dict):
+        return {**value, "zzFirst": 1}
+    return "first"
+
+
+def object_paths(document, prefix=()) -> list[tuple]:
+    """Every object path in a document, so the sweep can duplicate a key in each."""
+
+    found = []
+    if isinstance(document, dict):
+        found.append(prefix)
+        for key, value in document.items():
+            found.extend(object_paths(value, prefix + (key,)))
+    elif isinstance(document, list):
+        for index, value in enumerate(document):
+            found.extend(object_paths(value, prefix + (index,)))
+    return found
+
+
+def test_a_duplicate_key_in_the_vf_evidence_document_is_refused(tmp_path):
+    """The exact case #332 r2 found: two ``schemaVersion`` values, the second one winning."""
+
+    document = vf_evidence_dir(tmp_path)
+    original = json.loads(document.read_text(encoding="utf-8"))
+    document.write_text(
+        '{"schemaVersion": "ac11-vf-evidence:0", '
+        + json.dumps(original)[1:],
+        encoding="utf-8",
+    )
+    with pytest.raises(tool.SecurityImportError, match="duplicate JSON key"):
+        tool.vf_evidence_inputs(document)
+
+
+@pytest.mark.parametrize(
+    "document_name",
+    ["producer report", "definer member", "rls member", "vf proof", "vf evidence",
+     "run metadata", "artifact metadata"],
+)
+def test_duplicating_any_key_of_any_input_document_is_refused(tmp_path, document_name):
+    """The sweep: every object in every input document, one duplicated key at a time.
+
+    Seven documents reach this importer and each one is checked field by field elsewhere -- but
+    every one of those checks reads the dict *after* parsing, so a duplicate had already been
+    resolved to the last value before any of them looked.  One parser now refuses it, and this
+    sweep is what keeps all seven on that parser.
+    """
+
+    documents = {
+        "producer report": producer_report(),
+        "definer member": definer_report(),
+        "rls member": rls_report(),
+        "vf proof": vf_proof(),
+        "vf evidence": json.loads(vf_evidence_dir(tmp_path).read_text(encoding="utf-8")),
+        "run metadata": metadata(archive())[0],
+        "artifact metadata": metadata(archive())[1],
+    }
+    document = documents[document_name]
+    paths = object_paths(document)
+    assert paths, document_name
+    survivors = []
+    for path in paths:
+        cursor = document
+        for step in path:
+            cursor = cursor[step]
+        if not cursor:
+            continue
+        key = next(iter(cursor))
+        try:
+            forged = duplicated(document, path, key)
+        except AssertionError:
+            continue  # the nested object does not render uniquely; other paths cover it
+        try:
+            tool._loads(forged, document_name)
+        except tool.SecurityImportError as refusal:
+            assert "duplicate JSON key" in str(refusal)
+            continue
+        survivors.append((path, key))
+    assert survivors == []
+
+
 def test_the_vf_evidence_document_imports_the_same_envelope_as_the_three_flags(tmp_path):
     """One argument or three, the same evidence and the same verdict.
 

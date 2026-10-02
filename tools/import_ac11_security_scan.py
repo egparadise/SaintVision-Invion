@@ -157,14 +157,49 @@ def importer_blob() -> str:
     return hashlib.sha1(f"blob {len(data)}\0".encode() + data).hexdigest()
 
 
-def _json(path: Path, label: str) -> dict[str, Any]:
+class DuplicateKey(ValueError):
+    """A JSON object stated the same key twice."""
+
+
+def _no_duplicates(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    """Refuse a repeated key instead of keeping the last one.
+
+    ``json.loads`` keeps the last value silently, so ``{"schemaVersion": "…:0", "schemaVersion":
+    "…:1"}`` parsed as the second one -- a document could carry a value for review and another for
+    the evaluator (#332 r2 F1).  Every exact-key check in this file reads the dict *after* parsing,
+    so the duplicate had already been resolved before any of them looked.  The sibling
+    ``assemble_ac11_manifest`` has refused this since #299; this is the same rule, applied to every
+    JSON input here.
+    """
+
+    seen: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in seen:
+            raise DuplicateKey(f"duplicate JSON key {key!r}")
+        seen[key] = value
+    return seen
+
+
+def _loads(raw: str, label: str) -> dict[str, Any]:
+    """The only JSON parser in this file: strict about duplicates, and objects only."""
+
     try:
-        value = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        value = json.loads(raw, object_pairs_hook=_no_duplicates)
+    except DuplicateKey as duplicate:
+        raise SecurityImportError(f"{label}: {duplicate}") from None
+    except (UnicodeError, json.JSONDecodeError) as exc:
         raise SecurityImportError(f"{label} unreadable: {type(exc).__name__}") from None
     if not isinstance(value, dict):
         raise SecurityImportError(f"{label} must be an object")
     return value
+
+
+def _json(path: Path, label: str) -> dict[str, Any]:
+    try:
+        raw = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as exc:
+        raise SecurityImportError(f"{label} unreadable: {type(exc).__name__}") from None
+    return _loads(raw, label)
 
 
 def _utc(value: Any, label: str) -> datetime:
@@ -289,11 +324,10 @@ def import_evidence(
         raise SecurityImportError("import clock must be timezone-aware")
     members = _members(archive)
     try:
-        report = json.loads(members[REPORT_MEMBER].decode("utf-8"))
-    except (UnicodeError, json.JSONDecodeError) as exc:
+        report_text = members[REPORT_MEMBER].decode("utf-8")
+    except UnicodeError as exc:
         raise SecurityImportError(f"producer report unreadable: {type(exc).__name__}") from None
-    if not isinstance(report, dict):
-        raise SecurityImportError("producer report must be an object")
+    report = _loads(report_text, "producer report")
     source = report.get("sourceHeadSha")
     source_run_id = report.get("sourceRunId")
     if not isinstance(source, str) or not SHA1_RE.fullmatch(source):
@@ -510,7 +544,7 @@ def _reviewed_allowlist() -> dict[str, Any]:
     """
 
     try:
-        value = json.loads(DEFAULT_ALLOWLIST.read_text(encoding="utf-8"))
+        value = _json(DEFAULT_ALLOWLIST, "reviewed security allowlist")
         validate_allowlist(value)
     except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
         raise SecurityImportError(
@@ -533,11 +567,12 @@ def _database_reports(members: dict[str, bytes], report: dict[str, Any]) -> list
         if raw is None:
             continue
         try:
-            document = json.loads(raw.decode("utf-8"))
-        except (UnicodeError, json.JSONDecodeError) as exc:
+            member_text = raw.decode("utf-8")
+        except UnicodeError as exc:
             raise SecurityImportError(
                 f"{member} unreadable: {type(exc).__name__}"
             ) from None
+        document = _loads(member_text, member)
         if not isinstance(document, dict) or document.get("threatId") != threat_id:
             raise SecurityImportError(f"{member} does not carry {threat_id}")
         for field in ("sourceRunId", "sourceHeadSha", "checkoutTreeSha"):
@@ -572,14 +607,12 @@ def _vf_proof(archive: bytes) -> dict[str, Any]:
             f"browser lane artifact unreadable: {type(exc).__name__}"
         ) from None
     try:
-        value = json.loads(raw.decode("utf-8"))
-    except (UnicodeError, json.JSONDecodeError) as exc:
+        proof_text = raw.decode("utf-8")
+    except UnicodeError as exc:
         raise SecurityImportError(
             f"browser lane proof unreadable: {type(exc).__name__}"
         ) from None
-    if not isinstance(value, dict):
-        raise SecurityImportError("browser lane proof must be an object")
-    return value
+    return _loads(proof_text, "browser lane proof")
 
 
 def vf_report(
