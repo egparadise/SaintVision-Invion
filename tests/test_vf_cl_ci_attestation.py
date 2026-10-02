@@ -4,6 +4,7 @@ import datetime as dt
 import hashlib
 import json
 from pathlib import Path
+import shlex
 import subprocess
 
 import pytest
@@ -290,5 +291,22 @@ def test_workflow_grants_signing_permissions_only_to_manual_attestation_job():
         step for step in attestation["steps"]
         if step.get("name") == "Create the authoritative VF-CL receipt"
     )
-    assert '--expected-artifact-digest "$EVIDENCE_ARTIFACT_DIGEST"' in create_step["run"]
-    assert "${EVIDENCE_ARTIFACT_DIGEST#sha256:}" not in create_step["run"]
+    command_parts = []
+    collecting = False
+    for raw_line in create_step["run"].splitlines():
+        line = raw_line.strip()
+        if not collecting:
+            collecting = line.startswith("python tools/create_vf_cl_ci_attestation_receipt.py")
+            if not collecting:
+                continue
+        if line.startswith("#"):
+            break
+        continued = line.endswith("\\")
+        command_parts.append(line[:-1].rstrip() if continued else line)
+        if not continued:
+            break
+    command = shlex.split(" ".join(command_parts))
+    assert command.count("--expected-artifact-digest") == 1
+    position = command.index("--expected-artifact-digest")
+    assert command[position + 1] == "$EVIDENCE_ARTIFACT_DIGEST"
+    assert "${EVIDENCE_ARTIFACT_DIGEST#sha256:}" not in command

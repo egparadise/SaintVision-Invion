@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-2026-10-02-CARD211-VFCL-CI-ATTESTATION-CODEX"
 title: "Card 211 VF-CL CI receipt attestation"
-version: "1.2.1"
+version: "1.3.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-02T10:13:30+09:00"
+updated: "2026-10-02T10:25:52+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "d0b2a4c6"
@@ -41,6 +41,18 @@ runner에서 닫을 수 있으므로 train 14 후보 `d0b2a4c6` 위에 `#295`와
 - exact-head label producer run `36940633798`은 head `c8466697b156d896e62a1446281bf5410a37e2ef`에서
   success했다. 같은 head의 workflow_dispatch run `36940757636`은 producer와 attestation job 모두
   success했고, receipt 내부 run/head/ref/workflow와 verifier의 Sigstore identity가 일치했다.
+- digest 정규화를 receipt 생성기로 옮긴 executable head `e470c0902534a1e0ae6de643be4db3b03fe2576b`의
+  workflow_dispatch run `36950676320`도 producer 44초·attestation 16초로 success했다. receipt 생성,
+  `actions/attest`, 저장소 verifier, artifact upload 네 단계가 모두 success였고, 내려받은 bundle을
+  `gh attestation verify`와 `tools/verify_vf_cl_ci_attestation.py`로 다시 검증해 exit 0과 `VERIFIED`를
+  확인했다. receipt 내부 `receiptSha256`은
+  `57dd282ea06174c20f01b2dc27881cdfe79e0ef361221f6d73ee96641edddad1`, attested file subject digest는
+  `1449b024791daf401db20d949875e6e952b64a316c0012038f697480adff3de9`다.
+- 이 run의 Evidence artifact `11204020983`은 digest
+  `sha256:d64933813a129fb439d3a591b8908db2122d27029a4294e6d9436ae3e0314465`, 만료 시각
+  `2026-11-01T01:23:51Z`다. attestation artifact `11204100906`은 digest
+  `sha256:ac761635bb38d65bf1f5204eb298f3b0345b253aa5b87666e48b1ba98bb2919e`, 만료 시각
+  `2026-11-01T01:24:12Z`다. 새 bundle member 경로는 `_temp/wAaG3T/attestation.json`이다.
 - Evidence artifact `11200122628`은 digest
   `sha256:5615eba6779b020e4aa03d45b5fb68e1ff488c8a802f9408d4fe63bfd7e29025`, 만료 시각
   `2026-10-31T23:26:34Z`다. attestation artifact `11200405399`는 digest
