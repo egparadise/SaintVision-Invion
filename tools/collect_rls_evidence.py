@@ -29,12 +29,16 @@ and are reported under 'accepted'):
      SET -- judged by ROW IDENTITY, never by count or by a value projection:
      inside one REPEATABLE READ transaction the owner fingerprints tenant A's rows
      and the role fingerprints what it sees.  Identity is ``ctid`` when the role
-     can read it, otherwise ``tenant_id`` + the complete primary key when the role
-     can read all of them.  A different set (count inflation OR a same-count row
-     swap) is an E4 violation.  When neither identity is readable the table is
-     "identity unverifiable": it is reported under ``unmeasured`` and the verdict
-     becomes UNMEASURED (exit 3) -- never PASS -- unless the baseline accepts that
-     (role, table) with a reason;
+     can read it, else ``tenant_id`` + the complete primary key when the role can
+     read all of them, else the readable part of that key **when the owner measures
+     it to be unique over the rows being compared, in the same snapshot** -- a
+     projection the owner proved injective on this row set is an identity, which is
+     a different thing from believing a projection (card 225).  A different set
+     (count inflation OR a same-count row swap) is an E4 violation.  When no
+     identity is available -- ctid denied, the key not fully readable, and the
+     readable part measured non-unique -- the table is "identity unverifiable": it
+     is reported under ``unmeasured`` and the verdict becomes UNMEASURED (exit 3)
+     -- never PASS -- unless the baseline accepts that (role, table) with a reason;
   E5 with the GUC set to an unknown tenant the role sees 0 rows;
   E6 no SECURITY DEFINER function grants EXECUTE to PUBLIC.
 
@@ -145,6 +149,38 @@ def _fingerprint(conn, schema: str, name: str, columns: list[str] | None, where:
         return {"denied": error.sqlstate or "unknown"}
 
 
+def _distinct_fingerprint(conn, schema: str, name: str, columns: list[str],
+                          where: str = "", params=()) -> dict:
+    """The owner's fingerprint of ``columns`` **and** whether they identify these rows.
+
+    ``{"rows": n, "distinct": d, "unique": n == d, "fp": md5}`` or ``{"denied": sqlstate}``.
+    The uniqueness is measured on the same rows that are about to be compared and in the same
+    snapshot, which is what lets a readable projection stand in for a row identity: if the
+    owner sees as many distinct tuples as rows, two different rows cannot share one tuple here
+    (card 225).  A projection nobody measured would only be a guess, and E4 refuses guesses.
+    """
+
+    from psycopg import sql
+    import psycopg
+    rowexpr = sql.SQL("concat_ws('\x1f', {})").format(
+        sql.SQL(", ").join(sql.Identifier(c) for c in columns)
+    )
+    try:
+        with conn.transaction():
+            row = conn.execute(
+                sql.SQL(
+                    "SELECT count(*), count(DISTINCT {r}),"
+                    " md5(coalesce(string_agg({r}, ',' ORDER BY {r}), '')) FROM {}.{}"
+                    + (" WHERE " + where if where else "")
+                ).format(sql.Identifier(schema), sql.Identifier(name), r=rowexpr),
+                params,
+            ).fetchone()
+            return {"rows": int(row[0]), "distinct": int(row[1]),
+                    "unique": int(row[0]) == int(row[1]), "fp": row[2]}
+    except psycopg.Error as error:
+        return {"denied": error.sqlstate or "unknown"}
+
+
 def _readable_columns(conn, role: str, table: dict) -> list[str]:
     rows = conn.execute(
         "SELECT a.attname FROM pg_attribute a JOIN pg_class c ON c.oid=a.attrelid JOIN pg_namespace n ON n.oid=c.relnamespace"
@@ -167,8 +203,9 @@ def _primary_key(conn, table: dict) -> list[str]:
 def _identity(conn, role: str, table: dict, tenant_a: str) -> dict:
     """Owner-side tenant-A row set vs the set the role sees under GUC = A (same snapshot).
 
-    Identity is ctid, else tenant_id + the full primary key; a value projection is
-    never accepted (two different rows may project to the same values).
+    Identity is ctid, else tenant_id + the full primary key, else the readable part of that
+    key once the owner has measured it unique over the compared rows; an unmeasured value
+    projection is never accepted (two different rows may project to the same values).
     Must be called inside the probe transaction BEFORE ``SET LOCAL ROLE``."""
     schema, name = table["schema"], table["name"]
     from psycopg import sql
@@ -176,8 +213,18 @@ def _identity(conn, role: str, table: dict, tenant_a: str) -> dict:
     readable = set(_readable_columns(conn, role, table))
     key_cols = ["tenant_id"] + [c for c in pk if c != "tenant_id"] if pk else []
     key_readable = bool(key_cols) and set(key_cols) <= readable
+    # The part of that key the role may read.  A partitioned table puts its partition key in
+    # the primary key, so a role granted the business columns only (for example
+    # ``SELECT (tenant_id, event_id)`` on a table partitioned by ``occurred_at``) can never
+    # read the whole key -- and that is a property of the reviewed grant, not a gap to widen.
+    subset_cols = [column for column in key_cols if column in readable]
     owner_ctid = _fingerprint(conn, schema, name, None, "tenant_id = %s", (tenant_a,))
     owner_key = _fingerprint(conn, schema, name, key_cols, "tenant_id = %s", (tenant_a,)) if key_readable else None
+    owner_subset = (
+        _distinct_fingerprint(conn, schema, name, subset_cols, "tenant_id = %s", (tenant_a,))
+        if not key_readable and subset_cols
+        else None
+    )
     conn.execute(sql.SQL("SET LOCAL ROLE {}").format(sql.Identifier(role)))
     conn.execute("SELECT set_config(%s, %s, true)", (TENANT_GUC, tenant_a))
     role_ctid = _fingerprint(conn, schema, name, None)
@@ -191,10 +238,33 @@ def _identity(conn, role: str, table: dict, tenant_a: str) -> dict:
                       "match": role_key["fp"] == owner_key["fp"]}
         else:
             result = {"method": "unverifiable", "reason": f"pk projection denied {role_key.get('denied')}"}
+    elif owner_subset is not None and owner_subset.get("unique") is True:
+        role_subset = _fingerprint(conn, schema, name, subset_cols)
+        if "fp" in role_subset:
+            result = {
+                "method": "owner-verified-key", "columns": subset_cols,
+                "ownerDistinctness": {"rows": owner_subset["rows"],
+                                      "distinct": owner_subset["distinct"]},
+                "owner_a": {"rows": owner_subset["rows"], "fp": owner_subset["fp"]},
+                "role_a": role_subset,
+                "match": role_subset["fp"] == owner_subset["fp"],
+            }
+        else:
+            result = {"method": "unverifiable",
+                      "reason": f"readable-key projection denied {role_subset.get('denied')}"}
+    elif owner_subset is not None and owner_subset.get("unique") is False:
+        result = {"method": "unverifiable",
+                  "reason": f"ctid denied {role_ctid.get('denied')}; the readable identity "
+                            f"columns {subset_cols} are not unique over the owner's tenant-A "
+                            f"rows ({owner_subset['rows']} rows / {owner_subset['distinct']} "
+                            f"distinct)"}
     else:
         missing = sorted(set(key_cols) - readable) if key_cols else ["<no primary key>"]
+        detail = (f"; readable identity columns {subset_cols} unreadable to the owner "
+                  f"({owner_subset.get('denied')})" if owner_subset is not None else "")
         result = {"method": "unverifiable",
-                  "reason": f"ctid denied {role_ctid.get('denied')}; identity columns not readable: {missing}"}
+                  "reason": f"ctid denied {role_ctid.get('denied')}; identity columns not "
+                            f"readable: {missing}{detail}"}
     conn.execute("RESET ROLE")
     conn.execute(f"RESET {TENANT_GUC}")
     return result

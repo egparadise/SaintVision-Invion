@@ -148,6 +148,61 @@ def test_unverifiable_identity_is_unmeasured_never_pass():
     assert "**UNMEASURED**" in md and "Unverifiable row identities" in md
 
 
+def test_e4_identity_can_be_a_readable_key_the_owner_measured_unique():
+    """Card 225: a partitioned, column-granted table has an identity after all.
+
+    ``public.audit_events`` is RANGE partitioned by ``occurred_at``, so PostgreSQL puts that
+    column in the primary key, and ``inv_cancel_bridge_owner`` is granted
+    ``SELECT (tenant_id, event_id)`` -- the reviewed grant, which this card may not widen.  The
+    full key is therefore unreadable and ``ctid`` is denied, which used to end in
+    "identity unverifiable".  What closes it is a measurement, not a wider grant: the owner
+    counts rows and distinct ``(tenant_id, event_id)`` tuples over the compared rows in the same
+    snapshot, and when those are equal the tuple *is* a row identity for this comparison.
+    """
+
+    observation = deepcopy(_observation())
+    vis = observation["roles"]["inv_app"]["tables"]["public.projects"]["visible"]
+    vis["guc_tenant_a_foreign_rows"] = {"denied": "42501"}
+    vis["identity"] = {
+        "method": "owner-verified-key", "columns": ["tenant_id", "event_id"],
+        "ownerDistinctness": {"rows": 2, "distinct": 2},
+        "owner_a": {"rows": 2, "fp": "aa"}, "role_a": {"rows": 2, "fp": "bb"}, "match": False,
+    }
+    violations = tool.evaluate(observation)
+    assert [v["rule"] for v in violations] == ["E4"]
+    assert "owner-verified-key" in violations[0]["detail"]
+    assert tool.unverified_identities(observation) == []
+
+    vis["identity"]["role_a"] = {"rows": 2, "fp": "aa"}
+    vis["identity"]["match"] = True
+    assert tool.evaluate(observation) == []
+    assert tool.verdict([], tool.unverified_identities(observation)) == "PASS"
+
+
+def test_a_readable_key_that_is_not_unique_stays_unmeasured():
+    """The method is only an identity while the owner's own count says it is.
+
+    If the readable tuple repeats over the compared rows, two different rows could share it and
+    a swap would survive the fingerprint -- so the collector reports the pair as unverifiable
+    with the two numbers, and the verdict stays UNMEASURED rather than PASS.
+    """
+
+    observation = deepcopy(_observation())
+    vis = observation["roles"]["inv_app"]["tables"]["public.projects"]["visible"]
+    vis["identity"] = {
+        "method": "unverifiable",
+        "reason": "ctid denied 42501; the readable identity columns ['tenant_id'] are not "
+                  "unique over the owner's tenant-A rows (2 rows / 1 distinct)",
+    }
+    assert tool.evaluate(observation) == []
+    unmeasured = tool.unverified_identities(observation)
+    assert [(u["rule"], u["role"], u["table"]) for u in unmeasured] == [
+        ("E4", "inv_app", "public.projects")
+    ]
+    assert "not unique" in unmeasured[0]["detail"]
+    assert tool.verdict([], unmeasured) == "UNMEASURED"
+
+
 def test_e4_uses_owner_truth_when_foreign_probe_is_denied():
     """Codex finding 1 (PR #68): a column-privilege role cannot run ``tenant_id <> A``; the
     denied probe must not read as zero foreign rows when the role sees more than tenant A owns."""
@@ -209,6 +264,41 @@ def rls_db():
 
     with tool.disposable_database(admin) as (owner, tenant_a):
         yield Redacted(owner=owner, tenant_a=tenant_a)
+
+
+AUDIT_SEED = (
+    "INSERT INTO public.audit_events"
+    "(event_id,occurred_at,tenant_id,actor_type,action,outcome,detail)"
+    " VALUES (%s,now(),%s,'system','rls.evidence.seed','allow','{}'::jsonb)"
+)
+
+
+def seed_audit_rows(dsn: str, tenant_a: str, other: str) -> list[str]:
+    """Two audit rows per tenant, inserted by this test and removed by it.
+
+    They do **not** belong in ``disposable_database``: measured on this tree, seeding that
+    shared fixture makes ``inv_audit_reader``'s accepted E3/E4/E5 rows appear, and the reviewed
+    AC-11 allowlist carries three dispositions that do not include them -- so the AC-11 RLS
+    report would turn INVALID_RUN.  That is a review decision about the allowlist, not
+    something a test fixture may decide (card 225 §3).
+    """
+
+    import psycopg
+
+    ids = []
+    with psycopg.connect(dsn, autocommit=True) as conn:
+        for tenant in (tenant_a, tenant_a, other, other):
+            event_id = "aud_" + uuid4().hex[:26].upper()
+            conn.execute(AUDIT_SEED, (event_id, tenant))
+            ids.append(event_id)
+    return ids
+
+
+def drop_audit_rows(dsn: str, ids: list[str]) -> None:
+    import psycopg
+
+    with psycopg.connect(dsn, autocommit=True) as conn:
+        conn.execute("DELETE FROM public.audit_events WHERE event_id = ANY(%s::text[])", (ids,))
 
 
 @pytest.mark.postgres
@@ -352,6 +442,144 @@ def test_real_pg_negative_control_unscoped_table_is_reported_then_clears(rls_db)
             conn.execute("DROP TABLE public.rls_probe_swap")
     after, _ = tool.apply_baseline(tool.evaluate(tool.collect(rls_db["owner"], ("inv_app",), rls_db["tenant_a"])), tool.load_baseline())
     assert [v["table"] for v in after] == []
+
+
+@pytest.mark.postgres
+def test_real_pg_an_empty_audit_table_is_measured_but_says_so(rls_db):
+    """With no rows the comparison is measured and **vacuous**, and the numbers say which.
+
+    The AC-11 producer measures an empty ``public.audit_events`` (the disposable fixture seeds
+    tenants and projects, not audit rows), so this pair is no longer ``unmeasured`` -- but
+    ``match: true`` over zero rows proves nothing about a populated table, and the recorded row
+    counts are what let a reader tell the two apart.
+    """
+
+    observation = tool.collect(rls_db["owner"], tool.DEFAULT_ROLES, rls_db["tenant_a"])
+    identity = (
+        observation["roles"]["inv_cancel_bridge_owner"]["tables"]["public.audit_events"]
+        ["visible"]["identity"]
+    )
+    assert identity["method"] == "owner-verified-key"
+    assert identity["match"] is True
+    assert identity["owner_a"]["rows"] == identity["role_a"]["rows"] == 0
+    assert identity["ownerDistinctness"] == {"rows": 0, "distinct": 0}
+    assert tool.unverified_identities(observation) == []
+
+
+@pytest.mark.postgres
+def test_real_pg_cancel_bridge_audit_identity_is_measured_not_unmeasured(rls_db):
+    """Card 225: the row AC-11 reported as unmeasured is measured now, and it passes.
+
+    Measured before this card: ``inv_cancel_bridge_owner`` / ``public.audit_events`` / E4 came
+    back "row identity unverifiable: ctid denied 42501; identity columns not readable:
+    ['occurred_at']" and made the whole SEC-RLS-001 report UNMEASURED.  Nothing about the grant
+    changed -- the role still reads two columns and the role population is still the
+    collector's own eight -- what changed is that the owner now measures whether those two
+    columns identify the rows being compared.
+    """
+
+    ids = seed_audit_rows(rls_db["owner"], rls_db["tenant_a"], str(uuid4()))
+    try:
+        observation = tool.collect(rls_db["owner"], tool.DEFAULT_ROLES, rls_db["tenant_a"])
+    finally:
+        drop_audit_rows(rls_db["owner"], ids)
+    bridge = observation["roles"]["inv_cancel_bridge_owner"]["tables"]["public.audit_events"]
+    assert bridge["privileges"]["select"] == "column"
+    identity = bridge["visible"]["identity"]
+    assert identity["method"] == "owner-verified-key"
+    assert identity["columns"] == ["tenant_id", "event_id"]
+    # Non-vacuous: rows exist for both tenants, so an empty set is not being compared with an
+    # empty set -- which is the whole difference between "measured" and "trivially equal".
+    assert identity["ownerDistinctness"]["rows"] == 2
+    assert identity["ownerDistinctness"]["distinct"] == 2
+    assert identity["role_a"]["rows"] == identity["owner_a"]["rows"] == 2
+    assert identity["match"] is True
+    truth = observation["ground_truth"]["public.audit_events"]
+    assert truth["tenant_a"]["rows"] == 2 and truth["other_tenants"]["rows"] == 2
+    assert bridge["visible"]["guc_unset"] == {"rows": 0}
+    assert bridge["visible"]["guc_tenant_a_foreign_rows"] == {"rows": 0}
+
+    violations = [
+        v for v in tool.evaluate(observation)
+        if (v.get("role"), v.get("table")) == ("inv_cancel_bridge_owner", "public.audit_events")
+    ]
+    unmeasured = tool.unverified_identities(observation)
+    assert violations == []
+    assert [(u["role"], u["table"]) for u in unmeasured] == []
+
+
+@pytest.mark.postgres
+def test_real_pg_negative_control_a_swapped_audit_row_set_is_e4_fail(rls_db):
+    """Plant a policy violation and the measurement has to say FAIL.
+
+    The planted policy shows the bridge role one of tenant A's audit rows and one row of another
+    tenant: the same count as the owner's tenant-A set, a different set.  Counts alone cannot
+    see that; the identity fingerprint can, and the foreign-row probe sees the leak as well --
+    two independent observations of one policy violation, which is what should happen.
+    """
+
+    import psycopg
+
+    canonical = (
+        "CREATE POLICY cancel_bridge_audit_read ON public.audit_events"
+        " FOR SELECT TO inv_cancel_bridge_owner"
+        " USING (tenant_id = NULLIF(pg_catalog.current_setting('inv.tenant_id',true),'')::uuid)"
+    )
+    ids = seed_audit_rows(rls_db["owner"], rls_db["tenant_a"], str(uuid4()))
+    with psycopg.connect(rls_db["owner"], autocommit=True) as conn:
+        rows = conn.execute(
+            "SELECT event_id, tenant_id::text FROM public.audit_events"
+            " WHERE event_id = ANY(%s::text[]) ORDER BY event_id",
+            (ids,),
+        ).fetchall()
+        mine = [r[0] for r in rows if r[1] == rls_db["tenant_a"]]
+        theirs = [r[0] for r in rows if r[1] != rls_db["tenant_a"]]
+        assert len(mine) == 2 and len(theirs) == 2
+        try:
+            conn.execute("DROP POLICY cancel_bridge_audit_read ON public.audit_events")
+            # DDL takes no bind parameters, so the two ids are composed as quoted literals.
+            from psycopg import sql
+
+            conn.execute(
+                sql.SQL(
+                    "CREATE POLICY cancel_bridge_audit_read ON public.audit_events"
+                    " FOR SELECT TO inv_cancel_bridge_owner USING (event_id IN ({}))"
+                ).format(sql.SQL(", ").join(sql.Literal(i) for i in (mine[0], theirs[0])))
+            )
+            leaked = tool.collect(rls_db["owner"], tool.DEFAULT_ROLES, rls_db["tenant_a"])
+        finally:
+            conn.execute("DROP POLICY IF EXISTS cancel_bridge_audit_read ON public.audit_events")
+            conn.execute(canonical)
+
+    bridge = leaked["roles"]["inv_cancel_bridge_owner"]["tables"]["public.audit_events"]
+    identity = bridge["visible"]["identity"]
+    assert identity["method"] == "owner-verified-key"
+    assert identity["match"] is False, "a swapped row set must not look like the owner's"
+    assert identity["role_a"]["rows"] == identity["owner_a"]["rows"], (
+        "this plant keeps the count equal on purpose -- only identity exposes it"
+    )
+    violations = tool.evaluate(leaked)
+    e4 = [
+        v for v in violations
+        if v["rule"] == "E4" and v["role"] == "inv_cancel_bridge_owner"
+        and v["table"] == "public.audit_events"
+    ]
+    assert e4, violations
+    assert tool.verdict(violations, tool.unverified_identities(leaked)) == "VIOLATIONS"
+
+    # And the canonical policy is back: the same measurement passes again.
+    try:
+        restored = tool.collect(rls_db["owner"], tool.DEFAULT_ROLES, rls_db["tenant_a"])
+    finally:
+        drop_audit_rows(rls_db["owner"], ids)
+    restored_identity = (
+        restored["roles"]["inv_cancel_bridge_owner"]["tables"]["public.audit_events"]["visible"]
+    )
+    assert restored_identity["identity"]["match"] is True
+    assert [
+        v for v in tool.evaluate(restored)
+        if (v.get("role"), v.get("table")) == ("inv_cancel_bridge_owner", "public.audit_events")
+    ] == []
 
 
 @pytest.mark.postgres

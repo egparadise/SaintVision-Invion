@@ -86,7 +86,7 @@ DEFINER_FILES = [
     {"path": "tools/definer-policy.json", "blob": "90c0e34e7db172aea4e4203bcebad39f8f732514"},
 ]
 RLS_FILES = [
-    {"path": "tools/collect_rls_evidence.py", "blob": "446c6cc12ccdd2df373713ba4558792f02701c62"},
+    {"path": "tools/collect_rls_evidence.py", "blob": "ad32949512eadac067209c194f909f3627b75cdd"},
     {"path": "tools/rls-boundary-baseline.json", "blob": "5f6eb104fa6ca455de78423a6f678fd8fc99d6df"},
 ]
 
