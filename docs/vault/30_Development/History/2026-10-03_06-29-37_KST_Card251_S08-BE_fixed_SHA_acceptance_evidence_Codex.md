@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD251-S08-FIXED-SHA-EVIDENCE-CODEX-001"
 title: "Card 251 S08-BE fixed-SHA acceptance evidence"
-version: "1.1.0"
+version: "1.2.0"
 status: "implementation"
 author: "Codex"
-updated: "2026-10-03T06:46:20+09:00"
+updated: "2026-10-03T07:25:19+09:00"
 source_of_truth: "Git"
 ---
 
@@ -59,7 +59,18 @@ JUnit 두 개로 JSON evidence와 독립 evaluation을 만든다. PR merge ref�
 개발 중 호환성 확인에는 승인된 이전 exact-head Core run `37060259771`의 실제 artifact를
 사용해 13/13 `MEASURED_PASS` 재계산을 확인했다. 이 재계산은 run id·attempt·checkout tree를
 evidence 내부 값이 아니라 evaluator 입력과 대조했다. 이것은 새 Card 251 정본 run이 아니다.
-정본 run ID와 artifact는 이 PR exact head dispatch 뒤 기록한다.
+
+수정 코드 head `88890edcf27c358d37fa10babd11eb039a1498fc`의 exact-head
+`workflow_dispatch` run `37069106763`은 성공했다. 정본 `saintvision-core-evidence`
+artifact는 `11255160387`, GitHub artifact digest는
+`sha256:1754e7efd272844584935fc8fd0ae10e79f5fc5b3dcb5fc06aa589b33670d55a`, 만료 시각은
+`2026-11-01T22:24:08Z`다. evaluation은 source tree
+`11a1975e65c1ca52a74e9e7b12a32c9b4f361a8d`, run attempt 1, worker config digest
+`53bfeeba087e6ef5f060fea6c2cd2a20073fbf85ad63c03978887c8839b44cc7`을 결속하고
+13/13 `MEASURED_PASS`를 냈다. real-PG artifact는 13 passed·0 skipped였고, 전체 Core
+artifact는 8,358 passed·23 declared skipped·0 failure·0 error였다. evidence JSON 파일 SHA-256은
+`dd32b1512ef99330baa5fc50680d8c52ca847c1921508df5133a72360341ca21`, evaluation JSON 파일
+SHA-256은 `a034d62c9be36b4b67aabefb100afbaa6b7797e6e52411baed1fdd83b63fbb58`이다.
 
 ## 비주장 경계
 

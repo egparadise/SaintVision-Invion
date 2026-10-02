@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.302"
+version: "1.0.303"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T06:46:20+09:00"
+updated: "2026-10-03T07:25:19+09:00"
 source_of_truth: "Git"
 active_card: "CARD-251 S08-BE fixed-SHA acceptance evidence"
-active_card_status: "Claude r1 provenance and whole-suite findings are closed locally; exact-head hosted opt-in measurement is pending"
-active_card_next: "Obtain Claude review and one exact-head Core workflow_dispatch evidence artifact; keep product flag default off and defer any 50-to-75 score decision to rescoring"
+active_card_status: "Claude r1 findings closed; exact-head hosted run 37069106763 produced 13/13 MEASURED_PASS evidence"
+active_card_next: "Re-dispatch the docs-recorded final head, request Claude r2, keep product flag default off, and defer any 50-to-75 score decision to rescoring"
 ---
 
 ## 2026-10-03 Card 251 — S08-BE fixed-SHA acceptance evidence
@@ -25,6 +25,9 @@ active_card_next: "Obtain Claude review and one exact-head Core workflow_dispatc
   file with zero skip, includes unrelated suite failures in the verdict, and derives the verdict
   from raw observations. Physical builder acceptance remains `NOT_OBSERVED`; score change claim is
   always false. [[2026-10-03_06-29-37_KST_Card251_S08-BE_fixed_SHA_acceptance_evidence_Codex]].
+- Exact-head hosted run `37069106763` passed at source `88890edc`: fixed cases 13/13,
+  real-PG 13 passed/0 skipped, Core 8,358 passed/23 declared skips/0 failure/0 error.
+  Artifact `11255160387` is retained through `2026-11-01T22:24:08Z`.
 
 ## 2026-10-03 Card 247 — S08-BE BuildRequest product entry
 
