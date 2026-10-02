@@ -19,21 +19,21 @@ const RUN_STATE_CONFIG: Record<
 > = {
   draft: {
     label: '초안',
-    color: 'var(--color-text-muted)',
+    color: 'var(--color-text-secondary)',
     bg: 'var(--color-bg-subtle)',
     border: 'var(--color-border-subtle)',
   },
   validated: {
     label: '검증됨',
-    color: 'var(--color-brand-primary)',
+    color: 'var(--color-text-secondary)',
     bg: 'var(--color-bg-subtle)',
-    border: 'var(--color-brand-primary)',
+    border: 'var(--color-border-subtle)',
   },
   planned: {
     label: '계획 수립',
-    color: 'var(--color-status-active)',
+    color: 'var(--color-text-secondary)',
     bg: 'var(--color-bg-subtle)',
-    border: 'var(--color-status-active)',
+    border: 'var(--color-border-subtle)',
   },
   awaiting_approval: {
     label: '승인 대기',
@@ -43,9 +43,9 @@ const RUN_STATE_CONFIG: Record<
   },
   scheduled: {
     label: '스케줄됨',
-    color: 'var(--color-brand-hover)',
+    color: 'var(--color-text-secondary)',
     bg: 'var(--color-bg-subtle)',
-    border: 'var(--color-brand-hover)',
+    border: 'var(--color-border-subtle)',
   },
   running: {
     label: '실행 중',
@@ -55,9 +55,9 @@ const RUN_STATE_CONFIG: Record<
   },
   verifying: {
     label: '결과 검증',
-    color: 'var(--color-brand-primary)',
+    color: 'var(--color-text-secondary)',
     bg: 'var(--color-bg-subtle)',
-    border: 'var(--color-brand-primary)',
+    border: 'var(--color-border-subtle)',
   },
   recovering: {
     label: '복구 중',

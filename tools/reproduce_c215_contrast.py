@@ -63,20 +63,22 @@ shard_parent_bg_l = alpha_composite((139, 92, 246, 0.10), light_surf)
 release_pending_bg_d = alpha_composite((217, 119, 6, 0.15), dark_surf)
 release_pending_bg_l = alpha_composite((217, 119, 6, 0.15), light_surf)
 
+# Base RUN_STATE_CONFIG badges before (cbb6df09 / 02d5ecd4):
+# rendered in table over surface (#ffffff / #111827) with base rgba alpha composition
 items = [
-    ("badge: draft / subtle", "#64748b", "#64748b", light_subt, dark_subt, "--color-text-secondary", "--color-bg-subtle"),
-    ("badge: validated / subtle", "#3b82f6", "#3b82f6", light_subt, dark_subt, "--color-brand-hover", "--color-bg-subtle"),
-    ("badge: planned / subtle", "#0284c7", "#0284c7", light_subt, dark_subt, "--color-brand-hover", "--color-bg-subtle"),
-    ("badge: awaiting_approval / subtle", "#f59e0b", "#f59e0b", light_subt, dark_subt, "--color-status-degraded", "--color-bg-subtle"),
-    ("badge: scheduled / subtle", "#8b5cf6", "#8b5cf6", light_subt, dark_subt, "--color-brand-hover", "--color-bg-subtle"),
-    ("badge: running / subtle", "#3b82f6", "#3b82f6", light_subt, dark_subt, "--color-brand-hover", "--color-bg-subtle"),
-    ("badge: verifying / subtle", "#06b6d4", "#06b6d4", light_subt, dark_subt, "--color-brand-hover", "--color-bg-subtle"),
-    ("badge: recovering / subtle", "#f97316", "#f97316", light_subt, dark_subt, "--color-status-active", "--color-bg-subtle"),
-    ("badge: succeeded / subtle", "#10b981", "#10b981", light_subt, dark_subt, "--color-status-online", "--color-bg-subtle"),
-    ("badge: failed / subtle", "#ef4444", "#ef4444", light_subt, dark_subt, "--color-status-offline", "--color-bg-subtle"),
-    ("badge: cancelled / subtle", "#6b7280", "#6b7280", light_subt, dark_subt, "--color-status-neutral", "--color-bg-subtle"),
+    ("badge: draft / subtle", "#64748b", "#64748b", alpha_composite((100, 116, 139, 0.15), light_surf), alpha_composite((100, 116, 139, 0.15), dark_surf), "--color-text-secondary", "--color-bg-subtle"),
+    ("badge: validated / subtle", "#3b82f6", "#3b82f6", alpha_composite((59, 130, 246, 0.15), light_surf), alpha_composite((59, 130, 246, 0.15), dark_surf), "--color-text-secondary", "--color-bg-subtle"),
+    ("badge: planned / subtle", "#0284c7", "#0284c7", alpha_composite((2, 132, 199, 0.15), light_surf), alpha_composite((2, 132, 199, 0.15), dark_surf), "--color-text-secondary", "--color-bg-subtle"),
+    ("badge: awaiting_approval / subtle", "#f59e0b", "#f59e0b", alpha_composite((245, 158, 11, 0.15), light_surf), alpha_composite((245, 158, 11, 0.15), dark_surf), "--color-status-degraded", "--color-bg-subtle"),
+    ("badge: scheduled / subtle", "#8b5cf6", "#8b5cf6", alpha_composite((139, 92, 246, 0.15), light_surf), alpha_composite((139, 92, 246, 0.15), dark_surf), "--color-text-secondary", "--color-bg-subtle"),
+    ("badge: running / subtle", "#3b82f6", "#3b82f6", alpha_composite((59, 130, 246, 0.20), light_surf), alpha_composite((59, 130, 246, 0.20), dark_surf), "--color-brand-hover", "--color-bg-subtle"),
+    ("badge: verifying / subtle", "#06b6d4", "#06b6d4", alpha_composite((6, 182, 212, 0.15), light_surf), alpha_composite((6, 182, 212, 0.15), dark_surf), "--color-text-secondary", "--color-bg-subtle"),
+    ("badge: recovering / subtle", "#f97316", "#f97316", alpha_composite((249, 115, 22, 0.15), light_surf), alpha_composite((249, 115, 22, 0.15), dark_surf), "--color-status-active", "--color-bg-subtle"),
+    ("badge: succeeded / subtle", "#10b981", "#10b981", alpha_composite((16, 185, 129, 0.15), light_surf), alpha_composite((16, 185, 129, 0.15), dark_surf), "--color-status-online", "--color-bg-subtle"),
+    ("badge: failed / subtle", "#ef4444", "#ef4444", alpha_composite((239, 68, 68, 0.15), light_surf), alpha_composite((239, 68, 68, 0.15), dark_surf), "--color-status-offline", "--color-bg-subtle"),
+    ("badge: cancelled / subtle", "#6b7280", "#6b7280", alpha_composite((107, 114, 128, 0.15), light_surf), alpha_composite((107, 114, 128, 0.15), dark_surf), "--color-status-neutral", "--color-bg-subtle"),
     ("stale warning banner text / subtle", "#fca5a5", "#fca5a5", stale_warn_bg_l, stale_warn_bg_d, "--color-status-offline", "--color-bg-subtle"),
-    ("fetch error banner title / subtle", "#f87171", "#f87171", fetch_err_bg_l, fetch_err_bg_d, "--color-status-offline", "--color-bg-subtle"),
+    ("fetch error banner title / subtle", "#fca5a5", "#fca5a5", fetch_err_bg_l, fetch_err_bg_d, "--color-status-offline", "--color-bg-subtle"),
     ("fetch error retry button / offline-bg", "#ffffff", "#ffffff", "#ef4444", "#ef4444", "--color-brand-primary-fg", "--color-status-offline-bg"),
     ("shard child badge / subtle", "#3b82f6", "#3b82f6", shard_child_bg_l, shard_child_bg_d, "--color-brand-hover", "--color-bg-subtle"),
     ("shard parent badge / subtle", "#8b5cf6", "#8b5cf6", shard_parent_bg_l, shard_parent_bg_d, "--color-status-active", "--color-bg-subtle"),
@@ -95,5 +97,4 @@ if __name__ == '__main__':
         b_cr_d = cr(b_fg_d, b_bg_d)
         a_cr_l = cr(light_tokens[a_fg], light_tokens[a_bg])
         a_cr_d = cr(dark_tokens[a_fg], dark_tokens[a_bg])
-        is_virtual = " (L virtual)" if (b_fg_l == b_fg_d and (b_bg_l == "#ffffff" or b_bg_l == "#f1f5f9" or "fef" in b_bg_l)) else " (L actual) "
-        print(f"{label:38s} | Before: {b_cr_l:5.2f}:1{is_virtual} / {b_cr_d:5.2f}:1 (D actual) | After: {a_cr_l:5.2f}:1 (Light) / {a_cr_d:5.2f}:1 (Dark)")
+        print(f"{label:38s} | Before: {b_cr_l:5.2f}:1 (L actual) / {b_cr_d:5.2f}:1 (D actual on {b_bg_d}) | After: {a_cr_l:5.2f}:1 (Light) / {a_cr_d:5.2f}:1 (Dark)")

@@ -4164,56 +4164,97 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(badgeSucceeded?.style.color).toBe('var(--color-status-online)');
       expect(badgeSucceeded?.style.borderColor).toBe('var(--color-status-online)');
       expect(badgeSucceeded?.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(badgeSucceeded.textContent).toBe('성공');
 
       expect(badgeRunning?.style.color).toBe('var(--color-brand-hover)');
       expect(badgeRunning?.style.borderColor).toBe('var(--color-brand-hover)');
       expect(badgeRunning?.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(badgeRunning.textContent).toBe('실행 중');
 
       expect(badgeFailed?.style.color).toBe('var(--color-status-offline)');
       expect(badgeFailed?.style.borderColor).toBe('var(--color-status-offline)');
       expect(badgeFailed?.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(badgeFailed.textContent).toBe('실패');
 
       expect(badgeCancelled?.style.color).toBe('var(--color-status-neutral)');
       expect(badgeCancelled?.style.borderColor).toBe('var(--color-border-strong)');
       expect(badgeCancelled?.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(badgeCancelled.textContent).toBe('취소됨');
 
       expect(badgeRecovering?.style.color).toBe('var(--color-status-active)');
       expect(badgeRecovering?.style.borderColor).toBe('var(--color-status-active)');
       expect(badgeRecovering?.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(badgeRecovering.textContent).toBe('복구 중');
 
       expect(badgeAwaiting?.style.color).toBe('var(--color-status-degraded)');
       expect(badgeAwaiting?.style.borderColor).toBe('var(--color-status-degraded)');
       expect(badgeAwaiting?.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(badgeAwaiting.textContent).toBe('승인 대기');
 
-      expect(badgeDraft?.style.color).toBe('var(--color-text-muted)');
+      expect(badgeDraft?.style.color).toBe('var(--color-text-secondary)');
       expect(badgeDraft?.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(badgeDraft?.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(badgeDraft.textContent).toBe('초안');
 
-      expect(badgeValidated?.style.color).toBe('var(--color-brand-primary)');
-      expect(badgeValidated?.style.borderColor).toBe('var(--color-brand-primary)');
+      expect(badgeValidated?.style.color).toBe('var(--color-text-secondary)');
+      expect(badgeValidated?.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(badgeValidated?.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(badgeValidated.textContent).toBe('검증됨');
 
-      expect(badgePlanned?.style.color).toBe('var(--color-status-active)');
-      expect(badgePlanned?.style.borderColor).toBe('var(--color-status-active)');
+      expect(badgePlanned?.style.color).toBe('var(--color-text-secondary)');
+      expect(badgePlanned?.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(badgePlanned?.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(badgePlanned.textContent).toBe('계획 수립');
 
-      expect(badgeScheduled?.style.color).toBe('var(--color-brand-hover)');
-      expect(badgeScheduled?.style.borderColor).toBe('var(--color-brand-hover)');
+      expect(badgeScheduled?.style.color).toBe('var(--color-text-secondary)');
+      expect(badgeScheduled?.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(badgeScheduled?.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(badgeScheduled.textContent).toBe('스케줄됨');
 
-      expect(badgeVerifying?.style.color).toBe('var(--color-brand-primary)');
-      expect(badgeVerifying?.style.borderColor).toBe('var(--color-brand-primary)');
+      expect(badgeVerifying?.style.color).toBe('var(--color-text-secondary)');
+      expect(badgeVerifying?.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(badgeVerifying?.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(badgeVerifying.textContent).toBe('결과 검증');
 
-      // Strict distinction assertions
+      // Opacity guard on all badges: must not have degraded opacity (kills C1)
+      const allBadges = [
+        badgeDraft, badgeValidated, badgePlanned, badgeAwaiting,
+        badgeScheduled, badgeRunning, badgeVerifying, badgeRecovering,
+        badgeSucceeded, badgeFailed, badgeCancelled
+      ];
+      for (const b of allBadges) {
+        expect(b.style.opacity || '1', 'Badge must not have degraded opacity').toBe('1');
+      }
+
+      // Strict distinction assertions: recovering and running tokens must be UNIQUE among all 11 states (F2)
+      expect(badgeRecovering.style.color, 'recovering must not collide with planned').not.toBe(badgePlanned.style.color);
+      expect(badgeRunning.style.color, 'running must not collide with scheduled').not.toBe(badgeScheduled.style.color);
+      expect(badgeRecovering.style.color, 'recovering must not collide with running').not.toBe(badgeRunning.style.color);
+      expect(badgeRecovering.style.color, 'recovering must not collide with succeeded').not.toBe(badgeSucceeded.style.color);
       expect(badgeSucceeded.style.color, 'Succeeded and failed must not have identical tokens').not.toBe(badgeFailed.style.color);
       expect(badgeSucceeded.style.color, 'Succeeded and running must not have identical tokens').not.toBe(badgeRunning.style.color);
       expect(badgeFailed.style.color, 'Failed and cancelled must not have identical tokens').not.toBe(badgeCancelled.style.color);
-      expect(badgeRecovering.style.color, 'Recovering and succeeded must not have identical tokens').not.toBe(badgeSucceeded.style.color);
       expect(badgeAwaiting.style.color, 'Awaiting approval and succeeded must not have identical tokens').not.toBe(badgeSucceeded.style.color);
+      expect(badgeCancelled.style.borderColor, 'cancelled border must use border-strong').toBe('var(--color-border-strong)');
 
-      // Contrast assertions on subtle background
+      const preparationBadges = [badgeDraft, badgeValidated, badgePlanned, badgeScheduled, badgeVerifying];
+      for (const pb of preparationBadges) {
+        expect(pb.style.color, 'Preparation state must not collide with recovering').not.toBe('var(--color-status-active)');
+        expect(pb.style.color, 'Preparation state must not collide with running').not.toBe('var(--color-brand-hover)');
+      }
+
+      // Contrast assertions for all 11 states on subtle background (both text and border)
       const bSuccFg = helperExtractVar(badgeSucceeded.style.color);
       const bFailFg = helperExtractVar(badgeFailed.style.color);
       const bRunFg = helperExtractVar(badgeRunning.style.color);
       const bRecFg = helperExtractVar(badgeRecovering.style.color);
       const bCancFg = helperExtractVar(badgeCancelled.style.color);
       const bAwFg = helperExtractVar(badgeAwaiting.style.color);
+      const bDraftFg = helperExtractVar(badgeDraft.style.color);
+      const bValFg = helperExtractVar(badgeValidated.style.color);
+      const bPlanFg = helperExtractVar(badgePlanned.style.color);
+      const bSchedFg = helperExtractVar(badgeScheduled.style.color);
+      const bVerFg = helperExtractVar(badgeVerifying.style.color);
 
       expect(getContrast(lightTokens[bSuccFg], lightTokens['--color-bg-subtle']), 'Succeeded badge light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
       expect(getContrast(darkTokens[bSuccFg], darkTokens['--color-bg-subtle']), 'Succeeded badge dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
@@ -4227,6 +4268,52 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(getContrast(darkTokens[bCancFg], darkTokens['--color-bg-subtle']), 'Cancelled badge dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
       expect(getContrast(lightTokens[bAwFg], lightTokens['--color-bg-subtle']), 'Awaiting approval badge light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
       expect(getContrast(darkTokens[bAwFg], darkTokens['--color-bg-subtle']), 'Awaiting approval badge dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[bDraftFg], lightTokens['--color-bg-subtle']), 'Draft badge light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[bDraftFg], darkTokens['--color-bg-subtle']), 'Draft badge dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[bValFg], lightTokens['--color-bg-subtle']), 'Validated badge light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[bValFg], darkTokens['--color-bg-subtle']), 'Validated badge dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[bPlanFg], lightTokens['--color-bg-subtle']), 'Planned badge light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[bPlanFg], darkTokens['--color-bg-subtle']), 'Planned badge dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[bSchedFg], lightTokens['--color-bg-subtle']), 'Scheduled badge light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[bSchedFg], darkTokens['--color-bg-subtle']), 'Scheduled badge dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[bVerFg], lightTokens['--color-bg-subtle']), 'Verifying badge light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[bVerFg], darkTokens['--color-bg-subtle']), 'Verifying badge dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      // Border contrast assertions for all 11 states
+      const bSuccBd = helperExtractVar(badgeSucceeded.style.borderColor);
+      const bFailBd = helperExtractVar(badgeFailed.style.borderColor);
+      const bRunBd = helperExtractVar(badgeRunning.style.borderColor);
+      const bRecBd = helperExtractVar(badgeRecovering.style.borderColor);
+      const bCancBd = helperExtractVar(badgeCancelled.style.borderColor);
+      const bAwBd = helperExtractVar(badgeAwaiting.style.borderColor);
+      const bDraftBd = helperExtractVar(badgeDraft.style.borderColor);
+      const bValBd = helperExtractVar(badgeValidated.style.borderColor);
+      const bPlanBd = helperExtractVar(badgePlanned.style.borderColor);
+      const bSchedBd = helperExtractVar(badgeScheduled.style.borderColor);
+      const bVerBd = helperExtractVar(badgeVerifying.style.borderColor);
+
+      expect(getContrast(lightTokens[bSuccBd], lightTokens['--color-bg-subtle']), 'Succeeded border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[bSuccBd], darkTokens['--color-bg-subtle']), 'Succeeded border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(lightTokens[bFailBd], lightTokens['--color-bg-subtle']), 'Failed border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[bFailBd], darkTokens['--color-bg-subtle']), 'Failed border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(lightTokens[bRunBd], lightTokens['--color-bg-subtle']), 'Running border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[bRunBd], darkTokens['--color-bg-subtle']), 'Running border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(lightTokens[bRecBd], lightTokens['--color-bg-subtle']), 'Recovering border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[bRecBd], darkTokens['--color-bg-subtle']), 'Recovering border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(lightTokens[bCancBd], lightTokens['--color-bg-subtle']), 'Cancelled border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[bCancBd], darkTokens['--color-bg-subtle']), 'Cancelled border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(lightTokens[bAwBd], lightTokens['--color-bg-subtle']), 'Awaiting approval border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[bAwBd], darkTokens['--color-bg-subtle']), 'Awaiting approval border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(lightTokens[bDraftBd], lightTokens['--color-bg-subtle']), 'Draft border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[bDraftBd], darkTokens['--color-bg-subtle']), 'Draft border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(lightTokens[bValBd], lightTokens['--color-bg-subtle']), 'Validated border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[bValBd], darkTokens['--color-bg-subtle']), 'Validated border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(lightTokens[bPlanBd], lightTokens['--color-bg-subtle']), 'Planned border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[bPlanBd], darkTokens['--color-bg-subtle']), 'Planned border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(lightTokens[bSchedBd], lightTokens['--color-bg-subtle']), 'Scheduled border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[bSchedBd], darkTokens['--color-bg-subtle']), 'Scheduled border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(lightTokens[bVerBd], lightTokens['--color-bg-subtle']), 'Verifying border light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[bVerBd], darkTokens['--color-bg-subtle']), 'Verifying border dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
 
       // 1-e. Shard and Parent badges
       const shardBadge = container.querySelector('[data-testid="run-shard-badge-run_succ_01"]') as HTMLElement;
@@ -4247,6 +4334,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(releaseBadge.style.color).toBe('var(--color-status-degraded)');
       expect(releaseBadge.style.borderColor).toBe('var(--color-status-degraded)');
       expect(releaseBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(releaseBadge.textContent).toContain('⏳');
+      expect(releaseBadge.textContent).toContain('자원 반환 대기');
 
       // 1-g. Link button & stateUpdatedAt
       const selectBtn = container.querySelector('[data-testid="run-select-btn-run_draft_01"]') as HTMLElement;
@@ -4519,6 +4608,41 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
         ts.forEachChild(node, child => traverseJsx(child, currentBgTokens, currentFgTokens, currentOpacity));
       }
 
+      function checkConfigTables(node: ts.Node) {
+        if (ts.isVariableDeclaration(node) && node.name.getText(sf) === 'RUN_STATE_CONFIG' && node.initializer && ts.isObjectLiteralExpression(node.initializer)) {
+          for (const prop of node.initializer.properties) {
+            if (ts.isPropertyAssignment(prop) && ts.isObjectLiteralExpression(prop.initializer)) {
+              totalStyleAttrs++;
+              let bgToken: string | null = null;
+              let fgToken: string | null = null;
+              let borderToken: string | null = null;
+              for (const subProp of prop.initializer.properties) {
+                if (ts.isPropertyAssignment(subProp)) {
+                  const pName = subProp.name.getText(sf);
+                  const text = subProp.initializer.getText(sf);
+                  const m = text.match(/var\((--color-[a-z0-9-]+)\)/);
+                  if (m) {
+                    if (pName === 'bg') bgToken = m[1];
+                    if (pName === 'color') fgToken = m[1];
+                    if (pName === 'border') borderToken = m[1];
+                  }
+                }
+              }
+              if (bgToken && fgToken) {
+                checkedObjects++;
+                checkPair(bgToken, fgToken, prop.initializer.getStart(sf), 1.0);
+              }
+              if (bgToken && borderToken) {
+                checkedBorderObjects++;
+                checkBorderPair(bgToken, borderToken, prop.initializer.getStart(sf), 1.0);
+              }
+            }
+          }
+        }
+        ts.forEachChild(node, checkConfigTables);
+      }
+
+      checkConfigTables(sf);
       traverseJsx(sf, ['--color-bg-canvas'], ['--color-text-primary'], 1.0);
 
       return {
@@ -4534,13 +4658,13 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
 
     const runListStats = analyzeFile('features/runs/RunList.tsx');
-    expect(runListStats.totalStyleAttrs, 'Total style attributes in RunList must be exactly 42').toBe(42);
-    expect(runListStats.checkedObjects, 'Explicit style objects in RunList must be exactly 8').toBe(8);
-    expect(runListStats.checkedPairs, 'Evaluated pairs in RunList must be exactly 25').toBe(25);
+    expect(runListStats.totalStyleAttrs, 'Total style attributes in RunList must be exactly 53').toBe(53);
+    expect(runListStats.checkedObjects, 'Explicit style objects in RunList must be exactly 19').toBe(19);
+    expect(runListStats.checkedPairs, 'Evaluated pairs in RunList must be exactly 36').toBe(36);
     expect(runListStats.unboundColorObjects, 'Unbound color objects in RunList must be exactly 14').toBe(14);
-    expect(runListStats.coveredColorObjects, 'Total covered color objects in RunList must be exactly 22').toBe(22);
-    expect(runListStats.checkedBorderObjects, 'Border objects in RunList must be exactly 12').toBe(12);
-    expect(runListStats.checkedBorderPairs, 'Border pairs in RunList must be exactly 13').toBe(13);
+    expect(runListStats.coveredColorObjects, 'Total covered color objects in RunList must be exactly 33').toBe(33);
+    expect(runListStats.checkedBorderObjects, 'Border objects in RunList must be exactly 23').toBe(23);
+    expect(runListStats.checkedBorderPairs, 'Border pairs in RunList must be exactly 24').toBe(24);
     expect(runListStats.violations, `RunList violations:\n${runListStats.violations.join('\n')}`).toEqual([]);
   });
 
@@ -4979,7 +5103,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
 
     // Exact count verification for var(--color-border-subtle)
-    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 384').toBe(384);
+    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 388').toBe(388);
     expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 26').toBe(26);
 
     // Fail-closed check 3: Total files with color literals must not exceed baseline file count

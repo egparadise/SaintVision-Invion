@@ -39,74 +39,116 @@ atexit.register(cleanup)
 
 MUTANTS = [
     {
-        'id': 'M1',
-        'name': 'RunList: status succeeded badge token swapped to brand-hover (semantic regression)',
-        'target': "  succeeded: {\n    label: '성공',\n    color: 'var(--color-status-online)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-status-online)',\n  },",
-        'replacement': "  succeeded: {\n    label: '성공',\n    color: 'var(--color-brand-hover)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-brand-hover)',\n  },",
-        'expected_guard': 'Test 9i (DOM assertion: badgeSucceeded.style.color must be var(--color-status-online))',
+        'id': 'M1 (A1)',
+        'name': 'RunList: stale warning banner bg -> status-offline (fg==bg collision)',
+        'target': "          style={{\n            padding: '12px 16px',\n            marginBottom: '16px',\n            backgroundColor: 'var(--color-bg-subtle)',\n            border: '1px solid var(--color-status-offline)',\n            borderRadius: 'var(--radius-md)',\n            color: 'var(--color-status-offline)',",
+        'replacement': "          style={{\n            padding: '12px 16px',\n            marginBottom: '16px',\n            backgroundColor: 'var(--color-status-offline)',\n            border: '1px solid var(--color-status-offline)',\n            borderRadius: 'var(--radius-md)',\n            color: 'var(--color-status-offline)',",
+        'expected_guard': 'Test 9i-2 / Test 9i (1:1 collision between bg and fg)',
     },
     {
-        'id': 'M2',
-        'name': 'RunList: status running badge token swapped to online (semantic regression)',
-        'target': "  running: {\n    label: '실행 중',\n    color: 'var(--color-brand-hover)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-brand-hover)',\n  },",
-        'replacement': "  running: {\n    label: '실행 중',\n    color: 'var(--color-status-online)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-status-online)',\n  },",
-        'expected_guard': 'Test 9i (DOM assertion: Succeeded and running must not have identical tokens)',
+        'id': 'M2 (A2)',
+        'name': 'RunList: RUN_STATE_CONFIG.validated.bg -> text-secondary (fg==bg collision)',
+        'target': "  validated: {\n    label: '검증됨',\n    color: 'var(--color-text-secondary)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-border-subtle)',\n  },",
+        'replacement': "  validated: {\n    label: '검증됨',\n    color: 'var(--color-text-secondary)',\n    bg: 'var(--color-text-secondary)',\n    border: 'var(--color-border-subtle)',\n  },",
+        'expected_guard': 'Test 9i-2 (AST guard: 1:1 collision) & Test 9i (DOM bg & contrast check)',
     },
     {
-        'id': 'M3',
-        'name': 'RunList: status recovering badge token swapped to online (semantic regression)',
+        'id': 'M3 (A3)',
+        'name': 'RunList: RUN_STATE_CONFIG.draft.bg -> text-muted (illegitimate text token as background)',
+        'target': "  draft: {\n    label: '초안',\n    color: 'var(--color-text-secondary)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-border-subtle)',\n  },",
+        'replacement': "  draft: {\n    label: '초안',\n    color: 'var(--color-text-secondary)',\n    bg: 'var(--color-text-muted)',\n    border: 'var(--color-border-subtle)',\n  },",
+        'expected_guard': 'Test 9i-2 (AST guard: text token background) & Test 9i (DOM bg & contrast check)',
+    },
+    {
+        'id': 'M4 (A4)',
+        'name': 'RunList: table header tr bg -> text-secondary (JSX text token as background)',
+        'target': "            <tr style={{ backgroundColor: 'var(--color-bg-subtle)', borderBottom: '1px solid var(--color-border-subtle)' }}>",
+        'replacement': "            <tr style={{ backgroundColor: 'var(--color-text-secondary)', borderBottom: '1px solid var(--color-border-subtle)' }}>",
+        'expected_guard': 'Test 9i-2 (AST guard: Illegitimate background token derived from text token)',
+    },
+    {
+        'id': 'M5 (B1)',
+        'name': 'RunList: RUN_STATE_CONFIG.draft.border -> bg-subtle (border==bg collision)',
+        'target': "  draft: {\n    label: '초안',\n    color: 'var(--color-text-secondary)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-border-subtle)',\n  },",
+        'replacement': "  draft: {\n    label: '초안',\n    color: 'var(--color-text-secondary)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-bg-subtle)',\n  },",
+        'expected_guard': 'Test 9i-2 (AST guard: Identical border-background token collision) & Test 9i (DOM)',
+    },
+    {
+        'id': 'M6 (B2)',
+        'name': 'RunList: ALL pill selected border -> brand-primary-bg (border==bg collision)',
+        'target': "            border: selectedFilter === 'ALL' ? '1px solid var(--color-brand-primary-fg)' : '1px solid var(--color-border-subtle)',\n            backgroundColor: selectedFilter === 'ALL' ? 'var(--color-brand-primary-bg)' : 'var(--color-bg-subtle)',",
+        'replacement': "            border: selectedFilter === 'ALL' ? '1px solid var(--color-brand-primary-bg)' : '1px solid var(--color-border-subtle)',\n            backgroundColor: selectedFilter === 'ALL' ? 'var(--color-brand-primary-bg)' : 'var(--color-bg-subtle)',",
+        'expected_guard': 'Test 9i-2 (AST guard: border-bg collision) / Test 9i',
+    },
+    {
+        'id': 'M7 (C1)',
+        'name': 'RunList: status badge opacity degraded to 0.4',
+        'target': "                      <span\n                        data-testid={`run-status-badge-${run.id}`}\n                        style={{\n                          display: 'inline-block',\n                          padding: '2px 8px',\n                          borderRadius: 'var(--radius-sm)',\n                          fontSize: '0.75rem',\n                          fontWeight: 600,\n                          color: cfg.color,\n                          backgroundColor: cfg.bg,\n                          border: `1px solid ${cfg.border}`,\n                        }}",
+        'replacement': "                      <span\n                        data-testid={`run-status-badge-${run.id}`}\n                        style={{\n                          display: 'inline-block',\n                          padding: '2px 8px',\n                          borderRadius: 'var(--radius-sm)',\n                          fontSize: '0.75rem',\n                          fontWeight: 600,\n                          opacity: 0.4,\n                          color: cfg.color,\n                          backgroundColor: cfg.bg,\n                          border: `1px solid ${cfg.border}`,\n                        }}",
+        'expected_guard': 'Test 9i (DOM assertion: Badge must not have degraded opacity)',
+    },
+    {
+        'id': 'M8 (C2)',
+        'name': 'RunList: stale warning banner opacity degraded to 0.5',
+        'target': "          style={{\n            padding: '12px 16px',\n            marginBottom: '16px',\n            backgroundColor: 'var(--color-bg-subtle)',\n            border: '1px solid var(--color-status-offline)',\n            borderRadius: 'var(--radius-md)',\n            color: 'var(--color-status-offline)',\n            fontSize: '0.8125rem',\n          }}",
+        'replacement': "          style={{\n            padding: '12px 16px',\n            marginBottom: '16px',\n            backgroundColor: 'var(--color-bg-subtle)',\n            border: '1px solid var(--color-status-offline)',\n            borderRadius: 'var(--radius-md)',\n            color: 'var(--color-status-offline)',\n            fontSize: '0.8125rem',\n            opacity: 0.5,\n          }}",
+        'expected_guard': 'Test 9i-2 (AST guard: Light/Dark text contrast < 4.5:1 with opacity)',
+    },
+    {
+        'id': 'M9 (D1)',
+        'name': 'RunList: decoy comment with legacy hex literal',
+        'target': "                    <div style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--color-status-offline)', marginBottom: '6px' }}>",
+        'replacement': "                    <div style={{ fontSize: '1rem', fontWeight: 600, color: '#fca5a5' /* var(--color-status-offline) */, marginBottom: '6px' }}>",
+        'expected_guard': 'Test 10 (Fail-Closed Multiset Inventory: unexpected raw hex literal)',
+    },
+    {
+        'id': 'M10 (E1)',
+        'name': 'RunList: recovering color reverted to legacy literal #f97316',
         'target': "  recovering: {\n    label: '복구 중',\n    color: 'var(--color-status-active)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-status-active)',\n  },",
-        'replacement': "  recovering: {\n    label: '복구 중',\n    color: 'var(--color-status-online)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-status-online)',\n  },",
-        'expected_guard': 'Test 9i (DOM assertion: Recovering and succeeded must not have identical tokens)',
+        'replacement': "  recovering: {\n    label: '복구 중',\n    color: '#f97316',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-status-active)',\n  },",
+        'expected_guard': 'Test 10 (Fail-Closed Multiset Inventory: #f97316 unexpected literal)',
     },
     {
-        'id': 'M4',
-        'name': 'RunList: status failed badge token swapped to online (semantic regression)',
+        'id': 'M11 (E2)',
+        'name': 'RunList: retry button bg reverted to legacy literal #ef4444',
+        'target': "                          backgroundColor: 'var(--color-status-offline-bg)',",
+        'replacement': "                          backgroundColor: '#ef4444',",
+        'expected_guard': 'Test 10 (Fail-Closed Multiset Inventory: #ef4444 unexpected literal)',
+    },
+    {
+        'id': 'M12 (F1)',
+        'name': 'RunList: recovering token collapsed to running token',
+        'target': "  recovering: {\n    label: '복구 중',\n    color: 'var(--color-status-active)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-status-active)',\n  },",
+        'replacement': "  recovering: {\n    label: '복구 중',\n    color: 'var(--color-brand-hover)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-brand-hover)',\n  },",
+        'expected_guard': 'Test 9i (DOM assertion: badgeRecovering.style.color must be var(--color-status-active))',
+    },
+    {
+        'id': 'M13 (F2)',
+        'name': 'RunList: failed token collapsed to cancelled token',
         'target': "  failed: {\n    label: '실패',\n    color: 'var(--color-status-offline)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-status-offline)',\n  },",
-        'replacement': "  failed: {\n    label: '실패',\n    color: 'var(--color-status-online)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-status-online)',\n  },",
-        'expected_guard': 'Test 9i (DOM assertion: Succeeded and failed must not have identical tokens)',
-    },
-    {
-        'id': 'M5',
-        'name': 'RunList: status cancelled badge token swapped to offline (semantic regression)',
-        'target': "  cancelled: {\n    label: '취소됨',\n    color: 'var(--color-status-neutral)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-border-strong)',\n  },",
-        'replacement': "  cancelled: {\n    label: '취소됨',\n    color: 'var(--color-status-offline)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-status-offline)',\n  },",
+        'replacement': "  failed: {\n    label: '실패',\n    color: 'var(--color-status-neutral)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-border-strong)',\n  },",
         'expected_guard': 'Test 9i (DOM assertion: Failed and cancelled must not have identical tokens)',
     },
     {
-        'id': 'M6',
-        'name': 'RunList: re-injects raw hex literal (fail-closed multiset inventory breach)',
-        'target': 'export const RunList: React.FC<RunListProps> = ({',
-        'replacement': "const _decoyRunList = '#ef4444';\nexport const RunList: React.FC<RunListProps> = ({",
-        'expected_guard': 'Test 10 (Fail-Closed Multiset Inventory: RunList multiset must be empty)',
+        'id': 'M14 (G1)',
+        'name': 'RunList: badge text label {cfg.label} removed',
+        'target': "                        {cfg.label}\n                      </span>",
+        'replacement': "                        {/* label removed */}\n                      </span>",
+        'expected_guard': 'Test 9i (DOM assertion: badgeDraft.textContent must be 초안)',
     },
     {
-        'id': 'M7',
-        'name': 'RunList: missing testid regression (removes run-status-badge)',
-        'target': "                      <span\n                        data-testid={`run-status-badge-${run.id}`}\n                        style={{",
-        'replacement': "                      <span\n                        style={{",
-        'expected_guard': 'Test 9i (DOM assertion: badgeSucceeded must render: expected null not to be null)',
+        'id': 'M15 (G2)',
+        'name': 'RunList: ⏳ icon removed from resourceReleasePending badge',
+        'target': "                          ⏳ 자원 반환 대기 (ADR-040)\n                        </span>",
+        'replacement': "                          자원 반환 대기 (ADR-040)\n                        </span>",
+        'expected_guard': 'Test 9i (DOM assertion: releaseBadge.textContent must contain ⏳)',
     },
     {
-        'id': 'M8',
-        'name': 'RunList: 1:1 border collision on table container',
-        'target': "        style={{\n          backgroundColor: 'var(--color-bg-surface)',\n          borderRadius: 'var(--radius-lg)',\n          border: '1px solid var(--color-border-subtle)',",
-        'replacement': "        style={{\n          backgroundColor: 'var(--color-bg-surface)',\n          borderRadius: 'var(--radius-lg)',\n          border: '1px solid var(--color-bg-surface)',",
-        'expected_guard': 'Test 9i-2 (AST guard: Identical border-background token collision detected)',
-    },
-    {
-        'id': 'M9',
-        'name': 'RunList: completedAt failed branch swapped to online (semantic collapse)',
-        'target': "                    {run.completedAt ? (\n                      <div data-testid={`run-completed-at-${run.id}`} style={{ fontSize: '0.75rem', color: run.state === 'succeeded' ? 'var(--color-status-online)' : 'var(--color-status-offline)', marginTop: '2px' }}>",
-        'replacement': "                    {run.completedAt ? (\n                      <div data-testid={`run-completed-at-${run.id}`} style={{ fontSize: '0.75rem', color: run.state === 'succeeded' ? 'var(--color-status-online)' : 'var(--color-status-online)', marginTop: '2px' }}>",
-        'expected_guard': 'Test 9i (DOM assertion: Succeeded and failed completedAt must have distinct status tokens)',
-    },
-    {
-        'id': 'M10',
-        'name': 'RunList: resource release pending badge swapped to online (semantic violation)',
-        'target': "                        <span\n                          data-testid={`run-resource-release-badge-${run.id}`}\n                          style={{\n                            display: 'inline-block',\n                            padding: '1px 6px',\n                            borderRadius: 'var(--radius-sm)',\n                            fontSize: '0.6875rem',\n                            fontWeight: 600,\n                            color: 'var(--color-status-degraded)',\n                            backgroundColor: 'var(--color-bg-subtle)',\n                            border: '1px solid var(--color-status-degraded)',\n                          }}",
-        'replacement': "                        <span\n                          data-testid={`run-resource-release-badge-${run.id}`}\n                          style={{\n                            display: 'inline-block',\n                            padding: '1px 6px',\n                            borderRadius: 'var(--radius-sm)',\n                            fontSize: '0.6875rem',\n                            fontWeight: 600,\n                            color: 'var(--color-status-online)',\n                            backgroundColor: 'var(--color-bg-subtle)',\n                            border: '1px solid var(--color-status-online)',\n                          }}",
-        'expected_guard': 'Test 9i (DOM assertion: releaseBadge.style.color must be var(--color-status-degraded))',
+        'id': 'M16 (F2 Collide)',
+        'name': 'RunList: planned state token collapsed back to recovering (status-active)',
+        'target': "  planned: {\n    label: '계획 수립',\n    color: 'var(--color-text-secondary)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-border-subtle)',\n  },",
+        'replacement': "  planned: {\n    label: '계획 수립',\n    color: 'var(--color-status-active)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-status-active)',\n  },",
+        'expected_guard': 'Test 9i (DOM assertion: recovering must not collide with planned)',
     },
 ]
 
@@ -121,6 +163,28 @@ def run_test():
         errors='replace'
     )
     return res.returncode, res.stdout, res.stderr
+
+def extract_failure_reason(stdout, stderr):
+    import re
+    ansi_escape = re.compile(r'\x1b\[[0-9;]*[a-zA-Z]')
+    clean = ansi_escape.sub('', stdout + '\n' + stderr)
+    output_lines = clean.splitlines()
+    failed_block = False
+    for line in output_lines:
+        line_s = line.strip()
+        if 'Failed Tests' in line_s:
+            failed_block = True
+            continue
+        if failed_block:
+            if 'AssertionError' in line_s or 'violations' in line_s or 'Expected' in line_s or '1:1' in line_s or 'Illegitimate' in line_s or 'expected' in line_s or 'collide' in line_s:
+                return line_s
+    for line in output_lines:
+        line_s = line.strip()
+        if not line_s or line_s.startswith('↓') or line_s.startswith('✓') or line_s.startswith('RUN') or line_s.startswith('Test Files') or line_s.startswith('Tests'):
+            continue
+        if 'AssertionError' in line_s or 'violations' in line_s or '1:1' in line_s or 'Illegitimate' in line_s or 'exceeded' in line_s:
+            return line_s
+    return 'Exit code 1 (Vitest test assertion failure)'
 
 def main():
     print('================================================================================')
@@ -167,9 +231,7 @@ def main():
 
         if rc != 0:
             killed_count += 1
-            output_lines = (stdout + '\n' + stderr).splitlines()
-            err_snips = [line.strip() for line in output_lines if not line.strip().startswith('↓') and ('AssertionError' in line or 'violations' in line or 'FAIL' in line or 'Expected' in line or '1:1' in line or 'exceeded' in line or 'not registered' in line)]
-            snippet = err_snips[0] if err_snips else 'Exit code 1 (Vitest test assertion failure)'
+            snippet = extract_failure_reason(stdout, stderr)
             print(f'[{i:02d}/{total_count}] {mid}: KILLED in {elapsed:.1f}s -- {name}')
             print(f'         Reason: {snippet[:100]}')
             results.append((mid, name, 'KILLED', snippet[:100]))
