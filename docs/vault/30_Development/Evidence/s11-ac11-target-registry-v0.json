@@ -57,9 +57,9 @@
       "targetId": "s11-security-critical-high-zero-v0",
       "axis": "security-critical-high-zero",
       "sourceDocument": {
-        "commit": "c62cb671692479b0ee2bc2cc8a12d3c10587174b",
+        "commit": "75b724b2da61d4556f66028ef0d87186d5f48742",
         "path": "docs/vault/30_Development/Evidence/s11-security-allowlist-v0.json",
-        "blob": "ff2f9966956da677ebcdee92ec1de2292bd5ec52"
+        "blob": "20f761dce5d54bd7bc62e2cc3f33fcba7e844c9d"
       },
       "criteria": {},
       "requiredEnvironment": {

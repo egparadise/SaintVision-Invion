@@ -237,6 +237,7 @@ def create_app(
     unresolved_settings=None,
     object_stores=None,
     build_admission_entry=None,
+    build_preparations=None,
 ):
     @asynccontextmanager
     async def lifespan(api):
@@ -257,6 +258,8 @@ def create_app(
     # route dependency, request handler, CLI, or user-controlled payload.
     if build_admission_entry is not None:
         api.state.build_admission_entry = build_admission_entry
+    if build_preparations is not None:
+        api.state.build_preparations = build_preparations
     if business is not None:
         from .business_surface import BusinessDispatch
 
@@ -652,6 +655,43 @@ def create_app(
         return JSONResponse(
             control.approvals.review(identity.principal, project, approval_id),
             headers={"Cache-Control": "no-store"},
+        )
+
+    def build_preparation_service():
+        if build_preparations is None:
+            raise DomainError("RES-0006", "Build preparation authority is unavailable", 503, True)
+        return build_preparations
+
+    @api.post("/v1/projects/{project}/runs/{run_id}/builds", status_code=201)
+    async def prepare_build(project: str, run_id: str, request: Request,
+                            identity=Depends(authenticated)):
+        from .build_preparations import validate_build_input
+
+        data = await request.json()
+        validate_contract("ProjectId", project)
+        validate_contract("RunId", run_id)
+        validate_build_input("BuildPreparationInput", data)
+        return await run_in_threadpool(
+            build_preparation_service().prepare, identity.principal, project, run_id, data,
+            key=key(request),
+        )
+
+    @api.post("/v1/projects/{project}/runs/{run_id}/builds/{build_id}/enqueue")
+    async def enqueue_build(project: str, run_id: str, build_id: str, request: Request,
+                            identity=Depends(authenticated)):
+        from .build_preparations import validate_build_input
+
+        data = await request.json()
+        validate_contract("ProjectId", project)
+        validate_contract("RunId", run_id)
+        if not isinstance(build_id, str) or not __import__("re").fullmatch(
+            r"bld_[0-9A-HJKMNP-TV-Z]{26}", build_id
+        ):
+            raise DomainError("VAL-0003", "Invalid build identifier", 422)
+        validate_build_input("BuildEnqueueInput", data)
+        return await run_in_threadpool(
+            build_preparation_service().enqueue, identity.principal, project, run_id, build_id,
+            data, key=key(request),
         )
 
     @api.get("/v1/projects/{project}/approvals/{approval_id}")
@@ -1156,6 +1196,7 @@ def create_configured_app():
                 "modelVerifier",
                 "placementShortCommit",
                 "configurationReadiness",
+                "buildCapsuleProviderId",
             }
         ):
             raise ValueError()
@@ -1212,6 +1253,28 @@ def create_configured_app():
         object_stores = _configured_object_stores(workspace, remote_object_store)
         from .build_product_runtime import TrustedBuildAdmissionEntry
 
+        build_preparations = None
+        if "buildCapsuleProviderId" in settings:
+            from .build_execution import PRODUCT_ENABLE_SETTING, PRODUCT_ENABLE_VALUE
+            from .build_preparations import (
+                BuildPreparationService,
+                configured_build_plan_authority,
+            )
+
+            plan_authority = None
+            if os.environ.get(PRODUCT_ENABLE_SETTING) == PRODUCT_ENABLE_VALUE:
+                plan_authority = configured_build_plan_authority(
+                    database,
+                    trusted_file(os.environ["INV_WORKER_CONFIG"]),
+                    environment=os.environ,
+                )
+
+            build_preparations = BuildPreparationService(
+                database,
+                object_stores.resolve(settings["buildCapsuleProviderId"]),
+                plan_factory=plan_authority,
+            )
+
         return create_app(
             database,
             identity,
@@ -1222,6 +1285,7 @@ def create_configured_app():
             unresolved_settings=unresolved_settings,
             object_stores=object_stores,
             build_admission_entry=TrustedBuildAdmissionEntry(database),
+            build_preparations=build_preparations,
         )
     except Exception:
         raise RuntimeError(

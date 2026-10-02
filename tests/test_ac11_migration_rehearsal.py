@@ -41,7 +41,7 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
     assert {
         key
         for key in mapping
-        if key.startswith(("0047_", "0050_", "0053_", "0054_", "0055_", "0056_", "0057_", "0058_", "0059_", "0060_"))
+        if key.startswith(("0047_", "0050_", "0053_", "0054_", "0055_", "0056_", "0057_", "0058_", "0059_", "0060_", "0061_"))
     } == {
         "0047_audit_events_isolation",
         "0050_dataset_digest_lookup",
@@ -53,6 +53,7 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
         "0058_release_acceptance_resolver",
         "0059_build_execution_intents",
         "0060_build_execution_admissions",
+        "0061_build_preparations",
     }
     # 0054 (W3 seam, #213): the downgrade refuses while any version is bound to
     # a measurement or any measurement row exists, and otherwise drops only
@@ -78,6 +79,7 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
             "0058_release_acceptance_resolver",
             "0059_build_execution_intents",
             "0060_build_execution_admissions",
+            "0061_build_preparations",
         )
     )
     ordered = chain()
@@ -91,6 +93,7 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
         "0058_release_acceptance_resolver",
         "0059_build_execution_intents",
         "0060_build_execution_admissions",
+        "0061_build_preparations",
     ]
 
 

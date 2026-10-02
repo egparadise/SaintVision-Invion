@@ -113,6 +113,10 @@
     {
       "revision": "0060_build_execution_admissions",
       "expected": "PRESERVED"
+    },
+    {
+      "revision": "0061_build_preparations",
+      "expected": "PRESERVED"
     }
   ]
 }

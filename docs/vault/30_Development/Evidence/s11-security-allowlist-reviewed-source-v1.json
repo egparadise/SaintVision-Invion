@@ -1,0 +1,99 @@
+{
+  "schemaVersion": "1.0.0",
+  "verifiedAt": "2026-10-03T06:13:47+09:00",
+  "definerReview": {
+    "policyRevision": "0061_build_preparations",
+    "reviewDocument": "docs/vault/30_Development/S11_AC11_SEC_DEF_001_allowlist_보안검토_Codex.md",
+    "signatures": [
+      "public.apply_capability_offer(uuid, character, character, bigint)",
+      "public.apply_resource_offer(uuid, character, text, bigint)",
+      "public.business_admin_allowed(uuid, text, text)",
+      "public.business_execution_permission(uuid, text, character)",
+      "public.consume_discovery_issue_budget(uuid)",
+      "public.model_location_readiness(text[])",
+      "public.model_registry_snapshot(uuid, text, text)",
+      "public.model_version_measurement(text)",
+      "public.node_by_certificate(character)",
+      "public.project_kernel_link(uuid, text)",
+      "public.record_auth_denial(text, text, text, text, text, text, text, text, jsonb, text, text)",
+      "public.record_kernel_run_cancel(text, text, text, text, text)",
+      "public.run_committed_outputs(uuid, text)",
+      "public.subject_kernel_link(uuid, character)",
+      "public.workspace_input_state(uuid, text)"
+    ]
+  },
+  "secVf001": {
+    "runner": {
+      "path": "tools/run_vf_security_tests.py",
+      "blob": "d9a40a03829a1a314383f920909ca980d62368d8"
+    },
+    "workflow": {
+      "path": ".github/workflows/desktop-browser.yml",
+      "blob": "bb5708a803e6e8ceed2252a34fd895ace61fd0fe"
+    },
+    "nodeDependencyResolver": {
+      "path": "tools/node_dependent_tests.py",
+      "blob": "342b8d28db4be131d8c590d79c44c2e48635f4ec"
+    },
+    "testFiles": [
+      {
+        "path": "tests/integration/test_approval_browser.py",
+        "blob": "2617ad0376be3354a8b3fc482e9c7f8bd02e8cf5"
+      },
+      {
+        "path": "tests/integration/test_desktop_browser.py",
+        "blob": "44fc2e5e25544ec31d117a757e0bc8e6f3d20886"
+      },
+      {
+        "path": "tests/integration/test_studio_browser.py",
+        "blob": "433d7fc9ed6ef9f34d9aacf54a01e5cf5f5e1bfa"
+      }
+    ],
+    "requiredNodeIds": [
+      "tests/integration/test_approval_browser.py::test_actual_browser_quorum_snapshot_and_no_duplicate_vote",
+      "tests/integration/test_approval_browser.py::test_actual_browser_stale_run_and_revoked_review_are_rejected",
+      "tests/integration/test_desktop_browser.py::test_browser_real_catalogue_owner_scope_and_revocation",
+      "tests/integration/test_desktop_browser.py::test_browser_real_committed_model_and_current_permission",
+      "tests/integration/test_studio_browser.py::test_full_studio_login_project_approval_and_logout"
+    ],
+    "requiredCaseIdentitiesSha256": "2c9607e9d71244a90f1d6972ff0f34005b39d0f73019bc827b5cbd055a4903e9",
+    "expectedTests": {
+      "failure": 0,
+      "error": 0,
+      "skipped": 0,
+      "passed": 6
+    }
+  },
+  "rlsAcceptedDispositions": [
+    {
+      "role": "inv_app",
+      "table": "public.tenants",
+      "rules": ["E2", "E3", "E4", "E5"],
+      "disposition": "accepted-with-expiry",
+      "expiresAt": "2026-10-31T23:59:59+09:00",
+      "proof": "0001_s02_baseline intentionally grants tenant registry SELECT; cross-tenant slug/display_name enumeration remains a design observation and is not a permanent false positive."
+    },
+    {
+      "role": "inv_discovery_issuer",
+      "table": "public.tenants",
+      "rules": ["E2", "E3", "E4", "E5"],
+      "disposition": "false-positive-with-proof",
+      "proof": "0045_discovery_machine_credentials grants SELECT(tenant_id) only to validate tenant existence; no slug/display_name projection is granted."
+    },
+    {
+      "role": "inv_discovery_issuer_guard",
+      "table": "public.discovery_credential_issue_budgets",
+      "rules": ["E2"],
+      "disposition": "false-positive-with-proof",
+      "proof": "0045 defines a NOLOGIN guard used only by the budget trigger to enforce issuer-wide budgets."
+    },
+    {
+      "role": "inv_audit_reader",
+      "table": "public.audit_events",
+      "rules": ["E3", "E4", "E5"],
+      "disposition": "accepted-with-expiry",
+      "expiresAt": "2026-10-31T23:59:59+09:00",
+      "proof": "0047 deliberately gives the dedicated NOLOGIN, NOINHERIT, NOBYPASSRLS, memberless audit role SELECT-only access under USING (true), including NULL-tenant denials and cross-tenant audit rows. E3/E4/E5 are real privileged visibility, not false positives; expiry requires the membership and operational-reader grant boundary to be reviewed again."
+    }
+  ]
+}

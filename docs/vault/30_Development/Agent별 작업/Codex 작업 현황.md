@@ -1,15 +1,32 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.291"
+version: "1.0.301"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T01:47:14+09:00"
+updated: "2026-10-03T07:21:40+09:00"
 source_of_truth: "Git"
-active_card: "CARD-247 S08-BE build-request entry implementation (migration 0061)"
-active_card_status: "Card 241 (#338) approved by Claude r3 at 1b4df727 with exact-head Backend/Core green; Card 246 design (#341) conditionally approved; Card 247 implementation in progress on #338"
-active_card_next: "Open the Card 247 PR with real-PG end-to-end evidence and the census repin; product dispatch stays off by default and enablement follows the S08 runbook (#335)"
+active_card: "CARD-251 S08-BE fixed-SHA acceptance evidence"
+active_card_status: "Card 247 (#343) is approved (Claude backend r3, UI r2, r4 delta) with exact-head Backend 37066783664 and Core 37066783581 green, including the 0061 definer/allowlist rebind; Card 251 fixed-SHA acceptance evidence is PR #347 under Claude review"
+active_card_next: "Close the Claude r1 findings on #347 and record one hosted run_s08_acceptance dispatch at the fixed head; product dispatch stays off by default"
 ---
+
+## 2026-10-03 Card 247 — S08-BE BuildRequest product entry
+
+- Migration 0061, strict prepare/enqueue contracts, redacted approval review, quota and
+  idempotency reservation, source capsule authority, and post-scheduled admission factory
+  are implemented. Product dispatch remains exact-flag disabled by default.
+- Hosted catalogue observation `37039236221` regenerated the 0061 census to 160 tables with
+  the repository generator. The final review-head comment carries exact-head Backend/Core and
+  real-PG results; the product flag remains off and S08-BE completion is not claimed.
+- [[2026-10-03_02-05-18_KST_Card247_S08-BE_build_request_entry_Codex]].
+- Claude r2 follow-up routes trusted `worker.json` bytes through the canonical parser and adds
+  real-PG behavior guards for owner immutability, sixth-attempt `RES-0007/429`, and post-quorum
+  source drift (`VERIFY-0002`, expired/failed, audit 1, admission 0). The UI follow-up rejects
+  unknown kinds and undeclared build-summary keys, validates both digests, and renders only an
+  explicit redacted projection with shared-fixture API/DOM tests. The replacement exact-head hosted
+  runs (Backend `37066783664`, Core `37066783581`) and Claude r3/r4 later confirmed this head, and
+  Card 251 resumed as PR #347.
 
 ## 2026-10-02 Card 241 — S08-BE trusted admission entry and deployment worker service
 
@@ -25,6 +42,18 @@ active_card_next: "Open the Card 247 PR with real-PG end-to-end evidence and the
   merge evidence. S08-BE completion, flag enablement, and physical builder acceptance
   are not claimed.
 - [[2026-10-02_22-36-44_KST_Card241_S08-BE_admission_entry_worker_service_Codex]].
+## 2026-10-03 Card 246 — S08-BE BuildRequest product entry design
+
+- Measured the remaining upstream gap: existing product dispatch callers do not provide build
+  authority, so a user intent cannot yet become a server-owned BuildRequest/BuildPlan.
+- Selected authenticated prepare + enqueue routes which accept selectors only. Source, profile,
+  policy, provider, lease, evidence and approval actors remain server-owned and are revalidated.
+- The immutable pre-approval authority needs migration 0061; no migration or public contract is
+  implemented before Claude approves the design. Claude r1 approved the table need and the coordinator
+  assigned 0061; v1.1 moves lease/plan construction after quorum, defines source/profile authority,
+  keeps legacy review compatibility, and fixes idempotency/quota/flag-off semantics.
+- Design review: PR #341, reviewer Claude.
+- [[2026-10-03_01-06-39_KST_Card246_S08-BE_BuildRequest_제품_진입점_설계_Codex]].
 
 ## 2026-10-02 Card 232 — S08-BE product worker loop and trusted intent producer
 

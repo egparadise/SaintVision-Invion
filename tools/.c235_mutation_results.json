@@ -1,0 +1,282 @@
+{
+  "Z31": {
+    "id": "Z31",
+    "index": 31,
+    "desc": "fail-closed: bypass Object.hasOwn with plain indexing",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z32": {
+    "id": "Z32",
+    "index": 32,
+    "desc": "prototype key: hijack toString into candidate config",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z33": {
+    "id": "Z33",
+    "index": 33,
+    "desc": "fail-closed: fallback returns candidate color instead of unknown",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z34": {
+    "id": "Z34",
+    "index": 34,
+    "desc": "contract bypass: map out-of-contract 'admitted' to candidate",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z35": {
+    "id": "Z35",
+    "index": 35,
+    "desc": "contract bypass: state !== 'candidate' bypass dropping candidate to unknown",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z36": {
+    "id": "Z36",
+    "index": 36,
+    "desc": "named color: candidate badge border injected with yellow",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z37": {
+    "id": "Z37",
+    "index": 37,
+    "desc": "named color: error banner color injected with red",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, and PlacementSimulator style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations"
+  },
+  "Z38": {
+    "id": "Z38",
+    "index": 38,
+    "desc": "unknown label: remove 'UNKNOWN (' prefix",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z39": {
+    "id": "Z39",
+    "index": 39,
+    "desc": "unknown label: bypass UNKNOWN format and return raw uppercase",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z40": {
+    "id": "Z40",
+    "index": 40,
+    "desc": "case-insensitive lookup: toLowerCase() lookup bypass",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z25": {
+    "id": "Z25",
+    "index": 25,
+    "desc": "unverified badge: text mutated to '[시뮬레이션]'",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z26": {
+    "id": "Z26",
+    "index": 26,
+    "desc": "preview retry button: text mutated to '!'",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z27": {
+    "id": "Z27",
+    "index": 27,
+    "desc": "gpu button: outline: 'none' suppressing focus ring",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z28": {
+    "id": "Z28",
+    "index": 28,
+    "desc": "retry button: outline: 0 suppressing focus ring",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z29": {
+    "id": "Z29",
+    "index": 29,
+    "desc": "pool button: outlineWidth: '0px' suppressing focus ring",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, and PlacementSimulator style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations"
+  },
+  "Z30": {
+    "id": "Z30",
+    "index": 30,
+    "desc": "gpu button: outline: '0px' suppressing focus ring",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z1": {
+    "id": "Z1",
+    "index": 1,
+    "desc": "candidate config: fg==bg collision (color: var(--color-bg-subtle))",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z2": {
+    "id": "Z2",
+    "index": 2,
+    "desc": "candidate config: border==bg collision (border: var(--color-bg-subtle))",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z3": {
+    "id": "Z3",
+    "index": 3,
+    "desc": "pool button selected: fg==bg collision (color: brand-subtle)",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z4": {
+    "id": "Z4",
+    "index": 4,
+    "desc": "pool button selected: border==bg collision (border: brand-subtle)",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z5": {
+    "id": "Z5",
+    "index": 5,
+    "desc": "unverified badge: fg==bg collision (color: bg-subtle)",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z6": {
+    "id": "Z6",
+    "index": 6,
+    "desc": "unverified badge: border==bg collision (border: bg-subtle)",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z7": {
+    "id": "Z7",
+    "index": 7,
+    "desc": "gpu button selected: border==bg collision (border: brand-subtle)",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z8": {
+    "id": "Z8",
+    "index": 8,
+    "desc": "error banner: border==bg collision (border: bg-subtle)",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z9": {
+    "id": "Z9",
+    "index": 9,
+    "desc": "preview retry button: border==bg collision (border: bg-subtle)",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z10": {
+    "id": "Z10",
+    "index": 10,
+    "desc": "candidate config: text token as bg (bg: var(--color-text-primary))",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z11": {
+    "id": "Z11",
+    "index": 11,
+    "desc": "pool button selected: text token as bg (backgroundColor: text-primary)",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z12": {
+    "id": "Z12",
+    "index": 12,
+    "desc": "candidate badge: opacity degradation (opacity: 0.4)",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z13": {
+    "id": "Z13",
+    "index": 13,
+    "desc": "unverified badge: opacity degradation (opacity: 0.45)",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z14": {
+    "id": "Z14",
+    "index": 14,
+    "desc": "pool button: opacity degradation (opacity: 0.35)",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, and PlacementSimulator style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations"
+  },
+  "Z15": {
+    "id": "Z15",
+    "index": 15,
+    "desc": "candidate config: comment decoy with legacy hex",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z16": {
+    "id": "Z16",
+    "index": 16,
+    "desc": "unverified badge: comment decoy with legacy hex",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z17": {
+    "id": "Z17",
+    "index": 17,
+    "desc": "candidate config: revert to legacy #fbbf24",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z18": {
+    "id": "Z18",
+    "index": 18,
+    "desc": "error banner: revert text to legacy #fca5a5",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z19": {
+    "id": "Z19",
+    "index": 19,
+    "desc": "error banner: revert border to legacy #ef4444",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z20": {
+    "id": "Z20",
+    "index": 20,
+    "desc": "operator note: revert text to legacy #93c5fd",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, and PlacementSimulator style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations"
+  },
+  "Z21": {
+    "id": "Z21",
+    "index": 21,
+    "desc": "candidate config: degraded color collapsed to status-online",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z22": {
+    "id": "Z22",
+    "index": 22,
+    "desc": "preview error banner: offline color collapsed to status-online",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z23": {
+    "id": "Z23",
+    "index": 23,
+    "desc": "unverified badge: degraded color collapsed to status-online",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  },
+  "Z24": {
+    "id": "Z24",
+    "index": 24,
+    "desc": "candidate config: label mutated to '대기'",
+    "status": "KILLED",
+    "detail": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/acc09-contrast-tokens.test.tsx\u001b[2m > \u001b[22mACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory\u001b[2m > \u001b[22mACC-09 / Card 235: PlacementSimulator component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification"
+  }
+}
