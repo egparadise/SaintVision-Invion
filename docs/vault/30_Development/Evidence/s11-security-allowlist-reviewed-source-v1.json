@@ -1,23 +1,27 @@
 {
   "schemaVersion": "1.0.0",
   "verifiedAt": "2026-10-02T20:18:00+09:00",
-  "definerPolicySignatures": [
-    "public.apply_capability_offer(uuid, character, character, bigint)",
-    "public.apply_resource_offer(uuid, character, text, bigint)",
-    "public.business_admin_allowed(uuid, text, text)",
-    "public.business_execution_permission(uuid, text, character)",
-    "public.consume_discovery_issue_budget(uuid)",
-    "public.model_location_readiness(text[])",
-    "public.model_registry_snapshot(uuid, text, text)",
-    "public.model_version_measurement(text)",
-    "public.node_by_certificate(character)",
-    "public.project_kernel_link(uuid, text)",
-    "public.record_auth_denial(text, text, text, text, text, text, text, text, jsonb, text, text)",
-    "public.record_kernel_run_cancel(text, text, text, text, text)",
-    "public.run_committed_outputs(uuid, text)",
-    "public.subject_kernel_link(uuid, character)",
-    "public.workspace_input_state(uuid, text)"
-  ],
+  "definerReview": {
+    "policyRevision": "0059_build_execution_intents",
+    "reviewDocument": "docs/vault/30_Development/S11_AC11_SEC_DEF_001_allowlist_보안검토_Codex.md",
+    "signatures": [
+      "public.apply_capability_offer(uuid, character, character, bigint)",
+      "public.apply_resource_offer(uuid, character, text, bigint)",
+      "public.business_admin_allowed(uuid, text, text)",
+      "public.business_execution_permission(uuid, text, character)",
+      "public.consume_discovery_issue_budget(uuid)",
+      "public.model_location_readiness(text[])",
+      "public.model_registry_snapshot(uuid, text, text)",
+      "public.model_version_measurement(text)",
+      "public.node_by_certificate(character)",
+      "public.project_kernel_link(uuid, text)",
+      "public.record_auth_denial(text, text, text, text, text, text, text, text, jsonb, text, text)",
+      "public.record_kernel_run_cancel(text, text, text, text, text)",
+      "public.run_committed_outputs(uuid, text)",
+      "public.subject_kernel_link(uuid, character)",
+      "public.workspace_input_state(uuid, text)"
+    ]
+  },
   "secVf001": {
     "runner": {
       "path": "tools/run_vf_security_tests.py",
@@ -64,12 +68,7 @@
     {
       "role": "inv_app",
       "table": "public.tenants",
-      "rules": [
-        "E2",
-        "E3",
-        "E4",
-        "E5"
-      ],
+      "rules": ["E2", "E3", "E4", "E5"],
       "disposition": "accepted-with-expiry",
       "expiresAt": "2026-10-31T23:59:59+09:00",
       "proof": "0001_s02_baseline intentionally grants tenant registry SELECT; cross-tenant slug/display_name enumeration remains a design observation and is not a permanent false positive."
@@ -77,32 +76,21 @@
     {
       "role": "inv_discovery_issuer",
       "table": "public.tenants",
-      "rules": [
-        "E2",
-        "E3",
-        "E4",
-        "E5"
-      ],
+      "rules": ["E2", "E3", "E4", "E5"],
       "disposition": "false-positive-with-proof",
       "proof": "0045_discovery_machine_credentials grants SELECT(tenant_id) only to validate tenant existence; no slug/display_name projection is granted."
     },
     {
       "role": "inv_discovery_issuer_guard",
       "table": "public.discovery_credential_issue_budgets",
-      "rules": [
-        "E2"
-      ],
+      "rules": ["E2"],
       "disposition": "false-positive-with-proof",
       "proof": "0045 defines a NOLOGIN guard used only by the budget trigger to enforce issuer-wide budgets."
     },
     {
       "role": "inv_audit_reader",
       "table": "public.audit_events",
-      "rules": [
-        "E3",
-        "E4",
-        "E5"
-      ],
+      "rules": ["E3", "E4", "E5"],
       "disposition": "accepted-with-expiry",
       "expiresAt": "2026-10-31T23:59:59+09:00",
       "proof": "0047 deliberately gives the dedicated NOLOGIN, NOINHERIT, NOBYPASSRLS, memberless audit role SELECT-only access under USING (true), including NULL-tenant denials and cross-tenant audit rows. E3/E4/E5 are real privileged visibility, not false positives; expiry requires the membership and operational-reader grant boundary to be reviewed again."

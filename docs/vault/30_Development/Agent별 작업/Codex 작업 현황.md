@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.283"
+version: "1.0.290"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T21:30:50+09:00"
+updated: "2026-10-02T22:23:04+09:00"
 source_of_truth: "Git"
-active_card: "CARD-232 S08-BE product worker loop and trusted intent producer"
-active_card_status: "Approved by Claude r6 at 076f64ba with exact-head Backend 37003189569 and Core 37003189727 green (9 real-PG cases executed, 0 skipped); bounded fair promotion, retryable heartbeat backoff, census repinned to 157 tables; product flag remains off"
-active_card_next: "Land with its train; enabling product dispatch follows the S08 enablement runbook (#335) and stays a separate decision"
+active_card: "CARD-241 S08-BE admission entry and deploy worker service"
+active_card_status: "Card 232 (#331) and Card 237 (#333) approved with exact-head Backend/Core green; Card 241 in progress (admission entry from committed decisions, compose worker service, flag default off)"
+active_card_next: "Open Card 241 PR with real-PG end-to-end evidence; enabling product dispatch follows the S08 enablement runbook (#335); revisit inv_audit_reader dispositions before 2026-10-31"
 ---
 
 ## 2026-10-02 Card 232 — S08-BE product worker loop and trusted intent producer
