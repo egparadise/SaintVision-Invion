@@ -321,16 +321,6 @@ def test_stale_node_promotion_backs_off_and_recovers_without_quarantine(env):
             (env.tenant, env.node),
         )
     assert store.promote_next(env.tenant) is None
-    replay = store.record(
-        Principal(admission.tenant_id, admission.actor_id),
-        admission.request,
-        admission.plan,
-        admission.decision,
-        policy_version=admission.policy_version,
-        run_id=admission.run_id,
-        evidence_id=admission.evidence_id,
-    )
-    assert replay.status == "ready"
     with psycopg.connect(env.owner) as conn:
         retry = conn.execute(
             """SELECT status,last_error_code,retry_count,next_attempt_at > created_at
@@ -342,6 +332,17 @@ def test_stale_node_promotion_backs_off_and_recovers_without_quarantine(env):
             WHERE tenant_id=%s AND node_id=%s""",
             (env.tenant, env.node),
         )
+    replay = store.record(
+        Principal(admission.tenant_id, admission.actor_id),
+        admission.request,
+        admission.plan,
+        admission.decision,
+        policy_version=admission.policy_version,
+        run_id=admission.run_id,
+        evidence_id=admission.evidence_id,
+    )
+    assert replay.status == "ready"
+    with psycopg.connect(env.owner) as conn:
         conn.execute("SELECT pg_sleep(1.1)")
     assert retry == ("ready", "RES-0003", 1, True)
     assert store.promote_next(env.tenant) == admission
