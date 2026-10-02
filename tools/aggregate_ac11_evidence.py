@@ -33,13 +33,13 @@ DEFAULT_ALLOWLIST = (
     ROOT / ALLOWLIST_REPO_PATH
 )
 TARGET_REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
-TARGET_REGISTRY_BLOB = "0e5f4b6e48ddc39c003751f56de08aea73b027ab"
+TARGET_REGISTRY_BLOB = "f2e705f853d06fc805d96e9d858a8a3f08566454"
 ALLOWLIST_BLOB = "20f761dce5d54bd7bc62e2cc3f33fcba7e844c9d"
 ALLOWLIST_CANONICAL_SHA256 = "89a7cadf7f66ea219595ce6b769d5eb0b8588f0afd74451c6c0901e5538f463f"
 SCAN_ALLOWLIST_REPO_PATH = (
     "docs/vault/30_Development/Evidence/s11-security-dependency-sast-allowlist-v1.json"
 )
-SCAN_ALLOWLIST_BLOB = "8f1a36c6584413c4ea308f35853c1f675f280fe9"
+SCAN_ALLOWLIST_BLOB = "373835c9802ef16ef9f61ba44d4a5a852480ebfc"
 #: The importer that may write this axis's envelopes, pinned by path here and by blob in
 #: the reviewed allowlist above (#313 F-R3).
 SECURITY_IMPORTER_REPO_PATH = "tools/import_ac11_security_scan.py"
