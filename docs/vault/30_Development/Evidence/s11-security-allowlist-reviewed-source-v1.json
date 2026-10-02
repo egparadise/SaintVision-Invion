@@ -28,8 +28,8 @@
       "blob": "d9a40a03829a1a314383f920909ca980d62368d8"
     },
     "workflow": {
-      "path": ".github/workflows/ac11-security-scan.yml",
-      "blob": "2d933a6276fed023da3e652aeb794f0976c2b19c"
+      "path": ".github/workflows/desktop-browser.yml",
+      "blob": "bb5708a803e6e8ceed2252a34fd895ace61fd0fe"
     },
     "nodeDependencyResolver": {
       "path": "tools/node_dependent_tests.py",

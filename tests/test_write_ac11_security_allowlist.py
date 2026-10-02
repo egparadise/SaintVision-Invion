@@ -36,6 +36,17 @@ def test_committed_allowlist_is_exact_generated_output():
     assert len(expected["definerPolicySignatures"]) == 15
 
 
+def test_sec_vf_001_stays_bound_to_the_browser_lane_not_the_scan_lane():
+    """The scan producer and SEC-VF-001 browser proof are different authorities."""
+
+    source, policy, baseline = inputs()
+    generated = tool.build_allowlist(source, policy, baseline)
+    workflow = generated["secVf001"]["workflow"]
+    assert workflow["path"] == ".github/workflows/desktop-browser.yml"
+    assert workflow["path"] != ".github/workflows/ac11-security-scan.yml"
+    assert workflow["blob"] == tool.git_blob((ROOT / workflow["path"]).read_bytes())
+
+
 @pytest.mark.parametrize("mutation", ["missing", "extra", "duplicate", "revision"])
 def test_definer_review_cannot_shrink_expand_duplicate_or_change_revision(mutation):
     source, policy, baseline = inputs()

@@ -1445,7 +1445,7 @@ def test_the_reviewed_security_allowlist_exactly_describes_this_tree():
     assert reviewed == declared
 
     workflow = APPROVED_ALLOWLIST["secVf001"]["workflow"]
-    assert workflow["path"] == ".github/workflows/ac11-security-scan.yml"
+    assert workflow["path"] == ".github/workflows/desktop-browser.yml"
     assert workflow["blob"] == git("hash-object", workflow["path"])
     spec = APPROVED_ALLOWLIST["secVf001"]
     for row in [spec["runner"], spec["nodeDependencyResolver"], *spec["testFiles"]]:
