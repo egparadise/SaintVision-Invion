@@ -80,8 +80,9 @@ describe('RunDetail Attempts Tab - Kernel RunAttemptList Contract Binding (Claud
     const nodeSpan = container.querySelector('[data-testid="run-attempt-node-1"]');
     expect(nodeSpan?.textContent).toBe('nod_0123456789ABCDEFGHJKMNPQRS');
 
-    const exitSpan = container.querySelector('[data-testid="run-attempt-exit-1"]');
+    const exitSpan = container.querySelector('[data-testid="run-attempt-exit-1"]') as HTMLElement;
     expect(exitSpan?.textContent).toBe('0');
+    expect(exitSpan.style.color).toBe('var(--color-status-online)');
   });
 
   it('Scenario 2: Renders attempt with nullable startedAt: null and nodeId: null without crashing (contract richness)', async () => {
@@ -239,5 +240,50 @@ describe('RunDetail Attempts Tab - Kernel RunAttemptList Contract Binding (Claud
     expect(apiSpy).toHaveBeenCalledWith(
       '/v1/projects/prj_test_01/runs/run_test_01/attempts?after=10&limit=25'
     );
+  });
+
+  it('Scenario 9: Renders non-zero exit code with error status token and distinct styling', async () => {
+    const errorAttempts: RunAttemptList = {
+      source: 'execution-kernel',
+      runId: 'run_test_01',
+      attempts: [
+        {
+          attemptNumber: 1,
+          startedAt: '2026-09-21T12:00:00Z',
+          nodeId: 'nod_01JABCDEF01',
+          commandId: 'cmd_01',
+          stopReceiptId: 'rcpt_01',
+          exitCode: 137,
+          reason: 'killed_by_signal',
+          evidenceId: null,
+        },
+      ],
+      count: 1,
+      nextCursor: null,
+    };
+
+    vi.spyOn(client, 'apiClient').mockImplementation(async (url: string) => {
+      if (url.includes('/attempts')) {
+        return errorAttempts as any;
+      }
+      return { shards: [] } as any;
+    });
+
+    await act(async () => {
+      root.render(<RunDetail run={sampleRun} onBack={() => {}} />);
+    });
+
+    const attemptsTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('6. 시도 이력')
+    );
+    await act(async () => {
+      attemptsTabBtn!.click();
+    });
+
+    const exitSpan = container.querySelector('[data-testid="run-attempt-exit-1"]') as HTMLElement;
+    expect(exitSpan).not.toBeNull();
+    expect(exitSpan.textContent).toBe('137');
+    expect(exitSpan.style.color).toBe('var(--color-status-offline)');
+    expect(exitSpan.style.color).not.toBe('var(--color-status-online)');
   });
 });
