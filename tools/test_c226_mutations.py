@@ -95,11 +95,11 @@ MUTANTS = [
         'expected_guard': 'Test 10 (COLOR_LITERAL_MULTISET_BASELINE ratchet)',
     },
     {
-        'id': 'M9 (F1)',
-        'name': 'ModelStudioView: replica unhealthy color collapsed to status-online (healthy collision)',
-        'target': "  unhealthy: {\n    color: 'var(--color-status-offline)',",
-        'replacement': "  unhealthy: {\n    color: 'var(--color-status-online)',",
-        'expected_guard': 'Test 9l (replica state token uniqueness assertion)',
+        'id': 'M9 (F-R1 replica out-of-contract enum)',
+        'name': 'ModelStudioView: REPLICA_STATUS_CONFIG injects out-of-contract enum unhealthy',
+        'target': "  repairing: {\n    color: 'var(--color-status-degraded)',",
+        'replacement': "  unhealthy: {\n    color: 'var(--color-status-offline)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-status-offline)',\n    label: '이상',\n  },\n  repairing: {\n    color: 'var(--color-status-degraded)',",
+        'expected_guard': 'Test 9l (exact wire contract enum keys assertion for REPLICA_STATUS_CONFIG)',
     },
     {
         'id': 'M10 (F2)',
@@ -165,11 +165,11 @@ MUTANTS = [
         'expected_guard': 'Test 9l (computed outline-width 0 assertion)',
     },
     {
-        'id': 'M19 (M1 fail-open)',
-        'name': 'ModelStudioView: getModelAvailabilityConfig fail-open fallback returns observed',
-        'target': "  return {\n    color: 'var(--color-status-unknown)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-status-unknown)',\n    label: `알 수 없음 (${availability || 'UNKNOWN'}) · 실행 재검증 필요 (requiresExecutionRevalidation: true)`,\n  };",
-        'replacement': "  return MODEL_AVAILABILITY_CONFIG.observed;",
-        'expected_guard': 'Test 9l (availability unknown fallback fail-closed assertion)',
+        'id': 'M19 (F-R1 availability out-of-contract enum)',
+        'name': 'ModelStudioView: MODEL_AVAILABILITY_CONFIG injects out-of-contract enum observed',
+        'target': "export const MODEL_AVAILABILITY_CONFIG = {\n  unknown: {",
+        'replacement': "export const MODEL_AVAILABILITY_CONFIG = {\n  observed: {\n    color: 'var(--color-status-active)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-status-active)',\n    label: '관측됨',\n  },\n  unknown: {",
+        'expected_guard': 'Test 9l (exact wire contract enum keys assertion for MODEL_AVAILABILITY_CONFIG)',
     },
     {
         'id': 'M20 (M1 own-key)',
@@ -193,11 +193,11 @@ MUTANTS = [
         'expected_guard': 'Test 9l (replica missing uniqueness assertion)',
     },
     {
-        'id': 'M23 (L1 repair outline)',
+        'id': 'M23 (F-R2 repair outline)',
         'name': 'ModelStudioView: shard repair button outline ring suppressed with outline: none',
-        'target': "                          canRepair ? (\n                            <button",
-        'replacement': "                          canRepair ? (\n                            <button style={{ outline: 'none' }}",
-        'expected_guard': 'Test 9l (repair button focus ring assertion)',
+        'target': "                                padding: '4px 8px',\n                                fontSize: '0.75rem',",
+        'replacement': "                                outline: 'none',\n                                padding: '4px 8px',\n                                fontSize: '0.75rem',",
+        'expected_guard': 'Test 9j-2 (AST outline guard) & Test 9l (repair button focus ring assertion)',
     },
 ]
 
