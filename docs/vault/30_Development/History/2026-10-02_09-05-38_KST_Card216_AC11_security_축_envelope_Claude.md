@@ -6,7 +6,7 @@ status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-02T10:06:01+09:00"
+updated: "2026-10-02T10:31:52+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "097da87d"
@@ -169,3 +169,87 @@ producer의 `toolFiles`는 **검토된 allowlist의 세 pin을 그대로 복사*
 - **네 report가 다 오는 경로**는 그 producer들을 두는 카드의 것이고, 그때 `RECOMPUTABLE_THREAT_IDS`를 그 재계산과 함께 넓히는 것이 올바른 순서다.
 - **producer는 자기 pin을 검증하지 않는다** — allowlist의 세 pin을 복사하면서 tree와 같은지 확인하지 않는다. 그래서 `0f614152` 이후의 run들이 tree에 없는 blob을 pin으로 담은 report를 냈다 — 카드 216이 쓴 run `36943527856`이 그중 하나다. producer owner에게 남기는 관찰이고, 이 PR은 importer·집계기·래칫에서 fail-closed로 막았다.
 - **AC-11 축 정의는 그대로다.** `REQUIRED_AXES`·`REQUIRED_TARGET_BY_AXIS`·네 threat ID 집합 어느 것도 바꾸지 않았다. 추가한 것은 **더 엄격한 결속**뿐이다.
+
+## 8. #313 r2 — N1: 재계산기를 두 개 두지 않는다 (코드 `3ae6b316`)
+
+r1에서 F-R1·F-R3는 해소됐고, F-R2가 부분 해소로 남았다. 지적은 정확했다 — §7-2가 "직접
+재계산"이라고 쓴 것이 **count 두 개와 inventory 네 개의 길이**뿐이었다.
+
+### 8-1 재현 — 실제 artifact bytes로
+
+run `36951113824`의 실제 report payload를 변형하고 `payloadSha256`을 다시 계산해(위조자가
+해야 하는 일을 그대로) importer에 넣었다:
+
+| probe | 변형 | r1 importer | 지금 |
+|---|---|---|---|
+| 0 | 없음 | `MEASURED_PASS` | `MEASURED_PASS` |
+| 1 | HIGH finding row 한 줄 추가, `criticalCount`·`highCount`는 0 유지 | **`MEASURED_PASS`** | **거부** — `counts, summary-finding-counts` |
+| 2 | `scannedPythonFiles: []`, bandit `scannedFileCount: 0`, `auditedDependencies: []`, pip-audit `dependencyCount: 0`, 두 exit 0 | **`MEASURED_PASS`** | **거부** — `audited-dependencies, scanned-python-files` |
+
+### 8-2 조치 — 같은 주장을 검사하는 함수를 하나로
+
+`aggregate_ac11_evidence.py`의 payload 산술을 **`scan_payload_invariants()`** 로 뽑고,
+`evaluate_security_scan()`과 importer가 **그 한 함수를 읽는다**. 검증기가 둘이면 갈라지고,
+갈라진 결과가 이 결함이었다.
+
+그 함수가 묶는 것:
+
+| 묶는 것 | 내용 |
+|---|---|
+| finding row | exact key 여섯 개, `findingId` 고유·정렬, severity ∈ {CRITICAL, HIGH}, pip-audit은 HIGH만 |
+| count | row에서 센 CRITICAL·HIGH 수 == `criticalCount`·`highCount` |
+| summary | `bandit.highFindingCount` == bandit row 수, `pip-audit.findingCount` == pip-audit row 수 |
+| exit code | summary에서 **파생**된다 — pip-audit은 findingCount>0이면 1, bandit은 low+medium+high>0이면 1 |
+| coverage | bandit이 읽은 **파일 목록**(정렬·고유·`.py`, **비면 거부**) == `scannedFileCount`, pip-audit이 audit한 **dependency 목록**(정렬·고유, **비면 거부**) == `dependencyCount` |
+| inventory | 네 목록의 모양(정렬·고유·문자열) |
+
+allowlist 비교와 Git provenance(`scanInputs` object id, requirements pin, `git ls-tree`와의
+파일 목록 대조)는 **집계기만 물을 수 있으므로 집계기에 남는다**. importer는 모순된 payload를
+`NOT_OBSERVED`로 넘기지 않고 **거부**한다 — "관측되지 않음"은 producer의 unavailable 경로가
+말하는 것이고, 완결됐다고 적힌 report가 자기와 어긋나면 읽을 수 없는 증거다.
+
+### 8-3 실측 — 다시 exact head에서
+
+| 단계 | 결과 |
+|---|---|
+| dispatch | **run `36951113824`**, head **`3ae6b316`**, `workflow_dispatch`, success |
+| artifact | **`11203836829`** `s11-ac11-security-3ae6b316…`, 미만료, API digest `6892dc8a…` = 내려받은 bytes |
+| artifact의 pin | importer `1d358cf9`(= 실행 blob), workflow `b1b37265`, allowlist `67e80df8`(= 집계기 상수) |
+| 실제 payload | `scannedPythonFiles` **207개 목록**, `auditedDependencies` **41개**, critical 0 / high 0, bandit low 16·medium 4 → exit 1, pip-audit findingCount 0 → exit 0 |
+| importer | exit 0, `NOT_OBSERVED`, `scanRecomputed MEASURED_PASS` |
+| 조립기 → 집계기 | `assembledAxes: ["security-critical-high-zero"]`, **축 `NOT_OBSERVED`**, run 수준은 `missing required axes` 일곱 줄뿐 |
+
+### 8-4 변이 사살 — 7/7
+
+| 변이 | 죽은 시험 |
+|---|---|
+| importer가 모순된 payload를 무시 | `test_a_finding_row_the_counts_do_not_admit_is_refused` |
+| count를 row에서 재계산하지 않음 | 같은 시험 |
+| bandit이 읽은 파일 0을 허용 | `test_a_scan_that_read_nothing_is_not_a_pass[bandit-read-no-files]` |
+| pip-audit이 audit한 dependency 0을 허용 | `test_a_scan_that_read_nothing_is_not_a_pass[pip-audit-read-no-dependencies]` |
+| summary가 row와 달라도 통과 | `test_a_summary_that_disagrees_with_the_finding_rows_is_refused` |
+| exit code를 summary에서 파생하지 않음 | `test_a_scanner_exit_code_that_contradicts_its_summary_is_refused` |
+| 집계기가 공유 재계산을 읽지 않음 | `test_security_scan_registered_shape_guards_are_mutation_sensitive`(집계기 자신의 변이 시험) |
+
+**빈 coverage는 scanner별 단독 변이로 각각 사살한다** — 처음엔 두 scanner를 함께 비우는
+probe 하나만 두었더니 **각 검사를 하나씩 지워도 시험이 살아남았다**(다른 쪽이 여전히
+실패해서). 시험을 scanner별로 쪼갰다.
+
+### 8-5 검증
+
+| 항목 | 결과 |
+|---|---|
+| `tests/test_import_ac11_security_scan.py` | 27 → **33 passed** |
+| `tests/test_aggregate_ac11_evidence.py` | **86 passed** — 집계기 리팩터가 의미를 바꾸지 않았다는 증거다(변이 민감도 시험 포함) |
+| 인접 포함 5 suite | **293 passed** |
+| `check_docs.py` · `check_doc_single_source.py` · `check_doc_path_citations.py --ratchet` · `git diff --check` | exit 0 |
+
+**fixture를 또 실제 모양으로 고쳤다**: `scannedPythonFiles`는 **수가 아니라 파일 목록**이고,
+모든 summary 수치가 그 목록의 산술이다. r1 fixture는 수(120)를 넣고 있었다 — stub이 실제와
+다른 세 번째 자리이고, 그래서 **실제 artifact로 재측정하는 것이 유일한 확인**이다.
+
+### 8-6 남은 것
+
+- **pin 회전이 두 번 일어났다**(importer 파일이 바뀔 때마다). 래칫 시험이 그것을 강제하고,
+  이 PR의 마지막 head에서 lane을 다시 돌린 artifact가 그 pin을 담고 있다.
+- **`MEASURED_PASS`는 여전히 범위 밖이다** — 세 threat report에 producer가 없다.
