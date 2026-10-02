@@ -725,6 +725,14 @@ class BuildExecutionService:
                 "the admitted BuildPlan names no buildSessionId, which the product path "
                 "requires even though the contract leaves it optional"
             )
+        if (
+            isinstance(intent_claim_fencing_token, bool)
+            or not isinstance(intent_claim_fencing_token, int)
+            or intent_claim_fencing_token < 1
+        ):
+            raise _refuse_product_dispatch(
+                "the product dispatch is not bound to a durable intent claim generation"
+            )
         lease_id = plan["lease"]["leaseId"]
         resource_id = plan["lease"]["resourceId"]
         lease_epoch = plan["lease"].get("recoveryEpoch")
@@ -781,6 +789,7 @@ class BuildExecutionService:
             run_id=run_id,
             evidence_id=evidence_id,
             actor_id=actor_id,
+            intent_claim_fencing_token=intent_claim_fencing_token,
         )
         receipt_session = dispatched.receipt.get("buildSessionId") or plan_session
         if not receipt_session:
@@ -844,7 +853,7 @@ class BuildExecutionService:
             # accounted for. The one-shot decision claim is consumed, so an automatic retry
             # answers IDEM-0001 -- which makes a durable reconciliation marker the only way
             # an operator learns about it (#312 F-R4).
-            if error.code in {"VERIFY-0022", "LEASE-0002"}:
+            if error.code in {"VERIFY-0022", "LEASE-0002", "IDEM-0001"}:
                 # Nothing committed: no Evidence, no release. The node keeps the
                 # unaccounted state, so it is quarantined rather than handed the next
                 # build, and an operator reconciles it.

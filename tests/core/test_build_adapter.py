@@ -132,12 +132,13 @@ def _patch_boundary(monkeypatch, *, authorize_error=None, finalize_error=None):
         calls.append(("live", deepcopy(request), deepcopy(plan), run_id))
         return "node-1"
 
-    def claim(_conn, request, plan, decision, run_id, binding_digest):
+    def claim(_conn, request, plan, decision, run_id, binding_digest, **_kwargs):
         identity = decision["decisionId"]
         calls.append(("claim", identity, binding_digest))
         if identity in claims:
             raise DomainError("IDEM-0001", "Build dispatch identity is already consumed", 409)
         claims.add(identity)
+        return True
 
     def quarantine(_database, _request, admitted, reason_code):
         calls.append(("quarantine", admitted.binding_digest, reason_code))
@@ -236,14 +237,17 @@ def test_consumed_admission_cannot_dispatch_twice(monkeypatch):
 
 
 class _ClaimConnection:
-    def __init__(self, *, inserted, prior_hash=None):
+    def __init__(self, *, inserted, prior_hash=None, intent_owner=None):
         self.inserted = inserted
         self.prior_hash = prior_hash
+        self.intent_owner = intent_owner
         self.statements = []
 
     def execute(self, sql, params=None):
         normalized = " ".join(sql.split())
         self.statements.append((normalized, params))
+        if "FROM inv.build_execution_intents" in normalized:
+            return _One(self.intent_owner)
         if "INSERT INTO inv.idempotency" in normalized:
             return _One({"key": "claim"} if self.inserted else None)
         if "SELECT request_hash FROM inv.idempotency" in normalized:
@@ -279,6 +283,45 @@ def test_atomic_claim_uses_unique_ledger_and_redacted_audit(monkeypatch):
                 "bindingDigest": "c" * 64,
                 "resourceId": "resource-1",
                 "leaseId": "lease-1",
+            },
+        )
+    ]
+
+
+def test_stale_intent_generation_is_audited_before_the_one_shot_ledger(monkeypatch):
+    events = []
+    monkeypatch.setattr(
+        adapter_module,
+        "_audit_event",
+        lambda _conn, tenant, run, kind, payload: events.append((tenant, run, kind, payload)),
+    )
+    conn = _ClaimConnection(
+        inserted=True,
+        intent_owner={"status": "claimed", "attempt_count": 2},
+    )
+    _, request, plan, decision = _inputs()
+
+    claimed = adapter_module._claim_build_dispatch(
+        conn,
+        request,
+        plan,
+        decision,
+        "run-1",
+        "c" * 64,
+        intent_claim_fencing_token=1,
+    )
+
+    assert claimed is False
+    assert not any("INSERT INTO inv.idempotency" in statement for statement, _ in conn.statements)
+    assert events == [
+        (
+            TENANT,
+            "run-1",
+            "inv.build.dispatch_fenced",
+            {
+                "claimFencingToken": 1,
+                "currentClaimFencingToken": 2,
+                "currentIntentStatus": "claimed",
             },
         )
     ]

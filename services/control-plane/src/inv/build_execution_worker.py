@@ -23,7 +23,10 @@ from dataclasses import dataclass
 import errno
 import logging
 import os
+import socket
+import subprocess
 from typing import Any, Mapping
+from urllib.error import URLError
 
 from psycopg import OperationalError
 from psycopg.types.json import Jsonb
@@ -103,12 +106,18 @@ def _retryable_interruption(error: BaseException) -> bool:
             KeyboardInterrupt,
             asyncio.CancelledError,
             FutureCancelledError,
+            subprocess.TimeoutExpired,
+            SystemExit,
             TimeoutError,
             ConnectionError,
             OperationalError,
         ),
     ):
         return True
+    if isinstance(error, socket.gaierror):
+        return error.errno == socket.EAI_AGAIN
+    if isinstance(error, URLError):
+        return isinstance(error.reason, BaseException) and _retryable_interruption(error.reason)
     return isinstance(error, OSError) and error.errno in RETRYABLE_NETWORK_ERRNOS
 
 

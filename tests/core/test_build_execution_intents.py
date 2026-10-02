@@ -7,6 +7,9 @@ from concurrent.futures import CancelledError as FutureCancelledError
 from copy import deepcopy
 import errno
 from pathlib import Path
+import socket
+import subprocess
+from urllib.error import URLError
 
 import pytest
 
@@ -310,8 +313,12 @@ def test_worker_preserves_original_base_exception_when_requeue_fails():
         KeyboardInterrupt("operator interrupted"),
         asyncio.CancelledError("task cancelled"),
         FutureCancelledError("future cancelled"),
+        subprocess.TimeoutExpired(["buildctl", "debug", "workers"], 10),
+        SystemExit(143),
         TimeoutError("transport timeout"),
         ConnectionResetError("peer reset"),
+        socket.gaierror(socket.EAI_AGAIN, "temporary DNS failure"),
+        URLError(socket.gaierror(socket.EAI_AGAIN, "temporary DNS failure")),
         OSError(errno.ENETUNREACH, "network unreachable"),
         DomainError("RES-0006", "retry later", 503, retryable=True),
     ],
@@ -328,6 +335,8 @@ def test_worker_classifies_interrupt_timeout_and_network_uncertainty_as_retryabl
     [
         ValueError("bad product data"),
         OSError(errno.EACCES, "permission denied"),
+        socket.gaierror(socket.EAI_NONAME, "permanent DNS failure"),
+        URLError(ValueError("invalid URL")),
         DomainError("VERIFY-0002", "permanent mismatch", 422, retryable=False),
     ],
 )
@@ -342,6 +351,8 @@ def test_worker_classifies_permanent_failures_as_quarantine(error):
     "error",
     [
         asyncio.CancelledError("cancelled"),
+        subprocess.TimeoutExpired(["buildctl", "build"], 300),
+        SystemExit(143),
         TimeoutError("timed out"),
         ConnectionRefusedError("refused"),
     ],
