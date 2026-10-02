@@ -1,12 +1,12 @@
 ---
 doc_id: "HISTORY-CARD225-RLS-E4-MEASURABLE-20261002"
-title: "카드 225 — SEC-RLS-001의 미측정 한 행이 측정됐다. 권한을 넓히지도 role을 빼지도 않고, 소유자가 읽을 수 있는 key의 유일성을 같은 snapshot에서 측정하게 한 것이 전부다"
-version: "1.0.0"
+title: "카드 225 — E4는 소유자가 유일성을 측정한 readable key로도 판정된다. 다만 비교 대상이 0행인 run은 PASS가 아니라 UNMEASURED다"
+version: "1.1.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-02T13:11:22+09:00"
+updated: "2026-10-02T14:04:52+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "89b15488"
@@ -18,7 +18,9 @@ tags: ["ac11", "security", "rls", "e4", "collector", "s11", "claude"]
 
 ## 0. 한 줄
 
-`#319`이 남긴 한 줄은 **`inv_cancel_bridge_owner` / `public.audit_events` / `E4` — row identity 확인 불가**였다. 정본을 읽고 측정한 결과 그것은 **정의상 판정 불가가 아니라 관측 방법의 한계**였고, **권한을 넓히지도 role을 모집단에서 빼지도 않고** 그 행이 측정된다. SEC-RLS-001은 **`NOT_OBSERVED` → `MEASURED_PASS`** 로 움직였다.
+`#319`이 남긴 한 줄은 **`inv_cancel_bridge_owner` / `public.audit_events` / `E4` — row identity 확인 불가**였다. 정본을 읽고 측정한 결과 그것은 **정의상 판정 불가가 아니라 관측 방법의 한계**였고, **권한을 넓히지도 role을 모집단에서 빼지도 않고** 그 두 컬럼으로 판정할 방법이 있다.
+
+**r2에서 한 번 더 고쳤다.** 첫 판에서는 그 방법이 **비교 대상이 0행일 때도 `match: true`로 PASS**를 냈다(#322 Codex F-R1). 0행 비교는 어떤 투영이든 단사이고 어떤 fingerprint든 같으므로 **아무것도 측정하지 않는다.** 이제 0행·NULL·중복·미등록 쌍은 전부 `unverifiable`이고, 그래서 **hosted run의 그 행은 PASS가 아니라 UNMEASURED**다. 방법이 위반을 잡는다는 증명은 **행을 심은 실 PG 시험**이 하고, hosted에서 그 행을 진짜로 측정하려면 §5의 **검토 결정이 먼저** 필요하다.
 
 ## 1. 정본이 그 role에 무엇을 허용하는가
 
@@ -30,7 +32,7 @@ tags: ["ac11", "security", "rls", "e4", "collector", "s11", "claude"]
 | 그 표에 대한 권한 | `GRANT SELECT (tenant_id, event_id) ON public.audit_events` — **두 컬럼뿐**. INSERT는 열두 컬럼 |
 | 정책 | `CREATE POLICY cancel_bridge_audit_read ... FOR SELECT USING (tenant_id = NULLIF(current_setting('inv.tenant_id',true),'')::uuid)` |
 
-즉 **정본의 의도는 "자기 tenant의 audit 행만, 두 컬럼만 읽는다"** 이고, 그 두 컬럼이라는 좁힘이 바로 설계다. 넓히는 것은 이 카드의 범위가 아니고 카드가 금지한 것이다.
+즉 **정본의 의도는 "자기 tenant의 audit 행만, 두 컬럼만 읽는다"** 이고, 그 두 컬럼이라는 좁힘이 바로 설계다. 넓히는 것은 이 카드가 금지한 것이다.
 
 ## 2. 왜 관측이 안 됐나 — 측정했다
 
@@ -43,7 +45,7 @@ collector의 E4 identity는 **`ctid`, 없으면 `tenant_id` + PK 전체**를 요
 
 그래서 "identity unverifiable"이었다. **이것은 정책상 접근이 막혀서가 아니다** — role은 자기 tenant의 행을 **두 컬럼으로 볼 수 있고**, 막힌 것은 **collector가 그 두 컬럼을 identity로 인정하지 않았다는 것**이다. 카드 step 2의 두 갈래 중 **첫 번째**(부수 컬럼 권한에 의존한 관측 한계)로 측정됐다.
 
-## 3. 무엇을 고쳤나 — 관측 방법 하나
+## 3. 무엇을 고쳤나 — 관측 방법 하나, 그리고 그 방법의 울타리
 
 E4의 의미를 그대로 두고 identity 방법을 **셋째**까지 넓혔다:
 
@@ -51,7 +53,18 @@ E4의 의미를 그대로 두고 identity 방법을 **셋째**까지 넓혔다:
 2. `tenant_id` + PK 전체
 3. **`owner-verified-key`** — 그 key에서 **role이 읽을 수 있는 부분**을, **소유자가 같은 snapshot에서 그 비교 대상 행들에 대해 유일함을 측정했을 때만** identity로 쓴다
 
-세 번째가 "값 투영을 믿지 않는다"는 원칙을 어기지 않는 이유: 소유자가 `count(*)`와 `count(DISTINCT 그 tuple)`을 **같은 트랜잭션·같은 행 집합에서** 세고 **같을 때만** 그 tuple을 identity로 쓴다. 두 개의 다른 행이 같은 tuple을 가질 수 없다는 것이 **측정된 사실**일 때 그 tuple은 row identity다 — 믿은 투영이 아니다. 유일하지 않으면 **여전히 unverifiable**이고, 사유에 **두 숫자(행 수 / distinct 수)** 를 적는다.
+세 번째가 "값 투영을 믿지 않는다"는 원칙을 어기지 않는 이유: 소유자가 `count(*)`와 `count(DISTINCT 그 tuple)`을 **같은 트랜잭션·같은 행 집합에서** 세고 **같을 때만** 그 tuple을 identity로 쓴다. 두 개의 다른 행이 같은 tuple을 가질 수 없다는 것이 **측정된 사실**일 때 그 tuple은 row identity다 — 믿은 투영이 아니다.
+
+### 3-1. r2에서 닫은 네 구멍 (#322 Codex)
+
+| 구멍 | 지금 |
+|---|---|
+| **0행 비교가 PASS가 됐다** (F-R1, fail-open) | `rows == 0`이면 `unverifiable`. 사유에 "compared over 0 rows … matches trivially and measures nothing"을 적는다 |
+| key 직렬화가 **구분자 충돌**에 취약 (F-R2) | `concat_ws`에서 **`jsonb_build_array(…)::text`** 로. 구분자를 값 안에 넣어 다른 tuple을 흉내내던 쌍이 서로 다르게 적힌다 |
+| **NULL**이 조용히 생략됐다 (F-R2) | 같은 snapshot에서 `nullRows`를 세고 0이 아니면 `unverifiable` — 암묵이 아니라 **명시적 fail-closed** |
+| 방법이 **모든 role/table로 번질 수 있었다** (F-R2) | `OWNER_VERIFIED_KEY_SCOPE`에 `(inv_cancel_bridge_owner, public.audit_events, (tenant_id, event_id))` **한 쌍만** 등록. 이 파일 blob은 집계기의 `RLS_FILES`에 고정돼 있으므로 쌍을 늘리면 **pin 회전과 함께 검토**를 받는다 |
+
+세 겹으로 같은 질문을 묻는다: **살아있는 probe**(`_identity`), **기록된 보고의 판정**(`unverified_identities`), **정본 집계기**(`evaluate_rls`). 마지막 겹이 중요한 이유는 보고가 *tree에 대한 증거*이고 *그것을 쓴 도구의 약속*이 아니기 때문이다 — 집계기는 등록 밖·0행·중복·NULL key를 `INVALID_RUN`으로 거부한다.
 
 `tenant_id`가 tuple에 들어 있으므로 다른 tenant의 행이 섞여 들어오면 tuple이 달라져 잡히고, 그와 별도로 foreign-row probe가 같은 누수를 따로 본다 — 한 위반에 **두 관측**이다.
 
@@ -59,47 +72,39 @@ E4의 의미를 그대로 두고 identity 방법을 **셋째**까지 넓혔다:
 
 | 측정 | 결과 |
 |---|---|
-| 그 행의 identity | `method: owner-verified-key`, `columns: ["tenant_id","event_id"]`, `ownerDistinctness`와 두 fingerprint를 기록 |
-| collector 판정 | `violations 0`, **`unmeasured 0`**, `verdict PASS`(8 role 모집단 그대로) |
-| 집계기 평가 | `evaluate_rls` → **`MEASURED_PASS`**(collector pin 회전 뒤) |
-| 봉투 | `SEC-SCAN-001` PASS · `SEC-RLS-001` **PASS** · `SEC-VF-001` PASS · `SEC-DEF-001`은 검토 공백으로 `INVALID_RUN` |
-| 축 판정 | **`NOT_OBSERVED`** — 올라간 것은 RLS 한 행이고, 축은 `SEC-DEF-001`의 검토 공백(카드 221 §3) 때문에 그대로다 |
-
-**부정 시험(정책 위반을 심었다)**: 그 role의 SELECT 정책을 "tenant A의 행 하나 + 다른 tenant의 행 하나"만 보이게 바꾸면 **행 수는 소유자와 같고 집합은 다르다**. identity fingerprint가 `match: false`를 내고 **E4 위반**이 되며 verdict는 `VIOLATIONS`다. 정본 정책을 되돌리면 같은 측정이 다시 PASS다. (foreign-row probe도 함께 잡는다 — 예상된 일이고, 한 위반을 두 관측이 본다는 뜻이다.)
+| 행을 심은 실 PG | `method: owner-verified-key`, `columns: ["tenant_id","event_id"]`, `ownerDistinctness {rows 2, distinct 2, nullRows 0}`, `match: true` → 그 행이 **측정된다** |
+| 심은 위반 | 같은 수·다른 집합을 심으면 `match: false` → **E4 위반** → `VIOLATIONS`, 정본 정책 복구 후 다시 PASS |
+| **빈 표** | `unverifiable`("compared over 0 rows") → `unmeasured` 1 → **UNMEASURED**. r2 이전에는 이것이 PASS였다 |
+| 직렬화 | 실 PG에서 구분자 충돌 쌍이 `rows 2 / distinct 2`로 **구별되고**, NULL 한 행이 들어오면 `unique: false` |
+| 미등록 쌍 | `OWNER_VERIFIED_KEY_SCOPE`를 비우면 같은 행이 `unverifiable`("not registered") |
 
 ### 4-1. hosted 재실측 — 실제 run
 
-이 branch의 head를 그대로 두 lane에 dispatch하고, 받은 artifact로 importer → 집계기를 돌렸다.
+| run | head | 결과 |
+|---|---|---|
+| security `36963704528` + browser `36963707158` (r1) | `2e87dc12` | `SEC-RLS-001` PASS, 그러나 **그 비교가 0행**이었다 — 이것이 F-R1이 가리킨 fail-open이고, 이 run은 그 행에 대해 **reference-only**다 |
+| security **`36967195872`** (r2) | `12be0822` | `exit 3` · `verdict UNMEASURED` · `violations 0` · **`unmeasured 1`** · `accepted 9` |
 
-| 입력 | 값 |
-|---|---|
-| security lane run | `36963704528` (`completed/success`) |
-| browser lane run | `36963707158` (`completed/success`), artifact `11208544434` |
-| source head / tree | 두 run 모두 이 branch head, tree `49113c08` |
-| VF artifact digest | GitHub metadata와 **받은 바이트의 재계산이 같다**(`c7244c55…`) |
-
-hosted `SEC-RLS-001` 보고가 적은 것:
+r2 run이 그 한 행에 대해 적는 것:
 
 ```
-exit 0  verdict PASS  violations 0  unmeasured 0  accepted 3  measuredRoles 8
-inv_cancel_bridge_owner / public.audit_events / privileges.select = "column"
-identity = {"method":"owner-verified-key","columns":["tenant_id","event_id"],
-            "ownerDistinctness":{"rows":0,"distinct":0},"match":true}
+E4 inv_cancel_bridge_owner public.audit_events
+row identity unverifiable: ctid denied 42501; the readable identity columns
+['tenant_id', 'event_id'] were compared over 0 rows of the owner's tenant-A set:
+an empty comparison matches trivially and measures nothing
 ```
 
-**`unmeasured`가 1 → 0이다.** 그 행이 `method: owner-verified-key`로 **측정됐고**, `0/0`이라는 숫자가 이 run에서는 그 비교가 **vacuous**하다는 것까지 같이 적는다(§5) — 방법이 위반을 잡는다는 증명은 행을 심은 실 PG 시험이 한다.
-
-집계기를 importer와 **따로** 돌려 같은 결론을 확인했다:
+importer와 **따로** 돌린 정본 집계기도 같은 결론이다:
 
 | 집계기 호출 | 결과 |
 |---|---|
-| `evaluate_rls(hosted 보고, 검토된 allowlist, now)` | **`MEASURED_PASS`** |
-| `evaluate_vf(hosted 보고, …)` | `MEASURED_PASS` (provenance는 browser run 자신의 것) |
-| `evaluate_axis(봉투, RepositoryGit, …)` | **`NOT_OBSERVED`**, `reasons: []` |
+| `evaluate_rls(hosted 보고, 검토된 allowlist, now)` | **`NOT_OBSERVED`** |
+| 봉투 `threatReportVerdicts` | `SEC-SCAN-001` MEASURED_PASS · `SEC-RLS-001` **NOT_OBSERVED** |
+| `evaluate_axis` | `NOT_OBSERVED` (사유에 `SEC-DEF-001 (INVALID_RUN)`과 `SEC-RLS-001 recomputes NOT_OBSERVED`가 함께 적힌다) |
 
-**축은 올라가지 않았다. 정직하게 적는다**: 봉투의 사유는 `no admissible report for SEC-DEF-001; refused by the canonical evaluator: SEC-DEF-001 (INVALID_RUN)`이고, 그것은 **카드 221 §3이 이미 보고한 검토 공백**(definer 정책이 15 서명으로 자랐는데 검토된 allowlist는 12를 고정)이다. 카드 225가 고칠 수 있는 것이 아니고, 검토된 allowlist를 돌리는 것은 AC-11 정의 변경이라 금지된 길이다. 이 카드가 움직인 것은 **그 축 안의 RLS 한 행**이다.
+**정직하게**: 이 카드는 그 행을 hosted에서 PASS로 **올리지 못했다.** 올린 것은 *방법*이고, 그 방법이 참임을 증명하는 것은 행을 심은 실 PG 시험이다. hosted에서 그 행이 진짜로 측정되려면 §5의 결정이 먼저다.
 
-## 5. 측정하다 발견한 것 — **네 번째 검토 결정**
+## 5. 측정하다 발견한 것 — **네 번째 검토 결정** (이제 차단 사유다)
 
 처음에는 `disposable_database()`(collector의 공용 fixture)에 audit 행을 심어 비교를 비지 않게 하려 했다. 그러면 **`inv_audit_reader`의 accepted E3·E4·E5 세 행이 생기고**, 검토된 AC-11 allowlist의 **dispositions 세 개에는 그 role이 없다** → `evaluate_rls`가 `INVALID_RUN`을 낸다(측정했다: accepted 12행, 그 중 3행이 검토 집합 밖).
 
@@ -107,27 +112,29 @@ identity = {"method":"owner-verified-key","columns":["tenant_id","event_id"],
 
 - 공용 fixture는 **그대로 두었다**(audit 행을 심지 않는다).
 - 행이 필요한 시험은 **그 시험이 심고 그 시험이 지운다**.
-- 그래서 **생산자의 실제 run에서 이 비교는 빈 집합끼리다** — `unmeasured`가 아니라 `measured`이고, 기록된 행 수(0/0)가 그 비어 있음을 말한다. 방법의 힘은 행을 심은 시험이 증명한다.
+- 그래서 **생산자의 실제 run에서 이 비교는 빈 집합끼리이고, r2부터 그것은 PASS가 아니라 UNMEASURED다.**
 
-이것을 **네 번째 검토 결정**으로 보고한다: *audit_events에 행이 있는 환경에서 AC-11 RLS 보고가 유효하려면 `inv_audit_reader`의 그 세 규칙을 검토된 dispositions에 넣을지 결정해야 한다.*
+**결정 요청**: *AC-11 evidence lane의 disposable DB에 비식별 audit 행을 심어 이 비교를 non-vacuous하게 만들려면, `inv_audit_reader`의 E3·E4·E5를 검토된 dispositions에 넣을지 먼저 결정해야 한다.* 결정 없이 행을 심으면 보고 전체가 `INVALID_RUN`이 된다. Codex r2도 같은 순서를 지시했다("미결인 disposition/allowlist를 먼저 결정").
 
 ## 6. 검증
 
 | 항목 | 결과 |
 |---|---|
-| `tests/test_collect_rls_evidence.py` | 신설 **다섯**(offline 둘: `owner-verified-key`의 match False/True와 유일하지 않을 때의 unverifiable; 실 PG 셋: 빈 표의 vacuous 측정, 행을 심은 측정, **심은 위반의 FAIL과 복구**) |
-| `tests/test_import_ac11_security_scan.py` · `test_run_ac11_security_threat_reports.py` · `test_aggregate_ac11_evidence.py` | **161 passed** |
-| 실 PG | 이 PC의 disposable migrated DB로 producer와 시험을 실제 실행 |
-| pin 회전 | 집계기의 `RLS_FILES` collector blob(파일이 바뀌었으므로). `s11-security-allowlist-v0.json`은 **건드리지 않았다** |
+| `tests/test_collect_rls_evidence.py` | **33 passed**(실 PG 8 포함, 582s). 신설: offline 7(0행·NULL·중복·미등록 columns·distinctness 없음·미등록 쌍·정상), 실 PG 3(빈 표 UNMEASURED / 직렬화·NULL fail-closed / 미등록 쌍 거부) |
+| `tests/test_aggregate_ac11_evidence.py` | 신설 6(등록·측정된 key만 MEASURED_PASS, 나머지 다섯 변형은 `INVALID_RUN`) 포함 **전부 통과** |
+| `test_import_ac11_security_scan.py` · `test_run_ac11_security_threat_reports.py` | **전부 통과**(후자는 실 PG) |
+| 단독 변이 **8/8 사살** | 0행 허용·`concat_ws` 복귀·0행 거부 삭제(offline과 실 PG 각각)·NULL 거부 삭제·scope 검사 삭제·기록 재검사 삭제·집계기 검사 삭제 |
+| pin 회전 | 집계기의 `RLS_FILES` collector blob. **`s11-security-allowlist-v0.json`은 건드리지 않았다** |
 
 ## 7. 하지 않은 것
 
 - **권한을 넓히지 않았다.** `0056`의 `GRANT SELECT (tenant_id, event_id)`는 그대로다.
 - **role을 모집단에서 빼지 않았다.** 측정은 collector의 `DEFAULT_ROLES` 여덟 개 그대로다.
-- **E4의 의미를 낮추지 않았다.** 값 투영을 믿지 않는다는 원칙은 유지되고, 유일성이 **측정되지 않으면** 여전히 unverifiable이다.
-- **검토된 allowlist를 고치지 않았다.** §5의 네 번째 결정은 보고이고 결정이 아니다.
+- **E4의 의미를 낮추지 않았다.** 값 투영을 믿지 않는다는 원칙은 유지되고, 유일성이 **측정되지 않으면**(0행도 측정이 아니다) 여전히 unverifiable이다.
+- **검토된 allowlist를 고치지 않았다.** §5는 보고이고 결정이 아니다.
+- **evidence lane에 행을 심지 않았다.** §5의 결정이 먼저다.
 
 ## 8. 다음 첫 행동
 
-1. **Codex / allowlist owner**: §5의 네 번째 결정(audit 행이 있는 환경에서 `inv_audit_reader`의 세 규칙). 카드 221 §3의 세 결정과 **같은 파일**이므로 함께 보는 것이 맞다.
-2. **Claude**: 이 PR의 검토 반영.
+1. **Codex / allowlist owner**: §5의 결정(`inv_audit_reader`의 세 규칙). 카드 221 §3의 세 결정과 **같은 파일**이므로 함께 보는 것이 맞다. 그 결정이 나오면 그 행은 hosted에서도 non-vacuous하게 측정된다.
+2. **Claude**: 이 PR의 r2 검토 반영.
