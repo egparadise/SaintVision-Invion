@@ -167,14 +167,140 @@ def producer_report(body: dict | None = None, **over) -> dict:
     return report
 
 
-def archive(report: dict | None = None, extra: str | None = None) -> bytes:
+APPROVED_ALLOWLIST = json.loads(
+    (ROOT / aggregator.ALLOWLIST_REPO_PATH).read_text(encoding="utf-8")
+)
+
+
+def definer_report(**over) -> dict:
+    """A SEC-DEF-001 report the canonical evaluator admits.
+
+    ``evaluate_definer``'s exit-0 branch requires the observed privileged-function set to equal
+    the reviewed signature list **exactly**, so the fixture observes those twelve and nothing
+    else.  The tree's own database has fifteen, which is the review gap card 221 measured and
+    did not close.
+    """
+
+    document = {
+        "threatId": "SEC-DEF-001",
+        "sourceRunId": RUN_ID,
+        "sourceHeadSha": SOURCE,
+        "checkoutTreeSha": TREE,
+        "toolFiles": [dict(row) for row in aggregator.DEFINER_FILES],
+        "status": "matches_reviewed_policy",
+        "functions": [
+            {"function": signature, "problems": []}
+            for signature in APPROVED_ALLOWLIST["definerPolicySignatures"]
+        ],
+        "unsafe": 0,
+        "exitCode": 0,
+    }
+    document.update(over)
+    return document
+
+
+def rls_report(**over) -> dict:
+    """A SEC-RLS-001 report the canonical evaluator admits."""
+
+    document = {
+        "threatId": "SEC-RLS-001",
+        "sourceRunId": RUN_ID,
+        "sourceHeadSha": SOURCE,
+        "checkoutTreeSha": TREE,
+        "toolFiles": [dict(row) for row in aggregator.RLS_FILES],
+        "baselineAccepted": [
+            {"role": entry["role"], "table": entry["table"], "rules": list(entry["rules"])}
+            for entry in APPROVED_ALLOWLIST["rlsAcceptedDispositions"]
+        ],
+        "exitCode": 0,
+        "verdict": "PASS",
+        "violations": [],
+        "accepted": [],
+        "unmeasured": [],
+        "roles": {"inv_app": {"present": True}},
+        "ground_truth": {"public.projects": {"tenantScoped": True}},
+    }
+    document.update(over)
+    return document
+
+
+VF_RUN_ID = "36958633624"
+VF_ARTIFACT_ID = "11207615096"
+
+
+def vf_proof(**over) -> dict:
+    """What the browser lane's own proof carries, measured from a real run of that lane.
+
+    The five values below are all public -- they are in the reviewed allowlist -- which is why a
+    loose proof document proves nothing and the archive it came from has to be bound (#319 F1).
+    """
+
+    spec = APPROVED_ALLOWLIST["secVf001"]
+    document = {
+        "exitCode": 0,
+        "subprocessExitCode": 0,
+        "evidenceStatus": "complete",
+        "caseIdentitiesSha256": spec["requiredCaseIdentitiesSha256"],
+        "tests": dict(spec["expectedTests"]),
+        "evidenceScope": "current invocation JUnit; not expected-suite or operational",
+    }
+    document.update(over)
+    return document
+
+
+def vf_bundle(proof=None, run=None, artifact=None, members=None) -> tuple:
+    """The browser lane's artifact with the two GitHub metadata documents that bind it."""
+
+    proof = vf_proof() if proof is None else proof
+    output = io.BytesIO()
+    with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as bundle:
+        rows = members if members is not None else [
+            (tool.VF_PROOF_MEMBER, json.dumps(proof).encode()),
+            ("web-container-tests.xml", b'<testsuite tests="6" failures="0"/>'),
+        ]
+        for name, content in rows:
+            bundle.writestr(zipfile.ZipInfo(name, (2026, 10, 2, 3, 20, 0)), content)
+    archive = output.getvalue()
+    run_metadata = {
+        "id": int(VF_RUN_ID),
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": SOURCE,
+        # GitHub's own statement about which commit -- and so which tree -- that run built.
+        "head_commit": {"id": SOURCE, "tree_id": TREE},
+        "event": "workflow_dispatch",
+        "path": APPROVED_ALLOWLIST["secVf001"]["workflow"]["path"] + "@refs/heads/x",
+        "repository": {"full_name": tool.REPOSITORY},
+    }
+    run_metadata.update(run or {})
+    artifact_metadata = {
+        "id": int(VF_ARTIFACT_ID),
+        "name": tool.VF_ARTIFACT_NAME,
+        "expired": False,
+        "expires_at": "2026-11-01T01:03:19Z",
+        "digest": "sha256:" + hashlib.sha256(archive).hexdigest(),
+        "workflow_run": {"id": int(VF_RUN_ID), "head_sha": SOURCE},
+    }
+    artifact_metadata.update(artifact or {})
+    return archive, run_metadata, artifact_metadata
+
+
+def archive(
+    report: dict | None = None,
+    extra: str | None = None,
+    database: tuple[dict, dict] | None = None,
+) -> bytes:
     report = producer_report() if report is None else report
     output = io.BytesIO()
     with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as bundle:
-        for name, content in (
+        members = [
             (tool.REPORT_MEMBER, json.dumps(report).encode()),
             (tool.JUNIT_MEMBER, b'<testsuite tests="4" failures="0"/>'),
-        ):
+        ]
+        if database is not None:
+            members.append((tool.DEFINER_MEMBER, json.dumps(database[0]).encode()))
+            members.append((tool.RLS_MEMBER, json.dumps(database[1]).encode()))
+        for name, content in members:
             info = zipfile.ZipInfo(name, (2026, 10, 2, 2, 52, 46))
             bundle.writestr(info, content)
         if extra is not None:
@@ -188,6 +314,7 @@ def metadata(payload_bytes: bytes) -> tuple[dict, dict]:
         "status": "completed",
         "conclusion": "success",
         "head_sha": SOURCE,
+        "head_commit": {"id": SOURCE, "tree_id": TREE},
         "event": "pull_request",
         "path": f"{tool.WORKFLOW_PATH}@refs/pull/226/merge",
         "repository": {"full_name": tool.REPOSITORY},
@@ -203,10 +330,19 @@ def metadata(payload_bytes: bytes) -> tuple[dict, dict]:
     return run, artifact
 
 
-def imported(report: dict | None = None):
-    blob = archive(report)
+def imported(report: dict | None = None, database=None, vf=None):
+    blob = archive(report, database=database)
     run_metadata, artifact_metadata = metadata(blob)
-    return tool.import_evidence(blob, run_metadata, artifact_metadata, now=NOW)
+    vf_archive, vf_run, vf_artifact = vf if vf is not None else (None, None, None)
+    return tool.import_evidence(
+        blob,
+        run_metadata,
+        artifact_metadata,
+        now=NOW,
+        vf_archive=vf_archive,
+        vf_run_metadata=vf_run,
+        vf_artifact_metadata=vf_artifact,
+    )
 
 
 def test_import_binds_run_artifact_digest_and_member_hashes():
@@ -270,26 +406,31 @@ def test_the_envelope_is_admissible_and_names_the_threat_reports_it_lacks():
     assert envelope["runPurpose"] == "ac11-axis-evidence"
     assert envelope["axis"] == "security-critical-high-zero"
     assert envelope["verdict"] == "NOT_OBSERVED"
-    assert envelope["reason"] == "no producer emits SEC-DEF-001, SEC-RLS-001, SEC-VF-001"
+    assert envelope["reason"] == (
+        "no admissible report for SEC-DEF-001, SEC-RLS-001, SEC-VF-001"
+    )
     assert [row["threatId"] for row in envelope["observations"]] == ["SEC-SCAN-001"]
+    assert envelope["threatReportVerdicts"] == {"SEC-SCAN-001": "MEASURED_PASS"}
     assert envelope["targetRef"]["targetId"] == "s11-security-critical-high-zero-v0"
     assert envelope["artifactSha256"] == envelope["artifactObservedSha256"]
     assert envelope["artifactAvailable"] is True
     assert envelope["scanRecomputed"] == "MEASURED_PASS"
 
 
-class CheckoutGit(aggregator.RepositoryGit):
-    """The repository, answering one question about this checkout instead of the commit.
+#: Paths this test answers from the working tree rather than from the commit.  The envelope is
+#: bound to the importer that is *executing* and to the reviewed allowlist this checkout holds;
+#: while a change is uncommitted those are the working files, not the committed ones.  Pinning
+#: them from disk keeps this test about the question it asks -- is the envelope admissible --
+#: and each binding is measured by its own test below.
+CHECKOUT_ANSWERED = (tool.IMPORTER_REPO_PATH, aggregator.ALLOWLIST_REPO_PATH)
 
-    The envelope is bound to the importer that is *executing*, which while the change is
-    uncommitted is the working file rather than the committed one.  Overriding that single
-    answer keeps this test about the question it asks -- is the envelope admissible -- and
-    the binding itself is measured by its own tests below.
-    """
+
+class CheckoutGit(aggregator.RepositoryGit):
+    """The repository, answering two questions about this checkout instead of the commit."""
 
     def blob(self, commit: str, path: str) -> str:
-        if path == tool.IMPORTER_REPO_PATH:
-            return tool.importer_blob()
+        if path in CHECKOUT_ANSWERED:
+            return git("hash-object", path)
         return super().blob(commit, path)
 
 
@@ -339,12 +480,14 @@ def test_a_producer_comparability_group_that_disagrees_is_refused():
         imported(report)
 
 
-def test_four_threat_rows_this_importer_cannot_recompute_cannot_become_a_pass():
-    """#313 F-R2: r1 turned four empty rows and a top-level claim into MEASURED_PASS.
+def test_four_threat_rows_with_nothing_measured_still_cannot_become_a_pass():
+    """#313 F-R2, held by a different mechanism after card 221.
 
-    Nothing in those rows measures the definer policy, the RLS probes or the VF
-    observations, and this importer has no recomputation for them, so it refuses to answer
-    rather than passing a claim through.
+    r1 of #313 turned four empty rows and a top-level claim into MEASURED_PASS; the fix then
+    was to refuse any report this importer could not recompute.  Card 221 gives it the
+    aggregator's own evaluators instead, which is strictly stronger: the empty rows are now
+    *evaluated*, refused by name, and the envelope says NOT_OBSERVED -- the one thing that must
+    never happen, a pass, still cannot.
     """
 
     report = producer_report(
@@ -355,8 +498,257 @@ def test_four_threat_rows_this_importer_cannot_recompute_cannot_become_a_pass():
             producer_report(),
         ],
     )
-    with pytest.raises(tool.SecurityImportError, match="recomputes SEC-SCAN-001 only"):
-        imported(report)
+    envelope = imported(report)
+    assert envelope["verdict"] == "NOT_OBSERVED"
+    for threat_id in ("SEC-DEF-001", "SEC-RLS-001", "SEC-VF-001"):
+        assert f"{threat_id} (INVALID_RUN)" in envelope["reason"]
+    assert [row["threatId"] for row in envelope["observations"]] == ["SEC-SCAN-001"]
+
+
+def test_the_four_measured_reports_recompute_a_pass_and_the_envelope_says_so():
+    """Card 221: the axis can reach a verdict, and the verdict is the evaluators' own.
+
+    Every report here is one the canonical evaluator admits, so the envelope carries four
+    observations and MEASURED_PASS.  This is the shape the lane produces once the three review
+    gaps card 221 measured are closed; the importer needs no further change for it.
+    """
+
+    envelope = imported(
+        database=(definer_report(), rls_report()),
+        vf=vf_bundle(),
+    )
+    assert envelope["verdict"] == "MEASURED_PASS"
+    assert "reason" not in envelope
+    assert sorted(row["threatId"] for row in envelope["observations"]) == [
+        "SEC-DEF-001", "SEC-RLS-001", "SEC-SCAN-001", "SEC-VF-001",
+    ]
+    assert envelope["threatReportVerdicts"] == {
+        "SEC-DEF-001": "MEASURED_PASS",
+        "SEC-RLS-001": "MEASURED_PASS",
+        "SEC-SCAN-001": "MEASURED_PASS",
+        "SEC-VF-001": "MEASURED_PASS",
+    }
+
+
+def test_an_unobserved_database_report_keeps_the_axis_unobserved_and_names_it():
+    """The honest middle: the boundary was measured and one row could not be verified."""
+
+    unmeasured = rls_report(
+        exitCode=3,
+        verdict="UNMEASURED",
+        unmeasured=[{"role": "inv_cancel_bridge_owner", "table": "public.audit_events",
+                     "rule": "E4", "detail": "row identity unverifiable"}],
+    )
+    envelope = imported(database=(definer_report(), unmeasured), vf=vf_bundle())
+    assert envelope["verdict"] == "NOT_OBSERVED"
+    assert "SEC-RLS-001 recomputes NOT_OBSERVED" in envelope["reason"]
+    assert envelope["threatReportVerdicts"]["SEC-DEF-001"] == "MEASURED_PASS"
+
+
+def test_a_measured_database_failure_is_carried_as_a_failure():
+    """A verdict is not lowered: a violation makes the axis MEASURED_FAIL."""
+
+    violated = rls_report(
+        exitCode=1,
+        verdict="VIOLATIONS",
+        violations=[{"role": "inv_app", "table": "public.audit_events", "rule": "E2",
+                     "detail": "tenant-scoped readable table without enabled+forced RLS"}],
+    )
+    envelope = imported(database=(definer_report(), violated), vf=vf_bundle())
+    assert envelope["verdict"] == "MEASURED_FAIL"
+    assert "SEC-RLS-001 recomputes MEASURED_FAIL" in envelope["reason"]
+
+
+def test_a_failure_outranks_an_unobserved_report_in_the_same_envelope():
+    """Precedence matters when both are present: a measured failure is the louder fact.
+
+    The aggregator answers MEASURED_FAIL when any report failed, even if another is
+    unobserved, so the envelope must say the same thing -- otherwise a run with a real RLS
+    violation would be filed as "not observed" because something else was unavailable.
+    """
+
+    unavailable = definer_report(
+        status="unavailable", exitCode=2, unsafe=None, functions=None,
+    )
+    unavailable.pop("functions")
+    violated = rls_report(
+        exitCode=1,
+        verdict="VIOLATIONS",
+        violations=[{"role": "inv_app", "table": "public.audit_events", "rule": "E2",
+                     "detail": "tenant-scoped readable table without enabled+forced RLS"}],
+    )
+    envelope = imported(database=(unavailable, violated), vf=vf_bundle())
+    assert envelope["verdict"] == "MEASURED_FAIL"
+    assert envelope["threatReportVerdicts"]["SEC-DEF-001"] == "NOT_OBSERVED"
+    assert envelope["threatReportVerdicts"]["SEC-RLS-001"] == "MEASURED_FAIL"
+
+
+def test_a_database_report_from_another_run_is_refused():
+    """One envelope, one run: a report about another run is not this artifact's evidence."""
+
+    with pytest.raises(tool.SecurityImportError, match="differs from the scan report"):
+        imported(database=(definer_report(sourceRunId="36000000000"), rls_report()))
+    with pytest.raises(tool.SecurityImportError, match="differs from the scan report"):
+        imported(database=(definer_report(), rls_report(sourceHeadSha="f" * 40)))
+
+
+def test_a_database_member_that_carries_the_wrong_threat_is_refused():
+    with pytest.raises(tool.SecurityImportError, match="does not carry SEC-DEF-001"):
+        imported(database=(rls_report(), rls_report()))
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        {"caseIdentitiesSha256": "0" * 64},
+        {"tests": {"failure": 0, "error": 0, "skipped": 0, "passed": 5}},
+        {"evidenceStatus": "partial"},
+        {"exitCode": 1},
+        {"subprocessExitCode": 1},
+    ],
+    ids=["identity-hash", "case-count", "evidence-status", "exit-code", "subprocess-exit"],
+)
+def test_browser_lane_evidence_that_is_not_the_reviewed_one_is_refused(mutation):
+    """SEC-VF-001 is only written when the reviewed identity hash and counts are the measured
+    ones -- ``nodeIds`` alone is a tautology against ``requiredNodeIds``, so the hash is the
+    binding that matters."""
+
+    with pytest.raises(tool.SecurityImportError, match="reviewed"):
+        imported(
+            database=(definer_report(), rls_report()),
+            vf=vf_bundle(proof=vf_proof(**mutation)),
+        )
+
+
+@pytest.mark.parametrize(
+    ("label", "kwargs", "message"),
+    [
+        ("other-run", {"artifact": {"workflow_run": {"id": 36000000000, "head_sha": SOURCE}}},
+         "another run"),
+        ("other-head", {"run": {"head_sha": "f" * 40}}, "another source head"),
+        ("other-artifact-head",
+         {"artifact": {"workflow_run": {"id": int(VF_RUN_ID), "head_sha": "f" * 40}}},
+         "another source head"),
+        ("wrong-repo", {"run": {"repository": {"full_name": "fork/example"}}}, "canonical"),
+        ("wrong-workflow", {"run": {"path": ".github/workflows/other.yml@refs/heads/x"}},
+         "reviewed workflow"),
+        ("failed-run", {"run": {"conclusion": "failure"}}, "successfully"),
+        ("incomplete-run", {"run": {"status": "in_progress"}}, "successfully"),
+        ("pushed-event", {"run": {"event": "push"}}, "approved opt-in trigger"),
+        ("forged-digest", {"artifact": {"digest": "sha256:" + "0" * 64}}, "digest"),
+        ("expired-flag", {"artifact": {"expired": True}}, "expired"),
+        ("expired-date", {"artifact": {"expires_at": "2026-10-01T00:00:00Z"}}, "expired"),
+        ("other-artifact-name", {"artifact": {"name": "something-else"}}, "artifact name"),
+        # #319 r2 F2: the tree was not bound at all, so these three were not refusals.
+        ("missing-head-commit", {"run": {"head_commit": None}}, "no head_commit object"),
+        ("head-commit-other-id", {"run": {"head_commit": {"id": "f" * 40, "tree_id": TREE}}},
+         "about another commit"),
+        ("head-commit-other-tree",
+         {"run": {"head_commit": {"id": SOURCE, "tree_id": "f" * 40}}},
+         "tree differs from the scan tree"),
+        ("head-commit-no-tree", {"run": {"head_commit": {"id": SOURCE}}},
+         "no canonical tree id"),
+    ],
+)
+def test_browser_lane_provenance_is_verified_one_mutation_at_a_time(label, kwargs, message):
+    """#319 F1: r1 verified five public values and copied the scan's provenance.
+
+    So a locally written JSON passed, and the resulting report claimed the security scan's run.
+    Each mutation below is a single thing GitHub would have said differently about the browser
+    run or its artifact, and each one has to be a refusal on its own.
+    """
+
+    with pytest.raises(tool.SecurityImportError, match=message):
+        imported(database=(definer_report(), rls_report()), vf=vf_bundle(**kwargs))
+
+
+def test_the_vf_report_carries_the_browser_run_not_the_scan_run():
+    """The provenance that ends up in the envelope is the one that was verified."""
+
+    envelope = imported(database=(definer_report(), rls_report()), vf=vf_bundle())
+    vf = [row for row in envelope["observations"] if row["threatId"] == "SEC-VF-001"][0]
+    assert vf["sourceRunId"] == VF_RUN_ID != RUN_ID
+    assert vf["sourceHeadSha"] == SOURCE
+    binding = vf["vfArtifact"]
+    assert binding["runId"] == VF_RUN_ID
+    assert binding["artifactId"] == VF_ARTIFACT_ID
+    assert binding["artifactName"] == tool.VF_ARTIFACT_NAME
+    assert binding["workflowPath"] == APPROVED_ALLOWLIST["secVf001"]["workflow"]["path"]
+    assert binding["digest"] == binding["observedDigest"]
+    assert binding["runConclusion"] == "success"
+    assert len(binding["proofSha256"]) == 64
+
+
+def test_the_vf_tree_is_read_from_the_browser_head_commit_not_copied():
+    """#319 r2 F2: the exact probe Codex ran -- change the scan report's tree alone.
+
+    r1 compared ``head_sha`` and then copied ``checkoutTreeSha`` out of the scan report, so a
+    report naming any tree imported as MEASURED_PASS.  Now the scan run's own ``head_commit``
+    refuses that report, and what the VF report records comes from the browser run's verified
+    ``head_commit.tree_id`` -- the same value, reached independently.
+    """
+
+    forged = producer_report()
+    forged["checkoutTreeSha"] = "f" * 40
+    with pytest.raises(tool.SecurityImportError, match="head_commit tree"):
+        imported(forged, database=(definer_report(), rls_report()), vf=vf_bundle())
+
+    envelope = imported(database=(definer_report(), rls_report()), vf=vf_bundle())
+    vf = [row for row in envelope["observations"] if row["threatId"] == "SEC-VF-001"][0]
+    assert vf["checkoutTreeSha"] == TREE
+
+
+def test_a_scan_run_without_a_head_commit_tree_is_refused():
+    """The scan side is bound the same way: no head_commit, no import.
+
+    Both importers in this chain get their run metadata from ``gh api .../actions/runs/<id>``,
+    which carries ``head_commit``; a hand-written metadata file that drops it is exactly the
+    input this refusal exists for.
+    """
+
+    blob = archive(database=(definer_report(), rls_report()))
+    run_metadata, artifact_metadata = metadata(blob)
+    del run_metadata["head_commit"]
+    with pytest.raises(tool.SecurityImportError, match="no head_commit object"):
+        tool.import_evidence(blob, run_metadata, artifact_metadata, now=NOW)
+
+
+def test_a_browser_artifact_without_the_proof_member_is_refused():
+    with pytest.raises(tool.SecurityImportError, match="no proof member"):
+        imported(
+            database=(definer_report(), rls_report()),
+            vf=vf_bundle(members=[("web-container-tests.xml", b"<testsuite/>")]),
+        )
+
+
+def test_a_browser_artifact_with_an_unsafe_member_is_refused():
+    with pytest.raises(tool.SecurityImportError, match="unsafe"):
+        imported(
+            database=(definer_report(), rls_report()),
+            vf=vf_bundle(members=[
+                (tool.VF_PROOF_MEMBER, json.dumps(vf_proof()).encode()),
+                ("../outside.json", b"{}"),
+            ]),
+        )
+
+
+@pytest.mark.parametrize("dropped", [0, 1, 2], ids=["archive", "run-metadata", "artifact-metadata"])
+def test_two_of_the_three_vf_inputs_are_not_enough(dropped):
+    """Dropping one input would let a caller shed exactly the binding it dislikes."""
+
+    bundle = list(vf_bundle())
+    bundle[dropped] = None
+    with pytest.raises(tool.SecurityImportError, match="needs the browser lane archive"):
+        imported(database=(definer_report(), rls_report()), vf=tuple(bundle))
+
+
+def test_the_vf_report_pins_the_five_reviewed_files():
+    envelope = imported(database=(definer_report(), rls_report()), vf=vf_bundle())
+    vf = [row for row in envelope["observations"] if row["threatId"] == "SEC-VF-001"][0]
+    spec = APPROVED_ALLOWLIST["secVf001"]
+    expected = [spec["runner"], spec["workflow"], spec["nodeDependencyResolver"], *spec["testFiles"]]
+    assert vf["toolFiles"] == [dict(row) for row in expected]
+    assert sorted(vf["nodeIds"]) == sorted(spec["requiredNodeIds"])
 
 
 def test_a_scan_verdict_that_contradicts_its_own_payload_is_refused():
@@ -568,6 +960,65 @@ def test_the_scan_allowlist_pins_the_files_this_checkout_actually_has():
     assert aggregator.SCAN_ALLOWLIST_BLOB == git(
         "hash-object", tool.SCAN_ALLOWLIST_REPO_PATH
     ), "the aggregator pins a different allowlist than this checkout has"
+
+
+def test_the_definer_and_rls_tool_pins_match_the_files_this_checkout_has():
+    """Card 221: a threat report pins the tools that ran, and the aggregator compares them.
+
+    ``evaluate_definer`` and ``evaluate_rls`` refuse a report whose ``toolFiles`` are not the
+    reviewed pins, so a tool that moves without its pin moving turns both reports into
+    INVALID_RUN -- silently, because nothing was producing them.  ``c96f4f60`` moved the RLS
+    baseline that way on 2026-09-28 and this card found it by producing the report.
+    """
+
+    for row in [*aggregator.DEFINER_FILES, *aggregator.RLS_FILES]:
+        assert row["blob"] == git("hash-object", row["path"]), f"{row['path']} pin is stale"
+
+
+def test_the_reviewed_security_allowlist_still_describes_this_tree():
+    """Card 221: the two review decisions the axis is waiting on, named as measurements.
+
+    Neither is a code change and neither is this card's to make -- both are content of the
+    reviewed allowlist, which is also the AC-11 target's pinned ``sourceDocument``, so editing
+    it moves an AC-11 definition.  They are asserted here so the axis's state is checkable and
+    so that **closing either one fails this test**: whoever reviews it updates these numbers,
+    the axis-sources reason and the History together.
+
+    1. ``definerPolicySignatures`` has twelve signatures while the checker's own policy -- and
+       the live catalogue -- has fifteen.  ``evaluate_definer``'s exit-0 branch requires the
+       observed set to equal the reviewed one *exactly*, so SEC-DEF-001 is INVALID_RUN until
+       the three newer privileged functions are reviewed in.
+    2. ``secVf001.workflow`` pins a blob of the browser lane that ``0f614152`` moved on
+       2026-10-01 -- the same commit that moved the dependency/SAST workflow pin (#313 F-R3).
+       ``evaluate_vf`` does not see it, because it compares the report's ``toolFiles`` with the
+       allowlist rather than with the tree; the aggregator makes that comparison only once all
+       four threat reports are present.  So the drift is latent and turns the *axis* into
+       INVALID_RUN the moment the first gap closes -- the two have to be reviewed together.
+    """
+
+    policy = json.loads((ROOT / "tools/definer-policy.json").read_text(encoding="utf-8"))
+    reviewed = set(APPROVED_ALLOWLIST["definerPolicySignatures"])
+    # The policy maps each signature to its reviewed definition, so its keys are the set.
+    declared = set(policy["functions"])
+    assert len(reviewed) == 12
+    assert len(declared) == 15
+    assert reviewed < declared, "the reviewed list is no longer a strict subset of the policy"
+    assert sorted(declared - reviewed) == [
+        "public.model_version_measurement(text)",
+        "public.record_auth_denial(text, text, text, text, text, text, text, text, jsonb, text, text)",
+        "public.record_kernel_run_cancel(text, text, text, text, text)",
+    ]
+
+    workflow = APPROVED_ALLOWLIST["secVf001"]["workflow"]
+    assert workflow["path"] == ".github/workflows/desktop-browser.yml"
+    assert workflow["blob"] != git("hash-object", workflow["path"]), (
+        "the browser lane pin now matches the tree: re-review it, then update this test, the "
+        "axis-sources reason and the History"
+    )
+    # Every other VF pin does match, so the workflow pin is the only one in the way.
+    spec = APPROVED_ALLOWLIST["secVf001"]
+    for row in [spec["runner"], spec["nodeDependencyResolver"], *spec["testFiles"]]:
+        assert row["blob"] == git("hash-object", row["path"]), f"{row['path']} pin is stale"
 
 
 def test_an_unregistered_threat_id_is_refused_rather_than_carried():
