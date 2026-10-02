@@ -41,7 +41,7 @@ def conforming_health(**overrides):
         "nodeId": NODE,
         "builderInstanceId": "builder-c214",
         "builderProfileId": "rootless-product-v1",
-        "recoveryEpoch": 7,
+        "recoveryEpoch": "223e4567-e89b-12d3-a456-426614174000",
         "observedAt": "2026-10-02T08:00:00Z",
         "runtimeIdentity": "sha256:" + "a" * 64,
         "daemonIdentity": dict(DAEMON),
@@ -108,28 +108,32 @@ def test_a_missing_receipt_is_a_refusal_not_an_empty_reading(tmp_path):
     assert refused.value.code == "RES-0006"
 
 
-def test_the_contract_epoch_type_does_not_yet_satisfy_the_three_way_agreement(tmp_path):
-    """Recorded conflict, not a desired behaviour (reported on PR #311).
+def test_the_uuid_epoch_now_satisfies_the_three_way_agreement():
+    """The conflict this test used to record is closed, so it records the resolution.
 
-    The decision requires ``recoveryEpoch == <system epoch> == lease.recovery_epoch``.
-    The contract types ``recoveryEpoch`` as ``integer >= 1``, while this tree's recovery
-    epoch is a UUID string on the database handle and on both ``inv.nodes`` and
-    ``inv.resource_leases``.  So a schema-conforming receipt can never agree with the
-    system epoch, and this test fails the moment either side is changed -- which is the
-    point: whoever resolves #311 must come back here.
+    Until #311 r2 the contract typed ``recoveryEpoch`` as ``integer``, which could never
+    equal this tree's UUID epoch, and the earlier version of this test asserted that
+    refusal so that resolving the contract would break it.  It did break -- the contract
+    now types it ``string/format uuid`` -- so the assertion is inverted: an agreeing UUID
+    passes, a different UUID still refuses, and case alone never decides.
     """
 
     class _Database:
-        recovery_epoch = "223e4567-e89b-12d3-a456-426614174000"
-
-        def transaction(self, tenant_id):  # pragma: no cover - never reached
-            raise AssertionError("the epoch comparison refuses before any statement")
+        recovery_epoch = "223E4567-E89B-12D3-A456-426614174000"   # upper case on purpose
 
     service = BuildExecutionService(
         _Database(), object(), object(), environment={PRODUCT_ENABLE_SETTING: "1"}
     )
+    lowercase = _Database.recovery_epoch.lower()
+    identity = service._health_authority(
+        conforming_health(recoveryEpoch=lowercase), leased_node_id=NODE, lease_epoch=lowercase
+    )
+    assert identity["comm"] == "buildkitd"
+
     with pytest.raises(DomainError) as refused:
         service._health_authority(
-            conforming_health(), leased_node_id=NODE, lease_epoch=_Database.recovery_epoch
+            conforming_health(recoveryEpoch="99999999-9999-4999-8999-999999999999"),
+            leased_node_id=NODE,
+            lease_epoch=lowercase,
         )
     assert "recovery epoch" in str(refused.value)

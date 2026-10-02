@@ -29,7 +29,7 @@ RUN = "run_c214"
 NODE = "nod_c214"
 RESOURCE = "res_c214"
 LEASE = "lse_c214"
-SESSION = "bsn-c214-0001"
+SESSION = "7f4a1c62-9d1e-4a3b-8c55-0f21aa9b4e10"
 EVIDENCE_ID = "evd_c214"
 ENABLED = {PRODUCT_ENABLE_SETTING: "1"}
 
@@ -187,6 +187,7 @@ class _Boundary:
 def request_plan_decision(lease_epoch=EPOCH):
     request = {"tenantId": TENANT, "projectId": PROJECT, "workspaceId": "wsp_c214"}
     plan = {
+        "buildSessionId": SESSION,
         "lease": {
             "leaseId": LEASE,
             "resourceId": RESOURCE,
@@ -344,7 +345,8 @@ def test_a_daemon_that_changed_across_the_dispatch_goes_to_cleanup(after, code):
         ({"nodeId": "nod_other"}, "nodeId does not bind"),
         ({"resourceId": "res_other"}, "resourceId does not bind"),
         ({"leaseId": "lse_other"}, "leaseId does not bind"),
-        ({"buildSessionId": "bsn-other"}, "buildSessionId does not bind"),
+        ({"buildSessionId": "11111111-2222-4333-8444-555555555555"},
+         "buildSessionId does not bind"),
         ({"recoveryEpoch": "333e4567-e89b-12d3-a456-426614174000"}, "recovery epoch"),
         ({"writerKind": "control-plane"}, "node agent"),
         ({"schemaVersion": "build-physical-cleanup-receipt:0"}, "schema is not authoritative"),
@@ -435,6 +437,87 @@ def test_the_persisted_envelope_carries_the_cleanup_receipt_and_its_digest():
     result = run(service)
     evidence = [params for kind, params in database.committed[-1] if kind == "evidence"]
     envelope = evidence[0][3].obj
-    assert envelope["physicalCleanupReceipt"]["buildSessionId"] == SESSION
-    assert len(envelope["physicalCleanupReceiptSha256"]) == 64
+    # The contract's names, and the pair the product path requires.
+    assert envelope["cleanupReceipt"]["physicalReceipt"]["buildSessionId"] == SESSION
+    assert len(envelope["cleanupReceipt"]["physicalReceiptDigest"]) == 64
     assert result.evidence_digest and len(result.evidence_digest) == 64
+
+
+# --- what the product path requires although the contract leaves it optional ------------
+
+
+def test_a_plan_without_a_build_session_id_is_refused_before_dispatch():
+    """``BuildPlan.buildSessionId`` is optional in the contract; here it is not.
+
+    A legacy plan without one stays contract valid, but the physical cleanup receipt binds
+    itself to a session, so a product dispatch with no session has nothing for that receipt
+    to be about.
+    """
+
+    service, _database, adapter, _boundary = build()
+    request, plan, decision = request_plan_decision()
+    plan.pop("buildSessionId")
+    with pytest.raises(DomainError) as refused:
+        service.execute(
+            object(), request, plan, decision,
+            policy_version="v1", run_id=RUN, evidence_id=EVIDENCE_ID, actor_id="act_c214",
+        )
+    assert refused.value.code == "RES-0006"
+    assert "buildSessionId" in str(refused.value)
+    assert adapter.calls == 0
+
+
+def test_a_receipt_session_that_differs_from_the_admitted_plan_is_refused():
+    other = "22222222-3333-4444-8555-666666666666"
+    service, database, _adapter, _boundary = build(
+        adapter=_Adapter(receipt={"buildSessionId": other})
+    )
+    with pytest.raises(DomainError) as refused:
+        run(service)
+    assert refused.value.code == "VERIFY-0002"
+    assert "differs from the admitted plan" in str(refused.value)
+    assert all(batch == [] for batch in database.committed)
+
+
+def test_case_alone_never_decides_the_session_or_epoch_comparison():
+    service, database, _adapter, _boundary = build(
+        adapter=_Adapter(receipt={"buildSessionId": SESSION.upper()})
+    )
+    result = run(service)
+    assert result.lease_released is True
+
+
+def test_the_persisted_cleanup_receipt_carries_the_pair_the_contract_only_pairs():
+    """The contract makes the pair ``dependentRequired``, so neither present is valid.
+
+    The product path requires both, and the digest has to be the canonical digest of the
+    physical receipt beside it -- a digest of something else is a pair in name only.
+    """
+
+    service, database, _adapter, _boundary = build()
+    run(service)
+    evidence = [params for kind, params in database.committed[-1] if kind == "evidence"]
+    cleanup = evidence[0][3].obj["cleanupReceipt"]
+    assert set(cleanup) == {"physicalReceipt", "physicalReceiptDigest"}
+    from inv.build_execution import canonical_digest
+
+    assert cleanup["physicalReceiptDigest"] == canonical_digest(cleanup["physicalReceipt"])
+
+
+def test_a_mismatched_physical_digest_is_refused_rather_than_committed():
+    service, database, _adapter, _boundary = build()
+    original = BuildExecutionService._require_physical_pair
+
+    def tampering(self, cleanup):
+        cleanup["physicalReceiptDigest"] = "0" * 64
+        return original(self, cleanup)
+
+    BuildExecutionService._require_physical_pair = tampering
+    try:
+        with pytest.raises(DomainError) as refused:
+            run(service)
+    finally:
+        BuildExecutionService._require_physical_pair = original
+    assert refused.value.code == "VERIFY-0022"
+    assert "does not match the physical receipt" in str(refused.value)
+    assert all(batch == [] for batch in database.committed)

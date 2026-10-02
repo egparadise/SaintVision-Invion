@@ -33,6 +33,7 @@ from dataclasses import dataclass
 import hashlib
 import json
 import os
+import re
 from typing import Any, Mapping
 from uuid import uuid4
 
@@ -63,6 +64,8 @@ COMPLETED_EVENT = "inv.build.dispatch_completed"
 PARTIAL_EXPORT_DISPOSITIONS = frozenset({"quarantined", "purged"})
 CACHE_DISPOSITIONS = frozenset({"retained", "quarantined", "purged"})
 
+SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+
 #: The daemon identity fields that must be identical before and after the dispatch.
 #: ``comm`` is included because a rootlesskit process answering in buildkitd's place
 #: would otherwise satisfy a pid-only comparison.
@@ -86,6 +89,19 @@ def canonical_digest(document: Mapping[str, Any]) -> str:
         document, sort_keys=True, separators=(",", ":"), ensure_ascii=False
     ).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
+
+
+def _uuid_key(value: Any) -> str:
+    """The comparison form for a UUID-shaped value.
+
+    The contract's patterns are lowercase-only, so a validated document is already in this
+    form -- but not every side of these comparisons is a validated document.  The database
+    hands back ``str(UUID(...))`` and a caller may hand in a plan field from somewhere
+    else, and ``'A1B2' != 'a1b2'`` would refuse a dispatch whose authority actually agrees.
+    Normalising before comparing keeps the refusal about disagreement rather than casing.
+    """
+
+    return str(value).strip().lower()
 
 
 def _refuse_product_dispatch(detail: str) -> DomainError:
@@ -143,8 +159,8 @@ class BuildExecutionService:
         other authority check in ``build_adapter`` compares against.
         """
 
-        system_epoch = str(self.db.recovery_epoch)
-        if str(receipt_epoch) != system_epoch or str(lease_epoch) != system_epoch:
+        system_epoch = _uuid_key(self.db.recovery_epoch)
+        if _uuid_key(receipt_epoch) != system_epoch or _uuid_key(lease_epoch) != system_epoch:
             raise _refuse_product_dispatch(
                 "builder, database and lease do not agree on the recovery epoch"
             )
@@ -206,16 +222,20 @@ class BuildExecutionService:
             raise refuse("Build cleanup receipt schema is not authoritative")
         if receipt.get("writerKind") != WRITER_KIND:
             raise refuse("Build cleanup receipt was not written by the node agent")
+        if _uuid_key(receipt.get("buildSessionId")) != _uuid_key(build_session_id):
+            raise refuse("Build cleanup receipt buildSessionId does not bind this dispatch")
         for field, expected in (
-            ("buildSessionId", build_session_id),
             ("nodeId", leased_node_id),
             ("resourceId", resource_id),
             ("leaseId", lease_id),
         ):
             if receipt.get(field) != expected:
                 raise refuse(f"Build cleanup receipt {field} does not bind this dispatch")
-        system_epoch = str(self.db.recovery_epoch)
-        if str(receipt.get("recoveryEpoch")) != system_epoch or str(lease_epoch) != system_epoch:
+        system_epoch = _uuid_key(self.db.recovery_epoch)
+        if (
+            _uuid_key(receipt.get("recoveryEpoch")) != system_epoch
+            or _uuid_key(lease_epoch) != system_epoch
+        ):
             raise refuse("Build cleanup receipt does not agree on the recovery epoch")
         identity = self._daemon_identity(receipt, "Build cleanup receipt")
         if any(identity[field] != daemon_before[field] for field in DAEMON_IDENTITY_FIELDS):
@@ -233,6 +253,38 @@ class BuildExecutionService:
         if not receipt.get("verifiedAt"):
             raise refuse("Build cleanup receipt records no verification time")
         return dict(receipt)
+
+    def _require_physical_pair(self, cleanup: Any) -> None:
+        """The product path requires the pair the contract only requires together.
+
+        ``BuildCleanupReceipt`` makes ``physicalReceipt`` and ``physicalReceiptDigest``
+        ``dependentRequired`` on each other, so a receipt carrying **neither** is contract
+        valid -- that is the legacy caller's shape.  A product release has to be justified
+        by a physical receipt, so the caller requires both rather than inheriting a
+        permission written for callers that never had one.
+        """
+
+        if not isinstance(cleanup, dict):
+            raise DomainError("VERIFY-0022", "Build cleanup receipt is unavailable", 409)
+        receipt = cleanup.get("physicalReceipt")
+        digest = cleanup.get("physicalReceiptDigest")
+        if receipt is None or digest is None:
+            raise DomainError(
+                "VERIFY-0022",
+                "Build cleanup receipt carries no physical receipt pair, which the product "
+                "path requires even though the contract allows a legacy receipt without one",
+                409,
+            )
+        if not isinstance(digest, str) or not SHA256_RE.fullmatch(digest):
+            raise DomainError(
+                "VERIFY-0022", "Build cleanup physicalReceiptDigest is malformed", 409
+            )
+        if canonical_digest(receipt) != digest:
+            raise DomainError(
+                "VERIFY-0022",
+                "Build cleanup physicalReceiptDigest does not match the physical receipt",
+                409,
+            )
 
     # ---------------------------------------------------------------- the one transaction
 
@@ -268,7 +320,7 @@ class BuildExecutionService:
                 or lease["project_id"] != project_id
                 or str(lease["resource_id"]) != resource_id
                 or lease["released_at"] is not None
-                or str(lease["recovery_epoch"]) != str(self.db.recovery_epoch)
+                or _uuid_key(lease["recovery_epoch"]) != _uuid_key(self.db.recovery_epoch)
             ):
                 # The adapter revalidated before this point; this is the same check at
                 # commit time, because the only state that may be released is the state
@@ -287,10 +339,18 @@ class BuildExecutionService:
                 lease_epoch=str(lease["recovery_epoch"]),
                 daemon_before=daemon_before,
             )
+            # The contract's own names: BuildCleanupReceipt references the physical receipt
+            # and its canonical digest as ``physicalReceipt``/``physicalReceiptDigest``.  The
+            # pair is only ``dependentRequired`` there -- neither present is valid for a
+            # legacy caller -- so the product path requires it here before committing.
+            cleanup_receipt = {
+                "physicalReceipt": deepcopy(verified),
+                "physicalReceiptDigest": canonical_digest(verified),
+            }
+            self._require_physical_pair(cleanup_receipt)
             envelope = {
                 **deepcopy(dict(evidence)),
-                "physicalCleanupReceipt": deepcopy(verified),
-                "physicalCleanupReceiptSha256": canonical_digest(verified),
+                "cleanupReceipt": cleanup_receipt,
             }
             evidence_digest = canonical_digest(envelope)
             conn.execute(
@@ -351,6 +411,16 @@ class BuildExecutionService:
         """Dispatch one admitted build and commit its durable consequences."""
 
         self._require_product_enable()
+        # ``BuildPlan.buildSessionId`` is optional in the contract so a legacy plan without
+        # one stays valid. The product path requires it: the physical cleanup receipt binds
+        # itself to a session, and a dispatch with no session of its own has nothing for
+        # that receipt to be about.
+        plan_session = plan.get("buildSessionId")
+        if not plan_session:
+            raise _refuse_product_dispatch(
+                "the admitted BuildPlan names no buildSessionId, which the product path "
+                "requires even though the contract leaves it optional"
+            )
         lease_id = plan["lease"]["leaseId"]
         resource_id = plan["lease"]["resourceId"]
         lease_epoch = plan["lease"].get("recoveryEpoch")
@@ -371,9 +441,16 @@ class BuildExecutionService:
             evidence_id=evidence_id,
             actor_id=actor_id,
         )
-        build_session_id = dispatched.receipt.get("buildSessionId")
-        if not build_session_id:
+        receipt_session = dispatched.receipt.get("buildSessionId") or plan_session
+        if not receipt_session:
             raise DomainError("VERIFY-0002", "Build receipt names no session", 422)
+        if _uuid_key(receipt_session) != _uuid_key(plan_session):
+            raise DomainError(
+                "VERIFY-0002", "Build receipt session differs from the admitted plan", 422
+            )
+        # Downstream uses the *admitted* form, not the transport's casing: the plan is the
+        # document that was admitted, and the receipt only has to agree with it.
+        build_session_id = plan_session
 
         daemon_after = self._daemon_identity(
             {"daemonIdentity": self._transport.daemon_identity()}, "post-dispatch observation"
