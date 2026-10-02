@@ -16,6 +16,36 @@ import { PlacementExplainView } from './PlacementExplainView';
 export type PoolItem = PoolListItemResponse;
 export type CandidateItem = DiscoveryCandidateResponse;
 
+export type DiscoveryCandidateStateKey = DiscoveryCandidateResponse['state'];
+
+export interface DiscoveryCandidateStateStyle {
+  color: string;
+  bg: string;
+  border: string;
+  label: string;
+}
+
+export const DISCOVERY_CANDIDATE_STATE_CONFIG = {
+  candidate: {
+    color: 'var(--color-status-degraded)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-degraded)',
+    label: 'CANDIDATE (미검증)',
+  },
+} satisfies Record<DiscoveryCandidateStateKey, DiscoveryCandidateStateStyle>;
+
+export function getDiscoveryCandidateStateConfig(state?: string | null): DiscoveryCandidateStateStyle {
+  if (state && Object.hasOwn(DISCOVERY_CANDIDATE_STATE_CONFIG, state)) {
+    return DISCOVERY_CANDIDATE_STATE_CONFIG[state as DiscoveryCandidateStateKey];
+  }
+  return {
+    color: 'var(--color-status-unknown)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-unknown)',
+    label: state ? `UNKNOWN (${state})` : 'UNKNOWN',
+  };
+}
+
 export interface PlacementSimulatorProps {
   nodes: NodeItem[];
   initialPools?: PoolItem[];
@@ -233,9 +263,9 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
             style={{
               padding: '3px 8px',
               borderRadius: '4px',
-              backgroundColor: 'rgba(234, 179, 8, 0.15)',
-              border: '1px solid rgba(234, 179, 8, 0.3)',
-              color: '#fbbf24',
+              backgroundColor: 'var(--color-bg-subtle)',
+              border: '1px solid var(--color-status-degraded)',
+              color: 'var(--color-status-degraded)',
               fontSize: '0.6875rem',
               fontWeight: 600,
             }}
@@ -261,10 +291,10 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
           data-testid="pools-error-banner"
           style={{
             padding: '14px 18px',
-            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            backgroundColor: 'var(--color-bg-subtle)',
             borderRadius: 'var(--radius-lg)',
-            border: '1px solid #ef4444',
-            color: '#fca5a5',
+            border: '1px solid var(--color-status-offline)',
+            color: 'var(--color-status-offline)',
             marginBottom: '20px',
           }}
         >
@@ -274,7 +304,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
             type="button"
             data-testid="pools-retry-btn"
             onClick={loadPools}
-            style={{ marginTop: '8px', padding: '4px 10px', fontSize: '0.6875rem', backgroundColor: '#334155', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+            style={{ marginTop: '8px', padding: '4px 10px', fontSize: '0.6875rem', backgroundColor: 'var(--color-bg-subtle)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border-subtle)', borderRadius: '4px', cursor: 'pointer' }}
           >
             재시도 (Retry)
           </button>
@@ -312,9 +342,9 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
                     fontSize: '0.8125rem',
                     fontWeight: 600,
                     cursor: 'pointer',
-                    border: '1px solid var(--color-border-strong)',
-                    backgroundColor: isSelected ? 'var(--color-brand-primary-bg)' : 'var(--color-bg-subtle)',
-                    color: isSelected ? '#ffffff' : 'var(--color-text-secondary)',
+                    border: isSelected ? '1px solid var(--color-brand-hover)' : '1px solid var(--color-border-subtle)',
+                    backgroundColor: isSelected ? 'var(--color-brand-subtle)' : 'var(--color-bg-subtle)',
+                    color: isSelected ? 'var(--color-brand-hover)' : 'var(--color-text-secondary)',
                   }}
                 >
                   {p.name} ({count} 노드)
@@ -331,7 +361,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
           )}
 
           {poolCapacityState === 'error' && (
-            <div data-testid="pool-capacity-error" style={{ padding: '10px 14px', fontSize: '0.75rem', color: '#fca5a5', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: 'var(--radius-sm)', border: '1px solid #ef4444' }}>
+            <div data-testid="pool-capacity-error" style={{ padding: '10px 14px', fontSize: '0.75rem', color: 'var(--color-status-offline)', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-status-offline)' }}>
               ⚠️ {poolCapacityError}
             </div>
           )}
@@ -405,7 +435,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
               자원 풀 연동 대기 중입니다.
             </span>
           </div>
-          <span style={{ fontSize: '0.75rem', color: '#fbbf24', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--color-status-degraded)', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
             [로컬 결정론적 평가 (UNVERIFIED)]
           </span>
         </div>
@@ -431,7 +461,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
               자원 풀 정보가 없습니다. 현재 관측된 노드 정보로 배치 가능성을 미리 평가합니다.
             </span>
           </div>
-          <span style={{ fontSize: '0.75rem', color: '#fbbf24', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--color-status-degraded)', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
             [로컬 결정론적 평가 (UNVERIFIED)]
           </span>
         </div>
@@ -495,9 +525,9 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
                 fontSize: '0.8125rem',
                 fontWeight: 600,
                 cursor: 'pointer',
-                border: '1px solid var(--color-border-strong)',
-                backgroundColor: requiresGpu ? 'var(--color-brand-primary-bg)' : 'var(--color-bg-subtle)',
-                color: requiresGpu ? '#ffffff' : 'var(--color-text-secondary)',
+                border: requiresGpu ? '1px solid var(--color-brand-hover)' : '1px solid var(--color-border-subtle)',
+                backgroundColor: requiresGpu ? 'var(--color-brand-subtle)' : 'var(--color-bg-subtle)',
+                color: requiresGpu ? 'var(--color-brand-hover)' : 'var(--color-text-secondary)',
               }}
             >
               {requiresGpu ? '⚡ GPU 필수 요구 (CUDA)' : '무관 (CPU 전용 가능)'}
@@ -562,8 +592,8 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
         <div
           style={{
             padding: '12px 16px',
-            backgroundColor: 'rgba(35, 134, 54, 0.1)',
-            border: '1px solid var(--color-success)',
+            backgroundColor: 'var(--color-bg-subtle)',
+            border: '1px solid var(--color-status-online)',
             borderRadius: 'var(--radius-md)',
             fontSize: '0.8125rem',
             color: 'var(--color-text-primary)',
@@ -600,7 +630,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
             분산 데이터 샤드 배치 상태 (/v1/pools/{selectedPoolId}/placement-preview)
           </h4>
           {previewState === 'loading' && (
-            <div data-testid="preview-loading" style={{ padding: '12px', textAlign: 'center', color: '#94a3b8', fontSize: '0.75rem' }}>
+            <div data-testid="preview-loading" style={{ padding: '12px', textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>
               서버 배치 미리보기 조회 중...
             </div>
           )}
@@ -611,23 +641,23 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
               data-testid="preview-error-banner"
               style={{
                 padding: '12px',
-                backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                border: '1px solid #ef4444',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-status-offline)',
                 borderRadius: '6px',
-                color: '#fca5a5',
+                color: 'var(--color-status-offline)',
                 fontSize: '0.75rem',
               }}
             >
               <div style={{ fontWeight: 600 }}>⚠️ 서버 배치 미리보기 실패</div>
               <div style={{ marginTop: '2px' }}>{previewError}</div>
-              <div style={{ fontSize: '0.6875rem', color: '#f87171', marginTop: '4px' }}>
+              <div style={{ fontSize: '0.6875rem', color: 'var(--color-status-offline)', marginTop: '4px' }}>
                 서버 어드미션 미검증: 가짜 샤드 상태를 생성하지 않습니다.
               </div>
               <button
                 type="button"
                 data-testid="preview-retry-btn"
                 onClick={loadPlacementPreview}
-                style={{ marginTop: '8px', padding: '3px 8px', fontSize: '0.6875rem', backgroundColor: '#334155', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                style={{ marginTop: '8px', padding: '3px 8px', fontSize: '0.6875rem', backgroundColor: 'var(--color-bg-subtle)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border-subtle)', borderRadius: '4px', cursor: 'pointer' }}
               >
                 재시도 (Retry)
               </button>
@@ -660,7 +690,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
             자원 디스커버리 후보 목록 (/v1/discovery/candidates)
           </h4>
           {candidatesState === 'loading' && (
-            <div data-testid="candidates-loading" style={{ padding: '12px', textAlign: 'center', color: '#94a3b8', fontSize: '0.75rem' }}>
+            <div data-testid="candidates-loading" style={{ padding: '12px', textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>
               디스커버리 후보 목록 조회 중...
             </div>
           )}
@@ -677,10 +707,10 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
               data-testid="candidates-error-banner"
               style={{
                 padding: '10px 12px',
-                backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                border: '1px solid #ef4444',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-status-offline)',
                 borderRadius: '6px',
-                color: '#fca5a5',
+                color: 'var(--color-status-offline)',
                 fontSize: '0.75rem',
               }}
             >
@@ -690,7 +720,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
                 type="button"
                 data-testid="candidates-retry-btn"
                 onClick={loadCandidates}
-                style={{ marginTop: '6px', padding: '3px 8px', fontSize: '0.6875rem', backgroundColor: '#334155', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                style={{ marginTop: '6px', padding: '3px 8px', fontSize: '0.6875rem', backgroundColor: 'var(--color-bg-subtle)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border-subtle)', borderRadius: '4px', cursor: 'pointer' }}
               >
                 재시도 (Retry)
               </button>
@@ -700,7 +730,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
           {candidatesState === 'success' && candidates.length === 0 && (
             <p data-testid="candidates-empty-state" role="status" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', padding: '8px 0', lineHeight: '1.4' }}>
               승인 대기 중인 디스커버리 후보가 없습니다.<br />
-              <span style={{ fontSize: '0.6875rem', color: '#93c5fd' }}>
+              <span style={{ fontSize: '0.6875rem', color: 'var(--color-brand-hover)' }}>
                 🛠️ <strong>[운영자 조치 필요]</strong>: 신규 머신 등록은 클러스터 인프라 운영자에게 요청하십시오 (Node 운영 런북 'docs/vault/20_Operations/노드 운영 런북.md'의 'saint operator issue-grant' 참조).
               </span>
             </p>
@@ -715,6 +745,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
                 const claimedCores = c.claimedCpuCores ?? (c as any).availableCores;
                 const claimedRam = c.claimedRamBytes ?? (c as any).availableMemoryBytes;
                 const claimedGpus = c.claimedGpuCount ?? (c as any).gpuCount ?? 0;
+                const candStateCfg = getDiscoveryCandidateStateConfig(c.state);
 
                 return (
                   <div
@@ -742,14 +773,14 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
                       style={{
                         padding: '2px 6px',
                         borderRadius: 'var(--radius-sm)',
-                        backgroundColor: 'rgba(234, 179, 8, 0.15)',
-                        color: '#fbbf24',
-                        border: '1px solid rgba(234, 179, 8, 0.3)',
+                        backgroundColor: candStateCfg.bg,
+                        color: candStateCfg.color,
+                        border: `1px solid ${candStateCfg.border}`,
                         fontWeight: 600,
                         fontSize: '0.6875rem',
                       }}
                     >
-                      CANDIDATE (미검증)
+                      {candStateCfg.label}
                     </span>
                   </div>
                 );
