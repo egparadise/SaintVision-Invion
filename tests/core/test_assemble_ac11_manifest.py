@@ -325,7 +325,11 @@ def test_emitted_axes_reads_each_importers_declaration():
     emits nothing.
     """
     assert assembler.emitted_axes("tools/import_ac11_migration_rehearsal.py") == set(MIGRATION_AXES)
-    assert assembler.emitted_axes("tools/import_ac11_security_scan.py") == set()
+    # Card 216: this was ``set()`` while the importer returned the producer's report
+    # unchanged.  It now adapts that report into an axis envelope, so it declares its axis.
+    assert assembler.emitted_axes("tools/import_ac11_security_scan.py") == {
+        "security-critical-high-zero"
+    }
     assert assembler.emitted_axes("tools/import_ac11_composite_long_soak.py") == {"long-soak"}
     assert assembler.emitted_axes(None) == set()
 
@@ -416,19 +420,21 @@ def test_the_shipped_axis_map_covers_every_axis_and_loads():
 
 
 def test_the_shipped_axis_map_is_honest_about_what_cannot_be_collected():
-    """Measured from the tree, not asserted: three axes have complete chains today.
+    """Measured from the tree, not asserted: four axes have complete chains today.
 
-    Migration and accessibility have admissible importers. Security has an importer whose
-    output is not an axis envelope, long-soak has no workflow, and three axes are external.
+    Migration, accessibility and -- since card 216 -- security have admissible importers.
+    Long-soak has no workflow and three axes are external.
     """
     axes = {entry["axis"]: entry for entry in assembler.load_sources(assembler.DEFAULT_SOURCES)}
     complete = {axis for axis, entry in axes.items() if entry["chain"] == "complete"}
-    # Two, not three. The security chain was classified complete because producer, workflow
-    # and importer all exist -- and its importer returns the producer's report with
-    # runPurpose "s11-ac11-security-scan" and no axis field, so there is no admissible
-    # envelope (#299 r1). "The importer exists" is not "the importer emits an axis envelope".
+    # #299 r1 called security complete because producer, workflow and importer all existed,
+    # which was wrong: the importer returned the producer's report with no axis field, so
+    # there was no admissible envelope. Card 216 wrote that adapter, so security is complete
+    # again -- this time because an envelope exists, not because three files do. The axis
+    # still does not pass; "complete" is about the chain, not the verdict.
     assert complete == {
-        "migration-reversible-segment", "irreversible-restore-forward", "accessibility-e2e"
+        "migration-reversible-segment", "irreversible-restore-forward", "accessibility-e2e",
+        "security-critical-high-zero",
     }
     assert all(
         axes[axis]["envelopeShape"] == "axes-bundle"
@@ -439,10 +445,11 @@ def test_the_shipped_axis_map_is_honest_about_what_cannot_be_collected():
     assert accessibility["importer"] == "tools/import_ac11_accessibility_evidence.py"
     assert accessibility["importerEmitsAxes"] == ["accessibility-e2e"]
     security = axes["security-critical-high-zero"]
-    assert security["chain"] == "incomplete"
-    assert security["envelopeShape"] == "not-an-axis-envelope"
-    assert security["importerEmitsAxes"] == []
-    assert "no axis field" in security["reason"]
+    assert security["chain"] == "complete"
+    assert security["envelopeShape"] == "axis-evidence"
+    assert security["importer"] == "tools/import_ac11_security_scan.py"
+    assert security["importerEmitsAxes"] == ["security-critical-high-zero"]
+    assert security["reason"] is None
     assert axes["long-soak"]["chain"] == "incomplete"
     assert axes["long-soak"]["workflow"] is None
     for axis in ("actual-pitr-rpo-rto-retention", "physical-five-node-ac05-placement-load",
