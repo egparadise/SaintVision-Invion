@@ -1,13 +1,13 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.301"
+version: "1.0.302"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T06:29:37+09:00"
+updated: "2026-10-03T06:46:20+09:00"
 source_of_truth: "Git"
 active_card: "CARD-251 S08-BE fixed-SHA acceptance evidence"
-active_card_status: "Strict raw-JUnit collector and independent evaluator implemented above approved Card 247; exact-head hosted opt-in measurement is pending"
+active_card_status: "Claude r1 provenance and whole-suite findings are closed locally; exact-head hosted opt-in measurement is pending"
 active_card_next: "Obtain Claude review and one exact-head Core workflow_dispatch evidence artifact; keep product flag default off and defer any 50-to-75 score decision to rescoring"
 ---
 
@@ -16,12 +16,14 @@ active_card_next: "Obtain Claude review and one exact-head Core workflow_dispatc
 - The opt-in Core phase binds a clean exact checkout SHA and tree, the redacted worker
   configuration digest, and the two original JUnit artifacts. It does not reimplement the
   product path.
-- The fixed ten-case matrix covers the server-owned prepare-to-dispatch chain, default-off zero
-  dispatch, raw authority/provider rejection, tenant isolation, forged approver rejection,
+- The fixed thirteen-case matrix covers the server-owned prepare-to-dispatch chain, both
+  default-off entry/runtime boundaries, explicit intent claim, project permission, raw
+  authority/provider rejection, tenant isolation, forged approver rejection,
   idempotency/concurrency, quota, drift terminalization, and legacy no-regression.
 - The evaluator rejects non-exact object keys and duplicate JSON keys, re-reads both JUnit XML
-  files and worker config, recomputes all digests/counts/outcomes, and derives the verdict from
-  raw observations. Physical builder acceptance remains `NOT_OBSERVED`; score change claim is
+  files and worker config, independently binds run/attempt/tree/job, requires the real-PG 13-case
+  file with zero skip, includes unrelated suite failures in the verdict, and derives the verdict
+  from raw observations. Physical builder acceptance remains `NOT_OBSERVED`; score change claim is
   always false. [[2026-10-03_06-29-37_KST_Card251_S08-BE_fixed_SHA_acceptance_evidence_Codex]].
 
 ## 2026-10-03 Card 247 — S08-BE BuildRequest product entry

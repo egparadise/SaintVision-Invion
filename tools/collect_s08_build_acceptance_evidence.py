@@ -45,7 +45,13 @@ CASE_SPECS: tuple[dict[str, str], ...] = (
         "caseId": "flag-off-dispatch-zero",
         "classname": "tests.integration.test_build_product_runtime_real_pg",
         "name": "test_flag_off_preserves_admission_without_intent_or_dispatch",
-        "requirement": "default-off product path dispatches zero times",
+        "requirement": "default-off runtime preserves a ready admission and creates no intent or dispatch",
+    },
+    {
+        "caseId": "flag-off-enqueue-admission-zero",
+        "classname": "tests.core.test_build_preparations",
+        "name": "test_flag_off_refuses_before_quota_approval_or_storage",
+        "requirement": "default-off enqueue touches no database or storage and creates no admission",
     },
     {
         "caseId": "raw-authority-rejected",
@@ -78,6 +84,18 @@ CASE_SPECS: tuple[dict[str, str], ...] = (
         "requirement": "concurrent product loops dispatch exactly once",
     },
     {
+        "caseId": "intent-claim-completes-once",
+        "classname": "tests.integration.test_build_execution_intents_real_pg",
+        "name": "test_internal_product_worker_calls_service_once_and_completes",
+        "requirement": "the product worker claims one intent, calls the service once and completes it",
+    },
+    {
+        "caseId": "project-permission-rejected",
+        "classname": "tests.integration.test_build_product_runtime_real_pg",
+        "name": "test_missing_project_permission_records_no_admission",
+        "requirement": "missing project permission records no admission",
+    },
+    {
         "caseId": "quota-rate-limit-enforced",
         "classname": "tests.integration.test_build_preparations_real_pg",
         "name": "test_prepare_rate_limit_is_enforced_before_repeated_failed_work",
@@ -103,7 +121,7 @@ TOP_KEYS = {
 }
 SOURCE_KEYS = {
     "codeSha", "checkoutTreeSha", "cleanCheckout", "repository", "workflow",
-    "runId", "runAttempt",
+    "job", "runId", "runAttempt",
 }
 WORKER_ENVELOPE_KEYS = {"sha256", "configuration"}
 WORKER_KEYS = {
@@ -255,6 +273,7 @@ def collect(
             "cleanCheckout": True,
             "repository": REPOSITORY,
             "workflow": WORKFLOW,
+            "job": "core",
             "runId": run_id,
             "runAttempt": run_attempt,
         },
@@ -271,7 +290,8 @@ def collect(
 
 def evaluate(
     evidence: dict[str, Any], *, junit_paths: Iterable[Path], worker_path: Path,
-    expected_source_sha: str,
+    expected_source_sha: str, expected_checkout_tree_sha: str,
+    expected_run_id: int, expected_run_attempt: int,
 ) -> dict[str, Any]:
     _exact_keys(evidence, TOP_KEYS, "evidence")
     if evidence["schemaVersion"] != SCHEMA_VERSION:
@@ -281,14 +301,29 @@ def evaluate(
     source = _exact_keys(evidence["source"], SOURCE_KEYS, "source")
     if not SHA40.fullmatch(expected_source_sha) or source["codeSha"] != expected_source_sha:
         raise InvalidEvidence("source codeSha differs from the expected checkout")
-    if not SHA40.fullmatch(source["checkoutTreeSha"]):
-        raise InvalidEvidence("checkoutTreeSha is not a lowercase SHA")
-    if source["cleanCheckout"] is not True or source["repository"] != REPOSITORY or source["workflow"] != WORKFLOW:
+    if (
+        not SHA40.fullmatch(expected_checkout_tree_sha)
+        or source["checkoutTreeSha"] != expected_checkout_tree_sha
+    ):
+        raise InvalidEvidence("checkoutTreeSha differs from the expected checkout tree")
+    if (
+        source["cleanCheckout"] is not True
+        or source["repository"] != REPOSITORY
+        or source["workflow"] != WORKFLOW
+        or source["job"] != "core"
+    ):
         raise InvalidEvidence("source provenance differs")
-    if type(source["runId"]) is not int or source["runId"] <= 0:
-        raise InvalidEvidence("runId must be a positive integer")
-    if type(source["runAttempt"]) is not int or source["runAttempt"] <= 0:
-        raise InvalidEvidence("runAttempt must be a positive integer")
+    if (
+        type(expected_run_id) is not int or expected_run_id <= 0
+        or type(source["runId"]) is not int or source["runId"] != expected_run_id
+    ):
+        raise InvalidEvidence("runId differs from the expected workflow run")
+    if (
+        type(expected_run_attempt) is not int or expected_run_attempt <= 0
+        or type(source["runAttempt"]) is not int
+        or source["runAttempt"] != expected_run_attempt
+    ):
+        raise InvalidEvidence("runAttempt differs from the expected workflow attempt")
 
     expected_junit, case_sources, worker, worker_digest = _read_inputs(junit_paths, worker_path)
     worker_envelope = _exact_keys(evidence["workerConfiguration"], WORKER_ENVELOPE_KEYS, "workerConfiguration")
@@ -310,6 +345,10 @@ def evaluate(
             raise InvalidEvidence(f"junitArtifacts[{index}].sha256 differs")
     if junit != expected_junit:
         raise InvalidEvidence("JUnit summaries differ from the uploaded XML bytes")
+    summaries = {item["name"]: item for item in expected_junit}
+    runtime_summary = summaries["build-product-runtime-real-pg.xml"]
+    if runtime_summary["testCount"] != 13 or runtime_summary["skippedCount"] != 0:
+        raise InvalidEvidence("build product real-PG artifact must execute exactly 13 cases with no skip")
 
     expected_observations = _observations(case_sources)
     observations = evidence["observations"]
@@ -331,11 +370,23 @@ def evaluate(
         raise InvalidEvidence("claims exceed the hosted evidence boundary")
 
     outcomes = [item["outcome"] for item in expected_observations]
-    verdict = "MEASURED_PASS" if set(outcomes) == {"passed"} else "MEASURED_FAIL"
+    artifact_failures = sum(
+        item["failureCount"] + item["errorCount"] for item in expected_junit
+    )
+    verdict = (
+        "MEASURED_PASS"
+        if set(outcomes) == {"passed"} and artifact_failures == 0
+        else "MEASURED_FAIL"
+    )
     return {
         "schemaVersion": EVALUATION_VERSION,
         "evidenceSha256": sha256(canonical_bytes(evidence)),
         "sourceSha": source["codeSha"],
+        "checkoutTreeSha": source["checkoutTreeSha"],
+        "runId": source["runId"],
+        "runAttempt": source["runAttempt"],
+        "job": source["job"],
+        "workerConfigSha256": worker_digest,
         "verdict": verdict,
         "requiredCaseCount": len(CASE_SPECS),
         "passedCaseCount": outcomes.count("passed"),
@@ -368,6 +419,9 @@ def main(argv: list[str] | None = None) -> int:
     collect_parser.add_argument("--run-id", required=True, type=int)
     collect_parser.add_argument("--run-attempt", required=True, type=int)
     evaluate_parser.add_argument("--evidence", required=True)
+    evaluate_parser.add_argument("--checkout-tree-sha", required=True)
+    evaluate_parser.add_argument("--run-id", required=True, type=int)
+    evaluate_parser.add_argument("--run-attempt", required=True, type=int)
     args = parser.parse_args(argv)
     try:
         if args.command == "collect":
@@ -382,6 +436,9 @@ def main(argv: list[str] | None = None) -> int:
         result = evaluate(
             evidence, junit_paths=_paths(args.junit), worker_path=Path(args.worker_config),
             expected_source_sha=args.expected_source_sha,
+            expected_checkout_tree_sha=args.checkout_tree_sha,
+            expected_run_id=args.run_id,
+            expected_run_attempt=args.run_attempt,
         )
         _write(Path(args.output), result)
         return 0 if result["verdict"] == "MEASURED_PASS" else 1

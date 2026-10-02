@@ -16,14 +16,42 @@ SOURCE_SHA = "a" * 40
 TREE_SHA = "b" * 40
 
 
-def _write_junit(path: Path, specs: list[dict[str, str]], *, failed: str | None = None):
-    suite = ET.Element("testsuite", name=path.stem, tests=str(len(specs)))
+def _write_junit(
+    path: Path,
+    specs: list[dict[str, str]],
+    *,
+    failed: str | None = None,
+    skipped: str | None = None,
+    filler_count: int = 0,
+    unrelated_failure: bool = False,
+):
+    total = len(specs) + filler_count + int(unrelated_failure)
+    suite = ET.Element(
+        "testsuite", name=path.stem, tests=str(total)
+    )
     for spec in specs:
         case = ET.SubElement(
             suite, "testcase", classname=spec["classname"], name=spec["name"]
         )
         if spec["caseId"] == failed:
             ET.SubElement(case, "failure", message="redacted")
+        if spec["caseId"] == skipped:
+            ET.SubElement(case, "skipped", message="redacted")
+    for index in range(filler_count):
+        ET.SubElement(
+            suite,
+            "testcase",
+            classname="tests.integration.test_build_product_runtime_real_pg",
+            name=f"test_unrelated_runtime_case_{index}",
+        )
+    if unrelated_failure:
+        case = ET.SubElement(
+            suite,
+            "testcase",
+            classname="tests.core.test_unrelated",
+            name="test_unrelated_failure",
+        )
+        ET.SubElement(case, "failure", message="redacted")
     ET.ElementTree(suite).write(path, encoding="utf-8", xml_declaration=True)
 
 
@@ -37,7 +65,7 @@ def inputs(tmp_path):
     ]
     core_specs = [spec for spec in tool.CASE_SPECS if spec not in runtime_specs]
     _write_junit(core, core_specs)
-    _write_junit(runtime, runtime_specs)
+    _write_junit(runtime, runtime_specs, filler_count=13 - len(runtime_specs))
     worker = tmp_path / "worker.json"
     worker.write_bytes(
         (Path(__file__).parents[1] / "tools/specs/s08-build-acceptance-worker-v1.json").read_bytes()
@@ -61,7 +89,13 @@ def evidence(inputs):
 def evaluate(value, inputs):
     junit, worker = inputs
     return tool.evaluate(
-        value, junit_paths=junit, worker_path=worker, expected_source_sha=SOURCE_SHA
+        value,
+        junit_paths=junit,
+        worker_path=worker,
+        expected_source_sha=SOURCE_SHA,
+        expected_checkout_tree_sha=TREE_SHA,
+        expected_run_id=123,
+        expected_run_attempt=1,
     )
 
 
@@ -72,9 +106,14 @@ def test_fixed_case_set_is_recomputed_from_both_junit_artifacts(inputs):
         "schemaVersion": tool.EVALUATION_VERSION,
         "evidenceSha256": tool.sha256(tool.canonical_bytes(value)),
         "sourceSha": SOURCE_SHA,
+        "checkoutTreeSha": TREE_SHA,
+        "runId": 123,
+        "runAttempt": 1,
+        "job": "core",
+        "workerConfigSha256": tool.EXPECTED_WORKER_CONFIG_SHA256,
         "verdict": "MEASURED_PASS",
-        "requiredCaseCount": 10,
-        "passedCaseCount": 10,
+        "requiredCaseCount": 13,
+        "passedCaseCount": 13,
         "failedCaseCount": 0,
         "scoreChangeClaim": False,
     }
@@ -89,14 +128,109 @@ def test_a_real_junit_failure_recomputes_measured_fail(inputs):
         spec for spec in tool.CASE_SPECS
         if spec["classname"] == "tests.integration.test_build_product_runtime_real_pg"
     ]
-    _write_junit(junit[1], runtime_specs, failed="two-worker-dispatch-once")
+    _write_junit(
+        junit[1], runtime_specs, failed="two-worker-dispatch-once",
+        filler_count=13 - len(runtime_specs),
+    )
     value = tool.collect(
         junit_paths=junit, worker_path=worker, code_sha=SOURCE_SHA,
         checkout_tree_sha=TREE_SHA, clean_checkout=True, run_id=123, run_attempt=1,
     )
     result = evaluate(value, inputs)
     assert result["verdict"] == "MEASURED_FAIL"
-    assert (result["passedCaseCount"], result["failedCaseCount"]) == (9, 1)
+    assert (result["passedCaseCount"], result["failedCaseCount"]) == (12, 1)
+
+
+def test_skipped_required_core_case_recomputes_measured_fail(inputs):
+    junit, worker = inputs
+    runtime_specs = [
+        spec for spec in tool.CASE_SPECS
+        if spec["classname"] == "tests.integration.test_build_product_runtime_real_pg"
+    ]
+    core_specs = [spec for spec in tool.CASE_SPECS if spec not in runtime_specs]
+    _write_junit(junit[0], core_specs, skipped="raw-authority-rejected")
+    value = tool.collect(
+        junit_paths=junit, worker_path=worker, code_sha=SOURCE_SHA,
+        checkout_tree_sha=TREE_SHA, clean_checkout=True, run_id=123, run_attempt=1,
+    )
+    result = evaluate(value, inputs)
+    assert result["verdict"] == "MEASURED_FAIL"
+    assert (result["passedCaseCount"], result["failedCaseCount"]) == (12, 1)
+
+
+def test_unrelated_core_failure_prevents_measured_pass(inputs):
+    junit, worker = inputs
+    runtime_specs = [
+        spec for spec in tool.CASE_SPECS
+        if spec["classname"] == "tests.integration.test_build_product_runtime_real_pg"
+    ]
+    core_specs = [spec for spec in tool.CASE_SPECS if spec not in runtime_specs]
+    _write_junit(junit[0], core_specs, unrelated_failure=True)
+    value = tool.collect(
+        junit_paths=junit, worker_path=worker, code_sha=SOURCE_SHA,
+        checkout_tree_sha=TREE_SHA, clean_checkout=True, run_id=123, run_attempt=1,
+    )
+    result = evaluate(value, inputs)
+    assert result["verdict"] == "MEASURED_FAIL"
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [("sha256", "0" * 64), ("testCount", 999), ("failureCount", 1)],
+)
+def test_recorded_junit_summary_cannot_replace_raw_xml(inputs, field, value):
+    mutated = evidence(inputs)
+    mutated["junitArtifacts"][0][field] = value
+    with pytest.raises(tool.InvalidEvidence):
+        evaluate(mutated, inputs)
+
+
+@pytest.mark.parametrize(
+    ("field", "expected"),
+    [("tree", "c" * 40), ("run", 999999), ("attempt", 7)],
+)
+def test_expected_workflow_identity_is_independent_of_the_report(inputs, field, expected):
+    value = evidence(inputs)
+    kwargs = {
+        "expected_source_sha": SOURCE_SHA,
+        "expected_checkout_tree_sha": TREE_SHA,
+        "expected_run_id": 123,
+        "expected_run_attempt": 1,
+    }
+    argument = {
+        "tree": "expected_checkout_tree_sha",
+        "run": "expected_run_id",
+        "attempt": "expected_run_attempt",
+    }[field]
+    kwargs[argument] = expected
+    with pytest.raises(tool.InvalidEvidence):
+        tool.evaluate(value, junit_paths=inputs[0], worker_path=inputs[1], **kwargs)
+
+
+def test_real_pg_artifact_requires_exactly_thirteen_unskipped_cases(inputs):
+    junit, worker = inputs
+    runtime_specs = [
+        spec for spec in tool.CASE_SPECS
+        if spec["classname"] == "tests.integration.test_build_product_runtime_real_pg"
+    ]
+    _write_junit(junit[1], runtime_specs, filler_count=12 - len(runtime_specs))
+    value = tool.collect(
+        junit_paths=junit, worker_path=worker, code_sha=SOURCE_SHA,
+        checkout_tree_sha=TREE_SHA, clean_checkout=True, run_id=123, run_attempt=1,
+    )
+    with pytest.raises(tool.InvalidEvidence, match="exactly 13"):
+        evaluate(value, inputs)
+
+    _write_junit(
+        junit[1], runtime_specs, skipped="flag-off-dispatch-zero",
+        filler_count=13 - len(runtime_specs),
+    )
+    value = tool.collect(
+        junit_paths=junit, worker_path=worker, code_sha=SOURCE_SHA,
+        checkout_tree_sha=TREE_SHA, clean_checkout=True, run_id=123, run_attempt=1,
+    )
+    with pytest.raises(tool.InvalidEvidence, match="no skip"):
+        evaluate(value, inputs)
 
 
 def test_every_exact_shape_key_is_required_and_extra_keys_are_refused(inputs):
@@ -155,6 +289,10 @@ def test_drop_add_and_duplicate_case_sweep_is_fail_closed(inputs):
     [
         (("source", "codeSha"), "c" * 40),
         (("source", "cleanCheckout"), False),
+        (("source", "job"), "backend"),
+        (("source", "runId"), 999999),
+        (("source", "runAttempt"), 7),
+        (("source", "runAttempt"), True),
         (("workerConfiguration", "sha256"), "0" * 64),
         (("junitArtifacts", 0, "passedCount"), 0),
         (("observations", 0, "outcome"), "passed"),
@@ -221,3 +359,6 @@ def test_core_workflow_exposes_only_an_explicit_exact_sha_evidence_phase():
     assert "--junit dist/core-tests.xml" in workflow
     assert "--junit dist/build-product-runtime-real-pg.xml" in workflow
     assert "--worker-config tools/specs/s08-build-acceptance-worker-v1.json" in workflow
+    assert workflow.count("--checkout-tree-sha \"$tree_sha\"") == 2
+    assert workflow.count("--run-id \"$GITHUB_RUN_ID\"") == 2
+    assert workflow.count("--run-attempt \"$GITHUB_RUN_ATTEMPT\"") == 2
