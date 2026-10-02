@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "verifiedAt": "2026-10-02T20:18:00+09:00",
+  "verifiedAt": "2026-10-03T06:13:47+09:00",
   "definerPolicySignatures": [
     "public.apply_capability_offer(uuid, character, character, bigint)",
     "public.apply_resource_offer(uuid, character, text, bigint)",

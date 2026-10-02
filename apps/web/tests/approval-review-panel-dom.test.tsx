@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ApprovalReviewPanel } from '../src/features/approvals/ApprovalReviewPanel';
 import * as approvalReviewApi from '../src/shared/api/approvalReview';
 import type { ApprovalItem } from '../src/contracts/types';
-import { approvalReviewFixture } from './fixtures/approval-review';
+import { approvalReviewFixture, buildApprovalReviewFixture } from './fixtures/approval-review';
 
 function deferred<T>() {
   let resolve!: (value: T) => void;
@@ -133,6 +133,43 @@ describe('ApprovalReviewPanel Async Effect & State Transition (DOM Harness)', ()
     expect(calledId).toBe(sampleApprovalItem.id);
     expect(calledAction).toBeDefined();
     expect(calledAction.actionDigest).toBe(sampleApprovalItem.actionDigest);
+  });
+
+  it('renders only the declared build review projection and never opaque payload fields', async () => {
+    const baitedReview = structuredClone(buildApprovalReviewFixture) as approvalReviewApi.ApprovalReview & {
+      workload: approvalReviewApi.ApprovalReview['workload'] & Record<string, unknown>;
+    };
+    baitedReview.workload.secretRefs = ['vault://do-not-render'];
+    baitedReview.workload.registryToken = 'registry-token-do-not-render';
+    baitedReview.workload.plan = { privileged: true };
+    vi.spyOn(approvalReviewApi, 'fetchApprovalReview').mockResolvedValue(baitedReview);
+
+    await act(async () => {
+      root.render(
+        <ApprovalReviewPanel
+          approval={sampleApprovalItem}
+          currentUserId="usr_reviewer_01"
+          onApprove={async () => {}}
+          onReject={async () => {}}
+        />
+      );
+    });
+
+    const summary = container.querySelector('[data-testid="build-review-summary"]');
+    expect(summary).not.toBeNull();
+    expect(summary?.textContent).toContain('Build targetimage');
+    expect(summary?.textContent).toContain('bpp_01ARZ3NDEKTSV4RRFFQ69G5FAV v1');
+    expect(summary?.textContent).toContain('Source revision2');
+    expect(summary?.textContent).toContain('d'.repeat(64));
+    expect(summary?.textContent).toContain('e'.repeat(64));
+    expect(summary?.textContent).toContain('Network modenone');
+    expect(summary?.textContent).toContain('Cache moderead-only');
+    expect(summary?.textContent).toContain('Secret useno (0)');
+    expect(container.textContent).not.toContain('secretRefs');
+    expect(container.textContent).not.toContain('vault://do-not-render');
+    expect(container.textContent).not.toContain('registryToken');
+    expect(container.textContent).not.toContain('registry-token-do-not-render');
+    expect(container.textContent).not.toContain('privileged');
   });
 
   it('3. failure transition: renders role="alert" error, keeps approve button disabled, and supports retry', async () => {

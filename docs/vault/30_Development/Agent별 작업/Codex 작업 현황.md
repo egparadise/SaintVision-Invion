@@ -1,15 +1,31 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.293"
+version: "1.0.300"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T03:02:00+09:00"
+updated: "2026-10-03T06:13:47+09:00"
 source_of_truth: "Git"
 active_card: "CARD-247 S08-BE build-request entry implementation (migration 0061)"
-active_card_status: "Card 241 (#338) approved by Claude r3 and verified for landing; Card 246 design (#341) conditionally approved by Claude r2 (Medium conditions carried into the implementation review); Card 247 implementation is PR #343 under Claude review"
-active_card_next: "Settle a single review head for #343 with the census repin (158 tables) and exact-head Backend/Core green; product dispatch stays off by default and enablement follows the S08 runbook (#335)"
+active_card_status: "Card 247 PR #343 is approved by Claude backend r3 and UI r2; train 32 integration requires only the reviewed 0061 definer revision rebind"
+active_card_next: "Regenerate the AC-11 allowlist from the 0061-reviewed source, require exact-head Backend/Core/security/frontend, then resume Card 251; product dispatch stays off by default"
 ---
+
+## 2026-10-03 Card 247 — S08-BE BuildRequest product entry
+
+- Migration 0061, strict prepare/enqueue contracts, redacted approval review, quota and
+  idempotency reservation, source capsule authority, and post-scheduled admission factory
+  are implemented. Product dispatch remains exact-flag disabled by default.
+- Hosted catalogue observation `37039236221` regenerated the 0061 census to 160 tables with
+  the repository generator. The final review-head comment carries exact-head Backend/Core and
+  real-PG results; the product flag remains off and S08-BE completion is not claimed.
+- [[2026-10-03_02-05-18_KST_Card247_S08-BE_build_request_entry_Codex]].
+- Claude r2 follow-up routes trusted `worker.json` bytes through the canonical parser and adds
+  real-PG behavior guards for owner immutability, sixth-attempt `RES-0007/429`, and post-quorum
+  source drift (`VERIFY-0002`, expired/failed, audit 1, admission 0). The UI follow-up rejects
+  unknown kinds and undeclared build-summary keys, validates both digests, and renders only an
+  explicit redacted projection with shared-fixture API/DOM tests. Card 251 remains paused until the
+  replacement exact-head hosted runs and Claude r3 confirm this head.
 
 ## 2026-10-02 Card 241 — S08-BE trusted admission entry and deployment worker service
 
