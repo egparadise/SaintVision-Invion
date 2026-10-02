@@ -1,12 +1,12 @@
 ---
 doc_id: "HISTORY-CARD236-RLS-AUDIT-SEED-20261002"
 title: "카드 236 — 빈 audit 표 위의 비교를 제품의 쓰기 경로로 채웠다. 그 축은 처음으로 PASS도 FAIL도 아닌 상태를 벗어나 MEASURED_FAIL을 측정했다"
-version: "1.0.0"
+version: "1.1.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-02T20:41:14+09:00"
+updated: "2026-10-02T21:09:19+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "68ccba07"
@@ -36,6 +36,28 @@ tags: ["ac11", "security", "rls", "audit-events", "seed", "claude"]
 1. **정책이 정말 검사했는가**: `_prove_policy_enforced()`가 **다른 tenant의 행을 이 tenant의 scope로** 쓰려 하고 **거부를 요구**한다. 실측된 거부는 PostgreSQL 자신의 문장이다 — `new row violates row-level security policy for table "audit_events"`. 통과하면 `ProducerError`다("정책이 검사하지 않은 행 위의 가시성 측정은 기록하지 않는다").
 2. **쓴 것이 말한 것과 같은가**: owner가 tenant별로 센 수가 seed가 말한 수(2×2)와 **정확히** 같아야 한다. `tenant_id IS NULL` 행이 하나라도 생겼거나 제3의 tenant 행이 있으면 거부다.
 3. **어긋나면 아무것도 측정하지 않는다**: 위 둘 중 하나라도 실패하면 생산자는 두 보고를 `unavailable`(exit 2)로 쓴다 — `evaluate_definer`/`evaluate_rls`가 그 쌍을 `NOT_OBSERVED`로 읽는다. **빈 표 위의 PASS는 어떤 경로로도 만들어지지 않는다.**
+
+## 2-1. r1 — "거부되었다"가 아니라 **그 정책이 거부했다**
+
+Codex r1(차단, High): `_prove_policy_enforced()`가 **모든 `DBAPIError`를 거부 성공으로** 읽었다. 그러면 `sqlite://` engine으로도, 오타로도, 없는 표로도, 끊긴 연결로도 "정책이 강제됐다"가 나온다 — **증명이 아무것도 증명하지 않았다.** 맞는 지적이다.
+
+`rls_refusal(error, table, policy)`가 세 가지를 **모두** 요구한다.
+
+| 요구 | 실측 기준값(PostgreSQL 16, `0047` 정책) |
+|---|---|
+| SQLSTATE | **`42501`** (`sqlalchemy.exc.ProgrammingError`가 `psycopg.errors.InsufficientPrivilege`를 감싼다) |
+| 문장 | **`new row violates row-level security policy for table "audit_events"`** |
+| 이름 | 그 문장이 **이 표**를 가리켜야 하고, 서버가 정책 이름을 함께 적으면 그 정책이 `audit_events_tenant_isolation`이어야 한다 |
+
+`diag.table_name`은 이 오류에 **채워지지 않는다**(측정했다) — 그래서 표 이름은 메시지에서 읽는다. 그 밖의 오류는 `ProducerError`이고 두 보고가 `unavailable`(exit 2)이 된다. **거부 메시지의 원문은 인용하지 않는다** — 연결 실패 메시지는 host·user를 담을 수 있으므로 예외 클래스와 SQLSTATE만 적는다.
+
+**문장이 증명의 일부이므로 locale을 고정한다**: probe 연결은 `SET ROLE` 전에 `SET lc_messages = 'C'`를 요청한다. 그것은 `PGC_SUSET`이라 실패할 수 있고 그때는 치명적이지 않다 — 번역된 메시지는 문장 검사에서 떨어져 **`unavailable`** 이 되고, 증명되지 않은 seed가 통과하지는 않는다.
+
+**sqlalchemy wrapper에는 `sqlstate`가 없다**(변이로 확인했다: 드라이버 예외를 풀지 않으면 진짜 거부조차 `sqlstate=None`으로 거절된다). 그래서 `error.orig`를 본다.
+
+**hosted 재측정** (head `6c9624ba`): AC-11 Security Critical High Scan **`37004766458`** success, artifact **`11225606236`** — 그 보고가 여전히 `VIOLATIONS` exit 1이고 정본 평가기가 **`MEASURED_FAIL`** 이다. 즉 CI의 PostgreSQL이 **그 영어 문장 그대로** 거부했고 더 엄격해진 검사가 그것을 증명으로 받아들였다(아니면 보고가 `unavailable`이 됐을 것이다).
+
+시험 **31건**(순수 24 + 실 PG 7). 부정 6건: 다른 SQLSTATE · 같은 `42501`의 다른 문장 · 다른 표 · 다른 정책 · 연결 실패(원문 비인용까지 단언) · **`sqlite` engine을 통한 probe 전체**. 변이 **5/5 사살**(어떤 SQLSTATE나 허용 · 어떤 문장이나 허용 · 표 이름 미검사 · 정책 이름 미검사 · 드라이버 예외 미해제).
 
 ## 3. 보고서가 말한 기준으로 판정한다
 
@@ -113,10 +135,10 @@ reason: no admissible report for SEC-DEF-001, SEC-VF-001;
 
 | 항목 | 결과 |
 |---|---|
-| `tests/test_run_ac11_security_threat_reports.py` | **23 passed**(실 PG 7 포함, 110s). 순수 16: 검토 기준 판정·검토 밖 예외는 위반·accepted의 `reason`/`since`가 문자열·seed 실패 시 unavailable·seed가 측정보다 먼저 |
+| `tests/test_run_ac11_security_threat_reports.py` | **31 passed**(실 PG 7 포함, 105s; r1에서 +8). 순수 24: 검토 기준 판정·검토 밖 예외는 위반·accepted의 `reason`/`since`가 문자열·seed 실패 시 unavailable·seed가 측정보다 먼저 |
 | 실 PG 7 | 빈 표는 아무것도 관측하지 않음 / seed가 두 tenant×2행을 제품 경로로 씀 / **bypass가 아님**(다른 tenant·scope 없음·`inv_app`의 SELECT 거부 각각) / 비교가 실제 행으로 성립 / 축이 `NOT_OBSERVED` → `MEASURED_FAIL` / 정책이 검사하지 않은 seed 거부 / 쓴 수가 말한 수와 다르면 거부 |
 | 네 suite 합계 | **331 passed**(producer 23 · aggregator 138 · importer 98 · collector 33 · manifest 39 중 해당분, 실 DSN으로 399s) |
-| 단독 변이 **8/8 사살, 생존 0** | superset baseline 복귀 · 정책 증명 생략 · 외부 tenant 쓰기 허용 · owner 계수 생략 · seed를 측정 뒤로 · 거부된 seed 무시 · `SET ROLE` 제거(owner로 쓰기) · 검토 baseline에서 `since` 누락 |
+| 단독 변이 **13/13 사살, 생존 0**(r1의 5건 포함) | superset baseline 복귀 · 정책 증명 생략 · 외부 tenant 쓰기 허용 · owner 계수 생략 · seed를 측정 뒤로 · 거부된 seed 무시 · `SET ROLE` 제거(owner로 쓰기) · 검토 baseline에서 `since` 누락 |
 | 정직하게 | 처음 변이판에서 "`accepted`의 null 제거" 한 건이 **생존**했다. 그 코드는 `reviewed_baseline`이 항상 `since`를 주므로 **죽은 코드**였고, 시험이 아무것도 고정하지 않았다. 코드를 지우고 시험을 strict(`reason`/`since`가 비지 않은 문자열)로 바꾼 뒤 그 자리의 변이가 죽는다 |
 | pin | 회전 없음 — 생산자 파일은 blob pin 대상이 아니다. **`s11-security-allowlist-v0.json`은 건드리지 않았다** |
 
