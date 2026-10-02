@@ -1,15 +1,25 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.290"
+version: "1.0.291"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T22:23:04+09:00"
+updated: "2026-10-03T01:06:39+09:00"
 source_of_truth: "Git"
-active_card: "CARD-241 S08-BE admission entry and deploy worker service"
-active_card_status: "Card 232 (#331) and Card 237 (#333) approved with exact-head Backend/Core green; Card 241 in progress (admission entry from committed decisions, compose worker service, flag default off)"
-active_card_next: "Open Card 241 PR with real-PG end-to-end evidence; enabling product dispatch follows the S08 enablement runbook (#335); revisit inv_audit_reader dispositions before 2026-10-31"
+active_card: "CARD-246 S08-BE BuildRequest product entry design"
+active_card_status: "Card 241 r3 tests pushed; Card 246 docs design fixes the raw-document-free prepare/enqueue contract and requests migration 0061 before implementation"
+active_card_next: "Claude design review; after approval, implement strict contracts, migration 0061, server-owned compiler, quorum binding, and hosted real-PG negative tests"
 ---
+
+## 2026-10-03 Card 246 — S08-BE BuildRequest product entry design
+
+- Measured the remaining upstream gap: existing product dispatch callers do not provide build
+  authority, so a user intent cannot yet become a server-owned BuildRequest/BuildPlan.
+- Selected authenticated prepare + enqueue routes which accept selectors only. Source, profile,
+  policy, provider, lease, evidence and approval actors remain server-owned and are revalidated.
+- The immutable pre-approval authority needs migration 0061; no migration or public contract is
+  implemented before Claude approves the design. Flag default off and S08-BE score remain unchanged.
+- [[2026-10-03_01-06-39_KST_Card246_S08-BE_BuildRequest_제품_진입점_설계_Codex]].
 
 ## 2026-10-02 Card 232 — S08-BE product worker loop and trusted intent producer
 
