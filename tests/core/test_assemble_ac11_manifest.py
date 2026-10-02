@@ -533,3 +533,23 @@ def test_the_lane_reads_the_axis_map_rather_than_hardcoding_the_axes():
     assert "tools/aggregate_ac11_evidence.py" in text
     for axis in REQUIRED_AXES:
         assert axis not in text, f"the lane names {axis} instead of reading it"
+
+
+def test_the_long_soak_row_says_why_no_hosted_workflow_can_produce_it():
+    """Card 217: the axis stays incomplete for a reason a reader can check.
+
+    The registered target requires a 24-hour window on five physical nodes with controlled
+    fault injection and an external observer, so a hosted lane cannot produce this evidence
+    and the definition is not lowered to let one.  If somebody adds a workflow to this row,
+    this test is where they have to explain it.
+    """
+
+    axes = {entry["axis"]: entry for entry in assembler.load_sources(assembler.DEFAULT_SOURCES)}
+    long_soak = axes["long-soak"]
+    assert long_soak["chain"] == "incomplete"
+    assert long_soak["workflow"] is None
+    reason = long_soak["reason"]
+    for fragment in ("86400", "physical-five-node", "external-monotonic-v1", "G-24"):
+        assert fragment in reason, fragment
+    # The importer is ready; what is missing is the run.
+    assert assembler.emitted_axes(long_soak["importer"]) == {"long-soak"}
