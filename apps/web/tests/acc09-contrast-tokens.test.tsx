@@ -4886,7 +4886,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(CANDIDATE_STATUS_CONFIG.active.color).not.toBe(CANDIDATE_STATUS_CONFIG.waiting.color);
       expect(CANDIDATE_STATUS_CONFIG.active.label).not.toBe(CANDIDATE_STATUS_CONFIG.waiting.label);
 
-      // Fail-closed Unknown status negative verification (H1)
+      // Fail-closed Unknown status negative verification (H1 / Codex F1)
       const unknownSlo = getSloStatusConfig('bogus_status');
       expect(unknownSlo.color).toBe('var(--color-status-unknown)');
       expect(unknownSlo.border).toBe('var(--color-status-unknown)');
@@ -4901,7 +4901,26 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(unknownCandidate.color).toBe('var(--color-status-unknown)');
       expect(unknownCandidate.label).toBe('UNKNOWN (bogus_candidate)');
 
-      // Render with mock evidence having bogus SLO status to verify DOM fail-closed display (H1)
+      // Prototype keys must fail closed and never bypass to Object.prototype properties (Codex F1)
+      const protoKeys = ['toString', 'constructor', '__proto__'];
+      for (const pk of protoKeys) {
+        const unknownSloProto = getSloStatusConfig(pk);
+        expect(unknownSloProto.color).toBe('var(--color-status-unknown)');
+        expect(unknownSloProto.border).toBe('var(--color-status-unknown)');
+        expect(unknownSloProto.label).toBe(`UNKNOWN (${pk})`);
+
+        const unknownAuditProto = getAuditStatusConfig(pk);
+        expect(unknownAuditProto.color).toBe('var(--color-status-unknown)');
+        expect(unknownAuditProto.border).toBe('var(--color-status-unknown)');
+        expect(unknownAuditProto.label).toBe(`UNKNOWN (${pk})`);
+
+        const unknownCandProto = getCandidateStatusConfig(pk);
+        expect(unknownCandProto.color).toBe('var(--color-status-unknown)');
+        expect(unknownCandProto.border).toBe('var(--color-status-unknown)');
+        expect(unknownCandProto.label).toBe(`UNKNOWN (${pk})`);
+      }
+
+      // Render with mock evidence having prototype keys and bogus SLO status to verify DOM fail-closed display (H1 / Codex F1)
       const sloSpy = vi.spyOn(ReleaseManager.prototype, 'getSloRecords').mockReturnValueOnce([
         {
           name: 'Unknown Probe SLO',
@@ -4910,15 +4929,44 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
           status: 'bogus_slo' as any,
           category: 'resilience',
         },
+        {
+          name: 'Proto Probe toString',
+          targetValue: '99.9%',
+          actualValue: '0%',
+          status: 'toString' as any,
+          category: 'resilience',
+        },
+        {
+          name: 'Proto Probe constructor',
+          targetValue: '99.9%',
+          actualValue: '0%',
+          status: 'constructor' as any,
+          category: 'resilience',
+        },
+        {
+          name: 'Proto Probe __proto__',
+          targetValue: '99.9%',
+          actualValue: '0%',
+          status: '__proto__' as any,
+          category: 'resilience',
+        },
       ]);
       await act(async () => {
-        root.render(<ReleaseCandidateView key="bogus" />);
+        root.render(<ReleaseCandidateView key="bogus-and-proto-keys" />);
       });
       const bogusBadge = container.querySelector('[data-testid="slo-status-badge-Unknown Probe SLO"]') as HTMLElement;
       expect(bogusBadge, 'Bogus SLO badge must render in DOM').not.toBeNull();
       expect(bogusBadge.style.color).toBe('var(--color-status-unknown)');
       expect(bogusBadge.style.borderColor).toBe('var(--color-status-unknown)');
       expect(bogusBadge.textContent).toContain('UNKNOWN (bogus_slo)');
+
+      for (const pk of protoKeys) {
+        const protoBadge = container.querySelector(`[data-testid="slo-status-badge-Proto Probe ${pk}"]`) as HTMLElement;
+        expect(protoBadge, `Prototype key "${pk}" SLO badge must render in DOM as unknown`).not.toBeNull();
+        expect(protoBadge.style.color).toBe('var(--color-status-unknown)');
+        expect(protoBadge.style.borderColor).toBe('var(--color-status-unknown)');
+        expect(protoBadge.textContent).toContain(`UNKNOWN (${pk})`);
+      }
       sloSpy.mockRestore();
 
       // Re-render default to proceed with rollback action notice verification

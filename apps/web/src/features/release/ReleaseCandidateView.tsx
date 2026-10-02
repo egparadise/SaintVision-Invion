@@ -85,7 +85,7 @@ export const CANDIDATE_STATUS_CONFIG: Record<CandidateActiveStatus, CandidateSta
 };
 
 export function getSloStatusConfig(status?: string | null): SloStatusStyle {
-  if (status && status in SLO_STATUS_CONFIG) {
+  if (status && Object.hasOwn(SLO_STATUS_CONFIG, status)) {
     return SLO_STATUS_CONFIG[status as SloRecordStatus];
   }
   return {
@@ -97,7 +97,7 @@ export function getSloStatusConfig(status?: string | null): SloStatusStyle {
 }
 
 export function getAuditStatusConfig(status?: string | null): AuditStatusStyle {
-  if (status && status in AUDIT_STATUS_CONFIG) {
+  if (status && Object.hasOwn(AUDIT_STATUS_CONFIG, status)) {
     return AUDIT_STATUS_CONFIG[status as AuditStatus];
   }
   return {
@@ -109,7 +109,7 @@ export function getAuditStatusConfig(status?: string | null): AuditStatusStyle {
 }
 
 export function getCandidateStatusConfig(status?: string | null): CandidateStatusStyle {
-  if (status && status in CANDIDATE_STATUS_CONFIG) {
+  if (status && Object.hasOwn(CANDIDATE_STATUS_CONFIG, status)) {
     return CANDIDATE_STATUS_CONFIG[status as CandidateActiveStatus];
   }
   return {

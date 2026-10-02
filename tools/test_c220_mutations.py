@@ -3,7 +3,7 @@
 tools/test_c220_mutations.py
 
 Card 220 (ACC-09) Release Candidate screen (ReleaseCandidateView.tsx) Mutation Testing Suite.
-Verifies that 20 distinct regressions/mutations (M1-M20) across
+Verifies that 21 distinct regressions/mutations (M1-M21) across
 color contrast, border collisions, status semantics, testid binding,
 fail-closed unknown handling, and non-color accessibility are strictly caught
 and killed by the test suite (ACC-09 Test 9k, Test 9j-2, and Test 10).
@@ -174,9 +174,16 @@ MUTANTS = [
     {
         'id': 'M20 (H1)',
         'name': 'ReleaseCandidateView: getSloStatusConfig unknown fallback changed to met (fail-closed bypass)',
-        'target': "export function getSloStatusConfig(status?: string | null): SloStatusStyle {\n  if (status && status in SLO_STATUS_CONFIG) {\n    return SLO_STATUS_CONFIG[status as SloRecordStatus];\n  }\n  return {\n    color: 'var(--color-status-unknown)',\n    border: 'var(--color-status-unknown)',\n    bg: 'var(--color-bg-subtle)',\n    label: `UNKNOWN (${status || 'UNKNOWN'})`,\n  };\n}",
-        'replacement': "export function getSloStatusConfig(status?: string | null): SloStatusStyle {\n  if (status && status in SLO_STATUS_CONFIG) {\n    return SLO_STATUS_CONFIG[status as SloRecordStatus];\n  }\n  return SLO_STATUS_CONFIG.met;\n}",
+        'target': "export function getSloStatusConfig(status?: string | null): SloStatusStyle {\n  if (status && Object.hasOwn(SLO_STATUS_CONFIG, status)) {\n    return SLO_STATUS_CONFIG[status as SloRecordStatus];\n  }\n  return {\n    color: 'var(--color-status-unknown)',\n    border: 'var(--color-status-unknown)',\n    bg: 'var(--color-bg-subtle)',\n    label: `UNKNOWN (${status || 'UNKNOWN'})`,\n  };\n}",
+        'replacement': "export function getSloStatusConfig(status?: string | null): SloStatusStyle {\n  if (status && Object.hasOwn(SLO_STATUS_CONFIG, status)) {\n    return SLO_STATUS_CONFIG[status as SloRecordStatus];\n  }\n  return SLO_STATUS_CONFIG.met;\n}",
         'expected_guard': 'Test 9k (rendered unknown status fail-closed token & label assertion)',
+    },
+    {
+        'id': 'M21 (Codex F1)',
+        'name': 'ReleaseCandidateView: getSloStatusConfig uses status in SLO_STATUS_CONFIG bypassing prototype keys',
+        'target': "export function getSloStatusConfig(status?: string | null): SloStatusStyle {\n  if (status && Object.hasOwn(SLO_STATUS_CONFIG, status)) {\n    return SLO_STATUS_CONFIG[status as SloRecordStatus];\n  }\n  return {\n    color: 'var(--color-status-unknown)',\n    border: 'var(--color-status-unknown)',\n    bg: 'var(--color-bg-subtle)',\n    label: `UNKNOWN (${status || 'UNKNOWN'})`,\n  };\n}",
+        'replacement': "export function getSloStatusConfig(status?: string | null): SloStatusStyle {\n  if (status && status in SLO_STATUS_CONFIG) {\n    return SLO_STATUS_CONFIG[status as SloRecordStatus];\n  }\n  return {\n    color: 'var(--color-status-unknown)',\n    border: 'var(--color-status-unknown)',\n    bg: 'var(--color-bg-subtle)',\n    label: `UNKNOWN (${status || 'UNKNOWN'})`,\n  };\n}",
+        'expected_guard': 'Test 9k (prototype key fail-closed own-key defense assertion)',
     },
 ]
 
@@ -203,7 +210,7 @@ def run_test_suite():
 
 def main():
     print('=' * 80)
-    print(' Card 220 (ACC-09): Reproducible Mutant Test Suite (20 Mutants: M1-M20)')
+    print(' Card 220 (ACC-09): Reproducible Mutant Test Suite (21 Mutants: M1-M21)')
     print(' Target: ReleaseCandidateView.tsx')
     print('=' * 80)
 
