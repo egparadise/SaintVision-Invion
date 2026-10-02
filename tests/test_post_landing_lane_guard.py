@@ -35,9 +35,10 @@ def _real_bash() -> str | None:
     is accepted only when it reports a ``$BASH_VERSION``; BusyBox prints nothing.
 
     The candidate paths use forward slashes on purpose: the Windows path written with backslashes
-    in a non-raw string turned ```` into a backspace character, so this helper found nothing
-    and every test skipped silently (#320 r2 F1).  Windows accepts forward slashes, so there is
-    nothing left to escape.
+    in a non-raw string turned backslash-b into a backspace character, so this helper found
+    nothing and every test skipped silently (#320 r2 F1 -- and the sentence describing it carried
+    the same byte until r3).  Windows accepts forward slashes, so there is nothing to escape, and
+    ``test_this_file_carries_no_stray_control_bytes`` keeps it that way.
     """
 
     seen = []
@@ -65,6 +66,24 @@ def _real_bash() -> str | None:
 
 
 BASH = _real_bash()
+
+
+def test_this_file_carries_no_stray_control_bytes():
+    """A path written with ``\b`` in a non-raw string is a backspace, and it hides in review.
+
+    That is exactly how the Windows bash candidate became an unreachable path (#320 r2 F1), and
+    the sentence explaining it carried the same byte afterwards.  Only tab, newline and carriage
+    return are text here; anything else is a mistake no diff shows.
+    """
+
+    for path in (
+        Path(__file__),
+        ROOT / "tools" / "post_landing_lane_guard.sh",
+        ROOT / "tools" / "post_landing_select_run.py",
+    ):
+        raw = path.read_bytes()
+        stray = sorted({byte for byte in raw if byte < 32 and byte not in (9, 10, 13)})
+        assert stray == [], f"{path.name} carries control bytes {stray}"
 
 
 def test_a_real_bash_is_available_to_run_these_gates():
