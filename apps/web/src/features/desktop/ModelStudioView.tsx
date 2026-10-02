@@ -26,6 +26,18 @@ export const REPLICA_STATUS_CONFIG = {
     border: 'var(--color-status-online)',
     label: '정상 (HEALTHY)',
   },
+  repairing: {
+    color: 'var(--color-status-degraded)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-degraded)',
+    label: '복구 중 (REPAIRING)',
+  },
+  missing: {
+    color: 'var(--color-status-offline)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-offline)',
+    label: '유실 (MISSING)',
+  },
   unhealthy: {
     color: 'var(--color-status-offline)',
     bg: 'var(--color-bg-subtle)',
@@ -98,13 +110,15 @@ export function getReplicaStatusConfig(status?: string | null) {
 }
 
 export function getModelAvailabilityConfig(availability?: string | null) {
-  if (availability === 'unknown') {
-    return MODEL_AVAILABILITY_CONFIG.unknown;
+  if (availability && Object.hasOwn(MODEL_AVAILABILITY_CONFIG, availability)) {
+    return MODEL_AVAILABILITY_CONFIG[availability as keyof typeof MODEL_AVAILABILITY_CONFIG];
   }
-  if (availability && availability !== 'unknown') {
-    return MODEL_AVAILABILITY_CONFIG.observed;
-  }
-  return MODEL_AVAILABILITY_CONFIG.unknown;
+  return {
+    color: 'var(--color-status-unknown)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-unknown)',
+    label: `알 수 없음 (${availability || 'UNKNOWN'}) · 실행 재검증 필요 (requiresExecutionRevalidation: true)`,
+  };
 }
 
 export function getPlanFeasibilityConfig(isFeasible: boolean) {
@@ -421,8 +435,8 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
           disabled={!projectId || !modelId || !version || loading}
           style={{
             padding: '6px 14px',
-            backgroundColor: 'var(--color-brand-primary)',
-            color: 'var(--color-text-inverse)',
+            backgroundColor: 'var(--color-brand-primary-bg)',
+            color: 'var(--color-brand-primary-fg)',
             border: 'none',
             borderRadius: '4px',
             cursor: loading ? 'not-allowed' : 'pointer',

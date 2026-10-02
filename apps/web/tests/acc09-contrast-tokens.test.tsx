@@ -5036,7 +5036,10 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
 
     const helperExtractVar = (val: string) => {
       const m = val.match(/var\((--color-[a-z0-9-]+)\)/);
-      return m ? m[1] : val;
+      if (!m) {
+        throw new Error(`Expected var(--color-*), got: ${val}`);
+      }
+      return m[1];
     };
 
     const mockNodes: NodeItem[] = [
@@ -5099,7 +5102,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
           sizeBytes: 20 * 1024 * 1024 * 1024,
           replicas: [
             { nodeId: 'node-01', nodeHostname: 'worker-gpu-01', status: 'healthy' },
-            { nodeId: 'node-02', nodeHostname: 'obs-node-02', status: 'degraded' },
+            { nodeId: 'node-02', nodeHostname: 'obs-node-02', status: 'repairing' },
+            { nodeId: 'node-03', nodeHostname: 'worker-gpu-03', status: 'missing' },
           ],
         },
       ],
@@ -5125,15 +5129,28 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       // 2. Query Button
       const queryBtn = container.querySelector('[data-testid="query-model-btn"]') as HTMLButtonElement;
       expect(queryBtn).not.toBeNull();
-      expect(queryBtn.style.backgroundColor).toBe('var(--color-brand-primary)');
-      expect(queryBtn.style.color).toBe('var(--color-text-inverse)');
-      expect(queryBtn.style.outline || 'inherit', 'Focus visible must not be suppressed by inline outline none').not.toBe('none');
+      expect(queryBtn.style.backgroundColor).toBe('var(--color-brand-primary-bg)');
+      expect(queryBtn.style.color).toBe('var(--color-brand-primary-fg)');
+      const computedQuery = window.getComputedStyle(queryBtn);
+      expect(computedQuery.outlineStyle || 'inherit', 'Query button must not suppress focus ring with outline-style none').not.toBe('none');
+      expect(computedQuery.outlineWidth || 'inherit', 'Query button must not suppress focus ring with outline-width 0').not.toMatch(/^(0px|0)$/);
+      expect(queryBtn.style.outline || 'inherit', 'Query button must not have inline outline none/0').not.toMatch(/(none|0px|\b0\b)/);
+      expect(queryBtn.style.outlineWidth || 'inherit', 'Query button must not have inline outline-width 0').not.toMatch(/^(0px|0)$/);
+      expect(queryBtn.style.outlineStyle || 'inherit', 'Query button must not have inline outline-style none').not.toBe('none');
 
-      // 3. Manifest Article
+      // 3. Manifest Article & Availability
       const article = container.querySelector('[data-testid="model-manifest-article"]') as HTMLElement;
       expect(article).not.toBeNull();
       expect(article.style.backgroundColor).toBe('var(--color-bg-surface)');
       expect(article.style.borderColor).toBe('var(--color-border-subtle)');
+
+      const availBadge = container.querySelector('[data-testid="model-availability-status"]') as HTMLElement;
+      expect(availBadge).not.toBeNull();
+      expect(availBadge.style.color).toBe('var(--color-status-active)');
+      expect(availBadge.style.opacity || '1', 'Availability badge must not have degraded opacity').toBe('1');
+      expect(window.getComputedStyle(availBadge).opacity || '1').toBe('1');
+      expect(window.getComputedStyle(availBadge).opacity).not.toMatch(/^(0\.[0-9]+|0)$/);
+      expect(availBadge.textContent).toContain('관측 완료');
 
       // 4. Shard Matrix Table & Badges
       const shardsTable = container.querySelector('[data-testid="shards-table"]');
@@ -5145,7 +5162,32 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(healthyBadge.style.color).toBe('var(--color-status-online)');
       expect(healthyBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
       expect(healthyBadge.style.borderColor).toBe('var(--color-status-online)');
-      expect(healthyBadge.textContent!.trim().length).toBeGreaterThan(0);
+      expect(healthyBadge.style.opacity || '1', 'Healthy replica must not have degraded opacity').toBe('1');
+      expect(window.getComputedStyle(healthyBadge).opacity || '1').toBe('1');
+      expect(window.getComputedStyle(healthyBadge).opacity).not.toMatch(/^(0\.[0-9]+|0)$/);
+      expect(healthyBadge.textContent).toContain('healthy');
+
+      // Repairing replica badge
+      const repairingBadge = container.querySelector('[data-testid="replica-status-node-02"]') as HTMLElement;
+      expect(repairingBadge).not.toBeNull();
+      expect(repairingBadge.style.color).toBe('var(--color-status-degraded)');
+      expect(repairingBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(repairingBadge.style.borderColor).toBe('var(--color-status-degraded)');
+      expect(repairingBadge.style.opacity || '1', 'Repairing replica must not have degraded opacity').toBe('1');
+      expect(window.getComputedStyle(repairingBadge).opacity || '1').toBe('1');
+      expect(window.getComputedStyle(repairingBadge).opacity).not.toMatch(/^(0\.[0-9]+|0)$/);
+      expect(repairingBadge.textContent).toContain('repairing');
+
+      // Missing replica badge
+      const missingBadge = container.querySelector('[data-testid="replica-status-node-03"]') as HTMLElement;
+      expect(missingBadge).not.toBeNull();
+      expect(missingBadge.style.color).toBe('var(--color-status-offline)');
+      expect(missingBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(missingBadge.style.borderColor).toBe('var(--color-status-offline)');
+      expect(missingBadge.style.opacity || '1', 'Missing replica must not have degraded opacity').toBe('1');
+      expect(window.getComputedStyle(missingBadge).opacity || '1').toBe('1');
+      expect(window.getComputedStyle(missingBadge).opacity).not.toMatch(/^(0\.[0-9]+|0)$/);
+      expect(missingBadge.textContent).toContain('missing');
 
       // Shard degradation alert badge
       const degBadge = container.querySelector('[data-testid="shard-degradation-badge"]') as HTMLElement;
@@ -5153,6 +5195,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(degBadge.style.color).toBe('var(--color-status-degraded)');
       expect(degBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
       expect(degBadge.style.opacity || '1', 'Degradation badge must not have degraded opacity').toBe('1');
+      expect(window.getComputedStyle(degBadge).opacity || '1').toBe('1');
+      expect(window.getComputedStyle(degBadge).opacity).not.toMatch(/^(0\.[0-9]+|0)$/);
       expect(degBadge.textContent!.trim().length).toBeGreaterThan(0);
 
       // 5. Execution Planner Section & Badges
@@ -5165,7 +5209,28 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(planBadge).not.toBeNull();
       expect(planBadge.style.color).toBe('var(--color-status-online)');
       expect(planBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(planBadge.style.opacity || '1', 'Plan badge must not have degraded opacity').toBe('1');
+      expect(window.getComputedStyle(planBadge).opacity || '1').toBe('1');
+      expect(window.getComputedStyle(planBadge).opacity).not.toMatch(/^(0\.[0-9]+|0)$/);
       expect(planBadge.textContent!.trim().length).toBeGreaterThan(0);
+
+      // Trigger LAN warning with tensor_pipeline_parallel and multi-node
+      const modeSelect = container.querySelector('[data-testid="execution-mode-select"]') as HTMLSelectElement;
+      const node3Check = container.querySelector('[data-testid="node-select-node-03"]') as HTMLInputElement;
+      await act(async () => {
+        modeSelect.value = 'tensor_pipeline_parallel';
+        modeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        node3Check.click();
+      });
+      const lanWarning = container.querySelector('[data-testid="tensor-parallel-lan-warning"]') as HTMLElement;
+      expect(lanWarning, 'Tensor parallel LAN warning must render when cross-node').not.toBeNull();
+      expect(lanWarning.textContent).toContain('⚠️');
+      expect(lanWarning.style.color).toBe('var(--color-status-degraded)');
+      expect(lanWarning.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(lanWarning.style.borderColor).toBe('var(--color-status-degraded)');
+      expect(lanWarning.style.opacity || '1', 'LAN warning must not have degraded opacity').toBe('1');
+      expect(window.getComputedStyle(lanWarning).opacity || '1').toBe('1');
+      expect(window.getComputedStyle(lanWarning).opacity).not.toMatch(/^(0\.[0-9]+|0)$/);
 
       // 6. Node Assignment Table & Ineligible Badge
       const ineligBadge = container.querySelector('[data-testid="node-ineligible-badge"]') as HTMLElement;
@@ -5201,10 +5266,15 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
 
       // State uniqueness & Non-collapse
       expect(REPLICA_STATUS_CONFIG.healthy.color).not.toBe(REPLICA_STATUS_CONFIG.unhealthy.color);
+      expect(REPLICA_STATUS_CONFIG.healthy.color).not.toBe(REPLICA_STATUS_CONFIG.degraded.color);
+      expect(REPLICA_STATUS_CONFIG.repairing.color).not.toBe(REPLICA_STATUS_CONFIG.healthy.color);
+      expect(REPLICA_STATUS_CONFIG.missing.color).not.toBe(REPLICA_STATUS_CONFIG.healthy.color);
+      expect(REPLICA_STATUS_CONFIG.repairing.color).not.toBe(REPLICA_STATUS_CONFIG.missing.color);
+      expect(MODEL_AVAILABILITY_CONFIG.observed.color).not.toBe(MODEL_AVAILABILITY_CONFIG.unknown.color);
       expect(PLAN_FEASIBILITY_CONFIG.feasible.color).not.toBe(PLAN_FEASIBILITY_CONFIG.infeasible.color);
       expect(NODE_ELIGIBILITY_CONFIG.eligible.color).not.toBe(NODE_ELIGIBILITY_CONFIG.ineligible.color);
 
-      // Fail-closed Unknown status handling & Prototype key own-key defense (Codex F1)
+      // Fail-closed Unknown status handling & Prototype key own-key defense (Codex F1 & M1)
       const unknownReplica = getReplicaStatusConfig('invalid_corrupted_state');
       expect(unknownReplica.color).toBe('var(--color-status-unknown)');
       expect(unknownReplica.label).toContain('알 수 없음');
@@ -5214,6 +5284,13 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
         expect(protoReplica.color).toBe('var(--color-status-unknown)');
         expect(protoReplica.border).toBe('var(--color-status-unknown)');
         expect(protoReplica.label).toBe(`알 수 없음 (${pk})`);
+      }
+
+      for (const pk of ['toString', 'constructor', '__proto__', 'bogus', undefined, null]) {
+        const availCfg = getModelAvailabilityConfig(pk as any);
+        expect(availCfg.color).toBe('var(--color-status-unknown)');
+        expect(availCfg.border).toBe('var(--color-status-unknown)');
+        expect(availCfg.label).toContain('알 수 없음');
       }
 
       const unknownPlan = getPlanFeasibilityConfig(false);
@@ -5233,6 +5310,13 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
 
       const repairBtn = container.querySelector('[data-testid="repair-shard-0-btn"]') as HTMLButtonElement;
       expect(repairBtn, 'Repair shard button must be rendered for repairable degraded shard').not.toBeNull();
+      const computedRepair = window.getComputedStyle(repairBtn);
+      expect(computedRepair.outlineStyle || 'inherit', 'Repair button must not suppress focus ring with outline-style none').not.toBe('none');
+      expect(computedRepair.outlineWidth || 'inherit', 'Repair button must not suppress focus ring with outline-width 0').not.toMatch(/^(0px|0)$/);
+      expect(repairBtn.style.outline || 'inherit', 'Repair button must not have inline outline none/0').not.toMatch(/(none|0px|\b0\b)/);
+      expect(repairBtn.style.outlineWidth || 'inherit', 'Repair button must not have inline outline-width 0').not.toMatch(/^(0px|0)$/);
+      expect(repairBtn.style.outlineStyle || 'inherit', 'Repair button must not have inline outline-style none').not.toBe('none');
+
       await act(async () => {
         repairBtn.click();
       });
@@ -5507,32 +5591,37 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       }
 
       function checkConfigTables(node: ts.Node) {
-        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG') && node.initializer && ts.isObjectLiteralExpression(node.initializer)) {
-          for (const prop of node.initializer.properties) {
-            if (ts.isPropertyAssignment(prop) && ts.isObjectLiteralExpression(prop.initializer)) {
-              totalStyleAttrs++;
-              let bgToken: string | null = null;
-              let fgToken: string | null = null;
-              let borderToken: string | null = null;
-              for (const subProp of prop.initializer.properties) {
-                if (ts.isPropertyAssignment(subProp)) {
-                  const pName = subProp.name.getText(sf);
-                  const text = subProp.initializer.getText(sf);
-                  const m = text.match(/var\((--color-[a-z0-9-]+)\)/);
-                  if (m) {
-                    if (pName === 'bg') bgToken = m[1];
-                    if (pName === 'color') fgToken = m[1];
-                    if (pName === 'border') borderToken = m[1];
+        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG') && node.initializer) {
+          const init = (ts.isAsExpression(node.initializer) || ts.isSatisfiesExpression(node.initializer))
+            ? node.initializer.expression
+            : node.initializer;
+          if (init && ts.isObjectLiteralExpression(init)) {
+            for (const prop of init.properties) {
+              if (ts.isPropertyAssignment(prop) && ts.isObjectLiteralExpression(prop.initializer)) {
+                totalStyleAttrs++;
+                let bgToken: string | null = null;
+                let fgToken: string | null = null;
+                let borderToken: string | null = null;
+                for (const subProp of prop.initializer.properties) {
+                  if (ts.isPropertyAssignment(subProp)) {
+                    const pName = subProp.name.getText(sf);
+                    const text = subProp.initializer.getText(sf);
+                    const m = text.match(/var\((--color-[a-z0-9-]+)\)/);
+                    if (m) {
+                      if (pName === 'bg') bgToken = m[1];
+                      if (pName === 'color') fgToken = m[1];
+                      if (pName === 'border') borderToken = m[1];
+                    }
                   }
                 }
-              }
-              if (bgToken && fgToken) {
-                checkedObjects++;
-                checkPair(bgToken, fgToken, prop.initializer.getStart(sf), 1.0);
-              }
-              if (bgToken && borderToken) {
-                checkedBorderObjects++;
-                checkBorderPair(bgToken, borderToken, prop.initializer.getStart(sf), 1.0);
+                if (bgToken && fgToken) {
+                  checkedObjects++;
+                  checkPair(bgToken, fgToken, prop.initializer.getStart(sf), 1.0);
+                }
+                if (bgToken && borderToken) {
+                  checkedBorderObjects++;
+                  checkBorderPair(bgToken, borderToken, prop.initializer.getStart(sf), 1.0);
+                }
               }
             }
           }
@@ -5586,13 +5675,13 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(releaseStats.violations, `ReleaseCandidateView violations:\n${releaseStats.violations.join('\n')}`).toEqual([]);
 
     const modelStudioStats = analyzeFile('features/desktop/ModelStudioView.tsx');
-    expect(modelStudioStats.totalStyleAttrs, 'Total style attributes in ModelStudioView must be exactly 75').toBe(75);
-    expect(modelStudioStats.checkedObjects, 'Explicit style objects in ModelStudioView must be exactly 13').toBe(13);
-    expect(modelStudioStats.checkedPairs, 'Evaluated pairs in ModelStudioView must be exactly 31').toBe(31);
+    expect(modelStudioStats.totalStyleAttrs, 'Total style attributes in ModelStudioView must be exactly 86').toBe(86);
+    expect(modelStudioStats.checkedObjects, 'Explicit style objects in ModelStudioView must be exactly 24').toBe(24);
+    expect(modelStudioStats.checkedPairs, 'Evaluated pairs in ModelStudioView must be exactly 42').toBe(42);
     expect(modelStudioStats.unboundColorObjects, 'Unbound color objects in ModelStudioView must be exactly 18').toBe(18);
-    expect(modelStudioStats.coveredColorObjects, 'Total covered color objects in ModelStudioView must be exactly 31').toBe(31);
-    expect(modelStudioStats.checkedBorderObjects, 'Border objects in ModelStudioView must be exactly 18').toBe(18);
-    expect(modelStudioStats.checkedBorderPairs, 'Border pairs in ModelStudioView must be exactly 18').toBe(18);
+    expect(modelStudioStats.coveredColorObjects, 'Total covered color objects in ModelStudioView must be exactly 42').toBe(42);
+    expect(modelStudioStats.checkedBorderObjects, 'Border objects in ModelStudioView must be exactly 29').toBe(29);
+    expect(modelStudioStats.checkedBorderPairs, 'Border pairs in ModelStudioView must be exactly 29').toBe(29);
     expect(modelStudioStats.violations, `ModelStudioView violations:\n${modelStudioStats.violations.join('\n')}`).toEqual([]);
 
   });
@@ -6016,9 +6105,10 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(probe84Cr, 'Former unhealthy replica text #fca5a5 on light subtle fails 4.5:1').toBeLessThan(4.5);
     expect(probe84Cr).toBeCloseTo(1.73, 1);
 
-    // Probe 85 [Card 226]: ModelStudioView text token as bg collision (--color-text-secondary on light surface)
-    const probe85Cr = getContrast(lightTokens['--color-text-secondary'], lightTokens['--color-text-secondary']);
-    expect(probe85Cr, 'Text token as background 1:1 collision must equal 1.0').toBe(1.0);
+    // Probe 85 [Card 226]: ModelStudioView former LAN alert text #fde68a on light subtle strictly fails 4.5:1
+    const probe85Cr = getContrast('#fde68a', lightTokens['--color-bg-subtle']);
+    expect(probe85Cr, 'Former LAN alert text #fde68a on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe85Cr).toBeCloseTo(1.14, 1);
 
 
     // Legacy Token Reverts:
