@@ -5572,7 +5572,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       { id: 'notif_4', title: '노드 장애', message: '노드 nod_03 응답 없음 상태입니다.', level: 'error', timestamp: '12:03', read: true },
       { id: 'notif_5', title: '심각 장애', message: '계약외 critical 레벨 알림입니다.', level: 'critical' as any, timestamp: '12:04', read: true },
       { id: 'notif_6', title: '대문자 에러', message: '대소문자 변형 ERROR 레벨 알림입니다.', level: 'ERROR' as any, timestamp: '12:05', read: true },
-      { id: 'notif_7', title: '프로토타입 키', message: '프로토타입 toString 레벨 알림입니다.', level: 'toString' as any, timestamp: '12:06', read: true },
+      { id: 'notif_7', title: '대소문자 인포', message: '대소문자 변형 Info 레벨 알림입니다.', level: 'Info' as any, timestamp: '12:06', read: true },
+      { id: 'notif_8', title: '프로토타입 키', message: '프로토타입 toString 레벨 알림입니다.', level: 'toString' as any, timestamp: '12:07', read: true },
     ];
 
     const mockShellProps = {
@@ -5728,10 +5729,10 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(notifDrawer.style.color).toBe('var(--color-text-primary)');
 
       const notifItems = container.querySelectorAll('[data-testid="desktop-notification-item"]');
-      expect(notifItems.length).toBe(7);
+      expect(notifItems.length).toBe(8);
 
       const notifBadges = Array.from(container.querySelectorAll('[data-testid="desktop-notification-badge"]')) as HTMLElement[];
-      expect(notifBadges.length).toBe(7);
+      expect(notifBadges.length).toBe(8);
 
       // Verify SUCCESS badge
       const successBadge = notifBadges.find((b) => b.textContent === 'SUCCESS');
@@ -5776,6 +5777,13 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(caseErrorBadge!.style.color).toBe('var(--color-status-unknown)');
       expect(caseErrorBadge!.style.borderColor).toBe('var(--color-status-unknown)');
 
+      // Verify case-variant Info level rendered in DOM (kills case-insensitive lookup to known info)
+      const caseInfoBadge = notifBadges.find((b) => b.textContent === 'UNKNOWN (Info)');
+      expect(caseInfoBadge, 'Case-variant Info badge must render in DOM with UNKNOWN (Info)').toBeDefined();
+      expect(caseInfoBadge!.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(caseInfoBadge!.style.color).toBe('var(--color-status-unknown)');
+      expect(caseInfoBadge!.style.borderColor).toBe('var(--color-status-unknown)');
+
       // Verify prototype key toString level rendered in DOM (kills M12)
       const protoBadge = notifBadges.find((b) => b.textContent === 'UNKNOWN (toString)');
       expect(protoBadge, 'Prototype toString badge must render in DOM with UNKNOWN (toString)').toBeDefined();
@@ -5801,6 +5809,10 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       const errorUpperCfg = getNotificationLevelConfig('ERROR' as any);
       expect(errorUpperCfg.color).toBe('var(--color-status-unknown)');
       expect(errorUpperCfg.label).toBe('UNKNOWN (ERROR)');
+
+      const infoCaseCfg = getNotificationLevelConfig('Info' as any);
+      expect(infoCaseCfg.color).toBe('var(--color-status-unknown)');
+      expect(infoCaseCfg.label).toBe('UNKNOWN (Info)');
 
       const criticalCfg = getNotificationLevelConfig('critical' as any);
       expect(criticalCfg.color).toBe('var(--color-status-unknown)');

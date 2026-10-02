@@ -320,6 +320,29 @@ MUTANTS = [
         'replacement': "          color: 'white',\n          fontSize: '0.8125rem',",
         'expected_guard': 'Test 9j-2 (named color guard)',
     },
+
+    # 13. Label formatting & Case sensitivity (Codex r1 & Claude r1 verification)
+    {
+        'id': 'Y38',
+        'name': 'DesktopShell: getNotificationLevelConfig fallback label drops UNKNOWN prefix (raw level)',
+        'target': "    label: level ? `UNKNOWN (${level})` : 'UNKNOWN',",
+        'replacement': "    label: level ? level : 'UNKNOWN',",
+        'expected_guard': 'Test 9n (UNKNOWN prefix guard on out-of-contract levels)',
+    },
+    {
+        'id': 'Y39',
+        'name': 'DesktopShell: getNotificationLevelConfig fallback label converts raw level to uppercase',
+        'target': "    label: level ? `UNKNOWN (${level})` : 'UNKNOWN',",
+        'replacement': "    label: (level || 'UNKNOWN').toUpperCase(),",
+        'expected_guard': 'Test 9n (casing preservation and UNKNOWN wrapper guard)',
+    },
+    {
+        'id': 'Y40',
+        'name': 'DesktopShell: getNotificationLevelConfig normalizes case with toLowerCase() (case-insensitive bypass)',
+        'target': "  if (level && Object.hasOwn(NOTIFICATION_LEVEL_CONFIG, level)) {",
+        'replacement': "  if (level && Object.hasOwn(NOTIFICATION_LEVEL_CONFIG, level.toLowerCase())) {",
+        'expected_guard': 'Test 9n (case-insensitive lookup defense for non-canonical keys)',
+    },
 ]
 
 def run_test_suite():

@@ -174,7 +174,7 @@ Total Audit Items: 34 | Passed: 34 | Failed: 0
 
 ---
 
-## 4. 변이 사살 표 (tools/test_c230_mutations.py 37종 전수 사살)
+## 4. 변이 사살 표 (tools/test_c230_mutations.py 40종 전수 사살)
 
 | 변이 ID | 변이 내용 | 사살 검증 게이트 |
 | :--- | :--- | :--- |
@@ -215,10 +215,13 @@ Total Audit Items: 34 | Passed: 34 | Failed: 0
 | Y35 | DesktopShell: contract level (error) bypassed in getNotificationLevelConfig (treated as unknown) | KILLED (Test 9n (ERROR badge exact token and label)) |
 | Y36 | DesktopShell: success config border injected with named color green | KILLED (Test 9j-2 (named color guard)) |
 | Y37 | DesktopShell: header text color injected with named color white | KILLED (Test 9j-2 (named color guard)) |
+| Y38 | DesktopShell: getNotificationLevelConfig fallback label drops UNKNOWN prefix (raw level) | KILLED (Test 9n (UNKNOWN prefix guard on out-of-contract levels)) |
+| Y39 | DesktopShell: getNotificationLevelConfig fallback label converts raw level to uppercase | KILLED (Test 9n (casing preservation and UNKNOWN wrapper guard)) |
+| Y40 | DesktopShell: getNotificationLevelConfig normalizes case with toLowerCase() (case-insensitive bypass) | KILLED (Test 9n (case-insensitive lookup defense for non-canonical keys)) |
 
 ---
 
 ## 5. 다음 행동 및 인계
-- **현재 상태**: Card 230 [r2] 구현 완료, 로컬 전체 게이트 100% 통과, 37종 변이 전원 사살 실측 완료, PR #328 반영 준비 완료.
+- **현재 상태**: Card 230 [r2] 구현 완료, 로컬 전체 게이트 100% 통과, 40종 변이 전원 사살 실측 완료, PR #328 반영 준비 완료.
 - **다음 행동**: `agent/gemini/c230-desktop-shell-contrast` 브랜치 커밋 및 푸시, PR #328에 r2 리뷰 요청 코멘트 등록 (Zero bot tags `@...`).
 - **다음 담당자**: Claude UI (기본 리뷰어) 및 Codex (보조 리뷰어).
