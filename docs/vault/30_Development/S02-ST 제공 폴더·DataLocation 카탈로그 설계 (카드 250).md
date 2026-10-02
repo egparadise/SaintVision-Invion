@@ -1,11 +1,11 @@
 ---
 doc_id: "CLAUDE-S02-ST-CATALOG-DESIGN-250"
-title: "S02-ST 제공 폴더·DataLocation 카탈로그 설계 (카드 250) — 측정 먼저: 카탈로그 표·route·`inv://` resolver·시험은 **이미 있고**(`src/saintvision/api/v1/storage.py:81~284`, `data_locations`·`storage_contributions` FORCE RLS, 통합 8 + 계약 3 case) 정본 재채점은 S02-ST를 **75**로 적는다(v1.7 정정). 외부 전제 없이 닫을 수 있는 공백은 셋이다 — (1) 카탈로그에 **project 차원이 없다**(두 표에 `project_id` 열이 없고 RLS 정책이 tenant 전용이라 AC-02의 '다른 project 정보 접근 차단'을 DB가 강제하지 못한다), (2) **읽기는 소유자 범위인데 쓰기는 tenant 범위**다(`activate_contribution`·`revoke_contribution`이 소유자를 보지 않는다), (3) **kernel(inv) 쪽 카탈로그 읽기 표면이 없다**. 이 문서는 그 셋의 계약·migration(0062 예약)·RLS·인증 실패 기록·시험 계획만 담는다. 구현 0줄, 브라우저 화면은 Gemini 몫. **r2(Codex r1)**: 거부 기록이 있는 앱은 core 하나뿐이므로(kernel의 `DomainError` handler는 `problem()`만 반환한다) 새 읽기 표면을 **core 앱의 `/v1/projects/{project_id}/storage/…`** 로 확정하고 계약도 core 세대에 둔다, project GUC는 `require_project_access` 통과 뒤 의존성 계층이 세운다, RLS 교체는 **Phase 2로 분리**한다(0062는 열만 더하고 정책을 바꾸지 않으므로 가역), `kind`는 정본 **4값**에 그대로 결속한다. **r3(Codex r2)**: `project_id`를 만드는 제품 경로가 **0건**이므로(제공 폴더 등록은 스스로 tenant 전체라고 적고 location을 만드는 제품 호출자는 없다) 결속을 **`data_locations` 한 표**로 줄이고 **그 열을 채우는 project 범위 쓰기 route를 같은 카드에 묶었다**, 읽기 권위는 `canRequest`∨`canApprove`·쓰기는 `canRequest`·활성화/철회는 **행 소유자 하나**로 확정했다(archived project는 boolean이 false이므로 예외 부재를 승인으로 쓰지 않는다), census repin이 필요하다던 문장은 **거짓이어서 정정했다**"
-version: "1.2.0"
+title: "S02-ST 제공 폴더·DataLocation 카탈로그 설계 (카드 250) — 측정 먼저: 카탈로그 표·route·`inv://` resolver·시험은 **이미 있고**(`src/saintvision/api/v1/storage.py:81~284`, `data_locations`·`storage_contributions` FORCE RLS, 통합 8 + 계약 3 case) 정본 재채점은 S02-ST를 **75**로 적는다(v1.7 정정). 외부 전제 없이 닫을 수 있는 공백은 셋이다 — (1) 카탈로그에 **project 차원이 없다**(두 표에 `project_id` 열이 없고 RLS 정책이 tenant 전용이라 AC-02의 '다른 project 정보 접근 차단'을 DB가 강제하지 못한다), (2) **읽기는 소유자 범위인데 쓰기는 tenant 범위**다(`activate_contribution`·`revoke_contribution`이 소유자를 보지 않는다), (3) **kernel(inv) 쪽 카탈로그 읽기 표면이 없다**. 이 문서는 그 셋의 계약·migration(0062 예약)·RLS·인증 실패 기록·시험 계획만 담는다. 구현 0줄, 브라우저 화면은 Gemini 몫. **r2(Codex r1)**: 거부 기록이 있는 앱은 core 하나뿐이므로(kernel의 `DomainError` handler는 `problem()`만 반환한다) 새 읽기 표면을 **core 앱의 `/v1/projects/{project_id}/storage/…`** 로 확정하고 계약도 core 세대에 둔다, project GUC는 `require_project_access` 통과 뒤 의존성 계층이 세운다, RLS 교체는 **Phase 2로 분리**한다(0062는 열만 더하고 정책을 바꾸지 않으므로 가역), `kind`는 정본 **4값**에 그대로 결속한다. **r3(Codex r2)**: `project_id`를 만드는 제품 경로가 **0건**이므로(제공 폴더 등록은 스스로 tenant 전체라고 적고 location을 만드는 제품 호출자는 없다) 결속을 **`data_locations` 한 표**로 줄이고 **그 열을 채우는 project 범위 쓰기 route를 같은 카드에 묶었다**, 읽기 권위는 `canRequest`∨`canApprove`·쓰기는 `canRequest`·활성화/철회는 **행 소유자 하나**로 확정했다(archived project는 boolean이 false이므로 예외 부재를 승인으로 쓰지 않는다), census repin이 필요하다던 문장은 **거짓이어서 정정했다**. **r4(Codex r3)**: 쓰기 route가 **contribution 소유자**를 보게 계약으로 고정하고(존재 신탁 없는 같은 거부 + 자기 `audit_action`으로 감사), 요청 계약을 `kind`별 `oneOf`로 strict하게 적고 `projectId`를 본문에서 금지하고, idempotency를 tenant+경로 project+operation+canonical body에 결속해 같은 key·같은 body는 exact replay·같은 key·다른 body는 `GRAPH-IDEMPOTENCY-CONFLICT` 409로 고정했다(core 앱 코드이고 `IDEM-0001`이 아니다)"
+version: "1.3.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-10-03T05:42:55+09:00"
+updated: "2026-10-03T05:54:19+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "ab2829d955398d686bc8b96b1f12b82c1914df10"
@@ -94,7 +94,7 @@ r1의 §3-3은 "kernel route가 생기면 project 표적이 자동으로 남는�
 
 그래서 **읽기 표면을 kernel에 두면 거부 기록이 사라진다** — AC-02의 세 번째 증거("인증 실패 기록")를 새 표면에서 잃는다. kernel에 recorder를 새로 만드는 것은 kernel의 감사 모델·AC-11 definer 집합을 건드리는 **별 카드**다.
 
-**확정**: 새 project 범위 카탈로그 읽기 표면은 **core 앱**에 둔다. 경로는 `/v1/projects/{project_id}/storage/contributions`·`…/locations`·`…/resolve`·`…/replica-status`다. 근거는 셋이다 — (1) 카탈로그 서비스·표·기존 route가 모두 core 앱이다, (2) 거부 기록이 거기 있다, (3) recorder가 **경로의 `project_id`만** 표적으로 적으므로(`src/saintvision/api/app.py:133-136`) 이 경로 모양이면 **표적이 코드 변경 없이 남는다**(M6 해소).
+**확정**: 새 project 범위 카탈로그 읽기 표면은 **core 앱**에 둔다. 경로는 **`/v1/projects/{project_id}/storage/locations`**(읽기·쓰기)와 `…/locations/resolve`·`…/locations/replica-status`다 — **contribution 경로는 두지 않는다**(r4 정정: 제공 폴더는 tenant 전체이고 project로 묶지 않는다, §3-2-1). 근거는 셋이다 — (1) 카탈로그 서비스·표·기존 route가 모두 core 앱이다, (2) 거부 기록이 거기 있다, (3) recorder가 **경로의 `project_id`만** 표적으로 적으므로(`src/saintvision/api/app.py:133-136`) 이 경로 모양이면 **표적이 코드 변경 없이 남는다**(M6 해소).
 
 **그 결과 r1의 계약 제안 위치도 바뀐다** — route가 core 앱이면 응답 계약은 **core 세대**(`contracts/*.schema.json`, 기존 카탈로그 응답과 같은 자리)다. `contracts/v1alpha1/core.schema.json`은 kernel 계약이므로 **건드리지 않는다**. r1 §3-1이 v1alpha1에 적자고 한 것은 kernel route를 가정한 결과였고, 그 가정이 측정으로 깨졌다.
 
@@ -181,11 +181,79 @@ POST /v1/projects/{project_id}/storage/locations        (core 앱, §3-0)
 
 **확정 3 — 이미 있는 행의 결속은 별도 route이고, 선택이다.** 제품에는 location 행을 만드는 경로가 없으므로 **지금 tree에 결속할 과거 행이 없다**. 파일럿 DB에 행이 있다면 `POST /v1/projects/{project_id}/storage/locations/{location_id}/assignment`를 둔다 — **`canAdminister`(owner 하나)** 를 요구하고, `NULL → project` **한 방향만** 허용하며(project → 다른 project 재할당 금지), 감사에 남는다. 이것은 **사용자 데이터가 있을 때만** 만든다(없는 것을 위해 미리 만들지 않는다).
 
+#### 3-2-2. 쓰기 route는 **contribution 소유자**를 본다 (r4, Codex r3 F1)
+
+측정: `catalogue_location`은 **소유자를 보지 않는다.**
+
+| 무엇 | 측정 |
+|---|---|
+| contribution 적재 | `src/saintvision/services/storage.py:300-304 _load_contribution`은 **tenant만** 본다(`tenant_id` 불일치면 `RES-CONTRIBUTION-NOT-FOUND`) |
+| 그 뒤 검사 | `:142-146`의 `status != "active"` 거부와 `byte_size < 0` 거부뿐이다 — `registered_by_user_id`는 **어디에도 없다** |
+| 읽기 쪽 | 같은 파일 `:250`·`:282`가 `registered_by_user_id == reader_user_id`를 건다 |
+
+즉 §3-2-1의 쓰기 route를 project `canRequest`만으로 열면, **같은 tenant의 operator가 남의 contribution id로 그 폴더의 항목을 자기 project에 결속·노출**할 수 있다(Codex r3 F1). 읽기보다 쓰기가 느슨한 M3와 같은 모양이 카탈로그 경로에서 한 번 더 나온다.
+
+**확정 — 소유자 검사를 계약으로 고정한다.** `POST /v1/projects/{project_id}/storage/locations`의 순서는 이렇게 고정한다:
+
+```
+1. require_project_access(...)                     -> AUTH-0030, 존재 신탁 없음
+2. permission["canRequest"] 가 true 인지 확인        -> §3-4-2
+3. contribution 을 적재하고
+     contribution.tenant_id == principal.tenant_id
+     contribution.registered_by_user_id == principal.user_id   <- r4 가 더하는 조건
+     contribution.status == "active"
+   세 조건 중 하나라도 아니면 **같은 거부**를 낸다(아래)
+4. project_scope(...) -> SET LOCAL inv.project_id   (검증된 경로 값)
+5. catalogue_location(..., project_id=<경로 값>)
+```
+
+- **거부의 모양**: 소유자가 아닌 경우와 존재하지 않는 경우를 **구분하지 않는다** — 둘 다 기존 `RES-CONTRIBUTION-NOT-FOUND`로 답한다. 구분하면 남의 contribution id의 존재를 확인해 주는 신탁이 된다(`require_project_access`가 project에 대해 세운 규율과 같다).
+- **그래도 감사에 남는다**: 그 거부는 `RES` 범주 404이므로 `src/saintvision/api/problem.py:219-229 is_audited_denial`의 첫 규칙(AUTH·SEC 401/403)에 걸리지 않는다. 그래서 이 route는 **자기 `audit_action`을 선언한다** — 그 함수의 두 번째 규칙("route가 `audit_action`을 지정한 거부")이 `#282` §8의 상태 거부를 위해 존재하고, 이 경우가 정확히 그것이다.
+- **위임은 지금 만들지 않는다.** project 역할이 소유권을 대신하지 않는다. 위임이 필요해지면 **저장된 허가 행**(예: `storage_contribution_delegations`)과 그 자신의 route·감사로 하고, 그때까지 **소유자 하나**다. 암묵적 위임(역할·project 멤버십)은 금지한다.
+
+부정 시험은 T12·T13이다.
+
 **Phase 2 — 별 migration(0063 이후, 별 카드)**
 - **모든** reader가 project GUC를 세우게 된 뒤에(기존 owner 범위 route를 project 범위로 옮기거나 폐기한 뒤) 정책을 교체한다:
   `USING/WITH CHECK (tenant_id = current_setting('inv.tenant_id') AND project_id = current_setting('inv.project_id'))`.
 - **그때까지 DB 강제는 tenant 하나**이고, project 경계는 **앱 계층 + 시험**이 든다. 이 문서는 그 사실을 숨기지 않는다 — AC-02의 "다른 project 차단"이 **DB 불변식이 되는 시점은 Phase 2**다.
 - 전환 중 두 모드를 한 정책에 담는 타협(`project_id IS NULL OR …`)은 **쓰지 않는다** — 그러면 미결속 행이 모든 project에 보인다.
+
+#### 3-2-3. 새 POST의 요청 계약과 idempotency (r4, Codex r3 F2)
+
+**요청 계약** — 새 파일 하나를 더한다. 기존 카탈로그 계약과 같은 규율(`additionalProperties:false`)이고, **`projectId`는 본문에 두지 않는다**(경로에서만 온다 — 그래서 속성에 없고 `additionalProperties:false`가 보낸 것을 거부한다).
+
+```
+contracts/project-data-location-request.schema.json
+  additionalProperties: false
+  required: ["contributionId", "kind", "relativePath", "byteSize"]
+  contributionId : string (InvId)
+  kind           : enum ["artifact","dataset","model","workspace"]      (§3-1-1 의 정본 4값)
+  relativePath   : string (minLength 1)   -- 경로 안전 검사는 서비스가 한다(pathsafe)
+  byteSize       : integer, minimum 0                                   (서비스 :145-146 과 DB CHECK 와 같은 하한)
+  name, version, runId, artifactId, workspaceId : kind 별로만 허용(아래)
+
+  kind 별 식별자 (oneOf) — src/saintvision/storage/pathsafe.py:242-266 의 build_uri 문법과 1:1
+    dataset | model : name + version 필수,  runId·artifactId·workspaceId 금지
+    artifact        : runId + artifactId 필수, name·version·workspaceId 금지
+    workspace       : workspaceId 필수,       name·version·runId·artifactId 금지
+```
+
+`oneOf`를 쓰는 계약은 `contracts/`에 **아직 없다**(측정: 0건). 그래서 이것이 첫 사례이고, 이유는 **URI를 만들 수 없는 요청을 edge에서 거부**하기 위해서다 — 지금은 `build_uri`가 `ValueError`를 던지고 route가 그것을 `VAL-SCHEMA`로 바꾼다(`src/saintvision/services/storage.py:163-165`). 계약이 먼저 거부하면 그 경로가 **문서화된 거부**가 된다.
+
+**idempotency** — 새로 만들지 않고 **이미 있는 두 원시 함수**를 그대로 쓴다.
+
+| 무엇 | 확정 |
+|---|---|
+| 직렬화 | `serialise_idempotent_write(session, tenant_id=…, endpoint=ENDPOINT, idempotency_key=…, project_id=<검증된 경로 project>)`를 **자원 행보다 먼저** 잡는다 — 그 docstring이 "Every write route takes this lock **before** any resource row"라고 잠금 순서를 고정한다(`src/saintvision/api/deps.py:105-135`) |
+| 결속 | `replay_or_reserve(...)`가 `(tenant_id, project_id, endpoint, idempotency_key)`로 조회하고 본문은 `request_digest(payload)`로 비교한다(`:164-205`) → **tenant + 검증된 경로 project + operation + canonical body**에 결속된다. 본문에 project 필드가 없으므로 ledger의 `project_id`는 **경로 값만**이다 |
+| `ENDPOINT` | `"POST /v1/projects/{project_id}/storage/locations"` — **식별자 없는 bounded template**(감사 action과 같은 규율) |
+| 같은 key·같은 body | 저장된 응답을 **그대로** 돌려준다(status·body 동일). **두 번째 location도, 두 번째 감사 행도 만들지 않는다** |
+| 같은 key·다른 body | **`GRAPH-IDEMPOTENCY-CONFLICT` 409**. **Codex r3의 표기 정정**: core 앱의 코드는 `src/saintvision/errors.py:141`의 그 상수이고 **`IDEM-0001`이 아니다** — `IDEM-0001`은 kernel 쪽 코드 계열이다. route가 core 앱이므로(§3-0) core 앱의 코드를 쓴다 |
+| exactly-once | 쓰기 route는 `get_write_session`(`src/saintvision/api/deps.py:76-100`)의 **한 transaction** 안이고 `bounded_lock_wait`가 걸린다 → location insert·ledger 기록·감사가 같은 경계에서 커밋되거나 함께 사라진다 |
+| key 없음 | `Idempotency-Key`가 없으면 `replay_or_reserve`가 `None`을 돌려주고 그대로 진행한다(기존 동작). 이 route는 그것을 **바꾸지 않는다** |
+
+시험은 T14·T15·T16이다.
 
 ### 3-3. 인증 실패 기록 경로 (r2 정정)
 
@@ -205,17 +273,23 @@ POST /v1/projects/{project_id}/storage/locations        (core 앱, §3-0)
 
 | # | 시험 | 종류 | 무엇을 거부하게 하는가 |
 |---|---|---|---|
-| T1 | 계약 shape: 새 네 파일이 `additionalProperties:false`이고 required가 **기존 required + `projectId`** 그대로 | PG 없음 | 필드 추가·이름 변경 |
+| T1 | 계약 shape: **새 세 파일**(응답 2 + 요청 1)이 `additionalProperties:false`이고, 응답 required는 **기존 required + `projectId`**, 요청 required는 §3-2-3 그대로이며 **요청에 `projectId`가 없다** | PG 없음 | 필드 추가·이름 변경, 본문으로 project를 주입하려는 시도 |
 | T2 | `kind` 열거가 **세 자리에서 같다** — 계약 파일, `src/saintvision/db/models/storage.py:32 LOCATION_KINDS`, DB CHECK `kind_allowed`(네 값). `mode`·`status`도 같은 방식으로 상수와 비교 | PG 없음(CHECK는 실 PG) | 계약 밖 값의 조용한 승격, 세 자리의 drift |
 | T3 | **교차 project 읽기 0행**: tenant 같고 project 다른 주체의 목록·resolve·replica-status가 행을 내지 않고 **존재 신탁도 없다**(`require_project_access`의 같은 거부) | 실 PG | M2를 앱 계층에서 |
-| T4 | **교차 project 쓰기 거부**: 다른 project 주체의 활성화·철회가 거부되고 **행 상태가 바뀌지 않는다** | 실 PG | M3·M2 |
+| T4 | **교차 project 쓰기 거부**: 다른 project 주체가 §3-2-1의 location 쓰기 route를 부르면 `require_project_access`의 거부로 끝나고 **행이 생기지 않는다**(판정 축은 `effective_permission`의 `canRequest`다 — 활성화·철회는 T6의 다른 축이다) | 실 PG | M2 |
 | T5 | **project GUC는 `require_project_access` 통과 뒤에만 세워진다** — 검사를 건너뛰면 GUC가 비어 있고, 그 상태의 project 범위 조회는 **거부이고 빈 목록이 아니다** | 실 PG | §3-2의 권위 주체와 조용한 0행 |
-| T6 | 소유자 아닌 **같은 project** 주체의 활성화·철회가 **거부**된다(§3-4-2의 결정) — 그리고 그 거부가 `effective_permission`의 boolean을 **읽어서** 나온 것이지 예외 부재가 아니다 | 실 PG | M3 |
+| T6 | 소유자 아닌 주체의 **활성화·철회**가 거부된다 — 판정 축은 **행의 `registered_by_user_id`** 하나이고 `effective_permission`이 아니다(§3-4-2: 제공 폴더는 project의 것이 아니다). 같은 project 멤버여도 거부되고 **행 상태가 바뀌지 않는다** | 실 PG | M3 |
 | T7 | `project_id IS NULL` 행이 **어떤 project 범위 조회에도 보이지 않는다**(owner 범위 조회에서는 그대로 보인다) | 실 PG | Phase 1의 fail-closed와 무회귀 |
 | T8 | 0062 **downgrade 왕복**: 열 목록이 이전과 같고 `pg_policies`·`relforcerowsecurity`가 **변하지 않는다**(§3-4-1) | 실 PG | 가역성과 "정책을 건드리지 않았다" |
 | T9 | 카탈로그 거부가 **감사 행 하나**를 남기고, **core 앱의** `/v1/projects/{project_id}/storage/…` 거부에는 **project 표적**이 있다(`AUTH-0030`은 감사 범주 `AUTH`다) | 실 PG | M6·§3-0·§3-3 |
 | T10 | 기존 8 + 3 case가 **그대로 통과**한다(계약·소유자 범위·revocation·위조 cursor) | 기존 | 회귀 |
 | T11 | kernel에는 새 route가 **없다**(그 앱에 거부 기록이 없다는 §3-0의 이유) | PG 없음 | 표면이 조용히 kernel로 새는 것 |
+| T12 | **같은 tenant의 비소유자**가 남의 `contributionId`로 쓰기를 부르면 거부되고 **location이 생기지 않으며**, 그 거부가 존재하지 않는 id와 **같은 응답**이다(신탁 없음) | 실 PG | §3-2-2 |
+| T13 | project 역할(`canRequest`·`canAdminister`)이 **소유권을 대신하지 않는다** — 역할을 올려도 T12의 결과가 같다 | 실 PG | §3-2-2의 암묵적 위임 금지 |
+| T14 | **같은 key·같은 body**는 저장된 응답을 그대로 돌려주고 **location·감사 행이 하나씩만** 남는다 | 실 PG | §3-2-3 exactly-once |
+| T15 | **같은 key·다른 body**는 `GRAPH-IDEMPOTENCY-CONFLICT` 409이고 **아무 행도 생기지 않는다** | 실 PG | §3-2-3 |
+| T16 | ledger의 `project_id`가 **경로 값**이다 — 본문에 `projectId`를 넣으면 계약이 먼저 거부한다(T1) | 실 PG | 본문 주입 |
+| T17 | `kind`별 식별자 조합이 **계약에서** 거부된다(`dataset`에 `runId`, `artifact`에 `name` 등) | PG 없음 | §3-2-3의 `oneOf` |
 
 ### 3-4-1. `0062`의 downgrade — SQL 수준 불변식 (r2, Codex F4)
 
@@ -244,7 +318,7 @@ Phase 1이 정책을 바꾸지 않으므로 **0062는 완전히 가역이다.** 
 
 **`viewer` 역할은 위 세 boolean 전부 false다**(`:66-70`의 역할 목록에 있고 세 집합 중 어디에도 없다). 그래서 이 설계에서 **`viewer`는 project 범위 카탈로그를 읽지 못한다.** 그것을 바꾸려면 새 boolean(예: `canView`)이 필요하고 그것은 **이 카드의 범위가 아니다** — 제품 결정이므로 여기서 조용히 넓히지 않고 사실로 적어 둔다.
 
-**변이 계획**: T3·T4·T7의 단언을 지우는 변이, 새 route의 `WHERE project_id` 조건을 빼는 변이, `require_project_access` 호출을 지우는 변이(그러면 T5가 울어야 한다), `NULL` 행을 보이게 하는 변이, 거부 기록을 지우는 변이를 각각 하나씩 넣어 **전부 죽는지** 확인한다(한 번에 하나, 매 회 원복·바이트 대조 — 카드 243·249에서 쓴 방식이고 복원은 `newline=""`로 byte 동일하게 한다).
+**변이 계획**: T3·T4·T7의 단언을 지우는 변이, 새 route의 `WHERE project_id` 조건을 빼는 변이, `require_project_access` 호출을 지우는 변이(그러면 T5가 울어야 한다), `NULL` 행을 보이게 하는 변이, 거부 기록을 지우는 변이, **`registered_by_user_id` 검사를 지우는 변이**(T12가 울어야 한다), **idempotency 직렬화를 자원 행 뒤로 옮기는 변이**와 **본문 digest 비교를 지우는 변이**(T14·T15)를 각각 하나씩 넣어 **전부 죽는지** 확인한다(한 번에 하나, 매 회 원복·바이트 대조 — 카드 243·249에서 쓴 방식이고 복원은 `newline=""`로 byte 동일하게 한다).
 
 **hosted 전제**: Backend(3.12·3.14)와 Core의 실 PG lane이 green이어야 한다. **r3 정정 — 0062는 census repin이 필요 없다**: `tools/collect_rls_evidence.py:495-500`의 `table_census`는 그 schema들의 **`pg_class` 표 집합**이고, Phase 1은 **열만 더하므로 표 집합이 변하지 않는다**. r2까지 적혀 있던 "census pin을 한 칸 올린다"는 **거짓이었다**(Codex r2의 정정). 표를 더하는 것은 §3-2-1 확정 3의 선택 route도 아니고 Phase 2도 아니므로, census repin은 **이 설계 어디에도 필요하지 않다**.
 
