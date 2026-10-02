@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.300"
+version: "1.0.301"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T06:13:47+09:00"
+updated: "2026-10-03T07:21:40+09:00"
 source_of_truth: "Git"
-active_card: "CARD-247 S08-BE build-request entry implementation (migration 0061)"
-active_card_status: "Card 247 PR #343 is approved by Claude backend r3 and UI r2; train 32 integration requires only the reviewed 0061 definer revision rebind"
-active_card_next: "Regenerate the AC-11 allowlist from the 0061-reviewed source, require exact-head Backend/Core/security/frontend, then resume Card 251; product dispatch stays off by default"
+active_card: "CARD-251 S08-BE fixed-SHA acceptance evidence"
+active_card_status: "Card 247 (#343) is approved (Claude backend r3, UI r2, r4 delta) with exact-head Backend 37066783664 and Core 37066783581 green, including the 0061 definer/allowlist rebind; Card 251 fixed-SHA acceptance evidence is PR #347 under Claude review"
+active_card_next: "Close the Claude r1 findings on #347 and record one hosted run_s08_acceptance dispatch at the fixed head; product dispatch stays off by default"
 ---
 
 ## 2026-10-03 Card 247 — S08-BE BuildRequest product entry
@@ -24,8 +24,9 @@ active_card_next: "Regenerate the AC-11 allowlist from the 0061-reviewed source,
   real-PG behavior guards for owner immutability, sixth-attempt `RES-0007/429`, and post-quorum
   source drift (`VERIFY-0002`, expired/failed, audit 1, admission 0). The UI follow-up rejects
   unknown kinds and undeclared build-summary keys, validates both digests, and renders only an
-  explicit redacted projection with shared-fixture API/DOM tests. Card 251 remains paused until the
-  replacement exact-head hosted runs and Claude r3 confirm this head.
+  explicit redacted projection with shared-fixture API/DOM tests. The replacement exact-head hosted
+  runs (Backend `37066783664`, Core `37066783581`) and Claude r3/r4 later confirmed this head, and
+  Card 251 resumed as PR #347.
 
 ## 2026-10-02 Card 241 — S08-BE trusted admission entry and deployment worker service
 
