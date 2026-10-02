@@ -2,8 +2,14 @@
 
 from __future__ import annotations
 
+import asyncio
+from concurrent.futures import CancelledError as FutureCancelledError
 from copy import deepcopy
+import errno
 from pathlib import Path
+import socket
+import subprocess
+from urllib.error import URLError
 
 import pytest
 
@@ -12,7 +18,9 @@ from inv.build_execution import BuildExecutionResult, PRODUCT_ENABLE_SETTING
 from inv.build_execution_worker import (
     BuildExecutionIntent,
     BuildExecutionWorker,
+    _retryable_interruption,
     _validated_documents,
+    _worker_error_code,
 )
 from inv.build_governance import canonical_build_action
 from inv.errors import DomainError
@@ -268,6 +276,7 @@ def test_worker_calls_service_with_persisted_authority_then_completes():
         "run_id": RUN,
         "evidence_id": EVIDENCE,
         "actor_id": SUBJECT,
+        "intent_claim_fencing_token": 1,
     }
 
 
@@ -285,16 +294,79 @@ def test_worker_failure_requeues_only_through_the_unconsumed_boundary():
 
 def test_worker_preserves_original_base_exception_when_requeue_fails():
     class BrokenQueue(Queue):
-        def quarantine_if_unconsumed(self, item, error_code):
-            super().quarantine_if_unconsumed(item, error_code)
+        def requeue_if_unconsumed(self, item, error_code):
+            super().requeue_if_unconsumed(item, error_code)
             raise RuntimeError("database unavailable")
 
     queue = BrokenQueue(intent())
     service = Service(KeyboardInterrupt("stop"))
     with pytest.raises(KeyboardInterrupt, match="stop"):
         BuildExecutionWorker(queue, service, environment={PRODUCT_ENABLE_SETTING: "1"}).once(TENANT)
-    assert queue.requeues == 0
-    assert queue.quarantines == 1
+    assert queue.requeues == 1
+    assert queue.quarantines == 0
+    assert queue.completions == 0
+
+
+@pytest.mark.parametrize(
+    "error",
+    [
+        KeyboardInterrupt("operator interrupted"),
+        asyncio.CancelledError("task cancelled"),
+        FutureCancelledError("future cancelled"),
+        subprocess.TimeoutExpired(["buildctl", "debug", "workers"], 10),
+        SystemExit(143),
+        TimeoutError("transport timeout"),
+        ConnectionResetError("peer reset"),
+        socket.gaierror(socket.EAI_AGAIN, "temporary DNS failure"),
+        URLError(socket.gaierror(socket.EAI_AGAIN, "temporary DNS failure")),
+        OSError(errno.ENETUNREACH, "network unreachable"),
+        DomainError("RES-0006", "retry later", 503, retryable=True),
+    ],
+)
+def test_worker_classifies_interrupt_timeout_and_network_uncertainty_as_retryable(error):
+    assert _retryable_interruption(error) is True
+    assert _worker_error_code(error) == (
+        error.code if isinstance(error, DomainError) else "RES-0006"
+    )
+
+
+@pytest.mark.parametrize(
+    "error",
+    [
+        ValueError("bad product data"),
+        OSError(errno.EACCES, "permission denied"),
+        socket.gaierror(socket.EAI_NONAME, "permanent DNS failure"),
+        URLError(ValueError("invalid URL")),
+        DomainError("VERIFY-0002", "permanent mismatch", 422, retryable=False),
+    ],
+)
+def test_worker_classifies_permanent_failures_as_quarantine(error):
+    assert _retryable_interruption(error) is False
+    assert _worker_error_code(error) == (
+        error.code if isinstance(error, DomainError) else "SYS-0001"
+    )
+
+
+@pytest.mark.parametrize(
+    "error",
+    [
+        asyncio.CancelledError("cancelled"),
+        subprocess.TimeoutExpired(["buildctl", "build"], 300),
+        SystemExit(143),
+        TimeoutError("timed out"),
+        ConnectionRefusedError("refused"),
+    ],
+)
+def test_worker_requeues_retryable_non_domain_failures_without_quarantine(error):
+    queue = Queue(intent())
+    with pytest.raises(type(error)):
+        BuildExecutionWorker(
+            queue,
+            Service(error),
+            environment={PRODUCT_ENABLE_SETTING: "1"},
+        ).once(TENANT)
+    assert queue.requeues == 1
+    assert queue.quarantines == 0
     assert queue.completions == 0
 
 

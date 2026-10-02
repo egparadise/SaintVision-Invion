@@ -167,7 +167,9 @@ def _claim_build_dispatch(
     decision: dict,
     run_id: str,
     binding_digest: str,
-) -> None:
+    *,
+    intent_claim_fencing_token: int | None = None,
+) -> bool:
     """Atomically consume one policy decision for exactly one dispatch.
 
     The key is derived from ``decisionId`` alone because PolicyDecision has no
@@ -177,6 +179,41 @@ def _claim_build_dispatch(
     identical.  That makes an ambiguous crash fail closed until an operator
     reconciles the external builder state.
     """
+
+    if intent_claim_fencing_token is not None:
+        if (
+            isinstance(intent_claim_fencing_token, bool)
+            or not isinstance(intent_claim_fencing_token, int)
+            or intent_claim_fencing_token < 1
+        ):
+            raise DomainError("IDEM-0001", "Build intent claim ownership is invalid", 409)
+        owner = conn.execute(
+            """SELECT status,attempt_count FROM inv.build_execution_intents
+            WHERE tenant_id=%s AND project_id=%s AND run_id=%s FOR UPDATE""",
+            (request["tenantId"], request["projectId"], run_id),
+        ).fetchone()
+        if (
+            not owner
+            or owner["status"] != "claimed"
+            or owner["attempt_count"] != intent_claim_fencing_token
+        ):
+            # Commit the rejected generation as an audit fact without consuming the
+            # one-shot ledger. The current generation, or a pending row's sweeper,
+            # therefore remains free to make progress.
+            _audit_event(
+                conn,
+                request["tenantId"],
+                run_id,
+                "inv.build.dispatch_fenced",
+                {
+                    "claimFencingToken": intent_claim_fencing_token,
+                    "currentClaimFencingToken": (
+                        owner["attempt_count"] if owner is not None else None
+                    ),
+                    "currentIntentStatus": owner["status"] if owner is not None else "missing",
+                },
+            )
+            return False
 
     claim_key = action_digest({"decisionId": decision["decisionId"]})
     inserted = conn.execute(
@@ -221,6 +258,7 @@ def _claim_build_dispatch(
             "leaseId": plan["lease"]["leaseId"],
         },
     )
+    return True
 
 
 def _record_build_quarantine(
@@ -265,6 +303,7 @@ class BuildExecutionAdapter:
         run_id: str,
         evidence_id: str,
         actor_id: str,
+        intent_claim_fencing_token: int | None = None,
     ) -> BuildAdapterResult:
         """Dispatch one admitted build and return unpersisted strict Evidence."""
 
@@ -306,14 +345,18 @@ class BuildExecutionAdapter:
                 "fencingToken": frozen_plan["lease"]["fencingToken"],
             }
             binding_digest = action_digest(dispatch_binding)
-            _claim_build_dispatch(
+            dispatch_claimed = _claim_build_dispatch(
                 conn,
                 frozen_request,
                 frozen_plan,
                 frozen_decision,
                 run_id,
                 binding_digest,
+                intent_claim_fencing_token=intent_claim_fencing_token,
             )
+
+        if not dispatch_claimed:
+            raise DomainError("IDEM-0001", "Build intent claim ownership is stale", 409)
 
         admitted = _AdmittedBuild(
             request=deepcopy(frozen_request),
