@@ -1,10 +1,10 @@
 ---
 doc_id: "S08-BE-NODE-QUARANTINE-001"
 title: "S08-BE node-agent durable quarantine channel"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T11:49:10+09:00"
+updated: "2026-10-02T12:16:40+09:00"
 source_of_truth: "Git"
 base_sha: "63ef20c4df9455eaae05758ff18d00ad46e5ff0f"
 reviewer: "Claude"
@@ -63,3 +63,17 @@ Node가 복구 의무를 기록했다고 확인할 수 있는 최소 채널을 �
   최초 1건+replay 7건.
 - Linux-only journal 시험은 hosted Core `run-core`에서 실행한다. 로컬 Windows Go는 runtime/transport
   compile과 platform-independent transport 시험만 증명한다.
+
+# Claude r1 보강
+
+- quarantine identity는 `buildSessionId`뿐 아니라 `leaseId`, `resourceId`, `decisionId`,
+  `bindingDigest`, `daemonIdentity`, `recoveryEpoch`를 포함한다. replay key도 이 전체 authority를
+  포함하므로 한 Node의 서로 다른 lease generation이나 daemon 패자는 합쳐지지 않는다.
+- 제품 dispatch 직전 fresh nonce를 mTLS Node에 보내 tenant·Node·epoch·5초 freshness를 exact
+  대조한다. 런타임 도달 불가이면 adapter 호출 전 `RES-0006`으로 거부하고 control-plane의
+  `inv.nodes.status`를 `quarantined`로 바꾸며 redacted outbox marker를 같은 transaction에 남긴다.
+- post-dispatch 실패에서는 Node journal과 control-plane scheduling fence를 독립적으로 시도한다.
+  어느 secondary quarantine 호출이 실패해도 최초 `VERIFY-0002`, `VERIFY-0022`, `LEASE-0002`
+  원인을 덮지 않는다.
+- placement와 final build admission은 기존대로 `inv.nodes.status='online'`을 요구하므로 위 fence가
+  새 build 배정을 막는다. marker는 복구 완료가 아니라 reconciliation 의무다.

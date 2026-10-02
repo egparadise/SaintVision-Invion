@@ -247,7 +247,12 @@ func (j *Journal) RecordQuarantine(request contracts.BuildQuarantineRequest, rec
 			prior.NodeId != request.NodeId ||
 			prior.RecoveryEpoch != request.RecoveryEpoch ||
 			prior.Scope != request.Scope ||
-			!reflect.DeepEqual(prior.BuildSessionId, request.BuildSessionId) ||
+			prior.BuildSessionId != request.BuildSessionId ||
+			prior.LeaseId != request.LeaseId ||
+			prior.ResourceId != request.ResourceId ||
+			prior.DecisionId != request.DecisionId ||
+			prior.BindingDigest != request.BindingDigest ||
+			!reflect.DeepEqual(prior.DaemonIdentity, request.DaemonIdentity) ||
 			prior.ReasonCode != request.ReasonCode ||
 			prior.RequestedAt != request.RequestedAt {
 			return contracts.BuildQuarantineReceipt{}, false, errors.New("NODE-0015: quarantine request content differs")
@@ -267,6 +272,11 @@ func (j *Journal) RecordQuarantine(request contracts.BuildQuarantineRequest, rec
 		RecoveryEpoch:  request.RecoveryEpoch,
 		Scope:          request.Scope,
 		BuildSessionId: request.BuildSessionId,
+		LeaseId:        request.LeaseId,
+		ResourceId:     request.ResourceId,
+		DecisionId:     request.DecisionId,
+		BindingDigest:  request.BindingDigest,
+		DaemonIdentity: request.DaemonIdentity,
 		ReasonCode:     request.ReasonCode,
 		RequestedAt:    request.RequestedAt,
 		RecordedAt:     recordedAt,

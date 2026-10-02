@@ -436,7 +436,12 @@ class BuildQuarantineRequest(BaseModel):
     nodeId: NodeId
     recoveryEpoch: UUID
     scope: Scope
-    buildSessionId: UUID | None
+    buildSessionId: UUID
+    leaseId: LeaseId
+    resourceId: ResourceId
+    decisionId: constr(min_length=1, max_length=200)
+    bindingDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    daemonIdentity: BuildDaemonIdentity
     reasonCode: constr(pattern=r'^[A-Z]+-[0-9]{4}$')
     requestedAt: Timestamp
 
@@ -452,7 +457,12 @@ class BuildQuarantineReceipt(BaseModel):
     nodeId: NodeId
     recoveryEpoch: UUID
     scope: Scope
-    buildSessionId: UUID | None
+    buildSessionId: UUID
+    leaseId: LeaseId
+    resourceId: ResourceId
+    decisionId: constr(min_length=1, max_length=200)
+    bindingDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    daemonIdentity: BuildDaemonIdentity
     reasonCode: constr(pattern=r'^[A-Z]+-[0-9]{4}$')
     requestedAt: Timestamp
     recordedAt: Timestamp

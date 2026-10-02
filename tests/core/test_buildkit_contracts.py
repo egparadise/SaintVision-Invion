@@ -227,6 +227,11 @@ def _quarantine_request() -> dict:
         "recoveryEpoch": "223e4567-e89b-12d3-a456-426614174000",
         "scope": "build-session",
         "buildSessionId": "44444444-4444-4444-8444-444444444444",
+        "leaseId": f"lse_{ULID}",
+        "resourceId": f"res_{ULID}",
+        "decisionId": "policy-s08-build-1",
+        "bindingDigest": "b" * 64,
+        "daemonIdentity": _daemon_identity(),
         "reasonCode": "VERIFY-0022",
         "requestedAt": "2026-10-02T08:00:00Z",
     }
@@ -771,6 +776,11 @@ def test_build_quarantine_contracts_accept_only_the_bound_durable_shape():
         "recoveryEpoch",
         "scope",
         "buildSessionId",
+        "leaseId",
+        "resourceId",
+        "decisionId",
+        "bindingDigest",
+        "daemonIdentity",
         "reasonCode",
         "requestedAt",
     ],
@@ -798,16 +808,13 @@ def test_build_quarantine_request_rejects_contract_drift(field, value):
     _rejected("BuildQuarantineRequest", changed)
 
 
-def test_build_quarantine_scope_and_session_id_are_tied_together():
+def test_build_quarantine_always_identifies_the_affected_session():
     changed = _quarantine_request()
     changed["buildSessionId"] = None
     _rejected("BuildQuarantineRequest", changed)
 
     changed = _quarantine_request()
     changed["scope"] = "node"
-    _rejected("BuildQuarantineRequest", changed)
-
-    changed["buildSessionId"] = None
     validate_contract("BuildQuarantineRequest", changed)
 
 

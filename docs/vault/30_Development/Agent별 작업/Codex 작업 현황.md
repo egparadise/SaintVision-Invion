@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.268"
+version: "1.0.269"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T11:49:10+09:00"
+updated: "2026-10-02T12:16:40+09:00"
 source_of_truth: "Git"
 active_card: "CARD-222 node-agent durable quarantine channel"
-active_card_status: "Contract, node journal/route, and control-plane mTLS seam implemented; hosted Core and Claude review pending"
-active_card_next: "Push PR on train 17 base, run exact-head Core with run-core, then address Claude independent review without claiming recovery completion"
+active_card_status: "Claude r1 M-1..M-4 fixed: full authority replay key, runtime preflight, CP scheduling fence, original-cause preservation; exact-head CI pending"
+active_card_next: "Push r1 fixes, obtain exact-head Core/Backend green and Claude r2, then start Card 223 product caller on the approved head"
 ---
 
 ## 2026-10-02 Card 222 — node-agent durable quarantine channel
@@ -20,6 +20,10 @@ active_card_next: "Push PR on train 17 base, run exact-head Core with run-core, 
 - receipt는 reconciliation 의무 기록이며 cleanup·lease release·복구 완료 증거가 아니다. S08-BE
   상태·점수와 물리 builder 인수는 유지한다. [[S08-BE_node-agent_durable_quarantine_channel]] ·
   [[2026-10-02_11-49-10_KST_Card222_node_agent_durable_quarantine_Codex]].
+- Claude r1 뒤 lease/session/daemon/decision/binding/epoch를 request·receipt·replay key에 결속했다.
+  fresh nonce preflight 실패는 dispatch 전에 `RES-0006`과 DB node quarantine/outbox marker를 남긴다.
+  post-dispatch Node journal 실패도 최초 경합 원인을 덮지 않으며 CP scheduling fence가 다음 build를
+  막는다. focused Python **239 passed, 1 skipped**; exact-head hosted 판정 대기다.
 
 ## 2026-10-02 Card 211 — VF-CL CI receipt attestation
 

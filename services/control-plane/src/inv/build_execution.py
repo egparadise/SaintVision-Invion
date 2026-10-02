@@ -64,6 +64,7 @@ CLEANUP_SCHEMA = "build-physical-cleanup-receipt:1"
 WRITER_KIND = "node-agent"
 DAEMON_COMM = "buildkitd"
 COMPLETED_EVENT = "inv.build.dispatch_completed"
+QUARANTINED_EVENT = "inv.build.node_quarantined"
 PARTIAL_EXPORT_DISPOSITIONS = frozenset({"quarantined", "purged"})
 CACHE_DISPOSITIONS = frozenset({"retained", "quarantined", "purged"})
 
@@ -74,12 +75,9 @@ SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 #: would otherwise satisfy a pid-only comparison.
 DAEMON_IDENTITY_FIELDS = ("pid", "processUid", "processStartTicks", "comm")
 
-#: A transport attribute the product path requires to be ``True``.  F-R4 made the service
-#: record a reconciliation marker through the transport when a dispatch loses the commit, but
-#: the production collector's ``quarantine_node`` only raises: nothing durable is written, so
-#: the race loser would consume its one-shot decision claim with no marker anywhere (#312 N2).
-#: Absent or false means the capability is not connected, and a dispatch that could not be
-#: reconciled does not start.
+#: A transport attribute the product path requires to be ``True``.  Absent or false means
+#: the authenticated node journal is not connected, so a dispatch that could not later be
+#: reconciled does not start.  Runtime reachability is proved separately for every dispatch.
 QUARANTINE_CAPABILITY = "records_durable_quarantine"
 
 #: How old a node-agent health observation may be, measured against the database clock.
@@ -268,6 +266,121 @@ class BuildExecutionService:
         if not row or not row.get("node_id"):
             raise _refuse_product_dispatch("the leased resource names no node")
         return str(row["node_id"])
+
+    def _mark_node_quarantined(
+        self,
+        *,
+        tenant_id: str,
+        project_id: str,
+        run_id: str,
+        leased_node_id: str,
+        recovery_epoch: str,
+        reason_code: str,
+        identity: Mapping[str, Any],
+    ) -> None:
+        """Make a durable control-plane scheduling refusal after external side effects.
+
+        The node-agent journal is the physical reconciliation obligation; this row state is
+        the independent scheduling fence.  Placement and final build admission already
+        require ``inv.nodes.status = 'online'``, so a committed transition prevents the same
+        Node from receiving another build while an operator reconciles the journal.
+        """
+
+        with self.db.transaction(tenant_id) as conn:
+            node = conn.execute(
+                "SELECT status,recovery_epoch FROM inv.nodes WHERE node_id=%s FOR UPDATE",
+                (leased_node_id,),
+            ).fetchone()
+            if (
+                not node
+                or _uuid_key(node["recovery_epoch"]) != _uuid_key(recovery_epoch)
+            ):
+                raise _refuse_product_dispatch(
+                    "the build Node cannot be fenced for reconciliation"
+                )
+            conn.execute(
+                "UPDATE inv.nodes SET status='quarantined' WHERE node_id=%s",
+                (leased_node_id,),
+            )
+            conn.execute(
+                """INSERT INTO inv.outbox(tenant_id,run_id,event_id,event_type,payload)
+                VALUES (%s,%s,%s,%s,%s)""",
+                (
+                    tenant_id,
+                    run_id,
+                    uuid4(),
+                    QUARANTINED_EVENT,
+                    Jsonb(
+                        {
+                            "projectId": project_id,
+                            "nodeId": leased_node_id,
+                            "reasonCode": reason_code,
+                            "buildSessionId": identity["build_session_id"],
+                            "leaseId": identity["lease_id"],
+                            "resourceId": identity["resource_id"],
+                            "decisionId": identity["decision_id"],
+                            "bindingDigest": identity["binding_digest"],
+                        }
+                    ),
+                ),
+            )
+
+    def _record_post_dispatch_quarantine(
+        self,
+        *,
+        scope: str,
+        tenant_id: str,
+        project_id: str,
+        run_id: str,
+        leased_node_id: str,
+        recovery_epoch: str,
+        reason_code: str,
+        identity: Mapping[str, Any],
+    ) -> None:
+        """Best-effort both durable markers without replacing the triggering error.
+
+        Runtime channel loss after dispatch cannot be repaired by raising its transport
+        error: that would erase the authority/race failure and still leave the Node
+        schedulable.  We therefore attempt the node journal and the independent DB fence,
+        swallowing only their secondary errors so the caller surfaces the original cause.
+        The pre-dispatch live probe makes reaching this double-failure state exceptional.
+        """
+
+        transport_identity = {
+            "lease_id": identity["lease_id"],
+            "resource_id": identity["resource_id"],
+            "decision_id": identity["decision_id"],
+            "binding_digest": identity["binding_digest"],
+            "daemon_identity": identity["daemon_identity"],
+        }
+        try:
+            if scope == "build-session":
+                self._transport.cancel_and_quarantine_session(
+                    identity["build_session_id"], reason_code, **transport_identity
+                )
+            else:
+                self._transport.quarantine_node(
+                    leased_node_id,
+                    identity["build_session_id"],
+                    reason_code,
+                    **transport_identity,
+                )
+        except Exception:
+            # This marker is secondary evidence.  Even an unexpected client failure may not
+            # replace the authority/race error which explains why quarantine was required.
+            pass
+        try:
+            self._mark_node_quarantined(
+                tenant_id=tenant_id,
+                project_id=project_id,
+                run_id=run_id,
+                leased_node_id=leased_node_id,
+                recovery_epoch=recovery_epoch,
+                reason_code=reason_code,
+                identity=identity,
+            )
+        except DomainError:
+            pass
 
     # ---------------------------------------------------------------- cleanup authority
 
@@ -539,8 +652,40 @@ class BuildExecutionService:
         lease_id = plan["lease"]["leaseId"]
         resource_id = plan["lease"]["resourceId"]
         lease_epoch = plan["lease"].get("recoveryEpoch")
+        binding_digest = action_digest(
+            {
+                "decisionId": decision["decisionId"],
+                "leaseId": lease_id,
+                "resourceId": resource_id,
+            }
+        )
 
         leased_node_id = self._leased_node_id(request["tenantId"], resource_id)
+        preflight_identity = {
+            "build_session_id": plan_session,
+            "lease_id": lease_id,
+            "resource_id": resource_id,
+            "decision_id": decision["decisionId"],
+            "binding_digest": binding_digest,
+        }
+        try:
+            self._transport.preflight_quarantine(leased_node_id, lease_epoch)
+        except DomainError:
+            # A configured client is not a live reconciliation channel.  Fence the node in
+            # the control plane before returning the original fail-closed transport error.
+            try:
+                self._mark_node_quarantined(
+                    tenant_id=request["tenantId"],
+                    project_id=request["projectId"],
+                    run_id=run_id,
+                    leased_node_id=leased_node_id,
+                    recovery_epoch=lease_epoch,
+                    reason_code="RES-0006",
+                    identity=preflight_identity,
+                )
+            except DomainError:
+                pass
+            raise
         health = self._transport.collect_product_health()
         daemon_before = self._health_authority(
             health,
@@ -569,6 +714,14 @@ class BuildExecutionService:
         # Downstream uses the *admitted* form, not the transport's casing: the plan is the
         # document that was admitted, and the receipt only has to agree with it.
         build_session_id = plan_session
+        quarantine_identity = {
+            "build_session_id": build_session_id,
+            "lease_id": lease_id,
+            "resource_id": resource_id,
+            "decision_id": decision["decisionId"],
+            "binding_digest": binding_digest,
+            "daemon_identity": daemon_before,
+        }
 
         daemon_after = self._daemon_identity(
             {"daemonIdentity": self._transport.daemon_identity()}, "post-dispatch observation"
@@ -576,7 +729,16 @@ class BuildExecutionService:
         if any(daemon_after[field] != daemon_before[field] for field in DAEMON_IDENTITY_FIELDS):
             # A different daemon answered after the dispatch, so any side effect this
             # build may have produced is unaccounted for: go straight to cleanup.
-            self._transport.cancel_and_quarantine_session(build_session_id, "VERIFY-0002")
+            self._record_post_dispatch_quarantine(
+                scope="build-session",
+                tenant_id=request["tenantId"],
+                project_id=request["projectId"],
+                run_id=run_id,
+                leased_node_id=leased_node_id,
+                recovery_epoch=lease_epoch,
+                reason_code="VERIFY-0002",
+                identity=quarantine_identity,
+            )
             raise DomainError("VERIFY-0002", "Build daemon identity changed", 422)
 
         cleanup_receipt = self._transport.collect_cleanup_receipt(build_session_id)
@@ -594,13 +756,7 @@ class BuildExecutionService:
                 lease_id=lease_id,
                 leased_node_id=leased_node_id,
                 resource_id=resource_id,
-                binding_digest=action_digest(
-                    {
-                        "decisionId": decision["decisionId"],
-                        "leaseId": lease_id,
-                        "resourceId": resource_id,
-                    }
-                ),
+                binding_digest=binding_digest,
                 decision_id=decision["decisionId"],
             )
         except DomainError as error:
@@ -613,13 +769,14 @@ class BuildExecutionService:
                 # Nothing committed: no Evidence, no release. The node keeps the
                 # unaccounted state, so it is quarantined rather than handed the next
                 # build, and an operator reconciles it.
-                try:
-                    self._transport.quarantine_node(leased_node_id, error.code)
-                except DomainError:
-                    # A failing reconciliation attempt must not replace the reason this
-                    # dispatch failed: an operator who sees the transport's own refusal here
-                    # loses the fact that a race was lost after an external dispatch.  The
-                    # product path refuses such a transport up front, so reaching this is a
-                    # transport regression -- and the original cause is what says so.
-                    pass
+                self._record_post_dispatch_quarantine(
+                    scope="node",
+                    tenant_id=request["tenantId"],
+                    project_id=request["projectId"],
+                    run_id=run_id,
+                    leased_node_id=leased_node_id,
+                    recovery_epoch=lease_epoch,
+                    reason_code=error.code,
+                    identity=quarantine_identity,
+                )
             raise

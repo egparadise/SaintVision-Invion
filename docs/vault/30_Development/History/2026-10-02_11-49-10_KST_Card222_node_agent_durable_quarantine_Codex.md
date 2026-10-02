@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD222-NODE-QUARANTINE-20261002"
 title: "Card 222 node-agent durable quarantine channel"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T11:49:10+09:00"
+updated: "2026-10-02T12:16:40+09:00"
 source_of_truth: "Git"
 base_sha: "63ef20c4df9455eaae05758ff18d00ad46e5ff0f"
 reviewer: "Claude"
@@ -42,3 +42,20 @@ train 17 후보의 `#312`는 BuildExecutionService가 durable quarantine capabil
 코드 경계는 구현됐지만 hosted Core, 독립 Claude 검토, 실제 제품 caller 주입은 아직 남아 있다.
 receipt는 reconciliation 의무의 durable 기록일 뿐 복구 완료 증거가 아니며, S08-BE 완료·점수 승격과
 물리 builder 인수를 주장하지 않는다. 설계는 [[S08-BE_node-agent_durable_quarantine_channel]].
+
+# Claude r1 조치
+
+Claude r1 `issuecomment-5944843555`의 M-1~M-4를 다음처럼 닫았다.
+
+- Node quarantine의 secondary `NODE-0030`이 최초 오류를 덮지 않도록 원인 보존 경계를 넓혔다.
+- lease/session/daemon/decision/binding/epoch를 request·receipt와 replay key에 결속했다. epoch 또는
+  daemon만 바뀌어도 새 requestId가 생기고, lost acknowledgement만 exact replay한다.
+- capability 설정만 믿지 않고 매 dispatch fresh nonce preflight를 수행한다. 런타임 도달 불가도
+  adapter 호출 0건인 상태에서 DB scheduling fence와 redacted outbox로 durable 표시한다.
+- post-dispatch 격리는 Node journal과 `inv.nodes.status='quarantined'` 두 marker를 독립 기록한다.
+  기존 placement/build admission의 online guard가 후속 배정을 거부한다.
+- focused Python 결과는 **239 passed, 1 skipped**였고, 추가 collector/service 재검증은
+  **89 passed, 1 skipped**였다. skip 1건은 Windows의 POSIX mode 비지원이다.
+
+hosted Core·Backend exact-head 결과와 Claude r2 판정은 이 조치 commit 이후 기록한다. 제품 caller와
+실제 builder Node 인수는 여전히 별도 카드이며 S08-BE 완료를 주장하지 않는다.

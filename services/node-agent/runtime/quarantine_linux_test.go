@@ -13,7 +13,6 @@ import (
 )
 
 func quarantineRequest(c Config) contracts.BuildQuarantineRequest {
-	session := "33333333-3333-4333-8333-333333333333"
 	return contracts.BuildQuarantineRequest{
 		SchemaVersion:  "build-quarantine-request:1",
 		RequestId:      "44444444-4444-4444-8444-444444444444",
@@ -21,7 +20,12 @@ func quarantineRequest(c Config) contracts.BuildQuarantineRequest {
 		NodeId:         contracts.NodeId(c.NodeID),
 		RecoveryEpoch:  c.Epoch,
 		Scope:          "build-session",
-		BuildSessionId: &session,
+		BuildSessionId: "33333333-3333-4333-8333-333333333333",
+		LeaseId:        contracts.LeaseId("lse_00000000000000000000000000"),
+		ResourceId:     contracts.ResourceId("res_00000000000000000000000000"),
+		DecisionId:     "decision-card222",
+		BindingDigest:  "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+		DaemonIdentity: contracts.BuildDaemonIdentity{Pid: 42, ProcessUid: 1000, ProcessStartTicks: 28815, Comm: "buildkitd"},
 		ReasonCode:     "VERIFY-0022",
 		RequestedAt:    contracts.Timestamp("2026-10-02T00:00:00Z"),
 	}

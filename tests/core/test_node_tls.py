@@ -159,7 +159,17 @@ def test_quarantine_uses_the_pinned_mtls_channel_and_strict_contract(peer):
         "nodeId": peer.node.node_id,
         "recoveryEpoch": peer.epoch,
         "scope": "node",
-        "buildSessionId": None,
+        "buildSessionId": "44444444-4444-4444-8444-444444444444",
+        "leaseId": "lse_00000000000000000000000000",
+        "resourceId": "res_00000000000000000000000000",
+        "decisionId": "decision-card222",
+        "bindingDigest": "b" * 64,
+        "daemonIdentity": {
+            "pid": 42,
+            "processUid": 1000,
+            "processStartTicks": 28815,
+            "comm": "buildkitd",
+        },
         "reasonCode": "RES-0006",
         "requestedAt": "2026-10-02T08:00:00Z",
     }

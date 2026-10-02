@@ -1204,16 +1204,27 @@
           ]
         },
         "buildSessionId": {
-          "anyOf": [
-            {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "leaseId": {
+          "$ref": "#/$defs/LeaseId"
+        },
+        "resourceId": {
+          "$ref": "#/$defs/ResourceId"
+        },
+        "decisionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "bindingDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "daemonIdentity": {
+          "$ref": "#/$defs/BuildDaemonIdentity"
         },
         "reasonCode": {
           "type": "string",
@@ -1231,35 +1242,13 @@
         "recoveryEpoch",
         "scope",
         "buildSessionId",
+        "leaseId",
+        "resourceId",
+        "decisionId",
+        "bindingDigest",
+        "daemonIdentity",
         "reasonCode",
         "requestedAt"
-      ],
-      "allOf": [
-        {
-          "if": {
-            "properties": {
-              "scope": {
-                "const": "build-session"
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "buildSessionId": {
-                "type": "string",
-                "format": "uuid",
-                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-              }
-            }
-          },
-          "else": {
-            "properties": {
-              "buildSessionId": {
-                "type": "null"
-              }
-            }
-          }
-        }
       ],
       "additionalProperties": false
     },
@@ -1298,16 +1287,27 @@
           ]
         },
         "buildSessionId": {
-          "anyOf": [
-            {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "leaseId": {
+          "$ref": "#/$defs/LeaseId"
+        },
+        "resourceId": {
+          "$ref": "#/$defs/ResourceId"
+        },
+        "decisionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "bindingDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "daemonIdentity": {
+          "$ref": "#/$defs/BuildDaemonIdentity"
         },
         "reasonCode": {
           "type": "string",
@@ -1336,38 +1336,16 @@
         "recoveryEpoch",
         "scope",
         "buildSessionId",
+        "leaseId",
+        "resourceId",
+        "decisionId",
+        "bindingDigest",
+        "daemonIdentity",
         "reasonCode",
         "requestedAt",
         "recordedAt",
         "durable",
         "replayed"
-      ],
-      "allOf": [
-        {
-          "if": {
-            "properties": {
-              "scope": {
-                "const": "build-session"
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "buildSessionId": {
-                "type": "string",
-                "format": "uuid",
-                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-              }
-            }
-          },
-          "else": {
-            "properties": {
-              "buildSessionId": {
-                "type": "null"
-              }
-            }
-          }
-        }
       ],
       "additionalProperties": false
     },

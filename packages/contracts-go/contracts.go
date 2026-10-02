@@ -247,7 +247,12 @@ type BuildQuarantineRequest struct {
     NodeId NodeId `json:"nodeId"`
     RecoveryEpoch string `json:"recoveryEpoch"`
     Scope string `json:"scope"`
-    BuildSessionId *string `json:"buildSessionId"`
+    BuildSessionId string `json:"buildSessionId"`
+    LeaseId LeaseId `json:"leaseId"`
+    ResourceId ResourceId `json:"resourceId"`
+    DecisionId string `json:"decisionId"`
+    BindingDigest string `json:"bindingDigest"`
+    DaemonIdentity BuildDaemonIdentity `json:"daemonIdentity"`
     ReasonCode string `json:"reasonCode"`
     RequestedAt Timestamp `json:"requestedAt"`
 }
@@ -260,7 +265,12 @@ type BuildQuarantineReceipt struct {
     NodeId NodeId `json:"nodeId"`
     RecoveryEpoch string `json:"recoveryEpoch"`
     Scope string `json:"scope"`
-    BuildSessionId *string `json:"buildSessionId"`
+    BuildSessionId string `json:"buildSessionId"`
+    LeaseId LeaseId `json:"leaseId"`
+    ResourceId ResourceId `json:"resourceId"`
+    DecisionId string `json:"decisionId"`
+    BindingDigest string `json:"bindingDigest"`
+    DaemonIdentity BuildDaemonIdentity `json:"daemonIdentity"`
     ReasonCode string `json:"reasonCode"`
     RequestedAt Timestamp `json:"requestedAt"`
     RecordedAt Timestamp `json:"recordedAt"`

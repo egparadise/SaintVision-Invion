@@ -14,6 +14,7 @@ an operational acceptance claim.
 
 from __future__ import annotations
 
+from collections import OrderedDict
 from dataclasses import dataclass
 from datetime import datetime, timezone
 import hashlib
@@ -22,6 +23,7 @@ import os
 from pathlib import Path
 from pathlib import PurePosixPath
 import re
+import secrets
 import stat
 import subprocess
 import tarfile
@@ -795,6 +797,7 @@ class RootlessBuildkitTransport:
 #: by the card 211 contract PR rather than here.
 PRODUCT_HEALTH_RECEIPT = "product-health.json"
 PRODUCT_CLEANUP_RECEIPT_PREFIX = "cleanup-"
+_MAX_QUARANTINE_REPLAY_KEYS = 1024
 
 
 class NodeAgentReceipts:
@@ -824,9 +827,50 @@ class NodeAgentReceipts:
         self._quarantine_channel = quarantine_channel
         self._request_id_factory = request_id_factory
         self._clock = clock
-        self._quarantine_requests: dict[tuple[str, str | None, str], dict] = {}
+        self._quarantine_requests: OrderedDict[tuple[object, ...], dict] = OrderedDict()
         self._quarantine_lock = Lock()
         self.records_durable_quarantine = quarantine_client is not None
+
+    def preflight_quarantine(self, node_id: str, recovery_epoch: str) -> None:
+        """Prove the configured mTLS channel is live before an external dispatch.
+
+        A configured client is not a runtime capability.  This fresh nonce exchange proves
+        that the pinned Node is reachable and still answers for the exact tenant/node/epoch;
+        otherwise the product caller refuses before BuildKit can create any side effect.
+        """
+
+        channel = self._quarantine_channel
+        if (
+            not self.records_durable_quarantine
+            or channel is None
+            or node_id != channel.node_id
+            or self._canonical_uuid(recovery_epoch, "recovery epoch")
+            != self._canonical_uuid(channel.recovery_epoch, "recovery epoch")
+        ):
+            raise DomainError(
+                "RES-0006", "Node quarantine channel is not live", 503, retryable=True
+            )
+        request = {"nonce": secrets.token_hex(32)}
+        try:
+            response = self._quarantine_client.probe(channel, request)
+            observed = datetime.fromisoformat(
+                str(response.get("observedAt", "")).replace("Z", "+00:00")
+            )
+            age = (self._clock().astimezone(timezone.utc) - observed).total_seconds()
+            if (
+                response.get("nonce") != request["nonce"]
+                or response.get("tenantId") != channel.tenant_id
+                or response.get("nodeId") != channel.node_id
+                or self._canonical_uuid(response.get("recoveryEpoch"), "recovery epoch")
+                != self._canonical_uuid(channel.recovery_epoch, "recovery epoch")
+                or observed.tzinfo is None
+                or not -5 <= age <= 5
+            ):
+                raise ValueError()
+        except (DomainError, TypeError, ValueError, AttributeError):
+            raise DomainError(
+                "RES-0006", "Node quarantine channel is not live", 503, retryable=True
+            ) from None
 
     def collect_product_health(self) -> dict:
         receipt = _protected_json(self._directory / PRODUCT_HEALTH_RECEIPT)
@@ -871,7 +915,16 @@ class NodeAgentReceipts:
         return canonical
 
     def _record_quarantine(
-        self, *, scope: str, build_session_id: str | None, reason_code: str
+        self,
+        *,
+        scope: str,
+        build_session_id: str,
+        lease_id: str,
+        resource_id: str,
+        decision_id: str,
+        binding_digest: str,
+        daemon_identity: Mapping[str, object],
+        reason_code: str,
     ) -> dict:
         if not self.records_durable_quarantine:
             raise DomainError(
@@ -880,7 +933,18 @@ class NodeAgentReceipts:
         if not isinstance(reason_code, str) or not _QUARANTINE_REASON.fullmatch(reason_code):
             raise DomainError("VERIFY-0022", "Invalid Node quarantine reason", 409)
         channel = self._quarantine_channel
-        key = (scope, build_session_id, reason_code)
+        recovery_epoch = self._canonical_uuid(channel.recovery_epoch, "recovery epoch")
+        key = (
+            scope,
+            build_session_id,
+            lease_id,
+            resource_id,
+            decision_id,
+            binding_digest,
+            recovery_epoch,
+            json.dumps(daemon_identity, sort_keys=True, separators=(",", ":")),
+            reason_code,
+        )
         with self._quarantine_lock:
             request = self._quarantine_requests.get(key)
             if request is None:
@@ -889,9 +953,14 @@ class NodeAgentReceipts:
                     "requestId": str(self._request_id_factory()),
                     "tenantId": channel.tenant_id,
                     "nodeId": channel.node_id,
-                    "recoveryEpoch": self._canonical_uuid(channel.recovery_epoch, "recovery epoch"),
+                    "recoveryEpoch": recovery_epoch,
                     "scope": scope,
                     "buildSessionId": build_session_id,
+                    "leaseId": lease_id,
+                    "resourceId": resource_id,
+                    "decisionId": decision_id,
+                    "bindingDigest": binding_digest,
+                    "daemonIdentity": dict(daemon_identity),
                     "reasonCode": reason_code,
                     "requestedAt": self._clock()
                     .astimezone(timezone.utc)
@@ -901,6 +970,9 @@ class NodeAgentReceipts:
                 # Retain before I/O: an uncertain response is retried under the same
                 # idempotency key and requestedAt, never as a second quarantine event.
                 self._quarantine_requests[key] = request
+                self._quarantine_requests.move_to_end(key)
+                while len(self._quarantine_requests) > _MAX_QUARANTINE_REPLAY_KEYS:
+                    self._quarantine_requests.popitem(last=False)
             request = dict(request)
         validate_contract("BuildQuarantineRequest", request)
         receipt = self._quarantine_client.quarantine(channel, request)
@@ -916,15 +988,23 @@ class NodeAgentReceipts:
             raise DomainError("VERIFY-0022", "Node quarantine was not durably recorded", 409)
         return receipt
 
-    def cancel_and_quarantine_session(self, build_session_id: str, reason_code: str) -> dict:
+    def cancel_and_quarantine_session(
+        self, build_session_id: str, reason_code: str, **identity
+    ) -> dict:
         session_id = self._canonical_uuid(build_session_id, "build session ID")
         return self._record_quarantine(
-            scope="build-session", build_session_id=session_id, reason_code=reason_code
+            scope="build-session", build_session_id=session_id,
+            reason_code=reason_code, **identity
         )
 
-    def quarantine_node(self, node_id: str, reason_code: str) -> dict:
+    def quarantine_node(
+        self, node_id: str, build_session_id: str, reason_code: str, **identity
+    ) -> dict:
         if self._quarantine_channel is None or node_id != self._quarantine_channel.node_id:
             raise DomainError("VERIFY-0022", "Node quarantine identity differs", 409)
         return self._record_quarantine(
-            scope="node", build_session_id=None, reason_code=reason_code
+            scope="node",
+            build_session_id=self._canonical_uuid(build_session_id, "build session ID"),
+            reason_code=reason_code,
+            **identity,
         )

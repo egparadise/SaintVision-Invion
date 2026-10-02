@@ -245,7 +245,12 @@ export interface BuildQuarantineRequest {
   nodeId: NodeId;
   recoveryEpoch: string;
   scope: "build-session" | "node";
-  buildSessionId: (string | null);
+  buildSessionId: string;
+  leaseId: LeaseId;
+  resourceId: ResourceId;
+  decisionId: string;
+  bindingDigest: string;
+  daemonIdentity: BuildDaemonIdentity;
   reasonCode: string;
   requestedAt: Timestamp;
 }
@@ -258,7 +263,12 @@ export interface BuildQuarantineReceipt {
   nodeId: NodeId;
   recoveryEpoch: string;
   scope: "build-session" | "node";
-  buildSessionId: (string | null);
+  buildSessionId: string;
+  leaseId: LeaseId;
+  resourceId: ResourceId;
+  decisionId: string;
+  bindingDigest: string;
+  daemonIdentity: BuildDaemonIdentity;
   reasonCode: string;
   requestedAt: Timestamp;
   recordedAt: Timestamp;
