@@ -3687,6 +3687,11 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(getContrast(lightTokens[brBorder], lightTokens[bsBg]), 'Running border contrast light >= 3.0:1').toBeGreaterThanOrEqual(3.0);
       expect(getContrast(darkTokens[brBorder], darkTokens[bsBg]), 'Running border contrast dark >= 3.0:1').toBeGreaterThanOrEqual(3.0);
 
+      // Lifecycle step ring outline indicator (F5)
+      const currentStepIndicator = container.querySelector('[data-testid="run-step-indicator-running"]') as HTMLElement;
+      expect(currentStepIndicator, 'Current step indicator must render').not.toBeNull();
+      expect(currentStepIndicator.style.outlineColor || currentStepIndicator.style.outline, 'Current step ring outline must be bound to border-strong').toContain('var(--color-border-strong)');
+
       // 2-c. FAILED State
       await act(async () => {
         root.render(<RunDetail run={{ ...baseRun, state: 'failed', status: 'failed' }} onBack={() => {}} />);
@@ -3760,10 +3765,10 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       const attemptsTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
         b.textContent?.includes('시도 이력')
       );
-      if (attemptsTabBtn) {
-        await act(async () => {
-          attemptsTabBtn.click();
-        });
+      expect(attemptsTabBtn, 'Attempts tab button must exist').not.toBeNull();
+      await act(async () => {
+        attemptsTabBtn!.click();
+      });
         await act(async () => {
           await Promise.resolve();
           await Promise.resolve();
@@ -3781,7 +3786,6 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
         expect(getContrast(darkTokens[exit0Fg], darkTokens['--color-bg-surface']), 'ExitCode 0 dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
         expect(getContrast(lightTokens[exit1Fg], lightTokens['--color-bg-surface']), 'ExitCode 1 light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
         expect(getContrast(darkTokens[exit1Fg], darkTokens['--color-bg-surface']), 'ExitCode 1 dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
-      }
     } finally {
       vi.unstubAllGlobals();
       if (typeof window !== 'undefined' && originalWindowFetch) {

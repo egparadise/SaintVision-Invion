@@ -1081,6 +1081,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
                 <div key={step} style={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: '90px' }}>
                   <div style={{ textAlign: 'center', width: '100%' }}>
                     <div
+                      data-testid={`run-step-indicator-${step}`}
                       style={{
                         width: '32px',
                         height: '32px',

@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.192"
+version: "1.0.193"
 status: "proposed"
 author: "Gemini"
-updated: "2026-10-02T08:59:00+09:00"
+updated: "2026-10-02T09:25:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,7 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-10-02T08:59:00+09:00 (Card 213 실행 기록 화면 SealRecordPanel & RunDetail r1 조치: Claude UI 및 Codex r1 피드백 전수 반영 — (1) 상태 붕괴 변이 3종 사살(UNSEALED 배지 M11 degraded->online, completedAt failed 분기 M12 offline->online, attempt exitCode!=0 M13 offline->online) DOM 결속 시험 신설 및 tools/test_c213_mutations.py 13종 변이 M1~M13 13/13 100% 사살 실측, (2) 수명주기 스텝 현재 표시기 outline(3px solid var(--color-border-strong), offset 2px) 복원(7.58:1/6.99:1 >= 3.0:1 보장), (3) run-detail-seal-record.test.tsx 레거시 배열 완화 제거 및 exact token 단언 일원화, (4) History Before 열 base 02d5ecd4 실제 코드색(#f0f6fc, #3fb950, #e3b341 등) 및 alpha 합성 실제 배경(#12261e, #2b2519, #1b3629 등)으로 전수 갱신, 산술 오류(2.32:1, 3.35:1) 정정 및 라이트 모드 '가상 비교' 명시, 파이썬 독립 재현 스크립트 결속, (5) 상태 색 재매핑을 '의도적 재정의 및 RunList 일관성 확립'으로 명시; Vitest 24 passed, seal record tests 25 passed, attempts DOM 9 passed, related runs 45 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반, check_contract_bindings PASS, check_docs PASS, diff --check clean).
+- 확인 기준: 2026-10-02T09:25:00+09:00 (Card 213 실행 기록 화면 SealRecordPanel & RunDetail r2 조치: Claude UI r2 조건부 승인 지적 전수 반영 — (1) History Before 열 및 Python 동적 재현 스크립트 정정: succeeded/failed/cancelled 베이스 실측을 text-secondary(Light #475569 on #dce0e3 5.71:1 PASS / Dark #e5e7eb on #1d222b 12.89:1 PASS)로 정정하고 상태 색 재정의(Semantic Redesign) 목적 명시, RunDetail 다크 렌더 조상 배경을 body canvas #090d16 합성치(running 6.02, recovering 4.78, awaiting 4.95, completedAt 10.11/7.02)로 전수 재계산 및 Python 재현 블록 14행 100% 일치 결속, (2) recovering 통일 서술을 '후속 카드 215에서 RunList.tsx를 var(--color-status-active)로 통일 정합하여 화면 간 불일치를 완전 해소 예정'으로 미래형 정정, (3) 현재 단계 링 형태 단서 보호 DOM 단언(run-step-indicator-running outline toContain var(--color-border-strong)) 신설 및 attemptsTabBtn non-null 단언 강화, (4) AST style-pair 가드 bg-only 공백 및 outline 속성 파싱을 후속 정적 가드 개선 백로그로 명시; Vitest 24 passed, seal record tests 25 passed, attempts DOM 9 passed, related runs 45 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반, check_contract_bindings PASS, check_docs PASS, diff --check clean).
 - 확인 기준: 2026-10-02T07:22:00+09:00 (Card 206 개발 스튜디오 화면 DeveloperStudio 색상 리터럴 inventory 전수(174→0), 대비 표본/DOM 결속 감사 및 디자인 토큰 승격: base b78b3b04 PR #301 head 위 작업, DeveloperStudio 174건 -> 0건 해소, COLOR_LITERAL_MULTISET_BASELINE {} 래칫, border-subtle 356건/25개 파일 래칫, 레거시 #30363d 64건/11파일 상한 강화, non-schedulable 카드 opacity 0.75 제거로 muted 텍스트 4.67/5.75 >= 4.5:1 보장, active tab borderBottom 1:1 충돌 transparent 교정, projects useMemo 메모이제이션 무한 재렌더링 차단, Step 2 readiness.blockedBy safe navigation 안정화, Test 9g DOM 실제 렌더링 동적 대비 단언 신설, Test 9g-2 252개 style 속성 전수 AST 스타일-쌍 명도 대비 및 조상/불투명도 추적 가드 신설, Revert-Fail Probes 58~60 추가, tools/test_c206_mutations.py 10종 변이 10/10 100% 사살 실측; Vitest 22 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반, check_contract_bindings PASS, check_docs PASS, diff --check clean).
 - 확인 기준: 2026-10-02T06:50:00+09:00 (Card 202 사내망 배포 화면 Train 14 tip d0b2a4c6 머지 및 #289 step-up 재인증 섹션 래칫 동기화: PR #289 / Card 192 step-up 재인증 UI(8개 style 객체, 0개 리터럴) 병합 후 AST 가드 전수 통과 확인(violations 0), totalStyleAttrs 193 -> 201, checkedObjects 23, checkedPairs 150, unboundColorObjects 106, coveredColorObjects 129, checkedBorderObjects 36, checkedBorderPairs 38로 래칫 재고정, COLOR_LITERAL_MULTISET_BASELINE {} 0건 유지, Vitest 20 passed, tsc 0 error, build 성공, route coverage 41 passed, check_frontend_integrity 0 위반, check_docs PASS, diff --check clean).
 - 확인 기준: 2026-10-02T06:22:08+09:00 (Card 202 사내망 배포 화면 r2 조치: Claude UI r2 조건부 승인 지적 2건 전수 반영 — (1) §2.2 bash heredoc index.css 동적 재현 명령의 Python 정규식 따옴표 회귀 및 SyntaxError를 r"\[data-theme='dark'\]\s*\{([\s\S]*?)\}"로 완전 수정하고 실제 실행 exit code 0 콘솔 출력 직접 결속; (2) §2.1 표 첫 행 미노출 안내 Before composite hex를 index.css 정본 캔버스(#f8fafc / #090d16) 위 0.12 alpha 합성 실측치인 #e1edfc 2.13:1(Light) / #0f1c32 6.75:1(Dark)로 시험과 동일하게 정정; 문서 단독 commit).
@@ -39,32 +39,33 @@ source_of_truth: "Git"
 - 확인 기준: 2026-10-02T02:05:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer r1 조치: Claude UI r1 및 Codex r1 피드백 전수 반영 — R1 버튼 요소 DEF-S11-09 위반 해소 `var(--color-brand-primary-bg)` 및 `--color-brand-primary-fg` 승격; R2 활성 네임스페이스 칩 및 버전 배지 `var(--color-brand-hover)` 적용 5.49:1(Light)/8.11:1(Dark), 비활성 버튼 `var(--color-bg-subtle)`/`var(--color-text-muted)`/`var(--color-border-subtle)` 5.25:1/5.78:1 및 3.18:1/3.08:1 충족; R3 실제 렌더 배경 기반 전수 실측표 재구성; R4 Test 9c 확장 및 10종 변이 M1~M10 100% 사살 실측; R5 History 제어 바이트 60개 전수 제거 완료; 보라색 리터럴 의도적 브랜드 통합 명시; Vitest 14 passed, s11-defect-fixes 16 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-02T01:20:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer Light/Dark 명도 대비 전수 감사 및 디자인 토큰 승격: base db37dbc5 위 작업, ResourceExplorer 390건 -> 0건, InvFileExplorer 124건 -> 0건 100% 해소, COLOR_LITERAL_MULTISET_BASELINE 양 파일 {} 래칫, border-subtle 232건/22개 파일 래칫, DOM 실제 렌더링 동적 대비 단언 신설, 변이 M1~M4 100% 사살 실측, Vitest 9개 스위트 139 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 
-## 2026-10-02 실행 기록 화면 (SealRecordPanel & RunDetail) 색상 리터럴 inventory 전수(135+122→0), 대비 표본/DOM 결속 감사 및 불변 봉인 원장 접근성 승격 (Card 213, `agent/gemini/c213-runs-contrast`, base `02d5ecd4` PR #308 r1)
-- **개요**: ACC-09 다음 영역인 실행 기록 및 봉인 원장 화면(`SealRecordPanel.tsx` 135건, `RunDetail.tsx` 122건)의 색상 리터럴 inventory 전수(257→0), 대비 표본/DOM 결속 감사 및 불변 봉인 원장 접근성 승격 (PR #310 r1 Claude UI 및 Codex 피드백 전수 반영):
+## 2026-10-02 실행 기록 화면 (SealRecordPanel & RunDetail) 색상 리터럴 inventory 전수(135+122→0), 대비 표본/DOM 결속 감사 및 불변 봉인 원장 접근성 승격 (Card 213, `agent/gemini/c213-runs-contrast`, base `02d5ecd4` PR #308 r1, r2 피드백 반영)
+- **개요**: ACC-09 다음 영역인 실행 기록 및 봉인 원장 화면(`SealRecordPanel.tsx` 135건, `RunDetail.tsx` 122건)의 색상 리터럴 inventory 전수(257→0), 대비 표본/DOM 결속 감사 및 불변 봉인 원장 접근성 승격 (PR #310 r2 Claude UI 조건부 승인 및 Codex 피드백 전수 반영):
   1. **색상 리터럴 전수 해소 및 의도적 상태 디자인 승격**:
      - `SealRecordPanel.tsx`: 기존 135건 $\rightarrow$ **0건** (전수 제거).
      - `RunDetail.tsx`: 기존 122건 $\rightarrow$ **0건** (전수 제거).
-     - 실행 상세 상태 배지(`run-detail-status-badge`)를 신설하여 6가지 핵심 수명주기 상태(`succeeded`, `running`, `failed`, `cancelled`, `recovering`, `awaiting_approval`)를 각각 고유한 정본 시맨틱 토큰 및 테두리로 명확히 분리 및 의도적 재정의 (RunList 화면과 통일):
+     - 실행 상세 상태 배지(`run-detail-status-badge`)를 신설하여 6가지 핵심 수명주기 상태(`succeeded`, `running`, `failed`, `cancelled`, `recovering`, `awaiting_approval`)를 각각 고유한 정본 시맨틱 토큰 및 테두리로 명확히 분리 및 의도적 재정의:
        - `succeeded`: `var(--color-status-online)` (녹색, 테두리 일치)
        - `running`: `var(--color-brand-hover)` (파란색, 테두리 일치)
        - `failed`: `var(--color-status-offline)` (빨간색, 테두리 일치)
        - `cancelled`: `var(--color-status-neutral)` (회색, `var(--color-border-strong)` 테두리)
-       - `recovering`: `var(--color-status-active)` (하늘색, 테두리 일치)
+       - `recovering`: `var(--color-status-active)` (하늘색, 테두리 일치 — 후속 카드 215에서 RunList와 통일 정합 예정)
        - `awaiting_approval`: `var(--color-status-degraded)` (호박색, 테두리 일치)
      - 취소 모달 타이틀의 미선언 토큰 `var(--color-brand-danger)`를 정본 에러 토큰인 `var(--color-status-offline)`로 교체.
-     - 수명주기 스텝 원형 인디케이터에서 다크 모드 저대비(2.18:1 < 3.0:1)를 유발하던 스텝 서클 테두리 대신 DeveloperStudio 규격과 일원화된 외부 링 `outline: isCurrent ? '3px solid var(--color-border-strong)' : 'none'` 및 `outlineOffset: '2px'`를 부여하여 캔버스/서피스 대비 7.58:1(Light) / 6.99:1(Dark) >= 3.0:1 보장.
+     - 수명주기 스텝 원형 인디케이터에서 다크 모드 저대비(2.18:1 < 3.0:1)를 유발하던 스텝 서클 테두리 대신 DeveloperStudio 규격과 일원화된 외부 링 `outline: isCurrent ? '3px solid var(--color-border-strong)' : 'none'` 및 `outlineOffset: '2px'`를 부여하여 캔버스/서피스 대비 7.58:1(Light) / 6.99:1(Dark) >= 3.0:1 보장 및 DOM 단언(`run-step-indicator-running`)으로 링 형태 단서 보호.
   2. **Fail-Closed Multiset Baseline 래칫 강제**:
      - `acc09-contrast-tokens.test.tsx`의 `COLOR_LITERAL_MULTISET_BASELINE`에서 `SealRecordPanel.tsx` 및 `RunDetail.tsx`의 허용 인벤토리를 `{}` (0건)으로 전면 고정.
      - `var(--color-border-subtle)` 사용 횟수 **382건**, 파일 수 **26개**로 fail-closed 단언 충족.
      - 레거시 리터럴 상한치 강화 (`#d97706` <= 8/5, `#e2e8f0` <= 0/0(소멸), `#30363d` <= 55/9).
   3. **실제 렌더링 DOM 기반 동적 대비 단언 및 13종 변이 100% 사살**:
-     - Test 9h 신설 및 보강: 봉인 상태 배지(`seal-status-badge`) 봉인됨/미봉인 대비 단언 및 반대 상태 토큰 불일치(`not.toBe`) 단언(M11 사살), 봉인 원장 핵심 필드(`seal-record-id`, `seal-final-state`, `seal-workload-spec-sha`, `bundle-hash`) surface 대비 >= 4.5:1 단언, 실행 상세 상태 배지(`run-detail-status-badge`) 6개 상태 전경/배경/테두리 대비 동적 단언 (텍스트 >= 4.5:1, 테두리 >= 3.0:1), 완료 시각(`run-detail-completedAt`) 성공/실패 분기 동적 단언 및 반대 상태 토큰 불일치 단언(M12 사살), 시도 이력(attempts) 성공(exit 0)/실패(exit 137) 분기 동적 단언 및 반대 상태 토큰 불일치 단언(M13 사살).
+     - Test 9h 신설 및 보강: 봉인 상태 배지(`seal-status-badge`) 봉인됨/미봉인 대비 단언 및 반대 상태 토큰 불일치(`not.toBe`) 단언(M11 사살), 봉인 원장 핵심 필드(`seal-record-id`, `seal-final-state`, `seal-workload-spec-sha`, `bundle-hash`) surface 대비 >= 4.5:1 단언, 실행 상세 상태 배지(`run-detail-status-badge`) 6개 상태 전경/배경/테두리 대비 동적 단언 (텍스트 >= 4.5:1, 테두리 >= 3.0:1), 완료 시각(`run-detail-completedAt`) 성공/실패 분기 동적 단언 및 반대 상태 토큰 불일치 단언(M12 사살), 시도 이력(attempts) 성공(exit 0)/실패(exit 137) 분기 동적 단언 및 반대 상태 토큰 불일치 단언(M13 사살), 시도 이력 탭 non-null 보장, 현재 단계 링 형태 단서(`run-step-indicator-running`) outline 단언 추가.
      - Test 9h-2 신설: SealRecordPanel 133개 style 속성 중 색상 관여 76개, RunDetail 229개 style 속성 중 색상 관여 103개 대상 조상 컨테이너 배경 스택 추적 및 불투명도 합성 기반 동적 AST 명도 대비 계산 및 커버리지 래칫 (violations 0).
-     - Revert-Fail Probes 61~65 추가 (Probe 61 hardcoded #8b949e fail, Probe 62 hardcoded #58a6ff fail, Probe 63 hardcoded #d29922 fail, Probe 64 hardcoded #3fb950 fail, Probe 65 hardcoded #d97706 fail).
-     - `tools/test_c213_mutations.py` 신규 커밋: 13종 변이 M1~M13 전원 사살 실측 (13/13 = 100% killed, exit code 0).
+     - Revert-Fail Probes 61~65 추가.
+     - `tools/test_c213_mutations.py`: 13종 변이 M1~M13 전원 사살 실측 (13/13 = 100% killed, exit code 0).
      - `run-detail-seal-record.test.tsx`: 이전 배열 허용치 제거 및 exact 정본 토큰 단언(`var(--color-status-online)`, `var(--color-status-offline)`) 일원화.
   4. **잔여 백로그 현황**:
      - 실행 기록 및 봉인 원장 화면 잔여 색상 리터럴: **0건**.
+     - AST style-pair 가드 bg-only 공백 및 outline 파싱 가드는 후속 정적 분석 개선 백로그로 등록 (제품 코드 상 위반 0건 확인).
 - **담당 및 역할**: Gemini (Frontend / UI / 접근성 소유). Reviewer: Claude (UI/접근성/테스트), Codex (디자인 토큰/무결성/불변식).
 - **관측 근거 (Evidence)**:
   - 단위 시험: `npx vitest run tests/acc09-contrast-tokens.test.tsx` (24 passed 100%, exit 0)
