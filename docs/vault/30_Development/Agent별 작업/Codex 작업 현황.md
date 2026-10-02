@@ -8,7 +8,7 @@ updated: "2026-10-02T09:45:53+09:00"
 source_of_truth: "Git"
 active_card: "CARD-205 AC-11 accessibility user-device manual acceptance importer"
 active_card_status: "Canonical AC-11 accessibility row now complete and assembler-to-aggregator consumption regression passes"
-active_card_next: "Land with train 16 (#302 final head 1d6894fe, exact-head Backend/Frontend green); after landing, the user runs the §12 device manual acceptance per the #300 checklist and imports it with tools/import_ac11_accessibility_evidence.py"
+active_card_next: "Land with train 16 (#302 repair merged; Backend/Frontend green on repair head 1d6894fe); after landing, the user runs the §12 device manual acceptance per the #300 checklist and imports it with tools/import_ac11_accessibility_evidence.py"
 ---
 
 ## 2026-10-02 Card 205 — AC-11 사용자 기기 접근성 수동 인수 importer
