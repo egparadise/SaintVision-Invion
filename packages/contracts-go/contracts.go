@@ -138,6 +138,44 @@ type BuildRequest struct {
     TimeoutSeconds int64 `json:"timeoutSeconds"`
 }
 
+type BuildPreparationInput struct {
+    CheckoutId string `json:"checkoutId"`
+    BuildPolicyProfileId string `json:"buildPolicyProfileId"`
+    ExpectedRunVersion int64 `json:"expectedRunVersion"`
+    RequestedTarget string `json:"requestedTarget"`
+}
+
+type BuildEnqueueInput struct {
+    ApprovalId ApprovalId `json:"approvalId"`
+    ExpectedRunVersion int64 `json:"expectedRunVersion"`
+}
+
+type BuildPreparationView struct {
+    BuildId string `json:"buildId"`
+    RunId RunId `json:"runId"`
+    SourceRunId RunId `json:"sourceRunId"`
+    ApprovalId ApprovalId `json:"approvalId"`
+    RequestDigest ActionDigest `json:"requestDigest"`
+    DecisionIdentityDigest ActionDigest `json:"decisionIdentityDigest"`
+    Status string `json:"status"`
+    ExpiresAt Timestamp `json:"expiresAt"`
+}
+
+type BuildApprovalReviewSummary struct {
+    Kind string `json:"kind"`
+    Target string `json:"target"`
+    RiskLevel string `json:"riskLevel"`
+    ProfileId string `json:"profileId"`
+    ProfileVersion int64 `json:"profileVersion"`
+    SourceRevision int64 `json:"sourceRevision"`
+    ContextDigest ActionDigest `json:"contextDigest"`
+    DockerfileDigest ActionDigest `json:"dockerfileDigest"`
+    NetworkMode string `json:"networkMode"`
+    CacheMode string `json:"cacheMode"`
+    UsesSecrets bool `json:"usesSecrets"`
+    SecretCount int64 `json:"secretCount"`
+}
+
 type BuildPlan struct {
     ApiVersion string `json:"apiVersion"`
     Kind string `json:"kind"`
@@ -770,7 +808,7 @@ type WorkspacePrepareInput struct {
     CheckoutId string `json:"checkoutId"`
     ResumeId string `json:"resumeId"`
     StepId string `json:"stepId"`
-    Workload WorkloadSpec `json:"workload"`
+    Workload any `json:"workload"`
     ExpectedVersion int64 `json:"expectedVersion"`
 }
 

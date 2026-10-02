@@ -301,6 +301,33 @@ class ApprovalStore:
 
     def _review_snapshot(self, conn, row):
         workload, policy, policy_sha256 = self._review_documents(conn, row)
+        if workload.get("kind") == "BuildRequest":
+            preparation = conn.execute(
+                """SELECT p.source_revision,p.profile_id,p.profile_version,
+                bp.context_path,bp.dockerfile_path,bp.network_policy_id,
+                bp.cache_policy_id,bp.secret_aliases
+                FROM inv.build_preparations p JOIN inv.build_policy_profiles bp
+                  ON bp.profile_id=p.profile_id AND bp.version=p.profile_version
+                WHERE p.approval_id=%s""",
+                (row["approval_id"],),
+            ).fetchone()
+            if not preparation:
+                raise DomainError("AUTH-0032", "Build review authority unavailable")
+            workload = {
+                "kind": "build", "target": "image", "riskLevel": "L2",
+                "profileId": preparation["profile_id"],
+                "profileVersion": preparation["profile_version"],
+                "sourceRevision": preparation["source_revision"],
+                "contextDigest": digest(preparation["context_path"]),
+                "dockerfileDigest": digest(preparation["dockerfile_path"]),
+                "networkMode": "none",
+                "cacheMode": (
+                    "disabled" if preparation["cache_policy_id"] == "cachepol_disabled"
+                    else "read-only"
+                ),
+                "usesSecrets": bool(preparation["secret_aliases"]),
+                "secretCount": len(preparation["secret_aliases"]),
+            }
         return {"approval": view(row), "workload": workload, "riskLevel": policy["riskLevel"],
                 "policyDigest": policy_sha256}
 
@@ -435,16 +462,21 @@ class ApprovalStore:
         key,
         build_plan=None,
         build_evidence_id=None,
+        build_authority_factory=None,
     ):
         approval_action = _approval_action(workload)
         build_request = workload.get("kind") == "BuildRequest"
-        if build_request != (build_plan is not None and build_evidence_id is not None):
+        direct_authority = build_plan is not None and build_evidence_id is not None
+        factory_authority = build_authority_factory is not None
+        if build_request != (direct_authority or factory_authority) or (
+            direct_authority and factory_authority
+        ):
             raise DomainError("VAL-0003", "Exact build admission documents are required", 422)
         if workload["tenantId"] != principal.tenant_id or workload["projectId"] != project_id:
             raise DomainError("AUTH-0011", "Action scope differs", 403)
         action_hash = action_digest(approval_action)
         dispatch_payload = {"approval": approval_id, "actionDigest": action_hash}
-        if build_request:
+        if direct_authority:
             dispatch_payload.update(
                 {
                     "buildPlanDigest": digest(build_plan),
@@ -531,6 +563,10 @@ class ApprovalStore:
                 # No HTTP route accepts BuildRequest/BuildPlan documents.
                 approved_decision = deepcopy(reviewed_policy)
                 approved_decision["approvedBy"] = sorted(v["actor_id"] for v in voters)
+                if factory_authority:
+                    build_plan, build_evidence_id = build_authority_factory(
+                        conn, run, approved_decision, reviewed_workload
+                    )
                 from .build_product_runtime import TrustedBuildAdmissionEntry
 
                 TrustedBuildAdmissionEntry(self.db).record_committed(

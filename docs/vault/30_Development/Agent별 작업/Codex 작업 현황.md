@@ -1,15 +1,24 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.291"
+version: "1.0.292"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T01:47:14+09:00"
+updated: "2026-10-03T02:05:18+09:00"
 source_of_truth: "Git"
 active_card: "CARD-247 S08-BE build-request entry implementation (migration 0061)"
 active_card_status: "Card 241 (#338) approved by Claude r3 at 1b4df727 with exact-head Backend/Core green; Card 246 design (#341) conditionally approved; Card 247 implementation in progress on #338"
 active_card_next: "Open the Card 247 PR with real-PG end-to-end evidence and the census repin; product dispatch stays off by default and enablement follows the S08 runbook (#335)"
 ---
+
+## 2026-10-03 Card 247 — S08-BE BuildRequest product entry
+
+- Migration 0061, strict prepare/enqueue contracts, redacted approval review, quota and
+  idempotency reservation, source capsule authority, and post-scheduled admission factory
+  are implemented. Product dispatch remains exact-flag disabled by default.
+- Current local evidence is PG-free only. Hosted real-PG end-to-end, generated RLS census
+  repin, and exact-head Backend/Core are required before review approval.
+- [[2026-10-03_02-05-18_KST_Card247_S08-BE_build_request_entry_Codex]].
 
 ## 2026-10-02 Card 241 — S08-BE trusted admission entry and deployment worker service
 

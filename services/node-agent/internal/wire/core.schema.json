@@ -618,6 +618,61 @@
       ],
       "additionalProperties": false
     },
+    "BuildPreparationInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "checkoutId": { "type": "string", "format": "uuid" },
+        "buildPolicyProfileId": { "type": "string", "pattern": "^bpp_[0-9A-HJKMNP-TV-Z]{26}$" },
+        "expectedRunVersion": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+        "requestedTarget": { "type": "string", "const": "image" }
+      },
+      "required": ["checkoutId", "buildPolicyProfileId", "expectedRunVersion", "requestedTarget"]
+    },
+    "BuildEnqueueInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "approvalId": { "$ref": "#/$defs/ApprovalId" },
+        "expectedRunVersion": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 }
+      },
+      "required": ["approvalId", "expectedRunVersion"]
+    },
+    "BuildPreparationView": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "buildId": { "type": "string", "pattern": "^bld_[0-9A-HJKMNP-TV-Z]{26}$" },
+        "runId": { "$ref": "#/$defs/RunId" },
+        "sourceRunId": { "$ref": "#/$defs/RunId" },
+        "approvalId": { "$ref": "#/$defs/ApprovalId" },
+        "requestDigest": { "$ref": "#/$defs/ActionDigest" },
+        "decisionIdentityDigest": { "$ref": "#/$defs/ActionDigest" },
+        "status": { "type": "string", "const": "awaiting_approval" },
+        "expiresAt": { "$ref": "#/$defs/Timestamp" }
+      },
+      "required": ["buildId", "runId", "sourceRunId", "approvalId", "requestDigest", "decisionIdentityDigest", "status", "expiresAt"]
+    },
+    "BuildApprovalReviewSummary": {
+      "description": "Redacted human-review projection; it carries no raw path, secret identifier, provider, node, or lease.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "type": "string", "const": "build" },
+        "target": { "type": "string", "const": "image" },
+        "riskLevel": { "type": "string", "const": "L2" },
+        "profileId": { "type": "string", "pattern": "^bpp_[0-9A-HJKMNP-TV-Z]{26}$" },
+        "profileVersion": { "type": "integer", "minimum": 1 },
+        "sourceRevision": { "type": "integer", "minimum": 1 },
+        "contextDigest": { "$ref": "#/$defs/ActionDigest" },
+        "dockerfileDigest": { "$ref": "#/$defs/ActionDigest" },
+        "networkMode": { "type": "string", "const": "none" },
+        "cacheMode": { "type": "string", "enum": ["disabled", "read-only"] },
+        "usesSecrets": { "type": "boolean" },
+        "secretCount": { "type": "integer", "minimum": 0, "maximum": 32 }
+      },
+      "required": ["kind", "target", "riskLevel", "profileId", "profileVersion", "sourceRevision", "contextDigest", "dockerfileDigest", "networkMode", "cacheMode", "usesSecrets", "secretCount"]
+    },
     "BuildPlan": {
       "description": "Policy-compiled rootless BuildKit plan. Isolation fields are literals, not caller choices.",
       "type": "object",
@@ -3619,7 +3674,10 @@
           "maxLength": 200
         },
         "workload": {
-          "$ref": "#/$defs/WorkloadSpec"
+          "oneOf": [
+            { "$ref": "#/$defs/WorkloadSpec" },
+            { "$ref": "#/$defs/BuildApprovalReviewSummary" }
+          ]
         },
         "expectedVersion": {
           "type": "integer",

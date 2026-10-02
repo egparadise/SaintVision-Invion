@@ -278,6 +278,17 @@ class BuildExecutionAdmissionStore:
             )
         ):
             raise DomainError("AUTH-0032", "Committed build approval binding differs", 403)
+        preparation = conn.execute(
+            """SELECT request_sha256,queued_at,source_capsule_sha256
+            FROM inv.build_preparations WHERE approval_id=%s""",
+            (approval["approval_id"],),
+        ).fetchone()
+        if preparation and (
+            preparation["request_sha256"] != digest(request)
+            or preparation["queued_at"] is None
+            or not isinstance(preparation["source_capsule_sha256"], str)
+        ):
+            raise DomainError("VERIFY-0002", "Prepared build source binding differs", 422)
 
     def promote_next(self, tenant_id: str) -> BuildExecutionAdmission | None:
         """Atomically revalidate one admission and create its 0059 intent."""
