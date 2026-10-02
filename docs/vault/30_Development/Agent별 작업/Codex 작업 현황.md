@@ -1,15 +1,30 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.301"
+version: "1.0.305"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T07:21:40+09:00"
+updated: "2026-10-03T08:48:03+09:00"
 source_of_truth: "Git"
-active_card: "CARD-251 S08-BE fixed-SHA acceptance evidence"
-active_card_status: "Card 247 (#343) is approved (Claude backend r3, UI r2, r4 delta) with exact-head Backend 37066783664 and Core 37066783581 green, including the 0061 definer/allowlist rebind; Card 251 fixed-SHA acceptance evidence is PR #347 under Claude review"
-active_card_next: "Close the Claude r1 findings on #347 and record one hosted run_s08_acceptance dispatch at the fixed head; product dispatch stays off by default"
+active_card: "CARD-255 S08 pre-enable Mediums (production plan budget, base-image digest, worker trust boundary in the API)"
+active_card_status: "Card 254 #349 is approved by Claude r1 at 280045f8; hosted run 37077352052 recomputed SEC-RLS-001 MEASURED_PASS and the inv_audit_reader E3/E4/E5 dispositions are renewed until 2026-11-30 with fail-closed boundary checks. Card 251 #347 is approved with hosted run 37072629027"
+active_card_next: "Close the three pre-enable Mediums recorded in the Card 247 History before any S08 flag enablement; product dispatch stays off by default"
 ---
+
+## 2026-10-03 Card 254 — inv_audit_reader disposition 재검토
+
+- Base `752245861eb0af1e3a4e714cb77c0948ce6f76b7`; branch
+  `agent/codex/c254-audit-reader-disposition`; reviewer Claude.
+- E3/E4/E5는 `USING (true)`가 의도한 실제 privileged visibility다. 0061 tree에서 0047
+  이후 role grant/policy 변경과 제품 reader 호출 경로가 없음을 다시 측정했다.
+- 다음 만료는 `2026-11-30T23:59:59+09:00`으로 한 달만 연장한다. collector/evaluator가
+  member 양방향·role 속성·SELECT-only·FORCE RLS·exact policy를 live report에서 강제한다.
+- 생성 allowlist·target registry·모든 importer pin을 순서대로 회전했고 focused PG-free는
+  **386 passed, 15 skipped**다. skip 15건은 모두 disposable PostgreSQL DSN node다.
+- 현재 상태는 로컬 검증과 첫 hosted SEC-RLS-001 실측 완료·Claude 검토 전 `review`다.
+- Hosted PostgreSQL 16 run `37077352052` / artifact `11257466419`에서 정본 evaluator가
+  **MEASURED_PASS**를 재계산했다. E3/E4/E5는 각각 4/2/4행이고 exact role·grant·policy
+  경계가 모두 일치했다. 최종 docs head 재실행 뒤 Claude 검토를 요청한다.
 
 ## 2026-10-03 Card 247 — S08-BE BuildRequest product entry
 

@@ -412,6 +412,7 @@ def rls_role_entry(tables: dict | None = None, **overrides) -> dict:
         "login": False,
         "inherit": True,
         "member_of": [],
+        "granted_to": [],
         "functions": {},
         "tables": copy.deepcopy(tables) if tables is not None else default_tables(),
     }
@@ -437,6 +438,18 @@ def rls_roles(tables: dict | None = None, *, role: str = "inv_app", **role_overr
                         else rls_table())
     roles = {name: rls_role_entry(shared) for name in sorted(tool.RLS_REQUIRED_ROLES)}
     roles[role] = rls_role_entry(interesting, **role_overrides)
+    reader = roles["inv_audit_reader"]
+    reader["inherit"] = False
+    reader_table = reader["tables"]["public.audit_events"]
+    reader_table["rls_enabled"] = True
+    reader_table["rls_forced"] = True
+    reader_table["privileges"] = {
+        "select": "table", "insert": None, "update": None, "delete": None,
+    }
+    reader_table["policies"] = [{
+        "name": "audit_events_audit_read", "cmd": "SELECT", "permissive": "PERMISSIVE",
+        "roles": ["inv_audit_reader"], "using": True, "with_check": False,
+    }]
     return roles
 
 
@@ -828,11 +841,41 @@ def test_rls_accepted_expiry_and_baseline_exact_match(allowlist):
     report = rls_report(allowlist, roles=roles)
     report["accepted"] = [{"rule": "E2", "role": "inv_app", "table": "public.tenants"}]
     assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.MEASURED_PASS
-    expired = datetime(2026, 11, 1, tzinfo=timezone.utc)
+    expired = datetime(2026, 12, 1, tzinfo=timezone.utc)
     assert tool.evaluate_rls(report, allowlist, expired) is tool.Verdict.MEASURED_FAIL
     assert tool.evaluate_rls(report, allowlist, expired) is tool.Verdict.MEASURED_FAIL
     report["baselineAccepted"] = []
     assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.INVALID_RUN
+
+
+@pytest.mark.parametrize(
+    ("label", "mutate"),
+    [
+        ("login", lambda role, table: role.__setitem__("login", True)),
+        ("inherit", lambda role, table: role.__setitem__("inherit", True)),
+        ("parent-role", lambda role, table: role["member_of"].append("privileged_parent")),
+        ("reader-member", lambda role, table: role["granted_to"].append("operator_login")),
+        ("insert-grant", lambda role, table: table["privileges"].__setitem__("insert", "table")),
+        ("select-revoked", lambda role, table: (
+            table["privileges"].__setitem__("select", None), table.pop("visible")
+        )),
+        ("rls-not-forced", lambda role, table: table.__setitem__("rls_forced", False)),
+        ("policy-widened", lambda role, table: table["policies"][0]["roles"].append("inv_app")),
+    ],
+)
+def test_audit_reader_disposition_requires_the_reviewed_live_boundary(label, mutate, allowlist):
+    """The temporary E3/E4/E5 acceptance is conditional on the measured role boundary.
+
+    The exception is genuine privileged visibility, so an operational login/member or a wider
+    table grant cannot inherit the calendar allowance.  Each mutation remains a measured
+    failure even though the producer's own E1..E5 rows would otherwise still say PASS.
+    """
+
+    report = rls_report(allowlist)
+    role = report["roles"]["inv_audit_reader"]
+    table = role["tables"]["public.audit_events"]
+    mutate(role, table)
+    assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.MEASURED_FAIL, label
 
 
 @pytest.mark.parametrize(

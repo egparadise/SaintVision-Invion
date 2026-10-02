@@ -237,16 +237,27 @@ def rls_population() -> dict:
                          "role_a": {"rows": 1, "fp": CTID_FP}, "match": True},
         },
     }
-    return {
+    roles = {
         role: {
             "present": True, "superuser": False, "bypassrls": False, "login": False,
-            "inherit": True, "member_of": [], "functions": {},
+            "inherit": True, "member_of": [], "granted_to": [], "functions": {},
             # Every role measures the same tables, and the set covers what the reviewed allowlist
             # and the pinned readable-key scope anchor on (#322 r2 F-R6).
             "tables": {name: copy.deepcopy(clean) for name in RLS_FIXTURE_TABLES},
         }
         for role in sorted(aggregator.RLS_REQUIRED_ROLES)
     }
+    reader = roles["inv_audit_reader"]
+    reader["inherit"] = False
+    reader_table = reader["tables"]["public.audit_events"]
+    reader_table["privileges"] = {
+        "select": "table", "insert": None, "update": None, "delete": None,
+    }
+    reader_table["policies"] = [{
+        "name": "audit_events_audit_read", "cmd": "SELECT", "permissive": "PERMISSIVE",
+        "roles": ["inv_audit_reader"], "using": True, "with_check": False,
+    }]
+    return roles
 
 
 def rls_violating_report(**over) -> dict:

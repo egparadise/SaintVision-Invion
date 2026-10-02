@@ -88,7 +88,11 @@ PRIVILEGES = ("SELECT", "INSERT", "UPDATE", "DELETE")
 ROLE_QUERY = """
 SELECT r.rolname, r.rolsuper, r.rolbypassrls, r.rolcanlogin, r.rolinherit,
        (SELECT coalesce(array_agg(g.rolname ORDER BY g.rolname), '{}')
-          FROM pg_auth_members m JOIN pg_roles g ON g.oid=m.roleid WHERE m.member=r.oid) AS member_of
+          FROM pg_auth_members m JOIN pg_roles g ON g.oid=m.roleid WHERE m.member=r.oid) AS member_of,
+       (SELECT coalesce(array_agg(member_role.rolname ORDER BY member_role.rolname), '{}')
+          FROM pg_auth_members m
+          JOIN pg_roles member_role ON member_role.oid=m.member
+         WHERE m.roleid=r.oid) AS granted_to
 FROM pg_roles r WHERE r.rolname = %s
 """
 
@@ -447,6 +451,7 @@ def collect(dsn: str, roles: tuple[str, ...], tenant_a: str | None = None) -> di
                 "superuser": attrs["rolsuper"], "bypassrls": attrs["rolbypassrls"],
                 "login": attrs["rolcanlogin"], "inherit": attrs["rolinherit"],
                 "member_of": list(attrs["member_of"]),
+                "granted_to": list(attrs["granted_to"]),
                 "tables": {}, "functions": {},
             }
             for table in tables:
@@ -683,7 +688,7 @@ def render_markdown(observation: dict, violations: list[dict], accepted: list[di
             continue
         lines += [
             f"superuser={report['superuser']} bypassrls={report['bypassrls']} login={report['login']}"
-            f" member_of={report['member_of'] or '[]'}",
+            f" member_of={report['member_of'] or '[]'} granted_to={report['granted_to'] or '[]'}",
             "",
             "| table | scoped | RLS | privileges | policies | truth total / A / other | unset | A | A-foreign | A-identity | unknown | not-uuid |",
             "|---|---|---|---|---|---|---|---|---|---|---|---|",
