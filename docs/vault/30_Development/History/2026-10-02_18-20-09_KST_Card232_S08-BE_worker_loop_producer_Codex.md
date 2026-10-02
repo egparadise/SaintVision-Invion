@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD232-S08-BE-WORKER-PRODUCER-20261002"
 title: "Card 232 S08-BE product worker loop and trusted intent producer"
-version: "1.6.0"
+version: "1.7.0"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T20:34:16+09:00"
+updated: "2026-10-02T20:47:34+09:00"
 source_of_truth: "Git"
 base_sha: "c57697d2ab80877f44e189c1efe172a6dd03a7e6"
 reviewer: "Claude"
@@ -191,3 +191,19 @@ healthy admission. The first call consumes the 128-row budget and returns; the s
 must process the remaining stale rows and promote the healthy row. Both calls are capped
 at 20 seconds, every stale row has exactly one retry, and no row has a second retry.
 Removing the fair ordering restores the six-tick starvation class and fails the test.
+
+# Claude r5 executable-fixture correction
+
+The first fairness fixtures attempted to move an existing resource to a synthetic stale
+Node. Migration 0003 deliberately makes resource identity immutable, and the synthetic
+Node was inserted with an already-stale heartbeat that the Node authority rejects. Those
+fixtures failed during setup and earlier hosted runs had not executed the new cases.
+
+The corrected fixtures create every admission against the existing healthy Node, then
+age only that Node's heartbeat. The later healthy admission is created against a new
+online Node; no resource identity is mutated and no invalid initial heartbeat is
+inserted. Core now runs this real-PostgreSQL file as an explicit focused step, requires
+exactly nine executed cases with zero skips/failures, writes a dedicated JUnit file, and
+excludes it from the subsequent full-suite invocation to prevent double execution. A
+PG-free workflow regression fixes that collection and evidence boundary; it passes 4/4
+locally. The exact-head hosted Core JUnit is the measurement authority.

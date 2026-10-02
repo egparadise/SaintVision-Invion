@@ -69,3 +69,16 @@ def test_recovery_drill_runs_in_a_fresh_focused_session_before_the_full_suite():
     assert "assert skips == Counter()" in text[gate:full]
     assert "internal_network_reason" not in text[gate:full]
     assert "--ignore=tests/integration/test_recovery_drill.py" in text[full:]
+
+
+def test_build_admission_real_pg_cases_execute_once_in_a_focused_core_step():
+    text = WORKFLOW.read_text(encoding="utf-8")
+
+    focused = text.index("name: Verify build admission queue fairness on PostgreSQL")
+    gate = text.index("name: Require executed build admission queue evidence")
+    full = text.index("python -m pytest --junitxml=dist/core-tests.xml")
+    assert focused < gate < full
+    assert "tests/integration/test_build_product_runtime_real_pg.py" in text[focused:gate]
+    assert "assert len(cases) == 9" in text[gate:full]
+    assert "assert not root.findall('.//skipped')" in text[gate:full]
+    assert "--ignore=tests/integration/test_build_product_runtime_real_pg.py" in text[full:]

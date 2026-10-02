@@ -27,7 +27,7 @@ def _timestamp(value):
     return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
-def _authority(env, *, grant=True):
+def _authority(env, *, grant=True, node_id=None):
     run = env.runs.create(env.tenant, env.project)
     run = env.runs.transition(env.tenant, run["runId"], "validated", expected_version=1)
     run = env.runs.transition(env.tenant, run["runId"], "planned", expected_version=2)
@@ -37,6 +37,7 @@ def _authority(env, *, grant=True):
     resource_id = new_id("res")
     expires = datetime.now(timezone.utc) + timedelta(minutes=4)
     policy_expires = expires + timedelta(minutes=1)
+    selected_node = node_id or env.node
     with psycopg.connect(env.owner) as conn:
         if grant:
             conn.execute(
@@ -47,7 +48,7 @@ def _authority(env, *, grant=True):
             )
         conn.execute(
             "INSERT INTO inv.resources VALUES (%s,%s,%s,'cpu',10,10)",
-            (env.tenant, resource_id, env.node),
+            (env.tenant, resource_id, selected_node),
         )
         conn.execute(
             """INSERT INTO inv.resource_leases(
@@ -124,8 +125,10 @@ def _authority(env, *, grant=True):
     return Principal(env.tenant, subject), run["runId"], request, plan, decision
 
 
-def _record(env, *, grant=True):
-    principal, run_id, request, plan, decision = _authority(env, grant=grant)
+def _record(env, *, grant=True, node_id=None):
+    principal, run_id, request, plan, decision = _authority(
+        env, grant=grant, node_id=node_id
+    )
     evidence_id = new_id("evd")
     admission = BuildExecutionAdmissionStore(env.db).record(
         principal,
@@ -141,24 +144,25 @@ def _record(env, *, grant=True):
 
 def _records_on_stale_node(env, count):
     admissions = [_record(env, grant=index == 0) for index in range(count)]
-    stale_node = new_id("nod")
+    with psycopg.connect(env.owner) as conn:
+        conn.execute(
+            """UPDATE inv.nodes SET heartbeat_at=clock_timestamp()-interval '1 hour'
+            WHERE tenant_id=%s AND node_id=%s""",
+            (env.tenant, env.node),
+        )
+    return admissions
+
+
+def _new_healthy_node(env):
+    node_id = new_id("nod")
     with psycopg.connect(env.owner) as conn:
         conn.execute(
             """INSERT INTO inv.nodes(
-            tenant_id,node_id,status,heartbeat_at,recovery_epoch,clock_skew_seconds
-            ) VALUES (%s,%s,'online',clock_timestamp()-interval '1 hour',%s,0)""",
-            (env.tenant, stale_node, env.epoch),
+            tenant_id,node_id,status,recovery_epoch,clock_skew_seconds
+            ) VALUES (%s,%s,'online',%s,0)""",
+            (env.tenant, node_id, env.epoch),
         )
-        conn.execute(
-            """UPDATE inv.resources SET node_id=%s
-            WHERE tenant_id=%s AND resource_id = ANY(%s::text[])""",
-            (
-                stale_node,
-                env.tenant,
-                [admission.plan["lease"]["resourceId"] for admission in admissions],
-            ),
-        )
-    return admissions
+    return node_id
 
 
 def test_committed_admission_promotes_atomically_and_is_tenant_isolated(env):
@@ -378,21 +382,14 @@ def test_stale_node_promotion_backs_off_and_recovers_without_quarantine(env):
 
 def test_retryable_stale_admission_does_not_block_next_due_admission(env):
     stale = _record(env)
-    stale_node = new_id("nod")
     with psycopg.connect(env.owner) as conn:
         conn.execute(
-            """INSERT INTO inv.nodes(
-            tenant_id,node_id,status,heartbeat_at,recovery_epoch,clock_skew_seconds
-            ) VALUES (%s,%s,'online',clock_timestamp()-interval '1 hour',%s,0)""",
-            (env.tenant, stale_node, env.epoch),
-        )
-        conn.execute(
-            """UPDATE inv.resources SET node_id=%s
-            WHERE tenant_id=%s AND resource_id=%s""",
-            (stale_node, env.tenant, stale.plan["lease"]["resourceId"]),
+            """UPDATE inv.nodes SET heartbeat_at=clock_timestamp()-interval '1 hour'
+            WHERE tenant_id=%s AND node_id=%s""",
+            (env.tenant, env.node),
         )
 
-    healthy = _record(env, grant=False)
+    healthy = _record(env, grant=False, node_id=_new_healthy_node(env))
     promoted = BuildExecutionAdmissionStore(env.db).promote_next(env.tenant)
 
     assert promoted == healthy
@@ -418,7 +415,7 @@ def test_retryable_stale_admission_does_not_block_next_due_admission(env):
 
 def test_promotion_tick_bounds_sixty_stale_admissions_and_reaches_healthy_row(env):
     stale = _records_on_stale_node(env, 60)
-    healthy = _record(env, grant=False)
+    healthy = _record(env, grant=False, node_id=_new_healthy_node(env))
     started = monotonic()
     promoted = BuildExecutionAdmissionStore(env.db).promote_next(env.tenant)
     elapsed = monotonic() - started
@@ -439,7 +436,7 @@ def test_promotion_tick_bounds_sixty_stale_admissions_and_reaches_healthy_row(en
 
 def test_promotion_order_reaches_healthy_row_beyond_one_tick_budget(env):
     stale = _records_on_stale_node(env, 200)
-    healthy = _record(env, grant=False)
+    healthy = _record(env, grant=False, node_id=_new_healthy_node(env))
     store = BuildExecutionAdmissionStore(env.db)
 
     first_started = monotonic()
