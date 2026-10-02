@@ -1101,6 +1101,8 @@ export const RunDetail: React.FC<RunDetailProps> = ({
                           : isPassed
                           ? 'var(--color-text-inverse)'
                           : 'var(--color-text-muted)',
+                        outline: isCurrent ? '3px solid var(--color-border-strong)' : 'none',
+                        outlineOffset: '2px',
                       }}
                     >
                       {isPassed && !isCurrent ? '✓' : idx + 1}

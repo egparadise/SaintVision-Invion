@@ -206,8 +206,11 @@ describe('SealRecordPanel Component (G-04 R1·R2·R3)', () => {
       root.render(<SealRecordPanel projectId={sampleRun.projectId} runId={sampleRun.id} />);
     });
 
-    const statusBadge = container.querySelector('[data-testid="seal-status-badge"]');
+    const statusBadge = container.querySelector('[data-testid="seal-status-badge"]') as HTMLElement;
     expect(statusBadge?.textContent).toContain('봉인됨 (SEALED)');
+    expect(statusBadge.style.color).toBe('var(--color-status-online)');
+    expect(statusBadge.style.borderColor).toBe('var(--color-status-online)');
+    expect(statusBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
 
     const liveRegion = container.querySelector('[data-testid="seal-record-live-status"]');
     expect(liveRegion?.textContent).toContain('봉인 기록 조회 완료: 봉인됨 (아티팩트 이 페이지 2건, 번들 해시일치)');
@@ -257,7 +260,7 @@ describe('SealRecordPanel Component (G-04 R1·R2·R3)', () => {
     const successBadge = container.querySelector(`[data-testid="seal-artifact-verify-status-${ART_ID_1}"]`) as HTMLElement;
     expect(successBadge?.textContent).toContain('✔ 일치 (Verified)');
     expect(successBadge.getAttribute('data-tone')).toBe('match');
-    expect(['var(--color-status-online)', 'rgb(63, 185, 80)', '#3fb950']).toContain(successBadge.style.color);
+    expect(successBadge.style.color).toBe('var(--color-status-online)');
 
     verifyResponse = {
       runId: sampleRun.id,
@@ -275,9 +278,8 @@ describe('SealRecordPanel Component (G-04 R1·R2·R3)', () => {
     const mismatchBadge = container.querySelector(`[data-testid="seal-artifact-verify-status-${ART_ID_2}"]`) as HTMLElement;
     expect(mismatchBadge?.textContent).toContain('⚠️ 불일치 (봉인 다이제스트와 다름·대상 없음)');
     expect(mismatchBadge.getAttribute('data-tone')).toBe('mismatch');
-    expect(['var(--color-status-offline)', 'rgb(255, 123, 114)', '#ff7b72']).toContain(mismatchBadge.style.color);
+    expect(mismatchBadge.style.color).toBe('var(--color-status-offline)');
     expect(mismatchBadge.style.color).not.toBe('var(--color-status-online)');
-    expect(mismatchBadge.style.color).not.toBe('rgb(63, 185, 80)');
   });
 
   it('4. Context bundle hash verification (R3): handles hashVerified: true and false (reported as facts)', async () => {
@@ -301,9 +303,8 @@ describe('SealRecordPanel Component (G-04 R1·R2·R3)', () => {
     expect(bundleHashStatus).not.toBeNull();
     expect(bundleHashStatus.textContent).toContain('⚠️ 해시 불일치 (Hash Mismatch)');
     expect(bundleHashStatus.getAttribute('data-tone')).toBe('mismatch');
-    expect(['var(--color-status-offline)', 'rgb(255, 123, 114)', '#ff7b72']).toContain(bundleHashStatus.style.color);
+    expect(bundleHashStatus.style.color).toBe('var(--color-status-offline)');
     expect(bundleHashStatus.style.color).not.toBe('var(--color-status-online)');
-    expect(bundleHashStatus.style.color).not.toBe('rgb(63, 185, 80)');
     expect(bundleHashStatus.textContent).not.toMatch(/✔|해시 일치 \(/);
   });
 
@@ -322,8 +323,11 @@ describe('SealRecordPanel Component (G-04 R1·R2·R3)', () => {
       root.render(<SealRecordPanel projectId={sampleRun.projectId} runId={sampleRun.id} />);
     });
 
-    const statusBadge = container.querySelector('[data-testid="seal-status-badge"]');
+    const statusBadge = container.querySelector('[data-testid="seal-status-badge"]') as HTMLElement;
     expect(statusBadge?.textContent).toContain('미봉인 (UNSEALED)');
+    expect(statusBadge.style.color).toBe('var(--color-status-degraded)');
+    expect(statusBadge.style.borderColor).toBe('var(--color-status-degraded)');
+    expect(statusBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
 
     const unsealedNotice = container.querySelector('[data-testid="seal-record-unsealed-notice"]');
     expect(unsealedNotice).not.toBeNull();

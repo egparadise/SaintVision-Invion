@@ -3495,6 +3495,30 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     };
 
     vi.spyOn(client, 'apiClient').mockImplementation(async (url: string) => {
+      if (url.includes('unsealed')) {
+        if (url.includes('/record')) {
+          throw new client.ApiError({
+            type: 'about:blank',
+            title: 'RES-0004',
+            status: 404,
+            code: 'RES-0004',
+            detail: 'No sealed record for this run.',
+            category: 'RES',
+            retryable: false,
+          } as any);
+        }
+        if (url.includes('/context-bundle')) {
+          throw new client.ApiError({
+            type: 'about:blank',
+            title: 'RES-0004',
+            status: 404,
+            code: 'RES-0004',
+            detail: 'No context bundle for this run.',
+            category: 'RES',
+            retryable: false,
+          } as any);
+        }
+      }
       if (url.includes('/verify')) {
         return {
           runId: testRunId,
@@ -3507,7 +3531,18 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       if (url.includes('/record/artifacts')) return artifactsFixture as any;
       if (url.includes('/context-bundle')) return bundleFixture as any;
       if (url.includes('/record')) return sealedFixture as any;
-      if (url.includes('/attempts')) return { attempts: [], runId: testRunId } as any;
+      if (url.includes('/attempts')) {
+        return {
+          source: 'execution-kernel',
+          runId: testRunId,
+          attempts: [
+            { attemptNumber: 1, startedAt: '2026-10-02T04:00:05Z', nodeId: 'nod_01JABCDEF01', commandId: 'c1', stopReceiptId: 's1', exitCode: 0, reason: 'completed', evidenceId: null },
+            { attemptNumber: 2, startedAt: '2026-10-02T04:01:05Z', nodeId: 'nod_01JABCDEF01', commandId: 'c2', stopReceiptId: 's2', exitCode: 1, reason: 'failed', evidenceId: null },
+          ],
+          count: 2,
+          nextCursor: null,
+        } as any;
+      }
       if (url.includes('/shards')) return { shards: [] } as any;
       if (url.includes('/logs')) return { runId: testRunId, stdout: 'Sample run logs', stderr: '', completedAt: '2026-10-02T05:05:00Z' } as any;
       return {} as any;
@@ -3566,6 +3601,31 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       const bhFg = helperExtractVar(bundleHash.style.color);
       expect(getContrast(lightTokens[bhFg], lightTokens['--color-bg-surface']), 'Bundle hash light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
       expect(getContrast(darkTokens[bhFg], darkTokens['--color-bg-surface']), 'Bundle hash dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
+      // 1b. SealRecordPanel (Unsealed State - 404 RES-0004)
+      await act(async () => {
+        root.render(<SealRecordPanel projectId={testProjectId} runId="run_c213_unsealed" key="unsealed" />);
+      });
+      await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+
+      const unsealedBadge = container.querySelector('[data-testid="seal-status-badge"]') as HTMLElement;
+      expect(unsealedBadge, 'Unsealed status badge must render').not.toBeNull();
+      expect(unsealedBadge.textContent).toContain('미봉인 (UNSEALED)');
+      expect(unsealedBadge.style.color).toBe('var(--color-status-degraded)');
+      expect(unsealedBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(unsealedBadge.style.borderColor).toBe('var(--color-status-degraded)');
+      expect(unsealedBadge.style.color, 'SEALED and UNSEALED status badges must have distinct semantic tokens').not.toBe(sealBadge.style.color);
+
+      const usbFg = helperExtractVar(unsealedBadge.style.color);
+      const usbBg = helperExtractVar(unsealedBadge.style.backgroundColor);
+      const usbBorder = helperExtractVar(unsealedBadge.style.borderColor);
+      expect(getContrast(lightTokens[usbFg], lightTokens[usbBg]), 'Unsealed badge light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[usbFg], darkTokens[usbBg]), 'Unsealed badge dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(lightTokens[usbBorder], lightTokens[usbBg]), 'Unsealed badge light border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[usbBorder], darkTokens[usbBg]), 'Unsealed badge dark border contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
 
       // 2. RunDetail Status Badges (Succeeded, Running, Failed, Cancelled, Recovering, Awaiting Approval)
       const baseRun: RunItem = {
@@ -3642,6 +3702,15 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(getContrast(lightTokens[bfBorder], lightTokens[bsBg]), 'Failed border contrast light >= 3.0:1').toBeGreaterThanOrEqual(3.0);
       expect(getContrast(darkTokens[bfBorder], darkTokens[bsBg]), 'Failed border contrast dark >= 3.0:1').toBeGreaterThanOrEqual(3.0);
 
+      // CompletedAt in failed state
+      const runCompletedAtFailed = container.querySelector('[data-testid="run-detail-completed-at"]') as HTMLElement;
+      expect(runCompletedAtFailed, 'RunDetail completedAt (failed) must render').not.toBeNull();
+      expect(runCompletedAtFailed.style.color).toBe('var(--color-status-offline)');
+      expect(runCompletedAtFailed.style.color, 'Succeeded and failed completedAt must have distinct status tokens').not.toBe(runCompletedAt.style.color);
+      const rcafFg = helperExtractVar(runCompletedAtFailed.style.color);
+      expect(getContrast(lightTokens[rcafFg], lightTokens['--color-bg-surface']), 'CompletedAt (failed) light text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      expect(getContrast(darkTokens[rcafFg], darkTokens['--color-bg-surface']), 'CompletedAt (failed) dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+
       // 2-d. CANCELLED State
       await act(async () => {
         root.render(<RunDetail run={{ ...baseRun, state: 'cancelled', status: 'cancelled' }} onBack={() => {}} />);
@@ -3686,6 +3755,33 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(getContrast(darkTokens[baFg], darkTokens[bsBg]), 'Awaiting approval dark text contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
       expect(getContrast(lightTokens[baBorder], lightTokens[bsBg]), 'Awaiting approval border contrast light >= 3.0:1').toBeGreaterThanOrEqual(3.0);
       expect(getContrast(darkTokens[baBorder], darkTokens[bsBg]), 'Awaiting approval border contrast dark >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+
+      // 2-g. Attempts Tab Exit Code Badges (exitCode 0 vs exitCode != 0)
+      const attemptsTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('시도 이력')
+      );
+      if (attemptsTabBtn) {
+        await act(async () => {
+          attemptsTabBtn.click();
+        });
+        await act(async () => {
+          await Promise.resolve();
+          await Promise.resolve();
+        });
+        const exit0 = container.querySelector('[data-testid="run-attempt-exit-1"]') as HTMLElement;
+        const exit1 = container.querySelector('[data-testid="run-attempt-exit-2"]') as HTMLElement;
+        expect(exit0, 'Attempt 1 exitCode 0 must render').not.toBeNull();
+        expect(exit1, 'Attempt 2 exitCode 1 must render').not.toBeNull();
+        expect(exit0.style.color).toBe('var(--color-status-online)');
+        expect(exit1.style.color).toBe('var(--color-status-offline)');
+        expect(exit0.style.color, 'ExitCode 0 and non-zero must have distinct status tokens').not.toBe(exit1.style.color);
+        const exit0Fg = helperExtractVar(exit0.style.color);
+        const exit1Fg = helperExtractVar(exit1.style.color);
+        expect(getContrast(lightTokens[exit0Fg], lightTokens['--color-bg-surface']), 'ExitCode 0 light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+        expect(getContrast(darkTokens[exit0Fg], darkTokens['--color-bg-surface']), 'ExitCode 0 dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+        expect(getContrast(lightTokens[exit1Fg], lightTokens['--color-bg-surface']), 'ExitCode 1 light contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+        expect(getContrast(darkTokens[exit1Fg], darkTokens['--color-bg-surface']), 'ExitCode 1 dark contrast >= 4.5:1').toBeGreaterThanOrEqual(4.5);
+      }
     } finally {
       vi.unstubAllGlobals();
       if (typeof window !== 'undefined' && originalWindowFetch) {
@@ -3952,7 +4048,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
 
     const sealStats = analyzeFile('features/runs/SealRecordPanel.tsx');
     const runStats = analyzeFile('features/runs/RunDetail.tsx');
-    // Ratchet assertions covering 100% of SealRecordPanel style declarations
+    // Ratchet assertions for SealRecordPanel: 76 of 133 style declarations carry color/background properties (100% audited)
     expect(sealStats.totalStyleAttrs, 'Total style attributes in SealRecordPanel must be exactly 133').toBe(133);
     expect(sealStats.checkedObjects, 'Explicit style objects in SealRecordPanel must be exactly 17').toBe(17);
     expect(sealStats.checkedPairs, 'Evaluated pairs in SealRecordPanel must be exactly 78').toBe(78);
@@ -3962,7 +4058,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(sealStats.checkedBorderPairs, 'Border pairs in SealRecordPanel must be exactly 38').toBe(38);
     expect(sealStats.violations, `SealRecordPanel violations:\n${sealStats.violations.join('\n')}`).toEqual([]);
 
-    // Ratchet assertions covering 100% of RunDetail style declarations
+    // Ratchet assertions for RunDetail: 103 of 229 style declarations carry color/background properties (100% audited)
     expect(runStats.totalStyleAttrs, 'Total style attributes in RunDetail must be exactly 229').toBe(229);
     expect(runStats.checkedObjects, 'Explicit style objects in RunDetail must be exactly 29').toBe(29);
     expect(runStats.checkedPairs, 'Evaluated pairs in RunDetail must be exactly 135').toBe(135);

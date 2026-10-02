@@ -3,7 +3,7 @@
 tools/test_c213_mutations.py
 
 Card 213 (ACC-09) Runs execution record screens (SealRecordPanel & RunDetail) Mutation Testing Suite.
-Verifies that 10 distinct regressions/mutations (M1-M10) across
+Verifies that 13 distinct regressions/mutations (M1-M13) across
 color contrast, border collisions, status semantics, testid binding,
 and fail-closed multiset inventory are strictly caught and killed by the test suite
 (ACC-09 Test 9h, Test 9h-2, and Test 10).
@@ -127,6 +127,30 @@ MUTANTS = [
         'replacement': "border: '1px solid var(--color-bg-surface)',\n              padding: '24px',\n              maxWidth: '440px',\n              width: '100%',\n              boxShadow: 'var(--shadow-md)',\n            }}\n          >\n            <h3 id=\"run-cancel-modal-title\"",
         'expected_guard': 'Test 9h-2 (1:1 border-background collision detected: --color-bg-surface on --color-bg-surface)',
     },
+    {
+        'id': 'M11',
+        'file': 'seal',
+        'name': 'SealRecordPanel: unsealed badge status token swapped to online (semantic violation)',
+        'target': "color: 'var(--color-status-degraded)',\n                  border: '1px solid var(--color-status-degraded)',",
+        'replacement': "color: 'var(--color-status-online)',\n                  border: '1px solid var(--color-status-online)',",
+        'expected_guard': 'Test 9h (DOM assertion fails: Unsealed badge color must bind to var(--color-status-degraded))',
+    },
+    {
+        'id': 'M12',
+        'file': 'run',
+        'name': 'RunDetail: completedAt failed branch status token swapped to online (semantic violation)',
+        'target': "color: run.state === 'succeeded' ? 'var(--color-status-online)' : 'var(--color-status-offline)'",
+        'replacement': "color: run.state === 'succeeded' ? 'var(--color-status-online)' : 'var(--color-status-online)'",
+        'expected_guard': 'Test 9h (DOM assertion fails: Succeeded and failed completedAt must have distinct status tokens)',
+    },
+    {
+        'id': 'M13',
+        'file': 'run',
+        'name': 'RunDetail: attempt exitCode != 0 status token swapped to online (semantic violation)',
+        'target': "style={{ color: att.exitCode === 0 ? 'var(--color-status-online)' : 'var(--color-status-offline)' }}",
+        'replacement': "style={{ color: att.exitCode === 0 ? 'var(--color-status-online)' : 'var(--color-status-online)' }}",
+        'expected_guard': 'Test 9h (DOM assertion fails: ExitCode 0 and non-zero must have distinct status tokens)',
+    },
 ]
 
 def run_test():
@@ -143,7 +167,7 @@ def run_test():
 
 def main():
     print('================================================================================')
-    print(' Card 213 (ACC-09): Reproducible Mutant Test Suite (10 Mutants: M1-M10)')
+    print(' Card 213 (ACC-09): Reproducible Mutant Test Suite (13 Mutants: M1-M13)')
     print(' Targets: SealRecordPanel.tsx & RunDetail.tsx')
     print('================================================================================\n')
 
