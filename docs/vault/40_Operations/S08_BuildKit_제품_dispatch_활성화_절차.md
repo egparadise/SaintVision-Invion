@@ -1,12 +1,12 @@
 ---
 doc_id: "RUNBOOK-S08-BUILDKIT-PRODUCT-ENABLE-V1"
 title: "S08 BuildKit 제품 dispatch 활성화 절차 — 켜기 전에 확인할 것, 켜는 위치와 순서, 켠 직후 관측, 끄기와 격리 해제 (카드 238)"
-version: "1.0.0"
+version: "1.1.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "user"
-updated: "2026-10-02T21:25:08+09:00"
+updated: "2026-10-02T21:27:41+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "843d283c"
@@ -207,6 +207,19 @@ id -u; grep -c . /proc/self/uid_map   # rootless 여부의 근거(uid map이 1:1
 ```
 
 **판정**: `debug workers`가 worker를 하나 이상 출력하고, `uid_map`이 rootless 매핑이어야 한다. 사용자 네임스페이스나 AppArmor/seccomp 완화가 필요하다면 그것은 **`[sudo]` 단계**이고 §6에 있다. hosted runner에서의 같은 측정은 그 완화를 **limitation으로 기록**한다 — 실물 노드 인수가 따로 필요한 이유가 그것이다([[사용자 조치 단일 체크리스트]] §10).
+
+**같은 측정을 한 번에 돌리는 경로가 이미 있다.** 저장소의 참조 lane이 rootless daemon을 띄우고 **제품과 같은 transport로** 왕복까지 하며, 그 lane은 hosted에서도 돌고 있다. 노드에서 같은 것을 돌릴 때는 lane 스크립트의 환경 계약을 그대로 쓴다(여섯 변수 전부 필수이고, 하나라도 없으면 스크립트가 멈춘다):
+
+```bash
+# 노드에서. 값은 그 노드의 경로이고, 비밀은 들어가지 않는다.
+SV_BUILDKIT_BIN_DIR=/path/to/buildkit/bin SV_BUILDKIT_RUNTIME_IMAGE="$ROOTLESS_IMAGE" SV_BUILDKIT_CONTAINER_NAME="sv-s08-check-$(date +%s)" SV_BUILDKIT_OUTPUT_DIR="$PWD/dist/s08-buildkit-check" SV_BUILDKIT_RUNTIME_DIR="$XDG_RUNTIME_DIR/s08-buildkit-check" INV_EVIDENCE_CODE_SHA="$(git rev-parse HEAD)"   bash tools/run_buildkit_rootless_lane.sh
+```
+
+그리고 **그 lane의 hosted 결과**는 배포 SHA에서 이렇게 읽는다(label opt-in이거나 dispatch이므로 돌지 않았을 수 있고, 그때는 "증거 없음"이 정답이다):
+
+```bash
+gh run list --workflow s08-buildkit-reference.yml --commit "$(git rev-parse HEAD)" --limit 5   --json event,status,conclusion,databaseId   --jq '.[] | [.event, .status, (.conclusion // "-"), (.databaseId|tostring)] | @tsv'   || echo "그 SHA에서 참조 lane이 돌지 않았다"
+```
 
 ---
 
@@ -457,6 +470,7 @@ curl -sS -X POST "$CP/v1/nodes/<nodeId>/resume" \
 | §1-D (3)의 PR 루프 | `gh pr view` + `git merge-base --is-ancestor` 실제 실행 | `#311`·`#312`·`#318`·`#323`·`#327`은 **IN-TREE**, `#331`은 **NOT-IN-TREE**(모두 `OPEN`) |
 | 셸 블록 문법 | 이 문서의 모든 bash 블록을 추출해 `bash -n` | exit 0 |
 | `tools/run_buildkit_rootless_roundtrip.py --help` | 실제 실행 | 사용법이 출력된다(§2-3의 명령이 존재함을 확인) |
+| `tools/run_buildkit_rootless_lane.sh` | `bash -n` | exit 0. 그 스크립트가 요구하는 여섯 환경 변수를 §2-3에 그대로 적었다(값은 노드의 경로다) |
 
 **확인하지 못한 것** — 모두 사내망 노드가 필요하고, 이 PC에서 실행하면 거짓이 된다:
 
