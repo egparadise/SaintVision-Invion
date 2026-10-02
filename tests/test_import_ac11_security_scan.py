@@ -167,14 +167,94 @@ def producer_report(body: dict | None = None, **over) -> dict:
     return report
 
 
-def archive(report: dict | None = None, extra: str | None = None) -> bytes:
+APPROVED_ALLOWLIST = json.loads(
+    (ROOT / aggregator.ALLOWLIST_REPO_PATH).read_text(encoding="utf-8")
+)
+
+
+def definer_report(**over) -> dict:
+    """A SEC-DEF-001 report the canonical evaluator admits.
+
+    ``evaluate_definer``'s exit-0 branch requires the observed privileged-function set to equal
+    the reviewed signature list **exactly**, so the fixture observes those twelve and nothing
+    else.  The tree's own database has fifteen, which is the review gap card 221 measured and
+    did not close.
+    """
+
+    document = {
+        "threatId": "SEC-DEF-001",
+        "sourceRunId": RUN_ID,
+        "sourceHeadSha": SOURCE,
+        "checkoutTreeSha": TREE,
+        "toolFiles": [dict(row) for row in aggregator.DEFINER_FILES],
+        "status": "matches_reviewed_policy",
+        "functions": [
+            {"function": signature, "problems": []}
+            for signature in APPROVED_ALLOWLIST["definerPolicySignatures"]
+        ],
+        "unsafe": 0,
+        "exitCode": 0,
+    }
+    document.update(over)
+    return document
+
+
+def rls_report(**over) -> dict:
+    """A SEC-RLS-001 report the canonical evaluator admits."""
+
+    document = {
+        "threatId": "SEC-RLS-001",
+        "sourceRunId": RUN_ID,
+        "sourceHeadSha": SOURCE,
+        "checkoutTreeSha": TREE,
+        "toolFiles": [dict(row) for row in aggregator.RLS_FILES],
+        "baselineAccepted": [
+            {"role": entry["role"], "table": entry["table"], "rules": list(entry["rules"])}
+            for entry in APPROVED_ALLOWLIST["rlsAcceptedDispositions"]
+        ],
+        "exitCode": 0,
+        "verdict": "PASS",
+        "violations": [],
+        "accepted": [],
+        "unmeasured": [],
+        "roles": {"inv_app": {"present": True}},
+        "ground_truth": {"public.projects": {"tenantScoped": True}},
+    }
+    document.update(over)
+    return document
+
+
+def vf_evidence(**over) -> dict:
+    """What the browser lane's own proof carries, measured from a real run of that lane."""
+
+    spec = APPROVED_ALLOWLIST["secVf001"]
+    document = {
+        "exitCode": 0,
+        "subprocessExitCode": 0,
+        "evidenceStatus": "complete",
+        "caseIdentitiesSha256": spec["requiredCaseIdentitiesSha256"],
+        "tests": dict(spec["expectedTests"]),
+    }
+    document.update(over)
+    return document
+
+
+def archive(
+    report: dict | None = None,
+    extra: str | None = None,
+    database: tuple[dict, dict] | None = None,
+) -> bytes:
     report = producer_report() if report is None else report
     output = io.BytesIO()
     with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as bundle:
-        for name, content in (
+        members = [
             (tool.REPORT_MEMBER, json.dumps(report).encode()),
             (tool.JUNIT_MEMBER, b'<testsuite tests="4" failures="0"/>'),
-        ):
+        ]
+        if database is not None:
+            members.append((tool.DEFINER_MEMBER, json.dumps(database[0]).encode()))
+            members.append((tool.RLS_MEMBER, json.dumps(database[1]).encode()))
+        for name, content in members:
             info = zipfile.ZipInfo(name, (2026, 10, 2, 2, 52, 46))
             bundle.writestr(info, content)
         if extra is not None:
@@ -203,10 +283,12 @@ def metadata(payload_bytes: bytes) -> tuple[dict, dict]:
     return run, artifact
 
 
-def imported(report: dict | None = None):
-    blob = archive(report)
+def imported(report: dict | None = None, database=None, vf=None):
+    blob = archive(report, database=database)
     run_metadata, artifact_metadata = metadata(blob)
-    return tool.import_evidence(blob, run_metadata, artifact_metadata, now=NOW)
+    return tool.import_evidence(
+        blob, run_metadata, artifact_metadata, now=NOW, vf_evidence=vf
+    )
 
 
 def test_import_binds_run_artifact_digest_and_member_hashes():
@@ -270,8 +352,11 @@ def test_the_envelope_is_admissible_and_names_the_threat_reports_it_lacks():
     assert envelope["runPurpose"] == "ac11-axis-evidence"
     assert envelope["axis"] == "security-critical-high-zero"
     assert envelope["verdict"] == "NOT_OBSERVED"
-    assert envelope["reason"] == "no producer emits SEC-DEF-001, SEC-RLS-001, SEC-VF-001"
+    assert envelope["reason"] == (
+        "no admissible report for SEC-DEF-001, SEC-RLS-001, SEC-VF-001"
+    )
     assert [row["threatId"] for row in envelope["observations"]] == ["SEC-SCAN-001"]
+    assert envelope["threatReportVerdicts"] == {"SEC-SCAN-001": "MEASURED_PASS"}
     assert envelope["targetRef"]["targetId"] == "s11-security-critical-high-zero-v0"
     assert envelope["artifactSha256"] == envelope["artifactObservedSha256"]
     assert envelope["artifactAvailable"] is True
@@ -341,12 +426,14 @@ def test_a_producer_comparability_group_that_disagrees_is_refused():
         imported(report)
 
 
-def test_four_threat_rows_this_importer_cannot_recompute_cannot_become_a_pass():
-    """#313 F-R2: r1 turned four empty rows and a top-level claim into MEASURED_PASS.
+def test_four_threat_rows_with_nothing_measured_still_cannot_become_a_pass():
+    """#313 F-R2, held by a different mechanism after card 221.
 
-    Nothing in those rows measures the definer policy, the RLS probes or the VF
-    observations, and this importer has no recomputation for them, so it refuses to answer
-    rather than passing a claim through.
+    r1 of #313 turned four empty rows and a top-level claim into MEASURED_PASS; the fix then
+    was to refuse any report this importer could not recompute.  Card 221 gives it the
+    aggregator's own evaluators instead, which is strictly stronger: the empty rows are now
+    *evaluated*, refused by name, and the envelope says NOT_OBSERVED -- the one thing that must
+    never happen, a pass, still cannot.
     """
 
     report = producer_report(
@@ -357,8 +444,116 @@ def test_four_threat_rows_this_importer_cannot_recompute_cannot_become_a_pass():
             producer_report(),
         ],
     )
-    with pytest.raises(tool.SecurityImportError, match="recomputes SEC-SCAN-001 only"):
-        imported(report)
+    envelope = imported(report)
+    assert envelope["verdict"] == "NOT_OBSERVED"
+    for threat_id in ("SEC-DEF-001", "SEC-RLS-001", "SEC-VF-001"):
+        assert f"{threat_id} (INVALID_RUN)" in envelope["reason"]
+    assert [row["threatId"] for row in envelope["observations"]] == ["SEC-SCAN-001"]
+
+
+def test_the_four_measured_reports_recompute_a_pass_and_the_envelope_says_so():
+    """Card 221: the axis can reach a verdict, and the verdict is the evaluators' own.
+
+    Every report here is one the canonical evaluator admits, so the envelope carries four
+    observations and MEASURED_PASS.  This is the shape the lane produces once the three review
+    gaps card 221 measured are closed; the importer needs no further change for it.
+    """
+
+    envelope = imported(
+        database=(definer_report(), rls_report()),
+        vf=vf_evidence(),
+    )
+    assert envelope["verdict"] == "MEASURED_PASS"
+    assert "reason" not in envelope
+    assert sorted(row["threatId"] for row in envelope["observations"]) == [
+        "SEC-DEF-001", "SEC-RLS-001", "SEC-SCAN-001", "SEC-VF-001",
+    ]
+    assert envelope["threatReportVerdicts"] == {
+        "SEC-DEF-001": "MEASURED_PASS",
+        "SEC-RLS-001": "MEASURED_PASS",
+        "SEC-SCAN-001": "MEASURED_PASS",
+        "SEC-VF-001": "MEASURED_PASS",
+    }
+
+
+def test_an_unobserved_database_report_keeps_the_axis_unobserved_and_names_it():
+    """The honest middle: the boundary was measured and one row could not be verified."""
+
+    unmeasured = rls_report(
+        exitCode=3,
+        verdict="UNMEASURED",
+        unmeasured=[{"role": "inv_cancel_bridge_owner", "table": "public.audit_events",
+                     "rule": "E4", "detail": "row identity unverifiable"}],
+    )
+    envelope = imported(database=(definer_report(), unmeasured), vf=vf_evidence())
+    assert envelope["verdict"] == "NOT_OBSERVED"
+    assert "SEC-RLS-001 recomputes NOT_OBSERVED" in envelope["reason"]
+    assert envelope["threatReportVerdicts"]["SEC-DEF-001"] == "MEASURED_PASS"
+
+
+def test_a_measured_database_failure_is_carried_as_a_failure():
+    """A verdict is not lowered: a violation makes the axis MEASURED_FAIL."""
+
+    violated = rls_report(
+        exitCode=1,
+        verdict="VIOLATIONS",
+        violations=[{"role": "inv_app", "table": "public.audit_events", "rule": "E2",
+                     "detail": "tenant-scoped readable table without enabled+forced RLS"}],
+    )
+    envelope = imported(database=(definer_report(), violated), vf=vf_evidence())
+    assert envelope["verdict"] == "MEASURED_FAIL"
+    assert "SEC-RLS-001 recomputes MEASURED_FAIL" in envelope["reason"]
+
+
+def test_a_database_report_from_another_run_is_refused():
+    """One envelope, one run: a report about another run is not this artifact's evidence."""
+
+    with pytest.raises(tool.SecurityImportError, match="differs from the scan report"):
+        imported(database=(definer_report(sourceRunId="36000000000"), rls_report()))
+    with pytest.raises(tool.SecurityImportError, match="differs from the scan report"):
+        imported(database=(definer_report(), rls_report(sourceHeadSha="f" * 40)))
+
+
+def test_a_database_member_that_carries_the_wrong_threat_is_refused():
+    with pytest.raises(tool.SecurityImportError, match="does not carry SEC-DEF-001"):
+        imported(database=(rls_report(), rls_report()))
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        {"caseIdentitiesSha256": "0" * 64},
+        {"tests": {"failure": 0, "error": 0, "skipped": 0, "passed": 5}},
+        {"evidenceStatus": "partial"},
+        {"exitCode": 1},
+        {"subprocessExitCode": 1},
+    ],
+    ids=["identity-hash", "case-count", "evidence-status", "exit-code", "subprocess-exit"],
+)
+def test_browser_lane_evidence_that_is_not_the_reviewed_one_is_refused(mutation):
+    """SEC-VF-001 is only written when the reviewed identity hash and counts are the measured
+    ones -- ``nodeIds`` alone is a tautology against ``requiredNodeIds``, so the hash is the
+    binding that matters."""
+
+    with pytest.raises(tool.SecurityImportError, match="reviewed"):
+        imported(database=(definer_report(), rls_report()), vf=vf_evidence(**mutation))
+
+
+def test_browser_lane_evidence_about_another_head_is_refused():
+    with pytest.raises(tool.SecurityImportError, match="another source head"):
+        imported(
+            database=(definer_report(), rls_report()),
+            vf=vf_evidence(sourceHeadSha="f" * 40),
+        )
+
+
+def test_the_vf_report_pins_the_five_reviewed_files():
+    envelope = imported(database=(definer_report(), rls_report()), vf=vf_evidence())
+    vf = [row for row in envelope["observations"] if row["threatId"] == "SEC-VF-001"][0]
+    spec = APPROVED_ALLOWLIST["secVf001"]
+    expected = [spec["runner"], spec["workflow"], spec["nodeDependencyResolver"], *spec["testFiles"]]
+    assert vf["toolFiles"] == [dict(row) for row in expected]
+    assert sorted(vf["nodeIds"]) == sorted(spec["requiredNodeIds"])
 
 
 def test_a_scan_verdict_that_contradicts_its_own_payload_is_refused():
