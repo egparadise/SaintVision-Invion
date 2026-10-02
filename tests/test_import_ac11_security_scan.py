@@ -767,6 +767,62 @@ def test_the_scan_allowlist_pins_the_files_this_checkout_actually_has():
     ), "the aggregator pins a different allowlist than this checkout has"
 
 
+def test_the_definer_and_rls_tool_pins_match_the_files_this_checkout_has():
+    """Card 221: a threat report pins the tools that ran, and the aggregator compares them.
+
+    ``evaluate_definer`` and ``evaluate_rls`` refuse a report whose ``toolFiles`` are not the
+    reviewed pins, so a tool that moves without its pin moving turns both reports into
+    INVALID_RUN -- silently, because nothing was producing them.  ``c96f4f60`` moved the RLS
+    baseline that way on 2026-09-28 and this card found it by producing the report.
+    """
+
+    for row in [*aggregator.DEFINER_FILES, *aggregator.RLS_FILES]:
+        assert row["blob"] == git("hash-object", row["path"]), f"{row['path']} pin is stale"
+
+
+def test_the_reviewed_security_allowlist_still_describes_this_tree():
+    """Card 221: the two review decisions the axis is waiting on, named as measurements.
+
+    Neither is a code change and neither is this card's to make -- both are content of the
+    reviewed allowlist, which is also the AC-11 target's pinned ``sourceDocument``, so editing
+    it moves an AC-11 definition.  They are asserted here so the axis's state is checkable and
+    so that **closing either one fails this test**: whoever reviews it updates these numbers,
+    the axis-sources reason and the History together.
+
+    1. ``definerPolicySignatures`` has twelve signatures while the checker's own policy -- and
+       the live catalogue -- has fifteen.  ``evaluate_definer``'s exit-0 branch requires the
+       observed set to equal the reviewed one *exactly*, so SEC-DEF-001 is INVALID_RUN until
+       the three newer privileged functions are reviewed in.
+    2. ``secVf001.workflow`` pins a blob of the browser lane that ``0f614152`` moved on
+       2026-10-01 -- the same commit that moved the dependency/SAST workflow pin (#313 F-R3).
+       SEC-VF-001 is INVALID_RUN until that pin is re-reviewed.
+    """
+
+    policy = json.loads((ROOT / "tools/definer-policy.json").read_text(encoding="utf-8"))
+    reviewed = set(APPROVED_ALLOWLIST["definerPolicySignatures"])
+    # The policy maps each signature to its reviewed definition, so its keys are the set.
+    declared = set(policy["functions"])
+    assert len(reviewed) == 12
+    assert len(declared) == 15
+    assert reviewed < declared, "the reviewed list is no longer a strict subset of the policy"
+    assert sorted(declared - reviewed) == [
+        "public.model_version_measurement(text)",
+        "public.record_auth_denial(text, text, text, text, text, text, text, text, jsonb, text, text)",
+        "public.record_kernel_run_cancel(text, text, text, text, text)",
+    ]
+
+    workflow = APPROVED_ALLOWLIST["secVf001"]["workflow"]
+    assert workflow["path"] == ".github/workflows/desktop-browser.yml"
+    assert workflow["blob"] != git("hash-object", workflow["path"]), (
+        "the browser lane pin now matches the tree: re-review it, then update this test, the "
+        "axis-sources reason and the History"
+    )
+    # Every other VF pin does match, so the workflow pin is the only one in the way.
+    spec = APPROVED_ALLOWLIST["secVf001"]
+    for row in [spec["runner"], spec["nodeDependencyResolver"], *spec["testFiles"]]:
+        assert row["blob"] == git("hash-object", row["path"]), f"{row['path']} pin is stale"
+
+
 def test_an_unregistered_threat_id_is_refused_rather_than_carried():
     report = producer_report(
         observations=[{"threatId": "SEC-INVENTED-001"}],
