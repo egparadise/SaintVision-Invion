@@ -1,15 +1,48 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.272"
+version: "1.0.278"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T14:13:22+09:00"
+updated: "2026-10-02T15:53:22+09:00"
 source_of_truth: "Git"
-active_card: "CARD-222 node-agent durable quarantine channel"
-active_card_status: "Approved by Claude r4 at 2dd25ff7 with exact-head Core 36962173155 and Backend 36962173156 green; Node-wide quarantine resume requires every scope settled, trusted stop receipt, fresh observation and two-person approval"
-active_card_next: "Land with its train; Card 223 product caller (#323, migration 0059) continues on this approved head; quarantine-specific unauthorized-clear negatives are Claude card 227"
+active_card: "CARD-223 S08-BE product caller"
+active_card_status: "PR #323 Claude r4 conditionally approved: pre-scan and quarantined-terminal mutations are closed; exact-head Backend/Core confirmation remains; product dispatch stays disabled"
+active_card_next: "Require exact-head Backend/Core green with 12 real-PG JUnit cases; CARD-229 activation fencing and interruption classification remains registered follow-up"
 ---
+
+- Card 223 r3 adds real-PG regressions that require the set-based digest pre-scan to quarantine a
+  later corrupt row and forbid terminal `quarantined -> pending` revival.
+- Card 223 r2 correction distinguishes retryable and permanent refusals. Permanent refusals and
+  schema/workspace/request-digest/claim-key poison are terminally quarantined per row, so a bad row
+  cannot hold the tenant queue. Retryable refusals alone return to bounded-backoff pending.
+- A 30-second stale-claim sweeper recovers only a row for which no canonical `build.dispatch`
+  ledger key exists. Both current and legacy response shapes remain claimed; the ledger response
+  is not trusted as the discriminator. Focused PG-free verification is **277 passed** and the
+  expanded **12-case** real-PG file awaits exact-head hosted Core execution.
+- **CARD-229 registered follow-up (activation prerequisite, owner Codex, reviewer Claude):** add a
+  per-claim fencing token or equivalent heartbeat ownership before enabling product dispatch, and
+  classify process interruption plus network/transport uncertainty as retryable rather than
+  terminal quarantine. The default-off flag and S08-BE non-completion boundary remain until both
+  are implemented and reviewed.
+
+## 2026-10-02 Card 223 — S08-BE product caller
+
+- `#317`의 기계 측정에서 `BuildExecutionService`를 구성·호출하는 제품 경로가 0건이었고, 공개 route 없이
+  외부 전제 없이 닫을 수 있는 Codex 소유 공백이어서 선택했다. base는 승인된 `#318` head
+  `2dd25ff77a152575988b19a568ede348fd4dc1d8`이다.
+- 예약된 migration `0059_build_execution_intents`는 `0058`을 단일 부모로 삼는다. tenant/project/run
+  복합 PK, strict request/plan/decision JSONB, PostgreSQL canonical digest, policy/evidence/actor 결속,
+  FORCE RLS, payload 불변·DELETE 금지, bounded retry와 terminal quarantine 전이를 둔다.
+- trusted internal enqueue와 `FOR UPDATE SKIP LOCKED` one-shot claim 뒤
+  `BuildExecutionService.execute()`를 호출하는 worker seam을 추가했다. public route는 없고
+  `INV_BUILDKIT_PRODUCT_ENABLED=1` exact 설정 전에는 pending 행도 소비하지 않는다.
+- 로컬 PG-free focused는 **13 passed**, migration/AC-11 focused는 **52 passed**,
+  migration static gate는 **27 passed**, offline Alembic render와 단일 head 확인은 exit 0이다.
+  실 PG 동시 claim·RLS·trigger 시험은 exact-head hosted Core 전까지 미측정이다.
+- S08-BE 완료·75 승격·물리 builder 인수는 주장하지 않는다. `#318` quarantine fence가 없거나 검증되지
+  않으면 기존 `RES-0006` fail-closed를 유지한다.
+  [[2026-10-02_13-44-26_KST_Card223_S08-BE_product_caller_Codex]].
 
 ## 2026-10-02 Card 222 — node-agent durable quarantine channel
 

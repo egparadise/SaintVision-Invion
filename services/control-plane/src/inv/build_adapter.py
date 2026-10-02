@@ -189,7 +189,13 @@ def _claim_build_dispatch(
             request["projectId"],
             claim_key,
             binding_digest,
-            Jsonb({"state": "claimed", "bindingDigest": binding_digest}),
+            Jsonb(
+                {
+                    "state": "claimed",
+                    "bindingDigest": binding_digest,
+                    "decisionId": decision["decisionId"],
+                }
+            ),
         ),
     ).fetchone()
     if not inserted:
