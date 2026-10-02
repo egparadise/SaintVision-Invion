@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD223-S08-BE-PRODUCT-CALLER-20261002"
 title: "Card 223 S08-BE product caller"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T13:44:26+09:00"
+updated: "2026-10-02T14:16:24+09:00"
 source_of_truth: "Git"
 base_sha: "2dd25ff77a152575988b19a568ede348fd4dc1d8"
 reviewer: "Claude"
@@ -56,6 +56,23 @@ decision one-shot, live lease/fence, ROOF, node-agent health·cleanup, durable q
 | `.venv\\Scripts\\python.exe tools/migration_graph.py --head` | exit 0, `0059_build_execution_intents` |
 | `python -m alembic upgrade head --sql` | exit 0, table·policy offline render 확인 |
 | `git diff --check` | exit 0 |
+
+## Hosted 1차 실행과 교정
+
+PR `#323`의 첫 exact-head Backend run `36966250740`은 Python 3.12와 3.14에서 같은 두
+시험이 실패했다. 첫째, migration head를 `0059`로 올리며 바뀐
+`tools/definer-policy.json` Git blob을 AC-11 집계기의 `DEFINER_FILES` pin에 함께
+회전하지 않았다. 둘째, replay 부정 시험이 저장된 문서와 다른 **유효한** strict 문서가
+아니라 request만 바꾼 무효 문서를 넣어, 의도한 `IDEM-0001`보다 앞선 authority 검증의
+`VERIFY-0002`를 받았다. 제품 dispatch 또는 DB 경합 실패가 아니라 pin·시험 fixture
+결함이다.
+
+교정은 definer policy blob을 실제 Git blob `e16ee086d5ba301d45fec4f8fac6a5333ae1a39a`로
+고정하고, replay fixture가 변경 request의 `requestDigest`와 canonical action digest를
+plan·decision 양쪽에 다시 결속하도록 했다. 교정 후 focused PG-free 검증은
+`test_kernel_cancel_bridge.py` + `test_build_execution_intents.py` 34 passed,
+AC-11 집계기까지 포함한 묶음은 120 passed다. 로컬에는 disposable PostgreSQL DSN이 없어
+real-PG 5건은 계속 hosted Core의 exact-head JUnit을 판정 근거로 삼는다.
 
 로컬 `INV_TEST_ADMIN_DSN`은 설정되지 않았다. 따라서
 `tests/integration/test_build_execution_intents_real_pg.py`의 two-connection one-shot claim, RLS,

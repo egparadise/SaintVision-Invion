@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.272"
+version: "1.0.273"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T13:44:26+09:00"
+updated: "2026-10-02T14:16:24+09:00"
 source_of_truth: "Git"
 active_card: "CARD-223 S08-BE product caller"
-active_card_status: "0059 durable intent queue and internal one-shot worker implemented; hosted real-PG and Claude review pending"
-active_card_next: "Commit, push and open the stacked PR with the table/RLS/trigger design first; run exact-head Core"
+active_card_status: "PR #323 opened; first Backend run exposed AC-11 pin and replay-fixture defects, both corrected"
+active_card_next: "Push the corrective commit; require exact-head Backend/Core green, real-PG JUnit execution and Claude review"
 ---
 
 ## 2026-10-02 Card 223 — S08-BE product caller

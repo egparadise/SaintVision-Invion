@@ -141,12 +141,19 @@ def test_enqueue_is_exact_replay_and_database_owns_canonical_digests(env):
     assert row[4] == row[5]
 
     changed = dict(intent.request, targetStage="different")
+    changed_action_digest = action_digest(canonical_build_action(changed))
+    changed_plan = dict(
+        intent.plan,
+        requestDigest=action_digest(changed),
+        actionDigest=changed_action_digest,
+    )
+    changed_decision = dict(intent.decision, actionDigest=changed_action_digest)
     with pytest.raises(DomainError) as caught:
         queue.enqueue(
             Principal(env.tenant, intent.actor_id),
             changed,
-            intent.plan,
-            intent.decision,
+            changed_plan,
+            changed_decision,
             policy_version=intent.policy_version,
             run_id=intent.run_id,
             evidence_id=intent.evidence_id,
