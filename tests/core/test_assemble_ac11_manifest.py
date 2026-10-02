@@ -20,6 +20,7 @@ from pathlib import Path
 import pytest
 
 from tools import assemble_ac11_manifest as assembler
+from tools import import_ac11_composite_long_soak as long_soak_importer
 from tools.aggregate_ac11_evidence import AXIS_PURPOSE, REQUIRED_AXES, RUN_PURPOSE, SCHEMA_VERSION
 
 SHA = "a" * 40
@@ -535,14 +536,66 @@ def test_the_lane_reads_the_axis_map_rather_than_hardcoding_the_axes():
         assert axis not in text, f"the lane names {axis} instead of reading it"
 
 
-def test_the_long_soak_row_says_why_no_hosted_workflow_can_produce_it():
-    """Card 217: the axis stays incomplete for a reason a reader can check.
+#: The registered long-soak target, read from the canonical registry rather than restated.
+LONG_SOAK_TARGET = "s11-ac11-composite-long-soak-v0"
+REPO = Path(__file__).resolve().parents[2]
+TARGET_REGISTRY = REPO / "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
 
-    The registered target requires a 24-hour window on five physical nodes with controlled
-    fault injection and an external observer, so a hosted lane cannot produce this evidence
-    and the definition is not lowered to let one.  If somebody adds a workflow to this row,
-    this test is where they have to explain it.
+
+def registered_target(target_id: str) -> dict:
+    registry = json.loads(TARGET_REGISTRY.read_text(encoding="utf-8"))
+    matches = [row for row in registry["targets"] if row["targetId"] == target_id]
+    assert len(matches) == 1, target_id
+    return matches[0]
+
+
+def test_the_registered_long_soak_target_is_not_lowered_to_fit_a_hosted_runner():
+    """Card 217: the axis stays incomplete because the target is what it is.
+
+    Checking the row's prose is not enough -- a change that lowered ``windowSeconds`` or
+    softened ``requiredEnvironment`` would leave every sentence in this repository true while
+    making the axis measurable on a hosted runner, which is the one outcome the card forbids
+    (#315 F-R3).  So the values are read from the registry the aggregator itself reads.
     """
+
+    target = registered_target(LONG_SOAK_TARGET)
+    criteria = target["criteria"]
+    assert target["axis"] == "long-soak"
+    # The whole criteria set, not a sample: a criterion that disappears is a criterion
+    # nobody has to satisfy.
+    assert len(criteria) == 48
+    assert criteria["windowSeconds"] == {"operator": "gte", "value": 86400}
+    assert criteria["requiredCaseCount"] == {"operator": "eq", "value": 14}
+    assert criteria["executedRequiredCaseCount"] == {"operator": "eq", "value": 14}
+    assert criteria["externalObserverCoveragePpm"] == {"operator": "gte", "value": 990000}
+    for name, value in (
+        ("plannedPowerFaultCaseCount", 2), ("switchFaultCaseCount", 2), ("wanFaultCaseCount", 2),
+        ("powerRecoveryPassCount", 2), ("switchRecoveryPassCount", 2), ("wanRecoveryPassCount", 2),
+    ):
+        assert criteria[name] == {"operator": "gte", "value": value}, name
+    for name, value in (
+        ("maxPowerRecoverySeconds", 900), ("maxSwitchRecoverySeconds", 300),
+        ("maxWanRecoverySeconds", 120),
+    ):
+        assert criteria[name] == {"operator": "lte", "value": value}, name
+    assert criteria["minThermalHeadroomMilliC"] == {"operator": "gte", "value": 5000}
+    assert criteria["thermalThrottleSeconds"] == {"operator": "eq", "value": 0}
+    assert target["requiredEnvironment"] == {
+        "topology": "physical-five-node",
+        "registeredNodeCount": 5,
+        "eligibleNodeCount": 4,
+        "excludedNodeCount": 1,
+        "cpIndependentWorkerHostCount": 4,
+        "cpColocatedNodeCount": 1,
+        "timedPopulation": "cp-independent-ubuntu-four",
+        "observer": "external-monotonic-v1",
+        "faultInjection": "controlled-v1",
+        "windowClass": "physical-24h",
+    }
+
+
+def test_the_long_soak_row_stays_incomplete_and_says_why():
+    """The row describes the tree: the chain is open and no workflow claims to close it."""
 
     axes = {entry["axis"]: entry for entry in assembler.load_sources(assembler.DEFAULT_SOURCES)}
     long_soak = axes["long-soak"]
@@ -551,5 +604,57 @@ def test_the_long_soak_row_says_why_no_hosted_workflow_can_produce_it():
     reason = long_soak["reason"]
     for fragment in ("86400", "physical-five-node", "external-monotonic-v1", "G-24"):
         assert fragment in reason, fragment
-    # The importer is ready; what is missing is the run.
     assert assembler.emitted_axes(long_soak["importer"]) == {"long-soak"}
+
+
+class _RegistryGit:
+    """Enough Git to answer the importer's provenance questions about this checkout."""
+
+    def __init__(self):
+        target = registered_target(LONG_SOAK_TARGET)
+        self.document = target["sourceDocument"]
+
+    def tree(self, commit: str) -> str:
+        return "e" * 40
+
+    def blob(self, commit: str, path: str) -> str:
+        if path == long_soak_importer.REGISTRY_PATH:
+            return long_soak_importer.REGISTRY_BLOB
+        assert path == self.document["path"], path
+        return self.document["blob"]
+
+    def show(self, commit: str, path: str) -> str:
+        assert path == long_soak_importer.REGISTRY_PATH, path
+        return TARGET_REGISTRY.read_text(encoding="utf-8")
+
+    def is_ancestor(self, ancestor: str, descendant: str) -> bool:
+        return True
+
+
+def test_the_physical_import_path_exists_and_both_operator_resources_are_required():
+    """#315 F-R3: the gap is the run, not the import path.
+
+    r1 of this card claimed the importer had no physical branch.  It has one, and it binds
+    this target: ``readiness`` answers BLOCKED_EXTERNAL naming *both* missing operator
+    resources, and once they are declared it says the run itself is what is missing.  If
+    somebody weakens that to a single resource, or lets the physical path through without
+    them, this test fails -- and so does the claim in the runbook that the only thing left is
+    the measurement.
+    """
+
+    git = _RegistryGit()
+    blocked = long_soak_importer.readiness(SHA, set(), git)
+    assert blocked["verdict"] == "BLOCKED_EXTERNAL"
+    assert blocked["blocker"] == "G-19,G-24"
+    assert long_soak_importer.readiness(SHA, {"G-19"}, git)["blocker"] == "G-24"
+    ready = long_soak_importer.readiness(SHA, {"G-19", "G-24"}, git)
+    assert ready == {
+        "axis": "long-soak",
+        "verdict": "NOT_OBSERVED",
+        "reason": "physical run not supplied",
+    }
+    # The physical report is bound to this target, and only the dry-run is reference-only.
+    assert long_soak_importer.TARGET_ID == LONG_SOAK_TARGET
+    assert long_soak_importer.REQUIRED_RESOURCES == frozenset({"G-19", "G-24"})
+    assert long_soak_importer.DRY_RUN_PURPOSE == "s11-ac11-composite-long-soak-dry-run"
+    assert long_soak_importer.EMITTED_AXES == ("long-soak",)

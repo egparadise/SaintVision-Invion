@@ -69,16 +69,37 @@ python tools/run_ac11_composite_long_soak.py --mode physical \
 | G-24 fault-control adapter(전원·switch·WAN 고장 주입) | **외부 자산** | 이 저장소에 없다. 그것이 오기 전에는 `--mode physical`이 BLOCKED_EXTERNAL로 멈춘다 |
 | 외부 monotonic 관측자 | **외부 자산** | `observer: external-monotonic-v1` — 측정 대상 밖의 호스트 |
 | 24시간 창 | 운영 결정 | 그 시간 동안 노드를 다른 작업에 쓰지 않는다 |
+| **Python >= 3.11** | 환경 | 생산자가 `enum.StrEnum`을 쓴다. 이 PC 기본 `python`은 3.10.11이고 `--help`조차 `ImportError: cannot import name 'StrEnum' from 'enum'`으로 멈춘다(실행해 확인). importer는 3.10에서도 `--help`가 돈다 |
 
 **노드의 `sudo`가 필요한 단계는 사용자가 실행한다**(코디네이터도 agent도 노드 sudo 비밀번호를 갖고 있지 않다). 비밀은 `.work/intranet/`(untracked)에만 두고 이 문서로 옮기지 않는다.
 
 ## 2. 실행 — 전제가 갖춰진 뒤
 
+### 2-0. 먼저 이 블록이 통과하는지 본다 (cwd와 interpreter)
+
+```bash
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+test -f tools/run_ac11_composite_long_soak.py
+python -c "import sys; assert sys.version_info >= (3, 11), sys.version"
+python tools/run_ac11_composite_long_soak.py --help > /dev/null
+python tools/import_ac11_composite_long_soak.py --help > /dev/null
+echo "smoke ok: $(pwd) with python $(python -c "import sys;print(sys.version.split()[0])")"
+```
+
+**실행한 결과**(이 PC):
+
+- 3.11 이상이 PATH에 있을 때 → `smoke ok: … with python 3.14.7`
+- 기본 `python`(3.10.11)일 때 → 세 번째 줄에서 `AssertionError: 3.10.11 …`로 멈춘다. **그 assert가 먼저 멈추는 것이 이 블록의 목적**이다: 그것 없이는 생산자의 `ImportError`가 나중에 나온다.
+
+**절대 경로를 적지 않는 이유**: 정본 checkout의 위치는 기계마다 다르고, 이 저장소에는 상위 디렉터리에 `tools/`가 없는 중간 경로가 실제로 존재한다. `git rev-parse --show-toplevel`이 그것을 묻지 않고 답한다.
+
 ### 2-1. 인벤토리를 주고 preflight만 먼저 돌린다
 
 ```bash
 set -euo pipefail
-cd /d/Project/SaintVisionI-Invion
+cd "$(git rev-parse --show-toplevel)"
+test -f tools/run_ac11_composite_long_soak.py   # 이 cwd가 정본 checkout인지 먼저 확인한다
 INV="${INV:?5노드 인벤토리 JSON 경로를 INV로 export하고 다시 실행}"
 RUN="${RUN:?이 실행을 묶을 run id를 RUN으로 export하고 다시 실행}"
 OUT=.work/ac11-long-soak
@@ -114,7 +135,8 @@ python tools/import_ac11_composite_long_soak.py --help
 
 ```bash
 set -euo pipefail
-cd /d/Project/SaintVisionI-Invion
+cd "$(git rev-parse --show-toplevel)"
+test -f tools/import_ac11_composite_long_soak.py
 OUT=.work/ac11-long-soak
 python tools/import_ac11_composite_long_soak.py \
   --report "$OUT/report.json" \
@@ -123,16 +145,17 @@ python tools/import_ac11_composite_long_soak.py \
   --output "$OUT/ac11-axis-evidence.json"
 ```
 
-**importer가 축 envelope을 내는 것은 dry-run report에 대해서다** — 읽어서 확인했다:
+**importer는 물리 report를 이미 받는다** — `import_report()`를 읽고 확인했다:
 
 | 측정한 것 | 결과 |
 |---|---|
 | `EMITTED_AXES` | `("long-soak",)`, 봉투의 `axis`는 그 상수에서 나온다 |
-| 받는 report | **`runPurpose`가 `s11-ac11-composite-long-soak-dry-run`이 아니면 거부**한다(`tools/import_ac11_composite_long_soak.py:242`) |
-| 그 봉투의 판정 | `verdict: NOT_OBSERVED`, reason `synthetic dry-run is reference-only and cannot satisfy the physical target`, `environment.comparableGroup: reference-only` |
-| 물리 창 report | **분기가 없다.** 생산자가 `--mode physical`에서 BLOCKED_EXTERNAL로 멈추므로 물리 report는 **아직 존재하지 않는 문서**다 |
+| dry-run | `runPurpose == s11-ac11-composite-long-soak-dry-run`일 때만 **reference-only 분기**로 가고, 그 봉투는 `NOT_OBSERVED`(`comparableGroup: reference-only`, `topology: synthetic-five-node`) |
+| 물리 report | 그 밖에는 `readiness()`로 **G-19·G-24 보유**를 확인한 뒤 **exact v1 key set 22개**를 요구한다 |
+| 물리 판정 | 48개 metric을 registry criteria와 **exact set**으로 대조해 `MEASURED_PASS` / `MEASURED_FAIL` 봉투를 만들고, `targetRef`에 registry criteria를 그대로 싣는다 |
+| 집계기까지 | `tests/test_import_ac11_composite_long_soak.py::test_valid_physical_report_is_accepted_by_the_ac11_aggregator`가 물리 report → 봉투 → `evaluate_axis()` → **`MEASURED_PASS`**를 고정한다 |
 
-**그래서 이 축에 남은 것은 실행만이 아니다** — 물리 창 report를 들이는 importer 분기도 없다. 그 분기를 지금 쓰면 **아무도 만들 수 없는 문서의 모양을 발명하는 것**이 되므로, 이 절차는 그 분기가 무엇을 요구해야 하는지를 §5에 질문으로 남긴다.
+**그래서 이 축에 남은 것은 코드가 아니라 실측이다** — 들이는 계약은 이미 있고, 그 계약의 final report를 **생산할 수 있는 것이 없다**(§4).
 
 ### 2-5. 집계기에 넣는다
 
@@ -158,16 +181,29 @@ python tools/import_ac11_composite_long_soak.py \
 
 **이 표의 값은 전부 target registry에서 읽은 것이다** — `docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json`의 `s11-ac11-composite-long-soak-v0` `criteria` 48개 항목이고, 집계기가 그 registry를 Git에서 직접 읽어 비교한다. **정본의 숫자를 여기에 옮겨 적은 것이지 여기서 정하는 것이 아니다.**
 
-## 4. 물리 importer 분기에 필요한 계약 질문 (소유자: S11 target/producer owner)
+## 4. 실제 공백 — 계약은 있고, 그 계약을 채울 생산자가 없다
 
-물리 창 report를 받을 분기는 **그 report가 무엇을 담는지가 정해진 뒤에** 쓰는 것이 맞다. 지금 정해지지 않은 것:
+**들이는 계약은 이미 정해져 있다.** `tools/import_ac11_composite_long_soak.py`의 `import_report()`가 물리 report에 요구하는 것(읽어서 적었다):
 
-1. **물리 report의 `runPurpose`와 `environment`**: dry-run은 `synthetic-*`·`comparableGroup: reference-only`를 pin한다. 물리 창은 registry의 `requiredEnvironment`(`topology: physical-five-node`, `observer: external-monotonic-v1`, `faultInjection: controlled-v1`, `windowClass: physical-24h`, `timedPopulation: cp-independent-ubuntu-four`)를 그대로 쓰는가, 그리고 **comparability group 이름**은 무엇인가.
-2. **48개 criteria 값을 report의 어디에 싣는가**: dry-run은 case universe와 `casePlans`를 담는다. 물리 창은 측정값(창 길이·고장 주입 수·복구 시간·누수 지표·WS 지표·시계 지표)을 **어떤 키로** 담는가. 집계기의 일반 경로(`observations`)인가, 축 전용 모양인가.
-3. **두 reference의 결속**: `storagePhysicalReferencePassCount`·`hostedDriftReferencePassCount`가 1이어야 하는데, 물리 창에서도 dry-run과 같은 두 reference 문서를 쓰는가.
-4. **중단된 창의 처리**: 24시간 중 고장 주입이 실패해 창이 끊기면 `NOT_OBSERVED`인가 `MEASURED_FAIL`인가. 정본에 그 구분이 없다.
+| 요구 | 내용 |
+|---|---|
+| key set | **exact 22개**: `schemaVersion`·`runPurpose`·`sourceRunId`·`sourceHeadSha`·`checkoutTreeSha`·`cleanCheckout`·`startedAt`·`finishedAt`·`artifactSha256`·`artifactObservedSha256`·`artifactExpiresAt`·`inventoryRevision`·`environment`·`operatorResources`·`caseIdentities`·`faultClasses`·`cases`·`metrics`·`cleanup`·`externalObserverReceipt`·`storageReferenceSha256`·`hostedReferenceSha256`. 하나 더 있거나 빠지면 거부 |
+| 식별 | `runPurpose == "s11-ac11-composite-long-soak"`, `operatorResources`는 `{G-19, G-24}`의 고유 부분집합이고 **둘 다 있어야** readiness를 통과한다 |
+| tree | `cleanCheckout: true`이고 `checkoutTreeSha == git tree(sourceHeadSha)` |
+| 창 | `finishedAt - startedAt >= 24시간`. 짧으면 거부 |
+| environment | registry의 `requiredEnvironment` 9개 값을 **그대로** 만족하고 **비어 있지 않은 `comparableGroup`** |
+| case | `caseIdentities`·`faultClasses`가 pin된 목록과 exact(그 canonical sha까지), `cases`는 14개 전부·중복 없음·`PASS`/`FAIL`, FAIL은 그 identity가 허용하는 fault class만 |
+| 관측자 | `externalObserverReceipt == {kind: external-monotonic-v1, inventoryRevision: 보고서의 값, coveragePpm: metrics의 값, redacted: true}` |
+| 두 child reference | `storageReferenceSha256`·`hostedReferenceSha256`이 각 문서의 canonical sha와 일치하고, 두 문서가 같은 source·같은 창에 결속된 passing reference |
+| metrics | registry criteria와 **exact set**(48개). `windowSeconds`·`requiredCaseCount`·`executedRequiredCaseCount`·두 reference pass count·`classificationMismatchCount`·`unclassifiedFaultCount`·`cleanupResidueCount`는 importer가 **직접 재계산해 대조**하므로 적어 넣는 값이 아니다 |
+| 판정 | 48개 criteria를 operator(`eq`/`gte`/`lte`)로 평가해 `MEASURED_PASS`/`MEASURED_FAIL`. FAIL한 case가 있는데 어떤 criterion도 실패하지 않으면 **거부**한다 |
 
-**이 질문들이 닫히기 전에 분기를 쓰면 추측을 코드로 고정하는 것이고, 그 추측은 아무도 반증할 수 없다**(생산자가 물리 report를 낼 수 없으므로).
+**그래서 이 절차가 기다리는 것은 계약이 아니라 그 계약을 채우는 실행이다.** 측정한 생산자 쪽 공백:
+
+- `tools/run_ac11_composite_long_soak.py`의 `--mode physical`은 **항상** `blocked_physical_report`를 쓰고 exit 2다 — 인벤토리가 없으면 `G-19`, 인벤토리가 통과하면 `G-24`. 위 22-key final report를 쓰는 분기는 **생산자에 없다**.
+- 그 분기는 **24시간 창을 실제로 돌리고 고장을 주입한 뒤에만** 의미가 있으므로, G-24 adapter와 물리 5노드가 오는 것과 같은 작업이다.
+
+**그러므로 producer owner가 할 일은 새 계약을 정하는 것이 아니라 위 표를 그대로 채우는 것이다.** 이 절차가 그 표를 인용하는 이유도 그것이다 — importer가 정본이고, 여기 적힌 것은 그 정본을 읽은 결과다.
 
 ## 5. 이 절차가 하지 않는 것
 
@@ -175,4 +211,4 @@ python tools/import_ac11_composite_long_soak.py \
 - **hosted workflow를 만들지 않는다.** §0의 일곱 줄이 그 이유이고, 만들면 증거를 만들 수 없는 lane이 하나 늘 뿐이다.
 - **G-24 adapter의 명령을 적지 않는다.** 이 저장소에 없는 것을 명령으로 적을 수 없다(§2-2).
 - **24시간 창을 줄이지 않는다.** 짧은 창은 이 축의 측정이 아니다.
-- **물리 importer 분기를 추측으로 쓰지 않는다.** §4의 질문이 닫힌 뒤에 쓴다.
+- **importer를 고치지 않는다.** 물리 계약은 이미 있고(§4), 이 절차는 그것을 인용할 뿐이다.
