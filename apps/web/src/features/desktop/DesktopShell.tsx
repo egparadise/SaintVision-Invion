@@ -50,7 +50,7 @@ export function getNotificationLevelConfig(level?: string | null): NotificationL
     color: 'var(--color-status-unknown)',
     bg: 'var(--color-bg-subtle)',
     border: 'var(--color-status-unknown)',
-    label: (level || 'UNKNOWN').toUpperCase(),
+    label: level ? `UNKNOWN (${level})` : 'UNKNOWN',
   };
 }
 import { NodeItem, RunItem, ApprovalItem, WorkspaceItem } from '@/contracts/types';
@@ -181,7 +181,7 @@ const DEFAULT_WINDOWS: IDesktopWindow[] = [
   },
 ];
 
-const DESKTOP_SHORTCUTS = [
+export const DESKTOP_SHORTCUTS = [
   { appId: 'my-computer' as AppId, title: '내 컴퓨터', icon: '💻' },
   { appId: 'file-explorer' as AppId, title: 'inv:// 파일', icon: '📁' },
   { appId: 'model-studio' as AppId, title: 'Model Studio', icon: '🧠' },
@@ -889,7 +889,10 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
                 borderRadius: '10px',
                 cursor: 'pointer',
                 padding: '6px',
+                transition: 'background-color 0.15s ease',
               }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-bg-subtle)')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
             >
               <div
                 style={{

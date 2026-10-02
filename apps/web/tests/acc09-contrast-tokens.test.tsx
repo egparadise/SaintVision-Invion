@@ -34,6 +34,7 @@ import {
   DesktopShell,
   NOTIFICATION_LEVEL_CONFIG,
   getNotificationLevelConfig,
+  DESKTOP_SHORTCUTS,
 } from '../src/features/desktop/DesktopShell';
 import type { DesktopNotification } from '../src/contracts/virtualFabric';
 import {
@@ -5569,6 +5570,9 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       { id: 'notif_2', title: '시스템 점검', message: '정기 점검 작업이 예정되어 있습니다.', level: 'info', timestamp: '12:01', read: true },
       { id: 'notif_3', title: '자원 경고', message: 'VRAM 사용량이 85%를 초과했습니다.', level: 'warning', timestamp: '12:02', read: true },
       { id: 'notif_4', title: '노드 장애', message: '노드 nod_03 응답 없음 상태입니다.', level: 'error', timestamp: '12:03', read: true },
+      { id: 'notif_5', title: '심각 장애', message: '계약외 critical 레벨 알림입니다.', level: 'critical' as any, timestamp: '12:04', read: true },
+      { id: 'notif_6', title: '대문자 에러', message: '대소문자 변형 ERROR 레벨 알림입니다.', level: 'ERROR' as any, timestamp: '12:05', read: true },
+      { id: 'notif_7', title: '프로토타입 키', message: '프로토타입 toString 레벨 알림입니다.', level: 'toString' as any, timestamp: '12:06', read: true },
     ];
 
     const mockShellProps = {
@@ -5640,6 +5644,13 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(modeSwitcher.style.outlineWidth || 'inherit', 'Mode switcher must not have inline outline-width 0').not.toMatch(/^(0px|0)$/);
       expect(modeSwitcher.style.outlineStyle || 'inherit', 'Mode switcher must not have inline outline-style none').not.toBe('none');
 
+      // Focus event verification on mode switcher (kills onFocus outline: none mutant M09b)
+      modeSwitcher.focus();
+      modeSwitcher.dispatchEvent(new Event('focus'));
+      expect(modeSwitcher.style.outline || 'inherit', 'Mode switcher must not set outline none on focus').not.toMatch(/(none|0px|\b0\b)/);
+      expect(modeSwitcher.style.outlineStyle || 'inherit', 'Mode switcher must not set outline-style none on focus').not.toBe('none');
+      expect(window.getComputedStyle(modeSwitcher).outlineStyle || 'inherit').not.toBe('none');
+
       // Unread notification dot indicator
       const unreadDot = container.querySelector('[data-testid="desktop-unread-notif-dot"]') as HTMLElement;
       expect(unreadDot, 'Unread notification dot must render').not.toBeNull();
@@ -5651,6 +5662,14 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(taskbar.style.backgroundColor).toBe('var(--color-bg-surface)');
       expect(taskbar.style.borderColor).toBe('var(--color-border-subtle)');
 
+      // Dock icon rendering for all shortcut items (kills M08c)
+      for (const item of DESKTOP_SHORTCUTS) {
+        const tile = container.querySelector(`[data-testid="desktop-dock-tile-${item.appId}"]`) as HTMLElement;
+        expect(tile, `Dock tile for ${item.appId} must render`).not.toBeNull();
+        expect(tile.textContent, `Dock tile for ${item.appId} must render icon ${item.icon}`).toContain(item.icon);
+      }
+
+      // Active dock tile & running dot (my-computer is active initially)
       const activeDockTile = container.querySelector('[data-testid="desktop-dock-tile-my-computer"]') as HTMLElement;
       expect(activeDockTile, 'Active dock tile must render').not.toBeNull();
       expect(activeDockTile.style.backgroundColor).toBe('var(--color-brand-subtle)');
@@ -5659,10 +5678,44 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       const activeRunningDot = container.querySelector('[data-testid="desktop-dock-running-my-computer"]') as HTMLElement;
       expect(activeRunningDot, 'Active running dot must render').not.toBeNull();
       expect(activeRunningDot.style.backgroundColor).toBe('var(--color-brand-hover)');
+      expect(activeRunningDot.style.opacity || '1', 'Active running dot must not have degraded opacity').toBe('1');
+
+      // Click my-computer dock button to minimize it, transitioning it to open-but-inactive
+      const myComputerTile = container.querySelector('[data-testid="desktop-dock-tile-my-computer"]') as HTMLElement;
+      const myComputerDockBtn = myComputerTile?.closest('button') as HTMLButtonElement;
+      expect(myComputerDockBtn, 'My computer dock button must exist').not.toBeNull();
+      await act(async () => {
+        myComputerDockBtn.click();
+      });
+
+      // Now my-computer is open but minimized/inactive
+      const inactiveDockTile = container.querySelector('[data-testid="desktop-dock-tile-my-computer"]') as HTMLElement;
+      expect(inactiveDockTile, 'Inactive dock tile must render').not.toBeNull();
+      expect(inactiveDockTile.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(inactiveDockTile.style.borderColor).toBe('var(--color-border-subtle)');
+
+      const inactiveRunningDot = container.querySelector('[data-testid="desktop-dock-running-my-computer"]') as HTMLElement;
+      expect(inactiveRunningDot, 'Inactive running dot must render when my-computer is open but inactive').not.toBeNull();
+      expect(inactiveRunningDot.style.backgroundColor).toBe('var(--color-border-strong)');
+      expect(inactiveRunningDot.style.backgroundColor, 'Inactive running dot must not collapse to text-muted').not.toBe('var(--color-text-muted)'); // kills M03
+      expect(inactiveRunningDot.style.backgroundColor, 'Inactive running dot must not collapse to brand-hover').not.toBe('var(--color-brand-hover)'); // kills M07b
+      expect(inactiveRunningDot.style.opacity || '1', 'Inactive running dot must not have degraded opacity').toBe('1'); // kills M04b
+
+      // 3:1 Non-text contrast verification for running dots and unread badge dot (WCAG 1.4.11)
+      const activeDotToken = helperExtractVar(activeRunningDot.style.backgroundColor);
+      const inactiveDotToken = helperExtractVar(inactiveRunningDot.style.backgroundColor);
+      const unreadDotToken = helperExtractVar(unreadDot.style.backgroundColor);
+      expect(getContrast(lightTokens[activeDotToken], lightTokens['--color-bg-surface']), 'Active dot light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[activeDotToken], darkTokens['--color-bg-surface']), 'Active dot dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(lightTokens[inactiveDotToken], lightTokens['--color-bg-surface']), 'Inactive dot light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[inactiveDotToken], darkTokens['--color-bg-surface']), 'Inactive dot dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(lightTokens[unreadDotToken], lightTokens['--color-bg-surface']), 'Unread dot light contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
+      expect(getContrast(darkTokens[unreadDotToken], darkTokens['--color-bg-surface']), 'Unread dot dark contrast >= 3.0:1').toBeGreaterThanOrEqual(3.0);
 
       // 4. Notification Center Drawer & Badges
       const notifTrigger = container.querySelector('#desktop-notification-trigger') as HTMLButtonElement;
       expect(notifTrigger, 'Notification trigger must render').not.toBeNull();
+      expect(notifTrigger.textContent, 'Notification trigger must render bell glyph 🔔').toContain('🔔'); // kills M08b
 
       await act(async () => {
         notifTrigger.click();
@@ -5675,10 +5728,10 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(notifDrawer.style.color).toBe('var(--color-text-primary)');
 
       const notifItems = container.querySelectorAll('[data-testid="desktop-notification-item"]');
-      expect(notifItems.length).toBe(4);
+      expect(notifItems.length).toBe(7);
 
       const notifBadges = Array.from(container.querySelectorAll('[data-testid="desktop-notification-badge"]')) as HTMLElement[];
-      expect(notifBadges.length).toBe(4);
+      expect(notifBadges.length).toBe(7);
 
       // Verify SUCCESS badge
       const successBadge = notifBadges.find((b) => b.textContent === 'SUCCESS');
@@ -5709,6 +5762,27 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(errorBadge!.style.color).toBe('var(--color-status-offline)');
       expect(errorBadge!.style.borderColor).toBe('var(--color-status-offline)');
 
+      // Verify out-of-contract critical level rendered in DOM (kills M11b & M13)
+      const criticalBadge = notifBadges.find((b) => b.textContent === 'UNKNOWN (critical)');
+      expect(criticalBadge, 'Out-of-contract critical badge must render in DOM with UNKNOWN (critical)').toBeDefined();
+      expect(criticalBadge!.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(criticalBadge!.style.color).toBe('var(--color-status-unknown)');
+      expect(criticalBadge!.style.borderColor).toBe('var(--color-status-unknown)');
+
+      // Verify case-variant ERROR level rendered in DOM (kills M14)
+      const caseErrorBadge = notifBadges.find((b) => b.textContent === 'UNKNOWN (ERROR)');
+      expect(caseErrorBadge, 'Case-variant ERROR badge must render in DOM with UNKNOWN (ERROR)').toBeDefined();
+      expect(caseErrorBadge!.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(caseErrorBadge!.style.color).toBe('var(--color-status-unknown)');
+      expect(caseErrorBadge!.style.borderColor).toBe('var(--color-status-unknown)');
+
+      // Verify prototype key toString level rendered in DOM (kills M12)
+      const protoBadge = notifBadges.find((b) => b.textContent === 'UNKNOWN (toString)');
+      expect(protoBadge, 'Prototype toString badge must render in DOM with UNKNOWN (toString)').toBeDefined();
+      expect(protoBadge!.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(protoBadge!.style.color).toBe('var(--color-status-unknown)');
+      expect(protoBadge!.style.borderColor).toBe('var(--color-status-unknown)');
+
       // 5. Config table exact contract enum key set binding
       const expectedContractLevels = ['error', 'info', 'success', 'warning'];
       expect(Object.keys(NOTIFICATION_LEVEL_CONFIG).sort()).toEqual(expectedContractLevels);
@@ -5718,10 +5792,23 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(corruptedCfg.color).toBe('var(--color-status-unknown)');
       expect(corruptedCfg.border).toBe('var(--color-status-unknown)');
       expect(corruptedCfg.bg).toBe('var(--color-bg-subtle)');
-      expect(corruptedCfg.label).toBe('CORRUPTED_UNKNOWN');
+      expect(corruptedCfg.label).toBe('UNKNOWN (corrupted_unknown)');
 
       const bogusCfg = getNotificationLevelConfig('bogus' as any);
       expect(bogusCfg.color).toBe('var(--color-status-unknown)');
+      expect(bogusCfg.label).toBe('UNKNOWN (bogus)');
+
+      const errorUpperCfg = getNotificationLevelConfig('ERROR' as any);
+      expect(errorUpperCfg.color).toBe('var(--color-status-unknown)');
+      expect(errorUpperCfg.label).toBe('UNKNOWN (ERROR)');
+
+      const criticalCfg = getNotificationLevelConfig('critical' as any);
+      expect(criticalCfg.color).toBe('var(--color-status-unknown)');
+      expect(criticalCfg.label).toBe('UNKNOWN (critical)');
+
+      const debugCfg = getNotificationLevelConfig('debug' as any);
+      expect(debugCfg.color).toBe('var(--color-status-unknown)');
+      expect(debugCfg.label).toBe('UNKNOWN (debug)');
 
       const nullCfg = getNotificationLevelConfig(null as any);
       expect(nullCfg.color).toBe('var(--color-status-unknown)');
@@ -5740,7 +5827,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       for (const pk of protoKeys) {
         const protoCfg = getNotificationLevelConfig(pk as any);
         expect(protoCfg.color, `Prototype key ${pk} must fall back to var(--color-status-unknown)`).toBe('var(--color-status-unknown)');
-        expect(protoCfg.label).toBe(pk.toUpperCase());
+        expect(protoCfg.label).toBe(`UNKNOWN (${pk})`);
       }
 
       // Close notification drawer
@@ -5791,8 +5878,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
   });
 
 
-  // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView & NaturalLanguageRunView
-  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, and NaturalLanguageRunView style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
+  // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView & DesktopShell
+  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, and DesktopShell style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
     interface Branch {
       cond: string;
       token: string;
@@ -5983,7 +6070,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
                 const name = p.name.getText(sf);
                 if (name === 'backgroundColor' || name === 'background') bgNode = p.initializer;
                 if (name === 'color') fgNode = p.initializer;
-                if (name === 'border' || name === 'borderColor' || name === 'borderBottom' || name === 'borderLeft') borderNode = p.initializer;
+                if (name === 'border' || name === 'borderColor' || name === 'borderBottom' || name === 'borderLeft' || name === 'borderTop') borderNode = p.initializer;
                 if (name === 'opacity') opacityNode = p.initializer;
                 if (name === 'outline') {
                   let initExpr = p.initializer;
@@ -6191,8 +6278,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(desktopShellStats.checkedPairs, 'Evaluated pairs in DesktopShell must be exactly 22').toBe(22);
     expect(desktopShellStats.unboundColorObjects, 'Unbound color objects in DesktopShell must be exactly 14').toBe(14);
     expect(desktopShellStats.coveredColorObjects, 'Total covered color objects in DesktopShell must be exactly 22').toBe(22);
-    expect(desktopShellStats.checkedBorderObjects, 'Border objects in DesktopShell must be exactly 13').toBe(13);
-    expect(desktopShellStats.checkedBorderPairs, 'Border pairs in DesktopShell must be exactly 14').toBe(14);
+    expect(desktopShellStats.checkedBorderObjects, 'Border objects in DesktopShell must be exactly 14').toBe(14);
+    expect(desktopShellStats.checkedBorderPairs, 'Border pairs in DesktopShell must be exactly 15').toBe(15);
     expect(desktopShellStats.violations, `DesktopShell violations:\n${desktopShellStats.violations.join('\n')}`).toEqual([]);
   });
 

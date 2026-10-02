@@ -3,7 +3,7 @@
 tools/reproduce_c230_contrast.py
 
 Card 230: Desktop Shell screen (DesktopShell.tsx) WCAG 2.2 AA Contrast Audit.
-Evaluates 33 representative UI elements across the Desktop Shell (Top Menu Bar,
+Evaluates 34 representative UI elements across the Desktop Shell (Top Menu Bar,
 Start Menu Dropdown, Notification Center Drawer, Surface Shortcuts, and Bottom Floating Dock)
 in both Light and Dark themes using tokens dynamically parsed from apps/web/src/index.css.
 

@@ -155,8 +155,8 @@ MUTANTS = [
     {
         'id': 'Y16',
         'name': 'DesktopShell: unknown fallback border with comment decoy literal',
-        'target': "    border: 'var(--color-status-unknown)',\n    label: (level || 'UNKNOWN').toUpperCase(),",
-        'replacement': "    border: 'var(--color-status-unknown) /* #8b949e */',\n    label: (level || 'UNKNOWN').toUpperCase(),",
+        'target': "    border: 'var(--color-status-unknown)',\n    label: level ? `UNKNOWN (${level})` : 'UNKNOWN',",
+        'replacement': "    border: 'var(--color-status-unknown) /* #8b949e */',\n    label: level ? `UNKNOWN (${level})` : 'UNKNOWN',",
         'expected_guard': 'Test 9n (strict token equality)',
     },
 
@@ -277,7 +277,7 @@ MUTANTS = [
     {
         'id': 'Y32',
         'name': 'DesktopShell: getNotificationLevelConfig unknown fallback returns info config',
-        'target': "  return {\n    color: 'var(--color-status-unknown)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-status-unknown)',\n    label: (level || 'UNKNOWN').toUpperCase(),\n  };",
+        'target': "  return {\n    color: 'var(--color-status-unknown)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-status-unknown)',\n    label: level ? `UNKNOWN (${level})` : 'UNKNOWN',\n  };",
         'replacement': "  return NOTIFICATION_LEVEL_CONFIG.info;",
         'expected_guard': 'Test 9n (unknown fallback assertion)',
     },
@@ -299,10 +299,10 @@ MUTANTS = [
     },
     {
         'id': 'Y35',
-        'name': 'DesktopShell: contract level (error) removed from NOTIFICATION_LEVEL_CONFIG',
-        'target': "  error: {\n    color: 'var(--color-status-offline)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-status-offline)',\n    label: 'ERROR',\n  },\n} as const satisfies Record<NotificationLevelKey, NotificationLevelStyle>;",
-        'replacement': "} as const satisfies Partial<Record<NotificationLevelKey, NotificationLevelStyle>>;",
-        'expected_guard': 'Test 9n (key set equality & error fallback assertion)',
+        'name': 'DesktopShell: contract level (error) bypassed in getNotificationLevelConfig (treated as unknown)',
+        'target': "export function getNotificationLevelConfig(level?: string | null): NotificationLevelStyle {\n  if (level && Object.hasOwn(NOTIFICATION_LEVEL_CONFIG, level)) {",
+        'replacement': "export function getNotificationLevelConfig(level?: string | null): NotificationLevelStyle {\n  if (level && level !== 'error' && Object.hasOwn(NOTIFICATION_LEVEL_CONFIG, level)) {",
+        'expected_guard': 'Test 9n (ERROR badge exact token and label)',
     },
 
     # 12. Named colors injection
