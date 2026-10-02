@@ -443,7 +443,7 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
             padding: '16px',
             backgroundColor: 'var(--color-bg-surface)',
             borderRadius: '8px',
-            border: '1px solid var(--color-bg-surface)',
+            border: '1px solid var(--color-border-subtle)',
             display: 'flex',
             flexDirection: 'column',
             gap: '8px',
