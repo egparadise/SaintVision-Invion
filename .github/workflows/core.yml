@@ -14,6 +14,11 @@ on:
         description: 'Opaque id for a tool to bind this exact run; leave empty for a normal manual run'
         required: false
         default: ''
+      run_s08_acceptance:
+        description: 'Derive strict S08 fixed-SHA acceptance evidence from this exact Core run'
+        required: false
+        type: boolean
+        default: false
   push:
     branches:
       - main
@@ -329,6 +334,38 @@ jobs:
           }, f'docker-host case set drifted: {host_cases}'
           assert not any(host.findall('.//' + tag) for tag in ('failure', 'error', 'skipped')), 'Docker host lane must run and pass'
           PY
+      - name: Collect fixed-SHA S08 build acceptance observations
+        if: github.event_name == 'workflow_dispatch' && inputs.run_s08_acceptance
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -z "$(git status --porcelain)"
+          tree_sha="$(git rev-parse 'HEAD^{tree}')"
+          python tools/collect_s08_build_acceptance_evidence.py collect \
+            --junit dist/core-tests.xml \
+            --junit dist/build-product-runtime-real-pg.xml \
+            --worker-config tools/specs/s08-build-acceptance-worker-v1.json \
+            --expected-source-sha "$GITHUB_SHA" \
+            --checkout-tree-sha "$tree_sha" \
+            --clean-checkout \
+            --run-id "$GITHUB_RUN_ID" \
+            --run-attempt "$GITHUB_RUN_ATTEMPT" \
+            --output dist/s08-build-acceptance-evidence.json
+      - name: Recompute S08 build acceptance verdict from raw artifacts
+        if: github.event_name == 'workflow_dispatch' && inputs.run_s08_acceptance
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -z "$(git status --porcelain)"
+          tree_sha="$(git rev-parse 'HEAD^{tree}')"
+          python tools/collect_s08_build_acceptance_evidence.py evaluate \
+            --junit dist/core-tests.xml \
+            --junit dist/build-product-runtime-real-pg.xml \
+            --worker-config tools/specs/s08-build-acceptance-worker-v1.json \
+            --expected-source-sha "$GITHUB_SHA" \
+            --checkout-tree-sha "$tree_sha" \
+            --run-id "$GITHUB_RUN_ID" \
+            --run-attempt "$GITHUB_RUN_ATTEMPT" \
+            --evidence dist/s08-build-acceptance-evidence.json \
+            --output dist/s08-build-acceptance-evaluation.json
       - run: python -m build services/control-plane --outdir dist
       - run: go test ./...
         working-directory: packages/contracts-go

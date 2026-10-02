@@ -1,0 +1,9 @@
+{
+  "builderAuthority": "measured-fixture",
+  "database": "postgresql-16",
+  "externalBuilderRequired": false,
+  "nodeRuntime": "repository-built-linux-amd64",
+  "productFlagCoverage": "enabled-and-disabled",
+  "schemaVersion": "s08-build-acceptance-worker:1",
+  "secretsIncluded": false
+}
