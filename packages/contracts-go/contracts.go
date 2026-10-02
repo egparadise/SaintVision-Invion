@@ -240,6 +240,34 @@ type BuildPhysicalCleanupReceipt struct {
     VerifiedAt Timestamp `json:"verifiedAt"`
 }
 
+type BuildQuarantineRequest struct {
+    SchemaVersion string `json:"schemaVersion"`
+    RequestId string `json:"requestId"`
+    TenantId TenantId `json:"tenantId"`
+    NodeId NodeId `json:"nodeId"`
+    RecoveryEpoch string `json:"recoveryEpoch"`
+    Scope string `json:"scope"`
+    BuildSessionId *string `json:"buildSessionId"`
+    ReasonCode string `json:"reasonCode"`
+    RequestedAt Timestamp `json:"requestedAt"`
+}
+
+type BuildQuarantineReceipt struct {
+    SchemaVersion string `json:"schemaVersion"`
+    WriterKind string `json:"writerKind"`
+    RequestId string `json:"requestId"`
+    TenantId TenantId `json:"tenantId"`
+    NodeId NodeId `json:"nodeId"`
+    RecoveryEpoch string `json:"recoveryEpoch"`
+    Scope string `json:"scope"`
+    BuildSessionId *string `json:"buildSessionId"`
+    ReasonCode string `json:"reasonCode"`
+    RequestedAt Timestamp `json:"requestedAt"`
+    RecordedAt Timestamp `json:"recordedAt"`
+    Durable bool `json:"durable"`
+    Replayed bool `json:"replayed"`
+}
+
 type BuildCleanupReceipt struct {
     LeaseReleased bool `json:"leaseReleased"`
     BuilderClaimReleased bool `json:"builderClaimReleased"`

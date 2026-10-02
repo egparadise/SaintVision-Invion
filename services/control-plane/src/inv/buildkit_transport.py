@@ -25,7 +25,9 @@ import re
 import stat
 import subprocess
 import tarfile
+from threading import Lock
 from typing import Mapping, Protocol, Sequence
+from uuid import UUID, uuid4
 
 from .build_governance import BuildProviderObservation
 from .contracts import validate_contract
@@ -35,6 +37,7 @@ from .policy import action_digest
 
 TRANSPORT_ENABLE_SETTING = "INV_BUILDKIT_REFERENCE_ENABLED"
 _SESSION_ID = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
+_QUARANTINE_REASON = re.compile(r"^[A-Z]+-[0-9]{4}$")
 _HEX_40 = re.compile(r"[0-9a-f]{40}")
 _HEX_64 = re.compile(r"[0-9a-f]{64}")
 _IMAGE_DIGEST = re.compile(r"sha256:[0-9a-f]{64}")
@@ -795,15 +798,35 @@ PRODUCT_CLEANUP_RECEIPT_PREFIX = "cleanup-"
 
 
 class NodeAgentReceipts:
-    """Read-only collector for the two node-agent receipts on this host.
+    """Collector plus an optional authenticated node-agent quarantine channel.
 
-    It deliberately has no write path and no network call: the node agent writes, the
-    control plane reads.  A collector that could also produce a receipt would make the
-    freshness of one the opinion of the other.
+    Health and cleanup remain read-only files authored by the node agent. Quarantine is
+    a separate mTLS call whose response is accepted only after the node agent has fsynced
+    its journal. The capability stays false unless both a client and its pinned channel
+    proof are supplied.
     """
 
-    def __init__(self, directory: Path):
+    def __init__(
+        self,
+        directory: Path,
+        *,
+        quarantine_client=None,
+        quarantine_channel=None,
+        request_id_factory=uuid4,
+        clock=lambda: datetime.now(timezone.utc),
+    ):
         self._directory = Path(directory)
+        if (quarantine_client is None) != (quarantine_channel is None):
+            raise DomainError(
+                "VERIFY-0022", "Node quarantine channel configuration is incomplete", 409
+            )
+        self._quarantine_client = quarantine_client
+        self._quarantine_channel = quarantine_channel
+        self._request_id_factory = request_id_factory
+        self._clock = clock
+        self._quarantine_requests: dict[tuple[str, str | None, str], dict] = {}
+        self._quarantine_lock = Lock()
+        self.records_durable_quarantine = quarantine_client is not None
 
     def collect_product_health(self) -> dict:
         receipt = _protected_json(self._directory / PRODUCT_HEALTH_RECEIPT)
@@ -833,22 +856,75 @@ class NodeAgentReceipts:
             )
         return daemon
 
-    #: Neither method below writes anything durable, so this collector declares the
-    #: capability absent and the product caller refuses a dispatch it could not reconcile
-    #: (#312 N2).  Whoever connects the write channel flips this and has to show a durable
-    #: quarantine receipt for it.
+    #: Default remains fail closed for code which inspects the class rather than a fully
+    #: configured instance. A real instance shadows it only after both mTLS components exist.
     records_durable_quarantine = False
 
-    def cancel_and_quarantine_session(self, build_session_id: str, reason_code: str) -> None:
-        raise DomainError(
-            "VERIFY-0022",
-            "Node agent session cancellation is not connected",
-            409,
+    @staticmethod
+    def _canonical_uuid(value: str, field: str) -> str:
+        try:
+            canonical = str(UUID(value))
+        except (ValueError, TypeError, AttributeError):
+            raise DomainError("VERIFY-0022", f"Invalid {field} for Node quarantine", 409) from None
+        if value != canonical:
+            raise DomainError("VERIFY-0022", f"Non-canonical {field} for Node quarantine", 409)
+        return canonical
+
+    def _record_quarantine(
+        self, *, scope: str, build_session_id: str | None, reason_code: str
+    ) -> dict:
+        if not self.records_durable_quarantine:
+            raise DomainError(
+                "VERIFY-0022", "Node agent quarantine is not connected", 409
+            )
+        if not isinstance(reason_code, str) or not _QUARANTINE_REASON.fullmatch(reason_code):
+            raise DomainError("VERIFY-0022", "Invalid Node quarantine reason", 409)
+        channel = self._quarantine_channel
+        key = (scope, build_session_id, reason_code)
+        with self._quarantine_lock:
+            request = self._quarantine_requests.get(key)
+            if request is None:
+                request = {
+                    "schemaVersion": "build-quarantine-request:1",
+                    "requestId": str(self._request_id_factory()),
+                    "tenantId": channel.tenant_id,
+                    "nodeId": channel.node_id,
+                    "recoveryEpoch": self._canonical_uuid(channel.recovery_epoch, "recovery epoch"),
+                    "scope": scope,
+                    "buildSessionId": build_session_id,
+                    "reasonCode": reason_code,
+                    "requestedAt": self._clock()
+                    .astimezone(timezone.utc)
+                    .isoformat()
+                    .replace("+00:00", "Z"),
+                }
+                # Retain before I/O: an uncertain response is retried under the same
+                # idempotency key and requestedAt, never as a second quarantine event.
+                self._quarantine_requests[key] = request
+            request = dict(request)
+        validate_contract("BuildQuarantineRequest", request)
+        receipt = self._quarantine_client.quarantine(channel, request)
+        validate_contract("BuildQuarantineReceipt", receipt)
+        for key, value in request.items():
+            if key == "schemaVersion":
+                continue
+            if receipt.get(key) != value:
+                raise DomainError(
+                    "VERIFY-0022", "Node quarantine receipt differs from its request", 409
+                )
+        if receipt.get("writerKind") != "node-agent" or receipt.get("durable") is not True:
+            raise DomainError("VERIFY-0022", "Node quarantine was not durably recorded", 409)
+        return receipt
+
+    def cancel_and_quarantine_session(self, build_session_id: str, reason_code: str) -> dict:
+        session_id = self._canonical_uuid(build_session_id, "build session ID")
+        return self._record_quarantine(
+            scope="build-session", build_session_id=session_id, reason_code=reason_code
         )
 
-    def quarantine_node(self, node_id: str, reason_code: str) -> None:
-        raise DomainError(
-            "VERIFY-0022",
-            "Node agent quarantine is not connected",
-            409,
+    def quarantine_node(self, node_id: str, reason_code: str) -> dict:
+        if self._quarantine_channel is None or node_id != self._quarantine_channel.node_id:
+            raise DomainError("VERIFY-0022", "Node quarantine identity differs", 409)
+        return self._record_quarantine(
+            scope="node", build_session_id=None, reason_code=reason_code
         )

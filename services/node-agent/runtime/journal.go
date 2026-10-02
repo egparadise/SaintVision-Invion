@@ -87,6 +87,39 @@ func (j *Journal) create(path string, value any) error {
 	}
 	return j.syncDir()
 }
+
+func (j *Journal) createAtomic(path string, value any) error {
+	bytes, err := json.Marshal(value)
+	if err != nil {
+		return err
+	}
+	file, err := os.CreateTemp(j.root, ".quarantine-")
+	if err != nil {
+		return err
+	}
+	name := file.Name()
+	defer os.Remove(name)
+	if err = file.Chmod(0600); err == nil {
+		_, err = file.Write(bytes)
+	}
+	if err == nil {
+		err = file.Sync()
+	}
+	closeErr := file.Close()
+	if err == nil {
+		err = closeErr
+	}
+	if err == nil {
+		err = os.Rename(name, path)
+	}
+	if err == nil {
+		err = j.syncDir()
+	}
+	if err != nil {
+		return errors.New("NODE-0013: atomic journal write failed")
+	}
+	return nil
+}
 func readPrivate(path string, value any) error {
 	info, err := os.Lstat(path)
 	if err != nil {
@@ -197,6 +230,57 @@ func (j *Journal) begin(p Permit, name string, neverStarted bool) (*Record, erro
 }
 func (j *Journal) Save(receipt contracts.NodeStopReceipt) error {
 	return j.create(filepath.Join(j.root, string(receipt.CommandId)+".receipt"), receipt)
+}
+
+// RecordQuarantine creates the node-agent-authored durable reconciliation record.
+// A request ID is an idempotency key: an exact replay receives the original
+// receipt, while reuse with different content is rejected without replacing it.
+func (j *Journal) RecordQuarantine(request contracts.BuildQuarantineRequest, recordedAt contracts.Timestamp) (contracts.BuildQuarantineReceipt, bool, error) {
+	path := filepath.Join(j.root, request.RequestId+".build-quarantine")
+	var prior contracts.BuildQuarantineReceipt
+	err := readPrivate(path, &prior)
+	if err == nil {
+		raw, _ := json.Marshal(prior)
+		if wire.Validate("BuildQuarantineReceipt", raw) != nil ||
+			prior.RequestId != request.RequestId ||
+			prior.TenantId != request.TenantId ||
+			prior.NodeId != request.NodeId ||
+			prior.RecoveryEpoch != request.RecoveryEpoch ||
+			prior.Scope != request.Scope ||
+			!reflect.DeepEqual(prior.BuildSessionId, request.BuildSessionId) ||
+			prior.ReasonCode != request.ReasonCode ||
+			prior.RequestedAt != request.RequestedAt {
+			return contracts.BuildQuarantineReceipt{}, false, errors.New("NODE-0015: quarantine request content differs")
+		}
+		prior.Replayed = true
+		return prior, true, nil
+	}
+	if !os.IsNotExist(err) {
+		return contracts.BuildQuarantineReceipt{}, false, err
+	}
+	receipt := contracts.BuildQuarantineReceipt{
+		SchemaVersion:  "build-quarantine-receipt:1",
+		WriterKind:     "node-agent",
+		RequestId:      request.RequestId,
+		TenantId:       request.TenantId,
+		NodeId:         request.NodeId,
+		RecoveryEpoch:  request.RecoveryEpoch,
+		Scope:          request.Scope,
+		BuildSessionId: request.BuildSessionId,
+		ReasonCode:     request.ReasonCode,
+		RequestedAt:    request.RequestedAt,
+		RecordedAt:     recordedAt,
+		Durable:        true,
+		Replayed:       false,
+	}
+	raw, _ := json.Marshal(receipt)
+	if wire.Validate("BuildQuarantineReceipt", raw) != nil {
+		return contracts.BuildQuarantineReceipt{}, false, errors.New("NODE-0013: invalid quarantine receipt")
+	}
+	if err := j.createAtomic(path, receipt); err != nil {
+		return contracts.BuildQuarantineReceipt{}, false, errors.New("NODE-0013: quarantine receipt persistence failed")
+	}
+	return receipt, false, nil
 }
 
 // A stopped-container candidate is durable before removal. It is not exposed as

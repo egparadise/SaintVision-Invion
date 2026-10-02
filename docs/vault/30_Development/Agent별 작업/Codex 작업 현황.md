@@ -1,15 +1,25 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.267"
+version: "1.0.268"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T09:45:53+09:00"
+updated: "2026-10-02T11:49:10+09:00"
 source_of_truth: "Git"
-active_card: "CARD-211 VF-CL CI receipt attestation"
-active_card_status: "Exact-head producer and attestation dispatch passed; signed receipt remains feature-head evidence"
-active_card_next: "Land with train 16 (#302 repair merged; Backend/Frontend green on repair head 1d6894fe); after landing, the user runs the §12 device manual acceptance per the #300 checklist and imports it with tools/import_ac11_accessibility_evidence.py"
+active_card: "CARD-222 node-agent durable quarantine channel"
+active_card_status: "Contract, node journal/route, and control-plane mTLS seam implemented; hosted Core and Claude review pending"
+active_card_next: "Push PR on train 17 base, run exact-head Core with run-core, then address Claude independent review without claiming recovery completion"
 ---
+
+## 2026-10-02 Card 222 — node-agent durable quarantine channel
+
+- `#312` N2가 드러낸 기록 없는 `VERIFY-0022` quarantine seam을 strict request/receipt 계약,
+  authenticated Node route, private fsync+atomic journal, exact replay로 닫았다.
+- mTLS client와 pinned channel proof가 함께 없으면 capability는 false이며 제품 dispatch는 계속
+  `RES-0006` fail closed다. 같은 requestId의 다른 원인·identity는 덮어쓰지 않는다.
+- receipt는 reconciliation 의무 기록이며 cleanup·lease release·복구 완료 증거가 아니다. S08-BE
+  상태·점수와 물리 builder 인수는 유지한다. [[S08-BE_node-agent_durable_quarantine_channel]] ·
+  [[2026-10-02_11-49-10_KST_Card222_node_agent_durable_quarantine_Codex]].
 
 ## 2026-10-02 Card 211 — VF-CL CI receipt attestation
 

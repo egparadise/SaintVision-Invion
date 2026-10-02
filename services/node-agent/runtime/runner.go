@@ -20,13 +20,14 @@ type Result struct {
 	CleanupPending bool                       `json:"cleanupPending"`
 }
 type Runner struct {
-	config       Config
-	journal      *Journal
-	engine       Engine
-	mutex        sync.Mutex
-	activeMutex  sync.Mutex
-	activeHash   string
-	activeCancel context.CancelFunc
+	config          Config
+	journal         *Journal
+	engine          Engine
+	mutex           sync.Mutex
+	quarantineMutex sync.Mutex
+	activeMutex     sync.Mutex
+	activeHash      string
+	activeCancel    context.CancelFunc
 }
 
 func New(config Config, journal *Journal, engine Engine) *Runner {

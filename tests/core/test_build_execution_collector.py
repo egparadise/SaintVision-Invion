@@ -7,6 +7,9 @@ contract and the implementation do not yet agree on -- see the last test.
 
 import json
 import os
+from datetime import datetime, timezone
+from types import SimpleNamespace
+from uuid import UUID
 
 import pytest
 
@@ -161,3 +164,130 @@ def test_the_uuid_epoch_now_satisfies_the_three_way_agreement():
             lease_epoch=lowercase,
         )
     assert "recovery epoch" in str(refused.value)
+
+
+class _QuarantineClient:
+    def __init__(self, mutate=None):
+        self.requests = []
+        self._mutate = mutate
+
+    def quarantine(self, channel, request):
+        self.requests.append((channel, dict(request)))
+        receipt = {
+            **request,
+            "schemaVersion": "build-quarantine-receipt:1",
+            "writerKind": "node-agent",
+            "recordedAt": "2026-10-02T08:00:01Z",
+            "durable": True,
+            "replayed": False,
+        }
+        if self._mutate:
+            self._mutate(receipt)
+        return receipt
+
+
+class _FailOnceQuarantineClient(_QuarantineClient):
+    def quarantine(self, channel, request):
+        if not self.requests:
+            self.requests.append((channel, dict(request)))
+            raise DomainError("NODE-0030", "synthetic lost acknowledgement", 503)
+        return super().quarantine(channel, request)
+
+
+def _quarantine_boundary(tmp_path, client):
+    channel = SimpleNamespace(
+        tenant_id="123e4567-e89b-12d3-a456-426614174000",
+        node_id=NODE,
+        recovery_epoch="223e4567-e89b-12d3-a456-426614174000",
+    )
+    return NodeAgentReceipts(
+        tmp_path,
+        quarantine_client=client,
+        quarantine_channel=channel,
+        request_id_factory=lambda: UUID("33333333-3333-4333-8333-333333333333"),
+        clock=lambda: datetime(2026, 10, 2, 8, 0, tzinfo=timezone.utc),
+    )
+
+
+def test_quarantine_capability_exists_only_with_a_complete_mtls_channel(tmp_path):
+    assert NodeAgentReceipts(tmp_path).records_durable_quarantine is False
+    channel = SimpleNamespace(
+        tenant_id="123e4567-e89b-12d3-a456-426614174000",
+        node_id=NODE,
+        recovery_epoch="223e4567-e89b-12d3-a456-426614174000",
+    )
+    with pytest.raises(DomainError, match="configuration is incomplete"):
+        NodeAgentReceipts(tmp_path, quarantine_client=_QuarantineClient())
+    with pytest.raises(DomainError, match="configuration is incomplete"):
+        NodeAgentReceipts(tmp_path, quarantine_channel=channel)
+
+
+def test_quarantine_request_and_receipt_are_exactly_bound(tmp_path):
+    client = _QuarantineClient()
+    boundary = _quarantine_boundary(tmp_path, client)
+    assert boundary.records_durable_quarantine is True
+    receipt = boundary.cancel_and_quarantine_session(
+        "44444444-4444-4444-8444-444444444444", "VERIFY-0022"
+    )
+    request = client.requests[0][1]
+    assert request == {
+        "schemaVersion": "build-quarantine-request:1",
+        "requestId": "33333333-3333-4333-8333-333333333333",
+        "tenantId": "123e4567-e89b-12d3-a456-426614174000",
+        "nodeId": NODE,
+        "recoveryEpoch": "223e4567-e89b-12d3-a456-426614174000",
+        "scope": "build-session",
+        "buildSessionId": "44444444-4444-4444-8444-444444444444",
+        "reasonCode": "VERIFY-0022",
+        "requestedAt": "2026-10-02T08:00:00Z",
+    }
+    assert receipt["durable"] is True
+
+    boundary.cancel_and_quarantine_session(
+        "44444444-4444-4444-8444-444444444444", "VERIFY-0022"
+    )
+    assert client.requests[1][1] == request
+
+
+def test_quarantine_retry_after_an_uncertain_response_reuses_the_exact_request(tmp_path):
+    client = _FailOnceQuarantineClient()
+    boundary = _quarantine_boundary(tmp_path, client)
+    with pytest.raises(DomainError, match="lost acknowledgement"):
+        boundary.quarantine_node(NODE, "RES-0006")
+    receipt = boundary.quarantine_node(NODE, "RES-0006")
+    assert client.requests[0][1] == client.requests[1][1]
+    assert receipt["requestId"] == "33333333-3333-4333-8333-333333333333"
+
+
+@pytest.mark.parametrize(
+    "mutate",
+    [
+        lambda receipt: receipt.__setitem__("nodeId", "nod_11111111111111111111111111"),
+        lambda receipt: receipt.__setitem__("reasonCode", "VERIFY-0022"),
+        lambda receipt: receipt.__setitem__("durable", False),
+        lambda receipt: receipt.__setitem__("writerKind", "control-plane"),
+    ],
+    ids=["node", "reason", "not-durable", "writer"],
+)
+def test_quarantine_rejects_an_unbound_or_non_durable_receipt(tmp_path, mutate):
+    boundary = _quarantine_boundary(tmp_path, _QuarantineClient(mutate))
+    with pytest.raises(DomainError):
+        boundary.quarantine_node(NODE, "RES-0006")
+
+
+@pytest.mark.parametrize(
+    ("node_id", "session_id", "reason"),
+    [
+        ("nod_11111111111111111111111111", None, "RES-0006"),
+        (NODE, "NOT-A-UUID", "RES-0006"),
+        (NODE, None, "bad"),
+    ],
+)
+def test_quarantine_rejects_invalid_authority_inputs(tmp_path, node_id, session_id, reason):
+    boundary = _quarantine_boundary(tmp_path, _QuarantineClient())
+    with pytest.raises(DomainError) as refused:
+        if session_id is None:
+            boundary.quarantine_node(node_id, reason)
+        else:
+            boundary.cancel_and_quarantine_session(session_id, reason)
+    assert refused.value.code == "VERIFY-0022"

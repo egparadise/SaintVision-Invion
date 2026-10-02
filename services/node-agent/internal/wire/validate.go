@@ -31,7 +31,7 @@ func initialize() {
 		return
 	}
 	schemas = make(map[string]*js.Schema)
-	for _, name := range []string{"SignedNodePermit", "NodeExecutionPermit", "NodeStopReceipt", "NodeExecutionResult", "NodePeerPolicy", "NodeProbeInput", "NodeProbeResult", "NodeResourceSnapshot", "NodeChunkInput", "NodeChunkResult", "WorkspaceSnapshot", "CommandId", "TerminalSpec", "TerminalFrameInput", "NodeTerminalInput", "NodeTerminalResult", "NodeStorageChallenge", "NodeStorageSampleInput", "NodeStorageSignedSample", "NodeStorageRootConfig", "ModelExecutionManifestObservation"} {
+	for _, name := range []string{"SignedNodePermit", "NodeExecutionPermit", "NodeStopReceipt", "NodeExecutionResult", "NodePeerPolicy", "NodeProbeInput", "NodeProbeResult", "NodeResourceSnapshot", "NodeChunkInput", "NodeChunkResult", "WorkspaceSnapshot", "CommandId", "TerminalSpec", "TerminalFrameInput", "NodeTerminalInput", "NodeTerminalResult", "NodeStorageChallenge", "NodeStorageSampleInput", "NodeStorageSignedSample", "NodeStorageRootConfig", "ModelExecutionManifestObservation", "BuildQuarantineRequest", "BuildQuarantineReceipt"} {
 		schemas[name], initErr = compiler.Compile(schemaURL + "#/$defs/" + name)
 		if initErr != nil {
 			return
