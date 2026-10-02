@@ -326,6 +326,69 @@ def test_claim_skips_owner_tampered_digest_and_insert_rejects_poison_binding(env
             )
 
 
+def test_digest_prescan_quarantines_a_later_corrupt_row_before_claiming_healthy(env):
+    """The set-based pre-scan must not be replaceable by candidate-only validation."""
+
+    queue, healthy = enqueue(env)
+    _other_queue, corrupt = enqueue(env)
+    with psycopg.connect(env.owner) as conn:
+        conn.execute("SET LOCAL session_replication_role=replica")
+        conn.execute(
+            """UPDATE inv.build_execution_intents
+            SET created_at=clock_timestamp() - interval '2 minutes'
+            WHERE run_id=%s""",
+            (healthy.run_id,),
+        )
+        conn.execute(
+            """UPDATE inv.build_execution_intents
+            SET created_at=clock_timestamp() - interval '1 minute',
+                request=request || '{"targetStage":"tampered-after-healthy"}'::jsonb
+            WHERE run_id=%s""",
+            (corrupt.run_id,),
+        )
+
+    claimed = queue.claim_next(env.tenant)
+    assert claimed is not None and claimed.run_id == healthy.run_id
+    with psycopg.connect(env.owner) as conn:
+        corrupt_state = conn.execute(
+            """SELECT status,last_error_code FROM inv.build_execution_intents
+            WHERE run_id=%s""",
+            (corrupt.run_id,),
+        ).fetchone()
+    assert corrupt_state == ("quarantined", "VERIFY-0002")
+
+
+def test_quarantined_intent_cannot_transition_back_to_pending(env):
+    """A terminal poison row must never re-enter the dispatch queue."""
+
+    _queue, intent = enqueue(env)
+    with psycopg.connect(env.owner) as conn:
+        conn.execute(
+            """UPDATE inv.build_execution_intents
+            SET status='quarantined',last_error_code='VERIFY-0002'
+            WHERE run_id=%s""",
+            (intent.run_id,),
+        )
+
+    with psycopg.connect(env.owner) as conn:
+        with pytest.raises(psycopg.errors.CheckViolation):
+            conn.execute(
+                """UPDATE inv.build_execution_intents
+                SET status='pending',last_error_code='RES-0006'
+                WHERE run_id=%s""",
+                (intent.run_id,),
+            )
+        conn.rollback()
+
+    with psycopg.connect(env.owner) as conn:
+        state = conn.execute(
+            """SELECT status,last_error_code FROM inv.build_execution_intents
+            WHERE run_id=%s""",
+            (intent.run_id,),
+        ).fetchone()
+    assert state == ("quarantined", "VERIFY-0002")
+
+
 def test_claimed_intent_requeues_only_before_the_dispatch_decision_is_consumed(env):
     queue, _intent = enqueue(env)
     claimed = queue.claim_next(env.tenant)

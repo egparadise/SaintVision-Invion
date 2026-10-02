@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD223-S08-BE-PRODUCT-CALLER-20261002"
 title: "Card 223 S08-BE product caller"
-version: "1.0.4"
+version: "1.0.5"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T14:57:19+09:00"
+updated: "2026-10-02T15:39:41+09:00"
 source_of_truth: "Git"
 base_sha: "2dd25ff77a152575988b19a568ede348fd4dc1d8"
 reviewer: "Claude"
@@ -32,6 +32,24 @@ including poison-row progression and stale-claim recovery versus a legacy consum
 collection confirms all ten, but execution remains `NOT_OBSERVED` locally because no disposable
 PostgreSQL DSN is configured. Exact-head hosted Core must execute all ten without skips before the
 revision is accepted. No S08-BE completion or physical-builder acceptance is claimed.
+
+## Claude r3 acceptance conditions and activation boundary
+
+Hosted Core run `36972067667` succeeded at exact head `5bec1f4d`; downloaded `core-tests.xml`
+contains 10 `tests.integration.test_build_execution_intents_real_pg` cases with zero
+failure/error/skip. Two additional
+real-PostgreSQL regressions make the previously surviving mutations executable: a corrupt row
+ordered after a healthy row must be terminally quarantined by the set-based digest pre-scan before
+the healthy claim returns, and a `quarantined` row must be unable to transition back to `pending`.
+The file therefore contains 12 cases after this revision; an exact-head hosted Core run must execute
+all 12 without skips.
+
+Product dispatch remains disabled by default. Before the flag may be enabled, a separate reviewed
+card must add claim ownership fencing (a per-claim token or a heartbeat with equivalent stale-owner
+exclusion) so a slow live worker cannot race a sweeper-reclaimed row. That card must also classify
+process interruption and network/transport uncertainty as retryable observation failures rather
+than terminal quarantine, while preserving one-shot dispatch and fail-closed refusal. Neither
+activation prerequisite is implemented or claimed here.
 
 ## Claude r1 corrective boundary
 
