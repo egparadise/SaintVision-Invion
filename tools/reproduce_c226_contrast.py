@@ -81,7 +81,7 @@ def main() -> int:
         ("query header desc / canvas", "#64748b", BASE_BG_ROOT, "--color-text-muted", "--color-bg-canvas", 4.5),
         ("query form label / surface", "#cbd5e1", BASE_BG_PANEL, "--color-text-secondary", "--color-bg-surface", 4.5),
         ("query form input text / subtle", "#f8fafc", BASE_BG_INPUT, "--color-text-primary", "--color-bg-subtle", 4.5),
-        ("query button text / brand-primary", "#ffffff", "#3b82f6", "--color-text-inverse", "--color-brand-primary", 4.5),
+        ("query button text / brand-primary-bg", "#ffffff", "#3b82f6", "--color-brand-primary-fg", "--color-brand-primary-bg", 4.5),
         ("query status loading / canvas", "#93c5fd", BASE_BG_ROOT, "--color-brand-hover", "--color-bg-canvas", 4.5),
         ("query status error / canvas", "#f87171", BASE_BG_ROOT, "--color-status-offline", "--color-bg-canvas", 4.5),
         ("manifest committed at / surface", "#94a3b8", BASE_BG_PANEL, "--color-text-secondary", "--color-bg-surface", 4.5),

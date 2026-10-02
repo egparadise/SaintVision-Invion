@@ -3,7 +3,7 @@
 tools/test_c226_mutations.py
 
 Card 226 (ACC-09) Model Studio screen (ModelStudioView.tsx) Mutation Testing Suite.
-Verifies that 17 distinct regressions/mutations (M1-M17) across
+Verifies that 23 distinct regressions/mutations (M1-M23) across
 color contrast, border collisions, status semantics, testid binding,
 fail-closed unknown handling, and token inventory are strictly caught and killed
 by the test suite (ACC-09 Test 9l, Test 9j-2, and Test 10).
@@ -69,8 +69,8 @@ MUTANTS = [
     {
         'id': 'M5 (B1)',
         'name': 'ModelStudioView: query-model-btn outline ring suppressed with outline: none',
-        'target': "            padding: '6px 14px',\n            backgroundColor: 'var(--color-brand-primary)',",
-        'replacement': "            outline: 'none',\n            padding: '6px 14px',\n            backgroundColor: 'var(--color-brand-primary)',",
+        'target': "            padding: '6px 14px',\n            backgroundColor: 'var(--color-brand-primary-bg)',",
+        'replacement': "            outline: 'none',\n            padding: '6px 14px',\n            backgroundColor: 'var(--color-brand-primary-bg)',",
         'expected_guard': 'Test 9l (focus ring suppression assertion)',
     },
     {
@@ -146,7 +146,7 @@ MUTANTS = [
     {
         'id': 'M16 (H2)',
         'name': 'ModelStudioView: query-model-btn inject named color lightgray',
-        'target': "            color: 'var(--color-text-inverse)',\n            border: 'none',",
+        'target': "            color: 'var(--color-brand-primary-fg)',\n            border: 'none',",
         'replacement': "            color: 'lightgray',\n            border: 'none',",
         'expected_guard': 'Test 9j-2 (named color literal violation) & Test 10',
     },
@@ -156,6 +156,48 @@ MUTANTS = [
         'target': "export function getReplicaStatusConfig(status?: string | null) {\n  if (status && Object.hasOwn(REPLICA_STATUS_CONFIG, status)) {",
         'replacement': "export function getReplicaStatusConfig(status?: string | null) {\n  if (status && status in REPLICA_STATUS_CONFIG) {",
         'expected_guard': 'Test 9l (prototype key fail-closed own-key defense assertion)',
+    },
+    {
+        'id': 'M18 (Claude Low)',
+        'name': 'ModelStudioView: query-model-btn outline ring suppressed with outline: 0',
+        'target': "            padding: '6px 14px',\n            backgroundColor: 'var(--color-brand-primary-bg)',",
+        'replacement': "            outline: '0',\n            padding: '6px 14px',\n            backgroundColor: 'var(--color-brand-primary-bg)',",
+        'expected_guard': 'Test 9l (computed outline-width 0 assertion)',
+    },
+    {
+        'id': 'M19 (M1 fail-open)',
+        'name': 'ModelStudioView: getModelAvailabilityConfig fail-open fallback returns observed',
+        'target': "  return {\n    color: 'var(--color-status-unknown)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-status-unknown)',\n    label: `알 수 없음 (${availability || 'UNKNOWN'}) · 실행 재검증 필요 (requiresExecutionRevalidation: true)`,\n  };",
+        'replacement': "  return MODEL_AVAILABILITY_CONFIG.observed;",
+        'expected_guard': 'Test 9l (availability unknown fallback fail-closed assertion)',
+    },
+    {
+        'id': 'M20 (M1 own-key)',
+        'name': 'ModelStudioView: getModelAvailabilityConfig uses availability in MODEL_AVAILABILITY_CONFIG bypassing prototype keys',
+        'target': "export function getModelAvailabilityConfig(availability?: string | null) {\n  if (availability && Object.hasOwn(MODEL_AVAILABILITY_CONFIG, availability)) {",
+        'replacement': "export function getModelAvailabilityConfig(availability?: string | null) {\n  if (availability && availability in MODEL_AVAILABILITY_CONFIG) {",
+        'expected_guard': 'Test 9l (availability prototype key defense assertion)',
+    },
+    {
+        'id': 'M21 (H2 repairing collapse)',
+        'name': 'ModelStudioView: replica repairing color collapsed to status-online (healthy collision)',
+        'target': "  repairing: {\n    color: 'var(--color-status-degraded)',",
+        'replacement': "  repairing: {\n    color: 'var(--color-status-online)',",
+        'expected_guard': 'Test 9l (replica repairing uniqueness assertion)',
+    },
+    {
+        'id': 'M22 (H2 missing collapse)',
+        'name': 'ModelStudioView: replica missing color collapsed to status-online (healthy collision)',
+        'target': "  missing: {\n    color: 'var(--color-status-offline)',",
+        'replacement': "  missing: {\n    color: 'var(--color-status-online)',",
+        'expected_guard': 'Test 9l (replica missing uniqueness assertion)',
+    },
+    {
+        'id': 'M23 (L1 repair outline)',
+        'name': 'ModelStudioView: shard repair button outline ring suppressed with outline: none',
+        'target': "                          canRepair ? (\n                            <button",
+        'replacement': "                          canRepair ? (\n                            <button style={{ outline: 'none' }}",
+        'expected_guard': 'Test 9l (repair button focus ring assertion)',
     },
 ]
 
@@ -182,7 +224,7 @@ def run_test_suite():
 
 def main():
     print('=' * 80)
-    print(' Card 226 (ACC-09): Reproducible Mutant Test Suite (17 Mutants: M1-M17)')
+    print(' Card 226 (ACC-09): Reproducible Mutant Test Suite (23 Mutants: M1-M23)')
     print(' Target: ModelStudioView.tsx')
     print('=' * 80)
 

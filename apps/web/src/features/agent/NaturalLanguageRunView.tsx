@@ -505,7 +505,6 @@ export const NaturalLanguageRunView: React.FC = () => {
                     padding: '2px 8px',
                     borderRadius: '4px',
                     fontSize: '11px',
-                    opacity: 0.4,
                     fontWeight: 700,
                     backgroundColor: statusCfg.bg,
                     border: `1px solid ${statusCfg.border}`,
