@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import ast
+import functools
 import hashlib
 import json
 import math
@@ -674,173 +675,378 @@ RLS_IDENTITY_METHOD_KEYS = {
     "unverifiable": frozenset({"method", "reason"}),
 }
 RLS_GROUND_TRUTH_KEYS = frozenset({"total", "tenant_a", "other_tenants"})
+#: The report's own top-level keys, measured from the producer's output.  An extra key is a
+#: refusal: it is either a field this evaluator does not understand or a field someone added to
+#: carry a claim nothing checks (#322 r2 F-R6).
+RLS_REPORT_KEYS = frozenset({
+    "threatId", "sourceRunId", "sourceHeadSha", "checkoutTreeSha", "cleanCheckout",
+    "reportAvailable", "runPurpose", "schemaVersion", "startedAt", "finishedAt",
+    "toolFiles", "baselineAccepted", "exitCode", "verdict", "violations", "accepted",
+    "unmeasured", "measuredRoles", "roles", "ground_truth",
+})
+#: Tables that must appear in the measured set, derived from the pinned readable-key scope (the
+#: reviewed allowlist's own tables are anchored separately, because ``baselineAccepted`` has to
+#: match it exactly and every table it names has to be measured).  An independent anchor against
+#: a report that simply measures fewer tables -- see ``rls_report_shape`` for what that does and
+#: does not close.
+RLS_ANCHOR_TABLES = frozenset(table for _role, table, _columns in OWNER_VERIFIED_KEY_SCOPE)
 
 
-def _rls_count_cell(value: Any) -> str | None:
+def _rls_count_cell_schema() -> dict[str, Any]:
     """A measured count or a recorded denial, and nothing else."""
 
-    if not isinstance(value, dict):
-        return "a visibility cell must be an object"
-    keys = set(value)
-    if keys == {"denied"}:
-        return None if isinstance(value["denied"], str) and value["denied"] else "a denial needs its sqlstate"
-    if keys != {"rows"}:
-        return f"a visibility cell carries {sorted(keys)} rather than rows or denied"
-    rows = value["rows"]
-    if not isinstance(rows, int) or isinstance(rows, bool) or rows < 0:
-        return "a row count must be a non-negative integer"
-    return None
+    return {
+        "oneOf": [
+            {
+                "type": "object", "additionalProperties": False,
+                "required": ["rows"],
+                "properties": {"rows": {"type": "integer", "minimum": 0}},
+            },
+            {
+                "type": "object", "additionalProperties": False,
+                "required": ["denied"],
+                "properties": {"denied": {"type": "string", "minLength": 1}},
+            },
+        ]
+    }
 
 
-def _rls_identity_shape(identity: Any) -> str | None:
-    if not isinstance(identity, dict):
-        return "identity must be an object"
-    method = identity.get("method")
-    expected = RLS_IDENTITY_METHOD_KEYS.get(method)
-    if expected is None:
-        return f"identity method {method!r} is not one this evaluator knows"
-    if set(identity) != expected:
-        return f"identity for method {method} carries {sorted(set(identity))}"
-    if method == "unverifiable":
-        return None if str(identity["reason"]).strip() else "an unverifiable identity needs a reason"
-    for side in ("owner_a", "role_a"):
-        value = identity[side]
-        if not isinstance(value, dict) or set(value) != {"rows", "fp"}:
-            return f"identity.{side} must carry exactly rows and fp"
-        if not isinstance(value["rows"], int) or isinstance(value["rows"], bool) or value["rows"] < 0:
-            return f"identity.{side}.rows must be a non-negative integer"
-        if not MD5_RE.fullmatch(str(value["fp"])):
-            return f"identity.{side}.fp is not a digest"
-    if not isinstance(identity["match"], bool):
-        return "identity.match must be a boolean"
-    if method != "ctid" and not (
-        isinstance(identity["columns"], list)
-        and identity["columns"]
-        and all(isinstance(column, str) and column for column in identity["columns"])
-    ):
-        return "identity.columns must be a non-empty list of column names"
-    if method == OWNER_VERIFIED_KEY_METHOD:
-        measured = identity["ownerDistinctness"]
-        if not isinstance(measured, dict) or set(measured) != {"rows", "distinct", "nullRows"}:
-            return "ownerDistinctness must carry exactly rows, distinct and nullRows"
-        for field, value in measured.items():
-            if not isinstance(value, int) or isinstance(value, bool) or value < 0:
-                return f"ownerDistinctness.{field} must be a non-negative integer"
-    return None
+def _rls_identity_schema() -> dict[str, Any]:
+    side = {
+        "type": "object", "additionalProperties": False, "required": ["rows", "fp"],
+        "properties": {
+            "rows": {"type": "integer", "minimum": 0},
+            "fp": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
+        },
+    }
+    columns = {"type": "array", "minItems": 1, "uniqueItems": True,
+               "items": {"type": "string", "minLength": 1}}
+    counted = {
+        "type": "object", "additionalProperties": False,
+        "required": ["rows", "distinct", "nullRows"],
+        "properties": {name: {"type": "integer", "minimum": 0}
+                       for name in ("rows", "distinct", "nullRows")},
+    }
+    return {
+        "oneOf": [
+            {
+                "type": "object", "additionalProperties": False,
+                "required": ["method", "owner_a", "role_a", "match"],
+                "properties": {"method": {"const": "ctid"}, "owner_a": side, "role_a": side,
+                               "match": {"type": "boolean"}},
+            },
+            {
+                "type": "object", "additionalProperties": False,
+                "required": ["method", "columns", "owner_a", "role_a", "match"],
+                "properties": {"method": {"const": "pk"}, "columns": columns, "owner_a": side,
+                               "role_a": side, "match": {"type": "boolean"}},
+            },
+            {
+                "type": "object", "additionalProperties": False,
+                "required": ["method", "columns", "ownerDistinctness", "owner_a", "role_a",
+                             "match"],
+                "properties": {"method": {"const": OWNER_VERIFIED_KEY_METHOD},
+                               "columns": columns, "ownerDistinctness": counted,
+                               "owner_a": side, "role_a": side, "match": {"type": "boolean"}},
+            },
+            {
+                "type": "object", "additionalProperties": False,
+                "required": ["method", "reason"],
+                "properties": {"method": {"const": "unverifiable"},
+                               "reason": {"type": "string", "minLength": 1}},
+            },
+        ]
+    }
 
 
-def rls_report_shape(report: dict[str, Any]) -> str | None:
-    """The exact shape the RLS evaluator requires, or the first reason it is refused.
+def _rls_table_schema() -> dict[str, Any]:
+    cell = _rls_count_cell_schema()
+    base_cells = {name: cell for name in sorted(RLS_BASE_CELLS)}
+    scoped_cells = {**base_cells, "guc_tenant_a_foreign_rows": cell,
+                    "identity": _rls_identity_schema()}
+    return {
+        "type": "object", "additionalProperties": False,
+        "required": sorted(RLS_TABLE_KEYS),
+        "properties": {
+            "tenant_scoped": {"type": "boolean"},
+            "rls_enabled": {"type": "boolean"},
+            "rls_forced": {"type": "boolean"},
+            "privileges": {
+                "type": "object", "additionalProperties": False,
+                "required": sorted(RLS_PRIVILEGE_KEYS),
+                "properties": {name: {"enum": ["table", "column", None]}
+                               for name in sorted(RLS_PRIVILEGE_KEYS)},
+            },
+            "policies": {
+                "type": "array", "uniqueItems": True,
+                "items": {
+                    "type": "object", "additionalProperties": False,
+                    "required": ["name", "cmd", "permissive", "roles", "using", "with_check"],
+                    "properties": {
+                        "name": {"type": "string", "minLength": 1},
+                        "cmd": {"type": "string", "minLength": 1},
+                        "permissive": {"type": "string", "minLength": 1},
+                        "roles": {"type": "array", "items": {"type": "string"},
+                                  "uniqueItems": True},
+                        "using": {"type": "boolean"},
+                        "with_check": {"type": "boolean"},
+                    },
+                },
+            },
+            "visible": {"type": "object"},
+        },
+        "allOf": [
+            # A readable table carries its probe and an unreadable one does not: the two halves
+            # of one fact, so neither may appear without the other (#322 r2 F-R6).
+            {
+                "if": {"properties": {"privileges": {"properties": {"select": {"type": "null"}}}}},
+                "then": {"not": {"required": ["visible"]}},
+                "else": {"required": ["visible"]},
+            },
+            # Which cells a probe carries follows from whether the table has a tenant column.
+            {
+                "if": {"required": ["visible"], "properties": {"tenant_scoped": {"const": True}}},
+                "then": {"properties": {"visible": {
+                    "type": "object", "additionalProperties": False,
+                    "required": sorted(scoped_cells), "properties": scoped_cells,
+                }}},
+            },
+            {
+                "if": {"required": ["visible"], "properties": {"tenant_scoped": {"const": False}}},
+                "then": {"properties": {"visible": {
+                    "type": "object", "additionalProperties": False,
+                    "required": sorted(base_cells), "properties": base_cells,
+                }}},
+            },
+        ],
+    }
 
-    Checked before any number is read, because the three findings before this one were all
-    "the evaluator read a field that was not there and treated the absence as zero" (#322 r2
-    F-R5): deleting ``guc_unset``, deleting every cell, emptying ``tables``, saying
-    ``present: false`` or writing a negative count all produced MEASURED_PASS.  There is no
-    default value for a missing observation -- the report is simply not evidence.
+
+@functools.lru_cache(maxsize=1)
+def rls_report_schema() -> dict[str, Any]:
+    """The RLS report's exact shape, declared rather than hand-walked.
+
+    Cached because a hosted report carries a thousand table objects and the validator is called
+    per report; building the document each time was measurable in the suite.
+
+    ``additionalProperties: false`` everywhere and ``uniqueItems`` on the role list are the two
+    things F-R6 asked for: four of the five findings on this PR were the evaluator reading a
+    field that was missing, mistyped or quietly defaulted, and the fifth was the shape being
+    checked for *absence* only -- an extra key, a duplicate entry or a ghost row still passed.
     """
 
-    roles = report.get("roles")
-    measured = report.get("measuredRoles")
-    if not isinstance(roles, dict) or set(roles) != RLS_REQUIRED_ROLES:
-        return f"the report must measure exactly {sorted(RLS_REQUIRED_ROLES)}"
-    if not isinstance(measured, list) or set(measured) != RLS_REQUIRED_ROLES:
+    role_present = {
+        "type": "object", "additionalProperties": False, "required": sorted(RLS_ROLE_KEYS),
+        "properties": {
+            "present": {"const": True},
+            "superuser": {"type": "boolean"},
+            "bypassrls": {"type": "boolean"},
+            "login": {"type": "boolean"},
+            "inherit": {"type": "boolean"},
+            "member_of": {"type": "array", "items": {"type": "string"}, "uniqueItems": True},
+            "functions": {
+                "type": "object",
+                "additionalProperties": {
+                    "type": "object", "additionalProperties": False, "required": ["execute"],
+                    "properties": {"execute": {"type": "boolean"}},
+                },
+            },
+            "tables": {"type": "object", "minProperties": 1,
+                       "additionalProperties": _rls_table_schema()},
+        },
+    }
+    role_absent = {
+        "type": "object", "additionalProperties": False, "required": ["present"],
+        "properties": {"present": {"const": False}},
+    }
+    # The rows the collector writes: a rule plus where it was observed, and nothing else.  The
+    # optional members are what each rule actually carries (E1 has no table, E6 names a function,
+    # an accepted row carries its reviewed reason), and an extra key is refused (#322 r2 F-R6).
+    rule_row = {
+        "type": "object", "additionalProperties": False, "required": ["rule"],
+        "properties": {
+            "rule": {"enum": sorted(RLS_RULES)},
+            "role": {"type": "string", "minLength": 1},
+            "table": {"type": "string", "minLength": 1},
+            "function": {"type": "string", "minLength": 1},
+            "detail": {"type": "string"},
+            "reason": {"type": "string"},
+            "since": {"type": "string"},
+        },
+    }
+    truth = {
+        "oneOf": [
+            {"type": "object", "additionalProperties": False,
+             "required": sorted(RLS_GROUND_TRUTH_KEYS),
+             "properties": {name: _rls_count_cell_schema()
+                            for name in sorted(RLS_GROUND_TRUTH_KEYS)}},
+            {"type": "object", "additionalProperties": False, "required": ["total"],
+             "properties": {"total": _rls_count_cell_schema()}},
+        ]
+    }
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "additionalProperties": False,
+        "required": sorted(RLS_REPORT_KEYS),
+        "properties": {
+            "threatId": {"const": "SEC-RLS-001"},
+            "sourceRunId": {"type": "string", "pattern": "^[0-9]+$"},
+            "sourceHeadSha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "checkoutTreeSha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "cleanCheckout": {"type": "boolean"},
+            "reportAvailable": {"type": "boolean"},
+            "runPurpose": {"type": "string", "minLength": 1},
+            "schemaVersion": {"type": "string", "minLength": 1},
+            "startedAt": {"type": "string", "minLength": 1},
+            "finishedAt": {"type": "string", "minLength": 1},
+            "exitCode": {"enum": [0, 1, 2, 3]},
+            "verdict": {"enum": ["PASS", "VIOLATIONS", "UNMEASURED"]},
+            "toolFiles": {
+                "type": "array", "minItems": 1, "uniqueItems": True,
+                "items": {
+                    "type": "object", "additionalProperties": False,
+                    "required": ["path", "blob"],
+                    "properties": {"path": {"type": "string", "minLength": 1},
+                                   "blob": {"type": "string", "pattern": "^[0-9a-f]{40}$"}},
+                },
+            },
+            "baselineAccepted": {
+                "type": "array", "uniqueItems": True,
+                "items": {
+                    "type": "object", "additionalProperties": False,
+                    "required": ["role", "table", "rules"],
+                    "properties": {
+                        "role": {"type": "string", "minLength": 1},
+                        "table": {"type": "string", "minLength": 1},
+                        "rules": {"type": "array", "minItems": 1, "uniqueItems": True,
+                                  "items": {"enum": sorted(RLS_RULES)}},
+                    },
+                },
+            },
+            "violations": {"type": "array", "uniqueItems": True, "items": rule_row},
+            "accepted": {"type": "array", "uniqueItems": True, "items": rule_row},
+            "unmeasured": {"type": "array", "uniqueItems": True, "items": rule_row},
+            "measuredRoles": {
+                "type": "array", "uniqueItems": True,
+                "minItems": len(RLS_REQUIRED_ROLES), "maxItems": len(RLS_REQUIRED_ROLES),
+                "items": {"enum": sorted(RLS_REQUIRED_ROLES)},
+            },
+            "roles": {
+                "type": "object", "additionalProperties": False,
+                "required": sorted(RLS_REQUIRED_ROLES),
+                "properties": {
+                    name: ({"oneOf": [role_present, role_absent]}
+                           if name in RLS_OPTIONAL_ROLES else role_present)
+                    for name in sorted(RLS_REQUIRED_ROLES)
+                },
+            },
+            "ground_truth": {"type": "object", "minProperties": 1,
+                             "additionalProperties": truth},
+        },
+    }
+
+
+@functools.lru_cache(maxsize=1)
+def _rls_validator():
+    """One compiled validator, because compiling it per report was the whole cost.
+
+    ``jsonschema.validate`` rebuilds the validator on every call, and this schema describes a
+    thousand table objects through ``if``/``then`` and ``oneOf``; the suite measured the
+    difference in minutes.
+    """
+
+    try:
+        import jsonschema
+    except ImportError:  # pragma: no cover - requirements-core pins jsonschema for both lanes
+        return None
+    return jsonschema.Draft202012Validator(rls_report_schema())
+
+
+def rls_report_shape(report: Any) -> str | None:
+    """The exact shape the RLS evaluator requires, or the first reason it is refused.
+
+    Two halves, because neither alone is enough:
+
+    * the declared schema (``rls_report_schema``) -- ``additionalProperties: false`` at every
+      level and ``uniqueItems`` on the lists, so a **missing**, **extra**, **mistyped**,
+      **negative** or **duplicated** field is refused rather than defaulted;
+    * the correspondences a schema cannot state, because they relate one part of the report to
+      another: the measured table set is the same for every role present, ``ground_truth`` covers
+      exactly that set (no ghost rows, no gaps), each truth row has the shape its table's tenant
+      column implies, every row the report judges names something it measured, and the tables the
+      reviewed allowlist anchors on are among them.
+
+    What this still does not close, stated rather than implied: the evaluator cannot know how
+    many tables the migrated database has, so a report that drops a table **together with** its
+    ground-truth row and its rows in every list is internally consistent and is accepted.  The
+    anchors below catch that for the tables the reviewed allowlist names; closing it in general
+    needs the expected table set to come from the reviewed source, which is an AC-11 definition
+    change and is not made here (#322 r2 F-R6).
+    """
+
+    if not isinstance(report, dict):
+        return "the report must be an object"
+    validator = _rls_validator()
+    if validator is None:  # pragma: no cover - requirements-core pins jsonschema for both lanes
+        return "jsonschema is unavailable, so the report's shape cannot be checked"
+    error = next(iter(validator.iter_errors(report)), None)
+    if error is not None:
+        where = "/".join(str(part) for part in error.absolute_path) or "<root>"
+        return f"{where}: {error.message}"
+
+    roles: dict[str, Any] = report["roles"]
+    ground_truth: dict[str, Any] = report["ground_truth"]
+    if set(report["measuredRoles"]) != set(roles):
         return "measuredRoles must name exactly the measured population"
-    ground_truth = report.get("ground_truth")
-    if not isinstance(ground_truth, dict) or not ground_truth:
-        return "ground_truth must be a non-empty object"
+
+    measured: set[str] | None = None
     scoped: set[str] = set()
-    unscoped: set[str] = set()
-    for role_report in roles.values():
-        tables = role_report.get("tables") if isinstance(role_report, dict) else None
-        for table_name, table in (tables or {}).items():
-            if isinstance(table, dict) and isinstance(table.get("tenant_scoped"), bool):
-                (scoped if table["tenant_scoped"] else unscoped).add(table_name)
-    for table_name, truth in ground_truth.items():
-        if not isinstance(truth, dict):
-            return f"ground_truth[{table_name}] must be an object"
-        keys = set(truth)
-        # A table without a tenant column has no tenant-A truth to record, so the collector
-        # writes ``total`` alone; a tenant-scoped one carries all three.  Tables no role still
-        # lists (compaction drops the untouched ones) may be either.
-        if table_name in scoped:
-            expected = {RLS_GROUND_TRUTH_KEYS}
-        elif table_name in unscoped:
-            expected = {frozenset({"total"})}
-        else:
-            expected = {RLS_GROUND_TRUTH_KEYS, frozenset({"total"})}
-        if frozenset(keys) not in expected:
-            return (f"ground_truth[{table_name}] carries {sorted(keys)}, which is not a shape "
-                    f"this evaluator knows for that table")
-        for field, cell in truth.items():
-            reason = _rls_count_cell(cell)
-            if reason is not None:
-                return f"ground_truth[{table_name}].{field}: {reason}"
     for role_name, role_report in roles.items():
-        if not isinstance(role_report, dict):
-            return f"roles[{role_name}] must be an object"
         if role_report.get("present") is False:
-            # A role that does not exist cannot bypass RLS, so its absence is a fact -- but only
-            # for the one role no migration creates.  For the other seven, ``present: false``
-            # would shrink the population the verdict covers without saying so.
-            if role_name in RLS_OPTIONAL_ROLES and set(role_report) == {"present"}:
-                continue
-            return f"roles[{role_name}] may not be reported absent"
-        if role_report.get("present") is not True:
-            return f"roles[{role_name}].present must be a boolean"
-        if set(role_report) != RLS_ROLE_KEYS:
-            return f"roles[{role_name}] carries {sorted(set(role_report))}"
-        for field in ("superuser", "bypassrls", "login", "inherit"):
-            if not isinstance(role_report[field], bool):
-                return f"roles[{role_name}].{field} must be a boolean"
-        if not isinstance(role_report["member_of"], list):
-            return f"roles[{role_name}].member_of must be a list"
-        if not isinstance(role_report["functions"], dict):
-            return f"roles[{role_name}].functions must be an object"
-        tables = role_report["tables"]
-        if not isinstance(tables, dict) or not tables:
-            return f"roles[{role_name}].tables must be a non-empty object"
-        for table_name, table in tables.items():
-            if not isinstance(table, dict):
-                return f"roles[{role_name}].tables[{table_name}] must be an object"
-            keys = set(table)
-            if not RLS_TABLE_KEYS <= keys or not keys <= RLS_TABLE_KEYS | {"visible"}:
-                return f"roles[{role_name}].tables[{table_name}] carries {sorted(keys)}"
-            for field in ("tenant_scoped", "rls_enabled", "rls_forced"):
-                if not isinstance(table[field], bool):
-                    return f"{role_name}/{table_name}.{field} must be a boolean"
-            privileges = table["privileges"]
-            if not isinstance(privileges, dict) or set(privileges) != RLS_PRIVILEGE_KEYS:
-                return f"{role_name}/{table_name}.privileges carries the wrong keys"
-            if any(value not in RLS_PRIVILEGE_VALUES for value in privileges.values()):
-                return f"{role_name}/{table_name}.privileges has an unknown level"
-            if not isinstance(table["policies"], list):
-                return f"{role_name}/{table_name}.policies must be a list"
-            readable = privileges["select"] is not None
-            if not readable:
-                if "visible" in keys:
-                    return f"{role_name}/{table_name} is unreadable but carries a probe"
-                continue
-            if "visible" not in keys:
-                return f"{role_name}/{table_name} is readable but carries no probe"
-            visible = table["visible"]
-            if not isinstance(visible, dict):
-                return f"{role_name}/{table_name}.visible must be an object"
-            expected = RLS_BASE_CELLS | (RLS_SCOPED_CELLS if table["tenant_scoped"] else frozenset())
-            if set(visible) != expected:
-                missing = sorted(expected - set(visible))
-                extra = sorted(set(visible) - expected)
-                return (f"{role_name}/{table_name}.visible is missing {missing} and carries "
-                        f"unexpected {extra}")
-            for cell in sorted(expected - {"identity"}):
-                reason = _rls_count_cell(visible[cell])
-                if reason is not None:
-                    return f"{role_name}/{table_name}.visible.{cell}: {reason}"
+            continue
+        tables = set(role_report["tables"])
+        if measured is None:
+            measured = tables
+        elif tables != measured:
+            missing = sorted(measured - tables)
+            extra = sorted(tables - measured)
+            return (f"roles[{role_name}] measures a different table set than the others "
+                    f"(missing {missing[:3]}, extra {extra[:3]})")
+        for table_name, table in role_report["tables"].items():
             if table["tenant_scoped"]:
-                reason = _rls_identity_shape(visible["identity"])
-                if reason is not None:
-                    return f"{role_name}/{table_name}.visible.identity: {reason}"
-                if table_name not in ground_truth:
-                    return f"{role_name}/{table_name} is judged but ground_truth does not cover it"
+                scoped.add(table_name)
+    if not measured:
+        return "no role measured any table"
+    if set(ground_truth) != measured:
+        ghosts = sorted(set(ground_truth) - measured)
+        gaps = sorted(measured - set(ground_truth))
+        return (f"ground_truth does not correspond to the measured tables "
+                f"(truth for unmeasured {ghosts[:3]}, no truth for {gaps[:3]})")
+    for table_name, truth in ground_truth.items():
+        expected = RLS_GROUND_TRUTH_KEYS if table_name in scoped else frozenset({"total"})
+        if set(truth) != expected:
+            return (f"ground_truth[{table_name}] carries {sorted(truth)}, but that table is "
+                    f"{'tenant-scoped' if table_name in scoped else 'not tenant-scoped'}")
+    missing_anchors = sorted(RLS_ANCHOR_TABLES - measured)
+    if missing_anchors:
+        return f"the reviewed allowlist anchors on {missing_anchors}, which this report omits"
+    for field in ("violations", "accepted", "unmeasured"):
+        for row in report[field]:
+            role_name, table_name = row.get("role"), row.get("table")
+            if row["rule"] == "E6":
+                continue  # a definer-function row: SEC-DEF-001's territory, not measured here
+            if role_name not in roles or roles[role_name].get("present") is not True:
+                return f"{field} names {role_name}, which this report does not measure"
+            if row["rule"] == "E1":
+                continue  # role-scoped rule, no table
+            if table_name not in roles[role_name]["tables"]:
+                return f"{field} names {role_name}/{table_name}, which this report does not measure"
+    for row in report["baselineAccepted"]:
+        if not isinstance(row, dict):
+            return "baselineAccepted rows must be objects"
+        if row.get("table") not in measured:
+            return f"baselineAccepted names {row.get('table')}, which this report does not measure"
     return None
 
 

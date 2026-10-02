@@ -369,6 +369,17 @@ def rls_table(identity: dict | None = None, **overrides) -> dict:
     return table
 
 
+#: The tables every fixture report measures: its own plus the ones the reviewed allowlist and the
+#: pinned readable-key scope anchor on.  A report that omits them is refused, which is the point
+#: of the anchors (#322 r2 F-R6).
+ANCHOR_TABLES = ("public.projects", "public.tenants",
+                 "public.discovery_credential_issue_budgets", "public.audit_events")
+
+
+def default_tables() -> dict:
+    return {name: rls_table() for name in ANCHOR_TABLES}
+
+
 def rls_role_entry(tables: dict | None = None, **overrides) -> dict:
     entry = {
         "present": True,
@@ -378,7 +389,7 @@ def rls_role_entry(tables: dict | None = None, **overrides) -> dict:
         "inherit": True,
         "member_of": [],
         "functions": {},
-        "tables": copy.deepcopy(tables) if tables is not None else {"public.projects": rls_table()},
+        "tables": copy.deepcopy(tables) if tables is not None else default_tables(),
     }
     entry.update(overrides)
     return entry
@@ -392,15 +403,23 @@ def rls_roles(tables: dict | None = None, *, role: str = "inv_app", **role_overr
     covers without saying so.  So a fixture about one role still has to carry the other seven.
     """
 
-    roles = {name: rls_role_entry() for name in sorted(tool.RLS_REQUIRED_ROLES)}
-    roles[role] = rls_role_entry(tables, **role_overrides)
+    interesting = copy.deepcopy(tables) if tables is not None else default_tables()
+    # Every role measures the same tables -- that is what the collector does, and the evaluator
+    # now requires it (#322 r2 F-R6).  The *values* differ per role; the key set may not.
+    shared = {}
+    for name, table in interesting.items():
+        # Whether a table has a tenant column is a property of the table, not of the role.
+        shared[name] = (copy.deepcopy(table) if table.get("tenant_scoped") is False
+                        else rls_table())
+    roles = {name: rls_role_entry(shared) for name in sorted(tool.RLS_REQUIRED_ROLES)}
+    roles[role] = rls_role_entry(interesting, **role_overrides)
     return roles
 
 
 def rls_ground_truth(*tables: str) -> dict:
     return {
         name: {"total": {"rows": 2}, "tenant_a": {"rows": 1}, "other_tenants": {"rows": 1}}
-        for name in (tables or ("public.projects",))
+        for name in (tables or ANCHOR_TABLES)
     }
 
 
@@ -409,6 +428,18 @@ def rls_report(allowlist: dict, exit_code: int = 0, roles: dict | None = None,
     roles = copy.deepcopy(roles) if roles is not None else rls_roles()
     tables = [name for entry in roles.values() for name in entry.get("tables", {})]
     value = {
+        # The whole top-level key set the producer writes: the schema refuses an extra or a
+        # missing one, so a fixture thinner than the real report is not a report (#322 r2 F-R6).
+        "threatId": "SEC-RLS-001",
+        "sourceRunId": "36370000000",
+        "sourceHeadSha": SOURCE,
+        "checkoutTreeSha": TREE,
+        "cleanCheckout": True,
+        "reportAvailable": True,
+        "runPurpose": "s11-ac11-security-threat-reports",
+        "schemaVersion": "1.0.0",
+        "startedAt": "2026-10-02T05:32:03.335160Z",
+        "finishedAt": "2026-10-02T05:32:08.135160Z",
         "exitCode": exit_code,
         "toolFiles": copy.deepcopy(tool.RLS_FILES),
         "baselineAccepted": [
@@ -730,15 +761,15 @@ def rls_rule_observation(rule: str) -> dict:
 
     if rule == "E1":
         return rls_roles(superuser=True)
-    if rule == "E2":
-        return rls_roles({"public.projects": rls_table(rls_forced=False)})
-    if rule == "E3":
-        return rls_roles({"public.projects": rls_table(guc_unset={"rows": 1})})
-    if rule == "E4":
-        return rls_roles({"public.projects": rls_table(guc_tenant_a_foreign_rows={"rows": 1})})
-    if rule == "E5":
-        return rls_roles({"public.projects": rls_table(guc_unknown_tenant={"rows": 1})})
-    return rls_roles()
+    overrides = {
+        "E2": {"rls_forced": False},
+        "E3": {"guc_unset": {"rows": 1}},
+        "E4": {"guc_tenant_a_foreign_rows": {"rows": 1}},
+        "E5": {"guc_unknown_tenant": {"rows": 1}},
+    }.get(rule)
+    if overrides is None:
+        return rls_roles()
+    return rls_roles({**default_tables(), "public.projects": rls_table(**overrides)})
 
 
 @pytest.mark.parametrize("rule", sorted(tool.RLS_RULES))
@@ -763,10 +794,7 @@ def test_each_unaccepted_rls_rule_is_critical(rule, allowlist):
 def test_rls_accepted_expiry_and_baseline_exact_match(allowlist):
     # The accepted row is a real derivation: public.tenants is observed without forced RLS, and
     # the reviewed baseline accepts E2 there.  An accepted row nothing derives is refused.
-    roles = rls_roles({
-        "public.projects": rls_table(),
-        "public.tenants": rls_table(rls_forced=False),
-    })
+    roles = rls_roles({**default_tables(), "public.tenants": rls_table(rls_forced=False)})
     report = rls_report(allowlist, roles=roles)
     report["accepted"] = [{"rule": "E2", "role": "inv_app", "table": "public.tenants"}]
     assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.MEASURED_PASS
@@ -782,7 +810,7 @@ def test_rls_accepted_expiry_and_baseline_exact_match(allowlist):
     [(2, tool.Verdict.NOT_OBSERVED), (3, tool.Verdict.NOT_OBSERVED), (9, tool.Verdict.INVALID_RUN)],
 )
 def test_rls_unmeasured_and_unknown_exit_mapping(exit_code, expected, allowlist):
-    roles = rls_roles({"public.projects": rls_table(
+    roles = rls_roles({**default_tables(), "public.projects": rls_table(
         {"method": "unverifiable", "reason": "ctid denied 42501; identity columns not readable"}
     )}) if exit_code == 3 else None
     report = rls_report(allowlist, exit_code, roles=roles)
@@ -805,7 +833,8 @@ def identity_roles(identity: dict, role: str = "inv_cancel_bridge_owner",
                    table: str = "public.audit_events") -> dict:
     """The registered pair, carrying a full observation with ``identity`` in it."""
 
-    return rls_roles({table: rls_table(identity, guc_tenant_a={"rows": 2})}, role=role)
+    return rls_roles({**default_tables(), table: rls_table(identity, guc_tenant_a={"rows": 2})},
+                     role=role)
 
 
 @pytest.mark.parametrize(
@@ -981,6 +1010,178 @@ def test_removing_any_required_key_refuses_the_report(allowlist):
     assert survivors == []
 
 
+def _at(report, path: tuple):
+    cursor = report
+    for key in path:
+        cursor = cursor[key]
+    return cursor
+
+
+def _insert(report: dict, path: tuple, key: str, value) -> dict:
+    out = copy.deepcopy(report)
+    _at(out, path)[key] = value
+    return out
+
+
+def _duplicate(report: dict, path: tuple) -> dict:
+    """The list at ``path`` with its first item appended again."""
+
+    out = copy.deepcopy(report)
+    target = _at(out, path)
+    target.append(copy.deepcopy(target[0]))
+    return out
+
+
+def test_an_extra_key_anywhere_in_the_report_is_refused(allowlist):
+    """``additionalProperties: false`` at every level, swept rather than asserted once.
+
+    An extra key is either a field this evaluator does not understand or a field someone added to
+    carry a claim nothing checks; both are refusals (#322 r2 F-R6).  The sweep walks every object
+    in a real-shaped report and inserts one key into it.
+    """
+
+    report = rls_report(allowlist)
+    assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.MEASURED_PASS
+    paths = [path for path in _dict_paths(report)]
+    assert len(paths) > 100, f"the sweep must cover the report, got {len(paths)}"
+    survivors = []
+    for path in paths:
+        forged = _insert(report, path, "zzExtra", 1)
+        try:
+            verdict = tool.evaluate_rls(forged, allowlist, NOW)
+        except ValueError:
+            continue
+        if verdict is tool.Verdict.MEASURED_PASS:
+            survivors.append(path)
+    assert survivors == []
+
+
+def _dict_paths(value, prefix=()) -> list[tuple]:
+    out = []
+    if isinstance(value, dict):
+        out.append(prefix)
+        for key, child in value.items():
+            out.extend(_dict_paths(child, prefix + (key,)))
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            out.extend(_dict_paths(child, prefix + (index,)))
+    return out
+
+
+def _list_paths(value, prefix=()) -> list[tuple]:
+    out = []
+    if isinstance(value, dict):
+        for key, child in value.items():
+            out.extend(_list_paths(child, prefix + (key,)))
+    elif isinstance(value, list):
+        if value:
+            out.append(prefix)
+        for index, child in enumerate(value):
+            out.extend(_list_paths(child, prefix + (index,)))
+    return out
+
+
+def test_duplicating_any_list_item_is_refused(allowlist):
+    """A repeated entry is not a longer list of facts, it is the same fact twice.
+
+    ``measuredRoles`` was the one F-R6 found, but the same applies to the tool pins and the
+    baseline dispositions, so the sweep duplicates the first item of every non-empty list in the
+    report.
+    """
+
+    report = rls_report(allowlist)
+    report["violations"] = []
+    paths = _list_paths(report)
+    assert paths, "the report must carry lists to duplicate"
+    survivors = []
+    for path in paths:
+        forged = _duplicate(report, path)
+        try:
+            verdict = tool.evaluate_rls(forged, allowlist, NOW)
+        except ValueError:
+            continue
+        if verdict is tool.Verdict.MEASURED_PASS:
+            survivors.append(path)
+    assert survivors == []
+
+
+def test_ground_truth_must_correspond_to_the_measured_tables_both_ways(allowlist):
+    """A truth row for a table nothing measured, and a measured table with no truth row.
+
+    Both directions, because the derivation reads the owner's tenant-A count out of
+    ``ground_truth``: a ghost row is a claim about nothing, and a gap is a judged table whose
+    comparison has no owner side (#322 r2 F-R6).
+    """
+
+    ghost = rls_report(allowlist)
+    ghost["ground_truth"]["public.ghost"] = {
+        "total": {"rows": 9}, "tenant_a": {"rows": 9}, "other_tenants": {"rows": 0},
+    }
+    assert tool.evaluate_rls(ghost, allowlist, NOW) is tool.Verdict.INVALID_RUN
+
+    gap = rls_report(allowlist)
+    del gap["ground_truth"]["public.tenants"]
+    assert tool.evaluate_rls(gap, allowlist, NOW) is tool.Verdict.INVALID_RUN
+
+
+def test_every_role_must_measure_the_same_tables(allowlist):
+    """One role measuring fewer tables is a smaller report wearing a complete one's verdict."""
+
+    narrowed = rls_report(allowlist)
+    del narrowed["roles"]["inv_kernel"]["tables"]["public.tenants"]
+    assert tool.evaluate_rls(narrowed, allowlist, NOW) is tool.Verdict.INVALID_RUN
+
+    widened = rls_report(allowlist)
+    widened["roles"]["inv_kernel"]["tables"]["public.extra"] = rls_table()
+    assert tool.evaluate_rls(widened, allowlist, NOW) is tool.Verdict.INVALID_RUN
+
+
+def test_a_row_may_not_name_something_the_report_did_not_measure(allowlist):
+    """A judged row about an unmeasured role or table is a claim with no observation behind it."""
+
+    for row in (
+        {"rule": "E2", "role": "inv_nonexistent", "table": "public.projects"},
+        {"rule": "E2", "role": "inv_app", "table": "public.nowhere"},
+    ):
+        report = rls_report(allowlist, 1)
+        report.update(verdict="VIOLATIONS", violations=[row])
+        assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.INVALID_RUN
+
+
+def test_dropping_a_table_with_its_truth_is_caught_only_where_something_anchors_it(allowlist):
+    """The residual this evaluator cannot close, written down instead of left implied.
+
+    A report that drops a table **together with** its ground-truth row and every row that names
+    it is internally consistent, and the evaluator cannot know how many tables the migrated
+    database has -- that number lives in the database, not in the report or the reviewed
+    allowlist.  Two anchors catch the cases that matter today: the tables the reviewed allowlist
+    accepts dispositions for, and the table the pinned readable-key scope names.  Beyond those,
+    the pair deletion is accepted, and closing it exactly would need the expected table set to
+    come from the reviewed source -- an AC-11 definition change, which this card does not make
+    (#322 r2 F-R6).
+    """
+
+    def without(table_name: str) -> dict:
+        report = rls_report(allowlist)
+        for role_report in report["roles"].values():
+            role_report["tables"].pop(table_name, None)
+        report["ground_truth"].pop(table_name, None)
+        report["baselineAccepted"] = [
+            row for row in report["baselineAccepted"] if row["table"] != table_name
+        ]
+        return report
+
+    # Anchored: the readable-key scope names this one, so its absence is a refusal.
+    assert tool.evaluate_rls(without("public.audit_events"), allowlist, NOW) is \
+        tool.Verdict.INVALID_RUN
+    # Anchored through baselineAccepted: dropping the table *and* its disposition no longer
+    # matches the reviewed allowlist, which is checked exactly.
+    assert tool.evaluate_rls(without("public.tenants"), allowlist, NOW) is tool.Verdict.INVALID_RUN
+    # Not anchored: this is the residual, and it is accepted today.
+    assert tool.evaluate_rls(without("public.projects"), allowlist, NOW) is \
+        tool.Verdict.MEASURED_PASS
+
+
 def test_the_one_role_no_migration_creates_may_be_absent_and_the_others_may_not(allowlist):
     """``inv_runtime_dev`` is absent in the producer's database; the other seven may not be.
 
@@ -1019,14 +1220,14 @@ def test_ground_truth_must_have_the_shape_that_table_actually_has(allowlist):
     # An unscoped readable table carries total alone, and claiming a tenant truth for it is also
     # a shape the collector never writes.
     unscoped = rls_roles({
-        "public.projects": rls_table(),
+        **default_tables(),
         "inv.control_epoch": rls_table(
             tenant_scoped=False,
             visible={"guc_unset": {"rows": 1}, "guc_tenant_a": {"rows": 1},
                      "guc_unknown_tenant": {"rows": 1}, "guc_not_uuid": {"rows": 1}},
         ),
     })
-    truth = rls_ground_truth("public.projects")
+    truth = rls_ground_truth()
     truth["inv.control_epoch"] = {"total": {"rows": 1}}
     report = rls_report(allowlist, roles=unscoped, ground_truth=truth)
     assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.MEASURED_PASS
@@ -1167,9 +1368,9 @@ def test_every_rls_row_must_be_derivable_from_the_observations(forge, allowlist)
     forges exactly one of those relations.
     """
 
-    leaking = rls_roles({"public.projects": rls_table(),
+    leaking = rls_roles({**default_tables(),
                          "public.runs": rls_table(guc_tenant_a_foreign_rows={"rows": 1})})
-    truth = rls_ground_truth("public.projects", "public.runs")
+    truth = rls_ground_truth(*ANCHOR_TABLES, "public.runs")
     row = {"rule": "E4", "role": "inv_app", "table": "public.runs"}
 
     if forge == "measured-roles-differ":
@@ -1184,7 +1385,7 @@ def test_every_rls_row_must_be_derivable_from_the_observations(forge, allowlist)
         report = rls_report(allowlist, 3)
         report.update(verdict="UNMEASURED", unmeasured=[dict(row)])
     elif forge == "hidden-unmeasured":
-        roles = rls_roles({"public.projects": rls_table(
+        roles = rls_roles({**default_tables(), "public.projects": rls_table(
             {"method": "unverifiable", "reason": "ctid denied 42501"}
         )})
         report = rls_report(allowlist, roles=roles)
@@ -1219,9 +1420,9 @@ def test_the_collector_and_the_evaluator_derive_the_same_rows(allowlist):
     spec.loader.exec_module(collector)
 
     roles = rls_roles({
-        # One clean table, one that leaks a foreign row, and one whose identity is unverifiable:
-        # an E4 violation and an E4 unmeasured row derived by the collector itself.
-        "public.projects": rls_table(),
+        # The anchor tables plus one that leaks a foreign row; the audit table carries an
+        # unverifiable identity, so the collector derives an E4 violation and an E4 unmeasured row.
+        **default_tables(),
         "public.runs": rls_table(guc_tenant_a_foreign_rows={"rows": 1}),
         "public.audit_events": rls_table(
             {"method": "unverifiable", "reason": "ctid denied 42501; identity columns not readable"}

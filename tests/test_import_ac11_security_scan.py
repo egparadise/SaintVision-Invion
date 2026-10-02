@@ -200,6 +200,8 @@ def definer_report(**over) -> dict:
 
 
 CTID_FP = "5d41402abc4b2a76b9719d911017c592"
+RLS_FIXTURE_TABLES = ("public.projects", "public.tenants",
+                      "public.discovery_credential_issue_budgets", "public.audit_events")
 
 
 def rls_population() -> dict:
@@ -227,7 +229,9 @@ def rls_population() -> dict:
         role: {
             "present": True, "superuser": False, "bypassrls": False, "login": False,
             "inherit": True, "member_of": [], "functions": {},
-            "tables": {"public.projects": copy.deepcopy(clean)},
+            # Every role measures the same tables, and the set covers what the reviewed allowlist
+            # and the pinned readable-key scope anchor on (#322 r2 F-R6).
+            "tables": {name: copy.deepcopy(clean) for name in RLS_FIXTURE_TABLES},
         }
         for role in sorted(aggregator.RLS_REQUIRED_ROLES)
     }
@@ -242,15 +246,9 @@ def rls_violating_report(**over) -> dict:
     """
 
     population = rls_population()
-    leaking = copy.deepcopy(population["inv_app"]["tables"]["public.projects"])
-    leaking["rls_forced"] = False
-    population["inv_app"]["tables"]["public.audit_events"] = leaking
+    population["inv_app"]["tables"]["public.audit_events"]["rls_forced"] = False
     document = rls_report(
         roles=population,
-        ground_truth={
-            name: {"total": {"rows": 2}, "tenant_a": {"rows": 1}, "other_tenants": {"rows": 1}}
-            for name in ("public.projects", "public.audit_events")
-        },
         exitCode=1,
         verdict="VIOLATIONS",
         violations=[{"role": "inv_app", "table": "public.audit_events", "rule": "E2",
@@ -288,6 +286,14 @@ def rls_report(**over) -> dict:
         "sourceRunId": RUN_ID,
         "sourceHeadSha": SOURCE,
         "checkoutTreeSha": TREE,
+        # The producer's whole top-level key set: the evaluator's schema refuses a missing or an
+        # extra one, so a thinner fixture is not a report (#322 r2 F-R6).
+        "cleanCheckout": True,
+        "reportAvailable": True,
+        "runPurpose": "s11-ac11-security-threat-reports",
+        "schemaVersion": "1.0.0",
+        "startedAt": "2026-10-02T05:32:03.335160Z",
+        "finishedAt": "2026-10-02T05:32:08.135160Z",
         "toolFiles": [dict(row) for row in aggregator.RLS_FILES],
         "baselineAccepted": [
             {"role": entry["role"], "table": entry["table"], "rules": list(entry["rules"])}
@@ -301,8 +307,8 @@ def rls_report(**over) -> dict:
         "measuredRoles": sorted(aggregator.RLS_REQUIRED_ROLES),
         "roles": rls_population(),
         "ground_truth": {
-            "public.projects": {"total": {"rows": 2}, "tenant_a": {"rows": 1},
-                                "other_tenants": {"rows": 1}},
+            name: {"total": {"rows": 2}, "tenant_a": {"rows": 1}, "other_tenants": {"rows": 1}}
+            for name in RLS_FIXTURE_TABLES
         },
     }
     document.update(over)
