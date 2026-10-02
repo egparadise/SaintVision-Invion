@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.282"
+version: "1.0.283"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T18:47:45+09:00"
+updated: "2026-10-02T21:30:50+09:00"
 source_of_truth: "Git"
 active_card: "CARD-232 S08-BE product worker loop and trusted intent producer"
-active_card_status: "PR #331 head 514a66a3 is in review; migration 0060 is the single head, product flag remains off, hosted real-PG is running, and #330 + 0060 requires a 157-table census repin"
-active_card_next: "Require exact-head Backend/Core and non-skipped real-PG evidence, close independent review findings, then hand the combined-tree census repin condition to the merge train"
+active_card_status: "Approved by Claude r6 at 076f64ba with exact-head Backend 37003189569 and Core 37003189727 green (9 real-PG cases executed, 0 skipped); bounded fair promotion, retryable heartbeat backoff, census repinned to 157 tables; product flag remains off"
+active_card_next: "Land with its train; enabling product dispatch follows the S08 enablement runbook (#335) and stays a separate decision"
 ---
 
 ## 2026-10-02 Card 232 — S08-BE product worker loop and trusted intent producer
