@@ -6,17 +6,19 @@ JSON values in ``inv.build_execution_intents``.  A worker claims one row with
 ``FOR UPDATE SKIP LOCKED`` and is the product composition seam which actually
 calls :class:`inv.build_execution.BuildExecutionService`.
 
-Claim is one-way.  Once a row is claimed, a crash or a failed dispatch does not
-put it back in the queue: the service's decision claim and node-quarantine
-channel are the reconciliation authority.  Product dispatch remains disabled
-unless ``INV_BUILDKIT_PRODUCT_ENABLED`` is exactly ``1``; that check happens
-before a queue row is claimed and is repeated by ``BuildExecutionService``.
+A failed pre-dispatch claim is returned to pending only when the adapter's
+durable one-shot decision claim does not exist.  Once that claim is committed,
+the row remains claimed: the decision claim and node-quarantine channel are the
+reconciliation authority.  Product dispatch remains disabled unless
+``INV_BUILDKIT_PRODUCT_ENABLED`` is exactly ``1``; that check happens before a
+queue row is claimed and is repeated by ``BuildExecutionService``.
 """
 
 from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import dataclass
+import logging
 import os
 from typing import Any, Mapping
 
@@ -32,6 +34,8 @@ from .build_governance import canonical_build_action
 from .contracts import validate_contract
 from .errors import DomainError
 from .policy import action_digest
+
+LOGGER = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -179,6 +183,12 @@ class BuildExecutionIntentQueue:
                   SELECT tenant_id,project_id,run_id
                   FROM inv.build_execution_intents
                   WHERE tenant_id=%s AND status='pending'
+                    AND request_sha256 =
+                      encode(sha256(convert_to(request::text,'UTF8')),'hex')
+                    AND plan_sha256 =
+                      encode(sha256(convert_to(plan::text,'UTF8')),'hex')
+                    AND decision_sha256 =
+                      encode(sha256(convert_to(decision::text,'UTF8')),'hex')
                   ORDER BY created_at,project_id,run_id
                   LIMIT 1 FOR UPDATE SKIP LOCKED
                 )
@@ -202,6 +212,33 @@ class BuildExecutionIntentQueue:
                 policy_version=intent.policy_version,
             )
             return intent
+
+    def requeue_if_unconsumed(self, intent: BuildExecutionIntent) -> bool:
+        """Return a failed pre-dispatch claim to pending, never an admitted dispatch.
+
+        ``BuildExecutionAdapter`` consumes the PolicyDecision in ``inv.idempotency`` before
+        its first external side effect and records the decision ID in that claim.  Absence of
+        that row is therefore the only safe automatic-retry boundary.  The 0059 trigger asks
+        the same question so a direct runtime UPDATE cannot requeue a consumed dispatch.
+        """
+
+        claim_key = action_digest({"decisionId": intent.decision["decisionId"]})
+        with self.db.transaction(intent.tenant_id) as conn:
+            consumed = conn.execute(
+                """SELECT 1 FROM inv.idempotency
+                WHERE project_id=%s AND operation='build.dispatch' AND key=%s
+                  AND response->>'decisionId'=%s""",
+                (intent.project_id, claim_key, intent.decision["decisionId"]),
+            ).fetchone()
+            if consumed:
+                return False
+            pending = conn.execute(
+                """UPDATE inv.build_execution_intents SET status='pending'
+                WHERE tenant_id=%s AND project_id=%s AND run_id=%s AND status='claimed'
+                RETURNING run_id""",
+                (intent.tenant_id, intent.project_id, intent.run_id),
+            ).fetchone()
+            return pending is not None
 
     def complete(self, intent: BuildExecutionIntent) -> None:
         with self.db.transaction(intent.tenant_id) as conn:
@@ -230,15 +267,24 @@ class BuildExecutionWorker:
         intent = self.queue.claim_next(tenant_id)
         if intent is None:
             return None
-        result = self.service.execute(
-            Principal(intent.tenant_id, intent.actor_id),
-            intent.request,
-            intent.plan,
-            intent.decision,
-            policy_version=intent.policy_version,
-            run_id=intent.run_id,
-            evidence_id=intent.evidence_id,
-            actor_id=intent.actor_id,
-        )
+        try:
+            result = self.service.execute(
+                Principal(intent.tenant_id, intent.actor_id),
+                intent.request,
+                intent.plan,
+                intent.decision,
+                policy_version=intent.policy_version,
+                run_id=intent.run_id,
+                evidence_id=intent.evidence_id,
+                actor_id=intent.actor_id,
+            )
+        except BaseException:
+            try:
+                self.queue.requeue_if_unconsumed(intent)
+            except Exception:
+                # Requeue is a recovery aid, never permission to replace the original cause.
+                # A consumed dispatch or an unavailable DB therefore remains claimed.
+                LOGGER.exception("build intent could not be safely requeued")
+            raise
         self.queue.complete(intent)
         return result

@@ -124,6 +124,9 @@ def upgrade() -> None:
                OR NEW.decision->>'projectId' IS DISTINCT FROM NEW.project_id
                OR NEW.plan->>'policyVersion' IS DISTINCT FROM NEW.policy_version
                OR NEW.plan->>'policyDecisionId' IS DISTINCT FROM NEW.decision->>'decisionId'
+               OR NEW.decision->>'subjectId' IS DISTINCT FROM NEW.actor_id
+               OR NEW.plan->>'actionDigest' IS DISTINCT FROM NEW.decision->>'actionDigest'
+               OR NEW.plan->>'policyExpiresAt' IS DISTINCT FROM NEW.decision->>'expiresAt'
             THEN
               RAISE EXCEPTION 'build execution intent scope or policy binding differs'
                 USING ERRCODE = 'check_violation',
@@ -151,6 +154,20 @@ def upgrade() -> None:
           v_now := clock_timestamp();
           IF OLD.status = 'pending' AND NEW.status = 'claimed' THEN
             NEW.claimed_at := v_now;
+            NEW.completed_at := NULL;
+          ELSIF OLD.status = 'claimed' AND NEW.status = 'pending' THEN
+            IF EXISTS (
+              SELECT 1 FROM inv.idempotency
+              WHERE tenant_id = OLD.tenant_id
+                AND project_id = OLD.project_id
+                AND operation = 'build.dispatch'
+                AND response->>'decisionId' = OLD.decision->>'decisionId'
+            ) THEN
+              RAISE EXCEPTION 'a consumed build dispatch cannot be requeued'
+                USING ERRCODE = 'check_violation',
+                      CONSTRAINT = 'build_execution_intent_dispatch_consumed';
+            END IF;
+            NEW.claimed_at := NULL;
             NEW.completed_at := NULL;
           ELSIF OLD.status = 'claimed' AND NEW.status = 'completed' THEN
             NEW.claimed_at := OLD.claimed_at;

@@ -1,15 +1,21 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.273"
+version: "1.0.274"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T14:16:24+09:00"
+updated: "2026-10-02T14:34:00+09:00"
 source_of_truth: "Git"
 active_card: "CARD-223 S08-BE product caller"
-active_card_status: "Base #318 approved at 2dd25ff7 with exact-head Core/Backend green; PR #323 first Backend run exposed AC-11 pin and replay-fixture defects, both corrected"
-active_card_next: "Push the corrective commit; require exact-head Backend/Core green, real-PG JUnit execution and Claude review"
+active_card_status: "PR #323 Claude r1 findings F2-F6 corrected with consumed-claim-aware requeue, digest/poison guards and mutation-killing tests"
+active_card_next: "Require exact-head Backend/Core green, nine real-PG JUnit cases and Claude r2 approval"
 ---
+
+- Card 223 r1 correction narrows retry to a durable boundary: only a claimed intent with no
+  committed `build.dispatch` one-shot claim can return to pending; consumed dispatches stay claimed.
+- Database-owned digest checks skip corrupt restored rows; INSERT bindings reject poison actor,
+  action-digest and expiry combinations. Focused PG-free verification is **100 passed**; the
+  expanded **9-case** real-PG file awaits exact-head hosted Core execution.
 
 ## 2026-10-02 Card 223 — S08-BE product caller
 

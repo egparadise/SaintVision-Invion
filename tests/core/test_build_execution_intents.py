@@ -18,7 +18,6 @@ from inv.build_governance import canonical_build_action
 from inv.errors import DomainError
 from inv.policy import action_digest
 
-
 ROOT = Path(__file__).resolve().parents[2]
 MIGRATION = ROOT / "migrations/versions/0059_build_execution_intents.py"
 WORKER = ROOT / "services/control-plane/src/inv/build_execution_worker.py"
@@ -131,22 +130,39 @@ def test_migration_is_linear_tenant_scoped_payload_immutable_and_delete_forbidde
     assert "build execution intent payload is immutable" in source
     assert "build execution intents are not deletable" in source
     assert "pending' AND NEW.status = 'claimed" in source
+    assert "claimed' AND NEW.status = 'pending" in source
     assert "claimed' AND NEW.status = 'completed" in source
+    assert "response->>'decisionId' = OLD.decision->>'decisionId'" in source
+    assert "NEW.decision->>'subjectId' IS DISTINCT FROM NEW.actor_id" in source
+    assert "NEW.plan->>'actionDigest' IS DISTINCT FROM NEW.decision->>'actionDigest'" in source
+    assert "NEW.plan->>'policyExpiresAt' IS DISTINCT FROM NEW.decision->>'expiresAt'" in source
     assert "SELECT count(*) FROM inv.build_execution_intents" in source
 
 
 def test_worker_claim_is_skip_locked_and_no_public_route_is_added():
     source = WORKER.read_text(encoding="utf-8")
     assert "FOR UPDATE SKIP LOCKED" in source
+    assert "request_sha256 =" in source
+    assert "plan_sha256 =" in source
+    assert "decision_sha256 =" in source
     assert "class BuildExecutionWorker" in source
-    app = (ROOT / "services/control-plane/src/inv/app.py").read_text(encoding="utf-8")
-    assert "build_execution_worker" not in app
+    inv_root = ROOT / "services/control-plane/src/inv"
+    consumers = []
+    for path in inv_root.glob("*.py"):
+        if path == WORKER:
+            continue
+        text = path.read_text(encoding="utf-8")
+        if "build_execution_worker" in text or "BuildExecutionWorker" in text:
+            consumers.append(path.name)
+    assert consumers == []
 
 
 @pytest.mark.parametrize(
     "mutate",
     [
-        lambda request, plan, decision: request.update(tenantId="223e4567-e89b-12d3-a456-426614174000"),
+        lambda request, plan, decision: request.update(
+            tenantId="223e4567-e89b-12d3-a456-426614174000"
+        ),
         lambda request, plan, decision: plan.update(projectId=f"prj_{'0' * 26}"),
         lambda request, plan, decision: decision.update(subjectId="somebody-else"),
         lambda request, plan, decision: plan.update(policyVersion="drift"),
@@ -174,6 +190,7 @@ class Queue:
         self.item = item
         self.claims = 0
         self.completions = 0
+        self.requeues = 0
 
     def claim_next(self, tenant_id):
         assert tenant_id == TENANT
@@ -184,6 +201,11 @@ class Queue:
         assert item is self.item
         self.completions += 1
 
+    def requeue_if_unconsumed(self, item):
+        assert item is self.item
+        self.requeues += 1
+        return True
+
 
 class Service:
     def __init__(self, error=None):
@@ -191,7 +213,9 @@ class Service:
         self.calls = []
 
     def execute(self, principal, request, plan, decision, **kwargs):
-        self.calls.append((principal, deepcopy(request), deepcopy(plan), deepcopy(decision), kwargs))
+        self.calls.append(
+            (principal, deepcopy(request), deepcopy(plan), deepcopy(decision), kwargs)
+        )
         if self.error:
             raise self.error
         return BuildExecutionResult("evd", "a" * 64, True, True)
@@ -209,9 +233,9 @@ def test_worker_calls_service_with_persisted_authority_then_completes():
     queued = intent()
     queue = Queue(queued)
     service = Service()
-    result = BuildExecutionWorker(
-        queue, service, environment={PRODUCT_ENABLE_SETTING: "1"}
-    ).once(TENANT)
+    result = BuildExecutionWorker(queue, service, environment={PRODUCT_ENABLE_SETTING: "1"}).once(
+        TENANT
+    )
     assert result.lease_released is True
     assert queue.claims == queue.completions == 1
     principal, request, plan, decision, kwargs = service.calls[0]
@@ -225,13 +249,26 @@ def test_worker_calls_service_with_persisted_authority_then_completes():
     }
 
 
-def test_worker_failure_never_requeues_or_marks_completed():
+def test_worker_failure_requeues_only_through_the_unconsumed_boundary():
     queue = Queue(intent())
     service = Service(DomainError("RES-0006", "fence unavailable", 503, retryable=True))
     with pytest.raises(DomainError) as caught:
-        BuildExecutionWorker(
-            queue, service, environment={PRODUCT_ENABLE_SETTING: "1"}
-        ).once(TENANT)
+        BuildExecutionWorker(queue, service, environment={PRODUCT_ENABLE_SETTING: "1"}).once(TENANT)
     assert caught.value.code == "RES-0006"
     assert queue.claims == 1
+    assert queue.requeues == 1
+    assert queue.completions == 0
+
+
+def test_worker_preserves_original_base_exception_when_requeue_fails():
+    class BrokenQueue(Queue):
+        def requeue_if_unconsumed(self, item):
+            super().requeue_if_unconsumed(item)
+            raise RuntimeError("database unavailable")
+
+    queue = BrokenQueue(intent())
+    service = Service(KeyboardInterrupt("stop"))
+    with pytest.raises(KeyboardInterrupt, match="stop"):
+        BuildExecutionWorker(queue, service, environment={PRODUCT_ENABLE_SETTING: "1"}).once(TENANT)
+    assert queue.requeues == 1
     assert queue.completions == 0

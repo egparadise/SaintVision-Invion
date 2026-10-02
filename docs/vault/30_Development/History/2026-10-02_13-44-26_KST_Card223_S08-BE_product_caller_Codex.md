@@ -1,14 +1,35 @@
 ---
 doc_id: "HISTORY-CARD223-S08-BE-PRODUCT-CALLER-20261002"
 title: "Card 223 S08-BE product caller"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T14:16:24+09:00"
+updated: "2026-10-02T14:34:00+09:00"
 source_of_truth: "Git"
 base_sha: "2dd25ff77a152575988b19a568ede348fd4dc1d8"
 reviewer: "Claude"
 ---
+
+## Claude r1 corrective boundary
+
+Claude r1 correctly found that committing `pending -> claimed` before the service call could
+strand every pre-dispatch retryable failure. The correction does not permit a general retry. It
+returns `claimed -> pending` only when the adapter's durable `build.dispatch` one-shot claim is
+absent. The adapter now stores the decision ID in that claim, and both the runtime queue and the
+database trigger independently refuse to requeue a consumed dispatch. The original failure is
+preserved even when the recovery write itself fails.
+
+The claim query now verifies all three database-owned JSONB digests before transition. The INSERT
+trigger also binds actor/subject, plan/decision action digest, and plan/decision expiry, so an
+owner-restored corrupt row is skipped and a SQL-checkable poison row is rejected before it can
+block the queue. The strengthened real-PG cases cover a locked-first-row `SKIP LOCKED` selection,
+payload mutation during a valid transition, completed-to-pending rollback, unconsumed versus
+consumed requeue, digest tampering, poison binding, and a retryable pre-dispatch failure.
+
+PG-free focused verification is **100 passed**. The local real-PG file contains **9 cases** but is
+`NOT_OBSERVED` locally because no disposable PostgreSQL DSN is configured; exact-head hosted Core
+must execute all nine before this revision is accepted. S08-BE completion or physical-builder
+acceptance is still not claimed.
 
 # 선택 근거
 

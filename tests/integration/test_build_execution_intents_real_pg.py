@@ -6,6 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import psycopg
 import pytest
+from psycopg.types.json import Jsonb
 
 from inv.approvals import Principal
 from inv.build_execution import BuildExecutionResult, PRODUCT_ENABLE_SETTING
@@ -14,7 +15,6 @@ from inv.build_governance import canonical_build_action
 from inv.errors import DomainError
 from inv.ids import new_id
 from inv.policy import action_digest
-
 
 pytestmark = pytest.mark.postgres
 ULID = "01M3PTP800EEMWMDYKEZZ3CWNP"
@@ -179,13 +179,38 @@ def test_two_connections_cannot_claim_the_same_intent_and_other_tenant_cannot_se
     assert state[0] == "claimed" and state[1] is not None and state[2] is None
 
 
+def test_skip_locked_claims_the_second_intent_while_the_first_row_is_locked(env):
+    queue, first = enqueue(env)
+    _other_queue, second = enqueue(env)
+    with psycopg.connect(env.owner) as blocker:
+        blocker.execute(
+            "SELECT 1 FROM inv.build_execution_intents WHERE run_id=%s FOR UPDATE",
+            (first.run_id,),
+        )
+        claimed = queue.claim_next(env.tenant)
+        assert claimed is not None
+        assert claimed.run_id == second.run_id
+
+
 def test_payload_update_delete_and_invalid_transition_are_rejected_by_database(env):
-    _queue, intent = enqueue(env)
+    queue, intent = enqueue(env)
     with psycopg.connect(env.owner) as conn:
         conn.execute("SELECT set_config('inv.tenant_id',%s,true)", (env.tenant,))
         with pytest.raises(psycopg.errors.CheckViolation):
             conn.execute(
-                "UPDATE inv.build_execution_intents SET request=request || '{\"targetStage\":\"drift\"}'::jsonb WHERE run_id=%s",
+                """UPDATE inv.build_execution_intents
+                SET status='claimed',request=request || '{\"targetStage\":\"drift\"}'::jsonb
+                WHERE run_id=%s""",
+                (intent.run_id,),
+            )
+        conn.rollback()
+    claimed = queue.claim_next(env.tenant)
+    assert claimed is not None
+    queue.complete(claimed)
+    with psycopg.connect(env.owner) as conn:
+        with pytest.raises(psycopg.errors.CheckViolation):
+            conn.execute(
+                "UPDATE inv.build_execution_intents SET status='pending' WHERE run_id=%s",
                 (intent.run_id,),
             )
         conn.rollback()
@@ -193,14 +218,80 @@ def test_payload_update_delete_and_invalid_transition_are_rejected_by_database(e
         conn.execute("SELECT set_config('inv.tenant_id',%s,true)", (env.tenant,))
         with pytest.raises(psycopg.errors.CheckViolation):
             conn.execute(
-                "UPDATE inv.build_execution_intents SET status='completed' WHERE run_id=%s",
-                (intent.run_id,),
+                "DELETE FROM inv.build_execution_intents WHERE run_id=%s", (intent.run_id,)
             )
-        conn.rollback()
+
+
+def test_claim_skips_owner_tampered_digest_and_insert_rejects_poison_binding(env):
+    queue, intent = enqueue(env)
     with psycopg.connect(env.owner) as conn:
-        conn.execute("SELECT set_config('inv.tenant_id',%s,true)", (env.tenant,))
+        conn.execute("SET LOCAL session_replication_role=replica")
+        conn.execute(
+            """UPDATE inv.build_execution_intents
+            SET request=request || '{\"targetStage\":\"tampered\"}'::jsonb
+            WHERE run_id=%s""",
+            (intent.run_id,),
+        )
+    assert queue.claim_next(env.tenant) is None
+
+    run = scheduled_run(env)
+    request, plan, decision = build_documents(env, "oidc:other-actor")
+    with psycopg.connect(env.owner) as conn:
         with pytest.raises(psycopg.errors.CheckViolation):
-            conn.execute("DELETE FROM inv.build_execution_intents WHERE run_id=%s", (intent.run_id,))
+            conn.execute(
+                """INSERT INTO inv.build_execution_intents(
+                tenant_id,project_id,run_id,request,plan,decision,
+                policy_version,evidence_id,actor_id
+                ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                (
+                    env.tenant,
+                    env.project,
+                    run["runId"],
+                    Jsonb(request),
+                    Jsonb(plan),
+                    Jsonb(decision),
+                    "s08-build-v1",
+                    new_id("evd"),
+                    "oidc:different-actor",
+                ),
+            )
+
+
+def test_claimed_intent_requeues_only_before_the_dispatch_decision_is_consumed(env):
+    queue, _intent = enqueue(env)
+    claimed = queue.claim_next(env.tenant)
+    assert claimed is not None
+    assert queue.requeue_if_unconsumed(claimed) is True
+    claimed = queue.claim_next(env.tenant)
+    assert claimed is not None
+
+    claim_key = action_digest({"decisionId": claimed.decision["decisionId"]})
+    with psycopg.connect(env.owner) as conn:
+        conn.execute(
+            """INSERT INTO inv.idempotency(
+            tenant_id,project_id,operation,key,request_hash,response
+            ) VALUES (%s,%s,'build.dispatch',%s,%s,%s)""",
+            (
+                env.tenant,
+                env.project,
+                claim_key,
+                "a" * 64,
+                Jsonb(
+                    {
+                        "state": "claimed",
+                        "bindingDigest": "a" * 64,
+                        "decisionId": claimed.decision["decisionId"],
+                    }
+                ),
+            ),
+        )
+    assert queue.requeue_if_unconsumed(claimed) is False
+    with psycopg.connect(env.owner) as conn:
+        with pytest.raises(psycopg.errors.CheckViolation):
+            conn.execute(
+                "UPDATE inv.build_execution_intents SET status='pending' WHERE run_id=%s",
+                (claimed.run_id,),
+            )
 
 
 class SuccessfulService:
@@ -210,6 +301,11 @@ class SuccessfulService:
     def execute(self, principal, request, plan, decision, **kwargs):
         self.calls.append((principal, request, plan, decision, kwargs))
         return BuildExecutionResult(kwargs["evidence_id"], "a" * 64, True, True)
+
+
+class FailingService:
+    def execute(self, *_args, **_kwargs):
+        raise DomainError("RES-0006", "pre-dispatch fence unavailable", 503, retryable=True)
 
 
 def test_internal_product_worker_calls_service_once_and_completes(env):
@@ -242,3 +338,21 @@ def test_disabled_product_worker_does_not_consume_pending_intent(env):
             "SELECT status FROM inv.build_execution_intents WHERE run_id=%s", (intent.run_id,)
         ).fetchone()[0]
     assert status == "pending"
+
+
+def test_pre_dispatch_product_failure_returns_unconsumed_intent_to_pending(env):
+    queue, intent = enqueue(env)
+    worker = BuildExecutionWorker(
+        queue,
+        FailingService(),
+        environment={PRODUCT_ENABLE_SETTING: "1"},
+    )
+    with pytest.raises(DomainError) as caught:
+        worker.once(env.tenant)
+    assert caught.value.code == "RES-0006"
+    with psycopg.connect(env.owner) as conn:
+        state = conn.execute(
+            "SELECT status,claimed_at FROM inv.build_execution_intents WHERE run_id=%s",
+            (intent.run_id,),
+        ).fetchone()
+    assert state == ("pending", None)
