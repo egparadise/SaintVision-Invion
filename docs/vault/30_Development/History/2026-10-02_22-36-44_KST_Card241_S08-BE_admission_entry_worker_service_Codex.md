@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD241-S08-BE-ADMISSION-WORKER-20261002"
 title: "Card 241 S08-BE trusted admission entry and deployed worker service"
-version: "1.1.0"
+version: "1.1.1"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T23:37:20+09:00"
+updated: "2026-10-02T23:54:08+09:00"
 source_of_truth: "Git"
 base_sha: "a2d64b6193913a56448a0ef495d1b7b374de2a54"
 reviewer: "Claude"
@@ -118,6 +118,13 @@ BuildKit, browser, or full suite was started.
 | doc-path citation ratchet against the base | passed; no new broken citation |
 | exact-head hosted real-PG | 12-case Core review lane required; local run is intentionally skipped without a disposable DSN |
 | exact-head Backend/Core | pending after review-r1 remediation |
+
+The first remediation Core run `37022207788` failed before the focused build
+lane because `SELECT ... FOR SHARE` was added to immutable approval snapshot and
+dispatch receipt tables. The runtime role intentionally has no `UPDATE` privilege on
+those tables. The follow-up keeps the approval request row locked while reading the
+append-only snapshot, votes, and receipt with ordinary `SELECT`; focused tests assert
+that this least-privilege boundary is not widened. A new exact-head run is required.
 
 # Review-r1 remediation boundary
 

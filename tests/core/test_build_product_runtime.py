@@ -432,3 +432,9 @@ def test_trusted_entry_is_composed_in_process_without_a_public_route():
     assert "build_admission_entry=TrustedBuildAdmissionEntry(database)" in source
     approvals = (ROOT / "services/control-plane/src/inv/approvals.py").read_text(encoding="utf-8")
     assert "TrustedBuildAdmissionEntry(self.db).record_committed(" in approvals
+    assert "approval_review_snapshots WHERE approval_id=%s FOR SHARE" not in approvals
+    runtime = (ROOT / "services/control-plane/src/inv/build_product_runtime.py").read_text(
+        encoding="utf-8"
+    )
+    assert "approval_review_snapshots WHERE approval_id=%s FOR SHARE" not in runtime
+    assert "approval_dispatches WHERE approval_id=%s FOR SHARE" not in runtime

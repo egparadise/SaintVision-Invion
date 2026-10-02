@@ -280,7 +280,7 @@ class ApprovalStore:
 
     def _review_documents(self, conn, row):
         snapshot = conn.execute(
-            "SELECT * FROM inv.approval_review_snapshots WHERE approval_id=%s FOR SHARE",
+            "SELECT * FROM inv.approval_review_snapshots WHERE approval_id=%s",
             (row["approval_id"],),
         ).fetchone()
         if not snapshot:

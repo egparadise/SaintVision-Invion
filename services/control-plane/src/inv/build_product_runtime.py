@@ -241,7 +241,7 @@ class BuildExecutionAdmissionStore:
         approval = approvals[0]
         snapshot = conn.execute(
             """SELECT workload,policy,policy_sha256
-            FROM inv.approval_review_snapshots WHERE approval_id=%s FOR SHARE""",
+            FROM inv.approval_review_snapshots WHERE approval_id=%s""",
             (approval["approval_id"],),
         ).fetchone()
         votes = conn.execute(
@@ -250,7 +250,7 @@ class BuildExecutionAdmissionStore:
             (approval["approval_id"],),
         ).fetchall()
         dispatched = conn.execute(
-            "SELECT 1 FROM inv.approval_dispatches WHERE approval_id=%s FOR SHARE",
+            "SELECT 1 FROM inv.approval_dispatches WHERE approval_id=%s",
             (approval["approval_id"],),
         ).fetchone()
         actors = sorted({row["actor_id"] for row in votes})
