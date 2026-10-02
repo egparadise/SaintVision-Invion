@@ -87,7 +87,7 @@ DEFINER_FILES = [
 ]
 RLS_FILES = [
     {"path": "tools/collect_rls_evidence.py", "blob": "446c6cc12ccdd2df373713ba4558792f02701c62"},
-    {"path": "tools/rls-boundary-baseline.json", "blob": "698a5b55d3f7ca5042d2760b0d8b448ea0143404"},
+    {"path": "tools/rls-boundary-baseline.json", "blob": "5f6eb104fa6ca455de78423a6f678fd8fc99d6df"},
 ]
 
 DEFINER_CRITICAL = {

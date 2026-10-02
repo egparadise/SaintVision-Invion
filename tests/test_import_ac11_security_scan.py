@@ -278,18 +278,20 @@ def test_the_envelope_is_admissible_and_names_the_threat_reports_it_lacks():
     assert envelope["scanRecomputed"] == "MEASURED_PASS"
 
 
-class CheckoutGit(aggregator.RepositoryGit):
-    """The repository, answering one question about this checkout instead of the commit.
+#: Paths this test answers from the working tree rather than from the commit.  The envelope is
+#: bound to the importer that is *executing* and to the reviewed allowlist this checkout holds;
+#: while a change is uncommitted those are the working files, not the committed ones.  Pinning
+#: them from disk keeps this test about the question it asks -- is the envelope admissible --
+#: and each binding is measured by its own test below.
+CHECKOUT_ANSWERED = (tool.IMPORTER_REPO_PATH, aggregator.ALLOWLIST_REPO_PATH)
 
-    The envelope is bound to the importer that is *executing*, which while the change is
-    uncommitted is the working file rather than the committed one.  Overriding that single
-    answer keeps this test about the question it asks -- is the envelope admissible -- and
-    the binding itself is measured by its own tests below.
-    """
+
+class CheckoutGit(aggregator.RepositoryGit):
+    """The repository, answering two questions about this checkout instead of the commit."""
 
     def blob(self, commit: str, path: str) -> str:
-        if path == tool.IMPORTER_REPO_PATH:
-            return tool.importer_blob()
+        if path in CHECKOUT_ANSWERED:
+            return git("hash-object", path)
         return super().blob(commit, path)
 
 
