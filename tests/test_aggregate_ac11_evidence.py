@@ -688,10 +688,13 @@ def test_rls_unmeasured_and_unknown_exit_mapping(exit_code, expected, allowlist)
     assert tool.evaluate_rls(report, allowlist, NOW) is expected
 
 
+OWNER_FP = "9b74c9897bac770ffc029102a200c5de"
+OTHER_FP = "0cc175b9c0f1b6a831c399e269772661"
 OWNER_VERIFIED_IDENTITY = {
     "method": "owner-verified-key", "columns": ["tenant_id", "event_id"],
     "ownerDistinctness": {"rows": 2, "distinct": 2, "nullRows": 0},
-    "owner_a": {"rows": 2, "fp": "aa"}, "role_a": {"rows": 2, "fp": "aa"}, "match": True,
+    "owner_a": {"rows": 2, "fp": OWNER_FP}, "role_a": {"rows": 2, "fp": OWNER_FP},
+    "match": True,
 }
 
 
@@ -736,6 +739,39 @@ def identity_roles(identity: dict, role: str = "inv_cancel_bridge_owner",
             tool.Verdict.INVALID_RUN,
             id="unregistered-pair",
         ),
+        # #322 r2 F-R3: the report's own observations are recomputed, so these synthesised
+        # reports cannot claim a pass.  Each one changes a single thing.
+        pytest.param(
+            identity_roles({**OWNER_VERIFIED_IDENTITY,
+                            "role_a": {"rows": 2, "fp": OTHER_FP}, "match": False}),
+            tool.Verdict.INVALID_RUN,
+            id="mismatch-claimed-as-pass",
+        ),
+        pytest.param(
+            identity_roles({**OWNER_VERIFIED_IDENTITY, "role_a": {"rows": 2, "fp": OTHER_FP}}),
+            tool.Verdict.INVALID_RUN,
+            id="match-true-but-fingerprints-differ",
+        ),
+        pytest.param(
+            identity_roles({**OWNER_VERIFIED_IDENTITY, "match": False}),
+            tool.Verdict.INVALID_RUN,
+            id="match-false-but-fingerprints-equal",
+        ),
+        pytest.param(
+            identity_roles({**OWNER_VERIFIED_IDENTITY, "owner_a": {"rows": 0, "fp": OWNER_FP}}),
+            tool.Verdict.INVALID_RUN,
+            id="owner-observed-zero-rows",
+        ),
+        pytest.param(
+            identity_roles({**OWNER_VERIFIED_IDENTITY, "role_a": {"rows": 2, "fp": "aa"}}),
+            tool.Verdict.INVALID_RUN,
+            id="fingerprint-is-not-a-digest",
+        ),
+        pytest.param(
+            identity_roles({k: v for k, v in OWNER_VERIFIED_IDENTITY.items() if k != "role_a"}),
+            tool.Verdict.INVALID_RUN,
+            id="no-role-observation",
+        ),
     ],
 )
 def test_an_owner_verified_key_identity_must_be_registered_and_non_vacuous(
@@ -753,6 +789,36 @@ def test_an_owner_verified_key_identity_must_be_registered_and_non_vacuous(
     report = rls_report(allowlist)
     report["roles"] = copy.deepcopy(roles)
     assert tool.evaluate_rls(report, allowlist, NOW) is expected
+
+
+def test_a_recomputed_identity_mismatch_cannot_hide_in_an_unmeasured_report(allowlist):
+    """A measured mismatch is a violation, not an absence of observation (#322 r2 F-R3).
+
+    An UNMEASURED report reads as "nothing was observed to be wrong", so a report carrying a
+    recomputed ``match: false`` under exit 3 is refused rather than passed through as
+    NOT_OBSERVED -- otherwise a forger could downgrade a violation into a quiet gap.
+    """
+
+    mismatch = identity_roles(
+        {**OWNER_VERIFIED_IDENTITY, "role_a": {"rows": 2, "fp": OTHER_FP}, "match": False}
+    )
+    report = rls_report(allowlist, 3)
+    report.update(
+        verdict="UNMEASURED",
+        unmeasured=[{"rule": "E4", "role": "inv_app", "table": "public.projects"}],
+        roles=copy.deepcopy(mismatch),
+    )
+    assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.INVALID_RUN
+
+    # The same observation reported honestly is a measured failure, which is admissible.
+    violation = rls_report(allowlist, 1)
+    violation.update(
+        verdict="VIOLATIONS",
+        violations=[{"rule": "E4", "role": "inv_cancel_bridge_owner",
+                     "table": "public.audit_events"}],
+        roles=copy.deepcopy(mismatch),
+    )
+    assert tool.evaluate_rls(violation, allowlist, NOW) is tool.Verdict.MEASURED_FAIL
 
 
 def test_security_requires_all_registered_reports_and_exact_vf_inventory(allowlist):

@@ -97,6 +97,7 @@ RLS_FILES = [
 #: wrote it, so the evaluator refuses an out-of-scope or vacuous readable-key identity even if
 #: some collector offered one (#322 r2).
 OWNER_VERIFIED_KEY_METHOD = "owner-verified-key"
+MD5_RE = re.compile(r"^[0-9a-f]{32}$")
 OWNER_VERIFIED_KEY_SCOPE = frozenset(
     {("inv_cancel_bridge_owner", "public.audit_events", ("tenant_id", "event_id"))}
 )
@@ -673,6 +674,7 @@ def evaluate_rls(report: dict[str, Any], allowlist: dict[str, Any], now: datetim
     for row in [*violations, *accepted, *unmeasured]:
         if not isinstance(row, dict) or row.get("rule") not in RLS_RULES:
             return Verdict.INVALID_RUN
+    identity_mismatches: list[tuple[str, str]] = []
     for role_name, role_report in roles.items():
         tables = role_report.get("tables") if isinstance(role_report, dict) else None
         if not isinstance(tables, dict):
@@ -699,6 +701,26 @@ def evaluate_rls(report: dict[str, Any], allowlist: dict[str, Any], now: datetim
                 # every fingerprint matches over zero rows), a repeated key or a NULL-bearing
                 # key: none of these is a row identity, so the report is not admissible.
                 return Verdict.INVALID_RUN
+            # ``match`` is a conclusion, so it is recomputed here from the two fingerprints the
+            # report carries, and the owner side has to be the same observation the distinctness
+            # was measured on.  Trusting the field let a report state a conclusion its own
+            # numbers contradict -- a synthesised PASS with ``match: false``, or an owner
+            # observation of zero rows beside a distinctness claiming two (#322 r2 F-R3).
+            owner, role_side = identity.get("owner_a"), identity.get("role_a")
+            if (
+                not isinstance(owner, dict)
+                or not isinstance(role_side, dict)
+                or owner.get("rows") != measured["rows"]
+                or not isinstance(role_side.get("rows"), int)
+                or not MD5_RE.fullmatch(str(owner.get("fp")))
+                or not MD5_RE.fullmatch(str(role_side.get("fp")))
+                or identity.get("match") is not (owner["fp"] == role_side["fp"])
+            ):
+                return Verdict.INVALID_RUN
+            if identity["match"] is not True:
+                # The role saw a different row set.  That is an E4 violation, so a report that
+                # calls itself a pass is inconsistent with its own observation.
+                identity_mismatches.append((role_name, table_name))
     allowed_identities = {
         (entry["role"], entry["table"], rule)
         for entry in allowlist["rlsAcceptedDispositions"] for rule in entry["rules"]
@@ -706,9 +728,15 @@ def evaluate_rls(report: dict[str, Any], allowlist: dict[str, Any], now: datetim
     if any((row.get("role"), row.get("table"), row.get("rule")) not in allowed_identities for row in accepted):
         return Verdict.INVALID_RUN
     if exit_code == 0:
+        if identity_mismatches:
+            return Verdict.INVALID_RUN
         return Verdict.MEASURED_PASS if report.get("verdict") == "PASS" and not violations and not unmeasured else Verdict.INVALID_RUN
     if exit_code == 1:
         return Verdict.MEASURED_FAIL if report.get("verdict") == "VIOLATIONS" and violations else Verdict.INVALID_RUN
+    if identity_mismatches:
+        # A recomputed mismatch is a measured violation, not something an UNMEASURED report may
+        # carry quietly: that report would be read as "nothing was observed to be wrong".
+        return Verdict.INVALID_RUN
     return Verdict.NOT_OBSERVED if report.get("verdict") == "UNMEASURED" and unmeasured and not violations else Verdict.INVALID_RUN
 
 

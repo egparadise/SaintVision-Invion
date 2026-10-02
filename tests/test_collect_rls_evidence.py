@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 import sys
 from copy import deepcopy
@@ -679,6 +680,14 @@ def test_real_pg_cancel_bridge_audit_identity_is_measured_not_unmeasured(rls_db)
     assert identity["ownerDistinctness"] == {"rows": 2, "distinct": 2, "nullRows": 0}
     assert identity["role_a"]["rows"] == identity["owner_a"]["rows"] == 2
     assert identity["match"] is True
+    # The shape the canonical evaluator recomputes from (#322 r2 F-R3): the owner observation
+    # is the one the distinctness was measured on, both fingerprints are digests, and ``match``
+    # is exactly what comparing them says.  Written here because this is the real producer.
+    assert identity["owner_a"]["rows"] == identity["ownerDistinctness"]["rows"]
+    assert all(
+        re.fullmatch(r"[0-9a-f]{32}", identity[side]["fp"]) for side in ("owner_a", "role_a")
+    )
+    assert identity["match"] is (identity["owner_a"]["fp"] == identity["role_a"]["fp"])
     truth = observation["ground_truth"]["public.audit_events"]
     assert truth["tenant_a"]["rows"] == 2 and truth["other_tenants"]["rows"] == 2
     assert bridge["visible"]["guc_unset"] == {"rows": 0}
