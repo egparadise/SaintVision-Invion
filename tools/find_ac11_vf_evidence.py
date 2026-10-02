@@ -11,9 +11,17 @@ What it does, and deliberately only this:
 * reads **which** workflow and **which** artifact name from the reviewed sources -- the allowlist's
   ``secVf001.workflow.path`` and the importer's ``VF_ARTIFACT_NAME`` -- so this file adds no second
   definition of the browser lane's identity;
-* requires **exactly one** candidate at every step: one successful run of that workflow at that
-  source SHA from an approved event, and one artifact of that name in it.  Zero is an answer
-  ("no evidence at this SHA") and two is a refusal, never a pick;
+* requires the candidates to be **one piece of evidence**: successful runs of that workflow at
+  that source SHA from an approved event, each with one artifact of the reviewed name.  Zero is an
+  answer ("no evidence at this SHA").  Several are accepted **only when their proofs agree on every
+  field the report asserts** (``importer.VF_DECISIVE_FIELDS``) -- then choosing between them is not
+  a choice, and the lowest run id is taken so the result is reproducible.  Any disagreement is a
+  refusal, never a pick.  Measured on the lane (card 233): pushing a branch and dispatching the
+  browser lane leaves two successful runs at one head, an "exactly one" rule dropped SEC-VF-001
+  from the envelope whenever that happened (aggregate run 36993502607), and comparing the artifact
+  *digests* would not have helped -- runs 36993192700 and 36993193630 differ by a fresh run uuid,
+  two timestamps, the paths built from that uuid and a JUnit digest whose durations differ, while
+  every decisive field is identical;
 * downloads the three inputs and writes an ``ac11-vf-evidence:1`` document naming them.
 
 What it does **not** do: verify the run and artifact.  That is ``import_ac11_security_scan``'s
@@ -72,8 +80,8 @@ def _gh_bytes(*args: str) -> bytes:
     return result.stdout
 
 
-def select_run(rows: Any, source_sha: str, workflow_path: str) -> dict[str, Any]:
-    """The one run of that workflow at that SHA which finished successfully.
+def candidate_runs(rows: Any, source_sha: str, workflow_path: str) -> list[int]:
+    """Every successful run of that workflow at that SHA from an approved event, by id.
 
     ``gh run list --json`` has no ``path`` field (measured: it refuses the name and prints the
     fifteen it has), so the workflow is selected by the ``--workflow`` argument here and the
@@ -83,23 +91,70 @@ def select_run(rows: Any, source_sha: str, workflow_path: str) -> dict[str, Any]
 
     if not isinstance(rows, list):
         raise RuntimeError("gh run list did not return a list")
-    matching = [
-        row for row in rows
-        if isinstance(row, dict)
-        and row.get("headSha") == source_sha
-        and row.get("status") == "completed"
-        and row.get("conclusion") == "success"
-        and row.get("event") in APPROVED_EVENTS
-    ]
-    if len(matching) != 1:
+    found = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        if (
+            row.get("headSha") != source_sha
+            or row.get("status") != "completed"
+            or row.get("conclusion") != "success"
+            or row.get("event") not in APPROVED_EVENTS
+        ):
+            continue
+        run_id = row.get("databaseId")
+        if not isinstance(run_id, int) or isinstance(run_id, bool) or run_id <= 0:
+            raise NoSingleCandidate("a matching run has no usable databaseId")
+        found.append(run_id)
+    if not found:
         raise NoSingleCandidate(
-            f"expected exactly 1 successful {workflow_path} run at {source_sha} from "
-            f"{list(APPROVED_EVENTS)}, found {len(matching)}"
+            f"no successful {workflow_path} run at {source_sha} from {list(APPROVED_EVENTS)}"
         )
-    run_id = matching[0].get("databaseId")
-    if not isinstance(run_id, int) or isinstance(run_id, bool) or run_id <= 0:
-        raise NoSingleCandidate("the matching run has no usable databaseId")
-    return matching[0]
+    return sorted(set(found))
+
+
+def select_evidence(
+    run_ids: list[int], artifacts_of, archive_of, name: str
+) -> tuple[int, dict[str, Any]]:
+    """(run id, artifact) for the one piece of evidence those runs carry.
+
+    Several runs at one head are ordinary -- pushing the branch and dispatching the lane both run
+    it -- so the question is not "how many runs" but "do they say the same thing".  Byte equality
+    cannot answer it: two such runs differ by a fresh run uuid, two timestamps, the paths built
+    from that uuid and the digest of a JUnit file whose durations differ (measured on runs
+    36993192700 and 36993193630 at one head), so their artifact digests always differ.  What the
+    report asserts is ``importer.VF_DECISIVE_FIELDS`` -- the fields ``vf_report`` checks against the
+    reviewed allowlist and records -- and those are compared here, read out of each candidate's own
+    archive.  All equal: one piece of evidence, and the lowest run id is taken so the answer is
+    reproducible; the importer then verifies that run in full.  Any difference is a refusal, because
+    choosing which of two observations to believe is not this tool's job (card 233).
+    """
+
+    ordered = sorted(set(run_ids))
+    chosen_id = ordered[0]
+    chosen = select_artifact(artifacts_of(chosen_id), name)
+    if len(ordered) == 1:
+        return chosen_id, chosen
+    try:
+        decisive = importer.vf_decisive(
+            importer.vf_proof_of_archive(archive_of(chosen_id)), f"run {chosen_id}"
+        )
+        for run_id in ordered[1:]:
+            # Each candidate must also carry exactly one artifact of that name, or its evidence
+            # cannot be compared at all.
+            select_artifact(artifacts_of(run_id), name)
+            other = importer.vf_decisive(
+                importer.vf_proof_of_archive(archive_of(run_id)), f"run {run_id}"
+            )
+            differing = [field for field in decisive if decisive[field] != other[field]]
+            if differing:
+                raise NoSingleCandidate(
+                    f"runs {chosen_id} and {run_id} disagree about "
+                    f"{', '.join(sorted(differing))}; this tool does not choose between them"
+                )
+    except importer.SecurityImportError as unusable:
+        raise NoSingleCandidate(str(unusable)) from None
+    return chosen_id, chosen
 
 
 def select_artifact(payload: Any, name: str) -> dict[str, Any]:
@@ -156,12 +211,34 @@ def main(argv: list[str] | None = None) -> int:
             )
             or "[]"
         )
-        run = select_run(rows, args.source_sha, workflow_path)
-        run_id = int(run["databaseId"])
-        payload = json.loads(
-            _gh("api", f"repos/{repository}/actions/runs/{run_id}/artifacts") or "{}"
+        run_ids = candidate_runs(rows, args.source_sha, workflow_path)
+
+        artifacts: dict[int, Any] = {}
+        archives: dict[int, bytes] = {}
+
+        def artifacts_of(candidate: int) -> Any:
+            if candidate not in artifacts:
+                artifacts[candidate] = json.loads(
+                    _gh("api", f"repos/{repository}/actions/runs/{candidate}/artifacts") or "{}"
+                )
+            return artifacts[candidate]
+
+        def archive_of(candidate: int) -> bytes:
+            # Only reached when there is more than one candidate, and memoised by artifact id so
+            # the chosen archive is downloaded once however often it is read.
+            artifact_of_candidate = select_artifact(
+                artifacts_of(candidate), importer.VF_ARTIFACT_NAME
+            )
+            key = int(artifact_of_candidate["id"])
+            if key not in archives:
+                archives[key] = _gh_bytes(
+                    "api", f"repos/{repository}/actions/artifacts/{key}/zip"
+                )
+            return archives[key]
+
+        run_id, artifact = select_evidence(
+            run_ids, artifacts_of, archive_of, importer.VF_ARTIFACT_NAME
         )
-        artifact = select_artifact(payload, importer.VF_ARTIFACT_NAME)
         artifact_id = int(artifact["id"])
     except NoSingleCandidate as reason:
         print(f"no browser lane evidence at {args.source_sha}: {reason}", file=sys.stderr)
@@ -179,7 +256,8 @@ def main(argv: list[str] | None = None) -> int:
             _gh("api", f"repos/{repository}/actions/artifacts/{artifact_id}"), encoding="utf-8"
         )
         (args.out_dir / ARCHIVE_NAME).write_bytes(
-            _gh_bytes("api", f"repos/{repository}/actions/artifacts/{artifact_id}/zip")
+            archives.get(artifact_id)
+            or _gh_bytes("api", f"repos/{repository}/actions/artifacts/{artifact_id}/zip")
         )
     except (RuntimeError, OSError, subprocess.SubprocessError) as error:
         print(f"browser lane download failed: {error}", file=sys.stderr)

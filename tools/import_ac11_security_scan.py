@@ -106,6 +106,16 @@ VF_THREAT_ID = "SEC-VF-001"
 #: name is not head-bound, so the head binding comes from the run metadata rather than from it.
 VF_ARTIFACT_NAME = "desktop-browser-safe-evidence"
 VF_PROOF_MEMBER = "vf-desktop-browser-ci.json"
+#: What SEC-VF-001 is *about*: every value ``vf_report`` reads out of that proof and either
+#: checks against the reviewed allowlist or records in the report.  Two runs of the browser lane
+#: at one head are never byte-identical -- measured on runs 36993192700 and 36993193630, whose
+#: artifacts differ by a fresh run uuid, two timestamps, the paths built from that uuid and the
+#: digest of a JUnit file whose durations differ -- so "do two candidates carry the same
+#: evidence?" is a question about these fields and nothing else.  Declared here so the finder
+#: asks it with this list rather than a second one of its own (card 233).
+VF_DECISIVE_FIELDS = (
+    "caseIdentitiesSha256", "evidenceStatus", "exitCode", "subprocessExitCode", "tests",
+)
 #: The document ``--vf-evidence`` takes: the three inputs the browser-lane binding needs, named
 #: once so the AC-11 aggregate lane can pass them as one argument (card 233).  It is validated as
 #: an **exact** key set with no defaults -- a missing key is a binding the caller dropped and an
@@ -584,7 +594,43 @@ def _database_reports(members: dict[str, bytes], report: dict[str, Any]) -> list
     return reports
 
 
-def _vf_proof(archive: bytes) -> dict[str, Any]:
+def vf_required(spec: dict[str, Any]) -> dict[str, Any]:
+    """What the reviewed allowlist requires of the proof, keyed by :data:`VF_DECISIVE_FIELDS`.
+
+    One mapping, used by ``vf_report`` to judge a proof and by the finder to compare two
+    candidates.  The key-set guard is the point: adding a reviewed field here without adding it
+    to ``VF_DECISIVE_FIELDS`` would leave the comparison blind to it, so the two cannot drift.
+    """
+
+    required = {
+        "caseIdentitiesSha256": spec["requiredCaseIdentitiesSha256"],
+        "tests": spec["expectedTests"],
+        "evidenceStatus": "complete",
+        "exitCode": 0,
+        "subprocessExitCode": 0,
+    }
+    if set(required) != set(VF_DECISIVE_FIELDS):
+        raise SecurityImportError(
+            "the reviewed browser-lane fields and VF_DECISIVE_FIELDS disagree"
+        )
+    return required
+
+
+def vf_decisive(proof: dict[str, Any], label: str) -> dict[str, Any]:
+    """The decisive fields of one proof, every one of them actually stated.
+
+    A missing field is not "equal by absence": calling two candidates the same evidence on a
+    field neither of them states would be a verdict about nothing observed, which is the
+    default-value class of fail-open this file has already had to close four times.
+    """
+
+    missing = [field for field in VF_DECISIVE_FIELDS if field not in proof]
+    if missing:
+        raise SecurityImportError(f"{label} proof states no {', '.join(missing)}")
+    return {field: proof[field] for field in VF_DECISIVE_FIELDS}
+
+
+def vf_proof_of_archive(archive: bytes) -> dict[str, Any]:
     """The proof document, read out of the browser lane's artifact rather than from a file.
 
     A loose JSON is exactly what r1 of this card accepted: the five reviewed values it compares
@@ -676,16 +722,10 @@ def vf_report(
     if observed_digest != expected_digest:
         raise SecurityImportError("browser lane artifact digest differs from GitHub metadata")
 
-    proof = _vf_proof(archive)
-    required = {
-        "caseIdentitiesSha256": spec["requiredCaseIdentitiesSha256"],
-        "tests": spec["expectedTests"],
-        "evidenceStatus": "complete",
-        "exitCode": 0,
-        "subprocessExitCode": 0,
-    }
-    for field, expected in required.items():
-        if proof.get(field) != expected:
+    proof = vf_proof_of_archive(archive)
+    decisive = vf_decisive(proof, "browser lane")
+    for field, expected in vf_required(spec).items():
+        if decisive[field] != expected:
             raise SecurityImportError(
                 f"browser lane evidence does not satisfy the reviewed {field}"
             )
@@ -715,11 +755,11 @@ def vf_report(
         },
         "toolFiles": [dict(row) for row in files],
         "nodeIds": list(spec["requiredNodeIds"]),
-        "exitCode": proof["exitCode"],
-        "subprocessExitCode": proof["subprocessExitCode"],
-        "evidenceStatus": proof["evidenceStatus"],
-        "caseIdentitiesSha256": proof["caseIdentitiesSha256"],
-        "tests": dict(proof["tests"]),
+        "exitCode": decisive["exitCode"],
+        "subprocessExitCode": decisive["subprocessExitCode"],
+        "evidenceStatus": decisive["evidenceStatus"],
+        "caseIdentitiesSha256": decisive["caseIdentitiesSha256"],
+        "tests": dict(decisive["tests"]),
     }
 
 

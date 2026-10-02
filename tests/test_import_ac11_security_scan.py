@@ -357,6 +357,57 @@ def vf_proof(**over) -> dict:
     return document
 
 
+def test_the_reviewed_browser_fields_are_exactly_the_decisive_fields():
+    """One list, used twice: ``vf_report`` judges a proof with it and the finder compares with it.
+
+    ``find_ac11_vf_evidence`` asks "do two candidate runs carry the same evidence?" by comparing
+    exactly these fields, so a reviewed field added here without being added to
+    ``VF_DECISIVE_FIELDS`` would be a field the comparison is blind to.  The guard makes that a
+    refusal rather than a silent gap (card 233).
+    """
+
+    spec = APPROVED_ALLOWLIST["secVf001"]
+    assert set(tool.vf_required(spec)) == set(tool.VF_DECISIVE_FIELDS)
+    assert tool.vf_required(spec) == {
+        "caseIdentitiesSha256": spec["requiredCaseIdentitiesSha256"],
+        "tests": spec["expectedTests"],
+        "evidenceStatus": "complete",
+        "exitCode": 0,
+        "subprocessExitCode": 0,
+    }
+
+
+@pytest.mark.parametrize("dropped", sorted(tool.VF_DECISIVE_FIELDS))
+def test_a_decisive_field_outside_the_declared_list_is_refused(monkeypatch, dropped):
+    """If the two drift apart, the importer says so instead of comparing fewer fields."""
+
+    monkeypatch.setattr(
+        tool, "VF_DECISIVE_FIELDS",
+        tuple(field for field in tool.VF_DECISIVE_FIELDS if field != dropped),
+    )
+    with pytest.raises(tool.SecurityImportError, match="VF_DECISIVE_FIELDS disagree"):
+        tool.vf_required(APPROVED_ALLOWLIST["secVf001"])
+
+
+@pytest.mark.parametrize("missing", sorted(tool.VF_DECISIVE_FIELDS))
+def test_a_proof_that_omits_a_decisive_field_is_refused_by_name(missing):
+    """Absence is not a value: no default is substituted and the field is named in the refusal."""
+
+    proof = vf_proof()
+    proof.pop(missing)
+    with pytest.raises(tool.SecurityImportError, match=f"states no {missing}"):
+        tool.vf_decisive(proof, "browser lane")
+
+
+def test_the_decisive_fields_of_a_real_proof_are_read_once():
+    """What ``vf_decisive`` returns is what the report records, with nothing else added."""
+
+    proof = vf_proof()
+    decisive = tool.vf_decisive(proof, "browser lane")
+    assert decisive == {field: proof[field] for field in tool.VF_DECISIVE_FIELDS}
+    assert "evidenceScope" not in decisive, "only the fields the report asserts"
+
+
 def vf_bundle(proof=None, run=None, artifact=None, members=None) -> tuple:
     """The browser lane's artifact with the two GitHub metadata documents that bind it."""
 
