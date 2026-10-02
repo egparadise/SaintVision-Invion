@@ -36,6 +36,9 @@ subprocess.run(
 
 
 def typename(spec, lang):
+    if "oneOf" in spec:
+        choices = [typename(item, lang) for item in spec["oneOf"]]
+        return "(" + " | ".join(choices) + ")" if lang == "ts" else "any"
     if "anyOf" in spec:
         choices = spec["anyOf"]
         concrete = [item for item in choices if item.get("type") != "null"]

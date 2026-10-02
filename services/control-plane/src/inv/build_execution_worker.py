@@ -78,6 +78,8 @@ class BuildExecutionIntent:
     attempt_count: int
     next_attempt_at: Any
     last_error_code: str | None
+    source_capsule_sha256: str | None = None
+    source_capsule_locator: str | None = None
 
     @property
     def claim_fencing_token(self) -> int:
@@ -180,6 +182,8 @@ def _row_to_intent(row: Mapping[str, Any]) -> BuildExecutionIntent:
         attempt_count=row["attempt_count"],
         next_attempt_at=row["next_attempt_at"],
         last_error_code=row["last_error_code"],
+        source_capsule_sha256=row.get("source_capsule_sha256"),
+        source_capsule_locator=row.get("source_capsule_locator"),
     )
 
 
@@ -321,6 +325,14 @@ class BuildExecutionIntentQueue:
                 if not row:
                     return None
                 intent = _row_to_intent(row)
+                capsule = conn.execute(
+                    """SELECT source_capsule_sha256,source_capsule_locator
+                    FROM inv.build_preparations WHERE project_id=%s AND run_id=%s""",
+                    (intent.project_id, intent.run_id),
+                ).fetchone()
+                if capsule:
+                    row = {**row, **capsule}
+                    intent = _row_to_intent(row)
                 try:
                     # The trigger binds SQL-readable fields; this validates the complete strict
                     # public contracts before any external side effect.
@@ -446,6 +458,11 @@ class BuildExecutionWorker:
         if intent is None:
             return None
         try:
+            if intent.source_capsule_sha256 is not None:
+                binder = getattr(self.service, "bind_source_capsule", None)
+                if binder is None:
+                    raise _refuse("Build source capsule materializer is unavailable")
+                binder(intent.source_capsule_locator, intent.source_capsule_sha256)
             result = self.service.execute(
                 Principal(intent.tenant_id, intent.actor_id),
                 intent.request,

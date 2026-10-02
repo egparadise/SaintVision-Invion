@@ -33,13 +33,13 @@ DEFAULT_ALLOWLIST = (
     ROOT / ALLOWLIST_REPO_PATH
 )
 TARGET_REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
-TARGET_REGISTRY_BLOB = "60800cc0a86aa723f04308f2f38786423a94f968"
-ALLOWLIST_BLOB = "54f8edf27a845a35e1428b69bcdff6754de91bbc"
-ALLOWLIST_CANONICAL_SHA256 = "c75fc38a5a988852e6068329b901d6f01e6fa0aa7aab5dbab2846137fc16836e"
+TARGET_REGISTRY_BLOB = "f2e705f853d06fc805d96e9d858a8a3f08566454"
+ALLOWLIST_BLOB = "20f761dce5d54bd7bc62e2cc3f33fcba7e844c9d"
+ALLOWLIST_CANONICAL_SHA256 = "89a7cadf7f66ea219595ce6b769d5eb0b8588f0afd74451c6c0901e5538f463f"
 SCAN_ALLOWLIST_REPO_PATH = (
     "docs/vault/30_Development/Evidence/s11-security-dependency-sast-allowlist-v1.json"
 )
-SCAN_ALLOWLIST_BLOB = "8f1a36c6584413c4ea308f35853c1f675f280fe9"
+SCAN_ALLOWLIST_BLOB = "8975f7bc9e56e8b8b0e8f70187ad06c370257c97"
 #: The importer that may write this axis's envelopes, pinned by path here and by blob in
 #: the reviewed allowlist above (#313 F-R3).
 SECURITY_IMPORTER_REPO_PATH = "tools/import_ac11_security_scan.py"
@@ -84,7 +84,7 @@ PIN_RE = re.compile(r"^([A-Za-z0-9_.-]+)(?:\[[^\]]+\])?==([^\s;]+)$")
 
 DEFINER_FILES = [
     {"path": "tools/check_definer_functions.py", "blob": "5831f8d8806900146add2e5e7b51b934dced3952"},
-    {"path": "tools/definer-policy.json", "blob": "d8202da2ee4227e78a1e73c6c6545295ff3f3efc"},
+    {"path": "tools/definer-policy.json", "blob": "72e234f80d8c1cf7d114550dd302c1aa0570f3cc"},
 ]
 RLS_FILES = [
     {"path": "tools/collect_rls_evidence.py", "blob": "684e0f4896202e112a70798ea8c01a545ffd3896"},
@@ -690,7 +690,7 @@ RLS_REPORT_KEYS = frozenset({
 #: that adds or removes a table in ``inv``/``public`` makes this stale: regenerate with
 #: ``tools/collect_rls_evidence.py --disposable`` and repin the blob in the same reviewed change.
 RLS_CENSUS_REPO_PATH = "tools/rls-table-census.json"
-RLS_CENSUS_BLOB = "ee6c3f7fb1eefc25388893ff0bad76797dabe3ab"
+RLS_CENSUS_BLOB = "dc641de461553bda1eff2f6d6c83b2f7b37ed8c4"
 #: Tables that must appear in the measured set, derived from the pinned readable-key scope (the
 #: reviewed allowlist's own tables are anchored separately, because ``baselineAccepted`` has to
 #: match it exactly and every table it names has to be measured).  An independent anchor against
