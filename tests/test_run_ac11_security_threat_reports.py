@@ -57,6 +57,22 @@ def run(tmp_path, monkeypatch, *, dsn: str | None = None, admin: str | None = No
     return code, definer, boundary
 
 
+def document(report: dict) -> dict:
+    """A measured report with the provenance ``main`` adds, which is what the evaluator reads."""
+
+    class _Args:
+        source_run_id = RUN_ID
+        source_head_sha = head()
+
+    return {
+        **producer._provenance(_Args, producer._utc_now()),
+        "threatId": producer.RLS_THREAT_ID,
+        "toolFiles": producer.tool_files(producer.RLS_TOOL_PATHS),
+        "reportAvailable": report.get("exitCode") != 2,
+        **report,
+    }
+
+
 def test_without_a_database_both_reports_are_unavailable_rather_than_passing(tmp_path, monkeypatch):
     code, definer, boundary = run(tmp_path, monkeypatch)
     assert code == 2
@@ -183,3 +199,415 @@ def test_the_boundary_is_measured_over_the_collector_s_own_role_population(monke
     assert report["measuredRoles"] == list(rls.DEFAULT_ROLES)
     assert report["table_census"]["tables"] == ["public.projects"]
     assert report["exitCode"] == 0 and report["verdict"] == "PASS"
+
+
+# ---------------------------------------------------------------- card 236: the audit seed
+
+REVIEWED_ROW = {
+    "rule": "E3", "role": "inv_app", "table": "public.tenants",
+    "detail": "2 rows visible with inv.tenant_id unset",
+}
+AUDIT_ROWS = [
+    {"rule": "E3", "role": "inv_audit_reader", "table": "public.audit_events",
+     "detail": "4 rows visible with inv.tenant_id unset"},
+    {"rule": "E4", "role": "inv_audit_reader", "table": "public.audit_events",
+     "detail": "2 rows of other tenants visible"},
+    {"rule": "E5", "role": "inv_audit_reader", "table": "public.audit_events",
+     "detail": "4 rows visible for an unknown tenant"},
+]
+
+
+def judged(monkeypatch, rows, *, unverified=()):
+    """``rls_report`` over a stubbed evaluation, so the subject is *which* baseline is applied."""
+
+    import collect_rls_evidence as rls
+
+    observation = {
+        "roles": {"inv_app": {"present": True}},
+        "ground_truth": {"public.audit_events": {"total": {"rows": 4}}},
+        "table_census": {"schemas": ["public"], "count": 1, "sha256": "0" * 64,
+                         "tables": ["public.audit_events"]},
+    }
+    monkeypatch.setattr(rls, "collect", lambda *_args, **_kwargs: observation)
+    monkeypatch.setattr(rls, "evaluate", lambda _observation: [dict(row) for row in rows])
+    monkeypatch.setattr(
+        rls, "unverified_identities", lambda _observation: [dict(row) for row in unverified]
+    )
+
+    def refuse_superset():
+        raise AssertionError(
+            "the AC-11 report must be judged by the dispositions it names, not by the "
+            "collector's S02-DB superset"
+        )
+
+    monkeypatch.setattr(rls, "load_baseline", refuse_superset)
+    return producer.rls_report("postgresql://unused", None, APPROVED_ALLOWLIST)
+
+
+def test_an_exception_the_reviewed_allowlist_does_not_carry_is_a_violation(monkeypatch):
+    """Card 236: with ``audit_events`` seeded, this is the difference between FAIL and INVALID_RUN.
+
+    ``baselineAccepted`` says the measurement was judged against the reviewed dispositions, and
+    ``evaluate_rls`` refuses any ``accepted`` row outside them -- so judging with the collector's
+    four-entry superset made the report claim one thing and do another: the audit reader's three
+    real cross-tenant observations were "accepted" by a disposition the axis has never reviewed,
+    and the evaluator answered INVALID_RUN, which is neither a PASS nor a FAIL.
+    """
+
+    report = judged(monkeypatch, [REVIEWED_ROW, *AUDIT_ROWS])
+    assert report["verdict"] == "VIOLATIONS" and report["exitCode"] == 1
+    assert [(row["role"], row["table"], row["rule"]) for row in report["violations"]] == [
+        ("inv_audit_reader", "public.audit_events", rule) for rule in ("E3", "E4", "E5")
+    ]
+    assert [(row["role"], row["table"], row["rule"]) for row in report["accepted"]] == [
+        ("inv_app", "public.tenants", "E3")
+    ]
+
+
+def test_a_reviewed_disposition_is_still_accepted_with_its_proof(monkeypatch):
+    report = judged(monkeypatch, [REVIEWED_ROW])
+    assert report["verdict"] == "PASS" and report["exitCode"] == 0
+    accepted = report["accepted"][0]
+    assert accepted["reason"] == APPROVED_ALLOWLIST["rlsAcceptedDispositions"][0]["proof"]
+    assert accepted["since"] == APPROVED_ALLOWLIST["rlsAcceptedDispositions"][0]["disposition"]
+
+
+def test_every_accepted_row_carries_a_string_reason_and_since(monkeypatch):
+    """``apply_baseline`` passes ``since`` through as ``None`` when the entry has none, and the
+    evaluator's schema types that field as a string -- so every reviewed disposition has to supply
+    one.  The disposition kind is what it says here, because that is the reviewed reason this row
+    is accepted at all."""
+
+    report = judged(monkeypatch, [REVIEWED_ROW], unverified=[dict(REVIEWED_ROW, rule="E4")])
+    assert len(report["accepted"]) == 2, "the reviewed disposition covers both rows"
+    for row in report["accepted"]:
+        assert isinstance(row["reason"], str) and row["reason"]
+        assert isinstance(row["since"], str) and row["since"]
+
+
+def test_the_reviewed_baseline_is_exactly_the_reviewed_dispositions():
+    baseline = producer.reviewed_baseline(APPROVED_ALLOWLIST)
+    assert [(e["role"], e["table"], tuple(e["rules"])) for e in baseline["accepted"]] == [
+        (e["role"], e["table"], tuple(e["rules"]))
+        for e in APPROVED_ALLOWLIST["rlsAcceptedDispositions"]
+    ]
+    assert all(isinstance(e["reason"], str) and e["reason"] for e in baseline["accepted"])
+
+
+def test_a_seed_that_cannot_be_written_makes_the_observation_unavailable(tmp_path, monkeypatch):
+    """An empty audit table measures nothing, so a failed seed must not become a pass.
+
+    The disposable database is created and the seed refuses; both reports then say
+    ``unavailable`` with exit 2 (``evaluate_rls`` answers NOT_OBSERVED for that pair) rather than
+    a verdict over a table nobody wrote to.
+    """
+
+    import collect_rls_evidence as rls
+
+    import contextlib
+
+    @contextlib.contextmanager
+    def fake_disposable(_admin):
+        yield "postgresql://unused", "00000000-0000-0000-0000-000000000000"
+
+    measured: list[str] = []
+    monkeypatch.setattr(rls, "disposable_database", fake_disposable)
+    monkeypatch.setattr(
+        producer, "seed_audit_rows",
+        lambda _dsn: (_ for _ in ()).throw(producer.ProducerError("no tenants")),
+    )
+    monkeypatch.setattr(rls, "collect", lambda *_a, **_k: measured.append("collected") or {})
+    code, definer, boundary = run(tmp_path, monkeypatch, admin="postgresql://admin")
+    assert code == 2
+    assert boundary["exitCode"] == 2 and boundary["status"] == "unavailable"
+    assert definer["exitCode"] == 2
+    assert measured == [], "nothing is measured once the seed refused"
+    assert aggregator.evaluate_rls(boundary, APPROVED_ALLOWLIST, NOW) is aggregator.Verdict.NOT_OBSERVED
+
+
+def test_the_seed_runs_before_anything_is_measured(tmp_path, monkeypatch):
+    import collect_rls_evidence as rls
+
+    import contextlib
+
+    order: list[str] = []
+
+    @contextlib.contextmanager
+    def fake_disposable(_admin):
+        yield "postgresql://unused", "00000000-0000-0000-0000-000000000000"
+
+    monkeypatch.setattr(rls, "disposable_database", fake_disposable)
+    monkeypatch.setattr(producer, "seed_audit_rows", lambda _dsn: order.append("seed") or {
+        "table": "public.audit_events", "path": "p", "role": "inv_app",
+        "tenants": ["a", "b"], "rowsPerTenant": 2, "crossTenantWriteRefusedWith": "refused",
+    })
+    monkeypatch.setattr(producer, "definer_report", lambda _dsn: order.append("definer") or
+                        {"exitCode": 2, "status": "unavailable"})
+    monkeypatch.setattr(producer, "rls_report", lambda *_a, **_k: order.append("rls") or
+                        {"exitCode": 2, "status": "unavailable", "baselineAccepted": []})
+    run(tmp_path, monkeypatch, admin="postgresql://admin")
+    assert order == ["seed", "definer", "rls"]
+
+
+# ---------------------------------------------------------------- card 236: against a real server
+
+
+@pytest.fixture(scope="module")
+def audit_db():
+    """A disposable migrated database with an **empty** ``public.audit_events``."""
+
+    import os
+
+    sys.path.insert(0, str(ROOT / "tools"))
+    import collect_rls_evidence as rls
+
+    admin = os.getenv("INV_TEST_ADMIN_DSN")
+    if not admin:
+        if os.getenv("CI"):
+            pytest.fail("CI requires INV_TEST_ADMIN_DSN; DB tests must not be skipped")
+        pytest.skip("Set INV_TEST_ADMIN_DSN to a disposable PostgreSQL 16+ test server")
+
+    class Redacted(str):  # pytest prints fixture values on failure: never show the DSN
+        def __repr__(self):
+            return "<audit_db dsn=redacted>"
+
+    with rls.disposable_database(admin) as (dsn, tenant_a):
+        yield Redacted(dsn), tenant_a
+
+
+@pytest.fixture(scope="module")
+def before_and_after(audit_db):
+    """The same database measured with the audit table empty and then seeded.
+
+    One fixture, so the two measurements cannot drift apart into two databases -- and so the
+    before state cannot be "whatever an earlier test left behind".
+    """
+
+    dsn, tenant_a = audit_db
+    before = producer.rls_report(str(dsn), tenant_a, APPROVED_ALLOWLIST)
+    summary = producer.seed_audit_rows(str(dsn))
+    after = producer.rls_report(str(dsn), tenant_a, APPROVED_ALLOWLIST)
+    return before, summary, after
+
+
+def audit_cells(report):
+    table = report["roles"]["inv_audit_reader"]["tables"]["public.audit_events"]
+    return table["visible"]
+
+
+def test_an_empty_audit_table_observes_nothing_and_the_axis_says_so(before_and_after):
+    """Why this card exists: "the role sees none of the other tenant's rows" over no rows.
+
+    Every visibility cell is 0 because the table is empty, the identity fingerprints are both the
+    digest of nothing, and the canonical evaluator answers NOT_OBSERVED -- the axis is not claiming
+    a measured boundary, which is correct and is also why nothing here is evidence of isolation.
+    """
+
+    before, _summary, _after = before_and_after
+    cells = audit_cells(before)
+    assert before["ground_truth"]["public.audit_events"] == {
+        "total": {"rows": 0}, "tenant_a": {"rows": 0}, "other_tenants": {"rows": 0}
+    }
+    assert {name: cell.get("rows") for name, cell in cells.items() if name != "identity"} == {
+        "guc_unset": 0, "guc_tenant_a": 0, "guc_tenant_a_foreign_rows": 0,
+        "guc_unknown_tenant": 0, "guc_not_uuid": 0,
+    }
+    assert cells["identity"]["owner_a"]["rows"] == 0 and cells["identity"]["role_a"]["rows"] == 0
+
+
+def test_the_seed_writes_two_tenants_through_the_product_writers(before_and_after, audit_db):
+    """Two tenants, two rows each, by ``record_denial_out_of_band`` and ``record_event``."""
+
+    import psycopg
+
+    dsn, _tenant_a = audit_db
+    _before, summary, _after = before_and_after
+    assert summary["role"] == producer.APP_ROLE
+    assert len(summary["tenants"]) == 2 and summary["rowsPerTenant"] == 2
+    with psycopg.connect(str(dsn)) as conn:
+        rows = conn.execute(
+            "SELECT tenant_id::text, outcome, action, actor_type FROM public.audit_events "
+            "ORDER BY tenant_id, outcome"
+        ).fetchall()
+    assert len(rows) == 4
+    assert sorted({row[0] for row in rows}) == sorted(summary["tenants"])
+    assert sorted({row[1] for row in rows}) == ["allow", "deny"]
+    assert all(row[3] == "user" for row in rows), "the product writes a principal's audit row"
+    assert all(row[2].startswith(("GET /v1/", "POST /v1/")) for row in rows)
+
+
+def test_the_seed_is_not_a_bypass(before_and_after, audit_db):
+    """The policy -- not the seed -- is what admitted those rows.
+
+    Three refusals, all from the database: another tenant's row under this tenant's scope, a row
+    with **no** scope set at all, and the application reading what it wrote (0047 revoked SELECT).
+    If any of them succeeded, the rows measured afterwards would be rows no policy ever checked.
+    """
+
+    import datetime as _dt
+    import uuid as _uuid
+
+    import psycopg
+    from sqlalchemy import text as _text
+    from sqlalchemy.exc import DBAPIError
+    from sqlalchemy.orm import sessionmaker
+
+    sys.path.insert(0, str(ROOT / "src"))
+    from saintvision.services.audit import record_event
+
+    dsn, _tenant_a = audit_db
+    _before, summary, _after = before_and_after
+    assert "row-level security" in summary["crossTenantWriteRefusedWith"]
+
+    engine = producer._app_engine(str(dsn))
+    try:
+        factory = sessionmaker(bind=engine, expire_on_commit=False)
+        # No scope at all: the WITH CHECK compares tenant_id with an unset GUC.
+        with pytest.raises(DBAPIError, match="row-level security"):
+            with factory() as session:
+                with session.begin():
+                    record_event(
+                        session, now=_dt.datetime.now(_dt.timezone.utc), actor_type="system",
+                        action="ac11.audit_seed.unscoped_probe", outcome="deny",
+                        tenant_id=_uuid.UUID(summary["tenants"][0]), reason_code="AC11-SEED-PROBE",
+                    )
+        # And the application cannot read the table it appends to.
+        with pytest.raises(DBAPIError, match="permission denied"):
+            with engine.begin() as connection:
+                connection.execute(_text("SELECT count(*) FROM public.audit_events"))
+    finally:
+        engine.dispose()
+
+    with psycopg.connect(str(dsn)) as conn:
+        assert conn.execute(
+            "SELECT count(*) FROM public.audit_events WHERE tenant_id IS NULL"
+        ).fetchone()[0] == 0, "the seed adds no tenant-less row"
+        assert conn.execute("SELECT count(*) FROM public.audit_events").fetchone()[0] == 4, (
+            "the refused probes left nothing behind"
+        )
+
+
+def test_the_seeded_table_makes_the_cross_tenant_comparison_real(before_and_after):
+    """What the card asked for: the comparison now has rows on both sides.
+
+    The owner sees tenant A's two rows; ``inv_audit_reader`` sees all four, of which two belong to
+    the other tenant -- so E3/E4/E5 are statements about rows that exist, and the identity
+    fingerprints differ instead of both being the digest of nothing.
+    """
+
+    _before, _summary, after = before_and_after
+    cells = audit_cells(after)
+    assert after["ground_truth"]["public.audit_events"] == {
+        "total": {"rows": 4}, "tenant_a": {"rows": 2}, "other_tenants": {"rows": 2}
+    }
+    assert cells["guc_unset"]["rows"] == 4
+    assert cells["guc_tenant_a_foreign_rows"]["rows"] == 2
+    identity = cells["identity"]
+    assert identity["owner_a"]["rows"] == 2 and identity["role_a"]["rows"] == 4
+    assert identity["match"] is False
+    assert identity["owner_a"]["fp"] != identity["role_a"]["fp"]
+
+
+def test_the_axis_now_measures_a_verdict_instead_of_observing_nothing(before_and_after):
+    """NOT_OBSERVED before, MEASURED_FAIL after -- and the three rows name why.
+
+    The failure is the audit reader's cross-tenant SELECT, which 0047 grants on purpose and the
+    S02-DB baseline excepts with its reason -- but the **reviewed** AC-11 dispositions do not carry
+    that exception.  Adding it is a review decision on the axis's source document, so this card
+    measures and reports rather than deciding (card 236 Codex decision request #1).
+    """
+
+    before, _summary, after = before_and_after
+    before_document = document(before)
+    after_document = document(after)
+    assert aggregator.rls_report_shape(before_document) is None
+    assert aggregator.rls_report_shape(after_document) is None
+    assert aggregator.evaluate_rls(before_document, APPROVED_ALLOWLIST, NOW) is (
+        aggregator.Verdict.NOT_OBSERVED
+    )
+    assert aggregator.evaluate_rls(after_document, APPROVED_ALLOWLIST, NOW) is (
+        aggregator.Verdict.MEASURED_FAIL
+    )
+    assert [(row["role"], row["table"], row["rule"]) for row in after["violations"]] == [
+        ("inv_audit_reader", "public.audit_events", rule) for rule in ("E3", "E4", "E5")
+    ]
+
+
+@pytest.fixture
+def fresh_audit_db():
+    """A disposable migrated database of this test's own, because it ends up with extra rows."""
+
+    import os
+
+    sys.path.insert(0, str(ROOT / "tools"))
+    import collect_rls_evidence as rls
+
+    admin = os.getenv("INV_TEST_ADMIN_DSN")
+    if not admin:
+        if os.getenv("CI"):
+            pytest.fail("CI requires INV_TEST_ADMIN_DSN; DB tests must not be skipped")
+        pytest.skip("Set INV_TEST_ADMIN_DSN to a disposable PostgreSQL 16+ test server")
+    with rls.disposable_database(admin) as (dsn, _tenant_a):
+        yield dsn
+
+
+def test_a_seed_the_policy_did_not_check_is_refused(fresh_audit_db):
+    """If the write is not policy-enforced, no visibility measurement is recorded.
+
+    ``_prove_policy_enforced`` writes the *other* tenant's row under this tenant's scope and
+    requires the database to refuse it.  Here it is handed an engine that is **not** the
+    application role -- the DSN that created the database -- so on a server where that role
+    bypasses RLS the write succeeds, and the producer must refuse the whole observation rather
+    than measure rows no policy ever checked.
+    """
+
+    import datetime as _dt
+
+    import psycopg
+    from psycopg.conninfo import conninfo_to_dict
+    from sqlalchemy import create_engine
+    from sqlalchemy.engine import URL
+    from sqlalchemy.pool import NullPool
+
+    with psycopg.connect(fresh_audit_db) as conn:
+        bypasses = conn.execute(
+            "SELECT rolsuper OR rolbypassrls FROM pg_roles WHERE rolname = current_user"
+        ).fetchone()[0]
+        tenants = [
+            str(row[0]) for row in conn.execute(
+                "SELECT tenant_id::text FROM public.tenants ORDER BY tenant_id"
+            ).fetchall()
+        ]
+    if not bypasses:
+        pytest.skip("this server's owner is subject to RLS, so it cannot demonstrate a bypass")
+
+    info = conninfo_to_dict(fresh_audit_db)
+    owner_engine = create_engine(
+        URL.create(
+            "postgresql+psycopg", username=info.get("user"), password=info.get("password"),
+            host=info.get("host"), port=int(info.get("port", 5432)), database=info.get("dbname"),
+        ),
+        future=True, poolclass=NullPool,
+    )
+    try:
+        with pytest.raises(producer.ProducerError, match="not policy-enforced"):
+            producer._prove_policy_enforced(
+                owner_engine, tenants[0], tenants[1], _dt.datetime.now(_dt.timezone.utc)
+            )
+    finally:
+        owner_engine.dispose()
+
+
+def test_a_seed_that_wrote_something_other_than_what_it_says_is_refused(
+    fresh_audit_db, monkeypatch
+):
+    """The owner counts the rows, and the count has to be the one the seed claims.
+
+    Patched to claim three rows per tenant while the two product writers still write two, the
+    verification refuses -- so a seed that half-wrote cannot be measured as though it had written
+    what it meant to.
+    """
+
+    monkeypatch.setattr(producer, "AUDIT_SEED_ROWS_PER_TENANT", 3)
+    with pytest.raises(producer.ProducerError, match="not what was written"):
+        producer.seed_audit_rows(fresh_audit_db)
