@@ -79,6 +79,6 @@ def test_build_admission_real_pg_cases_execute_once_in_a_focused_core_step():
     full = text.index("python -m pytest --junitxml=dist/core-tests.xml")
     assert focused < gate < full
     assert "tests/integration/test_build_product_runtime_real_pg.py" in text[focused:gate]
-    assert "assert len(cases) == 12" in text[gate:full]
+    assert "assert len(cases) == 13" in text[gate:full]
     assert "assert not root.findall('.//skipped')" in text[gate:full]
     assert "--ignore=tests/integration/test_build_product_runtime_real_pg.py" in text[full:]
