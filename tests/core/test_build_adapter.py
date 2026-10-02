@@ -265,6 +265,11 @@ def test_atomic_claim_uses_unique_ledger_and_redacted_audit(monkeypatch):
 
     assert "ON CONFLICT DO NOTHING RETURNING key" in conn.statements[0][0]
     assert "'build.dispatch'" in conn.statements[0][0]
+    assert conn.statements[0][1][4].obj == {
+        "state": "claimed",
+        "bindingDigest": "c" * 64,
+        "decisionId": decision["decisionId"],
+    }
     assert events == [
         (
             TENANT,
