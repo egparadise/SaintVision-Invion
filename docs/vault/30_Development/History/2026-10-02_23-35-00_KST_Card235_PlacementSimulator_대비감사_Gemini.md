@@ -1,14 +1,14 @@
-# 2026-10-02 23:35:00 KST — Card 235 [r2]: 배치 시뮬레이터 (PlacementSimulator) 색상 리터럴 전수 토큰화(28줄 33건→0), 상태 색 정합성 및 접근성 승격 (PR #340)
+# 2026-10-02 23:35:00 KST — Card 235 [r3]: 배치 시뮬레이터 (PlacementSimulator) 색상 리터럴 전수 토큰화(28줄 33건→0), 상태 색 정합성 및 접근성 승격 (PR #340)
 
 ## 1. 개요 및 변경 목적
-- **작업 ID**: Card 235 (ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory) [r2]
+- **작업 ID**: Card 235 (ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory) [r3]
 - **대상 화면**: `apps/web/src/features/placement/PlacementSimulator.tsx`
 - **담당자**: Gemini (Antigravity)
 - **작업 브랜치**: `agent/gemini/c235-placement-contrast`
 - **기반 커밋 (Base)**: `81e9851b` (PR #328 head merge 후 실제 base)
 - **PR 대상 (Target)**: `agent/gemini/c230-desktop-shell-contrast`
 - **PR 번호**: PR #340
-- **KST 시각**: 2026-10-02 23:35:00 KST (r2 갱신: 2026-10-03 02:10:00 KST)
+- **KST 시각**: 2026-10-02 23:35:00 KST (r3 갱신: 2026-10-03 02:45:00 KST)
 
 ### 1.1 주요 작업 내역
 1. **색상 리터럴 전수 해소 (28줄 33 occurrences -> 0건, 100% 토큰화)**:
@@ -41,13 +41,18 @@
    - `pools-error-banner` 및 `candidates-error-banner`: `var(--color-status-offline)`, subtle 배경/테두리, `⚠️` 경고 아이콘, 헤딩/내용, 재시도 버튼 토큰 및 computed outline 단언 (Claude 변이 C08, C09 사살).
 7. **40종 전수 변이 실측 사살 (tools/test_c235_mutations.py Z1~Z40 100% 사살)**:
    - fg==bg 충돌, border==bg 충돌, text token as bg, 불투명도 저하, 주석 decoy, 토큰 되돌림, 상태 색 붕괴, 라벨/아이콘 변형, outline: none/0 억제, prototype key 탈취, 계약 외 값 주입, 명명 색상 주입, UNKNOWN 접두어 제거, raw bypass, case-insensitive lookup 등 40종 변이를 컴파일 가능한 단일 유효 코드로 작성하여 전원 사살 실측.
-   - Z32 (`state === 'toString'` prototype key) 및 Z31~Z40 순차 실행 100% 사살 실측 (Codex F-R1 해소).
+   - Z32 (`state === 'toString'` prototype key) 및 Z31~Z40 순차 실행 100% 사살 실측 (Codex r2 승인 완료).
 
 ---
 
 ## 2. 실측 명도 대비 지표 (§2.1 대비 표본)
 
-아래 Before 값은 베이스(`81e9851b`)의 실제 조상 JSX 체인과 정본 디자인 토큰(`index.css`: Light surface `#ffffff`, subtle `#f1f5f9`, canvas `#f8fafc` / Dark surface `#111827`, subtle `#1f2937`, canvas `#090d16`) 기준 렌더링 합성값입니다. 베이스의 하드코딩 리터럴은 다크 테마에서 일부 우연히 대비를 통과했으나, **라이트 테마 전환 시 35개 지표 중 13개 이상이 심각한 결손(Probes 96~100 실측)**을 보였습니다. After 값은 `python tools/reproduce_c235_contrast.py` 실행 결과와 100% 일치합니다.
+아래 Before 값은 베이스(`81e9851b`)의 실제 조상 JSX 체인과 정본 디자인 토큰(`index.css`: Light surface `#ffffff`, subtle `#f1f5f9`, canvas `#f8fafc` / Dark surface `#111827`, subtle `#1f2937`, canvas `#090d16`) 기준 렌더링 합성값입니다.
+- 베이스의 비선택 풀/GPU 버튼(`var(--color-border-strong)` on subtle)은 다크 5.78:1, 라이트 6.92:1로 대비 기준(>= 3.0:1)을 충족합니다.
+- 서버 설명 안내 테두리는 베이스(`PlacementSimulator.tsx:566`)에 `1px solid var(--color-success)`가 지정되었으나 베이스 `index.css`에 `--color-success` 토큰이 미정의(grep 0건)되어 렌더링되지 않는 결함 상태였습니다 (N/A).
+- 미리보기 에러 배너와 디스커버리 후보 목록 에러 배너의 실제 조상은 캔버스가 아니라 각각 shard 카드 및 후보 카드의 `bg-surface`입니다.
+- 디스커버리 후보 상태 배지의 실제 조상은 candidate-item 컨테이너의 `bg-subtle`입니다.
+- After 값은 `python tools/reproduce_c235_contrast.py` 실행 결과와 100% 일치합니다.
 
 | UI 요소 | 식별자 / 위치 | Before 베이스 합성값 (Hex/RGBA on Canvas/Surface) | Before 명도비 (Light) | Before 명도비 (Dark) | After 토큰 쌍 (전경 / 배경 / 테두리) | After 명도비 (Light) | After 명도비 (Dark) | WCAG 기준 | 판정 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -58,33 +63,33 @@
 | 풀 재시도 버튼 텍스트 | pools-retry-btn text | #ffffff on #334155 | 10.35:1 (PASS) | 10.35:1 (PASS) | --color-text-primary on --color-bg-subtle | 16.30:1 | 14.05:1 | >= 4.5:1 | PASS |
 | 풀 재시도 버튼 테두리 | pools-retry-btn border | (border: none in base) | N/A (경계 미식별) | N/A (경계 미식별) | --color-border-subtle on --color-bg-subtle | 3.18:1 | 3.08:1 | >= 3.0:1 | PASS |
 | 선택된 풀 버튼 텍스트 | pool-btn-selected text | #ffffff on brand-primary-bg | 5.17:1 (PASS) | 6.70:1 (PASS) | --color-brand-hover on --color-brand-subtle | 5.49:1 | 8.11:1 | >= 4.5:1 | PASS |
-| 선택된 풀 버튼 테두리 | pool-btn-selected border | var(--color-border-strong) on brand-primary-bg | 2.02:1 (FAIL) | 1.13:1 (FAIL) | --color-brand-hover on --color-brand-subtle | 5.49:1 | 8.11:1 | >= 3.0:1 | PASS |
-| 비선택 풀 버튼 텍스트 | pool-btn-unselected text | var(--color-text-secondary) on subtle | 6.92:1 (PASS) | 5.72:1 (PASS) | --color-text-secondary on --color-bg-subtle | 6.92:1 | 11.86:1 | >= 4.5:1 | PASS |
-| 비선택 풀 버튼 테두리 | pool-btn-unselected border | var(--color-border-strong) on subtle | 2.34:1 (FAIL) | 1.94:1 (FAIL) | --color-border-subtle on --color-bg-subtle | 3.18:1 | 3.08:1 | >= 3.0:1 | PASS |
+| 선택된 풀 버튼 테두리 | pool-btn-selected border | var(--color-border-strong) on brand-primary-bg | 1.47:1 (FAIL) | 2.64:1 (FAIL) | --color-brand-hover on --color-brand-subtle | 5.49:1 | 8.11:1 | >= 3.0:1 | PASS |
+| 비선택 풀 버튼 텍스트 | pool-btn-unselected text | var(--color-text-secondary) on subtle | 6.92:1 (PASS) | 11.86:1 (PASS) | --color-text-secondary on --color-bg-subtle | 6.92:1 | 11.86:1 | >= 4.5:1 | PASS |
+| 비선택 풀 버튼 테두리 | pool-btn-unselected border | var(--color-border-strong) on subtle | 6.92:1 (PASS) | 5.78:1 (PASS) | --color-border-subtle on --color-bg-subtle | 3.18:1 | 3.08:1 | >= 3.0:1 | PASS |
 | 풀 용량 초과 텍스트 | pool-capacity-error text | #fca5a5 on rgba(239,68,68,0.1) over surface | 1.66:1 (FAIL) | 8.61:1 (PASS) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 4.5:1 | PASS |
 | 풀 용량 초과 테두리 | pool-capacity-error border | #ef4444 on rgba(239,68,68,0.1) over surface | 3.29:1 (PASS) | 4.34:1 (PASS) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 3.0:1 | PASS |
 | 디스커버리 미검증 풀 배지 | pools-idle-unverified text | #fbbf24 on subtle | 1.52:1 (FAIL) | 8.79:1 (PASS) | --color-status-degraded on --color-bg-subtle | 4.58:1 | 6.83:1 | >= 4.5:1 | PASS |
 | 폴백 미검증 풀 배지 | pools-fallback-unverified text | #fbbf24 on subtle | 1.52:1 (FAIL) | 8.79:1 (PASS) | --color-status-degraded on --color-bg-subtle | 4.58:1 | 6.83:1 | >= 4.5:1 | PASS |
 | 활성 GPU 버튼 텍스트 | gpu-btn-active text | #ffffff on brand-primary-bg | 5.17:1 (PASS) | 6.70:1 (PASS) | --color-brand-hover on --color-brand-subtle | 5.49:1 | 8.11:1 | >= 4.5:1 | PASS |
-| 활성 GPU 버튼 테두리 | gpu-btn-active border | var(--color-border-strong) on brand-primary-bg | 2.02:1 (FAIL) | 1.13:1 (FAIL) | --color-brand-hover on --color-brand-subtle | 5.49:1 | 8.11:1 | >= 3.0:1 | PASS |
-| 비활성 GPU 버튼 텍스트 | gpu-btn-inactive text | var(--color-text-secondary) on subtle | 6.92:1 (PASS) | 5.72:1 (PASS) | --color-text-secondary on --color-bg-subtle | 6.92:1 | 11.86:1 | >= 4.5:1 | PASS |
-| 비활성 GPU 버튼 테두리 | gpu-btn-inactive border | var(--color-border-strong) on subtle | 2.34:1 (FAIL) | 1.94:1 (FAIL) | --color-border-subtle on --color-bg-subtle | 3.18:1 | 3.08:1 | >= 3.0:1 | PASS |
-| 서버 설명 안내 텍스트 | server-explanation text | var(--color-text-primary) on rgba(35,134,54,0.1) | 15.71:1 (PASS) | 15.45:1 (PASS) | --color-text-primary on --color-bg-subtle | 16.30:1 | 14.05:1 | >= 4.5:1 | PASS |
-| 서버 설명 안내 테두리 | server-explanation border | var(--color-success) on rgba(35,134,54,0.1) | 4.08:1 (PASS) | 6.37:1 (PASS) | --color-status-online on --color-bg-subtle | 4.58:1 | 6.44:1 | >= 3.0:1 | PASS |
+| 활성 GPU 버튼 테두리 | gpu-btn-active border | var(--color-border-strong) on brand-primary-bg | 1.47:1 (FAIL) | 2.64:1 (FAIL) | --color-brand-hover on --color-brand-subtle | 5.49:1 | 8.11:1 | >= 3.0:1 | PASS |
+| 비활성 GPU 버튼 텍스트 | gpu-btn-inactive text | var(--color-text-secondary) on subtle | 6.92:1 (PASS) | 11.86:1 (PASS) | --color-text-secondary on --color-bg-subtle | 6.92:1 | 11.86:1 | >= 4.5:1 | PASS |
+| 비활성 GPU 버튼 테두리 | gpu-btn-inactive border | var(--color-border-strong) on subtle | 6.92:1 (PASS) | 5.78:1 (PASS) | --color-border-subtle on --color-bg-subtle | 3.18:1 | 3.08:1 | >= 3.0:1 | PASS |
+| 서버 설명 안내 텍스트 | server-explanation text | var(--color-text-primary) on rgba(35,134,54,0.1) | 15.01:1 (PASS) | 17.19:1 (PASS) | --color-text-primary on --color-bg-subtle | 16.30:1 | 14.05:1 | >= 4.5:1 | PASS |
+| 서버 설명 안내 테두리 | server-explanation border | var(--color-success) on rgba(35,134,54,0.1) (토큰 미정의) | N/A (미렌더링) | N/A (미렌더링) | --color-status-online on --color-bg-subtle | 4.58:1 | 6.44:1 | >= 3.0:1 | PASS |
 | 미리보기 로딩 텍스트 | preview-loading text | #94a3b8 on surface | 2.56:1 (FAIL) | 6.92:1 (PASS) | --color-text-muted on --color-bg-surface | 5.75:1 | 6.99:1 | >= 4.5:1 | PASS |
-| 미리보기 에러 배너 텍스트 | preview-error text | #fca5a5 on rgba(239,68,68,0.1) over canvas | 1.60:1 (FAIL) | 9.51:1 (PASS) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 4.5:1 | PASS |
-| 미리보기 에러 보조문구 | preview-error subtext | #f87171 on rgba(239,68,68,0.1) over canvas | 2.33:1 (FAIL) | 6.52:1 (PASS) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 4.5:1 | PASS |
-| 미리보기 에러 테두리 | preview-error border | #ef4444 on canvas | 3.60:1 (PASS) | 5.16:1 (PASS) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 3.0:1 | PASS |
+| 미리보기 에러 배너 텍스트 | preview-error text | #fca5a5 on rgba(239,68,68,0.1) over surface | 1.66:1 (FAIL) | 8.61:1 (PASS) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 4.5:1 | PASS |
+| 미리보기 에러 보조문구 | preview-error subtext | #f87171 on rgba(239,68,68,0.1) over surface | 2.42:1 (FAIL) | 5.90:1 (PASS) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 4.5:1 | PASS |
+| 미리보기 에러 테두리 | preview-error border | #ef4444 on surface | 3.76:1 (PASS) | 4.71:1 (PASS) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 3.0:1 | PASS |
 | 미리보기 재시도 버튼 텍스트 | preview-retry-btn text | #ffffff on #334155 | 10.35:1 (PASS) | 10.35:1 (PASS) | --color-text-primary on --color-bg-subtle | 16.30:1 | 14.05:1 | >= 4.5:1 | PASS |
 | 미리보기 재시도 버튼 테두리 | preview-retry-btn border | (border: none in base) | N/A (경계 미식별) | N/A (경계 미식별) | --color-border-subtle on --color-bg-subtle | 3.18:1 | 3.08:1 | >= 3.0:1 | PASS |
 | 후보 목록 로딩 텍스트 | candidates-loading text | #94a3b8 on surface | 2.56:1 (FAIL) | 6.92:1 (PASS) | --color-text-muted on --color-bg-surface | 5.75:1 | 6.99:1 | >= 4.5:1 | PASS |
-| 후보 목록 에러 배너 텍스트 | candidates-error text | #fca5a5 on rgba(239,68,68,0.1) over canvas | 1.60:1 (FAIL) | 9.51:1 (PASS) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 4.5:1 | PASS |
-| 후보 목록 에러 테두리 | candidates-error border | #ef4444 on canvas | 3.60:1 (PASS) | 5.16:1 (PASS) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 3.0:1 | PASS |
+| 후보 목록 에러 배너 텍스트 | candidates-error text | #fca5a5 on rgba(239,68,68,0.1) over surface | 1.66:1 (FAIL) | 8.61:1 (PASS) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 4.5:1 | PASS |
+| 후보 목록 에러 테두리 | candidates-error border | #ef4444 on surface | 3.76:1 (PASS) | 4.71:1 (PASS) | --color-status-offline on --color-bg-subtle | 5.91:1 | 5.31:1 | >= 3.0:1 | PASS |
 | 후보 재시도 버튼 텍스트 | candidates-retry-btn text | #ffffff on #334155 | 10.35:1 (PASS) | 10.35:1 (PASS) | --color-text-primary on --color-bg-subtle | 16.30:1 | 14.05:1 | >= 4.5:1 | PASS |
 | 후보 재시도 버튼 테두리 | candidates-retry-btn border | (border: none in base) | N/A (경계 미식별) | N/A (경계 미식별) | --color-border-subtle on --color-bg-subtle | 3.18:1 | 3.08:1 | >= 3.0:1 | PASS |
 | 후보 목록 빈 상태 안내문구 | candidates-empty note | #93c5fd on surface | 1.80:1 (FAIL) | 9.84:1 (PASS) | --color-brand-hover on --color-bg-surface | 6.70:1 | 9.84:1 | >= 4.5:1 | PASS |
-| 후보 상태 배지 텍스트 | candidate-status text | #fbbf24 on rgba(234,179,8,0.15) over surface | 1.52:1 (FAIL) | 8.04:1 (PASS) | --color-status-degraded on --color-bg-subtle | 4.58:1 | 6.83:1 | >= 4.5:1 | PASS |
-| 후보 상태 배지 테두리 | candidate-status border | rgba(234,179,8,0.3) on surface | 1.22:1 (FAIL) | 1.90:1 (FAIL) | --color-status-degraded on --color-bg-subtle | 4.58:1 | 6.83:1 | >= 3.0:1 | PASS |
+| 후보 상태 배지 텍스트 | candidate-status text | #fbbf24 on rgba(234,179,8,0.15) over subtle | 1.40:1 (FAIL) | 6.52:1 (PASS) | --color-status-degraded on --color-bg-subtle | 4.58:1 | 6.83:1 | >= 4.5:1 | PASS |
+| 후보 상태 배지 테두리 | candidate-status border | rgba(234,179,8,0.3) on subtle | 1.19:1 (FAIL) | 1.88:1 (FAIL) | --color-status-degraded on --color-bg-subtle | 4.58:1 | 6.83:1 | >= 3.0:1 | PASS |
 | 미지 후보 상태 배지 텍스트 | candidate-unknown text | (베이스 미구현, 미토큰화) | N/A (FAIL) | N/A (FAIL) | --color-status-unknown on --color-bg-subtle | 6.47:1 | 5.82:1 | >= 4.5:1 | PASS |
 
 > [!NOTE]
@@ -191,12 +196,12 @@ Total Audit Items: 35 | Passed: 35 | Failed: 0
 | Z12 | candidate badge: opacity degradation (opacity: 0.4) | KILLED (Test 9o) |
 | Z13 | unverified badge: opacity degradation (opacity: 0.45) | KILLED (Test 9o) |
 | Z14 | pool button: opacity degradation (opacity: 0.35) | KILLED (Test 9j-2) |
-| Z15 | candidate config: comment decoy with legacy hex | KILLED (Test 9j-2 & Test 9o) |
+| Z15 | candidate config: comment decoy with legacy hex | KILLED (Test 9o + Test 10) |
 | Z16 | unverified badge: comment decoy with legacy hex | KILLED (Test 9j-2 & Test 9o) |
 | Z17 | candidate config: revert to legacy #fbbf24 | KILLED (Test 10 & Test 9j-2 & Test 9o) |
 | Z18 | error banner: revert text to legacy #fca5a5 | KILLED (Test 10 & Test 9j-2 & Test 9o) |
 | Z19 | error banner: revert border to legacy #ef4444 | KILLED (Test 10 & Test 9j-2 & Test 9o) |
-| Z20 | operator note: revert text to legacy #93c5fd | KILLED (Test 9j-2) |
+| Z20 | operator note: revert text to legacy #93c5fd | KILLED (Test 9j-2 & Test 10) |
 | Z21 | candidate config: degraded color collapsed to status-online | KILLED (Test 9o) |
 | Z22 | preview error banner: offline color collapsed to status-online | KILLED (Test 9o) |
 | Z23 | unverified badge: degraded color collapsed to status-online | KILLED (Test 9o) |
@@ -227,6 +232,6 @@ Total Audit Items: 35 | Passed: 35 | Failed: 0
 ---
 
 ## 5. 다음 행동 및 인계
-- **현재 상태**: Card 235 [r2] 수정 조치 완료, Claude UI r1 (F1~F7) 및 Codex r1 (F-R1, F-R2) 지적 전수 반영, 로컬 전체 게이트 100% 통과, 40종 변이 전원 사살 실측 완료, PR #340 업데이트 준비 완료.
-- **다음 행동**: `agent/gemini/c235-placement-contrast` 브랜치 커밋 및 푸시 (no force push), PR #340 리뷰 요청 (r2) 코멘트 등록 (Zero bot tags `@...`), 이후 Card 245 (#342) branch에 고친 #340 head merge 및 #342 검토 요청.
+- **현재 상태**: Card 235 [r3] 문서 보강 완료, Codex r2 승인 완료, Claude UI r2 잔여 지적(R2-1 9개 행 조상 체인 실측치 정정, R2-2 Z15 사살 경로 정정) 전수 반영 완료.
+- **다음 행동**: `agent/gemini/c235-placement-contrast` 브랜치 커밋 및 푸시 (no force push), PR #340 Claude UI r3 승인 전환 요청 코멘트 등록 (Zero bot tags `@...`), 이후 Card 245 (#342) branch에 고친 #340 head merge 및 Card 248 재개.
 - **다음 담당자**: Claude UI (기본 리뷰어) 및 Codex (보조 리뷰어).
