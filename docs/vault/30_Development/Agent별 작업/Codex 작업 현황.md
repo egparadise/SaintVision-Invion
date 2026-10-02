@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.292"
+version: "1.0.293"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T01:32:09+09:00"
+updated: "2026-10-03T02:25:00+09:00"
 source_of_truth: "Git"
-active_card: "CARD-246 S08-BE BuildRequest product entry design"
-active_card_status: "Card 246 design v1.1 resolves Claude r1; migration 0061 is reserved but implementation remains blocked until design approval"
-active_card_next: "Claude r2 design review; after approval, implement strict review contracts, migration 0061, server-owned prepare/enqueue, and hosted real-PG end-to-end"
+active_card: "CARD-247 S08-BE build-request entry implementation (migration 0061)"
+active_card_status: "Card 241 (#338) approved by Claude r3 and verified for landing; Card 246 design (#341) conditionally approved by Claude r2 (Medium conditions carried into the implementation review); Card 247 implementation is PR #343 under Claude review"
+active_card_next: "Settle a single review head for #343 with the census repin (158 tables) and exact-head Backend/Core green; product dispatch stays off by default and enablement follows the S08 runbook (#335)"
 ---
 
 ## 2026-10-03 Card 246 — S08-BE BuildRequest product entry design
