@@ -156,7 +156,10 @@ class BuildPreparationService:
         if snapshot_sha != checkout["content_hash"]:
             raise DomainError("VERIFY-0002", "Workspace snapshot digest differs", 422)
         capsule_sha = snapshot_sha
-        locator = f"build-capsules/{principal.tenant_id}/{project_id}/{capsule_sha}"
+        # ObjectStore locators are private flat handles, never caller paths.  The
+        # full SHA remains the collision authority and an existing differing
+        # object is refused by the immutable provider.
+        locator = "obj-" + capsule_sha[:32]
         self.capsule_store.put(locator, raw, capsule_sha)
 
         request = {
@@ -261,6 +264,8 @@ class BuildPreparationService:
             raise DomainError("RES-0004", "Build preparation was not found", 404)
         if prep["requester_id"] != principal.subject_id:
             raise DomainError("AUTH-0011", "Build preparation actor differs", 403)
+        if prep["bound_run_version"] != data["expectedRunVersion"]:
+            raise DomainError("GRAPH-0003", "Build approval Run version differs", 409)
 
         def authority_factory(conn, run, approved_decision, request):
             locked = conn.execute(
