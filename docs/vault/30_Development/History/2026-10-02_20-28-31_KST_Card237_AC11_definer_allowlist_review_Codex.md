@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD237-AC11-DEFINER-ALLOWLIST-20261002"
 title: "Card 237 AC-11 SECURITY DEFINER allowlist review"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T20:30:49+09:00"
+updated: "2026-10-02T20:38:27+09:00"
 source_of_truth: "Git"
 base_sha: "843d283c1ee70cc021385b0f8f25ec323d434829"
 reviewer: "Claude"
@@ -40,10 +40,12 @@ generated allowlist blob and canonical SHA-256 are pinned by the aggregator. A f
 commit must repin the AC-11 target registry to this commit and rotate every importer
 registry pin together; until that commit, no hosted PASS is claimed.
 
-Local verification uses the repository Python 3.14 virtual environment. The generator
-test file passed 10/10. The security importer file passed 127 tests and had one unrelated
-local Git ancestry timeout; it is rerun after the target-registry repin. Exact-head
-hosted security evidence and its canonical verdict remain merge conditions.
+Local verification uses the repository Python 3.14 virtual environment with
+`PYTHONUTF8=1`; without that Windows console setting, a Git-show subprocess cannot decode
+the Korean registry content under CP949. The generator passed 10/10, security importer
+128/128, aggregator 138/138, accessibility importer 32/32, migration importer 19/19,
+and composite-long-soak importer 23/23. Exact-head hosted security evidence and its
+canonical verdict remain merge conditions.
 
 # Registry repin
 
