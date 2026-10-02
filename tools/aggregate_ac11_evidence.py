@@ -84,7 +84,7 @@ PIN_RE = re.compile(r"^([A-Za-z0-9_.-]+)(?:\[[^\]]+\])?==([^\s;]+)$")
 
 DEFINER_FILES = [
     {"path": "tools/check_definer_functions.py", "blob": "5831f8d8806900146add2e5e7b51b934dced3952"},
-    {"path": "tools/definer-policy.json", "blob": "e16ee086d5ba301d45fec4f8fac6a5333ae1a39a"},
+    {"path": "tools/definer-policy.json", "blob": "d8202da2ee4227e78a1e73c6c6545295ff3f3efc"},
 ]
 RLS_FILES = [
     {"path": "tools/collect_rls_evidence.py", "blob": "684e0f4896202e112a70798ea8c01a545ffd3896"},
@@ -690,7 +690,7 @@ RLS_REPORT_KEYS = frozenset({
 #: that adds or removes a table in ``inv``/``public`` makes this stale: regenerate with
 #: ``tools/collect_rls_evidence.py --disposable`` and repin the blob in the same reviewed change.
 RLS_CENSUS_REPO_PATH = "tools/rls-table-census.json"
-RLS_CENSUS_BLOB = "f1618c0df1b36ea37a7f9066db87de1d28fdbca5"
+RLS_CENSUS_BLOB = "ee6c3f7fb1eefc25388893ff0bad76797dabe3ab"
 #: Tables that must appear in the measured set, derived from the pinned readable-key scope (the
 #: reviewed allowlist's own tables are anchored separately, because ``baselineAccepted`` has to
 #: match it exactly and every table it names has to be measured).  An independent anchor against

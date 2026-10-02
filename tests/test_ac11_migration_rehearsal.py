@@ -41,7 +41,7 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
     assert {
         key
         for key in mapping
-        if key.startswith(("0047_", "0050_", "0053_", "0054_", "0055_", "0056_", "0057_", "0058_", "0059_"))
+        if key.startswith(("0047_", "0050_", "0053_", "0054_", "0055_", "0056_", "0057_", "0058_", "0059_", "0060_"))
     } == {
         "0047_audit_events_isolation",
         "0050_dataset_digest_lookup",
@@ -52,6 +52,7 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
         "0057_release_acceptance_quorum",
         "0058_release_acceptance_resolver",
         "0059_build_execution_intents",
+        "0060_build_execution_admissions",
     }
     # 0054 (W3 seam, #213): the downgrade refuses while any version is bound to
     # a measurement or any measurement row exists, and otherwise drops only
@@ -63,6 +64,7 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
     # which is a real loss on this axis rather than a test to update.
     # 0059 refuses downgrade while any intent exists and otherwise drops only an empty
     # queue, so it joins the reversible PRESERVED tail rather than the restore fixtures.
+    # 0060 applies the same rule to the committed admission authority.
     assert all(
         mapping[key] == "PRESERVED"
         for key in (
@@ -75,6 +77,7 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
             "0057_release_acceptance_quorum",
             "0058_release_acceptance_resolver",
             "0059_build_execution_intents",
+            "0060_build_execution_admissions",
         )
     )
     ordered = chain()
@@ -87,6 +90,7 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
         "0057_release_acceptance_quorum",
         "0058_release_acceptance_resolver",
         "0059_build_execution_intents",
+        "0060_build_execution_admissions",
     ]
 
 
