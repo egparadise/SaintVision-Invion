@@ -37,6 +37,11 @@ import {
   DESKTOP_SHORTCUTS,
 } from '../src/features/desktop/DesktopShell';
 import {
+  ApprovalCenter,
+  APPROVAL_STATUS_CONFIG,
+  getApprovalStatusConfig,
+} from '../src/features/approvals/ApprovalCenter';
+import {
   PlacementSimulator,
   DISCOVERY_CANDIDATE_STATE_CONFIG,
   getDiscoveryCandidateStateConfig,
@@ -312,7 +317,7 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "app/App.tsx": {"#991b1b": 2, "#dc2626": 1, "#ef4444": 1, "#f87171": 1, "#fca5a5": 1, "#fed7aa": 1, "#fee2e2": 1, "#ffffff": 2, "rgba(239,68,68,0.1)": 1},
   "features/admin/AdminSecurityConsole.tsx": {},
   "features/agent/NaturalLanguageRunView.tsx": {},
-  "features/approvals/ApprovalCenter.tsx": {"#1e293b": 1, "#334155": 1, "#3b82f6": 1, "#93c5fd": 1, "#ef4444": 2, "#f8fafc": 1, "#fca5a5": 2, "#fed7aa": 1, "#fff": 1, "rgba(16,185,129,0.15)": 1, "rgba(234,179,8,0.15)": 1, "rgba(239,68,68,0.15)": 2, "rgba(59,130,246,0.1)": 1, "rgba(59,130,246,0.25)": 1},
+  "features/approvals/ApprovalCenter.tsx": {},
   "features/approvals/ApprovalDetail.tsx": {"#0d1117": 1, "#30363d": 1, "#58a6ff": 1, "#c9d1d9": 1, "rgba(0,0,0,0.5)": 1, "rgba(220,38,38,0.1)": 1, "rgba(56,139,253,0.15)": 1},
   "features/dashboard/ClusterOverview.tsx": {"#10b981": 1, "#38bdf8": 1, "#64748b": 2, "#8b5cf6": 1, "#d29922": 1, "#ef4444": 4, "#f59e0b": 1, "#fca5a5": 3, "#fff": 1, "rgba(239,68,68,0.1)": 2},
   "features/deployment/IntranetDeploymentView.tsx": {},
@@ -6286,8 +6291,288 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
   });
 
-  // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell & PlacementSimulator
-  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, and PlacementSimulator style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
+  // 9p. [Card 245 / ACC-09] ApprovalCenter DOM Rendering & Strict Token Parity
+  it('ACC-09 / Card 245: ApprovalCenter component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification', async () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    const mockApprovals: ApprovalItem[] = [
+      {
+        id: 'apr_001',
+        runId: 'run_001',
+        status: 'pending',
+        target: 'Worker cluster scaling',
+        policyReason: 'High blast radius',
+        expiresAt: new Date(Date.now() + 3600000).toISOString(),
+        requiredApprovals: 2,
+        firstApprovedBy: 'usr_alice',
+      },
+      {
+        id: 'apr_002',
+        runId: 'run_002',
+        status: 'approved',
+        target: 'Model rollout v2',
+        policyReason: 'Verified checkpoint',
+        expiresAt: new Date(Date.now() + 3600000).toISOString(),
+        requiredApprovals: 1,
+      },
+      {
+        id: 'apr_003',
+        runId: 'run_003',
+        status: 'rejected',
+        target: 'Host root shell',
+        policyReason: 'Prohibited command',
+        expiresAt: new Date(Date.now() + 3600000).toISOString(),
+      },
+      {
+        id: 'apr_004',
+        runId: 'run_004',
+        status: 'expired',
+        target: 'Emergency brake',
+        policyReason: 'TTL elapsed',
+        expiresAt: new Date(Date.now() - 3600000).toISOString(),
+      },
+      {
+        id: 'apr_005',
+        runId: 'run_005',
+        status: 'dispatched',
+        target: 'Automated remediation',
+        policyReason: 'Pre-approved workflow',
+        expiresAt: new Date(Date.now() + 3600000).toISOString(),
+      },
+      {
+        id: 'apr_006',
+        runId: 'run_006',
+        status: 'admitted' as any,
+        target: 'Bypassed admission',
+        policyReason: 'Invalid state injection',
+        expiresAt: new Date(Date.now() + 3600000).toISOString(),
+      },
+      {
+        id: 'apr_007',
+        runId: 'run_007',
+        status: 'PENDING' as any,
+        target: 'Casing bypass',
+        policyReason: 'Casing mismatch',
+        expiresAt: new Date(Date.now() + 3600000).toISOString(),
+      },
+      {
+        id: 'apr_008',
+        runId: 'run_008',
+        status: 'toString' as any,
+        target: 'Prototype hijack test',
+        policyReason: 'Prototype key defense',
+        expiresAt: new Date(Date.now() + 3600000).toISOString(),
+      },
+      {
+        id: 'apr_009',
+        runId: 'run_009',
+        status: 'pending',
+        target: 'Two person rule unstarted',
+        policyReason: 'Requires 2 approvals',
+        expiresAt: new Date(Date.now() + 3600000).toISOString(),
+        requiredApprovals: 2,
+      },
+    ];
+
+    try {
+      await act(async () => {
+        root.render(
+          <ApprovalCenter
+            approvals={mockApprovals}
+            currentUserId="usr_alice"
+            onApprove={vi.fn()}
+            onReject={vi.fn()}
+            approvalsState="error"
+            approvalError="Connection timeout"
+            lastFetchedAt={new Date(2026, 9, 2, 23, 30, 0)}
+            onRefresh={vi.fn()}
+          />
+        );
+      });
+
+      // 1. Freshness indicator
+      const freshnessBadge = container.querySelector('[data-testid="approval-freshness-indicator"]') as HTMLElement;
+      expect(freshnessBadge).not.toBeNull();
+      expect(freshnessBadge.style.backgroundColor).toBe('var(--color-brand-subtle)');
+      expect(freshnessBadge.style.borderColor).toBe('var(--color-brand-hover)');
+      expect(freshnessBadge.style.color).toBe('var(--color-brand-hover)');
+
+      // 2. Refresh button
+      const refreshBtn = container.querySelector('[data-testid="approval-refresh-btn"]') as HTMLElement;
+      expect(refreshBtn).not.toBeNull();
+      expect(refreshBtn.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(refreshBtn.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(refreshBtn.style.color).toBe('var(--color-text-primary)');
+      expect(refreshBtn.textContent).toContain('새로고침');
+
+      // Focus ring preservation on refresh button
+      const computedRefresh = window.getComputedStyle(refreshBtn);
+      expect(computedRefresh.outlineStyle !== 'none' || computedRefresh.outline !== 'none', 'Refresh button focus ring must be preserved').toBe(true);
+
+      // 3. Stale warning banner
+      const staleWarning = container.querySelector('[data-testid="approval-stale-warning"]') as HTMLElement;
+      expect(staleWarning).not.toBeNull();
+      expect(staleWarning.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(staleWarning.style.borderColor).toBe('var(--color-status-offline)');
+      expect(staleWarning.style.color).toBe('var(--color-status-offline)');
+
+      // 4. Status badges
+      const status001 = container.querySelector('[data-testid="approval-status-apr_001"]') as HTMLElement;
+      expect(status001.textContent).toBe('PENDING');
+      expect(status001.style.color).toBe('var(--color-status-degraded)');
+      expect(status001.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(status001.style.borderColor).toBe('var(--color-status-degraded)');
+      expect(status001.style.opacity || '1', 'Pending status badge opacity must not be degraded').toBe('1');
+
+      const status002 = container.querySelector('[data-testid="approval-status-apr_002"]') as HTMLElement;
+      expect(status002.textContent).toBe('APPROVED');
+      expect(status002.style.color).toBe('var(--color-status-online)');
+      expect(status002.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(status002.style.borderColor).toBe('var(--color-status-online)');
+
+      const status003 = container.querySelector('[data-testid="approval-status-apr_003"]') as HTMLElement;
+      expect(status003.textContent).toBe('REJECTED');
+      expect(status003.style.color).toBe('var(--color-status-offline)');
+      expect(status003.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(status003.style.borderColor).toBe('var(--color-status-offline)');
+
+      const status004 = container.querySelector('[data-testid="approval-status-apr_004"]') as HTMLElement;
+      expect(status004.textContent).toBe('EXPIRED');
+      expect(status004.style.color).toBe('var(--color-status-offline)');
+      expect(status004.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(status004.style.borderColor).toBe('var(--color-status-offline)');
+
+      const status005 = container.querySelector('[data-testid="approval-status-apr_005"]') as HTMLElement;
+      expect(status005.textContent).toBe('DISPATCHED');
+      expect(status005.style.color).toBe('var(--color-brand-hover)');
+      expect(status005.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(status005.style.borderColor).toBe('var(--color-brand-hover)');
+
+      // Out of contract, casing, prototype defense in DOM
+      const status006 = container.querySelector('[data-testid="approval-status-apr_006"]') as HTMLElement;
+      expect(status006.textContent).toBe('UNKNOWN (admitted)');
+      expect(status006.style.color).toBe('var(--color-status-unknown)');
+      expect(status006.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(status006.style.borderColor).toBe('var(--color-status-unknown)');
+
+      const status007 = container.querySelector('[data-testid="approval-status-apr_007"]') as HTMLElement;
+      expect(status007.textContent).toBe('UNKNOWN (PENDING)');
+      expect(status007.style.color).toBe('var(--color-status-unknown)');
+      expect(status007.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(status007.style.borderColor).toBe('var(--color-status-unknown)');
+
+      const status008 = container.querySelector('[data-testid="approval-status-apr_008"]') as HTMLElement;
+      expect(status008.textContent).toBe('UNKNOWN (toString)');
+      expect(status008.style.color).toBe('var(--color-status-unknown)');
+      expect(status008.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(status008.style.borderColor).toBe('var(--color-status-unknown)');
+
+      // Two-person progression badges
+      const twoPerson001 = container.querySelector('[data-testid="approval-two-person-apr_001"]') as HTMLElement;
+      expect(twoPerson001).not.toBeNull();
+      expect(twoPerson001.textContent).toBe('1/2 승인 (2차 대기)');
+      expect(twoPerson001.style.color).toBe('var(--color-brand-hover)');
+      expect(twoPerson001.style.borderColor).toBe('var(--color-brand-hover)');
+      expect(twoPerson001.style.opacity || '1', 'Two-person badge opacity must not be degraded').toBe('1');
+
+      const twoPerson009 = container.querySelector('[data-testid="approval-two-person-apr_009"]') as HTMLElement;
+      expect(twoPerson009).not.toBeNull();
+      expect(twoPerson009.textContent).toBe('2인 필수');
+      expect(twoPerson009.style.color).toBe('var(--color-text-secondary)');
+      expect(twoPerson009.style.borderColor).toBe('var(--color-border-subtle)');
+
+      // 5. Empty error state with retry button
+      await act(async () => {
+        root.render(
+          <ApprovalCenter
+            approvals={[]}
+            currentUserId="usr_alice"
+            onApprove={vi.fn()}
+            onReject={vi.fn()}
+            approvalsState="error"
+            approvalError="Network unreachable"
+            onRefresh={vi.fn()}
+          />
+        );
+      });
+
+      const errBox = container.querySelector('[data-testid="approval-fetch-error-state"]') as HTMLElement;
+      expect(errBox).not.toBeNull();
+      expect(errBox.style.borderColor).toBe('var(--color-status-offline)');
+
+      const retryBtn = container.querySelector('[data-testid="approval-error-retry-btn"]') as HTMLElement;
+      expect(retryBtn).not.toBeNull();
+      expect(retryBtn.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(retryBtn.style.color).toBe('var(--color-text-primary)');
+      expect(retryBtn.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(retryBtn.textContent).toContain('재시도 (Retry)');
+
+      // Focus ring preservation on retry button
+      const computedRetry = window.getComputedStyle(retryBtn);
+      expect(computedRetry.outlineStyle !== 'none' || computedRetry.outline !== 'none', 'Retry button focus ring must be preserved').toBe(true);
+
+      // 6. Contract exact key set check
+      expect(Object.keys(APPROVAL_STATUS_CONFIG).sort()).toEqual(['approved', 'dispatched', 'expired', 'pending', 'rejected']);
+
+      // 7. Unit helper fail-closed and prototype defense
+      const normPending = getApprovalStatusConfig('pending');
+      expect(normPending.color).toBe('var(--color-status-degraded)');
+      expect(normPending.label).toBe('PENDING');
+
+      const normApproved = getApprovalStatusConfig('approved');
+      expect(normApproved.color).toBe('var(--color-status-online)');
+      expect(normApproved.label).toBe('APPROVED');
+
+      const normRejected = getApprovalStatusConfig('rejected');
+      expect(normRejected.color).toBe('var(--color-status-offline)');
+      expect(normRejected.label).toBe('REJECTED');
+
+      const normExpired = getApprovalStatusConfig('expired');
+      expect(normExpired.color).toBe('var(--color-status-offline)');
+      expect(normExpired.label).toBe('EXPIRED');
+
+      const normDispatched = getApprovalStatusConfig('dispatched');
+      expect(normDispatched.color).toBe('var(--color-brand-hover)');
+      expect(normDispatched.label).toBe('DISPATCHED');
+
+      const unknownOut = getApprovalStatusConfig('admitted');
+      expect(unknownOut.color).toBe('var(--color-status-unknown)');
+      expect(unknownOut.label).toBe('UNKNOWN (admitted)');
+
+      const unknownUpper = getApprovalStatusConfig('PENDING');
+      expect(unknownUpper.color).toBe('var(--color-status-unknown)');
+      expect(unknownUpper.label).toBe('UNKNOWN (PENDING)');
+
+      const nullCfg = getApprovalStatusConfig(null);
+      expect(nullCfg.color).toBe('var(--color-status-unknown)');
+      expect(nullCfg.label).toBe('UNKNOWN');
+
+      const undefCfg = getApprovalStatusConfig(undefined);
+      expect(undefCfg.color).toBe('var(--color-status-unknown)');
+      expect(undefCfg.label).toBe('UNKNOWN');
+
+      const emptyCfg = getApprovalStatusConfig('');
+      expect(emptyCfg.color).toBe('var(--color-status-unknown)');
+      expect(emptyCfg.label).toBe('UNKNOWN');
+
+      const protoKeys = ['toString', 'constructor', '__proto__', 'valueOf', 'hasOwnProperty', 'isPrototypeOf'];
+      for (const pk of protoKeys) {
+        const protoCfg = getApprovalStatusConfig(pk as any);
+        expect(protoCfg.color, `Prototype key ${pk} must fall back to var(--color-status-unknown)`).toBe('var(--color-status-unknown)');
+        expect(protoCfg.label).toBe(`UNKNOWN (${pk})`);
+      }
+    } finally {
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    }
+  });
+
+  // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator & ApprovalCenter
+  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228 & Card 230 & Card 235 & Card 245: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, NaturalLanguageRunView, DesktopShell, PlacementSimulator, and ApprovalCenter style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
     interface Branch {
       cond: string;
       token: string;
@@ -6699,6 +6984,16 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(placementStats.checkedBorderObjects, 'Border objects in PlacementSimulator must be exactly 21').toBe(21);
     expect(placementStats.checkedBorderPairs, 'Border pairs in PlacementSimulator must be exactly 23').toBe(23);
     expect(placementStats.violations, `PlacementSimulator violations:\n${placementStats.violations.join('\n')}`).toEqual([]);
+
+    const approvalStats = analyzeFile('features/approvals/ApprovalCenter.tsx');
+    expect(approvalStats.totalStyleAttrs, 'Total style attributes in ApprovalCenter must be exactly 37').toBe(37);
+    expect(approvalStats.checkedObjects, 'Explicit style objects in ApprovalCenter must be exactly 5').toBe(5);
+    expect(approvalStats.checkedPairs, 'Evaluated pairs in ApprovalCenter must be exactly 19').toBe(19);
+    expect(approvalStats.unboundColorObjects, 'Unbound color objects in ApprovalCenter must be exactly 13').toBe(13);
+    expect(approvalStats.coveredColorObjects, 'Total covered color objects in ApprovalCenter must be exactly 18').toBe(18);
+    expect(approvalStats.checkedBorderObjects, 'Border objects in ApprovalCenter must be exactly 13').toBe(13);
+    expect(approvalStats.checkedBorderPairs, 'Border pairs in ApprovalCenter must be exactly 14').toBe(14);
+    expect(approvalStats.violations, `ApprovalCenter violations:\n${approvalStats.violations.join('\n')}`).toEqual([]);
   });
 
 
@@ -7204,6 +7499,31 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(probe100Cr, 'PlacementSimulator former #93c5fd on light surface fails 4.5:1').toBeLessThan(4.5);
     expect(probe100Cr).toBeCloseTo(1.80, 1);
 
+    // Probe 101 [Card 245]: ApprovalCenter former freshness indicator #93c5fd on light surface strictly fails 4.5:1
+    const probe101Cr = getContrast('#93c5fd', lightTokens['--color-bg-surface']);
+    expect(probe101Cr, 'ApprovalCenter former #93c5fd on light surface fails 4.5:1').toBeLessThan(4.5);
+    expect(probe101Cr).toBeCloseTo(1.80, 1);
+
+    // Probe 102 [Card 245]: ApprovalCenter former stale warning title #fca5a5 on light surface strictly fails 4.5:1
+    const probe102Cr = getContrast('#fca5a5', lightTokens['--color-bg-surface']);
+    expect(probe102Cr, 'ApprovalCenter former #fca5a5 on light surface fails 4.5:1').toBeLessThan(4.5);
+    expect(probe102Cr).toBeCloseTo(1.90, 1);
+
+    // Probe 103 [Card 245]: ApprovalCenter former snapshot note #fed7aa on light surface strictly fails 4.5:1
+    const probe103Cr = getContrast('#fed7aa', lightTokens['--color-bg-surface']);
+    expect(probe103Cr, 'ApprovalCenter former #fed7aa on light surface fails 4.5:1').toBeLessThan(4.5);
+    expect(probe103Cr).toBeCloseTo(1.35, 1);
+
+    // Probe 104 [Card 245]: ApprovalCenter former retry button #3b82f6 on light surface strictly fails 4.5:1
+    const probe104Cr = getContrast('#3b82f6', lightTokens['--color-bg-surface']);
+    expect(probe104Cr, 'ApprovalCenter former #3b82f6 on light surface fails 4.5:1').toBeLessThan(4.5);
+    expect(probe104Cr).toBeCloseTo(3.68, 1);
+
+    // Probe 105 [Card 245]: ApprovalCenter former stale warning border #ef4444 on dark subtle strictly fails 4.5:1 text
+    const probe105Cr = getContrast('#ef4444', darkTokens['--color-bg-subtle']);
+    expect(probe105Cr, 'ApprovalCenter former #ef4444 on dark subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe105Cr).toBeCloseTo(3.89, 1);
+
 
     // Legacy Token Reverts:
     // Legacy Dark --color-border-subtle: #374151
@@ -7299,7 +7619,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
 
     // Exact count verification for var(--color-border-subtle)
-    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 456').toBe(456);
+    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 458').toBe(458);
     expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 31').toBe(31);
 
     // Fail-closed check 3: Total files with color literals must not exceed baseline file count
