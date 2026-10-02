@@ -896,6 +896,58 @@ def test_an_owner_verified_key_identity_must_be_registered_and_non_vacuous(
     assert tool.evaluate_rls(report, allowlist, NOW) is expected
 
 
+@pytest.mark.parametrize(
+    "forge",
+    [
+        pytest.param("measured-roles-differ", id="measured-roles-differ"),
+        pytest.param("invented-violation", id="invented-violation"),
+        pytest.param("hidden-violation", id="hidden-violation"),
+        pytest.param("invented-unmeasured", id="invented-unmeasured"),
+        pytest.param("hidden-unmeasured", id="hidden-unmeasured"),
+        pytest.param("accepted-row-nothing-derives", id="accepted-row-nothing-derives"),
+        pytest.param("role-without-tables", id="role-without-tables"),
+    ],
+)
+def test_every_rls_row_must_be_derivable_from_the_observations(forge, allowlist):
+    """A report may not claim a row its own observations do not produce, or hide one they do.
+
+    This is the class the three findings of #322 r2 belong to: the evaluator used to read a
+    conclusion (``verdict``, ``match``, a list) and not the numbers beside it.  Each case below
+    forges exactly one of those relations.
+    """
+
+    leaking = rls_roles({"public.projects": rls_table(),
+                         "public.runs": rls_table(guc_tenant_a_foreign_rows={"rows": 1})})
+    truth = rls_ground_truth("public.projects", "public.runs")
+    row = {"rule": "E4", "role": "inv_app", "table": "public.runs"}
+
+    if forge == "measured-roles-differ":
+        report = rls_report(allowlist)
+        report["measuredRoles"] = ["inv_app", "inv_kernel"]
+    elif forge == "invented-violation":
+        report = rls_report(allowlist, 1)
+        report.update(verdict="VIOLATIONS", violations=[dict(row)])
+    elif forge == "hidden-violation":
+        report = rls_report(allowlist, roles=leaking, ground_truth=truth)
+    elif forge == "invented-unmeasured":
+        report = rls_report(allowlist, 3)
+        report.update(verdict="UNMEASURED", unmeasured=[dict(row)])
+    elif forge == "hidden-unmeasured":
+        roles = rls_roles({"public.projects": rls_table(
+            {"method": "unverifiable", "reason": "ctid denied 42501"}
+        )})
+        report = rls_report(allowlist, roles=roles)
+    elif forge == "accepted-row-nothing-derives":
+        report = rls_report(allowlist)
+        report["accepted"] = [{"rule": "E2", "role": "inv_app", "table": "public.tenants"}]
+    else:
+        roles = rls_roles()
+        del roles["inv_app"]["tables"]
+        report = rls_report(allowlist, roles=roles, ground_truth=truth)
+
+    assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.INVALID_RUN
+
+
 def test_the_collector_and_the_evaluator_derive_the_same_rows(allowlist):
     """The two implementations of E1..E5 must agree, and this test is where drift shows.
 
