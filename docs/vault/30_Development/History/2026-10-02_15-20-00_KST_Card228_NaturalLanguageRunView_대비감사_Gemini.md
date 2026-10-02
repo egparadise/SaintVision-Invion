@@ -17,7 +17,7 @@
    - 계약 외 임의 상태 7종(`planning`, `running`, `executing`, `awaiting_approval`, `failed`, `blocked`, `idle`)을 config 테이블에서 전면 제거하고 known 부당 승격 차단.
    - `expect(Object.keys(AGENT_RUN_STATUS_CONFIG).sort()).toEqual(['completed', 'draft', 'evaluating', 'ready', 'rejected', 'repairing'])` 불변식 고정.
 3. **비색상 동작 및 배지 공개 계약 100% 복원 (F-R2, Claude UI r1 / Codex r1 지적 해소)**:
-   - 형제 테스트 `tests/node-fetch-error-workspace-wiring.test.tsx:360` hosted frontend 실패 원인이었던 상태 배지 아이콘/한글 복합 DOM(`⚡준비 완료 (READY)`)을 wire 상태 대문자 원문(`READY`, `REPAIRING`, `COMPLETED`, `REJECTED`) 단일 span 렌더로 완전 복원.
+   - 형제 테스트 `apps/web/tests/node-fetch-error-workspace-wiring.test.tsx:360` hosted frontend 실패 원인이었던 상태 배지 아이콘/한글 복합 DOM(`⚡준비 완료 (READY)`)을 wire 상태 대문자 원문(`READY`, `REPAIRING`, `COMPLETED`, `REJECTED`) 단일 span 렌더로 완전 복원.
    - `natural-language-run-view.test.tsx`의 exact equality(`toBe('COMPLETED')`, `toBe('READY')`) 회귀 복원 및 8/8 통과, 형제 배선 시험 10/10 전수 통과 실측.
 4. **Fail-Closed Own-Key 방어 체계 확립 (Codex F1 선제 적용 및 X29 사살)**:
    - `getAgentRunStatusConfig`: `Object.hasOwn(AGENT_RUN_STATUS_CONFIG, status)` own-key 검사 적용.

@@ -31,6 +31,12 @@ import {
   getAgentRunStatusConfig,
 } from '../src/features/agent/NaturalLanguageRunView';
 import {
+  DesktopShell,
+  NOTIFICATION_LEVEL_CONFIG,
+  getNotificationLevelConfig,
+} from '../src/features/desktop/DesktopShell';
+import type { DesktopNotification } from '../src/contracts/virtualFabric';
+import {
   ModelStudioView,
   REPLICA_STATUS_CONFIG,
   MODEL_AVAILABILITY_CONFIG,
@@ -300,7 +306,7 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/approvals/ApprovalDetail.tsx": {"#0d1117": 1, "#30363d": 1, "#58a6ff": 1, "#c9d1d9": 1, "rgba(0,0,0,0.5)": 1, "rgba(220,38,38,0.1)": 1, "rgba(56,139,253,0.15)": 1},
   "features/dashboard/ClusterOverview.tsx": {"#10b981": 1, "#38bdf8": 1, "#64748b": 2, "#8b5cf6": 1, "#d29922": 1, "#ef4444": 4, "#f59e0b": 1, "#fca5a5": 3, "#fff": 1, "rgba(239,68,68,0.1)": 2},
   "features/deployment/IntranetDeploymentView.tsx": {},
-  "features/desktop/DesktopShell.tsx": {"#030712": 1, "#090d16": 1, "#0f172a": 1, "#1e3a8a": 1, "#34d399": 2, "#38bdf8": 3, "#60a5fa": 2, "#94a3b8": 5, "#ef4444": 1, "#f8fafc": 5, "#ffffff": 1, "rgba(0,0,0,0.3)": 1, "rgba(0,0,0,0.5)": 1, "rgba(0,0,0,0.6)": 2, "rgba(0,0,0,0.8)": 1, "rgba(15,23,42,0.75)": 1, "rgba(15,23,42,0.85)": 1, "rgba(15,23,42,0.95)": 2, "rgba(255,255,255,0.05)": 1, "rgba(255,255,255,0.08)": 2, "rgba(255,255,255,0.1)": 5, "rgba(255,255,255,0.15)": 4, "rgba(255,255,255,0.5)": 1, "rgba(59,130,246,0.2)": 1, "rgba(59,130,246,0.3)": 1, "rgba(59,130,246,0.4)": 1, "rgba(59,130,246,0.5)": 1},
+  "features/desktop/DesktopShell.tsx": {},
   "features/desktop/DesktopWindow.tsx": {"#0f172a": 1, "#10b981": 1, "#1e293b": 1, "#333": 1, "#334155": 1, "#64748b": 1, "#94a3b8": 1, "#ef4444": 1, "#f59e0b": 1, "#f8fafc": 1, "rgba(0,0,0,0.25)": 1, "rgba(0,0,0,0.3)": 4, "rgba(0,0,0,0.45)": 1, "rgba(0,0,0,0.5)": 1},
   "features/desktop/InvFileExplorer.tsx": {},
   "features/desktop/ModelStudioView.tsx": {},
@@ -5504,6 +5510,238 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       container.remove();
     }
   });
+  // 9n. [Card 230 / ACC-09] Component DOM Rendering Verification: DesktopShell binds foregrounds and container backgrounds to design tokens with dynamic contrast verification
+  it('ACC-09 / Card 230: DesktopShell component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification', async () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    const mockNotifications: DesktopNotification[] = [
+      { id: 'notif_1', title: '배포 성공', message: '카나리 배포가 성공적으로 완료되었습니다.', level: 'success', timestamp: '12:00', read: false },
+      { id: 'notif_2', title: '시스템 점검', message: '정기 점검 작업이 예정되어 있습니다.', level: 'info', timestamp: '12:01', read: true },
+      { id: 'notif_3', title: '자원 경고', message: 'VRAM 사용량이 85%를 초과했습니다.', level: 'warning', timestamp: '12:02', read: true },
+      { id: 'notif_4', title: '노드 장애', message: '노드 nod_03 응답 없음 상태입니다.', level: 'error', timestamp: '12:03', read: true },
+    ];
+
+    const mockShellProps = {
+      projectId: 'prj_test_01',
+      tenantId: 'tnt_test_01',
+      checkoutId: 'chk_test_01',
+      nodes: [
+        {
+          id: 'nod_test_01',
+          name: 'Node 01',
+          hostname: 'node-win-01',
+          os: 'windows' as const,
+          cpuCores: 16,
+          cpuUsagePercent: 20,
+          memoryTotalBytes: 64 * 1024 ** 3,
+          memoryUsagePercent: 30,
+          gpuName: 'RTX 4090',
+          gpuCount: 1,
+          status: 'online' as const,
+          labels: {},
+          observationOnly: false,
+          schedulable: true,
+        },
+      ],
+      runs: [],
+      approvals: [],
+      workspaces: [],
+      currentReviewerId: 'usr_test_operator',
+      onRefreshNodes: vi.fn(),
+      onApprove: vi.fn(),
+      onReject: vi.fn(),
+      onChangeUser: vi.fn(),
+      onSwitchToPortalView: vi.fn(),
+      currentTheme: 'dark' as const,
+      onToggleTheme: vi.fn(),
+      notifications: mockNotifications,
+    };
+
+    try {
+      await act(async () => {
+        root.render(<DesktopShell {...mockShellProps} />);
+      });
+
+      // 1. Desktop Shell Wallpaper Container
+      const shellContainer = container.querySelector('[data-testid="desktop-shell-container"]') as HTMLElement;
+      expect(shellContainer, 'Desktop shell container must render').not.toBeNull();
+      expect(shellContainer.style.backgroundColor).toBe('var(--color-bg-canvas)');
+      expect(shellContainer.style.backgroundImage).toContain('var(--color-brand-subtle)');
+      expect(shellContainer.style.backgroundImage).toContain('var(--color-bg-surface)');
+      expect(shellContainer.style.backgroundImage).toContain('var(--color-bg-canvas)');
+
+      // 2. Top System Menu Bar
+      const startMenuTrigger = container.querySelector('#desktop-start-menu-trigger') as HTMLButtonElement;
+      expect(startMenuTrigger, 'Start menu trigger must render').not.toBeNull();
+      expect(startMenuTrigger.style.color).toBe('var(--color-brand-hover)');
+
+      const modeSwitcher = container.querySelector('[data-testid="desktop-mode-switcher"]') as HTMLButtonElement;
+      expect(modeSwitcher, 'Mode switcher button must render').not.toBeNull();
+      expect(modeSwitcher.style.backgroundColor).toBe('var(--color-brand-subtle)');
+      expect(modeSwitcher.style.borderColor).toBe('var(--color-brand-hover)');
+      expect(modeSwitcher.style.color).toBe('var(--color-brand-hover)');
+      expect(modeSwitcher.style.opacity || '1', 'Mode switcher must not have degraded opacity').toBe('1');
+
+      // Focus ring preservation on mode switcher & start menu trigger
+      const computedModeSwitcher = window.getComputedStyle(modeSwitcher);
+      expect(computedModeSwitcher.outlineStyle || 'inherit', 'Mode switcher must not suppress focus ring with outline-style none').not.toBe('none');
+      expect(computedModeSwitcher.outlineWidth || 'inherit', 'Mode switcher must not suppress focus ring with outline-width 0').not.toMatch(/^(0px|0)$/);
+      expect(modeSwitcher.style.outline || 'inherit', 'Mode switcher must not have inline outline none/0').not.toMatch(/(none|0px|\b0\b)/);
+      expect(modeSwitcher.style.outlineWidth || 'inherit', 'Mode switcher must not have inline outline-width 0').not.toMatch(/^(0px|0)$/);
+      expect(modeSwitcher.style.outlineStyle || 'inherit', 'Mode switcher must not have inline outline-style none').not.toBe('none');
+
+      // Unread notification dot indicator
+      const unreadDot = container.querySelector('[data-testid="desktop-unread-notif-dot"]') as HTMLElement;
+      expect(unreadDot, 'Unread notification dot must render').not.toBeNull();
+      expect(unreadDot.style.backgroundColor).toBe('var(--color-status-offline)');
+
+      // 3. Floating Dock Toolbar
+      const taskbar = container.querySelector('[data-testid="desktop-taskbar"]') as HTMLElement;
+      expect(taskbar, 'Taskbar dock must render').not.toBeNull();
+      expect(taskbar.style.backgroundColor).toBe('var(--color-bg-surface)');
+      expect(taskbar.style.borderColor).toBe('var(--color-border-subtle)');
+
+      const activeDockTile = container.querySelector('[data-testid="desktop-dock-tile-my-computer"]') as HTMLElement;
+      expect(activeDockTile, 'Active dock tile must render').not.toBeNull();
+      expect(activeDockTile.style.backgroundColor).toBe('var(--color-brand-subtle)');
+      expect(activeDockTile.style.borderColor).toBe('var(--color-brand-hover)');
+
+      const activeRunningDot = container.querySelector('[data-testid="desktop-dock-running-my-computer"]') as HTMLElement;
+      expect(activeRunningDot, 'Active running dot must render').not.toBeNull();
+      expect(activeRunningDot.style.backgroundColor).toBe('var(--color-brand-hover)');
+
+      // 4. Notification Center Drawer & Badges
+      const notifTrigger = container.querySelector('#desktop-notification-trigger') as HTMLButtonElement;
+      expect(notifTrigger, 'Notification trigger must render').not.toBeNull();
+
+      await act(async () => {
+        notifTrigger.click();
+      });
+
+      const notifDrawer = container.querySelector('#desktop-notification-drawer') as HTMLElement;
+      expect(notifDrawer, 'Notification drawer must open').not.toBeNull();
+      expect(notifDrawer.style.backgroundColor).toBe('var(--color-bg-surface)');
+      expect(notifDrawer.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(notifDrawer.style.color).toBe('var(--color-text-primary)');
+
+      const notifItems = container.querySelectorAll('[data-testid="desktop-notification-item"]');
+      expect(notifItems.length).toBe(4);
+
+      const notifBadges = Array.from(container.querySelectorAll('[data-testid="desktop-notification-badge"]')) as HTMLElement[];
+      expect(notifBadges.length).toBe(4);
+
+      // Verify SUCCESS badge
+      const successBadge = notifBadges.find((b) => b.textContent === 'SUCCESS');
+      expect(successBadge).toBeDefined();
+      expect(successBadge!.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(successBadge!.style.color).toBe('var(--color-status-online)');
+      expect(successBadge!.style.borderColor).toBe('var(--color-status-online)');
+      expect(successBadge!.style.opacity || '1', 'Notification badge must not have degraded opacity').toBe('1');
+
+      // Verify INFO badge
+      const infoBadge = notifBadges.find((b) => b.textContent === 'INFO');
+      expect(infoBadge).toBeDefined();
+      expect(infoBadge!.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(infoBadge!.style.color).toBe('var(--color-brand-hover)');
+      expect(infoBadge!.style.borderColor).toBe('var(--color-brand-hover)');
+
+      // Verify WARNING badge
+      const warningBadge = notifBadges.find((b) => b.textContent === 'WARNING');
+      expect(warningBadge).toBeDefined();
+      expect(warningBadge!.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(warningBadge!.style.color).toBe('var(--color-status-degraded)');
+      expect(warningBadge!.style.borderColor).toBe('var(--color-status-degraded)');
+
+      // Verify ERROR badge
+      const errorBadge = notifBadges.find((b) => b.textContent === 'ERROR');
+      expect(errorBadge).toBeDefined();
+      expect(errorBadge!.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(errorBadge!.style.color).toBe('var(--color-status-offline)');
+      expect(errorBadge!.style.borderColor).toBe('var(--color-status-offline)');
+
+      // 5. Config table exact contract enum key set binding
+      const expectedContractLevels = ['error', 'info', 'success', 'warning'];
+      expect(Object.keys(NOTIFICATION_LEVEL_CONFIG).sort()).toEqual(expectedContractLevels);
+
+      // 6. Fail-closed out-of-contract rejection and prototype key defense
+      const corruptedCfg = getNotificationLevelConfig('corrupted_unknown' as any);
+      expect(corruptedCfg.color).toBe('var(--color-status-unknown)');
+      expect(corruptedCfg.border).toBe('var(--color-status-unknown)');
+      expect(corruptedCfg.bg).toBe('var(--color-bg-subtle)');
+      expect(corruptedCfg.label).toBe('CORRUPTED_UNKNOWN');
+
+      const bogusCfg = getNotificationLevelConfig('bogus' as any);
+      expect(bogusCfg.color).toBe('var(--color-status-unknown)');
+
+      const nullCfg = getNotificationLevelConfig(null as any);
+      expect(nullCfg.color).toBe('var(--color-status-unknown)');
+      expect(nullCfg.label).toBe('UNKNOWN');
+
+      const emptyCfg = getNotificationLevelConfig('' as any);
+      expect(emptyCfg.color).toBe('var(--color-status-unknown)');
+      expect(emptyCfg.label).toBe('UNKNOWN');
+
+      const undefCfg = getNotificationLevelConfig(undefined as any);
+      expect(undefCfg.color).toBe('var(--color-status-unknown)');
+      expect(undefCfg.label).toBe('UNKNOWN');
+
+      // Prototype key hijack defense
+      const protoKeys = ['toString', 'constructor', '__proto__', 'valueOf', 'hasOwnProperty', 'isPrototypeOf'];
+      for (const pk of protoKeys) {
+        const protoCfg = getNotificationLevelConfig(pk as any);
+        expect(protoCfg.color, `Prototype key ${pk} must fall back to var(--color-status-unknown)`).toBe('var(--color-status-unknown)');
+        expect(protoCfg.label).toBe(pk.toUpperCase());
+      }
+
+      // Close notification drawer
+      await act(async () => {
+        notifTrigger.click();
+      });
+
+      // 7. Open Start Menu and check dropdown
+      await act(async () => {
+        startMenuTrigger.click();
+      });
+
+      const startMenuDropdown = container.querySelector('#desktop-start-menu-dropdown') as HTMLElement;
+      expect(startMenuDropdown, 'Start menu dropdown must open').not.toBeNull();
+      expect(startMenuDropdown.style.backgroundColor).toBe('var(--color-bg-surface)');
+      expect(startMenuDropdown.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(startMenuDropdown.style.color).toBe('var(--color-text-primary)');
+
+      // 8. Dynamic contrast ratio verification for all 4 notification levels in Light and Dark
+      for (const level of expectedContractLevels as ('error' | 'info' | 'success' | 'warning')[]) {
+        const cfg = NOTIFICATION_LEVEL_CONFIG[level];
+        const lightFgHex = resolveTokenHex(helperExtractVar(cfg.color), lightTokens);
+        const lightBgHex = resolveTokenHex(helperExtractVar(cfg.bg), lightTokens);
+        const lightBorderHex = resolveTokenHex(helperExtractVar(cfg.border), lightTokens);
+
+        const darkFgHex = resolveTokenHex(helperExtractVar(cfg.color), darkTokens);
+        const darkBgHex = resolveTokenHex(helperExtractVar(cfg.bg), darkTokens);
+        const darkBorderHex = resolveTokenHex(helperExtractVar(cfg.border), darkTokens);
+
+        // Text contrast >= 4.5:1
+        const lightTextCr = getContrast(lightFgHex, lightBgHex);
+        const darkTextCr = getContrast(darkFgHex, darkBgHex);
+        expect(lightTextCr, `Notification ${level} light text >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
+        expect(darkTextCr, `Notification ${level} dark text >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
+
+        // Border contrast >= 3.0:1
+        const lightBorderCr = getContrast(lightBorderHex, lightBgHex);
+        const darkBorderCr = getContrast(darkBorderHex, darkBgHex);
+        expect(lightBorderCr, `Notification ${level} light border >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
+        expect(darkBorderCr, `Notification ${level} dark border >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
+      }
+    } finally {
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    }
+  });
+
 
   // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView & NaturalLanguageRunView
   it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, and NaturalLanguageRunView style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
@@ -5795,7 +6033,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       }
 
       function checkConfigTables(node: ts.Node) {
-        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG' || node.name.getText(sf) === 'AGENT_RUN_STATUS_CONFIG') && node.initializer) {
+        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG' || node.name.getText(sf) === 'AGENT_RUN_STATUS_CONFIG' || node.name.getText(sf) === 'NOTIFICATION_LEVEL_CONFIG') && node.initializer) {
           let init = node.initializer;
           while (ts.isAsExpression(init) || ts.isSatisfiesExpression(init) || ts.isParenthesizedExpression(init)) {
             init = init.expression;
@@ -5898,6 +6136,16 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(nlRunStats.checkedBorderObjects, 'Border objects in NaturalLanguageRunView must be exactly 20').toBe(20);
     expect(nlRunStats.checkedBorderPairs, 'Border pairs in NaturalLanguageRunView must be exactly 23').toBe(23);
     expect(nlRunStats.violations, `NaturalLanguageRunView violations:\n${nlRunStats.violations.join('\n')}`).toEqual([]);
+
+    const desktopShellStats = analyzeFile('features/desktop/DesktopShell.tsx');
+    expect(desktopShellStats.totalStyleAttrs, 'Total style attributes in DesktopShell must be exactly 50').toBe(50);
+    expect(desktopShellStats.checkedObjects, 'Explicit style objects in DesktopShell must be exactly 8').toBe(8);
+    expect(desktopShellStats.checkedPairs, 'Evaluated pairs in DesktopShell must be exactly 22').toBe(22);
+    expect(desktopShellStats.unboundColorObjects, 'Unbound color objects in DesktopShell must be exactly 14').toBe(14);
+    expect(desktopShellStats.coveredColorObjects, 'Total covered color objects in DesktopShell must be exactly 22').toBe(22);
+    expect(desktopShellStats.checkedBorderObjects, 'Border objects in DesktopShell must be exactly 13').toBe(13);
+    expect(desktopShellStats.checkedBorderPairs, 'Border pairs in DesktopShell must be exactly 14').toBe(14);
+    expect(desktopShellStats.violations, `DesktopShell violations:\n${desktopShellStats.violations.join('\n')}`).toEqual([]);
   });
 
 
@@ -6352,6 +6600,31 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(probe90Cr, 'NaturalLanguageRunView former #ff7b72 on light surface fails 4.5:1').toBeLessThan(4.5);
     expect(probe90Cr).toBeCloseTo(2.52, 1);
 
+    // Probe 91 [Card 230]: DesktopShell former muted text literal #94a3b8 on light surface strictly fails 4.5:1
+    const probe91Cr = getContrast('#94a3b8', lightTokens['--color-bg-surface']);
+    expect(probe91Cr, 'DesktopShell former #94a3b8 on light surface fails 4.5:1').toBeLessThan(4.5);
+    expect(probe91Cr).toBeCloseTo(2.56, 1);
+
+    // Probe 92 [Card 230]: DesktopShell former brand text literal #38bdf8 on light surface strictly fails 4.5:1
+    const probe92Cr = getContrast('#38bdf8', lightTokens['--color-bg-surface']);
+    expect(probe92Cr, 'DesktopShell former #38bdf8 on light surface fails 4.5:1').toBeLessThan(4.5);
+    expect(probe92Cr).toBeCloseTo(2.14, 1);
+
+    // Probe 93 [Card 230]: DesktopShell former online text literal #34d399 on light surface strictly fails 4.5:1
+    const probe93Cr = getContrast('#34d399', lightTokens['--color-bg-surface']);
+    expect(probe93Cr, 'DesktopShell former #34d399 on light surface fails 4.5:1').toBeLessThan(4.5);
+    expect(probe93Cr).toBeCloseTo(1.92, 1);
+
+    // Probe 94 [Card 230]: DesktopShell former mode switcher text literal #60a5fa on light surface strictly fails 4.5:1
+    const probe94Cr = getContrast('#60a5fa', lightTokens['--color-bg-surface']);
+    expect(probe94Cr, 'DesktopShell former #60a5fa on light surface fails 4.5:1').toBeLessThan(4.5);
+    expect(probe94Cr).toBeCloseTo(2.53, 1);
+
+    // Probe 95 [Card 230]: DesktopShell former white text literal #ffffff on light canvas strictly fails 4.5:1
+    const probe95Cr = getContrast('#ffffff', lightTokens['--color-bg-canvas']);
+    expect(probe95Cr, 'DesktopShell former #ffffff on light canvas fails 4.5:1').toBeLessThan(4.5);
+    expect(probe95Cr).toBeCloseTo(1.05, 1);
+
 
     // Legacy Token Reverts:
     // Legacy Dark --color-border-subtle: #374151
@@ -6447,8 +6720,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
 
     // Exact count verification for var(--color-border-subtle)
-    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 442').toBe(442);
-    expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 30').toBe(30);
+    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 451').toBe(451);
+    expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 31').toBe(31);
 
     // Fail-closed check 3: Total files with color literals must not exceed baseline file count
     const baselineFileCount = Object.keys(COLOR_LITERAL_MULTISET_BASELINE).length;
