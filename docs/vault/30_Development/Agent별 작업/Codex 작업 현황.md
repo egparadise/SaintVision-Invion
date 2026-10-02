@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.303"
+version: "1.0.304"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T07:25:19+09:00"
+updated: "2026-10-03T08:08:48+09:00"
 source_of_truth: "Git"
-active_card: "CARD-251 S08-BE fixed-SHA acceptance evidence"
-active_card_status: "Card 247 #343 is approved and exact-head green; Card 251 Claude r1 findings are closed and hosted run 37069106763 produced 13/13 MEASURED_PASS evidence"
-active_card_next: "Re-dispatch the docs-recorded final head, request Claude r2, keep product flag default off, and defer any 50-to-75 score decision to rescoring"
+active_card: "CARD-254 inv_audit_reader disposition re-review before the 2026-10-31 expiry"
+active_card_status: "Card 251 #347 is approved by Claude r2 at 4e148ae4; the hosted run_s08_acceptance run 37072629027 at that final head produced 13/13 MEASURED_PASS (earlier run 37069106763 at 88890edc); product dispatch stays default off and any score change is left to rescoring"
+active_card_next: "Re-measure the inv_audit_reader E3/E4/E5 accepted dispositions on the current tree and renew or remove them before 2026-10-31"
 ---
 
 ## 2026-10-03 Card 251 — S08-BE fixed-SHA acceptance evidence
