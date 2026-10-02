@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -611,3 +612,102 @@ def test_a_seed_that_wrote_something_other_than_what_it_says_is_refused(
     monkeypatch.setattr(producer, "AUDIT_SEED_ROWS_PER_TENANT", 3)
     with pytest.raises(producer.ProducerError, match="not what was written"):
         producer.seed_audit_rows(fresh_audit_db)
+
+
+# ------------------------------------------------- #334 r1: which refusal counts as the proof
+
+MEASURED_REFUSAL = 'new row violates row-level security policy for table "audit_events"'
+
+
+def pg_error(sqlstate: str, message: str):
+    """A psycopg error of that SQLSTATE, the way the driver raises it."""
+
+    import psycopg
+
+    return psycopg.errors.lookup(sqlstate)(message)
+
+
+def test_the_measured_postgres_refusal_is_the_proof():
+    """The exact words and SQLSTATE measured against PostgreSQL 16 with 0047's policy."""
+
+    assert producer.rls_refusal(
+        pg_error(producer.RLS_REFUSAL_SQLSTATE, MEASURED_REFUSAL),
+        producer.AUDIT_SEED_TABLE, producer.AUDIT_SEED_POLICY,
+    ) == MEASURED_REFUSAL
+
+
+def test_a_refusal_that_names_the_policy_is_also_the_proof():
+    """PostgreSQL names the policy in some versions; then it has to be the reviewed one."""
+
+    named = (
+        'new row violates row-level security policy "audit_events_tenant_isolation" '
+        'for table "audit_events"'
+    )
+    assert producer.rls_refusal(
+        pg_error(producer.RLS_REFUSAL_SQLSTATE, named),
+        producer.AUDIT_SEED_TABLE, producer.AUDIT_SEED_POLICY,
+    ) == named
+
+
+@pytest.mark.parametrize(
+    ("label", "sqlstate", "message", "reason"),
+    [
+        ("another sqlstate", "42P01", 'relation "audit_events" does not exist',
+         "not a row-level security refusal"),
+        ("a different 42501", "42501", "permission denied for table audit_events",
+         "not with PostgreSQL's row-level security wording"),
+        ("another table", "42501",
+         'new row violates row-level security policy for table "projects"',
+         "names table 'projects'"),
+        ("another policy", "42501",
+         'new row violates row-level security policy "something_else" for table "audit_events"',
+         "names policy 'something_else'"),
+    ],
+    ids=["other-sqlstate", "other-42501", "other-table", "other-policy"],
+)
+def test_an_error_that_is_not_that_refusal_is_not_a_proof(label, sqlstate, message, reason):
+    """#334 r1: any ``DBAPIError`` counted as "the policy refused", so an unenforced seed passed."""
+
+    with pytest.raises(producer.ProducerError, match=re.escape(reason)):
+        producer.rls_refusal(
+            pg_error(sqlstate, message), producer.AUDIT_SEED_TABLE, producer.AUDIT_SEED_POLICY
+        )
+
+
+def test_a_connection_failure_is_not_a_proof_and_is_not_quoted():
+    """A dropped connection is not a policy decision, and its message can carry host and user."""
+
+    import psycopg
+
+    error = psycopg.OperationalError("connection failed: host=db.internal user=invowner")
+    with pytest.raises(producer.ProducerError) as refused:
+        producer.rls_refusal(error, producer.AUDIT_SEED_TABLE, producer.AUDIT_SEED_POLICY)
+    assert "OperationalError" in str(refused.value) and "sqlstate=None" in str(refused.value)
+    for secret in ("db.internal", "invowner", "connection failed"):
+        assert secret not in str(refused.value)
+
+
+def test_a_sqlite_engine_cannot_prove_that_a_policy_checked_anything(tmp_path):
+    """The probe end to end against an engine that has no row-level security at all.
+
+    This is the case Codex found: ``_prove_policy_enforced`` caught ``DBAPIError`` and called it a
+    refusal, so a sqlite engine -- which fails for an entirely different reason and has no policies
+    -- certified the seed as policy-enforced.
+    """
+
+    import datetime as _dt
+
+    from sqlalchemy import create_engine
+
+    engine = create_engine(f"sqlite+pysqlite:///{tmp_path / 'probe.sqlite'}", future=True)
+    try:
+        with pytest.raises(producer.ProducerError, match="not a row-level security refusal|"
+                                                        "row-level security wording"):
+            producer._prove_policy_enforced(
+                engine,
+                "00000000-0000-0000-0000-000000000001",
+                "00000000-0000-0000-0000-000000000002",
+                _dt.datetime.now(_dt.timezone.utc),
+            )
+    finally:
+        engine.dispose()

@@ -42,6 +42,7 @@ import datetime as dt
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -96,6 +97,21 @@ AUDIT_SEED_PATH = (
 #: statement about rows that exist, in both directions, for two different tenants.
 AUDIT_SEED_ROWS_PER_TENANT = 2
 APP_ROLE = "inv_app"
+#: The policy that must be the one doing the refusing, and the exact refusal that proves it.
+#:
+#: Measured against PostgreSQL 16 (0047's policy, the write of another tenant's row under this
+#: tenant's scope): ``sqlalchemy.exc.ProgrammingError`` wrapping
+#: ``psycopg.errors.InsufficientPrivilege``, ``sqlstate`` **42501**, message ``new row violates
+#: row-level security policy for table "audit_events"`` -- ``diag.table_name`` is not populated for
+#: this error, so the table comes from the message.  Any *other* error is not a proof: a sqlite
+#: engine, a typo, a missing table or a dropped connection all raise ``DBAPIError`` too, and taking
+#: them as "the policy refused" would certify an unenforced seed (#334 r1).
+AUDIT_SEED_POLICY = "audit_events_tenant_isolation"
+RLS_REFUSAL_SQLSTATE = "42501"
+RLS_REFUSAL_RE = re.compile(
+    r'^new row violates row-level security policy(?: "(?P<policy>[^"]+)")?'
+    r' for table "(?P<table>[^"]+)"'
+)
 
 #: The role population is the collector's own default, read from it rather than chosen here.
 #: Choosing a smaller set would change the verdict: measuring two roles instead of the
@@ -186,6 +202,15 @@ def _app_engine(dsn: str):
     @event.listens_for(engine, "connect")
     def _become_the_application(dbapi_connection, _record):  # noqa: ANN001, ARG001
         with dbapi_connection.cursor() as cursor:
+            # Part of the proof that the policy refused is PostgreSQL's own wording, which the
+            # server translates, so the probe asks for the untranslated messages first.  It is
+            # ``PGC_SUSET`` and this DSN may not be a superuser, so a refusal here is not fatal:
+            # the wording check then fails on a translated message and the producer records the
+            # observation as unavailable rather than claiming an unproved seed (#334 r1).
+            try:
+                cursor.execute("SET lc_messages = 'C'")
+            except Exception:  # noqa: BLE001 - the SQLSTATE check still applies either way
+                dbapi_connection.rollback()
             cursor.execute(f"SET ROLE {APP_ROLE}")
 
     return engine
@@ -212,13 +237,55 @@ def _seed_tenants(dsn: str) -> list[tuple[str, str]]:
     return sorted(tenants.items())[:2]
 
 
+def rls_refusal(error: Any, table: str, policy: str) -> str:
+    """PostgreSQL's own RLS refusal for that table, or ``ProducerError``.
+
+    What makes this a proof is **which** refusal it is: SQLSTATE ``42501`` *and* the row-level
+    security wording *and* the table named in it -- and, when the server names the policy, that
+    policy.  Accepting any ``DBAPIError`` instead proved nothing at all: a sqlite engine, a typo, a
+    missing table or a dropped connection raise one too, so an unenforced seed would have been
+    certified as enforced (#334 r1).
+
+    The refusal text is returned so the History can quote the database's own words; nothing else
+    from the exception is, because a connection failure's message can carry host and user.
+    """
+
+    sqlstate = getattr(error, "sqlstate", None)
+    first_line = str(error).strip().splitlines()[0] if str(error).strip() else ""
+    detail = f"{type(error).__name__} sqlstate={sqlstate!r}"
+    if sqlstate != RLS_REFUSAL_SQLSTATE:
+        raise ProducerError(
+            f"the cross-tenant write failed with {detail}, which is not a row-level security "
+            f"refusal; no visibility measurement is recorded"
+        )
+    match = RLS_REFUSAL_RE.match(first_line)
+    if match is None:
+        raise ProducerError(
+            f"the cross-tenant write failed with {detail} but not with PostgreSQL's row-level "
+            f"security wording; no visibility measurement is recorded"
+        )
+    named_table = match.group("table")
+    if named_table not in (table, table.split(".")[-1]):
+        raise ProducerError(
+            f"the row-level security refusal names table {named_table!r}, not {table!r}; "
+            f"no visibility measurement is recorded"
+        )
+    named_policy = match.group("policy")
+    if named_policy is not None and named_policy != policy:
+        raise ProducerError(
+            f"the row-level security refusal names policy {named_policy!r}, not {policy!r}; "
+            f"no visibility measurement is recorded"
+        )
+    return first_line[:200]
+
+
 def _prove_policy_enforced(engine, tenant: str, foreign_tenant: str, now) -> str:
     """Write one row of the *other* tenant under this tenant's scope and require a refusal.
 
     Without this the seed could be silently writing as a role that bypasses RLS, and then every
     visibility cell measured afterwards would be about rows no policy ever checked -- a vacuous
-    PASS of a different shape.  The refusal message is returned (PostgreSQL's own words, no row
-    values) so the History can quote what the database said.
+    PASS of a different shape.  :func:`rls_refusal` decides whether what came back is that policy
+    refusing; its words are returned so the History can quote the database.
     """
 
     import uuid as _uuid
@@ -244,8 +311,9 @@ def _prove_policy_enforced(engine, tenant: str, foreign_tenant: str, now) -> str
                         reason_code="AC11-SEED-PROBE",
                     )
     except DBAPIError as refusal:
-        message = str(getattr(refusal, "orig", refusal)).strip().splitlines()[0]
-        return message[:200]
+        return rls_refusal(
+            getattr(refusal, "orig", None) or refusal, AUDIT_SEED_TABLE, AUDIT_SEED_POLICY
+        )
     raise ProducerError(
         "the seed path wrote another tenant's audit row, so it is not policy-enforced; "
         "no visibility measurement is recorded"
