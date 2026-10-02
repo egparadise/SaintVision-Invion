@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.279"
+version: "1.0.280"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T16:46:18+09:00"
+updated: "2026-10-02T18:01:15+09:00"
 source_of_truth: "Git"
 active_card: "CARD-229 build dispatch activation fencing"
-active_card_status: "implementation in progress: attempt_count claim generation fences queue and final consequence transaction; retryable interruption/network classification added; product dispatch remains disabled"
-active_card_next: "Push PR over #323, obtain exact-head Backend/Core real-PG evidence, then request Claude independent review"
+active_card_status: "Approved by Claude r2 at 5afd8aac with exact-head Backend 36983834624 and Core 36983834554 green (real-PG); claim generation is checked before external dispatch and at the final consequence transaction; interruption/timeout/network are retryable; product dispatch remains disabled by default"
+active_card_next: "Land with its train; Card 232 (product worker loop and trusted intent producer) builds on this head"
 ---
 
 - **CARD-229 implementation:** migration 0059의 `attempt_count`를 단일 단조 claim fencing
