@@ -4792,7 +4792,9 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(activeRcCard.style.borderColor).toBe('var(--color-border-subtle)');
 
       // Active candidate card has no focus-mimicking inline outline (base non-outline preserved)
-      expect(activeRcCard.style.outline || 'none', 'Active candidate card must not have inline outline mimicking focus ring').toBe('none');
+      expect(activeRcCard.style.outline, 'Active candidate card must not have inline outline mimicking focus ring').toBe('');
+      const computedActive = window.getComputedStyle(activeRcCard);
+      expect(computedActive.outlineStyle || 'none', 'Active candidate card must not have solid outline').not.toBe('solid');
 
       // 3. SLO Status Badges & Ancestor Contrast (M1)
       for (const [status, cfg] of Object.entries(SLO_STATUS_CONFIG)) {
@@ -4983,7 +4985,12 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
 
       const rollbackBtn = container.querySelector('button[aria-label*="롤백 실행"]') as HTMLButtonElement;
       expect(rollbackBtn, 'Rollback button must render for inactive candidate').not.toBeNull();
-      expect(rollbackBtn.style.outline || 'inherit', 'Rollback button must not have inline outline: none suppressing focus ring').not.toBe('none');
+      const computedRollback = window.getComputedStyle(rollbackBtn);
+      expect(computedRollback.outlineStyle || 'inherit', 'Rollback button must not suppress focus ring with outline-style none').not.toBe('none');
+      expect(computedRollback.outlineWidth || 'inherit', 'Rollback button must not suppress focus ring with outline-width 0').not.toMatch(/^(0px|0)$/);
+      expect(rollbackBtn.style.outline || 'inherit', 'Rollback button must not have inline outline none/0').not.toMatch(/(none|0px|\b0\b)/);
+      expect(rollbackBtn.style.outlineWidth || 'inherit', 'Rollback button must not have inline outline-width 0').not.toMatch(/^(0px|0)$/);
+      expect(rollbackBtn.style.outlineStyle || 'inherit', 'Rollback button must not have inline outline-style none').not.toBe('none');
       await act(async () => {
         rollbackBtn.click();
       });
@@ -5418,9 +5425,23 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
                 if (name === 'opacity') opacityNode = p.initializer;
                 if (name === 'outline') {
                   const outlineVal = p.initializer.getText(sf).replace(/['"`]/g, '').trim().toLowerCase();
-                  if (outlineVal === 'none') {
+                  if (outlineVal === 'none' || outlineVal === '0' || outlineVal === '0px') {
                     const { line } = sf.getLineAndCharacterOfPosition(p.getStart(sf));
-                    violations.push(`L${line + 1}: Inline outline: none suppressing focus ring`);
+                    violations.push(`L${line + 1}: Inline outline: ${outlineVal} suppressing focus ring`);
+                  }
+                }
+                if (name === 'outlineWidth') {
+                  const widthVal = p.initializer.getText(sf).replace(/['"`]/g, '').trim().toLowerCase();
+                  if (widthVal === '0' || widthVal === '0px') {
+                    const { line } = sf.getLineAndCharacterOfPosition(p.getStart(sf));
+                    violations.push(`L${line + 1}: Inline outlineWidth: 0 suppressing focus ring`);
+                  }
+                }
+                if (name === 'outlineStyle') {
+                  const styleVal = p.initializer.getText(sf).replace(/['"`]/g, '').trim().toLowerCase();
+                  if (styleVal === 'none') {
+                    const { line } = sf.getLineAndCharacterOfPosition(p.getStart(sf));
+                    violations.push(`L${line + 1}: Inline outlineStyle: none suppressing focus ring`);
                   }
                 }
               }

@@ -3,7 +3,7 @@
 tools/test_c220_mutations.py
 
 Card 220 (ACC-09) Release Candidate screen (ReleaseCandidateView.tsx) Mutation Testing Suite.
-Verifies that 21 distinct regressions/mutations (M1-M21) across
+Verifies that 22 distinct regressions/mutations (M1-M22) across
 color contrast, border collisions, status semantics, testid binding,
 fail-closed unknown handling, and non-color accessibility are strictly caught
 and killed by the test suite (ACC-09 Test 9k, Test 9j-2, and Test 10).
@@ -185,6 +185,13 @@ MUTANTS = [
         'replacement': "export function getSloStatusConfig(status?: string | null): SloStatusStyle {\n  if (status && status in SLO_STATUS_CONFIG) {\n    return SLO_STATUS_CONFIG[status as SloRecordStatus];\n  }\n  return {\n    color: 'var(--color-status-unknown)',\n    border: 'var(--color-status-unknown)',\n    bg: 'var(--color-bg-subtle)',\n    label: `UNKNOWN (${status || 'UNKNOWN'})`,\n  };\n}",
         'expected_guard': 'Test 9k (prototype key fail-closed own-key defense assertion)',
     },
+    {
+        'id': 'M22 (Claude Low)',
+        'name': 'ReleaseCandidateView: rollback button injects style={{ outline: 0 }} suppressing focus ring',
+        'target': "<Button\n                          size=\"sm\"\n                          variant=\"secondary\"\n                          aria-label={`이 버전(${rc.tag})으로 롤백 실행 (AC-11)`}",
+        'replacement': "<Button\n                          size=\"sm\"\n                          variant=\"secondary\"\n                          style={{ outline: 0 }}\n                          aria-label={`이 버전(${rc.tag})으로 롤백 실행 (AC-11)`}",
+        'expected_guard': 'Test 9k (computed outline-width/style and inline outline non-zero assertion) & Test 9j-2',
+    },
 ]
 
 def run_test_suite():
@@ -210,7 +217,7 @@ def run_test_suite():
 
 def main():
     print('=' * 80)
-    print(' Card 220 (ACC-09): Reproducible Mutant Test Suite (21 Mutants: M1-M21)')
+    print(' Card 220 (ACC-09): Reproducible Mutant Test Suite (22 Mutants: M1-M22)')
     print(' Target: ReleaseCandidateView.tsx')
     print('=' * 80)
 
