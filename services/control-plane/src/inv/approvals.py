@@ -6,6 +6,7 @@ No browser endpoint or external command executor is exposed by this module.
 """
 
 from dataclasses import dataclass
+from copy import deepcopy
 from datetime import datetime
 from uuid import UUID, uuid4
 import hashlib
@@ -40,6 +41,23 @@ def digest(value):
     return hashlib.sha256(
         json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
     ).hexdigest()
+
+
+def _approval_action(document):
+    """Validate and return the exact action reviewed by the approval quorum.
+
+    Build requests use the ROOF action projection rather than allowing a caller to
+    substitute an arbitrary action digest.  This is an internal product path; the
+    public workload contracts and routes remain unchanged.
+    """
+
+    if isinstance(document, dict) and document.get("kind") == "BuildRequest":
+        validate_contract("BuildRequest", document)
+        from .build_governance import canonical_build_action
+
+        return canonical_build_action(document)
+    validate_contract("WorkloadSpec", document)
+    return document
 
 
 def view(row):
@@ -164,14 +182,14 @@ class ApprovalStore:
         expected_version,
         key,
     ):
-        validate_contract("WorkloadSpec", workload)
+        approval_action = _approval_action(workload)
         validate_contract("PolicyDecision", policy)
         if type(expected_version) is not int or not 1 <= expected_version <= 9007199254740991:
             raise DomainError("VAL-0003", "Current integer Run version is required", 422)
         if not isinstance(policy_version, str) or not 1 <= len(policy_version) <= 200:
             raise DomainError("VAL-0003", "Policy version is required", 422)
         project_id = workload["projectId"]
-        action_hash = action_digest(workload)
+        action_hash = action_digest(approval_action)
         if workload["tenantId"] != principal.tenant_id or any(
             policy[k] != v
             for k, v in {
@@ -260,7 +278,7 @@ class ApprovalStore:
             self._audit(conn, principal, row, "requested")
             return self._save(conn, project_id, "approval.request", key, view(row))
 
-    def _review_snapshot(self, conn, row):
+    def _review_documents(self, conn, row):
         snapshot = conn.execute(
             "SELECT * FROM inv.approval_review_snapshots WHERE approval_id=%s",
             (row["approval_id"],),
@@ -268,19 +286,23 @@ class ApprovalStore:
         if not snapshot:
             raise DomainError("AUTH-0031", "Approval review snapshot unavailable", 409)
         workload, policy = snapshot["workload"], snapshot["policy"]
-        validate_contract("WorkloadSpec", workload)
+        approval_action = _approval_action(workload)
         validate_contract("PolicyDecision", policy)
         expected = {"tenantId": str(row["tenant_id"]), "projectId": row["project_id"],
                     "subjectId": row["requester_id"], "actionDigest": row["action_digest"],
                     "decisionId": row["policy_decision_id"], "requiredApprovals": row["required_approvals"]}
-        if (action_digest(workload) != row["action_digest"] or digest(policy) != snapshot["policy_sha256"]
+        if (action_digest(approval_action) != row["action_digest"] or digest(policy) != snapshot["policy_sha256"]
             or workload["tenantId"] != str(row["tenant_id"]) or workload["projectId"] != row["project_id"]
             or any(policy.get(k) != v for k, v in expected.items())
             or policy["effect"] != "require_approval" or policy["riskLevel"] == "L3" or policy["approvedBy"]
             or datetime.fromisoformat(policy["expiresAt"].replace("Z", "+00:00")) != row["expires_at"]):
             raise DomainError("AUTH-0032", "Approval review snapshot binding differs")
+        return workload, policy, snapshot["policy_sha256"]
+
+    def _review_snapshot(self, conn, row):
+        workload, policy, policy_sha256 = self._review_documents(conn, row)
         return {"approval": view(row), "workload": workload, "riskLevel": policy["riskLevel"],
-                "policyDigest": snapshot["policy_sha256"]}
+                "policyDigest": policy_sha256}
 
     def review(self, principal, project_id, approval_id):
         validate_contract("ApprovalId", approval_id)
@@ -403,11 +425,32 @@ class ApprovalStore:
             validate_contract("ApprovalView", response)
             return response
 
-    def dispatch(self, principal, project_id, approval_id, workload, *, key):
-        validate_contract("WorkloadSpec", workload)
+    def dispatch(
+        self,
+        principal,
+        project_id,
+        approval_id,
+        workload,
+        *,
+        key,
+        build_plan=None,
+        build_evidence_id=None,
+    ):
+        approval_action = _approval_action(workload)
+        build_request = workload.get("kind") == "BuildRequest"
+        if build_request != (build_plan is not None and build_evidence_id is not None):
+            raise DomainError("VAL-0003", "Exact build admission documents are required", 422)
         if workload["tenantId"] != principal.tenant_id or workload["projectId"] != project_id:
             raise DomainError("AUTH-0011", "Action scope differs", 403)
-        action_hash = action_digest(workload)
+        action_hash = action_digest(approval_action)
+        dispatch_payload = {"approval": approval_id, "actionDigest": action_hash}
+        if build_request:
+            dispatch_payload.update(
+                {
+                    "buildPlanDigest": digest(build_plan),
+                    "buildEvidenceId": build_evidence_id,
+                }
+            )
         with self.db.transaction(principal.tenant_id) as conn:
             prior = self._ledger(
                 conn,
@@ -415,7 +458,7 @@ class ApprovalStore:
                 project_id,
                 "approval.dispatch",
                 key,
-                {"approval": approval_id, "actionDigest": action_hash},
+                dispatch_payload,
             )
             run, row = self._locked(conn, approval_id, project_id)
             from .shard_recovery import require_recovery_admission
@@ -447,7 +490,9 @@ class ApprovalStore:
             if prior is not None:
                 return prior
             self._current(conn, run, row, {"approved"})
-            self._review_snapshot(conn, row)
+            reviewed_workload, reviewed_policy, _ = self._review_documents(conn, row)
+            if reviewed_workload != workload:
+                raise DomainError("AUTH-0032", "Approval review snapshot binding differs")
             if len(voters) < row["required_approvals"] or any(
                 v["actor_id"] == principal.subject_id for v in voters
             ):
@@ -481,6 +526,23 @@ class ApprovalStore:
             )
             self._audit(conn, principal, row, "dispatched")
             self.runs._transition(conn, principal.tenant_id, run, "scheduled", run["version"])
+            if build_request:
+                # The human approval and immutable build admission commit together.
+                # No HTTP route accepts BuildRequest/BuildPlan documents.
+                approved_decision = deepcopy(reviewed_policy)
+                approved_decision["approvedBy"] = sorted(v["actor_id"] for v in voters)
+                from .build_product_runtime import TrustedBuildAdmissionEntry
+
+                TrustedBuildAdmissionEntry(self.db).record_committed(
+                    principal,
+                    workload,
+                    build_plan,
+                    approved_decision,
+                    policy_version=row["policy_version"],
+                    run_id=run["run_id"],
+                    evidence_id=build_evidence_id,
+                    connection=conn,
+                )
             return self._save(conn, project_id, "approval.dispatch", key, result)
 
     def expire(self, tenant_id, project_id, approval_id):

@@ -1,4 +1,5 @@
 """Compose must refuse missing deployment credentials before starting services."""
+
 import os
 import json
 from pathlib import Path
@@ -7,14 +8,17 @@ import subprocess
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
-REQUIRED = {"INV_BUSINESS_DSN": "postgresql+psycopg://example:example@postgres/saintvision",
-            "INV_RUNTIME_DSN": "postgresql://kernel:example@postgres/saintvision",
-            "INV_RECOVERY_EPOCH": "11111111-1111-4111-8111-111111111111",
-            "INV_CONFIG_VOLUME": "synthetic-config-volume",
-            "INV_WEB_AUTH_CONFIG": "./synthetic-auth-config.js",
-            "POSTGRES_PASSWORD": "synthetic-admin-only", "MINIO_ROOT_USER": "synthetic-admin",
-            "SAINTVISION_DEV_CERT_DIR": "C:/SaintVision/secrets/saintvision-dev",
-            "MINIO_ROOT_PASSWORD": "synthetic-storage-only"}
+REQUIRED = {
+    "INV_BUSINESS_DSN": "postgresql+psycopg://example:example@postgres/saintvision",
+    "INV_RUNTIME_DSN": "postgresql://kernel:example@postgres/saintvision",
+    "INV_RECOVERY_EPOCH": "11111111-1111-4111-8111-111111111111",
+    "INV_CONFIG_VOLUME": "synthetic-config-volume",
+    "INV_WEB_AUTH_CONFIG": "./synthetic-auth-config.js",
+    "POSTGRES_PASSWORD": "synthetic-admin-only",
+    "MINIO_ROOT_USER": "synthetic-admin",
+    "SAINTVISION_DEV_CERT_DIR": "C:/SaintVision/secrets/saintvision-dev",
+    "MINIO_ROOT_PASSWORD": "synthetic-storage-only",
+}
 
 
 @pytest.mark.parametrize("missing", [None, *REQUIRED])
@@ -29,9 +33,21 @@ def test_compose_requires_explicit_credentials(tmp_path, missing):
     env.update({k: v for k, v in REQUIRED.items() if k != missing})
     empty = tmp_path / "empty.env"
     empty.write_text("")
-    result = subprocess.run(["docker", "compose", "--env-file", str(empty), "-f",
-                             str(ROOT / "docker-compose.prod.yml"), "config", "--quiet"],
-                            env=env, capture_output=True, timeout=30)
+    result = subprocess.run(
+        [
+            "docker",
+            "compose",
+            "--env-file",
+            str(empty),
+            "-f",
+            str(ROOT / "docker-compose.prod.yml"),
+            "config",
+            "--quiet",
+        ],
+        env=env,
+        capture_output=True,
+        timeout=30,
+    )
     assert (result.returncode == 0) == (missing is None)
     if missing:
         assert missing.encode() in result.stderr
@@ -47,19 +63,37 @@ def test_workspace_overlay_requires_external_volume(tmp_path, volume):
         env["INV_WORKSPACE_VOLUME"] = volume
     empty = tmp_path / "empty.env"
     empty.write_text("")
-    result = subprocess.run(["docker", "compose", "--env-file", str(empty),
-                             "-f", str(ROOT / "docker-compose.prod.yml"),
-                             "-f", str(ROOT / "docker-compose.workspace.yml"),
-                             "config", "--format", "json"], env=env, capture_output=True, timeout=30)
+    result = subprocess.run(
+        [
+            "docker",
+            "compose",
+            "--env-file",
+            str(empty),
+            "-f",
+            str(ROOT / "docker-compose.prod.yml"),
+            "-f",
+            str(ROOT / "docker-compose.workspace.yml"),
+            "config",
+            "--format",
+            "json",
+        ],
+        env=env,
+        capture_output=True,
+        timeout=30,
+    )
     if volume is None:
         assert result.returncode != 0 and b"INV_WORKSPACE_VOLUME" in result.stderr
         return
     assert result.returncode == 0
     config = json.loads(result.stdout)
-    auth_mount = next(v for v in config['services']['web']['volumes'] if v['target'] == '/usr/share/nginx/html/auth-config.js')
-    assert auth_mount['type'] == 'bind' and auth_mount['read_only'] is True
+    auth_mount = next(
+        v
+        for v in config["services"]["web"]["volumes"]
+        if v["target"] == "/usr/share/nginx/html/auth-config.js"
+    )
+    assert auth_mount["type"] == "bind" and auth_mount["read_only"] is True
     # Compose omits false booleans in its normalized JSON output.
-    assert auth_mount.get('bind', {}).get('create_host_path', False) is False
+    assert auth_mount.get("bind", {}).get("create_host_path", False) is False
     assert config["volumes"]["workspace_data"]["external"] is True
     assert config["volumes"]["workspace_data"]["name"] == volume
     backend = config["services"]["control-plane"]
@@ -95,9 +129,31 @@ def test_tls_file_mounts_require_external_certificate_directory():
     tls_sources = {
         mount["target"]: mount["source"]
         for mount in mounts
-        if isinstance(mount, dict) and mount.get("target", "").endswith(("saintvision.crt", "saintvision.key"))
+        if isinstance(mount, dict)
+        and mount.get("target", "").endswith(("saintvision.crt", "saintvision.key"))
     }
     assert tls_sources == {
         "/etc/ssl/certs/saintvision.crt": "${SAINTVISION_DEV_CERT_DIR:?Set an existing external development TLS certificate directory}/saintvision.crt",
         "/etc/ssl/private/saintvision.key": "${SAINTVISION_DEV_CERT_DIR:?Set an existing external development TLS certificate directory}/saintvision.key",
     }
+
+
+def test_worker_service_is_private_configured_and_build_dispatch_defaults_off():
+    import yaml
+
+    compose = yaml.safe_load((ROOT / "docker-compose.prod.yml").read_text(encoding="utf-8"))
+    worker = compose["services"]["worker"]
+    assert worker["command"] == ["python", "-m", "inv.worker"]
+    assert "ports" not in worker
+    environment = worker["environment"]
+    assert environment.count("INV_WORKER_CONFIG=/run/saintvision/worker.json") == 1
+    assert environment.count("INV_API_CONFIG=/run/saintvision/api.json") == 1
+    build_flags = [item for item in environment if item.startswith("INV_BUILDKIT_PRODUCT_ENABLED=")]
+    assert build_flags == [
+        "INV_BUILDKIT_PRODUCT_ENABLED=${INV_BUILDKIT_PRODUCT_ENABLED:-0}"
+    ]
+    assert not any(item.startswith("INV_BUSINESS_DSN=") for item in environment)
+    mount = next(item for item in worker["volumes"] if item["target"] == "/run/saintvision")
+    assert mount["source"] == "server_config"
+    assert mount["read_only"] is True and mount["volume"]["nocopy"] is True
+    assert worker["depends_on"]["postgres"]["condition"] == "service_healthy"

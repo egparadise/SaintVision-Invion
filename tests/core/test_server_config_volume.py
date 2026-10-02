@@ -81,6 +81,76 @@ def test_object_store_credential_is_the_only_new_private_file(tmp_path):
     assert private == {"object-store.json"}
 
 
+def test_worker_json_and_only_its_flat_tls_references_enter_volume(tmp_path):
+    (tmp_path / "api.json").write_text(
+        json.dumps({"identity": {"jwks_file": "/run/saintvision/jwks.json"}})
+    )
+    worker = {
+        "tenantId": "11111111-1111-4111-8111-111111111111",
+        "tls": {
+            "ca_file": "/run/saintvision/node-ca.pem",
+            "certificate_file": "/run/saintvision/worker.pem",
+            "key_file": "/run/saintvision/worker.key",
+        },
+        "buildExecution": {
+            "buildctlPath": "/usr/bin/buildctl",
+            "address": "unix:///run/user/65532/buildkit/buildkitd.sock",
+            "sourceRoot": "/workspaces",
+            "referenceHealthReceipt": "/run/saintvision/buildkit-health.json",
+            "productReceiptDirectory": "/var/lib/saintvision/build-receipts",
+            "builderInstanceId": "builder-rootless-01",
+            "builderProfileId": "buildkit-rootless-v1",
+            "providerRecoveryEpoch": 7,
+            "nodeId": "nod_00000000000000000000000000",
+        },
+    }
+    (tmp_path / "worker.json").write_text(json.dumps(worker))
+    for name in ("jwks.json", "node-ca.pem", "worker.pem", "worker.key"):
+        (tmp_path / name).write_text("synthetic")
+    (tmp_path / "unreferenced.key").write_text("must-not-enter")
+
+    files, private = module.collect(tmp_path)
+
+    assert set(files) == {
+        "api.json",
+        "worker.json",
+        "jwks.json",
+        "node-ca.pem",
+        "worker.pem",
+        "worker.key",
+    }
+    assert private == {"worker.key"}
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        lambda worker: worker.update({"unknown": True}),
+        lambda worker: worker.update({"tenantId": "not-a-uuid"}),
+        lambda worker: worker["tls"].update({"key_file": "/outside/worker.key"}),
+        lambda worker: worker["tls"].update({"key_file": "/run/saintvision/worker.json"}),
+        lambda worker: worker.update({"buildExecution": {"nodeId": "node"}}),
+    ],
+)
+def test_worker_configuration_is_strict_and_flat(tmp_path, mutation):
+    (tmp_path / "api.json").write_text(
+        json.dumps({"identity": {"jwks_file": "/run/saintvision/jwks.json"}})
+    )
+    (tmp_path / "jwks.json").write_text("{}")
+    worker = {
+        "tenantId": "11111111-1111-4111-8111-111111111111",
+        "tls": {
+            "ca_file": "/run/saintvision/node-ca.pem",
+            "certificate_file": "/run/saintvision/worker.pem",
+            "key_file": "/run/saintvision/worker.key",
+        },
+    }
+    mutation(worker)
+    (tmp_path / "worker.json").write_text(json.dumps(worker))
+    with pytest.raises(ValueError):
+        module.collect(tmp_path)
+
+
 @pytest.mark.parametrize(
     "object_store",
     [
