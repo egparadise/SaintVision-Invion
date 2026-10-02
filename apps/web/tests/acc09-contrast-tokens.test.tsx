@@ -5197,10 +5197,17 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(PLAN_FEASIBILITY_CONFIG.feasible.color).not.toBe(PLAN_FEASIBILITY_CONFIG.infeasible.color);
       expect(NODE_ELIGIBILITY_CONFIG.eligible.color).not.toBe(NODE_ELIGIBILITY_CONFIG.ineligible.color);
 
-      // Fail-closed Unknown status handling
+      // Fail-closed Unknown status handling & Prototype key own-key defense (Codex F1)
       const unknownReplica = getReplicaStatusConfig('invalid_corrupted_state');
       expect(unknownReplica.color).toBe('var(--color-status-unknown)');
       expect(unknownReplica.label).toContain('알 수 없음');
+
+      for (const pk of ['toString', 'constructor', '__proto__']) {
+        const protoReplica = getReplicaStatusConfig(pk);
+        expect(protoReplica.color).toBe('var(--color-status-unknown)');
+        expect(protoReplica.border).toBe('var(--color-status-unknown)');
+        expect(protoReplica.label).toBe(`알 수 없음 (${pk})`);
+      }
 
       const unknownPlan = getPlanFeasibilityConfig(false);
       expect(unknownPlan.color).toBe('var(--color-status-offline)');

@@ -3,7 +3,7 @@
 tools/test_c226_mutations.py
 
 Card 226 (ACC-09) Model Studio screen (ModelStudioView.tsx) Mutation Testing Suite.
-Verifies that 16 distinct regressions/mutations (M1-M16) across
+Verifies that 17 distinct regressions/mutations (M1-M17) across
 color contrast, border collisions, status semantics, testid binding,
 fail-closed unknown handling, and token inventory are strictly caught and killed
 by the test suite (ACC-09 Test 9l, Test 9j-2, and Test 10).
@@ -150,6 +150,13 @@ MUTANTS = [
         'replacement': "            color: 'lightgray',\n            border: 'none',",
         'expected_guard': 'Test 9j-2 (named color literal violation) & Test 10',
     },
+    {
+        'id': 'M17 (Codex F1)',
+        'name': 'ModelStudioView: getReplicaStatusConfig uses status in REPLICA_STATUS_CONFIG bypassing prototype keys',
+        'target': "export function getReplicaStatusConfig(status?: string | null) {\n  if (status && Object.hasOwn(REPLICA_STATUS_CONFIG, status)) {",
+        'replacement': "export function getReplicaStatusConfig(status?: string | null) {\n  if (status && status in REPLICA_STATUS_CONFIG) {",
+        'expected_guard': 'Test 9l (prototype key fail-closed own-key defense assertion)',
+    },
 ]
 
 def run_test_suite():
@@ -160,7 +167,6 @@ def run_test_suite():
         'tests/acc09-contrast-tokens.test.tsx',
     ]
     env = os.environ.copy()
-    env['NODE_OPTIONS'] = '--max-old-space-size=4096'
     res = subprocess.run(
         cmd,
         cwd=os.path.join(REPO_ROOT, 'apps', 'web'),
@@ -176,7 +182,7 @@ def run_test_suite():
 
 def main():
     print('=' * 80)
-    print(' Card 226 (ACC-09): Reproducible Mutant Test Suite (16 Mutants: M1-M16)')
+    print(' Card 226 (ACC-09): Reproducible Mutant Test Suite (17 Mutants: M1-M17)')
     print(' Target: ModelStudioView.tsx')
     print('=' * 80)
 

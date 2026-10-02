@@ -86,7 +86,7 @@ export const NODE_ELIGIBILITY_CONFIG = {
 } as const;
 
 export function getReplicaStatusConfig(status?: string | null) {
-  if (status && status in REPLICA_STATUS_CONFIG) {
+  if (status && Object.hasOwn(REPLICA_STATUS_CONFIG, status)) {
     return REPLICA_STATUS_CONFIG[status as keyof typeof REPLICA_STATUS_CONFIG];
   }
   return {
