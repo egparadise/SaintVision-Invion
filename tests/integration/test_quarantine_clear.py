@@ -334,6 +334,125 @@ def test_an_expired_or_forged_approval_cannot_clear_a_quarantine(ops):
     assert count(a, "containment_requests") == 0
 
 
+def copy_approval(a, source: str, approval_id: str, status: str, voters: tuple[str, ...]) -> None:
+    """A hand-written approval row with exactly the votes named, for the forgery cases.
+
+    Written with the owner connection because the application never produces these states: an
+    ``approved`` row with one vote, or a ``pending`` row with two.  Each one isolates a product
+    check that the ordinary paths mask -- measured by mutating the product and watching which
+    test noticed (card 227).
+    """
+
+    with psycopg.connect(a.e.owner) as conn:
+        conn.execute(
+            """INSERT INTO inv.containment_approvals
+            SELECT tenant_id,%s,%s,requester_id,requester_person_id,operation,node_id,
+                   expected_version,gate_version,recovery_epoch,reason_code,content_digest,
+                   request_hash,%s,created_at,expires_at,NULL
+            FROM inv.containment_approvals WHERE tenant_id=%s AND approval_id=%s""",
+            (approval_id, str(approval_id), status, a.e.tenant, source),
+        )
+        for voter in voters:
+            conn.execute(
+                """INSERT INTO inv.containment_votes
+                SELECT tenant_id,%s,actor_id,person_id,key,decision,request_hash,response,created_at
+                FROM inv.containment_votes
+                WHERE tenant_id=%s AND approval_id=%s AND actor_id=%s""",
+                (approval_id, a.e.tenant, source, a.people[voter].subject_id),
+            )
+
+
+def test_an_approved_row_with_one_vote_behind_it_cannot_clear_a_quarantine(ops):
+    """Two distinct people is counted, not inferred from the status word.
+
+    Measured by mutation: with the ordinary flow, a single vote leaves the approval ``pending``,
+    so the status check refuses first and the vote count is never reached.  This row says
+    ``approved`` with one vote behind it, which is the state a forger would write, and it is the
+    only case where the count itself is the refusal.
+    """
+
+    a = ops
+    quarantine_the_node(a)
+    fresh_observation(a)
+    row = propose(a)
+    for voter in ("alice", "carol"):
+        vote(a, row["approvalId"], voter)
+
+    one_vote = str(uuid4())
+    copy_approval(a, row["approvalId"], one_vote, "approved", ("alice",))
+    with pytest.raises(DomainError) as caught:
+        clear(a, one_vote, key="one-vote")
+    assert caught.value.code == "AUTH-0063"
+    assert node_status(a) == "quarantined"
+    assert count(a, "containment_requests") == 0
+
+
+def test_two_votes_under_a_status_that_was_never_approved_cannot_clear_a_quarantine(ops):
+    """The status is a fact the votes produced, so a row that skips it is refused.
+
+    With two real votes copied under a ``pending`` row, every other check passes -- the people are
+    distinct and current, the scope matches -- and the refusal has to come from the status.  The
+    database's own trigger refuses to *change* a status this way, so the forgery is an insert.
+    """
+
+    a = ops
+    quarantine_the_node(a)
+    fresh_observation(a)
+    row = propose(a)
+    for voter in ("alice", "carol"):
+        vote(a, row["approvalId"], voter)
+
+    pending = str(uuid4())
+    copy_approval(a, row["approvalId"], pending, "pending", ("alice", "carol"))
+    with pytest.raises(DomainError) as caught:
+        clear(a, pending, key="pending")
+    assert caught.value.code == "AUTH-0063"
+    assert node_status(a) == "quarantined"
+    assert count(a, "containment_requests") == 0
+
+
+def test_the_requester_cannot_be_counted_as_one_of_the_two_people(ops):
+    """The requester's own person is already in the set, so their vote is not a second person.
+
+    ``inv.containment_votes`` is unique per person, so the only way to reach this check is the
+    requester voting on their own request -- which is exactly what an operator with both grants
+    would do.  The row is inserted because ``challenge`` refuses it earlier in the live flow, and
+    this test exists to keep the *consume*-side check load-bearing too.
+    """
+
+    a = ops
+    quarantine_the_node(a)
+    fresh_observation(a)
+    row = propose(a)
+    for voter in ("alice", "carol"):
+        vote(a, row["approvalId"], voter)
+    with psycopg.connect(a.e.owner) as conn:
+        conn.execute(
+            "UPDATE inv.operator_grants SET can_approve=true WHERE tenant_id=%s AND subject_id=%s",
+            (a.e.tenant, a.people["bob"].subject_id),
+        )
+        person = conn.execute(
+            "SELECT person_id FROM inv.operator_grants WHERE tenant_id=%s AND subject_id=%s",
+            (a.e.tenant, a.people["bob"].subject_id),
+        ).fetchone()[0]
+
+    self_approved = str(uuid4())
+    copy_approval(a, row["approvalId"], self_approved, "approved", ("alice",))
+    with psycopg.connect(a.e.owner) as conn:
+        conn.execute(
+            """INSERT INTO inv.containment_votes
+            (tenant_id,approval_id,actor_id,person_id,key,decision,request_hash)
+            VALUES (%s,%s,%s,%s,%s,'approve',%s)""",
+            (a.e.tenant, self_approved, a.people["bob"].subject_id, person, "self-vote",
+             "0" * 64),
+        )
+    with pytest.raises(DomainError) as caught:
+        clear(a, self_approved, key="self-approved")
+    assert caught.value.code == "AUTH-0063"
+    assert node_status(a) == "quarantined"
+    assert count(a, "containment_requests") == 0
+
+
 def test_an_approval_for_another_node_or_for_the_tenant_gate_cannot_clear_this_node(ops):
     """An approval is bound to its target: another Node, and the tenant-wide gate, are refused.
 
