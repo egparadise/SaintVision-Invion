@@ -43,7 +43,7 @@ EMITTED_AXES: tuple[str, ...] = (
 )
 #: The reviewed AC-11 target registry, pinned the same way the accessibility importer pins
 #: it: the aggregator refuses a targetRef whose blob is not the reviewed one.
-REGISTRY_COMMIT = "58c7e9e2bc11ea535c72238bfc504ad5e44d8e68"
+REGISTRY_COMMIT = "2e7c851ab6ac815e34cf005f5b99332c792acbc3"
 REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
 REGISTRY_BLOB = "f2e705f853d06fc805d96e9d858a8a3f08566454"
 TARGET_ID = "s11-security-critical-high-zero-v0"
