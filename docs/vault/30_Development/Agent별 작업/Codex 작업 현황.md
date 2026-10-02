@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.291"
+version: "1.0.293"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T01:47:14+09:00"
+updated: "2026-10-03T03:02:00+09:00"
 source_of_truth: "Git"
 active_card: "CARD-247 S08-BE build-request entry implementation (migration 0061)"
-active_card_status: "Card 241 (#338) approved by Claude r3 at 1b4df727 with exact-head Backend/Core green; Card 246 design (#341) conditionally approved; Card 247 implementation in progress on #338"
-active_card_next: "Open the Card 247 PR with real-PG end-to-end evidence and the census repin; product dispatch stays off by default and enablement follows the S08 runbook (#335)"
+active_card_status: "Card 241 (#338) approved by Claude r3 and verified for landing; Card 246 design (#341) conditionally approved by Claude r2 (Medium conditions carried into the implementation review); Card 247 implementation is PR #343 under Claude review"
+active_card_next: "Settle a single review head for #343 with the census repin (158 tables) and exact-head Backend/Core green; product dispatch stays off by default and enablement follows the S08 runbook (#335)"
 ---
 
 ## 2026-10-02 Card 241 — S08-BE trusted admission entry and deployment worker service
@@ -25,6 +25,18 @@ active_card_next: "Open the Card 247 PR with real-PG end-to-end evidence and the
   merge evidence. S08-BE completion, flag enablement, and physical builder acceptance
   are not claimed.
 - [[2026-10-02_22-36-44_KST_Card241_S08-BE_admission_entry_worker_service_Codex]].
+## 2026-10-03 Card 246 — S08-BE BuildRequest product entry design
+
+- Measured the remaining upstream gap: existing product dispatch callers do not provide build
+  authority, so a user intent cannot yet become a server-owned BuildRequest/BuildPlan.
+- Selected authenticated prepare + enqueue routes which accept selectors only. Source, profile,
+  policy, provider, lease, evidence and approval actors remain server-owned and are revalidated.
+- The immutable pre-approval authority needs migration 0061; no migration or public contract is
+  implemented before Claude approves the design. Claude r1 approved the table need and the coordinator
+  assigned 0061; v1.1 moves lease/plan construction after quorum, defines source/profile authority,
+  keeps legacy review compatibility, and fixes idempotency/quota/flag-off semantics.
+- Design review: PR #341, reviewer Claude.
+- [[2026-10-03_01-06-39_KST_Card246_S08-BE_BuildRequest_제품_진입점_설계_Codex]].
 
 ## 2026-10-02 Card 232 — S08-BE product worker loop and trusted intent producer
 
