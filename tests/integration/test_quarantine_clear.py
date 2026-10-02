@@ -491,6 +491,132 @@ def test_an_approval_for_another_node_or_for_the_tenant_gate_cannot_clear_this_n
     assert count(a, "containment_requests") == 0
 
 
+def rows_in(a, tenant: str, statement: str, params=()) -> list[dict]:
+    """Read inside ``tenant``'s own transaction, so RLS answers as that tenant."""
+
+    with a.e.db.transaction(tenant) as conn:
+        return [dict(row) for row in conn.execute(statement, params).fetchall()]
+
+
+def second_tenant(a) -> dict:
+    """A second tenant with its own node, its own operator people and its own approved resume.
+
+    The other tenant is not a bystander here: it has a complete, valid containment ceremony of its
+    own, so the only thing wrong with using its approval on this tenant's Node is the tenant
+    boundary itself.
+    """
+
+    other = a.e.other
+    node = new_id("nod")
+    people = {}
+    with psycopg.connect(a.e.owner) as conn:
+        conn.execute(
+            "INSERT INTO inv.nodes(tenant_id,node_id,status,recovery_epoch,clock_skew_seconds)"
+            " VALUES (%s,%s,'quarantined',%s,0)",
+            (other, node, a.e.db.recovery_epoch),
+        )
+        for name, resume, approve in (("owner", True, False), ("one", False, True),
+                                      ("two", False, True)):
+            subject = f"other-{name}"
+            people[name] = Principal(other, subject)
+            conn.execute(
+                "INSERT INTO inv.operator_grants"
+                "(tenant_id,subject_id,person_id,can_contain,can_resume,can_approve)"
+                " VALUES(%s,%s,%s,false,%s,%s)",
+                (other, subject, uuid4(), resume, approve),
+            )
+    approvals = a.control_approvals
+    proposed = approvals.propose(
+        people["owner"],
+        {"operation": "resume", "nodeId": node, "expectedVersion": 0,
+         "reasonCode": "maintenance"},
+        "other-tenant-proposal",
+    )
+    for name in ("one", "two"):
+        challenge = approvals.challenge(people[name], proposed["approvalId"])
+        decided = approvals.decide(
+            people[name], proposed["approvalId"], {**challenge, "decision": "approve"}, name
+        )
+    assert decided["status"] == "approved"
+    return {"tenant": other, "node": node, "people": people,
+            "approvalId": proposed["approvalId"]}
+
+
+def test_an_approval_from_another_tenant_cannot_clear_a_quarantine_in_either_direction(ops):
+    """A quarantine clear is bound to its tenant, and the refusal does not disclose the other one.
+
+    Both directions, because a boundary that holds one way and not the other is not a boundary:
+    this tenant's operator presenting the other tenant's (correctly approved) approval id, and the
+    other tenant's operator presenting this one's.  Row-level security makes each approval
+    invisible outside its tenant, so the canonical answer is ``RES-0004`` -- "unavailable" rather
+    than "exists but not for you", which is the non-disclosure the boundary is for.
+
+    Nothing may move in either tenant: both Node statuses, both audit tables and both approvals'
+    consumption state are read before and after.
+    """
+
+    a = ops
+    quarantine_the_node(a)
+    fresh_observation(a)
+    mine = propose(a)
+    for voter in ("alice", "carol"):
+        vote(a, mine["approvalId"], voter)
+    other = second_tenant(a)
+
+    def state() -> dict:
+        return {
+            "mine_status": node_status(a),
+            "other_status": rows_in(a, other["tenant"],
+                                   "SELECT status FROM inv.nodes WHERE node_id=%s",
+                                   (other["node"],))[0]["status"],
+            "mine_requests": rows_in(a, a.e.tenant,
+                                     "SELECT count(*) AS n FROM inv.containment_requests")[0]["n"],
+            "other_requests": rows_in(a, other["tenant"],
+                                      "SELECT count(*) AS n FROM inv.containment_requests")[0]["n"],
+            "mine_approval": rows_in(
+                a, a.e.tenant,
+                "SELECT status,consumed_request_id FROM inv.containment_approvals"
+                " WHERE approval_id=%s", (mine["approvalId"],))[0],
+            "other_approval": rows_in(
+                a, other["tenant"],
+                "SELECT status,consumed_request_id FROM inv.containment_approvals"
+                " WHERE approval_id=%s", (other["approvalId"],))[0],
+        }
+
+    before = state()
+    assert before["mine_status"] == "quarantined" and before["other_status"] == "quarantined"
+    assert before["mine_approval"]["status"] == before["other_approval"]["status"] == "approved"
+    assert before["mine_requests"] == before["other_requests"] == 0
+
+    # This tenant's operator, the other tenant's approval.
+    with pytest.raises(DomainError) as forward:
+        clear(a, other["approvalId"], key="other-tenant-approval")
+    assert forward.value.code == "RES-0004"
+    assert "unavailable" in forward.value.detail
+
+    # The other tenant's operator, this tenant's approval -- on the other tenant's own Node.
+    with pytest.raises(DomainError) as backward:
+        a.ops.change(
+            other["people"]["owner"],
+            "resume",
+            {"approvalId": mine["approvalId"], "expectedVersion": 0,
+             "reasonCode": "maintenance"},
+            "this-tenant-approval",
+            other["node"],
+        )
+    assert backward.value.code == "RES-0004"
+
+    assert state() == before
+
+    # And each tenant's own approval still works, so the refusals above were about the boundary.
+    assert clear(a, mine["approvalId"], key="own-tenant")["control"]["nodeStatus"] == "online"
+    assert node_status(a) == "online"
+    assert rows_in(a, other["tenant"], "SELECT status FROM inv.nodes WHERE node_id=%s",
+                   (other["node"],))[0]["status"] == "quarantined"
+    assert rows_in(a, other["tenant"],
+                   "SELECT count(*) AS n FROM inv.containment_requests")[0]["n"] == 0
+
+
 def test_a_clear_without_an_addressable_audit_row_is_refused(ops):
     """No idempotency key, no audit row, no clear -- and the row cannot be rewritten afterwards.
 
