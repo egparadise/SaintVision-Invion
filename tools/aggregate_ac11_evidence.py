@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import ast
+import functools
 import hashlib
 import json
 import math
@@ -38,7 +39,7 @@ ALLOWLIST_CANONICAL_SHA256 = "b73aba8ff97443bbd1e314d5ca0375fdcbce8205a1a746bc5a
 SCAN_ALLOWLIST_REPO_PATH = (
     "docs/vault/30_Development/Evidence/s11-security-dependency-sast-allowlist-v1.json"
 )
-SCAN_ALLOWLIST_BLOB = "67e80df8d4db56f5095496857dc53339cb01f3bf"
+SCAN_ALLOWLIST_BLOB = "629e276a3de5579ead86856fb9c6d55d43aa6071"
 #: The importer that may write this axis's envelopes, pinned by path here and by blob in
 #: the reviewed allowlist above (#313 F-R3).
 SECURITY_IMPORTER_REPO_PATH = "tools/import_ac11_security_scan.py"
@@ -83,12 +84,24 @@ PIN_RE = re.compile(r"^([A-Za-z0-9_.-]+)(?:\[[^\]]+\])?==([^\s;]+)$")
 
 DEFINER_FILES = [
     {"path": "tools/check_definer_functions.py", "blob": "5831f8d8806900146add2e5e7b51b934dced3952"},
-    {"path": "tools/definer-policy.json", "blob": "e16ee086d5ba301d45fec4f8fac6a5333ae1a39a"},
+    {"path": "tools/definer-policy.json", "blob": "d8202da2ee4227e78a1e73c6c6545295ff3f3efc"},
 ]
 RLS_FILES = [
-    {"path": "tools/collect_rls_evidence.py", "blob": "446c6cc12ccdd2df373713ba4558792f02701c62"},
-    {"path": "tools/rls-boundary-baseline.json", "blob": "698a5b55d3f7ca5042d2760b0d8b448ea0143404"},
+    {"path": "tools/collect_rls_evidence.py", "blob": "684e0f4896202e112a70798ea8c01a545ffd3896"},
+    {"path": "tools/rls-boundary-baseline.json", "blob": "5f6eb104fa6ca455de78423a6f678fd8fc99d6df"},
 ]
+
+#: E4 may fall back to an owner-verified readable key only for these (role, table, columns)
+#: triples, and the collector's own copy (``OWNER_VERIFIED_KEY_SCOPE`` in
+#: tools/collect_rls_evidence.py, whose blob is pinned above) must agree.  The check below is
+#: independent on purpose: a report is evidence about a tree, not a promise from the tool that
+#: wrote it, so the evaluator refuses an out-of-scope or vacuous readable-key identity even if
+#: some collector offered one (#322 r2).
+OWNER_VERIFIED_KEY_METHOD = "owner-verified-key"
+MD5_RE = re.compile(r"^[0-9a-f]{32}$")
+OWNER_VERIFIED_KEY_SCOPE = frozenset(
+    {("inv_cancel_bridge_owner", "public.audit_events", ("tenant_id", "event_id"))}
+)
 
 DEFINER_CRITICAL = {
     "unrecognized_privileged_function",
@@ -623,6 +636,591 @@ def validate_allowlist(allowlist: Any) -> None:
                 raise ValueError("accepted-with-expiry requires a timezone-aware expiry")
 
 
+#: The RLS report's shape, pinned here because four findings in a row (#322 r2 F-R1, F-R3,
+#: F-R4, F-R5) came from reading a field that was missing, wrongly typed or quietly defaulted.
+#: The evaluator now validates this exact shape **before** deriving anything: a missing key, an
+#: extra key, a wrong type or a negative count is INVALID_RUN, never a zero.
+#:
+#: The role population is the collector's own ``DEFAULT_ROLES``; dropping a role would shrink the
+#: population a verdict is about, so all of them must be present and measured.  Changing either
+#: list is a reviewed change: this file pins the collector's blob in ``RLS_FILES``.
+RLS_REQUIRED_ROLES = frozenset({
+    "inv_app", "inv_kernel", "inv_runtime_dev", "inv_discovery_issuer",
+    "inv_discovery_issuer_guard", "inv_audit_writer", "inv_audit_reader",
+    "inv_cancel_bridge_owner",
+})
+#: The one measured role that may be reported absent, and why: ``inv_runtime_dev`` is a
+#: developer login no migration creates (measured on the hosted producer's disposable database,
+#: where it is absent while the other seven exist).  A role that does not exist cannot bypass
+#: RLS, so its absence is a fact rather than a gap -- but it is pinned here, because
+#: ``present: false`` on any of the other seven would shrink the population a verdict covers.
+RLS_OPTIONAL_ROLES = frozenset({"inv_runtime_dev"})
+RLS_ROLE_KEYS = frozenset({
+    "present", "superuser", "bypassrls", "login", "inherit", "member_of", "tables", "functions",
+})
+RLS_TABLE_KEYS = frozenset({
+    "tenant_scoped", "rls_enabled", "rls_forced", "privileges", "policies",
+})
+RLS_PRIVILEGE_KEYS = frozenset({"select", "insert", "update", "delete"})
+RLS_PRIVILEGE_VALUES = frozenset({"table", "column", None})
+#: Cells every readable table carries, and the two more a tenant-scoped one carries.
+RLS_BASE_CELLS = frozenset({"guc_unset", "guc_tenant_a", "guc_unknown_tenant", "guc_not_uuid"})
+RLS_SCOPED_CELLS = frozenset({"guc_tenant_a_foreign_rows", "identity"})
+RLS_IDENTITY_METHOD_KEYS = {
+    "ctid": frozenset({"method", "owner_a", "role_a", "match"}),
+    "pk": frozenset({"method", "columns", "owner_a", "role_a", "match"}),
+    OWNER_VERIFIED_KEY_METHOD: frozenset(
+        {"method", "columns", "ownerDistinctness", "owner_a", "role_a", "match"}
+    ),
+    "unverifiable": frozenset({"method", "reason"}),
+}
+RLS_GROUND_TRUTH_KEYS = frozenset({"total", "tenant_a", "other_tenants"})
+#: The report's own top-level keys, measured from the producer's output.  An extra key is a
+#: refusal: it is either a field this evaluator does not understand or a field someone added to
+#: carry a claim nothing checks (#322 r2 F-R6).
+RLS_REPORT_KEYS = frozenset({
+    "threatId", "sourceRunId", "sourceHeadSha", "checkoutTreeSha", "cleanCheckout",
+    "reportAvailable", "runPurpose", "schemaVersion", "startedAt", "finishedAt",
+    "toolFiles", "baselineAccepted", "exitCode", "verdict", "violations", "accepted",
+    "unmeasured", "measuredRoles", "roles", "table_census", "ground_truth",
+})
+#: The reviewed table population.  Without it the measured population was whatever the report
+#: carried, so deleting a table together with its truth row and its baseline rows left a
+#: self-consistent report and a MEASURED_PASS over a smaller database (#322 r2 F-R7).  A migration
+#: that adds or removes a table in ``inv``/``public`` makes this stale: regenerate with
+#: ``tools/collect_rls_evidence.py --disposable`` and repin the blob in the same reviewed change.
+RLS_CENSUS_REPO_PATH = "tools/rls-table-census.json"
+RLS_CENSUS_BLOB = "ee6c3f7fb1eefc25388893ff0bad76797dabe3ab"
+#: Tables that must appear in the measured set, derived from the pinned readable-key scope (the
+#: reviewed allowlist's own tables are anchored separately, because ``baselineAccepted`` has to
+#: match it exactly and every table it names has to be measured).  An independent anchor against
+#: a report that simply measures fewer tables -- see ``rls_report_shape`` for what that does and
+#: does not close.
+RLS_ANCHOR_TABLES = frozenset(table for _role, table, _columns in OWNER_VERIFIED_KEY_SCOPE)
+
+
+def _rls_count_cell_schema() -> dict[str, Any]:
+    """A measured count or a recorded denial, and nothing else."""
+
+    return {
+        "oneOf": [
+            {
+                "type": "object", "additionalProperties": False,
+                "required": ["rows"],
+                "properties": {"rows": {"type": "integer", "minimum": 0}},
+            },
+            {
+                "type": "object", "additionalProperties": False,
+                "required": ["denied"],
+                "properties": {"denied": {"type": "string", "minLength": 1}},
+            },
+        ]
+    }
+
+
+def _rls_identity_schema() -> dict[str, Any]:
+    side = {
+        "type": "object", "additionalProperties": False, "required": ["rows", "fp"],
+        "properties": {
+            "rows": {"type": "integer", "minimum": 0},
+            "fp": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
+        },
+    }
+    columns = {"type": "array", "minItems": 1, "uniqueItems": True,
+               "items": {"type": "string", "minLength": 1}}
+    counted = {
+        "type": "object", "additionalProperties": False,
+        "required": ["rows", "distinct", "nullRows"],
+        "properties": {name: {"type": "integer", "minimum": 0}
+                       for name in ("rows", "distinct", "nullRows")},
+    }
+    return {
+        "oneOf": [
+            {
+                "type": "object", "additionalProperties": False,
+                "required": ["method", "owner_a", "role_a", "match"],
+                "properties": {"method": {"const": "ctid"}, "owner_a": side, "role_a": side,
+                               "match": {"type": "boolean"}},
+            },
+            {
+                "type": "object", "additionalProperties": False,
+                "required": ["method", "columns", "owner_a", "role_a", "match"],
+                "properties": {"method": {"const": "pk"}, "columns": columns, "owner_a": side,
+                               "role_a": side, "match": {"type": "boolean"}},
+            },
+            {
+                "type": "object", "additionalProperties": False,
+                "required": ["method", "columns", "ownerDistinctness", "owner_a", "role_a",
+                             "match"],
+                "properties": {"method": {"const": OWNER_VERIFIED_KEY_METHOD},
+                               "columns": columns, "ownerDistinctness": counted,
+                               "owner_a": side, "role_a": side, "match": {"type": "boolean"}},
+            },
+            {
+                "type": "object", "additionalProperties": False,
+                "required": ["method", "reason"],
+                "properties": {"method": {"const": "unverifiable"},
+                               "reason": {"type": "string", "minLength": 1}},
+            },
+        ]
+    }
+
+
+def _rls_table_schema() -> dict[str, Any]:
+    cell = _rls_count_cell_schema()
+    base_cells = {name: cell for name in sorted(RLS_BASE_CELLS)}
+    scoped_cells = {**base_cells, "guc_tenant_a_foreign_rows": cell,
+                    "identity": _rls_identity_schema()}
+    return {
+        "type": "object", "additionalProperties": False,
+        "required": sorted(RLS_TABLE_KEYS),
+        "properties": {
+            "tenant_scoped": {"type": "boolean"},
+            "rls_enabled": {"type": "boolean"},
+            "rls_forced": {"type": "boolean"},
+            "privileges": {
+                "type": "object", "additionalProperties": False,
+                "required": sorted(RLS_PRIVILEGE_KEYS),
+                "properties": {name: {"enum": ["table", "column", None]}
+                               for name in sorted(RLS_PRIVILEGE_KEYS)},
+            },
+            "policies": {
+                "type": "array", "uniqueItems": True,
+                "items": {
+                    "type": "object", "additionalProperties": False,
+                    "required": ["name", "cmd", "permissive", "roles", "using", "with_check"],
+                    "properties": {
+                        "name": {"type": "string", "minLength": 1},
+                        "cmd": {"type": "string", "minLength": 1},
+                        "permissive": {"type": "string", "minLength": 1},
+                        "roles": {"type": "array", "items": {"type": "string"},
+                                  "uniqueItems": True},
+                        "using": {"type": "boolean"},
+                        "with_check": {"type": "boolean"},
+                    },
+                },
+            },
+            "visible": {"type": "object"},
+        },
+        "allOf": [
+            # A readable table carries its probe and an unreadable one does not: the two halves
+            # of one fact, so neither may appear without the other (#322 r2 F-R6).
+            {
+                "if": {"properties": {"privileges": {"properties": {"select": {"type": "null"}}}}},
+                "then": {"not": {"required": ["visible"]}},
+                "else": {"required": ["visible"]},
+            },
+            # Which cells a probe carries follows from whether the table has a tenant column.
+            {
+                "if": {"required": ["visible"], "properties": {"tenant_scoped": {"const": True}}},
+                "then": {"properties": {"visible": {
+                    "type": "object", "additionalProperties": False,
+                    "required": sorted(scoped_cells), "properties": scoped_cells,
+                }}},
+            },
+            {
+                "if": {"required": ["visible"], "properties": {"tenant_scoped": {"const": False}}},
+                "then": {"properties": {"visible": {
+                    "type": "object", "additionalProperties": False,
+                    "required": sorted(base_cells), "properties": base_cells,
+                }}},
+            },
+        ],
+    }
+
+
+@functools.lru_cache(maxsize=1)
+def rls_report_schema() -> dict[str, Any]:
+    """The RLS report's exact shape, declared rather than hand-walked.
+
+    Cached because a hosted report carries a thousand table objects and the validator is called
+    per report; building the document each time was measurable in the suite.
+
+    ``additionalProperties: false`` everywhere and ``uniqueItems`` on the role list are the two
+    things F-R6 asked for: four of the five findings on this PR were the evaluator reading a
+    field that was missing, mistyped or quietly defaulted, and the fifth was the shape being
+    checked for *absence* only -- an extra key, a duplicate entry or a ghost row still passed.
+    """
+
+    role_present = {
+        "type": "object", "additionalProperties": False, "required": sorted(RLS_ROLE_KEYS),
+        "properties": {
+            "present": {"const": True},
+            "superuser": {"type": "boolean"},
+            "bypassrls": {"type": "boolean"},
+            "login": {"type": "boolean"},
+            "inherit": {"type": "boolean"},
+            "member_of": {"type": "array", "items": {"type": "string"}, "uniqueItems": True},
+            "functions": {
+                "type": "object",
+                "additionalProperties": {
+                    "type": "object", "additionalProperties": False, "required": ["execute"],
+                    "properties": {"execute": {"type": "boolean"}},
+                },
+            },
+            "tables": {"type": "object", "minProperties": 1,
+                       "additionalProperties": _rls_table_schema()},
+        },
+    }
+    role_absent = {
+        "type": "object", "additionalProperties": False, "required": ["present"],
+        "properties": {"present": {"const": False}},
+    }
+    # The rows the collector writes: a rule plus where it was observed, and nothing else.  The
+    # optional members are what each rule actually carries (E1 has no table, E6 names a function,
+    # an accepted row carries its reviewed reason), and an extra key is refused (#322 r2 F-R6).
+    rule_row = {
+        "type": "object", "additionalProperties": False, "required": ["rule"],
+        "properties": {
+            "rule": {"enum": sorted(RLS_RULES)},
+            "role": {"type": "string", "minLength": 1},
+            "table": {"type": "string", "minLength": 1},
+            "function": {"type": "string", "minLength": 1},
+            "detail": {"type": "string"},
+            "reason": {"type": "string"},
+            "since": {"type": "string"},
+        },
+    }
+    truth = {
+        "oneOf": [
+            {"type": "object", "additionalProperties": False,
+             "required": sorted(RLS_GROUND_TRUTH_KEYS),
+             "properties": {name: _rls_count_cell_schema()
+                            for name in sorted(RLS_GROUND_TRUTH_KEYS)}},
+            {"type": "object", "additionalProperties": False, "required": ["total"],
+             "properties": {"total": _rls_count_cell_schema()}},
+        ]
+    }
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "additionalProperties": False,
+        "required": sorted(RLS_REPORT_KEYS),
+        "properties": {
+            "threatId": {"const": "SEC-RLS-001"},
+            "sourceRunId": {"type": "string", "pattern": "^[0-9]+$"},
+            "sourceHeadSha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "checkoutTreeSha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "cleanCheckout": {"type": "boolean"},
+            "reportAvailable": {"type": "boolean"},
+            "runPurpose": {"type": "string", "minLength": 1},
+            "schemaVersion": {"type": "string", "minLength": 1},
+            "startedAt": {"type": "string", "minLength": 1},
+            "finishedAt": {"type": "string", "minLength": 1},
+            "exitCode": {"enum": [0, 1, 2, 3]},
+            "verdict": {"enum": ["PASS", "VIOLATIONS", "UNMEASURED"]},
+            "toolFiles": {
+                "type": "array", "minItems": 1, "uniqueItems": True,
+                "items": {
+                    "type": "object", "additionalProperties": False,
+                    "required": ["path", "blob"],
+                    "properties": {"path": {"type": "string", "minLength": 1},
+                                   "blob": {"type": "string", "pattern": "^[0-9a-f]{40}$"}},
+                },
+            },
+            "baselineAccepted": {
+                "type": "array", "uniqueItems": True,
+                "items": {
+                    "type": "object", "additionalProperties": False,
+                    "required": ["role", "table", "rules"],
+                    "properties": {
+                        "role": {"type": "string", "minLength": 1},
+                        "table": {"type": "string", "minLength": 1},
+                        "rules": {"type": "array", "minItems": 1, "uniqueItems": True,
+                                  "items": {"enum": sorted(RLS_RULES)}},
+                    },
+                },
+            },
+            "violations": {"type": "array", "uniqueItems": True, "items": rule_row},
+            "accepted": {"type": "array", "uniqueItems": True, "items": rule_row},
+            "unmeasured": {"type": "array", "uniqueItems": True, "items": rule_row},
+            "measuredRoles": {
+                "type": "array", "uniqueItems": True,
+                "minItems": len(RLS_REQUIRED_ROLES), "maxItems": len(RLS_REQUIRED_ROLES),
+                "items": {"enum": sorted(RLS_REQUIRED_ROLES)},
+            },
+            "roles": {
+                "type": "object", "additionalProperties": False,
+                "required": sorted(RLS_REQUIRED_ROLES),
+                "properties": {
+                    name: ({"oneOf": [role_present, role_absent]}
+                           if name in RLS_OPTIONAL_ROLES else role_present)
+                    for name in sorted(RLS_REQUIRED_ROLES)
+                },
+            },
+            "table_census": {
+                "type": "object", "additionalProperties": False,
+                "required": ["schemas", "count", "sha256", "tables"],
+                "properties": {
+                    "schemas": {"type": "array", "minItems": 1, "uniqueItems": True,
+                                "items": {"type": "string", "minLength": 1}},
+                    "count": {"type": "integer", "minimum": 1},
+                    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+                    "tables": {"type": "array", "minItems": 1, "uniqueItems": True,
+                               "items": {"type": "string", "minLength": 1}},
+                },
+            },
+            "ground_truth": {"type": "object", "minProperties": 1,
+                             "additionalProperties": truth},
+        },
+    }
+
+
+def _rls_census_digest(tables) -> str:
+    """The digest both the reviewed file and the report state over their sorted names."""
+
+    return hashlib.sha256(chr(10).join(sorted(tables)).encode("utf-8")).hexdigest()
+
+
+@functools.lru_cache(maxsize=1)
+def rls_table_census() -> frozenset[str] | None:
+    """The reviewed table population, or None when the file is missing or not the reviewed one.
+
+    Verified by blob, like every other reviewed sidecar in this chain, and re-derived from its own
+    contents: the file states a count and a digest over its sorted names, and both are recomputed
+    here so the file cannot disagree with itself either.
+    """
+
+    path = ROOT / RLS_CENSUS_REPO_PATH
+    try:
+        raw = path.read_bytes()
+    except OSError:
+        return None
+    blob = hashlib.sha1(f"blob {len(raw)}\0".encode() + raw).hexdigest()
+    if blob != RLS_CENSUS_BLOB:
+        return None
+    try:
+        document = json.loads(raw.decode("utf-8"))
+        tables = document["tables"]
+        if (
+            not isinstance(tables, list)
+            or len(tables) != len(set(tables))
+            or document["count"] != len(tables)
+            or document["sha256"] != _rls_census_digest(tables)
+        ):
+            return None
+    except (UnicodeError, json.JSONDecodeError, KeyError, TypeError):
+        return None
+    return frozenset(tables)
+
+
+@functools.lru_cache(maxsize=1)
+def _rls_validator():
+    """One compiled validator, because compiling it per report was the whole cost.
+
+    ``jsonschema.validate`` rebuilds the validator on every call, and this schema describes a
+    thousand table objects through ``if``/``then`` and ``oneOf``; the suite measured the
+    difference in minutes.
+    """
+
+    try:
+        import jsonschema
+    except ImportError:  # pragma: no cover - requirements-core pins jsonschema for both lanes
+        return None
+    return jsonschema.Draft202012Validator(rls_report_schema())
+
+
+def rls_report_shape(report: Any) -> str | None:
+    """The exact shape the RLS evaluator requires, or the first reason it is refused.
+
+    Two halves, because neither alone is enough:
+
+    * the declared schema (``rls_report_schema``) -- ``additionalProperties: false`` at every
+      level and ``uniqueItems`` on the lists, so a **missing**, **extra**, **mistyped**,
+      **negative** or **duplicated** field is refused rather than defaulted;
+    * the correspondences a schema cannot state, because they relate one part of the report to
+      another: the measured table set is the same for every role present, ``ground_truth`` covers
+      exactly that set (no ghost rows, no gaps), each truth row has the shape its table's tenant
+      column implies, every row the report judges names something it measured, and the tables the
+      reviewed allowlist anchors on are among them.
+
+    What this still does not close, stated rather than implied: the evaluator cannot know how
+    many tables the migrated database has, so a report that drops a table **together with** its
+    ground-truth row and its rows in every list is internally consistent and is accepted.  The
+    anchors below catch that for the tables the reviewed allowlist names; closing it in general
+    needs the expected table set to come from the reviewed source, which is an AC-11 definition
+    change and is not made here (#322 r2 F-R6).
+    """
+
+    if not isinstance(report, dict):
+        return "the report must be an object"
+    validator = _rls_validator()
+    if validator is None:  # pragma: no cover - requirements-core pins jsonschema for both lanes
+        return "jsonschema is unavailable, so the report's shape cannot be checked"
+    error = next(iter(validator.iter_errors(report)), None)
+    if error is not None:
+        where = "/".join(str(part) for part in error.absolute_path) or "<root>"
+        return f"{where}: {error.message}"
+
+    roles: dict[str, Any] = report["roles"]
+    ground_truth: dict[str, Any] = report["ground_truth"]
+    if set(report["measuredRoles"]) != set(roles):
+        return "measuredRoles must name exactly the measured population"
+
+    # The population a verdict covers comes from the reviewed census, not from the report.
+    reviewed = rls_table_census()
+    if reviewed is None:
+        return f"{RLS_CENSUS_REPO_PATH} is missing, unpinned or inconsistent with itself"
+    census = report["table_census"]
+    observed = set(census["tables"])
+    if census["count"] != len(census["tables"]):
+        return "table_census.count does not match the names it lists"
+    if census["sha256"] != _rls_census_digest(census["tables"]):
+        return "table_census.sha256 does not cover the names it lists"
+    if observed != reviewed:
+        unexpected = sorted(observed - reviewed)
+        absent = sorted(reviewed - observed)
+        return (f"the collector's catalogue census does not match the reviewed population "
+                f"(unreviewed {unexpected[:3]}, missing {absent[:3]})")
+
+    measured: set[str] | None = None
+    scoped: set[str] = set()
+    for role_name, role_report in roles.items():
+        if role_report.get("present") is False:
+            continue
+        tables = set(role_report["tables"])
+        if measured is None:
+            measured = tables
+        elif tables != measured:
+            missing = sorted(measured - tables)
+            extra = sorted(tables - measured)
+            return (f"roles[{role_name}] measures a different table set than the others "
+                    f"(missing {missing[:3]}, extra {extra[:3]})")
+        for table_name, table in role_report["tables"].items():
+            if table["tenant_scoped"]:
+                scoped.add(table_name)
+    if not measured:
+        return "no role measured any table"
+    if measured != reviewed:
+        unexpected = sorted(measured - reviewed)
+        absent = sorted(reviewed - measured)
+        return (f"the measured tables are not the reviewed population "
+                f"(unreviewed {unexpected[:3]}, missing {absent[:3]})")
+    if set(ground_truth) != measured:
+        ghosts = sorted(set(ground_truth) - measured)
+        gaps = sorted(measured - set(ground_truth))
+        return (f"ground_truth does not correspond to the measured tables "
+                f"(truth for unmeasured {ghosts[:3]}, no truth for {gaps[:3]})")
+    for table_name, truth in ground_truth.items():
+        expected = RLS_GROUND_TRUTH_KEYS if table_name in scoped else frozenset({"total"})
+        if set(truth) != expected:
+            return (f"ground_truth[{table_name}] carries {sorted(truth)}, but that table is "
+                    f"{'tenant-scoped' if table_name in scoped else 'not tenant-scoped'}")
+    missing_anchors = sorted(RLS_ANCHOR_TABLES - measured)
+    if missing_anchors:
+        return f"the reviewed allowlist anchors on {missing_anchors}, which this report omits"
+    for field in ("violations", "accepted", "unmeasured"):
+        for row in report[field]:
+            role_name, table_name = row.get("role"), row.get("table")
+            if row["rule"] == "E6":
+                continue  # a definer-function row: SEC-DEF-001's territory, not measured here
+            if role_name not in roles or roles[role_name].get("present") is not True:
+                return f"{field} names {role_name}, which this report does not measure"
+            if row["rule"] == "E1":
+                continue  # role-scoped rule, no table
+            if table_name not in roles[role_name]["tables"]:
+                return f"{field} names {role_name}/{table_name}, which this report does not measure"
+    for row in report["baselineAccepted"]:
+        if not isinstance(row, dict):
+            return "baselineAccepted rows must be objects"
+        if row.get("table") not in measured:
+            return f"baselineAccepted names {row.get('table')}, which this report does not measure"
+    return None
+
+
+#: E1..E5 are re-derived from the observations the RLS report carries.  E6 is about SECURITY
+#: DEFINER functions, which this report does not observe (SEC-DEF-001 does), so an E6 row is
+#: carried as reported and left out of the comparison -- stated rather than silently ignored.
+RLS_RECOMPUTED_RULES = ("E1", "E2", "E3", "E4", "E5")
+
+
+def _rls_recomputation(
+    roles: dict[str, Any], ground_truth: dict[str, Any]
+) -> tuple[set[tuple[str, str, str | None]], set[tuple[str, str, str | None]]] | None:
+    """Re-derive (violations, unmeasured) from the recorded observations, or None to refuse.
+
+    Three findings in a row (#322 r2 F-R1, F-R3, F-R4) were the same shape: the evaluator read
+    one field of the report and trusted the conclusion beside it.  This function stops reading
+    conclusions.  It applies E1..E5 to the rows, counts and fingerprints the report carries, in
+    the collector's own precedence, and the caller compares the result with what the report
+    claims -- so a forged report has to forge an observation that produces its own verdict, and
+    every number it carries is then cross-checked by that derivation.
+
+    None means the report does not carry enough observation to be checked, which is a refusal:
+    a report that omits what it concluded from cannot be evidence about a tree.
+    """
+
+    violations: set[tuple[str, str, str | None]] = set()
+    unmeasured: set[tuple[str, str, str | None]] = set()
+    for role_name, role_report in roles.items():
+        if not isinstance(role_report, dict):
+            return None
+        if role_report.get("present") is not True:
+            continue
+        for field in ("superuser", "bypassrls"):
+            if not isinstance(role_report.get(field), bool):
+                return None
+        if role_report["superuser"] or role_report["bypassrls"]:
+            violations.add(("E1", role_name, None))
+        tables = role_report.get("tables")
+        if not isinstance(tables, dict):
+            return None
+        for table_name, table_report in tables.items():
+            if not isinstance(table_report, dict):
+                return None
+            privileges = table_report.get("privileges")
+            if not isinstance(privileges, dict) or "select" not in privileges:
+                return None
+            if table_report.get("tenant_scoped") is not True or privileges["select"] is None:
+                continue
+            for field in ("rls_enabled", "rls_forced"):
+                if not isinstance(table_report.get(field), bool):
+                    return None
+            visible = table_report.get("visible")
+            if not isinstance(visible, dict):
+                return None
+            if not (table_report["rls_enabled"] and table_report["rls_forced"]):
+                violations.add(("E2", role_name, table_name))
+
+            def cell(name: str) -> int | None:
+                value = visible.get(name)
+                if value is None:
+                    return 0
+                if not isinstance(value, dict):
+                    return None
+                if "denied" in value:
+                    return 0
+                rows = value.get("rows")
+                return rows if isinstance(rows, int) and not isinstance(rows, bool) else None
+
+            unset, foreign, unknown = cell("guc_unset"), cell("guc_tenant_a_foreign_rows"), cell("guc_unknown_tenant")
+            if unset is None or foreign is None or unknown is None:
+                return None
+            if unset > 0:
+                violations.add(("E3", role_name, table_name))
+            identity = visible.get("identity")
+            if identity is not None and not isinstance(identity, dict):
+                return None
+            seen_a = (visible.get("guc_tenant_a") or {}).get("rows")
+            truth_a = ((ground_truth.get(table_name) or {}).get("tenant_a") or {}).get("rows")
+            if foreign > 0:
+                violations.add(("E4", role_name, table_name))
+            elif identity is not None and identity.get("match") is False:
+                violations.add(("E4", role_name, table_name))
+            elif (
+                identity is None
+                and isinstance(seen_a, int)
+                and isinstance(truth_a, int)
+                and seen_a > truth_a
+            ):
+                violations.add(("E4", role_name, table_name))
+            if unknown > 0:
+                violations.add(("E5", role_name, table_name))
+            if isinstance(identity, dict) and identity.get("method") == "unverifiable":
+                unmeasured.add(("E4", role_name, table_name))
+    return violations, unmeasured
+
+
 def evaluate_rls(report: dict[str, Any], allowlist: dict[str, Any], now: datetime) -> Verdict:
     if _files(report.get("toolFiles")) != _files(RLS_FILES):
         return Verdict.INVALID_RUN
@@ -662,6 +1260,87 @@ def evaluate_rls(report: dict[str, Any], allowlist: dict[str, Any], now: datetim
     for row in [*violations, *accepted, *unmeasured]:
         if not isinstance(row, dict) or row.get("rule") not in RLS_RULES:
             return Verdict.INVALID_RUN
+    identity_mismatches: list[tuple[str, str]] = []
+    for role_name, role_report in roles.items():
+        tables = role_report.get("tables") if isinstance(role_report, dict) else None
+        if not isinstance(tables, dict):
+            continue
+        for table_name, table_report in tables.items():
+            visible = table_report.get("visible") if isinstance(table_report, dict) else None
+            identity = visible.get("identity") if isinstance(visible, dict) else None
+            if not isinstance(identity, dict):
+                continue
+            if identity.get("method") != OWNER_VERIFIED_KEY_METHOD:
+                continue
+            columns = identity.get("columns")
+            measured = identity.get("ownerDistinctness")
+            if (
+                not isinstance(columns, list)
+                or (role_name, table_name, tuple(columns)) not in OWNER_VERIFIED_KEY_SCOPE
+                or not isinstance(measured, dict)
+                or not isinstance(measured.get("rows"), int)
+                or measured["rows"] < 1
+                or measured.get("distinct") != measured["rows"]
+                or measured.get("nullRows") != 0
+            ):
+                # An unregistered pair, an empty comparison (every projection is injective and
+                # every fingerprint matches over zero rows), a repeated key or a NULL-bearing
+                # key: none of these is a row identity, so the report is not admissible.
+                return Verdict.INVALID_RUN
+            # ``match`` is a conclusion, so it is recomputed here from the two fingerprints the
+            # report carries, and the owner side has to be the same observation the distinctness
+            # was measured on.  Trusting the field let a report state a conclusion its own
+            # numbers contradict -- a synthesised PASS with ``match: false``, or an owner
+            # observation of zero rows beside a distinctness claiming two (#322 r2 F-R3).
+            owner, role_side = identity.get("owner_a"), identity.get("role_a")
+            if (
+                not isinstance(owner, dict)
+                or not isinstance(role_side, dict)
+                or owner.get("rows") != measured["rows"]
+                or not isinstance(role_side.get("rows"), int)
+                or not MD5_RE.fullmatch(str(owner.get("fp")))
+                or not MD5_RE.fullmatch(str(role_side.get("fp")))
+                or identity.get("match") is not (owner["fp"] == role_side["fp"])
+            ):
+                return Verdict.INVALID_RUN
+            if identity["match"] is True and role_side["rows"] != owner["rows"]:
+                # Equal fingerprints over a different number of rows is impossible: the
+                # fingerprint is taken over the row set.  Requiring it here forces
+                # ``role_a.rows == owner_a.rows == ownerDistinctness.rows`` for every claimed
+                # match, which a synthesised report had been able to contradict (#322 r2 F-R4).
+                return Verdict.INVALID_RUN
+            if identity["match"] is not True:
+                # The role saw a different row set.  That is an E4 violation, so a report that
+                # calls itself a pass is inconsistent with its own observation.
+                identity_mismatches.append((role_name, table_name))
+    # Shape first, numbers second: nothing below may read a field this did not check.
+    if rls_report_shape(report) is not None:
+        return Verdict.INVALID_RUN
+    recomputed = _rls_recomputation(roles, ground_truth)
+    if recomputed is None:
+        return Verdict.INVALID_RUN
+    derived_violations, derived_unmeasured = recomputed
+
+    def rows_of(entries: list[Any]) -> set[tuple[str, str, str | None]]:
+        return {
+            (str(row.get("rule")), str(row.get("role")), row.get("table"))
+            for row in entries
+            if isinstance(row, dict) and row.get("rule") in RLS_RECOMPUTED_RULES
+        }
+
+    reported_violations, reported_unmeasured = rows_of(violations), rows_of(unmeasured)
+    reported_accepted = rows_of(accepted)
+    # Neither direction may drift: a row the observations do not produce was invented, and a row
+    # they do produce that the report does not list (nor accept with a reviewed reason) was
+    # hidden.  ``accepted`` may hold either kind, so it counts for both.
+    if (
+        not reported_violations <= derived_violations
+        or not derived_violations <= reported_violations | reported_accepted
+        or not reported_unmeasured <= derived_unmeasured
+        or not derived_unmeasured <= reported_unmeasured | reported_accepted
+        or not reported_accepted <= derived_violations | derived_unmeasured
+    ):
+        return Verdict.INVALID_RUN
     allowed_identities = {
         (entry["role"], entry["table"], rule)
         for entry in allowlist["rlsAcceptedDispositions"] for rule in entry["rules"]
@@ -669,9 +1348,15 @@ def evaluate_rls(report: dict[str, Any], allowlist: dict[str, Any], now: datetim
     if any((row.get("role"), row.get("table"), row.get("rule")) not in allowed_identities for row in accepted):
         return Verdict.INVALID_RUN
     if exit_code == 0:
+        if identity_mismatches:
+            return Verdict.INVALID_RUN
         return Verdict.MEASURED_PASS if report.get("verdict") == "PASS" and not violations and not unmeasured else Verdict.INVALID_RUN
     if exit_code == 1:
         return Verdict.MEASURED_FAIL if report.get("verdict") == "VIOLATIONS" and violations else Verdict.INVALID_RUN
+    if identity_mismatches:
+        # A recomputed mismatch is a measured violation, not something an UNMEASURED report may
+        # carry quietly: that report would be read as "nothing was observed to be wrong".
+        return Verdict.INVALID_RUN
     return Verdict.NOT_OBSERVED if report.get("verdict") == "UNMEASURED" and unmeasured and not violations else Verdict.INVALID_RUN
 
 

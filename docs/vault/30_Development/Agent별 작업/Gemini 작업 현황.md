@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.193"
+version: "1.0.203"
 status: "proposed"
 author: "Gemini"
-updated: "2026-10-02T09:25:00+09:00"
+updated: "2026-10-02T15:43:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,6 +19,13 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
+- 확인 기준: 2026-10-02T15:43:00+09:00 (Card 226 모델 스튜디오 화면 ModelStudioView r3 조치: Codex r2 피드백 전수 반영 — (1) F-R1 wire 계약 enum 일치 및 fail-closed 검증: REPLICA_STATUS_CONFIG에서 wire 계약(virtualFabric.ts:194) 외 임의 별칭이었던 unhealthy·degraded를 제거하여 known 부당 승격을 원천 차단하고 healthy·repairing·missing 3종으로 한정, MODEL_AVAILABILITY_CONFIG에서 wire 계약(fabricObservation.ts:38) 외 임의 상태인 observed를 제거하고 unknown 1종으로 한정, config 키 집합 == 계약 enum 집합 동등성 불변식 시험(Object.keys().sort()) 고정, unhealthy·degraded·observed·bogus·toString 등 계약 밖 값 렌더 시 fail-closed UNKNOWN(var(--color-status-unknown)) 강등 부정 시험 단언, (2) Test 9j-2 AST 커버리지 래칫 갱신: totalStyleAttrs 83, checkedObjects 21, checkedPairs 39, coveredColorObjects 39, checkedBorderObjects 26, checkedBorderPairs 26, violations 0, (3) F-R2 변이 M23 단일 유효 JSX style 주입 개정: 중복 style 속성 오류를 배제하고 shard repair button style 객체 내부 outline: 'none' 주입 단일 변이로 개정하여 Test 9j-2 및 Test 9l로 100% 사살, tools/test_c226_mutations.py 23종 변이 M1~M23 23/23 100% 사살 실측, tools/reproduce_c226_contrast.py 26개 지표 통과; Vitest 29 passed, s11-defect-fixes 16 passed, tsc 0 error, build 성공, route coverage 41 passed, check_frontend_integrity 0 위반, check_contract_bindings PASS, check_docs PASS, sync_obsidian --check 0 conflicts).
+- 확인 기준: 2026-10-02T14:03:00+09:00 (Card 220 릴리스 후보 화면 ReleaseCandidateView [r3]: Codex r2 & Claude r2 피드백 전수 반영 — (1) fail-closed 미지 상태 helper(getSloStatusConfig, getAuditStatusConfig, getCandidateStatusConfig)에서 'status in CONFIG'를 'Object.hasOwn(CONFIG, status)' own-key 검사로 교체하여 prototype key(toString·constructor·__proto__) 탈취 차단 및 3종 전수 UNKNOWN (<raw>)·unknown token DOM 렌더링 단일 부정 시험 단언, (2) 계산된 DOM outline-style/width 및 인라인 outline: 0/none/outlineWidth 0 단언과 AST 가드 확장으로 outline: 0 변이 사살, (3) 작업판·History 시각 14:03:00 commit 이하 동기화, (4) 22종 변이 M1~M22 22/22 100% 사살 실측; Vitest 28 passed, tsc 0 error, build 성공, route coverage 41 passed, check_frontend_integrity 0 위반, check_contract_bindings PASS, check_docs PASS, sync_obsidian --check 0 conflicts).
+- 확인 기준: 2026-10-02T12:35:00+09:00 (Card 218 분산 복구 화면 DistributedRecoveryView 색상 리터럴 inventory 전수(16종/81 occurrences→0), 대비 표본/DOM 결속 감사 및 클러스터 헬스 상태 접근성 승격 [r5]: base 3ebfb1b8 PR #314 r3 head 위 작업, DistributedRecoveryView 81건 -> 0건 100% 해소, COLOR_LITERAL_MULTISET_BASELINE {} 래칫, border-subtle 402건(+14)/27개 파일 래칫, 레거시 #30363d <= 43/8 상한 강화(실측치 정확 고정), recovering을 var(--color-status-active)로 승격하여 RunDetail/RunList와의 화면 간 불일치 완전 해소, fenced를 var(--color-status-neutral) 및 var(--color-border-strong)으로 매핑, 노드 선택 카드 인라인 outline 제거로 index.css 전역 :focus-visible 키보드 포커스 링 온전 보존 및 2px brand-hover 선택 테두리 적용, recoveryEngine evaluateInitialHealth의 recovering 임의 매핑 철회 및 NodeStatus 정본 계약 엄수, DistributedRecoveryViewProps 내 시험용 recoveryManager optional prop 지원, 미지 헬스 상태 fail-closed UNKNOWN 및 neutral 토큰 안전 폴백, Test 9j DOM 실제 렌더링 동적 대비 단언 신설, Test 9j-2 68개 style 속성 및 NODE_HEALTH_CONFIG 객체 리터럴 AST 가드 신설(violations 0, lightgray 등 CSS 명명 색상 전수 차단 가드 보강), Probes 71~75 추가, tools/test_c218_mutations.py 22종 변이 M1~M22 22/22 100% 사살 (Object.hasOwn prototype key 탈취 방어 및 outline: 0 사살 포함) (Object.hasOwn prototype key 탈취 방어 포함) 실측, tools/reproduce_c218_contrast.py 21개 지표 실측 통과; Vitest 27 passed, defect-recovery tests 26 passed, tsc 0 error, build 성공, route coverage 41 passed, check_frontend_integrity 0 위반, check_contract_bindings PASS, check_docs PASS, diff --check clean).
+- 확인 기준: 2026-10-02T10:55:00+09:00 (Card 215 실행 목록 화면 RunList r3 조치: Claude r2 및 Codex r2 조건부 승인 지적 전수 반영 — (1) base 고유 색상 리터럴 35종(46 occurrences) 정정, (2) 동기화 경고 문구(stale warning) 조상 배경 캔버스(--color-bg-canvas #f8fafc / #090d16) 위 0.10 알파 합성 실측치(#f7e8ea 1.60:1 / #20121b 9.51:1) 정정, (3) History §2.1 표 및 §2.2 동적 재현 스크립트 Light 합성 배경 hex 16개 정정(reproduce_c215_contrast.py 21행 결속) 및 에러 상태 제목 전경 base #fca5a5 정정, (4) 변이 러너 배너 16 Mutants 정정 및 \n 제거, (5) Test 9i 필터 알약 비색상 텍스트 레이블 단언 보강; Vitest 26 passed, 연관 시험 77 passed, tsc 0 error, build 성공, route coverage 41 passed, check_frontend_integrity 0 위반, check_contract_bindings PASS, check_docs PASS, diff --check clean).
+
+- 확인 기준: 2026-10-02T10:15:00+09:00 (Card 215 실행 목록 화면 RunList r2 조치: Claude UI r1 및 Codex r1 피드백 전수 반영 — (1) 수명주기 상태 색상 정합 및 충돌 해소: draft/validated/planned/scheduled/verifying을 RunDetail 미등록 fallback 규격인 var(--color-text-secondary) 및 var(--color-border-subtle)로 100% 통일 일치, recovering(status-active)과 running(brand-hover)의 고유성 확보 및 planned/scheduled와의 색상 충돌 원천 방지; (2) 시험 공백 해소 및 16종 변이 M1~M16 100% 사살: Test 9i에 11개 배지 전수 전경/테두리/배경 대비 및 한국어 레이블 textContent 단언, opacity 0.4 저하 금지 단언, releaseBadge ⏳ 아이콘 단언, recovering!=planned 및 failed!=cancelled 고유성 단언, Test 9i-2에 RUN_STATE_CONFIG 객체 리터럴 AST 검사 로직(checkConfigTables) 추가; (3) History §1.1/§1.2/§1.4 및 실측표 정본 동기화: baseline 34종(46 occurrences) 명확화, 비활성 필터 bg-subtle+text-muted 정정, 비색상·시각 변경(ALL pill border, 재시도 버튼 #dc2626, 분산 부모 sky, testid 7종) 명시, python tools/reproduce_c215_contrast.py 동적 재현 콘솔 출력 21행 결속; Vitest 2 passed/24 skipped, 연관 시험 77 passed, tsc 0 error, build 성공, route coverage 41 passed, check_frontend_integrity 0 위반, check_contract_bindings PASS, check_docs PASS, diff --check clean).
+- 확인 기준: 2026-10-02T09:35:00+09:00 (Card 215 실행 목록 화면 RunList 색상 리터럴 전수 토큰화(34→0), 수명주기 상태 색 정합성 및 접근성 승격: base cbb6df09 PR #310 r2 승인 head 위 작업, RunList 34건 -> 0건 해소, COLOR_LITERAL_MULTISET_BASELINE {} 래칫 고정, border-subtle 384건/26개 파일 래칫 고정, 레거시 #64748b 4건 이하/3파일 이하 및 #d97706 6건 이하/4파일 이하 상한 강화, recovering을 var(--color-status-active)로 승격하여 RunDetail과의 화면 간 불일치 완전 해소, stale 경고·에러 배너·재시도 버튼·샤드 배지·필터 알약 전수 토큰화, Test 9i DOM 실제 렌더링 동적 대비 단언 신설, Test 9i-2 42개 style 속성 AST 조건 분기 경로 일치 기반 스타일-쌍 명도 대비 가드 신설(violations 0), Probes 66~70 추가, tools/test_c215_mutations.py 10종 변이 M1~M10 10/10 100% 사살 실측; Vitest 26 passed, 연관 시험 77 passed, tsc 0 error, build 성공, route coverage 41 passed, 프런트엔드 0 위반, check_contract_bindings PASS, check_docs PASS, diff --check clean).
 - 확인 기준: 2026-10-02T09:25:00+09:00 (Card 213 실행 기록 화면 SealRecordPanel & RunDetail r2 조치: Claude UI r2 조건부 승인 지적 전수 반영 — (1) History Before 열 및 Python 동적 재현 스크립트 정정: succeeded/failed/cancelled 베이스 실측을 text-secondary(Light #475569 on #dce0e3 5.71:1 PASS / Dark #e5e7eb on #1d222b 12.89:1 PASS)로 정정하고 상태 색 재정의(Semantic Redesign) 목적 명시, RunDetail 다크 렌더 조상 배경을 body canvas #090d16 합성치(running 6.02, recovering 4.78, awaiting 4.95, completedAt 10.11/7.02)로 전수 재계산 및 Python 재현 블록 14행 100% 일치 결속, (2) recovering 통일 서술을 '후속 카드 215에서 RunList.tsx를 var(--color-status-active)로 통일 정합하여 화면 간 불일치를 완전 해소 예정'으로 미래형 정정, (3) 현재 단계 링 형태 단서 보호 DOM 단언(run-step-indicator-running outline toContain var(--color-border-strong)) 신설 및 attemptsTabBtn non-null 단언 강화, (4) AST style-pair 가드 bg-only 공백 및 outline 속성 파싱을 후속 정적 가드 개선 백로그로 명시; Vitest 24 passed, seal record tests 25 passed, attempts DOM 9 passed, related runs 45 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반, check_contract_bindings PASS, check_docs PASS, diff --check clean).
 - 확인 기준: 2026-10-02T07:22:00+09:00 (Card 206 개발 스튜디오 화면 DeveloperStudio 색상 리터럴 inventory 전수(174→0), 대비 표본/DOM 결속 감사 및 디자인 토큰 승격: base b78b3b04 PR #301 head 위 작업, DeveloperStudio 174건 -> 0건 해소, COLOR_LITERAL_MULTISET_BASELINE {} 래칫, border-subtle 356건/25개 파일 래칫, 레거시 #30363d 64건/11파일 상한 강화, non-schedulable 카드 opacity 0.75 제거로 muted 텍스트 4.67/5.75 >= 4.5:1 보장, active tab borderBottom 1:1 충돌 transparent 교정, projects useMemo 메모이제이션 무한 재렌더링 차단, Step 2 readiness.blockedBy safe navigation 안정화, Test 9g DOM 실제 렌더링 동적 대비 단언 신설, Test 9g-2 252개 style 속성 전수 AST 스타일-쌍 명도 대비 및 조상/불투명도 추적 가드 신설, Revert-Fail Probes 58~60 추가, tools/test_c206_mutations.py 10종 변이 10/10 100% 사살 실측; Vitest 22 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반, check_contract_bindings PASS, check_docs PASS, diff --check clean).
 - 확인 기준: 2026-10-02T06:50:00+09:00 (Card 202 사내망 배포 화면 Train 14 tip d0b2a4c6 머지 및 #289 step-up 재인증 섹션 래칫 동기화: PR #289 / Card 192 step-up 재인증 UI(8개 style 객체, 0개 리터럴) 병합 후 AST 가드 전수 통과 확인(violations 0), totalStyleAttrs 193 -> 201, checkedObjects 23, checkedPairs 150, unboundColorObjects 106, coveredColorObjects 129, checkedBorderObjects 36, checkedBorderPairs 38로 래칫 재고정, COLOR_LITERAL_MULTISET_BASELINE {} 0건 유지, Vitest 20 passed, tsc 0 error, build 성공, route coverage 41 passed, check_frontend_integrity 0 위반, check_docs PASS, diff --check clean).
@@ -38,6 +45,144 @@ source_of_truth: "Git"
 - 확인 기준: 2026-10-02T02:22:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer r2 조치: Claude UI r2 조건부 승인 및 Codex r2 피드백 반영 — W1 History 전수 표 'before' 열 SaintVision 정본 베이스 다크 패널(#0f172a surface, #1e293b subtle) 재계산 및 4개 수치 오류(2.77:1, 3.44:1, 10.35:1, 3.48:1/3.75:1) 정정, W2 discovery-action-success 및 repair-action-error DOM 바인딩 단언 및 Probe 30/31 추가로 1:1 결함 변이 M11/M12 100% 사살 실측(총 12/12 100%), W3 commit 전 시각 동기화; Vitest 14 passed, s11-defect-fixes 16 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-02T02:05:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer r1 조치: Claude UI r1 및 Codex r1 피드백 전수 반영 — R1 버튼 요소 DEF-S11-09 위반 해소 `var(--color-brand-primary-bg)` 및 `--color-brand-primary-fg` 승격; R2 활성 네임스페이스 칩 및 버전 배지 `var(--color-brand-hover)` 적용 5.49:1(Light)/8.11:1(Dark), 비활성 버튼 `var(--color-bg-subtle)`/`var(--color-text-muted)`/`var(--color-border-subtle)` 5.25:1/5.78:1 및 3.18:1/3.08:1 충족; R3 실제 렌더 배경 기반 전수 실측표 재구성; R4 Test 9c 확장 및 10종 변이 M1~M10 100% 사살 실측; R5 History 제어 바이트 60개 전수 제거 완료; 보라색 리터럴 의도적 브랜드 통합 명시; Vitest 14 passed, s11-defect-fixes 16 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-02T01:20:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer Light/Dark 명도 대비 전수 감사 및 디자인 토큰 승격: base db37dbc5 위 작업, ResourceExplorer 390건 -> 0건, InvFileExplorer 124건 -> 0건 100% 해소, COLOR_LITERAL_MULTISET_BASELINE 양 파일 {} 래칫, border-subtle 232건/22개 파일 래칫, DOM 실제 렌더링 동적 대비 단언 신설, 변이 M1~M4 100% 사살 실측, Vitest 9개 스위트 139 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
+
+## 2026-10-02 모델 스튜디오 화면 (ModelStudioView) 색상 리터럴 전수 토큰화(26종/78 occurrences→0), 상태 색 정합성 및 접근성 승격 [r3] (Card 226, `agent/gemini/c226-model-studio-contrast`, base `72fe74ce` PR #321 r3 head)
+- **개요**: ACC-09 다음 영역인 모델 분산 패브릭 관측 및 샤드/복제본 복구 제어 화면(`ModelStudioView.tsx`)의 색상 리터럴 inventory 전수(26종/78 occurrences→0), 대비 표본/DOM 결속 감사 및 상태 색 정합성 접근성 승격 (Codex r2 검토 의견 전수 반영 [r3]):
+  1. **색상 리터럴 전수 해소 및 의도적 상태 디자인 승격 (Card 213, 215, 218, 220 정합)**:
+     - `ModelStudioView.tsx`: 기존 26종(78 occurrences: Hex 20종 67건, RGBA 6종 11건) -> **0건** (전수 제거).
+     - 4대 상태 설정 객체 최상단 정의 및 export: `REPLICA_STATUS_CONFIG`, `MODEL_AVAILABILITY_CONFIG`, `PLAN_FEASIBILITY_CONFIG`, `NODE_ELIGIBILITY_CONFIG`.
+     - `REPLICA_STATUS_CONFIG`: 정본 wire 계약(`virtualFabric.ts:194`)에 정확히 맞게 `healthy`(`var(--color-status-online)`), `repairing`(`var(--color-status-degraded)`), `missing`(`var(--color-status-offline)`) 3종으로 한정하고 계약 외 임의 별칭(unhealthy/degraded) 제거, config 키 집합 == wire enum 동등성 시험 고정.
+     - `MODEL_AVAILABILITY_CONFIG`: 정본 wire 계약(`fabricObservation.ts:38`)에 맞게 `unknown`(`var(--color-status-unknown)`) 1종으로 한정하고 계약 외 임의 상태(observed) 제거, config 키 집합 == wire enum 동등성 시험 고정.
+     - `PLAN_FEASIBILITY_CONFIG`: `feasible`(`var(--color-status-online)`), `infeasible`(`var(--color-status-offline)`).
+     - `NODE_ELIGIBILITY_CONFIG`: `eligible`(`var(--color-status-online)`), `ineligible`(`var(--color-status-offline)`).
+     - fail-closed 미지 상태 및 own-key 방어: `getReplicaStatusConfig` 및 `getModelAvailabilityConfig`에 `Object.hasOwn` 기반 own-key 검사를 적용하여 prototype key(`toString`, `constructor`, `__proto__`, 임의 미지값) 탈취/fail-open 승격을 차단하고 `var(--color-status-unknown)` 및 `알 수 없음 (<status>)`으로 fail-closed 매핑.
+     - 조회 버튼(`query-model-btn`): DEF-S11-09 규격에 맞게 `var(--color-brand-primary-bg)` 및 `var(--color-brand-primary-fg)` 적용, 인라인 `outline: none/0` 억제 없이 전역 `:focus-visible` 링 온전 보존(computed outline-style/width 단언).
+     - 샤드 복구 버튼: 인라인 `outline: none/0` 배제 및 computed outline 단언.
+     - 비색상 식별 수단(배지 텍스트 레이블, ✔, ⚠️, ℹ️ 기호 등) 100% 보존.
+  2. **Fail-Closed Multiset Baseline 래칫 강제**:
+     - `acc09-contrast-tokens.test.tsx`의 `COLOR_LITERAL_MULTISET_BASELINE`에서 `features/desktop/ModelStudioView.tsx`의 허용 인벤토리를 `{}` (0건)으로 전면 고정.
+     - `var(--color-border-subtle)` 사용 횟수 417건 -> **429건**(+12건), 파일 수 28개 -> **29개**(+1개)로 fail-closed 단언 갱신.
+     - 레거시 리터럴 상한치 강화: `#64748b` 4→3건, `#d97706` 6→5건으로 강화 래칫.
+  3. **실제 렌더링 DOM 기반 동적 대비 단언 및 23종 변이 100% 사살**:
+     - Test 9l 신설/보강: 루트 컨테이너, 쿼리 폼, 조회 버튼 포커스 링(computed outline), 매니페스트 아티클, 샤드 매트릭스 테이블 및 healthy/repairing/missing 복제본 배지(DOM 전경/배경/테두리/opacity: 1), 샤드 저하 알림 배지, 실행 계획 배치 배지, 노드 적격성 배지, LAN 경고(⚠️), 샤드 복구 에러 알림 배너, prototype key(`toString`, `constructor`, `__proto__`) fail-closed own-key 방어 단언.
+     - Test 9j-2 확장: `checkConfigTables`에서 `as const`/`satisfies` unwrapping을 적용하여 ModelStudioView 4대 상태 설정 객체 정적 검사 보장, 83개 style 속성 리터럴 AST 검사 로직 기반 스타일-쌍 명도 대비 계산 및 커버리지 래칫 (checkedObjects 21, checkedPairs 39, unboundColorObjects 18, coveredColorObjects 39, checkedBorderObjects 26, checkedBorderPairs 26, violations 0).
+     - Revert-Fail Probes 81~85 추가 (Probe 85는 light subtle 위 LAN 경고 텍스트 #fde68a 1.14:1 < 4.5:1 실효 실패 검증).
+     - `tools/test_c226_mutations.py` 신규 커밋: 23종 변이 M1~M23 전원 사살 실측 (23/23 = 100% killed, exit code 0).
+     - `tools/reproduce_c226_contrast.py` 26개 지표 실측 통과.
+  4. **잔여 백로그 현황**:
+     - model studio 관련 하드코딩 리터럴 잔여 0건.
+
+## 2026-10-02 릴리스 후보 화면 (ReleaseCandidateView) 색상 리터럴 전수 토큰화(19종/84 occurrences→0), 상태 색 정합성 및 접근성 승격 [r3] (Card 220, `agent/gemini/c220-release-contrast`, base `23fbedae` PR #316 r5 head)
+- **개요**: ACC-09 다음 영역인 릴리스 후보 관리 및 무중단 롤백 제어 화면(`ReleaseCandidateView.tsx`)의 색상 리터럴 inventory 전수(19종/84 occurrences→0), 대비 표본/DOM 결속 감사 및 상태 색 정합성 접근성 승격 (r1 검토 의견 전수 반영):
+  1. **색상 리터럴 전수 해소 및 의도적 상태 디자인 승격 (Card 213, 215, 218 정합)**:
+     - `ReleaseCandidateView.tsx`: 기존 19종(84 occurrences: hex 11종 74건, rgba 8종 10건) -> **0건** (전수 제거).
+     - 3대 상태 설정 객체 최상단 정의 및 fail-closed own-key 헬퍼 export (`Object.hasOwn` 기반 prototype key 방어): `SLO_STATUS_CONFIG`, `AUDIT_STATUS_CONFIG`, `CANDIDATE_STATUS_CONFIG`, `getSloStatusConfig`, `getAuditStatusConfig`, `getCandidateStatusConfig`.
+     - `SLO_STATUS_CONFIG`: `met`(`var(--color-status-online)`, 레이블 `모의 MET (미측정)`), `unmeasured`(`var(--color-text-secondary)`, 레이블 `UNMEASURED (미측정) · 모의 MET (미측정)`), `breached`(`var(--color-status-offline)`, 레이블 `BREACHED`).
+     - `AUDIT_STATUS_CONFIG`: `pass`(`var(--color-status-online)`, 레이블 `모의 PASS`), `fail`(`var(--color-status-offline)`, 레이블 `FAIL`).
+     - `CANDIDATE_STATUS_CONFIG`: `active`(`var(--color-brand-hover)`, 레이블 `모의 활성 (서버 API 미노출 · 실 인프라 미배포)`), `waiting`(`var(--color-text-secondary)`, 레이블 `모의 대기`).
+     - fail-closed 미지 상태: `UNKNOWN (${status})` 및 `var(--color-status-unknown)` 토큰으로 매핑하여 위험 신호가 조용히 기본값/정상으로 완화되지 않도록 차단.
+     - 활성 후보 카드: 상시 outline 제거(base 복원, `:focus-visible` 링 오인 차단) 및 텍스트 레이블("현재 활성 릴리스 후보 (RC)")로 명확히 식별.
+     - 롤백 버튼: 인라인 `outline: none` 억제 없이 전역 포커스 링 온전 보존.
+     - 공지 배너(`release-unexposed-notice`): `var(--color-bg-subtle)` 배경, `var(--color-border-subtle)` 테두리, `var(--color-text-secondary)` 텍스트 (Light 6.92:1 / Dark 11.86:1 >= 4.5:1).
+     - KPI 카드(`kpi-vulns-card`, `kpi-slo-card`, `kpi-wcag-card`, `active-candidate-card`): 서피스 배경, `var(--color-border-subtle)` 테두리, 지표 수치 전수 토큰화.
+     - 롤백 관리 패널(`rollback-management-card`): 서피스 배경, `var(--color-border-subtle)` 테두리/행 구분선.
+     - 롤백 알림 배너(`release-action-notice`): 에러 `var(--color-status-offline)`, 성공 `var(--color-status-online)` 분기 전수 토큰화.
+     - 비색상 식별 수단(배지 텍스트 레이블, ✔, 🛑, ℹ️ 기호 등) 100% 보존.
+  2. **Fail-Closed Multiset Baseline 래칫 강제**:
+     - `acc09-contrast-tokens.test.tsx`의 `COLOR_LITERAL_MULTISET_BASELINE`에서 `features/release/ReleaseCandidateView.tsx`의 허용 인벤토리를 `{}` (0건)으로 전면 고정.
+     - `var(--color-border-subtle)` 사용 횟수 402건 -> **417건**(+15건), 파일 수 27개 -> **28개**(+1개)로 fail-closed 단언 갱신.
+     - 레거시 리터럴 상한치 강화 (`#30363d` <= 34/7, 43건에서 32건으로 실측 11건 감소 고정).
+  3. **실제 렌더링 DOM 기반 동적 대비 단언 및 20종 변이 100% 사살**:
+     - Test 9k 신설: 공지 배너, 4개 KPI 카드, 비아웃라인 활성 카드, 롤백 버튼 포커스 링 보존, SLO/감사/후보 배지 3종 전수 DOM 렌더링 결속(전경/배경/테두리/투명도/레이블 config 일치 단언), 상태 전 쌍 상호 고유성 단언, 체크마크(✔) 보존 단언, 실제 조상 컨테이너(subtle 행 위 감사 테두리 대비 등) 명도 대비 단언, fail-closed UNKNOWN DOM 렌더링 단언, 롤백 실패 및 성공 배너 단언.
+     - Test 9j-2 확장: ReleaseCandidateView 80개 style 속성 및 3대 상태 설정 객체 리터럴 AST 검사 로직(checkConfigTables) 기반 스타일-쌍 명도 대비 계산 및 커버리지 래칫 (checkedObjects 9, checkedPairs 52, unboundColorObjects 35, coveredColorObjects 44, checkedBorderObjects 21, checkedBorderPairs 22, violations 0), shorthand 명명 색상 검출 및 인라인 outline: none 차단 가드 보강.
+     - Revert-Fail Probes 76~80 추가 (Probe 76 #58a6ff 2.13:1 fail, Probe 77 #f85149 2.69:1 fail, Probe 78 #3fb950 2.06:1 fail, Probe 79 #8b949e 4.14:1 fail, Probe 80 #f85149 4.04:1 fail).
+     - `tools/test_c220_mutations.py` 신규 커밋: 20종 변이 M1~M20 전원 사살 실측 (20/20 = 100% killed, exit code 0, 표준 힙 메모리 구동).
+     - `tools/reproduce_c220_contrast.py` 25개 지표 실측 통과 (trailing whitespace 0).
+  4. **잔여 백로그 현황**:
+     - release candidate 관련 하드코딩 리터럴 잔여 0건.
+
+## 2026-10-02 분산 복구 화면 (DistributedRecoveryView) 색상 리터럴 전수 토큰화(16종/81 occurrences→0), 클러스터 헬스 상태 색 정합성 및 접근성 승격 [r3] (Card 218, `agent/gemini/c218-recovery-contrast`, base `3ebfb1b8` PR #314 r3 head)
+- **개요**: ACC-09 다음 영역인 분산 복구 화면(`DistributedRecoveryView.tsx`)의 색상 리터럴 inventory 전수(16종/81 occurrences→0), 대비 표본/DOM 결속 감사 및 클러스터 헬스 상태 접근성 승격:
+  1. **색상 리터럴 전수 해소 및 의도적 상태 디자인 승격 (Card 213 & 215 정합)**:
+     - `DistributedRecoveryView.tsx`: 기존 16종(81 occurrences) -> **0건** (전수 제거).
+     - `NODE_HEALTH_CONFIG` 객체 리터럴 컴포넌트 최상단 정의 및 export: 5대 헬스 상태(`online`, `stale`, `offline`, `recovering`, `fenced`)의 전경색 및 테두리를 플랫폼 정본 토큰으로 승격.
+     - `recovering` 상태: `var(--color-status-active)` (스카이블루, 테두리 일치)로 승격하여 `RunDetail.tsx`(Card 213) 및 `RunList.tsx`(Card 215)와의 화면 간 불일치 완전 해소.
+     - `fenced` 상태: `var(--color-status-neutral)` (회색 텍스트/배경) 및 `var(--color-border-strong)` 테두리로 격리 상태 고유 시맨틱 부여.
+     - `online` (`var(--color-status-online)`), `stale` (`var(--color-status-degraded)`), `offline` (`var(--color-status-offline)`).
+     - 노드 카드 선택 및 포커스 분리: 선택 시 `border: '2px solid var(--color-brand-hover)'`를 적용하고, 인라인 outline을 제거하여 `index.css` 전역 `:focus-visible` 키보드 포커스 링(`outline: 2px solid var(--color-brand-primary)`, `offset: 2px`)을 온전히 보존.
+     - 공지 배너(`recovery-unexposed-notice`): `var(--color-bg-subtle)` 배경, `var(--color-brand-hover)` 테두리 및 텍스트 (Light 6.12:1 / Dark 8.14:1 >= 4.5:1).
+     - KPI 카드(`kpi-card-detection`, `kpi-card-zombie`, `kpi-card-recovery`): 서피스 배경, `var(--color-border-subtle)` 테두리, 좀비 쓰기 수치 `var(--color-status-online)`, 성공률 `var(--color-brand-hover)`, 감지 시간 레이블 `var(--color-text-secondary)`.
+     - 장애 시뮬레이션 제어기 및 패널(ADR-043 체크아웃, 거부 감사 스트림, 복원 감사 패널): `var(--color-bg-surface)` 패널 배경, `var(--color-bg-subtle)` 아이템 배경, `var(--color-border-subtle)` 구분선, 거부 항목 `var(--color-status-offline)` 테두리/텍스트, 복원 상태 `var(--color-status-online)` 전수 토큰화.
+     - 비색상 식별 수단(5대 헬스 레이블 `ONLINE`, `STALE`, `OFFLINE`, `RECOVERING`, `FENCED`, 🚨 배지, BLOCKED 칩 등) 100% 보존, 시험용 recoveryManager optional prop 지원으로 상태 전이 결정론적 검증 지원, evaluateInitialHealth는 recovering 임의 매핑 없이 NodeStatus 정본 계약 엄수.
+  2. **Fail-Closed Multiset Baseline 래칫 강제**:
+     - `acc09-contrast-tokens.test.tsx`의 `COLOR_LITERAL_MULTISET_BASELINE`에서 `features/recovery/DistributedRecoveryView.tsx`의 허용 인벤토리를 `{}` (0건)으로 전면 고정.
+     - `var(--color-border-subtle)` 사용 횟수 388건 -> **402건**(+14건), 파일 수 26개 -> **27개**(+1개)로 fail-closed 단언 갱신.
+     - 레거시 리터럴 상한치 강화 (`#30363d` <= 43/8, 실측치 정확 고정).
+  3. **실제 렌더링 DOM 기반 동적 대비 단언 및 20종 변이 100% 사살**:
+     - Test 9j 신설: 공지 배너, 3개 KPI 카드, 4개 노드 카드(온라인, 스테일, 오프라인, 복구 중) 헬스 배지 전경/배경/테두리 명도 대비 동적 단언, 선택 카드 2px brand-hover 테두리 및 인라인 outline 제거(:focus-visible 보존) 단언, 5대 헬스 상태 레이블(ONLINE, STALE, OFFLINE, RECOVERING, FENCED) 비색상 식별 수단 고유성 단언, 미지/누락 헬스 상태 fail-closed UNKNOWN 및 neutral 토큰 안전 폴백 부정 시험 단언, 시뮬레이션 상태 뱃지 4종(파티션, 좀비, 리컨실, 체크아웃) 단언, opacity 0.4 저하 금지 단언, 빈 상태 뷰 단언.
+     - Test 9j-2 신설: DistributedRecoveryView 68개 style 속성 및 NODE_HEALTH_CONFIG 객체 리터럴 AST 검사 로직(checkConfigTables) 기반 스타일-쌍 명도 대비 계산 및 커버리지 래칫 (checkedObjects 8, checkedPairs 47, unboundColorObjects 34, coveredColorObjects 42, checkedBorderObjects 20, checkedBorderPairs 23, violations 0), raw color literal 위반 검출 가드 추가.
+     - Revert-Fail Probes 71~75 추가 (Probe 71 #58a6ff 2.31:1 fail, Probe 72 #3fb950 2.32:1 fail, Probe 73 #8b949e 3.08:1 fail, Probe 74 #f85149 3.06:1 fail, Probe 75 #e3b341 1.78:1 fail).
+     - `tools/test_c218_mutations.py` 신규 커밋: 20종 변이 M1~M20 전원 사살 실측 (20/20 = 100% killed, exit code 0).
+     - `tools/reproduce_c218_contrast.py` 21개 지표 실측 통과.
+  4. **잔여 백로그 현황**:
+     - 분산 복구 화면 잔여 색상 리터럴: **0건**.
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성 소유). Reviewer: Claude (UI/접근성/테스트), Codex (디자인 토큰/무결성/불변식).
+- **관측 근거 (Evidence)**:
+  - 단위 시험: `npx vitest run tests/acc09-contrast-tokens.test.tsx` (27 passed, exit 0)
+  - 연관 복구 시험: `npx vitest run tests/defect-recovery-admin-recovery-editor.test.tsx` (26 passed 100%, exit 0)
+  - 변이 불변식 실측: `python tools/test_c218_mutations.py` (20 / 20 killed 100%, exit code 0)
+  - 명도 대비 재현: `python tools/reproduce_c218_contrast.py` (21개 항목 전수 실측 통과, exit code 0)
+  - 타입 검사: `cd apps/web && npx tsc -b` (에러 0건, 클린 통과, exit 0)
+  - 프로덕션 빌드: `cd apps/web && npm run build` (built in ~8.6s, exit 0)
+  - 라우트 커버리지: `pytest tests/test_route_coverage.py` (41 passed 100%, exit 0)
+  - 프런트엔드 무결성: `python tools/check_frontend_integrity.py` (93 files scanned, 0 violations, exit 0)
+  - 계약 바인딩: `python tools/check_contract_bindings.py` (55 fixtures, 20 bound types, exit 0)
+  - 문서 일관성: `python tools/check_docs.py` (PASS, exit 0)
+  - Git 차분 검사: `git diff --check` (clean, exit 0)
+- **전문 문서**: [[2026-10-02_10-25-00_KST_Card218_DistributedRecoveryView_대비감사_Gemini]]
+
+## 2026-10-02 실행 목록 화면 (RunList) 색상 리터럴 전수 토큰화(35종/46 occurrences→0), 수명주기 상태 색 정합성 및 접근성 승격 [r3] (Card 215, `agent/gemini/c215-runlist-contrast`, base `cbb6df09` PR #310 r2 승인 head)
+- **개요**: ACC-09 다음 영역인 실행 목록 화면(`RunList.tsx`)의 색상 리터럴 inventory 전수(35종/46 occurrences→0), 대비 표본/DOM 결속 감사 및 수명주기 상태 색 정합성 확보 (Claude r2 및 Codex r2 조건부 승인 피드백 전수 반영):
+  1. **색상 리터럴 전수 해소 및 의도적 상태 디자인 승격 (Card 213 정합)**:
+     - `RunList.tsx`: 기존 35종(46 occurrences) $\rightarrow$ **0건** (전수 제거).
+     - `recovering` 상태: 주황색(`#f97316`) $\rightarrow$ `var(--color-status-active)` (스카이블루, 테두리 일치)로 승격하여 `RunDetail.tsx`(Card 213)와의 화면 간 불일치 완전 해소 및 planned와의 충돌 해소.
+     - `running` 상태: 파랑(`#3b82f6`) $\rightarrow$ `var(--color-brand-hover)` (테두리 일치)로 scheduled와의 충돌 해소.
+     - 준비/계획/검증 상태군 (`draft`, `validated`, `planned`, `scheduled`, `verifying`): `RunDetail.tsx`의 미등록 fallback 규격(`var(--color-text-secondary)` on `var(--color-bg-subtle)`, 테두리 `var(--color-border-subtle)`)과 100% 동일 일치화하여 활성/복구 상태와의 색상 충돌 원천 방지.
+     - `awaiting_approval`: `var(--color-status-degraded)` (호박색, 테두리 일치).
+     - `succeeded`: `var(--color-status-online)` (녹색, 테두리 일치).
+     - `failed`: `var(--color-status-offline)` (빨간색, 테두리 일치).
+     - `cancelled`: `var(--color-status-neutral)` (회색, `var(--color-border-strong)` 테두리).
+     - 동기화 실패 경고 배너(`run-stale-warning`): `var(--color-bg-subtle)` 배경, `var(--color-status-offline)` 테두리 및 텍스트 (Light 5.91:1 / Dark 5.31:1 >= 4.5:1).
+     - 목록 페칭 에러 상태(`run-fetch-error-state`) 및 재시도 버튼: `var(--color-bg-subtle)` 배경, `var(--color-status-offline)` 테두리 및 텍스트, 재시도 버튼 `var(--color-status-offline-bg)` (`#dc2626`) 배경 + `var(--color-brand-primary-fg)` 텍스트 (4.83:1 >= 4.5:1).
+     - 샤드 배지(`run-shard-badge`, `run-parent-shard-badge`): 자식 샤드 `var(--color-brand-hover)` (Light 6.12:1 / Dark 8.14:1), 분산 부모 샤드 `var(--color-status-active)` (Light 5.42:1 / Dark 6.85:1).
+     - 자원 반환 대기 배지(`run-resource-release-badge`): `var(--color-status-degraded)` (Light 4.58:1 / Dark 6.83:1), `⏳` 아이콘 보존.
+     - 필터 알약: 활성 버튼 `var(--color-brand-primary-bg)` 배경 + `var(--color-brand-primary-fg)` 텍스트/테두리 (`1px solid #ffffff`), 비활성 버튼 `var(--color-bg-subtle)` 배경 + `var(--color-text-muted)` + `var(--color-border-subtle)` 테두리.
+     - 실행 작업 링크 및 타임스탬프: `var(--color-brand-hover)` (Light 6.70:1 / Dark 9.84:1), 완료 시각 성공 `var(--color-status-online)` (Light 5.02:1 / Dark 7.79:1), 완료 시각 실패 `var(--color-status-offline)` (Light 6.47:1 / Dark 6.41:1).
+  2. **Fail-Closed Multiset Baseline 래칫 강제**:
+     - `acc09-contrast-tokens.test.tsx`의 `COLOR_LITERAL_MULTISET_BASELINE`에서 `features/runs/RunList.tsx`의 허용 인벤토리를 `{}` (0건)으로 전면 고정.
+     - `var(--color-border-subtle)` 사용 횟수 382건 $\rightarrow$ **388건**(+6건), 파일 수 **26개** 유지로 fail-closed 단언 갱신.
+     - 레거시 리터럴 상한치 강화 (`#64748b` <= 4/3, `#d97706` <= 6/4).
+  3. **실제 렌더링 DOM 기반 동적 대비 단언 및 16종 변이 100% 사살**:
+     - Test 9i 신설/보강: 11개 수명주기 상태 배지 DOM 렌더링 및 전경/배경/테두리 명도 대비(텍스트 >= 4.5:1, 테두리 >= 3.0:1) 동적 단언, 상태 간 토큰 비동일성 단언, 한국어 레이블 textContent 단언, opacity 0.4 저하 금지 단언, releaseBadge ⏳ 아이콘 단언, recovering!=planned 및 failed!=cancelled 고유성 단언, stale 경고 배너 단언, 에러 상태 컨테이너 및 재시도 버튼 단언, 샤드 자식/부모 배지 단언, 자원 반환 배지 단언, 활성/비활성 필터 알약 단언, 완료 시각 분기 단언.
+     - Test 9i-2 신설/보강: RunList 53개 style 속성 및 RUN_STATE_CONFIG 객체 리터럴 검사 로직(checkConfigTables) 기반 AST 스타일-쌍 명도 대비 계산 및 커버리지 래칫 (checkedObjects 19, checkedPairs 36, unboundColorObjects 14, coveredColorObjects 33, checkedBorderObjects 23, checkedBorderPairs 24, violations 0).
+     - Revert-Fail Probes 66~70 추가 (Probe 66 #64748b 4.34:1 fail, Probe 67 #0284c7 3.74:1 fail, Probe 68 #3b82f6 3.36:1 fail, Probe 69 #8b5cf6 3.87:1 fail, Probe 70 #fca5a5 1.73:1 fail).
+     - `tools/test_c215_mutations.py` 신규 커밋: 16종 변이 M1~M16 전원 사살 실측 (16/16 = 100% killed, exit code 0).
+  4. **잔여 백로그 현황**:
+     - 실행 목록 화면 잔여 색상 리터럴: **0건**.
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성 소유). Reviewer: Claude (UI/접근성/테스트), Codex (디자인 토큰/무결성/불변식).
+- **관측 근거 (Evidence)**:
+  - 단위 시험: `npx vitest run tests/acc09-contrast-tokens.test.tsx` (2 passed, 24 skipped, exit 0)
+  - 연관 런 및 내비게이션 시험: `npx vitest run tests/acc-interactive-navigation.test.tsx tests/dashboard-runlist-freshness-wiring.test.tsx tests/response-freshness-wiring.test.tsx tests/run-approval-observation.test.tsx tests/s11-defect-fixes.test.tsx tests/truth-time-and-freshness-axis.test.tsx` (77 passed 100%, exit 0)
+  - 변이 불변식 실측: `python tools/test_c215_mutations.py` (16 / 16 killed 100%, exit code 0)
+  - 명도 대비 재현: `python tools/reproduce_c215_contrast.py` (21개 항목 전수 실측 통과, exit code 0)
+  - 타입 검사: `cd apps/web && npx tsc -b` (에러 0건, 클린 통과, exit 0)
+  - 프로덕션 빌드: `cd apps/web && npm run build` (built in ~8.6s, exit 0)
+  - 라우트 커버리지: `pytest tests/test_route_coverage.py` (41 passed 100%, exit 0)
+  - 프런트엔드 무결성: `python tools/check_frontend_integrity.py` (93 files scanned, 0 violations, exit 0)
+  - 계약 바인딩: `python tools/check_contract_bindings.py` (55 fixtures, 20 bound types, exit 0)
+  - 문서 일관성: `python tools/check_docs.py` (PASS, exit 0)
+  - Git 차분 검사: `git diff --check` (clean, exit 0)
+- **전문 문서**: [[2026-10-02_09-15-00_KST_Card215_RunList_대비감사_Gemini]]
 
 ## 2026-10-02 실행 기록 화면 (SealRecordPanel & RunDetail) 색상 리터럴 inventory 전수(135+122→0), 대비 표본/DOM 결속 감사 및 불변 봉인 원장 접근성 승격 (Card 213, `agent/gemini/c213-runs-contrast`, base `02d5ecd4` PR #308 r1, r2 피드백 반영)
 - **개요**: ACC-09 다음 영역인 실행 기록 및 봉인 원장 화면(`SealRecordPanel.tsx` 135건, `RunDetail.tsx` 122건)의 색상 리터럴 inventory 전수(257→0), 대비 표본/DOM 결속 감사 및 불변 봉인 원장 접근성 승격 (PR #310 r2 Claude UI 조건부 승인 및 Codex 피드백 전수 반영):

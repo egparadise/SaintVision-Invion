@@ -93,7 +93,10 @@ HEALTH_FRESHNESS_SECONDS = 15
 #: compared exactly rather than trusted separately (#312 F-R2).  ``leaseReleased`` is not
 #: here: it is proven by the conditional UPDATE, never by a caller's statement.
 DUPLICATED_CLEANUP_OBSERVATIONS = (
-    "cacheDisposition", "builderClaimReleased", "cgroupRemoved", "verifiedAt",
+    "cacheDisposition",
+    "builderClaimReleased",
+    "cgroupRemoved",
+    "verifiedAt",
 )
 
 
@@ -138,7 +141,9 @@ def _refuse_product_dispatch(detail: str) -> DomainError:
 class BuildExecutionService:
     """Sequence one admitted build and commit its consequences atomically."""
 
-    def __init__(self, database, adapter, transport, *, environment: Mapping[str, str] | None = None):
+    def __init__(
+        self, database, adapter, transport, *, environment: Mapping[str, str] | None = None
+    ):
         self.db = database
         self._adapter = adapter
         self._transport = transport
@@ -294,13 +299,8 @@ class BuildExecutionService:
                 "SELECT status,recovery_epoch FROM inv.nodes WHERE node_id=%s FOR UPDATE",
                 (leased_node_id,),
             ).fetchone()
-            if (
-                not node
-                or _uuid_key(node["recovery_epoch"]) != _uuid_key(recovery_epoch)
-            ):
-                raise _refuse_product_dispatch(
-                    "the build Node cannot be fenced for reconciliation"
-                )
+            if not node or _uuid_key(node["recovery_epoch"]) != _uuid_key(recovery_epoch):
+                raise _refuse_product_dispatch("the build Node cannot be fenced for reconciliation")
             conn.execute(
                 "UPDATE inv.nodes SET status='quarantined' WHERE node_id=%s",
                 (leased_node_id,),
@@ -735,7 +735,11 @@ class BuildExecutionService:
             )
         lease_id = plan["lease"]["leaseId"]
         resource_id = plan["lease"]["resourceId"]
-        lease_epoch = plan["lease"].get("recoveryEpoch")
+        # BuildLeaseFence carries the database recovery epoch as the prefix of its
+        # canonical fencing token; it deliberately has no second recoveryEpoch field.
+        # Reading a nonexistent field made every strict product plan fail quarantine
+        # preflight even though the adapter had already verified the same lease.
+        lease_epoch = str(plan["lease"]["fencingToken"]).rsplit(":", 1)[0]
         binding_digest = action_digest(
             {
                 "decisionId": decision["decisionId"],

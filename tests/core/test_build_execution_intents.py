@@ -176,7 +176,9 @@ def test_worker_claim_is_skip_locked_and_no_public_route_is_added():
         text = path.read_text(encoding="utf-8")
         if "build_execution_worker" in text or "BuildExecutionWorker" in text:
             consumers.append(path.name)
-    assert consumers == []
+    # Card 232 adds the single private process composition root. Public API modules
+    # must still not consume this worker directly.
+    assert consumers == ["build_product_runtime.py"]
 
 
 @pytest.mark.parametrize(
