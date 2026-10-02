@@ -80,9 +80,9 @@ ACC-09(접근성 명도 대비 적합화) 트랙의 후속 영역으로, 실행 
 | **컨텍스트 번들 해시 / surface** | `#58a6ff` on `#ffffff` (L 가상)<br>`#58a6ff` on `#161b22` (D 실제) | 2.53:1 / 6.85:1 | **FAIL** (Light < 4.5:1) | `var(--color-brand-hover)` on<br>`var(--color-bg-surface)` | **6.70:1** | **9.84:1** | **PASS** (>= 4.5:1) |
 | **봉인 배지: 봉인됨 / subtle** | `#3fb950` on `#f1f5f9` (L 가상)<br>`#3fb950` on `#12261e` (D 실제 합성) | 2.32:1 / 6.25:1 | **FAIL** (Light < 4.5:1) | `var(--color-status-online)` on<br>`var(--color-bg-subtle)` | **4.58:1** | **6.44:1** | **PASS** (>= 4.5:1) |
 | **봉인 배지: 미봉인 / subtle** | `#e3b341` on `#f1f5f9` (L 가상)<br>`#e3b341` on `#2b2519` (D 실제 합성) | 1.78:1 / 7.81:1 | **FAIL** (Light < 4.5:1) | `var(--color-status-degraded)` on<br>`var(--color-bg-subtle)` | **4.58:1** | **6.83:1** | **PASS** (>= 4.5:1) |
-| **런 상태 배지: running / subtle** | `#3fb950` on `#f1f5f9` (L 가상)<br>`#3fb950` on `#142517` (D 실제 body canvas 합성) | 2.32:1 / 6.02:1 | **FAIL** (Light < 4.5:1) | `var(--color-brand-hover)` on<br>`var(--color-bg-subtle)` | **6.12:1** | **8.14:1** | **PASS** (>= 4.5:1) |
-| **런 상태 배지: recovering / subtle** | `#d97706` on `#f1f5f9` (L 가상)<br>`#d97706` on `#332314` (D 실제 body canvas 합성) | 2.91:1 / 4.78:1 | **FAIL** (Light < 4.5:1) | `var(--color-status-active)` on<br>`var(--color-bg-subtle)` | **5.42:1** | **6.85:1** | **PASS** (>= 4.5:1) |
-| **런 상태 배지: awaiting_approval / subtle** | `#f85149` on `#f1f5f9` (L 가상)<br>`#f85149` on `#39171b` (D 실제 body canvas 합성) | 3.06:1 / 4.95:1 | **FAIL** (Light < 4.5:1) | `var(--color-status-degraded)` on<br>`var(--color-bg-subtle)` | **4.58:1** | **6.83:1** | **PASS** (>= 4.5:1) |
+| **런 상태 배지: running / subtle** | `#3fb950` on `#f1f5f9` (L 가상)<br>`#3fb950` on `#102a1f` (D 실제 body canvas 합성) | 2.32:1 / 6.02:1 | **FAIL** (Light < 4.5:1) | `var(--color-brand-hover)` on<br>`var(--color-bg-subtle)` | **6.12:1** | **8.14:1** | **PASS** (>= 4.5:1) |
+| **런 상태 배지: recovering / subtle** | `#d97706` on `#f1f5f9` (L 가상)<br>`#d97706` on `#332213` (D 실제 body canvas 합성) | 2.91:1 / 4.78:1 | **FAIL** (Light < 4.5:1) | `var(--color-status-active)` on<br>`var(--color-bg-subtle)` | **5.42:1** | **6.85:1** | **PASS** (>= 4.5:1) |
+| **런 상태 배지: awaiting_approval / subtle** | `#f85149` on `#f1f5f9` (L 가상)<br>`#f85149` on `#33151c` (D 실제 body canvas 합성) | 3.06:1 / 4.95:1 | **FAIL** (Light < 4.5:1) | `var(--color-status-degraded)` on<br>`var(--color-bg-subtle)` | **4.58:1** | **6.83:1** | **PASS** (>= 4.5:1) |
 | **런 상태 배지: succeeded / subtle** | `var(--color-text-secondary)`<br>`#475569` on `#dce0e3` (L) / `#e5e7eb` on `#1d222b` (D) | 5.71:1 / 12.89:1 | **PASS** (상태 색 재정의 대상) | `var(--color-status-online)` on<br>`var(--color-bg-subtle)` | **4.58:1** | **6.44:1** | **PASS** (>= 4.5:1) |
 | **런 상태 배지: failed / subtle** | `var(--color-text-secondary)`<br>`#475569` on `#dce0e3` (L) / `#e5e7eb` on `#1d222b` (D) | 5.71:1 / 12.89:1 | **PASS** (상태 색 재정의 대상) | `var(--color-status-offline)` on<br>`var(--color-bg-subtle)` | **5.91:1** | **5.31:1** | **PASS** (>= 4.5:1) |
 | **런 상태 배지: cancelled / subtle** | `var(--color-text-secondary)`<br>`#475569` on `#dce0e3` (L) / `#e5e7eb` on `#1d222b` (D) | 5.71:1 / 12.89:1 | **PASS** (상태 색 재정의 대상) | `var(--color-status-neutral)` on<br>`var(--color-bg-subtle)` | **5.25:1** | **5.78:1** | **PASS** (>= 4.5:1) |
@@ -172,26 +172,26 @@ for label, b_fg_l, b_fg_d, b_bg_l, b_bg_d, a_fg, a_bg in items:
     a_cr_l = cr(light_tokens[a_fg], light_tokens[a_bg])
     a_cr_d = cr(dark_tokens[a_fg], dark_tokens[a_bg])
     is_virtual = " (L virtual)" if (b_fg_l == b_fg_d and (b_bg_l == "#ffffff" or b_bg_l == "#f1f5f9")) else " (L actual) "
-    print(f"{label:42s} | Before: {b_cr_l:5.2f}:1{is_virtual} / {b_cr_d:5.2f}:1 (D actual) | After: {a_cr_l:5.2f}:1 (Light) / {a_cr_d:5.2f}:1 (Dark)")
+    print(f"{label:42s} | Before: {b_cr_l:5.2f}:1{is_virtual} / {b_cr_d:5.2f}:1 (D actual on {b_bg_d}) | After: {a_cr_l:5.2f}:1 (Light) / {a_cr_d:5.2f}:1 (Dark)")
 PY
 ```
 
 실행 출력 (재현 실측치):
 ```text
-bundle hash / surface                      | Before:  2.53:1 (L virtual) /  6.85:1 (D actual) | After:  6.70:1 (Light) /  9.84:1 (Dark)
-run completedAt (failed) / surface         | Before:  2.77:1 (L virtual) /  7.02:1 (D actual) | After:  6.47:1 (Light) /  6.41:1 (Dark)
-run completedAt (succeeded) / surface      | Before:  1.92:1 (L virtual) / 10.11:1 (D actual) | After:  5.02:1 (Light) /  7.79:1 (Dark)
-run status awaiting_approval / subtle      | Before:  3.06:1 (L virtual) /  4.95:1 (D actual) | After:  4.58:1 (Light) /  6.83:1 (Dark)
-run status cancelled / subtle              | Before:  5.71:1 (L actual)  / 12.89:1 (D actual) | After:  5.25:1 (Light) /  5.78:1 (Dark)
-run status failed / subtle                 | Before:  5.71:1 (L actual)  / 12.89:1 (D actual) | After:  5.91:1 (Light) /  5.31:1 (Dark)
-run status recovering / subtle             | Before:  2.91:1 (L virtual) /  4.78:1 (D actual) | After:  5.42:1 (Light) /  6.85:1 (Dark)
-run status running / subtle                | Before:  2.32:1 (L virtual) /  6.02:1 (D actual) | After:  6.12:1 (Light) /  8.14:1 (Dark)
-run status succeeded / subtle              | Before:  5.71:1 (L actual)  / 12.89:1 (D actual) | After:  4.58:1 (Light) /  6.44:1 (Dark)
-seal badge degraded (unsealed) / subtle    | Before:  1.78:1 (L virtual) /  7.81:1 (D actual) | After:  4.58:1 (Light) /  6.83:1 (Dark)
-seal badge online (sealed) / subtle        | Before:  2.32:1 (L virtual) /  6.25:1 (D actual) | After:  4.58:1 (Light) /  6.44:1 (Dark)
-seal final state / surface                 | Before:  2.53:1 (L virtual) /  6.85:1 (D actual) | After:  6.70:1 (Light) /  9.84:1 (Dark)
-seal record ID / surface                   | Before:  1.09:1 (L virtual) / 15.89:1 (D actual) | After: 17.85:1 (Light) / 16.98:1 (Dark)
-seal workload spec sha / surface           | Before:  2.53:1 (L virtual) /  6.85:1 (D actual) | After:  6.70:1 (Light) /  9.84:1 (Dark)
+bundle hash / surface                      | Before:  2.53:1 (L virtual) /  6.85:1 (D actual on #161b22) | After:  6.70:1 (Light) /  9.84:1 (Dark)
+run completedAt (failed) / surface         | Before:  2.77:1 (L virtual) /  7.02:1 (D actual on #090d16) | After:  6.47:1 (Light) /  6.41:1 (Dark)
+run completedAt (succeeded) / surface      | Before:  1.92:1 (L virtual) / 10.11:1 (D actual on #090d16) | After:  5.02:1 (Light) /  7.79:1 (Dark)
+run status awaiting_approval / subtle      | Before:  3.06:1 (L virtual) /  4.95:1 (D actual on #33151c) | After:  4.58:1 (Light) /  6.83:1 (Dark)
+run status cancelled / subtle              | Before:  5.71:1 (L actual)  / 12.89:1 (D actual on #1d222b) | After:  5.25:1 (Light) /  5.78:1 (Dark)
+run status failed / subtle                 | Before:  5.71:1 (L actual)  / 12.89:1 (D actual on #1d222b) | After:  5.91:1 (Light) /  5.31:1 (Dark)
+run status recovering / subtle             | Before:  2.91:1 (L virtual) /  4.78:1 (D actual on #332213) | After:  5.42:1 (Light) /  6.85:1 (Dark)
+run status running / subtle                | Before:  2.32:1 (L virtual) /  6.02:1 (D actual on #102a1f) | After:  6.12:1 (Light) /  8.14:1 (Dark)
+run status succeeded / subtle              | Before:  5.71:1 (L actual)  / 12.89:1 (D actual on #1d222b) | After:  4.58:1 (Light) /  6.44:1 (Dark)
+seal badge degraded (unsealed) / subtle    | Before:  1.78:1 (L virtual) /  7.81:1 (D actual on #2b2519) | After:  4.58:1 (Light) /  6.83:1 (Dark)
+seal badge online (sealed) / subtle        | Before:  2.32:1 (L virtual) /  6.25:1 (D actual on #12261e) | After:  4.58:1 (Light) /  6.44:1 (Dark)
+seal final state / surface                 | Before:  2.53:1 (L virtual) /  6.85:1 (D actual on #161b22) | After:  6.70:1 (Light) /  9.84:1 (Dark)
+seal record ID / surface                   | Before:  1.09:1 (L virtual) / 15.89:1 (D actual on #161b22) | After: 17.85:1 (Light) / 16.98:1 (Dark)
+seal workload spec sha / surface           | Before:  2.53:1 (L virtual) /  6.85:1 (D actual on #161b22) | After:  6.70:1 (Light) /  9.84:1 (Dark)
 ```
 
 ---
