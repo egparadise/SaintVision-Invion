@@ -26,6 +26,11 @@ import { ModelLineageView } from '../src/features/mlops/ModelLineageView';
 import { AdminSecurityConsole } from '../src/features/admin/AdminSecurityConsole';
 import { IntranetDeploymentView } from '../src/features/deployment/IntranetDeploymentView';
 import {
+  NaturalLanguageRunView,
+  AGENT_RUN_STATUS_CONFIG,
+  getAgentRunStatusConfig,
+} from '../src/features/agent/NaturalLanguageRunView';
+import {
   ModelStudioView,
   REPLICA_STATUS_CONFIG,
   MODEL_AVAILABILITY_CONFIG,
@@ -290,7 +295,7 @@ function scanColorLiterals(text: string): Record<string, number> {
 const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = {
   "app/App.tsx": {"#991b1b": 2, "#dc2626": 1, "#ef4444": 1, "#f87171": 1, "#fca5a5": 1, "#fed7aa": 1, "#fee2e2": 1, "#ffffff": 2, "rgba(239,68,68,0.1)": 1},
   "features/admin/AdminSecurityConsole.tsx": {},
-  "features/agent/NaturalLanguageRunView.tsx": {"#0d1117": 6, "#161b22": 7, "#30363d": 12, "#3fb950": 7, "#58a6ff": 8, "#8b949e": 16, "#93c5fd": 1, "#94a3b8": 1, "#c9d1d9": 2, "#cbd5e1": 1, "#f0f6fc": 3, "#f85149": 7, "#ff7b72": 1, "rgba(248,81,73,0.15)": 2, "rgba(46,160,67,0.15)": 1, "rgba(46,160,67,0.2)": 1, "rgba(56,139,253,0.15)": 2, "rgba(56,139,253,0.2)": 1},
+  "features/agent/NaturalLanguageRunView.tsx": {},
   "features/approvals/ApprovalCenter.tsx": {"#1e293b": 1, "#334155": 1, "#3b82f6": 1, "#93c5fd": 1, "#ef4444": 2, "#f8fafc": 1, "#fca5a5": 2, "#fed7aa": 1, "#fff": 1, "rgba(16,185,129,0.15)": 1, "rgba(234,179,8,0.15)": 1, "rgba(239,68,68,0.15)": 2, "rgba(59,130,246,0.1)": 1, "rgba(59,130,246,0.25)": 1},
   "features/approvals/ApprovalDetail.tsx": {"#0d1117": 1, "#30363d": 1, "#58a6ff": 1, "#c9d1d9": 1, "rgba(0,0,0,0.5)": 1, "rgba(220,38,38,0.1)": 1, "rgba(56,139,253,0.15)": 1},
   "features/dashboard/ClusterOverview.tsx": {"#10b981": 1, "#38bdf8": 1, "#64748b": 2, "#8b5cf6": 1, "#d29922": 1, "#ef4444": 4, "#f59e0b": 1, "#fca5a5": 3, "#fff": 1, "rgba(239,68,68,0.1)": 2},
@@ -5330,8 +5335,226 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
   });
 
-  // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList, DistributedRecoveryView, ReleaseCandidateView & ModelStudioView
-  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226: RunList, DistributedRecoveryView, ReleaseCandidateView, and ModelStudioView style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
+  // 9m. [Card 228 / ACC-09] Component DOM Rendering Verification: NaturalLanguageRunView binds foregrounds and container backgrounds to design tokens with dynamic contrast verification
+  it('ACC-09 / Card 228: NaturalLanguageRunView component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification', async () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    const helperExtractVar = (val: string) => {
+      const m = val.match(/var\((--color-[a-z0-9-]+)\)/);
+      return m ? m[1] : val;
+    };
+
+    try {
+      await act(async () => {
+        root.render(<NaturalLanguageRunView />);
+      });
+
+      // 1. Unexposed Notice Banner
+      const unexposedNotice = container.querySelector('[data-testid="agent-unexposed-notice"]') as HTMLElement;
+      expect(unexposedNotice, 'Unexposed notice banner must render').not.toBeNull();
+      expect(unexposedNotice.style.backgroundColor).toBe('var(--color-bg-surface)');
+      expect(unexposedNotice.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(unexposedNotice.style.color).toBe('var(--color-text-primary)');
+
+      // 2. Form submission to generate active request and diff
+      const submitBtn = Array.from(container.querySelectorAll('button[type="submit"]')).find((b) =>
+        b.textContent?.includes('자연어 Run 분석 및 제안 Diff 생성')
+      ) as HTMLButtonElement;
+      expect(submitBtn).toBeDefined();
+
+      await act(async () => {
+        submitBtn.click();
+      });
+
+      // 3. Status Badge rendering & properties (Exact string and non-color behavior preservation)
+      const statusBadge = container.querySelector('[data-testid="agent-status-badge"]') as HTMLElement;
+      expect(statusBadge, 'Agent status badge must render').not.toBeNull();
+      expect(statusBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(statusBadge.style.color).toBe('var(--color-brand-hover)');
+      expect(statusBadge.style.borderColor).toBe('var(--color-brand-hover)');
+      expect(statusBadge.style.opacity || '1', 'Status badge must not have degraded opacity').toBe('1');
+      expect(statusBadge.textContent).toBe('READY');
+
+      // Success action notice from submit
+      const actionNotice = container.querySelector('[data-testid="agent-action-notice"]') as HTMLElement;
+      expect(actionNotice, 'Action notice must render').not.toBeNull();
+      expect(actionNotice.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(actionNotice.style.borderColor).toBe('var(--color-status-online)');
+      expect(actionNotice.style.color).toBe('var(--color-status-online)');
+      expect(actionNotice.style.opacity || '1').toBe('1');
+      expect(actionNotice.textContent?.trim().length).toBeGreaterThan(0);
+
+      // 4. Bounded repair loop transition (ready -> repairing)
+      const refineBtn = container.querySelector('[data-testid="agent-refine-btn"]') as HTMLButtonElement;
+      expect(refineBtn, 'Refine button must render').not.toBeNull();
+
+      const computedRefine = window.getComputedStyle(refineBtn);
+      expect(computedRefine.outlineStyle || 'inherit', 'Refine button must not suppress focus ring with outline-style none').not.toBe('none');
+      expect(computedRefine.outlineWidth || 'inherit', 'Refine button must not suppress focus ring with outline-width 0').not.toMatch(/^(0px|0)$/);
+      expect(refineBtn.style.outline || 'inherit', 'Refine button must not have inline outline none/0').not.toMatch(/(none|0px|\b0\b)/);
+      expect(refineBtn.style.outlineWidth || 'inherit', 'Refine button must not have inline outline-width 0').not.toMatch(/^(0px|0)$/);
+      expect(refineBtn.style.outlineStyle || 'inherit', 'Refine button must not have inline outline-style none').not.toBe('none');
+
+      await act(async () => {
+        refineBtn.click();
+      });
+
+      expect(statusBadge.style.color).toBe('var(--color-status-degraded)');
+      expect(statusBadge.style.borderColor).toBe('var(--color-status-degraded)');
+      expect(statusBadge.textContent).toBe('REPAIRING');
+
+      // Info action notice from repair loop
+      expect(actionNotice.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(actionNotice.style.borderColor).toBe('var(--color-brand-hover)');
+      expect(actionNotice.style.color).toBe('var(--color-brand-hover)');
+
+      // Advance loops to rejection (loop 2, loop 3, loop 4 exceeds limit)
+      await act(async () => {
+        refineBtn.click();
+      });
+      await act(async () => {
+        refineBtn.click();
+      });
+      await act(async () => {
+        refineBtn.click();
+      });
+
+      expect(statusBadge.style.color).toBe('var(--color-status-offline)');
+      expect(statusBadge.style.borderColor).toBe('var(--color-status-offline)');
+      expect(statusBadge.textContent).toBe('REJECTED');
+
+      // 5. Action Notice Banner (Error state from rejected max loop)
+      expect(actionNotice, 'Action notice must render').not.toBeNull();
+      expect(actionNotice.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(actionNotice.style.borderColor).toBe('var(--color-status-offline)');
+      expect(actionNotice.style.color).toBe('var(--color-status-offline)');
+
+      // Also verify apply diff completes run and turns status to COMPLETED
+      await act(async () => {
+        submitBtn.click(); // generate fresh ready request
+      });
+      expect(statusBadge.textContent).toBe('READY');
+      const applyDiffBtn = container.querySelector('[data-testid="agent-apply-diff-btn"]') as HTMLButtonElement;
+      expect(applyDiffBtn, 'Apply diff button must render').not.toBeNull();
+      await act(async () => {
+        applyDiffBtn.click();
+      });
+      expect(statusBadge.textContent).toBe('COMPLETED');
+      expect(statusBadge.style.color).toBe('var(--color-status-online)');
+      expect(statusBadge.style.borderColor).toBe('var(--color-status-online)');
+
+      // 6. Config table exact contract enum key set binding (F-R1)
+      const expectedContractStatuses = ['completed', 'draft', 'evaluating', 'ready', 'rejected', 'repairing'];
+      expect(Object.keys(AGENT_RUN_STATUS_CONFIG).sort()).toEqual(expectedContractStatuses);
+
+      // Contrast checks for all contract statuses
+      for (const [st, cfg] of Object.entries(AGENT_RUN_STATUS_CONFIG)) {
+        const cVar = helperExtractVar(cfg.color);
+        const bgVar = helperExtractVar(cfg.bg);
+        const bVar = helperExtractVar(cfg.border);
+        expect(getContrast(lightTokens[cVar], lightTokens[bgVar]), `Agent status ${st} light text >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
+        expect(getContrast(darkTokens[cVar], darkTokens[bgVar]), `Agent status ${st} dark text >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
+        expect(getContrast(lightTokens[bVar], lightTokens['--color-bg-surface']), `Agent status ${st} light border >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
+        expect(getContrast(darkTokens[bVar], darkTokens['--color-bg-surface']), `Agent status ${st} dark border >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
+        expect(cfg.label, `Agent status ${st} label must equal uppercase status`).toBe(st.toUpperCase());
+      }
+
+      // 7. Non-color distinction & State uniqueness
+      expect(AGENT_RUN_STATUS_CONFIG.ready.color).not.toBe(AGENT_RUN_STATUS_CONFIG.rejected.color);
+      expect(AGENT_RUN_STATUS_CONFIG.completed.color).not.toBe(AGENT_RUN_STATUS_CONFIG.rejected.color);
+      expect(AGENT_RUN_STATUS_CONFIG.repairing.color).not.toBe(AGENT_RUN_STATUS_CONFIG.completed.color);
+      expect(AGENT_RUN_STATUS_CONFIG.evaluating.color).not.toBe(AGENT_RUN_STATUS_CONFIG.completed.color);
+      expect(AGENT_RUN_STATUS_CONFIG.draft.color).not.toBe(AGENT_RUN_STATUS_CONFIG.ready.color);
+
+      // 8. Fail-closed Unknown status handling, Out-of-contract rejection & Prototype key defense
+      const unknownStatus = getAgentRunStatusConfig('invalid_corrupted_state');
+      expect(unknownStatus.color).toBe('var(--color-status-unknown)');
+      expect(unknownStatus.border).toBe('var(--color-status-unknown)');
+      expect(unknownStatus.bg).toBe('var(--color-bg-subtle)');
+      expect(unknownStatus.label).toBe('UNKNOWN (invalid_corrupted_state)');
+
+      // Empty / null / undefined fallbacks (X27)
+      expect(getAgentRunStatusConfig(null).label).toBe('UNKNOWN');
+      expect(getAgentRunStatusConfig('').label).toBe('UNKNOWN');
+      expect(getAgentRunStatusConfig(undefined).label).toBe('UNKNOWN');
+      expect(getAgentRunStatusConfig(null).color).toBe('var(--color-status-unknown)');
+
+      // Out-of-contract wire enum rejection (F-R1, R2-2, R2-3)
+      const outOfContractStatuses = ['planning', 'running', 'executing', 'awaiting_approval', 'failed', 'blocked', 'idle', 'bogus'];
+      for (const ooc of outOfContractStatuses) {
+        const oocCfg = getAgentRunStatusConfig(ooc);
+        expect(oocCfg.color).toBe('var(--color-status-unknown)');
+        expect(oocCfg.border).toBe('var(--color-status-unknown)');
+        expect(oocCfg.label).toBe(`UNKNOWN (${ooc})`);
+      }
+
+      // Prototype key defense (X29)
+      for (const pk of ['toString', 'constructor', '__proto__']) {
+        const protoStatus = getAgentRunStatusConfig(pk);
+        expect(protoStatus.color).toBe('var(--color-status-unknown)');
+        expect(protoStatus.border).toBe('var(--color-status-unknown)');
+        expect(protoStatus.label).toBe(`UNKNOWN (${pk})`);
+      }
+
+      // Strict exact-match lookup invariants: Case-folding, whitespace & alias mutations strictly rejected (X30, X31, X31b)
+      // 1. Case variations & leading/trailing whitespace variations must strictly fail to match known keys
+      const caseAndWhitespaceVariants = [
+        'COMPLETED', 'Completed', ' completed', 'completed ',
+        'DRAFT', 'Draft', ' draft',
+        'READY', 'Ready', ' ready',
+        'REPAIRING', 'Repairing', ' repairing',
+        'REJECTED', 'Rejected', ' rejected',
+        'EVALUATING', 'Evaluating', ' evaluating',
+      ];
+      for (const variant of caseAndWhitespaceVariants) {
+        const vCfg = getAgentRunStatusConfig(variant);
+        expect(vCfg.label).toBe(`UNKNOWN (${variant})`);
+        expect(vCfg.color).toBe('var(--color-status-unknown)');
+        expect(vCfg.border).toBe('var(--color-status-unknown)');
+      }
+
+      // 2. Out-of-contract aliases (succeeded, success, failed, failure) must never map to known statuses
+      const aliasVariants = ['succeeded', 'success', 'passed', 'failed', 'failure'];
+      for (const alias of aliasVariants) {
+        const aCfg = getAgentRunStatusConfig(alias);
+        expect(aCfg.label).toBe(`UNKNOWN (${alias})`);
+        expect(aCfg.color).toBe('var(--color-status-unknown)');
+        expect(aCfg.border).toBe('var(--color-status-unknown)');
+      }
+      expect(Object.hasOwn(AGENT_RUN_STATUS_CONFIG, 'succeeded')).toBe(false);
+      expect(Object.hasOwn(AGENT_RUN_STATUS_CONFIG, 'failed')).toBe(false);
+
+      // 3. Exact key equivalence invariant: getAgentRunStatusConfig(s) === AGENT_RUN_STATUS_CONFIG[s] iff s is a valid contract key
+      const knownKeys = new Set(['draft', 'evaluating', 'ready', 'repairing', 'completed', 'rejected']);
+      const sampleQueries = [
+        ...knownKeys,
+        ...caseAndWhitespaceVariants,
+        ...aliasVariants,
+        'planning', 'running', 'executing', 'awaiting_approval', 'blocked', 'idle', 'bogus',
+      ];
+      for (const query of sampleQueries) {
+        const res = getAgentRunStatusConfig(query);
+        if (knownKeys.has(query)) {
+          expect(res).toBe(AGENT_RUN_STATUS_CONFIG[query as AgentRunStatusKey]);
+          expect(res.label).toBe(query.toUpperCase());
+          expect(res.color).not.toBe('var(--color-status-unknown)');
+        } else {
+          expect(res.label).toBe(`UNKNOWN (${query})`);
+          expect(res.color).toBe('var(--color-status-unknown)');
+        }
+      }
+    } finally {
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    }
+  });
+
+  // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 & Card 228 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView & NaturalLanguageRunView
+  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226 & Card 228: RunList, DistributedRecoveryView, ReleaseCandidateView, ModelStudioView, and NaturalLanguageRunView style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
     interface Branch {
       cond: string;
       token: string;
@@ -5480,18 +5703,38 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
         if (ts.isJsxElement(node) || ts.isJsxSelfClosingElement(node)) {
           const opening = ts.isJsxElement(node) ? node.openingElement : node;
           const attrs = opening.attributes?.properties || [];
-          let styleObj: ts.ObjectLiteralExpression | null = null;
+          const styleObjs: ts.ObjectLiteralExpression[] = [];
+
+          function extractStyleObjects(expr: ts.Expression): ts.ObjectLiteralExpression[] {
+            let current: ts.Expression = expr;
+            while (ts.isAsExpression(current) || ts.isSatisfiesExpression(current) || ts.isParenthesizedExpression(current)) {
+              current = current.expression;
+            }
+            if (ts.isObjectLiteralExpression(current)) {
+              return [current];
+            }
+            if (ts.isConditionalExpression(current)) {
+              return [...extractStyleObjects(current.whenTrue), ...extractStyleObjects(current.whenFalse)];
+            }
+            if (ts.isBinaryExpression(current) && current.operatorToken.kind === ts.SyntaxKind.BarBarToken) {
+              return [...extractStyleObjects(current.left), ...extractStyleObjects(current.right)];
+            }
+            if (ts.isBinaryExpression(current) && current.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken) {
+              return extractStyleObjects(current.right);
+            }
+            return [];
+          }
 
           for (const attr of attrs) {
             if (ts.isJsxAttribute(attr) && attr.name.text === 'style') {
               totalStyleAttrs++;
-              if (attr.initializer && ts.isJsxExpression(attr.initializer) && attr.initializer.expression && ts.isObjectLiteralExpression(attr.initializer.expression)) {
-                styleObj = attr.initializer.expression;
+              if (attr.initializer && ts.isJsxExpression(attr.initializer) && attr.initializer.expression) {
+                styleObjs.push(...extractStyleObjects(attr.initializer.expression));
               }
             }
           }
 
-          if (styleObj) {
+          for (const styleObj of styleObjs) {
             let bgNode: ts.Expression | null = null;
             let fgNode: ts.Expression | null = null;
             let borderNode: ts.Expression | null = null;
@@ -5505,21 +5748,33 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
                 if (name === 'border' || name === 'borderColor' || name === 'borderBottom' || name === 'borderLeft') borderNode = p.initializer;
                 if (name === 'opacity') opacityNode = p.initializer;
                 if (name === 'outline') {
-                  const outlineVal = p.initializer.getText(sf).replace(/['"`]/g, '').trim().toLowerCase();
+                  let initExpr = p.initializer;
+                  while (ts.isAsExpression(initExpr) || ts.isSatisfiesExpression(initExpr) || ts.isParenthesizedExpression(initExpr)) {
+                    initExpr = initExpr.expression;
+                  }
+                  const outlineVal = initExpr.getText(sf).replace(/['"`]/g, '').trim().toLowerCase();
                   if (outlineVal === 'none' || outlineVal === '0' || outlineVal === '0px') {
                     const { line } = sf.getLineAndCharacterOfPosition(p.getStart(sf));
                     violations.push(`L${line + 1}: Inline outline: ${outlineVal} suppressing focus ring`);
                   }
                 }
                 if (name === 'outlineWidth') {
-                  const widthVal = p.initializer.getText(sf).replace(/['"`]/g, '').trim().toLowerCase();
+                  let initExpr = p.initializer;
+                  while (ts.isAsExpression(initExpr) || ts.isSatisfiesExpression(initExpr) || ts.isParenthesizedExpression(initExpr)) {
+                    initExpr = initExpr.expression;
+                  }
+                  const widthVal = initExpr.getText(sf).replace(/['"`]/g, '').trim().toLowerCase();
                   if (widthVal === '0' || widthVal === '0px') {
                     const { line } = sf.getLineAndCharacterOfPosition(p.getStart(sf));
                     violations.push(`L${line + 1}: Inline outlineWidth: 0 suppressing focus ring`);
                   }
                 }
                 if (name === 'outlineStyle') {
-                  const styleVal = p.initializer.getText(sf).replace(/['"`]/g, '').trim().toLowerCase();
+                  let initExpr = p.initializer;
+                  while (ts.isAsExpression(initExpr) || ts.isSatisfiesExpression(initExpr) || ts.isParenthesizedExpression(initExpr)) {
+                    initExpr = initExpr.expression;
+                  }
+                  const styleVal = initExpr.getText(sf).replace(/['"`]/g, '').trim().toLowerCase();
                   if (styleVal === 'none') {
                     const { line } = sf.getLineAndCharacterOfPosition(p.getStart(sf));
                     violations.push(`L${line + 1}: Inline outlineStyle: none suppressing focus ring`);
@@ -5588,10 +5843,11 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       }
 
       function checkConfigTables(node: ts.Node) {
-        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG') && node.initializer) {
-          const init = (ts.isAsExpression(node.initializer) || ts.isSatisfiesExpression(node.initializer))
-            ? node.initializer.expression
-            : node.initializer;
+        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG' || node.name.getText(sf) === 'AGENT_RUN_STATUS_CONFIG') && node.initializer) {
+          let init = node.initializer;
+          while (ts.isAsExpression(init) || ts.isSatisfiesExpression(init) || ts.isParenthesizedExpression(init)) {
+            init = init.expression;
+          }
           if (init && ts.isObjectLiteralExpression(init)) {
             for (const prop of init.properties) {
               if (ts.isPropertyAssignment(prop) && ts.isObjectLiteralExpression(prop.initializer)) {
@@ -5681,6 +5937,15 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(modelStudioStats.checkedBorderPairs, 'Border pairs in ModelStudioView must be exactly 26').toBe(26);
     expect(modelStudioStats.violations, `ModelStudioView violations:\n${modelStudioStats.violations.join('\n')}`).toEqual([]);
 
+    const nlRunStats = analyzeFile('features/agent/NaturalLanguageRunView.tsx');
+    expect(nlRunStats.totalStyleAttrs, 'Total style attributes in NaturalLanguageRunView must be exactly 56').toBe(56);
+    expect(nlRunStats.checkedObjects, 'Explicit style objects in NaturalLanguageRunView must be exactly 13').toBe(13);
+    expect(nlRunStats.checkedPairs, 'Evaluated pairs in NaturalLanguageRunView must be exactly 45').toBe(45);
+    expect(nlRunStats.unboundColorObjects, 'Unbound color objects in NaturalLanguageRunView must be exactly 27').toBe(27);
+    expect(nlRunStats.coveredColorObjects, 'Total covered color objects in NaturalLanguageRunView must be exactly 40').toBe(40);
+    expect(nlRunStats.checkedBorderObjects, 'Border objects in NaturalLanguageRunView must be exactly 20').toBe(20);
+    expect(nlRunStats.checkedBorderPairs, 'Border pairs in NaturalLanguageRunView must be exactly 23').toBe(23);
+    expect(nlRunStats.violations, `NaturalLanguageRunView violations:\n${nlRunStats.violations.join('\n')}`).toEqual([]);
   });
 
 
@@ -6107,6 +6372,34 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(probe85Cr, 'Former LAN alert text #fde68a on light subtle fails 4.5:1').toBeLessThan(4.5);
     expect(probe85Cr).toBeCloseTo(1.14, 1);
 
+    // Probe 86 [Card 228]: NaturalLanguageRunView former notice error tint on light canvas (#f8fafc) strictly fails 4.5:1
+    const lightCanvasNoticeErrorComposite = blendRgba([248, 81, 73], 0.15, lightTokens['--color-bg-canvas']);
+    const probe86Cr = getContrast('#f85149', lightCanvasNoticeErrorComposite);
+    expect(probe86Cr, 'NaturalLanguageRunView former error notice #f85149 on light canvas error composite fails 4.5:1').toBeLessThan(4.5);
+    expect(probe86Cr).toBeCloseTo(2.69, 1);
+
+    // Probe 87 [Card 228]: NaturalLanguageRunView former notice success tint on light canvas (#f8fafc) strictly fails 4.5:1
+    const lightCanvasNoticeSuccessComposite = blendRgba([46, 160, 67], 0.15, lightTokens['--color-bg-canvas']);
+    const probe87Cr = getContrast('#3fb950', lightCanvasNoticeSuccessComposite);
+    expect(probe87Cr, 'NaturalLanguageRunView former success notice #3fb950 on light canvas success composite fails 4.5:1').toBeLessThan(4.5);
+    expect(probe87Cr).toBeCloseTo(2.06, 1);
+
+    // Probe 88 [Card 228]: NaturalLanguageRunView former notice info tint on light canvas (#f8fafc) strictly fails 4.5:1
+    const lightCanvasNoticeInfoComposite = blendRgba([56, 139, 253], 0.15, lightTokens['--color-bg-canvas']);
+    const probe88Cr = getContrast('#58a6ff', lightCanvasNoticeInfoComposite);
+    expect(probe88Cr, 'NaturalLanguageRunView former info notice #58a6ff on light canvas info composite fails 4.5:1').toBeLessThan(4.5);
+    expect(probe88Cr).toBeCloseTo(2.05, 1);
+
+    // Probe 89 [Card 228]: NaturalLanguageRunView former notice title #93c5fd on light surface (#ffffff) strictly fails 4.5:1
+    const probe89Cr = getContrast('#93c5fd', lightTokens['--color-bg-surface']);
+    expect(probe89Cr, 'NaturalLanguageRunView former #93c5fd on light surface fails 4.5:1').toBeLessThan(4.5);
+    expect(probe89Cr).toBeCloseTo(1.80, 1);
+
+    // Probe 90 [Card 228]: NaturalLanguageRunView former rejected text #ff7b72 on light surface (#ffffff) strictly fails 4.5:1
+    const probe90Cr = getContrast('#ff7b72', lightTokens['--color-bg-surface']);
+    expect(probe90Cr, 'NaturalLanguageRunView former #ff7b72 on light surface fails 4.5:1').toBeLessThan(4.5);
+    expect(probe90Cr).toBeCloseTo(2.52, 1);
+
 
     // Legacy Token Reverts:
     // Legacy Dark --color-border-subtle: #374151
@@ -6202,8 +6495,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
 
     // Exact count verification for var(--color-border-subtle)
-    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 429').toBe(429);
-    expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 29').toBe(29);
+    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 442').toBe(442);
+    expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 30').toBe(30);
 
     // Fail-closed check 3: Total files with color literals must not exceed baseline file count
     const baselineFileCount = Object.keys(COLOR_LITERAL_MULTISET_BASELINE).length;
@@ -6222,8 +6515,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(legacyCounts['#dc2626'], 'Legacy #dc2626 literal count must not exceed 1').toBeLessThanOrEqual(1);
     expect(legacyFiles['#dc2626'].size, 'Legacy #dc2626 file count must not exceed 1').toBeLessThanOrEqual(1);
 
-    expect(legacyCounts['#30363d'], 'Legacy #30363d literal count must not exceed 34').toBeLessThanOrEqual(34);
-    expect(legacyFiles['#30363d'].size, 'Legacy #30363d file count must not exceed 7').toBeLessThanOrEqual(7);
+    expect(legacyCounts['#30363d'], 'Legacy #30363d literal count must not exceed 22').toBeLessThanOrEqual(22);
+    expect(legacyFiles['#30363d'].size, 'Legacy #30363d file count must not exceed 6').toBeLessThanOrEqual(6);
   }, 30000);
 
   // 11. Comment-trivia exclusion: comments are never colours, but real string/template/JSX values still count
