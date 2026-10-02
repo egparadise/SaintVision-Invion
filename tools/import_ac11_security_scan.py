@@ -106,6 +106,16 @@ VF_THREAT_ID = "SEC-VF-001"
 #: name is not head-bound, so the head binding comes from the run metadata rather than from it.
 VF_ARTIFACT_NAME = "desktop-browser-safe-evidence"
 VF_PROOF_MEMBER = "vf-desktop-browser-ci.json"
+#: The document ``--vf-evidence`` takes: the three inputs the browser-lane binding needs, named
+#: once so the AC-11 aggregate lane can pass them as one argument (card 233).  It is validated as
+#: an **exact** key set with no defaults -- a missing key is a binding the caller dropped and an
+#: unexpected one is a field nothing checks -- and every value is cross-checked against the
+#: metadata it claims to describe, so the document cannot say one run and carry another.
+VF_EVIDENCE_SCHEMA = "ac11-vf-evidence:1"
+VF_EVIDENCE_KEYS = frozenset({
+    "schemaVersion", "repository", "workflowPath", "runId", "artifactId",
+    "archive", "runMetadata", "artifactMetadata",
+})
 DEFINER_THREAT_ID = "SEC-DEF-001"
 RLS_THREAT_ID = "SEC-RLS-001"
 #: Verdicts a threat report may carry into the envelope.  A report the canonical evaluator
@@ -220,6 +230,48 @@ def _head_commit_tree(run_metadata: dict[str, Any], label: str, source: str) -> 
     if not isinstance(tree, str) or not SHA1_RE.fullmatch(tree):
         raise SecurityImportError(f"{label} run head_commit has no canonical tree id")
     return tree
+
+
+def vf_evidence_inputs(path: Path) -> tuple[bytes, dict[str, Any], dict[str, Any]]:
+    """Read the ``--vf-evidence`` document and return the three inputs it names.
+
+    Nothing here re-implements the browser-lane verification: that lives in ``vf_report`` and
+    stays the single definition (card 233).  What this adds is the document's own strictness --
+    exact keys, the reviewed repository and workflow path, and the two ids it states having to
+    equal the ids in the metadata files it points at.  A document that names a run and carries
+    another run's metadata is refused here rather than silently importing the latter.
+    """
+
+    document = _json(path, "browser lane evidence document")
+    if set(document) != VF_EVIDENCE_KEYS:
+        missing = sorted(VF_EVIDENCE_KEYS - set(document))
+        extra = sorted(set(document) - VF_EVIDENCE_KEYS)
+        raise SecurityImportError(
+            f"browser lane evidence document is missing {missing} and carries unexpected {extra}"
+        )
+    if document["schemaVersion"] != VF_EVIDENCE_SCHEMA:
+        raise SecurityImportError("browser lane evidence document has another schemaVersion")
+    if document["repository"] != REPOSITORY:
+        raise SecurityImportError("browser lane evidence document names another repository")
+    expected_workflow = _reviewed_allowlist()["secVf001"]["workflow"]["path"]
+    if document["workflowPath"] != expected_workflow:
+        raise SecurityImportError("browser lane evidence document names another workflow")
+    run_id = _numeric(document["runId"], "browser lane evidence runId")
+    artifact_id = _numeric(document["artifactId"], "browser lane evidence artifactId")
+    base = path.parent
+    try:
+        archive = (base / str(document["archive"])).read_bytes()
+    except OSError:
+        raise SecurityImportError("browser lane evidence archive is unreadable") from None
+    run_metadata = _json(base / str(document["runMetadata"]), "browser lane run metadata")
+    artifact_metadata = _json(
+        base / str(document["artifactMetadata"]), "browser lane artifact metadata"
+    )
+    if run_id != _numeric(run_metadata.get("id"), "browser lane run metadata id"):
+        raise SecurityImportError("browser lane evidence document names another run")
+    if artifact_id != _numeric(artifact_metadata.get("id"), "browser lane artifact metadata id"):
+        raise SecurityImportError("browser lane evidence document names another artifact")
+    return archive, run_metadata, artifact_metadata
 
 
 def import_evidence(
@@ -806,26 +858,46 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--vf-run-metadata", type=Path, default=None)
     parser.add_argument("--vf-artifact-metadata", type=Path, default=None)
+    parser.add_argument(
+        "--vf-evidence",
+        type=Path,
+        default=None,
+        help=(
+            "an ac11-vf-evidence:1 document naming the browser lane archive and its two "
+            "metadata files; what the AC-11 aggregate lane passes (card 233)"
+        ),
+    )
     args = parser.parse_args(argv)
     try:
+        individual = (args.vf_archive, args.vf_run_metadata, args.vf_artifact_metadata)
+        if args.vf_evidence is not None and any(value is not None for value in individual):
+            # Two ways to say the same thing, differing: the caller would not know which one
+            # was used, and neither would the envelope.
+            raise SecurityImportError(
+                "--vf-evidence and the individual --vf-* inputs are alternatives, not both"
+            )
+        if args.vf_evidence is not None:
+            vf_archive, vf_run, vf_artifact = vf_evidence_inputs(args.vf_evidence)
+        else:
+            vf_archive = args.vf_archive.read_bytes() if args.vf_archive is not None else None
+            vf_run = (
+                _json(args.vf_run_metadata, "browser lane run metadata")
+                if args.vf_run_metadata is not None
+                else None
+            )
+            vf_artifact = (
+                _json(args.vf_artifact_metadata, "browser lane artifact metadata")
+                if args.vf_artifact_metadata is not None
+                else None
+            )
         archive = args.archive.read_bytes()
         result = import_evidence(
             archive,
             _json(args.run_metadata, "run metadata"),
             _json(args.artifact_metadata, "artifact metadata"),
-            vf_archive=(
-                args.vf_archive.read_bytes() if args.vf_archive is not None else None
-            ),
-            vf_run_metadata=(
-                _json(args.vf_run_metadata, "browser lane run metadata")
-                if args.vf_run_metadata is not None
-                else None
-            ),
-            vf_artifact_metadata=(
-                _json(args.vf_artifact_metadata, "browser lane artifact metadata")
-                if args.vf_artifact_metadata is not None
-                else None
-            ),
+            vf_archive=vf_archive,
+            vf_run_metadata=vf_run,
+            vf_artifact_metadata=vf_artifact,
         )
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(

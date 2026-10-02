@@ -144,14 +144,21 @@ jobs:
               if key in seen:
                   continue          # two axes can share one run; collect it once
               seen.add(key)
+              # A row may name supplemental evidence: a second artifact that axis needs and the
+              # tool which finds it.  Empty fields mean "none", so the loop reads four or six
+              # columns without a second format (card 233).
+              supplemental = entry["supplementalEvidence"] or {}
               print("\t".join([
                   entry["workflow"].rsplit("/", 1)[-1],
                   entry["artifactNamePrefix"],
                   entry["importer"],
                   entry["importerArchiveFlag"],
+                  supplemental.get("finder", ""),
+                  supplemental.get("flag", ""),
+                  supplemental.get("threatId", ""),
               ]))
           PY
-          while IFS=$'\t' read -r workflow prefix importer archive_flag; do
+          while IFS=$'\t' read -r workflow prefix importer archive_flag finder flag threat; do
             echo "::group::$workflow"
             run_id=$(gh run list --workflow "$workflow" --limit 50 \
               --json databaseId,headSha,status,conclusion \
@@ -172,6 +179,32 @@ jobs:
             gh api "repos/$REPO/actions/artifacts/$artifact_id"  > /tmp/artifact.json
             gh api "repos/$REPO/actions/artifacts/$artifact_id/zip" > /tmp/artifact.zip
             base=$(basename "$importer" .py)
+            # Supplemental evidence, when the row names a finder: a second artifact this axis
+            # needs.  The finder requires exactly one candidate at the same source SHA and only
+            # downloads it -- the verification stays in the importer (card 233).  Exit 3 means
+            # "no single candidate", which is an answer: the import continues without it and the
+            # envelope's own reason names the threat report that is therefore not admissible.
+            # It is never a silent omission, and never a reason to fail this lane.
+            supplemental=()
+            if [ -n "$finder" ]; then
+              rm -rf /tmp/vf-evidence
+              set +e
+              document=$(python "$finder" --source-sha "$SOURCE_SHA" --out-dir /tmp/vf-evidence 2>/tmp/vf-reason)
+              finder_code=$?
+              set -e
+              if [ "$finder_code" -eq 0 ] && [ -n "$document" ]; then
+                supplemental=("$flag" "$document")
+                echo "supplemental evidence for ${threat:-?}: $document"
+              else
+                echo "no supplemental evidence for ${threat:-?} (finder exit $finder_code):"
+                cat /tmp/vf-reason || true
+                if [ "$finder_code" -ne 3 ]; then
+                  echo "the finder failed rather than finding nothing -- recorded, lane continues" >&2
+                fi
+                printf '%s\n' "${threat:-?} NOT_OBSERVED: $(cat /tmp/vf-reason 2>/dev/null | tr '\n' ' ')" \
+                  >> "$ENVELOPES/../supplemental-missing.txt"
+              fi
+            fi
             # The flag name comes from the sources file: the two importers in this chain
             # take the zip under different names, and trying both would turn a real
             # refusal into a retry with the wrong flag.
@@ -179,6 +212,7 @@ jobs:
               "$archive_flag" /tmp/artifact.zip \
               --run-metadata /tmp/run.json \
               --artifact-metadata /tmp/artifact.json \
+              ${supplemental[@]+"${supplemental[@]}"} \
               --output "$ENVELOPES/$base.json"
             echo "::endgroup::"
           done < /tmp/complete.tsv
@@ -194,6 +228,13 @@ jobs:
             --output "$MANIFEST" \
             --report "$ASSEMBLY"
           cat "$ASSEMBLY"
+          # Supplemental evidence that could not be found is part of this run's answer, so it is
+          # printed here and uploaded with the rest rather than left in a step log (card 233).
+          if [ -f "$ENVELOPES/../supplemental-missing.txt" ]; then
+            echo "::warning::supplemental evidence missing at this SHA:"
+            cat "$ENVELOPES/../supplemental-missing.txt"
+            cp "$ENVELOPES/../supplemental-missing.txt" evidence/ac11-supplemental-missing.txt
+          fi
 
       - name: Recompute the eight axes
         id: aggregate

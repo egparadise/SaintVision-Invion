@@ -66,7 +66,17 @@ CHAINS = ("complete", "incomplete", "absent")
 SOURCE_KEYS = frozenset({
     "axis", "chain", "workflow", "producer", "importer", "importerArchiveFlag",
     "artifactNamePrefix", "envelopeMember", "importerEmitsAxes", "envelopeShape", "reason",
+    "supplementalEvidence",
 })
+#: ``supplementalEvidence``, when a row has one, names a **second** artifact that axis needs and
+#: the tool which finds it.  The security axis is the case: one of its four threat reports comes
+#: from the browser lane's artifact, and the aggregate lane did not pass it, so the envelope that
+#: lane produced never carried SEC-VF-001 (#319 r2, card 233).  The keys are exact, and what the
+#: finder looks for (workflow, artifact name) stays in the reviewed allowlist rather than here --
+#: this row says *that* the axis takes one and *who* fetches it.
+SUPPLEMENTAL_KEYS = frozenset({"threatId", "finder", "flag"})
+#: Threat reports that can arrive as supplemental evidence.  Named so a row cannot invent one.
+SUPPLEMENTAL_THREATS = ("SEC-VF-001",)
 #: The top-level keys of the axis map, exactly. An unknown one is a field nobody validates,
 #: and ``repository`` was readable as anything at all before this (#299 r1).
 SOURCES_TOP_KEYS = frozenset({"schemaVersion", "purpose", "note", "repository", "axes"})
@@ -243,6 +253,27 @@ def load_sources(path: Path) -> list[dict[str, Any]]:
             value = entry[field]
             if value is not None and not (REPO_ROOT / value).is_file():
                 raise Refused(f"{axis}: {field} {value} is not in the tree")
+        supplemental = entry["supplementalEvidence"]
+        if supplemental is not None:
+            if not isinstance(supplemental, dict) or set(supplemental) != SUPPLEMENTAL_KEYS:
+                raise Refused(
+                    f"{axis}: supplementalEvidence must carry exactly {sorted(SUPPLEMENTAL_KEYS)}"
+                )
+            if supplemental["threatId"] not in SUPPLEMENTAL_THREATS:
+                raise Refused(
+                    f"{axis}: supplementalEvidence names {supplemental['threatId']!r}, "
+                    f"which is not a threat report this chain fetches separately"
+                )
+            if not str(supplemental["flag"]).startswith("--"):
+                raise Refused(f"{axis}: supplementalEvidence flag is not an option name")
+            if not (REPO_ROOT / str(supplemental["finder"])).is_file():
+                raise Refused(
+                    f"{axis}: supplementalEvidence finder {supplemental['finder']} "
+                    f"is not in the tree"
+                )
+            if entry["chain"] != "complete":
+                # A row that cannot be collected at all has nothing to supplement.
+                raise Refused(f"{axis}: supplementalEvidence on a {entry['chain']} chain")
         # Bound to the importer's own source as an EXACT set, not as a subset. r1 only
         # checked that each claimed name appears somewhere, so dropping the second axis
         # from the migration rows left a true statement that described half the chain --

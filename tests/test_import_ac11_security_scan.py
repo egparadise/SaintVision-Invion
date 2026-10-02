@@ -807,6 +807,131 @@ def test_a_scan_run_without_a_head_commit_tree_is_refused():
         tool.import_evidence(blob, run_metadata, artifact_metadata, now=NOW)
 
 
+def vf_evidence_dir(tmp_path, bundle=None, **overrides):
+    """The three browser-lane inputs on disk plus the document that names them.
+
+    This is what the AC-11 aggregate lane now passes as one argument (card 233): the finder writes
+    it, the importer reads it, and these tests forge one field at a time.
+    """
+
+    archive, run_metadata, artifact_metadata = bundle if bundle is not None else vf_bundle()
+    (tmp_path / "vf-archive.zip").write_bytes(archive)
+    (tmp_path / "vf-run.json").write_text(json.dumps(run_metadata), encoding="utf-8")
+    (tmp_path / "vf-artifact.json").write_text(json.dumps(artifact_metadata), encoding="utf-8")
+    document = {
+        "schemaVersion": tool.VF_EVIDENCE_SCHEMA,
+        "repository": tool.REPOSITORY,
+        "workflowPath": APPROVED_ALLOWLIST["secVf001"]["workflow"]["path"],
+        "runId": str(run_metadata["id"]),
+        "artifactId": str(artifact_metadata["id"]),
+        "archive": "vf-archive.zip",
+        "runMetadata": "vf-run.json",
+        "artifactMetadata": "vf-artifact.json",
+    }
+    document.update(overrides)
+    for key in [key for key, value in overrides.items() if value is DROP]:
+        del document[key]
+    path = tmp_path / "vf-evidence.json"
+    path.write_text(json.dumps(document), encoding="utf-8")
+    return path
+
+
+DROP = object()
+
+
+def test_the_vf_evidence_document_imports_the_same_envelope_as_the_three_flags(tmp_path):
+    """One argument or three, the same evidence and the same verdict.
+
+    The aggregate lane passes one document because its loop cannot grow three per-axis arguments;
+    the envelope it produces has to be the one the three flags produce, or the lane would be
+    importing something else (card 233).
+    """
+
+    bundle = vf_bundle()
+    blob = archive(database=(definer_report(), rls_report()))
+    run_metadata, artifact_metadata = metadata(blob)
+    three = tool.import_evidence(
+        blob, run_metadata, artifact_metadata, now=NOW,
+        vf_archive=bundle[0], vf_run_metadata=bundle[1], vf_artifact_metadata=bundle[2],
+    )
+    document = vf_evidence_dir(tmp_path, bundle=bundle)
+    vf_archive, vf_run, vf_artifact = tool.vf_evidence_inputs(document)
+    one = tool.import_evidence(
+        blob, run_metadata, artifact_metadata, now=NOW,
+        vf_archive=vf_archive, vf_run_metadata=vf_run, vf_artifact_metadata=vf_artifact,
+    )
+    assert one == three
+    assert one["threatReportVerdicts"]["SEC-VF-001"] == "MEASURED_PASS"
+
+
+@pytest.mark.parametrize("key", sorted(tool.VF_EVIDENCE_KEYS))
+def test_removing_any_key_of_the_vf_evidence_document_is_refused(tmp_path, key):
+    """The sweep: every required key, removed one at a time.
+
+    A missing key is a binding the caller dropped, and defaulting one would make the document a
+    suggestion rather than a contract.
+    """
+
+    document = vf_evidence_dir(tmp_path, **{key: DROP})
+    with pytest.raises(tool.SecurityImportError, match="missing"):
+        tool.vf_evidence_inputs(document)
+
+
+def test_an_extra_key_in_the_vf_evidence_document_is_refused(tmp_path):
+    document = vf_evidence_dir(tmp_path, note="harmless")
+    with pytest.raises(tool.SecurityImportError, match="unexpected"):
+        tool.vf_evidence_inputs(document)
+
+
+@pytest.mark.parametrize(
+    ("label", "overrides", "message"),
+    [
+        ("another schema", {"schemaVersion": "ac11-vf-evidence:2"}, "schemaVersion"),
+        ("another repository", {"repository": "fork/example"}, "repository"),
+        ("another workflow", {"workflowPath": ".github/workflows/other.yml"}, "workflow"),
+        ("run id that is not digits", {"runId": "not-a-run"}, "runId"),
+        ("artifact id that is not digits", {"artifactId": "not-an-artifact"}, "artifactId"),
+        ("a run id the metadata does not have", {"runId": "36000000000"}, "another run"),
+        ("an artifact id the metadata does not have", {"artifactId": "99"}, "another artifact"),
+        ("an archive that is not there", {"archive": "absent.zip"}, "unreadable"),
+    ],
+)
+def test_each_forged_field_of_the_vf_evidence_document_is_refused(tmp_path, label, overrides,
+                                                                 message):
+    """Every value is cross-checked against the file it claims to describe.
+
+    The dangerous one is the pair at the end: a document that names one run and carries another
+    run's metadata would otherwise import the latter while the lane's log recorded the former.
+    """
+
+    document = vf_evidence_dir(tmp_path, **overrides)
+    with pytest.raises(tool.SecurityImportError, match=message):
+        tool.vf_evidence_inputs(document)
+
+
+def test_the_document_and_the_individual_flags_are_alternatives(tmp_path):
+    """Both at once is refused: nobody could tell which one was used, least of all the envelope."""
+
+    bundle = vf_bundle()
+    blob = archive(database=(definer_report(), rls_report()))
+    run_metadata, artifact_metadata = metadata(blob)
+    (tmp_path / "scan.zip").write_bytes(blob)
+    (tmp_path / "run.json").write_text(json.dumps(run_metadata), encoding="utf-8")
+    (tmp_path / "artifact.json").write_text(json.dumps(artifact_metadata), encoding="utf-8")
+    (tmp_path / "other.zip").write_bytes(bundle[0])
+    document = vf_evidence_dir(tmp_path, bundle=bundle)
+    code = tool.main([
+        "--archive", str(tmp_path / "scan.zip"),
+        "--run-metadata", str(tmp_path / "run.json"),
+        "--artifact-metadata", str(tmp_path / "artifact.json"),
+        "--vf-evidence", str(document),
+        "--vf-archive", str(tmp_path / "other.zip"),
+        "--output", str(tmp_path / "envelope.json"),
+    ])
+    assert code == 2
+    assert not (tmp_path / "envelope.json").exists()
+
+
 def test_a_browser_artifact_without_the_proof_member_is_refused():
     with pytest.raises(tool.SecurityImportError, match="no proof member"):
         imported(
