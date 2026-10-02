@@ -224,8 +224,16 @@ def rls_report(**over) -> dict:
     return document
 
 
-def vf_evidence(**over) -> dict:
-    """What the browser lane's own proof carries, measured from a real run of that lane."""
+VF_RUN_ID = "36958633624"
+VF_ARTIFACT_ID = "11207615096"
+
+
+def vf_proof(**over) -> dict:
+    """What the browser lane's own proof carries, measured from a real run of that lane.
+
+    The five values below are all public -- they are in the reviewed allowlist -- which is why a
+    loose proof document proves nothing and the archive it came from has to be bound (#319 F1).
+    """
 
     spec = APPROVED_ALLOWLIST["secVf001"]
     document = {
@@ -234,9 +242,45 @@ def vf_evidence(**over) -> dict:
         "evidenceStatus": "complete",
         "caseIdentitiesSha256": spec["requiredCaseIdentitiesSha256"],
         "tests": dict(spec["expectedTests"]),
+        "evidenceScope": "current invocation JUnit; not expected-suite or operational",
     }
     document.update(over)
     return document
+
+
+def vf_bundle(proof=None, run=None, artifact=None, members=None) -> tuple:
+    """The browser lane's artifact with the two GitHub metadata documents that bind it."""
+
+    proof = vf_proof() if proof is None else proof
+    output = io.BytesIO()
+    with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as bundle:
+        rows = members if members is not None else [
+            (tool.VF_PROOF_MEMBER, json.dumps(proof).encode()),
+            ("web-container-tests.xml", b'<testsuite tests="6" failures="0"/>'),
+        ]
+        for name, content in rows:
+            bundle.writestr(zipfile.ZipInfo(name, (2026, 10, 2, 3, 20, 0)), content)
+    archive = output.getvalue()
+    run_metadata = {
+        "id": int(VF_RUN_ID),
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": SOURCE,
+        "event": "workflow_dispatch",
+        "path": APPROVED_ALLOWLIST["secVf001"]["workflow"]["path"] + "@refs/heads/x",
+        "repository": {"full_name": tool.REPOSITORY},
+    }
+    run_metadata.update(run or {})
+    artifact_metadata = {
+        "id": int(VF_ARTIFACT_ID),
+        "name": tool.VF_ARTIFACT_NAME,
+        "expired": False,
+        "expires_at": "2026-11-01T01:03:19Z",
+        "digest": "sha256:" + hashlib.sha256(archive).hexdigest(),
+        "workflow_run": {"id": int(VF_RUN_ID), "head_sha": SOURCE},
+    }
+    artifact_metadata.update(artifact or {})
+    return archive, run_metadata, artifact_metadata
 
 
 def archive(
@@ -286,8 +330,15 @@ def metadata(payload_bytes: bytes) -> tuple[dict, dict]:
 def imported(report: dict | None = None, database=None, vf=None):
     blob = archive(report, database=database)
     run_metadata, artifact_metadata = metadata(blob)
+    vf_archive, vf_run, vf_artifact = vf if vf is not None else (None, None, None)
     return tool.import_evidence(
-        blob, run_metadata, artifact_metadata, now=NOW, vf_evidence=vf
+        blob,
+        run_metadata,
+        artifact_metadata,
+        now=NOW,
+        vf_archive=vf_archive,
+        vf_run_metadata=vf_run,
+        vf_artifact_metadata=vf_artifact,
     )
 
 
@@ -461,7 +512,7 @@ def test_the_four_measured_reports_recompute_a_pass_and_the_envelope_says_so():
 
     envelope = imported(
         database=(definer_report(), rls_report()),
-        vf=vf_evidence(),
+        vf=vf_bundle(),
     )
     assert envelope["verdict"] == "MEASURED_PASS"
     assert "reason" not in envelope
@@ -485,7 +536,7 @@ def test_an_unobserved_database_report_keeps_the_axis_unobserved_and_names_it():
         unmeasured=[{"role": "inv_cancel_bridge_owner", "table": "public.audit_events",
                      "rule": "E4", "detail": "row identity unverifiable"}],
     )
-    envelope = imported(database=(definer_report(), unmeasured), vf=vf_evidence())
+    envelope = imported(database=(definer_report(), unmeasured), vf=vf_bundle())
     assert envelope["verdict"] == "NOT_OBSERVED"
     assert "SEC-RLS-001 recomputes NOT_OBSERVED" in envelope["reason"]
     assert envelope["threatReportVerdicts"]["SEC-DEF-001"] == "MEASURED_PASS"
@@ -500,7 +551,7 @@ def test_a_measured_database_failure_is_carried_as_a_failure():
         violations=[{"role": "inv_app", "table": "public.audit_events", "rule": "E2",
                      "detail": "tenant-scoped readable table without enabled+forced RLS"}],
     )
-    envelope = imported(database=(definer_report(), violated), vf=vf_evidence())
+    envelope = imported(database=(definer_report(), violated), vf=vf_bundle())
     assert envelope["verdict"] == "MEASURED_FAIL"
     assert "SEC-RLS-001 recomputes MEASURED_FAIL" in envelope["reason"]
 
@@ -523,7 +574,7 @@ def test_a_failure_outranks_an_unobserved_report_in_the_same_envelope():
         violations=[{"role": "inv_app", "table": "public.audit_events", "rule": "E2",
                      "detail": "tenant-scoped readable table without enabled+forced RLS"}],
     )
-    envelope = imported(database=(unavailable, violated), vf=vf_evidence())
+    envelope = imported(database=(unavailable, violated), vf=vf_bundle())
     assert envelope["verdict"] == "MEASURED_FAIL"
     assert envelope["threatReportVerdicts"]["SEC-DEF-001"] == "NOT_OBSERVED"
     assert envelope["threatReportVerdicts"]["SEC-RLS-001"] == "MEASURED_FAIL"
@@ -560,19 +611,93 @@ def test_browser_lane_evidence_that_is_not_the_reviewed_one_is_refused(mutation)
     binding that matters."""
 
     with pytest.raises(tool.SecurityImportError, match="reviewed"):
-        imported(database=(definer_report(), rls_report()), vf=vf_evidence(**mutation))
-
-
-def test_browser_lane_evidence_about_another_head_is_refused():
-    with pytest.raises(tool.SecurityImportError, match="another source head"):
         imported(
             database=(definer_report(), rls_report()),
-            vf=vf_evidence(sourceHeadSha="f" * 40),
+            vf=vf_bundle(proof=vf_proof(**mutation)),
         )
 
 
+@pytest.mark.parametrize(
+    ("label", "kwargs", "message"),
+    [
+        ("other-run", {"artifact": {"workflow_run": {"id": 36000000000, "head_sha": SOURCE}}},
+         "another run"),
+        ("other-head", {"run": {"head_sha": "f" * 40}}, "another source head"),
+        ("other-artifact-head",
+         {"artifact": {"workflow_run": {"id": int(VF_RUN_ID), "head_sha": "f" * 40}}},
+         "another source head"),
+        ("wrong-repo", {"run": {"repository": {"full_name": "fork/example"}}}, "canonical"),
+        ("wrong-workflow", {"run": {"path": ".github/workflows/other.yml@refs/heads/x"}},
+         "reviewed workflow"),
+        ("failed-run", {"run": {"conclusion": "failure"}}, "successfully"),
+        ("incomplete-run", {"run": {"status": "in_progress"}}, "successfully"),
+        ("pushed-event", {"run": {"event": "push"}}, "approved opt-in trigger"),
+        ("forged-digest", {"artifact": {"digest": "sha256:" + "0" * 64}}, "digest"),
+        ("expired-flag", {"artifact": {"expired": True}}, "expired"),
+        ("expired-date", {"artifact": {"expires_at": "2026-10-01T00:00:00Z"}}, "expired"),
+        ("other-artifact-name", {"artifact": {"name": "something-else"}}, "artifact name"),
+    ],
+)
+def test_browser_lane_provenance_is_verified_one_mutation_at_a_time(label, kwargs, message):
+    """#319 F1: r1 verified five public values and copied the scan's provenance.
+
+    So a locally written JSON passed, and the resulting report claimed the security scan's run.
+    Each mutation below is a single thing GitHub would have said differently about the browser
+    run or its artifact, and each one has to be a refusal on its own.
+    """
+
+    with pytest.raises(tool.SecurityImportError, match=message):
+        imported(database=(definer_report(), rls_report()), vf=vf_bundle(**kwargs))
+
+
+def test_the_vf_report_carries_the_browser_run_not_the_scan_run():
+    """The provenance that ends up in the envelope is the one that was verified."""
+
+    envelope = imported(database=(definer_report(), rls_report()), vf=vf_bundle())
+    vf = [row for row in envelope["observations"] if row["threatId"] == "SEC-VF-001"][0]
+    assert vf["sourceRunId"] == VF_RUN_ID != RUN_ID
+    assert vf["sourceHeadSha"] == SOURCE
+    binding = vf["vfArtifact"]
+    assert binding["runId"] == VF_RUN_ID
+    assert binding["artifactId"] == VF_ARTIFACT_ID
+    assert binding["artifactName"] == tool.VF_ARTIFACT_NAME
+    assert binding["workflowPath"] == APPROVED_ALLOWLIST["secVf001"]["workflow"]["path"]
+    assert binding["digest"] == binding["observedDigest"]
+    assert binding["runConclusion"] == "success"
+    assert len(binding["proofSha256"]) == 64
+
+
+def test_a_browser_artifact_without_the_proof_member_is_refused():
+    with pytest.raises(tool.SecurityImportError, match="no proof member"):
+        imported(
+            database=(definer_report(), rls_report()),
+            vf=vf_bundle(members=[("web-container-tests.xml", b"<testsuite/>")]),
+        )
+
+
+def test_a_browser_artifact_with_an_unsafe_member_is_refused():
+    with pytest.raises(tool.SecurityImportError, match="unsafe"):
+        imported(
+            database=(definer_report(), rls_report()),
+            vf=vf_bundle(members=[
+                (tool.VF_PROOF_MEMBER, json.dumps(vf_proof()).encode()),
+                ("../outside.json", b"{}"),
+            ]),
+        )
+
+
+@pytest.mark.parametrize("dropped", [0, 1, 2], ids=["archive", "run-metadata", "artifact-metadata"])
+def test_two_of_the_three_vf_inputs_are_not_enough(dropped):
+    """Dropping one input would let a caller shed exactly the binding it dislikes."""
+
+    bundle = list(vf_bundle())
+    bundle[dropped] = None
+    with pytest.raises(tool.SecurityImportError, match="needs the browser lane archive"):
+        imported(database=(definer_report(), rls_report()), vf=tuple(bundle))
+
+
 def test_the_vf_report_pins_the_five_reviewed_files():
-    envelope = imported(database=(definer_report(), rls_report()), vf=vf_evidence())
+    envelope = imported(database=(definer_report(), rls_report()), vf=vf_bundle())
     vf = [row for row in envelope["observations"] if row["threatId"] == "SEC-VF-001"][0]
     spec = APPROVED_ALLOWLIST["secVf001"]
     expected = [spec["runner"], spec["workflow"], spec["nodeDependencyResolver"], *spec["testFiles"]]

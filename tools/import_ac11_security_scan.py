@@ -102,6 +102,10 @@ MEMBER_SETS = (BASE_MEMBERS, BASE_MEMBERS | DATABASE_MEMBERS)
 #: of its tool files), so its evidence arrives as a child reference bound by digest and head --
 #: the same shape the long-soak importer uses for its two references.
 VF_THREAT_ID = "SEC-VF-001"
+#: The browser lane's artifact: its fixed name and the one member that carries the proof.  The
+#: name is not head-bound, so the head binding comes from the run metadata rather than from it.
+VF_ARTIFACT_NAME = "desktop-browser-safe-evidence"
+VF_PROOF_MEMBER = "vf-desktop-browser-ci.json"
 DEFINER_THREAT_ID = "SEC-DEF-001"
 RLS_THREAT_ID = "SEC-RLS-001"
 #: Verdicts a threat report may carry into the envelope.  A report the canonical evaluator
@@ -203,7 +207,9 @@ def import_evidence(
     artifact_metadata: dict[str, Any],
     *,
     now: datetime | None = None,
-    vf_evidence: dict[str, Any] | None = None,
+    vf_archive: bytes | None = None,
+    vf_run_metadata: dict[str, Any] | None = None,
+    vf_artifact_metadata: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     observed_now = now or datetime.now(timezone.utc)
     if observed_now.tzinfo is None:
@@ -270,11 +276,23 @@ def import_evidence(
     }
     report["scanArtifact"] = scan_artifact
     extra = list(_database_reports(members, report))
-    if vf_evidence is not None:
-        # The browser lane's proof is about the same source head or it is about another run.
-        if vf_evidence.get("sourceHeadSha") not in (None, source):
-            raise SecurityImportError("browser lane evidence is about another source head")
-        extra.append(vf_report(vf_evidence, _reviewed_allowlist(), report))
+    vf_inputs = (vf_archive, vf_run_metadata, vf_artifact_metadata)
+    if any(value is not None for value in vf_inputs):
+        if any(value is None for value in vf_inputs):
+            # Two of the three would let a caller drop the binding it finds inconvenient.
+            raise SecurityImportError(
+                "SEC-VF-001 needs the browser lane archive with its run and artifact metadata"
+            )
+        extra.append(
+            vf_report(
+                vf_archive,
+                vf_run_metadata,
+                vf_artifact_metadata,
+                _reviewed_allowlist(),
+                report,
+                observed_now,
+            )
+        )
     return axis_envelope(
         report,
         expected_digest=expected_digest,
@@ -455,18 +473,95 @@ def _database_reports(members: dict[str, bytes], report: dict[str, Any]) -> list
     return reports
 
 
-def vf_report(evidence: dict[str, Any], allowlist: dict[str, Any], report: dict[str, Any]) -> dict[str, Any]:
-    """Adapt the browser lane's own proof into SEC-VF-001.
+def _vf_proof(archive: bytes) -> dict[str, Any]:
+    """The proof document, read out of the browser lane's artifact rather than from a file.
+
+    A loose JSON is exactly what r1 of this card accepted: the five reviewed values it compares
+    are all public (they are in the reviewed allowlist), so anyone could write a passing file.
+    The proof has to come from inside the archive whose digest GitHub signed for (#319 F1).
+    """
+
+    try:
+        with zipfile.ZipFile(BytesIO(archive)) as bundle:
+            names = bundle.namelist()
+            if VF_PROOF_MEMBER not in names:
+                raise SecurityImportError("browser lane artifact carries no proof member")
+            for name in names:
+                path = PurePosixPath(name)
+                if path.is_absolute() or ".." in path.parts or bundle.getinfo(name).is_dir():
+                    raise SecurityImportError("browser lane artifact member path is unsafe")
+            raw = bundle.read(VF_PROOF_MEMBER)
+    except (OSError, zipfile.BadZipFile, KeyError) as exc:
+        raise SecurityImportError(
+            f"browser lane artifact unreadable: {type(exc).__name__}"
+        ) from None
+    try:
+        value = json.loads(raw.decode("utf-8"))
+    except (UnicodeError, json.JSONDecodeError) as exc:
+        raise SecurityImportError(
+            f"browser lane proof unreadable: {type(exc).__name__}"
+        ) from None
+    if not isinstance(value, dict):
+        raise SecurityImportError("browser lane proof must be an object")
+    return value
+
+
+def vf_report(
+    archive: bytes,
+    run_metadata: dict[str, Any],
+    artifact_metadata: dict[str, Any],
+    allowlist: dict[str, Any],
+    report: dict[str, Any],
+    observed_now: datetime,
+) -> dict[str, Any]:
+    """Adapt the browser lane's own artifact into SEC-VF-001.
 
     The reviewed allowlist pins the five files that lane runs and the identity hash of the case
-    set it must execute.  Everything this adapter asserts is measured in the evidence it was
-    handed except ``nodeIds``, which the aggregator compares with ``requiredNodeIds``: that
-    comparison is a tautology on its own, so the binding that matters is the identity hash --
-    and this adapter refuses to write the report unless that hash, the test counts, the
-    evidence status and both exit codes are the reviewed ones.
+    set it must execute, and r1 of this card checked only those -- so a synthetic dict with five
+    public values became MEASURED_PASS and the report then *copied the security scan's*
+    provenance (#319 F1).  This version binds the report to the browser run and artifact the way
+    the scan report is bound to its own: the canonical repository and workflow path, an approved
+    opt-in event, a completed successful run, the exact same source head as the scan, the
+    artifact's name, its unexpired GitHub digest recomputed over the bytes, and the proof read
+    from inside that archive.  ``nodeIds`` is still entailed rather than observed (the
+    aggregator compares it with ``requiredNodeIds``, which is a tautology on its own), so the
+    binding that matters is the identity hash -- now on top of a verified artifact.
     """
 
     spec = allowlist["secVf001"]
+    source = report["sourceHeadSha"]
+
+    run_id = _numeric(run_metadata.get("id"), "browser lane run id")
+    workflow_run = artifact_metadata.get("workflow_run")
+    if not isinstance(workflow_run, dict):
+        raise SecurityImportError("browser lane artifact workflow_run metadata is missing")
+    if run_id != _numeric(workflow_run.get("id"), "browser lane artifact run id"):
+        raise SecurityImportError("browser lane artifact belongs to another run")
+    repository = run_metadata.get("repository")
+    if not isinstance(repository, dict) or repository.get("full_name") != REPOSITORY:
+        raise SecurityImportError("browser lane run repository is not canonical")
+    workflow = str(run_metadata.get("path", "")).split("@", 1)[0]
+    if workflow != spec["workflow"]["path"]:
+        raise SecurityImportError("browser lane run is not the reviewed workflow")
+    if run_metadata.get("event") not in {"pull_request", "workflow_dispatch"}:
+        raise SecurityImportError("browser lane run event is not an approved opt-in trigger")
+    if run_metadata.get("status") != "completed" or run_metadata.get("conclusion") != "success":
+        raise SecurityImportError("browser lane run did not complete successfully")
+    if run_metadata.get("head_sha") != source or workflow_run.get("head_sha") != source:
+        raise SecurityImportError("browser lane run is about another source head")
+    if artifact_metadata.get("name") != VF_ARTIFACT_NAME:
+        raise SecurityImportError("browser lane artifact name is not the reviewed one")
+    if artifact_metadata.get("expired") is not False:
+        raise SecurityImportError("browser lane artifact is expired or its state is unknown")
+    expires_at = _utc(artifact_metadata.get("expires_at"), "browser lane artifact expiresAt")
+    if expires_at <= observed_now.astimezone(timezone.utc):
+        raise SecurityImportError("browser lane artifact is expired")
+    expected_digest = _digest(artifact_metadata.get("digest"))
+    observed_digest = hashlib.sha256(archive).hexdigest()
+    if observed_digest != expected_digest:
+        raise SecurityImportError("browser lane artifact digest differs from GitHub metadata")
+
+    proof = _vf_proof(archive)
     required = {
         "caseIdentitiesSha256": spec["requiredCaseIdentitiesSha256"],
         "tests": spec["expectedTests"],
@@ -475,23 +570,40 @@ def vf_report(evidence: dict[str, Any], allowlist: dict[str, Any], report: dict[
         "subprocessExitCode": 0,
     }
     for field, expected in required.items():
-        if evidence.get(field) != expected:
+        if proof.get(field) != expected:
             raise SecurityImportError(
                 f"browser lane evidence does not satisfy the reviewed {field}"
             )
     files = [spec["runner"], spec["workflow"], spec["nodeDependencyResolver"], *spec["testFiles"]]
     return {
         "threatId": VF_THREAT_ID,
-        "sourceRunId": report["sourceRunId"],
-        "sourceHeadSha": report["sourceHeadSha"],
+        # This report's provenance is the browser run's own, not the scan's: the only thing the
+        # two share is the source head, and that is checked above rather than copied.
+        "sourceRunId": run_id,
+        "sourceHeadSha": source,
         "checkoutTreeSha": report["checkoutTreeSha"],
+        "vfArtifact": {
+            "repository": REPOSITORY,
+            "workflowPath": spec["workflow"]["path"],
+            "runId": run_id,
+            "artifactId": _numeric(artifact_metadata.get("id"), "browser lane artifact id"),
+            "artifactName": VF_ARTIFACT_NAME,
+            "digest": expected_digest,
+            "observedDigest": observed_digest,
+            "expiresAt": expires_at.isoformat().replace("+00:00", "Z"),
+            "runConclusion": "success",
+            "proofSha256": hashlib.sha256(
+                json.dumps(proof, ensure_ascii=False, sort_keys=True,
+                           separators=(",", ":")).encode("utf-8")
+            ).hexdigest(),
+        },
         "toolFiles": [dict(row) for row in files],
         "nodeIds": list(spec["requiredNodeIds"]),
-        "exitCode": evidence["exitCode"],
-        "subprocessExitCode": evidence["subprocessExitCode"],
-        "evidenceStatus": evidence["evidenceStatus"],
-        "caseIdentitiesSha256": evidence["caseIdentitiesSha256"],
-        "tests": dict(evidence["tests"]),
+        "exitCode": proof["exitCode"],
+        "subprocessExitCode": proof["subprocessExitCode"],
+        "evidenceStatus": proof["evidenceStatus"],
+        "caseIdentitiesSha256": proof["caseIdentitiesSha256"],
+        "tests": dict(proof["tests"]),
     }
 
 
@@ -656,11 +768,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--artifact-metadata", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument(
-        "--vf-evidence",
+        "--vf-archive",
         type=Path,
         default=None,
-        help="the browser lane's own proof (vf-desktop-browser-ci.json) for SEC-VF-001",
+        help="the browser lane's artifact zip, for SEC-VF-001",
     )
+    parser.add_argument("--vf-run-metadata", type=Path, default=None)
+    parser.add_argument("--vf-artifact-metadata", type=Path, default=None)
     args = parser.parse_args(argv)
     try:
         archive = args.archive.read_bytes()
@@ -668,9 +782,17 @@ def main(argv: list[str] | None = None) -> int:
             archive,
             _json(args.run_metadata, "run metadata"),
             _json(args.artifact_metadata, "artifact metadata"),
-            vf_evidence=(
-                _json(args.vf_evidence, "browser lane evidence")
-                if args.vf_evidence is not None
+            vf_archive=(
+                args.vf_archive.read_bytes() if args.vf_archive is not None else None
+            ),
+            vf_run_metadata=(
+                _json(args.vf_run_metadata, "browser lane run metadata")
+                if args.vf_run_metadata is not None
+                else None
+            ),
+            vf_artifact_metadata=(
+                _json(args.vf_artifact_metadata, "browser lane artifact metadata")
+                if args.vf_artifact_metadata is not None
                 else None
             ),
         )
