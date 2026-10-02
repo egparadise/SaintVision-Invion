@@ -1,12 +1,12 @@
 ---
 doc_id: "HISTORY-CARD233-AGGREGATE-LANE-VF-INPUT-20261002"
 title: "카드 233 — 집계 lane이 브라우저 artifact를 security importer에 넘긴다. 그 lane의 봉투에 SEC-VF-001이 처음으로 들어왔다"
-version: "1.1.0"
+version: "1.2.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-02T19:36:10+09:00"
+updated: "2026-10-02T19:55:31+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "74035b39"
@@ -132,14 +132,86 @@ ac11-supplemental-missing.txt: 없음
 
 **변이 harness에서 찾은 내 실수 하나**: 첫 sweep을 `--timeout 300`과 함께 돌렸는데 이 checkout에 `pytest-timeout`이 없어 **pytest가 usage error(exit 4)로 거부**했고, "exit != 0 == 사살"로 읽은 harness가 **9건 전부 사살**이라고 보고했다. baseline을 같은 명령으로 돌려 보고 알아차렸다. harness를 exit 1만 사살로 세고 4는 즉시 중단하도록 고친 뒤 다시 돌리니 **생존 2건**이 나왔고(§3-1의 셋째·다섯째 행), 그 둘에 시험을 더해 닫았다.
 
+## 3-2. r3 재측정 — JSON 타입과 모집단
+
+Codex r3이 §3-1의 새 규칙에서 두 건을 찾았다. 둘 다 **fail-open**이었고 둘 다 재현됐다.
+
+### F1 — `0 == False`
+
+Python에서 `0 == False`이고 `isinstance(False, int)`도 참이다. 그래서 `decisive[field] != other[field]`와 `decisive[field] != expected`는 **타입이 다른 두 값을 같다고 보았다**. Codex probe: 한 run의 `exitCode`가 JSON number `0`, 다른 run이 JSON boolean `false`면 `ACCEPTED_TYPE_DISAGREEMENT`, 그리고 full importer는 boolean `exitCode`/`subprocessExitCode`를 **그대로 observations에 넣고 `SEC-VF-001 = MEASURED_PASS`**를 냈다. `tests.failure: false`도 기대값 `0`과 같다고 보았다.
+
+고친 방식은 "비교 전에 정본 validator가 **타입을 값의 일부로** 검사한다"다. `VF_FIELD_SHAPES`를 `VF_DECISIVE_FIELDS`와 **같은 key 집합**으로 선언하고(어긋나면 거부), `vf_decisive()`가 다섯 필드를 그 shape로 검사한 뒤에야 mapping을 돌려준다.
+
+| 필드 | shape |
+|---|---|
+| `caseIdentitiesSha256` | 64자 **소문자 hex 문자열**(`SHA256_RE`) |
+| `evidenceStatus` | **빈 문자열이 아닌** 문자열 |
+| `exitCode`·`subprocessExitCode` | **`bool`을 제외한** 정수, 음수 거부 |
+| `tests` | object이고 key가 **정확히** `error·failure·passed·skipped`, 각 값은 `bool` 제외 정수·음수 거부 |
+
+**검토 쪽도 같은 검사를 통과해야 한다** — `vf_required(spec)`가 자기 반환값을 `vf_decisive`로 통과시킨다. 검토된 allowlist에 `"failure": false`가 있어도 관측 `0`과 같아지는 **반대 방향**이 있기 때문이다. validator가 한 곳이므로 finder의 후보 비교와 full importer가 같은 규칙을 쓴다(Codex가 요구한 "양쪽에서 죽어야").
+
+### F2 — 모집단이 조용히 잘렸다
+
+`gh run list --workflow … --limit 50`은 **저장소의 최근 50개 run**을 돌려주고 SHA 필터는 그 **뒤에** 적용됐다. 같은 SHA의 상충 run이 그 창 밖에 있고 새 run만 창 안이면, "유리한 쪽 고르기 금지"가 **보이지 않는 후보** 때문에 무력화된다.
+
+이제 REST `GET /repos/{repo}/actions/runs?head_sha=<source>`를 `per_page=100`으로 **끝까지** 읽는다(`runs_at_head`). 세 가지가 거부다:
+
+1. GitHub가 말한 `total_count`와 **실제로 센 수가 다르면** 거부 — 짧은 목록은 "다른 후보가 없다"와 구분되지 않는다.
+2. `total_count`가 listing endpoint 한도(**1000**)를 넘으면 거부 — 완전함을 증명할 수 없다.
+3. 페이지 사이에 `total_count`가 **바뀌면** 거부 — 두 페이지가 서로 다른 모집단을 설명한다.
+
+그리고 REST run object에는 `path`가 있으므로(`gh run list --json`에는 없다 — §5-1) 같은 commit의 **다른 lane run**을 모집단에서 제외한다. workflow 경로의 **검증**은 여전히 importer 한 곳이다.
+
+### 재측정 (head `589a24a9`)
+
+| lane | run | 결과 |
+|---|---|---|
+| security scan | **`36997509044`** | success (dispatch) |
+| desktop browser | **`36997505319`** | success (pull_request), artifact `11222666107`, digest `39d76eb141f3657c…`(24594 bytes) |
+| desktop browser | **`36997512174`** | success (dispatch), artifact `11221822889`, digest `df8f0773b9739c0a…`(24596 bytes) |
+| **ac11-aggregate** | **`36997785758`** | success, artifact `11222825452` |
+
+모집단 조회가 그 commit에서 실제로 돌려준 수: **`total_count` 13**(그 중 browser run 둘). 봉투:
+
+```
+threatReportVerdicts: {"SEC-SCAN-001": "MEASURED_PASS", "SEC-VF-001": "MEASURED_PASS"}
+SEC-VF-001 sourceRunId 36997505319 (둘 중 작은 id) · artifactId 11222666107
+           digest == observedDigest == 39d76eb1… · tree 72778601
+           exitCode·subprocessExitCode int · evidenceStatus str · tests 네 값 모두 int
+ac11-supplemental-missing.txt: 없음
+```
+
+### 변이 (r3)
+
+| 변이 | 결과 |
+|---|---|
+| boolean을 정수로 센다 | 사살 |
+| float를 정수로 센다 | 사살 |
+| 음수 count를 받는다 | 사살 |
+| 아무 문자열이나 sha로 본다 | 사살 |
+| 아무 값이나 status로 본다 | 사살 |
+| `tests`의 key 집합을 보지 않는다 | 사살 |
+| shape 선언이 decisive 목록과 어긋나도 통과 | 사살 |
+| 검토 쪽을 shape 검사하지 않는다 | 사살 |
+| 잘린 모집단을 받는다 | 사살 |
+| 한도를 넘는 모집단을 받는다 | 사살 |
+| 조회 중 바뀐 모집단을 받는다 | 사살 |
+| 첫 페이지만 읽는다 | 사살 |
+| 다른 workflow의 run도 후보로 본다 | 사살 |
+| 조회 query에 `head_sha`를 넣지 않는다 | 사살 |
+| **합계** | **14/14 사살, 생존 0** |
+
 ## 4. 시험
 
 | 파일 | 무엇 |
 |---|---|
-| `tests/test_find_ac11_vf_evidence.py`(신설, **40**) | 후보가 0건·다른 head·실패·미완·승인되지 않은 event·id 없음을 **전부 거부**, 결정 필드별 **불일치 sweep**과 **누락 sweep**(각 5건), 세 번째 후보까지 비교, **digest가 달라도 수용됨**을 실제 run-local 값으로 단언, 후보 1건은 내려받지 않음, 뒤 후보의 artifact도 정확히 1개, 문서가 importer의 요구와 **정확히 같은 key 집합**, `main`이 두 후보 end-to-end(다운로드 2회·선택 run 재다운로드 없음)와 exit 0/2/3 **구분**, 그리고 **그 문서를 importer가 실제로 받아들인다** |
-| `tests/test_import_ac11_security_scan.py`(신설 **28**, 전체 110) | `--vf-evidence`가 셋을 넘긴 것과 **같은 봉투**를 낸다, 필수 key 제거·여분 key·**중복 key**(모든 입력 문서의 모든 수준 자동 순회) sweep, schema·repository·workflow 위조, **문서가 적은 id와 metadata의 id가 다른 두 경우**, 없는 archive, 문서와 개별 flag를 함께 주면 거부, 그리고 **검토 필드 == `VF_DECISIVE_FIELDS`**·결정 필드 누락 sweep |
+| `tests/test_find_ac11_vf_evidence.py`(신설, **60**) | r3: 모집단 페이징(**후보가 2페이지에 있는 경우**)·절단·1000 초과·조회 중 변동·읽을 수 없는 응답은 exit 2·같은 commit의 다른 workflow run 제외·호출 계약에 `head_sha`와 `per_page`가 들어있음, decisive 필드 **타입 혼동 10건**(`false`·`0.0`·`"0"`·extra key·非object 등) |
+| ↑ r2까지 | 후보가 0건·다른 head·실패·미완·승인되지 않은 event·id 없음을 **전부 거부**, 결정 필드별 **불일치 sweep**과 **누락 sweep**(각 5건), 세 번째 후보까지 비교, **digest가 달라도 수용됨**을 실제 run-local 값으로 단언, 후보 1건은 내려받지 않음, 뒤 후보의 artifact도 정확히 1개, 문서가 importer의 요구와 **정확히 같은 key 집합**, `main`이 두 후보 end-to-end(다운로드 2회·선택 run 재다운로드 없음)와 exit 0/2/3 **구분**, 그리고 **그 문서를 importer가 실제로 받아들인다** |
+| `tests/test_import_ac11_security_scan.py`(전체 **128**) | r3: **타입 혼동 15건이 full importer end-to-end에서 거부**(boolean exit code·boolean test count·float·대문자 sha·음수·exact key 위반 등), shape 선언 guard, **검토 쪽 기대값도 shape 검사** |
+| ↑ r2까지 | `--vf-evidence`가 셋을 넘긴 것과 **같은 봉투**를 낸다, 필수 key 제거·여분 key·**중복 key**(모든 입력 문서의 모든 수준 자동 순회) sweep, schema·repository·workflow 위조, **문서가 적은 id와 metadata의 id가 다른 두 경우**, 없는 archive, 문서와 개별 flag를 함께 주면 거부, 그리고 **검토 필드 == `VF_DECISIVE_FIELDS`**·결정 필드 누락 sweep |
 | `tests/core/test_assemble_ac11_manifest.py`(신설 4, 전체 75) | `supplementalEvidence`의 exact key, 모르는 threat id, flag가 아닌 값, tree에 없는 finder, `complete`가 아닌 사슬에 붙은 경우, 그리고 **정본 map에서 그 필드를 가진 행이 security 하나뿐** |
-| 합계 | 네 suite **363 passed**(finder 40 · importer 110 · manifest 75 · aggregator 138) |
+| 합계 | 네 suite **401 passed**(finder 60 · importer 128 · manifest 75 · aggregator 138) |
 
 **lane의 shell도 검사했다**: 집계 lane의 shell block **여섯 개 전부 `bash -n` exit 0**(추출해 실제로 돌렸다).
 
