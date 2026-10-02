@@ -1,12 +1,12 @@
 ---
 doc_id: "RUNBOOK-S08-BUILDKIT-PRODUCT-ENABLE-V1"
 title: "S08 BuildKit 제품 dispatch 활성화 절차 — 켜기 전에 확인할 것, 켜는 위치와 순서, 켠 직후 관측, 끄기와 격리 해제 (카드 238)"
-version: "1.2.0"
+version: "1.3.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "user"
-updated: "2026-10-02T21:49:05+09:00"
+updated: "2026-10-02T22:17:30+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "ed6033da"
@@ -112,9 +112,12 @@ printf '정본 head: %s\n' "$canonical"
 grep -rn "BuildExecutionWorker(" --include=*.py services | grep -v "/tests/" \
   || echo "worker를 구성하는 제품 코드 없음"
 
-# 2) 그 worker를 돌리는 프로세스/서비스 정의가 있는가
-grep -rn "build_execution_worker\|build-worker" docker-compose.prod.yml deploy/ \
-  || echo "worker 서비스 정의 없음"
+# 2) 그 worker를 돌리는 프로세스/서비스 정의가 있는가.
+#    서비스 **이름**은 이 문서가 정하지 않는다(카드 241이 정의를 가져온다) — 그래서 이름이 아니라
+#    코드가 요구하는 것으로 찾는다: 실행 모듈과 그 프로세스가 반드시 읽는 환경 변수.
+grep -rn "inv\.worker\|INV_WORKER_CONFIG\|INV_BUILDKIT_PRODUCT_ENABLED" \
+  docker-compose.prod.yml deploy/ 2>/dev/null \
+  || echo "worker 프로세스를 정의하는 배포 설정 없음"
 
 # 3) 그 작업(worker loop + producer)을 가져오는 PR의 상태와 포함 여부
 for pr in 311 312 318 323 327 331; do
@@ -152,14 +155,30 @@ for pr in 311 312 318 323 327 331; do
             --jq '[.[] | select(.name == "Backend Build" or .name == "Core Build")
                        | select(.conclusion == "success") | .name] | unique | join(",")')
   printf '#%s state=%s review=%s landed=%s green=[%s]\n' "$pr" "$state" "$review" "$landed" "$green"
-  if [ "$state" != "MERGED" ] || [ "$landed" = "no" ]; then blocked=1; fi
+  # 출력은 gate가 아니다. 네 조건을 모두 blocked에 넣는다 (#335 r2 N1).
+  if [ "$state" != "MERGED" ]; then blocked=1; fi
+  if [ "$landed" = "no" ]; then blocked=1; fi
+  case "$green" in
+    *"Backend Build"*) : ;;
+    *) blocked=1 ;;
+  esac
+  case "$green" in
+    *"Core Build"*) : ;;
+    *) blocked=1 ;;
+  esac
+  case "$review" in
+    APPROVED) : ;;
+    *) blocked=1 ;;
+  esac
 done
 if [ "$blocked" -ne 0 ]; then
-  echo "BLOCKED: MERGED가 아니거나 착지 tip의 조상이 아닌 PR이 있다 — 켜지 않는다"
+  echo "BLOCKED: MERGED·착지 tip의 조상·exact head의 Backend/Core success·APPROVED 중 하나라도 아닌 PR이 있다 — 켜지 않는다"
 fi
 ```
 
-**판정(운영 배포 tree)**: 여섯 모두 `state=MERGED`이고 `landed`가 `yes`(merge commit이 착지 tip의 조상)여야 하며, 각 head에서 **Backend Build와 Core Build가 `success`** 로 보여야 한다. `green`이 빈 칸이면 그 SHA에서 그 lane이 돌지 않은 것이고(`skipped`는 green이 아니다) 그것도 증거 없음이다. 하나라도 아니면 **`BLOCKED`** — 그 조각이 producer나 worker loop이면 켜도 아무 일도 일어나지 않는다.
+**판정(운영 배포 tree)**: 위 루프가 `BLOCKED`를 출력하지 않아야 한다 — **네 조건이 전부 gate**다: `state=MERGED`, `landed=yes`(merge commit이 착지 tip의 조상), 그 head에서 **Backend Build와 Core Build가 `success`**, 그리고 **`reviewDecision=APPROVED`**(독립 검토). `green`이 빈 칸이면 그 SHA에서 그 lane이 돌지 않은 것이고(`skipped`는 green이 아니다) 그것도 **증거 없음 = blocked**다.
+
+> **주의 — `reviewDecision`은 머지 뒤에 비어 보일 수 있다.** 그런 PR은 **승인 근거를 따로 확인**해야 하고(그 PR의 승인 코멘트 또는 진행판 `latest_codex_card`가 적는 exact head와 run id), 확인하지 못하면 **blocked로 둔다**. 출력만 보고 통과시키는 것이 r2가 지적한 바로 그 결함이다.
 
 **판정(후보 tree에서 연습할 때)**: 착지 전에 이 절차를 시험해 볼 수는 있다. 그때는 `state=MERGED`가 성립하지 않으므로 **연습이라고 적고** 운영 활성화의 전제로 쓰지 않는다.
 
@@ -320,41 +339,18 @@ gh run list --workflow s08-buildkit-reference.yml --commit "$(git rev-parse HEAD
 
 플래그가 켜져 있는데 `buildExecution`이 없으면 worker는 **시작하지 않는다**(`Build execution configuration unavailable`). 즉 **반쯤 켜진 상태는 없다.**
 
-### 3-1. **BLOCKED — 배포본에 worker 서비스 정의가 없다**
+### 3-1. **BLOCKED — 이 tree에는 그 프로세스를 돌릴 배포 정의가 없다. 그 정의는 카드 241이 가져온다**
 
-측정(§7): 이 tree의 `docker-compose.prod.yml`에는 **worker 서비스도, `INV_WORKER_CONFIG`도, `INV_BUILDKIT_PRODUCT_ENABLED`도 없다.** 그래서 지금은 **켤 수 있는 절차가 존재하지 않는다** — 아래 정의가 배포 설정에 들어오기 전까지 §3은 실행 절차가 아니라 **차단 상태**다. 필요한 정의는 위 표에서 그대로 나온다:
+측정(§7), **이 tree에서**:
 
-```yaml
-  # docker-compose.prod.yml — 배포 설정 담당이 PR로 추가한다(사용자가 노드에서 고치면 다음 배포에서 사라진다).
-  worker:
-    build:
-      context: .
-      dockerfile: deploy/Dockerfile.backend
-    container_name: saintvision-worker
-    command: ["python", "-m", "inv.worker"]
-    environment:
-      - INV_RUNTIME_DSN=${INV_RUNTIME_DSN:?Set the non-owner kernel login DSN}
-      - INV_RECOVERY_EPOCH=${INV_RECOVERY_EPOCH:?Set the reconciled database recovery epoch}
-      - INV_WORKER_CONFIG=/run/saintvision/worker.json
-      - INV_API_CONFIG=/run/saintvision/api.json
-      # 기본은 꺼짐. 켜는 것은 운영자 환경 파일의 한 줄이다(§3-2).
-      - INV_BUILDKIT_PRODUCT_ENABLED=${INV_BUILDKIT_PRODUCT_ENABLED:-0}
-    volumes:
-      # 설정과 mTLS 자료는 read-only. worker.json은 group/other 쓰기 권한이 없어야 한다.
-      - type: volume
-        source: server_config
-        target: /run/saintvision
-        read_only: true
-        volume:
-          nocopy: true
-    depends_on:
-      - postgres
-    restart: unless-stopped
-    networks:
-      - saintvision-net
-```
+- `docker-compose.prod.yml`에 **`inv.worker`를 실행하는 서비스가 없고**, `INV_WORKER_CONFIG`도 `INV_BUILDKIT_PRODUCT_ENABLED`도 **없다**.
+- `tools/prepare_server_config.py`의 `collect()`는 **`api.json`과 그 파일이 참조하는 파일만** config volume에 넣는다 — **`worker.json`을 넣는 경로가 없다**(그 함수는 `api.json`의 `identity.jwks_file`·`configurationReadiness`·`workspace`에서만 참조를 모은다).
 
-그 서비스가 **들어온 뒤** §3-2부터가 실행 절차가 된다. 그 전에는 §1-B·§1-D의 출력과 이 절을 함께 보고 **"아직 켤 수 없다"** 가 정답이다.
+**그래서 이 문서는 그 정의를 지어내지 않는다.** 배포 worker 서비스와 `INV_WORKER_CONFIG` 준비(= config volume에 `worker.json`이 들어가는 경로)는 **카드 241이 실제로 추가할 예정**이고, **그 PR이 착지한 뒤 이 절차는 그 정의를 따른다** — 서비스 이름·image·mount 경로·준비 명령은 그때 그 PR에서 읽는다. 여기 적어 두면 그 정의와 어긋날 수 있고, **어긋난 절차는 절차가 아니다**.
+
+> **이전 판(r1)은 여기에 compose 블록을 적었다.** 그것은 이 문서가 **지어낸** 정의였고, 서비스 이름(`worker`)과 `worker.json`을 named volume에 넣는 전제가 **배포 도구의 실제 지원 범위와 달랐다**(위 두 번째 측정). r2에서 그 블록을 **지우고** 조건부 서술로 바꿨다.
+
+**지금 정답은 "아직 켤 수 없다"** 이고 근거는 §1-B·§1-D의 출력과 이 절의 두 측정이다. §3-0의 세 가지 — **켜는 대상은 worker 프로세스**, **값은 정확히 `1`**, **그 프로세스를 재시작해야 읽힌다** — 는 **코드에서 읽은 것**이므로 카드 241이 무엇을 정하든 바뀌지 않는다. 그 아래 §3-2·§3-3은 그 정의가 생긴 뒤에 쓰는 뼈대이고, 그 전에는 실행하지 않는다.
 
 ### 3-2. 운영자 환경 파일에 값을 넣는다
 
@@ -381,7 +377,9 @@ stat -c '%a %U %n' /path/to/deployment/config/worker.json
 | 2 | node agent가 떠 있는지 **확인만** (§2-1) | `docker ps --filter "name=saintvision-<node>"` | 컨테이너를 다시 만들면 journal·epoch 화해가 필요해진다 |
 | 3 | **worker 재시작** | `docker compose -f docker-compose.prod.yml up -d --no-deps worker` | 환경 변수는 **프로세스 시작 시점**에 읽힌다(`worker.py`의 `main()`이 그때 `os.environ`를 보고 runtime을 구성한다). 재시작 없이는 켜지지 않는다 |
 | 4 | **그 프로세스**에서 읽기 확인 | `docker compose -f docker-compose.prod.yml exec -T worker printenv INV_BUILDKIT_PRODUCT_ENABLED` | `1`이 출력돼야 한다. 다른 값이면 §3-1·§3-2를 다시 본다 |
-| 5 | 한 tick만 돌려 구성이 성립하는지 확인(선택) | `docker compose -f docker-compose.prod.yml run --rm --no-deps worker python -m inv.worker --once` | 구성이 어긋나면 **시작 자체가 거부**되고(`Explicit delivery worker configuration unavailable`) 상주 프로세스를 건드리지 않는다 |
+| 5 | **구성이 성립했는지** 확인 | `docker compose -f docker-compose.prod.yml ps worker` 와 `docker compose -f docker-compose.prod.yml logs --tail 20 --no-color worker` | 구성이 어긋나면 그 프로세스는 **시작하지 못하고 종료**한다(`worker.py`의 `main()`이 `SystemExit("Explicit delivery worker configuration unavailable")`를 낸다). 그래서 **`ps`가 `Up`이 아니거나 로그 마지막 줄이 그 문장이면 구성이 틀린 것**이고, 이 확인은 **아무 것도 실행하지 않는다** |
+
+> **`--once`를 확인용으로 쓰지 않는다** (#335 r2 N4). `python -m inv.worker --once`는 설정만 보는 것이 아니라 **한 tick을 실제로 실행한다** — `worker.py`가 `build_runtime.once(tenant)`와 `worker.once(tenant)`를 차례로 부르므로, admission이 하나라도 `ready`면 **승격하고 dispatch한다**(외부 side effect와 소비된 claim이 남는다). 구성만 보려면 위 5행처럼 **프로세스가 떠 있는지와 그 종료 문장**을 본다.
 
 **`[sudo]` 아님**: 위 명령은 docker 그룹 권한으로 충분하다. 그 그룹 권한 자체를 부여하는 일이 `[sudo]`다(§6).
 
@@ -534,13 +532,13 @@ LIMIT 10;
 ### 4-6. 로그에서 같은 사건을 확인한다 (비밀 미출력)
 
 ```bash
-# reason code와 사건 이름만 본다. payload 전체를 출력하지 않는다.
-docker compose -f docker-compose.prod.yml logs --since 30m --no-color control-plane \
-  | grep -E "RES-0006|IDEM-0001|NODE-00(15|32|33)|inv\.build\.(dispatch_completed|node_quarantined|quarantine_preflight_unavailable)" \
+# 제품 dispatch가 사는 프로세스는 worker다. reason code만 보고 payload는 출력하지 않는다.
+docker compose -f docker-compose.prod.yml logs --since 30m --no-color worker \
+  | grep -E "Explicit delivery worker configuration unavailable|build intent could not be safely requeued|RES-0006|IDEM-0001|NODE-00(15|32|33)" \
   | tail -40
 ```
 
-**읽는 법**: `RES-0006`이 반복되면 제품 경로가 **capability 부족으로 거부**하고 있다(§1-E). `NODE-0033`은 epoch·node 상태(§1-F), `NODE-0032`는 인증서 pin(§2-2)이다.
+**읽는 법 — 그리고 로그가 말해 주지 않는 것** (#335 r2 N5). 제품 loop는 **tick마다 아무것도 기록하지 않는다**: `worker.py`의 `consume_builds()`가 결과를 지역 변수에만 담고(`outcome`) 로그를 남기지 않으며, 예외도 그 변수로 삼켜진다. 그래서 **켜졌는지·돌고 있는지의 정본 관측은 §4의 DB 행**이고 로그는 보조다. 로그에서 볼 수 있는 것은 셋이다 — ① 시작 실패(`Explicit delivery worker configuration unavailable`), ② `build intent could not be safely requeued`(`build_execution_worker.py`의 유일한 로그 — 되돌릴 수 없는 상태를 기록한다), ③ 그 외 reason code가 보일 때. `RES-0006`이 반복되면 capability 부족(§1-E), `NODE-0033`은 epoch·node 상태(§1-F), `NODE-0032`는 인증서 pin(§2-2)이다. **control-plane 로그에는 이 경로가 없다** — API 프로세스는 제품 runtime을 구성하지 않는다.
 
 ---
 
@@ -659,8 +657,11 @@ curl -sS -X POST "$CP/v1/nodes/<nodeId>/resume" \
 | §4-1~§4-6의 SQL 10개 | 같은 방식으로 **실제 실행**(placeholder만 psycopg 형식 `%(tenant)s`로, `LIKE 'inv.build.%'`의 `%`는 psycopg 규칙대로 두 번 — 문장과 열 이름은 위와 같다) | 10/10 실행 성공(행 0개) |
 | §3-0의 **아홉 key 엄격 요구** | `configured_tenant_product_runtime()`에 **여덟 key**(`nodeId` 누락)와 **열 key**(여분 1개)를 실제로 넘겨 호출 | 둘 다 `ValueError: Exact build execution configuration required` — **DB에 닿기 전에** 거부한다 |
 | §3-1의 worker 서비스 정의가 **배포본에 없음** | `grep -n "INV_WORKER_CONFIG\|worker" docker-compose.prod.yml` | 결과 **0건**. `INV_WORKER_CONFIG`는 `deploy/CONFIGURED-SERVER.md`의 서술에만 있고 compose 정의에는 없다 → §3은 **BLOCKED** |
-| §3-1의 worker 서비스 YAML | `docker-compose.prod.yml`의 `services:` 아래에 넣고 `yaml.safe_load` | parse 성공 — `command: python -m inv.worker`, 다섯 환경 변수, config/TLS volume이 `read_only: true`, 기존 네 서비스 유지 |
+| ~~§3-1의 worker 서비스 YAML~~ | (r1에서 `yaml.safe_load`로 확인했다) | **r2에서 그 블록을 지웠다** — 이 문서가 **지어낸** 정의였고 `tools/prepare_server_config.py`의 실제 지원 범위와 달랐다. 정의는 **카드 241**이 가져온다(§3-1) |
 | §2-3의 digest 고정 이미지 출처 | `.github/workflows/s08-buildkit-reference.yml`에서 `BUILDKIT_ROOTLESS_IMAGE`를 읽는 명령 실행 | `docker.io/moby/buildkit@sha256:…` 형식(digest 고정)을 돌려준다 |
+| `tools/prepare_server_config.py`의 범위 | `collect()`를 읽었다 | `api.json`과 **그 파일이 참조하는 파일만** config volume에 넣는다(`identity.jwks_file`·`configurationReadiness`·`workspace`의 참조). **`worker.json` 경로는 없다** → §3-1의 두 번째 측정 |
+| `--once`가 무엇을 하는가 | `services/control-plane/src/inv/worker.py`의 `--once` 분기를 읽었다 | `build_runtime.once(tenant)`와 `worker.once(tenant)`를 **실제로 호출한다** — 구성 검사가 아니라 **한 tick 실행**이다. 그래서 §3-3의 확인용 명령에서 **빼고** 경고를 달았다 |
+| 제품 loop의 로그 | `consume_builds()`와 `build_execution_worker.py`의 `LOGGER` 사용을 읽었다 | loop는 **tick마다 아무것도 기록하지 않는다**(`outcome`을 변수에만 담는다). 그 경로의 로그는 **시작 실패 문장**과 `build intent could not be safely requeued` **하나**뿐 → §4-6을 `worker` 대상으로 바꾸고 그 사실을 적었다 |
 | §1-A·B·E의 `grep` 명령 | 이 checkout에서 실제 실행 | **A는 네 자리**(`build_execution.py` 정의와 service 검사, `worker.py:78` 구성 분기, `build_product_runtime.py:330` tick, `build_execution_worker.py:443` claim 전)에서 줄이 나왔다. **B는 "선언 없음"**(worker 서비스도 `INV_WORKER_CONFIG`도 compose에 없다). E의 `NodeAgentReceipts(` 제품 호출은 **`build_product_runtime.py` 한 곳**(= `#331`이 가져온 composition) |
 | §1-D (4)의 착지 gate | `gh pr view` + `git ls-remote` + `git merge-base --is-ancestor` 실제 실행 | 여섯 PR 모두 **`OPEN`**(merge commit 없음)이고 착지 tip의 조상이 아니다 → 운영 기준으로는 **`BLOCKED`**. 이 tree는 후보 tree이므로 §1-D의 "연습" 판정이다 |
 | 셸 블록 문법 | 이 문서의 모든 bash 블록을 추출해 `bash -n` | exit 0 |
@@ -669,7 +670,8 @@ curl -sS -X POST "$CP/v1/nodes/<nodeId>/resume" \
 **확인하지 못한 것** — 모두 사내망 노드나 살아 있는 배포가 필요하고, 이 PC에서 실행하면 거짓이 된다:
 
 - §2의 노드 명령(`docker ps`·`openssl`·`buildctl debug workers`·`systemctl --user`) — **노드에서만** 의미가 있다. 문법만 확인했다.
-- §3-2·§3-3의 환경 파일 쓰기와 재시작, §3-3 5행의 `--once`, §5-1의 `printenv` — **worker 서비스 정의가 배포본에 없으므로**(§3-1) 실행할 대상이 아직 없다. 정의가 들어온 뒤 처음 켜는 사람이 그 출력을 남긴다.
+- §3-2·§3-3의 환경 파일 쓰기와 재시작, §3-3 5행의 상태 확인, §5-1의 `printenv` — **그 프로세스를 돌릴 배포 정의가 이 tree에 없으므로**(§3-1) 실행할 대상이 아직 없다. **카드 241이 그 정의를 가져온 뒤** 처음 켜는 사람이 그 출력을 남긴다.
+- **worker 서비스 이름·image·mount 경로와 `worker.json` 준비 명령** — 이 문서는 **지어내지 않는다**(r2). 카드 241의 정의가 정본이고, 그때 §1-B·§1-D(2)·§3-1·§3-3을 그 이름으로 다시 읽는다.
 - §5의 `curl` 호출 — 살아 있는 CP와 **두 사람의** 토큰이 필요하다. 요청 본문과 **필수 헤더**는 정본 코드·schema에서 읽어 적었다(`app.py`의 decision 경로가 `Idempotency-Key`를 검증한다 — 그래서 §5-2의 decision 예제에 그 헤더가 있다).
 - **제품 dispatch 한 번의 실제 관측** — admission·intent·claim·Evidence를 실제로 만드는 것은 producer와 worker 프로세스이고, 그 배포 정의가 없다. §4의 쿼리는 **그 경로가 생긴 뒤 처음 켜는 사람이 실행할 것**이고, 쿼리 자체는 위에서 실제로 돌려 확인했다.
 - `0060`의 `ready`/`quarantined` **표본 행**을 만들어 §4-0의 출력을 눈으로 보는 것 — admission insert guard가 세 문서의 tenant/project/정책 결속과 digest 재계산을 요구하므로, 손으로 만든 행이 아니라 **producer가 넣은 행**이어야 의미가 있다. `#331`의 real-PG 시험이 그 경로를 덮고, 이 문서는 **쿼리가 그 head에서 실행된다는 것까지** 확인했다.
