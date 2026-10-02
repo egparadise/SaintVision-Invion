@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.271"
+version: "1.0.272"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T12:46:10+09:00"
+updated: "2026-10-02T14:13:22+09:00"
 source_of_truth: "Git"
 active_card: "CARD-222 node-agent durable quarantine channel"
-active_card_status: "Claude r3 condition addressed: Node-wide quarantine resume requires every scope settled, trusted stop receipt, fresh observation and two-person approval"
-active_card_next: "Push r2 fixes, obtain exact-head Core/Backend green and Claude r3, then start Card 223 product caller on the approved head"
+active_card_status: "Approved by Claude r4 at 2dd25ff7 with exact-head Core 36962173155 and Backend 36962173156 green; Node-wide quarantine resume requires every scope settled, trusted stop receipt, fresh observation and two-person approval"
+active_card_next: "Land with its train; Card 223 product caller (#323, migration 0059) continues on this approved head; quarantine-specific unauthorized-clear negatives are Claude card 227"
 ---
 
 ## 2026-10-02 Card 222 — node-agent durable quarantine channel
