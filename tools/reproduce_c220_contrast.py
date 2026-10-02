@@ -50,13 +50,13 @@ def composite(fg_rgba: tuple[int, int, int, float], bg_rgb: tuple[int, int, int]
 
 def parse_css_tokens(css_path: Path) -> tuple[dict[str, tuple[int, int, int]], dict[str, tuple[int, int, int]]]:
     content = css_path.read_text(encoding="utf-8")
-    
+
     root_match = re.search(r":root\s*\{([\s\S]*?)\}", content)
     dark_match = re.search(r"\[data-theme=['\"]dark['\"]\]\s*\{([\s\S]*?)\}", content)
-    
+
     if not root_match or not dark_match:
         raise ValueError("Could not parse :root or [data-theme='dark'] from index.css")
-        
+
     def extract_tokens(block: str) -> dict[str, tuple[int, int, int]]:
         tokens = {}
         for line in block.splitlines():
@@ -69,7 +69,7 @@ def parse_css_tokens(css_path: Path) -> tuple[dict[str, tuple[int, int, int]], d
 
 def main() -> int:
     light_tokens, dark_tokens = parse_css_tokens(INDEX_CSS)
-    
+
     # 25 Canonical Audit Items for ReleaseCandidateView
     ITEMS = [
         # (label, before_fg, (before_alpha_str, before_bg_key), after_fg_token, after_bg_token, min_cr)
@@ -103,7 +103,7 @@ def main() -> int:
     all_passed = True
     for label, b_fg, b_bg, a_fg, a_bg, min_cr in ITEMS:
         fg_before = hex_to_rgb(b_fg)
-        
+
         if isinstance(b_bg, tuple):
             rgba_str, bg_key = b_bg
             m = re.match(r"rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)", rgba_str)

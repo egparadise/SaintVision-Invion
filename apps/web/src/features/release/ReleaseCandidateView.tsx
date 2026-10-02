@@ -84,6 +84,42 @@ export const CANDIDATE_STATUS_CONFIG: Record<CandidateActiveStatus, CandidateSta
   },
 };
 
+export function getSloStatusConfig(status?: string | null): SloStatusStyle {
+  if (status && status in SLO_STATUS_CONFIG) {
+    return SLO_STATUS_CONFIG[status as SloRecordStatus];
+  }
+  return {
+    color: 'var(--color-status-unknown)',
+    border: 'var(--color-status-unknown)',
+    bg: 'var(--color-bg-subtle)',
+    label: `UNKNOWN (${status || 'UNKNOWN'})`,
+  };
+}
+
+export function getAuditStatusConfig(status?: string | null): AuditStatusStyle {
+  if (status && status in AUDIT_STATUS_CONFIG) {
+    return AUDIT_STATUS_CONFIG[status as AuditStatus];
+  }
+  return {
+    color: 'var(--color-status-unknown)',
+    border: 'var(--color-status-unknown)',
+    bg: 'var(--color-bg-subtle)',
+    label: `UNKNOWN (${status || 'UNKNOWN'})`,
+  };
+}
+
+export function getCandidateStatusConfig(status?: string | null): CandidateStatusStyle {
+  if (status && status in CANDIDATE_STATUS_CONFIG) {
+    return CANDIDATE_STATUS_CONFIG[status as CandidateActiveStatus];
+  }
+  return {
+    color: 'var(--color-status-unknown)',
+    border: 'var(--color-status-unknown)',
+    bg: 'var(--color-bg-subtle)',
+    label: `UNKNOWN (${status || 'UNKNOWN'})`,
+  };
+}
+
 export const ReleaseCandidateView: React.FC<ReleaseCandidateViewProps> = ({ initialEvidence }) => {
   const [releaseManager] = useState<ReleaseManager>(() => new ReleaseManager());
   const [slos] = useState(() =>
@@ -250,8 +286,6 @@ export const ReleaseCandidateView: React.FC<ReleaseCandidateViewProps> = ({ init
             border: '1px solid var(--color-border-subtle)',
             borderRadius: '8px',
             padding: '16px 20px',
-            outline: '2px solid var(--color-brand-primary)',
-            outlineOffset: '2px',
           }}
         >
           <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', fontWeight: 600 }}>현재 활성 릴리스 후보 (RC)</div>
@@ -318,7 +352,7 @@ export const ReleaseCandidateView: React.FC<ReleaseCandidateViewProps> = ({ init
               </thead>
               <tbody>
                 {slos.map((slo) => {
-                  const statusCfg = SLO_STATUS_CONFIG[slo.status as SloRecordStatus] || SLO_STATUS_CONFIG.unmeasured;
+                  const statusCfg = getSloStatusConfig(slo.status);
                   return (
                     <tr key={slo.name} style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
                       <td style={{ padding: '8px', fontWeight: 500, color: 'var(--color-text-primary)' }}>{slo.name}</td>
@@ -373,7 +407,7 @@ export const ReleaseCandidateView: React.FC<ReleaseCandidateViewProps> = ({ init
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {audits.map((audit) => {
-              const auditCfg = AUDIT_STATUS_CONFIG[audit.status as AuditStatus] || AUDIT_STATUS_CONFIG.fail;
+              const auditCfg = getAuditStatusConfig(audit.status);
               return (
                 <div
                   key={audit.ruleId}
@@ -475,7 +509,7 @@ export const ReleaseCandidateView: React.FC<ReleaseCandidateViewProps> = ({ init
             </thead>
             <tbody>
               {candidates.map((rc) => {
-                const rcCfg = CANDIDATE_STATUS_CONFIG[rc.isActive ? 'active' : 'waiting'];
+                const rcCfg = getCandidateStatusConfig(rc.isActive ? 'active' : 'waiting');
                 return (
                   <tr key={rc.tag} style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
                     <td style={{ padding: '10px 8px', fontWeight: 600, color: 'var(--color-text-primary)' }}>{rc.tag}</td>
