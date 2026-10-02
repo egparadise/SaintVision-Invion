@@ -5,6 +5,7 @@ import { DistributedRecoveryManager, ResilientNodeState } from './recoveryEngine
 
 interface DistributedRecoveryViewProps {
   nodes: NodeItem[];
+  recoveryManager?: DistributedRecoveryManager;
 }
 
 interface NodeHealthConfig {
@@ -13,6 +14,13 @@ interface NodeHealthConfig {
   bg: string;
   border: string;
 }
+
+export const NODE_HEALTH_UNKNOWN_CONFIG: NodeHealthConfig = {
+  label: 'UNKNOWN',
+  color: 'var(--color-status-neutral)',
+  bg: 'var(--color-bg-subtle)',
+  border: 'var(--color-border-subtle)',
+};
 
 export const NODE_HEALTH_CONFIG: Record<ResilientNodeState['healthState'], NodeHealthConfig> = {
   online: {
@@ -47,8 +55,8 @@ export const NODE_HEALTH_CONFIG: Record<ResilientNodeState['healthState'], NodeH
   },
 };
 
-export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = ({ nodes }) => {
-  const [recoveryManager] = useState<DistributedRecoveryManager>(() => {
+export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = ({ nodes, recoveryManager: propRecoveryManager }) => {
+  const [internalManager] = useState<DistributedRecoveryManager>(() => {
     return new DistributedRecoveryManager(
       nodes.map((n, i) => ({
         nodeId: n.id,
@@ -59,9 +67,10 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
       }))
     );
   });
+  const recoveryManager = propRecoveryManager || internalManager;
 
   const [resilientNodes, setResilientNodes] = useState<ResilientNodeState[]>(() => recoveryManager.getNodes());
-  const [selectedNodeId, setSelectedNodeId] = useState<string>(() => nodes[0]?.id || '');
+  const [selectedNodeId, setSelectedNodeId] = useState<string>(() => recoveryManager.getNodes()[0]?.nodeId || nodes[0]?.id || '');
   const [actionNotice, setActionNotice] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
   const [checkouts, setCheckouts] = useState<
     Array<{
@@ -76,19 +85,21 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
     }>
   >([]);
 
-  // Sync incoming nodes prop with recoveryManager
+  // Sync incoming nodes prop with recoveryManager (only if recoveryManager not explicitly injected)
   useEffect(() => {
-    recoveryManager.syncNodes(
-      nodes.map((n, i) => ({
-        nodeId: n.id,
-        hostname: n.hostname,
-        activeWorkspaces: i + 1,
-        status: n.status,
-        heartbeatAt: n.heartbeatAt ?? null,
-      }))
-    );
+    if (!propRecoveryManager) {
+      recoveryManager.syncNodes(
+        nodes.map((n, i) => ({
+          nodeId: n.id,
+          hostname: n.hostname,
+          activeWorkspaces: i + 1,
+          status: n.status,
+          heartbeatAt: n.heartbeatAt ?? null,
+        }))
+      );
+    }
     setResilientNodes(recoveryManager.getNodes());
-  }, [nodes, recoveryManager]);
+  }, [nodes, recoveryManager, propRecoveryManager]);
 
   const selectedNode = resilientNodes.find((n) => n.nodeId === selectedNodeId) || resilientNodes[0];
 
@@ -346,12 +357,16 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
               {resilientNodes.map((node) => {
                 const isSelected = selectedNode && node.nodeId === selectedNode.nodeId;
-                const healthCfg = NODE_HEALTH_CONFIG[node.healthState] || {
-                  label: (node.healthState || 'UNKNOWN').toUpperCase(),
-                  color: 'var(--color-status-neutral)',
-                  bg: 'var(--color-bg-subtle)',
-                  border: 'var(--color-border-subtle)',
-                };
+                const healthCfg =
+                  (node.healthState && NODE_HEALTH_CONFIG[node.healthState]) ||
+                  (node.healthState
+                    ? {
+                        label: String(node.healthState).toUpperCase(),
+                        color: 'var(--color-status-neutral)',
+                        bg: 'var(--color-bg-subtle)',
+                        border: 'var(--color-border-subtle)',
+                      }
+                    : NODE_HEALTH_UNKNOWN_CONFIG);
 
                 return (
                   <div
@@ -360,7 +375,7 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
                     tabIndex={0}
                     data-testid={`node-card-${node.nodeId}`}
                     aria-pressed={isSelected}
-                    aria-label={`${node.hostname} (실제: ${node.actualStatus || 'unknown'}, 시뮬레이션: ${node.healthState.toUpperCase()})`}
+                    aria-label={`${node.hostname} (실제: ${node.actualStatus || 'unknown'}, 시뮬레이션: ${(node.healthState || 'unknown').toUpperCase()})`}
                     onClick={() => setSelectedNodeId(node.nodeId)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {

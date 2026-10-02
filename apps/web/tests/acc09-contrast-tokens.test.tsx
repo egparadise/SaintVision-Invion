@@ -8,7 +8,15 @@ import ts from 'typescript';
 import { RunDetail } from '../src/features/runs/RunDetail';
 import { SealRecordPanel } from '../src/features/runs/SealRecordPanel';
 import { RunList } from '../src/features/runs/RunList';
-import { DistributedRecoveryView, NODE_HEALTH_CONFIG } from '../src/features/recovery/DistributedRecoveryView';
+import {
+  DistributedRecoveryView,
+  NODE_HEALTH_CONFIG,
+  NODE_HEALTH_UNKNOWN_CONFIG,
+} from '../src/features/recovery/DistributedRecoveryView';
+import {
+  DistributedRecoveryManager,
+  evaluateInitialHealth,
+} from '../src/features/recovery/recoveryEngine';
 import { NodeList } from '../src/features/nodes/NodeList';
 import { NodeDetail } from '../src/features/nodes/NodeDetail';
 import { DeveloperStudio } from '../src/features/studio/DeveloperStudio';
@@ -4627,6 +4635,67 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(NODE_HEALTH_CONFIG.recovering.color, 'recovering color must match active status token').toBe('var(--color-status-active)');
       expect(NODE_HEALTH_CONFIG.fenced.border, 'fenced border must match border-strong token').toBe('var(--color-border-strong)');
 
+      // 1-j. Fail-Closed Non-Color State Contract & Negative Fallback Verification
+      // A: Engine level negative checks
+      expect(evaluateInitialHealth('unknown', null).health, 'Unreported heartbeat with unknown status must evaluate to offline').toBe('offline');
+      expect(evaluateInitialHealth(undefined, null).health, 'Missing status and heartbeat must evaluate to offline').toBe('offline');
+      expect(evaluateInitialHealth('corrupted_status' as any, null).health, 'Corrupted status must evaluate to offline').toBe('offline');
+      expect(evaluateInitialHealth('online', null).health, 'Online status without heartbeat must evaluate to stale, never silently online').toBe('stale');
+      expect(evaluateInitialHealth('recovering', new Date().toISOString()).health, 'Recovering status with fresh heartbeat must evaluate to recovering').toBe('recovering');
+
+      // B: Config fallback contract: unknown telemetry states must never silently fallback to ONLINE
+      expect(NODE_HEALTH_UNKNOWN_CONFIG.label).toBe('UNKNOWN');
+      expect(NODE_HEALTH_UNKNOWN_CONFIG.color).toBe('var(--color-status-neutral)');
+      expect(NODE_HEALTH_UNKNOWN_CONFIG.color).not.toBe('var(--color-status-online)');
+
+      // C: DOM level negative checks: render view with unmapped/corrupted and missing health states
+      const failClosedMgr = new DistributedRecoveryManager([
+        {
+          nodeId: 'nod_rec_unmapped',
+          hostname: 'worker-unmapped.saint.local',
+          status: 'corrupted_variant',
+          heartbeatAt: new Date().toISOString(),
+        },
+        {
+          nodeId: 'nod_rec_missing',
+          hostname: 'worker-missing.saint.local',
+          status: 'unknown',
+          heartbeatAt: null,
+        },
+      ]);
+      // Force unmapped healthState to simulate unhandled or newly introduced backend telemetry variant
+      (failClosedMgr.getNodes()[0] as any).healthState = 'unknown_variant';
+      // Force null/undefined healthState to simulate missing state field
+      (failClosedMgr.getNodes()[1] as any).healthState = undefined;
+
+      await act(async () => {
+        root.render(<DistributedRecoveryView key="fail-closed" nodes={[]} recoveryManager={failClosedMgr} />);
+      });
+
+      const simBadgeUnmapped = container.querySelector('[data-testid="node-sim-status-nod_rec_unmapped"]') as HTMLElement;
+      expect(simBadgeUnmapped, 'Unmapped node badge must render').not.toBeNull();
+      expect(simBadgeUnmapped.textContent, 'Unmapped state must render uppercase label, not ONLINE').toBe('시뮬레이션: UNKNOWN_VARIANT');
+      expect(simBadgeUnmapped.textContent).not.toContain('ONLINE');
+      expect(simBadgeUnmapped.style.color, 'Unmapped state must use neutral token, not online').toBe('var(--color-status-neutral)');
+      expect(simBadgeUnmapped.style.color).not.toBe('var(--color-status-online)');
+      expect(simBadgeUnmapped.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(simBadgeUnmapped.style.borderColor).toBe('var(--color-border-subtle)');
+
+      const simBadgeMissing = container.querySelector('[data-testid="node-sim-status-nod_rec_missing"]') as HTMLElement;
+      expect(simBadgeMissing, 'Missing state node badge must render').not.toBeNull();
+      expect(simBadgeMissing.textContent, 'Missing state must render UNKNOWN fallback, not ONLINE').toBe('시뮬레이션: UNKNOWN');
+      expect(simBadgeMissing.textContent).not.toContain('ONLINE');
+      expect(simBadgeMissing.style.color, 'Missing state must use neutral token, not online').toBe('var(--color-status-neutral)');
+      expect(simBadgeMissing.style.color).not.toBe('var(--color-status-online)');
+      expect(simBadgeMissing.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(simBadgeMissing.style.borderColor).toBe('var(--color-border-subtle)');
+
+      // Verify aria-label non-crashing and semantic fallback for unmapped and missing states
+      const cardUnmapped = container.querySelector('[data-testid="node-card-nod_rec_unmapped"]') as HTMLElement;
+      expect(cardUnmapped.getAttribute('aria-label')).toBe('worker-unmapped.saint.local (실제: corrupted_variant, 시뮬레이션: UNKNOWN_VARIANT)');
+      const cardMissing = container.querySelector('[data-testid="node-card-nod_rec_missing"]') as HTMLElement;
+      expect(cardMissing.getAttribute('aria-label')).toBe('worker-missing.saint.local (실제: unknown, 시뮬레이션: UNKNOWN)');
+
       // 2. Empty state screen
       await act(async () => {
         root.render(<DistributedRecoveryView nodes={[]} />);
@@ -5404,7 +5473,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
 
     // Exact count verification for var(--color-border-subtle)
-    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 401').toBe(401);
+    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 402').toBe(402);
     expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 27').toBe(27);
 
     // Fail-closed check 3: Total files with color literals must not exceed baseline file count

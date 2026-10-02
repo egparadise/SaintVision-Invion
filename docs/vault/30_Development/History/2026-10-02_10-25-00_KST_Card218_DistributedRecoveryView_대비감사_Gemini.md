@@ -22,7 +22,7 @@ ACC-09(접근성 명도 대비 적합화) 트랙의 후속 영역으로, 분산 
 - **감사 및 조치 결과**:
   - `DistributedRecoveryView.tsx`: 16종(81 occurrences) -> **0건** (리터럴 잔여 0건 multiset `{}` 달성).
   - `COLOR_LITERAL_MULTISET_BASELINE`에서 `features/recovery/DistributedRecoveryView.tsx`의 허용 multiset을 `{}` (0건)으로 래칫 고정.
-  - 전역 `var(--color-border-subtle)` 사용 횟수: **401건**, 사용 파일 수: **27개** (정확 일치 래칫 통과).
+  - 전역 `var(--color-border-subtle)` 사용 횟수: **402건**, 사용 파일 수: **27개** (정확 일치 래칫 통과).
   - 레거시 하드코딩 리터럴 잔여 상한 래칫 전면 강화:
     - `#30363d`: 55건 이하(9개 파일) -> **43건 이하(8개 파일 이하, 실측치 정확 고정)**
   - 비색상 변경: 노드 카드 및 체크아웃/감사 아이템 testid 추가, 체크아웃 상태 active 여부에 따른 토큰 조건화, 미지 헬스 상태 원문 텍스트 및 neutral 토큰 안전 폴백, 선택 카드는 2px brand-hover 테두리로 구분하며 브라우저 전역 :focus-visible 키보드 포커스 링을 온전히 보존.
@@ -131,56 +131,60 @@ reconciliation item failure / subtle  | Before:  5.65:1 (L actual on #0d1117) / 
 
 ## 3. 재현 가능한 뮤테이션 테스트 및 결함 사살 검증 (`tools/test_c218_mutations.py`)
 
-`tools/test_c218_mutations.py`를 실행하여 18종의 다양한 단일 변이(A1~A4 배경/전경 충돌 및 텍스트 토큰 배경화, B1 포커스 링 outline:none 주입 회귀, C1 배지 투명도 감쇠, D1~D2 레거시 리터럴 회귀, F1~F3 상태 붕괴 및 테두리 약화, G1~G3 배지 텍스트 레이블 제거/빈문자열/상태붕괴, E1~E4 알림/거부/빈화면 테두리·전경 스왑)를 시험하였으며, **18종 전수 사살(100.0% Kill Rate)**을 확인하였습니다.
+`tools/test_c218_mutations.py`를 실행하여 20종의 다양한 단일 변이(A1~A4 배경/전경 충돌 및 텍스트 토큰 배경화, B1 포커스 링 outline:none 주입 회귀, C1 배지 투명도 감쇠, D1~D2 레거시 리터럴 회귀, F1~F3 상태 붕괴 및 테두리 약화, G1~G3 배지 텍스트 레이블 제거/빈문자열/상태붕괴, H1~H2 미지/누락 상태 fail-open ONLINE 회귀 변이, E1~E4 알림/거부/빈화면 테두리·전경 스왑)를 시험하였으며, **20종 전수 사살(100.0% Kill Rate)**을 확인하였습니다.
 
 ```text
 ================================================================================
- Card 218 (ACC-09): Reproducible Mutant Test Suite (18 Mutants: M1-M18)
+ Card 218 (ACC-09): Reproducible Mutant Test Suite (20 Mutants: M1-M20)
  Target: DistributedRecoveryView.tsx
 ================================================================================
 
 [Baseline Check] Testing unmutated code...
 [Baseline Check] Clean pass (exit code 0).
 
-[01/18] M1 (A1): KILLED in 5.4s -- DistributedRecoveryView: notice banner bg -> brand-hover (fg==bg collision)
+[01/20] M1 (A1): KILLED in 6.0s -- DistributedRecoveryView: notice banner bg -> brand-hover (fg==bg collision)
          Reason: AssertionError: expected 'var(--color-brand-hover)' to be 'var(--color-bg-subtle)' // Object.is equa
-[02/18] M2 (A2): KILLED in 4.8s -- DistributedRecoveryView: NODE_HEALTH_CONFIG.online.bg -> status-online (fg==bg collision)
+[02/20] M2 (A2): KILLED in 6.0s -- DistributedRecoveryView: NODE_HEALTH_CONFIG.online.bg -> status-online (fg==bg collision)
          Reason: AssertionError: expected 'var(--color-status-online)' to be 'var(--color-bg-subtle)' // Object.is eq
-[03/18] M3 (A3): KILLED in 5.0s -- DistributedRecoveryView: NODE_HEALTH_CONFIG.fenced.bg -> text-secondary (text token as bg)
+[03/20] M3 (A3): KILLED in 5.4s -- DistributedRecoveryView: NODE_HEALTH_CONFIG.fenced.bg -> text-secondary (text token as bg)
          Reason: AssertionError: expected 'var(--color-text-secondary)' to be 'var(--color-bg-subtle)' // Object.is e
-[04/18] M4 (A4): KILLED in 5.2s -- DistributedRecoveryView: node card unselected border -> bg-surface (border==bg collision)
+[04/20] M4 (A4): KILLED in 4.8s -- DistributedRecoveryView: node card unselected border -> bg-surface (border==bg collision)
          Reason: AssertionError: expected 'var(--color-bg-surface)' to be 'var(--color-border-subtle)' // Object.is e
-[05/18] M5 (B1): KILLED in 5.3s -- DistributedRecoveryView: unselected node card given inline outline: "none" (destroying :focus-visible keyboard focus ring)
+[05/20] M5 (B1): KILLED in 5.1s -- DistributedRecoveryView: unselected node card given inline outline: "none" (destroying :focus-visible keyboard focus ring)
          Reason: AssertionError: expected 'none none' to be '' // Object.is equality
-[06/18] M6 (C1): KILLED in 5.6s -- DistributedRecoveryView: status badge opacity degraded to 0.4
+[06/20] M6 (C1): KILLED in 4.5s -- DistributedRecoveryView: status badge opacity degraded to 0.4
          Reason: AssertionError: Online badge must not have degraded opacity: expected '0.4' to be '1' // Object.is e
-[07/18] M7 (D1): KILLED in 5.1s -- DistributedRecoveryView: NODE_HEALTH_CONFIG.online.color reverted to legacy literal #3fb950
+[07/20] M7 (D1): KILLED in 4.7s -- DistributedRecoveryView: NODE_HEALTH_CONFIG.online.color reverted to legacy literal #3fb950
          Reason: AssertionError: expected '#3fb950' to be 'var(--color-status-online)' // Object.is equality
-[08/18] M8 (D2): KILLED in 4.9s -- DistributedRecoveryView: recovering color reverted to legacy literal #58a6ff
+[08/20] M8 (D2): KILLED in 4.6s -- DistributedRecoveryView: recovering color reverted to legacy literal #58a6ff
          Reason: AssertionError: expected '#58a6ff' to be 'var(--color-status-active)' // Object.is equality
-[09/18] M9 (F1): KILLED in 6.7s -- DistributedRecoveryView: recovering color collapsed to status-neutral (fenced collision)
+[09/20] M9 (F1): KILLED in 4.5s -- DistributedRecoveryView: recovering color collapsed to status-neutral (fenced collision)
          Reason: AssertionError: expected 'var(--color-status-neutral)' to be 'var(--color-status-active)' // Object.
-[10/18] M10 (F2): KILLED in 5.5s -- DistributedRecoveryView: recovering color collapsed to status-online (online collision)
+[10/20] M10 (F2): KILLED in 4.9s -- DistributedRecoveryView: recovering color collapsed to status-online (online collision)
          Reason: AssertionError: expected 'var(--color-status-online)' to be 'var(--color-status-active)' // Object.i
-[11/18] M11 (G1): KILLED in 5.4s -- DistributedRecoveryView: status badge text label {healthCfg.label} removed
+[11/20] M11 (G1): KILLED in 4.7s -- DistributedRecoveryView: status badge text label {healthCfg.label} removed
          Reason: AssertionError: expected '시뮬레이션: ' to be '시뮬레이션: ONLINE' // Object.is equality
-[12/18] M12 (E1): KILLED in 5.1s -- DistributedRecoveryView: action notice error border swapped to status-online
+[12/20] M12 (E1): KILLED in 4.7s -- DistributedRecoveryView: action notice error border swapped to status-online
          Reason: AssertionError: expected 'var(--color-status-online)' to be 'var(--color-status-offline)' // Object.
-[13/18] M13 (E2): KILLED in 4.9s -- DistributedRecoveryView: KPI zombie writes color swapped to text-secondary
+[13/20] M13 (E2): KILLED in 4.5s -- DistributedRecoveryView: KPI zombie writes color swapped to text-secondary
          Reason: AssertionError: expected 'var(--color-text-secondary)' to be 'var(--color-status-online)' // Object.
-[14/18] M14 (E3): KILLED in 4.9s -- DistributedRecoveryView: rejection item border swapped to border-subtle
+[14/20] M14 (E3): KILLED in 4.2s -- DistributedRecoveryView: rejection item border swapped to border-subtle
          Reason: AssertionError: expected 'var(--color-border-subtle)' to be 'var(--color-status-offline)' // Object.
-[15/18] M15 (E4): KILLED in 4.9s -- DistributedRecoveryView: empty screen border swapped to bg-surface (border==bg collision)
+[15/20] M15 (E4): KILLED in 4.4s -- DistributedRecoveryView: empty screen border swapped to bg-surface (border==bg collision)
          Reason: AssertionError: expected 'var(--color-bg-surface)' to be 'var(--color-border-subtle)' // Object.is e
-[16/18] M16 (F3): KILLED in 4.5s -- DistributedRecoveryView: fenced border token reverted from border-strong to border-subtle
+[16/20] M16 (F3): KILLED in 4.3s -- DistributedRecoveryView: fenced border token reverted from border-strong to border-subtle
          Reason: AssertionError: expected 'var(--color-border-subtle)' to be 'var(--color-border-strong)' // Object.i
-[17/18] M17 (G2): KILLED in 5.1s -- DistributedRecoveryView: recovering label set to empty string (M8a non-color a11y)
+[17/20] M17 (G2): KILLED in 4.4s -- DistributedRecoveryView: recovering label set to empty string (M8a non-color a11y)
          Reason: AssertionError: expected '시뮬레이션: ' to be '시뮬레이션: RECOVERING' // Object.is equality
-[18/18] M18 (G3): KILLED in 6.1s -- DistributedRecoveryView: recovering label collapsed to ONLINE (M8d non-color state collapse)
+[18/20] M18 (G3): KILLED in 4.9s -- DistributedRecoveryView: recovering label collapsed to ONLINE (M8d non-color state collapse)
          Reason: AssertionError: expected '시뮬레이션: ONLINE' to be '시뮬레이션: RECOVERING' // Object.is equality
+[19/20] M19 (H1): KILLED in 4.5s -- DistributedRecoveryView: unmapped healthState fallback reverted to online (fail-open regression)
+         Reason: AssertionError: Unmapped state must render uppercase label, not ONLINE: expected '시뮬레이션: ONLINE' to 
+[20/20] M20 (H2): KILLED in 4.5s -- DistributedRecoveryView: missing healthState fallback label collapsed to ONLINE (fail-open regression)
+         Reason: AssertionError: expected 'ONLINE' to be 'UNKNOWN' // Object.is equality
 
 ================================================================================
- Summary: 18/18 mutants killed (100.0%)
+ Summary: 20/20 mutants killed (100.0%)
 ================================================================================
  [PASS] M1 (A1): KILLED   | DistributedRecoveryView: notice banner bg -> brand-hover (fg==bg collision) (AssertionError: expected 'var(--color-brand-hover)' to be 'var(--color-bg-subtle)' // Object.is equa)
  [PASS] M2 (A2): KILLED   | DistributedRecoveryView: NODE_HEALTH_CONFIG.online.bg -> status-online (fg==bg collision) (AssertionError: expected 'var(--color-status-online)' to be 'var(--color-bg-subtle)' // Object.is eq)
@@ -200,6 +204,8 @@ reconciliation item failure / subtle  | Before:  5.65:1 (L actual on #0d1117) / 
  [PASS] M16 (F3): KILLED   | DistributedRecoveryView: fenced border token reverted from border-strong to border-subtle (AssertionError: expected 'var(--color-border-subtle)' to be 'var(--color-border-strong)' // Object.i)
  [PASS] M17 (G2): KILLED   | DistributedRecoveryView: recovering label set to empty string (M8a non-color a11y) (AssertionError: expected '시뮬레이션: ' to be '시뮬레이션: RECOVERING' // Object.is equality)
  [PASS] M18 (G3): KILLED   | DistributedRecoveryView: recovering label collapsed to ONLINE (M8d non-color state collapse) (AssertionError: expected '시뮬레이션: ONLINE' to be '시뮬레이션: RECOVERING' // Object.is equality)
+ [PASS] M19 (H1): KILLED   | DistributedRecoveryView: unmapped healthState fallback reverted to online (fail-open regression) (AssertionError: Unmapped state must render uppercase label, not ONLINE: expected '시뮬레이션: ONLINE' to )
+ [PASS] M20 (H2): KILLED   | DistributedRecoveryView: missing healthState fallback label collapsed to ONLINE (fail-open regression) (AssertionError: expected 'ONLINE' to be 'UNKNOWN' // Object.is equality)
 
 SUCCESS: 100% mutant kill rate achieved. All accessibility invariants strictly hold.
 ```

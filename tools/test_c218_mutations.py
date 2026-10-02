@@ -3,7 +3,7 @@
 tools/test_c218_mutations.py
 
 Card 218 (ACC-09) Distributed Recovery screen (DistributedRecoveryView.tsx) Mutation Testing Suite.
-Verifies that 18 distinct regressions/mutations (M1-M18) across
+Verifies that 20 distinct regressions/mutations (M1-M20) across
 color contrast, border collisions, status semantics, testid binding,
 outline focus ring preservation, non-color label distinctness,
 and fail-closed multiset inventory are strictly caught and killed by the test suite
@@ -165,6 +165,40 @@ MUTANTS = [
         'replacement': "  recovering: {\n    label: 'ONLINE',\n    color: 'var(--color-status-active)',",
         'expected_guard': 'Test 9j (DOM / Config assertion: all 5 labels must be distinct and recovering label must be RECOVERING)',
     },
+    {
+        'id': 'M19 (H1)',
+        'name': 'DistributedRecoveryView: unmapped healthState fallback reverted to online (fail-open regression)',
+        'target': """                const healthCfg =
+                  (node.healthState && NODE_HEALTH_CONFIG[node.healthState]) ||
+                  (node.healthState
+                    ? {
+                        label: String(node.healthState).toUpperCase(),
+                        color: 'var(--color-status-neutral)',
+                        bg: 'var(--color-bg-subtle)',
+                        border: 'var(--color-border-subtle)',
+                      }
+                    : NODE_HEALTH_UNKNOWN_CONFIG);""",
+        'replacement': """                const healthCfg =
+                  (node.healthState && NODE_HEALTH_CONFIG[node.healthState]) || NODE_HEALTH_CONFIG.online;""",
+        'expected_guard': 'Test 9j (Fail-closed negative test: unmapped state must never render ONLINE or with online tokens)',
+    },
+    {
+        'id': 'M20 (H2)',
+        'name': 'DistributedRecoveryView: missing healthState fallback label collapsed to ONLINE (fail-open regression)',
+        'target': """export const NODE_HEALTH_UNKNOWN_CONFIG: NodeHealthConfig = {
+  label: 'UNKNOWN',
+  color: 'var(--color-status-neutral)',
+  bg: 'var(--color-bg-subtle)',
+  border: 'var(--color-border-subtle)',
+};""",
+        'replacement': """export const NODE_HEALTH_UNKNOWN_CONFIG: NodeHealthConfig = {
+  label: 'ONLINE',
+  color: 'var(--color-status-online)',
+  bg: 'var(--color-bg-subtle)',
+  border: 'var(--color-status-online)',
+};""",
+        'expected_guard': 'Test 9j (Fail-closed negative test: missing state must never render ONLINE or with online tokens)',
+    },
 ]
 
 def run_test():
@@ -203,7 +237,7 @@ def extract_failure_reason(stdout, stderr):
 
 def main():
     print('================================================================================')
-    print(' Card 218 (ACC-09): Reproducible Mutant Test Suite (18 Mutants: M1-M18)')
+    print(' Card 218 (ACC-09): Reproducible Mutant Test Suite (20 Mutants: M1-M20)')
     print(' Target: DistributedRecoveryView.tsx')
     print('================================================================================\n')
 

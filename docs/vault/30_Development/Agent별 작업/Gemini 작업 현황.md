@@ -59,13 +59,13 @@ source_of_truth: "Git"
      - 비색상 식별 수단(5대 헬스 레이블 `ONLINE`, `STALE`, `OFFLINE`, `RECOVERING`, `FENCED`, 🚨 배지, BLOCKED 칩 등) 100% 보존.
   2. **Fail-Closed Multiset Baseline 래칫 강제**:
      - `acc09-contrast-tokens.test.tsx`의 `COLOR_LITERAL_MULTISET_BASELINE`에서 `features/recovery/DistributedRecoveryView.tsx`의 허용 인벤토리를 `{}` (0건)으로 전면 고정.
-     - `var(--color-border-subtle)` 사용 횟수 388건 -> **401건**(+13건), 파일 수 26개 -> **27개**(+1개)로 fail-closed 단언 갱신.
+     - `var(--color-border-subtle)` 사용 횟수 388건 -> **402건**(+14건), 파일 수 26개 -> **27개**(+1개)로 fail-closed 단언 갱신.
      - 레거시 리터럴 상한치 강화 (`#30363d` <= 43/8, 실측치 정확 고정).
-  3. **실제 렌더링 DOM 기반 동적 대비 단언 및 18종 변이 100% 사살**:
-     - Test 9j 신설: 공지 배너, 3개 KPI 카드, 4개 노드 카드(온라인, 스테일, 오프라인, 복구 중) 헬스 배지 전경/배경/테두리 명도 대비 동적 단언, 선택 카드 2px brand-hover 테두리 및 인라인 outline 제거(:focus-visible 보존) 단언, 5대 헬스 상태 레이블(ONLINE, STALE, OFFLINE, RECOVERING, FENCED) 비색상 식별 수단 고유성 단언, 시뮬레이션 상태 뱃지 4종(파티션, 좀비, 리컨실, 체크아웃) 단언, opacity 0.4 저하 금지 단언, 빈 상태 뷰 단언.
+  3. **실제 렌더링 DOM 기반 동적 대비 단언 및 20종 변이 100% 사살**:
+     - Test 9j 신설: 공지 배너, 3개 KPI 카드, 4개 노드 카드(온라인, 스테일, 오프라인, 복구 중) 헬스 배지 전경/배경/테두리 명도 대비 동적 단언, 선택 카드 2px brand-hover 테두리 및 인라인 outline 제거(:focus-visible 보존) 단언, 5대 헬스 상태 레이블(ONLINE, STALE, OFFLINE, RECOVERING, FENCED) 비색상 식별 수단 고유성 단언, 미지/누락 헬스 상태 fail-closed UNKNOWN 및 neutral 토큰 안전 폴백 부정 시험 단언, 시뮬레이션 상태 뱃지 4종(파티션, 좀비, 리컨실, 체크아웃) 단언, opacity 0.4 저하 금지 단언, 빈 상태 뷰 단언.
      - Test 9j-2 신설: DistributedRecoveryView 68개 style 속성 및 NODE_HEALTH_CONFIG 객체 리터럴 AST 검사 로직(checkConfigTables) 기반 스타일-쌍 명도 대비 계산 및 커버리지 래칫 (checkedObjects 8, checkedPairs 47, unboundColorObjects 34, coveredColorObjects 42, checkedBorderObjects 20, checkedBorderPairs 23, violations 0), raw color literal 위반 검출 가드 추가.
      - Revert-Fail Probes 71~75 추가 (Probe 71 #58a6ff 2.31:1 fail, Probe 72 #3fb950 2.32:1 fail, Probe 73 #8b949e 3.08:1 fail, Probe 74 #f85149 3.06:1 fail, Probe 75 #e3b341 1.78:1 fail).
-     - `tools/test_c218_mutations.py` 신규 커밋: 18종 변이 M1~M18 전원 사살 실측 (18/18 = 100% killed, exit code 0).
+     - `tools/test_c218_mutations.py` 신규 커밋: 20종 변이 M1~M20 전원 사살 실측 (20/20 = 100% killed, exit code 0).
      - `tools/reproduce_c218_contrast.py` 21개 지표 실측 통과.
   4. **잔여 백로그 현황**:
      - 분산 복구 화면 잔여 색상 리터럴: **0건**.
@@ -73,7 +73,7 @@ source_of_truth: "Git"
 - **관측 근거 (Evidence)**:
   - 단위 시험: `npx vitest run tests/acc09-contrast-tokens.test.tsx` (27 passed, exit 0)
   - 연관 복구 시험: `npx vitest run tests/defect-recovery-admin-recovery-editor.test.tsx` (26 passed 100%, exit 0)
-  - 변이 불변식 실측: `python tools/test_c218_mutations.py` (18 / 18 killed 100%, exit code 0)
+  - 변이 불변식 실측: `python tools/test_c218_mutations.py` (20 / 20 killed 100%, exit code 0)
   - 명도 대비 재현: `python tools/reproduce_c218_contrast.py` (21개 항목 전수 실측 통과, exit code 0)
   - 타입 검사: `cd apps/web && npx tsc -b` (에러 0건, 클린 통과, exit 0)
   - 프로덕션 빌드: `cd apps/web && npm run build` (built in ~8.6s, exit 0)
