@@ -1,11 +1,11 @@
 ---
 doc_id: "DESIGN-S08-BE-BUILD-REQUEST-ENTRY-001"
 title: "S08-BE BuildRequest 제품 진입점 설계"
-version: "1.0.2"
+version: "1.1.0"
 status: "proposed"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-03T01:25:07+09:00"
+updated: "2026-10-03T01:32:09+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "53458da3604027e91d428e11db02bc09d279097c"
@@ -17,195 +17,179 @@ tags: ["s08-be", "build-request", "approval", "buildkit", "contract", "design"]
 
 ## 0. 선택 근거와 비주장 경계
 
-카드 241의 승인 후보는 승인된 build 문서를 0060 admission에 기록하는 내부 seam을 만든다.
-그러나 현재 제품의 `ApprovalStore.dispatch()` 호출자 세 곳
-(`workspace_api.py:307`, `workspace_start.py:303`, `shard_recovery.py:314`)은 모두 기존
-`WorkloadSpec`만 전달하며 build plan/evidence를 전달하지 않는다. 정본 `BuildRequest`와
-`BuildPlan` 계약은 존재하지만(`generated/models.py:246`, `:276`), 사용자가 build 문서를
-직접 넣는 route는 없다. 따라서 다음 공백은 transport가 아니라 **사용자 intent를 서버 소유
-build authority로 바꾸고 승인에 올리는 제품 입구**다.
+카드 241은 승인된 build authority를 0060 admission에 기록하는 internal seam을 만들었다.
+그러나 현재 `ApprovalStore.dispatch()` 제품 호출자는 모두 `WorkloadSpec`만 전달하며,
+사용자 intent를 서버 소유 `BuildRequest`로 바꾸는 입구가 없다. 이 문서는 raw build
+문서를 받지 않는 prepare/enqueue 표면과, 인간 승인 전후 authority를 분리한다.
 
-이 문서는 그 입구의 공개 계약과 저장 경계를 결정한다. route, schema, migration, worker를
-구현하지 않으며 S08-BE 점수 상승이나 운영 BuildKit 인수를 주장하지 않는다. 구현은 카드 241
-최종 승인 head를 포함한 별도 카드에서 수행한다. 제품 dispatch flag는 계속 기본 off다.
+이 PR은 docs-only다. route, schema, migration, worker를 구현하지 않고 S08-BE 승격이나
+운영 BuildKit 인수를 주장하지 않는다. 제품 dispatch flag는 기본 off다.
 
-## 1. 결정: prepare + enqueue의 두 단계 route
+## 1. 공개 표면: prepare와 enqueue
 
 ### 1.1 prepare
 
 `POST /v1/projects/{project}/runs/{run_id}/builds`
 
-- 인증된 사용자와 `Idempotency-Key`가 필수다.
-- strict request `BuildPreparationInput`은 다음 네 필드만 허용한다.
-  `checkoutId`, `buildProfileId`, `expectedRunVersion`, `requestedTarget`.
-- `requestedTarget`은 `image` 단일 literal이다. 향후 target 추가는 계약 version 변경이다.
-- caller가 `BuildRequest`, `BuildPlan`, `PolicyDecision`, source SHA, context/dockerfile path,
-  network/cache/secret policy, builder/node/lease, evidence ID, `approvedBy`를 보내면
-  `VAL-0003/422`다. unknown field도 같은 오류다.
-- 성공은 `201 BuildPreparationView`다. 공개 응답은 `buildId`, `runId`, `approvalId`,
-  `requestDigest`, `planDigest`, `policyDecisionId`, `status=awaiting_approval`, `expiresAt`만
-  포함한다. raw plan, secret ref, provider topology는 반환하지 않는다.
+- 서명 검증된 사용자와 `Idempotency-Key`가 필수다.
+- strict `BuildPreparationInput`은 `checkoutId`, `buildPolicyProfileId`, `expectedRunVersion`,
+  `requestedTarget` 네 필드만 받는다. target은 현재 `image` 단일 literal이다.
+- caller가 `BuildRequest`, `BuildPlan`, `PolicyDecision`, source SHA, path, provider, lease,
+  evidence ID, `approvedBy`를 보내면 `VAL-0003/422`다.
+- prepare는 schema, project/source/profile scope, action identity, policy precondition만 검증한다.
+  승인 전 `approvedBy=[]`이므로 `authorize_build()`/`enforce_decision()`을 호출하지 않는다.
+- 성공은 `201 BuildPreparationView`이며 `buildId`, `runId`, `sourceRunId`, `approvalId`,
+  `requestDigest`, `decisionIdentityDigest`, `status=awaiting_approval`, `expiresAt`만 노출한다.
+  prepare 응답에 `planDigest`, lease, provider, evidence ID는 없다.
 
 ### 1.2 review와 quorum
 
-prepare transaction은 서버가 만든 immutable build authority의 digest와 같은 action digest로
-기존 approval request를 만든다. 두 번째 운영자는 기존
-`GET /v1/projects/{project}/approvals/{approval_id}/review`(`app.py:643`)에서 위험 수준과
-서버가 만든 redacted build 요약을 읽고, 기존 challenge/decision route(`app.py:660`, `:674`)로
-투표한다.
+prepare transaction은 서버가 만든 `BuildRequest`와 pre-approval `PolicyDecision`을 기존
+approval snapshot에 같이 고정한다. pre-approval decision의 full digest는 `approvedBy=[]`을
+포함하며, `decisionIdentityDigest`는 `approvedBy`를 제외한 불변 필드의 canonical digest다.
+0060 `decision_sha256`는 enqueue 시점에 DB vote로 `approvedBy`를 재구성한 승인 후 full
+decision digest로 다르다. enqueue는 승인 전/후 decision의 identity digest가 같은지 검증한다.
 
-- requester는 approver가 될 수 없다.
-- `PolicyDecision.requiredApprovals`를 그대로 적용하며 L3는 계속 거부한다.
-- quorum을 줄이거나 승인 snapshot을 건너뛰는 build 전용 예외는 없다.
-- review snapshot에는 raw secret ID 배열 대신 secret 사용 여부와 개수만 보인다.
-- 승인 만료, run version 변화, source/profile/policy drift는 enqueue 전에 다시 검증한다.
+기존 `ApprovalReviewView.workload`는 하위 호환 union으로 확장한다.
+
+- 기존 `WorkloadSpec` variant는 필드와 의미를 바꾸지 않는다.
+- 새 `BuildApprovalReviewSummary` variant는 `kind=build`, target, risk level, profile ID/version,
+  source revision, context/dockerfile digest, network/cache mode, secret 사용 여부와 개수만
+  포함한다. raw path, secret alias/ID, provider/node/lease는 노출하지 않는다.
+- requester는 approver가 될 수 없고 distinct two-person quorum을 유지한다.
+- web `ApprovalReviewPanel`은 Gemini 후속 카드로 인계하며 API redaction 계약을 약화하지 않는다.
 
 ### 1.3 enqueue
 
 `POST /v1/projects/{project}/runs/{run_id}/builds/{build_id}/enqueue`
 
-- strict body는 `BuildEnqueueInput { approvalId, expectedRunVersion }`이고
-  `Idempotency-Key`가 필수다.
-- requester 본인, `can_request`, exact project/run/build/approval binding, distinct approval
-  quorum을 다시 검사한다.
-- 서버 저장소에서 frozen `BuildRequest`, `BuildPlan`, `PolicyDecision`, policy version,
-  evidence ID를 읽어 카드 241의 trusted admission seam에 전달한다. caller가 어느 문서도
-  합성하지 않는다.
-- 성공은 `202 BuildPreparationView`의 `status=queued`다. 같은 key와 같은 body는 exact
-  replay, 같은 key와 다른 body 또는 다른 path identity는 `IDEM-0001/409`다.
-- flag off, provider observation 부재/노후, lease drift, quarantine channel 부재는 admission을
-  우회하지 않는다. dispatch는 0이며 정본 `RES-0006/503/retryable=true`를 유지한다.
+- strict body는 `BuildEnqueueInput { approvalId, expectedRunVersion }`이고 `Idempotency-Key`가 필수다.
+- flag off이면 approval을 소비하거나 Run을 전이하기 **전** `RES-0006/503/retryable=true`로
+  거부한다. preparation은 awaiting_approval에 남고 admission은 0이다.
+- flag on이면 requester, project/run/build/approval, `bound_run_version`, current voter grant,
+  source/profile/policy를 재검증한다.
+- provider 측정은 DB lock 밖에서 candidate로 읽고, 최종 transaction에서 source/profile/
+  approval을 다시 잠그고 Run을 scheduled로 전이한 뒤 live lease를 획득한다.
+- 그 transaction에서만 DB vote로 approved decision을 재구성하고 `BuildPlan`,
+  `buildSessionId`, evidence ID를 처음 생성한다. 그 뒤 `authorize_build()`를 실행하고
+  0060 admission을 원자적으로 삽입한다. 외부 BuildKit 호출은 이 transaction에 없다.
+- drift나 승인 만료는 approval/preparation을 terminal로, dedicated build Run을 failed로
+  전이하고 새 Run을 요구한다.
 
-별도 공개 `/admit`, raw queue route, CLI는 만들지 않는다. 실제 transport는 기존 worker가
-0060 admission을 0059 intent로 승격한 뒤에만 접근한다
-(`build_product_runtime.py:85`, `:165`).
+별도 `/admit`, raw queue route, CLI는 만들지 않고 enqueue는 0059 intent를 직접 만들지
+않는다. 0060 admission이 기존 product worker를 통해 0059 intent로 승격된다.
 
-## 2. 서버 소유 compilation
+## 2. build Run과 source authority
 
-prepare는 다음 순서로 짧은 DB transaction 안에서 authority를 잠그고, 외부 BuildKit 호출은
-하지 않는다.
+- path `{run_id}`는 build 전용 planned Run이다. checkout을 소유한 `sourceRunId`는 같은
+  tenant/project의 recovering Run이고 requester가 두 Run 모두에 접근 권한을 가져야 한다.
+- prepare는 `checkout_id`, editor `revision`, 해당 revision의 snapshot hash, source Run/attempt/
+  recovery epoch를 고정한다. 낡은 `workspace_checkouts.content_hash`만을 권위로 쓰지 않는다.
+- prepare 후 editor revision이 바뀌면 enqueue는 `VERIFY-0002/422`로 거부한다.
+- source capsule materialization은 DB transaction 밖에서 한다. lstat 기준으로 absolute path,
+  `..`, symlink/hardlink/device, case collision, context/dockerfile escape를 거부한다. 완성 후
+  transaction에서 revision/hash를 다시 검증한다.
+- capsule은 tenant/project scoped ObjectStore에 canonical digest로 보관하고, worker는 오직 그
+  digest의 bytes를 다운로드한다. retention은 preparation/audit과 같은 최소 35일이다.
+- Git SHA가 필요하면 tree bytes, fixed author/committer, fixed timestamp, fixed message, no parent로
+  합성한 deterministic commit만 사용한다.
 
-1. authenticated tenant와 path project/run을 검증하고 `can_request`를 재확인한다.
-2. current Run과 `expectedRunVersion`, current workspace checkout을 잠근다.
-   checkout은 tenant/run/source attempt/recovery epoch와 결속돼 있고
-   `workspace_checkouts`에는 content hash가 있다
-   (`services/control-plane/src/inv/migrations/0017_workspace_checkouts.sql:2`).
-3. `buildProfileId`를 운영자 소유, versioned profile registry에서 resolve한다. profile이
-   `contextPath`, `dockerfilePath`, target platform/stage, network/cache policy, 허용 secret
-   aliases, timeout을 소유한다. registry가 비거나 profile이 없으면 fail closed다.
-4. source adapter가 checkout의 immutable snapshot을 private Git checkout으로 materialize한 뒤
-   commit/tree SHA를 관측한다. 사용자 문자열이나 remote branch head를 SHA authority로 쓰지
-   않는다. dirty checkout, SHA/content-hash 불일치는 `VERIFY-0002/422`다.
-5. 측정된 provider health, live resource lease, current recovery epoch, containment, project
-   budget을 읽는다. provider가 없거나 15초 freshness를 넘으면 문서를 만들지 않는다.
-6. 서버가 strict `BuildRequest`를 구성하고 `canonical_build_action()`
-   (`build_governance.py:46`)으로 policy를 조회한다. policy result와 live authority로
-   `BuildPlan`을 구성하며 `buildSessionId`와 evidence ID도 서버가 발급한다.
-7. `authorize_build()`(`build_governance.py:139`)과 JSON Schema validation을 통과한 세 문서,
-   canonical digest, profile version, checkout content hash, run version을 한 frozen row와
-   approval snapshot으로 원자적으로 저장한다.
+## 3. profile registry와 build PDP
 
-enqueue는 같은 lock order로 current Run → frozen preparation → approval → live lease/provider를
-재검증한다. prepare 때의 plan을 무조건 신뢰하지 않고, 변하는 authority(provider observation,
-lease expiry, containment)는 새 값과 exact binding이 다르면 fail closed다. plan을 조용히
-재작성하지 않으며 사용자는 새 preparation을 요청해야 한다.
+0061에 `inv.build_policy_profiles`를 둔다. 이 테이블은 operator-owned, versioned,
+append-only authority이며 `inv_kernel`은 SELECT만 가능하다. public mutation route는 없다.
+profile은 tenant/project allowlist, `contextPath`, `dockerfilePath`, target platform/stage, network/cache,
+secret alias allowlist, timeout을 소유한다. 이 ID는 `buildPolicyProfileId`이며 provider의
+`BuildPlan.builderProfileId`와 다른 의미다.
 
-## 3. 권한, 감사, idempotency, rate limit
+build PDP는 최소 L2, requester 제외 distinct 2인, `require_approval`, 만료 600초 이하다.
+secret을 쓰거나 `networkMode != none`이거나 cache write가 있으면 위험을 낮출 수 없다.
+privileged, host socket/access, host bind/device는 profile로 표현할 수 없다. secret alias는
+해당 tenant의 서버 저장소에서만 resolve하며 실제 값과 ID를 review/감사에 남기지 않는다.
 
-| 경계 | 결정 |
-|---|---|
-| 인증/tenant | 서명 검증된 principal만 사용하고 tenant는 token에서만 온다. path/body가 다른 tenant를 고를 수 없다. |
-| project | prepare/enqueue 모두 live `require_project_access`와 `can_request`; review/decision은 기존 `can_approve`. 존재 비노출 정책을 유지한다. |
-| 승인자 | requester와 다른 활성 사용자, 기존 challenge nonce, current quorum. `approvedBy`는 DB votes에서만 재구성한다. |
-| idempotency | operation은 path identity를 포함한 `build.prepare:{project}:{run}` / `build.enqueue:{project}:{run}:{build}`. replay 전에도 인증·권한을 다시 검사한다. |
-| 동시성 | run마다 nonterminal build preparation 하나. 두 prepare/enqueue가 경합하면 row lock+unique constraint로 한 건만 전이하고 패자는 exact replay 또는 `IDEM-0001`이다. |
-| rate limit | tenant+project+subject 기준 prepare 5회/분, enqueue 10회/분. 0061의 DB-backed fixed-window counter를 project row와 함께 잠그므로 재시작으로 초기화되지 않는다. 초과는 `RES-0007/429/retryable=true`; 인증·권한 확인을 마친 exact replay는 새 quota를 소비하지 않는다. |
-| 감사 | `inv.build.preparation_requested`, `inv.build.approval_bound`, `inv.build.enqueue_requested`, 카드 241의 `inv.build.admission_recorded`. ID와 digest만 기록하고 plan, paths, secret aliases, token은 기록하지 않는다. |
+## 4. idempotency, quota, lock order
 
-감사 쓰기 실패는 business transaction 전체를 rollback한다. 권한·quorum·rate-limit 거부에는
-정본 denial 경계를 사용하되 raw 불일치 값은 ProblemDetails, 감사, 로그에 싣지 않는다.
+- operation은 path를 포함하지 않는 `build.prepare`/`build.enqueue`로 고정한다.
+  tenant/project/run/build/approval/subject는 request hash에 포함한다. 다른 path에서 같은 key를
+  재사용하면 같은 ledger row에서 `IDEM-0001/409`다. ledger에 TTL이 없으므로 epoch/
+  input drift도 409로 남는다.
+- quota는 subject prepare 5/min, enqueue 10/min, project prepare+enqueue 30/min, tenant+project
+  60/min이다. DB `clock_timestamp()`과 0061 fixed-window counter를 쓴다.
+- 인증/project access와 changed-key 검사 후, expensive materialization 전에 별도 짧은
+  transaction으로 idempotency reservation과 quota를 commit한다. exact replay는 새 quota를 소비하지
+  않고, 이후 prepare가 실패해도 quota는 소비된다.
+- DB row lock을 잡은 채 file/Git/ObjectStore/provider I/O를 하지 않는다. 최종 enqueue lock order는
+  idempotency -> run -> preparation -> approval/snapshot/votes -> profile -> lease -> 0060 admission이다.
 
-## 4. migration 결정: 0061 필요
+## 5. migration 0061: 예약 확정, column 재설계
 
-0060 `inv.build_execution_admissions`는 승인과 dispatch가 끝난 뒤의 immutable authority이며
-(`migrations/versions/0060_build_execution_admissions.py:24`), prepare와 review 사이 authority를
-보관할 수 없다. 기존 approval snapshot도 `WorkloadSpec`/policy 중심이고 BuildPlan, profile
-version, checkout/content binding을 소유하지 않는다. coordinator는 0061을 **조건부 예약**했다.
-Claude가 이 설계에서 table 필요성을 승인하면 확정하며, 승인 전 migration 파일을 만들지 않는다.
-확정 시 `down_revision`은 0060이고 migration graph는 단일 head여야 한다.
+coordinator가 0061을 카드 246에 확정 배정했다. `down_revision` 은 0060이고 graph head는
+하나여야 한다. 구현은 이 v1.1 승인 전에 시작하지 않는다.
 
-제안 table `inv.build_preparations`:
+`inv.build_preparations`:
 
 - PK `(tenant_id, project_id, run_id, build_id)`, active partial unique `(tenant_id, run_id)`;
-- FK run/checkout/approval, requester ID, profile ID+version, expected/current run version;
-- strict request/plan/decision JSONB와 각 canonical SHA-256, checkout content hash,
-  evidence ID, status(`awaiting_approval|approved|queued|rejected|expired`);
-- FORCE RLS, tenant exact policy, `inv_kernel` 최소 column grant;
-- payload/identity immutable trigger, 허용된 status 전이만 update, application DELETE 금지;
-- `expires_at`은 approval/policy/lease 중 가장 이른 시각 이하이고 최대 1시간이다. 만료 row는
-  dispatch할 수 없고 `expired` terminal 전이와 감사만 허용한다;
-- terminal row는 감사·재현을 위해 최소 35일 보존한다. 0061 v1은 모든 DELETE를 거부하며,
-  삭제는 별도 승인된 GC 계약과 digest receipt가 생기기 전까지 NOT_IMPLEMENTED다. migration
-  downgrade는 row가 한 건이라도 있으면 거부한다.
+- source run/checkout/revision/snapshot/capsule digests, approval FK, requester, profile ID/version,
+  expected/bound run version, request digest, pre-approval decision full/identity digests, `expires_at`;
+- approval status는 `approval_requests`에서 파생하고 중복 저장하지 않는다. preparation은
+  immutable이고 `queued_at` 한 필드만 NULL -> timestamp set-once를 허용한다.
+- raw request/decision JSON, plan, lease, provider, evidence ID를 저장하지 않는다. request/decision 정본은
+  approval snapshot이고 0060은 승인 후 plan/decision 정본이다.
 
-같은 0061에 `inv.build_preparation_rate_windows`를 둔다. PK는
-`(tenant_id,project_id,subject_id,operation,window_started_at)`이고 count와 expiry만 저장한다.
-FORCE RLS와 application DELETE 거부를 똑같이 적용하며, 만료 counter 정리는 별도 운영 GC 전까지
-하지 않는다. prepare payload나 identity token은 이 table에 저장하지 않는다.
+`inv.build_policy_profiles`와 `inv.build_preparation_rate_windows`도 같은 migration에 추가한다.
+세 테이블은 FORCE RLS tenant exact policy를 사용하고 trigger는 SECURITY INVOKER다.
+preparation/profile payload UPDATE와 application DELETE는 거부한다. terminal preparation은 최소 35일
+보존하며 v1에 GC carve-out을 두지 않는다. 삭제는 별도 승인된 GC 계약 전까지
+NOT_IMPLEMENTED다. nonempty downgrade는 거부한다.
 
-승인 snapshot과 preparation은 같은 transaction에서 만들어지며 approval ID와 action digest가
-양방향 exact match해야 한다. 구현 PR은 `tools/write_rls_table_census.py`로 RLS census와 ground
-truth를 재생성하며 손으로 편집하지 않는다. trigger가 새 SECURITY DEFINER를 요구한다면 #333
-allowlist/definer policy에 넣기 전에 별도 보안 검토 근거와 pin 회전을 제공한다. 가능하면
-SECURITY INVOKER trigger를 사용한다.
+구현 PR은 `tools/write_rls_table_census.py`로 census/ground truth를 재생성하고 migration head
+ratchet도 0061로 repin한다. SECURITY DEFINER를 새로 만들지 않는다.
 
-## 5. 오류와 공개 계약
+## 6. 오류와 감사
 
 | 조건 | ProblemDetails |
 |---|---|
 | malformed/unknown/raw build field | `VAL-0003`, 422, non-retryable |
-| scope/permission/actor mismatch | 기존 `AUTH-0011` 또는 `AUTH-0030`, 403 |
-| requester가 승인하거나 quorum 불충분 | 기존 `AUTH-0033`, 403 |
-| source/profile/plan/decision binding drift | `VERIFY-0002`, 422 |
+| scope/permission/actor mismatch | `AUTH-0011` 또는 `AUTH-0030`, 403 |
+| requester vote/quorum 부족 | `AUTH-0033`, 403 |
+| source/profile/decision drift | `VERIFY-0002`, 422 |
 | changed idempotency input/path | `IDEM-0001`, 409 |
-| stale run/terminal state/version | `GRAPH-0003`, 409 |
-| build/preparation 존재 비노출 | `RES-0004`, 404 |
-| provider/quarantine/worker authority unavailable | `RES-0006`, 503, retryable |
-| lock/rate budget 초과 | `RES-0007`, 429 또는 기존 lock 경계의 503, retryable |
+| stale/terminal Run | `GRAPH-0003`, 409 |
+| preparation 존재 비노출 | `RES-0004`, 404 |
+| provider/quarantine/worker authority 부재 | `RES-0006`, 503, retryable |
+| lock/rate budget 초과 | `RES-0007`, 429 또는 lock 503, retryable |
 
-구현 계약 PR은 `BuildPreparationInput`, `BuildEnqueueInput`, `BuildPreparationView`를
-`contracts/v1alpha1/core.schema.json`에 strict `additionalProperties:false`로 추가하고 Python,
-TypeScript, Go 생성물을 함께 갱신한다. 기존 BuildRequest/BuildPlan의 공개 의미는 바꾸지 않는다.
+감사는 preparation requested, approval bound, enqueue requested, admission recorded를 구분하고 ID/
+digest만 남긴다. 감사 실패는 해당 business transaction 전체를 rollback한다.
 
-## 6. 구현 순서와 수용 시험
+## 7. 수용 시험과 되살림 변이
 
-1. 계약 schema/생성물과 0061 migration/권한/trigger를 한 PR에서 먼저 고정한다.
-2. compiler service와 prepare route를 구현한다. 실제 BuildKit 호출은 없어야 한다.
-3. review redaction과 기존 quorum 결속을 구현한다.
-4. enqueue route가 카드 241 trusted seam을 호출하도록 연결한다. flag 기본 off를 유지한다.
-5. worker/transport 실측은 그 다음 enablement 카드에서만 수행한다.
+- contract/generated models와 `ApprovalReviewView` union 하위 호환, build review redaction;
+- prepare가 `authorize_build()`를 호출하지 않고 enqueue만 승인 후 decision으로 호출;
+- build/source Run project 결속, revision drift, symlink/hardlink/path escape, capsule digest 거부;
+- profile tenant/project/version, secret alias scope, PDP 하한, provider freshness, live lease 거부;
+- requester vote, duplicate voter, grant 회수, stale approval, approval identity drift 거부;
+- fixed operation idempotency: exact replay, body/path/subject drift 409;
+- 실패한 prepare도 quota 소비, project/subject/tenant 상한, DB clock;
+- concurrent enqueue는 0060 admission/audit 각 1건, 0059 intent 직접 생성 0;
+- flag off에서 approval consumption, Run transition, admission, dispatch 모두 0;
+- FORCE RLS, immutable payload, queued_at set-once, DELETE/nonempty downgrade 거부, census 0061 repin.
 
-필수 PG-free/실-PG 부정 시험:
+필수 real-PG 성공 경로는 `request -> prepare -> 서로 다른 2인 approve -> enqueue ->
+admission 1 -> promote -> claim -> dispatch 1`을 flag-on test fixture로 실행한다. raw path/secret/provider는
+evidence/JUnit에 남지 않는다.
 
-- raw BuildRequest/BuildPlan 및 unknown field, forged tenant/project/run/requester/approvedBy 거부;
-- caller source SHA/context/network/secret/provider/lease 입력 거부, server-derived 값 exact match;
-- missing/unknown/changed profile, dirty source, checkout content/SHA drift 거부;
-- request/plan/decision/action digest 하나씩 변조, expired policy/lease/provider 거부;
-- requester vote, 같은 사람 중복 vote, quorum 부족, stale approval/run version 거부;
-- same key same body exact replay, changed body/path key reuse 거부;
-- 두 connection prepare/enqueue 경합에서 preparation/admission/audit 각 정확히 1행;
-- rate window 경계와 replay 비소비, clock rollback에도 우회 불가;
-- audit 실패, admission 실패, 0060 insert 실패에서 approval/preparation/status 전체 rollback;
-- flag off에서 admission까지 저장돼도 external dispatch 0, public `/admit` route 0;
-- tenant A가 tenant B preparation을 GET/enqueue/list할 수 없고 존재를 드러내지 않음;
-- migration upgrade/downgrade, FORCE RLS, column grant, immutable payload, nonempty downgrade 거부.
+되살림 변이는 pre-approval authorize 호출, prepare lease 획득, legacy review union 제거,
+source/project/revision 결속 제거, profile scope 제거, quota precommit 제거, operation에 path 포함,
+flag-off admission commit, 0059 direct intent 생성을 각각 독립 시험으로 사살한다.
 
-되살림 변이는 `additionalProperties`, profile ownership, source SHA 재관측, `approvedBy` DB 재구성,
-quorum, unique active row, action digest, audit rollback, flag-off, public-admit-route 금지를 각각
-한 줄씩 제거해도 해당 단독 시험이 실패해야 한다.
+## 8. 구현 순서와 외부 전제
 
-## 7. 외부 전제와 판정
+1. strict contract/union/generated models와 0061 migration을 고정한다.
+2. source capsule/profile/prepare를 구현한다. BuildKit 호출은 0이다.
+3. review redaction과 quorum을 결속하고 Gemini UI 인계를 남긴다.
+4. enqueue가 scheduled transition, live lease/plan, 0060 admission을 원자적으로 만든다.
+5. hosted real-PG e2e로 성공/경합/rollback을 실측한다.
 
-route/DB/compiler/quorum은 hosted PostgreSQL에서 MEASURED 가능하다. 실제 rootless builder 왕복,
-node mTLS receipt, cleanup, lease release와 물리 LAN 인수는 이 카드의 통과 조건이 아니며 기존
-enablement/실장비 카드에 남는다. 설계 승인만으로 S08-BE를 승격하지 않는다.
+실제 rootless builder, node mTLS receipt, cleanup/lease release, LAN 인수는 기존 enablement/실장비
+카드의 외부 전제다. 이 설계 승인만으로 S08-BE를 승격하지 않는다.

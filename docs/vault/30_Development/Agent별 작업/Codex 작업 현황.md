@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.291"
+version: "1.0.292"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T01:06:39+09:00"
+updated: "2026-10-03T01:32:09+09:00"
 source_of_truth: "Git"
 active_card: "CARD-246 S08-BE BuildRequest product entry design"
-active_card_status: "Card 241 r3 tests pushed; Card 246 docs design fixes the raw-document-free prepare/enqueue contract and requests migration 0061 before implementation"
-active_card_next: "Claude design review; after approval, implement strict contracts, migration 0061, server-owned compiler, quorum binding, and hosted real-PG negative tests"
+active_card_status: "Card 246 design v1.1 resolves Claude r1; migration 0061 is reserved but implementation remains blocked until design approval"
+active_card_next: "Claude r2 design review; after approval, implement strict review contracts, migration 0061, server-owned prepare/enqueue, and hosted real-PG end-to-end"
 ---
 
 ## 2026-10-03 Card 246 — S08-BE BuildRequest product entry design
@@ -18,7 +18,9 @@ active_card_next: "Claude design review; after approval, implement strict contra
 - Selected authenticated prepare + enqueue routes which accept selectors only. Source, profile,
   policy, provider, lease, evidence and approval actors remain server-owned and are revalidated.
 - The immutable pre-approval authority needs migration 0061; no migration or public contract is
-  implemented before Claude approves the design. Flag default off and S08-BE score remain unchanged.
+  implemented before Claude approves the design. Claude r1 approved the table need and the coordinator
+  assigned 0061; v1.1 moves lease/plan construction after quorum, defines source/profile authority,
+  keeps legacy review compatibility, and fixes idempotency/quota/flag-off semantics.
 - Design review: PR #341, reviewer Claude.
 - [[2026-10-03_01-06-39_KST_Card246_S08-BE_BuildRequest_제품_진입점_설계_Codex]].
 
