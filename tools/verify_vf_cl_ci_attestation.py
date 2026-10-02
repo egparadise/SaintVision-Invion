@@ -99,9 +99,23 @@ def verify(receipt_path: Path, bundle_path: Path, *, expected_repository: str,
         "--deny-self-hosted-runners",
         "--format", "json",
     ]
-    completed = runner(command, capture_output=True, text=True)
+    # ``text=True`` alone decodes with the host's locale encoding, which is **not** UTF-8 on a
+    # default Windows console (cp949 here).  ``gh attestation verify --format json`` emits UTF-8,
+    # so the locale default raised ``UnicodeDecodeError`` and the verification never ran -- found
+    # by review on this PC (#339 r1 F1).  The encoding is therefore stated, not inherited, and a
+    # byte sequence that is not UTF-8 is an explicit refusal rather than a traceback.
+    try:
+        completed = runner(
+            command, capture_output=True, text=True, encoding="utf-8", errors="strict"
+        )
+    except UnicodeDecodeError:
+        raise AttestationError("gh verification output is not valid UTF-8") from None
     if completed.returncode != 0:
         raise AttestationError("GitHub attestation signature or identity verification failed")
+    # A runner that did not capture stdout leaves it ``None``; ``json.loads(None)`` is a
+    # ``TypeError``, which exits 1 with a traceback instead of saying what was wrong.
+    if not isinstance(completed.stdout, str) or not completed.stdout.strip():
+        raise AttestationError("gh verification produced no output to verify")
     try:
         verification = json.loads(completed.stdout, object_pairs_hook=_strict_object)
     except (json.JSONDecodeError, AttestationError):
