@@ -11,7 +11,33 @@ from pathlib import Path
 import re
 import stat
 import subprocess
-from uuid import uuid4
+from uuid import UUID, uuid4
+
+WORKER_KEYS = {"tenantId", "tls", "outputRoot", "buildExecution"}
+TLS_KEYS = {"ca_file", "certificate_file", "key_file", "timeout"}
+BUILD_EXECUTION_KEYS = {
+    "buildctlPath",
+    "address",
+    "sourceRoot",
+    "referenceHealthReceipt",
+    "productReceiptDirectory",
+    "builderInstanceId",
+    "builderProfileId",
+    "providerRecoveryEpoch",
+    "nodeId",
+}
+
+
+def strict_json(raw):
+    def object_pairs(pairs):
+        value = {}
+        for key, item in pairs:
+            if key in value:
+                raise ValueError("Duplicate configuration key")
+            value[key] = item
+        return value
+
+    return json.loads(raw, object_pairs_hook=object_pairs)
 
 
 def docker(*args, payload=None):
@@ -41,7 +67,7 @@ def collect(directory):
     if not stat.S_ISDIR(info.st_mode) or getattr(info, "st_file_attributes", 0) & 0x400:
         raise ValueError("Regular configuration directory required")
     files = {"api.json": read_regular(directory / "api.json")}
-    config = json.loads(files["api.json"])
+    config = strict_json(files["api.json"])
     names = {"api.json"}
     private = set()
 
@@ -51,7 +77,7 @@ def collect(directory):
         ):
             raise ValueError("Configuration references must be flat /run/saintvision paths")
         name = value.rsplit("/", 1)[1]
-        if name == "api.json":
+        if name in {"api.json", "worker.json"}:
             raise ValueError("Credential reference aliases the configuration")
         names.add(name)
         if secret:
@@ -91,6 +117,49 @@ def collect(directory):
             reference(target["signingKeyFile"], secret=True)
             for name in ("ca_file", "certificate_file", "key_file"):
                 reference(target["tls"][name], secret=name == "key_file")
+    worker_path = directory / "worker.json"
+    if worker_path.exists():
+        files["worker.json"] = read_regular(worker_path)
+        worker = strict_json(files["worker.json"])
+        if (
+            not isinstance(worker, dict)
+            or not {"tenantId", "tls"} <= set(worker)
+            or set(worker) - WORKER_KEYS
+            or not isinstance(worker["tenantId"], str)
+            or not isinstance(worker["tls"], dict)
+        ):
+            raise ValueError("Invalid worker configuration")
+        try:
+            if str(UUID(worker["tenantId"])) != worker["tenantId"]:
+                raise ValueError("Invalid worker tenantId")
+        except (ValueError, AttributeError):
+            raise ValueError("Invalid worker tenantId") from None
+        tls = worker["tls"]
+        if not {"ca_file", "certificate_file", "key_file"} <= set(tls) or set(tls) - TLS_KEYS:
+            raise ValueError("Invalid worker TLS configuration")
+        if "timeout" in tls and (
+            type(tls["timeout"]) not in (int, float) or not 0.1 <= tls["timeout"] <= 40
+        ):
+            raise ValueError("Invalid worker TLS timeout")
+        for name in ("ca_file", "certificate_file", "key_file"):
+            reference(tls[name], secret=name == "key_file")
+        if "outputRoot" in worker and (
+            not isinstance(worker["outputRoot"], str) or not worker["outputRoot"]
+        ):
+            raise ValueError("Invalid worker outputRoot")
+        if "buildExecution" in worker:
+            build = worker["buildExecution"]
+            if (
+                not isinstance(build, dict)
+                or set(build) != BUILD_EXECUTION_KEYS
+                or any(
+                    not isinstance(build[name], str) or not build[name]
+                    for name in BUILD_EXECUTION_KEYS - {"providerRecoveryEpoch"}
+                )
+                or type(build["providerRecoveryEpoch"]) is not int
+                or build["providerRecoveryEpoch"] < 1
+            ):
+                raise ValueError("Invalid build execution configuration")
     for name in sorted(names - {"api.json"}):
         files[name] = read_regular(directory / name)
     return files, private
@@ -115,7 +184,8 @@ VERIFY = r"""
 import hashlib,json,os,sys
 from pathlib import Path
 from inv.identity import AccessTokens,trusted_file,strict_object
-from inv.node_transport import private_key
+from inv.node_transport import NodeTLSClient,private_key
+from inv.worker import validated_worker_configuration
 data=json.load(sys.stdin); root=Path('/run/saintvision')
 assert os.geteuid()==65532
 for name,digest in data['hashes'].items():
@@ -125,6 +195,10 @@ for name,digest in data['hashes'].items():
 for name in data['private']: private_key(root/name)
 config=strict_object(trusted_file(root/'api.json'))
 AccessTokens(**config['identity'])._keys()
+worker=root/'worker.json'
+if worker.exists():
+    worker_config=validated_worker_configuration(trusted_file(worker))
+    NodeTLSClient(**worker_config['tls'])
 """
 
 

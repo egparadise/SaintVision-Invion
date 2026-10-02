@@ -14,7 +14,11 @@ from inv.approvals import Principal
 from inv.build_execution import BuildExecutionResult, PRODUCT_ENABLE_SETTING
 from inv.build_execution_worker import BuildExecutionIntentQueue, BuildExecutionWorker
 from inv.build_governance import canonical_build_action
-from inv.build_product_runtime import BuildExecutionAdmissionStore, BuildProductRuntime
+from inv.build_product_runtime import (
+    BuildExecutionAdmissionStore,
+    BuildProductRuntime,
+    TrustedBuildAdmissionEntry,
+)
 from inv.errors import DomainError
 from inv.ids import new_id
 from inv.policy import action_digest
@@ -135,11 +139,9 @@ def _authority(env, *, grant=True, node_id=None):
 
 
 def _record(env, *, grant=True, node_id=None):
-    principal, run_id, request, plan, decision = _authority(
-        env, grant=grant, node_id=node_id
-    )
+    principal, run_id, request, plan, decision = _authority(env, grant=grant, node_id=node_id)
     evidence_id = new_id("evd")
-    admission = BuildExecutionAdmissionStore(env.db).record(
+    admission = TrustedBuildAdmissionEntry(env.db).record_committed(
         principal,
         request,
         plan,
@@ -203,6 +205,14 @@ def test_committed_admission_promotes_atomically_and_is_tenant_isolated(env):
     assert store.promote_next(env.tenant) is None
     assert store.promote_next(env.other) is None
     with psycopg.connect(env.owner) as conn:
+        assert (
+            conn.execute(
+                """SELECT count(*) FROM inv.outbox
+            WHERE run_id=%s AND event_type='inv.build.admission_recorded'""",
+                (admission.run_id,),
+            ).fetchone()[0]
+            == 1
+        )
         authority = conn.execute(
             """SELECT status,request_sha256,
             encode(sha256(convert_to(request::text,'UTF8')),'hex')
@@ -286,6 +296,34 @@ def test_two_product_loops_promote_and_dispatch_exactly_once(env):
                 (admission.run_id,),
             ).fetchone()[0]
             == "completed"
+        )
+
+
+def test_flag_off_preserves_admission_without_intent_or_dispatch(env):
+    admission = _record(env)
+
+    class Worker:
+        def once(self, _tenant):
+            raise AssertionError("flag-off product work must not dispatch")
+
+    runtime = BuildProductRuntime(BuildExecutionAdmissionStore(env.db), Worker(), environment={})
+    with pytest.raises(DomainError) as caught:
+        runtime.once(env.tenant)
+    assert caught.value.code == "RES-0006"
+    with psycopg.connect(env.owner) as conn:
+        assert (
+            conn.execute(
+                "SELECT status FROM inv.build_execution_admissions WHERE run_id=%s",
+                (admission.run_id,),
+            ).fetchone()[0]
+            == "ready"
+        )
+        assert (
+            conn.execute(
+                "SELECT count(*) FROM inv.build_execution_intents WHERE run_id=%s",
+                (admission.run_id,),
+            ).fetchone()[0]
+            == 0
         )
 
 

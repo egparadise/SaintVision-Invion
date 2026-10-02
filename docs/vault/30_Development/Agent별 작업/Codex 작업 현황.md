@@ -1,15 +1,30 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.283"
+version: "1.0.284"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T21:30:50+09:00"
+updated: "2026-10-02T22:36:44+09:00"
 source_of_truth: "Git"
-active_card: "CARD-232 S08-BE product worker loop and trusted intent producer"
-active_card_status: "Approved by Claude r6 at 076f64ba with exact-head Backend 37003189569 and Core 37003189727 green (9 real-PG cases executed, 0 skipped); bounded fair promotion, retryable heartbeat backoff, census repinned to 157 tables; product flag remains off"
-active_card_next: "Land with its train; enabling product dispatch follows the S08 enablement runbook (#335) and stays a separate decision"
+active_card: "CARD-241 S08-BE trusted admission entry and deployment worker service"
+active_card_status: "Implementation in review: internal exact-document admission seam, atomic redacted audit, private Compose worker, strict worker.json volume boundary; product flag remains off"
+active_card_next: "Run exact-head hosted Core real-PG and Backend, then obtain Claude independent review; operator enablement remains a separate decision"
 ---
+
+## 2026-10-02 Card 241 — S08-BE trusted admission entry and deployment worker service
+
+- The configured Control Plane now owns an internal-only `TrustedBuildAdmissionEntry`.
+  It accepts already committed exact documents and exposes no HTTP route or CLI. The
+  first immutable admission and its redacted audit outbox event are one transaction;
+  exact replay emits no duplicate audit event.
+- Production Compose now has a private worker service and a default-off exact product
+  flag. `prepare_server_config.py` collects and image-verifies strict `worker.json` plus
+  only its referenced flat TLS files; the Node key is private and unrelated files stay
+  outside the volume.
+- Focused PG-free files are green. Hosted real-PG and exact-head Core/Backend remain the
+  merge evidence. S08-BE completion, flag enablement, and physical builder acceptance
+  are not claimed.
+- [[2026-10-02_22-36-44_KST_Card241_S08-BE_admission_entry_worker_service_Codex]].
 
 ## 2026-10-02 Card 232 — S08-BE product worker loop and trusted intent producer
 

@@ -17,6 +17,63 @@ from .dispatch import DeliveryWorker
 from .identity import strict_object, trusted_file
 from .node_transport import NodeDelivery, NodeTLSClient
 
+WORKER_KEYS = frozenset({"tenantId", "tls", "outputRoot", "buildExecution"})
+TLS_KEYS = frozenset({"ca_file", "certificate_file", "key_file", "timeout"})
+BUILD_EXECUTION_KEYS = frozenset(
+    {
+        "buildctlPath",
+        "address",
+        "sourceRoot",
+        "referenceHealthReceipt",
+        "productReceiptDirectory",
+        "builderInstanceId",
+        "builderProfileId",
+        "providerRecoveryEpoch",
+        "nodeId",
+    }
+)
+
+
+def validated_worker_configuration(value):
+    """Return a strict worker document without constructing transports."""
+
+    config = strict_object(value)
+    if not {"tenantId", "tls"} <= set(config) or set(config) - WORKER_KEYS:
+        raise ValueError("Exact worker configuration required")
+    tenant = str(UUID(config["tenantId"]))
+    if tenant != config["tenantId"]:
+        raise ValueError("Canonical worker tenantId required")
+    tls = config["tls"]
+    if not isinstance(tls, dict):
+        raise ValueError("Exact worker TLS configuration required")
+    if not {"ca_file", "certificate_file", "key_file"} <= set(tls) or set(tls) - TLS_KEYS:
+        raise ValueError("Exact worker TLS configuration required")
+    if any(
+        not isinstance(tls[name], str) or not tls[name]
+        for name in ("ca_file", "certificate_file", "key_file")
+    ):
+        raise ValueError("Worker TLS paths must be non-empty strings")
+    if "timeout" in tls and (
+        type(tls["timeout"]) not in (int, float) or not 0.1 <= tls["timeout"] <= 40
+    ):
+        raise ValueError("Worker TLS timeout out of range")
+    if "outputRoot" in config and (
+        not isinstance(config["outputRoot"], str) or not config["outputRoot"]
+    ):
+        raise ValueError("Worker outputRoot must be a non-empty string")
+    if "buildExecution" in config:
+        build = config["buildExecution"]
+        if not isinstance(build, dict):
+            raise ValueError("Exact build execution configuration required")
+        if set(build) != BUILD_EXECUTION_KEYS or any(
+            not isinstance(build[name], str) or not build[name]
+            for name in BUILD_EXECUTION_KEYS - {"providerRecoveryEpoch"}
+        ):
+            raise ValueError("Exact build execution configuration required")
+        if type(build["providerRecoveryEpoch"]) is not int or build["providerRecoveryEpoch"] < 1:
+            raise ValueError("Measured provider recovery epoch required")
+    return config
+
 
 def _output_provider(config):
     """Select exactly one legacy-local or canonical API-configured provider."""
@@ -56,15 +113,8 @@ def main():
     parser.add_argument("--once", action="store_true")
     args = parser.parse_args()
     try:
-        config = strict_object(trusted_file(os.environ["INV_WORKER_CONFIG"]))
-        if not {"tenantId", "tls"} <= set(config) or set(config) - {
-            "tenantId",
-            "tls",
-            "outputRoot",
-            "buildExecution",
-        }:
-            raise ValueError()
-        tenant = str(UUID(config["tenantId"]))
+        config = validated_worker_configuration(trusted_file(os.environ["INV_WORKER_CONFIG"]))
+        tenant = config["tenantId"]
         db = Database(
             os.environ["INV_RUNTIME_DSN"],
             recovery_epoch=os.environ["INV_RECOVERY_EPOCH"],

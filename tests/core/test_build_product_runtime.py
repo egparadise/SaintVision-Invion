@@ -5,6 +5,7 @@ from __future__ import annotations
 from contextlib import contextmanager
 from copy import deepcopy
 from datetime import datetime, timezone
+import json
 from pathlib import Path
 
 import pytest
@@ -12,10 +13,12 @@ import pytest
 import inv.build_product_runtime as runtime_module
 import inv.worker as worker_module
 from inv.approvals import Principal
+from inv.app import create_app
 from inv.build_execution import BuildExecutionService, PRODUCT_ENABLE_SETTING
 from inv.build_product_runtime import (
     BuildExecutionAdmissionStore,
     BuildProductRuntime,
+    TrustedBuildAdmissionEntry,
     configured_tenant_product_runtime,
 )
 from inv.errors import DomainError
@@ -32,6 +35,22 @@ ROOT = Path(__file__).resolve().parents[2]
 MIGRATION = ROOT / "migrations/versions/0060_build_execution_admissions.py"
 PROCESS = ROOT / "services/control-plane/src/inv/worker.py"
 SERVICE = ROOT / "services/control-plane/src/inv/build_execution.py"
+BUILD_CONFIG = {
+    "buildctlPath": "/usr/bin/buildctl",
+    "address": "unix:///run/user/65532/buildkit/buildkitd.sock",
+    "sourceRoot": "/workspaces",
+    "referenceHealthReceipt": "/run/saintvision/buildkit-health.json",
+    "productReceiptDirectory": "/var/lib/saintvision/build-receipts",
+    "builderInstanceId": "builder-rootless-01",
+    "builderProfileId": "buildkit-rootless-v1",
+    "providerRecoveryEpoch": 7,
+    "nodeId": "nod_00000000000000000000000000",
+}
+TLS_CONFIG = {
+    "ca_file": "/run/saintvision/node-ca.pem",
+    "certificate_file": "/run/saintvision/worker.pem",
+    "key_file": "/run/saintvision/worker.key",
+}
 
 
 def test_migration_is_linear_force_rls_immutable_and_non_destructive():
@@ -124,6 +143,25 @@ def test_process_composes_build_lane_only_behind_exact_product_flag():
     assert "INV_BUILDKIT_PRODUCT_ENABLED" not in source
 
 
+def test_real_worker_configuration_parser_accepts_exact_nested_json_only():
+    config = {
+        "tenantId": TENANT,
+        "tls": deepcopy(TLS_CONFIG),
+        "buildExecution": deepcopy(BUILD_CONFIG),
+    }
+    assert worker_module.validated_worker_configuration(json.dumps(config).encode()) == config
+    config["tls"]["unknown"] = True
+    with pytest.raises(ValueError, match="Exact worker TLS"):
+        worker_module.validated_worker_configuration(json.dumps(config).encode())
+    config = {
+        "tenantId": TENANT,
+        "tls": deepcopy(TLS_CONFIG),
+        "buildExecution": {**BUILD_CONFIG, "providerRecoveryEpoch": "7"},
+    }
+    with pytest.raises(ValueError, match="provider recovery epoch"):
+        worker_module.validated_worker_configuration(json.dumps(config).encode())
+
+
 def _run_process_once(monkeypatch, *, enabled):
     calls = []
 
@@ -152,9 +190,9 @@ def _run_process_once(monkeypatch, *, enabled):
             calls.append("build")
             return "build"
 
-    config = {"tenantId": TENANT, "tls": {}}
+    config = {"tenantId": TENANT, "tls": TLS_CONFIG}
     if enabled:
-        config["buildExecution"] = {}
+        config["buildExecution"] = BUILD_CONFIG
     monkeypatch.setattr(worker_module, "Database", Database)
     monkeypatch.setattr(worker_module, "strict_object", lambda value: value)
     monkeypatch.setattr(worker_module, "trusted_file", lambda _path: config)
@@ -276,6 +314,8 @@ class _Connection:
     def execute(self, sql, params=None):
         normalized = " ".join(sql.split())
         self.statements.append((normalized, params))
+        if normalized.startswith("INSERT INTO inv.build_execution_admissions"):
+            return _Result({"run_id": RUN})
         if normalized.startswith("SELECT * FROM inv.build_execution_admissions"):
             return _Result(self.stored)
         return _Result()
@@ -333,3 +373,51 @@ def test_record_rechecks_permission_policy_and_live_lease_before_insert(monkeypa
     insert = next(sql for sql, _ in connection.statements if sql.startswith("INSERT INTO"))
     assert "inv.build_execution_admissions" in insert
     assert "ON CONFLICT DO NOTHING" in insert
+    audit = next(
+        (sql, params)
+        for sql, params in connection.statements
+        if sql.startswith("INSERT INTO inv.outbox")
+    )
+    assert audit[1][3] == "inv.build.admission_recorded"
+
+
+def test_trusted_product_entry_delegates_exact_committed_documents(monkeypatch):
+    request, plan, decision = documents()
+    calls = []
+
+    def record(_self, principal, got_request, got_plan, got_decision, **kwargs):
+        calls.append((principal, got_request, got_plan, got_decision, kwargs))
+        return "recorded"
+
+    monkeypatch.setattr(BuildExecutionAdmissionStore, "record", record)
+    entry = TrustedBuildAdmissionEntry(object())
+    assert (
+        entry.record_committed(
+            Principal(TENANT, SUBJECT),
+            request,
+            plan,
+            decision,
+            policy_version="s08-build-v1",
+            run_id=RUN,
+            evidence_id=EVIDENCE,
+        )
+        == "recorded"
+    )
+    assert calls == [
+        (
+            Principal(TENANT, SUBJECT),
+            request,
+            plan,
+            decision,
+            {"policy_version": "s08-build-v1", "run_id": RUN, "evidence_id": EVIDENCE},
+        )
+    ]
+
+
+def test_trusted_entry_is_composed_in_process_without_a_public_route():
+    entry = object()
+    api = create_app(build_admission_entry=entry)
+    assert api.state.build_admission_entry is entry
+    assert not any("build-admission" in route.path for route in api.routes)
+    source = (ROOT / "services/control-plane/src/inv/app.py").read_text(encoding="utf-8")
+    assert "build_admission_entry=TrustedBuildAdmissionEntry(database)" in source

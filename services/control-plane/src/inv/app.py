@@ -236,6 +236,7 @@ def create_app(
     model_retry=None,
     unresolved_settings=None,
     object_stores=None,
+    build_admission_entry=None,
 ):
     @asynccontextmanager
     async def lifespan(api):
@@ -252,6 +253,10 @@ def create_app(
         redoc_url=None,
         lifespan=lifespan,
     )
+    # Trusted in-process product seam only.  Deliberately not attached to any
+    # route dependency, request handler, CLI, or user-controlled payload.
+    if build_admission_entry is not None:
+        api.state.build_admission_entry = build_admission_entry
     if business is not None:
         from .business_surface import BusinessDispatch
 
@@ -1205,6 +1210,7 @@ def create_configured_app():
             if not unresolved_object_store(object_store_configuration):
                 remote_object_store = configured_object_store(object_store_configuration)
         object_stores = _configured_object_stores(workspace, remote_object_store)
+        from .build_product_runtime import TrustedBuildAdmissionEntry
 
         return create_app(
             database,
@@ -1215,6 +1221,7 @@ def create_configured_app():
             model_retry=model_retry,
             unresolved_settings=unresolved_settings,
             object_stores=object_stores,
+            build_admission_entry=TrustedBuildAdmissionEntry(database),
         )
     except Exception:
         raise RuntimeError(

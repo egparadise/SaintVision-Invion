@@ -42,6 +42,7 @@ from .policy import action_digest, enforce_decision
 from .tooling import NodePrincipal
 
 PROMOTED_EVENT = "inv.build.intent_enqueued"
+ADMITTED_EVENT = "inv.build.admission_recorded"
 TRANSIENT_PROMOTION_CODES = frozenset({"RES-0003", "RES-0007"})
 PROMOTION_RETRY_DELAY_SECONDS = 1
 MAX_PROMOTION_CANDIDATES_PER_TICK = 128
@@ -122,12 +123,12 @@ class BuildExecutionAdmissionStore:
                 database_recovery_epoch=self.db.recovery_epoch,
                 now=now,
             )
-            conn.execute(
+            inserted = conn.execute(
                 """INSERT INTO inv.build_execution_admissions(
                 tenant_id,project_id,run_id,request,plan,decision,
                 policy_version,evidence_id,actor_id
                 ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
-                ON CONFLICT DO NOTHING""",
+                ON CONFLICT DO NOTHING RETURNING run_id""",
                 (
                     principal.tenant_id,
                     project_id,
@@ -139,7 +140,29 @@ class BuildExecutionAdmissionStore:
                     evidence_id,
                     principal.subject_id,
                 ),
-            )
+            ).fetchone()
+            if inserted:
+                # The immutable authority record and its redacted audit event are
+                # committed together.  Exact replay never emits a second event.
+                conn.execute(
+                    """INSERT INTO inv.outbox(tenant_id,run_id,event_id,event_type,payload)
+                    VALUES (%s,%s,%s,%s,%s)""",
+                    (
+                        principal.tenant_id,
+                        run_id,
+                        uuid4(),
+                        ADMITTED_EVENT,
+                        Jsonb(
+                            {
+                                "projectId": project_id,
+                                "runId": run_id,
+                                "decisionId": decision_doc["decisionId"],
+                                "evidenceId": evidence_id,
+                                "policyVersion": policy_version,
+                            }
+                        ),
+                    ),
+                )
             stored = conn.execute(
                 """SELECT * FROM inv.build_execution_admissions
                 WHERE project_id=%s AND run_id=%s FOR SHARE""",
@@ -168,7 +191,8 @@ class BuildExecutionAdmissionStore:
         seen_run_ids: set[str] = set()
         while len(seen_run_ids) < MAX_PROMOTION_CANDIDATES_PER_TICK:
             with self.db.transaction(tenant_id) as conn:
-                stored = conn.execute("""SELECT *,
+                stored = conn.execute(
+                    """SELECT *,
                     request_sha256 = encode(sha256(convert_to(request::text,'UTF8')),'hex')
                       AND plan_sha256 = encode(sha256(convert_to(plan::text,'UTF8')),'hex')
                       AND decision_sha256 = encode(sha256(convert_to(decision::text,'UTF8')),'hex')
@@ -316,6 +340,40 @@ class BuildExecutionAdmissionStore:
                 )
                 return admission
         return None
+
+
+class TrustedBuildAdmissionEntry:
+    """Internal-only product seam for already committed build authority.
+
+    This object is installed in the configured Control Plane composition root,
+    but no HTTP route or CLI exposes it.  The upstream policy/planning service
+    must supply the exact committed documents; this boundary never synthesizes
+    a request, plan, decision, actor, Run, or Evidence identifier.
+    """
+
+    def __init__(self, database):
+        self._store = BuildExecutionAdmissionStore(database)
+
+    def record_committed(
+        self,
+        principal: Principal,
+        request: Mapping[str, Any],
+        plan: Mapping[str, Any],
+        decision: Mapping[str, Any],
+        *,
+        policy_version: str,
+        run_id: str,
+        evidence_id: str,
+    ) -> BuildExecutionAdmission:
+        return self._store.record(
+            principal,
+            request,
+            plan,
+            decision,
+            policy_version=policy_version,
+            run_id=run_id,
+            evidence_id=evidence_id,
+        )
 
 
 class BuildProductRuntime:
