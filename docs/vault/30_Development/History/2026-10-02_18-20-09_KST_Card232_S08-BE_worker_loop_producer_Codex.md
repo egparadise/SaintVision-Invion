@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD232-S08-BE-WORKER-PRODUCER-20261002"
 title: "Card 232 S08-BE product worker loop and trusted intent producer"
-version: "1.2.0"
+version: "1.3.0"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T18:55:06+09:00"
+updated: "2026-10-02T19:02:27+09:00"
 source_of_truth: "Git"
 base_sha: "c57697d2ab80877f44e189c1efe172a6dd03a7e6"
 reviewer: "Claude"
@@ -89,11 +89,23 @@ reference transport still refuses product dispatch.
 # Cross-train RLS census condition
 
 Card 234 (`#330`) introduced the reviewed RLS-table census and correctly repinned it for
-0059 at 156 tables. Migration 0060 adds one more FORCE-RLS table, so a train that contains
-both changes must measure and repin the census to 157 before landing Card 232. This branch
-does not merge Card 234's wider train into the Card 229 stack; the merge-train owner must
-order Card 234 first and regenerate the census from the combined 0060 tree. A 156-table
-census beside 0060 is stale and must fail closed, never be accepted as this card's evidence.
+0059 at 156 tables. Its approved head `f91ce5db` was merged non-force before repinning
+0060. Hosted security run `36992706201` measured the combined exact head `1269f37f` on a
+disposable migrated PostgreSQL 16 database. The normalized RLS report carried 157 unique
+tables with digest `32ecadb725a9f231aef60117346c76f6707c5f32dded1084d48b6f002298299e`.
+`tools/write_rls_table_census.py`, not a hand edit, wrote the reviewed census and produced
+Git blob `ee6c3f7fb1eefc25388893ff0bad76797dabe3ab`; the aggregator pins that exact blob.
+
+The 0060 table's measured ground truth matches its owner design: it is tenant scoped with
+RLS enabled and forced; `inv_kernel` has table SELECT/INSERT, lifecycle-column UPDATE,
+no DELETE, and the single `build_execution_admissions_tenant_isolation` ALL policy.
+The other seven measured runtime/audit roles have no table privilege or policy on it.
+All observed row counts were zero, so this run remains `UNMEASURED` for row isolation; it
+is catalog/RLS disposition evidence and is not promoted to a security PASS.
+
+The writer also accepts the hosted normalized RLS artifact only when `reportAvailable` is
+true, threat and run IDs match, its source SHA is the current exact HEAD, and the migration
+graph has one readable head. This keeps hosted-only repinning generated and fail closed.
 
 # Corrective finding
 
@@ -127,5 +139,7 @@ No local PostgreSQL, Docker, BuildKit, or full suite was started.
 |---|---|
 | producer, intent, AC-11 migration, and resolver focused set | 197 passed |
 | BuildExecution, adapter, intent, producer, worker-config, and migration regressions | 185 passed |
+| r1 correction + AC-11 census/aggregator focused set | 247 passed |
+| hosted 0060 RLS catalog observation | run `36992706201`, 157 tables, `UNMEASURED` row verdict |
 | `tools/migration_graph.py --head` | `0060_build_execution_admissions`, one head |
 | `git diff --check` | exit 0 |

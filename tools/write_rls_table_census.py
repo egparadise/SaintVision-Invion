@@ -3,8 +3,10 @@
 
 ``tools/rls-table-census.json`` is the reviewed population the AC-11 evaluator binds an RLS report
 to (#322 F-R7).  It is therefore a measurement, not a list someone maintains: this tool takes the
-JSON the collector wrote -- the file ``collect_rls_evidence.py`` produces, whose ``table_census``
-block is that collector's own catalogue observation -- and writes the reviewed file from it.
+JSON the collector wrote -- or the normalized hosted SEC-RLS-001 report that preserves that
+collector's ``table_census`` block -- and writes the reviewed file from it.  A normalized hosted
+report is accepted only for the current exact HEAD and its source run ID; the current migration
+head is read from ``tools/migration_graph.py`` rather than supplied by a caller.
 
 Why a tool rather than an edit (card 234): the file went stale the first time a migration added a
 table (``0059`` added ``inv.build_execution_intents``), and the evaluator refused every RLS report
@@ -44,15 +46,37 @@ NOTE = (
 )
 
 
-def census_from_observation(observation: Any, run_id: str | None) -> dict[str, Any]:
+def census_from_observation(
+    observation: Any,
+    run_id: str | None,
+    *,
+    migration_head: str | None = None,
+) -> dict[str, Any]:
     """The reviewed document, rebuilt from the collector's own census block."""
 
     if not isinstance(observation, dict):
         raise ValueError("the observation must be an object")
     census = observation.get("table_census")
     database = observation.get("database")
-    if not isinstance(census, dict) or not isinstance(database, dict):
-        raise ValueError("the observation carries no table_census and database block")
+    if not isinstance(census, dict):
+        raise ValueError("the observation carries no table_census block")
+    if isinstance(database, dict):
+        source_head_sha = str(observation.get("git_sha") or "unknown")
+        observed_migration_head = str(database.get("migration_head") or "unknown")
+    else:
+        if (
+            observation.get("threatId") != "SEC-RLS-001"
+            or observation.get("reportAvailable") is not True
+            or not isinstance(observation.get("sourceHeadSha"), str)
+            or not observation["sourceHeadSha"]
+        ):
+            raise ValueError("the normalized hosted observation is not a measured RLS report")
+        if run_id is not None and str(observation.get("sourceRunId")) != str(run_id):
+            raise ValueError("the hosted observation sourceRunId differs")
+        if not migration_head:
+            raise ValueError("the normalized hosted observation requires a migration head")
+        source_head_sha = observation["sourceHeadSha"]
+        observed_migration_head = migration_head
     tables = census.get("tables")
     if not isinstance(tables, list) or not tables or len(set(tables)) != len(tables):
         raise ValueError("table_census.tables must be a non-empty list of distinct names")
@@ -67,8 +91,8 @@ def census_from_observation(observation: Any, run_id: str | None) -> dict[str, A
         "note": NOTE,
         "measuredFrom": {
             "runId": run_id or "local",
-            "sourceHeadSha": str(observation.get("git_sha") or "unknown"),
-            "migrationHead": str(database.get("migration_head") or "unknown"),
+            "sourceHeadSha": source_head_sha,
+            "migrationHead": observed_migration_head,
         },
         "schemas": sorted(schemas),
         "count": len(tables),
@@ -85,8 +109,32 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         observation = json.loads(args.observation.read_text(encoding="utf-8"))
-        document = census_from_observation(observation, args.run_id)
-    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as error:
+        migration_head = None
+        if not isinstance(observation.get("database"), dict):
+            source_head = subprocess.run(
+                ["git", "rev-parse", "HEAD"],
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout.strip()
+            if observation.get("sourceHeadSha") != source_head:
+                raise ValueError("the hosted observation is not for the current exact head")
+            migration_head = subprocess.run(
+                [sys.executable, "tools/migration_graph.py", "--head"],
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout.strip()
+        document = census_from_observation(observation, args.run_id, migration_head=migration_head)
+    except (
+        OSError,
+        UnicodeError,
+        json.JSONDecodeError,
+        subprocess.CalledProcessError,
+        ValueError,
+    ) as error:
         print(f"the collector observation is unusable: {error}", file=sys.stderr)
         return 2
     rendered = json.dumps(document, ensure_ascii=False, indent=2) + "\n"
@@ -96,7 +144,7 @@ def main(argv: list[str] | None = None) -> int:
     raw = args.out.read_bytes()
     blob = hashlib.sha1(b"blob %d\0" % len(raw) + raw).hexdigest()
     print(f"{args.out}: {document['count']} tables, sha256 {document['sha256']}")
-    print(f"RLS_CENSUS_BLOB = \"{blob}\"")
+    print(f'RLS_CENSUS_BLOB = "{blob}"')
     return 0
 
 
