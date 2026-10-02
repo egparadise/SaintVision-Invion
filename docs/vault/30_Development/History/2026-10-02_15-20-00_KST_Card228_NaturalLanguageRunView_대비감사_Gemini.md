@@ -4,7 +4,7 @@
 - **작업 ID**: Card 228 (ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory)
 - **대상 화면**: `apps/web/src/features/agent/NaturalLanguageRunView.tsx`
 - **담당자**: Gemini (Antigravity)
-- **작업 브랜치**: `agent/gemini/c228-nl-run-contrast`
+- **작업 브랜치**: `agent/gemini/c228-nl-run-contrast` (PR #325)
 - **기반 커밋 (Base)**: `46773e20` (PR #324 / Card 226 r2 최종 반영 head)
 - **KST 시각**: 2026-10-02 15:20:00 KST
 
