@@ -36,6 +36,24 @@ it.each([{ command: [] }, { command: 'shell text' }, { projectId: 'other' }, { t
   const v = review(); api.mockResolvedValue({ ...v, workload: { ...v.workload, ...patch } });
   await expect(fetchApprovalReview(item())).rejects.toThrow();
 });
+it('accepts only a complete redacted build review summary', async () => {
+  const v = review();
+  const buildReview = {
+    ...v,
+    workload: {
+      kind: 'build' as const, target: 'image' as const, riskLevel: 'L2' as const,
+      profileId: 'profile-rootless', profileVersion: 1, sourceRevision: 2,
+      contextDigest: 'd'.repeat(64), dockerfileDigest: 'e'.repeat(64),
+      networkMode: 'none' as const, cacheMode: 'read-only' as const,
+      usesSecrets: false, secretCount: 0,
+    },
+  };
+  api.mockResolvedValue(buildReview);
+  await expect(fetchApprovalReview(item())).resolves.toEqual(buildReview);
+
+  api.mockResolvedValue({ ...buildReview, workload: { ...buildReview.workload, secretCount: 1 } });
+  await expect(fetchApprovalReview(item())).rejects.toThrow();
+});
 it('does not fallback or enable approval when review is unsupported', async () => {
   api.mockRejectedValue(new Error('404')); await expect(fetchApprovalReview(item())).rejects.toThrow();
   expect(api).toHaveBeenCalledTimes(1);

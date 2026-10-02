@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-CARD247-S08-BE-BUILD-REQUEST-ENTRY-001"
 title: "Card 247 S08-BE BuildRequest product entry implementation"
-version: "1.2.0"
+version: "1.2.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-03T03:03:58+09:00"
+updated: "2026-10-03T03:25:33+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S08-BE", "CARD-247"]
@@ -84,6 +84,12 @@ and fixture imports are current. Focused PG-free results are `test_build_prepara
 ratchet 5 passed. The two-case real-PG file collects with all dependencies. Exact-head
 Backend/Core/security and real-PG results are intentionally recorded in the PR review-baseline
 comment after the single final push, because those runs do not exist when this commit is made.
+
+The first exact-head frontend compile exposed the intended H2 union at its consumer: the UI
+still assumed every `ApprovalReviewView.workload` was a `WorkloadSpec`. The consumer now
+discriminates the generated `kind: build` type, validates every redacted build-summary field,
+and presents that summary without inventing a workspace or command. Production build and the
+two focused approval-review UI files pass (`33 passed`).
 
 S08-BE completion, product flag enablement, and physical builder acceptance are not
 claimed. The actual census count is derived from the hosted catalogue; the current base

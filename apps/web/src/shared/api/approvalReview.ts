@@ -3,8 +3,34 @@ import type { ApprovalReviewView } from '../../../../../packages/contracts-ts/sr
 import { apiClient } from './client';
 import { decideApproval } from './kernelMutations';
 export type ApprovalReview = ApprovalReviewView;
+type ReviewedWorkload = ApprovalReview['workload'];
+type BuildReviewSummary = Extract<ReviewedWorkload, { kind: 'build' }>;
 export interface ReviewedAction { approvalId: string; projectId: string; actionDigest: string; runVersion: number }
 const sha256 = (value: unknown): value is string => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
+export const isBuildReviewSummary = (workload: ReviewedWorkload): workload is BuildReviewSummary =>
+  workload.kind === 'build';
+
+function validBuildReviewSummary(workload: BuildReviewSummary, riskLevel: string): boolean {
+  return workload.target === 'image' && workload.riskLevel === 'L2' && riskLevel === 'L2' &&
+    typeof workload.profileId === 'string' && workload.profileId.length > 0 &&
+    Number.isSafeInteger(workload.profileVersion) && workload.profileVersion > 0 &&
+    Number.isSafeInteger(workload.sourceRevision) && workload.sourceRevision > 0 &&
+    sha256(workload.contextDigest) && sha256(workload.dockerfileDigest) &&
+    workload.networkMode === 'none' && ['disabled', 'read-only'].includes(workload.cacheMode) &&
+    typeof workload.usesSecrets === 'boolean' && Number.isSafeInteger(workload.secretCount) &&
+    workload.secretCount >= 0 && workload.usesSecrets === (workload.secretCount > 0);
+}
+
+function validWorkloadSpec(workload: Exclude<ReviewedWorkload, BuildReviewSummary>, projectId: string): boolean {
+  return workload.projectId === projectId && typeof workload.workspaceId === 'string' &&
+    workload.workspaceId.length > 0 && Array.isArray(workload.command) && workload.command.length > 0 &&
+    workload.command.every((arg: string) => typeof arg === 'string') &&
+    typeof workload.imageDigest === 'string' && /^sha256:[a-f0-9]{64}$/.test(workload.imageDigest) &&
+    Number.isSafeInteger(workload.timeoutSeconds) && workload.timeoutSeconds > 0 &&
+    Boolean(workload.resources) &&
+    (['cpuMillis','memoryBytes','gpuCount','minVramBytes'] as const).every(k =>
+      typeof workload.resources[k] === 'number' && Number.isFinite(workload.resources[k]) && workload.resources[k] >= 0);
+}
 export function reviewIdentity(item: ApprovalItem): string {
   return JSON.stringify([item.projectId, item.id, item.runId, item.actionDigest, item.boundRunVersion,
     item.requestedBy, item.requiredApprovals, item.policyReason, item.expiresAt, item.status]);
@@ -14,17 +40,15 @@ export async function fetchApprovalReview(item: ApprovalItem): Promise<ApprovalR
   if (!expected.projectId || !sha256(expected.actionDigest)) throw new Error('승인 검토 정보가 불완전합니다.');
   const result = await apiClient<ApprovalReview>(`/v1/projects/${encodeURIComponent(expected.projectId)}/approvals/${encodeURIComponent(expected.id)}/review`);
   const a = result?.approval; const w = result?.workload;
+  const workloadValid = !w ? false : (isBuildReviewSummary(w)
+    ? validBuildReviewSummary(w, result.riskLevel)
+    : validWorkloadSpec(w, expected.projectId));
   if (!a || a.approvalId !== expected.id || a.projectId !== expected.projectId || a.runId !== expected.runId ||
       a.actionDigest !== expected.actionDigest || a.runVersion !== expected.boundRunVersion ||
       a.requesterId !== expected.requestedBy || a.requiredApprovals !== expected.requiredApprovals ||
       a.policyVersion !== expected.policyReason || a.expiresAt !== expected.expiresAt || a.status !== expected.status ||
       !sha256(result.policyDigest) || !['L0', 'L1', 'L2'].includes(result.riskLevel) ||
-      !w || w.projectId !== expected.projectId || typeof w.workspaceId !== 'string' || !w.workspaceId ||
-      !Array.isArray(w.command) || !w.command.length || w.command.some(arg => typeof arg !== 'string') ||
-      typeof w.imageDigest !== 'string' || !/^sha256:[a-f0-9]{64}$/.test(w.imageDigest) ||
-      !Number.isSafeInteger(w.timeoutSeconds) || w.timeoutSeconds < 1 || !w.resources ||
-      (['cpuMillis','memoryBytes','gpuCount','minVramBytes'] as const).some(k =>
-        typeof w.resources[k] !== 'number' || !Number.isFinite(w.resources[k]) || w.resources[k] < 0)) {
+      !workloadValid) {
     throw new Error('표시할 승인 내용이 현재 안건과 일치하지 않습니다. 목록을 새로고침하세요.');
   }
   return result;

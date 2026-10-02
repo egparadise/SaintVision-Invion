@@ -1,13 +1,13 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.295"
+version: "1.0.296"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T03:03:58+09:00"
+updated: "2026-10-03T03:25:33+09:00"
 source_of_truth: "Git"
 active_card: "CARD-247 S08-BE build-request entry implementation (migration 0061)"
-active_card_status: "Card 247 PR #343 r1 blockers are corrected locally as one final review head: legal terminal transitions, configured measured plan authority, capsule/readback/retention, census 160, and two hosted real-PG cases"
+active_card_status: "Card 247 PR #343 r1 blockers and the generated ApprovalReviewView union consumer are corrected: legal terminal transitions, configured measured plan authority, capsule/readback/retention, census 160, and two hosted real-PG cases"
 active_card_next: "Record the single review head and its exact-head Backend/Core results on #343; product dispatch stays off by default and enablement follows the S08 runbook (#335)"
 ---
 

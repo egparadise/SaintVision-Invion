@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ApprovalDetail, type ApprovalDetailProps } from './ApprovalDetail';
-import { fetchApprovalReview, reviewIdentity, reviewedAction, type ApprovalReview } from '@/shared/api/approvalReview';
+import { fetchApprovalReview, isBuildReviewSummary, reviewIdentity, reviewedAction, type ApprovalReview } from '@/shared/api/approvalReview';
 
 export function ApprovalReviewPanel(props: ApprovalDetailProps) {
   const identity = reviewIdentity(props.approval);
@@ -16,9 +16,13 @@ export function ApprovalReviewPanel(props: ApprovalDetailProps) {
     return () => { active = false; };
   }, [identity, props.currentUserId, reload]);
   const review = loaded?.identity === identity ? loaded.review : null;
-  const approval = review ? { ...props.approval, command: JSON.stringify(review.workload.command),
-    riskLevel: review.riskLevel, workspaceId: review.workload.workspaceId,
-    target: review.workload.workspaceId } : { ...props.approval, command: undefined, riskLevel: undefined };
+  const workload = review?.workload;
+  const approval = review && workload ? (isBuildReviewSummary(workload)
+    ? { ...props.approval, command: JSON.stringify(workload), riskLevel: review.riskLevel,
+        workspaceId: undefined, target: workload.target }
+    : { ...props.approval, command: JSON.stringify(workload.command), riskLevel: review.riskLevel,
+        workspaceId: workload.workspaceId, target: workload.workspaceId })
+    : { ...props.approval, command: undefined, riskLevel: undefined };
   return <section>
     {error ? <p role="alert">{error} <button onClick={() => { setLoaded(null); setReload(n => n + 1); }}>다시 조회</button></p>
       : !review && <p role="status">승인할 작업 내용을 조회하고 있습니다.</p>}
