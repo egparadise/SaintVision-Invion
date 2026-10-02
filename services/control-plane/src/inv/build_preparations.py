@@ -251,7 +251,12 @@ def configured_build_plan_authority(database, worker_config, *, environment=None
 
     from .worker import validated_worker_configuration
 
-    config = validated_worker_configuration(dict(worker_config))
+    # ``create_configured_app`` deliberately passes the bytes returned by
+    # ``trusted_file``.  Keep that trust boundary intact: the worker validator
+    # owns duplicate-key rejection and the exact JSON shape.  Converting here
+    # with ``dict(...)`` rejects bytes before the canonical parser can inspect
+    # them and made every product-enabled API startup fail closed.
+    config = validated_worker_configuration(worker_config)
     build = config.get("buildExecution")
     if build is None:
         raise ValueError("Build execution configuration unavailable")

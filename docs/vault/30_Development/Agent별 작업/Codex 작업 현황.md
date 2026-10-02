@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.297"
+version: "1.0.298"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T04:03:33+09:00"
+updated: "2026-10-03T04:55:31+09:00"
 source_of_truth: "Git"
 active_card: "CARD-247 S08-BE build-request entry implementation (migration 0061)"
-active_card_status: "Card 247 PR #343 r1 blockers and the generated ApprovalReviewView union consumer are corrected; Core run 37047480344 additionally exposed and fixed the transitive node_runtime/approval fixture registration for both real-PG cases"
-active_card_next: "Require the replacement exact-head Backend/Core/security results before recording the single review baseline on #343; product dispatch stays off by default"
+active_card_status: "Card 247 PR #343 Claude r2 startup defect is corrected and real-PG mutation guards now cover immutable authority, quota exhaustion, and post-quorum source drift"
+active_card_next: "Require exact-head Backend/Core/security and the five-case real-PG module, then resume Card 251 evidence on the approved #343 head; product dispatch stays off by default"
 ---
 
 ## 2026-10-03 Card 247 — S08-BE BuildRequest product entry
@@ -20,6 +20,10 @@ active_card_next: "Require the replacement exact-head Backend/Core/security resu
   the repository generator. The final review-head comment carries exact-head Backend/Core and
   real-PG results; the product flag remains off and S08-BE completion is not claimed.
 - [[2026-10-03_02-05-18_KST_Card247_S08-BE_build_request_entry_Codex]].
+- Claude r2 follow-up routes trusted `worker.json` bytes through the canonical parser and adds
+  real-PG behavior guards for owner immutability, sixth-attempt `RES-0007/429`, and post-quorum
+  source drift (`VERIFY-0002`, expired/failed, audit 1, admission 0). Card 251 remains paused until
+  the replacement exact-head hosted runs and Claude r3 confirm this head.
 
 ## 2026-10-02 Card 241 — S08-BE trusted admission entry and deployment worker service
 

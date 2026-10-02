@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-CARD247-S08-BE-BUILD-REQUEST-ENTRY-001"
 title: "Card 247 S08-BE BuildRequest product entry implementation"
-version: "1.2.2"
+version: "1.2.3"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-03T04:03:33+09:00"
+updated: "2026-10-03T04:55:31+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S08-BE", "CARD-247"]
@@ -96,6 +96,31 @@ that the new two-case real-PG module registered `remote` without registering its
 `node_runtime` and `approval` fixtures. Both cases failed during setup rather than being skipped
 or reaching product code. The module now imports the complete fixture chain explicitly; the
 replacement exact-head Core run is the only run eligible for the final review baseline.
+
+Claude r2 found one remaining production-startup defect and three missing behavioral mutation
+guards. `create_configured_app` passes the bytes returned by `trusted_file(worker.json)` into
+`configured_build_plan_authority`, but that function converted the bytes with `dict(...)` before
+the canonical duplicate-key/exact-shape parser could read them. The authority now passes the raw
+trusted bytes directly to `validated_worker_configuration`, exactly as the worker composition root
+does. A PG-free factory test writes real `api.json` and `worker.json` files, enables the exact flag,
+calls `create_configured_app`, and requires the configured capsule store plus measured plan
+authority to be installed.
+
+The real-PG file now also proves behavior that the prior static guards did not: owner-role UPDATE
+and DELETE attempts against both immutable authority tables are `23514`; the sixth same-minute
+prepare attempt is `RES-0007/429` even though attempts 2--5 fail later; and a source edit after
+two-person quorum makes enqueue return `VERIFY-0002/422`, expires the approval, fails the Run,
+records exactly one canonical terminal audit, and records no admission. These cases are intended
+to fail if the append-only trigger, quota accounting, or final TOCTOU revalidation is removed.
+
+Two activation boundaries remain explicit rather than being presented as measured authority.
+The current plan's `1/1/1` budget and request-derived `resolvedBaseImageDigests` are placeholders,
+not measured resource or registry resolution; product activation requires replacing them with
+operator/profile and registry authorities. Enabling the product also deliberately lets the API
+process read the private worker configuration and contact the rootless BuildKit address for the
+pre-transaction measurement. This expands that socket/file trust boundary beyond the worker and
+must be accepted in deployment policy before the default-off flag changes. Neither boundary is
+used to claim S08-BE completion in this card.
 
 S08-BE completion, product flag enablement, and physical builder acceptance are not
 claimed. The actual census count is derived from the hosted catalogue; the current base

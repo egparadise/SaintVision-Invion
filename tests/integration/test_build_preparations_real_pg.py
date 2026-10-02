@@ -16,6 +16,7 @@ from inv.build_governance import BuildProviderObservation
 from inv.build_preparations import BuildPreparationService, ConfiguredBuildPlanAuthority
 from inv.build_product_runtime import BuildExecutionAdmissionStore, BuildProductRuntime
 from inv.buildkit_transport import MeasuredBuilder
+from inv.errors import DomainError
 from inv.ids import new_id
 from inv.object_store import registered_provider
 from inv.policy import action_digest
@@ -42,7 +43,7 @@ class _MeasuredService:
         return BuildExecutionResult(new_id("evd"), "a" * 64, True, True)
 
 
-def test_build_request_to_worker_is_one_server_owned_chain(workspace_http, monkeypatch):
+def _setup_prepared_build(workspace_http, *, key="build-prepare"):
     a = workspace_http
     source_url = a.url + "/checkouts/" + a.checkout_id + "/files"
     original = a.http.get(source_url, headers=a.headers()).json()
@@ -122,8 +123,30 @@ def test_build_request_to_worker_is_one_server_owned_chain(workspace_http, monke
         requester, a.e.project, build_run["runId"],
         {"checkoutId": a.checkout_id, "buildPolicyProfileId": profile_id,
          "expectedRunVersion": build_run["version"], "requestedTarget": "image"},
-        key="build-prepare",
+        key=key,
     )
+    return {
+        "a": a,
+        "source_url": source_url,
+        "build_run": build_run,
+        "requester": requester,
+        "approvers": approvers,
+        "profile_id": profile_id,
+        "service": service,
+        "prepared": prepared,
+        "prepare_input": {
+            "checkoutId": a.checkout_id,
+            "buildPolicyProfileId": profile_id,
+            "expectedRunVersion": build_run["version"],
+            "requestedTarget": "image",
+        },
+    }
+
+
+def _approve_prepared_build(context):
+    a = context["a"]
+    prepared = context["prepared"]
+    approvers = context["approvers"]
     approvals = ApprovalStore(a.e.db)
     review = approvals.review(approvers[0], a.e.project, prepared["approvalId"])
     assert review["workload"]["kind"] == "build" and "contextPath" not in review["workload"]
@@ -135,6 +158,17 @@ def test_build_request_to_worker_is_one_server_owned_chain(workspace_http, monke
             actor, a.e.project, row["approvalId"], "approve", challenge["nonce"],
             action_digest=row["actionDigest"], key=f"build-vote-{index}",
         )
+    return row
+
+
+def test_build_request_to_worker_is_one_server_owned_chain(workspace_http, monkeypatch):
+    context = _setup_prepared_build(workspace_http)
+    a = context["a"]
+    build_run = context["build_run"]
+    requester = context["requester"]
+    service = context["service"]
+    prepared = context["prepared"]
+    row = _approve_prepared_build(context)
     monkeypatch.setenv(PRODUCT_ENABLE_SETTING, "1")
     service.enqueue(
         requester, a.e.project, build_run["runId"], prepared["buildId"],
@@ -161,6 +195,119 @@ def test_build_request_to_worker_is_one_server_owned_chain(workspace_http, monke
             (build_run["runId"], build_run["runId"], build_run["runId"]),
         ).fetchone()
     assert counts == {"preparations": 1, "admissions": 1, "intents": 1}
+
+
+def test_build_authority_rows_are_immutable_even_to_the_owner(workspace_http):
+    context = _setup_prepared_build(workspace_http)
+    a, prepared = context["a"], context["prepared"]
+    statements = (
+        (
+            "UPDATE inv.build_policy_profiles SET timeout_seconds=301 WHERE profile_id=%s",
+            (context["profile_id"],),
+        ),
+        (
+            "DELETE FROM inv.build_policy_profiles WHERE profile_id=%s",
+            (context["profile_id"],),
+        ),
+        (
+            "UPDATE inv.build_preparations SET request_sha256=%s WHERE build_id=%s",
+            ("f" * 64, prepared["buildId"]),
+        ),
+        (
+            "DELETE FROM inv.build_preparations WHERE build_id=%s",
+            (prepared["buildId"],),
+        ),
+    )
+    with psycopg.connect(a.e.owner, autocommit=True) as conn:
+        for statement, parameters in statements:
+            with pytest.raises(psycopg.errors.CheckViolation):
+                conn.execute(statement, parameters)
+
+
+def test_prepare_rate_limit_is_enforced_before_repeated_failed_work(workspace_http):
+    context = _setup_prepared_build(workspace_http, key="rate-1")
+    a, service = context["a"], context["service"]
+    for index in range(2, 6):
+        with pytest.raises(DomainError) as refused:
+            service.prepare(
+                context["requester"],
+                a.e.project,
+                context["build_run"]["runId"],
+                context["prepare_input"],
+                key=f"rate-{index}",
+            )
+        assert refused.value.code != "RES-0007"
+    with pytest.raises(DomainError) as exhausted:
+        service.prepare(
+            context["requester"],
+            a.e.project,
+            context["build_run"]["runId"],
+            context["prepare_input"],
+            key="rate-6",
+        )
+    assert (exhausted.value.code, exhausted.value.status, exhausted.value.retryable) == (
+        "RES-0007",
+        429,
+        True,
+    )
+
+
+def test_source_drift_before_enqueue_expires_approval_without_admission(
+    workspace_http, monkeypatch
+):
+    context = _setup_prepared_build(workspace_http)
+    a, prepared = context["a"], context["prepared"]
+    row = _approve_prepared_build(context)
+    current = a.http.get(context["source_url"], headers=a.headers()).json()
+    source = next(
+        item for item in current["snapshot"]["files"] if item["path"] == "src/main.py"
+    )
+    changed = a.http.post(
+        context["source_url"],
+        json={
+            "expectedRevision": current["revision"],
+            "expectedSha256": current["sha256"],
+            "changes": [
+                {
+                    "path": "src/main.py",
+                    "expectedSha256": source["sha256"],
+                    "executable": False,
+                    "dataBase64": base64.b64encode(b"print('drift after quorum')\n").decode(),
+                }
+            ],
+        },
+        headers=a.headers(key="build-drift-after-quorum"),
+    )
+    assert changed.status_code == 200
+    monkeypatch.setenv(PRODUCT_ENABLE_SETTING, "1")
+    with pytest.raises(DomainError) as drifted:
+        context["service"].enqueue(
+            context["requester"],
+            a.e.project,
+            context["build_run"]["runId"],
+            prepared["buildId"],
+            {"approvalId": prepared["approvalId"], "expectedRunVersion": row["runVersion"]},
+            key="build-enqueue-after-drift",
+        )
+    assert (drifted.value.code, drifted.value.status) == ("VERIFY-0002", 422)
+    with a.e.db.transaction(a.e.tenant) as conn:
+        observed = conn.execute(
+            """SELECT a.status,r.state,
+            (SELECT count(*) FROM inv.approval_audit x
+             WHERE x.approval_id=a.approval_id AND x.phase='expired'
+               AND x.actor_id='system:build-preparation-drift') AS terminal_audits,
+            (SELECT count(*) FROM inv.build_execution_admissions x
+             WHERE x.run_id=r.run_id) AS admissions
+            FROM inv.approval_requests a JOIN inv.runs r USING(tenant_id,run_id)
+            WHERE a.approval_id=%s""",
+            (prepared["approvalId"],),
+        ).fetchone()
+    assert observed == {
+        "status": "expired",
+        "state": "failed",
+        "terminal_audits": 1,
+        "admissions": 0,
+    }
 
 
 def test_legacy_build_quorum_and_approved_drift_terminalize_without_invalid_transition(

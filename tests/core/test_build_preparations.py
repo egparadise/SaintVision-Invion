@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from types import SimpleNamespace
+from uuid import uuid4
 
 import pytest
 
@@ -179,6 +181,75 @@ def test_configured_app_installs_measured_plan_authority_only_under_exact_flag()
     assert 'return plan, new_id("evd")' in authority
     assert "INV_WORKER_CONFIG=/run/saintvision/worker.json" in compose
     assert "INV_BUILDKIT_PRODUCT_ENABLED=${INV_BUILDKIT_PRODUCT_ENABLED:-0}" in compose
+
+
+def test_product_enabled_app_reads_real_worker_json_bytes_and_installs_authority(
+    monkeypatch, tmp_path
+):
+    """Exercise the production factory boundary, not a constructor bypass."""
+
+    import inv.app as app_module
+    import inv.configuration_readiness as readiness_module
+
+    tenant = str(uuid4())
+    api_config = tmp_path / "api.json"
+    worker_config = tmp_path / "worker.json"
+    api_config.write_text(
+        json.dumps({"identity": {}, "buildCapsuleProviderId": "fixture-capsules"}),
+        encoding="utf-8",
+    )
+    worker_config.write_text(
+        json.dumps(
+            {
+                "tenantId": tenant,
+                "tls": {
+                    "ca_file": "/run/saintvision/node-ca.pem",
+                    "certificate_file": "/run/saintvision/worker.pem",
+                    "key_file": "/run/saintvision/worker-key.pem",
+                },
+                "buildExecution": {
+                    "buildctlPath": "/usr/local/bin/buildctl",
+                    "address": "unix:///run/user/65532/buildkit/buildkitd.sock",
+                    "sourceRoot": "/run/saintvision/build-sources",
+                    "referenceHealthReceipt": "/run/saintvision/buildkit-health.json",
+                    "productReceiptDirectory": "/run/saintvision/build-receipts",
+                    "builderInstanceId": "builder-hosted-fixture",
+                    "builderProfileId": "rootless-v1",
+                    "providerRecoveryEpoch": 1,
+                    "nodeId": "nod_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("INV_API_CONFIG", str(api_config))
+    monkeypatch.setenv("INV_WORKER_CONFIG", str(worker_config))
+    monkeypatch.setenv("INV_RUNTIME_DSN", "postgresql://not-connected")
+    monkeypatch.setenv("INV_RECOVERY_EPOCH", str(uuid4()))
+    monkeypatch.setenv("INV_BUILDKIT_PRODUCT_ENABLED", "1")
+    monkeypatch.setattr(
+        app_module, "AccessTokens", lambda **_kwargs: SimpleNamespace(tenant_id=tenant)
+    )
+    monkeypatch.setattr(readiness_module, "configured_s01_readiness", lambda _value: None)
+    capsule_store = object()
+    registry = SimpleNamespace(resolve=lambda provider_id: capsule_store)
+    monkeypatch.setattr(app_module, "_configured_object_stores", lambda *_args: registry)
+    captured = {}
+
+    def configured(_database, _identity, **kwargs):
+        captured.update(kwargs)
+        return kwargs["build_preparations"]
+
+    monkeypatch.setattr(app_module, "create_app", configured)
+    service = app_module.create_configured_app()
+
+    assert service is captured["build_preparations"]
+    assert service.capsule_store is capsule_store
+    assert service.plan_factory.node_id == "nod_01ARZ3NDEKTSV4RRFFQ69G5FAV"
+    assert (
+        service.plan_factory.transport.configuration.builder_instance_id
+        == "builder-hosted-fixture"
+    )
 
 
 def test_secret_aliases_require_a_server_owned_resolver():
