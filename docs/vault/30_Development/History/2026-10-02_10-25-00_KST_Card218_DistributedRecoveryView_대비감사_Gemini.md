@@ -16,9 +16,9 @@ ACC-09(접근성 명도 대비 적합화) 트랙의 후속 영역으로, 분산 
 
 - **대상 파일**:
   - `apps/web/src/features/recovery/DistributedRecoveryView.tsx` (기존 baseline 리터럴: **16종(81 occurrences)** -> **0건**)
-  - `apps/web/tests/acc09-contrast-tokens.test.tsx` (Test 9j, Test 9j-2, Probes 71~75 추가, Fail-Closed 래칫 고정, AST config inspection, 18종 결함 사살)
+  - `apps/web/tests/acc09-contrast-tokens.test.tsx` (Test 9j, Test 9j-2, Probes 71~75 추가, Fail-Closed 래칫 고정, AST config inspection, 20종 결함 사살)
   - `tools/reproduce_c218_contrast.py` (21종 Before/After 명도 대비 동적 재현 스크립트)
-  - `tools/test_c218_mutations.py` (재현 가능한 18종 뮤테이션 M1~M18 전수 시험 러너)
+  - `tools/test_c218_mutations.py` (재현 가능한 20종 뮤테이션 M1~M20 전수 시험 러너)
 - **감사 및 조치 결과**:
   - `DistributedRecoveryView.tsx`: 16종(81 occurrences) -> **0건** (리터럴 잔여 0건 multiset `{}` 달성).
   - `COLOR_LITERAL_MULTISET_BASELINE`에서 `features/recovery/DistributedRecoveryView.tsx`의 허용 multiset을 `{}` (0건)으로 래칫 고정.
