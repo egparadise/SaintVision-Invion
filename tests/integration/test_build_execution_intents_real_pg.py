@@ -532,7 +532,8 @@ def test_stale_claim_cannot_commit_release_evidence_or_outbox(env):
     assert old_owner is not None
     with psycopg.connect(env.owner) as conn:
         conn.execute(
-            """UPDATE inv.build_execution_intents SET status='pending'
+            """UPDATE inv.build_execution_intents
+            SET status='pending',last_error_code='RES-0006'
             WHERE run_id=%s""",
             (intent.run_id,),
         )
