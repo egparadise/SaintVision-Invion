@@ -11,7 +11,7 @@
   },
   "importer": {
     "path": "tools/import_ac11_security_scan.py",
-    "blob": "226237f65f53f2253e8e9e5e6ab70e2d80af2b20"
+    "blob": "421f3b3224ac6c7f22b3afbb90b7f8f81e514ada"
   },
   "scanners": [
     {
