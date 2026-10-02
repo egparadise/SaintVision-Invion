@@ -24,7 +24,15 @@ from typing import Any
 # the validator the evidence has to satisfy.  Calling it here rather than keeping a shorter
 # list of checks is what stops the two from drifting again (#313 r2 N1); the sibling
 # migration importer reads the aggregator the same way.
-from aggregate_ac11_evidence import scan_payload_invariants
+from aggregate_ac11_evidence import (
+    DEFAULT_ALLOWLIST,
+    Verdict,
+    evaluate_definer,
+    evaluate_rls,
+    evaluate_vf,
+    scan_payload_invariants,
+    validate_allowlist,
+)
 
 
 #: The AC-11 axes this importer writes envelopes for, as string literals at module level
@@ -45,13 +53,6 @@ TARGET_ID = "s11-security-critical-high-zero-v0"
 #: thing from the "no admissible envelope" this importer used to leave behind.
 REQUIRED_THREAT_IDS = ("SEC-DEF-001", "SEC-RLS-001", "SEC-VF-001", "SEC-SCAN-001")
 SCAN_THREAT_ID = "SEC-SCAN-001"
-#: The one threat report this importer can recompute for itself.  The aggregator owns the
-#: canonical recomputation of all four (``evaluate_definer``, ``evaluate_rls``,
-#: ``evaluate_vf``, ``evaluate_security_scan``); this importer is handed one artifact, so a
-#: verdict about the other three would be a verdict about measurements it has never seen.
-#: Rows that merely carry a threat ID are exactly that, and r1 accepted four of them as a
-#: pass (#313 F-R2), so the importer now refuses to answer instead of guessing.
-RECOMPUTABLE_THREAT_IDS = (SCAN_THREAT_ID,)
 #: The comparability group this importer declares for the hosted dependency/SAST lane.  The
 #: aggregator requires one on every axis envelope (``aggregate_ac11_evidence.py:334``) and
 #: the producer does not write one, so the adapter writes it the way the accessibility and
@@ -86,7 +87,34 @@ REPOSITORY = "egparadise/SaintVision-Invion"
 WORKFLOW_PATH = ".github/workflows/ac11-security-scan.yml"
 REPORT_MEMBER = "s11-ac11-security-scan.json"
 JUNIT_MEMBER = "s11-ac11-security-scan.xml"
-MEMBERS = {REPORT_MEMBER, JUNIT_MEMBER}
+#: The two database threat reports ``run_ac11_security_threat_reports.py`` adds to the lane's
+#: artifact.  They are optional members: an artifact from before that producer existed carries
+#: neither, and this importer says which reports are absent rather than inventing them.
+DEFINER_MEMBER = "s11-ac11-security-definer.json"
+RLS_MEMBER = "s11-ac11-security-rls.json"
+#: The exact member set, in both admissible shapes.  An unexpected member is still refused:
+#: a file nobody validates is a file nobody measured.
+BASE_MEMBERS = {REPORT_MEMBER, JUNIT_MEMBER}
+DATABASE_MEMBERS = {DEFINER_MEMBER, RLS_MEMBER}
+MEMBERS = BASE_MEMBERS
+MEMBER_SETS = (BASE_MEMBERS, BASE_MEMBERS | DATABASE_MEMBERS)
+#: SEC-VF-001 is produced by a different lane (the reviewed allowlist pins that workflow as one
+#: of its tool files), so its evidence arrives as a child reference bound by digest and head --
+#: the same shape the long-soak importer uses for its two references.
+VF_THREAT_ID = "SEC-VF-001"
+#: The browser lane's artifact: its fixed name and the one member that carries the proof.  The
+#: name is not head-bound, so the head binding comes from the run metadata rather than from it.
+VF_ARTIFACT_NAME = "desktop-browser-safe-evidence"
+VF_PROOF_MEMBER = "vf-desktop-browser-ci.json"
+DEFINER_THREAT_ID = "SEC-DEF-001"
+RLS_THREAT_ID = "SEC-RLS-001"
+#: Verdicts a threat report may carry into the envelope.  A report the canonical evaluator
+#: calls INVALID_RUN is not carried at all: an envelope whose own verdict would then have to be
+#: INVALID_RUN is not evidence, and omitting it with its reason is what this importer can
+#: honestly say (card 221).
+ADMISSIBLE_REPORT_VERDICTS = (
+    Verdict.MEASURED_PASS, Verdict.MEASURED_FAIL, Verdict.NOT_OBSERVED,
+)
 SHA1_RE = re.compile(r"^[0-9a-f]{40}$")
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 RUN_ID_RE = re.compile(r"^[0-9]+$")
@@ -161,7 +189,7 @@ def _members(archive: bytes) -> dict[str, bytes]:
     try:
         with zipfile.ZipFile(BytesIO(archive)) as bundle:
             names = bundle.namelist()
-            if set(names) != MEMBERS or len(names) != len(MEMBERS):
+            if set(names) not in MEMBER_SETS or len(names) != len(set(names)):
                 raise SecurityImportError("artifact member set is not exact")
             for name in names:
                 path = PurePosixPath(name)
@@ -173,12 +201,36 @@ def _members(archive: bytes) -> dict[str, bytes]:
         raise SecurityImportError(f"artifact archive unreadable: {type(exc).__name__}") from None
 
 
+def _head_commit_tree(run_metadata: dict[str, Any], label: str, source: str) -> str:
+    """The tree GitHub recorded for that run's head commit -- not a value a report chose.
+
+    ``head_commit`` is part of the run metadata GitHub keeps for the workflow run that produced
+    the artifact, so its ``tree_id`` is an independent statement about which tree ran.  Checking
+    only ``head_sha`` left ``checkoutTreeSha`` free: the producer report could name any tree and
+    the VF report copied whatever the scan report said, so changing one field to ``f`` * 40
+    still imported as MEASURED_PASS (#319 r2 F2).  Strict object, exact commit, canonical tree.
+    """
+
+    commit = run_metadata.get("head_commit")
+    if not isinstance(commit, dict):
+        raise SecurityImportError(f"{label} run metadata carries no head_commit object")
+    if commit.get("id") != source:
+        raise SecurityImportError(f"{label} run head_commit is about another commit")
+    tree = commit.get("tree_id")
+    if not isinstance(tree, str) or not SHA1_RE.fullmatch(tree):
+        raise SecurityImportError(f"{label} run head_commit has no canonical tree id")
+    return tree
+
+
 def import_evidence(
     archive: bytes,
     run_metadata: dict[str, Any],
     artifact_metadata: dict[str, Any],
     *,
     now: datetime | None = None,
+    vf_archive: bytes | None = None,
+    vf_run_metadata: dict[str, Any] | None = None,
+    vf_artifact_metadata: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     observed_now = now or datetime.now(timezone.utc)
     if observed_now.tzinfo is None:
@@ -209,6 +261,9 @@ def import_evidence(
         raise SecurityImportError("GitHub run did not complete successfully")
     if run_metadata.get("head_sha") != source or workflow_run.get("head_sha") != source:
         raise SecurityImportError("GitHub run or artifact head differs from sourceHeadSha")
+    checkout_tree = _head_commit_tree(run_metadata, "security scan", source)
+    if report.get("checkoutTreeSha") != checkout_tree:
+        raise SecurityImportError("checkoutTreeSha differs from the run head_commit tree")
     repository = run_metadata.get("repository")
     if not isinstance(repository, dict) or repository.get("full_name") != REPOSITORY:
         raise SecurityImportError("run repository is not canonical")
@@ -244,12 +299,32 @@ def import_evidence(
         "junitSha256": hashlib.sha256(members[JUNIT_MEMBER]).hexdigest(),
     }
     report["scanArtifact"] = scan_artifact
+    extra = list(_database_reports(members, report))
+    vf_inputs = (vf_archive, vf_run_metadata, vf_artifact_metadata)
+    if any(value is not None for value in vf_inputs):
+        if any(value is None for value in vf_inputs):
+            # Two of the three would let a caller drop the binding it finds inconvenient.
+            raise SecurityImportError(
+                "SEC-VF-001 needs the browser lane archive with its run and artifact metadata"
+            )
+        extra.append(
+            vf_report(
+                vf_archive,
+                vf_run_metadata,
+                vf_artifact_metadata,
+                _reviewed_allowlist(),
+                report,
+                observed_now,
+            )
+        )
     return axis_envelope(
         report,
         expected_digest=expected_digest,
         observed_digest=observed_digest,
         expires_at=expires_at,
         scan_artifact=scan_artifact,
+        extra_reports=tuple(extra),
+        now=observed_now,
     )
 
 
@@ -374,6 +449,231 @@ def _recompute_scan(report: dict[str, Any]) -> tuple[str, str | None]:
     return "MEASURED_PASS", None
 
 
+def _reviewed_allowlist() -> dict[str, Any]:
+    """The reviewed security allowlist, loaded the way the aggregator loads it.
+
+    ``validate_allowlist`` refuses content whose canonical digest is not the reviewed one, so
+    a tampered or drifted allowlist stops this importer here rather than producing an envelope
+    that the aggregator would later refuse for the same reason.
+    """
+
+    try:
+        value = json.loads(DEFAULT_ALLOWLIST.read_text(encoding="utf-8"))
+        validate_allowlist(value)
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+        raise SecurityImportError(
+            f"reviewed security allowlist is unusable: {type(exc).__name__}"
+        ) from None
+    return value
+
+
+def _database_reports(members: dict[str, bytes], report: dict[str, Any]) -> list[dict[str, Any]]:
+    """The SEC-DEF-001 and SEC-RLS-001 reports the lane's artifact carries, if any.
+
+    Both must be about the same run and the same source head as the scan: the envelope has one
+    ``sourceRunId`` and one artifact digest, so a report from another run would make the
+    envelope's own provenance a statement about evidence it does not contain.
+    """
+
+    reports: list[dict[str, Any]] = []
+    for member, threat_id in ((DEFINER_MEMBER, DEFINER_THREAT_ID), (RLS_MEMBER, RLS_THREAT_ID)):
+        raw = members.get(member)
+        if raw is None:
+            continue
+        try:
+            document = json.loads(raw.decode("utf-8"))
+        except (UnicodeError, json.JSONDecodeError) as exc:
+            raise SecurityImportError(
+                f"{member} unreadable: {type(exc).__name__}"
+            ) from None
+        if not isinstance(document, dict) or document.get("threatId") != threat_id:
+            raise SecurityImportError(f"{member} does not carry {threat_id}")
+        for field in ("sourceRunId", "sourceHeadSha", "checkoutTreeSha"):
+            if document.get(field) != report.get(field):
+                raise SecurityImportError(
+                    f"{threat_id} {field} differs from the scan report in the same artifact"
+                )
+        reports.append(document)
+    return reports
+
+
+def _vf_proof(archive: bytes) -> dict[str, Any]:
+    """The proof document, read out of the browser lane's artifact rather than from a file.
+
+    A loose JSON is exactly what r1 of this card accepted: the five reviewed values it compares
+    are all public (they are in the reviewed allowlist), so anyone could write a passing file.
+    The proof has to come from inside the archive whose digest GitHub signed for (#319 F1).
+    """
+
+    try:
+        with zipfile.ZipFile(BytesIO(archive)) as bundle:
+            names = bundle.namelist()
+            if VF_PROOF_MEMBER not in names:
+                raise SecurityImportError("browser lane artifact carries no proof member")
+            for name in names:
+                path = PurePosixPath(name)
+                if path.is_absolute() or ".." in path.parts or bundle.getinfo(name).is_dir():
+                    raise SecurityImportError("browser lane artifact member path is unsafe")
+            raw = bundle.read(VF_PROOF_MEMBER)
+    except (OSError, zipfile.BadZipFile, KeyError) as exc:
+        raise SecurityImportError(
+            f"browser lane artifact unreadable: {type(exc).__name__}"
+        ) from None
+    try:
+        value = json.loads(raw.decode("utf-8"))
+    except (UnicodeError, json.JSONDecodeError) as exc:
+        raise SecurityImportError(
+            f"browser lane proof unreadable: {type(exc).__name__}"
+        ) from None
+    if not isinstance(value, dict):
+        raise SecurityImportError("browser lane proof must be an object")
+    return value
+
+
+def vf_report(
+    archive: bytes,
+    run_metadata: dict[str, Any],
+    artifact_metadata: dict[str, Any],
+    allowlist: dict[str, Any],
+    report: dict[str, Any],
+    observed_now: datetime,
+) -> dict[str, Any]:
+    """Adapt the browser lane's own artifact into SEC-VF-001.
+
+    The reviewed allowlist pins the five files that lane runs and the identity hash of the case
+    set it must execute, and r1 of this card checked only those -- so a synthetic dict with five
+    public values became MEASURED_PASS and the report then *copied the security scan's*
+    provenance (#319 F1).  This version binds the report to the browser run and artifact the way
+    the scan report is bound to its own: the canonical repository and workflow path, an approved
+    opt-in event, a completed successful run, the exact same source head as the scan, the
+    artifact's name, its unexpired GitHub digest recomputed over the bytes, and the proof read
+    from inside that archive.  ``nodeIds`` is still entailed rather than observed (the
+    aggregator compares it with ``requiredNodeIds``, which is a tautology on its own), so the
+    binding that matters is the identity hash -- now on top of a verified artifact.
+    """
+
+    spec = allowlist["secVf001"]
+    source = report["sourceHeadSha"]
+
+    run_id = _numeric(run_metadata.get("id"), "browser lane run id")
+    workflow_run = artifact_metadata.get("workflow_run")
+    if not isinstance(workflow_run, dict):
+        raise SecurityImportError("browser lane artifact workflow_run metadata is missing")
+    if run_id != _numeric(workflow_run.get("id"), "browser lane artifact run id"):
+        raise SecurityImportError("browser lane artifact belongs to another run")
+    repository = run_metadata.get("repository")
+    if not isinstance(repository, dict) or repository.get("full_name") != REPOSITORY:
+        raise SecurityImportError("browser lane run repository is not canonical")
+    workflow = str(run_metadata.get("path", "")).split("@", 1)[0]
+    if workflow != spec["workflow"]["path"]:
+        raise SecurityImportError("browser lane run is not the reviewed workflow")
+    if run_metadata.get("event") not in {"pull_request", "workflow_dispatch"}:
+        raise SecurityImportError("browser lane run event is not an approved opt-in trigger")
+    if run_metadata.get("status") != "completed" or run_metadata.get("conclusion") != "success":
+        raise SecurityImportError("browser lane run did not complete successfully")
+    if run_metadata.get("head_sha") != source or workflow_run.get("head_sha") != source:
+        raise SecurityImportError("browser lane run is about another source head")
+    # The browser run's own head_commit is the second, independent witness of the tree: the
+    # scan report's claim was already checked against the scan run's head_commit, and this one
+    # must agree with it.  Nothing here is copied from the scan report (#319 r2 F2).
+    checkout_tree = _head_commit_tree(run_metadata, "browser lane", source)
+    if report["checkoutTreeSha"] != checkout_tree:
+        raise SecurityImportError("browser lane run head_commit tree differs from the scan tree")
+    if artifact_metadata.get("name") != VF_ARTIFACT_NAME:
+        raise SecurityImportError("browser lane artifact name is not the reviewed one")
+    if artifact_metadata.get("expired") is not False:
+        raise SecurityImportError("browser lane artifact is expired or its state is unknown")
+    expires_at = _utc(artifact_metadata.get("expires_at"), "browser lane artifact expiresAt")
+    if expires_at <= observed_now.astimezone(timezone.utc):
+        raise SecurityImportError("browser lane artifact is expired")
+    expected_digest = _digest(artifact_metadata.get("digest"))
+    observed_digest = hashlib.sha256(archive).hexdigest()
+    if observed_digest != expected_digest:
+        raise SecurityImportError("browser lane artifact digest differs from GitHub metadata")
+
+    proof = _vf_proof(archive)
+    required = {
+        "caseIdentitiesSha256": spec["requiredCaseIdentitiesSha256"],
+        "tests": spec["expectedTests"],
+        "evidenceStatus": "complete",
+        "exitCode": 0,
+        "subprocessExitCode": 0,
+    }
+    for field, expected in required.items():
+        if proof.get(field) != expected:
+            raise SecurityImportError(
+                f"browser lane evidence does not satisfy the reviewed {field}"
+            )
+    files = [spec["runner"], spec["workflow"], spec["nodeDependencyResolver"], *spec["testFiles"]]
+    return {
+        "threatId": VF_THREAT_ID,
+        # This report's provenance is the browser run's own, not the scan's: the only thing the
+        # two share is the source head, and that is checked above rather than copied.
+        "sourceRunId": run_id,
+        "sourceHeadSha": source,
+        # Recorded from the verified head_commit tree, not from the scan report.
+        "checkoutTreeSha": checkout_tree,
+        "vfArtifact": {
+            "repository": REPOSITORY,
+            "workflowPath": spec["workflow"]["path"],
+            "runId": run_id,
+            "artifactId": _numeric(artifact_metadata.get("id"), "browser lane artifact id"),
+            "artifactName": VF_ARTIFACT_NAME,
+            "digest": expected_digest,
+            "observedDigest": observed_digest,
+            "expiresAt": expires_at.isoformat().replace("+00:00", "Z"),
+            "runConclusion": "success",
+            "proofSha256": hashlib.sha256(
+                json.dumps(proof, ensure_ascii=False, sort_keys=True,
+                           separators=(",", ":")).encode("utf-8")
+            ).hexdigest(),
+        },
+        "toolFiles": [dict(row) for row in files],
+        "nodeIds": list(spec["requiredNodeIds"]),
+        "exitCode": proof["exitCode"],
+        "subprocessExitCode": proof["subprocessExitCode"],
+        "evidenceStatus": proof["evidenceStatus"],
+        "caseIdentitiesSha256": proof["caseIdentitiesSha256"],
+        "tests": dict(proof["tests"]),
+    }
+
+
+def admissible_reports(
+    reports: list[dict[str, Any]], allowlist: dict[str, Any], now: datetime
+) -> tuple[list[dict[str, Any]], list[str]]:
+    """Keep the reports the canonical evaluators can admit, and name the ones they cannot.
+
+    The evaluators are the aggregator's own -- this importer does not keep a second opinion
+    about what a threat report means (#313 r2).  A report the evaluator calls INVALID_RUN is
+    dropped with its name: carrying it would force the envelope's verdict to INVALID_RUN, and
+    an envelope that refuses itself tells an operator less than an envelope that says which
+    report could not be admitted and why.
+    """
+
+    evaluators = {
+        DEFINER_THREAT_ID: lambda row: evaluate_definer(row, allowlist),
+        RLS_THREAT_ID: lambda row: evaluate_rls(row, allowlist, now),
+        VF_THREAT_ID: lambda row: evaluate_vf(row, allowlist),
+    }
+    kept: list[dict[str, Any]] = []
+    refused: list[str] = []
+    for row in reports:
+        threat_id = str(row.get("threatId"))
+        evaluate = evaluators.get(threat_id)
+        if evaluate is None:
+            kept.append(row)
+            continue
+        try:
+            verdict = evaluate(row)
+        except Exception:  # noqa: BLE001 - an evaluator refusal is a refusal, not a crash
+            verdict = Verdict.INVALID_RUN
+        if verdict in ADMISSIBLE_REPORT_VERDICTS:
+            kept.append(row)
+        else:
+            refused.append(f"{threat_id} ({verdict.value})")
+    return kept, refused
+
+
 def axis_envelope(
     report: dict[str, Any],
     *,
@@ -381,16 +681,27 @@ def axis_envelope(
     observed_digest: str,
     expires_at: datetime,
     scan_artifact: dict[str, Any],
+    extra_reports: tuple[dict[str, Any], ...] = (),
+    now: datetime | None = None,
 ) -> dict[str, Any]:
-    """Adapt the validated producer report into an admissible AC-11 axis envelope.
+    """Adapt the validated producer reports into an admissible AC-11 axis envelope.
 
     Everything the aggregator binds -- the artifact digests, the clean checkout, the run
     conclusion, the reviewed target registry -- is already measured above; this function
-    only arranges it in the shape ``aggregate_ac11_evidence`` accepts, and decides the one
-    thing the arrangement cannot borrow: the verdict.
+    arranges it in the shape ``aggregate_ac11_evidence`` accepts and decides the one thing the
+    arrangement cannot borrow: the verdict.
+
+    Card 221 changes where that verdict comes from.  Until now this importer could recompute
+    SEC-SCAN-001 only and refused to carry any other threat report, because guessing a verdict
+    for a measurement it could not check is how an empty scan becomes a pass (#313 F-R2).  The
+    other three reports now exist, and the right answer is not a second opinion about them but
+    **the aggregator's own evaluators**: ``evaluate_definer``, ``evaluate_rls`` and
+    ``evaluate_vf`` decide what each report means, exactly as they will when the aggregator
+    reads the envelope, and a report they refuse is dropped by name rather than carried.
     """
 
     reports = _threat_reports(report)
+    reports = [*reports, *extra_reports]
     present = {str(row["threatId"]) for row in reports}
     unregistered = sorted(present - set(REQUIRED_THREAT_IDS))
     if unregistered:
@@ -406,32 +717,45 @@ def axis_envelope(
         raise SecurityImportError(
             f"the scan report claims {claimed} while its own payload recomputes {scan_verdict}"
         )
-    unrecomputable = [
-        threat
-        for threat in REQUIRED_THREAT_IDS
-        if threat in present and threat not in RECOMPUTABLE_THREAT_IDS
-    ]
-    if unrecomputable:
-        raise SecurityImportError(
-            "this importer recomputes SEC-SCAN-001 only, so it cannot say what "
-            + ", ".join(unrecomputable)
-            + " measured; that verdict belongs to the path that combines those producers' "
-            "verified results"
-        )
+    allowlist = _reviewed_allowlist()
+    observed_now = now or datetime.now(timezone.utc)
+    reports, refused = admissible_reports(reports, allowlist, observed_now)
+    present = {str(row["threatId"]) for row in reports}
     missing = [threat for threat in REQUIRED_THREAT_IDS if threat not in present]
-    # The aggregator reaches the same conclusion from the same absence; declaring it here
-    # keeps the envelope's own verdict equal to the recomputed one, which is what stops a
-    # partial scan from being read as a pass.  It is always reached today: three of the four
-    # threat reports have no producer anywhere in this repository, and a report this
-    # importer cannot recompute is refused above rather than carried.
-    verdict = "NOT_OBSERVED"
-    reason = "no producer emits " + ", ".join(missing)
-    if scan_verdict != "MEASURED_PASS":
-        # A failing or unmeasured scan must not disappear into "not observed" without
-        # saying so: the aggregator cannot see past the missing reports either.
-        reason += f"; the SEC-SCAN-001 report itself recomputes {scan_verdict}"
-        if scan_detail:
-            reason += f" ({scan_detail})"
+    verdicts = {SCAN_THREAT_ID: Verdict(scan_verdict)}
+    for row in reports:
+        threat_id = str(row["threatId"])
+        if threat_id == SCAN_THREAT_ID:
+            continue
+        if threat_id == DEFINER_THREAT_ID:
+            verdicts[threat_id] = evaluate_definer(row, allowlist)
+        elif threat_id == RLS_THREAT_ID:
+            verdicts[threat_id] = evaluate_rls(row, allowlist, observed_now)
+        elif threat_id == VF_THREAT_ID:
+            verdicts[threat_id] = evaluate_vf(row, allowlist)
+    # The aggregator's own order of precedence: a missing report is an unobserved axis however
+    # well the present ones did, and a measured failure outranks an unobserved one.
+    if missing:
+        verdict = Verdict.NOT_OBSERVED
+    elif Verdict.MEASURED_FAIL in verdicts.values():
+        verdict = Verdict.MEASURED_FAIL
+    elif Verdict.NOT_OBSERVED in verdicts.values():
+        verdict = Verdict.NOT_OBSERVED
+    else:
+        verdict = Verdict.MEASURED_PASS
+    details = []
+    if missing:
+        details.append("no admissible report for " + ", ".join(missing))
+    if refused:
+        details.append("refused by the canonical evaluator: " + ", ".join(refused))
+    for threat_id, value in sorted(verdicts.items()):
+        if value is not Verdict.MEASURED_PASS:
+            line = f"{threat_id} recomputes {value.value}"
+            if threat_id == SCAN_THREAT_ID and scan_detail:
+                line += f" ({scan_detail})"
+            details.append(line)
+    verdict = verdict.value
+    reason = "; ".join(details) if details else None
     envelope = {
         "schemaVersion": report.get("schemaVersion", "1.0.0"),
         "runPurpose": "ac11-axis-evidence",
@@ -457,12 +781,14 @@ def axis_envelope(
             "criteria": {},
         },
         "observations": reports,
+        "threatReportVerdicts": {key: value.value for key, value in sorted(verdicts.items())},
         "cleanup": report.get("cleanup", {"residueCount": 0}),
         "scanArtifact": scan_artifact,
         "importerFile": _bound_importer(report),
         "scanRecomputed": scan_verdict,
     }
-    envelope["reason"] = reason
+    if reason is not None:
+        envelope["reason"] = reason
     return envelope
 
 
@@ -472,6 +798,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--run-metadata", type=Path, required=True)
     parser.add_argument("--artifact-metadata", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--vf-archive",
+        type=Path,
+        default=None,
+        help="the browser lane's artifact zip, for SEC-VF-001",
+    )
+    parser.add_argument("--vf-run-metadata", type=Path, default=None)
+    parser.add_argument("--vf-artifact-metadata", type=Path, default=None)
     args = parser.parse_args(argv)
     try:
         archive = args.archive.read_bytes()
@@ -479,6 +813,19 @@ def main(argv: list[str] | None = None) -> int:
             archive,
             _json(args.run_metadata, "run metadata"),
             _json(args.artifact_metadata, "artifact metadata"),
+            vf_archive=(
+                args.vf_archive.read_bytes() if args.vf_archive is not None else None
+            ),
+            vf_run_metadata=(
+                _json(args.vf_run_metadata, "browser lane run metadata")
+                if args.vf_run_metadata is not None
+                else None
+            ),
+            vf_artifact_metadata=(
+                _json(args.vf_artifact_metadata, "browser lane artifact metadata")
+                if args.vf_artifact_metadata is not None
+                else None
+            ),
         )
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(
