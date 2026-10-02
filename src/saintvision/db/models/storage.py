@@ -127,11 +127,30 @@ class DataLocation(Base):
         ),
         Index("ix_data_locations_tenant_id_kind", "tenant_id", "kind"),
         Index("ix_data_locations_contribution_id", "contribution_id"),
+        # 0062: a binding may only name a project of the same tenant. The
+        # composite target exists for this (uq_projects_tenant_id_project_id).
+        ForeignKeyConstraint(
+            ["tenant_id", "project_id"],
+            ["projects.tenant_id", "projects.project_id"],
+            name="fk_data_locations_tenant_id_project_id",
+        ),
+        Index(
+            "ix_data_locations_tenant_id_project_id",
+            "tenant_id",
+            "project_id",
+            "catalogued_at",
+        ),
     )
 
     location_id: Mapped[InvId] = mapped_column(primary_key=True)
     tenant_id: Mapped[TenantId] = mapped_column()
     contribution_id: Mapped[InvId] = mapped_column()
+    #: The project this catalogued item belongs to (0062). Nullable because rows
+    #: catalogued before that revision have no project, and "no project" means
+    #: invisible to every project-scoped read rather than visible to all of them.
+    #: The project-scoped route never writes NULL: it takes the value from its
+    #: own path, after the caller's membership is checked.
+    project_id: Mapped[InvId | None] = mapped_column(nullable=True)
     #: inv://datasets/<name>@<version>/<path> and friends (ADR-010).
     uri: Mapped[str] = mapped_column(Text)
     kind: Mapped[str] = mapped_column(String(16))

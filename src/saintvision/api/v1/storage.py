@@ -187,7 +187,10 @@ def activate_contribution(
     session: Session = Depends(get_write_session),
 ) -> dict:
     contribution = storage_service.activate_contribution(
-        session, tenant_id=principal.tenant_id, contribution_id=contribution_id
+        session,
+        tenant_id=principal.tenant_id,
+        contribution_id=contribution_id,
+        owner_user_id=principal.user_id,
     )
     return {"contribution": _contribution_body(contribution)}
 
@@ -204,7 +207,11 @@ def revoke_contribution(
 ) -> dict:
     """Withdraw a contribution. The user's files are left alone."""
     contribution = storage_service.revoke_contribution(
-        session, tenant_id=principal.tenant_id, contribution_id=contribution_id, now=now
+        session,
+        tenant_id=principal.tenant_id,
+        contribution_id=contribution_id,
+        owner_user_id=principal.user_id,
+        now=now,
     )
     return {"contribution": _contribution_body(contribution)}
 

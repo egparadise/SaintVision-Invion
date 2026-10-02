@@ -92,10 +92,18 @@ def register_contribution(
 
 
 def activate_contribution(
-    session, *, tenant_id: uuid.UUID, contribution_id: str
+    session, *, tenant_id: uuid.UUID, contribution_id: str, owner_user_id: str
 ) -> StorageContribution:
-    """Move a contribution to active once the node has confirmed the folder."""
-    contribution = _load_contribution(session, tenant_id=tenant_id, contribution_id=contribution_id)
+    """Move a contribution to active once the node has confirmed the folder.
+
+    Only the user who registered the folder may do this. The authority is the
+    row's ``registered_by_user_id`` and **not** a project grade: a contributed
+    folder belongs to a node and to the person who offered it, so no project
+    role -- however high -- stands in for its owner (card 250 §3-4-2).
+    """
+    contribution = _owned_for_update(
+        session, tenant_id=tenant_id, contribution_id=contribution_id, owner_user_id=owner_user_id
+    )
     if contribution.status == "revoked":
         raise InvError(VAL_SCHEMA, "a revoked contribution cannot be reactivated")
     contribution.status = "active"
@@ -104,15 +112,17 @@ def activate_contribution(
 
 
 def revoke_contribution(
-    session, *, tenant_id: uuid.UUID, contribution_id: str, now: dt.datetime
+    session, *, tenant_id: uuid.UUID, contribution_id: str, owner_user_id: str, now: dt.datetime
 ) -> StorageContribution:
-    """Withdraw a contribution.
+    """Withdraw a contribution. Only its owner may, as for activation.
 
     The catalogue rows are kept. Deleting them would destroy the record of what
     had been referenced, and the folder belongs to the user either way — the
     platform stops using it, it does not clean it up.
     """
-    contribution = _load_contribution(session, tenant_id=tenant_id, contribution_id=contribution_id)
+    contribution = _owned_for_update(
+        session, tenant_id=tenant_id, contribution_id=contribution_id, owner_user_id=owner_user_id
+    )
     contribution.status = "revoked"
     contribution.revoked_at = now
     session.flush()
@@ -132,12 +142,20 @@ def catalogue_location(
     run_id: str = "",
     artifact_id: str = "",
     workspace_id: str = "",
+    project_id: str | None = None,
     now: dt.datetime,
 ) -> DataLocation:
     """Record an item inside a contribution, addressed by an ``inv://`` URI.
 
     Catalogued means known, not usable. ``ready`` stays false until a checksum
     over the real bytes is recorded.
+
+    ``project_id`` (0062) is the project the row becomes visible to. The caller
+    passes the value its own path carried and nothing else: this function does
+    not read a project from the request, and ``None`` means the row stays
+    invisible to every project-scoped read, which is what rows catalogued before
+    0062 are. The caller is responsible for having checked membership first --
+    the project-scoped route does that, and re-checks it after the row lock.
     """
     contribution = _load_contribution(session, tenant_id=tenant_id, contribution_id=contribution_id)
     if contribution.status != "active":
@@ -167,6 +185,7 @@ def catalogue_location(
     location = DataLocation(
         location_id=new_id("data_location"),
         tenant_id=tenant_id,
+        project_id=project_id,
         contribution_id=contribution_id,
         uri=uri,
         kind=kind,
@@ -302,3 +321,94 @@ def _load_contribution(session, *, tenant_id: uuid.UUID, contribution_id: str) -
     if contribution is None or contribution.tenant_id != tenant_id:
         raise InvError(RES_CONTRIBUTION_NOT_FOUND, "storage contribution not found")
     return contribution
+
+
+def _owned_for_update(
+    session, *, tenant_id: uuid.UUID, contribution_id: str, owner_user_id: str
+) -> StorageContribution:
+    """The row, locked, and only if this caller registered it.
+
+    Absence and someone else's folder are **one refusal**: a distinct answer per
+    cause would confirm that a contribution id exists, which is the oracle
+    ``require_project_access`` already refuses to be for projects. The lock is
+    taken because every caller of this either writes this row or writes a row
+    whose validity depends on it.
+    """
+    contribution = session.execute(
+        select(StorageContribution)
+        .where(
+            StorageContribution.tenant_id == tenant_id,
+            StorageContribution.contribution_id == contribution_id,
+        )
+        .with_for_update()
+    ).scalar_one_or_none()
+    if contribution is None or contribution.registered_by_user_id != owner_user_id:
+        raise InvError(RES_CONTRIBUTION_NOT_FOUND, "storage contribution not found")
+    return contribution
+
+
+def locked_contribution(
+    session, *, tenant_id: uuid.UUID, contribution_id: str, owner_user_id: str
+) -> StorageContribution:
+    """The contribution row, locked, and only if this caller owns it and it is active.
+
+    Three reasons this takes ``FOR UPDATE`` rather than reading and then trusting
+    what it read (card 250 §3-2-2):
+
+    * the isolation level is READ COMMITTED, so a revoke committed between an
+      unlocked read and the insert would leave a location inside a folder whose
+      owner had just withdrawn it;
+    * ``revoke_contribution`` updates this same row, so the lock makes the two
+      orders the only two outcomes -- refuse, or insert and let the revoke land
+      afterwards (which is what revocation already means: the catalogue rows
+      stay);
+    * owner and status are then read *from the locked row*, which is the only
+      version of them that still holds when the insert happens.
+
+    Ownership, absence and inactivity are **one refusal**. Telling them apart
+    would confirm that someone else's contribution id exists, which is the same
+    oracle ``require_project_access`` refuses to be for projects.
+    """
+    contribution = _owned_for_update(
+        session, tenant_id=tenant_id, contribution_id=contribution_id, owner_user_id=owner_user_id
+    )
+    if contribution.status != "active":
+        raise InvError(RES_CONTRIBUTION_NOT_FOUND, "storage contribution not found")
+    return contribution
+
+
+def list_project_locations(
+    session,
+    *,
+    tenant_id: uuid.UUID,
+    project_id: str,
+    kind: str | None = None,
+    ready_only: bool = False,
+    limit: int | None,
+    cursor: str | None,
+    default_limit: int,
+    max_limit: int,
+) -> Page:
+    """Catalogued locations bound to one project (0062).
+
+    Rows whose ``project_id`` is NULL are **not** in any project's page: a
+    binding that was never made is not a binding to everything. The caller's
+    membership in ``project_id`` is the route's business, checked before this
+    runs and again before any write.
+    """
+    effective = clamp_limit(limit, default=default_limit, maximum=max_limit)
+    after = validate_cursor(cursor)
+    query = select(DataLocation).where(
+        DataLocation.tenant_id == tenant_id,
+        DataLocation.project_id == project_id,
+    )
+    if kind is not None:
+        query = query.where(DataLocation.kind == kind)
+    if ready_only:
+        query = query.where(DataLocation.ready.is_(True))
+    if after is not None:
+        query = query.where(DataLocation.location_id > after)
+    rows = session.scalars(
+        query.order_by(DataLocation.location_id).limit(effective + 1)
+    ).all()
+    return build_page(rows, limit=effective, id_attr="location_id")

@@ -80,7 +80,10 @@ def _active_contribution(session, seeded):
         now=NOW,
     )
     storage_service.activate_contribution(
-        session, tenant_id=seeded["tenant_a"], contribution_id=contribution.contribution_id
+        session,
+        tenant_id=seeded["tenant_a"],
+        contribution_id=contribution.contribution_id,
+        owner_user_id=seeded["user_id"],
     )
     return contribution
 
@@ -101,11 +104,18 @@ def test_contribution_lifecycle_is_pending_then_active_then_revoked(app_sessionm
                 assert contribution.status == "pending"
                 cid = contribution.contribution_id
                 storage_service.activate_contribution(
-                    session, tenant_id=seeded["tenant_a"], contribution_id=cid
+                    session,
+                    tenant_id=seeded["tenant_a"],
+                    contribution_id=cid,
+                    owner_user_id=seeded["user_id"],
                 )
                 assert contribution.status == "active"
                 storage_service.revoke_contribution(
-                    session, tenant_id=seeded["tenant_a"], contribution_id=cid, now=NOW
+                    session,
+                    tenant_id=seeded["tenant_a"],
+                    contribution_id=cid,
+                    owner_user_id=seeded["user_id"],
+                    now=NOW,
                 )
                 assert contribution.status == "revoked"
                 assert contribution.revoked_at is not None
