@@ -42,6 +42,8 @@ from .policy import action_digest, enforce_decision
 from .tooling import NodePrincipal
 
 PROMOTED_EVENT = "inv.build.intent_enqueued"
+TRANSIENT_PROMOTION_CODES = frozenset({"RES-0003", "RES-0007"})
+PROMOTION_RETRY_DELAY_SECONDS = 1
 
 
 @dataclass(frozen=True)
@@ -70,6 +72,12 @@ def _row(row: Mapping[str, Any]) -> BuildExecutionAdmission:
         evidence_id=row["evidence_id"],
         actor_id=row["actor_id"],
         status=row["status"],
+    )
+
+
+def _retryable_promotion_error(error: BaseException) -> bool:
+    return isinstance(error, DomainError) and (
+        error.retryable or error.code in TRANSIENT_PROMOTION_CODES
     )
 
 
@@ -148,6 +156,9 @@ class BuildExecutionAdmissionStore:
                 or candidate.actor_id != principal.subject_id
             ):
                 raise DomainError("IDEM-0001", "Build admission replay differs", 409)
+            if candidate.status == "quarantined":
+                code = stored.get("last_error_code") or "VERIFY-0002"
+                raise DomainError(code, "Build admission is quarantined", 409)
             return candidate
 
     def promote_next(self, tenant_id: str) -> BuildExecutionAdmission | None:
@@ -161,7 +172,7 @@ class BuildExecutionAdmissionStore:
                       AND decision_sha256 = encode(sha256(convert_to(decision::text,'UTF8')),'hex')
                       AS digests_match
                     FROM inv.build_execution_admissions
-                    WHERE status='ready'
+                    WHERE status='ready' AND next_attempt_at <= clock_timestamp()
                     ORDER BY created_at,project_id,run_id
                     LIMIT 1 FOR UPDATE SKIP LOCKED""").fetchone()
                 if not stored:
@@ -204,6 +215,21 @@ class BuildExecutionAdmissionStore:
                     )
                 except (DomainError, KeyError, TypeError, ValueError) as error:
                     code = error.code if isinstance(error, DomainError) else "VERIFY-0002"
+                    if _retryable_promotion_error(error):
+                        conn.execute(
+                            """UPDATE inv.build_execution_admissions
+                            SET retry_count=retry_count+1,last_error_code=%s,
+                                next_attempt_at=clock_timestamp()
+                                  + make_interval(secs => %s)
+                            WHERE project_id=%s AND run_id=%s AND status='ready'""",
+                            (
+                                code,
+                                PROMOTION_RETRY_DELAY_SECONDS,
+                                admission.project_id,
+                                admission.run_id,
+                            ),
+                        )
+                        return None
                     conn.execute(
                         """UPDATE inv.build_execution_admissions
                         SET status='quarantined',last_error_code=%s
@@ -247,7 +273,13 @@ class BuildExecutionAdmissionStore:
                         intent["actor_id"] != admission.actor_id,
                     )
                 ):
-                    raise DomainError("IDEM-0001", "Promoted build intent differs", 409)
+                    conn.execute(
+                        """UPDATE inv.build_execution_admissions
+                        SET status='quarantined',last_error_code='IDEM-0001'
+                        WHERE project_id=%s AND run_id=%s AND status='ready'""",
+                        (admission.project_id, admission.run_id),
+                    )
+                    continue
                 conn.execute(
                     """UPDATE inv.build_execution_admissions SET status='promoted'
                     WHERE project_id=%s AND run_id=%s AND status='ready'""",

@@ -133,12 +133,10 @@ def _lock_live_build_authority(
         FROM inv.nodes WHERE node_id=%s""",
         (resource["node_id"],),
     ).fetchone()
-    if (
-        not node
-        or node["status"] != "online"
-        or str(node["recovery_epoch"]) != database_recovery_epoch
-    ):
-        raise DomainError("NODE-0033", "Build node is not current and online", 409)
+    if not node or str(node["recovery_epoch"]) != database_recovery_epoch:
+        raise DomainError("NODE-0033", "Build node authority changed", 409)
+    if node["status"] != "online":
+        raise DomainError("NODE-0033", "Build node is temporarily offline", 503, retryable=True)
     heartbeat = node["heartbeat_at"]
     skew = node["clock_skew_seconds"]
     try:

@@ -269,3 +269,79 @@ def test_admission_payload_update_delete_and_terminal_revival_are_rejected(env):
                 "DELETE FROM inv.build_execution_admissions WHERE run_id=%s",
                 (admission.run_id,),
             )
+
+
+def test_conflicting_existing_intent_quarantines_only_that_admission(env):
+    first = _record(env)
+    BuildExecutionIntentQueue(env.db).enqueue(
+        Principal(first.tenant_id, first.actor_id),
+        first.request,
+        first.plan,
+        first.decision,
+        policy_version=first.policy_version,
+        run_id=first.run_id,
+        evidence_id=new_id("evd"),
+    )
+    second = _record(env, grant=False)
+
+    promoted = BuildExecutionAdmissionStore(env.db).promote_next(env.tenant)
+    assert promoted == second
+    with psycopg.connect(env.owner) as conn:
+        states = dict(
+            conn.execute(
+                """SELECT run_id,status || ':' || COALESCE(last_error_code,'')
+                FROM inv.build_execution_admissions WHERE run_id IN (%s,%s)""",
+                (first.run_id, second.run_id),
+            ).fetchall()
+        )
+    assert states == {
+        first.run_id: "quarantined:IDEM-0001",
+        second.run_id: "promoted:",
+    }
+    with pytest.raises(DomainError) as caught:
+        BuildExecutionAdmissionStore(env.db).record(
+            Principal(first.tenant_id, first.actor_id),
+            first.request,
+            first.plan,
+            first.decision,
+            policy_version=first.policy_version,
+            run_id=first.run_id,
+            evidence_id=first.evidence_id,
+        )
+    assert caught.value.code == "IDEM-0001"
+
+
+def test_stale_node_promotion_backs_off_and_recovers_without_quarantine(env):
+    admission = _record(env)
+    store = BuildExecutionAdmissionStore(env.db)
+    with psycopg.connect(env.owner) as conn:
+        conn.execute(
+            """UPDATE inv.nodes SET heartbeat_at=clock_timestamp()-interval '1 hour'
+            WHERE tenant_id=%s AND node_id=%s""",
+            (env.tenant, env.node),
+        )
+    assert store.promote_next(env.tenant) is None
+    replay = store.record(
+        Principal(admission.tenant_id, admission.actor_id),
+        admission.request,
+        admission.plan,
+        admission.decision,
+        policy_version=admission.policy_version,
+        run_id=admission.run_id,
+        evidence_id=admission.evidence_id,
+    )
+    assert replay.status == "ready"
+    with psycopg.connect(env.owner) as conn:
+        retry = conn.execute(
+            """SELECT status,last_error_code,retry_count,next_attempt_at > created_at
+            FROM inv.build_execution_admissions WHERE run_id=%s""",
+            (admission.run_id,),
+        ).fetchone()
+        conn.execute(
+            """UPDATE inv.nodes SET heartbeat_at=clock_timestamp()
+            WHERE tenant_id=%s AND node_id=%s""",
+            (env.tenant, env.node),
+        )
+        conn.execute("SELECT pg_sleep(1.1)")
+    assert retry == ("ready", "RES-0003", 1, True)
+    assert store.promote_next(env.tenant) == admission

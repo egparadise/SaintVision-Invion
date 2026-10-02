@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD232-S08-BE-WORKER-PRODUCER-20261002"
 title: "Card 232 S08-BE product worker loop and trusted intent producer"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T18:47:45+09:00"
+updated: "2026-10-02T18:55:06+09:00"
 source_of_truth: "Git"
 base_sha: "c57697d2ab80877f44e189c1efe172a6dd03a7e6"
 reviewer: "Claude"
@@ -25,8 +25,19 @@ opening a public route. Migration number 0060 was coordinator-reserved for this 
 tenant-scoped authority row above `0059_build_execution_intents`. The exact
 `BuildRequest`, `BuildPlan`, and `PolicyDecision`, policy version, Evidence ID, and human
 actor are immutable. PostgreSQL computes all three JSONB digests. FORCE RLS isolates
-tenants, DELETE is forbidden, and only `ready -> promoted|quarantined` is legal. A
+tenants, DELETE is forbidden, and only a guarded `ready -> ready` retry or
+`ready -> promoted|quarantined` terminal transition is legal. A
 downgrade refuses while any committed admission exists.
+
+0060 is intentionally separate from 0059. The admission row is the durable, immutable
+authority accepted by the trusted producer; it may remain `ready` while the product
+worker is disabled or while a current Node observation is temporarily unavailable. The
+0059 row is instead an executable queue item: its claim lease, fencing token, retry
+classification, and one-shot dispatch ledger begin only after promotion. Writing 0059
+at producer time would either expose an un-revalidated executable item while the product
+lane is disabled, or overload 0059's dispatch state with pre-dispatch policy and live
+authority waiting. The two-row boundary therefore separates durable intent acceptance
+from executable dispatch authority, while promotion binds them in one transaction.
 
 `services/control-plane/src/inv/build_product_runtime.py` records an admission only after
 current project permission, the policy expiry/effect, Run state, Node/resource, and exact
@@ -34,6 +45,13 @@ live lease fence have been locked and checked. Promotion repeats those checks, r
 all three database digests, inserts the 0059 intent and redacted outbox audit event in one
 transaction, and isolates one poison row rather than blocking the tenant queue. There is
 no HTTP route or CLI for either operation.
+
+Promotion treats digest or existing-0059 conflicts as permanent row-local quarantine
+and continues to the next admission. Stale observations, temporarily offline Nodes, and
+explicit retryable errors remain `ready` with a database-owned retry counter and bounded
+`next_attempt_at`; replay exposes the `ready` state and can recover after freshness is
+restored. Replaying a permanently quarantined admission raises its recorded error rather
+than returning an object that appears accepted.
 
 # Product process boundary
 
@@ -84,6 +102,19 @@ UUID prefix of `fencingToken`. `BuildExecutionService` previously read a nonexis
 `lease.recoveryEpoch`, so every strict plan would fail Node quarantine preflight. It now
 passes the verified fencing-token prefix, with a direct regression that stops at the
 preflight call and asserts the exact UUID.
+
+# Claude r1 corrections
+
+- The AC-11 definer-policy blob pin now follows the reviewed 0060 policy revision. 0060
+  adds no `SECURITY DEFINER` function; its guard is explicitly `SECURITY INVOKER` and
+  executable by neither `PUBLIC` nor `inv_kernel`.
+- An existing 0059 row with different content now quarantines only its matching 0060
+  admission as `IDEM-0001`; the same promotion call can advance the next ready row.
+- Observation staleness and temporary Node offline state back off without becoming a
+  terminal quarantine. Node recovery-epoch drift remains a permanent authority error.
+- The touched eval-suite, model-version, object-store, release-acceptance, and AC-11
+  rehearsal tests only advance their expected migration head from 0059 to 0060. They do
+  not change those features' behavior or acceptance criteria.
 
 # Verification
 

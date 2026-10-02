@@ -37,6 +37,13 @@ def upgrade() -> None:
         sa.Column("actor_id", sa.Text(), nullable=False),
         sa.Column("status", sa.Text(), nullable=False, server_default="ready"),
         sa.Column("last_error_code", sa.Text(), nullable=True),
+        sa.Column("retry_count", sa.Integer(), nullable=False, server_default="0"),
+        sa.Column(
+            "next_attempt_at",
+            sa.DateTime(timezone=True),
+            nullable=False,
+            server_default=sa.text("clock_timestamp()"),
+        ),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),
@@ -72,6 +79,7 @@ def upgrade() -> None:
             "last_error_code IS NULL OR last_error_code ~ '^[A-Z]+-[0-9]{4}$'",
             name="last_error_code_shape",
         ),
+        sa.CheckConstraint("retry_count >= 0", name="retry_count_nonnegative"),
         schema="inv",
     )
     op.create_index(
@@ -96,6 +104,7 @@ def upgrade() -> None:
           END IF;
           IF TG_OP = 'INSERT' THEN
             IF NEW.status <> 'ready' OR NEW.last_error_code IS NOT NULL
+               OR NEW.retry_count <> 0
                OR NEW.promoted_at IS NOT NULL OR NEW.quarantined_at IS NOT NULL THEN
               RAISE EXCEPTION 'build execution admissions begin ready'
                 USING ERRCODE='check_violation',
@@ -134,7 +143,17 @@ def upgrade() -> None:
                     CONSTRAINT='build_execution_admission_payload_immutable';
           END IF;
           v_now := clock_timestamp();
-          IF OLD.status='ready' AND NEW.status='promoted' THEN
+          IF OLD.status='ready' AND NEW.status='ready' THEN
+            IF NEW.retry_count <> OLD.retry_count + 1
+               OR NEW.next_attempt_at <= OLD.next_attempt_at
+               OR NEW.last_error_code IS NULL THEN
+              RAISE EXCEPTION 'a ready admission retry requires bounded backoff'
+                USING ERRCODE='check_violation',
+                      CONSTRAINT='build_execution_admission_retry_backoff';
+            END IF;
+            NEW.promoted_at := NULL;
+            NEW.quarantined_at := NULL;
+          ELSIF OLD.status='ready' AND NEW.status='promoted' THEN
             NEW.promoted_at := v_now;
             NEW.quarantined_at := NULL;
             NEW.last_error_code := NULL;
@@ -170,7 +189,8 @@ def upgrade() -> None:
     )
     op.execute("GRANT SELECT, INSERT ON inv.build_execution_admissions TO inv_kernel")
     op.execute(
-        "GRANT UPDATE(status,last_error_code,promoted_at,quarantined_at) "
+        "GRANT UPDATE(status,last_error_code,retry_count,next_attempt_at,"
+        "promoted_at,quarantined_at) "
         "ON inv.build_execution_admissions TO inv_kernel"
     )
 

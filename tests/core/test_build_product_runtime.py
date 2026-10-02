@@ -45,7 +45,24 @@ def test_migration_is_linear_force_rls_immutable_and_non_destructive():
     assert "build execution admissions are not deletable" in source
     assert "OLD.status='ready' AND NEW.status='promoted'" in source
     assert "OLD.status='ready' AND NEW.status='quarantined'" in source
+    assert "OLD.status='ready' AND NEW.status='ready'" in source
+    assert "NEW.retry_count <> OLD.retry_count + 1" in source
+    assert "next_attempt_at <= OLD.next_attempt_at" in source
     assert "SELECT count(*) FROM inv.build_execution_admissions" in source
+
+
+@pytest.mark.parametrize(
+    ("error", "expected"),
+    [
+        (DomainError("RES-0003", "stale"), True),
+        (DomainError("RES-0007", "busy"), True),
+        (DomainError("NODE-0033", "offline", 503, retryable=True), True),
+        (DomainError("NODE-0033", "epoch changed"), False),
+        (DomainError("RES-0005", "terminal state"), False),
+    ],
+)
+def test_promotion_retry_classification_is_explicit(error, expected):
+    assert runtime_module._retryable_promotion_error(error) is expected
 
 
 class _Admission:
