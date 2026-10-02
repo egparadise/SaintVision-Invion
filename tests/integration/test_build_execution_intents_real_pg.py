@@ -39,7 +39,9 @@ def build_documents(env, subject):
         "timeoutSeconds": 300,
     }
     decision = {
-        "decisionId": "policy-s08-product-real-pg",
+        # A PolicyDecision is one-shot authority. Each queued intent must exercise a distinct
+        # decision key; reusing one here would make an adjacent legacy ledger row consume both.
+        "decisionId": f"policy-s08-product-real-pg-{new_id('run')}",
         "tenantId": env.tenant,
         "projectId": env.project,
         "subjectId": subject,
@@ -386,6 +388,7 @@ def test_stale_claim_sweeper_recovers_only_rows_without_current_or_legacy_ledger
     second = queue.claim_next(env.tenant)
     assert first is not None and second is not None
     assert {first.run_id, second.run_id} == {recoverable.run_id, consumed.run_id}
+    assert first.dispatch_claim_key != second.dispatch_claim_key
     claimed = {first.run_id: first, second.run_id: second}
     consumed_intent = claimed[consumed.run_id]
 
