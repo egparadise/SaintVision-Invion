@@ -132,13 +132,15 @@ def test_enqueue_is_exact_replay_and_database_owns_canonical_digests(env):
               encode(sha256(convert_to(request::text,'UTF8')),'hex') AS observed_request,
               plan_sha256,encode(sha256(convert_to(plan::text,'UTF8')),'hex') AS observed_plan,
               decision_sha256,
-              encode(sha256(convert_to(decision::text,'UTF8')),'hex') AS observed_decision
+              encode(sha256(convert_to(decision::text,'UTF8')),'hex') AS observed_decision,
+              dispatch_claim_key
               FROM inv.build_execution_intents WHERE run_id=%s""",
             (intent.run_id,),
         ).fetchone()
     assert row[0] == row[1]
     assert row[2] == row[3]
     assert row[4] == row[5]
+    assert row[6] == action_digest({"decisionId": intent.decision["decisionId"]})
 
     changed = dict(intent.request, targetStage="different")
     changed_action_digest = action_digest(canonical_build_action(changed))
@@ -243,7 +245,10 @@ def test_claim_skips_owner_tampered_digest_and_insert_rejects_poison_binding(env
         ).fetchone()
     assert corrupt == ("quarantined", "VERIFY-0002")
 
-    _bad_queue, bad_contract = enqueue(env)
+    _bad_queue, bad_schema = enqueue(env)
+    _workspace_queue, bad_workspace = enqueue(env)
+    _digest_queue, bad_request_digest = enqueue(env)
+    _claim_key_queue, bad_claim_key = enqueue(env)
     _next_queue, next_healthy = enqueue(env)
     with psycopg.connect(env.owner) as conn:
         conn.execute("SET LOCAL session_replication_role=replica")
@@ -253,17 +258,47 @@ def test_claim_skips_owner_tampered_digest_and_insert_rejects_poison_binding(env
                 request_sha256=encode(
                   sha256(convert_to((request - 'kind')::text,'UTF8')),'hex')
             WHERE run_id=%s""",
-            (bad_contract.run_id,),
+            (bad_schema.run_id,),
+        )
+        conn.execute(
+            """UPDATE inv.build_execution_intents
+            SET request=jsonb_set(request,'{workspaceId}','\"wsp_00000000000000000000000000\"'),
+                request_sha256=encode(sha256(convert_to(jsonb_set(
+                  request,'{workspaceId}','\"wsp_00000000000000000000000000\"')::text,
+                  'UTF8')),'hex')
+            WHERE run_id=%s""",
+            (bad_workspace.run_id,),
+        )
+        conn.execute(
+            """UPDATE inv.build_execution_intents
+            SET plan=jsonb_set(plan,'{requestDigest}',to_jsonb(%s::text)),
+                plan_sha256=encode(sha256(convert_to(jsonb_set(
+                  plan,'{requestDigest}',to_jsonb(%s::text))::text,'UTF8')),'hex')
+            WHERE run_id=%s""",
+            ("0" * 64, "0" * 64, bad_request_digest.run_id),
+        )
+        conn.execute(
+            """UPDATE inv.build_execution_intents
+            SET dispatch_claim_key=%s WHERE run_id=%s""",
+            ("0" * 64, bad_claim_key.run_id),
         )
     claimed = queue.claim_next(env.tenant)
     assert claimed is not None and claimed.run_id == next_healthy.run_id
     with psycopg.connect(env.owner) as conn:
         invalid = conn.execute(
-            """SELECT status,last_error_code FROM inv.build_execution_intents
-            WHERE run_id=%s""",
-            (bad_contract.run_id,),
-        ).fetchone()
-    assert invalid == ("quarantined", "VERIFY-0002")
+            """SELECT run_id,status,last_error_code FROM inv.build_execution_intents
+            WHERE run_id=ANY(%s) ORDER BY run_id""",
+            (
+                [
+                    bad_schema.run_id,
+                    bad_workspace.run_id,
+                    bad_request_digest.run_id,
+                    bad_claim_key.run_id,
+                ],
+            ),
+        ).fetchall()
+    assert len(invalid) == 4
+    assert all(row[1:] == ("quarantined", "VERIFY-0002") for row in invalid)
 
     run = scheduled_run(env)
     request, plan, decision = build_documents(env, "oidc:other-actor")
@@ -272,8 +307,8 @@ def test_claim_skips_owner_tampered_digest_and_insert_rejects_poison_binding(env
             conn.execute(
                 """INSERT INTO inv.build_execution_intents(
                 tenant_id,project_id,run_id,request,plan,decision,
-                policy_version,evidence_id,actor_id
-                ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                dispatch_claim_key,policy_version,evidence_id,actor_id
+                ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                 (
                     env.tenant,
                     env.project,
@@ -281,6 +316,7 @@ def test_claim_skips_owner_tampered_digest_and_insert_rejects_poison_binding(env
                     Jsonb(request),
                     Jsonb(plan),
                     Jsonb(decision),
+                    action_digest({"decisionId": decision["decisionId"]}),
                     "s08-build-v1",
                     new_id("evd"),
                     "oidc:different-actor",
@@ -322,7 +358,6 @@ def test_claimed_intent_requeues_only_before_the_dispatch_decision_is_consumed(e
                     {
                         "state": "claimed",
                         "bindingDigest": "a" * 64,
-                        "decisionId": claimed.decision["decisionId"],
                     }
                 ),
             ),
@@ -342,6 +377,53 @@ def test_claimed_intent_requeues_only_before_the_dispatch_decision_is_consumed(e
                 SET status='quarantined',last_error_code='SYS-0001' WHERE run_id=%s""",
                 (claimed.run_id,),
             )
+
+
+def test_stale_claim_sweeper_recovers_only_rows_without_current_or_legacy_ledger(env):
+    queue, recoverable = enqueue(env)
+    _other_queue, consumed = enqueue(env)
+    first = queue.claim_next(env.tenant)
+    second = queue.claim_next(env.tenant)
+    assert first is not None and second is not None
+    assert {first.run_id, second.run_id} == {recoverable.run_id, consumed.run_id}
+    claimed = {first.run_id: first, second.run_id: second}
+    consumed_intent = claimed[consumed.run_id]
+
+    with psycopg.connect(env.owner) as conn:
+        conn.execute(
+            """INSERT INTO inv.idempotency(
+            tenant_id,project_id,operation,key,request_hash,response
+            ) VALUES (%s,%s,'build.dispatch',%s,%s,%s)""",
+            (
+                env.tenant,
+                env.project,
+                consumed_intent.dispatch_claim_key,
+                "b" * 64,
+                Jsonb({"state": "claimed", "bindingDigest": "b" * 64}),
+            ),
+        )
+        conn.execute("SET LOCAL session_replication_role=replica")
+        conn.execute(
+            """UPDATE inv.build_execution_intents
+            SET claimed_at=clock_timestamp() - interval '31 seconds'
+            WHERE run_id=ANY(%s)""",
+            ([recoverable.run_id, consumed.run_id],),
+        )
+
+    assert queue.claim_next(env.tenant) is None
+    with psycopg.connect(env.owner) as conn:
+        states = dict(
+            conn.execute(
+                """SELECT run_id,status FROM inv.build_execution_intents
+                WHERE run_id=ANY(%s)""",
+                ([recoverable.run_id, consumed.run_id],),
+            ).fetchall()
+        )
+        conn.execute("SELECT pg_sleep(1.1)")
+    assert states == {recoverable.run_id: "pending", consumed.run_id: "claimed"}
+    reclaimed = queue.claim_next(env.tenant)
+    assert reclaimed is not None and reclaimed.run_id == recoverable.run_id
+    assert reclaimed.attempt_count == 2
 
 
 class SuccessfulService:

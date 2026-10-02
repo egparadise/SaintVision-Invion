@@ -111,6 +111,7 @@ def intent() -> BuildExecutionIntent:
         request_sha256="1" * 64,
         plan_sha256="2" * 64,
         decision_sha256="3" * 64,
+        dispatch_claim_key=action_digest({"decisionId": decision["decisionId"]}),
         policy_version="s08-build-v1",
         evidence_id=EVIDENCE,
         actor_id=SUBJECT,
@@ -136,10 +137,12 @@ def test_migration_is_linear_tenant_scoped_payload_immutable_and_delete_forbidde
     assert "claimed' AND NEW.status = 'pending" in source
     assert "OLD.status IN ('pending','claimed') AND NEW.status = 'quarantined'" in source
     assert "claimed' AND NEW.status = 'completed" in source
-    assert "response->>'decisionId' = OLD.decision->>'decisionId'" in source
+    assert "response->>'decisionId' = OLD.decision->>'decisionId'" not in source
     assert "NEW.decision->>'subjectId' IS DISTINCT FROM NEW.actor_id" in source
     assert "NEW.plan->>'actionDigest' IS DISTINCT FROM NEW.decision->>'actionDigest'" in source
     assert "NEW.plan->>'policyExpiresAt' IS DISTINCT FROM NEW.decision->>'expiresAt'" in source
+    assert "dispatch_claim_key ~ '^[0-9a-f]{64}$'" in source
+    assert "AND key = OLD.dispatch_claim_key" in source
     assert "NEW.attempt_count := OLD.attempt_count + 1" in source
     assert "make_interval" in source
     assert "SELECT count(*) FROM inv.build_execution_intents" in source
@@ -153,6 +156,9 @@ def test_worker_claim_is_skip_locked_and_no_public_route_is_added():
     assert "decision_sha256 IS DISTINCT FROM" in source
     assert "status='quarantined',last_error_code='VERIFY-0002'" in source
     assert "next_attempt_at <= clock_timestamp()" in source
+    assert "claimed_at <= clock_timestamp() - make_interval" in source
+    assert "ledger.key=intent.dispatch_claim_key" in source
+    assert '"Build dispatch claim identity differs"' in source
     assert "class BuildExecutionWorker" in source
     inv_root = ROOT / "services/control-plane/src/inv"
     consumers = []

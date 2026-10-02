@@ -36,6 +36,7 @@ from .errors import DomainError
 from .policy import action_digest
 
 LOGGER = logging.getLogger(__name__)
+CLAIM_LEASE_SECONDS = 30
 
 
 @dataclass(frozen=True)
@@ -49,6 +50,7 @@ class BuildExecutionIntent:
     request_sha256: str
     plan_sha256: str
     decision_sha256: str
+    dispatch_claim_key: str
     policy_version: str
     evidence_id: str
     actor_id: str
@@ -107,6 +109,7 @@ def _row_to_intent(row: Mapping[str, Any]) -> BuildExecutionIntent:
         request_sha256=row["request_sha256"],
         plan_sha256=row["plan_sha256"],
         decision_sha256=row["decision_sha256"],
+        dispatch_claim_key=row["dispatch_claim_key"],
         policy_version=row["policy_version"],
         evidence_id=row["evidence_id"],
         actor_id=row["actor_id"],
@@ -149,8 +152,8 @@ class BuildExecutionIntentQueue:
             conn.execute(
                 """INSERT INTO inv.build_execution_intents(
                 tenant_id,project_id,run_id,request,plan,decision,
-                policy_version,evidence_id,actor_id
-                ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                dispatch_claim_key,policy_version,evidence_id,actor_id
+                ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                 ON CONFLICT DO NOTHING""",
                 (
                     principal.tenant_id,
@@ -159,6 +162,7 @@ class BuildExecutionIntentQueue:
                     Jsonb(request_doc),
                     Jsonb(plan_doc),
                     Jsonb(decision_doc),
+                    action_digest({"decisionId": decision_doc["decisionId"]}),
                     policy_version,
                     evidence_id,
                     principal.subject_id,
@@ -175,6 +179,8 @@ class BuildExecutionIntentQueue:
                 row["request"] != request_doc
                 or row["plan"] != plan_doc
                 or row["decision"] != decision_doc
+                or row["dispatch_claim_key"]
+                != action_digest({"decisionId": decision_doc["decisionId"]})
                 or row["policy_version"] != policy_version
                 or row["evidence_id"] != evidence_id
                 or row["actor_id"] != principal.subject_id
@@ -186,6 +192,30 @@ class BuildExecutionIntentQueue:
         while True:
             invalid = False
             with self.db.transaction(tenant_id) as conn:
+                # A process may die after the row claim and before entering the adapter. Only a
+                # stale claim without any current or legacy one-shot ledger row is recoverable.
+                conn.execute(
+                    """WITH stale AS (
+                      SELECT intent.tenant_id,intent.project_id,intent.run_id
+                      FROM inv.build_execution_intents AS intent
+                      WHERE intent.tenant_id=%s AND intent.status='claimed'
+                        AND intent.claimed_at <= clock_timestamp() - make_interval(secs => %s)
+                        AND NOT EXISTS (
+                          SELECT 1 FROM inv.idempotency AS ledger
+                          WHERE ledger.tenant_id=intent.tenant_id
+                            AND ledger.project_id=intent.project_id
+                            AND ledger.operation='build.dispatch'
+                            AND ledger.key=intent.dispatch_claim_key
+                        )
+                      FOR UPDATE OF intent SKIP LOCKED
+                    )
+                    UPDATE inv.build_execution_intents AS intent SET
+                      status='pending',last_error_code='RES-0006'
+                    FROM stale
+                    WHERE (intent.tenant_id,intent.project_id,intent.run_id) =
+                          (stale.tenant_id,stale.project_id,stale.run_id)""",
+                    (tenant_id, CLAIM_LEASE_SECONDS),
+                )
                 # A restored or owner-mutated row must not poison the tenant queue. Quarantine
                 # every due row whose database-owned digest no longer describes its payload.
                 conn.execute(
@@ -231,6 +261,12 @@ class BuildExecutionIntentQueue:
                 try:
                     # The trigger binds SQL-readable fields; this validates the complete strict
                     # public contracts before any external side effect.
+                    if intent.dispatch_claim_key != action_digest(
+                        {"decisionId": intent.decision.get("decisionId")}
+                    ):
+                        raise DomainError(
+                            "VERIFY-0002", "Build dispatch claim identity differs", 422
+                        )
                     _validated_documents(
                         Principal(intent.tenant_id, intent.actor_id),
                         intent.request,
@@ -252,13 +288,12 @@ class BuildExecutionIntentQueue:
             return intent
 
     def _dispatch_consumed(self, conn, intent: BuildExecutionIntent) -> bool:
-        claim_key = action_digest({"decisionId": intent.decision["decisionId"]})
         return (
             conn.execute(
                 """SELECT 1 FROM inv.idempotency
                 WHERE project_id=%s AND operation='build.dispatch' AND key=%s
-                  AND response->>'decisionId'=%s""",
-                (intent.project_id, claim_key, intent.decision["decisionId"]),
+                """,
+                (intent.project_id, intent.dispatch_claim_key),
             ).fetchone()
             is not None
         )
@@ -267,9 +302,10 @@ class BuildExecutionIntentQueue:
         """Return a failed pre-dispatch claim to pending, never an admitted dispatch.
 
         ``BuildExecutionAdapter`` consumes the PolicyDecision in ``inv.idempotency`` before
-        its first external side effect and records the decision ID in that claim.  Absence of
-        that row is therefore the only safe automatic-retry boundary.  The 0059 trigger asks
-        the same question so a direct runtime UPDATE cannot requeue a consumed dispatch.
+        its first external side effect.  Current and legacy rows share the same canonical key;
+        their response JSON is deliberately not trusted. Absence of that row is therefore the
+        only safe automatic-retry boundary. The 0059 trigger asks the same question so a direct
+        runtime UPDATE cannot requeue a consumed dispatch.
         """
 
         with self.db.transaction(intent.tenant_id) as conn:

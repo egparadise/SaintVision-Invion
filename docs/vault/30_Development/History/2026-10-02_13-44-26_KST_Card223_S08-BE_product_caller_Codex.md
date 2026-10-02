@@ -1,14 +1,37 @@
 ---
 doc_id: "HISTORY-CARD223-S08-BE-PRODUCT-CALLER-20261002"
 title: "Card 223 S08-BE product caller"
-version: "1.0.3"
+version: "1.0.4"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T14:45:13+09:00"
+updated: "2026-10-02T14:57:19+09:00"
 source_of_truth: "Git"
 base_sha: "2dd25ff77a152575988b19a568ede348fd4dc1d8"
 reviewer: "Claude"
 ---
+
+## Claude r2 corrective boundary
+
+The worker now distinguishes failures by the canonical `DomainError.retryable` value. Only a
+retryable refusal returns to bounded-backoff `pending`; a non-retryable refusal is terminally
+`quarantined`. Contract-schema, workspace, request-digest, database-document-digest, and dispatch
+claim-key poison are each isolated per row before any external dispatch, after which the next due
+row remains claimable. This closes the `[A, A, A]` permanent-refusal loop without weakening the
+three pre-existing dispatch gates.
+
+A claimed row older than 30 seconds is eligible for recovery only when no `build.dispatch`
+idempotency row exists at its immutable canonical `dispatch_claim_key`. The test deliberately uses
+a legacy ledger response without `decisionId`: the matching key alone keeps that row `claimed`,
+while an adjacent unconsumed crash row returns to pending and is reclaimed as attempt 2. The
+runtime check and the database transition trigger use the same key rule, so response-shape drift
+cannot authorize a second external dispatch. Owner-restored claim-key drift is itself quarantined
+before service entry.
+
+Focused PG-free verification is **277 passed**. The real-PostgreSQL file now contains **10 cases**,
+including poison-row progression and stale-claim recovery versus a legacy consumed ledger. Local
+collection confirms all ten, but execution remains `NOT_OBSERVED` locally because no disposable
+PostgreSQL DSN is configured. Exact-head hosted Core must execute all ten without skips before the
+revision is accepted. No S08-BE completion or physical-builder acceptance is claimed.
 
 ## Claude r1 corrective boundary
 

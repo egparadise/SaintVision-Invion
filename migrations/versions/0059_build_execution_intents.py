@@ -42,6 +42,7 @@ def upgrade() -> None:
         sa.Column("request_sha256", sa.CHAR(64), nullable=False),
         sa.Column("plan_sha256", sa.CHAR(64), nullable=False),
         sa.Column("decision_sha256", sa.CHAR(64), nullable=False),
+        sa.Column("dispatch_claim_key", sa.CHAR(64), nullable=False),
         sa.Column("policy_version", sa.Text(), nullable=False),
         sa.Column("evidence_id", sa.Text(), nullable=False),
         sa.Column("actor_id", sa.Text(), nullable=False),
@@ -74,7 +75,8 @@ def upgrade() -> None:
         sa.CheckConstraint(
             "request_sha256 ~ '^[0-9a-f]{64}$' AND "
             "plan_sha256 ~ '^[0-9a-f]{64}$' AND "
-            "decision_sha256 ~ '^[0-9a-f]{64}$'",
+            "decision_sha256 ~ '^[0-9a-f]{64}$' AND "
+            "dispatch_claim_key ~ '^[0-9a-f]{64}$'",
             name="document_digests_are_lowercase",
         ),
         sa.CheckConstraint(
@@ -161,10 +163,12 @@ def upgrade() -> None:
 
           IF (NEW.tenant_id, NEW.project_id, NEW.run_id, NEW.request, NEW.plan,
               NEW.decision, NEW.request_sha256, NEW.plan_sha256, NEW.decision_sha256,
+              NEW.dispatch_claim_key,
               NEW.policy_version, NEW.evidence_id, NEW.actor_id, NEW.created_at)
              IS DISTINCT FROM
              (OLD.tenant_id, OLD.project_id, OLD.run_id, OLD.request, OLD.plan,
               OLD.decision, OLD.request_sha256, OLD.plan_sha256, OLD.decision_sha256,
+              OLD.dispatch_claim_key,
               OLD.policy_version, OLD.evidence_id, OLD.actor_id, OLD.created_at)
           THEN
             RAISE EXCEPTION 'build execution intent payload is immutable'
@@ -186,7 +190,7 @@ def upgrade() -> None:
               WHERE tenant_id = OLD.tenant_id
                 AND project_id = OLD.project_id
                 AND operation = 'build.dispatch'
-                AND response->>'decisionId' = OLD.decision->>'decisionId'
+                AND key = OLD.dispatch_claim_key
             ) THEN
               RAISE EXCEPTION 'a consumed build dispatch cannot be requeued'
                 USING ERRCODE = 'check_violation',
@@ -210,7 +214,7 @@ def upgrade() -> None:
               WHERE tenant_id = OLD.tenant_id
                 AND project_id = OLD.project_id
                 AND operation = 'build.dispatch'
-                AND response->>'decisionId' = OLD.decision->>'decisionId'
+                AND key = OLD.dispatch_claim_key
             ) THEN
               RAISE EXCEPTION 'a consumed build dispatch cannot be quarantined'
                 USING ERRCODE = 'check_violation',

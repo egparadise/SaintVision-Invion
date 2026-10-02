@@ -1,22 +1,23 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.275"
+version: "1.0.276"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T14:45:13+09:00"
+updated: "2026-10-02T14:57:19+09:00"
 source_of_truth: "Git"
 active_card: "CARD-223 S08-BE product caller"
-active_card_status: "PR #323 Claude r1 exact requirements applied: bounded retry metadata, corrupt-row quarantine with queue progress, consumed-dispatch reconciliation"
-active_card_next: "Require exact-head Backend/Core green, nine real-PG JUnit cases and Claude r2 approval"
+active_card_status: "PR #323 Claude r2 N1-N3 applied: permanent refusal and every poison row terminate independently; stale unconsumed claims sweep safely while current and legacy consumed claims remain claimed"
+active_card_next: "Require exact-head Backend/Core green, ten real-PG JUnit cases and Claude r3 approval"
 ---
 
-- Card 223 r1 correction narrows retry to a durable boundary: only a claimed intent with no
-  committed `build.dispatch` one-shot claim can return to pending; consumed dispatches stay claimed.
-- Database-owned digest checks quarantine corrupt restored rows and continue the queue; INSERT
-  bindings reject poison actor, action-digest and expiry combinations. Focused PG-free verification
-  is **101 passed**; the
-  expanded **9-case** real-PG file awaits exact-head hosted Core execution.
+- Card 223 r2 correction distinguishes retryable and permanent refusals. Permanent refusals and
+  schema/workspace/request-digest/claim-key poison are terminally quarantined per row, so a bad row
+  cannot hold the tenant queue. Retryable refusals alone return to bounded-backoff pending.
+- A 30-second stale-claim sweeper recovers only a row for which no canonical `build.dispatch`
+  ledger key exists. Both current and legacy response shapes remain claimed; the ledger response
+  is not trusted as the discriminator. Focused PG-free verification is **277 passed** and the
+  expanded **10-case** real-PG file awaits exact-head hosted Core execution.
 
 ## 2026-10-02 Card 223 — S08-BE product caller
 
