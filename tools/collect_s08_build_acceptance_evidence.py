@@ -26,6 +26,7 @@ import xml.etree.ElementTree as ET
 SCHEMA_VERSION = "s08-build-acceptance-evidence:1"
 EVALUATION_VERSION = "s08-build-acceptance-evaluation:1"
 WORKER_SCHEMA_VERSION = "s08-build-acceptance-worker:1"
+EXPECTED_WORKER_CONFIG_SHA256 = "53bfeeba087e6ef5f060fea6c2cd2a20073fbf85ad63c03978887c8839b44cc7"
 REPOSITORY = "egparadise/SaintVision-Invion"
 WORKFLOW = ".github/workflows/core.yml"
 EXPECTED_JUNIT_NAMES = {"core-tests.xml", "build-product-runtime-real-pg.xml"}
@@ -212,6 +213,8 @@ def _read_inputs(junit_paths: Iterable[Path], worker_path: Path):
     if worker["secretsIncluded"] is not False or worker["externalBuilderRequired"] is not False:
         raise InvalidEvidence("hosted worker configuration must be redacted and self-contained")
     worker_digest = sha256(canonical_bytes(worker))
+    if worker_digest != EXPECTED_WORKER_CONFIG_SHA256:
+        raise InvalidEvidence("worker configuration differs from the reviewed fixed-SHA lane")
     return junit_summaries, case_sources, worker, worker_digest
 
 

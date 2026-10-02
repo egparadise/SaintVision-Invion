@@ -199,6 +199,18 @@ def test_collector_refuses_dirty_or_misnamed_inputs(inputs, tmp_path):
         )
 
 
+def test_worker_configuration_is_bound_to_the_reviewed_canonical_digest(inputs):
+    junit, worker = inputs
+    mutated = json.loads(worker.read_text("utf-8"))
+    mutated["builderAuthority"] = "caller-supplied"
+    worker.write_text(json.dumps(mutated), "utf-8")
+    with pytest.raises(tool.InvalidEvidence, match="reviewed fixed-SHA lane"):
+        tool.collect(
+            junit_paths=junit, worker_path=worker, code_sha=SOURCE_SHA,
+            checkout_tree_sha=TREE_SHA, clean_checkout=True, run_id=1, run_attempt=1,
+        )
+
+
 def test_core_workflow_exposes_only_an_explicit_exact_sha_evidence_phase():
     workflow = (Path(__file__).parents[1] / ".github/workflows/core.yml").read_text("utf-8")
     assert "run_s08_acceptance:" in workflow

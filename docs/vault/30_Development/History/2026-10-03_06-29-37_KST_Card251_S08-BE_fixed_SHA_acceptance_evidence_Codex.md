@@ -38,7 +38,7 @@ Card 247의 승인 제품 경로를 다시 흉내 내지 않고, hosted Core가 
 collector verdict를 받지 않고 다음을 원문에서 다시 계산한다.
 
 - `core-tests.xml`, `build-product-runtime-real-pg.xml`의 SHA-256·case identity·outcome·counts
-- `tools/specs/s08-build-acceptance-worker-v1.json`의 canonical digest와 redaction 경계
+- `tools/specs/s08-build-acceptance-worker-v1.json`의 고정 canonical digest와 redaction 경계
 - exact source SHA/tree, clean checkout, workflow run id/attempt
 - exact 10-case 집합과 cross-field 합계
 
