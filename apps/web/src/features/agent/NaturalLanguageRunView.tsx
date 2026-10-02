@@ -3,6 +3,136 @@ import { AgentRunRequest } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { AgentLoopManager } from './agentEngine';
 
+export type AgentRunStatusKey =
+  | 'draft'
+  | 'planning'
+  | 'evaluating'
+  | 'ready'
+  | 'running'
+  | 'executing'
+  | 'awaiting_approval'
+  | 'repairing'
+  | 'completed'
+  | 'rejected'
+  | 'failed'
+  | 'blocked'
+  | 'idle';
+
+export interface AgentRunStatusStyle {
+  color: string;
+  bg: string;
+  border: string;
+  label: string;
+  icon: string;
+}
+
+export const AGENT_RUN_STATUS_CONFIG: Record<AgentRunStatusKey, AgentRunStatusStyle> = {
+  draft: {
+    color: 'var(--color-text-secondary)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-border-subtle)',
+    label: '초안 (DRAFT)',
+    icon: '📝',
+  },
+  planning: {
+    color: 'var(--color-status-active)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-active)',
+    label: '계획 수립 (PLANNING)',
+    icon: '🧭',
+  },
+  evaluating: {
+    color: 'var(--color-status-active)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-active)',
+    label: '평가 중 (EVALUATING)',
+    icon: '⏳',
+  },
+  ready: {
+    color: 'var(--color-brand-hover)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-brand-hover)',
+    label: '준비 완료 (READY)',
+    icon: '⚡',
+  },
+  running: {
+    color: 'var(--color-brand-hover)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-brand-hover)',
+    label: '실행 중 (RUNNING)',
+    icon: '⚡',
+  },
+  executing: {
+    color: 'var(--color-brand-hover)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-brand-hover)',
+    label: '실행 중 (EXECUTING)',
+    icon: '⚡',
+  },
+  awaiting_approval: {
+    color: 'var(--color-status-degraded)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-degraded)',
+    label: '승인 대기 (AWAITING APPROVAL)',
+    icon: '⏸️',
+  },
+  repairing: {
+    color: 'var(--color-status-degraded)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-degraded)',
+    label: '보정 루프 (REPAIRING)',
+    icon: '🔄',
+  },
+  completed: {
+    color: 'var(--color-status-online)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-online)',
+    label: '적용 완료 (COMPLETED)',
+    icon: '✔',
+  },
+  rejected: {
+    color: 'var(--color-status-offline)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-offline)',
+    label: '반려/차단 (REJECTED)',
+    icon: '🛑',
+  },
+  failed: {
+    color: 'var(--color-status-offline)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-offline)',
+    label: '실패 (FAILED)',
+    icon: '❌',
+  },
+  blocked: {
+    color: 'var(--color-status-offline)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-offline)',
+    label: '차단 (BLOCKED)',
+    icon: '🚫',
+  },
+  idle: {
+    color: 'var(--color-text-secondary)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-border-subtle)',
+    label: '대기 (IDLE)',
+    icon: '💤',
+  },
+};
+
+export function getAgentRunStatusConfig(status?: string | null): AgentRunStatusStyle {
+  if (status && Object.hasOwn(AGENT_RUN_STATUS_CONFIG, status)) {
+    return AGENT_RUN_STATUS_CONFIG[status as AgentRunStatusKey];
+  }
+  return {
+    color: 'var(--color-status-unknown)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-unknown)',
+    label: `UNKNOWN (${status || 'UNKNOWN'})`,
+    icon: '❓',
+  };
+}
+
 export const NaturalLanguageRunView: React.FC = () => {
   const [agentManager] = useState<AgentLoopManager>(() => new AgentLoopManager());
   const [objective, setObjective] = useState('DICOM 영상 전처리 파이프라인 버그 수정 및 단위 테스트 수행');
@@ -94,17 +224,17 @@ export const NaturalLanguageRunView: React.FC = () => {
         aria-live="polite"
         style={{
           padding: '16px 20px',
-          backgroundColor: '#161b22',
-          border: '1px solid #30363d',
+          backgroundColor: 'var(--color-bg-surface)',
+          border: '1px solid var(--color-border-subtle)',
           borderRadius: '8px',
-          color: '#cbd5e1',
+          color: 'var(--color-text-primary)',
         }}
       >
-        <div style={{ fontWeight: 600, fontSize: '0.875rem', color: '#93c5fd', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--color-brand-hover)', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span>ℹ️</span>
           <span>자연어 에이전트 실행 및 골든 평가 제어기 (API 미노출)</span>
         </div>
-        <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '6px', lineHeight: '1.5' }}>
+        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '6px', lineHeight: '1.5' }}>
           현재 SaintVision 백엔드에는 자연어 에이전트 자율 실행 및 코드 diff 자동 패치 엔드포인트(<code>/v1/agent/*</code>)가 배선되어 있지 않습니다.
           아래 표시된 유효율 및 코딩 성공률은 백엔드 실측 관측치가 아닌 AC-09 클라이언트 테스트 픽스처 모의 수치이며, 실제 백엔드 에이전트 계약 수립 전까지는 클라이언트 측 보안 규칙(AC-09 프롬프트 유출 사전 차단 등) 검증 및 사전 모의 용도로만 제한 동작합니다.
         </div>
@@ -118,36 +248,36 @@ export const NaturalLanguageRunView: React.FC = () => {
           gap: '16px',
         }}
       >
-        <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
-          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>Prompt 100건 유효율 (AC-09 픽스처)</div>
-          <div style={{ fontSize: '24px', fontWeight: 700, color: '#3fb950', marginTop: '4px' }}>
+        <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '8px', padding: '16px 20px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>Prompt 100건 유효율 (AC-09 픽스처)</div>
+          <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--color-status-online)', marginTop: '4px' }}>
             {goldenMetric.promptValidityRate.toFixed(1)}% ({goldenMetric.promptValid}/{goldenMetric.promptTotal})
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>목표: ≥99% (합성 · 운영 인수 아님(G-26))</div>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>목표: ≥99% (합성 · 운영 인수 아님(G-26))</div>
         </div>
 
-        <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
-          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>코딩 과제 30건 성공률 (AC-09 픽스처)</div>
-          <div style={{ fontSize: '24px', fontWeight: 700, color: '#3fb950', marginTop: '4px' }}>
+        <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '8px', padding: '16px 20px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>코딩 과제 30건 성공률 (AC-09 픽스처)</div>
+          <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--color-status-online)', marginTop: '4px' }}>
             {goldenMetric.codingSuccessRate.toFixed(1)}% ({goldenMetric.codingTasksPassed}/{goldenMetric.codingTasksTotal})
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>목표: ≥70% (합성 · 운영 인수 아님(G-26))</div>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>목표: ≥70% (합성 · 운영 인수 아님(G-26))</div>
         </div>
 
-        <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
-          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>비밀/시스템 프롬프트 누출</div>
-          <div style={{ fontSize: '24px', fontWeight: 700, color: goldenMetric.secretLeaksDetected === 0 ? '#3fb950' : '#f85149', marginTop: '4px' }}>
+        <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '8px', padding: '16px 20px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>비밀/시스템 프롬프트 누출</div>
+          <div style={{ fontSize: '24px', fontWeight: 700, color: goldenMetric.secretLeaksDetected === 0 ? 'var(--color-status-online)' : 'var(--color-status-offline)', marginTop: '4px' }}>
             {goldenMetric.secretLeaksDetected} 건 ({goldenMetric.secretLeaksDetected === 0 ? '완전 차단' : '누출 감지'})
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>AC-09 Zero Leakage 로컬 규칙</div>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>AC-09 Zero Leakage 로컬 규칙</div>
         </div>
 
-        <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
-          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>테넌트 잔여 예산 쿼터 (로컬 가상값)</div>
-          <div style={{ fontSize: '24px', fontWeight: 700, color: '#58a6ff', marginTop: '4px' }}>
+        <div style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '8px', padding: '16px 20px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>테넌트 잔여 예산 쿼터 (로컬 가상값)</div>
+          <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--color-brand-hover)', marginTop: '4px' }}>
             {currentBudget.toLocaleString()} KRW
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>작업 요청 시 실시간 차감 (모의)</div>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>작업 요청 시 실시간 차감 (모의)</div>
         </div>
       </div>
 
@@ -163,25 +293,20 @@ export const NaturalLanguageRunView: React.FC = () => {
                 borderRadius: '6px',
                 fontSize: '13px',
                 fontWeight: 500,
-                backgroundColor:
-                  actionNotice.type === 'error'
-                    ? 'rgba(248, 81, 73, 0.15)'
-                    : actionNotice.type === 'success'
-                    ? 'rgba(46, 160, 67, 0.15)'
-                    : 'rgba(56, 139, 253, 0.15)',
+                backgroundColor: 'var(--color-bg-subtle)',
                 border: `1px solid ${
                   actionNotice.type === 'error'
-                    ? '#f85149'
+                    ? 'var(--color-status-offline)'
                     : actionNotice.type === 'success'
-                    ? '#3fb950'
-                    : '#58a6ff'
+                    ? 'var(--color-status-online)'
+                    : 'var(--color-brand-hover)'
                 }`,
                 color:
                   actionNotice.type === 'error'
-                    ? '#f85149'
+                    ? 'var(--color-status-offline)'
                     : actionNotice.type === 'success'
-                    ? '#3fb950'
-                    : '#58a6ff',
+                    ? 'var(--color-status-online)'
+                    : 'var(--color-brand-hover)',
               }
             : undefined
         }
@@ -194,8 +319,8 @@ export const NaturalLanguageRunView: React.FC = () => {
         {/* Left: Natural Language Request Form */}
         <div
           style={{
-            backgroundColor: '#161b22',
-            border: '1px solid #30363d',
+            backgroundColor: 'var(--color-bg-surface)',
+            border: '1px solid var(--color-border-subtle)',
             borderRadius: '8px',
             padding: '20px',
             display: 'flex',
@@ -204,10 +329,10 @@ export const NaturalLanguageRunView: React.FC = () => {
           }}
         >
           <div>
-            <h3 style={{ margin: 0, fontSize: '16px', color: '#f0f6fc' }}>
+            <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--color-text-primary)' }}>
               자연어 Run 요청 및 비용 쿼터 검사 (S09-FE)
             </h3>
-            <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
+            <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: 'var(--color-text-secondary)' }}>
               자연어로 목표를 작성하면 사전 비행 검사를 거쳐 예산과 누출 여부를 검증합니다.
             </p>
           </div>
@@ -221,9 +346,9 @@ export const NaturalLanguageRunView: React.FC = () => {
                 fontSize: '11px',
                 padding: '4px 8px',
                 borderRadius: '4px',
-                border: '1px solid #30363d',
-                backgroundColor: '#0d1117',
-                color: '#58a6ff',
+                border: '1px solid var(--color-border-subtle)',
+                backgroundColor: 'var(--color-bg-subtle)',
+                color: 'var(--color-brand-hover)',
                 cursor: 'pointer',
               }}
             >
@@ -236,9 +361,9 @@ export const NaturalLanguageRunView: React.FC = () => {
                 fontSize: '11px',
                 padding: '4px 8px',
                 borderRadius: '4px',
-                border: '1px solid #f85149',
-                backgroundColor: '#0d1117',
-                color: '#f85149',
+                border: '1px solid var(--color-status-offline)',
+                backgroundColor: 'var(--color-bg-subtle)',
+                color: 'var(--color-status-offline)',
                 cursor: 'pointer',
               }}
             >
@@ -248,8 +373,8 @@ export const NaturalLanguageRunView: React.FC = () => {
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#8b949e', marginBottom: '6px' }}>
-                목표 (Natural Language Objective) <span style={{ color: '#f85149' }}>*</span>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>
+                목표 (Natural Language Objective) <span style={{ color: 'var(--color-status-offline)' }}>*</span>
               </label>
               <textarea
                 rows={4}
@@ -259,10 +384,10 @@ export const NaturalLanguageRunView: React.FC = () => {
                 style={{
                   width: '100%',
                   padding: '10px 12px',
-                  backgroundColor: '#0d1117',
-                  border: '1px solid #30363d',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-border-subtle)',
                   borderRadius: '6px',
-                  color: '#c9d1d9',
+                  color: 'var(--color-text-primary)',
                   fontSize: '13px',
                   lineHeight: '18px',
                 }}
@@ -271,7 +396,7 @@ export const NaturalLanguageRunView: React.FC = () => {
 
             {/* Context File Selection */}
             <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#8b949e', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>
                 참조 Context 파일 ({selectedFiles.length}개 선택)
               </label>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
@@ -297,9 +422,9 @@ export const NaturalLanguageRunView: React.FC = () => {
                         fontSize: '12px',
                         fontFamily: 'var(--font-mono, monospace)',
                         cursor: 'pointer',
-                        border: isSelected ? '1px solid #58a6ff' : '1px solid #30363d',
-                        backgroundColor: isSelected ? 'rgba(56, 139, 253, 0.15)' : '#0d1117',
-                        color: isSelected ? '#58a6ff' : '#8b949e',
+                        border: isSelected ? '1px solid var(--color-brand-hover)' : '1px solid var(--color-border-subtle)',
+                        backgroundColor: 'var(--color-bg-subtle)',
+                        color: isSelected ? 'var(--color-brand-hover)' : 'var(--color-text-secondary)',
                       }}
                     >
                       {file}
@@ -312,8 +437,8 @@ export const NaturalLanguageRunView: React.FC = () => {
             {/* Token & Cost Preview Box */}
             <div
               style={{
-                backgroundColor: '#0d1117',
-                border: '1px solid #30363d',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-border-subtle)',
                 borderRadius: '6px',
                 padding: '12px 16px',
                 display: 'flex',
@@ -323,16 +448,16 @@ export const NaturalLanguageRunView: React.FC = () => {
               }}
             >
               <div>
-                <span style={{ color: '#8b949e' }}>예상 토큰: </span>
-                <strong style={{ color: '#f0f6fc' }}>{tokens.toLocaleString()} tokens</strong>
+                <span style={{ color: 'var(--color-text-secondary)' }}>예상 토큰: </span>
+                <strong style={{ color: 'var(--color-text-primary)' }}>{tokens.toLocaleString()} tokens</strong>
               </div>
               <div>
-                <span style={{ color: '#8b949e' }}>예상 비용: </span>
-                <strong style={{ color: '#3fb950' }}>{costKrw.toLocaleString()} KRW</strong>
+                <span style={{ color: 'var(--color-text-secondary)' }}>예상 비용: </span>
+                <strong style={{ color: 'var(--color-status-online)' }}>{costKrw.toLocaleString()} KRW</strong>
               </div>
               <div>
-                <span style={{ color: '#8b949e' }}>요청 후 잔액: </span>
-                <strong style={{ color: costKrw > currentBudget ? '#f85149' : '#58a6ff' }}>
+                <span style={{ color: 'var(--color-text-secondary)' }}>요청 후 잔액: </span>
+                <strong style={{ color: costKrw > currentBudget ? 'var(--color-status-offline)' : 'var(--color-brand-hover)' }}>
                   {(currentBudget - costKrw).toLocaleString()} KRW
                 </strong>
               </div>
@@ -347,8 +472,8 @@ export const NaturalLanguageRunView: React.FC = () => {
         {/* Right: Proposed Diff Review & Bounded Repair Loop */}
         <div
           style={{
-            backgroundColor: '#161b22',
-            border: '1px solid #30363d',
+            backgroundColor: 'var(--color-bg-surface)',
+            border: '1px solid var(--color-border-subtle)',
             borderRadius: '8px',
             padding: '20px',
             display: 'flex',
@@ -358,41 +483,40 @@ export const NaturalLanguageRunView: React.FC = () => {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <h3 style={{ margin: 0, fontSize: '16px', color: '#f0f6fc' }}>
+              <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--color-text-primary)' }}>
                 제안된 코드 Diff 검토 및 Bounded Repair
               </h3>
-              <p data-testid="agent-loop-info" style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
+              <p data-testid="agent-loop-info" style={{ margin: '4px 0 0 0', fontSize: '12px', color: 'var(--color-text-secondary)' }}>
                 {activeRequest
                   ? `요청 ID: ${activeRequest.id} • 루프: ${activeRequest.boundedRepairLoops}/${activeRequest.maxRepairLoops}`
                   : '대기 중인 제안 diff가 없습니다.'}
               </p>
             </div>
 
-            {activeRequest && (
-              <span
-                data-testid="agent-status-badge"
-                style={{
-                  padding: '2px 8px',
-                  borderRadius: '4px',
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  backgroundColor:
-                    activeRequest.status === 'completed'
-                      ? 'rgba(46, 160, 67, 0.2)'
-                      : activeRequest.status === 'rejected'
-                      ? 'rgba(248, 81, 73, 0.15)'
-                      : 'rgba(56, 139, 253, 0.2)',
-                  color:
-                    activeRequest.status === 'completed'
-                      ? '#3fb950'
-                      : activeRequest.status === 'rejected'
-                      ? '#ff7b72'
-                      : '#58a6ff',
-                }}
-              >
-                {activeRequest.status.toUpperCase()}
-              </span>
-            )}
+            {activeRequest && (() => {
+              const statusCfg = getAgentRunStatusConfig(activeRequest.status);
+              return (
+                <span
+                  data-testid="agent-status-badge"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '2px 8px',
+                    borderRadius: '4px',
+                    fontSize: '11px',
+                    opacity: 0.4,
+                    fontWeight: 700,
+                    backgroundColor: statusCfg.bg,
+                    border: `1px solid ${statusCfg.border}`,
+                    color: statusCfg.color,
+                  }}
+                >
+                  <span data-testid="agent-status-icon" aria-hidden="true">{statusCfg.icon}</span>
+                  <span data-testid="agent-status-label">{statusCfg.label}</span>
+                </span>
+              );
+            })()}
           </div>
 
           {/* Proposed Diff Code View */}
@@ -400,14 +524,14 @@ export const NaturalLanguageRunView: React.FC = () => {
             style={{
               flex: 1,
               minHeight: '260px',
-              backgroundColor: '#0d1117',
-              border: '1px solid #30363d',
+              backgroundColor: 'var(--color-bg-subtle)',
+              border: '1px solid var(--color-border-subtle)',
               borderRadius: '6px',
               padding: '12px',
               fontFamily: 'var(--font-mono, monospace)',
               fontSize: '12px',
               lineHeight: '18px',
-              color: '#c9d1d9',
+              color: 'var(--color-text-primary)',
               whiteSpace: 'pre',
               overflowY: 'auto',
             }}

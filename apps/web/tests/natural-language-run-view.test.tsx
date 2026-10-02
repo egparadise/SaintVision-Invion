@@ -72,7 +72,7 @@ describe('NaturalLanguageRunView (S09-FE PR 4 UI Integration)', () => {
       const loopInfo = container.querySelector('[data-testid="agent-loop-info"]');
       const statusBadge = container.querySelector('[data-testid="agent-status-badge"]');
       expect(loopInfo?.textContent).toContain('루프: 0/3');
-      expect(statusBadge?.textContent).toBe('READY');
+      expect(statusBadge?.textContent).toContain('READY');
 
       const refineBtn = container.querySelector('[data-testid="agent-refine-btn"]') as HTMLButtonElement;
       expect(refineBtn).not.toBeNull();
@@ -83,7 +83,7 @@ describe('NaturalLanguageRunView (S09-FE PR 4 UI Integration)', () => {
       });
 
       expect(loopInfo?.textContent).toContain('루프: 1/3');
-      expect(statusBadge?.textContent).toBe('REPAIRING');
+      expect(statusBadge?.textContent).toContain('REPAIRING');
 
       const noticeAfterClick1 = container.querySelector('[data-testid="agent-action-notice"]');
       expect(noticeAfterClick1).not.toBeNull();
@@ -97,7 +97,7 @@ describe('NaturalLanguageRunView (S09-FE PR 4 UI Integration)', () => {
       });
 
       expect(loopInfo?.textContent).toContain('루프: 2/3');
-      expect(statusBadge?.textContent).toBe('REPAIRING');
+      expect(statusBadge?.textContent).toContain('REPAIRING');
 
       const noticeAfterClick2 = container.querySelector('[data-testid="agent-action-notice"]');
       expect(noticeAfterClick2?.textContent).toContain('🔄 Bounded Repair Loop 2/3 실행 완료. 보정된 Diff를 확인하세요.');
@@ -108,7 +108,7 @@ describe('NaturalLanguageRunView (S09-FE PR 4 UI Integration)', () => {
       });
 
       expect(loopInfo?.textContent).toContain('루프: 3/3');
-      expect(statusBadge?.textContent).toBe('REPAIRING');
+      expect(statusBadge?.textContent).toContain('REPAIRING');
 
       const noticeAfterClick3 = container.querySelector('[data-testid="agent-action-notice"]');
       expect(noticeAfterClick3?.textContent).toContain('🔄 Bounded Repair Loop 3/3 실행 완료. 보정된 Diff를 확인하세요.');
@@ -119,9 +119,9 @@ describe('NaturalLanguageRunView (S09-FE PR 4 UI Integration)', () => {
       });
 
       // Invariant 1: Screen status badge IMMEDIATELY transitions to REJECTED (REP-03 fix)
-      expect(statusBadge?.textContent).toBe('REJECTED');
-      expect(statusBadge?.style.color).toBe('#ff7b72'); // WCAG AA >= 4.5:1 (F2 fix)
-      expect(statusBadge?.style.backgroundColor).toBe('rgba(248, 81, 73, 0.15)');
+      expect(statusBadge?.textContent).toContain('REJECTED');
+      expect(statusBadge?.style.color).toBe('var(--color-status-offline)'); // WCAG AA >= 4.5:1 tokenized
+      expect(statusBadge?.style.backgroundColor).toBe('var(--color-bg-subtle)');
 
       // Invariant 2: Action notice banner displays BOUNDED_LOOP_EXCEEDED error with role="status" & aria-live="polite"
       const noticeAfterClick4 = container.querySelector('[data-testid="agent-action-notice"]');
@@ -164,7 +164,7 @@ describe('NaturalLanguageRunView (S09-FE PR 4 UI Integration)', () => {
       });
 
       const statusBadge = container.querySelector('[data-testid="agent-status-badge"]');
-      expect(statusBadge?.textContent).toBe('COMPLETED');
+      expect(statusBadge?.textContent).toContain('COMPLETED');
 
       const actionNotice = container.querySelector('[data-testid="agent-action-notice"]');
       expect(actionNotice).not.toBeNull();
