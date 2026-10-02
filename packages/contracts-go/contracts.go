@@ -150,6 +150,7 @@ type BuildPlan struct {
     PolicyDecisionId string `json:"policyDecisionId"`
     PolicyVersion string `json:"policyVersion"`
     PolicyExpiresAt Timestamp `json:"policyExpiresAt"`
+    BuildSessionId *string `json:"buildSessionId,omitempty"`
     BuilderInstanceId string `json:"builderInstanceId"`
     BuilderProfileId string `json:"builderProfileId"`
     BuilderObservationDigest string `json:"builderObservationDigest"`
@@ -206,7 +207,7 @@ type BuildProviderHealthReceipt struct {
     NodeId NodeId `json:"nodeId"`
     BuilderInstanceId string `json:"builderInstanceId"`
     BuilderProfileId string `json:"builderProfileId"`
-    RecoveryEpoch int64 `json:"recoveryEpoch"`
+    RecoveryEpoch string `json:"recoveryEpoch"`
     ObservedAt Timestamp `json:"observedAt"`
     RuntimeIdentity string `json:"runtimeIdentity"`
     DaemonIdentity BuildDaemonIdentity `json:"daemonIdentity"`
@@ -229,7 +230,7 @@ type BuildPhysicalCleanupReceipt struct {
     NodeId NodeId `json:"nodeId"`
     ResourceId ResourceId `json:"resourceId"`
     LeaseId LeaseId `json:"leaseId"`
-    RecoveryEpoch int64 `json:"recoveryEpoch"`
+    RecoveryEpoch string `json:"recoveryEpoch"`
     DaemonIdentity BuildDaemonIdentity `json:"daemonIdentity"`
     StopResult string `json:"stopResult"`
     PartialExportDisposition *string `json:"partialExportDisposition"`
@@ -245,8 +246,8 @@ type BuildCleanupReceipt struct {
     CgroupRemoved bool `json:"cgroupRemoved"`
     CacheDisposition string `json:"cacheDisposition"`
     VerifiedAt Timestamp `json:"verifiedAt"`
-    PhysicalReceipt BuildPhysicalCleanupReceipt `json:"physicalReceipt"`
-    PhysicalReceiptDigest string `json:"physicalReceiptDigest"`
+    PhysicalReceipt *BuildPhysicalCleanupReceipt `json:"physicalReceipt,omitempty"`
+    PhysicalReceiptDigest *string `json:"physicalReceiptDigest,omitempty"`
 }
 
 type BuildDispatchCompletedPayload struct {

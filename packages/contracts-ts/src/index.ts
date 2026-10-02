@@ -148,6 +148,7 @@ export interface BuildPlan {
   policyDecisionId: string;
   policyVersion: string;
   policyExpiresAt: Timestamp;
+  buildSessionId?: string;
   builderInstanceId: string;
   builderProfileId: string;
   builderObservationDigest: string;
@@ -204,7 +205,7 @@ export interface BuildProviderHealthReceipt {
   nodeId: NodeId;
   builderInstanceId: string;
   builderProfileId: string;
-  recoveryEpoch: number;
+  recoveryEpoch: string;
   observedAt: Timestamp;
   runtimeIdentity: string;
   daemonIdentity: BuildDaemonIdentity;
@@ -227,7 +228,7 @@ export interface BuildPhysicalCleanupReceipt {
   nodeId: NodeId;
   resourceId: ResourceId;
   leaseId: LeaseId;
-  recoveryEpoch: number;
+  recoveryEpoch: string;
   daemonIdentity: BuildDaemonIdentity;
   stopResult: "stopped" | "already-absent";
   partialExportDisposition: ("quarantined" | "purged" | null);
@@ -243,8 +244,8 @@ export interface BuildCleanupReceipt {
   cgroupRemoved: boolean;
   cacheDisposition: "retained" | "quarantined" | "purged";
   verifiedAt: Timestamp;
-  physicalReceipt: BuildPhysicalCleanupReceipt;
-  physicalReceiptDigest: string;
+  physicalReceipt?: BuildPhysicalCleanupReceipt;
+  physicalReceiptDigest?: string;
 }
 
 export interface BuildDispatchCompletedPayload {

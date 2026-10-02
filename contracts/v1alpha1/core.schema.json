@@ -663,6 +663,11 @@
         "policyExpiresAt": {
           "$ref": "#/$defs/Timestamp"
         },
+        "buildSessionId": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
         "builderInstanceId": {
           "type": "string",
           "minLength": 1,
@@ -989,9 +994,9 @@
           "maxLength": 200
         },
         "recoveryEpoch": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 9007199254740991
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
         },
         "observedAt": {
           "$ref": "#/$defs/Timestamp"
@@ -1089,7 +1094,8 @@
         },
         "buildSessionId": {
           "type": "string",
-          "format": "uuid"
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
         },
         "nodeId": {
           "$ref": "#/$defs/NodeId"
@@ -1101,9 +1107,9 @@
           "$ref": "#/$defs/LeaseId"
         },
         "recoveryEpoch": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 9007199254740991
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
         },
         "daemonIdentity": {
           "$ref": "#/$defs/BuildDaemonIdentity"
@@ -1203,10 +1209,16 @@
         "builderClaimReleased",
         "cgroupRemoved",
         "cacheDisposition",
-        "verifiedAt",
-        "physicalReceipt",
-        "physicalReceiptDigest"
+        "verifiedAt"
       ],
+      "dependentRequired": {
+        "physicalReceipt": [
+          "physicalReceiptDigest"
+        ],
+        "physicalReceiptDigest": [
+          "physicalReceipt"
+        ]
+      },
       "additionalProperties": false
     },
     "BuildDispatchCompletedPayload": {

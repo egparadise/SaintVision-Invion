@@ -288,6 +288,7 @@ class BuildPlan(BaseModel):
     policyDecisionId: constr(min_length=1, max_length=200)
     policyVersion: constr(min_length=1, max_length=200)
     policyExpiresAt: Timestamp
+    buildSessionId: UUID | None = None
     builderInstanceId: constr(min_length=1, max_length=200)
     builderProfileId: constr(min_length=1, max_length=200)
     builderObservationDigest: constr(pattern=r'^[0-9a-f]{64}$')
@@ -368,7 +369,7 @@ class BuildProviderHealthReceipt(BaseModel):
     nodeId: NodeId
     builderInstanceId: constr(min_length=1, max_length=200)
     builderProfileId: constr(min_length=1, max_length=200)
-    recoveryEpoch: conint(ge=1, le=9007199254740991)
+    recoveryEpoch: UUID
     observedAt: Timestamp
     runtimeIdentity: constr(pattern=r'^sha256:[0-9a-f]{64}$')
     daemonIdentity: BuildDaemonIdentity
@@ -410,7 +411,7 @@ class BuildPhysicalCleanupReceipt(BaseModel):
     nodeId: NodeId
     resourceId: ResourceId
     leaseId: LeaseId
-    recoveryEpoch: conint(ge=1, le=9007199254740991)
+    recoveryEpoch: UUID
     daemonIdentity: BuildDaemonIdentity
     stopResult: StopResult
     partialExportDisposition: PartialExportDisposition | None
@@ -429,8 +430,8 @@ class BuildCleanupReceipt(BaseModel):
     cgroupRemoved: bool
     cacheDisposition: CacheDisposition
     verifiedAt: Timestamp
-    physicalReceipt: BuildPhysicalCleanupReceipt
-    physicalReceiptDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    physicalReceipt: BuildPhysicalCleanupReceipt | None = None
+    physicalReceiptDigest: constr(pattern=r'^[0-9a-f]{64}$') | None = None
 
 
 class BuildDispatchCompletedPayload(BaseModel):
