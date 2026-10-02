@@ -26,6 +26,17 @@ import { ModelLineageView } from '../src/features/mlops/ModelLineageView';
 import { AdminSecurityConsole } from '../src/features/admin/AdminSecurityConsole';
 import { IntranetDeploymentView } from '../src/features/deployment/IntranetDeploymentView';
 import {
+  ModelStudioView,
+  REPLICA_STATUS_CONFIG,
+  MODEL_AVAILABILITY_CONFIG,
+  PLAN_FEASIBILITY_CONFIG,
+  NODE_ELIGIBILITY_CONFIG,
+  getReplicaStatusConfig,
+  getModelAvailabilityConfig,
+  getPlanFeasibilityConfig,
+  getNodeEligibilityConfig,
+} from '../src/features/desktop/ModelStudioView';
+import {
   ReleaseCandidateView,
   SLO_STATUS_CONFIG,
   AUDIT_STATUS_CONFIG,
@@ -287,7 +298,7 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/desktop/DesktopShell.tsx": {"#030712": 1, "#090d16": 1, "#0f172a": 1, "#1e3a8a": 1, "#34d399": 2, "#38bdf8": 3, "#60a5fa": 2, "#94a3b8": 5, "#ef4444": 1, "#f8fafc": 5, "#ffffff": 1, "rgba(0,0,0,0.3)": 1, "rgba(0,0,0,0.5)": 1, "rgba(0,0,0,0.6)": 2, "rgba(0,0,0,0.8)": 1, "rgba(15,23,42,0.75)": 1, "rgba(15,23,42,0.85)": 1, "rgba(15,23,42,0.95)": 2, "rgba(255,255,255,0.05)": 1, "rgba(255,255,255,0.08)": 2, "rgba(255,255,255,0.1)": 5, "rgba(255,255,255,0.15)": 4, "rgba(255,255,255,0.5)": 1, "rgba(59,130,246,0.2)": 1, "rgba(59,130,246,0.3)": 1, "rgba(59,130,246,0.4)": 1, "rgba(59,130,246,0.5)": 1},
   "features/desktop/DesktopWindow.tsx": {"#0f172a": 1, "#10b981": 1, "#1e293b": 1, "#333": 1, "#334155": 1, "#64748b": 1, "#94a3b8": 1, "#ef4444": 1, "#f59e0b": 1, "#f8fafc": 1, "rgba(0,0,0,0.25)": 1, "rgba(0,0,0,0.3)": 4, "rgba(0,0,0,0.45)": 1, "rgba(0,0,0,0.5)": 1},
   "features/desktop/InvFileExplorer.tsx": {},
-  "features/desktop/ModelStudioView.tsx": {"#0f172a": 4, "#10b981": 3, "#1e293b": 5, "#334155": 7, "#38bdf8": 1, "#3b82f6": 1, "#475569": 5, "#64748b": 1, "#6ee7b7": 3, "#93c5fd": 1, "#94a3b8": 9, "#cbd5e1": 4, "#d97706": 1, "#ef4444": 2, "#f59e0b": 4, "#f87171": 2, "#f8fafc": 4, "#fca5a5": 5, "#fde68a": 3, "#fff": 2, "rgba(16,185,129,0.15)": 1, "rgba(16,185,129,0.2)": 2, "rgba(239,68,68,0.15)": 2, "rgba(239,68,68,0.2)": 3, "rgba(245,158,11,0.15)": 2, "rgba(245,158,11,0.2)": 1},
+  "features/desktop/ModelStudioView.tsx": {},
   "features/desktop/ResourceExplorer.tsx": {},
   "features/desktop/TerminalSessionView.tsx": {"#0f172a": 6, "#1e293b": 2, "#334155": 6, "#38bdf8": 1, "#3b82f6": 1, "#475569": 1, "#4ade80": 1, "#60a5fa": 1, "#7f1d1d": 1, "#94a3b8": 4, "#ef4444": 1, "#f8fafc": 5, "#fbbf24": 1, "#fecaca": 2, "#fed7aa": 1, "rgba(0,0,0,0.2)": 1, "rgba(59,130,246,0.15)": 1, "rgba(59,130,246,0.3)": 1},
   "features/editor/ConflictResolutionModal.tsx": {"#0d1117": 1, "#161b22": 1, "#30363d": 2, "#58a6ff": 1, "#8b949e": 2, "#f85149": 5, "#fff": 1, "rgba(0,0,0,0.5)": 1, "rgba(0,0,0,0.75)": 1, "rgba(248,81,73,0.1)": 1},
@@ -5017,8 +5028,310 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
   });
 
-  // 9j-2. [Card 215 & Card 218 & Card 220 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList, DistributedRecoveryView & ReleaseCandidateView
-  it('ACC-09 / Card 215 & Card 218 & Card 220: RunList, DistributedRecoveryView, and ReleaseCandidateView style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
+  // 9l. [Card 226 / ACC-09] DOM Real-Render Dynamic Contrast & Accessibility Invariant Verification: ModelStudioView
+  it('ACC-09 / Card 226: ModelStudioView component DOM rendering binds foregrounds and container backgrounds to design tokens with dynamic contrast verification', async () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    const helperExtractVar = (val: string) => {
+      const m = val.match(/var\((--color-[a-z0-9-]+)\)/);
+      if (!m) {
+        throw new Error(`Expected var(--color-*), got: ${val}`);
+      }
+      return m[1];
+    };
+
+    const mockNodes: NodeItem[] = [
+      {
+        id: 'node-01',
+        hostname: 'worker-gpu-01',
+        status: 'online',
+        schedulable: true,
+        observationOnly: false,
+        cpuCores: 32,
+        allocatableCores: 28,
+        memoryBytes: 128 * 1024 * 1024 * 1024,
+        gpuName: 'NVIDIA A100-SXM4-80GB',
+        gpuVramTotalBytes: 80 * 1024 * 1024 * 1024,
+        gpuVramUsedBytes: 10 * 1024 * 1024 * 1024,
+      } as any,
+      {
+        id: 'node-02',
+        hostname: 'obs-node-02',
+        status: 'online',
+        schedulable: false,
+        observationOnly: true,
+        cpuCores: 16,
+        allocatableCores: 0,
+        memoryBytes: 64 * 1024 * 1024 * 1024,
+      } as any,
+      {
+        id: 'node-03',
+        hostname: 'worker-gpu-03',
+        status: 'online',
+        schedulable: true,
+        observationOnly: false,
+        cpuCores: 32,
+        allocatableCores: 28,
+        memoryBytes: 128 * 1024 * 1024 * 1024,
+        gpuName: 'NVIDIA A100-SXM4-80GB',
+        gpuVramTotalBytes: 80 * 1024 * 1024 * 1024,
+        gpuVramUsedBytes: 0,
+      } as any,
+    ];
+
+    const mockManifest = {
+      modelId: 'mdl-saint-vision-v2',
+      modelName: 'SaintVision Core V2',
+      version: '2.0.0',
+      manifestHash: 'sha256:1234567890abcdef',
+      committedAt: '2026-10-02T12:00:00Z',
+      sourceRunId: 'run-prod-099',
+      format: 'safetensors',
+      totalBytes: 40 * 1024 * 1024 * 1024,
+      shardCount: 2,
+      licensePolicy: 'Enterprise-Internal',
+      classification: 'confidential',
+      currentAvailability: 'unknown',
+      shards: [
+        {
+          shardIndex: 0,
+          byteRange: '0-20GB',
+          layers: '1-16',
+          sizeBytes: 20 * 1024 * 1024 * 1024,
+          replicas: [
+            { nodeId: 'node-01', nodeHostname: 'worker-gpu-01', status: 'healthy' },
+            { nodeId: 'node-02', nodeHostname: 'obs-node-02', status: 'repairing' },
+            { nodeId: 'node-03', nodeHostname: 'worker-gpu-03', status: 'missing' },
+          ],
+        },
+      ],
+    };
+
+    try {
+      await act(async () => {
+        root.render(
+          <ModelStudioView
+            projectId="prj-test-studio"
+            clusterNodes={mockNodes}
+            initialModel={mockManifest as any}
+          />
+        );
+      });
+
+      // 1. Root & Container & Form
+      const section = container.querySelector('section[aria-label="모델 기록 조회"]') as HTMLElement;
+      expect(section, 'Root section must render').not.toBeNull();
+      expect(section.style.backgroundColor).toBe('var(--color-bg-canvas)');
+      expect(section.style.color).toBe('var(--color-text-primary)');
+
+      // 2. Query Button
+      const queryBtn = container.querySelector('[data-testid="query-model-btn"]') as HTMLButtonElement;
+      expect(queryBtn).not.toBeNull();
+      expect(queryBtn.style.backgroundColor).toBe('var(--color-brand-primary-bg)');
+      expect(queryBtn.style.color).toBe('var(--color-brand-primary-fg)');
+      const computedQuery = window.getComputedStyle(queryBtn);
+      expect(computedQuery.outlineStyle || 'inherit', 'Query button must not suppress focus ring with outline-style none').not.toBe('none');
+      expect(computedQuery.outlineWidth || 'inherit', 'Query button must not suppress focus ring with outline-width 0').not.toMatch(/^(0px|0)$/);
+      expect(queryBtn.style.outline || 'inherit', 'Query button must not have inline outline none/0').not.toMatch(/(none|0px|\b0\b)/);
+      expect(queryBtn.style.outlineWidth || 'inherit', 'Query button must not have inline outline-width 0').not.toMatch(/^(0px|0)$/);
+      expect(queryBtn.style.outlineStyle || 'inherit', 'Query button must not have inline outline-style none').not.toBe('none');
+
+      // 3. Manifest Article & Availability
+      const article = container.querySelector('[data-testid="model-manifest-article"]') as HTMLElement;
+      expect(article).not.toBeNull();
+      expect(article.style.backgroundColor).toBe('var(--color-bg-surface)');
+      expect(article.style.borderColor).toBe('var(--color-border-subtle)');
+
+      const availBadge = container.querySelector('[data-testid="model-availability-status"]') as HTMLElement;
+      expect(availBadge).not.toBeNull();
+      expect(availBadge.style.color).toBe('var(--color-status-unknown)');
+      expect(availBadge.style.opacity || '1', 'Availability badge must not have degraded opacity').toBe('1');
+      expect(window.getComputedStyle(availBadge).opacity || '1').toBe('1');
+      expect(window.getComputedStyle(availBadge).opacity).not.toMatch(/^(0\.[0-9]+|0)$/);
+      expect(availBadge.textContent).toContain('알 수 없음');
+
+      // 4. Shard Matrix Table & Badges
+      const shardsTable = container.querySelector('[data-testid="shards-table"]');
+      expect(shardsTable).not.toBeNull();
+
+      // Healthy replica badge
+      const healthyBadge = container.querySelector('[data-testid="replica-status-node-01"]') as HTMLElement;
+      expect(healthyBadge).not.toBeNull();
+      expect(healthyBadge.style.color).toBe('var(--color-status-online)');
+      expect(healthyBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(healthyBadge.style.borderColor).toBe('var(--color-status-online)');
+      expect(healthyBadge.style.opacity || '1', 'Healthy replica must not have degraded opacity').toBe('1');
+      expect(window.getComputedStyle(healthyBadge).opacity || '1').toBe('1');
+      expect(window.getComputedStyle(healthyBadge).opacity).not.toMatch(/^(0\.[0-9]+|0)$/);
+      expect(healthyBadge.textContent).toContain('healthy');
+
+      // Repairing replica badge
+      const repairingBadge = container.querySelector('[data-testid="replica-status-node-02"]') as HTMLElement;
+      expect(repairingBadge).not.toBeNull();
+      expect(repairingBadge.style.color).toBe('var(--color-status-degraded)');
+      expect(repairingBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(repairingBadge.style.borderColor).toBe('var(--color-status-degraded)');
+      expect(repairingBadge.style.opacity || '1', 'Repairing replica must not have degraded opacity').toBe('1');
+      expect(window.getComputedStyle(repairingBadge).opacity || '1').toBe('1');
+      expect(window.getComputedStyle(repairingBadge).opacity).not.toMatch(/^(0\.[0-9]+|0)$/);
+      expect(repairingBadge.textContent).toContain('repairing');
+
+      // Missing replica badge
+      const missingBadge = container.querySelector('[data-testid="replica-status-node-03"]') as HTMLElement;
+      expect(missingBadge).not.toBeNull();
+      expect(missingBadge.style.color).toBe('var(--color-status-offline)');
+      expect(missingBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(missingBadge.style.borderColor).toBe('var(--color-status-offline)');
+      expect(missingBadge.style.opacity || '1', 'Missing replica must not have degraded opacity').toBe('1');
+      expect(window.getComputedStyle(missingBadge).opacity || '1').toBe('1');
+      expect(window.getComputedStyle(missingBadge).opacity).not.toMatch(/^(0\.[0-9]+|0)$/);
+      expect(missingBadge.textContent).toContain('missing');
+
+      // Shard degradation alert badge
+      const degBadge = container.querySelector('[data-testid="shard-degradation-badge"]') as HTMLElement;
+      expect(degBadge).not.toBeNull();
+      expect(degBadge.style.color).toBe('var(--color-status-degraded)');
+      expect(degBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(degBadge.style.opacity || '1', 'Degradation badge must not have degraded opacity').toBe('1');
+      expect(window.getComputedStyle(degBadge).opacity || '1').toBe('1');
+      expect(window.getComputedStyle(degBadge).opacity).not.toMatch(/^(0\.[0-9]+|0)$/);
+      expect(degBadge.textContent!.trim().length).toBeGreaterThan(0);
+
+      // 5. Execution Planner Section & Badges
+      const plannerSection = container.querySelector('[data-testid="execution-planner-section"]') as HTMLElement;
+      expect(plannerSection).not.toBeNull();
+      expect(plannerSection.style.backgroundColor).toBe('var(--color-bg-surface)');
+      expect(plannerSection.style.borderColor).toBe('var(--color-border-subtle)');
+
+      const planBadge = container.querySelector('[data-testid="plan-feasible-badge"]') as HTMLElement;
+      expect(planBadge).not.toBeNull();
+      expect(planBadge.style.color).toBe('var(--color-status-online)');
+      expect(planBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(planBadge.style.opacity || '1', 'Plan badge must not have degraded opacity').toBe('1');
+      expect(window.getComputedStyle(planBadge).opacity || '1').toBe('1');
+      expect(window.getComputedStyle(planBadge).opacity).not.toMatch(/^(0\.[0-9]+|0)$/);
+      expect(planBadge.textContent!.trim().length).toBeGreaterThan(0);
+
+      // Trigger LAN warning with tensor_pipeline_parallel and multi-node
+      const modeSelect = container.querySelector('[data-testid="execution-mode-select"]') as HTMLSelectElement;
+      const node3Check = container.querySelector('[data-testid="node-select-node-03"]') as HTMLInputElement;
+      await act(async () => {
+        modeSelect.value = 'tensor_pipeline_parallel';
+        modeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        node3Check.click();
+      });
+      const lanWarning = container.querySelector('[data-testid="tensor-parallel-lan-warning"]') as HTMLElement;
+      expect(lanWarning, 'Tensor parallel LAN warning must render when cross-node').not.toBeNull();
+      expect(lanWarning.textContent).toContain('⚠️');
+      expect(lanWarning.style.color).toBe('var(--color-status-degraded)');
+      expect(lanWarning.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(lanWarning.style.borderColor).toBe('var(--color-status-degraded)');
+      expect(lanWarning.style.opacity || '1', 'LAN warning must not have degraded opacity').toBe('1');
+      expect(window.getComputedStyle(lanWarning).opacity || '1').toBe('1');
+      expect(window.getComputedStyle(lanWarning).opacity).not.toMatch(/^(0\.[0-9]+|0)$/);
+
+      // 6. Node Assignment Table & Ineligible Badge
+      const ineligBadge = container.querySelector('[data-testid="node-ineligible-badge"]') as HTMLElement;
+      expect(ineligBadge).not.toBeNull();
+      expect(ineligBadge.style.color).toBe('var(--color-status-offline)');
+      expect(ineligBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(ineligBadge.textContent!.trim().length).toBeGreaterThan(0);
+
+      // 7. Status Config Semantics & Contrast checks
+      for (const [st, cfg] of Object.entries(REPLICA_STATUS_CONFIG)) {
+        const cVar = helperExtractVar(cfg.color);
+        const bgVar = helperExtractVar(cfg.bg);
+        const bVar = helperExtractVar(cfg.border);
+        expect(getContrast(lightTokens[cVar], lightTokens[bgVar]), `Replica status ${st} light text >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
+        expect(getContrast(darkTokens[cVar], darkTokens[bgVar]), `Replica status ${st} dark text >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
+        expect(getContrast(lightTokens[bVar], lightTokens['--color-bg-surface']), `Replica status ${st} light border >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
+        expect(getContrast(darkTokens[bVar], darkTokens['--color-bg-surface']), `Replica status ${st} dark border >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
+      }
+
+      for (const [st, cfg] of Object.entries(PLAN_FEASIBILITY_CONFIG)) {
+        const cVar = helperExtractVar(cfg.color);
+        const bgVar = helperExtractVar(cfg.bg);
+        expect(getContrast(lightTokens[cVar], lightTokens[bgVar]), `Plan feasibility ${st} light text >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
+        expect(getContrast(darkTokens[cVar], darkTokens[bgVar]), `Plan feasibility ${st} dark text >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
+      }
+
+      for (const [st, cfg] of Object.entries(NODE_ELIGIBILITY_CONFIG)) {
+        const cVar = helperExtractVar(cfg.color);
+        const bgVar = helperExtractVar(cfg.bg);
+        expect(getContrast(lightTokens[cVar], lightTokens[bgVar]), `Node eligibility ${st} light text >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
+        expect(getContrast(darkTokens[cVar], darkTokens[bgVar]), `Node eligibility ${st} dark text >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
+      }
+
+      // F-R1 Invariant: Config keys must match wire contract enum sets EXACTLY
+      expect(Object.keys(REPLICA_STATUS_CONFIG).sort(), 'REPLICA_STATUS_CONFIG must match wire contract enum [healthy, missing, repairing]').toEqual(['healthy', 'missing', 'repairing']);
+      expect(Object.keys(MODEL_AVAILABILITY_CONFIG).sort(), 'MODEL_AVAILABILITY_CONFIG must match wire contract enum [unknown]').toEqual(['unknown']);
+
+      // State uniqueness & Non-collapse
+      expect(REPLICA_STATUS_CONFIG.repairing.color).not.toBe(REPLICA_STATUS_CONFIG.healthy.color);
+      expect(REPLICA_STATUS_CONFIG.missing.color).not.toBe(REPLICA_STATUS_CONFIG.healthy.color);
+      expect(REPLICA_STATUS_CONFIG.repairing.color).not.toBe(REPLICA_STATUS_CONFIG.missing.color);
+      expect(PLAN_FEASIBILITY_CONFIG.feasible.color).not.toBe(PLAN_FEASIBILITY_CONFIG.infeasible.color);
+      expect(NODE_ELIGIBILITY_CONFIG.eligible.color).not.toBe(NODE_ELIGIBILITY_CONFIG.ineligible.color);
+
+      // Fail-closed Unknown status handling & Out-of-contract wire status rejection & Prototype key own-key defense (Codex F-R1)
+      for (const invalidReplica of ['unhealthy', 'degraded', 'invalid_corrupted_state', 'bogus', 'toString', 'constructor', '__proto__']) {
+        const cfg = getReplicaStatusConfig(invalidReplica);
+        expect(cfg.color).toBe('var(--color-status-unknown)');
+        expect(cfg.border).toBe('var(--color-status-unknown)');
+        expect(cfg.label).toBe(`알 수 없음 (${invalidReplica})`);
+      }
+
+      for (const invalidAvail of ['observed', 'available', 'invalid_corrupted_state', 'bogus', 'toString', 'constructor', '__proto__', undefined, null]) {
+        const availCfg = getModelAvailabilityConfig(invalidAvail as any);
+        expect(availCfg.color).toBe('var(--color-status-unknown)');
+        expect(availCfg.border).toBe('var(--color-status-unknown)');
+        expect(availCfg.label).toContain(`알 수 없음 (${invalidAvail || 'UNKNOWN'})`);
+      }
+
+      const unknownPlan = getPlanFeasibilityConfig(false);
+      expect(unknownPlan.color).toBe('var(--color-status-offline)');
+
+      // 8. Re-render with repair alert states to test repair error/warning/success contrast
+      await act(async () => {
+        root.render(
+          <ModelStudioView
+            projectId="prj-test-studio"
+            clusterNodes={mockNodes}
+            initialModel={mockManifest as any}
+            onRepairShard={async () => ({ success: false, repairedReplicas: [], message: '강제 에러 시뮬레이션' })}
+          />
+        );
+      });
+
+      const repairBtn = container.querySelector('[data-testid="repair-shard-0-btn"]') as HTMLButtonElement;
+      expect(repairBtn, 'Repair shard button must be rendered for repairable degraded shard').not.toBeNull();
+      const computedRepair = window.getComputedStyle(repairBtn);
+      expect(computedRepair.outlineStyle || 'inherit', 'Repair button must not suppress focus ring with outline-style none').not.toBe('none');
+      expect(computedRepair.outlineWidth || 'inherit', 'Repair button must not suppress focus ring with outline-width 0').not.toMatch(/^(0px|0)$/);
+      expect(repairBtn.style.outline || 'inherit', 'Repair button must not have inline outline none/0').not.toMatch(/(none|0px|\b0\b)/);
+      expect(repairBtn.style.outlineWidth || 'inherit', 'Repair button must not have inline outline-width 0').not.toMatch(/^(0px|0)$/);
+      expect(repairBtn.style.outlineStyle || 'inherit', 'Repair button must not have inline outline-style none').not.toBe('none');
+
+      await act(async () => {
+        repairBtn.click();
+      });
+      const errAlert = container.querySelector('[data-testid="shard-repair-error"]') as HTMLElement;
+      expect(errAlert, 'Repair error alert must render on failed repair').not.toBeNull();
+      expect(errAlert.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(errAlert.style.borderColor).toBe('var(--color-status-offline)');
+      expect(errAlert.style.color).toBe('var(--color-status-offline)');
+    } finally {
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    }
+  });
+
+  // 9j-2. [Card 215 & Card 218 & Card 220 & Card 226 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList, DistributedRecoveryView, ReleaseCandidateView & ModelStudioView
+  it('ACC-09 / Card 215 & Card 218 & Card 220 & Card 226: RunList, DistributedRecoveryView, ReleaseCandidateView, and ModelStudioView style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
     interface Branch {
       cond: string;
       token: string;
@@ -5275,32 +5588,37 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       }
 
       function checkConfigTables(node: ts.Node) {
-        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG') && node.initializer && ts.isObjectLiteralExpression(node.initializer)) {
-          for (const prop of node.initializer.properties) {
-            if (ts.isPropertyAssignment(prop) && ts.isObjectLiteralExpression(prop.initializer)) {
-              totalStyleAttrs++;
-              let bgToken: string | null = null;
-              let fgToken: string | null = null;
-              let borderToken: string | null = null;
-              for (const subProp of prop.initializer.properties) {
-                if (ts.isPropertyAssignment(subProp)) {
-                  const pName = subProp.name.getText(sf);
-                  const text = subProp.initializer.getText(sf);
-                  const m = text.match(/var\((--color-[a-z0-9-]+)\)/);
-                  if (m) {
-                    if (pName === 'bg') bgToken = m[1];
-                    if (pName === 'color') fgToken = m[1];
-                    if (pName === 'border') borderToken = m[1];
+        if (ts.isVariableDeclaration(node) && (node.name.getText(sf) === 'RUN_STATE_CONFIG' || node.name.getText(sf) === 'NODE_HEALTH_CONFIG' || node.name.getText(sf) === 'SLO_STATUS_CONFIG' || node.name.getText(sf) === 'AUDIT_STATUS_CONFIG' || node.name.getText(sf) === 'CANDIDATE_STATUS_CONFIG' || node.name.getText(sf) === 'REPLICA_STATUS_CONFIG' || node.name.getText(sf) === 'MODEL_AVAILABILITY_CONFIG' || node.name.getText(sf) === 'PLAN_FEASIBILITY_CONFIG' || node.name.getText(sf) === 'NODE_ELIGIBILITY_CONFIG') && node.initializer) {
+          const init = (ts.isAsExpression(node.initializer) || ts.isSatisfiesExpression(node.initializer))
+            ? node.initializer.expression
+            : node.initializer;
+          if (init && ts.isObjectLiteralExpression(init)) {
+            for (const prop of init.properties) {
+              if (ts.isPropertyAssignment(prop) && ts.isObjectLiteralExpression(prop.initializer)) {
+                totalStyleAttrs++;
+                let bgToken: string | null = null;
+                let fgToken: string | null = null;
+                let borderToken: string | null = null;
+                for (const subProp of prop.initializer.properties) {
+                  if (ts.isPropertyAssignment(subProp)) {
+                    const pName = subProp.name.getText(sf);
+                    const text = subProp.initializer.getText(sf);
+                    const m = text.match(/var\((--color-[a-z0-9-]+)\)/);
+                    if (m) {
+                      if (pName === 'bg') bgToken = m[1];
+                      if (pName === 'color') fgToken = m[1];
+                      if (pName === 'border') borderToken = m[1];
+                    }
                   }
                 }
-              }
-              if (bgToken && fgToken) {
-                checkedObjects++;
-                checkPair(bgToken, fgToken, prop.initializer.getStart(sf), 1.0);
-              }
-              if (bgToken && borderToken) {
-                checkedBorderObjects++;
-                checkBorderPair(bgToken, borderToken, prop.initializer.getStart(sf), 1.0);
+                if (bgToken && fgToken) {
+                  checkedObjects++;
+                  checkPair(bgToken, fgToken, prop.initializer.getStart(sf), 1.0);
+                }
+                if (bgToken && borderToken) {
+                  checkedBorderObjects++;
+                  checkBorderPair(bgToken, borderToken, prop.initializer.getStart(sf), 1.0);
+                }
               }
             }
           }
@@ -5352,6 +5670,16 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(releaseStats.checkedBorderObjects, 'Border objects in ReleaseCandidateView must be exactly 21').toBe(21);
     expect(releaseStats.checkedBorderPairs, 'Border pairs in ReleaseCandidateView must be exactly 22').toBe(22);
     expect(releaseStats.violations, `ReleaseCandidateView violations:\n${releaseStats.violations.join('\n')}`).toEqual([]);
+
+    const modelStudioStats = analyzeFile('features/desktop/ModelStudioView.tsx');
+    expect(modelStudioStats.totalStyleAttrs, 'Total style attributes in ModelStudioView must be exactly 83').toBe(83);
+    expect(modelStudioStats.checkedObjects, 'Explicit style objects in ModelStudioView must be exactly 21').toBe(21);
+    expect(modelStudioStats.checkedPairs, 'Evaluated pairs in ModelStudioView must be exactly 39').toBe(39);
+    expect(modelStudioStats.unboundColorObjects, 'Unbound color objects in ModelStudioView must be exactly 18').toBe(18);
+    expect(modelStudioStats.coveredColorObjects, 'Total covered color objects in ModelStudioView must be exactly 39').toBe(39);
+    expect(modelStudioStats.checkedBorderObjects, 'Border objects in ModelStudioView must be exactly 26').toBe(26);
+    expect(modelStudioStats.checkedBorderPairs, 'Border pairs in ModelStudioView must be exactly 26').toBe(26);
+    expect(modelStudioStats.violations, `ModelStudioView violations:\n${modelStudioStats.violations.join('\n')}`).toEqual([]);
 
   });
 
@@ -5751,6 +6079,34 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(probe80Cr, 'ReleaseCandidateView former #f85149 on dark breached composite fails 4.5:1').toBeLessThan(4.5);
     expect(probe80Cr).toBeCloseTo(4.04, 1);
 
+    // Probe 81 [Card 226]: ModelStudioView query desc with former #64748b on base #0f172a
+    const defectiveQueryDesc = '#64748b';
+    const probe81Cr = getContrast(defectiveQueryDesc, '#0f172a');
+    expect(probe81Cr, 'Defective query desc #64748b on #0f172a must fail 4.5:1').toBeLessThan(4.5);
+    expect(probe81Cr).toBeCloseTo(3.75, 1);
+
+    // Probe 82 [Card 226]: ModelStudioView query button text with former #ffffff on #3b82f6
+    const defectiveQueryBtnFg = '#ffffff';
+    const probe82Cr = getContrast(defectiveQueryBtnFg, '#3b82f6');
+    expect(probe82Cr, 'Defective query button white on #3b82f6 must fail 4.5:1').toBeLessThan(4.5);
+    expect(probe82Cr).toBeCloseTo(3.68, 1);
+
+    // Probe 83 [Card 226]: ModelStudioView shard repair button with former #ffffff on #d97706
+    const defectiveRepairBtnFg = '#ffffff';
+    const probe83Cr = getContrast(defectiveRepairBtnFg, '#d97706');
+    expect(probe83Cr, 'Defective shard repair button white on #d97706 must fail 4.5:1').toBeLessThan(4.5);
+    expect(probe83Cr).toBeCloseTo(3.19, 1);
+
+    // Probe 84 [Card 226]: ModelStudioView former replica unhealthy badge text #fca5a5 on light subtle strictly fails 4.5:1
+    const probe84Cr = getContrast('#fca5a5', lightTokens['--color-bg-subtle']);
+    expect(probe84Cr, 'Former unhealthy replica text #fca5a5 on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe84Cr).toBeCloseTo(1.73, 1);
+
+    // Probe 85 [Card 226]: ModelStudioView former LAN alert text #fde68a on light subtle strictly fails 4.5:1
+    const probe85Cr = getContrast('#fde68a', lightTokens['--color-bg-subtle']);
+    expect(probe85Cr, 'Former LAN alert text #fde68a on light subtle fails 4.5:1').toBeLessThan(4.5);
+    expect(probe85Cr).toBeCloseTo(1.14, 1);
+
 
     // Legacy Token Reverts:
     // Legacy Dark --color-border-subtle: #374151
@@ -5846,19 +6202,19 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
 
     // Exact count verification for var(--color-border-subtle)
-    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 417').toBe(417);
-    expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 28').toBe(28);
+    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 429').toBe(429);
+    expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 29').toBe(29);
 
     // Fail-closed check 3: Total files with color literals must not exceed baseline file count
     const baselineFileCount = Object.keys(COLOR_LITERAL_MULTISET_BASELINE).length;
     expect(Object.keys(observedFileMultisets).length, 'Total files with color literals must not exceed baseline').toBeLessThanOrEqual(baselineFileCount);
 
     // Ratchet assertions for specific legacy literals (occurrences & files)
-    expect(legacyCounts['#64748b'], 'Legacy #64748b literal count must not exceed 4').toBeLessThanOrEqual(4);
-    expect(legacyFiles['#64748b'].size, 'Legacy #64748b file count must not exceed 3').toBeLessThanOrEqual(3);
+    expect(legacyCounts['#64748b'], 'Legacy #64748b literal count must not exceed 3').toBeLessThanOrEqual(3);
+    expect(legacyFiles['#64748b'].size, 'Legacy #64748b file count must not exceed 2').toBeLessThanOrEqual(2);
 
-    expect(legacyCounts['#d97706'], 'Legacy #d97706 literal count must not exceed 6').toBeLessThanOrEqual(6);
-    expect(legacyFiles['#d97706'].size, 'Legacy #d97706 file count must not exceed 4').toBeLessThanOrEqual(4);
+    expect(legacyCounts['#d97706'], 'Legacy #d97706 literal count must not exceed 5').toBeLessThanOrEqual(5);
+    expect(legacyFiles['#d97706'].size, 'Legacy #d97706 file count must not exceed 3').toBeLessThanOrEqual(3);
 
     expect(legacyCounts['#e2e8f0'], 'Legacy #e2e8f0 literal count must not exceed 0').toBeLessThanOrEqual(0);
     expect(legacyFiles['#e2e8f0'].size, 'Legacy #e2e8f0 file count must not exceed 0').toBeLessThanOrEqual(0);
