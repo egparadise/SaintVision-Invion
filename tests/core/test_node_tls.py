@@ -73,7 +73,9 @@ def peer(tmp_path):
     cp = issue(ca, "synthetic-control-plane")
     files = credentials(tmp_path, ca, server, prefix="server")
     client_files = credentials(tmp_path, ca, cp, prefix="client")
-    state = SimpleNamespace(requests=0, result=receipt(node, epoch), status=200, drip=False)
+    state = SimpleNamespace(
+        requests=0, result=receipt(node, epoch), status=200, drip=False, path=None, body=None
+    )
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *args):
@@ -81,7 +83,8 @@ def peer(tmp_path):
 
         def do_POST(self):
             state.requests += 1
-            self.rfile.read(int(self.headers["Content-Length"]))
+            state.path = self.path
+            state.body = self.rfile.read(int(self.headers["Content-Length"]))
             body = json.dumps(state.result).encode()
             self.send_response(state.status)
             self.send_header("Content-Type", "application/json")
@@ -146,6 +149,46 @@ def test_real_python_tls_verifies_identity_before_transmitting(peer, monkeypatch
     result = client.exchange(a.channel, {"synthetic": "private-payload"})
     assert client.context.keylog_filename is None and not keylog.exists()
     assert result == a.state.result and a.state.requests == 1
+
+
+def test_quarantine_uses_the_pinned_mtls_channel_and_strict_contract(peer):
+    request = {
+        "schemaVersion": "build-quarantine-request:1",
+        "requestId": "33333333-3333-4333-8333-333333333333",
+        "tenantId": peer.node.tenant_id,
+        "nodeId": peer.node.node_id,
+        "recoveryEpoch": peer.epoch,
+        "scope": "node",
+        "buildSessionId": "44444444-4444-4444-8444-444444444444",
+        "leaseId": "lse_00000000000000000000000000",
+        "resourceId": "res_00000000000000000000000000",
+        "decisionId": "decision-card222",
+        "bindingDigest": "b" * 64,
+        "daemonIdentity": {
+            "pid": 42,
+            "processUid": 1000,
+            "processStartTicks": 28815,
+            "comm": "buildkitd",
+        },
+        "reasonCode": "RES-0006",
+        "requestedAt": "2026-10-02T08:00:00Z",
+    }
+    peer.state.result = {
+        **request,
+        "schemaVersion": "build-quarantine-receipt:1",
+        "writerKind": "node-agent",
+        "recordedAt": "2026-10-02T08:00:01Z",
+        "durable": True,
+        "replayed": False,
+    }
+    assert peer.client.quarantine(peer.channel, request) == peer.state.result
+    assert peer.state.path == "/v1/builds/quarantine"
+    assert json.loads(peer.state.body) == request
+
+    request["extra"] = True
+    with pytest.raises(DomainError, match="VAL-0002"):
+        peer.client.quarantine(peer.channel, request)
+    assert peer.state.requests == 1
 
 
 @pytest.mark.parametrize("change", ["pin", "node", "tenant", "epoch", "ca"])

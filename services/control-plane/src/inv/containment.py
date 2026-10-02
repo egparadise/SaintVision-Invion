@@ -164,8 +164,13 @@ class Containment:
                     target = "draining"
                 else:
                     require_execution(conn)
-                    if node["status"] != "draining" or not current["settled"]:
-                        raise DomainError("LEASE-0003", "A drained and settled Node is required")
+                    if node["status"] not in {"draining", "quarantined"} or not current[
+                        "settled"
+                    ]:
+                        raise DomainError(
+                            "LEASE-0003",
+                            "A drained/quarantined and settled Node is required",
+                        )
                     ready = conn.execute(
                         """SELECT 1 FROM inv.nodes n JOIN inv.node_channels c USING(tenant_id,node_id)
                         JOIN inv.node_resource_snapshots s USING(tenant_id,node_id)
@@ -181,6 +186,12 @@ class Containment:
                             "Fresh authenticated Node resource observation required",
                             409,
                         )
+                    # ``resume`` is also the sole quarantine reconciliation path.  The
+                    # caller is a person-backed can_resume operator, a two-person approval
+                    # was consumed above, every pending-work count is zero, and this query
+                    # binds a fresh authenticated channel/resource observation to the live
+                    # recovery epoch.  containment_requests durably records actor, reason,
+                    # approval and the exact response before the status becomes reusable.
                     target = "online"
                 conn.execute("UPDATE inv.nodes SET status=%s WHERE node_id=%s", (target, node_id))
                 conn.execute(

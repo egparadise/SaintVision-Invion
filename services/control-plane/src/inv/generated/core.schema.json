@@ -1173,6 +1173,182 @@
       ],
       "additionalProperties": false
     },
+    "BuildQuarantineRequest": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "const": "build-quarantine-request:1"
+        },
+        "requestId": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "tenantId": {
+          "$ref": "#/$defs/TenantId"
+        },
+        "nodeId": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "recoveryEpoch": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "build-session",
+            "node"
+          ]
+        },
+        "buildSessionId": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "leaseId": {
+          "$ref": "#/$defs/LeaseId"
+        },
+        "resourceId": {
+          "$ref": "#/$defs/ResourceId"
+        },
+        "decisionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "bindingDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "daemonIdentity": {
+          "$ref": "#/$defs/BuildDaemonIdentity"
+        },
+        "reasonCode": {
+          "type": "string",
+          "pattern": "^[A-Z]+-[0-9]{4}$"
+        },
+        "requestedAt": {
+          "$ref": "#/$defs/Timestamp"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "requestId",
+        "tenantId",
+        "nodeId",
+        "recoveryEpoch",
+        "scope",
+        "buildSessionId",
+        "leaseId",
+        "resourceId",
+        "decisionId",
+        "bindingDigest",
+        "daemonIdentity",
+        "reasonCode",
+        "requestedAt"
+      ],
+      "additionalProperties": false
+    },
+    "BuildQuarantineReceipt": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "const": "build-quarantine-receipt:1"
+        },
+        "writerKind": {
+          "type": "string",
+          "const": "node-agent"
+        },
+        "requestId": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "tenantId": {
+          "$ref": "#/$defs/TenantId"
+        },
+        "nodeId": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "recoveryEpoch": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "build-session",
+            "node"
+          ]
+        },
+        "buildSessionId": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "leaseId": {
+          "$ref": "#/$defs/LeaseId"
+        },
+        "resourceId": {
+          "$ref": "#/$defs/ResourceId"
+        },
+        "decisionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "bindingDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "daemonIdentity": {
+          "$ref": "#/$defs/BuildDaemonIdentity"
+        },
+        "reasonCode": {
+          "type": "string",
+          "pattern": "^[A-Z]+-[0-9]{4}$"
+        },
+        "requestedAt": {
+          "$ref": "#/$defs/Timestamp"
+        },
+        "recordedAt": {
+          "$ref": "#/$defs/Timestamp"
+        },
+        "durable": {
+          "type": "boolean",
+          "const": true
+        },
+        "replayed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "writerKind",
+        "requestId",
+        "tenantId",
+        "nodeId",
+        "recoveryEpoch",
+        "scope",
+        "buildSessionId",
+        "leaseId",
+        "resourceId",
+        "decisionId",
+        "bindingDigest",
+        "daemonIdentity",
+        "reasonCode",
+        "requestedAt",
+        "recordedAt",
+        "durable",
+        "replayed"
+      ],
+      "additionalProperties": false
+    },
     "BuildCleanupReceipt": {
       "type": "object",
       "properties": {

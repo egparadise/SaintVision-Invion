@@ -62,8 +62,9 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	chunk := r.URL.Path == "/v1/objects/read"
 	terminal := r.URL.Path == "/v1/terminals/frame"
 	cancelling := r.URL.Path == "/v1/executions/cancel"
+	quarantine := r.URL.Path == "/v1/builds/quarantine"
 	storageSample := r.URL.Path == "/v1/storage/sample"
-	if r.Method != "POST" || (r.URL.Path != "/v1/executions" && r.URL.Path != "/v1/executions/receipts" && !probe && !cancelling && !snapshot && !chunk && !terminal && !storageSample) || r.URL.RawQuery != "" || r.URL.RawPath != "" {
+	if r.Method != "POST" || (r.URL.Path != "/v1/executions" && r.URL.Path != "/v1/executions/receipts" && !probe && !cancelling && !quarantine && !snapshot && !chunk && !terminal && !storageSample) || r.URL.RawQuery != "" || r.URL.RawPath != "" {
 		reject(w, 404)
 		return
 	}
@@ -72,7 +73,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	slot := h.slot
-	if probe || cancelling || snapshot {
+	if probe || cancelling || quarantine || snapshot {
 		slot = h.controlSlot
 	}
 	if chunk {
@@ -109,6 +110,9 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if storageSample {
 		contract = "NodeStorageSampleInput"
 	}
+	if quarantine {
+		contract = "BuildQuarantineRequest"
+	}
 	if err != nil || len(raw) > 2*1024*1024 || wire.Validate(contract, raw) != nil {
 		reject(w, 400)
 		return
@@ -129,6 +133,35 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		body, err := json.Marshal(result)
 		if err != nil || wire.Validate("NodeStorageSignedSample", body) != nil {
+			reject(w, 503)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Cache-Control", "no-store")
+		_, _ = w.Write(body)
+		return
+	}
+	if quarantine {
+		recorder, ok := h.runner.(interface {
+			Quarantine(context.Context, []byte) (contracts.BuildQuarantineReceipt, error)
+		})
+		if !ok {
+			reject(w, 503)
+			return
+		}
+		ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+		defer cancel()
+		result, err := recorder.Quarantine(ctx, raw)
+		if err != nil || ctx.Err() != nil {
+			reject(w, 503)
+			return
+		}
+		if h.authority.Authorize(r.TLS) != nil {
+			reject(w, 403)
+			return
+		}
+		body, err := json.Marshal(result)
+		if err != nil || wire.Validate("BuildQuarantineReceipt", body) != nil {
 			reject(w, 503)
 			return
 		}

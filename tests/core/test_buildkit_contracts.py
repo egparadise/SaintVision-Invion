@@ -218,6 +218,36 @@ def _physical_cleanup_receipt() -> dict:
     }
 
 
+def _quarantine_request() -> dict:
+    return {
+        "schemaVersion": "build-quarantine-request:1",
+        "requestId": "33333333-3333-4333-8333-333333333333",
+        "tenantId": TENANT,
+        "nodeId": f"nod_{ULID}",
+        "recoveryEpoch": "223e4567-e89b-12d3-a456-426614174000",
+        "scope": "build-session",
+        "buildSessionId": "44444444-4444-4444-8444-444444444444",
+        "leaseId": f"lse_{ULID}",
+        "resourceId": f"res_{ULID}",
+        "decisionId": "policy-s08-build-1",
+        "bindingDigest": "b" * 64,
+        "daemonIdentity": _daemon_identity(),
+        "reasonCode": "VERIFY-0022",
+        "requestedAt": "2026-10-02T08:00:00Z",
+    }
+
+
+def _quarantine_receipt() -> dict:
+    return {
+        **_quarantine_request(),
+        "schemaVersion": "build-quarantine-receipt:1",
+        "writerKind": "node-agent",
+        "recordedAt": "2026-10-02T08:00:01Z",
+        "durable": True,
+        "replayed": False,
+    }
+
+
 def _dispatch_completed_payload() -> dict:
     return {
         "decisionId": "policy-s08-build-1",
@@ -729,3 +759,76 @@ def test_workload_contract_cannot_be_reinterpreted_as_build_request():
     validate_contract("WorkloadSpec", workload)
     workload["dockerfilePath"] = "Dockerfile"
     _rejected("WorkloadSpec", workload)
+
+
+def test_build_quarantine_contracts_accept_only_the_bound_durable_shape():
+    validate_contract("BuildQuarantineRequest", _quarantine_request())
+    validate_contract("BuildQuarantineReceipt", _quarantine_receipt())
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "schemaVersion",
+        "requestId",
+        "tenantId",
+        "nodeId",
+        "recoveryEpoch",
+        "scope",
+        "buildSessionId",
+        "leaseId",
+        "resourceId",
+        "decisionId",
+        "bindingDigest",
+        "daemonIdentity",
+        "reasonCode",
+        "requestedAt",
+    ],
+)
+def test_build_quarantine_request_fields_are_all_required(field):
+    changed = _quarantine_request()
+    del changed[field]
+    _rejected("BuildQuarantineRequest", changed)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("schemaVersion", "build-quarantine-request:2"),
+        ("requestId", "33333333-3333-4333-8333-33333333333A"),
+        ("recoveryEpoch", "not-a-uuid"),
+        ("scope", "host"),
+        ("reasonCode", "VERIFY-22"),
+        ("extra", True),
+    ],
+)
+def test_build_quarantine_request_rejects_contract_drift(field, value):
+    changed = _quarantine_request()
+    changed[field] = value
+    _rejected("BuildQuarantineRequest", changed)
+
+
+def test_build_quarantine_always_identifies_the_affected_session():
+    changed = _quarantine_request()
+    changed["buildSessionId"] = None
+    _rejected("BuildQuarantineRequest", changed)
+
+    changed = _quarantine_request()
+    changed["scope"] = "node"
+    validate_contract("BuildQuarantineRequest", changed)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("schemaVersion", "build-quarantine-receipt:2"),
+        ("writerKind", "control-plane"),
+        ("durable", False),
+        ("replayed", "false"),
+        ("extra", True),
+    ],
+)
+def test_build_quarantine_receipt_rejects_authority_drift(field, value):
+    changed = _quarantine_receipt()
+    changed[field] = value
+    _rejected("BuildQuarantineReceipt", changed)

@@ -421,6 +421,55 @@ class BuildPhysicalCleanupReceipt(BaseModel):
     verifiedAt: Timestamp
 
 
+class Scope(StrEnum):
+    build_session = 'build-session'
+    node = 'node'
+
+
+class BuildQuarantineRequest(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    schemaVersion: Literal['build-quarantine-request:1']
+    requestId: UUID
+    tenantId: TenantId
+    nodeId: NodeId
+    recoveryEpoch: UUID
+    scope: Scope
+    buildSessionId: UUID
+    leaseId: LeaseId
+    resourceId: ResourceId
+    decisionId: constr(min_length=1, max_length=200)
+    bindingDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    daemonIdentity: BuildDaemonIdentity
+    reasonCode: constr(pattern=r'^[A-Z]+-[0-9]{4}$')
+    requestedAt: Timestamp
+
+
+class BuildQuarantineReceipt(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    schemaVersion: Literal['build-quarantine-receipt:1']
+    writerKind: Literal['node-agent']
+    requestId: UUID
+    tenantId: TenantId
+    nodeId: NodeId
+    recoveryEpoch: UUID
+    scope: Scope
+    buildSessionId: UUID
+    leaseId: LeaseId
+    resourceId: ResourceId
+    decisionId: constr(min_length=1, max_length=200)
+    bindingDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    daemonIdentity: BuildDaemonIdentity
+    reasonCode: constr(pattern=r'^[A-Z]+-[0-9]{4}$')
+    requestedAt: Timestamp
+    recordedAt: Timestamp
+    durable: Literal[True]
+    replayed: bool
+
+
 class BuildCleanupReceipt(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
