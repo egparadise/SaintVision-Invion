@@ -320,8 +320,9 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
       data-testid="seal-record-panel"
       style={{
         padding: '24px',
-        backgroundColor: '#0d1117',
-        color: '#c9d1d9',
+        backgroundColor: 'var(--color-bg-surface)',
+        color: 'var(--color-text-secondary)',
+        border: '1px solid var(--color-border-subtle)',
         borderRadius: '8px',
         minHeight: '400px',
         fontFamily: 'system-ui, -apple-system, sans-serif',
@@ -354,13 +355,13 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
           justifyContent: 'space-between',
           alignItems: 'center',
           marginBottom: '20px',
-          borderBottom: '1px solid #30363d',
+          borderBottom: '1px solid var(--color-border-subtle)',
           paddingBottom: '14px',
         }}
       >
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#f0f6fc', margin: 0 }}>
+            <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>
               실행 봉인 기록 (Run Seal Record)
             </h3>
             {isUnsealed && (
@@ -371,9 +372,9 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
                   fontWeight: 600,
                   padding: '2px 8px',
                   borderRadius: '12px',
-                  backgroundColor: 'rgba(210, 153, 34, 0.15)',
-                  color: '#e3b341',
-                  border: '1px solid rgba(210, 153, 34, 0.4)',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  color: 'var(--color-status-degraded)',
+                  border: '1px solid var(--color-status-degraded)',
                 }}
               >
                 미봉인 (UNSEALED)
@@ -387,16 +388,16 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
                   fontWeight: 600,
                   padding: '2px 8px',
                   borderRadius: '12px',
-                  backgroundColor: 'rgba(46, 160, 67, 0.15)',
-                  color: '#3fb950',
-                  border: '1px solid rgba(46, 160, 67, 0.4)',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  color: 'var(--color-status-online)',
+                  border: '1px solid var(--color-status-online)',
                 }}
               >
                 ✔ 봉인됨 (SEALED)
               </span>
             )}
           </div>
-          <p style={{ fontSize: '0.8125rem', color: '#8b949e', marginTop: '4px', margin: 0 }}>
+          <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginTop: '4px', margin: 0 }}>
             G-04 불변 봉인 원장 규격: 서버 파생 아티팩트 핀, 컨텍스트 번들 해시 및 무결성 검증 (R1·R2·R3)
           </p>
         </div>
@@ -419,7 +420,7 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
           style={{
             padding: '20px',
             textAlign: 'center',
-            color: '#58a6ff',
+            color: 'var(--color-brand-hover)',
             fontSize: '0.875rem',
           }}
         >
@@ -435,17 +436,17 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
           style={{
             padding: '14px 18px',
             marginBottom: '20px',
-            backgroundColor: 'rgba(248, 81, 73, 0.15)',
-            border: '1px solid #f85149',
+            backgroundColor: 'var(--color-bg-subtle)',
+            border: '1px solid var(--color-status-offline)',
             borderRadius: '6px',
-            color: '#ff7b72',
+            color: 'var(--color-status-offline)',
             fontSize: '0.875rem',
           }}
         >
           <div style={{ fontWeight: 600, marginBottom: '4px' }}>
             ⚠️ 봉인 기록 조회 실패 {error.code ? `[${error.code}]` : ''} {error.status ? `(${error.status})` : ''}
           </div>
-          <div style={{ fontSize: '0.8125rem', color: '#f0f6fc' }}>
+          <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-primary)' }}>
             {error.detail || error.message}
           </div>
         </div>
@@ -457,20 +458,20 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
           data-testid="seal-record-unsealed-notice"
           style={{
             padding: '16px 20px',
-            backgroundColor: 'rgba(210, 153, 34, 0.1)',
-            border: '1px solid #d29922',
+            backgroundColor: 'var(--color-bg-subtle)',
+            border: '1px solid var(--color-status-degraded)',
             borderRadius: '6px',
-            color: '#f0f6fc',
+            color: 'var(--color-text-primary)',
             marginBottom: '20px',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
             <span style={{ fontSize: '1.125rem' }}>ℹ️</span>
-            <span style={{ fontWeight: 600, color: '#e3b341', fontSize: '0.9375rem' }}>
+            <span style={{ fontWeight: 600, color: 'var(--color-status-degraded)', fontSize: '0.9375rem' }}>
               미봉인 실행 (Run Not Sealed)
             </span>
           </div>
-          <p style={{ margin: 0, fontSize: '0.8125rem', color: '#c9d1d9', lineHeight: 1.5 }}>
+          <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
             이 실행(Run)은 아직 봉인(Seal)되지 않은 실행입니다. 원장 불변 고정 기록(RunRecord)이
             생성되지 않았으므로 봉인 다이제스트 및 핀 아티팩트 목록이 비어 있습니다. (404 RES-0004)
           </p>
@@ -484,12 +485,12 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
           style={{
             marginBottom: '24px',
             padding: '16px',
-            backgroundColor: '#0d1117',
+            backgroundColor: 'var(--color-bg-subtle)',
             borderRadius: '6px',
-            border: '1px solid #30363d',
+            border: '1px solid var(--color-border-subtle)',
           }}
         >
-          <h4 style={{ fontSize: '0.9375rem', fontWeight: 600, color: '#f0f6fc', marginTop: 0, marginBottom: '12px' }}>
+          <h4 style={{ fontSize: '0.9375rem', fontWeight: 600, color: 'var(--color-text-primary)', marginTop: 0, marginBottom: '12px' }}>
             1. 원장 봉인 메타데이터 (Run Record Ledger)
           </h4>
 
@@ -501,61 +502,61 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
               fontSize: '0.8125rem',
             }}
           >
-            <div style={{ padding: '8px 12px', backgroundColor: '#161b22', borderRadius: '4px' }}>
-              <div style={{ color: '#8b949e', fontSize: '0.75rem' }}>기록 식별자 (Record ID)</div>
-              <div data-testid="seal-record-id" style={{ fontFamily: 'monospace', fontWeight: 600, color: '#f0f6fc', marginTop: '2px' }}>
+            <div style={{ padding: '8px 12px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '4px' }}>
+              <div style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>기록 식별자 (Record ID)</div>
+              <div data-testid="seal-record-id" style={{ fontFamily: 'monospace', fontWeight: 600, color: 'var(--color-text-primary)', marginTop: '2px' }}>
                 {runRecord.recordId}
               </div>
             </div>
 
-            <div style={{ padding: '8px 12px', backgroundColor: '#161b22', borderRadius: '4px' }}>
-              <div style={{ color: '#8b949e', fontSize: '0.75rem' }}>봉인 시각 (Sealed At)</div>
-              <div data-testid="seal-record-sealed-at" style={{ color: '#f0f6fc', marginTop: '2px' }}>
+            <div style={{ padding: '8px 12px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '4px' }}>
+              <div style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>봉인 시각 (Sealed At)</div>
+              <div data-testid="seal-record-sealed-at" style={{ color: 'var(--color-text-primary)', marginTop: '2px' }}>
                 {new Date(runRecord.sealedAt).toLocaleString('ko-KR')}
               </div>
             </div>
 
-            <div style={{ padding: '8px 12px', backgroundColor: '#161b22', borderRadius: '4px' }}>
-              <div style={{ color: '#8b949e', fontSize: '0.75rem' }}>최종 상태 / 사유</div>
+            <div style={{ padding: '8px 12px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '4px' }}>
+              <div style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>최종 상태 / 사유</div>
               <div style={{ marginTop: '2px', display: 'flex', gap: '6px', alignItems: 'center' }}>
-                <span data-testid="seal-final-state" style={{ fontWeight: 600, color: '#58a6ff' }}>
+                <span data-testid="seal-final-state" style={{ fontWeight: 600, color: 'var(--color-brand-hover)' }}>
                   {runRecord.finalState}
                 </span>
-                <span style={{ color: '#8b949e' }}>/</span>
-                <span data-testid="seal-termination-reason" style={{ color: '#c9d1d9' }}>
+                <span style={{ color: 'var(--color-text-muted)' }}>/</span>
+                <span data-testid="seal-termination-reason" style={{ color: 'var(--color-text-secondary)' }}>
                   {runRecord.terminationReason}
                 </span>
               </div>
             </div>
 
-            <div style={{ padding: '8px 12px', backgroundColor: '#161b22', borderRadius: '4px' }}>
-              <div style={{ color: '#8b949e', fontSize: '0.75rem' }}>시도 횟수 (Attempt Count)</div>
-              <div data-testid="seal-attempt-count" style={{ fontWeight: 600, color: '#f0f6fc', marginTop: '2px' }}>
+            <div style={{ padding: '8px 12px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '4px' }}>
+              <div style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>시도 횟수 (Attempt Count)</div>
+              <div data-testid="seal-attempt-count" style={{ fontWeight: 600, color: 'var(--color-text-primary)', marginTop: '2px' }}>
                 {runRecord.attemptCount}회
               </div>
             </div>
 
-            <div style={{ padding: '8px 12px', backgroundColor: '#161b22', borderRadius: '4px' }}>
-              <div style={{ color: '#8b949e', fontSize: '0.75rem' }}>에비던스 식별자 (Evidence ID)</div>
-              <div data-testid="seal-evidence-id" style={{ fontFamily: 'monospace', color: '#c9d1d9', marginTop: '2px' }}>
+            <div style={{ padding: '8px 12px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '4px' }}>
+              <div style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>에비던스 식별자 (Evidence ID)</div>
+              <div data-testid="seal-evidence-id" style={{ fontFamily: 'monospace', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
                 {runRecord.evidenceId ?? '없음'}
               </div>
             </div>
 
-            <div style={{ padding: '8px 12px', backgroundColor: '#161b22', borderRadius: '4px', gridColumn: '1 / -1' }}>
-              <div style={{ color: '#8b949e', fontSize: '0.75rem' }}>워크로드 사양 해시 (Workload Spec SHA-256)</div>
-              <div data-testid="seal-workload-spec-sha" style={{ fontFamily: 'monospace', color: '#58a6ff', marginTop: '2px', wordBreak: 'break-all' }}>
+            <div style={{ padding: '8px 12px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '4px', gridColumn: '1 / -1' }}>
+              <div style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>워크로드 사양 해시 (Workload Spec SHA-256)</div>
+              <div data-testid="seal-workload-spec-sha" style={{ fontFamily: 'monospace', color: 'var(--color-brand-hover)', marginTop: '2px', wordBreak: 'break-all' }}>
                 {runRecord.workloadSpecSha256}
               </div>
             </div>
 
             {runRecord.bundleId && (
-              <div style={{ padding: '8px 12px', backgroundColor: '#161b22', borderRadius: '4px', gridColumn: '1 / -1' }}>
-                <div style={{ color: '#8b949e', fontSize: '0.75rem' }}>고정 컨텍스트 번들 (Pinned Context Bundle)</div>
-                <div data-testid="seal-bundle-info" style={{ fontFamily: 'monospace', marginTop: '2px', color: '#c9d1d9' }}>
+              <div style={{ padding: '8px 12px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '4px', gridColumn: '1 / -1' }}>
+                <div style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>고정 컨텍스트 번들 (Pinned Context Bundle)</div>
+                <div data-testid="seal-bundle-info" style={{ fontFamily: 'monospace', marginTop: '2px', color: 'var(--color-text-secondary)' }}>
                   <code>{runRecord.bundleId}</code>
                   {runRecord.bundleHash && (
-                    <span style={{ marginLeft: '10px', color: '#8b949e' }}>
+                    <span style={{ marginLeft: '10px', color: 'var(--color-text-muted)' }}>
                       (Hash: {runRecord.bundleHash.slice(0, 16)}...)
                     </span>
                   )}
@@ -567,7 +568,7 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
           {/* Component versions */}
           {runRecord.componentVersions && Object.keys(runRecord.componentVersions).length > 0 && (
             <div style={{ marginTop: '14px' }}>
-              <div style={{ fontSize: '0.75rem', color: '#8b949e', marginBottom: '6px' }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '6px' }}>
                 봉인 컴포넌트 버전 (Component Versions)
               </div>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -578,10 +579,10 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
                       fontSize: '0.75rem',
                       fontFamily: 'monospace',
                       padding: '2px 8px',
-                      backgroundColor: '#161b22',
+                      backgroundColor: 'var(--color-bg-surface)',
                       borderRadius: '4px',
-                      border: '1px solid #30363d',
-                      color: '#a0a8b2',
+                      border: '1px solid var(--color-border-subtle)',
+                      color: 'var(--color-text-secondary)',
                     }}
                   >
                     <strong>{k}</strong>: {v}
@@ -600,17 +601,17 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
           style={{
             marginBottom: '24px',
             padding: '16px',
-            backgroundColor: '#0d1117',
+            backgroundColor: 'var(--color-bg-subtle)',
             borderRadius: '6px',
-            border: '1px solid #30363d',
+            border: '1px solid var(--color-border-subtle)',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-            <h4 style={{ fontSize: '0.9375rem', fontWeight: 600, color: '#f0f6fc', margin: 0 }}>
+            <h4 style={{ fontSize: '0.9375rem', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>
               2. 봉인 아티팩트 핀 목록 (Pinned Artifacts)
             </h4>
             {artifactsPage && (
-              <span data-testid="seal-artifacts-page-count" style={{ fontSize: '0.75rem', color: '#8b949e' }}>
+              <span data-testid="seal-artifacts-page-count" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
                 이 페이지 {artifactsPage.count}건{artifactsPage.nextCursor ? ' (추가 항목 있음)' : ''}
               </span>
             )}
@@ -622,10 +623,10 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
               data-testid="seal-artifacts-error"
               style={{
                 padding: '12px 16px',
-                backgroundColor: 'rgba(248, 81, 73, 0.15)',
-                border: '1px solid #f85149',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-status-offline)',
                 borderRadius: '6px',
-                color: '#ff7b72',
+                color: 'var(--color-status-offline)',
                 fontSize: '0.8125rem',
                 marginBottom: '12px',
               }}
@@ -635,17 +636,17 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
           )}
 
           {artifactsPage && artifactsPage.items.length === 0 ? (
-            <div style={{ padding: '16px', textAlign: 'center', color: '#8b949e', fontSize: '0.8125rem' }}>
+            <div style={{ padding: '16px', textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '0.8125rem' }}>
               봉인된 아티팩트가 없습니다.
             </div>
           ) : artifactsPage && (
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8125rem' }}>
-                <caption style={{ textAlign: 'left', fontSize: '0.75rem', color: '#8b949e', marginBottom: '8px' }}>
+                <caption style={{ textAlign: 'left', fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '8px' }}>
                   봉인된 아티팩트 목록 및 무결성 검증
                 </caption>
                 <thead>
-                  <tr style={{ borderBottom: '1px solid #30363d', color: '#8b949e', textAlign: 'left' }}>
+                  <tr style={{ borderBottom: '1px solid var(--color-border-subtle)', color: 'var(--color-text-muted)', textAlign: 'left' }}>
                     <th scope="col" style={{ padding: '8px' }}>아티팩트 ID</th>
                     <th scope="col" style={{ padding: '8px' }}>역할 (Role)</th>
                     <th scope="col" style={{ padding: '8px' }}>버전</th>
@@ -662,11 +663,11 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
                       <tr
                         key={item.artifactId}
                         data-testid={`seal-artifact-row-${item.artifactId}`}
-                        style={{ borderBottom: '1px solid #21262d' }}
+                        style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
                       >
                         <td
                           data-testid={`seal-artifact-id-${item.artifactId}`}
-                          style={{ padding: '8px', fontFamily: 'monospace', fontWeight: 600, color: '#f0f6fc' }}
+                          style={{ padding: '8px', fontFamily: 'monospace', fontWeight: 600, color: 'var(--color-text-primary)' }}
                         >
                           {item.artifactId}
                         </td>
@@ -677,9 +678,9 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
                               fontSize: '0.6875rem',
                               padding: '2px 6px',
                               borderRadius: '4px',
-                              backgroundColor: 'rgba(56, 139, 253, 0.15)',
-                              color: '#58a6ff',
-                              border: '1px solid rgba(56, 139, 253, 0.3)',
+                              backgroundColor: 'var(--color-bg-surface)',
+                              color: 'var(--color-brand-hover)',
+                              border: '1px solid var(--color-brand-hover)',
                               fontWeight: 600,
                             }}
                           >
@@ -688,34 +689,34 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
                         </td>
                         <td
                           data-testid={`seal-artifact-version-${item.artifactId}`}
-                          style={{ padding: '8px', fontFamily: 'monospace', color: '#8b949e', fontSize: '0.75rem' }}
+                          style={{ padding: '8px', fontFamily: 'monospace', color: 'var(--color-text-muted)', fontSize: '0.75rem' }}
                         >
                           {item.objectVersion ?? '-'}
                         </td>
                         <td
                           data-testid={`seal-artifact-uri-${item.artifactId}`}
-                          style={{ padding: '8px', fontFamily: 'monospace', color: '#c9d1d9', maxWidth: '240px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                          style={{ padding: '8px', fontFamily: 'monospace', color: 'var(--color-text-secondary)', maxWidth: '240px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                           title={item.uri}
                         >
                           {item.uri}
                         </td>
                         <td
                           data-testid={`seal-artifact-checksum-${item.artifactId}`}
-                          style={{ padding: '8px', fontFamily: 'monospace', color: '#8b949e', fontSize: '0.75rem' }}
+                          style={{ padding: '8px', fontFamily: 'monospace', color: 'var(--color-text-muted)', fontSize: '0.75rem' }}
                           title={item.checksumSha256}
                         >
                           {item.checksumSha256.slice(0, 16)}...
                         </td>
                         <td
                           data-testid={`seal-artifact-size-${item.artifactId}`}
-                          style={{ padding: '8px', color: '#c9d1d9' }}
+                          style={{ padding: '8px', color: 'var(--color-text-secondary)' }}
                         >
                           {item.byteSize.toLocaleString()} B
                         </td>
                         <td style={{ padding: '8px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             {vState?.isVerifying && (
-                              <span style={{ color: '#58a6ff', fontSize: '0.75rem' }}>⏳ 검증 중...</span>
+                              <span style={{ color: 'var(--color-brand-hover)', fontSize: '0.75rem' }}>⏳ 검증 중...</span>
                             )}
 
                             {vState?.verified === true && (
@@ -725,11 +726,11 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
                                 style={{
                                   fontSize: '0.75rem',
                                   fontWeight: 600,
-                                  color: '#3fb950',
-                                  backgroundColor: 'rgba(46, 160, 67, 0.15)',
+                                  color: 'var(--color-status-online)',
+                                  backgroundColor: 'var(--color-bg-surface)',
                                   padding: '2px 6px',
                                   borderRadius: '4px',
-                                  border: '1px solid rgba(46, 160, 67, 0.4)',
+                                  border: '1px solid var(--color-status-online)',
                                 }}
                               >
                                 ✔ 일치 (Verified)
@@ -743,11 +744,11 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
                                 style={{
                                   fontSize: '0.75rem',
                                   fontWeight: 600,
-                                  color: '#ff7b72',
-                                  backgroundColor: 'rgba(248, 81, 73, 0.15)',
+                                  color: 'var(--color-status-offline)',
+                                  backgroundColor: 'var(--color-bg-surface)',
                                   padding: '2px 6px',
                                   borderRadius: '4px',
-                                  border: '1px solid rgba(248, 81, 73, 0.4)',
+                                  border: '1px solid var(--color-status-offline)',
                                 }}
                               >
                                 ⚠️ 불일치 (봉인 다이제스트와 다름·대상 없음)
@@ -755,7 +756,7 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
                             )}
 
                             {vState?.error && (
-                              <span style={{ fontSize: '0.75rem', color: '#ff7b72' }}>
+                              <span style={{ fontSize: '0.75rem', color: 'var(--color-status-offline)' }}>
                                 오류: {vState.error}
                               </span>
                             )}
@@ -766,10 +767,11 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
                                   data-testid={`seal-artifact-verify-status-${item.artifactId}`}
                                   style={{
                                     fontSize: '0.75rem',
-                                    color: '#a0a8b2',
-                                    backgroundColor: 'rgba(160, 168, 178, 0.15)',
+                                    color: 'var(--color-text-muted)',
+                                    backgroundColor: 'var(--color-bg-surface)',
                                     padding: '2px 6px',
                                     borderRadius: '4px',
+                                    border: '1px solid var(--color-border-subtle)',
                                   }}
                                 >
                                   미검증 (검증 대기)
@@ -797,7 +799,7 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
               {/* Pagination when nextCursor is present */}
               {artifactsPage.nextCursor && (
                 <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '0.75rem', color: '#8b949e' }}>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
                     추가 항목 있음 (Next cursor: {artifactsPage.nextCursor.slice(0, 16)}...)
                   </span>
                   <Button
@@ -824,13 +826,13 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
           data-testid="seal-bundle-section"
           style={{
             padding: '16px',
-            backgroundColor: '#0d1117',
+            backgroundColor: 'var(--color-bg-subtle)',
             borderRadius: '6px',
-            border: '1px solid #30363d',
+            border: '1px solid var(--color-border-subtle)',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-            <h4 style={{ fontSize: '0.9375rem', fontWeight: 600, color: '#f0f6fc', margin: 0 }}>
+            <h4 style={{ fontSize: '0.9375rem', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>
               3. 컨텍스트 번들 메타데이터 (Context Bundle)
             </h4>
             {contextBundle && (
@@ -842,9 +844,9 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
                     padding: '2px 8px',
                     borderRadius: '12px',
                     fontWeight: 600,
-                    backgroundColor: contextBundle.sealed ? 'rgba(46, 160, 67, 0.15)' : 'rgba(210, 153, 34, 0.15)',
-                    color: contextBundle.sealed ? '#3fb950' : '#e3b341',
-                    border: contextBundle.sealed ? '1px solid rgba(46, 160, 67, 0.4)' : '1px solid rgba(210, 153, 34, 0.4)',
+                    backgroundColor: 'var(--color-bg-surface)',
+                    color: contextBundle.sealed ? 'var(--color-status-online)' : 'var(--color-status-degraded)',
+                    border: contextBundle.sealed ? '1px solid var(--color-status-online)' : '1px solid var(--color-status-degraded)',
                   }}
                 >
                   {contextBundle.sealed ? '봉인 고정 (Sealed Pin)' : '최신 빌드 (Latest Build)'}
@@ -857,9 +859,9 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
                     padding: '2px 8px',
                     borderRadius: '12px',
                     fontWeight: 600,
-                    backgroundColor: contextBundle.hashVerified ? 'rgba(46, 160, 67, 0.15)' : 'rgba(248, 81, 73, 0.15)',
-                    color: contextBundle.hashVerified ? '#3fb950' : '#ff7b72',
-                    border: contextBundle.hashVerified ? '1px solid rgba(46, 160, 67, 0.4)' : '1px solid rgba(248, 81, 73, 0.4)',
+                    backgroundColor: 'var(--color-bg-surface)',
+                    color: contextBundle.hashVerified ? 'var(--color-status-online)' : 'var(--color-status-offline)',
+                    border: contextBundle.hashVerified ? '1px solid var(--color-status-online)' : '1px solid var(--color-status-offline)',
                   }}
                 >
                   {contextBundle.hashVerified ? '✔ 해시 일치 (Hash Verified)' : '⚠️ 해시 불일치 (Hash Mismatch)'}
@@ -875,10 +877,10 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
               data-testid="seal-bundle-error"
               style={{
                 padding: '12px 16px',
-                backgroundColor: 'rgba(248, 81, 73, 0.15)',
-                border: '1px solid #f85149',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-status-offline)',
                 borderRadius: '6px',
-                color: '#ff7b72',
+                color: 'var(--color-status-offline)',
                 fontSize: '0.8125rem',
               }}
             >
@@ -893,17 +895,17 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
               data-tone="mismatch"
               style={{
                 padding: '12px 16px',
-                backgroundColor: 'rgba(248, 81, 73, 0.15)',
-                border: '1px solid #f85149',
+                backgroundColor: 'var(--color-bg-subtle)',
+                border: '1px solid var(--color-status-offline)',
                 borderRadius: '6px',
-                color: '#ff7b72',
+                color: 'var(--color-status-offline)',
                 fontSize: '0.875rem',
               }}
             >
               <div style={{ fontWeight: 600, marginBottom: '4px' }}>
                 ⚠️ 번들 재현 불가 (Snapshot Missing / GRAPH-0002)
               </div>
-              <div style={{ fontSize: '0.8125rem', color: '#f0f6fc' }}>
+              <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-primary)' }}>
                 고정된 컨텍스트 스냅숏을 찾을 수 없거나 재현할 수 없습니다 (무결성 검증 실패 사실 보고).
               </div>
             </div>
@@ -915,10 +917,10 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
               data-testid="seal-bundle-not-found"
               style={{
                 padding: '12px 16px',
-                backgroundColor: '#161b22',
-                border: '1px solid #30363d',
+                backgroundColor: 'var(--color-bg-surface)',
+                border: '1px solid var(--color-border-subtle)',
                 borderRadius: '6px',
-                color: '#8b949e',
+                color: 'var(--color-text-muted)',
                 fontSize: '0.8125rem',
               }}
             >
@@ -937,36 +939,36 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
                   marginBottom: '14px',
                 }}
               >
-                <div style={{ padding: '8px 12px', backgroundColor: '#161b22', borderRadius: '4px' }}>
-                  <div style={{ color: '#8b949e', fontSize: '0.75rem' }}>번들 식별자 (Bundle ID)</div>
-                  <div data-testid="bundle-id" style={{ fontFamily: 'monospace', fontWeight: 600, color: '#f0f6fc', marginTop: '2px' }}>
+                <div style={{ padding: '8px 12px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '4px' }}>
+                  <div style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>번들 식별자 (Bundle ID)</div>
+                  <div data-testid="bundle-id" style={{ fontFamily: 'monospace', fontWeight: 600, color: 'var(--color-text-primary)', marginTop: '2px' }}>
                     {contextBundle.bundleId}
                   </div>
                 </div>
 
-                <div style={{ padding: '8px 12px', backgroundColor: '#161b22', borderRadius: '4px' }}>
-                  <div style={{ color: '#8b949e', fontSize: '0.75rem' }}>빌드 시각 (Built At)</div>
-                  <div style={{ color: '#f0f6fc', marginTop: '2px' }}>
+                <div style={{ padding: '8px 12px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '4px' }}>
+                  <div style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>빌드 시각 (Built At)</div>
+                  <div style={{ color: 'var(--color-text-primary)', marginTop: '2px' }}>
                     {new Date(contextBundle.builtAt).toLocaleString('ko-KR')}
                   </div>
                 </div>
 
-                <div style={{ padding: '8px 12px', backgroundColor: '#161b22', borderRadius: '4px' }}>
-                  <div style={{ color: '#8b949e', fontSize: '0.75rem' }}>검색 전략 / 아이템 수 / 토큰 추정</div>
-                  <div style={{ color: '#f0f6fc', marginTop: '2px' }}>
-                    <span data-testid="bundle-retrieval-strategy" style={{ fontWeight: 600, color: '#58a6ff' }}>
+                <div style={{ padding: '8px 12px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '4px' }}>
+                  <div style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>검색 전략 / 아이템 수 / 토큰 추정</div>
+                  <div style={{ color: 'var(--color-text-primary)', marginTop: '2px' }}>
+                    <span data-testid="bundle-retrieval-strategy" style={{ fontWeight: 600, color: 'var(--color-brand-hover)' }}>
                       {contextBundle.retrievalStrategy}
                     </span>
-                    <span style={{ color: '#8b949e', margin: '0 6px' }}>•</span>
+                    <span style={{ color: 'var(--color-text-muted)', margin: '0 6px' }}>•</span>
                     <span data-testid="bundle-item-token-summary">
                       {contextBundle.itemCount}개 ({contextBundle.totalBytes.toLocaleString()} B, 토큰 추정: {contextBundle.tokenEstimate !== null && contextBundle.tokenEstimate !== undefined ? contextBundle.tokenEstimate.toLocaleString() : '미제공'})
                     </span>
                   </div>
                 </div>
 
-                <div style={{ padding: '8px 12px', backgroundColor: '#161b22', borderRadius: '4px', gridColumn: '1 / -1' }}>
-                  <div style={{ color: '#8b949e', fontSize: '0.75rem' }}>번들 해시 (Bundle Hash SHA-256)</div>
-                  <div data-testid="bundle-hash" style={{ fontFamily: 'monospace', color: '#58a6ff', marginTop: '2px', wordBreak: 'break-all' }}>
+                <div style={{ padding: '8px 12px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '4px', gridColumn: '1 / -1' }}>
+                  <div style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>번들 해시 (Bundle Hash SHA-256)</div>
+                  <div data-testid="bundle-hash" style={{ fontFamily: 'monospace', color: 'var(--color-brand-hover)', marginTop: '2px', wordBreak: 'break-all' }}>
                     {contextBundle.bundleHash}
                   </div>
                 </div>
@@ -977,7 +979,7 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8125rem' }}>
                     <thead>
-                      <tr style={{ borderBottom: '1px solid #30363d', color: '#8b949e', textAlign: 'left' }}>
+                      <tr style={{ borderBottom: '1px solid var(--color-border-subtle)', color: 'var(--color-text-muted)', textAlign: 'left' }}>
                         <th scope="col" style={{ padding: '8px' }}>순번</th>
                         <th scope="col" style={{ padding: '8px' }}>항목 ID</th>
                         <th scope="col" style={{ padding: '8px' }}>종류 (Kind)</th>
@@ -990,27 +992,27 @@ export const SealRecordPanel: React.FC<SealRecordPanelProps> = ({ projectId, run
                     </thead>
                     <tbody>
                       {contextBundle.items.map((item, idx) => (
-                        <tr key={`${item.itemId}-${idx}`} style={{ borderBottom: '1px solid #21262d' }}>
-                          <td style={{ padding: '8px', color: '#8b949e' }}>{item.ordinal ?? idx + 1}</td>
-                          <td style={{ padding: '8px', fontFamily: 'monospace', color: '#c9d1d9' }}>{item.itemId}</td>
-                          <td style={{ padding: '8px', color: '#58a6ff' }}>{item.kind}</td>
-                          <td style={{ padding: '8px', color: '#8b949e' }}>v{item.itemVersion}</td>
+                        <tr key={`${item.itemId}-${idx}`} style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
+                          <td style={{ padding: '8px', color: 'var(--color-text-muted)' }}>{item.ordinal ?? idx + 1}</td>
+                          <td style={{ padding: '8px', fontFamily: 'monospace', color: 'var(--color-text-secondary)' }}>{item.itemId}</td>
+                          <td style={{ padding: '8px', color: 'var(--color-brand-hover)' }}>{item.kind}</td>
+                          <td style={{ padding: '8px', color: 'var(--color-text-muted)' }}>v{item.itemVersion}</td>
                           <td style={{ padding: '8px' }}>
                             {item.redacted ? (
-                              <span style={{ fontSize: '0.6875rem', padding: '1px 6px', borderRadius: '4px', backgroundColor: 'rgba(210, 153, 34, 0.2)', color: '#d29922', fontWeight: 600 }}>
+                              <span style={{ fontSize: '0.6875rem', padding: '1px 6px', borderRadius: '4px', backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-status-degraded)', color: 'var(--color-status-degraded)', fontWeight: 600 }}>
                                 [비식별화]
                               </span>
                             ) : (
-                              <span style={{ color: '#8b949e' }}>-</span>
+                              <span style={{ color: 'var(--color-text-muted)' }}>-</span>
                             )}
                           </td>
-                          <td style={{ padding: '8px', color: '#8b949e' }}>
+                          <td style={{ padding: '8px', color: 'var(--color-text-muted)' }}>
                             {item.confidence !== undefined && item.confidence !== null ? `${(item.confidence * 100).toFixed(0)}%` : '-'}
                           </td>
-                          <td style={{ padding: '8px', fontFamily: 'monospace', color: '#8b949e', fontSize: '0.75rem' }}>
+                          <td style={{ padding: '8px', fontFamily: 'monospace', color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>
                             {item.contentHash.slice(0, 16)}...
                           </td>
-                          <td style={{ padding: '8px', color: '#c9d1d9' }}>{item.byteSize.toLocaleString()} B</td>
+                          <td style={{ padding: '8px', color: 'var(--color-text-secondary)' }}>{item.byteSize.toLocaleString()} B</td>
                         </tr>
                       ))}
                     </tbody>
