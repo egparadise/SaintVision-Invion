@@ -491,7 +491,7 @@ def test_drain_preserves_inflight_execution_and_resume_needs_fresh_probe(remote)
         cleanup_lease["leaseId"],
         cleanup_lease["fencingToken"],
         authenticated_node_id=a.e.node,
-        stop_receipt=uuid4(),
+        stop_receipt=str(uuid4()),
     )
     cleanup_run = a.e.runs.transition(
         a.e.tenant,
