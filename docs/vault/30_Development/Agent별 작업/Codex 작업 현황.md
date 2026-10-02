@@ -1,15 +1,23 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.278"
+version: "1.0.279"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T15:53:22+09:00"
+updated: "2026-10-02T16:46:18+09:00"
 source_of_truth: "Git"
-active_card: "CARD-223 S08-BE product caller"
-active_card_status: "PR #323 Claude r4 conditionally approved: pre-scan and quarantined-terminal mutations are closed; exact-head Backend/Core confirmation remains; product dispatch stays disabled"
-active_card_next: "Require exact-head Backend/Core green with 12 real-PG JUnit cases; CARD-229 activation fencing and interruption classification remains registered follow-up"
+active_card: "CARD-229 build dispatch activation fencing"
+active_card_status: "implementation in progress: attempt_count claim generation fences queue and final consequence transaction; retryable interruption/network classification added; product dispatch remains disabled"
+active_card_next: "Push PR over #323, obtain exact-head Backend/Core real-PG evidence, then request Claude independent review"
 ---
+
+- **CARD-229 implementation:** migration 0059의 `attempt_count`를 단일 단조 claim fencing
+  authority로 재사용한다. stale owner는 requeue/quarantine/complete뿐 아니라 lease release,
+  Evidence, outbox를 담는 최종 transaction도 시작할 수 없다. process cancellation·timeout·network
+  uncertainty는 retryable pending으로, 영구 validation/product refusal만 quarantine으로 분리했다.
+  실 PG slow-worker/sweeper/second-worker 시험은 canonical ledger dispatch 1회와 stale consequence
+  0을 고정한다. flag는 기본 off이고 활성화·S08-BE 완료는 주장하지 않는다.
+  [[2026-10-02_16-46-18_KST_Card229_build_claim_fencing_Codex]].
 
 - Card 223 r3 adds real-PG regressions that require the set-based digest pre-scan to quarantine a
   later corrupt row and forbid terminal `quarantined -> pending` revival.

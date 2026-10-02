@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
+from threading import Event
 
 import psycopg
 import pytest
 from psycopg.types.json import Jsonb
 
 from inv.approvals import Principal
-from inv.build_execution import BuildExecutionResult, PRODUCT_ENABLE_SETTING
+from inv.build_execution import BuildExecutionResult, BuildExecutionService, PRODUCT_ENABLE_SETTING
 from inv.build_execution_worker import BuildExecutionIntentQueue, BuildExecutionWorker
 from inv.build_governance import canonical_build_action
 from inv.errors import DomainError
@@ -490,6 +491,160 @@ def test_stale_claim_sweeper_recovers_only_rows_without_current_or_legacy_ledger
     reclaimed = queue.claim_next(env.tenant)
     assert reclaimed is not None and reclaimed.run_id == recoverable.run_id
     assert reclaimed.attempt_count == 2
+
+
+def test_reclaimed_claim_generation_fences_every_old_owner_transition(env):
+    queue, _intent = enqueue(env)
+    old_owner = queue.claim_next(env.tenant)
+    assert old_owner is not None and old_owner.claim_fencing_token == 1
+    with psycopg.connect(env.owner) as conn:
+        conn.execute("SET LOCAL session_replication_role=replica")
+        conn.execute(
+            """UPDATE inv.build_execution_intents
+            SET claimed_at=clock_timestamp() - interval '31 seconds'
+            WHERE run_id=%s""",
+            (old_owner.run_id,),
+        )
+
+    assert queue.claim_next(env.tenant) is None
+    with psycopg.connect(env.owner) as conn:
+        conn.execute("SELECT pg_sleep(1.1)")
+    new_owner = queue.claim_next(env.tenant)
+    assert new_owner is not None and new_owner.claim_fencing_token == 2
+
+    assert queue.requeue_if_unconsumed(old_owner, "RES-0006") is False
+    assert queue.quarantine_if_unconsumed(old_owner, "SYS-0001") is False
+    with pytest.raises(DomainError) as caught:
+        queue.complete(old_owner)
+    assert caught.value.code == "IDEM-0001"
+    with psycopg.connect(env.owner) as conn:
+        state = conn.execute(
+            """SELECT status,attempt_count FROM inv.build_execution_intents
+            WHERE run_id=%s""",
+            (old_owner.run_id,),
+        ).fetchone()
+    assert state == ("claimed", 2)
+
+
+def test_stale_claim_cannot_commit_release_evidence_or_outbox(env):
+    queue, intent = enqueue(env)
+    old_owner = queue.claim_next(env.tenant)
+    assert old_owner is not None
+    with psycopg.connect(env.owner) as conn:
+        conn.execute(
+            """UPDATE inv.build_execution_intents SET status='pending'
+            WHERE run_id=%s""",
+            (intent.run_id,),
+        )
+    with psycopg.connect(env.owner) as conn:
+        conn.execute("SELECT pg_sleep(1.1)")
+    new_owner = queue.claim_next(env.tenant)
+    assert new_owner is not None and new_owner.claim_fencing_token == 2
+
+    service = BuildExecutionService(env.db, object(), object(), environment={})
+    with pytest.raises(DomainError) as caught:
+        service._commit_consequences(
+            tenant_id=env.tenant,
+            project_id=env.project,
+            run_id=intent.run_id,
+            evidence_id=intent.evidence_id,
+            evidence={},
+            cleanup_receipt={},
+            caller_cleanup={},
+            build_session_id="7f4a1c62-9d1e-4a3b-8c55-0f21aa9b4e10",
+            daemon_before={},
+            lease_id="lse_missing",
+            leased_node_id="nod_missing",
+            resource_id=env.resource,
+            binding_digest="a" * 64,
+            decision_id=intent.decision["decisionId"],
+            intent_claim_fencing_token=old_owner.claim_fencing_token,
+        )
+    assert caught.value.code == "IDEM-0001"
+    with psycopg.connect(env.owner) as conn:
+        evidence_count = conn.execute(
+            "SELECT count(*) FROM inv.evidence WHERE evidence_id=%s",
+            (intent.evidence_id,),
+        ).fetchone()[0]
+        outbox_count = conn.execute(
+            """SELECT count(*) FROM inv.outbox
+            WHERE run_id=%s AND event_type='inv.build.dispatch_completed'""",
+            (intent.run_id,),
+        ).fetchone()[0]
+    assert (evidence_count, outbox_count) == (0, 0)
+
+
+def test_slow_worker_sweeper_and_second_worker_dispatch_exactly_once(env):
+    queue, intent = enqueue(env)
+    first_entered = Event()
+    release_first = Event()
+    dispatch_tokens = []
+
+    class LedgerBackedService:
+        def execute(self, _principal, _request, _plan, decision, **kwargs):
+            token = kwargs["intent_claim_fencing_token"]
+            if token == 1:
+                first_entered.set()
+                assert release_first.wait(timeout=15)
+            with psycopg.connect(env.owner) as conn:
+                claimed = conn.execute(
+                    """INSERT INTO inv.idempotency(
+                    tenant_id,project_id,operation,key,request_hash,response
+                    ) VALUES (%s,%s,'build.dispatch',%s,%s,%s)
+                    ON CONFLICT DO NOTHING RETURNING key""",
+                    (
+                        env.tenant,
+                        env.project,
+                        action_digest({"decisionId": decision["decisionId"]}),
+                        "c" * 64,
+                        Jsonb({"state": "claimed", "bindingDigest": "c" * 64}),
+                    ),
+                ).fetchone()
+            if not claimed:
+                raise DomainError("IDEM-0001", "decision was already dispatched", 409)
+            dispatch_tokens.append(token)
+            return BuildExecutionResult(kwargs["evidence_id"], "d" * 64, True, True)
+
+    worker = BuildExecutionWorker(
+        queue,
+        LedgerBackedService(),
+        environment={PRODUCT_ENABLE_SETTING: "1"},
+    )
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        first_future = executor.submit(worker.once, env.tenant)
+        assert first_entered.wait(timeout=15)
+        with psycopg.connect(env.owner) as conn:
+            conn.execute("SET LOCAL session_replication_role=replica")
+            conn.execute(
+                """UPDATE inv.build_execution_intents
+                SET claimed_at=clock_timestamp() - interval '31 seconds'
+                WHERE run_id=%s""",
+                (intent.run_id,),
+            )
+        assert queue.claim_next(env.tenant) is None
+        with psycopg.connect(env.owner) as conn:
+            conn.execute("SELECT pg_sleep(1.1)")
+        second = worker.once(env.tenant)
+        assert second is not None
+        release_first.set()
+        with pytest.raises(DomainError) as caught:
+            first_future.result(timeout=15)
+    assert caught.value.code == "IDEM-0001"
+    assert dispatch_tokens == [2]
+    with psycopg.connect(env.owner) as conn:
+        state = conn.execute(
+            """SELECT status,attempt_count FROM inv.build_execution_intents
+            WHERE run_id=%s""",
+            (intent.run_id,),
+        ).fetchone()
+        ledger_count = conn.execute(
+            """SELECT count(*) FROM inv.idempotency
+            WHERE project_id=%s AND operation='build.dispatch'
+              AND key=%s""",
+            (env.project, intent.dispatch_claim_key),
+        ).fetchone()[0]
+    assert state == ("completed", 2)
+    assert ledger_count == 1
 
 
 class SuccessfulService:
