@@ -5473,7 +5473,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(unknownStatus.color).toBe('var(--color-status-unknown)');
       expect(unknownStatus.border).toBe('var(--color-status-unknown)');
       expect(unknownStatus.bg).toBe('var(--color-bg-subtle)');
-      expect(unknownStatus.label).toBe('INVALID_CORRUPTED_STATE');
+      expect(unknownStatus.label).toBe('UNKNOWN (invalid_corrupted_state)');
 
       // Empty / null / undefined fallbacks (X27)
       expect(getAgentRunStatusConfig(null).label).toBe('UNKNOWN');
@@ -5481,13 +5481,13 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(getAgentRunStatusConfig(undefined).label).toBe('UNKNOWN');
       expect(getAgentRunStatusConfig(null).color).toBe('var(--color-status-unknown)');
 
-      // Out-of-contract wire enum rejection (F-R1, X30b, X31b)
+      // Out-of-contract wire enum rejection (F-R1, R2-2, R2-3)
       const outOfContractStatuses = ['planning', 'running', 'executing', 'awaiting_approval', 'failed', 'blocked', 'idle', 'bogus'];
       for (const ooc of outOfContractStatuses) {
         const oocCfg = getAgentRunStatusConfig(ooc);
         expect(oocCfg.color).toBe('var(--color-status-unknown)');
         expect(oocCfg.border).toBe('var(--color-status-unknown)');
-        expect(oocCfg.label).toBe(ooc.toUpperCase());
+        expect(oocCfg.label).toBe(`UNKNOWN (${ooc})`);
       }
 
       // Prototype key defense (X29)
@@ -5495,7 +5495,55 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
         const protoStatus = getAgentRunStatusConfig(pk);
         expect(protoStatus.color).toBe('var(--color-status-unknown)');
         expect(protoStatus.border).toBe('var(--color-status-unknown)');
-        expect(protoStatus.label).toBe(pk.toUpperCase());
+        expect(protoStatus.label).toBe(`UNKNOWN (${pk})`);
+      }
+
+      // Strict exact-match lookup invariants: Case-folding, whitespace & alias mutations strictly rejected (X30, X31, X31b)
+      // 1. Case variations & leading/trailing whitespace variations must strictly fail to match known keys
+      const caseAndWhitespaceVariants = [
+        'COMPLETED', 'Completed', ' completed', 'completed ',
+        'DRAFT', 'Draft', ' draft',
+        'READY', 'Ready', ' ready',
+        'REPAIRING', 'Repairing', ' repairing',
+        'REJECTED', 'Rejected', ' rejected',
+        'EVALUATING', 'Evaluating', ' evaluating',
+      ];
+      for (const variant of caseAndWhitespaceVariants) {
+        const vCfg = getAgentRunStatusConfig(variant);
+        expect(vCfg.label).toBe(`UNKNOWN (${variant})`);
+        expect(vCfg.color).toBe('var(--color-status-unknown)');
+        expect(vCfg.border).toBe('var(--color-status-unknown)');
+      }
+
+      // 2. Out-of-contract aliases (succeeded, success, failed, failure) must never map to known statuses
+      const aliasVariants = ['succeeded', 'success', 'passed', 'failed', 'failure'];
+      for (const alias of aliasVariants) {
+        const aCfg = getAgentRunStatusConfig(alias);
+        expect(aCfg.label).toBe(`UNKNOWN (${alias})`);
+        expect(aCfg.color).toBe('var(--color-status-unknown)');
+        expect(aCfg.border).toBe('var(--color-status-unknown)');
+      }
+      expect(Object.hasOwn(AGENT_RUN_STATUS_CONFIG, 'succeeded')).toBe(false);
+      expect(Object.hasOwn(AGENT_RUN_STATUS_CONFIG, 'failed')).toBe(false);
+
+      // 3. Exact key equivalence invariant: getAgentRunStatusConfig(s) === AGENT_RUN_STATUS_CONFIG[s] iff s is a valid contract key
+      const knownKeys = new Set(['draft', 'evaluating', 'ready', 'repairing', 'completed', 'rejected']);
+      const sampleQueries = [
+        ...knownKeys,
+        ...caseAndWhitespaceVariants,
+        ...aliasVariants,
+        'planning', 'running', 'executing', 'awaiting_approval', 'blocked', 'idle', 'bogus',
+      ];
+      for (const query of sampleQueries) {
+        const res = getAgentRunStatusConfig(query);
+        if (knownKeys.has(query)) {
+          expect(res).toBe(AGENT_RUN_STATUS_CONFIG[query as AgentRunStatusKey]);
+          expect(res.label).toBe(query.toUpperCase());
+          expect(res.color).not.toBe('var(--color-status-unknown)');
+        } else {
+          expect(res.label).toBe(`UNKNOWN (${query})`);
+          expect(res.color).toBe('var(--color-status-unknown)');
+        }
       }
     } finally {
       act(() => {

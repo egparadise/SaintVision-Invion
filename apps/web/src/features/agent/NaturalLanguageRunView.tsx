@@ -59,7 +59,7 @@ export function getAgentRunStatusConfig(status?: string | null): AgentRunStatusS
     color: 'var(--color-status-unknown)',
     bg: 'var(--color-bg-subtle)',
     border: 'var(--color-status-unknown)',
-    label: (status || 'UNKNOWN').toUpperCase(),
+    label: status ? `UNKNOWN (${status})` : 'UNKNOWN',
   };
 }
 

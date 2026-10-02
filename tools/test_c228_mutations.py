@@ -3,7 +3,7 @@
 tools/test_c228_mutations.py
 
 Card 228 (ACC-09) Natural Language Run screen (NaturalLanguageRunView.tsx) Mutation Testing Suite.
-Verifies that 34 distinct regressions/mutations (X1-X34) across
+Verifies that 35 distinct regressions/mutations (X1-X34 + X31b) across
 color contrast, border collisions, status semantics, wire contract enum purity,
 fail-closed unknown handling, prototype key defense, outline suppression, and token inventory
 are strictly caught and killed by the test suite (ACC-09 Test 9m, Test 9j-2, and Test 10).
@@ -134,8 +134,8 @@ MUTANTS = [
     {
         'id': 'X13',
         'name': 'NaturalLanguageRunView: unknown fallback border with comment decoy literal',
-        'target': "    border: 'var(--color-status-unknown)',\n    label: (status || 'UNKNOWN').toUpperCase(),",
-        'replacement': "    border: '#8b949e' /* var(--color-status-unknown) */,\n    label: (status || 'UNKNOWN').toUpperCase(),",
+        'target': "    border: 'var(--color-status-unknown)',\n    label: status ? `UNKNOWN (${status})` : 'UNKNOWN',",
+        'replacement': "    border: '#8b949e' /* var(--color-status-unknown) */,\n    label: status ? `UNKNOWN (${status})` : 'UNKNOWN',",
         'expected_guard': 'Test 10 (COLOR_LITERAL_MULTISET_BASELINE ratchet)',
     },
 
@@ -249,7 +249,7 @@ MUTANTS = [
     {
         'id': 'X28',
         'name': 'NaturalLanguageRunView: getAgentRunStatusConfig unknown fallback returns ready config',
-        'target': "  return {\n    color: 'var(--color-status-unknown)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-status-unknown)',\n    label: (status || 'UNKNOWN').toUpperCase(),\n  };",
+        'target': "  return {\n    color: 'var(--color-status-unknown)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-status-unknown)',\n    label: status ? `UNKNOWN (${status})` : 'UNKNOWN',\n  };",
         'replacement': "  return AGENT_RUN_STATUS_CONFIG.ready;",
         'expected_guard': 'Test 9m (unknown status fail-closed token assertion)',
     },
@@ -263,20 +263,27 @@ MUTANTS = [
         'expected_guard': 'Test 9m (prototype key fail-closed own-key defense assertion)',
     },
 
-    # 12. wire contract enum purity (Codex F-R1)
+    # 12. exact wire contract query & alias defense (Codex F-R1, Claude r2 R2-3)
     {
-        'id': 'X30b',
-        'name': 'NaturalLanguageRunView: out-of-contract status (planning) added to AGENT_RUN_STATUS_CONFIG',
-        'target': "  draft: {\n    color: 'var(--color-text-secondary)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-border-subtle)',\n    label: 'DRAFT',\n  },",
-        'replacement': "  draft: {\n    color: 'var(--color-text-secondary)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-border-subtle)',\n    label: 'DRAFT',\n  },\n  planning: {\n    color: 'var(--color-brand-hover)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-brand-hover)',\n    label: 'PLANNING',\n  } as any,",
-        'expected_guard': 'Test 9m (exact wire contract key set equality assertion)',
+        'id': 'X30',
+        'name': 'NaturalLanguageRunView: getAgentRunStatusConfig normalizes query via trim and toLowerCase (case-folding/whitespace bypass)',
+        'target': "export function getAgentRunStatusConfig(status?: string | null): AgentRunStatusStyle {\n  if (status && Object.hasOwn(AGENT_RUN_STATUS_CONFIG, status)) {",
+        'replacement': "export function getAgentRunStatusConfig(status?: string | null): AgentRunStatusStyle {\n  const normalized = status?.trim().toLowerCase();\n  if (normalized && Object.hasOwn(AGENT_RUN_STATUS_CONFIG, normalized)) {\n    return AGENT_RUN_STATUS_CONFIG[normalized as AgentRunStatusKey];\n  }\n  if (status && Object.hasOwn(AGENT_RUN_STATUS_CONFIG, status)) {",
+        'expected_guard': 'Test 9m (case/whitespace variation UNKNOWN assertion)',
+    },
+    {
+        'id': 'X31',
+        'name': 'NaturalLanguageRunView: getAgentRunStatusConfig aliases out-of-contract "failed" to rejected',
+        'target': "export function getAgentRunStatusConfig(status?: string | null): AgentRunStatusStyle {\n  if (status && Object.hasOwn(AGENT_RUN_STATUS_CONFIG, status)) {",
+        'replacement': "export function getAgentRunStatusConfig(status?: string | null): AgentRunStatusStyle {\n  if (status === 'failed') return AGENT_RUN_STATUS_CONFIG.rejected;\n  if (status && Object.hasOwn(AGENT_RUN_STATUS_CONFIG, status)) {",
+        'expected_guard': 'Test 9m (out-of-contract alias rejection)',
     },
     {
         'id': 'X31b',
-        'name': 'NaturalLanguageRunView: contract status (completed) removed from AGENT_RUN_STATUS_CONFIG',
-        'target': "  completed: {\n    color: 'var(--color-status-online)',\n    bg: 'var(--color-bg-subtle)',\n    border: 'var(--color-status-online)',\n    label: 'COMPLETED',\n  },",
-        'replacement': "",
-        'expected_guard': 'Test 9m (exact wire contract key set equality assertion)',
+        'name': 'NaturalLanguageRunView: getAgentRunStatusConfig aliases out-of-contract "succeeded" to completed',
+        'target': "export function getAgentRunStatusConfig(status?: string | null): AgentRunStatusStyle {\n  if (status && Object.hasOwn(AGENT_RUN_STATUS_CONFIG, status)) {",
+        'replacement': "export function getAgentRunStatusConfig(status?: string | null): AgentRunStatusStyle {\n  if (status === 'succeeded') return AGENT_RUN_STATUS_CONFIG.completed;\n  if (status && Object.hasOwn(AGENT_RUN_STATUS_CONFIG, status)) {",
+        'expected_guard': 'Test 9m (out-of-contract alias rejection)',
     },
 
     # 13. named color literals
@@ -326,7 +333,7 @@ def run_test_suite():
 
 def main():
     print('=' * 80)
-    print(' Card 228 (ACC-09): Reproducible Mutant Test Suite (34 Mutants: X1-X34)')
+    print(' Card 228 (ACC-09): Reproducible Mutant Test Suite (35 Mutants: X1-X34 + X31b)')
     print(' Target: NaturalLanguageRunView.tsx')
     print('=' * 80)
 
