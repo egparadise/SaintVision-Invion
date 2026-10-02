@@ -218,21 +218,7 @@ def security_reports(allowlist: dict) -> list[dict]:
                 for signature in allowlist["definerPolicySignatures"]
             ],
         },
-        {
-            "threatId": "SEC-RLS-001",
-            "exitCode": 0,
-            "toolFiles": copy.deepcopy(tool.RLS_FILES),
-            "baselineAccepted": [
-                {"role": row["role"], "table": row["table"], "rules": copy.deepcopy(row["rules"])}
-                for row in allowlist["rlsAcceptedDispositions"]
-            ],
-            "verdict": "PASS",
-            "violations": [],
-            "accepted": [],
-            "unmeasured": [],
-            "roles": {"inv_app": {"present": True}},
-            "ground_truth": {"public.projects": {"tenantScoped": True}},
-        },
+        {"threatId": "SEC-RLS-001", **rls_report(allowlist)},
         {
             "threatId": "SEC-VF-001",
             "exitCode": 0,
@@ -342,7 +328,67 @@ def security_envelope(allowlist: dict) -> dict:
     return value
 
 
-def rls_report(allowlist: dict, exit_code: int = 0) -> dict:
+CTID_FP = "5d41402abc4b2a76b9719d911017c592"
+
+
+def rls_table(identity: dict | None = None, **overrides) -> dict:
+    """One tenant-scoped, readable, clean table as the collector records it.
+
+    The fixtures used to be a stub (``{"present": True}``) because nothing read them.  The
+    evaluator now re-derives E1..E5 from these observations, so a test that wants a violation has
+    to carry the observation that produces it -- which is the point: three findings in a row were
+    reports whose conclusions nothing cross-checked (#322 r2).
+    """
+
+    table = {
+        "tenant_scoped": True,
+        "rls_enabled": True,
+        "rls_forced": True,
+        "privileges": {"select": "table", "insert": "table", "update": None, "delete": None},
+        "visible": {
+            "guc_unset": {"rows": 0},
+            "guc_tenant_a": {"rows": 1},
+            "guc_tenant_a_foreign_rows": {"rows": 0},
+            "guc_unknown_tenant": {"rows": 0},
+            "guc_not_uuid": {"denied": "22P02"},
+            "identity": copy.deepcopy(identity) if identity is not None else {
+                "method": "ctid",
+                "owner_a": {"rows": 1, "fp": CTID_FP},
+                "role_a": {"rows": 1, "fp": CTID_FP},
+                "match": True,
+            },
+        },
+    }
+    for key, value in overrides.items():
+        if key in {"guc_unset", "guc_tenant_a", "guc_tenant_a_foreign_rows", "guc_unknown_tenant"}:
+            table["visible"][key] = value
+        else:
+            table[key] = value
+    return table
+
+
+def rls_roles(tables: dict | None = None, *, role: str = "inv_app", **role_overrides) -> dict:
+    entry = {
+        "present": True,
+        "superuser": False,
+        "bypassrls": False,
+        "tables": tables if tables is not None else {"public.projects": rls_table()},
+    }
+    entry.update(role_overrides)
+    return {role: entry}
+
+
+def rls_ground_truth(*tables: str) -> dict:
+    return {
+        name: {"total": {"rows": 2}, "tenant_a": {"rows": 1}, "other_tenants": {"rows": 1}}
+        for name in (tables or ("public.projects",))
+    }
+
+
+def rls_report(allowlist: dict, exit_code: int = 0, roles: dict | None = None,
+               ground_truth: dict | None = None) -> dict:
+    roles = copy.deepcopy(roles) if roles is not None else rls_roles()
+    tables = [name for entry in roles.values() for name in entry.get("tables", {})]
     value = {
         "exitCode": exit_code,
         "toolFiles": copy.deepcopy(tool.RLS_FILES),
@@ -354,8 +400,9 @@ def rls_report(allowlist: dict, exit_code: int = 0) -> dict:
         "violations": [],
         "accepted": [],
         "unmeasured": [],
-        "roles": {"inv_app": {"present": True}},
-        "ground_truth": {"public.projects": {"tenantScoped": True}},
+        "measuredRoles": sorted(roles),
+        "roles": roles,
+        "ground_truth": ground_truth if ground_truth is not None else rls_ground_truth(*tables),
     }
     return value
 
@@ -659,15 +706,49 @@ def test_definer_exit_mapping(exit_code, expected, allowlist):
     assert tool.evaluate_definer(report, allowlist) is expected
 
 
+def rls_rule_observation(rule: str) -> dict:
+    """Roles whose observations actually produce ``rule`` for inv_app / public.projects."""
+
+    if rule == "E1":
+        return rls_roles(superuser=True)
+    if rule == "E2":
+        return rls_roles({"public.projects": rls_table(rls_forced=False)})
+    if rule == "E3":
+        return rls_roles({"public.projects": rls_table(guc_unset={"rows": 1})})
+    if rule == "E4":
+        return rls_roles({"public.projects": rls_table(guc_tenant_a_foreign_rows={"rows": 1})})
+    if rule == "E5":
+        return rls_roles({"public.projects": rls_table(guc_unknown_tenant={"rows": 1})})
+    return rls_roles()
+
+
 @pytest.mark.parametrize("rule", sorted(tool.RLS_RULES))
 def test_each_unaccepted_rls_rule_is_critical(rule, allowlist):
-    report = rls_report(allowlist, 1)
-    report.update(verdict="VIOLATIONS", violations=[{"rule": rule, "role": "unlisted", "table": "public.secret"}])
+    """Every rule the report carries unaccepted is a measured failure.
+
+    The row is no longer invented: each case carries the observation that produces it, because
+    the evaluator re-derives E1..E5 and refuses a violation the numbers do not support.  E6 is
+    the exception and says so -- it is about SECURITY DEFINER functions, which this report does
+    not observe, so it is carried as reported (``RLS_RECOMPUTED_RULES`` leaves it out).
+    """
+
+    roles = rls_rule_observation(rule)
+    report = rls_report(allowlist, 1, roles=roles)
+    row = ({"rule": rule, "function": "public.forged()"} if rule == "E6"
+           else {"rule": rule, "role": "inv_app",
+                 **({} if rule == "E1" else {"table": "public.projects"})})
+    report.update(verdict="VIOLATIONS", violations=[row])
     assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.MEASURED_FAIL
 
 
 def test_rls_accepted_expiry_and_baseline_exact_match(allowlist):
-    report = rls_report(allowlist)
+    # The accepted row is a real derivation: public.tenants is observed without forced RLS, and
+    # the reviewed baseline accepts E2 there.  An accepted row nothing derives is refused.
+    roles = rls_roles({
+        "public.projects": rls_table(),
+        "public.tenants": rls_table(rls_forced=False),
+    })
+    report = rls_report(allowlist, roles=roles)
     report["accepted"] = [{"rule": "E2", "role": "inv_app", "table": "public.tenants"}]
     assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.MEASURED_PASS
     expired = datetime(2026, 11, 1, tzinfo=timezone.utc)
@@ -682,7 +763,10 @@ def test_rls_accepted_expiry_and_baseline_exact_match(allowlist):
     [(2, tool.Verdict.NOT_OBSERVED), (3, tool.Verdict.NOT_OBSERVED), (9, tool.Verdict.INVALID_RUN)],
 )
 def test_rls_unmeasured_and_unknown_exit_mapping(exit_code, expected, allowlist):
-    report = rls_report(allowlist, exit_code)
+    roles = rls_roles({"public.projects": rls_table(
+        {"method": "unverifiable", "reason": "ctid denied 42501; identity columns not readable"}
+    )}) if exit_code == 3 else None
+    report = rls_report(allowlist, exit_code, roles=roles)
     if exit_code == 3:
         report.update(verdict="UNMEASURED", unmeasured=[{"rule": "E4", "role": "inv_app", "table": "public.projects"}])
     assert tool.evaluate_rls(report, allowlist, NOW) is expected
@@ -700,7 +784,9 @@ OWNER_VERIFIED_IDENTITY = {
 
 def identity_roles(identity: dict, role: str = "inv_cancel_bridge_owner",
                    table: str = "public.audit_events") -> dict:
-    return {role: {"present": True, "tables": {table: {"visible": {"identity": identity}}}}}
+    """The registered pair, carrying a full observation with ``identity`` in it."""
+
+    return rls_roles({table: rls_table(identity, guc_tenant_a={"rows": 2})}, role=role)
 
 
 @pytest.mark.parametrize(
@@ -772,6 +858,24 @@ def identity_roles(identity: dict, role: str = "inv_cancel_bridge_owner",
             tool.Verdict.INVALID_RUN,
             id="no-role-observation",
         ),
+        # #322 r2 F-R4: role_a.rows was only checked for being an integer, so a claimed match
+        # over a different number of rows passed -- impossible, since the fingerprint is taken
+        # over the row set.
+        pytest.param(
+            identity_roles({**OWNER_VERIFIED_IDENTITY, "role_a": {"rows": 0, "fp": OWNER_FP}}),
+            tool.Verdict.INVALID_RUN,
+            id="match-over-zero-role-rows",
+        ),
+        pytest.param(
+            identity_roles({**OWNER_VERIFIED_IDENTITY, "role_a": {"rows": 1, "fp": OWNER_FP}}),
+            tool.Verdict.INVALID_RUN,
+            id="match-over-one-role-row",
+        ),
+        pytest.param(
+            identity_roles({**OWNER_VERIFIED_IDENTITY, "role_a": {"rows": 3, "fp": OWNER_FP}}),
+            tool.Verdict.INVALID_RUN,
+            id="match-over-three-role-rows",
+        ),
     ],
 )
 def test_an_owner_verified_key_identity_must_be_registered_and_non_vacuous(
@@ -786,9 +890,56 @@ def test_an_owner_verified_key_identity_must_be_registered_and_non_vacuous(
     comparison into a PASS axis.
     """
 
-    report = rls_report(allowlist)
-    report["roles"] = copy.deepcopy(roles)
+    report = rls_report(allowlist, roles=roles, ground_truth=rls_ground_truth(
+        "public.projects", "public.audit_events"
+    ))
     assert tool.evaluate_rls(report, allowlist, NOW) is expected
+
+
+def test_the_collector_and_the_evaluator_derive_the_same_rows(allowlist):
+    """The two implementations of E1..E5 must agree, and this test is where drift shows.
+
+    The evaluator re-derives the rules rather than trusting the report (#322 r2), so there are
+    now two implementations: ``collect_rls_evidence.evaluate`` writes the report and
+    ``aggregate_ac11_evidence._rls_recomputation`` checks it.  Here the collector's own output is
+    fed to the evaluator: if either side changes its precedence, this stops passing instead of
+    turning every future hosted report into INVALID_RUN.
+    """
+
+    import importlib.util
+    import sys
+
+    path = ROOT / "tools" / "collect_rls_evidence.py"
+    spec = importlib.util.spec_from_file_location("collect_rls_evidence", path)
+    collector = importlib.util.module_from_spec(spec)
+    sys.modules["collect_rls_evidence"] = collector
+    spec.loader.exec_module(collector)
+
+    roles = rls_roles({
+        # One clean table, one that leaks a foreign row, and one whose identity is unverifiable:
+        # an E4 violation and an E4 unmeasured row derived by the collector itself.
+        "public.projects": rls_table(),
+        "public.runs": rls_table(guc_tenant_a_foreign_rows={"rows": 1}),
+        "public.audit_events": rls_table(
+            {"method": "unverifiable", "reason": "ctid denied 42501; identity columns not readable"}
+        ),
+    })
+    observation = {
+        "roles": copy.deepcopy(roles),
+        "ground_truth": rls_ground_truth("public.projects", "public.runs", "public.audit_events"),
+        "definer_functions": {},
+    }
+    violations = [
+        row for row in collector.evaluate(observation)
+        if row["rule"] in tool.RLS_RECOMPUTED_RULES
+    ]
+    unmeasured = collector.unverified_identities(observation)
+    assert [(row["rule"], row["table"]) for row in violations] == [("E4", "public.runs")]
+    assert [(row["rule"], row["table"]) for row in unmeasured] == [("E4", "public.audit_events")]
+
+    report = rls_report(allowlist, 1, roles=roles, ground_truth=observation["ground_truth"])
+    report.update(verdict="VIOLATIONS", violations=violations, unmeasured=unmeasured)
+    assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.MEASURED_FAIL
 
 
 def test_a_recomputed_identity_mismatch_cannot_hide_in_an_unmeasured_report(allowlist):
@@ -802,21 +953,21 @@ def test_a_recomputed_identity_mismatch_cannot_hide_in_an_unmeasured_report(allo
     mismatch = identity_roles(
         {**OWNER_VERIFIED_IDENTITY, "role_a": {"rows": 2, "fp": OTHER_FP}, "match": False}
     )
-    report = rls_report(allowlist, 3)
+    truth = rls_ground_truth("public.audit_events")
+    report = rls_report(allowlist, 3, roles=mismatch, ground_truth=truth)
     report.update(
         verdict="UNMEASURED",
-        unmeasured=[{"rule": "E4", "role": "inv_app", "table": "public.projects"}],
-        roles=copy.deepcopy(mismatch),
+        unmeasured=[{"rule": "E4", "role": "inv_cancel_bridge_owner",
+                     "table": "public.audit_events"}],
     )
     assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.INVALID_RUN
 
     # The same observation reported honestly is a measured failure, which is admissible.
-    violation = rls_report(allowlist, 1)
+    violation = rls_report(allowlist, 1, roles=mismatch, ground_truth=truth)
     violation.update(
         verdict="VIOLATIONS",
         violations=[{"rule": "E4", "role": "inv_cancel_bridge_owner",
                      "table": "public.audit_events"}],
-        roles=copy.deepcopy(mismatch),
     )
     assert tool.evaluate_rls(violation, allowlist, NOW) is tool.Verdict.MEASURED_FAIL
 

@@ -635,6 +635,99 @@ def validate_allowlist(allowlist: Any) -> None:
                 raise ValueError("accepted-with-expiry requires a timezone-aware expiry")
 
 
+#: E1..E5 are re-derived from the observations the RLS report carries.  E6 is about SECURITY
+#: DEFINER functions, which this report does not observe (SEC-DEF-001 does), so an E6 row is
+#: carried as reported and left out of the comparison -- stated rather than silently ignored.
+RLS_RECOMPUTED_RULES = ("E1", "E2", "E3", "E4", "E5")
+
+
+def _rls_recomputation(
+    roles: dict[str, Any], ground_truth: dict[str, Any]
+) -> tuple[set[tuple[str, str, str | None]], set[tuple[str, str, str | None]]] | None:
+    """Re-derive (violations, unmeasured) from the recorded observations, or None to refuse.
+
+    Three findings in a row (#322 r2 F-R1, F-R3, F-R4) were the same shape: the evaluator read
+    one field of the report and trusted the conclusion beside it.  This function stops reading
+    conclusions.  It applies E1..E5 to the rows, counts and fingerprints the report carries, in
+    the collector's own precedence, and the caller compares the result with what the report
+    claims -- so a forged report has to forge an observation that produces its own verdict, and
+    every number it carries is then cross-checked by that derivation.
+
+    None means the report does not carry enough observation to be checked, which is a refusal:
+    a report that omits what it concluded from cannot be evidence about a tree.
+    """
+
+    violations: set[tuple[str, str, str | None]] = set()
+    unmeasured: set[tuple[str, str, str | None]] = set()
+    for role_name, role_report in roles.items():
+        if not isinstance(role_report, dict):
+            return None
+        if role_report.get("present") is not True:
+            continue
+        for field in ("superuser", "bypassrls"):
+            if not isinstance(role_report.get(field), bool):
+                return None
+        if role_report["superuser"] or role_report["bypassrls"]:
+            violations.add(("E1", role_name, None))
+        tables = role_report.get("tables")
+        if not isinstance(tables, dict):
+            return None
+        for table_name, table_report in tables.items():
+            if not isinstance(table_report, dict):
+                return None
+            privileges = table_report.get("privileges")
+            if not isinstance(privileges, dict) or "select" not in privileges:
+                return None
+            if table_report.get("tenant_scoped") is not True or privileges["select"] is None:
+                continue
+            for field in ("rls_enabled", "rls_forced"):
+                if not isinstance(table_report.get(field), bool):
+                    return None
+            visible = table_report.get("visible")
+            if not isinstance(visible, dict):
+                return None
+            if not (table_report["rls_enabled"] and table_report["rls_forced"]):
+                violations.add(("E2", role_name, table_name))
+
+            def cell(name: str) -> int | None:
+                value = visible.get(name)
+                if value is None:
+                    return 0
+                if not isinstance(value, dict):
+                    return None
+                if "denied" in value:
+                    return 0
+                rows = value.get("rows")
+                return rows if isinstance(rows, int) and not isinstance(rows, bool) else None
+
+            unset, foreign, unknown = cell("guc_unset"), cell("guc_tenant_a_foreign_rows"), cell("guc_unknown_tenant")
+            if unset is None or foreign is None or unknown is None:
+                return None
+            if unset > 0:
+                violations.add(("E3", role_name, table_name))
+            identity = visible.get("identity")
+            if identity is not None and not isinstance(identity, dict):
+                return None
+            seen_a = (visible.get("guc_tenant_a") or {}).get("rows")
+            truth_a = ((ground_truth.get(table_name) or {}).get("tenant_a") or {}).get("rows")
+            if foreign > 0:
+                violations.add(("E4", role_name, table_name))
+            elif identity is not None and identity.get("match") is False:
+                violations.add(("E4", role_name, table_name))
+            elif (
+                identity is None
+                and isinstance(seen_a, int)
+                and isinstance(truth_a, int)
+                and seen_a > truth_a
+            ):
+                violations.add(("E4", role_name, table_name))
+            if unknown > 0:
+                violations.add(("E5", role_name, table_name))
+            if isinstance(identity, dict) and identity.get("method") == "unverifiable":
+                unmeasured.add(("E4", role_name, table_name))
+    return violations, unmeasured
+
+
 def evaluate_rls(report: dict[str, Any], allowlist: dict[str, Any], now: datetime) -> Verdict:
     if _files(report.get("toolFiles")) != _files(RLS_FILES):
         return Verdict.INVALID_RUN
@@ -717,10 +810,46 @@ def evaluate_rls(report: dict[str, Any], allowlist: dict[str, Any], now: datetim
                 or identity.get("match") is not (owner["fp"] == role_side["fp"])
             ):
                 return Verdict.INVALID_RUN
+            if identity["match"] is True and role_side["rows"] != owner["rows"]:
+                # Equal fingerprints over a different number of rows is impossible: the
+                # fingerprint is taken over the row set.  Requiring it here forces
+                # ``role_a.rows == owner_a.rows == ownerDistinctness.rows`` for every claimed
+                # match, which a synthesised report had been able to contradict (#322 r2 F-R4).
+                return Verdict.INVALID_RUN
             if identity["match"] is not True:
                 # The role saw a different row set.  That is an E4 violation, so a report that
                 # calls itself a pass is inconsistent with its own observation.
                 identity_mismatches.append((role_name, table_name))
+    measured_roles = report.get("measuredRoles")
+    if not isinstance(measured_roles, list) or set(measured_roles) != set(roles):
+        # The report names which roles it measured; if that is not the population it carries,
+        # one of the two is a story about the other.
+        return Verdict.INVALID_RUN
+    recomputed = _rls_recomputation(roles, ground_truth)
+    if recomputed is None:
+        return Verdict.INVALID_RUN
+    derived_violations, derived_unmeasured = recomputed
+
+    def rows_of(entries: list[Any]) -> set[tuple[str, str, str | None]]:
+        return {
+            (str(row.get("rule")), str(row.get("role")), row.get("table"))
+            for row in entries
+            if isinstance(row, dict) and row.get("rule") in RLS_RECOMPUTED_RULES
+        }
+
+    reported_violations, reported_unmeasured = rows_of(violations), rows_of(unmeasured)
+    reported_accepted = rows_of(accepted)
+    # Neither direction may drift: a row the observations do not produce was invented, and a row
+    # they do produce that the report does not list (nor accept with a reviewed reason) was
+    # hidden.  ``accepted`` may hold either kind, so it counts for both.
+    if (
+        not reported_violations <= derived_violations
+        or not derived_violations <= reported_violations | reported_accepted
+        or not reported_unmeasured <= derived_unmeasured
+        or not derived_unmeasured <= reported_unmeasured | reported_accepted
+        or not reported_accepted <= derived_violations | derived_unmeasured
+    ):
+        return Verdict.INVALID_RUN
     allowed_identities = {
         (entry["role"], entry["table"], rule)
         for entry in allowlist["rlsAcceptedDispositions"] for rule in entry["rules"]
