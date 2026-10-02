@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.304"
+version: "1.0.305"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T08:08:48+09:00"
+updated: "2026-10-03T08:48:03+09:00"
 source_of_truth: "Git"
-active_card: "CARD-254 inv_audit_reader disposition re-review before the 2026-10-31 expiry"
-active_card_status: "Card 251 #347 is approved by Claude r2 at 4e148ae4; the hosted run_s08_acceptance run 37072629027 at that final head produced 13/13 MEASURED_PASS (earlier run 37069106763 at 88890edc); product dispatch stays default off and any score change is left to rescoring"
-active_card_next: "Re-measure the inv_audit_reader E3/E4/E5 accepted dispositions on the current tree and renew or remove them before 2026-10-31"
+active_card: "CARD-255 S08 pre-enable Mediums (production plan budget, base-image digest, worker trust boundary in the API)"
+active_card_status: "Card 254 #349 is approved by Claude r1 at 280045f8; hosted run 37077352052 recomputed SEC-RLS-001 MEASURED_PASS and the inv_audit_reader E3/E4/E5 dispositions are renewed until 2026-11-30 with fail-closed boundary checks. Card 251 #347 is approved with hosted run 37072629027"
+active_card_next: "Close the three pre-enable Mediums recorded in the Card 247 History before any S08 flag enablement; product dispatch stays off by default"
 ---
 
 ## 2026-10-03 Card 251 — S08-BE fixed-SHA acceptance evidence
@@ -28,6 +28,20 @@ active_card_next: "Re-measure the inv_audit_reader E3/E4/E5 accepted disposition
 - Exact-head hosted run `37069106763` passed at source `88890edc`: fixed cases 13/13,
   real-PG 13 passed/0 skipped, Core 8,358 passed/23 declared skips/0 failure/0 error.
   Artifact `11255160387` is retained through `2026-11-01T22:24:08Z`.
+## 2026-10-03 Card 254 — inv_audit_reader disposition 재검토
+
+- Base `752245861eb0af1e3a4e714cb77c0948ce6f76b7`; branch
+  `agent/codex/c254-audit-reader-disposition`; reviewer Claude.
+- E3/E4/E5는 `USING (true)`가 의도한 실제 privileged visibility다. 0061 tree에서 0047
+  이후 role grant/policy 변경과 제품 reader 호출 경로가 없음을 다시 측정했다.
+- 다음 만료는 `2026-11-30T23:59:59+09:00`으로 한 달만 연장한다. collector/evaluator가
+  member 양방향·role 속성·SELECT-only·FORCE RLS·exact policy를 live report에서 강제한다.
+- 생성 allowlist·target registry·모든 importer pin을 순서대로 회전했고 focused PG-free는
+  **386 passed, 15 skipped**다. skip 15건은 모두 disposable PostgreSQL DSN node다.
+- 현재 상태는 로컬 검증과 첫 hosted SEC-RLS-001 실측 완료·Claude 검토 전 `review`다.
+- Hosted PostgreSQL 16 run `37077352052` / artifact `11257466419`에서 정본 evaluator가
+  **MEASURED_PASS**를 재계산했다. E3/E4/E5는 각각 4/2/4행이고 exact role·grant·policy
+  경계가 모두 일치했다. 최종 docs head 재실행 뒤 Claude 검토를 요청한다.
 
 ## 2026-10-03 Card 247 — S08-BE BuildRequest product entry
 
