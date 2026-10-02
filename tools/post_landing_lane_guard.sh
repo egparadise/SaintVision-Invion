@@ -38,10 +38,22 @@ guard_refuse() {
 }
 
 # require_sha <name> <value> -- exactly 40 lowercase hex characters, nothing else.
+#
+# The refusal never prints the value.  An operator pasting into this terminal may paste a token
+# instead of a SHA, and a refusal that echoed it would write that token into the session log and
+# into whatever captures it (#320 r2 F2).  Length and the failing property are enough to fix the
+# paste; the value itself adds nothing a person does not already have in their clipboard.
 require_sha() {
-  local name="${1:-value}" value="${2-}"
+  local name="${1:-value}" value="${2-}" why
   if [[ ! $value =~ ^[0-9a-f]{40}$ ]]; then
-    guard_refuse "$name must be exactly 40 lowercase hex characters, got '${value}' (${#value} characters)"
+    if [ "${#value}" -ne 40 ]; then
+      why="length ${#value}, expected 40"
+    elif [[ $value =~ [A-F] ]]; then
+      why="contains upper-case hex; this must be lower case"
+    else
+      why="contains a character outside 0-9a-f"
+    fi
+    guard_refuse "$name is not a 40-character lowercase Git SHA ($why); the value is not printed"
     return 2
   fi
 }

@@ -30,16 +30,22 @@ OTHER = "b" * 40
 def _real_bash() -> str | None:
     """A bash that is really bash.
 
-    Measured on this PC: the first ``bash`` on PATH is a BusyBox applet, which runs the script
-    but is not the shell the runbook's blocks are written for (``[[ =~ ]]``, ``local``).  A
-    candidate is accepted only when it reports a ``$BASH_VERSION``; BusyBox prints nothing.
+    Measured on this PC: the first ``bash`` on PATH is a BusyBox applet, which runs a script but
+    is not the shell the runbook's blocks are written for (``[[ =~ ]]``, ``local``).  A candidate
+    is accepted only when it reports a ``$BASH_VERSION``; BusyBox prints nothing.
+
+    The candidate paths use forward slashes on purpose: the Windows path written with backslashes
+    in a non-raw string turned ```` into a backspace character, so this helper found nothing
+    and every test skipped silently (#320 r2 F1).  Windows accepts forward slashes, so there is
+    nothing left to escape.
     """
 
     seen = []
     for candidate in (
         os.environ.get("GUARD_TEST_BASH"),
         shutil.which("bash"),
-        r"C:\Program Files\Gitinash.exe",
+        "C:/Program Files/Git/bin/bash.exe",
+        "C:/Program Files/Git/usr/bin/bash.exe",
         "/bin/bash",
         "/usr/bin/bash",
     ):
@@ -59,7 +65,21 @@ def _real_bash() -> str | None:
 
 
 BASH = _real_bash()
-pytestmark = pytest.mark.skipif(BASH is None, reason="a real bash is required")
+
+
+def test_a_real_bash_is_available_to_run_these_gates():
+    """No bash is a failure, not a skip: a silent skip is how F1 survived a review round.
+
+    The gates are shell functions, so a run that cannot find bash has measured nothing -- and
+    saying so out loud is the only way a green run means what it looks like.  Point
+    ``GUARD_TEST_BASH`` at one if it lives somewhere unusual.
+    """
+
+    assert BASH is not None, (
+        "no real bash found (tried GUARD_TEST_BASH, PATH, Git for Windows, /bin, /usr/bin); "
+        "the post-landing gate tests cannot run without one"
+    )
+
 
 FAKE_GH = """#!/usr/bin/env bash
 # Log every call, then answer it from $GUARD_FAKE_STATE.
@@ -98,6 +118,9 @@ else:
 
 def run_guard(tmp_path: Path, script: str, state: dict) -> subprocess.CompletedProcess:
     """Run a snippet with the guard sourced and a fake gh first on PATH."""
+
+    if BASH is None:  # the test above already failed; do not add two dozen more
+        pytest.skip("no real bash; see test_a_real_bash_is_available_to_run_these_gates")
 
     bin_dir = tmp_path / "bin"
     bin_dir.mkdir(exist_ok=True)
@@ -161,7 +184,23 @@ def test_a_value_that_is_not_an_exact_40_hex_sha_is_refused(tmp_path, value):
 
     result = run_guard(tmp_path, f'require_sha LAND "{value}"', {})
     assert result.returncode == 2, result.stdout + result.stderr
-    assert "exactly 40 lowercase hex characters" in result.stderr
+    assert "not a 40-character lowercase Git SHA" in result.stderr
+
+
+def test_a_refused_value_is_never_printed_back(tmp_path):
+    """A mis-paste must not become a logged secret (#320 r2 F2).
+
+    The value an operator pastes here may be a token rather than a SHA, so the refusal says the
+    length and the failing property and stops.  Each candidate below is a distinct string that
+    must not appear anywhere in the output.
+    """
+
+    for secret in ("ghp_averyrealtokenvalue12345678901234567890", "Deadbeef" * 5, "not-a-sha"):
+        result = run_guard(tmp_path, f'require_sha LAND "{secret}"', {})
+        assert result.returncode == 2
+        assert secret not in result.stderr + result.stdout
+        assert "the value is not printed" in result.stderr
+        assert f"length {len(secret)}" in result.stderr or "upper-case" in result.stderr             or "outside 0-9a-f" in result.stderr
 
 
 def test_the_landing_sha_itself_is_accepted(tmp_path):
