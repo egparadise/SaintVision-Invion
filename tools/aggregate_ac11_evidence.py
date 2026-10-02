@@ -690,7 +690,7 @@ RLS_REPORT_KEYS = frozenset({
 #: that adds or removes a table in ``inv``/``public`` makes this stale: regenerate with
 #: ``tools/collect_rls_evidence.py --disposable`` and repin the blob in the same reviewed change.
 RLS_CENSUS_REPO_PATH = "tools/rls-table-census.json"
-RLS_CENSUS_BLOB = "ee6c3f7fb1eefc25388893ff0bad76797dabe3ab"
+RLS_CENSUS_BLOB = "dc641de461553bda1eff2f6d6c83b2f7b37ed8c4"
 #: Tables that must appear in the measured set, derived from the pinned readable-key scope (the
 #: reviewed allowlist's own tables are anchored separately, because ``baselineAccepted`` has to
 #: match it exactly and every table it names has to be measured).  An independent anchor against

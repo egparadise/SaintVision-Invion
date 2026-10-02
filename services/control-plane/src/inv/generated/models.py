@@ -2315,7 +2315,7 @@ class WorkspacePrepareInput(BaseModel):
     checkoutId: UUID
     resumeId: UUID
     stepId: constr(min_length=1, max_length=200)
-    workload: WorkloadSpec | BuildApprovalReviewSummary
+    workload: WorkloadSpec
     expectedVersion: conint(ge=1, le=9007199254740991)
 
 
@@ -2457,7 +2457,7 @@ class ApprovalReviewView(BaseModel):
         extra='forbid',
     )
     approval: ApprovalView
-    workload: WorkloadSpec
+    workload: WorkloadSpec | BuildApprovalReviewSummary
     riskLevel: RiskLevel1
     policyDigest: ActionDigest
 

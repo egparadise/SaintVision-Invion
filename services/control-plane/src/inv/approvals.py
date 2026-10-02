@@ -299,20 +299,27 @@ class ApprovalStore:
             raise DomainError("AUTH-0032", "Approval review snapshot binding differs")
         return workload, policy, snapshot["policy_sha256"]
 
-    def _review_snapshot(self, conn, row):
+    def _review_snapshot(self, conn, row, require_redacted_build=False):
         workload, policy, policy_sha256 = self._review_documents(conn, row)
         if workload.get("kind") == "BuildRequest":
             preparation = conn.execute(
                 """SELECT p.source_revision,p.profile_id,p.profile_version,
                 bp.context_path,bp.dockerfile_path,bp.network_policy_id,
-                bp.cache_policy_id,bp.secret_aliases
+                bp.cache_mode,bp.secret_aliases
                 FROM inv.build_preparations p JOIN inv.build_policy_profiles bp
                   ON bp.profile_id=p.profile_id AND bp.version=p.profile_version
                 WHERE p.approval_id=%s""",
                 (row["approval_id"],),
             ).fetchone()
             if not preparation:
-                raise DomainError("AUTH-0032", "Build review authority unavailable")
+                # Pre-0061 internal callers already commit an exact BuildRequest/plan
+                # pair and still need quorum validation.  They have no public build
+                # review projection, however, so only the operator review endpoint
+                # refuses their non-redactable snapshot.  ``decide`` ignores this
+                # return value after _review_documents() has verified the authority.
+                if require_redacted_build:
+                    raise DomainError("AUTH-0032", "Build review authority unavailable")
+                return None
             workload = {
                 "kind": "build", "target": "image", "riskLevel": "L2",
                 "profileId": preparation["profile_id"],
@@ -321,10 +328,7 @@ class ApprovalStore:
                 "contextDigest": digest(preparation["context_path"]),
                 "dockerfileDigest": digest(preparation["dockerfile_path"]),
                 "networkMode": "none",
-                "cacheMode": (
-                    "disabled" if preparation["cache_policy_id"] == "cachepol_disabled"
-                    else "read-only"
-                ),
+                "cacheMode": preparation["cache_mode"],
                 "usesSecrets": bool(preparation["secret_aliases"]),
                 "secretCount": len(preparation["secret_aliases"]),
             }
@@ -337,7 +341,7 @@ class ApprovalStore:
             run, row = self._locked(conn, approval_id, project_id)
             self._grant(conn, project_id, principal.subject_id, "can_approve")
             self._current(conn, run, row, {"pending", "approved"})
-            result = self._review_snapshot(conn, row)
+            result = self._review_snapshot(conn, row, True)
             validate_contract("ApprovalReviewView", result)
             return result
 

@@ -3674,10 +3674,7 @@
           "maxLength": 200
         },
         "workload": {
-          "oneOf": [
-            { "$ref": "#/$defs/WorkloadSpec" },
-            { "$ref": "#/$defs/BuildApprovalReviewSummary" }
-          ]
+          "$ref": "#/$defs/WorkloadSpec"
         },
         "expectedVersion": {
           "type": "integer",
@@ -6786,7 +6783,10 @@
           "$ref": "#/$defs/ApprovalView"
         },
         "workload": {
-          "$ref": "#/$defs/WorkloadSpec"
+          "oneOf": [
+            { "$ref": "#/$defs/WorkloadSpec" },
+            { "$ref": "#/$defs/BuildApprovalReviewSummary" }
+          ]
         },
         "riskLevel": {
           "type": "string",

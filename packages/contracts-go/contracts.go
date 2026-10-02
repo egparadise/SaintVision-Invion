@@ -808,7 +808,7 @@ type WorkspacePrepareInput struct {
     CheckoutId string `json:"checkoutId"`
     ResumeId string `json:"resumeId"`
     StepId string `json:"stepId"`
-    Workload any `json:"workload"`
+    Workload WorkloadSpec `json:"workload"`
     ExpectedVersion int64 `json:"expectedVersion"`
 }
 
@@ -1461,7 +1461,7 @@ type ShardObservation struct {
 
 type ApprovalReviewView struct {
     Approval ApprovalView `json:"approval"`
-    Workload WorkloadSpec `json:"workload"`
+    Workload any `json:"workload"`
     RiskLevel string `json:"riskLevel"`
     PolicyDigest ActionDigest `json:"policyDigest"`
 }

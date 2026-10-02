@@ -42,6 +42,7 @@ def upgrade() -> None:
         sa.Column("target_stage", sa.Text(), nullable=False),
         sa.Column("network_policy_id", sa.Text(), nullable=False),
         sa.Column("cache_policy_id", sa.Text(), nullable=False),
+        sa.Column("cache_mode", sa.Text(), nullable=False),
         sa.Column("secret_aliases", postgresql.ARRAY(sa.Text()), nullable=False),
         sa.Column("timeout_seconds", sa.Integer(), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False,
@@ -53,6 +54,9 @@ def upgrade() -> None:
         sa.CheckConstraint("cardinality(project_ids) > 0", name="profile_projects_nonempty"),
         sa.CheckConstraint("target_platform ~ '^linux/(amd64|arm64)$'", name="profile_platform_allowed"),
         sa.CheckConstraint("network_policy_id = 'none'", name="profile_network_fail_closed"),
+        sa.CheckConstraint(
+            "cache_mode IN ('disabled','read-only')", name="profile_cache_mode_allowed"
+        ),
         sa.CheckConstraint("timeout_seconds BETWEEN 1 AND 3600", name="profile_timeout_bounded"),
         schema="inv",
     )
@@ -64,10 +68,13 @@ def upgrade() -> None:
         sa.Column("build_id", sa.Text(), nullable=False),
         sa.Column("source_run_id", sa.Text(), nullable=False),
         sa.Column("checkout_id", postgresql.UUID(as_uuid=True), nullable=False),
+        sa.Column("source_attempt", sa.Integer(), nullable=False),
+        sa.Column("source_recovery_epoch", postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column("source_revision", sa.BigInteger(), nullable=False),
         sa.Column("source_snapshot_sha256", sa.CHAR(64), nullable=False),
         sa.Column("source_capsule_sha256", sa.CHAR(64), nullable=False),
         sa.Column("source_capsule_locator", sa.Text(), nullable=False),
+        sa.Column("source_capsule_retained_until", sa.DateTime(timezone=True), nullable=False),
         sa.Column("approval_id", sa.Text(), nullable=False),
         sa.Column("requester_id", sa.Text(), nullable=False),
         sa.Column("profile_id", sa.Text(), nullable=False),
@@ -105,7 +112,10 @@ def upgrade() -> None:
              "inv.build_policy_profiles.version"],
         ),
         sa.CheckConstraint("build_id ~ '^bld_[0-9A-HJKMNP-TV-Z]{26}$'", name="build_id_shape"),
-        sa.CheckConstraint("source_revision > 0", name="source_revision_positive"),
+        sa.CheckConstraint(
+            "source_attempt > 0 AND source_revision > 0",
+            name="build_preparation_source_cursors_positive",
+        ),
         sa.CheckConstraint(
             "source_snapshot_sha256 ~ '^[0-9a-f]{64}$' AND "
             "source_capsule_sha256 ~ '^[0-9a-f]{64}$' AND "
@@ -117,6 +127,10 @@ def upgrade() -> None:
         sa.CheckConstraint("expected_run_version > 0 AND bound_run_version > 0",
                            name="build_preparation_versions_positive"),
         sa.CheckConstraint("expires_at > created_at", name="build_preparation_expiry_future"),
+        sa.CheckConstraint(
+            "source_capsule_retained_until >= created_at + interval '35 days'",
+            name="build_capsule_retention_minimum",
+        ),
         schema="inv",
     )
     op.create_index(

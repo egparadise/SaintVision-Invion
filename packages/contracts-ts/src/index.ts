@@ -806,7 +806,7 @@ export interface WorkspacePrepareInput {
   checkoutId: string;
   resumeId: string;
   stepId: string;
-  workload: (WorkloadSpec | BuildApprovalReviewSummary);
+  workload: WorkloadSpec;
   expectedVersion: number;
 }
 
@@ -1459,7 +1459,7 @@ export interface ShardObservation {
 
 export interface ApprovalReviewView {
   approval: ApprovalView;
-  workload: WorkloadSpec;
+  workload: (WorkloadSpec | BuildApprovalReviewSummary);
   riskLevel: "L0" | "L1" | "L2";
   policyDigest: ActionDigest;
 }

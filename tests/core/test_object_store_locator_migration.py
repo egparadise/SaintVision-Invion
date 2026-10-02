@@ -180,7 +180,7 @@ def test_object_store_locator_revision_is_irreversible_and_the_chain_has_one_hea
     measurements = next(r for r in revisions if r.revision == "0054_model_version_measurements")
     assert measurements.down_revision == "0053_eval_suite_project_scope"   # W3 seam (#209 v1.1), above 0053
     assert head.revision == "0061_build_preparations"
-    assert head.down_revision == "0059_build_execution_intents"
+    assert head.down_revision == "0060_build_execution_admissions"
 
 
 def test_definer_policy_tracks_object_store_locator_head_without_catalog_drift():

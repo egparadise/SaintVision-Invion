@@ -665,10 +665,12 @@ def create_app(
     @api.post("/v1/projects/{project}/runs/{run_id}/builds", status_code=201)
     async def prepare_build(project: str, run_id: str, request: Request,
                             identity=Depends(authenticated)):
+        from .build_preparations import validate_build_input
+
         data = await request.json()
         validate_contract("ProjectId", project)
         validate_contract("RunId", run_id)
-        validate_contract("BuildPreparationInput", data)
+        validate_build_input("BuildPreparationInput", data)
         return await run_in_threadpool(
             build_preparation_service().prepare, identity.principal, project, run_id, data,
             key=key(request),
@@ -677,6 +679,8 @@ def create_app(
     @api.post("/v1/projects/{project}/runs/{run_id}/builds/{build_id}/enqueue")
     async def enqueue_build(project: str, run_id: str, build_id: str, request: Request,
                             identity=Depends(authenticated)):
+        from .build_preparations import validate_build_input
+
         data = await request.json()
         validate_contract("ProjectId", project)
         validate_contract("RunId", run_id)
@@ -684,7 +688,7 @@ def create_app(
             r"bld_[0-9A-HJKMNP-TV-Z]{26}", build_id
         ):
             raise DomainError("VAL-0003", "Invalid build identifier", 422)
-        validate_contract("BuildEnqueueInput", data)
+        validate_build_input("BuildEnqueueInput", data)
         return await run_in_threadpool(
             build_preparation_service().enqueue, identity.principal, project, run_id, build_id,
             data, key=key(request),
@@ -1251,10 +1255,24 @@ def create_configured_app():
 
         build_preparations = None
         if "buildCapsuleProviderId" in settings:
-            from .build_preparations import BuildPreparationService
+            from .build_execution import PRODUCT_ENABLE_SETTING, PRODUCT_ENABLE_VALUE
+            from .build_preparations import (
+                BuildPreparationService,
+                configured_build_plan_authority,
+            )
+
+            plan_authority = None
+            if os.environ.get(PRODUCT_ENABLE_SETTING) == PRODUCT_ENABLE_VALUE:
+                plan_authority = configured_build_plan_authority(
+                    database,
+                    trusted_file(os.environ["INV_WORKER_CONFIG"]),
+                    environment=os.environ,
+                )
 
             build_preparations = BuildPreparationService(
-                database, object_stores.resolve(settings["buildCapsuleProviderId"])
+                database,
+                object_stores.resolve(settings["buildCapsuleProviderId"]),
+                plan_factory=plan_authority,
             )
 
         return create_app(
