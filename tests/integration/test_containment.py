@@ -461,13 +461,45 @@ def test_drain_preserves_inflight_execution_and_resume_needs_fresh_probe(remote)
     assert a.ops.get(a.people["requester"], a.e.node)["nodeStatus"] == "draining"
     assert change(a, "resume", 1)["control"]["nodeStatus"] == "online"
 
-    # A post-dispatch quarantine can be cleared only through the same person-backed,
-    # two-person-approved resume operation, after a fresh authenticated observation.
+    # A post-dispatch quarantine is Node-scoped rather than build/GPU scoped. Before the
+    # one global resume may clear it, every scope must have settled: an active lease keeps
+    # the Node quarantined until a trusted Node stop receipt releases it.
+    cleanup_run = a.e.runs.create(a.e.tenant, a.e.project)
+    for state in ("validated", "planned"):
+        cleanup_run = a.e.runs.transition(
+            a.e.tenant,
+            cleanup_run["runId"],
+            state,
+            expected_version=cleanup_run["version"],
+        )
+    cleanup_lease = a.e.leases.reserve(
+        a.e.tenant,
+        a.e.project,
+        cleanup_run["runId"],
+        [Allocation(a.e.resource, 1)],
+        key="quarantine-cleanup-proof",
+    )[0]
     with psycopg.connect(a.e.owner) as conn:
         conn.execute(
             "UPDATE inv.nodes SET status='quarantined' WHERE tenant_id=%s AND node_id=%s",
             (a.e.tenant, a.e.node),
         )
+    with pytest.raises(DomainError, match="LEASE-0003"):
+        change(a, "resume", 2, key="reconcile-active-scope")
+    a.e.leases.release(
+        a.e.tenant,
+        cleanup_lease["leaseId"],
+        cleanup_lease["fencingToken"],
+        authenticated_node_id=a.e.node,
+        stop_receipt=uuid4(),
+    )
+    cleanup_run = a.e.runs.transition(
+        a.e.tenant,
+        cleanup_run["runId"],
+        "cancelled",
+        expected_version=cleanup_run["version"],
+    )
+    with psycopg.connect(a.e.owner) as conn:
         conn.execute(
             "UPDATE inv.node_resource_snapshots SET received_at=clock_timestamp()-interval '1 minute' "
             "WHERE tenant_id=%s AND node_id=%s",
@@ -486,6 +518,12 @@ def test_drain_preserves_inflight_execution_and_resume_needs_fresh_probe(remote)
     assert audit["subject_id"] == a.people["bob"].subject_id
     assert audit["reason_code"] == "maintenance"
     assert audit["response"]["approvalId"] == reconciled["approvalId"]
+    with a.e.db.transaction(a.e.tenant) as conn:
+        released = conn.execute(
+            "SELECT released_at,stop_receipt FROM inv.resource_leases WHERE lease_id=%s",
+            (cleanup_lease["leaseId"],),
+        ).fetchone()
+    assert released["released_at"] is not None and released["stop_receipt"] is not None
 
 
 def test_restart_reconciler_keeps_kill_active_after_operator_is_revoked(remote):

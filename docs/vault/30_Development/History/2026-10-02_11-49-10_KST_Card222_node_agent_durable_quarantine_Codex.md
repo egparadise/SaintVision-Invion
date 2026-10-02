@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD222-NODE-QUARANTINE-20261002"
 title: "Card 222 node-agent durable quarantine channel"
-version: "1.2.0"
+version: "1.2.1"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T12:34:09+09:00"
+updated: "2026-10-02T12:46:10+09:00"
 source_of_truth: "Git"
 base_sha: "63ef20c4df9455eaae05758ff18d00ad46e5ff0f"
 reviewer: "Claude"
@@ -74,3 +74,11 @@ hosted Core·Backend exact-head 결과와 Claude r2 판정은 이 조치 commit 
 
 focused collector/service는 **92 passed, 1 skipped**다. quarantine resume의 실 PostgreSQL 경로는
 exact-head Backend에서 실행하며, Core의 Linux journal과 함께 green 확인 전 승인·완료를 주장하지 않는다.
+
+# Claude r3 잔여 판단
+
+격리는 build/GPU별 부분 상태가 아니라 Node 단위 scheduling fence로 유지한다. scope마다 Node를 online으로
+만드는 것은 단일 `inv.nodes.status` 모델과 모순되고 다른 scope의 위험을 조용히 해제하므로 허용하지 않는다.
+대신 어느 scope든 active lease·delivery·run이 남아 있으면 resume를 `LEASE-0003`으로 거부한다. quarantine
+전용 실 PG 회귀는 active lease 상태의 해제 거부와 trusted Node stop receipt에 의한 release를 확인한 뒤,
+fresh observation과 2인 승인으로만 복귀함을 고정한다. resume 자체를 cleanup 영수증으로 부르지는 않는다.

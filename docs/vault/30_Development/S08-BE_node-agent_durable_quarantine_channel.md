@@ -1,10 +1,10 @@
 ---
 doc_id: "S08-BE-NODE-QUARANTINE-001"
 title: "S08-BE node-agent durable quarantine channel"
-version: "1.2.0"
+version: "1.2.1"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T12:34:09+09:00"
+updated: "2026-10-02T12:46:10+09:00"
 source_of_truth: "Git"
 base_sha: "63ef20c4df9455eaae05758ff18d00ad46e5ff0f"
 reviewer: "Claude"
@@ -81,3 +81,9 @@ Node가 복구 의무를 기록했다고 확인할 수 있는 최소 채널을 �
   pending work 0건, fresh authenticated channel/resource snapshot, recovery epoch 일치가 모두 확인된 기존
   `POST /v1/nodes/{nodeId}/resume` 경로로만 해제된다. actor·reason·approval·응답은 append-only
   `inv.containment_requests`에 감사 기록된다.
+- 격리는 build/GPU별 부분 상태가 아니라 **Node 전체 스케줄링 fence**다. 따라서 resume도 scope 하나만
+  선택적으로 해제하지 않는다. 대신 `activeLeases=0`, `pendingDeliveries=0`, `unsettledRuns=0`이 모두
+  참이어야 하므로 어느 scope의 물리 cleanup도 미완인 동안 전역 fence가 유지된다. 실 PG 회귀 시험은
+  quarantine 뒤 active lease를 둔 resume를 `LEASE-0003`으로 거부하고, 인증된 Node stop receipt로 lease를
+  해제한 뒤에만 fresh observation+2인 승인으로 online 전환됨을 고정한다. 이 resume는 각 cleanup의 내용을
+  새로 증명하는 API가 아니라, 모든 durable cleanup/release 기록을 전제로 한 Node 단위 운영자 reconciliation이다.

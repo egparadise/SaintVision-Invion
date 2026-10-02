@@ -1,13 +1,13 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.270"
+version: "1.0.271"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T12:34:09+09:00"
+updated: "2026-10-02T12:46:10+09:00"
 source_of_truth: "Git"
 active_card: "CARD-222 node-agent durable quarantine channel"
-active_card_status: "Claude r2 N-1..N-3 fixed: transient preflight observation without fence, approved quarantine reconcile/resume, all secondary failures preserve original cause"
+active_card_status: "Claude r3 condition addressed: Node-wide quarantine resume requires every scope settled, trusted stop receipt, fresh observation and two-person approval"
 active_card_next: "Push r2 fixes, obtain exact-head Core/Backend green and Claude r3, then start Card 223 product caller on the approved head"
 ---
 
@@ -28,6 +28,10 @@ active_card_next: "Push r2 fixes, obtain exact-head Core/Backend green and Claud
   관측만 남긴다. post-dispatch 영구 격리는 `can_resume` 사람 운영자+2인 approval+settled+fresh
   authenticated Node evidence를 요구하는 기존 resume 경로로만 해제한다. driver 오류도 최초 원인을
   덮지 않으며 ±5초 freshness 변이는 단독 시험으로 사살했다.
+- Claude r3 잔여 판단은 build/GPU별 부분 해제가 아닌 Node-wide fence로 확정했다. quarantine 상태에서
+  active lease가 하나라도 있으면 resume는 `LEASE-0003`; trusted Node stop receipt가 release를 기록하고
+  모든 run/delivery가 settled된 뒤 fresh observation과 2인 승인이 있어야만 online이 된다. 이 경계를
+  quarantine 전용 실 PG 회귀로 고정했으며 resume를 cleanup 증명 자체로 과장하지 않는다.
 
 ## 2026-10-02 Card 211 — VF-CL CI receipt attestation
 
