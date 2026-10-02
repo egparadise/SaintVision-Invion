@@ -176,7 +176,7 @@ class BuildExecutionAdmissionStore:
                     FROM inv.build_execution_admissions
                     WHERE status='ready' AND next_attempt_at <= clock_timestamp()
                       AND NOT (run_id = ANY(%s::text[]))
-                    ORDER BY created_at,project_id,run_id
+                    ORDER BY next_attempt_at,retry_count,created_at,project_id,run_id
                     LIMIT 1 FOR UPDATE SKIP LOCKED""",
                     (sorted(seen_run_ids),),
                 ).fetchone()

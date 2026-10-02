@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD232-S08-BE-WORKER-PRODUCER-20261002"
 title: "Card 232 S08-BE product worker loop and trusted intent producer"
-version: "1.5.0"
+version: "1.6.0"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T20:22:58+09:00"
+updated: "2026-10-02T20:34:16+09:00"
 source_of_truth: "Git"
 base_sha: "c57697d2ab80877f44e189c1efe172a6dd03a7e6"
 reviewer: "Claude"
@@ -176,3 +176,18 @@ by one healthy admission. A single promotion call must visit each stale row once
 all 60 at `ready/RES-0003/retry_count=1`, promote the healthy row, and return in under
 15 seconds. Removing the visited-row SQL exclusion recreates the reviewer-observed
 long-running selection; reducing the budget below the healthy row prevents promotion.
+
+# Claude r4 cross-tick fairness correction
+
+A fixed 128-row budget bounded one call but did not by itself make progress fair across
+calls. With more than 128 stale rows and a one-second product-loop interval, the oldest
+retried rows became due again and `ORDER BY created_at` selected them ahead of every
+unseen row. Selection now orders by `next_attempt_at`, then `retry_count`, creation time,
+project, and Run. A retry therefore moves behind never-attempted due work even after its
+backoff expires; the existing due-time predicate still prevents early retry.
+
+The hosted real-PostgreSQL regression creates 200 stale admissions followed by one
+healthy admission. The first call consumes the 128-row budget and returns; the second
+must process the remaining stale rows and promote the healthy row. Both calls are capped
+at 20 seconds, every stale row has exactly one retry, and no row has a second retry.
+Removing the fair ordering restores the six-tick starvation class and fails the test.

@@ -139,6 +139,28 @@ def _record(env, *, grant=True):
     return admission
 
 
+def _records_on_stale_node(env, count):
+    admissions = [_record(env, grant=index == 0) for index in range(count)]
+    stale_node = new_id("nod")
+    with psycopg.connect(env.owner) as conn:
+        conn.execute(
+            """INSERT INTO inv.nodes(
+            tenant_id,node_id,status,heartbeat_at,recovery_epoch,clock_skew_seconds
+            ) VALUES (%s,%s,'online',clock_timestamp()-interval '1 hour',%s,0)""",
+            (env.tenant, stale_node, env.epoch),
+        )
+        conn.execute(
+            """UPDATE inv.resources SET node_id=%s
+            WHERE tenant_id=%s AND resource_id = ANY(%s::text[])""",
+            (
+                stale_node,
+                env.tenant,
+                [admission.plan["lease"]["resourceId"] for admission in admissions],
+            ),
+        )
+    return admissions
+
+
 def test_committed_admission_promotes_atomically_and_is_tenant_isolated(env):
     admission = _record(env)
     store = BuildExecutionAdmissionStore(env.db)
@@ -395,25 +417,7 @@ def test_retryable_stale_admission_does_not_block_next_due_admission(env):
 
 
 def test_promotion_tick_bounds_sixty_stale_admissions_and_reaches_healthy_row(env):
-    stale = [_record(env, grant=index == 0) for index in range(60)]
-    stale_node = new_id("nod")
-    with psycopg.connect(env.owner) as conn:
-        conn.execute(
-            """INSERT INTO inv.nodes(
-            tenant_id,node_id,status,heartbeat_at,recovery_epoch,clock_skew_seconds
-            ) VALUES (%s,%s,'online',clock_timestamp()-interval '1 hour',%s,0)""",
-            (env.tenant, stale_node, env.epoch),
-        )
-        conn.execute(
-            """UPDATE inv.resources SET node_id=%s
-            WHERE tenant_id=%s AND resource_id = ANY(%s::text[])""",
-            (
-                stale_node,
-                env.tenant,
-                [admission.plan["lease"]["resourceId"] for admission in stale],
-            ),
-        )
-
+    stale = _records_on_stale_node(env, 60)
     healthy = _record(env, grant=False)
     started = monotonic()
     promoted = BuildExecutionAdmissionStore(env.db).promote_next(env.tenant)
@@ -431,3 +435,29 @@ def test_promotion_tick_bounds_sixty_stale_admissions_and_reaches_healthy_row(en
             ([admission.run_id for admission in stale],),
         ).fetchone()
     assert stale_counts == (60, 60)
+
+
+def test_promotion_order_reaches_healthy_row_beyond_one_tick_budget(env):
+    stale = _records_on_stale_node(env, 200)
+    healthy = _record(env, grant=False)
+    store = BuildExecutionAdmissionStore(env.db)
+
+    first_started = monotonic()
+    assert store.promote_next(env.tenant) is None
+    first_elapsed = monotonic() - first_started
+    second_started = monotonic()
+    promoted = store.promote_next(env.tenant)
+    second_elapsed = monotonic() - second_started
+
+    assert promoted == healthy
+    assert first_elapsed < 20
+    assert second_elapsed < 20
+    with psycopg.connect(env.owner) as conn:
+        attempted = conn.execute(
+            """SELECT count(*) FILTER (WHERE retry_count=1),
+            count(*) FILTER (WHERE retry_count>1)
+            FROM inv.build_execution_admissions
+            WHERE run_id = ANY(%s::text[])""",
+            ([admission.run_id for admission in stale],),
+        ).fetchone()
+    assert attempted == (200, 0)
