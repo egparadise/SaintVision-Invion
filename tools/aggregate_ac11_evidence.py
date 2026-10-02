@@ -33,13 +33,13 @@ DEFAULT_ALLOWLIST = (
     ROOT / ALLOWLIST_REPO_PATH
 )
 TARGET_REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
-TARGET_REGISTRY_BLOB = "f2e705f853d06fc805d96e9d858a8a3f08566454"
+TARGET_REGISTRY_BLOB = "c3db4aafd1c90e12e93b1cd2c465438d2763a5b3"
 ALLOWLIST_BLOB = "6c57afcf7b8b4e4a2ecb874f41b01501e48a2a74"
 ALLOWLIST_CANONICAL_SHA256 = "ec896c3f9398c1e888b1c90e4c287ae06cab92f5a9ad4785ff66be38ecb296c2"
 SCAN_ALLOWLIST_REPO_PATH = (
     "docs/vault/30_Development/Evidence/s11-security-dependency-sast-allowlist-v1.json"
 )
-SCAN_ALLOWLIST_BLOB = "8975f7bc9e56e8b8b0e8f70187ad06c370257c97"
+SCAN_ALLOWLIST_BLOB = "1d65a5b718d82414fa0479478150b078074984a4"
 #: The importer that may write this axis's envelopes, pinned by path here and by blob in
 #: the reviewed allowlist above (#313 F-R3).
 SECURITY_IMPORTER_REPO_PATH = "tools/import_ac11_security_scan.py"
@@ -134,7 +134,12 @@ class RepositoryGit:
 
     def _run(self, *args: str) -> str:
         result = subprocess.run(
-            ["git", *args], cwd=self.root, text=True, capture_output=True, timeout=15
+            ["git", *args],
+            cwd=self.root,
+            text=True,
+            encoding="utf-8",
+            capture_output=True,
+            timeout=15,
         )
         if result.returncode:
             raise ValueError("git provenance is unreachable")
@@ -148,6 +153,7 @@ class RepositoryGit:
             ["git", "merge-base", "--is-ancestor", ancestor, descendant],
             cwd=self.root,
             text=True,
+            encoding="utf-8",
             capture_output=True,
             timeout=15,
         )
