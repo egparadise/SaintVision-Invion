@@ -146,3 +146,35 @@ def test_a_head_that_is_not_in_this_repository_is_refused(tmp_path, monkeypatch)
             "--source-head-sha", "f" * 40,
             "--output-dir", str(tmp_path),
         ])
+
+
+def test_the_boundary_is_measured_over_the_collector_s_own_role_population(monkeypatch):
+    """Asking fewer roles changes the verdict, so the population is the collector's, not ours.
+
+    Measured on this tree: with the collector's eight roles the boundary comes out UNMEASURED,
+    because one row's identity cannot be verified for ``inv_cancel_bridge_owner``; with a
+    two-role list that row is never asked about and the same database answers PASS.  A verdict
+    obtained by asking less is not this axis's measurement, so the producer reads
+    ``collect_rls_evidence.DEFAULT_ROLES`` instead of carrying a list of its own.
+    """
+
+    import collect_rls_evidence as rls
+
+    seen: dict[str, object] = {}
+
+    def fake_collect(dsn, roles, tenant):
+        seen["roles"] = roles
+        return {
+            "roles": {"inv_app": {"present": True}},
+            "ground_truth": {"public.projects": {"tenantScoped": True}},
+            "definer_functions": [],
+        }
+
+    monkeypatch.setattr(rls, "collect", fake_collect)
+    monkeypatch.setattr(rls, "evaluate", lambda observation: [])
+    monkeypatch.setattr(rls, "unverified_identities", lambda observation: [])
+    report = producer.rls_report("postgresql://unused", None, APPROVED_ALLOWLIST)
+    assert seen["roles"] == rls.DEFAULT_ROLES
+    assert len(rls.DEFAULT_ROLES) == 8
+    assert report["measuredRoles"] == list(rls.DEFAULT_ROLES)
+    assert report["exitCode"] == 0 and report["verdict"] == "PASS"

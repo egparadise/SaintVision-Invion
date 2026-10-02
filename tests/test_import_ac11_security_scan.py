@@ -505,6 +505,30 @@ def test_a_measured_database_failure_is_carried_as_a_failure():
     assert "SEC-RLS-001 recomputes MEASURED_FAIL" in envelope["reason"]
 
 
+def test_a_failure_outranks_an_unobserved_report_in_the_same_envelope():
+    """Precedence matters when both are present: a measured failure is the louder fact.
+
+    The aggregator answers MEASURED_FAIL when any report failed, even if another is
+    unobserved, so the envelope must say the same thing -- otherwise a run with a real RLS
+    violation would be filed as "not observed" because something else was unavailable.
+    """
+
+    unavailable = definer_report(
+        status="unavailable", exitCode=2, unsafe=None, functions=None,
+    )
+    unavailable.pop("functions")
+    violated = rls_report(
+        exitCode=1,
+        verdict="VIOLATIONS",
+        violations=[{"role": "inv_app", "table": "public.audit_events", "rule": "E2",
+                     "detail": "tenant-scoped readable table without enabled+forced RLS"}],
+    )
+    envelope = imported(database=(unavailable, violated), vf=vf_evidence())
+    assert envelope["verdict"] == "MEASURED_FAIL"
+    assert envelope["threatReportVerdicts"]["SEC-DEF-001"] == "NOT_OBSERVED"
+    assert envelope["threatReportVerdicts"]["SEC-RLS-001"] == "MEASURED_FAIL"
+
+
 def test_a_database_report_from_another_run_is_refused():
     """One envelope, one run: a report about another run is not this artifact's evidence."""
 
@@ -795,7 +819,10 @@ def test_the_reviewed_security_allowlist_still_describes_this_tree():
        the three newer privileged functions are reviewed in.
     2. ``secVf001.workflow`` pins a blob of the browser lane that ``0f614152`` moved on
        2026-10-01 -- the same commit that moved the dependency/SAST workflow pin (#313 F-R3).
-       SEC-VF-001 is INVALID_RUN until that pin is re-reviewed.
+       ``evaluate_vf`` does not see it, because it compares the report's ``toolFiles`` with the
+       allowlist rather than with the tree; the aggregator makes that comparison only once all
+       four threat reports are present.  So the drift is latent and turns the *axis* into
+       INVALID_RUN the moment the first gap closes -- the two have to be reviewed together.
     """
 
     policy = json.loads((ROOT / "tools/definer-policy.json").read_text(encoding="utf-8"))
