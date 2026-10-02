@@ -255,6 +255,123 @@ def test_missing_bundle_and_failed_signature_are_fail_closed(tmp_path):
         )
 
 
+def test_gh_output_is_read_as_utf8_whatever_the_host_locale_is(tmp_path):
+    """The verifier must state the encoding instead of inheriting the console's.
+
+    Measured on this PC (#339 r1 F1): with the default locale (cp949) and no ``PYTHONUTF8``,
+    ``text=True`` decoded ``gh attestation verify --format json`` with cp949 and raised
+    ``UnicodeDecodeError`` before any verification happened -- then ``stdout=None`` turned that
+    into a ``TypeError`` and exit 1.  Adding ``PYTHONUTF8=1`` to the runbook would only hide it
+    for the person who remembers the variable.
+    """
+
+    receipt = tmp_path / "VF-CL-04.json"
+    write_receipt(receipt)
+    bundle = tmp_path / "VF-CL-04.sigstore.json"
+    bundle.write_text("{}", encoding="utf-8")
+    seen = {}
+
+    def run(command, **kwargs):
+        seen.update(kwargs)
+        # A real ``gh`` writes UTF-8, and its stderr carries localized text; both are read with
+        # the stated encoding rather than the console's.
+        payload = json.dumps(verification_for(receipt), ensure_ascii=False)
+        return subprocess.CompletedProcess(command, 0, payload, "서명 확인 ✓")
+
+    verifier.verify(
+        receipt, bundle, expected_repository=creator.REPOSITORY, expected_workflow=creator.WORKFLOW_PATH,
+        expected_head=HEAD, expected_ref=REF, runner=run,
+    )
+    assert seen.get("encoding") == "utf-8", "the encoding is stated, not inherited"
+    assert seen.get("errors") == "strict", "a byte that is not UTF-8 must refuse, not be replaced"
+
+
+def test_output_that_is_not_utf8_is_an_explicit_refusal(tmp_path):
+    """What the host actually did: the decode raises, and that must become our error."""
+
+    receipt = tmp_path / "VF-CL-04.json"
+    write_receipt(receipt)
+    bundle = tmp_path / "VF-CL-04.sigstore.json"
+    bundle.write_text("{}", encoding="utf-8")
+
+    def run(command, **kwargs):
+        # subprocess raises this from inside run() when the child's bytes are not UTF-8.
+        raise UnicodeDecodeError("utf-8", b"\xff", 0, 1, "invalid start byte")
+
+    with pytest.raises(verifier.AttestationError, match="not valid UTF-8"):
+        verifier.verify(
+            receipt, bundle, expected_repository=creator.REPOSITORY, expected_workflow=creator.WORKFLOW_PATH,
+            expected_head=HEAD, expected_ref=REF, runner=run,
+        )
+
+
+@pytest.mark.parametrize("stdout", [None, "", "   "])
+def test_no_output_to_verify_is_an_explicit_refusal(tmp_path, stdout):
+    """``json.loads(None)`` is a ``TypeError``; a refusal has to say what was missing."""
+
+    receipt = tmp_path / "VF-CL-04.json"
+    write_receipt(receipt)
+    bundle = tmp_path / "VF-CL-04.sigstore.json"
+    bundle.write_text("{}", encoding="utf-8")
+
+    def run(command, **kwargs):
+        return subprocess.CompletedProcess(command, 0, stdout, "")
+
+    with pytest.raises(verifier.AttestationError, match="no output to verify"):
+        verifier.verify(
+            receipt, bundle, expected_repository=creator.REPOSITORY, expected_workflow=creator.WORKFLOW_PATH,
+            expected_head=HEAD, expected_ref=REF, runner=run,
+        )
+
+
+def test_a_real_child_process_decodes_without_pythonutf8(tmp_path, monkeypatch):
+    """End to end over the real ``subprocess``: a child printing UTF-8 while the locale is not.
+
+    ``PYTHONUTF8`` and ``PYTHONIOENCODING`` are removed, so the parent's default would be the
+    host's locale encoding (cp949 on this PC).  The child writes bytes cp949 cannot decode;
+    the verifier reads them because the encoding is stated at the call site (#339 r1 F1).
+    """
+
+    import os
+    import subprocess as real_subprocess
+    import sys as real_sys
+
+    receipt = tmp_path / "VF-CL-04.json"
+    write_receipt(receipt)
+    bundle = tmp_path / "VF-CL-04.sigstore.json"
+    bundle.write_text("{}", encoding="utf-8")
+    # The payload itself carries non-ASCII, and the test asserts the **exact** round trip --
+    # a wrong codec either raises or silently mojibakes, and both must fail here.
+    document = verification_for(receipt)
+    document[0]["signerDisplayName"] = "서명자 ✓ Signer"
+    payload = json.dumps(document, ensure_ascii=False)
+    stdout_bytes = (payload + chr(10)).encode("utf-8")
+    stderr_bytes = ("\u2713 서명 확인" + chr(10)).encode("utf-8")
+    script = tmp_path / "fake_gh.py"
+    script.write_text(
+        "import sys" + chr(10)
+        + "sys.stdout.buffer.write(%r)" % stdout_bytes + chr(10)
+        + "sys.stderr.buffer.write(%r)" % stderr_bytes + chr(10),
+        encoding="utf-8",
+    )
+    monkeypatch.delenv("PYTHONUTF8", raising=False)
+    monkeypatch.delenv("PYTHONIOENCODING", raising=False)
+
+    def run(command, **kwargs):
+        return real_subprocess.run([real_sys.executable, str(script)], **kwargs)
+
+    out = tmp_path / "verification.json"
+    result = verifier.verify(
+        receipt, bundle, expected_repository=creator.REPOSITORY,
+        expected_workflow=creator.WORKFLOW_PATH, expected_head=HEAD,
+        expected_ref=REF, runner=run, output_path=out,
+    )
+    assert result["headSha"] == HEAD
+    assert os.environ.get("PYTHONUTF8") is None
+    written = json.loads(out.read_text(encoding="utf-8"))
+    assert written[0]["signerDisplayName"] == "서명자 ✓ Signer", "decoded text must survive exactly"
+
+
 def test_workflow_grants_signing_permissions_only_to_manual_attestation_job():
     workflow = yaml.safe_load(Path(".github/workflows/s12-acceptance-evidence.yml").read_text(
         encoding="utf-8"
