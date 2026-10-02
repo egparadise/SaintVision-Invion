@@ -1,4 +1,4 @@
-# 2026-10-02 15:03:00 KST — Card 226: 모델 스튜디오 화면 (ModelStudioView) 색상 리터럴 전수 토큰화(26종/78 occurrences→0), 상태 색 정합성 및 접근성 승격 (r2)
+# 2026-10-02 15:43:00 KST — Card 226: 모델 스튜디오 화면 (ModelStudioView) 색상 리터럴 전수 토큰화(26종/78 occurrences→0), 상태 색 정합성 및 접근성 승격 (r3)
 
 ## 1. 개요 및 변경 목적
 - **작업 ID**: Card 226 (ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inventory)
@@ -6,7 +6,7 @@
 - **담당자**: Gemini (Antigravity)
 - **작업 브랜치**: `agent/gemini/c226-model-studio-contrast`
 - **기반 커밋 (Base)**: `72fe74ce` (PR #321 r3 최종 반영 head)
-- **KST 시각**: 2026-10-02 15:03:00 KST
+- **KST 시각**: 2026-10-02 15:43:00 KST
 
 ### 1.1 Claude UI r1 및 Codex r1 피드백 조치 내역 (r2)
 1. **[차단 / High] H1. DEF-S11-09 버튼 토큰 규격 준수 (exact-head hosted frontend 회복)**:
@@ -36,6 +36,17 @@
    - Index 보드 PR 번호 오타(#326 -> #324) 정정.
    - Gemini 보드 Card 220 r3 확인 기준 줄 복원 및 `{}` 오타 정정.
 
+### 1.2 Codex r2 피드백 조치 내역 (r3)
+1. **[High] F-R1. wire 계약 enum 일치 및 계약 외 상태 fail-closed UNKNOWN 격하**:
+   - `REPLICA_STATUS_CONFIG`: wire 계약(`apps/web/src/contracts/virtualFabric.ts:194`)은 엄격히 `'healthy' | 'repairing' | 'missing'` 3종이므로 wire 계약 외 임의 별칭이었던 `unhealthy` 및 `degraded`를 config 표에서 제거하여 known으로 부당 승격되는 결함 원천 차단.
+   - `MODEL_AVAILABILITY_CONFIG`: 관측 API 계약(`apps/web/src/shared/api/fabricObservation.ts:38`)은 wire에서 `currentAvailability !== 'unknown'` 규칙에 따라 UI 상단 계약이 `unknown`만 정의하므로 계약 외 클라이언트 합성 상태였던 `observed`를 config 표에서 제거.
+   - 불변식 단언: `expect(Object.keys(REPLICA_STATUS_CONFIG).sort()).toEqual(['healthy', 'missing', 'repairing'])` 및 `expect(Object.keys(MODEL_AVAILABILITY_CONFIG).sort()).toEqual(['unknown'])` 시험 고정.
+   - 부정 시험: `unhealthy`, `degraded`, `observed`, `invalid_corrupted_state`, `bogus`, `toString`, `constructor`, `__proto__` 등 계약 외/프로토타입 문자열이 입력될 때 fail-closed되어 `var(--color-status-unknown)` 및 `알 수 없음 (<status>)`로 렌더됨을 DOM 및 helper 단언으로 검증.
+   - AST 커버리지 래칫: 설정 객체 축소 반영 (totalStyleAttrs 83, checkedObjects 21, checkedPairs 39, coveredColorObjects 39, checkedBorderObjects 26, checkedBorderPairs 26, violations 0).
+2. **[Low] F-R2. M23 focus ring 변이의 단일 유효 JSX style 주입 개정**:
+   - r2에서 M23이 `<button style={{ outline: 'none' }} style={{...}}>` 형태로 중복 JSX 속성을 생성하여 구문 오류로 죽던 문제 수정.
+   - 기존 style 객체 내부에 `outline: 'none'`을 주입하는 단일 유효 변이로 재작성하여 Test 9j-2 (AST outline 가드) 및 Test 9l (DOM focus ring 가드)에 의해 100% 사살됨을 실측.
+
 ---
 
 ## 2. 실측 명도 대비 지표 (§2.1 대비 표본)
@@ -54,7 +65,6 @@
 | 매니페스트 생성시각 | manifest committed at / surface | `#94a3b8` on `#1e293b` | 5.71:1 / 5.71:1 | `--color-text-secondary` on `--color-bg-surface` | 7.58:1 | 14.33:1 | >= 4.5:1 | PASS |
 | 매니페스트 해시 | manifest sha hash / surface | `#94a3b8` on `#1e293b` | 5.71:1 / 5.71:1 | `--color-text-secondary` on `--color-bg-surface` | 7.58:1 | 14.33:1 | >= 4.5:1 | PASS |
 | 미지 가용성 배지 | manifest availability unknown / surface | `#f59e0b` on `#1e293b` | 6.81:1 / 6.81:1 | `--color-status-unknown` on `--color-bg-surface` | 7.09:1 | 7.03:1 | >= 4.5:1 | PASS |
-| 관측 가용성 배지 | manifest availability observed / surface | `#38bdf8` on `#1e293b` | 6.83:1 / 6.83:1 | `--color-status-active` on `--color-bg-surface` | 5.93:1 | 8.28:1 | >= 4.5:1 | PASS |
 | 실행 재검증 안내 | manifest verify notice / surface | `#f59e0b` on `#1e293b` | 6.81:1 / 6.81:1 | `--color-status-degraded` on `--color-bg-surface` | 5.02:1 | 8.26:1 | >= 4.5:1 | PASS |
 | 미관측 샤드 안내 | unobserved shards notice / surface | `#94a3b8` on `#1e293b` | 5.71:1 / 5.71:1 | `--color-text-secondary` on `--color-bg-surface` | 7.58:1 | 14.33:1 | >= 4.5:1 | PASS |
 | 샤드 복구 에러 | shard repair error / subtle | `#fca5a5` on `#3d2d3c` | 6.75:1 / 6.75:1 | `--color-status-offline` on `--color-bg-subtle` | 5.91:1 | 5.31:1 | >= 4.5:1 | PASS |
@@ -62,7 +72,8 @@
 | 샤드 복구 성공 | shard repair success / subtle | `#6ee7b7` on `#1c3f46` | 7.45:1 / 7.45:1 | `--color-status-online` on `--color-bg-subtle` | 4.58:1 | 6.44:1 | >= 4.5:1 | PASS |
 | 샤드 테이블 헤더 | shards table header / surface | `#94a3b8` on `#1e293b` | 5.71:1 / 5.71:1 | `--color-text-secondary` on `--color-bg-surface` | 7.58:1 | 14.33:1 | >= 4.5:1 | PASS |
 | 정상 복제본 배지 | replica badge healthy / subtle | `#6ee7b7` on `#1b4649` | 6.82:1 / 6.82:1 | `--color-status-online` on `--color-bg-subtle` | 4.58:1 | 6.44:1 | >= 4.5:1 | PASS |
-| 이상 복제본 배지 | replica badge unhealthy / subtle | `#fca5a5` on `#482e3d` | 6.38:1 / 6.38:1 | `--color-status-offline` on `--color-bg-subtle` | 5.91:1 | 5.31:1 | >= 4.5:1 | PASS |
+| 복구 중 복제본 배지 | replica badge repairing / subtle | `#fde68a` on `#494031` | 8.18:1 / 8.18:1 | `--color-status-degraded` on `--color-bg-subtle` | 4.58:1 | 6.83:1 | >= 4.5:1 | PASS |
+| 유실 복제본 배지 | replica badge missing / subtle | `#fca5a5` on `#482e3d` | 6.38:1 / 6.38:1 | `--color-status-offline` on `--color-bg-subtle` | 5.91:1 | 5.31:1 | >= 4.5:1 | PASS |
 | 샤드 저하 알림 배지 | shard degradation badge / subtle | `#fde68a` on `#494031` | 8.18:1 / 8.18:1 | `--color-status-degraded` on `--color-bg-subtle` | 4.58:1 | 6.83:1 | >= 4.5:1 | PASS |
 | 샤드 복구 실행 버튼 | shard repair button / surface | `#ffffff` on `#d97706` | 3.19:1 / 3.19:1 (FAIL) | `--color-text-inverse` on `--color-status-degraded` | 5.02:1 | 8.31:1 | >= 4.5:1 | PASS |
 | 배치 가능 계획 배지 | plan feasible badge / subtle | `#6ee7b7` on `#1b4649` | 6.82:1 / 6.82:1 | `--color-status-online` on `--color-bg-subtle` | 4.58:1 | 6.44:1 | >= 4.5:1 | PASS |
@@ -83,7 +94,6 @@ query status error / canvas              | Before:  6.45:1 (L actual on #0f172a)
 manifest committed at / surface          | Before:  5.71:1 (L actual on #1e293b) /  5.71:1 (D actual on #1e293b) | After:  7.58:1 (Light) / 14.33:1 (Dark)
 manifest sha hash / surface              | Before:  5.71:1 (L actual on #1e293b) /  5.71:1 (D actual on #1e293b) | After:  7.58:1 (Light) / 14.33:1 (Dark)
 manifest availability unknown / surface  | Before:  6.81:1 (L actual on #1e293b) /  6.81:1 (D actual on #1e293b) | After:  7.09:1 (Light) /  7.03:1 (Dark)
-manifest availability observed / surface | Before:  6.83:1 (L actual on #1e293b) /  6.83:1 (D actual on #1e293b) | After:  5.93:1 (Light) /  8.28:1 (Dark)
 manifest verify notice / surface         | Before:  6.81:1 (L actual on #1e293b) /  6.81:1 (D actual on #1e293b) | After:  5.02:1 (Light) /  8.26:1 (Dark)
 unobserved shards notice / surface       | Before:  5.71:1 (L actual on #1e293b) /  5.71:1 (D actual on #1e293b) | After:  7.58:1 (Light) / 14.33:1 (Dark)
 shard repair error / subtle              | Before:  6.75:1 (L actual on #3d2d3c) /  6.75:1 (D actual on #3d2d3c) | After:  5.91:1 (Light) /  5.31:1 (Dark)
@@ -91,7 +101,8 @@ shard repair warning / subtle            | Before:  8.97:1 (L actual on #3e3b34)
 shard repair success / subtle            | Before:  7.45:1 (L actual on #1c3f46) /  7.45:1 (D actual on #1c3f46) | After:  4.58:1 (Light) /  6.44:1 (Dark)
 shards table header / surface            | Before:  5.71:1 (L actual on #1e293b) /  5.71:1 (D actual on #1e293b) | After:  7.58:1 (Light) / 14.33:1 (Dark)
 replica badge healthy / subtle           | Before:  6.82:1 (L actual on #1b4649) /  6.82:1 (D actual on #1b4649) | After:  4.58:1 (Light) /  6.44:1 (Dark)
-replica badge unhealthy / subtle         | Before:  6.38:1 (L actual on #482e3d) /  6.38:1 (D actual on #482e3d) | After:  5.91:1 (Light) /  5.31:1 (Dark)
+replica badge repairing / subtle         | Before:  8.18:1 (L actual on #494031) /  8.18:1 (D actual on #494031) | After:  4.58:1 (Light) /  6.83:1 (Dark)
+replica badge missing / subtle           | Before:  6.38:1 (L actual on #482e3d) /  6.38:1 (D actual on #482e3d) | After:  5.91:1 (Light) /  5.31:1 (Dark)
 shard degradation badge / subtle         | Before:  8.18:1 (L actual on #494031) /  8.18:1 (D actual on #494031) | After:  4.58:1 (Light) /  6.83:1 (Dark)
 shard repair button / surface            | Before:  3.19:1 (L actual on #d97706) /  3.19:1 (D actual on #d97706) | After:  5.02:1 (Light) /  8.31:1 (Dark)
 plan feasible badge / subtle             | Before:  6.82:1 (L actual on #1b4649) /  6.82:1 (D actual on #1b4649) | After:  4.58:1 (Light) /  6.44:1 (Dark)
@@ -106,13 +117,13 @@ node eligible text / surface             | Before:  5.77:1 (L actual on #1e293b)
 ## 3. 정적 AST 검사 및 커버리지 래칫 (Test 9j-2)
 
 - **Target File**: `features/desktop/ModelStudioView.tsx`
-- **Total Style Attributes**: `86` (100% 정합)
-- **Checked Objects (Explicit style objects)**: `24`
-- **Checked Pairs (Evaluated color-background pairings)**: `42`
+- **Total Style Attributes**: `83` (100% 정합)
+- **Checked Objects (Explicit style objects)**: `21`
+- **Checked Pairs (Evaluated color-background pairings)**: `39`
 - **Unbound Color Objects**: `18`
-- **Covered Color Objects**: `42`
-- **Checked Border Objects**: `29`
-- **Checked Border Pairs**: `29`
+- **Covered Color Objects**: `39`
+- **Checked Border Objects**: `26`
+- **Checked Border Pairs**: `26`
 - **Violations**: `[]` (0건)
 - **Hardcoded Color Literal Residual**: `0건`
 
@@ -133,7 +144,7 @@ node eligible text / surface             | Before:  5.77:1 (L actual on #1e293b)
  [PASS] KILLED    | ModelStudioView: shard-degradation-badge opacity degraded to 0.4
  [PASS] KILLED    | ModelStudioView: REPLICA_STATUS_CONFIG.healthy.color reverted to legacy literal #10b981
  [PASS] KILLED    | ModelStudioView: PLAN_FEASIBILITY_CONFIG.infeasible.color reverted to legacy literal #ef4444
- [PASS] KILLED    | ModelStudioView: replica unhealthy color collapsed to status-online (healthy collision)
+ [PASS] KILLED    | ModelStudioView: REPLICA_STATUS_CONFIG injects out-of-contract enum unhealthy
  [PASS] KILLED    | ModelStudioView: plan infeasible color collapsed to status-online (feasible collision)
  [PASS] KILLED    | ModelStudioView: shard-degradation-badge text label removed
  [PASS] KILLED    | ModelStudioView: plan-feasible-badge text label removed
@@ -143,7 +154,7 @@ node eligible text / surface             | Before:  5.77:1 (L actual on #1e293b)
  [PASS] KILLED    | ModelStudioView: query-model-btn inject named color lightgray
  [PASS] KILLED    | ModelStudioView: getReplicaStatusConfig uses status in REPLICA_STATUS_CONFIG bypassing prototype keys
  [PASS] KILLED    | ModelStudioView: query-model-btn outline ring suppressed with outline: 0
- [PASS] KILLED    | ModelStudioView: getModelAvailabilityConfig fail-open fallback returns observed
+ [PASS] KILLED    | ModelStudioView: MODEL_AVAILABILITY_CONFIG injects out-of-contract enum observed
  [PASS] KILLED    | ModelStudioView: getModelAvailabilityConfig uses availability in MODEL_AVAILABILITY_CONFIG bypassing prototype keys
  [PASS] KILLED    | ModelStudioView: replica repairing color collapsed to status-online (healthy collision)
  [PASS] KILLED    | ModelStudioView: replica missing color collapsed to status-online (healthy collision)

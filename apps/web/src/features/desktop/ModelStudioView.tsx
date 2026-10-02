@@ -38,27 +38,9 @@ export const REPLICA_STATUS_CONFIG = {
     border: 'var(--color-status-offline)',
     label: '유실 (MISSING)',
   },
-  unhealthy: {
-    color: 'var(--color-status-offline)',
-    bg: 'var(--color-bg-subtle)',
-    border: 'var(--color-status-offline)',
-    label: '이상 (UNHEALTHY)',
-  },
-  degraded: {
-    color: 'var(--color-status-degraded)',
-    bg: 'var(--color-bg-subtle)',
-    border: 'var(--color-status-degraded)',
-    label: '저하 (DEGRADED)',
-  },
 } as const;
 
 export const MODEL_AVAILABILITY_CONFIG = {
-  observed: {
-    color: 'var(--color-status-active)',
-    bg: 'var(--color-bg-subtle)',
-    border: 'var(--color-status-active)',
-    label: '관측 완료 · 분산 패브릭 연동',
-  },
   unknown: {
     color: 'var(--color-status-unknown)',
     bg: 'var(--color-bg-subtle)',

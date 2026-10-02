@@ -5093,7 +5093,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       shardCount: 2,
       licensePolicy: 'Enterprise-Internal',
       classification: 'confidential',
-      currentAvailability: 'observed',
+      currentAvailability: 'unknown',
       shards: [
         {
           shardIndex: 0,
@@ -5146,11 +5146,11 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
 
       const availBadge = container.querySelector('[data-testid="model-availability-status"]') as HTMLElement;
       expect(availBadge).not.toBeNull();
-      expect(availBadge.style.color).toBe('var(--color-status-active)');
+      expect(availBadge.style.color).toBe('var(--color-status-unknown)');
       expect(availBadge.style.opacity || '1', 'Availability badge must not have degraded opacity').toBe('1');
       expect(window.getComputedStyle(availBadge).opacity || '1').toBe('1');
       expect(window.getComputedStyle(availBadge).opacity).not.toMatch(/^(0\.[0-9]+|0)$/);
-      expect(availBadge.textContent).toContain('관측 완료');
+      expect(availBadge.textContent).toContain('알 수 없음');
 
       // 4. Shard Matrix Table & Badges
       const shardsTable = container.querySelector('[data-testid="shards-table"]');
@@ -5264,33 +5264,30 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
         expect(getContrast(darkTokens[cVar], darkTokens[bgVar]), `Node eligibility ${st} dark text >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
       }
 
+      // F-R1 Invariant: Config keys must match wire contract enum sets EXACTLY
+      expect(Object.keys(REPLICA_STATUS_CONFIG).sort(), 'REPLICA_STATUS_CONFIG must match wire contract enum [healthy, missing, repairing]').toEqual(['healthy', 'missing', 'repairing']);
+      expect(Object.keys(MODEL_AVAILABILITY_CONFIG).sort(), 'MODEL_AVAILABILITY_CONFIG must match wire contract enum [unknown]').toEqual(['unknown']);
+
       // State uniqueness & Non-collapse
-      expect(REPLICA_STATUS_CONFIG.healthy.color).not.toBe(REPLICA_STATUS_CONFIG.unhealthy.color);
-      expect(REPLICA_STATUS_CONFIG.healthy.color).not.toBe(REPLICA_STATUS_CONFIG.degraded.color);
       expect(REPLICA_STATUS_CONFIG.repairing.color).not.toBe(REPLICA_STATUS_CONFIG.healthy.color);
       expect(REPLICA_STATUS_CONFIG.missing.color).not.toBe(REPLICA_STATUS_CONFIG.healthy.color);
       expect(REPLICA_STATUS_CONFIG.repairing.color).not.toBe(REPLICA_STATUS_CONFIG.missing.color);
-      expect(MODEL_AVAILABILITY_CONFIG.observed.color).not.toBe(MODEL_AVAILABILITY_CONFIG.unknown.color);
       expect(PLAN_FEASIBILITY_CONFIG.feasible.color).not.toBe(PLAN_FEASIBILITY_CONFIG.infeasible.color);
       expect(NODE_ELIGIBILITY_CONFIG.eligible.color).not.toBe(NODE_ELIGIBILITY_CONFIG.ineligible.color);
 
-      // Fail-closed Unknown status handling & Prototype key own-key defense (Codex F1 & M1)
-      const unknownReplica = getReplicaStatusConfig('invalid_corrupted_state');
-      expect(unknownReplica.color).toBe('var(--color-status-unknown)');
-      expect(unknownReplica.label).toContain('알 수 없음');
-
-      for (const pk of ['toString', 'constructor', '__proto__']) {
-        const protoReplica = getReplicaStatusConfig(pk);
-        expect(protoReplica.color).toBe('var(--color-status-unknown)');
-        expect(protoReplica.border).toBe('var(--color-status-unknown)');
-        expect(protoReplica.label).toBe(`알 수 없음 (${pk})`);
+      // Fail-closed Unknown status handling & Out-of-contract wire status rejection & Prototype key own-key defense (Codex F-R1)
+      for (const invalidReplica of ['unhealthy', 'degraded', 'invalid_corrupted_state', 'bogus', 'toString', 'constructor', '__proto__']) {
+        const cfg = getReplicaStatusConfig(invalidReplica);
+        expect(cfg.color).toBe('var(--color-status-unknown)');
+        expect(cfg.border).toBe('var(--color-status-unknown)');
+        expect(cfg.label).toBe(`알 수 없음 (${invalidReplica})`);
       }
 
-      for (const pk of ['toString', 'constructor', '__proto__', 'bogus', undefined, null]) {
-        const availCfg = getModelAvailabilityConfig(pk as any);
+      for (const invalidAvail of ['observed', 'available', 'invalid_corrupted_state', 'bogus', 'toString', 'constructor', '__proto__', undefined, null]) {
+        const availCfg = getModelAvailabilityConfig(invalidAvail as any);
         expect(availCfg.color).toBe('var(--color-status-unknown)');
         expect(availCfg.border).toBe('var(--color-status-unknown)');
-        expect(availCfg.label).toContain('알 수 없음');
+        expect(availCfg.label).toContain(`알 수 없음 (${invalidAvail || 'UNKNOWN'})`);
       }
 
       const unknownPlan = getPlanFeasibilityConfig(false);
@@ -5675,13 +5672,13 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     expect(releaseStats.violations, `ReleaseCandidateView violations:\n${releaseStats.violations.join('\n')}`).toEqual([]);
 
     const modelStudioStats = analyzeFile('features/desktop/ModelStudioView.tsx');
-    expect(modelStudioStats.totalStyleAttrs, 'Total style attributes in ModelStudioView must be exactly 86').toBe(86);
-    expect(modelStudioStats.checkedObjects, 'Explicit style objects in ModelStudioView must be exactly 24').toBe(24);
-    expect(modelStudioStats.checkedPairs, 'Evaluated pairs in ModelStudioView must be exactly 42').toBe(42);
+    expect(modelStudioStats.totalStyleAttrs, 'Total style attributes in ModelStudioView must be exactly 83').toBe(83);
+    expect(modelStudioStats.checkedObjects, 'Explicit style objects in ModelStudioView must be exactly 21').toBe(21);
+    expect(modelStudioStats.checkedPairs, 'Evaluated pairs in ModelStudioView must be exactly 39').toBe(39);
     expect(modelStudioStats.unboundColorObjects, 'Unbound color objects in ModelStudioView must be exactly 18').toBe(18);
-    expect(modelStudioStats.coveredColorObjects, 'Total covered color objects in ModelStudioView must be exactly 42').toBe(42);
-    expect(modelStudioStats.checkedBorderObjects, 'Border objects in ModelStudioView must be exactly 29').toBe(29);
-    expect(modelStudioStats.checkedBorderPairs, 'Border pairs in ModelStudioView must be exactly 29').toBe(29);
+    expect(modelStudioStats.coveredColorObjects, 'Total covered color objects in ModelStudioView must be exactly 39').toBe(39);
+    expect(modelStudioStats.checkedBorderObjects, 'Border objects in ModelStudioView must be exactly 26').toBe(26);
+    expect(modelStudioStats.checkedBorderPairs, 'Border pairs in ModelStudioView must be exactly 26').toBe(26);
     expect(modelStudioStats.violations, `ModelStudioView violations:\n${modelStudioStats.violations.join('\n')}`).toEqual([]);
 
   });
