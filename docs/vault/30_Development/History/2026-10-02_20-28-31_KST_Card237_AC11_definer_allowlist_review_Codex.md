@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD237-AC11-DEFINER-ALLOWLIST-20261002"
 title: "Card 237 AC-11 SECURITY DEFINER allowlist review"
-version: "1.2.0"
+version: "1.3.0"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T20:38:27+09:00"
+updated: "2026-10-02T20:41:47+09:00"
 source_of_truth: "Git"
 base_sha: "843d283c1ee70cc021385b0f8f25ec323d434829"
 reviewer: "Claude"
@@ -56,3 +56,13 @@ binds `s11-security-critical-high-zero-v0` to that reachable commit and exact bl
 resulting registry blob is `5f92d6f70c614501cb4b20a78615379b1aea7078`; the aggregator and all four registry-aware
 importers rotate to that same value in one follow-up commit. This is a definition-source
 repin, not a relaxation of the empty `criteria` or hosted environment boundary.
+
+# Hosted observation
+
+Opt-in AC-11 security run `37002231140` executed on source head
+`634d2a96ed49057f65826d6a7034121fcc151492`. Artifact `11224420911` has GitHub digest
+`sha256:78a1c6bccc1e48262b57a88fe19b5c6dd4fabad3860dc004c2789948cbf299b1` and is not
+expired at observation time. Its SEC-DEF-001 report records 15 functions,
+`matches_reviewed_policy`, and exit 0. The dependency/SAST report is `MEASURED_PASS`;
+the RLS row-isolation report remains `UNMEASURED` with exit 3. The latter is retained as
+an honest independent threat boundary and is not converted into a PASS by this card.
