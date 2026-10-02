@@ -16,12 +16,19 @@ queue row is claimed and is repeated by ``BuildExecutionService``.
 
 from __future__ import annotations
 
+import asyncio
 from copy import deepcopy
+from concurrent.futures import CancelledError as FutureCancelledError
 from dataclasses import dataclass
+import errno
 import logging
 import os
+import socket
+import subprocess
 from typing import Any, Mapping
+from urllib.error import URLError
 
+from psycopg import OperationalError
 from psycopg.types.json import Jsonb
 
 from .approvals import Principal
@@ -37,6 +44,19 @@ from .policy import action_digest
 
 LOGGER = logging.getLogger(__name__)
 CLAIM_LEASE_SECONDS = 30
+RETRYABLE_NETWORK_ERRNOS = frozenset(
+    {
+        errno.ECONNABORTED,
+        errno.ECONNREFUSED,
+        errno.ECONNRESET,
+        errno.EHOSTUNREACH,
+        errno.ENETDOWN,
+        errno.ENETRESET,
+        errno.ENETUNREACH,
+        errno.EPIPE,
+        errno.ETIMEDOUT,
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -59,9 +79,52 @@ class BuildExecutionIntent:
     next_attempt_at: Any
     last_error_code: str | None
 
+    @property
+    def claim_fencing_token(self) -> int:
+        """The database-monotonic owner generation for this claimed row.
+
+        Migration 0059 already increments ``attempt_count`` on every
+        ``pending -> claimed`` transition.  Reusing that durable generation keeps the
+        fencing authority in one place and avoids a second counter which could drift.
+        """
+
+        return self.attempt_count
+
 
 def _refuse(detail: str) -> DomainError:
     return DomainError("RES-0006", detail, 503, retryable=True)
+
+
+def _retryable_interruption(error: BaseException) -> bool:
+    """Classify observation uncertainty without turning permanent defects into retries."""
+
+    if isinstance(error, DomainError):
+        return error.retryable
+    if isinstance(
+        error,
+        (
+            KeyboardInterrupt,
+            asyncio.CancelledError,
+            FutureCancelledError,
+            subprocess.TimeoutExpired,
+            SystemExit,
+            TimeoutError,
+            ConnectionError,
+            OperationalError,
+        ),
+    ):
+        return True
+    if isinstance(error, socket.gaierror):
+        return error.errno == socket.EAI_AGAIN
+    if isinstance(error, URLError):
+        return isinstance(error.reason, BaseException) and _retryable_interruption(error.reason)
+    return isinstance(error, OSError) and error.errno in RETRYABLE_NETWORK_ERRNOS
+
+
+def _worker_error_code(error: BaseException) -> str:
+    if isinstance(error, DomainError):
+        return error.code
+    return "RES-0006" if _retryable_interruption(error) else "SYS-0001"
 
 
 def _validated_documents(
@@ -315,8 +378,15 @@ class BuildExecutionIntentQueue:
                 """UPDATE inv.build_execution_intents
                 SET status='pending',last_error_code=%s
                 WHERE tenant_id=%s AND project_id=%s AND run_id=%s AND status='claimed'
+                  AND attempt_count=%s
                 RETURNING run_id""",
-                (error_code, intent.tenant_id, intent.project_id, intent.run_id),
+                (
+                    error_code,
+                    intent.tenant_id,
+                    intent.project_id,
+                    intent.run_id,
+                    intent.claim_fencing_token,
+                ),
             ).fetchone()
             return pending is not None
 
@@ -330,8 +400,15 @@ class BuildExecutionIntentQueue:
                 """UPDATE inv.build_execution_intents
                 SET status='quarantined',last_error_code=%s
                 WHERE tenant_id=%s AND project_id=%s AND run_id=%s AND status='claimed'
+                  AND attempt_count=%s
                 RETURNING run_id""",
-                (error_code, intent.tenant_id, intent.project_id, intent.run_id),
+                (
+                    error_code,
+                    intent.tenant_id,
+                    intent.project_id,
+                    intent.run_id,
+                    intent.claim_fencing_token,
+                ),
             ).fetchone()
             return quarantined is not None
 
@@ -340,8 +417,14 @@ class BuildExecutionIntentQueue:
             completed = conn.execute(
                 """UPDATE inv.build_execution_intents SET status='completed'
                 WHERE tenant_id=%s AND project_id=%s AND run_id=%s AND status='claimed'
+                  AND attempt_count=%s
                 RETURNING run_id""",
-                (intent.tenant_id, intent.project_id, intent.run_id),
+                (
+                    intent.tenant_id,
+                    intent.project_id,
+                    intent.run_id,
+                    intent.claim_fencing_token,
+                ),
             ).fetchone()
             if not completed:
                 raise DomainError("IDEM-0001", "Build execution intent is not claimed", 409)
@@ -372,11 +455,12 @@ class BuildExecutionWorker:
                 run_id=intent.run_id,
                 evidence_id=intent.evidence_id,
                 actor_id=intent.actor_id,
+                intent_claim_fencing_token=intent.claim_fencing_token,
             )
         except BaseException as error:
             try:
-                code = error.code if isinstance(error, DomainError) else "SYS-0001"
-                if isinstance(error, DomainError) and error.retryable:
+                code = _worker_error_code(error)
+                if _retryable_interruption(error):
                     self.queue.requeue_if_unconsumed(intent, code)
                 else:
                     self.queue.quarantine_if_unconsumed(intent, code)

@@ -124,6 +124,8 @@ class _Connection:
             self._result = {"status": self.db.node_status, "recovery_epoch": EPOCH}
         elif "FROM inv.resource_leases" in text and "FOR UPDATE" in text:
             self._result = deepcopy(self.db.lease_row)
+        elif "FROM inv.build_execution_intents" in text and "FOR UPDATE" in text:
+            self._result = {"status": "claimed", "attempt_count": 1}
         elif text.startswith("INSERT INTO inv.evidence"):
             self.db.writes.append(("evidence", params))
             self._result = None
@@ -199,9 +201,11 @@ class _Adapter:
         }
         self.error = error
         self.calls = 0
+        self.call_kwargs = []
 
     def execute(self, principal, request, plan, decision, **kwargs):
         self.calls += 1
+        self.call_kwargs.append(dict(kwargs))
         if self.error is not None:
             raise self.error
         from inv.build_adapter import BuildAdapterResult
@@ -287,6 +291,7 @@ def run(service, *, lease_epoch=EPOCH):
         run_id=RUN,
         evidence_id=EVIDENCE_ID,
         actor_id="act_c214",
+        intent_claim_fencing_token=1,
     )
 
 
@@ -332,6 +337,49 @@ def test_an_agreeing_dispatch_persists_releases_and_records_in_one_transaction()
     assert [kind for kind, _ in committed[-1]] == ["release", "evidence", "outbox"]
     assert database.rolled_back == []
     assert boundary.quarantined_nodes == []
+
+
+def test_intent_claim_fencing_token_reaches_adapter_before_dispatch():
+    adapter = _Adapter(error=DomainError("RES-0006", "stop before dispatch", 503, retryable=True))
+    service, _database, _adapter, _boundary = build(adapter=adapter)
+    request, plan, decision = request_plan_decision()
+
+    with pytest.raises(DomainError, match="stop before dispatch"):
+        service.execute(
+            object(),
+            request,
+            plan,
+            decision,
+            policy_version="v1",
+            run_id=RUN,
+            evidence_id=EVIDENCE_ID,
+            actor_id="act_c214",
+            intent_claim_fencing_token=7,
+        )
+
+    assert adapter.calls == 1
+    assert adapter.call_kwargs[0]["intent_claim_fencing_token"] == 7
+
+
+def test_product_dispatch_without_an_intent_claim_generation_is_refused():
+    service, _database, adapter, _boundary = build()
+    request, plan, decision = request_plan_decision()
+
+    with pytest.raises(DomainError) as refused:
+        service.execute(
+            object(),
+            request,
+            plan,
+            decision,
+            policy_version="v1",
+            run_id=RUN,
+            evidence_id=EVIDENCE_ID,
+            actor_id="act_c214",
+        )
+
+    assert refused.value.code == "RES-0006"
+    assert "claim generation" in str(refused.value)
+    assert adapter.calls == 0
 
 
 # --- the product enable ------------------------------------------------------------------

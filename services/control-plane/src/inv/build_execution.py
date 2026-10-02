@@ -565,10 +565,36 @@ class BuildExecutionService:
         resource_id: str,
         binding_digest: str,
         decision_id: str,
+        intent_claim_fencing_token: int | None = None,
     ) -> BuildExecutionResult:
         """Persist Evidence, release the lease and record the event, or nothing."""
 
         with self.db.transaction(tenant_id) as conn:
+            # The worker's claim generation is authority, not telemetry.  Migration
+            # 0059 increments attempt_count on every pending -> claimed transition,
+            # including a sweeper reclaim.  Lock and compare that generation before
+            # touching the lease, Evidence or outbox so an old worker cannot commit
+            # after its claim has been reassigned.
+            if intent_claim_fencing_token is not None:
+                if (
+                    isinstance(intent_claim_fencing_token, bool)
+                    or not isinstance(intent_claim_fencing_token, int)
+                    or intent_claim_fencing_token < 1
+                ):
+                    raise DomainError("IDEM-0001", "Build intent claim token is invalid", 409)
+                claim = conn.execute(
+                    """SELECT status,attempt_count
+                    FROM inv.build_execution_intents
+                    WHERE tenant_id=%s AND project_id=%s AND run_id=%s
+                    FOR UPDATE""",
+                    (tenant_id, project_id, run_id),
+                ).fetchone()
+                if (
+                    not claim
+                    or claim["status"] != "claimed"
+                    or claim["attempt_count"] != intent_claim_fencing_token
+                ):
+                    raise DomainError("IDEM-0001", "Build intent claim ownership is stale", 409)
             lease = conn.execute(
                 """SELECT tenant_id,project_id,resource_id,recovery_epoch,released_at
                 FROM inv.resource_leases
@@ -683,6 +709,7 @@ class BuildExecutionService:
         run_id: str,
         evidence_id: str,
         actor_id: str,
+        intent_claim_fencing_token: int | None = None,
     ) -> BuildExecutionResult:
         """Dispatch one admitted build and commit its durable consequences."""
 
@@ -697,6 +724,14 @@ class BuildExecutionService:
             raise _refuse_product_dispatch(
                 "the admitted BuildPlan names no buildSessionId, which the product path "
                 "requires even though the contract leaves it optional"
+            )
+        if (
+            isinstance(intent_claim_fencing_token, bool)
+            or not isinstance(intent_claim_fencing_token, int)
+            or intent_claim_fencing_token < 1
+        ):
+            raise _refuse_product_dispatch(
+                "the product dispatch is not bound to a durable intent claim generation"
             )
         lease_id = plan["lease"]["leaseId"]
         resource_id = plan["lease"]["resourceId"]
@@ -754,6 +789,7 @@ class BuildExecutionService:
             run_id=run_id,
             evidence_id=evidence_id,
             actor_id=actor_id,
+            intent_claim_fencing_token=intent_claim_fencing_token,
         )
         receipt_session = dispatched.receipt.get("buildSessionId") or plan_session
         if not receipt_session:
@@ -809,6 +845,7 @@ class BuildExecutionService:
                 resource_id=resource_id,
                 binding_digest=binding_digest,
                 decision_id=decision["decisionId"],
+                intent_claim_fencing_token=intent_claim_fencing_token,
             )
         except DomainError as error:
             # LEASE-0002 here means the external dispatch already happened and this caller
@@ -816,7 +853,7 @@ class BuildExecutionService:
             # accounted for. The one-shot decision claim is consumed, so an automatic retry
             # answers IDEM-0001 -- which makes a durable reconciliation marker the only way
             # an operator learns about it (#312 F-R4).
-            if error.code in {"VERIFY-0022", "LEASE-0002"}:
+            if error.code in {"VERIFY-0022", "LEASE-0002", "IDEM-0001"}:
                 # Nothing committed: no Evidence, no release. The node keeps the
                 # unaccounted state, so it is quarantined rather than handed the next
                 # build, and an operator reconciles it.
