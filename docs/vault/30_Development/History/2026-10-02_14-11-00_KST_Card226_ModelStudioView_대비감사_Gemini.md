@@ -14,7 +14,7 @@
    - 컴포넌트 표준 규격인 `var(--color-brand-primary-bg)` 및 `var(--color-brand-primary-fg)` 조합으로 교체.
    - 로컬 `s11-defect-fixes.test.tsx` (16 tests) 전수 통과 확인 및 exact-head frontend CI 회복.
 2. **[High] H2. wire 계약 replica 상태 (`healthy | repairing | missing`) 의미 보존**:
-   - `contracts/virtualFabric.ts:194`의 정본 replica 상태는 `'healthy' | 'repairing' | 'missing'`이나, r1에서 `missing`과 `repairing`이 누락되어 UNKNOWN으로 강등되던 결함 해소.
+   - `apps/web/src/contracts/virtualFabric.ts:194`의 정본 replica 상태는 `'healthy' | 'repairing' | 'missing'`이나, r1에서 `missing`과 `repairing`이 누락되어 UNKNOWN으로 강등되던 결함 해소.
    - `REPLICA_STATUS_CONFIG`에 `repairing`(`var(--color-status-degraded)`, 진행/오렌지) 및 `missing`(`var(--color-status-offline)`, 실패/레드)을 정식 등록하고 기존 `unhealthy`/`degraded` 별칭도 방어적으로 유지.
 3. **[High] H3. 정적 AST 가드 `checkConfigTables`의 `as const`/`satisfies` unwrap 지원**:
    - `ModelStudioView.tsx`의 4대 설정 객체가 `as const`로 선언되어 `ts.isObjectLiteralExpression(node.initializer)`에서 누락되던 맹점 해소.
