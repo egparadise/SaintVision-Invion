@@ -136,6 +136,44 @@ export interface BuildRequest {
   timeoutSeconds: number;
 }
 
+export interface BuildPreparationInput {
+  checkoutId: string;
+  buildPolicyProfileId: string;
+  expectedRunVersion: number;
+  requestedTarget: "image";
+}
+
+export interface BuildEnqueueInput {
+  approvalId: ApprovalId;
+  expectedRunVersion: number;
+}
+
+export interface BuildPreparationView {
+  buildId: string;
+  runId: RunId;
+  sourceRunId: RunId;
+  approvalId: ApprovalId;
+  requestDigest: ActionDigest;
+  decisionIdentityDigest: ActionDigest;
+  status: "awaiting_approval";
+  expiresAt: Timestamp;
+}
+
+export interface BuildApprovalReviewSummary {
+  kind: "build";
+  target: "image";
+  riskLevel: "L2";
+  profileId: string;
+  profileVersion: number;
+  sourceRevision: number;
+  contextDigest: ActionDigest;
+  dockerfileDigest: ActionDigest;
+  networkMode: "none";
+  cacheMode: "disabled" | "read-only";
+  usesSecrets: boolean;
+  secretCount: number;
+}
+
 export interface BuildPlan {
   apiVersion: "inv.saintvision.ai/v1alpha1";
   kind: "BuildPlan";
@@ -1421,7 +1459,7 @@ export interface ShardObservation {
 
 export interface ApprovalReviewView {
   approval: ApprovalView;
-  workload: WorkloadSpec;
+  workload: (WorkloadSpec | BuildApprovalReviewSummary);
   riskLevel: "L0" | "L1" | "L2";
   policyDigest: ActionDigest;
 }

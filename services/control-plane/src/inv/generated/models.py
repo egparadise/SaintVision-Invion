@@ -264,6 +264,21 @@ class BuildRequest(BaseModel):
     timeoutSeconds: conint(ge=1, le=3600)
 
 
+class BuildPreparationInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    checkoutId: UUID
+    buildPolicyProfileId: constr(pattern=r'^bpp_[0-9A-HJKMNP-TV-Z]{26}$')
+    expectedRunVersion: conint(ge=1, le=9007199254740991)
+    requestedTarget: Literal['image']
+
+
+class CacheMode(StrEnum):
+    disabled = 'disabled'
+    read_only = 'read-only'
+
+
 class NetworkMode(StrEnum):
     none = 'none'
     allowlist = 'allowlist'
@@ -2185,6 +2200,46 @@ class WorkloadSpec(BaseModel):
     modelInput: ModelExecutionRef | None = None
 
 
+class BuildEnqueueInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    approvalId: ApprovalId
+    expectedRunVersion: conint(ge=1, le=9007199254740991)
+
+
+class BuildPreparationView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    buildId: constr(pattern=r'^bld_[0-9A-HJKMNP-TV-Z]{26}$')
+    runId: RunId
+    sourceRunId: RunId
+    approvalId: ApprovalId
+    requestDigest: ActionDigest
+    decisionIdentityDigest: ActionDigest
+    status: Literal['awaiting_approval']
+    expiresAt: Timestamp
+
+
+class BuildApprovalReviewSummary(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    kind: Literal['build']
+    target: Literal['image']
+    riskLevel: Literal['L2']
+    profileId: constr(pattern=r'^bpp_[0-9A-HJKMNP-TV-Z]{26}$')
+    profileVersion: conint(ge=1)
+    sourceRevision: conint(ge=1)
+    contextDigest: ActionDigest
+    dockerfileDigest: ActionDigest
+    networkMode: Literal['none']
+    cacheMode: CacheMode
+    usesSecrets: bool
+    secretCount: conint(ge=0, le=32)
+
+
 class SandboxLaunchSpec(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -2402,7 +2457,7 @@ class ApprovalReviewView(BaseModel):
         extra='forbid',
     )
     approval: ApprovalView
-    workload: WorkloadSpec
+    workload: WorkloadSpec | BuildApprovalReviewSummary
     riskLevel: RiskLevel1
     policyDigest: ActionDigest
 

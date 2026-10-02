@@ -872,3 +872,22 @@ class BuildExecutionService:
                     identity=quarantine_identity,
                 )
             raise
+
+    def bind_source_capsule(self, locator: str, sha256: str) -> None:
+        """Materialize the exact prepared capsule before external dispatch.
+
+        The reference transport intentionally has no ObjectStore authority.  A
+        deployment must supply a transport adapter with this method; otherwise
+        the product path remains fail closed rather than building a mutable host
+        checkout.
+        """
+
+        materialize = getattr(self._transport, "materialize_source_capsule", None)
+        if (
+            materialize is None
+            or not isinstance(locator, str)
+            or not isinstance(sha256, str)
+            or not re.fullmatch(r"[0-9a-f]{64}", sha256)
+        ):
+            raise DomainError("RES-0006", "Build source capsule authority unavailable", 503, True)
+        materialize(locator, sha256)

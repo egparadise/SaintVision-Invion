@@ -177,9 +177,14 @@ def test_t11_the_kernel_has_no_catalogue_route():
 def test_the_migration_adds_a_column_and_leaves_every_policy_alone():
     """Phase 1 is reversible because it never touches a policy (card 250 §3-4-1)."""
     source = (ROOT / "migrations/versions/0062_data_location_project_scope.py").read_text(encoding="utf-8")
-    assert 'down_revision = "0060_build_execution_admissions"' in source
+    # 0062 sits directly on 0061 (#343): two revisions with the same parent would
+    # be two migration heads, which alembic refuses to upgrade.
+    assert 'down_revision = "0061_build_preparations"' in source
     for forbidden in ("CREATE POLICY", "DROP POLICY", "ENABLE ROW LEVEL", "FORCE ROW LEVEL", "GRANT "):
         assert forbidden not in source, forbidden
     upgrade, downgrade = source.split("def downgrade()")
     assert "add_column" in upgrade and "create_foreign_key" in upgrade
     assert "drop_column" in downgrade and "drop_constraint" in downgrade
+    # The drop is guarded: bound rows refuse it before any DDL (0053's rule).
+    assert "RuntimeError" in downgrade and "reviewed data fix" in downgrade
+    assert downgrade.index("RuntimeError") < downgrade.index("drop_index")

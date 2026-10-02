@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "verifiedAt": "2026-10-02T20:18:00+09:00",
+  "verifiedAt": "2026-10-03T06:13:47+09:00",
   "definerReview": {
     "policyRevision": "0062_data_location_project_scope",
     "reviewDocument": "docs/vault/30_Development/S11_AC11_SEC_DEF_001_allowlist_보안검토_Codex.md",

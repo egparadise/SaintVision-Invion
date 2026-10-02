@@ -884,12 +884,56 @@ def _schema_state(connection):
     return columns, policies, forced, grants
 
 
-def test_t8_the_0062_downgrade_restores_the_schema_and_never_touched_a_policy(
-    owner_engine, clean_tables
-):
+def _migration_0062():
     spec = importlib.util.spec_from_file_location("migration_0062", MIGRATION)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
+    return module
+
+
+def test_the_0062_downgrade_refuses_while_a_location_holds_a_binding(
+    owner_engine, app_engine, two_tenants, clean_tables
+):
+    """0053 set this rule for the same shape of change, and 0062 follows it: a
+    column drop that would discard bindings silently is refused, so the AC-11
+    reversibility axis can call this revision PRESERVED rather than a declared
+    loss. Remove the guard and a downgrade quietly makes every bound row
+    invisible to the routes that were serving it."""
+    tenant, _ = two_tenants
+    with owner_engine.begin() as connection:
+        ids = _seed(connection, tenant_id=tenant, now=NOW, label="t8refuse")
+    owner = _client(app_engine, tenant_id=tenant, user_id=ids["owner"])
+    created = _post(owner, ids["a"], _body(ids))
+    assert created.status_code == 201, created.text
+    module = _migration_0062()
+
+    with owner_engine.begin() as connection:
+        before = _schema_state(connection)
+        with pytest.raises(RuntimeError) as raised:
+            with Operations.context(MigrationContext.configure(connection)):
+                module.downgrade()
+        message = str(raised.value)
+        assert created.json()["locationId"] in message      # which rows block it
+        assert "reviewed data fix" in message                # and what to do
+        # Nothing was dropped: the refusal comes before any DDL.
+        assert _schema_state(connection) == before
+
+    # And with the binding cleared, the same downgrade proceeds.
+    with owner_engine.begin() as connection:
+        connection.execute(text("DELETE FROM data_locations WHERE tenant_id = :t"), {"t": tenant})
+        try:
+            with Operations.context(MigrationContext.configure(connection)):
+                module.downgrade()
+            assert not any(row[0] == "project_id" for row in _schema_state(connection)[0])
+        finally:
+            with Operations.context(MigrationContext.configure(connection)):
+                module.upgrade()
+
+
+def test_t8_the_0062_downgrade_restores_the_schema_and_never_touched_a_policy(
+    owner_engine, clean_tables
+):
+    module = _migration_0062()
 
     with owner_engine.begin() as connection:
         before = _schema_state(connection)

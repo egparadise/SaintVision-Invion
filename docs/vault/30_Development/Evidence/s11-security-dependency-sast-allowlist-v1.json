@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "verifiedAt": "2026-10-02T20:30:49+09:00",
+  "verifiedAt": "2026-10-03T06:13:47+09:00",
   "producer": {
     "path": "tools/run_ac11_security_scan.py",
     "blob": "87d142e045b43776b776732ea6dc28822a1c0f32"
@@ -11,7 +11,7 @@
   },
   "importer": {
     "path": "tools/import_ac11_security_scan.py",
-    "blob": "0c46ccd9f3006ab723825815568268d7d1f45abb"
+    "blob": "c5a2b1a1b6291687487315234c85edcb46c530ce"
   },
   "scanners": [
     {

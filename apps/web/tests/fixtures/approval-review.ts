@@ -23,3 +23,5 @@ function getFixturePath(relativePath: string): string {
 
 const source = getFixturePath('../../../../contracts/fixtures/approval-review-response.json');
 export const approvalReviewFixture = JSON.parse(readFileSync(source, 'utf8')) as ApprovalReviewView;
+const buildSource = getFixturePath('../../../../contracts/fixtures/approval-review-build-response.json');
+export const buildApprovalReviewFixture = JSON.parse(readFileSync(buildSource, 'utf8')) as ApprovalReviewView;
