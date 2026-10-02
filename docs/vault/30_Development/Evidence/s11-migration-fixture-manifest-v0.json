@@ -105,6 +105,10 @@
     {
       "revision": "0058_release_acceptance_resolver",
       "expected": "PRESERVED"
+    },
+    {
+      "revision": "0059_build_execution_intents",
+      "expected": "PRESERVED"
     }
   ]
 }

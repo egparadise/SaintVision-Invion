@@ -1,15 +1,33 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.271"
+version: "1.0.272"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T12:46:10+09:00"
+updated: "2026-10-02T13:44:26+09:00"
 source_of_truth: "Git"
-active_card: "CARD-222 node-agent durable quarantine channel"
-active_card_status: "Claude r3 condition addressed: Node-wide quarantine resume requires every scope settled, trusted stop receipt, fresh observation and two-person approval"
-active_card_next: "Push r2 fixes, obtain exact-head Core/Backend green and Claude r3, then start Card 223 product caller on the approved head"
+active_card: "CARD-223 S08-BE product caller"
+active_card_status: "0059 durable intent queue and internal one-shot worker implemented; hosted real-PG and Claude review pending"
+active_card_next: "Commit, push and open the stacked PR with the table/RLS/trigger design first; run exact-head Core"
 ---
+
+## 2026-10-02 Card 223 — S08-BE product caller
+
+- `#317`의 기계 측정에서 `BuildExecutionService`를 구성·호출하는 제품 경로가 0건이었고, 공개 route 없이
+  외부 전제 없이 닫을 수 있는 Codex 소유 공백이어서 선택했다. base는 승인된 `#318` head
+  `2dd25ff77a152575988b19a568ede348fd4dc1d8`이다.
+- 예약된 migration `0059_build_execution_intents`는 `0058`을 단일 부모로 삼는다. tenant/project/run
+  복합 PK, strict request/plan/decision JSONB, PostgreSQL canonical digest, policy/evidence/actor 결속,
+  FORCE RLS, payload 불변·DELETE 금지·`pending → claimed → completed` 전이만 둔다.
+- trusted internal enqueue와 `FOR UPDATE SKIP LOCKED` one-shot claim 뒤
+  `BuildExecutionService.execute()`를 호출하는 worker seam을 추가했다. public route는 없고
+  `INV_BUILDKIT_PRODUCT_ENABLED=1` exact 설정 전에는 pending 행도 소비하지 않는다.
+- 로컬 PG-free focused는 **13 passed**, migration/AC-11 focused는 **52 passed**,
+  migration static gate는 **27 passed**, offline Alembic render와 단일 head 확인은 exit 0이다.
+  실 PG 동시 claim·RLS·trigger 시험은 exact-head hosted Core 전까지 미측정이다.
+- S08-BE 완료·75 승격·물리 builder 인수는 주장하지 않는다. `#318` quarantine fence가 없거나 검증되지
+  않으면 기존 `RES-0006` fail-closed를 유지한다.
+  [[2026-10-02_13-44-26_KST_Card223_S08-BE_product_caller_Codex]].
 
 ## 2026-10-02 Card 222 — node-agent durable quarantine channel
 

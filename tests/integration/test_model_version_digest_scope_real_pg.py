@@ -33,7 +33,7 @@ from saintvision.ids import new_id
 
 pytestmark = pytest.mark.postgres
 
-CURRENT_HEAD = "0058_release_acceptance_resolver"
+CURRENT_HEAD = "0059_build_execution_intents"
 
 OLD = "uq_model_versions_tenant_id_content_sha256"
 NEW = "uq_model_versions_model_id_content_sha256"
