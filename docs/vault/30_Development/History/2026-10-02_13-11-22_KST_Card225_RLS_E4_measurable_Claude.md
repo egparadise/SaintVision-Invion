@@ -1,12 +1,12 @@
 ---
 doc_id: "HISTORY-CARD225-RLS-E4-MEASURABLE-20261002"
 title: "카드 225 — E4는 소유자가 유일성을 측정한 readable key로도 판정된다. 다만 비교 대상이 0행인 run은 PASS가 아니라 UNMEASURED다"
-version: "1.1.0"
+version: "1.2.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-02T14:04:52+09:00"
+updated: "2026-10-02T15:21:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "89b15488"
@@ -55,7 +55,7 @@ E4의 의미를 그대로 두고 identity 방법을 **셋째**까지 넓혔다:
 
 세 번째가 "값 투영을 믿지 않는다"는 원칙을 어기지 않는 이유: 소유자가 `count(*)`와 `count(DISTINCT 그 tuple)`을 **같은 트랜잭션·같은 행 집합에서** 세고 **같을 때만** 그 tuple을 identity로 쓴다. 두 개의 다른 행이 같은 tuple을 가질 수 없다는 것이 **측정된 사실**일 때 그 tuple은 row identity다 — 믿은 투영이 아니다.
 
-### 3-1. r2에서 닫은 네 구멍 (#322 Codex)
+### 3-1. r2에서 닫은 다섯 구멍 (#322 Codex)
 
 | 구멍 | 지금 |
 |---|---|
@@ -63,6 +63,7 @@ E4의 의미를 그대로 두고 identity 방법을 **셋째**까지 넓혔다:
 | key 직렬화가 **구분자 충돌**에 취약 (F-R2) | `concat_ws`에서 **`jsonb_build_array(…)::text`** 로. 구분자를 값 안에 넣어 다른 tuple을 흉내내던 쌍이 서로 다르게 적힌다 |
 | **NULL**이 조용히 생략됐다 (F-R2) | 같은 snapshot에서 `nullRows`를 세고 0이 아니면 `unverifiable` — 암묵이 아니라 **명시적 fail-closed** |
 | 방법이 **모든 role/table로 번질 수 있었다** (F-R2) | `OWNER_VERIFIED_KEY_SCOPE`에 `(inv_cancel_bridge_owner, public.audit_events, (tenant_id, event_id))` **한 쌍만** 등록. 이 파일 blob은 집계기의 `RLS_FILES`에 고정돼 있으므로 쌍을 늘리면 **pin 회전과 함께 검토**를 받는다 |
+| 집계기가 **`match`를 믿었다** (F-R3) | `match`는 결론이므로 **두 fingerprint에서 다시 계산**한다. owner 관측이 distinctness를 측정한 그 관측인지(`owner_a.rows == ownerDistinctness.rows`), 두 fingerprint가 digest인지 확인하고, **재계산된 불일치는 측정된 위반**이므로 `exit 0 PASS`도 `exit 3 UNMEASURED`도 될 수 없다(`INVALID_RUN`). 정직하게 적힌 같은 관측은 `exit 1 VIOLATIONS` → `MEASURED_FAIL`이다 |
 
 세 겹으로 같은 질문을 묻는다: **살아있는 probe**(`_identity`), **기록된 보고의 판정**(`unverified_identities`), **정본 집계기**(`evaluate_rls`). 마지막 겹이 중요한 이유는 보고가 *tree에 대한 증거*이고 *그것을 쓴 도구의 약속*이 아니기 때문이다 — 집계기는 등록 밖·0행·중복·NULL key를 `INVALID_RUN`으로 거부한다.
 
@@ -84,6 +85,7 @@ E4의 의미를 그대로 두고 identity 방법을 **셋째**까지 넓혔다:
 |---|---|---|
 | security `36963704528` + browser `36963707158` (r1) | `2e87dc12` | `SEC-RLS-001` PASS, 그러나 **그 비교가 0행**이었다 — 이것이 F-R1이 가리킨 fail-open이고, 이 run은 그 행에 대해 **reference-only**다 |
 | security **`36967195872`** (r2) | `12be0822` | `exit 3` · `verdict UNMEASURED` · `violations 0` · **`unmeasured 1`** · `accepted 9` |
+| security **`36969295226`** + browser **`36969297736`** (r3) | `762a3c67` | 같은 `exit 3 / UNMEASURED / unmeasured 1`. 네 입력 import exit 0, 봉투 `SEC-SCAN-001` MEASURED_PASS · `SEC-RLS-001` **NOT_OBSERVED** · `SEC-VF-001` MEASURED_PASS(#319 F2의 tree 결속 포함), 축 `NOT_OBSERVED` |
 
 r2 run이 그 한 행에 대해 적는 것:
 
@@ -121,9 +123,9 @@ importer와 **따로** 돌린 정본 집계기도 같은 결론이다:
 | 항목 | 결과 |
 |---|---|
 | `tests/test_collect_rls_evidence.py` | **33 passed**(실 PG 8 포함, 582s). 신설: offline 7(0행·NULL·중복·미등록 columns·distinctness 없음·미등록 쌍·정상), 실 PG 3(빈 표 UNMEASURED / 직렬화·NULL fail-closed / 미등록 쌍 거부) |
-| `tests/test_aggregate_ac11_evidence.py` | 신설 6(등록·측정된 key만 MEASURED_PASS, 나머지 다섯 변형은 `INVALID_RUN`) 포함 **전부 통과** |
+| `tests/test_aggregate_ac11_evidence.py` | 신설 **13** — 등록·측정된 key만 MEASURED_PASS, 나머지 열한 변형(미등록 쌍·미등록 columns·0행·중복·NULL·불일치를 PASS로·fingerprint 불일치인데 match true·같은데 match false·owner 0행·digest 아닌 fingerprint·role 관측 없음)은 `INVALID_RUN`, 그리고 **UNMEASURED에 숨긴 불일치는 거부·정직한 VIOLATIONS는 MEASURED_FAIL** |
 | `test_import_ac11_security_scan.py` · `test_run_ac11_security_threat_reports.py` | **전부 통과**(후자는 실 PG) |
-| 단독 변이 **8/8 사살** | 0행 허용·`concat_ws` 복귀·0행 거부 삭제(offline과 실 PG 각각)·NULL 거부 삭제·scope 검사 삭제·기록 재검사 삭제·집계기 검사 삭제 |
+| 단독 변이 **10/10 사살** | 0행 허용·`concat_ws` 복귀·0행 거부 삭제(offline과 실 PG 각각)·NULL 거부 삭제·scope 검사 삭제·기록 재검사 삭제·집계기 scope 검사 삭제·**`match` 재계산 삭제**·**PASS 직전 불일치 무시** |
 | pin 회전 | 집계기의 `RLS_FILES` collector blob. **`s11-security-allowlist-v0.json`은 건드리지 않았다** |
 
 ## 7. 하지 않은 것
