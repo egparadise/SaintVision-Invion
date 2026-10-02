@@ -33,9 +33,50 @@ ENQUEUE_LIMITS = (("subject", "enqueue", 10), ("project", "combined", 30),
                   ("tenant-project", "combined", 60))
 
 
-def _sha1(kind: bytes, body: bytes) -> str:
+def _git_hash(kind: bytes, body: bytes) -> bytes:
     framed = kind + b" " + str(len(body)).encode("ascii") + b"\0" + body
-    return hashlib.sha1(framed).hexdigest()
+    return hashlib.sha1(framed).digest()
+
+
+def _git_source_identity(raw: bytes, workspace_id: str, context: str, dockerfile: str):
+    """Return real Git object identities for one canonical immutable snapshot."""
+
+    manifest, content = decode_snapshot(raw, workspace_id)
+    directories = set(manifest["directories"])
+    if context not in directories or dockerfile not in content or not dockerfile.startswith(
+        context.rstrip("/") + "/"
+    ):
+        raise DomainError("VERIFY-0002", "Build context or Dockerfile escapes the snapshot", 422)
+    tree: dict[str, dict] = {}
+    executable = {item["path"]: item["executable"] for item in manifest["files"]}
+    for path, body in content.items():
+        node = tree
+        parts = path.split("/")
+        for part in parts[:-1]:
+            node = node.setdefault(part, {})
+        node[parts[-1]] = (body, executable[path])
+
+    def tree_oid(node: dict) -> bytes:
+        entries = []
+        for name in sorted(node, key=lambda value: (value + ("/" if isinstance(node[value], dict) else "")).encode()):
+            value = node[name]
+            if isinstance(value, dict):
+                mode, oid = b"40000", tree_oid(value)
+            else:
+                body, is_executable = value
+                mode, oid = (b"100755" if is_executable else b"100644"), _git_hash(b"blob", body)
+            entries.append(mode + b" " + name.encode("utf-8") + b"\0" + oid)
+        return _git_hash(b"tree", b"".join(entries))
+
+    tree_digest = tree_oid(tree)
+    tree_hex = tree_digest.hex()
+    commit = (
+        f"tree {tree_hex}\n"
+        "author SaintVision Build Authority <build@sv.invalid> 0 +0000\n"
+        "committer SaintVision Build Authority <build@sv.invalid> 0 +0000\n\n"
+        "SaintVision immutable build capsule\n"
+    ).encode("utf-8")
+    return _git_hash(b"commit", commit).hex(), tree_hex
 
 
 def _identity_decision(decision: Mapping) -> dict:
@@ -151,7 +192,9 @@ class BuildPreparationService:
         if not checkout or not profile:
             raise DomainError("RES-0004", "Build preparation authority was not found", 404)
         raw = bytes(checkout["snapshot"])
-        decode_snapshot(raw, checkout["workspace_id"])
+        commit_sha, tree_sha = _git_source_identity(
+            raw, checkout["workspace_id"], profile["context_path"], profile["dockerfile_path"]
+        )
         snapshot_sha = hashlib.sha256(raw).hexdigest()
         if snapshot_sha != checkout["content_hash"]:
             raise DomainError("VERIFY-0002", "Workspace snapshot digest differs", 422)
@@ -166,7 +209,7 @@ class BuildPreparationService:
             "apiVersion": "inv.saintvision.ai/v1alpha1", "kind": "BuildRequest",
             "tenantId": principal.tenant_id, "projectId": project_id,
             "workspaceId": checkout["workspace_id"],
-            "sourceCommitSha": _sha1(b"commit", raw), "sourceTreeSha": _sha1(b"tree", raw),
+            "sourceCommitSha": commit_sha, "sourceTreeSha": tree_sha,
             "contextPath": profile["context_path"],
             "dockerfilePath": profile["dockerfile_path"],
             "targetPlatform": profile["target_platform"],

@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 from inv.approvals import Principal
-from inv.build_preparations import BuildPreparationService
+from inv.build_preparations import BuildPreparationService, _git_source_identity
 from inv.contracts import validate_contract
 from inv.errors import DomainError
 
@@ -118,3 +118,24 @@ def test_dispatch_factory_runs_after_scheduled_transition_and_before_admission()
     factory = source.index("build_authority_factory(", scheduled)
     admission = source.index("TrustedBuildAdmissionEntry(self.db).record_committed", factory)
     assert scheduled < factory < admission
+
+
+def test_source_identity_is_a_real_deterministic_git_tree_and_commit():
+    import base64
+    import hashlib
+    from inv.workspace_files import canonical
+
+    workspace = "wsp_01M3PTP800EEMWMDYKEZZ3CWNP"
+    body = b"FROM scratch\n"
+    raw = canonical({
+        "format": "workspace-snapshot:1", "workspaceId": workspace,
+        "directories": ["src"],
+        "files": [{"path": "src/Dockerfile", "executable": False,
+                   "sha256": hashlib.sha256(body).hexdigest(), "sizeBytes": len(body),
+                   "dataBase64": base64.b64encode(body).decode()}],
+    })
+    first = _git_source_identity(raw, workspace, "src", "src/Dockerfile")
+    assert first == _git_source_identity(raw, workspace, "src", "src/Dockerfile")
+    assert all(len(value) == 40 for value in first) and first[0] != first[1]
+    with pytest.raises(DomainError, match="VERIFY-0002"):
+        _git_source_identity(raw, workspace, "src", "Dockerfile")

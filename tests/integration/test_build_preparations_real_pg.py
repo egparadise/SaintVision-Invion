@@ -46,11 +46,14 @@ def test_build_request_to_worker_is_one_server_owned_chain(workspace_http, monke
         json={
             "expectedRevision": original["revision"],
             "expectedSha256": original["sha256"],
-            "changes": [{
-                "path": "src/main.py", "expectedSha256": file["sha256"],
-                "executable": False,
-                "dataBase64": base64.b64encode(b"print('build capsule')\n").decode(),
-            }],
+            "changes": [
+                {"path": "src/main.py", "expectedSha256": file["sha256"],
+                 "executable": False,
+                 "dataBase64": base64.b64encode(b"print('build capsule')\n").decode()},
+                {"path": "src/Dockerfile", "expectedSha256": None,
+                 "executable": False,
+                 "dataBase64": base64.b64encode(b"FROM scratch\n").decode()},
+            ],
         },
         headers=a.headers(key="build-source-edit"),
     )
