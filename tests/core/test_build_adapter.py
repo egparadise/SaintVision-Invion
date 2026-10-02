@@ -134,7 +134,9 @@ def _patch_boundary(monkeypatch, *, authorize_error=None, finalize_error=None):
 
     def claim(_conn, request, plan, decision, run_id, binding_digest, **_kwargs):
         identity = decision["decisionId"]
-        calls.append(("claim", identity, binding_digest))
+        calls.append(
+            ("claim", identity, binding_digest, _kwargs.get("intent_claim_fencing_token"))
+        )
         if identity in claims:
             raise DomainError("IDEM-0001", "Build dispatch identity is already consumed", 409)
         claims.add(identity)
@@ -157,7 +159,7 @@ def _patch_boundary(monkeypatch, *, authorize_error=None, finalize_error=None):
     return calls
 
 
-def _execute(adapter):
+def _execute(adapter, *, intent_claim_fencing_token=None):
     principal, request, plan, decision = _inputs()
     return adapter.execute(
         principal,
@@ -168,6 +170,7 @@ def _execute(adapter):
         run_id="run-1",
         evidence_id="evidence-1",
         actor_id="operator-1",
+        intent_claim_fencing_token=intent_claim_fencing_token,
     )
 
 
@@ -189,6 +192,20 @@ def test_transport_receives_only_admitted_binding_between_two_short_transactions
     ]
     assert "transportMutation" not in calls[-1][2]
     assert result.evidence == {"result": "succeeded"}
+
+
+def test_intent_generation_reaches_the_pre_dispatch_ledger_boundary(monkeypatch):
+    calls = _patch_boundary(monkeypatch)
+    database = _Database()
+    transport = _Transport(database)
+
+    _execute(
+        BuildExecutionAdapter(database, transport),
+        intent_claim_fencing_token=7,
+    )
+
+    claim = next(call for call in calls if call[0] == "claim")
+    assert claim[3] == 7
 
 
 def test_failed_admission_has_zero_dispatch_side_effect(monkeypatch):
