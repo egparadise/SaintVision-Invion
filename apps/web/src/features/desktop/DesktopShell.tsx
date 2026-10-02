@@ -5,6 +5,54 @@ import {
   DesktopWindow as IDesktopWindow,
   DesktopNotification,
 } from '@/contracts/virtualFabric';
+
+export type NotificationLevelKey = DesktopNotification['level'];
+
+export interface NotificationLevelStyle {
+  color: string;
+  bg: string;
+  border: string;
+  label: string;
+}
+
+export const NOTIFICATION_LEVEL_CONFIG = {
+  info: {
+    color: 'var(--color-brand-hover)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-brand-hover)',
+    label: 'INFO',
+  },
+  success: {
+    color: 'var(--color-status-online)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-online)',
+    label: 'SUCCESS',
+  },
+  warning: {
+    color: 'var(--color-status-degraded)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-degraded)',
+    label: 'WARNING',
+  },
+  error: {
+    color: 'var(--color-status-offline)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-offline)',
+    label: 'ERROR',
+  },
+} as const satisfies Record<NotificationLevelKey, NotificationLevelStyle>;
+
+export function getNotificationLevelConfig(level?: string | null): NotificationLevelStyle {
+  if (level && Object.hasOwn(NOTIFICATION_LEVEL_CONFIG, level)) {
+    return NOTIFICATION_LEVEL_CONFIG[level as NotificationLevelKey];
+  }
+  return {
+    color: 'var(--color-status-unknown)',
+    bg: 'var(--color-bg-subtle)',
+    border: 'var(--color-status-unknown)',
+    label: level ? `UNKNOWN (${level})` : 'UNKNOWN',
+  };
+}
 import { NodeItem, RunItem, ApprovalItem, WorkspaceItem } from '@/contracts/types';
 import { DesktopWindowComponent } from './DesktopWindow';
 import { ResourceExplorer } from './ResourceExplorer';
@@ -31,6 +79,7 @@ export interface DesktopShellProps {
   onSwitchToPortalView: () => void;
   currentTheme: 'light' | 'dark';
   onToggleTheme: () => void;
+  notifications?: DesktopNotification[];
 }
 
 const DEFAULT_WINDOWS: IDesktopWindow[] = [
@@ -132,7 +181,7 @@ const DEFAULT_WINDOWS: IDesktopWindow[] = [
   },
 ];
 
-const DESKTOP_SHORTCUTS = [
+export const DESKTOP_SHORTCUTS = [
   { appId: 'my-computer' as AppId, title: '내 컴퓨터', icon: '💻' },
   { appId: 'file-explorer' as AppId, title: 'inv:// 파일', icon: '📁' },
   { appId: 'model-studio' as AppId, title: 'Model Studio', icon: '🧠' },
@@ -158,6 +207,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
   onSwitchToPortalView,
   currentTheme,
   onToggleTheme,
+  notifications: initialNotifications,
 }) => {
   const [windows, setWindows] = useState<IDesktopWindow[]>(() => {
     try {
@@ -173,7 +223,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
 
   const [activeWindowId, setActiveWindowId] = useState<string | null>('win_my_computer');
   const [currentTime, setCurrentTime] = useState<string>('');
-  const [notifications] = useState<DesktopNotification[]>([]);
+  const [notifications] = useState<DesktopNotification[]>(initialNotifications || []);
 
   // Overlays mutual exclusion: only one of 'none', 'start', 'notifications' can be active at a time (F2)
   type ActiveOverlay = 'none' | 'start' | 'notifications';
@@ -470,8 +520,8 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
         width: '100vw',
         height: '100vh',
         overflow: 'hidden',
-        backgroundColor: '#090d16',
-        backgroundImage: `radial-gradient(circle at 50% 30%, #1e3a8a 0%, #0f172a 50%, #030712 100%)`,
+        backgroundColor: 'var(--color-bg-canvas)',
+        backgroundImage: `radial-gradient(circle at 50% 30%, var(--color-brand-subtle) 0%, var(--color-bg-surface) 50%, var(--color-bg-canvas) 100%)`,
         userSelect: 'none',
         display: 'flex',
         flexDirection: 'column',
@@ -481,15 +531,15 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
       <header
         style={{
           height: '36px',
-          backgroundColor: 'rgba(15, 23, 42, 0.85)',
+          backgroundColor: 'var(--color-bg-surface)',
           backdropFilter: 'blur(16px)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          borderBottom: '1px solid var(--color-border-subtle)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '0 16px',
           zIndex: 9999,
-          color: '#f8fafc',
+          color: 'var(--color-text-primary)',
           fontSize: '0.8125rem',
         }}
       >
@@ -510,7 +560,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
               gap: '6px',
               fontWeight: 700,
               fontSize: '0.875rem',
-              color: '#38bdf8',
+              color: 'var(--color-brand-hover)',
               background: 'none',
               border: 'none',
               cursor: 'pointer',
@@ -523,9 +573,9 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
           </button>
 
           {activeWindow && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#94a3b8' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-text-muted)' }}>
               <span>|</span>
-              <span style={{ fontWeight: 600, color: '#f8fafc' }}>{activeWindow.title}</span>
+              <span style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>{activeWindow.title}</span>
             </div>
           )}
         </div>
@@ -536,7 +586,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
             style={{
               fontSize: '0.6875rem',
               fontWeight: 600,
-              color: '#34d399',
+              color: 'var(--color-status-online)',
               display: 'flex',
               alignItems: 'center',
               gap: '4px',
@@ -545,7 +595,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
             ● 5 Nodes (4 Schedulable)
           </span>
 
-          <span style={{ fontSize: '0.6875rem', color: '#94a3b8' }}>RTT: 8ms</span>
+          <span style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)' }}>RTT: 8ms</span>
 
           {/* Switch to Classic Portal Button */}
           <button
@@ -557,9 +607,9 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
               fontSize: '0.6875rem',
               fontWeight: 600,
               borderRadius: '4px',
-              backgroundColor: 'rgba(59, 130, 246, 0.2)',
-              border: '1px solid rgba(59, 130, 246, 0.4)',
-              color: '#60a5fa',
+              backgroundColor: 'var(--color-brand-subtle)',
+              border: '1px solid var(--color-brand-hover)',
+              color: 'var(--color-brand-hover)',
               cursor: 'pointer',
             }}
           >
@@ -576,6 +626,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
               cursor: 'pointer',
               fontSize: '0.875rem',
               padding: '2px',
+              color: 'var(--color-text-secondary)',
             }}
             title="테마 전환"
           >
@@ -599,12 +650,14 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
               fontSize: '0.875rem',
               position: 'relative',
               padding: '2px',
+              color: 'var(--color-text-secondary)',
             }}
             title="알림 센터"
           >
             🔔
             {notifications.some((n) => !n.read) && (
               <span
+                data-testid="desktop-unread-notif-dot"
                 style={{
                   position: 'absolute',
                   top: '-2px',
@@ -612,7 +665,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
                   width: '6px',
                   height: '6px',
                   borderRadius: '50%',
-                  backgroundColor: '#ef4444',
+                  backgroundColor: 'var(--color-status-offline)',
                 }}
               />
             )}
@@ -639,19 +692,19 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
             top: '40px',
             left: '16px',
             width: '280px',
-            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+            backgroundColor: 'var(--color-bg-surface)',
             backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
+            border: '1px solid var(--color-border-subtle)',
             borderRadius: '12px',
-            boxShadow: '0 16px 36px rgba(0,0,0,0.6)',
+            boxShadow: 'var(--shadow-lg)',
             padding: '12px',
             zIndex: 10000,
-            color: '#f8fafc',
+            color: 'var(--color-text-primary)',
           }}
         >
-          <div style={{ padding: '6px 10px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '8px' }}>
+          <div style={{ padding: '6px 10px', borderBottom: '1px solid var(--color-border-subtle)', marginBottom: '8px' }}>
             <div style={{ fontWeight: 700, fontSize: '0.875rem' }}>SaintVision / INV 가상 컴퓨터</div>
-            <div style={{ fontSize: '0.6875rem', color: '#94a3b8' }}>사용자: {currentReviewerId}</div>
+            <div style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)' }}>사용자: {currentReviewerId}</div>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -668,7 +721,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
                   borderRadius: '6px',
                   border: 'none',
                   backgroundColor: 'transparent',
-                  color: 'inherit',
+                  color: 'var(--color-text-primary)',
                   fontSize: '0.8125rem',
                   fontWeight: 500,
                   cursor: 'pointer',
@@ -681,7 +734,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
             ))}
           </div>
 
-          <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', marginTop: '8px', paddingTop: '8px' }}>
+          <div style={{ borderTop: '1px solid var(--color-border-subtle)', marginTop: '8px', paddingTop: '8px' }}>
             <button
               type="button"
               onClick={onSwitchToPortalView}
@@ -694,7 +747,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
                 borderRadius: '6px',
                 border: 'none',
                 backgroundColor: 'transparent',
-                color: '#60a5fa',
+                color: 'var(--color-brand-hover)',
                 fontSize: '0.75rem',
                 cursor: 'pointer',
                 textAlign: 'left',
@@ -722,14 +775,14 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
             top: '40px',
             right: '16px',
             width: '320px',
-            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+            backgroundColor: 'var(--color-bg-surface)',
             backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
+            border: '1px solid var(--color-border-subtle)',
             borderRadius: '12px',
-            boxShadow: '0 16px 36px rgba(0,0,0,0.6)',
+            boxShadow: 'var(--shadow-lg)',
             padding: '16px',
             zIndex: 10000,
-            color: '#f8fafc',
+            color: 'var(--color-text-primary)',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
@@ -741,28 +794,49 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
                 notifTriggerRef.current?.focus();
               }}
               aria-label="알림 센터 닫기"
-              style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+              style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer' }}
             >
               ×
             </button>
           </div>
-          {notifications.map((n) => (
-            <div
-              key={n.id}
-              style={{
-                padding: '10px',
-                borderRadius: '8px',
-                backgroundColor: 'rgba(255,255,255,0.05)',
-                marginBottom: '8px',
-                fontSize: '0.75rem',
-              }}
-            >
-              <div style={{ fontWeight: 600, color: n.level === 'success' ? '#34d399' : '#f8fafc' }}>
-                {n.title}
+          {notifications.map((n) => {
+            const notifCfg = getNotificationLevelConfig(n.level);
+            return (
+              <div
+                key={n.id}
+                data-testid="desktop-notification-item"
+                style={{
+                  padding: '10px',
+                  borderRadius: '8px',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-border-subtle)',
+                  marginBottom: '8px',
+                  fontSize: '0.75rem',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginBottom: '4px' }}>
+                  <span style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                    {n.title}
+                  </span>
+                  <span
+                    data-testid="desktop-notification-badge"
+                    style={{
+                      padding: '1px 6px',
+                      borderRadius: '4px',
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      backgroundColor: notifCfg.bg,
+                      color: notifCfg.color,
+                      border: `1px solid ${notifCfg.border}`,
+                    }}
+                  >
+                    {notifCfg.label}
+                  </span>
+                </div>
+                <div style={{ color: 'var(--color-text-secondary)', marginTop: '2px' }}>{n.message}</div>
               </div>
-              <div style={{ color: '#94a3b8', marginTop: '2px' }}>{n.message}</div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -814,10 +888,10 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
                 justifyContent: 'center',
                 borderRadius: '10px',
                 cursor: 'pointer',
-                transition: 'background-color 0.15s ease',
                 padding: '6px',
+                transition: 'background-color 0.15s ease',
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)')}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-bg-subtle)')}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
             >
               <div
@@ -825,14 +899,14 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
                   width: '44px',
                   height: '44px',
                   borderRadius: '12px',
-                  backgroundColor: 'rgba(255,255,255,0.08)',
+                  backgroundColor: 'var(--color-bg-surface)',
                   backdropFilter: 'blur(8px)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: '1.5rem',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-                  border: '1px solid rgba(255,255,255,0.15)',
+                  boxShadow: 'var(--shadow-md)',
+                  border: '1px solid var(--color-border-subtle)',
                 }}
               >
                 {item.icon}
@@ -842,8 +916,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
                   marginTop: '6px',
                   fontSize: '0.6875rem',
                   fontWeight: 600,
-                  color: '#ffffff',
-                  textShadow: '0 1px 3px rgba(0,0,0,0.8)',
+                  color: 'var(--color-text-primary)',
                   textAlign: 'center',
                   lineHeight: 1.2,
                 }}
@@ -970,11 +1043,11 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
             alignItems: 'center',
             gap: '8px',
             padding: '6px 14px',
-            backgroundColor: 'rgba(15, 23, 42, 0.75)',
+            backgroundColor: 'var(--color-bg-surface)',
             backdropFilter: 'blur(24px)',
             borderRadius: '20px',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            boxShadow: '0 12px 32px rgba(0,0,0,0.5)',
+            border: '1px solid var(--color-border-subtle)',
+            boxShadow: 'var(--shadow-lg)',
           }}
         >
           {DESKTOP_SHORTCUTS.map((item) => {
@@ -1013,17 +1086,18 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
                 }}
               >
                 <div
+                  data-testid={`desktop-dock-tile-${item.appId}`}
                   style={{
                     width: '44px',
                     height: '44px',
                     borderRadius: '12px',
-                    backgroundColor: isActive ? 'rgba(59, 130, 246, 0.3)' : 'rgba(255, 255, 255, 0.08)',
+                    backgroundColor: isActive ? 'var(--color-brand-subtle)' : 'var(--color-bg-subtle)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontSize: '1.5rem',
-                    boxShadow: isActive ? '0 0 12px rgba(59, 130, 246, 0.5)' : 'none',
-                    border: isActive ? '1.5px solid #38bdf8' : '1px solid rgba(255,255,255,0.1)',
+                    boxShadow: isActive ? 'var(--shadow-md)' : 'none',
+                    border: isActive ? '1.5px solid var(--color-brand-hover)' : '1px solid var(--color-border-subtle)',
                   }}
                 >
                   {item.icon}
@@ -1032,11 +1106,12 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
                 {/* Running dot indicator */}
                 {isOpen && (
                   <div
+                    data-testid={`desktop-dock-running-${item.appId}`}
                     style={{
                       width: '4px',
                       height: '4px',
                       borderRadius: '50%',
-                      backgroundColor: isActive ? '#38bdf8' : 'rgba(255,255,255,0.5)',
+                      backgroundColor: isActive ? 'var(--color-brand-hover)' : 'var(--color-border-strong)',
                       marginTop: '3px',
                     }}
                   />
