@@ -19,7 +19,9 @@ from inv.buildkit_transport import MeasuredBuilder
 from inv.ids import new_id
 from inv.object_store import registered_provider
 from inv.policy import action_digest
+from test_approvals import approval  # noqa: F401 - registers node runtime fixture dependency
 from test_node_delivery import remote  # noqa: F401 - registers workspace fixture dependency
+from test_node_runtime import node_runtime  # noqa: F401 - registers remote fixture dependency
 from test_snapshots import storage  # noqa: F401 - registers workspace fixture dependency
 from test_workspace_api import workspace_http
 

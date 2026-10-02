@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-CARD247-S08-BE-BUILD-REQUEST-ENTRY-001"
 title: "Card 247 S08-BE BuildRequest product entry implementation"
-version: "1.2.1"
+version: "1.2.2"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-03T03:25:33+09:00"
+updated: "2026-10-03T04:03:33+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S08-BE", "CARD-247"]
@@ -90,6 +90,12 @@ still assumed every `ApprovalReviewView.workload` was a `WorkloadSpec`. The cons
 discriminates the generated `kind: build` type, validates every redacted build-summary field,
 and presents that summary without inventing a workspace or command. Production build and the
 two focused approval-review UI files pass (`33 passed`).
+
+Exact-head Core run `37047480344` then executed the full collection (`8285 passed`) and exposed
+that the new two-case real-PG module registered `remote` without registering its transitive
+`node_runtime` and `approval` fixtures. Both cases failed during setup rather than being skipped
+or reaching product code. The module now imports the complete fixture chain explicitly; the
+replacement exact-head Core run is the only run eligible for the final review baseline.
 
 S08-BE completion, product flag enablement, and physical builder acceptance are not
 claimed. The actual census count is derived from the hosted catalogue; the current base
