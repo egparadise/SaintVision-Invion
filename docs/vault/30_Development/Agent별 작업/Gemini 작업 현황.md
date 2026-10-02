@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.208"
+version: "1.0.209"
 status: "proposed"
 author: "Gemini"
-updated: "2026-10-02T23:35:00+09:00"
+updated: "2026-10-03T01:25:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -48,6 +48,28 @@ source_of_truth: "Git"
 - 확인 기준: 2026-10-02T02:22:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer r2 조치: Claude UI r2 조건부 승인 및 Codex r2 피드백 반영 — W1 History 전수 표 'before' 열 SaintVision 정본 베이스 다크 패널(#0f172a surface, #1e293b subtle) 재계산 및 4개 수치 오류(2.77:1, 3.44:1, 10.35:1, 3.48:1/3.75:1) 정정, W2 discovery-action-success 및 repair-action-error DOM 바인딩 단언 및 Probe 30/31 추가로 1:1 결함 변이 M11/M12 100% 사살 실측(총 12/12 100%), W3 commit 전 시각 동기화; Vitest 14 passed, s11-defect-fixes 16 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-02T02:05:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer r1 조치: Claude UI r1 및 Codex r1 피드백 전수 반영 — R1 버튼 요소 DEF-S11-09 위반 해소 `var(--color-brand-primary-bg)` 및 `--color-brand-primary-fg` 승격; R2 활성 네임스페이스 칩 및 버전 배지 `var(--color-brand-hover)` 적용 5.49:1(Light)/8.11:1(Dark), 비활성 버튼 `var(--color-bg-subtle)`/`var(--color-text-muted)`/`var(--color-border-subtle)` 5.25:1/5.78:1 및 3.18:1/3.08:1 충족; R3 실제 렌더 배경 기반 전수 실측표 재구성; R4 Test 9c 확장 및 10종 변이 M1~M10 100% 사살 실측; R5 History 제어 바이트 60개 전수 제거 완료; 보라색 리터럴 의도적 브랜드 통합 명시; Vitest 14 passed, s11-defect-fixes 16 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-02T01:20:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer Light/Dark 명도 대비 전수 감사 및 디자인 토큰 승격: base db37dbc5 위 작업, ResourceExplorer 390건 -> 0건, InvFileExplorer 124건 -> 0건 100% 해소, COLOR_LITERAL_MULTISET_BASELINE 양 파일 {} 래칫, border-subtle 232건/22개 파일 래칫, DOM 실제 렌더링 동적 대비 단언 신설, 변이 M1~M4 100% 사살 실측, Vitest 9개 스위트 139 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
+
+## 2026-10-03 거버넌스 승인 센터 화면 (ApprovalCenter) 색상 리터럴 전수 토큰화(17건→0), 상태 색 정합성 및 접근성 승격 (Card 245, `agent/gemini/c245-approval-center-contrast`, base `f580e495`, PR 대상 `agent/gemini/c235-placement-contrast`)
+- **개요**: ACC-09 다음 영역인 거버넌스 승인 센터 메인 화면(`apps/web/src/features/approvals/ApprovalCenter.tsx`)의 색상 리터럴 inventory 전수(17건→0), 대비 표본/DOM 결속 감사 및 승인 상태 계약 순수성 접근성 승격:
+  1. **색상 리터럴 전수 해소 및 의도적 상태 디자인 승격 (Card 213, 215, 218, 220, 226, 228, 230, 235 정합)**:
+     - `ApprovalCenter.tsx`: 기존 하드코딩 색상 리터럴 전수(17건) -> **0건** (100% 토큰화).
+     - 승인 상태 설정 객체 최상단 정의 및 export: `APPROVAL_STATUS_CONFIG` (`approved`, `dispatched`, `expired`, `pending`, `rejected` 5종 wire 계약 enum과 엄밀 일치).
+     - 상태 설정 및 대비 보장: `approved`(`var(--color-status-online)`), `dispatched`(`var(--color-brand-hover)`), `expired`(`var(--color-status-offline)`), `pending`(`var(--color-status-degraded)`), `rejected`(`var(--color-status-offline)`).
+     - fail-closed 미지 상태 및 own-key 방어: `getApprovalStatusConfig`에 `Object.hasOwn` 기반 own-key 검사를 적용하여 prototype key(`toString`, `constructor`, `__proto__`, `valueOf`, `hasOwnProperty`, `isPrototypeOf`), 계약 외 값(`admitted`), 대소문자 변형(`PENDING`) 탈취/fail-open 승격을 원천 차단하고 `var(--color-status-unknown)` 및 `UNKNOWN (<raw>)` 형식(null/undefined/빈값은 `UNKNOWN`)으로 fail-closed 매핑(WCAG 1.4.1 준수).
+     - 2인 승인 규칙 진행 상태 배지 시맨틱 분리: `1/2 승인 (2차 대기)` (`var(--color-brand-hover)`) vs `2인 필수` (`var(--color-text-secondary)`).
+     - 키보드 포커스 링 보존: 새로고침 버튼 및 에러 재시도 버튼에 인라인 `outline: none/0`, `outlineWidth: 0` 억제 배제 및 focus 후 computed outline 단언으로 focus ring 보존.
+     - 신선도 배지, 동기화 실패 경고 배너, 지표 행, 에러 상태 박스 전면 토큰화로 다크/라이트 양 테마 WCAG 2.2 AA (텍스트 >= 4.5:1, 비텍스트/테두리 >= 3.0:1) 100% 충족.
+  2. **Fail-Closed Multiset Baseline 래칫 강제**:
+     - `apps/web/tests/acc09-contrast-tokens.test.tsx`의 `COLOR_LITERAL_MULTISET_BASELINE`에서 `features/approvals/ApprovalCenter.tsx`의 허용 인벤토리를 `{}` (0건)으로 전면 고정.
+     - `borderSubtleCount` 458건 / 31개 파일 래칫.
+  3. **실제 렌더링 DOM 기반 동적 대비 단언 및 40종 변이 100% 사살**:
+     - Test 9p 신설: 신선도 배지, 새로고침 버튼, 동기화 실패 경고 배너, 상태 배지 5종, 계약 밖 admitted·대소문자 변형 PENDING·proto toString 실제 DOM 렌더링 검속, 2인 승인 진행 배지 2종, 빈 에러 상태 재시도 버튼 DOM 전경/배경/테두리/opacity: 1/텍스트 단언, config 키 집합 == wire enum 집합 동등성 단언, 계약 밖 상태 및 prototype key fail-closed own-key 방어 단언.
+     - Test 9j-2 확장: `ApprovalCenter.tsx` style 속성 AST 가드 기반 스타일-쌍 명도 대비 계산 및 커버리지 래칫 (totalStyleAttrs 37, checkedObjects 5, checkedPairs 19, unboundColorObjects 13, coveredColorObjects 18, checkedBorderObjects 13, checkedBorderPairs 14, violations 0).
+     - Revert-Fail Probes 101~105 추가.
+     - `tools/test_c245_mutations.py`: 40종 변이 W1~W40 전원 사살 실측 (40/40 = 100% killed, exit code 0).
+     - `tools/reproduce_c245_contrast.py` 31개 지표 실측 통과.
+  4. **잔여 백로그 현황**:
+     - ApprovalCenter 관련 하드코딩 리터럴 잔여 0건.
 
 ## 2026-10-02 배치 시뮬레이터 화면 (PlacementSimulator) 색상 리터럴 전수 토큰화(28건→0), 상태 색 정합성 및 접근성 승격 (Card 235, `agent/gemini/c235-placement-contrast`, base `81e9851b`, PR 대상 `agent/gemini/c230-desktop-shell-contrast`)
 - **개요**: ACC-09 다음 영역인 배치 시뮬레이터 화면(`PlacementSimulator.tsx`)의 색상 리터럴 inventory 전수(28건→0), 대비 표본/DOM 결속 감사 및 디스커버리 후보 계약 순수성 접근성 승격:
