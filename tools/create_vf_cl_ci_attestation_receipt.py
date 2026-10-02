@@ -24,6 +24,7 @@ WORKFLOW_PATH = ".github/workflows/s12-acceptance-evidence.yml"
 CARD = "VF-CL-04"
 SHA = re.compile(r"^[0-9a-f]{40}$")
 ARTIFACT_DIGEST = re.compile(r"^sha256:[0-9a-f]{64}$")
+RAW_ARTIFACT_DIGEST = re.compile(r"^[0-9a-f]{64}$")
 RECEIPT_KEYS = frozenset({
     "schemaVersion", "card", "repository", "workflowPath", "runId", "runAttempt",
     "event", "headSha", "headRef", "producerJob", "requiredSteps", "evidenceArtifact",
@@ -63,6 +64,17 @@ def canonical_digest(receipt: dict[str, Any]) -> str:
         body, sort_keys=True, separators=(",", ":"), ensure_ascii=False
     ).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
+
+
+def normalize_artifact_digest(value: Any) -> str:
+    """Normalize the two digest forms emitted by Actions to the API form."""
+    if not isinstance(value, str):
+        raise ReceiptError("expected evidence artifact digest is missing or malformed")
+    if RAW_ARTIFACT_DIGEST.fullmatch(value):
+        return f"sha256:{value}"
+    if ARTIFACT_DIGEST.fullmatch(value):
+        return value
+    raise ReceiptError("expected evidence artifact digest is missing or malformed")
 
 
 def _utc(value: Any, field: str) -> str:
@@ -109,7 +121,8 @@ def select_artifact(metadata: dict[str, Any], *, artifact_id: str, artifact_name
 def build_receipt(*, metadata: dict[str, Any], artifact_id: str, artifact_name: str,
                   repository: str, run_id: str, run_attempt: str, event: str,
                   head_sha: str, head_ref: str, producer_conclusion: str,
-                  required_steps: list[str], now: dt.datetime | None = None) -> dict[str, Any]:
+                  required_steps: list[str], expected_artifact_digest: str,
+                  now: dt.datetime | None = None) -> dict[str, Any]:
     if repository != REPOSITORY:
         raise ReceiptError(f"repository must be {REPOSITORY}")
     if not run_id.isdigit() or not run_attempt.isdigit():
@@ -129,6 +142,12 @@ def build_receipt(*, metadata: dict[str, Any], artifact_id: str, artifact_name: 
     moment = now or dt.datetime.now(dt.timezone.utc)
     if moment.tzinfo is None:
         raise ReceiptError("recordedAt source must be timezone-aware")
+    artifact = select_artifact(
+        metadata, artifact_id=artifact_id, artifact_name=artifact_name,
+        run_id=run_id, head_sha=head_sha,
+    )
+    if artifact["digest"] != normalize_artifact_digest(expected_artifact_digest):
+        raise ReceiptError("upload output and Actions API artifact digests do not match")
     receipt: dict[str, Any] = {
         "schemaVersion": SCHEMA,
         "card": CARD,
@@ -141,10 +160,7 @@ def build_receipt(*, metadata: dict[str, Any], artifact_id: str, artifact_name: 
         "headRef": head_ref,
         "producerJob": {"name": "s12-acceptance-evidence", "conclusion": producer_conclusion},
         "requiredSteps": required_steps,
-        "evidenceArtifact": select_artifact(
-            metadata, artifact_id=artifact_id, artifact_name=artifact_name,
-            run_id=run_id, head_sha=head_sha,
-        ),
+        "evidenceArtifact": artifact,
         "recordedAt": moment.astimezone(dt.timezone.utc).isoformat().replace("+00:00", "Z"),
     }
     receipt["receiptSha256"] = canonical_digest(receipt)
@@ -156,6 +172,7 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--artifact-metadata", type=Path, required=True)
     result.add_argument("--artifact-id", required=True)
     result.add_argument("--artifact-name", required=True)
+    result.add_argument("--expected-artifact-digest", required=True)
     result.add_argument("--producer-conclusion", required=True)
     result.add_argument("--required-step", action="append", required=True)
     result.add_argument("--out", type=Path, required=True)
@@ -177,6 +194,7 @@ def main(argv: list[str] | None = None) -> int:
             head_ref=os.environ.get("GITHUB_REF", ""),
             producer_conclusion=args.producer_conclusion,
             required_steps=args.required_step,
+            expected_artifact_digest=args.expected_artifact_digest,
         )
         args.out.parent.mkdir(parents=True, exist_ok=True)
         args.out.write_text(json.dumps(receipt, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

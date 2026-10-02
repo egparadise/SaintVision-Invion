@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-2026-10-02-CARD211-VFCL-CI-ATTESTATION-CODEX"
 title: "Card 211 VF-CL CI receipt attestation"
-version: "1.2.0"
+version: "1.2.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-02T08:29:06+09:00"
+updated: "2026-10-02T10:13:30+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "d0b2a4c6"
@@ -46,10 +46,14 @@ runner에서 닫을 수 있으므로 train 14 후보 `d0b2a4c6` 위에 `#295`와
   `2026-10-31T23:26:34Z`다. attestation artifact `11200405399`는 digest
   `sha256:efa66df4f8a7319f7720639b1bf955227a20d43831110d764d79e4e026482905`, 만료 시각
   `2026-10-31T23:27:03Z`다. `verification.json`은 repository, workflow, branch ref, exact head,
-  GitHub-hosted runner와 receipt subject digest를 모두 검증했다.
+  GitHub-hosted runner와 receipt subject digest를 모두 검증했다. 다운로드한 artifact ZIP의 Sigstore
+  bundle member 경로는 `_temp/VMTJin/attestation.json`이고 receipt와 verification member는 각각
+  `SaintVision-Invion/SaintVision-Invion/.work/vf-cl-attestation/VF-CL-04.json`과
+  `SaintVision-Invion/SaintVision-Invion/.work/vf-cl-attestation/verification.json`이다.
 - 이 run은 feature head의 attestation machinery를 측정한 것이다. landing SHA의 권위 증거가 아니므로
   `VF-CL-04.ciVerified=false`와 registry 상태는 유지한다.
 - label producer run `36940289003`은 head `8c2a703c`에서 success했다. 첫 workflow_dispatch run
   `36940396639`은 producer success 뒤 receipt step의 digest 비교에서 실패했다. `upload-artifact` output은
   64-hex, Actions API는 `sha256:<hex>`였는데 workflow가 형식을 정규화하지 않은 하네스 결함이다. 실패는
-  숨기지 않고 보존하며 `sha256:${digest#sha256:}` 정규화와 회귀 시험 뒤 exact-head를 재실행한다.
+  숨기지 않고 보존했다. 후속에서는 셸 문자열 비교를 제거하고 receipt 생성기가 raw 64-hex와
+  `sha256:<hex>`를 단일 정본 형식으로 정규화한 뒤 Actions API digest와 대조하도록 고정했다.

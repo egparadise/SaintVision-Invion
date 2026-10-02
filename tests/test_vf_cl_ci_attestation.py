@@ -40,7 +40,7 @@ def artifact_metadata(**changes):
     return {"total_count": 1, "artifacts": [artifact]}
 
 
-def receipt_document(**changes):
+def receipt_document(*, expected_artifact_digest="b" * 64, **changes):
     value = creator.build_receipt(
         metadata=artifact_metadata(),
         artifact_id=ARTIFACT_ID,
@@ -53,6 +53,7 @@ def receipt_document(**changes):
         head_ref=REF,
         producer_conclusion="success",
         required_steps=STEPS,
+        expected_artifact_digest=expected_artifact_digest,
         now=dt.datetime(2026, 10, 2, tzinfo=dt.timezone.utc),
     )
     value.update(changes)
@@ -91,6 +92,19 @@ def test_creator_binds_current_run_head_and_artifact():
     assert value["receiptSha256"] == creator.canonical_digest(value)
 
 
+@pytest.mark.parametrize("expected", ["b" * 64, "sha256:" + "b" * 64])
+def test_creator_normalizes_both_actions_digest_forms(expected):
+    value = receipt_document(expected_artifact_digest=expected)
+    assert value["evidenceArtifact"]["digest"] == "sha256:" + "b" * 64
+
+
+@pytest.mark.parametrize("expected", ["c" * 64, "", "SHA256:" + "b" * 64])
+def test_creator_refuses_mismatched_or_malformed_upload_digest(expected):
+    message = "do not match" if expected == "c" * 64 else "missing or malformed"
+    with pytest.raises(creator.ReceiptError, match=message):
+        receipt_document(expected_artifact_digest=expected)
+
+
 @pytest.mark.parametrize(
     ("change", "message"),
     [
@@ -107,7 +121,7 @@ def test_creator_rejects_unbound_artifact_metadata(change, message):
             artifact_name=ARTIFACT_NAME, repository=creator.REPOSITORY,
             run_id=RUN_ID, run_attempt="1", event="workflow_dispatch",
             head_sha=HEAD, head_ref=REF, producer_conclusion="success",
-            required_steps=STEPS,
+            required_steps=STEPS, expected_artifact_digest="b" * 64,
         )
 
 
@@ -127,6 +141,7 @@ def test_creator_rejects_untrusted_context(field, value, message):
         repository=creator.REPOSITORY, run_id=RUN_ID, run_attempt="1",
         event="workflow_dispatch", head_sha=HEAD, head_ref=REF,
         producer_conclusion="success", required_steps=STEPS,
+        expected_artifact_digest="b" * 64,
     )
     kwargs[field] = value
     with pytest.raises(creator.ReceiptError, match=message):
@@ -275,4 +290,5 @@ def test_workflow_grants_signing_permissions_only_to_manual_attestation_job():
         step for step in attestation["steps"]
         if step.get("name") == "Create the authoritative VF-CL receipt"
     )
-    assert 'sha256:${EVIDENCE_ARTIFACT_DIGEST#sha256:}' in create_step["run"]
+    assert '--expected-artifact-digest "$EVIDENCE_ARTIFACT_DIGEST"' in create_step["run"]
+    assert "${EVIDENCE_ARTIFACT_DIGEST#sha256:}" not in create_step["run"]

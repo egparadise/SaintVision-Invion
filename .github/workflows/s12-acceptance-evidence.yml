@@ -211,6 +211,7 @@ jobs:
             --artifact-metadata "$RECEIPT_DIR/artifacts.json" \
             --artifact-id "$EVIDENCE_ARTIFACT_ID" \
             --artifact-name "$EVIDENCE_ARTIFACT_NAME" \
+            --expected-artifact-digest "$EVIDENCE_ARTIFACT_DIGEST" \
             --producer-conclusion '${{ needs.s12-acceptance-evidence.result }}' \
             --required-step 'Derive the AC-12 acceptance items' \
             --required-step 'Hold the bundle to its shape and to this head' \
@@ -218,8 +219,6 @@ jobs:
             --required-step 'Upload the acceptance evidence' \
             --out "$RECEIPT_PATH"
           test "$(sha256sum "$RECEIPT_PATH" | cut -d' ' -f1)" != ""
-          test "sha256:${EVIDENCE_ARTIFACT_DIGEST#sha256:}" = "$(python -c \
-            'import json,os; print(json.load(open(os.environ["RECEIPT_PATH"]))["evidenceArtifact"]["digest"])')"
       - name: Attest the CI-produced VF-CL receipt
         id: receipt-attestation
         uses: actions/attest@v4
