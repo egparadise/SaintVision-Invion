@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD232-S08-BE-WORKER-PRODUCER-20261002"
 title: "Card 232 S08-BE product worker loop and trusted intent producer"
-version: "1.3.0"
+version: "1.4.0"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T19:02:27+09:00"
+updated: "2026-10-02T20:12:31+09:00"
 source_of_truth: "Git"
 base_sha: "c57697d2ab80877f44e189c1efe172a6dd03a7e6"
 reviewer: "Claude"
@@ -143,3 +143,20 @@ No local PostgreSQL, Docker, BuildKit, or full suite was started.
 | hosted 0060 RLS catalog observation | run `36992706201`, 157 tables, `UNMEASURED` row verdict |
 | `tools/migration_graph.py --head` | `0060_build_execution_admissions`, one head |
 | `git diff --check` | exit 0 |
+
+# Claude r2 queue-fairness correction
+
+The r1 retry branch committed a one-second database-owned backoff and returned from the
+promotion call. Because the product tick also waits one second, the oldest temporarily
+stale admission could become due again before every tick and starve all later healthy
+admissions. The retry branch now commits its backoff and continues the bounded selection
+loop, so that row is no longer due and the same tick can promote the next healthy row.
+
+A real-PostgreSQL regression creates one admission on a stale Node and a later admission
+on a healthy Node. The first tick must leave only the stale row at
+`ready/RES-0003/retry_count=1` with a future `next_attempt_at` and must promote the healthy
+row. Replacing the `continue` with the former `return None` makes that regression fail.
+The local workstation could only compile these two changed Python files: its installed
+Python 3.14 has no pytest package and default Python 3.10 cannot import `enum.StrEnum`.
+The real-PG result is therefore an exact-head hosted Core merge condition, not a local
+measurement claim.

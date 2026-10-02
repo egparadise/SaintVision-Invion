@@ -351,3 +351,43 @@ def test_stale_node_promotion_backs_off_and_recovers_without_quarantine(env):
         conn.execute("SELECT pg_sleep(1.1)")
     assert retry == ("ready", "RES-0003", 1, True)
     assert store.promote_next(env.tenant) == admission
+
+
+def test_retryable_stale_admission_does_not_block_next_due_admission(env):
+    stale = _record(env)
+    stale_node = new_id("nod")
+    with psycopg.connect(env.owner) as conn:
+        conn.execute(
+            """INSERT INTO inv.nodes(
+            tenant_id,node_id,status,heartbeat_at,recovery_epoch,clock_skew_seconds
+            ) VALUES (%s,%s,'online',clock_timestamp()-interval '1 hour',%s,0)""",
+            (env.tenant, stale_node, env.epoch),
+        )
+        conn.execute(
+            """UPDATE inv.resources SET node_id=%s
+            WHERE tenant_id=%s AND resource_id=%s""",
+            (stale_node, env.tenant, stale.plan["lease"]["resourceId"]),
+        )
+
+    healthy = _record(env, grant=False)
+    promoted = BuildExecutionAdmissionStore(env.db).promote_next(env.tenant)
+
+    assert promoted == healthy
+    with psycopg.connect(env.owner) as conn:
+        states = dict(
+            conn.execute(
+                """SELECT run_id,status || ':' || COALESCE(last_error_code,'')
+                FROM inv.build_execution_admissions WHERE run_id IN (%s,%s)""",
+                (stale.run_id, healthy.run_id),
+            ).fetchall()
+        )
+        retries = conn.execute(
+            """SELECT retry_count,next_attempt_at > clock_timestamp()
+            FROM inv.build_execution_admissions WHERE run_id=%s""",
+            (stale.run_id,),
+        ).fetchone()
+    assert states == {
+        stale.run_id: "ready:RES-0003",
+        healthy.run_id: "promoted:",
+    }
+    assert retries == (1, True)

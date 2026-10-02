@@ -229,7 +229,12 @@ class BuildExecutionAdmissionStore:
                                 admission.run_id,
                             ),
                         )
-                        return None
+                        # The transaction commits this row's bounded backoff before the
+                        # loop selects another due admission.  Returning here would let
+                        # one temporarily stale authority monopolise the tenant queue on
+                        # every worker tick because the retry delay and tick interval are
+                        # both one second.
+                        continue
                     conn.execute(
                         """UPDATE inv.build_execution_admissions
                         SET status='quarantined',last_error_code=%s
