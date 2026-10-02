@@ -21,7 +21,7 @@ import argparse
 import subprocess
 from pathlib import Path
 
-WORKTREE_ROOT = Path(r"D:\Project\SaintVisionI-Invion\https-github.com-egparadise-SaintVision-Invion.git\.worktrees\gemini-c235")
+WORKTREE_ROOT = Path(__file__).resolve().parent.parent
 APPS_WEB = WORKTREE_ROOT / "apps" / "web"
 TARGET_FILE = APPS_WEB / "src" / "features" / "placement" / "PlacementSimulator.tsx"
 RESULTS_FILE = WORKTREE_ROOT / "tools" / ".c235_mutation_results.json"
@@ -298,6 +298,7 @@ def run_vitest_acc09(timeout=120):
         "npx.cmd" if os.name == "nt" else "npx",
         "vitest",
         "run",
+        "--no-cache",
         "tests/acc09-contrast-tokens.test.tsx",
     ]
     try:

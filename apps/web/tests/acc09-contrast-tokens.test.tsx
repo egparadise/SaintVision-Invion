@@ -6042,7 +6042,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       initialPools: mockPools,
       initialPoolsState: 'success' as const,
       initialPoolCapacity: mockCapacity,
-      initialPoolCapacityState: 'success' as const,
+      initialPoolCapacityState: 'error' as const,
+      initialPoolCapacityError: '실시간 용량 초과 경고: 모의 한도 도달',
       initialPreviewState: 'error' as const,
       initialPreviewError: '서버 배치 미리보기 실패: 모의 연결 오류',
       initialCandidates: mockCandidates,
@@ -6123,12 +6124,20 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(gpuBtn.style.outline || 'inherit').not.toMatch(/(none|0px|\b0\b)/);
       expect(gpuBtn.style.outlineStyle || 'inherit').not.toBe('none');
 
+      // Focus ring preservation on pool button
+      const computedPool = window.getComputedStyle(pool01Btn);
+      expect(computedPool.outlineStyle || 'inherit').not.toBe('none');
+      expect(pool01Btn.style.outline || 'inherit').not.toMatch(/(none|0px|\b0\b)/);
+      expect(pool01Btn.style.outlineStyle || 'inherit').not.toBe('none');
+
       // 4. Preview Error Banner & Retry Button
       const prevErrorBanner = container.querySelector('[data-testid="preview-error-banner"]') as HTMLElement;
       expect(prevErrorBanner, 'Preview error banner must render').not.toBeNull();
       expect(prevErrorBanner.style.backgroundColor).toBe('var(--color-bg-subtle)');
       expect(prevErrorBanner.style.borderColor).toBe('var(--color-status-offline)');
       expect(prevErrorBanner.style.color).toBe('var(--color-status-offline)');
+      expect(prevErrorBanner.textContent, 'Preview error banner must contain warning icon').toContain('⚠️');
+      expect(prevErrorBanner.textContent, 'Preview error banner must contain failure heading').toContain('서버 배치 미리보기 실패');
 
       const prevRetryBtn = container.querySelector('[data-testid="preview-retry-btn"]') as HTMLButtonElement;
       expect(prevRetryBtn, 'Preview retry button must render').not.toBeNull();
@@ -6142,6 +6151,15 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(computedRetry.outlineStyle || 'inherit').not.toBe('none');
       expect(prevRetryBtn.style.outline || 'inherit').not.toMatch(/(none|0px|\b0\b)/);
       expect(prevRetryBtn.style.outlineStyle || 'inherit').not.toBe('none');
+
+      // 4a. Pool capacity error in DOM
+      const capError = container.querySelector('[data-testid="pool-capacity-error"]') as HTMLElement;
+      expect(capError, 'Pool capacity error banner must render').not.toBeNull();
+      expect(capError.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(capError.style.borderColor).toBe('var(--color-status-offline)');
+      expect(capError.style.color).toBe('var(--color-status-offline)');
+      expect(capError.textContent).toContain('⚠️');
+      expect(capError.textContent).toContain('실시간 용량 초과 경고');
 
       // 5. Discovery Candidates State Badges (Contract candidate, Out-of-contract, Case variant, Prototype key)
       const candAlphaBadge = container.querySelector('[data-testid="candidate-status-ann_01"]') as HTMLElement;
@@ -6172,6 +6190,60 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(candDeltaBadge.style.color).toBe('var(--color-status-unknown)');
       expect(candDeltaBadge.style.backgroundColor).toBe('var(--color-bg-subtle)');
       expect(candDeltaBadge.style.borderColor).toBe('var(--color-status-unknown)');
+
+      // 5b. Danger Banners in DOM (pools-error-banner and candidates-error-banner)
+      await act(async () => {
+        root.render(
+          <PlacementSimulator
+            key="error-state-render"
+            {...mockProps}
+            initialPoolsState="error"
+            initialPoolsError="자원 풀 서버 연결 거부"
+            initialCandidatesState="error"
+            initialCandidatesError="후보 노드 레지스트리 통신 오류"
+          />
+        );
+      });
+
+      // 5b-1. pools-error-banner
+      const poolsErrorBanner = container.querySelector('[data-testid="pools-error-banner"]') as HTMLElement;
+      expect(poolsErrorBanner, 'Pools error banner must render').not.toBeNull();
+      expect(poolsErrorBanner.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(poolsErrorBanner.style.borderColor).toBe('var(--color-status-offline)');
+      expect(poolsErrorBanner.style.color).toBe('var(--color-status-offline)');
+      expect(poolsErrorBanner.textContent).toContain('⚠️');
+      expect(poolsErrorBanner.textContent).toContain('자원 풀 연동 실패');
+      expect(poolsErrorBanner.textContent).toContain('자원 풀 서버 연결 거부');
+
+      const poolsRetryBtn = container.querySelector('[data-testid="pools-retry-btn"]') as HTMLButtonElement;
+      expect(poolsRetryBtn, 'Pools retry button must render').not.toBeNull();
+      expect(poolsRetryBtn.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(poolsRetryBtn.style.color).toBe('var(--color-text-primary)');
+      expect(poolsRetryBtn.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(poolsRetryBtn.textContent).toContain('재시도 (Retry)');
+      const computedPoolsRetry = window.getComputedStyle(poolsRetryBtn);
+      expect(computedPoolsRetry.outlineStyle || 'inherit').not.toBe('none');
+      expect(poolsRetryBtn.style.outline || 'inherit').not.toMatch(/(none|0px|\b0\b)/);
+
+      // 5b-2. candidates-error-banner
+      const candErrorBanner = container.querySelector('[data-testid="candidates-error-banner"]') as HTMLElement;
+      expect(candErrorBanner, 'Candidates error banner must render').not.toBeNull();
+      expect(candErrorBanner.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(candErrorBanner.style.borderColor).toBe('var(--color-status-offline)');
+      expect(candErrorBanner.style.color).toBe('var(--color-status-offline)');
+      expect(candErrorBanner.textContent).toContain('⚠️');
+      expect(candErrorBanner.textContent).toContain('디스커버리 후보 조회 실패');
+      expect(candErrorBanner.textContent).toContain('후보 노드 레지스트리 통신 오류');
+
+      const candRetryBtn = container.querySelector('[data-testid="candidates-retry-btn"]') as HTMLButtonElement;
+      expect(candRetryBtn, 'Candidates retry button must render').not.toBeNull();
+      expect(candRetryBtn.style.backgroundColor).toBe('var(--color-bg-subtle)');
+      expect(candRetryBtn.style.color).toBe('var(--color-text-primary)');
+      expect(candRetryBtn.style.borderColor).toBe('var(--color-border-subtle)');
+      expect(candRetryBtn.textContent).toContain('재시도 (Retry)');
+      const computedCandRetry = window.getComputedStyle(candRetryBtn);
+      expect(computedCandRetry.outlineStyle || 'inherit').not.toBe('none');
+      expect(candRetryBtn.style.outline || 'inherit').not.toMatch(/(none|0px|\b0\b)/);
 
       // 6. DISCOVERY_CANDIDATE_STATE_CONFIG exact key set contract check
       expect(Object.keys(DISCOVERY_CANDIDATE_STATE_CONFIG).sort()).toEqual(['candidate']);
