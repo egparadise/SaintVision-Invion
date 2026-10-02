@@ -41,6 +41,9 @@ import {
   SLO_STATUS_CONFIG,
   AUDIT_STATUS_CONFIG,
   CANDIDATE_STATUS_CONFIG,
+  getSloStatusConfig,
+  getAuditStatusConfig,
+  getCandidateStatusConfig,
 } from '../src/features/release/ReleaseCandidateView';
 import { ReleaseManager } from '../src/features/release/releaseEngine';
 import type {
@@ -4788,43 +4791,61 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
       expect(activeRcCard.style.backgroundColor).toBe('var(--color-bg-surface)');
       expect(activeRcCard.style.borderColor).toBe('var(--color-border-subtle)');
 
-      // Outline ring on active candidate card
-      expect(activeRcCard.style.outlineColor || activeRcCard.style.outline).toContain('var(--color-brand-primary)');
-      expect(activeRcCard.style.outlineOffset).toBe('2px');
+      // Active candidate card has no focus-mimicking inline outline (base non-outline preserved)
+      expect(activeRcCard.style.outline || 'none', 'Active candidate card must not have inline outline mimicking focus ring').toBe('none');
 
-      // 3. SLO Status Badges
+      // 3. SLO Status Badges & Ancestor Contrast (M1)
       for (const [status, cfg] of Object.entries(SLO_STATUS_CONFIG)) {
         const cVar = helperExtractVar(cfg.color);
         const bVar = helperExtractVar(cfg.border);
         const bgVar = helperExtractVar(cfg.bg);
         expect(getContrast(lightTokens[cVar], lightTokens[bgVar]), `SLO status ${status} light text contrast >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
         expect(getContrast(darkTokens[cVar], darkTokens[bgVar]), `SLO status ${status} dark text contrast >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
-        expect(getContrast(lightTokens[bVar], lightTokens['--color-bg-surface']), `SLO status ${status} light border contrast >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
-        expect(getContrast(darkTokens[bVar], darkTokens['--color-bg-surface']), `SLO status ${status} dark border contrast >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
+        expect(getContrast(lightTokens[bVar], lightTokens['--color-bg-surface']), `SLO status ${status} light border contrast on surface >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
+        expect(getContrast(darkTokens[bVar], darkTokens['--color-bg-surface']), `SLO status ${status} dark border contrast on surface >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
+        expect(getContrast(lightTokens[bVar], lightTokens['--color-bg-subtle']), `SLO status ${status} light border contrast on subtle >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
+        expect(getContrast(darkTokens[bVar], darkTokens['--color-bg-subtle']), `SLO status ${status} dark border contrast on subtle >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
       }
 
-      // Check rendered SLO badge
-      const sloBadges = container.querySelectorAll('[data-testid^="slo-status-badge-"]');
-      expect(sloBadges.length).toBeGreaterThan(0);
-      sloBadges.forEach((b) => {
-        const el = b as HTMLElement;
-        expect(el.style.backgroundColor).toBe('var(--color-bg-subtle)');
-        expect(el.style.opacity || '1', 'SLO badge must not have degraded opacity').toBe('1');
-        expect(el.textContent!.trim().length).toBeGreaterThan(0);
-      });
+      const releaseMgr = new ReleaseManager();
+      const defaultSlos = releaseMgr.getSloRecords();
+      expect(defaultSlos.length).toBeGreaterThan(0);
+      for (const slo of defaultSlos) {
+        const badge = container.querySelector(`[data-testid="slo-status-badge-${slo.name}"]`) as HTMLElement;
+        expect(badge, `SLO badge for ${slo.name} must render in DOM`).not.toBeNull();
+        const cfg = getSloStatusConfig(slo.status);
+        expect(badge.style.color, `SLO badge color for ${slo.name} must match config color`).toBe(cfg.color);
+        expect(badge.style.backgroundColor, `SLO badge bg for ${slo.name} must match config bg`).toBe(cfg.bg);
+        expect(badge.style.borderColor, `SLO badge border for ${slo.name} must match config border`).toBe(cfg.border);
+        expect(badge.style.opacity || '1', `SLO badge ${slo.name} must not have degraded opacity`).toBe('1');
+        expect(badge.textContent!.trim(), `SLO badge text for ${slo.name} must match config label`).toBe(cfg.label);
+      }
 
-      // 4. Audit Status Badges
+      // 4. Audit Status Badges & Ancestor Contrast (M1)
       for (const [status, cfg] of Object.entries(AUDIT_STATUS_CONFIG)) {
         const cVar = helperExtractVar(cfg.color);
         const bVar = helperExtractVar(cfg.border);
         const bgVar = helperExtractVar(cfg.bg);
         expect(getContrast(lightTokens[cVar], lightTokens[bgVar]), `Audit status ${status} light text contrast >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
         expect(getContrast(darkTokens[cVar], darkTokens[bgVar]), `Audit status ${status} dark text contrast >= 4.5:1`).toBeGreaterThanOrEqual(4.5);
-        expect(getContrast(lightTokens[bVar], lightTokens['--color-bg-surface']), `Audit status ${status} light border contrast >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
-        expect(getContrast(darkTokens[bVar], darkTokens['--color-bg-surface']), `Audit status ${status} dark border contrast >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
+        expect(getContrast(lightTokens[bVar], lightTokens['--color-bg-subtle']), `Audit status ${status} light border contrast on subtle row >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
+        expect(getContrast(darkTokens[bVar], darkTokens['--color-bg-subtle']), `Audit status ${status} dark border contrast on subtle row >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
       }
 
-      // 5. Candidate Active Badges
+      const defaultAudits = releaseMgr.getAccessibilityAudits();
+      expect(defaultAudits.length).toBeGreaterThan(0);
+      for (const audit of defaultAudits) {
+        const badge = container.querySelector(`[data-testid="audit-status-badge-${audit.ruleId}"]`) as HTMLElement;
+        expect(badge, `Audit badge for ${audit.ruleId} must render in DOM`).not.toBeNull();
+        const cfg = getAuditStatusConfig(audit.status);
+        expect(badge.style.color, `Audit badge color for ${audit.ruleId} must match config color`).toBe(cfg.color);
+        expect(badge.style.backgroundColor, `Audit badge bg for ${audit.ruleId} must match config bg`).toBe(cfg.bg);
+        expect(badge.style.borderColor, `Audit badge border for ${audit.ruleId} must match config border`).toBe(cfg.border);
+        expect(badge.style.opacity || '1', `Audit badge ${audit.ruleId} must not have degraded opacity`).toBe('1');
+        expect(badge.textContent!.trim(), `Audit badge text for ${audit.ruleId} must match config label`).toBe(cfg.label);
+      }
+
+      // 5. Candidate Active Badges & Ancestor Contrast
       for (const [status, cfg] of Object.entries(CANDIDATE_STATUS_CONFIG)) {
         const cVar = helperExtractVar(cfg.color);
         const bVar = helperExtractVar(cfg.border);
@@ -4835,20 +4856,75 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
         expect(getContrast(darkTokens[bVar], darkTokens['--color-bg-surface']), `Candidate status ${status} dark border contrast >= 3.0:1`).toBeGreaterThanOrEqual(3.0);
       }
 
-      // Check rendered candidate badges and non-empty text label
-      const candidateBadges = container.querySelectorAll('[data-testid^="candidate-status-badge-"]');
-      expect(candidateBadges.length).toBeGreaterThan(0);
-      candidateBadges.forEach((b) => {
-        const el = b as HTMLElement;
-        expect(el.textContent!.trim().length).toBeGreaterThan(0);
-      });
+      const defaultCandidates = releaseMgr.getReleaseCandidates();
+      expect(defaultCandidates.length).toBeGreaterThan(0);
+      for (const rc of defaultCandidates) {
+        const badge = container.querySelector(`[data-testid="candidate-status-badge-${rc.tag}"]`) as HTMLElement;
+        expect(badge, `Candidate badge for ${rc.tag} must render in DOM`).not.toBeNull();
+        const cfg = getCandidateStatusConfig(rc.isActive ? 'active' : 'waiting');
+        expect(badge.style.color, `Candidate badge color for ${rc.tag} must match config color`).toBe(cfg.color);
+        expect(badge.style.backgroundColor, `Candidate badge bg for ${rc.tag} must match config bg`).toBe(cfg.bg);
+        expect(badge.style.borderColor, `Candidate badge border for ${rc.tag} must match config border`).toBe(cfg.border);
+        expect(badge.style.opacity || '1', `Candidate badge ${rc.tag} must not have degraded opacity`).toBe('1');
+        expect(badge.textContent!.trim(), `Candidate badge text for ${rc.tag} must match config label`).toBe(cfg.label);
+      }
 
-      // Uniqueness and state color semantics
-      expect(CANDIDATE_STATUS_CONFIG.active.color).not.toBe(CANDIDATE_STATUS_CONFIG.waiting.color);
-      expect(SLO_STATUS_CONFIG.met.color).not.toBe(SLO_STATUS_CONFIG.breached.color);
-      expect(AUDIT_STATUS_CONFIG.fail.color).toBe('var(--color-status-offline)');
-      expect(AUDIT_STATUS_CONFIG.pass.color).toBe('var(--color-status-online)');
+      // Non-color indication for candidate status (waiting state initially)
+      expect(container.textContent, 'Unverified candidate must show waiting indicator').toContain('미측정 (대기)');
+
+      // Pairwise uniqueness across all status states (H2)
+      const sloStatuses: SloRecordStatus[] = ['met', 'unmeasured', 'breached'];
+      for (let i = 0; i < sloStatuses.length; i++) {
+        for (let j = i + 1; j < sloStatuses.length; j++) {
+          const s1 = sloStatuses[i], s2 = sloStatuses[j];
+          expect(SLO_STATUS_CONFIG[s1].color, `SLO ${s1} and ${s2} must have distinct colors`).not.toBe(SLO_STATUS_CONFIG[s2].color);
+          expect(SLO_STATUS_CONFIG[s1].label, `SLO ${s1} and ${s2} must have distinct labels`).not.toBe(SLO_STATUS_CONFIG[s2].label);
+        }
+      }
       expect(AUDIT_STATUS_CONFIG.pass.color).not.toBe(AUDIT_STATUS_CONFIG.fail.color);
+      expect(AUDIT_STATUS_CONFIG.pass.label).not.toBe(AUDIT_STATUS_CONFIG.fail.label);
+      expect(CANDIDATE_STATUS_CONFIG.active.color).not.toBe(CANDIDATE_STATUS_CONFIG.waiting.color);
+      expect(CANDIDATE_STATUS_CONFIG.active.label).not.toBe(CANDIDATE_STATUS_CONFIG.waiting.label);
+
+      // Fail-closed Unknown status negative verification (H1)
+      const unknownSlo = getSloStatusConfig('bogus_status');
+      expect(unknownSlo.color).toBe('var(--color-status-unknown)');
+      expect(unknownSlo.border).toBe('var(--color-status-unknown)');
+      expect(unknownSlo.label).toBe('UNKNOWN (bogus_status)');
+
+      const unknownAudit = getAuditStatusConfig('bogus_audit');
+      expect(unknownAudit.color).toBe('var(--color-status-unknown)');
+      expect(unknownAudit.border).toBe('var(--color-status-unknown)');
+      expect(unknownAudit.label).toBe('UNKNOWN (bogus_audit)');
+
+      const unknownCandidate = getCandidateStatusConfig('bogus_candidate');
+      expect(unknownCandidate.color).toBe('var(--color-status-unknown)');
+      expect(unknownCandidate.label).toBe('UNKNOWN (bogus_candidate)');
+
+      // Render with mock evidence having bogus SLO status to verify DOM fail-closed display (H1)
+      const sloSpy = vi.spyOn(ReleaseManager.prototype, 'getSloRecords').mockReturnValueOnce([
+        {
+          name: 'Unknown Probe SLO',
+          targetValue: '99.9%',
+          actualValue: '0%',
+          status: 'bogus_slo' as any,
+          category: 'resilience',
+        },
+      ]);
+      await act(async () => {
+        root.render(<ReleaseCandidateView key="bogus" />);
+      });
+      const bogusBadge = container.querySelector('[data-testid="slo-status-badge-Unknown Probe SLO"]') as HTMLElement;
+      expect(bogusBadge, 'Bogus SLO badge must render in DOM').not.toBeNull();
+      expect(bogusBadge.style.color).toBe('var(--color-status-unknown)');
+      expect(bogusBadge.style.borderColor).toBe('var(--color-status-unknown)');
+      expect(bogusBadge.textContent).toContain('UNKNOWN (bogus_slo)');
+      sloSpy.mockRestore();
+
+      // Re-render default to proceed with rollback action notice verification
+      await act(async () => {
+        root.render(<ReleaseCandidateView key="default-rollback" />);
+      });
 
       // 6. Action Notification
       // 6.a Error action notice via simulated rollback failure
@@ -4859,6 +4935,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
 
       const rollbackBtn = container.querySelector('button[aria-label*="롤백 실행"]') as HTMLButtonElement;
       expect(rollbackBtn, 'Rollback button must render for inactive candidate').not.toBeNull();
+      expect(rollbackBtn.style.outline || 'inherit', 'Rollback button must not have inline outline: none suppressing focus ring').not.toBe('none');
       await act(async () => {
         rollbackBtn.click();
       });
@@ -4877,6 +4954,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
 
       const actionNotice = container.querySelector('[data-testid="release-action-notice"]') as HTMLElement;
       expect(actionNotice, 'Action notice banner must render').not.toBeNull();
+      expect(container.textContent, 'Verified candidate must show checkmark icon after rollback').toContain('✔ 모의 검증 완료');
       expect(actionNotice.style.backgroundColor).toBe('var(--color-bg-subtle)');
       expect(actionNotice.style.borderColor).toBe('var(--color-status-online)');
       expect(actionNotice.style.color).toBe('var(--color-status-online)');
@@ -5098,7 +5176,7 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
   });
 
   // 9j-2. [Card 215 & Card 218 & Card 220 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: RunList, DistributedRecoveryView & ReleaseCandidateView
-  it('ACC-09 / Card 215 & Card 218: RunList and DistributedRecoveryView style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
+  it('ACC-09 / Card 215 & Card 218 & Card 220: RunList, DistributedRecoveryView, and ReleaseCandidateView style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
     interface Branch {
       cond: string;
       token: string;
@@ -5132,6 +5210,15 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
               if (clean.startsWith('#') || clean.startsWith('rgb') || clean.startsWith('hsl') || namedColors.includes(clean) || (!allowedNonTokens.includes(clean) && /^[a-z]+$/.test(clean))) {
                 const { line } = sf.getLineAndCharacterOfPosition(n.getStart(sf));
                 violations.push(`L${line + 1}: Raw color literal detected instead of design token: ${text}`);
+              } else {
+                const subTokens = clean.split(/\s+/);
+                for (const tok of subTokens) {
+                  if (tok.startsWith('#') || tok.startsWith('rgb') || tok.startsWith('hsl') || namedColors.includes(tok)) {
+                    const { line } = sf.getLineAndCharacterOfPosition(n.getStart(sf));
+                    violations.push(`L${line + 1}: Raw color literal detected in shorthand expression instead of design token: ${text}`);
+                    break;
+                  }
+                }
               }
             }
           }
@@ -5262,6 +5349,13 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
                 if (name === 'color') fgNode = p.initializer;
                 if (name === 'border' || name === 'borderColor' || name === 'borderBottom' || name === 'borderLeft') borderNode = p.initializer;
                 if (name === 'opacity') opacityNode = p.initializer;
+                if (name === 'outline') {
+                  const outlineVal = p.initializer.getText(sf).replace(/['"`]/g, '').trim().toLowerCase();
+                  if (outlineVal === 'none') {
+                    const { line } = sf.getLineAndCharacterOfPosition(p.getStart(sf));
+                    violations.push(`L${line + 1}: Inline outline: none suppressing focus ring`);
+                  }
+                }
               }
             }
 

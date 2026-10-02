@@ -3,10 +3,10 @@
 tools/test_c220_mutations.py
 
 Card 220 (ACC-09) Release Candidate screen (ReleaseCandidateView.tsx) Mutation Testing Suite.
-Verifies that 16 distinct regressions/mutations (M1-M16) across
+Verifies that 20 distinct regressions/mutations (M1-M20) across
 color contrast, border collisions, status semantics, testid binding,
-and fail-closed multiset inventory are strictly caught and killed by the test suite
-(ACC-09 Test 9k, Test 9j-2 / Test 9k-2, and Test 10).
+fail-closed unknown handling, and non-color accessibility are strictly caught
+and killed by the test suite (ACC-09 Test 9k, Test 9j-2, and Test 10).
 
 Usage:
     python tools/test_c220_mutations.py
@@ -41,8 +41,8 @@ MUTANTS = [
     {
         'id': 'M1 (A1)',
         'name': 'ReleaseCandidateView: notice banner bg -> text-secondary (fg==bg collision)',
-        'target': "        style={{\n          padding: '8px 16px',\n          backgroundColor: 'var(--color-bg-subtle)',\n          border: '1px solid var(--color-border-subtle)',\n          borderRadius: '6px',\n          color: 'var(--color-text-secondary)',",
-        'replacement': "        style={{\n          padding: '8px 16px',\n          backgroundColor: 'var(--color-text-secondary)',\n          border: '1px solid var(--color-border-subtle)',\n          borderRadius: '6px',\n          color: 'var(--color-text-secondary)',",
+        'target': "padding: '8px 16px',\n          backgroundColor: 'var(--color-bg-subtle)',\n          border: '1px solid var(--color-border-subtle)',\n          borderRadius: '6px',\n          color: 'var(--color-text-secondary)',",
+        'replacement': "padding: '8px 16px',\n          backgroundColor: 'var(--color-text-secondary)',\n          border: '1px solid var(--color-border-subtle)',\n          borderRadius: '6px',\n          color: 'var(--color-text-secondary)',",
         'expected_guard': 'Test 9k / Test 9j-2 (1:1 collision between bg and fg)',
     },
     {
@@ -68,16 +68,16 @@ MUTANTS = [
     },
     {
         'id': 'M5 (B1)',
-        'name': 'ReleaseCandidateView: active candidate card outline ring removed',
-        'target': "        <div\n          data-testid=\"active-candidate-card\"\n          style={{\n            backgroundColor: 'var(--color-bg-surface)',\n            border: '1px solid var(--color-border-subtle)',\n            borderRadius: '8px',\n            padding: '16px 20px',\n            outline: '2px solid var(--color-brand-primary)',\n            outlineOffset: '2px',\n          }}",
-        'replacement': "        <div\n          data-testid=\"active-candidate-card\"\n          style={{\n            backgroundColor: 'var(--color-bg-surface)',\n            border: '1px solid var(--color-border-subtle)',\n            borderRadius: '8px',\n            padding: '16px 20px',\n            outline: 'none',\n            outlineOffset: '2px',\n          }}",
-        'expected_guard': 'Test 9k (active candidate outline ring assertion)',
+        'name': 'ReleaseCandidateView: rollback button injects inline outline: none suppressing focus ring',
+        'target': "<Button\n                          size=\"sm\"\n                          variant=\"secondary\"\n                          aria-label={`이 버전(${rc.tag})으로 롤백 실행 (AC-11)`}",
+        'replacement': "<Button\n                          size=\"sm\"\n                          variant=\"secondary\"\n                          style={{ outline: 'none' }}\n                          aria-label={`이 버전(${rc.tag})으로 롤백 실행 (AC-11)`}",
+        'expected_guard': 'Test 9k (rollback button outline ring suppression assertion) & Test 9j-2',
     },
     {
         'id': 'M6 (C1)',
         'name': 'ReleaseCandidateView: SLO status badge opacity degraded to 0.4',
-        'target': "                        <span\n                          data-testid={`slo-status-badge-${slo.name}`}\n                          style={{\n                            padding: '2px 8px',",
-        'replacement': "                        <span\n                          data-testid={`slo-status-badge-${slo.name}`}\n                          style={{\n                            opacity: 0.4,\n                            padding: '2px 8px',",
+        'target': "<span\n                          data-testid={`slo-status-badge-${slo.name}`}\n                          style={{\n                            padding: '2px 8px',",
+        'replacement': "<span\n                          data-testid={`slo-status-badge-${slo.name}`}\n                          style={{\n                            opacity: 0.4,\n                            padding: '2px 8px',",
         'expected_guard': 'Test 9k (opacity 0.4 degradation assertion)',
     },
     {
@@ -132,8 +132,8 @@ MUTANTS = [
     {
         'id': 'M14 (E2)',
         'name': 'ReleaseCandidateView: KPI vulns title color swapped to bg-surface (invisible text)',
-        'target': "          <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Critical / High 미완화 결함 (AC-11)</div>",
-        'replacement': "          <div style={{ fontSize: '12px', color: 'var(--color-bg-surface)', fontWeight: 600 }}>Critical / High 미완화 결함 (AC-11)</div>",
+        'target': "<div style={{ fontSize: '12px', color: 'var(--color-text-muted)', fontWeight: 600 }}>Critical / High 미완화 결함 (AC-11)</div>",
+        'replacement': "<div style={{ fontSize: '12px', color: 'var(--color-bg-surface)', fontWeight: 600 }}>Critical / High 미완화 결함 (AC-11)</div>",
         'expected_guard': 'Test 9j-2 (1:1 collision between fg and bg)',
     },
     {
@@ -150,6 +150,34 @@ MUTANTS = [
         'replacement': "  active: {\n    color: 'var(--color-brand-hover)',\n    border: 'var(--color-border-subtle)',",
         'expected_guard': 'Test 9k (candidate active border token assertion)',
     },
+    {
+        'id': 'M17 (H2-1)',
+        'name': 'ReleaseCandidateView: SLO status badge color set to statusCfg.bg (rendered fg==bg collision)',
+        'target': "backgroundColor: statusCfg.bg,\n                            border: `1px solid ${statusCfg.border}`,\n                            color: statusCfg.color,",
+        'replacement': "backgroundColor: statusCfg.bg,\n                            border: `1px solid ${statusCfg.border}`,\n                            color: statusCfg.bg,",
+        'expected_guard': 'Test 9k (rendered badge color matches config color assertion)',
+    },
+    {
+        'id': 'M18 (H2-2)',
+        'name': 'ReleaseCandidateView: Audit status badge border set to auditCfg.bg (rendered border==bg collision)',
+        'target': "backgroundColor: auditCfg.bg,\n                      border: `1px solid ${auditCfg.border}`,\n                      color: auditCfg.color,",
+        'replacement': "backgroundColor: auditCfg.bg,\n                      border: `1px solid ${auditCfg.bg}`,\n                      color: auditCfg.color,",
+        'expected_guard': 'Test 9k (rendered badge border matches config border assertion)',
+    },
+    {
+        'id': 'M19 (H2-3)',
+        'name': 'ReleaseCandidateView: Audit status badge opacity degraded to 0.4',
+        'target': "<span\n                    data-testid={`audit-status-badge-${audit.ruleId}`}\n                    style={{\n                      padding: '2px 8px',",
+        'replacement': "<span\n                    data-testid={`audit-status-badge-${audit.ruleId}`}\n                    style={{\n                      opacity: 0.4,\n                      padding: '2px 8px',",
+        'expected_guard': 'Test 9k (rendered audit badge opacity 1 assertion)',
+    },
+    {
+        'id': 'M20 (H1)',
+        'name': 'ReleaseCandidateView: getSloStatusConfig unknown fallback changed to met (fail-closed bypass)',
+        'target': "export function getSloStatusConfig(status?: string | null): SloStatusStyle {\n  if (status && status in SLO_STATUS_CONFIG) {\n    return SLO_STATUS_CONFIG[status as SloRecordStatus];\n  }\n  return {\n    color: 'var(--color-status-unknown)',\n    border: 'var(--color-status-unknown)',\n    bg: 'var(--color-bg-subtle)',\n    label: `UNKNOWN (${status || 'UNKNOWN'})`,\n  };\n}",
+        'replacement': "export function getSloStatusConfig(status?: string | null): SloStatusStyle {\n  if (status && status in SLO_STATUS_CONFIG) {\n    return SLO_STATUS_CONFIG[status as SloRecordStatus];\n  }\n  return SLO_STATUS_CONFIG.met;\n}",
+        'expected_guard': 'Test 9k (rendered unknown status fail-closed token & label assertion)',
+    },
 ]
 
 def run_test_suite():
@@ -158,10 +186,8 @@ def run_test_suite():
         'vitest',
         'run',
         'tests/acc09-contrast-tokens.test.tsx',
-        '--test-timeout=30000',
     ]
     env = os.environ.copy()
-    env['NODE_OPTIONS'] = '--max-old-space-size=4096'
     res = subprocess.run(
         cmd,
         cwd=os.path.join(REPO_ROOT, 'apps', 'web'),
@@ -177,7 +203,7 @@ def run_test_suite():
 
 def main():
     print('=' * 80)
-    print(' Card 220 (ACC-09): Reproducible Mutant Test Suite (16 Mutants: M1-M16)')
+    print(' Card 220 (ACC-09): Reproducible Mutant Test Suite (20 Mutants: M1-M20)')
     print(' Target: ReleaseCandidateView.tsx')
     print('=' * 80)
 
@@ -224,12 +250,12 @@ def main():
                 if 'AssertionError' in line or 'Error:' in line or 'expected' in line:
                     reason = line.strip()[:100]
                     break
-            print(f'[{i:02d}/{total_mutants}] {mid}: KILLED in {elapsed:.1f}s -- {mname}', flush=True)
-            print(f'         Reason: {reason}', flush=True)
+            print(f'[{i:02d}/{total_mutants}] {mid}: KILLED in {elapsed:.1f}s -- {mname}')
+            print(f'         Reason: {reason}')
             results.append((mid, mname, 'KILLED', reason))
         else:
-            print(f'[{i:02d}/{total_mutants}] {mid}: SURVIVED (MUTANT ESCAPED!) in {elapsed:.1f}s -- {mname}', flush=True)
-            print(f'         Expected to be caught by: {m["expected_guard"]}', flush=True)
+            print(f'[{i:02d}/{total_mutants}] {mid}: SURVIVED (MUTANT ESCAPED!) in {elapsed:.1f}s -- {mname}')
+            print(f'         Expected to be caught by: {m["expected_guard"]}')
             results.append((mid, mname, 'SURVIVED', 'Test suite returned 0 (did not fail)'))
 
     print('\n' + '=' * 80)

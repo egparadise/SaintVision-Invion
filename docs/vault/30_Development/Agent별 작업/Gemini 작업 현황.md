@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.197"
+version: "1.0.198"
 status: "proposed"
 author: "Gemini"
-updated: "2026-10-02T12:40:00+09:00"
+updated: "2026-10-02T13:40:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,7 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-10-02T12:40:00+09:00 (Card 220 릴리스 후보 화면 ReleaseCandidateView 색상 리터럴 inventory 전수(14종/64 occurrences→0), 대비 표본/DOM 결속 감사 및 상태 색 정합성 접근성 승격: base 23fbedae PR #316 r5 head 위 작업, ReleaseCandidateView 64건 -> 0건 100% 해소, COLOR_LITERAL_MULTISET_BASELINE {} 래칫, border-subtle 417건(+15)/28개 파일 래칫, 레거시 #30363d <= 34/7 상한 강화, SLO_STATUS_CONFIG(met/unmeasured/breached)·AUDIT_STATUS_CONFIG(pass/fail)·CANDIDATE_STATUS_CONFIG(active/waiting) 상태 설정 객체 정비 및 화면 간 상태 색 정합 일치화, 공지 배너 text-secondary 토큰화, 활성 후보 카드 outline 링(2px solid var(--color-brand-primary), offset 2px) 복원, Test 9k DOM 실제 렌더링 동적 대비/배지 텍스트 레이블/롤백 실패 및 성공 배너 단언, Test 9j-2 80개 style 속성 및 3대 상태 설정 객체 리터럴 AST 가드 신설(violations 0), Probes 76~80 추가, tools/test_c220_mutations.py 16종 변이 M1~M16 16/16 100% 사살 실측, tools/reproduce_c220_contrast.py 25개 지표 실측 통과; Vitest 28 passed, tsc 0 error, build 성공, route coverage 41 passed, check_frontend_integrity 0 위반, check_contract_bindings PASS, check_docs PASS, diff --check clean).
+- 확인 기준: 2026-10-02T13:40:00+09:00 (Card 220 릴리스 후보 화면 ReleaseCandidateView [r2]: Claude UI r1 피드백 전수 반영 — (1) fail-closed 미지 상태 helper(getSloStatusConfig, getAuditStatusConfig, getCandidateStatusConfig) 신설 및 UNKNOWN (<원문>) 표시(위험 경고 상태 유지, 부정 시험 단언), (2) 렌더된 배지 전경/배경/테두리/투명도/레이블 DOM 결속 및 전 쌍 상호 고유성/아이콘(✔) 단언으로 20종 변이 M1~M20 20/20 100% 사살, (3) 활성 후보 카드의 상시 outline 제거로 키보드 포커스 링 오인 차단 및 비색상 변경 배제, (4) baseline 19종 84건 정정, #30363d 실측 11건 감소(43->32건, 상한 <= 34) 정정, 실제 레이블 '모의 MET (미측정)' 등 정합화, git diff --check 23fbedae clean (exit 0) 및 CR 0바이트; Vitest 28 passed, tsc 0 error, build 성공, route coverage 41 passed, check_frontend_integrity 0 위반, check_contract_bindings PASS, check_docs PASS, sync_obsidian --check 0 conflicts).
 - 확인 기준: 2026-10-02T12:35:00+09:00 (Card 218 분산 복구 화면 DistributedRecoveryView 색상 리터럴 inventory 전수(16종/81 occurrences→0), 대비 표본/DOM 결속 감사 및 클러스터 헬스 상태 접근성 승격 [r5]: base 3ebfb1b8 PR #314 r3 head 위 작업, DistributedRecoveryView 81건 -> 0건 100% 해소, COLOR_LITERAL_MULTISET_BASELINE {} 래칫, border-subtle 402건(+14)/27개 파일 래칫, 레거시 #30363d <= 43/8 상한 강화(실측치 정확 고정), recovering을 var(--color-status-active)로 승격하여 RunDetail/RunList와의 화면 간 불일치 완전 해소, fenced를 var(--color-status-neutral) 및 var(--color-border-strong)으로 매핑, 노드 선택 카드 인라인 outline 제거로 index.css 전역 :focus-visible 키보드 포커스 링 온전 보존 및 2px brand-hover 선택 테두리 적용, recoveryEngine evaluateInitialHealth의 recovering 임의 매핑 철회 및 NodeStatus 정본 계약 엄수, DistributedRecoveryViewProps 내 시험용 recoveryManager optional prop 지원, 미지 헬스 상태 fail-closed UNKNOWN 및 neutral 토큰 안전 폴백, Test 9j DOM 실제 렌더링 동적 대비 단언 신설, Test 9j-2 68개 style 속성 및 NODE_HEALTH_CONFIG 객체 리터럴 AST 가드 신설(violations 0, lightgray 등 CSS 명명 색상 전수 차단 가드 보강), Probes 71~75 추가, tools/test_c218_mutations.py 20종 변이 M1~M20 20/20 100% 사살 실측, tools/reproduce_c218_contrast.py 21개 지표 실측 통과; Vitest 27 passed, defect-recovery tests 26 passed, tsc 0 error, build 성공, route coverage 41 passed, check_frontend_integrity 0 위반, check_contract_bindings PASS, check_docs PASS, diff --check clean).
 - 확인 기준: 2026-10-02T10:55:00+09:00 (Card 215 실행 목록 화면 RunList r3 조치: Claude r2 및 Codex r2 조건부 승인 지적 전수 반영 — (1) base 고유 색상 리터럴 35종(46 occurrences) 정정, (2) 동기화 경고 문구(stale warning) 조상 배경 캔버스(--color-bg-canvas #f8fafc / #090d16) 위 0.10 알파 합성 실측치(#f7e8ea 1.60:1 / #20121b 9.51:1) 정정, (3) History §2.1 표 및 §2.2 동적 재현 스크립트 Light 합성 배경 hex 16개 정정(reproduce_c215_contrast.py 21행 결속) 및 에러 상태 제목 전경 base #fca5a5 정정, (4) 변이 러너 배너 16 Mutants 정정 및 \n 제거, (5) Test 9i 필터 알약 비색상 텍스트 레이블 단언 보강; Vitest 26 passed, 연관 시험 77 passed, tsc 0 error, build 성공, route coverage 41 passed, check_frontend_integrity 0 위반, check_contract_bindings PASS, check_docs PASS, diff --check clean).
 
@@ -45,15 +45,17 @@ source_of_truth: "Git"
 - 확인 기준: 2026-10-02T02:05:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer r1 조치: Claude UI r1 및 Codex r1 피드백 전수 반영 — R1 버튼 요소 DEF-S11-09 위반 해소 `var(--color-brand-primary-bg)` 및 `--color-brand-primary-fg` 승격; R2 활성 네임스페이스 칩 및 버전 배지 `var(--color-brand-hover)` 적용 5.49:1(Light)/8.11:1(Dark), 비활성 버튼 `var(--color-bg-subtle)`/`var(--color-text-muted)`/`var(--color-border-subtle)` 5.25:1/5.78:1 및 3.18:1/3.08:1 충족; R3 실제 렌더 배경 기반 전수 실측표 재구성; R4 Test 9c 확장 및 10종 변이 M1~M10 100% 사살 실측; R5 History 제어 바이트 60개 전수 제거 완료; 보라색 리터럴 의도적 브랜드 통합 명시; Vitest 14 passed, s11-defect-fixes 16 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 - 확인 기준: 2026-10-02T01:20:00+09:00 (Card 195 데스크톱 탐색기 ResourceExplorer & InvFileExplorer Light/Dark 명도 대비 전수 감사 및 디자인 토큰 승격: base db37dbc5 위 작업, ResourceExplorer 390건 -> 0건, InvFileExplorer 124건 -> 0건 100% 해소, COLOR_LITERAL_MULTISET_BASELINE 양 파일 {} 래칫, border-subtle 232건/22개 파일 래칫, DOM 실제 렌더링 동적 대비 단언 신설, 변이 M1~M4 100% 사살 실측, Vitest 9개 스위트 139 passed, tsc 0 error, build 성공, route coverage 41 passed, 9대 무결성 0 위반).
 
-## 2026-10-02 릴리스 후보 화면 (ReleaseCandidateView) 색상 리터럴 전수 토큰화(14종/64 occurrences→0), 상태 색 정합성 및 접근성 승격 (Card 220, `agent/gemini/c220-release-contrast`, base `23fbedae` PR #316 r5 head)
-- **개요**: ACC-09 다음 영역인 릴리스 후보 관리 및 무중단 롤백 제어 화면(`ReleaseCandidateView.tsx`)의 색상 리터럴 inventory 전수(14종/64 occurrences→0), 대비 표본/DOM 결속 감사 및 상태 색 정합성 접근성 승격:
+## 2026-10-02 릴리스 후보 화면 (ReleaseCandidateView) 색상 리터럴 전수 토큰화(19종/84 occurrences→0), 상태 색 정합성 및 접근성 승격 [r2] (Card 220, `agent/gemini/c220-release-contrast`, base `23fbedae` PR #316 r5 head)
+- **개요**: ACC-09 다음 영역인 릴리스 후보 관리 및 무중단 롤백 제어 화면(`ReleaseCandidateView.tsx`)의 색상 리터럴 inventory 전수(19종/84 occurrences→0), 대비 표본/DOM 결속 감사 및 상태 색 정합성 접근성 승격 (r1 검토 의견 전수 반영):
   1. **색상 리터럴 전수 해소 및 의도적 상태 디자인 승격 (Card 213, 215, 218 정합)**:
-     - `ReleaseCandidateView.tsx`: 기존 14종(64 occurrences) -> **0건** (전수 제거).
-     - 3대 상태 설정 객체 최상단 정의 및 export: `SLO_STATUS_CONFIG`, `AUDIT_STATUS_CONFIG`, `CANDIDATE_STATUS_CONFIG`.
-     - `SLO_STATUS_CONFIG`: `met`(`var(--color-status-online)`), `unmeasured`(`var(--color-text-secondary)`), `breached`(`var(--color-status-offline)`).
-     - `AUDIT_STATUS_CONFIG`: `pass`(`var(--color-status-online)`), `fail`(`var(--color-status-offline)`).
-     - `CANDIDATE_STATUS_CONFIG`: `active`(`var(--color-brand-hover)`), `waiting`(`var(--color-text-secondary)`).
-     - 활성 후보 카드: 2px solid `var(--color-brand-primary)` outline 링(`offset: 2px`)을 적용하여 활성 상태와 키보드 포커스 가시성을 명확히 분리 및 보장.
+     - `ReleaseCandidateView.tsx`: 기존 19종(84 occurrences: hex 11종 74건, rgba 8종 10건) -> **0건** (전수 제거).
+     - 3대 상태 설정 객체 최상단 정의 및 fail-closed 헬퍼 export: `SLO_STATUS_CONFIG`, `AUDIT_STATUS_CONFIG`, `CANDIDATE_STATUS_CONFIG`, `getSloStatusConfig`, `getAuditStatusConfig`, `getCandidateStatusConfig`.
+     - `SLO_STATUS_CONFIG`: `met`(`var(--color-status-online)`, 레이블 `모의 MET (미측정)`), `unmeasured`(`var(--color-text-secondary)`, 레이블 `UNMEASURED (미측정) · 모의 MET (미측정)`), `breached`(`var(--color-status-offline)`, 레이블 `BREACHED`).
+     - `AUDIT_STATUS_CONFIG`: `pass`(`var(--color-status-online)`, 레이블 `모의 PASS`), `fail`(`var(--color-status-offline)`, 레이블 `FAIL`).
+     - `CANDIDATE_STATUS_CONFIG`: `active`(`var(--color-brand-hover)`, 레이블 `모의 활성 (서버 API 미노출 · 실 인프라 미배포)`), `waiting`(`var(--color-text-secondary)`, 레이블 `모의 대기`).
+     - fail-closed 미지 상태: `UNKNOWN (${status})` 및 `var(--color-status-unknown)` 토큰으로 매핑하여 위험 신호가 조용히 기본값/정상으로 완화되지 않도록 차단.
+     - 활성 후보 카드: 상시 outline 제거(base 복원, `:focus-visible` 링 오인 차단) 및 텍스트 레이블("현재 활성 릴리스 후보 (RC)")로 명확히 식별.
+     - 롤백 버튼: 인라인 `outline: none` 억제 없이 전역 포커스 링 온전 보존.
      - 공지 배너(`release-unexposed-notice`): `var(--color-bg-subtle)` 배경, `var(--color-border-subtle)` 테두리, `var(--color-text-secondary)` 텍스트 (Light 6.92:1 / Dark 11.86:1 >= 4.5:1).
      - KPI 카드(`kpi-vulns-card`, `kpi-slo-card`, `kpi-wcag-card`, `active-candidate-card`): 서피스 배경, `var(--color-border-subtle)` 테두리, 지표 수치 전수 토큰화.
      - 롤백 관리 패널(`rollback-management-card`): 서피스 배경, `var(--color-border-subtle)` 테두리/행 구분선.
@@ -62,13 +64,13 @@ source_of_truth: "Git"
   2. **Fail-Closed Multiset Baseline 래칫 강제**:
      - `acc09-contrast-tokens.test.tsx`의 `COLOR_LITERAL_MULTISET_BASELINE`에서 `features/release/ReleaseCandidateView.tsx`의 허용 인벤토리를 `{}` (0건)으로 전면 고정.
      - `var(--color-border-subtle)` 사용 횟수 402건 -> **417건**(+15건), 파일 수 27개 -> **28개**(+1개)로 fail-closed 단언 갱신.
-     - 레거시 리터럴 상한치 강화 (`#30363d` <= 34/7, 실측치 정확 9건 감소 고정).
-  3. **실제 렌더링 DOM 기반 동적 대비 단언 및 16종 변이 100% 사살**:
-     - Test 9k 신설: 공지 배너, 4개 KPI 카드, 활성 후보 외곽선 링, SLO/감사/후보 배지 전경/배경/테두리 명도 대비 동적 단언, 배지 텍스트 레이블 non-empty 단언, 상태 색 고유성 단언, 롤백 실패 및 성공 배너 단언.
-     - Test 9j-2 확장: ReleaseCandidateView 80개 style 속성 및 3대 상태 설정 객체 리터럴 AST 검사 로직(checkConfigTables) 기반 스타일-쌍 명도 대비 계산 및 커버리지 래칫 (checkedObjects 9, checkedPairs 52, unboundColorObjects 35, coveredColorObjects 44, checkedBorderObjects 21, checkedBorderPairs 22, violations 0), raw color literal 위반 검출 가드 추가.
+     - 레거시 리터럴 상한치 강화 (`#30363d` <= 34/7, 43건에서 32건으로 실측 11건 감소 고정).
+  3. **실제 렌더링 DOM 기반 동적 대비 단언 및 20종 변이 100% 사살**:
+     - Test 9k 신설: 공지 배너, 4개 KPI 카드, 비아웃라인 활성 카드, 롤백 버튼 포커스 링 보존, SLO/감사/후보 배지 3종 전수 DOM 렌더링 결속(전경/배경/테두리/투명도/레이블 config 일치 단언), 상태 전 쌍 상호 고유성 단언, 체크마크(✔) 보존 단언, 실제 조상 컨테이너(subtle 행 위 감사 테두리 대비 등) 명도 대비 단언, fail-closed UNKNOWN DOM 렌더링 단언, 롤백 실패 및 성공 배너 단언.
+     - Test 9j-2 확장: ReleaseCandidateView 80개 style 속성 및 3대 상태 설정 객체 리터럴 AST 검사 로직(checkConfigTables) 기반 스타일-쌍 명도 대비 계산 및 커버리지 래칫 (checkedObjects 9, checkedPairs 52, unboundColorObjects 35, coveredColorObjects 44, checkedBorderObjects 21, checkedBorderPairs 22, violations 0), shorthand 명명 색상 검출 및 인라인 outline: none 차단 가드 보강.
      - Revert-Fail Probes 76~80 추가 (Probe 76 #58a6ff 2.13:1 fail, Probe 77 #f85149 2.69:1 fail, Probe 78 #3fb950 2.06:1 fail, Probe 79 #8b949e 4.14:1 fail, Probe 80 #f85149 4.04:1 fail).
-     - `tools/test_c220_mutations.py` 신규 커밋: 16종 변이 M1~M16 전원 사살 실측 (16/16 = 100% killed, exit code 0).
-     - `tools/reproduce_c220_contrast.py` 25개 지표 실측 통과.
+     - `tools/test_c220_mutations.py` 신규 커밋: 20종 변이 M1~M20 전원 사살 실측 (20/20 = 100% killed, exit code 0, 표준 힙 메모리 구동).
+     - `tools/reproduce_c220_contrast.py` 25개 지표 실측 통과 (trailing whitespace 0).
   4. **잔여 백로그 현황**:
      - release candidate 관련 하드코딩 리터럴 잔여 0건.
 
