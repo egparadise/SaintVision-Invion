@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD237-AC11-DEFINER-ALLOWLIST-20261002"
 title: "Card 237 AC-11 SECURITY DEFINER allowlist review"
-version: "1.3.0"
+version: "1.4.0"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T20:41:47+09:00"
+updated: "2026-10-02T21:27:57+09:00"
 source_of_truth: "Git"
 base_sha: "843d283c1ee70cc021385b0f8f25ec323d434829"
 reviewer: "Claude"
@@ -66,3 +66,28 @@ expired at observation time. Its SEC-DEF-001 report records 15 functions,
 `matches_reviewed_policy`, and exit 0. The dependency/SAST report is `MEASURED_PASS`;
 the RLS row-isolation report remains `UNMEASURED` with exit 3. The latter is retained as
 an honest independent threat boundary and is not converted into a PASS by this card.
+
+# Backend regression and authority correction
+
+The first generated review source incorrectly copied the dependency/SAST producer lane
+(`.github/workflows/ac11-security-scan.yml`) into `secVf001.workflow`. SEC-VF-001 is the
+separate browser proof, so `tools/find_ac11_vf_evidence.py` correctly stopped finding the
+desktop-browser runs and four established finder tests failed with exit 3. Their expected
+0/2 outcomes were not weakened.
+
+Commit `976586282a0b0ebff0265e99a46589d1ddd096f2` restores the authority to
+`.github/workflows/desktop-browser.yml` and its tree blob
+`bb5708a803e6e8ceed2252a34fd895ace61fd0fe`. The generated allowlist blob is now
+`54f8edf27a845a35e1428b69bcdff6754de91bbc` with canonical SHA-256
+`c75fc38a5a988852e6068329b901d6f01e6fa0aa7aab5dbab2846137fc16836e`.
+Commit `58c7e9e2bc11ea535c72238bfc504ad5e44d8e68` repins the canonical target
+registry; its blob is `60800cc0a86aa723f04308f2f38786423a94f968`. The aggregator and all
+registry-aware importers use that same blob. A regression test now keeps the SEC-VF
+browser workflow distinct from the security-scan producer workflow.
+
+Rotating the registry constants changes the security importer blob to
+`0c46ccd9f3006ab723825815568268d7d1f45abb`; therefore the dependency/SAST
+allowlist was mechanically repinned as well. Its resulting blob is
+`8f1a36c6584413c4ea308f35853c1f675f280fe9`. This second pin remains about the
+`ac11-security-scan.yml` producer and does not replace the distinct SEC-VF browser
+authority.
