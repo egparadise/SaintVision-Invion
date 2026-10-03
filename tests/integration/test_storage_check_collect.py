@@ -209,6 +209,24 @@ def _as_owner(sample, statement, parameters):  # noqa: F811
         connection.commit()
 
 
+def _another_user(sample):  # noqa: F811
+    """A second real user to hand the folder to. Created here rather than assumed,
+    because the fixture only needs one owner for everything else it does."""
+    import psycopg
+
+    from inv.ids import new_id
+
+    user = new_id("usr")
+    with psycopg.connect(sample.e.owner) as connection:
+        connection.execute(
+            "INSERT INTO public.users(tenant_id,user_id,external_subject,display_name) "
+            "VALUES(%s,%s,%s,'other')",
+            (sample.e.tenant, user, "oidc:c266-other-" + user),
+        )
+        connection.commit()
+    return user
+
+
 def _revoke_grant(sample):  # noqa: F811
     _as_owner(
         sample,
@@ -356,3 +374,75 @@ def test_a_crash_after_the_writes_and_before_the_commit_leaves_nothing(collector
     assert replayed is False
     assert _counts(sample)[:3] == (1, 1, 1)
     assert _counts(sample)[3] == [response]
+
+
+def test_a_contribution_that_changed_hands_is_the_same_answer_as_absence(collector, sample):  # noqa: F811
+    """Ownership is read **now**, not taken from the ledger row's memory. A folder
+    that was handed to someone else since the first success is the same answer as
+    one that is not there."""
+    first, _ = _collect(collector, sample, key="c266-k")
+    before = _counts(sample)
+    _, transport = collector
+    calls = transport.calls
+    _as_owner(
+        sample,
+        "UPDATE public.storage_contributions SET registered_by_user_id=%s "
+        "WHERE contribution_id=%s",
+        (_another_user(sample), sample.contribution),
+    )
+    with pytest.raises(DomainError) as raised:
+        _collect(collector, sample, key="c266-k")
+    assert (raised.value.code, raised.value.status) == ("RES-0004", 404)
+    # Not 2xx, no node call, nothing written -- and the stored response stayed put.
+    assert transport.calls == calls
+    assert _counts(sample) == before
+
+
+def test_a_grant_revoked_during_the_node_call_refuses_the_late_replay(collector, sample):  # noqa: F811
+    """The schedule the phase-three authority check exists for.
+
+    One request is held inside its node call. A second completes and stores the
+    response. The grant is then revoked, and only now is the first released: its
+    final transaction finds a response **and** finds the authority gone, so it must
+    refuse rather than hand that response back.
+    """
+    collector_obj, transport = collector
+    released = threading.Event()
+    in_flight = threading.Event()
+
+    def pause_first():
+        if transport.calls == 1:
+            in_flight.set()
+            released.wait(timeout=30)
+
+    transport.before_call = pause_first
+    outcome: dict[str, object] = {}
+
+    def run_first():
+        try:
+            outcome["result"] = _collect(collector, sample, key="c266-late")
+        except Exception as error:
+            outcome["result"] = error
+
+    first = threading.Thread(target=run_first)
+    first.start()
+    assert in_flight.wait(timeout=30), "the first request never reached the node call"
+
+    # A second request on the same key finishes and stores the response.
+    transport.before_call = None
+    second, replayed = _collect(collector, sample, key="c266-late")
+    assert replayed is False
+    stored = _counts(sample)
+    assert stored[:3] == (1, 1, 1)
+
+    # Now the authority disappears, and only then is the first request released.
+    _revoke_grant(sample)
+    released.set()
+    first.join(timeout=60)
+
+    assert isinstance(outcome["result"], DomainError), outcome["result"]
+    assert outcome["result"].code == "AUTH-0030"
+    assert outcome["result"].status == 403
+    # The stored answer did not go back to a subject who had lost the right to it,
+    # and the late request wrote nothing of its own.
+    assert _counts(sample) == stored
