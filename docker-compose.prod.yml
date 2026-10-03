@@ -49,7 +49,6 @@ services:
       - INV_RUNTIME_DSN=${INV_RUNTIME_DSN:?Set the non-owner kernel login DSN}
       - INV_RECOVERY_EPOCH=${INV_RECOVERY_EPOCH:?Set the reconciled database recovery epoch}
       - INV_API_CONFIG=/run/saintvision/api.json
-      - INV_WORKER_CONFIG=/run/saintvision/worker.json
       # The API creates measured lease/plan authority only under the same
       # explicit rollout switch as the private worker.  Default remains off.
       - INV_BUILDKIT_PRODUCT_ENABLED=${INV_BUILDKIT_PRODUCT_ENABLED:-0}

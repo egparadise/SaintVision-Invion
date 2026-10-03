@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "0061_build_preparations",
+  "revision": "0063_build_policy_budgets",
   "referenceSource": "1e8baf045c5a554209aaef601ae4883b64da50a7",
   "scope": "Exact catalogue definitions and execute grants; runtime authorization tests remain required",
   "functions": {

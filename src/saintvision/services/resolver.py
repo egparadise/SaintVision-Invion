@@ -35,7 +35,8 @@ from ..storage.pathsafe import ParsedUri, parse_uri
 
 
 def resolve_location(session: Session, *, tenant_id: uuid.UUID, uri: str,
-                     reader_user_id: str | None = None) -> DataLocation:
+                     reader_user_id: str | None = None,
+                     project_id: str | None = None) -> DataLocation:
     """The catalogued :class:`DataLocation` a URI names, within one tenant.
 
     Parses first so a malformed URI is rejected as a value error before any
@@ -44,12 +45,19 @@ def resolve_location(session: Session, *, tenant_id: uuid.UUID, uri: str,
     not-found here, not another tenant's row. Public readers also pass their
     verified user ID: only their active contributions are visible. Omitting
     that filter is reserved for existing internal tenant maintenance callers.
+
+    ``project_id`` (0062) narrows the lookup to one project's bindings. It is a
+    filter, not a second answer: a URI bound to another project -- or to none --
+    is the same not-found as a URI that was never catalogued, so a project
+    member cannot learn that a location exists outside their project.
     """
     parse_uri(uri)  # reject malformed before touching the database
     query = select(DataLocation).where(
         DataLocation.tenant_id == tenant_id,
         DataLocation.uri == uri,
     )
+    if project_id is not None:
+        query = query.where(DataLocation.project_id == project_id)
     if reader_user_id is not None:
         query = query.where(DataLocation.contribution_id.in_(
             select(StorageContribution.contribution_id).where(
