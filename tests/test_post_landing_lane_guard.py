@@ -350,6 +350,7 @@ def ac11_environment(tmp_path: Path, *, exit_code: int | None = None) -> tuple[d
     environment = {
         "GUARD_AC11_PYTHON": sys.executable.replace("\\", "/"),
         "GUARD_AC11_ORCHESTRATOR": orchestrator.as_posix(),
+        "GUARD_AC11_TEST_OVERRIDE": "1",
         "GUARD_AC11_LOG": log.as_posix(),
         "GUARD_REPOSITORY": "egparadise/SaintVision-Invion",
     }
@@ -395,6 +396,21 @@ def test_ac11_orchestrator_refusal_is_preserved_without_legacy_dispatch(tmp_path
         extra_env=environment,
     )
     assert result.returncode == 2
+    assert result.log == ""
+
+
+def test_ac11_orchestrator_override_is_refused_outside_the_explicit_test_seam(tmp_path: Path) -> None:
+    environment, log = ac11_environment(tmp_path)
+    environment.pop("GUARD_AC11_TEST_OVERRIDE")
+    result = run_guard(
+        tmp_path,
+        f'ac11_dispatch_in_order "{LAND}" "{(tmp_path / "receipt.json").as_posix()}"',
+        {},
+        extra_env=environment,
+    )
+    assert result.returncode == 2
+    assert "reserved for the test harness" in result.stderr
+    assert not log.exists()
     assert result.log == ""
 
 

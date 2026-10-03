@@ -134,9 +134,16 @@ ac11_dispatch_in_order() {
   local land="${1-}" ref="${GUARD_DISPATCH_REF:-integration/all-agents-unified}"
   local output="${2:-.work/post-landing/${land}/ac11-exact-sha-orchestration.json}"
   local repository="${GUARD_REPOSITORY:-egparadise/SaintVision-Invion}"
-  local orchestrator="${GUARD_AC11_ORCHESTRATOR:-$GUARD_DIR/run_ac11_exact_sha_aggregate.py}"
+  local orchestrator="$GUARD_DIR/run_ac11_exact_sha_aggregate.py"
   local interpreter="${GUARD_AC11_PYTHON:-${GUARD_PYTHON:-python}}"
   require_sha LAND "$land" || return $?
+  if [ -n "${GUARD_AC11_ORCHESTRATOR:-}" ]; then
+    if [ "${GUARD_AC11_TEST_OVERRIDE:-}" != "1" ]; then
+      guard_refuse "the AC-11 orchestrator override is reserved for the test harness"
+      return 2
+    fi
+    orchestrator="$GUARD_AC11_ORCHESTRATOR"
+  fi
   if [ ! -f "$orchestrator" ]; then
     guard_refuse "canonical AC-11 exact-SHA orchestrator is unavailable"
     return 2

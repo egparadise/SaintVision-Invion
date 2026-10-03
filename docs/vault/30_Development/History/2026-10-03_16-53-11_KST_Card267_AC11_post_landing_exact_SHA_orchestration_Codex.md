@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-CARD267-AC11-POST-LANDING-EXACT-SHA-ORCHESTRATION-CODEX"
 title: "Card 267 AC-11 착지 직후 exact-SHA orchestration 결속"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-03T16:53:11+09:00"
+updated: "2026-10-03T17:09:36+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "9e9a551cd25b9a237d5d439c317854d927a5640d"
@@ -37,13 +37,17 @@ schema, target, workflow와 migration을 바꾸지 않고 runbook이 그 단일 
 - 카드 260 fake-gh 시험은 security, accessibility, migration rehearsal 각각이 누락됐을 때 그
   producer 하나와 aggregate만 dispatch하는 parameterized 회귀로 확장했다. 기존 prior failure,
   duplicate, expiry, run/ref/SHA, aggregate canonical recomputation 시험은 그대로 사용한다.
+- Claude r1 뒤 새로 dispatch한 producer가 실패하거나, 끝나지 않거나, 목록에 나타나지 않는 세
+  경우를 각각 거부하고 aggregate dispatch가 0임을 고정했다. runbook은 `$LAND`로 clean detached
+  checkout한 뒤 그 tree의 guard를 다시 읽으며, orchestrator 경로 override는 명시적 test seam
+  밖에서 거부한다.
 
 ## 로컬 검증
 
 | 명령 | 결과 | 환경 |
 |---|---|---|
-| `python -m pytest -q tests/test_post_landing_lane_guard.py` | `23 passed` | Windows, Git Bash 실실행, skip 0 |
-| `python -m pytest -q tests/test_run_ac11_exact_sha_aggregate.py` | `37 passed` | Windows, fake-gh, skip 0 |
+| `python -m pytest -q tests/test_post_landing_lane_guard.py` | `24 passed` | Windows, Git Bash 실실행, skip 0 |
+| `python -m pytest -q tests/test_run_ac11_exact_sha_aggregate.py` | `40 passed` | Windows, fake-gh, skip 0 |
 | `bash -n tools/post_landing_lane_guard.sh` / orchestrator `--help` / `git diff --check` | exit 0 | shell·CLI·whitespace gate |
 | `python tools/check_docs.py` | PASS | 24 original hashes, 1129 versioned documents |
 | `python tools/check_ontology.py` | PASS | RDF/SHACL/48 task mappings |
@@ -52,6 +56,7 @@ schema, target, workflow와 migration을 바꾸지 않고 runbook이 그 단일 
 첫 guard 실행에서는 fake orchestrator fixture의 newline escape가 생성 파일 안에서 실제 newline로
 해석돼 2건 실패했다. fixture source가 `\\n`을 쓰게 고친 뒤 같은 시험 파일을 다시 실행해 23건
 전부 통과했다. 제품·workflow·evaluator 동작 실패가 아니며 실패 이력을 삭제하지 않는다.
+Claude r1 조건을 더한 최종 focused 재실행은 guard 24건과 orchestrator 40건 모두 통과했다.
 
 로컬 `check_doc_path_citations.py --ratchet --base-ref origin/coord/train42a-ci-1511`은 생성된
 프런트엔드 산출물 때문에 기존 citation 5건을 `stale baseline`으로 오판했다. clean hosted

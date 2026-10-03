@@ -54,6 +54,7 @@ class FakeGh:
         self.artifact_details: dict[int, dict[str, object]] = {}
         self.archives: dict[int, bytes] = {}
         self.dispatched: list[str] = []
+        self.dispatch_outcome: dict[str, str] = {}
         self.duplicate_aggregate = False
         if seeded:
             for producer in subject.load_producers():
@@ -158,9 +159,14 @@ class FakeGh:
             return 0, json_bytes(self.views[int(command[3])])
         if command[:3] == ["gh", "workflow", "run"]:
             workflow = self._workflow_from_filename(command[3])
+            outcome = self.dispatch_outcome.get(workflow, "success")
+            assert outcome in {"success", "failure", "active", "missing"}
             values = [command[index + 1] for index, item in enumerate(command[:-1]) if item == "-f"]
             fields = dict(value.split("=", 1) for value in values)
             title = fields.get("correlation_id")
+            self.dispatched.append(workflow)
+            if outcome == "missing":
+                return 0, b""
             archive = None
             if workflow == subject.AGGREGATE_WORKFLOW:
                 archive = zip_bytes(
@@ -170,7 +176,7 @@ class FakeGh:
                         "ac11-aggregate-result.json": b"{}",
                     }
                 )
-            self.add_success(
+            row = self.add_success(
                 workflow,
                 (
                     subject.AGGREGATE_ARTIFACT_PREFIX + SHA
@@ -184,6 +190,22 @@ class FakeGh:
                 title=title,
                 archive=archive,
             )
+            run_id = int(row["databaseId"])
+            if outcome == "failure":
+                # The list first exposes the newly-created active run. Its authoritative view then
+                # completes red. This specifically kills removal of the post-dispatch success
+                # validation instead of being caught earlier by prior-run laundering checks.
+                row["status"] = "in_progress"
+                row["conclusion"] = None
+                self.views[run_id]["conclusion"] = "failure"
+                self.api_runs[run_id]["conclusion"] = "failure"
+            elif outcome == "active":
+                row["status"] = "in_progress"
+                row["conclusion"] = None
+                self.views[run_id]["status"] = "in_progress"
+                self.views[run_id]["conclusion"] = None
+                self.api_runs[run_id]["status"] = "in_progress"
+                self.api_runs[run_id]["conclusion"] = None
             if self.duplicate_aggregate and workflow == subject.AGGREGATE_WORKFLOW:
                 self.add_success(
                     workflow,
@@ -191,7 +213,6 @@ class FakeGh:
                     title=title,
                     archive=archive,
                 )
-            self.dispatched.append(workflow)
             return 0, b""
         raise AssertionError(f"unexpected command: {command}")
 
@@ -200,7 +221,12 @@ def fixed_correlation(workflow: str) -> str:
     return "ac11-exact-sha/" + Path(workflow).stem
 
 
-def run(fake: FakeGh, monkeypatch: pytest.MonkeyPatch) -> dict[str, object]:
+def run(
+    fake: FakeGh,
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    monotonic=lambda: 1,
+) -> dict[str, object]:
     monkeypatch.setattr(subject, "recompute", lambda *args, **kwargs: deepcopy(RESULT))
     return subject.orchestrate(
         source=SHA,
@@ -210,7 +236,7 @@ def run(fake: FakeGh, monkeypatch: pytest.MonkeyPatch) -> dict[str, object]:
         poll_seconds=0,
         deadline_seconds=30,
         sleep=lambda _: None,
-        monotonic=lambda: 1,
+        monotonic=monotonic,
         now_utc=lambda: NOW,
         correlation_factory=fixed_correlation,
     )
@@ -265,6 +291,39 @@ def test_dispatches_only_each_missing_producer_then_aggregate(
     assert fake.dispatched == [missing, subject.AGGREGATE_WORKFLOW]
     security = next(row for row in receipt["producerRuns"] if row["workflow"] == missing)
     assert security["reused"] is False
+
+
+@pytest.mark.parametrize(
+    ("outcome", "message"),
+    [
+        ("failure", "did not complete successfully"),
+        ("active", "did not complete before the deadline"),
+        ("missing", "did not complete before the deadline"),
+    ],
+)
+def test_newly_dispatched_producer_must_appear_and_complete_successfully_before_aggregate(
+    monkeypatch: pytest.MonkeyPatch,
+    outcome: str,
+    message: str,
+) -> None:
+    fake = FakeGh()
+    missing = subject.load_producers()[0]
+    run_id = int(fake.runs[missing.workflow][0]["databaseId"])
+    artifact_id = int(fake.artifacts[run_id][0]["id"])
+    fake.runs[missing.workflow].clear()
+    fake.views.pop(run_id)
+    fake.api_runs.pop(run_id)
+    fake.artifacts.pop(run_id)
+    fake.artifact_details.pop(artifact_id)
+    fake.archives.pop(artifact_id)
+    fake.dispatch_outcome[missing.workflow] = outcome
+    ticks = iter((0.0, 31.0))
+
+    with pytest.raises(subject.Refused, match=message):
+        run(fake, monkeypatch, monotonic=lambda: next(ticks, 31.0))
+
+    assert fake.dispatched == [missing.workflow]
+    assert subject.AGGREGATE_WORKFLOW not in fake.dispatched
 
 
 def test_remote_ref_must_still_equal_the_exact_sha(monkeypatch: pytest.MonkeyPatch) -> None:

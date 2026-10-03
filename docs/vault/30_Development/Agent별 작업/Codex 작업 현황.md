@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.315"
+version: "1.0.316"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T16:53:11+09:00"
+updated: "2026-10-03T17:09:36+09:00"
 source_of_truth: "Git"
 active_card: "CARD-267 post-landing AC-11 exact-SHA orchestration binding"
-active_card_status: "The shell guard now delegates once to Card 260's canonical three-producer exact-SHA orchestrator; focused guard 23/23 and fake-gh orchestrator 37/37 pass, with evaluator/schema/target/workflow/migration unchanged"
-active_card_next: "Run documentation gates and exact-head hosted CI, then request Claude independent review; actual post-landing workflow dispatch remains an operator action"
+active_card_status: "Claude r1 conditions are closed: the landed clean detached checkout is explicit, newly dispatched failure/unfinished/missing runs refuse before aggregate, and focused guard 24/24 plus fake-gh 40/40 pass"
+active_card_next: "Confirm exact-head Backend 3.12/3.14 and Docs, then hold the reviewed head; actual post-landing workflow dispatch remains an operator action"
 ---
 
 ## 2026-10-03 Card 267 — post-landing AC-11 exact-SHA orchestration binding
@@ -21,8 +21,10 @@ active_card_next: "Run documentation gates and exact-head hosted CI, then reques
   duplicate/prior-failure refusal, final producer-set recheck and canonical aggregate recomputation.
 - The runbook records one redacted JSON receipt instead of a partial TSV run list. No evaluator,
   schema, target, workflow, migration or score rule changed.
-- Focused local results are **23 passed** for the real-Bash guard boundary and **37 passed** for the
-  fake-gh exact-SHA orchestration. Hosted CI and Claude review are pending.
+- Claude r1's dispatched failure/unfinished/missing-run gaps are fixed before aggregate, and the
+  runbook now switches to a clean detached `$LAND` checkout before loading the guard. The override
+  seam is test-only. Focused local results are **24 passed** for the real-Bash guard boundary and
+  **40 passed** for fake-gh exact-SHA orchestration; final exact-head hosted CI is pending.
 - [[2026-10-03_16-53-11_KST_Card267_AC11_post_landing_exact_SHA_orchestration_Codex]].
 
 ## 2026-10-03 Card 262 — server_config volume split
