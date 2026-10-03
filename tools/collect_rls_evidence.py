@@ -67,9 +67,9 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 BASELINE_PATH = Path(__file__).with_name("rls-boundary-baseline.json")
-#: The audit roles are measured even though neither is an application login: a
-#: report that omitted inv_audit_reader would read as "no role sees another
-#: tenant's audit rows", which is not what 0047_audit_events_isolation does.
+#: The audit roles remain measured even though neither is an application login.
+#: 0067 revokes the dormant reader boundary, and keeping the role in the measured
+#: population makes any later privilege, membership or login drift observable.
 DEFAULT_ROLES = ("inv_app", "inv_kernel", "inv_runtime_dev", "inv_discovery_issuer", "inv_discovery_issuer_guard",
                  "inv_audit_writer", "inv_audit_reader", "inv_cancel_bridge_owner")
 #: The exact (role, qualified table, identity columns) triples where E4 may fall back to

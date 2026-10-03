@@ -81,8 +81,8 @@ class AuditEvent(Base):
     tenant, and losing that record is exactly the case AC-02 asks us to keep.
     No tenant policy can cover such a row, so reading this table is not the
     application role's job: 0047_audit_events_isolation gives the application
-    INSERT under a tenant policy, revokes its SELECT, grants the read to
-    ``inv_audit_reader``, and routes the tenant-less denial through
+    INSERT under a tenant policy and revokes its SELECT; 0067 also removes the
+    unused cross-tenant reader. Tenant-less denials still go through
     ``public.record_auth_denial`` — the only writer of a NULL-tenant row.
     """
 

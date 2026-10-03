@@ -293,8 +293,8 @@ APPEND_ONLY_TABLES: tuple[str, ...] = (
 #: tenant_id is nullable — an authentication failure may resolve to no tenant, and
 #: AC-02 requires keeping that record — so a tenant policy cannot cover every row
 #: and a reader scoped by tenant would miss exactly the rows that matter. Reading
-#: belongs to ``inv_audit_reader``; 0047_audit_events_isolation is the DDL, and
-#: the difference from APPEND_ONLY_TABLES is the withheld SELECT.
+#: is not a product capability; 0067 removes the unused cross-tenant reader.
+#: The difference from APPEND_ONLY_TABLES is the withheld SELECT.
 AUDIT_TABLES: tuple[str, ...] = ("audit_events",)
 
 #: Tables whose *identity* is immutable but whose lifecycle advances. The

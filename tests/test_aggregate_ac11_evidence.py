@@ -209,13 +209,15 @@ def envelope(axis: str, verdict: str = "MEASURED_PASS") -> dict:
 
 class ZeroTailGit(FakeGit):
     def show(self, commit: str, path: str) -> str:
-        if path == "migrations/versions/0066_tenant_registry_revoke.py":
+        if path == "migrations/versions/0067_audit_reader_revoke.py":
             return (
-                'revision = "0066_tenant_registry_revoke"\n'
+                'revision = "0067_audit_reader_revoke"\n'
                 'down_revision = "0001_base"\n'
                 'irreversible = True\n'
                 'def downgrade():\n'
-                '    op.execute("REVOKE SELECT ON public.tenants FROM inv_app")\n'
+                '    op.execute("DROP POLICY IF EXISTS audit_events_audit_read ON public.audit_events")\n'
+                '    op.execute("REVOKE SELECT ON public.audit_events FROM inv_audit_reader")\n'
+                '    op.execute("REVOKE USAGE ON SCHEMA public FROM inv_audit_reader")\n'
             )
         return super().show(commit, path)
 
@@ -223,19 +225,19 @@ class ZeroTailGit(FakeGit):
         if prefix == "migrations/versions":
             return [
                 "migrations/versions/0001_base.py",
-                "migrations/versions/0066_tenant_registry_revoke.py",
+                "migrations/versions/0067_audit_reader_revoke.py",
             ]
         return super().list_paths(commit, prefix)
 
 
 class UnsafeZeroTailGit(ZeroTailGit):
-    replacement = 'op.execute("GRANT SELECT ON public.tenants TO inv_app")'
+    replacement = 'op.execute("GRANT SELECT ON public.audit_events TO inv_audit_reader")'
 
     def show(self, commit: str, path: str) -> str:
         source = super().show(commit, path)
-        if path == "migrations/versions/0066_tenant_registry_revoke.py":
+        if path == "migrations/versions/0067_audit_reader_revoke.py":
             return source.replace(
-                'op.execute("REVOKE SELECT ON public.tenants FROM inv_app")',
+                'op.execute("REVOKE SELECT ON public.audit_events FROM inv_audit_reader")',
                 self.replacement,
             )
         return source
@@ -471,12 +473,10 @@ def rls_roles(tables: dict | None = None, *, role: str = "inv_app", **role_overr
     reader_table["rls_enabled"] = True
     reader_table["rls_forced"] = True
     reader_table["privileges"] = {
-        "select": "table", "insert": None, "update": None, "delete": None,
+        "select": None, "insert": None, "update": None, "delete": None,
     }
-    reader_table["policies"] = [{
-        "name": "audit_events_audit_read", "cmd": "SELECT", "permissive": "PERMISSIVE",
-        "roles": ["inv_audit_reader"], "using": True, "with_check": False,
-    }]
+    reader_table["policies"] = []
+    reader_table.pop("visible", None)
     return roles
 
 
@@ -861,14 +861,13 @@ def test_each_unaccepted_rls_rule_is_critical(rule, allowlist):
     assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.MEASURED_FAIL
 
 
-def test_rls_accepted_expiry_and_baseline_exact_match(allowlist):
-    # Card 264 removed the expiring inv_app/public.tenants exception.  The audit-reader
-    # visibility remains genuinely privileged and keeps the axis on a calendar review.
+def test_rls_baseline_exact_match_after_the_last_expiring_exception_is_removed(allowlist):
+    assert all(
+        row["disposition"] != "accepted-with-expiry"
+        for row in allowlist["rlsAcceptedDispositions"]
+    )
     report = rls_report(allowlist)
     assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.MEASURED_PASS
-    expired = datetime(2026, 12, 1, tzinfo=timezone.utc)
-    assert tool.evaluate_rls(report, allowlist, expired) is tool.Verdict.MEASURED_FAIL
-    assert tool.evaluate_rls(report, allowlist, expired) is tool.Verdict.MEASURED_FAIL
     report["baselineAccepted"] = []
     assert tool.evaluate_rls(report, allowlist, NOW) is tool.Verdict.INVALID_RUN
 
@@ -881,20 +880,19 @@ def test_rls_accepted_expiry_and_baseline_exact_match(allowlist):
         ("parent-role", lambda role, table: role["member_of"].append("privileged_parent")),
         ("reader-member", lambda role, table: role["granted_to"].append("operator_login")),
         ("insert-grant", lambda role, table: table["privileges"].__setitem__("insert", "table")),
-        ("select-revoked", lambda role, table: (
-            table["privileges"].__setitem__("select", None), table.pop("visible")
+        ("select-restored", lambda role, table: (
+            table["privileges"].__setitem__("select", "table"),
+            table.__setitem__("visible", rls_table()["visible"]),
         )),
         ("rls-not-forced", lambda role, table: table.__setitem__("rls_forced", False)),
-        ("policy-widened", lambda role, table: table["policies"][0]["roles"].append("inv_app")),
+        ("policy-restored", lambda role, table: table["policies"].append({
+            "name": "audit_events_audit_read", "cmd": "SELECT", "permissive": "PERMISSIVE",
+            "roles": ["inv_audit_reader"], "using": True, "with_check": False,
+        })),
     ],
 )
-def test_audit_reader_disposition_requires_the_reviewed_live_boundary(label, mutate, allowlist):
-    """The temporary E3/E4/E5 acceptance is conditional on the measured role boundary.
-
-    The exception is genuine privileged visibility, so an operational login/member or a wider
-    table grant cannot inherit the calendar allowance.  Each mutation remains a measured
-    failure even though the producer's own E1..E5 rows would otherwise still say PASS.
-    """
+def test_removed_audit_reader_boundary_cannot_be_reintroduced(label, mutate, allowlist):
+    """Any role, grant or policy drift recreating the removed reader is a measured failure."""
 
     report = rls_report(allowlist)
     role = report["roles"]["inv_audit_reader"]
@@ -1965,8 +1963,8 @@ def test_only_reversible_axis_accepts_declared_zero_tail(allowlist):
 @pytest.mark.parametrize(
     "replacement",
     [
-        'op.execute("GRANT SELECT ON public.tenants TO inv_app")',
-        'op.drop_table("tenants", schema="public")',
+        'op.execute("GRANT SELECT ON public.audit_events TO inv_audit_reader")',
+        'op.drop_table("audit_events", schema="public")',
     ],
     ids=["grant", "drop-table"],
 )
@@ -1983,7 +1981,7 @@ def test_zero_tail_rejects_an_unsafe_explicit_irreversible_downgrade(
     result = axis_result(value, allowlist, UnsafeZeroTailGit())
     assert result.verdict is tool.Verdict.INVALID_RUN
     assert result.reasons == (
-        "invalid migration graph entry: migrations/versions/0066_tenant_registry_revoke.py",
+        "invalid migration graph entry: migrations/versions/0067_audit_reader_revoke.py",
     )
 
 
