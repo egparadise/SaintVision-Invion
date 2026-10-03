@@ -2,6 +2,11 @@
 
 export type Bytesize = number;
 export type Contentsha256 = string;
+export type Lineage = ProvableLineageEdge[] | null;
+export type Kind = 'approval' | 'dataset_version' | 'eval_run';
+export type Relation = string;
+export type Subjectid = string;
+export type Producedbyrunid = string | null;
 export type Version = string;
 
 /**
@@ -25,12 +30,32 @@ export type Version = string;
  * the server derives it instead of validating a string that has no reason to
  * vary.
  *
- * ``producedByRunId`` and ``lineage`` are deliberately absent -- see the
- * module docstring of ``api/v1/model_versions.py`` for why neither can be
- * bound to the path's project on this branch.
+ * ``producedByRunId`` and ``lineage`` are here **since card 261**, and each one
+ * waited for a different thing to exist (card 257 §4-1·§4-2):
+ *
+ * * ``producedByRunId`` needed a way to prove the run belongs to the path's
+ *   project. ``project_scope.run_in_project`` does that through the workload,
+ *   so an unbound value can no longer attach this version to another project's
+ *   run, and ``0064`` adds the composite key underneath.
+ * * ``lineage`` needed subject validation. ``record_lineage`` now refuses a
+ *   subject that is not in this tenant, and the kinds accepted **here** are
+ *   only the three whose project can be proven -- ``code_commit`` and
+ *   ``container_image`` carry no project anywhere in the schema, so a caller
+ *   cannot assert them (the service still writes them for server-derived
+ *   paths; see the design's §4-2-1).
  */
 export interface ModelVersionRegisterRequest {
   byteSize?: Bytesize;
   contentSha256: Contentsha256;
+  lineage?: Lineage;
+  producedByRunId?: Producedbyrunid;
   version: Version;
+}
+/**
+ * One asserted lineage edge, in a kind whose project can be proven.
+ */
+export interface ProvableLineageEdge {
+  kind: Kind;
+  relation?: Relation;
+  subjectId: Subjectid;
 }
