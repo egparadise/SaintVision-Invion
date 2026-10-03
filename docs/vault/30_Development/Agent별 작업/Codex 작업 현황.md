@@ -1,15 +1,28 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.308"
+version: "1.0.309"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T11:06:13+09:00"
+updated: "2026-10-03T11:21:53+09:00"
 source_of_truth: "Git"
 active_card: "CARD-258 AC-11 aggregation lane axis coverage measurement"
-active_card_status: "Card 255 #351 is approved by Claude r2 at 1c2d06da with exact-head Backend/Core/security green: migration 0063 enforces all-or-none positive budgets and base-image pins, plans compare them with locked project ceilings and the immutable snapshot Dockerfile, and the API no longer parses worker.json"
-active_card_next: "Measure which AC-11 axes the hosted aggregation lane can add without physical nodes, long soak or user device acceptance, and propose before implementing; product dispatch stays off by default"
+active_card_status: "Exact target 694217b0 now has same-SHA security, accessibility and migration artifacts; canonical aggregation assembled 4/8 axes and independently recomputed INVALID_RUN without changing any contract or target"
+active_card_next: "Hand the docs-only measurement to Claude; missing-lane discovery and dispatch automation remains a separate card, and no AC-11 score promotion is claimed"
 ---
+
+## 2026-10-03 Card 258 — AC-11 exact-SHA axis coverage measurement
+
+- Target `694217b0df7cca2765e1bce5ecd7d9148f5615b5` reused security run
+  `37084904992` and accessibility run `37084910005`, then added migration rehearsal run
+  `37088890116` and aggregate run `37089008514` at that exact SHA.
+- Migration rehearsal emitted both migration axes as `MEASURED_PASS`; its JUnit was 7/7 with zero
+  skip and cleanup residue 0. Aggregate artifact `11261094847` assembled 4/8 required axes.
+- A detached exact-SHA invocation of `aggregate_ac11_evidence.py` recomputed the uploaded result:
+  migration two axes and security passed, accessibility remained `MEASURED_FAIL`, four external
+  axes were absent, and overall stayed `INVALID_RUN` / `done=false`.
+- No evaluator, schema, target, workflow or product file changed, and this card makes no score or
+  completion claim. [[2026-10-03_11-21-53_KST_Card258_AC11_exact_SHA_axis_coverage_Codex]].
 
 ## 2026-10-03 Card 255 — S08-BE activation prerequisites
 
