@@ -381,11 +381,9 @@ AUDIT_SEED = (
 def seed_audit_rows(dsn: str, tenant_a: str, other: str) -> list[str]:
     """Two audit rows per tenant, inserted by this test and removed by it.
 
-    They do **not** belong in ``disposable_database``: measured on this tree, seeding that
-    shared fixture makes ``inv_audit_reader``'s accepted E3/E4/E5 rows appear.  The reviewed
-    AC-11 allowlist now accepts that real privileged visibility only while the role's measured
-    login/membership/grant boundary remains exact; this helper is for the isolated collector test,
-    not a second producer for that reviewed security evidence.
+    They do **not** belong in ``disposable_database``: the rows exercise the narrowly granted
+    cancel-bridge identity comparison.  Migration 0067 has retired ``inv_audit_reader``'s
+    visibility, so the same seed must not make a reader cell appear.
     """
 
     import psycopg
@@ -439,12 +437,10 @@ def test_real_pg_boundary_passes_and_records_kernel_denial(rls_db, tmp_path):
     assert reader["member_of"] == [] and reader["granted_to"] == []
     reader_audit = reader["tables"]["public.audit_events"]
     assert reader_audit["privileges"] == {
-        "select": "table", "insert": None, "update": None, "delete": None,
+        "select": None, "insert": None, "update": None, "delete": None,
     }
-    assert reader_audit["policies"] == [{
-        "name": "audit_events_audit_read", "cmd": "SELECT", "permissive": "PERMISSIVE",
-        "roles": ["inv_audit_reader"], "using": True, "with_check": False,
-    }]
+    assert reader_audit["policies"] == []
+    assert "visible" not in reader_audit
     writer_audit = observation["roles"]["inv_audit_writer"]["tables"]["public.audit_events"]
     assert writer_audit["privileges"] == {"select": None, "insert": "table", "update": None, "delete": None}
     bridge = observation["roles"]["inv_cancel_bridge_owner"]

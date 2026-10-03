@@ -96,15 +96,14 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
         )
     )
     ordered = chain()
-    tenant_registry = next(
-        item for item in ordered if item.revision == "0066_tenant_registry_revoke"
-    )
-    assert tenant_registry.irreversible is True
-    assert tenant_registry.recovery_note and "irreversible" in tenant_registry.recovery_note
-    source = tenant_registry.path.read_text(encoding="utf-8")
-    assert runner.downgrade_body_kind(source) == "security-preserving"
-    without_marker = source.replace("irreversible = True", "irreversible = False")
-    assert runner.downgrade_body_kind(without_marker) == "reversible"
+    for revision in ("0066_tenant_registry_revoke", "0067_audit_reader_revoke"):
+        boundary = next(item for item in ordered if item.revision == revision)
+        assert boundary.irreversible is True
+        assert boundary.recovery_note and "irreversible" in boundary.recovery_note
+        source = boundary.path.read_text(encoding="utf-8")
+        assert runner.downgrade_body_kind(source) == "security-preserving"
+        without_marker = source.replace("irreversible = True", "irreversible = False")
+        assert runner.downgrade_body_kind(without_marker) == "reversible"
     last_irreversible = max(index for index, item in enumerate(ordered) if item.irreversible)
     assert [item.revision for item in ordered[last_irreversible + 1 :]] == []
 
@@ -112,21 +111,22 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
 @pytest.mark.parametrize(
     "unsafe_downgrade",
     [
-        'op.execute("GRANT SELECT ON public.tenants TO inv_app")',
-        'op.drop_table("tenants", schema="public")',
+        'op.execute("GRANT SELECT ON public.audit_events TO inv_audit_reader")',
+        'op.drop_table("audit_events", schema="public")',
+        'op.execute("REVOKE SELECT ON public.audit_events FROM inv_audit_reader")',
     ],
-    ids=["grant", "drop-table"],
+    ids=["grant", "drop-table", "incomplete"],
 )
-def test_reviewed_irreversible_marker_rejects_non_revoke_downgrades(unsafe_downgrade):
+def test_reviewed_irreversible_marker_rejects_non_reviewed_operations(unsafe_downgrade):
     source = (
-        'revision = "0066_tenant_registry_revoke"\n'
-        'down_revision = "0064_model_version_run_fk"\n'
+        'revision = "0067_audit_reader_revoke"\n'
+        'down_revision = "0066_tenant_registry_revoke"\n'
         'irreversible = True\n'
         f'def downgrade():\n    {unsafe_downgrade}\n'
     )
     tree = ast.parse(source)
     with pytest.raises(ValueError, match="security-preserving downgrade"):
-        reviewed_security_preserving_downgrade(tree, "0066_tenant_registry_revoke")
+        reviewed_security_preserving_downgrade(tree, "0067_audit_reader_revoke")
     with pytest.raises(runner.RehearsalError, match="security-preserving downgrade"):
         runner.downgrade_body_kind(source)
 
@@ -134,16 +134,16 @@ def test_reviewed_irreversible_marker_rejects_non_revoke_downgrades(unsafe_downg
 @pytest.mark.parametrize(
     "unsafe_downgrade",
     [
-        'op.execute("GRANT SELECT ON public.tenants TO inv_app")',
-        'op.drop_table("tenants", schema="public")',
+        'op.execute("GRANT SELECT ON public.audit_events TO inv_audit_reader")',
+        'op.drop_table("audit_events", schema="public")',
     ],
     ids=["grant", "drop-table"],
 )
 def test_migration_graph_rejects_an_unsafe_reviewed_marker(
     unsafe_downgrade, tmp_path, monkeypatch
 ):
-    (tmp_path / "0066.py").write_text(
-        'revision = "0066_tenant_registry_revoke"\n'
+    (tmp_path / "0067.py").write_text(
+        'revision = "0067_audit_reader_revoke"\n'
         'down_revision = None\n'
         'irreversible = True\n'
         f'def downgrade():\n    {unsafe_downgrade}\n',
@@ -156,8 +156,8 @@ def test_migration_graph_rejects_an_unsafe_reviewed_marker(
 
 def test_unreviewed_revision_cannot_claim_an_explicit_irreversible_marker():
     source = (
-        'revision = "0067_future"\n'
-        'down_revision = "0066_tenant_registry_revoke"\n'
+        'revision = "0068_future"\n'
+        'down_revision = "0067_audit_reader_revoke"\n'
         'irreversible = True\n'
         'def downgrade():\n    op.execute("REVOKE SELECT ON sample FROM app")\n'
     )

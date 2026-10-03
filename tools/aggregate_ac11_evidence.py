@@ -39,8 +39,8 @@ DEFAULT_ALLOWLIST = (
 )
 TARGET_REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
 TARGET_REGISTRY_BLOB = "45fa057257e4002d80d6ce4045e1decf52793f59"
-ALLOWLIST_BLOB = "544ed7258759e516b7c56f86e466e348fdde6f8e"
-ALLOWLIST_CANONICAL_SHA256 = "2cf1e52f64e19f4474917baf2c8e5ad70015f099fb4f1da85fba4b7e6b3c7735"
+ALLOWLIST_BLOB = "949b693182428d50fd7ff6c0911c7c4cf094f016"
+ALLOWLIST_CANONICAL_SHA256 = "7f97b4d3c6f2679c93273a2db0a14c40f5e953375f187213686b8f8ff9d8f756"
 SCAN_ALLOWLIST_REPO_PATH = (
     "docs/vault/30_Development/Evidence/s11-security-dependency-sast-allowlist-v1.json"
 )
@@ -89,11 +89,11 @@ PIN_RE = re.compile(r"^([A-Za-z0-9_.-]+)(?:\[[^\]]+\])?==([^\s;]+)$")
 
 DEFINER_FILES = [
     {"path": "tools/check_definer_functions.py", "blob": "5831f8d8806900146add2e5e7b51b934dced3952"},
-    {"path": "tools/definer-policy.json", "blob": "32a9a4b2724b50555c4980725e167f3f17aba7cb"},
+    {"path": "tools/definer-policy.json", "blob": "90683af47d3e4485a700a2b052d7b9010b8fe4f5"},
 ]
 RLS_FILES = [
-    {"path": "tools/collect_rls_evidence.py", "blob": "d95fddf3260029953e0062e838bd2905e78702bf"},
-    {"path": "tools/rls-boundary-baseline.json", "blob": "0327d9ce12b09edd5f6fd59cde5e53fef452872f"},
+    {"path": "tools/collect_rls_evidence.py", "blob": "bd14e3d77d57d6d506dc785d376ccb6da4600545"},
+    {"path": "tools/rls-boundary-baseline.json", "blob": "a6b86004a90c5f2f919e7a75862c3d019eaf4c5d"},
 ]
 
 #: E4 may fall back to an owner-verified readable key only for these (role, table, columns)
@@ -1332,12 +1332,10 @@ def evaluate_rls(report: dict[str, Any], allowlist: dict[str, Any], now: datetim
     # Shape first, numbers second: nothing below may read a field this did not check.
     if rls_report_shape(report) is not None:
         return Verdict.INVALID_RUN
-    # The audit reader's E3/E4/E5 disposition accepts real cross-tenant visibility, not a
-    # false positive.  Its reviewed safety boundary is therefore part of the verdict: the
-    # role remains a non-login, non-inheriting, non-bypass role with no member or parent role,
-    # and its audit_events privilege remains SELECT-only under the one unconditional read
-    # policy.  A later operational membership or wider grant must fail the axis immediately;
-    # waiting for the calendar expiry would turn the review into a prose-only control.
+    # 0067 removes the dormant cross-tenant audit reader rather than extending its temporary
+    # E3/E4/E5 disposition.  The role is cluster-scoped and therefore retained, so the verdict
+    # still binds its live attributes and the exact audit_events cell: no login, inheritance,
+    # membership, table privilege or policy may recreate the removed reader boundary.
     reader = roles.get("inv_audit_reader")
     reader_table = reader.get("tables", {}).get("public.audit_events") if isinstance(reader, dict) else None
     if (
@@ -1348,18 +1346,11 @@ def evaluate_rls(report: dict[str, Any], allowlist: dict[str, Any], now: datetim
         or reader.get("granted_to") != []
         or not isinstance(reader_table, dict)
         or reader_table.get("privileges") != {
-            "select": "table", "insert": None, "update": None, "delete": None
+            "select": None, "insert": None, "update": None, "delete": None
         }
         or reader_table.get("rls_enabled") is not True
         or reader_table.get("rls_forced") is not True
-        or reader_table.get("policies") != [{
-            "name": "audit_events_audit_read",
-            "cmd": "SELECT",
-            "permissive": "PERMISSIVE",
-            "roles": ["inv_audit_reader"],
-            "using": True,
-            "with_check": False,
-        }]
+        or reader_table.get("policies") != []
     ):
         return Verdict.MEASURED_FAIL
     recomputed = _rls_recomputation(roles, ground_truth)

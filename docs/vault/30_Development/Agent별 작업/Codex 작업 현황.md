@@ -1,15 +1,30 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.316"
+version: "1.0.317"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T16:42:33+09:00"
+updated: "2026-10-03T17:58:55+09:00"
 source_of_truth: "Git"
-active_card: "CARD-264 complete; next Codex card under measurement"
-active_card_status: "Card 264 #360 is approved by Claude r3 at d709c7f4: irreversible migration 0066 revokes the unused inv_app public.tenants SELECT, the irreversible marker is bound to exactly {0066} with a single exact REVOKE downgrade, hosted security run 37100881089 recomputed SEC-RLS-001 MEASURED_PASS, and only the inv_audit_reader 2026-11-30 disposition remains"
-active_card_next: "Propose the next Codex-owned card from measurement before implementing; product dispatch stays off by default"
+active_card: "CARD-268 inv_audit_reader disposition removal"
+active_card_status: "Implementation complete locally: migration 0067 revokes the dormant audit-reader SELECT, schema USAGE, and unconditional policy without restoring them on downgrade; allowlist exceptions are now zero and the live evaluator requires the revoked boundary. Registry repin, hosted security evidence, and Claude review remain"
+active_card_next: "Commit the reviewed source, repin the AC-11 registry/importers to that immutable blob, run hosted security evidence, and request Claude review"
 ---
+
+## 2026-10-03 Card 268 — inv_audit_reader disposition removal
+
+- Train 43 (`1d2d5289`) still has no product connection, role switch, membership grant, or read
+  route for `inv_audit_reader`; the role exists only as legacy audit DDL and as a measured
+  security boundary. The 2026-11-30 exception is therefore not extended.
+- Migration `0067_audit_reader_revoke` removes `SELECT`, schema `USAGE`, and the unconditional
+  read policy. Its irreversible downgrade repeats those exact removals, and the migration graph
+  accepts only the reviewed 0066/0067 operation sets.
+- The generated allowlist has zero `accepted-with-expiry` rows. The evaluator independently
+  requires the reader role to remain non-login/non-inheriting/non-member, with no audit-table
+  privilege and no reader policy; any restored visibility is `MEASURED_FAIL`.
+- Focused PG-free checks pass; disposable-PostgreSQL execution, target-registry repin, hosted
+  security evidence, and Claude review remain.
+  [[2026-10-03_17-58-55_KST_Card268_audit_reader_disposition_removal_Codex]].
 
 ## 2026-10-03 Card 262 — server_config volume split
 
