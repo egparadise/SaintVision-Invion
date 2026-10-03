@@ -226,6 +226,14 @@ def _configured_object_stores(workspace, remote=None):
     return registry
 
 
+def _utc_now():
+    """The denial recorder's clock. A function so the handler holds no datetime
+    import of its own and a test can see one name to patch."""
+    from datetime import datetime, timezone
+
+    return datetime.now(timezone.utc)
+
+
 def create_app(
     database=None,
     tokens=None,
@@ -238,6 +246,8 @@ def create_app(
     object_stores=None,
     build_admission_entry=None,
     build_preparations=None,
+    storage_sample_collector=None,
+    denial_engine=None,
 ):
     @asynccontextmanager
     async def lifespan(api):
@@ -269,6 +279,24 @@ def create_app(
 
     @api.exception_handler(DomainError)
     async def domain_error(request, error):
+        # Card 266: this handler used to build a ProblemDetails and stop, so a
+        # kernel refusal was never audited. AC-02 asks for AUTH/SEC refusals to be
+        # recorded, and the rule for *how* lives in exactly one place -- the core
+        # app's recorder, which this now calls. No route records a denial itself:
+        # a route sits inside a transaction the refusal rolls back.
+        if denial_engine is not None:
+            from saintvision.api import denial_recorder
+
+            category = str(error.code).split("-", 1)[0]
+            if denial_recorder.is_denial(category):
+                await run_in_threadpool(
+                    denial_recorder.record_denial,
+                    denial_engine,
+                    request,
+                    code=error.code,
+                    trace_id=request.state.trace_id,
+                    now=_utc_now,
+                )
         return problem(error, request.state.trace_id)
 
     @api.exception_handler(RequestValidationError)
@@ -522,6 +550,46 @@ def create_app(
         project: str, run_id: str, request_id: str, identity=Depends(authenticated)
     ):
         return storage_view.result(identity.principal, project, run_id, request_id)
+
+    @api.post("/v1/projects/{project}/runs/{run_id}/storage-samples", status_code=201)
+    async def collect_storage_sample(
+        request: Request, project: str, run_id: str, identity=Depends(authenticated)
+    ):
+        """Record one signed folder check, idempotently, against an active Run.
+
+        The **only** public write surface for this protocol: ``issue`` and
+        ``accept`` stay internal steps, because exposing both would let a caller
+        issue and vanish, let ``accept`` be called with a different envelope, and
+        create two public key spaces for one operation.
+
+        ``run_id`` comes from the path only and the body carries no ``requestId``:
+        the ``Idempotency-Key`` header is the single authority, and the protocol's
+        own request id is derived from the scope and that key (card 263 §5-1-1).
+
+        Unconfigured is 503 and writes nothing. A deployment without the node mTLS
+        material cannot observe a folder, and "not observed" must never be recorded
+        as a check -- that is the thing this whole card exists to stop.
+        """
+        if storage_sample_collector is None:
+            raise DomainError("SYS-0001", "Storage sample collection is not configured", 503)
+        body = await request.json()
+        if not isinstance(body, dict) or set(body) - {"contributionId", "sampleLimit"}:
+            raise DomainError("VAL-0003", "Unknown storage sample field", 422)
+        contribution = body.get("contributionId")
+        if not isinstance(contribution, str) or not contribution:
+            raise DomainError("VAL-0003", "contributionId is required", 422)
+        sample = body.get("sampleLimit", storage_sample_collector.MAX_SAMPLE)
+        response, replayed = await run_in_threadpool(
+            storage_sample_collector.collect,
+            identity.principal,
+            project,
+            run_id,
+            contribution=contribution,
+            key=key(request),
+            sample=sample,
+        )
+        # A replay is the same answer, and says so rather than pretending to be new.
+        return JSONResponse(response, status_code=200 if replayed else 201)
 
     @api.get("/v1/projects/{project}/runs/{run_id}/result")
     @api.get("/v1/runs/{run_id}/result")
@@ -1219,12 +1287,14 @@ def create_configured_app():
 
             workspace = configured_workspace(database, identity.tenant_id, settings["workspace"])
         business = None
+        denial_engine = None
         if "business" in settings:
             if settings["business"] is not True:
                 raise ValueError()
             from .business_surface import configured_business
 
             business = configured_business(database, identity)
+            denial_engine = getattr(business.state, "denial_engine", None)
         model_retry = None
         if "modelVerifier" in settings:
             from .model_manifest import ConfiguredModelVerifier
@@ -1276,6 +1346,14 @@ def create_configured_app():
                 plan_factory=plan_authority,
             )
 
+        storage_sample_collector = None
+        if "storageSample" in settings:
+            from .storage_check_collect import configured_storage_sample_collector
+
+            storage_sample_collector = configured_storage_sample_collector(
+                database, settings["storageSample"]
+            )
+
         return create_app(
             database,
             identity,
@@ -1287,6 +1365,8 @@ def create_configured_app():
             object_stores=object_stores,
             build_admission_entry=TrustedBuildAdmissionEntry(database),
             build_preparations=build_preparations,
+            storage_sample_collector=storage_sample_collector,
+            denial_engine=denial_engine,
         )
     except Exception:
         raise RuntimeError(

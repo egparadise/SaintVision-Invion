@@ -183,9 +183,13 @@ class StorageSampleStore:
         challenge.validate(now)
         return now
 
-    def accept(self, principal, project, run_id, request_id, envelope, certificate_der):
-        request_id = str(UUID(request_id))
-        # Bound and copy caller-controlled bytes before entering the write transaction.
+    @staticmethod
+    def bound_envelope(envelope, certificate_der):
+        """Copy and bound caller bytes, and hash the pair, **before** any transaction.
+
+        Separated so every caller does it at the same point: outside the write
+        transaction, on a copy, before anything is locked.
+        """
         envelope = deepcopy(envelope)
         validate_contract("NodeStorageSignedSample", envelope)
         if type(certificate_der) is not bytes or not 1 <= len(certificate_der) <= 16384:
@@ -195,106 +199,175 @@ class StorageSampleStore:
                 {"envelope": envelope, "certificate": base64.b64encode(certificate_der).decode()}
             )
         ).hexdigest()
-        with self.db.transaction(principal.tenant_id) as conn:
-            # Advisory lookup has no side effects; Run lock serializes all accepts.
-            pending = conn.execute(
-                "SELECT * FROM inv.storage_sample_requests WHERE request_id=%s", (request_id,)
-            ).fetchone()
-            if not pending or (pending["project_id"], pending["run_id"], pending["subject_id"]) != (
-                project,
-                run_id,
-                principal.subject_id,
-            ):
-                refused()
-            run, root, channel = self._scope(
-                conn, principal, project, run_id, pending["contribution_id"]
-            )
-            prior = conn.execute(
-                "SELECT * FROM inv.storage_sample_consumptions WHERE request_id=%s", (request_id,)
-            ).fetchone()
-            if prior:
-                if prior["response_sha256"] != response_hash:
-                    raise DomainError("IDEM-0001", "Storage sample response already differs", 409)
-                return {
-                    "evidenceId": prior["evidence_id"],
-                    "checkId": prior["check_id"],
-                    "replayed": True,
-                }
-            challenge = decode_challenge(pending["challenge"])
-            now = self._current(conn, pending, run, root, channel, challenge)
-            verified = verify_sample(challenge, envelope, certificate_der=certificate_der, now=now)
-            evidence_id, check_id = new_id("evd"), new_id("chk")
-            observed = datetime.fromtimestamp(verified.observed_at, timezone.utc)
-            evidence = {
-                "evidenceId": evidence_id,
-                "tenantId": principal.tenant_id,
-                "runId": run_id,
-                "traceId": hashlib.sha256(("storage:" + request_id).encode()).hexdigest()[:32],
-                "timestamp": observed.isoformat(),
-                "actorId": principal.subject_id,
-                "action": "verify-storage-sample",
-                "policyDecisionId": "storage-owner-v1:" + request_id,
-                "inputSha256": challenge.digest(),
-                "outputSha256": verified.payload_sha256,
-                "result": "succeeded" if verified.sample_healthy else "failed",
+        return envelope, response_hash
+
+    def locked_sample_authority(
+        self,
+        conn,
+        principal,
+        project,
+        run_id,
+        request_id,
+        *,
+        envelope,
+        certificate_der,
+        response_hash,
+    ):
+        """Lock this request's authority and judge the envelope. **Writes nothing.**
+
+        Returns ``("replay", stored)`` when the request was already consumed, or
+        ``("apply", context)`` with everything :meth:`apply_sample` needs. A caller
+        that stops after this leaves the database exactly as it found it, which is
+        what makes a permission re-read possible between the locks and the write
+        (card 263 §5-1-3-2; the same split card 261 made for ``record_deployment``).
+        """
+        pending = conn.execute(
+            "SELECT * FROM inv.storage_sample_requests WHERE request_id=%s", (request_id,)
+        ).fetchone()
+        if not pending or (pending["project_id"], pending["run_id"], pending["subject_id"]) != (
+            project,
+            run_id,
+            principal.subject_id,
+        ):
+            refused()
+        run, root, channel = self._scope(
+            conn, principal, project, run_id, pending["contribution_id"]
+        )
+        prior = conn.execute(
+            "SELECT * FROM inv.storage_sample_consumptions WHERE request_id=%s", (request_id,)
+        ).fetchone()
+        if prior:
+            if prior["response_sha256"] != response_hash:
+                raise DomainError("IDEM-0001", "Storage sample response already differs", 409)
+            return "replay", {
+                "evidenceId": prior["evidence_id"],
+                "checkId": prior["check_id"],
+                "replayed": True,
             }
-            validate_contract("EvidenceEnvelope", evidence)
-            detail = {
-                "scope": "node-storage-sample-v1",
+        challenge = decode_challenge(pending["challenge"])
+        now = self._current(conn, pending, run, root, channel, challenge)
+        verified = verify_sample(challenge, envelope, certificate_der=certificate_der, now=now)
+        return "apply", {
+            "pending": pending,
+            "challenge": challenge,
+            "verified": verified,
+            "envelope": envelope,
+            "certificate_der": certificate_der,
+            "request_id": request_id,
+            "response_hash": response_hash,
+        }
+
+    def apply_sample(self, conn, principal, run_id, context):
+        """Write the five rows this observation consists of. **Judges nothing.**
+
+        Every judgement already happened in :meth:`locked_sample_authority`, in
+        this same transaction, holding the same locks. The freshness re-check at
+        the end is not a new judgement: it is the existing guard against an INSERT
+        or trigger wait having outlived the challenge.
+        """
+        pending = context["pending"]
+        challenge = context["challenge"]
+        verified = context["verified"]
+        envelope = context["envelope"]
+        certificate_der = context["certificate_der"]
+        request_id = context["request_id"]
+        response_hash = context["response_hash"]
+
+        evidence_id, check_id = new_id("evd"), new_id("chk")
+        observed = datetime.fromtimestamp(verified.observed_at, timezone.utc)
+        evidence = {
+            "evidenceId": evidence_id,
+            "tenantId": principal.tenant_id,
+            "runId": run_id,
+            "traceId": hashlib.sha256(("storage:" + request_id).encode()).hexdigest()[:32],
+            "timestamp": observed.isoformat(),
+            "actorId": principal.subject_id,
+            "action": "verify-storage-sample",
+            "policyDecisionId": "storage-owner-v1:" + request_id,
+            "inputSha256": challenge.digest(),
+            "outputSha256": verified.payload_sha256,
+            "result": "succeeded" if verified.sample_healthy else "failed",
+        }
+        validate_contract("EvidenceEnvelope", evidence)
+        detail = {
+            "scope": "node-storage-sample-v1",
+            "requestId": request_id,
+            "evidenceId": evidence_id,
+            "challenge": pending["challenge"],
+            "envelope": envelope,
+            "certificateDer": base64.b64encode(certificate_der).decode(),
+            "unverifiable": verified.unverifiable,
+            "examined": verified.examined,
+            "unsampled": verified.unsampled,
+            "cataloguedAtIssue": challenge.catalogued,
+            "operationalAcceptanceAssessed": False,
+        }
+        conn.execute(
+            "INSERT INTO inv.evidence(tenant_id,run_id,evidence_id,envelope) VALUES(%s,%s,%s,%s)",
+            (principal.tenant_id, run_id, evidence_id, Jsonb(evidence)),
+        )
+        conn.execute(
+            """INSERT INTO public.storage_checks(check_id,tenant_id,contribution_id,reachable,sampled_count,mismatch_count,healthy,checked_at,detail)
+          VALUES(%s,%s,%s,true,%s,%s,%s,%s,%s)""",
+            (
+                check_id,
+                principal.tenant_id,
+                pending["contribution_id"],
+                verified.sampled,
+                verified.mismatches,
+                verified.sample_healthy,
+                observed,
+                Jsonb(detail),
+            ),
+        )
+        conn.execute(
+            "INSERT INTO inv.storage_sample_consumptions(tenant_id,request_id,response_sha256,evidence_id,check_id) VALUES(%s,%s,%s,%s,%s)",
+            (principal.tenant_id, request_id, response_hash, evidence_id, check_id),
+        )
+        event(
+            conn,
+            principal.tenant_id,
+            run_id,
+            "inv.storage.sample_recorded",
+            {
                 "requestId": request_id,
                 "evidenceId": evidence_id,
-                "challenge": pending["challenge"],
-                "envelope": envelope,
-                "certificateDer": base64.b64encode(certificate_der).decode(),
-                "unverifiable": verified.unverifiable,
-                "examined": verified.examined,
-                "unsampled": verified.unsampled,
-                "cataloguedAtIssue": challenge.catalogued,
-                "operationalAcceptanceAssessed": False,
-            }
-            conn.execute(
-                "INSERT INTO inv.evidence(tenant_id,run_id,evidence_id,envelope) VALUES(%s,%s,%s,%s)",
-                (principal.tenant_id, run_id, evidence_id, Jsonb(evidence)),
-            )
-            conn.execute(
-                """INSERT INTO public.storage_checks(check_id,tenant_id,contribution_id,reachable,sampled_count,mismatch_count,healthy,checked_at,detail)
-              VALUES(%s,%s,%s,true,%s,%s,%s,%s,%s)""",
-                (
-                    check_id,
-                    principal.tenant_id,
-                    pending["contribution_id"],
-                    verified.sampled,
-                    verified.mismatches,
-                    verified.sample_healthy,
-                    observed,
-                    Jsonb(detail),
-                ),
-            )
-            conn.execute(
-                "INSERT INTO inv.storage_sample_consumptions(tenant_id,request_id,response_sha256,evidence_id,check_id) VALUES(%s,%s,%s,%s,%s)",
-                (principal.tenant_id, request_id, response_hash, evidence_id, check_id),
-            )
-            event(
+                "checkId": check_id,
+                "sampleHealthy": verified.sample_healthy,
+            },
+        )
+        # Check freshness again after any INSERT/trigger wait, while all current
+        # authority and catalog locks are still held.
+        final_now = int(
+            conn.execute("SELECT extract(epoch FROM clock_timestamp()) AS now").fetchone()["now"]
+        )
+        verify_sample(challenge, envelope, certificate_der=certificate_der, now=final_now)
+        return {"evidenceId": evidence_id, "checkId": check_id, "replayed": False}
+
+    def accept(self, principal, project, run_id, request_id, envelope, certificate_der):
+        """Lock, judge and write in one transaction -- the existing entry point.
+
+        Unchanged in behaviour for its existing callers. The collect surface does
+        not use it, because that one has to commit the idempotency response in the
+        **same** transaction as these writes and therefore drives the two halves
+        itself (card 263 §5-1-3-2).
+        """
+        request_id = str(UUID(request_id))
+        envelope, response_hash = self.bound_envelope(envelope, certificate_der)
+        with self.db.transaction(principal.tenant_id) as conn:
+            outcome, payload = self.locked_sample_authority(
                 conn,
-                principal.tenant_id,
+                principal,
+                project,
                 run_id,
-                "inv.storage.sample_recorded",
-                {
-                    "requestId": request_id,
-                    "evidenceId": evidence_id,
-                    "checkId": check_id,
-                    "sampleHealthy": verified.sample_healthy,
-                },
+                request_id,
+                envelope=envelope,
+                certificate_der=certificate_der,
+                response_hash=response_hash,
             )
-            # Check freshness again after any INSERT/trigger wait, while all
-            # current authority and catalog locks are still held.
-            final_now = int(
-                conn.execute("SELECT extract(epoch FROM clock_timestamp()) AS now").fetchone()[
-                    "now"
-                ]
-            )
-            verify_sample(challenge, envelope, certificate_der=certificate_der, now=final_now)
-            return {"evidenceId": evidence_id, "checkId": check_id, "replayed": False}
+            if outcome == "replay":
+                return payload
+            return self.apply_sample(conn, principal, run_id, payload)
 
     def collect(self, principal, project, run_id, contribution, *, request_id, client, sample=32):
         challenge = self.issue(

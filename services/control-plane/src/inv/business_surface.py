@@ -83,6 +83,13 @@ def configured_business(database, tokens):
             settings=Settings(database_url="configured", kernel_base_url=kernel_base_url),
             verifier=OidcPrincipalVerifier(tokens, make_session_factory(engine)))
         business.router.add_event_handler("shutdown", engine.dispose)
+        # Card 266: the kernel's own handlers write no audit row, and the shared
+        # denial recorder needs an engine with the ``inv_app`` role to write
+        # ``public.audit_events``. This is the only engine in this process with
+        # that role, so a kernel denial is recorded through it rather than through
+        # a second connection of its own. Exposed on the app's state so the return
+        # type -- and every existing caller -- stays as it was.
+        business.state.denial_engine = engine
         return business
     except Exception:
         engine.dispose()
