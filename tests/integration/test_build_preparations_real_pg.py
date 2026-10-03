@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 from datetime import datetime, timedelta, timezone
+from itertools import product
 from uuid import uuid4
 
 import psycopg
@@ -49,6 +50,8 @@ def _setup_prepared_build(
     *,
     key="build-prepare",
     profile_budget=(10, 1048576, 1048576),
+    profile_digest=BASE_IMAGE_DIGEST,
+    profile_drift=None,
 ):
     a = workspace_http
     source_url = a.url + "/checkouts/" + a.checkout_id + "/files"
@@ -97,7 +100,7 @@ def _setup_prepared_build(
                 profile_id,
                 [a.e.project],
                 *profile_budget,
-                [BASE_IMAGE_DIGEST] if all(value is not None for value in profile_budget) else None,
+                [profile_digest] if all(value is not None for value in profile_budget) else None,
             ),
         )
         conn.execute(
@@ -131,9 +134,35 @@ def _setup_prepared_build(
     authority.node_id = a.e.node
     authority.transport = type("MeasuredTransport", (), {"measure": lambda self: measured_builder})()
 
-    service = BuildPreparationService(
-        a.e.db, registered_provider(a.storage.provider), plan_factory=authority
-    )
+    capsule_store = registered_provider(a.storage.provider)
+    if profile_drift is not None:
+        drift_column, drift_value = profile_drift
+        assert drift_column in {"budget_cpu_millis", "base_image_digests"}
+
+        class _DriftingCapsuleStore:
+            def __init__(self, delegate):
+                self.delegate = delegate
+                self.changed = False
+
+            def __getattr__(self, name):
+                return getattr(self.delegate, name)
+
+            def put(self, locator, raw, expected_sha256):
+                result = self.delegate.put(locator, raw, expected_sha256)
+                if not self.changed:
+                    self.changed = True
+                    with psycopg.connect(a.e.owner) as conn:
+                        conn.execute("SET LOCAL session_replication_role=replica")
+                        conn.execute(
+                            f"UPDATE inv.build_policy_profiles SET {drift_column}=%s "
+                            "WHERE profile_id=%s AND version=1",
+                            (drift_value, profile_id),
+                        )
+                return result
+
+        capsule_store = _DriftingCapsuleStore(capsule_store)
+
+    service = BuildPreparationService(a.e.db, capsule_store, plan_factory=authority)
     prepared = service.prepare(
         requester, a.e.project, build_run["runId"],
         {"checkoutId": a.checkout_id, "buildPolicyProfileId": profile_id,
@@ -274,6 +303,108 @@ def test_pre_0063_profile_without_budget_or_base_pin_fails_closed_during_prepare
         503,
         True,
     )
+
+
+@pytest.mark.parametrize("present", list(product((False, True), repeat=4)))
+def test_0063_budget_constraint_is_all_or_none_for_every_null_combination(
+    workspace_http, present
+):
+    a = workspace_http
+    values = (
+        10 if present[0] else None,
+        1048576 if present[1] else None,
+        1048576 if present[2] else None,
+        [BASE_IMAGE_DIGEST] if present[3] else None,
+    )
+    statement = """INSERT INTO inv.build_policy_profiles(
+        tenant_id,profile_id,version,project_ids,context_path,dockerfile_path,
+        target_platform,target_stage,network_policy_id,cache_policy_id,
+        cache_mode,secret_aliases,timeout_seconds,budget_cpu_millis,
+        budget_memory_bytes,budget_storage_bytes,base_image_digests)
+        VALUES(%s,%s,1,%s,'src','src/Dockerfile','linux/amd64','runtime','none',
+               'cachepol-s08-constraint','read-only','{}',300,%s,%s,%s,%s)"""
+    with psycopg.connect(a.e.owner) as conn:
+        if all(present) or not any(present):
+            conn.execute(
+                statement,
+                (a.e.tenant, new_id("bpp"), [a.e.project], *values),
+            )
+            conn.rollback()
+        else:
+            with pytest.raises(psycopg.errors.CheckViolation):
+                conn.execute(
+                    statement,
+                    (a.e.tenant, new_id("bpp"), [a.e.project], *values),
+                )
+            conn.rollback()
+
+
+@pytest.mark.parametrize("budget", [(0, 1048576, 1048576), (-1, 1048576, 1048576)])
+def test_0063_budget_constraint_rejects_non_positive_complete_budget(workspace_http, budget):
+    a = workspace_http
+    with psycopg.connect(a.e.owner) as conn:
+        with pytest.raises(psycopg.errors.CheckViolation):
+            conn.execute(
+                """INSERT INTO inv.build_policy_profiles(
+                tenant_id,profile_id,version,project_ids,context_path,dockerfile_path,
+                target_platform,target_stage,network_policy_id,cache_policy_id,
+                cache_mode,secret_aliases,timeout_seconds,budget_cpu_millis,
+                budget_memory_bytes,budget_storage_bytes,base_image_digests)
+                VALUES(%s,%s,1,%s,'src','src/Dockerfile','linux/amd64','runtime','none',
+                       'cachepol-s08-positive','read-only','{}',300,%s,%s,%s,%s)""",
+                (a.e.tenant, new_id("bpp"), [a.e.project], *budget, [BASE_IMAGE_DIGEST]),
+            )
+        conn.rollback()
+
+
+def test_profile_budget_above_project_ceiling_fails_before_admission(
+    workspace_http, monkeypatch
+):
+    context = _setup_prepared_build(
+        workspace_http, profile_budget=(11, 1048576, 1048576)
+    )
+    row = _approve_prepared_build(context)
+    monkeypatch.setenv(PRODUCT_ENABLE_SETTING, "1")
+    with pytest.raises(DomainError) as refused:
+        context["service"].enqueue(
+            context["requester"],
+            context["a"].e.project,
+            context["build_run"]["runId"],
+            context["prepared"]["buildId"],
+            {"approvalId": context["prepared"]["approvalId"],
+             "expectedRunVersion": row["runVersion"]},
+            key="build-enqueue-over-project-ceiling",
+        )
+    assert (refused.value.code, refused.value.status) == ("RES-0006", 503)
+    with context["a"].e.db.transaction(context["a"].e.tenant) as conn:
+        assert conn.execute(
+            "SELECT count(*) AS n FROM inv.build_execution_admissions WHERE run_id=%s",
+            (context["build_run"]["runId"],),
+        ).fetchone()["n"] == 0
+
+
+def test_profile_base_pin_must_equal_the_immutable_snapshot(workspace_http):
+    with pytest.raises(DomainError) as refused:
+        _setup_prepared_build(
+            workspace_http,
+            profile_digest="sha256:" + "2" * 64,
+        )
+    assert (refused.value.code, refused.value.status) == ("VERIFY-0002", 422)
+
+
+@pytest.mark.parametrize(
+    "profile_drift",
+    [
+        ("base_image_digests", ["sha256:" + "2" * 64]),
+        ("budget_cpu_millis", 9),
+    ],
+)
+def test_final_prepare_transaction_rejects_profile_authority_drift(
+    workspace_http, profile_drift
+):
+    with pytest.raises(DomainError) as refused:
+        _setup_prepared_build(workspace_http, profile_drift=profile_drift)
+    assert (refused.value.code, refused.value.status) == ("VERIFY-0002", 422)
 
 
 def test_build_authority_rows_are_immutable_even_to_the_owner(workspace_http):

@@ -1,10 +1,10 @@
 ---
 doc_id: "S08-BE-ACTIVATION-PLAN-AUTHORITY-001"
 title: "S08-BE activation plan authority"
-version: "1.0.0"
+version: "1.1.0"
 status: "implemented-review"
 author: "Codex"
-updated: "2026-10-03T09:10:30+09:00"
+updated: "2026-10-03T10:15:54+09:00"
 source_of_truth: "Git"
 ---
 
@@ -23,11 +23,19 @@ This decision closes the three Medium prerequisites left by Card 247. It does no
    Dockerfile `FROM` must carry a literal lowercase `@sha256:<64 hex>` reference. Tags, ARG
    expansion, `scratch`, absent measurements, a dirty checkout, or a source SHA mismatch fail
    closed. The observed digests become `BuildPlan.resolvedBaseImageDigests`; request bytes are
-   never hashed into a synthetic image identity.
+   never hashed into a synthetic image identity. This intentionally rejects Dockerfile stage
+   aliases (`FROM build`) and variable references even when a digest suffix is present
+   (`FROM ${BASE}@sha256:...`); activation requires each `FROM` to repeat its external literal
+   digest-pinned reference.
 3. The API does not parse `worker.json`. Its `api.json.buildPlanAuthority` object has exactly eight
    non-secret planning fields and excludes worker TLS, output root and product receipt directory.
    The Control Plane service no longer receives `INV_WORKER_CONFIG`; only the worker service does.
    The API still performs the explicitly intended read-only builder health/source measurement.
+   The current deployment compiler still places `worker.json` and its TLS files in the same
+   read-only Docker volume mounted by both containers. Because both processes use uid 65532,
+   absence of `INV_WORKER_CONFIG` is an application parsing boundary, not a confidentiality
+   boundary. Product dispatch remains default-off; a later activation decision must either split
+   API/worker volumes or explicitly accept this co-mount as part of the API container trust base.
 
 ## Binding points
 

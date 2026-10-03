@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.306"
+version: "1.0.307"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T09:10:30+09:00"
+updated: "2026-10-03T10:15:54+09:00"
 source_of_truth: "Git"
 active_card: "CARD-255 S08 pre-enable Mediums (production plan budget, base-image digest, worker trust boundary in the API)"
-active_card_status: "Card 255 implements immutable profile budgets, exact source-pinned base-image measurement, and a minimal non-secret API plan-authority config; PG-free gates are green and hosted real-PG review evidence is pending"
-active_card_next: "Run exact-head hosted Core/Backend/security, record the real-PG result, and request Claude review; product dispatch stays off by default"
+active_card_status: "Card 255 Claude r1 corrections close the partial-NULL constraint and five mutation gaps; PG-free gates are green and exact-head hosted real-PG evidence is pending"
+active_card_next: "Run exact-head hosted Core/Backend/security, record all 16 NULL combinations and M1/M2/M3/M5/M8 results, and request Claude r2; product dispatch stays off"
 ---
 
 ## 2026-10-03 Card 255 — S08-BE activation prerequisites
@@ -20,6 +20,9 @@ active_card_next: "Run exact-head hosted Core/Backend/security, record the real-
 - The API reads a minimal `buildPlanAuthority` object and no longer parses or receives worker TLS,
   output or product-receipt configuration. Product enablement remains default off.
 - Migration head is 0063 on reviewed 0062; hosted real-PG evidence and Claude review are next.
+- Claude r1 correction uses `num_nulls(...)=4 OR (=0 AND positive bounds)` and tests all 16 NULL
+  combinations plus M1/M2/M3/M5/M8 independently. The shared config volume remains an explicitly
+  recorded OS trust-base residual; the API parser itself cannot consume worker-private fields.
 - [[2026-10-03_09-10-30_KST_Card255_S08-BE_activation_prerequisites_Codex]].
 
 ## 2026-10-03 Card 251 — S08-BE fixed-SHA acceptance evidence

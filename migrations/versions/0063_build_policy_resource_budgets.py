@@ -32,12 +32,13 @@ def upgrade() -> None:
     op.create_check_constraint(
         "build_policy_budget_complete_and_positive",
         TABLE,
-        "(budget_cpu_millis IS NULL AND budget_memory_bytes IS NULL "
-        "AND budget_storage_bytes IS NULL AND base_image_digests IS NULL) OR "
-        "(budget_cpu_millis BETWEEN 1 AND 9007199254740991 "
+        "num_nulls(budget_cpu_millis,budget_memory_bytes,budget_storage_bytes,"
+        "base_image_digests) = 4 OR "
+        "(num_nulls(budget_cpu_millis,budget_memory_bytes,budget_storage_bytes,"
+        "base_image_digests) = 0 "
+        "AND budget_cpu_millis BETWEEN 1 AND 9007199254740991 "
         "AND budget_memory_bytes BETWEEN 1 AND 9007199254740991 "
         "AND budget_storage_bytes BETWEEN 1 AND 9007199254740991 "
-        "AND base_image_digests IS NOT NULL "
         "AND cardinality(base_image_digests) BETWEEN 1 AND 64)",
         schema="inv",
     )

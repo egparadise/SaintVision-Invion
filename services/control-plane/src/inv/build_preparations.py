@@ -161,7 +161,7 @@ def _pinned_base_image_digests(raw: bytes, workspace_id: str, dockerfile: str) -
         if "@" not in reference:
             raise DomainError("VERIFY-0002", "Build base image is not digest pinned", 422)
         name, image_digest = reference.rsplit("@", 1)
-        if not name or not _PINNED_IMAGE_DIGEST.fullmatch(image_digest):
+        if not name or "$" in name or not _PINNED_IMAGE_DIGEST.fullmatch(image_digest):
             raise DomainError("VERIFY-0002", "Build base image is not digest pinned", 422)
         if image_digest not in digests:
             digests.append(image_digest)
@@ -582,9 +582,26 @@ class BuildPreparationService:
                 WHERE profile_id=%s AND version=%s""",
                 (profile["profile_id"], profile["version"]),
             ).fetchone()
+            profile_budget = tuple(
+                profile[name]
+                for name in (
+                    "budget_cpu_millis",
+                    "budget_memory_bytes",
+                    "budget_storage_bytes",
+                )
+            )
+            locked_budget = tuple(
+                locked_profile[name]
+                for name in (
+                    "budget_cpu_millis",
+                    "budget_memory_bytes",
+                    "budget_storage_bytes",
+                )
+            ) if locked_profile else ()
             if (not current or current["revision"] != checkout["revision"]
                     or current["content_hash"] != snapshot_sha or not locked_profile
                     or project_id not in locked_profile["project_ids"]
+                    or locked_budget != profile_budget
                     or tuple(locked_profile["base_image_digests"] or ()) != base_image_digests):
                 raise DomainError("VERIFY-0002", "Build source or policy profile drifted", 422)
             conn.execute(

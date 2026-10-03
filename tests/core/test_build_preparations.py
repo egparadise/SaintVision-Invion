@@ -353,7 +353,9 @@ def test_base_image_measurement_uses_the_immutable_snapshot_and_exact_pins():
     [
         b"FROM ubuntu:latest\n",
         b"ARG BASE\nFROM ${BASE}\n",
+        ("ARG BASE\nFROM ${BASE}@sha256:" + "1" * 64 + "\n").encode(),
         b"FROM scratch\n",
+        b"FROM build AS final\n",
         b"FROM repo@example.invalid\n",
         ("FROM repo@sha256:" + "A" * 64 + "\n").encode(),
         ("FROM repo@sha256:" + "1" * 63 + "\n").encode(),

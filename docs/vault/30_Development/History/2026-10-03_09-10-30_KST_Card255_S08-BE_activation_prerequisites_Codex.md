@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD255-S08-BE-ACTIVATION-PREREQUISITES-CODEX-001"
 title: "Card 255 S08-BE activation prerequisites"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T09:10:30+09:00"
+updated: "2026-10-03T10:15:54+09:00"
 source_of_truth: "Git"
 ---
 
@@ -34,14 +34,25 @@ was merged first. The graph is one head: `0063_build_policy_budgets`.
   Control Plane container no longer receives `INV_WORKER_CONFIG`.
 - Definer revision and AC-11 migration fixtures were advanced to 0063. No definer function or RLS
   table population changed; the reviewed 15-function set and 160-table census remain unchanged.
+- Claude r1 found PostgreSQL three-valued logic made the first 0063 constraint accept some partial
+  rows. The constraint now requires `num_nulls(...)` to be exactly 4 (legacy audit row) or exactly
+  0 plus all positive/cardinality bounds. The hosted real-PG suite covers all 16 NULL combinations
+  and separate zero/negative complete rows.
+- Project-ceiling, positive/available authority, source/profile image pin, final profile budget/pin
+  drift, and pre-0063 profile boundaries now each have an independent regression assertion.
+- The Dockerfile policy is deliberately conservative: stage-alias reuse and ARG-based image names
+  are rejected even with a digest suffix. The shared read-only config volume is recorded as an OS
+  trust-base residual; removing `INV_WORKER_CONFIG` narrows parsing but does not hide worker TLS
+  bytes from a compromised API container. Dispatch stays off until that residual is accepted or
+  the volumes are split.
 
 ## Verification so far
 
 - Focused PG-free contract, transport, deployment-config, migration rehearsal and pin tests:
   **254 passed, 2 declared environment skips**.
 - `tools/migration_graph.py --head`: `0063_build_policy_budgets`.
-- Hosted real-PostgreSQL and exact-head Backend/Core/security results are pending and must be added
-  before merge review is complete.
+- Exact-head hosted Backend/Core/security results are pending after the r1 corrections and must be
+  recorded in the PR before merge review is complete.
 
 The flag remains default off. This card does not claim physical builder acceptance or S08-BE
 completion.
