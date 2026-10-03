@@ -81,7 +81,10 @@ def grant_app_privileges(
             connection.execute(text(f"GRANT INSERT ON {table} TO {role}"))
         else:
             connection.execute(text(f"GRANT SELECT, INSERT ON {table} TO {role}"))
-    connection.execute(text(f"GRANT SELECT ON tenants TO {role}"))
+    # ``tenants`` is a global registry: table-wide SELECT reveals every slug and
+    # display name and cannot be tenant-scoped by its own key.  No application
+    # product path needs that read, so 0066 revokes the 0001 legacy grant.  A
+    # dedicated discovery issuer retains only SELECT(tenant_id) under 0045.
 
 
 def enable_rls(

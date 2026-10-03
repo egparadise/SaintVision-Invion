@@ -33,7 +33,7 @@ from saintvision.ids import new_id
 
 pytestmark = pytest.mark.postgres
 
-CURRENT_HEAD = "0064_model_version_run_fk"
+CURRENT_HEAD = "0066_tenant_registry_revoke"
 
 OLD = "uq_model_versions_tenant_id_content_sha256"
 NEW = "uq_model_versions_model_id_content_sha256"

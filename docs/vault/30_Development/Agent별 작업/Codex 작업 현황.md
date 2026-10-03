@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.314"
+version: "1.0.316"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T14:20:37+09:00"
+updated: "2026-10-03T16:42:33+09:00"
 source_of_truth: "Git"
-active_card: "CARD-264 public.tenants E2-E5 disposition re-review before the 2026-10-31 expiry"
-active_card_status: "Card 262 #357 is approved by Claude r3 at 5002d2fc: the API mounts only api_config and no service but the worker can reach worker_config, with Backend 37097898581 and Core 37097898556 green and the candidate-image, four-combination compose sweep and symlink/FIFO cases executed, not skipped"
-active_card_next: "Re-measure the public.tenants accepted-with-expiry disposition (E2-E5, expires 2026-10-31) on the current tree and renew with evidence or remove it; product dispatch stays off by default"
+active_card: "CARD-264 complete; next Codex card under measurement"
+active_card_status: "Card 264 #360 is approved by Claude r3 at d709c7f4: irreversible migration 0066 revokes the unused inv_app public.tenants SELECT, the irreversible marker is bound to exactly {0066} with a single exact REVOKE downgrade, hosted security run 37100881089 recomputed SEC-RLS-001 MEASURED_PASS, and only the inv_audit_reader 2026-11-30 disposition remains"
+active_card_next: "Propose the next Codex-owned card from measurement before implementing; product dispatch stays off by default"
 ---
 
 ## 2026-10-03 Card 262 — server_config volume split

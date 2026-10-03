@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 import copy
 import importlib.util
 import inspect
@@ -13,7 +14,8 @@ from pathlib import Path
 
 import pytest
 
-from tools.migration_graph import Revision, chain
+from tools import migration_graph
+from tools.migration_graph import Revision, chain, reviewed_security_preserving_downgrade
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -94,21 +96,73 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
         )
     )
     ordered = chain()
+    tenant_registry = next(
+        item for item in ordered if item.revision == "0066_tenant_registry_revoke"
+    )
+    assert tenant_registry.irreversible is True
+    assert tenant_registry.recovery_note and "irreversible" in tenant_registry.recovery_note
+    source = tenant_registry.path.read_text(encoding="utf-8")
+    assert runner.downgrade_body_kind(source) == "security-preserving"
+    without_marker = source.replace("irreversible = True", "irreversible = False")
+    assert runner.downgrade_body_kind(without_marker) == "reversible"
     last_irreversible = max(index for index, item in enumerate(ordered) if item.irreversible)
-    assert [item.revision for item in ordered[last_irreversible + 1 :]] == [
-        "0053_eval_suite_project_scope",
-        "0054_model_version_measurements",
-        "0055_adapter_conformance_records",
-        "0056_kernel_cancel_audit_bridge",
-        "0057_release_acceptance_quorum",
-        "0058_release_acceptance_resolver",
-        "0059_build_execution_intents",
-        "0060_build_execution_admissions",
-        "0061_build_preparations",
-        "0062_data_location_project_scope",
-        "0063_build_policy_budgets",
-        "0064_model_version_run_fk",
-    ]
+    assert [item.revision for item in ordered[last_irreversible + 1 :]] == []
+
+
+@pytest.mark.parametrize(
+    "unsafe_downgrade",
+    [
+        'op.execute("GRANT SELECT ON public.tenants TO inv_app")',
+        'op.drop_table("tenants", schema="public")',
+    ],
+    ids=["grant", "drop-table"],
+)
+def test_reviewed_irreversible_marker_rejects_non_revoke_downgrades(unsafe_downgrade):
+    source = (
+        'revision = "0066_tenant_registry_revoke"\n'
+        'down_revision = "0064_model_version_run_fk"\n'
+        'irreversible = True\n'
+        f'def downgrade():\n    {unsafe_downgrade}\n'
+    )
+    tree = ast.parse(source)
+    with pytest.raises(ValueError, match="security-preserving downgrade"):
+        reviewed_security_preserving_downgrade(tree, "0066_tenant_registry_revoke")
+    with pytest.raises(runner.RehearsalError, match="security-preserving downgrade"):
+        runner.downgrade_body_kind(source)
+
+
+@pytest.mark.parametrize(
+    "unsafe_downgrade",
+    [
+        'op.execute("GRANT SELECT ON public.tenants TO inv_app")',
+        'op.drop_table("tenants", schema="public")',
+    ],
+    ids=["grant", "drop-table"],
+)
+def test_migration_graph_rejects_an_unsafe_reviewed_marker(
+    unsafe_downgrade, tmp_path, monkeypatch
+):
+    (tmp_path / "0066.py").write_text(
+        'revision = "0066_tenant_registry_revoke"\n'
+        'down_revision = None\n'
+        'irreversible = True\n'
+        f'def downgrade():\n    {unsafe_downgrade}\n',
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(migration_graph, "VERSIONS", tmp_path)
+    with pytest.raises(ValueError, match="security-preserving downgrade"):
+        migration_graph.load()
+
+
+def test_unreviewed_revision_cannot_claim_an_explicit_irreversible_marker():
+    source = (
+        'revision = "0067_future"\n'
+        'down_revision = "0066_tenant_registry_revoke"\n'
+        'irreversible = True\n'
+        'def downgrade():\n    op.execute("REVOKE SELECT ON sample FROM app")\n'
+    )
+    with pytest.raises(runner.RehearsalError, match="unreviewed explicit irreversible marker"):
+        runner.downgrade_body_kind(source)
 
 
 def test_noop_downgrade_is_invalid_before_any_database_call(tmp_path, monkeypatch):

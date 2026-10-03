@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "verifiedAt": "2026-10-03T08:09:44+09:00",
+  "verifiedAt": "2026-10-03T14:28:54+09:00",
   "definerPolicySignatures": [
     "public.apply_capability_offer(uuid, character, character, bigint)",
     "public.apply_resource_offer(uuid, character, text, bigint)",
@@ -61,19 +61,6 @@
     }
   },
   "rlsAcceptedDispositions": [
-    {
-      "role": "inv_app",
-      "table": "public.tenants",
-      "rules": [
-        "E2",
-        "E3",
-        "E4",
-        "E5"
-      ],
-      "disposition": "accepted-with-expiry",
-      "expiresAt": "2026-10-31T23:59:59+09:00",
-      "proof": "0001_s02_baseline intentionally grants tenant registry SELECT; cross-tenant slug/display_name enumeration remains a design observation and is not a permanent false positive."
-    },
     {
       "role": "inv_discovery_issuer",
       "table": "public.tenants",

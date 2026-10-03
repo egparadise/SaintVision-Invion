@@ -103,6 +103,50 @@ def test_inv_audit_reader_visibility_is_expiring_not_a_false_positive():
     assert reader["expiresAt"] == "2026-11-30T23:59:59+09:00"
 
 
+def test_inv_app_tenant_registry_exception_was_removed_with_the_grant():
+    source, policy, baseline = inputs()
+    generated = tool.build_allowlist(source, policy, baseline)
+    identities = {
+        (row["role"], row["table"])
+        for row in generated["rlsAcceptedDispositions"]
+    }
+    assert ("inv_app", "public.tenants") not in identities
+    assert ("inv_discovery_issuer", "public.tenants") in identities
+
+    migration = (
+        ROOT / "migrations/versions/0066_tenant_registry_revoke.py"
+    ).read_text(encoding="utf-8")
+    helper = (ROOT / "src/saintvision/db/rls.py").read_text(encoding="utf-8")
+    assert 'revision = "0066_tenant_registry_revoke"' in migration
+    assert 'down_revision = "0064_model_version_run_fk"' in migration
+    assert "irreversible = True" in migration
+    assert "REVOKE SELECT ON public.tenants FROM inv_app" in migration
+    assert "GRANT SELECT ON tenants" not in helper
+    downgrade = migration.split("def downgrade():", 1)[1]
+    assert "REVOKE SELECT ON public.tenants FROM inv_app" in downgrade
+    assert "GRANT SELECT" not in downgrade
+
+
+def test_no_product_path_reads_public_tenant_registry_as_inv_app():
+    """Card 264 ratchet: new product use requires a new least-privilege design.
+
+    Operator provisioning and security measurement live under ``tools`` and use an
+    owner/admin DSN.  The product trees have no tenant-registry query; explanatory
+    strings about the boundary are allowed but executable SQL is not.
+    """
+
+    query = re.compile(
+        r"(?:from|join)\s+(?:public\.)?tenants\b",
+        re.IGNORECASE,
+    )
+    matches = []
+    for parent in (ROOT / "src", ROOT / "services"):
+        for path in parent.rglob("*.py"):
+            if query.search(path.read_text(encoding="utf-8")):
+                matches.append(path.relative_to(ROOT).as_posix())
+    assert matches == []
+
+
 def test_audit_reader_review_matches_the_only_grant_and_has_no_product_caller():
     """Card 254 re-review: the privilege is dormant and its DDL boundary is unchanged.
 
