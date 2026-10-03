@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.317"
+version: "1.0.318"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T17:49:17+09:00"
+updated: "2026-10-03T18:27:48+09:00"
 source_of_truth: "Git"
 active_card: "CARD-268 inv_audit_reader disposition re-measurement before the 2026-11-30 expiry"
 active_card_status: "Card 267 #361 is approved by Claude r2 at a8cc5352: the post-landing guard runs the Card 260 orchestrator at the landed clean detached $LAND, requires security, accessibility and migration exactly, refuses failed, unfinished or missing new runs before aggregate, and Backend 3.12/3.14 and Docs are green"
@@ -24,7 +24,8 @@ active_card_next: "Re-measure the inv_audit_reader public.audit_events E3-E5 dis
 - Claude r1's dispatched failure/unfinished/missing-run gaps are fixed before aggregate, and the
   runbook now switches to a clean detached `$LAND` checkout before loading the guard. The override
   seam is test-only. Focused local results are **24 passed** for the real-Bash guard boundary and
-  **40 passed** for fake-gh exact-SHA orchestration; final exact-head hosted CI is pending.
+  **40 passed** for fake-gh exact-SHA orchestration; final exact-head hosted CI at `e627bc61` succeeded
+  (Backend run `37110979411` 3.12/3.14, Docs run `37110979408`; coordinator update).
 - [[2026-10-03_16-53-11_KST_Card267_AC11_post_landing_exact_SHA_orchestration_Codex]].
 
 ## 2026-10-03 Card 262 — server_config volume split
