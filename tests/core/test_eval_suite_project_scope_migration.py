@@ -135,7 +135,7 @@ def test_the_graph_has_one_head_and_it_is_this_revision():
     assert head.returncode == 0, head.stderr
     # Later revisions sit above this migration; the repository graph must still
     # converge on the current release-acceptance resolver head.
-    assert head.stdout.strip() == "0063_build_policy_budgets"
+    assert head.stdout.strip() == "0064_model_version_run_fk"
 
 
 # ---------------------------------------------------------------- upgrade paths

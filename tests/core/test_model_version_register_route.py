@@ -607,24 +607,51 @@ def test_the_request_contract_is_enforced_at_the_boundary(monkeypatch, body):
     assert world["registered"] == []
 
 
-@pytest.mark.parametrize(
-    "field", ["producedByRunId", "lineage", "stage", "modelId", "uri"]
-)
+@pytest.mark.parametrize("field", ["stage", "modelId", "uri"])
 def test_the_request_refuses_the_fields_this_route_deliberately_does_not_take(
     monkeypatch, field
 ):
-    """``producedByRunId`` and ``lineage`` are omissions with a reason (see the
-    module docstring), not oversights. Accepting either by accident would write
-    provenance nothing has checked."""
+    """``stage``, ``modelId`` and ``uri`` are still refused. ``uri`` is the one
+    with teeth: a caller-supplied address persisted verbatim, so the server
+    derives it (Codex #191 F2)."""
     world = {}
     client = build(monkeypatch, world)
-    if field == "lineage":
-        value = []
-    elif field == "uri":
-        value = "https://user:secret@host/model.safetensors"
-    else:
-        value = "run_01J8Z3XQ2K9WMV5T7N4B6C8D0E"
+    value = (
+        "https://user:secret@host/model.safetensors" if field == "uri"
+        else "run_01J8Z3XQ2K9WMV5T7N4B6C8D0E"
+    )
     canonical(post(client, {**BODY, field: value}), code="VAL-0003", status=422)
+    assert world["registered"] == []
+
+
+@pytest.mark.parametrize(
+    "kind", ["code_commit", "container_image", "astrology", "APPROVAL"]
+)
+def test_an_asserted_edge_of_an_unprovable_kind_is_refused_by_the_contract(
+    monkeypatch, kind
+):
+    """Card 261: a caller may assert only the three kinds whose project the schema
+    can prove. ``code_commit`` and ``container_image`` carry no project anywhere,
+    so the contract -- not a later check -- is where they stop."""
+    world = {}
+    client = build(monkeypatch, world)
+    body = {**BODY, "lineage": [{"kind": kind, "subjectId": "apr_01J8Z3XQ2K9WMV5T7N4B6C8D0E"}]}
+    canonical(post(client, body), code="VAL-0003", status=422)
+    assert world["registered"] == []
+
+
+def test_an_asserted_edge_cannot_carry_an_undeclared_field(monkeypatch):
+    world = {}
+    client = build(monkeypatch, world)
+    body = {
+        **BODY,
+        "lineage": [{
+            "kind": "approval",
+            "subjectId": "apr_01J8Z3XQ2K9WMV5T7N4B6C8D0E",
+            "projectId": "prj_elsewhere",
+        }],
+    }
+    canonical(post(client, body), code="VAL-0003", status=422)
     assert world["registered"] == []
 
 
@@ -643,10 +670,12 @@ def test_the_service_is_called_with_only_what_the_request_carried(monkeypatch):
         "uri": DERIVED_URI,
         "now": NOW,
         "byte_size": 4096,
+        # Card 261: both provenance arguments are passed explicitly now. The
+        # body carried neither, so the route passes the absence through rather
+        # than inventing a value.
+        "produced_by_run_id": None,
+        "lineage": [],
     }
-    # The service's own defaults for the provenance arguments stay in force.
-    assert "produced_by_run_id" not in call
-    assert "lineage" not in call
 
 
 # --------------------------------------------------------------------------
