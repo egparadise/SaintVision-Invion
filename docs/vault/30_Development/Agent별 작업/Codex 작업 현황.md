@@ -1,15 +1,32 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.310"
+version: "1.0.314"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T11:59:37+09:00"
+updated: "2026-10-03T14:20:37+09:00"
 source_of_truth: "Git"
-active_card: "CARD-260 AC-11 exact-SHA aggregation automation"
-active_card_status: "Card 258 #354 is approved by Claude r1 at 6be1339d: exact target 694217b0 has same-SHA security, accessibility and migration artifacts and canonical aggregation assembled 4/8 axes, recomputing INVALID_RUN without changing any contract or target"
-active_card_next: "Build the fail-closed producer-run discovery, missing-lane dispatch and aggregate tool with fake-gh tests (Card 260); evaluator, schema and targets stay unchanged"
+active_card: "CARD-264 public.tenants E2-E5 disposition re-review before the 2026-10-31 expiry"
+active_card_status: "Card 262 #357 is approved by Claude r3 at 5002d2fc: the API mounts only api_config and no service but the worker can reach worker_config, with Backend 37097898581 and Core 37097898556 green and the candidate-image, four-combination compose sweep and symlink/FIFO cases executed, not skipped"
+active_card_next: "Re-measure the public.tenants accepted-with-expiry disposition (E2-E5, expires 2026-10-31) on the current tree and renew with evidence or remove it; product dispatch stays off by default"
 ---
+
+## 2026-10-03 Card 262 — server_config volume split
+
+- Started from train 38 candidate `ce63a5e8136742389e8148adc64d466df0f7af77` because Card 255
+  left one activation residual: API and worker mounted the same volume containing worker TLS bytes.
+- `api_config` remains the API authority at `/run/saintvision`; the new `worker_config` volume is
+  mounted only by the worker at `/run/saintvision-worker`. Both are read-only and the product flag
+  remains default off.
+- The preparation tool now assigns API and worker files to exact roots, rejects cross-root worker
+  TLS references and existing/equal volumes, and verifies each volume before returning a redacted
+  receipt. A failed two-volume preparation removes only volumes owned by that invocation.
+- Claude r1's two surviving mutations are now covered: rendered base/Workspace/PITR/all-override
+  graphs sweep every service for forbidden worker mounts, and the file boundary rejects symlink,
+  hardlink, directory, FIFO, and oversized inputs. Focused local results are server-config
+  **32 passed / 7 explicit platform-or-candidate-image skips**, rendered deployment boundary
+  **20 passed**, and VF Compose boundary **3 passed**. Hosted container JUnit and full exact-head CI
+  are not yet claimed. [[2026-10-03_13-05-15_KST_Card262_server_config_volume_split_Codex]].
 
 ## 2026-10-03 Card 258 — AC-11 exact-SHA axis coverage measurement
 

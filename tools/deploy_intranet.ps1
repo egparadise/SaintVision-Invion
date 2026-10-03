@@ -118,6 +118,7 @@ try {
         $authConfigPath = if (Test-Path "README.md") { ((Resolve-Path "README.md").Path -replace '\\', '/') } else { "README.md" }
         if (-not $env:INV_WEB_AUTH_CONFIG) { $env:INV_WEB_AUTH_CONFIG = $authConfigPath }
         if (-not $env:INV_CONFIG_VOLUME) { $env:INV_CONFIG_VOLUME = "saintvision-config-preflight" }
+        if (-not $env:INV_WORKER_CONFIG_VOLUME) { $env:INV_WORKER_CONFIG_VOLUME = "saintvision-worker-config-preflight" }
         # DSN values below are placeholders for docker compose config --quiet; this script does not connect to PostgreSQL.
         if (-not $env:INV_BUSINESS_DSN) { $env:INV_BUSINESS_DSN = "postgresql+psycopg://preflight:***@postgres/saintvision" }
         if (-not $env:INV_RUNTIME_DSN) { $env:INV_RUNTIME_DSN = "postgresql+psycopg://preflight:***@postgres/saintvision" }

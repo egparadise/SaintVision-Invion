@@ -82,8 +82,14 @@ docker compose -f docker-compose.prod.yml -f docker-compose.workspace.yml config
 `tools/prepare_server_config.py`는 api.json과 그 안에서 참조하는 공개 신뢰 키·Workspace 서명 키·TLS 파일만 새 Linux volume으로 옮긴다. 참조 경로는 `/run/saintvision/<파일명>` 형식이며 실제 파일은 입력 디렉터리 바로 아래에 둔다. 다른 파일이나 외부 경로는 복사하지 않는다. 후보 이미지의 **sha256 image ID**를 명시한다.
 
 ```powershell
-python tools/prepare_server_config.py --directory <보호된-설정-디렉터리> --volume <새-volume-이름> --image sha256:<검증한-이미지-ID>
+python tools/prepare_server_config.py --directory <보호된-설정-디렉터리> --volume <새-API-volume-이름> --worker-volume <새-worker-volume-이름> --image sha256:<검증한-이미지-ID>
 ```
+
+`worker.json`이 있으면 `--worker-volume`은 필수다. API 설정과 그 참조 파일은
+`INV_CONFIG_VOLUME`으로 지정한 volume의 `/run/saintvision`에, `worker.json`과 Node TLS
+자료는 `INV_WORKER_CONFIG_VOLUME`으로 지정한 별도 volume의
+`/run/saintvision-worker`에 배치된다. 두 volume은 서로 다른 이름이어야 하며 둘 다
+read-only로 mount된다. control-plane은 worker volume을 mount하지 않는다.
 
 복사 바이트 hash·owner65532·0600·현재 identity 신뢰 묶음을 컨테이너에서 검증한다. 실패하면 이번에 만든 volume만 정리하고, 기존 volume·입력 파일은 보존한다. 성공 receipt의 volume 이름을 `INV_CONFIG_VOLUME`에 지정한다. 이 도구는 서버 기동·DB 수정·Workspace 실행을 하지 않는다. 설정 변경 시에도 새 volume을 검증한 후 전환하며, 기존 운영 volume을 덮어쓰지 않는다. Workspace 개인키의 실제 용도·mTLS 유효성은 후보 서버 기동/Node 연결 단계에서 별도로 검증된다.
 
