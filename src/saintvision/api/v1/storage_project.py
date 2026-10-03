@@ -53,6 +53,7 @@ from ...services import projects as project_service
 from ...services import storage as storage_service
 from ...services import resolver
 from ...services.replica_observation import observe_replicas
+from ...services import replica_repair
 from .. import schemas
 from ...identity.principal import Principal
 from ..deps import (
@@ -416,3 +417,87 @@ def project_replica_status(
             raise _absent(InvError(RES_CONTRIBUTION_NOT_FOUND, "data location not found")) from None
         raise translate(error, table=TRANSLATION) from None
     return observation
+
+
+#: The plan is bounded: a project with a long catalogue cannot be asked for all of
+#: it in one response. The ceiling is the contract's own ``max_length``, not a
+#: preference, and ``truncated`` says when the answer was cut.
+REPAIR_PLAN_MAX = 200
+
+
+@router.get(
+    "/projects/{project_id}/storage/replica-repair-plan",
+    response_model=schemas.ReplicaRepairPlanResponse,
+    tags=["storage"],
+)
+def project_replica_repair_plan(
+    project_id: str,
+    replica_factor: int = Query(default=None, ge=1, le=16, alias="replicaFactor"),
+    limit: int = Query(default=50, ge=1, le=REPAIR_PLAN_MAX),
+    principal: Principal = Depends(get_principal),
+    session: Session = Depends(get_session),
+    now: dt.datetime = Depends(get_now),
+) -> dict:
+    """Which of this project's locations are short of ready copies, and from where.
+
+    The service has decided "short of ready copies" since VF-CL-04 and no product
+    path read it, so the catalogue routes could report five per-state counts and
+    still never say a location was **under-replicated**. This is that reading.
+
+    What it is not: it writes nothing, it moves no bytes, and it does not repair.
+    A plan is the *input* to a node-runtime transfer (VF-CX-03/04), not a
+    substitute for one, and ``repairPerformed`` is a literal ``false`` so a reader
+    cannot mistake the two.
+
+    Scope: ``project_id`` reaches the service as an **authority input**, so another
+    project's location and a pre-``0062`` row whose ``project_id`` is NULL are both
+    outside this answer. An unknown project and an empty one answer alike, because
+    ``require_project_access`` already refuses both the same way -- a project id
+    must not become an existence oracle either.
+    """
+    desired = replica_factor if replica_factor is not None else replica_repair.DEFAULT_REPLICA_FACTOR
+    try:
+        _readable(session, principal=principal, project_id=project_id)
+        with project_scope(session, project_id):
+            summary = replica_repair.fleet_replica_summary(
+                session,
+                tenant_id=principal.tenant_id,
+                project_id=project_id,
+                desired=desired,
+            )
+            # One more than the page so ``truncated`` is measured, not guessed.
+            needing = replica_repair.locations_needing_repair(
+                session,
+                tenant_id=principal.tenant_id,
+                project_id=project_id,
+                desired=desired,
+                limit=limit + 1,
+            )
+    except InvError as error:
+        raise translate(error, table=TRANSLATION) from None
+
+    truncated = len(needing) > limit
+    return schemas.ReplicaRepairPlanResponse(
+        projectId=project_id,
+        observedAt=now,
+        replicaFactor=desired,
+        locations=summary.locations,
+        healthy=summary.healthy,
+        underReplicated=summary.under_replicated,
+        atRisk=summary.at_risk,
+        unreplicated=summary.unreplicated,
+        items=[
+            schemas.ReplicaRepairItem(
+                locationId=health.location_id,
+                ready=health.ready,
+                desired=health.desired,
+                deficit=health.deficit,
+                classification=health.classification,
+                unusable=dict(health.unusable),
+                sourceNodes=list(health.source_nodes),
+            )
+            for health in needing[:limit]
+        ],
+        truncated=truncated,
+        repairPerformed=False,
+    ).model_dump(by_alias=True, mode="json")

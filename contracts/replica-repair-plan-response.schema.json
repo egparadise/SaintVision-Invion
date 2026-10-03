@@ -1,0 +1,137 @@
+{
+  "$defs": {
+    "ReplicaRepairItem": {
+      "additionalProperties": false,
+      "description": "One location that is short of ready copies, and where a copy can come from.\n\n``desired`` and ``ready`` are both reported and neither is derived from the\nother: the replica factor is a policy input with a stated default, and the\nready count is an observation. A reader that saw only the deficit could not\ntell a policy change from a lost copy.",
+      "properties": {
+        "classification": {
+          "enum": [
+            "under_replicated",
+            "at_risk",
+            "unreplicated"
+          ],
+          "title": "Classification",
+          "type": "string"
+        },
+        "deficit": {
+          "minimum": 0,
+          "title": "Deficit",
+          "type": "integer"
+        },
+        "desired": {
+          "minimum": 1,
+          "title": "Desired",
+          "type": "integer"
+        },
+        "locationId": {
+          "title": "Locationid",
+          "type": "string"
+        },
+        "ready": {
+          "minimum": 0,
+          "title": "Ready",
+          "type": "integer"
+        },
+        "sourceNodes": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 64,
+          "title": "Sourcenodes",
+          "type": "array"
+        },
+        "unusable": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Unusable",
+          "type": "object"
+        }
+      },
+      "required": [
+        "locationId",
+        "ready",
+        "desired",
+        "deficit",
+        "classification"
+      ],
+      "title": "ReplicaRepairItem",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "What this project's catalogue needs, and what this answer is not.\n\nIt is a **plan**, not an action: establishing a new replica is a node-runtime\ntransfer and this route moves no bytes. ``observedAt`` is when the counts were\nread; nothing here promises the bytes are reachable now.",
+  "properties": {
+    "atRisk": {
+      "minimum": 0,
+      "title": "Atrisk",
+      "type": "integer"
+    },
+    "healthy": {
+      "minimum": 0,
+      "title": "Healthy",
+      "type": "integer"
+    },
+    "items": {
+      "items": {
+        "$ref": "#/$defs/ReplicaRepairItem"
+      },
+      "maxItems": 200,
+      "title": "Items",
+      "type": "array"
+    },
+    "locations": {
+      "minimum": 0,
+      "title": "Locations",
+      "type": "integer"
+    },
+    "observedAt": {
+      "format": "date-time",
+      "title": "Observedat",
+      "type": "string"
+    },
+    "projectId": {
+      "title": "Projectid",
+      "type": "string"
+    },
+    "repairPerformed": {
+      "const": false,
+      "title": "Repairperformed",
+      "type": "boolean"
+    },
+    "replicaFactor": {
+      "minimum": 1,
+      "title": "Replicafactor",
+      "type": "integer"
+    },
+    "truncated": {
+      "title": "Truncated",
+      "type": "boolean"
+    },
+    "underReplicated": {
+      "minimum": 0,
+      "title": "Underreplicated",
+      "type": "integer"
+    },
+    "unreplicated": {
+      "minimum": 0,
+      "title": "Unreplicated",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "projectId",
+    "observedAt",
+    "replicaFactor",
+    "locations",
+    "healthy",
+    "underReplicated",
+    "atRisk",
+    "unreplicated",
+    "truncated",
+    "repairPerformed"
+  ],
+  "title": "ReplicaRepairPlanResponse",
+  "type": "object"
+}

@@ -32,6 +32,7 @@ def _configuration() -> dict:
 
 def _seed_round(owner_engine, *, node_count: int, round_index: int):
     tenant_id = uuid.uuid4()
+    project_id = new_id("project")
     user_id = new_id("user")
     node_ids = [new_id("node") for _ in range(node_count)]
     capability_ids = [new_id("capability") for _ in node_ids]
@@ -114,18 +115,27 @@ def _seed_round(owner_engine, *, node_count: int, round_index: int):
                 "at": departed_at,
             },
         )
+        connection.execute(
+            text(
+                "INSERT INTO projects(project_id,tenant_id,code,display_name,status,"
+                "created_at,version) VALUES(:p,:t,'s07','s07','active',now(),1)"
+            ),
+            {"p": project_id, "t": tenant_id},
+        )
         for shard_index in range(shard_count):
             location_id = new_id("data_location")
             locations.append(location_id)
             connection.execute(
                 text(
-                    "INSERT INTO data_locations(location_id,tenant_id,contribution_id,uri,kind,"
-                    "relative_path,byte_size,checksum_sha256,verified_at,ready,catalogued_at,version) "
-                    "VALUES(:l,:t,:c,:uri,'dataset',:path,4096,:sha,:at,true,:at,1)"
+                    "INSERT INTO data_locations(location_id,tenant_id,project_id,contribution_id,"
+                    "uri,kind,relative_path,byte_size,checksum_sha256,verified_at,ready,"
+                    "catalogued_at,version) "
+                    "VALUES(:l,:t,:p,:c,:uri,'dataset',:path,4096,:sha,:at,true,:at,1)"
                 ),
                 {
                     "l": location_id,
                     "t": tenant_id,
+                    "p": project_id,
                     "c": contribution_id,
                     "uri": f"inv://datasets/s07-{round_index}@1/shard-{shard_index}.bin",
                     "path": f"shard-{shard_index}.bin",
@@ -210,7 +220,7 @@ def test_repeated_node_loss_and_synthetic_repair_measurement(
             with session.begin():
                 with tenant_scope(session, tenant_id):
                     planned = replica_repair.locations_needing_repair(
-                        session, tenant_id=tenant_id, desired=2
+                        session, tenant_id=tenant_id, project_id=project_id, desired=2
                     )
                     spare = pools.node_spare(
                         session,
@@ -245,7 +255,11 @@ def test_repeated_node_loss_and_synthetic_repair_measurement(
                     with tenant_scope(session, tenant_id):
                         recovered = sum(
                             replica_repair.replica_health(
-                                session, tenant_id=tenant_id, location_id=location_id, desired=2
+                                session,
+                                tenant_id=tenant_id,
+                                location_id=location_id,
+                                project_id=project_id,
+                                desired=2,
                             ).classification
                             == "healthy"
                             for location_id in locations
