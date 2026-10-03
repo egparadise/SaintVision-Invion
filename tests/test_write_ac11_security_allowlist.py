@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -99,4 +100,43 @@ def test_inv_audit_reader_visibility_is_expiring_not_a_false_positive():
     assert reader["table"] == "public.audit_events"
     assert reader["rules"] == ["E3", "E4", "E5"]
     assert reader["disposition"] == "accepted-with-expiry"
-    assert reader["expiresAt"] == "2026-10-31T23:59:59+09:00"
+    assert reader["expiresAt"] == "2026-11-30T23:59:59+09:00"
+
+
+def test_audit_reader_review_matches_the_only_grant_and_has_no_product_caller():
+    """Card 254 re-review: the privilege is dormant and its DDL boundary is unchanged.
+
+    The exact product-source occurrence set is a ratchet.  Those three references are explanatory
+    docstrings/comments, not a connection or role-assumption path; adding any product reference
+    forces this reviewed disposition back through security review before its next expiry.
+    """
+
+    migration = (ROOT / "migrations/versions/0047_audit_events_isolation.py").read_text(
+        encoding="utf-8"
+    )
+    assert "ALTER ROLE inv_audit_reader NOLOGIN NOSUPERUSER" in migration
+    assert "NOINHERIT NOBYPASSRLS" in migration
+    assert "inv_audit_reader already has members" in migration
+    assert "CREATE POLICY audit_events_audit_read ON audit_events FOR SELECT TO inv_audit_reader" in migration
+    assert "USING (true)" in migration
+    assert "GRANT SELECT ON audit_events TO inv_audit_reader" in migration
+    assert "REVOKE SELECT ON audit_events FROM inv_app" in migration
+
+    later_migrations = [
+        path for path in (ROOT / "migrations/versions").glob("*.py")
+        if path.name > "0047_audit_events_isolation.py"
+        and "inv_audit_reader" in path.read_text(encoding="utf-8")
+    ]
+    assert later_migrations == []
+
+    product_refs = {
+        path.relative_to(ROOT).as_posix()
+        for parent in (ROOT / "src", ROOT / "services")
+        for path in parent.rglob("*.py")
+        if re.search(r"\binv_audit_reader\b", path.read_text(encoding="utf-8"))
+    }
+    assert product_refs == {
+        "src/saintvision/db/models/__init__.py",
+        "src/saintvision/db/models/operations.py",
+        "src/saintvision/services/audit.py",
+    }

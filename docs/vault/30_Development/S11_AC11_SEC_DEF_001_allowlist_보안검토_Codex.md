@@ -1,12 +1,12 @@
 ---
 doc_id: "S11-AC11-SEC-DEF-001-ALLOWLIST-REVIEW-CODEX"
 title: "AC-11 SEC-DEF-001 SECURITY DEFINER allowlist 보안 검토"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-10-02T20:18:00+09:00"
+updated: "2026-10-03T08:09:44+09:00"
 source_of_truth: "Git"
-base_sha: "843d283c1ee70cc021385b0f8f25ec323d434829"
+base_sha: "752245861eb0af1e3a4e714cb77c0948ce6f76b7"
 reviewer: "Claude"
 ---
 
@@ -49,9 +49,29 @@ E3(GUC unset), E4(foreign tenant), E5(unknown tenant) 관측은 실제 privilege
 `accepted-with-expiry`로 분류한다.
 
 수용 경계는 0047이 강제하는 `NOLOGIN`, `NOINHERIT`, `NOBYPASSRLS`, direct member 0,
-SELECT-only, `inv_app` SELECT 없음이다. 만료는 `2026-10-31T23:59:59+09:00`이다.
+SELECT-only, `inv_app` SELECT 없음이다. 만료는 `2026-11-30T23:59:59+09:00`이다.
 그 전에 실제 운영 reader membership·grant 경로를 재검토하지 않으면 canonical evaluator가
 `MEASURED_FAIL`을 내며, 만료를 자동 연장하지 않는다. 정의·E1~E6 자체는 완화하지 않는다.
+
+## Card 254 재검토 — 0061 tree
+
+`752245861eb0af1e3a4e714cb77c0948ce6f76b7`에서 다시 대조한 결과는 다음과 같다.
+
+- `migrations/versions/0047_audit_events_isolation.py`만 role을 이름으로 참조한다. 이후
+  migration은 role의 속성·membership·grant·policy를 바꾸지 않는다.
+- 0047은 role을 `NOLOGIN`, `NOINHERIT`, `NOBYPASSRLS`로 재고정하고 direct member가
+  하나라도 있으면 migration을 거부한다. `public.audit_events`에는 SELECT만 주며
+  FORCE RLS와 `audit_events_audit_read USING (true)`를 유지한다. `inv_app` SELECT는 없다.
+- 제품 `src/`·`services/`의 role 문자열 세 곳은 모델·서비스 경계 설명뿐이다. role로
+  연결하거나 `SET ROLE` 하는 제품 경로와 운영 reader membership 발급 경로는 0건이다.
+- role의 목적은 tenant를 해석하지 못한 인증 거부를 포함한 감사 조회다. SELECT를 지금
+  회수하면 이 목적을 없애므로 grant 축소 migration은 만들지 않는다. 대신 다음 운영
+  reader 경로가 생기기 전 다시 review하도록 한 달 단위로만 갱신한다.
+
+이번 갱신은 문구에 의존하지 않는다. collector가 role을 직접 보유한 principal 목록
+`granted_to`를 live catalogue에서 기록하고, evaluator는 login/inherit/bypass/member 양방향,
+SELECT-only, FORCE RLS, exact policy가 모두 일치해야만 임시 disposition을 적용한다. 하나라도
+달라지면 만료 전이라도 `MEASURED_FAIL`이다.
 
 # 생성·pin 절차
 
