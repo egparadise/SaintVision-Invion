@@ -1,12 +1,12 @@
 ---
 doc_id: "HISTORY-CARD266-VF-CL-04-STORAGE-CHECK-COLLECT-20261003"
 title: "카드 266 — 서명된 폴더 점검을 돌리는 제품 경로를 설계대로 구현했다. ledger 응답이 쓰기와 같은 transaction에서 커밋되고, 저장된 응답은 지금 권한이 있는 주체에게만 돌아간다"
-version: "1.1.0"
+version: "1.2.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-03T18:23:39+09:00"
+updated: "2026-10-03T20:45:40+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "9e9a551c"
@@ -18,7 +18,7 @@ tags: ["vf-cl-04", "storage-check", "idempotency", "concurrency", "replica-repai
 
 ## 0. 한 줄
 
-`#358`(카드 263) 설계가 Codex r8 승인(`e14aa8ce`)이고 **그 설계가 구현 계약**이었다. 사슬은 전부 있었고 **그것을 돌리는 것이 없었다** — `StorageSampleStore`를 생성하는 코드가 저장소 전체에서 시험 한 곳뿐이었고, 그래서 AC-12 인수 항목 `contributed-folders-checked`가 폴더 0개일 때 `PASS`, 1개부터는 영원히 `FAIL`이었다. 이제 **공개 write surface 하나**(`POST /v1/projects/{project}/runs/{run_id}/storage-samples`)가 세 단계로 그것을 돌리고, **ledger 응답이 다섯 쓰기와 같은 transaction에서 커밋되며**, **저장된 응답은 지금 권한이 있는 주체에게만** 돌아간다. **r2 기준** 시험 **61**(collect 28 + HTTP 11 + repair route 6 + replica 16), 변이 **18/18 사살**(runner와 결과가 tree에 있다), migration **0건**(`0065` 비움). r2에서 고친 차단 다섯과 **측정이 뒤집은 전제 하나**는 §9다.
+`#358`(카드 263) 설계가 Codex r8 승인(`e14aa8ce`)이고 **그 설계가 구현 계약**이었다. 사슬은 전부 있었고 **그것을 돌리는 것이 없었다** — `StorageSampleStore`를 생성하는 코드가 저장소 전체에서 시험 한 곳뿐이었고, 그래서 AC-12 인수 항목 `contributed-folders-checked`가 폴더 0개일 때 `PASS`, 1개부터는 영원히 `FAIL`이었다. 이제 **공개 write surface 하나**(`POST /v1/projects/{project}/runs/{run_id}/storage-samples`)가 세 단계로 그것을 돌리고, **ledger 응답이 다섯 쓰기와 같은 transaction에서 커밋되며**, **저장된 응답은 지금 권한이 있는 주체에게만** 돌아간다. **r3 기준** 시험 **70**(collect 32 + HTTP 9 + startup 5 + repair route 6 + replica 18), 변이 **22개 중 21 사살 + 1 equivalent(사유 기록)**(runner와 결과가 tree에 있다), migration **0건**(`0065` 비움). r2에서 고친 차단 다섯과 **측정이 뒤집은 전제 하나**는 §9다.
 
 ## 1. 무엇이 들어갔는가
 
@@ -123,7 +123,7 @@ has_column_privilege('inv_app',   'public.data_locations','project_id','SELECT')
 
 `0062`(내 카드 253)가 열을 더하면서 **GRANT를 바꾸지 않았고**, kernel의 column 단위 grant 일곱 개에 그 열이 없다. 그래서 **kernel의 손을 넓히지 않고** 카탈로그의 주인인 app role 연결에서 그 한 질문만 묻는다(그 읽기는 RLS 아래이므로 tenant GUC를 세운다). 규칙은 **전부 아니면 거부**다 — 이 project에 **하나 이상** 있고 **밖에 하나도 없어야** 하며 **NULL은 밖**이다.
 
-**한계도 적었다**: 그 읽기는 다른 transaction이므로 kernel의 행들과 **함께 잠글 수 없다**. 양쪽 phase에서 확인하고 쓰기 경로의 잠금은 그대로지만, 잠글 수 있게 만드는 길은 셋(열 GRANT, definer 함수 — **definer 수가 움직여 AC-11 검토 집합을 건드린다**, surface를 app으로 이동)이고 **고르는 것은 이 카드의 몫이 아니다**.
+**한계도 적었다** — 그런데 그 서술 자체가 r3에서 **틀린 것으로 판명됐다**(§10-1): 그 읽기는 다른 transaction이지만, **폴더 행을 먼저 잠그면** 제품의 catalogue 쓰기가 같은 행을 잡으므로 경계는 고정된다. r2의 모양은 잠금보다 **먼저** 물어서 실제 경쟁이 있었다. 양쪽 phase에서 확인하고 쓰기 경로의 잠금은 그대로지만, 잠글 수 있게 만드는 길은 셋(열 GRANT, definer 함수 — **definer 수가 움직여 AC-11 검토 집합을 건드린다**, surface를 app으로 이동)이고 **고르는 것은 이 카드의 몫이 아니다**.
 
 ### 9-3. 증거
 
@@ -143,3 +143,27 @@ HTTP 시험이 드는 것: 201·replay 200 · **인증된 거부가 정확히 1�
 ### 9-4. 측정이 뒤집은 전제
 
 설계와 나(그리고 r5의 논의)가 공유한 전제는 "두 요청이 **같은 봉투를 받지 않는다**"였다. **틀렸다** — `observedAt`이 **초 단위**이고 서명이 결정론적이므로 **같은 초 안의 두 표본은 byte 단위로 같다**(실측). 세 단계가 존재하는 이유는 "항상 다르다"가 아니라 **"초가 넘어가면 다르다"**이고, 시험이 양쪽을 단언한다. 같은 초에서는 응답 hash 비교만으로도 우연히 맞아 보이기 때문에, 빠른 시험에서 괜찮아 보이고 운영에서 깨지는 모양이다.
+
+## 10. r3 — Codex r2의 셋
+
+### 10-1. F1은 한계가 아니라 **경쟁이었다**
+
+r2까지 나는 cross-connection 경계 읽기를 "잠글 수 없는 한계"로 적어 두었다. **그것이 틀렸다** — final phase가 catalogue 읽기를 끝낸 **뒤에** Run·contribution을 잠갔으므로, 그 사이에 폴더의 location을 다른 project로 옮기는 commit이 들어오면 collect가 **거부 없이 check를 기록**했다(Codex r2의 probe).
+
+**고친 것은 connection이 아니라 순서다.** `_locked_boundary`가 `_scope`로 **Run과 contribution 행을 `FOR UPDATE`로 잡고 그다음에** catalogue를 묻는다. 두 phase 모두 **replay 분기보다 먼저** 그것을 지난다 — 저장된 답도 project를 떠난 폴더에 대해서는 돌아가지 않는다.
+
+cross-connection 읽기가 **안전한 이유**도 이제 단언한다: 제품의 catalogue 쓰기가 **같은 contribution 행을 먼저 `FOR UPDATE`로 잡는다**(`services/storage.py locked_contribution`, `api/v1/storage_project.py`가 그것을 쓴다). 그래서 잠금을 든 동안 그 폴더의 location은 들어오거나 나갈 수 없다. **잠금이 그 읽기를 안전하게 만드는 것이고, 읽기 혼자서는 처음부터 안전하지 않았다.**
+
+시험 셋: 잠금을 든 동안 이동을 시도하는 **mid-flight schedule**(가능한 결과가 "이동 먼저 → 거부"와 "collect 먼저 → 이동은 뒤에" 둘뿐이고, "떠난 폴더에 대한 check 기록"은 없다) · **replay 분기의 같은 경쟁** · 질문이 두 phase 모두에서 잠금 아래에 남아 있다는 **source 수준 단언**(그 시험이 스스로 그렇게 적는다).
+
+### 10-2. F2 — 감사 실패는 **정확히 500**
+
+Boundary가 임의 예외를 `SYS-0001` 503으로 바꾸므로 감사 쓰기 실패가 503으로 나갔고, **내 시험이 (500, 503) 둘 다 허용해서** 되돌려도 통과했다. handler가 **500을 명시**하고(거부 자신의 코드는 떨어뜨려 실패에서 판정을 읽을 수 없게) 시험이 **정확히 500**과 body에 `AUTH-0030` 없음을 단언한다 — "관측 불가"의 세 503과 **다른 답**이다. 공유 불변식은 `tests/integration/test_canonical_denial_audit_real_pg.py`의 그것이다.
+
+### 10-3. F3 — 운영 구성으로 실제 기동
+
+`create_configured_app()` + settings 파일 + **실제 test PKI** + business surface로 기동해 **route 등록**을 단언하고, 인증된 요청이 collector 자신의 거부(`AUTH-0030`)에 도달하는 것까지 본다. 그리고 기동이 **거부되어야 하는** 넷 — block의 알 수 없는 키 · `business` 없는 `storageSample` · 읽을 수 없는 TLS 자산 · (변이로) 허용 집합에서 `storageSample` 제거 — 가 각각 **영구 503으로 degrade하지 않고 startup에서 실패**한다.
+
+### 10-4. 변이 22개 — 21 사살 + 1 equivalent
+
+**M2를 equivalent로 선언했고 사유를 측정했다**: phase 3에서 그것이 지우는 호출 뒤에 `_locked_boundary`가 오고, 그 `_scope`가 **같은 grant와 같은 소유권을 잠금 아래에서 다시 본다**(`storage_commit.py:48-49`의 `_grant`·`permission(..., linked=True)`). 그래서 동작이 바뀌지 않고 어떤 시험도 둘을 구별할 수 없다. 집합에서 지우지 않고 남긴 이유는, 그 줄을 다음에 옮길 사람이 이 메모를 봐야 하기 때문이다.
