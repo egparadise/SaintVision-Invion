@@ -275,6 +275,18 @@ def exact_rows(rows: list[dict[str, Any]], producer: Producer, sha: str, ref: st
         status = row.get("status")
         if status not in RUN_STATUSES:
             raise Refused(f"{producer.workflow} has unknown run status {status!r}")
+        # A red/cancelled/skipped dispatch is evidence about this exact source. Silently ignoring
+        # it and dispatching until a green run appears is retry-to-green laundering. There is no
+        # override in this tool: a reviewed operator must first explain the prior run outside this
+        # automation and choose a new source SHA if another measurement is warranted.
+        conclusion = row.get("conclusion")
+        if status == "completed" and conclusion != "success":
+            raise Refused(
+                f"{producer.workflow} exact-SHA run {_row_id(row)} completed with "
+                f"non-success conclusion {conclusion!r}"
+            )
+        if status != "completed" and conclusion not in {None, ""}:
+            raise Refused(f"{producer.workflow} active run has an unexpected conclusion")
         selected.append(row)
     return sorted(selected, key=_row_id)
 

@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-CARD260-AC11-EXACT-SHA-AUTOMATION-CODEX-001"
 title: "Card 260 AC-11 exact-SHA aggregation automation"
-version: "1.0.1"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T12:02:31+09:00"
+updated: "2026-10-03T12:10:43+09:00"
 source_of_truth: "Git"
 ---
 
@@ -44,7 +44,7 @@ does not turn `MEASURED_FAIL` or `INVALID_RUN` into success and `promotesScore` 
 
 ## Verification before hosted execution
 
-- `python -m pytest -q tests/test_run_ac11_exact_sha_aggregate.py`: **25 passed**.
+- `python -m pytest -q tests/test_run_ac11_exact_sha_aggregate.py`: **32 passed**.
 - The fake-gh suite covers missing-only dispatch and the SHA/ref/event/workflow/attempt, duplicate
   run/correlation, run-id reuse, saturated run/artifact listings, artifact identity/expiry/digest
   and canonical-result boundaries.
@@ -56,3 +56,27 @@ does not turn `MEASURED_FAIL` or `INVALID_RUN` into success and `promotesScore` 
 The exact-head hosted producer/aggregate run IDs belong in the PR verification comment after this
 documentation commit fixes the final code SHA. Until those runs complete, this record claims only
 the PG-free fake-gh result above.
+
+## Claude r1 correction and superseded dispatches
+
+Claude r1 found that a completed non-success dispatch at the exact SHA was discarded before the
+tool considered dispatching again. That is retry-to-green laundering even if a later run passes.
+There is now no override: any exact workflow/ref/SHA `workflow_dispatch` with a completed
+non-success conclusion refuses the procedure before another dispatch. Failure followed by success,
+each supported non-success conclusion, expiry by time with `expired=false`, and a concurrent
+producer appearing after binding all have independent regressions. The focused result is the 32
+passed count above.
+
+Two security runs were created while bringing up the live procedure and are not final Card 260
+evidence:
+
+- Run `37091487344`, head `6afdcc4d2e6e0d73d8a2cc829ec671b597dd37b5`, completed success with
+  artifact `11262209537` (`sha256:c5bef8e415772fa5836897c37b1cb52392a243736f09d0da41f953c4f38946c6`).
+  The surrounding orchestration lost GitHub REST access before producing an aggregate receipt, and
+  later documentation and fail-closed corrections superseded that head.
+- Run `37092129615`, head `f9227a630b6267ebc1447ad8aa1eb848aa2f58e2`, completed success with
+  artifact `11263290786` (`sha256:3502d87d6a8a1b1877a2febb0290a56624ef03cf5dc83aac487c2aa877ea1183`).
+  Claude r1 arrived while it was running; the local orchestrator was interrupted before it could
+  dispatch accessibility, migration or aggregate at a head that required correction.
+
+Neither run is promoted, substituted for a final-head measurement, or counted as an aggregate.

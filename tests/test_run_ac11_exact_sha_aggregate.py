@@ -286,6 +286,30 @@ def test_rerun_attempt_is_refused_before_adoption(monkeypatch: pytest.MonkeyPatc
         run(fake, monkeypatch)
 
 
+@pytest.mark.parametrize("conclusion", ["failure", "cancelled", "skipped", "timed_out"])
+def test_any_prior_exact_sha_non_success_is_refused_without_redispatch(
+    monkeypatch: pytest.MonkeyPatch, conclusion: str
+) -> None:
+    fake = FakeGh()
+    workflow = ".github/workflows/ac11-security-scan.yml"
+    fake.runs[workflow][0]["conclusion"] = conclusion
+    with pytest.raises(subject.Refused, match="non-success conclusion"):
+        run(fake, monkeypatch)
+    assert fake.dispatched == []
+
+
+def test_prior_failure_is_not_hidden_by_a_later_success(monkeypatch: pytest.MonkeyPatch) -> None:
+    fake = FakeGh()
+    producer = subject.load_producers()[0]
+    failed = deepcopy(fake.runs[producer.workflow][0])
+    failed["databaseId"] = 777
+    failed["conclusion"] = "failure"
+    fake.runs[producer.workflow].insert(0, failed)
+    with pytest.raises(subject.Refused, match="run 777 completed with non-success"):
+        run(fake, monkeypatch)
+    assert fake.dispatched == []
+
+
 def test_duplicate_usable_producer_run_is_refused(monkeypatch: pytest.MonkeyPatch) -> None:
     fake = FakeGh()
     producer = subject.load_producers()[0]
@@ -309,7 +333,11 @@ def test_saturated_run_listing_is_refused_instead_of_silently_truncated(
 
 
 @pytest.mark.parametrize(
-    "damage", ["missing", "duplicate", "expired", "wrong-run", "wrong-sha", "wrong-ref", "digest"]
+    "damage",
+    [
+        "missing", "duplicate", "expired", "expired-time", "wrong-run", "wrong-sha",
+        "wrong-ref", "digest",
+    ],
 )
 def test_artifact_boundary_is_fail_closed(
     monkeypatch: pytest.MonkeyPatch, damage: str
@@ -324,6 +352,8 @@ def test_artifact_boundary_is_fail_closed(
         fake.artifacts[run_id].append(deepcopy(fake.artifacts[run_id][0]))
     elif damage == "expired":
         fake.artifact_details[artifact_id]["expired"] = True
+    elif damage == "expired-time":
+        fake.artifact_details[artifact_id]["expires_at"] = "2026-10-02T23:59:59Z"
     elif damage == "wrong-run":
         fake.artifact_details[artifact_id]["workflow_run"] = {
             "id": 999, "head_sha": SHA, "head_branch": REF
@@ -375,6 +405,43 @@ def test_duplicate_aggregate_correlation_is_refused(monkeypatch: pytest.MonkeyPa
     fake.duplicate_aggregate = True
     with pytest.raises(subject.Refused, match="duplicate aggregate runs"):
         run(fake, monkeypatch)
+
+
+def test_concurrent_producer_added_after_binding_is_caught_by_final_recheck(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    fake = FakeGh()
+    producer = subject.load_producers()[0]
+    original = fake.__call__
+    list_count = 0
+
+    def concurrent(args, *, timeout=300.0):
+        nonlocal list_count
+        command = list(args)
+        if (
+            command[:3] == ["gh", "run", "list"]
+            and command[command.index("--workflow") + 1] == Path(producer.workflow).name
+        ):
+            list_count += 1
+            if list_count == 2:
+                fake.add_success(producer.workflow, producer.artifact_prefix + SHA)
+        return original(args, timeout=timeout)
+
+    monkeypatch.setattr(subject, "recompute", lambda *args, **kwargs: deepcopy(RESULT))
+    with pytest.raises(subject.Refused, match="producer set changed before aggregation"):
+        subject.orchestrate(
+            source=SHA,
+            ref=REF,
+            repository=REPOSITORY,
+            runner=concurrent,
+            poll_seconds=0,
+            deadline_seconds=30,
+            sleep=lambda _: None,
+            monotonic=lambda: 1,
+            now_utc=lambda: NOW,
+            correlation_factory=fixed_correlation,
+        )
+    assert subject.AGGREGATE_WORKFLOW not in fake.dispatched
 
 
 def test_one_run_id_cannot_be_reused_by_two_producers(monkeypatch: pytest.MonkeyPatch) -> None:
