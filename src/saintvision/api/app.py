@@ -22,6 +22,7 @@ from ..errors import PROBLEM_CONTENT_TYPE, VAL_SCHEMA, InvError
 from ..ids import is_id, is_trace_id, new_trace_id
 from ..identity.principal import PrincipalVerifier
 from ..services.audit import record_denial_out_of_band
+from . import denial_recorder
 from .audit_action import audit_action
 from .problem import canonical_response, install_canonical_problem_handler, legacy_not_found_problem
 from .v1 import adapters as adapters_router
@@ -102,52 +103,31 @@ def create_app(
         response.headers["traceparent"] = f"{TRACEPARENT_VERSION}-{trace_id}-{'0'*16}-01"
         return response
 
-    #: Denial categories that are audited (AC-02). Shared by both handlers.
-    DENIAL_CATEGORIES = ("AUTH", "SEC")
+    #: Denial categories that are audited (AC-02). Both handlers use the shared
+    #: set rather than their own copy -- see ``api/denial_recorder.py``, which the
+    #: kernel's handler now calls as well (card 266).
+    DENIAL_CATEGORIES = denial_recorder.DENIAL_CATEGORIES
 
     def _record_denial(request: Request, *, code: str, trace_id: str | None) -> None:
-        """Record one denial, out of band, from what the request already proved.
+        """Record one denial through the one shared recorder.
 
-        The single audit point for a refused request: the legacy ``InvError``
-        handler and the canonical handler both call it, and no route records
-        a denial itself (a route is inside a transaction that the refusal
-        rolls back, and per-route recording drifts).
-
-        * ``action`` is the bounded, identifier-free ``audit_action`` (#189).
-        * The actor and the tenant come only from what ``get_principal`` pinned
-          on ``request.state`` for a *verified* credential; nothing is parsed
-          again from the header or the body. An unauthenticated request is
-          therefore ``anonymous`` with no tenant.
-        * The project target is the path's ``project_id`` only when it is a
-          well-formed project id; caller text that is not one is not recorded
-          anywhere. The tenant is always the caller's, never the project's.
-        * ``detail`` is empty: every value belongs in its own column.
-
-        Fail-closed: if the write fails the exception propagates and the
-        request ends as a generic 500 with nothing privileged done -- an audit
-        failure is not disguised as a successful refusal.
+        It used to be written here. It moved to ``api/denial_recorder.py`` when the
+        kernel needed the same rule: the kernel's handlers write no audit row of
+        their own, so the choice was to duplicate ``DENIAL_CATEGORIES``, the
+        bounded-action rule and the verified-credential rule, or to share them.
+        This function stays as the engine-bound adapter the handlers already call.
         """
-        # A route may name the action its contract requires; otherwise it is the
-        # bounded ``METHOD <template>`` (#189). Either way this is still the only place a
-        # denial is written.
-        declared = getattr(request.state, "denial_action", None)
-        project_id = request.path_params.get("project_id")
-        target = ("project", project_id) if is_id(project_id, "project") else (None, None)
-        record_denial_out_of_band(
+        # The two collaborators are resolved here, from this module's names, so a
+        # test that patches them on this module still intercepts and the rule
+        # itself stays in one file.
+        denial_recorder.record_denial(
             engine,
-            now=now(),
-            actor_type=getattr(request.state, "actor_type", "anonymous"),
-            actor_id=getattr(request.state, "actor_id", None),
-            action=declared if isinstance(declared, str) and declared else audit_action(request),
-            outcome="deny",
-            tenant_id=getattr(request.state, "tenant_id", None),
-            reason_code=code,
+            request,
+            code=code,
             trace_id=trace_id,
-            target_type=target[0],
-            target_id=target[1],
-            detail={},
-            source_ip=request.client.host if request.client else None,
-            user_agent=request.headers.get("user-agent"),
+            now=now,
+            writer=record_denial_out_of_band,
+            action_for=audit_action,
         )
 
     def _problem(request: Request, error: InvError, *, trace_id: str) -> JSONResponse:
