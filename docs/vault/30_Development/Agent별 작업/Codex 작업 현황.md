@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.312"
+version: "1.0.313"
 status: "review"
 author: "Codex"
-updated: "2026-10-03T12:17:50+09:00"
+updated: "2026-10-03T12:47:15+09:00"
 source_of_truth: "Git"
-active_card: "CARD-260 AC-11 exact-SHA aggregation repeat automation"
-active_card_status: "Card 258 #354 is approved and frozen; Card 260 #355 Claude r2 code conditions are fixed with 35 passing fake-gh tests, three superseded producer runs are recorded, and final-head hosted execution remains pending"
-active_card_next: "Run the Card 260 final exact head through security, accessibility, migration rehearsal and canonical aggregation, record all run/artifact bindings in the PR, then request Claude review"
+active_card: "CARD-262 split the shared server_config volume so the API cannot read worker.json"
+active_card_status: "Card 260 #355 is approved by Claude r3 at 2122b103: the exact-SHA tool refuses any prior non-success run before dispatch, and hosted runs 37092807238/37092895354/37093057306/37093146441 at that head recompute 4/8 axes and INVALID_RUN exactly"
+active_card_next: "Remove the remaining S08 activation residual by giving the API and worker separate read-only config volumes, with deployment and real-container tests; product dispatch stays off by default"
 ---
 
 ## 2026-10-03 Card 260 — AC-11 exact-SHA aggregation automation
