@@ -42,6 +42,12 @@ def location(owner_engine, two_tenants):
         "nodes": [new_id("node") for _ in range(3)],
         "contribution_id": new_id("storage_contribution"),
         "location_id": new_id("data_location"),
+        # Card 266: the scope the three functions now take as authority, plus the
+        # two rows that must stay out of this project's answer.
+        "project_id": new_id("project"),
+        "other_project_id": new_id("project"),
+        "other_project_location_id": new_id("data_location"),
+        "legacy_location_id": new_id("data_location"),
         "bytes": 4096,
     }
     with owner_engine.begin() as c:
@@ -71,16 +77,34 @@ def location(owner_engine, two_tenants):
             ),
             {"c": ids["contribution_id"], "t": tenant_a, "n": ids["nodes"][0], "u": ids["user_id"]},
         )
-        c.execute(
-            text(
-                "INSERT INTO data_locations (location_id, tenant_id, contribution_id, uri, kind, "
-                "relative_path, byte_size, checksum_sha256, verified_at, ready, catalogued_at, version) "
-                "VALUES (:l, :t, :c, 'inv://datasets/corpus@1/data.bin', 'dataset', 'data.bin', "
-                ":b, :s, now(), true, now(), 1)"
-            ),
-            {"l": ids["location_id"], "t": tenant_a, "c": ids["contribution_id"],
-             "b": ids["bytes"], "s": SHA},
-        )
+        for key, code in (("project_id", "rep-a"), ("other_project_id", "rep-b")):
+            c.execute(
+                text(
+                    "INSERT INTO projects (project_id, tenant_id, code, display_name, status, "
+                    "created_at, version) VALUES (:p, :t, :c, :c, 'active', now(), 1)"
+                ),
+                {"p": ids[key], "t": tenant_a, "c": code},
+            )
+        # Three locations in one contribution: this project's, another project's,
+        # and one with a NULL project_id -- the shape every row had before 0062.
+        for key, project in (
+            ("location_id", ids["project_id"]),
+            ("other_project_location_id", ids["other_project_id"]),
+            ("legacy_location_id", None),
+        ):
+            c.execute(
+                text(
+                    "INSERT INTO data_locations (location_id, tenant_id, project_id, "
+                    "contribution_id, uri, kind, relative_path, byte_size, checksum_sha256, "
+                    "verified_at, ready, catalogued_at, version) "
+                    "VALUES (:l, :t, :p, :c, :uri, 'dataset', :rel, :b, :s, now(), true, now(), 1)"
+                ),
+                {
+                    "l": ids[key], "t": tenant_a, "p": project, "c": ids["contribution_id"],
+                    "uri": f"inv://datasets/corpus@1/{key}.bin", "rel": f"{key}.bin",
+                    "b": ids["bytes"], "s": SHA,
+                },
+            )
     return ids
 
 
@@ -121,7 +145,8 @@ def test_two_ready_replicas_meets_a_factor_of_two(owner_engine, app_sessionmaker
             with tenant_scope(session, location["tenant_a"]):
                 health = replica_repair.replica_health(
                     session, tenant_id=location["tenant_a"],
-                    location_id=location["location_id"], desired=2,
+                    location_id=location["location_id"],
+                    project_id=location["project_id"], desired=2,
                 )
                 assert health.classification == "healthy"
                 assert health.ready == 2
@@ -136,7 +161,8 @@ def test_one_ready_replica_is_under_replicated_with_a_source(owner_engine, app_s
             with tenant_scope(session, location["tenant_a"]):
                 health = replica_repair.replica_health(
                     session, tenant_id=location["tenant_a"],
-                    location_id=location["location_id"], desired=2,
+                    location_id=location["location_id"],
+                    project_id=location["project_id"], desired=2,
                 )
                 assert health.classification == "under_replicated"
                 assert health.deficit == 1
@@ -152,7 +178,8 @@ def test_only_unusable_copies_is_at_risk_not_healthy(owner_engine, app_sessionma
             with tenant_scope(session, location["tenant_a"]):
                 health = replica_repair.replica_health(
                     session, tenant_id=location["tenant_a"],
-                    location_id=location["location_id"], desired=2,
+                    location_id=location["location_id"],
+                    project_id=location["project_id"], desired=2,
                 )
                 assert health.classification == "at_risk"
                 assert health.ready == 0
@@ -166,7 +193,8 @@ def test_no_replica_at_all_is_unreplicated(app_sessionmaker, location):
             with tenant_scope(session, location["tenant_a"]):
                 health = replica_repair.replica_health(
                     session, tenant_id=location["tenant_a"],
-                    location_id=location["location_id"], desired=2,
+                    location_id=location["location_id"],
+                    project_id=location["project_id"], desired=2,
                 )
                 assert health.classification == "unreplicated"
                 assert health.ready == 0
@@ -179,7 +207,8 @@ def test_locations_needing_repair_excludes_healthy_ones(owner_engine, app_sessio
         with session.begin():
             with tenant_scope(session, location["tenant_a"]):
                 needing = replica_repair.locations_needing_repair(
-                    session, tenant_id=location["tenant_a"], desired=2,
+                    session, tenant_id=location["tenant_a"],
+                    project_id=location["project_id"], desired=2,
                 )
                 assert [h.location_id for h in needing] == [location["location_id"]]
                 # Raise the copies to the factor and it drops off the list.
@@ -188,7 +217,8 @@ def test_locations_needing_repair_excludes_healthy_ones(owner_engine, app_sessio
         with session.begin():
             with tenant_scope(session, location["tenant_a"]):
                 needing = replica_repair.locations_needing_repair(
-                    session, tenant_id=location["tenant_a"], desired=2,
+                    session, tenant_id=location["tenant_a"],
+                    project_id=location["project_id"], desired=2,
                 )
                 assert needing == []
 
@@ -209,7 +239,8 @@ def test_a_departed_node_marks_its_copies_stale_and_keeps_the_location(
                 # The location survives; only node 0's copy is gone.
                 health = replica_repair.replica_health(
                     session, tenant_id=location["tenant_a"],
-                    location_id=location["location_id"], desired=2,
+                    location_id=location["location_id"],
+                    project_id=location["project_id"], desired=2,
                 )
                 assert health.ready == 1
                 assert health.unusable.get("stale") == 1
@@ -357,7 +388,8 @@ def test_fleet_summary_aggregates_classification_across_the_catalogue(
         with session.begin():
             with tenant_scope(session, location["tenant_a"]):
                 summary = replica_repair.fleet_replica_summary(
-                    session, tenant_id=location["tenant_a"], desired=2,
+                    session, tenant_id=location["tenant_a"],
+                    project_id=location["project_id"], desired=2,
                 )
                 assert summary.to_dict() == {
                     "locations": 1, "healthy": 0, "underReplicated": 0,
@@ -370,7 +402,8 @@ def test_fleet_summary_aggregates_classification_across_the_catalogue(
         with session.begin():
             with tenant_scope(session, location["tenant_a"]):
                 summary = replica_repair.fleet_replica_summary(
-                    session, tenant_id=location["tenant_a"], desired=2,
+                    session, tenant_id=location["tenant_a"],
+                    project_id=location["project_id"], desired=2,
                 )
                 assert summary.healthy == 1
                 assert summary.needing_repair == 0
@@ -383,5 +416,105 @@ def test_a_replica_factor_below_one_is_rejected(app_sessionmaker, location):
                 with pytest.raises(InvError, match="at least 1"):
                     replica_repair.replica_health(
                         session, tenant_id=location["tenant_a"],
-                        location_id=location["location_id"], desired=0,
+                        location_id=location["location_id"],
+                        project_id=location["project_id"], desired=0,
                     )
+
+
+# ===========================================================================
+# Card 266: project is an authority input, not a convenience filter.
+#
+# Before this card the three functions narrowed by tenant alone, so a
+# project-scoped reader would have been handed the whole tenant's catalogue.
+# Each test below dies if one scope condition is removed.
+# ===========================================================================
+
+
+def test_another_projects_location_is_the_same_answer_as_absence(app_sessionmaker, location):
+    """Not "forbidden" and not an empty result -- the same refusal as a row that
+    is not there, because telling them apart names somebody else's location."""
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, location["tenant_a"]):
+                with pytest.raises(InvError, match="data location not found"):
+                    replica_repair.replica_health(
+                        session,
+                        tenant_id=location["tenant_a"],
+                        location_id=location["other_project_location_id"],
+                        project_id=location["project_id"],
+                        desired=2,
+                    )
+
+
+def test_a_legacy_null_project_location_is_in_no_projects_answer(app_sessionmaker, location):
+    """0062 added project_id as nullable, so rows catalogued before it are NULL.
+    NULL is not "every project": it is no project."""
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, location["tenant_a"]):
+                with pytest.raises(InvError, match="data location not found"):
+                    replica_repair.replica_health(
+                        session,
+                        tenant_id=location["tenant_a"],
+                        location_id=location["legacy_location_id"],
+                        project_id=location["project_id"],
+                        desired=2,
+                    )
+
+
+def test_the_repair_plan_lists_only_this_projects_locations(app_sessionmaker, location):
+    """Three unreplicated locations exist in the tenant; one belongs to this
+    project. A tenant-only query would return all three."""
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, location["tenant_a"]):
+                needing = replica_repair.locations_needing_repair(
+                    session,
+                    tenant_id=location["tenant_a"],
+                    project_id=location["project_id"], desired=2,
+                )
+                assert [health.location_id for health in needing] == [location["location_id"]]
+                # And the other project sees exactly its own one.
+                other = replica_repair.locations_needing_repair(
+                    session,
+                    tenant_id=location["tenant_a"],
+                    project_id=location["other_project_id"], desired=2,
+                )
+                assert [health.location_id for health in other] == [
+                    location["other_project_location_id"]
+                ]
+
+
+def test_the_fleet_summary_counts_only_this_projects_locations(app_sessionmaker, location):
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, location["tenant_a"]):
+                summary = replica_repair.fleet_replica_summary(
+                    session,
+                    tenant_id=location["tenant_a"],
+                    project_id=location["project_id"], desired=2,
+                )
+                # One location, not the tenant's three.
+                assert summary.locations == 1
+                assert summary.unreplicated == 1
+
+
+def test_a_project_with_no_locations_and_an_unknown_project_answer_alike(
+    app_sessionmaker, location
+):
+    """No existence oracle for projects either: an id that names nothing and a
+    project that holds nothing give the same empty answer."""
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, location["tenant_a"]):
+                for project_id in (new_id("project"), location["other_project_id"]):
+                    summary = replica_repair.fleet_replica_summary(
+                        session,
+                        tenant_id=location["tenant_a"],
+                        project_id=project_id, desired=2,
+                    )
+                    if project_id == location["other_project_id"]:
+                        assert summary.locations == 1
+                    else:
+                        assert summary.locations == 0
+                        assert summary.needing_repair == 0
