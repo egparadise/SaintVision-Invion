@@ -1,12 +1,12 @@
 ---
 doc_id: "DESIGN-CARD257-S10-MODEL-REGISTRY-LINEAGE-WRITE"
 title: "카드 257 — S10 model registry·lineage: 읽기는 이미 있다. 없는 것은 계보를 만드는 제품 경로다"
-version: "1.0.0"
+version: "1.1.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
 audience: "agent"
-updated: "2026-10-03T10:21:00+09:00"
+updated: "2026-10-03T10:56:12+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "694217b0"
@@ -22,7 +22,7 @@ tags: ["s10-db", "s10-st", "lineage", "model-registry", "design", "vf-cl", "clau
 
 **측정으로 나온 공백은 하나의 모양이다 — 계보의 subject를 만드는 제품 경로가 없다.** `register_dataset_version`·`register_commit`·`register_image`·`record_deployment` 네 service 함수는 **제품 호출자가 0건**이고 시험만 부른다. 그리고 공개 등록 route는 `producedByRunId`와 `lineage`를 **의도적으로 받지 않는데**, 그 docstring이 적은 두 선행 조건 중 **하나는 이 tree에서 이미 해소됐다**.
 
-외부 전제(실 Provider CLI 인수 `G-25`, 배포 digest 운영 인수 `G-23`) 없이 닫을 수 있는 것은 **셋**이고, 그 셋은 모두 "기록을 만드는 쓰기 경로"다. 점수를 올리는 것은 이 카드의 목표가 아니다 — 네 행의 100은 외부 인수이고, 이 설계는 **그 인수가 가능해지는 자리**를 만든다.
+외부 전제(실 Provider CLI 인수 `G-25`, 배포 digest 운영 인수 `G-23`) 없이 닫을 수 있는 것은 **셋**이고, 그 셋은 모두 "기록을 만드는 쓰기 경로"다. **r2에서 그 셋의 계약을 고쳤다** — subject의 project는 kind별 사슬로 증명하고 증명 못 하는 둘은 거부하며(§4-2), 배포 digest는 **호출자가 주지 않고** 기존 정본이 model version에서 파생한다(§4-3), 그 route의 권한·멱등·감사는 카드 250 계약 그대로이고(§4-3-1), `0064`는 기존 dangling 값을 **측정하고 거부**한다(§4-4). 점수를 올리는 것은 이 카드의 목표가 아니다 — 네 행의 100은 외부 인수이고, 이 설계는 **그 인수가 가능해지는 자리**를 만든다.
 
 ## 1. 측정 — train 36 후보 `694217b0`에서 무엇이 있는가
 
@@ -123,34 +123,104 @@ tags: ["s10-db", "s10-st", "lineage", "model-registry", "design", "vf-cl", "clau
 | 잠금 순서 | 기존 route의 순서를 바꾸지 않는다 — 이 조회는 `register_model_version` **앞**, idempotency 잠금 **뒤**에 둔다(기존 두 span 구조는 `model_versions.py`가 적는 그대로 유지) |
 | DB | §4-4의 migration `0064`가 복합 FK를 더한다. **FK가 있어도 route의 검사는 남는다** — FK는 tenant 안의 존재만 보장하고 project 소속은 보장하지 않는다 |
 
-### 4-2. (ㄴ) `record_lineage`에 **subject 존재·소유 검사**를 넣고, 그 뒤에만 `lineage`를 공개한다
+### 4-2. (ㄴ) subject의 **project를 증명하는 사슬**을 kind별로 고정한다 (r2, Codex F1)
+
+r1의 "tenant까지만 검사"는 **틀렸다** — tenant만 보면 **같은 tenant의 다른 project** subject로 provenance를 위조할 수 있고, 그것은 읽기 정본(`docs/vault/30_Development/S10-DB_lineage_조회_API_설계.md` §5)이 이미 금지한 상태다. 그래서 schema를 다시 읽어 **kind별로 project를 증명하는 실제 사슬**을 아래 표로 고정한다. 증명할 수 없는 kind는 **쓰기에서 거부**한다(fail-closed).
+
+| `kind` | subject 표 | 그 표에 `project_id`가 | project를 증명하는 사슬 | 쓰기 판정 |
+|---|---|---|---|---|
+| `dataset_version` | `dataset_versions` (`src/saintvision/db/models/lineage.py:76`) | **없다** | `dataset_versions.dataset_id` → `datasets.project_id` (`src/saintvision/db/models/lineage.py:46`, **NOT NULL**) | **증명 가능** — 그 값이 경로의 project와 같아야 한다 |
+| `eval_run` | `eval_runs` (`src/saintvision/db/models/evaluation.py:129`) | **없다** | `eval_runs.suite_id` → `eval_suites.project_id` (`src/saintvision/db/models/evaluation.py:52`, **nullable** — `0053`이 더했다) | **조건부** — 값이 있으면 같아야 하고, **NULL이면 거부**(증명 불가) |
+| `approval` | `approvals` (`src/saintvision/db/models/execution.py:337`) | **없다** | `approvals.run_id`(NOT NULL) → `runs.workload_id` → `workloads.project_id` (`src/saintvision/db/models/execution.py:141`, **NOT NULL**) | **증명 가능** — 세 hop을 거쳐 같아야 한다 |
+| `code_commit` | `code_commits` (`src/saintvision/db/models/lineage.py:121`) | **없다** | **없다** — 그 표에는 `tenant_id`뿐이다 | **거부**(fail-closed) |
+| `container_image` | `container_images` (`src/saintvision/db/models/lineage.py:156`) | **없다** | **없다** | **거부**(fail-closed) |
+
+그리고 간선이 붙는 **model version 자신**도 같은 방식으로 경로에 결속한다 — `model_versions`에 `project_id`가 없으므로 부모 `models.project_id`(`src/saintvision/db/models/lineage.py:177`, NOT NULL)를 거친다. 그 idiom은 이미 있다: `src/saintvision/api/v1/lineage_query.py:144-167 _version_in_project`이고, 없음·다른 project·다른 tenant를 **한 가지 404**로 돌려준다. 쓰기도 그 함수를 쓴다.
 
 | 무엇 | 확정 |
 |---|---|
-| 검사 | `kind`별로 subject 행을 **같은 tenant 안에서** 조회한다 — `dataset_version`→`dataset_versions`, `code_commit`→`code_commits`, `container_image`→`container_images`, `eval_run`→`eval_runs`, `approval`→ 승인 축의 정본 표. 없으면 **거부**다 |
-| project 소유 | 읽기 설계(`S10-DB_lineage_조회_API_설계.md` §5)가 이미 정한 규칙을 **쓰기에서 그대로 쓴다** — 소유를 증명할 수 없는 subject는 **쓰기 시점에 거부**한다. `container_images`에 `project_id`가 **없다**는 그 문서의 측정이 여전히 참이므로, 그 kind는 **tenant 소유까지만** 검사하고 그 한계를 거부 사유에 넣지 않는다(존재 oracle 금지) |
-| 거부 코드 | 없는 subject는 `RES-0004` 404(기존 `legacy_not_found_problem` 경로), kind 밖 값은 계약이 먼저 거부한다 |
-| 공개 순서 | **(ㄴ)이 먼저 들어가고 그 다음에** 요청의 `lineage`를 받는다. 역순으로 하면 dangling 간선이 생기고, 그것은 읽기 설계가 "없는 간선보다 나쁘다"고 적은 상태다 |
+| 검사 지점 | `record_lineage`(`src/saintvision/services/lineage.py:253`) 안이다. route가 아니라 service에 두는 이유: 그 함수를 부르는 **모든** 경로(지금은 `register_model_version` 하나)가 같은 규칙을 받아야 한다 |
+| 거부 코드 | 증명 실패·subject 없음·다른 project·다른 tenant는 **모두 같은** `RES-0004` 404 `"No such resource."`다. 네 가지를 구별하면 **존재 oracle**이 된다(읽기 설계 §5의 같은 원칙) |
+| `code_commit`·`container_image` | **그래서 공개 `lineage`가 지금 받을 수 있는 kind는 세 개**(`dataset_version`·`eval_run`·`approval`)다. 나머지 둘을 받으려면 그 두 표에 project 열이 필요하고 **그것은 이 카드의 migration이 아니다** — 별 카드로 남긴다(§6). r1처럼 "tenant까지만 검사하고 한계를 시험에 적는다"로 열지 않는다 |
+| 순서 | **(ㄴ)이 먼저 들어가고 그 다음에** 요청의 `lineage`를 받는다. 역순이면 dangling·교차 project 간선이 생기고, 그것은 읽기 설계가 "없는 간선보다 나쁘다"고 적은 상태다 |
 
-### 4-3. (ㄷ) **배포 digest 기록 route** 하나 — 기록은 제품, 인수는 외부
+### 4-3. (ㄷ) **배포 기록 route** 하나 — digest는 호출자가 주지 않는다 (r2, Codex F2)
+
+r1은 몸체에 `deployedDigest`를 두고 "승인 digest와 대조한다"고 적었다. **그것은 기존 정본과 모순이다.** `record_deployment`(`src/saintvision/services/lineage.py:527-615`)를 다시 읽으면 권위 사슬이 이미 전부 그 안에 있다.
+
+| 기존 함수가 이미 하는 것 | 자리 |
+|---|---|
+| `environment`를 `('lab','staging','pilot')`로 제한 | `:554` |
+| model version을 **`FOR UPDATE`** 로 잠그고 `populate_existing` | `:558-566` |
+| `stage != 'released'`면 거부 | `:569-574` |
+| 승인을 **`FOR UPDATE read=True`** 로 잠금 | `:576-581` |
+| `decision != 'approved'`면 거부 | `:584` |
+| **반열린 유효구간** `decided_at <= now < expires_at` 아니면 거부 | `:586` |
+| **`approval.subject_sha256 != version.content_sha256`면 거부** | `:588-593` |
+| 같은 environment의 기존 `active` 배포를 **같은 transaction에서 `superseded`** | `:596-603` |
+| `deployed_digest`를 **`version.content_sha256`에서 파생** | `:611` |
+
+즉 **digest는 호출자가 주는 값이 아니다.** 그래서 설계를 고친다.
 
 | 무엇 | 확정 |
 |---|---|
-| route | `POST /v1/projects/{project_id}/models/{model_id}/versions/{version}/deployments` 하나. 몸체는 `environment`·`deployedDigest`·`imageId`(optional)·`approvalId`이고 **서버가 version을 경로에서 결속**한다 |
-| 권위 | `deployedDigest`는 **호출자가 주는 값이 아니라** release가 승인한 digest와 **대조**된다 — `release_acceptance_*`와 `release_evidence_bindings`가 이미 그 승인 사슬을 든다. 불일치는 `GRAPH-0002` 409다("하나를 승인하고 다른 것을 같은 version 이름으로 내보내는 것"을 `deployments` docstring이 금지한다) |
-| 읽기 | `trace_model`에 `deployments`를 **더하지 않는다** — 읽기 설계 §1-3이 그 부재를 의도로 적었으므로, 더할지는 **그 문서의 owner 결정**이고 이 카드의 범위가 아니다. 대신 이 route의 응답이 기록된 행을 그대로 돌려준다 |
-| 외부 경계 | **실제 배포를 수행하는 것은 이 설계가 아니다.** `G-23`(배포 digest 운영 인수)은 그대로 외부에 남는다 — 이 route는 그 인수가 기록할 자리를 만든다 |
+| route | `POST /v1/projects/{project_id}/models/{model_id}/versions/{version}/deployments` |
+| 요청 몸체 | `environment`(enum `lab|staging|pilot`) · `approvalId` · `imageId`(optional). **`deployedDigest`는 없다** — `additionalProperties:false`가 보낸 것을 거부한다. `notes`도 받지 않는다(서버가 쓰는 자리이고 호출자 text를 넣을 이유가 없다) |
+| 권위 | **route는 새 권위를 만들지 않는다.** 위 표의 검사는 전부 기존 함수의 것이고, route는 경로의 `(project, model, version)`을 `_version_in_project`로 풀어 `model_version_id`를 넘기는 일만 더한다 |
+| 응답 | 기록된 행(`deploymentId`·`environment`·`status`·`deployedDigest`·`imageId`·`approvalId`·`deployedAt`)을 strict 계약으로 돌려준다. `deployedDigest`는 **응답에만** 있다 |
+| 읽기 | `trace_model`에 `deployments`를 **더하지 않는다** — 읽기 설계 §1-3이 그 부재를 의도로 적었으므로 그 변경은 그 문서 owner의 결정이다 |
+| 외부 경계 | **실제 배포를 수행하지 않는다.** 함수 docstring이 "it does not perform deployment or issue a kernel execution permit"라고 적고, `G-23`(배포 digest 운영 인수)은 그대로 외부다 |
 
-### 4-4. migration `0064` 예약 — `produced_by_run_id`의 복합 FK
+#### 4-3-1. 그 route의 권한·동시성·멱등·감사 계약 (r2, Codex F3 — 카드 250에서 맞춘 계약 그대로)
+
+`#345`(카드 250) §3-2-2·§3-2-3에서 Codex와 맞춘 쓰기 계약을 **그대로** 쓴다. 순서가 계약이다.
+
+| # | 단계 | 확정 |
+|---|---|---|
+| 1 | 필수 key | `_require_idempotency_key`(`src/saintvision/api/v1/model_versions.py:192`)를 **edge에서** 부른다 — 없거나 `[A-Za-z0-9._:-]{1,128}` 밖이면 **`VAL-0003` 422**이고 그 앞에 아무 일도 일어나지 않는다 |
+| 2 | 권한 1차 | `project_service.require_project_access`(`src/saintvision/services/projects.py:204`)를 부르고 **`canApprove` boolean을 읽는다**. 이유: 이 행은 "이 내용이 그 승인 아래 나갔다"는 **결정 등급의 진술**이고 `canRequest`로는 만들 수 없다. `effective_permission`은 archived project·suspended user에서 **예외 없이 false 셋**을 주므로 "예외가 없었다"를 승인으로 쓰지 않는다 |
+| 3 | 직렬화 | `serialise_idempotent_write`를 **자원 행보다 먼저** 잡는다(그 docstring이 잠금 순서를 고정한다). 그래서 이 lane의 잠금 순서는 **key → model version 행 → 승인 행**이고 기존 함수의 두 잠금이 그 뒤에 온다 |
+| 4 | 권한 2차 | **replay 판단 전에** 다시 읽는다 — 그 lock을 기다리는 동안 등급을 잃은 호출자에게 저장된 성공을 돌려주면 안 된다 |
+| 5 | ledger 결속 | `replay_or_reserve`가 `(tenant, project, endpoint, key)`로 조회하고 본문을 `request_digest`로 비교한다(`src/saintvision/api/deps.py:164`). 그 본문에 **경로의 `modelId`·`version`을 함께 넣는다** — 그러지 않으면 같은 key로 **다른 version**의 저장된 응답이 replay된다. `ENDPOINT`는 식별자 없는 bounded template `"POST /v1/projects/{project_id}/models/{model_id}/versions/{version}/deployments"` |
+| 6 | 자원 | `record_deployment`가 version을 `FOR UPDATE`, 승인을 `FOR UPDATE read=True`로 잡고 §4-3의 검사를 한다 |
+| 7 | 권한 3차 | **insert 직전** 한 번 더 — 행 잠금도 대기이고 그 사이에 같은 철회가 커밋될 수 있다(카드 253에서 `T21`·`T22`로 고정한 것과 같은 이유) |
+| 8 | 기록 | `store_idempotent_response` + **allow 감사 1행**(`model.deployment.record`, `target_type="deployment"`, `detail`은 `projectId`·`modelVersionId`·`environment`만 — digest와 notes는 넣지 않는다), 전부 **같은 transaction 경계** |
+| 9 | 거부 감사 | `AUTH-0030` 403은 `src/saintvision/api/app.py`의 단일 recorder가 범주로 적는다. 없는 version·없는 승인은 **`RES-0004` 404**이고 카드 253의 `_absent` 방식으로 `audit_action`을 붙여 **감사된다** |
+| 10 | 번역표 | route가 자기 `TRANSLATION` 표를 갖고 `AUTH_APPROVAL_DIGEST_MISMATCH`·`VAL_SCHEMA`·`RES_ARTIFACT_NOT_FOUND`·`GRAPH_IDEMPOTENCY_CONFLICT`를 공개 코드로 바꾼다. **표의 빈칸은 `SYS-0002` 500**이 되므로 **coverage 시험**을 둔다(선례: `tests/core/test_eval_run_route.py`) |
+
+승인 digest 불일치의 **공개 코드**를 정한다 — 내부 `AUTH_APPROVAL_DIGEST_MISMATCH`는 "승인이 다른 내용에 주어졌다"는 **상태** 거부이므로 공개는 **`GRAPH-0002` 409**다(`AUTH-0030`은 호출자의 권한 이야기이고 여기서는 권한이 아니다). 없는 승인과 결정이 승인이 아닌 경우도 같은 409로 묶어 **승인 id의 존재 oracle을 만들지 않는다**.
+
+### 4-4. migration `0064` 예약 — `produced_by_run_id`의 복합 FK와 **기존 행 경계** (r2, Codex F4)
 
 | 무엇 | 확정 |
 |---|---|
 | 번호 | **`0064`** (`0062` = `#348` 카드 253, `0063` = `#351` 카드 255) |
-| 내용 | `model_versions`에 `(tenant_id, produced_by_run_id)` → `runs(tenant_id, run_id)` **복합 FK** 하나. 열은 **이미 있다**(`src/saintvision/db/models/lineage.py` `produced_by_run_id`, nullable) — **열을 더하지 않는다** |
-| nullable | 유지한다. run에서 나오지 않은 version(가져온 가중치)이 있고, NULL은 "주장하지 않음"이다 |
-| 정책·GRANT | **건드리지 않는다.** 표를 더하지 않으므로 census(160)와 definer(15)도 그대로다 — `0062`에서 같은 성질을 측정으로 확인했다 |
-| downgrade | FK 하나를 떨어뜨린다. `0063`이 세운 규칙(값을 가진 행이 있으면 거부)은 **여기에 필요하지 않다** — FK를 떨어뜨려도 열과 값이 남으므로 **잃는 것이 없다**. 그 이유를 migration이 적는다 |
-| revision 식별자 | **32자 이하**로 짓는다 — `alembic_version.version_num`이 `varchar(32)`이고 `#351`이 34자로 그 벽에 부딪혔다(카드 255 r1에서 실 DB로 재현했다) |
+| revision 식별자 | **32자 이하.** `alembic_version.version_num`이 `varchar(32)`이고 `#351`의 34자가 그 벽에 부딪혀 `upgrade head`가 실패하는 것을 카드 255 r1에서 실 DB로 재현했다 |
+| 내용 | `model_versions`에 `(tenant_id, produced_by_run_id)` → `runs(tenant_id, run_id)` **복합 FK 하나**. 열은 **이미 있고**(nullable) 더하지 않는다 |
+| FK 대상이 가능한가 | **측정했다** — `runs`에 `UniqueConstraint("tenant_id", "run_id", name="uq_runs_tenant_id_run_id")`가 있고(`src/saintvision/db/models/execution.py`), 이미 **다섯 표**가 같은 쌍을 FK로 참조한다(`src/saintvision/db/models/artifacts.py:54`, `src/saintvision/db/models/context.py:94`·`:189`, `src/saintvision/db/models/execution.py:239`·`:313`) |
+| 참조 동작 | `ON UPDATE NO ACTION` · `ON DELETE NO ACTION`(제품이 만드는 기본값, `0062`에서 `a`/`a`로 실측). version이 주장하는 run을 **지울 수 없게** 되는 것이 의도다 |
+
+**기존 행 경계 — FK는 조용히 실패할 수 있다.** 열은 FK 없이 살아왔으므로 지금 값 중 `runs`에 없는 것(**dangling**)이 있으면 `ADD CONSTRAINT`가 실패한다. 그래서 upgrade가 **먼저 측정하고, 고치지 않고 거부**한다(`0053`·`0062`·`0063`과 같은 규율이다).
+
+```sql
+-- upgrade의 첫 문장. offline(--sql) 모드에서는 건너뛴다(context.as_sql).
+SELECT mv.tenant_id, mv.model_version_id, mv.produced_by_run_id
+  FROM model_versions mv
+  LEFT JOIN runs r
+    ON r.tenant_id = mv.tenant_id AND r.run_id = mv.produced_by_run_id
+ WHERE mv.produced_by_run_id IS NOT NULL
+   AND r.run_id IS NULL
+ ORDER BY mv.model_version_id
+ LIMIT 10;
+```
+
+| 무엇 | 확정 |
+|---|---|
+| 행이 있으면 | **`RuntimeError`로 거부**하고 최대 10개의 `model_version_id@produced_by_run_id`를 메시지에 적는다. 그 값이 **다른 tenant의 run**을 가리키는 경우도 같은 거부다(위 조회가 `tenant_id`를 같이 묶으므로 교차 tenant는 dangling으로 나온다) |
+| **자동 수정 금지** | 값을 `NULL`로 만들거나 행을 지우지 **않는다**. 그 값은 누군가 기록한 provenance 주장이고, 그것을 지우는 것은 **검토된 데이터 수정**의 일이다. 메시지가 그렇게 적는다 |
+| 운영 절차 | 거부 메시지가 (ㄱ) 위 조회를 그대로 실행해 목록을 받고, (ㄴ) 잘못된 주장은 검토 뒤 `NULL`로 정정하고, (ㄷ) 다시 `upgrade`하라고 적는다 |
+| downgrade | **FK 하나만 떨어뜨린다.** 열과 값이 남으므로 **잃는 것이 없고**, 그래서 `0063`이 세운 거부 규칙은 여기 **필요하지 않다** — 그 이유를 migration이 적는다 |
+| 불변 | 표를 더하지 않으므로 census **160**과 definer **15**가 그대로다(`0062`에서 같은 성질을 실 DB로 확인했다). 정책·GRANT·`ENABLE`·`FORCE`도 건드리지 않는다 |
 
 ## 5. 시험 계획
 
@@ -168,6 +238,13 @@ tags: ["s10-db", "s10-st", "lineage", "model-registry", "design", "vf-cl", "clau
 | T10 | 같은 (version, environment, digest)에 같은 key로 두 번 → 행 1개·ledger 1개 | 실 PG | exactly-once |
 | T11 | 기존 route·시험 **무회귀** — `GET …/lineage` 응답 shape과 역추적 정렬이 그대로 | 기존 | 회귀 |
 | T12 | `trace_model`은 **여전히 `deployments`를 보고하지 않는다**(§4-3의 경계를 시험으로 고정) | PG 없음 | 범위 확장 |
+| T13 (r2) | **dangling `produced_by_run_id`가 있으면 `0064` upgrade가 거부**하고 FK가 생기지 않으며 행이 그대로다. 값을 정정한 뒤 같은 upgrade가 성공한다 | 실 PG | 조용한 실패·자동 수정 |
+| T14 (r2) | ledger가 **경로의 `modelId`·`version`까지 결속**한다 — 같은 key로 다른 version을 부르면 저장된 응답이 아니라 **`GRAPH-0002` 409** | 실 PG | 같은 key의 교차 version replay |
+| T15 (r2) | **같은 tenant 다른 project의 subject**를 가리키는 간선이 kind 셋 각각에서 거부되고 `model_lineage`에 행이 0이다. `code_commit`·`container_image`는 **project를 증명할 수 없으므로 언제나 거부**다 | 실 PG | §4-2의 provenance 위조 |
+| T16 (r2) | `eval_suites.project_id`가 **NULL인 suite의 `eval_run`** 간선은 거부된다(증명 불가) | 실 PG | nullable을 통과로 읽는 것 |
+| T17 (r2) | `canRequest`만 가진 주체의 배포 기록은 **`AUTH-0030` 403 + denial audit 1행**이고 `deployments`에 행이 0이다. `canApprove`는 성공한다 | 실 PG | §4-3-1의 등급 |
+| T18 (r2) | 요청 계약에 **`deployedDigest`가 없고** 보내면 거부된다. 응답에는 있고 그 값이 `model_versions.content_sha256`과 같다 | PG 없음 | 호출자가 digest를 주는 것 |
+| T19 (r2) | 승인 불일치 셋(없는 승인·`decision != approved`·`subject_sha256` 불일치)이 **같은 `GRAPH-0002` 409**이고 서로 구별되지 않는다 | 실 PG | 승인 id 존재 oracle |
 
 ## 6. 이 카드가 하지 않는 것
 
@@ -176,4 +253,5 @@ tags: ["s10-db", "s10-st", "lineage", "model-registry", "design", "vf-cl", "clau
 * **읽기 API를 다시 설계하지 않는다** — 정본은 `S10-DB_lineage_조회_API_설계.md`다.
 * **`trace_model`에 `deployments`를 더하지 않는다**(§4-3).
 * **MLflow 미러를 건드리지 않는다** — `S10-BE`의 정본 설계가 따로 있다.
+* **`code_commits`·`container_images`에 project 열을 더하지 않는다** (r2). 그 둘은 project를 증명할 수 없어 §4-2가 **거부**로 두었고, 받으려면 열과 migration이 필요하다 — **별 카드**다. 이 카드의 `0064`는 FK 하나뿐이다.
 * **구현 0줄.** 이 PR은 이 문서뿐이고, 구현은 승인 뒤 별도 카드다.
