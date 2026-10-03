@@ -210,7 +210,12 @@ def envelope(axis: str, verdict: str = "MEASURED_PASS") -> dict:
 class ZeroTailGit(FakeGit):
     def show(self, commit: str, path: str) -> str:
         if path == "migrations/versions/0002_head.py":
-            return 'revision = "0002_head"\ndown_revision = "0001_base"\ndef downgrade():\n    raise RuntimeError("restore")\n'
+            return (
+                'revision = "0002_head"\n'
+                'down_revision = "0001_base"\n'
+                'irreversible = True\n'
+                'def downgrade():\n    op.execute("REVOKE SELECT ON sample FROM app")\n'
+            )
         return super().show(commit, path)
 
 

@@ -98,7 +98,11 @@ def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_res
         item for item in ordered if item.revision == "0066_tenant_registry_revoke"
     )
     assert tenant_registry.irreversible is True
-    assert tenant_registry.recovery_note and "forward fix" in tenant_registry.recovery_note
+    assert tenant_registry.recovery_note and "irreversible" in tenant_registry.recovery_note
+    source = tenant_registry.path.read_text(encoding="utf-8")
+    assert runner.downgrade_body_kind(source) == "security-preserving"
+    without_marker = source.replace("irreversible = True", "irreversible = False")
+    assert runner.downgrade_body_kind(without_marker) == "reversible"
     last_irreversible = max(index for index, item in enumerate(ordered) if item.irreversible)
     assert [item.revision for item in ordered[last_irreversible + 1 :]] == []
 

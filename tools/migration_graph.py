@@ -50,8 +50,22 @@ class Revision:
         return self.path.name
 
 
+def _explicit_irreversible_marker(tree: ast.Module) -> bool:
+    for node in tree.body:
+        if not isinstance(node, ast.Assign):
+            continue
+        if any(isinstance(target, ast.Name) and target.id == "irreversible" for target in node.targets):
+            try:
+                return ast.literal_eval(node.value) is True
+            except (ValueError, TypeError):
+                return False
+    return False
+
+
 def _downgrade_is_refusal(tree: ast.Module) -> tuple[bool, str | None]:
-    """Whether ``downgrade()`` does nothing but refuse, and what it says."""
+    """Whether a downgrade is an explicit irreversible security boundary."""
+    if _explicit_irreversible_marker(tree):
+        return True, None
     for node in tree.body:
         if not isinstance(node, ast.FunctionDef) or node.name != "downgrade":
             continue

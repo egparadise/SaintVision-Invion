@@ -119,9 +119,12 @@ def test_inv_app_tenant_registry_exception_was_removed_with_the_grant():
     helper = (ROOT / "src/saintvision/db/rls.py").read_text(encoding="utf-8")
     assert 'revision = "0066_tenant_registry_revoke"' in migration
     assert 'down_revision = "0064_model_version_run_fk"' in migration
+    assert "irreversible = True" in migration
     assert "REVOKE SELECT ON public.tenants FROM inv_app" in migration
     assert "GRANT SELECT ON tenants" not in helper
-    assert "Restoring inv_app cross-tenant registry SELECT requires a reviewed forward fix" in migration
+    downgrade = migration.split("def downgrade():", 1)[1]
+    assert "REVOKE SELECT ON public.tenants FROM inv_app" in downgrade
+    assert "GRANT SELECT" not in downgrade
 
 
 def test_no_product_path_reads_public_tenant_registry_as_inv_app():

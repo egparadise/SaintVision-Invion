@@ -459,6 +459,16 @@ def _migration_reversible_segment(git: GitReader, source: str) -> tuple[str, str
             parents = () if down is None else (down,) if isinstance(down, str) else tuple(down)
             if not parents and down is not None or any(not isinstance(item, str) for item in parents):
                 raise ValueError("invalid down_revision")
+            explicit_irreversible = any(
+                isinstance(node, ast.Assign)
+                and any(
+                    isinstance(target, ast.Name) and target.id == "irreversible"
+                    for target in node.targets
+                )
+                and isinstance(node.value, ast.Constant)
+                and node.value.value is True
+                for node in tree.body
+            )
             if downgrade is None:
                 irreversible = True
             else:
@@ -469,7 +479,9 @@ def _migration_reversible_segment(git: GitReader, source: str) -> tuple[str, str
                 # A no-op ``pass`` is not an approved irreversible declaration. Treat
                 # it as a reversible tail candidate so a structural N/A cannot hide
                 # the stage-2 negative fixture that must reject no-op downgrades.
-                irreversible = len(body) == 1 and isinstance(body[0], ast.Raise)
+                irreversible = explicit_irreversible or (
+                    len(body) == 1 and isinstance(body[0], ast.Raise)
+                )
             revisions[revision] = (parents, irreversible or len(parents) > 1)
         except (SyntaxError, ValueError, TypeError) as exc:
             raise ValueError(f"invalid migration graph entry: {path}") from exc

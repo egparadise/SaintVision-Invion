@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-CARD264-TENANT-REGISTRY-DISPOSITION-CODEX"
 title: "Card 264 public.tenants E2-E5 disposition re-review"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-10-03T14:49:24+09:00"
+updated: "2026-10-03T15:18:57+09:00"
 source_of_truth: "Git"
 base_sha: "2ed65f5f9f16d06ce3d4f55953f9338df422d78e"
 ---
@@ -32,9 +32,21 @@ base_sha: "2ed65f5f9f16d06ce3d4f55953f9338df422d78e"
 # migration과 fail-closed rollback
 
 `0066_tenant_registry_revoke`는 `REVOKE SELECT ON public.tenants FROM inv_app`만
-수행한다. downgrade로 옛 노출을 조용히 되살리지 않고 reviewed forward fix를
-요구한다. 카드 263이 0065를 조건부 예약했으므로 이 branch는 현재 0064 head를
-부모로 둔다. 0065가 실제로 생기면 train 전에 0065 위로 사슬을 다시 잇는다.
+수행한다. 최초 구현은 downgrade를 예외로 막았으나 Backend run `37101100471`에서
+기존 0054·0058 왕복 시험이 head에서 내려오는 첫 단계에서 중단됐다. 수정된
+downgrade는 옛 grant를 복원하지 않고 같은 REVOKE를 다시 실행한다. 따라서 이전
+revision rehearsal은 계속할 수 있지만 cross-tenant 노출은 fail-closed로 남는다.
+`irreversible = True` 명시 marker를 migration graph와 AC-11 정적 판정기가 읽으므로
+복원 장벽 분류도 유지된다. 카드 263이 0065를 조건부 예약했으므로 이 branch는 현재
+0064 head를 부모로 둔다. 0065가 실제로 생기면 train 전에 0065 위로 사슬을 다시
+잇는다.
+
+이 장벽 때문에 `migration-reversible-segment`의 현재 tail은 기존 0053–0064의
+12개에서 0개로 바뀌며 판정은 구조적 `NOT_APPLICABLE`이다. 짝인
+`irreversible-restore-forward`가 `MEASURED_PASS`일 때만 집계기가 이 예외를
+허용한다. 다음 가역 migration이 0066 뒤에 생기면 tail은 다시 1 이상이 되어 실제
+downgrade·catalog fingerprint 측정을 수행한다. 즉 이번 변경은 축 정의를 낮춘 것이
+아니라 최신 보안 장벽 뒤에 아직 가역 revision이 없다는 현재 graph의 결과다.
 
 # allowlist와 검증
 
@@ -50,6 +62,8 @@ baseline·policy Git blob에 맞춰 함께 회전했다.
 - security threat producer: 24 passed, PostgreSQL 7 skipped
 - RLS collector: 25 passed, PostgreSQL 8 skipped
 - migration rehearsal PG-free: 21 passed
+- migration graph·head consumer focused: 150 passed
+- security importer·RLS collector focused: 153 passed, PostgreSQL 8 skipped
 
 hosted security run `37100881089`는 source head
 `4fc5a11729f92e8f4d9f0259020a7526cab0d39d`에서 모든 step을 통과했다. artifact
