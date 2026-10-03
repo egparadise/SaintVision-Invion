@@ -1,0 +1,135 @@
+{
+  "card": 266,
+  "scope": "storage-check-collect-and-replica-repair-project-binding",
+  "note": "Only pytest exit code 1 counts as KILLED. The runner restores each file and verifies the restore, so a survivor is a test gap rather than a leftover mutant.",
+  "killed": 18,
+  "total": 18,
+  "mutants": [
+    {
+      "id": "M1",
+      "what": "phase one replays before authority is re-read",
+      "file": "services\\control-plane\\src\\inv\\storage_check_collect.py",
+      "verdict": "KILLED",
+      "exitCode": 1
+    },
+    {
+      "id": "M2",
+      "what": "phase three replays before authority is re-read",
+      "file": "services\\control-plane\\src\\inv\\storage_check_collect.py",
+      "verdict": "KILLED",
+      "exitCode": 1
+    },
+    {
+      "id": "M3",
+      "what": "the ledger response is not stored with the writes",
+      "file": "services\\control-plane\\src\\inv\\storage_check_collect.py",
+      "verdict": "KILLED",
+      "exitCode": 1
+    },
+    {
+      "id": "M4",
+      "what": "phase three ignores a response a concurrent request already stored",
+      "file": "services\\control-plane\\src\\inv\\storage_check_collect.py",
+      "verdict": "KILLED",
+      "exitCode": 1
+    },
+    {
+      "id": "M5",
+      "what": "the request id is minted instead of derived",
+      "file": "services\\control-plane\\src\\inv\\storage_check_collect.py",
+      "verdict": "KILLED",
+      "exitCode": 1
+    },
+    {
+      "id": "M6",
+      "what": "the derivation drops its separator",
+      "file": "services\\control-plane\\src\\inv\\storage_check_collect.py",
+      "verdict": "KILLED",
+      "exitCode": 1
+    },
+    {
+      "id": "M7",
+      "what": "the contribution's current owner is not compared",
+      "file": "services\\control-plane\\src\\inv\\storage_check_collect.py",
+      "verdict": "KILLED",
+      "exitCode": 1
+    },
+    {
+      "id": "M8",
+      "what": "the project boundary is not checked at all",
+      "file": "services\\control-plane\\src\\inv\\storage_check_collect.py",
+      "verdict": "KILLED",
+      "exitCode": 1
+    },
+    {
+      "id": "M9",
+      "what": "the boundary tolerates a folder straddling two projects",
+      "file": "services\\control-plane\\src\\inv\\storage_check_collect.py",
+      "verdict": "KILLED",
+      "exitCode": 1
+    },
+    {
+      "id": "M10",
+      "what": "the boundary stops counting a NULL project as outside",
+      "file": "services\\control-plane\\src\\inv\\storage_check_collect.py",
+      "verdict": "KILLED",
+      "exitCode": 1
+    },
+    {
+      "id": "M11",
+      "what": "the business link is not required, so a kernel-only project 500s",
+      "file": "services\\control-plane\\src\\inv\\storage_check_collect.py",
+      "verdict": "KILLED",
+      "exitCode": 1
+    },
+    {
+      "id": "M12",
+      "what": "the pre-I/O phase issues on its own transaction again",
+      "file": "services\\control-plane\\src\\inv\\storage_check_collect.py",
+      "verdict": "KILLED",
+      "exitCode": 1
+    },
+    {
+      "id": "M13",
+      "what": "the verified identity is not pinned, so a denial is anonymous",
+      "file": "services\\control-plane\\src\\inv\\app.py",
+      "verdict": "KILLED",
+      "exitCode": 1
+    },
+    {
+      "id": "M14",
+      "what": "the audited target loses the path's project",
+      "file": "services\\control-plane\\src\\inv\\app.py",
+      "verdict": "KILLED",
+      "exitCode": 1
+    },
+    {
+      "id": "M15",
+      "what": "a configured collector no longer requires the business surface",
+      "file": "services\\control-plane\\src\\inv\\storage_check_collect.py",
+      "verdict": "KILLED",
+      "exitCode": 1
+    },
+    {
+      "id": "M16",
+      "what": "the repair list drops its project condition",
+      "file": "src\\saintvision\\services\\replica_repair.py",
+      "verdict": "KILLED",
+      "exitCode": 1
+    },
+    {
+      "id": "M17",
+      "what": "a NULL legacy project is treated as this project",
+      "file": "src\\saintvision\\services\\replica_repair.py",
+      "verdict": "KILLED",
+      "exitCode": 1
+    },
+    {
+      "id": "M18",
+      "what": "the fleet summary drops its project condition",
+      "file": "src\\saintvision\\services\\replica_repair.py",
+      "verdict": "KILLED",
+      "exitCode": 1
+    }
+  ]
+}

@@ -92,15 +92,84 @@ def derive_request_id(*, tenant_id, project_id, run_id, key) -> str:
     return str(uuid.uuid5(REQUEST_NAMESPACE, name))
 
 
+class CatalogueProjectReader:
+    """Answers "does this folder's catalogue belong to that project" -- as ``inv_app``.
+
+    **Why it is not the kernel's own connection.** The boundary needs
+    ``public.data_locations.project_id``, and the kernel role is not granted that
+    column. Measured at migration head rather than assumed::
+
+        has_column_privilege('inv_kernel', 'public.data_locations', 'project_id', 'SELECT')  -> False
+        has_column_privilege('inv_app',    'public.data_locations', 'project_id', 'SELECT')  -> True
+
+    ``0062`` added the column and deliberately changed no GRANT, so the column-level
+    grants the kernel has (seven columns, chosen to keep it out of the catalogue's
+    business attributes) do not cover it. The catalogue is the app role's domain, so
+    the question is asked there instead of widening the kernel's reach.
+
+    **The limitation, stated rather than hidden.** This read is on another connection
+    and therefore another transaction: it cannot be locked together with the
+    kernel's rows, so a catalogue change committed between this check and the write
+    is not excluded by it. The gate is applied in **both** phases, so a change has
+    to land inside a window that also survives phase three's re-check, and the
+    write path's own locks still bind the Run, the folder and the channel. Making
+    the binding lockable from the kernel needs one of three reviewed changes --
+    granting the column, a SECURITY DEFINER function (which moves the definer count
+    and therefore the AC-11 reviewed set), or moving the surface into the app --
+    and choosing is not this card's to make.
+    """
+
+    def __init__(self, engine):
+        self.engine = engine
+
+    def contribution_is_wholly_in(self, *, tenant_id, project_id, contribution_id) -> bool:
+        """True only when every catalogued item of the folder is in that project.
+
+        All-or-nothing, and ``project_id IS NULL`` counts as outside: a row
+        catalogued before ``0062`` belongs to no project, and a folder whose
+        catalogue straddles projects is somebody's migration to finish rather than
+        something to sample half of. A folder with nothing catalogued is outside
+        too -- there is no evidence it belongs to this project.
+        """
+        import uuid as _uuid
+
+        from sqlalchemy import text as sql_text
+
+        # The app role reads this table under row-level security, so the tenant has
+        # to be in the transaction's GUC or the policy returns nothing and an
+        # in-project folder would look like an absent one. Validated as a UUID
+        # before it reaches the statement, because SET LOCAL takes no bind.
+        tenant = str(tenant_id)
+        _uuid.UUID(tenant)
+        with self.engine.begin() as connection:
+            connection.execute(sql_text(f"SET LOCAL inv.tenant_id = '{tenant}'"))
+            row = connection.execute(
+                sql_text(
+                    "SELECT count(*) FILTER (WHERE project_id = :project) AS inside, "
+                    "count(*) FILTER (WHERE project_id IS NULL OR project_id <> :project)"
+                    " AS outside "
+                    "FROM public.data_locations "
+                    "WHERE tenant_id = :tenant AND contribution_id = :contribution"
+                ),
+                {
+                    "project": project_id,
+                    "tenant": tenant,
+                    "contribution": contribution_id,
+                },
+            ).mappings().one()
+        return row["inside"] > 0 and row["outside"] == 0
+
+
 class StorageCheckCollector:
     """Drive the three phases. Owns no rules the two halves already own."""
 
     #: Read by the route so the ceiling has one source rather than two.
     MAX_SAMPLE = MAX_SAMPLE
 
-    def __init__(self, database, client):
+    def __init__(self, database, client, catalogue):
         self.db = database
         self.client = client
+        self.catalogue = catalogue
         self.samples = StorageSampleStore(database)
         self.auth = ApprovalStore(database)
 
@@ -128,7 +197,12 @@ class StorageCheckCollector:
         # AUTH-0030 403 here, and ``_grant`` is the same check the rest of this lane
         # uses rather than a second copy of the rule.
         self.auth._grant(conn, project, principal.subject_id, "can_request")
-        granted = business_permission(conn, project, principal.subject_id, "can_request")
+        # ``linked=True`` matters: without it a project with no ``inv.business_projects``
+        # row returns None instead of raising, and reading ``userId`` off None would be
+        # a 500 where the honest answer is a fail-closed AUTH-0030 (Codex r1).
+        granted = business_permission(
+            conn, project, principal.subject_id, "can_request", linked=True
+        )
         # Then the contribution side. One query, one answer: absent, another
         # tenant's, re-owned and deactivated are indistinguishable from here on.
         row = conn.execute(
@@ -143,7 +217,27 @@ class StorageCheckCollector:
             or row["registered_by_user_id"] != granted["userId"]
         ):
             raise DomainError("RES-0004", "Storage contribution not found", 404)
+        self._project_boundary(principal, project, contribution)
         return granted
+
+    def _project_boundary(self, principal, project, contribution):
+        """The folder's catalogue must belong to **this** project, all of it.
+
+        ``storage_contributions`` carries no project column, so the boundary comes
+        from what the folder holds -- ``data_locations.project_id``, added as
+        nullable by ``0062``. Ownership and tenancy alone were not enough: a
+        same-tenant owner could otherwise collect a folder whose catalogue belongs
+        to another project, or to no project at all (Codex r1 F2).
+
+        The refusal is the same ``RES-0004`` as absence, because which project a
+        folder's contents belong to is exactly what a caller outside it must not
+        learn. See :class:`CatalogueProjectReader` for why this one question is
+        asked on the app role's connection, and what that costs.
+        """
+        if not self.catalogue.contribution_is_wholly_in(
+            tenant_id=principal.tenant_id, project_id=project, contribution_id=contribution
+        ):
+            raise DomainError("RES-0004", "Storage contribution not found", 404)
 
     # --------------------------------------------------------------- the three phases
     def collect(self, principal, project, run_id, *, contribution, key, sample=MAX_SAMPLE):
@@ -172,8 +266,14 @@ class StorageCheckCollector:
             self._authority(conn, principal, project, contribution)
             if prior is not None:
                 return prior, True
-            challenge = self.samples.issue(
-                principal, project, run_id, contribution, request_id=request_id, sample=sample
+            # ``locked_issue``, not ``issue``: ``db.transaction`` opens its own
+            # connection, so calling ``issue`` here would commit the pending request
+            # on a second connection *before* this transaction -- and a failure
+            # afterwards would leave that request behind with no ledger row to
+            # consume it. The two rows commit together (Codex r1 F3).
+            challenge = self.samples.locked_issue(
+                conn, principal, project, run_id, contribution,
+                request_id=request_id, sample=sample,
             )
 
         # --- 2. node I/O, outside every transaction. Writes nothing on failure.
@@ -214,7 +314,7 @@ class StorageCheckCollector:
             return response, False
 
 
-def configured_storage_sample_collector(database, configuration):
+def configured_storage_sample_collector(database, configuration, catalogue_engine):
     """Build the collector from explicit, operator-supplied mTLS material.
 
     Fail-closed in both directions. A deployment that does not configure this gets
@@ -225,14 +325,24 @@ def configured_storage_sample_collector(database, configuration):
     The three paths are read from the configuration, never guessed, and a missing
     or non-string value is a configuration error rather than a default.
     """
-    if not isinstance(configuration, dict):
-        raise ValueError("Storage sample configuration must be an object")
+    allowed = {"caFile", "certificateFile", "keyFile"}
+    if not isinstance(configuration, dict) or not configuration.keys() <= allowed:
+        # Strict, like every other nested block: an unknown key is a configuration
+        # error, not something to ignore (Codex r1 F1).
+        raise ValueError("Storage sample configuration must be an object of " + ", ".join(sorted(allowed)))
     missing = [
-        name for name in ("caFile", "certificateFile", "keyFile")
+        name for name in sorted(allowed)
         if not isinstance(configuration.get(name), str) or not configuration[name]
     ]
     if missing:
         raise ValueError("Storage sample TLS material incomplete: " + ", ".join(missing))
+    if catalogue_engine is None:
+        # The project boundary cannot be read without it, and a collect surface that
+        # cannot prove the boundary must not exist at all rather than sample across
+        # projects. Refusing startup is the fail-closed half of F2/F4.
+        raise ValueError(
+            "Storage sample collection requires the business catalogue connection"
+        )
     from .node_transport import NodeTLSClient
 
     client = NodeTLSClient(
@@ -240,4 +350,6 @@ def configured_storage_sample_collector(database, configuration):
         certificate_file=configuration["certificateFile"],
         key_file=configuration["keyFile"],
     )
-    return StorageCheckCollector(database, client)
+    return StorageCheckCollector(
+        database, client, CatalogueProjectReader(catalogue_engine)
+    )

@@ -96,73 +96,95 @@ class StorageSampleStore:
         return tuple(SampleItem(**row) for row in rows)
 
     def issue(self, principal, project, run_id, contribution, *, request_id, sample=32):
+        """Open a transaction and issue. The existing entry point, unchanged.
+
+        ``db.transaction`` opens its **own connection**, so a caller that is already
+        inside a transaction must not call this: the pending row would commit on a
+        second connection before the caller's own work, and a failure afterwards
+        would leave the request behind with nothing to consume it. Such a caller
+        uses :meth:`locked_issue` instead (card 266 F3).
+        """
+        with self.db.transaction(principal.tenant_id) as conn:
+            return self.locked_issue(
+                conn, principal, project, run_id, contribution,
+                request_id=request_id, sample=sample,
+            )
+
+    def locked_issue(
+        self, conn, principal, project, run_id, contribution, *, request_id, sample=32
+    ):
+        """Issue inside a transaction the caller owns.
+
+        Everything ``issue`` did, minus the transaction. The point is atomicity with
+        whatever else that caller is writing -- for the collect surface, the ledger
+        row and this pending request commit together or not at all.
+        """
         request_id = str(UUID(request_id))
         if type(sample) is not int or not 1 <= sample <= 32:
             refused()
-        with self.db.transaction(principal.tenant_id) as conn:
-            run, root, channel = self._scope(conn, principal, project, run_id, contribution)
-            previous = conn.execute(
-                "SELECT * FROM inv.storage_sample_requests WHERE request_id=%s", (request_id,)
-            ).fetchone()
-            if previous:
-                if previous["sample_limit"] != sample:
-                    refused()
-                if (
-                    previous["run_id"],
-                    previous["project_id"],
-                    previous["subject_id"],
-                    previous["contribution_id"],
-                ) != (run_id, project, principal.subject_id, contribution):
-                    refused()
-                challenge = decode_challenge(previous["challenge"])
-                # Never silently renew or change an existing request's nonce.
-                self._current(conn, previous, run, root, channel, challenge)
-                return challenge
-            if run["state"] in TERMINAL or run["state"] == "recovering":
+        run, root, channel = self._scope(conn, principal, project, run_id, contribution)
+        previous = conn.execute(
+            "SELECT * FROM inv.storage_sample_requests WHERE request_id=%s", (request_id,)
+        ).fetchone()
+        if previous:
+            if previous["sample_limit"] != sample:
                 refused()
-            items = self._items(conn, contribution, sample)
-            # The count describes the issue snapshot, not a hash of unsampled files.
-            count = conn.execute(
-                "SELECT count(*) AS n FROM public.data_locations WHERE contribution_id=%s",
-                (contribution,),
-            ).fetchone()["n"]
-            now = int(
-                conn.execute("SELECT extract(epoch FROM clock_timestamp()) AS now").fetchone()[
-                    "now"
-                ]
-            )
-            challenge = new_challenge(
-                channel=channel,
-                project_id=project,
-                run_id=run_id,
-                contribution_id=contribution,
-                root_version=root["version"],
-                catalogued=count,
-                items=items,
-                now=now,
-            )
-            created = conn.execute(
-                """INSERT INTO inv.storage_sample_requests
-              (tenant_id,request_id,project_id,run_id,subject_id,contribution_id,run_version,attempt,root_path,sample_limit,challenge,challenge_sha256)
-              VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING RETURNING request_id""",
-                (
-                    principal.tenant_id,
-                    request_id,
-                    project,
-                    run_id,
-                    principal.subject_id,
-                    contribution,
-                    run["version"],
-                    run["attempt"],
-                    root["normalized_path"],
-                    sample,
-                    Jsonb(asdict(challenge)),
-                    challenge.digest(),
-                ),
-            ).fetchone()
-            if not created:
+            if (
+                previous["run_id"],
+                previous["project_id"],
+                previous["subject_id"],
+                previous["contribution_id"],
+            ) != (run_id, project, principal.subject_id, contribution):
                 refused()
+            challenge = decode_challenge(previous["challenge"])
+            # Never silently renew or change an existing request's nonce.
+            self._current(conn, previous, run, root, channel, challenge)
             return challenge
+        if run["state"] in TERMINAL or run["state"] == "recovering":
+            refused()
+        items = self._items(conn, contribution, sample)
+        # The count describes the issue snapshot, not a hash of unsampled files.
+        count = conn.execute(
+            "SELECT count(*) AS n FROM public.data_locations WHERE contribution_id=%s",
+            (contribution,),
+        ).fetchone()["n"]
+        now = int(
+            conn.execute("SELECT extract(epoch FROM clock_timestamp()) AS now").fetchone()[
+                "now"
+            ]
+        )
+        challenge = new_challenge(
+            channel=channel,
+            project_id=project,
+            run_id=run_id,
+            contribution_id=contribution,
+            root_version=root["version"],
+            catalogued=count,
+            items=items,
+            now=now,
+        )
+        created = conn.execute(
+            """INSERT INTO inv.storage_sample_requests
+          (tenant_id,request_id,project_id,run_id,subject_id,contribution_id,run_version,attempt,root_path,sample_limit,challenge,challenge_sha256)
+          VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING RETURNING request_id""",
+            (
+                principal.tenant_id,
+                request_id,
+                project,
+                run_id,
+                principal.subject_id,
+                contribution,
+                run["version"],
+                run["attempt"],
+                root["normalized_path"],
+                sample,
+                Jsonb(asdict(challenge)),
+                challenge.digest(),
+            ),
+        ).fetchone()
+        if not created:
+            refused()
+        return challenge
 
     def _current(self, conn, pending, run, root, channel, challenge):
         if (

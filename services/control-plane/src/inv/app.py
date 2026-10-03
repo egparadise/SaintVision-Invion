@@ -316,7 +316,17 @@ def create_app(
         header = request.headers.get("authorization", "")
         if not header.startswith("Bearer ") or header.count(" ") != 1:
             raise DomainError("AUTH-0050", "A current access token is required", 401)
-        return tokens.verify(header[7:])
+        identity = tokens.verify(header[7:])
+        # Card 266: pin what the credential proved, for the denial recorder.
+        # Its contract is that the actor comes only from a *verified* credential
+        # pinned on request.state -- never parsed again from the header or body. The
+        # kernel never pinned it, so an authenticated refusal was recorded as
+        # ``anonymous`` with no tenant (Codex r1 F4). Set after verification, so an
+        # unauthenticated request still records as anonymous.
+        request.state.actor_type = "user"
+        request.state.actor_id = getattr(identity.principal, "subject_id", None)
+        request.state.tenant_id = getattr(identity.principal, "tenant_id", None)
+        return identity
 
     def key(request):
         value = request.headers.get("idempotency-key")
@@ -551,9 +561,9 @@ def create_app(
     ):
         return storage_view.result(identity.principal, project, run_id, request_id)
 
-    @api.post("/v1/projects/{project}/runs/{run_id}/storage-samples", status_code=201)
+    @api.post("/v1/projects/{project_id}/runs/{run_id}/storage-samples", status_code=201)
     async def collect_storage_sample(
-        request: Request, project: str, run_id: str, identity=Depends(authenticated)
+        request: Request, project_id: str, run_id: str, identity=Depends(authenticated)
     ):
         """Record one signed folder check, idempotently, against an active Run.
 
@@ -565,6 +575,11 @@ def create_app(
         ``run_id`` comes from the path only and the body carries no ``requestId``:
         the ``Idempotency-Key`` header is the single authority, and the protocol's
         own request id is derived from the scope and that key (card 263 §5-1-1).
+
+        The path parameter is ``project_id`` rather than this file's usual
+        ``project`` because the denial recorder's contract reads
+        ``path_params["project_id"]`` to decide the audited target; with the other
+        spelling an audited refusal recorded no project at all (Codex r1 F4).
 
         Unconfigured is 503 and writes nothing. A deployment without the node mTLS
         material cannot observe a folder, and "not observed" must never be recorded
@@ -582,7 +597,7 @@ def create_app(
         response, replayed = await run_in_threadpool(
             storage_sample_collector.collect,
             identity.principal,
-            project,
+            project_id,
             run_id,
             contribution=contribution,
             key=key(request),
@@ -1266,6 +1281,7 @@ def create_configured_app():
                 "configurationReadiness",
                 "buildCapsuleProviderId",
                 "buildPlanAuthority",
+                "storageSample",
             }
         ):
             raise ValueError()
@@ -1350,8 +1366,17 @@ def create_configured_app():
         if "storageSample" in settings:
             from .storage_check_collect import configured_storage_sample_collector
 
+            if denial_engine is None:
+                # The collect surface records AUTH/SEC refusals, and the recorder
+                # needs the app-role engine the business composition builds. Without
+                # it an audited refusal would quietly write nothing, so the process
+                # refuses to start instead (Codex r1 F4).
+                raise ValueError(
+                    "Storage sample collection requires the business surface for"
+                    " catalogue reads and denial recording"
+                )
             storage_sample_collector = configured_storage_sample_collector(
-                database, settings["storageSample"]
+                database, settings["storageSample"], denial_engine
             )
 
         return create_app(

@@ -47,9 +47,69 @@ class Transport:
 
 
 @pytest.fixture
-def collector(sample):  # noqa: F811
+def catalogue_engine(sample):  # noqa: F811
+    """A SQLAlchemy engine on a login role granted ``inv_app``.
+
+    Not the owner and not the kernel role: the boundary read is only meaningful if
+    it runs with the grants production gives it. Measured at head --
+    ``has_column_privilege('inv_kernel', 'public.data_locations', 'project_id',
+    'SELECT')`` is **False** and ``inv_app``'s is **True** -- which is the whole
+    reason that one question is asked on this connection.
+    """
+    import secrets
+
+    import psycopg
+    from psycopg import sql
+    from sqlalchemy import create_engine
+
+    role = "c266_app_" + secrets.token_hex(8)
+    password = secrets.token_urlsafe(24)
+    with psycopg.connect(sample.e.owner) as connection:
+        connection.execute(
+            sql.SQL("CREATE ROLE {} LOGIN PASSWORD {}").format(
+                sql.Identifier(role), sql.Literal(password)
+            )
+        )
+        connection.execute(sql.SQL("GRANT inv_app TO {}").format(sql.Identifier(role)))
+        connection.commit()
+    dsn = psycopg.conninfo.make_conninfo(sample.e.owner, user=role, password=password)
+    engine = create_engine("postgresql+psycopg://", connect_args=psycopg.conninfo.conninfo_to_dict(dsn))
+    try:
+        yield engine
+    finally:
+        engine.dispose()
+        with psycopg.connect(sample.e.owner) as connection:
+            connection.execute(sql.SQL("DROP ROLE IF EXISTS {}").format(sql.Identifier(role)))
+            connection.commit()
+
+
+def _bind_locations(sample, project_id):  # noqa: F811
+    """Put the folder's catalogue in a project, as the owner would.
+
+    The shared fixture predates ``0062`` in spirit -- its locations have no project
+    -- and the boundary now refuses exactly that, so each test says which project
+    the folder's contents belong to.
+    """
+    import psycopg
+
+    with psycopg.connect(sample.e.owner) as connection:
+        connection.execute(
+            "UPDATE public.data_locations SET project_id=%s WHERE contribution_id=%s",
+            (project_id, sample.contribution),
+        )
+        connection.commit()
+
+
+@pytest.fixture
+def collector(sample, catalogue_engine):  # noqa: F811
+    from inv.storage_check_collect import CatalogueProjectReader
+
+    _bind_locations(sample, sample.e.project)
     transport = Transport(sample.sampler, sample.certificate.der)
-    return StorageCheckCollector(sample.e.db, transport), transport
+    built = StorageCheckCollector(
+        sample.e.db, transport, CatalogueProjectReader(catalogue_engine)
+    )
+    return built, transport
 
 
 def _counts(sample):  # noqa: F811
@@ -446,3 +506,296 @@ def test_a_grant_revoked_during_the_node_call_refuses_the_late_replay(collector,
     # The stored answer did not go back to a subject who had lost the right to it,
     # and the late request wrote nothing of its own.
     assert _counts(sample) == stored
+
+
+# ===========================================================================
+# Card 266 r2: the project boundary (Codex r1 F2).
+#
+# storage_contributions has no project column, so the boundary comes from what
+# the folder holds. Ownership and tenancy alone let a same-tenant owner collect
+# a folder catalogued in another project, or in none.
+# ===========================================================================
+
+
+def _project(sample, suffix):  # noqa: F811
+    """A second project of this tenant, created as the owner."""
+    import psycopg
+
+    from inv.ids import new_id
+
+    project = new_id("prj")
+    with psycopg.connect(sample.e.owner) as connection:
+        connection.execute(
+            "INSERT INTO public.projects(tenant_id,project_id,code,display_name) "
+            "VALUES(%s,%s,%s,%s)",
+            (sample.e.tenant, project, suffix, suffix),
+        )
+        connection.commit()
+    return project
+
+
+def test_a_folder_catalogued_in_another_project_is_the_same_answer_as_absence(
+    collector, sample  # noqa: F811
+):
+    _bind_locations(sample, _project(sample, "c266-other"))
+    with pytest.raises(DomainError) as raised:
+        _collect(collector, sample, key="c266-other-project")
+    assert (raised.value.code, raised.value.status) == ("RES-0004", 404)
+    assert _counts(sample)[:3] == (0, 0, 0)
+
+
+def test_a_legacy_null_project_folder_is_refused(collector, sample):  # noqa: F811
+    """``0062`` made the column nullable, so a folder catalogued before it has NULL.
+    NULL is not "every project": it is none, and sampling it for a project would
+    record a check that project cannot claim."""
+    _bind_locations(sample, None)
+    with pytest.raises(DomainError) as raised:
+        _collect(collector, sample, key="c266-null-legacy")
+    assert (raised.value.code, raised.value.status) == ("RES-0004", 404)
+    assert _counts(sample)[:3] == (0, 0, 0)
+
+
+def test_a_folder_straddling_two_projects_is_refused_rather_than_half_sampled(
+    collector, sample  # noqa: F811
+):
+    """All-or-nothing: a mixed catalogue is somebody else's migration to finish."""
+    import hashlib
+
+    import psycopg
+
+    from inv.ids import new_id
+
+    other = _project(sample, "c266-mixed")
+    with psycopg.connect(sample.e.owner) as connection:
+        connection.execute(
+            "INSERT INTO public.data_locations(location_id,tenant_id,project_id,"
+            "contribution_id,uri,kind,relative_path,byte_size,checksum_sha256) "
+            "VALUES(%s,%s,%s,%s,'file:other.bin','dataset','other.bin',12,%s)",
+            (
+                new_id("dtl"), sample.e.tenant, other, sample.contribution,
+                hashlib.sha256(b"other bytes").hexdigest(),
+            ),
+        )
+        connection.commit()
+    with pytest.raises(DomainError) as raised:
+        _collect(collector, sample, key="c266-mixed")
+    assert (raised.value.code, raised.value.status) == ("RES-0004", 404)
+    assert _counts(sample)[:3] == (0, 0, 0)
+
+
+def test_the_boundary_read_runs_with_the_app_roles_grants(catalogue_engine):
+    """The measurement this placement rests on, asserted rather than remembered:
+    the kernel role cannot read that column and the app role can."""
+    from sqlalchemy import text as sql_text
+
+    with catalogue_engine.connect() as connection:
+        kernel, app = connection.execute(
+            sql_text(
+                "SELECT has_column_privilege('inv_kernel','public.data_locations',"
+                "'project_id','SELECT'), "
+                "has_column_privilege('inv_app','public.data_locations',"
+                "'project_id','SELECT')"
+            )
+        ).one()
+    assert kernel is False
+    assert app is True
+
+
+# ===========================================================================
+# Card 266 r2: the remaining counter-examples (Codex r1 F5).
+# ===========================================================================
+
+
+def test_two_samples_of_one_folder_differ_once_the_observed_second_moves(
+    collector, sample  # noqa: F811
+):
+    """The premise of the race test, corrected by measuring it.
+
+    I had assumed two samples of one folder **always** differ. They do not: the
+    signed payload carries ``observedAt`` as whole seconds and the signature is
+    deterministic, so two calls inside one second produce **byte-identical**
+    envelopes -- measured here, not reasoned about. The hazard the three phases
+    exist for is therefore not "always different" but "different as soon as the
+    second moves", which this asserts both ways.
+    """
+    import time
+
+    collector_obj, transport = collector
+    challenge = collector_obj.samples.issue(
+        sample.principal, sample.e.project, sample.run, sample.contribution,
+        request_id=str(uuid.uuid4()),
+    )
+    first, certificate = transport.storage_sample(challenge.channel, challenge)
+    immediately, _ = transport.storage_sample(challenge.channel, challenge)
+    _, first_hash = collector_obj.samples.bound_envelope(first, certificate)
+    _, immediate_hash = collector_obj.samples.bound_envelope(immediately, certificate)
+    # Same second, deterministic signature: identical. This is why a response-hash
+    # comparison alone can look fine in a fast test and fail in production.
+    assert first_hash == immediate_hash
+
+    time.sleep(1.05)
+    later, _ = transport.storage_sample(challenge.channel, challenge)
+    _, later_hash = collector_obj.samples.bound_envelope(later, certificate)
+    assert later_hash != first_hash
+
+
+def test_the_same_key_with_another_contribution_is_a_conflict(collector, sample):  # noqa: F811
+    _collect(collector, sample, key="c266-other-contribution")
+    with pytest.raises(DomainError) as raised:
+        _collect(
+            collector, sample, key="c266-other-contribution",
+            contribution="stc_" + "1" * 26,
+        )
+    assert raised.value.code == "IDEM-0001"
+
+
+def test_the_same_key_on_another_path_run_is_a_different_request(collector, sample):  # noqa: F811
+    """The key is scoped by the path, so the same text on another Run is not a
+    replay of this one: it derives a different request id and is judged on that
+    Run's own authority instead of being answered from this Run's ledger."""
+    first, _ = _collect(collector, sample, key="c266-run-scope")
+    collector_obj, _ = collector
+    assert derive_request_id(
+        tenant_id=sample.e.tenant, project_id=sample.e.project,
+        run_id=sample.run, key="c266-run-scope",
+    ) != derive_request_id(
+        tenant_id=sample.e.tenant, project_id=sample.e.project,
+        run_id="run_" + "0" * 26, key="c266-run-scope",
+    )
+    with pytest.raises(DomainError):
+        collector_obj.collect(
+            sample.principal, sample.e.project, "run_" + "0" * 26,
+            contribution=sample.contribution, key="c266-run-scope",
+        )
+    assert _counts(sample)[3] == [first]
+
+
+def test_a_crash_inside_the_pre_io_phase_leaves_neither_row(collector, sample):  # noqa: F811
+    """F3's reason, measured: the ledger row and the pending request are in one
+    transaction, so a failure between them strands nothing."""
+    collector_obj, transport = collector
+    real_issue = collector_obj.samples.locked_issue
+
+    def issue_then_fail(*args, **kwargs):
+        real_issue(*args, **kwargs)
+        raise RuntimeError("injected inside the pre-I/O transaction")
+
+    collector_obj.samples.locked_issue = issue_then_fail
+    try:
+        with pytest.raises(RuntimeError, match="injected"):
+            _collect(collector, sample, key="c266-preio-crash")
+    finally:
+        collector_obj.samples.locked_issue = real_issue
+
+    with sample.e.db.transaction(sample.e.tenant) as c:
+        pending = c.execute(
+            "SELECT count(*) AS n FROM inv.storage_sample_requests"
+        ).fetchone()["n"]
+    assert pending == 0
+    assert _counts(sample)[3] == []
+    assert transport.calls == 0
+
+
+def test_a_project_the_kernel_knows_but_the_business_surface_does_not_fails_closed(
+    collector, sample  # noqa: F811
+):
+    """``business_permission`` returns **None** for a project with no
+    ``inv.business_projects`` row unless it is asked with ``linked=True``.
+
+    Without that flag the next line read ``granted["userId"]`` off None and the
+    caller got a 500 where the honest answer is a fail-closed refusal (Codex r1).
+    A kernel-only project is exactly that shape, so it is built here rather than
+    reasoned about.
+    """
+    import psycopg
+
+    from inv.ids import new_id
+
+    kernel_only = new_id("prj")
+    with psycopg.connect(sample.e.owner) as connection:
+        connection.execute(
+            "INSERT INTO public.projects(tenant_id,project_id,code,display_name) "
+            "VALUES(%s,%s,'c266-kernel-only','c266-kernel-only')",
+            (sample.e.tenant, kernel_only),
+        )
+        # The kernel knows it; the business surface does not. That is the shape --
+        # an inv.projects row with no inv.business_projects row.
+        connection.execute(
+            "INSERT INTO inv.projects VALUES(%s,%s)", (sample.e.tenant, kernel_only)
+        )
+        # A grant exists, so the first check passes and the second one is reached --
+        # which is the only way this path gets exercised at all.
+        connection.execute(
+            "INSERT INTO inv.project_grants(tenant_id,project_id,subject_id,can_request) "
+            "VALUES(%s,%s,%s,true)",
+            (sample.e.tenant, kernel_only, sample.principal.subject_id),
+        )
+        connection.commit()
+
+    collector_obj, _ = collector
+    with pytest.raises(DomainError) as raised:
+        collector_obj.collect(
+            sample.principal, kernel_only, sample.run,
+            contribution=sample.contribution, key="c266-kernel-only",
+        )
+    assert raised.value.code == "AUTH-0030"
+    assert raised.value.status == 403
+    assert _counts(sample)[:3] == (0, 0, 0)
+
+
+def test_a_partly_migrated_folder_is_refused_even_though_some_rows_are_in_project(
+    collector, sample  # noqa: F811
+):
+    """The case the all-NULL test cannot reach.
+
+    With every row NULL the folder is refused for having nothing *inside* the
+    project, which is true but not the reason that matters. A folder with one row
+    bound and one still NULL has something inside, so only the "nothing outside"
+    half can refuse it -- and a NULL that stopped counting as outside would let it
+    through. The sweep found this gap, which is what a sweep is for.
+    """
+    import hashlib
+
+    import psycopg
+
+    from inv.ids import new_id
+
+    with psycopg.connect(sample.e.owner) as connection:
+        connection.execute(
+            "INSERT INTO public.data_locations(location_id,tenant_id,project_id,"
+            "contribution_id,uri,kind,relative_path,byte_size,checksum_sha256) "
+            "VALUES(%s,%s,NULL,%s,'file:unmigrated.bin','dataset','unmigrated.bin',12,%s)",
+            (
+                new_id("dtl"), sample.e.tenant, sample.contribution,
+                hashlib.sha256(b"unmigrated bytes").hexdigest(),
+            ),
+        )
+        connection.commit()
+    with pytest.raises(DomainError) as raised:
+        _collect(collector, sample, key="c266-partly-migrated")
+    assert (raised.value.code, raised.value.status) == ("RES-0004", 404)
+    assert _counts(sample)[:3] == (0, 0, 0)
+
+
+def test_the_pre_io_phase_issues_on_the_transaction_it_already_holds(collector):  # noqa: F811
+    """A source-level assertion, and it says so.
+
+    ``issue`` opens its **own connection** (``db.transaction`` connects), so calling
+    it from inside phase one would commit the pending request on a second
+    connection before this transaction -- and a failure afterwards would strand it
+    with no ledger row to consume it (Codex r1 F3).
+
+    This is checked by reading the code rather than by behaviour because the two
+    shapes are indistinguishable from outside unless the *commit itself* fails
+    after a successful issue, and there is no honest way to inject that here. A
+    weaker check that is true beats a stronger one that is staged.
+    """
+    import inspect
+
+    collector_obj, _ = collector
+    source = inspect.getsource(type(collector_obj).collect)
+    pre_io, final = source.split("--- 2. node I/O", 1)
+    assert "self.samples.locked_issue(" in pre_io
+    assert "self.samples.issue(" not in pre_io
+    # And the method it must not use is still there for its own callers.
+    assert hasattr(collector_obj.samples, "issue")
