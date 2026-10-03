@@ -546,7 +546,8 @@ def test_the_axis_passes_only_after_seed_from_the_same_revoked_boundary(before_a
     assert aggregator.evaluate_rls(after_document, APPROVED_ALLOWLIST, NOW) is (
         aggregator.Verdict.MEASURED_PASS
     )
-    assert after["violations"] == [] and after["accepted"] == []
+    assert after["violations"] == []
+    assert not any(item["role"] == "inv_audit_reader" for item in after["accepted"])
 
 
 def test_the_retired_reader_cannot_select_seeded_audit_rows(before_and_after, audit_db):

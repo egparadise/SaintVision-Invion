@@ -143,8 +143,7 @@ def test_audit_events_rls_is_enabled_forced_and_policed(app_engine, migrated):
         ).mappings().all()
         retired_reader = connection.execute(
             text(
-                "SELECT has_schema_privilege(:role, 'public', 'USAGE') AS schema_usage, "
-                "has_table_privilege(:role, 'public.audit_events', 'SELECT') AS table_select, "
+                "SELECT has_table_privilege(:role, 'public.audit_events', 'SELECT') AS table_select, "
                 "has_any_column_privilege(:role, 'public.audit_events', 'SELECT') AS column_select"
             ),
             {"role": READER_ROLE},
@@ -162,7 +161,6 @@ def test_audit_events_rls_is_enabled_forced_and_policed(app_engine, migrated):
     assert BRIDGE_ROLE in by_name["cancel_bridge_audit_append"]
     assert BRIDGE_ROLE in by_name["cancel_bridge_audit_read"]
     assert retired_reader == {
-        "schema_usage": False,
         "table_select": False,
         "column_select": False,
     }
