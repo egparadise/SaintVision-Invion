@@ -12,7 +12,7 @@
 # PREREQUISITE for this Tier-A local archive: pre-provision the external wal_archive
 # volume owned by the postgres image's runtime user (postgres:16-alpine -> uid/gid 70;
 # confirm with `docker run --rm postgres:16-alpine id postgres`), mode 0700, mirroring
-# how server_config / workspace_data are provisioned. Otherwise the archive_command
+# how api_config / worker_config / workspace_data are provisioned. Otherwise archive_command
 # cannot write and WAL will accumulate in pg_wal until the data disk fills.
 services:
   postgres:

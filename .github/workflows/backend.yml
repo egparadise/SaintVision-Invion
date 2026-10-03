@@ -177,7 +177,9 @@ jobs:
           # evidence rather than being counted as success or allowed to grow.
           expected_skips = Counter({
               'PowerShell and csc.exe shim require Windows': 1,
-              'Explicit pinned local candidate image required': 2,
+              # Card 262: two volume copy/cleanup cases plus the API namespace
+              # isolation case run with INV_TEST_CONFIG_IMAGE in hosted Core.
+              'Explicit pinned local candidate image required': 3,
               'Actual Windows PowerShell launcher': 10,
               'Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)': 1,
               # G-02: the two live archiver cases now run here (docker exec probe,
