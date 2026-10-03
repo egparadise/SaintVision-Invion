@@ -26,6 +26,11 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Protocol
 
+try:
+    from tools.migration_graph import reviewed_security_preserving_downgrade
+except ModuleNotFoundError:  # direct ``python tools/aggregate_ac11_evidence.py``
+    from migration_graph import reviewed_security_preserving_downgrade
+
 
 ROOT = Path(__file__).resolve().parents[1]
 ALLOWLIST_REPO_PATH = "docs/vault/30_Development/Evidence/s11-security-allowlist-v0.json"
@@ -33,13 +38,13 @@ DEFAULT_ALLOWLIST = (
     ROOT / ALLOWLIST_REPO_PATH
 )
 TARGET_REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
-TARGET_REGISTRY_BLOB = "c3db4aafd1c90e12e93b1cd2c465438d2763a5b3"
-ALLOWLIST_BLOB = "6c57afcf7b8b4e4a2ecb874f41b01501e48a2a74"
-ALLOWLIST_CANONICAL_SHA256 = "ec896c3f9398c1e888b1c90e4c287ae06cab92f5a9ad4785ff66be38ecb296c2"
+TARGET_REGISTRY_BLOB = "45fa057257e4002d80d6ce4045e1decf52793f59"
+ALLOWLIST_BLOB = "544ed7258759e516b7c56f86e466e348fdde6f8e"
+ALLOWLIST_CANONICAL_SHA256 = "2cf1e52f64e19f4474917baf2c8e5ad70015f099fb4f1da85fba4b7e6b3c7735"
 SCAN_ALLOWLIST_REPO_PATH = (
     "docs/vault/30_Development/Evidence/s11-security-dependency-sast-allowlist-v1.json"
 )
-SCAN_ALLOWLIST_BLOB = "1d65a5b718d82414fa0479478150b078074984a4"
+SCAN_ALLOWLIST_BLOB = "9ea1bcfc754722eb9fd892c8db9f169be2b0cee0"
 #: The importer that may write this axis's envelopes, pinned by path here and by blob in
 #: the reviewed allowlist above (#313 F-R3).
 SECURITY_IMPORTER_REPO_PATH = "tools/import_ac11_security_scan.py"
@@ -84,11 +89,11 @@ PIN_RE = re.compile(r"^([A-Za-z0-9_.-]+)(?:\[[^\]]+\])?==([^\s;]+)$")
 
 DEFINER_FILES = [
     {"path": "tools/check_definer_functions.py", "blob": "5831f8d8806900146add2e5e7b51b934dced3952"},
-    {"path": "tools/definer-policy.json", "blob": "bfac852e430c5310f601f551e4acdd005167d9c3"},
+    {"path": "tools/definer-policy.json", "blob": "32a9a4b2724b50555c4980725e167f3f17aba7cb"},
 ]
 RLS_FILES = [
     {"path": "tools/collect_rls_evidence.py", "blob": "d95fddf3260029953e0062e838bd2905e78702bf"},
-    {"path": "tools/rls-boundary-baseline.json", "blob": "5f6eb104fa6ca455de78423a6f678fd8fc99d6df"},
+    {"path": "tools/rls-boundary-baseline.json", "blob": "0327d9ce12b09edd5f6fd59cde5e53fef452872f"},
 ]
 
 #: E4 may fall back to an owner-verified readable key only for these (role, table, columns)
@@ -459,6 +464,7 @@ def _migration_reversible_segment(git: GitReader, source: str) -> tuple[str, str
             parents = () if down is None else (down,) if isinstance(down, str) else tuple(down)
             if not parents and down is not None or any(not isinstance(item, str) for item in parents):
                 raise ValueError("invalid down_revision")
+            security_preserving = reviewed_security_preserving_downgrade(tree, revision)
             if downgrade is None:
                 irreversible = True
             else:
@@ -469,7 +475,9 @@ def _migration_reversible_segment(git: GitReader, source: str) -> tuple[str, str
                 # A no-op ``pass`` is not an approved irreversible declaration. Treat
                 # it as a reversible tail candidate so a structural N/A cannot hide
                 # the stage-2 negative fixture that must reject no-op downgrades.
-                irreversible = len(body) == 1 and isinstance(body[0], ast.Raise)
+                irreversible = security_preserving or (
+                    len(body) == 1 and isinstance(body[0], ast.Raise)
+                )
             revisions[revision] = (parents, irreversible or len(parents) > 1)
         except (SyntaxError, ValueError, TypeError) as exc:
             raise ValueError(f"invalid migration graph entry: {path}") from exc

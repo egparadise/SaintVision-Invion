@@ -60,7 +60,7 @@ services:
       - INV_KERNEL_BASE_URL=${INV_KERNEL_BASE_URL:-http://127.0.0.1:8080}
     volumes:
       - type: volume
-        source: server_config
+        source: api_config
         target: /run/saintvision
         read_only: true
         volume:
@@ -87,14 +87,20 @@ services:
       - INV_RUNTIME_DSN=${INV_RUNTIME_DSN:?Set the non-owner kernel login DSN}
       - INV_RECOVERY_EPOCH=${INV_RECOVERY_EPOCH:?Set the reconciled database recovery epoch}
       - INV_API_CONFIG=/run/saintvision/api.json
-      - INV_WORKER_CONFIG=/run/saintvision/worker.json
+      - INV_WORKER_CONFIG=/run/saintvision-worker/worker.json
       # Product BuildKit work is an explicit rollout decision.  The delivery
       # worker still runs while this remains at its safe default of zero.
       - INV_BUILDKIT_PRODUCT_ENABLED=${INV_BUILDKIT_PRODUCT_ENABLED:-0}
     volumes:
       - type: volume
-        source: server_config
+        source: api_config
         target: /run/saintvision
+        read_only: true
+        volume:
+          nocopy: true
+      - type: volume
+        source: worker_config
+        target: /run/saintvision-worker
         read_only: true
         volume:
           nocopy: true
@@ -143,9 +149,12 @@ services:
       - saintvision-net
 
 volumes:
-  server_config:
+  api_config:
     external: true
     name: ${INV_CONFIG_VOLUME:?Prepare a private server configuration volume first}
+  worker_config:
+    external: true
+    name: ${INV_WORKER_CONFIG_VOLUME:?Prepare a private worker configuration volume first}
   postgres_data:
   minio_data:
 

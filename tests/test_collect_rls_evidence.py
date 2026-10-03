@@ -425,7 +425,11 @@ def test_real_pg_boundary_passes_and_records_kernel_denial(rls_db, tmp_path):
     # 0047_audit_events_isolation: inv_app has no SELECT on the table and RLS is
     # enabled and forced, so no expectation applies to it for that role.
     assert [(v["rule"], v["role"], v["table"]) for v in violations] == []
-    assert {(a["role"], a["table"]) for a in accepted} == {("inv_app", "public.tenants")}
+    assert accepted == []
+    tenant_registry = observation["roles"]["inv_app"]["tables"]["public.tenants"]
+    assert tenant_registry["privileges"] == {
+        "select": None, "insert": None, "update": None, "delete": None,
+    }
     audit = observation["roles"]["inv_app"]["tables"]["public.audit_events"]
     assert audit["rls_enabled"] and audit["rls_forced"]
     assert audit["privileges"] == {"select": None, "insert": "table", "update": None, "delete": None}

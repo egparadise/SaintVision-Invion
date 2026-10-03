@@ -205,7 +205,7 @@ def test_the_boundary_is_measured_over_the_collector_s_own_role_population(monke
 # ---------------------------------------------------------------- card 236: the audit seed
 
 REVIEWED_ROW = {
-    "rule": "E3", "role": "inv_app", "table": "public.tenants",
+    "rule": "E3", "role": "inv_discovery_issuer", "table": "public.tenants",
     "detail": "2 rows visible with inv.tenant_id unset",
 }
 AUDIT_ROWS = [
@@ -289,7 +289,7 @@ def test_an_exception_the_reviewed_allowlist_does_not_carry_is_a_violation(monke
     # outside it is a violation.
     assert observed_violations == expected_violations
     assert all(row in reviewed for row in observed_accepted)
-    assert ("inv_app", "public.tenants", "E3") in observed_accepted
+    assert ("inv_discovery_issuer", "public.tenants", "E3") in observed_accepted
     for row in AUDIT_READER_ROWS:
         assert (row in observed_accepted) == (row in reviewed), row
     # And the verdict follows from that, rather than being written down.

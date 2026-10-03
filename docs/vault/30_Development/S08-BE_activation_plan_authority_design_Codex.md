@@ -37,6 +37,12 @@ This decision closes the three Medium prerequisites left by Card 247. It does no
    boundary. Product dispatch remains default-off; a later activation decision must either split
    API/worker volumes or explicitly accept this co-mount as part of the API container trust base.
 
+**Card 262 implementation note:** the split alternative is now implemented. `api_config` remains at
+`/run/saintvision`; a distinct `worker_config` is mounted only by the worker at
+`/run/saintvision-worker`. Worker TLS references into the API root are rejected, and the flag
+remains default-off. The historical paragraph above records why the split was required rather than
+the current deployment boundary.
+
 ## Binding points
 
 - `services/control-plane/src/inv/build_preparations.py`: profile budget rebind, project policy

@@ -328,7 +328,7 @@ gh run list --workflow s08-buildkit-reference.yml --commit "$(git rev-parse HEAD
 
 | 무엇 | 요구 |
 |---|---|
-| `INV_WORKER_CONFIG` | **operator-owned 공개 설정 파일 경로.** `trusted_file`이 regular file·**64KiB 이하**·**group/other 쓰기 권한 없음**(`mode & 0o022 == 0`)을 요구하고, `strict_object`가 **중복 JSON key를 거부**한다 |
+| `INV_WORKER_CONFIG` | worker 전용 read-only volume의 `/run/saintvision-worker/worker.json`. `trusted_file`이 regular file·**64KiB 이하**·**group/other 쓰기 권한 없음**(`mode & 0o022 == 0`)을 요구하고, `strict_object`가 **중복 JSON key를 거부**한다 |
 | 설정 최상위 key | `tenantId`·`tls`는 **필수**, 그 밖에는 `outputRoot`·`buildExecution`만 허용(다른 key가 있으면 시작 거부) |
 | `buildExecution` | **정확히 아홉 key**: `buildctlPath` · `address` · `sourceRoot` · `referenceHealthReceipt` · `productReceiptDirectory` · `builderInstanceId` · `builderProfileId` · `providerRecoveryEpoch` · `nodeId`. 하나 빠지거나 하나 더 있으면 `Exact build execution configuration required`로 거부(§7에서 실제로 확인했다) |
 | `tls` | `NodeTLSClient(ca_file=…, certificate_file=…, key_file=…)` 로 그대로 전달된다 — mTLS 자료의 **컨테이너 경로** |
@@ -339,18 +339,34 @@ gh run list --workflow s08-buildkit-reference.yml --commit "$(git rev-parse HEAD
 
 플래그가 켜져 있는데 `buildExecution`이 없으면 worker는 **시작하지 않는다**(`Build execution configuration unavailable`). 즉 **반쯤 켜진 상태는 없다.**
 
-### 3-1. **BLOCKED — 이 tree에는 그 프로세스를 돌릴 배포 정의가 없다. 그 정의는 카드 241이 가져온다**
+### 3-1. 배포 정의와 설정 volume을 먼저 검증한다
 
-측정(§7), **이 tree에서**:
+`docker-compose.prod.yml`의 `worker` 서비스는 `python -m inv.worker`를 실행하고 포트를
+공개하지 않는다. API와 worker가 함께 읽는 `api.json` 계열은 `api_config` volume으로,
+`worker.json`과 그 Node TLS 자료는 별도 `worker_config` volume으로 전달한다. 두 mount는
+모두 read-only이고, control-plane은 `worker_config`를 mount하지 않는다.
 
-- `docker-compose.prod.yml`에 **`inv.worker`를 실행하는 서비스가 없고**, `INV_WORKER_CONFIG`도 `INV_BUILDKIT_PRODUCT_ENABLED`도 **없다**.
-- `tools/prepare_server_config.py`의 `collect()`는 **`api.json`과 그 파일이 참조하는 파일만** config volume에 넣는다 — **`worker.json`을 넣는 경로가 없다**(그 함수는 `api.json`의 `identity.jwks_file`·`configurationReadiness`·`workspace`에서만 참조를 모은다).
+보호된 설정 디렉터리의 worker TLS 경로는 반드시 flat
+`/run/saintvision-worker/<file>`이어야 한다. 다음 명령은 기존 volume을 덮어쓰지 않고 두
+새 volume을 함께 만들고 검증한다. 둘 중 하나라도 실패하면 이 실행이 만든 volume만
+정리한다.
 
-**그래서 이 문서는 그 정의를 지어내지 않는다.** 배포 worker 서비스와 `INV_WORKER_CONFIG` 준비(= config volume에 `worker.json`이 들어가는 경로)는 **카드 241이 실제로 추가할 예정**이고, **그 PR이 착지한 뒤 이 절차는 그 정의를 따른다** — 서비스 이름·image·mount 경로·준비 명령은 그때 그 PR에서 읽는다. 여기 적어 두면 그 정의와 어긋날 수 있고, **어긋난 절차는 절차가 아니다**.
+```bash
+python tools/prepare_server_config.py \
+  --directory /path/to/deployment/config \
+  --volume saintvision-api-config-v1 \
+  --worker-volume saintvision-worker-config-v1 \
+  --image sha256:<reviewed-backend-image-id>
+```
 
-> **이전 판(r1)은 여기에 compose 블록을 적었다.** 그것은 이 문서가 **지어낸** 정의였고, 서비스 이름(`worker`)과 `worker.json`을 named volume에 넣는 전제가 **배포 도구의 실제 지원 범위와 달랐다**(위 두 번째 측정). r2에서 그 블록을 **지우고** 조건부 서술로 바꿨다.
+운영자 환경 파일에는 서로 다른 두 이름을 넣는다. `docker compose config`가 성공하기
+전에는 서비스를 시작하지 않는다.
 
-**지금 정답은 "아직 켤 수 없다"** 이고 근거는 §1-B·§1-D의 출력과 이 절의 두 측정이다. §3-0의 세 가지 — **켜는 대상은 worker 프로세스**, **값은 정확히 `1`**, **그 프로세스를 재시작해야 읽힌다** — 는 **코드에서 읽은 것**이므로 카드 241이 무엇을 정하든 바뀌지 않는다. 그 아래 §3-2·§3-3은 그 정의가 생긴 뒤에 쓰는 뼈대이고, 그 전에는 실행하지 않는다.
+```bash
+INV_CONFIG_VOLUME=saintvision-api-config-v1
+INV_WORKER_CONFIG_VOLUME=saintvision-worker-config-v1
+docker compose -f docker-compose.prod.yml config --quiet
+```
 
 ### 3-2. 운영자 환경 파일에 값을 넣는다
 
@@ -364,7 +380,8 @@ grep -c '^INV_BUILDKIT_PRODUCT_ENABLED=1$' /path/to/deployment/.env   # 1이어�
 
 ```bash
 # 컨테이너가 읽을 파일의 권한. group/other 쓰기 비트가 있으면 worker가 시작을 거부한다.
-stat -c '%a %U %n' /path/to/deployment/config/worker.json
+docker compose -f docker-compose.prod.yml exec -T worker \
+  stat -c '%a %U %n' /run/saintvision-worker/worker.json
 ```
 
 ### 3-3. 재시작 순서
